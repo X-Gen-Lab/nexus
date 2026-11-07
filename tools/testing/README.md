@@ -1,59 +1,39 @@
-# Host TDD execution
+# 宿主 TDD 与合同执行
 
-New public C API and provider behavior uses GoogleTest and GoogleMock. Firmware
-remains C11. The framework is the `ext/googletest` Git submodule, pinned by
-`dependencies/googletest.lock.json` and the matching Gitlink. Prepare it explicitly
-with `python tools/dev/dev.py prepare --scope native --allow-network` or
-`git submodule update --init --recursive ext/googletest` before running Native
-tests. Configuration uses only this local source, rejects missing, modified or
-incorrectly pinned checkouts, and never downloads dependencies. Firmware and
-source SDK consumers do not require the host test submodule.
+新增公共 C API／provider 行为使用 GoogleTest／GoogleMock，固件保持 C11。
+框架来自 `ext/googletest`，由 `dependencies/googletest.lock.json` 和 Gitlink 锁定。
+先执行 `python tools/dev/dev.py prepare --scope native --allow-network` 或
+`git submodule update --init --recursive ext/googletest`。配置只读本地框架，拒绝
+缺失、修改、错误 pin，不下载依赖。固件和 SDK 消费不要求宿主框架。
 
-The selected framework includes an organization-fork ownership fix on upstream
-1.16.0 (`6910c9d9165801d8827d628cb72eb7ea9dd538c5`). It disables `RE`
-copy-assignment while preserving deep-copy construction, preventing shallow
-ownership of POSIX regular-expression state. The lock and Gitlink select the
-patched commit; the lock's `upstream_commit` and official URL record upstream
-provenance, while
-`.gitmodules` selects the reviewed organization fork for retrieval. This patch
-applies only to host tests.
+所选组织 fork 基于上游 1.16.0（`6910c9d9165801d8827d628cb72eb7ea9dd538c5`），
+修复 `RE` 所有权：禁用 copy-assignment、保留深拷贝构造，避免 POSIX 正则状态浅拷贝。
+lock／Gitlink 选补丁提交，`upstream_commit`／官方 URL 记来源，`.gitmodules`
+选已审组织检索路径。该补丁仅作用宿主测试。
 
-Run the same check locally and in CI:
+从仓库根执行与 CI 相同门禁：
 
 ```sh
 python scripts/ci/tdd_gate.py --all --preset native-debug
 ```
 
-The gate executes the four complete tool domains (`testing`, `configure`, `ci`
-and `workflows`), builds the explicit `nexus_google_contracts` target, discovers
-all cases in each binary, then runs them without filters or shards. Fresh XML
-must contain completed, passing cases and the same number of cases as discovery. Empty, stale, skipped, failed and partial
-runs cannot establish acceptance. Raw commands and results are in
-`build/<preset>/tdd/`; `execution.json` is a development execution record.
+门禁执行 `testing`／`configure`／`ci`／`workflows` 四个完整工具域，构建
+`nexus_google_contracts`，发现各程序全部用例后无 filter／shard 执行。新 XML 必须
+是已完成通过、且身份与数量匹配 discovery；空、陈旧、跳过、失败、部分执行均不能
+验收。原始命令结果位于 `build/<preset>/tdd/`，`execution.json` 是开发记录。
 
-The pre-commit hook calls the same gate for behavioral changes, including every
-`tools/` and `scripts/` path. The local baseline executes those four complete
-tool domains and all GoogleTest contracts. Longer SDK/contract and FreeRTOS tool
-suites run in their explicit CI domains. The gate checks relevant staged source
-against unstaged or untracked behavior before and after execution and requires
-the exact Git index tree to remain unchanged. A late source or staging change rejects the new summary. Git's
-pre-commit runner temporarily stashes tracked unstaged edits before hooks execute.
-It loads the current `.pre-commit-config.yaml`, so an already installed hook reads
-new gate definitions without reinstalling. CI executes the gate independently.
-Child configure/build/test processes clear Git's repository-local environment so
-SDK submodules use their own repository and index. The gate itself retains the
-active commit index for its staged snapshot checks.
+行为变更的 commit hook 调相同 gate，包括适用 tools／scripts 输入。较长 SDK／合同
+和 FreeRTOS 工具测试有自己的 CI 域。gate 前后检查 staged 与未暂存／未跟踪行为，
+要求 index tree 不变；迟到源码或暂存修改拒绝本次摘要。pre-commit 临时 stash 已
+跟踪的未暂存编辑，读取当前 `.pre-commit-config.yaml`，新 gate 定义无需重装 hook；
+CI 独立执行。子 configure／build／test 清除 Git 仓库局部环境，子模块使用自己的
+index；gate 自身保留实际提交 index 做快照检查。
 
-The `evidence/` directory records selected actual RED/GREEN development steps.
-Some initial RED records are compiler/linker failures for new interfaces; UART
-owner, IRQ wake, stream storage and staged execution records include actual
-failing behavior. Existing owner
-regressions were added after the earlier implementation and have GREEN records
-only. These records do not prove that every historical edit followed TDD, bind a
-clean release candidate, or establish physical MCU qualification.
+`evidence/` 记录选定 RED／GREEN。有些初期 RED 是新接口编译／链接失败；UART
+owner、IRQ wake、stream storage、staged execution 另有真实行为失败。早期 owner
+回归在实现后添加，仅有 GREEN。记录不能证明每次历史编辑都先 RED，也不建立 clean
+candidate 或物理资格。
 
-GoogleMock tests replace dependency ports while calling the real Nexus public
-API. Provider storage, admission, cancellation, quarantine, instance isolation,
-notification and DMA drain behavior are checked at their observable boundaries.
-Python tool tests use stdlib unittest and must also execute nonempty suites with
-no skipped or expected-failure cases.
+GoogleMock 替换依赖端口并调用真实 API，检查存储、准入、取消、隔离、实例独立、
+通知和 DMA 排空。Python 工具使用 stdlib unittest，同样要求非空执行，无 skipped
+或 expected-failure 用例。

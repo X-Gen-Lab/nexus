@@ -1,24 +1,14 @@
-# GD32 controller compile/link fixtures
+# GD32 控制器编译／链接夹具
 
-These development software fixtures explicitly assemble the actual GD32F470ZGT6
-providers for SPI4, I2C0, internal FMC, FWDGT, EXTI3, TIMER2 PWM, and ADC0 single
-or two-channel low-rate scan. Each independent firmware avoids conflicting pins
-and uses the public typed API. I2C has two fixed 7-bit address endpoints sharing
-one controller; SPI uses the provider's reviewed built-in active-low PF6 CS.
+独立软件装配选择 GD32F470ZGT6 的 SPI4、I2C0、内部 FMC、FWDGT、EXTI3、TIMER2
+PWM、ADC0 单次或双通道低速 scan，分别避免 pad 冲突，使用 typed API。I2C 两个
+固定 7-bit endpoint 共用 controller；SPI 使用已审 active-low PF6 CS。
 
-The `software_board` is not a physical PCB package. It does not qualify external
-pull-ups, fitted devices, oscillators, analog input, VDD, or actual electrical
-wiring. These firmware images are ineligible for physical HIL and product
-promotion. Volatile reads of every selected typed factory face retain concrete
-operations tables and initialized methods without invoking Flash programming
-or watchdog enable. The post-link `bin/provider-retention.json` audit verifies
-actual face/table LOAD bytes, public ABI layout, provider initializer methods
-and local function source identity. Production-source host fault models execute
-operation behavior separately.
+`software_board` 不是 PCB，不证明 pull-up、焊接器件、晶振、模拟输入、VDD 或接线，
+不具备 HIL／产品晋级资格。volatile 读取每个 factory face 保留真实方法表和初始化
+方法，不执行 Flash program／watchdog enable。`bin/provider-retention.json`
+核对 face／table LOAD、公共 ABI、初始化方法与本地函数源码身份，host 模型另测行为。
 
-Configure this directory as an independent consumer with `NEXUS_SOURCE_ROOT`,
-one explicit TOML `NEXUS_ASSEMBLY_FILE`, and the platform ARM toolchain. Actual
-ELF links and retention reports demonstrate API/ABI/construction, selected
-resource allocation and retained method bytes.
-They do not establish cycle counts or inherit physical reference-Board
-qualification.
+作为独立 consumer，传 `NEXUS_SOURCE_ROOT`、一份 `NEXUS_ASSEMBLY_FILE` 和平台
+ARM toolchain。ELF／retention 只证明 API／ABI／构造、资源分配和方法字节，不测
+cycles，也不继承物理参考板资格。

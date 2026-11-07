@@ -1,161 +1,124 @@
-# Qiming STM32F407ZG core-board schematic reference
+# 启明 STM32F407ZG 核心板原理图参考
 
-This independent minimum-system board has its own STM32F407ZGT6, power supply,
-8 MHz HSE and 32.768 kHz LSE. It is not assumed to plug into the separately
-drawn V4.1 high-configuration board. `schematic-2020-05-05` identifies the
-uploaded drawing; the physical PCB revision remains unknown.
+这是独立的最小系统板，具有自己的 STM32F407ZGT6、电源、8 MHz HSE 和 32.768 kHz
+LSE，不假定它插接在另行绘制的 V4.1 高配板上。`schematic-2020-05-05` 标识上传
+图纸，实际 PCB 修订仍未知。
 
-`board.json` records the original PDF SHA-256, sheet and relevant nets. The PDF
-itself is not republished. These declarations establish reviewed schematic
-connections, not fitted parts, connector continuity or physical qualification.
+`board.json` 记录原 PDF 的 SHA-256、页号与相关网络，原 PDF 不再发布。声明只建立
+已审原理图连接，不证明器件已安装、连接器导通或实板资格。芯片机制见
+[F407 实现](../../soc/stm32/stm32f407/README.md)。
 
-| Binding | Exact reviewed connection |
+## 已审绑定
+
+| 绑定 | 精确连接 |
 | --- | --- |
-| `led0`, `led1` | PG13, PG14, active low; initial high before output mode |
-| `key0`, `key1` | PF6, PF7, switches to ground; input with explicit pull-up |
-| `key0-edge`, `key1-edge` | Alternative EXTI owners of those same switches |
-| `uart1` | USART1 PA9/PA10 to the CH340C and download circuit |
-| `uart2`, `uart3` | USART2 PA2/PA3; USART3 PB10/PB11 |
-| `uart4`, `uart5`, `uart6` | UART4 PA0/PA1; UART5 PC12/PD2; USART6 PC6/PC7 |
-| `i2c1` | PB6/PB7, 4.7 kOhm pull-ups; drawn AT24C02 address pins grounded |
-| `spi1`, `nor-cs` | SPI1 PB3/PB4/PB5 and PG8 CS, conditional NOR fitting |
-| `can1`, `can2` | PB8/PB9 and PB12/PB13, exported without on-board transceivers |
-| `usbfs` | PA11/PA12 to J1; explicit declared device connection |
-| `lcd-backlight` | PF10 GPIO, initially low for the identified active-high module |
-| `touch-clk`, `touch-mosi`, `touch-miso`, `touch-cs` | PA5, PB1, PB2, PB0; mixed GPIO, not a hardware SPI route |
-| `touch-pen`, `touch-pen-edge` | PF11 input or alternative EXTI11 owner |
+| `led0`、`led1` | PG13、PG14，低有效；先写高再启用输出 |
+| `key0`、`key1` | PF6、PF7 开关接地，输入须显式上拉 |
+| `key0-edge`、`key1-edge` | 同一开关的替代 EXTI owner |
+| `uart1` | USART1 PA9/PA10，接 CH340C 和下载电路 |
+| `uart2`、`uart3` | USART2 PA2/PA3；USART3 PB10/PB11 |
+| `uart4`、`uart5`、`uart6` | UART4 PA0/PA1；UART5 PC12/PD2；USART6 PC6/PC7 |
+| `i2c1` | PB6/PB7，4.7 kOhm 上拉，图中 AT24C02 地址脚接地 |
+| `spi1`、`nor-cs` | SPI1 PB3/PB4/PB5、PG8 CS，取决于 NOR 实装 |
+| `can1`、`can2` | PB8/PB9、PB12/PB13 导出，板上无收发器 |
+| `usbfs` | PA11/PA12 至 J1，显式声明 device 连接 |
+| `lcd-backlight` | PF10 GPIO，对已识别高有效模块初始低 |
+| `touch-clk`、`touch-mosi`、`touch-miso`、`touch-cs` | PA5、PB1、PB2、PB0，混合 GPIO，非硬件 SPI 路线 |
+| `touch-pen`、`touch-pen-edge` | PF11 输入或替代 EXTI11 owner |
 
-Only D0/LED0 and D1/LED1 are drawn as controlled LEDs. PG15/LED2 is an exported
-net, not a third fitted LED. Only S2/PF6 and S3/PF7 are drawn as switches;
-PF8/KEY2 is an exported net. The key inputs have no drawn external pull-ups.
-Select `pull = "up"` explicitly. The input-only key routes reject output mode.
+图中只有 D0/LED0、D1/LED1 是受控 LED，PG15/LED2 只是导出网络，不是第三颗已装 LED。
+只有 S2/PF6、S3/PF7 是开关，PF8/KEY2 是导出网络。按键没有画外部上拉，应显式选
+`pull = "up"`；只输入的按键路线拒绝 output 模式。
 
-## Explicit hardware choices
+## 显式硬件选择
 
-Hardware choices have no implicit selected value. `[hardware]` declares the
-reviewed connection intended by one assembly; it is not inspection evidence.
+`[hardware]` 不存在隐式已选默认值；它声明本次装配拟用的已审连接，不是实物检查。
 
-- NOR transport requires `nor_population = "w25q128"` and
-  `debug_port = "swd"`. The drawing marks the NOR footprint **unpopulated**.
-  Full JTAG/SWO conflicts with PB3/PB4; PA13/PA14 remain reserved for SWD.
-- CAN routes require `can1_transceiver = "external"` or
-  `can2_transceiver = "external"`. External transceiver type, supply and
-  termination still need review.
-- USB requires `usb_port = "j1-device"`. No host, HS or automatic VBUS/ID
-  capability is inferred from the connector.
-- The user-identified ILI9341 16-bit module selects
-  `display_module = "ili9341-16bit"`; XPT2046 GPIO connections select
-  `touch_module = "xpt2046-gpio"`. Both default to unselected. These GPIO
-  bindings do not establish a delivered FSMC/display/touch device driver.
+- NOR 需要 `nor_population = "w25q128"` 和 `debug_port = "swd"`。图纸标注 NOR
+  位置未安装。完整 JTAG/SWO 与 PB3/PB4 冲突，PA13/PA14 继续保留给 SWD。
+- CAN 需要 `can1_transceiver = "external"` 或 `can2_transceiver = "external"`；
+  外部收发器型号、供电和终端电阻仍须审查。
+- USB 需要 `usb_port = "j1-device"`，不从连接器推断 Host、HS 或自动 VBUS/ID。
+- 用户确认的 ILI9341 16 位模块选择 `display_module = "ili9341-16bit"`；XPT2046
+  GPIO 接线选择 `touch_module = "xpt2046-gpio"`。二者默认不选；硬件选项本身只
+  授权连接，显示／触摸行为还需要显式端口及组件组合。
 
-Choose either GPIO or EXTI for a switch or PEN pin. They are alternative owners;
-selecting both rejects the duplicate physical pin. IRQ notifications are hints,
-not substitutes for the device's authoritative state.
+每个按键或 PEN 只能选择 GPIO／EXTI 之一；同时选择会因重复物理引脚而拒绝。
+IRQ 通知仅是提示，不能替代器件权威状态。
 
-## Minimal source and installed-SDK selection
+## 最小装配与可选显示
+
+以下命令从仓库根目录执行，只查询／校验，不访问硬件：
 
 ```sh
 python tools/configure/configure.py list-bindings --board stm32f407zg_qiming_core
 python tools/configure/configure.py check --assembly boards/stm32f407zg_qiming_core/assemblies/minimal.toml
 ```
 
-The maintained minimal assembly selects the two actual LEDs, two pulled-up
-inputs and USART1. It starts no application worker, watchdog or external memory.
-The UART1 byte-event path is also selectable for UART2/3/4/5/6. Additional
-controllers expose only their implemented `irq-byte-event` mode; this package
-does not imply DMA modes for every UART.
+正常结果是列出已审绑定并通过完整资源校验。最小装配选择两颗实际 LED、两个上拉
+输入和 USART1，不启动应用任务、watchdog 或外部内存。UART2/3/4/5/6 也能选择已维护
+的 `irq-byte-event`；新增控制器不因此获得所有 UART DMA 模式。
 
-## Display and touch without fitted SRAM
+| 配置 | 资源与要求 |
+| --- | --- |
+| `assemblies/display-touch.toml` | ILI9341 NE4＋XPT2046 GPIO/EXTI，背光初始关闭；LCD 自带 GRAM，不要求 SRAM；只租用 20 个 LCD FSMC 引脚 |
+| `assemblies/display-touch-sram.toml` | 显式 LCD／触摸＋IS62WV51216 CPU window，41 个 FSMC 引脚；须声明 `sram_population = "is62wv51216"` 并确认实装 |
+| `assemblies/sram-window.toml` | 独立 SRAM 运行期窗口，40 个 FSMC 引脚 |
 
-`assemblies/display-touch.toml` selects the ILI9341 NE4 endpoint and XPT2046
-GPIO/EXTI transport with backlight initially off. It needs no external SRAM:
-ILI9341 has its own GRAM. The FSMC owner claims only twenty LCD bus pads;
-NE3 and SRAM-only address/byte-lane pads remain unselected.
+核心板图纸把 SRAM 标为 DNP，组合配置执行前必须确认安装。LCD-only 不选择 NE3
+或 SRAM 专属地址／字节通道引脚；以上选择均不建立模块导通或 HIL 资格。
 
-`assemblies/display-touch-sram.toml` preserves the explicit LCD/touch plus
-IS62WV51216 CPU-window reference: forty-one FSMC pads and an authored
-`sram_population = "is62wv51216"` declaration.
-The core schematic marks this SRAM footprint DNP; the explicit combined
-profile requires actual fitting before execution.
-`sram-window.toml` remains the separate forty-pad SRAM-only runtime profile.
-None of these selections establishes physical module continuity or HIL.
+## RTC 备份域责任
 
-`display-touch.toml` 仅选择 ILI9341 的 NE4 并口与 XPT2046 GPIO／EXTI，背光初始
-关闭。ILI9341 自带 GRAM，不要求外部 SRAM；FSMC 仅占用 20 个 LCD 总线引脚，
-不选择 NE3 或 SRAM 专用引脚。`display-touch-sram.toml` 显式保留 LCD／触摸加
-SRAM 的 41 引脚组合，要求声明并安装 IS62WV51216；核心板原理图将此 SRAM 标为 DNP，使用组合配置前必须确认实际安装。
-`sram-window.toml` 继续作为独立的 40 引脚运行时 SRAM 参考。这些配置不是实板验收。
+`assemblies/rtc-adopt.toml` 选择真实 Y1 32.768 kHz PC14/PC15 和轮询 Alarm A。
+外部 boot owner 须在 Platform start 前准备精确 LSE、RTC clock、DBP access、锁定
+写保护、BCD 24 小时日历、BYPSHAD 和 PRER 127/255。未经准备的上电板会拒绝
+`adopt-retained`；查询 factory 不设日期、不复位备份域。
 
-## Explicit RTC backup ownership
+初始化空的类复位备份域必须另外选择 `provision-empty`，并显式提供 `initial`
+的全部原始字段：`year`、`month`、`day`、`weekday`、`hour`、`minute`、`second`。
+年为 00..99，weekday 独立于日期。两种策略都要求显式 `allow_set`、`timeout_us`、
+`poll_limit`；`allow_set = false` 禁止后续替换日历。C provider 检查 PC14/PC15
+电气准入但不改 GPIO，独占资源 claim 仍阻止其他 pin owner，且不为其保存或恢复普通
+GPIO 快照。
 
-`assemblies/rtc-adopt.toml` selects the actual Y1 32.768 kHz PC14/PC15
-oscillator route and polling Alarm A. It requires an external boot owner to
-prepare the exact LSE crystal, RTC clock, DBP access, locked write protection,
-BCD 24-hour calendar, BYPSHAD and PRER 127/255 profile before Platform start.
-An unprepared power-on board rejects this `adopt-retained` profile; lookup never
-provisions a date or resets the backup domain.
+Provision 留下自主备份 clock／calendar 效果。公共 alarm stop 可成功，但私有
+Platform close 仍可返回 `BUSY`；责任通过复位或未来显式 handoff 结束，不能强关
+时钟。电池标注未安装，两种策略都不保证断电保留。不包括 Alarm B、WUT、tamper、
+timestamp、calibration、IRQ wake 或物理资格。
 
-To initialize an empty reset-like backup domain, author `provision-empty` and
-an explicit `initial` table with all seven raw `year`, `month`, `day`, `weekday`,
-`hour`, `minute` and `second` fields. Year is 00..99; weekday is independent of
-the date. Both policies require explicit `allow_set`, `timeout_us` and
-`poll_limit`. `allow_set = false` keeps later calendar replacement closed.
-The C provider checks PC14/PC15 electrical admission without rewriting GPIO.
-Their exclusive resource claims prevent another selected pin owner even though
-they receive no ordinary GPIO snapshot or restore operation.
+## 外部 SRAM 启动放置
 
-Provisioning leaves autonomous backup clocks/calendar effects running. Public
-alarm stop can succeed while private Platform close returns `BUSY`; the
-remaining ownership requires a reset or a future explicit handoff, not forced
-clock removal. The battery is marked unpopulated, so neither policy establishes
-power-off retention. No Alarm B, wakeup timer, tamper, timestamp, calibration,
-IRQ wake or physical qualification is implied.
+`assemblies/sram-startup.toml` 声明已安装的 IS62WV51216 NE3，选择 `startup-memory`
+和独立 4 KiB 放置预算。由于原图 SRAM 未安装，这是显式软件参考；读写 timing 为
+HCLK 不高于 168 MHz 的声明假设，执行前须验证实际后缀、速度等级、供电、实装和
+电气时序。
 
-## Explicit external SRAM startup placement
+`NX_MEMORY_ADDSRAM_DATA`、`NX_MEMORY_ADDSRAM_BSS`、`NX_MEMORY_ADDSRAM_NOINIT`
+将静态对象放在 0x68000000 的 1 MiB NE3 窗口。只读 Flash boot plan 在修改复位引脚
+前验证完整 primary RAM、可选 CCM 和外部段边界，并引用运行期随后接管的同一 NE3
+时序对象。DATA 从内部 Flash 拷贝，BSS 清零，NOINIT 不处理；读取前必须自行初始化，
+不能据此声明物理保留。MSP、heap 和普通对象仍在内部 SRAM，代码和向量仍在内部
+Flash，外部 SRAM 不获得 DMA 权限。
 
-`assemblies/sram-startup.toml` declares a fitted IS62WV51216 on FSMC NE3 and
-selects `startup-memory` plus a separate 4 KiB placement budget. The source
-schematic marks SRAM unpopulated: this is an opt-in software reference, not
-proof that SRAM exists on a particular board. Its encoded read/write timings
-are declared assumptions for HCLK up to 168 MHz. Verify actual part suffix,
-speed grade, power, fitting and electrical timing before execution.
+首个 profile 只接受完整复位地址的 baremetal image，内部 MSP 至少 512 字节。
+维护的非 LTO 编译 profile 有绑定源码的静态启动栈证明；512 是准入界限，不是实测
+峰值或不可屏蔽异常的覆盖。拒绝 offset/layout image、image prefix/suffix 预留、
+MPU placement 和 startup LTO；可选 CCM 只沿既有路径初始化一次。
 
-The selected `NX_MEMORY_ADDSRAM_DATA`, `NX_MEMORY_ADDSRAM_BSS` and
-`NX_MEMORY_ADDSRAM_NOINIT` variable attributes place objects inside the 1 MiB
-NE3 window at 0x68000000. A read-only Flash boot plan validates complete primary
-RAM, optional CCM and external section bounds before reset-time pin changes.
-It references the same NE3 timing object later adopted by the runtime owner.
-DATA is copied from internal Flash, BSS is cleared and NOINIT is untouched.
-Initialize NOINIT explicitly before reading it; no physical retention is
-promised. Internal SRAM still holds the MSP, heap and ordinary objects; code
-and vectors stay in internal Flash. External SRAM receives no DMA permission.
+全局对象在整个生存期持有 bank 和 40 个 SRAM 引脚，因此 Platform stop 返回
+`BUSY`。只读 geometry 标记 `startup_backing`，整 bank 运行期 acquire 返回
+`UNSUPPORTED`，防止与全局对象重叠。若需要调用者持有的运行期 bank lease，应使用
+无 addsram 放置预算的 `cpu-window`。
 
-This first profile requires a full reset-address baremetal image and at least
-512 bytes of internal MSP. The maintained non-LTO compiler profiles have a
-source-bound static bootstrap stack proof; 512 is an admission bound, not a
-measured peak or a bound for nonmaskable faults. Offset/layout images, image
-prefix/suffix reservations, MPU placement and startup LTO are refused. Optional
-CCM uses its existing initialization path once.
+## 物理与高级功能边界
 
-Placed globals retain the bank and forty SRAM pads for their complete lifetime.
-Platform stop therefore returns `BUSY`. Read-only memory-window geometry marks
-`startup_backing`; whole-bank runtime acquire returns `UNSUPPORTED`, preventing
-an aliasing lease over globals. Use `cpu-window` without an addsram placement
-budget when a caller-owned runtime bank lease is required instead.
+不自动把外部 SRAM 加入 linker 或启动计划。完整音频和摄像头仍是独立工作，Board
+声明不会创建这些能力。LCD reset 连接全局 NRST，没有独立 GPIO reset。
 
-## Remaining physical and advanced boundaries
+部分 FSMC 地址网络还带无线控制导出标签，连接模块前须审查组合。TF card detect
+未接 MCU。核心板 P4 的 SWC/SWD 标注与 U1 JTCK/JTMS 不一致，须确认 CAD netlist
+或导通。两个 USB 连接器共用 VCC5，未画电源隔离，工装供电选择必须明确。
 
-SRAM IS62WV51216 and the backup battery are also marked unpopulated. No external
-SRAM is automatically added to the linker or startup initialization plan.
-Complete audio and camera support remain separate
-implementation work, not capabilities created by this Board declaration.
-
-LCD reset is tied to global NRST. There is no independent LCD GPIO reset.
-Some FSMC address nets also carry exported wireless control labels. Review the
-selected combination before attaching modules. TF card detect is not wired to
-a MCU pin. Core P4 SWC/SWD labels differ from U1 JTCK/JTMS labels; confirm the
-CAD netlist or continuity. Both USB connectors share VCC5 without drawn source
-isolation, so fixture supply selection must be explicit.
-
-Physical HIL is `not_executed`; no waveform, throughput, power, reset, retention
-or fitted-module result is implied by resolver acceptance or an ARM link.
+HIL 为 `not_executed`；配置通过或 ARM 链接不证明波形、吞吐、功耗、复位、保留或
+器件实装行为。

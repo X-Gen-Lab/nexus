@@ -1,339 +1,220 @@
-# Optional lwIP Ethernet adapter
+# 可选 lwIP 以太网与 TCP 适配器
 
-This optional component integrates lwIP 2.2.1, commit
-`1f53f34b4aa7c6583540c0f4c35142fa66616c78`, tree
-`7e65d6e65cefeffa2be44be0bb0ee51136626f1d`, through the reviewed
-`X-Gen-Lab/lwip` organization gitlink. Source admission does not establish a
-qualified network platform, a new software candidate or physical Ethernet
-acceptance. The curated source is based on upstream commit
-`77dcd25a72509eb83f72b033d219b1d40cd8eb95`; its only upstream C change is
-the documented sizing-condition exception in `ext/lwip/NEXUS_CURATED_SOURCE.md`.
+本目录将官方 lwIP 的固定 profile 接到 Nexus Ethernet frame 接口与产品执行者。
+组件管理软件协议栈推进和明确的帧借用，不发现 PHY、不创建 worker、不启动调度器，
+也不替产品决定地址、链路恢复或生命周期。
 
-CMake defines the explicit `Nexus::LwIP` target but does not build or link the
-stack into firmware unless the external composition selects that target.
-Configuration verifies the exact clean checkout, organization origin, parent
-index gitlink and fixed closure of 311 source/header/license/curation-notice files through
-`tools/maintenance/lwip_lock.py`. The verifier rechecks observed source bytes;
-a dirty file cannot be hidden merely by an unchanged Git status. Configuration
-never downloads dependencies or writes to the upstream checkout.
+## 来源、构建与接口边界
 
-Source SDK consumption uses the same fixed byte closure after the existing SDK
-manifest verifier has admitted the installation. It does not invent Git
-metadata for an installed payload. Explicit upstream experiments may select
-`NEXUS_LWIP_SOURCE` with `NEXUS_LWIP_DEVELOPMENT=ON`; those results remain
-unqualified development and cannot replace the production organization origin.
+固定 lwIP 2.2.1 组织 Gitlink 为 `X-Gen-Lab/lwip`，commit
+`1f53f34b4aa7c6583540c0f4c35142fa66616c78`，tree
+`7e65d6e65cefeffa2be44be0bb0ee51136626f1d`，基于上游 commit
+`77dcd25a72509eb83f72b033d219b1d40cd8eb95`。唯一上游 C 变更是
+`ext/lwip/NEXUS_CURATED_SOURCE.md` 记录的容量条件例外。源码准入不建立已认证的网络
+平台、新软件候选或物理以太网资格。
 
-## Execution and resources
+CMake 定义显式 `Nexus::LwIP` target，只有外部组合选择它才编译／链接进 firmware。
+但配置阶段会立即使用 `tools/maintenance/lwip_lock.py` 检查精确干净检出、组织
+origin、父 index gitlink，以及 311 个 source／header／license／整理说明文件的
+固定闭包。验证实际文件字节，不能靠未改变 Git status 隐藏脏文件；配置不下载依赖，
+也不写上游 checkout。配置依赖与实际链接裁剪是两件事，冷态最小依赖缺口见
+[问题 #52](https://github.com/X-Gen-Lab/nexus/issues/52)。
 
-The selected profile is `NO_SYS=1`, with one serialized stack owner and one
-netif. The owner may be a product FreeRTOS task or a cooperative application
-loop. Every raw API call, callback, adapter operation and timer operation uses
-that same nonreentrant execution context. No worker, scheduler startup, OS lock,
-socket API or Netconn API is created by the component.
+安装 Source SDK 先通过已有 manifest 校验，再使用同一固定字节闭包，不伪造 Git
+元数据。显式上游实验可设 `NEXUS_LWIP_SOURCE` 与 `NEXUS_LWIP_DEVELOPMENT=ON`，
+只形成未取得资格的开发结果，不能替换生产组织 origin。
 
-The fixed reference profile provides Ethernet II, ARP, IPv4, ICMP, UDP and TCP.
-DHCP, DNS, IPv6, VLAN delivery and IP fragmentation/reassembly are not enabled.
-Optional Nexus TLS and MQTT components use the byte interface above this profile;
-the lwIP built-in TLS/socket integrations are not selected. Address, mask, gateway, MAC identity, PHY observation and reconnect
-policy are supplied by the external composition. The adapter does not discover
-a PHY, negotiate a link or establish Board electrical facts.
+普通 `Nexus::LwIP` 公共 API 仅使用 Nexus 类型，不传播 vendor include 或 stack
+配置宏。静态装配处显式链接 `Nexus::LwIPStorage`，通过 `lwip_storage.h` 分配精确
+netif／adapter 布局。这个后端存储头依赖锁定 profile，避免最大 opaque object，
+不进入通用 I/O 接口。
 
-The reference stack has a 16 KiB internal arena, 24 fixed 512-byte pool
-payloads, four UDP PCBs, four TCP PCBs, two listening TCP PCBs, 32 TCP segments,
-eight ARP entries and eight timer entries. lwIP additionally uses fixed protocol metadata;
-these numbers are not the complete `.bss` size. There is no libc allocation or
-unbounded storage growth. The arena is a bounded optional stack allocator, not
-an allocation-free guarantee for lwIP internals. Pool/arena exhaustion remains
-observable and must be handled by the product. The complete chosen ELF, not a
-sum of nominal pool payloads, establishes its resource cost. Arena alignment
-is eight bytes on Native64 and four bytes on the maintained 32-bit MCU ABI.
+## 执行者、协议与资源
 
-The public adapter API uses Nexus types. Generic users link `Nexus::LwIP` and
-inherit neither vendor include paths nor the stack configuration macros. Only
-the composition site explicitly links `Nexus::LwIPStorage` and includes
-`lwip_storage.h` to allocate the exact `netif` and adapter layout.
-This backend storage header depends on the pinned lwIP profile. It avoids a
-maximum-size opaque object and does not enter the generic I/O interface.
+固定配置是 `NO_SYS=1`，一个串行 stack owner、一个 netif。执行者可为产品
+FreeRTOS task 或协作主循环；全部 raw API、回调、adapter 和 timer 操作都在同一个
+不可重入上下文。不创建 OS lock、socket API 或 Netconn API。
 
-## Startup, clocks and hooks
+参考 profile 提供 Ethernet II、ARP、IPv4、ICMP、UDP、TCP，不启用 DHCP、DNS、
+IPv6、VLAN delivery 或 IP fragmentation／reassembly。可选 Nexus TLS／MQTT 使用
+上层 byte interface，不选 lwIP 内建 TLS／socket 集成。产品提供 address、mask、
+gateway、MAC identity、PHY 观察和重连策略；adapter 不协商链路或建立 Board 电气事实。
 
-The composition initializes lwIP once with `lwip_init()` before attaching an
-adapter. Stack-global pools and timers are not per-adapter objects; a second
-simultaneous netif is rejected. Adapter attachment does not initialize or start
-the hardware controller. The product first starts its reviewed platform and
-then supplies stable frame and clock faces, TX storage and RX fragment views.
+复制 RX 配置包含 16 KiB 内部 arena、24 个固定 512 字节 pool payload、四个 UDP
+PCB、四个 TCP PCB、两个 listening TCP PCB、32 个 TCP segments、八个 ARP entries
+和八个 timer entries，另有固定协议元数据，不能把这些数值当成完整 `.bss`。无 libc
+分配或无界存储增长，但 arena 仍是有界的可选栈分配器，不代表 lwIP 内部完全无分配。
+产品必须处理 arena／pool 耗尽；完整选定 ELF 才确定资源成本。arena 在 Native64
+对齐八字节，在维护的 32 位 MCU ABI 对齐四字节。
 
-The adapter requires three explicit product hooks:
+## 启动、时间与产品钩子
 
-- `nx_lwip_port_now_ms()` supplies wrapping monotonic milliseconds throughout
-  the lifetime of all lwIP timers. It must not silently change domains.
-- `nx_lwip_port_random_u32()` supplies admitted random data. Source failure
-  enters a nonreturning product fault path; no timestamp, fixed-seed or libc
-  fallback is supplied. A deterministic host fixture is not MCU entropy proof.
-- `nx_lwip_port_assert()` is a nonreturning invariant failure path. It must not
-  reclaim DMA or borrowed storage merely because a stack assertion occurred.
+装配先调用一次 `lwip_init()`，再 attach adapter。栈全局 pools／timers 不属于
+逐 adapter 对象，同时第二个 netif 会被拒绝。attach 不初始化或启动硬件；产品先
+启动已审 Platform，再提供稳定 frame／clock faces、TX 存储与 RX fragment views。
 
-The separate `nx_clock_t` in the adapter configuration supplies microseconds in
-the actual MAC provider deadline domain. TX timeout must be finite and nonzero;
-clock exhaustion rejects submission. A successful adapter stop does not end
-global stack timers. Changing or withdrawing their clock requires the product's
-complete stack shutdown/restart procedure, not a replacement numerical epoch.
+三个显式产品钩子缺一不可：
 
-## Frame ownership and progress
+- `nx_lwip_port_now_ms()`：在全部 lwIP timers 生命周期提供可回绕单调毫秒，不得
+  静默换时间域。
+- `nx_lwip_port_random_u32()`：提供已准入随机数据；来源失败进入产品永不返回故障
+  路径，没有 timestamp、固定 seed 或 libc 回退。确定性主机夹具不证明 MCU 熵质量。
+- `nx_lwip_port_assert()`：永不返回的不变量失败路径；断言不允许回收仍被 DMA 或
+  provider 借用的存储。
 
-`nx_lwip_adapter_service()` progresses the MAC and due lwIP timers before
-acquiring at most its explicit receive budget. RX overload cannot indefinitely
-starve protocol timers. The receive budget bounds
-acquired frames. It does not bound the total duration of arbitrary stack or
-application callbacks. Choose and measure a service interval for the actual
-arrival rate, pool capacity and workload.
+adapter 的独立 `nx_clock_t` 使用实际 MAC provider deadline 时间域的微秒。
+TX timeout 必须有限且非零，时钟耗尽拒绝提交。adapter stop 成功不结束全局 stack
+timers；换域或撤销其时钟需要产品完整 stack shutdown／restart，不能只换数值 epoch。
+
+## 帧借用与执行进度
+
+`nx_lwip_adapter_service()` 先推进 MAC 与已到期 lwIP timers，再按明确预算获取
+RX。过载不能无限饿死协议 timers。RX budget 限制获取帧数，不限制任意 stack／应用
+回调总耗时；按实际到达率、容量与工作负载选择并测量 service 间隔。
 
 ```text
-MAC RX loan -> copy into bounded pbuf storage -> exact RX release -> lwIP input
-lwIP pbuf  -> copy into caller TX buffer -> MAC ACCEPTED -> observed SETTLED
+MAC RX 借用 → 复制到有界 pbuf → 精确归还 RX → lwIP input
+lwIP pbuf   → 复制到调用者 TX buffer → MAC ACCEPTED → 观察 SETTLED
 ```
 
-The adapter supplies one contiguous TX buffer of at least 1514 bytes. A busy
-borrow returns lwIP backpressure without overwriting that buffer. Stack pbufs
-are not retained by the MAC. A successful link output means admission, not
-delivery to a peer; the provider's later wire failure remains packet loss for
-the selected protocol. TCP retransmission and product recovery retain their
-normal responsibilities.
+adapter 使用一个至少 1514 字节的连续 TX buffer。仍被借用时返回背压，不覆盖
+buffer；MAC 不保留 stack pbuf。link output 成功表示接纳，不证明对端交付。provider
+后续线上故障是所选协议的 packet loss；TCP 重传与产品恢复继续承担各自职责。
 
-The adapter additionally preserves a failed final TX result until
-`nx_lwip_adapter_service` reports that exact result once. An accepted transfer
-may settle inline; its admission still returns `ERR_OK`. Another link output
-before error observation returns `ERR_IF` without copying or admitting the new
-frame. Successful inline completion remains immediately reusable without a
-service round trip. Borrowed transfers still return `ERR_MEM` backpressure.
-Service checks completion before and after MAC, timer and bounded RX progress;
-an inline failure produced during that progress is reported in that invocation.
+最终 TX 失败保留到 `nx_lwip_adapter_service` 精确报告一次。已接纳传输可能 inline
+失败并 SETTLED，原 admission 仍返回 `ERR_OK`；错误观察前，新 link output 返回
+`ERR_IF`，不复制或接纳新帧。成功 inline 完成可以立即复用，不额外等待 service。
+仍被借用请求以 `ERR_MEM` 背压。service 在 MAC、timer 和有界 RX 推进前后均检查
+结果，因此本次推进产生的 inline 失败也会在该次调用报告。
 
-After acquiring a settled failure, service consumes it by preparing the existing
-unborrowed request back to READY. It does not close the adapter, reset the MAC,
-replay bytes or require a stop/restart merely because one packet was lost. The
-product chooses whether the actual provider state needs recovery; persistent
-provider health errors may still be reported independently. A settled TX error
-has return precedence when the same progress call also reports a MAC/RX error;
-there is no aggregate error history. The optional typed TCP facade keeps its
-existing policy: BUSY/EXHAUSTED are temporary, while other network-service errors
-fail that connection. Observing a frame error does not promise transparent
-connection recovery. An ACTIVE or QUARANTINED request is never cleared by outcome
-observation. The selected
-TX path adds no error queue or per-instance field. This is an error-observability improvement;
-the earlier best-effort packet-loss contract did not promise this notification.
+acquire 观察失败 SETTLED 后，service 将已有且无借用 request prepare 回 READY，
+不关闭 adapter、重置 MAC、重放字节或因单帧丢失强制 stop／restart。产品按真实
+provider 状态决定恢复，持续健康错误仍可独立报告。同次调用另有 MAC／RX 错误时，
+已结清 TX 错误优先；不保存聚合错误历史。typed TCP 保留既有策略：BUSY／EXHAUSTED
+暂态，其他 network-service 错误使该连接失败。帧错误可观察不保证连接透明恢复。
+ACTIVE／QUARANTINED request 不会被结果观察清除，TX 路径不新增错误队列或实例字段。
+这是错误可观察性的完善，早期 best-effort 丢包合同没有承诺此通知。
 
-发送结果可观察性：ACCEPTED 仍只表示接纳，不能证明线上成功。传输可以在 submit
-返回前以失败 SETTLED；该次接纳仍返回 `ERR_OK`，但最终错误保留到
-`nx_lwip_adapter_service` 精确报告一次。在此之前，新 link output 返回 `ERR_IF`，
-不会复制或接纳新帧；成功的 inline 完成仍可直接复用，无需额外 service 往返。
-仍被借用的请求继续以 `ERR_MEM` 表达背压。service 会在 MAC、timer 和有界 RX
-处理前后检查结果，因此该次处理内产生的 inline 错误也会在本次返回。
+RX fragment views 由调用者按所选 descriptor geometry 提供。容量不足时硬件帧仍
+排队；获取后长度／VLAN 非法或 pool 耗尽，精确归还 loan 并报错。归还失败保留
+原 token，仅丢弃新软件副本，关闭后续 adapter 进度，不能把同一帧交给 stack，
+也不能强制重臂仍被持有的 descriptors。
 
-service 只在 acquire 观察到 SETTLED 后消费错误，把已有且无借用的请求准备为
-READY；不自动关闭 adapter、复位 MAC、重放字节，也不会因单帧丢失强制 stop／
-restart。产品根据真实 provider 状态选择恢复；provider 的持续健康错误仍可独立
-报告。同次处理也有 MAC／RX 错误时，已结清的 TX 错误优先返回，不提供错误历史
-聚合。可选 typed TCP facade 保留既有策略：BUSY／EXHAUSTED 视为暂态，其他
-network-service 错误使该连接失败；帧错误可观察不等于连接一定透明恢复。
-ACTIVE／QUARANTINED 的借用不会被清除。TX 路径不新增错误队列或实例字段。这是对错误可观察性的完善，之前的
-best-effort 丢包合同没有承诺这项通知。
+## 停止、恢复与全局责任
 
-RX fragment views are caller-owned and sized for the selected descriptor
-geometry. Insufficient view capacity leaves the hardware frame queued. After
-acquisition, invalid length/VLAN or pool exhaustion releases the exact loan and
-returns an error. Release failure retains the token, discards only the new
-software copy, closes further adapter progress and never feeds the same frame
-into the stack. No held descriptors are forcefully rearmed.
+产品先关闭 raw PCBs、应用回调、timers、pending queues 和外部 observers。
+`nx_lwip_adapter_stop()` 随后关闭 adapter 准入、将 netif down、重试 held RX release
+并请求真实 provider stop。只有 provider 成功且 acquire 观察 TX SETTLED 后才 detach。
 
-## Shutdown and recovery
+provider 错误、BUSY 或未完成 TX 保留 adapter 与全部剩余 buffer／token。调用者可
+按 provider 显式恢复，再重试 stop；不自动 reset／replay。成功 detach 幂等，但不能
+证明全局 stack 或全部连接已停止。产品资源须存活到其回调与 timers 真正结束。
 
-The product first closes its raw PCBs, application callbacks, timers, pending
-queues and external observers. `nx_lwip_adapter_stop()` then closes adapter
-admission, brings its netif down, retries any held RX release and requests the
-actual provider stop. It detaches the netif only after provider success and
-acquire-observed TX settlement.
+## 可选复制式 TCP 字节客户端
 
-Provider failure, BUSY or an unfinished TX preserves the adapter and every
-remaining buffer/token. The caller may perform the provider's explicit
-recovery, then retry stop. There is no automatic reset or replay. Successful
-detachment is idempotent; it does not claim the global lwIP stack or every
-connection has shut down. Keep product stack resources live until their own
-callbacks and timers have exited.
+`Nexus::LwIPTCP` 在一条官方 raw TCP connection 上实现既有只读
+`nx_byte_stream_t`。普通消费者包含 `nexus/network/lwip_tcp.h`，获得 Nexus 类型；
+静态装配显式链接 `Nexus::LwIPTCPStorage` 分配精确 PCB／pbuf adapter 布局。
+不增加 socket registry、worker 或最大 opaque pool，未选择的 firmware 不链接它。
 
-## Current validation boundary
+运行调用为：外部串行执行者 → 可选 MQTT → 可选 TLS → 即时复制 byte face → Nexus
+raw TCP → 固定 lwIP TCP／pool 与显式网络推进 → Nexus Ethernet frame loans。
+[FIG-32](../../docs/assets/diagrams/lwip-tcp-tls-mqtt-host.svg) 展示独立的主机互通参考：
+两条 TCP 连接、一条端到端 TLS，不能将测试 relay 当作生产 socket adapter。
 
-Focused GoogleTest execution links the actual pinned lwIP C implementation.
-It covers ARP parsing/reply, ICMP echo reply, UDP transmit and receive, TCP SYN,
-fragment copying, RX release failure, TX borrowing, stop retention, fixed pool
-exhaustion, timer progress during overload, Native pointer alignment, invalid
-MAC/provider identity, duplicate attachment and corrupted IPv4 input. Python
-tests cover
-the source lock, changed bytes, wrong commit/origin, dirty source, unsafe paths
-fixed closure enforcement, changes during observation, production origin and
-gitlink rejection, source-SDK scope and symbolic CMake selector rejection.
+调用者提供清零 client、live network adapter、正数 receive-frame budget 和 IPv4
+address／port；配置与地址会复制。`start` 成功只接纳 CONNECTING，不证明 ESTABLISHED。
+第一次有限 connect deadline 保留，连接故障持续存在；没有隐式 retry、fallback、
+DNS 或 reconnect。
 
-TCP client model tests additionally cover copied queue admission, receive
-backpressure, peer FIN, close/abort, bounded progress, deadline and shared-pool
-reclamation. The separate
-[complete host network fixture](../../tests/contracts/lwip_mqtt_interop/README.md)
-connects the actual lwIP/TCP/TLS/MQTT client to real Mosquitto through a test-only
-transparent ciphertext relay. One TCP connection crosses software Ethernet frame
-ports between two independent lwIP processes; the second crosses a nonblocking
-host socket from the relay to the broker. TLS/mTLS and MQTT acknowledgements
-terminate at the Nexus client and broker. The relay does not decrypt TLS or
-provide a production socket adapter.
+同一个串行 NO_SYS 执行者拥有 stack、adapters 和全部 clients；facade data／control
+不得从 raw callback 内调用。共享 in-call guard 拒绝不同 facade 实例间嵌套变更，
+没有实例 registry 或 active-client pointer。adapter、存储、clock epoch、全局 timers
+存活到每条连接结束，包括已 detach 的 FIN／TIME_WAIT。毫秒 timers 与微秒 API
+使用同一不变时间域。
 
-That host fixture retains separate normal and sanitizer execution identities.
-Its local TCP close only detaches the client context; FIN/TIME_WAIT and global
-clock retirement are separate. It aborts remaining owned PCBs, releases accepted
-pbufs, settles MAC loans and stops its adapter before ending service. Network and
-clock storage remain live until process exit, which retires the isolated test
-stack domain. An MCU cannot infer permission to destroy its global clock or
-reinitialize lwIP merely from adapter stop.
+每个非零字节尝试可执行一次显式预算的 network service，使 coreMQTT 等同步调用者
+无隐藏线程也能接收。先消费 held RX，避免 pbuf pool 耗尽时再依赖分配。timer 回调
+耗时由 profile 与 raw users 约束，帧数不是硬墙钟时间上界。
 
-These are development results. Full software-plan and installed-SDK acceptance,
-physical PHY/DMA, network performance and MCU trusted-time/entropy qualification
-retain their own source-bound evidence. Model frames and a real host broker do
-not prove Board wiring, physical connectivity or HIL.
+写入使用官方 `tcp_write(..., TCP_WRITE_FLAG_COPY)`。正数部分接纳将字节复制进
+现有有界 stack 存储，源可立即复用；这只是队列接纳，产品以协议 ACK 限制交付时间。
+复制接纳后观察到致命 output 不能撤销已接纳事实；诊断与后续调用保留失败到显式
+abort。would-block／容量不足返回 BUSY，count 为零。
 
+RX 最多持有一个已接纳 pbuf chain 及 partial offset。拒绝另一个 chain 返回 ERR_MEM，
+其所有权仍在 lwIP。只有复制给调用者的字节才增加 `tcp_recved` credit。完整消费或
+abort 后精确释放一次；error callback 的 PCB 已由库释放，不能再 free。缓冲数据
+先于有序 FIN 返回，对端半关闭仍可写；TLS 独立判断 close-notify 认证。
 
-## Optional copied TCP byte client
+生产者 join 后，`close` 关闭写准入，并等待 held／refused RX 与 queued／unacknowledged
+TX，第一次有限 deadline 不能延长。TIMEOUT／BUSY 保留 context。先 detach callback
+再调用官方 `tcp_close`，只有错误返回才允许再次触碰 PCB。成功可能只是上游延后
+分配 FIN，FIN／TIME_WAIT timers 仍运行，因此只证明本 context 对 stack 的最后访问，
+不是全局或 PHY drain。显式 `abort` 丢弃数据、摘除回调并释放仍自有的 PCB／pbuf；
+MAC loan 由 network adapter 独立撤回。产品先停全部已知 clients，再排空／移除 adapter。
 
-`Nexus::LwIPTCP` provides the existing readonly `nx_byte_stream_t` contract over
-one official raw TCP connection. Ordinary consumers include
-`nexus/network/lwip_tcp.h` and receive Nexus types. A static composition unit
-explicitly links `Nexus::LwIPTCPStorage` to allocate the exact reviewed PCB/pbuf
-adapter layout. The component adds no socket registry, worker or maximum opaque
-object pool. Unselected firmware does not link this target.
+固定 stack 共享四个 TCP PCB、24 个 512 字节 pool blocks 和显式 arena。一个 held
+chain 可占满 receive window，refused／out-of-order 数据也占全局资源。产品须及时
+读取和推进；容量拒绝和连接状态不是物理网络或性能资格。
 
-```mermaid
-flowchart LR
-    Product[External serialized executor] --> MQTT[Optional MQTT client]
-    MQTT --> TLS[Optional TLS client]
-    TLS --> Byte[Readonly immediate-copy byte face]
-    Byte --> TCP[Nexus raw TCP client]
-    TCP --> Stack[Reviewed lwIP TCP and bounded pools]
-    TCP --> Network[Explicit budgeted network adapter progress]
-    Stack --> Network
-    Network --> Frames[Nexus Ethernet frame loans]
-```
+PCB 分配保留官方回收策略：`tcp_new_ip_type` 使用普通 priority，首次分配失败时
+`tcp_alloc` 先推进 pending close，再尝试回收 TIME_WAIT、LAST_ACK、CLOSING 和
+低优先级 active connections。因此新 client start 期间其他连接可能收到 error
+callback，即使新 start 最终拒绝，也不承诺全局 stack 不变。局部拒绝只表示本 context
+不保留新的 PCB、pbuf 或配置引用。产品预算共享池并处理每条连接错误，adapter 不建
+第二 allocator 或隐藏预留池。四个 CLOSED PCB 的拒绝测试没有可回收对象，不证明
+普遍“不回收”规则。
 
-The caller supplies zeroed client storage, a live network adapter, one positive
-receive-frame budget and an IPv4 address/port. Configuration and address are
-copied. `start` success accepts CONNECTING; it does not prove ESTABLISHED.
-The first finite connect deadline is retained. Connection failure is sticky;
-there is no implicit retry, fallback, DNS or reconnection.
-
-One serialized NO_SYS executor owns the stack, adapters and all clients. Call
-facade data/control outside raw callbacks. A shared in-call guard prevents nested
-mutation across facade instances; it holds no instance registry or active-client
-pointer. The network adapter, its storage, clock epoch and global stack timers
-outlive every connection, including detached FIN/TIME_WAIT state. Millisecond
-stack timers and microsecond API deadlines use the same unchanged time domain.
-
-Each nonzero byte attempt may perform one explicitly budgeted network service
-pass so a synchronous caller such as coreMQTT can receive packets without a
-hidden thread. Held RX is consumed first, avoiding an allocation dependency while
-its pbuf pool is exhausted. Timer callback cost remains subject to the selected
-stack profile and its raw users; a frame count is not a hard wall-clock bound.
-
-Writes use official `tcp_write(..., TCP_WRITE_FLAG_COPY)`. Positive partial
-acceptance copies bytes into lwIP's existing bounded storage; the source may be
-reused immediately. It promises queue admission, not delivery. The caller bounds
-delivery using its protocol acknowledgement policy. A fatal output observed
-after copied admission cannot undo acceptance; diagnostics and subsequent calls
-remain failed until explicit abort. Would-block/capacity produces BUSY/count zero.
-
-RX holds at most one accepted pbuf chain and a partial-read offset. Returning
-ERR_MEM for another chain retains lwIP ownership of that refused chain. Only
-bytes copied to the caller receive `tcp_recved` credit. The accepted chain is
-released exactly once after complete consumption or explicit abort; the error
-callback has already freed its PCB and never frees it twice. Buffered data
-precedes orderly TCP FIN, and a peer half-close still permits writes. TLS makes
-its separate close-notify authentication decision.
-
-After producers join, `close` shuts write admission and waits for held/refused RX
-and queued/unacknowledged TX. Its first finite deadline cannot be extended.
-Timeout or BUSY retains the context. Callback references detach before official
-`tcp_close`; only an error permits touching the PCB again. Success may represent
-upstream deferred FIN allocation and still-running FIN/TIME_WAIT timers, so it
-proves this context's final stack access rather than global/PHY drain. Explicit
-`abort` discards data, detaches callbacks and frees any still-owned PCB/pbuf;
-MAC frame loans remain the network adapter's independent withdrawal duty.
-Products stop all known clients before draining/removing the adapter.
-
-The fixed stack currently budgets four shared TCP PCBs, 24 shared 512-byte pool
-blocks and the explicitly configured stack arena. One held chain can consume a
-receive window; refused/out-of-order data also consumes shared stack resources.
-Applications must schedule timely reads and progress. Capacity refusal and
-connection state do not provide a physical network or performance qualification.
-
-PCB allocation deliberately retains the pinned official reclamation policy.
-`tcp_new_ip_type` uses normal priority. If its first pool allocation fails,
-`tcp_alloc` first progresses pending closes, then attempts to reclaim TIME_WAIT,
-LAST_ACK, CLOSING and lower-priority active connections. Other connections can
-therefore receive error callbacks while a new client starts; even a subsequently
-rejected start does not promise a globally unchanged stack. Local rejection
-means this context retains no new PCB, pbuf or configuration reference. Products
-budget the shared pool and handle every connection's error; this adapter adds no
-second allocator or hidden reservation pool. The four-CLOSED-PCB rejection test
-has no reclaimable victim and does not establish a universal no-reclaim rule.
-
-## Optional RX payload loans / 可选 RX 负载借用
-
-The [selected RX-loan contract](../../docs/reference/api/components.md#lwip-loaned-rx-contract)
-defines the authoritative composition and lifetime rules. Select
-`Nexus::LwIPLoanedRX` or `Nexus::LwIPTCPLoanedRX`, and use their respective
-`Storage` targets only at static composition. The existing targets and their
-24-block resource descriptions above refer to copied RX. One image selects
-one singleton stack profile; CMake rejects a copied/loaned mixture.
-
-Each caller-owned frame slot supplies a writable 136 B copied prefix and
-custom-pbuf metadata. Only the remaining immutable `PBUF_ROM` payload tails
-reference MAC bytes; raw users clone before writing. Supply nonzero exact slots
-and at least `slot_count * base.rx_capacity` pieces. Reference operations and
-adapter calls share the serialized NO_SYS owner. Final pbuf frees only mark
-release-ready pieces; later owner service or stop performs exact MAC release.
-Failed release closes admission and retains storage; stop remains BUSY while
-pbuf references remain. The enhanced F407/GD470 provider's independent held
-loans do not imply universal capacity or guaranteed ACK progress.
-
-This selected profile retains two spare 512 B pool payloads, the existing
-16 KiB arena and unchanged other fixed pools. External slots, pieces, prefixes,
-MAC buffers and TX bytes still have explicit storage costs; TX and ICMP reply
-fallback use bounded RAM. Pool counts do not prove complete SRAM fit. Selected
-C11 link-only external development probes pass a 32 KiB SRAM budget on F407
-and GD470 with two frame slots, four pieces, a 2048 B main stack and no libc
-heap. Their measured SRAM is 24344 B and 24316 B respectively; real MAC rings
-and payload buffers are not supplied by those probes. Source/installed-SDK
-qualification remains separate. This option adds no DMA/cache,
-PHY, throughput or physical HIL qualification.
-The curated organization fork exempts only this explicit custom-RX/custom-pbuf
-profile from the stock `PBUF_POOL`/`TCP_WND` sizing heuristic; all other sanity
-checks stay active. The exemption does not prove stock-upstream admission.
+## 可选 RX 负载借用
 
 [选定 RX 借用合同](../../docs/reference/api/components.md#lwip-loaned-rx-contract)
-是装配与生命周期规则的权威来源。显式选择 `Nexus::LwIPLoanedRX` 或
-`Nexus::LwIPTCPLoanedRX`，只在静态装配处使用各自的 `Storage` target。
-上文既有 target 及其 24 块资源描述适用于复制 RX。每个镜像只选择一个单例协议栈
-配置；CMake 拒绝混合复制与借用配置。
+是装配与生命周期权威。选择 `Nexus::LwIPLoanedRX` 或 `Nexus::LwIPTCPLoanedRX`，
+仅在静态装配处使用各自 `Storage`。上述既有目标和 24 块描述属于复制 RX；每镜像
+只允许一个 singleton stack profile，CMake 拒绝复制／借用混合。
 
-每个调用方自备帧槽包含可写的 136 B 复制前缀及 custom-pbuf 元数据。只有前缀后
-剩余的只读 `PBUF_ROM` 负载尾段引用 MAC 原始字节；raw 用户写入前必须克隆。
-显式提供非零帧槽数和至少 `slot_count * base.rx_capacity` 个 piece。
-引用操作和 adapter 调用共享同一个串行 NO_SYS 所有者。最后一次 pbuf free 只标记
-piece 已可归还；后续 owner service 或 stop 才精确归还 MAC 借用。归还失败关闭
-准入并保留存储；仍有 pbuf 引用时 stop 保持 BUSY。增强型 F407／GD470 provider
-的独立持有借用不代表通用容量或 ACK 必定推进。
+每个调用者 frame slot 提供可写 136 B 复制前缀和 custom-pbuf metadata。只有剩余
+只读 `PBUF_ROM` payload tails 引用 MAC 字节，raw 用户写前须 clone。提供非零精确
+slots 和至少 `slot_count * base.rx_capacity` 个 pieces。引用操作与 adapter 调用
+共享串行 NO_SYS owner。最终 pbuf free 只标记 release-ready，后续 owner service／
+stop 才精确归还 MAC。失败关闭准入并保留存储；pbuf 引用未结束时 stop 保持 BUSY。
+增强 F407／GD470 provider 的独立 held loans 不表示通用容量或 ACK 保证。
 
-此显式配置保留两个备用 512 B 池负载块，沿用既有 16 KiB arena 和其他固定池。
-外部 slot、piece、前缀、MAC 缓冲区与 TX 字节仍有显式存储成本；TX 和 ICMP 回复
-回退使用有界 RAM。池计数不能证明完整 SRAM 可容纳。C11 外部开发配置的链接
-探针使用两个帧槽、四个 piece、2048 B 主栈且无 libc heap，F407／GD470 的
-SRAM 分别为 24344 B／24316 B，均通过 32 KiB 预算。这些探针没有提供真实
-MAC 环和负载缓冲区；源码及已安装 SDK 资格仍需独立验证。该选项不新增
-DMA／cache、PHY、吞吐量或物理 HIL 资格。
-维护的组织 fork 仅让此显式 custom-RX／custom-pbuf 配置豁免原版
-`PBUF_POOL`／`TCP_WND` 容量启发式检查；其他 sanity 检查全部保留。
-此豁免不能证明原版上游也准入该配置。
+此配置保留两个备用 512 B pool payload、既有 16 KiB arena 和其他不变固定池。
+外部 slots、pieces、prefixes、MAC buffers、TX 字节另计；TX 与 ICMP 回复回退仍用
+有界 RAM。pool 计数不能证明完整 SRAM 适合。C11 link-only 外部开发探针在 F407／
+GD470 使用两 frame slots、四 pieces、2048 B main stack、无 libc heap，通过
+32 KiB 预算，实测链接 SRAM 分别为 24344 B／24316 B；探针不提供真实 MAC rings
+和 payload buffers。源码／安装 SDK 资格另行建立，不新增 DMA／Cache、PHY、吞吐或
+物理 HIL 资格。组织 fork 只对此显式 custom-RX／custom-pbuf profile 豁免原版
+`PBUF_POOL`／`TCP_WND` 容量启发式，保留其他全部 sanity checks；不证明原版上游准入。
+
+## 源码入口与验证范围
+
+先读 `include/nexus/network/` 的 adapter／TCP 公共合同，再看 `src/` 的单执行者
+实现；`Profiles.cmake` 与 `port/lwipopts.h` 维护固定目标／资源，锁文件校验属于
+`tools/maintenance/lwip_lock.py`。
+
+定向 GoogleTest 链接真实锁定的 lwIP C：覆盖 ARP 解析／应答、ICMP 回显、UDP 收发、
+TCP SYN、分片复制、RX 释放失败、TX 借用、停止失败后的责任保留、固定池耗尽、
+过载时的定时器推进、Native 指针对齐、非法 MAC／provider 身份、
+重复 attach 和坏 IPv4。Python 检查 source lock、改字节、错 commit／origin、dirty
+source、不安全路径、固定闭包、观察期间修改、production origin／gitlink 拒绝、
+Source SDK 范围及 symbolic CMake selector 拒绝。
+
+TCP client 模型另覆盖复制队列准入、接收背压、peer FIN、close／abort、有界推进、
+deadline 和共享池回收。[完整主机网络夹具](../../tests/contracts/lwip_mqtt_interop/README.md)
+通过测试专用透明密文 relay 将真实 lwIP／TCP／TLS／MQTT client 接到真实 Mosquitto：
+一条 TCP 通过两个独立 lwIP 进程的软件 Ethernet ports，另一条通过 relay 至 broker
+的非阻塞 host socket。TLS／mTLS 和 MQTT ACK 终止于 client／broker，relay 不解密
+也不提供生产 socket adapter。
+
+夹具保留普通与 sanitizer 的独立执行身份。局部 TCP close 仅 detach client context，
+FIN／TIME_WAIT 和全局 clock retirement 独立。它 abort 剩余自有 PCB、释放已接纳
+pbuf、结清 MAC loans 并 stop adapter 后才结束 service。network／clock 存储持续到
+进程退出，由此退休隔离测试 stack 域。MCU 不能从 adapter stop 推导可销毁全局时钟
+或重新初始化 lwIP。
+
+以上为各自精确源码下的开发证据。完整软件计划、已安装 SDK、物理 PHY／DMA、性能、
+MCU trusted time／entropy 各有独立验收；模型帧和真实主机 broker 不证明 Board 接线、
+物理连通或 HIL。

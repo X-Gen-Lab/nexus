@@ -1,240 +1,188 @@
-# ThreadX backend
+# ThreadX：真实内核的显式静态适配
 
-This backend uses the official Eclipse ThreadX kernel, not a scheduler model.
-The reviewed source is `v6.5.2.202603_rel`, commit
-`93387b0a60382a29579bbad5045c68328e3751df`, under the original MIT license.
-The intended first integration scope is the Linux GNU port and the Cortex-M4 GNU
-port for STM32F407 and GD32F470. Other Cortex profiles, MPU/TZ task isolation,
-tickless sleep, direct notification slots and runtime scheduler shutdown are not
-implemented by this adapter. Arch and FreeRTOS support remain separate.
+本后端使用官方 Eclipse ThreadX 内核。受审来源为 `v6.5.2.202603_rel`，
+提交 `93387b0a60382a29579bbad5045c68328e3751df`，保留原 MIT 许可。
+首批集成范围为 Linux GNU 端口，以及用于 STM32F407／GD32F470 的 Cortex-M4
+GNU 端口。当前适配器尚未实现其他 Cortex 配置组合、MPU／TrustZone 任务隔离、
+无节拍空闲、直接通知槽位和运行中调度器停机；Arch、FreeRTOS 的支持范围独立维护。
 
-`nexus/os/threadx.h` exposes caller-owned, backend-specific static services. The
-portable wait face is still the existing four-pointer `nx_wait_port_t`; device
-faces, typed factory and ordinary I/O calls do not acquire a ThreadX dependency.
-Selecting a different OS does not change the generated device identities.
-Firmware that does not select ThreadX creates no production ThreadX target or
-linked kernel objects/RAM. Host contracts explicitly select their own isolated
-kernel fixture, as the FreeRTOS host contracts do.
+公共头 `nexus/os/threadx.h` 提供后端专属的静态服务，存储由调用者持有。
+可移植等待仍使用四指针 `nx_wait_port_t`；设备接口、类型化 factory 和普通 I/O
+调用不依赖 ThreadX。切换 OS 不改变生成的设备身份。未选择 ThreadX 的固件
+不建立生产 ThreadX 目标，也不链接其内核对象或 RAM。宿主合同测试显式选择
+独立的真实内核验证夹具，与 FreeRTOS 的宿主验证方式相同。
 
-## Startup and lifetime
+本目录的 `CMakeLists.txt` 选择内核和端口；`threadx.c` 实现静态对象与等待，
+`m4.c`、`m4_vectors.S` 负责 M4 启动和向量连接。上层关系见
+[FIG-08：等待、唤醒与停机](../../docs/assets/diagrams/wait-wake-shutdown.svg)
+及 [OS 总览](../README.md)。图不表示本后端支持全部 OS 功能或已通过实板验收。
 
-The product first initializes the platform and its continuous monotonic clock,
-then calls `nx_threadx_kernel_enter(startup, context)`. It must enter privileged,
-unmasked Thread mode using MSP with CONTROL.FPCA clear. The attempted kernel entry
-is irreversible. The adapter's actual `tx_application_define` callback opens the
-only bootstrap scope, invokes product startup, then seals that scope before
-returning to the kernel. Callback entry also validates actual privileged Thread
-context and canonical bootstrap masks before the product runs. Only the trusted
-kernel may call the adapter callback; this check is not a privilege boundary.
-The product does not define a competing callback.
+## 启动、任务和存活期
 
-Startup may initialize notifications/queues, create tasks, publish a wake hint
-and reverse-discard a created returning task that has never executed. It may not
-block, join or operate queues. The narrow pinned internal terminate/delete
-services used by prestart discard are permitted only in this proven callback
-scope. Comparing a scheduler state or interrupt mask elsewhere never reopens it.
-Partial startup failure must either complete proven reverse discard, or retain
-all outstanding effects and enter the product's safe failure policy.
+产品先初始化 Platform 及连续单调时钟，再调用
+`nx_threadx_kernel_enter(startup, context)`。入口要求特权线程模式、中断未屏蔽、
+使用 MSP，且 CONTROL.FPCA 清零。尝试进入内核是不可逆动作。适配器的真实
+`tx_application_define` 回调打开唯一的内核引导范围，调用产品启动函数，然后
+在返回内核前封闭该范围。回调在产品运行前验证真实特权线程上下文和规范引导
+屏蔽状态。仅受信内核可以调用此回调，这项检查不构成权限边界；产品不能另行
+定义竞争回调。
 
-At runtime, returning tasks cooperate with stop/admission closure, publishers
-quiesce, accepted I/O drains or remains quarantined, and an external single joiner
-joins tasks before reclaiming controls, borrowed names, stacks and contexts. A
-completion semaphore is only a hint. Successful real ThreadX thread deletion
-establishes that scheduler references are detached; timeout retains all storage.
-Task creation may run a higher-priority entry before creation returns. Failed
-resume retains a live control, rather than guessing that the entry never ran.
+引导期间可以初始化通知／队列、创建任务、发布唤醒提示，并逆序撤销已创建但
+从未执行的可返回任务；不能阻塞、等待任务退出或操作队列。启动前撤销使用锁定
+内核的内部终止／删除服务，仅在这个已证明的真实回调范围内允许。其他位置不能
+通过比较调度器状态或中断屏蔽值重新打开该范围。部分启动失败必须完成已证明
+合法的逆序撤销，或保留全部未撤销效果并执行产品的安全故障策略。
 
-Permanent tasks have no completion latch, join or destruction. Control, name,
-stack and context stay valid until reset. A returning permanent entry invokes
-retaining fail-stop. An unexpected `tx_kernel_enter` return also invokes
-fail-stop; it does not authorize prestart rollback. The weak default spins
-forever; product output safety and reset are external responsibilities, with no
-promised completion time. Kernel entry/shutdown examples must retain platform
-clocks and IRQ infrastructure while a scheduler is still alive.
+运行期间，可返回任务配合停止和关闭准入，发布者停止访问，已接纳的 I/O 排空或
+保持隔离。唯一外部退出会合者成功等待退出后，才能回收控制对象、借用名称、栈
+和上下文。完成信号量只是提示；真实 ThreadX 线程删除成功才证明调度器引用已
+撤销。超时保留全部存储。高优先级任务可能在创建调用返回前开始运行；恢复运行
+失败时保留存活控制对象，不能推断任务入口从未执行。
 
-Every live control is adapter-owned. One external owner serializes object
-init/destroy and task join. It must stop new users and quiesce existing task/IRQ
-publishers before destruction; a caller-visible `live` field is not a lock or a
-permission to reclaim concurrent users. Controls, task stacks, complete borrowed
-names/contexts, queue payloads, item buffers and waiters must be disjoint. Cold
-admission rejects wrapping ranges and known control/stack/payload overlap; it
-also rejects name/context starting inside a control or stack. Opaque context
-extents cannot be inferred and remain the caller's explicit responsibility.
+永久任务没有完成锁存、退出等待或销毁操作。控制对象、名称、栈和上下文有效到
+复位；入口返回时进入保留资源责任的故障停机。`tx_kernel_enter` 意外返回也进入
+同类故障停机，不授权启动前回滚。弱符号默认无限停住；安全输出、复位和完成
+时限由产品负责。只要调度器仍存活，就必须保留 Platform 时钟和 IRQ 基础设施。
 
-## Wait and queues
+存活控制对象由适配器操作。唯一外部责任者串行执行初始化、销毁和任务退出等待；
+销毁前关闭新使用者并使现有任务／IRQ 发布者停止访问。公开 `live` 字段不是锁，
+也不授权并发回收。控制对象、任务栈、完整借用名称／上下文、队列有效数据、
+单项缓冲区和等待者存储须互不重叠。冷态准入拒绝地址回绕及已知的控制对象、
+栈、有效数据重叠，也拒绝名称／上下文起点位于控制对象或栈内。不透明上下文的
+完整跨度不可推断，仍由调用者明确保证。
 
-A notification uses a real binary ceiling-put semaphore and a release-published
-sequence hint. There is one concurrent blocking waiter; each publisher needs its
-own valid task or reviewed IRQ context. Blocking finite waits compare the Core
-absolute deadline before observing a changed sequence on every iteration.
-`NX_DEADLINE_NEVER` uses a real unbounded kernel wait. Bounded kernel tick chunks
-preserve the original absolute budget; no retry obtains a new relative budget.
-The portable caller still rechecks its authoritative completion predicate.
+## 通知、队列与关闭
 
-The byte queue uses two real counting semaphores and caller payload storage.
-ThreadX's native word queue only accepts 1–16 `ULONG` words; using it directly
-would narrow Nexus's arbitrary-byte contract. This queue supports exact 3-byte
-and larger non-word payloads without rounding or undocumented padding. Caller
-capacity is exactly `depth * item_size`; all products must validate their actual
-payload and depth budgets. Immediate available data/space wins over an expired
-queue deadline, while failed receive leaves output unchanged.
+通知使用真实二值信号量的封顶投递操作和以 release 内存序发布的序列提示。
+同一时刻只允许一个阻塞等待者；每个发布者必须处于合法任务上下文或受审 IRQ
+上下文。有限阻塞等待每轮都先比较 Core 绝对截止时间，再观察序列变化。
+`NX_DEADLINE_NEVER` 使用真实无界内核等待。按内核节拍分段的有界等待共用原始
+绝对预算，重试不重新取得相对预算。可移植调用者仍须重查权威完成判定条件。
 
-A task preemption-threshold guard serializes queue commit and close registries.
-It saves/restores the incoming threshold and leaves IRQ delivery enabled. Payload
-copy size and the explicit maximum simultaneous waiters determine scheduling
-pause. They do not turn the entire copy or broadcast into an IRQ-masked region.
-The selected port must support preemption thresholds. Foreign priority-zero
-threads with a nonzero time slice are rejected before mutation because threshold
-zero cannot exclude their equal-priority rotation. Nexus-created tasks have no
-time slice and meet the guard contract. Foreign callers must follow the same
-single-core privileged lifecycle/context rules and must not mutate another
-caller's scheduling parameters.
+字节队列使用两个真实计数信号量和调用者提供的有效数据存储。ThreadX 原生字
+队列只接受 1～16 个 `ULONG`，直接使用会缩窄 Nexus 的任意字节合同。本实现
+支持精确三字节及更大的非整字数据，不取整、不加入未说明的填充。容量恰为
+`depth * item_size`，产品须核对实际深度和有效数据预算。已有数据／空位可以
+立即满足操作时，优先于已过期的队列截止时间；接收失败不改变输出。
 
-The optional closable queue adds two caller-linked waiter lists. Each simultaneous
-operation supplies its own initialized waiter. Registration, admission and close
-share the task guard; sequence arm before releasing it closes wake-before-block.
-Close is idempotent, rejects future sends, immediately latches every registered
-waiter and preserves old items for draining. There is no polling worker or global
-waiter pool. Destroy requires closed, drained, inactive and externally quiesced
-users. Raw queues require drained/quiesced users but have no close broadcast. Never mix
-raw operations on a closable queue's inner object with closable operations; raw
-waiters are not registered and cannot receive close broadcast.
+任务抢占阈值保护区串行执行队列提交和关闭登记，保存并恢复输入阈值，保持
+IRQ 可递送。有效数据复制大小和显式最大并发等待者数决定调度暂停成本，整段
+复制或广播不因此变为 IRQ 屏蔽区间。所选端口必须支持抢占阈值。外部任务若
+优先级为零且启用非零时间片，在变更前拒绝，因为阈值零不能阻止同优先级轮转。
+Nexus 创建的任务不使用时间片，满足此合同。外部调用者须遵守相同的单核特权
+生命周期和上下文规则，不能修改其他调用者的调度参数。
 
-## Cortex-M4 integration
+可选可关闭队列增加两个由调用者连接的等待者链表，每个并发操作提供自有且
+已初始化的等待者。登记、准入和关闭共用任务保护区；释放保护区前武装序列，
+防止唤醒先于阻塞的竞争。关闭幂等，拒绝后续发送，立即锁存全部已登记等待者，
+并保留旧数据供排空。不设轮询工作线程或全局等待者池。销毁要求已关闭、已排空、
+无活动操作，且外部使用者已停止访问。原始队列要求已排空且使用者停止访问，
+但没有关闭广播。禁止混用可关闭队列内部原始对象的操作；原始等待者未登记，
+收不到关闭广播。
 
-Use the pinned `ports/cortex_m4/gnu` C/ASM headers and all seven upstream ASM
-sources listed by that port's CMake file. The official schedule object owns
-both strong `PendSV_Handler` and `__tx_PendSVHandler` aliases at the same naked
-entry; an extra wrapper would conflict or change the exception frame.
-`m4_vectors.S` supplies only SysTick wiring to the actual `_tx_timer_interrupt`.
-This port does not require SVC. The port's real FP context handling remains intact.
+## Cortex-M4 集成
 
-`m4.c` supplies `_tx_initialize_low_level` instead of the upstream demo. It uses
-resolved `NEXUS_CORE_HZ`, `NEXUS_OS_TICK_HZ`, `NEXUS_OS_SYSTICK_RELOAD`,
-`NEXUS_OS_EXTERNAL_TICK`, `NEXUS_IRQ_PRIORITY_BITS` and
-`NEXUS_IRQ_SYSCALL_PRIORITY`. No 6 MHz sample clock, DWT clock or guessed heap is
-used. PendSV receives the lowest implemented priority; SysTick receives the
-selected kernel ceiling, or the lowest priority with PRIMASK policy. Unrelated
-SHPR3 fields are preserved. Startup masks PRIMASK; the real upstream scheduler
-releases its bootstrap mask.
+使用锁定的 `ports/cortex_m4/gnu` C／汇编头和该端口 CMake 列出的全部七个上游
+汇编源。官方调度对象在同一裸函数入口拥有强符号 `PendSV_Handler` 和
+`__tx_PendSVHandler` 两个别名；额外包装会导致冲突或改变异常栈帧。
+`m4_vectors.S` 只把 SysTick 连接到真实 `_tx_timer_interrupt`。此端口不需要
+SVC，保留端口真实的浮点上下文处理。
 
-BASEPRI selection must set `TX_PORT_USE_BASEPRI` and the same numeric literal
-`TX_PORT_BASEPRI` for both C and ASM. Its encoded value must equal the resolved
-logical syscall priority shifted by the implemented IRQ width. A generated C
-macro with a `U` suffix is not a valid GAS immediate. PRIMASK selection omits
-these macros. `nx_threadx_isr_allowed` rejects system exceptions, out-of-range
-external IRQs, unprivileged/masked contexts, incompatible priority grouping and
-BASEPRI IRQ priorities above the syscall ceiling before kernel wake mutation.
-Native cannot claim a hardware ISR and returns false.
+`m4.c` 提供 `_tx_initialize_low_level`，替代上游示例，消费已解析的
+`NEXUS_CORE_HZ`、`NEXUS_OS_TICK_HZ`、`NEXUS_OS_SYSTICK_RELOAD`、
+`NEXUS_OS_EXTERNAL_TICK`、`NEXUS_IRQ_PRIORITY_BITS` 和
+`NEXUS_IRQ_SYSCALL_PRIORITY`。不使用示例中的 6 MHz 时钟、DWT 时钟或猜测的堆。
+PendSV 使用最低已实现优先级；SysTick 使用选定内核上限，PRIMASK 策略则使用
+最低优先级。其他 SHPR3 字段保持原值。启动设置 PRIMASK，真实上游调度器撤销
+引导屏蔽状态。
 
-Explicit external Tick requires the product's strong
-`nx_threadx_external_tick_setup(tick_hz)` implementation. Missing implementation
-must fail linking; failure parks with effects retained. That hook binds a real
-bounded periodic IRQ at the correct kernel ceiling and does not replace the
-continuous monotonic clock. Existing STM32 TIM2 and GD32 TIMER1 platform clocks
-remain the Core deadline domain. The default config processes timer callbacks in
-ISR and creates no hidden timer task/stack; optional kernel timer callbacks must
-therefore meet ISR bounds. ThreadX has no automatically allocated idle task;
-scheduler idle consumes the application-supplied startup/MSP budget.
+选择 BASEPRI 时，C 和汇编都须设置 `TX_PORT_USE_BASEPRI`，并使用相同数字字面量
+定义 `TX_PORT_BASEPRI`；其编码等于已解析逻辑系统调用优先级按真实 IRQ 位宽
+左移的结果。带 `U` 后缀的 C 宏不是合法 GAS 立即数。PRIMASK 策略不定义这些宏。
+`nx_threadx_isr_allowed` 在内核唤醒操作变更前拒绝系统异常、越界外部 IRQ、
+非特权或中断已屏蔽上下文、不兼容优先级分组，以及 BASEPRI 下高于系统调用
+上限的 IRQ 优先级。Native 无法声称处于硬件 ISR，返回 false。
 
-## Linux qualification scope
+显式外部 Tick 要求产品提供强符号 `nx_threadx_external_tick_setup(tick_hz)`。
+缺实现必须链接失败；建立失败保留效果并保持停机。此钩子绑定处于正确内核上限
+的真实有界周期 IRQ，不替代连续单调时钟。STM32 TIM2／GD32 TIMER1 仍作为 Core
+截止时间域。默认配置在 ISR 中处理定时器回调，不创建隐藏定时器任务或栈，因此
+回调须满足 ISR 上界。ThreadX 不自动分配 Idle 任务；调度器空闲阶段消耗产品
+提供的启动／MSP 栈预算。
 
-The reviewed Linux GNU port runs real ThreadX pthread scheduler, task and timer
-threads. The host port allocates memory internally and uses its own pthread
-stacks; caller stack bytes are kernel metadata capacity, not a Linux or sanitizer
-stack budget. Unprivileged hosts may not obtain upstream SCHED_FIFO policy. Test
-fixtures bind the first actually permitted CPU; they do not enable the port's
-random multi-core affinity option. These tests prove behavior, not MCU RAM,
-real-time timing, physical IRQ priority or host privilege.
+## Linux 实现与资格边界
 
-Linux task admission first checks the actual port's thread-local task identity,
-then observes current TCB, interrupt nesting and preemption state under the
-existing port mutex. It checks the real pthread identity and ThreadX interrupt
-posture without changing that posture or retaining another mutex depth. The
-port's timed lock retry remains active. An unrelated pthread cannot borrow the
-currently scheduled task. Bootstrap ownership is callback-thread-local; cold
-calls reject before touching an uninitialized scheduler mutex. These Linux
-observations do not add locks or thread-local storage to the Cortex-M path.
+Linux GNU 端口执行真实 ThreadX pthread 调度器、任务和定时器线程，内部会分配
+内存并使用自有 pthread 栈。调用者栈字节是内核元数据容量，不是 Linux 或检测
+工具的栈预算。非特权宿主可能无法取得上游 SCHED_FIFO 策略。测试夹具绑定首个
+实际许可 CPU，不启用端口的随机多核亲和性选项。这些测试证明行为，不证明 MCU
+RAM、实时性、物理 IRQ 优先级或宿主权限。
 
-The Linux-only `tx_user.h` overrides the official system-state, current-thread
-and system-return-check macros. Their observers read the actual values under the
-same recursive mutex; the return check snapshots system state and preemption
-flags together. One lock/unlock pair preserves an already masked caller's depth
-and posture. Successful recursive-mutex initialization publishes readiness with
-release ordering before creating the timer pthread. Before an acquire observes
-readiness, the supported single bootstrap thread reads the real initialization
-sentinel/current pointer without locking. Concurrent raw kernel calls during
-initialization remain outside the adapter contract. The overrides protect these
-observations rather than serializing every subsequent preemption decision.
+Linux 任务准入先检查真实端口的线程局部任务身份，再在既有端口互斥量下观察
+当前 TCB、中断嵌套及抢占状态。它检查真实 pthread 身份和 ThreadX 中断状态，
+不改变该状态，不额外保留互斥量深度，端口的限时加锁重试保持启用。无关 pthread
+不能借用当前已调度任务。引导责任限定于回调线程；冷态调用在访问未初始化的
+调度器互斥量前拒绝。Cortex-M 路径不增加这些锁或线程局部存储。
 
-`prepare_linux.py` produces build-local low-level and scheduler derivatives from
-their two exact reviewed source SHAs. It preserves upstream copyright/license
-and leaves the checkout unchanged. The timer uses CLOCK_MONOTONIC + GNU
-`sem_clockwait`, with `>=` normalization of the exact 1e9 nanosecond carry. The
-scheduler retains its mutex through the selected task's existing run
-acknowledgement. It omits a redundant timer suspend/resume there because timer
-context save already requires that mutex. The timer-origin ISR handshake stays
-unchanged.
+仅用于 Linux 的 `tx_user.h` 覆盖官方系统状态、当前线程及系统返回检查宏。
+观察操作在同一递归互斥量下读取真实值，返回检查同时取得系统状态和抢占标志
+快照。一对加锁／解锁保留原已屏蔽调用者的深度和中断状态。递归互斥量初始化
+成功后，先以 release 内存序发布就绪，再创建定时器 pthread。在以 acquire
+观察到就绪前，受支持的唯一引导线程不加锁读取真实初始化哨兵值和当前线程指针。
+初始化期间的并发原始内核调用不在适配器合同内。这些覆盖实现保护观察操作，
+不串行化后续每次抢占决策。
 
-The suspend handler preserves the interrupted caller's `errno`, including nested
-early return, and consumes the blocked resume signal with GNU `sigwait`. Its
-full handler mask and suspend acknowledgement stay in place; a resume arriving
-before the wait remains pending. Synchronous consumption avoids a nested resume
-handler corrupting GCC ThreadSanitizer's saved signal mask. The normal and
-instrumented host use the same derivative; no diagnostic suppression or raw
-syscall bypass is involved. An invalid wait aborts rather than falsely resuming.
-This is an explicitly reviewed Linux GNU libc syscall/cancellation path, not a
-portable POSIX async-safety claim. Raw termination/reset of executing product
-code retains the upstream cancellation caveat and is outside the adapter's
-completed-task or never-executed-bootstrap deletion contract. The Cortex-M
-implementation path and the official Gitlink remain unchanged.
-Unknown source/patch/output or a symlink is rejected. An existing output can be
-atomically upgraded only if its complete SHA matches an explicitly reviewed
-predecessor derived from the same exact official source. A self-declared sidecar
-does not establish ownership. A selecting
-CMake target must genuinely compile and link a `_GNU_SOURCE`/`Threads::Threads`
-`sem_clockwait` capability probe and fail when unavailable. The derivative never
-substitutes an unbounded realtime wait or weak fallback.
+`prepare_linux.py` 从两个精确受审源码 SHA 在构建目录生成底层初始化与调度器
+派生物，保留上游版权／许可，不改上游工作树。定时器使用 CLOCK_MONOTONIC 和
+GNU `sem_clockwait`；纳秒恰到 1e9 时用 `>=` 归一化。调度器保持互斥量，直到
+选定任务完成原有运行确认；此处省去多余的定时器挂起／恢复，因为定时器上下文
+保存已要求持有同一互斥量。定时器触发的 ISR 握手不变。
 
-Actual wall-clock adjustment requires a suitably privileged host and remains
-not executed. Source/clock-domain conformance and mocked libc boundary tests do
-not establish that physical host experiment.
+挂起处理程序保存被打断调用者的 `errno`，包括嵌套提前返回，并用 GNU
+`sigwait` 同步消费已屏蔽的恢复信号。完整处理程序信号屏蔽状态和挂起确认保持
+原样，等待前到达的恢复信号保持待处理。同步消费避免嵌套恢复处理程序破坏 GCC
+ThreadSanitizer 保存的信号屏蔽状态。普通宿主与检测工具插桩的宿主使用同一
+派生物，不压制诊断、不绕过系统调用；非法等待直接中止，不伪装恢复。此路径
+明确依赖受审 Linux GNU libc 系统调用和取消行为，不声称通用 POSIX 异步信号
+安全。原始终止／复位正在执行的产品代码仍有上游取消限制，不在适配器的已完成
+任务删除或从未执行的引导任务删除合同内。Cortex-M 实现和官方 gitlink 不变。
 
-## Cost and evidence
+未知源码、补丁、输出或符号链接均拒绝。已有输出仅在完整 SHA 匹配同一精确官方
+来源的显式受审前置版本时可原子升级；自报侧车记录不证明所有权。选择该端口的
+CMake 目标必须真实编译、链接使用 `_GNU_SOURCE`／`Threads::Threads` 的
+`sem_clockwait` 能力探针，不可用就失败，不回退到无界实时时钟等待或弱符号实现。
 
-The development ARM object probe uses GNU 14.3, Cortex-M4F hard-float, `-Os`,
-32 priorities, timer processing in ISR and the exact reviewed port header:
+调整真实墙上时钟需要具备相应权限的宿主，目前尚未执行。源码／时钟域符合性及
+模拟 libc 边界测试不证明已执行该物理宿主实验。
 
-| Caller-owned object | Bytes |
+## 成本、测试与交付
+
+开发 ARM 对象探针使用 GNU 14.3、Cortex-M4F hard-float、`-Os`、32 个优先级、
+ISR 定时器处理和精确受审端口头：
+
+| 调用者持有对象 | 字节 |
 | --- | ---: |
-| Kernel TCB / semaphore | 180 / 32 |
-| Binary notification / portable wait face | 44 / 16 |
-| Returning / permanent task control | 232 / 192 |
-| Raw / closable byte queue control | 96 / 112 |
-| Each close-aware operation waiter | 52 |
+| 内核 TCB／信号量 | 180／32 |
+| 二值通知／可移植等待接口对象 | 44／16 |
+| 可返回／永久任务控制对象 | 232／192 |
+| 原始／可关闭字节队列控制对象 | 96／112 |
+| 每个感知关闭的操作等待者 | 52 |
 
-Add actual task stacks and `depth * item_size` payload storage. Permanent tasks
-save 40 bytes here; closable queues add 16 bytes plus explicit waiter controls.
-These are real 32-bit ARM `sizeof` symbols, not total linked firmware RAM or
-Flash, timing measurements or a board qualification. Kernel configuration and
-compiler ABI changes require a fresh probe and actual ELF/map retention report.
+另加真实任务栈及 `depth * item_size` 有效数据存储。此配置中，永久任务节省
+40 B，可关闭队列多 16 B 和显式等待者控制对象。这些是实际 32 位 ARM `sizeof`
+符号，不是固件链接后的总 RAM／Flash、时序测量或实板资格。内核配置或编译器 ABI
+改变后须重新探测，并检查实际 ELF／map 的存储保留结果。
 
-The IO34 development evidence records real official Linux kernel GoogleTest
-execution, actual bootstrap callback lifecycle, queue/close/deadline behaviors,
-preimplementation RED snapshots, Cortex-M4 register boundary tests and the whole
-Linux timer source with mocked external libc boundaries. MCU vector/tick linking
-on three boards, installed-source SDK consumption, final clean source CI and
-physical HIL are separate acceptance steps. No port name, stub or software model
-may mark those steps passed.
+IO34 开发证据包含真实官方 Linux 内核的 GoogleTest 执行、真实引导回调生命周期、
+队列／关闭／截止时间行为、实现前 RED 快照、M4 寄存器边界测试，以及完整 Linux
+定时器源码配合外部 libc 模拟替身的测试。三板 MCU 向量／节拍链接、安装后的源码
+SDK 消费、最终干净源码 CI 和物理 HIL 各自验收；端口名称、桩或模型不能将其标为
+通过。
 
-The maintained [ARM matrix gate](../../scripts/ci/os_threadx.py) links the actual
-three Board graphs under both supported IRQ policies and checks the missing
-external-Tick provider as a separate negative link. It verifies same-address
-strong official PendSV aliases, all locked compiled kernel objects, resolved
-policy, ELF budget and exact evidence identities. Host Google contracts select
-an independent real Linux kernel through `tests/google/threadx.cmake`; eight
-executables discover and execute their complete runtime, initialization and
-external-boundary case sets with fresh reports. The Linux signal contracts also
-exercise complete mask restoration and a real resume queued before its wait.
-Final clean candidate,
-SDK and physical qualification remain separate from development execution.
+[ARM 矩阵门禁](../../scripts/ci/os_threadx.py)真实链接三板生产目标图和两种 IRQ
+策略，并独立执行缺外部 Tick 实现的负链接测试。它核对同地址强符号官方 PendSV
+别名、全部锁定已编译内核对象、解析后的策略、ELF 预算和精确证据身份。
+`tests/google/threadx.cmake` 选择独立真实 Linux 内核，八个可执行文件完整发现、
+执行运行期／初始化／外部边界用例，并生成全新报告。Linux 信号合同还验证完整
+屏蔽状态恢复，以及等待前已真实排队的恢复信号。最终干净源码候选、SDK 与物理
+资格均独立于开发阶段执行。

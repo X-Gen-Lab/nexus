@@ -1,15 +1,11 @@
-# G474 shared TIM3 software reference
+# G474 共享 TIM3 软件参考
 
-This reference declares STM32G474RET6 PA6/TIM3_CH1 and PA7/TIM3_CH2 AF2 for
-the explicit `shared-fixed-pwm` selection. Both public PWM faces use one physical
-TIM3 owner and one fixed time base. The second channel joins the current phase;
-this reference does not promise coherent simultaneous start or a full first pulse.
+本参考为 `shared-fixed-pwm` 声明 STM32G474RET6 PA6／TIM3_CH1 与
+PA7／TIM3_CH2 AF2。两个 PWM 接口共用一个物理 TIM3 owner 和固定时基。
+第二通道加入当前相位，不承诺同时起动或完整首脉冲。
 
-The Board declares a24MHz HSE input, inactive-low PA6 and inactive-high PA7.
-These are software test inputs. No physical PCB, connector, output load,
-electrical safety, clock measurement or HIL result is established.
+Board 声明 24 MHz HSE、PA6 inactive-low、PA7 inactive-high，仅为软件测试输入，
+不建立 PCB、connector、负载、电气安全、时钟测量或 HIL 结果。
 
-The sole normal input is
-[`g474-pwm-shared.toml`](../../g474-pwm-shared.toml). Static route selection,
-actual provider behavior, linked-image cost and physical qualification have
-separate evidence boundaries.
+唯一普通输入为 [`g474-pwm-shared.toml`](../../g474-pwm-shared.toml)。静态路线、
+provider 行为、链接成本和物理资格各有独立证据边界。

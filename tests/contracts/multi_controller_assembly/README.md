@@ -1,39 +1,26 @@
-# Multiple-controller software fixtures
+# 多控制器软件装配
 
-These assemblies select reviewed silicon pads for STM32F407ZGT6,
-STM32F407VET6 and GD32F470ZGT6. Their Board packages are explicit software
-contracts. PCB revisions, external device wiring, pulls, voltages and physical
-qualification remain unknown.
+软件 Board 明确选择 F407ZGT6、F407VET6、GD470ZGT6 硅片 pad，PCB、外部线、pull、
+电压与物理资格未知。每料号六份手写 TOML，runner 不改 backend 或临时编装配：
 
-Each part has six authored TOMLs. No test runner edits a backend or invents an
-assembly:
-
-| Suffix | Selected controller graph | Backend |
+| 后缀 | 控制器图 | 后端 |
 | --- | --- | --- |
-| `.toml` | Two UART TX-DMA, two SPI DMA, one secondary I2C DMA | Bare metal |
-| `-freertos.toml` | Same five independent controllers | FreeRTOS |
-| `-i2c-pair.toml` | Two I2C controllers with finite message DMA | Bare metal |
-| `-i2c-pair-freertos.toml` | Same I2C DMA pair | FreeRTOS |
-| `-i2c-pair-irq.toml` | Two I2C controllers with finite message IRQ | Bare metal |
-| `-i2c-pair-irq-freertos.toml` | Same I2C IRQ pair | FreeRTOS |
+| `.toml` | 两 UART TX-DMA、两 SPI DMA、一个 secondary I2C DMA | baremetal |
+| `-freertos.toml` | 同上五个独立 controller | FreeRTOS |
+| `-i2c-pair.toml` | 两 I2C 有限 message DMA | baremetal |
+| `-i2c-pair-freertos.toml` | 同一 I2C DMA pair | FreeRTOS |
+| `-i2c-pair-irq.toml` | 两 I2C 有限 message IRQ | baremetal |
+| `-i2c-pair-irq-freertos.toml` | 同一 I2C IRQ pair | FreeRTOS |
 
-The secondary UART TX engine and the primary I2C TX engine both use physical
-stream 6 in DMA1 on STM32 and DMA0 on GD32. The resolver rejects selecting those
-owners together, even though their request selectors differ. The five-controller
-graph therefore selects the secondary I2C controller. Same-address I2C endpoints
-on two distinct buses retain separate identities and contexts.
+secondary UART TX 与 primary I2C TX 共用 STM DMA1／GD DMA0 的物理 stream6，
+即使 selector 不同也冲突，resolver 拒绝同时选择；五路图改选 secondary I2C。
+不同 bus 的同地址 endpoint 保持独立身份／context。
 
-The CMake fixture consumes `NEXUS_SOURCE_ROOT` and one explicit
-`NEXUS_ASSEMBLY_FILE`, then calls the maintained `nexus_add_firmware` function.
-Its main retains every selected public controller and endpoint face through the
-typed factory. It initiates no transfer and does not establish physical device
-behavior. The post-link observer checks actual ELF contexts and readonly
-operations tables; the maintained provider-assembly runner also verifies budgets
-and source/configuration identities.
+CMake 读 `NEXUS_SOURCE_ROOT` 和一份 `NEXUS_ASSEMBLY_FILE`，调用生产
+`nexus_add_firmware`。main 通过 typed factory 保留全部 controller／endpoint，
+不发传输、不证明器件。post-link 检查实际 context／只读 ops，provider runner
+另查预算和 source／config。
 
-Generated cold assembly owns the selected clock, pin and NVIC leases. A failed
-constructor participates in reverse cleanup. Successful source drain and NVIC
-quiescence precede pin restoration; every active-low CS output observes an
-inactive level before any pin in its controller group is restored. A refused
-withdrawal keeps the lease and blocks restart until explicit cleanup succeeds.
-Ordinary I/O calls still invoke the public face's shared provider table directly.
+生成冷装配持有 clock／pin／NVIC lease，失败构造也参与逆序清理。实际撤源与 NVIC
+quiescence 后才恢复 pad；每个 active-low CS 在同组任一引脚恢复前先观察 inactive。
+撤回拒绝保留 lease、阻止 restart，直到显式清理成功。日常 I/O 仍直接调用共享表。

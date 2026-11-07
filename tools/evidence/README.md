@@ -1,22 +1,24 @@
-# Offline builds and external consumers
+# 离线复现、证据存储与原始诊断
 
-Reproduction declares the platform's clean Git revision, complete publishable
-Source SDK, immutable OCI environment and content-hashed ARM toolchain. It
-executes two fresh builds with different source and build mount paths, no
-network, read-only inputs and no host credential mounts. Passing means that
-the actual ELF and BIN pairs match byte for byte. It does not run an MCU.
+本目录将 clean source、Source SDK、环境、命令执行和产物作为独立身份核对；
+`reproduce.py` 执行离线构建，`store.py` 保存／恢复原件，传输和诊断工具只证明各自
+处理的字节与上下文。它们不把复制成功、摘要或本地目录名提升为候选或实板资格。
 
-Schema 1 builds a maintained assembly included in the Source SDK. Schema 2
-adds a separate clean Git consumer project. Only that project's tracked regular
-files enter the snapshot; `.git`, other projects, untracked files, symlinks and
-implicit submodules do not enter the container. The platform SDK remains its
-own verified input. Configuration still uses one authored TOML and one resolved
-IR; the reproduction spec records inputs and commands, not platform policy.
+## 两次离线构建与外部工程
 
-An external CMake project consumes `find_package(Nexus CONFIG REQUIRED)` and
-`nexus_add_firmware(nexus_firmware SOURCES main.c)`. Commit the project and its
-assembly before preparing a formal reproduction. An assembly may use a
-maintained `board` name without copying Board or vendor implementation files.
+复现输入绑定平台的干净 Git revision、完整 publishable Source SDK、不可变 OCI
+环境和 content-hashed ARM 工具链。两次 fresh build 使用不同源码／构建挂载路径、
+只读输入、无网络、无主机 credential mount；成功表示实际 ELF／BIN 两对逐字节相同，
+不运行 MCU。流程与身份见[软件资格](../../docs/delivery/qualification.md)。
+
+Schema 1 使用 SDK 内的维护 assembly；Schema 2 另含干净 Git consumer project。
+只复制该工程的 tracked regular files，排除 `.git`、其他工程、untracked、symlink
+和隐式 submodule，平台 SDK 单独验证。TOML／resolved IR 仍是平台配置链，复现 spec
+只描述输入和命令，不维护另一份平台策略。
+
+外部 CMake 使用 `find_package(Nexus CONFIG REQUIRED)` 与
+`nexus_add_firmware(nexus_firmware SOURCES main.c)`。先提交工程和 assembly，再
+准备复现；维护的 `board` 名不要求复制 Board 或 vendor 实现。在仓库根执行：
 
 ```sh
 python tools/evidence/reproduce.py --prepare-spec --spec /output/spec.json \
@@ -29,45 +31,34 @@ python tools/evidence/reproduce.py --spec /output/spec.json \
   --report /output/reproduction.json
 ```
 
-External consumers default to `nexus-sdk/generated/resolved.json` and
-`bin/nexus_firmware.{elf,bin}`. Use `--resolved`, `--artifact-elf` and
-`--artifact-bin` to declare another contained output path. The validator reparses
-the ELF using the resolved CPU/ABI and verifies the BIN against its load image.
-Candidate sealing rechecks both independent source snapshots, the external
-source file closure, exact mounts and commands, and the same resolved artifact.
+默认 consumer 输出为 `nexus-sdk/generated/resolved.json` 和
+`bin/nexus_firmware.{elf,bin}`；以 `--resolved`、`--artifact-elf`、`--artifact-bin`
+显式选其他 contained path。verifier 按 resolved CPU／ABI 重读 ELF 并核对 BIN 与
+load image；candidate sealing 重查两份独立 source snapshot、consumer 完整文件、
+精确 mounts／commands 和同一 resolved artifact。
 
-Docker storage admission serializes reproduction jobs for the current user.
-VFS needs physical allocation, not Docker's logical image size. A read-only
-scan is preferred; if the daemon's layer metadata is inaccessible, a bounded
-create-only probe measures one stopped container and always attempts named
-cleanup. Inconsistent observations or failed cleanup reject admission. Free
-space is checked again before each command. Overlay2/overlayfs use shared
-read-only layers, bounded `/tmp` tmpfs and disabled daemon log files. Unknown
-drivers are rejected. Reserves describe scheduling headroom, not a disk quota
-or a guarantee against unrelated filesystem pressure.
+## 存储准入、取消与源码观察
 
-Cancellation kills the CLI process group and removes its named daemon-owned
-container. Actual return codes and raw logs remain in the report directory;
-cancelled or failed work cannot produce a passing qualification. A complete
-software candidate additionally requires all other qualification scopes for
-the same source, resolved configuration and ELF. Physical HIL stays
-`not_executed` until equipment actually runs it.
+Docker 准入串行化同一用户的复现任务。VFS 使用实际物理分配量而非 Docker 逻辑大小；
+优先只读扫描，无法读取 daemon 层 metadata 时，使用有界 create-only stopped-container
+探针并始终尝试命名清理。观测矛盾或 cleanup 失败拒绝继续，每条命令前重查空间。
+Overlay2／overlayfs 使用共享只读层、有界 `/tmp` tmpfs、禁用 daemon log；未知 driver
+拒绝。预留是调度余量，不是 quota，也不保证无其他文件系统压力。
 
-Development source observations can also describe a dirty checkout. Only these
-dirty records add `working_tree_sha256`, binding the Git-visible tracked patch,
-index, untracked regular-file bytes and modes, symlink text and initialized
-submodule observations. Identical bytes rewritten with a new modification time
-keep the same identity. Historical dirty records without this fingerprint are
-stale; they cannot retrospectively prove which dirty bytes were observed.
+取消终止 CLI process group 并移除其命名 daemon container；实际 return code／raw
+log 保留，失败或取消不能产生 passed qualification。完整候选还要求同 source、
+resolved 配置与 ELF 的其他软件 scope；物理 HIL 继续为 `not_executed`。
 
-Clean source records keep exactly `root`, `commit`, `tree`, `dirty` and
-`submodules`. Candidates and external consumers still require clean source.
-Dirty observation does not qualify a candidate or an OCI/offline reproduction.
-It excludes ignored or Git-hidden worktree data and does not lock out concurrent
-writers or prove that no change-and-restore occurred between observations.
+开发观察可以记录 dirty checkout。仅 dirty 记录新增 `working_tree_sha256`，覆盖
+Git-visible tracked patch、index、untracked regular bytes／modes、symlink text 和
+已初始化子模块观察。相同字节仅 mtime 变化不改变身份；缺指纹的历史 dirty 记录不能
+追溯证明观察的字节。clean 记录仍精确包含 `root`、`commit`、`tree`、`dirty`、
+`submodules`。dirty 观察不建立候选／OCI 离线资格，不包含 ignored／Git-hidden 数据，
+不锁住 writer，也不能证明两次观察之间没有修改后恢复。
 
-Local portable-evidence recovery can continue through `store.py recover`.
-An explicit plan lists the original package-envelope and archive identities:
+## 便携证据恢复与继续
+
+`store.py recover` 使用显式计划，列出原 package envelope 和 archive 的实际身份：
 
 ```json
 {
@@ -84,15 +75,12 @@ An explicit plan lists the original package-envelope and archive identities:
 }
 ```
 
-Replace every size and hash with its actual identity. Paths can explicitly
-navigate transported archives; original envelope bytes stay unchanged. Recovery
-admits only the existing `portable_evidence` format, at most 128 unique packages,
-and no embedded commands or inner validators. It checks the complete manifest's
-expanded bytes, file-block allocation, directory/metadata overhead and explicit
-reserve before creating recovery outputs; it checks space again per package.
-`restore_capacity` exposes the same manifest-based estimate to other maintained
-coordinators. Add any nested validator's simultaneous restoration to the reserve.
-These estimates do not reserve disk space or establish tmpfs memory headroom.
+将所有 size／SHA256 替换为原始实际值。路径可以导航运输后的归档，原 envelope 字节
+不变。只接受既有 `portable_evidence`，最多 128 个唯一包，不接收内嵌命令／inner
+validator。创建输出前按完整 manifest 的 expanded bytes、file-block allocation、
+目录／metadata 和显式 reserve 准入，每包前重查。`restore_capacity` 为协调器提供
+同一估算；嵌套 verifier 的同时恢复空间另计 reserve，估算不预占磁盘或证明 tmpfs
+物理内存余量。
 
 ```sh
 python tools/evidence/store.py recover --plan /input/recovery-plan.json \
@@ -101,99 +89,32 @@ python tools/evidence/store.py recover --plan /input/recovery-plan.json \
   --destination /new/recovery --resume --report /new/resumed-result.json
 ```
 
-The POSIX coordinator holds a nonblocking kernel file lock. Explicit `--resume`
-requires unchanged verifier source and plan fingerprints, package/archive bytes
-and complete existing payload members. Each invocation executes fresh owned
-store commands; completed copies are reverified, not recopied. Original unique
-command receipts and streams remain immutable, and the previous journal is
-copied into the new attempt. An interrupted active command with unknown process
-withdrawal rejects continuation; inspect its original receipt and resolve that
-operation first. Partial or unselected payload targets are retained and rejected.
-No raw evidence is pruned automatically. An unknown outer exit stays unknown;
-new byte verification does not rewrite its result. Recovery never runs or caches
-tests, promotes an inner report, or establishes candidate or physical acceptance.
+POSIX 协调器持有 nonblocking kernel file lock。`--resume` 要求 verifier source、
+plan fingerprints、原 package／archive 和完整 existing payload 不变。每次真实运行
+新的 owned store 命令，已完成副本重新验证而不重复复制；原 unique command receipt
+与 streams 保留，上次 journal 复制进新 attempt。
 
-# 离线构建与外部工程
+活动命令的进程撤回未知时拒绝继续，先查原 receipt 并处理该操作。partial／未选
+payload 目标保留并拒绝，不自动裁剪 raw evidence。原 outer exit 未知仍为未知，
+新 byte verification 不改写旧结果；恢复不执行或缓存测试，不升格 inner report。
 
-复现输入分别绑定平台的干净 Git 版本、完整可发布 Source SDK、不可变 OCI
-环境和 ARM 工具链字节摘要。工具在不同源码与构建挂载路径执行两次全新构建；
-输入只读、网络关闭，不挂载主机凭据。通过表示实际 ELF／BIN 逐字节一致，
-不表示 MCU 已运行。
+## 分卷下载完整 qualification
 
-Schema 1 使用 SDK 内的维护配置；Schema 2 另行声明干净 Git 外部工程。
-只复制所选工程的已跟踪普通文件，排除 Git 元数据、其他工程、未跟踪文件、
-符号链接和隐式子模块。平台 SDK 始终单独验证。一份 TOML 和一份 resolved IR
-仍是配置链路；复现 spec 只记录输入与命令。
+非发布 qualification workflow 运输完整原 qualification、delivery、job-identity
+树，精确角色由 `qualification_transfer.py` 的 immutable `ROOTS` 维护。factory、
+SDK、environment、recipe、candidate 合同不变；保留 hidden files、empty dirs、
+零 stderr 和 file mode，不做 selected-file 优化，也不删除重复 OCI 字节。
 
-外部工程通过 `find_package(Nexus CONFIG REQUIRED)` 和
-`nexus_add_firmware(nexus_firmware SOURCES main.c)` 消费平台。先提交工程及
-装配 TOML，再按上述命令声明输入。`board` 可引用平台维护的板卡名称，无需
-复制板级或厂商实现。默认 resolved 路径为
-`nexus-sdk/generated/resolved.json`，产物为 `bin/nexus_firmware.elf` 和
-`bin/nexus_firmware.bin`；自定义路径必须显式声明且位于构建目录内部。
+准备时将既有 schema 的 portable evidence 直接写为最多八个 256 MiB 分片，每片用
+固定 GitHub artifact upload 且 compression disabled，保留足够 ZIP 余量低于连接器
+512 MiB 上限。独立 core artifact 保存原 identity bytes、顺序 offset／size／SHA256、
+logical archive identity 和实际上传结果。完整输入 inventory／stat identity 不得变；
+symlink、special entry、alias root、重叠输出拒绝。外层分卷不改变内部格式上限。
 
-VFS 的容器会完整复制镜像，存储准入使用实际分配量。无法读取 daemon 层目录时，
-只创建而不启动一个有界探测容器，并在退出和取消时清理。观测矛盾、清理失败、
-空间不足均拒绝继续。每条构建命令前重新检查空间，同一用户的复现任务串行执行。
-Overlay2／overlayfs 使用共享只读镜像层、有界 tmpfs 并关闭 daemon 日志文件。
-这些预留是调度余量，不能保证外部进程不再占用空间。
-
-取消会终止 CLI 进程组并清理命名容器；真实退出码和原始日志保留。失败或取消
-不产生通过资格。最终候选还须满足同一源码、resolved 配置和 ELF 的全部软件
-验收范围。实板未执行时，物理 HIL 始终记录为 `not_executed`。
-
-开发阶段也可观察 dirty 工作区。仅 dirty 记录新增 `working_tree_sha256`，
-绑定 Git 可见的已跟踪补丁、索引、未跟踪普通文件的字节和权限、符号链接文本，
-以及已初始化子模块的观察结果。相同字节只因重写而修改时间发生变化时，身份不变。
-缺少该指纹的历史 dirty 记录视为过期，不能追溯证明当时观察了哪些 dirty 字节。
-
-clean 源码记录仍精确包含 `root`、`commit`、`tree`、`dirty` 和 `submodules`
-五项。候选与外部工程消费仍要求 clean 源码。dirty 观察不能赋予候选或 OCI／离线
-复现资格；它不涵盖被忽略或被 Git 隐藏的工作区数据，也不锁住并发写入者，不能
-证明两次观察之间没有发生修改后恢复原值的操作。
-
-本地可移植证据通过 `store.py recover` 按显式计划逐包恢复；上例中的大小、SHA256
-须替换为原始 envelope 与归档的实际身份。只接受既有 `portable_evidence`，最多
-128 个唯一包，不接收内嵌命令或执行内部 verifier。移动归档只改变显式导航，原始
-envelope 字节保持不变。开始前按完整 manifest 的展开字节、文件块、目录及元数据
-开销和显式预留检查空间，每包执行前再次检查。`restore_capacity` 向其他维护工具
-提供同一估算；内部 validator 同时展开 SDK 等空间须另行加入 reserve。该观察不是
-磁盘预占，也不能证明 tmpfs 具有足够物理内存。
-
-协调器使用 POSIX 非阻塞内核锁。显式 `--resume` 要求 verifier 源码、计划指纹、
-包与归档身份不变，并逐成员复核已有 payload。每次都真实执行新的 store 命令；
-已有完整副本重新验证而不重复复制。原始独立 attempt receipt 与输出保留，上轮
-journal 原样复制到新 attempt。活动命令退出或进程撤回状态未知时拒绝继续，先检查
-原始 receipt 并处理该操作；部分或未选择的 payload 也保留并拒绝，不自动删证据。
-原来未知的外层退出码仍然未知；新字节验证不会补写其成功。该功能不执行或缓存测试，
-不升格内部报告，也不建立候选或实板资格。
-
-## Independently downloadable qualification evidence
-
-The nonpublishing qualification workflow transports its complete original
-qualification, delivery and job-identity trees. The immutable `ROOTS` table in
-`qualification_transfer.py` owns their exact roles; factory, SDK, environment,
-recipe and candidate contracts are unchanged. Hidden files, empty directories,
-zero-byte stderr and file modes remain part of the complete inventory. There
-is no selected-file optimization or removal of duplicated OCI bytes.
-
-Preparation writes an existing-schema portable evidence archive directly into
-at most eight 256 MiB parts. Each part has its own pinned GitHub artifact upload
-with compression disabled, leaving ample ZIP overhead below the connector's
-512 MiB limit. A separate core artifact contains the original identity bytes,
-ordered offsets/sizes/SHA256, logical archive identity and actual upload outcomes.
-The whole original input inventory and stat identities must remain unchanged;
-symlinks, special entries, aliased roots and overlapping outputs are rejected.
-The new transport bounds are not changes to any inner evidence-format limit.
-
-Download core first and bind it to the actual final run, job, source and attempt.
-Obtain every declared part by its actual GitHub artifact ID and API ZIP digest,
-not by an arbitrary filename or a producer's success flag. Keep each part ZIP
-separate: one artifact containing all parts would still exceed the limit.
-Admit storage for the complete compressed archive, reassembly and any subsequent
-restore before downloading; tmpfs capacity alone is not memory headroom.
-
-After safe ZIP extraction into a new parts directory, verify the complete set:
+先下载 core，绑定真实最终 run／job／source／attempt；每片通过实际 artifact ID 和
+API ZIP digest 获取，不能只信文件名或 producer success。各 ZIP 分开，放在一个
+artifact 中仍会超限。下载前为完整压缩包、重组和后续 restore 准入，tmpfs 容量不能
+代替物理内存余量。安全抽取 ZIP 到新 parts 目录后，在仓库根验证：
 
 ```sh
 python -B tools/evidence/qualification_transfer.py verify \
@@ -202,47 +123,34 @@ python -B tools/evidence/qualification_transfer.py verify \
   --run-id ACTUAL_RUN_ID --attempt ACTUAL_ATTEMPT
 ```
 
-Verification checks every ordinal, offset, size and digest, the entire joined
-archive, one complete gzip member through CRC/ISIZE, strict TAR framing,
-non-sparse bounded logical sizes and the unchanged portable-evidence inventory.
-The original logical job, source, run
-and result must match the core; its identity bytes must also match the archived
-copy, whose qualification/delivery files must match the original artifact list.
-Rehashing an outer envelope cannot substitute a different original source.
-Existing `store.py`, `environment.py`,
-SDK and reproduction validators then retain their own responsibilities. Never
-execute archived scripts. Existing outputs are not overwritten; interrupted
-attempts retain partial files and must use a fresh destination for another try.
+验证逐一核对 ordinal、offset、size、digest、完整拼接包、读至 CRC／ISIZE 的单个
+完整 gzip member、严格 TAR framing、non-sparse logical bounds 和未变 inventory。
+原 logical job／source／run／result 必须匹配 core；identity bytes 匹配归档副本，
+qualification／delivery 文件匹配原 artifact list。重新 hash outer envelope 不能替换
+original source。既有 store／environment／SDK／reproduction verifier 各自负责，
+不得执行归档脚本。已有输出不覆盖，中断保留 partial，新尝试使用新 destination。
 
-A failed required volume, missing upload identity or failed core upload means
-incomplete delivery. Remaining volume/core uploads still preserve diagnostics.
-If preparation fails, the original monolithic failure-only uploader preserves
-available raw bytes, potentially exceeding the connector limit; that fallback
-is not successful multipart delivery. Final GitHub job/API identity remains
-mandatory even when an earlier original job-identity record says success.
+required volume 失败、缺 upload identity 或 core 上传失败均为 incomplete delivery；
+其余 volume／core 仍保存诊断。prepare 失败时原 monolithic failure-only uploader
+可保留原 raw bytes 并超过连接器限制，这不是成功分卷交付。即使原 job-identity 写
+success，最终 GitHub job／API identity 仍必须核对。
 
-`verified_transport` proves transported bytes and modes only. It never establishes
-a software candidate, physical MCU execution, HIL or independent validation of a
-historical artifact that could not be downloaded. New runs have new transport
-identities; the previous oversized ZIP and all failed download observations keep
-their original identities and unresolved validation status.
+`verified_transport` 只证明运输字节和权限，不建立候选、MCU 执行、HIL，也不证明
+未能下载的历史 artifact 已独立验证。新 run 有新身份；旧 oversized ZIP 与失败下载
+观察保留原 identity 和未解决状态。
 
-## Original formal-run diagnostics and large archive transport
+## 原始 formal 诊断与大归档传输
 
-`formal_diagnostics.py` reads a previously downloaded formal artifact. Select
-its exact source commit, run and attempt; the workflow checks the original
-GitHub run and artifact identity before download. Local file names alone do not
-authenticate GitHub. The tool verifies both complete existing store archives,
-binds the original job identity and nested envelope, then copies the original
-plan report, all executed stage receipts and complete failed-stage raw/attempt
-files. It never executes archived scripts or reruns checkers.
+`formal_diagnostics.py` 读取已下载的 formal artifact，要求精确 source commit、run、
+attempt；workflow 下载前核对原 run／artifact identity，本地名字不认证 GitHub。
+工具完整验证外层／内层既有 store archives、原 job identity 和 nested envelope，
+复制原 plan report、全部已执行 stage receipt、failed-stage 完整 raw／attempt，不执行
+归档脚本，不重跑 checker。
 
-The maintained `formal-software.yml` workflow also accepts `mode=diagnostics`,
-`run_id`, `attempt` and `expected_source`. Dispatch the revision containing that
-entry point; its own workflow SHA is distinct from the original source being
-read. The original run must have completed with success or failure, and its
-actual conclusion remains recorded. `expected_commit` belongs to formal mode.
-A successful diagnostics job cannot change the original plan's conclusion.
+`formal-software.yml` 接受 `mode=diagnostics`、`run_id`、`attempt`、`expected_source`。
+从有该入口的 revision 派发，其 workflow SHA 与原 source 区分。原 run 必须完成且
+conclusion 为 success／failure，实际结论保留；`expected_commit` 属于 formal mode。
+诊断 job success 不改变原 plan 结论。在仓库根执行本地抽取：
 
 ```sh
 python -B tools/evidence/formal_diagnostics.py \
@@ -252,58 +160,16 @@ python -B tools/evidence/formal_diagnostics.py \
   --run-attempt ORIGINAL_ATTEMPT
 ```
 
-`diagnostics/` retains the observed original outcome; exit zero means extraction
-and byte verification succeeded, even when that original outcome is failure.
-It never establishes software qualification. `transport/` contains the exact
-original build envelope and a manifest of the unchanged archive's full size/SHA
-and ordered offsets, sizes and SHA256 values for `parts/part-000`, and so on.
-Each part is at most 450 MiB, with at most 16 parts. Upload each part as a separate
-artifact; combining them defeats the connector's 512 MiB limit. Keep diagnostics
-and transport metadata separate too. Reject missing or changed parts before
-joining them in the recorded order, verify the complete archive size/SHA, then
-run the unchanged store verifier with the original envelope and an explicit
-archive location. Splitting does not alter the original package format.
+`diagnostics/` 保留原 observed outcome；exit 0 仅表示抽取／byte verification 成功，
+原失败仍失败，不产生 qualification。`transport/` 保存精确 original build envelope、
+完整 archive size／SHA 和 `parts/part-000` 等分片的顺序 offset／size／SHA256。
+每片最多 450 MiB，最多 16 片，各自独立 artifact 上传；诊断与 metadata 另分开，
+合并会超过连接器 512 MiB。接收端先拒绝缺失／变更分片，按记录顺序拼接，核对完整
+大小／SHA，再用原 envelope 和 explicit archive path 调用原 store verifier；格式不变。
 
-Unknown files, aliases, context mismatches, archive changes and exceeded bounds
-fail without truncating evidence. The complete diagnostic directory is limited
-to 400 MiB. Failed attempts retain their output; retries require a new directory.
-Original input files remain unchanged and must stay available for recovery.
-
-For a failed stage, an explicit `--report` is restricted to that stage's original
-output directory and copied with its matching `.contexts` directory. Native
-contract failures select only the declared one of the four maintained Native
-presets: its complete `tdd/` logs, `ctest-results.xml` and
-`Testing/Temporary/LastTest.log`. Absent optional diagnostics remain explicitly
-missing. These files share the same complete 400 MiB diagnostic budget.
-
-## 原始 formal 诊断与大归档传输
-
-`formal_diagnostics.py` 只读取已经下载的原始 formal artifact。必须指定精确
-源码提交、run 和 attempt；workflow 在下载前核对 GitHub 原始运行及 artifact
-身份，本地文件名不能证明远端来源。工具完整验证既有外层和内层 store 归档，
-绑定原始 job identity 与内层 envelope，复制原计划报告、全部已执行阶段收据及
-失败阶段的完整 raw／attempt 文件；不执行归档内脚本，也不重跑 checker。
-
-维护中的 `formal-software.yml` 另支持 `mode=diagnostics`、`run_id`、`attempt`
-和 `expected_source`。应从包含该入口的 revision 派发；诊断 workflow 自身的
-SHA 与读取的原始源码身份分开。原运行须已完成，且实际结论为成功或失败，原结论
-保持记录；`expected_commit` 仅用于 formal 模式。诊断 job 成功不能改变原计划
-的失败结论。
-
-`diagnostics/` 保留原始结果。退出零仅表示抽取和字节验证成功，原始失败仍为
-失败，不产生软件资格。`transport/` 保存原始 build envelope 和传输清单；
-清单记录原归档完整大小／SHA，以及 `parts/part-000` 等分片的顺序、偏移、大小
-和 SHA256。每片最多 450 MiB、最多 16 片，必须分别上传为独立 artifact，不能
-重新合并成超出连接器 512 MiB 限额的大包。诊断和传输元数据也分别上传。
-接收端先拒绝缺失或变更的分片，按清单顺序拼接，再核对完整归档大小／SHA，
-最后用原 envelope 和明确的新归档路径调用既有 store 验证器。原包格式不变。
-
-未知文件、别名、上下文错配、归档变化或超限均失败，不截断证据；完整诊断目录
-上限为 400 MiB。失败尝试保留输出，重试必须使用新目录。原始输入保持不变，
-仍须保留以便恢复；传输成功不替代候选资格或实际硬件验收。
-
-失败阶段显式声明的 `--report` 必须位于原阶段输出目录内部；工具复制该文件及
-同名 `.contexts` 目录。Native 契约失败只选择明确声明的四种维护 preset 之一，
-保留其完整 `tdd/` 日志、`ctest-results.xml` 和
-`Testing/Temporary/LastTest.log`。不存在的可选诊断明确记为缺失；这些文件同样
-计入完整诊断目录共享的 400 MiB 上限。
+未知文件、alias、context mismatch、archive 变化或超限都失败，不截断证据。完整
+诊断目录上限 400 MiB，失败保留输出，重试用新目录；原输入不变且需留供恢复。
+failed stage 的显式 `--report` 限于原 stage output directory，和同名 `.contexts`
+一起复制。Native failure 只选声明的四种 maintained preset 之一，保留完整 `tdd/`、
+`ctest-results.xml`、`Testing/Temporary/LastTest.log`；缺可选诊断明确 missing，
+全部仍计入同一 400 MiB。传输不建立当前候选或实物资格。

@@ -1,18 +1,14 @@
-# Real split-world compiler/link contract
+# 真实 split-world 编译／链接合同
 
-The fixture composes two independent production Runtime images. The Secure image
-uses explicit Secure CPU facts, a baremetal runtime and `Nexus::SecureContext`.
-The NS image uses matching Nonsecure facts and the `split` FreeRTOS profile.
-Secure linking emits seven distinct SG veneers in `.gnu.sgstubs` plus the actual
-CMSE import object; NS linking
-consumes that object and retains the real SVC/PendSV context paths.
+两幅独立生产 Runtime：Secure 选明确 CPU facts、baremetal、`Nexus::SecureContext`；
+NS 选匹配 Nonsecure facts 与 split FreeRTOS。Secure 链接生成七个不同 SG veneer
+于 `.gnu.sgstubs` 和真实 CMSE import object，NS 消费该 object，保留真实 SVC／
+PendSV context 路径。
 
-Both the example task and Idle task have caller-owned NS TCBs/stacks and distinct
-prepared Secure context metadata/stacks. The immutable Secure selector uses the
-two explicitly paired synthetic TCB addresses. Neither image supplies a default
-Secure context pool or a heap.
+例 task 与 Idle 都有 caller-owned NS TCB／stack 和各自已准备 Secure metadata／
+stack；不可变 selector 只使用两组明确配对的合成 TCB 地址。两镜像都无默认 Secure
+context pool 或 heap。
 
-The ROM/RAM/NSC ranges and static TCB identities here are synthetic software facts.
-There is no SAU/IDAU/vector/interrupt-target initialization, external NS transfer,
-board startup or hardware execution. A real SDK supplies those electrical and
-memory attribution contracts; hardware acceptance remains pending.
+ROM／RAM／NSC 范围、TCB 身份为软件事实，没有 SAU／IDAU／vector／IRQ target
+初始化、外部 NS transfer、板级启动或硬件执行。真实集成另供电气、内存归属和启动
+合同，实板验收保持待执行。

@@ -1,69 +1,42 @@
-# Bounded GPIO one-wire
+# 有界 GPIO OneWire 总线
 
-`Nexus::OneWire` provides one static, caller-owned standard-speed bus. Board and
-assembly supply one already configured open-drain GPIO output, its external
-pull-up, actual input readback and a live monotonic clock. Writing one releases
-the wire. The component neither changes GPIO modes nor creates a task, queue,
-allocator, device registry or global interrupt mask.
+`Nexus::OneWire` 提供调用者持有的标准速率静态总线。Board／assembly 提供已经
+配置的开漏 GPIO output、外部上拉、真实输入回读和有效单调 clock。写一表示释放
+线路；组件不改变 mode、不创建 task／queue／allocator／设备注册表或全局 IRQ mask。
 
-`nx_onewire_exchange` performs reset/presence, transmits 1–16 LSB-first bytes and
-receives 0–128 bits. It always starts a fresh protocol transaction. Zero unused
-bits complete the final receive byte. CPU buffer access ends on every return;
-partial receive bytes may change on failure. Caller spans are disjoint from
-known owner/configuration/face/operations storage. Complete opaque GPIO/clock
-context extents remain the assembly's responsibility.
+## 事务与时序
 
-Every wait checks a finite absolute deadline and an explicit finite poll count.
-The falling edge is bracketed: minimum pulse duration is measured from its
-post-write observation, maximum from its pre-write observation. Read sampling
-finishes inside a strict 14-us observed bound. Slot/recovery minima also include
-post-edge observations. Delayed GPIO/clock callbacks and preemption cause errors
-rather than a claim of successful timing. The fixed 500-us reset-low target and
-960-us software ceiling are a conservative reference profile; 960 us is not the
-external-VDD data sheet's maximum. Physical pull-up RC, clock uncertainty,
-waveforms and WCET still require hardware measurement. No physical timing or
-parasite-power capability is inferred from host mocks.
+`nx_onewire_exchange` 每次从新 reset／presence 开始，按 LSB-first 发送 1～16 字节，
+接收 0～128 位；最后接收字节未用 bit 补零。每次返回都结束 CPU buffer 访问，失败
+可能改变 partial receive bytes。span 与已知 owner／config／face／ops 分离；完整
+opaque GPIO／clock context 范围由装配保证。
 
-One serialized task owns calls and configuration. Never change the clock domain,
-pins or pull-up while the owner remains open. Synchronous failures attempt one
-immediate release/readback even after the transfer deadline. The primary error
-and cleanup result are separate. Failed withdrawal retains the wire binding,
-fault and GPIO lifetime, while retaining no CPU payload pointer. Use a fresh
-finite budget with `nx_onewire_stop` before dropping outer GPIO/configuration
-storage. Faulted stop holds the existing open-drain/clock binding for 500 us
-from the first observed physical high and post-read clock, then verifies high
-and deadline again: an aborted reset can trigger a later presence pulse. A short
-budget or insufficient poll count retains the binding; clean stop adds no such
-wait. A backward or nonfinite clock permanently faults this epoch; stop may
-attempt immediate electrical release but cannot claim clean closure in that
-invalid epoch. External reset or a separately reviewed handoff is then required.
-No later numerical deadline silently repairs the epoch.
+每次等待同时受有限绝对 deadline 和有限 poll count 限制。下降沿前后都读 clock：
+最小 pulse 从写后观察计时，最大 pulse 从写前观察计时。读取采样在严格的已观察
+14 µs 内完成，slot／recovery 最小值也包含边沿后观察。GPIO／clock callback 延迟
+或抢占导致错误，不报告虚假的时序成功。
 
-The DS18B20 component composes this transport. It does not use a stale read-bit
-conversion context across unrelated transactions. Overdrive, ROM search,
-multimaster operation, strong pull-up and parasite supply are absent. Source
-review identities are in `references.json`; physical HIL is `not_executed`.
+500 µs reset-low target 与 960 µs 软件 ceiling 是保守参考；960 µs 不是外部 VDD
+数据手册最大值。真实 pull-up RC、clock 不确定度、波形和 WCET 仍需测量，host mock
+不建立物理时序或寄生供电能力。
 
-## 中文合同
+## 失败和清理
 
-本组件是调用者持有的标准速率 1-Wire 总线。Board 和装配明确提供开漏输出、外部上拉、
-实际输入回读以及有效的单调时钟；写一表示释放线路。组件不配置引脚，不分配内存、
-创建线程或队列，也不长时间屏蔽中断。每次事务都先复位并检测存在脉冲，再按低位优先
-发送 1～16 字节、接收 0～128 位。
+同一串行 task 拥有调用与配置。owner 未关闭前，不改变 clock 域、pin 或 pull-up。
+同步失败即使已超过 transfer deadline，仍尝试一次立即 release／readback；primary
+和 cleanup 结果分开。withdraw 失败保留 wire binding、fault 和 GPIO 生命周期，但
+不保留 CPU payload 指针。释放外层 GPIO／config 前，用新的有限预算调用
+`nx_onewire_stop` 并验证结果。
 
-每个等待同时受绝对有限 deadline 和轮询次数约束。下降沿前后分别观察时钟，用较晚
-时间保证最短低电平，用较早时间限制最长低电平；读取在观察到的 14 微秒窗口内完成。
-时隙与恢复时间也从边沿后的观察推导。GPIO 回调、时钟读取或抢占超时均返回错误。
-500 微秒复位目标、960 微秒软件上限是保守参考配置；960 微秒并非外部供电模式的
-数据手册上限。模型不证明实物波形、上拉 RC、时钟误差或最坏执行时间。
+faulted stop 从首次观察到物理高及随后 clock 起，保留现有开漏／clock binding
+500 µs，再验证 high 和 deadline；中止 reset 可能引出迟到 presence pulse。预算
+太短或 poll 不足继续保留 binding，clean stop 不增加此等待。
 
-所有同步返回都结束对 CPU 缓冲区的访问，失败可能留下部分接收数据。线路释放失败
-继续保留总线、配置和 GPIO 的责任。停止需要新的有限预算，并成功确认线路释放后
-才可释放外层资源。时钟回退或返回非有限值会永久终止原时钟域；即使尝试释放线路，
-也不能用新的数值 deadline 假装修复，必须外部复位或经过单独审查的所有权交接。
-故障后的停止会从首次物理高电平及其后时钟观察起继续保留开漏和时钟绑定 500 微秒，
-再检查高电平和 deadline，避免复位失败后迟到的存在脉冲。预算或轮询次数不足时
-继续保留绑定；正常停止不增加此等待。
+回退或非有限 clock 永久使该 epoch 故障。stop 可尝试立即电气释放，不能宣称该失效
+epoch 已 clean close，需外部 reset 或单独审核的 handoff；新数值 deadline 不会修复。
 
-本组件不提供寄生供电、强上拉、超速、ROM 搜索或多主机。实板状态仍为未执行；
-DS18B20 在此机制之上实现明确器件协议。
+## 组合边界
+
+[DS18B20](../ds18b20/README.md)在此总线上实现器件协议，不跨无关事务使用旧
+read-bit 转换上下文。未提供 overdrive、ROM search、多主机、strong pull-up 或
+parasite supply。来源身份见 `references.json`，物理 HIL 为 `not_executed`。

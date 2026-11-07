@@ -1,47 +1,33 @@
-# Reviewed exact-part I/O selections
+# 精确料号 I/O 正向选择夹具
 
-These development fixtures bring reviewed positive route selections into the
-maintained capability table and the existing
-`providers-multi_controller_assembly` software stage. Each flat TOML is an
-explicit ARM build input. The shared C11 main starts the selected platform and
-reads each selected public face through a volatile pointer, retaining the real
-operations tables and initialized methods through section garbage collection.
-The provider checker validates compiler inputs, the exact resolved selection,
-CPU ABI, declared image/RAM limits and the post-link method-retention report.
-Linking does not execute these operations or establish physical behavior.
+这些开发夹具把已审正向路线纳入维护能力表与既有
+`providers-multi_controller_assembly` 软件阶段。每份平坦 TOML 是明确 ARM 输入，
+共享 C11 main 启动 Platform，通过 volatile 指针读各 face，使 GC 后仍保留真实方法表
+和初始化方法。provider checker 核对 compiler 输入、选择、CPU ABI、Flash／RAM
+预算和 post-link retention；链接不执行操作、不证明物理行为。
 
-The first eleven groups preserve 29 historically authored positive selections
-for F103RB, F407ZG, G474RE, GD303RC, GD470ZG, H743ZI and U575ZI. Their software
-Board provenance retains the original source revision. The current maintained
-TOMLs use local software Board packages; `f407-output.toml` additionally selects
-the reviewed ZG GPIOB PB2 output route. Historical execution receipts retain
-their original identities and do not qualify the current source.
+最初十一组保留 F103RB、F407ZG、G474RE、GD303RC、GD470ZG、H743ZI、U575ZI 的
+29 项历史正向选择，软件 Board 来源仍绑定原 revision。当前 TOML 使用本地软件
+Board，`f407-output.toml` 另选已审 ZG GPIOB PB2。历史收条不资格化当前源码。
 
-Five independent F407VE groups cover fourteen additional positive selections:
+五组 F407VE 另覆盖十四项正向选择：
 
-| Assembly | Selected controller duties |
+| 装配 | 选择 |
 | --- | --- |
-| `ve-word-adc-can.toml` | USART1 word IRQ, ADC1 continuous trigger DMA, CAN1 and CAN2 internal loopback |
-| `ve-rx-idle.toml` | USART1 idle RX DMA, EXTI0, GPIOB input and GPIOE input |
-| `ve-rx-continuous.toml` | USART1 continuous RX DMA, GPIOA input and GPIOE output |
-| `ve-duplex.toml` | USART1 finite duplex DMA and GPIOA output |
+| `ve-word-adc-can.toml` | USART1 字传输 IRQ、ADC1 连续触发 DMA、CAN1／CAN2 内部回环 |
+| `ve-rx-idle.toml` | USART1 空闲检测 RX DMA、EXTI0、GPIOB／GPIOE 输入 |
+| `ve-rx-continuous.toml` | USART1 连续 RX DMA、GPIOA 输入、GPIOE 输出 |
+| `ve-duplex.toml` | USART1 有限双工 DMA、GPIOA 输出 |
 | `ve-duplex-continuous.toml` | USART1 continuous duplex DMA |
 
-USART1 modes are mutually exclusive. ADC PA0/PA1 is separate from EXTI0/GPIOA
-users; DMA streams and CAN pins are admitted by the normal production resource
-graph. GPIOF/G modes reserved by the G474 SoC remain rejected. F407VE GPIOG and
-Ethernet selections lack reviewed exact-part routes and remain rejected too.
+USART1 模式互斥。ADC PA0／PA1 与 EXTI0／GPIOA 用户分开，DMA 和 CAN pad 由
+生产资源图准入；G474 保留 GPIOF／G 模式继续拒绝，F407VE 无已审 GPIOG／Ethernet
+精确路线也继续拒绝。
 
-All assemblies select baremetal, explicit clocks, `Os`, 2 KiB main stack and
-zero libc heap. The static RAM limit is 16 KiB for F103RB and 32 KiB for the
-other fixtures; all Flash limits are 64 KiB. These limits are checked against
-actual linked images. The software Board packages declare no physical
-PCB revision, fitted device, voltage, pull, oscillator measurement or external
-wiring. They are not physical Board packages and cannot establish HIL, complete
-series support, throughput, IRQ latency or product qualification. Firmware
-remains C11; host selection regressions use Python's existing unittest domain.
+全部选 baremetal、显式 clock、Os、2 KiB MSP、libc heap 0；F103 static RAM
+限 16 KiB，其他 32 KiB，Flash 全部 64 KiB，均对实际 ELF 检查。软件 Board 不声明
+PCB、焊接器件、电压、pull、晶振实测或外接线，不是物理 Board，不能建立 HIL、全
+系列、吞吐、IRQ latency 或产品资格。固件 C11，host 选择回归用 stdlib unittest。
 
-Run the normal provider checker with this source tree, the platform ARM
-toolchain and explicit TOML inputs. The formal software plan lists all sixteen
-fixtures once in its existing provider stage; no separate discovery mechanism
-or Source SDK consumer list is introduced here.
+用明确源码、ARM 工具和 TOML 运行普通 provider checker；正式计划在既有阶段枚举
+所有维护 fixture，不另建 discovery 或 Source SDK 消费者清单。

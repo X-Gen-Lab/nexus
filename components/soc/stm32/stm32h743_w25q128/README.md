@@ -1,75 +1,75 @@
-# H743 W25Q128JV single-line reference
+# H743 与 W25Q128JV 单线映射存储参考
 
-This optional software reference uses the existing mapped-storage owner and its
-caller-owned slots, requests, clock and backend state. It targets the EF4018
-Q/N/JQ identity from Winbond W25Q128JV Rev M, 24 December 2024. EF7018 M/JM parts
-require their separate DTR profile. No Board wiring or physical qualification is
-established by this component.
+可选软件参考将既有 mapped-storage owner 的调用者 slots、request、clock 与
+backend state 接到 H743 QUADSPI。器件身份是 Winbond W25Q128JV Rev M、
+2024-12-24 的 EF4018 Q／N／JQ；EF7018 M／JM 需要独立 DTR profile。本组件不
+建立 Board 接线或物理资格。
 
-The first profile uses mode 0, single-line 03h reads, 02h page program and 20h
-4 KiB sector erase at at most 16 MHz. Program requests split at 256-byte page
-boundaries, require erased input locations and verify written bytes. Erase
-completion also verifies the sector contents. Each owner service advances one
-command or bounded FIFO step; verification uses a 16-byte private buffer.
+## 架构与固定协议
 
-The SoC cold owner must acquire and preserve the actual QUADSPI clock and exact
-pin leases before preparation. Both CPU caches remain disabled, the QUADSPI NVIC
-remains disabled and inactive, and every external CPU/DMA/XIP user is excluded.
-Startup must already enable the MPU with HardFault/NMI coverage. The cold owner
-supplies two exclusive MPU region claims, with the readable region at higher
-priority. Both regions must initially be disabled. The adapter installs a
-256 MiB no-access/XN guard over the complete QUADSPI alias window and permits
-only the verified 16 MiB CPU aperture as read-only/XN/noncacheable while mapped.
-It rejects foreign higher-priority aperture overrides and never changes global
-MPU control. MPU protection does not join DMA, debugger or other bus masters.
-The supplied kernel frequency and clock domain remain stable. Preparation waits
-at least 5 ms before discovery, assuming flash power is already stable. There is
-no default PCB pinout, external device power control or implicit recovery reset.
+首个 profile 是 mode 0、单线 `03h` read、`02h` page program、`20h` 4 KiB sector
+erase，最高 16 MHz。program 按 256 字节 page 边界拆分，要求目标已擦除并回读
+验证；erase 完成也验证整个 sector。每次 owner service 推进一个命令或有限 FIFO
+步骤，verification 使用 16 字节私有 buffer。
 
-Only CPU read loans are advertised. The last release must withdraw the mapped
-aperture; a failed release retains its loan. Cancellation stops future mutating
-commands and finishes or retains an already issued page/sector operation.
-Deadline, a HAL callback, and HAL READY alone do not prove drain. An uncertain
-controller, flash BUSY/WEL, interrupt or buffer reference keeps storage borrowed.
-Final release removes readable MPU permission and fences the CPU before
-controller abort. On failed release the old view must never be used again;
-consumers stay joined while cleanup is retried, and new admission is closed.
-Map failure must prove deny and rollback or enter the retained platform fault
-path. Stop restores the cold descriptors and selector after controller
-withdrawal; refused restoration retains ownership.
-The generic owner must stop and its consumers/controls must join before the
-private controller stop releases its state. Clock and pin release remain the
-explicit SoC cold owner's responsibility.
+本组件属于 H743 Platform，不是 Runtime-only HAL 包。消费者使用
+`nexus_add_firmware` 或等价提供真实 SoC startup／clock owner。私有 supplier
+prelude 读取实际 System `core_hz`，满足官方 MDMA clock 依赖，不创建第二个全局
+clock 或猜测 peripheral frequency。vendor 与 construction headers 保持私有。
 
-The adapter reuses complete official HAL command, transmit/receive interrupt,
-IRQ dispatch, mapping and abort functions. HAL peripheral interrupt facts are
-polled by the serialized task; no NVIC interrupt, worker or MDMA is enabled.
-MDMA source is linked only because the official QSPI IRQ implementation references
-its abort entry point. Its presence grants no DMA capability.
-This is an H743 Platform component, not a Runtime-only HAL package. Consumers use
-`nexus_add_firmware` or equivalently provide the selected real SoC startup and
-clock owner. A private supplier prelude reads the actual System `core_hz` for
-the official MDMA clock dependency; it creates no duplicate global clock or
-guessed peripheral frequency. Vendor and construction headers remain private.
+从 `CMakeLists.txt`、`src/` 与 `private/` 进入；通用 owner 合同见
+[映射存储组件](../../../mapped_storage/README.md)，本页只规定精确硬件 adapter。
 
-Reviewed SDK gaps require bounded Nexus C:
+[FIG-23 所有权图](../../../../docs/assets/diagrams/io-extension-ownership.svg) 的映射
+分支表示通用读借用与撤回责任；本页精确 MPU／Flash 准入仍须分别满足。
 
-- HAL initialization replaces a reset handle's timeout with 5000 ms before a
-  BUSY wait. The cold adapter instead validates reset/idle hardware and writes
-  only the selected CR/DCR fields with readback, using official CMSIS masks.
-- HAL command and mapping functions still wait internally despite their IT
-  names. The private handle uses timeout zero and independent idle admission.
-  HAL abort/READY and deinitialization do not establish complete source removal;
-  the adapter separately checks BUSY/ABORT/FIFO, mode/source withdrawal, pending
-  IRQ and retained HAL pointers before allowing final release.
-- Official command configuration does not verify the address before an
-  irreversible command. The adapter first disarms the old CCR, stages and
-  reads back the address, then invokes the complete HAL function and checks its
-  result. A normal RX callback can still leave an incomplete count, and a
-  simultaneous transfer error can lose priority to completion in HAL dispatch;
-  exact remaining counts and error flags precede parsing any response.
+## 冷态准入与 MPU
 
-The immutable datasheet and official HAL source audit are recorded in the
-delivery evidence. Cache, arbitrary MPU policy, quad/QE changes, mapped DMA, XIP, erase
-suspend, status/protection writes and power-loss durability are outside this
-first profile. Test models and ARM links do not establish electrical behavior.
+SoC cold owner 在 prepare 前取得并保留真实 QUADSPI clock 和精确 pin leases。
+CPU 两种 caches 均关闭，QUADSPI NVIC disabled／inactive，排除全部外部 CPU／DMA／
+XIP users。startup 已开启含 HardFault／NMI coverage 的 MPU；cold owner 提供两份
+独占 MPU region claims，可读区域优先级更高，两区域初始均 disabled。
+
+adapter 在完整 QUADSPI alias window 建立 256 MiB no-access／XN guard，只在映射
+期间对已验证 16 MiB CPU aperture 授予 read-only／XN／noncacheable。它拒绝外来
+更高优先级 aperture override，不改 global MPU control。MPU 不负责 join DMA、
+debugger 或其他 masters。kernel frequency 和 clock domain 全程稳定；假设 Flash
+power 已稳定后，prepare 仍至少等待 5 ms 才 discovery。没有默认 pinout、外部供电
+控制或隐式 recovery reset。
+
+## 借用、撤回与恢复
+
+只发布 CPU read loans。最后一次 release 必须撤销 mapped aperture，失败保留
+loan。cancel 阻止未来变更命令，对已发出的 page／sector 操作完成或保留责任。
+deadline、HAL callback 或 HAL READY 都不足以证明 drain；不确定 controller、
+Flash BUSY／WEL、IRQ 或 buffer 引用都保留借用。
+
+最终 release 先删除可读 MPU permission、执行 CPU fence，再 controller abort。
+失败后旧 view 永远不可再访问，消费者保持 joined，cleanup 重试期间不开放新准入。
+map 失败必须证明 deny 和 rollback，或进入 retained platform fault。stop 在
+controller 撤回后恢复 cold descriptors 与 selector，恢复拒绝继续持有责任。
+
+generic owner 先 stop，全部 consumers／controls join 后，私有 controller stop
+才释放状态。clock／pin 归还仍由显式 SoC cold owner 负责。
+
+## 官方 HAL 复用与已审例外
+
+adapter 复用完整官方 HAL command、transmit／receive interrupt、IRQ dispatch、
+mapping 和 abort 函数。串行 task 轮询 HAL peripheral interrupt facts，不启 NVIC、
+worker 或 MDMA。MDMA 源仅因官方 QSPI IRQ 引用其 abort entry 而链接，不授予 DMA 能力。
+
+需要有界 Nexus C 的已审 SDK 缺口为：
+
+- HAL init 在 BUSY wait 前把 reset handle timeout 换为 5000 ms；cold adapter
+  改为验证 reset／idle 硬件，使用官方 CMSIS masks，仅写所选 CR／DCR 并 readback。
+- HAL command／mapping 虽名含 IT，内部仍等待。私有 handle 使用 timeout zero
+  和独立 idle admission；HAL abort／READY／deinit 不证明全部撤源，adapter 分别
+  检查 BUSY／ABORT／FIFO、mode／source withdrawal、pending IRQ 和 HAL retained pointers。
+- 官方 command config 不在不可逆命令前验证地址。adapter 先 disarm 旧 CCR，stage
+  并回读 address，再调用完整 HAL 函数并检查结果。普通 RX callback 仍可能计数不全，
+  同时 error 也可能在 HAL dispatch 中低于 completion；解析响应前先看精确 remaining
+  与 error flags。
+
+不可变 datasheet 和官方 HAL audit 见交付证据。Cache、任意 MPU policy、quad／QE
+变化、mapped DMA、XIP、erase suspend、status／protection 写入和掉电持久性不属于
+首个 profile。模型和 ARM 链接不建立电气或实板资格。

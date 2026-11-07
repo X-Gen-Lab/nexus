@@ -1,28 +1,19 @@
-# SPI endpoint allocation fixture
+# SPI endpoint 分配成本
 
-This link-only firmware consumes the public factory, validates every selected
-endpoint against its public controller face, and uses one polling transfer loop.
-Select `COST_ENDPOINTS=0`, `1`, `2` or `4`. Zero has no selected SPI controller,
-endpoint face, endpoint array or SPI factory ID reference. The nonzero consumers
-share the same topology-validation and transfer structure. One and two endpoints
-keep a two-pointer local array; four keeps four pointers. The extra unused slot
-in the one-endpoint consumer preserves the original one/two comparison shape.
+link-only 固件消费公共 factory，验证每个 endpoint 属于其 controller，再用一个
+polling loop。`COST_ENDPOINTS=0/1/2/4`；zero 无 SPI controller、face、数组或 ID
+引用。非零共用 topology／transfer 结构，一／二保留两个 pointer 数组，四保留四个；
+一 endpoint 的未用 slot 保留旧比较形状。
 
-All configurations select STM32F407ZGT6, Cortex-M4F hard float, baremetal,
-HSE8/PLL168, `Os`, a 2048-byte main stack and no libc heap. They use the same
-Flash and static RAM budgets. The zero image measures the common platform
-startup/stop baseline. Nonzero images add the complete selected SPI1 transport,
-generated cold resources and the consumer; their deltas are not face size alone.
+全部选 F407ZGT6、M4F hard float、baremetal、HSE8／PLL168、Os、2048 B MSP、
+libc heap 0，相同 Flash／RAM 预算。zero 测共同启动／停止基线，非零包含完整 SPI1、
+冷资源和 consumer，不是单独 face 大小。
 
-The original `software-board` and `endpoints-1.toml`/`endpoints-2.toml` remain
-unchanged. They describe silicon pads only: SPI1 PA5/PA6/PA7 and active-low PE4,
-then PE3. The separate `software-board-four` adds the existing exact ZGT6 PG9 and
-PB2 GPIO routes. It deliberately uses **three chip-select GPIO banks**, E/G/B,
-in addition to the shared SPI pins on GPIOA. No PCB, device connection, voltage,
-pull resistor or physical qualification is asserted by these software facts.
+原 `software-board`、`endpoints-1.toml`／`endpoints-2.toml` 保持原输入：PA5／6／7，
+active-low PE4 后加 PE3。四路包另加已审 ZGT6 PG9／PB2，因此除 GPIOA SPI 外还有
+E／G／B 三个 CS bank，不声明 PCB、器件、电压、pull 或物理资格。
 
-Build the maintained fixture with one explicit verified source tree and ARM
-toolchain; there is no dedicated root preset:
+本 fixture 没有专用根 preset，明确源码与 ARM toolchain：
 
 ```sh
 cmake -S tests/contracts/io_storage_cost/spi_endpoints -B build/spi-cost-4 \
@@ -33,26 +24,14 @@ cmake -S tests/contracts/io_storage_cost/spi_endpoints -B build/spi-cost-4 \
 cmake --build build/spi-cost-4 --target endpoint_cost --parallel 1
 ```
 
-Retain the exact source/configuration hashes, actual compile commands and
-compiler identity with every ELF/BIN/map. The firmware's normal resource gate
-measures LOAD, RAM and MSP/heap reservations. Apply the existing
-`tools/measurement/interfaces.py`, `static_storage.inspect_storage` and
-`retention.py` observers to the same ELF and generated configuration. Nonzero
-images must retain both the controller and endpoint faces/tables. For zero,
-record full face retention as not applicable and verify actual absence of SPI
-faces, tables and provider state; never turn an empty retention report into a
-pass. Static storage subsets are already included in total RAM.
+每个 ELF／BIN／map 绑定 source／config、compile command、compiler。普通 gate
+测 LOAD／RAM／MSP／heap；对同一 ELF 和配置运行 `interfaces.py`、
+`static_storage.inspect_storage`、`retention.py`。非零必须保留 controller 与
+endpoint face／table，zero 记完整 face retention 不适用，并验证 SPI face／table／
+state 缺失，不能把空报告当通过。storage 子集已计入总 RAM，不再相加。
 
-Report complete-image deltas separately from endpoint state, CS state, readonly
-faces, shared tables, cold pin snapshots and application code. The two-to-four
-delta also activates GPIOG/GPIOB gates and leases, so it cannot establish a pure
-per-endpoint linear cost. The zero-to-one delta includes the shared transport.
-
-The earlier consumer transferred only through endpoint faces; linker collection
-of its unused public controller face was legitimate. Its full face-retention
-observer therefore failed. The current consumer also validates public topology
-and retains that controller face/table. Preserve the old one/two images as an
-endpoint-only workload, and account for this consumer/coverage difference before
-comparing them with the new matrix. It is not a provider defect or proof of
-regression. These link results do not measure cycles, wire timing, dynamic stack
-high-water or physical behavior; no compiler stack-usage flag is required here.
+整镜像与 endpoint／CS state、只读 face、共享表、冷 pin snapshot、应用代码分别报。
+2→4 包含 GPIOG／B gate／lease，0→1 包含共享 transport。早期 consumer 只传输
+endpoint，未用 controller 被 GC 合法，其 full-retention 曾失败；当前增加 topology
+检查并保留 controller。旧一／二 ELF 属于 endpoint-only workload，不是 provider
+缺陷或优化回归。链接不测周期、线上时序、动态栈或实物，本夹具不要求 `.su` 参数。

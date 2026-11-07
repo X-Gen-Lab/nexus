@@ -1,133 +1,92 @@
-# U575 dual-world software reference
+# U575 双安全域软件参考
 
-This is an explicit application integration fixture for STM32U575ZIT6Q. It uses
-the maintained CPU Runtime, U575 cold security owner, Arch CMSE range check,
-scalar user I/O broker and actual GPIO provider. It does not modify the platform's
-existing TZEN=0 references or choose partitions for external products.
+本应用集成 fixture 精确选 STM32U575ZIT6Q，组合生产 CPU Runtime、U575 cold
+security owner、Arch CMSE range check、scalar user I/O broker 与真实 GPIO。
+不修改默认 TZEN=0 路径，不替产品选择分区。
 
-The Secure and NonSecure images are separate CMake builds and linker layouts.
-The Secure build creates the actual SG import object; the NonSecure build links
-that exact object. Both use Cortex-M33 with soft float and no FP ownership.
-The toolchain CMSE helper retains its architecture-defined conditional FP
-context instructions; ordinary reference code and NonSecure callers use no FP.
-The Secure launch crosses through the compiler's real CMSE NonSecure call ABI.
-The test gate inspects actual ELF/LOAD/vector/SG/import bytes and BLXNS code.
-There is no physical station execution or software candidate promotion here.
+Secure／NonSecure 使用独立 CMake／linker。Secure 生成真实 SG import object，NS
+链接该精确 object。两者为 M33 soft-float、无 FP owner；toolchain CMSE helper
+仍含架构规定的条件 FP context 指令，普通参考／NS caller 不用 FP。launch 使用
+编译器真实 CMSE NS call ABI，gate查实际ELF／LOAD／vector／SG／import／BLXNS。
+没有实板执行或候选晋级。
 
-| Owner | Exact reference extent |
-|---|---|
-| Secure Flash bank 1 | `0x0c000000` through `0x0c0fdfff` |
-| Secure NSC veneers | `0x0c0fe000`, 8 KiB |
-| Secure RAM and stack | SRAM1 Secure alias; final 4 KiB at `0x3002f000` |
-| NonSecure Flash | Bank 2 first 64 KiB at `0x08100000` |
-| NonSecure RAM | SRAM3 first 16 KiB at `0x20040000` |
-| NonSecure stack | Last 2 KiB, initial MSP `0x20044000` |
+## 精确内存归属
 
-The external boot owner and station must establish TZEN=1, SWAP_BANK=0,
-appropriate Secure boot address/ownership, the reviewed Flash watermark/block
-attribution and SRAM3 ECC option state before execution. The narrow mapper
-observes option bytes and rejects incompatibility; it does not program them.
-Use the precise private mapper contract and current device reference manual for
-provisioning. No fixture command flashes or rewrites option bytes automatically.
-The external image/boot owner must erase and verify the whole reserved NSC
-extent, including unused bytes, so sparse programming cannot retain old SG
-entries. The byte gate does not authenticate unprogrammed device Flash.
+| owner | 参考范围 |
+| --- | --- |
+| Secure Flash bank1 | `0x0c000000` 至 `0x0c0fdfff` |
+| Secure NSC veneer | `0x0c0fe000` 起8 KiB |
+| Secure RAM／stack | SRAM1 Secure alias，末4 KiB在 `0x3002f000` |
+| NS Flash | bank2 首64 KiB，`0x08100000` |
+| NS RAM | SRAM3 首16 KiB，`0x20040000` |
+| NS stack | 末2 KiB，初始MSP `0x20044000` |
 
-Only one unprivileged NonSecure Thread exists. It has no kernel, IRQ handlers,
-DMA or FP ownership; all 140 vector words after MSP/Reset are zero. Secure
-launch requires NS Reset after the reserved first 1 KiB of NS Flash; the
-NonSecure linker and byte gate enforce this same boundary. Secure
-fault/NMI handlers park. NonSecure code initializes its own ordinary RAM and
-calls one fixed-principal scalar GPIO gateway. It cannot choose a principal,
-peripheral pointer, callback or asynchronous loan. The reference grants only
-PC7 and verifies that its GPIO security bit remains Secure before use. PCB
-revision, LED route and electrical observations remain HIL responsibilities.
+外部 boot owner／工位须先建立 TZEN=1、SWAP_BANK=0、正确 Secure boot address／
+owner、已审Flash watermark／block归属和SRAM3 ECC option。mapper只观察并拒绝
+矛盾，不写option bytes；按私有mapper合同与当前手册provision，不自动刷写。
+外部镜像owner须erase并验证完整NSC保留区（含未用字节），避免稀疏program遗留旧SG。
+字节gate不认证设备未编程Flash。
 
-The gateway checks the actual NonSecure caller and Thread context, preserves
-Secure interrupt state, and saves/masks/restores PRIMASK_NS around its complete
-synchronous transaction. The broker's pin port checks both the exact SRAM
-window and real CMSE NonSecure unprivileged MPU access. A pin holds the sealed
-static mapping for this synchronous invocation; it is not a claim that a range
-check alone creates a lifetime guarantee. Attribution cannot change in RUNNING,
-no NS privileged exception can remap it, and no DMA or asynchronous caller is
-admitted. A retained cleanup failure parks without returning control or loans.
-The U575 owner also verifies the reset-only SYSCFG locks for the NS MPU/VTOR
-and Secure SAU/VTOR/AIRCR before admitting NonSecure execution. The Secure reset
-sets its own VTOR and MSPLIM before ordinary initialization or interrupt unmask.
-NS MPU maps only its Flash and RAM. ARMv8-M checks an instruction fetch in
-Secure NSC against the Secure MPU and Secure privilege; it does not require
-granting the NS MPU access to Secure Flash. See the maintained
-[U575 contract](../../../docs/design/u575-trustzone-contract.md).
+只有一个非特权NS Thread，无kernel／IRQ handler／DMA／FP。MSP／Reset后的140个
+vector word全0。NS Reset必须在Flash首1 KiB保留区后，linker和byte gate同样约束。
+Secure fault／NMI park；NS自行初始化普通RAM，只访问固定principal GPIO gateway，
+不能选principal、peripheral pointer、callback或async loan。只授PC7，并核对其
+security bit仍Secure；PCB／LED／电气仍属HIL。
 
-Build and inspect with the locked ARM toolchain in PATH:
+gateway检查真实NS caller／Thread，保持Secure IRQ状态，对完整同步事务保存、
+mask并恢复PRIMASK_NS。broker pin同时检查精确SRAM窗口与真实CMSE NS非特权MPU
+权限；pin代表该同步调用的sealed静态mapping，不是range check单独保证生命周期。
+RUNNING归属不可改、无NS特权异常remap、无DMA／async caller；清理失败park，不
+返回control或loan。owner还核对reset-only SYSCFG锁NS MPU／VTOR与Secure
+SAU／VTOR／AIRCR。Secure reset在普通初始化／开IRQ前设VTOR／MSPLIM。
+NS MPU只映射自己的Flash／RAM；Secure NSC取指按Secure MPU／权限检查，不要求
+授NS MPU访问Secure Flash。见[U575合同](../../../docs/design/u575-trustzone-contract.md)。
 
-```
+## 构建与字节检查
+
+将锁定ARM工具加入PATH，从仓库根执行；输出必须全新：
+
+```sh
 python -B scripts/ci/u575_trustzone.py --output NEW_OUTPUT_DIRECTORY
 NEXUS_U575_PAIR_BUILD=NEW_OUTPUT_DIRECTORY \
     python -B tests/contracts/u575_trustzone/test_gate.py
 ```
 
-The output records actual commands, source/tool identities, both original maps,
-the SG import object and both ELF images. Mutation regressions use those real
-ELF bytes. These checks prove software linkage and declared boundaries, not MCU
-execution, secure boot authentication, physical isolation or certification.
-The single-ELF candidate schema does not qualify this pair. The dedicated
-pair-build evidence tool below seals the explicit data closure as unsigned,
-not-qualified software evidence; it does not change candidate-v1.
+输出记录真实命令、source／tool、两份原始map、SG import和ELF。mutation使用真实
+ELF字节，只证明软件链接／声明边界，不证明MCU执行、secure boot认证、隔离或认证。
+单ELF candidate schema不准入此pair；下述专用工具封存无签名未资格化字节闭包，
+不改变candidate-v1。
 
-## Copied cooperative GPIO jobs
+## 复制式协作GPIO批次
 
-The second SG entry `nx_reference_gpio_batch` accepts one fixed76byte scalar
-message and a16byte reply. Complete aligned NS SRAM spans, overflow, input/reply
-aliasing and real CMSE unprivileged permissions are checked before the input is
-copied. No NS pointer is retained after return. One static Secure slot copies
-at most eight disjoint granted PC7 set/clear commands. Admission does no GPIO I/O.
-An explicit SERVICE call executes at most one command; POLL only observes status.
-CANCEL settles future work while prior writes remain effective. CONSUME releases
-only a terminal ticket. Epochs increase monotonically and exhaust at UINT32_MAX;
-stale tickets never address another job. Failed writes latch FAILED for polling.
+第二SG `nx_reference_gpio_batch` 接固定76 B scalar message和16 B reply。完整
+检查NS SRAM跨度、溢出、对齐、input／reply alias和真实CMSE非特权权限后才复制，
+返回后不保留NS pointer。一个静态Secure slot最多复制8个互不重叠授权PC7 set／clear
+命令，admission不做GPIO。SERVICE一次至多1条，POLL只观察，CANCEL停止未来命令，
+已写效果保留；CONSUME仅释放terminal ticket。epoch单调至UINT32_MAX耗尽，旧票据
+不定位新任务；write失败锁存FAILED供poll。
 
-This is cooperative deferred work, with no timing, gap-free, Secure UART,
-NS IRQ, NS RTOS, arbitrary callback or retained user-buffer promise. Both actual
-SG veneers and both import symbols are checked against the paired ARM bytes.
+这是协作延后执行，无定时、无间隙、Secure UART、NS IRQ／RTOS、任意callback或
+保留user buffer承诺。两个真实SG veneer／import都对pair ARM字节检查，无隐藏任务。
 
-中文：新增窄范围异步场景为 Secure 私有 GPIO 命令批次。完整检查 NS 输入/输出跨度、
-溢出、对齐、别名和 CMSE 权限后先复制，再受理；跨返回不保留任何 NS 指针。最多8条
-PC7 命令使用1个静态槽，SERVICE 每次最多执行1条，POLL 只读取状态，CANCEL 停止
-后续命令，CONSUME 仅消费终态。单调 epoch 与不回绕规则拒绝旧票据和重放。此场景
-不引入隐藏工作线程，不保证执行间隔，不扩大为通用 TrustZone 异步缓冲或 NS RTOS。
+## 可移位pair构建证据
 
+`tools/evidence/u575_pair.py` 使用调用者固定context与既有portable store。
+context的 `schema_version=1`、`kind="u575_pair_build_context"`，包含原始report
+身份、精确clean source、7个原始tools身份、独立留存inventory的history列表。
+每身份有原absolute label、size、SHA256，完整context摘要必须来自独立build owner；
+新算hash不能补缺失的历史身份。
 
-## Portable pair-build evidence
+history inventory显式files含path／bytes／sha256／原mode，额外保存metadata是惰性
+数据。外部身份授权原始数据，不能扫描live目录自发现权威。build owner必须固定
+实际map LOAD库／object，尤其libgcc.a／libc_nano.a／libnosys.a的真实输入记录。
+compile database可列未构建target，其产物标 `not_emitted`，不虚构也不静默要求。
 
-`tools/evidence/u575_pair.py` uses a caller-pinned context and the existing
-portable evidence store. The context has `schema_version = 1`,
-`kind = "u575_pair_build_context"`, the original `report` identity, exact clean
-`source` record, seven original `tools` identities, and a `history` list of
-independently retained inventory identities. Each identity records its original
-absolute label, byte size and SHA256. The context's complete SHA256 must come
-from the independent build owner. A newly computed file hash cannot fill a
-missing historical build identity.
-
-A history inventory contains explicit `files` rows with `path`, `bytes`,
-`sha256` and original permission `mode`. Extra preservation metadata remains
-inert data. Its external identity authorizes the retained original data; the
-sealer does not discover authority by scanning a live build directory. The
-build owner must preserve and hash-lock actual map `LOAD` libraries and objects
-as well as report inputs. In particular, toolchain `libgcc.a`, `libc_nano.a`
-and `libnosys.a` need their own actual build-input records. A compile database
-also lists targets that the selected pair did not build. Those outputs are
-explicitly marked `not_emitted`; they are not invented or silently required.
-
-The exact payload consists of typed report references, all command stdout and
-stderr (including empty streams), the two eight-file runtime bundles, proved
-emitted compile outputs, real map link inputs and the pinned inventory records.
-The tool rejects unrelated extra files. Original source, tool binaries and
-commands are preserved as data. Verification executes only explicitly pinned
-external `nm` and `objdump` readers on small retained ELF/import views; it never
-runs an archived program, compiler, script, hook or recorded command line.
-The original report paths remain labels. Offline verification does not open
-the old source, compiler or build paths.
+payload只含typed report refs、全部stdout／stderr（含空流）、两份8文件runtime
+bundle、已证明生成object、真实map inputs和固定inventory，额外无关文件拒绝。
+源码、tool binary和命令作为数据保留；verify仅运行外部固定nm／objdump读取小型
+ELF／import view，不执行归档program／compiler／script／hook／recorded command。
+原路径只为label，离线不访问旧source／compiler／build。
 
 ```sh
 python -B tools/evidence/u575_pair.py seal \
@@ -147,30 +106,13 @@ python -B tools/evidence/u575_pair.py verify \
   --objdump-sha256 EXPECTED_OBJDUMP_SHA256
 ```
 
-The unique external offline anchor is the SHA256 of the complete outer
-`manifest.json`. It transitively binds `pair.json`, the portable archive,
-its internal member inventory and every role. A self-rehashed package does
-not supply that independent anchor. The checker revalidates configuration,
-compiler ABI/security flags, paired vectors/partitions/imports/SG bytes, actual
-BLXNS and all inspected NonSecure functions. It rejects unsafe or oversized
-archives before the generic store interprets extended headers. Outputs must
-be fresh; failure can leave diagnostic partial files but cannot return a
-verified result. Existing files are never overwritten.
+唯一离线外部根锚是完整outer manifest.json SHA256，传递绑定pair.json、archive、
+内部inventory和每个role；自重算包不提供独立锚。verify重核config、compiler ABI／
+security flag、paired vector／partition／import／SG、真实BLXNS和全部检查NS函数。
+unsafe／超大archive在通用store解释extended header前拒绝。输出fresh，不覆写旧文件，
+失败可留diagnostic partial，但不能返回verified。
 
-A verified package remains `unsigned`, `not_qualified`, `not_executed`, with
-`qualified = false` and `promoted = false`. It proves retained byte/role and
-software-boundary consistency under the external anchors. It does not prove
-builder authenticity, compilation history, a new-source SDK, MCU execution,
-secure boot or physical TrustZone isolation. Streaming verification is also
-separate from a complete independent restore, which must compare all restored
-bytes and permission modes through the maintained store restoration API.
-
-中文：双域构建使用独立的无签名证据格式，不修改单 ELF candidate-v1。外部构建
-负责人固定原报告、clean 源码、工具与历史文件清单，并提供完整 context 摘要。
-离线验证唯一根锚是外部提供的完整 `manifest.json` 摘要，传递绑定角色表、归档和
-全部成员；包内自行重算摘要不建立信任。只保留确定的报告引用、两组配置、真实
-生成对象、map 链接输入和全部原始输出；未生成的数据库目标明确记录，额外文件拒绝。
-历史路径只是标签，不读取旧目录，不执行归档内程序；只运行外部固定摘要的 `nm`
-和 `objdump` 数据读取工具。真实链接库必须在构建时固定身份，不能事后补一个摘要
-冒充原构建输入。通过仍为未签名、未资格化、实板未执行，不代表产品、安全认证或
-TrustZone 实板隔离通过；完整恢复与流式检查分别验收。
+通过仍为 `unsigned`、`not_qualified`、`not_executed`、`qualified=false`、
+`promoted=false`，只证明外部锚下字节／role／软件边界一致，不证明builder真实性、
+编译历史、新SDK、MCU执行、secure boot或物理TrustZone。streaming verify与完整
+独立restore分别验收，后者须用既有restore API比较全部字节及permission mode。

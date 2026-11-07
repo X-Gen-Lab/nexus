@@ -1,12 +1,9 @@
-# Mapped-storage link fixture
+# 映射存储链接夹具
 
-This fixture links `Nexus::MappedStorage` through the production F407 and GD470
-platform target graphs. Its callbacks are test-local doubles. It does not
-implement a serial-memory controller, authorize a PCB route, run a device, or
-establish physical XIP/cache/DMA timing. `Nexus::NativeMappedStorage` is excluded
-from both firmware images.
+通过 F407／GD470 生产目标图链接 `Nexus::MappedStorage`，callback 是本地测试
+替身；不实现串行存储控制器、不授权 PCB、不运行器件，不证明 XIP／Cache／DMA
+时序。两个固件都排除 `Nexus::NativeMappedStorage`。
 
-The face, shared table, exact caller state and two map slots remain measurable in
-the ELF. Configure with the ordinary ARM toolchain and an explicit existing
-`sky-baremetal.toml` or `liangshan-baremetal.toml` assembly. No product Flash
-reservation is made. Host behavior is covered by `nexus_mapped_storage_test`.
+ELF 保留 face、共享表、精确 caller state 和两个 map slot。普通 ARM toolchain
+配现有 `sky-baremetal.toml` 或 `liangshan-baremetal.toml`，不保留产品 Flash 区域。
+host 行为由 `nexus_mapped_storage_test` 验证。

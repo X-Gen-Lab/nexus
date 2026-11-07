@@ -1,19 +1,20 @@
-# LCKFB Sky STM32F407VE youth reference wiring
+# 立创天空星 STM32F407VE 青春版接线参考
 
-Exact selected part: **STM32F407VET6**, LQFP100, 512 KiB internal Flash.
-The youth edition has an 8 MHz HSE and separate 64 KiB CCM; the maintained
-profile uses 168 MHz and the main 128 KiB SRAM. Physical PCB revision remains
-`null` until inspection; VG high-spec and populated-header editions are
-separate fixtures.
+精确型号为 **STM32F407VET6**，LQFP100、内部 Flash 512 KiB。青春版使用 8 MHz
+HSE，另有独立 64 KiB CCM；维护的固定配置为 168 MHz，默认只使用主 128 KiB SRAM。
+实物检查前 PCB 修订保持 `null`，VG 高配版和排针实装版必须作为不同工装处理。
 
-`board.json` binds PB2 as an active-high LED, preloading inactive low before
-output mode. USART1 uses PA9/PA10 AF7 at MCU 3.3 V logic. The youth debug header
-is unpopulated, so HIL requires a fitted connection and external probe/UART
-bridge. PA13/PA14 remain reserved for SWD. First-party wiki/schematic references
-are retained as fact provenance.
+## 已审接线与执行前提
 
-Onboard external Flash is not assumed populated. No SPI/I2C/RS485/PWM/ADC/EXTI
-external resource or product partition is selected by this package. A consumer
-may add a separately reviewed Board package and electrical profile. Physical
-clock, fitted options, reset levels, UART/IRQ and loaded operation have not been
-executed; software evidence establishes compile/model scope only.
+`board.json` 绑定 PB2 为高有效 LED，先预置低电平再进入输出模式。USART1 使用
+PA9/PA10 AF7，MCU 侧为 3.3 V 逻辑。青春版调试排针未实装，HIL 需要安装连接并
+使用外部调试器／串口桥。PA13/PA14 保留给 SWD；官方 wiki／原理图来源保存在事实中。
+
+## 支持边界
+
+不假定板上外部 Flash 已安装。本包不选择 SPI／I2C／RS485／PWM／ADC／EXTI
+外部资源，也不预留产品分区。用户可另加经过审核的 Board 包和电气配置，复用
+[F407 实现](../../soc/stm32/stm32f407/README.md)。
+
+实际时钟、选装器件、复位电平、UART／IRQ 和负载运行尚未执行；软件证据只覆盖
+编译／模型，不能建立物理资格。

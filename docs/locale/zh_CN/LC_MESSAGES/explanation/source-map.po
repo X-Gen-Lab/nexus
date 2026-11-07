@@ -7,1168 +7,1051 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 1a1210fb8f57dc9e7709dd3f9e766fda82c8040d445b290456bc3390192465db\n"
+"X-Nexus-Source-SHA256: 91b834e1d9b76f3b74be62ff991c076b4e40291be28fed535a8313915b4124d3\n"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:8
-msgid "Source-adjacent contracts"
-msgstr "源码旁的权威合同"
+msgid "源码旁的架构与维护合同"
+msgstr "源码旁的架构与维护合同"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:10
-msgid ""
-"The layer README files remain canonical beside their implementation. The "
-"following inclusions read those exact files rather than copying a second "
-"contract. Relative source links are bound to the website source revision."
-msgstr ""
-"各层 README 与实现相邻，保持其权威合同身份。以下引用直接读取这些文件，不复制第二份合同。相对源码链接绑定到本站的源码 revision。"
+msgid "各层 README 与实现放在一起，作为该目录的架构和维护入口。本页直接包含这些原文， 不复制第二份合同。站点内的源码链接绑定文档对应的 revision；当前实现、软件执行、 候选与实板资格分别记录，不能通过页面发布自动转移。"
+msgstr "各层 README 与实现放在一起，作为该目录的架构和维护入口。本页直接包含这些原文， 不复制第二份合同。站点内的源码链接绑定文档对应的 revision；当前实现、软件执行、 候选与实板资格分别记录，不能通过页面发布自动转移。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:14
-msgid ""
-"The physical layout groups Arm CPU implementations by ISA and MCU packages "
-"by vendor. Family identifiers, public include paths and explicit target "
-"names remain stable. These are source ownership groups, not runtime "
-"forwarding layers."
-msgstr ""
-"物理目录按 ISA 分组 Arm CPU 实现，按厂家分组 MCU "
-"包。系列标识、公共头路径和显式目标名称保持稳定。这些分组表达源码所有权，不是运行时转发层。"
+msgid "Arm CPU 实现按 ISA 分组，MCU 集成按厂家分组。family 标识、公共 include 路径和 CMake target 是各自明确的接口；目录分组表达源码归属，不增加运行时转发层。"
+msgstr "Arm CPU 实现按 ISA 分组，MCU 集成按厂家分组。family 标识、公共 include 路径和 CMake target 是各自明确的接口；目录分组表达源码归属，不增加运行时转发层。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:18
-msgid ""
-"Historical development collections are retained in the [evidence "
-"archive](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/docs/archive/evidence/README.md) with exact member identities and "
-"restore instructions. Their original source and execution scope remain "
-"unchanged; archive restoration does not establish current-source "
-"qualification."
-msgstr ""
-"历史开发集合保存在[证据归档](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/docs/archive/evidence/README.md)中，附有精确成员身份和恢复步骤。其原始源码与执行范围保持不变；恢复归档不建立当前源码的资格。"
+msgid "历史开发资料保存在[证据归档](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/docs/archive/evidence/README.md)，使用原始成员身份和 恢复方法。恢复归档不建立当前源码资格；其中的原始执行范围与失败记录保持不变。"
+msgstr "历史开发资料保存在[证据归档](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/docs/archive/evidence/README.md)，使用原始成员身份和 恢复方法。恢复归档不建立当前源码资格；其中的原始执行范围与失败记录保持不变。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:44
 msgid "Core"
 msgstr "Core"
 
-#: ../../../../tmp/nexus-quality-20261019/core/README.md:2
-msgid "Core contracts"
-msgstr "Core 合同"
+msgid "Core：请求、时间与生命周期合同"
+msgstr "Core：请求、时间与生命周期合同"
 
-#: ../../../../tmp/nexus-quality-20261019/core/README.md:4
-msgid ""
-"C11 caller-owned request admission, stable control identities, completion "
-"state and monotonic absolute deadlines. No devices, OS scheduler, allocation"
-" or global registry. Public interfaces are in `include/nexus/core`."
-msgstr ""
-"C11 调用者拥有的请求准入、稳定控制身份、完成状态和绝对单调截止时间。不包含设备、OS 调度器、分配或全局登记表。公共接口位于 "
-"`include/nexus/core`。"
+msgid "Core 提供调用者持有存储的 C11 请求准入、完成状态、稳定控制身份、单调绝对 截止时间和可选观察。公共头在 `include/nexus/core/`，实现在 `src/`。 它不依赖设备、Arch、OS 或厂商 SDK，没有堆、全局注册表或隐藏执行线程。 I/O 具体实现、责任者和等待适配在这些基础合同上组合具体行为。"
+msgstr "Core 提供调用者持有存储的 C11 请求准入、完成状态、稳定控制身份、单调绝对 截止时间和可选观察。公共头在 `include/nexus/core/`，实现在 `src/`。 它不依赖设备、Arch、OS 或厂商 SDK，没有堆、全局注册表或隐藏执行线程。 I/O 具体实现、责任者和等待适配在这些基础合同上组合具体行为。"
 
-#: ../../../../tmp/nexus-quality-20261019/core/README.md:8
-msgid ""
-"REJECTED retains no references. An accepted chain borrows request and "
-"buffers until acquire-observed SETTLED. SETTLED is its last request access. "
-"Cancel/timeouts never revoke a borrow; failed drain keeps QUARANTINED "
-"storage alive. Producers wait on latched state; a single executor services "
-"the operation. Queue adapters own their outer request and use explicit inner"
-" provider metadata where needed."
-msgstr ""
-"REJECTED 不保留任何引用。接受的请求链借用 request 和 buffer，直到调用者以 acquire 观察到 "
-"SETTLED。SETTLED 的发布是其对请求的最后一次访问。取消／超时绝不撤销借用；排空失败后仍保持 QUARANTINED "
-"存储有效。生产者等待锁存状态，由唯一执行者推进操作。队列适配器拥有外层请求，并按需要使用显式内层提供者元数据。"
+msgid "![FIG-06：Core 请求状态与借用](../docs/assets/diagrams/request-lifecycle.svg)"
+msgstr "![FIG-06：Core 请求状态与借用](../docs/assets/diagrams/request-lifecycle.svg)"
 
-#: ../../../../tmp/nexus-quality-20261019/core/README.md:14
-msgid ""
-"`tests/contracts/core_contract_test.c` executes publication, admission, "
-"wrapping time arithmetic and terminal-state invariants. Host results do not "
-"prove MCU interrupt ordering or worst-case execution time."
-msgstr ""
-"`tests/contracts/core_contract_test.c` 实际验证发布、准入、回绕时间运算和终态不变量。主机结果不能证明 MCU "
-"中断顺序或最坏执行时间。"
+msgid "FIG-06：Core 请求状态与借用"
+msgstr "FIG-06：Core 请求状态与借用"
 
-msgid "Admission, shutdown and reuse"
-msgstr "准入、关闭与复用"
+msgid "图表示当前辅助函数的迁移及调用前提，不承诺每个具体实现都有恢复 API。 图源与范围见[图册](/assets/diagrams/README.md)。"
+msgstr "图表示当前辅助函数的迁移及调用前提，不承诺每个具体实现都有恢复 API。 图源与范围见[图册](/assets/diagrams/README.md)。"
 
-msgid "Initialize fresh, unpublished storage once. `nx_request_prepare` resets only a READY request or a consumed SETTLED incarnation. It cannot discover outstanding adapter loans, control commands or observers; the owning adapter must join them. One serialized executor admits and advances the request. The request state is a release/acquire predicate, independent of whether a notification was delivered."
-msgstr "对全新、尚未发布的存储只初始化一次。`nx_request_prepare` 只重置 READY 请求或结果已消费的 SETTLED 实例。它无法发现尚未归还的适配器借用、控制命令或观察者；所属适配器必须等待它们结束。由唯一串行执行者接纳并推进请求。请求状态是 release/acquire 谓词，与通知是否已送达无关。"
+msgid "入口"
+msgstr "入口"
 
-msgid "The complete shutdown order is:"
-msgstr "完整关闭顺序为："
+msgid "责任"
+msgstr "责任"
 
-msgid "Close admission and stop new controls or observation bindings."
-msgstr "关闭准入，停止接纳新的控制命令或观察绑定。"
+msgid "`src/request.c`、`include/nexus/core/request.h`"
+msgstr "`src/request.c`、`include/nexus/core/request.h`"
 
-msgid "Let the unique executor cancel and drain hardware, IRQ, DMA and deferred references. A failed drain retains the request and payload in QUARANTINED; neither a timeout nor detaching an observer authorizes reclamation."
-msgstr "由唯一执行者取消并排空硬件、IRQ、DMA 和延后执行引用。排空失败时，请求及 payload 继续保留在 QUARANTINED；超时或解除观察者绑定均不授权回收。"
+msgid "请求、结果发布、稳定槽位／代次"
+msgstr "请求、结果发布、稳定槽位／代次"
 
-msgid "Before release-publishing SETTLED, detach every provider reference and capture any independently lived wake target. Settlement is the provider's final request/payload access. A pending notification must not retain the request."
-msgstr "以 release 发布 SETTLED 之前，解除提供者的每个引用，并取得生命周期独立的唤醒目标。结清是提供者对请求及 payload 的最后一次访问。待发送的通知不得继续持有请求引用。"
+msgid "`src/time.c`、`include/nexus/core/time.h`"
+msgstr "`src/time.c`、`include/nexus/core/time.h`"
 
-msgid "Acquire-observe SETTLED and consume its result. Separately acknowledge queued controls and join all task, diagnostic and completion observers, including already executing calls. Detach their sidecars under the adapter's guard."
-msgstr "以 acquire 观察 SETTLED 并消费结果。另行确认排队中的控制命令完成，等待所有任务、诊断及完成观察者结束，包括已在执行的调用。在适配器的保护下解除其附属记录绑定。"
+msgid "截止时间与 32 位时钟扩展"
+msgstr "截止时间与 32 位时钟扩展"
 
-msgid "Release the stable slot. Only then prepare/rebind the request, reclaim its storage, or stop dependencies once every other consumer has joined."
-msgstr "释放稳定 slot。只有此后才能 prepare／重新绑定请求、回收其存储，或在所有其他消费者均已结束后停止依赖项。"
+msgid "`src/request_observer.c`"
+msgstr "`src/request_observer.c`"
 
-msgid "The adapter synchronizes bind, lookup and release. Epochs identify incarnations inside one stable slot's lifetime; they are not globally unique wire IDs. `UINT64_MAX` is the last usable epoch. Its next bind rejects without changing the slot or output. Retire that exhausted slot; never zero it while any old command can address its storage. Replacing storage or restarting the owner requires joining all controls/observers and withdrawing every old reference first."
-msgstr "适配器同步 bind、lookup 和 release。epoch 标识一个稳定 slot 生命周期内的实例，并非全局唯一的线缆协议 ID。`UINT64_MAX` 是最后可用 epoch；下一次 bind 拒绝且不改变 slot 或输出。应退役已耗尽的 slot；任何旧命令仍能寻址该存储时绝不能将其清零。替换存储或重新启动 owner 前，必须先等待所有控制命令和观察者结束，并撤销全部旧引用。"
+msgid "可选复制观察，不接管执行或回收"
+msgstr "可选复制观察，不接管执行或回收"
 
-msgid "The maintained UART/SPI example in [`io_owner_diagnostic_pipeline_test.cpp`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/io_owner_diagnostic_pipeline_test.cpp) uses real Native providers and owner adapters: failed drain retains the hardware, recovery settles, observers detach, and only then does provider stop succeed. `core_lifecycle_test.cpp` additionally checks the full legal-transition matrix, prepare rejection and the last usable epoch. The publication regression in the C contract target observes results across real host threads without a wake hint. None of these tests authorizes concurrent admissions or unguarded slot access."
-msgstr "维护的 UART／SPI 示例 [`io_owner_diagnostic_pipeline_test.cpp`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/io_owner_diagnostic_pipeline_test.cpp) 使用真实 Native 提供者和 owner 适配器：排空失败保留硬件，恢复后结清，观察者解除绑定，此后提供者 stop 才成功。`core_lifecycle_test.cpp` 还检查完整合法转换矩阵、prepare 拒绝及最后可用 epoch。C 合同目标中的发布回归在真实主机线程之间观察结果，不依赖唤醒提示。这些测试均不授权并发准入或未经保护的 slot 访问。"
+msgid "`src/fault.c`"
+msgstr "`src/fault.c`"
 
-msgid "Clock domains and bounded waits"
-msgstr "时钟域与有界等待"
+msgid "默认无状态的弱故障观察"
+msgstr "默认无状态的弱故障观察"
 
-msgid "A `nx_clock32_t` has one execution owner, a stable nonzero frequency and an uninterrupted counter. Its maximum observation gap is strictly less than `2^32 / frequency_hz` seconds: at 1 MHz this is 4294.967296 seconds. Equal snapshots after a full wrap are indistinguishable from no progress. Account for idle, masked work, Flash maintenance, sleep and worst-case owner latency; this helper cannot detect a missed wrap. A successful observation commits the tick extension and output together. Invalid arguments, alias or exhaustion change neither. Output storage must be distinct from the complete extension state."
-msgstr "`nx_clock32_t` 具有唯一执行 owner、稳定的非零频率和不中断的计数器。其最大观察间隔严格小于 `2^32 / frequency_hz` 秒：1 MHz 时为 4294.967296 秒。完整回绕后的相等快照与没有推进无法区分。应计入空闲、屏蔽期间的工作、Flash 维护、睡眠和 owner 的最坏延迟；此 helper 无法检测漏过的回绕。成功观察同时提交 tick 扩展状态和输出。非法参数、别名或耗尽均不改变二者。输出存储必须与完整扩展状态分离。"
+msgid "`src/stack_observation.c`"
+msgstr "`src/stack_observation.c`"
 
-msgid "The selected physical clock has its own reviewed overflow/service contract; the generic 32-bit helper does not establish that provider's readiness. Stop, restart, clock replacement or frequency change creates a new domain. Join all deadline consumers before withdrawing the old clock; even an equal numerical timestamp cannot make old deadlines valid. This is a lifecycle rule, without a mandatory generation field in each request. A terminal clock failure retains loans and follows the selected provider's fail-stop contract."
-msgstr "选定物理时钟具有独立审阅的溢出／service 合同；通用 32-bit helper 不建立该提供者的就绪状态。停止、重启、更换时钟或改变频率均建立新时钟域。撤销旧时钟前须等待所有 deadline 消费者结束；数值相同的时间戳也不能使旧 deadline 有效。这是生命周期规则，并不强制每个请求都具有 generation 字段。终止性的时钟故障保留借用，并遵循选定提供者的 fail-stop 合同。"
+msgid "已静止栈的有界只读观察"
+msgstr "已静止栈的有界只读观察"
 
-msgid "For a required finite wait, use `nx_deadline_finite_after(now, duration, &end)` before admission and handle failure. It rejects the nonfinite `now` sentinel and any sum reaching the sentinel without rewriting `end`; zero duration is valid. `nx_deadline_after` keeps its explicit saturation-to-infinite-wait semantics. Neither helper reads a clock or proves readiness; a zero clock value is not a startup acknowledgement."
-msgstr "必须有限等待时，在准入之前使用 `nx_deadline_finite_after(now, duration, &end)` 并处理失败。它拒绝非有限 `now` 哨兵及达到该哨兵的和，且不改写 `end`；零 duration 合法。`nx_deadline_after` 保持其显式饱和到无限等待的语义。两个 helper 均不读取时钟，也不证明就绪；时钟值为零不是启动确认。"
+msgid "`src/silicon.c`"
+msgstr "`src/silicon.c`"
 
-msgid "Optional observation and minimal fault capture"
-msgstr "可选观察与最小故障记录"
+msgid "获取 I/O 资源前的精确硅版本准入"
+msgstr "获取 I/O 资源前的精确硅版本准入"
 
-msgid "Request observation is a copied diagnostic view, not another execution owner. Its gaps and transition counts describe sampled observations, not IRQ latency, WCET or every intervening state. The stable slot outlives the observer; the caller serializes sampling against request reuse and slot release. The helper rejects output overlap with known control objects. Only the caller knows full request, payload and external context spans and must keep them disjoint and alive."
-msgstr "请求观察提供复制的诊断视图，并非另一个执行 owner。其 gaps 和转换计数描述采样观察，并非 IRQ 延迟、WCET 或所有中间状态。稳定 slot 的生命周期覆盖观察者；调用者将采样与请求复用及 slot 释放串行化。helper 拒绝输出与已知控制对象重叠。只有调用者知道完整请求、payload 和外部 context 范围，必须保持它们互不重叠且存活。"
+msgid "请求、唯一执行者与回收"
+msgstr "请求、唯一执行者与回收"
 
-msgid "The weak `nx_fault_observe` remains stateless. A product can link one bounded C11 override writing an explicitly owned, debugger-visible record. The following minimal shape deliberately stores no clock, task name or dynamic pointer:"
-msgstr "弱符号 `nx_fault_observe` 保持无状态。产品可链接一个有界 C11 覆盖实现，写入显式拥有且调试器可见的记录。以下最小示例特意不保存时钟、任务名或动态指针："
+msgid "REJECTED 不保留引用。接受后的链路借用请求和缓冲区，直到 acquire 观察 SETTLED；release 发布 SETTLED 是具体实现最后一次访问请求／有效数据。 取消、超时不撤销借用；排空失败时，QUARANTINED 存储保持有效。等待者观察 锁存状态，唯一执行者推进操作；队列适配器拥有外层请求，必要时使用独立内部 具体实现元数据。"
+msgstr "REJECTED 不保留引用。接受后的链路借用请求和缓冲区，直到 acquire 观察 SETTLED；release 发布 SETTLED 是具体实现最后一次访问请求／有效数据。 取消、超时不撤销借用；排空失败时，QUARANTINED 存储保持有效。等待者观察 锁存状态，唯一执行者推进操作；队列适配器拥有外层请求，必要时使用独立内部 具体实现元数据。"
 
-msgid "This is best-effort forensic storage inspected after terminal halt, with no coherent concurrent-reader or nested-fault guarantee. `volatile` is not a lock or a release/acquire protocol. The owning product selects valid writable memory and retention requirements. The hook cannot repair a corrupt stack, claim safe outputs, release loans or rely on a clock, kernel or transport. It never changes incoming masks. If it returns, the reporting terminal path still parks. The existing FreeRTOS fail-stop tests exercise this actual hook boundary, retained requests and preservation of PRIMASK/BASEPRI/FAULTMASK. No snapshot, queue, worker or record is added to the default Core image."
-msgstr "这是在终止停机后检查的尽力取证存储，不保证并发读取或嵌套故障下的一致性。`volatile` 不是锁，也不是 release/acquire 协议。所属产品选择合法可写内存及保留要求。hook 不能修复损坏的栈、宣称安全输出、释放借用或依赖时钟、内核及传输。它从不改变输入 mask。如果它返回，报告故障的终止路径仍会停驻。既有 FreeRTOS fail-stop 测试覆盖此真实 hook 边界、保留的请求以及 PRIMASK／BASEPRI／FAULTMASK 保持。不向默认 Core 镜像增加 snapshot、队列、worker 或记录。"
+msgid "首次只初始化未发布存储。`nx_request_prepare` 只重置 READY 或已消费结果的 SETTLED 实例代次；它无法发现适配器借用、控制命令或观察者，责任者 必须先等待退出它们。准入和推进由一个串行执行者完成；原子状态通过 release／acquire 形成可观察的判定条件，不是多生产者准入锁，也不依赖通知必达。"
+msgstr "首次只初始化未发布存储。`nx_request_prepare` 只重置 READY 或已消费结果的 SETTLED 实例代次；它无法发现适配器借用、控制命令或观察者，责任者 必须先等待退出它们。准入和推进由一个串行执行者完成；原子状态通过 release／acquire 形成可观察的判定条件，不是多生产者准入锁，也不依赖通知必达。"
 
-msgid "Stack and explicitly placed memory"
-msgstr "栈与显式放置的内存"
+msgid "完整关闭顺序："
+msgstr "完整关闭顺序："
 
-msgid "For `nx_stack_observe`, the caller first acquires an external quiescent lease: the stack owner is stopped/joined and cannot execute or receive an exception on the sampled stack while the read is in progress. Supply the original painted low-address region, excluding active frames, current SP and independently sized exception/context reservation. Boot startup establishes MSP paint provenance; the helper does not infer it. Never paint a live stack or mask interrupts around an unbounded scan. Cost is bounded by the declared byte count; reservations or writes equal to the paint hide use, so the result is not a proven stack peak. `tests/google/stack_observation_test.cpp` checks bounds, read-only behavior and alias rejection; OS stack-snapshot helpers own the separate task-context rules."
-msgstr "使用 `nx_stack_observe` 前，调用者先取得外部静止访问租约：栈 owner 已停止／join，读取期间不得在被采样栈上执行或接收异常。提供原先已填充的低地址区域，排除活动帧、当前 SP 和独立计算大小的异常／context 预留。启动代码建立 MSP 填充来源依据；helper 不推断它。绝不填充正在使用的栈，也不通过屏蔽中断包围无界扫描。成本受声明的字节数限制；预留空间或恰与填充值相同的写入会掩盖使用，因此结果不是已证明的栈峰值。`tests/google/stack_observation_test.cpp` 检查边界、只读行为和别名拒绝；OS 栈快照 helper 另行负责其任务上下文规则。"
+msgid "关闭新准入，停止新增控制命令和观察绑定。"
+msgstr "关闭新准入，停止新增控制命令和观察绑定。"
 
-msgid "Memory-placement macros apply to one static variable definition per declaration, only when the authored assembly selects that region:"
-msgstr "内存放置宏每次声明只适用于一个静态变量定义，并且仅在配置声明的装配选定该区域时使用："
+msgid "保持唯一执行者取消并排空硬件／IRQ／DMA／延后引用。失败保留 QUARANTINED 请求和有效数据；超时或观察者拆除引用均不允许回收。"
+msgstr "保持唯一执行者取消并排空硬件／IRQ／DMA／延后引用。失败保留 QUARANTINED 请求和有效数据；超时或观察者拆除引用均不允许回收。"
 
-msgid "Suffix"
+msgid "发布 SETTLED 前撤销全部具体实现引用，预先捕获独立存活的唤醒目标。 待发通知不得继续保留请求，结清后不再访问请求／有效数据。"
+msgstr "发布 SETTLED 前撤销全部具体实现引用，预先捕获独立存活的唤醒目标。 待发通知不得继续保留请求，结清后不再访问请求／有效数据。"
+
+msgid "acquire 观察并消费结果；另行确认排队中的控制命令，等待退出任务、诊断、 完成观察者以及已执行中的调用，在适配器保护区下拆除侧车。"
+msgstr "acquire 观察并消费结果；另行确认排队中的控制命令，等待退出任务、诊断、 完成观察者以及已执行中的调用，在适配器保护区下拆除侧车。"
+
+msgid "释放稳定槽位，之后才准备／重新绑定／回收存储。停止依赖前还须等待退出 其他所有使用者。"
+msgstr "释放稳定槽位，之后才准备／重新绑定／回收存储。停止依赖前还须等待退出 其他所有使用者。"
+
+msgid "适配器串行保护稳定槽位绑定／查找／释放。代次在该稳定槽位生命周期内 区分实例代次，不是全局通信 ID。`UINT64_MAX` 是最后可用代次；下一次绑定 拒绝且不改稳定槽位／输出。耗尽稳定槽位必须退休，旧命令仍可能访问时不能清零。 替换存储或重启责任者前，先等待退出全部控制者／观察者并撤回旧引用。"
+msgstr "适配器串行保护稳定槽位绑定／查找／释放。代次在该稳定槽位生命周期内 区分实例代次，不是全局通信 ID。`UINT64_MAX` 是最后可用代次；下一次绑定 拒绝且不改稳定槽位／输出。耗尽稳定槽位必须退休，旧命令仍可能访问时不能清零。 替换存储或重启责任者前，先等待退出全部控制者／观察者并撤回旧引用。"
+
+msgid "[UART／SPI 集成测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/io_owner_diagnostic_pipeline_test.cpp) 使用真实 Native 具体实现与责任者，验证排空失败、恢复结清、观察者拆除引用 后才允许具体实现停止。`core_lifecycle_test.cpp` 检查完整合法迁移矩阵、 准备拒绝、最后可用代次。C 合同的真实线程回归不靠唤醒提示观察发布； 这些测试不授权并发准入或无保护区的稳定槽位操作。"
+msgstr "[UART／SPI 集成测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/io_owner_diagnostic_pipeline_test.cpp) 使用真实 Native 具体实现与责任者，验证排空失败、恢复结清、观察者拆除引用 后才允许具体实现停止。`core_lifecycle_test.cpp` 检查完整合法迁移矩阵、 准备拒绝、最后可用代次。C 合同的真实线程回归不靠唤醒提示观察发布； 这些测试不授权并发准入或无保护区的稳定槽位操作。"
+
+msgid "时钟域与有限等待"
+msgstr "时钟域与有限等待"
+
+msgid "`nx_clock32_t` 要求唯一执行者、稳定非零频率和不中断计数器。最大观察间隔 严格小于 `2^32 / frequency_hz` 秒；1 MHz 时是 4294.967296 秒。一整圈后的相同 快照与完全未推进无法区分，辅助函数不能检测漏圈。预算包含空闲阶段、屏蔽状态区间、 Flash 维护、睡眠和责任者最坏延迟。成功时一起提交计数扩展与输出；非法参数、 别名或耗尽不改二者，输出须与完整扩展状态分离。"
+msgstr "`nx_clock32_t` 要求唯一执行者、稳定非零频率和不中断计数器。最大观察间隔 严格小于 `2^32 / frequency_hz` 秒；1 MHz 时是 4294.967296 秒。一整圈后的相同 快照与完全未推进无法区分，辅助函数不能检测漏圈。预算包含空闲阶段、屏蔽状态区间、 Flash 维护、睡眠和责任者最坏延迟。成功时一起提交计数扩展与输出；非法参数、 别名或耗尽不改二者，输出须与完整扩展状态分离。"
+
+msgid "物理时钟另有受审溢出／推进服务合同，通用扩展不能证明具体实现就绪状态。 停止、重启、换源、改频产生新域；撤销旧域前等待退出全部截止时间使用者。 数值相等也不使旧截止时间继续有效；这是生命周期规则，不在每个请求强制 保存代次。终端时钟故障保留借用，并执行所选具体实现保留责任停机。"
+msgstr "物理时钟另有受审溢出／推进服务合同，通用扩展不能证明具体实现就绪状态。 停止、重启、换源、改频产生新域；撤销旧域前等待退出全部截止时间使用者。 数值相等也不使旧截止时间继续有效；这是生命周期规则，不在每个请求强制 保存代次。终端时钟故障保留借用，并执行所选具体实现保留责任停机。"
+
+msgid "真正有限的等待在准入前调用 `nx_deadline_finite_after(now, duration, &end)` 并 处理失败：拒绝非有限 now 或到哨兵值的求和，失败不改 end，零 duration 合法。 `nx_deadline_after` 仍有饱和为无限等待的明确语义。二者不读时钟、不证明就绪， 零时间值也不构成启动确认。"
+msgstr "真正有限的等待在准入前调用 `nx_deadline_finite_after(now, duration, &end)` 并 处理失败：拒绝非有限 now 或到哨兵值的求和，失败不改 end，零 duration 合法。 `nx_deadline_after` 仍有饱和为无限等待的明确语义。二者不读时钟、不证明就绪， 零时间值也不构成启动确认。"
+
+msgid "可选观察与故障捕获"
+msgstr "可选观察与故障捕获"
+
+msgid "请求观察者提供复制诊断视图，不是另一执行者。间隙／迁移计数 仅是采样观察，不是 IRQ 延迟、WCET 或全部中间迁移。稳定槽位比观察者 活得更久；调用者串行保护采样与请求复用／稳定槽位释放。辅助函数 拒绝输出与已知控制对象重叠，完整请求／有效数据／外部上下文跨度和 存活期仍由调用者保证。"
+msgstr "请求观察者提供复制诊断视图，不是另一执行者。间隙／迁移计数 仅是采样观察，不是 IRQ 延迟、WCET 或全部中间迁移。稳定槽位比观察者 活得更久；调用者串行保护采样与请求复用／稳定槽位释放。辅助函数 拒绝输出与已知控制对象重叠，完整请求／有效数据／外部上下文跨度和 存活期仍由调用者保证。"
+
+msgid "弱 `nx_fault_observe` 默认无状态。产品可写一个有界 C11 覆盖函数，保存到 自有调试器可见记录。下面仅是最小片段，不包含时钟、任务名称或 动态指针："
+msgstr "弱 `nx_fault_observe` 默认无状态。产品可写一个有界 C11 覆盖函数，保存到 自有调试器可见记录。下面仅是最小片段，不包含时钟、任务名称或 动态指针："
+
+msgid "记录仅供终端停机后尽力取证，不保证并发读者看到一致快照，也不保证嵌套故障安全。`volatile` 不是锁或 release／acquire 协议。产品选择可写内存及保留条件。 钩子不能修复坏栈、建立安全输出、释放借用或依赖时钟、内核、传输层； 不改输入屏蔽状态，返回后终端路径仍保持停机。真实 FreeRTOS 保留责任停机测试检查 钩子、保留请求和 PRIMASK／BASEPRI／FAULTMASK。默认 Core 不加入 快照、队列、工作线程或记录。"
+msgstr "记录仅供终端停机后尽力取证，不保证并发读者看到一致快照，也不保证嵌套故障安全。`volatile` 不是锁或 release／acquire 协议。产品选择可写内存及保留条件。 钩子不能修复坏栈、建立安全输出、释放借用或依赖时钟、内核、传输层； 不改输入屏蔽状态，返回后终端路径仍保持停机。真实 FreeRTOS 保留责任停机测试检查 钩子、保留请求和 PRIMASK／BASEPRI／FAULTMASK。默认 Core 不加入 快照、队列、工作线程或记录。"
+
+msgid "栈观察与内存放置"
+msgstr "栈观察与内存放置"
+
+msgid "`nx_stack_observe` 要求外部静止租约：责任者已停／等待退出，读取期间不能 在该栈运行或进入异常。提供原始涂色低地址区，排除活动栈帧、 当前 SP 和独立预算的异常／上下文预留区。启动建立 MSP 涂色 来源，辅助函数不推测。不得涂写仍在执行的栈，也不得为无界扫描长时间屏蔽 IRQ。 成本受字节数约束；预留区或等于涂色的写入可能隐藏使用，结果不是已证明 栈峰值。`tests/google/stack_observation_test.cpp` 覆盖边界、只读、 别名，OS 栈快照另行负责任务上下文规则。"
+msgstr "`nx_stack_observe` 要求外部静止租约：责任者已停／等待退出，读取期间不能 在该栈运行或进入异常。提供原始涂色低地址区，排除活动栈帧、 当前 SP 和独立预算的异常／上下文预留区。启动建立 MSP 涂色 来源，辅助函数不推测。不得涂写仍在执行的栈，也不得为无界扫描长时间屏蔽 IRQ。 成本受字节数约束；预留区或等于涂色的写入可能隐藏使用，结果不是已证明 栈峰值。`tests/google/stack_observation_test.cpp` 覆盖边界、只读、 别名，OS 栈快照另行负责任务上下文规则。"
+
+msgid "放置宏每个声明仅作用一个静态变量定义，且装配已选区域："
+msgstr "放置宏每个声明仅作用一个静态变量定义，且装配已选区域："
+
+msgid "后缀"
 msgstr "后缀"
 
-msgid "Reset initialization"
+msgid "复位初始化"
 msgstr "复位初始化"
 
-msgid "Caller obligation"
+msgid "调用者责任"
 msgstr "调用者责任"
 
 msgid "DATA"
 msgstr "DATA"
 
-msgid "Copy initializer from Flash"
-msgstr "从 Flash 复制初值"
+msgid "从 Flash 拷贝初值"
+msgstr "从 Flash 拷贝初值"
 
-msgid "Budget both load and run regions"
-msgstr "同时计入加载区和运行区预算"
+msgid "同时预算加载／运行"
+msgstr "同时预算加载／运行"
 
 msgid "BSS"
 msgstr "BSS"
 
-msgid "Zero storage"
-msgstr "存储清零"
+msgid "清零"
+msgstr "清零"
 
-msgid "Use no nonzero initializer"
-msgstr "不得使用非零初值"
+msgid "不提供非零初值"
+msgstr "不提供非零初值"
 
 msgid "NOINIT"
 msgstr "NOINIT"
 
-msgid "Neither copy nor clear"
-msgstr "不复制也不清零"
+msgid "不拷贝、不清零"
+msgstr "不拷贝、不清零"
 
-msgid "Initialize or validate before every read"
-msgstr "每次读取之前初始化或验证"
+msgid "每次读前初始化或验证"
+msgstr "每次读前初始化或验证"
 
-msgid "Select the matching ADDSRAM/TCM/CCM/SRAM1/SRAM4 macro; there is no implicit fallback region. Startup/linker tests and the linked ELF establish copy/zero spans, alignment, garbage collection and budgets. NOINIT alone promises no reset or power-loss retention. Treat TCM/CCM placement as CPU-only unless the exact SoC contract authorizes the selected bus master's access. Placement alone never grants DMA reachability, cache coherence, alignment or borrowing permission. The default main stack and ordinary storage layout remain unchanged."
-msgstr "选择匹配的 ADDSRAM／TCM／CCM／SRAM1／SRAM4 宏；不存在隐式回退区域。启动／链接器测试与已链接 ELF 建立复制／清零范围、对齐、垃圾回收及预算的证据。单独 NOINIT 不承诺复位或断电保留。除非精确 SoC 合同授权所选 bus master 访问，否则将 TCM／CCM 放置视为仅供 CPU 使用。内存放置本身从不授予 DMA 可达性、cache 一致性、对齐或借用权限。默认主栈及普通存储布局保持不变。"
+msgid "选择 ADDSRAM／TCM／CCM／SRAM1／SRAM4 对应宏，无隐式后备实现。启动／链接器 测试和 ELF 检查拷贝／清零跨度、对齐、GC、预算。NOINIT 不保证复位／ 掉电保留。除非精确 SoC 合同授权所选总线主设备，TCM／CCM 按仅 CPU 处理； 放置不授予 DMA 可达性、Cache 一致性、对齐或借用权限。 默认主栈和普通存储布局保持原选择。"
+msgstr "选择 ADDSRAM／TCM／CCM／SRAM1／SRAM4 对应宏，无隐式后备实现。启动／链接器 测试和 ELF 检查拷贝／清零跨度、对齐、GC、预算。NOINIT 不保证复位／ 掉电保留。除非精确 SoC 合同授权所选总线主设备，TCM／CCM 按仅 CPU 处理； 放置不授予 DMA 可达性、Cache 一致性、对齐或借用权限。 默认主栈和普通存储布局保持原选择。"
 
-msgid "Exact silicon admission"
-msgstr "精确芯片准入"
+msgid "精确硅版本与验证"
+msgstr "精确硅版本与验证"
 
-msgid "Optional cold `nx_silicon_preflight` reads the selected source once, after the caller establishes legal privilege, MMIO and security state, before acquiring I/O resources. It never enables clocks or repairs hardware. Keep the policy, strictly ordered exact revision rules and their review-source SHA256 together; the digest identifies review input and is not authentication or a claim that workarounds were applied. The build supplies its reviewed applied-workaround mask. Numerical revision zero is valid when explicitly observed."
-msgstr "可选冷态 `nx_silicon_preflight` 在调用者建立合法特权、MMIO 和安全状态之后、取得 I/O 资源之前，读取选定来源一次。它从不启用时钟或修复硬件。策略、严格排序的精确 revision 规则及其审阅来源 SHA256 应一同保存；摘要标识审阅输入，并非认证或已应用 workaround 的证明。构建提供经审阅的已应用 workaround mask。显式观察到的数值 revision 零合法。"
+msgid "可选冷态 `nx_silicon_preflight` 在调用者建立合法权限／MMIO／安全 后、取得 I/O 资源前读取来源一次，不启时钟、不修硬件。策略、严格排序的 精确修订号规则与审核来源 SHA256 一起维护；摘要标识审核输入， 不是认证或勘误规避措施已应用证明。构建提供经过审核的已应用规避措施位掩码； 明确观察到的修订号数值零合法。"
+msgstr "可选冷态 `nx_silicon_preflight` 在调用者建立合法权限／MMIO／安全 后、取得 I/O 资源前读取来源一次，不启时钟、不修硬件。策略、严格排序的 精确修订号规则与审核来源 SHA256 一起维护；摘要标识审核输入， 不是认证或勘误规避措施已应用证明。构建提供经过审核的已应用规避措施位掩码； 明确观察到的修订号数值零合法。"
 
-msgid "`allow_unreviewed` cannot bypass a blocked revision, missing observation, group/density mismatch or missing workaround. A completed rejection copies its diagnostic reason without authorizing startup; source failure leaves output unchanged. A device group and density do not establish package, PCB or physical qualification. `silicon_admission_test.cpp` tests these distinctions against the real preflight implementation and an explicit mocked identity source."
-msgstr "`allow_unreviewed` 不能绕过被阻止的 revision、缺失的观察、group／density 不匹配或缺失的 workaround。已完成的拒绝复制其诊断原因，但不授权启动；来源失败时输出保持不变。device group 和 density 不建立封装、PCB 或物理资格。`silicon_admission_test.cpp` 使用真实 preflight 实现和显式 mock 身份来源测试这些区别。"
+msgid "`allow_unreviewed` 不绕过禁止的修订号、缺少观察、设备组／密度 不符或缺少勘误规避措施。完成拒绝会复制原因但不授权启动；来源读取失败保留输出。 设备组／密度不证明封装／PCB／物理资格。 `silicon_admission_test.cpp` 使用真实预检和显式模拟身份来源检查这些区别。"
+msgstr "`allow_unreviewed` 不绕过禁止的修订号、缺少观察、设备组／密度 不符或缺少勘误规避措施。完成拒绝会复制原因但不授权启动；来源读取失败保留输出。 设备组／密度不证明封装／PCB／物理资格。 `silicon_admission_test.cpp` 使用真实预检和显式模拟身份来源检查这些区别。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:51
+msgid "`tests/contracts/core_contract_test.c` 执行发布、准入、时间回绕和终态不变量。宿主结果不证明 MCU 中断排序或 WCET； 完整范围见[资格说明](/delivery/qualification.md)。"
+msgstr "`tests/contracts/core_contract_test.c` 执行发布、准入、时间回绕和终态不变量。宿主结果不证明 MCU 中断排序或 WCET； 完整范围见[资格说明](/delivery/qualification.md)。"
+
 msgid "Arch"
 msgstr "Arch"
 
-#: ../../../../tmp/nexus-quality-20261019/arch/README.md:2
-msgid "CPU-local primitives"
-msgstr "CPU 本地原语"
+msgid "Arch：CPU 原语与显式可选机制"
+msgstr "Arch：CPU 原语与显式可选机制"
 
-#: ../../../../tmp/nexus-quality-20261019/arch/README.md:4
-msgid ""
-"Public headers remain in `include/nexus/arch/`. Arm Cortex-M implementation "
-"sources live in `arm/cortex_m/`, and host primitives live in `native/`. The "
-"ISA directory is a build-time ownership boundary; CPU facts select one "
-"implementation without a runtime CPU factory. A new architecture needs its "
-"own reviewed implementation and compiler contract rather than a placeholder "
-"support claim."
-msgstr ""
-"公共头仍位于 `include/nexus/arch/`。Arm Cortex-M 实现源码位于 `arm/cortex_m/`，主机原语位于 "
-"`native/`。ISA 目录是构建期所有权边界；CPU 事实选择一个实现，不设置运行时 CPU "
-"factory。新架构需要自身经过审查的实现和编译器合同，不能以占位声明代替支持。"
+msgid "Arch 为 I/O、SoC 和 OS 适配提供 CPU 局部机制。公共头在 `include/nexus/arch/`，Arm Cortex-M 实现在 `arm/cortex_m/`，宿主实现在 `native/`。CPU 事实在构建期选择唯一基础实现，没有运行时 CPU factory。 新架构需要受审实现和编译器合同，不能仅登记名称就宣称支持。"
+msgstr "Arch 为 I/O、SoC 和 OS 适配提供 CPU 局部机制。公共头在 `include/nexus/arch/`，Arm Cortex-M 实现在 `arm/cortex_m/`，宿主实现在 `native/`。CPU 事实在构建期选择唯一基础实现，没有运行时 CPU factory。 新架构需要受审实现和编译器合同，不能仅登记名称就宣称支持。"
 
-#: ../../../../tmp/nexus-quality-20261019/arch/README.md:10
-msgid ""
-"`Nexus::Arch` exposes saved interrupt masks, exact exception identity, "
-"current privilege, ordering barriers and an optional already-enabled DWT "
-"cycle snapshot. It does not call I/O, OS or vendor SDK code. One compile-"
-"time Cortex-M primitive implementation covers "
-"M0/M0+/M3/M4/M7/M23/M33/M55/M85, including ARMv8.1-M Mainline compiler "
-"profiles. STM32F407 and GD32F470 maintain the initial platform scope; G474, "
-"H743 and U575 provide explicit reference slices described in the [support "
-"matrix](/delivery/support.md). CPU support does not extend those SoC or "
-"Board slices. The separate CPU runtime assembly selects Core/Arch and "
-"optional OS software for all nine cores without creating a SoC, Board, "
-"startup or factory. See [CPU contracts](/design/arch-contracts.md) and the "
-"[runtime assembly example](/delivery/cortex-m.md)."
-msgstr ""
-"`Nexus::Arch` 暴露保存／恢复中断屏蔽、准确异常身份、当前特权级、顺序屏障及可选的已启用 DWT 周期快照。它不调用 I/O、OS 或厂商 "
-"SDK。一个编译期 Cortex-M 原语实现覆盖 M0/M0+/M3/M4/M7/M23/M33/M55/M85，包括 ARMv8.1-M "
-"Mainline 编译配置。STM32F407 与 GD32F470 维持首发平台范围；G474、H743、U575 "
-"提供[支持矩阵](/delivery/support.md)中的明确参考切片。CPU 支持不扩大这些 SoC 或 Board 切片。独立 CPU "
-"runtime 装配为全部九核选择 Core/Arch 及可选 OS 软件，不创建 SoC、Board、startup 或 factory。详见 "
-"[CPU 合同](/design/arch-contracts.md)和 [runtime 装配示例](/delivery/cortex-m.md)。"
+msgid "![FIG-13：Cortex-M 能力分层](../docs/assets/diagrams/cortex-m-capabilities.svg)"
+msgstr "![FIG-13：Cortex-M 能力分层](../docs/assets/diagrams/cortex-m-capabilities.svg)"
 
-#: ../../../../tmp/nexus-quality-20261019/arch/README.md:22
-msgid ""
-"Save/restore tokens on the same CPU/thread in strict reverse order. Cortex-M"
-" preserves incoming PRIMASK and does not overwrite BASEPRI/FAULTMASK where "
-"those registers exist. Only privileged Task/configurable-IRQ callers may "
-"change masks. NMI and HardFault remain unmasked and must not access this "
-"protected metadata. Keep metadata sections short: no blocking, allocation, "
-"large copies, kernel calls or user callbacks. A saved Arch token is not a "
-"kernel critical-section token or an SMP lock."
-msgstr ""
-"必须在同一 CPU／线程上严格逆序保存／恢复 token。Cortex-M 保持进入时的 PRIMASK，并在相应寄存器存在时不覆盖 "
-"BASEPRI/FAULTMASK。只有特权 Task／可配置 IRQ 调用者可以修改屏蔽。NMI 与 HardFault "
-"保持未屏蔽，且不得访问这些受保护元数据。元数据临界区必须短小：不得阻塞、分配、大量复制、调用内核或用户回调。已保存的 Arch token "
-"不是内核临界区 token，也不是 SMP 锁。"
+msgid "FIG-13：Cortex-M 能力分层"
+msgstr "FIG-13：Cortex-M 能力分层"
 
-#: ../../../../tmp/nexus-quality-20261019/arch/README.md:30
-msgid ""
-"Mask/context queries let blocking I/O reject contexts that prevent its "
-"progress. The read-only mask snapshot distinguishes PRIMASK, BASEPRI and "
-"FAULTMASK; it is not a restore token and does not freeze interrupt or "
-"security-world execution. Baseline M0/M0+/M23 queries never read absent "
-"BASEPRI/FAULTMASK. Handler mode is privileged even when CONTROL.nPRIV "
-"describes an interrupted unprivileged Thread. An exception number identifies"
-" the current CPU/security state; it does not grant permission to call a "
-"kernel ISR API or coordinate another security world. DMB/DSB/ISB encode "
-"different ordering guarantees; they do not prove peripheral or DMA "
-"quiescence. DWT snapshots require an explicit reviewed CPU capability and "
-"privileged access. A disabled capability emits no DWT reads. Snapshots do "
-"not enable or reset the counter and are not monotonic deadlines. Their "
-"wrap/frequency limits are documented in the header. Reviewed capabilities "
-"are explicit CPU facts, never inferred by probing arbitrary registers or "
-"enabling optional units."
-msgstr ""
-"屏蔽／上下文查询允许阻塞 I/O 拒绝会阻碍其推进的上下文。只读屏蔽快照区分 PRIMASK、BASEPRI、FAULTMASK；它不是恢复 "
-"token，也不冻结中断或安全世界执行。Baseline M0/M0+/M23 查询绝不读取不存在的 BASEPRI/FAULTMASK。即使 "
-"CONTROL.nPRIV 描述的是被打断的非特权 Thread，Handler 模式仍为特权。异常号识别当前 CPU／安全状态，不授予内核 ISR "
-"API 调用权限，也不协调另一安全世界。DMB/DSB/ISB 具有不同顺序保证，不能证明外设或 DMA 静止。DWT 快照要求显式审查的 CPU "
-"能力和特权访问；能力禁用时不产生 DWT 读取。快照不启用或复位计数器，也不是单调截止时间；回绕／频率限制见头文件。已审查能力是明确 CPU "
-"事实，绝不能通过探测任意寄存器或启用可选单元来推断。"
+msgid "图区分当前 CPU 原语、Runtime、SoC 接入和实板范围。图源与图例见 [图册](/assets/diagrams/README.md)，规范见 [CPU 契约](/design/arch-contracts.md)。"
+msgstr "图区分当前 CPU 原语、Runtime、SoC 接入和实板范围。图源与图例见 [图册](/assets/diagrams/README.md)，规范见 [CPU 契约](/design/arch-contracts.md)。"
 
-#: ../../../../tmp/nexus-quality-20261019/arch/README.md:44
-msgid ""
-"`sleep.h` exposes two explicit shallow-sleep operations. The masked "
-"`nx_arch_wait_for_interrupt()` requires privileged Thread mode, PRIMASK=1, "
-"BASEPRI/FAULTMASK clear and SCR.SLEEPDEEP clear. It executes DSB/WFI/ISB "
-"without changing masks, clocks or pending interrupts. The caller owns the "
-"final readiness check and an enabled IRQ wake source; a pending enabled IRQ "
-"wakes WFI despite PRIMASK and runs after the caller restores its saved mask."
-" `nx_arch_idle_if_unchanged()` instead requires all incoming masks clear, "
-"saves PRIMASK, rechecks an aligned published sequence with acquire semantics"
-" and sleeps only when it still matches the caller's snapshot. It restores "
-"the exact incoming mask; the caller retries the authoritative predicate and "
-"supplies an IRQ timer for finite deadlines. This is one CPU and one security"
-" state's publication domain. NMI/HardFault, DMA, SMP and other security-"
-"world publishers are excluded. Native reports unsupported. Compiler/model "
-"evidence does not qualify a concrete timer, clock continuity, physical power"
-" behavior or wake latency."
-msgstr ""
-"`sleep.h` 暴露两个显式浅睡眠操作。屏蔽模式的 `nx_arch_wait_for_interrupt()` 要求特权 "
-"Thread、PRIMASK=1、BASEPRI/FAULTMASK 清零且 SCR.SLEEPDEEP 清零。它执行 "
-"DSB/WFI/ISB，不改变屏蔽、时钟或 pending 中断。调用者负责最后就绪检查及已启用 IRQ 唤醒源；即使 PRIMASK "
-"已置位，pending 的已启用 IRQ 仍可唤醒 WFI，并在调用者恢复保存的屏蔽后执行。`nx_arch_idle_if_unchanged()` "
-"则要求进入时全部屏蔽清零，保存 PRIMASK，再以 acquire "
-"语义重新检查对齐的已发布序列；仅仍与调用者快照匹配时睡眠。它恢复准确进入屏蔽；调用者重新检查权威谓词，并为有限截止时间供给 IRQ 定时器。这是单 "
-"CPU、单安全状态的发布域，排除 NMI/HardFault、DMA、SMP 和另一安全世界发布者。Native "
-"返回不支持。编译器／模型证据不建立具体定时器、时钟连续性、物理功耗行为或唤醒延迟资格。"
+msgid "依赖与源码入口"
+msgstr "依赖与源码入口"
 
-#: ../../../../tmp/nexus-quality-20261019/arch/README.md:59
-msgid ""
-"`cache.h` exposes distinct data clean, invalidate, combined maintenance and "
-"instruction synchronization. Every range must own complete reviewed 32-byte "
-"lines, fit the CPU address space and be quiescent across CPU/DMA/security "
-"users. The functions do not round ranges, enable caches or flush unrelated "
-"dirty lines. `cache_control.h` separately owns cold M7 transitions. The "
-"caller supplies one zero-initialized control object, masks configurable "
-"interrupts and excludes DMA and all other memory users. Trusted reset or a "
-"prior successful owned clean/disable establishes cold state; clear CCR bits "
-"alone cannot prove that foreign dirty lines are absent. Enable rejects pre-"
-"existing caches; disable cleans every reviewed data set/way and changes CCR "
-"in a leaf that cannot dirty its own stack. Failed partial changes retain "
-"cache/CSSELR recovery responsibility. Actual instruction audits verify "
-"addresses, loops and barriers at O0/Os/O2. Other CPU profiles remain "
-"unsupported by this cold-control API; their range maintenance capability "
-"does not imply a reviewed global cache transition. `mpu.h` retains distinct "
-"v7-format and v8 base/limit/MAIR encoders. Single-region programming "
-"requires an already masked privileged Thread and disabled MPU; actual TYPE "
-"bounds and fields are checked before writes. CTRL and incoming RNR are "
-"preserved. Memory policy and any later enable operation belong to the "
-"caller. The optional M0+ MPU uses the v7-format registers confirmed by "
-"CMSIS."
-msgstr ""
-"`cache.h` 分别暴露数据 clean、invalidate、组合维护及指令同步。每个范围必须独占完整、已审查的 32 字节行，位于 CPU "
-"地址空间内，并在 CPU/DMA／安全用户之间保持静止。函数不扩展对齐范围、不启用缓存、不刷新无关脏行。`cache_control.h` 单独拥有 "
-"M7 冷态转换。调用者供给一个零初始化控制对象，屏蔽可配置中断，并排除 DMA 及全部其他内存使用者。可信复位或此前成功的自有 "
-"clean/disable 建立冷态；仅 CCR 位清零不能证明不存在外来脏行。Enable 拒绝已有启用缓存；disable 清理全部已审查数据 "
-"set/way，并在不会弄脏自身栈的叶函数中修改 CCR。部分变更失败后保留缓存／CSSELR 恢复责任。实际指令审计在 O0/Os/O2 "
-"验证地址、循环和屏障。其他 CPU 配置不受此冷控制 API 支持；其范围维护能力不暗示已审查的全局缓存转换。`mpu.h` 分开保留 v7 格式和 "
-"v8 base/limit/MAIR 编码器。单区域编程要求已屏蔽的特权 Thread 及关闭的 MPU；写入前检查实际 TYPE 边界与字段。CTRL"
-" 和进入时 RNR 保持不变。内存策略和后续 enable 属于调用者。可选 M0+ MPU 使用 CMSIS 确认的 v7 格式寄存器。"
+msgid "`Nexus::Arch` 不调用 I/O、OS 或厂商 SDK，提供屏蔽状态保存恢复、异常身份、权限、 排序屏障和可选已启用 DWT 快照。私有硬件辅助函数内联，正常 ARM 不链接模拟替身； 公共外部函数仍有普通 C 调用边界，不能宣称全部原语零调用成本。"
+msgstr "`Nexus::Arch` 不调用 I/O、OS 或厂商 SDK，提供屏蔽状态保存恢复、异常身份、权限、 排序屏障和可选已启用 DWT 快照。私有硬件辅助函数内联，正常 ARM 不链接模拟替身； 公共外部函数仍有普通 C 调用边界，不能宣称全部原语零调用成本。"
 
-#: ../../../../tmp/nexus-quality-20261019/arch/README.md:79
-msgid ""
-"`security.h` identifies the reviewed image state and encodes explicit SAU "
-"regions. Only a Secure compiler/profile with reviewed SAU regions can "
-"program one owned region, while SAU is disabled and the privileged Thread "
-"has PRIMASK set. No API changes SAU CTRL/ALLNS, another region, Secure "
-"gateways or another world's alias. NonSecure and single-domain images return"
-" unsupported without SAU MMIO. IDAU, overlap rules, memory permissions and "
-"gateway policy stay outside these mechanisms."
-msgstr ""
-"`security.h` 识别已审查镜像状态并编码显式 SAU 区域。只有带已审查 SAU 区域的 Secure 编译器／配置可以编程一个自有区域，且 "
-"SAU 必须关闭、特权 Thread 已设置 PRIMASK。API 不修改 SAU CTRL/ALLNS、其他区域、Secure "
-"网关或另一安全世界别名。NonSecure 和单域镜像在不访问 SAU MMIO "
-"的情况下返回不支持。IDAU、重叠规则、内存权限与网关策略位于这些机制之外。"
+msgid "`arch.h`、`arm/cortex_m/nx_arch_cortex_m.c`"
+msgstr "`arch.h`、`arm/cortex_m/nx_arch_cortex_m.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/arch/README.md:86
-msgid ""
-"`nonsecure.h` supplies an instantaneous Secure Thread observation of a "
-"complete span using the actual CMSE NonSecure unprivileged read or "
-"read/write check. It needs no programmable SAU when an IDAU establishes "
-"attribution. Native, single-state and NonSecure images return unsupported "
-"without crossing domains. Success does not pin, copy, authenticate, exclude "
-"MMIO or freeze mappings, DMA and bus firewall policy. SoC and gateway owners"
-" must separately establish these conditions before accessing memory or "
-"performing an operation."
-msgstr ""
-"`nonsecure.h` 使用真实 CMSE NonSecure 非特权读或读写检查，提供 Secure Thread 对完整范围的瞬时观察。若 "
-"IDAU 已建立属性，则不需要可编程 SAU。Native、单状态和 NonSecure 镜像不跨域，直接返回不支持。成功不表示 "
-"pin、复制、鉴权、排除 MMIO，或冻结映射、DMA 和总线防火墙策略。SoC 与网关所有者必须在访问内存或执行操作之前，分别建立这些条件。"
+msgid "屏蔽状态、上下文、屏障、周期快照"
+msgstr "屏蔽状态、上下文、屏障、周期快照"
 
-#: ../../../../tmp/nexus-quality-20261019/arch/README.md:94
-msgid ""
-"`features.h` reports immutable reviewed cache/MPU/DWT/security/SAU "
-"capabilities, not enabled state or hardware qualification. Native exposes "
-"the same APIs with absent-hardware results; pure encoders remain usable. "
-"Extending CPU mechanisms does not provide a SoC startup, vector table, clock"
-" tree, memory/DMA routes, Board wiring or an RTOS FPU/MVE context port. Each"
-" new platform must supply and verify those boundaries independently. "
-"Publication and RMW atomics have separate contracts in `atomic.h`; CPU-"
-"specific fallback never silently links libatomic. Aligned acquire/release "
-"word loads and stores do not mask IRQs. M0/M0+ RMW uses bounded saved-"
-"PRIMASK exclusion and restores the incoming mask; all concurrent users must "
-"be privileged local Thread/configurable-IRQ callers. NMI, HardFault, another"
-" core, DMA and another security world are outside this exclusion domain. "
-"Other maintained cores use compiler lock-free RMW; exclusive retries do not "
-"establish a fixed cycle bound. Initialize words before publication and "
-"retain their lifetime until every reader/writer has stopped."
-msgstr ""
-"`features.h` 报告不可变、已审查的 cache/MPU/DWT/security/SAU 能力，不报告启用状态或硬件资格。Native "
-"暴露相同 API，但返回硬件不存在结果；纯编码器仍可使用。扩展 CPU 机制不提供 SoC startup、向量表、时钟树、内存／DMA "
-"路由、Board 接线或 RTOS FPU/MVE 上下文端口。每个新平台必须独立供给并验证这些边界。发布及 RMW 原子操作在 `atomic.h` "
-"中具有独立合同；CPU 特定回退绝不隐式链接 libatomic。对齐的 acquire/release 字加载和存储不屏蔽 IRQ。M0/M0+ "
-"RMW 使用有界、保存 PRIMASK 的互斥机制，并恢复进入屏蔽；全部并发使用者必须是本地特权 Thread／可配置 IRQ "
-"调用者。NMI、HardFault、其他核、DMA 和另一安全世界位于互斥域之外。其他维护核使用编译器无锁 RMW；exclusive "
-"重试不建立固定周期上限。发布前初始化字，并保持其生命周期直到每个读者／写者停止。"
+msgid "`atomic.h`"
+msgstr "`atomic.h`"
 
-msgid "Native models recursive exclusion and C11 fences; it does not model real NVIC, DMA, physical timing or signal-safe interrupts. Invalid restore nesting aborts in both Debug and Release. GoogleTest/GoogleMock compiles the real Cortex-M algorithm against a narrow register/instruction hardware boundary for nine CPU profiles; the normal ARM path inlines that boundary and never links the mocks. Native tests exercise real recursive exclusion, strict token nesting and context queries. Cache, MPU and security models mock only external CPU/MMIO operations and run the production C algorithms, including rejection before state changes. The pinned official CMSIS-Core v6.4.0 headers `core_cm0plus.h`, `core_cm7.h`, `core_cm23.h`, `core_cm33.h`, `core_cm55.h`, `core_cm85.h`, `m-profile/armv7m_mpu.h`, `m-profile/armv8m_mpu.h` and `m-profile/armv7m_cachel1.h` provide reviewed register-layout references. The shared private `registers.h` holds the used current-domain addresses once. `tests/contracts/arch_cmsis_layout_probe.c` independently compares those facts and used MPU/SAU/cache fields with official headers for all nine CPU profiles. The compile gate verifies the clean pinned Core and actual include origins; the production target keeps its Nexus-only dependency boundary. The shared private Core source does not change Nexus's public context, ownership, mask-restoration or cache/MPU/SAU contracts, and does not establish new processor/profile or physical support. Actual IRQ latency, privilege transitions, DMA/cache coherency and CPU timing require HIL."
-msgstr "Native 对递归互斥和 C11 fence 建模；它不模拟真实 NVIC、DMA、物理时序或信号安全的中断。非法 restore 嵌套在 Debug 和 Release 中均会 abort。GoogleTest／GoogleMock 针对九个 CPU profile，通过狭窄的寄存器／指令硬件边界编译真实 Cortex-M 算法；普通 ARM 路径将该边界内联，从不链接 mock。Native 测试执行真实递归互斥、严格 token 嵌套和 context 查询。Cache、MPU 和 security 模型只 mock 外部 CPU／MMIO 操作，运行生产 C 算法，包括状态变化前的拒绝。锁定的官方 CMSIS-Core v6.4.0 头文件 `core_cm0plus.h`、`core_cm7.h`、`core_cm23.h`、`core_cm33.h`、`core_cm55.h`、`core_cm85.h`、`m-profile/armv7m_mpu.h`、`m-profile/armv8m_mpu.h` 及 `m-profile/armv7m_cachel1.h` 提供经审阅的寄存器布局参考。共享私有 `registers.h` 统一保存使用中的当前域地址。`tests/contracts/arch_cmsis_layout_probe.c` 独立将这些事实及使用中的 MPU／SAU／cache 字段与九个 CPU profile 的官方头文件比较。编译门禁验证干净的锁定 Core 和实际 include 来源；生产 target 保持仅依赖 Nexus 的边界。共享私有 Core 源码不改变 Nexus 公共 context、ownership、mask 恢复或 cache／MPU／SAU 合同，也不建立新的处理器／profile 或物理支持。真实 IRQ 延迟、特权转换、DMA／cache 一致性及 CPU 时序需要 HIL。"
+msgid "内联自然对齐 32 位发布／读改写（RMW）"
+msgstr "内联自然对齐 32 位发布／读改写（RMW）"
 
-msgid "`scripts/ci/arch_compile.py` compiles all declared CPU/FPU/MVE/security/DSP ABI variants with the actual GNU ARM compiler at O2. Separate real production `atomic.h` probes retain all nine public operations. Function-level audits bind saved masks, restore barriers, publication access and exclusive RMW to each operation; actual relocation records bind M0/M0+ calls to the saved-PRIMASK port. Machine instruction counts describe static code shapes. They neither bound exclusive retries nor establish timing, wake latency or WCET. ARM Clang qualification, SoC startup, Board wiring and physical behavior remain separate evidence scopes. MPU/SAU programming success means validated writes followed by barriers; these mechanisms do not verify readback or an enabled policy."
-msgstr "`scripts/ci/arch_compile.py` 使用真实 GNU ARM 编译器，以 O2 编译所有声明的 CPU／FPU／MVE／security／DSP ABI 变体。单独的真实生产 `atomic.h` probe 保留全部九个公共操作。逐函数审计将保存的 mask、恢复屏障、发布访问和 exclusive RMW 绑定到每个操作；真实 relocation 记录将 M0／M0+ 调用绑定到 saved-PRIMASK 端口。机器指令计数描述静态代码形状，并不限制 exclusive 重试次数，也不建立时序、唤醒延迟或 WCET。ARM Clang 资格、SoC 启动、Board 接线及物理行为仍属独立证据范围。MPU／SAU 编程成功表示参数经验证后的写入和屏障；这些机制不验证读回或已启用的策略。"
+msgid "`features.h`"
+msgstr "`features.h`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:58
-msgid "Typed I/O"
+msgid "不可变受审编译能力，不探测已启用状态"
+msgstr "不可变受审编译能力，不探测已启用状态"
+
+msgid "`cache.h`、`cache_control.h`"
+msgstr "`cache.h`、`cache_control.h`"
+
+msgid "范围维护、独立 M7 冷态控制"
+msgstr "范围维护、独立 M7 冷态控制"
+
+msgid "`mpu.h`、`security.h`、`nonsecure.h`"
+msgstr "`mpu.h`、`security.h`、`nonsecure.h`"
+
+msgid "MPU、SAU 和即时 CMSE 范围观察"
+msgstr "MPU、SAU 和即时 CMSE 范围观察"
+
+msgid "`sleep.h`"
+msgstr "`sleep.h`"
+
+msgid "两种显式浅睡眠操作"
+msgstr "两种显式浅睡眠操作"
+
+msgid "`arm/cortex_m/private/`"
+msgstr "`arm/cortex_m/private/`"
+
+msgid "指令／MMIO 边界和统一寄存器事实"
+msgstr "指令／MMIO 边界和统一寄存器事实"
+
+msgid "`native/nx_arch_native.c`"
+msgstr "`native/nx_arch_native.c`"
+
+msgid "宿主递归排他和 C11 内存屏障"
+msgstr "宿主递归排他和 C11 内存屏障"
+
+msgid "同一 Cortex-M 实现覆盖 M0／M0+／M3／M4／M7／M23／M33／M55／M85，包括 ARMv8.1-M Mainline 编译器配置组合。F407／F470 首发与 G474／H743／U575 参考范围 由[支持矩阵](/delivery/support.md)限定。CPU 能力不扩大 SoC／Board。 独立 CPU 运行时选择 Core／Arch 和可选 OS，不创建 SoC、Board、启动或 factory；见 [Runtime 装配](/delivery/cortex-m.md)。"
+msgstr "同一 Cortex-M 实现覆盖 M0／M0+／M3／M4／M7／M23／M33／M55／M85，包括 ARMv8.1-M Mainline 编译器配置组合。F407／F470 首发与 G474／H743／U575 参考范围 由[支持矩阵](/delivery/support.md)限定。CPU 能力不扩大 SoC／Board。 独立 CPU 运行时选择 Core／Arch 和可选 OS，不创建 SoC、Board、启动或 factory；见 [Runtime 装配](/delivery/cortex-m.md)。"
+
+msgid "中断状态、上下文和排序"
+msgstr "中断状态、上下文和排序"
+
+msgid "同 CPU／线程严格逆序使用一次保存／恢复令牌。Cortex-M 保存输入 PRIMASK， 不改 BASEPRI／FAULTMASK。仅特权线程或可配置 IRQ 可以改变屏蔽状态。NMI／HardFault 不被屏蔽，不得访问受保护元数据。临界区不阻塞、分配、大块复制、调用内核或 用户回调。Arch 恢复令牌不代替内核临界区令牌或 SMP 锁。"
+msgstr "同 CPU／线程严格逆序使用一次保存／恢复令牌。Cortex-M 保存输入 PRIMASK， 不改 BASEPRI／FAULTMASK。仅特权线程或可配置 IRQ 可以改变屏蔽状态。NMI／HardFault 不被屏蔽，不得访问受保护元数据。临界区不阻塞、分配、大块复制、调用内核或 用户回调。Arch 恢复令牌不代替内核临界区令牌或 SMP 锁。"
+
+msgid "只读快照区分 PRIMASK、BASEPRI、FAULTMASK，不是恢复令牌，不冻结 IRQ 或另一安全态。M0／M0+／M23 不读不存在的 BASEPRI／FAULTMASK。异常模式即使打断 非特权线程模式也有特权；CONTROL.nPRIV 描述线程模式。异常号只标识当前 CPU／ 安全态，不能据此调用内核 ISR API 或协调另一世界。"
+msgstr "只读快照区分 PRIMASK、BASEPRI、FAULTMASK，不是恢复令牌，不冻结 IRQ 或另一安全态。M0／M0+／M23 不读不存在的 BASEPRI／FAULTMASK。异常模式即使打断 非特权线程模式也有特权；CONTROL.nPRIV 描述线程模式。异常号只标识当前 CPU／ 安全态，不能据此调用内核 ISR API 或协调另一世界。"
+
+msgid "DMB／DSB／ISB 提供不同排序保证，不证明外设或 DMA 已静止。DWT 要求显式 受审能力和特权访问；能力关闭时不产生 DWT 读取。快照不启用／ 复位计数器，不是单调截止时间，回绕／频率限制见公共头。能力来自 显式 CPU 事实，不靠试读任意寄存器或暗中开启可选单元。"
+msgstr "DMB／DSB／ISB 提供不同排序保证，不证明外设或 DMA 已静止。DWT 要求显式 受审能力和特权访问；能力关闭时不产生 DWT 读取。快照不启用／ 复位计数器，不是单调截止时间，回绕／频率限制见公共头。能力来自 显式 CPU 事实，不靠试读任意寄存器或暗中开启可选单元。"
+
+msgid "原子与存储责任"
+msgstr "原子与存储责任"
+
+msgid "`atomic.h` 区分发布与读改写（RMW），不会静默链接 libatomic。自然对齐字的 acquire 读取和 release 写入不屏蔽 IRQ。M0／M0+ RMW 使用有界 PRIMASK 保存／ 恢复排他区；参与者限同 CPU 的特权线程或可配置 IRQ。NMI、HardFault、 另一核、DMA、另一安全域不在该排他域。"
+msgstr "`atomic.h` 区分发布与读改写（RMW），不会静默链接 libatomic。自然对齐字的 acquire 读取和 release 写入不屏蔽 IRQ。M0／M0+ RMW 使用有界 PRIMASK 保存／ 恢复排他区；参与者限同 CPU 的特权线程或可配置 IRQ。NMI、HardFault、 另一核、DMA、另一安全域不在该排他域。"
+
+msgid "其他维护核（包括 M23）用编译器无锁 RMW；独占重试不保证固定 周期上界。发布前初始化字，并保持有效直到每个读取者／写入者停止；这些 操作不自动回收请求、通知或队列。"
+msgstr "其他维护核（包括 M23）用编译器无锁 RMW；独占重试不保证固定 周期上界。发布前初始化字，并保持有效直到每个读取者／写入者停止；这些 操作不自动回收请求、通知或队列。"
+
+msgid "浅睡眠"
+msgstr "浅睡眠"
+
+msgid "`nx_arch_wait_for_interrupt()` 要求特权线程模式、PRIMASK=1、 BASEPRI／FAULTMASK 清除、SCR.SLEEPDEEP 清除；执行 DSB／WFI／ISB，不改变屏蔽状态、时钟或待处理中断状态。调用者完成最终就绪状态检查并提供已启 IRQ 唤醒源。 待处理已启用 IRQ 可在 PRIMASK 屏蔽执行时唤醒 WFI，恢复屏蔽状态后再执行。"
+msgstr "`nx_arch_wait_for_interrupt()` 要求特权线程模式、PRIMASK=1、 BASEPRI／FAULTMASK 清除、SCR.SLEEPDEEP 清除；执行 DSB／WFI／ISB，不改变屏蔽状态、时钟或待处理中断状态。调用者完成最终就绪状态检查并提供已启 IRQ 唤醒源。 待处理已启用 IRQ 可在 PRIMASK 屏蔽执行时唤醒 WFI，恢复屏蔽状态后再执行。"
+
+msgid "`nx_arch_idle_if_unchanged()` 要求输入屏蔽状态全清，保存 PRIMASK，以 acquire 重查对齐已发布序列，仅与调用者快照相同时睡眠，最后恢复原值。醒后 重查权威判定条件，有限截止时间另提供 IRQ 定时器。证明域限单 CPU／安全态， 排除 NMI／HardFault、DMA、SMP、另一世界发布者。Native 返回不支持。模型／ 编译不建立实际定时器、时钟连续性、功耗或唤醒延迟资格。"
+msgstr "`nx_arch_idle_if_unchanged()` 要求输入屏蔽状态全清，保存 PRIMASK，以 acquire 重查对齐已发布序列，仅与调用者快照相同时睡眠，最后恢复原值。醒后 重查权威判定条件，有限截止时间另提供 IRQ 定时器。证明域限单 CPU／安全态， 排除 NMI／HardFault、DMA、SMP、另一世界发布者。Native 返回不支持。模型／ 编译不建立实际定时器、时钟连续性、功耗或唤醒延迟资格。"
+
+msgid "Cache、MPU 与安全域"
+msgstr "Cache、MPU 与安全域"
+
+msgid "`cache.h` 区分清理、失效、清理并失效、指令同步。 范围须独占完整受审的 32 B 缓存行、适合 CPU 地址空间，并排除 CPU、DMA 和其他安全域的并发使用。不向外取整、不启用 Cache、不处理无关的脏缓存行。"
+msgstr "`cache.h` 区分清理、失效、清理并失效、指令同步。 范围须独占完整受审的 32 B 缓存行、适合 CPU 地址空间，并排除 CPU、DMA 和其他安全域的并发使用。不向外取整、不启用 Cache、不处理无关的脏缓存行。"
+
+msgid "`cache_control.h` 单独负责 M7 冷态启停。调用者提供零初始化控制对象，屏蔽可配置 IRQ 并排除 DMA 和其他内存使用者。可信复位或此前成功的自有清理／关闭 建立冷态前提，CCR 清位不能证明外来脏行不存在。启用拒绝已有 Cache； 关闭时清理全部受审缓存组／路，由不写脏自身栈的叶函数修改 CCR。部分失败 保留 Cache／CSSELR 恢复责任。实际 O0／Os／O2 指令审查检查地址、循环、屏障； 其他 CPU 范围维护不代表已审核全局冷态控制。"
+msgstr "`cache_control.h` 单独负责 M7 冷态启停。调用者提供零初始化控制对象，屏蔽可配置 IRQ 并排除 DMA 和其他内存使用者。可信复位或此前成功的自有清理／关闭 建立冷态前提，CCR 清位不能证明外来脏行不存在。启用拒绝已有 Cache； 关闭时清理全部受审缓存组／路，由不写脏自身栈的叶函数修改 CCR。部分失败 保留 Cache／CSSELR 恢复责任。实际 O0／Os／O2 指令审查检查地址、循环、屏障； 其他 CPU 范围维护不代表已审核全局冷态控制。"
+
+msgid "`mpu.h` 分别保留 v7 格式和 v8 基址／上界／MAIR 编码器。单区域编程要求 已经屏蔽可配置中断的特权线程，且 MPU 已关闭；写前查真实 TYPE 上限及字段， 保留 CTRL、输入 RNR。内存策略和后续启用属调用者。可选 M0+ MPU 用 CMSIS 核对的 v7 格式。成功表示校验写入与屏障，不含读回或已启用 策略验证。"
+msgstr "`mpu.h` 分别保留 v7 格式和 v8 基址／上界／MAIR 编码器。单区域编程要求 已经屏蔽可配置中断的特权线程，且 MPU 已关闭；写前查真实 TYPE 上限及字段， 保留 CTRL、输入 RNR。内存策略和后续启用属调用者。可选 M0+ MPU 用 CMSIS 核对的 v7 格式。成功表示校验写入与屏障，不含读回或已启用 策略验证。"
+
+msgid "`security.h` 查询受审镜像状态并编码显式 SAU 区域。仅 Secure 编译器／ 配置组合与受审 SAU 能力能写自有区域，要求 SAU 已关闭、特权线程模式 已置 PRIMASK。API 不改 CTRL／ALLNS、其他区域、网关或另一世界别名。 NonSecure／单状态不做 SAU MMIO 并返回不支持；IDAU、重叠、内存 权限和网关策略归外部集成。"
+msgstr "`security.h` 查询受审镜像状态并编码显式 SAU 区域。仅 Secure 编译器／ 配置组合与受审 SAU 能力能写自有区域，要求 SAU 已关闭、特权线程模式 已置 PRIMASK。API 不改 CTRL／ALLNS、其他区域、网关或另一世界别名。 NonSecure／单状态不做 SAU MMIO 并返回不支持；IDAU、重叠、内存 权限和网关策略归外部集成。"
+
+msgid "`nonsecure.h` 用真实 CMSE 瞬时观察完整跨度的 NS 非特权读取／读写 权限；IDAU 已建立归属时不需要可编程 SAU。Native、单状态、 NonSecure 不跨域并返回不支持。成功不固定、复制、认证、排除 MMIO 或 冻结映射／DMA／总线防火墙；SoC／网关责任者另建立这些前提。"
+msgstr "`nonsecure.h` 用真实 CMSE 瞬时观察完整跨度的 NS 非特权读取／读写 权限；IDAU 已建立归属时不需要可编程 SAU。Native、单状态、 NonSecure 不跨域并返回不支持。成功不固定、复制、认证、排除 MMIO 或 冻结映射／DMA／总线防火墙；SoC／网关责任者另建立这些前提。"
+
+msgid "Native、官方事实与验证"
+msgstr "Native、官方事实与验证"
+
+msgid "`features.h` 报告不可变受审 Cache／MPU／DWT／安全／SAU 能力，不是已启用 状态或硬件资格。Native 提供硬件不存在结果，纯编码器仍可用。CPU 机制 不提供 SoC 启动、向量表、时钟树、内存／DMA 路线、Board 接线或 RTOS FP／MVE 上下文端口，各平台分别提供和验证。"
+msgstr "`features.h` 报告不可变受审 Cache／MPU／DWT／安全／SAU 能力，不是已启用 状态或硬件资格。Native 提供硬件不存在结果，纯编码器仍可用。CPU 机制 不提供 SoC 启动、向量表、时钟树、内存／DMA 路线、Board 接线或 RTOS FP／MVE 上下文端口，各平台分别提供和验证。"
+
+msgid "Native 用递归排他和 C11 内存屏障，不模拟 NVIC、DMA、物理时间或 信号处理安全中断。Debug／Release 对非法恢复嵌套均中止。九核 GoogleTest／ GoogleMock 编译真实 Cortex-M 算法，仅替换窄寄存器／指令边界；Cache／MPU／ Security 模型也只替换外部 CPU／MMIO 操作，覆盖变更前拒绝。Native 测试执行真实 排他、令牌嵌套和上下文查询。"
+msgstr "Native 用递归排他和 C11 内存屏障，不模拟 NVIC、DMA、物理时间或 信号处理安全中断。Debug／Release 对非法恢复嵌套均中止。九核 GoogleTest／ GoogleMock 编译真实 Cortex-M 算法，仅替换窄寄存器／指令边界；Cache／MPU／ Security 模型也只替换外部 CPU／MMIO 操作，覆盖变更前拒绝。Native 测试执行真实 排他、令牌嵌套和上下文查询。"
+
+msgid "CMSIS-Core v6.4.0 的 `core_cm0plus.h`、`core_cm7.h`、`core_cm23.h`、 `core_cm33.h`、`core_cm55.h`、`core_cm85.h`、`m-profile/armv7m_mpu.h`、 `m-profile/armv8m_mpu.h` 和 `m-profile/armv7m_cachel1.h` 是受审布局参考。 私有 `registers.h` 集中已用当前域地址； `tests/contracts/arch_cmsis_layout_probe.c` 独立核对九核 MPU／SAU／Cache 字段。 编译门禁核对 CMSIS-Core 为锁定的精确版本、工作树干净，并检查真实 include 来源。生产目标保持 Nexus 接口依赖边界；共享官方 Core 不改变上下文、所有权、屏蔽恢复或可选机制合同， 也不建立新处理器／配置组合／物理支持。"
+msgstr "CMSIS-Core v6.4.0 的 `core_cm0plus.h`、`core_cm7.h`、`core_cm23.h`、 `core_cm33.h`、`core_cm55.h`、`core_cm85.h`、`m-profile/armv7m_mpu.h`、 `m-profile/armv8m_mpu.h` 和 `m-profile/armv7m_cachel1.h` 是受审布局参考。 私有 `registers.h` 集中已用当前域地址； `tests/contracts/arch_cmsis_layout_probe.c` 独立核对九核 MPU／SAU／Cache 字段。 编译门禁核对 CMSIS-Core 为锁定的精确版本、工作树干净，并检查真实 include 来源。生产目标保持 Nexus 接口依赖边界；共享官方 Core 不改变上下文、所有权、屏蔽恢复或可选机制合同， 也不建立新处理器／配置组合／物理支持。"
+
+msgid "`scripts/ci/arch_compile.py` 用真实 GNU ARM O2 编译声明的 CPU／FPU／MVE／安全／ DSP ABI。生产原子探针保留九个操作，按函数审查屏蔽状态、恢复屏障、 发布、独占 RMW，并以重定位关联 M0／M0+ IRQ 端口。静态指令数 不约束重试，不建立时序、唤醒延迟或 WCET。ARM Clang、SoC 启动、 Board 接线和实际 IRQ 延迟、权限迁移、DMA／Cache 一致性、 CPU 时序各有独立证据范围，物理行为仍须 HIL。"
+msgstr "`scripts/ci/arch_compile.py` 用真实 GNU ARM O2 编译声明的 CPU／FPU／MVE／安全／ DSP ABI。生产原子探针保留九个操作，按函数审查屏蔽状态、恢复屏障、 发布、独占 RMW，并以重定位关联 M0／M0+ IRQ 端口。静态指令数 不约束重试，不建立时序、唤醒延迟或 WCET。ARM Clang、SoC 启动、 Board 接线和实际 IRQ 延迟、权限迁移、DMA／Cache 一致性、 CPU 时序各有独立证据范围，物理行为仍须 HIL。"
+
+msgid "类型化 I/O"
 msgstr "类型化 I/O"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:2
-msgid "Typed I/O contracts and shared mechanisms"
-msgstr "类型化 I/O 合同与共享机制"
+msgid "I/O：类型化接口与共享执行机制"
+msgstr "I/O：类型化接口与共享执行机制"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:4
-msgid ""
-"Public C11 interfaces cover GPIO, UART, SPI, I2C, physical Flash, watchdog, "
-"interrupt/timer/acquisition mechanisms, CAN, USB, Ethernet and selected "
-"RTC/LPTIM contracts. The [derived capability "
-"matrix](/delivery/capabilities.md) identifies actual provider modes and "
-"reviewed routes. An interface header alone does not provide every operation "
-"on every chip or authorize PCB wiring."
-msgstr ""
-"公共 C11 接口覆盖 GPIO、UART、SPI、I2C、物理 Flash、watchdog、中断／定时／采集机制、CAN、USB、Ethernet "
-"和选定的 RTC／LPTIM 合同。[派生能力矩阵](/delivery/capabilities.md)标明实际 provider "
-"模式和已审路由。仅有接口头文件不代表每款芯片提供全部操作，也不授权 PCB 接线。"
+msgid "I/O 为应用和组件提供公共 C11 类型，为 SoC 的具体实现规定操作、借用与退出 合同。公共类型不含厂商 Handle 或寄存器布局。实际模式和受审路线以 [能力矩阵](/delivery/capabilities.md)为准；公共头存在不代表每颗芯片实现 全部操作，也不授权未知 PCB 接线。"
+msgstr "I/O 为应用和组件提供公共 C11 类型，为 SoC 的具体实现规定操作、借用与退出 合同。公共类型不含厂商 Handle 或寄存器布局。实际模式和受审路线以 [能力矩阵](/delivery/capabilities.md)为准；公共头存在不代表每颗芯片实现 全部操作，也不授权未知 PCB 接线。"
 
-msgid "Physical Platform builds compile the selected controller domains and authored component dependencies from the CMake source contracts. Timestamp and diagnostic helpers remain available even for an empty assembly. Native models and CPU-only Runtime retain the complete public contract for caller-defined providers. Public headers remain available in every profile; unselected physical device operations do not become a second implicit provider. Compilation selection and final ELF garbage collection are measured separately."
-msgstr "物理 Platform 构建依据 CMake 源码合同，编译所选控制器域与装配中指定的组件依赖。即使是空装配，也保留时间戳与诊断辅助机制。Native 模型与 CPU-only Runtime 为调用者自行提供的 provider 保留完整公共合同。所有配置均提供公共头文件；未选入的物理设备操作不会成为第二套隐式 provider。编译选择与最终 ELF 未用代码回收分别测量。"
+msgid "![FIG-04：factory 与静态实例](../docs/assets/diagrams/factory-instances.svg)"
+msgstr "![FIG-04：factory 与静态实例](../docs/assets/diagrams/factory-instances.svg)"
 
-msgid "Public component targets declare their own I/O domain dependencies. For example, `Nexus::TMP117I2C` links `Nexus::IOI2C`, so an external owner may supply an endpoint without inventing a physical controller in the assembly. Domain archives are excluded until selected or linked, and shared mechanisms compile once. Optional targets can still appear in `compile_commands.json`; selected Ninja command closures and fresh builds establish which sources actually compile."
-msgstr "公共组件目标声明各自的 I/O 域依赖。例如，`Nexus::TMP117I2C` 链接 `Nexus::IOI2C`，因此外部所有者可以直接提供端点，无需在装配中虚构物理控制器。域归档库在被选择或链接前不参与构建，共享机制只编译一次。可选目标仍可能出现在 `compile_commands.json` 中；所选 Ninja 命令依赖闭包与全新构建证明哪些源码实际参与编译。"
+msgid "FIG-04：factory 与静态实例"
+msgstr "FIG-04：factory 与静态实例"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
-msgid "Source group"
-msgstr "源码组"
+msgid "该图是精确参考装配，区分已有接口对象、共享方法表与独立上下文；查找不启动 硬件。当前通用装配与执行另见 [FIG-16](../docs/assets/diagrams/io-evolution.svg)，范围与图例见 [图册](/assets/diagrams/README.md)。"
+msgstr "该图是精确参考装配，区分已有接口对象、共享方法表与独立上下文；查找不启动 硬件。当前通用装配与执行另见 [FIG-16](../docs/assets/diagrams/io-evolution.svg)，范围与图例见 [图册](/assets/diagrams/README.md)。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
-msgid "Responsibility"
-msgstr "责任"
+msgid "目录和构建边界"
+msgstr "目录和构建边界"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "目录"
+msgstr "目录"
+
 msgid "`include/nexus/io/`"
 msgstr "`include/nexus/io/`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
-msgid "Stable public Nexus types and operation/ownership contracts"
-msgstr "稳定公共 Nexus 类型与操作／所有权合同"
+msgid "公共类型、操作与所有权合同"
+msgstr "公共类型、操作与所有权合同"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
 msgid "`src/api/`"
 msgstr "`src/api/`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
-msgid "Checked dispatch through the selected immutable face"
-msgstr "通过所选不可变 face 校验并分派"
+msgid "检查并分派到选定只读接口对象"
+msgstr "检查并分派到选定只读接口对象"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
 msgid "`src/mechanisms/`"
 msgstr "`src/mechanisms/`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
-msgid "Shared stream, DMA drain, wake, transaction and observation rules"
-msgstr "共享 stream、DMA 排空、唤醒、事务与观察规则"
+msgid "流、DMA 排空、唤醒、事务和观察"
+msgstr "流、DMA 排空、唤醒、事务和观察"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
 msgid "`private/`"
 msgstr "`private/`"
 
-msgid "Hardware-independent validation, sequence identity and calendar helpers"
-msgstr "不依赖硬件的校验、序列身份与日历辅助机制"
+msgid "无硬件依赖的验证、序列身份和日历"
+msgstr "无硬件依赖的验证、序列身份和日历"
 
 msgid "`../drivers/`"
 msgstr "`../drivers/`"
 
-msgid "Reviewed hardware IP engines and templates selected by SoC targets"
-msgstr "由 SoC 目标选择的已审查硬件 IP 引擎与模板"
+msgid "SoC 私有选编的受审 IP 引擎／模板"
+msgstr "SoC 私有选编的受审 IP 引擎／模板"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
 msgid "`../soc/native/drivers/`"
 msgstr "`../soc/native/drivers/`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
-msgid "Independent host models implementing the same public faces"
-msgstr "实现相同公共 face 的独立主机模型"
+msgid "实现同一接口对象的独立宿主模型"
+msgstr "实现同一接口对象的独立宿主模型"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
 msgid "`../soc/<vendor>/<family>/drivers/`"
 msgstr "`../soc/<vendor>/<family>/drivers/`"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
-msgid "Exact MCU provider and mode implementations"
-msgstr "精确 MCU provider 与模式实现"
+msgid "精确 MCU 具体实现和模式"
+msgstr "精确 MCU 具体实现和模式"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:20
-msgid ""
-"Every selected instance has a readonly face containing shared readonly "
-"methods and an independent private context. On a 32-bit target the face "
-"occupies eight bytes of readonly storage; method tables, mutable state, "
-"selected buffers and linked code have separate costs. Generated instances "
-"use exact static storage; explicit constructors use storage provided by "
-"their owner. Public consumers receive no vendor register layout or SDK state"
-" type."
-msgstr ""
-"每个所选实例拥有一个只读 face，其中包含共享只读方法和独立私有 context。在 32 位目标上，face "
-"占用八字节只读存储；方法表、可变状态、所选缓冲和链接代码的成本分别计算。生成实例使用精确静态存储；显式构造器使用其所有者供给的存储。公共消费者不会获得厂商寄存器布局或"
-" SDK 状态类型。"
+msgid "物理 Platform 按 CMake 源码合同编译选定控制器域与组件依赖；空装配仍有时间戳 和诊断辅助。Native 与仅复用 CPU 的 Runtime 保留公共合同以接纳调用者自定义实现。所有配置组合可见公共头，未选操作 不成为第二个隐式具体实现；编译选择与最终 ELF GC 分别测量。"
+msgstr "物理 Platform 按 CMake 源码合同编译选定控制器域与组件依赖；空装配仍有时间戳 和诊断辅助。Native 与仅复用 CPU 的 Runtime 保留公共合同以接纳调用者自定义实现。所有配置组合可见公共头，未选操作 不成为第二个隐式具体实现；编译选择与最终 ELF GC 分别测量。"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:27
-msgid ""
-"Public operations validate the face and dispatch `ops(context, ...)`. "
-"Providers can use direct private calls within their register hot paths. A "
-"missing optional method reports `NX_ERROR_UNSUPPORTED`. Different "
-"provider/mode tables coexist without replacing public symbols. IRQ entries "
-"are fixed to the selected concrete instances and do not look up a factory "
-"for each byte."
-msgstr ""
-"公共操作校验 face，再分派 `ops(context, ...)`。provider 可在寄存器热路径内使用私有直接调用。缺失的可选方法返回 "
-"`NX_ERROR_UNSUPPORTED`。不同 provider／模式的方法表可并存，无须替换公共符号。IRQ "
-"入口固定连接所选具体实例，不逐字节查询 factory。"
+msgid "组件目标自己声明 I/O 域依赖。如 `Nexus::TMP117I2C` 链接 `Nexus::IOI2C`，外部资源责任者可提供端点，无需在装配中虚构物理控制器。 域静态库在选择或链接前排除构建，共享机制只编译一次；可选目标 仍可能出现在 `compile_commands.json`，实际选中的 Ninja 命令闭包和一次新构建 才能证明编译了什么。"
+msgstr "组件目标自己声明 I/O 域依赖。如 `Nexus::TMP117I2C` 链接 `Nexus::IOI2C`，外部资源责任者可提供端点，无需在装配中虚构物理控制器。 域静态库在选择或链接前排除构建，共享机制只编译一次；可选目标 仍可能出现在 `compile_commands.json`，实际选中的 Ninja 命令闭包和一次新构建 才能证明编译了什么。"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:33
-msgid ""
-"Generated factory getters return existing identities. Lookup, Platform "
-"start, request admission, service, recovery and stop remain separate "
-"actions. Controller and endpoint identities stay distinct for SPI/I2C buses."
-" New products should use the generated strong-reference header; see the "
-"[factory contract](/explanation/factory.md) for headers and ID lifetime."
-msgstr ""
-"生成的 factory getter 返回已有身份。查找、Platform 启动、请求接纳、service、恢复和停止仍是独立动作。SPI／I2C "
-"总线的控制器与端点身份保持独立。新产品应使用生成的强类型引用头；头文件和 ID 生命周期参见 [factory "
-"合同](/explanation/factory.md)。"
+msgid "静态实例与多态调用"
+msgstr "静态实例与多态调用"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:39
-msgid ""
-"The direct path has one serialized executor in each operation's allowed "
-"context. Requests and transfer buffers remain caller-owned through acquire-"
-"observed SETTLED. Cancel, deadline and failed drain never revoke a borrow. A"
-" provider withdraws hardware, IRQ and deferred references before its final "
-"release publication; QUARANTINED storage and cleanup responsibility remain "
-"retained. The [ownership table](/explanation/ownership.md) distinguishes "
-"direct calls, fixed IRQ work, cross-task adapters, waiting and shutdown."
-msgstr ""
-"直接路径在每项操作允许的上下文中由单一串行执行者推进。请求与传输缓冲由调用者拥有，并须保持到 acquire 观察 "
-"SETTLED。取消、deadline 和排空失败绝不撤销借用。provider 在最终 release 发布前撤回硬件、IRQ "
-"和延迟引用；QUARANTINED 存储与清理责任继续保留。[所有权表](/explanation/ownership.md)区分直接调用、固定 IRQ"
-" 工作、跨任务 adapter、等待和停机。"
+msgid "每个选定实例具有只读接口对象，保存共享只读方法表和独立私有上下文。32 位 目标接口对象本身为 8 B，只读方法表、可变状态、选定缓冲区、已链接代码 另算。生成实例用精确静态存储，显式构造器用责任者提供的存储。"
+msgstr "每个选定实例具有只读接口对象，保存共享只读方法表和独立私有上下文。32 位 目标接口对象本身为 8 B，只读方法表、可变状态、选定缓冲区、已链接代码 另算。生成实例用精确静态存储，显式构造器用责任者提供的存储。"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:47
-msgid ""
-"`nexus/io/diagnostic.h` composes copied request/stream observations and "
-"explicitly known lifecycle, owner admission, service-time and observer-join "
-"facts. The result retains independent finding bits and unknown fact groups. "
-"An unchanged request does not prove a missed service; a service-gap finding "
-"requires explicit timestamps and a declared budget in the same monotonic "
-"domain. Neither this helper nor a readable reason key touches live hardware "
-"or changes ownership. SETTLED does not prove successful transfer or joined "
-"observers. An outstanding stream count includes producer, ready and consumer"
-" loans, and a busy ordinary cursor does not describe a private preposted "
-"cursor. Unknown facts remain unknown; an empty finding mask does not "
-"establish health."
-msgstr ""
-"`nexus/io/diagnostic.h` 组合复制的 request／stream 观察以及明确已知的生命周期、owner 准入、service "
-"时间和 observer join 事实。结果保留独立 finding 位与未知事实组。request 不变不能证明漏调 service；service"
-" 间隔诊断需要同一单调时钟域的显式时间戳和声明预算。该函数及可读原因 key 都不访问实际硬件或改变所有权。SETTLED 不能证明传输成功或 "
-"observer 已 join。未结清 stream 数量包含生产者、ready 和消费者借用；普通 cursor 忙不描述私有预投递 "
-"cursor。未知事实仍未知；空 finding 掩码不建立健康证明。"
+msgid "公共 API 验证接口对象后执行 `ops(context, ...)`，具体实现寄存器热路径可以私有 直接调用。缺失可选方法返回 `NX_ERROR_UNSUPPORTED`。不同具体实现／ 模式表共存，不替换公共符号；IRQ 固定绑定实例，不逐字节查 factory。"
+msgstr "公共 API 验证接口对象后执行 `ops(context, ...)`，具体实现寄存器热路径可以私有 直接调用。缺失可选方法返回 `NX_ERROR_UNSUPPORTED`。不同具体实现／ 模式表共存，不替换公共符号；IRQ 固定绑定实例，不逐字节查 factory。"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:58
-msgid ""
-"Stream reserve, publish, acquire, release, abort and stop access a constant "
-"amount of metadata independent of block count. Stop checks the outstanding "
-"count and does not scan or revoke borrowed blocks under an interrupt mask. "
-"Cold storage-overlap validation examines the complete selected block set; it"
-" has a different cost. These software complexity contracts do not establish "
-"physical IRQ latency."
-msgstr ""
-"stream 的 reserve、publish、acquire、release、abort 和 stop 访问的元数据数量固定，与块数无关。stop "
-"检查未归还计数，不在中断屏蔽期间扫描或撤销借出的块。冷态存储重叠校验检查完整所选块集合，具有不同成本。这些软件复杂度合同不建立物理 IRQ 延迟资格。"
+msgid "factory 查询函数返回已有身份。查找、Platform 启动、请求准入、 推进服务、恢复、停止分开。SPI／I2C 控制器与端点身份独立，新产品 用强类型引用头文件；见[factory 合同](/explanation/factory.md)。"
+msgstr "factory 查询函数返回已有身份。查找、Platform 启动、请求准入、 推进服务、恢复、停止分开。SPI／I2C 控制器与端点身份独立，新产品 用强类型引用头文件；见[factory 合同](/explanation/factory.md)。"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:64
-msgid ""
-"DMA memory completion, peripheral wire completion and request settlement are"
-" separate facts. Providers check exact DMA reachability, selected domains, "
-"Cache ownership and real source withdrawal. Finite and continuous modes have"
-" distinct loan/rearm/backpressure contracts. Default paths add no mandatory "
-"OS locks, hidden driver tasks or universal buffer pools. The [DMA and stream"
-" contracts](/design/io-evolution.md) own exact scope."
-msgstr ""
-"DMA 内存完成、外设线上完成和请求结清是不同事实。provider 检查精确 DMA 可达性、所选域、Cache "
-"所有权和真实源撤回。有限模式与连续模式具有不同借用／重装／背压合同。默认路径不增加强制 OS 锁、隐藏驱动任务或通用缓冲池。精确范围由 [DMA 与 "
-"stream 合同](/design/io-evolution.md)规定。"
+msgid "RS485 适配器用同一强类型 UART 引用取得 `nx_factory_uart_ref` 和 `nx_factory_uart_tx_validator_ref`。仅受审精确模式导出回调，其他模式／ 非法 ID 返回 NULL。查询不分配存储、不操作硬件、不准入传输；回调不是实例认证，调用者 配对精确上下文并独占 TX，提供稳定适配器／配置、GPIO 方向接口对象、 极性、方向建立／保持时长。不新增角色框架、每 UART 状态或方法表字段。"
+msgstr "RS485 适配器用同一强类型 UART 引用取得 `nx_factory_uart_ref` 和 `nx_factory_uart_tx_validator_ref`。仅受审精确模式导出回调，其他模式／ 非法 ID 返回 NULL。查询不分配存储、不操作硬件、不准入传输；回调不是实例认证，调用者 配对精确上下文并独占 TX，提供稳定适配器／配置、GPIO 方向接口对象、 极性、方向建立／保持时长。不新增角色框架、每 UART 状态或方法表字段。"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:71
-msgid ""
-"`nx_dma_storage_validate` checks a caller's explicit whole reservation "
-"separately from the transfer payload. For example, an aligned 64-byte "
-"reservation may carry a 17-byte payload while exclusively owning two 32-byte"
-" cache lines. Address and capacity must already fit the declared alignment, "
-"complete DMA-visible domain and optional whole-line geometry; no rounding, "
-"allocation or hidden bounce buffer occurs. The caller supplies reviewed "
-"geometry and exclusive ownership. The provider still validates the selected "
-"mode and actual cache/DMA capabilities and performs necessary maintenance. "
-"Cancel or deadline expiry never permits storage reuse before drain and "
-"acquire-observed settlement."
-msgstr ""
-"`nx_dma_storage_validate` 将调用者显式的完整 reservation 与传输 payload 分开检查。例如，对齐的64 字节"
-" reservation 可以承载17 字节 payload，并独占两条32 字节 cache line。地址和容量必须已经满足声明的对齐、完整 DMA"
-" 可达域及可选的完整行几何；不进行取整、分配或隐藏 bounce buffer。调用者提供复核过的几何与独占所有权。provider "
-"仍验证选定模式及真实 cache／DMA 能力，并执行所需维护。取消或 deadline 到期不允许在排空和 acquire 观察结清之前重用存储。"
+msgid "控制器、并行端点和内存窗口"
+msgstr "控制器、并行端点和内存窗口"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:81
-msgid ""
-"The optional [USB activation contract](/design/usb-device.md) keeps a "
-"separate immutable activation face and the existing provider context. Its "
-"selected nonzero endpoint setter is a bounded controller action; external "
-"Chapter 9 policy owns configuration, rollback and ordinary packet admission."
-" It adds no default worker or configuration transaction. The public "
-"declaration retains its context, partial-effect and full-stop obligations."
-msgstr ""
-"可选 [USB 激活合同](/design/usb-device.md)保留独立不可变激活 face 和已有 provider "
-"context。其所选非零端点 setter 是有界控制器动作；外部 Chapter 9 政策拥有配置、回退和普通数据包接纳责任。它不增加默认 "
-"worker 或配置事务。公共声明继续规定上下文、部分效果和完整停止义务。"
+msgid "外部总线路径分开共享 `nx_external_bus_port_t`、显示存储体 `nx_parallel16_endpoint_t`、SRAM 存储体 `nx_memory_window_port_t`。Platform 在 C 中准备控制器并获取显示存储体；factory 只返回稳定接口对象。并行字 调用同步完成，每次返回前结束所有 CPU 存储跨度的访问；显示组件消费公共端点／只读配置， SoC 不导入组件协议或公开厂商类型。"
+msgstr "外部总线路径分开共享 `nx_external_bus_port_t`、显示存储体 `nx_parallel16_endpoint_t`、SRAM 存储体 `nx_memory_window_port_t`。Platform 在 C 中准备控制器并获取显示存储体；factory 只返回稳定接口对象。并行字 调用同步完成，每次返回前结束所有 CPU 存储跨度的访问；显示组件消费公共端点／只读配置， SoC 不导入组件协议或公开厂商类型。"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:88
-msgid ""
-"Native, production-register models, selected ARM links and physical HIL "
-"establish different evidence. Independent instance state and source-"
-"directory organization do not establish electrical behavior, measured timing"
-" or losslessness under arbitrary load. MCU physical HIL remains "
-"`not_executed`."
-msgstr ""
-"Native、生产寄存器模型、所选 ARM 链接和实物 HIL "
-"分别建立不同证据。独立实例状态和源码目录组织不能证明电气行为、实测时序或任意负载下无丢失。MCU 实物 HIL 仍为 `not_executed`。"
+msgid "内存窗口借用返回地址、字节数和代次，后续 CPU 直接读写该地址， 无逐访问分派。释放原稳定借用前须等待退出所有派生指针使用者。 `cpu-window` 与 `startup-memory` 是独立显式模式；后者整个镜像生命周期 持有 SRAM，不发放与已放置的全局对象重叠的整存储体借用。C 责任记录在 Platform 启动前已持有承载内存，上下文／预检／身份／启动失败都不能 抹除。全局停止在撤共享引脚／系统时钟前报告保留责任。几何 只描述选定事实，不证明实物焊接配置／时序；两类接口对象都不授予 DMA、 堆、外部栈或可执行内存权限。"
+msgstr "内存窗口借用返回地址、字节数和代次，后续 CPU 直接读写该地址， 无逐访问分派。释放原稳定借用前须等待退出所有派生指针使用者。 `cpu-window` 与 `startup-memory` 是独立显式模式；后者整个镜像生命周期 持有 SRAM，不发放与已放置的全局对象重叠的整存储体借用。C 责任记录在 Platform 启动前已持有承载内存，上下文／预检／身份／启动失败都不能 抹除。全局停止在撤共享引脚／系统时钟前报告保留责任。几何 只描述选定事实，不证明实物焊接配置／时序；两类接口对象都不授予 DMA、 堆、外部栈或可执行内存权限。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:65
-msgid "OS adapters"
-msgstr "OS 适配器"
+msgid "借用、进度与排空"
+msgstr "借用、进度与排空"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:2
-msgid "Optional OS adapters"
-msgstr "可选 OS 适配器"
+msgid "直接路径在允许上下文中由一个串行执行者推进。请求和有效数据 始终调用者持有，但借用持续到 acquire 观察 SETTLED。取消／截止时间／失败 排空不撤销借用；具体实现先撤硬件／IRQ／延后引用，最后以 release 发布。QUARANTINED 保留存储和清理责任。 [所有权表](/explanation/ownership.md)区分直接、固定 IRQ、跨任务 适配器、等待与停机。"
+msgstr "直接路径在允许上下文中由一个串行执行者推进。请求和有效数据 始终调用者持有，但借用持续到 acquire 观察 SETTLED。取消／截止时间／失败 排空不撤销借用；具体实现先撤硬件／IRQ／延后引用，最后以 release 发布。QUARANTINED 保留存储和清理责任。 [所有权表](/explanation/ownership.md)区分直接、固定 IRQ、跨任务 适配器、等待与停机。"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:4
-msgid ""
-"Thin wait/wake and per-object storage contracts. Baremetal has no scheduler;"
-" Native uses POSIX threads; FreeRTOS uses explicit static TCB, stack and "
-"queue storage selected by the caller. No universal maximum pool, hidden "
-"worker, default timer daemon or device dependency on OS."
-msgstr ""
-"轻量 wait/wake 与每对象存储合同。裸机没有调度器；Native 使用 POSIX 线程；FreeRTOS 使用调用者选择的显式静态 "
-"TCB、栈及队列存储。不使用通用最大对象池、隐藏执行任务、默认定时器 daemon，也不让设备依赖 OS。"
+msgid "DMA 内存完成、线上完成、请求结清是独立事实。 具体实现检查精确可达性、选定域、Cache 所有权和真实 撤销。有限与连续传输各有明确的借用、重新武装接收和背压合同。默认没有 强制 OS 锁、隐藏驱动任务、通用缓冲区池；精确范围见 [DMA／stream 合同](/design/io-evolution.md)。"
+msgstr "DMA 内存完成、线上完成、请求结清是独立事实。 具体实现检查精确可达性、选定域、Cache 所有权和真实 撤销。有限与连续传输各有明确的借用、重新武装接收和背压合同。默认没有 强制 OS 锁、隐藏驱动任务、通用缓冲区池；精确范围见 [DMA／stream 合同](/design/io-evolution.md)。"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:9
-msgid ""
-"The common public abstraction is the wait/wake port. Task, queue, join and "
-"storage APIs are deliberately backend-specific and expose the selected "
-"kernel's real control-block requirements. A product switching kernels adapts"
-" its task lifecycle explicitly; the platform supplies no universal "
-"Task/Queue ABI or maximum storage pool."
-msgstr ""
-"共同公共抽象是等待／唤醒端口。任务、队列、join 和存储 API "
-"有意采用后端专用形式，暴露所选内核的真实控制块要求。产品切换内核时显式适配任务生命周期；平台不提供通用 Task／Queue ABI 或最大存储池。"
+msgid "流的 reserve／publish／acquire／release／abort／stop 操作只访问与块数无关的 固定数量的元数据。停止时检查未归还计数，不在屏蔽 IRQ 的区间扫描或撤销已借用块。冷态 重叠验证检查完整选定块组，是不同成本；复杂度不证明 IRQ 延迟。"
+msgstr "流的 reserve／publish／acquire／release／abort／stop 操作只访问与块数无关的 固定数量的元数据。停止时检查未归还计数，不在屏蔽 IRQ 的区间扫描或撤销已借用块。冷态 重叠验证检查完整选定块组，是不同成本；复杂度不证明 IRQ 延迟。"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:15
-msgid ""
-"Notifications are hints: arm/recheck the authoritative request predicate. "
-"Kernel ISR operations validate the selected syscall ceiling. Native task "
-"return ends the pthread; FreeRTOS wrappers publish completion and suspend "
-"until external deletion; ThreadX wrappers enter the kernel completion path. "
-"The one external lifecycle owner must successfully join before reclaiming "
-"wrapper, TCB or stack storage. Completion hints alone do not prove kernel "
-"detachment. Applications own scheduler start, workers, queue depth, fairness"
-" and shutdown progress."
-msgstr ""
-"通知是提示：arm 后重新检查权威请求谓词。内核 ISR 操作验证选定系统调用阈值。Native 任务返回后 pthread 结束；FreeRTOS "
-"包装函数发布完成并挂起，等待外部删除；ThreadX 包装函数进入内核完成路径。唯一外部生命周期所有者必须成功 join，才能回收包装状态、TCB "
-"或栈存储。只有完成提示不能证明内核引用已撤离。应用拥有调度器启动、执行任务、队列深度、公平性及停机推进。"
+msgid "`nx_dma_storage_validate` 分开验证整个预留区和有效数据。例如对齐 64 B 预留区可承载 17 B 有效数据并独占两条 32 B 缓存行，具体实现仍可施加 更严格模式约束。地址／容量须满足对齐、完整 DMA 可见域、 可选整行几何；不取整、不分配、不隐藏中转缓冲区。 调用者给出受审几何／独占所有权，具体实现另验证模式／能力并 执行必要 Cache 维护。取消／截止时间不允许在排空并以 acquire 观察 SETTLED 前复用。"
+msgstr "`nx_dma_storage_validate` 分开验证整个预留区和有效数据。例如对齐 64 B 预留区可承载 17 B 有效数据并独占两条 32 B 缓存行，具体实现仍可施加 更严格模式约束。地址／容量须满足对齐、完整 DMA 可见域、 可选整行几何；不取整、不分配、不隐藏中转缓冲区。 调用者给出受审几何／独占所有权，具体实现另验证模式／能力并 执行必要 Cache 维护。取消／截止时间不允许在排空并以 acquire 观察 SETTLED 前复用。"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:23
-msgid ""
-"The real FreeRTOS POSIX scheduler fixture validates host task/queue "
-"lifecycle. The default privileged runtime selects exact pinned kernel "
-"sources from validated CPU facts: CM0 for M0/M0+, CM3 integer context for M3"
-" and M4 without FP, CM4F for M4 with FP, CM7/r0p1 for M7 with FP, and each "
-"CM23/33/55/85 NTZ port with its separate assembly file. Integer-only M7 uses"
-" a reviewed build-derived CM3 port with PRIMASK-preserving errata 837070 "
-"guards; pinned vendor files remain unchanged. Host execution does not "
-"qualify MCU exception priority, FP/MVE context switches, stack high-water or"
-" timing."
-msgstr ""
-"真实 FreeRTOS POSIX 调度器夹具验证主机任务／队列生命周期。默认特权 runtime 根据已验证 CPU "
-"事实选入准确锁定内核源：M0/M0+ 使用 CM0；M3 及无 FP 的 M4 使用 CM3 整数上下文；有 FP 的 M4 使用 CM4F；有 FP "
-"的 M7 使用 CM7/r0p1；CM23/33/55/85 则使用各自 NTZ 端口及独立汇编文件。纯整数 M7 使用已审查、构建派生的 CM3 "
-"端口，加入保持 PRIMASK 的勘误 837070 防护；锁定厂商文件保持不变。主机执行不建立 MCU 异常优先级、FP/MVE "
-"上下文切换、栈高水位或时序资格。"
+msgid "观察、USB 激活与证据"
+msgstr "观察、USB 激活与证据"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:32
-msgid ""
-"Running APIs require privileged, unmasked Thread mode. Before scheduler "
-"start, the pinned Baseline ports may retain PRIMASK=1 and Mainline ports "
-"their exact syscall BASEPRI; only that port's canonical mask is permitted in"
-" that phase. Matching a value cannot identify its owner. Fault masks and "
-"other masks reject before object mutation; a read-only scheduler query "
-"distinguishes bootstrap from running/suspended tasks. Baseline IRQ wakes use"
-" the PRIMASK kernel contract; Mainline IRQ wakes validate implemented "
-"bounds, priority width and syscall ceiling."
-msgstr ""
-"运行期 API 要求特权且未屏蔽的 Thread 模式。调度器启动前，锁定 Baseline 端口可能保留 PRIMASK=1，Mainline "
-"端口保留准确 syscall "
-"BASEPRI；该阶段只允许所选端口的规范屏蔽状态。数值匹配不能证明所有者身份。故障屏蔽或其他屏蔽状态在对象变更前拒绝；只读调度器查询区分 "
-"bootstrap 与运行／挂起任务。Baseline IRQ 唤醒使用 PRIMASK 内核合同；Mainline IRQ "
-"唤醒检查实现边界、优先级位宽及系统调用阈值。"
+msgid "`nexus/io/diagnostic.h` 组合复制的请求／流观察与明确已知的生命周期、 责任者准入、推进服务时间、观察者等待退出事实，独立保留发现项位／ 未知分组。请求不变不证明未调用 service；服务间隔判定必须有同一单调域中的时间戳与预算。辅助函数和原因键不读取实时硬件状态，不改变 所有权、不推进或恢复设备。SETTLED 不证明传输成功或观察者已等待退出。 流的未归还计数包括生产者、待消费和消费者持有的借用，普通游标的 忙不描述私有预提交游标；未知保留，零发现项不证明健康。"
+msgstr "`nexus/io/diagnostic.h` 组合复制的请求／流观察与明确已知的生命周期、 责任者准入、推进服务时间、观察者等待退出事实，独立保留发现项位／ 未知分组。请求不变不证明未调用 service；服务间隔判定必须有同一单调域中的时间戳与预算。辅助函数和原因键不读取实时硬件状态，不改变 所有权、不推进或恢复设备。SETTLED 不证明传输成功或观察者已等待退出。 流的未归还计数包括生产者、待消费和消费者持有的借用，普通游标的 忙不描述私有预提交游标；未知保留，零发现项不证明健康。"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:40
-msgid ""
-"Armv8-M supports explicit NTZ, Secure-only, and Nonsecure standalone build "
-"modes. The selected NTZ kernels do not allocate Secure task contexts or "
-"expose cross-world Secure function calls. Secure startup owns SAU/IDAU and "
-"Nonsecure coprocessor access; Nonsecure local masking cannot protect against"
-" Secure publishers. The default task APIs remain privileged; explicit MPU "
-"profiles provide a separate static restricted-task lifecycle and two "
-"pointer-free user delay/tick SVC services. Caller-owned protected metadata "
-"and reviewed user linker regions are required; no generic user-object pool "
-"or privileged I/O API is exposed. M0/M0+ and M7 MPU, and MPU combined with "
-"split security, are rejected. See the OS contracts and current matrix before"
-" selecting an optional isolation profile."
-msgstr ""
-"Armv8-M 支持显式 NTZ、Secure-only 及独立 Nonsecure 构建模式。选定 NTZ 内核不分配 Secure "
-"任务上下文，也不暴露跨世界 Secure 函数调用。Secure startup 拥有 SAU/IDAU 与 Nonsecure "
-"协处理器访问；Nonsecure 本地屏蔽不能防护 Secure 发布者。默认任务 API 保持特权；显式 MPU "
-"配置提供独立静态受限任务生命周期和两个无指针用户 delay/tick SVC "
-"服务。必须提供调用者自有受保护元数据及已审查用户链接区域；不暴露通用用户对象池或特权 I/O API。M0/M0+、M7 MPU 以及 MPU "
-"与分裂安全状态组合均被拒绝。选择可选隔离配置前必须查看 OS 合同及当前矩阵。"
+msgid "可选 [USB activation](/design/usb-device.md)保留独立不可变接口对象和 既有上下文。非零端点设置方法是有界控制器动作；外部 Chapter 9 策略拥有配置、回滚、普通数据包准入。不增加 默认工作线程或配置事务，公共声明保留上下文、部分效果 和完整停止责任。"
+msgstr "可选 [USB activation](/design/usb-device.md)保留独立不可变接口对象和 既有上下文。非零端点设置方法是有界控制器动作；外部 Chapter 9 策略拥有配置、回滚、普通数据包准入。不增加 默认工作线程或配置事务，公共声明保留上下文、部分效果 和完整停止责任。"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:51
-msgid ""
-"Explicit split mode instead selects the real TrustZone-aware Nonsecure ports"
-" and a separately linked Secure baremetal Runtime with "
-"`Nexus::SecureContext`. Both images use matching CPU/ABI facts and the "
-"actual CMSE import/SG veneers. Every authorized task, including Idle, has "
-"caller-owned NS TCB/stack and prepared Secure metadata/stack selected by an "
-"immutable trusted mapping. No Secure heap or maximum context pool is "
-"supplied. The NS privileged kernel is trusted; SAU/IDAU, startup, vectors, "
-"NSC memory attribution and interrupt routing remain consumer/SoC "
-"responsibilities. See the [Secure companion "
-"contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/os/freertos/secure/README.md) before integration. Two-image linking "
-"and host lease tests do not qualify physical attribution, context retention,"
-" stack peaks or adversarial NS-kernel isolation."
-msgstr ""
-"显式 split 模式选择真实 TrustZone 感知 Nonsecure 端口，及独立链接、带 `Nexus::SecureContext` 的 "
-"Secure 裸机 Runtime。两个镜像使用匹配 CPU/ABI 事实及真实 CMSE import/SG veneers。包括 Idle "
-"在内的每个授权任务，都拥有调用者提供的 NS TCB／栈，以及由不可变可信映射选择的已准备 Secure 元数据／栈。不提供 Secure "
-"堆或最大上下文池。NS 特权内核被信任；SAU/IDAU、startup、向量表、NSC 内存属性和中断路由仍由消费者／SoC 负责。集成前阅读 "
-"[Secure 配套合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/os/freertos/secure/README.md)。双镜像链接与主机租约测试不建立物理属性、上下文保持、栈峰值或对抗恶意 NS "
-"内核的隔离资格。"
+msgid "Native、生产寄存器模型、选定 ARM 链接、物理 HIL 证明不同 性质。独立实例或目录组织不建立电气、实测时序或任意负载下无损；MCU 物理 HIL 保持 `not_executed`。"
+msgstr "Native、生产寄存器模型、选定 ARM 链接、物理 HIL 证明不同 性质。独立实例或目录组织不建立电气、实测时序或任意负载下无损；MCU 物理 HIL 保持 `not_executed`。"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:63
-msgid ""
-"The first scheduler start requires cold privileged Thread/MSP state with "
-"FPCA clear; applications must not leave active FP context before bootstrap. "
-"The MPU start guard consumes a protected single-use lease against the real "
-"origin/frame. For v8-M, authored `security = \"single\"` means Arch state 0,"
-" not Nonsecure. It uses the traditional FD/F9 port return tuple without CMSE"
-" permission; explicit Secure uses the same tuple with its separate Secure "
-"facts, while explicit Nonsecure uses BC/B8. The generated "
-"`NEXUS_CPU_SECURE_ONLY` macro selects that port encoding and does not grant "
-"Secure access to a single-world image."
-msgstr ""
-"第一次调度器启动要求冷态特权 Thread/MSP 且 FPCA 清零；应用不得在 bootstrap 前留下活动 FP 上下文。MPU "
-"启动防护依据真实来源／异常帧消费受保护的一次性租约。v8-M 中，配置声明的 `security = \"single\"` 表示 Arch 状态 "
-"0，而不是 Nonsecure。它使用传统 FD/F9 端口返回元组，不具备 CMSE 权限；显式 Secure 使用相同元组，但具有独立 Secure"
-" 事实；显式 Nonsecure 使用 BC/B8。生成的 `NEXUS_CPU_SECURE_ONLY` 宏选择该端口编码，不向单世界镜像授予 "
-"Secure 访问权限。"
+msgid "OS 适配"
+msgstr "OS 适配"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:72
-msgid ""
-"M55/M85 use their actual MVE-aware exception/context ports. The kernel's "
-"`configENABLE_FPU` switch activates the shared coprocessor register bank and"
-" extended/lazy exception frame for either FP or MVE; CPU scalar-FP facts "
-"remain independent. Integer-only MVE compiles with `+nofp` and softfp "
-"calling convention. Upper shared registers are saved by the port. Complete "
-"lower-bank and VPR retention depends on hardware extended exception framing "
-"and remains part of physical context-switch acceptance. This build contract "
-"does not qualify that behavior or guarantee cross-world payload "
-"preservation."
-msgstr ""
-"M55/M85 使用真实、感知 MVE 的异常／上下文端口。内核 `configENABLE_FPU` 开关为 FP 或 MVE "
-"激活共享协处理器寄存器组及扩展／惰性异常帧；CPU 标量 FP 事实保持独立。纯整数 MVE 使用 `+nofp` 和 softfp "
-"调用约定编译。共享上半寄存器由端口保存；完整下半寄存器与 VPR "
-"保持依赖硬件扩展异常帧，仍属于物理上下文切换验收。此构建合同不建立该行为资格，也不保证跨世界载荷保持。"
+msgid "OS：可选等待与内核适配"
+msgstr "OS：可选等待与内核适配"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:81
-msgid ""
-"The host fixture keeps the pinned kernel and POSIX port unchanged, and uses "
-"`tests/contracts/os_freertos_runtime/posix_event.c` as its owned event "
-"support. The port cancels cond-waiting pthreads before signalling/joining "
-"them; upstream event support has no cancellation cleanup and can leave an "
-"exited thread's mutex locked. Owned waits unlock on both return and "
-"cancellation, preventing repeated task-join deadlocks. This host-only "
-"correction does not change the MCU backend or establish MCU scheduler "
-"qualification."
-msgstr ""
-"主机夹具保持锁定内核与 POSIX 端口不变，并使用 "
-"`tests/contracts/os_freertos_runtime/posix_event.c` 作为自有事件支持。端口在发信号／join "
-"之前取消条件变量等待中的 pthread；上游事件支持没有取消清理，可能使已退出线程的 mutex 保持锁定。自有等待在返回与取消时均解锁，避免重复任务"
-" join 死锁。该主机修正不改变 MCU 后端，也不建立 MCU 调度器资格。"
+msgid "OS 层提供公共等待／唤醒合同和后端专用静态对象 API。裸机没有调度器，Native 使用 POSIX 线程，FreeRTOS 使用调用者明确选择的 TCB、栈和队列存储。 没有通用最大对象池、隐藏产品工作线程、默认定时器后台任务，也不让设备依赖 OS。"
+msgstr "OS 层提供公共等待／唤醒合同和后端专用静态对象 API。裸机没有调度器，Native 使用 POSIX 线程，FreeRTOS 使用调用者明确选择的 TCB、栈和队列存储。 没有通用最大对象池、隐藏产品工作线程、默认定时器后台任务，也不让设备依赖 OS。"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:89
-msgid "Maintained execution contracts"
-msgstr "维护范围内的执行合同"
+msgid "![FIG-08：等待、唤醒与外部退出](../docs/assets/diagrams/wait-wake-shutdown.svg)"
+msgstr "![FIG-08：等待、唤醒与外部退出](../docs/assets/diagrams/wait-wake-shutdown.svg)"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:91
-msgid ""
-"See [OS contracts](/design/os-contracts.md), [delivery "
-"scope](/delivery/os.md) and the {download}`OS01-OS55 execution ledger "
-"</design/os-execution.csv>`. New-kernel admission uses the [backend "
-"integration contract](/design/os-backend-integration.md) and its active "
-"execution probe; a probe pass does not register another supported RTOS."
-msgstr ""
-"参见 [OS 合同](/design/os-contracts.md)、[交付范围](/delivery/os.md)及 "
-"{download}`OS01-OS55 执行台账 </design/os-"
-"execution.csv>`。新内核准入遵守[后端接入合同](/design/os-backend-"
-"integration.md)及主动执行探针；探针通过不登记另一个已支持 RTOS。"
+msgid "FIG-08：等待、唤醒与外部退出"
+msgstr "FIG-08：等待、唤醒与外部退出"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:98
-msgid ""
-"Finite notification deadlines are checked even after a coalesced sequence "
-"hint; continuous unrelated wakes cannot extend a wait. The public predicate "
-"receives one final observation after timeout, so an observed real completion"
-" can win. Queue operations keep immediate try semantics and consume an "
-"absolute budget only when blocking. `NX_DEADLINE_NEVER` uses genuine untimed"
-" host waiting."
-msgstr ""
-"即使序列提示已合并，仍检查有限通知截止时间；持续无关唤醒不能延长等待。超时后公共谓词获得最后一次观察机会，因此观察到真实完成仍可返回成功。队列操作保持立即尝试语义，只在阻塞时消耗绝对预算。`NX_DEADLINE_NEVER`"
-" 使用真正无超时的主机等待。"
+msgid "图表达当前“检查就绪 → 登记等待 → 再检查 → 等待 → 重查”及退出会合责任；图源、范围见 [图册](/assets/diagrams/README.md)。它不建立物理时序资格。"
+msgstr "图表达当前“检查就绪 → 登记等待 → 再检查 → 等待 → 重查”及退出会合责任；图源、范围见 [图册](/assets/diagrams/README.md)。它不建立物理时序资格。"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:104
-msgid ""
-"Task creation validates the selected port's startup frame and alignment "
-"before kernel mutation. Startup minimum and measured runtime stack budget "
-"remain distinct. One external lifecycle owner joins each returning task. "
-"Native tasks must not be cancelled or detached behind the adapter. Permanent"
-" tasks and direct notifications are explicit optional paths with their own "
-"storage and receiver/index contracts."
-msgstr ""
-"任务创建在修改内核之前验证选定端口的启动帧与对齐。启动最小栈和实测运行期栈预算保持区分。每个返回型任务由唯一外部生命周期所有者 "
-"join。不得在适配器背后取消或 detach Native 任务。永久任务及直接通知是显式可选路径，分别具有存储及接收者／索引合同。"
+msgid "分层与使用入口"
+msgstr "分层与使用入口"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:110
-msgid ""
-"Closable queues use separate caller-owned controls and per-operation waiter "
-"storage; raw queues retain their minimal native blocking implementation. "
-"Shutdown must close admission, keep the owner progressing, settle and join "
-"producers, join the owner, quiesce hardware IRQ publishers and only then "
-"destroy notification, queue and guard storage. The external UART owner "
-"example demonstrates that flow."
-msgstr ""
-"可关闭队列使用独立、调用者拥有的控制及每操作等待者存储；原始队列保留最小原生阻塞实现。停机必须关闭准入、保持 owner 推进、完成并排空并 join "
-"生产者、join owner、使硬件 IRQ 发布者静止，最后才能销毁通知、队列与 guard 存储。外部 UART owner 示例展示该流程。"
+msgid "公共抽象只有等待／唤醒端口。任务、队列、等待退出和存储 API 保持后端专用， 暴露真实内核控制块需求。产品换内核时显式调整任务生命周期，不存在统一 Task／ Queue ABI 或最大存储池。"
+msgstr "公共抽象只有等待／唤醒端口。任务、队列、等待退出和存储 API 保持后端专用， 暴露真实内核控制块需求。产品换内核时显式调整任务生命周期，不存在统一 Task／ Queue ABI 或最大存储池。"
 
-#: ../../../../tmp/nexus-quality-20261019/os/README.md:116
-msgid ""
-"The optional tickless path needs an explicitly bound timer port and a "
-"continuous clock; without it, normal Tick remains active. Diagnostics use "
-"caller-sized rings and weak no-op sinks. Trace, low power and task isolation"
-" do not imply physical qualification. `tools/hil/os_acceptance.py` prepares "
-"or verifies retained OS hardware records without operating equipment; all "
-"unexecuted physical cases stay `not_executed`."
-msgstr ""
-"可选 tickless 路径要求显式绑定定时器端口及连续时钟；未供给时正常 Tick 继续运行。诊断采用调用者确定容量的环与 weak "
-"空操作接收端。跟踪、低功耗及任务隔离不表示物理资格。`tools/hil/os_acceptance.py` 只准备或验证保留的 OS "
-"硬件记录，不操作设备；全部尚未执行的物理用例保持 `not_executed`。"
+msgid "内容"
+msgstr "内容"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:72
-msgid "Components"
-msgstr "组件"
+msgid "`include/nexus/os/wait.h`、`wait.c`"
+msgstr "`include/nexus/os/wait.h`、`wait.c`"
 
-#: ../../../../tmp/nexus-quality-20261019/components/README.md:2
-msgid "Optional common components"
+msgid "公共判定条件等待和等待选择"
+msgstr "公共判定条件等待和等待选择"
+
+msgid "`baremetal/`"
+msgstr "`baremetal/`"
+
+msgid "非阻塞序列通知，无隐式调度器／WFI"
+msgstr "非阻塞序列通知，无隐式调度器／WFI"
+
+msgid "`native/`"
+msgstr "`native/`"
+
+msgid "宿主线程、通知、队列和等待退出"
+msgstr "宿主线程、通知、队列和等待退出"
+
+msgid "`freertos/`"
+msgstr "`freertos/`"
+
+msgid "静态 FreeRTOS 任务／队列／通知"
+msgstr "静态 FreeRTOS 任务／队列／通知"
+
+msgid "`freertos/mpu/`、`freertos/secure/`"
+msgstr "`freertos/mpu/`、`freertos/secure/`"
+
+msgid "显式可选 MPU／分域安全配置组合"
+msgstr "显式可选 MPU／分域安全配置组合"
+
+msgid "`threadx/`"
+msgstr "`threadx/`"
+
+msgid "真实 ThreadX Linux／M4 的明确适配范围"
+msgstr "真实 ThreadX Linux／M4 的明确适配范围"
+
+msgid "通知只是提示，调用者通过登记等待／复查观察权威请求判定条件。 内核 ISR 操作验证选定系统调用上限。Native 任务返回结束 pthread； FreeRTOS 适配层发布完成后挂起，待外部删除；ThreadX 适配层 进入真实内核完成。唯一外部生命周期责任者成功等待退出后才回收适配层、 TCB、栈、上下文；完成提示不证明内核已拆除引用。应用拥有调度器 启动、工作线程、队列深度、公平性和停机执行进度。"
+msgstr "通知只是提示，调用者通过登记等待／复查观察权威请求判定条件。 内核 ISR 操作验证选定系统调用上限。Native 任务返回结束 pthread； FreeRTOS 适配层发布完成后挂起，待外部删除；ThreadX 适配层 进入真实内核完成。唯一外部生命周期责任者成功等待退出后才回收适配层、 TCB、栈、上下文；完成提示不证明内核已拆除引用。应用拥有调度器 启动、工作线程、队列深度、公平性和停机执行进度。"
+
+msgid "CPU、上下文与启动"
+msgstr "CPU、上下文与启动"
+
+msgid "FreeRTOS POSIX 验证夹具执行真实调度器和任务／队列生命周期。普通特权 运行时按受审 CPU 事实选精确锁定端口：M0／M0+ 用 CM0，M3／无 FP M4 用 CM3， FP M4 用 CM4F，FP M7 用 CM7/r0p1，CM23／33／55／85 用各自 NTZ 端口和独立 ASM。 仅整数 M7 用受审构建期派生 CM3 端口，含保存 PRIMASK 的勘误 837070 保护区，厂商字节不改。宿主执行不证明 MCU 异常优先级、FP／MVE 上下文、 栈高水位或时序。"
+msgstr "FreeRTOS POSIX 验证夹具执行真实调度器和任务／队列生命周期。普通特权 运行时按受审 CPU 事实选精确锁定端口：M0／M0+ 用 CM0，M3／无 FP M4 用 CM3， FP M4 用 CM4F，FP M7 用 CM7/r0p1，CM23／33／55／85 用各自 NTZ 端口和独立 ASM。 仅整数 M7 用受审构建期派生 CM3 端口，含保存 PRIMASK 的勘误 837070 保护区，厂商字节不改。宿主执行不证明 MCU 异常优先级、FP／MVE 上下文、 栈高水位或时序。"
+
+msgid "运行 API 要求特权线程模式，且 PRIMASK、BASEPRI、FAULTMASK 均清零。 调度器启动前有独立例外：Baseline 端口可保留 PRIMASK=1，Mainline 可保留 精确的系统调用 BASEPRI；仅接受该端口的规范引导屏蔽状态。数值匹配不能证明 调用者拥有屏蔽状态的控制权。故障屏蔽或其他屏蔽状态在对象变更前拒绝； 只读调度器查询区分内核引导、运行中任务和调度器暂停期间的任务。 Baseline IRQ 唤醒遵守 PRIMASK 内核合同，Mainline 还验证实际边界、 优先级位宽和系统调用上限。"
+msgstr "运行 API 要求特权线程模式，且 PRIMASK、BASEPRI、FAULTMASK 均清零。 调度器启动前有独立例外：Baseline 端口可保留 PRIMASK=1，Mainline 可保留 精确的系统调用 BASEPRI；仅接受该端口的规范引导屏蔽状态。数值匹配不能证明 调用者拥有屏蔽状态的控制权。故障屏蔽或其他屏蔽状态在对象变更前拒绝； 只读调度器查询区分内核引导、运行中任务和调度器暂停期间的任务。 Baseline IRQ 唤醒遵守 PRIMASK 内核合同，Mainline 还验证实际边界、 优先级位宽和系统调用上限。"
+
+msgid "首次调度器启动要求冷态特权线程模式／MSP，CONTROL.FPCA 清零；应用 不能在内核引导前遗留活动 FP 上下文。MPU 启动保护区依据真实来源／栈帧 消费受保护单次使用租约。v8-M `security = \"single\"` 是 Arch 状态 0， 不是 Nonsecure；它使用传统 FD／F9 返回组合，但没有 CMSE 权限。显式 Secure 使用相同组合和独立 Secure 事实，Nonsecure 用 BC／B8。 `NEXUS_CPU_SECURE_ONLY` 仅选择端口编码，不授予单世界 Secure 权限。"
+msgstr "首次调度器启动要求冷态特权线程模式／MSP，CONTROL.FPCA 清零；应用 不能在内核引导前遗留活动 FP 上下文。MPU 启动保护区依据真实来源／栈帧 消费受保护单次使用租约。v8-M `security = \"single\"` 是 Arch 状态 0， 不是 Nonsecure；它使用传统 FD／F9 返回组合，但没有 CMSE 权限。显式 Secure 使用相同组合和独立 Secure 事实，Nonsecure 用 BC／B8。 `NEXUS_CPU_SECURE_ONLY` 仅选择端口编码，不授予单世界 Secure 权限。"
+
+msgid "MPU、TrustZone 与 FP／MVE"
+msgstr "MPU、TrustZone 与 FP／MVE"
+
+msgid "Armv8-M 明确选择 NTZ、仅安全态或 Nonsecure 独立。NTZ 内核不分配 Secure 任务上下文、不开放跨世界 Secure 调用。Secure 启动负责 SAU／IDAU 和 Nonsecure 协处理器访问。NS 本地中断屏蔽不能阻止 Secure 发布者并发 访问受保护状态。"
+msgstr "Armv8-M 明确选择 NTZ、仅安全态或 Nonsecure 独立。NTZ 内核不分配 Secure 任务上下文、不开放跨世界 Secure 调用。Secure 启动负责 SAU／IDAU 和 Nonsecure 协处理器访问。NS 本地中断屏蔽不能阻止 Secure 发布者并发 访问受保护状态。"
+
+msgid "默认任务 API 仍只允许特权调用。显式 MPU 配置组合有独立静态受限任务 生命周期，默认只开放无指针的延时／节拍 SVC。调用者提供受保护 元数据和受审用户链接器区域，不开放通用用户对象池或特权 I/O。M0／M0+、M7 MPU 与 MPU＋分域安全组合拒绝；详见 [MPU 入口](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/freertos/mpu/README.md)和[OS 合同](/design/os-contracts.md)。"
+msgstr "默认任务 API 仍只允许特权调用。显式 MPU 配置组合有独立静态受限任务 生命周期，默认只开放无指针的延时／节拍 SVC。调用者提供受保护 元数据和受审用户链接器区域，不开放通用用户对象池或特权 I/O。M0／M0+、M7 MPU 与 MPU＋分域安全组合拒绝；详见 [MPU 入口](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/freertos/mpu/README.md)和[OS 合同](/design/os-contracts.md)。"
+
+msgid "分域模式选择真实具备 TrustZone 上下文支持的 NS 端口，另链接 Secure 裸机 Runtime 与 `Nexus::SecureContext`。两幅镜像匹配 CPU／ABI，并使用真实 CMSE 导入／SG。 包括 Idle 的每个授权任务都有调用者持有 NS TCB／栈和不可变受信 映射选择的已准备 Secure 元数据／栈。无 Secure 堆／最大上下文池。 NS 特权内核受信，SAU／IDAU、启动、向量、NSC 归属、IRQ 路由属消费方／SoC。见 [Secure companion](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/freertos/secure/README.md)。 两幅镜像链接／宿主租约测试不证明物理归属、上下文保留、 栈峰值或对抗恶意 NS 内核的隔离。"
+msgstr "分域模式选择真实具备 TrustZone 上下文支持的 NS 端口，另链接 Secure 裸机 Runtime 与 `Nexus::SecureContext`。两幅镜像匹配 CPU／ABI，并使用真实 CMSE 导入／SG。 包括 Idle 的每个授权任务都有调用者持有 NS TCB／栈和不可变受信 映射选择的已准备 Secure 元数据／栈。无 Secure 堆／最大上下文池。 NS 特权内核受信，SAU／IDAU、启动、向量、NSC 归属、IRQ 路由属消费方／SoC。见 [Secure companion](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/freertos/secure/README.md)。 两幅镜像链接／宿主租约测试不证明物理归属、上下文保留、 栈峰值或对抗恶意 NS 内核的隔离。"
+
+msgid "M55／M85 使用真实具备 MVE 上下文支持的上下文端口。`configENABLE_FPU` 为 FP 或 MVE 开启共享协处理器寄存器组与扩展／惰性栈帧，标量 FP 事实独立。 仅整数 MVE 用 `+nofp` 和 softfp ABI，高位共享寄存器组由端口保存； 完整低位寄存器组和 VPR 依赖硬件扩展异常栈帧，仍属物理切换验收。 编译合同不保证跨世界有效数据保留。"
+msgstr "M55／M85 使用真实具备 MVE 上下文支持的上下文端口。`configENABLE_FPU` 为 FP 或 MVE 开启共享协处理器寄存器组与扩展／惰性栈帧，标量 FP 事实独立。 仅整数 MVE 用 `+nofp` 和 softfp ABI，高位共享寄存器组由端口保存； 完整低位寄存器组和 VPR 依赖硬件扩展异常栈帧，仍属物理切换验收。 编译合同不保证跨世界有效数据保留。"
+
+msgid "宿主实现与持续等待"
+msgstr "宿主实现与持续等待"
+
+msgid "FreeRTOS 宿主验证夹具保留锁定内核／POSIX 端口，使用自有 `tests/contracts/os_freertos_runtime/posix_event.c`。端口先取消正在等待条件变量的 pthread，再发送信号并等待退出；上游事件支持缺少取消清理，可能留下锁住的 互斥量。自有等待在返回和取消时都解锁，避免重复任务等待退出死锁； 此修正只作用于宿主，不改变 MCU 后端，也不建立 MCU 调度器资格。"
+msgstr "FreeRTOS 宿主验证夹具保留锁定内核／POSIX 端口，使用自有 `tests/contracts/os_freertos_runtime/posix_event.c`。端口先取消正在等待条件变量的 pthread，再发送信号并等待退出；上游事件支持缺少取消清理，可能留下锁住的 互斥量。自有等待在返回和取消时都解锁，避免重复任务等待退出死锁； 此修正只作用于宿主，不改变 MCU 后端，也不建立 MCU 调度器资格。"
+
+msgid "有限通知截止时间在合并序列提示后也检查；无关连续 唤醒不能延长预算。超时后最终再观察判定条件，真实完成可以赢得 竞争。队列保留立即尝试语义，仅阻塞时消费绝对预算； `NX_DEADLINE_NEVER` 使用真实无时限宿主等待。"
+msgstr "有限通知截止时间在合并序列提示后也检查；无关连续 唤醒不能延长预算。超时后最终再观察判定条件，真实完成可以赢得 竞争。队列保留立即尝试语义，仅阻塞时消费绝对预算； `NX_DEADLINE_NEVER` 使用真实无时限宿主等待。"
+
+msgid "任务创建在内核变更前验证端口启动栈帧／对齐，最小 栈帧不等于运行栈预算。每个可返回任务由唯一外部责任者等待退出；Native 任务 不得绕过适配器取消任务或执行 pthread detach。永久任务、直接通知是显式 可选瘦路径，有独立存储和接收者／索引合同。"
+msgstr "任务创建在内核变更前验证端口启动栈帧／对齐，最小 栈帧不等于运行栈预算。每个可返回任务由唯一外部责任者等待退出；Native 任务 不得绕过适配器取消任务或执行 pthread detach。永久任务、直接通知是显式 可选瘦路径，有独立存储和接收者／索引合同。"
+
+msgid "关闭、低功耗与验证"
+msgstr "关闭、低功耗与验证"
+
+msgid "可关闭队列用独立调用者持有控制对象和每操作等待者，原始队列保持最小 原生阻塞实现。关闭时依次关闭准入，保持责任者推进服务，结清并等待生产者退出，再等待责任者 退出，撤销并排空硬件 IRQ 发布源，最后销毁 通知／队列／保护区。外部 UART 责任者示例演示此流程。"
+msgstr "可关闭队列用独立调用者持有控制对象和每操作等待者，原始队列保持最小 原生阻塞实现。关闭时依次关闭准入，保持责任者推进服务，结清并等待生产者退出，再等待责任者 退出，撤销并排空硬件 IRQ 发布源，最后销毁 通知／队列／保护区。外部 UART 责任者示例演示此流程。"
+
+msgid "无节拍空闲仅在显式定时器端口和连续时钟完整绑定时启用，否则普通 Tick 继续。诊断用调用者指定容量的环形存储和默认无操作的弱钩子。追踪、低功耗、任务 隔离不自动建立物理资格。`tools/hil/os_acceptance.py` 准备或 验证保留的 OS 硬件记录，不操作设备，未执行项仍是 `not_executed`。"
+msgstr "无节拍空闲仅在显式定时器端口和连续时钟完整绑定时启用，否则普通 Tick 继续。诊断用调用者指定容量的环形存储和默认无操作的弱钩子。追踪、低功耗、任务 隔离不自动建立物理资格。`tools/hil/os_acceptance.py` 准备或 验证保留的 OS 硬件记录，不操作设备，未执行项仍是 `not_executed`。"
+
+msgid "维护状态见[OS 交付](/delivery/os.md)、 {download}`OS01–OS55 台账 </design/os-execution.csv>`。新内核遵循 [后端接入合同](/design/os-backend-integration.md)并执行实际探针；探针 通过本身不登记新的受支持 RTOS。"
+msgstr "维护状态见[OS 交付](/delivery/os.md)、 {download}`OS01–OS55 台账 </design/os-execution.csv>`。新内核遵循 [后端接入合同](/design/os-backend-integration.md)并执行实际探针；探针 通过本身不登记新的受支持 RTOS。"
+
+msgid "通用组件"
+msgstr "通用组件"
+
+msgid "可选通用组件"
 msgstr "可选通用组件"
 
-msgid "Explicit CMake targets compose narrow ports: bounded BusOwner, SPI/UART owner, BMP280 core and SPI transport, [TMP117 one-shot I2C](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tmp117/README.md), instance-level Log, two-bank commit-last Storage, physical Flash region and Native file adapters, bounded Settings/KV staging, and pure Modbus RTU parsing. Unreferenced component code does not enter a firmware image."
-msgstr "显式 CMake 目标组合窄端口：有界 BusOwner、SPI/UART owner、BMP280 核心和 SPI transport、[TMP117 单次 I2C](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tmp117/README.md)、实例级 Log、双 bank commit-last Storage、物理 Flash region 与 Native 文件 adapter、有界 Settings/KV 暂存以及纯 Modbus RTU 解析。未引用的组件代码不进入固件镜像。"
+msgid "本目录提供可复用的器件协议、共享资源组合、存储与中间件机制。组件通过明确的窄端口 连接公共 I/O、时钟与外部策略；应用提供实例存储、执行者、预算和停机顺序。组件不 选择产品引脚、业务寄存器、默认任务或全局设备名称。"
+msgstr "本目录提供可复用的器件协议、共享资源组合、存储与中间件机制。组件通过明确的窄端口 连接公共 I/O、时钟与外部策略；应用提供实例存储、执行者、预算和停机顺序。组件不 选择产品引脚、业务寄存器、默认任务或全局设备名称。"
 
-msgid "`Nexus::Settings` builds on Storage with caller-owned staging, product-assigned integer keys and an explicit schema/capacity. Only commit writes persistent storage; schema migration, defaults, authorization and Flash regions remain external. See the [component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/settings/README.md) and the [development workflow](/guides/developer-workflow.md)."
-msgstr "`Nexus::Settings` 在 Storage 上使用调用者暂存、产品分配的整数 key 和显式 schema/容量。只有 commit 写持久化存储；schema 迁移、默认值、授权与 Flash region 保持外置。参见[组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/settings/README.md)和[开发流程](/guides/developer-workflow.md)。"
+msgid "架构与阅读入口"
+msgstr "架构与阅读入口"
 
-#: ../../../../tmp/nexus-quality-20261019/components/README.md:9
-msgid ""
-"General mechanisms remain in their named component directories. Exact STM32 "
-"extensions live under `components/soc/stm32/`, including selected F407 "
-"handoff/I2S2 and U575 retained-time/LPDMA/Stop2 mechanisms. Their public "
-"include paths and explicit target names stay stable. This source grouping "
-"does not broaden the supported chip, backend, clock, security or physical "
-"qualification scope."
-msgstr ""
-"通用机制保留在各自命名的组件目录。精确 STM32 扩展位于 `components/soc/stm32/`，包括所选 F407 "
-"handoff／I2S2 和 U575 retained-time／LPDMA／Stop2 "
-"机制。其公共头路径和显式目标名称保持稳定。这种源码分组不会扩大支持的芯片、后端、时钟、安全域或实物资格范围。"
+msgid "组件从公共端口进入具体 provider；factory 只查询已有静态接口，不执行初始化。 [FIG-04 静态实例与接口](../docs/assets/diagrams/factory-instances.svg)说明共享只读 方法表、独立上下文与控制器／端点身份；图不表示每个组件都创建 factory 类别。"
+msgstr "组件从公共端口进入具体 provider；factory 只查询已有静态接口，不执行初始化。 [FIG-04 静态实例与接口](../docs/assets/diagrams/factory-instances.svg)说明共享只读 方法表、独立上下文与控制器／端点身份；图不表示每个组件都创建 factory 类别。"
 
-#: ../../../../tmp/nexus-quality-20261019/components/README.md:15
-msgid ""
-"Owners have one executor, exact slot capacity, stable cancellation epochs "
-"and caller-owned operations. Initialization links unused slots before "
-"publication. Admission removes one free slot and appends one FIFO entry "
-"under the metadata guard; settlement/rejection returns one reusable slot. "
-"Both use constant work independent of capacity. The same slot link serves "
-"the free or FIFO chain, with one free-head index per owner and no extra per-"
-"slot storage. A slot reaching its final epoch is permanently retired, never "
-"rebound with a repeated identity. UART's explicit inner provider request "
-"lets the owner release the outer request only after its last access. Devices"
-" and protocols do not choose Board pins, product registers, default workers "
-"or global lookup. Products supply transports, authorization, regions, task "
-"policy and budgets."
-msgstr ""
-"Owner 具有唯一执行者、准确槽容量、稳定取消 epoch "
-"及调用者拥有的操作。初始化在发布之前连接尚未使用的槽。准入在元数据临界区中移除一个空闲槽并追加一个 FIFO "
-"条目；完成并排空／拒绝归还一个可复用槽。两者的工作量固定，不随容量变化。同一个槽链接服务于空闲链或 FIFO 链；每个 owner 仅有一个 free-"
-"head 索引，不增加逐槽存储。达到最后 epoch 的槽永久退役，不使用重复身份重新绑定。UART 显式内层提供者请求使 owner "
-"仅在自身最后一次访问之后释放外层请求。设备及协议不选择 Board 引脚、产品寄存器、默认执行任务或全局查找。产品供给传输、授权、区域、任务策略及预算。"
+msgid "类别"
+msgstr "类别"
 
-#: ../../../../tmp/nexus-quality-20261019/components/README.md:27
-msgid ""
-"Meaningful regressions in `tests/contracts` cover concurrent producers, late"
-" cancel/TC, failure quarantine, interrupted persistence and protocol "
-"malformed inputs. A durable host file is not a physical Flash power-cut "
-"qualification."
-msgstr ""
-"`tests/contracts` 中的有效回归覆盖并发生产者、延后取消／TC、失败隔离保留、持久化中断及协议畸形输入。持久主机文件不建立物理 "
-"Flash 断电资格。"
+msgid "组件及入口"
+msgstr "组件及入口"
 
-msgid "Selected network and boot contracts"
-msgstr "选定网络与 boot 合同"
+msgid "外部工程仍负责"
+msgstr "外部工程仍负责"
 
-msgid "The [network component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md) owns adapter execution, copied TCP bytes, TX outcome observation and shutdown. The {ref}`selected RX payload-loan contract <lwip-loaned-rx-contract>` owns the optional copied/loaned stack profiles and the separate public/Storage target boundaries. Final pbuf free marks a loan ready; the serialized owner later releases the exact MAC loan. Stop retains storage while references or failed releases remain. These choices do not qualify PHY wiring, DMA/cache or HIL."
-msgstr "[网络组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md)负责定义 adapter 执行、复制 TCP 字节、TX 结果观察和停机。{ref}`选定 RX 负载借用合同 <lwip-loaned-rx-contract>`负责定义可选复制／借用协议栈配置，以及独立的公共／Storage target 边界。最后一次 pbuf free 标记借用已可归还；串行 owner 随后精确归还 MAC 借用。仍有引用或归还失败时，stop 保留存储。这些选择不建立 PHY 布线、DMA／cache 或 HIL 资格。"
+msgid "共享资源与观察"
+msgstr "共享资源与观察"
 
-msgid "The [MCUboot component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) owns the selected overwrite-only profile, explicit Flash composition, the boot/application ownership diagram and product recovery duties. The {ref}`public control API <mcuboot-control-contract>` renders only the generic C11 header. Concrete Flash-port types and private boot/profile headers remain outside that API surface. Model and linked-image evidence do not establish power-cut recovery or physical Flash qualification."
-msgstr "[MCUboot 组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md)负责定义选定覆盖配置、显式 Flash 装配、boot／应用所有权图和产品恢复责任。{ref}`公共控制 API <mcuboot-control-contract>`仅呈现通用 C11 头文件。具体 Flash port 类型与私有 boot／profile 头文件不属于该 API 表面。模型与已链接镜像证据不建立掉电恢复或物理 Flash 资格。"
+msgid "[BusOwner／SPI／UART owner](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/bus_owner/README.md)、[OwnerObserver](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/owner_observer/README.md)、[ClockDomain](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/clock_domain/README.md)"
+msgstr "[BusOwner／SPI／UART owner](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/bus_owner/README.md)、[OwnerObserver](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/owner_observer/README.md)、[ClockDomain](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/clock_domain/README.md)"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:79
-msgid "Exact SoC implementations"
-msgstr "准确 SoC 实现"
+msgid "executor、guard、队列容量、时钟与退出会合"
+msgstr "executor、guard、队列容量、时钟与退出会合"
 
-#: ../../../../tmp/nexus-quality-20261019/soc/README.md:2
-msgid "SoC packages and private providers"
-msgstr "SoC 包与私有 provider"
+msgid "传感与输入"
+msgstr "传感与输入"
 
-#: ../../../../tmp/nexus-quality-20261019/soc/README.md:4
-msgid ""
-"MCU source ownership follows the vendor and exact maintained family. Public "
-"family identifiers such as `stm32f407` and `gd32f470` remain unchanged. The "
-"maintained family descriptor supplies the canonical source directory; "
-"directory names do not create another configuration authority or a runtime "
-"registry."
-msgstr ""
-"MCU 源码所有权按厂家和精确维护系列划分。`stm32f407`、`gd32f470` "
-"等公共系列标识保持不变。维护中的系列描述符提供规范源码目录；目录名称不产生另一份配置权威或运行时登记表。"
+msgid "[BMP280](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/bmp280/README.md)、[TMP117](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tmp117/README.md)、[DS18B20](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/ds18b20/README.md)、[红外](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/infrared/README.md)"
+msgstr "[BMP280](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/bmp280/README.md)、[TMP117](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tmp117/README.md)、[DS18B20](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/ds18b20/README.md)、[红外](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/infrared/README.md)"
 
-msgid "Each MCU family owns `soc.json`, `routes.json`, its private controller state, selected driver sources and explicit CMake targets. Its `configure/` package owns family capabilities, admission, construction and lifecycle emission. Provider tests remain in `tools/configure/tests/providers/<family>/`; shared parsing, typed IR, resource arbitration and bundle transactions remain in `tools/configure/`. Startup, clocks, timebase, memory and power code remain with that family. Reusable IP algorithms live in [drivers](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md) and are shared only after every wrapper checks the real vendor layout, bits, clocks, IRQ/DMA routes and errata. Similar peripheral names do not establish equivalence."
-msgstr "每个 MCU 家族拥有 `soc.json`、`routes.json`、私有控制器状态、选定驱动源码与显式 CMake target。其 `configure/` 包拥有家族能力、准入、构造与生命周期生成。provider 测试保留在 `tools/configure/tests/providers/<family>/`；共享解析、typed IR、资源仲裁与 bundle 事务保留在 `tools/configure/`。启动、时钟、timebase、内存与电源代码仍随该家族维护。可复用 IP 算法位于 [drivers](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md)，只有每个 wrapper 核对实际厂商布局、位定义、时钟、IRQ／DMA 路由和勘误后才可共享。相似外设名称不能证明等价。"
+msgid "实际器件、接线、供电、采样与产品策略"
+msgstr "实际器件、接线、供电、采样与产品策略"
 
-msgid "`native/drivers/` implements the public I/O contracts as independent host models; it does not establish MCU timing or electrical behavior. `common/uart_control.h` is a cross-vendor SoC collaboration contract; STM32 identity access belongs in `stm32/common/stm32_identity.h`. Neither is a reusable peripheral algorithm."
-msgstr "`native/drivers/` 通过独立主机模型实现公共 I/O 合同，不建立 MCU 时序或电气行为。`common/uart_control.h` 是跨厂家 SoC 协作合同；STM32 identity 访问属于 `stm32/common/stm32_identity.h`。两者均不是可复用外设算法。"
+msgid "显示与触摸"
+msgstr "显示与触摸"
 
-#: ../../../../tmp/nexus-quality-20261019/soc/README.md:30
-msgid ""
-"The [Board packages](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/boards/README.md) authorize reviewed PCB bindings. "
-"Adding a Board does not enable a new clock tree automatically: select an "
-"exact maintained clock profile, or implement and verify another profile. "
-"Keep unsupported oscillators, domains, modes and silicon revisions explicit."
-msgstr ""
-"[Board 包](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/boards/README.md)授权经过审查的 PCB 绑定。增加 Board 不会自动启用新的时钟树：应选择精确维护的时钟 "
-"profile，或实现并验证另一 profile。不支持的晶振、域、模式和硅片修订须明确保留。"
+msgid "[ILI9341](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/ili9341/README.md)、[XPT2046](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/xpt2046/README.md)"
+msgstr "[ILI9341](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/ili9341/README.md)、[XPT2046](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/xpt2046/README.md)"
 
-#: ../../../../tmp/nexus-quality-20261019/soc/README.md:35
-msgid ""
-"Use the [provider guide](/guides/provider-porting.md) for implementation, "
-"the [derived matrix](/delivery/capabilities.md) for selected routes and "
-"modes, and the [qualification guide](/reference/platforms/qualification.md) "
-"for actual evidence. CPU support, SDK macros and source-directory presence "
-"do not establish whole-family support. MCU physical HIL remains "
-"`not_executed`."
-msgstr ""
-"实现遵循 [provider 指南](/guides/provider-"
-"porting.md)，所选路由和模式参见[派生矩阵](/delivery/capabilities.md)，实际证据参见[资格指南](/reference/platforms/qualification.md)。CPU"
-" 支持、SDK 宏和源码目录存在均不建立整个系列的支持资格。MCU 实物 HIL 仍为 `not_executed`。"
+msgid "窄传输端口、背光、校准、界面和调度"
+msgstr "窄传输端口、背光、校准、界面和调度"
 
-msgid "Reusable IP implementations"
-msgstr "可复用 IP 实现"
+msgid "软件总线"
+msgstr "软件总线"
 
-msgid "This private source directory groups reviewed register-protocol algorithms by controller kind and IP implementation. A selected SoC target compiles the required sources directly with private includes and its exact ABI. Public faces and request ownership remain in `io/`; chip clocks, routes, startup, memory and provider state remain with the exact SoC. This grouping adds no runtime layer, registry, allocation, queue or worker."
-msgstr "该私有源码目录按控制器类别和 IP 实现组织经复核的寄存器协议算法。所选 SoC target 使用私有 include 与精确 ABI 直接编译所需源码。公共 face 和请求所有权仍在 `io/`；芯片时钟、路由、启动、内存和 provider 状态仍属于精确 SoC。该分组不增加运行时层、注册表、分配、队列或 worker。"
+msgid "[SPI](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/software_spi/README.md)、[I2C／SCCB](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/software_i2c/README.md)、[OneWire](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/onewire/README.md)"
+msgstr "[SPI](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/software_spi/README.md)、[I2C／SCCB](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/software_i2c/README.md)、[OneWire](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/onewire/README.md)"
 
-msgid "Source directory"
-msgstr "源码目录"
+msgid "GPIO 电气、上拉、时钟与实测时序"
+msgstr "GPIO 电气、上拉、时钟与实测时序"
 
-msgid "Maintained algorithm"
-msgstr "维护中的算法"
+msgid "外部存储器件"
+msgstr "外部存储器件"
+
+msgid "[AT24C02](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/at24c02/README.md)、[W25](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/w25/README.md)、[MappedStorage](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mapped_storage/README.md)"
+msgstr "[AT24C02](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/at24c02/README.md)、[W25](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/w25/README.md)、[MappedStorage](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mapped_storage/README.md)"
+
+msgid "精确型号、区域、写保护、恢复与耐久策略"
+msgstr "精确型号、区域、写保护、恢复与耐久策略"
+
+msgid "通用数据机制"
+msgstr "通用数据机制"
+
+msgid "[Storage](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/storage/README.md)、[Settings](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/settings/README.md)（`Nexus::Settings`）、[Log](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/log/README.md)、[Modbus RTU](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/modbus/README.md)"
+msgstr "[Storage](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/storage/README.md)、[Settings](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/settings/README.md)（`Nexus::Settings`）、[Log](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/log/README.md)、[Modbus RTU](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/modbus/README.md)"
+
+msgid "schema、授权、寄存器表、提交频率和日志去向"
+msgstr "schema、授权、寄存器表、提交频率和日志去向"
+
+msgid "总线与访问组合"
+msgstr "总线与访问组合"
+
+msgid "[DP83848](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/dp83848/README.md)、[USB control](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/usb_control/README.md)、[I3C controller](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/i3c_controller/README.md)、[User I/O broker](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/user_io_broker/README.md)、[AMP IPC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/amp_ipc/README.md)"
+msgstr "[DP83848](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/dp83848/README.md)、[USB control](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/usb_control/README.md)、[I3C controller](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/i3c_controller/README.md)、[User I/O broker](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/user_io_broker/README.md)、[AMP IPC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/amp_ipc/README.md)"
+
+msgid "硬件 owner、身份、内存权限和完整退出证明"
+msgstr "硬件 owner、身份、内存权限和完整退出证明"
+
+msgid "网络与镜像"
+msgstr "网络与镜像"
+
+msgid "[lwIP](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md)、[TLS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tls/README.md)、[MQTT](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mqtt/README.md)、[MCUboot](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md)"
+msgstr "[lwIP](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md)、[TLS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tls/README.md)、[MQTT](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mqtt/README.md)、[MCUboot](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md)"
+
+msgid "网络执行进度、信任根、产品布局与恢复"
+msgstr "网络执行进度、信任根、产品布局与恢复"
+
+msgid "通用机制保留在具名组件目录。精确 STM32 扩展位于 `components/soc/stm32/`，包括 选定 F407 handoff／I2S2、H563 I3C、H743 映射存储、H747 AMP 与 U575 低功耗机制。 目录归组不扩大芯片、后端、时钟、安全态或物理资格；各扩展保留自己的精确合同。"
+msgstr "通用机制保留在具名组件目录。精确 STM32 扩展位于 `components/soc/stm32/`，包括 选定 F407 handoff／I2S2、H563 I3C、H743 映射存储、H747 AMP 与 U575 低功耗机制。 目录归组不扩大芯片、后端、时钟、安全态或物理资格；各扩展保留自己的精确合同。"
+
+msgid "选择、存储与执行"
+msgstr "选择、存储与执行"
+
+msgid "CMake 管理组件源码依赖。已有 assembly component 列表、显式 `LIBRARIES` 和 中间件创建 helper 各有维护范围，不能假定所有 target 都能在 TOML 中选择。 未引用的组件代码不进入固件镜像；`EXCLUDE_FROM_ALL` 不等于配置期没有依赖， 网络冷态源码闭包的既有问题见 [#52](https://github.com/X-Gen-Lab/nexus/issues/52)。"
+msgstr "CMake 管理组件源码依赖。已有 assembly component 列表、显式 `LIBRARIES` 和 中间件创建 helper 各有维护范围，不能假定所有 target 都能在 TOML 中选择。 未引用的组件代码不进入固件镜像；`EXCLUDE_FROM_ALL` 不等于配置期没有依赖， 网络冷态源码闭包的既有问题见 [#52](https://github.com/X-Gen-Lab/nexus/issues/52)。"
+
+msgid "基础组件不创建堆、工作线程或最大对象池。可选 lwIP 使用明确池，TLS 可在调用者提供 的 arena 中子分配；必须按所选 profile 预算，不能将全部中间件统称为内部无分配。"
+msgstr "基础组件不创建堆、工作线程或最大对象池。可选 lwIP 使用明确池，TLS 可在调用者提供 的 arena 中子分配；必须按所选 profile 预算，不能将全部中间件统称为内部无分配。"
+
+msgid "owner 有唯一执行者、精确 slot 容量、稳定取消代次和调用者提供的 operation。初始化 在发布前连接空闲 slot；准入在短 metadata guard 内取一个空闲项并追加 FIFO，结清或 拒绝时归还一个项，工作量与容量无关。同一 link 复用为空闲链或 FIFO 链，每个 owner 仅有一个 free-head，不增加每 slot 存储。最终 epoch 后 slot 永久退休，不重用身份。 UART owner 的独立 inner request 保证 provider 最后访问结束后才能释放 outer request。"
+msgstr "owner 有唯一执行者、精确 slot 容量、稳定取消代次和调用者提供的 operation。初始化 在发布前连接空闲 slot；准入在短 metadata guard 内取一个空闲项并追加 FIFO，结清或 拒绝时归还一个项，工作量与容量无关。同一 link 复用为空闲链或 FIFO 链，每个 owner 仅有一个 free-head，不增加每 slot 存储。最终 epoch 后 slot 永久退休，不重用身份。 UART owner 的独立 inner request 保证 provider 最后访问结束后才能释放 outer request。"
+
+msgid "失败与验证"
+msgstr "失败与验证"
+
+msgid "请求被接受后保持借用，直到 acquire 观察 `SETTLED`；取消、超时与失败排空不撤销 借用。生产者、观察者、通知发布者与 executor 分别退出会合后，才能回收其存储。"
+msgstr "请求被接受后保持借用，直到 acquire 观察 `SETTLED`；取消、超时与失败排空不撤销 借用。生产者、观察者、通知发布者与 executor 分别退出会合后，才能回收其存储。"
+
+msgid "`tests/contracts` 与 GoogleTest／GoogleMock 维护并发提交、迟到取消／TC、隔离恢复、 中断持久化写入及畸形协议输入等回归。主机文件持久化不建立物理 Flash 掉电资格。 组件的具体实现、执行记录与实板状态分别阅读，不从目录或 target 存在推断全部支持。"
+msgstr "`tests/contracts` 与 GoogleTest／GoogleMock 维护并发提交、迟到取消／TC、隔离恢复、 中断持久化写入及畸形协议输入等回归。主机文件持久化不建立物理 Flash 掉电资格。 组件的具体实现、执行记录与实板状态分别阅读，不从目录或 target 存在推断全部支持。"
+
+msgid "选定网络与启动合同"
+msgstr "选定网络与启动合同"
+
+msgid "[网络组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md)维护适配器执行、复制 TCP 字节、 TX 结果观察和退出责任。{ref}`选定 RX payload 借用合同 <lwip-loaned-rx-contract>` 维护可选 copied／loaned profile，以及公共接口与 Storage target 的分界。最后一次 pbuf free 只把 loan 标记为可归还，串行 owner 随后释放精确 MAC loan；存在引用或 释放失败时继续保留存储。这些机制不建立 PHY 接线、DMA／Cache 或实板资格。"
+msgstr "[网络组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md)维护适配器执行、复制 TCP 字节、 TX 结果观察和退出责任。{ref}`选定 RX payload 借用合同 <lwip-loaned-rx-contract>` 维护可选 copied／loaned profile，以及公共接口与 Storage target 的分界。最后一次 pbuf free 只把 loan 标记为可归还，串行 owner 随后释放精确 MAC loan；存在引用或 释放失败时继续保留存储。这些机制不建立 PHY 接线、DMA／Cache 或实板资格。"
+
+msgid "[MCUboot 组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md)维护选定 overwrite-only profile、显式 Flash 组合、boot／application 所有权图及产品恢复责任。 {ref}`公共控制 API <mcuboot-control-contract>`只展示通用 C11 头，具体 Flash port 类型和私有 boot／profile 头不属于该接口。模型与链接结果不建立掉电或实物 Flash 资格。"
+msgstr "[MCUboot 组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md)维护选定 overwrite-only profile、显式 Flash 组合、boot／application 所有权图及产品恢复责任。 {ref}`公共控制 API <mcuboot-control-contract>`只展示通用 C11 头，具体 Flash port 类型和私有 boot／profile 头不属于该接口。模型与链接结果不建立掉电或实物 Flash 资格。"
+
+msgid "精确 SoC 集成"
+msgstr "精确 SoC 集成"
+
+msgid "SoC 芯片集成与私有实现"
+msgstr "SoC 芯片集成与私有实现"
+
+msgid "本层负责精确芯片的启动、时钟、时间域、内存、IRQ／DMA，以及公共 I/O 的具体实现。 MCU 源码按厂家和已维护系列组织；`stm32f407`、`gd32f470` 等公共系列标识保持独立， 不可变 family descriptor 给出唯一源码目录。目录层级不新增配置权威或运行时注册表。"
+msgstr "本层负责精确芯片的启动、时钟、时间域、内存、IRQ／DMA，以及公共 I/O 的具体实现。 MCU 源码按厂家和已维护系列组织；`stm32f407`、`gd32f470` 等公共系列标识保持独立， 不可变 family descriptor 给出唯一源码目录。目录层级不新增配置权威或运行时注册表。"
+
+msgid "目录与阅读入口"
+msgstr "目录与阅读入口"
+
+msgid "实现"
+msgstr "实现"
+
+msgid "精确范围入口"
+msgstr "精确范围入口"
+
+msgid "[STM32F103](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f103/README.md)"
+msgstr "[STM32F103](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f103/README.md)"
+
+msgid "F103RBT6 的所选模式"
+msgstr "F103RBT6 的所选模式"
+
+msgid "[STM32F407](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f407/README.md)"
+msgstr "[STM32F407](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f407/README.md)"
+
+msgid "F407VET6／ZGT6；密度与封装分别验证"
+msgstr "F407VET6／ZGT6；密度与封装分别验证"
+
+msgid "[STM32G474](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32g474/README.md)"
+msgstr "[STM32G474](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32g474/README.md)"
+
+msgid "G474RET6 参考与独立模式"
+msgstr "G474RET6 参考与独立模式"
+
+msgid "[STM32H743](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/README.md)"
+msgstr "[STM32H743](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/README.md)"
+
+msgid "H743ZIT6 固定 clock／Cache／revision 切片"
+msgstr "H743ZIT6 固定 clock／Cache／revision 切片"
+
+msgid "[STM32U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/README.md)"
+msgstr "[STM32U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/README.md)"
+
+msgid "U575ZIT6Q 单状态及独立双域参考"
+msgstr "U575ZIT6Q 单状态及独立双域参考"
+
+msgid "[GD32F303](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/gd32/gd32f303/README.md)"
+msgstr "[GD32F303](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/gd32/gd32f303/README.md)"
+
+msgid "GD32F303RCT6 精确封装参考"
+msgstr "GD32F303RCT6 精确封装参考"
+
+msgid "[GD32F470](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/gd32/gd32f470/README.md)"
+msgstr "[GD32F470](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/gd32/gd32f470/README.md)"
+
+msgid "GD32F470ZGT6 精确实现"
+msgstr "GD32F470ZGT6 精确实现"
+
+msgid "[Native](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/native/README.md)"
+msgstr "[Native](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/native/README.md)"
+
+msgid "主机行为模型，不建立 MCU 资格"
+msgstr "主机行为模型，不建立 MCU 资格"
+
+msgid "事实、装配与硬件行为"
+msgstr "事实、装配与硬件行为"
+
+msgid "各 MCU family 拥有 `soc.json`、`routes.json`、私有 controller 状态、选定驱动源码 和明确的 CMake target。其 `configure/` 负责系列能力、准入、静态构造描述及生命周期 调用顺序。配置测试仍位于 `tools/configure/tests/providers/<family>/`；共享解析、 不可变 IR、资源仲裁与 bundle 事务由 `tools/configure/` 维护。"
+msgstr "各 MCU family 拥有 `soc.json`、`routes.json`、私有 controller 状态、选定驱动源码 和明确的 CMake target。其 `configure/` 负责系列能力、准入、静态构造描述及生命周期 调用顺序。配置测试仍位于 `tools/configure/tests/providers/<family>/`；共享解析、 不可变 IR、资源仲裁与 bundle 事务由 `tools/configure/` 维护。"
+
+msgid "实际硬件算法直接由本 family 的 C 代码持有。启动、clock、timebase、memory 和 power 也留在本层。可复用 IP 算法进入 [drivers](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md)，但每个 wrapper 仍须检查真实厂商布局、bit、clock、IRQ／DMA 和 errata；外设同名不证明硬件等价。"
+msgstr "实际硬件算法直接由本 family 的 C 代码持有。启动、clock、timebase、memory 和 power 也留在本层。可复用 IP 算法进入 [drivers](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/drivers/README.md)，但每个 wrapper 仍须检查真实厂商布局、bit、clock、IRQ／DMA 和 errata；外设同名不证明硬件等价。"
+
+msgid "![FIG-31：共享 IP 与精确 SoC 源码归属](../docs/assets/diagrams/driver-source-ownership.svg)"
+msgstr "![FIG-31：共享 IP 与精确 SoC 源码归属](../docs/assets/diagrams/driver-source-ownership.svg)"
+
+msgid "FIG-31：共享 IP 与精确 SoC 源码归属"
+msgstr "FIG-31：共享 IP 与精确 SoC 源码归属"
+
+msgid "图表示源码和维护责任，不增加运行时转发层。`common/uart_control.h` 是跨厂家协作 合同；`stm32/common/stm32_identity.h` 是 STM32 身份辅助，两者都不是通用外设算法。"
+msgstr "图表示源码和维护责任，不增加运行时转发层。`common/uart_control.h` 是跨厂家协作 合同；`stm32/common/stm32_identity.h` 是 STM32 身份辅助，两者都不是通用外设算法。"
+
+msgid "接入和验证边界"
+msgstr "接入和验证边界"
+
+msgid "[Board 包](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/README.md)授权已审 PCB 绑定。新增 Board 不会自动开放新时钟树； 须选择精确已维护 clock profile，或实现并验证新的 profile。未维护的振荡源、domain、 mode 和 silicon revision 必须明确拒绝。"
+msgstr "[Board 包](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/README.md)授权已审 PCB 绑定。新增 Board 不会自动开放新时钟树； 须选择精确已维护 clock profile，或实现并验证新的 profile。未维护的振荡源、domain、 mode 和 silicon revision 必须明确拒绝。"
+
+msgid "接入顺序见 [provider 指南](/guides/provider-porting.md)，可选路线和模式见 [派生能力矩阵](/delivery/capabilities.md)，实际证据见 [资格说明](/reference/platforms/qualification.md)。CPU 支持、SDK 宏或目录存在 均不建立整系列支持；MCU 实板 HIL 仍为 `not_executed`。"
+msgstr "接入顺序见 [provider 指南](/guides/provider-porting.md)，可选路线和模式见 [派生能力矩阵](/delivery/capabilities.md)，实际证据见 [资格说明](/reference/platforms/qualification.md)。CPU 支持、SDK 宏或目录存在 均不建立整系列支持；MCU 实板 HIL 仍为 `not_executed`。"
+
+msgid "可复用 IP 算法"
+msgstr "可复用 IP 算法"
+
+msgid "Drivers：可复用硬件 IP 实现"
+msgstr "Drivers：可复用硬件 IP 实现"
+
+msgid "本目录按控制器类别和受审 IP 协议组织私有算法。精确 SoC 目标用自身 ABI 和私有 include 路径直接编译所需源码。公共接口对象／请求所有权归 I/O， 芯片时钟、路线、启动、内存和具体实现状态归 SoC。这是源码归属边界， 不增加运行时层、注册表、分配、队列或工作线程。"
+msgstr "本目录按控制器类别和受审 IP 协议组织私有算法。精确 SoC 目标用自身 ABI 和私有 include 路径直接编译所需源码。公共接口对象／请求所有权归 I/O， 芯片时钟、路线、启动、内存和具体实现状态归 SoC。这是源码归属边界， 不增加运行时层、注册表、分配、队列或工作线程。"
+
+msgid "图说明当前维护判定和编译责任，不表示每次 I/O 都经过额外转发。 图源与范围见[图册](/assets/diagrams/README.md)。"
+msgstr "图说明当前维护判定和编译责任，不表示每次 I/O 都经过额外转发。 图源与范围见[图册](/assets/diagrams/README.md)。"
+
+msgid "已维护引擎"
+msgstr "已维护引擎"
+
+msgid "算法"
+msgstr "算法"
 
 msgid "`uart/uart_v1_channel_dma/`"
 msgstr "`uart/uart_v1_channel_dma/`"
 
-msgid "Legacy USART with fixed-channel DMA"
-msgstr "带固定通道 DMA 的 legacy USART"
+msgid "旧式 USART 与固定通道 DMA"
+msgstr "旧式 USART 与固定通道 DMA"
 
 msgid "`i2c/i2c_v1_async/`"
 msgstr "`i2c/i2c_v1_async/`"
 
-msgid "Reviewed V1 IRQ/DMA message sequencing"
-msgstr "经复核的 V1 IRQ／DMA 消息时序"
+msgid "受审 V1 IRQ／DMA 消息顺序"
+msgstr "受审 V1 IRQ／DMA 消息顺序"
 
 msgid "`i2c/i2c_v2/`"
 msgstr "`i2c/i2c_v2/`"
 
-msgid "Reviewed V2 polling message sequencing"
-msgstr "经复核的 V2 轮询消息时序"
+msgid "受审 V2 轮询消息顺序"
+msgstr "受审 V2 轮询消息顺序"
 
 msgid "`adc/legacy_adc/`"
 msgstr "`adc/legacy_adc/`"
 
-msgid "Legacy single-shot ADC"
-msgstr "legacy 单次 ADC"
+msgid "旧式单次转换 ADC"
+msgstr "旧式单次转换 ADC"
 
 msgid "`timer/legacy_pwm/`"
 msgstr "`timer/legacy_pwm/`"
 
-msgid "Legacy fixed PWM"
-msgstr "legacy 固定 PWM"
+msgid "旧式固定 PWM"
+msgstr "旧式固定 PWM"
 
 msgid "`flash/legacy_flash/`"
 msgstr "`flash/legacy_flash/`"
 
-msgid "Legacy halfword Flash programming"
-msgstr "legacy 半字 Flash 编程"
+msgid "旧式半字 Flash 编程"
+msgstr "旧式半字 Flash 编程"
 
 msgid "`can/classic_can/`"
 msgstr "`can/classic_can/`"
 
-msgid "Reviewed classic mailboxes and shared filter domain"
-msgstr "已审查的经典邮箱与共享过滤器域"
+msgid "经典邮箱与共享过滤器域"
+msgstr "经典邮箱与共享过滤器域"
 
 msgid "`usb/fs_device_pio/`"
 msgstr "`usb/fs_device_pio/`"
 
-msgid "Reviewed FS device PIO endpoint and FIFO sequencing"
-msgstr "已审查的 FS 设备 PIO 端点与 FIFO 操作顺序"
+msgid "FS 设备端点／FIFO PIO"
+msgstr "FS 设备端点／FIFO PIO"
 
 msgid "`ethernet/legacy_mac/`"
 msgstr "`ethernet/legacy_mac/`"
 
-msgid "Normal and selected enhanced chained descriptors"
-msgstr "普通链式描述符与明确选定的增强链式描述符"
+msgid "普通和选定增强链式描述符"
+msgstr "普通和选定增强链式描述符"
 
 msgid "`timer/advanced_timer/`"
 msgstr "`timer/advanced_timer/`"
 
-msgid "Capture and complementary PWM/break templates"
-msgstr "捕获与互补 PWM/刹车模板"
+msgid "捕获、互补 PWM／刹车模板"
+msgstr "捕获、互补 PWM／刹车模板"
 
 msgid "`uart/usart_fifo/`"
 msgstr "`uart/usart_fifo/`"
 
-msgid "Bounded byte FIFO and selected RTS/CTS templates"
-msgstr "有界字节 FIFO 与选定 RTS/CTS 模板"
+msgid "有界字节 FIFO 与选定 RTS／CTS"
+msgstr "有界字节 FIFO 与选定 RTS／CTS"
 
 msgid "`gpio/owned_pin_state/`"
 msgstr "`gpio/owned_pin_state/`"
 
-msgid "Owned-mask two-state GPIO transitions"
-msgstr "按自有掩码管理的双状态 GPIO 切换"
+msgid "自有位掩码下的两态 GPIO 迁移"
+msgstr "自有位掩码下的两态 GPIO 迁移"
 
-msgid "`Nexus::DriverPrivateHeaders` supplies only private build-time include paths. Consumers link it privately; it contains no firmware source, object or state. The exact SoC target remains the sole source selector. Public checked dispatch, frame validation, sequence ownership and calendar arithmetic remain in `io/`. The classic CAN `cortex_m_port.h` keeps its byte-priority and word-NVIC accesses private. Native models override the same macros before inclusion; the extraction does not add a public Arch interface or change interrupt ordering. H743 and U575 share the four-byte immutable `uart_fifo_profile.h` value layout. SoC aliases retain their exact entry-point types without another runtime link."
-msgstr "`Nexus::DriverPrivateHeaders` 仅提供私有的构建期头文件路径。消费者以 PRIVATE 方式链接；该目标不包含固件源码、对象或状态。精确 SoC 目标仍是唯一源码选择方。公共检查派发、帧校验、序列所有权和日历运算保留在 `io/`。经典 CAN 的 `cortex_m_port.h` 将字节优先级和字长 NVIC 访问保持为私有实现。Native 模型在包含前覆盖同一组宏；本次提取不增加公共 Arch 接口，也不改变中断操作顺序。H743 和 U575 共享 `uart_fifo_profile.h` 中四字节的不可变值布局。SoC 别名保留各自精确的入口点类型，不增加运行时转接层。"
+msgid "`Nexus::DriverPrivateHeaders` 只提供私有构建期 include 路径，消费者私有 链接；不包含固件源码、对象或状态。精确 SoC 是唯一源码选择器。 公共检查分派、数据帧验证、序列所有权、日历运算 仍在 I/O。CAN 的 `cortex_m_port.h` 私有维护字节优先级／字访问 NVIC 访问； Native 在包含前替换同一宏，不增加公共 Arch API、不改中断排序。 H743／U575 共用四字节不可变 `uart_fifo_profile.h` 布局，SoC 别名保留精确 入口类型，不增加运行时链接。"
+msgstr "`Nexus::DriverPrivateHeaders` 只提供私有构建期 include 路径，消费者私有 链接；不包含固件源码、对象或状态。精确 SoC 是唯一源码选择器。 公共检查分派、数据帧验证、序列所有权、日历运算 仍在 I/O。CAN 的 `cortex_m_port.h` 私有维护字节优先级／字访问 NVIC 访问； Native 在包含前替换同一宏，不增加公共 Arch API、不改中断排序。 H743／U575 共用四字节不可变 `uart_fifo_profile.h` 布局，SoC 别名保留精确 入口类型，不增加运行时链接。"
 
-msgid "The I2C V1 engine is shared by STM32F407, GD32F470, STM32F103 and GD32F303. The first pair retains its reviewed 100 kHz profile. The 8 MHz low-end pair uses nominal 80 kHz, priority-zero non-kernel IRQs and no I2C DMA. ES096 2.8.1/2.8.5 and GD32F30x limitations 2.8.1 require these narrower choices. The F4 stream-DMA layout is never reused for a fixed-channel controller. Captured wake publishers join before stop returns borrowed notification storage; a refused vector withdrawal retains the initialized owner for explicit retry. Each SoC wrapper verifies its actual SDK register offsets and bit definitions, supplies exact clock, DMA/IRQ and visible-memory facts, and binds the selected static state. Matching register names cannot establish another chip's routing, pin wiring, clock rate or errata policy."
-msgstr "STM32F407、GD32F470、STM32F103 与 GD32F303 共享 I2C V1 引擎。前两者保留已复核的 100 kHz profile。8 MHz 低端组合采用标称 80 kHz、优先级零且不调用内核的 IRQ，并禁用 I2C DMA。ES096 2.8.1／2.8.5 与 GD32F30x limitations 2.8.1 要求这些更窄的选择。F4 stream-DMA 布局绝不复用于固定通道控制器。stop 归还借用的通知存储前，已捕获的唤醒发布者必须 join；向量撤回遭拒时保留已初始化 owner，供显式重试。每个 SoC wrapper 核验实际 SDK 寄存器偏移和位定义，提供精确时钟、DMA／IRQ 与可见内存事实，并绑定所选静态状态。寄存器名称相同不能证明另一芯片的路由、引脚接线、时钟频率或勘误策略。"
+msgid "共享条件与实例隔离"
+msgstr "共享条件与实例隔离"
 
-msgid "The UART V1 channel-DMA engine is shared by the exact F103 and GD303 providers. Its wrappers assert legacy USART and fixed-channel DMA masks and layout. `dma-tx` owns one TX channel and an explicit IRQ byte ring; `dma-duplex` owns both channels and caller-provided finite RX blocks. Actual wire TC remains independent of DMA memory completion. The engine detaches each source, observes a stable remaining count and acknowledges flags before returning a buffer. Unprovable withdrawal retains the request or producer loan. Normal RX restarts through owner service, with explicit gaps and backpressure; no consumer block is overwritten. A byte discarded from DATA at a finite boundary records loss. Neither circular reception nor a cache contract is inferred from this engine."
-msgstr "精确 F103 与 GD303 provider 共享 UART V1 channel-DMA 引擎。wrapper 对 legacy USART 和固定通道 DMA 的掩码与布局作断言。`dma-tx` 拥有一个 TX 通道及显式 IRQ 字节环；`dma-duplex` 拥有两个通道和调用者提供的有限 RX block。实际线上 TC 独立于 DMA 内存完成。引擎先分离每个来源、观察稳定剩余计数并确认标志，再归还缓冲区。无法证明撤回时保留 request 或 producer loan。正常 RX 通过 owner service 重启，具有明确间隙与背压；不得覆盖 consumer block。在有限边界从 DATA 丢弃的字节会记为丢失。该引擎不隐含循环接收或缓存合同。"
+msgid "共享依据是硬件协议和受审硅片语义，不是厂家或寄存器名字相同。SoC 适配层对照实际 SDK 寄存器偏移与位掩码，提供时钟、DMA／IRQ、可见内存， 并绑定选定静态状态。它们不因此继承另一芯片的路由、引脚接线、时钟或 勘误策略。"
+msgstr "共享依据是硬件协议和受审硅片语义，不是厂家或寄存器名字相同。SoC 适配层对照实际 SDK 寄存器偏移与位掩码，提供时钟、DMA／IRQ、可见内存， 并绑定选定静态状态。它们不因此继承另一芯片的路由、引脚接线、时钟或 勘误策略。"
 
-msgid "Keep per-byte operations shared only when their hardware protocol is identical. Cold validation, NVIC withdrawal and chip resources stay in SoC wrappers. A differing protocol or erratum requires a reviewed implementation or explicit narrow capability; do not add speculative family switches to a shared hot path. STM32 identity access remains in `soc/stm32/common/stm32_identity.h` and the cross-vendor SoC control contract remains in `soc/common/uart_control.h`."
-msgstr "只有硬件协议相同时才共享逐字节操作。冷态校验、NVIC 撤回与芯片资源保留在 SoC wrapper。不同协议或勘误需要经过复核的实现或显式窄能力；不得向共享热路径加入猜测性的家族分支。STM32 identity 访问保留在 `soc/stm32/common/stm32_identity.h`，跨厂家 SoC 控制合同保留在 `soc/common/uart_control.h`。"
+msgid "I2C V1 由 F407、GD470、F103、GD303 共用。前两者保留受审 100 kHz，8 MHz 低端 两款因 ES096 2.8.1／2.8.5 和 GD32F30x 限制 2.8.1，使用名义 80 kHz、 优先级为零且不调用内核的 IRQ，无 I2C DMA。F4 流式 DMA 布局不复用于固定通道 控制器。已捕获唤醒发布者等待退出后才停止并归还通知存储； 向量撤销拒绝时保留已初始化责任者，待显式重试。"
+msgstr "I2C V1 由 F407、GD470、F103、GD303 共用。前两者保留受审 100 kHz，8 MHz 低端 两款因 ES096 2.8.1／2.8.5 和 GD32F30x 限制 2.8.1，使用名义 80 kHz、 优先级为零且不调用内核的 IRQ，无 I2C DMA。F4 流式 DMA 布局不复用于固定通道 控制器。已捕获唤醒发布者等待退出后才停止并归还通知存储； 向量撤销拒绝时保留已初始化责任者，待显式重试。"
 
-msgid "CMake remains the only source graph. Unselected algorithms must not compile merely because their files exist here. Review the actual linked retention and resource costs of selected sources. Register-boundary models exercise the real engine and wrappers, including rejection, errors, cancel, failed drain and instance isolation. Compile each selected ARM implementation separately. Native models and linked ARM images establish different software properties; timing and electrical claims still require physical execution. See [execution budgets](/design/soc-execution-budgets.md) and the [provider guide](/guides/provider-porting.md)."
-msgstr "CMake 仍是唯一源码图。未选算法不得仅因文件存在于该目录而参与编译。审查所选源码实际链接保留和资源成本。寄存器边界模型测试真实引擎与 wrapper，包括拒绝、错误、取消、排空失败和实例隔离。分别编译每个选定 ARM 实现。Native 模型与链接后的 ARM 镜像建立不同软件性质；时序与电气结论仍需物理执行。参见[执行预算](/design/soc-execution-budgets.md)和 [provider 指南](/guides/provider-porting.md)。"
+msgid "UART V1 通道 DMA 为精确 F103／GD303 共享，适配层独立断言旧式 USART 和 固定通道 DMA 位掩码与布局。`dma-tx` 占一 TX 通道和显式 IRQ 字节环； `dma-duplex` 占两通道与调用者提供有限 RX 块。线上 TC 与 DMA 内存完成分开；引擎撤每个请求源、观察稳定剩余计数、确认标志后 才归还缓冲区。无法证明撤销时保留请求／生产者借用。普通 RX 由 责任者推进服务重启，具有明确间隙／背压，不覆盖消费方块。有限 边界丢弃 DATA 字节时记录丢失，不据此提供循环 RX 或 Cache 合同。"
+msgstr "UART V1 通道 DMA 为精确 F103／GD303 共享，适配层独立断言旧式 USART 和 固定通道 DMA 位掩码与布局。`dma-tx` 占一 TX 通道和显式 IRQ 字节环； `dma-duplex` 占两通道与调用者提供有限 RX 块。线上 TC 与 DMA 内存完成分开；引擎撤每个请求源、观察稳定剩余计数、确认标志后 才归还缓冲区。无法证明撤销时保留请求／生产者借用。普通 RX 由 责任者推进服务重启，具有明确间隙／背压，不覆盖消费方块。有限 边界丢弃 DATA 字节时记录丢失，不据此提供循环 RX 或 Cache 合同。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:86
-msgid ""
-"The private implementation boundaries and reference configurations are "
-"maintained in [STM32F103](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/soc/stm32/stm32f103/README.md), "
-"[GD32F303](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/gd32/gd32f303/README.md), [STM32F407](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f407/README.md), "
-"[GD32F470](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/gd32/gd32f470/README.md), [STM32G474](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32g474/README.md), "
-"[STM32H743](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32h743/README.md) and "
-"[STM32U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32u575/README.md). Their links bind this website "
-"revision."
-msgstr ""
-"私有实现边界与参考配置由 [STM32F103](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f103/README.md)、[GD32F303](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/gd32/gd32f303/README.md)、[STM32F407](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f407/README.md)、[GD32F470](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/gd32/gd32f470/README.md)、[STM32G474](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32g474/README.md)、[STM32H743](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/README.md) 和 "
-"[STM32U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32u575/README.md) 维护。这些链接绑定当前站点源码版本。"
+msgid "仅硬件协议一致时共享逐字节操作；冷态验证、NVIC 撤销和芯片 资源仍归适配层。协议／勘误不同须新受审实现或精确窄能力，不能在 热路径加入推测家族分支。STM32 身份访问位于 `soc/stm32/common/stm32_identity.h`，跨厂商 SoC 控制合同位于 `soc/common/uart_control.h`。"
+msgstr "仅硬件协议一致时共享逐字节操作；冷态验证、NVIC 撤销和芯片 资源仍归适配层。协议／勘误不同须新受审实现或精确窄能力，不能在 热路径加入推测家族分支。STM32 身份访问位于 `soc/stm32/common/stm32_identity.h`，跨厂商 SoC 控制合同位于 `soc/common/uart_control.h`。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:95
-msgid "Board packages"
+msgid "接入与验证"
+msgstr "接入与验证"
+
+msgid "CMake 是唯一源码图，未选算法不能因文件存在而编译。检查选定源码的真实 链接保留情况和 Flash／RAM 成本。寄存器边界模型执行真实引擎与适配层， 覆盖拒绝、错误、取消、失败排空、实例隔离；每个选定 ARM 实现分别编译。Native 模型与 ARM 链接建立不同软件属性， 时序／电气必须物理执行。"
+msgstr "CMake 是唯一源码图，未选算法不能因文件存在而编译。检查选定源码的真实 链接保留情况和 Flash／RAM 成本。寄存器边界模型执行真实引擎与适配层， 覆盖拒绝、错误、取消、失败排空、实例隔离；每个选定 ARM 实现分别编译。Native 模型与 ARM 链接建立不同软件属性， 时序／电气必须物理执行。"
+
+msgid "维护入口见[执行预算](/design/soc-execution-budgets.md)与 [provider 接入指南](/guides/provider-porting.md)。"
+msgstr "维护入口见[执行预算](/design/soc-execution-budgets.md)与 [provider 接入指南](/guides/provider-porting.md)。"
+
+msgid "精确实现边界与参考配置分别见 [STM32F103](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f103/README.md)、 [GD32F303](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/gd32/gd32f303/README.md)、 [STM32F407](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f407/README.md)、 [GD32F470](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/gd32/gd32f470/README.md)、 [STM32G474](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32g474/README.md)、 [STM32H743](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/README.md)和 [STM32U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/README.md)。站点链接绑定当前文档 revision， 每个 family 的完整退出条件和实际证据仍以对应合同为准。"
+msgstr "精确实现边界与参考配置分别见 [STM32F103](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f103/README.md)、 [GD32F303](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/gd32/gd32f303/README.md)、 [STM32F407](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f407/README.md)、 [GD32F470](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/gd32/gd32f470/README.md)、 [STM32G474](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32g474/README.md)、 [STM32H743](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/README.md)和 [STM32U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32u575/README.md)。站点链接绑定当前文档 revision， 每个 family 的完整退出条件和实际证据仍以对应合同为准。"
+
+msgid "Board 包"
 msgstr "Board 包"
 
-#: ../../../../tmp/nexus-quality-20261019/boards/README.md:2
-msgid "Reviewed Board facts"
-msgstr "经过审查的 Board 事实"
+msgid "板级事实与接入"
+msgstr "板级事实与接入"
 
-#: ../../../../tmp/nexus-quality-20261019/boards/README.md:4
-msgid ""
-"A Board package records PCB/source identity, the exact SoC, oscillators, "
-"reviewed controller bindings, safe initial levels, reserved resources, "
-"provenance and explicitly unknown electrical facts. It reuses the selected "
-"[SoC provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/README.md); it does not copy drivers or vendor SDKs."
-msgstr ""
-"Board 包记录 PCB／来源身份、精确 SoC、晶振、已审控制器绑定、安全初始电平、保留资源、资料来源，以及明确未知的电气事实。它复用所选 [SoC"
-" provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/README.md)，不复制驱动或厂商 SDK。"
+msgid "Board 包描述精确 SoC 与 PCB 的连接条件：来源身份、晶振、已审控制器绑定、初始安全 电平、保留资源，以及尚未确认的电气事实。它复用 [SoC 实现](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/README.md)， 不复制驱动或厂商 SDK，也不创建产品任务。"
+msgstr "Board 包描述精确 SoC 与 PCB 的连接条件：来源身份、晶振、已审控制器绑定、初始安全 电平、保留资源，以及尚未确认的电气事实。它复用 [SoC 实现](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/README.md)， 不复制驱动或厂商 SDK，也不创建产品任务。"
 
-#: ../../../../tmp/nexus-quality-20261019/boards/README.md:15
-msgid ""
-"Private PCB packages belong in external product repositories and are "
-"selected through `board_package`. Maintained public packages are selected "
-"through `board`. Keep the family identifier independent of the "
-"manufacturer's physical directory. Board declarations cannot change a chip's"
-" memory geometry or enable an unmaintained clock profile, DMA route or "
-"controller mode."
-msgstr ""
-"私有 PCB 包属于外部产品仓库，通过 `board_package` 选择。维护中的公共包通过 `board` "
-"选择。系列标识须独立于厂家的物理目录。Board 声明不能改变芯片内存几何，也不能启用未维护的时钟 profile、DMA 路由或控制器模式。"
+msgid "包结构与配置边界"
+msgstr "包结构与配置边界"
 
-#: ../../../../tmp/nexus-quality-20261019/boards/README.md:21
-msgid ""
-"Start with an exact part and a small reviewed route set, then follow the "
-"[Board porting guide](/guides/board-porting.md). A syntactically valid JSON "
-"file does not establish fitted components, connector continuity, power "
-"supply or physical timing. Uninspected PCB revisions and jumpers remain "
-"unknown; software fixtures do not qualify a real PCB. MCU physical HIL "
-"remains `not_executed`."
-msgstr ""
-"从精确料号和少量已审路由开始，再遵循 [Board 接入指南](/guides/board-porting.md)。JSON "
-"语法有效不能证明器件装配、连接器导通、电源或物理时序。未检查的 PCB 修订和跳线仍为未知；软件夹具不建立真实 PCB 的资格。MCU 实物 HIL "
-"仍为 `not_executed`。"
+msgid "公开包通过 `board` 选择；私有 PCB 包存放于外部产品仓库，通过 `board_package` 选择。系列标识不依赖厂家物理目录名。Board 声明不能改变芯片内存几何，也不能开放 尚未维护的时钟、DMA 路由或控制器模式。"
+msgstr "公开包通过 `board` 选择；私有 PCB 包存放于外部产品仓库，通过 `board_package` 选择。系列标识不依赖厂家物理目录名。Board 声明不能改变芯片内存几何，也不能开放 尚未维护的时钟、DMA 路由或控制器模式。"
 
-# Reviewed against the actual complete-site gettext expansion of io/README.md.
-msgid "A memory-window loan returns an address, byte size and epoch. Ordinary CPU loads/stores use that address directly without dispatch per access. The caller joins all derived pointer users before releasing the original stable loan. `cpu-window` and `startup-memory` are explicit separate configuration modes: startup backing owns the selected SRAM for the whole image lifetime and cannot grant an overlapping whole-bank loan. Its C receipt already owns that backing before Platform startup; context, preflight, identity and startup failures never erase it. Global stop reports the retained responsibility before withdrawing shared pads or system clocks. Geometry reports selected software facts, not physical fitting or memory timing qualification. No DMA, heap, external stack or executable-memory permission follows from either face."
-msgstr "内存窗口借用返回地址、字节大小和 epoch。普通 CPU 读写直接使用该地址，每次访问不经分派。归还原始稳定借用前，调用方必须汇合所有派生指针使用者。`cpu-window` 与 `startup-memory` 是显式分离的配置模式：启动支撑在整个镜像生命周期内持有所选 SRAM，不能授予与其重叠的整 Bank 借用。其 C 回执在 Platform 启动前已持有这部分支撑内存；上下文、预检、身份和启动失败都不会清除该责任。全局停机在撤出共享引脚或系统时钟前报告保留的责任。几何报告所选软件事实，不证明物理实装或内存时序资格。两类接口均不授予 DMA、堆、外部栈或可执行内存权限。"
+msgid "当前包导航"
+msgstr "当前包导航"
 
-# Reviewed against the actual complete-site gettext expansion of io/README.md.
-msgid "An optional RS485 owner obtains its UART face and admission callback using the same strong UART reference: `nx_factory_uart_ref` and `nx_factory_uart_tx_validator_ref`. Only explicitly reviewed exact provider modes export that existing callback; other modes and invalid IDs return NULL. Lookup allocates nothing, touches no hardware and admits no transfer. The shared function is not instance authentication: the caller pairs the exact context and owns TX exclusively. It supplies stable adapter/configuration storage, a GPIO direction face, polarity and explicit setup/hold durations. No role framework, per-UART state or additional operations-table field is introduced."
-msgstr "可选 RS485 所有者使用相同的强类型 UART 引用，通过 `nx_factory_uart_ref` 和 `nx_factory_uart_tx_validator_ref` 取得 UART 接口与准入回调。只有显式审阅的精确 provider 模式才导出该既有回调；其他模式及无效 ID 返回 NULL。查找不分配存储、不接触硬件，也不准入传输。共享函数不提供实例认证：调用方须配对精确 context，并独占 TX。调用方提供稳定的适配器/配置存储、GPIO 方向接口、极性及显式建立/保持时长。不引入角色框架、每 UART 状态或额外方法表字段。"
+msgid "包"
+msgstr "包"
 
-# Reviewed against the actual complete-site gettext expansion of io/README.md.
-msgid "The selected external-bus path separates a shared `nx_external_bus_port_t` controller from its `nx_parallel16_endpoint_t` and `nx_memory_window_port_t` bank faces. Platform prepares the concrete controller in C and acquires the selected display bank; factory lookup only returns stable readonly faces. Parallel word calls are synchronous and settle every CPU span before returning. The display component consumes that public endpoint and a readonly caller configuration; the SoC imports no component protocol or vendor-facing public type."
-msgstr "所选外部总线路径将共享的 `nx_external_bus_port_t` 控制器与其 `nx_parallel16_endpoint_t`、`nx_memory_window_port_t` Bank 接口区分。Platform 在 C 中准备具体控制器并取得所选显示 Bank；factory 查找仅返回稳定只读接口。并行字调用为同步调用，返回前结束对每个 CPU 缓冲区的访问。显示组件使用该公共端点和调用方只读配置；SoC 不引入组件协议或面向厂商的公共类型。"
+msgid "资料与适用边界"
+msgstr "资料与适用边界"
+
+msgid "[Native 事实](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/native_reference/board.json)"
+msgstr "[Native 事实](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/native_reference/board.json)"
+
+msgid "宿主模型，无实物 PCB；架构边界见 [Native provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/native/README.md)"
+msgstr "宿主模型，无实物 PCB；架构边界见 [Native provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/native/README.md)"
+
+msgid "[启明 F407ZG V3.1](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407_qiming_v31/README.md)"
+msgstr "[启明 F407ZG V3.1](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407_qiming_v31/README.md)"
+
+msgid "原 V3.1 手册接线；不代表已确认 PCB 修订"
+msgstr "原 V3.1 手册接线；不代表已确认 PCB 修订"
+
+msgid "[启明 F407ZG 核心板](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407zg_qiming_core/README.md)"
+msgstr "[启明 F407ZG 核心板](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407zg_qiming_core/README.md)"
+
+msgid "独立核心板原理图；选装器件必须显式声明"
+msgstr "独立核心板原理图；选装器件必须显式声明"
+
+msgid "[启明 F407ZG V4.1](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407zg_qiming_v41/README.md)"
+msgstr "[启明 F407ZG V4.1](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407zg_qiming_v41/README.md)"
+
+msgid "独立高配板原理图；跳线、收发器和 PHY 未知项分列"
+msgstr "独立高配板原理图；跳线、收发器和 PHY 未知项分列"
+
+msgid "[天空星 F407VE 青春版](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407ve_sky_qingchun/README.md)"
+msgstr "[天空星 F407VE 青春版](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407ve_sky_qingchun/README.md)"
+
+msgid "VE100 封装及青春版资料，不推广到 VG 高配版"
+msgstr "VE100 封装及青春版资料，不推广到 VG 高配版"
+
+msgid "[梁山派 GD32F470ZG](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/gd32f470_liangshan/README.md)"
+msgstr "[梁山派 GD32F470ZG](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/gd32f470_liangshan/README.md)"
+
+msgid "资料已审路线；实物 PCB 与外设电气待检查"
+msgstr "资料已审路线；实物 PCB 与外设电气待检查"
+
+msgid "[NUCLEO-F103RB](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f103_reference/README.md)"
+msgstr "[NUCLEO-F103RB](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f103_reference/README.md)"
+
+msgid "手册来源的软件参考，VCP 焊桥须实际核对"
+msgstr "手册来源的软件参考，VCP 焊桥须实际核对"
+
+msgid "[NUCLEO-G474RE](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32g474re_hse24_reference/README.md)"
+msgstr "[NUCLEO-G474RE](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32g474re_hse24_reference/README.md)"
+
+msgid "MB1367 HSE24 参考及明确标注的芯片路线夹具"
+msgstr "MB1367 HSE24 参考及明确标注的芯片路线夹具"
+
+msgid "[NUCLEO-H743ZI2](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32h743_nucleo_zi2/README.md)"
+msgstr "[NUCLEO-H743ZI2](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32h743_nucleo_zi2/README.md)"
+
+msgid "MB1364 来源参考，供电与焊桥未实物观察"
+msgstr "MB1364 来源参考，供电与焊桥未实物观察"
+
+msgid "[NUCLEO-U575ZI-Q](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32u575_nucleo_zi_q/README.md)"
+msgstr "[NUCLEO-U575ZI-Q](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32u575_nucleo_zi_q/README.md)"
+
+msgid "MB1549 单状态参考，option bytes 由外部启动方确认"
+msgstr "MB1549 单状态参考，option bytes 由外部启动方确认"
+
+msgid "[GD32F303RCT6](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/gd32f303_reference/README.md)"
+msgstr "[GD32F303RCT6](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/gd32f303_reference/README.md)"
+
+msgid "精确芯片封装软件夹具，不声明制造 PCB"
+msgstr "精确芯片封装软件夹具，不声明制造 PCB"
+
+msgid "[H743 外设组合](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32h743zi_hsi_reference/README.md)"
+msgstr "[H743 外设组合](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32h743zi_hsi_reference/README.md)"
+
+msgid "HSI32/64 的引脚组合参考，不声明实际连接器"
+msgstr "HSI32/64 的引脚组合参考，不声明实际连接器"
+
+msgid "[H743 RTS/CTS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32h743zi_rtscts_reference/README.md)"
+msgstr "[H743 RTS/CTS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32h743zi_rtscts_reference/README.md)"
+
+msgid "精确 AF 四线参考，外部连接与响应界限另行提供"
+msgstr "精确 AF 四线参考，外部连接与响应界限另行提供"
+
+msgid "[U575 RTS/CTS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32u575zi_rtscts_reference/README.md)"
+msgstr "[U575 RTS/CTS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32u575zi_rtscts_reference/README.md)"
+
+msgid "精确 AF 四线参考，不等于 Nucleo VCP 接线"
+msgstr "精确 AF 四线参考，不等于 Nucleo VCP 接线"
+
+msgid "[U575 RTC RUN 事实](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32u575zi_rtc_reference/board.json)"
+msgstr "[U575 RTC RUN 事实](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32u575zi_rtc_reference/board.json)"
+
+msgid "内部 RTC 软件参考；备份域与晶振由外部 boot owner 预备，不声明实际 PCB／VBAT／Stop2 资格"
+msgstr "内部 RTC 软件参考；备份域与晶振由外部 boot owner 预备，不声明实际 PCB／VBAT／Stop2 资格"
+
+msgid "[U575 LPTIM2 RUN 事实](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32u575zi_lptim_reference/board.json)"
+msgstr "[U575 LPTIM2 RUN 事实](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32u575zi_lptim_reference/board.json)"
+
+msgid "无外部引脚的 PCLK1 单次计时参考；不建立 STOP／自主运行或实板资格"
+msgstr "无外部引脚的 PCLK1 单次计时参考；不建立 STOP／自主运行或实板资格"
+
+msgid "导航覆盖当前事实包；有独立 README 的包链接其说明，其余直接链接完整事实和所属 SoC 合同。新增包时同时核对该表，不能把有 README 的数量当作全部 Board 数量。"
+msgstr "导航覆盖当前事实包；有独立 README 的包链接其说明，其余直接链接完整事实和所属 SoC 合同。新增包时同时核对该表，不能把有 README 的数量当作全部 Board 数量。"
+
+msgid "架构与接入顺序"
+msgstr "架构与接入顺序"
+
+msgid "![FIG-03：Board 事实进入严格配置和静态生成链](../docs/assets/diagrams/configuration-generation.svg)"
+msgstr "![FIG-03：Board 事实进入严格配置和静态生成链](../docs/assets/diagrams/configuration-generation.svg)"
+
+msgid "FIG-03：Board 事实进入严格配置和静态生成链"
+msgstr "FIG-03：Board 事实进入严格配置和静态生成链"
+
+msgid "图表示构建期事实与产物关系，不是运行时查找，也不表示实板已经通过。 先固定精确料号和最小已审路线，再依照 [Board 接入指南](/guides/board-porting.md) 编写事实、选择装配、检查冲突并验证实际目标。"
+msgstr "图表示构建期事实与产物关系，不是运行时查找，也不表示实板已经通过。 先固定精确料号和最小已审路线，再依照 [Board 接入指南](/guides/board-porting.md) 编写事实、选择装配、检查冲突并验证实际目标。"
+
+msgid "JSON 语法正确不证明器件已焊、连接器导通、供电兼容或物理时序成立。未检查的 PCB 修订和跳线保持未知；软件夹具不建立真实 PCB 资格。当前 MCU 实板 HIL 为 `not_executed`。"
+msgstr "JSON 语法正确不证明器件已焊、连接器导通、供电兼容或物理时序成立。未检查的 PCB 修订和跳线保持未知；软件夹具不建立真实 PCB 资格。当前 MCU 实板 HIL 为 `not_executed`。"

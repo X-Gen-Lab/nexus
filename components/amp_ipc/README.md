@@ -1,73 +1,47 @@
-# Optional epoch-safe AMP shared-memory lane
+# epoch 安全的 AMP 共享内存通道
 
-`Nexus::AMPIPC` supplies a bounded unidirectional lane. The public
-`nexus/components/amp_ipc_storage.h` header defines caller-owned endpoint,
-configuration and local-slot storage; `amp_ipc.h` defines operations and tickets.
-One sender and one receiver own separate offer/ACK cache lines. Each endpoint has
-one serialized privileged Thread executor. Two lanes provide bidirectional
-communication. There are no allocated objects, registry, interrupts or workers.
+`Nexus::AMPIPC` 提供有界单向通道。公共 `nexus/components/amp_ipc_storage.h` 定义
+调用者提供的 endpoint、配置和本地 slot 存储，`amp_ipc.h` 定义操作与 ticket。发送方
+和接收方分别独占 offer／ACK cache line，每端只有一个串行特权 Thread 执行者。
+双向通信显式使用两条通道；组件不创建堆对象、注册表、中断或 worker。
 
-The integration supplies the exact shared payload window, slot count, nonzero
-boot epochs, coherent atomic control-word operations and cache-maintenance port.
-Cache granules are explicit powers of two from 1 through 64 bytes. Each granule
-divides the fixed 64-byte wire isolation unit. All shared objects and payload
-spans have complete aligned cache lines; sender payload loans cannot overlap.
-The component validates address overflow, typed alignment and storage/output
-aliasing before admission. It sends shared offsets and lengths, never pointers.
+[FIG-23 共享机制所有权](../../docs/assets/diagrams/io-extension-ownership.svg)区分
+软件机制、外部证明与未完成物理退出，不代表新增硬件支持。
 
-The unique-role claim callback grants the hardware owner and atomically rejects
-every reused or decreasing local boot epoch, including after a normal join.
-The authoritative boot owner retains that history across resets and fails closed
-at exhaustion. The endpoint never reconstructs live or joined storage. Per-slot
-32-bit sequences increase without rollover; the final sequence retires its slot.
-Every copied ticket/control requires its original endpoint storage to remain alive.
+## 端口、身份与布局
 
-A successful send retains its payload until poll acquire-observes an ACK with
-the exact sender epoch, receiver epoch and slot sequence. Cache failures and peer
-epoch changes retain outstanding loans. A mismatch permanently closes that
-endpoint; restoring stale boot words cannot reopen it. Old-boot offers are inert
-and cannot block fresh offers in later slots. Successful receiver admission
-requires offer then payload invalidation. The caller joins all readers before
-finish; a valid finish consumes the caller view even if ACK clean/publication
-cannot complete. Failed ACKs retain endpoint storage and may be retried.
+集成方提供精确共享 payload window、slot 数、非零 boot epoch、coherent 原子控制字
+操作和 cache 维护端口。cache granule 是 1～64 字节的二次幂，必须整除固定 64 字节
+wire 隔离单元。全部共享对象与 payload span 覆盖完整且对齐的 cache line；发送方
+payload 借用不能互相重叠。准入前检查地址溢出、类型对齐和存储／输出别名。wire
+只发送 offset／length，不发送跨核指针。
 
-Close blocks new sends/receives. Ordinary join waits for exact sender ACKs and
-receiver finishes. Reset join additionally requires the port to prove that the
-exact old peer CPU, DMA, IRQ and observers can never access that physical lane
-and payload again. Receiver views must already have been consumed by finish.
-An observed new epoch, cancellation or timeout does not supply that proof.
-Only successful join relinquishes the unique owner. Endpoint/control storage
-remains alive until all copied ticket/control observers have joined.
+独占 role claim callback 授予硬件所有权，并原子拒绝重复或递减的本地 boot epoch，
+普通 join 后也不能重用。权威 boot owner 跨复位保留历史，耗尽时关闭准入。endpoint
+不重建 live 或已 join 的存储。每 slot 的 32 位 sequence 单调增加且不回绕，最终
+sequence 后 slot 退休。复制的 ticket／control 仍要求原 endpoint 存储存活。
 
-This is common software mechanism, not a selected AMP hardware integration.
-An exact multicore target, shared-region reachability/attributes, resource
-partition owner, control-word atomicity, cache ordering and trustworthy reset
-proof remain unselected. STM32H743 is single-core and is not an AMP target.
-Host GoogleTest/GoogleMock execution establishes this algorithm's software
-behavior; no physical cache/reset/IPC HIL has executed. IO-40's original unique
-hardware-owner and remote-reset/cache exits remain open.
+## 发送、接收与退出
 
-## 可选的 epoch 安全 AMP 共享内存通道
+发送成功后继续借用 payload，直到 poll 以 acquire 观察到 sender epoch、receiver
+epoch 和 slot sequence 均精确匹配的 ACK。cache 失败或 peer epoch 变化保留现有
+借用；epoch 不匹配永久关闭该 endpoint，恢复旧 boot word 不能重新开放。旧 boot
+的 offer 不生效，也不能阻塞后续 slot 中的新 offer。
 
-`Nexus::AMPIPC` 提供有界单向通道，公开 storage 头文件定义调用者提供的端点、
-配置和本地 slot。发送方与接收方独占不同的 offer／ACK cache line；每端只有一个
-串行特权 Thread executor。双向通信显式使用两条通道，无堆、注册表或隐藏任务。
-配置明确指定共享 payload、容量、非零 boot epoch、cache granule 与原子发布端口。
-granule 是 1 到 64 的二次幂，必须整除固定 64 字节隔离单元。软件检查地址溢出、
-自然对齐和配置／输出重叠；wire 只传 offset／length，不传跨核指针。
+接收准入先 invalidate offer，再 invalidate payload。调用者在 finish 前会合所有
+reader；有效 finish 即消费本地 view，即使 ACK clean／publication 失败也不能再次
+使用该 view。ACK 失败保留 endpoint 存储，可重试完成发布。
 
-独占 claim 端口同时拒绝重复或递减的本地 boot epoch，普通 join 后也不能重用。
-硬件 boot owner 跨复位保留历史，耗尽时关闭准入。slot sequence 不回绕，最终身份
-永久退休。发送借用只有精确 epoch／sequence 的 ACK 被 acquire 观察，或旧 peer
-停止证明通过后才结束。cache 失败、epoch 变化和超时都不撤销借用；旧 boot offer
-不会阻塞后面的新 offer。接收前依次 invalidate descriptor 和 payload。调用者先
-join 本地 reader，再 finish；有效 finish 即消费本地 view，即使 ACK 失败仍须保留
-端点／slot 存储并重试或恢复。复制的 ticket／control 的观察者全部 join 前，原端点
-存储始终存活。
+close 阻止新 send／receive。普通 join 等待精确 sender ACK 和 receiver finish；
+reset join 另外要求端口证明指定旧 peer 的 CPU、DMA、IRQ 和 observer 永远不能再
+访问该物理 lane 与 payload，且 receiver view 已被 finish 消费。新 epoch、取消或
+超时本身不是停止证明。仅成功 join 归还独占 owner；复制 ticket／control 的观察者
+也全部会合后，才可释放 endpoint／control 存储。
 
-close 关闭准入；普通 join 等待精确 ACK／finish。reset join 必须证明指定旧 peer
-的 CPU、DMA、IRQ 和 observer 永远不再访问该物理通道及 payload，且接收 view 已
-finish。仅观察新 epoch、取消或超时都不是停止证明。当前未选择确切多核芯片、共享
-内存属性、唯一硬件资源 owner、cache／原子性及可信复位端口。STM32H743 为单核，
-不作为 AMP 目标。主机测试只证明软件算法，物理 HIL 未执行，IO-40 原始退出条件
-仍未完成。
+## 软件与硬件边界
+
+此目录提供通用软件机制，不选择具体多核硬件集成。共享区可达性与属性、资源分区
+owner、控制字原子性、cache 顺序和可信 reset 证明必须由精确平台提供。STM32H743
+为单核，不是 AMP 目标；独立芯片扩展也须按自身合同验收，不能继承通用算法的资格。
+主机 GoogleTest／GoogleMock 证明实际执行范围的软件行为，未执行物理 cache／reset／
+IPC HIL，IO-40 原始唯一硬件 owner 与 remote-reset／cache 退出保持开放。

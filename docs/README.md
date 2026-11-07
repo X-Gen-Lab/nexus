@@ -5,6 +5,7 @@
 
 | 阅读目的 | 当前入口 |
 | --- | --- |
+| 平台中文总览与源码分层 | [仓库 README](../README.md)、[源码架构合同](explanation/source-map.md) |
 | 从读者任务开始 | [站点正文首页](index.md) |
 | 取得与当前文档匹配的源码 | [固定源码与递归依赖](guides/source-checkout.md) |
 | 首次消费与运行 Native 夹具 | [SDK 教程](tutorials/source-sdk.md)、[异步 I/O 教程](tutorials/async-io.md) |

@@ -1,64 +1,38 @@
-# Bounded GPIO SPI
+# 有界 GPIO SPI
 
-`Nexus::SoftwareSPI` is an optional C11, caller-owned synchronous SPI mode-zero
-endpoint. It uses the public GPIO and clock faces. One selected configuration
-owns SCK, MOSI, MISO and one active-low CS; those pins need not form a hardware
-SPI alternate-function route. The component adds no worker, interrupt handler,
-allocator, runtime registry or OS lock. Instances share immutable method tables.
+`Nexus::SoftwareSPI` 是调用者持有的可选 C11 同步 SPI mode 0 endpoint，通过公共
+GPIO 和 clock 工作。每个配置拥有 SCK、MOSI、MISO 和一个低有效 CS，引脚不要求
+形成硬件 SPI 复用路线。实例共享只读方法表；不创建 worker、IRQ handler、allocator、
+运行时注册表或 OS 锁。
 
-The Qiming touch connector is one use: PA5 clock, PB1 MOSI, PB2 MISO and PB0 CS.
-These are Board facts, not pin constants inside this component. The caller first
-establishes the reviewed GPIO modes and clock, keeps their faces/configuration
-alive, and stops all users before returning the GPIO leases. Software SPI never
-changes a pin mode or starts/stops a shared clock.
+启明 touch 是一个例子：PA5 clock、PB1 MOSI、PB2 MISO、PB0 CS。这些来自 Board，
+不是组件内部 pin 常量。调用者先建立受审 GPIO mode 和 clock，保持 face／配置存活，
+停止所有用户后才归还 GPIO lease。组件不修改 pin mode，也不启停共享 clock。
 
-## Execution and ownership
+## 执行与借用
 
-The selected task is the only executor. Transfers are MSB-first, 8-bit, CPOL=0,
-CPHA=0, with one complete CS interval and 1..`max_bytes` bytes, at most 256.
-Every transfer requires a finite absolute deadline in the configured clock
-domain. Minimum half-period, CS setup and CS hold are explicit microseconds.
-Each wait also has a finite clock-read limit: failure to observe enough elapsed
-time returns IO instead of spinning indefinitely. Interrupts can lengthen any
-phase. These values do not establish physical bus frequency, maximum pulse
-length, CPU budget or device acquisition accuracy; validate those properties for
-the actual task/interrupt load and wiring.
+只有选定 task 执行。一次传输为 MSB-first、8 位、CPOL=0／CPHA=0，覆盖完整 CS
+区间，长度 1～`max_bytes`，上限 256。有限绝对 deadline 属于配置 clock 域，最小
+half-period、CS setup／hold 显式以 µs 提供。每个等待还有有限 clock-read 次数，
+不足以观察所需时间时返回 IO，不无限空转。IRQ 可延长任一阶段；配置最小时间不
+建立实际频率、最大脉宽、CPU 预算或采样精度，须按真实任务／IRQ 负载与接线测量。
 
-NULL TX sends 0xff; NULL RX discards input. At least one buffer must exist.
-Exact in-place TX/RX is safe because one complete TX byte is copied before RX
-publication. Partial overlap and known aliases with state, config, faces or the
-count output reject. Opaque GPIO/clock context extents remain caller duties.
-Only complete bytes update RX/count; an incomplete byte is not published.
+NULL TX 发送 `0xff`，NULL RX 丢弃输入，但至少一个 buffer 必须存在。精确原地
+TX／RX 安全，因为先复制完整 TX byte 再发布 RX；部分重叠及已知 state／config／
+face／count 别名拒绝。完整 opaque GPIO／clock context 范围由调用者保证。只有
+完整 byte 更新 RX／count，不发布半个 byte。
 
-A synchronous return ends every payload access. SUCCESS additionally requires
-all bits, configured delays and inactive CS/SCK/MOSI withdrawal to complete.
-Failure after select was attempted latches a fault even if idle cleanup succeeds.
-No further transfer is allowed until explicit port recovery or stop succeeds.
-A failed CS/clock GPIO write retains the same pin owner and binding; it does not
-claim physical withdrawal, retain TX/RX pointers or replay a byte. Recovery only
-retries the three idle outputs. Stop unbinds only after all three succeed; it
-does not restore Board pin modes. Callback reentry is BUSY, including during the
-first clock callback. Async submit, wake binding and DMA are unsupported.
+每次同步返回结束 payload 访问。SUCCESS 另外要求全部 bits、延时及 CS／SCK／MOSI
+inactive 撤回成功。一旦尝试 select，之后错误即锁存 fault，即使 idle 清理成功；
+显式 recover 或 stop 成功前拒绝新传输。
 
-## Verification boundary
+CS／clock GPIO 写入失败保留同一 pin owner 和绑定，不宣称物理撤回、不保留 TX／RX
+指针，也不重放 byte。recover 只重试三个 idle output；三个均成功后 stop 才解绑，
+不恢复 Board pin mode。包括首次 clock callback 在内的重入返回 BUSY。异步 submit、
+wake binding 和 DMA 均不支持。
 
-GoogleTest wire models execute the actual production C source and inspect bit
-order, rising-edge samples, CS intervals, minimum clock ticks, finite waiting,
-known aliases, callback reentry, partial bytes, failed assertion/withdrawal,
-recovery and instance isolation. Those observations do not qualify physical GPIO
-waveforms, interrupt latency or the Qiming connector.
+## 验证边界
 
-## 中文合同
-
-这是可选、静态、单任务持有的软件 SPI mode 0 端点。四个 GPIO 不要求属于同一硬件
-SPI 复用组；引脚模式、上拉、资源和时钟仍由外部 Board/装配负责。初始化不接管共享
-GPIO 或时钟，不启动任务和中断，不分配内存。
-
-一次调用覆盖完整 CS 区间，最多 256 字节，绝对 deadline 有限；半周期、CS 建立与
-保持时间由调用者明确声明。每次等待还有有限轮询次数，时钟不前进时失败。中断可延长
-波形，不能把配置的最短时间宣称为实测频率、最大延迟或器件采样精度。
-
-所有同步返回都结束对 TX/RX 的访问。只有完整传输并成功撤回 CS/时钟等输出才返回
-SUCCESS。选中尝试后的错误会锁存故障；无法撤回 GPIO 时继续保留相同引脚责任，必须
-显式 recover/stop 成功后才可复用，不保留 payload 指针或自动重放字节。停止不归还
-外部 GPIO 模式租约。回调重入返回 BUSY。IRQ/DMA 异步模式不在本实现范围内。
+GoogleTest wire 模型执行真实生产 C，检查位序、上升沿采样、CS 区间、最小 clock
+间隔、有限等待、别名、重入、partial byte、assert／withdraw 失败、恢复和实例隔离。
+这些结果不建立物理 GPIO 波形、IRQ 延迟或启明 connector 的资格。

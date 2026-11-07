@@ -1,382 +1,274 @@
-# STM32G474 provider
+<a id="stm32g474-provider"></a>
 
-This provider implements an exact STM32G474RET6 software reference: Cortex-M4F
-startup, one fixed 170 MHz clock transaction, independent TIM2 time, statically
-selected GPIO banks, six IRQ-byte UART controllers, SPI1/SPI2 polling endpoints,
-TIM3/TIM4 CH1 fixed-base PWM, independent IWDG and PA0/PA1 EXTI events. The
-acquisition software fixture adds ADC1 PA0/IN1 shots, finite TIM6-triggered normal
-DMA blocks, I2C1 PB8/PB9 finite polling and full physical dual-bank Flash. Public
-typed faces share readonly
-operations tables and keep mutable state private. There is no allocator, worker,
-runtime registry or automatic IRQ/DMA/polling fallback.
+# STM32G474 芯片集成
 
-The silicon route inventory covers the 52 package GPIO pads. The fixed profile
-reserves PF0/PF1 for HSE and PG10 for NRST until an explicit reviewed option-byte
-policy exists. Pad inventory does not authorize a PCB connection. USB and
-Ethernet remain unsupported here. ADC and I2C routes are software fixtures with
-no populated analog circuit, pull-ups or external device asserted.
+本目录维护精确 **STM32G474RET6** 的 C11 软件参考。它把芯片时钟、内存、IRQ／DMA
+和私有控制器实现连接到 Nexus 公共只读接口；板级接线、应用任务、执行进度和
+恢复策略仍由外部工程负责。此处列出的模式才属于维护范围，配置不会自动回退到
+轮询、另一时钟或未审核的 PCB 路由。物理 HIL 均为 `not_executed`。
 
-FDCAN1 now has exact STM32G474RET6 ISO-FD normal and internal-loopback software
-selections at 500 kbit/s / 2 Mbit/s, fixed 212-word physical message RAM and three
-hardware-priority TX slots. See [the CAN FD ownership contract](../../../docs/design/can-fd.md);
-transceiver wiring, physical timing and HIL remain unverified.
+## 架构与源码入口
 
-The source-reviewed reference Board is NUCLEO-G474RE, MB1367 C04/C05 documentation.
-The physical PCB revision, fitted crystal and solder bridges have not been
-inspected. No physical test has executed. The initial reference selects the
-24 MHz X3 crystal, PA5/LD2 and LPUART1 PA2/PA3 AF12 VCP routes. Applications must
-confirm the Board profile and own LED/console policy. See
-[the detailed contract](../../../docs/design/stm32g474.md).
+| 入口 | 职责 |
+| --- | --- |
+| [system.c](system.c) | RAM 初始化前的 `SystemInit`、固定时钟事务、回滚、保留的 TIM2 IRQ 与单一时间域 |
+| [drivers/platform_cold.c](drivers/platform_cold.c) | 选定资源准入、共享时钟和引脚租约、原值快照及失败清理 |
+| [drivers/](drivers/) | 各外设的 C 准备／关闭操作、准入、传输、读回、排空和恢复 |
+| [configure/](configure/) | 不可变资源配置、精确静态存储和固定类型化调用，不生成硬件算法 |
+| [CMakeLists.txt](CMakeLists.txt) | 按选定模式私有编译实际实现及 SDK 依赖 |
 
-## Private ownership
+公共接口使用共享只读方法表，每个实例保留独立私有状态。不创建分配器、后台任务、
+运行时注册表或 IRQ／DMA／轮询降级路径。选定 I2C 在既有引擎内通过私有编译期端口
+复用官方 LL 收发叶操作，不增加传输责任者或运行时转发层；命令访问例外见
+[官方驱动合同](../../../docs/design/official-stm32-provider.md)。
 
-`system.c` supplies the pre-RAM CPU-only `SystemInit`, checked clock startup and
-rollback, reserved TIM2 handler and the single time domain. The concrete C
-owner in `drivers/platform_cold.c` admits selected resources, acquires clock and
-pin leases, and retains failed cleanup for retry. Python emits immutable resource
-records, exact storage and fixed calls to C lifecycle functions. Per-controller
-prepare/close functions keep hardware algorithms in their C implementation.
-The C owner validates every selected pin before the first change and retains one
-`uint16_t` original state per selected pin with validity/gate ownership until
-complete Platform release. Driver GPIO stop establishes its declared idle;
-Platform release subsequently restores the original input/analog lease. A
-failed restore readback retains original snapshots and clock leases for ordinary
-cleanup retry. This storage is separate from any constructor's temporary local
-snapshot. Empty selections emit no peripheral cold owner or pin-state storage.
-Before system stop, every peripheral and OS consumer must already have joined.
-Clock changes and deep-sleep continuity are excluded from this fixed profile.
-Reserved TIM2 admission checks trigger, slave and output controls both before
-clock effects and after enabling its gate. Startup holds TRGO on disabled CEN
-while issuing UG, then restores reset selection before starting the counter.
-Refused reset release or trigger restoration retains the timer for cleanup retry.
+![共享 IP 与 SoC 源码归属图 FIG-31](../../../docs/assets/diagrams/driver-source-ownership.svg)
+说明源码维护关系；图中的关系不代表运行时转发或实板资格。资源解析、factory 与
+硬件生命周期的完整边界见[接入合同](../../../docs/design/integration-contracts.md)。
 
-The GPIO owner supplies an exact port/mask, output direction and initial/inactive
-levels. Latch readback precedes output mode publication. Partial initialization
-keeps `retained` set until safe rollback succeeds. The hot BSRR write is a direct
-hardware command, with no polling or hidden lock. Toggle is a read/modify/write
-sequence and requires external serialization with all users of the same pins.
+## 精确参考与模式导航
 
-Each UART owner supplies separate static state, ring, baud and IRQ policy.
-LPUART1 uses PA2/PA3 AF12, IRQ91 and PCLK170/PRESC16. USART1 PA9/PA10 AF7,
-USART2 PA2/PA3 AF7, USART3 PB10/PB11 AF7, UART4 PC10/PC11 AF5 and UART5
-PC12/PD2 AF5 use their own vectors, APB gates and PCLK170/PRESC1/OVER16.
-All select 8N1, FIFO-disabled bytes and priority5. Only mutually nonconflicting
-routes can be selected. The additional routes are silicon software fixtures,
-not a statement about VCP bridges or inspected connector access.
+基础参考使用 Cortex-M4F 启动、固定 170 MHz 时钟、独立 TIM2 时间域、选定 GPIO、
+六路 IRQ 字节 UART、SPI1／SPI2 轮询、TIM3／TIM4 CH1 固定 PWM、独立 IWDG 和
+PA0／PA1 EXTI。独立采集夹具增加 ADC1 PA0／IN1 单次转换、TIM6 触发的有限普通
+DMA、I2C1 PB8／PB9 有限轮询，以及完整物理双存储体 Flash。
 
-TX admission borrows request/payload until actual TC and source withdrawal
-precede SETTLED. Failed wire drain preserves QUARANTINED storage. Cold stop joins
-captured notifications and proves UE/TEACK/REACK/NVIC withdrawal before releasing
-ring/wake ownership. The IRQ moves at most one byte in each direction and records
-hardware facts. Notification is a hint; predicates remain authoritative. No RX
-event/block or DMA mode is advertised.
+| 模式／接口 | 精确维护范围 | 详细合同 |
+| --- | --- | --- |
+| GPIO／UART／SPI／PWM／IWDG／EXTI | 本文列明的封装、路由、频率与生命周期 | [G474 合同](../../../docs/design/stm32g474.md) |
+| FDCAN1 | ISO-FD 正常／内部环回，500 kbit/s／2 Mbit/s，212 字消息 RAM，3 个硬件优先级 TX 槽 | [CAN FD](../../../docs/design/can-fd.md) |
+| `shared-fixed-pwm` | 单一 TIM3 责任者的 CH1／CH2 两个公共接口 | [规范装配](../../../cmake/package/verification/io_evolution/g474-pwm-shared.toml) |
+| ADC／有限 DMA | PA0／ADC1_IN1、TIM6、DMA1 channel1／DMAMUX1 request5 | 本文采集说明 |
+| `pwm_adc`／`finite-regular-dma` | 单一责任者的有限 PWM／ADC 联合采样 | [联合采样](../../../docs/design/pwm-adc.md) |
+| `adc_group` | 有序规则组／注入组整数帧 | [ADC 序列](../../../docs/design/adc-group.md) |
 
-SPI1 PA5/PA6/PA7 and SPI2 PB13/PB14/PB15 select AF5, G4 DS=7, byte FIFO threshold
-and actual 8-bit DR accesses. Each active-low endpoint owns an explicit GPIO CS,
-mode0..3 and rate. At APB170, legal divisors yield 664063 Hz requested minimum
-through 42.5 MHz maximum; APB/2=85 MHz exceeds DS12288 Table89 and is rejected.
-Polling transfers are limited to 256 bytes and a finite absolute deadline, with
-a bounded poll budget as a second termination bound. Both FIFO levels and BSY
-must drain. Failures reset only the selected APB controller and require explicit
-recovery. If an accepted polling call cannot prove reset/idle or inactive CS,
-it retains the executor, buffers and controller/CS owners, masks IRQs and calls
-the fault observer; it parks if the observer returns. Idle stop/recovery failures
-retain retryable leases. There are no asynchronous submission or DMA methods.
+封装清单覆盖 52 个 GPIO 焊盘；固定配置保留 PF0／PF1 给 HSE、PG10 给 NRST，
+直至存在另行审核的选项字节策略。焊盘清单不授权 PCB 接线。USB 和 Ethernet
+未在本芯片实现接入，ADC／I2C 软件夹具也不声明已安装模拟电路、上拉或外接器件。
+FDCAN 收发器接线、物理时序与 HIL 均未验证。
 
-The ordinary `fixed-pwm` mode selects TIM3 CH1 PA6 AF2 or TIM4 CH1 PB6 AF2, each with exclusive ownership
-of its whole timer. It is edge-aligned, upcounting and active-high, with a fixed
-170 MHz/integer-divisor tick, divisor1..65536, period1..65535 and duty0..period.
-CCR preload stages duty for an update event; period/base changes are rejected.
-SPI/PWM use OSPEEDR11. Counter limits are logical: DS12288 Table56 at 30 pF gives
-50 MHz pad toggling at 1.62..2.7 V and 120 MHz at 2.7..3.6 V. Period two at
-170 MHz is 85 MHz only as counter arithmetic; actual supply/load/pulse
-conditions require Board qualification and are not inferred from this profile.
-Startup uses quiet UG and an inactive GPIO level. Stop proves output/counter
-withdrawal and Board idle; failed private close retains cleanup responsibility.
-Other channels, shared bases, complementary output, capture, break, IRQ and DMA
-are outside this profile.
+参考板卡来源为 NUCLEO-G474RE、MB1367 C04／C05 文档，默认声明 X3 24 MHz
+晶振、PA5／LD2 和 LPUART1 PA2／PA3 AF12 VCP。实物 PCB 修订、晶振与焊桥均未
+观察；产品必须确认实际配置，并自行负责 LED 和控制台策略。
 
-The separate `shared-fixed-pwm` selection uses exact TIM3 CH1/PA6 and CH2/PA7
-AF2 at the fixed 170 MHz kernel. Two ordinary `nx_pwm_port_t` factory faces
-point through readonly channel references to one physical owner, one immutable
-tick/period configuration and one cold initialization/final close. Both existing
-`[pwm]` declarations must agree on tick and period; no share flag or runtime
-registry is added. The sole normal input is
-[`g474-pwm-shared.toml`](../../../cmake/package/verification/io_evolution/g474-pwm-shared.toml).
-Its 1 MHz counter, 1000-tick period, duties 250/750 and PA6-low/PA7-high inactive
-latches are software reference choices, not inspected PCB or electrical facts.
+<a id="private-ownership"></a>
 
-Each shared-channel set changes only its CCR preload. A channel joining a
-running peer adopts the current phase without UG or counter restart; coherent
-group start and a full first pulse are not promised. Channel stop withdraws only
-its own output and establishes its Board inactive GPIO level; only the last
-channel stops CEN. Final physical close may use exclusive reset and must succeed
-before Platform releases either pad snapshot, added clock or System lease.
-Refused reset, inactive-latch or outer restoration retains the relevant cleanup
-responsibility. The pair excludes other whole-TIM3 owners and conflicting
-PA6/PA7 users. It uses no TIM3 IRQ or DMA; physical phase/pulse timing and HIL
-remain unmeasured.
+## 系统、时钟与引脚生命周期
 
-IWDG lookup and Platform startup never enable or feed the watchdog. Enable uses
-the RM0440 non-window sequence and reports DS12288 Table45 full-temperature LSI
-bounds of 29.5--34 kHz. Activation is irreversible, including later setup failure.
-An automatically active watchdog with a pending register update reports unknown
-timeout bounds. Failed preactivation LSI/debug cleanup retains private leases for
-Platform stop retry. An active watchdog prevents complete Platform shutdown;
-health, feed and reset/handoff policy belong to the external application.
+C 冷态资源责任者在第一次修改前验证全部选中引脚，每个引脚只保留一份 `uint16_t`
+原始状态，并记录有效性及门控所有权，直至 Platform 完整释放。GPIO 驱动停止时
+先建立声明的空闲电平，Platform 最后再恢复原输入／模拟配置并释放租约。读回失败
+保留原快照和时钟，供显式重试；这些存储独立于构造函数的临时局部快照。空装配
+不生成外设冷态资源责任者或引脚状态存储。系统停止前，全部外设和 OS 使用者必须
+已退出并完成会合。固定配置不支持运行中变频或深睡眠期间的时间连续性。
 
-EXTI `edge-event` selects PA0/EXTI0 (IRQ6) or PA1/EXTI1 (IRQ7), with independent
-vectors and priorities. These are exact silicon routes in a software fixture;
-they do not add NUCLEO button wiring or claim inspected connector access. The
-caller explicitly supplies raw rising/falling/both edges and 1..4096 event
-slots. A generated factory owns exactly that storage; no maximum pool exists.
-Read has one task consumer. Each IRQ acknowledges its own W1C pending bit and
-latches at most one timestamped, coalesced fact. Both-edge direction comes from
-the sampled GPIO level, not a complete edge history. Full storage preserves
-older facts, then exposes one loss boundary before any later accepted facts.
-New edges can reassert pending immediately after acknowledgement; the handler
-does not poll or misclassify that reassertion as a hardware fault.
+保留 TIM2 的准入在产生时钟效果前和开启门控后，分别检查触发、从模式和输出
+控制。启动保持 `CEN=0`，选择不传播更新触发的 TRGO 配置后发出 UG，处理更新事件，
+再恢复复位选择并启动计数。释放复位或恢复触发配置被拒绝时保留定时器，等待
+清理重试。
 
-Cold EXTI admission rejects live interrupt/event/trigger/pending state and the
-selected live NVIC vector before global effects. Platform acquires the shared
-SYSCFG gate once, preserves any preexisting gate, and holds GPIO leases through
-complete stop. Each line preserves/restores its own four-bit mux field. Stop
-attempts independent line-source and vector withdrawal; a refused readback keeps
-event storage, wake target and mux recovery responsibility. An active wake
-publisher must join before stop can release it. Kernel notifications validate
-the actual vector priority against the generated policy. External bias, debounce,
-edge-rate budget and safe input wiring remain Board/product responsibilities.
+GPIO 责任者限定端口、位掩码、方向及初始／非活动电平，先读回输出锁存值，再
+切换为输出模式。部分初始化保持 `retained`，直到安全回滚成功。热路径 BSRR 是
+直接硬件命令，无轮询或隐藏锁；翻转操作是读改写，必须与同引脚全部使用者显式
+串行执行。
 
-## Selected acquisition and physical Flash
+## UART：独立实例与最终完成
 
-The acquisition fixture selects PA0/ADC1_IN1, single-ended 12-bit raw counts,
-SYSCLK/128 = 1.328125 MHz, bulb sampling and sample code0 (2.5 cycles). It owns
-the ADC12 common clock and explicit SYSCLK mux, rejects other ADC owners, waits
-22 us for the regulator and 5 us after calibration. These delays preserve the
-20 us and four-ADC-cycle minimums after 1 MHz time quantization. ES0430
-2.7.8--10 requires keeping the mux selected and discarding the first conversion
-after idle or software STOP. Each enable and conversion clears, barriers and
-reads back its own completion flags; stale ADRDY/EOC cannot become new data.
-Each shot performs two conversions separated by a
-3 us wait and publishes only the second. The masked prime/arm phase has one
-absolute 100 us deadline. Sampling is disabled before returning or waiting for
-another block. Failed drain retains the calling frame or producer loan.
-Declared reference voltage is nominal; raw counts do not establish accuracy.
+每路 UART 有独立静态状态、环形缓冲区、波特率和 IRQ 策略，均为 8N1、FIFO 关闭、
+优先级 5。只有互不冲突的路由可以组合：
 
-Finite DMA additionally owns TIM6, DMA1 channel1 and DMAMUX1 channel0 request5.
-Each block is primed before arming. Exact rates 2.5--50 kHz must divide the 1 MHz
-timer tick. RM0440 bulb sampling ends on the next trigger, so SMPR alone does not
-bound its aperture. DS12288 Table66 limits it to 2.5--640.5 ADC cycles: at the
-selected clock, the 20--400 us periods minus 12.5 conversion cycles give
-14.0625--518.75 sampling cycles. After UG, CNT is set to period minus ten; the
-first trigger follows ten timer ticks after CEN, with the same 100 us deadline
-checked before and after enabling CEN. The common SYSCLK source fixes these
-ratios. Host models cannot establish analog timing or physical clock accuracy.
+| 实例 | 引脚／复用 | 时钟与串行配置 |
+| --- | --- | --- |
+| LPUART1 | PA2／PA3 AF12，IRQ91 | PCLK170／PRESC16 |
+| USART1 | PA9／PA10 AF7 | 独立向量和 APB 门控，PCLK170／PRESC1／OVER16 |
+| USART2 | PA2／PA3 AF7 | 同上，使用本实例向量与门控 |
+| USART3 | PB10／PB11 AF7 | 同上，使用本实例向量与门控 |
+| UART4 | PC10／PC11 AF5 | 同上，使用本实例向量与门控 |
+| UART5 | PC12／PD2 AF5 | 同上，使用本实例向量与门控 |
 
-Halfword normal DMA never overwrites a consumer loan. IRQ stops the trigger;
-task service observes DMA/ADC withdrawal and disabled ADEN before publishing.
-The next service explicitly rearms an available block; backpressure leaves the
-sampler disabled. READY/BORROWED blocks still require consumer release. Close
-restores and reads back all owned timer, DMA and mux configuration before
-releasing the lease; refused restoration retains it for retry. The mode has
-trigger gaps and no hardware aperture timestamp. ES0430 2.3.1 requires specific
-TC/HT/TE acknowledgement, never global GIF clear on an active lane.
+附加路由是硅片软件参考，不证明已观察 VCP 焊桥或连接器。IRQ 每个方向至多搬运
+1 字节并记录硬件事实；通知只提示重新检查权威判定条件，不是完成凭据。不开放
+RX 事件、接收块或 DMA 模式。
 
-The selected linker and DMA domains use 96 KiB SRAM1/2. CCM32 KiB is counted
-once at 0x10000000; silicon also permits DMA through its 0x20018000 alias
-(RM0440 p89). Neither CCM address is selected by this software policy.
+TX 准入借用请求及有效数据，只有实际 TC 和来源撤回之后才发布 SETTLED。线上
+排空失败保留 QUARANTINED 存储。冷态停止会合已捕获的通知，并证明 UE／TEACK／
+REACK／NVIC 已撤回，成功后才释放环形缓冲区和唤醒发布责任。
 
-I2C1 selects PB8/PB9 AF4 open drain with external pull-ups, HSI16 kernel,
-TIMINGR `0x30420f13`, analog filter and DNF0. The reviewed electrical envelope is
-standard mode, rise at most 1000 ns and fall at most 300 ns. The finite master
-supports one to eight 7-bit messages, each one to 256 bytes, repeated START and
-one final STOP. A 256-byte message uses 255+1 RELOAD chunks. STOPF and cleared
-BUSY precede return. NACK/arbitration/error aborts reset the local controller,
-then require explicit recovery; this does not recover a physically stuck bus.
-ES0430 2.15.2 master-only spurious BERR is acknowledged without abort. No IRQ,
-DMA, slave mode, hidden retry or GPIO clock pulses are selected.
+## SPI：有限轮询与失败停驻
 
-The Flash face exposes all 512 KiB, two banks of 128 pages, 2 KiB erase pages
-and 8-byte ECC programming units. DBANK=1, BFB2=0 and observed FB_MODE=0 are
-required; the SYSCFG clock remains owned and observed before reading the live
-mapping. Remapped banks and foreign Flash control modes are rejected before
-unlock, data or erase effects. Page128 selects bank2/page0. There is no product
-reservation. The fixed software reference assumes 3300 mV; the Board must
-confirm programming voltage. Geometry explicitly advertises fresh-erase
-provenance: each written ECC line must come from a real erase, which byte
-readback cannot prove. Each all-ones input unit skips the physical pulse so it
-does not consume an erased ECC line. Program and erase wait for any live pulse
-after an elapsed deadline and relock after idle. Each pulse clears and reads
-back its own W1C status, checks the prepared control mode, and requires a fresh
-EOP after BSY withdrawal; a preceding page cannot provide its completion.
-RM0440 Category3 Table16 and FLASH_SR.Bit0 require EOPIE for EOP to latch.
-EOPIE/ERRIE are explicitly enabled only for the owned pulse while exclusively
-claimed FLASH_IRQn4 remains disabled in NVIC. Cold/live enabled, pending, active
-IRQ or ECCIE owners are rejected. Cleanup observes source withdrawal, clears
-status, then clears NVIC pending and observes disabled, not-pending and
-not-active before release without changing its priority. Failed cleanup retains
-a retryable lease.
-ES0430 2.2.2 requires disabling
-data cache before pulses and resetting it before restoring the original policy.
-Products own explicit regions, watchdog, execution stalls and power-loss
-recovery. Option writes, fast programming and mass erase are excluded.
+SPI1 使用 PA5／PA6／PA7，SPI2 使用 PB13／PB14／PB15，均为 AF5、G4 `DS=7`、
+字节 FIFO 阈值和实际 8 位 DR 访问。每个端点明确给出低有效 GPIO CS、模式 0..3
+和速率。APB170 下，允许的请求 SCK 为 664063 Hz..42.5 MHz；APB/2=85 MHz
+超出 DS12288 Table89，因此拒绝。
 
-Failed relock or cache restoration retains a private cleanup lease and rejects
-further reads/writes. Platform stop retries the actual restoration before
-releasing that state.
+每笔最多 256 字节，要求有限绝对截止时间，并以有界轮询预算提供另一终止界限。
+必须排空两个 FIFO 水位和 BSY。错误只复位所选 APB 控制器，随后要求显式恢复。
+已接受的调用若无法证明复位／空闲或 CS 非活动，保留执行者、缓冲区及控制器／CS
+责任者，屏蔽 IRQ 并调用故障观察者；观察者返回则停驻。空闲停止或恢复失败保留
+可重试租约。此模式没有异步提交或 DMA 方法。
 
-## Finite coupled PWM and ADC reference
+## PWM：固定基频与共享通道
 
-The separate `pwm_adc` / `finite-regular-dma` software assembly selects one
-TIM1/ADC1 owner and one `nx_pwm_adc_t` face. It keeps TIM1 CH1/2/3 PA8/PA9/PA10
-AF6 duties constant for a finite request, uses internal CH4 PWM2/TRGO2 at a
-50-tick phase in a 100-tick period, and samples PA0/ADC1_IN1 through DMA1
-channel1/DMAMUX1 request5. The counter is 1 MHz from the 170 MHz kernel; deadtime
-is separately 170 kernel ticks. COMP1 PA1/PA4 supplies the selected noninverted
-break input. This software-only Board does not establish analog wiring, a power
-stage or physical safety qualification.
+普通 `fixed-pwm` 仅选择 TIM3 CH1／PA6 AF2 或 TIM4 CH1／PB6 AF2，独占整个
+控制器。采用边沿对齐、向上计数、高电平有效；计数节拍由固定 170 MHz 整数分频
+得到，分频值为 1..65536、周期为 1..65535、占空比计数值为 0..period。CCR 预加载
+在更新事件生效，禁止动态修改周期或基准频率。启动使用不传播更新触发的 UG
+和 GPIO 非活动电平；停止时证明输出／计数器撤回及板级空闲电平，私有关闭失败
+保留责任。此模式不支持其他通道、共享基频、互补输出、捕获、刹车、IRQ 或 DMA。
 
-The owner disables ADC while idle and discards two software primes before each
-finite halfword DMA window. ADC limited requests with DMACFG0 prevent buffer
-overwrite after TC, but do not stop PWM. Task service proves CEN0 before changing
-the trigger route, then ADC stop/disable, DMA/address detachment and both vector
-joins before SETTLED. Captured and late TE/OVR/break errors remain authoritative;
-failed drain retains the request and outer leases. Public stop closes admission;
-final Platform close additionally restores priorities, comparator, pads and
-clocks. No independently startable ADC or group face aliases the owner. Exact
-format, finite deadline observation, failure and software-test boundaries are in
-[the coupled acquisition contract](../../../docs/design/pwm-adc.md). HIL remains
-`not_executed`.
+SPI／PWM 选择 `OSPEEDR11`。计数范围不是电气保证：DS12288 Table56 在 30 pF 下
+给出 1.62..2.7 V 时 50 MHz、2.7..3.6 V 时 120 MHz 的焊盘条件上限。170 MHz／
+周期 2 得到逻辑 85 MHz，不证明实际供电、负载或脉宽符合要求。
 
-## Finite ordered ADC groups
+独立 `shared-fixed-pwm` 使用固定 170 MHz 内核时钟下的 TIM3 CH1／PA6、CH2／PA7
+AF2。两个普通 `nx_pwm_port_t` 接口经只读通道引用连接一个物理责任者、同一份
+不可变节拍／周期和一次冷初始化／最终关闭。既有两个 `[pwm]` 声明必须使用相同
+节拍和周期，不引入共享标志或注册表。唯一规范输入为
+[`g474-pwm-shared.toml`](../../../cmake/package/verification/io_evolution/g474-pwm-shared.toml)：
+1 MHz 计数器、1000 节拍周期、250／750 占空比计数值和 PA6-low／PA7-high 非活动
+锁存值都是软件选择，不是已检查的 PCB 或电气事实。
 
-The separate `adc_group` selections own ADC1/common and expose one static
-`nx_adc_group_port_t`. At SYSCLK/8=21.25 MHz they execute regular sequences with
-real CONT1 or TIM6-triggered finite normal DMA, or one injected frame through
-software/JQDIS1 or a single TIM6 OPM trigger. Ordered logical channels, integer
-stride/padding, actual sample codes and trigger provenance are explicit.
-Named X/Y/Z layouts use the shared observed-IDCODE/Flash-size policy; Z rank
-duplication changes physical rank count and raw stride without a hidden buffer.
+共享通道设置只修改自身 CCR 预加载值。加入已运行的其他通道时采用当前相位，
+不发 UG 或重启计数器，不保证组同步启动或首个完整脉冲。通道停止只撤回自身输出，
+并建立板级非活动 GPIO 电平，最后一个通道才停止 CEN。最终物理关闭可使用独占
+复位，但必须在 Platform 释放任一引脚快照、新增时钟或系统租约前成功。复位、
+非活动锁存值或外层恢复被拒绝时，均保留对应责任。该组合排斥其他独占 TIM3 的
+责任者和 PA6／PA7 使用者，无 TIM3 IRQ／DMA；相位／脉冲时序未测量。
 
-Accepted arrays include whole-frame padding and remain borrowed through actual
-trigger, ADC, DMA and vector withdrawal. Real priming and a checked freshness
-budget prevent stale idle conversions from becoming valid data; failed drain
-retains the request and outer leases for retry. Ordinary ADC and PWM/ADC owners
-remain separate, mutually conflicting selections. The four canonical software
-assemblies, internal-channel limits, failure contract and software/physical
-boundaries are in [the ADC sequence contract](../../../docs/design/adc-group.md).
-HIL remains `not_executed`.
+## IWDG：不可逆激活
 
-## SDK and evidence
+factory 查询和 Platform 启动不启用或喂 IWDG。显式启用遵循 RM0440 非窗口顺序，
+报告 DS12288 Table45 全温 LSI 29.5--34 kHz 范围。激活后即使设置失败也不可逆；
+已自动运行且寄存器更新未完成的看门狗报告未知超时时间。激活前 LSI／调试配置
+清理失败保留私有租约，可由 Platform 停止时重试。活跃看门狗阻止 Platform 完整
+关闭，健康检查、喂狗、复位和责任交接策略由应用负责。
 
-The official CMSIS Device G4 source is pinned to
-`626ee412334a5ed2e5b320af5a8d77d69f03a558`, with its original Apache-2.0 LICENSE.md
-and ST source notices preserved. ADC/DMAMUX/I2C inline primitives use the private
-STM32CubeG4 v1.6.3 paired driver `f5929f431f9effe45fbe18f5337e4753ced9ac92`
-with its unchanged BSD-3-Clause notice and exact selected-file lock. Selected
-I2C receive/transmit use a private compile-time port inside the existing engine;
-see the [official-driver contract](../../../docs/design/official-stm32-provider.md)
-for retained command exceptions. Public product interfaces do not expose SDK
-register types. The SDK is private to selected implementation targets.
+## EXTI：合并事件、丢失与共享资源
 
-Developer model logs, strict C11 ARM commands, actual official startup ELF
-section/symbol outputs and resource comparisons are kept as execution evidence.
-They establish software behavior and linking only. Clean configured platform
-builds, reproducibility, OS composition and physical HIL have separate exits.
-Unsupported peripheral modes fail configuration rather than selecting polling,
-other clocks, alternate controllers or unreviewed PCB routes.
+`edge-event` 可选 PA0／EXTI0（IRQ6）或 PA1／EXTI1（IRQ7），向量和优先级独立。
+这是软件夹具的精确硅片路由，不新增 NUCLEO 按钮接线或已检查的连接器。调用者
+显式选择上升沿、下降沿或双边沿，以及 1..4096 个事件槽位，生成的 factory 只
+持有精确容量，无最大池。读取只允许一个任务消费者。
 
-## 中文范围说明
+IRQ 确认自身的 W1C 挂起位，每次至多锁存一个带时间戳的合并事实；双边沿方向
+来自采样 GPIO 电平，不是完整边沿历史。环形缓冲区已满时保留旧事实，在后续
+接受事件前先报告一个丢失边界。ACK 后新边沿可立即再次置位挂起位；处理程序
+不轮询，也不把新边沿造成的挂起误判成硬件故障。
 
-本 provider 仅接入精确的 STM32G474RET6 软件参考：固定 170 MHz 时钟、独立 TIM2
-时间域、封装有效 GPIO、六个 IRQ 字节 UART、SPI1/2 有限 polling、TIM3/4 CH1
-固定 PWM、独立 IWDG 和 PA0/PA1 EXTI。PF0/PF1 保留给 HSE，PG10 保留给 NRST。
-GPIO 焊盘清单不建立 PCB 接线。新增独立软件夹具接入 ADC1 PA0/IN1 单次采样、
-TIM6 触发的有限普通 DMA block、I2C1 PB8/PB9 polling 及完整物理 Flash；
-未列模式仍拒绝，USB/以太网未接入。
+冷态准入在全局效果前拒绝已有中断、事件、触发、挂起和活跃 NVIC。Platform
+只取得一次共享 SYSCFG 门控，保留原有门控，GPIO 租约持续到完整停止。每条线
+保存并恢复自身的 4 位复用选择。停止时独立尝试线路来源和向量撤回；读回被拒绝
+时保留环形缓冲区、唤醒目标和复用恢复责任。活跃唤醒发布者必须完成会合，内核
+通知另检查实际向量优先级。外部偏置、去抖、边沿速率和安全输入由板级／产品负责。
 
-硬件准入、时钟与引脚租约、读回、回滚和恢复由 `drivers/platform_cold.c` 与各外设
-的 C prepare/close 函数负责。Python 仅生成不可变资源配置、精确静态存储和固定的
-类型化调用，不生成硬件算法。每个选中焊盘只保留一份原始状态；清理失败保留原始
-快照及未归还时钟，等待显式重试。空装配不链接外设冷态实现或保留引脚状态。
-选定 I2C 通过私有编译期 port 复用官方 LL 收发叶操作，不增加运行时转发层或 owner；
-命令访问例外与资格边界见[官方驱动合同](../../../docs/design/official-stm32-provider.md)。
+<a id="selected-acquisition-and-physical-flash"></a>
 
-FDCAN1 新增精确 STM32G474RET6 的 ISO-FD 正常/内部环回软件装配，
-500 kbit/s / 2 Mbit/s、固定 212 word 物理消息 RAM 与 3 个硬件优先级发送槽。
-详见 [CAN FD 所有权合同](../../../docs/design/can-fd.md)；收发器接线、物理时序与
-HIL 仍未验证。
+## ADC：单次与有限普通 DMA
 
-ADC 为独立单端 12 位、SYSCLK/128=1.328125 MHz、code0（2.5 周期）bulb 采样。
-稳压器延迟 22 us，校准后延迟 5 us；考虑 1 MHz 计时量化后，仍满足 20 us 和
-四个 ADC 周期的最小等待。每次丢弃首次转换，两次软件转换间等待 3 us，只返回
-第二次。预热至 CEN 前后使用同一个 100 us 绝对 deadline。返回、背压或发布 block
-前必须禁用 ADEN，下次启用重新预热，不能让 bulb 采样无限延续。
+采集夹具为 PA0／ADC1_IN1、单端 12 位原始值、SYSCLK/128=1.328125 MHz、bulb
+采样模式、code0（2.5 cycles）。它拥有 ADC12 公共时钟和显式 SYSCLK
+时钟选择，拒绝其他 ADC 责任者；稳压器等待 22 us、校准后等待 5 us，考虑
+1 MHz 计时量化后仍满足 20 us 与 4 个 ADC 周期。ES0430 2.7.8--10 要求保留时钟
+选择，并丢弃空闲或软件 STOP 后的首次转换。每次启用／转换都清理、执行屏障并
+读回自己的完成位，陈旧 ADRDY／EOC 不能充当新数据。每次单次采样执行两次转换，
+间隔 3 us，只发布第二次。屏蔽中断期间的预热和武装共用同一 100 us 绝对截止时间；
+返回、等待下一块或发布前禁用采样／ADEN。排空失败保留调用栈帧或生产者借用。
+声明参考电压不证明精度。
 
-有限 DMA 使用 DMA1 channel1、DMAMUX request5、TIM6，速率仅允许精确整除
-1 MHz 的 2.5--50 kHz。bulb 孔径由前次 EOC 到下次触发决定；DS12288 Table66
-要求 2.5--640.5 ADC 周期，当前 20--400 us 触发间隔扣除 12.5 周期转换后得到
-14.0625--518.75 周期。UG 后 CNT=period−10，首次触发位于 CEN 后十个 tick。
-IRQ 停止触发，任务观察 DMA/ADC 撤离及 ADEN 清零后发布；下一次 service 才重装，
-存在间隙。close 读回冷态配置，失败保留责任并允许重试；消费者仍负责释放借用。
-仅选择 96 KiB SRAM1/2；32 KiB CCM 在 0x10000000 统计一次，芯片也允许通过
-0x20018000 别名进行 DMA（RM0440 p89），当前软件策略未开放这些 CCM 地址。
+有限 DMA 另拥有 TIM6、DMA1 channel1、DMAMUX1 channel0 request5。每块在武装前
+预热，只接纳精确整除 1 MHz 节拍的 2.5--50 kHz。RM0440 的 bulb 采样由下一次
+触发结束，SMPR 本身不能界定采样孔径。DS12288 Table66 允许 2.5--640.5 ADC
+周期；本配置 20--400 us 周期扣除 12.5 个转换周期后，为 14.0625--518.75 个
+采样周期。UG 后置 CNT=period−10，首次触发在 CEN 后 10 节拍；CEN 前后都检查
+同一 100 us 截止时间。同源 SYSCLK 固定了比例，宿主模型不证明模拟时序或实际频率。
 
-独立 `pwm_adc` / `finite-regular-dma` 软件装配用一个 `nx_pwm_adc_t` 接口统一拥有
-TIM1/ADC1。TIM1 CH1/2/3 的 PA8/PA9/PA10 AF6 占空比在有限请求期间保持不变；
-170 MHz 内核分频得到 1 MHz 计数，period100、内部 CH4 PWM2/TRGO2 phase50，
-deadtime 独立使用 170 个内核时钟 tick。PA0/ADC1_IN1 通过 DMA1 channel1、
-DMAMUX1 request5 进行半字普通 DMA；COMP1 PA1/PA4 提供选定的非反相 break。
-该软件 Board 不建立实际模拟接线、功率级或安全资格。
+半字普通 DMA 不覆盖消费者借用。IRQ 停止触发，任务侧推进服务观察 DMA／ADC
+撤回和 ADEN 关闭后发布；下一次推进服务才显式重新武装可用块，背压使采样器保持
+关闭。READY／BORROWED 块仍由消费者释放。关闭时恢复并读回定时器、DMA、时钟
+选择的全部自有配置后才释放，被拒绝时保留以便重试。此模式存在触发间隙，无
+硬件采样孔径时间戳。ES0430 2.3.1 要求确认选定 TC／HT／TE，不在活跃 DMA 通道
+清全局 GIF。
 
-每次启用 ADC 后先丢弃两次软件转换，空闲时禁用 ADC。DMACFG0 的有限请求避免
-TC 后覆写缓冲区，但不会停止 PWM。任务 service 先证明 CEN0，再改变触发路由，
-随后观察 ADC 停止/禁用、DMA 与地址撤离以及两个向量退出，才发布 SETTLED。
-排空中已捕获和迟到的 TE/OVR/break 不得被完成状态覆盖；失败时保留请求及外层
-租约。公共 stop 关闭新准入，最终 Platform close 还需恢复优先级、比较器、引脚
-和时钟。不会另暴露可独立启动的 ADC/group 接口。精确格式、有限 deadline 的观察
-规则、失败及软件测试范围见[联合采样合同](../../../docs/design/pwm-adc.md)；HIL 仍为
-`not_executed`。
+链接器和 DMA 只选择 96 KiB SRAM1／2。CCM 32 KiB 在 `0x10000000` 只计一次；
+芯片也允许 DMA 经 `0x20018000` 别名访问该存储（RM0440 p89），本软件策略未开放任一
+CCM 地址。
 
-独立 `adc_group` 装配统一拥有 ADC1/common，以一个静态 `nx_adc_group_port_t`
-暴露有序整数帧。SYSCLK/8=21.25 MHz 下，regular 使用真实 CONT1 或 TIM6 触发的
-有限普通 DMA；injected 只接收一次软件/JQDIS1 或 TIM6 OPM 触发的完整帧。
-逻辑通道顺序、整数步幅/填充、采样时间码和触发来源均显式报告；X/Y/Z 命名布局
-通过同一实读 IDCODE/Flash 大小策略准入，Z 重复物理 rank，改变步幅而不增加
-隐藏打包缓冲区。
+## I2C1：有限消息
 
-已接受数组包含完整帧填充，直到触发、ADC、DMA 和向量实际撤离后才归还。真实
-预转换和新鲜度预算防止空闲后的陈旧转换成为有效数据；排空失败保留请求及外层
-租约，允许重试。普通 ADC、PWM/ADC 和本组模式为独立且互斥的选择。四个规范
-软件装配、内部通道限制、失败合同及软件/实板边界见
-[ADC 序列合同](../../../docs/design/adc-group.md)；HIL 仍为 `not_executed`。
+PB8／PB9 AF4 开漏，使用外部上拉；独立 HSI16、`TIMINGR=0x30420f13`、模拟滤波器、
+DNF0。固定标准模式为 100 kHz，审核电气上升不超过 1000 ns、下降不超过 300 ns。
+有限主机模式支持 1..8 条 7 位消息，每条 1..256 字节，重复 START 后发送一个最终
+STOP；256 字节分为 255+1 RELOAD。STOPF 与 BUSY 清零后才返回。NACK、仲裁或错误
+中止会复位本控制器，要求显式恢复，不处理物理总线卡死。ES0430 2.15.2 规定的
+仅主机模式伪 BERR 只确认，不中止。无 IRQ、DMA、从机模式、隐藏重试或 GPIO
+时钟脉冲。
 
-I2C1 为 PB8/PB9 AF4 开漏、HSI16、100 kHz 标准模式的固定 timing，外部上拉与
-上升/下降时间由 Board 验证。每次最多八条消息，每条 1--256 字节；支持 repeated
-START，最终 STOPF 与 BUSY 清零后才返回。错误要求显式 recover，不会脉冲 GPIO
-或自动重试。Flash 为 DBANK1、512 KiB、两 bank、256 个 2 KiB page 和 8 字节
-ECC 编程单位；要求 DBANK1、BFB2=0、FB_MODE=0，先持有并观察 SYSCFG 时钟再读
-映射，操作时重新校验；外来 Flash CR 模式在任何写入前拒绝。无产品预留，3300 mV
-参考假设必须确认。脉冲结束前不因 deadline
-返回；每个脉冲先清理并读回自己的 W1C 状态和控制模式，BSY 撤离后必须观察新 EOP，
-不能继承上页的完成标志。Category3 的 EOP 仅在 EOPIE=1 才锁存；脉冲显式启用
-EOPIE/ERRIE，独占 FLASH_IRQn4，但始终不启用 NVIC。外来 enabled/pending/active
-或 ECCIE 均拒绝；清理先观察中断源撤离，再清状态、清除 NVIC pending，
-确认向量已禁用、无 pending 且无 active 后再释放，保持原优先级；失败保留可重试责任。操作前关闭 Flash 数据 cache，操作后复位并恢复。geometry 显式声明新擦除要求；全 FF 输入单位不产生物理脉冲，字节 FF 检查不能证明
-ECC 从未写入，产品负责真实擦除来源、
-Flash 区域、看门狗、执行停顿及掉电策略。所有新增模式的 HIL 仍未执行。
-重新加锁或 cache 恢复失败时保留私有清理责任，拒绝后续读写；Platform stop
-观察到实际恢复成功之后才释放该状态。
+## 物理 Flash：几何、ECC 与保留责任
 
-SPI 每次最多 256 字节、使用有限 deadline，最高 42.5 MHz；无法证明已接受调用的
-移位器排空或 CS 无效时，保留执行者与借用存储，屏蔽中断并观察故障，观察者返回后
-停驻。普通 `fixed-pwm` 模式仅为 TIM3 CH1 PA6 AF2、TIM4 CH1 PB6 AF2，独占整个控制器，不支持
-动态 base、其他 channel、互补、capture、break、IRQ 或 DMA。IWDG 激活不可逆；
-准备清理失败保留重试责任。所有 HIL 均为 `not_executed`。
-SPI/PWM 选择 OSPEEDR11。PWM 计数范围仅代表逻辑能力：DS12288 Table56 在 30 pF
-下给出低电压区 50 MHz、高电压区 120 MHz 的条件上限；period 二的逻辑 85 MHz
-不表示已证明引脚频率，供电、负载及脉宽必须由 Board 验证。
+接口暴露完整 512 KiB：两个存储体，各 128 个 2 KiB 页，8 字节 ECC 编程单位。
+要求 DBANK=1、BFB2=0、实读 FB_MODE=0，持有并观察 SYSCFG 时钟后才读取当前映射；
+存储体重映射或外来 CR 模式在解锁、写入或擦除前拒绝。Page128 为 bank2/page0。
+没有产品预留区，3300 mV 是软件参考假定，板级必须确认编程电压。
 
-完整职责、失败路径、来源与验收条件见[双语设计正文](../../../docs/design/stm32g474.md)
-及[主流接入合同](../../../docs/design/mainstream-mcu-adaptation.md)。主机模型和 ARM
-链接不替代实板电气、时序与性能测量。
+几何合同显式声明新擦除来源：每个已写 ECC 行必须来自真实擦除，字节读回无法
+证明。全 FF 输入跳过物理脉冲，不消耗已擦除 ECC 行。编程／擦除在截止时间到期后
+仍须等待活跃脉冲结束并进入空闲，再重新锁定。每次脉冲清理并读回自己的 W1C
+状态、准备控制模式，BSY 撤回后要求新 EOP，上一页的完成位不能复用。
+
+RM0440 Category3 Table16／FLASH_SR.Bit0 要求 EOPIE 才锁存 EOP。仅在自有脉冲内
+显式启用 EOPIE／ERRIE，独占 `FLASH_IRQn4`，NVIC 始终禁用。已有已使能、挂起、
+活跃 IRQ 或 ECCIE 责任者均拒绝。清理先观察来源撤回、清状态，再清 NVIC 挂起位，
+确认已禁用、未挂起、未活跃后释放，不更改优先级。失败保留可重试租约。
+ES0430 2.2.2 要求脉冲前关闭数据缓存，完成后复位缓存并恢复原策略。
+
+重新锁定或缓存恢复失败，保留私有清理租约并拒绝后续读写；Platform 停止必须
+观察实际恢复成功才释放。产品负责显式区域、看门狗、执行停顿和掉电恢复。选项
+字节写、快速编程和整片擦除未开放。
+
+<a id="finite-coupled-pwm-and-adc-reference"></a>
+
+## 有限 PWM／ADC 联合参考
+
+独立 `pwm_adc`／`finite-regular-dma` 以一个 `nx_pwm_adc_t` 统一拥有 TIM1／ADC1。
+TIM1 CH1／2／3 PA8／PA9／PA10 AF6 占空比在有限请求内固定；170 MHz 分频为
+1 MHz 计数器、周期 100、内部 CH4 PWM2／TRGO2 相位 50，死区时间独立为 170 个
+内核时钟节拍。PA0／ADC1_IN1 经 DMA1 channel1／DMAMUX1 request5 半字采集，
+COMP1 PA1／PA4 为非反相刹车输入。此软件板级配置不证明模拟接线、功率级或物理安全。
+
+空闲时禁用 ADC，每个有限 DMA 窗口前丢弃两次软件预热转换。DMACFG0 限制请求，
+避免 TC 后覆写，但不会停止 PWM。任务侧推进服务先证明 CEN0，才改变触发路由，
+随后证明 ADC 停止／禁用、DMA／地址撤回、两个向量完成会合，才发布 SETTLED。
+已捕获或迟到 TE／OVR／刹车仍为权威事实，排空失败保留请求和外层租约。公共停止
+操作关闭新准入，最终 Platform 关闭还恢复优先级、比较器、引脚和时钟。不另暴露
+可独立启动的 ADC 或采集组别名。精确格式、截止时间、失败和软件／实板范围见
+[联合采样合同](../../../docs/design/pwm-adc.md)，HIL 为 `not_executed`。
+
+<a id="finite-ordered-adc-groups"></a>
+
+## 有序 ADC 采集组
+
+独立 `adc_group` 统一拥有 ADC1 和公共资源，以一个静态 `nx_adc_group_port_t` 暴露
+有序整数帧。SYSCLK/8=21.25 MHz，规则组使用真实 CONT1 或 TIM6 有限普通 DMA；
+注入组为软件／JQDIS1 或单次 TIM6 OPM 触发的一帧。通道次序、整数步长／填充、
+实际采样编码和触发来源均显式声明。X／Y／Z 命名布局共用实读 IDCODE／Flash-size
+策略；Z 重复物理序列位置，改变序列位置数和原始步长，不使用隐藏打包缓冲区。
+
+借用数组包含整帧填充，直至触发、ADC、DMA 和向量实际撤回。真实预热与新鲜度
+预算排除空闲后的陈旧转换；失败保留请求和外层租约供重试。普通 ADC、PWM／ADC
+和采集组互为冲突选择。四个规范软件装配、内部通道限制及失败边界见
+[ADC 序列合同](../../../docs/design/adc-group.md)，HIL 为 `not_executed`。
+
+<a id="sdk-and-evidence"></a>
+
+## 官方依赖与验证边界
+
+CMSIS Device G4 固定 `626ee412334a5ed2e5b320af5a8d77d69f03a558`，保留原 Apache-2.0
+`LICENSE.md` 与 ST 通知。私有 ADC／DMAMUX／I2C 叶操作使用 STM32CubeG4 v1.6.3 配对
+驱动 `f5929f431f9effe45fbe18f5337e4753ced9ac92`，原 BSD-3-Clause 通知和精确文件锁
+不变。SDK 类型只对选定实现目标私有，公共产品接口不导出寄存器类型。
+
+开发模型日志、严格 C11 ARM 命令、官方启动代码 ELF 节区／符号与资源比较，分别
+记录软件行为和链接结果。干净配置整个平台、复现、OS 组合及 HIL 各有独立退出
+条件，不能从源码或模式声明继承资格。完整规则见
+[G474 设计正文](../../../docs/design/stm32g474.md)及
+[主流 MCU 接入合同](../../../docs/design/mainstream-mcu-adaptation.md)。

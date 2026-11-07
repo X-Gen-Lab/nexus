@@ -1,23 +1,19 @@
-# Native TLS and MQTT interoperability
+# Native TLS／MQTT 互通夹具
 
-This Linux host test connects the C11 Nexus TLS/coreMQTT adapters to a real
-Mosquitto 2.0.22 broker. POSIX nonblocking sockets are a test-only byte-stream
-port. The test does not exercise lwIP, a MAC/PHY, MCU entropy or a board, and does
-not grant release or physical qualification.
+Linux 测试将 C11 TLS／coreMQTT 接到真实 Mosquitto2.0.22。POSIX nonblocking
+socket 只是测试 byte-stream，不执行 lwIP、MAC／PHY、MCU entropy 或 Board，
+不授予发布／实板资格。
 
-Build `client.c` as a Native executable linked to the selected
-`Nexus::CoreMQTTStorage` and `Nexus::TLSStorage`, using the maintained ABI, build-options,
-strict-warning and target-policy targets. It accepts an explicit loopback port,
-case name and generated fixture directory. Neither firmware library creates a
-worker: the client drives TLS handshake/service/close and MQTT process/keepalive
-in one serialized executor with absolute monotonic deadlines and finite budgets.
-The host entropy port explicitly uses Linux `getrandom`; UTC comes from the host
-calendar. These choices establish no product entropy or trusted-time policy.
+client.c 用维护 ABI／build-options／严格告警／target-policy 链接
+`Nexus::CoreMQTTStorage`、`Nexus::TLSStorage`，显式接 loopback port、case 和
+fixture dir。一名 executor 以绝对单调 deadline／有限预算推进 TLS handshake／
+service／close、MQTT process／keepalive，无隐藏 worker。host getrandom／UTC
+不是产品 entropy／trusted time。
 
-The host runner requires the managed local Docker daemon, OpenSSL 3 and the
-already available image below. It never automatically pulls a host tool or adds a
-firmware dependency. Keep the existing proxy/CA settings and Docker registry
-configuration when obtaining the immutable image:
+## 显式准备与执行
+
+runner 要本地受管 Docker、OpenSSL3、已准备的不可变 image，不自动 pull host 工具
+或增加固件依赖。准备 image 时保持已有 proxy／CA／registry 设置：
 
 ```sh
 env -u DOCKER_HOST -u DOCKER_CONTEXT -u DOCKER_TLS \
@@ -29,54 +25,38 @@ python -B -m tools.testing.mqtt_tls_interop \
     --output-root /absolute/path/to/new-output-directory
 ```
 
-The output parent must exist. Each run creates a new private directory and fresh
-P-256 CA/server/client test credentials valid for two days. Keys remain local
-host fixtures; never add the generated output to Git, a Source SDK, firmware or
-manufacturing credentials. Only the broker's own CA/certificate/key and config
-are mounted read-only. The container uses the caller UID/GID, drops capabilities,
-has a read-only filesystem and bounded resources, and publishes a random port
-only on `127.0.0.1`.
+output parent 必须已存在，每次新建私有目录和两天有效的 P256 CA／server／client
+测试凭据。私钥仅留 host，不能进入 Git、SDK、固件或制造凭据。只把 broker 自有
+CA／cert／key／config 只读挂载，container 用 caller UID／GID、移除 capability、
+只读 filesystem、有界资源，只在127.0.0.1公开随机端口。
 
-Three real-broker cases run:
+三个真实用例：
 
-- Mutual TLS 1.2 with ECDSA authentication, MQTT clean-session CONNECT/SUBACK,
-  QoS1 publish/self-echo/PUBACK, UNSUBACK, DISCONNECT and locally accepted TLS
-  close-notify. Local close does not prove the peer consumed the final alert.
-- A real socket shutdown after the QoS1 frame drains. The client requires a sticky
-  I/O failure and observes zero subsequent transport calls when traffic is tried
-  again. The application still owns semantic recovery for uncertain delivery.
-- Missing client identity. Success requires the TLS public diagnostic to report
-  the actual peer fatal alert, rather than an arbitrary timeout or entropy/I/O
-  failure. Raw broker logs retain its concrete certificate rejection reason.
+- mTLS1.2 ECDSA、清洁会话 CONNECT／SUBACK、QoS1 发布／回显／PUBACK、UNSUBACK、
+  DISCONNECT 和本地接纳 close-notify；本地关闭不证明对端已读最后一条 alert。
+- QoS1 frame drain 后真实 socket shutdown，要求 sticky IO、重试时零 transport call；
+  不确定 delivery 的语义恢复仍归应用。
+- 缺 client identity，必须由公共 TLS diagnostic 观察真实 peer fatal alert，不能以
+  timeout、entropy／IO 错误冒充；broker 原始日志保留 certificate 拒绝原因。
 
-The report records image digest/ID, broker binary hash/version, OpenSSL identity,
-client binary hash, test credential hashes and raw command receipts. Cleanup
-checks full container ID, exact name and owner label in one snapshot, then uses
-only that immutable ID. Unknown ownership fails without touching the object.
-Controlled repeated cancellation is deferred through bounded withdrawal; external
-SIGKILL or a lost Docker daemon cannot guarantee cleanup. `owner.json` preserves
-the unique recovery identity. No global stop, prune or name-only removal occurs.
-Primary and cleanup failures remain separate in the report and cause failure.
+报告绑定 image digest／ID、broker binary hash／version、OpenSSL、client、凭据和
+命令收条。清理一次快照核对完整 container ID／精确 name／owner label，随后仅按
+不可变 ID 操作，未知归属不触碰。受控重复 cancel 延后到有界撤回结束；SIGKILL 或
+Docker 失联不保证清理，`owner.json` 留唯一恢复身份。不全局 stop／prune、不按名字
+删除。primary／cleanup 失败分开保留，均使执行失败。
 
-The small Python unit tests cover cleanup after a withdrawn Docker create client
-and repeated controlled cancellation. Their Docker model is host-tool evidence;
-it contributes no broker, TLS or hardware qualification. Run them with:
+Python 合同覆盖 create client 撤回后清理、重复 cancel，只建立 host-tool 证据：
 
 ```sh
 python -B -m unittest tools.testing.test_mqtt_tls_interop
 ```
 
-The separate [complete client-chain fixture](../lwip_mqtt_interop/README.md) uses
-`--transport lwip-test-relay` and its own helper to exercise the actual
-lwIP/TCP/TLS/MQTT client chain through a test-only ciphertext relay. That mode
-has five cases and distinct scope; it does not change these default three POSIX
-cases or turn their evidence into lwIP or hardware qualification.
+[完整链路夹具](../lwip_mqtt_interop/README.md)用 `--transport lwip-test-relay` 和
+独立 helper 运行5例真实 lwIP／TCP／TLS／MQTT，不改变默认3例的范围。
 
+## 外部仓库持有的 client
 
-## Externally owned host clients
-
-Use `--transport external-client` when the executable is owned by another
-repository and its transport is not this runner's reviewed POSIX or N09 probe:
+不属于已审 POSIX／N09 的程序必须显式选择：
 
 ```sh
 python -B -m tools.testing.mqtt_tls_interop \
@@ -85,42 +65,12 @@ python -B -m tools.testing.mqtt_tls_interop \
     --output-root /absolute/path/to/new-output-directory
 ```
 
-This explicit mode reuses the same broker, generated test CA, bounded process
-receipts and container cleanup. It invokes the original three plain bundles
-`clean`, `fault` and `missing-client`, passing port, bundle name and fixture
-directory as the existing positional arguments. It does not attach N09 Ethernet
-captures, require N09 stdout counters, or describe the external client as POSIX.
-There is no plugin registry, second runner or new evidence schema.
+复用 broker、测试CA、有界进程和清理，调用 clean／fault／missing-client 三普通
+bundle，按既有 positional args 传 port／bundle／fixture dir。不附 N09 PCAP 或
+stdout counter，不标成 POSIX，无插件注册表、第二 runner 或新 evidence schema。
 
-The result assesses broker-fixture/process orchestration only. The external
-client's actual transport, TLS and protocol behavior remain `not assessed` by
-this runner; an executable returning zero does not prove authentication, network
-path, MQTT outcomes, MCU or PHY qualification. An external wrapper may dispatch
-additional application-owned scenarios, but their exact binaries, configurations,
-child command receipts and protocol assertions belong to that external evidence.
-The public three-bundle report never substitutes for those child results.
-
-A development probe may explicitly identify the exact uncommitted public tool
-source and remains unqualified. Final external delivery consumes a new clean,
-approved SDK/repository pin containing this option; a tool override cannot
-silently upgrade the SDK's source identity. Private application source and raw
-execution evidence stay in their owning private repository.
-
-### 中文
-
-外部仓库持有的可执行程序若不是本 runner 已审的 POSIX 或 N09 探针，应显式选择
-`--transport external-client`，调用命令如上。该模式复用同一个 broker、临时测试
-CA、有界进程收据和容器清理，依次调用原有 `clean`、`fault`、`missing-client`
-三个普通 bundle，并传入端口、bundle 名称和测试凭据目录。不附加 N09 以太网
-抓包，不要求 N09 stdout 指标，也不会把外部客户端标成 POSIX；没有插件注册表、
-第二套 runner 或新的证据 schema。
-
-公开结果只说明 broker 工装与进程编排。该 runner 对外部客户端的真实 transport、
-TLS 和协议行为保持 `not assessed`；进程返回零不能证明认证、网络路径、MQTT
-结果或 MCU／PHY 资格。外部 wrapper 可以分发更多应用自有场景，但必须由外部
-证据保留精确二进制、配置、子命令收据与协议断言，不能用公开的三个 bundle
-结果代替这些子场景。
-
-开发探针可以明确记录未提交的公共工具源码身份，但不建立资格。最终外部交付应
-消费已包含该选项的新、干净、已确认 SDK／仓库 pin，不能通过工具覆盖偷偷升级
-SDK 身份。私有应用源码和原始执行证据留在各自的私有仓库。
+公开结果只评估 broker／进程编排，外部 transport／TLS／协议为 `not assessed`。
+exit0 不证明认证、网络、MQTT、MCU／PHY；外部 wrapper 的扩展场景需自有精确 binary、
+config、child command 和协议断言，三个 bundle 不代替子结果。开发探针可标记明确
+未提交工具源码但不资格化。最终交付用含选项的新 clean／approved SDK pin，工具
+覆盖不能升级 SDK 身份；私有源码和原始证据留在私有仓库。

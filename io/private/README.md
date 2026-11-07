@@ -1,33 +1,28 @@
-# Private I/O mechanisms
+# I/O 私有机制边界
 
-These headers and implementation templates are private contracts between typed
-I/O mechanisms and selected SoC providers. They never enter a product's public
-include path. Public faces contain immutable operations and an instance context;
-mutable state and vendor register types remain private.
+本目录保存类型化 I/O 机制与选定 SoC 实现间的私有合同，不进入产品公共头文件
+搜索路径。公共只读接口保存操作表和实例上下文，可变状态与厂商寄存器类型留在
+具体实现内部。公共入口见[上级 README](../README.md)。
 
-Reviewed CAN, USB FS device, Ethernet, timer, FIFO and pin-state hardware
-implementations live in `drivers/<kind>/<reviewed-ip>/`. A SoC wrapper supplies
-exact register and clock facts, IRQ/DMA bindings and checked silicon semantics.
-Private build-time header dependencies do not select sources or add runtime
-dispatch. The selected SoC CMake target still owns every compiled engine.
+| 目录 | 责任 |
+| --- | --- |
+| `io/src/api/` | 公共检查与分派 |
+| `io/src/mechanisms/` | 可复用 I/O 执行规则 |
+| `io/private/` | 无硬件依赖的验证、分段传输序列的所有权身份和有界日历运算 |
+| `drivers/<kind>/<reviewed-ip>/` | CAN、USB FS、Ethernet、定时器、FIFO、引脚状态实现 |
+| `soc/native/drivers/` | 独立宿主模型 |
+| `soc/<vendor>/<family>/drivers/` | 精确 MCU 适配实现 |
 
-`io/src/api/` owns public checked dispatch and `io/src/mechanisms/` owns reusable
-I/O rules. This directory keeps hardware-independent validation, sequence-owner
-identity and bounded calendar arithmetic. Native models live in
-`soc/native/drivers/`; MCU wrappers live under
-`soc/<vendor>/<family>/drivers/`. Identical names do not establish identical
-hardware semantics.
+SoC 适配层提供真实寄存器和时钟事实、IRQ／DMA 绑定及受审硅片语义。私有构建期
+头文件依赖不选择源码，不增加运行时分派；具体 SoC 的 CMake 目标仍拥有每个编入
+的引擎。相同名称不证明相同硬件语义。
 
-The selected SoC CMake target owns which controller sources are linked. Maintain
-private SDK includes and C11 firmware. No common engine may allocate implicit
-storage, discover devices, start a worker or acquire a mandatory OS lock.
+固件保持 C11，SDK 头文件依赖保持私有。共享私有引擎不能隐式分配存储、发现设备、
+启动工作线程或取得强制 OS 锁。队列、端点、描述符和流块容量来自用户装配或明确
+的调用者存储合同，成本须观察真实 ELF。
 
-IRQ work records bounded hardware facts. Task-side service continues deadline,
-wire and source withdrawal. SETTLED follows final reference withdrawal;
-QUARANTINED retains every outstanding borrow. Queue, endpoint, descriptor and
-block capacities come from the authored assembly or an explicit caller-owned
-contract. Their costs must be observed in the real linked ELF.
-
-See [execution budgets](../../docs/design/soc-execution-budgets.md), the public
-operation contracts and the controller-specific design documents for limits and
-physical qualification boundaries.
+IRQ 记录有界硬件事实，任务侧推进服务继续处理截止时间、线上完成和撤源。最终
+引用撤销后才发布 SETTLED，QUARANTINED 保留全部未结束借用。具体限额和物理范围
+见[执行预算](../../docs/design/soc-execution-budgets.md)、公共操作合同与各控制器
+设计说明。[FIG-31：驱动源码归属](../../docs/assets/diagrams/driver-source-ownership.svg)
+描述构建归属，不表示额外运行时转发层。

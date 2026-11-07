@@ -1,109 +1,84 @@
-# Explicit W25Q128JV single-line SPI component
+# W25Q128JV 单线 SPI 存储组件
 
-`Nexus::W25` is an optional allocation-free C11 component over the existing
-polling `nx_spi_endpoint_t`. It creates no bus, worker, task, lock, device registry
-or product partition. Vendor controller code and pin ownership remain behind
-the selected Nexus SPI endpoint.
+`Nexus::W25` 是可选、无动态分配 C11 组件，使用已有 polling
+`nx_spi_endpoint_t`。它不创建 bus、worker、task、lock、设备注册表或产品分区；
+vendor controller 和 pin 所有权留在所选 SPI endpoint 后面。
 
-The reviewed software profile is **W25Q128JV**, 16 MiB, JEDEC `EF4018`, using
-single-line 03h read, 02h page program and 20h 4 KiB sector erase. An explicit
-profile is required. EF4018 is necessary but does not uniquely prove every
-ordering suffix, FV/JV revision or physical fitting. Q64, EF7018 DTR, SFDP,
-four-byte addressing, quad/QPI, status/protection writes, erase suspend/resume,
-power-down and reset sequences are not selected. No identity fallback is used.
+## 精确 profile 与来源
 
-The source is Winbond **W25Q128JV Revision M, 24 December 2024**, Industrial and
-Industrial Plus grades:
+必须显式选择 **W25Q128JV**：16 MiB、JEDEC `EF4018`，使用单线 03h read、02h
+page program 和 20h 4 KiB sector erase。EF4018 必要但不能唯一证明全部订货后缀、
+FV／JV revision 或焊接型号。不接纳 Q64、EF7018 DTR、SFDP、四字节寻址、quad／QPI、
+status／protection 写入、erase suspend／resume、power-down 或 reset，也不自动回退。
 
-- [Official datasheet](https://www.winbond.com/resource-files/W25Q128JV%20RevM%2012242024%20Plus.pdf)
-- SHA-256: `b51bb4303e17a17750c9cbcafc9a776dea842a8971d7cdd5edc70ff738efb1fe`
-- Reviewed sections: power-up/write protection; status registers 1/2/3;
-  03h/02h/20h/06h/04h/9Fh and read-status instructions; page and sector geometry.
+来源为 Winbond **W25Q128JV Revision M, 24 December 2024**，Industrial／Industrial
+Plus grades：
 
-The original downloaded PDF stays in execution evidence rather than source Git.
+- [官方数据手册](https://www.winbond.com/resource-files/W25Q128JV%20RevM%2012242024%20Plus.pdf)
+- SHA-256：`b51bb4303e17a17750c9cbcafc9a776dea842a8971d7cdd5edc70ff738efb1fe`
+- 已审核 power-up／write protection、status 1／2／3、03h／02h／20h／06h／04h／9Fh、
+  read-status，以及 page／sector 几何。
 
-## Transport and ownership
+下载原 PDF 保存在执行证据中，不放源码 Git。
 
-The caller supplies one stable, awake, mode 0 or 3 single-line SPI endpoint at
-no more than the 03h read limit of 50 MHz. The exact endpoint remains responsible
-for whole-CS framing, hardware drain and its own retained recovery fault.
-The component never calls shared bus reset or stop.
+## Transport 与借用
 
-The SPI polling contract ends CPU access to all supplied buffers on every
-return. It may still retain controller/pin recovery responsibility after a
-failed CS withdrawal. W25 read/program therefore retain no caller payload
-pointer after their synchronous return. A flash program/erase pulse is different:
-component state, endpoint and clock remain live until later status progress
-establishes quiescence. A transport error or timeout does not erase that duty.
+调用者提供稳定、awake、mode 0 或 3 的单线 SPI endpoint，频率不超过 03h read 的
+50 MHz。endpoint 负责完整 CS、硬件排空及自己的保留恢复故障；组件不调用共享
+bus reset 或 stop。
 
-Calls are task-only and serialized. The caller excludes foreign Flash commands,
-pin/clock/power changes and concurrent bus access. Endpoint, ops and opaque
-contexts remain live and disjoint from mutable state and payloads. Known object
-spans and the single byte at each nonnull context address are checked. Complete
-opaque context extents remain the caller's responsibility; this is not a memory
-sandbox for arbitrary context pointers.
+polling 合同在每次返回结束全部 CPU buffer 访问，包括失败；CS 撤回失败仍可能
+保留 controller／pin 恢复责任。因此同步 read／program 返回后不保留 payload 指针，
+但 Flash program／erase pulse 不同：state、endpoint 和 clock 保留到后续 status
+进度证明静止。transport 错误或 timeout 不清除此责任。
 
-## Bounded operations
+操作 task-only 串行，调用者排除 foreign Flash command、pin／clock／power 改变和
+并发 bus 使用。endpoint、ops、opaque context 保持存活且与可变状态和 payload
+分离。实现检查已知对象和每个非空 context 首字节；完整 opaque context 范围仍由
+调用者保证，不是任意指针的内存沙箱。
 
-| Operation | Selected bound and meaning |
+## 有界操作
+
+| 操作 | 当前边界与完成含义 |
 | --- | --- |
-| `nx_w25_init` | Read-only probe of an explicitly declared profile, region and power/clock facts; no reset/wake/unlock |
-| `nx_w25_read` | 1..252 bytes, one 03h CS interval; failed/short reads leave output unchanged |
-| `nx_w25_program_start` | 1..252 bytes inside one physical 256-byte page; SUCCESS means command issued, not completed |
-| `nx_w25_erase_4k_start` | Exactly one aligned 4 KiB sector inside the caller-selected region |
-| `nx_w25_service` | At most four short status/disarm exchanges, no busy-wait loop |
-| `nx_w25_get_status` | No-I/O observation of pending duty and the last mutation outcome |
-| `nx_w25_stop` | No-I/O unbind only after pending/uncertain duty is gone |
+| `nx_w25_init` | 对明确 profile、region、power／clock 事实做只读 probe，不 reset／wake／unlock |
+| `nx_w25_read` | 1～252 字节，一个 03h CS 区间；失败／short read 保持输出 |
+| `nx_w25_program_start` | 单个 256 字节物理页内的 1～252 字节；SUCCESS 只表示已发命令 |
+| `nx_w25_erase_4k_start` | 产品区域内恰好一个对齐 4 KiB sector |
+| `nx_w25_service` | 至多 4 次短 status／disarm 交换，不忙等 |
+| `nx_w25_get_status` | 不做 I/O，观察 pending 责任和最后修改结果 |
+| `nx_w25_stop` | pending／uncertain 清除后才无 I/O 解绑 |
 
-The four-byte command/address header plus a 252-byte payload fits the maintained
-256-byte polling endpoint bound. It does not silently send a 260-byte full-page
-transaction. The caller explicitly splits larger work at region/page boundaries.
-Offsets are relative to the nonempty, erase-aligned region provided by the
-product; no region is reserved or selected by the platform.
+4 字节 header 加 252 字节 payload 正好满足 endpoint 的 256 字节上限，不偷偷发送
+260 字节整页事务。较大工作由调用者按 region／page 边界拆分。offset 相对产品提供
+的非空、erase-aligned region，平台不预留或选择分区。
 
-The local byte arrays are 512 bytes for read and 256 for program, plus the
-actual call stack. These source bounds are not measured task stack peaks.
-No maximum-object pool, heap buffer or retained payload copy is introduced.
+read 局部数组为 512 字节，program 为 256 字节，另加实际调用栈；这是源码边界，
+不是实测 task stack peak。不增加最大对象池、heap buffer 或保留 payload copy。
 
-The component admits writes only when the observed BP field, CMP and WPS are
-zero. It does not change protection or QE. WREN must be observed latched before
-an array command. An idle WEL after a supposedly issued array command is reported
-as an error and disarmed with WRDI plus status readback. WIP0 with SUS1 is never
-treated as completed; no automatic resume is attempted.
+只有实际 BP、CMP、WPS 均为零才允许写入，不修改 protection 或 QE。array command
+前必须观察 WREN 已锁存。发命令后 idle WEL 报错，并用 WRDI 加 status readback
+解除武装。WIP0／SUS1 不算完成，也不自动 resume。
 
-## Deadlines, failure and completion
+## deadline、失败与最终结果
 
-The caller establishes the real power-up/write delay and supplies its absolute
-`ready_at`. Initialization before that time returns BUSY without SPI. The clock
-must already be live; a numerical zero is not clock-readiness evidence.
-Clock domain/epoch labels are declarations, not runtime attestation.
+调用者建立真实上电／写入等待并提供绝对 `ready_at`，此前 init 返回 BUSY 且不做
+SPI。clock 已有效是前提，零值不证明 readiness，domain／epoch 标签也不是运行时
+证明。修改 deadline 包含后续 Flash busy 时间；service 使用独立有限 cleanup
+deadline，延长 probe 不延长原 operation。BUSY 保留责任，status 可已显示锁存
+TIMEOUT；新 cleanup 预算可证明稍后静止并返回原错误。pending 期间 clock 回退或
+非有限，存储继续保留给外部系统恢复。
 
-Mutation deadlines include later internal Flash busy time. Service receives a
-separate finite cleanup deadline; extending that probe budget never extends the
-original operation deadline. BUSY retains duty, while status can already expose
-a latched operation timeout. A new cleanup budget may establish later quiescence
-and return the original timeout/error. Backward/nonfinite clock observations
-during pending duty retain storage for external system recovery.
+WREN 失败也可能留下 armed 状态，program／erase 传输失败可能已改变阵列。
+`may_have_modified` 表达这种可能，不是字节计数证明。意外观察到活动也关闭新准入，
+直到 status service 证明静止。timeout 不释放 state，不取消不可逆 pulse。
 
-A failed WREN may leave the device armed, even when no array command was sent.
-A failed program/erase transfer may already have changed Flash. The status
-`may_have_modified` flag records that possibility; it is not a byte-count proof.
-Unexpected observed activity also closes new admission until status service
-proves quiescence. A timeout never releases state or cancels an irreversible
-program/erase pulse.
+命令完成不是数据验证、原子替换或掉电持久性。产品遵守 NOR 1→0 规则，提供已擦除
+目标或单独审核更新策略；回读／CRC、擦除验证、崩溃恢复、磨损和布局在外部。恢复
+idle 不能重建中断写入结果。
 
-Command completion is not byte verification, atomic replacement or power-loss
-durability. The caller obeys NOR 1-to-0 programming semantics and provides erased
-targets or a separately reviewed update policy. Readback/CRC, erase verification,
-crash recovery, wear management and product layout remain external. A recovered
-idle device cannot reconstruct the outcome of an interrupted write.
+## Board 与证据边界
 
-## Board and evidence boundary
-
-The uploaded core-board schematic marks W25Q128 as unpopulated. The high-board
-W25Q128 heading conflicts with its 64 Mbit note. Neither declaration selects this
-JV profile automatically; actual part/fitting and voltage require confirmation.
-
-Host protocol models and ARM/SDK links establish different software properties.
-No physical Flash timing, endurance, electrical operation or power-cut behavior
-is established by this component or its tests. Physical HIL is not executed.
+核心板图把 W25Q128 标为未焊，高配板 W25Q128 标题又与 64 Mbit 注释矛盾；两者
+都不自动选择 JV profile，实际器件、焊接和电压待确认。host 协议模型和 ARM／SDK
+链接分别证明软件属性，不证明物理时序、寿命、电气或掉电行为；HIL 未执行。

@@ -1,182 +1,104 @@
-# MCUboot fixed overwrite-only software reference
-
-This increment integrates the ordinary API of MCUboot 2.4.0, selected organization
-commit `62471ebd5825ef05b7c10922a15ed70f8ade9426`. It uses official bootutil
-sources and the same commit's TinyCrypt P256/SHA256 and vendored ASN.1 parser.
-The software profile is one image, overwrite-only, primary validation, maximum
-one erase sector per image slot, 8-byte trailer alignment and a non-ECC 4-byte
-Flash program unit. FIH is explicitly OFF. The reviewed target is STM32F407VET6;
-other hardware, clock, power and Flash modes need their own admission evidence.
-
-The source tree separates the generic C11 control header (`include/nexus`), the
-explicit Flash composition port (`port`), and the selected private upstream
-configuration (`profile`). `upstream_profile.cmake` reuses the official core
-source list in both host and ARM references; it introduces no runtime forwarding
-layer. The bootloader and application control use separate final link domains.
-
-Including `components/mcuboot/CMakeLists.txt` only registers optional helpers.
-A configured assembly explicitly calls `nexus_add_mcuboot_control()` to create
-`Nexus::MCUBootControl` and the composition-only `Nexus::MCUBootPort`, or
-`nexus_add_mcuboot_boot()` to add `Nexus::MCUBootBootStorage`. Helpers take no
-arguments and are idempotent. An unselected component creates no supplier target
-or runtime residency. Public Control exposes only Nexus types; Port explicitly
-exposes the selected Flash composition ABI. Full BootStorage is a separate boot
-image dependency. Its fixed GNU/LLVM link profile requires section collection
-(`--gc-sections`) to discard unused supplier allocator branches; no allocator
-implementation or hidden heap is supplied.
-
-Source admission checks the catalogue, exact selected Git commit/tree, owner
-index gitlink, declaration and all 80 reviewed file hashes before defining these
-targets. In a Source SDK, the existing SDK verifier must succeed before Git-free
-payload admission. Development source overrides are explicitly development-only;
-they cannot establish production or SDK qualification.
-
-```text
-Boot image                             Application
-  official boot_go                       Nexus control C11 API
-  official verification + copy           official bootutil_public.c
-  TinyCrypt + vendored ASN.1              no boot core or image crypto
-                 \                        /
-                  ordinary Flash API bridge
-                  explicit caller-owned regions
-                  existing Nexus Flash provider
-```
-
-The full BootStorage interface and TLS declare incompatible CMake crypto-ABI
-values. A single consumer linking both fails during CMake generation; Control
-with TLS and separate boot/TLS executables in one graph remain valid. This
-per-consumer supported-target check adds no runtime state. It is a build
-compatibility constraint, not isolation against manually linking internal
-archives or bypassing the public helpers. The TLS helper discovers its own
-Python interpreter instead of requiring caller-side discovery.
-
-The application control API has no runtime state, allocator, registry, task or
-lock. Products define one operation getter borrowing an immutable pair of areas,
-a borrowed `nx_clock_t` value and a finite absolute deadline throughout an
-upstream call, including nested opens and retries. The clock callback is bounded,
-and its context outlives the call. Its monotonic epoch and units must match both
-the deadline and the supplied Flash provider; there is no domain translation or
-implicit global clock. A missing read callback rejects without Flash access.
-This immutable operation occupies 24 bytes on the reviewed ARM ABI and 40 bytes
-on Native; the clock adds 8 and 16 bytes respectively, with no pool or worker.
-The areas, region descriptors, provider and live clock remain
-valid and unchanged through return. `open` is a pure structural lookup; `close`
-does not withdraw the provider. The product serializes operations and owns
-platform start/stop, watchdog, Flash-stall, reset and recovery policy. The
-required `nx_mcuboot_assert_fail()` fatal hook never returns; calling boot code
-without an authorized operation is not a recoverable query. Full boot additionally
-requires the product watchdog progress hook. The generic control API rejects a
-missing operation and does not start hardware.
-
-`nx_mcuboot_query` publishes its output only for a known upstream action. Positive
-`BOOT_SWAP_TYPE_PANIC=255` and unknown results are errors. Upstream intentionally
-treats an unreadable secondary trailer as empty: NONE does not prove slot health,
-authenticity or availability. Observing TEST or REVERT does not enable those modes.
-
-`nx_mcuboot_request(TEST)` returns UNSUPPORTED without Flash access. PERMANENT
-calls the official public API and requires a subsequent official action readback
-to report PERMANENT before returning success. A pre-existing TEST is not silently
-promoted. Any failure can follow persistent partial trailer writes; in particular,
-an interrupted permanent request can leave TEST pending. The caller must own
-recovery before reset. The adapter does not erase a candidate, renew its deadline
-or invent a rollback on failure. Confirmation and trial/revert are absent.
-
-Flash offsets address the complete physical slot, including the signed header
-and trailer. The image-prefix option only shifts the linked execution window;
-it never shifts Flash API access. Regions must own complete physical erase
-sectors and share one provider. Whole-slot bounds, permissions, physical alignment,
-settlement and fixed deadline are preserved through real `nx_flash_region_*`.
-The adapter does not broaden ECC/fresh-erase support or track hidden erase history.
-
-The ordinary software reference partitions the first 512 KiB as 128 KiB boot,
-128 KiB primary, 128 KiB secondary and 128 KiB unassigned. One layout document
-provides linker ownership and C region facts. The normal payload is linked at
-primary origin +512 bytes, with a conservative 1024-byte suffix reservation.
-This is a test reference, not a mandatory product partition or a promise that a
-TLS/networking application fits a 128 KiB slot. The control-only link probe uses
-a NULL operation and therefore cannot request a real physical update.
-
-Normal model evidence exercises explicit region admission, fixed deadlines,
-unsupported requests, positive PANIC, partial trailer writes, primary signature
-validation, a valid unrequested secondary, a permanent authenticated copy and a
-normal restart after completed copy. Official pinned imgtool signs and verifies
-the two fixtures using the upstream publicly known test key. It is never a
-production trust root. Signing-tool extras are isolated and hash locked; the
-recorded development host environment is not a sealed release toolchain tuple.
-The first valid-image flow passed on its first execution and is verification,
-not a fabricated TDD RED. Separate new-API and permanent-readback REDs are retained.
-
-Software model execution and linked ARM budgets do not establish MCU execution,
-Flash/IRQ/clock timing, measured stack high-water, physical interruption recovery,
-secure key storage, trustworthy anti-rollback counters or power-cut qualification.
-Overwrite-only permanently replaces the old application and has no old-image
-rollback. Products own trust roots, version/authorization policy and signing keys.
-No real signing key, debugger action or physical Flash operation is part of this
-reference. Repository/SDK admission and final candidate gates remain separate.
-
 # MCUboot 固定覆盖模式软件参考
 
-本增量复用 MCUboot 2.4.0 的组织固定提交、官方 bootutil，以及同一提交内的
-TinyCrypt P256/SHA256 与 ASN.1。配置固定为单镜像、覆盖更新、主槽校验、每槽最多
-一个擦除扇区、8 字节 trailer 对齐和非 ECC 的 4 字节编程单元。FIH 明确关闭。
-已审软件目标为 STM32F407VET6，不扩大其他芯片、电源、时钟或 Flash 模式的资格。
+本组件集成 MCUboot 2.4.0 普通 API，固定组织提交
+`62471ebd5825ef05b7c10922a15ed70f8ade9426`。它复用官方 bootutil，以及同一提交内
+TinyCrypt P256／SHA256 与 vendored ASN.1 parser。已审软件目标为 STM32F407VET6；
+其他硬件、电源、时钟与 Flash 模式需要各自准入证据。
 
-公共 C11 控制接口、显式 Flash 装配端口和私有 profile 分目录保存。主机与 ARM
-共用官方内核源列表。仅 include 组件 CMake 文件只注册可选 helper，不创建厂商目标或
-运行态常驻数据。已配置装配显式调用无参数、可重复调用的
-`nexus_add_mcuboot_control()`，得到 `Nexus::MCUBootControl` 与只用于装配的
-`Nexus::MCUBootPort`；调用 `nexus_add_mcuboot_boot()` 才加入独立 boot 镜像使用的
-`Nexus::MCUBootBootStorage`。Control 公共头仅暴露 Nexus 类型，Port 显式暴露所选
-Flash 装配 ABI。BootStorage 的固定 GNU/LLVM 链接配置传播 `--gc-sections`，丢弃
-未选用的厂商分支，不提供任何隐式 allocator 或 heap。
+## 架构、固定 profile 与目标
 
-创建目标前先核对 catalogue、固定 Git commit/tree、拥有仓库 index 内的 gitlink、
-声明以及全部 80 个已审文件 hash。Source SDK 必须先通过现有 SDK 自身校验，才允许
-无 Git 的 payload 准入；显式 development 覆盖只形成开发证据，不能获得生产或 SDK
-资格。boot 镜像与应用控制目标独立链接：应用只使用官方
-bootutil_public.c，不引入完整 boot 内核、TinyCrypt、ASN.1、TLS 或第二个 PSA
-运行时。接口不增加运行态状态、动态分配、注册表、任务或锁。
+profile 为单镜像、overwrite-only、主槽校验、每镜像槽最多一个擦除扇区、8 字节
+trailer 对齐，以及非 ECC 的 4 字节 Flash 编程单元。FIH 明确关闭。
 
-BootStorage 与 TLS 通过 CMake interface crypto-ABI 声明不兼容；同一最终目标混链
-会在生成阶段拒绝。Control+TLS 和同一构建图内的独立 boot/TLS 镜像仍可配置。
-检查没有运行态成本。这是受支持公共目标的构建兼容性约束，不能隔离绕过 helper
-手工混链的内部 archive。TLS helper 自行发现 Python，不要求调用者预先发现解释器。
+目录分开保存通用 C11 控制头 `include/nexus`、显式 Flash 装配端口 `port` 和私有
+上游配置 `profile`。`private/upstream_profile.cmake` 在主机和 ARM 参考共用官方
+内核源列表，不增加运行时转发层。bootloader 和 application control 独立最终链接。
 
-产品提供不可变操作上下文，借出两个 area、一个 `nx_clock_t` 值及有限绝对 deadline，
-覆盖完整上游调用、嵌套 open 和重试。时钟回调必须有界，context 持续存活；时钟、
-deadline 与 Flash provider 必须使用同一有效单调时基和单位，不隐式访问全局时钟，
-也不做跨域换算。缺少 read 回调时无 Flash 访问即拒绝。该对象在已审 ARM ABI 占
-24 字节、Native 占 40 字节，显式时钟分别增加 8/16 字节，不增加池或工作线程。
-area、region、provider 与有效时钟必须持续存活。
-open 只校验静态结构，close 不停止硬件；产品负责串行化、平台生命周期、看门狗、
-Flash stall、复位和恢复。产品必须定义永不返回的 `nx_mcuboot_assert_fail()` 致命
-处理钩子；未持有有效 operation 时调用 boot 不是可恢复查询。完整 boot 另需产品
-看门狗进度钩子，不能悄悄续期。通用 Control 对缺少 operation 返回错误，不启动硬件。
-Flash API 始终使用完整物理槽偏移，不叠加镜像前缀。
-底层真实 region 校验保留完整扇区、权限、对齐、有限 deadline 和脉冲结清合同。
+```text
+boot 镜像                              应用
+  官方 boot_go                           Nexus C11 control API
+  官方验证与复制                          官方 bootutil_public.c
+  TinyCrypt 与 vendored ASN.1             不含 boot 内核或镜像密码实现
+                   \                     /
+                    普通 Flash API bridge
+                    调用者显式拥有 region
+                    既有 Nexus Flash provider
+```
 
-查询只在成功时写出已知动作，正数 PANIC=255 和未知值都按错误处理。上游会将不可读
-secondary 视为空槽，因此 NONE 不是健康、可用或签名有效性证明。读到 TEST 或
-REVERT 也不代表当前覆盖模式支持试运行、回退或确认接口。
+仅 include `CMakeLists.txt` 注册可选 helpers。已配置 assembly 显式调用无参数、
+幂等的 `nexus_add_mcuboot_control()`，创建 `Nexus::MCUBootControl` 和只用于
+装配的 `Nexus::MCUBootPort`；`nexus_add_mcuboot_boot()` 才创建独立 boot 镜像
+使用的 `Nexus::MCUBootBootStorage`。未选择时不创建厂商目标或运行态常驻数据。
 
-TEST 请求无物理访问并返回 UNSUPPORTED。PERMANENT 调用官方公共接口后再次查询，
-只有实际动作是 PERMANENT 才返回成功；已存在的 TEST 不会被悄悄当成永久更新。
-失败可能发生在部分 trailer 已写入之后，中断的永久请求也可能留下 TEST pending。
-调用者必须在复位前落实恢复策略；适配器不擅自擦掉候选、不续期，也不伪造回滚。
+公共 Control 只有 Nexus 类型；Port 显式开放所选 Flash 装配 ABI。完整 BootStorage
+的固定 GNU／LLVM 链接配置要求 `--gc-sections`，丢弃未选供应商 allocator 分支；
+不提供 allocator 实现或隐藏 heap。
 
-软件参考把前 512 KiB 分为 boot、primary、secondary 和未分配空间，各 128 KiB；
-同一布局事实派生 linker 与 C region 数据。应用向量位于 primary+512，尾部保留
-1024 字节。这是测试参考，不是产品强制分区，也不保证 TLS/网络应用能放入该槽。
-control-only 链接夹具提供 NULL operation，不能发起实板更新。
+创建目标前核对 catalogue、精确 Git commit／tree、父 index gitlink、声明和全部
+80 个已审文件 hash。Source SDK 先通过自身 manifest，再准入无 Git payload。
+Development source override 仅建立开发证据，不能代替生产或 SDK 资格。
 
-真实主机模型覆盖 region 准入、有限 deadline、拒绝 TEST、正数 PANIC、部分 trailer
-写入、主镜像签名校验、未申请的有效 secondary、永久覆盖复制和完成复制后的正常
-重启。两个有效夹具由固定上游 imgtool 和公开已知的测试私钥签名并验证；测试根不能
-用于产品。额外 host 依赖隔离安装并校验 hash，但该开发环境不是正式封存工具链。
-首次有效镜像流程直接通过，诚实记录为既有行为验证；新增 API 和读回语义另有真实
-RED→GREEN 证据。
+BootStorage 与 TLS 的 CMake crypto-ABI 不兼容，同一最终消费者混链会在 CMake
+生成阶段拒绝；Control＋TLS，以及同一图中的独立 boot／TLS executables 仍合法。
+这项逐消费者公共目标检查无运行态状态，也不能隔离绕过 helper 手工混链的内部
+archives。TLS helper 自行发现 Python，不要求调用者提前发现解释器。
 
-ARM ELF 预算和主机执行不代表实板运行、时延、实际堆栈峰值、物理中断复制恢复、
-掉电资格、密钥可信存储或防降级计数器。覆盖模式会替换旧应用，没有旧版本自动回退。
-产品自行负责信任根、版本与授权策略、签名私钥、硬件安全输出及最终跳转。没有真实
-产品私钥、调试器或 Flash 实板操作。仓库/SDK 集成及最终候选门禁仍须分别执行。
+## 操作上下文与生命周期
+
+应用 Control 无运行态状态、allocator、注册表、任务或锁。产品提供 operation
+getter，在完整上游调用、嵌套 open 和重试期间，借出不可变双 area、`nx_clock_t`
+值及有限绝对 deadline。时钟回调有界、context 持续存活；时钟、deadline、Flash
+provider 使用同一单调 epoch 与单位，不做时间域换算或隐式全局时钟访问。缺少 read
+回调时无 Flash 访问即拒绝。
+
+不可变 operation 在已审 ARM ABI 为 24 字节、Native 为 40 字节；时钟另占
+8／16 字节，无池或 worker。area、region descriptors、provider 和有效时钟保持
+存活且不变到调用返回。`open` 是纯结构查找，`close` 不撤回 provider。产品串行化
+操作，并拥有 Platform start／stop、watchdog、Flash stall、reset 与恢复策略。
+
+必须提供永不返回的 `nx_mcuboot_assert_fail()`；未获授权 operation 就调用 boot
+不是可恢复查询。完整 boot 另需产品 watchdog progress hook。通用 Control 对
+缺失 operation 拒绝，不启动硬件。
+
+## 查询、永久更新与失败
+
+`nx_mcuboot_query` 只对已知成功动作发布输出。正数 `BOOT_SWAP_TYPE_PANIC=255`
+和未知返回值均为错误。上游故意把不可读 secondary trailer 当成空槽，因此 NONE
+不是槽健康、真实性或可用性证明；读到 TEST／REVERT 也不会启用对应模式。
+
+`nx_mcuboot_request(TEST)` 无 Flash 访问并返回 UNSUPPORTED。PERMANENT 调用
+官方公共 API 后，再次读实际动作，只有 PERMANENT 才成功；既有 TEST 不会被静默
+提升。任何失败都可能发生在部分 trailer 已持久写入之后，中断的永久请求也可能
+留下 TEST pending。调用者必须在 reset 前拥有恢复方案。adapter 不擦除候选、不
+续期 deadline、不伪造失败回滚；没有 confirmation 或 trial／revert 接口。
+
+## Flash 布局与产品边界
+
+Flash offset 始终指向含 signed header／trailer 的完整物理槽。image-prefix 只
+移动链接执行窗口，不移动 Flash API 地址。region 必须拥有完整物理擦除扇区并共享
+同一 provider；真实 `nx_flash_region_*` 保留 whole-slot bounds、权限、物理
+对齐、结清和固定 deadline，不扩大 ECC／fresh-erase 支持，不暗藏擦除历史。
+
+普通软件参考将前 512 KiB 分成 128 KiB boot、128 KiB primary、128 KiB secondary
+和 128 KiB 未分配空间，同一 layout 派生 linker 所有权与 C region facts。普通
+payload 链接于 primary origin＋512 字节，尾部保守预留 1024 字节。这是测试参考，
+不是强制产品分区，也不保证 TLS／网络应用适合 128 KiB 槽。control-only 链接探针
+提供 NULL operation，不能申请真实物理升级。
+
+## 源码、证据与限制
+
+先读公共 control 头与 `port` 的 area 合同，再查看 `CMakeLists.txt`、`profile/`
+及维护的 MCUboot fixtures。图中箭头表示编译／调用关系，不建立安全启动资格。
+
+普通模型覆盖 region 准入、固定 deadline、不支持请求、正数 PANIC、部分 trailer
+写入、主镜像签名校验、有效而未申请的 secondary、永久认证复制和复制后普通重启。
+固定官方 imgtool 用上游公开已知测试密钥签署并验证两个 fixtures，不能用作产品
+信任根。签名工具 extras 隔离并锁定 hash，已记录开发主机环境不是封存发布工具链。
+首次有效镜像流程第一次即通过，属于验证，不能伪造 TDD RED；新增 API 与永久更新
+readback 各自保留真实 RED。
+
+软件模型与 ARM 链接预算不证明 MCU 执行、Flash／IRQ／clock 时序、实测栈峰值、
+物理中断恢复、安全密钥存储、防回滚计数器或掉电资格。覆盖模式永久替换旧应用，
+没有旧镜像回滚。产品拥有信任根、版本／授权策略、签名私钥、硬件安全输出和最终
+跳转。本参考不含真实产品私钥、调试器动作或实板 Flash 操作；仓库／SDK 准入和
+最终候选门禁仍分别执行。

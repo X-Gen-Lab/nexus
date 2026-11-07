@@ -1,34 +1,22 @@
-# Wait ABI cost model
+# Wait ABI 成本模型
 
-`scripts/ci/os_wait_cost.py` compares the production four-pointer
-`nx_wait_port_t` with an experimental two-pointer face and one shared readonly
-operations table. The experimental layout is confined to this C fixture.
+`scripts/ci/os_wait_cost.py` 比较生产四 pointer `nx_wait_port_t` 与实验二 pointer
+face＋共享只读 ops；实验布局只存在本 C fixture，不改变生产 ABI。
 
-Run from the current source checkout with the maintained ARM GNU toolchain:
+从当前检出使用维护 ARM GNU 执行：
 
 ```sh
 python scripts/ci/os_wait_cost.py --output build/os-wait-cost-fresh
 ```
 
-The output directory must be new. Existing evidence and symlink destinations
-are rejected; no files are deleted. The tool records exact source and compiler
-identities, actual argv/return codes/raw logs, 48 linked ELF files, size/nm
-outputs, decoded dispatch instructions and ABI attributes. Missing tools,
-missing symbols, writable shared tables, incomplete execution and changed
-source inputs fail the comparison.
+输出须全新；旧证据、symlink 目标拒绝，不删除原件。工具记录精确源码／编译器、
+argv／exit／raw log、48 个 ELF、size／nm、分派反汇编与 ABI。缺工具、符号、表可写、
+执行不完整、输入变化都失败。
 
-The reviewed models cover M0+, M4 and M33 without DSP, `Os`/`O2`, one/two/four/
-eight retained faces, and both layouts. CPU flags come from the production
-resolver, including enum ABI. These are software models with fixed allocation
-addresses, not new SoC, Board or startup integrations. They do not run on hardware.
+模型覆盖 M0+／M4／无 DSP M33、Os／O2、1／2／4／8 face 与两种布局；CPU／enum
+参数来自生产 resolver。地址为软件参考，不新增 SoC／Board／startup，不跑硬件。
 
-The current default keeps direct callbacks: one owned notification does not need
-an additional table load in arm/wait/wake. A shared layout saves eight bytes of
-RAM per retained ARM face but adds a twelve-byte readonly table and extra
-dispatch loads. Multiple initialized faces can also reduce aggregate Flash;
-compare actual linked rows for the selected profile and object count.
-
-RAM and Flash measurements are allocation costs, and instruction counts describe
-decoded bodies only. They do not establish cycle latency, WCET or interrupt
-jitter. Application stack/register spills, temporary by-value ports, LTO and
-their own resource layout need measurements from the actual product image.
+默认保留直接 callback，单一 notification 的 arm／wait／wake 无须额外 table load。
+共享布局每 ARM face 省8 B RAM，但加12 B readonly table 和分派 load；多实例也可能
+减少总 Flash，必须看所选 profile 和实际 ELF。分配量／指令数不证明周期、WCET／
+jitter。应用 spill、临时 by-value port、LTO 和布局仍需真实镜像测量。

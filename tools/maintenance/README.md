@@ -1,51 +1,42 @@
-# Maintained capability and review checks
+# 平台能力、来源与维护检查
 
-`capabilities.py` uses SoC/routes/Board facts and the production resolver/emitter
-to check one deterministic generated block in `docs/delivery/capabilities.md`.
-It does not accept a second support configuration. Source ops evidence means an
-exact initialized production definition exists; it does not mean that hardware
-or the new HEAD has been qualified. Initialize the pinned SDK submodules before
-running the resolver-backed check.
+本目录维护可查询的能力投影、精确依赖来源、已有执行记录校验和评审导航。它消费既有
+配置、源码、锁与证据权威，不建立第二套支持声明，也不把配置一致性当成执行通过。
+命令从源码仓库根运行；需要 resolver 的检查先初始化锁定 SDK 子模块。
 
-`capabilities.py --assembly <assembly.toml>` prints the selected source and
-support projection. Its top-level `silicon_admission` belongs to the system-clock
-owner; the same field under each controller belongs only to that controller.
-These fields project existing reviewed policy, not observed chip identity.
-Unreviewed owners report `null`; endpoints and companion controllers do not
-inherit another owner's policy. H743 high-clock and SPI DMA reviews and G474 ADC
-review/workaround records keep their exact profile, revision and scope fields.
-They neither admit an unknown revision nor establish physical qualification.
+## 能力查询与候选关联
 
-Add `--candidate /path/to/sealed/candidate.json` to associate an existing
-software candidate with this exact assembly. The query runs the existing full
-candidate verifier, including referenced payloads, qualifications and linked
-artifacts. It does not execute new tests or publish a candidate. Both the
-observed current Git source and the referenced tested source are reported;
-moving a checkout does not change its commit/tree identity. A dirty checkout,
-changed source or different recursive dependency state cannot inherit a pass.
+`capabilities.py` 从 SoC／routes／Board facts 和生产 resolver／emitter，检查
+`docs/delivery/capabilities.md` 中确定性生成块。不接受第二份支持配置。source ops
+证据仅说明精确初始化的生产定义存在，不表示硬件或新 HEAD 已取得资格。
 
-The `evidence.relation` is `exact_source_and_configuration` only when clean
-source identity and the complete resolved configuration match. That relation
-projects the candidate's existing software scopes into `validation`. A valid
-candidate with another source is `historical_source`; a different configuration
-is `configuration_mismatch`. Both retain `not_assessed` for the current software
-selection. Missing, changed or invalid evidence rejects the query rather than
-becoming historical success. Physical HIL remains separately unassessed, even
-when the software candidate is valid. No candidate changes the aggregate family
-table or qualifies other Boards, controllers, modes or routes.
+`capabilities.py --assembly <assembly.toml>` 输出选定源码和支持投影。顶层
+`silicon_admission` 属于 system-clock owner，controller 下同名字段只属于该
+controller。它们投影已审策略，不是观察到的芯片身份；未审 owner 为 `null`，
+endpoint／companion 不继承别人的策略。H743 high-clock／SPI DMA 和 G474 ADC
+review／workaround 保留精确 profile、revision、scope，不准入未知 revision 或认证硬件。
 
-An exact assembly query also projects its resolved `os` selection: kernel source
-commit, actual port/CPU ABI, Tick policy, enabled optional capabilities and
-caller-owned stack/storage restrictions. Startup minima are not measured stack
-peaks. Ordinary/direct notification and joinable/permanent tasks remain explicit
-choices; Native queue roles do not imply independently measured object layouts.
-The existing candidate association still owns execution evidence. A configuration
-query alone reports execution and linked costs as unassessed/unmeasured.
+加入 `--candidate /path/to/sealed/candidate.json` 可关联已有软件候选。查询运行既有
+完整 candidate verifier，核对 referenced payload、qualification 和 linked artifacts，
+不执行新测试或发布。分别报告当前 Git source 与 referenced tested source；移动路径
+不改 commit／tree，dirty source、变化的源码或 recursive dependencies 不继承 pass。
 
-Without `--candidate`, queries keep their configuration-only behavior and need
-no Git or evidence observation. A portable candidate must first be restored with
-the existing artifact tools; this command reads the seal and its payloads without
-modifying them. Candidate validation may use disposable temporary SDK files.
+`evidence.relation` 只有 clean source 和完整 resolved config 都一致时才为
+`exact_source_and_configuration`，并将已有软件 scope 投影为 `validation`。其他
+源码为 `historical_source`，其他配置为 `configuration_mismatch`，当前选择仍保持
+`not_assessed`。missing／changed／invalid evidence 直接拒绝，不降格成历史成功。
+物理 HIL 即使候选有效也单独 unassessed；不能改变 family 总表或认证其他 Board／
+controller／mode／route。
+
+精确 assembly 查询另投影 `os`：kernel commit、实际 port／CPU ABI、Tick policy、
+optional capabilities、caller-owned stack／storage 限制。启动 minima 不是实测栈峰值；
+普通／direct notify、joinable／permanent task 仍显式选择。Native queue role 不等于
+独立测得的对象布局。配置查询不建立 execution 或 linked cost，保留 unassessed／
+unmeasured；已有候选关联才拥有执行证据。
+
+不提供 `--candidate` 时维持 configuration-only，不观察 Git／evidence。portable
+candidate 先用既有 artifact 工具 restore，查询只读 seal／payload；验证期间可使用
+临时 SDK 文件。
 
 ```sh
 python tools/maintenance/capabilities.py --check
@@ -58,23 +49,19 @@ python tools/maintenance/capabilities.py \
 python -B -m unittest tools.testing.test_maintenance -v
 ```
 
-`local_ci.py --report /path/to/report.json` verifies an existing complete
-execution of the checked-in `tools/dev/plans/software.json`. Use the Python
-interpreter recorded by that execution. The verifier requires the same clean
-source before, after and now; exact plan order, arguments and checker bytes;
-actual successful command and unique attempt receipts; and unchanged stdout,
-stderr and logs. Empty actual output is accepted only with its completed
-receipt. Partial, interrupted, skipped, changed or combined historical plans
-cannot publish a pass for a new commit.
+## 完整本地 CI 的验证与发布
 
-The default operation is offline and read-only. Explicit `--publish` uses the
-existing GitHub transport and configured `GH_TOKEN` to post the fixed status
-`nexus/local-software-plan` to the verified commit. It observes an open PR to
-this repository's `main` before and after verification, rejecting ordinary
-head/base drift. Status creation is bound to that SHA; it is not an atomic PR
-merge operation and a later head cannot inherit the old status. A new receipt
-retains the request and confirmed response, or an unconfirmed outcome if the
-remote operation fails. No credentials are included in the receipt.
+`local_ci.py --report /path/to/report.json` 验证既有完整
+`tools/dev/plans/software.json` 执行，使用该执行记录的 Python。要求执行前、后及
+现在同一 clean source，精确 plan 顺序／参数／checker bytes，真实成功命令和唯一
+attempt receipts，以及不变 stdout／stderr／logs。实际空输出只有 completed receipt
+才可接纳。partial、interrupted、skipped、改动或拼接历史计划不能为新 commit 发布 pass。
+
+默认离线只读。显式 `--publish` 使用既有 GitHub transport 与已配置 `GH_TOKEN`，
+向核验 commit 发布固定 `nexus/local-software-plan` status。验证前后观察本仓库指向
+`main` 的 open PR，拒绝通常的 head／base 漂移。status 只绑定该 SHA，不是原子 PR
+merge；后来的 head 不继承。新 receipt 保留请求与已确认响应，远端失败则保留
+unconfirmed outcome，不含凭据。
 
 ```sh
 .venv/bin/python tools/maintenance/local_ci.py --report /path/to/report.json
@@ -83,167 +70,127 @@ remote operation fails. No credentials are included in the receipt.
   --output /path/to/new-status-receipt.json
 ```
 
-This status means only the maintained local software plan passed for its exact
-source. It neither represents GitHub Actions jobs nor establishes a sealed
-candidate, physical HIL, release publication or branch protection. Required
-checks must name this actual producer and be verified separately on the server.
+此状态只证明精确源码的维护本地计划通过，不代表 GitHub Actions jobs、sealed
+candidate、物理 HIL、release 或 branch protection。required checks 必须指定真实
+producer 并在服务器单独核实。
 
-`work_packages.py` derives a review/navigation plan from existing provider,
-capability, resolver fixture, SDK-required-source and reviewed lifecycle-test
-authorities. Each entry has an exact family/controller/mode identity; these are
-mode review entries, not an additional top-level implementation ledger.
+## 派生工作包与维护责任
 
-Run from the source checkout root, using a fresh output path:
+`work_packages.py` 从 provider、capability、resolver fixture、SDK required source
+和已审 lifecycle-test 权威派生导航。每项为精确 family／controller／mode review
+entry，不建立另一套顶层实施台账。在 checkout root 使用新 output：
 
 ```sh
 python -B tools/maintenance/work_packages.py \
   --output build/quality/work-packages.json
 ```
 
-Success means those source relationships are consistent. The tool does not run
-tests, verify an installed SDK or establish support or qualification. It keeps
-`software_status` and `hardware_status` as `not_executed`, reports unmapped
-properties without guessed aliases, and records the input files it observes.
-Those hashes cover report authorities, not complete Git/configuration/dependency
-provenance. `source_selected` is a resolver source relationship, while
-`reviewed_bounded` identifies a matching existing reviewed property. Neither
-means passed execution. `not_catalogued` does not assert that no other test exists.
-The output is created exclusively; select a new path rather than overwrite a
-prior report. Source authorities cannot be used as output destinations.
+成功只说明来源关系一致，不运行测试、验证安装 SDK 或建立支持／资格。
+`software_status`／`hardware_status` 保持 `not_executed`；unmapped properties
+不猜 alias，记录的 hash 仅覆盖 report authorities，不是完整 Git／config／dependency
+provenance。`source_selected` 是 resolver 关系，`reviewed_bounded` 是已有 reviewed
+property 匹配，均不等于执行通过。`not_catalogued` 不声称没有别的测试。输出独占
+创建，不能覆盖旧报告或任何 source authority。
 
-`ownership.py` validates `.github/maintainer-roles.json`. The current
-`agent_managed` policy assigns maintenance to Codex across every review domain,
-including security, manufacturing and field interfaces. The ten seats describe
-the original capacity plan; they do not require named people. Empty `members`
-arrays are required in this mode. The strict check validates the responsible
-agent, complete paths, backup domains and mandatory automated gates.
+`ownership.py` 验证 `.github/maintainer-roles.json`。当前 `agent_managed` 将全部
+review domains（含 security、manufacturing、field）交给 Codex；十个 seats 是原
+容量计划，不要求实名人员。该模式要求空 `members`，strict 检查 responsible agent、
+完整 paths、backup domains 与 mandatory gates。
 
 ```sh
 python tools/maintenance/ownership.py
 python tools/maintenance/ownership.py --require-assigned
 ```
 
-GitHub CODEOWNERS requires actual GitHub accounts or team slugs. Agent-managed
-maintenance does not invent an account for Codex and refuses CODEOWNERS output.
-Independent human review, repository access and branch rules remain separately
-unverified; an assigned maintenance policy does not establish these conditions.
-
-If named-account maintenance is selected later, remove `maintenance`, fill each
-role's `members` and mark `assignment_status` as `assigned`. Verify account
-access before installing a reviewed `.github/CODEOWNERS` through normal checks:
+GitHub CODEOWNERS 必须是真实账号／team slug；agent-managed 不虚构 Codex 账号，
+拒绝输出 CODEOWNERS。独立人工 review、访问权限和 branch rules 未由此验证。
+将来若改 named-account，删除 `maintenance`，填真实 `members` 并将
+`assignment_status` 标为 `assigned`；先验证权限，再通过普通检查安装已审结果：
 
 ```sh
 python tools/maintenance/ownership.py --require-assigned \
   --output build/quality/CODEOWNERS.proposed
 ```
 
-The generator refuses to write the active `.github/CODEOWNERS` directly. Broad
-patterns precede specific overrides because GitHub uses the last matching line.
-CODEOWNERS itself does not enforce review. Confirm branch rules and required CI
-checks through GitHub before reporting them as configured.
+生成器拒绝直接写 active `.github/CODEOWNERS`。GitHub 后匹配覆盖前匹配，因此
+广泛规则在前、具体规则在后。CODEOWNERS 本身不强制评审，必须核实服务器 branch
+rules／required CI。`doctor`、`check`、Tool Contracts CI 校验能力正文并报告分配
+状态；完整 agent-managed 的 `--require-assigned` 不索取真人账号。
 
-`doctor`, `check` and Tool Contracts CI validate the generated capability text
-and report the assignment status. `--require-assigned` passes for a complete
-agent-managed policy without requesting human accounts.
+## CI 产物身份与安装 SDK 范围
 
-`job_identity.py` records each published CI artifact's actual checkout, tree,
-recursive dependency state, locks, configuration input closure, executable
-bytes, version-command output and artifact digests. A successful job rejects
-dirty source, missing required dependencies, incomplete outputs, stale inputs
-and files or tools that change during observation. Failed or cancelled jobs
-retain missing outputs and invalid configuration bytes with their actual state.
-Documentation and style jobs explicitly observe uninitialized SDK dependencies;
-they cannot report those dependencies as complete. CPU runtime inputs use the
-same length-framed assembly/facts hash as the production resolver.
+`job_identity.py` 记录真实 checkout／tree、recursive deps、locks、配置输入闭包、
+executable bytes、version-command output 和 artifact digests。成功 job 拒绝 dirty
+source、必需依赖缺失、不完整输出、过期输入、观察期间变化的文件／工具。失败／取消
+保留 missing outputs 和 invalid config 的真实状态。docs／style jobs 明确记录未
+初始化 SDK deps，不能标为 complete。CPU runtime 使用生产 resolver 相同的
+length-framed assembly／facts hash。
 
-The composite `record-identity` action supplies inputs through environment
-variables and constructs an argument list. It never executes input text as a
-shell command. Ordinary artifacts retain the identity and raw version logs for
-30 days. The manual source SDK workflow also requests GitHub provenance for the
-observed manifest and retains the returned bundle. Workflow configuration is
-not evidence that signing ran; GitHub must actually execute it successfully.
-The job identity explicitly remains `not_a_software_candidate`. Formal offline
-rebuild, source SDK consumption and physical qualification keep their separate
-admission rules.
+`record-identity` action 通过环境值构造 argv，不把输入当 shell 执行。普通 artifacts
+保留 identity 和 raw version logs 30 天；手动 source SDK workflow 另请求 GitHub
+provenance 并保留返回 bundle。workflow 定义不证明签名真正成功，job identity
+明确为 `not_a_software_candidate`；formal offline rebuild、SDK consumer 与 physical
+qualification 分别准入。
 
 ```sh
 python tools/maintenance/job_identity.py --help
 python -B -m unittest tools.testing.test_job_identity -v
 ```
 
-The installed source SDK intentionally omits repository docs, named assignments
-and the main firmware host contract suite. `doctor` first verifies its file map,
-package exports,
-dependency and source-import identities, then reports tools and this narrower
-scope. A manifest's presence alone never skips verification. `check` requires a
-development checkout and explicitly rejects the SDK-only scope.
+安装 Source SDK 故意不带 repository docs、named assignments 和主固件 host contract
+suite。`doctor` 每次先验证 file map、package exports、dependency／source-import
+identity，再报告工具和较窄范围；manifest 存在不跳过验证。`check` 要 development
+checkout，明确拒绝 SDK-only。
 
-`compatibility.py` checks the single
-`dependencies/platform-compatibility.json` policy against actual CMake,
-validator/emitter schemas, fact files and executed exact-version package tests.
-The production stdlib loader is `tools/configure/metadata.py`. Unknown requested
-source factory generations fail closed; current epoch 1 does not promise a
-binary ABI. Optional generated-header and installed-source-SDK checks verify
-actual bytes. This metadata consistency check is not software qualification.
+## 兼容性与依赖升级
 
-`dependency_proposals.py` observes actual current pins offline by default.
-Explicit `--observe-upstream --upstream-output <fresh-directory>` captures
-bounded public GitHub heads/tags and raw request/response identities. Failures
-remain `not_observed`. Codex owns weekly proposals and independent review.
-Candidate source/archive/license identities and nine mandatory software/legal
-gates are retained as pending or referenced/unreviewed; a passed marker never
-authorizes an upgrade. The tool never writes locks or merges source changes.
-See [source compatibility and maintenance](../../docs/design/source-compatibility.md)
-for scope, commands and the complete upgrade process.
+`compatibility.py` 对照真实 CMake、validator／emitter schema、facts 和实际 exact-
+version package tests，检查唯一 `dependencies/platform-compatibility.json`。
+生产 stdlib loader 是 `tools/configure/metadata.py`。未知 source factory generation
+拒绝，epoch 1 不承诺 binary ABI。可选 generated-header／installed-SDK 检查实际字节，
+metadata 一致性不是软件资格。
 
-`source_catalogue.py` separates official `upstream_url`, approved `fetch_url`
-and the selected Gitlink. Upstream observations follow the official URL even
-when retrieval uses a reviewed fork. The catalogue explicitly includes nested
-FreeRTOS modules and the TLS/crypto/framework mounts; host-only GoogleTest
-remains outside the production SDK.
-Hosting activation and the reviewed FreeRTOS transport commit are separate
-from upgrading the official base. The linked contract also defines checkout
-migration order, rejection of local changes and offline SDK trust boundaries.
+`dependency_proposals.py` 默认离线观察当前 pins。显式
+`--observe-upstream --upstream-output <fresh-directory>` 捕获有界 GitHub heads／tags
+和原始请求／响应身份，失败保持 `not_observed`。Codex 负责每周提案与独立 review。
+候选 source／archive／license 和九个必需软件／法律 gates 保留 pending 或
+referenced／unreviewed，passed marker 不授权升级。工具不改 locks 或 merge source。
+完整命令、scope 和过程见[来源兼容与维护](../../docs/design/source-compatibility.md)。
 
-`mbedtls_lock.py` verifies the exact curated Mbed TLS 4.1.1 and TF-PSA-Crypto
-1.1.1 sources through one [lock](../../dependencies/mbedtls.lock.json). The
-catalogue owns four selected mounts: Mbed TLS, its crypto child and two distinct
-mounts of the same framework commit/tree. Each mount must independently match
-its parent Gitlink, clean checkout, approved organization origin and locked
-bytes. The framework alias shares one canonical file map without substituting
-one checkout for the other. Every declared child is selected; this source graph
-has no ML-DSA Gitlink. Historical excluded pins remain in the curated vendor
-notice, and unexpected driver material cannot enter the closed SDK payload.
+`source_catalogue.py` 分开官方 `upstream_url`、批准 `fetch_url` 与选定 Gitlink。
+即使用已审 fork 获取，upstream 观察仍走官方 URL。显式登记 FreeRTOS nested modules、
+TLS／crypto／framework mounts；host-only GoogleTest 不属于生产 SDK。组织托管启用和
+已审 FreeRTOS transport commit 与官方 base 升级不同；上述合同也定义 checkout
+迁移、local change 拒绝和离线 SDK trust boundary。
+
+## Mbed TLS／coreMQTT 固定来源
+
+`mbedtls_lock.py` 通过[唯一锁](../../dependencies/mbedtls.lock.json)校验精确整理的
+Mbed TLS 4.1.1 与 TF-PSA-Crypto 1.1.1。catalogue 管四个 mounts：Mbed TLS、crypto
+child 和相同 framework commit／tree 的两处独立挂载；每处分别匹配 parent Gitlink、
+clean checkout、approved organization origin 和 locked bytes。framework alias 共享
+canonical file map，不能用一个 checkout 顶替另一个。全部 declared children 都
+选入，图中没有 ML-DSA Gitlink；历史排除 pin 保留 vendor notice，意外 driver 材料
+不能进入封闭 SDK payload。
 
 ```sh
 python tools/maintenance/mbedtls_lock.py --source ext/mbedtls
 ```
 
-The static payload includes the locked C/CMake inputs, public/private headers,
-eleven official release-generated files, generated-source provenance notices
-and complete license texts. Consumers must set `GEN_FILES=OFF`; source
-generators, upstream tests and programs are outside this SDK closure. Keep the
-configuration identical for library and caller, and compile the selected vendor
-targets as C11. The three canonical repositories use
-`Apache-2.0 OR GPL-2.0-or-later`; individual source notices, including the Everest
-Apache-2.0 notices, remain intact.
+静态 payload 包含 locked C／CMake、public／private headers、十一个官方 release-
+generated files、generated-source provenance notices 和完整 licenses。消费者必须
+`GEN_FILES=OFF`，生成器、上游 tests／programs 不在 SDK closure。library 与 caller
+profile 一致，vendor targets 编译为 C11。三个 canonical repos 为
+`Apache-2.0 OR GPL-2.0-or-later`，各源 notice（含 Everest Apache-2.0）保持原样。
 
-`--development` permits an explicit location for the same exact curated source
-and labels it unqualified. `--source-sdk` first invokes the owning installed SDK
-verifier and then checks all four dependency records and complete per-mount
-file sets; it never invents Git state for redistributed source. Source checks
-do not establish that a cipher profile was built, TLS handshakes succeeded,
-physical entropy is trustworthy, or a Board passed HIL. Those results require
-their separate source-bound build and execution evidence.
+`--development` 允许同一精确整理源码的显式路径，标为未取得资格；`--source-sdk`
+先调用 owning SDK verifier，再查四项 dependency records 和逐 mount 全部 files，
+不伪造 Git state。源码检查不证明 cipher profile 构建、TLS 握手、物理熵或 Board HIL。
 
-`coremqtt_lock.py --source ext/coremqtt` applies the same source boundary to
-the optional coreMQTT 2.3.1 client. Its organization commit removes the upstream
-CMock test submodule while preserving the production algorithms and MIT
-license. The [single lock](../../dependencies/coremqtt.lock.json) contains three
-C sources, five headers, `LICENSE` and the curation notice: ten exact files.
-The catalogue requires a selected leaf, not an unselected dependency exception.
-The SDK excludes CMock, upstream tests and unrelated files; rehashing an extra
-test dependency or an omitted algorithm does not authorize another closure.
-Inventory records the curated selection separately from its official upstream
-parent. Development and installed-SDK scopes remain explicit and do not
-establish broker behavior, credentials policy, TLS authentication or HIL.
+`coremqtt_lock.py --source ext/coremqtt` 对 coreMQTT 2.3.1 使用同一边界。组织 commit
+移除 CMock test submodule，保留生产算法和 MIT。[唯一锁](../../dependencies/coremqtt.lock.json)
+包含三 C、五 headers、`LICENSE` 和 curation notice，共十文件。catalogue 要求选定
+leaf，不是未选 dependency exception；SDK 不含 CMock、上游测试或无关文件。给额外
+依赖重新算 hash 或遗漏算法，都不授权新 closure。inventory 分开 curated selection
+与官方 upstream parent；development／SDK scope 不证明 broker、凭据策略、TLS 认证
+或 HIL。

@@ -1,10 +1,8 @@
-# Cross-vendor SoC collaboration
+# 跨厂家 SoC 协作合同
 
-This private directory retains `uart_control.h`, the shared control contract
-used by exact SoC providers. It does not own a public I/O API, chip facts or
-peripheral algorithms. Public request ownership remains in `io/`.
+本私有目录保存精确 SoC provider 共用的 `uart_control.h` 控制合同。它不拥有公共
+I/O API、芯片事实或外设算法；公共请求借用合同仍由 `io/` 定义。
 
-Reviewed reusable register algorithms are grouped under
-[drivers](../../drivers/README.md). STM32 identity access lives in
-`soc/stm32/common/stm32_identity.h`; it is not a cross-vendor contract.
-SoC wrappers retain chip-specific validation, clock and IRQ/DMA ownership.
+经审核的共享寄存器算法位于 [drivers](../../drivers/README.md)。STM32 身份访问位于
+`soc/stm32/common/stm32_identity.h`，不属于跨厂家合同。每个 SoC wrapper 继续负责
+芯片专属校验、clock 和 IRQ／DMA 所有权。

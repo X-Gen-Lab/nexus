@@ -1,12 +1,12 @@
-# DP83848
+# DP83848 PHY 组件
 
-An optional caller-owned Clause22 component: explicit identity/address, bounded
-BMCR soft reset, externally selected negotiation/fixed mode and observed link.
-It owns no GPIO, power rail, MAC, worker, task, stack, descriptor pool or network
-protocol. A configuration acknowledgement never substitutes for link truth.
+本组件由调用者静态提供状态，通过 Clause 22 MDIO 窄端口管理显式 PHY 身份与地址、
+有界 BMCR 软件复位、外部选择的协商／固定模式，以及实际观察到的链路状态。
+配置被接受不代表链路已经建立。
 
-The caller keeps its MDIO face and component state live, serializes operations,
-provides finite deadlines and explicitly applies observed link facts to its MAC.
-TI and NS IDs are chosen explicitly; unknown models reject. See
-[the Ethernet contract](../../docs/design/ethernet.md) for register sources,
-ownership, board-route restrictions and physical qualification boundaries.
+组件不拥有 GPIO、电源、MAC、任务、协议栈或 descriptor pool。调用者保持 MDIO
+接口与组件状态存活，串行执行操作，提供有限 deadline，并将观察到的链路事实显式
+应用到 MAC。TI 与 NS 身份必须明确选择，未知型号拒绝。
+
+接入前阅读[以太网合同](../../docs/design/ethernet.md)，核对寄存器来源、所有权、
+Board 路线和物理资格。源码接口不授权未审查的 PHY 电源、REFCLK、复位或 PCB 接线。
