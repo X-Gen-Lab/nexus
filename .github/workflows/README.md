@@ -1,120 +1,79 @@
-# Maintained platform workflows
+# 平台工作流与证据边界
 
-`ci.yml` gates all PR base branches, main/develop pushes, nightly and manual
-runs. Feature branches use PR validation; manual runs cover branches without a
-PR. Stacked PRs run the same read-only checks once per PR update.
-Required-job aggregation rejects failed/cancelled results and unjustified skips.
-Workflow edits require build, tool, analyzer and documentation validation.
+`ci.yml` 负责 PR 基础分支、main／develop push、nightly 和手动运行。feature 分支
+通过 PR 验证；无 PR 分支可手动运行。堆叠 PR 在每次更新运行同一只读检查。
+required-job 汇总拒绝失败、取消和无依据 skip。修改 workflow 需要构建、工具、
+分析器和文档验证；文件存在不表示执行通过。
 
-| Workflow | Actual responsibility |
-|---|---|
-| `build-matrix.yml` | Four Native configurations (Debug, Release, ASan/UBSan, TSan) each execute the complete CTest plan and validate every GoogleTest/GoogleMock case; six exact Board/backend ARM assemblies; CPU runtime links; kernel profiles and measured static OS costs; optional MPU and dual-image TrustZone links; software-only peripheral fixtures. |
-| `quality-checks.yml` | Same staged style policy as local hooks; actual compile-database clang-tidy/cppcheck; missing tools or empty scope fail. |
-| `enterprise-tools.yml` | Configuration, artifact tamper, budget, HIL admission, real source SDK relocation and command-failure boundaries. |
-| `performance.yml` | Three-board O2/Os/O3 ±LTO minimum-image resource comparisons; GC and budget checks; no inferred cycles. |
-| `release.yml` | Exact-SHA source SDK packaging and strict consumers; optional policy-versioned software preview publication from the trusted main workflow requires fresh complete main CI, existing matching tag, verified assets and actual provenance. Product promotion remains separate. |
-| `security.yml` | Resolved Python dependency audit, actual Native CodeQL contexts and secret scanning. |
-| `docs-build.yml` | Public-only Doxygen, strict bilingual Sphinx, locked documentation tools and verified prepared publication bytes. |
-| `docs-publish.yml` | Verify trusted prepared documentation bytes before Pages deployment; publication has its own source and receipts. |
+## 工作流职责
 
-One authored TOML assembly generates one atomic resolved configuration, typed
-factory IDs, readonly polymorphic faces and fixed typed bindings
-and physical memory input. CMake owns the code dependency graph. SDK and SoC
-implementation headers compile privately; startup/system objects enter firmware
-once. Dependency preparation initializes the declared selected closure, including
-the pinned recursive FreeRTOS dependencies and required CMSIS/ThreadX inputs.
-Source SDK packaging requires its complete declared closure. ARM uses the
-checksum-locked GNU distribution.
+| 工作流 | 实际责任 |
+| --- | --- |
+| `build-matrix.yml` | Debug、Release、ASan／UBSan、TSan 各执行完整 CTest／Google 用例；六个精确 Board／backend ARM 装配；CPU runtime、kernel profile、OS 静态成本、MPU／TrustZone 双镜像和软件外设夹具 |
+| `quality-checks.yml` | 与 hook 相同的 staged 风格规则；实际 compile database 上 clang-tidy／cppcheck；缺工具或空范围失败 |
+| `enterprise-tools.yml` | 配置、产物篡改、预算、HIL 准入、真实 SDK 搬移与失败边界 |
+| `performance.yml` | 三板 O2／Os／O3 与可选 LTO 的最小镜像、GC、预算比较，不推断周期 |
+| `release.yml` | 精确 SHA SDK 打包与严格消费者；可信 main 上按版本策略预览发布，要求新的完整 CI、匹配既有 tag、资产和 provenance |
+| `security.yml` | 实际解析的 Python 依赖审计、Native CodeQL 构建上下文与秘密扫描 |
+| `docs-build.yml` | 公开 Doxygen、严格中英文 Sphinx、锁定工具与待发布字节验证 |
+| `docs-publish.yml` | 验证可信准备包，再部署 Pages，保留独立源码与发布收条 |
 
-Native test execution deletes stale JUnit and verifies the actual fresh nonempty
-CTest report. ARM compilation and software-register fixtures have distinct scopes
-from real hardware. Advanced route fixtures explicitly declare unknown PCB
-revisions and cannot be used to claim three-board electrical qualification.
+一份 TOML 生成原子配置、typed factory ID、共享只读接口、固定绑定与物理内存输入，
+CMake 拥有源码图。SDK／SoC 头私有编译，startup／system object 只装一次。
+显式准备按声明闭包初始化固定递归 FreeRTOS、CMSIS、ThreadX 等源码；SDK 打包
+要求完整闭包，ARM 使用摘要锁定的 GNU 归档。最小 ARM 准备与配置期 lwIP 校验
+不一致的问题单独记录在 [#52](https://github.com/X-Gen-Lab/nexus/issues/52)。
 
-`scripts/ci/native_contracts.py` enumerates the complete CTest plan and every
-registered GoogleTest case, then executes CTest once. Its clean environment
-requests separate case-level XML from each Google binary, including disabled
-cases. Both the CTest identities and Google case identities must exactly match
-discovery; missing, extra, stale, skipped or failed reports reject execution.
-The commit hook keeps its independent full `tdd_gate.py` execution unchanged.
-TSan instruments owned Native providers, adapters and tests. The pinned POSIX
-kernel library retains its separate vendor compile policy, so its internal memory
-accesses are not a complete kernel race audit. A host-only cooperative Idle hook
-allows tick signals to progress under the sanitizer; it changes no MCU Idle hook.
-Tool reporting/configuration suites no longer run a second time after every
-Native CTest execution. The independently callable tool workflow retains its
-complete suites, including on manual invocation. It has one automatic caller
-in `ci.yml`, rather than a duplicate push/PR trigger. Maintained branch pushes
-and PR checks remain enabled in `ci.yml`.
+## 真执行与范围
 
-Filters, shards, empty reports and skipped runs cannot substitute for the
-contract set. GoogleTest/GoogleMock
-are checksum-pinned host test dependencies; firmware and the source SDK contain
-no framework runtime or test archive. TDD records describe executed failing and
-passing boundaries; hooks alone cannot prove the order of every local edit.
+Native 删除旧 JUnit，校验新鲜非空的实际 CTest 输出。`scripts/ci/native_contracts.py`
+发现完整 CTest 计划和每个 Google 用例，随后只执行一次 CTest。隔离环境要求每个
+Google 程序输出独立 XML，包括 disabled 用例；CTest／Google 身份都必须精确匹配
+发现结果，缺失、额外、陈旧、跳过或失败均拒绝。commit hook 仍独立执行完整
+`tdd_gate.py`。
 
-`tools/hil/prepare.py` creates an unbound station work plan for each resolved
-assembly. It checks exact Board/part and UART routes, carries selected modes and
-explicitly lists pending IRQ wake, DMA, RX block, ADC trigger/block and controller
-isolation measurements. Null fixture budgets require review before physical
-admission. Preparation never operates equipment or establishes physical status.
+TSan 覆盖自有 Native provider、adapter 和测试；固定 POSIX kernel 保留自己的
+vendor 编译策略，其内部访问不构成完整 kernel race audit。host-only 协作 Idle hook
+允许 tick signal 在 sanitizer 下推进，不修改 MCU Idle。工具报告／配置测试不在每个
+Native 模式重复执行；独立工具 workflow 保留完整 suite 与手动入口，仅由 `ci.yml`
+自动调用一次，main／PR trigger 仍在 `ci.yml`。
 
-Formal reproducibility uses a declared complete source SDK, content-hashed ARM
-input, observed sealed OCI filesystem, two independent empty output directories
-and network-disabled execution. `tools/evidence/candidate.py` additionally checks
-actual source/config/ELF/BIN/map and all six qualification scopes. Mutable runner
-checks and workflow definitions do not establish those claims by themselves.
+filter、shard、空报告或 skipped run 不代替合同集合。GoogleTest／GoogleMock
+固定摘要且只用于 host，固件与 SDK 不含框架运行时／测试库。hook 只能验证实际执行，
+不能证明每次历史编辑都先 RED。高级 route fixture 明确 PCB 未知，不能据此宣称
+三板电气通过。
 
-Physical HIL is currently unexecuted. Codex owns platform maintenance through
-the checked agent-managed policy; named people are not required. GitHub
-protection, product deployments, signing and release promotion retain their
-separate actual states; workflow files do not establish remote permissions or
-physical qualifications.
+`tools/hil/prepare.py` 生成未绑定工位计划，核对 Board／part／UART route，携带
+模式和待测 IRQ wake、DMA、RX block、ADC trigger／block、控制器隔离项目。
+null 数值预算需实际准入前审查；准备不操作设备、不建立物理状态。
 
-Nexus 0.1.0 is the first public Source SDK developer preview, dated 2026-10-15
-(Asia/Shanghai). Its source commit, package hashes, pinned dependencies, licenses
-and executed tool tuple belong in the release asset manifests and receipts.
-The release process must publish and re-download those exact bytes; a successful
-Actions artifact upload alone does not establish durable release delivery.
-Historical `cc6a065c` candidates retain their original source and cannot qualify
-a new source or version. Their eight archive paths currently point through a
-broken relocated `/tmp` directory; retain that availability limitation until
-the original bytes are recovered. The [release guide](../../docs/status/release-0.1.0.md)
-records scope and verification without rewriting historical result indices.
+正式复现要求完整源码 SDK、摘要固定 ARM 输入、实际封存 OCI、两个独立空输出目录
+和断网执行。`tools/evidence/candidate.py` 绑定实际 source／config／ELF／BIN／map
+及六个资格范围，可变 runner 检查不代替这些执行。MCU 实板 HIL 未执行。Codex
+承担维护；服务器权限、保护、部署、签名和产品晋级保持各自实际状态。
 
-SDK preparation and strict consumers run in `RUNNER_TEMP`; verified copies enter
-owned `build/delivery` staging for observed job identities. Publication requires
-all 29 exact CI jobs to succeed on the final main commit within 24 hours. It
-checks the existing main and tag again before making the release public.
+## 发布、归档与恢复
 
-A failed upload or verification leaves the release as a draft. A retry refuses
-an existing release. Inspect its tag, source, uploaded bytes and failure logs;
-remove only the incomplete draft after preserving that evidence, then retry the
-same reviewed commit with fresh CI. Never delete or overwrite a public release
-or move its tag as routine recovery. Source-only preview publication does not
-establish physical acceptance or signed firmware qualification.
+首个公开 SDK 预览为 Nexus 0.1.0，日期 2026-10-15（Asia/Shanghai）。源码、包摘要、
+依赖、许可和工具组合保存在实际 manifest／收条；必须发布并重新下载同一字节，
+Actions artifact upload 本身不建立持久交付。历史 `cc6a065c` 候选不能为新源码
+资格背书；其八个旧 archive 路径曾指向搬移后失效的 `/tmp`，原件未恢复前保留
+可用性限制，见[历史发行指南](../../docs/status/release-0.1.0.md)。
 
-Every ordinary artifact upload now retains an observed job identity and its
-tool-version command logs for 30 days. Documentation uploads include the same
-record in the published tree. Actual checkout SHA/tree, recursive gitlinks,
-locks, resolved configuration and input closure, executable bytes and uploaded
-file digests are checked together. A metadata success cannot replace successful
-test execution. Failed or cancelled jobs retain their actual partial outputs.
-The source SDK workflow requests provenance for this digest-bearing manifest,
-then preserves the actual returned attestation bundle in a separate upload.
-Attestation status comes from an actual successful workflow and its returned
-bundle. This configuration alone does not establish an attestation, a signed
-product release or physical qualification.
+SDK 准备与严格消费者在 `RUNNER_TEMP` 执行，验证后复制到自有 `build/delivery`
+以绑定 job 身份。发布要求最终 main 在 24 小时内通过策略列出的全部精确 CI jobs，
+公开前再次检查 main 与已有 tag。失败上传／验证保留 draft，retry 拒绝已有 release；
+先保存 tag／源码／资产／失败日志，只移除不完整 draft，再用同一已审提交和 fresh CI
+重试。不能把删除公开 release、覆写资产或移动 tag 作为普通恢复。
 
+普通 artifact 保留实际 job identity 与工具版本日志 30 天，文档树同样携带身份。
+核对真实 checkout SHA／tree、递归 Gitlink、锁、配置闭包、可执行字节和上传摘要，
+metadata success 不代替测试。失败／取消 job 保留部分原始输出。SDK workflow
+为摘要 manifest 请求 provenance，并单独保存实际返回的 attestation bundle；
+只有真实成功执行和返回值才能建立 attestation，配置本身不等于签名产品发布。
 
-`dependency-maintenance.yml` defines a Monday 03:00 UTC read-only observation
-job and manual dispatch. It retains actual locked revisions, compatibility
-checks and bounded public upstream refs under an observed source identity.
-It never changes a dependency lock or opens an unverified upgrade. A candidate
-upgrade needs license, model, ARM, SDK and reproducibility evidence for that
-exact source. Scheduled execution begins only when this workflow is present
-on the default branch; the definition does not claim an executed weekly run.
-
-The [release maintenance guide](../../tools/release/README.md) defines the sole
-version policy, source and builder identities, complete raw consumer transport,
-and the separate roles of historical delivery and evidence branches.
+`dependency-maintenance.yml` 声明周一 03:00 UTC 只读观察和手动入口，记录锁定版本、
+兼容性及有界公开上游 refs，不修改 lock 或发起未验证升级。升级需精确源码的许可、
+模型、ARM、SDK、复现证据。定时任务须在默认分支才可能运行，定义不证明已执行。
+版本权威、构建者身份、完整原始消费者运输及历史分支职责见
+[发布维护](../../tools/release/README.md)。

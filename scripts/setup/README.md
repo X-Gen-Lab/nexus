@@ -1,7 +1,7 @@
-# Development setup
+# 开发环境安装
 
-Use Python 3.11+, CMake 3.31.6, Ninja 1.13.2 and a C11 compiler. Install the
-repository tools and both local Git hooks for each clone:
+从仓库根准备 Python 3.11+、CMake 3.31.6、Ninja 1.13.2 与 C11 编译器。
+每个 clone 安装工具、pre-commit 和 commit-msg hook：
 
 ```sh
 python tools/dev/dev.py prepare --scope native --allow-network
@@ -10,39 +10,28 @@ python scripts/setup/install_dev_tools.py
 python tools/dev/dev.py doctor
 ```
 
-Preparation audits the exact source-owned graph and initializes its selected
-paths in parent-first layers. Omit `--allow-network` to verify sources already
-present offline. Unknown declarations, missing dependencies and changed pins
-fail admission. Firmware configuration never fetches a missing dependency.
+prepare 审计源码拥有的精确图，按父先于子的层次初始化。去掉 `--allow-network`
+只离线检查已有源码；未知声明、缺失依赖和变化 pin 会拒绝。固件 configure 不下载。
 
-The committed graph includes the shared `vendors/arm/CMSIS_6` Core source and
-the selected ST/GigaDevice Device and driver dependencies. CMSIS-Core is pinned
-to official v6.4.0; exact release, header-version and pack-metadata identities
-are recorded in [vendor versions](../../vendors/VERSIONS.md). It is a private
-implementation dependency, distinct from public `Nexus::Core`. Initializing
-these sources does not establish support for every upstream component or chip.
+提交图含共享 `vendors/arm/CMSIS_6` 与所选 ST／GigaDevice Device、driver。
+CMSIS-Core 固定官方 v6.4.0，release／头／pack 身份见
+[供应商版本](../../vendors/VERSIONS.md)。它私有于实现，与公共 `Nexus::Core` 不同，
+初始化不表示上游全部组件／芯片支持。
 
-The installer preserves existing hooks using pre-commit's migration and rejects
-an explicit `core.hooksPath`. CI uses `--skip-hooks` and executes the same checks.
-Normal setup uses `install --install-hooks` to prepare the isolated Python
-environments before the first commit, including when the outer tools already
-match their pins. The TDD environment declares exact pre-commit, clang-format
-and PyYAML versions for its four complete tool suites and real hook fixtures.
-The contract checks these pins against the development and workflow locks.
-Offline setup may use `PIP_NO_INDEX=1` and `PIP_FIND_LINKS` pointing to the checked
-wheel export; this also applies when pre-commit prepares its isolated environment.
-The export includes `dependencies/hook-build-tools.txt` for the local hook's
-isolated build backend, in addition to the runtime tool requirements.
-The root `.clang-format` and `.editorconfig` remain authoritative. Versions are
-locked in `dependencies/development-tools.txt` and `environment-tools.txt`.
+安装器通过 pre-commit migration 保留旧 hook，拒绝显式 `core.hooksPath`。
+CI 用 `--skip-hooks` 安装再独立执行相同检查。普通安装使用 `install --install-hooks`
+准备隔离环境，即使外层工具已匹配。TDD 环境精确固定 pre-commit、clang-format、
+PyYAML，并与开发／workflow 锁交叉检查。
 
-ARM uses GNU 14.3.rel1 with a hash-verified archive:
+离线可设 `PIP_NO_INDEX=1`，`PIP_FIND_LINKS` 指向验证后的 wheel 导出，同样用于
+hook 隔离环境。导出含运行工具与 `dependencies/hook-build-tools.txt` 的构建后端。
+根 `.clang-format`、`.editorconfig` 为格式权威，版本以开发／环境工具锁为准。
+
+ARM 使用摘要验证的 GNU 14.3.rel1：
 
 ```sh
 python scripts/ci/install_arm_toolchain.py --install-dir /your/toolchains/arm
 ```
 
-Add that directory's `bin` to PATH. Use one maintained preset through
-`python tools/dev/dev.py configure|build|test`. No dependency download occurs
-during firmware configuration. Formal offline builds use the observed sealed
-OCI environment; mutable host checks have a separate scope.
+将其 `bin` 加 PATH，通过维护 preset 构建。正式离线复现使用实际封存 OCI 环境，
+可变宿主工具检查另有范围。

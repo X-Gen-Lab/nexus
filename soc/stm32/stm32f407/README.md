@@ -1,183 +1,156 @@
-# STM32F407 implementation
+# STM32F407 精确芯片实现
 
-This package implements fixed typed C ports for **STM32F407VET6** (LQFP100,
-512 KiB Flash) and **STM32F407ZGT6** (LQFP144, 1 MiB Flash). Main SRAM is
-128 KiB; the separate 64 KiB CPU-only CCM domain is selected explicitly with
-`[memory.regions.ccm]`. `NX_MEMORY_CCM_DATA`, `NX_MEMORY_CCM_BSS` and
-`NX_MEMORY_CCM_NOINIT` use the generated linker and startup initialization plan;
-`NEXUS_MEMORY_CCM` exposes the selected domain. Default assemblies do not add
-CCM initialization storage or placement. CCM remains excluded from every DMA
-domain. No product Flash partition is reserved.
+本包维护 **STM32F407VET6**（LQFP100、512 KiB Flash）和 **STM32F407ZGT6**
+（LQFP144、1 MiB Flash）的固定类型 C 接口。公共接口在 `io/`，厂商类型与可变状态
+留在本包私有目录；Board 只授权已审接线，产品任务、分区和恢复策略由外部工程提供。
 
-The pre-main-RAM startup enables and observes the selected CCM clock, then
-validates the complete generated initialization plan before its first write.
-It uses Flash constants and the cold local stack without libc/global/heap
-dependencies. `.noinit` means no startup copy/clear, not measured physical
-retention through reset or loss of supply.
+## 源码与状态归属
 
-`system.c` establishes the reviewed 8 MHz HSE / 168 MHz PLL profile, APB1
-42 MHz and APB2 84 MHz. Reserved TIM2 runs at 1 MHz, with an overflow IRQ to
-extend its 32-bit counter. USB FS explicitly acquires a separate 48 MHz
-clock-domain owner; it is not enabled by base clock startup. The overflow IRQ must run at least once every
-2^32 microseconds. It does not use the RTOS SysTick. Initialization records
-primary failure, cleanup failure and remaining clock effects independently;
-failed HSI switching retains responsibility instead of disabling a live PLL.
-Bootstrap clock phases have explicit poll bounds because the final monotonic
-clock does not exist yet. Dynamic reclocking is unsupported.
+| 入口 | 责任 |
+| --- | --- |
+| `soc.json`、`routes.json`、`references.json` | 精确物理事实、可选路线和资料来源 |
+| `configure/` | 能力、装配准入、只读配置、精确存储、factory 和固定类型调用 |
+| `system.c` | 启动、固定时钟、TIM2 时间域与失败退出 |
+| `drivers/`、`private/` | 具体模式、实例状态、硬件生命周期与独立回读 |
+| `CMakeLists.txt` | 所选源码、官方库与私有编译依赖 |
 
-The official ST device package and Arm CMSIS submodules provide register
-layout, masks and the complete GCC vector/startup. The official STM32F4 HAL
-Driver package supplies selected LL operations inside private provider state
-machines and HAL finite TX for the selected UART `dma-tx` mode. Its reviewed
-version, exact Git identity, CMSIS pairing, selected file digests and license
-are recorded in
-[`stm32f4-hal.lock.json`](../../../dependencies/stm32f4-hal.lock.json). Vendor
-headers remain private to the implementation and generated static binding.
-Only `dma-tx` selects the private UART/DMA Handle transport and official UART,
-DMA and RCC C units. Other UART modes retain their existing providers; no
-global HAL startup, HAL SysTick or all-module support is introduced. See
-[official driver integration](../../../docs/design/official-stm32-provider.md)
-for ownership, time, cancellation, comparison and delivery requirements.
+![FIG-31：共享 IP 与精确 SoC 的源码责任](../../../docs/assets/diagrams/driver-source-ownership.svg)
 
-`SystemInit` enables CP10/CP11; this hard-float platform does not disable lazy
-floating-point context saving. The selected FreeRTOS CM4F port explicitly enables
-ASPEN/LSPEN. ES0182 Rev19 section2.1.2 (Arm776924) therefore remains an integration
-constraint on every listed F407 cut: an interrupting handler must execute more
-than two instructions in addition to exception return when the affected
-VDIV/VSQRT conditions are possible. Follow generated tail branches into their
-actual callees; unreachable padding or literal words do not count. Applications
-must apply the same rule to external handlers and recheck the emitted image
-after compiler, optimization or handler changes. The platform does not change
-FPCCR behind the kernel ABI. See the [short-ISR contract](../../../docs/design/official-stm32-provider.md#cortex-m4f-short-isr-constraint).
+图表示构建期源码归属，不增加运行时转发层。公共 face 共享只读方法表，各实例保有
+独立 context；factory 只返回已有身份，不初始化硬件。
 
-| Provider | Maintained execution and limits |
-|---|---|
-| GPIO | One-port 16-bit authorization mask; atomic BSRR set/reset; serialized toggle; initial level precedes mode |
-| UART | USART1 IRQ bytes/events, IRQ RX blocks, finite TX DMA, RX DMA/IDLE, finite/continuous duplex and continuous RX blocks; USART2 finite TX DMA and IRQ bytes/events; reviewed USART3/UART4/UART5/USART6 IRQ bytes/events; true TC, explicit loss, drain and quarantine |
-| SPI | SPI1 short polling or finite full-duplex DMA; SPI2 finite DMA; 8-bit MSB-first master, modes 0–3, complete CS interval; polling at most 256 bytes and DMA at most 65535 bytes |
-| I2C | I2C1 polling/IRQ/DMA and I2C2 IRQ/DMA messages, 42 MHz / 100 kHz; 7-bit address, at most 8 read/write messages of 1–256 bytes; repeated START, protected final-byte ACK handling, explicit NACK/arbitration/STOP failure |
-| Flash | Exact VE 8-sector / ZG 12-sector geometry, x32 program at caller-declared 2.7–3.6 V; range/alignment checks, complete pulses, cache invalidation; erase is never preempted by a C deadline |
-| IWDG | 4–256 prescaler, 12-bit reload, nominal 32 kHz with 17–47 kHz declared LSI bounds; hardware-option activation and irreversible software enable reported; debug freeze explicit |
-| EXTI | Static lines, bounded shared-vector dispatch, per-line event storage and observable overflow; pending hardware bits can coalesce edges; no debounce policy |
-| PWM | TIM3 general-purpose channels, fixed shared PSC/ARR, period 1–65535 counts, duty 0–period, shadow compare update; stop restores GPIO inactive level |
-| ADC | ADC1 12-bit software shots/scans, TIM3-triggered finite or continuous DMA blocks; explicit sample time/reference, complete scan alignment and consumer-loan backpressure |
-| CAN | CAN1/CAN2 Classic CAN IRQ, three mailboxes and shared filter domain; no CAN FD |
-| USB | OTG FS device PIO endpoints with explicit USB48 ownership; no host/HS/DMA/class stack |
-| Ethernet | Raw RMII frame/MDIO and caller-owned descriptor/RX loans; IP/protocol policy remains external |
-| Timer capture | Reviewed TIM4 edge-capture route and bounded events |
-| Advanced PWM | Reviewed TIM1 complementary outputs/deadtime/break; external electrical safety policy |
+## 内存、启动与时钟
 
-Reference Board packages bind only their reviewed routes. The independent Qiming
-core and V4.1 packages retain separate schematic and optional-jumper identities;
-they do not replace the older V3.1 package. Selection remains explicit. Internal
-Flash/IWDG bindings are available for explicit selection;
-they neither reserve storage nor enable the watchdog during startup.
-Other SoC routes describe controller implementation and silicon AF resources;
-they do not establish Board wiring, external pull-ups, device fitting or
-physical support. Consumers must supply reviewed external Board bindings to
-select those routes. Selected capture, advanced PWM and continuous double-buffer RX/ADC modes are
-maintained as listed below. Explicit I2C GPIO bus-clear is a separate common
-component. Internal ADC channels and undeclared modes remain rejected or absent from the
-selectable schema. Selected erase-aligned offset images have explicit startup,
-vector/linker and ELF/BIN checks; boot authentication, activation and running-image
-handoff qualification remain outside that software mechanism. The
-[derived matrix](../../../docs/delivery/capabilities.md) records exact selectable
-mode names, reference Board bindings and resolver-selected production source.
+主 SRAM 为 128 KiB；独立 64 KiB CPU-only CCM 通过 `[memory.regions.ccm]` 显式选择。
+`NX_MEMORY_CCM_DATA`、`NX_MEMORY_CCM_BSS`、`NX_MEMORY_CCM_NOINIT` 使用同源生成的
+linker／startup 计划，`NEXUS_MEMORY_CCM` 表达所选域。默认装配不增加 CCM 初始化
+存储或放置；所有 DMA 域均排除 CCM，不预留产品 Flash 分区。
 
-The additional byte/event UART routes are USART3 PB10/PB11 AF7, UART4 PA0/PA1
-AF8, UART5 PC12/PD2 AF8 and USART6 PC6/PC7 AF8. APB1 supplies 42 MHz to
-USART2/3 and UART4/5; APB2 supplies 84 MHz to USART1/6 in the selected fixed clock
-profile. Cold admission checks the exact pads, both GPIO banks, clock, gate and
-IRQ before acquisition. The small readonly cold descriptor table is never used
-by byte I/O and adds no mutable per-instance state. Existing DMA routes remain
-limited to USART1 and the selected USART2 finite TX mode; an additional IRQ route
-does not authorize another DMA mode. Factories share the same readonly byte ops
-table and retain independent request, receive and cleanup state. Software models
-do not establish electrical operation or physical board qualification.
+主 RAM 初始化前先启用并观察所选 CCM clock，再在第一次写入前验证完整初始化计划。
+该路径仅依赖 Flash 常量和冷态本地栈，不使用 libc、global 或 heap。`.noinit` 只表示
+不复制／清零，不保证复位或断电保留。
 
-The selected `dma-tx` owner combines official HAL finite TX with a disjoint LL
-IRQ-byte/event receiver. Its private callback ABI is 1 for all selected units;
-one shared readonly ops table serves separate static instance contexts. RX is
-not passed to HAL, and TX abort does not transfer RX ownership. Short CPU guards
-defer a preempting selected vector without a global interrupt mask around HAL
-calls. Every HAL DMA handler entry requires EN clear; HT-only progress uses
-bounded official acknowledgment, while refused error withdrawal masks that
-vector and defers HAL handling to task progress, avoiding the pinned IRQ poll. Failed
-drain/deinit keeps requests, pads, gates and cleanup ownership. The private
-bounded atomic and nearest-BRR compile profile requires the reviewed single-CPU
-owner; it leaves the vendor source unchanged. `HAL_GetTick` uses the existing
-TIM2 epoch, and `SystemCoreClock` tracks confirmed HCLK through failure cleanup;
-neither HAL initialization nor SysTick is started. Exact current-source model,
-factory, ARM/SDK and resource evidence remain separate; HIL is not executed.
+`system.c` 建立已审 8 MHz HSE／168 MHz PLL、APB1 42 MHz、APB2 84 MHz。保留 TIM2
+以 1 MHz 运行，通过 overflow IRQ 扩展 32-bit counter，IRQ 至少每 2^32 微秒服务
+一次，不占 RTOS SysTick。USB FS 另行显式取得独立 48 MHz clock owner，基本启动
+不会开启它。初始化分别记录 primary、cleanup、remaining effects；HSI 切换失败
+保留责任，不误关活动 PLL。单调时钟尚不存在的 bootstrap 阶段使用明确 poll 界限。
+不支持动态变频。
 
-UART/SPI finite DMA uses caller-owned buffers in reviewed DMA-accessible domains;
-CCM is excluded. DMA TC alone does not release a borrow: UART TC or SPI idle,
-memory-channel disable and IRQ-reference detachment must also be observed.
-Failed drain retains QUARANTINED storage. `irq-blocks` uses per-byte IRQ and
-IDLE boundaries; DMA receive uses distinct finite or continuous double-buffer
-providers. `dma-tx` with IRQ blocks is rejected; explicit `dma-duplex` and
-`dma-duplex-continuous` select the implemented bidirectional providers.
-Continuous modes never overwrite READY/BORROWED blocks; missing replacements
-stop capture and report loss without inventing a missed-event count.
+## 官方 HAL／LL 复用与 FPU 约束
 
-Finite ADC `trigger-dma` uses ordinary finite DMA. It stops trigger/conversion/DMA before
-publishing each complete block, then requires explicit service to rearm after
-stabilization. Consumer loans are never overwritten; stop remains BUSY until
-they are released. TIM3 is exclusive with PWM, and finite rearming introduces gaps. The separate
-`trigger-dma-continuous` provider maintains double-buffer ownership and requires
-replacement/service progress; it stops rather than overwrite a consumer loan.
+官方 ST Device 与 Arm CMSIS 子模块提供寄存器布局、mask、完整 GCC vector／startup。
+STM32F4 HAL Driver 为私有状态机提供所选 LL 操作，并仅在 UART `dma-tx` 模式提供
+HAL 有限 TX。审核版本、精确 Git、CMSIS 配对、文件摘要和许可证由
+[stm32f4-hal.lock.json](../../../dependencies/stm32f4-hal.lock.json)固定。
 
-All ports have one execution owner. No heap, registry, string lookup, default
-worker, OS lock, generic device reference or reserved copy pool is introduced.
-UART IRQ moves bytes and hardware facts; task service observes transfer
-deadlines and is required throughout cancel/stop. A late TC may resolve a
-quarantined transfer; until then its request remains borrowed. After SETTLED,
-no IRQ or provider reference remains. Request owners must preserve storage
-until settlement and separate observer/adapter drain.
+厂商头只进入实现与生成 binding。只有 `dma-tx` 选入私有 UART/DMA Handle 与官方
+UART／DMA／RCC C 单元；其他 UART 保留各自 provider。不调用全局 HAL 初始化，不启动
+HAL SysTick，不宣称全 HAL 支持。[官方驱动合同](../../../docs/design/official-stm32-provider.md)
+定义完整模式的所有权、时间、取消、成本比较和交付要求。
 
-I2C recovery checks the controller BUSY flag and both retained SCL/SDA GPIO
-input levels from the reviewed route. A low line returns IO even if BUSY is
-clear. Local reset does not emit GPIO pulses, replay a transaction or establish
-future bus availability; missing line facts reject before register writes.
+`SystemInit` 开启 CP10/CP11，此 hard-float 平台不关闭 lazy FP context。FreeRTOS
+CM4F port 显式开启 ASPEN/LSPEN。因此 ES0182 Rev19 §2.1.2（Arm776924）对所列全部
+F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，中断 handler 在异常
+返回之外必须执行超过两条指令。须沿生成尾分支进入真实 callee，不能计算不可达填充
+或 literal。外部 handler 同样遵守，修改编译器／优化／handler 后重新检查实际 image。
+平台不会绕过内核 ABI 修改 FPCCR，详见
+[短 ISR 合同](../../../docs/design/official-stm32-provider.md#cortex-m4f-short-isr-constraint)。
 
-Construction is a cold task operation with no other writers of the selected
-controllers. GPIO levels and reviewed AF fields are installed explicitly.
-The family `configure/` package emits readonly configuration, exact storage,
-factory faces and fixed typed calls. Private `platform_cold.c`, `uart_cold.c`
-and mode-specific cold headers maintain runtime admission, acquisition,
-rollback, stop and readback in C. A rejected owner with an empty receipt cannot
-stop or erase a live provider; partial effects retain their receipt until the
-same close proves withdrawal. These are software ownership contracts, not
-measured IRQ latency, throughput or physical Board qualification.
-Advanced constructors capture only affected pin fields and clock bits on the
-startup stack; a later acquisition failure restores those fields before the
-outer platform rolls back its earlier interfaces. Those local snapshots are
-separate from the generated Platform lease: one persistent `uint16_t` per
-selected pin plus validity and gate ownership. All selected pin modes/locks are
-checked before the first pin change; retained lease storage is sized by the
-actual assembly, with alignment accounted in the linked ELF.
+## 已维护模式
 
-Existing enabled channels or EXTI lines are rejected before pin changes.
-Shutdown drains interfaces in reverse order and first establishes declared
-driver CS/PWM inactive levels. Complete Platform release then restores the
-selected original pin fields/latches and releases added gates only after
-observed restoration. Failed restoration retains the exact unfinished lease;
-it does not repeat restoration of already released pins. Thus complete Platform
-release does not promise sustained product safe-output drive. Only the last
-EXTI vector owner disables that vector. An enabled IWDG remains an explicit
-irreversible effect and prevents a clean platform shutdown. These are ownership
-guarantees, not physical timing proof.
+| 接口 | 执行与限制 |
+| --- | --- |
+| GPIO | 单 port 的 16-bit 授权 mask；原子 BSRR set/reset；串行 toggle；先初值后 mode |
+| UART | USART1 IRQ bytes/events、IRQ RX blocks、有限 TX DMA、RX DMA/IDLE、有限／连续 duplex 和连续 RX blocks；USART2 有限 TX DMA 与 IRQ bytes/events；USART3/UART4/UART5/USART6 已审 IRQ bytes/events；真实 TC、显式 loss、drain、quarantine |
+| SPI | SPI1 短 polling／有限全双工 DMA，SPI2 有限 DMA；8-bit MSB-first master、mode0–3、完整 CS interval；polling 最多 256 bytes，DMA 最多 65535 bytes |
+| I2C | I2C1 polling/IRQ/DMA、I2C2 IRQ/DMA；42 MHz／100 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
+| Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |
+| IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
+| EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
+| PWM | TIM3 通道、固定共享 PSC/ARR、period1–65535、duty0–period、shadow update；stop 建立 GPIO inactive |
+| ADC | ADC1 12-bit 软件 shot/scan、TIM3 触发有限／连续 DMA block；显式 sample time/reference、完整 scan 和 consumer loan 背压 |
+| CAN | CAN1/CAN2 Classic CAN IRQ、三邮箱、共享 filter domain；无 CAN FD |
+| USB | OTG FS device PIO endpoint，独立 USB48 owner；无 Host/HS/DMA/class stack |
+| Ethernet | Raw RMII frame/MDIO、调用者 descriptor／RX loan；IP／协议策略外置 |
+| Timer capture | 已审 TIM4 edge-capture 路线和有界事件 |
+| Advanced PWM | 已审 TIM1 互补输出／deadtime／break，功率级电气安全外部验收 |
 
-`tests/contracts/stm32_model` compiles the real production providers against
-controlled official register structs and explicit model event hooks. It tests
-clock failure/rollback, timer wrap, GPIO masks, UART TC/cancel/late IRQ/RX loss,
-SPI reset/CS, I2C receive profiles/repeated-START auto-clear/NACK/arbitration/STOP/recovery, Flash bounds
-and pulses, irreversible IWDG failure, shared EXTI isolation, PWM and ADC faults.
-Host models and ARM ELF linkage remain separate evidence. Physical clock,
-IRQ timing, electrical waveform, Flash power loss and long-load qualification
-are **not executed** while hardware is disconnected.
-The constructor model compiles the same generated C used by firmware and
-injects a GPIO clock-readback failure after an earlier pin was changed. It also
-checks shared IRQ release and conflicting timer configuration. Separate
-software fixtures link every maintained controller for both exact densities;
-their external connectors are intentionally not qualified as Board wiring.
+IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征；当前没有
+声明满足条件的 operating profile，不能直接据此保证时限。名义配置可成功，但启用后
+物理界限查询仍可 `UNSUPPORTED`，同时保留 enabled／irreversible／debug 事实。
+
+独立核心板和 V4.1 包各自保留原理图与跳线身份，不替换旧 V3.1。内部 Flash／IWDG
+可以显式选择，但不会预留存储或在 startup 启狗。SoC AF 路线不证明 Board 接线、
+外部上拉、器件实装或物理支持，用户必须提供已审绑定。I2C GPIO bus-clear 为独立
+通用组件；内部 ADC channel 和未声明模式仍拒绝或不在 schema 内。
+
+已选 erase-aligned offset image 有明确 startup／vector／linker／ELF/BIN 检查，
+不包含 boot 认证、激活或运行镜像 handoff 资格。精确 mode／Board／生产源码见
+[派生矩阵](../../../docs/delivery/capabilities.md)。
+
+## UART、DMA 与执行进度
+
+额外 byte/event 路线为 USART3 PB10/PB11 AF7、UART4 PA0/PA1 AF8、UART5 PC12/PD2
+AF8、USART6 PC6/PC7 AF8。USART2/3、UART4/5 从 APB1 取得 42 MHz，USART1/6 从
+APB2 取得 84 MHz。冷准入在取得资源前检查精确引脚、两个 GPIO bank、clock、gate 和
+IRQ。小型只读 cold descriptor 表不在字节热路径使用，不增加可变实例状态。
+DMA 仍只开放 USART1 和所选 USART2 有限 TX；新增 IRQ 路线不授予其他 DMA 模式。
+
+`dma-tx` 的一个 owner 组合官方 HAL 有限 TX 与分离 LL IRQ-byte/event RX，所选
+单元 callback ABI 都为 1，实例共享只读 ops。RX 不交 HAL，TX abort 不改变 RX
+责任。短 CPU guard 延后抢占的所选 vector，不在 HAL 调用外套长全局 IRQ mask。
+HAL DMA handler 每次进入都要求 EN 清除；HT-only 使用有界官方 acknowledgement。
+错误撤回被拒时先 mask 此 vector，再交 task 推进 HAL，避免锁定 IRQ poll。
+排空／deinit 失败保留 request、pad、gate 和清理责任。私有 bounded atomic 与
+nearest-BRR 编译配置依赖受审单 CPU owner，不修改厂商源码。`HAL_GetTick` 使用既有
+TIM2 epoch，`SystemCoreClock` 在失败清理中追踪确认的 HCLK，不启动 HAL 或 SysTick。
+
+有限 UART／SPI DMA 只借用已审 DMA 可达域中的调用者 buffer，排除 CCM。DMA TC
+不能释放借用，还须 UART TC／SPI idle、memory channel disabled 和 IRQ detached。
+排空失败保留 QUARANTINED。`irq-blocks` 是逐字节 IRQ＋IDLE，不是 DMA RX；DMA RX
+另选有限或连续双缓冲 provider。拒绝 `dma-tx`＋IRQ blocks；双向显式选 `dma-duplex`
+或 `dma-duplex-continuous`。连续模式不覆盖 READY/BORROWED，缺 replacement 时停止
+并报告 loss，不虚构错过事件的准确次数。
+
+有限 ADC `trigger-dma` 在发布完整块前停 trigger／conversion／DMA，稳定后由显式
+service rearm，块间可有间隙。消费者借用不能被覆盖，未释放时 stop 保持 BUSY；
+TIM3 与 PWM 独占冲突。独立 `trigger-dma-continuous` 维护双缓冲和 replacement，
+进度不足时停止而非覆盖消费者。
+
+每个 port 只有一个执行者，不引入 heap、registry、字符串查找、默认 worker、OS
+lock、通用设备引用或预留 copy pool。UART IRQ 搬运字节和事实，task service 观察
+传输 deadline，并在 cancel／stop 期间持续运行。晚到 TC 可以结清隔离传输，但在此
+之前 request 保持借用。SETTLED 后无 IRQ／provider 引用，adapter／observer 还需
+独立排空。
+
+I2C recover 同时检查 BUSY 与已保留 SCL/SDA GPIO 实时输入；即使 BUSY 清除，只要
+线路低就返回 IO。局部 reset 不打 GPIO 恢复脉冲、不重放事务、不保证未来总线可用；
+缺线路事实时在寄存器写入前拒绝。
+
+## 冷态取得、逆序撤回与验证
+
+构造是无其他 controller writer 的冷态 task 操作，明确安装 GPIO 电平和已审 AF。
+`platform_cold.c`、`uart_cold.c` 和模式专属 cold 头以 C 实现准入、取得、回滚、停止
+和回读。被拒 owner 的空 receipt 不能停止或擦除其他 live provider；部分效果保留
+receipt，直到同一 close 证明退出。这不建立实测 IRQ、吞吐或物理 Board 资格。
+
+高级构造仅在启动栈保存受影响 pin field／clock bit，后续取得失败先恢复这些字段，
+再由外层回滚早先接口。局部快照与 Platform 持久 lease 分开：每个选中 pin 一个
+`uint16_t`，另有有效性与 gate 责任。所有 pin mode／lock 在第一次修改前检查，
+持有存储按实际装配定容，对齐由所选 ELF 计入。
+
+已有 enabled channel／EXTI line 在改引脚前拒绝。停止逆序排空，先建立 driver
+CS／PWM inactive；完整 Platform release 再恢复选中原 pin field／latch，观察恢复
+后才撤新增 gate。失败保留精确未完成 lease，不重复恢复已释放 pin，因此完整释放
+不承诺持续驱动产品安全电平。最后一个 EXTI vector owner 才关闭 vector；已启 IWDG
+是阻止干净关闭的不可逆效果。
+
+`tests/contracts/stm32_model` 用官方寄存器结构和外部事件模型编译真实生产 C，覆盖
+时钟回滚、定时器回绕、GPIO 位掩码、UART TC／取消／迟到 IRQ／RX 丢失、SPI 复位／CS、
+I2C 接收／重复 START 自动清除／NACK／仲裁／STOP／恢复、Flash 边界与编程脉冲、
+IWDG 不可逆失败、EXTI 隔离及 PWM／ADC 错误。
+构造模型运行与固件相同的生成 C，在前一 pin 已改后注入 GPIO clock readback 失败，
+并检查 shared IRQ release 和 timer 冲突。两种精确密度的独立软件夹具链接全部维护
+controller，外部连接器不据此获得 Board 资格。模型、ARM ELF 和资源证据分别记录；
+实板断开时，clock／IRQ／电气波形／Flash 掉电／长期负载都未执行。

@@ -1,37 +1,29 @@
-# Installed secure API consumers
+# 安装 SDK 的安全 API 消费参考
 
-These two public Source SDK scenarios are part of the single versioned consumer
-plan. They do not start a broker, open a socket, download data or install tools.
-Only a public synthetic CA is supplied; neither a client identity nor a private
-key is included. Products supply their own trust, time and provisioning policy.
+这两个公共场景属于唯一版本化消费计划，不启动 broker、socket、下载或工具安装。
+只提供合成公开 CA，不含 client identity 或私钥；信任、时间与 provisioning 归产品。
 
-The Native Linux scenario obtains words with `getrandom(GRND_NONBLOCK)` and uses
-the platform's actual `CLOCK_MONOTONIC` domain. Unavailable or interrupted entropy
-returns BUSY under finite deadlines; other failures return IO without a fallback.
-Its explicit fixture UTC is not a product clock authority. It successfully opens
-the PSA/runtime and TLS state, observes one bounded handshake WANT, initializes
-and deinits MQTT, aborts TLS and stops the runtime. A software MAC retains the
-normal bounded lwIP pools and exercises adapter start/service/stop; it never
-accepts TX, acquires RX or brings a link up. This does not establish an
-authenticated TLS connection or a broker exchange.
+## Native 场景
 
-The F407 scenario derives from the independent repository ARM service fixture.
-It uses the reviewed Qiming F407ZG `hse8-pll168` assembly and explicit RNG
-component. Its public application calls normal TLS and MQTT APIs; its composition
-supplies exact static storage and retains the default bounded lwIP pools. The
-transport is unconnected and UTC is explicitly untrusted. Source SDK verification
-only compiles and links it, checks actual CPU/ABI/C11 options, resource budgets,
-configuration identity and live implementation symbols. It does not execute the
-RNG, TLS or network on a device. Its budgets are 512 KiB Flash, 112 KiB static
-RAM, 8 KiB main stack and zero libc heap; a build exceeding them fails.
+Linux 通过 `getrandom(GRND_NONBLOCK)` 取随机字，并使用真实 `CLOCK_MONOTONIC`。
+熵不可用／中断在有限 deadline 下返回 BUSY，其他错误 IO，不使用替代随机数。
+fixture UTC 不是产品时间权威。流程打开 PSA／runtime／TLS，观察一次有界 handshake
+WANT，初始化并析构 MQTT、abort TLS、stop runtime。软件 MAC 保留正常有界 lwIP
+池，执行 adapter start／service／stop，但不接纳 TX、不取得 RX、不建立 link。
+它不证明认证 TLS 连接或 broker 交互。
 
-Both scenarios compile the ordinary API caller separately from storage
-composition. Only composition opts into `Nexus::TLSStorage`,
-`Nexus::CoreMQTTStorage` and the lwIP layout. Ordinary callers inherit no supplier
-headers or profile macros. Canonical inputs, actual compile rows, image identity
-and the installed SDK prefix remain bound to execution results. Successful
-software linking does not measure stack peaks, latency or physical behavior.
+## F407 场景
 
-The independent N09 host fixture verifies authenticated TLS/mTLS and a real broker
-exchange. Its results and source identity are separate; these installed consumer
-scenarios do not inherit that qualification.
+该场景来自独立仓库 ARM service fixture，使用已审启明 F407ZG `hse8-pll168`
+和显式 RNG 组件。普通应用调用公共 TLS／MQTT，组合层提供精确静态存储及默认
+有界 lwIP 池。transport 未连接，UTC 不可信。SDK 检查只编译、链接，核对实际
+CPU／ABI／C11、资源、配置身份和存活符号，不在设备上执行 RNG／TLS／网络。
+预算为 Flash 512 KiB、static RAM 112 KiB、main stack 8 KiB、libc heap 0，超限失败。
+
+两场景将普通 API caller 与 storage composition 分离。仅 composition 选择
+`Nexus::TLSStorage`、`Nexus::CoreMQTTStorage` 和 lwIP 布局，普通调用者不继承厂商
+头或 profile 宏。输入、compile row、镜像和 SDK prefix 绑定实际结果；链接不测量
+栈峰值、延迟或物理行为。
+
+独立 N09 host fixture 才验证认证 TLS／mTLS 和真实 broker 交换，其源码／结果
+身份独立；本安装消费场景不继承该资格。

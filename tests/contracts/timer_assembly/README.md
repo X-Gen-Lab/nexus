@@ -1,9 +1,8 @@
-These explicit fixtures select the reviewed STM32F407 and GD32F470 silicon pad
-routes. Their Board manifests are software contracts; they do not establish PCB
-wiring, power-stage presence, inactive electrical levels or break qualification.
+# Timer 装配的软件验证
 
-The caller supplies the capture ring and keeps it alive across refused shutdown.
-The firmware fixture retains the real typed factory, cold resource lifecycle,
-shared IRQ dispatch and selected C11 providers. Host Google models replace only
-external clock/pin and hardware register boundaries, using the generated bundle.
-No model, ELF or software reset result qualifies physical timer timing or safety.
+F407／GD470 fixture 显式选择已审 silicon pad。Board manifest 是软件合同，不证明
+PCB 接线、功率级、inactive 电平或 break 安全资格。
+
+调用者提供 capture ring，拒绝停机时仍保留存储。固件保留真实 factory、冷资源、
+共享 IRQ 和 C11 provider；Google 模型只替换外部 clock／pin／硬件边界，使用实际
+生成包。模型、ELF 或软件 reset 不资格化物理 timer 时序或安全。

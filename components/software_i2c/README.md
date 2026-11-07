@@ -1,42 +1,33 @@
-# Explicit GPIO I2C and SCCB
+# GPIO I2C 与 SCCB
 
-`Nexus::SoftwareI2C` provides a caller-owned, synchronous two-wire controller.
-`Nexus::SoftwareSCCB` selects the same library with a distinct protocol API.
-There is no task, heap, runtime discovery or long global interrupt mask.
+`Nexus::SoftwareI2C` 是调用者持有的同步两线控制器；`Nexus::SoftwareSCCB` 复用
+同一库，但提供独立协议 API。组件没有 task、heap、运行时发现或长全局关中断区。
 
-The immutable configuration supplies two already configured open-drain GPIO
-outputs, external pull-ups, actual input readback and one monotonic clock.
-Writing one releases a wire; it must never drive a push-pull high. The selected
-minimum half-period and finite polling bound constrain each wait. They do not
-establish a measured bus frequency, voltage or electrical qualification.
+## 端口与协议边界
 
-Strict I2C exposes the existing `nx_i2c_endpoint_t` with an immutable addressed
-child. It accepts 7-bit addresses `0x08..0x77`, up to eight messages of up to
-256 bytes each, repeated START between messages and one final STOP. Payload
-counts exclude address phases. NACK is reported; it is not silently ignored.
-Async methods are unsupported.
+只读配置提供已设为开漏输出的两个 GPIO、外部上拉、实际输入回读和同一单调 clock。
+写一是释放线路，绝不能推挽驱动高电平。显式最小 half-period 与有限 polling count
+约束每次等待，不代表实测频率、电压或电气资格。
 
-SCCB uses a separate child and register API. Its write identifier is an even
-8-bit value, with explicit register8/data8 transactions. Reads perform the
-documented STOP-separated sub-address and read cycles, then master NA. The
-master releases and ignores the target's ninth Don't-Care bit; successful
-waveform completion does not prove sensor presence. SCCB never weakens the
-strict I2C face or becomes a generic ignore-NACK fallback.
+严格 I2C 使用独立固定地址的 `nx_i2c_endpoint_t` child，接纳七位地址
+`0x08..0x77`，至多 8 条消息、每条至多 256 字节；消息间 repeated START，最后一次
+STOP。payload count 不包括地址阶段，NACK 如实报告，不忽略；异步方法不支持。
 
-Every synchronous return ends CPU access to all payload spans. A failed STOP
-separately retains the wire owner, configuration and pin responsibility. One
-serialized task owns calls and the clock. Arbitration loss releases the lines
-without forcing STOP. Before explicit recovery, the caller must reestablish
-exclusive ownership and join foreign writers. Recovery attempts one bounded
-STOP; it does not perform nine-clock bus clear, reset or transaction replay.
-The deadline-free controller recover method is unsupported.
+SCCB 使用不同 child 和 register API，write identifier 是偶数 8 位值，显式执行
+register8／data8。读取按文档以 STOP 分隔 sub-address 与 read cycle，再发送 master
+NA；master 释放并忽略 target 第九个 Don't-Care bit。成功完成波形不证明 sensor
+存在，SCCB 不削弱严格 I2C face，也不是通用 ignore-NACK 回退。
 
-Call the budgeted stop API and check its result before releasing the outer GPIO
-lease or configuration. A later numerical deadline cannot repair a failed or
-discontinuous clock domain. No API promises multi-controller operation.
+## 撤回与恢复
 
-The V4.1 camera PD6/PD7 control and audio PC0/PC13 control are GPIO pairs rather
-than hardware I2C routes. This mechanism makes those wires usable by explicitly
-selected device adapters; it does not select or initialize an audio codec or
-camera. Source review identities are in `references.json`. Physical HIL remains
-`not_executed`.
+每个同步返回结束全部 CPU payload 访问；失败 STOP 另外保留 wire owner、配置与
+引脚责任。同一 task 串行管理调用和 clock。仲裁丢失只释放线路，不强制 STOP。
+恢复前调用者重新建立独占并会合 foreign writer；恢复仅尝试一次有界 STOP，不做
+九时钟 bus-clear、reset 或事务重放。没有 deadline 的 controller recover 方法不支持。
+
+释放外层 GPIO lease／配置前，调用带预算的 stop 并确认成功。后来的数值 deadline
+不能修复故障或不连续 clock domain；不承诺多 controller 协作。
+
+V4.1 camera 的 PD6／PD7 与 audio 的 PC0／PC13 是 GPIO 对，不是硬件 I2C 路由。
+本机制仅供明确选择的器件 adapter 使用，不选择或初始化 codec／camera。来源身份见
+`references.json`，物理 HIL 保持 `not_executed`。

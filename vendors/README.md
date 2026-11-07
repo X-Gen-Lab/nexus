@@ -1,80 +1,70 @@
-# Vendor SDK sources
+# 厂商 SDK 与来源边界
 
-Maintained firmware targets use the SDKs below. A directory or submodule for another family does not establish a supported Nexus platform.
+本目录维护所选固件实现使用的厂商依赖。SoC target 私有选择 Device、startup 和
+HAL／LL／SPL；公共产品接口使用 Nexus 类型。一个目录或子模块存在，不表示对应
+芯片、全部外设或开发板已接入。
 
-| Sources | Origin and version identity | License boundary |
-| --- | --- | --- |
-| `arm/CMSIS_6` | Official Arm v6.4.0, gitlink `af1b110e46a1720349f6f125e386e126767699bd` | Apache-2.0; retain `LICENSE` and header notices |
-| `st/cmsis_device_{f1,f4,g4,h7,u5}` | Five official ST device repositories, pinned gitlinks | Upstream notices |
-| `st/stm32{f1,f4,g4,h7,u5}_hal` | Five official ST HAL/LL repositories, pinned gitlinks | Upstream notices |
-| `gigadevice/gd32f30x` | Official GD32F30x 3.0.3 selected headers/startup, per-file source lock | Original BSD-3-Clause, Apache-2.0 and GigaDevice notices; see its README and LICENSES |
-| `gigadevice/gd32f4xx` | Official GD32F4xx 3.3.3 Firmware subtree, per-file source lock | BSD-3-Clause, Apache-2.0 and two original Arm Cortex-M distribution notices; see its README and LICENSES |
+## 当前依赖与许可证
 
-The GigaDevice import is byte-identical to the selected upstream subtree. Git attributes preserve its original line endings. Validate it with:
+| 来源 | 版本与身份 | 许可证边界 |
+|---|---|---|
+| `arm/CMSIS_6` | 官方 Arm v6.4.0，gitlink `af1b110e46a1720349f6f125e386e126767699bd` | Apache-2.0，保留 LICENSE 与头部通知 |
+| `st/cmsis_device_{f1,f4,g4,h7,u5}` | 五个已维护 STM32 family 的官方 Device 子模块，精确 gitlink | 保留上游通知 |
+| `st/stm32{f1,f4,g4,h7,u5}_hal` | 对应官方 HAL／LL 子模块，精确 gitlink | 保留上游通知 |
+| `st/cmsis_device_h5`、`st/stm32h5_hal` | H563 I3C 有界软件参考的锁定 Device／HAL 依赖 | 目录存在不建立完整 H5 SoC／Board 支持 |
+| `gigadevice/gd32f30x` | 官方 GD32F30x 3.0.3 选定头与 startup，逐文件 source lock | 原始 BSD-3-Clause、Apache-2.0 与 GigaDevice 通知，见该目录 README／LICENSES |
+| `gigadevice/gd32f4xx` | 官方 GD32F4xx 3.3.3 Firmware 子树，逐文件 source lock | BSD-3-Clause、Apache-2.0 与两份原始 Arm Cortex-M 分发通知，见该目录 README／LICENSES |
+
+GigaDevice 导入与所选上游字节一致，Git attributes 保留原始行尾。其外层导入 README
+也参与来源／notice 身份核对，因此保留原文；本页提供中文导航，不覆盖原始通知。
+在仓库根验证选定导入：
 
 ```sh
 python3 scripts/ci/verify_vendor_source.py --root vendors/gigadevice/gd32f4xx
 ```
 
-Public product and typed I/O/OS interfaces use Nexus types. Vendor includes and
-macros belong to implementation targets; SDK bring-up code requires an explicit
-implementation dependency and does not change the ordinary public boundary.
+## CPU Core 与 Device 分别选择
 
-The shared CPU-header source is CMSIS-Core from `arm/CMSIS_6`. This migration
-selects that same source for STM32F103, STM32F407, STM32G474, STM32H743,
-STM32U575, GD32F303 and GD32F470. Device definitions, IRQ numbers, startup and
-HAL/LL still come from the separately locked ST or GigaDevice sources. The Core
-upgrade does not upgrade those packages or enable another chip, peripheral,
-processor profile or security domain. Exact version identities, including the
-upstream pack metadata, are recorded in [VERSIONS.md](VERSIONS.md).
+七个已维护 MCU family 使用共享 `arm/CMSIS_6` 的 CMSIS-Core 头：STM32F103、F407、
+G474、H743、U575，以及 GD32F303、F470。具体 Device 定义、IRQ、startup 和 HAL／LL
+仍来自各自锁定来源。Core 迁移不会升级这些包或启用其他芯片、外设、profile、安全域。
+精确版本、上游 pack 字段和许可证身份见 [VERSIONS.md](VERSIONS.md)。
 
-`cmake/platform/CMSISCore.cmake` owns the internal `nexus_cmsis_core` target and
-`nexus_use_cmsis_core(target)` helper. Concrete implementation targets consume
-the Core include tree privately. This target is distinct from the public
-`Nexus::Core` mechanisms and is not an application dependency or configuration
-input. Public Nexus headers and Arch ownership/context contracts do not acquire
-vendor types through this migration.
+`cmake/platform/CMSISCore.cmake` 拥有内部 `nexus_cmsis_core` target 和
+`nexus_use_cmsis_core(target)`。实现目标私有消费 Core include；这与公开的
+`Nexus::Core` 通用机制不同，也不是产品配置或普通应用依赖。
 
-The original GD32F4xx import still contains its bundled Core headers unchanged.
-Its `core_cm4.h` reports version macros 3.20 and a separate file-header version
-V3.30. The selected build moves to the shared Core 6.4 source; it does not edit or
-relicense those older imported bytes. Their original notices still apply when
-they are redistributed. Actual compiler include-closure checks, rather than
-directory presence, establish which Core headers a build consumed.
+原始 GD32F4xx 导入仍保留旧 Core 字节，其 `core_cm4.h` 宏版本为 3.20，文件头另记
+V3.30。实际构建选择共享 Core 6.4，不编辑或重新许可旧字节；分发时仍保留原始通知。
+使用哪份 Core 由真实编译 include 闭包证明，不能由目录存在推断。
 
-The Source SDK retains the complete recursive CMSIS-Core `Include` tree and its
-Apache-2.0 `LICENSE`, including compiler and architecture headers. It does not
-copy the entire CMSIS repository or select CMSIS-RTOS, CMSIS-Driver, DSP or NN
-components. Retained headers do not establish Nexus support for every processor
-they describe. SDK verification, actual selected firmware links and physical
-qualification remain separate acceptance scopes; older receipts do not qualify
-the migrated source.
+## 源码与实际编译验证
 
-From a checkout with the locked ARM GCC and G++ on `PATH`, choose a new output
-for the maintained Device/Core header probe:
+Source SDK 保留 CMSIS-Core 的完整递归 `Include` 和 Apache-2.0 LICENSE，包含
+compiler／architecture 头，不复制整个 CMSIS 仓库，也不自动选择 CMSIS-RTOS、
+CMSIS-Driver、DSP 或 NN。保留某个头不等于平台已支持其描述的所有 CPU。
+
+在仓库根、已准备锁定 ARM GCC／G++ 的环境中，选择新输出目录执行头探针：
 
 ```sh
 python -B tools/maintenance/cmsis_core_probe.py --output /tmp/nexus-cmsis-core-probe
 ```
 
-`--compiler` and `--cxx` may name the exact installed compiler paths. The probe
-builds 16 C11/C++17 translation units across seven families, including separate
-U575 Secure/Non-secure contexts. It sets `CMSIS_DISABLE_DEPRECATED=1`, retains
-full `-MD` dependencies including SYSTEM headers, and rejects a foreign Core
-path even when its version macros match. `report.json` records compiler/object
-identities, actual dependency files and command receipts. Missing compilers,
-failed compilation or an invalid include closure are failures, not skips.
-This is header compilation, not a full firmware link or physical execution;
-C++17 here is a consumer-header check, not a firmware-language change. The
-existing testing domain owns its regressions; it adds no formal plan stage.
+`--compiler` 与 `--cxx` 可显式指定安装路径。探针对七个 family 编译 16 个 C11／C++17
+单元，包括 U575 独立 Secure／NonSecure 上下文；启用 `CMSIS_DISABLE_DEPRECATED=1`，
+保存包含 SYSTEM 头的完整 `-MD` 依赖，并拒绝版本宏相同的外来 Core 路径。
+`report.json` 记录编译器、对象、依赖和命令收条。缺工具、编译失败、错误闭包均为失败，
+不作 skip。这里的 C++17 用于消费头检查，不改变固件 C11 语言边界，也不建立完整链接
+或实板资格。回归由既有 testing 域维护，不增加另一套正式计划。
 
-SDK updates require origin, version, license and content identity review plus the matching compile/link and device-contract regressions. Do not modify an imported vendor file to implement board wiring or product policy. Configuration does not download dependencies, and vendor code is not relicensed under the repository's MIT license.
+## 组织托管与维护
 
-Source provenance and retrieval have separate owners: the reviewed catalogue
-records the official `upstream_url` and the approved `fetch_url`; the Gitlink
-selects the exact commit. All registered Git dependencies are fetched from
-verified `X-Gen-Lab` forks with retained `refs/tags/nexus/pins/<full-SHA>` refs.
-Official provenance and versions remain separately recorded; this hosting change
-does not upgrade SDK code.
-See the [dependency hosting and recovery contract](../docs/design/source-compatibility.md)
-for recursive FreeRTOS handling, explicit preparation and Source SDK trust.
+来源和取回是两个身份：catalogue 记录官方 `upstream_url` 与受审 `fetch_url`，
+gitlink 选择精确 commit。注册 Git 依赖从 X-Gen-Lab fork 取回，并以
+`refs/tags/nexus/pins/<full-SHA>` 保留所选版本；这不升级 SDK 代码。递归 FreeRTOS、
+显式准备与恢复见[依赖托管合同](../docs/design/source-compatibility.md)。
+
+更新需要复核来源、版本、许可证和内容身份，执行匹配的编译／链接及设备合同回归。
+Board 接线写入 Nexus adapter 或外部工程，不修改导入文件；配置阶段不联网下载依赖。
+厂商代码不因进入本仓库而改用 MIT 许可。普通公共接口不传播厂商 Handle，显式 SDK
+bring-up 依赖也不改变该边界；SDK、实际固件和物理验证分别验收。

@@ -1,33 +1,25 @@
-# Relocatable Nexus source SDK
+# 可移位源码 SDK
 
-Nexus 0.2.1 is the current Source SDK version. A version value does not establish
-publication or software or hardware qualification. The consumer owns its assembly,
-application sources, compiler, ABI, workers and resource budgets. Vendor headers
-and concrete provider storage stay private. No precompiled MCU binary ABI or
-application generator is exported.
+当前版本为 Nexus 0.2.1，版本值不建立发布、软件或硬件资格。消费者拥有装配、应用、
+编译器／ABI、工作任务与资源预算；vendor 头和具体 provider 状态私有，不导出通用
+预编译 MCU ABI 或应用生成器。版本唯一权威是
+`dependencies/platform-compatibility.json`；CMake、生成头、安装包从它派生。
+source interface epoch `1` 与 assembly schema `2` 分别计代，不随语义版本自动改变。
 
-`dependencies/platform-compatibility.json` is the sole authored semantic-version
-policy. CMake, generated headers and the exported package derive their version
-from it. Source interface epoch `1` and authored assembly schema `2` are separate
-identities; they do not change solely because the semantic version changes.
+## 打包与消费
 
-Prepare from an initialized, clean, committed checkout:
+从已初始化、干净、已提交检出执行：
 
 ```sh
 python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-sdk
 ```
 
-The package records the source commit/tree, every packaged file hash, required
-recursive dependency commits/trees, the reviewed GD32 import and license notices.
-The installed CMake package verifies those bytes before configuring a consumer.
-Modified, missing, extra or symlinked files fail verification. Preparation and
-verification do not fetch missing dependencies.
+包记录源码 commit／tree、每个文件摘要、递归依赖 commit／tree、已审 GD32 导入和
+许可通知。安装 CMake 在配置前验证全部字节；修改、缺失、额外或 symlink 文件拒绝。
+准备／校验不下载缺失依赖。dirty 源仅可用 `--development-fixture` 生成不可发布包，
+消费者需显式 `NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON`，不建立发行资格。
 
-A dirty checkout can produce an explicitly nonpublishable development fixture
-with `--development-fixture`. Its consumers must deliberately set
-`NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON`. This does not qualify a release.
-
-Move the complete prefix, then consume it from an independent project:
+移动完整 prefix，再从独立工程消费：
 
 ```cmake
 cmake_minimum_required(VERSION 3.31)
@@ -44,142 +36,58 @@ cmake -S . -B build -G Ninja \
 cmake --build build
 ```
 
-An assembly chooses a reviewed Board package, exact part, clock, OS backend,
-explicit controller modes, device endpoints and memory budgets. Relative Board
-paths are relative to the assembly, including when it is outside the SDK.
-`NEXUS_EXPECTED_SOURCE_REVISION` can enforce a consumer-approved exact revision.
-Native models use a host compiler and omit the ARM toolchain argument.
+装配明确选择 Board、part、clock、backend、controller mode、endpoint 与预算。
+Board 相对路径相对于装配，即使位于 SDK 外；`NEXUS_EXPECTED_SOURCE_REVISION`
+可固定消费方已审版本。Native 使用 host 编译器，不传 ARM toolchain。
 
-`Nexus::Core`, `Nexus::Arch`, `Nexus::IO`, `Nexus::Platform` and optional component
-or OS targets expose their own includes and dependencies. `nexus_add_firmware`
-links explicit sources, selected components, startup, generated bindings and the
-resolved linker input. It does not create `main`, tasks or a scheduler. Consumers
-start hardware with `nx_platform_start`. Application code includes generated
-`nexus_factory_strong.h` and uses nominal references and pure static getters such
-as `nx_factory_gpio_ref(NX_GPIO_REF_LED0)`. C11 and C++17 reject references from
-another class, controller references passed to endpoint getters and raw scalar
-IDs. A getter neither initializes hardware nor allocates memory. The returned
-readonly face dispatches through one shared provider operations table to its own
-mutable context. Generated
-`nx_binding_<id>` and `nx_device_<id>` symbols remain fixed typed aliases.
-Backend and application startup order remains explicit in consumer code.
+`Nexus::Core`／`Arch`／`IO`／`Platform` 与可选组件、OS target 各自导出依赖。
+`nexus_add_firmware` 链接显式源码、选定组件、startup、生成绑定与 linker 输入，
+不创建 main／任务／scheduler。应用调用 `nx_platform_start`，使用生成
+`nexus_factory_strong.h`，例如 `nx_factory_gpio_ref(NX_GPIO_REF_LED0)`。
+C11／C++17 拒绝跨类别引用、controller 传 endpoint getter 和裸 scalar ID；getter
+只返回共享只读方法表与独立可变 context，不分配、不启动硬件。
+`nx_binding_<id>`／`nx_device_<id>` 仍是固定类型别名，启动顺序由应用明确拥有。
 
-Every generated bundle contains the strong header; no `[factory]` table is
-needed. Its only field is the optional boolean `capabilities`; set it to `true`
-to emit metadata. `factory.strong` is unknown and rejects. The scalar IDs and
-getters in `nexus_factory.h` remain available for existing consumers. Both headers
-return the same static objects without an additional runtime layer.
+每个包都有 strong header，不要求 `[factory]`。该表仅接受可选布尔 `capabilities`，
+true 输出 metadata，`factory.strong` 未知并拒绝。旧 scalar getter 仍可用，二者
+返回同一静态对象，没有额外运行层。
 
-Every MCU firmware produces ELF, BIN, map and a checked resource report. The ELF
-contains the configuration digest and the real startup vector. The selected CPU
-facts determine the instruction set, optional FPU, float ABI and enum ABI;
-consumers inherit those flags through Nexus targets. C++ consumers use their declared embedded
-runtime policy, such as `-fno-exceptions -fno-rtti` for the tested source SDK path.
+MCU 输出 ELF／BIN／map／资源报告，ELF 绑定配置摘要和真实向量。精确 CPU facts
+决定指令、FPU、float／enum ABI，目标传递相同参数。C++ 消费采用自己的嵌入式
+runtime 策略，已测路径例如 `-fno-exceptions -fno-rtti`。
+`tests/contracts/test_source_sdk.py` 对真实包做含空格路径搬移、篡改／身份拒绝、
+独立 Native C／C++ 执行及两 MCU 家族 ARM startup／linker／资源检查，不证明实板。
 
-The maintained boundary test is `tests/contracts/test_source_sdk.py`. It packages
-the real checkout, relocates into a path with spaces, verifies byte tamper and
-identity rejection, executes independent Native C/C++ consumers and links both
-maintained MCU C/C++ consumers with actual startup/linker/resource gates.
-Those software checks do not establish physical Board qualification.
+实际资产清单和执行收条标识 SDK、工具、依赖许可与结果；最低 Python／CMake
+声明不表示所有 host 已验证。维护的已执行 host 为 Linux，HIL 为 `not_executed`。
+历史候选保留原身份，[0.1.0 范围](../../docs/status/release-0.1.0.md)不资格化新版本。
 
-Use the release asset inventory and actual execution receipts to identify the
-SDK source, tool tuple, dependency/license closure and consumer results. The
-declared minimum Python/CMake versions do not establish installation or
-integration on every host. Linux is the maintained executed host scope; physical
-MCU HIL remains `not_executed`. Historical software candidates keep their original
-source identity. The [0.1.0 release scope](../../docs/status/release-0.1.0.md)
-is historical and does not qualify this development version.
+## 完整安装消费者验证
 
-Release automation verifies an existing publishable installed prefix with the
-same consumer template, without the development opt-in:
+发行自动化验证已有可发布 prefix，不使用开发 opt-in：
 
 ```sh
 python cmake/package/verify_consumers.py \
   --prefix /relocated/nexus-sdk --output build/installed-sdk-check
 ```
 
-`--parallel N` is the explicit total consumer job budget. When omitted, the
-coordinator inherits `NEXUS_BUILD_JOBS`, then `CMAKE_BUILD_PARALLEL_LEVEL`, or
-uses `2` if neither is set. An explicit option overrides this inherited default.
-Concurrent independent invocations need an orchestrator allocation; this is not
-a global CPU semaphore. Independent
-consumers may configure, build and verify concurrently; each compiler build uses
-one job. `--parallel 1` retains serial execution. Each consumer still performs
-fresh installed-source verification. A failure cancels and joins all started
-work before the final failed report is written.
+`--parallel N` 是总 consumer job 预算，未指定依次继承 `NEXUS_BUILD_JOBS`、
+`CMAKE_BUILD_PARALLEL_LEVEL`，两者皆无时为 `2`。显式值优先；多个独立调用需外部
+分配额度，不是全局 CPU semaphore。每个 compiler build 只用一个 job，`--parallel 1`
+保留串行。各 consumer 都重新验证源码；失败先取消并 join 所有已启动工作，再写
+最终失败报告。
 
-`verification.json` and per-command logs retain actual arguments and exit codes.
-This command fails for development fixtures, missing tools, any compile/run/link
-failure, leaked private includes or failed ELF resource/configuration binding.
-The SDK prefix and verification output must be canonical paths without symlink
-aliases, and neither may contain the other. Admission failure leaves both SDK
-bytes and any previous report untouched and writes its diagnostic to stderr.
-Only an admitted owned verification directory is invalidated for a new attempt.
+`verification.json` 和逐命令日志记录实际参数／退出码。开发 fixture、缺工具、
+编译／运行／链接失败、私有 include 泄漏或资源／配置绑定失败均拒绝。SDK 和输出
+必须为无 symlink 的 canonical 路径，互不包含。准入失败不改 SDK 或旧报告，只向
+stderr 写诊断；只允许失效已准入的自有输出目录。
 
-The package includes the repository formatter and comment-policy files. Git
-commit hooks and whole-checkout lint workflows remain repository maintenance
-tools; they are not installed into the consumer's Git repository by `find_package`.
+包带格式和注释策略，但 `find_package` 不向消费者 Git 安装 hook。TOML reader、
+typed resolver／factory、维护 assembly 和来源 lock 属于 SDK；host googletest、
+它的许可和 contract binary 不属于固件 payload。消费 configure 不下载测试依赖，
+需要平台测试时使用完整检出，安装 SDK 明确不提供那些合同 target。
 
-The source SDK includes authored TOML readers, typed resolution and factory
-generation, maintained default assemblies and dependency provenance locks.
-The pinned `ext/googletest` Git submodule, its licenses and contract binaries
-belong to host repository development and are excluded from the firmware SDK
-payload.
-Configuring a firmware consumer never downloads a test dependency. A consumer
-that needs platform development tests uses the complete repository checkout;
-the installed source SDK explicitly excludes those contract targets.
-
-
-## Device and executable-window consumers
-
-The current versioned plan in `tools/release/transport.py` includes the canonical
-Native external-provider lifecycle consumer alongside the device and image
-scenarios below. Every exact source/build root and linked image is required;
-plan structure alone does not establish a pass. The preceding device extension
-introduced five independent C11 consumers: F407/GD470 loaned RX, Native/F407
-MCUboot Control and a separate F407 full boot image.
-
-The TMP117 compositions explicitly link `Nexus::TMP117I2C`, own a settled software
-I2C endpoint and use all six public component functions. Native executes one
-bounded, positive sample/cleanup path. F407 links that same model with actual
-startup, generated bindings, resources and provider-retention checks; it never
-runs on an MCU. Neither scenario establishes physical TMP117, PCB or bus support.
-The component's two headers, two C sources and CMake target are mandatory SDK
-payload. Unselected device code remains eligible for link-time removal.
-
-The image reference copies one assembly and its physical layout from the SDK.
-The existing linker/resource gate checks the derived executable window, vectors,
-ELF LOADs and bounds. Its 512-byte prefix and 1,024-byte suffix reserve bytes;
-this consumer supplies no metadata encoding, bootloader, signature or activation.
-It selects no I/O faces, so provider-retention observation is not applicable.
-Its report still binds source, layout, configuration, ELF and checked resources.
-All three profiles audit actual C11/CPU/enum flags and public include boundaries;
-ARM images reject linked libc heap and C++ runtime. Native heap use is unassessed.
-
-The selected RX compositions own exactly two slots and four piece records, with
-only two 512-byte spare pbufs. Generic application translation units see opaque
-Nexus APIs; the composition explicitly links the selected Storage target. These
-ARM probes only link and measure resources: the fixture has no physical MAC/PHY,
-packet execution or usable random source, and no measured stack or timing.
-
-MCUboot Control uses the official public trailer implementation. Native executes
-NONE-to-PERMANENT control on the public, nonpersistent NOR model with two complete
-4,096-byte sectors, a four-byte program unit and one finite same-epoch operation.
-This does not authenticate a candidate. F407 Control uses a NULL operation so even
-an accidental run cannot modify Flash. Its empty assembly has no provider-retention
-observation. The separate full boot image retains official verification and copy
-code, an attributed public upstream test key and regions derived from one layout.
-It is ARM link evidence, without executed image authentication, Flash modification,
-handoff, reset, rollback or physical qualification. No production key is supplied.
-
-The complete 311-file lwIP and 80-file MCUboot reviewed source/notice closures,
-component helpers, generic/explicit headers and canonical consumer inputs are
-mandatory SDK payload. MCUboot's CLI first invokes the complete SDK verifier; its
-own source hash check cannot independently admit an incomplete SDK. ARM consumers
-retain the C11/CPU/enum checks and reject linked libc heap/C++ runtime. Native heap
-use remains unassessed. The full current plan must execute before qualification.
-
-### 中文
+## 器件与执行窗口消费者
 
 当前版本化消费计划由 `tools/release/transport.py` 唯一维护，在下述设备与镜像
 场景之外包括标准 Native 外置 provider 生命周期工程。每个精确的源码／构建

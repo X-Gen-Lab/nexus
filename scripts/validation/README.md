@@ -1,18 +1,16 @@
-# Actual test evidence
+# 实际测试报告验证
 
-`tools/dev/dev.py test --preset native-debug` removes any old JUnit, invokes
-CTest with `--no-tests=error` and an absolute `--output-junit` path, preserves its
-exit code, then validates the actual report against the execution start time.
+`tools/dev/dev.py test --preset native-debug` 删除旧 JUnit，调用 CTest 的
+`--no-tests=error` 和绝对 `--output-junit`，保留实际退出码，再按开始时间核对新报告。
 
-`junit.py` rejects missing, symlinked, old, malformed, empty, all-skipped,
-failed/errored, contradictory-count and duplicate/unnamed case evidence. Partial
-skips stay skipped. Report hashes alone do not identify which source/config ran;
-candidate qualifications bind those identities and raw execution logs separately.
+`junit.py` 拒绝缺失、符号链接、陈旧、格式错误、空、全跳过、失败／错误、矛盾计数、
+重复或无名用例。部分跳过仍标为跳过。报告摘要不标识执行源码／配置，候选资格另绑
+这些身份与原始日志。仓库根检查已有报告或运行验证器合同：
 
 ```sh
 python scripts/validation/junit.py --report build/native-debug/ctest-results.xml
 python -m unittest discover -s tests/contracts -p test_junit.py
 ```
 
-Native behavior, production-register models, ARM linkage/resource checks and
-physical HIL are separate evidence scopes. A workflow file is not an execution.
+Native、生产寄存器模型、ARM 链接／资源和物理 HIL 分别建立证据。
+workflow 存在不表示执行发生，验证器不会制造结果。

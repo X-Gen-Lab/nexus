@@ -1,11 +1,9 @@
-# RTS/CTS silicon-reference configuration
+# STM32U575 RTS/CTS 芯片路线参考
 
-This software-reference package declares exact package AF pads. A PCB
-net, connector or Nucleo virtual COM route is not inferred from it.
-Products supply the reviewed four-wire cross-connection, peer voltage
-and response bound, and electrical startup/stop policy.
+本软件参考声明精确封装的 AF 焊盘，不据此推断 PCB 网络、连接器或 Nucleo 虚拟串口
+接线。产品须提供已审四线交叉连接、对端电压与响应界限，以及电气启动／停止策略。
 
-The authored normal input selects `irq-fifo-rtscts-bytes` with one
-statically owned byte interface. Software models and ARM linking do not
-establish a physical RTS/CTS or noise/latency qualification. Physical
-validation remains not executed until the actual station runs it.
+正常 authored 输入选择 `irq-fifo-rtscts-bytes`，静态持有一个字节接口。软件模型与
+ARM 链接不建立物理 RTS/CTS、抗噪或延迟资格；真实工装执行前，物理验证保持未执行。
+
+具体模式和资源限制见 [U575 实现](../../soc/stm32/stm32u575/README.md)。

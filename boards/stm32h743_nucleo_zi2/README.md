@@ -1,21 +1,20 @@
-# NUCLEO-H743ZI2 software reference
+# NUCLEO-H743ZI2 板级软件参考
 
-This reusable Board package selects STM32H743ZIT6 and source-reviewed MB1364
-routes from UM2407 Rev6 (April 2026). Its physical PCB revision, regulator
-fitting and solder bridges are unknown. No physical HIL has executed.
+本包选择 STM32H743ZIT6，采用 UM2407 Rev6（2026 年 4 月）的 MB1364 已审资料
+路线。实际 PCB 修订、稳压器实装和焊桥未知，物理 HIL 未执行。
 
-The initial profile uses the internal HSI at 64 MHz, LDO supply, Cache off and
-one reserved TIM2 time domain. LED1 uses PB0 active high, with the documented
-SB39 ON/SB47 OFF route. USART3 PD8/PD9 AF7 uses the documented ST-LINK VCP
-SB19/SB12 path. Alternate PA5 LED fitting requires a distinct reviewed Board
-route. External products must inspect their actual PCB and own LED, console,
-supply, safety and recovery policy.
+## 已审参考配置
 
-The package inventory preserves PC2_C/PC3_C as conditional analog pads. They
-are not direct PC2/PC3 GPIO routes. No analog-switch configuration or electrical
-qualification is provided. Physical DMA-engine memory reachability does not
-open DMA modes, cache ownership or TCM placement in this reference.
+初始配置使用内部 HSI 64 MHz、LDO 供电、Cache off，并保留独立 TIM2 时间域。
+LED1 使用高有效 PB0，资料路线为 SB39 ON／SB47 OFF；USART3 PD8/PD9 AF7 使用
+ST-LINK VCP 的 SB19/SB12 路径。改用 PA5 LED 实装必须建立独立已审 Board 路线。
 
-[SoC ownership and limits](../../soc/stm32/stm32h743/README.md) describe the software
-scope. Host models and ARM linking do not establish hardware clock accuracy,
-power-entry latency, serial reliability or safe electrical outputs.
+外部产品须检查实际 PCB，并负责 LED、console、供电、安全与恢复策略。包中的
+PC2_C/PC3_C 是条件模拟焊盘，不是直接 PC2/PC3 GPIO 路线；本包不配置模拟开关，
+也不建立其电气资格。
+
+## 架构与限制
+
+[H743 SoC 合同](../../soc/stm32/stm32h743/README.md)说明软件所有权和模式限制。
+DMA 引擎的物理可达事实不能自动开放 DMA 模式、Cache 所有权或 TCM 放置。
+主机模型和 ARM 链接不证明实际时钟精度、供电入口延迟、串口可靠性或安全输出。

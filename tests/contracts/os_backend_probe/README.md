@@ -1,11 +1,8 @@
-# Backend onboarding probe
+# OS 后端接入探针
 
-`native.json` is the executable example for
-[the backend integration contract](../../../docs/design/os-backend-integration.md).
-It selects existing real Native GoogleTest contracts. It declares no new kernel
-support and performs no runtime backend registration.
-
-Configure through the normal development entry point, then execute a fresh probe:
+`native.json` 是[后端接入合同](../../../docs/design/os-backend-integration.md)的可执行
+示例，选择已有真实 Native GoogleTest，不声明新 kernel，不做运行时后端注册。
+从仓库根先正常 configure，再用全新输出运行：
 
 ```sh
 python tools/dev/dev.py configure --preset native-debug
@@ -16,14 +13,11 @@ python scripts/ci/os_backend_probe.py \
   --output build/backend-probe-native-001
 ```
 
-The output must not exist. Reruns use a different directory; previous evidence is
-never deleted or overwritten. Add multiple `--target` arguments when the reviewed
-contract spans several registered Google targets. Each selected target is fully
-executed without case filtering. The runner checks fresh XML and exact discovered
-identities, then measures its actual ELF with GNU `size`, `nm` and `readelf`.
+输出必须不存在，重跑换目录，不删除／覆写旧证据。合同覆盖多个注册 target 时重复
+`--target`，每目标无过滤执行全部用例，核对 fresh XML／发现身份，再用 GNU size／
+nm／readelf 测真实 ELF。
 
-For an MCU backend, supply these additional arguments against an already
-configured production firmware build:
+MCU 后端针对已配置生产 firmware build 另提供：
 
 - `--firmware-build <build-directory>`
 - `--firmware-target <reviewed-cmake-target>`
@@ -31,16 +25,12 @@ configured production firmware build:
 - `--cpu-resolution <generated-resolved-cpu.json-or-resolved.json>`
 - `--compiler <arm-none-eabi-gcc>`
 
-The existing CPU/backend resolver must already recognize the reviewed integration.
-This tool cannot accept an unregistered RTOS by introducing another configuration
-file or source graph. Kernel declarations include a source lock path within the
-checkout, required retained static API symbols and an actual scheduler case group.
-No placeholder declaration for another RTOS is provided.
+既有 resolver 必须已认识该后端，不能靠新 JSON 或源码图接入未注册 RTOS。
+kernel 声明包含检出内 source lock、必须保留的静态 API、真实 scheduler case group，
+不提供其他 RTOS 的占位声明。
 
-`report.json` retains command exit codes, raw output digests, source/build/tool
-identities, actual case records and ELF costs. Host measurements carry
-`host_elf_not_mcu_budget`; MCU link measurements carry
-`linked_mcu_elf_not_physical_timing`. Neither scope establishes board behavior,
-real cycle counts, clean-source candidate qualification or product acceptance.
-Run `python -m unittest discover -s scripts/ci -p test_os_backend_probe.py` for
-the declaration, registration, coverage, CPU/ABI and resource rejection contracts.
+report 保存 command exit、原始流摘要、source／build／tool、实际 cases 和 ELF。
+host 标记 `host_elf_not_mcu_budget`，MCU 标记
+`linked_mcu_elf_not_physical_timing`，均不证明板卡、周期、clean candidate 或产品。
+`python -m unittest discover -s scripts/ci -p test_os_backend_probe.py`
+覆盖声明、注册、coverage、CPU／ABI 和资源拒绝合同。

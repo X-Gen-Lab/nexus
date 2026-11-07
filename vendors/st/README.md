@@ -12,6 +12,10 @@
 | H743 | `cmsis_device_h7` | `stm32h7_hal` |
 | U575 | `cmsis_device_u5` | `stm32u5_hal` |
 
+H563 I3C 软件参考另使用 `cmsis_device_h5` 与 `stm32h5_hal` 的精确依赖，
+不建立完整 H5 SoC／Board 接入；具体边界见
+[SoC 扩展](../../components/soc/README.md)。
+
 共同 CPU 头迁移为 `vendors/arm/CMSIS_6` 的官方 v6.4.0 pin；Device、startup
 与 HAL/LL 的原 gitlink 保持。版本、PDSC 原始字段及许可证边界见
 [供应商版本](../VERSIONS.md)。CMake 内部 `nexus_cmsis_core` 与

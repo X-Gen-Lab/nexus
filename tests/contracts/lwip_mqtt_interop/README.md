@@ -1,33 +1,28 @@
-# Complete Native client network chain
+# Native 完整网络客户端链路
 
-This opt-in Linux integration runs the actual pinned Nexus Ethernet/lwIP adapter,
-TCP byte stream, TLS client and coreMQTT client together against the immutable
-Mosquitto broker used by the [POSIX integration](../mqtt_tls_interop/README.md).
-It is an unqualified host fixture. Production components are unchanged.
+本 Linux opt-in 夹具把锁定 Ethernet／lwIP adapter、TCP byte stream、TLS client、
+coreMQTT 一起接到 [POSIX 夹具](../mqtt_tls_interop/README.md)的不可变 Mosquitto。
+生产组件不变，结果保持未资格化。
 
 ```text
-Client process                          Relay process             Real broker
+客户端进程                        relay 进程                 真实 broker
 coreMQTT
-  Nexus TLS 1.2 -------------------------------------------------> Mosquitto TLS
-    Nexus TCP -> lwIP -> Ethernet IPC -> lwIP raw TCP -> OS socket -> MQTT engine
+  Nexus TLS1.2 ------------------------------------------> Mosquitto TLS
+    TCP → lwIP → Ethernet IPC → lwIP raw TCP → OS socket → MQTT engine
 ```
 
-The AF_UNIX datagram channel contains complete Ethernet frames, not application
-messages. Each process initializes its own real lwIP global state once. The relay
-copies opaque TLS ciphertext between an official raw TCP connection and a
-nonblocking loopback socket. It does not parse MQTT, terminate TLS, generate
-protocol replies or add a production socket abstraction. TLS authentication,
-hostname `server.test`, trust validation, client certificate checks and MQTT
-ACKs terminate at the actual broker. There are **two TCP connections** joined
-by this test relay; this is not packet routing or one end-to-end TCP connection.
-No TAP, network-administration capability or additional firmware stack is used.
+AF_UNIX datagram 传完整 Ethernet frame，不传应用消息；每进程只初始化一次自己的
+lwIP 全局域。relay 在官方 raw TCP 与 nonblocking loopback socket 间复制不透明 TLS
+密文，不解析 MQTT、不终止 TLS、不合成 reply、不加生产 socket API。
+`server.test`、trust、client cert、MQTT ACK 由真实 broker 终止。测试连接两条TCP，
+不是 packet routing／单条 end-to-end TCP，无 TAP、network-admin capability 或
+新增固件 stack。
 
-## Execution and bounds
+## 构建、场景与资源
 
-The Native Google TCP-stream target has a nested build dependency on
-`nexus_lwip_mqtt_interop_client`. The helper is not a registered Google test or
-an aggregate entry. Ordinary hooks compile it without starting Docker. Run the
-broker suite separately after building that maintained target:
+Native `nexus_network_tcp_stream_test` 嵌套依赖 helper
+`nexus_lwip_mqtt_interop_client`，helper 不是注册 Google 用例或聚合入口。普通 hook
+只构建，不启动 Docker。显式另跑 broker：
 
 ```sh
 python tools/dev/dev.py build --preset native-debug \
@@ -38,108 +33,44 @@ python -B -m tools.testing.mqtt_tls_interop \
     --output-root /absolute/path/to/new-output-directory
 ```
 
-Use the existing runner's exact cached broker image, proxy/CA configuration,
-fixture generation and owned-container cleanup. Its default `posix` selection
-keeps the original three socket cases. The new selection runs five real cases:
+复用精确缓存 broker image、proxy／CA、凭据生成、owned cleanup。默认 posix 保留
+3例，本模式5例：
 
-- `clean`: mutual TLS 1.2 ECDHE-ECDSA/AES-GCM, MQTT CONNECT, SUBACK, QoS1
-  publish/self-echo/PUBACK, UNSUBACK and DISCONNECT. The client sends its TLS
-  close alert, authenticates the broker's alert, then detaches its TCP context.
-- `backpressure`: the same sequence through 17-byte relay chunks and an initial
-  40 ms pause. Positive pause counters and complete ACKs are required. This
-  establishes progress under fragmentation/throttling; it does not claim a full
-  TCP receive-window test. The separate TCP-stream cases test that condition.
-- `fault`: a real official `tcp_abort` in the relay sends RST after the session
-  is established. MQTT must latch I/O failure and reject subsequent operations
-  without further provider calls or automatic replay.
-- `deadline`: the relay stops forwarding after SUBACK. A new 150 ms absolute
-  deadline must expire; MQTT remains failed and rejects replay. Pending TCP
-  data still belongs to the client until explicit abort.
-- `missing-client`: the actual broker must reject the omitted client identity
-  with its TLS fatal alert, rather than an unrelated timeout or entropy error.
+| 用例 | 真实检查 |
+| --- | --- |
+| `clean` | mTLS1.2 ECDHE-ECDSA／AES-GCM，CONNECT／SUBACK／QoS1 echo／PUBACK／UNSUBACK／DISCONNECT，发送并认证双方 close alert 后 detach TCP |
+| `backpressure` | 同流程，relay17 B chunk、初始40 ms pause，正 pause counter 与完整 ACK；不冒充完整 TCP receive-window 测试，后者另测 |
+| `fault` | session 建立后官方 tcp_abort 发 RST，MQTT sticky IO，后续零 provider call／无 replay |
+| `deadline` | SUBACK 后停转发，新150 ms absolute deadline 到期，MQTT 保持失败；待发数据归 client 到显式 abort |
+| `missing-client` | broker 以真实 TLS fatal alert 拒绝，不能用 timeout／entropy 错误冒充 |
 
-Every owner loop services at most four Ethernet frames per invocation. The relay
-retains one accepted pbuf chain with an offset; another callback returns ERR_MEM
-without consuming the stack's borrow. It credits `tcp_recved` only after the OS
-socket accepts those bytes and frees the chain exactly once. The reverse path
-has one 113-byte buffer (17-byte chunks in the throttle case), uses official
-`tcp_write(COPY)` and preserves an unaccepted tail. Each loop performs at most
-one send, one receive and one copied TCP submission. Socket buffers are requested
-explicitly at 4096 bytes; Linux may double them. Ethernet IPC buffers are bounded
-and all production lwIP pools use the unchanged fixed profile.
+每 owner loop 最多4帧。relay 持一条 accepted pbuf chain／offset，其他 callback
+返回 ERR_MEM 不消费 borrow；OS 接收后才 tcp_recved，chain 恰 free 一次。反向
+用113 B buffer（节流17 B），官方 tcp_write(COPY)，保留未接纳 tail。每loop至多
+一 send、一 receive、一 copied submission。socket请求4096 B，Linux 可加倍，
+IPC 与真实 lwIP pool 都有界且原profile不变。
 
-Each process has one serialized executor. The host monotonic elapsed clock
-supplies adapter/TCP/TLS/MQTT deadlines and lwIP milliseconds. It advances in real
-time; the existing virtual-time TCP cases remain separate. Protocol operations
-have five-second absolute deadlines, finite MQTT I/O-call budgets and bounded
-poll waits. The runner has an independent 20-second case watchdog. Host UTC and
-Linux `getrandom` are explicit fixtures, not MCU trusted-time or entropy claims.
-The production TLS profile remains client-only; no server profile is enabled.
+每进程唯一 executor，真实 host monotonic elapsed 同时供各 deadline／lwIP millis，
+不混用独立 virtual-time cases。operation5秒，MQTT call与poll预算有限，runner
+另有20秒case watchdog。host UTC／getrandom 不证明 MCU 时钟或熵；TLS仍client-only。
 
-## Withdrawal and evidence
+## 撤回与证据
 
-A successful TCP close means this context and its callbacks are detached. FIN,
-TIME_WAIT and global timer retirement are not established by that return. The
-fixture aborts remaining owned PCBs, releases its accepted pbuf chain, settles
-MAC requests and calls adapter stop before joining the relay process. The
-`client_loans_clear` and `loans_clear` observations cover this fixture's MAC
-TX/RX references, not global lwIP shutdown. Official netif removal can itself
-abort active/bound PCBs for that local address and does not drain all timers.
+TCP close 只证明此context／callback detach，不证明 FIN／TIME_WAIT／全局 timer
+退休。fixture abort 剩余 PCB，free其pbuf，settle MAC，stop adapter，再join relay。
+`client_loans_clear`／`loans_clear` 只覆盖本fixture MAC引用，不是全局lwIP shutdown；
+netif移除可abort此local address active／bound PCB，不排空全部timer。
 
-No stack timeout/service call runs after adapter detachment. Network and clock
-storage remain alive until process exit; the relay uses `_exit` before owner
-storage is unwound. Process termination retires the isolated stack domain. This
-does not establish that an MCU may destroy its global clock, reinitialize lwIP
-or reclaim global state after stopping one adapter.
+adapter撤回后不再service／timeout；clock／network存储保留至进程退出，relay用
+`_exit` 避免先unwind owner。进程结束退休隔离stack域，不授权MCU关闭全局clock、
+重初始化lwIP或回收global state。
 
-The runner retains binary identity, immutable image/broker identity, test
-credential hashes, broker logs, raw command receipts, explicit MQTT results,
-Ethernet/ciphertext counters and both withdrawals. Exit zero alone is refused.
-Source/compile-context manifests bind a particular execution; normal and
-ASan/UBSan are separate fresh executions. Any first successful run is integration
-validation of existing components, not invented TDD evidence. Tool contract
-changes retain genuine RED/GREEN regressions. This suite grants no Source SDK,
-release, PHY, board, timing, power or hardware-entropy qualification.
+runner绑定binary、image／broker、credential hash、日志、原始命令、MQTT结果、
+Ethernet／ciphertext counter、双方withdrawal，exit0不够。source／compile manifest
+绑定每次执行，普通和ASan／UBSan独立fresh。首GREEN是既有组件集成，不伪造TDD；
+工具变化另有真实RED／GREEN。不授予SDK／release／PHY／Board／时序／功耗／熵资格。
 
-
-## Bounded raw Ethernet captures
-
-Each full-chain case owns a new mode-0700 directory at
-`evidence/cases/<case>/`. `client.pcap` and `relay.pcap` contain the exact complete
-Ethernet bytes accepted by each successful AF_UNIX datagram send. The test hook
-copies them before TX publishes SETTLED and retains no request or payload span.
-Offered, EAGAIN, failed and deliberately discarded sends are not captured. These
-files cover the lwIP-to-lwIP IPC hop; they do not capture the relay-to-broker
-loopback TCP connection or physical PHY/DMA traffic.
-
-Files use ordinary little-endian PCAP 2.4, Ethernet link type 1, no FCS and a
-1,514-byte snapshot limit. Record timestamps are elapsed host CLOCK_MONOTONIC
-microseconds from the case's shared pre-fork origin, not UTC or hardware packet
-timestamps. A reader may display their zero epoch as January 1970. Each file is
-bounded to 1,024 frames and 1 MiB including headers. Exclusive file creation and
-no-follow directory traversal reject aliases and overwrites. Exhaustion, partial
-writes, invalid clocks or failed final sync/close latch a failed case; a truncated
-prefix never becomes complete evidence. This host-only fixture adds no firmware
-trace API, worker, registry, source configuration or selected MCU state.
-
-The existing runner binds each capture's retained parsed bytes, SHA256, size,
-direction and exact frame count to the completed case command receipt, raw stdout
-identity and actual client executable hash. It retains observations of the test
-source files before/after execution; actual compiler/source closure belongs to
-the separate build evidence and is not inferred from a live source hash.
-
-The bounded reader checks complete PCAP EOF, Ethernet/IPv4/TCP structure, the
-reviewed single IPC connection, consistent retransmitted bytes and TLS record
-framing. Clean and backpressure cases require complete application records in
-both directions. Failed protocol cases may explicitly report a partial trailing
-TLS record while every captured Ethernet record must remain complete. Known
-fixture MQTT topic/payload bytes must not appear in application-record bodies.
-This check does not decrypt TLS or prove cryptographic secrecy; authentication
-and MQTT outcomes remain the real broker/client observations. No TLS key log is
-created. Captures contain host test traffic and establish no board, throughput,
-wire timing, power or long-load qualification.
-
-### 中文
+## 有界原始以太网抓包
 
 每个完整链路用例独占 `evidence/cases/<case>/` 下新建的 0700 目录。
 `client.pcap` 与 `relay.pcap` 保存两个方向实际成功送入 AF_UNIX 数据报通道的

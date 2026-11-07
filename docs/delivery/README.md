@@ -5,11 +5,19 @@
 只读接口对象，共享只读操作表，独立状态留在 provider 内部。获取接口不启动硬件。
 应用、产品任务、私有 PCB、Flash 分区、恢复与安全策略由外部工程维护。
 
+当前源码的架构阅读入口为[中文 README](../../README.md)和[源码相邻合同](../explanation/source-map.md)。
+最新启明核心板／V4.1 软件参考已通过 PR #51 合入；软件实现绑定 `cb060a8d`，
+严格中英文文档绑定 `6f16246a`，合并提交为 `93423b0f`。具体配置、原始结果与未完成
+退出仍从[既有交付索引](developer-experience-results.json)的
+`observations.qiming_board_integration_20261107` 和[原台账](../design/developer-experience-execution.csv)
+进入。SDIO 当前仅轮询，PHY／选定音视频／完整高级示例仍有开放项，实板 HIL 未执行。
+README 中文整理只改变文档，不重建这些源码的软件资格、离线双构建或物理资格。
+
 当前公开版本为 `v0.2.1` 软件预览，固定平台源码 `b1b903da`。其 Source SDK、
 实际 CI、Release 和文档发布见{ref}`0.2.1 预览交付 <sdk-preview-v021>`。
 预览没有建立新的正式软件候选或物理资格。
 
-本轮最新选定软件候选固定 P2 `ab532250`，两轮完整159、八候选／16 次 fresh
+已封存的历史软件候选固定 P2 `ab532250`，两轮完整159、八候选／16 次 fresh
 断网构建、SDK v15、P2 严格双语包和无签名 outer 公开实际恢复见
 {ref}`当前 P2 无签名软件交付 <p2-unsigned-software-ab532250>`。独立 QA 后续
 `706ee80` 已通过普通完整索引门禁及完整 Python174 复扫，38 条 finding（含
@@ -46,7 +54,7 @@ Drivers／I/O／SoC 的后续实现、勘误修复、目录归属、构建依赖
 
 | 阅读入口 | 说明 |
 |---|---|
-| [开发体验迭代](../design/developer-experience.md) | 九组软件工作和集成退出；实际状态以75 项台账为准，H1–H6 实板未执行 |
+| [开发体验迭代](../design/developer-experience.md) | 九组软件、配置接入及 QB 板卡任务；状态以原 CSV 和精确结果索引为准，实板未执行 |
 | [当前架构](architecture.md) | 物理目录、依赖方向、执行与资源责任 |
 | [Cortex-M 软件支持](cortex-m.md) | 九核 ABI/feature、Core/Arch/OS runtime 与配置示例 |
 | [OS 交付](os.md) | 配置、显式存储、外部多任务示例与 OS HIL 范围 |
@@ -116,4 +124,4 @@ CP311 离线安装和物理 HIL 仍未执行。后续文档提交只记录其精
 C11。commit hooks 实际执行完整 testing／configure／ci／workflows 四域工具测试
 和全部 GoogleTest 契约，拒绝未完成、过滤或跳过的报告。执行结果证明当前合同；真实 RED→GREEN 过程由 PR 和原始日志记录。
 
-- [SoC refinement and physical acceptance](../design/soc-refinement.md)
+- [SoC 完善与物理验收](../design/soc-refinement.md)

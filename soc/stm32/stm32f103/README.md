@@ -1,209 +1,150 @@
-# STM32F103RB provider
+# STM32F103RB 精确芯片实现
 
-The maintained exact part is STM32F103RBT6, LQFP64, 128 KiB Flash and 20 KiB
-SRAM. This is a Cortex-M3 without FPU, DSP or MPU. Its 43 external IRQ slots
-and four implemented priority bits come from the official device header. Other
-STM32F1 densities, packages and connectivity-line devices are not implied.
+维护型号为 STM32F103RBT6、LQFP64、128 KiB Flash、20 KiB SRAM，CPU 为无 FPU／
+DSP／MPU 的 Cortex-M3。43 个外部 IRQ slot 和 4 个优先级位来自官方 Device 头；
+不推广到其他 F1 密度、封装或 connectivity-line 器件。
 
-The current vertical slice consists of official startup, CPU-only pre-RAM
-`SystemInit`, reset HSI8 admission, independent TIM2 time, GPIOA PA5 and USART2
-PA2/PA3 IRQ bytes, independent IWDG, PA0/PA1 EXTI events and bounded SPI1 polling with PA4 CS.
-The static typed factory returns pre-existing faces. Private
-states and bounded RX rings are generated once; no heap, task, registry, lock or
-scheduler is introduced. Other modes fail configuration admission.
+## 架构与基础模式
 
-Selected transport extensions add USART2 finite DMA TX and duplex finite RX
-blocks, plus default PB6/PB7 I2C1 IRQ messages. The exact source and ownership
-limits below remain distinct from physical Board validation.
+官方 startup、主 RAM 前 CPU-only `SystemInit`、复位 HSI8 准入、独立 TIM2、GPIOA
+PA5、USART2 PA2/PA3 IRQ bytes、IWDG、PA0/PA1 EXTI 和 PA4 CS 的有限 SPI1 polling
+构成基础切片。扩展另选 USART2 有限 DMA TX／duplex 有限 RX block，以及默认
+PB6/PB7 I2C1 IRQ message。其他模式配置时拒绝。
 
-## Source and electrical boundary
+`soc.json`／`routes.json` 描述事实和路线，`configure/` 生成精确状态、有限 RX ring、
+只读 face 和调用。factory 返回预存对象，不引入 heap、任务、registry、lock 或
+scheduler。硬件行为由 `system.c`、`drivers/` 与私有 cold C owner 维护。
 
-The private CMSIS and GPIO/USART/I2C LL headers use the exact pair pinned by
-STM32CubeF1 v1.8.7. The two dependency locks retain original notices and selected
-file identities. Selected I2C receive uses a private compile-time LL port;
-command and acknowledgement exceptions follow the
-[official-driver contract](../../../docs/design/official-stm32-provider.md).
-Vendor types do not enter public Nexus interfaces. Full HAL C
-engines, mutable Handles, HAL tick and `HAL_Init` are not linked. Finite direct
-control writes preserve request ownership and avoid LL exclusive retry loops.
-F1 CRL/CRH nibbles and SR/DR acknowledgement differ from modern STM32 register
-layouts; neither modern MODER/AFR nor USART ICR/TEACK is inferred. The shared
-layer boundaries follow [the platform contracts](../../../docs/design/README.md).
+## 官方来源、电气与身份
 
-The NUCLEO-F103RB Board is a source reference from UM1724 Rev17. PA5/LD2 and
-USART2 PA2/PA3 VCP are documented routes; SB13/SB14 ON and SB62/SB63 OFF must be
-checked on the actual Board. The physical PCB revision and bridge population
-remain unknown. No external oscillator is assumed. Nominal HSI8 frequency and
-serial baud retain the datasheet tolerance; no calibrated measurement is claimed.
+私有 CMSIS、GPIO／USART／I2C LL 使用 STM32CubeF1 v1.8.7 锁定配对，两份依赖锁
+保留原 notice 和选定文件身份。I2C RX 通过私有编译期 LL port 复用，command／ACK
+例外见 [官方驱动合同](../../../docs/design/official-stm32-provider.md)。厂商类型不
+进入公共接口；不链接完整 HAL C engine、可变 Handle、HAL tick 或 `HAL_Init`。
+有限 direct control write 保留借用并避免 LL exclusive retry loop。F1 CRL/CRH
+四位字段及 SR/DR 清除序列不同于现代 MODER/AFR、ICR/TEACK，不能套用。
 
-Standalone startup reads the factory Flash-size halfword at `0x1FFFF7E0` and
-requires 128 KiB for the declared STM32F103RBT6 target. RM0008 Rev21 section30.1.1
-permits this CPU read. ES096 Rev15 section2.2.2 states that normal software
-cannot read `DBGMCU_IDCODE` or `DBGMCU_CR`; it reads zero outside debug mode.
-Startup therefore does not use debug visibility as admission. Device group and
-silicon revision remain unobserved, and matching density does not prove the
-orderable part, package or Board. A strict revision policy cannot accept an
-unavailable debug read as revision A, accept an assembly literal as an
-observation, or infer permission from a newer-looking code.
+NUCLEO-F103RB 根据 UM1724 Rev17，PA5/LD2 和 USART2 PA2/PA3 VCP 是资料路线，
+实板须核对 SB13/SB14 ON、SB62/SB63 OFF。PCB 修订／焊桥未知，不假设外部振荡器；
+名义 HSI8 和 baud 保留数据手册容差，不声称已校准测量。
 
-The same ES096 limitation excludes ordinary-firmware `DBGMCU_CR` access.
-IWDG enable supports `debug_freeze=false`; a request for `true` returns
-`UNSUPPORTED` after context and output validation, before any hardware access
-or activation. Enable, feed, state and failed-preparation cleanup never read
-or write debug control. The reported false is the supported CPU configuration,
-not an observation of a debugger's setting. An external debugger owns its own
-freeze setup; this provider neither adopts nor clears that setup. The HAL/LL
-debug freeze macros directly access `DBGMCU_CR` and do not remove this erratum.
+独立 startup 读取 `0x1FFFF7E0` factory Flash-size 半字，要求 128 KiB；RM0008
+Rev21 §30.1.1 允许 CPU 读取。ES096 Rev15 §2.2.2 规定普通固件不能读取有效
+`DBGMCU_IDCODE`／`DBGMCU_CR`，非 debug 下读零。因此启动不以 debug visibility
+准入，device group／silicon revision 仍未观察，密度匹配也不证明料号、封装或 PCB。
+严格 revision 策略不能把不可读当 revision A、把配置字面值当观察，或凭较新的编码
+推断许可。
 
-## Clock and ownership
+同一勘误也排除普通固件的 `DBGMCU_CR` 操作。IWDG 仅支持 `debug_freeze=false`；
+请求 true 在 context／output 校验后、任何硬件访问或激活前返回 `UNSUPPORTED`。
+enable/feed/state/失败准备清理均不读写 debug control。返回 false 是支持的 CPU
+配置，不是 debugger 设置观察；外部 debugger 独立拥有其 freeze，provider 不接管
+或清除。HAL／LL freeze 宏也会直接访问该寄存器，不能绕过勘误。
 
-Cold admission rejects a foreign clock profile, timer, vector, USART gate,
-remapped route, locked pad or driven pin before taking ownership. TIM2 is a
-**16-bit** counter on F103. PSC7 and ARR65535 yield nominal 1 MHz and a 65.536 ms
-wrap interval. The overflow handler must execute at least once per interval;
-long IRQ masks, NMI/HardFault reads and deep STOP continuity are unsupported.
-One pending wrap is corrected in the timestamp snapshot. Prescaler UG is
-issued with MMS=CEN while CEN=0, so it cannot export an unselected TRGO pulse. An observed W0C failure
-invalidates the time epoch, retains every owner, observes the fault and parks.
+## 时钟、引脚和异步所有权
 
-The concrete C Platform owner leases only selected CRL fields and output
-latches. Generation emits its immutable selection and one eight-byte receipt;
-preflight, acquisition, readback, restoration and retained retry remain in C.
-GPIO preloads the latch before enabling output. Timer stop withdraws the source and
-observes cleared flags before its final NVIC disable/pending proof. Stop first quiesces controller and
-notification references, then restores selected pins and owned gates. Failed
-readback retains unfinished cleanup responsibility. Every consumer joins before
-the timer is stopped; old deadlines are invalid after a new epoch starts.
+冷准入在取得资源前拒绝外来 clock profile、timer、vector、USART gate、remap、
+locked pad 或 driven pin。F103 TIM2 是 **16-bit**，PSC7、ARR65535 形成名义 1 MHz、
+65.536 ms 回绕，overflow handler 必须在每圈执行；不支持长 mask、NMI/HardFault
+读取或 deep STOP 连续性。时间快照修正一次 pending wrap。PSC UG 在 CEN=0、MMS=CEN
+时发出，不导出未选 TRGO 脉冲。W0C 回读失败使 epoch 失效，保留全部 owner，观察
+故障后永久停止。
 
-USART TX borrows request and payload until actual TC and IRQ source withdrawal
-precede release-publication of SETTLED. Timeout and cancel stop loading bytes;
-failed drain retains QUARANTINED storage. RX has an explicit byte ring and reports
-loss without overwriting unread bytes. IRQ notification is only a hint; captured
-callbacks must drain before their borrowed target can be returned.
+C Platform owner 只租用选定 CRL 字段／latch，生成不可变选择和一份 8-byte receipt；
+preflight、取得、回读、恢复和失败重试均在 C。GPIO 先 latch 后 output；timer stop
+先撤源并确认 flag，再最终证明 NVIC disabled/pending 清除。stop 先排 controller／
+notify 引用，再恢复 pin 和自有 gate；失败保留清理责任。全部时钟消费者退出后才能
+停 timer，新 epoch 不能继续使用旧 deadline。
 
-EXTI0/1 use independent vectors 6/7 and AFIO EXTICR GPIOA selection. PA0 and PA1
-are documented CN8 A0/A1 pins 1/2; external stimulus, voltage, pull and debounce
-remain external responsibilities. Each IRQ acknowledges W1C once and records
-one coalesced timestamped fact. Both-edge direction is a sampled level, not an
-edge history. A full ring preserves old facts and then reports a loss boundary.
-Stop observes source/vector withdrawal and restores only its selected mux field.
+TX request／payload 直到真实 TC 和 IRQ 源撤离后才以 release 发布 SETTLED。timeout／
+cancel 停止装载新字节，排空失败保留 QUARANTINED。RX 显式 byte ring，不覆盖未读
+数据，loss 可观察；notify 仅提示，已捕获 callback 须结束后才能归还其 target。
 
-IWDG uses DS5319 nominal 40 kHz and 30..60 kHz LSI uncertainty, not F4's different
-oscillator bounds. PR and RLR can latch independently, so a failed update retains
-a conservative cross-product timeout envelope. Activation is irreversible;
-Platform stop reports STATE while enabled. Failed preactivation LSI/debug
-rollback retains private leases and requires ordinary stop retry. Hardware
-watchdog option bytes are observed without rewriting them. Pending automatic
-PR/RLR updates report enabled/irreversible with unknown bounds and UNSUPPORTED. Products own feed,
-health, reset and debug policy. No destructive hardware enable has been tested.
+EXTI0/1 是独立 vector6/7、AFIO EXTICR GPIOA；PA0/PA1 是资料 CN8 A0/A1 pin1/2。
+外部激励、电压、pull、debounce 外置。每 IRQ W1C 一次，记录一个可合并时间事实；
+both-edge 方向只采样实时电平。ring 满保留旧事实，之后报告 loss boundary。stop
+证明源／vector 退出后，仅恢复选中的 mux field。
 
-SPI1 uses default PA5 SCK, PA6 MISO and PA7 MOSI, with one explicit PA4
-active-low endpoint. The selected endpoint frequency is 31,250..4,000,000 Hz,
-rounded down by the actual 8 MHz APB2 divisor. Each privileged task call has a
-finite absolute deadline, one whole-CS interval and 1..256 full-duplex bytes.
-Modes 0..3 and exact in-place buffers are supported; partial overlap is rejected.
-Success follows actual BSY drain, CS-high readback and a final deadline check.
-A failed transfer resets and checks the controller before releasing buffers;
-recovery is explicit. An unresettable wire or unprovable CS release retains the
-executor and caller buffers, masks interrupts, observes the fault and parks if
-the observer returns. This terminal case never reports completion. PA5 is also
-LD2, so the LED and SPI clock cannot be selected together; its electrical load
-requires physical validation. No SPI DMA or asynchronous execution is claimed.
+IWDG 按 DS5319 名义 40 kHz、LSI 30..60 kHz，不套 F4 界限。PR/RLR 可独立 latch，
+更新失败保留保守交叉组合 timeout envelope。activation 不可逆，启用时 Platform
+stop 返回 STATE；激活前 LSI/debug rollback 失败保留 lease，需普通 stop 重试。
+观察 hardware option 不改写；自动 PR/RLR 更新未完成时报告 enabled/irreversible、
+unknown bounds 和 UNSUPPORTED。产品负责喂狗、健康、复位和 debug 策略，未进行破坏性
+硬件启用。
 
-## Finite UART channel DMA and I2C
+## SPI 有限 polling
 
-`dma-tx` uses DMA1 channel7 and the selected IRQ byte ring; it does not acquire
-channel6. `dma-duplex` additionally uses channel6 for normal RX blocks supplied
-by the caller. TX and each RX block contain 1..65535 bytes inside the declared
-20 KiB SRAM DMA domain. TX payloads must be placed in that admitted SRAM;
-Flash source reachability is not opened by this profile. The SDK wrapper checks
-the actual USART/DMA layout, gates and every selected vector. A foreign channel
-is rejected before admission. Generation selects one shared readonly ops table
-for the authored mode and one exact static instance; factory lookup returns that
-object. `dma-tx` owns a compact TX context and its IRQ byte ring. `dma-duplex`
-embeds the RX block extension after the same TX prefix. Direct selected
-initializers and vectors let ordinary section GC remove unused block-reception
-code from TX-only images; no runtime forwarding layer or configuration switch
-is added. Both modes retain the same request, drain and wake contracts.
+SPI1 默认 PA5 SCK、PA6 MISO、PA7 MOSI，加显式 PA4 低有效 endpoint。8 MHz APB2
+分频向下选择 31,250..4,000,000 Hz。每次特权 task 调用为 1..256 个全双工字节、
+有限绝对 deadline 和完整 CS interval，支持 mode0..3、精确原地 buffer，拒绝部分
+重叠。实际 BSY 排空、CS-high 回读和最终 deadline 检查后才成功。
 
-DMA completion only ends memory movement. Accepted TX retains its request and
-payload until the DMA request/channel/IRQ sources detach and real wire TC is
-observed. A completion first observed after the absolute deadline reports timeout.
-A refused drain retains QUARANTINED storage. RX publishes only after DMAR/EN
-withdrawal, a stable final count and acknowledgement. IDLE reports the observed
-prefix, not an exact timestamped byte boundary. Hardware errors discard the
-affected block and report loss. A DATA byte discarded during a finite boundary
-also reports loss. Owner service rearms a free block; gaps are possible and a
-borrowed consumer block is never reused. RX stop returns BUSY until producer,
-READY and consumer loans are drained; it never revokes them.
+失败先 reset 并检查 controller，再归还 buffer，恢复需显式调用。无法 reset 或
+无法证明 CS 释放时保留 executor 和 buffer，mask IRQ、调用 fault observer；即使
+observer 返回也继续 park，不报告完成。PA5 与 LD2 冲突，不可同选，负载需实板验证。
+无 SPI DMA 或 async。
 
-I2C1 uses default PB6 SCL/PB7 SDA, legacy AF open-drain, nominal 80 kHz at
-APB8 MHz (CCR50/TRISE9), and event/error IRQ priority0. ES096 2.8.1 requires
-highest-priority service; 2.8.2 receive windows remain under the saved interrupt
-mask; 2.8.5 excludes the affected 88..100 kHz repeated-START range. Kernel
-callbacks are rejected from these priority-zero IRQs. A FreeRTOS owner may
-poll the latched request or use a non-kernel notification mechanism. Products
-must budget global interrupt masking and inspect physical bus timing.
+## UART channel DMA 与 I2C IRQ
 
-The I2C cold owner separately leases only PB6/PB7 and added GPIOB/AFIO/I2C1
-gates. It preloads released lines, preserves unrelated pins and restores the
-captured nibbles/latches only after core IRQ/wake withdrawal. External pullups,
-bus voltage, capacitance, endpoint wiring and silicon revision remain external
-qualification inputs. A low/busy bus is rejected; no implicit GPIO bus clear,
-product recovery, SMBus, slave mode or I2C channel-DMA support is introduced.
+`dma-tx` 使用 DMA1 channel7＋IRQ byte ring，不取 channel6；`dma-duplex` 额外使用
+channel6 接收调用者普通 RX block。TX／每块 1..65535 bytes，完整位于 20 KiB SRAM
+DMA 域；本 profile 不准入 Flash TX。SDK wrapper 检查实际 USART/DMA ABI、gate 和
+所有选定 vector，外来 channel 在 admission 前拒绝。
 
-The external `tests/contracts/legacy_transport_assembly` consumer selects each
-new mode independently for baremetal and FreeRTOS. Its ARM images and host
-register models establish software execution and linking, not MCU waveforms.
+每个 mode 生成共享只读 ops 和精确实例。TX-only 只含 compact TX context／byte ring；
+duplex 在同一 TX prefix 后加 RX block extension。直接 initializer／vector 使 section
+GC 能移除 TX-only 未用 RX 代码，不新增运行时转发或配置开关，借用／排空／wake
+合同不因裁剪改变。
 
-## Physical Flash, ADC and PWM
+DMA memory complete 不等于 wire complete。TX 直到 DMA request/channel/IRQ 撤源
+并观察 TC 才结清；deadline 后第一次观察完成报告 timeout。排空被拒仍 QUARANTINED。
+RX 在 DMAR/EN 撤离、最终 count 稳定、ACK 后发布；IDLE 是观察到的 prefix，不是精确
+逐字节边界。错误丢弃该块并报 loss，有限边界丢弃的 DATA 字节也报 loss。service
+重新接纳 free block，可能有间隙，不复用消费者借用。RX stop 在 producer、READY、
+consumer loan 未退出前保持 BUSY。
 
-The exact Flash face exposes all 128 physical 1 KiB pages and a 2-byte program
-unit. The existing `poll-word` mode name does not imply 32-bit programming.
-Authored Board bindings declare `supply_mv`; the software reference uses 3300 mV,
-which is an input assumption and does not measure the actual supply. The driver
-admits 2700..3600 mV and exposes no product partition. Consumers must select an
-explicit writable, erase-aligned region and keep running code, vectors and live
-data outside destructive operations. Erase/program wait until hardware BUSY is
-clear even after the absolute deadline; timeout only prevents the next pulse.
-Neither cancellation nor a timeout aborts a physical pulse. Each halfword must
-be erased, except programming all zero. All-0xff input halfwords issue no
-program pulse. ES096 section 2.2.11's delayed BSY is
-handled by an intervening control-register read and barrier after erase start.
-Failed relock retains the initialized owner for explicit close retry.
+I2C1 默认 PB6 SCL／PB7 SDA legacy AF open-drain，APB8 MHz、CCR50/TRISE9，名义
+80 kHz，event/error IRQ priority0。ES096 §2.8.1 要求最高优先级，§2.8.2 接收窗口
+保存中断 mask，§2.8.5 排除受影响 88..100 kHz repeated-START。拒绝这些 IRQ 的 kernel
+callback，FreeRTOS owner 可轮询已锁存 request 或使用非内核通知。产品须预算全局
+mask 并实测总线时序。
 
-Same-bank instruction/vector fetch can stall during the pulse. DS5319 maximum
-1 KiB page erase is 40 ms; the 65.536 ms TIM2 service bound still includes that
-stall, other interrupt latency and masks. This mode establishes no tight IRQ
-deadline, RAM execution closure or watchdog feeding policy. A hardware pulse
-that never becomes idle never returns its caller's storage. FreeRTOS SysTick can
-coalesce during same-bank fetch stalls; this reference does not provide kernel
-tick catch-up.
+I2C 冷 owner 独立租用 PB6/PB7 与新增 GPIOB/AFIO/I2C1 gate，先 release 线路，保留
+邻接 pin，core IRQ/wake 撤离后才恢复 nibble/latch。外部上拉、电压、电容、endpoint
+和 revision 待验证；低／busy 总线拒绝，不自动 GPIO clear，不加入产品恢复、SMBus、
+slave 或 I2C channel DMA。`tests/contracts/legacy_transport_assembly` 分别在
+baremetal／FreeRTOS 选择这些模式，ARM 和寄存器模型不证明实物波形。
 
-ADC1 selects only PA0/channel0, independent 12-bit software shots, APB2/2 = 4 MHz
-and sample code7 (239.5 sample + 12.5 conversion cycles). It waits four nominal
-microseconds, resets calibration and completes calibration before admitting
-samples. The converter stays powered until close. The integer sequence API
-rounds both half-cycle values upward and reports a conservative 253-cycle
-scheduling bound; the physical conversion sum is 252 cycles. The nominal
-reference is caller-declared; input impedance, PA0 glitch applicability,
-accuracy and wiring require physical validation. No DMA/stream mode is implied.
+## Flash、ADC 与 PWM
 
-TIM3 CH1 uses PA6 default mapping with one fixed 8 MHz divisor and a 16-bit
-period of 1..65535 counts. Board `initial` declares the inactive level. Start
-loads shadow registers while TRGO follows disabled CEN, then enables alternate
-output and the timer. Stop preloads and selects the declared GPIO inactive
-level, then independently attempts each timer withdrawal. A refused timer leaf
-does not prevent pad detachment; failed cleanup retains the timer and pin lease.
-Platform restores the original pin only after complete withdrawal. Zero and full
-duty are explicit CCR0 and CCR=period. ADC/PWM/Flash reuse one private reviewed
-legacy engine with GD303; each exact family checks its own official register ABI
-and static resource facts. There is no extra runtime forwarding table.
+Flash face 暴露完整 128 个 1 KiB page、2-byte program unit；`poll-word` 名称不代表
+32-bit program。Board 必须声明 `supply_mv`，参考 3300 mV 是假设，准入 2700..3600 mV。
+产品提供可写 erase-aligned region，并让运行 code/vector/live data 避开破坏性操作。
+BUSY 未清即使 deadline 到期也等待，timeout 只阻止下一 pulse，不取消当前 pulse。
+半字须已擦除，all-zero 例外；all-0xff 输入跳过编程。ES096 §2.2.11 delayed BSY
+通过 erase start 后控制寄存器读＋barrier 处理。relock 失败保留 owner 供 close 重试。
 
-## Validation scope
+同 bank code/vector fetch 可停顿，DS5319 最大 page erase 为 40 ms；TIM2 65.536 ms
+服务预算还须包括该停顿、其他 IRQ 延迟和 mask。不保证紧 IRQ deadline、RAM 执行
+闭包或喂狗策略；永不 idle 的 pulse 不归还调用者存储。FreeRTOS SysTick 可合并，
+本参考不提供 kernel tick catch-up。
 
-GoogleTest/GoogleMock execute actual production C against external hardware
-models. Python tests check exact facts, routes, rejected modes and construction.
-ARM fixtures consume the typed factory in baremetal and FreeRTOS images. These
-establish software behavior and linking only. Physical HIL is `not_executed`.
-The original manuals and exact observations are indexed in `references.json`.
+ADC1 只接受 PA0/channel0，12-bit 独立软件 shot、APB2/2=4 MHz、sample code7：
+239.5 sample＋12.5 conversion cycles。启动后名义等 4 µs，再 reset calibration 和
+完成 calibration 才准入采样，converter 到 close 前保持供电。整数 sequence API 将
+两个半周期各向上取整，报告保守 253-cycle 调度界限；物理总和为 252 cycles。
+reference 名义值由调用者声明，输入阻抗、PA0 glitch、精度和接线须实板验证，无 DMA／
+stream 承诺。
+
+TIM3 CH1 默认 PA6，固定 8 MHz 分频，period1..65535，Board `initial` 声明非活动
+电平。start 在 TRGO 跟随禁用 CEN 时加载 shadow，再启 AF output 和 timer。stop
+先预置并选择 GPIO inactive，再独立尝试各 timer 撤源；某 timer leaf 失败不跳过
+pad detach，失败保留 timer／pin lease，全部退出后 Platform 才恢复原 pin。零／满
+占空比为 CCR0／CCR=period。ADC/PWM/Flash 与 GD303 复用受审 legacy engine，各自
+核对真实官方 ABI 和静态资源，不增加运行时转发表。
+
+## 验证范围
+
+GoogleTest/GoogleMock 对外部硬件模型运行真实生产 C，Python 检查 facts／route／
+拒绝／构造，ARM 夹具消费 baremetal／FreeRTOS typed factory。以上是软件与链接
+证据；HIL 为 `not_executed`。原资料与精确观察索引在 `references.json`。

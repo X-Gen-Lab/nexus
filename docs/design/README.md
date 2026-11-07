@@ -10,7 +10,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | 文档 | 用途 |
 |---|---|
 | [开发体验与 provider 迭代](developer-experience.md) | 应用入口、配置解释、实例接入、生命周期、资源成本、官方复用与执行效率的九组边界 |
-| [开发体验执行台账](developer-experience-execution.csv) | 保留原 75 项退出条件，追加 CF／EP／EV／MX／DX 的 32 项配置接入任务；实现与实际验证分列 |
+| [开发体验执行台账](developer-experience-execution.csv) | 保留原始退出条件，维护配置接入与 QB 板卡任务；实际行数、实现和软件／实板状态以 CSV 为准 |
 | [文档系统架构与交付规划](documentation-system.md) | 读者任务、单一正文、MyST/API、双语、门禁、版本与离线交付的目标方案 |
 | [文档系统58项台账](documentation-system-execution.csv) | 保留DOC-01至40并补内容/图示任务；依赖、退出条件与实施/验证分别记录 |
 | [完整文档优化清单](documentation-improvements.md) | 从同一台账派生的读者清单，不建立第二份状态权威 |
@@ -119,4 +119,4 @@ provider、factory 与 owner，配置工具用 Python unittest。commit hook 和
 门禁，生产 MCU target 不链接测试框架。构建期资源验证、实际寄存器模型、ARM ELF
 预算与物理 HIL 分别建立证据，方法表开销由实际 linked image 测量。
 
-- [Source compatibility and SDK versions](source-compatibility.md)
+- [源码兼容性与 SDK 版本](source-compatibility.md)

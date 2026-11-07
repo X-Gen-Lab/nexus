@@ -1,16 +1,25 @@
-# Platform development and evidence tools
+# 平台开发、测量与交付工具
 
-`dev/dev.py` is the thin configure/build/test entry. `configure/` resolves one
-SoC/Board/assembly input to an atomic bundle. `measurement/` checks actual ARM
-ELF physical regions, selected configuration and budgets, and compares minimum
-images across compiler profiles. `hil/` validates station admission and raw
-physical evidence without operating unavailable equipment. `evidence/` binds
-clean source, exact files, executed logs, SDK, environment and candidate bytes.
-`maintenance/` verifies the derived capability matrix and the checked
-agent-managed ownership policy. Codex owns all maintenance domains; named
-accounts are not required. Independent review and mandatory automated gates
-remain explicit. Local role checks neither configure GitHub branch protection
-nor establish hardware qualification.
+这些宿主工具配置和检查固件，不成为 MCU 运行时。硬件行为由 C11 和必要 Arch 汇编
+维护，不通过运行时寄存器脚本解释器执行。
+
+| 目录 | 输入、输出与责任 |
+| --- | --- |
+| `dev/` | preset configure／build／test 薄入口和显式准备 |
+| `configure/` | 一份装配与 SoC／Board 事实生成原子包 |
+| `measurement/` | 实际 ARM ELF、物理内存／配置／预算、最小镜像比较 |
+| `hil/` | 工位和真实物理证据准入，不操作未接入设备 |
+| `evidence/` | 干净源码、文件、日志、SDK、环境与候选字节 |
+| `maintenance/` | 能力矩阵、依赖和 agent-managed 所有权策略 |
+| `release/` | SDK 预览发布与完整消费者证据运输 |
+| `testing/` | 宿主 TDD 与工具负路径合同 |
+
+Codex 承担维护，不要求虚构实名账号；独立评审和自动门禁需实际执行。
+本地角色检查不配置 branch protection，也不建立硬件资格。
+
+## 日常操作
+
+工具前提见[安装说明](../scripts/setup/README.md)，从仓库根执行：
 
 ```sh
 python tools/dev/dev.py configure --preset native-debug
@@ -18,10 +27,10 @@ python tools/dev/dev.py build --preset native-debug --parallel 4
 python tools/dev/dev.py test --preset native-debug
 ```
 
-Source SDK preparation requires a clean checkout with initialized pinned
-submodules. The installed prefix is verified, including all files and exported
-CMake helpers. A nonpublishable development fixture cannot qualify a candidate.
-Formal reproduction uses that complete source SDK as its read-only source input:
+## SDK、复现与封存
+
+SDK 要求干净源码与固定子模块，完整 prefix 检查文件和 CMake 导出。不可发布开发
+fixture 不建立候选。以下命令展示输入关系，`/your/` 由执行工程提供：
 
 ```sh
 python cmake/package/package_source_sdk.py --source . --output /your/source-sdk
@@ -33,23 +42,13 @@ python tools/evidence/reproduce.py --prepare-spec --spec /your/repro-spec.json \
 python tools/evidence/reproduce.py --spec /your/repro-spec.json --report /your/repro-report.json
 ```
 
-Prepare the OCI input before formal execution with `tools/dev/Dockerfile` and
-`evidence/container.py seal`, then verify the observed image/OCI archive. The
-recipe uses a pinned base and observed dependencies; it does not promise that
-mutable preparation repositories recreate the same image. Firmware runs offline
-with read-only SDK/toolchain, separate outputs and no credentials mounted.
+正式执行前用 `tools/dev/Dockerfile`、`evidence/container.py seal` 准备并验证实际
+image／OCI archive。配方固定 base、记录实际依赖，不承诺可变准备源重新生成同一
+镜像。固件执行断网，SDK／toolchain 只读、输出独立、不挂载凭据。
 
-`release/` maintains Source SDK software-preview publication and complete raw
-consumer evidence transport. See [release maintenance](release/README.md) for
-the version authority, trusted workflow and historical branch responsibilities.
+候选需全部适用软件资格实际执行，递归保留原始日志和引用产物。报告放在源码树外
+避免自引用；硬件、产品晋级与签名分别记录。版本、workflow 和历史分支职责见
+[发布维护](release/README.md)。
 
-Candidate sealing requires all executed software qualification scopes and
-recursively retains actual raw logs and referenced artifacts. Evidence reports
-belong outside the source tree to avoid self-referential source identity. Hardware
-measurements, product promotion and signatures stay explicitly separate.
-
-The [historical evidence archive](../docs/archive/evidence/README.md) retains
-original development collections with exact member manifests and restore
-instructions. Source navigation keeps compact references instead of repeated
-source/build snapshots. Restoring an old collection preserves its original
-source and execution scope; it does not qualify the current checkout.
+[历史归档](../docs/archive/evidence/README.md)保留原始集合、成员和恢复说明。
+当前导航采用紧凑引用；恢复旧集合不为当前源码建立资格。

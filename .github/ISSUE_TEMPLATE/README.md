@@ -1,12 +1,9 @@
-# Platform issue intake
+# 平台问题入口
 
-Issues cover reusable mechanisms, exact SoC/Board routes, public contracts,
-configuration/build tools and evidence. Applications, product register policy,
-private PCB facts and deployment belong in the external consumer repository.
+这里受理可复用机制、精确 SoC／Board 路由、公共合同、配置与构建工具以及证据问题。
+应用业务、产品寄存器策略、私有 PCB 和部署问题由外部消费工程维护。
 
-Select a concrete bug, build, test, performance, platform, documentation or
-mechanism request. Report exact source/dependency/compiler/assembly identity and
-actual raw evidence. Mark unavailable PCB/station facts and unexecuted checks.
-Current scope is in [delivery](../../docs/delivery/README.md); the
-[33-task ledger](../../docs/design/next-generation-execution.csv) preserves
-implementation and qualification status separately.
+按实际目标选择缺陷、构建、测试、性能、平台、文档或机制请求模板。报告精确源码、
+依赖、编译器与装配身份，链接实际原始证据；未知 PCB／工位事实和未执行检查必须
+明确标注。当前范围见[交付入口](../../docs/delivery/README.md)，
+[33 项台账](../../docs/design/next-generation-execution.csv)分别记录实现与资格。
