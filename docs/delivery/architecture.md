@@ -52,7 +52,10 @@ F4，目录移动本身不改变指令数或资源成本。
 F4 C 实现维护资源准入、取得、收条、硬件撤回和 readback。部分取得失败必须处理
 当前步骤已经产生的效果，再逆序撤回前序步骤；失败释放保留实际责任。
 
-默认静态装配通过 `nx_platform_lifecycle_start/stop` 进入 Core 手写 C 协调器。
+默认静态装配通过 Core 私有 `platform_lifecycle_impl.h` 使用手写 C 协调器。
+公共 `nx_platform_lifecycle_start/stop` 以运行期参数调用同一实现。固定装配的配置、
+可选 owner 和诊断在同一编译单元可见，编译器可以裁剪恒定分支和不再需要的回调表；
+产品仅包含公共接口，不增加运行时转发层或第二份算法。
 全部 controller 准入先于硬件效果；随后依次建立 System、共享资源与 controller。
 失败按逆序撤回，在首个释放拒绝处保留剩余责任，后续 stop 只重试未完成部分。
 primary、cleanup、remaining effects 和调用期诊断独立保留，不以清理成功覆盖原始失败。
@@ -73,7 +76,9 @@ Board／SoC 不再保留 Python 插件。默认主机工具仍使用 Python 校�
 为统一外观把全部驱动改接同一组 ops。
 
 Host C11 `nxconfig` 是可选主机试点，其全面替换不作为固件 C 化或软件交付前置。
-新增协调状态不是零 RAM，也不改变日常 I/O 热路径；实际资源、模型行为、ARM 链接和
+协调状态保留身份、16-bit 前缀和重入保护，M4 ABI 为 8 字节；超过 65535 个物理
+controller 的 plan 在任何 owner 回调前拒绝。它不改变日常 I/O 热路径；实际资源、
+模型行为、ARM 链接和
 物理测量各自验收，不能从源码迁移推导整平台通过。
 
 其他 F4 型号需要精确内存、封装、时钟、DMA、IRQ 与硬件 profile；官方 HAL 覆盖

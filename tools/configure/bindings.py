@@ -162,7 +162,8 @@ def emit(result):
               ' * \\copyright       Copyright (c) 2026 Nexus Team', ' */',
               '#include "nexus_config.h"',
               '#include "nexus_bindings.h"', '#include "nexus_factory.h"',
-              '#include "nexus/arch/arch.h"']
+              '#include "nexus/arch/arch.h"',
+              '#include "platform_lifecycle_impl.h"']
     if uart_formats.probed(result):
         source.append('#include "nexus/io/cycle_probe.h"')
         source += [f"NX_IO_IRQ_PROBE_DECLARE({item.controller})"
@@ -176,7 +177,8 @@ def emit(result):
             result, symbol=geometry[0], sector_symbol=geometry[0] + "_sectors",
             program_unit=provider.FLASH_PROGRAM_UNIT,
             program_flags=geometry[1], static=False))
-    source += ['static nx_platform_lifecycle_state_t s_nx_platform_lifecycle;']
+    source += ['static nx_platform_lifecycle_state_t s_nx_platform_lifecycle;',
+               'static const uint8_t s_nx_platform_identity;']
     source.extend(provider.state_declarations(result))
     initialize = []
     admission = []
@@ -280,21 +282,21 @@ def emit(result):
                f'    .permanent_effects = {str(pre_c_effects).lower()}', '};',
                r'/** \brief Start the static platform through its C coordinator. */',
                'nx_platform_start_result_t nx_platform_start(void) {',
-               '    return nx_platform_lifecycle_start(',
-               '        &s_nx_platform_plan, &s_nx_platform_lifecycle, NULL);', '}',
+               '    return nx_platform_lifecycle_start_local(',
+               '        &s_nx_platform_plan, &s_nx_platform_lifecycle, NULL, &s_nx_platform_identity);', '}',
                r'/** \brief Add call-scoped metadata to the same C startup path. */',
                'nx_platform_start_result_t nx_platform_start_diagnosed(nx_platform_diagnostic_t* diagnostic) {',
-               '    return nx_platform_lifecycle_start(',
-               '        &s_nx_platform_plan, &s_nx_platform_lifecycle, diagnostic);',
+               '    return nx_platform_lifecycle_start_local(',
+               '        &s_nx_platform_plan, &s_nx_platform_lifecycle, diagnostic, &s_nx_platform_identity);',
                '}',
                r'/** \brief Stop and retry only the remaining C owner receipts. */',
                'nx_result_t nx_platform_stop(void) {',
-               '    return nx_platform_lifecycle_stop(',
-               '        &s_nx_platform_plan, &s_nx_platform_lifecycle, NULL);', '}',
+               '    return nx_platform_lifecycle_stop_local(',
+               '        &s_nx_platform_plan, &s_nx_platform_lifecycle, NULL, &s_nx_platform_identity);', '}',
                r'/** \brief Add call-scoped metadata to the same C stop path. */',
                'nx_result_t nx_platform_stop_diagnosed(nx_platform_diagnostic_t* diagnostic) {',
-               '    return nx_platform_lifecycle_stop(',
-               '        &s_nx_platform_plan, &s_nx_platform_lifecycle, diagnostic);',
+               '    return nx_platform_lifecycle_stop_local(',
+               '        &s_nx_platform_plan, &s_nx_platform_lifecycle, diagnostic, &s_nx_platform_identity);',
                '}']
     header += ['#ifdef __cplusplus', '}', '#endif', '#endif', '']
     return '\n'.join(header), '\n'.join(source) + '\n'

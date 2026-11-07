@@ -74,7 +74,7 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
                 self.assertIn(".context_check = nx_platform_context_check,", source)
                 self.assertIn(".release = nx_platform_release,", source)
                 self.assertIn("nx_stm32_advanced_cold_close(", source)
-                self.assertIn("nx_stm32f4_platform_system_start(", source)
+                self.assertIn("nx_stm32f4_platform_system_start_local(", source)
 
     def test_non_exact_divider_filter_edge_and_period_reject(self):
         for old, new in (("tick_hz=1000000", "tick_hz=999999"),

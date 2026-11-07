@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: fcc26c7c05e4fdabdf17d703906feb125bb6a693bbaeb00ca3b536901cd8af70\n"
+"X-Nexus-Source-SHA256: d65b249763960ae38d4de659fa85b2679306f64b4bf2879e1ffd810a9c9c0199\n"
 
 #: docs/assets/diagrams/README.md:8
 msgid "当前架构图册"
@@ -139,10 +139,10 @@ msgid "FIG-05 显式启动停机与失败撤回"
 msgstr "FIG-05 Explicit start, stop and failure cleanup"
 
 #: docs/assets/diagrams/README.md:61
-msgid "当前生成生命周期骨架与具体 C 清理；不是后续统一 C 引擎已经完成的声明。"
+msgid "图示显式冷态生命周期与具体 C owner 的清理责任；实际入口以当前 Core／F4 实现为准。"
 msgstr ""
-"Current generated lifecycle scaffolding and concrete C cleanup; this does not"
-" claim the future unified C engine is complete."
+"The diagram shows explicit cold-state lifecycle and concrete C owner cleanup "
+"responsibility; actual entries follow the current Core/F4 implementation."
 
 #: docs/assets/diagrams/README.md:63
 msgid "![FIG-05：显式启动停机与失败撤回](platform-lifecycle.svg)"

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 1c5e24e19bb1976462d43d5d0546ced3ee6a99838c928c383c5f649726494a03\n"
+"X-Nexus-Source-SHA256: e39e9655a91ca9d99f39091261d472990868794e9e97a93549e183816e19b4bc\n"
 
 #: docs/delivery/next-iterations.md:8
 msgid "F4 收敛后的迭代边界"
@@ -54,8 +54,8 @@ msgid "官方库与冷态行为"
 msgstr "官方库与冷态行为"
 
 #: docs/delivery/next-iterations.md:0
-msgid "逐完整模式验证 HAL／LL、失败回滚与排空；剩余生成状态机迁入真实 C"
-msgstr "逐完整模式验证 HAL／LL、失败回滚与排空；剩余生成状态机迁入真实 C"
+msgid "默认 F407 冷态算法已由 C 维护；扩展完整模式时继续验证 HAL／LL、回滚和排空"
+msgstr "默认 F407 冷态算法已由 C 维护；扩展完整模式时继续验证 HAL／LL、回滚和排空"
 
 #: docs/delivery/next-iterations.md:0
 msgid "默认配置链路"
@@ -109,8 +109,12 @@ msgstr ""
 
 #: docs/delivery/next-iterations.md:33
 msgid ""
-"当前固件主线是将默认链路的启动、停止、失败回滚、资源协调与硬件算法维护为手写 C， 按完整选择路径验收。具体完成状态以实际回归为准，不能由计划推导；非 "
-"F407 型号仍需 精确适配。软件候选与物理状态不得从旧版本继承，未执行的 HIL 保持 `not_executed`。"
+"默认链路的启动、停止、失败回滚、资源协调与硬件算法已由手写 C 维护；固定配置和 "
+"可选诊断在编译期裁剪，通用入口复用同一实现。后续按具体需求开展精确型号适配、 运行期电源管理、完整软件候选与真实 "
+"IRQ／吞吐／栈／功耗测量。当前 F4 仍拒绝 runtime power 配置，非 F407 型号仍需精确适配。软件候选与物理状态不得从旧版本"
+" 继承，未执行的 HIL 保持 `not_executed`。"
 msgstr ""
-"当前固件主线是将默认链路的启动、停止、失败回滚、资源协调与硬件算法维护为手写 C， 按完整选择路径验收。具体完成状态以实际回归为准，不能由计划推导；非 "
-"F407 型号仍需 精确适配。软件候选与物理状态不得从旧版本继承，未执行的 HIL 保持 `not_executed`。"
+"默认链路的启动、停止、失败回滚、资源协调与硬件算法已由手写 C 维护；固定配置和 "
+"可选诊断在编译期裁剪，通用入口复用同一实现。后续按具体需求开展精确型号适配、 运行期电源管理、完整软件候选与真实 "
+"IRQ／吞吐／栈／功耗测量。当前 F4 仍拒绝 runtime power 配置，非 F407 型号仍需精确适配。软件候选与物理状态不得从旧版本"
+" 继承，未执行的 HIL 保持 `not_executed`。"

@@ -27,7 +27,7 @@ class SelectedContractAuthorityTests(unittest.TestCase):
 
     def test_host_time_inputs_keep_selected_mechanisms(self):
         root = "cmake/package/verification/io_evolution/"
-        choices = (('native-time-pair', {'rtc', 'lptim'}, 'nx_native_lptim_prepare('), ('native-time-empty', set(), 'nx_platform_lifecycle_start('))
+        choices = (('native-time-pair', {'rtc', 'lptim'}, 'nx_native_lptim_prepare('), ('native-time-empty', set(), 'nx_platform_lifecycle_start_local('))
         for name, expected, mechanism in choices:
             with self.subTest(assembly=name):
                 result, records = self.selected(root + name + ".toml")

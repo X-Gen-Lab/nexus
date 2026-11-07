@@ -22,6 +22,14 @@ add_custom_target(nexus_google_contracts)
 function(nexus_google_test name)
     cmake_parse_arguments(ARG "STM32F4_LL" "" "SOURCES;LIBRARIES;INCLUDES" ${ARGN})
     add_executable(${name} ${ARG_SOURCES})
+    # Only generated bindings use the compile-visible Core coordinator. Keep
+    # that private include off unrelated test sources and compiler contexts.
+    foreach(source IN LISTS ARG_SOURCES)
+        if(source MATCHES "/bindings\\.c$")
+            set_property(SOURCE "${source}" APPEND PROPERTY INCLUDE_DIRECTORIES
+                "${NEXUS_SOURCE_DIR}/core/private")
+        endif()
+    endforeach()
     target_include_directories(${name} PRIVATE
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/classic_can"

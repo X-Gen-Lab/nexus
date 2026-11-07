@@ -78,7 +78,8 @@ include("${NEXUS_SOURCE_DIR}/cmake/platform/Provider.cmake")
 nexus_validate_selected_provider("${nexus_provider}")
 add_library(nexus_platform STATIC "${NEXUS_CONFIG_DIR}/bindings.c")
 target_include_directories(nexus_platform PUBLIC "${NEXUS_CONFIG_DIR}"
-    PRIVATE "${NEXUS_SOURCE_DIR}/io/private")
+    PRIVATE "${NEXUS_SOURCE_DIR}/io/private"
+        "${NEXUS_SOURCE_DIR}/core/private")
 target_link_libraries(nexus_platform PUBLIC ${nexus_provider}
     PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)
 foreach(ip classic_can fs_device_pio legacy_mac advanced_timer i2c_v1_async)

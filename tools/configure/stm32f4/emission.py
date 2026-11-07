@@ -33,7 +33,7 @@ def includes(result):
     source = []
     source.append('#include "stm32f407_provider.h"')
     source.append('#include "stm32f407_platform_cold.h"')
-    source.append('#include "stm32f4_platform_lifecycle.h"')
+    source.append('#include "stm32f4_platform_lifecycle_impl.h"')
     if any(item.kind in {"exti", "pwm", "adc"} for item in selections):
         source.append('#include "stm32f407_control_cold.h"')
     if any(item.kind in {"gpio", "flash", "watchdog"} for item in selections):
@@ -195,28 +195,28 @@ def platform_declarations(result):
 def platform_system_start(result):
     """Connect one concrete C startup transaction."""
     del result
-    return DirectCall("nx_stm32f4_platform_system_start", (
+    return DirectCall("nx_stm32f4_platform_system_start_local", (
         Address("s_nx_platform_lifecycle_config"),))
 
 
 def platform_resources_acquire(result):
     """Connect shared clock and packet capture without emitted recovery."""
     del result
-    return DirectCall("nx_stm32f4_platform_resources_acquire", (
+    return DirectCall("nx_stm32f4_platform_resources_acquire_local", (
         Address("s_nx_platform_lifecycle_config"),))
 
 
 def platform_resources_release(result):
     """Connect fixed C permanent/domain/pad/shared-clock withdrawal."""
     del result
-    return DirectCall("nx_stm32f4_platform_resources_release", (
+    return DirectCall("nx_stm32f4_platform_resources_release_local", (
         Address("s_nx_platform_lifecycle_config"),))
 
 
 def platform_system_release(result, started):
     """Connect the same system owner with the engine's actual receipt flag."""
     del result
-    return DirectCall("nx_stm32f4_platform_system_release", (
+    return DirectCall("nx_stm32f4_platform_system_release_local", (
         Address("s_nx_platform_lifecycle_config"), started))
 
 

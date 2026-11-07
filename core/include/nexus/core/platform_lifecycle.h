@@ -66,6 +66,8 @@ typedef struct {
  *                  Permanent SRAM, RTC and watchdog policy remains in those
  *                  dedicated C owners. permanent_effects marks pre-C effects
  *                  on every failed start, including context rejection.
+ *                  At most UINT16_MAX physical controllers are permitted;
+ *                  larger plans reject before any owner callback.
  */
 typedef struct {
     size_t controller_count;
@@ -85,15 +87,16 @@ typedef struct {
  * \brief           Zero-initialized storage for one serialized platform.
  * \note            Fields are readonly to callers. initialized is the remaining
  *                  physical-controller prefix; dedicated owners retain their
- *                  own receipts. bound forbids changing a live plan. operating
- *                  rejects synchronous callback reentry; it is not a task lock.
+ *                  own receipts. bound is an opaque identity that forbids
+ *                  changing a live plan. operating rejects synchronous callback
+ *                  reentry; it is not a task lock.
  *                  Plan, static connections and owner storage remain alive and
  *                  unchanged until complete withdrawal. Separate platforms must
  *                  own disjoint hardware and mutable owner storage.
  */
 typedef struct {
-    const nx_platform_lifecycle_plan_t* bound;
-    size_t initialized;
+    const void* bound;
+    uint16_t initialized;
     bool started;
     bool operating;
 } nx_platform_lifecycle_state_t;

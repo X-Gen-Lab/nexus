@@ -13,7 +13,7 @@
 | `devices.json` | 官方器件宏、启动文件、IRQ 与时基存在性的编译事实 |
 | 根目录 `tools/configure/stm32f4/` | 当前集中配置适配、静态存储与固定连接 |
 | `system.c` | 启动、固定时钟、TIM2 时间域与失败退出 |
-| `drivers/platform_coordinator.c` | System 与共享资源的手写 C 顺序、错误映射及撤回协调 |
+| `private/stm32f4_platform_lifecycle_impl.h`、`drivers/platform_coordinator.c` | System 与共享资源的同源 C 协调实现及通用入口 |
 | `drivers/`、`private/` | 具体模式、实例状态、硬件生命周期与独立回读 |
 | `CMakeLists.txt` | 所选源码、官方库与私有编译依赖 |
 
@@ -166,10 +166,12 @@ controller，外部连接器不据此获得 Board 资格。模型、ARM ELF 和�
 
 ## 默认平台协调与可选资源切片
 
-默认装配通过 Core 的 `nx_platform_lifecycle_start/stop` 协调整个平台，F4 私有
-`stm32f4_platform_lifecycle.h` 连接 `platform_coordinator.c` 的四个 C 入口：
-system start、resources acquire、resources release 和 system release。
-生成器只写只读配置与固定调用，硬件算法、顺序、错误映射和撤回控制流留在 C。
+默认装配通过 Core 私有 `platform_lifecycle_impl.h` 协调整个平台，F4 私有
+`stm32f4_platform_lifecycle_impl.h` 提供 system start、resources acquire、resources
+release 和 system release 的手写 C 实现。生成器只写只读配置与固定调用，使编译器
+在同一编译单元看到已选配置，裁剪恒定校验、未选 owner 和无诊断路径的元数据操作。
+`platform_coordinator.c` 的四个通用入口复用同一实现并保留运行期检查，产品不包含
+私有头。硬件算法、顺序、错误映射和撤回控制流只维护在 C 中。
 
 System 路径依次处理基础／所选资源准入、芯片身份、pins 取得与 system start；
 失败按实际责任合并 pin abort 与 System 结果。共享取得记录 Ethernet 责任后建立

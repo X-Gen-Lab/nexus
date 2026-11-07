@@ -422,6 +422,7 @@ REQUIRED_FILES = (
     'core/src/fault.c',
     'core/src/lifecycle.c',
     'core/src/platform_lifecycle.c',
+    'core/private/platform_lifecycle_impl.h',
     'core/src/request.c',
     'core/src/request_observer.c',
     'core/src/silicon.c',

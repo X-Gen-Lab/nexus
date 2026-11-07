@@ -60,7 +60,7 @@ class Stm32ExtiGenerationTests(unittest.TestCase):
         for bank in range(3):
             self.assertIn(f"NX_STM32_PLATFORM_IRQ_MASK(EXTI9_5_IRQn, {bank}u)", source)
         self.assertIn(".selected = &s_nx_platform_config", source)
-        self.assertIn("nx_stm32f4_platform_system_start(", source)
+        self.assertIn("nx_stm32f4_platform_system_start_local(", source)
 
 
 if __name__ == "__main__":

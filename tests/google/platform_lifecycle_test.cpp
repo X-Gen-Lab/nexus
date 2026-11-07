@@ -9,6 +9,7 @@
 #include "nexus/core/platform_lifecycle.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <vector>
 
 namespace {
 using testing::InSequence;
@@ -310,6 +311,51 @@ TEST_F(PlatformLifecycle, InvalidPlansRejectBeforeAnyCallback) {
     plan.ordinals = nullptr;
     EXPECT_EQ(nx_platform_lifecycle_start(&plan, &state, nullptr).primary,
               NX_ERROR_INVALID);
+}
+
+TEST_F(PlatformLifecycle, CoordinationStateFitsTwoNativePointers) {
+    EXPECT_LE(sizeof(nx_platform_lifecycle_state_t), 2U * sizeof(void*));
+}
+
+TEST_F(PlatformLifecycle, UnrepresentableControllerCountRejectsBeforeContext) {
+    plan.controller_count = static_cast<size_t>(UINT16_MAX) + 1U;
+    ON_CALL(ports, context()).WillByDefault(Return(NX_ERROR_CONTEXT));
+    EXPECT_CALL(ports, context()).Times(0);
+    EXPECT_EQ(nx_platform_lifecycle_start(&plan, &state, nullptr).primary,
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_platform_lifecycle_stop(&plan, &state, nullptr),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(state.bound, nullptr);
+    EXPECT_EQ(state.initialized, 0U);
+}
+
+TEST_F(PlatformLifecycle, MaximumControllerPrefixDoesNotWrapOrLoseRelease) {
+    std::vector<size_t> positions(UINT16_MAX);
+    for (size_t index = 0U; index < positions.size(); ++index) {
+        positions[index] = index;
+    }
+    plan.controller_count = positions.size();
+    plan.ordinals = positions.data();
+    plan.context_check = [] { return NX_SUCCESS; };
+    plan.admit = [](size_t) { return NX_SUCCESS; };
+    plan.system_start = [] {
+        return nx_platform_start_result_t{NX_SUCCESS, NX_SUCCESS, 0U};
+    };
+    plan.resources_acquire = [] { return NX_SUCCESS; };
+    plan.resources_release = [] { return NX_SUCCESS; };
+    plan.system_release = [](bool started) {
+        return started ? NX_SUCCESS : NX_ERROR_STATE;
+    };
+    plan.acquire = [](size_t) {
+        return nx_lifecycle_acquisition_t{NX_SUCCESS, true};
+    };
+    plan.release = [](size_t) { return NX_SUCCESS; };
+    EXPECT_EQ(nx_platform_lifecycle_start(&plan, &state, nullptr).primary,
+              NX_SUCCESS);
+    EXPECT_EQ(state.initialized, UINT16_MAX);
+    EXPECT_EQ(nx_platform_lifecycle_stop(&plan, &state, nullptr), NX_SUCCESS);
+    EXPECT_EQ(state.initialized, 0U);
+    EXPECT_EQ(state.bound, nullptr);
 }
 
 TEST_F(PlatformLifecycle, InvalidStateCannotHideThePermanentPlatformEffects) {

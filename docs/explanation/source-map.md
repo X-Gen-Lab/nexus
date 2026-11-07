@@ -41,8 +41,9 @@ vendors/                      全部锁定来源；按实际选择消费
 继续通过公共 I/O 访问设备，留在组件目录，不随 MCU 支持包迁移。
 
 Board 和 SoC 不再加载本地 Python 插件。默认 Python 工具集中校验事实并生成静态连接；
-Core `platform_lifecycle.c` 维护整平台启动、停止、回滚与诊断，F4
-`drivers/platform_coordinator.c` 维护 System 与共享资源的 C 协调。Host C11
+Core `private/platform_lifecycle_impl.h` 维护整平台启动、停止、回滚与诊断，F4
+`private/stm32f4_platform_lifecycle_impl.h` 维护 System 与共享资源的 C 协调；各自的
+`.c` 公共入口复用同一实现，固定装配让编译器看到常量并裁剪分支。Host C11
 工具是可选主机试点，不是固件 C 化或交付前置。实际生成 factory、模型与 ARM 产物
 各自验证，不能把源码移动视为整条链路已经验收。
 Native 必须显式启用测试 scope，不进入生产系列目录或能力聚合表。

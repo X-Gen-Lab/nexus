@@ -48,7 +48,7 @@ class ColdPreflightGenerationTests(unittest.TestCase):
                 source = self.start(relative)
                 self.assertIn(".system = &g_nx_stm32_system", source)
                 self.assertIn(".system_start = nx_platform_system_start,", source)
-                self.assertIn("nx_stm32f4_platform_system_start(", source)
+                self.assertIn("nx_stm32f4_platform_system_start_local(", source)
                 self.assertNotIn("nx_stm32_system_preflight(", source)
                 self.assertNotIn("nx_stm32_system_start(", source)
 
@@ -64,7 +64,7 @@ class ColdPreflightGenerationTests(unittest.TestCase):
                 for identifier in (uart, spi, dma, vector):
                     self.assertIn(identifier, data)
                 self.assertIn(".selected = &s_nx_platform_config", source)
-                self.assertIn("nx_stm32f4_platform_system_start(", source)
+                self.assertIn("nx_stm32f4_platform_system_start_local(", source)
                 for observation in ("NVIC->ISER", "NVIC->ISPR", "NVIC->IABR", "->CR"):
                     self.assertNotIn(observation, data)
                 self.assertNotIn("NX_PLATFORM_REGISTER_WRITE", source)

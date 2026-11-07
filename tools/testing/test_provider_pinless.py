@@ -50,7 +50,13 @@ class ProviderPinlessLinkTests(unittest.TestCase):
                  "--defined-only", str(elf)],
                 capture_output=True, text=True, check=False, timeout=30)
             self.assertEqual(symbols.returncode, 0, symbols.stderr)
-            self.assertIn("nx_stm32f4_platform_system_start", symbols.stdout)
+            self.assertRegex(symbols.stdout, r"\bnx_stm32_system_start\b")
+            self.assertNotRegex(
+                symbols.stdout, r"\bnx_platform_lifecycle_(?:start|stop)\b",
+                "A fixed assembly must specialize its handwritten coordinator")
+            self.assertNotRegex(
+                symbols.stdout, r"\bs_nx_platform_plan\b",
+                "Plan identity must not retain a redundant callback table")
             if not gpio_selected:
                 self.assertIsNone(re.search(
                     r"\bnx_stm32_(?:pin_(?:capture|restore|configure)|"

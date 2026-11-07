@@ -1,7 +1,8 @@
 # Core：请求、时间与生命周期合同
 
 Core 提供调用者持有存储的 C11 请求准入、完成状态、稳定控制身份、单调绝对
-截止时间、可选观察和整平台冷态协调。公共头在 `include/nexus/core/`，实现在 `src/`。
+截止时间、可选观察和整平台冷态协调。公共头在 `include/nexus/core/`，公共入口在
+`src/`；固定装配可见的同源 C 实现在 `private/`。
 它不依赖设备、Arch、OS 或厂商 SDK，没有堆、全局注册表或隐藏执行线程。
 I/O 具体实现、责任者和等待适配在这些基础合同上组合具体行为。
 
@@ -57,7 +58,10 @@ pre-C 永久 SRAM、不可逆 watchdog 和 RTC／备份域责任不能直接放�
 `nx_platform_lifecycle_plan_t` 连接只读回调和物理 controller 顺序，
 `nx_platform_lifecycle_state_t` 由调用者首次清零并独占。默认生成代码只保留静态
 连接、按索引选择的固定 typed call，以及公共 start／stop／diagnosed 薄入口；
-`nx_platform_lifecycle_start/stop` 在手写 C 中维护执行顺序与失败状态。
+`private/platform_lifecycle_impl.h` 在手写 C 中维护执行顺序与失败状态。
+固定装配在同一编译单元使用该实现，让编译器消除恒定校验和未选择的分支。
+公共 `nx_platform_lifecycle_start/stop` 以运行期参数调用同一实现，保留完整检查。
+产品仍只包含公共头；私有实现不成为产品 include 依赖。
 
 启动先检查上下文，再完成全部 controller 准入，之后依次取得 System、共享资源和
 各物理 controller。System 启动单独返回 primary、cleanup 和 remaining effects；
@@ -78,8 +82,15 @@ primary 和 cleanup 的 phase／位置独立，成功清空诊断。同步回调
 调用者诊断；该保护不是任务锁。调用者仍须串行执行，并先等待退出借用者与直接使用者。
 
 每个平台持有一份协调状态；具体收条仍由原驱动持有，没有每 controller 新增的可变
-协调记录。实际 ARM 布局与链接成本按所选 ABI 和装配测量，不能据此声明零 RAM 或
-更快的 I/O。该机制不分配内存、不查找设备、不启动 scheduler，也不转发正常 I/O。
+协调记录。状态保存身份、16-bit 剩余前缀、started 和 operating；最多 65535 个物理
+controller，超出在任何 owner 回调前拒绝。当前 M4 ABI 状态为 8 字节，64-bit Native
+为 16 字节。固定装配使用独有静态 token 绑定身份，避免仅为保存 plan 地址而保留
+回调表；通用入口仍以原 plan 地址绑定身份。两种入口不能混用同一状态。
+该状态布局相对旧版 ARM 12 字节／Native 24 字节发生 ABI 变化，消费者必须连同
+Core 和相关对象重新编译，不能将新头与旧预编译库混用。
+
+实际链接成本按所选 ABI 和装配测量，不能据此声明零 RAM 或更快的 I/O。
+该机制不分配内存、不查找设备、不启动 scheduler，也不转发正常 I/O。
 `tests/google/platform_lifecycle_test.cpp` 验证真实 C 的顺序、失败、重试和诊断；
 模型、ARM 产物与物理 HIL 各自提供对应范围的证据。
 

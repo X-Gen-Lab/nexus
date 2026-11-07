@@ -24,8 +24,9 @@ class PlatformLifecycleEmissionTests(unittest.TestCase):
             with self.subTest(assembly=relative):
                 header, source = bindings.emit(self.resolve(relative))
                 self.assertIn('"nexus/core/platform_lifecycle.h"', header)
-                self.assertIn("nx_platform_lifecycle_start(", source)
-                self.assertIn("nx_platform_lifecycle_stop(", source)
+                self.assertIn('"platform_lifecycle_impl.h"', source)
+                self.assertIn("nx_platform_lifecycle_start_local(", source)
+                self.assertIn("nx_platform_lifecycle_stop_local(", source)
                 self.assertIn("static nx_platform_lifecycle_state_t "
                               "s_nx_platform_lifecycle;", source)
                 self.assertNotIn("nx_platform_start_impl", source)

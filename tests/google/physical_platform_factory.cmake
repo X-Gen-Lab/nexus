@@ -19,6 +19,7 @@ foreach(physical_family stm32)
         set(physical_object "${physical_target}_${physical_mode}")
         add_library(${physical_object} OBJECT "${physical_bundle}/bindings.c")
         target_include_directories(${physical_object} PRIVATE
+            "${NEXUS_SOURCE_DIR}/core/private"
             "${physical_bundle}" "${NEXUS_SOC_SOURCE_${physical_soc}}"
             "${NEXUS_SOC_SOURCE_${physical_soc}}/private"
             "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
