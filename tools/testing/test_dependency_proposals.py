@@ -390,8 +390,8 @@ class DependencyInventoryGitTests(unittest.TestCase):
                 self.assertEqual(record["revision"], lock["commit"])
                 self.assertEqual(record["upstream_url"], parser.upstream_url)
                 observed = {Path(item["path"]) for item in record["identities"]}
-                self.assertTrue({self.root / parser.path / name
-                                 for name in lock["files"]} <= observed)
+                self.assertLessEqual({self.root / parser.path / name
+                                      for name in lock["files"]}, observed)
                 self.assertIn(self.root / parser.source_lock, observed)
 
     def test_host_parser_rehashed_omission_and_hidden_source_change_reject(self):

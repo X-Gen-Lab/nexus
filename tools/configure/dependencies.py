@@ -16,7 +16,7 @@ COMMON = (
 PLATFORM = (
     "configure", "selection", "onboarding", "authored", "bindings", "emission", "experience", "can", "memory",
     "usb_device", "ethernet", "timer_advanced", "secondary_controllers", "coupled_io",
-    "fact_references", "clocks", "physical_facts", "preflight", "gpio_phase",
+    "fact_references", "clocks", "physical_facts", "gpio_phase",
     "i2c_timing", "i2c_timing_selection", "pin_states", "runtime_power",
     "adc", "exti", "board_hardware", "gpio_electrical", "rtc",
     "providers/hardware",

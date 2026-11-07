@@ -1,5 +1,4 @@
 """Reviewed reference indices reject fictitious identity and qualification."""
-from tools.configure.tests.native_fixture import native_fixture
 from tools.configure.providers.descriptor import source_directory
 import copy
 import hashlib

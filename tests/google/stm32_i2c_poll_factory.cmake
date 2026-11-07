@@ -26,6 +26,7 @@ nexus_google_test(nexus_stm32_i2c_poll_factory_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
     LIBRARIES Nexus::IO

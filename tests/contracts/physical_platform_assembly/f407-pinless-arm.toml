@@ -1,0 +1,19 @@
+schema = 2
+board = "stm32f407ve_sky_qingchun"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[flash.physical]
+binding = "flash0"
+mode = "poll-word"
+
+[watchdog.watchdog0]
+binding = "iwdg0"
+mode = "independent"

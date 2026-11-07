@@ -3,47 +3,95 @@ from tools.configure.providers import for_selection
 from tools.configure.ir import ConfigurationIR
 from tools.configure.factory import (interface_type, public_header,
                                      controller_class, controller_ordinals)
-from tools.configure import gpio_phase, runtime_power
+from tools.configure import gpio_phase
 from tools.configure import enhanced_endpoints
 from tools.configure import stream_profiles, uart_formats
+from tools.configure.calls import DirectCall, Symbol
+from tools.configure.providers.common import fail
 
 
 def symbol(name):
     return name.replace("-", "_")
 
 
-def diagnostic_helpers():
-    """Emit call-scoped metadata helpers, without retained diagnostic storage."""
-    return [
-        '/** \\brief Reset only the supplied call-scoped output. */',
-        'static void nx_platform_diagnostic_reset(nx_platform_diagnostic_t* diagnostic) {',
-        '    if (diagnostic != NULL) {',
-        '        *diagnostic = (nx_platform_diagnostic_t){',
-        '            NX_PLATFORM_PHASE_NONE, SIZE_MAX,',
-        '            NX_PLATFORM_PHASE_NONE, SIZE_MAX };',
-        '    }', '}',
-        '/** \\brief Select the primary or cleanup path without replacing errors. */',
-        'static void nx_platform_diagnostic_phase(nx_platform_diagnostic_t* diagnostic,',
-        '                                         bool cleanup, nx_platform_phase_t phase,',
-        '                                         size_t controller_index) {',
-        '    if (diagnostic == NULL) { return; }',
-        '    if (cleanup) {',
-        '        diagnostic->cleanup_phase = phase;',
-        '        diagnostic->cleanup_controller_index = controller_index;',
-        '    } else {',
-        '        diagnostic->phase = phase;',
-        '        diagnostic->controller_index = controller_index;',
-        '    }', '}',
-        'static nx_result_t nx_platform_stop_impl(nx_platform_diagnostic_t* diagnostic, bool cleanup);',
-        'static nx_platform_start_result_t nx_platform_start_impl(nx_platform_diagnostic_t* diagnostic);',
-    ]
+def _sequence(calls, indent="        "):
+    """Connect a fixed typed call sequence with its normal success contract."""
+    source = []
+    for index, call in enumerate(calls[:-1]):
+        source += [f"{indent}nx_result_t status_{index} = {call};",
+                   f"{indent}if (status_{index} != NX_SUCCESS) {{",
+                   f"{indent}    return status_{index};", f"{indent}}}"]
+    source.append(f"{indent}return {calls[-1] if calls else 'NX_SUCCESS'};")
+    return source
+
+
+def _platform_connections(result, provider):
+    """Emit fixed hooks; model platforms explicitly have no system hardware."""
+    specifications = (
+        ("nx_platform_start_result_t", "system_start", "void"),
+        ("nx_result_t", "resources_acquire", "void"),
+        ("nx_result_t", "resources_release", "void"),
+        ("nx_result_t", "system_release", "bool started"))
+    source = []
+    if not provider.MODEL:
+        required = ("platform_declarations", *("platform_" + name
+                    for _, name, _ in specifications))
+        if any(not callable(getattr(provider, name, None)) for name in required):
+            fail("Physical provider requires typed platform lifecycle hooks")
+        source.extend(provider.platform_declarations(result))
+    for result_type, name, parameters in specifications:
+        source += [r"/** \brief Fixed connection to the selected platform owner. */",
+                   f"static {result_type} nx_platform_{name}({parameters}) {{"]
+        if provider.MODEL:
+            if name == "system_release":
+                source.append("    (void)started;")
+            value = ("(nx_platform_start_result_t){ NX_SUCCESS, NX_SUCCESS, 0u }"
+                     if name == "system_start" else "NX_SUCCESS")
+        else:
+            hook = getattr(provider, "platform_" + name)
+            call = (hook(result, Symbol("started"))
+                    if name == "system_release" else hook(result))
+            if not isinstance(call, DirectCall):
+                fail("Platform lifecycle hooks require fixed typed calls")
+            value = call.render()
+        source += [f"    return {value};", "}"]
+    return source
+
+
+def _controller_dispatch(initialize, admission, ordinals, retained, stop):
+    """Emit only indexed typed calls and constant failure responsibility."""
+    source = [r"/** \brief Exact controller admission without effects. */",
+              "static nx_result_t nx_platform_admit(size_t index) {",
+              "    switch (index) {"]
+    for index, ordinal in enumerate(ordinals):
+        calls = [call for owner, call in admission if owner == ordinal]
+        source += [f"    case {index}u: {{", *_sequence(calls), "    }"]
+    source += ["    default: return NX_ERROR_INVALID;", "    }", "}",
+               r"/** \brief Exact constructor and static failure responsibility. */",
+               "static nx_lifecycle_acquisition_t nx_platform_acquire(size_t index) {",
+               "    switch (index) {"]
+    for index, call in enumerate(initialize):
+        source += [f"    case {index}u:",
+                   "        return (nx_lifecycle_acquisition_t){ " + call +
+                   ", " + str(retained[index]).lower() + " };"]
+    source += ["    default:",
+               "        return (nx_lifecycle_acquisition_t){ NX_ERROR_INVALID, false };",
+               "    }", "}",
+               r"/** \brief Exact selected controller withdrawal calls. */",
+               "static nx_result_t nx_platform_release(size_t index) {",
+               "    switch (index) {"]
+    for index in range(len(initialize)):
+        calls = [call for owner, call in stop if owner == index + 1]
+        source += [f"    case {index}u: {{", *_sequence(calls), "    }"]
+    return source + ["    default: return NX_ERROR_INVALID;", "    }", "}"]
 
 
 def emit(result):
     if not isinstance(result, ConfigurationIR):
         raise TypeError("Bindings emission requires ConfigurationIR")
     provider = for_selection(result)
-    runtime = result.runtime_power is not None
+    if result.runtime_power is not None:
+        fail("Selected provider has no maintained runtime power lifecycle")
     selections = result.controllers
     context_guard = "nx_arch_in_isr() || nx_arch_irq_is_masked()"
     if not provider.MODEL:
@@ -54,7 +102,7 @@ def emit(result):
               ' * \\brief           Fixed typed aliases selected by one assembly.',
               ' * \\author          Nexus Team', ' */',
               '#ifndef NEXUS_BINDINGS_H', '#define NEXUS_BINDINGS_H',
-              '#include "nexus/core/status.h"']
+              '#include "nexus/core/platform_lifecycle.h"']
     if uart_formats.probed(result):
         header.insert(-1, '#include "nexus_config.h"')
     for kind in sorted({controller_class(item) for item in selections}):
@@ -67,9 +115,7 @@ def emit(result):
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')
     if any(item.kind in {"eth", "eth_frames"} for item in selections):
         header.append('#include "nexus/io/mdio.h"')
-    header += ['#ifdef __cplusplus', 'extern "C" {', '#endif', 'typedef struct {', '    nx_result_t primary;',
-               '    nx_result_t cleanup;', '    uint32_t remaining_effects;',
-               '} nx_platform_start_result_t;',
+    header += ['#ifdef __cplusplus', 'extern "C" {', '#endif',
                '/** \\brief Startup-only; no scheduler or product worker is created.',
                ' * \\return Primary/cleanup errors and retained effects. On error',
                ' * all ports remain unusable; preserve contexts until cleanup.',
@@ -83,24 +129,14 @@ def emit(result):
                ' * Complete release restores the selected original pin states;',
                ' * retain ownership if the product requires continued idle drive.',
                ' */', 'nx_result_t nx_platform_stop(void);',
-               '/** \\brief Cold lifecycle stage; errors remain in the normal result. */',
-               'typedef enum {',
-               '    NX_PLATFORM_PHASE_NONE, NX_PLATFORM_PHASE_CONTEXT,',
-               '    NX_PLATFORM_PHASE_SYSTEM, NX_PLATFORM_PHASE_RESOURCES,',
-               '    NX_PLATFORM_PHASE_CONTROLLER',
-               '} nx_platform_phase_t;',
                '/** \\brief Caller-owned output, accessed only during this call.',
                ' * Controller indices are zero-based resolved.json controllers',
                ' * positions, not typed factory IDs. SIZE_MAX means no controller.',
                ' * NX_PLATFORM_CONTROLLER_INDEX_* names those ordinals. Optional',
                ' * factory capabilities provide immutable labels and bounds.',
-               ' * Success clears all fields; failure identifies the failing stage.',
-               ' */', 'typedef struct {',
-               '    nx_platform_phase_t phase;',
-               '    size_t controller_index;',
-               '    nx_platform_phase_t cleanup_phase;',
-               '    size_t cleanup_controller_index;',
-               '} nx_platform_diagnostic_t;',
+               ' * Success clears all fields. Synchronous BUSY reentry preserves',
+               ' * this output; other failures identify the failing stage.',
+               ' */',
                '/** \\brief Start with optional call-scoped failure metadata.',
                ' * \\param diagnostic Writable output or NULL; never retained.',
                ' * \\return The normal primary/cleanup/remaining-effects result.',
@@ -119,8 +155,6 @@ def emit(result):
     header.extend(f'    {name} = {index},'
                   for index, _, name in controller_ordinals(result))
     header += [f'    NX_PLATFORM_CONTROLLER_INDEX_COUNT = {len(selections)}', '};']
-    if runtime:
-        header.extend(runtime_power.header())
     source = ['/**', ' * \\file            bindings.c',
               ' * \\brief           Generated fixed typed hardware construction.',
               ' * \\author          Nexus Team', ' * \\version         1.0.0',
@@ -142,10 +176,8 @@ def emit(result):
             result, symbol=geometry[0], sector_symbol=geometry[0] + "_sectors",
             program_unit=provider.FLASH_PROGRAM_UNIT,
             program_flags=geometry[1], static=False))
-    source += ['static bool s_nx_platform_started;', 'static size_t s_nx_platform_initialized;']
+    source += ['static nx_platform_lifecycle_state_t s_nx_platform_lifecycle;']
     source.extend(provider.state_declarations(result))
-    if runtime:
-        source.extend(runtime_power.state())
     initialize = []
     admission = []
     initialization_indices = []
@@ -221,131 +253,48 @@ def emit(result):
     # All constructor arrays precede their shared cold lease functions.
     # Reuse those static slots directly; no pointer registry is emitted.
     source.extend(gpio_phase.declarations(result, pin_snapshots))
-    source.extend(diagnostic_helpers())
-    if runtime:
-        source += ['static nx_result_t nx_platform_stop_io(nx_platform_diagnostic_t* diagnostic, bool cleanup);',
-                   'static nx_platform_start_result_t nx_runtime_start_system(nx_platform_diagnostic_t* diagnostic) {',
-                   '    (void)diagnostic;',
-                   '    nx_platform_start_result_t result = { NX_SUCCESS, NX_SUCCESS, 0u };']
-        source.extend(provider.start_system(result))
-        source += ['    return result;', '}']
-    source += ['/** \\brief Stop only the initialized selected interfaces. */',
-               'nx_result_t nx_platform_stop(void) {',
-               '    return nx_platform_stop_impl(NULL, false);', '}',
-               '/** \\brief Add caller-owned metadata to the same stop path. */',
-               'nx_result_t nx_platform_stop_diagnosed(nx_platform_diagnostic_t* diagnostic) {',
-               '    nx_platform_diagnostic_reset(diagnostic);',
-               '    return nx_platform_stop_impl(diagnostic, false);', '}',
-               '/** \\brief Shared stop body preserves primary failure metadata. */',
-               'static nx_result_t nx_platform_stop_impl(nx_platform_diagnostic_t* diagnostic, bool cleanup) {',
-               '    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_CONTEXT, SIZE_MAX);',
-               f'    if ({context_guard}) {{ return NX_ERROR_CONTEXT; }}']
-    if runtime:
-        source += ['    nx_result_t io = nx_platform_stop_io(diagnostic, cleanup);',
-                   '    if (io != NX_SUCCESS) { return io; }']
-        source.extend(provider.stop_system(result, resources=False,
-            system_phase='nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX)'))
-        source += ['    s_nx_platform_started = false;',
-                   '    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_NONE, SIZE_MAX);',
-                   '    return NX_SUCCESS;', '}',
-                   '/** \\brief One I/O withdrawal body, also used by runtime pause. */',
-                   'static nx_result_t nx_platform_stop_io(nx_platform_diagnostic_t* diagnostic, bool cleanup) {',
-                   '    nx_result_t closed = nx_clock_domain_cold_close(&s_nx_runtime_domain);',
-                   '    if (closed != NX_SUCCESS) { return closed; }',
-                   '    if (!nx_clock_domain_cold_has_lease(&s_nx_runtime_lease)) { return nx_clock_domain_cold_release(&s_nx_runtime_domain, &s_nx_runtime_lease); }']
-    for index in range(len(initialize), 0, -1):
-        source.append(f'    if (s_nx_platform_initialized >= {index}u) {{')
-        source.append(
-            '        nx_platform_diagnostic_phase(diagnostic, cleanup, '
-            f'NX_PLATFORM_PHASE_CONTROLLER, {initialization_indices[index - 1]}u);')
-        for counter, (_, expression) in enumerate(entry for entry in stop if entry[0] == index):
-            source += [f'        nx_result_t status_{counter} = {expression};',
-                       f'        if (status_{counter} != NX_SUCCESS) {{ return status_{counter}; }}']
-        source += [f'        s_nx_platform_initialized = {index - 1}u;', '    }']
-    source.append('    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_RESOURCES, SIZE_MAX);')
-    if runtime:
-        source.extend(provider.stop_resources(result))
-        source += ['    return nx_clock_domain_cold_release(&s_nx_runtime_domain, &s_nx_runtime_lease);', '}']
-        source.extend(runtime_power.runtime_functions(result, context_guard,
-                                                      initialize, admission))
-    else:
-        source.extend(provider.stop_system(
-            result, system_phase='nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX)'))
-        source += ['    s_nx_platform_started = false;',
-                   '    s_nx_platform_initialized = 0u;',
-                   '    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_NONE, SIZE_MAX);',
-                   '    return NX_SUCCESS;', '}']
-    source += ['/** \\brief Start explicit hardware only; rollback retains error facts. */',
-               'nx_platform_start_result_t nx_platform_start(void) {']
-    if pre_c_effects:
-        source += ['    nx_platform_start_result_t result = nx_platform_start_impl(NULL);',
-                   '    if (result.primary != NX_SUCCESS) { result.remaining_effects |= 1u; }',
-                   '    return result;']
-    else:
-        source.append('    return nx_platform_start_impl(NULL);')
-    source += ['}',
-               '/** \\brief Add caller-owned metadata to the same startup path. */',
+    source.extend(_platform_connections(result, provider))
+    source += [r'/** \brief Context is admitted, never established by bindings. */',
+               'static nx_result_t nx_platform_context_check(void) {',
+               f'    return ({context_guard}) ? NX_ERROR_CONTEXT : NX_SUCCESS;',
+               '}']
+    source.extend(_controller_dispatch(initialize, admission,
+                                         initialization_indices,
+                                         retained_initialization, stop))
+    if initialization_indices:
+        source += ['static const size_t s_nx_platform_ordinals[] = {',
+                   '    ' + ', '.join(f'{index}u'
+                                     for index in initialization_indices), '};']
+    source += ['static const nx_platform_lifecycle_plan_t s_nx_platform_plan = {',
+               f'    .controller_count = {len(initialize)}u,',
+               '    .ordinals = ' + ('s_nx_platform_ordinals'
+                                    if initialization_indices else 'NULL') + ',',
+               '    .context_check = nx_platform_context_check,',
+               '    .admit = nx_platform_admit,',
+               '    .system_start = nx_platform_system_start,',
+               '    .resources_acquire = nx_platform_resources_acquire,',
+               '    .resources_release = nx_platform_resources_release,',
+               '    .system_release = nx_platform_system_release,',
+               '    .acquire = nx_platform_acquire,',
+               '    .release = nx_platform_release,',
+               f'    .permanent_effects = {str(pre_c_effects).lower()}', '};',
+               r'/** \brief Start the static platform through its C coordinator. */',
+               'nx_platform_start_result_t nx_platform_start(void) {',
+               '    return nx_platform_lifecycle_start(',
+               '        &s_nx_platform_plan, &s_nx_platform_lifecycle, NULL);', '}',
+               r'/** \brief Add call-scoped metadata to the same C startup path. */',
                'nx_platform_start_result_t nx_platform_start_diagnosed(nx_platform_diagnostic_t* diagnostic) {',
-               '    nx_platform_diagnostic_reset(diagnostic);',
-               '    nx_platform_start_result_t result = nx_platform_start_impl(diagnostic);']
-    if pre_c_effects:
-        source.append('    if (result.primary != NX_SUCCESS) { result.remaining_effects |= 1u; }')
-    source += [
-               '    if (diagnostic != NULL && result.primary == NX_SUCCESS) {',
-               '        nx_platform_diagnostic_reset(diagnostic);',
-               '    } else if (diagnostic != NULL && result.cleanup != NX_SUCCESS &&',
-               '               diagnostic->cleanup_phase == NX_PLATFORM_PHASE_NONE) {',
-               '        diagnostic->cleanup_phase = NX_PLATFORM_PHASE_SYSTEM;',
-               '        diagnostic->cleanup_controller_index = SIZE_MAX;',
-               '    }', '    return result;', '}',
-               '/** \\brief One shared startup implementation, without stored observers. */',
-               'static nx_platform_start_result_t nx_platform_start_impl(nx_platform_diagnostic_t* diagnostic) {',
-               '    nx_platform_start_result_t result = { NX_SUCCESS, NX_SUCCESS, ' +
-               ('1u' if pre_c_effects else '0u') + ' };',
-               '    nx_platform_diagnostic_phase(diagnostic, false, NX_PLATFORM_PHASE_CONTEXT, SIZE_MAX);',
-               f'    if ({context_guard}) {{',
-               '        result.primary = NX_ERROR_CONTEXT; return result; }',
-               '    if (s_nx_platform_started) { result.primary = NX_ERROR_STATE; return result; }']
-    # Read-only C admission does not acquire a cleanup responsibility. Reject
-    # before any system/resource effect or initialized-instance marker.
-    for index, expression in admission:
-        source += ['    nx_platform_diagnostic_phase(diagnostic, false, '
-                   f'NX_PLATFORM_PHASE_CONTROLLER, {index}u);',
-                   f'    result.primary = {expression};',
-                   '    if (result.primary != NX_SUCCESS) { return result; }']
-    source.append('    nx_platform_diagnostic_phase(diagnostic, false, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX);')
-    if runtime:
-        source += ['    result.primary = nx_clock_domain_cold_start(&s_nx_runtime_domain, &s_nx_runtime_lease);',
-                   '    if (result.primary != NX_SUCCESS) { return result; }',
-                   '    result = nx_runtime_start_system(diagnostic);',
-                   '    if (result.primary != NX_SUCCESS) {',
-                   '        if (result.remaining_effects == 0u) {',
-                   '            nx_result_t cleanup = nx_clock_domain_cold_close(&s_nx_runtime_domain);',
-                   '            if (cleanup == NX_SUCCESS) { cleanup = nx_clock_domain_cold_release(&s_nx_runtime_domain, &s_nx_runtime_lease); }',
-                   '            if (cleanup != NX_SUCCESS) { result.cleanup = cleanup; result.remaining_effects = 1u; }',
-                   '        }', '        return result;', '    }']
-    else:
-        source.extend(provider.start_system(result))
-    source.append("    s_nx_platform_started = true;")
-    source.append('    nx_platform_diagnostic_phase(diagnostic, false, NX_PLATFORM_PHASE_RESOURCES, SIZE_MAX);')
-    source.extend(provider.start_resources(
-        result, cleanup='nx_platform_stop_impl(diagnostic, true)'))
-    for index, expression in enumerate(initialize):
-        source.append(
-            '    nx_platform_diagnostic_phase(diagnostic, false, '
-            f'NX_PLATFORM_PHASE_CONTROLLER, {initialization_indices[index]}u);')
-        if retained_initialization[index]:
-            # Cold failure may retain live hardware; include that instance
-            # in reverse cleanup before attempting initialization.
-            source.append(f"    s_nx_platform_initialized = {index + 1}u;")
-        source += [f'    result.primary = {expression};',
-                   '    if (result.primary != NX_SUCCESS) {',
-                   '        result.cleanup = nx_platform_stop_impl(diagnostic, true);',
-                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-                   '        return result;', '    }', f'    s_nx_platform_initialized = {index + 1}u;']
-    if pre_c_effects:
-        source.append('    result.remaining_effects = 0u;')
-    source += ['    nx_platform_diagnostic_phase(diagnostic, false, NX_PLATFORM_PHASE_NONE, SIZE_MAX);',
-               '    return result;', '}']
+               '    return nx_platform_lifecycle_start(',
+               '        &s_nx_platform_plan, &s_nx_platform_lifecycle, diagnostic);',
+               '}',
+               r'/** \brief Stop and retry only the remaining C owner receipts. */',
+               'nx_result_t nx_platform_stop(void) {',
+               '    return nx_platform_lifecycle_stop(',
+               '        &s_nx_platform_plan, &s_nx_platform_lifecycle, NULL);', '}',
+               r'/** \brief Add call-scoped metadata to the same C stop path. */',
+               'nx_result_t nx_platform_stop_diagnosed(nx_platform_diagnostic_t* diagnostic) {',
+               '    return nx_platform_lifecycle_stop(',
+               '        &s_nx_platform_plan, &s_nx_platform_lifecycle, diagnostic);',
+               '}']
     header += ['#ifdef __cplusplus', '}', '#endif', '#endif', '']
     return '\n'.join(header), '\n'.join(source) + '\n'

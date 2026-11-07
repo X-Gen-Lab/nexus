@@ -44,10 +44,11 @@ Native models live under `tests/support/native/` and require explicit
 They are test support, not a second production SoC.
 
 The [source map](source-map.md) links authoritative layer contracts. Board and
-SoC directories no longer contain Python plugins; the current centralized
-host generator still uses Python. Moving remaining generated lifecycle control
-into handwritten C and introducing an independent Host C11 tool are pending
-work, not completed language migration.
+SoC directories contain no Python plugins. The default host generator uses Python
+for validation and static connections. Core's handwritten C platform coordinator
+owns startup, stop, rollback and diagnostics; F4's private C coordinator owns
+System and shared-resource sequencing. The independent Host C11 tool is an optional
+pilot, not a prerequisite for firmware behavior in C or software delivery.
 
 All vendor sources, Gitlinks, locks and licenses remain available. Only selected
 dependencies enter preparation, verification, compilation or Source SDK output.
@@ -123,11 +124,13 @@ configuration, exact instances, factory getters and fixed IRQ handlers. Constant
 addresses and thin typed call sequences can remain generated without adding a
 runtime interpreter or another dispatch layer.
 
-Current F4 C helpers implement concrete admission, acquired-resource receipts,
-withdrawal and readback. Remaining generator-organized cold control still needs
-handwritten C consolidation. Native support is explicitly test-scoped. Historical
-cross-family lifecycle results remain bound to their original source and do not
-qualify this refactor.
+F4 C owners implement admission, acquired-resource receipts, withdrawal and
+readback. The default generated plan connects fixed typed callbacks and ordinals
+from the resolved controller order to `nx_platform_lifecycle_start/stop`; the C
+engine owns the control flow and retries only the retained prefix. The existing
+`nx_lifecycle_*` reversible-resource engine remains a separate optional mechanism.
+Native support is explicitly test-scoped. Actual generated factories, models and ARM images each
+require validation; historical cross-family results do not qualify this refactor.
 
 A cold receipt proves which resources this caller actually acquired. Rejection
 with an empty receipt cannot stop or overwrite an existing owner. Partial

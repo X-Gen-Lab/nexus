@@ -18,6 +18,7 @@ nexus_google_test(nexus_qiming_rs485_factory_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
     LIBRARIES Nexus::IO
     INCLUDES "${qiming_rs485_bundle}"

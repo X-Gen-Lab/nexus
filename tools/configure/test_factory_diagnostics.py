@@ -1,11 +1,10 @@
 """Controller ordinals and optional cold metadata use resolved identities."""
 from tools.configure.tests.native_fixture import native_fixture, canonical_assembly
-from dataclasses import replace
 from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import configure, factory
+from tools.configure import configure
 
 
 ROOT = configure.ROOT

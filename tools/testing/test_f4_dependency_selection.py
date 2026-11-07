@@ -4,7 +4,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
-from unittest import mock
+import unittest.mock as mock
 
 from tools.maintenance import source_catalogue as catalogue
 

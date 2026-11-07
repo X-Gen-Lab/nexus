@@ -53,10 +53,10 @@ from .contract import (
 )
 from .bindings import constructor
 from .emission import (includes, instance_declarations, implementation, operations,
-                       state_declarations, shared_irqs, stop_system,
-                       start_system, start_resources)
+                       state_declarations, shared_irqs, platform_declarations,
+                       platform_system_start, platform_resources_acquire,
+                       platform_resources_release, platform_system_release)
 from tools.configure.clocks import normalize as normalize_clock, plan as clock_plan
-from .preflight import PREFLIGHT_CALL, selected_preflight
 from . import gpio as GPIO_PHASE
 from . import sram as EXTERNAL_MEMORY
 from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS, CONTROLLER_PAIRS,

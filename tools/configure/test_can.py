@@ -75,11 +75,10 @@ class CanConfigurationTests(unittest.TestCase):
         self.assertIn('.domain = &s_nx_can_domain,', source)
         self.assertNotIn('static nx_result_t prepare_bus0', source)
         self.assertNotIn('static nx_result_t stop_bus0', source)
-        marker = 'result.primary = nx_stm32_can_prepare(&s_nx_port_bus1,'
-        begin = source.index('nx_platform_start_result_t nx_platform_start')
-        prior = source.rfind('s_nx_platform_initialized = 2u;', begin,
-                            source.index(marker))
-        self.assertGreater(prior, begin)
+        self.assertIn('(nx_lifecycle_acquisition_t){ '
+                      'nx_stm32_can_prepare(&s_nx_port_bus1, '
+                      '&s_nx_can_config_bus1, &s_nx_can_pin_leases_bus1), '
+                      'true }', source)
 
     def test_timing_requires_exact_apb_bitrate_and_valid_sampling_segments(self):
         for previous, replacement in (('prescaler=6', 'prescaler=7'),

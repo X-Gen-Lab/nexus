@@ -20,7 +20,7 @@ Nexus 提供静态 C11 通用机制。当前生产 SoC 入口只有 `soc/stm32/s
 
 | 位置 | 责任与所有者 |
 |---|---|
-| `core/` | 结果、单调 deadline、请求与借用规则 |
+| `core/` | 结果、单调 deadline、请求与借用规则、整平台冷态协调 |
 | `arch/` | 编译期 CPU 原语、中断状态保存恢复和明确能力 |
 | `io/` | 公共类型、检查分派与硬件无关机制 |
 | `soc/stm32/stm32f4/` | 精确芯片事实、启动、时钟、IRQ／DMA、私有控制器状态与 HAL／LL 适配 |
@@ -52,6 +52,12 @@ F4，目录移动本身不改变指令数或资源成本。
 F4 C 实现维护资源准入、取得、收条、硬件撤回和 readback。部分取得失败必须处理
 当前步骤已经产生的效果，再逆序撤回前序步骤；失败释放保留实际责任。
 
+默认静态装配通过 `nx_platform_lifecycle_start/stop` 进入 Core 手写 C 协调器。
+全部 controller 准入先于硬件效果；随后依次建立 System、共享资源与 controller。
+失败按逆序撤回，在首个释放拒绝处保留剩余责任，后续 stop 只重试未完成部分。
+primary、cleanup、remaining effects 和调用期诊断独立保留，不以清理成功覆盖原始失败。
+F4 的 System／DMA／SYSCFG／pins／CAN／Ethernet 共享责任由其私有 C 协调器处理。
+
 ACCEPTED 后借用请求与 buffer，直到 acquire 观察 SETTLED。DMA 完成、线上完成、
 IRQ／callback 撤回和最终发布分别证明；timeout／cancel 不提前释放借用。
 QUARANTINED 保留存储与恢复责任，观察者和 adapter 还需独立 join。
@@ -59,11 +65,16 @@ QUARANTINED 保留存储与恢复责任，观察者和 adapter 还需独立 join
 启动外部 SRAM、已启 watchdog 和保留 RTC 状态不能套用普通关闭。HAL 与自写
 实现也不能各自独立推进同一个 live controller 行为域。
 
-## 已迁移与后续目标
+## 当前实现与后续边界
 
-Board／SoC 不再保留 Python 插件；当前集中工具仍使用主机 Python，部分冷态连接
-顺序和控制流仍由生成器组织。统一手写 C 生命周期与 Host C11 `nxconfig` 尚未完成，
-必须按完整选择路径迁移并验证，不能机械翻译成另一种 C 字符串生成器。
+Board／SoC 不再保留 Python 插件。默认主机工具仍使用 Python 校验与生成静态对象、
+只读 plan、按索引选择的固定 typed call 和薄 IRQ 入口；启动、停止、回滚与诊断控制流
+由手写 C 维护。既有 `nx_lifecycle_*` 可撤销资源事务与整平台协调器职责不同，不要求
+为统一外观把全部驱动改接同一组 ops。
+
+Host C11 `nxconfig` 是可选主机试点，其全面替换不作为固件 C 化或软件交付前置。
+新增协调状态不是零 RAM，也不改变日常 I/O 热路径；实际资源、模型行为、ARM 链接和
+物理测量各自验收，不能从源码迁移推导整平台通过。
 
 其他 F4 型号需要精确内存、封装、时钟、DMA、IRQ 与硬件 profile；官方 HAL 覆盖
 不建立 Nexus 全系列资格。当前软件验证绑定本次执行，旧记录不继承；物理 HIL 为

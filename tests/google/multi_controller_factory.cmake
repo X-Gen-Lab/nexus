@@ -61,6 +61,7 @@ foreach(multi_family stm32)
     target_sources(${multi_target} PRIVATE
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c")
     include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
@@ -103,6 +104,7 @@ foreach(multi_family stm32)
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi.c"
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/platform_cold.c"
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/platform_lifecycle.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/platform_coordinator.c"
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/system_lifecycle.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${single_bundle}" "${NEXUS_SOC_SOURCE_${multi_soc}}"

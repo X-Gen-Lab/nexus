@@ -58,6 +58,7 @@ foreach(physical_family stm32)
         "${NEXUS_SOC_SOURCE_${physical_soc}}/drivers/gpio.c"
         "${NEXUS_SOC_SOURCE_${physical_soc}}/drivers/platform_cold.c"
         "${NEXUS_SOC_SOURCE_${physical_soc}}/drivers/platform_lifecycle.c"
+        "${NEXUS_SOC_SOURCE_${physical_soc}}/drivers/platform_coordinator.c"
         "${NEXUS_SOC_SOURCE_${physical_soc}}/drivers/system_lifecycle.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${physical_gpio_bundle}" "${NEXUS_SOC_SOURCE_${physical_soc}}"

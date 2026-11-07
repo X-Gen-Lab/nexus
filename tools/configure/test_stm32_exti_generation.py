@@ -20,16 +20,15 @@ class Stm32ExtiGenerationTests(unittest.TestCase):
     def source(self):
         return bindings.emit(self.result())[1]
 
-    def test_each_failed_init_is_counted_before_the_hardware_attempt(self):
+    def test_each_failed_init_retains_its_typed_hardware_owner(self):
         source = self.source()
-        start = source[source.index("nx_platform_start(void)"):]
         for number, name in ((1, "edge5"), (2, "edge6")):
-            call = (f"result.primary = nx_stm32_exti_prepare(&s_nx_port_{name}, "
-                    f"&s_nx_control_config_{name});")
-            self.assertLess(start.index(f"s_nx_platform_initialized = {number}u;"),
-                            start.index(call))
-        self.assertLess(source.index("nx_stm32_exti_close(&s_nx_port_edge6)"),
-                        source.index("nx_stm32_exti_close(&s_nx_port_edge5)"))
+            call = (f"nx_stm32_exti_prepare(&s_nx_port_{name}, "
+                    f"&s_nx_control_config_{name})")
+            self.assertIn("(nx_lifecycle_acquisition_t){ " + call +
+                          ", true }", source)
+            self.assertIn(f"case {number - 1}u:", source)
+            self.assertIn(f"nx_stm32_exti_close(&s_nx_port_{name})", source)
 
     def test_partial_effect_construction_retains_the_exact_c_cleanup(self):
         result = self.result()
@@ -60,9 +59,8 @@ class Stm32ExtiGenerationTests(unittest.TestCase):
         source = self.source()
         for bank in range(3):
             self.assertIn(f"NX_STM32_PLATFORM_IRQ_MASK(EXTI9_5_IRQn, {bank}u)", source)
-        start = source[source.index("nx_platform_start(void)"):]
-        self.assertLess(start.index("nx_stm32_platform_selected_preflight"),
-                        start.index("nx_stm32_system_start"))
+        self.assertIn(".selected = &s_nx_platform_config", source)
+        self.assertIn("nx_stm32f4_platform_system_start(", source)
 
 
 if __name__ == "__main__":

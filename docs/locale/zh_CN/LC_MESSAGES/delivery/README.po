@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: f7ecf8fbc001c57952516f25c08565637825c3e38c0d66d3f6dee5a630d4e16a\n"
+"X-Nexus-Source-SHA256: 29d52d89093b80a4f072942ded0ccad565ad6e5e988d36b6619aedbee7d97cb1\n"
 
 #: docs/delivery/README.md:8
 msgid "当前平台交付边界"
@@ -15,19 +15,31 @@ msgstr "当前平台交付边界"
 
 #: docs/delivery/README.md:10
 msgid ""
-"当前重构将生产 SoC 收敛为 STM32F4，现有 F407VE／ZG 及四个 Board 包迁入系列入口。 全部 vendor 来源保留；Native"
-" 移到显式测试支撑。应用任务、产品策略和私有 PCB 继续由外部工程维护。"
+"当前重构将生产 SoC 收敛为 STM32F4，现有 F407VE／ZG 及四个 Board 包迁入系列入口。 全部 vendor "
+"来源保留；Native 移到显式测试支撑。应用任务、产品策略和私有 PCB 继续由外部工程维护。"
 msgstr ""
-"当前重构将生产 SoC 收敛为 STM32F4，现有 F407VE／ZG 及四个 Board 包迁入系列入口。 全部 vendor 来源保留；Native"
-" 移到显式测试支撑。应用任务、产品策略和私有 PCB 继续由外部工程维护。"
+"当前重构将生产 SoC 收敛为 STM32F4，现有 F407VE／ZG 及四个 Board 包迁入系列入口。 全部 vendor "
+"来源保留；Native 移到显式测试支撑。应用任务、产品策略和私有 PCB 继续由外部工程维护。"
 
 #: docs/delivery/README.md:14
 msgid ""
-"本页说明当前阅读与验收入口，不把源码存在、文档构建或历史软件结果写成本次通过。 Host C11 配置工具、剩余冷态行为收敛和其他 F4 "
-"型号扩展仍有后续工作。当前物理 HIL 为 `not_executed`，本次重构没有自动建立软件候选。"
+"本页说明当前阅读与验收入口，不把源码存在、文档构建或历史软件结果写成本次通过。 当前主线是剩余冷态行为收敛和精确 F4 "
+"型号扩展，按实际回归与源码身份验收。当前物理 HIL 为 `not_executed`，本次重构没有自动建立软件候选。"
 msgstr ""
-"本页说明当前阅读与验收入口，不把源码存在、文档构建或历史软件结果写成本次通过。 Host C11 配置工具、剩余冷态行为收敛和其他 F4 "
-"型号扩展仍有后续工作。当前物理 HIL 为 `not_executed`，本次重构没有自动建立软件候选。"
+"本页说明当前阅读与验收入口，不把源码存在、文档构建或历史软件结果写成本次通过。 当前主线是剩余冷态行为收敛和精确 F4 "
+"型号扩展，按实际回归与源码身份验收。当前物理 HIL 为 `not_executed`，本次重构没有自动建立软件候选。"
+
+#: docs/delivery/README.md:18
+msgid ""
+"[Host C11 配置器](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/nxconfig/README.md)是在 PC 上运行的可选试点，默认平台 配置仍使用 "
+"Python。试点不进入固件，其全面替换不作为平台使用、固件 C 化或软件 交付的前置条件。它改变的是主机工具实现，不直接改变 MCU "
+"热路径或资源占用。"
+msgstr ""
+"[Host C11 配置器](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/nxconfig/README.md)是在 PC 上运行的可选试点，默认平台 配置仍使用 "
+"Python。试点不进入固件，其全面替换不作为平台使用、固件 C 化或软件 交付的前置条件。它改变的是主机工具实现，不直接改变 MCU "
+"热路径或资源占用。"
 
 #: docs/delivery/README.md:0
 msgid "入口"

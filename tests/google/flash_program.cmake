@@ -10,10 +10,14 @@ if(NOT flash_generated EQUAL 0)
     message(FATAL_ERROR "Physical Flash factory rejected: ${flash_output}${flash_error}")
 endif()
 nexus_google_configuration_inputs("${flash_bundle}")
-nexus_google_test(nexus_stm32_flash_program_test
+nexus_google_test(nexus_stm32_flash_program_test STM32F4_LL
     SOURCES flash_program_test.cpp flash_capability_test.cpp
         "${flash_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${flash_bundle}"

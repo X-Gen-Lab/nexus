@@ -68,9 +68,8 @@ class BindingIdentityTests(unittest.TestCase):
                 self.assert_unique_storage(source)
                 self.assertRegex(source, r"static nx_stm32_gpio_state_t s_nx_port_started;")
                 self.assertRegex(source, r"static nx_stm32_uart_state_t s_nx_port_initialized;")
-                self.assertIn("static bool s_nx_platform_started;", source)
-                self.assertIn("static size_t s_nx_platform_initialized;",
-                              source)
+                self.assertIn("static nx_platform_lifecycle_state_t "
+                              "s_nx_platform_lifecycle;", source)
 
     def test_gpio_identity_does_not_alias_spi_child_cs_storage(self):
         data = self.fixture("tests/contracts/stm32_assembly/ve-spi.toml")

@@ -1,5 +1,4 @@
 """Derived work packages never promote source navigation to qualification."""
-from tools.configure.tests.native_fixture import native_fixture
 from tools.configure.providers.descriptor import source_directory
 
 import copy

@@ -145,19 +145,17 @@ class UsbConfigurationTests(unittest.TestCase):
         self.assertIn("&nx_usb_fs_endpoint_ops, &s_nx_usb_endpoints_fs[", source)
         self.assertNotIn("malloc", source)
 
-    def test_cold_failure_is_counted_before_typed_prepare_and_close(self):
+    def test_cold_failure_retains_typed_prepare_and_close_responsibility(self):
         output = self.root / "generated"
         gate.configure(self.assembly(), output, test_support=native_fixture(self.assembly()))
         source = (output / "bindings.c").read_text()
-        start = source.index("nx_platform_start_result_t nx_platform_start")
-        prepare = source.index("result.primary = nx_stm32_usb_cold_prepare(", start)
-        self.assertLess(source.index("s_nx_platform_initialized = 1u;", start),
-                        prepare)
-        self.assertIn("&s_nx_port_fs, &s_nx_usb_config_fs, "
-                      "&s_nx_usb_pin_leases_fs", source[prepare:])
-        close = source.index("nx_stm32_usb_cold_close(")
-        resources = source.index("nx_stm32_platform_pins_release(", close)
-        self.assertLess(close, resources)
+        self.assertIn("(nx_lifecycle_acquisition_t){ "
+                      "nx_stm32_usb_cold_prepare(&s_nx_port_fs, "
+                      "&s_nx_usb_config_fs, &s_nx_usb_pin_leases_fs), true }",
+                      source)
+        self.assertIn("nx_stm32_usb_cold_close(", source)
+        self.assertIn(".resources_release = nx_platform_resources_release,",
+                      source)
         self.assertIn("static const nx_stm32_usb_cold_config_t", source)
         self.assertIn("static const nx_stm32_usb_endpoint_config_t", source)
         self.assertNotIn("nx_stm32_usb_clock_start(", source)

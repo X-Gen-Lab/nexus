@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 06bd5c0731341dff229dad9257cd56926e3b635613cb0c553cb990cba58dadcd\n"
+"X-Nexus-Source-SHA256: 08214148bfc575a5867dadd396f4d7198781febca0ea9a006aed416e0b468c0a\n"
 
 #: docs/delivery/architecture.md:8
 msgid "当前系统架构"
@@ -57,10 +57,6 @@ msgstr "Responsibility and owner"
 #: docs/delivery/architecture.md:0
 msgid "`core/`"
 msgstr "`core/`"
-
-#: docs/delivery/architecture.md:0
-msgid "结果、单调 deadline、请求与借用规则"
-msgstr "Results, monotonic deadlines, requests and borrowing rules"
 
 #: docs/delivery/architecture.md:0
 msgid "`arch/`"
@@ -230,21 +226,6 @@ msgstr ""
 "state cannot use ordinary shutdown blindly. HAL and a private implementation "
 "also cannot independently advance the same live controller behavior domain."
 
-#: docs/delivery/architecture.md:62
-msgid "已迁移与后续目标"
-msgstr "Migrated scope and future work"
-
-#: docs/delivery/architecture.md:64
-msgid ""
-"Board／SoC 不再保留 Python 插件；当前集中工具仍使用主机 Python，部分冷态连接 顺序和控制流仍由生成器组织。统一手写 C 生命周期与"
-" Host C11 `nxconfig` 尚未完成， 必须按完整选择路径迁移并验证，不能机械翻译成另一种 C 字符串生成器。"
-msgstr ""
-"Board and SoC trees no longer contain Python plugins. Centralized host "
-"tooling still uses Python, and the generator still organizes some cold-state "
-"connection order and control flow. Unified handwritten C lifecycle and Host "
-"C11 `nxconfig` are not complete. Migrate and verify complete selection paths "
-"instead of mechanically translating them into another C-string generator."
-
 #: docs/delivery/architecture.md:68
 msgid ""
 "其他 F4 型号需要精确内存、封装、时钟、DMA、IRQ 与硬件 profile；官方 HAL 覆盖 不建立 Nexus "
@@ -258,3 +239,56 @@ msgstr ""
 "[support](support.md) and "
 "[qualification](../reference/platforms/qualification.md) for exact "
 "boundaries."
+
+#: docs/delivery/architecture.md:0
+msgid "结果、单调 deadline、请求与借用规则、整平台冷态协调"
+msgstr ""
+"Results, monotonic deadlines, request and borrow rules, and whole-platform "
+"cold coordination"
+
+#: docs/delivery/architecture.md:55
+msgid ""
+"默认静态装配通过 `nx_platform_lifecycle_start/stop` 进入 Core 手写 C 协调器。 全部 controller "
+"准入先于硬件效果；随后依次建立 System、共享资源与 controller。 失败按逆序撤回，在首个释放拒绝处保留剩余责任，后续 stop "
+"只重试未完成部分。 primary、cleanup、remaining effects 和调用期诊断独立保留，不以清理成功覆盖原始失败。 F4 的 "
+"System／DMA／SYSCFG／pins／CAN／Ethernet 共享责任由其私有 C 协调器处理。"
+msgstr ""
+"The default static assembly enters the handwritten Core C coordinator "
+"through `nx_platform_lifecycle_start/stop`. All controller admissions "
+"precede hardware effects; System, shared resources and controllers are then "
+"established in order. Failure triggers reverse withdrawal, retaining "
+"remaining responsibility at the first release refusal; later stop calls "
+"retry only unfinished work. Primary, cleanup, remaining effects and call-"
+"scoped diagnostics remain independent; successful cleanup never overwrites "
+"the original failure. F4 handles shared System/DMA/SYSCFG/pins/CAN/Ethernet "
+"responsibility in its private C coordinator."
+
+#: docs/delivery/architecture.md:68
+msgid "当前实现与后续边界"
+msgstr "Current implementation and remaining boundaries"
+
+#: docs/delivery/architecture.md:70
+msgid ""
+"Board／SoC 不再保留 Python 插件。默认主机工具仍使用 Python 校验与生成静态对象、 只读 plan、按索引选择的固定 typed "
+"call 和薄 IRQ 入口；启动、停止、回滚与诊断控制流 由手写 C 维护。既有 `nx_lifecycle_*` "
+"可撤销资源事务与整平台协调器职责不同，不要求 为统一外观把全部驱动改接同一组 ops。"
+msgstr ""
+"Board and SoC packages contain no Python plugins. The default host tool "
+"still uses Python to validate and generate static objects, readonly plans, "
+"fixed typed calls selected by index and thin IRQ entries. Handwritten C owns"
+" startup, stop, rollback and diagnostic control flow. The existing "
+"`nx_lifecycle_*` reversible-resource transactions and the whole-platform "
+"coordinator have different responsibilities; a uniform appearance does not "
+"require every driver to use the same operations table."
+
+#: docs/delivery/architecture.md:75
+msgid ""
+"Host C11 `nxconfig` 是可选主机试点，其全面替换不作为固件 C 化或软件交付前置。 新增协调状态不是零 RAM，也不改变日常 I/O "
+"热路径；实际资源、模型行为、ARM 链接和 物理测量各自验收，不能从源码迁移推导整平台通过。"
+msgstr ""
+"Host C11 `nxconfig` is an optional host pilot; full replacement is not a "
+"prerequisite for moving firmware behavior to C or delivering software. The "
+"new coordination state is not zero RAM and does not change ordinary I/O hot "
+"paths. Actual resources, model behavior, ARM linking and physical "
+"measurements are accepted separately; source migration cannot establish a "
+"whole-platform pass."

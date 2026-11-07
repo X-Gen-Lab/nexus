@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: e40aa36b755b0ea5b588d6bb31c20b3a832c11f70265fc9ed58b97bd3b486779\n"
+"X-Nexus-Source-SHA256: 94b20aeb4fef2a193a027122e58e27aaff7a27388114232d09fbd3bdc80ecdfc\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/engineering-handbook.md:1
 msgid "下一代平台工程运行手册"
@@ -1736,11 +1736,11 @@ msgstr ""
 " SDK 前缀下的 静态成本差值不能直接解释为资源优化。当前 C11 固件的正式复现工具为源码、consumer 和构建目录设置 "
 "`-ffile-prefix-map`，并比较两次实际 ELF/BIN；仍须执行该流程才能声明 逐字节可复现。"
 
-msgid "`drivers/`"
-msgstr "`drivers/`"
+msgid "`soc/stm32/stm32f4/drivers/ip/`"
+msgstr "`soc/stm32/stm32f4/drivers/ip/`"
 
-msgid "经复核的共享 IP 寄存器算法，由所选 SoC target 私有选编"
-msgstr "经复核的共享 IP 寄存器算法，由所选 SoC target 私有选编"
+msgid "经复核且仍被 F4 使用的硬件 IP 算法，由 F4 target 私有选编"
+msgstr "经复核且仍被 F4 使用的硬件 IP 算法，由 F4 target 私有选编"
 
 msgid "CodeQL 的数据库与中间查询缓存放在 tmpfs 时，文件占用与查询进程、子进程和内核内存共用同一 cgroup 预算；不同 tmpfs 的可用空间不能相加当作独立 RAM。按实际余量显式设置 `--ram`、`--threads` 和 `--max-disk-cache`，并为数据库增长、执行中的临时文件及其他进程留出空间。`--ram` 是 evaluator 的内存目标，file-backed mmap 可能使实际占用超过它；`--max-disk-cache` 限定中间结果缓存，不能作为执行中查询、全部临时文件或整个 cgroup 的硬配额。不能依据 `build/` 路径判定缓存角色；清理前按 producer 角色与实际引用分类，postlink audit JSON、`.su`、`*.compiler.raw` 和 `*.objdump.raw` 属于 producer 证据，并保留原失败与恢复事实。"
 msgstr "CodeQL 的数据库与中间查询缓存放在 tmpfs 时，文件占用与查询进程、子进程和内核内存共用同一 cgroup 预算；不同 tmpfs 的可用空间不能相加当作独立 RAM。按实际余量显式设置 `--ram`、`--threads` 和 `--max-disk-cache`，并为数据库增长、执行中的临时文件及其他进程留出空间。`--ram` 是 evaluator 的内存目标，file-backed mmap 可能使实际占用超过它；`--max-disk-cache` 限定中间结果缓存，不能作为执行中查询、全部临时文件或整个 cgroup 的硬配额。不能依据 `build/` 路径判定缓存角色；清理前按 producer 角色与实际引用分类，postlink audit JSON、`.su`、`*.compiler.raw` 和 `*.objdump.raw` 属于 producer 证据，并保留原失败与恢复事实。"

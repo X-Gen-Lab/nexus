@@ -1,5 +1,4 @@
 """Exact SoC packages preserve loading, common types and test discovery."""
-from tools.configure.tests.native_fixture import native_fixture
 import dataclasses
 import json
 import os
@@ -98,13 +97,13 @@ class FamilyLoadingTests(unittest.TestCase):
     def test_native_construction_and_rejection_share_canonical_types(self):
         result = configure.resolve_ir(
             ROOT / "tests/support/native/assemblies/native-gpio.toml", test_support=True)
-        provider = maintained("native", test_support=("native" == "native"))
+        provider = maintained("native", test_support=True)
         construction = provider.constructor(
             result.controllers[0], result, result.board_bindings,
             result.routes, result.devices)
         self.assertIs(type(construction), common.Construction)
         with self.assertRaises(common.ConfigurationError):
-            maintained("../native", test_support=("../native" == "native"))
+            maintained("../native", test_support=False)
 
     def test_absolute_cli_ignores_ambient_configuration_packages(self):
         with tempfile.TemporaryDirectory(prefix="configuration package ") as name:

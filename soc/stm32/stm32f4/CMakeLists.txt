@@ -15,7 +15,8 @@ foreach(required "${stm32_device}/Include/${stm32_device_header}.h"
     endif()
 endforeach()
 include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/ControllerModes.cmake")
-set(stm32_sources drivers/platform_lifecycle.c drivers/system_lifecycle.c
+set(stm32_sources drivers/platform_coordinator.c drivers/platform_lifecycle.c
+    drivers/system_lifecycle.c
     drivers/lifecycle_pins.c)
 set(stm32_uart_hal OFF)
 foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth eth_frames

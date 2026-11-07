@@ -19,7 +19,8 @@ class ProviderSourceSelectionTests(unittest.TestCase):
         return {(directory / (name if name == "timebase.c" else
                               "drivers/" + name)).as_posix() for name in names} | {
             (directory / "drivers" / name).as_posix() for name in (
-                "platform_lifecycle.c", "system_lifecycle.c", "platform_cold.c",
+                "platform_coordinator.c", "platform_lifecycle.c",
+                "system_lifecycle.c", "platform_cold.c",
                 "lifecycle_pins.c")}
 
     def configure_sources(self, family, controllers):

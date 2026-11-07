@@ -160,9 +160,9 @@ nx_stm32_eth_pins_close(const nx_stm32_platform_pin_config_t* pins,
         receipt->leases &= (uint16_t)~bit;
     }
     if (receipt->mux_leased) {
-        NX_PLATFORM_REGISTER_WRITE(SYSCFG->PMC,
-                                   (SYSCFG->PMC & ~SYSCFG_PMC_MII_RMII_SEL) |
-                                       receipt->mux_saved);
+        NX_PLATFORM_REGISTER_WRITE(
+            SYSCFG->PMC, (SYSCFG->PMC & ~(uint32_t)SYSCFG_PMC_MII_RMII_SEL) |
+                             receipt->mux_saved);
         nx_arch_dsb();
         if ((SYSCFG->PMC & SYSCFG_PMC_MII_RMII_SEL) != receipt->mux_saved)
             return NX_ERROR_IO;

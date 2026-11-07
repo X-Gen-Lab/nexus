@@ -31,6 +31,7 @@ foreach(i2c_pair_family stm32)
             "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/gpio.c"
             "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/platform_cold.c"
             "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/platform_lifecycle.c"
+            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/platform_coordinator.c"
             "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/system_lifecycle.c"
             LIBRARIES Nexus::IO Nexus::Arch
             INCLUDES "${i2c_pair_bundle}"

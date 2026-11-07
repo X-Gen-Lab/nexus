@@ -1,7 +1,8 @@
 """Static provider wiring and family system lifecycle emission."""
 from . import bindings, packet
+from tools.configure.calls import Address, DirectCall, InitializeSequence
 from tools.configure.providers.common import mode_traits
-from tools.configure import can, timer_advanced, preflight, gpio_phase
+from tools.configure import can, timer_advanced, gpio_phase
 
 
 def implementation(item):
@@ -32,6 +33,7 @@ def includes(result):
     source = []
     source.append('#include "stm32f407_provider.h"')
     source.append('#include "stm32f407_platform_cold.h"')
+    source.append('#include "stm32f4_platform_lifecycle.h"')
     if any(item.kind in {"exti", "pwm", "adc"} for item in selections):
         source.append('#include "stm32f407_control_cold.h"')
     if any(item.kind in {"gpio", "flash", "watchdog"} for item in selections):
@@ -129,48 +131,93 @@ def shared_irqs(result):
     return bindings.shared_irq_definitions(result.controllers)
 
 
-def stop_system(result, *, system_phase=None):
-    selections = result.controllers
+def platform_declarations(result):
+    """Project readonly owner connections; C owns startup and withdrawal."""
     source = []
     boot_owners = {child.controller for child in result.devices
                    if child.driver == "memory_window-endpoint" and
                    child.options.mode == "startup-memory"}
-    for item in result.controllers:
-        if item.id in boot_owners:
-            name = item.id.replace("-", "_")
-            source += [f'    nx_result_t persistent_{name} = nx_stm32_fsmc_stop(&s_nx_port_{name});',
-                       f'    if (persistent_{name} != NX_SUCCESS) {{ return persistent_{name}; }}']
-    source += (['    nx_result_t can_domain = nx_stm32_can_domain_close(&s_nx_can_domain);',
-               '    if (can_domain != NX_SUCCESS) { return can_domain; }']
-              if result.can_domain is not None else [])
-    source.extend(packet.stop_system(result))
-    source += gpio_phase.release(result)
+    permanent = "NULL"
+    if boot_owners:
+        if len(boot_owners) != 1:
+            raise ValueError("F4 startup memory requires one permanent owner")
+        owner = next(iter(boot_owners)).replace("-", "_")
+        sequence = InitializeSequence("nx_platform_permanent_stop", (
+            DirectCall("nx_stm32_fsmc_stop", (Address("s_nx_port_" + owner),)),))
+        source += sequence.render()
+        permanent = sequence.function
+    can_close = "NULL"
+    if result.can_domain is not None:
+        sequence = InitializeSequence("nx_platform_can_close", (
+            DirectCall("nx_stm32_can_domain_close", (Address("s_nx_can_domain"),)),))
+        source += sequence.render()
+        can_close = sequence.function
+    ethernet = any(item.kind in {"eth", "eth_frames"}
+                   for item in result.controllers)
+    frames = any(item.kind == "eth_frames" for item in result.controllers)
+    pin_owner = "NULL"
+    if gpio_phase.applies(result):
+        source += [
+            'static const nx_stm32f4_platform_pin_owner_t s_nx_platform_pin_owner = {',
+            '    .preflight = nx_stm32_platform_selected_preflight,',
+            '    .acquire = nx_stm32_platform_pins_acquire,',
+            '    .release_clocks = nx_stm32_platform_gpio_clocks_release,',
+            '    .abort = nx_stm32_platform_pins_abort,',
+            '    .release = nx_stm32_platform_pins_release', '};']
+        pin_owner = "&s_nx_platform_pin_owner"
+    selected = "&s_nx_platform_config" if pin_owner != "NULL" else "NULL"
+    pins = "&s_nx_platform_pins" if pin_owner != "NULL" else "NULL"
     dma, syscfg = _resource_slots(result)
-    if dma != 'NULL' or syscfg != 'NULL':
-        source += [f'    nx_result_t resources = nx_stm32_platform_resources_release({dma}, {syscfg});',
-                   '    if (resources != NX_SUCCESS) { return resources; }']
-    if system_phase is not None:
-        source.append(f'    {system_phase};')
-    source += ['    nx_result_t system = nx_stm32_platform_system_release(',
-               '        &g_nx_stm32_system, s_nx_platform_started, 1000000u);',
-               '    if (system != NX_SUCCESS) { return system; }']
+    clock_owner = "NULL"
+    if dma != "NULL" or syscfg != "NULL":
+        source += [
+            'static const nx_stm32f4_platform_clock_owner_t s_nx_platform_clock_owner = {',
+            '    .acquire = nx_stm32_platform_resources_acquire,',
+            '    .release = nx_stm32_platform_resources_release', '};']
+        clock_owner = "&s_nx_platform_clock_owner"
+    source += [
+        'static const nx_stm32f4_platform_config_t s_nx_platform_lifecycle_config = {',
+        '    .system = &g_nx_stm32_system,',
+        f'    .selected = {selected}, .pins = {pins},',
+        f'    .pin_owner = {pin_owner},',
+        f'    .clock_owner = {clock_owner},',
+        f'    .flash_bytes = {result.flash["size"]}u, .poll_limit = 1000000u,',
+        f'    .dma_mask = {_dma_clock_mask(result) or "0u"},',
+        f'    .dma_added = {dma}, .syscfg_added = {syscfg},',
+        f'    .permanent_stop = {permanent}, .can_close = {can_close},',
+        '    .ethernet = ' + ('&s_nx_eth_resources,' if ethernet else 'NULL,'),
+        '    .ethernet_capture = ' + ('nx_stm32_eth_resources_capture,' if ethernet else 'NULL,'),
+        '    .ethernet_close = ' + ('nx_stm32_eth_resources_close,' if ethernet else 'NULL,'),
+        f'    .ethernet_frames = {str(frames).lower()}', '};']
     return source
 
 
-def start_system(result):
-    source = preflight.emit(result)
-    source += [f'    result.primary = nx_stm32_validate_identity({result.flash["size"]}u);',
-               '    if (result.primary != NX_SUCCESS) { return result; }']
-    source += gpio_phase.acquire(result)
-    source += ['    nx_stm32_start_result_t system = nx_stm32_system_start(&g_nx_stm32_system, 1000000u);',
-               '    if (system.primary != 0) {',
-               '        result.primary = NX_ERROR_IO;',
-               '        result.cleanup = system.cleanup == 0 ? NX_SUCCESS : NX_ERROR_IO;',
-               '        result.remaining_effects = system.remaining_effects;']
-    source += gpio_phase.abort(result)
-    source += ['        s_nx_platform_started = result.remaining_effects != 0u;',
-               '        return result;', '    }']
-    return source
+def platform_system_start(result):
+    """Connect one concrete C startup transaction."""
+    del result
+    return DirectCall("nx_stm32f4_platform_system_start", (
+        Address("s_nx_platform_lifecycle_config"),))
+
+
+def platform_resources_acquire(result):
+    """Connect shared clock and packet capture without emitted recovery."""
+    del result
+    return DirectCall("nx_stm32f4_platform_resources_acquire", (
+        Address("s_nx_platform_lifecycle_config"),))
+
+
+def platform_resources_release(result):
+    """Connect fixed C permanent/domain/pad/shared-clock withdrawal."""
+    del result
+    return DirectCall("nx_stm32f4_platform_resources_release", (
+        Address("s_nx_platform_lifecycle_config"),))
+
+
+def platform_system_release(result, started):
+    """Connect the same system owner with the engine's actual receipt flag."""
+    del result
+    return DirectCall("nx_stm32f4_platform_system_release", (
+        Address("s_nx_platform_lifecycle_config"), started))
 
 
 def _resource_slots(result):
@@ -179,19 +226,3 @@ def _resource_slots(result):
     syscfg = ('&s_nx_platform_syscfg_clock_added' if
               any(item.kind == 'exti' for item in result.controllers) else 'NULL')
     return dma, syscfg
-
-
-def start_resources(result, *, cleanup="nx_platform_stop()"):
-    source = packet.start_resources(result)
-    mask = _dma_clock_mask(result)
-    def acquire(call):
-        return [f'    result.primary = {call};',
-                '    if (result.primary != NX_SUCCESS) {',
-                f'        result.cleanup = {cleanup};',
-                '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-                '        return result;', '    }']
-    dma, syscfg = _resource_slots(result)
-    if dma != 'NULL' or syscfg != 'NULL':
-        source += acquire('nx_stm32_platform_resources_acquire('
-                          f'({mask or "0u"}), {dma}, {syscfg})')
-    return source

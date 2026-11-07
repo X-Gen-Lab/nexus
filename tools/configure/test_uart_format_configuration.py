@@ -191,15 +191,10 @@ class UARTFormatConfiguration(unittest.TestCase):
                     result.devices)
                 self.assertTrue(construction.retain_on_failed_init)
                 prefix = "stm32" if result.soc_family == 'stm32f4' else "gd32"
-                prepare = f"nx_{prefix}_uart_byte_cold_prepare"
                 self.assertIn(f"nx_{prefix}_uart_byte_cold_close", source)
-                start = source.index(
-                    "static nx_platform_start_result_t "
-                    "nx_platform_start_impl(nx_platform_diagnostic_t* "
-                    "diagnostic) {")
-                self.assertLess(
-                    source.index("s_nx_platform_initialized = 1u;", start),
-                    source.index("result.primary = " + prepare, start))
+                self.assertIn("(nx_lifecycle_acquisition_t){ " +
+                              construction.initialize.render() + ", true }",
+                              source)
 
 
 if __name__ == "__main__":

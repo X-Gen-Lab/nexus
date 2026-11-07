@@ -24,16 +24,3 @@ def static_declarations(result, pins, banks, slots):
     source += ['};']
     source += admission_declarations(result, 's_nx_platform_pins_config', len(pins))
     return source
-
-
-def cold_call(operation):
-    """Connect a fixed C function; no register algorithm remains in this hook."""
-    arguments = '&s_nx_platform_config, &s_nx_platform_pins'
-    functions = {
-        'admit': 'nx_stm32_platform_pins_admit(&s_nx_platform_config, true)',
-        'acquire': f'nx_stm32_platform_pins_acquire({arguments})',
-        'release': f'nx_stm32_platform_pins_release({arguments})',
-        'clocks_release': 'nx_stm32_platform_gpio_clocks_release(&s_nx_platform_pins)',
-        'abort': 'nx_stm32_platform_pins_abort(&s_nx_platform_pins)',
-    }
-    return functions[operation]

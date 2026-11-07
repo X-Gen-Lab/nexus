@@ -116,18 +116,3 @@ def _eth_selected(result):
 def state_declarations(result):
     return (["static nx_stm32_eth_resource_receipt_t s_nx_eth_resources;"]
             if _eth_selected(result) else [])
-
-
-def start_resources(result):
-    if not _eth_selected(result):
-        return []
-    frames = any(item.kind == "eth_frames" for item in result.controllers)
-    return ["    nx_stm32_eth_resources_capture(&s_nx_eth_resources, "
-            + str(frames).lower() + ");"]
-
-
-def stop_system(result):
-    if not _eth_selected(result):
-        return []
-    return ["    nx_result_t eth_resources = nx_stm32_eth_resources_close(&s_nx_eth_resources);",
-            "    if (eth_resources != NX_SUCCESS) { return eth_resources; }"]

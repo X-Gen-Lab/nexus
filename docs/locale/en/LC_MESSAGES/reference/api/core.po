@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 6192e0020a97003295af1a766d8e1d65e290729acdcd2cebe0d8c32b0f8fc60d\nX-Nexus-Reviewed: true\n"
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 78ed21136b8eecb64162fa8b7b792e80930c4c78b19e0d24f3cb4123ae88c9fb\nX-Nexus-Reviewed: true\n"
 
 msgid "Core: requests, status and time"
 msgstr "Core: requests, status and time"
@@ -436,3 +436,67 @@ msgstr "[out] Distinct extended elapsed microseconds."
 
 msgid "SUCCESS, INVALID for NULL/overlapping output, STATE for an uninitialized clock, or EXHAUSTED. Failure changes neither extension state nor output."
 msgstr "SUCCESS, INVALID for NULL/overlapping output, STATE for an uninitialized clock, or EXHAUSTED. Failure changes neither extension state nor output."
+
+#: docs/reference/api/core.md:12
+msgid "Cold lifecycle entry points"
+msgstr "Cold lifecycle entry points"
+
+#: docs/reference/api/core.md:0
+msgid "Scope"
+msgstr "Scope"
+
+#: docs/reference/api/core.md:0
+msgid "Public entry and contract"
+msgstr "Public entry and contract"
+
+#: docs/reference/api/core.md:0
+msgid "Reversible resource transactions"
+msgstr "Reversible resource transactions"
+
+#: docs/reference/api/core.md:0
+msgid ""
+"[`lifecycle.h`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/core/include/nexus/core/lifecycle.h): `nx_lifecycle_start/stop` "
+"admits a static resource plan and retries retained reverse cleanup."
+msgstr ""
+"[`lifecycle.h`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/core/include/nexus/core/lifecycle.h): `nx_lifecycle_start/stop` "
+"admits a static resource plan and retries retained reverse cleanup."
+
+#: docs/reference/api/core.md:0
+msgid "Complete platform coordination"
+msgstr "Complete platform coordination"
+
+#: docs/reference/api/core.md:0
+msgid ""
+"[`platform_lifecycle.h`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/core/include/nexus/core/platform_lifecycle.h): "
+"`nx_platform_lifecycle_start/stop` coordinates System, shared resources and "
+"physical controllers, with independent primary/cleanup results and optional "
+"call-scoped diagnostics."
+msgstr ""
+"[`platform_lifecycle.h`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/core/include/nexus/core/platform_lifecycle.h): "
+"`nx_platform_lifecycle_start/stop` coordinates System, shared resources and "
+"physical controllers, with independent primary/cleanup results and optional "
+"call-scoped diagnostics."
+
+#: docs/reference/api/core.md:19
+msgid ""
+"The [Core contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/core/README.md) explains both mechanisms and their "
+"failure boundaries. Callers provide zero-initialized state, keep plans and "
+"owner receipts alive, serialize lifecycle calls and join users before stop. "
+"Factory lookup and ordinary I/O do not pass through either lifecycle engine."
+" Complete types, callback requirements and C/C++ declarations remain in the "
+"linked public headers; neither mechanism starts a scheduler or establishes "
+"physical support."
+msgstr ""
+"The [Core contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/core/README.md) explains both mechanisms and their "
+"failure boundaries. Callers provide zero-initialized state, keep plans and "
+"owner receipts alive, serialize lifecycle calls and join users before stop. "
+"Factory lookup and ordinary I/O do not pass through either lifecycle engine."
+" Complete types, callback requirements and C/C++ declarations remain in the "
+"linked public headers; neither mechanism starts a scheduler or establishes "
+"physical support."

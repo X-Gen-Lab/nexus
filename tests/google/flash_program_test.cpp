@@ -15,6 +15,9 @@ extern "C" {
 #include <gtest/gtest.h>
 #include <sys/mman.h>
 
+/** \brief External GPIOA register bank required by the shared cold helpers. */
+GPIO_TypeDef g_nx_stm32_gpioa_model;
+
 static unsigned program_pulses;
 static unsigned erase_pulses, erase_attempts, refused_erase_attempt;
 static bool refuse_start, refuse_flags, refuse_second_flags, missing_end;

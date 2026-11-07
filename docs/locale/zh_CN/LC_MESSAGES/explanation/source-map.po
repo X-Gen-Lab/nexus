@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a6bf55a2ce452af1963f80affdc592efedc1cb889ba8b26b0d05923e6936853e\n"
+"X-Nexus-Source-SHA256: 5f9c327c3b7069fac36507b68e102df7b41d2465a4b403c9d29b697b671f42f6\n"
 
 #: docs/explanation/source-map.md:8
 msgid "当前源码与维护边界"
@@ -147,14 +147,6 @@ msgstr ""
 "顶层共享 MCU `drivers/` 已归入 F4，不增加运行时转发。ILI9341、XPT2046、W25 继续通过公共 I/O "
 "访问设备，留在组件目录，不随 MCU 支持包迁移。"
 
-#: docs/explanation/source-map.md:43
-msgid ""
-"Board 和 SoC 不再加载本地 Python 插件。当前生成实现集中在工具层，Host C11 工具与 剩余冷态控制流程的手写 C "
-"收敛尚待完成；不能把源码移动视为行为改造已经验收。 Native 必须显式启用测试 scope，不进入生产系列目录或能力聚合表。"
-msgstr ""
-"Board 和 SoC 不再加载本地 Python 插件。当前生成实现集中在工具层，Host C11 工具与 剩余冷态控制流程的手写 C "
-"收敛尚待完成；不能把源码移动视为行为改造已经验收。 Native 必须显式启用测试 scope，不进入生产系列目录或能力聚合表。"
-
 #: docs/explanation/source-map.md:47
 msgid ""
 "精确支持见[支持参考](../reference/platforms/support.md)。重构前的目录与执行范围可从 "
@@ -166,3 +158,15 @@ msgstr ""
 "[固定旧源码](https://github.com/X-Gen-"
 "Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18) "
 "追溯；旧记录保留原始身份，不建立本次重构的软件候选或实板资格。"
+
+#: docs/explanation/source-map.md:43
+msgid ""
+"Board 和 SoC 不再加载本地 Python 插件。默认 Python 工具集中校验事实并生成静态连接； Core "
+"`platform_lifecycle.c` 维护整平台启动、停止、回滚与诊断，F4 `drivers/platform_coordinator.c` "
+"维护 System 与共享资源的 C 协调。Host C11 工具是可选主机试点，不是固件 C 化或交付前置。实际生成 factory、模型与 ARM "
+"产物 各自验证，不能把源码移动视为整条链路已经验收。 Native 必须显式启用测试 scope，不进入生产系列目录或能力聚合表。"
+msgstr ""
+"Board 和 SoC 不再加载本地 Python 插件。默认 Python 工具集中校验事实并生成静态连接； Core "
+"`platform_lifecycle.c` 维护整平台启动、停止、回滚与诊断，F4 `drivers/platform_coordinator.c` "
+"维护 System 与共享资源的 C 协调。Host C11 工具是可选主机试点，不是固件 C 化或交付前置。实际生成 factory、模型与 ARM "
+"产物 各自验证，不能把源码移动视为整条链路已经验收。 Native 必须显式启用测试 scope，不进入生产系列目录或能力聚合表。"

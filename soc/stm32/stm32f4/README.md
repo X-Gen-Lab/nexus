@@ -13,6 +13,7 @@
 | `devices.json` | 官方器件宏、启动文件、IRQ 与时基存在性的编译事实 |
 | 根目录 `tools/configure/stm32f4/` | 当前集中配置适配、静态存储与固定连接 |
 | `system.c` | 启动、固定时钟、TIM2 时间域与失败退出 |
+| `drivers/platform_coordinator.c` | System 与共享资源的手写 C 顺序、错误映射及撤回协调 |
 | `drivers/`、`private/` | 具体模式、实例状态、硬件生命周期与独立回读 |
 | `CMakeLists.txt` | 所选源码、官方库与私有编译依赖 |
 
@@ -23,8 +24,9 @@
 
 `devices.json` 的 SDK 编译覆盖不代表其他 F4 型号已具备资源准入、驱动、
 Board 或运行时模式；当前具体支持以 F407VE／ZG 配置和执行范围为准。
-Board／SoC 中没有 Python 插件，集中主机工具与后续 Host C11、手写 C 生命周期
-收敛分别说明，不把目录移动标为语言或行为重构完成。
+Board／SoC 中没有 Python 插件。默认集中主机工具仍使用 Python，连接手写 C 的
+System／资源与整平台协调器。Host C11 是可选主机试点，不是固件 C 化或平台使用前置；
+目录移动、源码实现、模型回归、ARM 链接和实板资格分别说明。
 
 ## 内存、启动与时钟
 
@@ -162,13 +164,25 @@ IWDG 不可逆失败、EXTI 隔离及 PWM／ADC 错误。
 controller，外部连接器不据此获得 Board 资格。模型、ARM ELF 和资源证据分别记录；
 实板断开时，clock／IRQ／电气波形／Flash 掉电／长期负载都未执行。
 
-## 手写 C 生命周期集成切片
+## 默认平台协调与可选资源切片
+
+默认装配通过 Core 的 `nx_platform_lifecycle_start/stop` 协调整个平台，F4 私有
+`stm32f4_platform_lifecycle.h` 连接 `platform_coordinator.c` 的四个 C 入口：
+system start、resources acquire、resources release 和 system release。
+生成器只写只读配置与固定调用，硬件算法、顺序、错误映射和撤回控制流留在 C。
+
+System 路径依次处理基础／所选资源准入、芯片身份、pins 取得与 system start；
+失败按实际责任合并 pin abort 与 System 结果。共享取得记录 Ethernet 责任后建立
+DMA／SYSCFG；释放先检查永久 startup SRAM，再处理 CAN、Ethernet、pins 和共享
+clock，全部完成后才释放 System。可选 owner 用固定 typed hook 连接，未选项不引入
+相应链接依赖；没有 opcode、动作解释器或第二份可变收条。
 
 `private/stm32f4_lifecycle.h` 与 `drivers/lifecycle_{pins,gpio,uart,spi}.c` 为
-Core 生命周期引擎提供独立集成切片：外部 System owner 先建立时钟，共享 pins
+可选 `nx_lifecycle_*` 资源事务引擎提供独立集成切片：外部 System owner 先建立时钟，共享 pins
 先取得；目前只覆盖 GPIO input／output、8N1 IRQ UART byte／event 和带静态 CS
 的 SPI short-poll。只读配置／ops 与可变资源收条分开，每步只有一份真实资源收条。
 
-这些 C 路径已由实际模型回归，尚未替换默认 Python 生成装配；Host C11 工具也是
-独立切片。UART DMA／word／block、SPI DMA 和其余 I/O 仍保留当前路径。源码存在
-不等于所有模式已经切换，也不建立候选或物理 HIL。
+该可选切片不替代默认整平台协调器。默认协调器连接原有各维护模式的 C owner，
+不要求把 UART DMA／word／block、SPI DMA 等模式改成该切片的 ops。未维护模式仍
+明确拒绝。具体模型与实际生成 factory、ARM 镜像分别验证；源码存在不建立全模式
+通过、软件候选或物理 HIL。

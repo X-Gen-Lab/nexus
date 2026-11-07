@@ -1,0 +1,23 @@
+schema = 2
+board = "stm32f407ve_sky_qingchun"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[uart.link0]
+binding = "uart1"
+mode = "irq-byte-event"
+baud = 115200
+
+[uart.link0.rx]
+format = "events"
+capacity = 32
+
+[uart.link0.irq]
+priority = 5

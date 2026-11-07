@@ -86,8 +86,10 @@ class EthernetFramesConfiguration(unittest.TestCase):
                 self.assertIn(f'static const nx_{prefix}_eth_frames_cold_config_t',
                               source)
                 self.assertIn('.clock_domain = 1u', source)
-                self.assertIn(f'nx_{prefix}_eth_resources_capture('
-                              '&s_nx_eth_resources, true)', source)
+                self.assertIn('.ethernet = &s_nx_eth_resources,', source)
+                self.assertIn(f'.ethernet_capture = '
+                              f'nx_{prefix}_eth_resources_capture,', source)
+                self.assertIn('.ethernet_frames = true', source)
                 self.assertNotIn(f'nx_{prefix}_eth_frames_initialize(', source)
                 self.assertNotIn('s_nx_port_mac.rx_epoch', source)
                 self.assertNotIn('s_nx_port_mac.clock_epoch', source)

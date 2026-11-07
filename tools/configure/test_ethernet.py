@@ -78,19 +78,16 @@ class EthernetConfigurationTests(unittest.TestCase):
             with self.subTest(after=after), self.assertRaisesRegex(ValueError, "Ethernet"):
                 gate.resolve_ir(self.assembly(change=lambda text: text.replace(before, after)), test_support=native_fixture(self.assembly(change=lambda text: text.replace(before, after))))
 
-    def test_failed_mac_cold_is_counted_before_typed_prepare_and_close(self):
+    def test_failed_mac_cold_retains_typed_prepare_and_close_responsibility(self):
         output = self.root / "generated"
         gate.configure(self.assembly(), output, test_support=native_fixture(self.assembly()))
         source = (output / "bindings.c").read_text()
-        start = source.index("nx_platform_start_result_t nx_platform_start")
-        prepare = source.index("result.primary = nx_stm32_eth_cold_prepare(", start)
-        self.assertLess(source.index("s_nx_platform_initialized = 1u;", start),
-                        prepare)
-        self.assertIn("&s_nx_port_mac, &s_nx_eth_config_mac, "
-                      "&s_nx_eth_receipt_mac", source[prepare:])
-        close = source.index("nx_stm32_eth_cold_close(")
-        resources = source.index("nx_stm32_eth_resources_close(", close)
-        self.assertLess(close, resources)
+        self.assertIn("(nx_lifecycle_acquisition_t){ "
+                      "nx_stm32_eth_cold_prepare(&s_nx_port_mac, "
+                      "&s_nx_eth_config_mac, &s_nx_eth_receipt_mac), true }",
+                      source)
+        self.assertIn("nx_stm32_eth_cold_close(", source)
+        self.assertIn(".ethernet_close = nx_stm32_eth_resources_close,", source)
         self.assertIn("static const nx_stm32_eth_cold_config_t", source)
         self.assertNotIn("nx_stm32_eth_initialize(", source)
         self.assertNotIn("nx_stm32_pin_restore(", source)

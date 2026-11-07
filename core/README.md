@@ -1,7 +1,7 @@
 # Core：请求、时间与生命周期合同
 
 Core 提供调用者持有存储的 C11 请求准入、完成状态、稳定控制身份、单调绝对
-截止时间和可选观察。公共头在 `include/nexus/core/`，实现在 `src/`。
+截止时间、可选观察和整平台冷态协调。公共头在 `include/nexus/core/`，实现在 `src/`。
 它不依赖设备、Arch、OS 或厂商 SDK，没有堆、全局注册表或隐藏执行线程。
 I/O 具体实现、责任者和等待适配在这些基础合同上组合具体行为。
 
@@ -19,12 +19,14 @@ I/O 具体实现、责任者和等待适配在这些基础合同上组合具体�
 | `src/stack_observation.c` | 已静止栈的有界只读观察 |
 | `src/silicon.c` | 获取 I/O 资源前的精确硅版本准入 |
 | `src/lifecycle.c`、`include/nexus/core/lifecycle.h` | 静态资源取得与逆序释放，保留失败后的清理责任 |
+| `src/platform_lifecycle.c`、`include/nexus/core/platform_lifecycle.h` | System、共享资源与物理 controller 的整平台启动、停止及调用期诊断 |
 
 ## 静态冷态资源事务
 
 `nx_lifecycle_plan_t` 显式连接只读表、上下文检查和每项的 `ops/state/config`。
 `nx_lifecycle_state_t` 由调用者提供并首次清零。它只负责启动／停止，正常
-I/O 调用直接使用设备接口。既有平台装配尚未全部改用该引擎。
+I/O 调用直接使用设备接口。它是可选资源事务工具，默认整平台启动使用下节的
+独立协调器，不要求所有驱动改接这组资源 ops。
 
 启动先检查完整表和执行上下文，再完成所有 `admit`，之后才依次 `acquire`。
 `admit` 不写硬件、不保留引用。成功项必须按相反顺序 `release`；取得失败项
@@ -49,6 +51,37 @@ pre-C 永久 SRAM、不可逆 watchdog 和 RTC／备份域责任不能直接放�
 
 `tests/google/static_lifecycle_test.cpp` 使用 GoogleTest／GoogleMock 检查准入、
 顺序、部分失败、责任保留、逆序重试、重复调用和独立实例。
+
+## 整平台冷态协调
+
+`nx_platform_lifecycle_plan_t` 连接只读回调和物理 controller 顺序，
+`nx_platform_lifecycle_state_t` 由调用者首次清零并独占。默认生成代码只保留静态
+连接、按索引选择的固定 typed call，以及公共 start／stop／diagnosed 薄入口；
+`nx_platform_lifecycle_start/stop` 在手写 C 中维护执行顺序与失败状态。
+
+启动先检查上下文，再完成全部 controller 准入，之后依次取得 System、共享资源和
+各物理 controller。System 启动单独返回 primary、cleanup 和 remaining effects；
+controller 取得失败通过 retained 标志报告是否仍有责任。整平台引擎不复制具体驱动的
+收条，也不猜测硬件是否已恢复。共享 PWM 按一个物理 controller 参与，而非每个 face
+重复取得。remaining effects 表示仍保留的效果，不是本次调用新增效果的计数。System
+的原有责任位始终保留；pre-C 永久责任另按既有 ABI 合并 bit 0，因此掩码数值可能变化。
+
+撤回按逆序释放 controller，在首个拒绝处停止，保留剩余前缀、System 与同一 plan。
+再次 stop 不重复已经释放的后续项；controller 清理完成后才撤共享资源与 System。
+即使尚未启动 controller，也检查永久资源 guard。pre-C SRAM、已启 IWDG 和保留 RTC
+由各自 C owner 处理，不能套用可撤销资源循环。
+
+`nx_platform_diagnostic_t` 是可选调用期输出，指针不被保留。位置使用 resolved
+controller 顺序中的 ordinal；共享物理 owner 使用首个成员的 ordinal，可能跳号，
+不是引擎物理步骤序号或 typed factory ID；无 controller 时为 `SIZE_MAX`。
+primary 和 cleanup 的 phase／位置独立，成功清空诊断。同步回调重入返回 BUSY，不改
+调用者诊断；该保护不是任务锁。调用者仍须串行执行，并先等待退出借用者与直接使用者。
+
+每个平台持有一份协调状态；具体收条仍由原驱动持有，没有每 controller 新增的可变
+协调记录。实际 ARM 布局与链接成本按所选 ABI 和装配测量，不能据此声明零 RAM 或
+更快的 I/O。该机制不分配内存、不查找设备、不启动 scheduler，也不转发正常 I/O。
+`tests/google/platform_lifecycle_test.cpp` 验证真实 C 的顺序、失败、重试和诊断；
+模型、ARM 产物与物理 HIL 各自提供对应范围的证据。
 
 ## 请求、唯一执行者与回收
 

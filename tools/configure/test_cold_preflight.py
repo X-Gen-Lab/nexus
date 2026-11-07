@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 from tools.configure.tests.assembly_fixture import render_toml
-from tools.configure import bindings, configure as gate, preflight
+from tools.configure import bindings, configure as gate
 
 
 class AdmissionInput(dict):
@@ -39,38 +39,35 @@ class ColdPreflightGenerationTests(unittest.TestCase):
 
     def start(self, relative):
         result = gate.resolve_ir(gate.ROOT / relative, test_support=native_fixture(gate.ROOT / relative))
-        source = bindings.emit(result)[1]
-        return source[source.index("nx_platform_start_result_t "
-                                   "nx_platform_start(void)"):]
+        return bindings.emit(result)[1]
 
-    def test_each_physical_family_preflights_before_clock_start(self):
-        for relative, preflight, start in (("tools/configure/assemblies/qiming-baremetal-empty.toml",
-                 "nx_stm32_system_preflight", "nx_stm32_system_start"),):
+    def test_each_physical_family_connects_its_concrete_c_system_owner(self):
+        for relative in (
+                "tools/configure/assemblies/qiming-baremetal-empty.toml",):
             with self.subTest(relative=relative):
                 source = self.start(relative)
-                self.assertIn(preflight, source)
-                self.assertLess(source.index(preflight), source.index(start))
-                rejection = source.index("if (result.primary != NX_SUCCESS)",
-                                         source.index(preflight))
-                self.assertLess(rejection, source.index(start))
+                self.assertIn(".system = &g_nx_stm32_system", source)
+                self.assertIn(".system_start = nx_platform_system_start,", source)
+                self.assertIn("nx_stm32f4_platform_system_start(", source)
+                self.assertNotIn("nx_stm32_system_preflight(", source)
+                self.assertNotIn("nx_stm32_system_start(", source)
 
-    def test_selected_uart_spi_dma_and_irq_checks_precede_global_clock(self):
-        for relative, uart, spi, dma, vector, start in (("tests/contracts/stm32_assembly/ve-dma.toml",
+    def test_selected_uart_spi_dma_and_irq_facts_connect_to_c_preflight(self):
+        for relative, uart, spi, dma, vector in (("tests/contracts/stm32_assembly/ve-dma.toml",
                  "RCC_APB2ENR_USART1EN", "RCC_APB2ENR_SPI1EN",
-                 "DMA2_Stream7->CR", "USART1_IRQn", "nx_stm32_system_start"),):
+                 "DMA2_Stream7", "USART1_IRQn"),):
             with self.subTest(relative=relative):
                 source = self.start(relative)
-                boundary = source.index(start)
                 from tools.configure.stm32f4.preflight import admission_declarations
                 result = gate.resolve_ir(gate.ROOT / relative, test_support=native_fixture(gate.ROOT / relative))
                 data = "\n".join(admission_declarations(result, "NULL", 0))
-                for identifier in (uart, spi, dma.removesuffix("->CR"), vector):
+                for identifier in (uart, spi, dma, vector):
                     self.assertIn(identifier, data)
-                self.assertIn("nx_stm32_platform_selected_preflight", source[:boundary])
+                self.assertIn(".selected = &s_nx_platform_config", source)
+                self.assertIn("nx_stm32f4_platform_system_start(", source)
                 for observation in ("NVIC->ISER", "NVIC->ISPR", "NVIC->IABR", "->CR"):
                     self.assertNotIn(observation, data)
-                self.assertNotIn("NX_PLATFORM_REGISTER_WRITE",
-                                 source[:boundary])
+                self.assertNotIn("NX_PLATFORM_REGISTER_WRITE", source)
 
     def test_empty_selection_does_not_probe_unselected_external_devices(self):
         for relative in ("tools/configure/assemblies/qiming-baremetal-empty.toml",):

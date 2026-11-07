@@ -60,24 +60,21 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
         self.assertNotIn("static nx_timer_capture_event_t", source)
         self.assertNotIn("malloc", source)
 
-    def test_selected_timer_owner_is_privileged_before_system_start_or_cleanup(self):
+    def test_selected_timer_owner_has_a_privileged_context_connection(self):
         for label in ('stm32-zg',):
             with self.subTest(label=label):
                 output = self.directory / label
                 gate.configure(self.assembly(label), output, test_support=native_fixture(self.assembly(label)))
                 source = (output / "bindings.c").read_text()
-                stop = source.split("nx_result_t nx_platform_stop(void) {", 1)[1]
-                stop = stop.split("nx_platform_start_result_t nx_platform_start", 1)[0]
-                start = source.split("nx_platform_start_result_t nx_platform_start(void) {", 1)[1]
-                self.assertIn("!nx_arch_is_privileged()", stop)
-                self.assertIn("!nx_arch_is_privileged()", start)
-                close = "nx_stm32_advanced_cold_close("
-                self.assertIn(close, stop)
-                self.assertLess(stop.index("!nx_arch_is_privileged()"),
-                                stop.index(close))
-                system = "nx_stm32_system_start("
-                self.assertLess(start.index("!nx_arch_is_privileged()"),
-                                start.index(system))
+                context = source.split(
+                    "nx_platform_context_check(void) {", 1)[1].split("}", 1)[0]
+                for check in ("!nx_arch_is_privileged()", "nx_arch_in_isr()",
+                              "nx_arch_irq_is_masked()"):
+                    self.assertIn(check, context)
+                self.assertIn(".context_check = nx_platform_context_check,", source)
+                self.assertIn(".release = nx_platform_release,", source)
+                self.assertIn("nx_stm32_advanced_cold_close(", source)
+                self.assertIn("nx_stm32f4_platform_system_start(", source)
 
     def test_non_exact_divider_filter_edge_and_period_reject(self):
         for old, new in (("tick_hz=1000000", "tick_hz=999999"),

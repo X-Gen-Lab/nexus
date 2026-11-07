@@ -119,6 +119,19 @@ nexus_google_test(nexus_core_lifecycle_test SOURCES core_lifecycle_test.cpp
     LIBRARIES Nexus::Core)
 nexus_google_test(nexus_static_lifecycle_test SOURCES static_lifecycle_test.cpp
     LIBRARIES Nexus::Core)
+nexus_google_test(nexus_platform_lifecycle_test SOURCES platform_lifecycle_test.cpp
+    LIBRARIES Nexus::Core)
+nexus_google_test(nexus_stm32_platform_coordinator_test STM32F4_LL
+    SOURCES stm32_platform_coordinator_test.cpp
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
+    LIBRARIES Nexus::IO
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
+        "${NEXUS_SOURCE_DIR}/arch/include")
+target_include_directories(nexus_stm32_platform_coordinator_test SYSTEM PRIVATE
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+target_compile_definitions(nexus_stm32_platform_coordinator_test PRIVATE
+    STM32F407xx)
 nexus_google_test(nexus_spi_dma_transaction_test
     SOURCES spi_dma_transaction_test.cpp
     LIBRARIES Nexus::NativeModel Nexus::Arch

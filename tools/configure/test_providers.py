@@ -61,11 +61,11 @@ class ProviderContractTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, "topology"):
                         provider.validate_dma_resource(invalid)
         with self.assertRaisesRegex(ValueError, "topology"):
-            maintained("native", test_support=("native" == "native")).validate_dma_resource("dma:DMA1:stream0")
+            maintained("native", test_support=True).validate_dma_resource("dma:DMA1:stream0")
 
     def test_physical_dma_controller_names_follow_f4_topology(self):
         from tools.configure.providers import maintained
-        stm = maintained("stm32f4", test_support=("stm32f4" == "native"))
+        stm = maintained("stm32f4", test_support=False)
         stm.validate_dma_resource("dma:DMA2:stream7:channel4")
         with self.assertRaisesRegex(ValueError, "topology"):
             stm.validate_dma_resource("dma:DMA0:stream0:channel0")
@@ -146,7 +146,7 @@ class ProviderContractTests(unittest.TestCase):
                 with self.assertRaises(TypeError):
                     provider.CPU_ABI["arch"] = "other"
         with self.assertRaisesRegex(ValueError, "Unmaintained SoC integration descriptor"):
-            maintained("future", test_support=("future" == "native"))
+            maintained("future", test_support=False)
 
     def test_facts_cannot_advertise_an_unimplemented_mode(self):
         from tools.configure.providers import maintained

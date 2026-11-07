@@ -42,10 +42,14 @@ only selected HAL modules and required dependencies, with a consistent private
 configuration and callback ABI. Do not enable every module or modify vendor
 files. All other inventoried vendor sources remain retained and unselected.
 
-Current host generation remains centralized Python. Board and SoC trees no
-longer contain executable Python plugins. Moving remaining generated lifecycle
-control into handwritten C and introducing Host C11 tooling are pending work;
-translating strings into `fprintf()` would not fix the responsibility boundary.
+Default host generation remains centralized Python; Board and SoC trees contain
+no Python plugins. The generator emits static configuration and fixed typed
+connections. Core's C platform lifecycle engine owns startup, stop, rollback and
+diagnostics; F4's `platform_coordinator.c` owns System and shared-resource
+sequencing with the concrete owners' original receipts. The Host C11 tool is an
+optional host pilot, not a prerequisite for firmware behavior in C or delivery.
+Generated factories, C models, linked ARM images and physical behavior retain
+their separate validation boundaries.
 
 ## Selected F407 HAL UART transport
 

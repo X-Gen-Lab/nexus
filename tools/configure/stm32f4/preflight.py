@@ -5,9 +5,6 @@ from tools.configure.providers import hardware
 from tools.configure.providers.common import fail, owned_claims
 
 
-PREFLIGHT_CALL = 'nx_stm32_system_preflight(&g_nx_stm32_system)'
-
-
 def _clock(controller):
     """Name a maintained exclusive gate, not an inferred silicon topology."""
     if controller.startswith(('USART', 'UART', 'SPI', 'I2C')):
@@ -82,13 +79,3 @@ def admission_declarations(result, pins, pin_count):
         source.append('        ' + (' | '.join(terms) if terms else '0u') + ',')
     source += ['    },', f'    .exti_lines = {exti}u', '};']
     return source
-
-
-def selected_preflight(result, *, dma_conditions=None):
-    """Connect the reviewed immutable facts to the concrete C observer."""
-    del dma_conditions
-    from tools.configure.gpio_phase import selected_pins
-    if not selected_pins(result):
-        return []
-    return ['    result.primary = nx_stm32_platform_selected_preflight(&s_nx_platform_config);',
-            '    if (result.primary != NX_SUCCESS) { return result; }']

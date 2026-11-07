@@ -58,13 +58,9 @@ class ConstructionContractTests(unittest.TestCase):
                     self.assertIn(
                         f"static {construction.state_type} "
                         f"s_nx_port_{name};", source)
-                    before = source.index(
-                        f"s_nx_platform_initialized = "
-                        f"{result.controllers.index(item) + 1}u;",
-                        source.index("nx_platform_start(void)"))
-                    initialize = source.index(
-                        "result.primary = " + construction.initialize.render())
-                    self.assertLess(before, initialize)
+                    self.assertIn(
+                        "(nx_lifecycle_acquisition_t){ " +
+                        construction.initialize.render() + ", true }", source)
 
     def test_storage_type_is_provider_owned_without_prefix_inference(self):
         result = self.resolve("tests/support/native/assemblies/native-gpio.toml")
@@ -77,9 +73,6 @@ class ConstructionContractTests(unittest.TestCase):
             state_declarations=provider.state_declarations,
             instance_declarations=provider.instance_declarations,
             operations=provider.operations, shared_irqs=provider.shared_irqs,
-            stop_system=provider.stop_system,
-            start_system=provider.start_system,
-            start_resources=provider.start_resources,
             constructor=lambda *args: construction)
         with patch.object(bindings, "for_selection", return_value=explicit):
             source = bindings.emit(result)[1]
@@ -97,14 +90,10 @@ class ConstructionContractTests(unittest.TestCase):
                 with patch.object(provider, "constructor",
                                   return_value=construction):
                     source = bindings.emit(result)[1]
-                start = source[source.index("nx_platform_start(void)"):]
-                initialize = start.index(
-                    "result.primary = " + construction.initialize.render())
-                self.assertEqual("s_nx_platform_initialized = 1u;" in
-                                 start[:initialize], retained)
-                self.assertIn("result.cleanup = "
-                              "nx_platform_stop_impl(diagnostic, true);",
-                              start[initialize:])
+                self.assertIn("(nx_lifecycle_acquisition_t){ " +
+                              construction.initialize.render() + ", " +
+                              str(retained).lower() + " }", source)
+                self.assertIn(".acquire = nx_platform_acquire", source)
 
     def test_snapshot_storage_is_copied_and_readonly(self):
         result = self.resolve(
@@ -137,8 +126,7 @@ class ConstructionContractTests(unittest.TestCase):
         with patch.object(provider, "constructor", return_value=selected):
             source = bindings.emit(result)[1]
         self.assertIn("s_nx_port_led0 = NX_TEST_PERMANENT_STATE;", source)
-        self.assertIn("result.remaining_effects |= 1u;", source)
-        self.assertIn("NX_SUCCESS, NX_SUCCESS, 1u", source)
+        self.assertIn(".permanent_effects = true", source)
         for invalid in ("{ .boot_owned = true }", {}, 1, True):
             with self.subTest(initial=invalid), self.assertRaises(ValueError):
                 replace(original, initial_state=invalid)
@@ -168,16 +156,13 @@ class ConstructionContractTests(unittest.TestCase):
                               retain_on_failed_init=True)
         with patch.object(provider, "constructor", return_value=constructed):
             source = bindings.emit(result)[1]
-        start = source[source.index(
-            "static nx_platform_start_result_t nx_platform_start_impl("
-            "nx_platform_diagnostic_t* diagnostic) {"):]
-        admitted = start.index("result.primary = " + check.render())
-        self.assertLess(start.index("if (s_nx_platform_started)"), admitted)
-        self.assertLess(admitted, start.index("s_nx_platform_started = true;"))
-        self.assertLess(admitted, start.index("s_nx_platform_initialized = 1u;"))
-        initialized = start.index("result.primary = " + original.initialize.render())
-        self.assertLess(admitted, initialized)
-        self.assertNotIn("nx_platform_stop_impl", start[admitted:initialized])
+        start = source[source.index("nx_platform_admit(size_t index)"):
+                       source.index("nx_platform_acquire(size_t index)")]
+        self.assertIn("case 0u:", start)
+        self.assertIn("return " + check.render() + ";", start)
+        self.assertIn(".admit = nx_platform_admit", source)
+        self.assertNotIn(original.initialize.render(), start)
+        self.assertNotIn("nx_platform_lifecycle_stop", start)
 
 
 

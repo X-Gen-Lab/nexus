@@ -32,6 +32,8 @@ DESCRIPTOR = FamilyDescriptor(
         "soc/stm32/stm32f4/drivers/i2c_cold.c",
         "soc/stm32/stm32f4/drivers/platform_cold.c",
         "soc/stm32/stm32f4/drivers/platform_lifecycle.c",
+        "soc/stm32/stm32f4/drivers/platform_coordinator.c",
+        "soc/stm32/stm32f4/private/stm32f4_platform_lifecycle.h",
         "soc/stm32/stm32f4/drivers/system_lifecycle.c",
         "soc/stm32/stm32f4/drivers/lifecycle_pins.c",
         "soc/stm32/stm32f4/drivers/lifecycle_gpio.c",

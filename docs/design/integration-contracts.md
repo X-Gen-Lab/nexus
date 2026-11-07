@@ -55,7 +55,10 @@ Board／SoC 不放 Python 插件；当前 F4 配置适配集中在 `tools/config
 通用 schema、resolver、typed IR 与原子输出仍由公共工具维护。Native 仅在
 `tests/support/native/`，必须显式启用测试 scope；不会进入生产支持枚举。
 CPU 实现按 ISA 位于 `arch/arm/cortex_m/` 或 `arch/native/`，公共头路径保持稳定。
-完整静态 C 生命周期与 Host C11 工具迁移是后续目标，不能用目录调整宣布完成。
+默认生成入口连接 Core 的手写 C 整平台生命周期和 F4 的 System／共享资源 C 协调器。
+主机保留事实校验与静态连接，不维护硬件算法或启动／撤回控制流。Host C11 是独立
+可选试点，其全面替换不作为固件 C 化或交付前置。实际生成 factory、C 模型与 ARM
+镜像分别验收，不能用目录调整或源码存在宣布整条链路通过。
 
 ## 4. 解析、生成与 CMake 装配
 
