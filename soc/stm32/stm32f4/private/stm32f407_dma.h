@@ -57,7 +57,6 @@ typedef struct {
     const nx_dma_memory_region_t* regions;
     size_t region_count;
     nx_spi_request_t* active;
-    nx_stm32_spi_dma_endpoint_state_t* endpoint;
     const nx_irq_wake_t* wake;
     nx_time_us_t drain_deadline;
     nx_result_t terminal;

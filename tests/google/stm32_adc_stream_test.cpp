@@ -21,10 +21,15 @@ extern "C" {
 #undef nx_arch_dsb
 static ADC_TypeDef* s_power_adc;
 static bool s_delay_power_store;
+static bool s_refuse_power_enable;
+static nx_time_us_t s_first_start;
 
 /** \brief Complete the modeled APB power store before the warmup timestamp. */
 extern "C" void nx_stm32_adc_model_barrier(void) {
     nx_arch_dsb();
+    if (s_refuse_power_enable && s_power_adc != nullptr) {
+        s_power_adc->CR2 &= ~static_cast<uint32_t>(ADC_CR2_ADON);
+    }
     if (s_delay_power_store && s_power_adc != nullptr &&
         (s_power_adc->CR2 & ADC_CR2_ADON) != 0U) {
         (void)nx_native_clock_advance(5U);
@@ -40,6 +45,9 @@ extern "C" void nx_stm32_adc_model_poll(unsigned kind, void* raw) {
     EXPECT_EQ(kind, 5U);
     auto* state = static_cast<nx_stm32_adc_state_t*>(raw);
     ADC_TypeDef* adc = state->registers;
+    if ((adc->CR2 & ADC_CR2_SWSTART) != 0U && s_first_start == 0U) {
+        s_first_start = nx_time_now_us();
+    }
     (void)nx_native_clock_advance(1U);
     if ((adc->CR2 & ADC_CR2_SWSTART) != 0U) {
         unsigned rank =
@@ -134,9 +142,12 @@ class Stm32AdcStream : public testing::Test {
         s_error_ack = false;
         s_target_dma = &dma;
         s_delay_power_store = false;
+        s_refuse_power_enable = false;
+        s_first_start = 0U;
         s_power_adc = &adc;
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         state.adc.registers = &adc;
+        common.CCR = ADC_CCR_ADCPRE_0;
         state.adc.common = &common;
         state.adc.channels = channels;
         state.adc.sample_times = sample_times;
@@ -157,6 +168,32 @@ class Stm32AdcStream : public testing::Test {
         ASSERT_EQ(nx_stm32_adc_stream_initialize(&state), NX_SUCCESS);
     }
 };
+
+TEST_F(Stm32AdcStream, SoftwareShotWarmupStartsAfterThePowerStoreBarrier) {
+    s_delay_power_store = true;
+    uint16_t output[2]{};
+    size_t count{};
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_sample(&port, output, 2U, 1000U, &count));
+    EXPECT_GE(s_first_start, 108U);
+    EXPECT_FALSE(s_delay_power_store);
+    EXPECT_EQ(2U, count);
+}
+
+TEST_F(Stm32AdcStream, SoftwareShotRequiresAnObservedEnableBeforeConversion) {
+    s_refuse_power_enable = true;
+    uint16_t output[2]{0xBEEFU, 0xCAFEU};
+    size_t count{};
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_adc_port_sample(&port, output, 2U, 1000U, &count));
+    EXPECT_EQ(0U, count);
+    EXPECT_EQ(0xBEEFU, output[0]);
+    EXPECT_EQ(0xCAFEU, output[1]);
+    EXPECT_EQ(0U, s_first_start);
+    EXPECT_FALSE(state.adc.active);
+    s_refuse_power_enable = false;
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_sample(&port, output, 2U, 1000U, &count));
+    EXPECT_EQ(2U, count);
+}
 
 TEST_F(Stm32AdcStream, ExternalScanSamplesAllSixteenRanksInAuthoredOrder) {
     const uint8_t ranks[]{15U, 14U, 13U, 12U, 11U, 10U, 9U, 8U,
@@ -497,9 +534,12 @@ class Stm32AdcContinuous : public testing::Test {
         s_error_ack = false;
         s_target_dma = &dma;
         s_delay_power_store = false;
+        s_refuse_power_enable = false;
+        s_first_start = 0U;
         s_power_adc = &adc;
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         state.base.adc.registers = &adc;
+        common.CCR = ADC_CCR_ADCPRE_0;
         state.base.adc.common = &common;
         state.base.adc.channels = channels;
         state.base.adc.sample_times = sample_times;

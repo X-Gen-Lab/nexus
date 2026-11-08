@@ -279,8 +279,8 @@ TEST_F(ControlFactory, RejectedForeignControllerCannotBeStoppedOrReleased) {
     state.channel_count = 1U;
     state.reference_mv = 3300U;
     state.initialized = true;
-    const nx_stm32_adc_config_t config = {channels, sample_times, 1U, 3300U,
-                                          0U};
+    const nx_stm32_adc_config_t config = {channels, sample_times, 1U,
+                                          3300U,    0U,           ADC1};
 #endif
     const auto original = state;
     const auto* bytes = static_cast<const uint8_t*>(mmio);

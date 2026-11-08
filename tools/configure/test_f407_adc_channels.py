@@ -11,9 +11,12 @@ from tools.configure.stm32f4 import contract
 class F407AdcChannelTests(unittest.TestCase):
     PINS = tuple([f"PA{i}" for i in range(8)] + ["PB0", "PB1"] +
                  [f"PC{i}" for i in range(6)])
+    ADC3_PINS = ("PA0", "PA1", "PA2", "PA3", "PF6", "PF7", "PF8", "PF9",
+                 "PF10", "PF3", "PC0", "PC1", "PC2", "PC3", "PF4", "PF5")
 
-    def selection(self, pins, channels, samples=None, mode="low-rate-scan"):
-        route = {"controller": "ADC1", "kind": "adc",
+    def selection(self, pins, channels, samples=None, mode="low-rate-scan",
+                  controller="ADC1"):
+        route = {"controller": controller, "kind": "adc",
                  "pins": [{"pin": pin} for pin in pins]}
         selected = {"mode": mode, "channels": list(channels),
                     "sample_times": list(samples or [7] * len(channels)),
@@ -27,6 +30,25 @@ class F407AdcChannelTests(unittest.TestCase):
                                                   mode="single-shot")
                 adc.validate_selection(selected, route, contract)
                 contract.validate_selection(selected, route)
+
+    def test_adc2_and_adc3_use_their_own_reviewed_channel_maps(self):
+        for controller, pins in (("ADC2", self.PINS), ("ADC3", self.ADC3_PINS)):
+            for channel, pin in enumerate(pins):
+                with self.subTest(controller=controller, channel=channel):
+                    selected, route = self.selection(
+                        [pin], [channel], mode="single-shot",
+                        controller=controller)
+                    adc.validate_selection(selected, route, contract)
+                    contract.validate_selection(selected, route)
+
+    def test_adc3_never_reuses_the_adc12_upper_channel_map(self):
+        for channel in (4, 8, 9, 14, 15):
+            with self.subTest(channel=channel):
+                selected, route = self.selection(
+                    [self.PINS[channel]], [channel], mode="single-shot",
+                    controller="ADC3")
+                with self.assertRaises(ValueError):
+                    adc.validate_selection(selected, route, contract)
 
     def test_scan_order_and_consistent_repeated_ranks_remain_explicit(self):
         for pins, channels in ((self.PINS, list(reversed(range(16)))),
@@ -136,6 +158,45 @@ class F407AdcChannelTests(unittest.TestCase):
             self.assertIn(".channel_count = 7u", generated)
             self.assertIn(".pin_count = 6u", generated)
             self.assertEqual(len(result.routes["adc1-scan-external16"]["pins"]), 16)
+
+
+    def test_independent_factories_select_three_distinct_controllers(self):
+        fixture = gate.ROOT / "tests/contracts/adc_external_assembly"
+        for density in ("ve", "zg"):
+            with self.subTest(density=density):
+                result = gate.resolve_ir(fixture / f"{density}-independent.toml")
+                self.assertEqual([item.controller for item in result.controllers],
+                                 ["ADC1", "ADC2", "ADC3"])
+                self.assertEqual([item.options.resolution_bits
+                                  for item in result.controllers], [12, 10, 6])
+                source = bindings.emit(result)[1]
+                for controller in ("ADC1", "ADC2", "ADC3"):
+                    self.assertIn(f".registers = {controller}", source)
+                    self.assertNotIn(controller + "->", source)
+                self.assertEqual({claim.key for claim in result.resource_plan.claims
+                                  if claim.owner in {"a", "b", "c"}
+                                  and claim.key.startswith("pin:")},
+                                 {"pin:PA4", "pin:PB0",
+                                  "pin:PC0" if density == "ve" else "pin:PF6"})
+                self.assertFalse(any(claim.key.startswith("dma:")
+                                     for claim in result.resource_plan.claims))
+
+    def test_adc3_pf_input_requires_the_bonded_package(self):
+        fixture = gate.ROOT / "tests/contracts/adc_external_assembly"
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            board = gate.load(fixture / "zg_board/board.json")
+            assembly = directory / "assembly.toml"
+            assembly.write_text((fixture / "zg-independent.toml").read_text().replace(
+                'board_package = "zg_board"', 'board_package = "."'))
+            board["soc"] = "STM32F407VET6"
+            (directory / "board.json").write_text(json.dumps(board))
+            with self.assertRaises(ValueError):
+                gate.resolve_ir(assembly)
+            board["soc"] = "STM32F407ZGT6"
+            (directory / "board.json").write_text(json.dumps(board))
+            result = gate.resolve_ir(assembly)
+            self.assertEqual(result.controllers[2].pins[0]["pin"], "PF6")
 
 
 if __name__ == "__main__":

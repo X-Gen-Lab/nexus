@@ -328,3 +328,12 @@ extern "C" void nx_static_lifecycle_write(volatile uint32_t* address,
     }
     *address = value;
 }
+
+/** \brief Hardware latches pending GPIO writes before readback/capture. */
+extern "C" void nx_static_lifecycle_observe(void) {
+    for (unsigned bank = 0U; bank < 9U; ++bank) {
+        auto* gpio = reinterpret_cast<GPIO_TypeDef*>(UINT32_C(0x40020000) +
+                                                     bank * 0x400U);
+        (void)nx_stm32_spi_cs_model_read(&gpio->ODR, &gpio->BSRR);
+    }
+}

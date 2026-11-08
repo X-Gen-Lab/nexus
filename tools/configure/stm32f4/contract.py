@@ -129,6 +129,9 @@ def validate_selection(selection, route):
     elif kind == "block":
         from .block import validate
         validate(selection)
+    elif kind == "adc" and common.mode_traits(kind, selection["mode"]).dma:
+        if route["controller"] != "ADC1":
+            common.fail("ADC DMA requires the reviewed ADC1/TIM3 path")
     elif kind == "uart":
         common.integer(selection["baud"], *LIMITS["uart_baud"], "UART baud")
     elif kind == "pwm":

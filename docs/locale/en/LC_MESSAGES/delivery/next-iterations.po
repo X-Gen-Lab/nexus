@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: f66f42e646d003529704e08dded90008ecd7f9c7d48be907a2ae444530f85fa7\n"
+"X-Nexus-Source-SHA256: 0061d1c4be670dd07a910e347b7aef83f1090376e4dfe1d5dc5d7b1e21788974\n"
 
 #: docs/delivery/next-iterations.md:8
 msgid "F4 收敛后的迭代边界"
@@ -277,10 +277,9 @@ msgstr ""
 "ADC1--3 channels, regular and injected groups, resolutions, internal "
 "inputs, analog watchdogs, multi-ADC and triggered DMA"
 
-msgid "已扩展 ADC1 外部输入与 6／8／10／12 位；完整工作包未完成"
-msgstr ""
-"ADC1 external inputs and 6/8/10/12-bit resolution extended; the full "
-"work package remains incomplete"
+#: ../../../../docs/delivery/next-iterations.md:0
+msgid "已有三个独立 ADC 的外部 shot／scan 与 6／8／10／12 位、共享时钟观察和独立失败清理；DMA 仍只开放 ADC1；完整工作包未完成"
+msgstr "Independent ADC1/2/3 external software shots/scans at 6/8/10/12 bits, shared-clock observation and independent failure cleanup are implemented. DMA remains limited to ADC1; the full work package is incomplete."
 
 msgid "F4-13"
 msgstr "F4-13"
@@ -290,8 +289,8 @@ msgstr ""
 "Dual DAC channels, CPU/trigger/DMA, waveform output and underrun "
 "handling; define formats, stopped output levels and recovery"
 
-msgid "待实现"
-msgstr "Implementation pending"
+msgid "CPU、软件／独占 TIM6／7 触发、波形、有限／循环 DMA 与欠载恢复已实现；有限尾部允许延长周期，物理未验证"
+msgstr "CPU, software/exclusive TIM6/7 triggers, waveform, finite/circular DMA and underrun recovery implemented; the finite tail can extend a period; physical behavior remains unverified"
 
 msgid "F4-14"
 msgstr "F4-14"
@@ -342,6 +341,9 @@ msgstr ""
 "capture, JPEG byte streams and DMA; verify frame boundaries, frame "
 "loss and stop"
 
+msgid "待实现"
+msgstr "Implementation pending"
+
 msgid "F4-20"
 msgstr "F4-20"
 
@@ -367,6 +369,9 @@ msgid "RNG 健康错误、固定算法 CRC、UID 与器件信息；明确实际�
 msgstr ""
 "RNG health errors, fixed-algorithm CRC, UID and device information; "
 "specify actual capabilities and information usage"
+
+msgid "已有 RNG；新增 CRC-32 字序列及实际芯片信息查询；物理未验证"
+msgstr "Existing RNG plus new CRC-32 word sequences and actual chip information queries; physical behavior remains unverified"
 
 msgid "F4-23"
 msgstr "F4-23"
@@ -482,8 +487,10 @@ msgstr ""
 "exact adaptation. Software-candidate and physical status cannot be "
 "inherited from an older version; unexecuted HIL remains `not_executed`."
 
-msgid "CPU、软件／独占 TIM6／7 触发、波形、有限／循环 DMA 与欠载恢复已实现；有限尾部允许延长周期，物理未验证"
-msgstr "CPU, software/exclusive TIM6/7 triggers, waveform, finite/circular DMA and underrun recovery implemented; the finite tail can extend a period; physical behavior remains unverified"
 
-msgid "已有 RNG；新增 CRC-32 字序列及实际芯片信息查询；物理未验证"
-msgstr "Existing RNG plus new CRC-32 word sequences and actual chip information queries; physical behavior remains unverified"
+#: ../../../../docs/delivery/next-iterations.md:0
+msgid "已有增强 8／16 位事务；CS latch 核验、故障身份、DMA 隔离与关闭重试已实现；完整工作包未完成"
+msgstr ""
+"Enhanced 8/16-bit transactions already exist; checked CS latches, retained "
+"fault identity, DMA quarantine and retryable close are implemented; the full "
+"work package remains incomplete"

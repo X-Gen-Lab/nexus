@@ -32,8 +32,8 @@ typedef struct {
     bool inactive_high;
 } nx_stm32_pwm_config_t;
 
-/** \brief Immutable ADC1 external ranks and nominal reference.
- * \note Channels 0--7 use PA0--7, 8--9 use PB0--1 and 10--15 use PC0--5.
+/** \brief Immutable independent ADC1/2/3 ranks and nominal reference.
+ * \note ADC3 uses its distinct pad map. Board facts authorize bonded pins.
  *       One channel has one sample time even when repeated in the sequence.
  */
 typedef struct {
@@ -43,6 +43,7 @@ typedef struct {
     uint32_t reference_mv;
     uint8_t
         resolution; /**< ADC_CR1 RES encoding, including reset value zero. */
+    ADC_TypeDef* registers;
 } nx_stm32_adc_config_t;
 
 /** \brief Exact ADC1/TIM3/DMA2 stream four selection, without mode dispatch. */
@@ -220,8 +221,37 @@ static inline nx_result_t nx_stm32_pwm_close(nx_stm32_pwm_state_t* port,
     return NX_SUCCESS;
 }
 
-/** \brief Acquire ADC1 and analog pads; typed callers choose the actual engine.
+/** \brief Cold identity selects one gate; no register address is inferred. */
+static inline uint32_t nx_stm32_adc_clock(const ADC_TypeDef* registers) {
+    return registers == ADC1   ? RCC_APB2ENR_ADC1EN
+           : registers == ADC2 ? RCC_APB2ENR_ADC2EN
+           : registers == ADC3 ? RCC_APB2ENR_ADC3EN
+                               : 0U;
+}
+
+/** \brief Configure one reviewed external channel; sequence order is separate.
  */
+static inline nx_result_t nx_stm32_adc_pin(ADC_TypeDef* registers,
+                                           uint8_t channel) {
+    GPIO_TypeDef* gpio;
+    uint8_t pin;
+    if (registers == ADC3) {
+        static const uint8_t pads[16] = {
+            0x00U, 0x01U, 0x02U, 0x03U, 0x56U, 0x57U, 0x58U, 0x59U,
+            0x5AU, 0x53U, 0x20U, 0x21U, 0x22U, 0x23U, 0x54U, 0x55U};
+        uint8_t pad = pads[channel];
+        gpio = pad < 0x20U ? GPIOA : pad < 0x50U ? GPIOC : GPIOF;
+        pin = pad & 15U;
+    } else {
+        gpio = channel < 8U ? GPIOA : channel < 10U ? GPIOB : GPIOC;
+        pin = channel < 8U    ? channel
+              : channel < 10U ? (uint8_t)(channel - 8U)
+                              : (uint8_t)(channel - 10U);
+    }
+    return nx_stm32_pin_configure(gpio, pin, 3U, 0U, 0U, false);
+}
+
+/** \brief Acquire one converter; clock and controller receipts are distinct. */
 static inline nx_result_t
 nx_stm32_adc_cold_begin(nx_stm32_adc_state_t* port,
                         const nx_stm32_adc_config_t* config) {
@@ -230,7 +260,8 @@ nx_stm32_adc_cold_begin(nx_stm32_adc_state_t* port,
     if (port == NULL || config == NULL || config->channels == NULL ||
         config->sample_times == NULL || config->channel_count == 0U ||
         config->channel_count > 16U || config->reference_mv == 0U ||
-        config->reference_mv > 3600U)
+        config->reference_mv > 3600U ||
+        nx_stm32_adc_clock(config->registers) == 0U)
         return NX_ERROR_INVALID;
     if (config->resolution > 3U)
         return NX_ERROR_UNSUPPORTED;
@@ -243,36 +274,34 @@ nx_stm32_adc_cold_begin(nx_stm32_adc_state_t* port,
                 return NX_ERROR_UNSUPPORTED;
         }
     }
+    uint32_t clock = nx_stm32_adc_clock(config->registers);
     if (port->initialized || port->active || port->cold_effects != 0U ||
-        (RCC->APB2ENR & RCC_APB2ENR_ADC1EN) != 0U)
+        (RCC->APB2ENR & clock) != 0U)
         return NX_ERROR_BUSY;
-    port->cold_effects = 1U;
-    NX_PLATFORM_REGISTER_WRITE(RCC->APB2ENR, RCC->APB2ENR | RCC_APB2ENR_ADC1EN);
-    nx_arch_dsb();
-    if ((RCC->APB2ENR & RCC_APB2ENR_ADC1EN) == 0U)
-        return NX_ERROR_IO;
-    if ((ADC1->CR2 & ADC_CR2_ADON) != 0U)
-        return NX_ERROR_BUSY;
-    for (size_t i = 0U; i < config->channel_count; ++i) {
-        uint8_t channel = config->channels[i];
-        GPIO_TypeDef* gpio = channel < 8U    ? GPIOA
-                             : channel < 10U ? GPIOB
-                                             : GPIOC;
-        uint8_t pin = channel < 8U    ? channel
-                      : channel < 10U ? (uint8_t)(channel - 8U)
-                                      : (uint8_t)(channel - 10U);
-        nx_result_t status =
-            nx_stm32_pin_configure(gpio, pin, 3U, 0U, 0U, false);
-        if (status != NX_SUCCESS)
-            return status;
-    }
-    port->registers = ADC1;
+    port->registers = config->registers;
     port->common = ADC;
     port->channels = config->channels;
     port->sample_times = config->sample_times;
     port->channel_count = config->channel_count;
     port->reference_mv = config->reference_mv;
     port->resolution = config->resolution;
+    port->cold_effects = NX_STM32_ADC_CLOCK;
+    NX_PLATFORM_REGISTER_WRITE(RCC->APB2ENR, RCC->APB2ENR | clock);
+    nx_arch_dsb();
+    if ((RCC->APB2ENR & clock) == 0U)
+        return NX_ERROR_IO;
+    if ((port->registers->CR2 & ADC_CR2_ADON) != 0U)
+        return NX_ERROR_BUSY;
+    nx_result_t common = nx_stm32_adc_common_prepare(port);
+    if (common != NX_SUCCESS)
+        return common;
+    port->cold_effects |= NX_STM32_ADC_CONVERTER;
+    for (size_t i = 0U; i < config->channel_count; ++i) {
+        nx_result_t status =
+            nx_stm32_adc_pin(config->registers, config->channels[i]);
+        if (status != NX_SUCCESS)
+            return status;
+    }
     return NX_SUCCESS;
 }
 
@@ -284,33 +313,35 @@ static inline nx_result_t nx_stm32_adc_cold_finish(nx_stm32_adc_state_t* port) {
         return NX_ERROR_INVALID;
     if (port->cold_effects == 0U)
         return port->initialized || port->active ? NX_ERROR_BUSY : NX_SUCCESS;
-    if (port->active)
-        return NX_ERROR_BUSY;
-    if (port->initialized && (RCC->APB2ENR & RCC_APB2ENR_ADC1EN) == 0U)
-        return NX_ERROR_IO;
-    if ((port->cold_effects & 1U) != 0U &&
-        (RCC->APB2ENR & RCC_APB2ENR_ADC1EN) != 0U) {
-        NX_PLATFORM_REGISTER_WRITE(ADC1->CR2, 0U);
-        nx_arch_dsb();
-        if (ADC1->CR2 != 0U)
+    uint32_t clock = nx_stm32_adc_clock(port->registers);
+    if (clock == 0U)
+        return NX_ERROR_INVALID;
+    if ((port->cold_effects & NX_STM32_ADC_CONVERTER) != 0U) {
+        if ((RCC->APB2ENR & clock) == 0U)
             return NX_ERROR_IO;
+        nx_result_t result = nx_stm32_adc_quiesce(port);
+        if (result != NX_SUCCESS)
+            return result;
         port->initialized = false;
+        port->cold_effects &= (uint8_t)~NX_STM32_ADC_CONVERTER;
     }
-    if ((port->cold_effects & 2U) != 0U) {
+    nx_result_t probes = nx_stm32_adc_probe_close(port);
+    if (probes != NX_SUCCESS)
+        return probes;
+    if ((port->cold_effects & NX_STM32_ADC_TIMER) != 0U) {
         NX_PLATFORM_REGISTER_WRITE(
             RCC->APB1ENR, RCC->APB1ENR & ~(uint32_t)RCC_APB1ENR_TIM3EN);
         nx_arch_dsb();
         if ((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) != 0U)
             return NX_ERROR_IO;
-        port->cold_effects &= (uint8_t)~2U;
+        port->cold_effects &= (uint8_t)~NX_STM32_ADC_TIMER;
     }
-    if ((port->cold_effects & 1U) != 0U) {
-        NX_PLATFORM_REGISTER_WRITE(
-            RCC->APB2ENR, RCC->APB2ENR & ~(uint32_t)RCC_APB2ENR_ADC1EN);
+    if ((port->cold_effects & NX_STM32_ADC_CLOCK) != 0U) {
+        NX_PLATFORM_REGISTER_WRITE(RCC->APB2ENR, RCC->APB2ENR & ~clock);
         nx_arch_dsb();
-        if ((RCC->APB2ENR & RCC_APB2ENR_ADC1EN) != 0U)
+        if ((RCC->APB2ENR & clock) != 0U)
             return NX_ERROR_IO;
-        port->cold_effects &= (uint8_t)~1U;
+        port->cold_effects &= (uint8_t)~NX_STM32_ADC_CLOCK;
     }
     return NX_SUCCESS;
 }
@@ -334,13 +365,19 @@ static inline nx_result_t nx_stm32_adc_close(nx_stm32_adc_state_t* port) {
 static inline nx_result_t
 nx_stm32_adc_stream_cold_begin(nx_stm32_adc_stream_state_t* port,
                                const nx_stm32_adc_stream_config_t* config) {
+    if (!nx_stm32_control_cold_context())
+        return NX_ERROR_CONTEXT;
     if (port == NULL || config == NULL || config->regions == NULL ||
         config->region_count == 0U || config->priority > 15U)
         return NX_ERROR_INVALID;
+    if (config->adc.registers != ADC1)
+        return NX_ERROR_UNSUPPORTED;
+    if ((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) != 0U)
+        return NX_ERROR_BUSY;
     nx_result_t result = nx_stm32_adc_cold_begin(&port->adc, &config->adc);
     if (result != NX_SUCCESS)
         return result;
-    port->adc.cold_effects |= 2U;
+    port->adc.cold_effects |= NX_STM32_ADC_TIMER;
     NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR | RCC_APB1ENR_TIM3EN);
     nx_arch_dsb();
     if ((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) == 0U)
@@ -400,7 +437,7 @@ nx_stm32_adc_stream_cold_finish(nx_stm32_adc_stream_state_t* port) {
         return NX_ERROR_CONTEXT;
     if (port == NULL)
         return NX_ERROR_INVALID;
-    if (port->adc.cold_effects != 0U) {
+    if ((port->adc.cold_effects & NX_STM32_ADC_IRQ) != 0U) {
         NVIC_DisableIRQ(DMA2_Stream4_IRQn);
         NVIC_ClearPendingIRQ(DMA2_Stream4_IRQn);
         nx_arch_dsb();
@@ -408,6 +445,7 @@ nx_stm32_adc_stream_cold_finish(nx_stm32_adc_stream_state_t* port) {
             NVIC_GetPendingIRQ(DMA2_Stream4_IRQn) != 0U ||
             NVIC_GetActive(DMA2_Stream4_IRQn) != 0U)
             return NX_ERROR_BUSY;
+        port->adc.cold_effects &= (uint8_t)~NX_STM32_ADC_IRQ;
     }
     return nx_stm32_adc_cold_finish(&port->adc);
 }

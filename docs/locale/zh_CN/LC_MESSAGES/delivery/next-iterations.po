@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: f66f42e646d003529704e08dded90008ecd7f9c7d48be907a2ae444530f85fa7\n"
+"X-Nexus-Source-SHA256: 0061d1c4be670dd07a910e347b7aef83f1090376e4dfe1d5dc5d7b1e21788974\n"
 
 #: docs/delivery/next-iterations.md:8
 msgid "F4 收敛后的迭代边界"
@@ -212,8 +212,9 @@ msgstr "F4-12"
 msgid "ADC1--3 通道、规则与注入组、分辨率、内部输入、模拟看门狗、多 ADC 和触发 DMA"
 msgstr "ADC1--3 通道、规则与注入组、分辨率、内部输入、模拟看门狗、多 ADC 和触发 DMA"
 
-msgid "已扩展 ADC1 外部输入与 6／8／10／12 位；完整工作包未完成"
-msgstr "已扩展 ADC1 外部输入与 6／8／10／12 位；完整工作包未完成"
+#: ../../../../docs/delivery/next-iterations.md:0
+msgid "已有三个独立 ADC 的外部 shot／scan 与 6／8／10／12 位、共享时钟观察和独立失败清理；DMA 仍只开放 ADC1；完整工作包未完成"
+msgstr "已有三个独立 ADC 的外部 shot／scan 与 6／8／10／12 位、共享时钟观察和独立失败清理；DMA 仍只开放 ADC1；完整工作包未完成"
 
 msgid "F4-13"
 msgstr "F4-13"
@@ -221,8 +222,8 @@ msgstr "F4-13"
 msgid "DAC 双通道、CPU／触发／DMA、波形输出和欠载处理；定义格式、停止电平与恢复"
 msgstr "DAC 双通道、CPU／触发／DMA、波形输出和欠载处理；定义格式、停止电平与恢复"
 
-msgid "待实现"
-msgstr "待实现"
+msgid "CPU、软件／独占 TIM6／7 触发、波形、有限／循环 DMA 与欠载恢复已实现；有限尾部允许延长周期，物理未验证"
+msgstr "CPU、软件／独占 TIM6／7 触发、波形、有限／循环 DMA 与欠载恢复已实现；有限尾部允许延长周期，物理未验证"
 
 msgid "F4-14"
 msgstr "F4-14"
@@ -260,6 +261,9 @@ msgstr "F4-19"
 msgid "DCMI 数据宽度、同步、裁剪、快照／连续、JPEG 字节流与 DMA；验证帧边界、丢帧和停止"
 msgstr "DCMI 数据宽度、同步、裁剪、快照／连续、JPEG 字节流与 DMA；验证帧边界、丢帧和停止"
 
+msgid "待实现"
+msgstr "待实现"
+
 msgid "F4-20"
 msgstr "F4-20"
 
@@ -277,6 +281,9 @@ msgstr "F4-22"
 
 msgid "RNG 健康错误、固定算法 CRC、UID 与器件信息；明确实际能力与信息用途"
 msgstr "RNG 健康错误、固定算法 CRC、UID 与器件信息；明确实际能力与信息用途"
+
+msgid "已有 RNG；新增 CRC-32 字序列及实际芯片信息查询；物理未验证"
+msgstr "已有 RNG；新增 CRC-32 字序列及实际芯片信息查询；物理未验证"
 
 msgid "F4-23"
 msgstr "F4-23"
@@ -357,8 +364,8 @@ msgstr ""
 "IRQ／吞吐／栈／功耗测量。当前 F4 仍拒绝 runtime power 配置，非 F407 型号仍需精确适配。软件候选与物理状态不得从旧版本"
 " 继承，未执行的 HIL 保持 `not_executed`。"
 
-msgid "CPU、软件／独占 TIM6／7 触发、波形、有限／循环 DMA 与欠载恢复已实现；有限尾部允许延长周期，物理未验证"
-msgstr "CPU、软件／独占 TIM6／7 触发、波形、有限／循环 DMA 与欠载恢复已实现；有限尾部允许延长周期，物理未验证"
 
-msgid "已有 RNG；新增 CRC-32 字序列及实际芯片信息查询；物理未验证"
-msgstr "已有 RNG；新增 CRC-32 字序列及实际芯片信息查询；物理未验证"
+#: ../../../../docs/delivery/next-iterations.md:0
+msgid "已有增强 8／16 位事务；CS latch 核验、故障身份、DMA 隔离与关闭重试已实现；完整工作包未完成"
+msgstr ""
+"已有增强 8／16 位事务；CS latch 核验、故障身份、DMA 隔离与关闭重试已实现；完整工作包未完成"

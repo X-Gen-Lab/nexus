@@ -123,10 +123,13 @@ nx_result_t nx_spi_endpoint_transfer(const nx_spi_endpoint_t* endpoint,
 /**
  * \brief           Recover an idle SPI controller after its retained fault.
  *
- * \param[in]       port: Single executor with no live transaction or CS borrow.
+ * \param[in]       port: Single executor with no live transaction or payload
+ *                  borrow. A failed polling call may retain static CS recovery
+ *                  identity until this operation proves withdrawal.
  *
- * \return          Success only after reset/idle proof; BUSY/STATE/UNSUPPORTED
- *                  preserves recovery responsibility and never replays work.
+ * \return          Success only after reset/idle and retained CS withdrawal
+ *                  proof. Failure preserves recovery responsibility and never
+ *                  replays work. Latch readback does not prove external levels.
  */
 nx_result_t nx_spi_port_recover(const nx_spi_port_t* port);
 /**

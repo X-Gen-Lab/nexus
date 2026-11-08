@@ -72,6 +72,11 @@ nx_result_t nx_stm32_adc_stream_initialize(nx_stm32_adc_stream_state_t* state) {
         state->dma != DMA2 || state->memory != DMA2_Stream4) {
         return NX_ERROR_UNSUPPORTED;
     }
+    if (NVIC_GetEnableIRQ(DMA2_Stream4_IRQn) != 0U ||
+        NVIC_GetPendingIRQ(DMA2_Stream4_IRQn) != 0U ||
+        NVIC_GetActive(DMA2_Stream4_IRQn) != 0U) {
+        return NX_ERROR_BUSY;
+    }
 #endif
     if (state->stream != NULL || state->adc.initialized ||
         (state->memory->CR & DMA_SxCR_EN) != 0U ||
@@ -86,6 +91,7 @@ nx_result_t nx_stm32_adc_stream_initialize(nx_stm32_adc_stream_state_t* state) {
     state->stopping = true;
     acknowledge(state);
 #ifndef NEXUS_STM32_MODEL
+    state->adc.cold_effects |= NX_STM32_ADC_IRQ;
     NVIC_SetPriority(DMA2_Stream4_IRQn, 5U);
     NVIC_EnableIRQ(DMA2_Stream4_IRQn);
 #endif

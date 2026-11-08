@@ -2,6 +2,7 @@
 nexus_google_test(nexus_stm32_basic_cold_test STM32F4_LL
     SOURCES stm32_basic_cold_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/flash.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/watchdog.c"
     LIBRARIES Nexus::IO

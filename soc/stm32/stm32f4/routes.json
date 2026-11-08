@@ -2613,6 +2613,938 @@
         "crc32-words"
       ],
       "source": "RM0090 Rev22 section4: fixed 0x04c11db7 polynomial, initial 0xffffffff, 32-bit word access; SoC-internal, no PCB signal"
+    },
+    {
+      "id": "adc2-ch0-pa0",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-scan-pa0-pa1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch1-pa1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch2-pa2",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch3-pa3",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA3",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch4-pa4",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA4",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch5-pa5",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch6-pa6",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch7-pa7",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA7",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch8-pb0",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PB0",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch9-pb1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PB1",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch10-pc0",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC0",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch11-pc1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC1",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch12-pc2",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC2",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch13-pc3",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC3",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch14-pc4",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC4",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-ch15-pc5",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC5",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc2-scan-external16",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC2",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA2",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA3",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA4",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA5",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA6",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA7",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PB0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PB1",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC1",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC2",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC3",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC4",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC5",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch0-pa0",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch1-pa1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch2-pa2",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch3-pa3",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA3",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch4-pf6",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PF6",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch5-pf7",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PF7",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch6-pf8",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PF8",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch7-pf9",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PF9",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch8-pf10",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PF10",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch9-pf3",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PF3",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch10-pc0",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC0",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch11-pc1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC1",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch12-pc2",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC2",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch13-pc3",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC3",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch14-pf4",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PF4",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-ch15-pf5",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PF5",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-scan-external8",
+      "variants": [
+        "STM32F407VET6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA2",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA3",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC1",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC2",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC3",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+    },
+    {
+      "id": "adc3-scan-external16",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC3",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA2",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA3",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PF6",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PF7",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PF8",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PF9",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PF10",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PF3",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC1",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC2",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC3",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PF4",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PF5",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "low-rate-scan"
+      ],
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
     }
   ]
 }

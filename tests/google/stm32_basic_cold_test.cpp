@@ -224,7 +224,8 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
 TEST_F(BasicCold, AdcExternalRanksConfigureTheReviewedBanksOnly) {
     const uint8_t channels[]{15U, 9U, 3U, 10U, 8U, 0U};
     const uint8_t samples[]{7U, 6U, 5U, 4U, 3U, 2U};
-    const nx_stm32_adc_config_t selected{channels, samples, 6U, 3300U, 0U};
+    const nx_stm32_adc_config_t selected{channels, samples, 6U,
+                                         3300U,    0U,      ADC1};
     nx_stm32_adc_state_t adc{};
     RCC->AHB1ENR =
         RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN;
@@ -244,7 +245,8 @@ TEST_F(BasicCold, AdcAllowsSixteenRanksAndConsistentRepeatedChannels) {
     const uint8_t channels[]{0U, 1U, 2U,  3U,  4U,  5U,  6U,  7U,
                              8U, 9U, 10U, 11U, 12U, 13U, 14U, 15U};
     const uint8_t samples[16]{};
-    const nx_stm32_adc_config_t selected{channels, samples, 16U, 3300U, 0U};
+    const nx_stm32_adc_config_t selected{channels, samples, 16U,
+                                         3300U,    0U,      ADC1};
     nx_stm32_adc_state_t adc{};
     ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_begin(&adc, &selected));
     EXPECT_EQ(0xffffU, GPIOA->MODER);
@@ -254,8 +256,8 @@ TEST_F(BasicCold, AdcAllowsSixteenRanksAndConsistentRepeatedChannels) {
     adc = {};
     const uint8_t repeated[]{15U, 15U, 15U};
     const uint8_t repeated_samples[]{7U, 7U, 7U};
-    const nx_stm32_adc_config_t repeat{repeated, repeated_samples, 3U, 3300U,
-                                       0U};
+    const nx_stm32_adc_config_t repeat{
+        repeated, repeated_samples, 3U, 3300U, 0U, ADC1};
     ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_begin(&adc, &repeat));
     EXPECT_EQ(3U, adc.channel_count);
     ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_finish(&adc));
@@ -264,7 +266,8 @@ TEST_F(BasicCold, AdcAllowsSixteenRanksAndConsistentRepeatedChannels) {
 TEST_F(BasicCold, AdcRejectsConflictingSampleTimesBeforeAcquiringClocks) {
     const uint8_t channels[]{0U, 0U};
     const uint8_t samples[]{1U, 7U};
-    const nx_stm32_adc_config_t selected{channels, samples, 2U, 3300U, 0U};
+    const nx_stm32_adc_config_t selected{channels, samples, 2U,
+                                         3300U,    0U,      ADC1};
     nx_stm32_adc_state_t adc{};
     EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_adc_cold_begin(&adc, &selected));
     EXPECT_EQ(0U, RCC->APB2ENR);
@@ -275,7 +278,7 @@ TEST_F(BasicCold, AdcRejectsConflictingSampleTimesBeforeAcquiringClocks) {
 TEST_F(BasicCold, AdcRejectsInvalidResolutionBeforeAnyPadOrGateEffect) {
     const uint8_t channels[]{0U};
     const uint8_t samples[]{7U};
-    nx_stm32_adc_config_t selected{channels, samples, 1U, 3300U, 0U};
+    nx_stm32_adc_config_t selected{channels, samples, 1U, 3300U, 0U, ADC1};
     selected.resolution = 4U;
     nx_stm32_adc_state_t adc{};
     EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_adc_cold_begin(&adc, &selected));
@@ -288,7 +291,7 @@ TEST_F(BasicCold, AdcRejectsInvalidResolutionBeforeAnyPadOrGateEffect) {
 TEST_F(BasicCold, AdcColdConfigurationTransfersResolutionIntoTheEngine) {
     const uint8_t channels[]{0U};
     const uint8_t samples[]{7U};
-    nx_stm32_adc_config_t selected{channels, samples, 1U, 3300U, 0U};
+    nx_stm32_adc_config_t selected{channels, samples, 1U, 3300U, 0U, ADC1};
     selected.resolution = 3U;
     nx_stm32_adc_state_t adc{};
     ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_begin(&adc, &selected));

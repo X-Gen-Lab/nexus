@@ -296,7 +296,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         definitions += [f"static const {config_type} {config} = {{"]
         if dma:
             definitions += ["    .adc = {"]
-        definitions += [f"    .channels = s_nx_adc_channels_{name},",
+        definitions += [f"    .registers = {item.controller},",
+                        f"    .channels = s_nx_adc_channels_{name},",
                         f"    .sample_times = s_nx_adc_samples_{name},",
                         f"    .channel_count = {len(channels)}u, .reference_mv = {reference}u,",
                         f"    .resolution = {(12 - item.options.resolution_bits) // 2}u"]

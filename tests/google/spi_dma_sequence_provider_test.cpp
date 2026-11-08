@@ -73,6 +73,8 @@ class SPIDMAProviderSequence : public testing::Test {
             (void*)(uintptr_t)0x40000000U, 0x80000U, PROT_READ | PROT_WRITE,
             MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(mapping, (void*)(uintptr_t)0x40000000U);
+        nx_stm32_spi_cs_model_reset();
+        GPIOC->ODR = 1U;
         held = nullptr;
         busy_on_detach = false;
         busy_on_final_disable = false;
@@ -100,6 +102,7 @@ class SPIDMAProviderSequence : public testing::Test {
                   NX_SUCCESS);
     }
     void TearDown() override {
+        nx_stm32_spi_cs_model_reset();
         held = nullptr;
         busy_on_detach = false;
         busy_on_final_disable = false;
@@ -124,6 +127,45 @@ class SPIDMAProviderSequence : public testing::Test {
         IRQ(&state, false);
     }
 };
+TEST_F(SPIDMAProviderSequence, RefusedFirstCsStillBorrowsUntilCheckedRelease) {
+    g_nx_spi_cs_fault_odr = &GPIOC->ODR;
+    g_nx_spi_cs_hold_high = 1U;
+    ASSERT_EQ(nx_spi_dma_transaction_submit(&endpoint, &request), NX_SUCCESS);
+    EXPECT_EQ((RXCR | TXCR) & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(DMA_REQUESTS & (SPI_CR2_RXDMAEN | SPI_CR2_TXDMAEN), 0U);
+    EXPECT_EQ(WIRE_CONTROL & SPI_CR1_SPE, 0U);
+    EXPECT_EQ(sequence.active, &request);
+    nx_spi_dma_transaction_service(&port);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(request.base.transferred, 0U);
+    EXPECT_EQ(sequence.active, nullptr);
+    EXPECT_FALSE(state.spi.active);
+}
+TEST_F(SPIDMAProviderSequence, FinalCsFailureRetainsTheWholeChainUntilRetry) {
+    ASSERT_EQ(nx_spi_dma_transaction_submit(&endpoint, &request), NX_SUCCESS);
+    Complete();
+    nx_spi_dma_transaction_service(&port);
+    ASSERT_EQ(sequence.phase, 1U);
+    Complete();
+    g_nx_spi_cs_fault_odr = &GPIOC->ODR;
+    g_nx_spi_cs_hold_low = 1U;
+    nx_spi_dma_transaction_service(&port);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(sequence.active, &request);
+    EXPECT_TRUE(state.spi.active);
+    ASSERT_EQ(nx_native_clock_advance(201U), NX_SUCCESS);
+    nx_spi_dma_transaction_service(&port);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(sequence.active, &request);
+    g_nx_spi_cs_hold_low = 0U;
+    nx_spi_dma_transaction_service(&port);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(GPIOC->ODR & 1U, 1U);
+    EXPECT_EQ(sequence.active, nullptr);
+    EXPECT_FALSE(state.spi.active);
+}
 TEST_F(SPIDMAProviderSequence, ColdStopCannotTouchAnUnacquiredController) {
     DMA_STATE cold = state;
     cold.initialized = false;
@@ -269,7 +311,7 @@ TEST_F(SPIDMAProviderSequence,
     phase.rx = reinterpret_cast<uint8_t*>(rx);
     phase.length = 1U;
     state.spi.active = false;
-    state.endpoint = nullptr;
+    state.spi.held_endpoint = nullptr;
     CS = 0xA5A55A5AU;
     const auto Reject = [&](nx_result_t expected) {
         EXPECT_EQ(BACKEND.begin(&state, &child, &phase, 16U, 0U, true),
@@ -293,10 +335,10 @@ TEST_F(SPIDMAProviderSequence,
     Reject(NX_ERROR_STATE);
     /* Only a valid retained lease reaches the already expired deadline. */
     state.spi.active = true;
-    state.endpoint = &child;
+    state.spi.held_endpoint = &child.endpoint;
     Reject(NX_ERROR_TIMEOUT);
     state.spi.active = false;
-    state.endpoint = nullptr;
+    state.spi.held_endpoint = nullptr;
 }
 
 #if defined(NX_SPI_DMA_OWNER_TEST)

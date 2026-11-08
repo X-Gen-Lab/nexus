@@ -137,11 +137,14 @@ nx_result_t nx_adc_port_block_observation(const nx_adc_port_t* port,
  * \param[out]      count: Complete valid samples; remaining output is
  *                  untouched.
  *
- * \return          Success or INVALID/BUSY/TIMEOUT/IO; abort/drain completes
- *                  before return. No retained buffer, DMA/trigger/stream
- *                  promise.
+ * \return          Success or INVALID/BUSY/TIMEOUT/IO/CONTEXT/UNSUPPORTED.
+ *                  No caller buffer or count pointer is retained on return.
+ *                  A failed hardware stop returns IO and can retain device
+ *                  cleanup; new samples stay BUSY until its owner completes
+ *                  cleanup. Completed samples remain described by count.
  *
- * \note            CPU-active task-only acquisition. Reference voltage,
+ * \note            CPU-active task-only acquisition. A provider may require
+ *                  privileged, unmasked Thread mode. Reference voltage,
  *                  sampling error and maximum rate need physical qualification.
  */
 nx_result_t nx_adc_port_sample(const nx_adc_port_t* port, uint16_t* samples,

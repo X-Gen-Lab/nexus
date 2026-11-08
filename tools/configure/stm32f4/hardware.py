@@ -5,13 +5,16 @@ from tools.configure.providers.hardware import (
     ControllerBinding, fixed_dma_bindings, i2c_binding, spi_binding, uart_binding)
 
 
-# DS8626 Rev12 Table7: ADC1/2 external inputs span three distinct GPIO banks.
-# ADC3 has a different upper-channel map and is deliberately not inferred here.
+# DS8626 Rev12 Table7: ADC1/2 share the input map; ADC3 has distinct upper pads.
 ADC_PIN_CHANNELS = MappingProxyType({
-    ("ADC1", pin): channel
-    for channel, pin in enumerate(
-        (*[f"PA{i}" for i in range(8)], "PB0", "PB1",
-         *[f"PC{i}" for i in range(6)]))
+    **{(controller, pin): channel
+       for controller in ("ADC1", "ADC2")
+       for channel, pin in enumerate(
+           (*[f"PA{i}" for i in range(8)], "PB0", "PB1",
+            *[f"PC{i}" for i in range(6)]))},
+    **{("ADC3", pin): channel for channel, pin in enumerate(
+        ("PA0", "PA1", "PA2", "PA3", "PF6", "PF7", "PF8", "PF9", "PF10",
+         "PF3", "PC0", "PC1", "PC2", "PC3", "PF4", "PF5"))},
 })
 
 DAC_PIN_CHANNELS = MappingProxyType({("DAC", "PA4"): 1,
@@ -38,6 +41,8 @@ CONTROLLER_BINDINGS = (
     ControllerBinding("ADC1", "adc", 2, (), (
         ("trigger-dma", ((2, 4, 0),)),
         ("trigger-dma-continuous", ((2, 4, 0),)))),
+    ControllerBinding("ADC2", "adc", 2, (), ()),
+    ControllerBinding("ADC3", "adc", 2, (), ()),
 )
 DMA_IRQS = ((1, (11, 12, 13, 14, 15, 16, 17, 47)),
             (2, (56, 57, 58, 59, 60, 68, 69, 70)))

@@ -98,20 +98,28 @@ typedef struct {
     bool closing;
     bool tx_complete;
 } nx_stm32_uart_state_t;
+typedef struct nx_stm32_spi_endpoint_state nx_stm32_spi_endpoint_state_t;
 typedef struct {
     SPI_TypeDef* registers;
     RCC_TypeDef* rcc;
     uint32_t clock_hz;
     bool active;
     bool fault;
+    const nx_stm32_spi_endpoint_state_t* held_endpoint;
 } nx_stm32_spi_state_t;
-typedef struct {
+struct nx_stm32_spi_endpoint_state {
     nx_stm32_spi_state_t* port;
     nx_stm32_gpio_state_t* cs;
     uint32_t cs_mask;
     uint32_t frequency_hz;
     uint8_t mode;
-} nx_stm32_spi_endpoint_state_t;
+};
+
+/** \brief Check the selected CS output latch, retaining failed withdrawal.
+ * \note Endpoint identity is static; this never retains a payload pointer.
+ */
+nx_result_t nx_stm32_spi_select(const nx_stm32_spi_endpoint_state_t* endpoint,
+                                bool selected);
 typedef struct {
     I2C_TypeDef* registers;
     const GPIO_TypeDef* line_gpio;
@@ -174,6 +182,16 @@ typedef struct {
     bool running;
     uint8_t cold_effects;
 } nx_stm32_pwm_state_t;
+enum {
+    NX_STM32_ADC_CLOCK = 1U,
+    NX_STM32_ADC_TIMER = 2U,
+    NX_STM32_ADC_CONVERTER = 4U,
+    NX_STM32_ADC_PROBE1 = 8U,
+    NX_STM32_ADC_PROBE2 = 16U,
+    NX_STM32_ADC_PROBE3 = 32U,
+    NX_STM32_ADC_PROBES = 56U,
+    NX_STM32_ADC_IRQ = 64U
+};
 typedef struct {
     ADC_TypeDef* registers;
     ADC_Common_TypeDef* common;
@@ -279,9 +297,12 @@ void nx_stm32_exti_dispatch(nx_stm32_exti_state_t* const* ports, size_t count,
                             uint32_t vector_mask);
 /** \brief Initialize one TIM3 general-purpose PWM channel. */
 nx_result_t nx_stm32_pwm_initialize(nx_stm32_pwm_state_t* port);
-/** \brief Initialize fixed ADC1 channels and selected raw resolution.
+/** \brief Initialize independent ADC1/2/3 ranks and selected raw resolution.
  */
 nx_result_t nx_stm32_adc_initialize(nx_stm32_adc_state_t* port);
+nx_result_t nx_stm32_adc_common_prepare(nx_stm32_adc_state_t* port);
+nx_result_t nx_stm32_adc_probe_close(nx_stm32_adc_state_t* port);
+nx_result_t nx_stm32_adc_quiesce(nx_stm32_adc_state_t* port);
 
 /** \brief Shared provider methods for statically assembled interfaces. */
 extern const nx_gpio_ops_t nx_stm32_gpio_ops;

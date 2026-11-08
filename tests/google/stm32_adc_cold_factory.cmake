@@ -25,6 +25,7 @@ foreach(adc_variant ve zg ve6 zg10)
     nexus_google_test(${adc_target} STM32F4_LL
         SOURCES stm32_adc_cold_factory_test.cpp "${adc_bundle}/bindings.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_stream.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
@@ -41,5 +42,5 @@ foreach(adc_variant ve zg ve6 zg10)
         NX_TEST_ADC_BITS=${adc_bits}
         _init=nx_adc_cold_fixture_init _fini=nx_adc_cold_fixture_fini)
     target_compile_options(${adc_target} PRIVATE
-        "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_control_cold_model.h")
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_adc_cold_model.h")
 endforeach()

@@ -40,7 +40,7 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 | GPIO／EXTI | 受审引脚、静态电气与事件存储；不存在自动消抖政策 |
 | UART | IRQ byte/event、word 与明确 block／DMA 模式分别选择；有限 TX、有限 RX、连续 RX 和双向模式不自动互相授权 |
 | SPI／I2C | 受审 polling／异步／DMA 路径与显式 endpoint；不能从 controller 存在推定任意 route 或速率 |
-| ADC／Timer | ADC1 外部通道 0--15、最多 16 ranks 的 shot／scan 与触发 DMA；PWM、capture、互补输出与 break；共享 timer 和资源冲突须通过准入 |
+| ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入，独立 shot／scan 最多 16 ranks；触发 DMA 仍只开放 ADC1；Timer 资源冲突须通过准入 |
 | DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码 |
 | Flash／IWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
 | CRC／芯片身份 | 固定多项式 CRC-32 字序列；实际 UID、device／revision ID 和半字 Flash 容量；不建立认证或订货号推断 |
@@ -54,14 +54,21 @@ F407 `dma-tx` 的所选 UART transport 使用官方 HAL 有限 TX 与分离 LL I
 Handle 私有且由同一 owner 管理。其他模式保留各自明确实现，不能宣称整套 UART
 或全部外设已完成 HAL 替代。
 
-ADC1 通道对应 PA0--7、PB0--1、PC0--5。序列可以重新排序并重复同一通道，重复
-通道的 sample time 必须一致；所有使用的引脚都须有明确 Board route。ADC2／ADC3、
-内部输入、注入组和多 ADC 模式尚未接入。16-rank 软件参考装配见
+ADC1／2 通道对应 PA0--7、PB0--1、PC0--5。ADC3 在 VE 开放 PA0--3 的通道 0--3
+和 PC0--3 的通道 10--13；ZG 另有 PF6--10 的通道 4--8、PF3 的通道 9 和
+PF4／5 的通道 14／15。序列可以重新排序或重复同一输入，最多 16 ranks，重复
+输入的 sample time 必须一致；每个使用的引脚都须有明确 Board route。内部输入、
+注入组和同步多 ADC 模式尚未接入。16-rank 与三独立实例参考装配见
 `tests/contracts/adc_external_assembly/`，不授予真实 PCB 或物理采样资格。
 
-ADC1 的 `resolution_bits` 可选择 6／8／10／12，默认 12。poll、有限和连续 DMA
-共用该静态选择，转换周期与触发速率准入随之变化。DMA 仍使用 halfword，样本仍是
+三个 ADC 的 `resolution_bits` 均可选择 6／8／10／12，默认 12。ADC1 的 poll、有限
+和连续 DMA 共用该静态选择，转换周期与触发速率准入随之变化。DMA 仍使用 halfword，样本仍是
 右对齐的 `uint16_t` 原始计数；分辨率选择不自动建立模拟精度或实际吞吐资格。
+
+共享 ADCCLK 固定为 PCLK2／4，即 21 MHz。冷态改分频前先取得数字接口观察责任，
+确认所有 ADC 已关闭，再撤回本次临时 gate；匹配分频时不写 CCR。准备与其他 ADC
+启动必须串行，不支持并发热接入或动态调频。软件采样停止回读失败保留设备清理责任，
+平台关闭成功前禁止再次采样，但返回后不保留调用者的样本或 count。
 
 DMA buffer 必须位于所选可达域，CCM 不可用于该 DMA。连续 producer 不覆盖已借用
 块，缺替换存储时停止并报告 loss；模型或静态预算不证明任意负载下无丢失。

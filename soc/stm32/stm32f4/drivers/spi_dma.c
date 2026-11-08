@@ -234,6 +234,30 @@ static void program(nx_stm32_spi_dma_state_t* state, bool receive,
                  DMA_SxCR_DMEIE | (receive ? 0U : DMA_SxCR_DIR_0);
 }
 
+/** \brief Keep the first terminal error and deadline through every retry. */
+static void begin_drain(nx_stm32_spi_dma_state_t* state, nx_result_t terminal) {
+    detach(state, false);
+    detach(state, true);
+    if (state->terminal == NX_SUCCESS)
+        state->terminal = terminal;
+    if (!state->draining) {
+        state->draining = true;
+        if (state->drain_deadline == NX_DEADLINE_NEVER)
+            state->drain_deadline = nx_deadline_after(nx_time_now_us(), 200U);
+        (void)nx_request_transition(&state->active->base, NX_REQUEST_DRAINING);
+    }
+}
+
+/** \brief A missed drain budget isolates storage without revoking its loan. */
+static void observe_drain_deadline(nx_stm32_spi_dma_state_t* state,
+                                   nx_time_us_t now) {
+    if (state->draining && nx_deadline_expired(state->drain_deadline, now) &&
+        nx_request_state(&state->active->base) != NX_REQUEST_QUARANTINED) {
+        (void)nx_request_transition(&state->active->base,
+                                    NX_REQUEST_QUARANTINED);
+    }
+}
+
 /** \brief One admission gates both DMA engines and the entire selected CS
  * interval. */
 static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
@@ -261,7 +285,8 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
             (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
             result = NX_ERROR_BUSY;
         } else if (!retained_cs ||
-                   (state->spi.active && state->endpoint == device)) {
+                   (state->spi.active &&
+                    state->spi.held_endpoint == &device->endpoint)) {
             if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
                 result = NX_ERROR_TIMEOUT;
             } else {
@@ -278,7 +303,6 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
     }
     state->memory_flags = memory_flags;
     state->active = request;
-    state->endpoint = device;
     state->spi.active = true;
     state->terminal = NX_SUCCESS;
     state->draining = false;
@@ -289,9 +313,13 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
     state->spi.registers->CR2 = 0U;
     program(state, true, request, bits);
     program(state, false, request, bits);
-    if (!retained_cs) {
-        (void)nx_stm32_gpio_write(device->endpoint.cs, 0U,
-                                  device->endpoint.cs_mask);
+    if (!retained_cs &&
+        nx_stm32_spi_select(&device->endpoint, true) != NX_SUCCESS) {
+        /* Admission already borrowed memory. Do not start either engine or
+         * turn a partially applied CS command into an unborrowed rejection. */
+        begin_drain(state, NX_ERROR_IO);
+        nx_arch_irq_restore(saved);
+        return NX_SUCCESS;
     }
     nx_arch_dsb();
     state->rx->CR |= DMA_SxCR_EN;
@@ -321,17 +349,6 @@ static nx_result_t start_admitted(void* context, nx_spi_request_t* request) {
         return NX_ERROR_STATE;
     }
     return start(context, request, true, 0U, 8U, false);
-}
-
-/** \brief Stopping DMA does not withdraw CS before an actual SPI idle
- * observation. */
-static void begin_drain(nx_stm32_spi_dma_state_t* state, nx_result_t terminal) {
-    detach(state, false);
-    detach(state, true);
-    state->draining = true;
-    state->terminal = terminal;
-    state->drain_deadline = nx_deadline_after(nx_time_now_us(), 200U);
-    (void)nx_request_transition(&state->active->base, NX_REQUEST_DRAINING);
 }
 
 /** \brief Cancellation never reclaims memory or derives wire count from NDTR.
@@ -457,9 +474,14 @@ static void service_phase(void* context, bool retained_cs) {
         (void)state->spi.registers->DR;
         (void)state->spi.registers->SR;
         nx_arch_dsb();
-        nx_stm32_spi_endpoint_state_t* endpoint = &state->endpoint->endpoint;
-        if (!retained_cs) {
-            (void)nx_stm32_gpio_write(endpoint->cs, endpoint->cs_mask, 0U);
+        const nx_stm32_spi_endpoint_state_t* endpoint =
+            state->spi.held_endpoint;
+        if (!retained_cs &&
+            nx_stm32_spi_select(endpoint, false) != NX_SUCCESS) {
+            begin_drain(state, NX_ERROR_IO);
+            observe_drain_deadline(state, now);
+            nx_arch_irq_restore(saved);
+            return;
         }
         /* Both engines are actually disabled; do not erase a late error. */
         if (state->terminal == NX_SUCCESS &&
@@ -468,25 +490,16 @@ static void service_phase(void* context, bool retained_cs) {
         }
         nx_result_t result = state->terminal;
         size_t count = result == NX_SUCCESS ? request->length : 0U;
-        state->spi.fault = result == NX_ERROR_IO;
+        state->spi.fault = state->spi.fault || result == NX_ERROR_IO;
         state->active = NULL;
-        if (!retained_cs) {
-            state->endpoint = NULL;
-        }
         state->spi.active = retained_cs;
         nx_request_settle(&request->base, result, count);
     } else {
         if (!state->draining && state->tx_complete && state->rx_complete &&
             nx_deadline_expired(state->drain_deadline, now)) {
-            nx_time_us_t deadline = state->drain_deadline;
             begin_drain(state, NX_ERROR_IO);
-            state->drain_deadline = deadline;
         }
-        if (state->draining &&
-            nx_deadline_expired(state->drain_deadline, now) &&
-            nx_request_state(&request->base) != NX_REQUEST_QUARANTINED) {
-            (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
-        }
+        observe_drain_deadline(state, now);
     }
     nx_arch_irq_restore(saved);
 }
@@ -522,6 +535,12 @@ static nx_result_t stop(void* context) {
     if (((state->tx->CR | state->rx->CR) & DMA_SxCR_EN) != 0U ||
         (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
         return NX_ERROR_BUSY;
+    }
+    if (state->spi.held_endpoint != NULL) {
+        nx_result_t result =
+            nx_stm32_spi_select(state->spi.held_endpoint, false);
+        if (result != NX_SUCCESS)
+            return result;
     }
 #ifndef NEXUS_STM32_MODEL
     NVIC_DisableIRQ(dma_irq(state, true));
@@ -777,6 +796,8 @@ nx_result_t nx_stm32_spi_dma_pair_close(nx_stm32_spi_dma_state_t* state,
         cold->clock_added = 0U;
     }
     state->spi.registers = NULL;
+    state->spi.held_endpoint = NULL;
+    state->spi.fault = false;
     return NX_SUCCESS;
 }
 
@@ -928,7 +949,7 @@ static nx_result_t sequence_release(void* context, void* child) {
     nx_stm32_spi_dma_state_t* state = context;
     nx_stm32_spi_dma_endpoint_state_t* endpoint = child;
     if (state == NULL || endpoint == NULL || endpoint->dma != state ||
-        state->endpoint != endpoint) {
+        state->spi.held_endpoint != &endpoint->endpoint) {
         return NX_ERROR_INVALID;
     }
     if (state->active != NULL ||
@@ -937,10 +958,8 @@ static nx_result_t sequence_release(void* context, void* child) {
         return NX_ERROR_BUSY;
     }
     nx_arch_dsb();
-    nx_result_t result = nx_stm32_gpio_write(endpoint->endpoint.cs,
-                                             endpoint->endpoint.cs_mask, 0U);
+    nx_result_t result = nx_stm32_spi_select(&endpoint->endpoint, false);
     if (result == NX_SUCCESS) {
-        state->endpoint = NULL;
         state->spi.active = false;
     }
     return result;

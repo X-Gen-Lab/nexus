@@ -11,6 +11,18 @@ These declarations come from public header files. Selection, lifecycle, supporte
 
 The Native model controls in `model.h`, `spi_dma_model.h` and `rtc_lptim_model.h` support host tests. They do not establish MCU hardware support or device discovery. Optional interfaces describe selected contracts; their presence does not imply support on every provider.
 
+SPI byte-span lengths count bytes. The optional polling and segmented DMA
+transaction faces count 8- or 16-bit words; a 16-bit element is a numeric
+`uint16_t` in native storage. They do not swap bytes, concatenate segments or
+allocate hidden scratch storage. Selected bit order determines serialization.
+
+F407 SPI checks the GPIO CS output latch after each command. A polling return
+releases all caller buffers, but failed CS withdrawal retains the static endpoint
+identity and owner fault until explicit recover or close proves withdrawal.
+Finite DMA retains its request and buffers through failed CS withdrawal and
+quarantine; service retries cleanup without replaying payload or extending the
+first drain deadline. Latch readback does not establish the external pin voltage.
+
 ## Explicit media and external-controller faces
 
 | Public header | Selected identity and boundary |

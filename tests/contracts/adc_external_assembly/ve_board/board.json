@@ -13,6 +13,21 @@
       "id": "analog",
       "controller": "ADC1",
       "route": "adc1-scan-external16"
+    },
+    {
+      "id": "independent1",
+      "controller": "ADC1",
+      "route": "adc1-ch4-pa4"
+    },
+    {
+      "id": "independent2",
+      "controller": "ADC2",
+      "route": "adc2-ch8-pb0"
+    },
+    {
+      "id": "independent3",
+      "controller": "ADC3",
+      "route": "adc3-ch10-pc0"
     }
   ],
   "reserved_resources": [

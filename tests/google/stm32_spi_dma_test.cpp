@@ -50,6 +50,7 @@ class Stm32SpiDma : public testing::Test {
     nx_spi_request_t request = {};
 
     void SetUp() override {
+        nx_stm32_spi_cs_model_reset();
         s_hold_dma_enable = false;
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         regions[0] = {reinterpret_cast<uintptr_t>(source), sizeof(source),
@@ -68,6 +69,7 @@ class Stm32SpiDma : public testing::Test {
         cs.mask = 1U;
         cs.output = true;
         cs.initialized = true;
+        gpio.ODR = 1U;
         device.endpoint.port = &state.spi;
         device.endpoint.cs = &cs;
         device.endpoint.cs_mask = 1U;
@@ -88,7 +90,63 @@ class Stm32SpiDma : public testing::Test {
         nx_stm32_spi_dma_irq(&state, false);
         nx_stm32_spi_dma_irq(&state, true);
     }
+
+    void TearDown() override {
+        nx_stm32_spi_cs_model_reset();
+    }
 };
+
+TEST_F(Stm32SpiDma, RefusedAssertIsAcceptedWithoutStartingEitherEngine) {
+    tx.NDTR = 60000U;
+    rx.NDTR = 60000U;
+    g_nx_spi_cs_fault_odr = &gpio.ODR;
+    g_nx_spi_cs_hold_high = 1U;
+    ASSERT_EQ(nx_spi_endpoint_submit(&endpoint, &request), NX_SUCCESS);
+    EXPECT_EQ((tx.CR | rx.CR) & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(spi.CR2 & (SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN), 0U);
+    EXPECT_EQ(spi.CR1 & SPI_CR1_SPE, 0U);
+    EXPECT_EQ(state.active, &request);
+    nx_spi_port_service(&bus);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(request.base.transferred, 0U);
+    EXPECT_EQ(state.active, nullptr);
+    EXPECT_TRUE(state.spi.fault);
+    EXPECT_EQ(nx_spi_port_recover(&bus), NX_SUCCESS);
+}
+
+TEST_F(Stm32SpiDma, RefusedReleaseQuarantinesAndRetriesWithoutLosingBorrow) {
+    ASSERT_EQ(nx_spi_endpoint_submit(&endpoint, &request), NX_SUCCESS);
+    g_nx_spi_cs_fault_odr = &gpio.ODR;
+    g_nx_spi_cs_hold_low = 1U;
+    CompleteMemory();
+    nx_spi_port_service(&bus);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(state.active, &request);
+    EXPECT_EQ(state.spi.held_endpoint, &device.endpoint);
+    EXPECT_TRUE(state.spi.active);
+    EXPECT_EQ((tx.CR | rx.CR) & DMA_SxCR_EN, 0U);
+    nx_time_us_t cutoff = state.drain_deadline;
+    ASSERT_EQ(nx_native_clock_advance(201U), NX_SUCCESS);
+    nx_spi_port_service(&bus);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.drain_deadline, cutoff);
+    dma.LISR = 1U << 25U;
+    nx_stm32_spi_dma_irq(&state, false);
+    EXPECT_EQ(state.drain_deadline, cutoff);
+    g_nx_spi_cs_hold_low = 0U;
+    nx_spi_port_service(&bus);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(request.base.transferred, 0U);
+    EXPECT_EQ(state.active, nullptr);
+    EXPECT_EQ(state.spi.held_endpoint, nullptr);
+    EXPECT_FALSE(state.spi.active);
+    EXPECT_EQ(gpio.ODR & 1U, 1U);
+    gpio.BSRR = 0xA5U;
+    nx_spi_port_service(&bus);
+    EXPECT_EQ(gpio.BSRR, 0xA5U);
+}
 
 TEST_F(Stm32SpiDma, BothDmaCompletionsKeepCsAndBorrowUntilSpiIsIdle) {
     ASSERT_EQ(nx_spi_endpoint_submit(&endpoint, &request), NX_SUCCESS);

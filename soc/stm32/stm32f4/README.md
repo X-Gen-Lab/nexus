@@ -72,13 +72,13 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | --- | --- |
 | GPIO | 单 port 的 16-bit 授权 mask；原子 BSRR set/reset；串行 toggle；先初值后 mode |
 | UART | USART1 IRQ bytes/events、IRQ RX blocks、有限 TX DMA、RX DMA/IDLE、有限／连续 duplex 和连续 RX blocks；USART2 有限 TX DMA 与 IRQ bytes/events；USART3/UART4/UART5/USART6 已审 IRQ bytes/events；真实 TC、显式 loss、drain、quarantine |
-| SPI | SPI1 短 polling／有限全双工 DMA，SPI2 有限 DMA；8-bit MSB-first master、mode0–3、完整 CS interval；polling 最多 256 bytes，DMA 最多 65535 bytes |
+| SPI | SPI1 短 polling／有限全双工 DMA，SPI2 有限 DMA；MSB-first master、mode0–3；普通 byte face 为 8 位，增强事务支持 8／16 位 word；polling 最多 256 words，DMA 每段最多 65535 words |
 | I2C | I2C1 polling/IRQ/DMA、I2C2 IRQ/DMA；42 MHz／100 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
 | Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
 | PWM | TIM3 通道、固定共享 PSC/ARR、period1–65535、duty0–period、shadow update；stop 建立 GPIO inactive |
-| ADC | ADC1 外部通道 0--15、最多 16 ranks，6／8／10／12-bit 软件 shot/scan 与 TIM3 触发有限／连续 DMA block；显式 sample time/reference、完整 scan 和 consumer loan 背压 |
+| ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；独立 6／8／10／12-bit 软件 shot/scan、最多 16 ranks；ADC1 另有 TIM3 触发有限／连续 DMA block |
 | DAC | PA4／PA5 单／双通道，CPU direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA；u8／u12-right／u12-left |
 | CRC | 多项式 0x04C11DB7、初值 0xffffffff、32 位字输入；同步计算、独占 controller、失败输出保持 |
 | CAN | CAN1/CAN2 Classic CAN IRQ、三邮箱、共享 filter domain；无 CAN FD |
@@ -124,12 +124,41 @@ TIM2 epoch，`SystemCoreClock` 在失败清理中追踪确认的 HCLK，不启�
 或 `dma-duplex-continuous`。连续模式不覆盖 READY/BORROWED，缺 replacement 时停止
 并报告 loss，不虚构错过事件的准确次数。
 
-ADC1 外部输入按 DS8626 Rev12 Table7 对应 PA0--7、PB0--1、PC0--5 的通道
+SPI 每次 CS 命令都在原子 BSRR 写入后以 DSB 和官方 LL 读取 ODR，核验本 CS latch；
+这不证明外部引脚电压。通用 GPIO 写热路径不增加屏障。polling 返回后不再访问调用者
+payload，仅保留静态 endpoint 身份与 fault，供显式 recover／close 重试撤回。
+普通 DMA 在受理后遇到 assert 失败仍保持 ACCEPTED，未启动两个 engine；release
+失败不发布 SETTLED，保留原 request／buffer，逾期隔离后继续 service。增强 DMA
+复用既有整链 owner，在最终 CS 释放前保留全部段；关闭跳过已完成撤回的 CS。
+原 byte face 的 length 仍按字节计；增强 16 位数据是本机存储的 `uint16_t` 数值，
+长度与 NDTR 按 word 计，不做字节序转换或隐式复制。
+
+ADC1／2 外部输入按 DS8626 Rev12 Table7 对应 PA0--7、PB0--1、PC0--5 的通道
 0--15。Board 必须明确授权相应 SoC route；新增 silicon route 不修改既有 PCB
 接线。序列只能选择 Board 授权 route 中的通道，资源计划仅取得实际使用的唯一
 引脚；rank 可重新排序或重复，最多 16 个。重复通道共享同一个 SMPR 字段，
 sample time 不一致时在取得资源前拒绝。
 软件 shot/scan 保持逐 rank 转换语义，不承诺通道同时采样。
+
+ADC3 的通道 0--3 使用 PA0--3，10--13 使用 PC0--3；ZG 另有 PF6--10 的通道
+4--8、PF3 的通道 9、PF4／5 的通道 14／15。VE 没有这些 PF 引脚，故只开放八种
+外部输入，仍允许用重复输入组成最多 16 ranks。封装差异由事实和 Board route
+验证，不能从芯片头文件中存在 GPIOF 推导引脚已引出。三个转换器共用同一套软件
+shot/scan C、只读 ops 和类型化 factory，实例 context 保持独立。
+
+RM0090 §13.3.2／§13.13.16 区分每个转换器的数字接口 gate 和共享模拟 ADCCLK。
+本实现固定 PCLK2／4，即 21 MHz，拒绝继承 MULTI、公共 DMA 或 DDS。匹配的配置不再
+写 CCR；调整前临时打开尚未可读的数字接口，逐项记录责任，确认三个 ADON 都为零后
+才设置分频，再撤回本次临时 gate。启钟或撤回回读失败保留 receipt，由 close 重试。
+整个冷态准备与其他 ADC 启动必须串行；不提供动态调频、并发热接入或共享 ADCRST。
+停止一个实例不改写 CCR，也不关闭其他实例的 gate。
+
+软件采样在 ADON 写入经过 DSB 和回读确认后起算 3 µs 稳定期。结束时独立回读停止
+结果；失败返回 IO 并保留设备清理责任，新采样返回 BUSY，平台责任者须重试关闭。
+返回时不再访问调用者的样本或 count，已完成前缀仍由 count 描述。转换器、接口
+gate、临时观察 gate、TIM3 和 DMA IRQ 分开记录责任，复用现有状态字节，不增加
+可变字段；只读配置新增控制器身份。TIM3 或 DMA IRQ 已被占用时拒绝取得，未取得
+的 IRQ 不参与失败清理。
 
 `resolution_bits` 在主机配置时确定，默认 12，可显式选择 6／8／10。静态 C 配置
 保存对应的 RES 编码，C owner 在 ADON 清除后通过官方 LL 设置；poll、有限 DMA
@@ -140,8 +169,9 @@ sample time 不一致时在取得资源前拒绝。
 采样率。
 
 `tests/contracts/adc_external_assembly/` 提供两种密度的软件参考装配，使用三个
-GPIO bank 的 16-rank 反向序列；不代表实际板卡接线。ADC2／ADC3、内部输入、
-注入组和多 ADC 模式继续未实现，不能由外部通道扩展推定支持。
+GPIO bank 的 16-rank 反向序列，以及 VE／ZG 的三转换器独立实例装配；不代表实际
+板卡接线。内部输入、注入组和同步多 ADC 模式继续未实现。ADC2／3 的 DMA 模式在
+配置和 C 冷入口均拒绝，不从芯片硬件能力推导当前软件支持。
 
 有限 ADC `trigger-dma` 在发布完整块前停 trigger／conversion／DMA，稳定后由显式
 service rearm，块间可有间隙。消费者借用不能被覆盖，未释放时 stop 保持 BUSY；

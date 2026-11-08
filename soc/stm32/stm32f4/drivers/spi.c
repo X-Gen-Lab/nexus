@@ -9,6 +9,7 @@
 #include "nexus/io/spi_transaction.h"
 #include "stm32f407_provider.h"
 #include "stm32f407_spi_cold.h"
+#include "stm32f4xx_ll_gpio.h"
 #include "stm32f4xx_ll_spi.h"
 
 #ifndef NX_STM32_IO_POLL
@@ -18,6 +19,47 @@
 #ifndef NX_PLATFORM_REGISTER_WRITE
 #define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
 #endif
+
+#ifndef NX_STM32_SPI_CS_READ
+#define NX_STM32_SPI_CS_READ(gpio) LL_GPIO_ReadOutputPort(gpio)
+#endif
+#ifndef NX_STM32_SPI_TRANSACTION_CS
+#define NX_STM32_SPI_TRANSACTION_CS(active) ((void)(active))
+#endif
+
+nx_result_t nx_stm32_spi_select(const nx_stm32_spi_endpoint_state_t* endpoint,
+                                bool selected) {
+    if (endpoint == NULL || endpoint->port == NULL || endpoint->cs == NULL ||
+        endpoint->cs->registers == NULL)
+        return NX_ERROR_INVALID;
+    nx_stm32_spi_state_t* port = endpoint->port;
+    if (selected) {
+        if (port->held_endpoint != NULL && port->held_endpoint != endpoint)
+            return NX_ERROR_BUSY;
+        /* Preserve static recovery identity before the first electrical effect.
+         */
+        port->held_endpoint = endpoint;
+    }
+    uint32_t inactive = selected ? 0U : endpoint->cs_mask;
+    nx_result_t result = nx_stm32_gpio_write(endpoint->cs, inactive,
+                                             selected ? endpoint->cs_mask : 0U);
+    if (result == NX_SUCCESS) {
+        nx_arch_dsb();
+        if ((NX_STM32_SPI_CS_READ(endpoint->cs->registers) &
+             endpoint->cs_mask) != inactive)
+            result = NX_ERROR_IO;
+    }
+    if (result != NX_SUCCESS) {
+        port->fault = true;
+        if (port->held_endpoint == NULL)
+            port->held_endpoint = endpoint;
+    } else {
+        if (!selected && port->held_endpoint == endpoint)
+            port->held_endpoint = NULL;
+        NX_STM32_SPI_TRANSACTION_CS(selected);
+    }
+    return result;
+}
 
 static bool cold_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
@@ -87,10 +129,11 @@ nx_result_t nx_stm32_spi_admit(const nx_stm32_spi_state_t* port,
     if (port == NULL || receipt == NULL || !nx_stm32_spi_config_valid(config))
         return NX_ERROR_INVALID;
     if (port->registers != NULL || port->active || port->fault ||
-        receipt->rollback_pending || receipt->registers_captured ||
-        receipt->captured != 0U || receipt->gpio_mask != 0U ||
-        receipt->gpio_clocks != 0U || receipt->peripheral_clock != 0U ||
-        receipt->cr1 != 0U || receipt->cr2 != 0U)
+        port->held_endpoint != NULL || receipt->rollback_pending ||
+        receipt->registers_captured || receipt->captured != 0U ||
+        receipt->gpio_mask != 0U || receipt->gpio_clocks != 0U ||
+        receipt->peripheral_clock != 0U || receipt->cr1 != 0U ||
+        receipt->cr2 != 0U)
         return NX_ERROR_BUSY;
     for (size_t index = 0U; index < config->endpoint_count; ++index) {
         if (config->endpoints[index].chip_select->initialized)
@@ -151,7 +194,8 @@ nx_result_t nx_stm32_spi_cold_acquire(nx_stm32_spi_state_t* port,
         return NX_ERROR_CONTEXT;
     if (port == NULL || receipt == NULL)
         return NX_ERROR_INVALID;
-    if (port->registers != NULL || port->active || receipt->rollback_pending)
+    if (port->registers != NULL || port->active ||
+        port->held_endpoint != NULL || receipt->rollback_pending)
         return NX_ERROR_BUSY;
     if (!nx_stm32_spi_config_valid(config))
         return NX_ERROR_INVALID;
@@ -251,9 +295,13 @@ nx_result_t nx_stm32_spi_close(nx_stm32_spi_state_t* port,
         return NX_ERROR_IO;
     for (size_t i = 0U; i < config->endpoint_count; ++i) {
         nx_stm32_gpio_state_t* cs = config->endpoints[i].chip_select;
-        nx_result_t result = nx_stm32_gpio_stop(cs, cs->mask);
+        if (!cs->initialized)
+            continue;
+        nx_result_t result =
+            nx_stm32_spi_select(config->endpoints[i].endpoint, false);
         if (result != NX_SUCCESS)
             return result;
+        cs->initialized = false;
     }
     for (size_t i = 0U; i < 3U; ++i) {
         const nx_stm32_spi_pin_config_t* pin = &config->pins[i];
@@ -271,6 +319,8 @@ nx_result_t nx_stm32_spi_close(nx_stm32_spi_state_t* port,
         return NX_ERROR_IO;
     *receipt = (nx_stm32_spi_cold_receipt_t){0};
     port->registers = NULL;
+    port->held_endpoint = NULL;
+    port->fault = false;
     return NX_SUCCESS;
 }
 #ifndef NX_STM32_SPI_RESET
@@ -380,8 +430,7 @@ nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
                            ((endpoint->mode & 2U) != 0U ? SPI_CR1_CPOL : 0U);
     port->registers->CR2 = 0U;
     LL_SPI_Enable(port->registers);
-    nx_result_t result =
-        nx_stm32_gpio_write(endpoint->cs, 0U, endpoint->cs_mask);
+    nx_result_t result = nx_stm32_spi_select(endpoint, true);
     if (result == NX_SUCCESS) {
         for (size_t index = 0U; index < length; ++index) {
             result = wait_status(port, SPI_SR_TXE, SPI_SR_TXE, deadline);
@@ -409,8 +458,7 @@ nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
     } else {
         LL_SPI_Disable(port->registers);
     }
-    nx_result_t cs_result =
-        nx_stm32_gpio_write(endpoint->cs, endpoint->cs_mask, 0U);
+    nx_result_t cs_result = nx_stm32_spi_select(endpoint, false);
     port->active = false;
     if (result != NX_SUCCESS) {
         return result;
@@ -454,6 +502,11 @@ nx_result_t nx_stm32_spi_recover(void* context) {
     if ((port->registers->SR & (SPI_SR_BSY | SPI_SR_MODF | SPI_SR_OVR)) != 0U) {
         return NX_ERROR_IO;
     }
+    if (port->held_endpoint != NULL) {
+        nx_result_t result = nx_stm32_spi_select(port->held_endpoint, false);
+        if (result != NX_SUCCESS)
+            return result;
+    }
     port->fault = false;
     return NX_SUCCESS;
 }
@@ -464,9 +517,6 @@ const nx_spi_ops_t nx_stm32_spi_ops = {
     .recover = nx_stm32_spi_recover,
 };
 
-#ifndef NX_STM32_SPI_TRANSACTION_CS
-#define NX_STM32_SPI_TRANSACTION_CS(active) ((void)(active))
-#endif
 #ifndef NX_STM32_SPI_TRANSACTION_WRITE
 #define NX_STM32_SPI_TRANSACTION_WRITE(port, value, bits)                      \
     do {                                                                       \
@@ -541,11 +591,7 @@ static nx_result_t transaction_transfer(void* context,
                            ((endpoint->mode & 2U) != 0U ? SPI_CR1_CPOL : 0U);
     port->registers->CR2 = 0U;
     LL_SPI_Enable(port->registers);
-    nx_result_t result =
-        nx_stm32_gpio_write(endpoint->cs, 0U, endpoint->cs_mask);
-    if (result == NX_SUCCESS) {
-        NX_STM32_SPI_TRANSACTION_CS(true);
-    }
+    nx_result_t result = nx_stm32_spi_select(endpoint, true);
     for (size_t phase = 0U; phase < count && result == NX_SUCCESS; ++phase) {
         const nx_spi_segment_t* segment = &segments[phase];
         for (size_t word = 0U; word < segment->words; ++word) {
@@ -586,9 +632,7 @@ static nx_result_t transaction_transfer(void* context,
         abort_controller(port);
     }
     /* Deassert CS on every path while preserving the primary transfer error. */
-    nx_result_t release =
-        nx_stm32_gpio_write(endpoint->cs, endpoint->cs_mask, 0U);
-    NX_STM32_SPI_TRANSACTION_CS(false);
+    nx_result_t release = nx_stm32_spi_select(endpoint, false);
     port->active = false;
     if (result != NX_SUCCESS) {
         return result;

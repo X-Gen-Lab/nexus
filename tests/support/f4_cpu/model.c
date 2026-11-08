@@ -18,6 +18,10 @@ bool g_f4_model_isr;
 uint32_t g_f4_model_mask;
 static uint32_t s_host_ordering;
 
+#ifndef NX_F4_CPU_MMIO_SYNC
+#define NX_F4_CPU_MMIO_SYNC() ((void)0)
+#endif
+
 /** \brief Advance the caller-controlled monotonic test clock. */
 uint64_t nx_time_now_us(void) {
     return ++g_f4_model_now;
@@ -43,6 +47,7 @@ bool nx_arch_irq_is_masked(void) {
 }
 /** \brief MMIO storage completes synchronously in this host fixture. */
 void nx_arch_dsb(void) {
+    NX_F4_CPU_MMIO_SYNC();
 }
 /** \brief Expose the fixture's selected interrupt-mask domain. */
 nx_arch_irq_masks_t nx_arch_irq_masks(void) {
