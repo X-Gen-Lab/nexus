@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: e4c2e456dbb679457996ff3ab0ea22b2c6b82bab575c85badd0a7d94c982b229\n"
+"X-Nexus-Source-SHA256: 5562f49df4c0986d75cc5fe4cc15de0d264ba41cd67e8f231989d3ff4c2563b4\n"
 
 #: docs/delivery/capabilities.md:8
 msgid "当前派生能力矩阵"
@@ -1284,3 +1284,39 @@ msgstr ""
 "`tests/contracts/adc_external_assembly/zg-dma.toml`, "
 "`tests/contracts/stm32_assembly/ve-blocks.toml`, "
 "`tests/contracts/stm32_assembly/zg-blocks.toml`"
+
+#: docs/delivery/capabilities.md
+msgid "DAC"
+msgstr "DAC"
+
+#: docs/delivery/capabilities.md
+msgid "dac"
+msgstr "dac"
+
+#: docs/delivery/capabilities.md
+msgid "direct"
+msgstr "direct"
+
+#: docs/delivery/capabilities.md
+msgid "`dac-pa4`, `dac-pa4-pa5`, `dac-pa5`"
+msgstr "`dac-pa4`, `dac-pa4-pa5`, `dac-pa5`"
+
+#: docs/delivery/capabilities.md
+msgid "`tests/contracts/dac_assembly/ve-direct.toml`, `tests/contracts/dac_assembly/zg-direct.toml`"
+msgstr "`tests/contracts/dac_assembly/ve-direct.toml`, `tests/contracts/dac_assembly/zg-direct.toml`"
+
+#: docs/delivery/capabilities.md
+msgid "`soc/stm32/stm32f4/drivers/dac.c`"
+msgstr "`soc/stm32/stm32f4/drivers/dac.c`"
+
+#: docs/delivery/capabilities.md
+msgid "noise"
+msgstr "noise"
+
+#: docs/delivery/capabilities.md
+msgid "triangle"
+msgstr "triangle"
+
+#: docs/delivery/capabilities.md
+msgid "triggered"
+msgstr "triggered"

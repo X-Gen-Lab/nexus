@@ -351,6 +351,16 @@ class AdcOptions:
 
 
 @dataclass(frozen=True)
+class DacOptions:
+    channels: tuple[int, ...]
+    format: str
+    idle_codes: tuple[int, ...]
+    output_buffer: bool
+    trigger: str
+    amplitude: int = 0
+
+
+@dataclass(frozen=True)
 class SiliconRevisionRuleIR:
     revision_id: int
     required_workarounds: int
@@ -574,7 +584,7 @@ class CanFdOptions:
 
 
 ControllerOptions = (GpioOptions | BlockOptions | PinStateOptions | UartOptions | SpiOptions | I2cOptions |
-                     ExtiOptions | PwmOptions | PwmGroupOptions | EncoderOptions | AdcOptions | CanOptions |
+                     ExtiOptions | PwmOptions | PwmGroupOptions | EncoderOptions | AdcOptions | DacOptions | CanOptions |
                      UsbDeviceOptions | EthernetOptions | EthernetFramesOptions |
                      TimerCaptureOptions |
                      AdvancedPwmOptions | PwmAdcOptions | CanFdOptions |
@@ -685,6 +695,10 @@ def mode_options(values):
                               values["stream_resolution"])
                           if "stream_resolution" in values else None,
                           resolution_bits=values.get("resolution_bits", 12))
+    if kind == "dac":
+        return DacOptions(tuple(values["channels"]), values["format"],
+                          tuple(values["idle_codes"]), values["output_buffer"],
+                          values["trigger"], values.get("amplitude", 0))
     if kind == "lptim":
         return LptimOptions(values["tick_hz"], irq)
     if kind == "rtc":

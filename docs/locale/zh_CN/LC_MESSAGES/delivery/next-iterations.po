@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 76835fed51448cb33d82be44ddca548dc80fb58ade236a5801af5c1d22394cfa\n"
+"X-Nexus-Source-SHA256: 536db00cd19efeee1167b873a5ff5b0e10945bc5694174db5dd2caf4167649a7\n"
 
 #: docs/delivery/next-iterations.md:8
 msgid "F4 收敛后的迭代边界"
@@ -356,3 +356,7 @@ msgstr ""
 "可选诊断在编译期裁剪，通用入口复用同一实现。后续按具体需求开展精确型号适配、 运行期电源管理、完整软件候选与真实 "
 "IRQ／吞吐／栈／功耗测量。当前 F4 仍拒绝 runtime power 配置，非 F407 型号仍需精确适配。软件候选与物理状态不得从旧版本"
 " 继承，未执行的 HIL 保持 `not_executed`。"
+
+#: docs/delivery/next-iterations.md
+msgid "CPU、软件／TIM6／7 触发与波形已实现；DMA、欠载恢复未完成"
+msgstr "CPU、软件／TIM6／7 触发与波形已实现；DMA、欠载恢复未完成"

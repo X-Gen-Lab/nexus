@@ -19,7 +19,7 @@ set(stm32_sources drivers/platform_coordinator.c drivers/platform_lifecycle.c
     drivers/system_lifecycle.c
     drivers/lifecycle_pins.c)
 set(stm32_uart_hal OFF)
-foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth eth_frames
+foreach(kind gpio uart spi i2c flash watchdog exti pwm adc dac can usb_device eth eth_frames
         timer_capture advanced_pwm block rtc external_bus)
     nexus_controller_modes(modes "${kind}")
     if(NOT modes)
@@ -39,7 +39,7 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth et
         list(APPEND stm32_sources "drivers/${kind}.c")
     endif()
     # Pin acquisition and rollback share GPIO helpers, including CS/PWM pins.
-    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can|usb_device|eth|eth_frames|timer_capture|advanced_pwm|block|external_bus)$")
+    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|dac|can|usb_device|eth|eth_frames|timer_capture|advanced_pwm|block|external_bus)$")
         list(APPEND stm32_sources drivers/gpio.c)
     endif()
     if(kind STREQUAL "uart")

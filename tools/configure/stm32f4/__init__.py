@@ -8,6 +8,7 @@ from .contract import (
     PIN_ELECTRICAL,
     PUBLIC_FORMATS,
     ADC_PIN_CHANNELS,
+    DAC_PIN_CHANNELS,
     ADC_GROUP,
     CAN_CLOCK_HZ,
     CAN_CONTROLLERS,

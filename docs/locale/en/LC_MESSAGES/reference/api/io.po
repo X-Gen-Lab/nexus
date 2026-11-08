@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: bae08f07d07163d7390878e4b4a21c7488618a8e8bf0973c6acfbc6c34558043\n"
+"X-Nexus-Source-SHA256: a542eae86ef9271dd05f19cf87ac10295520828439cf4c7f08ecbc66b5f5bd58\n"
 
 #: docs/reference/api/io.md:8
 msgid "Typed I/O: devices and execution contracts"
@@ -9242,3 +9242,175 @@ msgstr ""
 "readable debug control observe its setting. A provider without CPU debug-"
 "control access supports false only; that value does not observe or describe "
 "an external debugger's setting."
+
+#: docs/reference/api/io.md
+msgid "dac.h"
+msgstr "dac.h"
+
+#: docs/reference/api/io.md
+msgid "Raw DAC output, explicit triggers and digital observation."
+msgstr "Raw DAC output, explicit triggers and digital observation."
+
+#: docs/reference/api/io.md
+msgid "One serialized task owner controls a port. Factory lookup has no hardware effect. Digital codes do not measure voltage, settling, precision or the external load."
+msgstr "One serialized task owner controls a port. Factory lookup has no hardware effect. Digital codes do not measure voltage, settling, precision or the external load."
+
+#: docs/reference/api/io.md
+msgid "Input storage encoding, distinct from the 12-bit digital output."
+msgstr "Input storage encoding, distinct from the 12-bit digital output."
+
+#: docs/reference/api/io.md
+msgid "Optional deterministic hardware waveform, never an entropy source."
+msgstr "Optional deterministic hardware waveform, never an entropy source."
+
+#: docs/reference/api/io.md
+msgid "Query fixed raw format and authorized channels without starting I/O."
+msgstr "Query fixed raw format and authorized channels without starting I/O."
+
+#: docs/reference/api/io.md
+msgid "[in] Stable initialized face; serialized task owner."
+msgstr "[in] Stable initialized face; serialized task owner."
+
+#: docs/reference/api/io.md
+msgid "[out] Independent output storage, unchanged on rejection."
+msgstr "[out] Independent output storage, unchanged on rejection."
+
+#: docs/reference/api/io.md
+msgid "SUCCESS, INVALID, STATE or UNSUPPORTED."
+msgstr "SUCCESS, INVALID, STATE or UNSUPPORTED."
+
+#: docs/reference/api/io.md
+msgid "Stage one input code; left alignment is encoded by the provider."
+msgstr "Stage one input code; left alignment is encoded by the provider."
+
+#: docs/reference/api/io.md
+msgid "No buffer is retained. Triggered output waits for a later trigger; waveform offsets must leave room for the selected amplitude."
+msgstr "No buffer is retained. Triggered output waits for a later trigger; waveform offsets must leave room for the selected amplitude."
+
+#: docs/reference/api/io.md
+msgid "[in] Selected controller under one serialized task owner."
+msgstr "[in] Selected controller under one serialized task owner."
+
+#: docs/reference/api/io.md
+msgid "[in] Physical channel 1 or 2, authorized by this face."
+msgstr "[in] Physical channel 1 or 2, authorized by this face."
+
+#: docs/reference/api/io.md
+msgid "[in] 0..255 for u8 or 0..4095 for either 12-bit storage format."
+msgstr "[in] 0..255 for u8 or 0..4095 for either 12-bit storage format."
+
+#: docs/reference/api/io.md
+msgid "SUCCESS, INVALID, PERMISSION, STATE, CONTEXT or UNSUPPORTED."
+msgstr "SUCCESS, INVALID, PERMISSION, STATE, CONTEXT or UNSUPPORTED."
+
+#: docs/reference/api/io.md
+msgid "Stage both channels using one hardware dual-data write."
+msgstr "Stage both channels using one hardware dual-data write."
+
+#: docs/reference/api/io.md
+msgid "No retained buffers. A common trigger determines simultaneous output; atomic staging alone does not establish analog simultaneity."
+msgstr "No retained buffers. A common trigger determines simultaneous output; atomic staging alone does not establish analog simultaneity."
+
+#: docs/reference/api/io.md
+msgid "[in] Exclusive owner authorized for both channels."
+msgstr "[in] Exclusive owner authorized for both channels."
+
+#: docs/reference/api/io.md
+msgid "[in] Channel-one input code in the selected raw unit."
+msgstr "[in] Channel-one input code in the selected raw unit."
+
+#: docs/reference/api/io.md
+msgid "[in] Channel-two input code in the selected raw unit."
+msgstr "[in] Channel-two input code in the selected raw unit."
+
+#: docs/reference/api/io.md
+msgid "Enable selected outputs and their explicitly owned trigger source."
+msgstr "Enable selected outputs and their explicitly owned trigger source."
+
+#: docs/reference/api/io.md
+msgid "Failure may retain enabled hardware; stop/close must observe release. Declared digital startup does not qualify an unknown analog load."
+msgstr "Failure may retain enabled hardware; stop/close must observe release. Declared digital startup does not qualify an unknown analog load."
+
+#: docs/reference/api/io.md
+msgid "[in] Prepared exclusive task owner; no concurrent controls."
+msgstr "[in] Prepared exclusive task owner; no concurrent controls."
+
+#: docs/reference/api/io.md
+msgid "[in] Positive for an owned timer; zero for direct/software."
+msgstr "[in] Positive for an owned timer; zero for direct/software."
+
+#: docs/reference/api/io.md
+msgid "[in] Absolute monotonic deadline including startup delay."
+msgstr "[in] Absolute monotonic deadline including startup delay."
+
+#: docs/reference/api/io.md
+msgid "SUCCESS, INVALID, BUSY, STATE, TIMEOUT, IO, CONTEXT or UNSUPPORTED."
+msgstr "SUCCESS, INVALID, BUSY, STATE, TIMEOUT, IO, CONTEXT or UNSUPPORTED."
+
+#: docs/reference/api/io.md
+msgid "Emit one common software trigger for an authorized channel mask."
+msgstr "Emit one common software trigger for an authorized channel mask."
+
+#: docs/reference/api/io.md
+msgid "This never substitutes for an external trigger or a DMA request."
+msgstr "This never substitutes for an external trigger or a DMA request."
+
+#: docs/reference/api/io.md
+msgid "[in] Running software-trigger owner, serialized task context."
+msgstr "[in] Running software-trigger owner, serialized task context."
+
+#: docs/reference/api/io.md
+msgid "[in] Nonempty NX_DAC_CHANNEL_* mask within authorization."
+msgstr "[in] Nonempty NX_DAC_CHANNEL_* mask within authorization."
+
+#: docs/reference/api/io.md
+msgid "Stop progression and hold selected idle codes until full close."
+msgstr "Stop progression and hold selected idle codes until full close."
+
+#: docs/reference/api/io.md
+msgid "BUSY/failure retains hardware responsibility. Full Platform release later disables the DAC and restores its selected original pin fields."
+msgstr "BUSY/failure retains hardware responsibility. Full Platform release later disables the DAC and restores its selected original pin fields."
+
+#: docs/reference/api/io.md
+msgid "[in] Same serialized owner, with all caller storage still live."
+msgstr "[in] Same serialized owner, with all caller storage still live."
+
+#: docs/reference/api/io.md
+msgid "[in] Absolute deadline for the digital idle observation."
+msgstr "[in] Absolute deadline for the digital idle observation."
+
+#: docs/reference/api/io.md
+msgid "SUCCESS, INVALID, STATE, BUSY, TIMEOUT, IO or CONTEXT."
+msgstr "SUCCESS, INVALID, STATE, BUSY, TIMEOUT, IO or CONTEXT."
+
+#: docs/reference/api/io.md
+msgid "Read digital DOR and declared timer division, not analog voltage."
+msgstr "Read digital DOR and declared timer division, not analog voltage."
+
+#: docs/reference/api/io.md
+msgid "[in] Initialized task owner; no concurrent state mutation."
+msgstr "[in] Initialized task owner; no concurrent state mutation."
+
+#: docs/reference/api/io.md
+msgid "[out] Independent snapshot; u8 input reads back as code<<4."
+msgstr "[out] Independent snapshot; u8 input reads back as code<<4."
+
+#: docs/reference/api/io.md
+msgid "SUCCESS, INVALID, STATE, CONTEXT or UNSUPPORTED."
+msgstr "SUCCESS, INVALID, STATE, CONTEXT or UNSUPPORTED."
+
+#: docs/reference/api/io.md
+msgid "Immutable selected facts; no physical qualification is inferred."
+msgstr "Immutable selected facts; no physical qualification is inferred."
+
+#: docs/reference/api/io.md
+msgid "DOR codes always use 12-bit right alignment, including u8 input."
+msgstr "DOR codes always use 12-bit right alignment, including u8 input."
+
+#: docs/reference/api/io.md
+msgid "Shared immutable operations; callbacks receive instance context."
+msgstr "Shared immutable operations; callbacks receive instance context."
+
+#: docs/reference/api/io.md
+msgid "Face and caller/provider storage outlive all uses and full close."
+msgstr "Face and caller/provider storage outlive all uses and full close."

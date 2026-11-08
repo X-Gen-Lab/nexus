@@ -85,6 +85,14 @@ verify transceiver supply, RS485 bus wiring or physical turnaround.
 :project: nexus
 ```
 
+(dac_8h)=
+
+## dac.h
+
+```{doxygenfile} io/include/nexus/io/dac.h
+:project: nexus
+```
+
 (adc_8h)=
 
 ## adc.h

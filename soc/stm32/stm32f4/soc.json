@@ -1090,6 +1090,20 @@
       "resources": [
         "exti:line:2"
       ]
+    },
+    "DAC": {
+      "kind": "dac",
+      "modes": [
+        "direct",
+        "triggered",
+        "noise",
+        "triangle"
+      ],
+      "irq": [],
+      "pins": [
+        "PA4",
+        "PA5"
+      ]
     }
   },
   "reserved_resources": [

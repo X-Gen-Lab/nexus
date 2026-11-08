@@ -1,0 +1,20 @@
+schema = 2
+board_package = "zg_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 16384
+libc_heap_bytes = 0
+
+[dac.output]
+binding = "output"
+mode = "direct"
+channels = [1, 2]
+format = "u8"
+idle_codes = [0, 0]
+output_buffer = true
+trigger = "none"

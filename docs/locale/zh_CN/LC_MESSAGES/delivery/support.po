@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: eefc11e02b5d76b8e2c7f51b4e4b24c3214bf3f12a437796adc5ac673db02922\n"
+"X-Nexus-Source-SHA256: e3279ff848adc2bfaeb2393154f90368acadf039c7f0709d038b323b1b15a7f2\n"
 
 #: docs/delivery/support.md:8
 msgid "当前精确支持范围"
@@ -274,3 +274,15 @@ msgstr ""
 "[重构前固定源码](https://github.com/X-Gen-"
 "Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)。 "
 "本次重构不能继承旧候选、软件计数或实板结果。"
+
+#: docs/delivery/support.md
+msgid "DAC"
+msgstr "DAC"
+
+#: docs/delivery/support.md
+msgid "单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；三种输入格式、原子双通道暂存与显式空闲码；DMA 尚未实现"
+msgstr "单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；三种输入格式、原子双通道暂存与显式空闲码；DMA 尚未实现"
+
+#: docs/delivery/support.md
+msgid "DAC 由一个 controller owner 独占，按所选通道取得 PA4／PA5；与 ADC 或 SPI 的 引脚冲突必须拒绝。公共 CPU 写入始终接收未移位原始码，`u12-left` 由 C 编码， 数字 DOR 始终为右对齐 12 位，`u8` 观察值为输入码乘 16。TIM6／7 触发只开放 独占的 84 MHz 固定时钟源，API 的 1 MHz 上限是数字配置政策，不是模拟性能保证； 实际分频可查询。noise 是确定性波形，不能用于熵源。stop 保持所声明空闲码， 完整 Platform stop 才禁用 DAC 并恢复原引脚字段；失败保留责任且可重试。两种密度的 `tests/contracts/dac_assembly/` 只提供软件参考，不代表 PCB 接线、负载、精度或 模拟 settling 资格。DAC DMA、欠载 IRQ、外部共享触发与物理验收仍未完成。"
+msgstr "DAC 由一个 controller owner 独占，按所选通道取得 PA4／PA5；与 ADC 或 SPI 的 引脚冲突必须拒绝。公共 CPU 写入始终接收未移位原始码，`u12-left` 由 C 编码， 数字 DOR 始终为右对齐 12 位，`u8` 观察值为输入码乘 16。TIM6／7 触发只开放 独占的 84 MHz 固定时钟源，API 的 1 MHz 上限是数字配置政策，不是模拟性能保证； 实际分频可查询。noise 是确定性波形，不能用于熵源。stop 保持所声明空闲码， 完整 Platform stop 才禁用 DAC 并恢复原引脚字段；失败保留责任且可重试。两种密度的 `tests/contracts/dac_assembly/` 只提供软件参考，不代表 PCB 接线、负载、精度或 模拟 settling 资格。DAC DMA、欠载 IRQ、外部共享触发与物理验收仍未完成。"

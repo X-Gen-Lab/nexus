@@ -51,6 +51,7 @@ nexus_io_domain(memory_window ALIAS IOMemoryWindow
 nexus_io_domain(watchdog ALIAS IOWatchdog SOURCES src/api/watchdog.c)
 nexus_io_domain(exti ALIAS IOEXTI SOURCES src/api/exti.c DEPENDS nexus_io_wake)
 nexus_io_domain(pwm ALIAS IOTimer SOURCES src/api/timer.c)
+nexus_io_domain(dac ALIAS IODAC SOURCES src/api/dac.c)
 nexus_io_domain(adc ALIAS IOADC
     SOURCES src/api/adc.c src/mechanisms/adc_observer.c
         src/mechanisms/adc_stream_profile.c
@@ -91,7 +92,7 @@ set(_nexus_io_domains ${NEXUS_SELECTED_KINDS})
 # Runtime and Native admit caller-defined providers, independently of Board facts.
 if(_nexus_runtime_scope OR NOT DEFINED NEXUS_SOC_FAMILY OR
         NEXUS_SOC_FAMILY STREQUAL "native")
-    set(_nexus_io_domains gpio uart spi i2c flash watchdog exti pwm adc can
+    set(_nexus_io_domains gpio uart spi i2c flash watchdog exti pwm adc dac can
         usb_device eth eth_frames timer_capture advanced_pwm pwm_group encoder
         pwm_adc can_fd adc_group rtc lptim entropy block external_bus
         parallel16 memory_window)

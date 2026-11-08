@@ -14,6 +14,9 @@ ADC_PIN_CHANNELS = MappingProxyType({
          *[f"PC{i}" for i in range(6)]))
 })
 
+DAC_PIN_CHANNELS = MappingProxyType({("DAC", "PA4"): 1,
+                                   ("DAC", "PA5"): 2})
+
 
 CONTROLLER_BINDINGS = (
     uart_binding("USART1", 2, 37, (2, 7, 4), (2, 2, 4)),

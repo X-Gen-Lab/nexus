@@ -15,6 +15,8 @@ DESCRIPTOR = FamilyDescriptor(
     ),
     references="references.json",
     owned_payload=(
+        "soc/stm32/stm32f4/drivers/dac.c",
+        "soc/stm32/stm32f4/private/stm32f407_dac.h",
         "soc/stm32/stm32f4/sram_boot.c",
         "soc/stm32/stm32f4/private/stm32f407_sram_boot.h",
         "soc/stm32/stm32f4/private/stm32f407_fsmc_profile.h",
@@ -58,6 +60,7 @@ DESCRIPTOR = FamilyDescriptor(
         "soc/stm32/stm32f4/private/stm32f407_eth_frames.h",
     ),
     configuration_helpers=(
+        "tools/configure/stm32f4/dac.py",
         "tools/configure/stm32f4/sram.py",
         "tools/configure/stm32f4/fsmc.py",
         "tools/configure/stm32f4/block.py",

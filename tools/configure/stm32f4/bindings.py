@@ -527,6 +527,9 @@ def _uart_constructor(item, result):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed STM32 instance, including its rollback and stop."""
     item = controller_ir(item, "stm32f4")
+    if item.kind == "dac":
+        from .dac import constructor as dac_constructor
+        return dac_constructor(item, result)
     if item.kind == "block":
         from .block import constructor as block_constructor
         return block_constructor(item, result)

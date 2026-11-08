@@ -41,6 +41,7 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 | UART | IRQ byte/event、word 与明确 block／DMA 模式分别选择；有限 TX、有限 RX、连续 RX 和双向模式不自动互相授权 |
 | SPI／I2C | 受审 polling／异步／DMA 路径与显式 endpoint；不能从 controller 存在推定任意 route 或速率 |
 | ADC／Timer | ADC1 外部通道 0--15、最多 16 ranks 的 shot／scan 与触发 DMA；PWM、capture、互补输出与 break；共享 timer 和资源冲突须通过准入 |
+| DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；三种输入格式、原子双通道暂存与显式空闲码；DMA 尚未实现 |
 | Flash／IWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
 | Classic CAN | 所选 mailbox 与共享 filter domain；不提供 CAN FD |
 | USB | 所选 OTG FS device PIO；不由此授予 Host、HS、DMA 或全部 class stack |
@@ -64,6 +65,15 @@ ADC1 的 `resolution_bits` 可选择 6／8／10／12，默认 12。poll、有限
 DMA buffer 必须位于所选可达域，CCM 不可用于该 DMA。连续 producer 不覆盖已借用
 块，缺替换存储时停止并报告 loss；模型或静态预算不证明任意负载下无丢失。
 取消、超时和停止失败继续保留 buffer 与恢复责任，直到真实排空并发布 SETTLED。
+
+DAC 由一个 controller owner 独占，按所选通道取得 PA4／PA5；与 ADC 或 SPI 的
+引脚冲突必须拒绝。公共 CPU 写入始终接收未移位原始码，`u12-left` 由 C 编码，
+数字 DOR 始终为右对齐 12 位，`u8` 观察值为输入码乘 16。TIM6／7 触发只开放
+独占的 84 MHz 固定时钟源，API 的 1 MHz 上限是数字配置政策，不是模拟性能保证；
+实际分频可查询。noise 是确定性波形，不能用于熵源。stop 保持所声明空闲码，
+完整 Platform stop 才禁用 DAC 并恢复原引脚字段；失败保留责任且可重试。两种密度的
+`tests/contracts/dac_assembly/` 只提供软件参考，不代表 PCB 接线、负载、精度或
+模拟 settling 资格。DAC DMA、欠载 IRQ、外部共享触发与物理验收仍未完成。
 
 ## 选择、证据与保留依赖
 

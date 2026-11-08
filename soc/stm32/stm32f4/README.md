@@ -79,6 +79,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
 | PWM | TIM3 通道、固定共享 PSC/ARR、period1–65535、duty0–period、shadow update；stop 建立 GPIO inactive |
 | ADC | ADC1 外部通道 0--15、最多 16 ranks，6／8／10／12-bit 软件 shot/scan 与 TIM3 触发有限／连续 DMA block；显式 sample time/reference、完整 scan 和 consumer loan 背压 |
+| DAC | PA4／PA5 的单／双通道，CPU direct、软件或独占 TIM6／7 触发、noise／triangle；u8／u12-right／u12-left；DMA 尚未实现 |
 | CAN | CAN1/CAN2 Classic CAN IRQ、三邮箱、共享 filter domain；无 CAN FD |
 | USB | OTG FS device PIO endpoint，独立 USB48 owner；无 Host/HS/DMA/class stack |
 | Ethernet | Raw RMII frame/MDIO、调用者 descriptor／RX loan；IP／协议策略外置 |
@@ -155,6 +156,34 @@ lock、通用设备引用或预留 copy pool。UART IRQ 搬运字节和事实，
 I2C recover 同时检查 BUSY 与已保留 SCL/SDA GPIO 实时输入；即使 BUSY 清除，只要
 线路低就返回 IO。局部 reset 不打 GPIO 恢复脉冲、不重放事务、不保证未来总线可用；
 缺线路事实时在寄存器写入前拒绝。
+
+## DAC 输出与触发所有权
+
+`dac.h` 暴露固定格式、物理通道授权、原始码写入、双通道暂存、start／trigger／stop
+及数字状态；公共接口不泄露厂商 Handle。`drivers/dac.c` 使用已锁定官方 LL，
+`private/stm32f407_dac.h` 保存只读配置和按实例定容的 CPU 状态，不预留 DMA buffer、
+worker 或请求队列。生成器只声明静态对象、factory 和 prepare／close 调用。
+
+PA4 对应通道 1，PA5 对应通道 2。单通道只取得对应引脚；双通道通过一次官方 dual
+DHR 写入暂存两个值。公共 CPU 输入始终是未移位原始码；`u12-left` 在 C 中左移，
+`u8` 的数字 DOR 回读为输入码乘 16。无论格式，状态均返回右对齐 12 位数字计数，
+不测量电压。noise／triangle 的偏移加幅度不得超过 4095，noise 不提供随机熵。
+
+软件触发不产生 DMA 请求。当前 CPU／wave 实现没有 DAC IRQ；TIM6／7 为独占
+trigger owner，从固定 84 MHz timer clock 取得向下限速的整数分频。API 只准入
+1 Hz--1 MHz 数字请求，状态返回实际分频；此政策不是实测模拟更新率或负载保证。
+修改 PSC／ARR 时先禁用并观察 DAC TEN，再生成 UG，避免配置过程输出额外样本；
+明确清除继承的 OPM／UDIS／URS／ARPE，并回读 divider／MMS。startup 延时从最后一个
+输出 enable 之后计，结束前再次检查绝对 deadline。
+
+stop 撤回触发与波形后安装所声明空闲码，完整 close 才关闭输出并撤回新增 gate。
+拒绝已活动的 DAC、欠载中断源或 TIM6／7；不清除其他 owner 的 IRQ／状态。停止、
+配置回读或 gate 撤回失败继续保留 cleanup receipt，可由同一 owner 重试。Platform
+随后恢复选中引脚和 GPIO clock；完整释放不承诺持续驱动空闲电平。
+
+`tests/contracts/dac_assembly/` 提供 VE 左对齐／ZG 8 位软件参考、真实 factory 与 ARM
+链接消费者；它们不授权任何实际 PCB。DAC DMA、欠载 IRQ／恢复、外部或共享 trigger
+仍待独立实现。当前没有 DAC 实板或模拟负载资格，物理 HIL 为 `not_executed`。
 
 ## 冷态取得、逆序撤回与验证
 

@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: bae08f07d07163d7390878e4b4a21c7488618a8e8bf0973c6acfbc6c34558043\n"
+"X-Nexus-Source-SHA256: a542eae86ef9271dd05f19cf87ac10295520828439cf4c7f08ecbc66b5f5bd58\n"
 
 #: docs/reference/api/io.md:8
 msgid "Typed I/O: devices and execution contracts"
@@ -8502,3 +8502,175 @@ msgstr ""
 "最小值和最大值均为零表示超时边界未知，例如硬件影子寄存器更新尚未完成，或振荡器限制尚未复核。enabled 和 irreversible "
 "事实仍然有效。debug_freeze 报告提供者支持的固件配置。能够由 CPU 读取调试控制的提供者会观察该设置。不具备 CPU "
 "调试控制访问能力的提供者仅支持 false；该值既未观察，也不描述外部调试器的设置。"
+
+#: docs/reference/api/io.md
+msgid "dac.h"
+msgstr "dac.h"
+
+#: docs/reference/api/io.md
+msgid "Raw DAC output, explicit triggers and digital observation."
+msgstr "原始 DAC 输出、显式触发与数字观察。"
+
+#: docs/reference/api/io.md
+msgid "One serialized task owner controls a port. Factory lookup has no hardware effect. Digital codes do not measure voltage, settling, precision or the external load."
+msgstr "端口由单一任务所有者串行控制。factory 查找不产生硬件副作用。数字码不测量电压、建立时间、精度或外部负载。"
+
+#: docs/reference/api/io.md
+msgid "Input storage encoding, distinct from the 12-bit digital output."
+msgstr "输入的存储编码；与 12 位数字输出的表示方式相区分。"
+
+#: docs/reference/api/io.md
+msgid "Optional deterministic hardware waveform, never an entropy source."
+msgstr "可选的确定性硬件波形，不能用作熵源。"
+
+#: docs/reference/api/io.md
+msgid "Query fixed raw format and authorized channels without starting I/O."
+msgstr "查询固定原始格式与授权通道，不启动 I/O。"
+
+#: docs/reference/api/io.md
+msgid "[in] Stable initialized face; serialized task owner."
+msgstr "[in] 稳定且已初始化的接口；由串行任务 owner 使用。"
+
+#: docs/reference/api/io.md
+msgid "[out] Independent output storage, unchanged on rejection."
+msgstr "[out] 独立输出存储；拒绝时保持原值。"
+
+#: docs/reference/api/io.md
+msgid "SUCCESS, INVALID, STATE or UNSUPPORTED."
+msgstr "SUCCESS、INVALID、STATE 或 UNSUPPORTED。"
+
+#: docs/reference/api/io.md
+msgid "Stage one input code; left alignment is encoded by the provider."
+msgstr "暂存一个输入码；左对齐由 provider 编码。"
+
+#: docs/reference/api/io.md
+msgid "No buffer is retained. Triggered output waits for a later trigger; waveform offsets must leave room for the selected amplitude."
+msgstr "不保留 buffer。触发模式的输出等待后续触发；波形偏移必须为所选幅度保留空间。"
+
+#: docs/reference/api/io.md
+msgid "[in] Selected controller under one serialized task owner."
+msgstr "[in] 由一个串行任务 owner 控制的所选控制器。"
+
+#: docs/reference/api/io.md
+msgid "[in] Physical channel 1 or 2, authorized by this face."
+msgstr "[in] 此接口授权的物理通道 1 或 2。"
+
+#: docs/reference/api/io.md
+msgid "[in] 0..255 for u8 or 0..4095 for either 12-bit storage format."
+msgstr "[in] u8 为 0..255，两种 12 位存储格式均为 0..4095。"
+
+#: docs/reference/api/io.md
+msgid "SUCCESS, INVALID, PERMISSION, STATE, CONTEXT or UNSUPPORTED."
+msgstr "SUCCESS、INVALID、PERMISSION、STATE、CONTEXT 或 UNSUPPORTED。"
+
+#: docs/reference/api/io.md
+msgid "Stage both channels using one hardware dual-data write."
+msgstr "通过一次硬件双通道数据写入暂存两个通道。"
+
+#: docs/reference/api/io.md
+msgid "No retained buffers. A common trigger determines simultaneous output; atomic staging alone does not establish analog simultaneity."
+msgstr "不保留 buffer。公共触发决定同时输出；原子暂存本身不能证明模拟输出同时变化。"
+
+#: docs/reference/api/io.md
+msgid "[in] Exclusive owner authorized for both channels."
+msgstr "[in] 同时获得两个通道授权的独占 owner。"
+
+#: docs/reference/api/io.md
+msgid "[in] Channel-one input code in the selected raw unit."
+msgstr "[in] 按所选原始单位表示的通道 1 输入码。"
+
+#: docs/reference/api/io.md
+msgid "[in] Channel-two input code in the selected raw unit."
+msgstr "[in] 按所选原始单位表示的通道 2 输入码。"
+
+#: docs/reference/api/io.md
+msgid "Enable selected outputs and their explicitly owned trigger source."
+msgstr "启用所选输出及其显式拥有的触发源。"
+
+#: docs/reference/api/io.md
+msgid "Failure may retain enabled hardware; stop/close must observe release. Declared digital startup does not qualify an unknown analog load."
+msgstr "失败后可能保留已启用硬件；stop／close 必须观察释放。声明的数字启动完成不代表未知模拟负载已通过验证。"
+
+#: docs/reference/api/io.md
+msgid "[in] Prepared exclusive task owner; no concurrent controls."
+msgstr "[in] 已准备的独占任务 owner；禁止并发控制。"
+
+#: docs/reference/api/io.md
+msgid "[in] Positive for an owned timer; zero for direct/software."
+msgstr "[in] 使用独占定时器触发时采样率须为正；direct／software 模式须为零。"
+
+#: docs/reference/api/io.md
+msgid "[in] Absolute monotonic deadline including startup delay."
+msgstr "[in] 包括启动延时的绝对单调 deadline。"
+
+#: docs/reference/api/io.md
+msgid "SUCCESS, INVALID, BUSY, STATE, TIMEOUT, IO, CONTEXT or UNSUPPORTED."
+msgstr "SUCCESS、INVALID、BUSY、STATE、TIMEOUT、IO、CONTEXT 或 UNSUPPORTED。"
+
+#: docs/reference/api/io.md
+msgid "Emit one common software trigger for an authorized channel mask."
+msgstr "为授权通道掩码发出一次公共软件触发。"
+
+#: docs/reference/api/io.md
+msgid "This never substitutes for an external trigger or a DMA request."
+msgstr "此操作不能替代外部触发或 DMA 请求。"
+
+#: docs/reference/api/io.md
+msgid "[in] Running software-trigger owner, serialized task context."
+msgstr "[in] 运行中的软件触发 owner；串行任务上下文。"
+
+#: docs/reference/api/io.md
+msgid "[in] Nonempty NX_DAC_CHANNEL_* mask within authorization."
+msgstr "[in] 授权范围内的非空 NX_DAC_CHANNEL_* 掩码。"
+
+#: docs/reference/api/io.md
+msgid "Stop progression and hold selected idle codes until full close."
+msgstr "停止推进并保持所选空闲码，直至完整 close。"
+
+#: docs/reference/api/io.md
+msgid "BUSY/failure retains hardware responsibility. Full Platform release later disables the DAC and restores its selected original pin fields."
+msgstr "BUSY／失败保留硬件责任。后续完整 Platform 释放才禁用 DAC 并恢复所选原引脚字段。"
+
+#: docs/reference/api/io.md
+msgid "[in] Same serialized owner, with all caller storage still live."
+msgstr "[in] 同一个串行 owner，调用者存储须仍然存活。"
+
+#: docs/reference/api/io.md
+msgid "[in] Absolute deadline for the digital idle observation."
+msgstr "[in] 数字空闲观察的绝对 deadline。"
+
+#: docs/reference/api/io.md
+msgid "SUCCESS, INVALID, STATE, BUSY, TIMEOUT, IO or CONTEXT."
+msgstr "SUCCESS、INVALID、STATE、BUSY、TIMEOUT、IO 或 CONTEXT。"
+
+#: docs/reference/api/io.md
+msgid "Read digital DOR and declared timer division, not analog voltage."
+msgstr "读取数字 DOR 和声明的 timer 分频，不读取模拟电压。"
+
+#: docs/reference/api/io.md
+msgid "[in] Initialized task owner; no concurrent state mutation."
+msgstr "[in] 已初始化的任务 owner；禁止并发修改状态。"
+
+#: docs/reference/api/io.md
+msgid "[out] Independent snapshot; u8 input reads back as code<<4."
+msgstr "[out] 独立快照；u8 输入回读为 code<<4。"
+
+#: docs/reference/api/io.md
+msgid "SUCCESS, INVALID, STATE, CONTEXT or UNSUPPORTED."
+msgstr "SUCCESS、INVALID、STATE、CONTEXT 或 UNSUPPORTED。"
+
+#: docs/reference/api/io.md
+msgid "Immutable selected facts; no physical qualification is inferred."
+msgstr "不可变的所选事实；不由此推导物理资格。"
+
+#: docs/reference/api/io.md
+msgid "DOR codes always use 12-bit right alignment, including u8 input."
+msgstr "DOR 码始终使用 12 位右对齐，u8 输入也如此。"
+
+#: docs/reference/api/io.md
+msgid "Shared immutable operations; callbacks receive instance context."
+msgstr "共享的不可变方法表；回调接收实例 context。"
+
+#: docs/reference/api/io.md
+msgid "Face and caller/provider storage outlive all uses and full close."
+msgstr "接口及调用者／provider 存储必须存活至所有使用和完整 close 结束。"

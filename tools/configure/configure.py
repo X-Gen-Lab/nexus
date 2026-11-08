@@ -28,7 +28,7 @@ if __package__ in (None, ""):
 
 from tools.configure import cpu as cpu_profiles
 from tools.configure import bundle, dependencies, sdk, i2s2, enhanced_endpoints
-from tools.configure import integration_package, adc
+from tools.configure import integration_package, adc, dac
 from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
 from tools.configure.ir import (
     CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
@@ -1018,6 +1018,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                 rtc.validate_board(selection, board)
             validate_selection(selection, route, provider, ram["size"])
             route = adc.selected_route(selection, route, provider)
+            route = dac.selected_route(selection, route, provider)
             resolved_pin_states = None
             if mode == "named-states":
                 from tools.configure import pin_states

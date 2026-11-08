@@ -288,6 +288,10 @@ def editor_schema():
         if kind == "i2c":
             i2c_timing_selection.controller_editor_schema(
                 properties[kind]["additionalProperties"], record)
+        if kind == "dac":
+            from tools.configure import dac
+            dac.editor_schema(properties[kind]["additionalProperties"][
+                "properties"])
         if kind in {"eth", "eth_frames"}:
             ethernet.controller_editor_schema(
                 properties[kind]["additionalProperties"])

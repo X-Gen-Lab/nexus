@@ -2519,6 +2519,80 @@
           "controller:TIM3"
         ]
       }
+    },
+    {
+      "id": "dac-pa4",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "DAC",
+      "kind": "dac",
+      "pins": [
+        {
+          "pin": "PA4",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "direct",
+        "triggered",
+        "noise",
+        "triangle"
+      ],
+      "source": "DS8626 Rev12 Table7 DAC_OUT1 PA4 and DAC_OUT2 PA5; RM0090 DAC; software route, no PCB or analog qualification"
+    },
+    {
+      "id": "dac-pa5",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "DAC",
+      "kind": "dac",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "direct",
+        "triggered",
+        "noise",
+        "triangle"
+      ],
+      "source": "DS8626 Rev12 Table7 DAC_OUT1 PA4 and DAC_OUT2 PA5; RM0090 DAC; software route, no PCB or analog qualification"
+    },
+    {
+      "id": "dac-pa4-pa5",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "DAC",
+      "kind": "dac",
+      "pins": [
+        {
+          "pin": "PA4",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA5",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "direct",
+        "triggered",
+        "noise",
+        "triangle"
+      ],
+      "source": "DS8626 Rev12 Table7 DAC_OUT1 PA4 and DAC_OUT2 PA5; RM0090 DAC; software route, no PCB or analog qualification"
     }
   ]
 }

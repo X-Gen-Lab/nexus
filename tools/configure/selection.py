@@ -99,6 +99,9 @@ def validate_selection(selection, route, provider, ram_size):
     elif kind == "adc":
         from tools.configure import adc
         adc.validate_selection(selection, route, provider)
+    elif kind == "dac":
+        from tools.configure import dac
+        dac.validate_selection(selection, route, provider)
     elif kind == "i2c":
         from tools.configure import i2c_timing_selection
         i2c_timing_selection.validate_selection(selection, provider)

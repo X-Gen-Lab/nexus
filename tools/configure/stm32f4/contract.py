@@ -5,7 +5,7 @@ from tools.configure.calls import Symbol
 from types import MappingProxyType
 
 from tools.configure.providers import common, descriptor
-from .hardware import ADC_PIN_CHANNELS, FIXED_DMA as _FIXED_DMA
+from .hardware import ADC_PIN_CHANNELS, DAC_PIN_CHANNELS, FIXED_DMA as _FIXED_DMA
 from tools.configure.adc import RESOLUTION_BITS
 
 PARTS = MappingProxyType({
@@ -73,6 +73,10 @@ SPI_REQUIRES_ENDPOINT = True
 PIN_ELECTRICAL = True
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
+    ('dac', 'direct'): 'dac',
+    ('dac', 'triggered'): 'dac',
+    ('dac', 'noise'): 'dac',
+    ('dac', 'triangle'): 'dac',
     ('memory_window', 'startup-memory'): 'fsmc',
     ('external_bus', 'async16'): 'fsmc',
     ('memory_window', 'cpu-window'): 'fsmc',
