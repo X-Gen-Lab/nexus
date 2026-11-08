@@ -64,6 +64,17 @@
             "minimum": 0,
             "description": "Declared analog reference in millivolts; not a measurement."
           },
+          "resolution_bits": {
+            "type": "integer",
+            "enum": [
+              6,
+              8,
+              10,
+              12
+            ],
+            "default": 12,
+            "description": "ADC raw resolution: 6, 8, 10 or 12 bits; omitted selects 12, subject to provider support."
+          },
           "sample_times": {
             "type": "array",
             "items": {

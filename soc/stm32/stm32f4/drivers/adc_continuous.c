@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_stream.h"
+#include "stm32f4xx_ll_adc.h"
 #include "stm32f4xx_ll_tim.h"
 
 #ifndef NX_STM32_DMA_DISABLE
@@ -111,6 +112,8 @@ static nx_result_t arm(nx_stm32_adc_continuous_state_t* state) {
     ADC_TypeDef* adc = base->adc.registers;
     adc->CR2 = 0U;
     adc->CR1 = base->adc.channel_count > 1U ? (uint32_t)ADC_CR1_SCAN : 0U;
+    LL_ADC_SetResolution(adc,
+                         (uint32_t)base->adc.resolution << ADC_CR1_RES_Pos);
     nx_stm32_adc_stream_sequence(base);
     adc->SR = 0U;
     base->timer->CR1 = 0U;
@@ -392,17 +395,19 @@ static nx_result_t sequence_info(const void* context,
     static const uint16_t cycles[] = {3U, 15U, 28U, 56U, 84U, 112U, 144U, 480U};
     uint32_t scan = 0U;
     for (size_t i = 0U; i < base->adc.channel_count; ++i) {
-        scan += cycles[base->adc.sample_times[i]] + 12U;
+        scan += cycles[base->adc.sample_times[i]] +
+                (12U - 2U * base->adc.resolution);
     }
-    *info = (nx_adc_sequence_info_t){.channels = base->adc.channels,
-                                     .sample_times = base->adc.sample_times,
-                                     .sample_cycles = cycles,
-                                     .channel_count = base->adc.channel_count,
-                                     .sample_code_count = 8U,
-                                     .adc_clock_hz = base->adc_clock_hz,
-                                     .timer_clock_hz = base->timer_clock_hz,
-                                     .scan_cycles = scan,
-                                     .conversion_cycles = 12U};
+    *info = (nx_adc_sequence_info_t){
+        .channels = base->adc.channels,
+        .sample_times = base->adc.sample_times,
+        .sample_cycles = cycles,
+        .channel_count = base->adc.channel_count,
+        .sample_code_count = 8U,
+        .adc_clock_hz = base->adc_clock_hz,
+        .timer_clock_hz = base->timer_clock_hz,
+        .scan_cycles = scan,
+        .conversion_cycles = (uint16_t)(12U - 2U * base->adc.resolution)};
     return NX_SUCCESS;
 }
 

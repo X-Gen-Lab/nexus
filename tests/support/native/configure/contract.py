@@ -2,6 +2,7 @@
 from tools.configure.uart_formats import UartFormatPolicy
 from types import MappingProxyType
 from tools.configure.providers import common
+from tools.configure.adc import RESOLUTION_BITS
 
 PARTS = MappingProxyType({
     "NATIVE_MODEL": common.PartPolicy("host-model"),
@@ -30,6 +31,7 @@ DMA_TOPOLOGY = (frozenset(), range(0), range(0))
 LIMITS = MappingProxyType({
     'uart_baud': (1200, 1000000), 'spi_hz': (390625, 50000000),
     'timer_hz': 100000000, 'pwm_period': 65535,
+    'adc_resolution_bits': RESOLUTION_BITS,
 })
 SPI_REQUIRES_ENDPOINT = False
 _FIXED_DMA = MappingProxyType({})

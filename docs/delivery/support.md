@@ -57,6 +57,10 @@ ADC1 通道对应 PA0--7、PB0--1、PC0--5。序列可以重新排序并重复�
 内部输入、注入组和多 ADC 模式尚未接入。16-rank 软件参考装配见
 `tests/contracts/adc_external_assembly/`，不授予真实 PCB 或物理采样资格。
 
+ADC1 的 `resolution_bits` 可选择 6／8／10／12，默认 12。poll、有限和连续 DMA
+共用该静态选择，转换周期与触发速率准入随之变化。DMA 仍使用 halfword，样本仍是
+右对齐的 `uint16_t` 原始计数；分辨率选择不自动建立模拟精度或实际吞吐资格。
+
 DMA buffer 必须位于所选可达域，CCM 不可用于该 DMA。连续 producer 不覆盖已借用
 块，缺替换存储时停止并报告 loss；模型或静态预算不证明任意负载下无丢失。
 取消、超时和停止失败继续保留 buffer 与恢复责任，直到真实排空并发布 SETTLED。

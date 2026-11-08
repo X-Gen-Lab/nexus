@@ -50,7 +50,11 @@ extern "C" void nx_stm32_adc_model_poll(unsigned kind, void* raw) {
         unsigned shift = rank < 6U    ? rank * 5U
                          : rank < 12U ? (rank - 6U) * 5U
                                       : (rank - 12U) * 5U;
-        adc->DR = 100U + ((sequence >> shift) & 31U) * 100U;
+        const uint32_t bits =
+            12U - 2U * static_cast<uint32_t>((adc->CR1 & ADC_CR1_RES) >>
+                                             ADC_CR1_RES_Pos);
+        adc->DR =
+            (100U + ((sequence >> shift) & 31U) * 100U) & ((1U << bits) - 1U);
         adc->CR2 &= ~static_cast<uint32_t>(ADC_CR2_SWSTART);
         adc->SR |= ADC_SR_EOC;
     }
@@ -389,6 +393,85 @@ TEST_F(Stm32AdcStream, StoppedMultiChannelStreamRestoresIndependentPollShots) {
     EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
 }
 
+class Stm32AdcResolution : public Stm32AdcStream,
+                           public testing::WithParamInterface<unsigned> {};
+
+TEST_P(Stm32AdcResolution, HardwareAndPollingReportTheSelectedRawFormat) {
+    state.adc.resolution = static_cast<uint8_t>((12U - GetParam()) / 2U);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_initialize(&state.adc));
+    EXPECT_EQ(state.adc.resolution, (adc.CR1 & ADC_CR1_RES) >> ADC_CR1_RES_Pos);
+    nx_adc_info_t info{};
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_info(&port, &info));
+    EXPECT_EQ(GetParam(), info.resolution_bits);
+    size_t count{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_adc_port_sample(&port, samples, 4U,
+                                 nx_deadline_after(100U, 50U), &count));
+    EXPECT_EQ(2U, count);
+    const unsigned mask = (1U << GetParam()) - 1U;
+    EXPECT_EQ(100U & mask, samples[0]);
+    EXPECT_EQ(200U & mask, samples[1]);
+    EXPECT_EQ(state.adc.resolution, (adc.CR1 & ADC_CR1_RES) >> ADC_CR1_RES_Pos);
+}
+
+TEST_P(Stm32AdcResolution,
+       RateBudgetIncludesSampleAndSelectedConversionCycles) {
+    state.adc.resolution = static_cast<uint8_t>((12U - GetParam()) / 2U);
+    sample_times[0] = sample_times[1] = 0U;
+    constexpr uint32_t admissible[]{700000U, 800000U, 875000U, 1000000U};
+    constexpr uint32_t excessive[]{1400000U, 1000000U, 1000000U, 1400000U};
+    uint16_t prescaler = UINT16_C(0x1234);
+    uint16_t period = UINT16_C(0x5678);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_adc_stream_rate(&state, admissible[state.adc.resolution],
+                                       &prescaler, &period));
+    EXPECT_EQ(admissible[state.adc.resolution],
+              UINT32_C(84000000) / ((static_cast<uint32_t>(prescaler) + 1U) *
+                                    (static_cast<uint32_t>(period) + 1U)));
+    prescaler = UINT16_C(0x1234);
+    period = UINT16_C(0x5678);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_stm32_adc_stream_rate(&state, excessive[state.adc.resolution],
+                                       &prescaler, &period));
+    EXPECT_EQ(UINT16_C(0x1234), prescaler);
+    EXPECT_EQ(UINT16_C(0x5678), period);
+}
+
+TEST_P(Stm32AdcResolution, DmaAndPollingKeepResolutionAndHalfwordStorage) {
+    state.adc.resolution = static_cast<uint8_t>((12U - GetParam()) / 2U);
+    for (unsigned cycle = 0U; cycle < 2U; ++cycle) {
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_start(&port, &stream, 1000U));
+        EXPECT_EQ(state.adc.resolution,
+                  (adc.CR1 & ADC_CR1_RES) >> ADC_CR1_RES_Pos);
+        EXPECT_EQ(DMA_SxCR_PSIZE_0 | DMA_SxCR_MSIZE_0,
+                  memory.CR & (DMA_SxCR_PSIZE | DMA_SxCR_MSIZE));
+        EXPECT_EQ(4U, memory.NDTR);
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+        size_t count{};
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_adc_port_sample(&port, samples, 4U,
+                                     nx_deadline_after(nx_time_now_us(), 50U),
+                                     &count));
+        EXPECT_EQ(2U, count);
+        EXPECT_EQ(0U, adc.CR1 & ADC_CR1_SCAN);
+        EXPECT_EQ(state.adc.resolution,
+                  (adc.CR1 & ADC_CR1_RES) >> ADC_CR1_RES_Pos);
+        ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, &slot, 1U));
+    }
+}
+
+INSTANTIATE_TEST_SUITE_P(AllF407Resolutions, Stm32AdcResolution,
+                         testing::Values(12U, 10U, 8U, 6U));
+
+TEST_F(Stm32AdcStream, InvalidResolutionIsRejectedBeforeAnyRegisterWrite) {
+    state.adc.resolution = 4U;
+    adc.CR1 = UINT32_C(0x5A000000);
+    common.CCR = UINT32_C(0x12345678);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_adc_initialize(&state.adc));
+    EXPECT_EQ(UINT32_C(0x5A000000), adc.CR1);
+    EXPECT_EQ(UINT32_C(0x12345678), common.CCR);
+}
+
 class Stm32AdcContinuous : public testing::Test {
   protected:
     ADC_TypeDef adc = {};
@@ -564,6 +647,35 @@ TEST_F(Stm32AdcContinuous, BankFlipDuringAddressWriteNeverPublishesOldTarget) {
     EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_IO);
     EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
 }
+
+class Stm32AdcContinuousResolution
+    : public Stm32AdcContinuous,
+      public testing::WithParamInterface<unsigned> {};
+
+TEST_P(Stm32AdcContinuousResolution, FactsAndEngineUseTheSameResolution) {
+    state.base.adc.resolution = static_cast<uint8_t>((12U - GetParam()) / 2U);
+    nx_adc_info_t raw{};
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_info(&port, &raw));
+    EXPECT_EQ(GetParam(), raw.resolution_bits);
+    nx_adc_sequence_info_t facts{};
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_sequence_info(&port, &facts));
+    EXPECT_EQ(GetParam(), facts.conversion_cycles);
+    EXPECT_EQ(2U * (15U + GetParam()), facts.scan_cycles);
+    EXPECT_EQ(0U, memory.CR & DMA_SxCR_EN);
+    for (unsigned cycle = 0U; cycle < 2U; ++cycle) {
+        Ready();
+        EXPECT_EQ(state.base.adc.resolution,
+                  (adc.CR1 & ADC_CR1_RES) >> ADC_CR1_RES_Pos);
+        EXPECT_EQ(DMA_SxCR_PSIZE_0 | DMA_SxCR_MSIZE_0,
+                  memory.CR & (DMA_SxCR_PSIZE | DMA_SxCR_MSIZE));
+        EXPECT_EQ(4U, memory.NDTR);
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+        ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, slots, 3U));
+    }
+}
+
+INSTANTIATE_TEST_SUITE_P(AllF407Resolutions, Stm32AdcContinuousResolution,
+                         testing::Values(12U, 10U, 8U, 6U));
 
 TEST_F(Stm32AdcContinuous, SequenceFactsAreColdAndDescribeCompleteScanCost) {
     nx_adc_sequence_info_t facts = {};

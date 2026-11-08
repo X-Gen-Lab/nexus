@@ -63,6 +63,41 @@ include it and use nominal references such as `NX_UART_REF_UART0` with
 the interface faces. Factory getters return existing static objects and do not
 start hardware.
 
+## ADC raw resolution and scan timing
+
+For the maintained F407 ADC1 modes, `resolution_bits` selects 6, 8, 10 or 12
+bits. Omitting it produces an explicit 12-bit decision in the immutable IR and
+resolved audit output. Booleans, strings and other integer values reject. A
+provider must declare support for the chosen resolution; the configuration
+field alone does not grant another device that capability.
+
+The following fragment belongs in an assembly whose Board explicitly authorizes
+the `analog` ADC binding. It is not a complete assembly or a PCB wiring claim.
+
+<!-- nexus-toml-fragment: ADC selection within an independently complete Board-authorized assembly -->
+```toml
+[adc.analog]
+binding = "analog"
+mode = "low-rate-scan"
+channels = [0, 1]
+sample_times = [0, 0]
+reference_mv = 3300
+resolution_bits = 8
+```
+
+Polling, finite trigger DMA and continuous trigger DMA share the selected raw
+format. According to RM0090 Rev22 §13.7, one rank costs its selected acquisition
+cycles plus 12, 10, 8 or 6 conversion cycles. Rate admission and continuous
+sequence metadata use the complete scan cost. A timer divider must also be exact;
+lowering the resolution never silently changes the requested trigger rate.
+
+DMA still transfers halfwords, and each sample remains a right-aligned native
+`uint16_t` raw count. Block capacities and lengths remain byte counts and must
+contain whole scans.
+No packed byte format or extra buffer is introduced for 6- or 8-bit conversions.
+These software facts do not establish analog accuracy, effective resolution,
+sample aperture timestamps or physical throughput.
+
 ## Physical Flash and the selected image
 
 `flash` in the resolved output describes the complete physical device, including

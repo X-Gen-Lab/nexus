@@ -41,6 +41,8 @@ typedef struct {
     const uint8_t* sample_times;
     size_t channel_count;
     uint32_t reference_mv;
+    uint8_t
+        resolution; /**< ADC_CR1 RES encoding, including reset value zero. */
 } nx_stm32_adc_config_t;
 
 /** \brief Exact ADC1/TIM3/DMA2 stream four selection, without mode dispatch. */
@@ -230,6 +232,8 @@ nx_stm32_adc_cold_begin(nx_stm32_adc_state_t* port,
         config->channel_count > 16U || config->reference_mv == 0U ||
         config->reference_mv > 3600U)
         return NX_ERROR_INVALID;
+    if (config->resolution > 3U)
+        return NX_ERROR_UNSUPPORTED;
     for (size_t i = 0U; i < config->channel_count; ++i) {
         if (config->channels[i] > 15U || config->sample_times[i] > 7U)
             return NX_ERROR_UNSUPPORTED;
@@ -268,6 +272,7 @@ nx_stm32_adc_cold_begin(nx_stm32_adc_state_t* port,
     port->sample_times = config->sample_times;
     port->channel_count = config->channel_count;
     port->reference_mv = config->reference_mv;
+    port->resolution = config->resolution;
     return NX_SUCCESS;
 }
 

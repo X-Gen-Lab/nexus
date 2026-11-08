@@ -3,6 +3,8 @@ import hashlib
 
 from tools.configure.providers.common import fail, integer, mode_traits, sequence
 
+RESOLUTION_BITS = (6, 8, 10, 12)
+
 
 def validate_selection(selection, route, provider):
     """Admit only the selected reviewed analog pins, sample and IRQ mode."""
@@ -38,6 +40,12 @@ def validate_selection(selection, route, provider):
             fail("ADC repeated channel requires one consistent sample time")
         timings[channel] = sample
     integer(selection["reference_mv"], 1, 3600, "ADC reference_mv")
+    bits = selection.get("resolution_bits", 12)
+    integer(bits, 6, 12, "ADC resolution_bits")
+    supported = provider.LIMITS.get("adc_resolution_bits", (12,))
+    if bits not in RESOLUTION_BITS or bits not in supported:
+        fail("ADC resolution_bits lacks a maintained provider mode")
+    selection["resolution_bits"] = bits
     if (selection["mode"] in {"single-shot", "low-rate-scan"} and
             (selection["mode"] == "single-shot") != (len(channels) == 1)):
         fail("ADC mode contradicts its reviewed channel count")

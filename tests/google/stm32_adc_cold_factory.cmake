@@ -1,13 +1,27 @@
-# Execute the real generated sixteen-pad factory for both exact densities.
-foreach(adc_density ve zg)
-    set(adc_bundle "${CMAKE_CURRENT_BINARY_DIR}/f407-adc-${adc_density}")
+# Execute real sixteen-pad factories, including nondefault raw resolutions.
+foreach(adc_variant ve zg ve6 zg10)
+    string(REGEX REPLACE "[0-9]+$" "" adc_density "${adc_variant}")
+    set(adc_bits 12)
+    set(adc_fixture "${NEXUS_SOURCE_DIR}/tests/contracts/adc_external_assembly")
+    set(adc_input "${adc_fixture}/${adc_density}-scan.toml")
+    if(adc_variant MATCHES "([0-9]+)$")
+        set(adc_bits "${CMAKE_MATCH_1}")
+        file(READ "${adc_input}" adc_assembly)
+        string(REPLACE "board_package = \"${adc_density}_board\""
+            "board_package = \"${adc_fixture}/${adc_density}_board\""
+            adc_assembly "${adc_assembly}")
+        string(APPEND adc_assembly "\nresolution_bits = ${adc_bits}\n")
+        set(adc_input "${CMAKE_CURRENT_BINARY_DIR}/adc-factory-inputs/${adc_variant}.toml")
+        file(CONFIGURE OUTPUT "${adc_input}" CONTENT "${adc_assembly}" @ONLY)
+    endif()
+    set(adc_bundle "${CMAKE_CURRENT_BINARY_DIR}/f407-adc-${adc_variant}")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B
         "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
         --source-root "${NEXUS_SOURCE_DIR}"
-        --assembly "${NEXUS_SOURCE_DIR}/tests/contracts/adc_external_assembly/${adc_density}-scan.toml"
+        --assembly "${adc_input}"
         --output "${adc_bundle}" COMMAND_ERROR_IS_FATAL ANY)
     nexus_google_configuration_inputs("${adc_bundle}")
-    set(adc_target "nexus_stm32_adc_${adc_density}_cold_factory_test")
+    set(adc_target "nexus_stm32_adc_${adc_variant}_cold_factory_test")
     nexus_google_test(${adc_target} STM32F4_LL
         SOURCES stm32_adc_cold_factory_test.cpp "${adc_bundle}/bindings.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc.c"
@@ -24,6 +38,7 @@ foreach(adc_density ve zg)
     target_include_directories(${adc_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
     target_compile_definitions(${adc_target} PRIVATE STM32F407xx
+        NX_TEST_ADC_BITS=${adc_bits}
         _init=nx_adc_cold_fixture_init _fini=nx_adc_cold_fixture_fini)
     target_compile_options(${adc_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_control_cold_model.h")

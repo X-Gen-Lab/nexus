@@ -298,7 +298,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             definitions += ["    .adc = {"]
         definitions += [f"    .channels = s_nx_adc_channels_{name},",
                         f"    .sample_times = s_nx_adc_samples_{name},",
-                        f"    .channel_count = {len(channels)}u, .reference_mv = {reference}u"]
+                        f"    .channel_count = {len(channels)}u, .reference_mv = {reference}u,",
+                        f"    .resolution = {(12 - item.options.resolution_bits) // 2}u"]
         if dma:
             definitions += ["    },", f"    .regions = s_nx_dma_regions_{name},",
                             f"    .region_count = {count}u, .priority = {item.options.irq.priority}u"]

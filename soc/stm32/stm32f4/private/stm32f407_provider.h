@@ -184,6 +184,7 @@ typedef struct {
     bool active;
     bool initialized;
     uint8_t cold_effects;
+    uint8_t resolution; /**< ADC_CR1 RES encoding: 0/1/2/3 = 12/10/8/6 bits. */
 } nx_stm32_adc_state_t;
 
 #ifdef NEXUS_STM32_MODEL
@@ -278,7 +279,7 @@ void nx_stm32_exti_dispatch(nx_stm32_exti_state_t* const* ports, size_t count,
                             uint32_t vector_mask);
 /** \brief Initialize one TIM3 general-purpose PWM channel. */
 nx_result_t nx_stm32_pwm_initialize(nx_stm32_pwm_state_t* port);
-/** \brief Initialize fixed ADC1 channels, independent 12-bit software trigger.
+/** \brief Initialize fixed ADC1 channels and selected raw resolution.
  */
 nx_result_t nx_stm32_adc_initialize(nx_stm32_adc_state_t* port);
 

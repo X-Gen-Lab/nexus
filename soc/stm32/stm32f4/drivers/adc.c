@@ -1,6 +1,6 @@
 /**
  * \file            adc.c
- * \brief           Fixed ADC1 software shots and low-rate scans
+ * \brief           Selected-resolution ADC1 software shots and low-rate scans
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-09
@@ -22,6 +22,9 @@ nx_result_t nx_stm32_adc_initialize(nx_stm32_adc_state_t* port) {
         port->reference_mv == 0U || port->active) {
         return NX_ERROR_INVALID;
     }
+    if (port->resolution > 3U) {
+        return NX_ERROR_UNSUPPORTED;
+    }
     for (size_t i = 0U; i < port->channel_count; ++i) {
         if (port->channels[i] > 15U || port->sample_times[i] > 7U) {
             return NX_ERROR_UNSUPPORTED;
@@ -35,6 +38,8 @@ nx_result_t nx_stm32_adc_initialize(nx_stm32_adc_state_t* port) {
     }
     port->registers->CR2 = 0U;
     port->registers->CR1 = 0U;
+    LL_ADC_SetResolution(port->registers,
+                         (uint32_t)port->resolution << ADC_CR1_RES_Pos);
     port->registers->SQR1 = 0U;
     port->registers->SQR2 = 0U;
     port->registers->SQR3 = 0U;
@@ -51,7 +56,8 @@ nx_result_t nx_stm32_adc_info(const void* context, nx_adc_info_t* info) {
     if (port == NULL || !port->initialized || info == NULL) {
         return NX_ERROR_INVALID;
     }
-    *info = (nx_adc_info_t){.resolution_bits = 12U,
+    *info = (nx_adc_info_t){.resolution_bits =
+                                (uint8_t)(12U - 2U * port->resolution),
                             .reference_mv = port->reference_mv,
                             .channel_count = port->channel_count};
     return NX_SUCCESS;
@@ -84,6 +90,8 @@ nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
      * Restore independent single-rank shots before enabling the converter.
      */
     port->registers->CR1 = 0U;
+    LL_ADC_SetResolution(port->registers,
+                         (uint32_t)port->resolution << ADC_CR1_RES_Pos);
     port->registers->SQR1 = 0U;
     port->registers->SQR2 = 0U;
     port->registers->CR2 = ADC_CR2_ADON;

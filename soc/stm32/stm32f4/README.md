@@ -78,7 +78,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
 | PWM | TIM3 通道、固定共享 PSC/ARR、period1–65535、duty0–period、shadow update；stop 建立 GPIO inactive |
-| ADC | ADC1 外部通道 0--15、最多 16 ranks 的 12-bit 软件 shot/scan 与 TIM3 触发有限／连续 DMA block；显式 sample time/reference、完整 scan 和 consumer loan 背压 |
+| ADC | ADC1 外部通道 0--15、最多 16 ranks，6／8／10／12-bit 软件 shot/scan 与 TIM3 触发有限／连续 DMA block；显式 sample time/reference、完整 scan 和 consumer loan 背压 |
 | CAN | CAN1/CAN2 Classic CAN IRQ、三邮箱、共享 filter domain；无 CAN FD |
 | USB | OTG FS device PIO endpoint，独立 USB48 owner；无 Host/HS/DMA/class stack |
 | Ethernet | Raw RMII frame/MDIO、调用者 descriptor／RX loan；IP／协议策略外置 |
@@ -128,6 +128,14 @@ ADC1 外部输入按 DS8626 Rev12 Table7 对应 PA0--7、PB0--1、PC0--5 的通�
 引脚；rank 可重新排序或重复，最多 16 个。重复通道共享同一个 SMPR 字段，
 sample time 不一致时在取得资源前拒绝。
 软件 shot/scan 保持逐 rank 转换语义，不承诺通道同时采样。
+
+`resolution_bits` 在主机配置时确定，默认 12，可显式选择 6／8／10。静态 C 配置
+保存对应的 RES 编码，C owner 在 ADON 清除后通过官方 LL 设置；poll、有限 DMA
+和连续 DMA 使用同一选择。依据 RM0090 Rev22 §13.7，每 rank 的转换时间为
+所选 sample cycles 加分辨率位数。速率准入和 sequence metadata 使用该完整成本；
+降低分辨率不改变 DMA halfword 宽度和 `uint16_t` 原始样本；块容量与长度仍以字节
+计，且必须包含整数个完整 scan。分辨率选择不证明实际信号的精度、有效位数或可达
+采样率。
 
 `tests/contracts/adc_external_assembly/` 提供两种密度的软件参考装配，使用三个
 GPIO bank 的 16-rank 反向序列；不代表实际板卡接线。ADC2／ADC3、内部输入、

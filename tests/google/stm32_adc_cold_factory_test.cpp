@@ -82,7 +82,9 @@ TEST_F(AdcColdFactory, LookupIsPureAndStopRestoresAllThreeBanks) {
     nx_adc_info_t info{};
     ASSERT_EQ(NX_SUCCESS, nx_adc_port_info(port, &info));
     EXPECT_EQ(16U, info.channel_count);
-    EXPECT_EQ(12U, info.resolution_bits);
+    EXPECT_EQ(NX_TEST_ADC_BITS, info.resolution_bits);
+    EXPECT_EQ((12U - NX_TEST_ADC_BITS) / 2U,
+              (ADC1->CR1 & ADC_CR1_RES) >> ADC_CR1_RES_Pos);
     EXPECT_EQ(0xffffU, GPIOA->MODER);
     EXPECT_EQ(0xfU, GPIOB->MODER);
     EXPECT_EQ(0xfffU, GPIOC->MODER);

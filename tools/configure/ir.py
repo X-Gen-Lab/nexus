@@ -347,6 +347,7 @@ class AdcOptions:
     timeout_ms: int | None
     irq: IrqOptions | None
     stream_profile: StreamProfileIR | None = None
+    resolution_bits: int = 12
 
 
 @dataclass(frozen=True)
@@ -682,7 +683,8 @@ def mode_options(values):
                           values.get("timeout_ms"), irq,
                           StreamProfileIR.from_validated(
                               values["stream_resolution"])
-                          if "stream_resolution" in values else None)
+                          if "stream_resolution" in values else None,
+                          resolution_bits=values.get("resolution_bits", 12))
     if kind == "lptim":
         return LptimOptions(values["tick_hz"], irq)
     if kind == "rtc":

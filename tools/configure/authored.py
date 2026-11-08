@@ -207,6 +207,10 @@ def editor_schema():
             properties[name]["maximum"] = 2**32 - 1
         for name in fields & {"channels", "sample_times"}:
             properties[name] = {"type": "array", "items": {"type": "integer", "minimum": 0}}
+        if "resolution_bits" in fields:
+            from tools.configure.adc import RESOLUTION_BITS
+            properties["resolution_bits"] = {
+                "type": "integer", "enum": list(RESOLUTION_BITS), "default": 12}
         for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing",
                              "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b"}:
             properties[name] = {"type": "boolean"}
@@ -339,6 +343,8 @@ def explain_schema(schema):
                      "its ceiling is checked."),
         "reference_mv": ("Declared analog reference in millivolts; "
                          "not a measurement."),
+        "resolution_bits": ("ADC raw resolution: 6, 8, 10 or 12 bits; "
+                            "omitted selects 12, subject to provider support."),
         "main_stack_bytes": ("Reserved main stack in bytes, not measured "
                              "high-water."),
         "libc_heap_bytes": ("Explicit libc heap reservation in bytes; "

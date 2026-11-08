@@ -13,6 +13,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_stream.h"
+#include "stm32f4xx_ll_adc.h"
 #include "stm32f4xx_ll_tim.h"
 
 #ifndef NX_STM32_DMA_DISABLE
@@ -99,12 +100,13 @@ nx_result_t nx_stm32_adc_stream_rate(nx_stm32_adc_stream_state_t* state,
                                              84U, 112U, 144U, 480U};
     if (trigger_hz == 0U || state->timer_clock_hz == 0U ||
         state->timer_clock_hz > 168000000U || state->adc_clock_hz == 0U ||
-        state->adc_clock_hz > 36000000U) {
+        state->adc_clock_hz > 36000000U || state->adc.resolution > 3U) {
         return NX_ERROR_INVALID;
     }
     uint32_t cycles = 0U;
     for (size_t i = 0U; i < state->adc.channel_count; ++i) {
-        cycles += sample_cycles[state->adc.sample_times[i]] + 12U;
+        cycles += sample_cycles[state->adc.sample_times[i]] +
+                  (12U - 2U * state->adc.resolution);
     }
     if (cycles == 0U || trigger_hz > state->adc_clock_hz / cycles ||
         state->timer_clock_hz % trigger_hz != 0U) {
@@ -181,6 +183,8 @@ static void arm(nx_stm32_adc_stream_state_t* state) {
     state->block_flags = NX_STREAM_BOUNDARY_TRIGGER;
     adc->CR2 = 0U;
     adc->CR1 = state->adc.channel_count > 1U ? (uint32_t)ADC_CR1_SCAN : 0U;
+    LL_ADC_SetResolution(adc,
+                         (uint32_t)state->adc.resolution << ADC_CR1_RES_Pos);
     nx_stm32_adc_stream_sequence(state);
     adc->SR = 0U;
     state->timer->CR1 = 0U;
