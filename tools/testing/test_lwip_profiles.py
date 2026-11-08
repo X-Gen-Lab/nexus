@@ -20,7 +20,7 @@ class LwIPProfilesTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.directory = Path(self.temporary.name)
 
-    def configure(self, libraries):
+    def configure(self, libraries, *, inherit_python=True):
         source = self.directory / "consumer source"
         source.mkdir()
         (source / "main.c").write_text("int main(void) { return 0; }\n")
@@ -31,8 +31,9 @@ class LwIPProfilesTests(unittest.TestCase):
             'project(lwip_profile_admission C)\n'
             'set(CMAKE_C_STANDARD 11)\n'
             'set(CMAKE_C_EXTENSIONS OFF)\n'
-            f'set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")\n'
-            f'set(Python3_EXECUTABLE "{Path(sys.executable).as_posix()}")\n'
+            f'set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")\n' +
+            (f'set(Python3_EXECUTABLE "{Path(sys.executable).as_posix()}")\n'
+             if inherit_python else '') +
             'add_library(fixture_config INTERFACE)\n'
             'add_library(Nexus::Config ALIAS fixture_config)\n'
             'set_property(TARGET fixture_config PROPERTY NEXUS_SOURCE_DIR "'
@@ -61,6 +62,10 @@ class LwIPProfilesTests(unittest.TestCase):
 
     def test_selected_loan_profile_configures(self):
         result = self.configure("Nexus::LwIPTCPLoanedRXStorage")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_external_consumer_without_inherited_python_configures(self):
+        result = self.configure("Nexus::LwIPTCPStorage", inherit_python=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_copy_and_loan_profiles_cannot_enter_one_image(self):
