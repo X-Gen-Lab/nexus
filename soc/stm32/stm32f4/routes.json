@@ -1901,6 +1901,624 @@
         "edge-event"
       ],
       "source": "DS8626 STM32F407ZG LQFP144 GPIO/EXTI mapping; uploaded V4.1 schematic p1/p3 reviewed separately, no fitted module qualification"
+    },
+    {
+      "id": "adc1-ch1-pa1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch2-pa2",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch3-pa3",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA3",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch4-pa4",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA4",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch5-pa5",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch6-pa6",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch7-pa7",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA7",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch8-pb0",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PB0",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch9-pb1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PB1",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch10-pc0",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC0",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch11-pc1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC1",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch12-pc2",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC2",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch13-pc3",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC3",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch14-pc4",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC4",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-ch15-pc5",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC5",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15 and LQFP100/LQFP144 pinouts; RM0090 Rev22 ADC regular sequence and SMPR1/SMPR2; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-scan-external16",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA2",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA3",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA4",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA5",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA6",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA7",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PB0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PB1",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC1",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC2",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC3",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC4",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PC5",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "DS8626 Rev12 Table7 ADC12_IN0..15; RM0090 Rev22 ADC regular sequence: up to16 ranks, SMPR per physical channel; silicon pads only, no PCB wiring or HIL claim",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     }
   ]
 }

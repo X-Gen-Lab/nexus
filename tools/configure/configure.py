@@ -1017,6 +1017,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                 from tools.configure import rtc
                 rtc.validate_board(selection, board)
             validate_selection(selection, route, provider, ram["size"])
+            route = adc.selected_route(selection, route, provider)
             resolved_pin_states = None
             if mode == "named-states":
                 from tools.configure import pin_states

@@ -32,7 +32,10 @@ typedef struct {
     bool inactive_high;
 } nx_stm32_pwm_config_t;
 
-/** \brief Immutable independent ADC1 PA0/PA1 sequence and nominal reference. */
+/** \brief Immutable ADC1 external ranks and nominal reference.
+ * \note Channels 0--7 use PA0--7, 8--9 use PB0--1 and 10--15 use PC0--5.
+ *       One channel has one sample time even when repeated in the sequence.
+ */
 typedef struct {
     const uint8_t* channels;
     const uint8_t* sample_times;
@@ -224,12 +227,17 @@ nx_stm32_adc_cold_begin(nx_stm32_adc_state_t* port,
         return NX_ERROR_CONTEXT;
     if (port == NULL || config == NULL || config->channels == NULL ||
         config->sample_times == NULL || config->channel_count == 0U ||
-        config->channel_count > 2U || config->reference_mv == 0U ||
+        config->channel_count > 16U || config->reference_mv == 0U ||
         config->reference_mv > 3600U)
         return NX_ERROR_INVALID;
     for (size_t i = 0U; i < config->channel_count; ++i) {
-        if (config->channels[i] != i || config->sample_times[i] > 7U)
+        if (config->channels[i] > 15U || config->sample_times[i] > 7U)
             return NX_ERROR_UNSUPPORTED;
+        for (size_t j = 0U; j < i; ++j) {
+            if (config->channels[i] == config->channels[j] &&
+                config->sample_times[i] != config->sample_times[j])
+                return NX_ERROR_UNSUPPORTED;
+        }
     }
     if (port->initialized || port->active || port->cold_effects != 0U ||
         (RCC->APB2ENR & RCC_APB2ENR_ADC1EN) != 0U)
@@ -242,8 +250,15 @@ nx_stm32_adc_cold_begin(nx_stm32_adc_state_t* port,
     if ((ADC1->CR2 & ADC_CR2_ADON) != 0U)
         return NX_ERROR_BUSY;
     for (size_t i = 0U; i < config->channel_count; ++i) {
-        nx_result_t status = nx_stm32_pin_configure(GPIOA, config->channels[i],
-                                                    3U, 0U, 0U, false);
+        uint8_t channel = config->channels[i];
+        GPIO_TypeDef* gpio = channel < 8U    ? GPIOA
+                             : channel < 10U ? GPIOB
+                                             : GPIOC;
+        uint8_t pin = channel < 8U    ? channel
+                      : channel < 10U ? (uint8_t)(channel - 8U)
+                                      : (uint8_t)(channel - 10U);
+        nx_result_t status =
+            nx_stm32_pin_configure(gpio, pin, 3U, 0U, 0U, false);
         if (status != NX_SUCCESS)
             return status;
     }

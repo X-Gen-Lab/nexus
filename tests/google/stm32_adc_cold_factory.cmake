@@ -1,0 +1,30 @@
+# Execute the real generated sixteen-pad factory for both exact densities.
+foreach(adc_density ve zg)
+    set(adc_bundle "${CMAKE_CURRENT_BINARY_DIR}/f407-adc-${adc_density}")
+    execute_process(COMMAND "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
+        --source-root "${NEXUS_SOURCE_DIR}"
+        --assembly "${NEXUS_SOURCE_DIR}/tests/contracts/adc_external_assembly/${adc_density}-scan.toml"
+        --output "${adc_bundle}" COMMAND_ERROR_IS_FATAL ANY)
+    nexus_google_configuration_inputs("${adc_bundle}")
+    set(adc_target "nexus_stm32_adc_${adc_density}_cold_factory_test")
+    nexus_google_test(${adc_target} STM32F4_LL
+        SOURCES stm32_adc_cold_factory_test.cpp "${adc_bundle}/bindings.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
+        LIBRARIES Nexus::IO
+        INCLUDES "${adc_bundle}"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            "${NEXUS_SOURCE_DIR}/arch/include"
+            "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
+    target_include_directories(${adc_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+    target_compile_definitions(${adc_target} PRIVATE STM32F407xx
+        _init=nx_adc_cold_fixture_init _fini=nx_adc_cold_fixture_fini)
+    target_compile_options(${adc_target} PRIVATE
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_control_cold_model.h")
+endforeach()

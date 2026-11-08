@@ -78,7 +78,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
 | PWM | TIM3 通道、固定共享 PSC/ARR、period1–65535、duty0–period、shadow update；stop 建立 GPIO inactive |
-| ADC | ADC1 12-bit 软件 shot/scan、TIM3 触发有限／连续 DMA block；显式 sample time/reference、完整 scan 和 consumer loan 背压 |
+| ADC | ADC1 外部通道 0--15、最多 16 ranks 的 12-bit 软件 shot/scan 与 TIM3 触发有限／连续 DMA block；显式 sample time/reference、完整 scan 和 consumer loan 背压 |
 | CAN | CAN1/CAN2 Classic CAN IRQ、三邮箱、共享 filter domain；无 CAN FD |
 | USB | OTG FS device PIO endpoint，独立 USB48 owner；无 Host/HS/DMA/class stack |
 | Ethernet | Raw RMII frame/MDIO、调用者 descriptor／RX loan；IP／协议策略外置 |
@@ -121,6 +121,17 @@ TIM2 epoch，`SystemCoreClock` 在失败清理中追踪确认的 HCLK，不启�
 另选有限或连续双缓冲 provider。拒绝 `dma-tx`＋IRQ blocks；双向显式选 `dma-duplex`
 或 `dma-duplex-continuous`。连续模式不覆盖 READY/BORROWED，缺 replacement 时停止
 并报告 loss，不虚构错过事件的准确次数。
+
+ADC1 外部输入按 DS8626 Rev12 Table7 对应 PA0--7、PB0--1、PC0--5 的通道
+0--15。Board 必须明确授权相应 SoC route；新增 silicon route 不修改既有 PCB
+接线。序列只能选择 Board 授权 route 中的通道，资源计划仅取得实际使用的唯一
+引脚；rank 可重新排序或重复，最多 16 个。重复通道共享同一个 SMPR 字段，
+sample time 不一致时在取得资源前拒绝。
+软件 shot/scan 保持逐 rank 转换语义，不承诺通道同时采样。
+
+`tests/contracts/adc_external_assembly/` 提供两种密度的软件参考装配，使用三个
+GPIO bank 的 16-rank 反向序列；不代表实际板卡接线。ADC2／ADC3、内部输入、
+注入组和多 ADC 模式继续未实现，不能由外部通道扩展推定支持。
 
 有限 ADC `trigger-dma` 在发布完整块前停 trigger／conversion／DMA，稳定后由显式
 service rearm，块间可有间隙。消费者借用不能被覆盖，未释放时 stop 保持 BUSY；

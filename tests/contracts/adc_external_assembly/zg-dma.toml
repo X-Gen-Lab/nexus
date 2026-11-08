@@ -1,0 +1,21 @@
+schema = 2
+board_package = "zg_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 16384
+libc_heap_bytes = 0
+
+[adc.analog]
+binding = "analog"
+mode = "trigger-dma"
+channels = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+sample_times = [7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
+reference_mv = 3300
+
+[adc.analog.irq]
+priority = 5

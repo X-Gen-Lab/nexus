@@ -80,7 +80,7 @@ class ProviderContractTests(unittest.TestCase):
                              "channels": channels,
                              "sample_times": [7] * len(channels),
                              "reference_mv": 3300, "timeout_ms": 100}
-                route = {"kind": "adc", "pins": [
+                route = {"kind": "adc", "controller": "ADC1", "pins": [
                     {"pin": f"PA{channel}"} for channel in channels]}
                 with self.subTest(family=family, mode=mode):
                     with self.assertRaisesRegex(ValueError, "channel count"):
@@ -92,9 +92,13 @@ class ProviderContractTests(unittest.TestCase):
         selection = {"id": "adc", "binding": "adc", "mode": "low-rate-scan",
                      "channels": [1, 0], "sample_times": [7, 7],
                      "reference_mv": 3300, "timeout_ms": 100}
-        route = {"kind": "adc", "pins": [{"pin": "PA1"}, {"pin": "PA0"}]}
+        route = {"kind": "adc", "controller": "ADC1",
+                 "pins": [{"pin": "PA1"}, {"pin": "PA0"}]}
         for family in ("stm32f4",):
             with self.subTest(family=family):
+                selection_rules.validate_selection(
+                    selection, route, maintained(family), 131072)
+                selection["channels"] = [1, 2]
                 with self.assertRaisesRegex(ValueError, "channel sequence"):
                     selection_rules.validate_selection(selection, route,
                                               maintained(family, test_support=(family == "native")), 131072)

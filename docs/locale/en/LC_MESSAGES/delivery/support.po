@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 22d55dae5960f3d72f84341a15deea8b62f1d4c0d88c3f69a8eb46ec3215318c\n"
+"X-Nexus-Source-SHA256: 124239d2ce4623b1fc153fbc18c362ce9c8df8b95bb7f10cdeb2495ffa4a4324\n"
 
 #: docs/delivery/support.md:8
 msgid "当前精确支持范围"
@@ -178,12 +178,6 @@ msgid "ADC／Timer"
 msgstr "ADC / Timer"
 
 #: docs/delivery/support.md:0
-msgid "所选 shot／scan、触发 DMA、PWM、capture、互补输出与 break；共享 timer 和资源冲突须通过准入"
-msgstr ""
-"Selected shot/scan, triggered DMA, PWM, capture, complementary outputs and "
-"break; shared timers and resource conflicts require admission"
-
-#: docs/delivery/support.md:0
 msgid "Flash／IWDG／RTC"
 msgstr "Flash／IWDG／RTC"
 
@@ -293,3 +287,24 @@ msgstr ""
 "source](https://github.com/X-Gen-"
 "Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18). This refactor "
 "cannot inherit old candidates, software counts or physical-board results."
+
+msgid ""
+"ADC1 外部通道 0--15、最多 16 ranks 的 shot／scan 与触发 DMA；PWM、capture、互补输出与 "
+"break；共享 timer 和资源冲突须通过准入"
+msgstr ""
+"ADC1 external channels 0--15, up to 16 ranks for shots/scans and "
+"triggered DMA; PWM, capture, complementary outputs and break; shared "
+"timers and resource conflicts require admission"
+
+msgid ""
+"ADC1 通道对应 PA0--7、PB0--1、PC0--5。序列可以重新排序并重复同一通道，重复 通道的 sample time "
+"必须一致；所有使用的引脚都须有明确 Board route。ADC2／ADC3、 内部输入、注入组和多 ADC 模式尚未接入。16-rank"
+" 软件参考装配见 `tests/contracts/adc_external_assembly/`，不授予真实 PCB 或物理采样资格。"
+msgstr ""
+"ADC1 channels map to PA0--7, PB0--1 and PC0--5. Sequences may reorder "
+"and repeat channels; repeated channels must use the same sample time, "
+"and every used pin requires an explicit Board route. ADC2/ADC3, "
+"internal inputs, injected groups and multi-ADC modes are not "
+"integrated. The 16-rank software reference assemblies in "
+"`tests/contracts/adc_external_assembly/` establish no physical PCB or "
+"sampling qualification."

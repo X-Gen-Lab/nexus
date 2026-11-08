@@ -5,7 +5,7 @@ from tools.configure.calls import Symbol
 from types import MappingProxyType
 
 from tools.configure.providers import common, descriptor
-from .hardware import FIXED_DMA as _FIXED_DMA
+from .hardware import ADC_PIN_CHANNELS, FIXED_DMA as _FIXED_DMA
 
 PARTS = MappingProxyType({
     "STM32F407VET6": common.PartPolicy("LQFP100", frozenset(('ccm',))),
@@ -67,7 +67,6 @@ LIMITS = MappingProxyType({
     'uart_baud': (1282, 1000000), 'spi_hz': (328125, 42000000),
     'timer_hz': 84000000, 'pwm_period': 65535,
 })
-ADC_CHANNEL_SEQUENCES = ((0,), (0, 1))
 SPI_REQUIRES_ENDPOINT = True
 PIN_ELECTRICAL = True
 
@@ -131,8 +130,6 @@ def validate_selection(selection, route):
     elif kind == "spi":
         common.integer(selection.get("max_hz", 1000000), *LIMITS["spi_hz"],
                        "SPI max_hz")
-    elif kind == "adc" and tuple(selection["channels"]) not in ADC_CHANNEL_SEQUENCES:
-        common.fail("ADC channel sequence is not implemented by the provider")
 
 
 def mode_implementation(kind, mode):

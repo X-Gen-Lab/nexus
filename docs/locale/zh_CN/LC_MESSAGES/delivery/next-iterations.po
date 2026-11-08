@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: e39e9655a91ca9d99f39091261d472990868794e9e97a93549e183816e19b4bc\n"
+"X-Nexus-Source-SHA256: fb2078631eda1abb7e1250e5c90c77957dd382c97e7fd00c7397ce6147d0a904\n"
 
 #: docs/delivery/next-iterations.md:8
 msgid "F4 收敛后的迭代边界"
@@ -118,3 +118,241 @@ msgstr ""
 "可选诊断在编译期裁剪，通用入口复用同一实现。后续按具体需求开展精确型号适配、 运行期电源管理、完整软件候选与真实 "
 "IRQ／吞吐／栈／功耗测量。当前 F4 仍拒绝 runtime power 配置，非 F407 型号仍需精确适配。软件候选与物理状态不得从旧版本"
 " 继承，未执行的 HIL 保持 `not_executed`。"
+
+msgid "STM32F4 全功能迭代清单"
+msgstr "STM32F4 全功能迭代清单"
+
+msgid ""
+"本轮以 F407VE／ZG 为首个完整验收基准，之后按精确器件扩展 STM32F4。下表是 当前实施清单；硬件存在、软件实现、Board "
+"授权和实际验证分别记录。已有子集不能 关闭整个工作包，其他 F4 器件独有的 IP 不计作 F407 缺失功能。"
+msgstr ""
+"本轮以 F407VE／ZG 为首个完整验收基准，之后按精确器件扩展 STM32F4。下表是 当前实施清单；硬件存在、软件实现、Board "
+"授权和实际验证分别记录。已有子集不能 关闭整个工作包，其他 F4 器件独有的 IP 不计作 F407 缺失功能。"
+
+msgid ""
+"装配关系继续遵循 [FIG-04](../assets/diagrams/factory-instances.svg)：主机生成静态 "
+"数据和固定连接，factory 返回已有接口，C owner 执行硬件行为。源码责任见 "
+"[FIG-31](../assets/diagrams/driver-source-ownership.svg)。资源图和触发图用于配置 "
+"校验，不在 MCU 上解释执行；新模式按需选编，不增加默认线程、heap 或全芯片对象池。"
+msgstr ""
+"装配关系继续遵循 [FIG-04](../assets/diagrams/factory-instances.svg)：主机生成静态 "
+"数据和固定连接，factory 返回已有接口，C owner 执行硬件行为。源码责任见 "
+"[FIG-31](../assets/diagrams/driver-source-ownership.svg)。资源图和触发图用于配置 "
+"校验，不在 MCU 上解释执行；新模式按需选编，不增加默认线程、heap 或全芯片对象池。"
+
+msgid "编号"
+msgstr "编号"
+
+msgid "范围与退出条件"
+msgstr "范围与退出条件"
+
+msgid "状态"
+msgstr "状态"
+
+msgid "F4-01"
+msgstr "F4-01"
+
+msgid "整理器件、封装、内存、时钟、IRQ、DMA、触发和勘误事实；每项能力关联资料与实际实现"
+msgstr "整理器件、封装、内存、时钟、IRQ、DMA、触发和勘误事实；每项能力关联资料与实际实现"
+
+msgid "已有子集，待扩展"
+msgstr "已有子集，待扩展"
+
+msgid "F4-02"
+msgstr "F4-02"
+
+msgid "收敛模式声明与 typed IR；生成静态配置、强类型 factory 和固定连接，新增实例无需修改硬件算法"
+msgstr "收敛模式声明与 typed IR；生成静态配置、强类型 factory 和固定连接，新增实例无需修改硬件算法"
+
+msgid "F4-03"
+msgstr "F4-03"
+
+msgid "完整 DMA 候选映射、确定性分配、宽度与计数单位、循环与双缓冲、共享 IRQ、错误与排空验证"
+msgstr "完整 DMA 候选映射、确定性分配、宽度与计数单位、循环与双缓冲、共享 IRQ、错误与排空验证"
+
+msgid "F4-04"
+msgstr "F4-04"
+
+msgid "经审核的时钟配置、PLL／48 MHz、APB timer、ADC 预分频、Flash latency、CSS 和时间域合同"
+msgstr "经审核的时钟配置、PLL／48 MHz、APB timer、ADC 预分频、Flash latency、CSS 和时间域合同"
+
+msgid "F4-05"
+msgstr "F4-05"
+
+msgid "统一生命周期、启动依赖、SRAM／CCM／备份与外部内存、FPU／MPU／向量及失败责任"
+msgstr "统一生命周期、启动依赖、SRAM／CCM／备份与外部内存、FPU／MPU／向量及失败责任"
+
+msgid "F4-06"
+msgstr "F4-06"
+
+msgid "完整封装合法 GPIO、AF、电气配置、EXTI line 与共享 vector；验证无毛刺准备、冲突和释放"
+msgstr "完整封装合法 GPIO、AF、电气配置、EXTI line 与共享 vector；验证无毛刺准备、冲突和释放"
+
+msgid "F4-07"
+msgstr "F4-07"
+
+msgid "六个 UART／USART 的合法格式、轮询／IRQ／DMA、半双工、流控、RS485、同步及专用模式"
+msgstr "六个 UART／USART 的合法格式、轮询／IRQ／DMA、半双工、流控、RS485、同步及专用模式"
+
+msgid "F4-08"
+msgstr "F4-08"
+
+msgid "SPI1--3 主从、8／16 位、位序、双工、单线、TI、CRC、事务和 DMA；验证 CS／NSS、尾部完成和停止"
+msgstr "SPI1--3 主从、8／16 位、位序、双工、单线、TI、CRC、事务和 DMA；验证 CS／NSS、尾部完成和停止"
+
+msgid "F4-09"
+msgstr "F4-09"
+
+msgid "I2S2／3 主从、收发、全双工、格式、MCLK 与 DMA；明确帧、时钟误差和缓冲所有权"
+msgstr "I2S2／3 主从、收发、全双工、格式、MCLK 与 DMA；明确帧、时钟误差和缓冲所有权"
+
+msgid "F4-10"
+msgstr "F4-10"
+
+msgid "I2C1--3、100／400 kHz、7／10 位、master／target、双地址、SMBus／PEC 与总线恢复"
+msgstr "I2C1--3、100／400 kHz、7／10 位、master／target、双地址、SMBus／PEC 与总线恢复"
+
+msgid "F4-11"
+msgstr "F4-11"
+
+msgid "TIM1--14 按实例能力覆盖计数、PWM、捕获、编码器、单脉冲、同步、DMA burst、死区和刹车"
+msgstr "TIM1--14 按实例能力覆盖计数、PWM、捕获、编码器、单脉冲、同步、DMA burst、死区和刹车"
+
+msgid "F4-12"
+msgstr "F4-12"
+
+msgid "ADC1--3 通道、规则与注入组、分辨率、内部输入、模拟看门狗、多 ADC 和触发 DMA"
+msgstr "ADC1--3 通道、规则与注入组、分辨率、内部输入、模拟看门狗、多 ADC 和触发 DMA"
+
+msgid "本批扩展 ADC1 外部输入；完整工作包未完成"
+msgstr "本批扩展 ADC1 外部输入；完整工作包未完成"
+
+msgid "F4-13"
+msgstr "F4-13"
+
+msgid "DAC 双通道、CPU／触发／DMA、波形输出和欠载处理；定义格式、停止电平与恢复"
+msgstr "DAC 双通道、CPU／触发／DMA、波形输出和欠载处理；定义格式、停止电平与恢复"
+
+msgid "待实现"
+msgstr "待实现"
+
+msgid "F4-14"
+msgstr "F4-14"
+
+msgid "CAN1／2 共享过滤器、ID、邮箱、FIFO、时间戳、bus-off、回环和恢复；不提供不存在的 CAN FD"
+msgstr "CAN1／2 共享过滤器、ID、邮箱、FIFO、时间戳、bus-off、回环和恢复；不提供不存在的 CAN FD"
+
+msgid "F4-15"
+msgstr "F4-15"
+
+msgid "SDIO host 与唯一卡协议 owner；按协议覆盖 SD／MMC／SDIO function、总线宽度、DMA 与拔卡排空"
+msgstr "SDIO host 与唯一卡协议 owner；按协议覆盖 SD／MMC／SDIO function、总线宽度、DMA 与拔卡排空"
+
+msgid "F4-16"
+msgstr "F4-16"
+
+msgid "FSMC 各受审模式、bank 与时序；区分内存窗口、设备 FIFO、NAND 页／OOB／ECC 和永久启动内存"
+msgstr "FSMC 各受审模式、bank 与时序；区分内存窗口、设备 FIFO、NAND 页／OOB／ECC 和永久启动内存"
+
+msgid "F4-17"
+msgstr "F4-17"
+
+msgid "USB FS／HS Device、Host、OTG、端点、DMA、PHY、角色与供电；中间件和控制器保持唯一状态归属"
+msgstr "USB FS／HS Device、Host、OTG、端点、DMA、PHY、角色与供电；中间件和控制器保持唯一状态归属"
+
+msgid "F4-18"
+msgstr "F4-18"
+
+msgid "Ethernet MII／RMII、PHY、descriptor、校验和、VLAN、SG、PTP、链路变化和异常回收"
+msgstr "Ethernet MII／RMII、PHY、descriptor、校验和、VLAN、SG、PTP、链路变化和异常回收"
+
+msgid "F4-19"
+msgstr "F4-19"
+
+msgid "DCMI 数据宽度、同步、裁剪、快照／连续、JPEG 字节流与 DMA；验证帧边界、丢帧和停止"
+msgstr "DCMI 数据宽度、同步、裁剪、快照／连续、JPEG 字节流与 DMA；验证帧边界、丢帧和停止"
+
+msgid "F4-20"
+msgstr "F4-20"
+
+msgid "RTC 日历、闹钟、唤醒、时间戳、防篡改、校准与备份域；分离 provision、adopt 和断电保持验证"
+msgstr "RTC 日历、闹钟、唤醒、时间戳、防篡改、校准与备份域；分离 provision、adopt 和断电保持验证"
+
+msgid "F4-21"
+msgstr "F4-21"
+
+msgid "IWDG、WWDG、PVD、复位原因、时钟故障、故障记录和可选 trace；明确不可逆动作与恢复责任"
+msgstr "IWDG、WWDG、PVD、复位原因、时钟故障、故障记录和可选 trace；明确不可逆动作与恢复责任"
+
+msgid "F4-22"
+msgstr "F4-22"
+
+msgid "RNG 健康错误、固定算法 CRC、UID 与器件信息；明确实际能力与信息用途"
+msgstr "RNG 健康错误、固定算法 CRC、UID 与器件信息；明确实际能力与信息用途"
+
+msgid "F4-23"
+msgstr "F4-23"
+
+msgid "Flash 几何、编程、擦除、镜像偏移、OTP、Option Bytes 和保护配置；隔离制造与不可逆维护"
+msgstr "Flash 几何、编程、擦除、镜像偏移、OTP、Option Bytes 和保护配置；隔离制造与不可逆维护"
+
+msgid "F4-24"
+msgstr "F4-24"
+
+msgid "浅睡眠、受约束 STOP／Standby、唤醒恢复和可选逻辑时间桥接；处理旧 deadline 与 OS 时间"
+msgstr "浅睡眠、受约束 STOP／Standby、唤醒恢复和可选逻辑时间桥接；处理旧 deadline 与 OS 时间"
+
+msgid "F4-25"
+msgstr "F4-25"
+
+msgid "按精确器件扩展其他 F4 子系列；相同 IP 复用，不同语义和独有外设单独实现并验收"
+msgstr "按精确器件扩展其他 F4 子系列；相同 IP 复用，不同语义和独有外设单独实现并验收"
+
+msgid "F4-26"
+msgstr "F4-26"
+
+msgid "每项新行为先执行 GoogleTest／GoogleMock 或主机 unittest RED，再实现 GREEN；完整门禁覆盖边界和失败"
+msgstr "每项新行为先执行 GoogleTest／GoogleMock 或主机 unittest RED，再实现 GREEN；完整门禁覆盖边界和失败"
+
+msgid "持续执行，不能预先关闭"
+msgstr "持续执行，不能预先关闭"
+
+msgid "F4-27"
+msgstr "F4-27"
+
+msgid "同步中英文文档、框图、接入示例、Source SDK 和外部消费者；维护唯一合同和真实命令"
+msgstr "同步中英文文档、框图、接入示例、Source SDK 和外部消费者；维护唯一合同和真实命令"
+
+msgid "F4-28"
+msgstr "F4-28"
+
+msgid "精确源码与依赖绑定的软件候选、两次离线复现、HIL 工装和实际测量；软件与物理结论分开"
+msgstr "精确源码与依赖绑定的软件候选、两次离线复现、HIL 工装和实际测量；软件与物理结论分开"
+
+msgid "软件候选待封存；物理未执行"
+msgstr "软件候选待封存；物理未执行"
+
+msgid ""
+"先完成 F4-01--05 的必要扩展，再用通信并发、PWM／ADC／编码器同步和显示／触摸／ "
+"存储三个纵向场景检验资源模型。随后闭合常用外设与大型外设，最后扩展电源配置和 其他 F4 器件。测试、文档和 SDK "
+"随每个功能包交付，不集中留到末尾。"
+msgstr ""
+"先完成 F4-01--05 的必要扩展，再用通信并发、PWM／ADC／编码器同步和显示／触摸／ "
+"存储三个纵向场景检验资源模型。随后闭合常用外设与大型外设，最后扩展电源配置和 其他 F4 器件。测试、文档和 SDK "
+"随每个功能包交付，不集中留到末尾。"
+
+msgid ""
+"每个功能包关闭前须具备公共合同、配置选择、factory、生产 C 实现、明确 HAL／LL 归属、启停与故障回归、ARM "
+"构建、资源预算和文档。完成一份接口头、SDK 编译或模型 测试不能替代其余条件；没有实物执行时，物理结论保持 `not_executed`。"
+msgstr ""
+"每个功能包关闭前须具备公共合同、配置选择、factory、生产 C 实现、明确 HAL／LL 归属、启停与故障回归、ARM "
+"构建、资源预算和文档。完成一份接口头、SDK 编译或模型 测试不能替代其余条件；没有实物执行时，物理结论保持 `not_executed`。"
+
+msgid ""
+"本轮已确定 USB Device／Host 上层采用 ST 官方中间件并按需编译，公共接口隔离厂商 类型。组织 "
+"fork、版本锁、许可、控制器适配和协议栈合同仍需逐项交付；该选择本身 不建立 Host／HS 或 class stack "
+"支持。其他厂商依赖继续保留，未选依赖不进入默认闭包。"
+msgstr ""
+"本轮已确定 USB Device／Host 上层采用 ST 官方中间件并按需编译，公共接口隔离厂商 类型。组织 "
+"fork、版本锁、许可、控制器适配和协议栈合同仍需逐项交付；该选择本身 不建立 Host／HS 或 class stack "
+"支持。其他厂商依赖继续保留，未选依赖不进入默认闭包。"

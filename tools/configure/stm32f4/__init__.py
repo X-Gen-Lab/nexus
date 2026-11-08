@@ -7,7 +7,7 @@ from .contract import (
     PARTS,
     PIN_ELECTRICAL,
     PUBLIC_FORMATS,
-    ADC_CHANNEL_SEQUENCES,
+    ADC_PIN_CHANNELS,
     ADC_GROUP,
     CAN_CLOCK_HZ,
     CAN_CONTROLLERS,

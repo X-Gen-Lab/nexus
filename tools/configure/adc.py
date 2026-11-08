@@ -9,6 +9,8 @@ def validate_selection(selection, route, provider):
     if not {"channels", "sample_times", "reference_mv"}.issubset(selection):
         fail("ADC requires channels, sample_times and reference_mv")
     channels = sequence(selection["channels"], "ADC channels")
+    for channel in channels:
+        integer(channel, 0, 15, "ADC channel")
     mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
     if mapping is None:
         expected = [int(pin["pin"][2:]) for pin in route["pins"]]
@@ -19,15 +21,22 @@ def validate_selection(selection, route, provider):
             if key not in mapping:
                 fail("ADC controller/pin lacks a reviewed channel mapping")
             expected.append(mapping[key])
-    if channels != expected or not channels or len(channels) > 16:
+    matches = (channels == expected if mapping is None
+               else set(channels).issubset(expected))
+    if not matches or not channels or len(channels) > 16:
         fail("ADC channel sequence differs from reviewed analog pins")
-    for channel in channels:
-        integer(channel, 0, 15, "ADC channel")
     samples = sequence(selection["sample_times"], "ADC sample_times")
     if len(samples) != len(channels):
         fail("ADC sample_times must match the channel sequence")
     for sample in samples:
         integer(sample, 0, 7, "ADC sample encoding")
+    # SMPR stores one setting per physical channel, not one per sequence rank.
+    # Repeating a channel is valid only with the same acquisition time.
+    timings = {}
+    for channel, sample in zip(channels, samples):
+        if channel in timings and timings[channel] != sample:
+            fail("ADC repeated channel requires one consistent sample time")
+        timings[channel] = sample
     integer(selection["reference_mv"], 1, 3600, "ADC reference_mv")
     if (selection["mode"] in {"single-shot", "low-rate-scan"} and
             (selection["mode"] == "single-shot") != (len(channels) == 1)):
@@ -38,6 +47,22 @@ def validate_selection(selection, route, provider):
     if (not mode_traits("adc", selection["mode"]).dma and
             ({"irq_priority", "calls_os"} & selection.keys())):
         fail("Polling ADC has no IRQ options")
+
+
+def selected_route(selection, route, provider):
+    """Project admitted analog ranks to unique pads before resource claiming.
+
+    The authored Board route remains the authorization boundary. Only selected
+    physical channels acquire pins; repeated ranks never duplicate a lease.
+    Other providers keep their existing exact route contract.
+    """
+    mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
+    if route["kind"] != "adc" or mapping is None:
+        return route
+    channels = frozenset(selection["channels"])
+    return {**route, "pins": [pin for pin in route["pins"]
+                             if mapping[(route["controller"], pin["pin"])]
+                             in channels]}
 
 
 def group_trigger_resources(selection, provider):

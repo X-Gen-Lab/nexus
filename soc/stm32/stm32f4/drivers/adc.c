@@ -26,6 +26,12 @@ nx_result_t nx_stm32_adc_initialize(nx_stm32_adc_state_t* port) {
         if (port->channels[i] > 15U || port->sample_times[i] > 7U) {
             return NX_ERROR_UNSUPPORTED;
         }
+        for (size_t j = 0U; j < i; ++j) {
+            if (port->channels[i] == port->channels[j] &&
+                port->sample_times[i] != port->sample_times[j]) {
+                return NX_ERROR_UNSUPPORTED;
+            }
+        }
     }
     port->registers->CR2 = 0U;
     port->registers->CR1 = 0U;

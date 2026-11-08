@@ -8,6 +8,7 @@
  */
 extern "C" {
 #include "stm32f407_basic_cold.h"
+#include "stm32f407_control_cold.h"
 nx_stm32_system_t g_nx_stm32_system;
 }
 #include <gtest/gtest.h>
@@ -218,6 +219,56 @@ extern "C" void nx_arch_dsb(void) {
 /** \brief External clock input; cold tests never claim physical timing. */
 extern "C" nx_time_us_t nx_time_now_us(void) {
     return model_time;
+}
+
+TEST_F(BasicCold, AdcExternalRanksConfigureTheReviewedBanksOnly) {
+    const uint8_t channels[]{15U, 9U, 3U, 10U, 8U, 0U};
+    const uint8_t samples[]{7U, 6U, 5U, 4U, 3U, 2U};
+    const nx_stm32_adc_config_t selected{channels, samples, 6U, 3300U};
+    nx_stm32_adc_state_t adc{};
+    RCC->AHB1ENR =
+        RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN;
+    GPIOA->MODER = GPIOB->MODER = GPIOC->MODER = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_begin(&adc, &selected));
+    EXPECT_EQ(3U | (3U << 6U), GPIOA->MODER);
+    EXPECT_EQ(3U | (3U << 2U), GPIOB->MODER);
+    EXPECT_EQ(3U | (3U << 10U), GPIOC->MODER);
+    EXPECT_EQ(ADC1, adc.registers);
+    EXPECT_EQ(6U, adc.channel_count);
+    EXPECT_EQ(channels, adc.channels);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_finish(&adc));
+    EXPECT_EQ(0U, RCC->APB2ENR & RCC_APB2ENR_ADC1EN);
+}
+
+TEST_F(BasicCold, AdcAllowsSixteenRanksAndConsistentRepeatedChannels) {
+    const uint8_t channels[]{0U, 1U, 2U,  3U,  4U,  5U,  6U,  7U,
+                             8U, 9U, 10U, 11U, 12U, 13U, 14U, 15U};
+    const uint8_t samples[16]{};
+    const nx_stm32_adc_config_t selected{channels, samples, 16U, 3300U};
+    nx_stm32_adc_state_t adc{};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_begin(&adc, &selected));
+    EXPECT_EQ(0xffffU, GPIOA->MODER);
+    EXPECT_EQ(0xfU, GPIOB->MODER);
+    EXPECT_EQ(0xfffU, GPIOC->MODER);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_finish(&adc));
+    adc = {};
+    const uint8_t repeated[]{15U, 15U, 15U};
+    const uint8_t repeated_samples[]{7U, 7U, 7U};
+    const nx_stm32_adc_config_t repeat{repeated, repeated_samples, 3U, 3300U};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_begin(&adc, &repeat));
+    EXPECT_EQ(3U, adc.channel_count);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_finish(&adc));
+}
+
+TEST_F(BasicCold, AdcRejectsConflictingSampleTimesBeforeAcquiringClocks) {
+    const uint8_t channels[]{0U, 0U};
+    const uint8_t samples[]{1U, 7U};
+    const nx_stm32_adc_config_t selected{channels, samples, 2U, 3300U};
+    nx_stm32_adc_state_t adc{};
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_adc_cold_begin(&adc, &selected));
+    EXPECT_EQ(0U, RCC->APB2ENR);
+    EXPECT_EQ(0U, adc.cold_effects);
+    EXPECT_EQ(nullptr, adc.registers);
 }
 
 TEST_F(BasicCold, RestrictedGpioCOutputsUseLowSpeedAndPreserveOtherFields) {

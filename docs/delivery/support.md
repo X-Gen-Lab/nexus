@@ -40,7 +40,7 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 | GPIO／EXTI | 受审引脚、静态电气与事件存储；不存在自动消抖政策 |
 | UART | IRQ byte/event、word 与明确 block／DMA 模式分别选择；有限 TX、有限 RX、连续 RX 和双向模式不自动互相授权 |
 | SPI／I2C | 受审 polling／异步／DMA 路径与显式 endpoint；不能从 controller 存在推定任意 route 或速率 |
-| ADC／Timer | 所选 shot／scan、触发 DMA、PWM、capture、互补输出与 break；共享 timer 和资源冲突须通过准入 |
+| ADC／Timer | ADC1 外部通道 0--15、最多 16 ranks 的 shot／scan 与触发 DMA；PWM、capture、互补输出与 break；共享 timer 和资源冲突须通过准入 |
 | Flash／IWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
 | Classic CAN | 所选 mailbox 与共享 filter domain；不提供 CAN FD |
 | USB | 所选 OTG FS device PIO；不由此授予 Host、HS、DMA 或全部 class stack |
@@ -51,6 +51,11 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 F407 `dma-tx` 的所选 UART transport 使用官方 HAL 有限 TX 与分离 LL IRQ RX，
 Handle 私有且由同一 owner 管理。其他模式保留各自明确实现，不能宣称整套 UART
 或全部外设已完成 HAL 替代。
+
+ADC1 通道对应 PA0--7、PB0--1、PC0--5。序列可以重新排序并重复同一通道，重复
+通道的 sample time 必须一致；所有使用的引脚都须有明确 Board route。ADC2／ADC3、
+内部输入、注入组和多 ADC 模式尚未接入。16-rank 软件参考装配见
+`tests/contracts/adc_external_assembly/`，不授予真实 PCB 或物理采样资格。
 
 DMA buffer 必须位于所选可达域，CCM 不可用于该 DMA。连续 producer 不覆盖已借用
 块，缺替换存储时停止并报告 loss；模型或静态预算不证明任意负载下无丢失。

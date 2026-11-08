@@ -5,6 +5,16 @@ from tools.configure.providers.hardware import (
     ControllerBinding, fixed_dma_bindings, i2c_binding, spi_binding, uart_binding)
 
 
+# DS8626 Rev12 Table7: ADC1/2 external inputs span three distinct GPIO banks.
+# ADC3 has a different upper-channel map and is deliberately not inferred here.
+ADC_PIN_CHANNELS = MappingProxyType({
+    ("ADC1", pin): channel
+    for channel, pin in enumerate(
+        (*[f"PA{i}" for i in range(8)], "PB0", "PB1",
+         *[f"PC{i}" for i in range(6)]))
+})
+
+
 CONTROLLER_BINDINGS = (
     uart_binding("USART1", 2, 37, (2, 7, 4), (2, 2, 4)),
     uart_binding("USART2", 1, 38, (1, 6, 4)),

@@ -8,7 +8,7 @@ from tools.configure import enhanced_endpoints, uart_formats
 from tools.configure.providers.common import Construction, exact_part, mode_traits
 from tools.configure.providers import hardware
 from tools.configure import timer_advanced, secondary_controllers
-from .contract import (ADC_CHANNEL_SEQUENCES, FLASH_PROGRAM_UNIT, LIMITS,
+from .contract import (ADC_PIN_CHANNELS, FLASH_PROGRAM_UNIT, LIMITS,
                        PARTS, mode_implementation)
 
 _PULL_VALUES = MappingProxyType({"none": 0, "up": 1, "down": 2})
@@ -274,9 +274,11 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         dma = traits.dma
         channels, sampling = item.options.channels, item.options.sample_times
         reference = item.options.reference_mv
-        reviewed = tuple(int(pin["pin"][2:]) for pin in item.pins)
-        if item.controller != "ADC1" or channels != reviewed or channels not in ADC_CHANNEL_SEQUENCES:
-            raise ValueError("ADC channel sequence must match the reviewed PA0/PA1 route")
+        reviewed = {ADC_PIN_CHANNELS.get((item.controller, pin["pin"]))
+                    for pin in item.pins}
+        if (None in reviewed or not channels or len(channels) > 16 or
+                set(channels) != reviewed):
+            raise ValueError("ADC channel sequence must match its reviewed analog pins")
         if len(sampling) != len(channels) or not all(
                 isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 7
                 for value in sampling):

@@ -154,6 +154,64 @@ class Stm32AdcStream : public testing::Test {
     }
 };
 
+TEST_F(Stm32AdcStream, ExternalScanSamplesAllSixteenRanksInAuthoredOrder) {
+    const uint8_t ranks[]{15U, 14U, 13U, 12U, 11U, 10U, 9U, 8U,
+                          7U,  6U,  5U,  4U,  3U,  2U,  1U, 0U};
+    const uint8_t timing[16]{};
+    uint16_t output[16]{};
+    state.adc.channels = ranks;
+    state.adc.sample_times = timing;
+    state.adc.channel_count = 16U;
+    size_t count = 0U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_adc_port_sample(&port, output, 16U, 1000U, &count));
+    ASSERT_EQ(16U, count);
+    for (size_t i = 0U; i < count; ++i) {
+        EXPECT_EQ(100U + 100U * ranks[i], output[i]);
+    }
+    EXPECT_EQ(0U, adc.CR2);
+    EXPECT_FALSE(state.adc.active);
+}
+
+TEST_F(Stm32AdcStream, RepeatedChannelCannotHaveConflictingSampleTimes) {
+    const uint8_t ranks[]{15U, 15U};
+    const uint8_t timing[]{0U, 7U};
+    state.adc.channels = ranks;
+    state.adc.sample_times = timing;
+    common.CCR = UINT32_C(0xA5000000);
+    adc.CR1 = UINT32_C(0x5A000000);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_adc_initialize(&state.adc));
+    EXPECT_EQ(UINT32_C(0xA5000000), common.CCR);
+    EXPECT_EQ(UINT32_C(0x5A000000), adc.CR1);
+}
+
+TEST_F(Stm32AdcStream, SixteenRankDmaSequenceCrossesBothRegisterBoundaries) {
+    const uint8_t ranks[]{0U, 1U, 2U,  3U,  4U,  5U,  6U,  7U,
+                          8U, 9U, 10U, 11U, 12U, 13U, 14U, 15U};
+    const uint8_t timing[16]{};
+    uint16_t output[16]{};
+    nx_stream_slot_t full_slot{};
+    nx_stream_t full_stream{};
+    full_slot.data = reinterpret_cast<uint8_t*>(output);
+    full_slot.capacity = sizeof(output);
+    ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&full_stream, &full_slot, 1U));
+    region = {reinterpret_cast<uintptr_t>(output), sizeof(output),
+              NX_DMA_MEMORY_WRITE};
+    state.adc.channels = ranks;
+    state.adc.sample_times = timing;
+    state.adc.channel_count = 16U;
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_start(&port, &full_stream, 1000U));
+    EXPECT_EQ(UINT32_C(0x0A418820), adc.SQR3);
+    EXPECT_EQ(UINT32_C(0x16A4A0E6), adc.SQR2);
+    EXPECT_EQ(UINT32_C(0x00F7B9AC), adc.SQR1);
+    EXPECT_EQ(16U, memory.NDTR);
+    EXPECT_EQ(NX_STREAM_SLOT_FILLING, full_slot.state);
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+    EXPECT_EQ(NX_STREAM_SLOT_FREE, full_slot.state);
+    EXPECT_EQ(0U, memory.CR & DMA_SxCR_EN);
+    EXPECT_EQ(0U, adc.CR2 & (ADC_CR2_EXTEN | ADC_CR2_DMA | ADC_CR2_ADON));
+}
+
 TEST_F(Stm32AdcStream, StabilizationRequiresExplicitServiceBeforeFirstTrigger) {
     ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
     EXPECT_EQ(timer.CR1 & TIM_CR1_CEN, 0U);
