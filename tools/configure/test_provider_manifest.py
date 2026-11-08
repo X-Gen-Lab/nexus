@@ -62,7 +62,7 @@ class ProviderManifestTests(unittest.TestCase):
             sys.executable, "-c",
             "import sys; from tools.configure.integration_package import load_manifest; "
             "load_manifest(sys.argv[1]); "
-            "assert not [name for name in sys.modules if name.startswith('soc.')], "
+            "assert not [name for name in sys.modules if name.startswith('soc.')], " +
             "'Static external metadata imported unselected builtin source'",
             str(self.package)], cwd=external_tests.ROOT,
             capture_output=True, text=True, timeout=30)

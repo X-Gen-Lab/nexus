@@ -2,6 +2,7 @@
 from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError, replace
 from types import SimpleNamespace
+from operator import getitem
 import unittest
 from unittest.mock import patch
 
@@ -38,7 +39,7 @@ class ConstructionContractTests(unittest.TestCase):
                     self.assertTrue(all(isinstance(call, DirectCall)
                                         for call in construction.stop))
                     with self.assertRaises(TypeError):
-                        construction["definitions"]
+                        getitem(construction, "definitions")
                     with self.assertRaises(FrozenInstanceError):
                         construction.state_type = "foreign_state_t"
 

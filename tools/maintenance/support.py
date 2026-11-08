@@ -26,6 +26,41 @@ LINKS = {"manifest", "qualifications", "source_sdk", "sdk_consumers",
          "sdk_consumer", "hil_admission", "hil_raw", "hil_measurements", "candidate"}
 
 
+def associate_candidate(result, resolved, source, candidate_path, *, legacy_replay=False):
+    """Only an exact verified source/configuration can support this selection."""
+    reference = (candidate.verified_projection(candidate_path, legacy_replay=True)
+                 if legacy_replay else candidate.verified_projection(candidate_path))
+    source_keys = ("commit", "tree", "dirty", "submodules")
+    clean_dependencies = all(line.startswith(" ")
+                             for line in source["submodules"])
+    source_match = (source["dirty"] is False and clean_dependencies and
+                    all(source[key] == reference["source"][key]
+                        for key in source_keys))
+    configuration_match = (
+        reference["configuration_sha256"] == resolved["configuration_sha256"]
+        and reference["resolved"] == resolved)
+    relation = ("configuration_mismatch" if not configuration_match else
+                "exact_source_and_configuration" if source_match else
+                "historical_source")
+    result["current_source"] = source
+    result["evidence"] = {
+        "relation": relation, "source_match": source_match,
+        "configuration_match": configuration_match,
+        "reference": {key: value for key, value in reference.items()
+                      if key != "resolved"}}
+    legacy = reference.get("sealed_schema_version") == 1
+    if source_match and configuration_match and not legacy:
+        for name in ("host_models", "arm_image", "installed_sdk",
+                     "software_candidate", "hil_tooling", "resource_budget",
+                     "reproducibility"):
+            result["validation"][name] = "passed"
+    if legacy:
+        result["evidence"]["relation"] = "legacy_read_only"
+    result["limitations"].append(
+        "Evidence association verifies an existing candidate; it executes no "
+        "new checks and does not assess physical HIL or qualify other selections.")
+
+
 def environment():
     """Observe availability without starting compilers, Docker or equipment."""
     return {"operation": "read_only", "python": sys.executable,
@@ -276,9 +311,8 @@ class Query:
 
     def sealed_candidate(self, reference, legacy_replay):
         try:
-            from tools.maintenance.capabilities import _associate_candidate
             identity, _ = self.read(reference)
-            _associate_candidate(self.result, self.resolved, self.source,
+            associate_candidate(self.result, self.resolved, self.source,
                                  Path(identity["path"]), legacy_replay=legacy_replay)
             evidence = self.result["evidence"]
             legacy = evidence["reference"].get("sealed_schema_version") == 1

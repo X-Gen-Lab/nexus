@@ -2,7 +2,6 @@
 
 import json
 from pathlib import Path
-import tempfile
 import unittest
 
 from scripts.ci import provider_assemblies

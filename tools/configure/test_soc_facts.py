@@ -1,15 +1,7 @@
 """Exact package admission and imported SDK inputs fail before publication."""
 from tools.configure.tests.device_fixture import load_soc_facts
 from tools.configure.providers.descriptor import source_directory
-import hashlib
-import json
-import os
-from pathlib import Path
-import shutil
-import subprocess
-import tempfile
 import unittest
-from unittest.mock import patch
 
 from tools.configure import configure as gate
 

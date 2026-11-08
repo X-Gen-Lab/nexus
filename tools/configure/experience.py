@@ -555,14 +555,16 @@ def run(gate, argv=None):
             # Own the path only after exclusive create succeeds. A failed
             # write or validation then removes only our incomplete file.
             stream = args.output.open("x", encoding="utf-8")
+            validated = False
             try:
                 with stream:
                     stream.write(contents)
                 result = resolve(args.output)
-            except BaseException:
+                validated = True
+            finally:
                 # Control exceptions must also withdraw our incomplete file.
-                args.output.unlink(missing_ok=True)
-                raise
+                if not validated:
+                    args.output.unlink(missing_ok=True)
         elif command == "generate":
             result = gate.configure(args.assembly, args.output,
                                     args.source_root,

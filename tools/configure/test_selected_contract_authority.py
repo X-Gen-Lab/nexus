@@ -6,10 +6,8 @@ Platform GoogleTests, linked resource measurements or physical qualification.
 from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError, replace
 import importlib
-import json
 from pathlib import Path
 import tempfile
-import tomllib
 import unittest
 
 from tools.configure import matrix, bindings, configure, dependencies, factory

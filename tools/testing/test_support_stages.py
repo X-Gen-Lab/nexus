@@ -1,7 +1,6 @@
 """Support queries replay original phase evidence without executing producers."""
 from tools.configure.tests.native_fixture import native_fixture
 
-import copy
 from contextlib import redirect_stderr, redirect_stdout
 import io
 import json

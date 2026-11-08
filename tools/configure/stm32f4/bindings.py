@@ -271,6 +271,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         stop = DirectCall("nx_stm32_pwm_close", (state, inactive))
     elif kind == "adc":
         traits = mode_traits(kind, item.mode)
+        dma = traits.dma
         channels, sampling = item.options.channels, item.options.sample_times
         reference = item.options.reference_mv
         reviewed = tuple(int(pin["pin"][2:]) for pin in item.pins)
@@ -286,24 +287,24 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         sampling_values = ", ".join(f"{value}u" for value in sampling)
         definitions += [f"static const uint8_t s_nx_adc_channels_{name}[] = {{ {channel_values} }};",
                         f"static const uint8_t s_nx_adc_samples_{name}[] = {{ {sampling_values} }};"]
-        config_type = "nx_stm32_adc_stream_config_t" if traits.dma else "nx_stm32_adc_config_t"
-        if traits.dma:
+        config_type = "nx_stm32_adc_stream_config_t" if dma else "nx_stm32_adc_config_t"
+        if dma:
             regions, count = dma_regions(name, result)
             definitions += regions
         definitions += [f"static const {config_type} {config} = {{"]
-        if traits.dma:
+        if dma:
             definitions += ["    .adc = {"]
         definitions += [f"    .channels = s_nx_adc_channels_{name},",
                         f"    .sample_times = s_nx_adc_samples_{name},",
                         f"    .channel_count = {len(channels)}u, .reference_mv = {reference}u"]
-        if traits.dma:
+        if dma:
             definitions += ["    },", f"    .regions = s_nx_dma_regions_{name},",
                             f"    .region_count = {count}u, .priority = {item.options.irq.priority}u"]
         definitions += ["};"]
-        selected = "adc_continuous" if traits.continuous else "adc_stream" if traits.dma else "adc"
+        selected = "adc_continuous" if traits.continuous else "adc_stream" if dma else "adc"
         initialize = DirectCall(f"nx_stm32_{selected}_prepare", (state, Address(config)))
         stop = DirectCall(f"nx_stm32_{selected}_close", (state,))
-        if traits.dma:
+        if dma:
             path = hardware.maintained("stm32f4", item.controller).dma(item.mode)[0]
             vector = hardware.dma_vector("stm32f4", path)
             definitions += [f"void {vector}_IRQHandler(void);",
@@ -409,6 +410,7 @@ def _uart_constructor(item, result):
         raise ValueError("UART requires its reviewed controller integration")
     name = _symbol(item.id)
     traits = mode_traits("uart", item.mode)
+    dma = traits.dma
     tx_dma, rx_dma = traits.tx_dma, traits.rx_dma
     blocks = traits.block_stream
     words = item.mode == "irq-words"
@@ -440,7 +442,7 @@ def _uart_constructor(item, result):
     vectors = [item.controller]
     binding = selected.hardware
     rx = tx = None
-    if traits.dma:
+    if dma:
         paths = secondary_controllers.dma_paths(item)
         expected = tuple((f"DMA{engine}", lane, request)
                          for engine, lane, request in paths)
@@ -464,11 +466,11 @@ def _uart_constructor(item, result):
         frame = "&s_nx_uart_frame_" + name
         definitions += [f"static const nx_uart_format_t s_nx_uart_frame_{name} =",
                         "    " + uart_formats.expression(options.frame) + ";"]
-    config_type = ("nx_stm32_uart_dma_cold_config_t" if traits.dma else
+    config_type = ("nx_stm32_uart_dma_cold_config_t" if dma else
                    "nx_stm32_uart_cold_config_t")
     definitions += [f"static const {config_type} {config} = {{"]
-    indent = "        " if traits.dma else "    "
-    if traits.dma:
+    indent = "        " if dma else "    "
+    if dma:
         definitions += ["    .uart = {"]
     definitions += [indent + f".registers = {item.controller}, .pins = s_nx_uart_pins_{name},",
                     indent + f".vectors = s_nx_uart_vectors_{name}, .vector_count = {len(vectors)}u,",
@@ -477,7 +479,7 @@ def _uart_constructor(item, result):
                     indent + f".profile = {profile}, .priority = {selected.irq.priority}u,",
                     indent + f".kernel_bound = {'true' if result.kernel is not None else 'false'},",
                     indent + f".preload_tx = {'true' if secondary_controllers.applies(item, result, 'stm32') else 'false'}, .format = {frame}"]
-    if traits.dma:
+    if dma:
         engine = (rx or tx)[0]
         definitions += ["    },",
                         f"    .resources = {{ DMA{engine}, s_nx_dma_regions_{name}, {region_count}u }},",

@@ -36,7 +36,7 @@ class QimingBoardFactsTests(unittest.TestCase):
         try:
             return gate.resolve_ir(self.authored(board, sections, hardware), test_support=native_fixture(self.authored(board, sections, hardware)))
         except gate.ConfigurationError as error:
-            self.fail(f"Reviewed Qiming selection is unavailable: {error}")
+            raise AssertionError(f"Reviewed Qiming selection is unavailable: {error}") from error
 
     @staticmethod
     def gpio(names, mode="output", pull=None):
@@ -281,9 +281,9 @@ class QimingBoardFactsTests(unittest.TestCase):
                                   if item.controller == "GPIOB"},
                                  {"touch-mosi", "touch-miso", "touch-cs"})
                 claims = {item.key for item in selected.claims}
-                self.assertTrue({"pin:PB0", "pin:PB1", "pin:PB2", "pin:PB3",
-                                 "pin:PB4", "pin:PB5", "pin:PA5", "pin:PF11"}
-                                <= claims)
+                self.assertLessEqual({"pin:PB0", "pin:PB1", "pin:PB2", "pin:PB3",
+                                 "pin:PB4", "pin:PB5", "pin:PA5", "pin:PF11"},
+                                     claims)
                 self.assertNotIn("controller:SPI3", claims)
                 self.assertEqual([item.controller for item in
                                   selected.controllers if item.kind == "exti"],

@@ -1,6 +1,5 @@
 """Optional exact RAM domains have explicit budgets and fail-closed sections."""
 from tools.configure.tests.native_fixture import native_fixture
-from dataclasses import FrozenInstanceError
 import json
 from pathlib import Path
 import shutil

@@ -74,7 +74,7 @@ class ResolutionPhaseTests(unittest.TestCase):
 
     def test_native_dependency_phase_does_not_query_unselected_git_sources(self):
         def unexpected(*args):
-            self.fail('Unselected dependency queried: ' + repr(args))
+            raise AssertionError('Unselected dependency queried: ' + repr(args))
 
         selected = gate._resolve_source_dependencies(
             self.soc, self.provider, 'native', gate.ROOT, 'native', gate.load,

@@ -4,7 +4,7 @@ JSON hardware facts and authored inputs are validated once by the resolver. This
 module stores that decision; it does not select targets or repair configuration.
 """
 from collections.abc import Mapping
-from dataclasses import dataclass, fields, is_dataclass, replace
+from dataclasses import dataclass, fields, replace
 from types import MappingProxyType
 from typing import ClassVar, TYPE_CHECKING
 
@@ -12,40 +12,12 @@ from tools.configure.resource_graph import ResourceClaimIR, ResourcePlanIR
 from tools.configure.trigger_graph import TriggerPlanIR
 from tools.configure.dma_topology import DmaLaneIR, DmaTopologyIR
 from tools.configure.i2s2 import I2s2RoleIR
+from tools.configure.records import Record, freeze, thaw
+
 if TYPE_CHECKING:
     from tools.configure.board_hardware import BoardHardwareIR
     from tools.configure.providers.hardware import ControllerBinding
     from tools.configure.integration_package import ProviderContext
-
-
-def freeze(value):
-    if isinstance(value, dict):
-        return MappingProxyType({key: freeze(item) for key, item in value.items()})
-    if isinstance(value, list):
-        return tuple(freeze(item) for item in value)
-    return value
-
-
-def thaw(value):
-    if isinstance(value, Record):
-        return {key: thaw(item) for key, item in value.projection().items()}
-    if is_dataclass(value):
-        return {item.name: thaw(getattr(value, item.name))
-                for item in fields(value)}
-    if isinstance(value, Mapping):
-        return {key: thaw(item) for key, item in value.items()}
-    if isinstance(value, tuple):
-        return [thaw(item) for item in value]
-    return value
-
-
-class Record:
-    """Derived read-only projection; named fields are the sole stored values."""
-    def projection(self):
-        return {item.name: getattr(self, item.name) for item in fields(self)}
-
-    def to_dict(self):
-        return thaw(self)
 
 
 @dataclass(frozen=True)

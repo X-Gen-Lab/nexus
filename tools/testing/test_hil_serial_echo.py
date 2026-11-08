@@ -160,6 +160,7 @@ class HilSerialEchoTests(unittest.TestCase):
                         time.sleep(0.001)
             except BaseException as error:
                 self.thread_error = error
+                raise
 
         thread = threading.Thread(target=run, name="software-only-pty-echo")
         thread.start()

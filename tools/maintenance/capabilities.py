@@ -186,20 +186,19 @@ def selection(assembly, root=ROOT, *, candidate_path=None, results_index=None,
                             "hardware qualification.",
                             *[item for item in data.get("limitations", [])
                               if item != "Physical qualification not executed"]]}
+    from tools.maintenance import support
     if candidate_path is not None:
-        _associate_candidate(result, data, source, Path(candidate_path),
-                             legacy_replay=legacy_replay)
+        support.associate_candidate(result, data, source, Path(candidate_path),
+                                    legacy_replay=legacy_replay)
     if results_index is not None:
         _associate_index(result, data, source, Path(results_index), record_pointer)
         links = result["indexed_evidence"]["record"].get("support_evidence")
         if verify_record and links is not None:
-            from tools.maintenance.support import LINKS
             from tools.evidence.common import fields
-            fields(links, set(), LINKS)
+            fields(links, set(), support.LINKS)
             if references.keys() & links.keys():
                 raise ValueError("explicit evidence duplicates a selected record reference")
             references.update(links)
-    from tools.maintenance import support
     if references:
         support.associate(result, data, source, references, legacy_replay=legacy_replay)
     else:
@@ -298,43 +297,6 @@ def _associate_index(result, resolved, source, path, pointer):
         "Indexed observations expose their recorded identity and scope only; "
         "raw execution receipts are not verified and validation status is unchanged. "
         "Missing source or configuration identity is never inherited from ancestors.")
-
-
-def _associate_candidate(result, resolved, source, candidate_path, *, legacy_replay=False):
-    """Only an exact verified source/configuration can support this selection."""
-    from tools.evidence import candidate
-
-    reference = (candidate.verified_projection(candidate_path, legacy_replay=True)
-                 if legacy_replay else candidate.verified_projection(candidate_path))
-    source_keys = ("commit", "tree", "dirty", "submodules")
-    clean_dependencies = all(line.startswith(" ")
-                             for line in source["submodules"])
-    source_match = (source["dirty"] is False and clean_dependencies and
-                    all(source[key] == reference["source"][key]
-                        for key in source_keys))
-    configuration_match = (
-        reference["configuration_sha256"] == resolved["configuration_sha256"]
-        and reference["resolved"] == resolved)
-    relation = ("configuration_mismatch" if not configuration_match else
-                "exact_source_and_configuration" if source_match else
-                "historical_source")
-    result["current_source"] = source
-    result["evidence"] = {
-        "relation": relation, "source_match": source_match,
-        "configuration_match": configuration_match,
-        "reference": {key: value for key, value in reference.items()
-                      if key != "resolved"}}
-    legacy = reference.get("sealed_schema_version") == 1
-    if source_match and configuration_match and not legacy:
-        for name in ("host_models", "arm_image", "installed_sdk",
-                     "software_candidate", "hil_tooling", "resource_budget",
-                     "reproducibility"):
-            result["validation"][name] = "passed"
-    if legacy:
-        result["evidence"]["relation"] = "legacy_read_only"
-    result["limitations"].append(
-        "Evidence association verifies an existing candidate; it executes no "
-        "new checks and does not assess physical HIL or qualify other selections.")
 
 
 def c_code(source):

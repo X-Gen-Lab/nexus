@@ -1445,6 +1445,7 @@ finally:
                 result.append(self.real_execute(mode='validation'))
             except BaseException as error:
                 errors.append(error)
+                raise
         worker = threading.Thread(target=execute)
         worker.start()
         try:

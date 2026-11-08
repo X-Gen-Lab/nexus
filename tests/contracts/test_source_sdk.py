@@ -18,8 +18,6 @@ sys.path.insert(0, str(ROOT / "cmake/package"))
 import verify_consumers as consumer_gate
 import package_source_sdk as source_sdk
 from tools.configure.metadata import load_policy
-from tools.configure.providers.descriptor import source_directory
-from tools.dev.presets import Presets
 
 # Fixture repositories are disposable; automatic maintenance must neither
 # detach nor outlive the Git command that owns their temporary directory.

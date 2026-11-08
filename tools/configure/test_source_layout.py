@@ -2,9 +2,6 @@
 from tools.configure.tests.native_fixture import native_fixture
 from pathlib import Path
 import importlib.util
-import shutil
-import subprocess
-import sys
 import tempfile
 import unittest
 

@@ -8,7 +8,6 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from scripts.ci import provider_assemblies
 from tools.dev import qualification
 from tools.dev.qualification import CHECKERS, validate_plan
 from tools.dev.presets import Presets

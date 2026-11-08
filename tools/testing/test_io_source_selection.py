@@ -129,9 +129,9 @@ target_link_libraries(consumer PRIVATE {required_target})
 
     def test_uart_retains_stream_word_and_rs485_gpio_dependencies(self):
         sources = self.sources(("uart",))
-        self.assertTrue({"src/api/uart.c", "src/api/uart_word.c",
+        self.assertLessEqual({"src/api/uart.c", "src/api/uart_word.c",
                          "src/mechanisms/stream_profile.c",
-                         "src/mechanisms/dma.c"} <= sources)
+                         "src/mechanisms/dma.c"}, sources)
         self.assertEqual({name for name in sources if name.startswith("src/api/")},
                          {"src/api/uart.c", "src/api/uart_word.c",
                           "src/api/gpio.c", "src/api/pin_state.c"})

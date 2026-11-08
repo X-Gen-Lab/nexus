@@ -25,7 +25,7 @@ SOURCE_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(SOURCE_ROOT))
 try:
     from tools.maintenance.source_catalogue import (
-        ALL_DEPENDENCIES, SOURCE_DEPENDENCIES, children, declared_modules,
+        children, declared_modules,
         dependency, relative_path, verify_alias_identities,
         verify_gitlinks,
     )
@@ -38,7 +38,6 @@ try:
     )
     from tools.configure.metadata import load_policy, parse_json, snapshot
     from tools.configure import dependencies as configuration_dependencies
-    from tools.configure import integration_package
     from tools.configure.providers import descriptor as provider_descriptors
 except ImportError as error:
     # Missing verifier modules are an incomplete SDK, including after an
@@ -773,6 +772,7 @@ REQUIRED_FILES = (
     'tools/configure/integration_package.py',
     'tools/configure/io_traits.py',
     'tools/configure/ir.py',
+    'tools/configure/records.py',
     'tools/configure/kernel.py',
     'tools/configure/lowpower.py',
     'tools/configure/matrix.py',

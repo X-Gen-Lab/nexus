@@ -7,7 +7,6 @@ import tempfile
 import unittest
 
 from tools.configure import configure as gate
-from tools.configure.providers import maintained
 
 
 class CanConfigurationTests(unittest.TestCase):

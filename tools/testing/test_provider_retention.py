@@ -8,8 +8,7 @@ from types import SimpleNamespace
 import unittest
 
 from tools.evidence.common import EvidenceError
-from tools.measurement.retention import (inspect_provider_retention,
-                                         reference_layout, source_contracts)
+from tools.measurement.retention import inspect_provider_retention, source_contracts
 from tools.measurement.elf import Elf32
 
 

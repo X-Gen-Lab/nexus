@@ -87,7 +87,7 @@ CLI 传 `--test-support`，CMake 测试工程声明 `NEXUS_TEST_SUPPORT=ON`。�
 | 入口 | 责任 |
 | --- | --- |
 | `authored.py`、公共 resolver | 读取用户意图，严格验证 SoC／Board／资源与冲突 |
-| `ir.py` | 不可变具名记录；运行时配置不暴露可变字典 |
+| `records.py`、`ir.py` | 前者只负责不可变值与审计投影；后者声明装配记录，Board 事实独立依赖前者，避免领域互相导入 |
 | `stm32f4_descriptor.py` | 显式 F4 元数据与输入位置 |
 | `stm32f4/` | 当前集中维护的 F4 配置适配 |
 | `emission.py` 等公共生成代码 | 精确静态配置、存储、face、factory 与固定连接 |

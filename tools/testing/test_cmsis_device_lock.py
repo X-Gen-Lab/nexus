@@ -62,7 +62,7 @@ class DeviceLockContracts:
             return self.git_state["origin"]
         if arguments == ("status", "--porcelain", "--untracked-files=all"):
             return self.git_state["status"]
-        self.fail("Unexpected Git identity command: " + repr(arguments))
+        raise AssertionError("Unexpected Git identity command: " + repr(arguments))
 
     def verify(self, **options):
         return cmsis_device_lock.verify(self.source, self.lock_path, **options)

@@ -1,15 +1,8 @@
 """Reviewed reference indices reject fictitious identity and qualification."""
 from tools.configure.providers.descriptor import source_directory
 import copy
-import hashlib
 import json
-import os
-from pathlib import Path
-import shutil
-import subprocess
-import tempfile
 import unittest
-from unittest.mock import patch
 
 from tools.configure import configure as gate, fact_references
 

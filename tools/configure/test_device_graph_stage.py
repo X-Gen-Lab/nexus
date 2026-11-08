@@ -7,8 +7,8 @@ controller before those decisions have been admitted.
 
 from collections.abc import Mapping
 from dataclasses import FrozenInstanceError
-from pathlib import Path
 from unittest.mock import patch
+from operator import getitem
 import unittest
 
 from tools.configure import configure
@@ -44,7 +44,7 @@ class DeviceGraphStageTests(unittest.TestCase):
         with self.assertRaises(FrozenInstanceError):
             graph.controllers = ()
         with self.assertRaises(TypeError):
-            graph["controllers"]
+            getitem(graph, "controllers")
 
     def test_usb_graph_contains_final_endpoint_order_and_nonoverlapping_fifos(self):
         graph, result = self.resolve_graph(

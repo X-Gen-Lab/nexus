@@ -1,14 +1,11 @@
 """SDK device components retain exactly their reviewed upstream closure."""
-from tools.configure.providers.descriptor import source_directory
 from pathlib import Path
 import hashlib
 import json
-import re
 import sys
 import shutil
 import subprocess
 import tempfile
-import tomllib
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]

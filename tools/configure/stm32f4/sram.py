@@ -5,7 +5,7 @@ from tools.configure.ir import ExternalMemoryRegionIR
 from tools.configure.providers.common import fail, integer
 
 
-def defer_budget(assembly, budgets, part):
+def defer_budget(assembly, budgets, part) -> tuple[str, ...]:
     """Defer only the reviewed NE3 budget until its bank graph is immutable."""
     choices = budgets.get("regions", {})
     if not isinstance(choices, Mapping) or "addsram" not in choices:
@@ -29,7 +29,7 @@ def defer_budget(assembly, budgets, part):
     return ("addsram",)
 
 
-def resolve(budget, devices, *, assembly, variant):
+def resolve(budget, devices, *, assembly, variant) -> tuple[ExternalMemoryRegionIR, ...]:
     """Bind one selected exact startup child, without cloning its geometry."""
     children = [item for item in devices
                 if item.driver == "memory_window-endpoint" and

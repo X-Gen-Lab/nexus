@@ -3,6 +3,7 @@ from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import fields, replace
 from collections.abc import Mapping
 from pathlib import Path
+from operator import getitem
 import tempfile
 import unittest
 
@@ -37,7 +38,7 @@ class UnifiedIrTests(unittest.TestCase):
         self.assertNotIsInstance(result, Mapping)
         self.assertNotIsInstance(result.cpu_profile, Mapping)
         with self.assertRaises(TypeError):
-            result["board"]
+            getitem(result, "board")
 
     def test_selected_claims_and_option_projection_have_one_owner(self):
         result = configure.resolve_ir(configure.ROOT /

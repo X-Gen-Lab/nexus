@@ -9,7 +9,7 @@ import subprocess
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure as gate, emission, memory
+from tools.configure import bindings, configure as gate, memory
 from tools.measurement.resources import memory_contract
 
 

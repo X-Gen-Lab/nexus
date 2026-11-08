@@ -74,7 +74,7 @@ class LwIPSourceLockTests(unittest.TestCase):
             return self.origin
         if arguments == ("status", "--porcelain", "--untracked-files=all"):
             return self.status
-        self.fail("Unexpected Git observation: " + repr(arguments))
+        raise AssertionError("Unexpected Git observation: " + repr(arguments))
 
     def verify(self, *, development=False, source_sdk=False):
         return lwip_lock.verify(self.source, self.lock_path,
