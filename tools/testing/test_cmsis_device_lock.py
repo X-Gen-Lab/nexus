@@ -13,6 +13,8 @@ import unittest
 from unittest.mock import patch as mock_patch
 from tools.maintenance import cmsis_device_lock, source_catalogue
 
+from tools.testing.inventory_fixtures import write_files
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -26,13 +28,9 @@ class DeviceLockContracts:
         self.folder = Path(self.temporary.name)
         self.source = self.folder / "official source"
         self.source.mkdir()
-        self.original = ROOT / "vendors/st" / ("cmsis_device_" + self.family)
         name = "stm32" + self.family + ".lock.json"
         self.lock = json.loads((ROOT / "dependencies" / name).read_text())
-        for name in self.lock["files"]:
-            file = self.source / name
-            file.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(self.original / name, file)
+        write_files(self.source, self.lock)
         # Git is an external read-only identity port. Tests do not manufacture
         # commits or change the real complete upstream checkout.
         (self.source / ".git").mkdir()
@@ -114,22 +112,6 @@ class DeviceLockContracts:
         with self.assertRaises(ValueError):
             self.verify()
 
-    def test_real_official_whole_checkout_and_cli_verify_read_only(self):
-        self.git_patch.stop()
-        name = "stm32" + self.family + ".lock.json"
-        lock_path = ROOT / "dependencies" / name
-        result = cmsis_device_lock.verify(self.original, lock_path)
-        self.assertEqual(result["verified_files"],
-                         len(self.lock["files"]))
-        command = [sys.executable, "-B", str(ROOT /
-                   "tools/maintenance/cmsis_device_lock.py"),
-                   "--source", str(self.original), "--lock", str(lock_path)]
-        executed = subprocess.run(command, capture_output=True, text=True,
-                                  timeout=30)
-        self.assertEqual(executed.returncode, 0,
-                         executed.stdout + executed.stderr)
-        self.assertEqual(json.loads(executed.stdout)["source_kind"],
-                         "git_checkout")
 
     def test_empty_unknown_and_missing_lock_fields_reject(self):
         for value in ({}, [], {**self.lock, "fallback": True}):

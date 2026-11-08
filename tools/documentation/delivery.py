@@ -625,8 +625,9 @@ def _manifest_identity(manifest):
             if not re.fullmatch(r"[0-9a-f]{40}", str(source.get(key, ""))):
                 raise ValueError("Documentation source commit/tree identity missing")
         submodules = source.get("submodules")
+        rejected_states = ("-", "+", "U") if manifest["schema_version"] == 1 else ("+", "U")
         if (not isinstance(submodules, list) or
-                any(not isinstance(line, str) or line.startswith(("-", "+", "U"))
+                any(not isinstance(line, str) or line.startswith(rejected_states)
                     for line in submodules)):
             raise ValueError("Documentation source submodule identity is incomplete")
         if (not isinstance(source.get("paths"), list) or not source["paths"] or
@@ -822,7 +823,10 @@ def package(build_dir, output_dir, *, source_root, release_id, toolchain=None,
         raise ValueError("Missing documentation build source identity") from error
     if build_source != _identity(source):
         raise ValueError("Stale documentation build source identity")
-    if any(line.startswith(("-", "+", "U")) for line in source["submodules"]):
+    # Current documentation binds declared Git pins, including dormant sources.
+    # It never grants firmware/SDK qualification. Candidate references retain
+    # their independent, stricter dependency admission above.
+    if any(line.startswith(("+", "U")) for line in source["submodules"]):
         raise ValueError("Documentation source submodules are incomplete or stale")
     policy = load_policy(source_root)
     source_interface = dict(policy)

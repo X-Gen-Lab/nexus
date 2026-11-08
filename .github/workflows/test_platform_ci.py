@@ -43,6 +43,43 @@ def selects_branch(event, branch):
 
 
 class WorkflowContracts(unittest.TestCase):
+    def test_native_contract_jobs_prepare_the_locked_cross_compiler(self):
+        for filename, name in (
+                ('build-matrix.yml', 'native'),
+                ('quality-checks.yml', 'static-analysis'),
+                ('security.yml', 'codeql')):
+            with self.subTest(workflow=filename, job=name):
+                job = workflow(filename)['jobs'][name]
+                setup = next(step for step in job['steps'] if step.get(
+                    'uses') == './.github/actions/setup-build')
+                self.assertEqual(setup['with'].get('arm'), 'true',
+                                 'Native Host C contracts compile real ARM objects')
+
+    def test_automatic_job_identity_retains_its_selected_preparation(self):
+        for filename in ('build-matrix.yml', 'quality-checks.yml',
+                         'enterprise-tools.yml'):
+            for name, job in workflow(filename)['jobs'].items():
+                setups = [step for step in job.get('steps', []) if step.get(
+                    'uses') == './.github/actions/setup-build']
+                if not setups:
+                    continue
+                preset = setups[0]['with']['preset']
+                for step in job['steps']:
+                    if step.get('uses') != './.github/actions/record-identity':
+                        continue
+                    with self.subTest(workflow=filename, job=name):
+                        selected = step['with']
+                        self.assertEqual(selected.get('dependency-preparation'),
+                                         'build/setup-dependencies.json')
+                        self.assertEqual(selected.get('dependency-preset'), preset)
+                        self.assertIn('build/setup-dependencies.json',
+                                      selected['artifacts'].splitlines())
+                        uploads = [item for item in job['steps'] if item.get(
+                            'uses', '').startswith('actions/upload-artifact@')]
+                        self.assertTrue(any('build/setup-dependencies.json' in
+                                            item['with']['path'].splitlines()
+                                            for item in uploads))
+
     def test_production_arm_jobs_are_within_current_f4_support(self):
         jobs = workflow('build-matrix.yml')['jobs']
         selected = jobs['arm']['strategy']['matrix']['preset']

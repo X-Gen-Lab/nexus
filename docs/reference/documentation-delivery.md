@@ -23,8 +23,10 @@
 
 构建记录采用 schema 1，`kind` 为 `nexus_documentation_build`。其 `source` 使用
 `tools.evidence.identity.observe_git_source()` 的实际观测结果，`tools` 保存实际工具
-版本，`languages` 固定为 `en`、`zh_CN`。交付工具拒绝脏源码、缺失或偏离锁定版本
-的 submodule，以及与当前源码不一致的陈旧构建。
+版本，`languages` 固定为 `en`、`zh_CN`。交付工具拒绝脏源码、已初始化后偏离锁定
+版本或冲突的 submodule，以及与当前源码不一致的陈旧构建。schema 2 文档包保留
+尚未物化的 `-` gitlink，只绑定文档来源，不证明厂商 SDK 完整或固件通过；旧 schema 1
+包和软件候选引用继续采用原来的严格依赖要求。
 
 版本号由既有严格 policy loader 从 `dependencies/platform-compatibility.json` 读取，
 该 JSON 是唯一人工维护的版本权威。CMake 调用同一 loader 派生版本，不从

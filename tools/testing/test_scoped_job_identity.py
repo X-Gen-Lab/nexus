@@ -22,6 +22,51 @@ from tools.maintenance.source_catalogue import (
 
 
 class SelectedIdentityTests(unittest.TestCase):
+    def prepare_native_scope(self):
+        (self.root / 'board/board.json').write_text('{"soc_family":"native"}')
+        self.assembly.write_text(self.assembly.read_text().replace(
+            'baremetal', 'native'))
+        presets = self.root / 'CMakePresets.json'
+        document = json.loads(presets.read_text())
+        document['configurePresets'][0]['cacheVariables']['NEXUS_TEST_SUPPORT'] = True
+        presets.write_text(json.dumps(document))
+        self.commit_source()
+        self.initialize(*(item.path for item in SOURCE_DEPENDENCIES))
+        self.initialize('ext/googletest', *(item.path for item in
+                          source_catalogue.host_configuration_sources()))
+        self.refresh_receipt()
+        self.write_configuration()
+
+    def test_native_compiler_job_binds_sources_without_platform_output(self):
+        self.prepare_native_scope()
+        (self.artifacts / 'resolved.json').unlink()
+        (self.artifacts / 'input_paths.json').unlink()
+        record = self.capture()
+        self.assertFalse(record['dependencies_complete'])
+        self.assertTrue(record['selected_dependencies_complete'])
+        self.assertEqual(record['dependency_scope']['scope'], 'native')
+        self.assertEqual(record['configurations'], [])
+        self.assertEqual(record['qualification'], 'not_a_software_candidate')
+
+    def test_native_matrix_validates_each_distinct_configuration(self):
+        self.prepare_native_scope()
+        other = self.artifacts / 'other'
+        other.mkdir()
+        source = self.root / 'build/other.toml'
+        source.write_text('schema = 2\nbackend = "baremetal"\n')
+        resolved = {'schema_version': 1, 'inputs': [{
+            'path': 'other', 'sha256': file_identity(source)['sha256']}]}
+        resolved['configuration_sha256'] = canonical_digest(resolved)
+        (other / 'resolved.json').write_text(json.dumps(resolved))
+        (other / 'input_paths.json').write_text(json.dumps({'other': str(source)}))
+        record = self.capture()
+        self.assertEqual(len(record['configurations']), 2)
+        self.assertTrue(all(item['validation'] == 'valid'
+                            for item in record['configurations']))
+        source.write_text('tampered input')
+        with self.assertRaisesRegex(EvidenceError, 'input changed'):
+            self.capture(output=self.root / 'build/tampered-identity')
+
     def setUp(self):
         baseline = tuple(replace(item, fetch_url=item.upstream_url)
                          for item in source_catalogue.ALL_DEPENDENCIES)

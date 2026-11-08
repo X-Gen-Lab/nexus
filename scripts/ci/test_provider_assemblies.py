@@ -13,6 +13,8 @@ import unittest.mock
 
 from scripts.ci import provider_assemblies as gate
 from tools.evidence.common import EvidenceError
+from tools.evidence import identity as source_identity
+from tools.configure import configure
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -20,6 +22,45 @@ USB = ROOT / "tests/contracts/usb_assembly/stm32-zg.toml"
 
 
 class FixtureAdmission(unittest.TestCase):
+    def test_unselected_inventory_does_not_mask_real_tool_admission(self):
+        source = source_identity.observe_git_source(ROOT)
+        path = 'vendors/st/cmsis_device_u5'
+        source['submodules'] = [
+            '-' + line[1:].split()[0] + ' ' + path
+            if line.split()[1] == path else line
+            for line in source['submodules']]
+        self.assertTrue(any(line.startswith('-') and path in line
+                            for line in source['submodules']))
+        environment = {key: value for key, value in os.environ.items()
+                       if not key.startswith('GIT_')}
+        with tempfile.TemporaryDirectory() as directory, \
+                unittest.mock.patch.dict(os.environ, environment, clear=True), \
+                unittest.mock.patch.object(source_identity,
+                    'observe_git_source', return_value=source), \
+                unittest.mock.patch.object(gate.arch_compile, 'tools',
+                    side_effect=EvidenceError('tool admission reached')):
+            output = Path(directory) / 'audit'
+            self.assertEqual(gate.run(ROOT, [USB], 'missing-compiler', output), 1)
+            report = json.loads((output / 'report.json').read_text())
+        self.assertEqual(report['error'], 'tool admission reached')
+        self.assertEqual(report['source_before'], source)
+        self.assertEqual(report['status'], 'failed')
+
+    def test_missing_selected_sdk_rejects_before_source_observation(self):
+        environment = {key: value for key, value in os.environ.items()
+                       if not key.startswith('GIT_')}
+        with tempfile.TemporaryDirectory() as directory, \
+                unittest.mock.patch.dict(os.environ, environment, clear=True), \
+                unittest.mock.patch.object(configure, 'dependency_identity',
+                    side_effect=configure.ConfigurationError('selected SDK missing')), \
+                unittest.mock.patch.object(source_identity,
+                    'observe_git_source') as observe:
+            output = Path(directory) / 'audit'
+            self.assertEqual(gate.run(ROOT, [USB], 'missing-compiler', output), 1)
+            report = json.loads((output / 'report.json').read_text())
+        self.assertIn('selected SDK missing', report['error'])
+        observe.assert_not_called()
+
     def test_empty_matrix_is_a_failure(self):
         with self.assertRaisesRegex(EvidenceError, "nonempty"):
             gate.validate_fixtures(ROOT, [])

@@ -31,7 +31,8 @@ from tools.configure.configure import resolve_ir
 from tools.dev import process as execution
 from tools.evidence.common import (EvidenceError, atomic_json, load_json,
                                    regular_file)
-from tools.evidence.identity import (git_source, resolved_identity,
+from tools.evidence import identity as source_identity
+from tools.evidence.identity import (resolved_identity,
                                      resolved_input_files)
 from tools.measurement import resources, retention
 from tools.measurement.elf import Elf32
@@ -367,7 +368,9 @@ def run(root, assemblies, compiler, output, *, family=None, parallel=None,
             raise EvidenceError("parallel count must be 1..16")
         fixtures = validate_fixtures(root, assemblies, family=family,
                                      project=project)
-        report["source_before"] = git_source(root)
+        # Resolution validates selected SDK pins. Keep dormant inventory in the
+        # observation without requiring it; full Git/input snapshots stay bound.
+        report["source_before"] = source_identity.observe_git_source(root)
         report["source_inputs"] = source_inputs(root, fixtures)
         tools = arch_compile.tools(compiler)
         for name in ("cmake", "ninja"):
@@ -402,7 +405,7 @@ def run(root, assemblies, compiler, output, *, family=None, parallel=None,
             report["fixtures"].append(row)
             verify_inputs(report["source_inputs"])
             atomic_json(output / "report.json", report)
-        report["source_after"] = git_source(root)
+        report["source_after"] = source_identity.observe_git_source(root)
         if report["source_after"] != report["source_before"]:
             raise EvidenceError("Git source identity changed during matrix")
         verify_snapshot(root, fixtures, report["source_inputs"])

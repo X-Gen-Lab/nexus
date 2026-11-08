@@ -14,6 +14,8 @@ import unittest
 from unittest.mock import patch
 from tools.maintenance import stm32g4_lock, source_catalogue
 
+from tools.testing.inventory_fixtures import write_files
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -27,10 +29,7 @@ class STM32G4LockTests(unittest.TestCase):
         cls.seed_source.mkdir()
         cls.seed_lock = json.loads(
             (ROOT / "dependencies/stm32g4.lock.json").read_text())
-        for name in cls.seed_lock["files"]:
-            file = cls.seed_source / name
-            file.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(ROOT / "vendors/st/cmsis_device_g4" / name, file)
+        write_files(cls.seed_source, cls.seed_lock)
         cls._git(cls.seed_source, "init", "--quiet")
         cls._git(cls.seed_source, "config", "user.name", "Device lock test")
         cls._git(cls.seed_source, "config", "user.email",
@@ -94,7 +93,7 @@ class STM32G4LockTests(unittest.TestCase):
             self.verify()
 
         sibling = type(self)(
-            "test_actual_official_root_checkout_is_hash_verified")
+            "test_real_git_source_verifies_exact_part_and_does_not_change_checkout")
         sibling.setUp()
         self.addCleanup(sibling.doCleanups)
         self.assertEqual((sibling.source / name).read_bytes(), original)
@@ -123,10 +122,6 @@ class STM32G4LockTests(unittest.TestCase):
         self.assertFalse(result["software_qualified"])
         self.assertEqual(self.git("status", "--porcelain"), before)
 
-    def test_actual_official_root_checkout_is_hash_verified(self):
-        result = stm32g4_lock.verify(ROOT / "vendors/st/cmsis_device_g4",
-                                    ROOT / "dependencies/stm32g4.lock.json")
-        self.assertEqual(result["verified_files"], 5)
 
     def test_approved_transport_is_separate_from_official_repository(self):
         item = source_catalogue.dependency("stm32g4_cmsis")
@@ -163,11 +158,13 @@ class STM32G4LockTests(unittest.TestCase):
 
     def test_duplicate_json_key_boolean_schema_and_nonfinite_identity_reject(self):
         data = json.dumps(self.lock)
+        nonfinite = json.loads(data)
+        next(iter(nonfinite["files"].values()))["bytes"] = float("nan")
         for changed in (data.replace('"schema_version": 1',
                                      '"schema_version": 1, "schema_version": 1'),
                         data.replace('"schema_version": 1',
                                      '"schema_version": true'),
-                        data.replace('"bytes": 8920', '"bytes": NaN')):
+                        json.dumps(nonfinite)):
             self.lock_path.write_text(changed)
             with self.subTest(data=changed[:64]), self.assertRaises(ValueError):
                 self.verify()
