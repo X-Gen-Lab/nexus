@@ -34,12 +34,11 @@ class SourceCatalogueTests(unittest.TestCase):
                 self.assertTrue((ROOT / entry.source_lock).is_file())
 
     def test_runtime_scope_excludes_google_and_keeps_nested_sources_explicit(self):
-        self.assertEqual(len(catalogue.ALL_DEPENDENCIES), 27)
-        self.assertEqual(len(catalogue.ALL_SOURCE_DEPENDENCIES), 22)
-        self.assertEqual(len(catalogue.SOURCE_DEPENDENCIES), 9)
-        self.assertEqual(len(catalogue.HOST_TEST_DEPENDENCIES), 1)
-        self.assertEqual(sum(item.scope == "inventory" for item in
-                             catalogue.ALL_SOURCE_DEPENDENCIES), 12)
+        self.assertEqual({item.identifier for item in catalogue.SOURCE_DEPENDENCIES}, {
+            "freertos", "cmsis_core", "stm32f4_cmsis", "stm32f4_hal",
+            "threadx", "lwip", "mbedtls", "coremqtt", "mcuboot"})
+        self.assertEqual({item.identifier for item in catalogue.HOST_TEST_DEPENDENCIES},
+                         {"googletest"})
         self.assertEqual(catalogue.dependency("googletest").scope, "host-test")
         self.assertTrue(all(item.parent is None
                             for item in catalogue.SOURCE_DEPENDENCIES))

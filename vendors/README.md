@@ -9,9 +9,10 @@ HAL／LL／SPL；公共产品接口使用 Nexus 类型。一个目录或子模�
 | 来源 | 版本与身份 | 许可证边界 |
 |---|---|---|
 | `arm/CMSIS_6` | 官方 Arm v6.4.0，gitlink `af1b110e46a1720349f6f125e386e126767699bd` | Apache-2.0，保留 LICENSE 与头部通知 |
-| `st/cmsis_device_{f1,f4,g4,h7,u5}` | 五个已维护 STM32 family 的官方 Device 子模块，精确 gitlink | 保留上游通知 |
+| `st/cmsis_device_{f1,f4,g4,h7,u5}` | 五个已登记 STM32 family 的官方 Device 库存，精确 gitlink | 保留上游通知；不建立五个 family 的生产支持 |
 | `st/stm32{f1,f4,g4,h7,u5}_hal` | 对应官方 HAL／LL 子模块，精确 gitlink | 保留上游通知 |
 | `st/cmsis_device_h5`、`st/stm32h5_hal` | H563 I3C 有界软件参考的锁定 Device／HAL 依赖 | 目录存在不建立完整 H5 SoC／Board 支持 |
+| `st/usb_device`、`st/usb_host` | 官方 Device v2.11.4／Host v3.5.3，匹配 STM32CubeF4 v1.28.3；组织 fork 与精确 gitlink | SLA0044 Rev5，保留原始 LICENSE；只供 ST 器件相关集成 |
 | `gigadevice/gd32f30x` | 官方 GD32F30x 3.0.3 选定头与 startup，逐文件 source lock | 原始 BSD-3-Clause、Apache-2.0 与 GigaDevice 通知，见该目录 README／LICENSES |
 | `gigadevice/gd32f4xx` | 官方 GD32F4xx 3.3.3 Firmware 子树，逐文件 source lock | BSD-3-Clause、Apache-2.0 与两份原始 Arm Cortex-M 分发通知，见该目录 README／LICENSES |
 
@@ -25,9 +26,10 @@ python3 scripts/ci/verify_vendor_source.py --root vendors/gigadevice/gd32f4xx
 
 ## CPU Core 与 Device 分别选择
 
-七个已维护 MCU family 使用共享 `arm/CMSIS_6` 的 CMSIS-Core 头：STM32F103、F407、
-G474、H743、U575，以及 GD32F303、F470。具体 Device 定义、IRQ、startup 和 HAL／LL
-仍来自各自锁定来源。Core 迁移不会升级这些包或启用其他芯片、外设、profile、安全域。
+保留的 STM32F103、F407、G474、H743、U575 与 GD32F303、F470 来源曾通过共享
+`arm/CMSIS_6` 的显式 Core 探针；这不建立七个 family 的当前生产支持。当前生产
+仅维护 STM32F4 的精确 F407VE／ZG 实现，其他来源作为库存保留。具体 Device、IRQ、
+startup 和 HAL／LL 仍来自各自锁定来源；Core 迁移不自动启用芯片、外设或安全域。
 精确版本、上游 pack 字段和许可证身份见 [VERSIONS.md](VERSIONS.md)。
 
 `cmake/platform/CMSISCore.cmake` 拥有内部 `nexus_cmsis_core` target 和
@@ -68,3 +70,10 @@ gitlink 选择精确 commit。注册 Git 依赖从 X-Gen-Lab fork 取回，并�
 Board 接线写入 Nexus adapter 或外部工程，不修改导入文件；配置阶段不联网下载依赖。
 厂商代码不因进入本仓库而改用 MIT 许可。普通公共接口不传播厂商 Handle，显式 SDK
 bring-up 依赖也不改变该边界；SDK、实际固件和物理验证分别验收。
+
+ST USB 中间件当前只登记源码库存，不进入默认准备、校验、编译或 Source SDK
+负载，也不由此提供 Host／HS／class stack。两份 source lock 记录官方提交、tree、
+完整文件摘要、许可和既有 HAL／CMSIS／Cube 配对：
+[Device](../dependencies/stm32-usb-device.lock.json)、
+[Host](../dependencies/stm32-usb-host.lock.json)。后续适配保留一个控制器状态 owner、
+调用方静态存储和完整排空，不使用厂商模板中的隐式 heap 或全局单实例池。
