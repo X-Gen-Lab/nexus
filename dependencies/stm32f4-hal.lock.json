@@ -73,6 +73,10 @@
       "bytes": 68155,
       "sha256": "e837e3bd9c24f2a897b570fa229a9bb99836baf342b99ce7ae55c3eeced18bbe"
     },
+    "Inc/stm32f4xx_ll_dma.h": {
+      "bytes": 106997,
+      "sha256": "39e89050700e16304e04643e29c162b6aaa9f3bfe53880cd78c255ce46104e82"
+    },
     "Inc/stm32f4xx_ll_fsmc.h": {
       "bytes": 47221,
       "sha256": "4a87d32439ec8d2d6cf2e6b4b00f5b71a5bf3dd71c4eab8a0270c875dbcfab4a"

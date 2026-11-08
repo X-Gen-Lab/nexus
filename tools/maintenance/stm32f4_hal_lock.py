@@ -3,7 +3,7 @@
 
 STM32CubeF4 v1.28.3 pins both reviewed components. The graph closes inline LL,
 ETH definitions and explicitly selected UART/DMA/RCC C, stateless FSMC/SDIO
-LL C and RTC/PWR/DAC inline operations with their transitive headers and notice.
+LL C and RTC/PWR/DAC/DMA/CRC/identity inline operations with their closed headers.
 GPIO/Flash headers supply RCC declarations only; their C, global HAL
 initialization and SysTick are not selected.
 Source admission does not qualify a transport or create mutable Handles.
@@ -35,7 +35,7 @@ REVIEWED_FILES = frozenset({
     "Inc/stm32f4xx_ll_spi.h", "Inc/stm32f4xx_ll_bus.h",
     "Inc/stm32f4xx_ll_rcc.h", "Inc/stm32f4xx_ll_rng.h",
     "Inc/stm32f4xx_ll_adc.h", "Inc/stm32f4xx_ll_tim.h",
-    "Inc/stm32f4xx_ll_dac.h",
+    "Inc/stm32f4xx_ll_dac.h", "Inc/stm32f4xx_ll_dma.h",
     "Inc/stm32f4xx_ll_crc.h", "Inc/stm32f4xx_ll_utils.h",
     "Inc/stm32f4xx_ll_system.h",
     "Inc/stm32f4xx_ll_iwdg.h", "LICENSE.md",

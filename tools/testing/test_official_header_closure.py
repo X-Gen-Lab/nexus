@@ -34,8 +34,8 @@ F4_REQUIRED_FILES = {
     'LICENSE.md', 'Inc/stm32f4xx_hal_eth.h', *F4_HAL_HEADERS,
     *F4_HAL_SOURCES, *F4_LL_SOURCES,
     *(f'Inc/stm32f4xx_ll_{unit}.h' for unit in
-                      ('gpio', 'usart', 'spi', 'adc', 'dac', 'tim', 'iwdg', 'i2c',
-                       'bus', 'rcc', 'rng', 'fsmc', 'sdmmc', 'rtc', 'pwr',
+                      ('gpio', 'usart', 'spi', 'adc', 'dac', 'dma', 'tim',
+                       'iwdg', 'i2c', 'bus', 'rcc', 'rng', 'fsmc', 'sdmmc', 'rtc', 'pwr',
                        'crc', 'utils', 'system'))}
 F4_SELECTED_API = 'stm32f407-reviewed-ll-fsmc-sdio-rtc-uart-dma-hal-tx'
 
@@ -189,7 +189,7 @@ class OfficialHeaderClosureTests(unittest.TestCase):
             candidate['files'][name] = {
                 'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
         expected = F4_REQUIRED_FILES
-        self.assertEqual(len(expected), 38)
+        self.assertEqual(len(expected), 39)
         self.assertEqual({name for name in expected if name.endswith('.c')},
                          F4_HAL_SOURCES | F4_LL_SOURCES)
         self.assertEqual(original['selected_api'], F4_SELECTED_API)
@@ -215,7 +215,7 @@ class OfficialHeaderClosureTests(unittest.TestCase):
             self.assertEqual(result['verified_files'], len(expected))
             self.assertFalse(result['software_qualified'])
 
-    def test_f4_exported_headers_compile_real_uart_dma_and_rcc_sources(self):
+    def test_f4_exported_headers_compile_vendor_and_nexus_transports(self):
         from tools.maintenance import stm32f4_hal_lock as f4
         compiler = (os.environ.get('NEXUS_ARM_GCC') or
                     shutil.which('arm-none-eabi-gcc'))
@@ -286,6 +286,52 @@ class OfficialHeaderClosureTests(unittest.TestCase):
                     if path.is_relative_to(exported):
                         used.add(path.relative_to(exported).as_posix())
             self.assertEqual(used, F4_HAL_HEADERS)
+
+            # Compile real Nexus transports with the sealed supplier graph.
+            # The checkout's complete HAL Inc directory must never mask gaps.
+            configuration = root / 'configuration'
+            configured = run([
+                sys.executable, '-B', str(ROOT / 'tools/configure/configure.py'),
+                '--source-root', str(ROOT), '--assembly',
+                str(ROOT / 'tests/contracts/dac_assembly/ve-dma.toml'),
+                '--output', str(configuration)], cwd=ROOT,
+                env=os.environ.copy(), log=root / 'configure.log',
+                timeout=60, stage='f4-exported-nexus-configuration')
+            self.assertEqual(configured.returncode, 0, configured.stderr)
+            owned_includes = [private, configuration,
+                ROOT / 'soc/stm32/stm32f4/private', ROOT / 'io/private',
+                ROOT / 'io/include', ROOT / 'core/include', ROOT / 'arch/include']
+            system_includes = includes[1:]
+            owned_flags = [flag for flag in flags if flag != '-DUSE_HAL_DRIVER']
+            owned_flags += ['-DCMSIS_DISABLE_DEPRECATED=1', '-fshort-enums',
+                            '-Wall', '-Wextra', '-Werror', '-Wpedantic',
+                            '-Wconversion', '-Wshadow', '-Wstrict-prototypes',
+                            '-Wmissing-prototypes']
+            checkout_headers = (ROOT / f4.DIRECTORY / 'Inc').resolve()
+            exported_headers = exported.resolve()
+            for unit in ('dac_dma', 'crc', 'chip'):
+                source = ROOT / 'soc/stm32/stm32f4/drivers' / (unit + '.c')
+                dependencies = root / (unit + '.d')
+                result = run([
+                    compiler, *owned_flags,
+                    *[arg for path in owned_includes for arg in ('-I', str(path))],
+                    *[arg for path in system_includes
+                      for arg in ('-isystem', str(path))],
+                    '-MD', '-MF', str(dependencies), '-c', str(source),
+                    '-o', str(root / (unit + '.o'))], cwd=root,
+                    env=os.environ.copy(), log=root / (unit + '.log'),
+                    timeout=60, stage='f4-exported-nexus-source-closure')
+                self.assertEqual(result.returncode, 0, result.stderr)
+                dependency_text = dependencies.read_text().replace('\\\n', ' ')
+                for token in shlex.split(dependency_text):
+                    path = Path(token)
+                    path = (path if path.is_absolute() else root / path).resolve()
+                    self.assertFalse(path.is_relative_to(checkout_headers))
+                    if path.is_relative_to(exported_headers):
+                        used.add(path.relative_to(exported_headers).as_posix())
+            self.assertLessEqual({f'Inc/stm32f4xx_ll_{unit}.h' for unit in
+                                  ('dma', 'dac', 'tim', 'crc', 'system', 'utils')},
+                                 used)
 
     def test_u5_exact_closed_graph_closes_inline_and_gpio_hal_commands(self):
         profile = PROFILES['u5']
