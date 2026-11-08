@@ -242,6 +242,9 @@ def describe(item, endpoint=None, *, public_class=None):
     if kind in {"uart", "spi", "i2c", "can", "can_fd", "eth", "eth_frames",
                 "usb_device"}:
         limits.update(unit="bytes", unit_bytes=1, word_bits=(8,))
+    if kind == "crc":
+        limits.update(unit="words", unit_bytes=4, buffer_alignment=4,
+                      word_bits=(32,))
     if kind in {"uart", "spi"} and shape.dma:
         limits["max_transfer_units"] = "UINT16_MAX"
     if kind == "spi" and not shape.dma and not provider.MODEL:

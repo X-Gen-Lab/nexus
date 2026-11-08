@@ -85,11 +85,35 @@ verify transceiver supply, RS485 bus wiring or physical turnaround.
 :project: nexus
 ```
 
+(chip_8h)=
+
+## chip.h
+
+```{doxygenfile} io/include/nexus/io/chip.h
+:project: nexus
+```
+
+(crc_8h)=
+
+## crc.h
+
+```{doxygenfile} io/include/nexus/io/crc.h
+:project: nexus
+```
+
 (dac_8h)=
 
 ## dac.h
 
 ```{doxygenfile} io/include/nexus/io/dac.h
+:project: nexus
+```
+
+(dac__tx_8h)=
+
+## dac_tx.h
+
+```{doxygenfile} io/include/nexus/io/dac_tx.h
 :project: nexus
 ```
 

@@ -105,6 +105,26 @@ def _uart_instances(result):
                  if controller_class(item) == "uart")
 
 
+def _dac_tx_factory(result):
+    """An optional face reuses the controller's ID, state and shared methods."""
+    instances = [item for item in result.controllers if item.kind == "dac"]
+    if not instances:
+        return [], []
+    header = ['#include "nexus/io/dac_tx.h"',
+        r'/** \brief Pure same-controller lookup; NULL for CPU modes or bad IDs. */',
+        'const nx_dac_tx_port_t* nx_factory_dac_tx(nx_dac_id_t id);']
+    source = [r'/** \brief Return an existing transfer face without side effects. */',
+        'const nx_dac_tx_port_t* nx_factory_dac_tx(nx_dac_id_t id) {',
+        '    switch (id) {']
+    for item in instances:
+        if for_selection(item).mode_implementation(item.kind, item.mode) == "dac_dma":
+            name = symbol(item.id)
+            source += [f'        case NX_DAC_ID_{name.upper()}:',
+                       f'            return &s_nx_dac_tx_{name};']
+    source += ['        default:', '            return NULL;', '    }', '}']
+    return header, source
+
+
 def _uart_validator_factory(result):
     """Expose an optional exact transport callback without a runtime registry."""
     instances = _uart_instances(result)
@@ -250,6 +270,9 @@ def emit(result):
     profile_header, profile_source = stream_profiles.emit_factory(result)
     header.extend(profile_header)
     source.extend(profile_source)
+    dac_header, dac_source = _dac_tx_factory(result)
+    header.extend(dac_header)
+    source.extend(dac_source)
     header += ['#ifdef __cplusplus', '}', '#endif', '#endif', '']
     return "\n".join(header), "\n".join(source) + "\n"
 
@@ -293,6 +316,12 @@ def emit_strong(result):
         header += ["/** \\brief Pure getter; lifecycle remains explicit. */",
                    *signature,
                    f"    return nx_factory_{class_name}(id.value);", "}"]
+    if any(item.kind == "dac" for item in result.controllers):
+        header += [
+            r'/** \brief Pure optional transfer lookup using the same DAC ref. */',
+            'static inline const nx_dac_tx_port_t*',
+            'nx_factory_dac_tx_ref(nx_dac_ref_t id) {',
+            '    return nx_factory_dac_tx(id.value);', '}']
     if _uart_instances(result):
         header += [
             '/** \\brief Pure callback lookup; pair with the same UART ref. */',

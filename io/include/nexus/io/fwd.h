@@ -21,6 +21,8 @@ typedef struct nx_block_port nx_block_port_t;
 typedef struct nx_can_fd_port nx_can_fd_port_t;
 typedef struct nx_can_port nx_can_port_t;
 typedef struct nx_dac_port nx_dac_port_t;
+typedef struct nx_dac_tx_port nx_dac_tx_port_t;
+typedef struct nx_crc_port nx_crc_port_t;
 typedef struct nx_encoder nx_encoder_t;
 typedef struct nx_eth_frames_port nx_eth_frames_port_t;
 typedef struct nx_eth_port nx_eth_port_t;

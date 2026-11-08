@@ -11,6 +11,7 @@ from unittest.mock import patch
 
 from scripts.ci import tdd_gate
 from tools.dev import dev
+from tools.configure import authored
 from tools.testing import test_tdd_matrix_integration as integration
 
 
@@ -207,6 +208,14 @@ class ContractDoctorProfileTests(unittest.TestCase):
         checks.assert_called_once()
         self.assertFalse(any("docker" in word for command in self.commands
                              for word in command))
+
+    def test_stale_editor_schema_stops_before_compilers_or_long_suites(self):
+        with patch.object(authored, "editor_schema", return_value={"stale": True}):
+            status, output, checks = self.doctor()
+        self.assertEqual(status, 2, output)
+        self.assertIn("editor schema", output)
+        self.assertEqual(self.commands, [])
+        checks.assert_not_called()
 
     def test_every_native_and_arm_compiler_is_required_before_maintenance(self):
         for name in ("gcc", "g++", "arm-none-eabi-gcc"):

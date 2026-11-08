@@ -646,6 +646,27 @@
       },
       "uniqueItems": true
     },
+    "crc": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string",
+            "description": "Exact reviewed Board binding; no route fallback."
+          },
+          "mode": {
+            "type": "string",
+            "description": "Explicit maintained mode; the product owns service and shutdown."
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
+    },
     "dac": {
       "type": "object",
       "additionalProperties": {
@@ -702,6 +723,24 @@
               "minimum": 0,
               "maximum": 4095
             }
+          },
+          "irq": {
+            "type": "object",
+            "properties": {
+              "calls_os": {
+                "type": "boolean",
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked."
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Logical NVIC priority; lower numeric values are more urgent."
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "additionalProperties": false
           },
           "mode": {
             "type": "string",

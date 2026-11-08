@@ -358,6 +358,7 @@ class DacOptions:
     output_buffer: bool
     trigger: str
     amplitude: int = 0
+    irq: IrqOptions | None = None
 
 
 @dataclass(frozen=True)
@@ -698,7 +699,7 @@ def mode_options(values):
     if kind == "dac":
         return DacOptions(tuple(values["channels"]), values["format"],
                           tuple(values["idle_codes"]), values["output_buffer"],
-                          values["trigger"], values.get("amplitude", 0))
+                          values["trigger"], values.get("amplitude", 0), irq)
     if kind == "lptim":
         return LptimOptions(values["tick_hz"], irq)
     if kind == "rtc":
@@ -710,7 +711,7 @@ def mode_options(values):
                               values["poll_limit"],
                               RtcCalendarOptions(**initial)
                               if initial is not None else None)
-    if kind in {"flash", "watchdog", "rtc"}:
+    if kind in {"flash", "watchdog", "rtc", "crc"}:
         return NoOptions()
     raise ValueError(f"Unmaintained controller decision: {kind}")
 

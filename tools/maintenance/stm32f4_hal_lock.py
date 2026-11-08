@@ -36,6 +36,8 @@ REVIEWED_FILES = frozenset({
     "Inc/stm32f4xx_ll_rcc.h", "Inc/stm32f4xx_ll_rng.h",
     "Inc/stm32f4xx_ll_adc.h", "Inc/stm32f4xx_ll_tim.h",
     "Inc/stm32f4xx_ll_dac.h",
+    "Inc/stm32f4xx_ll_crc.h", "Inc/stm32f4xx_ll_utils.h",
+    "Inc/stm32f4xx_ll_system.h",
     "Inc/stm32f4xx_ll_iwdg.h", "LICENSE.md",
     "Inc/stm32f4xx_ll_i2c.h",
     "Inc/stm32f4xx_hal_eth.h", "Inc/stm32f4xx_hal_def.h",

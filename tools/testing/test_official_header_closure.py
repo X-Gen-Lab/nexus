@@ -35,7 +35,8 @@ F4_REQUIRED_FILES = {
     *F4_HAL_SOURCES, *F4_LL_SOURCES,
     *(f'Inc/stm32f4xx_ll_{unit}.h' for unit in
                       ('gpio', 'usart', 'spi', 'adc', 'dac', 'tim', 'iwdg', 'i2c',
-                       'bus', 'rcc', 'rng', 'fsmc', 'sdmmc', 'rtc', 'pwr'))}
+                       'bus', 'rcc', 'rng', 'fsmc', 'sdmmc', 'rtc', 'pwr',
+                       'crc', 'utils', 'system'))}
 F4_SELECTED_API = 'stm32f407-reviewed-ll-fsmc-sdio-rtc-uart-dma-hal-tx'
 
 ADDITIONS = {
@@ -188,7 +189,7 @@ class OfficialHeaderClosureTests(unittest.TestCase):
             candidate['files'][name] = {
                 'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
         expected = F4_REQUIRED_FILES
-        self.assertEqual(len(expected), 35)
+        self.assertEqual(len(expected), 38)
         self.assertEqual({name for name in expected if name.endswith('.c')},
                          F4_HAL_SOURCES | F4_LL_SOURCES)
         self.assertEqual(original['selected_api'], F4_SELECTED_API)

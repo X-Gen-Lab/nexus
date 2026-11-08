@@ -156,6 +156,13 @@ def doctor(environment, native):
                        + remaining, environment)
     if remaining:
         raise ValueError("Unknown doctor arguments: " + " ".join(remaining))
+    if args.target in {"contracts", "candidate"}:
+        from tools.configure import authored
+        schema = ROOT / "tools/configure/assembly.schema.json"
+        if json.loads(schema.read_text()) != authored.editor_schema():
+            raise ValueError("Assembly editor schema is stale; regenerate "
+                             "tools/configure/assembly.schema.json from "
+                             "tools.configure.authored.editor_schema()")
     identity = workspace_identity()
     lock_path = ROOT / "dependencies/environment.lock.json"
     lock = json.loads(lock_path.read_text())

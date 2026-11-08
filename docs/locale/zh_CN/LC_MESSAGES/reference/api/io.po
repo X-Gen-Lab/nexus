@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a542eae86ef9271dd05f19cf87ac10295520828439cf4c7f08ecbc66b5f5bd58\n"
+"X-Nexus-Source-SHA256: 9b8dd5e153ebf1a5b8d2ca57db4efa455380d8642647c7cacc209d60f45d4b4a\n"
 
 #: docs/reference/api/io.md:8
 msgid "Typed I/O: devices and execution contracts"
@@ -8674,3 +8674,171 @@ msgstr "共享的不可变方法表；回调接收实例 context。"
 #: docs/reference/api/io.md
 msgid "Face and caller/provider storage outlive all uses and full close."
 msgstr "接口及调用者／provider 存储必须存活至所有使用和完整 close 结束。"
+
+msgid "dac_tx.h"
+msgstr "dac_tx.h"
+
+msgid "Borrowed encoded DAC frames under one serialized owner."
+msgstr "由单个串行 owner 借用的编码 DAC 帧。"
+
+msgid "Transport selection is static. No allocation, queue or worker is created by preparation or interface lookup."
+msgstr "静态选择传输实现。准备请求或查询接口都不分配存储，也不创建队列或 worker。"
+
+msgid "Prepare an unborrowed descriptor without copying encoded frames."
+msgstr "准备尚未借出的描述符，不复制编码帧。"
+
+msgid "Serialized task owner only. Preparation does not touch hardware or validate an unknown provider's memory reachability or frequency."
+msgstr "仅由串行 task owner 调用。准备不访问硬件，也不验证未知 provider 的内存可达性或频率。"
+
+msgid "[in] Independent immutable frames, live through settlement."
+msgstr "[in] 独立且不可变的帧，保持有效至结清。"
+
+msgid "[in] Nonzero byte extent; provider validates frame geometry."
+msgstr "[in] 非零字节长度；provider 验证帧布局。"
+
+msgid "[in] Nonzero requested hardware trigger frequency."
+msgstr "[in] 非零的目标硬件触发频率。"
+
+msgid "[in] Absolute live Core deadline, never a duration."
+msgstr "[in] 当前 Core 时域的绝对 deadline，不是持续时间。"
+
+msgid "SUCCESS, INVALID or STATE; rejection leaves the descriptor intact."
+msgstr "SUCCESS、INVALID 或 STATE；拒绝时描述符保持不变。"
+
+msgid "Admit one direct finite or circular transfer selected by the port."
+msgstr "准入由端口静态选定的直接有限或循环传输。"
+
+msgid "REJECTED retains nothing. ACCEPTED borrows until acquire-observed SETTLED, including timeout and quarantine. Service must be progressed. Finite SUCCESS includes the last digital latch, not analog settling. The first trigger outputs the declared idle code before frame zero is fetched. Delayed service can repeat the final code; finite mode does not promise exactly length/frame-size analog conversions. A finite tail may pause and restart the exclusively owned trigger timer, extending the last interval; finite output is not strictly periodic. Circular transfers settle only after cancellation, stop or failure. Circular byte progress describes the final cycle's consumed prefix, not total playback. DMA progress never counts digital conversions."
+msgstr "REJECTED 不保留引用。ACCEPTED 持续借用至 acquire 观察到 SETTLED，超时或隔离期间亦如此。调用方必须推进 service。有限 SUCCESS 包含最后数字锁存，不表示模拟稳定。第一个 trigger 在取入第零帧前输出声明的 idle。延迟 service 可重复末码；有限模式不承诺恰好 length/frame-size 次模拟转换。有限尾部可暂停并重启独占触发 timer，延长最后间隔，因此有限输出不严格等周期。循环传输仅在取消、停止或失败后结清。循环字节进度表示最后一轮已消耗的前缀，不是总播放量。DMA 进度不统计数字转换次数。"
+
+msgid "[in] Initialized face owned by this serialized task executor."
+msgstr "[in] 由该串行 task executor 拥有的已初始化接口。"
+
+msgid "[inout] READY descriptor and immutable encoded payload."
+msgstr "[inout] READY 描述符与不可变的编码 payload。"
+
+msgid "SUCCESS means ACCEPTED, including later hardware start failure; INVALID, BUSY, STATE, CONTEXT, TIMEOUT, PERMISSION or UNSUPPORTED is REJECTED."
+msgstr "SUCCESS 表示 ACCEPTED，包含随后发生硬件启动失败的情况；INVALID、BUSY、STATE、CONTEXT、TIMEOUT、PERMISSION 或 UNSUPPORTED 表示 REJECTED。"
+
+msgid "Request withdrawal; this never revokes the descriptor or frame loan."
+msgstr "请求撤回；这不会撤销描述符或帧的借用。"
+
+msgid "Cross-task controls require a separate stable slot/epoch adapter."
+msgstr "跨 task 控制需要独立的稳定 slot/epoch 适配器。"
+
+msgid "[in] Same serialized executor and stable instance face."
+msgstr "[in] 同一个串行 executor 和稳定的实例接口。"
+
+msgid "[inout] Exact live descriptor, retained through SETTLED."
+msgstr "[inout] 精确的有效描述符，保留至 SETTLED。"
+
+msgid "SUCCESS, INVALID, STATE, BUSY, CONTEXT or UNSUPPORTED."
+msgstr "SUCCESS、INVALID、STATE、BUSY、CONTEXT 或 UNSUPPORTED。"
+
+msgid "Progress deadlines, final digital latch and complete withdrawal."
+msgstr "推进 deadline、最后数字锁存和完整撤回。"
+
+msgid "No hidden worker or blocking completion wait. An IRQ is a hint; request state is authoritative. An invalid or absent method is a no-op. The matching DAC control face owns stop, idle code and observation."
+msgstr "没有隐藏 worker 或阻塞完成等待。IRQ 只是提示；请求状态是权威条件。无效或缺失的方法不执行操作。对应 DAC 控制接口负责 stop、idle code 和观察。"
+
+msgid "[in] Same nonreentrant serialized task owner; stable storage."
+msgstr "[in] 同一个不可重入的串行 task owner；存储保持稳定。"
+
+msgid "Bind an explicit IRQ hint target while the controller is idle."
+msgstr "在 controller 空闲时绑定显式 IRQ 提示目标。"
+
+msgid "The provider validates actual publisher priorities. Target and context outlive attachment and all publishers; shutdown/detachment joins them. A hint never returns a borrow or substitutes for latched request state."
+msgstr "provider 验证实际发布源的优先级。目标及其 context 持续存活至解除绑定并 join 所有发布者；停机或解除绑定会 join 发布者。提示不会归还借用，也不能替代锁存的请求状态。"
+
+msgid "[in] Same serialized task owner with all IRQ storage live."
+msgstr "[in] 同一个串行 task owner，所有 IRQ 存储保持有效。"
+
+msgid "[in] Borrowed immutable target, or NULL to detach it."
+msgstr "[in] 被借用的不可变目标，或用 NULL 解除绑定。"
+
+msgid "[in] Selected backend's unshifted IRQ ceiling."
+msgstr "[in] 所选后端未移位的 IRQ ceiling。"
+
+msgid "SUCCESS, INVALID, STATE, BUSY, CONTEXT, PERMISSION or UNSUPPORTED."
+msgstr "SUCCESS、INVALID、STATE、BUSY、CONTEXT、PERMISSION 或 UNSUPPORTED。"
+
+msgid "Query when the caller should next progress service."
+msgstr "查询调用方下次应推进 service 的时间。"
+
+msgid "This is a scheduling hint, not a completion or recovery guarantee. A quarantined request still requires the caller's recovery policy."
+msgstr "这只是调度提示，不保证完成或恢复。被隔离的请求仍需由调用方执行恢复策略。"
+
+msgid "[in] Same serialized task owner; no concurrent controls."
+msgstr "[in] 同一个串行 task owner；没有并发控制。"
+
+msgid "Absolute live Core deadline; NEVER means wait for a new IRQ/control."
+msgstr "当前 Core 时域的绝对 deadline；NEVER 表示等待新的 IRQ 或控制。"
+
+msgid "Descriptor and immutable encoded frames remain live until SETTLED."
+msgstr "描述符和不可变编码帧持续存活至 SETTLED。"
+
+msgid "Raw CPU writes use unshifted codes. This separate transfer interface borrows hardware-encoded frames without conversion or a bounce buffer. Single u8 frames are bytes; single 12-bit frames are uint16_t, with code in bits 11:0 or 15:4. Dual u8 frames put channel 1 in bits 7:0 and channel 2 in bits 15:8. Dual 12-bit uint32_t frames place each channel in its own 16-bit lane, using the selected alignment. Unused bits must be zero; the caller owns that invariant without a hidden whole-buffer conversion/validation pass. Length observations are bytes."
+msgstr "CPU 原始码写入使用未移位码。独立的传输接口借用硬件编码帧，不转换，也不使用 bounce buffer。单通道 u8 帧使用 byte；单通道 12 位帧使用 uint16_t，码位于 11:0 或 15:4。双通道 u8 帧的通道 1 位于 7:0，通道 2 位于 15:8。双通道 12 位 uint32_t 帧为每个通道使用独立 16 位 lane，并遵循所选对齐方式。未使用位必须为零；调用方负责该不变量，接口不隐式遍历整个缓冲区转换或验证。长度以字节观察。"
+
+msgid "Shared immutable methods receive the selected instance context."
+msgstr "共享的不可变方法接收所选实例的 context。"
+
+msgid "Stable optional transfer face; CPU-only modes need no TX storage."
+msgstr "稳定的可选传输接口；仅 CPU 模式无需 TX 存储。"
+
+msgid "chip.h"
+msgstr "chip.h"
+
+msgid "Read-only observed silicon identity without runtime storage."
+msgstr "无需运行时存储的只读硅片身份观察。"
+
+msgid "Read the selected SoC's physical identity into independent storage."
+msgstr "读取所选 SoC 的物理身份到独立存储。"
+
+msgid "Bounded privileged task/ISR read, including masked context. No clocks, allocation, preparation or retained references. The selected Platform supplies this symbol; CPU-only Runtime does not supply a SoC backend. UID is public silicon identity, not authentication. The device/revision fields do not prove an exact package or ordering code. Explicit Native test support reports UNSUPPORTED without inventing physical identity."
+msgstr "有界的特权 task／ISR 读取，包含已屏蔽中断的上下文。不启用时钟，不分配存储，不需准备，也不保留引用。符号由所选 Platform 提供；CPU-only Runtime 不提供 SoC 后端。UID 是公开的硅片身份，不提供认证证明。device／revision 字段不能证明精确封装或完整订货号。显式 Native 测试支撑返回 UNSUPPORTED，不编造物理身份。"
+
+msgid "[out] Aligned caller-owned output; changed only on success."
+msgstr "[out] 对齐且由调用方拥有的输出；仅在成功时修改。"
+
+msgid "SUCCESS, INVALID, CONTEXT or UNSUPPORTED; no cached fallback values."
+msgstr "SUCCESS、INVALID、CONTEXT 或 UNSUPPORTED；不使用缓存回退值。"
+
+msgid "Raw identity words, revision and actual factory Flash capacity."
+msgstr "原始身份字、revision 与实际出厂 Flash 容量。"
+
+msgid "crc.h"
+msgstr "crc.h"
+
+msgid "Serialized CRC-32 of an explicit sequence of 32-bit words."
+msgstr "对明确的 32 位字序列执行串行 CRC-32 计算。"
+
+msgid "Compute fixed CRC-32 without byte-order or padding inference."
+msgstr "计算固定 CRC-32，不推断字节顺序或补齐规则。"
+
+msgid "Polynomial is 0x04C11DB7, initial state 0xffffffff, no reflection and no final XOR. An empty sequence returns the initial state. This is a word sequence contract, not an arbitrary CRC or Ethernet byte stream. No allocation, IRQ, DMA or retained references; inputs, output and face remain stable through this synchronous call. A timeout discards the partial calculation; each new call begins with a fresh initial state. Caller storage is disjoint from provider state and hardware controls."
+msgstr "多项式为 0x04C11DB7，初始状态为 0xffffffff，不反射且无 final XOR。空序列返回初始状态。这是数值字序列合同，不是任意 CRC 或 Ethernet 字节流接口。不分配存储，不使用 IRQ／DMA，也不保留引用；输入、输出和接口在该同步调用期间保持稳定。超时丢弃部分计算；每次新调用从全新初始状态开始。调用方存储与 provider state 和硬件控制区分离。"
+
+msgid "[in] Initialized face with one serialized privileged task owner."
+msgstr "[in] 具有单一串行特权 task owner 的已初始化接口。"
+
+msgid "[in] Aligned immutable 32-bit values, consumed MSB first. NULL is permitted only for an empty sequence."
+msgstr "[in] 对齐且不可变的 32 位数值，MSB 优先处理。仅空序列允许 NULL。"
+
+msgid "[in] Number of words, not bytes; no implicit trailing padding."
+msgstr "[in] 数值字的数量，不是字节数；不隐式补齐尾部。"
+
+msgid "[in] Absolute live Core deadline, including final readback."
+msgstr "[in] 当前 Core 时域的绝对 deadline，包含最终读回。"
+
+msgid "[out] Independent aligned output, changed only on success."
+msgstr "[out] 独立且对齐的输出，仅在成功时修改。"
+
+msgid "SUCCESS, INVALID, STATE, CONTEXT, TIMEOUT, IO or UNSUPPORTED."
+msgstr "SUCCESS、INVALID、STATE、CONTEXT、TIMEOUT、IO 或 UNSUPPORTED。"
+
+msgid "Shared immutable methods receive the selected controller context."
+msgstr "共享的不可变方法接收所选 controller 的 context。"
+
+msgid "Stable controller identity; lookup never resets the calculator."
+msgstr "稳定的 controller 身份；查询不会 reset 计算器。"

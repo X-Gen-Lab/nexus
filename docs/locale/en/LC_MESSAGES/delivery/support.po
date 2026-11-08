@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: e3279ff848adc2bfaeb2393154f90368acadf039c7f0709d038b323b1b15a7f2\n"
+"X-Nexus-Source-SHA256: 5d39d57dc866704d1a3afcf78a37c301736b329e16e623139b1f2341390e47bc\n"
 
 #: docs/delivery/support.md:8
 msgid "当前精确支持范围"
@@ -325,10 +325,26 @@ msgstr ""
 msgid "DAC"
 msgstr "DAC"
 
-#: docs/delivery/support.md
-msgid "单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；三种输入格式、原子双通道暂存与显式空闲码；DMA 尚未实现"
-msgstr "Single/dual-channel direct output, software or exclusively owned TIM6/TIM7 triggering, and noise/triangle; three input formats, atomic dual-channel staging and explicit idle codes; DMA is not implemented"
+msgid "单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码"
+msgstr "Single/dual-channel direct, software or exclusive TIM6/7 triggering, noise/triangle; finite/circular triggered DMA, three input formats and explicit idle codes"
 
-#: docs/delivery/support.md
-msgid "DAC 由一个 controller owner 独占，按所选通道取得 PA4／PA5；与 ADC 或 SPI 的 引脚冲突必须拒绝。公共 CPU 写入始终接收未移位原始码，`u12-left` 由 C 编码， 数字 DOR 始终为右对齐 12 位，`u8` 观察值为输入码乘 16。TIM6／7 触发只开放 独占的 84 MHz 固定时钟源，API 的 1 MHz 上限是数字配置政策，不是模拟性能保证； 实际分频可查询。noise 是确定性波形，不能用于熵源。stop 保持所声明空闲码， 完整 Platform stop 才禁用 DAC 并恢复原引脚字段；失败保留责任且可重试。两种密度的 `tests/contracts/dac_assembly/` 只提供软件参考，不代表 PCB 接线、负载、精度或 模拟 settling 资格。DAC DMA、欠载 IRQ、外部共享触发与物理验收仍未完成。"
-msgstr "One controller owner exclusively controls the DAC and acquires PA4/PA5 according to the selected channels; pin conflicts with ADC or SPI must be rejected. Public CPU writes always accept unshifted raw codes, with C encoding `u12-left`. Digital DOR is always right-aligned 12-bit data; a `u8` observation equals the input code multiplied by 16. TIM6/TIM7 triggering only permits an exclusively owned fixed 84 MHz source. The API limit of 1 MHz is a digital configuration policy, not an analog performance guarantee; the actual divider is queryable. Noise is a deterministic waveform and cannot supply entropy. Stop holds the declared idle codes; full Platform stop then disables the DAC and restores the original pin fields. Failure retains responsibility and allows retry. `tests/contracts/dac_assembly/` provides software references for both densities only, without qualifying PCB wiring, load, accuracy or analog settling. DAC DMA, underrun IRQ, external shared triggers and physical acceptance remain incomplete."
+msgid "DAC 由一个 controller owner 独占，按所选通道取得 PA4／PA5；与 ADC 或 SPI 的 引脚冲突必须拒绝。公共 CPU 写入始终接收未移位原始码，`u12-left` 由 C 编码， 数字 DOR 始终为右对齐 12 位，`u8` 观察值为输入码乘 16。TIM6／7 触发只开放 独占的 84 MHz 固定时钟源，API 的 1 MHz 上限是数字配置政策，不是模拟性能保证； 实际分频可查询。noise 是确定性波形，不能用于熵源。stop 保持所声明空闲码， 完整 Platform stop 才禁用 DAC 并恢复原引脚字段；失败保留责任且可重试。两种密度的 `tests/contracts/dac_assembly/` 只提供软件参考，不代表 PCB 接线、负载、精度或 模拟 settling 资格。外部共享触发与物理验收仍未完成。"
+msgstr "One controller owner exclusively owns DAC and acquires PA4/PA5 for the selected channels; pin conflicts with ADC or SPI must be rejected. Public CPU writes always accept unshifted raw codes, and C encodes `u12-left`. Digital DOR observations always use right-aligned 12-bit units; `u8` observations equal the input code multiplied by 16. TIM6/7 triggering only admits an exclusive fixed 84 MHz timer source. The API limit of 1 MHz is a digital configuration policy, not an analog performance guarantee; the actual divider is queryable. Noise is a deterministic waveform, not an entropy source. Stop holds the declared idle code. Complete Platform stop disables DAC and restores the original pin fields; failures retain responsibility and can be retried. The two-density `tests/contracts/dac_assembly/` fixtures are software references only, without PCB wiring, load, accuracy or analog settling qualification. External shared triggering and physical acceptance remain incomplete."
+
+msgid "DAC 的 `trigger-dma`／`trigger-dma-circular` 是可选静态 TX 分面，共用同一个 controller ID；CPU 模式不预留 DMA 状态。调用方提供最多 65535 个编码帧，明确 字节数、对齐和 DMA 可读域；左对齐与双通道 lane 已由调用方编码，保留位须为零。 通道 1／双通道使用 DMA1 stream5 channel7，单独通道 2 使用 stream6 channel7， 同时独占所选 TIM6／7、stream IRQ 与 TIM6_DAC IRQ。IRQ 只锁存事实和可选 wake， 调用方推进 service；不会隐式建立 task、queue 或复制缓冲区。"
+msgstr "DAC `trigger-dma`/`trigger-dma-circular` modes use an optional static TX facet with the same controller ID; CPU modes reserve no DMA state. The caller supplies at most 65535 encoded frames with explicit byte extent, alignment and DMA-readable memory domains. Left alignment and dual-channel lanes are already encoded by the caller; reserved bits must be zero. Channel 1/dual mode uses DMA1 stream5 channel7; channel 2 alone uses stream6 channel7. They also exclusively own the selected TIM6/7, stream IRQ and TIM6_DAC IRQ. IRQs only latch facts and an optional wake hint; the caller progresses service. No task, queue or copy buffer is implicitly created."
+
+msgid "有限 DMA 成功包含最后数字锁存；首触发输出 idle，尾部可能短暂停 timer、插入 间隔或重复末码，不承诺恰好 N 次模拟转换。循环模式持续借用至取消、超时或故障后 完成排空。SETTLED 之前 request 与帧保持有效且不可改写；无法排空时保留 QUARANTINED，next_service 返回 NEVER，由调用方明确恢复和重试。欠载状态需显式 stop 与 W1C 回读恢复。软件模型和 ARM 链接不授予物理输出性能资格。"
+msgstr "Finite DMA success includes the final digital latch. The first trigger outputs idle; the tail may briefly pause the timer, insert an interval or repeat the last code. It does not promise exactly N analog conversions. Circular mode retains the loan until complete drain after cancellation, timeout or failure. The request and frames remain live and immutable until SETTLED. Failed drain retains QUARANTINED; next_service returns NEVER, and the caller explicitly recovers and retries. Underrun recovery requires explicit stop and W1C readback. Software models and ARM linkage do not establish physical output performance qualification."
+
+msgid "CRC／芯片身份"
+msgstr "CRC / chip identity"
+
+msgid "固定多项式 CRC-32 字序列；实际 UID、device／revision ID 和半字 Flash 容量；不建立认证或订货号推断"
+msgstr "Fixed-polynomial CRC-32 word sequences; actual UID, device/revision IDs and halfword Flash capacity; no authentication or ordering-code inference"
+
+msgid "静态装配指定唯一 CRC controller owner；factory 只查询既有接口。 `crc32-words` 使用多项式 0x04C11DB7、 初值 0xffffffff、MSB 优先、不反射且无 final XOR。输入为 32 位数值字，长度以字 计；不隐式拼装或补齐字节流。空序列返回初值。每 16 字和最终读回检查绝对 deadline； 失败不改输出、不保留借用，下一次计算重新 reset。输入／输出与 state、CRC 和其 时钟控制区隔离；关闭只撤回新增 gate，失败保持可重试 receipt，CRC_IDR 保持不变。"
+msgstr "Static assembly assigns one CRC controller owner; factory lookup returns the existing interface. `crc32-words` uses polynomial 0x04C11DB7, initial state 0xffffffff, MSB first, no reflection and no final XOR. Input is a sequence of numeric 32-bit words, with length in words; byte streams are not implicitly packed or padded. An empty sequence returns the initial state. The absolute deadline is checked every 16 words and after the final readback. Failure leaves output unchanged and retains no loan; the next calculation resets afresh. Input/output storage is separate from state, CRC and its clock controls. Close withdraws only the added gate and retains a retryable receipt on failure. CRC_IDR remains unchanged."
+
+msgid "`nx_chip_info_read` 无需启动外设，直接读取实际 UID、device／revision ID 和 16 位 Flash 容量，不补用配置值、不开时钟、不分配常驻状态。身份数据不代替硅片 启动准入，也不证明完整订货号／封装或认证秘密。Native 显式返回 UNSUPPORTED； 模型与 ARM 链接仍不能证明物理身份、吞吐或实板功能。"
+msgstr "`nx_chip_info_read` requires no peripheral startup. It directly observes the actual UID, device/revision IDs and 16-bit Flash capacity, without configured fallback values, clock enabling or persistent state. Identity data does not replace silicon startup admission or establish an exact ordering code, package or authentication secret. Native explicitly returns UNSUPPORTED. Models and ARM linkage do not establish physical identity, throughput or board functionality."

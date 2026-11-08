@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a542eae86ef9271dd05f19cf87ac10295520828439cf4c7f08ecbc66b5f5bd58\n"
+"X-Nexus-Source-SHA256: 9b8dd5e153ebf1a5b8d2ca57db4efa455380d8642647c7cacc209d60f45d4b4a\n"
 
 #: docs/reference/api/io.md:8
 msgid "Typed I/O: devices and execution contracts"
@@ -9414,3 +9414,171 @@ msgstr "Shared immutable operations; callbacks receive instance context."
 #: docs/reference/api/io.md
 msgid "Face and caller/provider storage outlive all uses and full close."
 msgstr "Face and caller/provider storage outlive all uses and full close."
+
+msgid "dac_tx.h"
+msgstr "dac_tx.h"
+
+msgid "Borrowed encoded DAC frames under one serialized owner."
+msgstr "Borrowed encoded DAC frames under one serialized owner."
+
+msgid "Transport selection is static. No allocation, queue or worker is created by preparation or interface lookup."
+msgstr "Transport selection is static. No allocation, queue or worker is created by preparation or interface lookup."
+
+msgid "Prepare an unborrowed descriptor without copying encoded frames."
+msgstr "Prepare an unborrowed descriptor without copying encoded frames."
+
+msgid "Serialized task owner only. Preparation does not touch hardware or validate an unknown provider's memory reachability or frequency."
+msgstr "Serialized task owner only. Preparation does not touch hardware or validate an unknown provider's memory reachability or frequency."
+
+msgid "[in] Independent immutable frames, live through settlement."
+msgstr "[in] Independent immutable frames, live through settlement."
+
+msgid "[in] Nonzero byte extent; provider validates frame geometry."
+msgstr "[in] Nonzero byte extent; provider validates frame geometry."
+
+msgid "[in] Nonzero requested hardware trigger frequency."
+msgstr "[in] Nonzero requested hardware trigger frequency."
+
+msgid "[in] Absolute live Core deadline, never a duration."
+msgstr "[in] Absolute live Core deadline, never a duration."
+
+msgid "SUCCESS, INVALID or STATE; rejection leaves the descriptor intact."
+msgstr "SUCCESS, INVALID or STATE; rejection leaves the descriptor intact."
+
+msgid "Admit one direct finite or circular transfer selected by the port."
+msgstr "Admit one direct finite or circular transfer selected by the port."
+
+msgid "REJECTED retains nothing. ACCEPTED borrows until acquire-observed SETTLED, including timeout and quarantine. Service must be progressed. Finite SUCCESS includes the last digital latch, not analog settling. The first trigger outputs the declared idle code before frame zero is fetched. Delayed service can repeat the final code; finite mode does not promise exactly length/frame-size analog conversions. A finite tail may pause and restart the exclusively owned trigger timer, extending the last interval; finite output is not strictly periodic. Circular transfers settle only after cancellation, stop or failure. Circular byte progress describes the final cycle's consumed prefix, not total playback. DMA progress never counts digital conversions."
+msgstr "REJECTED retains nothing. ACCEPTED borrows until acquire-observed SETTLED, including timeout and quarantine. Service must be progressed. Finite SUCCESS includes the last digital latch, not analog settling. The first trigger outputs the declared idle code before frame zero is fetched. Delayed service can repeat the final code; finite mode does not promise exactly length/frame-size analog conversions. A finite tail may pause and restart the exclusively owned trigger timer, extending the last interval; finite output is not strictly periodic. Circular transfers settle only after cancellation, stop or failure. Circular byte progress describes the final cycle's consumed prefix, not total playback. DMA progress never counts digital conversions."
+
+msgid "[in] Initialized face owned by this serialized task executor."
+msgstr "[in] Initialized face owned by this serialized task executor."
+
+msgid "[inout] READY descriptor and immutable encoded payload."
+msgstr "[inout] READY descriptor and immutable encoded payload."
+
+msgid "SUCCESS means ACCEPTED, including later hardware start failure; INVALID, BUSY, STATE, CONTEXT, TIMEOUT, PERMISSION or UNSUPPORTED is REJECTED."
+msgstr "SUCCESS means ACCEPTED, including later hardware start failure; INVALID, BUSY, STATE, CONTEXT, TIMEOUT, PERMISSION or UNSUPPORTED is REJECTED."
+
+msgid "Request withdrawal; this never revokes the descriptor or frame loan."
+msgstr "Request withdrawal; this never revokes the descriptor or frame loan."
+
+msgid "Cross-task controls require a separate stable slot/epoch adapter."
+msgstr "Cross-task controls require a separate stable slot/epoch adapter."
+
+msgid "[in] Same serialized executor and stable instance face."
+msgstr "[in] Same serialized executor and stable instance face."
+
+msgid "[inout] Exact live descriptor, retained through SETTLED."
+msgstr "[inout] Exact live descriptor, retained through SETTLED."
+
+msgid "SUCCESS, INVALID, STATE, BUSY, CONTEXT or UNSUPPORTED."
+msgstr "SUCCESS, INVALID, STATE, BUSY, CONTEXT or UNSUPPORTED."
+
+msgid "Progress deadlines, final digital latch and complete withdrawal."
+msgstr "Progress deadlines, final digital latch and complete withdrawal."
+
+msgid "No hidden worker or blocking completion wait. An IRQ is a hint; request state is authoritative. An invalid or absent method is a no-op. The matching DAC control face owns stop, idle code and observation."
+msgstr "No hidden worker or blocking completion wait. An IRQ is a hint; request state is authoritative. An invalid or absent method is a no-op. The matching DAC control face owns stop, idle code and observation."
+
+msgid "[in] Same nonreentrant serialized task owner; stable storage."
+msgstr "[in] Same nonreentrant serialized task owner; stable storage."
+
+msgid "Bind an explicit IRQ hint target while the controller is idle."
+msgstr "Bind an explicit IRQ hint target while the controller is idle."
+
+msgid "The provider validates actual publisher priorities. Target and context outlive attachment and all publishers; shutdown/detachment joins them. A hint never returns a borrow or substitutes for latched request state."
+msgstr "The provider validates actual publisher priorities. Target and context outlive attachment and all publishers; shutdown/detachment joins them. A hint never returns a borrow or substitutes for latched request state."
+
+msgid "[in] Same serialized task owner with all IRQ storage live."
+msgstr "[in] Same serialized task owner with all IRQ storage live."
+
+msgid "[in] Borrowed immutable target, or NULL to detach it."
+msgstr "[in] Borrowed immutable target, or NULL to detach it."
+
+msgid "[in] Selected backend's unshifted IRQ ceiling."
+msgstr "[in] Selected backend's unshifted IRQ ceiling."
+
+msgid "SUCCESS, INVALID, STATE, BUSY, CONTEXT, PERMISSION or UNSUPPORTED."
+msgstr "SUCCESS, INVALID, STATE, BUSY, CONTEXT, PERMISSION or UNSUPPORTED."
+
+msgid "Query when the caller should next progress service."
+msgstr "Query when the caller should next progress service."
+
+msgid "This is a scheduling hint, not a completion or recovery guarantee. A quarantined request still requires the caller's recovery policy."
+msgstr "This is a scheduling hint, not a completion or recovery guarantee. A quarantined request still requires the caller's recovery policy."
+
+msgid "[in] Same serialized task owner; no concurrent controls."
+msgstr "[in] Same serialized task owner; no concurrent controls."
+
+msgid "Absolute live Core deadline; NEVER means wait for a new IRQ/control."
+msgstr "Absolute live Core deadline; NEVER means wait for a new IRQ/control."
+
+msgid "Descriptor and immutable encoded frames remain live until SETTLED."
+msgstr "Descriptor and immutable encoded frames remain live until SETTLED."
+
+msgid "Raw CPU writes use unshifted codes. This separate transfer interface borrows hardware-encoded frames without conversion or a bounce buffer. Single u8 frames are bytes; single 12-bit frames are uint16_t, with code in bits 11:0 or 15:4. Dual u8 frames put channel 1 in bits 7:0 and channel 2 in bits 15:8. Dual 12-bit uint32_t frames place each channel in its own 16-bit lane, using the selected alignment. Unused bits must be zero; the caller owns that invariant without a hidden whole-buffer conversion/validation pass. Length observations are bytes."
+msgstr "Raw CPU writes use unshifted codes. This separate transfer interface borrows hardware-encoded frames without conversion or a bounce buffer. Single u8 frames are bytes; single 12-bit frames are uint16_t, with code in bits 11:0 or 15:4. Dual u8 frames put channel 1 in bits 7:0 and channel 2 in bits 15:8. Dual 12-bit uint32_t frames place each channel in its own 16-bit lane, using the selected alignment. Unused bits must be zero; the caller owns that invariant without a hidden whole-buffer conversion/validation pass. Length observations are bytes."
+
+msgid "Shared immutable methods receive the selected instance context."
+msgstr "Shared immutable methods receive the selected instance context."
+
+msgid "Stable optional transfer face; CPU-only modes need no TX storage."
+msgstr "Stable optional transfer face; CPU-only modes need no TX storage."
+
+msgid "chip.h"
+msgstr "chip.h"
+
+msgid "Read-only observed silicon identity without runtime storage."
+msgstr "Read-only observed silicon identity without runtime storage."
+
+msgid "Read the selected SoC's physical identity into independent storage."
+msgstr "Read the selected SoC's physical identity into independent storage."
+
+msgid "Bounded privileged task/ISR read, including masked context. No clocks, allocation, preparation or retained references. The selected Platform supplies this symbol; CPU-only Runtime does not supply a SoC backend. UID is public silicon identity, not authentication. The device/revision fields do not prove an exact package or ordering code. Explicit Native test support reports UNSUPPORTED without inventing physical identity."
+msgstr "Bounded privileged task/ISR read, including masked context. No clocks, allocation, preparation or retained references. The selected Platform supplies this symbol; CPU-only Runtime does not supply a SoC backend. UID is public silicon identity, not authentication. The device/revision fields do not prove an exact package or ordering code. Explicit Native test support reports UNSUPPORTED without inventing physical identity."
+
+msgid "[out] Aligned caller-owned output; changed only on success."
+msgstr "[out] Aligned caller-owned output; changed only on success."
+
+msgid "SUCCESS, INVALID, CONTEXT or UNSUPPORTED; no cached fallback values."
+msgstr "SUCCESS, INVALID, CONTEXT or UNSUPPORTED; no cached fallback values."
+
+msgid "Raw identity words, revision and actual factory Flash capacity."
+msgstr "Raw identity words, revision and actual factory Flash capacity."
+
+msgid "crc.h"
+msgstr "crc.h"
+
+msgid "Serialized CRC-32 of an explicit sequence of 32-bit words."
+msgstr "Serialized CRC-32 of an explicit sequence of 32-bit words."
+
+msgid "Compute fixed CRC-32 without byte-order or padding inference."
+msgstr "Compute fixed CRC-32 without byte-order or padding inference."
+
+msgid "Polynomial is 0x04C11DB7, initial state 0xffffffff, no reflection and no final XOR. An empty sequence returns the initial state. This is a word sequence contract, not an arbitrary CRC or Ethernet byte stream. No allocation, IRQ, DMA or retained references; inputs, output and face remain stable through this synchronous call. A timeout discards the partial calculation; each new call begins with a fresh initial state. Caller storage is disjoint from provider state and hardware controls."
+msgstr "Polynomial is 0x04C11DB7, initial state 0xffffffff, no reflection and no final XOR. An empty sequence returns the initial state. This is a word sequence contract, not an arbitrary CRC or Ethernet byte stream. No allocation, IRQ, DMA or retained references; inputs, output and face remain stable through this synchronous call. A timeout discards the partial calculation; each new call begins with a fresh initial state. Caller storage is disjoint from provider state and hardware controls."
+
+msgid "[in] Initialized face with one serialized privileged task owner."
+msgstr "[in] Initialized face with one serialized privileged task owner."
+
+msgid "[in] Aligned immutable 32-bit values, consumed MSB first. NULL is permitted only for an empty sequence."
+msgstr "[in] Aligned immutable 32-bit values, consumed MSB first. NULL is permitted only for an empty sequence."
+
+msgid "[in] Number of words, not bytes; no implicit trailing padding."
+msgstr "[in] Number of words, not bytes; no implicit trailing padding."
+
+msgid "[in] Absolute live Core deadline, including final readback."
+msgstr "[in] Absolute live Core deadline, including final readback."
+
+msgid "[out] Independent aligned output, changed only on success."
+msgstr "[out] Independent aligned output, changed only on success."
+
+msgid "SUCCESS, INVALID, STATE, CONTEXT, TIMEOUT, IO or UNSUPPORTED."
+msgstr "SUCCESS, INVALID, STATE, CONTEXT, TIMEOUT, IO or UNSUPPORTED."
+
+msgid "Shared immutable methods receive the selected controller context."
+msgstr "Shared immutable methods receive the selected controller context."
+
+msgid "Stable controller identity; lookup never resets the calculator."
+msgstr "Stable controller identity; lookup never resets the calculator."

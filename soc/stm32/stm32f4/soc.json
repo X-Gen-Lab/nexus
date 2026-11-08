@@ -1097,13 +1097,25 @@
         "direct",
         "triggered",
         "noise",
-        "triangle"
+        "triangle",
+        "trigger-dma",
+        "trigger-dma-circular"
       ],
-      "irq": [],
+      "irq": [
+        "TIM6_DAC_IRQn"
+      ],
       "pins": [
         "PA4",
         "PA5"
       ]
+    },
+    "CRC": {
+      "kind": "crc",
+      "modes": [
+        "crc32-words"
+      ],
+      "irq": [],
+      "pins": []
     }
   },
   "reserved_resources": [

@@ -4,6 +4,7 @@ from tools.configure.providers.common import fail, integer, sequence
 
 FORMATS = ("u8", "u12-right", "u12-left")
 WAVE_MODES = frozenset(("noise", "triangle"))
+DMA_MODES = frozenset(("trigger-dma", "trigger-dma-circular"))
 TRIGGERS = ("none", "software", "tim6-trgo", "tim7-trgo")
 AMPLITUDES = tuple((1 << bits) - 1 for bits in range(1, 13))
 
@@ -42,6 +43,13 @@ def validate_selection(selection, route, provider):
         fail("DAC trigger lacks a maintained source owner")
     if (mode == "direct") != (trigger == "none"):
         fail("DAC direct mode requires no trigger; triggered modes require one")
+    if mode in DMA_MODES:
+        if "irq_priority" not in selection:
+            fail("DAC DMA requires an explicit IRQ priority")
+        if trigger not in {"tim6-trgo", "tim7-trgo"}:
+            fail("DAC DMA requires an exclusively owned TIM6 or TIM7 timer")
+    elif {"irq_priority", "calls_os"} & selection.keys():
+        fail("DAC CPU modes have no IRQ options")
     if mode in WAVE_MODES:
         amplitude = selection.get("amplitude")
         if (type(amplitude) is not int or amplitude not in AMPLITUDES or
@@ -64,7 +72,12 @@ def selected_route(selection, route, provider):
     if selection["trigger"].startswith("tim"):
         timer = selection["trigger"].split("-", 1)[0].upper()
         resources += ["controller:" + timer, "timer:" + timer]
-    return {**route, "pins": pins, "resources": resources}
+    selected = {**route, "pins": pins, "resources": resources}
+    if selection["mode"] in DMA_MODES:
+        mask = sum(1 << (channel - 1) for channel in chosen)
+        selected["mode_dma"] = {
+            selection["mode"]: list(provider.DAC_DMA_ROUTES[mask])}
+    return selected
 
 
 def editor_schema(properties):

@@ -79,7 +79,8 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
 | PWM | TIM3 通道、固定共享 PSC/ARR、period1–65535、duty0–period、shadow update；stop 建立 GPIO inactive |
 | ADC | ADC1 外部通道 0--15、最多 16 ranks，6／8／10／12-bit 软件 shot/scan 与 TIM3 触发有限／连续 DMA block；显式 sample time/reference、完整 scan 和 consumer loan 背压 |
-| DAC | PA4／PA5 的单／双通道，CPU direct、软件或独占 TIM6／7 触发、noise／triangle；u8／u12-right／u12-left；DMA 尚未实现 |
+| DAC | PA4／PA5 单／双通道，CPU direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA；u8／u12-right／u12-left |
+| CRC | 多项式 0x04C11DB7、初值 0xffffffff、32 位字输入；同步计算、独占 controller、失败输出保持 |
 | CAN | CAN1/CAN2 Classic CAN IRQ、三邮箱、共享 filter domain；无 CAN FD |
 | USB | OTG FS device PIO endpoint，独立 USB48 owner；无 Host/HS/DMA/class stack |
 | Ethernet | Raw RMII frame/MDIO、调用者 descriptor／RX loan；IP／协议策略外置 |
@@ -182,8 +183,52 @@ stop 撤回触发与波形后安装所声明空闲码，完整 close 才关闭�
 随后恢复选中引脚和 GPIO clock；完整释放不承诺持续驱动空闲电平。
 
 `tests/contracts/dac_assembly/` 提供 VE 左对齐／ZG 8 位软件参考、真实 factory 与 ARM
-链接消费者；它们不授权任何实际 PCB。DAC DMA、欠载 IRQ／恢复、外部或共享 trigger
-仍待独立实现。当前没有 DAC 实板或模拟负载资格，物理 HIL 为 `not_executed`。
+链接消费者；它们不授权任何实际 PCB。当前没有 DAC 实板或模拟负载资格，物理 HIL
+为 `not_executed`。外部或共享 trigger 尚未接入。
+
+`trigger-dma` 与 `trigger-dma-circular` 通过独立 `dac_tx.h` 分面借用编码帧，
+factory 的 `nx_factory_dac_tx_ref` 复用同一个 DAC ID 和 controller state；CPU 模式
+返回 NULL，不增加 DMA 状态。单通道 8 位用 byte、12 位用 halfword；双通道 8 位
+用 halfword、12 位用 word，通道 1 位于低 lane。左对齐码须由调用方预编码，保留位
+为零。每次请求最多 65535 帧；缓冲区必须处于明确的 DMA 可读域，不能使用 CCM。
+
+通道 1／双通道只使用 DMA1 stream5 channel7；仅通道 2 使用 stream6 channel7。
+静态配置同时独占所选 TIM6／TIM7、DMA stream、其 IRQ 与 TIM6_DAC IRQ。显式
+`irq` 指定优先级和是否调用 OS；可选 wake 绑定时核对两个实际发布源的 syscall
+ceiling。IRQ 只锁存事实并发送提示；调用方推进 service 和处理绝对 deadline，
+平台不创建 worker 或队列。
+
+首个 trigger 输出声明的 idle，随后 DMA 填入第一个 frame。有限 TC 仅表示内存读取
+完成；C 代码短暂停独占 timer、建立新的尾部周期，直到新 update 和最后 DOR 均被
+观察后才结清。尾部可插入间隔或重复末码，不承诺恰好 N 次模拟转换或模拟 settling。
+循环模式跨回卷持续借用，直到 cancel／timeout／故障完成排空；transferred 是最后
+一轮已经消耗的字节前缀，不是总播放量。
+
+排空必须回读请求／触发／中断源已撤销、DMA EN 已清除、计数稳定、内存地址已清零、
+NVIC 发布者已 join。失败保留 request、payload、clock 与 cleanup receipt，超过
+排空预算进入 QUARANTINED。此时 next_service 返回 NEVER，调用方显式恢复并重试
+service／stop；不得回收存储或忙等。欠载后须显式 stop 并观察 W1C 清零才能复用。
+
+## CRC 与芯片身份
+
+CRC 是有可变硬件状态的 controller，使用同一静态 typed factory 和 prepare／close
+生命周期。四个 Board 包提供片内 `crc` binding；`[crc.signature]` 选择该 binding 和
+`mode="crc32-words"` 即可，无需新增 GPIO 或生成行为代码。实例只保留 initialized
+和 clock_added 两个标志；官方 LL 执行 reset、32 位 feed 和 read，C 负责时钟归属、
+上下文、绝对 deadline 与输入／输出隔离。CRC_IDR 和原有共享时钟保持不变。
+
+输入为明确的 32 位数值字，MSB 优先；初值为 0xffffffff，不反射、不做 final XOR。
+空序列返回初值，字节流的拼装和尾部补齐由调用方决定。每 16 个字检查进度，最后
+读取后再次检查 deadline；失败不发布部分签名，也不保留输入。输入／输出不得覆盖
+provider state、CRC 或其时钟控制寄存器。`tests/contracts/crc_assembly/` 提供 VE／ZG
+真实 factory 与 ARM／SDK 链接夹具，不能据此认定实板或吞吐资格。
+
+芯片身份是片内永久只读数据，`nx_chip_info_read` 直接查询，不建立实例、factory
+ID、时钟 lease 或缓存。UID、device ID、revision 复用官方 LL；Flash 容量按 RM0090
+Rev22 第 39.2 节读取半字，避开锁定 LL helper 的非对齐 uint32_t lvalue。返回实际
+容量，即使与装配期望不同也不补成配置值；启动准入仍由 System 的硅片策略负责。
+device ID 不足以识别完整订货号／封装，UID 不作为认证秘密。Native 返回 UNSUPPORTED
+并保持输出，不生成物理身份；CPU-only Runtime 没有 SoC 后端。
 
 ## 冷态取得、逆序撤回与验证
 

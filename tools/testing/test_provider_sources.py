@@ -21,7 +21,7 @@ class ProviderSourceSelectionTests(unittest.TestCase):
             (directory / "drivers" / name).as_posix() for name in (
                 "platform_coordinator.c", "platform_lifecycle.c",
                 "system_lifecycle.c", "platform_cold.c",
-                "lifecycle_pins.c")}
+                "lifecycle_pins.c", "chip.c")}
 
     def configure_sources(self, family, controllers):
         """Inspect production targets without claiming an ARM link proof."""
@@ -79,14 +79,14 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             self.assertEqual(len(units), len({unit["file"] for unit in units}))
             return provider, sdk
 
-    # Cold lifecycle mechanisms are real C units now. Exact expected sets below
-    # include the F4 shared resource, context and pin transaction mechanisms.
+    # Base units own cold lifecycle and stateless silicon identity queries.
+    # Exact sets retain the shared resource, context and pin mechanisms.
     # Selected GPIO/UART/SPI classes also own their C lifecycle adapters; ELF
     # retention remains a separate contract from compilation-unit selection.
     # UART modes share one cold unit. None of these mechanisms selects another
     # device, GPIO face, DMA engine or stream. Keep complete set equality so an
     # unrelated source added by CMake still fails these isolation contracts.
-    def test_empty_f4_compiles_only_shared_cold_mechanisms(self):
+    def test_empty_f4_compiles_only_base_platform_sources(self):
         self.assertEqual(self.configure_sources("stm32f4", []),
                          (self.private_sources("stm32f4", set()), set()))
 

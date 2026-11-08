@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 536db00cd19efeee1167b873a5ff5b0e10945bc5694174db5dd2caf4167649a7\n"
+"X-Nexus-Source-SHA256: f66f42e646d003529704e08dded90008ecd7f9c7d48be907a2ae444530f85fa7\n"
 
 #: docs/delivery/next-iterations.md:8
 msgid "F4 收敛后的迭代边界"
@@ -482,6 +482,8 @@ msgstr ""
 "exact adaptation. Software-candidate and physical status cannot be "
 "inherited from an older version; unexecuted HIL remains `not_executed`."
 
-#: docs/delivery/next-iterations.md
-msgid "CPU、软件／TIM6／7 触发与波形已实现；DMA、欠载恢复未完成"
-msgstr "CPU output, software/TIM6/TIM7 triggering and waveforms implemented; DMA and underrun recovery remain incomplete"
+msgid "CPU、软件／独占 TIM6／7 触发、波形、有限／循环 DMA 与欠载恢复已实现；有限尾部允许延长周期，物理未验证"
+msgstr "CPU, software/exclusive TIM6/7 triggers, waveform, finite/circular DMA and underrun recovery implemented; the finite tail can extend a period; physical behavior remains unverified"
+
+msgid "已有 RNG；新增 CRC-32 字序列及实际芯片信息查询；物理未验证"
+msgstr "Existing RNG plus new CRC-32 word sequences and actual chip information queries; physical behavior remains unverified"

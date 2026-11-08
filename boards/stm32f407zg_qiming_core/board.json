@@ -283,6 +283,11 @@
       "requires": {
         "display_module": "ili9341-16bit"
       }
+    },
+    {
+      "id": "crc",
+      "controller": "CRC",
+      "route": "crc-internal"
     }
   ],
   "reserved_resources": [

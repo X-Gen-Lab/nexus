@@ -51,6 +51,16 @@ nx_result_t nx_stm32_dac_prepare(nx_stm32_dac_state_t* state,
                                  const nx_stm32_dac_config_t* config);
 /** \brief Reverse only owned effects; refusal retains the same live receipt. */
 nx_result_t nx_stm32_dac_close(nx_stm32_dac_state_t* state);
+/** \brief Arm conversion with the optional DMA route still gated off. */
+nx_result_t nx_stm32_dac_arm(nx_stm32_dac_state_t* state, uint32_t hz,
+                             nx_time_us_t deadline, bool run_timer);
+/** \brief Shared CPU and DMA control observations use the same digital units.
+ */
+nx_result_t nx_stm32_dac_info(const void* context, nx_dac_info_t* output);
+/** \brief Withdraw triggers and verify the declared digital idle output. */
+nx_result_t nx_stm32_dac_stop(void* context, nx_time_us_t deadline);
+/** \brief Observe converter state into independent caller storage. */
+nx_result_t nx_stm32_dac_snapshot(const void* context, nx_dac_state_t* output);
 extern const nx_dac_ops_t nx_stm32_dac_ops;
 #ifdef __cplusplus
 }

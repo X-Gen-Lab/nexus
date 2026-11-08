@@ -41,8 +41,9 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 | UART | IRQ byte/event、word 与明确 block／DMA 模式分别选择；有限 TX、有限 RX、连续 RX 和双向模式不自动互相授权 |
 | SPI／I2C | 受审 polling／异步／DMA 路径与显式 endpoint；不能从 controller 存在推定任意 route 或速率 |
 | ADC／Timer | ADC1 外部通道 0--15、最多 16 ranks 的 shot／scan 与触发 DMA；PWM、capture、互补输出与 break；共享 timer 和资源冲突须通过准入 |
-| DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；三种输入格式、原子双通道暂存与显式空闲码；DMA 尚未实现 |
+| DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码 |
 | Flash／IWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
+| CRC／芯片身份 | 固定多项式 CRC-32 字序列；实际 UID、device／revision ID 和半字 Flash 容量；不建立认证或订货号推断 |
 | Classic CAN | 所选 mailbox 与共享 filter domain；不提供 CAN FD |
 | USB | 所选 OTG FS device PIO；不由此授予 Host、HS、DMA 或全部 class stack |
 | Ethernet | 所选 RMII／MDIO 与帧模式；协议栈、PHY 接线及实物行为分别验证 |
@@ -73,7 +74,32 @@ DAC 由一个 controller owner 独占，按所选通道取得 PA4／PA5；与 AD
 实际分频可查询。noise 是确定性波形，不能用于熵源。stop 保持所声明空闲码，
 完整 Platform stop 才禁用 DAC 并恢复原引脚字段；失败保留责任且可重试。两种密度的
 `tests/contracts/dac_assembly/` 只提供软件参考，不代表 PCB 接线、负载、精度或
-模拟 settling 资格。DAC DMA、欠载 IRQ、外部共享触发与物理验收仍未完成。
+模拟 settling 资格。外部共享触发与物理验收仍未完成。
+
+DAC 的 `trigger-dma`／`trigger-dma-circular` 是可选静态 TX 分面，共用同一个
+controller ID；CPU 模式不预留 DMA 状态。调用方提供最多 65535 个编码帧，明确
+字节数、对齐和 DMA 可读域；左对齐与双通道 lane 已由调用方编码，保留位须为零。
+通道 1／双通道使用 DMA1 stream5 channel7，单独通道 2 使用 stream6 channel7，
+同时独占所选 TIM6／7、stream IRQ 与 TIM6_DAC IRQ。IRQ 只锁存事实和可选 wake，
+调用方推进 service；不会隐式建立 task、queue 或复制缓冲区。
+
+有限 DMA 成功包含最后数字锁存；首触发输出 idle，尾部可能短暂停 timer、插入
+间隔或重复末码，不承诺恰好 N 次模拟转换。循环模式持续借用至取消、超时或故障后
+完成排空。SETTLED 之前 request 与帧保持有效且不可改写；无法排空时保留
+QUARANTINED，next_service 返回 NEVER，由调用方明确恢复和重试。欠载状态需显式
+stop 与 W1C 回读恢复。软件模型和 ARM 链接不授予物理输出性能资格。
+
+静态装配指定唯一 CRC controller owner；factory 只查询既有接口。
+`crc32-words` 使用多项式 0x04C11DB7、
+初值 0xffffffff、MSB 优先、不反射且无 final XOR。输入为 32 位数值字，长度以字
+计；不隐式拼装或补齐字节流。空序列返回初值。每 16 字和最终读回检查绝对 deadline；
+失败不改输出、不保留借用，下一次计算重新 reset。输入／输出与 state、CRC 和其
+时钟控制区隔离；关闭只撤回新增 gate，失败保持可重试 receipt，CRC_IDR 保持不变。
+
+`nx_chip_info_read` 无需启动外设，直接读取实际 UID、device／revision ID 和
+16 位 Flash 容量，不补用配置值、不开时钟、不分配常驻状态。身份数据不代替硅片
+启动准入，也不证明完整订货号／封装或认证秘密。Native 显式返回 UNSUPPORTED；
+模型与 ARM 链接仍不能证明物理身份、吞吐或实板功能。
 
 ## 选择、证据与保留依赖
 

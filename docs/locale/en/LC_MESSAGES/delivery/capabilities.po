@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 5562f49df4c0986d75cc5fe4cc15de0d264ba41cd67e8f231989d3ff4c2563b4\n"
+"X-Nexus-Source-SHA256: 9f49610dae8b758838ba7d1fafb6c21d3537252b13a464501e35e63d0ee96c2f\n"
 
 #: docs/delivery/capabilities.md:8
 msgid "当前派生能力矩阵"
@@ -1337,3 +1337,33 @@ msgstr "triangle"
 #: docs/delivery/capabilities.md
 msgid "triggered"
 msgstr "triggered"
+
+msgid "`tests/contracts/dac_assembly/ve-dma.toml`"
+msgstr "`tests/contracts/dac_assembly/ve-dma.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/dac_dma.c`"
+msgstr "`soc/stm32/stm32f4/drivers/dac_dma.c`"
+
+msgid "trigger-dma-circular"
+msgstr "trigger-dma-circular"
+
+msgid "`tests/contracts/dac_assembly/zg-dma.toml`"
+msgstr "`tests/contracts/dac_assembly/zg-dma.toml`"
+
+msgid "CRC"
+msgstr "CRC"
+
+msgid "crc"
+msgstr "crc"
+
+msgid "crc32-words"
+msgstr "crc32-words"
+
+msgid "`crc-internal`"
+msgstr "`crc-internal`"
+
+msgid "`tests/contracts/crc_assembly/ve.toml`, `tests/contracts/crc_assembly/zg.toml`"
+msgstr "`tests/contracts/crc_assembly/ve.toml`, `tests/contracts/crc_assembly/zg.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/crc.c`"
+msgstr "`soc/stm32/stm32f4/drivers/crc.c`"

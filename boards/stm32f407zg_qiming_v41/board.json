@@ -467,6 +467,11 @@
         "mode": "edge-event",
         "pull": "none"
       }
+    },
+    {
+      "id": "crc",
+      "controller": "CRC",
+      "route": "crc-internal"
     }
   ],
   "reserved_resources": [

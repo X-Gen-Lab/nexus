@@ -340,9 +340,13 @@ class ModeTraits:
 
 _MODE_TRAITS = MappingProxyType({
     ("dac", "direct"): ModeTraits(polling=True),
+    ("crc", "crc32-words"): ModeTraits(polling=True),
     ("dac", "triggered"): ModeTraits(polling=True),
     ("dac", "noise"): ModeTraits(polling=True),
     ("dac", "triangle"): ModeTraits(polling=True),
+    ("dac", "trigger-dma"): ModeTraits(irq=True, tx_dma=True),
+    ("dac", "trigger-dma-circular"): ModeTraits(irq=True, tx_dma=True,
+                                               continuous=True),
     ("memory_window", "startup-memory"): ModeTraits(),
     ("external_bus", "async16"): ModeTraits(polling=True),
     ("memory_window", "cpu-window"): ModeTraits(),

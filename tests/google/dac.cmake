@@ -1,4 +1,29 @@
 # Retain the real supplier LL bodies and only model external MMIO/CPU events.
+nexus_google_test(nexus_dac_tx_test
+    SOURCES dac_tx_test.cpp LIBRARIES Nexus::IODACTx)
+set(dac_dma_model_config "${CMAKE_CURRENT_BINARY_DIR}/dac-dma-model-config")
+file(MAKE_DIRECTORY "${dac_dma_model_config}")
+file(WRITE "${dac_dma_model_config}/nexus_config.h"
+    "#define NEXUS_IRQ_KERNEL_POLICY 2\n#define NEXUS_CPU_EXTERNAL_IRQ_COUNT 82\n#define NEXUS_IRQ_PRIORITY_BITS 4\n#define NEXUS_IRQ_SYSCALL_PRIORITY 5\n")
+nexus_google_test(nexus_stm32_dac_dma_test STM32F4_LL
+    SOURCES stm32_dac_dma_test.cpp
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/dac_dma.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/dac.c"
+    LIBRARIES Nexus::IODACTx Nexus::IODAC Nexus::IODMA Nexus::IOWake Nexus::Arch
+    INCLUDES "${dac_dma_model_config}"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+target_include_directories(nexus_stm32_dac_dma_test SYSTEM PRIVATE
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+nexus_use_cmsis_core(nexus_stm32_dac_dma_test)
+target_compile_definitions(nexus_stm32_dac_dma_test PRIVATE STM32F407xx
+    nx_arch_is_privileged=nx_dac_dma_model_privileged
+    nx_arch_in_isr=nx_dac_dma_model_isr
+    nx_arch_irq_is_masked=nx_dac_dma_model_masked
+    nx_arch_irq_save=nx_dac_dma_model_save
+    nx_arch_irq_restore=nx_dac_dma_model_restore
+    nx_arch_dsb=nx_dac_dma_model_dsb)
+target_compile_options(nexus_stm32_dac_dma_test PRIVATE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_dac_dma_model.h")
 nexus_google_test(nexus_stm32_dac_test STM32F4_LL
     SOURCES stm32_dac_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/dac.c"

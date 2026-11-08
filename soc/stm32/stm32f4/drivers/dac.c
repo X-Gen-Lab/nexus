@@ -242,7 +242,7 @@ static bool observation(const nx_stm32_dac_state_t* state, const void* data,
              (uintptr_t)state->config < begin + size);
 }
 /** \brief Query immutable digital facts without measuring the analog output. */
-static nx_result_t info(const void* context, nx_dac_info_t* output) {
+nx_result_t nx_stm32_dac_info(const void* context, nx_dac_info_t* output) {
     const nx_stm32_dac_state_t* state = context;
     if (!ready(state)) {
         return NX_ERROR_STATE;
@@ -314,8 +314,8 @@ static nx_result_t write_pair(void* context, uint16_t first, uint16_t second) {
     return NX_SUCCESS;
 }
 /** \brief Disable DAC triggers while timer EGR installs its divider. */
-static nx_result_t start(void* context, uint32_t hz, nx_time_us_t deadline) {
-    nx_stm32_dac_state_t* state = context;
+nx_result_t nx_stm32_dac_arm(nx_stm32_dac_state_t* state, uint32_t hz,
+                             nx_time_us_t deadline, bool run_timer) {
     if (!ready(state) || state->faulted) {
         return NX_ERROR_STATE;
     }
@@ -407,9 +407,11 @@ static nx_result_t start(void* context, uint32_t hz, nx_time_us_t deadline) {
             state->faulted = true;
             return NX_ERROR_IO;
         }
-        LL_TIM_EnableCounter(counter);
+        if (run_timer) {
+            LL_TIM_EnableCounter(counter);
+        }
         nx_arch_dsb();
-        if (LL_TIM_IsEnabledCounter(counter) == 0U) {
+        if ((LL_TIM_IsEnabledCounter(counter) != 0U) != run_timer) {
             state->faulted = true;
             return NX_ERROR_IO;
         }
@@ -419,6 +421,11 @@ static nx_result_t start(void* context, uint32_t hz, nx_time_us_t deadline) {
         return NX_ERROR_TIMEOUT;
     }
     return NX_SUCCESS;
+}
+/** \brief CPU modes start their selected timer after the common arm sequence.
+ */
+static nx_result_t start(void* context, uint32_t hz, nx_time_us_t deadline) {
+    return nx_stm32_dac_arm(context, hz, deadline, true);
 }
 /** \brief Only this supplier primitive explicitly supports ORed LL literals. */
 static nx_result_t trigger(void* context, uint8_t selected) {
@@ -502,7 +509,7 @@ static nx_result_t idle(nx_stm32_dac_state_t* state, nx_time_us_t deadline) {
     return NX_ERROR_BUSY;
 }
 /** \brief Stop leaves pad/clock ownership with the same initialized device. */
-static nx_result_t stop(void* context, nx_time_us_t deadline) {
+nx_result_t nx_stm32_dac_stop(void* context, nx_time_us_t deadline) {
     nx_stm32_dac_state_t* state = context;
     if (!ready(state)) {
         return NX_ERROR_STATE;
@@ -510,7 +517,7 @@ static nx_result_t stop(void* context, nx_time_us_t deadline) {
     return context_ok() ? idle(state, deadline) : NX_ERROR_CONTEXT;
 }
 /** \brief Hardware DOR is always right-aligned twelve-bit digital data. */
-static nx_result_t snapshot(const void* context, nx_dac_state_t* output) {
+nx_result_t nx_stm32_dac_snapshot(const void* context, nx_dac_state_t* output) {
     const nx_stm32_dac_state_t* state = context;
     if (!ready(state)) {
         return NX_ERROR_STATE;
@@ -583,10 +590,10 @@ nx_result_t nx_stm32_dac_close(nx_stm32_dac_state_t* state) {
     return NX_SUCCESS;
 }
 /** \brief Shared immutable operations never carry an instance context. */
-const nx_dac_ops_t nx_stm32_dac_ops = {.info = info,
+const nx_dac_ops_t nx_stm32_dac_ops = {.info = nx_stm32_dac_info,
                                        .write = write,
                                        .write_pair = write_pair,
                                        .start = start,
                                        .trigger = trigger,
-                                       .stop = stop,
-                                       .state = snapshot};
+                                       .stop = nx_stm32_dac_stop,
+                                       .state = nx_stm32_dac_snapshot};

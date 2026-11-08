@@ -16,10 +16,10 @@ foreach(required "${stm32_device}/Include/${stm32_device_header}.h"
 endforeach()
 include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/ControllerModes.cmake")
 set(stm32_sources drivers/platform_coordinator.c drivers/platform_lifecycle.c
-    drivers/system_lifecycle.c
+    drivers/system_lifecycle.c drivers/chip.c
     drivers/lifecycle_pins.c)
 set(stm32_uart_hal OFF)
-foreach(kind gpio uart spi i2c flash watchdog exti pwm adc dac can usb_device eth eth_frames
+foreach(kind gpio uart spi i2c flash watchdog exti pwm adc dac crc can usb_device eth eth_frames
         timer_capture advanced_pwm block rtc external_bus)
     nexus_controller_modes(modes "${kind}")
     if(NOT modes)
@@ -90,6 +90,10 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc dac can usb_device et
             drivers/ip/fs_device_pio/usb_device_controller.c)
     elseif(kind STREQUAL "can")
         list(APPEND stm32_sources drivers/ip/classic_can/can_controller.c)
+    elseif(kind STREQUAL "dac")
+        if("trigger-dma" IN_LIST modes OR "trigger-dma-circular" IN_LIST modes)
+            list(APPEND stm32_sources drivers/dac_dma.c)
+        endif()
     elseif(kind STREQUAL "adc")
         if("trigger-dma" IN_LIST modes
             OR "trigger-dma-continuous" IN_LIST modes)

@@ -65,6 +65,10 @@
       "bytes": 99874,
       "sha256": "95a518139f74d14a4477519b5172675347990e9fa637bd3948c69bd475bd7c88"
     },
+    "Inc/stm32f4xx_ll_crc.h": {
+      "bytes": 5338,
+      "sha256": "385f6767ea3bb38dc8a76526aa71c9cc8884695db44109a76117643641f62e63"
+    },
     "Inc/stm32f4xx_ll_dac.h": {
       "bytes": 68155,
       "sha256": "e837e3bd9c24f2a897b570fa229a9bb99836baf342b99ce7ae55c3eeced18bbe"
@@ -109,6 +113,10 @@
       "bytes": 66631,
       "sha256": "3b053ed6c58bc9ae4de03fcae86f64a14fb86ad4a36ef27a3bdf1524e93e9b54"
     },
+    "Inc/stm32f4xx_ll_system.h": {
+      "bytes": 70672,
+      "sha256": "d634a419a55e99b4a641fecc055e1f602d8a418bd7d822cf2f812a0965ac9a3e"
+    },
     "Inc/stm32f4xx_ll_tim.h": {
       "bytes": 174976,
       "sha256": "0d7eb3fd74100ee33cf592c6edb2e340d85ac320364702a6cc1d0e9d22da66d2"
@@ -116,6 +124,10 @@
     "Inc/stm32f4xx_ll_usart.h": {
       "bytes": 97617,
       "sha256": "982c4448c49ddc7c6c71bd788e5354f05e96aca5e98edd0626f8ffcaefc65e79"
+    },
+    "Inc/stm32f4xx_ll_utils.h": {
+      "bytes": 10642,
+      "sha256": "535cb625cfcd461d6054549bf04d25ef939ec5754f77731a5f9fd92728280ded"
     },
     "LICENSE.md": {
       "bytes": 1485,

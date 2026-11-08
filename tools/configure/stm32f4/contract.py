@@ -73,10 +73,13 @@ SPI_REQUIRES_ENDPOINT = True
 PIN_ELECTRICAL = True
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
+    ('crc', 'crc32-words'): 'crc',
     ('dac', 'direct'): 'dac',
     ('dac', 'triggered'): 'dac',
     ('dac', 'noise'): 'dac',
     ('dac', 'triangle'): 'dac',
+    ('dac', 'trigger-dma'): 'dac_dma',
+    ('dac', 'trigger-dma-circular'): 'dac_dma',
     ('memory_window', 'startup-memory'): 'fsmc',
     ('external_bus', 'async16'): 'fsmc',
     ('memory_window', 'cpu-window'): 'fsmc',
@@ -146,8 +149,15 @@ def mode_implementation(kind, mode):
 
 
 def validate_dma(route, mode, normalize):
+    if route['kind'] == 'dac':
+        from .hardware import DAC_DMA_ROUTES
+        mask = sum(1 << (DAC_PIN_CHANNELS[("DAC", pin["pin"])] - 1)
+                   for pin in route['pins'])
+        expected = DAC_DMA_ROUTES[mask]
+    else:
+        expected = _FIXED_DMA.get((route["controller"], mode))
     common.validate_dma(route, mode,
-                        _FIXED_DMA.get((route["controller"], mode)),
+                        expected,
                         'stm32f4', normalize, 'TIM3')
 
 

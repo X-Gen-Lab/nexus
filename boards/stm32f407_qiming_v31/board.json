@@ -54,6 +54,11 @@
       "id": "can2",
       "controller": "CAN2",
       "route": "can2-pb12-pb13"
+    },
+    {
+      "id": "crc",
+      "controller": "CRC",
+      "route": "crc-internal"
     }
   ],
   "reserved_resources": [

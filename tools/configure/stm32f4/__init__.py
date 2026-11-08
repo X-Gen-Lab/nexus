@@ -61,7 +61,7 @@ from tools.configure.clocks import normalize as normalize_clock, plan as clock_p
 from . import gpio as GPIO_PHASE
 from . import sram as EXTERNAL_MEMORY
 from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS, CONTROLLER_PAIRS,
-                       SECONDARY_FACTS)
+                       SECONDARY_FACTS, DAC_DMA_ROUTES)
 from .i2s2 import resolve_i2s2
 from .integration import USB_DEVICE, ETHERNET, TIMER_ADVANCED
 from .integration import CAN_INTEGRATION

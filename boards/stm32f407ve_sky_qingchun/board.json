@@ -30,6 +30,11 @@
       "id": "iwdg0",
       "controller": "IWDG",
       "route": "iwdg"
+    },
+    {
+      "id": "crc",
+      "controller": "CRC",
+      "route": "crc-internal"
     }
   ],
   "reserved_resources": [

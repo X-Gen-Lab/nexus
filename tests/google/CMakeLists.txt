@@ -57,6 +57,7 @@ function(nexus_google_test name)
 endfunction()
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/dac.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/crc.cmake")
 
 include("${CMAKE_CURRENT_LIST_DIR}/nxconfig.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/native_cold.cmake")

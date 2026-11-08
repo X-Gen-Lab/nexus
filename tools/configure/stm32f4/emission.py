@@ -33,8 +33,12 @@ def includes(result):
     source = []
     source.append('#include "stm32f407_provider.h"')
     source.append('#include "stm32f407_platform_cold.h"')
+    if any(item.kind == "crc" for item in selections):
+        source.append('#include "stm32f4_crc.h"')
     if any(item.kind == "dac" for item in selections):
         source.append('#include "stm32f407_dac.h"')
+    if any(implementation(item) == "dac_dma" for item in selections):
+        source.append('#include "stm32f407_dac_dma.h"')
     source.append('#include "stm32f4_platform_lifecycle_impl.h"')
     if any(item.kind in {"exti", "pwm", "adc"} for item in selections):
         source.append('#include "stm32f407_control_cold.h"')

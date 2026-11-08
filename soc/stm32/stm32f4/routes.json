@@ -2539,7 +2539,9 @@
         "direct",
         "triggered",
         "noise",
-        "triangle"
+        "triangle",
+        "trigger-dma",
+        "trigger-dma-circular"
       ],
       "source": "DS8626 Rev12 Table7 DAC_OUT1 PA4 and DAC_OUT2 PA5; RM0090 DAC; software route, no PCB or analog qualification"
     },
@@ -2562,7 +2564,9 @@
         "direct",
         "triggered",
         "noise",
-        "triangle"
+        "triangle",
+        "trigger-dma",
+        "trigger-dma-circular"
       ],
       "source": "DS8626 Rev12 Table7 DAC_OUT1 PA4 and DAC_OUT2 PA5; RM0090 DAC; software route, no PCB or analog qualification"
     },
@@ -2590,9 +2594,25 @@
         "direct",
         "triggered",
         "noise",
-        "triangle"
+        "triangle",
+        "trigger-dma",
+        "trigger-dma-circular"
       ],
       "source": "DS8626 Rev12 Table7 DAC_OUT1 PA4 and DAC_OUT2 PA5; RM0090 DAC; software route, no PCB or analog qualification"
+    },
+    {
+      "id": "crc-internal",
+      "controller": "CRC",
+      "kind": "crc",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "pins": [],
+      "modes": [
+        "crc32-words"
+      ],
+      "source": "RM0090 Rev22 section4: fixed 0x04c11db7 polynomial, initial 0xffffffff, 32-bit word access; SoC-internal, no PCB signal"
     }
   ]
 }

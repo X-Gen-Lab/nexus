@@ -120,11 +120,76 @@ class F407DacConfigurationTests(unittest.TestCase):
                         self.resolve(Path(temporary), mode="triangle",
                                      idle=idle, extra=extra)
 
-    def test_unimplemented_dma_is_not_an_advertised_production_mode(self):
+    def test_unimplemented_double_buffer_is_not_advertised(self):
         with tempfile.TemporaryDirectory() as temporary:
             with self.assertRaisesRegex(ValueError,
                                         "[Uu]nsupported|[Uu]nmaintained|not.*support"):
-                self.resolve(Path(temporary), mode="trigger-dma")
+                self.resolve(Path(temporary), mode="trigger-dma-doublebuffer")
+
+    def test_dma_selects_one_exact_stream_and_basic_timer_for_each_part(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            for density in ("ve", "zg"):
+                for mode in ("trigger-dma", "trigger-dma-circular"):
+                    for channels, idle, stream in (
+                            ("[1]", "[0]", 5), ("[2]", "[0]", 6),
+                            ("[1,2]", "[0,0]", 5)):
+                        with self.subTest(density=density, mode=mode,
+                                          channels=channels):
+                            result = self.resolve(Path(temporary),
+                                density=density, mode=mode, channels=channels,
+                                idle=idle, trigger="tim7-trgo",
+                                extra="irq={priority=6,calls_os=false}\n")
+                            item = result.controllers[0]
+                            self.assertEqual((f"DMA1:stream{stream}:channel7",),
+                                             item.dma)
+                            self.assertEqual(6, item.options.irq.priority)
+                            claims = {row.key for row in result.claims}
+                            self.assertTrue({"controller:TIM7",
+                                "irq:TIM6_DAC", f"irq:DMA1_Stream{stream}"}
+                                .issubset(claims))
+
+    def test_dma_factory_exposes_a_static_facet_with_the_same_nominal_id(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            result = self.resolve(Path(temporary), mode="trigger-dma",
+                trigger="tim6-trgo", extra="irq={priority=5}\n")
+            header, lookup = factory.emit(result)
+            source = bindings.emit(result)[1]
+            self.assertIn("nx_factory_dac_tx(nx_dac_id_t id)", header)
+            self.assertIn("nx_factory_dac_tx_ref(nx_dac_ref_t id)",
+                          factory.emit_strong(result))
+            self.assertIn("case NX_DAC_ID_OUTPUT:", lookup)
+            self.assertIn("return &s_nx_dac_tx_output;", lookup)
+            for token in ("nx_stm32_dac_dma_prepare",
+                          "nx_stm32_dac_dma_close",
+                          "nx_stm32_dac_dma_tx_ops",
+                          "DMA1_Stream5_IRQHandler", "TIM6_DAC_IRQHandler"):
+                self.assertIn(token, source)
+            for token in ("LL_DMA_", "LL_DAC_", "NVIC_", "while ("):
+                self.assertNotIn(token, source)
+
+    def test_dma_requires_explicit_irq_priority_and_hardware_trigger(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            with self.assertRaisesRegex(ValueError, "DAC.*IRQ"):
+                self.resolve(Path(temporary), mode="trigger-dma",
+                             trigger="tim6-trgo")
+            with self.assertRaisesRegex(ValueError, "DAC.*timer|DAC.*TIM"):
+                self.resolve(Path(temporary), mode="trigger-dma",
+                             trigger="software", extra="irq={priority=5}\n")
+
+    def test_cpu_dac_modes_reject_unused_irq_configuration(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            with self.assertRaisesRegex(ValueError, "DAC.*IRQ"):
+                self.resolve(Path(temporary), extra="irq={priority=5}\n")
+
+    def test_cpu_factory_does_not_allocate_a_dma_extension_or_transfer_face(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            result = self.resolve(Path(temporary))
+            header, lookup = factory.emit(result)
+            self.assertIn("nx_factory_dac_tx(nx_dac_id_t id)", header)
+            self.assertNotIn("return &s_nx_dac_tx_output", lookup)
+            source = bindings.emit(result)[1]
+            self.assertNotIn("nx_stm32_dac_dma", source)
+            self.assertNotIn("s_nx_dac_tx_output", source)
 
     def test_adc_and_dac_cannot_own_the_same_physical_pad(self):
         with tempfile.TemporaryDirectory() as temporary:

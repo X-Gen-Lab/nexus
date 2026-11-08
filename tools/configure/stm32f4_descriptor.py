@@ -15,8 +15,13 @@ DESCRIPTOR = FamilyDescriptor(
     ),
     references="references.json",
     owned_payload=(
+        "soc/stm32/stm32f4/drivers/chip.c",
+        "soc/stm32/stm32f4/drivers/crc.c",
+        "soc/stm32/stm32f4/private/stm32f4_crc.h",
         "soc/stm32/stm32f4/drivers/dac.c",
         "soc/stm32/stm32f4/private/stm32f407_dac.h",
+        "soc/stm32/stm32f4/drivers/dac_dma.c",
+        "soc/stm32/stm32f4/private/stm32f407_dac_dma.h",
         "soc/stm32/stm32f4/sram_boot.c",
         "soc/stm32/stm32f4/private/stm32f407_sram_boot.h",
         "soc/stm32/stm32f4/private/stm32f407_fsmc_profile.h",

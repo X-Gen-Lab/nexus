@@ -527,6 +527,12 @@ def _uart_constructor(item, result):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed STM32 instance, including its rollback and stop."""
     item = controller_ir(item, "stm32f4")
+    if item.kind == "crc":
+        state = Address("s_nx_port_" + _symbol(item.id))
+        return Construction(state_type="nx_stm32_crc_state_t", definitions=(),
+            initialize=DirectCall("nx_stm32_crc_prepare", (state,)),
+            stop=[DirectCall("nx_stm32_crc_close", (state,))],
+            retain_on_failed_init=True)
     if item.kind == "dac":
         from .dac import constructor as dac_constructor
         return dac_constructor(item, result)

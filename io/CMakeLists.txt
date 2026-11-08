@@ -52,6 +52,9 @@ nexus_io_domain(watchdog ALIAS IOWatchdog SOURCES src/api/watchdog.c)
 nexus_io_domain(exti ALIAS IOEXTI SOURCES src/api/exti.c DEPENDS nexus_io_wake)
 nexus_io_domain(pwm ALIAS IOTimer SOURCES src/api/timer.c)
 nexus_io_domain(dac ALIAS IODAC SOURCES src/api/dac.c)
+nexus_io_domain(crc ALIAS IOCRC SOURCES src/api/crc.c)
+nexus_io_domain(dac_tx ALIAS IODACTx SOURCES src/api/dac_tx.c
+    DEPENDS nexus_io_dma nexus_io_wake)
 nexus_io_domain(adc ALIAS IOADC
     SOURCES src/api/adc.c src/mechanisms/adc_observer.c
         src/mechanisms/adc_stream_profile.c
@@ -89,10 +92,17 @@ add_library(nexus_io STATIC
 target_link_libraries(nexus_io PUBLIC nexus_io_contract
     PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)
 set(_nexus_io_domains ${NEXUS_SELECTED_KINDS})
+if("dac" IN_LIST _nexus_io_domains)
+    include("${NEXUS_SOURCE_DIR}/cmake/platform/ControllerModes.cmake")
+    nexus_controller_modes(dac_modes dac)
+    if("trigger-dma" IN_LIST dac_modes OR "trigger-dma-circular" IN_LIST dac_modes)
+        list(APPEND _nexus_io_domains dac_tx)
+    endif()
+endif()
 # Runtime and Native admit caller-defined providers, independently of Board facts.
 if(_nexus_runtime_scope OR NOT DEFINED NEXUS_SOC_FAMILY OR
         NEXUS_SOC_FAMILY STREQUAL "native")
-    set(_nexus_io_domains gpio uart spi i2c flash watchdog exti pwm adc dac can
+    set(_nexus_io_domains gpio uart spi i2c flash watchdog exti pwm adc dac dac_tx crc can
         usb_device eth eth_frames timer_capture advanced_pwm pwm_group encoder
         pwm_adc can_fd adc_group rtc lptim entropy block external_bus
         parallel16 memory_window)

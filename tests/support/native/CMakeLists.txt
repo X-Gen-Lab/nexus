@@ -1,6 +1,6 @@
 # Native providers model complete public interfaces independently of assembly.
 add_library(nexus_io_native STATIC
-    drivers/time.c drivers/gpio.c drivers/uart.c drivers/uart_word.c
+    drivers/time.c drivers/chip.c drivers/gpio.c drivers/uart.c drivers/uart_word.c
     drivers/spi.c drivers/i2c.c
     drivers/flash.c drivers/watchdog.c drivers/exti.c
     drivers/timer.c drivers/adc.c
