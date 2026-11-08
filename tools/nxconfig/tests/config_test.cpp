@@ -10,8 +10,10 @@
 extern "C" {
 #include "../src/internal.h"
 }
+#include <cerrno>
 #include <cstdlib>
 #include <cstring>
+#include <dirent.h>
 #include <fcntl.h>
 #include <filesystem>
 #include <fstream>
@@ -265,12 +267,38 @@ TEST_F(HostConfiguration, GeneratedFilesRemainPrivateWithAnOpenProcessMask) {
     const auto output = temporary / "generated";
     ASSERT_EQ(nxconfig_emit(assembly, output.c_str(), &diagnostic),
               NXCONFIG_OK);
-    for (const auto& entry : fs::directory_iterator(output)) {
-        EXPECT_EQ(fs::status(entry).permissions() &
+    /* Keep this POSIX permission test independent of filesystem iterator
+     * constructor inlining in sanitizer builds of libstdc++.
+     */
+    struct Directory {
+        DIR* stream;
+        ~Directory() {
+            if (stream != nullptr) {
+                EXPECT_EQ(0, closedir(stream));
+            }
+        }
+    } directory{opendir(output.c_str())};
+    ASSERT_NE(nullptr, directory.stream);
+    unsigned observed = 0U;
+    for (;;) {
+        errno = 0;
+        const dirent* entry = readdir(directory.stream);
+        if (entry == nullptr) {
+            ASSERT_EQ(0, errno);
+            break;
+        }
+        if (std::strcmp(entry->d_name, ".") == 0 ||
+            std::strcmp(entry->d_name, "..") == 0) {
+            continue;
+        }
+        const auto path = output / entry->d_name;
+        EXPECT_EQ(fs::status(path).permissions() &
                       (fs::perms::group_all | fs::perms::others_all),
                   fs::perms::none)
-            << entry.path();
+            << path;
+        ++observed;
     }
+    EXPECT_GT(observed, 0U);
 }
 
 TEST_F(HostConfiguration, OutputParentCannotAdmitForeignWriters) {
