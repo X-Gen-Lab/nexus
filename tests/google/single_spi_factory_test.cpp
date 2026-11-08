@@ -10,24 +10,13 @@ extern "C" {
 #include "nexus/arch/arch.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#ifdef NX_MULTI_FACTORY_STM32
 #include "stm32f407_provider.h"
 #include "stm32f407_spi_cold.h"
 #define GPIO_GATE RCC->AHB1ENR
 #define SPI_GATE  RCC->APB2ENR
 #define SPI_BIT   RCC_APB2ENR_SPI1EN
-#else
-#include "gd32f470_provider.h"
-#include "gd32f470_spi_cold.h"
-#include "gd32f4xx_gpio.h"
-#include "gd32f4xx_rcu.h"
-#include "gd32f4xx_spi.h"
-#define GPIO_GATE RCU_AHB1EN
-#define SPI_GATE  RCU_APB2EN
-#define SPI_BIT   RCU_APB2EN_SPI4EN
-#endif
 /** \brief Both SDK fixtures share the host-only Cortex-M register model. */
-NVIC_Type g_gd32_model_nvic;
+NVIC_Type g_f4_model_nvic;
 }
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -44,20 +33,12 @@ static bool s_fail_pin_prepare;
 static bool s_refuse_withdraw;
 static bool s_refuse_gate_enable;
 static bool s_refuse_gate_disable;
-#ifdef NX_MULTI_FACTORY_STM32
 static bool s_refuse_cr_restore;
 static bool s_refuse_cr2_restore;
-#endif
 static unsigned s_system_stops;
-#ifdef NX_MULTI_FACTORY_STM32
 static constexpr unsigned FAILED_PORT = 0U;
 static constexpr unsigned FAILED_PIN = 7U;
 static constexpr unsigned FAILED_MODE = 2U;
-#else
-static constexpr unsigned FAILED_PORT = 5U;
-static constexpr unsigned FAILED_PIN = 6U;
-static constexpr unsigned FAILED_MODE = 1U;
-#endif
 
 /** \brief Access the common exact GPIO register layout in both real SDKs. */
 static volatile uint32_t& gpio(unsigned port, unsigned offset) {
@@ -82,7 +63,6 @@ extern "C" void nx_multi_factory_write(volatile uint32_t* reg, uint32_t value) {
          (s_refuse_gate_disable && (value & SPI_BIT) == 0U))) {
         value = (value & ~static_cast<uint32_t>(SPI_BIT)) | (*reg & SPI_BIT);
     }
-#ifdef NX_MULTI_FACTORY_STM32
     if (s_refuse_cr2_restore && reg == &SPI1->CR2 && value == SPI_CR2_SSOE) {
         value = *reg;
     }
@@ -90,7 +70,6 @@ extern "C" void nx_multi_factory_write(volatile uint32_t* reg, uint32_t value) {
         value == (SPI_CR1_MSTR | SPI_CR1_CPHA)) {
         value = *reg;
     }
-#endif
     if (s_refuse_withdraw && reg == &gpio(FAILED_PORT, 0U)) {
         const uint32_t mask = 3U << (FAILED_PIN * 2U);
         value = (value & ~mask) | (*reg & mask);
@@ -167,7 +146,6 @@ static void restore_pin(unsigned port, unsigned pin, uint16_t saved) {
     gpio(port, 0U) = (gpio(port, 0U) & ~(3U << shift)) |
                      ((static_cast<uint32_t>(saved) & 3U) << shift);
 }
-#ifdef NX_MULTI_FACTORY_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
 }
@@ -206,44 +184,13 @@ extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* port, uint8_t pin,
                                               uint8_t pull, bool drain) {
     return configure_pin(port_index(port), pin, mode, af, pull, drain);
 }
-#else
-extern "C" nx_result_t nx_gd32_soc_preflight(void) {
-    return NX_SUCCESS;
-}
-extern "C" int nx_gd32_soc_start(void) {
-    return 0;
-}
-extern "C" int nx_gd32_soc_stop(void) {
-    ++s_system_stops;
-    return 0;
-}
-extern "C" nx_result_t nx_gd32_gpio_clock_enable(unsigned port) {
-    GPIO_GATE |= 1U << port;
-    return NX_SUCCESS;
-}
-static unsigned port_index(uint32_t port) {
-    return (port - UINT32_C(0x40020000)) / 0x400U;
-}
-extern "C" uint16_t nx_gd32_pin_capture(uint32_t port, unsigned pin) {
-    return capture_pin(port_index(port), pin);
-}
-extern "C" void nx_gd32_pin_restore(uint32_t port, unsigned pin,
-                                    uint16_t state) {
-    restore_pin(port_index(port), pin, state);
-}
-extern "C" nx_result_t nx_gd32_pin_configure(uint32_t port, unsigned pin,
-                                             uint8_t mode, uint8_t af,
-                                             uint8_t pull, bool drain) {
-    return configure_pin(port_index(port), pin, mode, af, pull, drain);
-}
-#endif
 
 class SingleSpiFactory : public testing::Test {
   protected:
     NiceMock<SingleSpiPorts> ports;
     void* mapping = nullptr;
     void SetUp() override {
-        g_gd32_model_nvic = {};
+        g_f4_model_nvic = {};
         mapping =
             mmap(reinterpret_cast<void*>(UINT32_C(0x40000000)), 0x80000U,
                  PROT_READ | PROT_WRITE,
@@ -252,24 +199,16 @@ class SingleSpiFactory : public testing::Test {
         s_ports = &ports;
         s_fail_pin_prepare = s_refuse_withdraw = false;
         s_refuse_gate_enable = s_refuse_gate_disable = false;
-#ifdef NX_MULTI_FACTORY_STM32
         s_refuse_cr_restore = s_refuse_cr2_restore = false;
-#endif
         s_system_stops = 0U;
-#ifdef NX_MULTI_FACTORY_STM32
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
         SPI1->SR = SPI_SR_TXE;
-#else
-        SPI_STAT(SPI4) = SPI_STAT_TBE;
-#endif
     }
     void TearDown() override {
         s_fail_pin_prepare = s_refuse_withdraw = false;
         s_refuse_gate_enable = s_refuse_gate_disable = false;
-#ifdef NX_MULTI_FACTORY_STM32
         s_refuse_cr_restore = s_refuse_cr2_restore = false;
-#endif
         EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
         EXPECT_EQ(0, munmap(mapping, 0x80000U));
         s_ports = nullptr;
@@ -312,7 +251,6 @@ TEST_F(SingleSpiFactory, RefusedClockWithdrawalRetainsOwnerUntilRetry) {
     EXPECT_EQ(NX_SUCCESS, nx_platform_start().primary);
 }
 
-#ifdef NX_MULTI_FACTORY_STM32
 TEST_F(SingleSpiFactory, RefusedColdRegisterRestoreRetainsReceiptUntilRetry) {
     SPI1->CR1 = SPI_CR1_MSTR | SPI_CR1_CPHA;
     s_fail_pin_prepare = s_refuse_cr_restore = true;
@@ -368,9 +306,7 @@ TEST_F(SingleSpiFactory, ForeignEnabledControllerSurvivesFailedGateRestore) {
     EXPECT_EQ(SPI_CR2_SSOE, SPI1->CR2);
     EXPECT_EQ(0U, SPI_GATE & SPI_BIT);
 }
-#endif
 
-#ifdef NX_MULTI_FACTORY_STM32
 TEST_F(SingleSpiFactory, ColdPrepareRejectsInvalidResourcesWithoutEffects) {
     nx_stm32_spi_state_t state{};
     nx_stm32_spi_cold_receipt_t receipt{};
@@ -393,32 +329,6 @@ TEST_F(SingleSpiFactory, ColdPrepareCannotRebindAnExistingController) {
     EXPECT_EQ(0U, GPIO_GATE);
     EXPECT_EQ(0U, SPI_GATE & SPI_BIT);
 }
-#else
-TEST_F(SingleSpiFactory, ColdPrepareRejectsInvalidResourcesWithoutEffects) {
-    nx_gd32_spi_state_t state{};
-    nx_gd32_spi_cold_t cold{};
-    EXPECT_EQ(NX_ERROR_INVALID, nx_gd32_spi_prepare(&state, nullptr, &cold));
-    EXPECT_FALSE(state.initialized);
-    EXPECT_EQ(0U, cold.pin_leases);
-    EXPECT_EQ(0U, GPIO_GATE);
-    EXPECT_EQ(0U, SPI_GATE & SPI_BIT);
-}
-
-TEST_F(SingleSpiFactory, ColdPrepareCannotRebindAnExistingController) {
-    nx_gd32_spi_state_t state{};
-    state.controller = &nx_gd32_spi4_controller;
-    state.initialized = true;
-    state.active = true;
-    nx_gd32_spi_cold_t cold{};
-    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_spi_prepare(&state, nullptr, &cold));
-    EXPECT_EQ(&nx_gd32_spi4_controller, state.controller);
-    EXPECT_TRUE(state.initialized);
-    EXPECT_TRUE(state.active);
-    EXPECT_EQ(0U, cold.pin_leases);
-    EXPECT_EQ(0U, GPIO_GATE);
-    EXPECT_EQ(0U, SPI_GATE & SPI_BIT);
-}
-#endif
 TEST_F(SingleSpiFactory, ColdFailureWithdrawsDriveBeforeRestoringOldFields) {
     s_fail_pin_prepare = true;
     EXPECT_CALL(ports, Restore(_, _))
@@ -444,9 +354,6 @@ TEST_F(SingleSpiFactory, RefusedColdWithdrawalRetainsPinAndGateUntilRetry) {
     EXPECT_EQ(NX_ERROR_IO, result.cleanup);
     EXPECT_NE(0U, result.remaining_effects);
     EXPECT_EQ(FAILED_MODE, (gpio(FAILED_PORT, 0U) >> (FAILED_PIN * 2U)) & 3U);
-#ifndef NX_MULTI_FACTORY_STM32
-    EXPECT_NE(0U, gpio(FAILED_PORT, 20U) & (1U << FAILED_PIN));
-#endif
     EXPECT_NE(0U, GPIO_GATE & (1U << FAILED_PORT));
     EXPECT_EQ(0U, SPI_GATE & SPI_BIT);
     EXPECT_EQ(0U, s_system_stops);

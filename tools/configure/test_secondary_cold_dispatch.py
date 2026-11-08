@@ -1,4 +1,5 @@
 """Paired SPI/I2C use their concrete C lifecycle without obsolete emitters."""
+from tools.configure.tests.native_fixture import native_fixture
 import unittest
 
 from tools.configure import configure as gate, secondary_controllers
@@ -7,13 +8,10 @@ from tools.configure.providers import maintained
 
 class SecondaryColdDispatchTests(unittest.TestCase):
     def test_paired_spi_i2c_emit_their_concrete_c_lifecycle(self):
-        for family, prefix, relative in (
-                ("stm32f407", "stm32", "stm32-zg.toml"),
-                ("gd32f470", "gd32", "gd32.toml"),
-                ("stm32f407", "stm32", "stm32-zg-i2c-pair.toml"),
-                ("gd32f470", "gd32", "gd32-i2c-pair.toml")):
+        for family, prefix, relative in (('stm32f4', 'stm32', 'stm32-zg.toml'), ('stm32f4', 'stm32', 'stm32-zg-i2c-pair.toml')):
             result = gate.resolve_ir(gate.ROOT /
-                "tests/contracts/multi_controller_assembly" / relative)
+                "tests/contracts/multi_controller_assembly" / relative, test_support=native_fixture(gate.ROOT /
+                "tests/contracts/multi_controller_assembly" / relative))
             for item in result.controllers:
                 if item.kind not in {"spi", "i2c"}:
                     continue

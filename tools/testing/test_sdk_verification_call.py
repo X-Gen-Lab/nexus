@@ -43,7 +43,7 @@ class SDKPublicCompileInputTests(unittest.TestCase):
         (self.public / "nexus/components").mkdir(parents=True)
         (self.public.parent / "CMakeLists.txt").write_text(
             "# Maintained component exports its sibling include directory.\n")
-        self.private = self.sdk / "soc/stm32/stm32f407/private"
+        self.private = self.sdk / "soc/stm32/stm32f4/private"
         self.private.mkdir(parents=True)
         specification = importlib.util.spec_from_file_location(
             "include_boundary_consumer", ROOT / "cmake/package/verify_consumers.py")
@@ -72,7 +72,7 @@ class SDKPublicCompileInputTests(unittest.TestCase):
 
     def test_shared_ip_includes_remain_private_after_relocation(self):
         for root in (self.sdk, ROOT):
-            directory = root / "drivers/i2c/i2c_v1_async"
+            directory = root / "soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
             for option, path in (("-I", directory),
                                  ("-isystem", directory),
                                  ("-include", directory / "i2c_v1_async.h")):
@@ -91,7 +91,7 @@ class SDKPublicCompileInputTests(unittest.TestCase):
                  self.public.parent / "src/include",
                  self.public.parent / "other/include",
                  self.public / "../private",
-                 self.sdk / "components/../soc/stm32/stm32f407/private"]
+                 self.sdk / "components/../soc/stm32/stm32f4/private"]
         for option in ("-I", "-isystem", "-iquote", "-idirafter", "-include", "-imacros"):
             for path in paths:
                 for joined in (False, True):
@@ -380,53 +380,12 @@ class SDKConsumerParallelTests(unittest.TestCase):
     """Real CLI and templates; external CMake/SDK processes are test doubles."""
 
     SELECTED_INPUTS = (
-        ("h743 high", "h743-high-peripherals", "h743-high"),
-        ("u575 gpdma", "u575-uart-gpdma", "u575-uart-gpdma"),
-        ("g474 fd normal", "g474-can-fd-normal", "g474-can-fd"),
-        ("g474 fd loopback", "g474-can-fd-loopback", "g474-can-fd"),
-        ("g474 pwm adc", "g474-pwm-adc", "g474-pwm-adc"),
-        ("g474 adc regular software", "g474-adc-group-regular-software", "g474-adc-group"),
-        ("g474 adc regular timer", "g474-adc-group-regular-timer", "g474-adc-group"),
-        ("g474 adc injected software", "g474-adc-group-injected-software", "g474-adc-group"),
-        ("g474 adc injected timer", "g474-adc-group-injected-timer", "g474-adc-group"),
-        ("h743 fifo", "h743-uart-fifo", "uart-fifo"),
-        ("u575 fifo", "u575-uart-fifo", "uart-fifo"),
         ("f407 frames", "f407zg-eth-frames", "ethernet-frames"),
-        ("gd470 frames", "gd470-eth-frames", "ethernet-frames"),
-        ("h743 rtscts", "h743-uart-rtscts", "uart-fifo"),
-        ("u575 rtscts", "u575-uart-rtscts", "uart-fifo"),
-        ("g474 shared pwm", "g474-pwm-shared", "g474-pwm-shared"),
         ("native time pair", "native-time-pair", "native-time-pair"),
         ("native time empty", "native-time-empty", "native-time-empty"),
-        ("h743 runtime clock", "h743-spi-dma-runtime-clock", "h743-runtime-clock"),
-        ("h743 spi dma", "h743-spi-dma", "h743-spi-dma"),
-        ("h743 spi dma cache on", "h743-spi-dma-cache-on", "h743-spi-dma"),
-        ("u575 uart chain", "u575-uart-chain", "u575-uart-gpdma"),
-        ("h743 spi dma uart tx", "h743-spi-dma-uart-tx", "h743-spi-dma"),
-        ("h743 spi dma uart rx", "h743-spi-dma-uart-rx", "h743-spi-dma"),
-        ("g474 pin states", "g474-pin-states", "pin-states"),
-        ("u575 lptim run", "u575-lptim-run", "u575-lptim"),
-        ("u575 rtc run", "u575-rtc-run", "u575-rtc"),
-        ("h743 uart continuous", "h743-uart-continuous", "h743-uart-continuous"),
-        ("h743 uart continuous cache on", "h743-uart-continuous-cache-on", "h743-uart-continuous"),
-        ("h743 uart duplex continuous", "h743-uart-duplex-continuous", "h743-uart-duplex-continuous"),
-        ("h743 uart duplex continuous cache on", "h743-uart-duplex-continuous-cache-on", "h743-uart-duplex-continuous"),
-        ("u575 retained time", "nucleo-u575-baremetal-empty", "u575-retained-time"),
-        ("u575 stop2", "nucleo-u575-baremetal-empty", "u575-stop2"),
-        ("u575 lpdma copy", "u575-lpdma-copy-stop2", "u575-lpdma-copy"),
-        ("u575 lptim1 lpbam", "u575-lptim1-lpbam-stop2", "u575-lptim1-lpbam"),
-        ("u575 mpu gpio", "u575-mpu-gpio-write", "u575-mpu-gpio"),
         ("f407 i2s2 slave tx", "sky-i2s2-slave-tx", "f407-i2s2-slave-tx"),
     )
-    CANONICAL_ASSEMBLIES = frozenset({
-        "h743-high-peripherals", "h743-spi-dma-runtime-clock",
-        "h743-spi-dma", "h743-spi-dma-cache-on",
-        "u575-uart-chain", "h743-spi-dma-uart-tx", "h743-spi-dma-uart-rx",
-        "g474-pin-states", "u575-lptim-run", "u575-rtc-run", "h743-uart-continuous",
-        "h743-uart-continuous-cache-on", "h743-uart-duplex-continuous",
-        "h743-uart-duplex-continuous-cache-on", "nucleo-u575-baremetal-empty",
-        "u575-lpdma-copy-stop2", "u575-lptim1-lpbam-stop2",
-        "u575-mpu-gpio-write", "sky-i2s2-slave-tx"})
+    CANONICAL_ASSEMBLIES = frozenset({"sky-i2s2-slave-tx"})
 
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="SDK CLI budgets ")
@@ -442,57 +401,25 @@ class SDKConsumerParallelTests(unittest.TestCase):
             "publishable": True, "source_dirty": False,
             "source_revision": "a" * 40, "source_tree": "b" * 40}))
         verification = self.sdk / "cmake/package/verification/io_evolution"
-        for name in ("u575-uart-gpdma",
-                     "g474-can-fd-normal", "g474-can-fd-loopback",
-                     "g474-pwm-adc", "g474-adc-group-regular-software",
-                     "g474-adc-group-regular-timer",
-                     "g474-adc-group-injected-software",
-                     "g474-adc-group-injected-timer", "h743-uart-fifo",
-                     "u575-uart-fifo", "f407zg-eth-frames",
-                     "gd470-eth-frames", "h743-uart-rtscts",
-                     "u575-uart-rtscts", "g474-pwm-shared"):
-            file = verification / (name + ".toml")
-            file.parent.mkdir(parents=True, exist_ok=True)
-            file.write_text('schema = 2\nbackend = "baremetal"\n# canonical installed test input: ' + name)
-        for name in ("h743-high", "u575-uart-gpdma", "g474-can-fd",
-                     "g474-pwm-adc", "g474-adc-group", "uart-fifo",
-                     "ethernet-frames", "g474-pwm-shared"):
-            file = verification / "consumers" / (name + ".c")
-            file.parent.mkdir(parents=True, exist_ok=True)
-            file.write_text("/* installed public smoke: " + name + " */\n")
-        for stem in self.CANONICAL_ASSEMBLIES:
-            relative = Path("tools/configure/assemblies") / (stem + ".toml")
+        verification.mkdir(parents=True)
+        for _, stem, smoke in self.SELECTED_INPUTS:
+            relative = (Path("tools/configure/assemblies") if
+                        stem in self.CANONICAL_ASSEMBLIES else
+                        Path("cmake/package/verification/io_evolution"))
+            relative /= stem + ".toml"
             target = self.sdk / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / relative, target)
-        shutil.copyfile(ROOT / "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c",
-                        verification / "consumers/h743-spi-dma.c")
-        shutil.copyfile(ROOT / "cmake/package/verification/io_evolution/consumers/pin-states.c",
-                        verification / "consumers/pin-states.c")
-        for stem in ("u575-lptim", "u575-rtc", "u575-retained-time",
-                     "u575-stop2", "u575-lpdma-copy", "u575-lptim1-lpbam",
-                     "u575-mpu-gpio", "f407-i2s2-slave-tx",
-                     "h743-uart-continuous",
-                     "h743-uart-duplex-continuous"):
-            relative = Path("cmake/package/verification/io_evolution/consumers") / (stem + ".c")
-            shutil.copyfile(ROOT / relative, self.sdk / relative)
-        runtime_smoke = ROOT / "cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c"
-        if runtime_smoke.is_file():
-            shutil.copyfile(runtime_smoke, verification / "consumers/h743-runtime-clock.c")
-        # These two real canonical files are SUT inputs. Their actual C
-        # execution/proc mapping checks are qualified by the separate installed
-        # integration; this suite models only external process ports.
-        for profile in ("pair", "empty"):
-            stem = "native-time-" + profile
-            for relative in (stem + ".toml", "consumers/" + stem + ".c"):
-                shutil.copyfile(ROOT / "cmake/package/verification/io_evolution" /
-                                relative, verification / relative)
+            consumer = (Path("cmake/package/verification/io_evolution/consumers")
+                        / (smoke + ".c"))
+            (self.sdk / consumer).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / consumer, self.sdk / consumer)
         shutil.copytree(ROOT / "cmake/package/verification/common_services",
                         self.sdk / "cmake/package/verification/common_services")
         shutil.copytree(ROOT / "cmake/package/verification/secure_services",
                         self.sdk / "cmake/package/verification/secure_services")
         for scenario in ("device_tmp117", "image_window", "loaned_rx",
-                         "mcuboot_control", "mcuboot_boot", "external_provider"):
+                         "mcuboot_control", "mcuboot_boot"):
             shutil.copytree(ROOT / "cmake/package/verification" / scenario,
                             self.sdk / "cmake/package/verification" / scenario)
         specification = importlib.util.spec_from_file_location(
@@ -518,9 +445,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
             products = [path for path in (source / "main.c", source / "main.cpp",
                                          source / "private_headers.c",
                                          source / "application.c",
-                                         source / "composition.c", source / "public_key.c",
-                                         source / "consumer.c",
-                                         source / "provider/soc/lifecycle_adapter.c")
+                                         source / "composition.c", source / "public_key.c")
                         if path.exists()]
             rows = [{"file": str(path), "directory": str(build),
                      "arguments": ["cc", "-c", str(path)],
@@ -544,8 +469,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
             (build / "resolved-config.txt").write_text(str(config))
             binary = build / "bin"
             binary.mkdir()
-            for name in ("installed_c", "installed_cpp", "installed_modern",
-                         "installed_selected"):
+            for name in ("installed_c", "installed_cpp", "installed_selected"):
                 (binary / (name + ".resources.json")).write_text(
                     '{"status":"passed"}')
                 (binary / (name + ".elf")).write_bytes(b"test double")
@@ -576,7 +500,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                              "arguments": ["cc", "-c", str(config / "bindings.c")],
                              "command": "cc -c " + shlex.quote(str(config / "bindings.c"))})
                 if self.selected_fault == "native_private_include":
-                    rows[0]["arguments"].insert(1, "-I" + str(self.sdk / "soc/native/drivers"))
+                    rows[0]["arguments"].insert(1, "-I" + str(self.sdk / "tests/support/native/drivers"))
                     rows[0]["command"] = shlex.join(rows[0]["arguments"])
                 (build / "compile_commands.json").write_text(json.dumps(rows))
                 # Native owns no ARM byproducts. Their absence is asserted by
@@ -604,26 +528,19 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         {"file": str(source / "main.c"),
                          "directory": str(build),
                          "arguments": ["cc", "-I",
-                             str(self.sdk / "soc/stm32/stm32u575/private"),
+                             str(self.sdk / "soc/stm32/stm32f4/private"),
                              "-c", str(source / "main.c")],
                          "command": shlex.join(["cc", "-I",
-                             str(self.sdk / "soc/stm32/stm32u575/private"),
+                             str(self.sdk / "soc/stm32/stm32f4/private"),
                              "-c", str(source / "main.c")])},
                         {"file": str(source / "private_headers.c"),
                          "directory": str(build),
                          "command": "cc -c " + shlex.quote(
                              str(source / "private_headers.c"))}]))
             if service is not None:
-                family = {"native-services": "native", "native-device": "native",
-                          "native-boot-control": "native",
-                          "arm-device": "stm32f407", "arm-image": "stm32f407",
-                          "external-package": "sdk_services_model"}.get(
-                              service.domain, "stm32f407" if
-                              service.name == "f407 services" else "gd32f470")
+                family = "stm32f4" if service.arm else "native"
                 cpu = {"arch": "cortex-m4" if service.arm else "native"}
                 if service.scenario != "common_services" and service.arm:
-                    family = ("gd32f470" if service.name == "gd470 loaned rx"
-                              else "stm32f407")
                     cpu.update(float_abi="hard", fpu="fpv4-sp-d16")
                 (config / "resolved.json").write_text(json.dumps({
                     "backend": "baremetal" if service.arm else "native",
@@ -647,9 +564,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 header[:6] = (b"\x7fELF\x01\x01" if service.arm else
                               b"\x7fELF\x02\x01")
                 header[18:20] = (40 if service.arm else 62).to_bytes(2, "little")
-                image = binary / ("external_lifecycle_consumer"
-                                  if service.scenario == "external_provider" else
-                                  "installed_services" +
+                image = binary / ("installed_services" +
                                   (".elf" if service.arm else ""))
                 image.write_bytes(header)
                 if service.arm:
@@ -668,22 +583,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
             if (Path(command[2]).name.startswith("selected ") and
                     self.selected_fault == "build"):
                 code = 43
-            if (Path(command[2]).name.startswith("selected g474 adc ") and
-                    self.selected_fault == "adc_build"):
-                code = 44
-            if (" fifo " in Path(command[2]).name and
-                    self.selected_fault == "fifo_build"):
-                code = 45
             if (" frames " in Path(command[2]).name and
                     self.selected_fault == "frames_build"):
                 code = 46
-            for family in ("h743", "u575"):
-                if (Path(command[2]).name == "selected " + family + " rtscts build"
-                        and self.selected_fault == family + "_rtscts_build"):
-                    code = 47
-            if (Path(command[2]).name == "selected g474 shared pwm build"
-                    and self.selected_fault == "shared_pwm_build"):
-                code = 48
         elif command[0] in ("nm", "arm-none-eabi-nm"):
             build = Path(command[-1]).parents[1]
             if any(build.name == item.name + " build"
@@ -725,23 +627,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
             failed = ("selected " in command[command.index("--elf") + 1]
                       and self.selected_fault == "retention")
             failed = failed or (
-                "selected g474 adc " in command[command.index("--elf") + 1]
-                and self.selected_fault == "adc_retention")
-            failed = failed or (
-                " fifo " in command[command.index("--elf") + 1]
-                and self.selected_fault == "fifo_retention")
-            failed = failed or (
                 " frames " in command[command.index("--elf") + 1]
                 and self.selected_fault == "frames_retention")
-            for family in ("h743", "u575"):
-                failed = failed or (
-                    Path(command[command.index("--elf") + 1]).parents[1].name ==
-                    "selected " + family + " rtscts build" and
-                    self.selected_fault == family + "_rtscts_retention")
-            failed = failed or (
-                Path(command[command.index("--elf") + 1]).parents[1].name ==
-                "selected g474 shared pwm build" and
-                self.selected_fault == "shared_pwm_retention")
             report = {"status": "failed" if failed else "passed"}
             if ("selected " in command[command.index("--elf") + 1] or
                     Path(command[command.index("--elf") + 1]).name ==
@@ -761,7 +648,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 if self.selected_fault == "owner_kind":
                     report["kind"] = "provider_method_retention"
                 elif self.selected_fault == "owner_role":
-                    report["owner_profile"] = "u575-other-owner"
+                    report["owner_profile"] = "unreviewed-owner"
                 elif self.selected_fault == "owner_consumer":
                     report["consumer"]["sha256"] = "0" * 64
             Path(command[command.index("--output") + 1]).write_text(json.dumps(report))
@@ -822,43 +709,31 @@ class SDKConsumerParallelTests(unittest.TestCase):
 
     def assert_complete_matrix(self):
         builds = self.builds()
-        expected = {"native", "stm32", "gd32"}
-        expected.update(family + " " + backend
-                        for family in ("h743", "u575", "f103", "gd303", "g474")
-                        for backend in ("baremetal", "freertos"))
-        expected.update("selected " + name
-                        for name, _, _ in self.SELECTED_INPUTS)
+        expected = {"native", "stm32"}
+        expected.update("selected " + name for name, _, _ in self.SELECTED_INPUTS)
         expected.update(item.name for item in self.consumer.SERVICE_CONSUMERS)
         self.assertEqual({Path(command[2]).name.removesuffix(" build")
                           for command in builds}, expected)
-        self.assertEqual(len(builds), 28 + len(self.SELECTED_INPUTS))
+        self.assertEqual(len(builds), len(expected))
         self.assertEqual(sum(len(command) - command.index("--target") - 1
-                             for command in builds), 31 + len(self.SELECTED_INPUTS))
+                             for command in builds), len(expected) + 2)
         configurations = [command for command in self.commands
                           if command[0] == "cmake" and "-S" in command]
-        self.assertEqual(len(configurations), 28 + len(self.SELECTED_INPUTS))
+        self.assertEqual(len(configurations), len(expected))
         for command in configurations:
             self.assertIn("-DNEXUS_EXPECTED_SOURCE_REVISION=" + "a" * 40,
                           command)
-        retention = [command for command in self.commands
-                     if any(arg.endswith("retention.py") for arg in command)]
-        self.assertEqual(len(retention), 15 + len(self.SELECTED_INPUTS))
-        native = [command for command in self.commands if len(command) == 1]
-        self.assertEqual({Path(command[0]).name for command in native},
-                         {"installed_c", "installed_cpp", "installed_selected",
-                          "installed_services", "external_lifecycle_consumer"})
-        self.assertEqual(len(native), 10)
-        self.assertEqual({Path(command[0]).parents[1].name for command in native
-                          if Path(command[0]).name == "installed_selected"},
-                         {"selected native time pair build", "selected native time empty build"})
-        nm = [command for command in self.commands if command[0] == "nm"]
-        self.assertEqual(len(nm), 7)
-        self.assertEqual({Path(command[-1]).parents[1].name for command in nm},
-                         {"selected native time pair build", "selected native time empty build",
-                          "native services build", "external services build",
-                          "native secure services build", "native tmp117 build",
-                          "native mcuboot control build"})
-        self.assertIn("--verify", self.commands[0])
+        retained = {"selected " + name for name, _, smoke in self.SELECTED_INPUTS
+                    if not smoke.startswith("native-time-")}
+        retained.update(item.name for item in self.consumer.SERVICE_CONSUMERS
+                        if item.arm and item.scenario not in
+                        {"image_window", "mcuboot_control"})
+        commands = [command for command in self.commands
+                    if any(arg.endswith("retention.py") for arg in command)]
+        self.assertEqual({Path(command[command.index("--elf") + 1]).parents[1]
+                          .name.removesuffix(" build") for command in commands},
+                         retained)
+        self.assertEqual(len(commands), len(retained))
 
     def test_producer_uses_the_standalone_transport_plan_without_a_copy(self):
         from tools.release import transport
@@ -880,86 +755,28 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(sources, {source for source, _, _ in
                                    transport.consumer_layout()})
 
-    def test_spi_inputs_are_explicit_canonical_paths_with_one_smoke(self):
-        for label, variant in (("h743 spi dma", "spi-dma"),
-                               ("h743 spi dma cache on", "spi-dma-cache-on"),
-                               ("h743 spi dma uart tx", "spi-dma-uart-tx"),
-                               ("h743 spi dma uart rx", "spi-dma-uart-rx")):
-            with self.subTest(variant=variant):
-                self.assertIn((label, "tools/configure/assemblies/h743-" +
-                               variant + ".toml", "h743-spi-dma"),
-                              self.consumer.SELECTED_CONSUMERS)
-        self.assertTrue(all(Path(path).suffix == ".toml" and
-                            not Path(path).is_absolute() and
-                            ".." not in Path(path).parts
-                            for _, path, _ in self.consumer.SELECTED_CONSUMERS))
 
     def test_selected_owner_smokes_link_explicit_public_components(self):
-        for label, stem, smoke, library in (
-                ("u575 retained time", "nucleo-u575-baremetal-empty",
-                 "u575-retained-time", "Nexus::U575RetainedTime"),
-                ("u575 stop2", "nucleo-u575-baremetal-empty", "u575-stop2",
-                 "Nexus::U575Stop2"),
-                ("u575 lpdma copy", "u575-lpdma-copy-stop2", "u575-lpdma-copy",
-                 "Nexus::U575Stop2Copy"),
-                ("u575 lptim1 lpbam", "u575-lptim1-lpbam-stop2",
-                 "u575-lptim1-lpbam", "Nexus::U575Stop2Lptim1"),
-                ("u575 mpu gpio", "u575-mpu-gpio-write",
-                 "u575-mpu-gpio", "Nexus::U575MpuGpio"),
-                ("f407 i2s2 slave tx", "sky-i2s2-slave-tx",
-                 "f407-i2s2-slave-tx", "Nexus::F407I2S2SlaveTx")):
-            assembly = "tools/configure/assemblies/" + stem + ".toml"
-            with self.subTest(smoke=smoke):
-                directory = self.directory / smoke
-                directory.mkdir()
-                source, _, command = self.consumer.prepare_selected_consumer(
-                    self.prefix, directory, label, assembly, smoke,
-                    lambda argv: None, expected_revision="a" * 40)
-                canonical = (self.sdk / "cmake/package/verification/io_evolution/consumers" /
-                             (smoke + ".c"))
-                self.assertEqual((source / "main.c").read_bytes(),
-                                 canonical.read_bytes())
-                project = (source / "CMakeLists.txt").read_text()
-                self.assertIn("LIBRARIES " + library + ")", project)
-                if smoke == "f407-i2s2-slave-tx":
-                    self.assertIn("stm32f407_i2s2_slave_tx.h",
-                                  (source / "private_headers.c").read_text())
-                self.assertIn("set(CMAKE_C_STANDARD 11)", project)
-                self.assertIn("set(CMAKE_C_STANDARD_REQUIRED ON)", project)
-                self.assertIn("set(CMAKE_C_EXTENSIONS OFF)", project)
-                self.assertIn("-DNEXUS_ASSEMBLY_FILE=" +
-                              str(self.sdk / assembly), command)
-                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg
-                                    for arg in command))
+        label, stem, smoke = self.SELECTED_INPUTS[-1]
+        assembly = "tools/configure/assemblies/" + stem + ".toml"
+        directory = self.directory / smoke
+        directory.mkdir()
+        source, _, command = self.consumer.prepare_selected_consumer(
+            self.prefix, directory, label, assembly, smoke,
+            lambda argv: None, expected_revision="a" * 40)
+        canonical = (self.sdk / "cmake/package/verification/io_evolution/consumers"
+                     / (smoke + ".c"))
+        self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+        project = (source / "CMakeLists.txt").read_text()
+        self.assertIn("LIBRARIES Nexus::F407I2S2SlaveTx)", project)
+        self.assertIn("stm32f407_i2s2_slave_tx.h",
+                      (source / "private_headers.c").read_text())
+        self.assertIn("set(CMAKE_C_STANDARD 11)", project)
+        self.assertIn("set(CMAKE_C_STANDARD_REQUIRED ON)", project)
+        self.assertIn("set(CMAKE_C_EXTENSIONS OFF)", project)
+        self.assertIn("-DNEXUS_ASSEMBLY_FILE=" + str(self.sdk / assembly), command)
+        self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
 
-    def test_component_owner_audits_are_exactly_the_four_canonical_smokes(self):
-        status, _ = self.execute(("--parallel", "1"))
-        self.assertEqual(status, 0)
-        commands = [command for command in self.commands
-                    if "--component-owner" in command and
-                    command[command.index("--component-owner") + 1] !=
-                    "f407-secure-services"]
-        expected = {"u575-retained-time", "u575-stop2", "u575-lpdma-copy",
-                    "u575-lptim1-lpbam"}
-        self.assertEqual(len(commands), len(expected))
-        self.assertEqual({command[command.index("--component-owner") + 1]
-                          for command in commands}, expected)
-        for command in commands:
-            self.assertIn("--resolved", command)
-            consumer = Path(command[command.index("--consumer") + 1])
-            role = command[command.index("--component-owner") + 1]
-            canonical = (self.sdk / "cmake/package/verification/"
-                         "io_evolution/consumers" / (role + ".c"))
-            self.assertEqual(consumer.read_bytes(), canonical.read_bytes())
-        for tuple_ in self.consumer.SELECTED_CONSUMERS:
-            if tuple_[2] in expected:
-                with self.subTest(role=tuple_[2]):
-                    self.assertEqual(
-                        self.consumer.component_owner_selection(tuple_),
-                        tuple_[2])
-                    with self.assertRaisesRegex(ValueError, "canonical"):
-                        self.consumer.component_owner_selection(
-                            ("impostor", tuple_[1], tuple_[2]))
 
     def test_owner_report_cannot_claim_another_kind_role_or_source(self):
         for fault in ("owner_kind", "owner_role", "owner_consumer"):
@@ -969,24 +786,11 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     status, report = self.execute(("--parallel", "1"))
                 self.assertEqual(status, 1)
                 self.assertEqual(report["status"], "failed")
-                self.assertIn("component owner", report["error"])
+                self.assertIn("retention identity", report["error"])
 
-    def test_runtime_clock_uses_canonical_input_and_public_lifecycle_smoke(self):
-        self.assertIn(("h743 runtime clock",
-                       "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
-                       "h743-runtime-clock"), self.consumer.SELECTED_CONSUMERS)
-        status, _ = self.execute(("--parallel", "1"))
-        self.assertEqual(status, 0)
-        self.assert_complete_matrix()
-        smoke = self.output / "selected h743 runtime clock source/main.c"
-        canonical = self.sdk / "cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c"
-        self.assertEqual(smoke.read_bytes(), canonical.read_bytes())
-        for name in ("nx_platform_runtime_domain", "nx_platform_runtime_pause",
-                     "nx_platform_runtime_resume", "nx_clock_domain_quiescent"):
-            self.assertIn(name + "(", smoke.read_text())
 
     def test_missing_each_canonical_input_is_terminal_without_directory_fallback(self):
-        for stem in sorted(self.CANONICAL_ASSEMBLIES - {"g474-pin-states"}):
+        for stem in sorted(self.CANONICAL_ASSEMBLIES):
             with self.subTest(stem=stem):
                 path = self.sdk / "tools/configure/assemblies" / (stem + ".toml")
                 original = path.read_bytes()
@@ -1001,22 +805,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 path.write_bytes(original)
                 decoy.unlink()
 
-    def test_missing_named_pin_state_canonical_input_cannot_use_a_legacy_decoy(self):
-        relative = "tools/configure/assemblies/g474-pin-states.toml"
-        source = self.sdk / relative
-        original = source.read_bytes()
-        source.unlink()
-        decoy = self.sdk / "cmake/package/verification/io_evolution/g474-pin-states.toml"
-        decoy.write_bytes(original)
-        with contextlib.redirect_stderr(io.StringIO()):
-            status, report = self.execute(("--parallel", "1"))
-        self.assertEqual(status, 1)
-        self.assertEqual(report["status"], "failed")
-        self.assertNotIn("g474 pin states", {row["name"] for row in report["selected_images"]})
-        self.assertIn("g474-pin-states.toml", report["error"])
 
     def test_sdk_relative_inputs_reject_alias_schema_and_symlink_before_output(self):
-        relative = "tools/configure/assemblies/h743-spi-dma.toml"
+        relative = "cmake/package/verification/io_evolution/f407zg-eth-frames.toml"
         path = self.sdk / relative
         original = path.read_bytes()
         directory = self.directory / "invalid selected inputs"
@@ -1024,12 +815,12 @@ class SDKConsumerParallelTests(unittest.TestCase):
         alias = path.with_name("alias.toml")
         alias.symlink_to(path)
         cases = [str(path), "./" + relative,
-                 "tools/configure/assemblies/../assemblies/h743-spi-dma.toml",
-                 "tools/configure/assemblies/alias.toml"]
+                 "cmake/package/verification/io_evolution/../io_evolution/f407zg-eth-frames.toml",
+                 "cmake/package/verification/io_evolution/alias.toml"]
         for source in cases:
             with self.subTest(source=source), self.assertRaises(ValueError):
                 self.consumer.prepare_selected_consumer(
-                    self.prefix, directory, "invalid", source, "h743-spi-dma",
+                    self.prefix, directory, "invalid", source, "ethernet-frames",
                     lambda argv: None, expected_revision="a" * 40)
             self.assertFalse((directory / "selected invalid source").exists())
         for schema in ("1", "true", "2.0"):
@@ -1039,21 +830,16 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "schema 2"):
                     self.consumer.prepare_selected_consumer(
                         self.prefix, directory, "invalid", relative,
-                        "h743-spi-dma", lambda argv: None,
+                        "ethernet-frames", lambda argv: None,
                         expected_revision="a" * 40)
                 self.assertFalse((directory / "selected invalid source").exists())
         path.write_bytes(original)
 
     def test_each_selected_mode_build_and_retention_failure_terminates_the_matrix(self):
-        for label in ("h743 spi dma", "h743 spi dma cache on",
-                      "h743 spi dma uart tx", "h743 spi dma uart rx",
-                      "u575 uart chain", "u575 lptim run", "u575 rtc run",
-                      "h743 uart continuous", "h743 uart continuous cache on",
-                      "h743 uart duplex continuous",
-                      "h743 uart duplex continuous cache on",
-                      "u575 retained time", "u575 stop2", "u575 lpdma copy",
-                      "u575 lptim1 lpbam", "u575 mpu gpio", "f407 i2s2 slave tx"):
-            for operation, exit_code in (("build", 51), ("retention", 52)):
+        for label, _, smoke in self.SELECTED_INPUTS:
+            operations = (("build", 51),) if smoke.startswith("native-time-") else (
+                ("build", 51), ("retention", 52))
+            for operation, exit_code in operations:
                 with self.subTest(label=label, operation=operation):
                     self.selected_fault = "selected:" + operation + ":" + label
                     with contextlib.redirect_stderr(io.StringIO()):
@@ -1072,7 +858,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
                           for command in self.builds()],
-                         ["1"] * (28 + len(self.SELECTED_INPUTS)))
+                         ["1"] * len(self.consumer.consumer_plan()))
 
     def test_default_uses_two_consumers_with_one_job_per_build(self):
         with mock_patch.dict(os.environ):
@@ -1085,7 +871,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
                           for command in self.builds()],
-                         ["1"] * (28 + len(self.SELECTED_INPUTS)))
+                         ["1"] * len(self.consumer.consumer_plan()))
         self.assertEqual(report["parallel_jobs"], 2)
         self.assertEqual(report["consumer_workers"], 2)
 
@@ -1118,7 +904,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
                           for command in self.builds()],
-                         ["1"] * (28 + len(self.SELECTED_INPUTS)))
+                         ["1"] * len(self.consumer.consumer_plan()))
         self.assertEqual(report["parallel_jobs"], 3)
         self.assertEqual(report["consumer_workers"], 3)
 
@@ -1126,123 +912,49 @@ class SDKConsumerParallelTests(unittest.TestCase):
         status, report = self.execute(("--parallel", "1"))
         self.assertEqual(status, 0)
         configurations = [command for command in self.commands
-                          if command[0] == "cmake" and "-S" in command
-                          and Path(command[command.index("-S") + 1]).name.startswith(
-                              "selected ")]
+                          if command[0] == "cmake" and "-S" in command and
+                          Path(command[command.index("-S") + 1]).name.startswith("selected ")]
         self.assertEqual(len(configurations), len(self.SELECTED_INPUTS))
+        expected = {stem: smoke for _, stem, smoke in self.SELECTED_INPUTS}
         inputs = set()
         for command in configurations:
             assembly = Path(next(argument.split("=", 1)[1] for argument in command
                                  if argument.startswith("-DNEXUS_ASSEMBLY_FILE=")))
-            expected_parent = (self.sdk / "tools/configure/assemblies"
-                               if assembly.stem in self.CANONICAL_ASSEMBLIES else
-                               self.sdk / "cmake/package/verification/io_evolution")
-            self.assertEqual(assembly.parent, expected_parent)
-            inputs.add(assembly.name)
+            inputs.add(assembly.stem)
+            relative = (Path("tools/configure/assemblies") if
+                        assembly.stem in self.CANONICAL_ASSEMBLIES else
+                        Path("cmake/package/verification/io_evolution"))
+            self.assertEqual(assembly, self.sdk / relative / assembly.name)
             self.assertIn("-DNEXUS_BUILD_TESTS=OFF", command)
             self.assertIn("-DNEXUS_BUILD_WORKLOAD=OFF", command)
             self.assertFalse(any("ALLOW_SOURCE_SDK_FIXTURE" in arg for arg in command))
             source = Path(command[command.index("-S") + 1])
-            smoke = (source / "main.c").read_text()
-            if assembly.stem.startswith("native-time-"):
-                canonical = assembly.parent / "consumers" / (assembly.stem + ".c")
-                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
-                self.assertFalse(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
-                if assembly.stem.endswith("pair"):
-                    self.assertIn('/proc/self/maps', smoke)
-                    self.assertIn('readonly_mapping(a->ops, sizeof(*a->ops))', smoke)
-            elif assembly.name.startswith("h743-spi-dma"):
-                stem = ("h743-runtime-clock" if assembly.stem ==
-                        "h743-spi-dma-runtime-clock" else "h743-spi-dma")
-                canonical = self.sdk / "cmake/package/verification/io_evolution/consumers" / (stem + ".c")
-                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
-                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
-            elif assembly.stem == "sky-i2s2-slave-tx":
-                canonical = (self.sdk /
-                    "cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c")
-                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
-                self.assertIn("nx_f407_i2s2_slave_tx_initialize(", smoke)
-                self.assertIn("nx_frame_stream_acquire(", smoke)
-                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
-            elif assembly.stem == "nucleo-u575-baremetal-empty":
-                stem = ("u575-retained-time" if source.name ==
-                        "selected u575 retained time source" else "u575-stop2")
-                canonical = self.sdk / "cmake/package/verification/io_evolution/consumers" / (stem + ".c")
-                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
-                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
-            elif assembly.stem in {"u575-lpdma-copy-stop2",
-                                   "u575-lptim1-lpbam-stop2", "u575-mpu-gpio-write"}:
-                stem = ("u575-lpdma-copy" if assembly.stem ==
-                        "u575-lpdma-copy-stop2" else "u575-lptim1-lpbam" if
-                        assembly.stem == "u575-lptim1-lpbam-stop2" else "u575-mpu-gpio")
-                canonical = (self.sdk /
-                    "cmake/package/verification/io_evolution/consumers" /
-                    (stem + ".c"))
-                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
-                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
-            elif assembly.name == "g474-pin-states.toml":
-                canonical = self.sdk / "cmake/package/verification/io_evolution/consumers/pin-states.c"
-                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
-                self.assertIn("nx_factory_pin_state", smoke)
-                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
-            elif assembly.stem in {"u575-lptim-run", "u575-rtc-run", "h743-uart-continuous",
-                                   "h743-uart-continuous-cache-on",
-                                   "h743-uart-duplex-continuous",
-                                   "h743-uart-duplex-continuous-cache-on"}:
-                stem = ("u575-rtc" if assembly.stem == "u575-rtc-run"
-                        else "u575-lptim" if assembly.stem == "u575-lptim-run"
-                        else "h743-uart-duplex-continuous" if
-                        assembly.stem.startswith("h743-uart-duplex-")
-                        else "h743-uart-continuous")
-                canonical = self.sdk / "cmake/package/verification/io_evolution/consumers" / (stem + ".c")
-                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
-                self.assertIn("nx_factory_", smoke)
-                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
-            else:
-                self.assertTrue(smoke.startswith("/* installed public smoke: "))
-                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
-            private_guard = (source / "private_headers.c").read_text()
-            for name in ("stm32h7xx.h", "stm32u5xx.h", "stm32g4xx.h",
-                         "stm32f4xx.h", "gd32f4xx.h",
-                         "stm32f407_eth_frames.h", "gd32f470_eth_frames.h",
-                         "stm32g474_pwm_shared.h", "rtc_lptim_provider.h",
-                         "stm32h743_spi_dma.h", "stm32g474_pin_state.h",
-                         "pin_state_impl.h", "stm32u575_lptim.h", "stm32u575_rtc.h",
-                         "retained_time.h", "stm32u575_rtc_calendar.h",
-                         "stm32u575_stop2_hw.h",
-                         "stm32u575_lpdma_copy_hw.h",
-                         "stm32u575_lpdma_copy_internal.h",
-                         "stm32u575_lptim1_profile.h",
-                         "stm32u575_lpdma_lptim1_internal.h",
-                         "stm32u575_uart_gpdma_chain.h",
-                         "stm32u575_uart_gpdma_impl.h",
-                         "stm32h743_uart_continuous.h",
-                         "stm32h743_uart_duplex.h",
-                         "stm32h743_uart_continuous_impl.h",
-                         "stm32h743_uart_dma_parts.h"):
-                self.assertIn('__has_include("' + name + '")', private_guard)
+            canonical = (self.sdk / "cmake/package/verification/io_evolution/consumers"
+                         / (expected[assembly.stem] + ".c"))
+            self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+            native = assembly.stem.startswith("native-time-")
+            self.assertEqual(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command),
+                             not native)
+            private = (source / "private_headers.c").read_text()
+            for name in ("stm32f4xx.h", "stm32f407_provider.h",
+                         "stm32f407_eth_frames.h", "can_controller.h"):
+                self.assertIn('__has_include("' + name + '")', private)
             self.assertNotIn(str(ROOT), (source / "CMakeLists.txt").read_text())
-        self.assertEqual(inputs, {stem + ".toml" for _, stem, _
-                                  in self.SELECTED_INPUTS})
-        self.assertEqual(len(report["selected_images"]), len(self.SELECTED_INPUTS))
-        arm_images = [image for image in report["selected_images"]
-                      if not image["name"].startswith("native time ")]
-        self.assertEqual(len(arm_images), len(self.SELECTED_INPUTS) - 2)
-        for image in arm_images:
-            self.assertEqual(set(image["artifacts"]), {"elf", "bin", "map"})
-        native_images = [image for image in report["selected_images"]
-                         if image["name"].startswith("native time ")]
-        self.assertEqual([image["selected_state_count"] for image in native_images], [4, 0])
-        self.assertEqual([image["selected_state_bytes"] for image in native_images], [240, 0])
-        for image in native_images:
-            self.assertEqual(image["kind"], "native-time-host-observation")
-            self.assertEqual(image["status"], "passed")
-            self.assertNotIn("artifacts", image)
-            self.assertNotIn("resources", image)
-            binary = Path(image["elf"]["path"])
-            self.assertEqual(binary.name, "installed_selected")
-            for suffix in ("elf", "bin", "map", "resources.json"):
-                self.assertFalse(binary.with_name(binary.name + "." + suffix).exists())
+        self.assertEqual(inputs, set(expected))
+        self.assertEqual(len(report["selected_images"]), len(expected))
+        native_images = [item for item in report["selected_images"]
+                         if item["name"].startswith("native time ")]
+        self.assertEqual([item["selected_state_count"] for item in native_images], [4, 0])
+        self.assertEqual([item["selected_state_bytes"] for item in native_images], [240, 0])
+        for item in report["selected_images"]:
+            if item["name"].startswith("native time "):
+                self.assertEqual(item["status"], "passed")
+                self.assertEqual(item["kind"], "native-time-host-observation")
+                self.assertNotIn("artifacts", item)
+                self.assertNotIn("resources", item)
+                self.assertEqual(Path(item["elf"]["path"]).name, "installed_selected")
+            else:
+                self.assertEqual(set(item["artifacts"]), {"elf", "bin", "map"})
 
     def test_a_new_consumer_build_failure_is_terminal(self):
         self.selected_fault = "build"
@@ -1250,7 +962,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
             status, report = self.execute(("--parallel", "1"))
         self.assertEqual(status, 1)
         self.assertEqual(report["status"], "failed")
-        self.assertEqual(len(self.builds()), 14)
+        self.assertEqual(len(self.builds()), 3)
         self.assertEqual(report["commands"][-1]["exit_code"], 43)
 
     def test_selected_retention_failure_is_terminal(self):
@@ -1259,23 +971,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
             status, report = self.execute(("--parallel", "1"))
         self.assertEqual(status, 1)
         self.assertEqual(report["status"], "failed")
-        self.assertEqual(len(self.builds()), 14)
+        self.assertEqual(len(self.builds()), 3)
         self.assertIn("retention", report["error"])
 
-    def test_adc_group_failure_is_terminal_after_all_eighteen_prior_roots(self):
-        for fault in ("adc_build", "adc_retention"):
-            with self.subTest(fault=fault):
-                self.selected_fault = fault
-                before = len(self.builds())
-                with contextlib.redirect_stderr(io.StringIO()):
-                    status, report = self.execute(("--parallel", "1"))
-                self.assertEqual(status, 1)
-                self.assertEqual(report["status"], "failed")
-                self.assertEqual(len(self.builds()) - before, 19)
-                if fault == "adc_build":
-                    self.assertEqual(report["commands"][-1]["exit_code"], 44)
-                else:
-                    self.assertIn("retention", report["error"])
 
     def test_selected_private_inputs_and_stale_resources_are_rejected(self):
         for fault in ("private_include", "resource_identity", "missing_bin"):
@@ -1286,37 +984,16 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 self.assertEqual(status, 1)
                 self.assertEqual(report["status"], "failed")
 
-    def test_fifo_failure_is_terminal_after_all_twenty_two_prior_roots(self):
-        for fault in ("fifo_build", "fifo_retention"):
-            with self.subTest(fault=fault):
-                self.selected_fault = fault
-                before = len(self.builds())
-                with contextlib.redirect_stderr(io.StringIO()):
-                    status, report = self.execute(("--parallel", "1"))
-                self.assertEqual(status, 1)
-                self.assertEqual(report["status"], "failed")
-                self.assertEqual(len(self.builds()) - before, 23)
-                if fault == "fifo_build":
-                    self.assertEqual(report["commands"][-1]["exit_code"], 45)
-                else:
-                    self.assertIn("retention", report["error"])
 
     def test_missing_installed_input_or_smoke_never_falls_back_to_checkout(self):
-        directory = self.sdk / "cmake/package/verification/io_evolution"
-        inputs = [self.sdk / "tools/configure/assemblies/" /
-                  "h743-high-peripherals.toml"]
-        inputs.extend(directory / relative for relative in (
-            "consumers/h743-high.c",
-            "g474-adc-group-regular-software.toml",
-            "consumers/g474-adc-group.c", "h743-uart-fifo.toml",
-            "u575-uart-fifo.toml", "consumers/uart-fifo.c",
-            "f407zg-eth-frames.toml", "gd470-eth-frames.toml",
-            "consumers/ethernet-frames.c", "h743-uart-rtscts.toml",
-            "u575-uart-rtscts.toml", "g474-pwm-shared.toml",
-            "consumers/g474-pwm-shared.c", "consumers/u575-retained-time.c",
-            "consumers/u575-stop2.c", "consumers/u575-lptim1-lpbam.c",
-            "native-time-pair.toml", "native-time-empty.toml",
-            "consumers/native-time-pair.c", "consumers/native-time-empty.c"))
+        inputs = []
+        for _, stem, smoke in self.SELECTED_INPUTS:
+            relative = (Path("tools/configure/assemblies") if
+                        stem in self.CANONICAL_ASSEMBLIES else
+                        Path("cmake/package/verification/io_evolution"))
+            inputs += [self.sdk / relative / (stem + ".toml"),
+                       self.sdk / "cmake/package/verification/io_evolution/consumers"
+                       / (smoke + ".c")]
         for file in inputs:
             with self.subTest(relative=str(file.relative_to(self.sdk))):
                 original = file.read_bytes()
@@ -1329,23 +1006,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 finally:
                     file.write_bytes(original)
 
-    def test_missing_canonical_h743_input_rejects_old_verification_copy(self):
-        canonical = self.sdk / "tools/configure/assemblies/" / (
-            "h743-high-peripherals.toml")
-        previous = self.sdk / "cmake/package/verification/io_evolution/" / (
-            "h743-high-peripherals.toml")
-        self.assertTrue(canonical.is_file())
-        self.assertFalse(previous.exists())
-        previous.write_bytes(canonical.read_bytes())
-        canonical.unlink()
-        with contextlib.redirect_stderr(io.StringIO()):
-            status, report = self.execute(("--parallel", "1"))
-        self.assertEqual(status, 1)
-        self.assertEqual(report["status"], "failed")
-        self.assertEqual(len(self.builds()), 13,
-                         "Missing selected input must precede its CMake build")
 
-    def test_frames_failure_is_terminal_after_all_twenty_four_prior_roots(self):
+    def test_frames_failure_is_terminal_after_base_roots(self):
         for fault in ("frames_build", "frames_retention"):
             with self.subTest(fault=fault):
                 self.selected_fault = fault
@@ -1354,73 +1016,15 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     status, report = self.execute(("--parallel", "1"))
                 self.assertEqual(status, 1)
                 self.assertEqual(report["status"], "failed")
-                self.assertEqual(len(self.builds()) - before, 25)
+                self.assertEqual(len(self.builds()) - before, 3)
                 if fault == "frames_build":
                     self.assertEqual(report["commands"][-1]["exit_code"], 46)
                 else:
                     self.assertIn("retention", report["error"])
 
-    def test_rtscts_reuses_the_same_public_byte_smoke_in_both_roots(self):
-        status, report = self.execute(("--parallel", "1"))
-        self.assertEqual(status, 0)
-        expected = (self.sdk / "cmake/package/verification/io_evolution/"
-                    "consumers/uart-fifo.c").read_bytes()
-        for family in ("h743", "u575"):
-            source = self.output / ("selected " + family + " rtscts source")
-            self.assertTrue((source / "main.c").is_file())
-            self.assertEqual((source / "main.c").read_bytes(), expected)
-            self.assertEqual(sum(image["name"] == family + " rtscts"
-                                 for image in report["selected_images"]), 1)
 
-    def test_rtscts_product_probe_rejects_both_real_private_provider_headers(self):
-        directory = self.directory / "private isolation inputs"
-        directory.mkdir()
-        source, _, _ = self.consumer.prepare_selected_consumer(
-            self.prefix, directory, "h743 rtscts",
-            "cmake/package/verification/io_evolution/h743-uart-rtscts.toml",
-            "uart-fifo", lambda command: None, expected_revision="a" * 40)
-        probe = (source / "private_headers.c").read_text()
-        for family in ("stm32h743", "stm32u575"):
-            self.assertIn('__has_include("' + family + '_uart_rtscts.h")',
-                          probe)
 
-    def test_each_rtscts_failure_is_terminal_after_the_preserved_matrix(self):
-        for family, builds in (("h743", 27), ("u575", 28)):
-            for operation in ("build", "retention"):
-                with self.subTest(family=family, operation=operation):
-                    self.selected_fault = family + "_rtscts_" + operation
-                    before = len(self.builds())
-                    with contextlib.redirect_stderr(io.StringIO()):
-                        status, report = self.execute(("--parallel", "1"))
-                    self.assertEqual(status, 1)
-                    self.assertEqual(report["status"], "failed")
-                    self.assertEqual(len(self.builds()) - before, builds)
-                    self.assertEqual(Path(self.builds()[-1][2]).name,
-                                     "selected " + family + " rtscts build")
-                    self.assertFalse(any(image["name"] == family + " rtscts"
-                                         for image in report["selected_images"]))
-                    if operation == "build":
-                        self.assertEqual(report["commands"][-1]["exit_code"], 47)
-                    else:
-                        self.assertIn("retention", report["error"])
 
-    def test_shared_pwm_failure_is_terminal_after_all_preserved_roots(self):
-        for operation in ("build", "retention"):
-            with self.subTest(operation=operation):
-                self.selected_fault = "shared_pwm_" + operation
-                before = len(self.builds())
-                with contextlib.redirect_stderr(io.StringIO()):
-                    status, report = self.execute(("--parallel", "1"))
-                self.assertEqual(status, 1)
-                self.assertEqual(report["status"], "failed")
-                self.assertEqual(len(self.builds()) - before, 29)
-                self.assertEqual(Path(self.builds()[-1][2]).name,
-                                 "selected g474 shared pwm build")
-                self.assertEqual(len(report["selected_images"]), 15)
-                if operation == "build":
-                    self.assertEqual(report["commands"][-1]["exit_code"], 48)
-                else:
-                    self.assertIn("retention", report["error"])
 
     def test_public_chip_exports_preserve_every_consumer_guard_and_root(self):
         self.selected_fault = "public_chip_include"
@@ -1439,8 +1043,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     status, report = self.execute(("--parallel", "1"))
                 self.assertEqual(status, 1)
                 self.assertEqual(report["status"], "failed")
-                self.assertEqual(len(self.builds()) - before, 30)
-                self.assertEqual(len(report["selected_images"]), 16)
+                self.assertEqual(len(self.builds()) - before, 4)
+                self.assertEqual(len(report["selected_images"]), 1)
                 self.assertEqual(Path(self.builds()[-1][2]).name,
                                  "selected native time pair build")
                 if fault in ("native_runtime", "native_nm"):
@@ -1462,8 +1066,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     status, report = self.execute(("--parallel", "1"))
                 self.assertEqual(status, 1)
                 self.assertEqual(report["status"], "failed")
-                self.assertEqual(len(self.builds()) - before, 31)
-                self.assertEqual(len(report["selected_images"]), 17)
+                self.assertEqual(len(self.builds()) - before, 5)
+                self.assertEqual(len(report["selected_images"]), 2)
                 self.assertEqual(Path(self.builds()[-1][2]).name,
                                  "selected native time empty build")
                 self.assertIn("retention", report["error"])
@@ -1581,7 +1185,7 @@ try:
     label = Path(command[command.index('-S') + 1]).name if configure else ''
     mode = payload['mode']
     if mode == 'overlap' and configure:
-        first = ('native source', 'stm32 source', 'gd32 source')[:payload['jobs']]
+        first = ('native source', 'stm32 source', 'selected f407 frames source')[:payload['jobs']]
         if label in first:
             (workspace / ('ready-' + label)).write_text(str(os.getpid()))
             wait_for(lambda: all((workspace / ('ready-' + name)).exists()
@@ -1610,7 +1214,7 @@ try:
     if (mode == 'validation' and
             any(item.endswith('retention.py') for item in command)):
         image = Path(command[command.index('--elf') + 1])
-        if image.parents[1].name == 'h743 baremetal build':
+        if image.parents[1].name == 'selected f407 frames build':
             (workspace / 'validation-ready').write_text(str(os.getpid()))
             wait_for(lambda: (workspace / 'validation-release').exists(), 5)
     specification = importlib.util.spec_from_file_location(
@@ -1631,7 +1235,7 @@ try:
     if mode == 'validation' and (workspace / 'validation-ready').exists():
         if any(item.endswith('retention.py') for item in command):
             image = Path(command[command.index('--elf') + 1])
-            if image.parents[1].name == 'h743 baremetal build':
+            if image.parents[1].name == 'selected f407 frames build':
                 Path(command[command.index('--output') + 1]).write_text(
                     json.dumps({'status': 'failed'}))
     print(result.stdout, end='', flush=True)
@@ -1712,7 +1316,7 @@ finally:
         self.assertEqual(report['parallel_jobs'], jobs)
         self.assertEqual(report['consumer_workers'], jobs)
         self.assertEqual(len(report['consumers']),
-                         28 + len(self.fixture.SELECTED_INPUTS))
+                         len(self.fixture.consumer.consumer_plan()))
         self.assertTrue(all(row['status'] == 'passed'
                             for row in report['consumers']))
         self.assertEqual([row['name'] for row in report['selected_images']],
@@ -1760,7 +1364,7 @@ finally:
         self.assertEqual(report['first_failure']['exit_code'], 42)
         self.assertEqual({row['exit_code'] for row in report['commands']
                           if row['exit_code']}, {42, 130})
-        self.assertFalse(any('gd32 source' in ' '.join(event['argv'])
+        self.assertFalse(any('selected f407 frames source' in ' '.join(event['argv'])
                              for event in self.events()))
         self.assertEqual(sum(row['status'] != 'not_started'
                              for row in report['consumers']), 2)
@@ -1798,7 +1402,7 @@ finally:
         self.assertEqual({row['exit_code'] for row in report['failures']},
                          {42, 43})
         self.assertIn(report['first_failure']['exit_code'], (42, 43))
-        self.assertFalse(any('gd32 source' in ' '.join(event['argv'])
+        self.assertFalse(any('selected f407 frames source' in ' '.join(event['argv'])
                              for event in self.events()))
         failed = [row for row in report['commands'] if row['exit_code']]
         self.assertEqual({row['exit_code'] for row in failed}, {42, 43})
@@ -1841,6 +1445,7 @@ finally:
                 result.append(self.real_execute(mode='validation'))
             except BaseException as error:
                 errors.append(error)
+                raise
         worker = threading.Thread(target=execute)
         worker.start()
         try:
@@ -1860,7 +1465,7 @@ finally:
         self.assertEqual(status, 1)
         self.assertEqual(report['status'], 'failed')
         failed = [row for row in report['consumers'] if row['status'] == 'failed']
-        self.assertTrue(any(row['name'] == 'h743 baremetal' for row in failed))
+        self.assertTrue(any(row['name'] == 'selected f407 frames' for row in failed))
 
 
 if __name__ == "__main__":

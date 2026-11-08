@@ -1,6 +1,6 @@
 # 软件候选与物理资格
 
-平台机制已经实现，当前 [开发验证记录](verification.md) 说明真实执行的范围。
+平台机制已经实现，当前 [开发验证记录](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/delivery/verification.md) 说明真实执行的范围。
 **最终 clean-source SDK／离线双构建／候选封存与物理 HIL 是独立阶段**，不能因
 代码完成、CI 定义或某个 hash 存在就记录为 passed。
 
@@ -17,30 +17,10 @@ HIL fixture 和 station template 位于 `tools/hil/fixtures/`。空 station、�
 Board/PCB/芯片／probe／image/config、失效工具文件或不完整预算会被准入拒绝。
 准备工装不等于已经刷写、串口测试、测量波形或完成掉电试验。
 
-本轮新增 ThreadX、USB FS、浅睡眠 timebase、Ethernet、高级 timer、G474 和
-user I/O broker，以及 H743／U575 GPIO/UART 参考装配的证据各自绑定独立 source
-scope。ThreadX 的真实 Linux 内核
-执行不同于 IRQ/libc 边界模型；三板 BASEPRI/PRIMASK ELF 和缺少 external Tick 的
-精准负链接不同于 MCU 运行。安装 SDK 的 retention-only 永久任务程序只建立链接；
-有限退出的真实 Linux kernel consumer 另外建立运行证据。不能从链接程序的存在
-推断已运行 scheduler，也不能从两个 host case 推断完整 MCU backend 资格。
-
-八个公开单镜像候选配置使用 H743 HSI64／Cache off 和 U575 MSIS4 MHz／
-TZEN=0／SWAP_BANK=0。H743 的 HSI32／Cache on 固定配置及有限 TX DMA、U575
-独立 TZEN=1 双域参考另有各自软件与 ARM 证据，不属于这八个候选配置。
-模型和 ELF 不会观察实际供电、option bytes 或 silicon revision；per-engine
-DMA facts 本身也不建立实际 cache coherence 或安全域隔离。SDK 必须实际用
-当前完整 source closure 构建 H743/U575 公共 consumer；只加入 CMSIS dependency
-的旧包资格不能继承为新增平台资格。精确结果见
-[SoC 扩展执行记录](soc-extensions-verification.md)。
-
-G474 已有真实 typed factory 主机执行、system/provider/EXTI 回归及显式 TOML
-ARM 镜像（empty／selected／EXTI fixture × 裸机／FreeRTOS）。EXTI fixture 的
-PA0/PA1 是软件接线夹具，未获得 PCB 电气资格。镜像预算、操作表保留、未选
-外设裁剪及实际向量字节分别检查；SysTick 的 170 MHz／1 kHz／reload169999
-是编译配置与链接证明，不是时间精度测量。主机 sanitizer 只检查被执行的软件
-路径。参考配置的晶振／PCB／焊桥、硬件时序、同最终 clean HEAD 的 SDK／离线
-复现与新候选有各自退出条件，不能据此把 G474 的其他外设或 ThreadX 记为支持。
+当前重构的生产 SoC 只维护 F4，具体实现限定 F407VE／ZG。已有其他系列的原始
+执行记录保留原源码身份，不成为本轮验收输入。ThreadX、FreeRTOS、Native 内核、
+寄存器模型、ARM 链接与物理执行分别判断；链接程序存在不证明 scheduler 已运行。
+本轮必须重新取得适用的软件结果，不能复用历史测试数量或候选通过值。
 
 USB 的 packet/clock/factory 模型与软件 Board ELF 不提供 VBUS、connector、PHY、
 enumeration 或 flush 周期的物理证明。浅 Sleep 的 1 MHz timer 模型只建立被执行

@@ -1,8 +1,10 @@
 # Classic CAN 的平台机制与接入边界
 
-当前公共接口是 `nexus/io/can.h`，维护 Native、STM32F407 和 GD32F470 的同一
-classic CAN 所有权机制。两款 SoC 只有 CAN 2.0A/B：11/29-bit ID、DATA/RTR、
-0–8-byte DLC；接口拒绝 CAN FD、大于 8 的发送 DLC 和越界 ID。
+当前公共接口是 `nexus/io/can.h`，生产实现归属 `soc/stm32/stm32f4/`，
+精确适配 STM32F407VET6／ZGT6 的 classic CAN。家族目录不表示所有 STM32F4
+器件已完成适配。Native 位于 `tests/support/native/`，仅保留为显式启用的
+主机测试模型。当前硬件模式为 CAN 2.0A/B：11/29-bit ID、DATA/RTR、0–8-byte
+DLC；接口拒绝 CAN FD、大于 8 的发送 DLC 和越界 ID。
 
 ## 静态对象与执行
 
@@ -26,13 +28,12 @@ stop、detach 或 recover 在通知尚未返回时报告 BUSY。
 
 每个装配显式生成一个 `nx_can_filter_domain_t`，拥有主时钟、次时钟、28 个共享
 filter banks、split 与 immutable filter plan。无其他 controller 持有 active bit
-时才允许 domain stop 释放时钟。STM32 CAN2 依赖 CAN1 的时钟/过滤器域；GD32
-CAN1 同样依赖 CAN0。停止一个实例不 reset 主 controller，也不覆盖 peer filters。
+时才允许 domain stop 释放时钟。STM32 CAN2 依赖 CAN1 的时钟/过滤器域。
+停止一个实例不 reset 主 controller，也不覆盖 peer filters。
 
 | SoC | 控制器 | CAN 输入时钟 | TX/RX0/RX1/error IRQ |
 |---|---|---:|---|
 | STM32F407 | CAN1 / CAN2 | APB1 42 MHz | 19/20/21/22；63/64/65/66 |
-| GD32F470 | CAN0 / CAN1 | APB1 50 MHz | 19/20/21/22；63/64/65/66 |
 
 私有绑定用锁定 SDK 的真实寄存器 offset、bit masks、mailbox/FIFO/filter stride、
 CPU IRQ 数和 NVIC priority bits 做编译期/启动期检查。CAN 输入没有 APB timer 的
@@ -40,15 +41,6 @@ CPU IRQ 数和 NVIC priority bits 做编译期/启动期检查。CAN 输入没�
 `clock_hz = bitrate × prescaler × (1 + BS1 + BS2)`；不搜索或替换参数。
 第一版采用单次发送 NART，关闭 ABOM，RX 使用 locked FIFO；过滤器只实现 32-bit
 mask，显式匹配 IDE，可选择匹配 RTR。过滤器归属与 bank/split 范围先验证再写。
-
-GD32F470 的所选模式固定为 identifier-priority（`TFO=0`），不接受 FIFO
-发送顺序。[锁定的官方勘误](../../soc/gd32/gd32f470/references.json) Rev1.6
-§2.13.1 说明 FIFO 顺序的 abort 可能影响另一个 pending mailbox，不能通过隐式
-重发修复；§2.13.2 说明 `TFO=0` 时最大 extended ID `0x1FFFFFFF` 在 mailbox1/2
-不能发送。因此 GD32 两个 controller 都只把该 ID 的 DATA/RTR 帧放入 mailbox0；
-mailbox0 忙时返回 BUSY，request 保持 READY，不写其他 mailbox，也不排队或重发。
-其余 ID 仍可使用三个 mailbox。STM32 不应用这项 GD32 限制。该保守选择覆盖当前
-未观测 silicon revision 的 provider，不声明勘误已在实际芯片修复。
 
 安全装配顺序是：reviewed Board electrical/pin handoff → domain initialize →
 各 controller initialize → 外部执行者启动。cold initialize 在 acknowledged
@@ -97,13 +89,18 @@ CAN2 blob `ef8da679c5e7c7163fe2a48a80b6ce8f9d6ecfaa` 给出 PB12 RX/PB13 TX AF9�
 printed18/physical20 给出 TJA1050 U9/U11、5 V supply、RS 接地、120 Ω R35/R49。
 P21/P15 是人工复用跳帽；不能虚构软件 standby GPIO，也不能把软件 pin claim
 当作实物跳帽证明。CAN1 与 USART1 RTS/CTS、USB FS 的 PA11/PA12 必须拒绝并选。
-天空星与梁山派当前没有审阅的外接 CAN transceiver 路线，不猜 Board binding。
+天空星当前没有审阅的外接 CAN transceiver 路线，不猜 Board binding。
 
-[本轮执行证据](../../tools/testing/evidence/can-iteration/manifest.json) 记录 genuine
-RED/GREEN 与 fresh 30 Native + 8 STM32 + 8 GD32 production register-model cases、
-同三套 ASan/UBSan，以及 GCC14.3 六个严格 ARM compile units。历史 API 链接 RED
-与早期 harness 配置错误分开保留。开发 harness 位于外部工作目录，不能替代仓库
-维护构建注册、配置/factory/向量集成、完整 ARM ELF 或 clean candidate。
+F4 绑定位于 `soc/stm32/stm32f4/drivers/can.c`，控制器机制位于
+`soc/stm32/stm32f4/drivers/ip/classic_can/`；真实硬件定义来自锁定的
+`vendors/st/cmsis_device_f4/`。Native 叶端口位于
+`tests/support/native/drivers/can*`。当前 GoogleTest/GoogleMock、配置／factory／
+向量集成与精确 ARM ELF 分别验证其合同，不由一个旧开发 harness 代替。
+
+[原始跨系列开发证据（历史）](../../tools/testing/evidence/can-iteration/manifest.json)
+保留当时的固定源码哈希、工具身份、RED／GREEN 与执行范围，原始字节不修改。
+其中已退役系列和旧接口的计数不属于当前 F4 候选验收；当前用例数、资源与完整
+门禁结论必须绑定本次提交，不能继承历史通过状态。
 
 物理 CAN 波形、晶振/传播/采样点容差、termination、跳帽/电压、transceiver、
 仲裁/ACK/error 注入、bus-off 恢复时间与最大 IRQ 屏蔽/WCET 均未执行 HIL。

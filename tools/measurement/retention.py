@@ -87,7 +87,7 @@ def provider_initializers(path, source, root):
             if Path(name).name != name:
                 raise EvidenceError("provider template must be a direct private include")
             private = root / "io/private" / name
-            approved = set((root / "drivers").glob("*/*/" + name))
+            approved = set((root / "soc/stm32/stm32f4/drivers/ip").glob("*/" + name))
             if private.is_file():
                 approved.add(private)
             if not approved:
@@ -107,7 +107,8 @@ def provider_initializers(path, source, root):
                 if definition.start() > include.start():
                     raise EvidenceError("provider operations macro must bind before include")
                 owned = set()
-                for directory in (root / "soc", root / "drivers", root / "io"):
+                for directory in (root / "soc/stm32/stm32f4",
+                                  root / "tests/support/native", root / "io"):
                     owned.update(directory.rglob(name))
                 local = path.parent / name
                 if local.is_file():
@@ -171,8 +172,8 @@ def source_contracts(root=ROOT):
             if name in faces:
                 raise EvidenceError("duplicate public face type")
             faces[name] = operations
-    provider_sources = set((root / "soc").rglob("drivers/*.c"))
-    provider_sources.update((root / "drivers").rglob("*.c"))
+    provider_sources = set((root / "soc/stm32/stm32f4/drivers").rglob("*.c"))
+    provider_sources.update((root / "tests/support/native/drivers").rglob("*.c"))
     provider_sources.update((root / "io/src").rglob("*.c"))
     for path in sorted(provider_sources):
         source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
@@ -183,6 +184,10 @@ def source_contracts(root=ROOT):
                 r"\bconst\s+(nx_\w+_ops_t)\s+(nx_\w+_ops)\s*=\s*"
                 r"\{([^{}]*)\}\s*;", initializer)]
         for kind, name, body, template_source in initializers:
+            # Core cold transactions are not public I/O faces. Their callbacks
+            # never participate in the device face-to-method retention audit.
+            if kind == "nx_lifecycle_ops_t":
+                continue
             if name in providers or kind not in layouts:
                 raise EvidenceError(
                     f"unsupported concrete operations initializer: {path}:{name}")
@@ -541,7 +546,7 @@ def inspect_i2s2_component(elf, role, face_types, layouts, providers, root):
     if (provider is None or expected_type is None
             or provider["type"] != expected_type
             or provider["source"] != file_identity(
-                root / "soc/stm32/stm32f407/drivers/i2s2_slave_tx.c")):
+                root / "soc/stm32/stm32f4/drivers/i2s2_slave_tx.c")):
         raise EvidenceError(
             "missing exact I2S2 public/private operations contract")
     slot_names = layouts[expected_type]
@@ -621,10 +626,6 @@ def inspect_i2s2_component(elf, role, face_types, layouts, providers, root):
     return faces, table
 
 
-COMPONENT_OWNER_SMOKES = frozenset((
-    "u575-retained-time", "u575-stop2", "u575-lpdma-copy", "u575-lptim1-lpbam"))
-
-
 SECURE_COMPONENT_OWNER = "f407-secure-services"
 SECURE_ARM_HEAP_SYMBOLS = frozenset({
     "malloc", "calloc", "realloc", "free", "_malloc_r", "_calloc_r",
@@ -673,7 +674,7 @@ def secure_owner_inputs(root, consumer):
 
 def inspect_secure_owner(elf, bindings, resolved, consumer, root):
     """The explicit empty-F407 contract proves components, never factory faces."""
-    if (resolved is None or resolved.get("soc_family") != "stm32f407" or
+    if (resolved is None or resolved.get("soc_family") != "stm32f4" or
             resolved.get("part") != "STM32F407ZGT6" or
             resolved.get("backend") != "baremetal" or
             resolved.get("clock_profile") != "hse8-pll168" or
@@ -718,17 +719,6 @@ def inspect_secure_owner(elf, bindings, resolved, consumer, root):
                             "factory faces, execution, TLS authentication or HIL."]}
 
 
-def component_storage_size(root, stem, macro):
-    """Read the public ARM32 owner extent, rather than guess it from names."""
-    path = root / f"components/soc/stm32/{stem}/include/nexus/components/{stem}.h"
-    source = path.read_text()
-    sizes = re.findall(r"#if UINTPTR_MAX == UINT32_MAX\s+"
-                       r"#define " + macro + r" ([1-9][0-9]*)U", source)
-    if len(sizes) != 1 or f"private_bytes[{macro}]" not in source:
-        raise EvidenceError("unsupported component owner storage contract")
-    return int(sizes[0]), file_identity(path)
-
-
 def component_owner_object(elf, name):
     """Reject executable RAM and aliases, not just a writable section flag."""
     obj, section = linked_object(elf, name, "component owner", writable=True)
@@ -746,170 +736,17 @@ def component_owner_object(elf, name):
 
 def component_owner_input_paths(root):
     """Protect all optional source contracts before mutating the output."""
-    from tools.release.transport import SELECTED_CONSUMERS
     paths = {root / "core/include/nexus/core/time.h",
              root / "tools/release/transport.py"}
     paths.update((root / "io/include/nexus/io").glob("*.h"))
     paths.update((root / "components").rglob("include/nexus/components/*.h"))
     paths.update((root / "components").rglob("src/*.c"))
-    paths.update((root / "soc").rglob("drivers/*.c"))
-    paths.update((root / "drivers").rglob("*.c"))
-    paths.update((root / "drivers").rglob("*.h"))
+    paths.update((root / "soc/stm32/stm32f4/drivers").rglob("*.c"))
+    paths.update((root / "soc/stm32/stm32f4/drivers/ip").rglob("*.h"))
+    paths.update((root / "tests/support/native/drivers").rglob("*.c"))
     paths.update((root / "io/src").rglob("*.c"))
     paths.update((root / "io/private").glob("*.h"))
-    paths.add(root / "soc/stm32/stm32u575/stop2.c")
-    for _, assembly, smoke in SELECTED_CONSUMERS:
-        if smoke in COMPONENT_OWNER_SMOKES:
-            paths.update((root / assembly,
-                root / "cmake/package/verification/io_evolution/consumers" /
-                (smoke + ".c")))
     return {path.resolve() for path in paths}
-
-
-def inspect_component_owner(elf, bindings, resolved, smoke, consumer, root):
-    """Prove explicit public component consumers without factory face claims."""
-    from tools.release.transport import SELECTED_CONSUMERS
-    choices = [item for item in SELECTED_CONSUMERS if item[2] == smoke]
-    if (smoke not in COMPONENT_OWNER_SMOKES or len(choices) != 1
-            or consumer is None or resolved is None):
-        raise EvidenceError(
-            "component owner requires an exact consumer contract")
-    _, assembly, _ = choices[0]
-    canonical = (root / "cmake/package/verification/io_evolution/consumers" /
-                 (smoke + ".c"))
-    consumer_identity = file_identity(Path(consumer))
-    if consumer_identity["sha256"] != file_identity(canonical)["sha256"]:
-        raise EvidenceError(
-            "component owner consumer differs from canonical smoke")
-    expected = {"path": assembly,
-                "sha256": file_identity(root / assembly)["sha256"]}
-    if (expected not in resolved.get("inputs", [])
-            or resolved.get("soc_family") != "stm32u575"
-            or resolved.get("part") != "STM32U575ZIT6Q"
-            or resolved.get("backend") != "baremetal"
-            or resolved.get("clock_profile") != "msis4"
-            or resolved.get("controllers") != []
-            or resolved.get("devices") != []
-            or resolved.get("cpu_profile", {}).get("definitions", {}).get(
-                "NEXUS_ARCH_SECURITY_STATE") != 0
-            or FACE_DECLARATION.search(bindings)):
-        raise EvidenceError(
-            "component owner differs from canonical empty U575 selection")
-    storage_bytes, storage_contract = component_storage_size(
-        root, "stm32u575_retained_time", "NX_U575_RETAINED_TIME_STORAGE_BYTES")
-    state = component_owner_object(elf, "s_clock")
-    face, section = linked_object(elf, "s_clock_face", "retained clock face")
-    if (state["size"] != storage_bytes or state["value"] % 8
-            or face["size"] != 8):
-        raise EvidenceError(
-            "retained clock face/storage differs from public ABI")
-    reader, context = object_words(elf, face, section)
-    method = concrete_method(elf, reader)
-    read_symbol = unique_symbol(elf, "nx_stm32u575_retained_time_now")
-    if (context != state["value"] or read_symbol["binding"] != 1
-            or read_symbol["value"] != reader
-            or "nx_stm32u575_retained_time_now" not in method["symbols"]):
-        raise EvidenceError(
-            "retained clock read/context differs from real owner")
-    faces = [{"name": face["name"], "type": "nx_clock_t", "reader": method,
-              "context": state["name"], "context_address": context,
-              "context_bytes": state["size"],
-              "storage_contract": storage_contract}]
-    spans = [(state["value"], state["size"])]
-    def writable_owner(name):
-        obj = component_owner_object(elf, name)
-        if any(obj["value"] < address + size
-               and address < obj["value"] + obj["size"]
-               for address, size in spans):
-            raise EvidenceError("component owner storage overlaps")
-        spans.append((obj["value"], obj["size"]))
-        return obj
-    methods = ["nx_stm32u575_retained_time_sample"]
-    if smoke == "u575-retained-time":
-        methods.append("nx_stm32u575_retained_time_stop")
-    initializer = "nx_stm32u575_retained_time_initialize"
-    tables = []
-    if smoke != "u575-retained-time":
-        writable_owner("s_owner")
-        writable_owner("s_domain")
-        methods += ["nx_stm32u575_stop2_identity", "nx_stm32u575_stop2_domain",
-                    "nx_stm32u575_stop2_initialize",
-                    "nx_stm32u575_stop2_recover"]
-        methods.append({"u575-stop2": "nx_stm32u575_stop2_enter",
-                        "u575-lpdma-copy": "nx_stm32u575_stop2_copy_enter",
-                        "u575-lptim1-lpbam":
-                            "nx_stm32u575_stop2_lptim1_enter"}[smoke])
-    if smoke in {"u575-lpdma-copy", "u575-lptim1-lpbam"}:
-        suffix = "copy" if smoke == "u575-lpdma-copy" else "lptim1"
-        prefix = "nx_stm32u575_lpdma_" + suffix
-        stem = "stm32u575_lpdma_" + suffix
-        storage_bytes, contract = component_storage_size(
-            root, stem, "NX_U575_LPDMA_" + suffix.upper() + "_STORAGE_BYTES")
-        owner = writable_owner("s_copy" if suffix == "copy" else "s_receiver")
-        if owner["size"] != storage_bytes or owner["value"] % 8:
-            raise EvidenceError(
-                "component owner extent differs from public storage")
-        face, section = linked_object(elf, "s_component_face", "component face")
-        if face["size"] != 8:
-            raise EvidenceError("component face must contain two ARM pointers")
-        operations, context = object_words(elf, face, section)
-        face_types, layouts, providers, _ = source_contracts(root)
-        typename = prefix + "_t"
-        operations_type = face_types.get(typename)
-        provider = providers.get(prefix + "_ops")
-        if provider is None or provider["type"] != operations_type:
-            raise EvidenceError(
-                "component operations differ from public/private contract")
-        table = operations_table(elf, prefix + "_ops", operations_type,
-                                 layouts[operations_type], provider)
-        if (operations != table["address"] or context != owner["value"]
-                or table["null_methods"] != 0):
-            raise EvidenceError(
-                "component face operations/context differ from owner")
-        tables.append(table)
-        faces.append({"name": face["name"], "type": typename,
-                      "context": owner["name"], "context_address": context,
-                      "context_bytes": owner["size"],
-                      "storage_contract": contract})
-        workspace = writable_owner("s_workspace")
-        source = writable_owner("s_source" if suffix == "copy" else "s_tuple")
-        if (workspace["size"] != (24 if suffix == "copy" else 48)
-                or workspace["value"] % 4
-                or any(not 0x28000000 <= obj["value"]
-                       < obj["value"] + obj["size"]
-                       <= 0x28004000 for obj in (workspace, source))):
-            raise EvidenceError(
-                "component SRAM4 workspace/source contract differs")
-        source_section = elf.sections[source["section"]]
-        if source_section["kind"] == 8:
-            raise EvidenceError(
-                "component source requires initialized LOAD bytes")
-        loaded_range(elf, source["value"], source["size"], "component source",
-                     writable=True,
-                     offset=source_section["offset"] + source["value"]
-                     - source_section["address"])
-        methods += [prefix + "_initialize", prefix + "_request_prepare"]
-        if suffix == "copy":
-            initializer += "_alarm_a_copy"
-    entrypoints = []
-    for name in [initializer, *methods]:
-        symbol = unique_symbol(elf, name)
-        if symbol["binding"] != 1:
-            raise EvidenceError(
-                "component entrypoint must be strong public code")
-        entrypoints.append(
-            {"name": name, **concrete_method(elf, symbol["value"])})
-    return {"schema_version": 1, "kind": "linked_component_owner_retention",
-            "status": "passed", "owner_profile": smoke,
-            "face_count": len(faces), "operations_table_count": len(tables),
-            "method_count": 1 + sum(len(table["methods"]) for table in tables),
-            "faces": faces, "tables": tables, "entrypoints": entrypoints,
-            "consumer": consumer_identity,
-            "assembly": file_identity(root / assembly),
-            "physical_status": "not_executed",
-            "limitations": ["Actual linked component references/storage/code; "
-                            "not factory faces, execution or physical "
-                            "qualification."]}
 
 
 def inspect_provider_retention(elf, bindings, *, root=ROOT, resolved=None,
@@ -918,8 +755,7 @@ def inspect_provider_retention(elf, bindings, *, root=ROOT, resolved=None,
     if component_owner == SECURE_COMPONENT_OWNER:
         return inspect_secure_owner(elf, bindings, resolved, consumer_path, root)
     if component_owner is not None:
-        return inspect_component_owner(elf, bindings, resolved, component_owner,
-                                       consumer_path, root)
+        raise EvidenceError("unsupported component owner")
     role = selected_i2s2_role(resolved)
     connections = (selected_faces(bindings) if role is None
                    or FACE_DECLARATION.search(bindings) else [])
@@ -970,347 +806,13 @@ def inspect_provider_retention(elf, bindings, *, root=ROOT, resolved=None,
                             "not execution, electrical or timing evidence."]}
 
 
-
 def unique_symbol(elf, name):
     """A selected proof never chooses among duplicate definitions."""
     matches = [symbol for symbol in elf.defined_symbols
                if symbol["name"] == name]
     if len(matches) != 1:
-        raise EvidenceError("missing or duplicate MPU proof: " + name)
+        raise EvidenceError("missing or duplicate linked symbol: " + name)
     return matches[0]
-
-
-def thumb_branch(address, encoded, *, link=False):
-    """Decode one direct Thumb-2 B.W/BL, including both inverted J bits."""
-    if len(encoded) != 4:
-        raise EvidenceError("MPU entry must be a complete direct Thumb branch")
-    first, second = struct.unpack("<HH", encoded)
-    if first & 0xf800 != 0xf000 or second & 0xd000 != (
-            0xd000 if link else 0x9000):
-        raise EvidenceError("MPU entry has an unsupported direct branch")
-    sign = first >> 10 & 1
-    displacement = (sign << 24 | (~(second >> 13 ^ sign) & 1) << 23 |
-                    (~(second >> 11 ^ sign) & 1) << 22 |
-                    (first & 0x3ff) << 12 | (second & 0x7ff) << 1)
-    if sign:
-        displacement -= 1 << 25
-    return address + 4 + displacement
-
-
-def inspect_mpu_gpio(elf, resolved, providers, *, root=ROOT):
-    """Audit the selected U575 scalar ABI through actual linked LOAD bytes.
-
-    This checks the maintained five-domain layout and bounded startup/veneer
-    shapes, not CPU execution, MPU programming success or physical isolation.
-    Other explicit user helpers are permitted; no application entry name is
-    part of this contract. Default MPU images keep their existing 70-slot ABI.
-    """
-    kernel = resolved.get("kernel_profile", {})
-    if not isinstance(kernel, dict) or kernel.get("user_io") != "gpio-write":
-        return None
-    cpu = resolved.get("cpu", {})
-    definitions = resolved.get("cpu_profile", {}).get("definitions", {})
-    if (resolved.get("soc_family") != "stm32u575" or
-            resolved.get("part") != "STM32U575ZIT6Q" or
-            resolved.get("backend") != "freertos" or
-            resolved.get("clock_profile") != "msis4" or
-            cpu.get("arch") != "cortex-m33" or cpu.get("mpu_version") != 8 or
-            cpu.get("mpu_regions") != 8 or cpu.get("security") != "single" or
-            definitions.get("NEXUS_ARCH_SECURITY_STATE") != 0 or
-            kernel.get("memory_protection") is not True or
-            kernel.get("kernel_port") != "GCC/ARM_CM33_NTZ/non_secure" or
-            kernel.get("security_model") != "single" or
-            kernel.get("tick_source") != "systick" or
-            kernel.get("tickless") is not False):
-        raise EvidenceError("MPU GPIO proof requires the exact selected U575 profile")
-    sizes = resolved.get("memory_budgets", {}).get("mpu")
-    names = ("privileged_flash", "syscall_flash", "user_flash",
-             "privileged_ram", "user_ram")
-    if (not isinstance(sizes, dict) or
-            set(sizes) != {name + "_bytes" for name in names} or
-            any(type(value) is not int or value <= 0 or value % 32
-                for value in sizes.values())):
-        raise EvidenceError("missing or malformed exact MPU reservations")
-    if (resolved.get("layout", {}).get("origin") != 0x08000000 or
-            resolved["layout"].get("size") != 2097152):
-        raise EvidenceError("MPU GPIO Flash facts differ from exact part")
-    ram = [region for region in resolved.get("memory", [])
-           if region.get("linker") is True]
-    if (len(ram) != 1 or ram[0].get("id") != "sram1" or
-            ram[0].get("origin") != 0x20000000 or
-            ram[0].get("size") != 196608):
-        raise EvidenceError("MPU GPIO requires the exact primary SRAM1 facts")
-    domains, cursors = {}, [0x08000000, 0x20000000]
-    for index, name in enumerate(names):
-        cursor = 0 if index < 3 else 1
-        start = cursors[cursor]
-        end = start + sizes[name + "_bytes"]
-        cursors[cursor] = end
-        domains[name] = (start, end)
-        for suffix, expected in (("start", start), ("end", end)):
-            symbol = unique_symbol(elf, "__nexus_" + name + "_" + suffix + "__")
-            if symbol["binding"] != 1 or symbol["value"] != expected:
-                raise EvidenceError("linked MPU reservation differs from resolved size")
-    if cursors[0] > 0x08200000 or cursors[1] > 0x20030000:
-        raise EvidenceError("MPU reservations exceed physical part")
-    for alias, name in (("privileged_functions", "privileged_flash"),
-                        ("syscalls_flash", "syscall_flash"),
-                        ("unprivileged_flash", "user_flash"),
-                        ("privileged_sram", "privileged_ram")):
-        for suffix, expected in (("start", domains[name][0]),
-                                 ("end", domains[name][1] - 1)):
-            if unique_symbol(elf, "__" + alias + "_" + suffix + "__")["value"] != expected:
-                raise EvidenceError("port inclusive bounds differ from MPU reservation")
-
-    def contained(domain, address, size):
-        start, end = domains[domain]
-        return size >= 0 and start <= address <= end and size <= end - address
-
-    for section in elf.sections:
-        if section["flags"] & 2 and section["size"]:
-            possible = names[:3] if not section["flags"] & 1 else names[3:]
-            if not any(contained(name, section["address"], section["size"])
-                       for name in possible):
-                raise EvidenceError("allocated section crosses selected MPU domains")
-
-    def function(name, domain="privileged_flash", *, weak=False):
-        symbol = unique_symbol(elf, name)
-        address = symbol["value"] & ~1
-        if (symbol["type"] != 2 or symbol["size"] <= 0 or
-                not symbol["value"] & 1 or
-                symbol["binding"] == 2 and not weak or
-                not contained(domain, address, symbol["size"])):
-            raise EvidenceError("complete MPU function is outside allowed domain: " + name)
-        if weak:
-            if not 0 <= symbol["section"] < len(elf.sections):
-                raise EvidenceError("invalid reset code section")
-            section = elf.sections[symbol["section"]]
-            if section["flags"] & 7 != 6:
-                raise EvidenceError("reset code is not read-only executable")
-            loaded_range(elf, address, symbol["size"], name, executable=True,
-                         offset=section["offset"] + address - section["address"])
-        else:
-            concrete_method(elf, symbol["value"])
-            section = elf.sections[symbol["section"]]
-        offset = section["offset"] + address - section["address"]
-        return symbol, bytes(elf.data[offset:offset + symbol["size"]])
-
-    def object_at(address, role, domain, *, size=None, writable=False):
-        matching = [symbol for symbol in elf.defined_symbols
-                    if symbol["value"] == address and symbol["type"] == 1]
-        if len(matching) != 1:
-            raise EvidenceError("missing or ambiguous complete MPU " + role)
-        symbol, section = linked_object(elf, matching[0]["name"], role,
-                                         writable=writable)
-        if (symbol["binding"] == 2 or
-                not contained(domain, symbol["value"], symbol["size"]) or
-                size is not None and symbol["size"] != size):
-            raise EvidenceError("complete MPU object differs from protected ABI: " + role)
-        return symbol, section
-
-    required = ("nx_freertos_mpu_gpio_open", "nx_freertos_mpu_gpio_close",
-                "nx_freertos_mpu_gpio_join", "nx_freertos_mpu_gpio_write",
-                "nx_freertos_mpu_task_start", "nx_freertos_mpu_task_delete",
-                "nx_freertos_mpu_layout", "nx_stm32u575_gpio_mpu_validate",
-                "nx_factory_gpio", "nx_gpio_port_write",
-                "nx_stm32u575_mpu_user_initialize", "nx_stm32u575_validate_identity",
-                "nx_arch_irq_save", "vSystemCallEnter", "vSystemCallExit",
-                "xTaskGetCurrentTaskHandle", "xTaskCreateRestrictedStatic",
-                "vTaskDelete")
-    for name in required:
-        function(name)
-    for table in providers["tables"]:
-        object_at(table["address"], "provider operations", "privileged_flash")
-        for method in table["methods"]:
-            for name in method["symbols"]:
-                function(name)
-    for face in providers["faces"]:
-        object_at(face["address"], "provider face", "privileged_flash", size=8)
-
-    services = (("nx_freertos_user_delay", "MPU_vTaskDelay", 6),
-                ("nx_freertos_user_ticks", "MPU_xTaskGetTickCount", 13),
-                ("nx_freertos_user_gpio_write", "MPU_NexusGpioWrite", 70))
-    implementations = {}
-    for wrapper, veneer, slot in services:
-        ws, wb = function(wrapper, "user_flash")
-        vs, vb = function(veneer, "syscall_flash")
-        implementation, _ = function(veneer + "Impl")
-        implementations[slot] = implementation["value"]
-        if thumb_branch(ws["value"] & ~1, wb) != vs["value"] & ~1:
-            raise EvidenceError("Nexus user wrapper does not enter its actual veneer")
-        if slot == 70:
-            if vb != bytes.fromhex("46df0e207047"):
-                raise EvidenceError("GPIO veneer lacks SVC70 and refused-entry CONTEXT fallback")
-        elif (len(vb) != 20 or vb[:14] != bytes.fromhex(
-                "01b4eff3148010f0010f01bc01d1") or
-                vb[18:] != struct.pack("<H", 0xdf00 | slot) or
-                thumb_branch((vs["value"] & ~1) + 14, vb[14:18]) !=
-                implementation["value"] & ~1):
-            raise EvidenceError("pinned delay/tick veneer bytes differ from selected ABI")
-    table, section = linked_object(elf, "uxSystemCallImplementations",
-                                   "protected syscall table", writable=True)
-    if table["size"] != 71 * 4 or not contained(
-            "privileged_ram", table["value"], table["size"]):
-        raise EvidenceError("selected protected syscall table is not exactly 71 slots")
-    offset = section["offset"] + table["value"] - section["address"]
-    loaded_range(elf, table["value"], table["size"], "syscall initial bytes",
-                 writable=True, offset=offset)
-    if any(word != implementations.get(index, 0)
-           for index, word in enumerate(object_words(elf, table, section))):
-        raise EvidenceError("selected syscall table differs from slots 6/13/70")
-
-    abi = {}
-    for role in ("task", "control"):
-        fact = unique_symbol(elf, "__nexus_mpu_gpio_" + role + "_size")
-        if (fact["section"] != 0xfff1 or fact["binding"] != 1 or
-                fact["type"] != 0 or fact["size"] != 0 or
-                not 0 < fact["value"] <= 196608 or fact["value"] % 8):
-            raise EvidenceError("missing compiled selected production sizeof fact")
-        abi[role] = fact["value"]
-    binding, bs = linked_object(elf, "nx_freertos_mpu_gpio_binding", "GPIO binding")
-    if binding["size"] != 12 or not contained(
-            "privileged_flash", binding["value"], 12):
-        raise EvidenceError("GPIO binding is not wholly privileged read-only")
-    control, task, grant = object_words(elf, binding, bs)
-    object_at(control, "authority", "privileged_ram", size=abi["control"], writable=True)
-    object_at(task, "protected task", "privileged_ram", size=abi["task"], writable=True)
-    if (control % 8 or task % 8 or
-            control < task + abi["task"] and task < control + abi["control"]):
-        raise EvidenceError("protected task and authority overlap or misalign")
-    grant_object, gs = object_at(grant, "grant", "privileged_flash", size=12)
-    slot_address, device, mask = object_words(elf, grant_object, gs)
-    slot, ss = object_at(slot_address, "GPIO slot", "privileged_flash", size=4)
-    if (device != 0 or mask != 0x80 or slot["name"] != "nx_binding_led" or
-            not any(controller.get("kind") == "gpio" and
-                    controller.get("id") == "led" and
-                    controller.get("controller") == "GPIOC" and
-                    controller.get("mask") == 0x80 and
-                    controller.get("mode") == "output" and
-                    controller.get("route") == "gpio-pc7"
-                    for controller in resolved.get("controllers", []))):
-        raise EvidenceError("GPIO grant differs from exact PC7 WRITE reference")
-    face_address, = object_words(elf, slot, ss)
-    face, fs = object_at(face_address, "granted face", "privileged_flash", size=8)
-    if not any(f["address"] == face_address and
-               f["operations"] == "nx_stm32u575_gpio_ops" for f in providers["faces"]):
-        raise EvidenceError("GPIO grant is not a selected concrete U575 face")
-    _, context = object_words(elf, face, fs)
-    owner, _ = object_at(context, "GPIO context", "privileged_ram", writable=True)
-    if any(context < address + size and address < context + owner["size"]
-           for address, size in ((task, abi["task"]), (control, abi["control"]))):
-        raise EvidenceError("GPIO context overlaps protected task or authority")
-
-    initialization = {}
-    for role, section_name in (("data", ".nx_mpu_user_data"),
-                               ("bss", ".nx_mpu_user_bss")):
-        start = unique_symbol(elf, "__nx_mpu_user_" + role + "_start")["value"]
-        end = unique_symbol(elf, "__nx_mpu_user_" + role + "_end")["value"]
-        matching = [s for s in elf.sections if s["name"] == section_name]
-        if ((start | end) & 31 or start > end or
-                not contained("user_ram", start, end - start) or
-                len(matching) != 1 or matching[0]["address"] != start or
-                matching[0]["size"] != end - start or
-                matching[0]["flags"] & 7 != 3 or
-                (matching[0]["kind"] == 8) != (role == "bss")):
-            raise EvidenceError("complete user RAM initialization bounds differ from ELF")
-        initialization[role] = (start, end)
-        if role == "data":
-            load = unique_symbol(elf, "__nx_mpu_user_data_load")["value"]
-            if load % 32 or not contained("privileged_flash", load, end - start):
-                raise EvidenceError("user DATA source is outside privileged Flash")
-            loads = [item for item in elf.loads
-                     if item["virtual"] == start and item["physical"] == load and
-                     item["offset"] == matching[0]["offset"] and
-                     item["files"] == end - start and item["flags"] == 6]
-            if len(loads) != 1:
-                raise EvidenceError("user DATA load bytes do not match reset source")
-    if (initialization["data"][0] < initialization["bss"][1] and
-            initialization["bss"][0] < initialization["data"][1]):
-        raise EvidenceError("user DATA and BSS overlap")
-
-    def flash_bytes(address, size):
-        if not contained("privileged_flash", address, size):
-            raise EvidenceError("startup literal leaves privileged Flash")
-        sections = [section for section in elf.sections
-                    if section["flags"] & 3 == 2 and section["kind"] != 8 and
-                    section["address"] <= address and
-                    address + size <= section["address"] + section["size"]]
-        if len(sections) != 1:
-            raise EvidenceError("startup literal lacks unique read-only section")
-        section = sections[0]
-        offset = section["offset"] + address - section["address"]
-        loaded_range(elf, address, size, "startup literal", offset=offset)
-        return bytes(elf.data[offset:offset + size])
-
-    # A presence-only call scan accepts unreachable BLs after an early return.
-    # Audit the supported normal startup body, with all direct call targets
-    # decoded separately. Unknown compiler shapes fail closed.
-    reset, rb = function("Reset_Handler", weak=True)
-    system, sb = function("SystemInit")
-    boot, bb = function("nx_stm32u575_mpu_user_boot")
-    reset_address = reset["value"] & ~1
-    if (elf.entry != reset["value"] or rb[:4] != bytes.fromhex("dff834d0") or
-            thumb_branch(reset_address + 4, rb[4:8], link=True) !=
-            system["value"] & ~1):
-        raise EvidenceError("normal Reset must call SystemInit before primary RAM setup")
-    stack = unique_symbol(elf, "_estack")["value"]
-    if (stack != domains["privileged_ram"][1] or
-            struct.unpack("<I", flash_bytes(reset_address + 56, 4))[0] != stack or
-            struct.unpack("<2I", flash_bytes(domains["privileged_flash"][0], 8)) !=
-            (stack, reset["value"])):
-        raise EvidenceError("normal vector/reset stack is not wholly privileged")
-    expected = bytearray.fromhex(
-        "10b5124cd4f8883043f47003c4f88830"
-        "0000000000000000"
-        "4ff00063a360e2680b4b22f4e0621204120c1343e360"
-        "000000000000000000000000"
-        "10b100000000fee7000000000028f8d010bd"
-        "00ed00e00003fa05")
-    call_targets = ((16, "nx_arch_dsb"), (20, "nx_arch_isb"),
-                    (46, "nx_arch_dsb"), (50, "nx_arch_isb"),
-                    (54, "nx_stm32u575_validate_identity"),
-                    (60, "nx_arch_irq_save"),
-                    (66, "nx_stm32u575_mpu_user_boot"))
-    actual = bytearray(sb)
-    for offset, name in call_targets:
-        target, _ = function(name)
-        if thumb_branch((system["value"] & ~1) + offset,
-                        sb[offset:offset + 4], link=True) != target["value"] & ~1:
-            raise EvidenceError("normal SystemInit call differs from protected startup")
-        actual[offset:offset + 4] = bytes(4)
-    if actual != expected:
-        raise EvidenceError("SystemInit lacks reachable guarded identity/user-boot startup")
-    if (len(bb) != 44 or bb[:30] != bytes.fromhex(
-            "30b5094d91b001ac0fcd0fc40fcd0fc40fcd0fc4"
-            "95e8070084e8070001a8") or
-            bb[34:40] != bytes.fromhex("11b030bd00bf") or
-            thumb_branch((boot["value"] & ~1) + 30, bb[30:34], link=True) !=
-            unique_symbol(elf, "nx_stm32u575_mpu_user_initialize")["value"] & ~1):
-        raise EvidenceError("real user boot lacks the reachable bounded initializer")
-    plan_address, = struct.unpack("<I", bb[40:44])
-    plan = struct.unpack("<15I", flash_bytes(plan_address, 60))
-    data, bss = initialization["data"], initialization["bss"]
-    expected_plan = tuple(word for name in names for word in domains[name])
-    expected_plan += (unique_symbol(elf, "__nx_mpu_user_data_load")["value"],
-                      *data, *bss)
-    if plan != expected_plan:
-        raise EvidenceError("actual startup plan differs from user DATA/BSS/linker bounds")
-    proof_sources = [file_identity(root / path) for path in (
-        "os/freertos/mpu/gpio.c", "os/freertos/mpu/syscalls.c",
-        "os/freertos/mpu/task.c", "os/freertos/mpu/prepare_port.py",
-        "tools/configure/memory.py", "soc/stm32/stm32u575/system.c",
-        "soc/stm32/stm32u575/mpu_user_init.c",
-        "os/freertos/include/nexus/os/freertos_mpu_gpio.h",
-        "os/freertos/include/nexus/os/freertos_mpu.h",
-        "os/freertos/include/nexus/os/freertos_user.h",
-        "soc/stm32/stm32u575/drivers/gpio.c")]
-    return {"status": "passed", "kind": "selected_u575_mpu_gpio_linked_layout",
-            "domains": {name: list(span) for name, span in domains.items()},
-            "task_bytes": abi["task"], "control_bytes": abi["control"],
-            "syscall_slots": [6, 13, 70], "proof_sources": proof_sources,
-            "physical_status": "not_executed",
-            "limitations": ["Static linked bounds, pointer bytes, veneers and "
-                            "maintained startup shape; not runtime MPU isolation."]}
 
 
 def inspect_files(elf_path, bindings_path, *, resolved_path=None, root=ROOT,
@@ -1328,10 +830,6 @@ def inspect_files(elf_path, bindings_path, *, resolved_path=None, root=ROOT,
     report = inspect_provider_retention(
         elf, bindings_path.read_text(), root=root, resolved=resolved,
         component_owner=component_owner, consumer_path=consumer_path)
-    if resolved is not None:
-        mpu = inspect_mpu_gpio(elf, resolved, report, root=root)
-        if mpu is not None:
-            report["mpu_gpio"] = mpu
     report["elf"] = file_identity(elf_path)
     report["bindings"] = file_identity(bindings_path)
     if resolved_path is not None:
@@ -1347,7 +845,7 @@ def main(arguments=None):
     parser.add_argument("--resolved", type=Path,
                         help="bind current CPU ABI, linked configuration and declared inputs")
     parser.add_argument("--component-owner",
-                        choices=sorted(COMPONENT_OWNER_SMOKES | {SECURE_COMPONENT_OWNER}))
+                        choices=(SECURE_COMPONENT_OWNER,))
     parser.add_argument("--consumer", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(arguments)

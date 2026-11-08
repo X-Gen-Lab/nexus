@@ -4,9 +4,9 @@ from importlib import import_module
 from tools.configure.providers import descriptor
 from tools.configure.providers.common import fail
 
-def maintained(family):
+def maintained(family, *, test_support=False):
     """Reject a family until its capability and emission contract is maintained."""
-    selected = descriptor.maintained(family)
+    selected = descriptor.maintained(family, test_support=test_support)
     # Only the selected exact family participates in the configuration import
     # graph. Python caches the explicit module; no filesystem discovery occurs.
     directory = selected.configuration_directory

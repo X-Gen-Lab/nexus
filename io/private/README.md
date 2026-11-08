@@ -9,9 +9,9 @@
 | `io/src/api/` | 公共检查与分派 |
 | `io/src/mechanisms/` | 可复用 I/O 执行规则 |
 | `io/private/` | 无硬件依赖的验证、分段传输序列的所有权身份和有界日历运算 |
-| `drivers/<kind>/<reviewed-ip>/` | CAN、USB FS、Ethernet、定时器、FIFO、引脚状态实现 |
-| `soc/native/drivers/` | 独立宿主模型 |
-| `soc/<vendor>/<family>/drivers/` | 精确 MCU 适配实现 |
+| `soc/stm32/stm32f4/drivers/ip/` | F4 私有 CAN、USB FS、Ethernet、定时器和 I2C 算法 |
+| `tests/support/native/drivers/` | 显式测试 scope 的独立宿主模型 |
+| `soc/stm32/stm32f4/drivers/` | 当前 F407VE／ZG 具体模式和资源生命周期 |
 
 SoC 适配层提供真实寄存器和时钟事实、IRQ／DMA 绑定及受审硅片语义。私有构建期
 头文件依赖不选择源码，不增加运行时分派；具体 SoC 的 CMake 目标仍拥有每个编入

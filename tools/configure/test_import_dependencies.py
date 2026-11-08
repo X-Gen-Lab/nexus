@@ -1,30 +1,25 @@
-"""Imported SDK headers retain their separately pinned compiler dependencies."""
+"""Selected STM32F4 SDK sources retain their precise CMSIS dependencies."""
+
 from pathlib import Path
 import unittest
-from unittest.mock import patch
 
 from tools.configure import configure
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSEMBLY = ROOT / "tools/configure/assemblies/gd32-f303-baremetal-io.toml"
+ASSEMBLY = ROOT / "tools/configure/assemblies/qiming-baremetal.toml"
 
 
 class ImportedDependencyContracts(unittest.TestCase):
-    def test_imported_family_also_binds_its_pinned_cmsis_core(self):
+    def test_selected_family_binds_the_locked_core_device_and_hal(self):
         result = configure.resolve_ir(ASSEMBLY, ROOT)
         records = {item["path"]: item for item in result.source_dependencies}
-        self.assertEqual(records["vendors/arm/CMSIS_6"]["commit"],
-                         "af1b110e46a1720349f6f125e386e126767699bd")
-        self.assertEqual(records["vendors/gigadevice/gd32f30x"]["kind"],
-                         "vendor-source-import")
-
-    def test_auxiliary_git_identity_failure_cannot_be_ignored(self):
-        with patch.object(configure, "dependency_identity",
-                               side_effect=configure.ConfigurationError(
-                                   "auxiliary CMSIS identity changed")):
-            with self.assertRaisesRegex(configure.ConfigurationError,
-                                        "auxiliary CMSIS identity changed"):
-                configure.resolve_ir(ASSEMBLY, ROOT)
+        expected = {
+            "vendors/arm/CMSIS_6": "af1b110e46a1720349f6f125e386e126767699bd",
+            "vendors/st/cmsis_device_f4": "3c77349ce04c8af401454cc51f85ea9a50e34fc1",
+            "vendors/st/stm32f4_hal": "b6f0ed3829f3829eb358a2e7417d80bba1a42db7",
+        }
+        self.assertEqual({path: record["commit"] for path, record in records.items()},
+                         expected)
 
 
 if __name__ == "__main__":

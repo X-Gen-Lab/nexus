@@ -22,10 +22,6 @@ void nx_spi_multi_reset(volatile uint32_t* reset, uint32_t mask, bool active);
 #define NX_STM32_DMA_DISABLE(stream, mask)                                     \
     nx_spi_multi_dma_disable(&(stream)->CR, (mask))
 #define NX_STM32_SPI_DMA_ACK(clear, mask) nx_spi_multi_dma_ack((clear), (mask))
-#define NX_GD32_SPI_DMA_CONTROL_DISABLE(control, mask)                         \
-    nx_spi_multi_dma_disable((control), (mask))
-#define NX_GD32_SPI_DMA_FLAGS_ACK(clear, mask)                                 \
-    nx_spi_multi_dma_ack((clear), (mask))
 #define NX_STM32_SPI_RESET(reset, mask, active)                                \
     nx_spi_multi_reset((reset), (mask), (active))
 #endif

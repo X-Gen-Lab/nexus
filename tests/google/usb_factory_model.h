@@ -5,7 +5,6 @@
  */
 #ifndef NEXUS_USB_FACTORY_MODEL_H
 #define NEXUS_USB_FACTORY_MODEL_H
-#ifdef NX_USB_FACTORY_STM32
 #include "stm32f407xx.h"
 #ifdef __cplusplus
 extern "C" {
@@ -17,7 +16,6 @@ extern NVIC_Type g_nx_usb_factory_nvic;
 #endif
 #undef NVIC
 #define NVIC (&g_nx_usb_factory_nvic)
-#endif
 typedef __UINT32_TYPE__ nx_usb_factory_register_t;
 #ifdef __cplusplus
 extern "C" {

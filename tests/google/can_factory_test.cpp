@@ -11,14 +11,8 @@ extern "C" {
 #include "nexus/io/native/model.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#ifdef NX_CAN_FACTORY_STM32
 #include "stm32f407_can_cold.h"
 #include "stm32f407_provider.h"
-#else
-#include "gd32f470_can_cold.h"
-#include "gd32f470_provider.h"
-#include "gd32f4xx_can.h"
-#endif
 }
 #include <cstring>
 #include <gmock/gmock.h>
@@ -42,7 +36,6 @@ class CanAssemblyPorts {
 };
 static CanAssemblyPorts* s_ports;
 
-#ifdef NX_CAN_FACTORY_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
 NVIC_Type g_nx_can_factory_nvic;
@@ -86,39 +79,6 @@ extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* gpio, uint8_t pin,
         (reinterpret_cast<uintptr_t>(gpio) - GPIOA_BASE) / 0x400U);
     return s_ports->Configure(index, pin);
 }
-#else
-extern "C" {
-NVIC_Type g_gd32_model_nvic;
-}
-/** \brief Model only the external system admission result. */
-extern "C" nx_result_t nx_gd32_soc_preflight(void) {
-    return s_ports->Preflight();
-}
-extern "C" int nx_gd32_soc_start(void) {
-    return s_ports->Start();
-}
-extern "C" int nx_gd32_soc_stop(void) {
-    return s_ports->Stop();
-}
-extern "C" nx_result_t nx_gd32_gpio_clock_enable(unsigned index) {
-    nx_result_t result = s_ports->EnableClock(index);
-    if (result == NX_SUCCESS) {
-        RCU_AHB1EN |= 1U << index;
-    }
-    return result;
-}
-extern "C" uint16_t nx_gd32_pin_capture(uint32_t gpio, unsigned pin) {
-    return s_ports->Capture((gpio - GPIOA) / 0x400U, pin);
-}
-extern "C" void nx_gd32_pin_restore(uint32_t gpio, unsigned pin,
-                                    uint16_t state) {
-    s_ports->Restore((gpio - GPIOA) / 0x400U, pin, state);
-}
-extern "C" nx_result_t nx_gd32_pin_configure(uint32_t gpio, unsigned pin,
-                                             uint8_t, uint8_t, uint8_t, bool) {
-    return s_ports->Configure((gpio - GPIOA) / 0x400U, pin);
-}
-#endif
 
 class CanFactory : public testing::Test {
   protected:
@@ -150,11 +110,7 @@ class CanFactory : public testing::Test {
         ASSERT_NE(second, nullptr);
         first_state = static_cast<nx_can_controller_t*>(first->context);
         second_state = static_cast<nx_can_controller_t*>(second->context);
-#ifdef NX_CAN_FACTORY_STM32
         uintptr_t base = CAN1_BASE;
-#else
-        uintptr_t base = CAN0;
-#endif
         first_hw = reinterpret_cast<nx_native_can_registers_t*>(base);
         second_hw = reinterpret_cast<nx_native_can_registers_t*>(base + 0x400U);
         first_hw->registers[2] = 7U << 26U;
@@ -197,11 +153,7 @@ TEST_F(CanFactory, BasePreflightRejectsBeforeClockPinAndControllerEffects) {
     testing::Mock::VerifyAndClearExpectations(&ports);
 }
 TEST_F(CanFactory, SelectedForeignPendingIrqRejectsBeforeClockOrPinEffects) {
-#ifdef NX_CAN_FACTORY_STM32
     const unsigned irq = static_cast<unsigned>(CAN1_TX_IRQn);
-#else
-    const unsigned irq = static_cast<unsigned>(CAN0_TX_IRQn);
-#endif
     const unsigned word = irq / 32U;
     const uint32_t bit = 1U << (irq % 32U);
     NVIC->ISPR[word] = bit;
@@ -331,7 +283,6 @@ TEST_F(CanFactory, SecondPinFailureRestoresOnlyTheCapturedLeases) {
     EXPECT_EQ(result.remaining_effects, 0U);
 }
 
-#ifdef NX_CAN_FACTORY_STM32
 TEST_F(CanFactory, RejectedAlienReceiptCannotStopTheLiveGeneratedOwner) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
     uint16_t saved[2] = {};
@@ -355,8 +306,6 @@ TEST_F(CanFactory, RejectedAlienReceiptCannotStopTheLiveGeneratedOwner) {
     EXPECT_EQ(first_state->domain->active_mask, 3U);
 }
 
-#endif
-
 TEST_F(CanFactory, RefusedPadRestoreRetainsDomainAndTheExactPadUntilRetry) {
     bool changed = false;
     bool refuse_restore = true;
@@ -376,81 +325,11 @@ TEST_F(CanFactory, RefusedPadRestoreRetainsDomainAndTheExactPadUntilRetry) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
     EXPECT_EQ(nx_platform_stop(), NX_ERROR_IO);
     EXPECT_TRUE(changed);
-#ifdef NX_CAN_FACTORY_STM32
     EXPECT_NE(RCC->APB1ENR & RCC_APB1ENR_CAN1EN, 0U);
     EXPECT_NE(RCC->AHB1ENR & RCC_AHB1ENR_GPIOBEN, 0U);
-#else
-    EXPECT_NE(RCU_APB1EN & RCU_APB1EN_CAN0EN, 0U);
-    EXPECT_NE(RCU_AHB1EN & RCU_AHB1EN_PBEN, 0U);
-#endif
     EXPECT_EQ(nx_platform_start().primary, NX_ERROR_STATE);
     refuse_restore = false;
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
     EXPECT_FALSE(changed);
-#ifdef NX_CAN_FACTORY_STM32
     EXPECT_EQ(RCC->APB1ENR & (RCC_APB1ENR_CAN1EN | RCC_APB1ENR_CAN2EN), 0U);
-#else
-    EXPECT_EQ(RCU_APB1EN & (RCU_APB1EN_CAN0EN | RCU_APB1EN_CAN1EN), 0U);
-#endif
 }
-
-#ifndef NX_CAN_FACTORY_STM32
-TEST_F(CanFactory, UnsupportedFifoOrderRejectsBeforeColdPinOrDomainEffects) {
-    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
-    ASSERT_EQ(nx_platform_stop(), NX_SUCCESS);
-    uint16_t snapshots[2]{};
-    const nx_gd32_platform_pin_config_t pins[] = {
-        {GPIOA, &snapshots[0], 0U, 11U}, {GPIOA, &snapshots[1], 0U, 12U}};
-    nx_gd32_can_config_t config{};
-    config.domain = first_state->domain;
-    config.events = first_state->events;
-    config.pins = pins;
-    config.capacity = first_state->capacity;
-    config.timing = first_state->timing;
-    config.irq_policy = first_state->irq_policy;
-    config.drain_timeout_us = first_state->drain_timeout_us;
-    config.poll_limit = first_state->poll_limit;
-    config.mode = first_state->mode;
-    config.index = first_state->index;
-    config.priority = first_state->sources[0].priority;
-    config.fifo_order = true;
-    uint8_t leases = 0U;
-    const auto* bytes = static_cast<const uint8_t*>(mapping);
-    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
-    const nx_can_controller_t prior = *first_state;
-    /* A forbidden hardware call returns safely so a failed assertion never
-     * lets this negative mode test proceed into unrelated acquisition. */
-    ON_CALL(ports, EnableClock(_)).WillByDefault(Return(NX_ERROR_IO));
-    EXPECT_CALL(ports, EnableClock(_)).Times(0);
-    EXPECT_CALL(ports, Configure(_, _)).Times(0);
-    EXPECT_CALL(ports, Capture(_, _)).Times(0);
-    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
-    EXPECT_EQ(nx_gd32_can_prepare(first_state, &config, &leases),
-              NX_ERROR_UNSUPPORTED);
-    EXPECT_EQ(std::memcmp(&prior, first_state, sizeof(prior)), 0);
-    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
-    EXPECT_EQ(leases, 0U);
-    testing::Mock::VerifyAndClearExpectations(&ports);
-}
-TEST_F(CanFactory, AbsentColdReceiptCannotStopActiveController) {
-    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
-    const nx_can_controller_t prior = *first_state;
-    const nx_can_filter_domain_t domain_before = *first_state->domain;
-    uint16_t snapshots[2]{};
-    const nx_gd32_platform_pin_config_t pins[] = {
-        {GPIOA, &snapshots[0], 0U, 11U}, {GPIOA, &snapshots[1], 0U, 12U}};
-    nx_gd32_can_config_t config{};
-    config.pins = pins;
-    uint8_t leases = 0U;
-    const auto* bytes = static_cast<const uint8_t*>(mapping);
-    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
-    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
-    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_can_close(first_state, &config, &leases));
-    EXPECT_EQ(0, std::memcmp(&prior, first_state, sizeof(prior)));
-    EXPECT_EQ(0, std::memcmp(&domain_before, first_state->domain,
-                             sizeof(domain_before)));
-    EXPECT_EQ(0U, leases);
-    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
-    testing::Mock::VerifyAndClearExpectations(&ports);
-}
-#endif

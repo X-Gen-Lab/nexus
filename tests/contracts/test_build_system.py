@@ -107,7 +107,7 @@ class BuildSystemTests(unittest.TestCase):
 
     def tls_fixture(self, optimization):
         """Use the real TLS helper from a separate C11 composition directory."""
-        assembly_path = ROOT / "tools/configure/assemblies/native-empty.toml"
+        assembly_path = ROOT / "tests/support/native/assemblies/native-empty.toml"
         assembly = assembly_path.read_text()
         (self.source / "assembly.toml").write_text(assembly.replace(
             'optimization = "Os"', f'optimization = "{optimization}"'))
@@ -124,6 +124,7 @@ class BuildSystemTests(unittest.TestCase):
             'set(NEXUS_ASSEMBLY_FILE\n'
             '    "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")\n'
             'set(NEXUS_BUILD_TESTS OFF)\n'
+            'set(NEXUS_TEST_SUPPORT ON)\n'
             'set(NEXUS_BUILD_WORKLOAD OFF)\n'
             f'add_subdirectory("{ROOT.as_posix()}" nexus-sdk)\n'
             'nexus_add_tls()\n'
@@ -202,7 +203,8 @@ class BuildSystemTests(unittest.TestCase):
         self.run_command(self.cmake, "-S", str(ROOT), "-B", str(self.build),
                          "-G", "Ninja", "-DNEXUS_BUILD_TESTS=OFF",
                          "-DNEXUS_BUILD_WORKLOAD=ON",
-                         f"-DNEXUS_ASSEMBLY_FILE={ROOT}/tools/configure/"
+                         "-DNEXUS_TEST_SUPPORT=ON",
+                         f"-DNEXUS_ASSEMBLY_FILE={ROOT}/tests/support/native/"
                          "assemblies/native-empty.toml")
         commands = json.loads((self.build / "compile_commands.json").read_text())
         command = next(entry["command"] for entry in commands

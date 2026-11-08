@@ -161,9 +161,8 @@ read 或 read/write 权限，使用真实 CMSE 指令并同时检查安全归属
 成功只是当时的权限观察，不 pin/copy/borrow，不鉴别 gateway 调用者，不证明
 RAM、DMA 可达性、对象生命周期、总线防火墙或实际访问不会 fault，也不屏蔽
 中断或冻结另一世界。集成者必须排除 MMIO、阻止归属和映射变化，并单独复制输入
-快照、在不可逆效果前验证输出。U575 的独立同步双域参考显式提供这些 owner
-前提；它不是任意用户地址空间、异步 DMA 或 NS RTOS 的通用 transport。具体
-边界见 [U575 双域合同](u575-trustzone-contract.md)。
+快照、在不可逆效果前验证输出。具体安全世界和 gateway owner 必须由精确集成
+提供；当前 F4 支持包不声明 TrustZone 接入或泛用异步跨域 transport。
 
 ## 验证与可支持性
 
@@ -184,10 +183,6 @@ restore、查询和 barrier 也分别检查，不能用同一目标内另一个�
 
 本轮执行证据由当前源码重新生成；正式 clean-source SDK、离线双构建和 candidate
 封存还须遵循 [qualification](../delivery/qualification.md)。旧 HEAD 的通过数、
-candidate 或硬件状态不能继承。F407/F470 三板维护首发模式，G474/H743/U575
-参考装配另行维护具体 startup、timebase、GPIO 和 IRQ UART；G474 增加 selected
-EXTI，H743 增加固定 Cache 配置和有限 TX DMA，U575 另有独立无 OS 的同步双域
-参考。它们不由 CPU profile 自动生成，也不建立 DMA/cache/security 全功能支持。
-M7 冷 Cache 另有真实 leaf 指令门禁，U575 双域另有实际 SG／BLXNS、双 ELF
-地址和 LOAD 映射门禁；这些结果仍不能证明芯片物理隔离或一致性。全部实板 HIL
-未执行。软件模型或成功编译不提升产品 release。
+candidate 或硬件状态不能继承。当前生产 SoC 入口只有 F4，已迁入 F407VE／ZG。
+通用 M7 Cache 和其他 CPU-only 原语仍按自身软件范围验证，不重新建立已退出芯片
+的 SoC 支持。全部物理 HIL 未执行，成功编译不升级产品发布资格。

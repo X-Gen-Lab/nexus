@@ -353,11 +353,14 @@ def load_manifest(package_root, *, root=None):
     return record
 
 
-def select(value, *, family, root, assembly_directory):
+def select(value, *, family, root, assembly_directory, test_support=False):
     """Choose one explicit package; an external identity never shadows builtins."""
+    if family == "native" and not test_support:
+        fail("Native host model requires explicit test support")
     if value is None:
-        selected = descriptor.maintained(family)
-        return ProviderContext(root, selected, maintained(family))
+        selected = descriptor.maintained(family, test_support=test_support)
+        return ProviderContext(root, selected,
+                               maintained(family, test_support=test_support))
     if not isinstance(value, str) or not value:
         fail("soc_package requires an explicit directory path")
     manifest = load_manifest(value, root=assembly_directory)

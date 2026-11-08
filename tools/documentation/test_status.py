@@ -5,7 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.documentation import status
+from tools.documentation import check, status
 
 
 class StatusTests(unittest.TestCase):
@@ -211,6 +211,31 @@ class AuthorityMappingTests(unittest.TestCase):
 
     def test_unique_authority_and_existing_site_targets_pass(self):
         self.assertEqual(status.check_mapping(self.root)["errors"], [])
+
+    def test_source_scan_checks_declared_authority(self):
+        self.rows[0]["authority_source"] = "docs/missing.md"
+        self.write()
+        report = check.scan(self.root, check_diagrams=False,
+                            check_configuration=False, check_navigation=False)
+        self.assertIn("missing authority docs/missing.md",
+                      " ".join(report["errors"]))
+
+    def test_source_scan_accepts_valid_mapping_without_unselected_ledgers(self):
+        report = check.scan(self.root, check_diagrams=False,
+                            check_configuration=False, check_navigation=False)
+        self.assertEqual(report["errors"], [])
+
+    def test_retained_history_cannot_be_declared_as_current_site_target(self):
+        record = self.root / "docs/delivery/verification.md"
+        record.parent.mkdir()
+        original = b"# Frozen original\n[retired](removed.md)\n"
+        record.write_bytes(original)
+        self.rows[0]["actual_site_paths"] = "delivery/verification"
+        self.write()
+        errors = status.check_mapping(self.root)["errors"]
+        self.assertIn("missing site target delivery/verification",
+                      " ".join(errors))
+        self.assertEqual(record.read_bytes(), original)
 
     def test_duplicate_source_and_blank_reader_task_fail(self):
         self.rows.append(dict(self.rows[0]))

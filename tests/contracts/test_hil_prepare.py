@@ -10,16 +10,16 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class HilPreparationTests(unittest.TestCase):
     def setUp(self):
-        self.fixture = json.loads((ROOT / "tools/hil/fixtures/gd32f470_liangshan.json").read_text())
+        self.fixture = json.loads((ROOT / "tools/hil/fixtures/stm32f407_qiming_v31.json").read_text())
         self.resolved = {"board": self.fixture["board"],
                          "part": self.fixture["part"], "backend": "baremetal",
                          "controllers": [
                              {"id": "console", "kind": "uart", "mode": "irq-byte-event",
-                              "controller": "USART0", "baud": 115200,
+                              "controller": "USART1", "baud": 115200,
                               "pins": [{"function": "tx", "pin": "PA9"},
                                        {"function": "rx", "pin": "PA10"}]},
                              {"id": "sensor", "kind": "adc", "mode": "trigger-block",
-                              "controller": "ADC0", "pins": []}]}
+                              "controller": "ADC1", "pins": []}]}
 
     def prepare(self, resolved=None):
         from tools.hil.prepare import preparation_plan
@@ -65,7 +65,7 @@ class HilPreparationTests(unittest.TestCase):
         self.assertEqual(fixture, self.fixture)
         self.assertEqual(resolved, self.resolved)
 
-    def test_three_station_plans_retain_dma_stream_and_wake_measurements(self):
+    def test_current_station_plans_retain_dma_stream_and_wake_measurements(self):
         required = {"irq_executor_wake", "uart_rx_block", "adc_trigger_block",
                     "dma_memory_domain", "multi_controller_isolation"}
         for path in (ROOT / "tools/hil/fixtures").glob("*.json"):

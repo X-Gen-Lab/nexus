@@ -61,7 +61,18 @@ class ProjectCreationTests(unittest.TestCase):
 
     def create(self):
         projects = importlib.import_module("tools.dev.projects")
-        return projects.create(self.repo, self.revision, "native", self.output)
+        return projects.create(self.repo, self.revision, "native", self.output, test_support=True)
+
+    def test_native_project_requires_explicit_test_support(self):
+        from tools.dev import projects
+        with self.assertRaisesRegex(ValueError, "test.support|test support"):
+            projects.create(self.repo, self.revision, "native", self.output)
+        self.assertFalse(self.output.exists())
+        result = projects.create(self.repo, self.revision, "native", self.output,
+                                 test_support=True)
+        self.assertIn("--test-support", result["validation"]["argv"])
+        self.assertIn("-DNEXUS_TEST_SUPPORT=ON",
+                      result["commands"]["configure"])
 
     def selected_source(self, *, family="native", arch=None, mutation=""):
         source = self.root / "independent platform with spaces"
@@ -80,6 +91,7 @@ class ProjectCreationTests(unittest.TestCase):
             'parser.add_argument("--assembly", type=pathlib.Path)\n'
             'parser.add_argument("--output", type=pathlib.Path)\n'
             'parser.add_argument("--source-root", type=pathlib.Path)\n'
+            'parser.add_argument("--test-support", action="store_true")\n'
             'args = parser.parse_args()\n'
             'root = args.source_root\n'
             '(root / "execution.json").write_text(json.dumps(sys.argv))\n'
@@ -104,7 +116,7 @@ class ProjectCreationTests(unittest.TestCase):
         from tools.dev import projects
         source = self.selected_source()
         result = projects.create(self.repo, self.revision, "native", self.output,
-                                 source_root=source)
+                                 source_root=source, test_support=True)
         self.assertTrue((source / "execution.json").is_file())
         self.assertEqual(result["validation"]["configuration_sha256"], "c" * 64)
         self.assertEqual(result["validation"]["resolver"]["path"],
@@ -123,9 +135,9 @@ class ProjectCreationTests(unittest.TestCase):
 
     def test_selected_mcu_source_uses_its_toolchain_without_native_run(self):
         from tools.dev import projects
-        source = self.selected_source(family="stm32f407")
+        source = self.selected_source(family="stm32f4")
         result = projects.create(self.repo, self.revision, "native", self.output,
-                                 source_root=source)
+                                 source_root=source, test_support=True)
         self.assertIn("-DCMAKE_TOOLCHAIN_FILE=" +
                       str(source / "cmake/toolchains/arm-gcc.cmake"),
                       result["commands"]["configure"])
@@ -135,7 +147,7 @@ class ProjectCreationTests(unittest.TestCase):
         from tools.dev import projects
         source = self.selected_source(family="independent_model", arch="native")
         result = projects.create(self.repo, self.revision, "native", self.output,
-                                 source_root=source)
+                                 source_root=source, test_support=True)
         self.assertNotIn("-DCMAKE_TOOLCHAIN_FILE=", " ".join(
             result["commands"]["configure"]))
         self.assertIn("test", result["commands"])
@@ -147,7 +159,7 @@ class ProjectCreationTests(unittest.TestCase):
             'script.write_text(script.read_text() + "# changed\\n")\n'))
         with self.assertRaisesRegex(ValueError, "changed"):
             projects.create(self.repo, self.revision, "native", self.output,
-                            source_root=source)
+                            source_root=source, test_support=True)
         self.assertFalse(self.output.exists())
 
     def test_resolver_cannot_change_copied_payload_or_add_project_artifacts(self):
@@ -172,7 +184,7 @@ class ProjectCreationTests(unittest.TestCase):
                 try:
                     with self.assertRaisesRegex(ValueError, "copied|payload|project"):
                         projects.create(self.repo, self.revision, "native", self.output,
-                                        source_root=source)
+                                        source_root=source, test_support=True)
                     self.assertFalse(self.output.exists())
                     for filename, contents in self.payload.items():
                         self.assertEqual((self.template / filename).read_bytes(), contents)
@@ -206,7 +218,7 @@ class ProjectCreationTests(unittest.TestCase):
         source, external = self.replaced_output(symbolic=True)
         with self.assertRaisesRegex(ValueError, "root|replaced|owned"):
             projects.create(self.repo, self.revision, "native", self.output,
-                            source_root=source)
+                            source_root=source, test_support=True)
         self.assertTrue(self.output.is_symlink())
         self.assertEqual({path.name for path in external.iterdir()}, set(self.payload))
         for name, contents in self.payload.items():
@@ -218,7 +230,7 @@ class ProjectCreationTests(unittest.TestCase):
         source, _ = self.replaced_output(symbolic=False, reject=True)
         with self.assertRaisesRegex(ValueError, "Selected platform rejected"):
             projects.create(self.repo, self.revision, "native", self.output,
-                            source_root=source)
+                            source_root=source, test_support=True)
         self.assertTrue(self.output.is_dir())
         self.assertEqual({path.name for path in self.output.iterdir()}, set(self.payload))
         for name, contents in self.payload.items():
@@ -251,7 +263,7 @@ class ProjectCreationTests(unittest.TestCase):
         from tools.dev import projects
         prefix, source = self.sdk_prefix()
         result = projects.create(self.repo, self.revision, "native", self.output,
-                                 sdk_prefix=prefix)
+                                 sdk_prefix=prefix, test_support=True)
         self.assertTrue((source / "verified.json").is_file())
         self.assertTrue((source / "execution.json").is_file())
         self.assertEqual(result["selected_platform"]["kind"], "sdk")
@@ -266,14 +278,14 @@ class ProjectCreationTests(unittest.TestCase):
         prefix, _ = self.sdk_prefix(publishable=False)
         with self.assertRaisesRegex(ValueError, "publishable|development"):
             projects.create(self.repo, self.revision, "native", self.output,
-                            sdk_prefix=prefix)
+                            sdk_prefix=prefix, test_support=True)
         self.assertFalse(self.output.exists())
 
     def test_installed_source_selection_records_its_verified_actual_revision(self):
         from tools.dev import projects
         _, source = self.sdk_prefix()
         result = projects.create(self.repo, self.revision, "native", self.output,
-                                 source_root=source)
+                                 source_root=source, test_support=True)
         self.assertTrue((source / "verified.json").is_file())
         self.assertEqual(result["selected_platform"]["kind"], "source")
         self.assertEqual(result["selected_platform"]["source_revision"], "d" * 40)
@@ -284,7 +296,7 @@ class ProjectCreationTests(unittest.TestCase):
         from tools.dev import projects
         with self.assertRaisesRegex(ValueError, "source.*SDK|mutually"):
             projects.create(self.repo, self.revision, "native", self.output,
-                            source_root=self.root, sdk_prefix=self.root)
+                            source_root=self.root, sdk_prefix=self.root, test_support=True)
         self.assertFalse(self.output.exists())
 
     def test_cli_commands_quote_paths_and_json_retains_argument_boundaries(self):
@@ -292,7 +304,7 @@ class ProjectCreationTests(unittest.TestCase):
         source = self.selected_source()
         arguments = ["--templates", str(self.repo), "--revision", self.revision,
                      "--template", "native", "--output", str(self.output),
-                     "--source", str(source)]
+                     "--source", str(source), "--test-support"]
         stream = io.StringIO()
         with redirect_stdout(stream):
             self.assertEqual(projects.main(arguments), 0)
@@ -337,7 +349,7 @@ class ProjectCreationTests(unittest.TestCase):
         holder = self.root / "holder"
         holder.mkdir()
         result = projects.create(holder / ".." / "examples", self.revision,
-                                 "native", holder / ".." / self.output.name)
+                                 "native", holder / ".." / self.output.name, test_support=True)
         self.assertEqual((self.output / "main.c").read_bytes(),
                          self.payload["main.c"])
         self.assertEqual(result["examples_commit"], self.revision)
@@ -348,7 +360,7 @@ class ProjectCreationTests(unittest.TestCase):
         alias.symlink_to(self.repo, target_is_directory=True)
         with self.assertRaisesRegex(ValueError, "symlink"):
             projects.create(alias / ".." / "examples", self.revision,
-                            "native", self.output)
+                            "native", self.output, test_support=True)
         self.assertFalse(self.output.exists())
 
     def test_dirty_selected_source_is_rejected_before_creation(self):
@@ -425,7 +437,7 @@ class ProjectCreationTests(unittest.TestCase):
     def test_relative_input_outside_copied_template_cannot_pass_creation(self):
         from tools.dev import dev
         shared = self.repo / "templates/shared-board"
-        shutil.copytree(dev.ROOT / "boards/native_reference", shared)
+        shutil.copytree(dev.ROOT / "tests/support/native/board", shared)
         data = self.payload["assembly.toml"].replace(
             b'board = "native_reference"',
             b'board_package = "../shared-board"')

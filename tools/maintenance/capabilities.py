@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 import re
 import sys
+import tomllib
 
 if __name__ == "__main__":
     sys.dont_write_bytecode = True
@@ -20,6 +21,7 @@ if __name__ == "__main__":
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.configure import bindings, configure, documentation  # noqa: E402
+from tools.configure.providers import descriptor  # noqa: E402
 
 DOCUMENT = "docs/delivery/capabilities.md"
 START = "<!-- nexus-capabilities:start -->"
@@ -100,7 +102,8 @@ def selection(assembly, root=ROOT, *, candidate_path=None, results_index=None,
               record_pointer=None, manifest_path=None, qualification_paths=None,
               source_sdk_path=None, sdk_consumers_path=None,
               hil_admission_path=None, hil_raw_path=None,
-              hil_measurements_path=None, verify_record=False, legacy_replay=False):
+              hil_measurements_path=None, verify_record=False, legacy_replay=False,
+              test_support=False):
     """Describe one validated selection; execution has a separate authority.
 
     Family declarations cannot establish a selected Board/backend/clock tuple.
@@ -126,7 +129,8 @@ def selection(assembly, root=ROOT, *, candidate_path=None, results_index=None,
         raise ValueError("record verification requires an explicit index and record")
     source = (identity.observe_git_source(root)
               if associate else None)
-    typed = configure.resolve_ir(Path(assembly), root)
+    typed = configure.resolve_ir(Path(assembly), root,
+                                 test_support=test_support)
     data = typed.to_dict()
     contracts = selected_contracts.for_configuration(typed)
     policies = selected_contracts.silicon_policies(typed)
@@ -182,20 +186,19 @@ def selection(assembly, root=ROOT, *, candidate_path=None, results_index=None,
                             "hardware qualification.",
                             *[item for item in data.get("limitations", [])
                               if item != "Physical qualification not executed"]]}
+    from tools.maintenance import support
     if candidate_path is not None:
-        _associate_candidate(result, data, source, Path(candidate_path),
-                             legacy_replay=legacy_replay)
+        support.associate_candidate(result, data, source, Path(candidate_path),
+                                    legacy_replay=legacy_replay)
     if results_index is not None:
         _associate_index(result, data, source, Path(results_index), record_pointer)
         links = result["indexed_evidence"]["record"].get("support_evidence")
         if verify_record and links is not None:
-            from tools.maintenance.support import LINKS
             from tools.evidence.common import fields
-            fields(links, set(), LINKS)
+            fields(links, set(), support.LINKS)
             if references.keys() & links.keys():
                 raise ValueError("explicit evidence duplicates a selected record reference")
             references.update(links)
-    from tools.maintenance import support
     if references:
         support.associate(result, data, source, references, legacy_replay=legacy_replay)
     else:
@@ -296,43 +299,6 @@ def _associate_index(result, resolved, source, path, pointer):
         "Missing source or configuration identity is never inherited from ancestors.")
 
 
-def _associate_candidate(result, resolved, source, candidate_path, *, legacy_replay=False):
-    """Only an exact verified source/configuration can support this selection."""
-    from tools.evidence import candidate
-
-    reference = (candidate.verified_projection(candidate_path, legacy_replay=True)
-                 if legacy_replay else candidate.verified_projection(candidate_path))
-    source_keys = ("commit", "tree", "dirty", "submodules")
-    clean_dependencies = all(line.startswith(" ")
-                             for line in source["submodules"])
-    source_match = (source["dirty"] is False and clean_dependencies and
-                    all(source[key] == reference["source"][key]
-                        for key in source_keys))
-    configuration_match = (
-        reference["configuration_sha256"] == resolved["configuration_sha256"]
-        and reference["resolved"] == resolved)
-    relation = ("configuration_mismatch" if not configuration_match else
-                "exact_source_and_configuration" if source_match else
-                "historical_source")
-    result["current_source"] = source
-    result["evidence"] = {
-        "relation": relation, "source_match": source_match,
-        "configuration_match": configuration_match,
-        "reference": {key: value for key, value in reference.items()
-                      if key != "resolved"}}
-    legacy = reference.get("sealed_schema_version") == 1
-    if source_match and configuration_match and not legacy:
-        for name in ("host_models", "arm_image", "installed_sdk",
-                     "software_candidate", "hil_tooling", "resource_budget",
-                     "reproducibility"):
-            result["validation"][name] = "passed"
-    if legacy:
-        result["evidence"]["relation"] = "legacy_read_only"
-    result["limitations"].append(
-        "Evidence association verifies an existing candidate; it executes no "
-        "new checks and does not assess physical HIL or qualify other selections.")
-
-
 def c_code(source):
     """Remove comments and literals before examining exact C declarations."""
     return re.sub(r'/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',
@@ -371,8 +337,13 @@ def collect(root=ROOT):
         soc = configure.load(path)
         if soc["id"] == "native":
             continue
+        integration = descriptor.maintained(soc["id"])
+        catalog = (configure.load(path.parent / integration.device_catalog)
+                   if integration.device_catalog is not None else None)
         for part in soc["variants"]:
-            configure.validate_soc(soc, part)
+            selected = (configure.catalog_soc_facts(soc, part, catalog)[0]
+                        if catalog is not None else soc)
+            configure.validate_soc(selected, part)
         facts[soc["id"]] = soc
         route_doc = configure.load(path.parent / "routes.json")
         configure.obj(route_doc, {"schema_version", "routes"}, (), "routes")
@@ -385,16 +356,14 @@ def collect(root=ROOT):
             route_index.update(configure.resolve_routes(
                 route_doc, soc, part, provider))
         routes[soc["id"]] = route_index
-        for source in sorted((path.parent / "drivers").glob("*.c")):
+        for source in sorted((path.parent / "drivers").rglob("*.c")):
             for symbol in source_ops(source, root):
                 if symbol in exports:
                     raise ValueError(f"Duplicate ops definition: {symbol}")
                 exports[symbol] = source.relative_to(root).as_posix()
     # Shared algorithms keep one real readonly table across SoC wrappers.
     # Read actual production definitions, never expand provider-name guesses.
-    shared_sources = (set((root / "drivers").rglob("*.c"))
-                      | set((root / "io/src").rglob("*.c"))
-                      | set((root / "soc/native/drivers").glob("*.c")))
+    shared_sources = set((root / "io/src").rglob("*.c"))
     for source in sorted(shared_sources):
         for symbol in source_ops(source, root):
             if symbol in exports:
@@ -424,12 +393,11 @@ def collect(root=ROOT):
     fixture_paths = sorted(set(assembly_paths) | set(contract_paths)
                            | set(sdk_paths))
     for fixture in fixture_paths:
+        authored = tomllib.loads(fixture.read_text(encoding="utf-8"))
+        if authored.get("backend") == "native":
+            continue
         typed = configure.resolve_ir(fixture, root)
         result = typed.to_dict()
-        if result["soc_family"] == "native":
-            provider = configure.maintained(result["soc_family"])
-            if provider.MODEL is not True or result["physical_qualified"] is not False:
-                raise ValueError("Native source provenance requires an unqualified MODEL")
         source = c_code(bindings.emit(typed)[1])
         for item in result["controllers"]:
             name = bindings.symbol(item["id"])
@@ -462,18 +430,6 @@ def collect(root=ROOT):
                            "fixtures": sorted(selected[key]["fixtures"]),
                            "exports": sorted(selected[key]["exports"])}
                     rows.append(row)
-    # Host models have no physical SoC/Board inventory here. Project only
-    # controllers actually selected by the same resolver/face-to-ops path.
-    # Empty assemblies therefore cannot manufacture a model capability row.
-    for key in sorted(selected):
-        family, controller, kind, mode = key
-        if family != "native":
-            continue
-        rows.append({"family": family, "controller": controller,
-                     "kind": kind, "mode": mode, "routes": [], "boards": [],
-                     "fixtures": sorted(selected[key]["fixtures"]),
-                     "exports": sorted(selected[key]["exports"]),
-                     "implementation": "MODEL", "physical_qualified": False})
     known = {(row["family"], row["controller"], row["kind"], row["mode"])
              for row in rows}
     if selected.keys() - known:
@@ -537,6 +493,8 @@ def main(arguments=None, *, support_command=False):
         parser.add_argument("--" + option, dest=option.replace("-", "_") + "_path", type=Path)
     parser.add_argument("--json", action="store_true", help="print the same read-only query as JSON")
     parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument("--test-support", action="store_true",
+                        help="explicitly query a host test fixture")
     args = parser.parse_args(arguments)
     evidence_options = ("manifest_path", "qualification_paths", "source_sdk_path",
                         "sdk_consumers_path", "hil_admission_path", "hil_raw_path",
@@ -564,6 +522,7 @@ def main(arguments=None, *, support_command=False):
                                        record_pointer=args.record_pointer,
                                        verify_record=args.verify_record,
                                        legacy_replay=args.legacy_replay,
+                                       test_support=args.test_support,
                                        **{name: getattr(args, name) for name in evidence_options})
             if support_command:
                 from tools.maintenance import support

@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from pathlib import PurePath
 import re
 
-from tools.configure.ir import Record
+from tools.configure.records import Record
 from tools.configure.providers.common import fail
 
 

@@ -9,7 +9,7 @@
 [迁移映射](documentation-migration.csv)记录当前内容的去向和保留规则。
 这份文档不修改既有平台支持、软件资格或实板状态。
 新增和修改文档遵守 [内容与图示标准](documentation-standards.md)及
-[页面模板](documentation-templates.md)。[完整优化清单](documentation-improvements.md)
+[页面模板](documentation-templates.md)。[完整优化清单](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design/documentation-improvements.md)
 从同一台账派生；[参考图册](../assets/diagrams/README.md)区分当前与目标视图。
 
 ## 1. 目标和边界

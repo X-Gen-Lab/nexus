@@ -1,4 +1,5 @@
 """Exact Qiming LSE calendar assembly has explicit backup ownership policy."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 import json
 from pathlib import Path
@@ -33,10 +34,10 @@ class F407RtcConfigurationTests(unittest.TestCase):
     def resolve(self, text=None):
         path = self.directory / "assembly.toml"
         path.write_text(self.text() if text is None else text)
-        return gate.resolve_ir(path)
+        return gate.resolve_ir(path, test_support=native_fixture(path))
 
     def construction(self, result):
-        return maintained("stm32f407").constructor(
+        return maintained("stm32f4").constructor(
             result.controllers[0], result, result.board_bindings,
             result.routes, result.devices)
 
@@ -70,7 +71,8 @@ class F407RtcConfigurationTests(unittest.TestCase):
         for board in BOARDS:
             with self.subTest(board=board):
                 result = gate.resolve_ir(gate.ROOT / "boards" / board /
-                                         "assemblies/rtc-adopt.toml")
+                                         "assemblies/rtc-adopt.toml", test_support=native_fixture(gate.ROOT / "boards" / board /
+                                         "assemblies/rtc-adopt.toml"))
                 item, = result.controllers
                 self.assertEqual("adopt-retained", item.mode)
                 self.assertIsNone(item.options.initial)
@@ -212,19 +214,6 @@ class F407RtcConfigurationTests(unittest.TestCase):
                 self.resolve(self.text(mode="provision-empty",
                                        extra=INITIAL.replace(old, new)))
 
-    def test_u575_and_native_keep_their_no_option_rtc_contract(self):
-        for relative in ("tools/configure/assemblies/u575-rtc-run.toml",
-                         "cmake/package/verification/io_evolution/native-time-pair.toml"):
-            result = gate.resolve_ir(gate.ROOT / relative)
-            for item in result.controllers:
-                if item.kind == "rtc":
-                    self.assertEqual("NoOptions", type(item.options).__name__)
-        original = (gate.ROOT / "tools/configure/assemblies/u575-rtc-run.toml").read_text()
-        original = original.replace("../../../boards/stm32u575zi_rtc_reference",
-                                    str(gate.ROOT / "boards/stm32u575zi_rtc_reference"))
-        for option in ("allow_set = false", "timeout_us = 1", "poll_limit = 1", INITIAL):
-            with self.subTest(option=option), self.assertRaises(gate.ConfigurationError):
-                self.resolve(original + "\n" + option)
 
     def test_editor_schema_expresses_explicit_calendar_and_finite_bounds(self):
         schema = authored.editor_schema()["properties"]["rtc"]["additionalProperties"]
@@ -242,11 +231,11 @@ class F407RtcConfigurationTests(unittest.TestCase):
         path = self.directory / "assembly.toml"
         path.write_text(self.text())
         output = self.directory / "generated"
-        gate.configure(path, output)
+        gate.configure(path, output, test_support=native_fixture(path))
         self.assertTrue((output / "nexus_factory_strong.h").is_file())
         path.write_text(self.text(mode="provision-empty"))
         with self.assertRaisesRegex(gate.ConfigurationError, "initial"):
-            gate.configure(path, output)
+            gate.configure(path, output, test_support=native_fixture(path))
         self.assertFalse(output.exists())
 
 

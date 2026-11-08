@@ -5,6 +5,7 @@ from pathlib import Path
 
 _REPOSITORY = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_REPOSITORY))
+from tools.documentation.check import HISTORICAL_PAGES, HISTORICAL_PREFIXES
 
 project = 'Nexus Embedded Platform'
 author = 'Nexus Team'
@@ -22,6 +23,8 @@ exclude_patterns = ['archive/**', 'api/**', '_build/**', '_output/**',
                     'sphinx/configuration.rst', 'sphinx/migration.rst',
                     'sphinx/os.rst', 'sphinx/support.rst',
                     'sphinx/development/index.rst']
+exclude_patterns.extend(HISTORICAL_PAGES)
+exclude_patterns.extend(prefix + '**' for prefix in HISTORICAL_PREFIXES)
 html_theme = 'alabaster'
 html_theme_options = {'description': ('可复用的静态嵌入式平台机制'
                       if language == 'zh_CN' else 'Static embedded platform mechanisms')}

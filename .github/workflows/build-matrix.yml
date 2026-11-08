@@ -28,6 +28,7 @@ jobs:
       - uses: ./.github/actions/setup-build
         with:
           preset: ${{ matrix.preset }}
+          arm: 'true'
       - name: Configure actual target graph
         run: .venv/bin/python tools/dev/dev.py configure --preset "${{ matrix.preset }}"
       - name: Build platform and register models
@@ -49,7 +50,10 @@ jobs:
           expected-commit: ${{ github.sha }}
           output: build/job-identities/native-${{ matrix.preset }}
           require-dependencies: 'true'
+          dependency-preparation: build/setup-dependencies.json
+          dependency-preset: ${{ matrix.preset }}
           artifacts: |
+            build/setup-dependencies.json
             build/${{ matrix.preset }}/ctest-results.xml
             build/${{ matrix.preset }}/Testing/Temporary/
             build/${{ matrix.preset }}/generated/
@@ -60,12 +64,14 @@ jobs:
             python=python3
             cmake=cmake
             compiler=cc
+            armcompiler=arm-none-eabi-gcc
       - name: Preserve execution evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: contracts-${{ matrix.preset }}
           path: |
+            build/setup-dependencies.json
             build/${{ matrix.preset }}/ctest-results.xml
             build/${{ matrix.preset }}/Testing/Temporary/
             build/${{ matrix.preset }}/generated/
@@ -122,82 +128,11 @@ jobs:
         run: >-
           .venv/bin/python scripts/ci/stm32_memory.py
           --output build/stm32-memory
-      - name: Verify GD default and optional RAM startup images
+      - name: Audit locked STM32F4 device headers and startup vectors
         run: >-
-          .venv/bin/python scripts/ci/gd32_memory.py
-          --output build/gd32-memory
-      - name: Verify H743 reference startup and selected ARM assemblies
-        run: >-
-          .venv/bin/python scripts/ci/stm32h743.py
-          --root "$GITHUB_WORKSPACE"
+          .venv/bin/python scripts/ci/stm32f4_devices.py
           --compiler arm-none-eabi-gcc
-          --output build/stm32h743
-          --parallel 2
-      - name: Test H743 startup and image rejection boundaries
-        run: >-
-          .venv/bin/python -m unittest discover
-          -s tests/contracts/h743_assembly -p 'test_*.py' -v
-      - name: Verify U575 reference startup and selected ARM assemblies
-        run: >-
-          .venv/bin/python scripts/ci/stm32u575.py
-          --root "$GITHUB_WORKSPACE"
-          --compiler arm-none-eabi-gcc
-          --output build/stm32u575
-          --parallel 2
-      - name: Test U575 startup and image rejection boundaries
-        run: >-
-          .venv/bin/python -m unittest discover
-          -s tests/contracts/u575_assembly -p 'test_*.py' -v
-      - name: Link and inspect the U575 Secure and NonSecure image pair
-        run: >-
-          .venv/bin/python scripts/ci/u575_trustzone.py
-          --root "$GITHUB_WORKSPACE"
-          --compiler arm-none-eabi-gcc
-          --output build/u575-trustzone
-          --parallel 2
-          --capture-pair-context
-      - name: Reject mutations of the actual U575 pair and compiler ABI
-        run: >-
-          .venv/bin/python -m unittest discover
-          -s tests/contracts/u575_trustzone -p 'test_*.py' -v
-        env:
-          NEXUS_U575_PAIR_BUILD: build/u575-trustzone
-      - name: Seal and independently verify the U575 software pair
-        shell: bash
-        run: |
-          set -euo pipefail
-          control=build/u575-trustzone/pair-context
-          export_root="$RUNNER_TEMP/nexus-u575-pair-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          test ! -e "$export_root"
-          test ! -e build/u575-pair-evidence
-          context_sha=$(sha256sum "$control/context.json" | cut -d ' ' -f 1)
-          nm=$(realpath "$(command -v arm-none-eabi-nm)")
-          objdump=$(realpath "$(command -v arm-none-eabi-objdump)")
-          nm_sha=$(sha256sum "$nm" | cut -d ' ' -f 1)
-          objdump_sha=$(sha256sum "$objdump" | cut -d ' ' -f 1)
-          printf '%s\n' "$context_sha" > "$control/context.sha256"
-          .venv/bin/python tools/evidence/u575_pair.py seal \
-            --context "$control/context.json" \
-            --expected-context-sha256 "$context_sha" \
-            --output "$export_root" \
-            --nm "$nm" --nm-sha256 "$nm_sha" \
-            --objdump "$objdump" --objdump-sha256 "$objdump_sha" \
-            > "$control/seal.stdout.raw" 2> "$control/seal.stderr.raw"
-          manifest_sha=$(sha256sum "$export_root/manifest.json" | cut -d ' ' -f 1)
-          printf '%s\n' "$manifest_sha" > "$control/manifest.sha256"
-          archives=("$export_root"/store/*.tar.gz)
-          test "${#archives[@]}" -eq 1
-          test -f "${archives[0]}"
-          .venv/bin/python tools/evidence/u575_pair.py verify \
-            --manifest "$export_root/manifest.json" \
-            --expected-manifest-sha256 "$manifest_sha" \
-            --archive "${archives[0]}" \
-            --nm "$nm" --nm-sha256 "$nm_sha" \
-            --objdump "$objdump" --objdump-sha256 "$objdump_sha" \
-            > "$control/verify.stdout.raw" 2> "$control/verify.stderr.raw"
-          mkdir build/u575-pair-evidence
-          cp -p "$export_root/manifest.json" "${archives[0]}" \
-            build/u575-pair-evidence/
+          --output build/stm32f4-devices --jobs 2
       - name: Bind the upload to observed execution identity
         if: always()
         uses: ./.github/actions/record-identity
@@ -207,7 +142,10 @@ jobs:
           expected-commit: ${{ github.sha }}
           output: build/job-identities/arch
           require-dependencies: 'true'
+          dependency-preparation: build/setup-dependencies.json
+          dependency-preset: native-debug
           artifacts: |
+            build/setup-dependencies.json
             build/arch-compiler/
             build/cache-control/
             build/cortex-runtime/
@@ -215,11 +153,7 @@ jobs:
             build/os-wait-cost/
             build/os-resources/
             build/stm32-memory/
-            build/gd32-memory/
-            build/stm32h743/
-            build/stm32u575/
-            build/u575-trustzone/
-            build/u575-pair-evidence/
+            build/stm32f4-devices/
           tools: |
             python=python3
             compiler=arm-none-eabi-gcc
@@ -229,6 +163,7 @@ jobs:
         with:
           name: cortex-m-primitive-compiler
           path: |
+            build/setup-dependencies.json
             build/arch-compiler/
             build/cache-control/
             build/cortex-runtime/
@@ -236,11 +171,7 @@ jobs:
             build/os-wait-cost/
             build/os-resources/
             build/stm32-memory/
-            build/gd32-memory/
-            build/stm32h743/
-            build/stm32u575/
-            build/u575-trustzone/
-            build/u575-pair-evidence/
+            build/stm32f4-devices/
             build/job-identities/arch/
           retention-days: 30
           include-hidden-files: true
@@ -274,7 +205,10 @@ jobs:
           expected-commit: ${{ github.sha }}
           output: build/job-identities/threadx
           require-dependencies: 'true'
+          dependency-preparation: build/setup-dependencies.json
+          dependency-preset: native-debug
           artifacts: |
+            build/setup-dependencies.json
             build/os-threadx/
           tools: |
             python=python3
@@ -286,6 +220,7 @@ jobs:
         with:
           name: threadx-kernel-contracts
           path: |
+            build/setup-dependencies.json
             build/os-threadx/
             build/job-identities/threadx/
           retention-days: 30
@@ -325,7 +260,10 @@ jobs:
           expected-commit: ${{ github.sha }}
           output: build/job-identities/os-security
           require-dependencies: 'true'
+          dependency-preparation: build/setup-dependencies.json
+          dependency-preset: native-debug
           artifacts: |
+            build/setup-dependencies.json
             build/os-mpu/
             build/os-secure-runtime/
           tools: |
@@ -337,6 +275,7 @@ jobs:
         with:
           name: os-security-link-contracts
           path: |
+            build/setup-dependencies.json
             build/os-mpu/
             build/os-secure-runtime/
             build/job-identities/os-security/
@@ -358,8 +297,6 @@ jobs:
           - stm32-qiming-freertos
           - stm32-sky-baremetal
           - stm32-sky-freertos
-          - gd32-liangshan-baremetal
-          - gd32-liangshan-freertos
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -391,7 +328,6 @@ jobs:
           case "$PRESET" in
             stm32-qiming-*) fixture=stm32f407_qiming_v31 ;;
             stm32-sky-*) fixture=stm32f407ve_sky_qingchun ;;
-            gd32-liangshan-*) fixture=gd32f470_liangshan ;;
             *) exit 1 ;;
           esac
           .venv/bin/python -B tools/hil/prepare.py \
@@ -448,36 +384,11 @@ jobs:
       matrix:
         fixture:
           - stm32_assembly
-          - gd32_assembly
           - can_assembly
           - usb_assembly
           - ethernet_assembly
           - timer_assembly
-          - g474_assembly
-          - h743_assembly
-          - u575_assembly
           - multi_controller_assembly
-          - mainstream_assembly
-        include:
-          - fixture: h743_assembly
-            project: tests/contracts/h743_assembly
-            assemblies: |
-              tools/configure/assemblies/h743-spi-dma.toml
-              tools/configure/assemblies/h743-spi-dma-cache-on.toml
-              tools/configure/assemblies/h743-spi-dma-uart-tx.toml
-              tools/configure/assemblies/h743-spi-dma-uart-rx.toml
-              tools/configure/assemblies/h743-spi-dma-runtime-clock.toml
-              tools/configure/assemblies/h743-uart-continuous.toml
-              tools/configure/assemblies/h743-uart-continuous-cache-on.toml
-          - fixture: u575_assembly
-            project: tests/contracts/u575_assembly
-            assemblies: |
-              tools/configure/assemblies/u575-uart-chain.toml
-              tools/configure/assemblies/u575-lptim-run.toml
-          - fixture: pin_state_fixture
-            project: tests/contracts/pin_state_fixture
-            assemblies: |
-              tools/configure/assemblies/g474-pin-states.toml
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -490,8 +401,8 @@ jobs:
       - name: Link and audit each authored software assembly
         env:
           FIXTURE: ${{ matrix.fixture }}
-          PROVIDER_PROJECT: ${{ matrix.project }}
-          PROVIDER_ASSEMBLIES: ${{ matrix.assemblies }}
+          PROVIDER_PROJECT: ''
+          PROVIDER_ASSEMBLIES: ''
         run: |
           fixture="tests/contracts/$FIXTURE"
           arguments=()
@@ -522,7 +433,10 @@ jobs:
           expected-commit: ${{ github.sha }}
           output: build/job-identities/routes-${{ matrix.fixture }}
           require-dependencies: 'true'
+          dependency-preparation: build/setup-dependencies.json
+          dependency-preset: native-debug
           artifacts: |
+            build/setup-dependencies.json
             build/controller-routes/
           tools: |
             python=python3
@@ -534,6 +448,7 @@ jobs:
         with:
           name: controller-software-${{ matrix.fixture }}
           path: |
+            build/setup-dependencies.json
             build/controller-routes/
             build/job-identities/routes-${{ matrix.fixture }}/
           retention-days: 30

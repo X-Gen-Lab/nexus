@@ -279,7 +279,8 @@ class MbedTLSSDKPayloadTests(unittest.TestCase):
             entries = sdk.dependency_entries(ROOT, item.path)
             self.assertEqual(set(entries), files)
             self.assertTrue({item.path + '/' + name for name in files}.issubset(
-                sdk.REQUIRED_FILES))
+                sdk.required_files(ROOT, sdk.source_profile(
+                    components=("tls",)))))
 
 
 if __name__ == '__main__':

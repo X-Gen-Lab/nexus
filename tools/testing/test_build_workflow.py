@@ -793,18 +793,18 @@ class DeveloperWorkflowTests(unittest.TestCase):
     def test_dispatch_keeps_prepare_opt_in_network_and_candidate_endpoint(self):
         from tools.dev import dev
         with patch.object(dev, "execute", return_value=7) as execute:
-            result = dev.main(["prepare", "--scope", "arm", "--family", "stm32h743"])
+            result = dev.main(["prepare", "--scope", "arm", "--family", "stm32f4"])
         self.assertEqual(result, 7)
         self.assertEqual(execute.call_args.args[0], [sys.executable,
             "tools/dev/dependencies.py", "prepare", "--preset", "native-debug",
             "--scope", "arm",
-            "--family", "stm32h743"])
+            "--family", "stm32f4"])
         with patch.object(dev, "execute", return_value=0) as execute:
             self.assertEqual(dev.main(["prepare", "--preset",
-                                       "stm32-nucleo-h743-baremetal-empty"]), 0)
+                                       "stm32-qiming-baremetal"]), 0)
         self.assertEqual(execute.call_args.args[0], [sys.executable,
             "tools/dev/dependencies.py", "prepare", "--preset",
-            "stm32-nucleo-h743-baremetal-empty", "--scope", "preset"])
+            "stm32-qiming-baremetal", "--scope", "preset"])
         with patch.object(dev, "execute", return_value=0) as execute:
             self.assertEqual(dev.main(["candidate", "--plan", "candidate.json",
                                        "--output", "out"]), 0)
@@ -846,18 +846,15 @@ class DeveloperWorkflowTests(unittest.TestCase):
                   for row, _ in rows.rows["build"].values()}
         names = {row["name"] for row in configurations}
         self.assertIn("native-step-debug", names)
-        self.assertEqual(len({name for name in names
-                              if name.startswith("stm32-nucleo-")}), 8)
-        self.assertEqual(len({name for name in names
-                              if name.startswith("fixture-stm32-g474-")}), 14)
+        self.assertEqual({name for name in names
+                          if not name.startswith(("native-", "fixture-"))},
+                         {"stm32-qiming-baremetal", "stm32-qiming-freertos",
+                          "stm32-sky-baremetal", "stm32-sky-freertos"})
         for row in configurations:
             self.assertIn(row["name"], builds)
             selected = selected_configure(dev.ROOT, row["name"])
             assembly = selected["cacheVariables"]["NEXUS_ASSEMBLY_FILE"]
             self.assertTrue(Path(assembly).is_file(), assembly)
-            if "g474" in row["name"]:
-                self.assertTrue(row["name"].startswith("fixture-"))
-                self.assertIn("unqualified", row["displayName"])
 
 
 if __name__ == "__main__":

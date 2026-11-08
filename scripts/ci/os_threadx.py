@@ -1,6 +1,6 @@
-"""Link the actual locked ThreadX kernel on three Boards and two IRQ policies.
+"""Link the actual locked ThreadX kernel on two F4 Boards and two IRQ policies.
 
-Six positive ELF/resource checks and a precise missing external-Tick rejection
+Four positive ELF/resource checks and a precise missing external-Tick rejection
 are software evidence. They never establish physical execution, IRQ/FPU timing,
 stack peaks, an installed SDK or a complete clean product qualification.
 """
@@ -26,7 +26,7 @@ REQUIRED_SYMBOLS = frozenset({
 
 def matrix():
     rows = [{'name': board + '-' + mask, 'board': board, 'mask': mask,
-             'rejection': False} for board in ('qiming', 'sky', 'liangshan')
+             'rejection': False} for board in ('qiming', 'sky')
             for mask in ('basepri', 'primask')]
     rows.append({'name': 'qiming-external-missing', 'board': 'qiming',
                  'mask': 'basepri', 'rejection': True})

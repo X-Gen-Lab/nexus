@@ -5,6 +5,7 @@ import tempfile
 import unittest
 
 from tools.configure import configure as gate, documentation
+from tools.configure.tests.device_fixture import load_soc_facts
 
 
 class DocumentationConfigurationTests(unittest.TestCase):
@@ -19,7 +20,7 @@ class DocumentationConfigurationTests(unittest.TestCase):
 
     def test_complete_assembly_executes_real_resource_checks(self):
         assembly = (gate.ROOT /
-                    "tools/configure/assemblies/native-gpio.toml").read_text()
+                    "tools/configure/assemblies/qiming-baremetal-gpio.toml").read_text()
         rows = self.check("```toml\n" + assembly + "```\n")
         self.assertEqual(rows[0]["kind"], "assembly")
         self.assertEqual(len(rows[0]["configuration_sha256"]), 64)
@@ -30,11 +31,11 @@ class DocumentationConfigurationTests(unittest.TestCase):
     def test_relative_board_package_stays_relative_to_document(self):
         package = self.document.parent / "board with spaces"
         package.mkdir()
-        source = gate.ROOT / "boards/native_reference/board.json"
+        source = gate.ROOT / "boards/stm32f407_qiming_v31/board.json"
         (package / "board.json").write_bytes(source.read_bytes())
         assembly = (gate.ROOT /
-                    "tools/configure/assemblies/native-gpio.toml").read_text()
-        assembly = assembly.replace('board = "native_reference"',
+                    "tools/configure/assemblies/qiming-baremetal-gpio.toml").read_text()
+        assembly = assembly.replace('board = "stm32f407_qiming_v31"',
                                     '\'board_package\' = "board with spaces"')
         self.assertIn("board_package", assembly)
         rows = self.check("```toml\n" + assembly + "```\n")
@@ -59,7 +60,7 @@ class DocumentationConfigurationTests(unittest.TestCase):
                        "```toml\n[broken\n```\n")
 
     def test_runtime_uses_adjacent_inline_facts_and_actual_resolver(self):
-        facts = json.loads((gate.ROOT / "soc/stm32/stm32f407/soc.json").read_text())
+        facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
         package = {"schema_version": 1, "cpu": facts["cpu"],
                    "irq": facts["irq"], "clock_hz": 168000000}
         contents = ('```toml\nschema_version=1\ncpu_facts="cpu.json"\n'

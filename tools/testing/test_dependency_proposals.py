@@ -5,13 +5,14 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch as mock_patch
 import subprocess
 from tools.maintenance import dependency_proposals as proposals
 from tools.maintenance import (cmsis_device_lock, lwip_lock, mbedtls_lock, coremqtt_lock,
                                mcuboot_lock,
-                               source_catalogue, stm32f1_hal_lock, stm32f4_hal_lock,
-                               stm32h5_device_lock, stm32h5_hal_lock)
-from tools.maintenance.stm32_ll_lock import PROFILES
+                               source_catalogue, stm32f4_hal_lock)
+from tools.dev.dependencies import required_submodules
+from tools.testing.inventory_fixtures import write_files
 import os
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -32,43 +33,6 @@ class DependencyProposalTests(unittest.TestCase):
         data = path.read_bytes()
         return {"path": str(path), "sha256": hashlib.sha256(data).hexdigest(), "size": len(data)}
 
-    def test_actual_inventory_observes_pins_not_latest_claims(self):
-        expected = {item.path for item in source_catalogue.ALL_SOURCE_DEPENDENCIES}
-        declared = proposals.git(ROOT, "show", "HEAD:.gitmodules")
-        if any('path = ' + path not in declared and 'path=' + path not in declared
-               for path in expected):
-            # New dependency declarations and Gitlinks must be committed
-            # together. An unfinished source-graph change remains rejected.
-            with self.assertRaisesRegex(ValueError, "catalogue review|Missing committed source Gitlink"):
-                proposals.inventory(ROOT)
-            return
-        missing = [path for path in expected
-                   if not proposals.git(ROOT, "ls-tree", "HEAD", "--", path)]
-        if missing:
-            # A working .gitmodules addition is not a committed dependency pin.
-            # Exercise the actual rejection until root commits its Gitlink.
-            with self.assertRaisesRegex(ValueError, "Missing committed source Gitlink"):
-                proposals.inventory(ROOT)
-            return
-        changed = [path for path in expected if
-                   proposals.git(ROOT, "ls-tree", "HEAD", "--", path).split()[2]
-                   != proposals.git(ROOT / path, "rev-parse", "HEAD")]
-        if changed:
-            # A staged migration is not the committed weekly inventory. The
-            # ordinary hook validates that boundary instead of inventing pins.
-            with self.assertRaisesRegex(ValueError, "locked clean Gitlink"):
-                proposals.inventory(ROOT)
-            return
-        result = proposals.inventory(ROOT)
-        self.assertEqual(result["owner"], "codex")
-        self.assertEqual(result["mode"], "weekly_read_only")
-        self.assertFalse(result["locks_changed"])
-        self.assertFalse(result["upgrade_approved"])
-        self.assertEqual(result["network_reads"], 0)
-        self.assertGreaterEqual(len(result["dependencies"]), 8)
-        for record in result["dependencies"]:
-            self.assertTrue(record["revision"])
-            self.assertTrue(record["identities"])
 
     def test_archive_and_license_identity_produce_only_pending_proposal(self):
         result = proposals.propose(self.plan, self.current)
@@ -273,71 +237,116 @@ class DependencyProposalTests(unittest.TestCase):
             proposals.observe_upstream(self.upstream_current(), path, runner=lambda *_: self.fail("unexpected request"))
         self.assertFalse((ROOT / "dependencies/proposal-output-must-not-exist").exists())
 
-class DependencyInventoryGitTests(unittest.TestCase):
+class _InventoryGitFixture(unittest.TestCase):
+    """Real Git and validators, with explicitly owned external catalogue data."""
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="dependency gitlinks ")
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
-        self.environment = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+        self.environment = {k: v for k, v in os.environ.items()
+                            if not k.startswith("GIT_")}
         self.git(self.root, "init", "--quiet")
-        self.threadx_lock = json.loads((ROOT / "dependencies/threadx.lock.json").read_text())
-        self.g4_lock = json.loads((ROOT / "dependencies/stm32g4.lock.json").read_text())
-        dependencies = list(source_catalogue.ALL_DEPENDENCIES)
+        for name in ("dependencies/googletest.lock.json",
+                     "dependencies/toolchains.lock.json",
+                     "dependencies/environment.lock.json",
+                     "dependencies/development-tools.txt",
+                     "dependencies/environment-tools.txt",
+                     "dependencies/actions.lock.json",
+                     "vendors/gigadevice/gd32f4xx/source.lock.json"):
+            self.write(self.root / name, (ROOT / name).read_bytes())
+        from tools.maintenance.freertos_transport import REVIEW_FILES
+        for name in REVIEW_FILES:
+            if (ROOT / name).is_file():
+                self.write(self.root / name, (ROOT / name).read_bytes())
+        directory = Path("vendors/gigadevice/gd32f4xx/LICENSES")
+        for notice in (ROOT / directory).iterdir():
+            self.write(self.root / directory / notice.name, notice.read_bytes())
+
+    def catalogue(self, entries):
+        source_catalogue.validate_catalogue(entries)
+        roots = tuple(item for item in entries if item.parent is None)
+        for module, name, value in (
+                (source_catalogue, "ALL_DEPENDENCIES", entries),
+                (source_catalogue, "ALL_SOURCE_DEPENDENCIES", roots),
+                (proposals, "ALL_DEPENDENCIES", entries)):
+            patch = mock_patch.object(module, name, value)
+            patch.start()
+            self.addCleanup(patch.stop)
         self.write(self.root / ".gitmodules", "".join(
-            f'[submodule "{item.path}"]\npath = {item.path}\nurl = {item.fetch_url}\n'
-            for item in source_catalogue.ALL_SOURCE_DEPENDENCIES).encode())
-        for item in dependencies:
+            f'[submodule "{source_catalogue.module_name(item)}"]\n'
+            f'path = {source_catalogue.relative_path(item)}\n'
+            f'url = {item.fetch_url}\n' for item in roots).encode())
+
+    def write(self, path, data):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+
+    def git(self, path, *arguments):
+        result = subprocess.run(["git", "-C", str(path), *arguments],
+            capture_output=True, text=True, env=self.environment, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return result.stdout.strip()
+
+    def commit(self, path, message):
+        self.git(path, "-c", "user.name=Dependency test", "-c",
+                 "user.email=dependency-test@local.invalid", "commit",
+                 "--quiet", "-m", message)
+
+
+class DependencyInventoryGitTests(_InventoryGitFixture):
+    """An independent catalogue fixture using the selected F4/service sources.
+
+    This is neither the complete production inventory nor Native's closure.
+    FreeRTOS's full child graph has separate transport contracts; unselected
+    device verifiers use synthetic inputs in their own maintained suites.
+    """
+
+    def setUp(self):
+        super().setUp()
+        selected = set(required_submodules("native")) - {"ext/freertos"}
+        entries = tuple(item for item in source_catalogue.ALL_DEPENDENCIES
+                        if any(item.path == name or
+                               item.path.startswith(name + "/")
+                               for name in selected))
+        self.catalogue(entries)
+        self.entries = entries
+        self.threadx_lock = json.loads(
+            (ROOT / "dependencies/threadx.lock.json").read_text())
+        for item in entries:
             checkout = self.root / item.path
-            review = next((review for review in
-                           cmsis_device_lock.REVIEWED_DEVICES.values()
-                           if review["directory"] == item.path), None)
-            for official in (stm32f1_hal_lock, stm32f4_hal_lock):
-                if item.path in {official.DIRECTORY, official.CMSIS_DIRECTORY}:
-                    review = {"commit": (official.COMMIT
-                                          if item.path == official.DIRECTORY
-                                          else official.CMSIS_COMMIT)}
-            for official in (*PROFILES.values(), stm32h5_hal_lock.PROFILE):
-                if item.path in {official.directory, official.cmsis_directory}:
-                    review = {"commit": (official.commit
-                        if item.path == official.directory else official.cmsis_commit)}
-            if item.identifier in ("googletest", "mcuboot"):
-                review = {"commit": json.loads(
-                    (ROOT / item.source_lock).read_text())["commit"]}
+            review = None
+            official = stm32f4_hal_lock
+            if item.path in {official.DIRECTORY, official.CMSIS_DIRECTORY}:
+                review = (official.COMMIT if item.path == official.DIRECTORY
+                          else official.CMSIS_COMMIT)
+            if item.identifier in {"googletest", "mcuboot", "tomlc99", "cjson"}:
+                review = json.loads((ROOT / item.source_lock).read_text())["commit"]
             if item.identifier == "lwip":
-                review = {"commit": lwip_lock.COMMIT}
+                review = lwip_lock.COMMIT
             if item.identifier == "coremqtt":
-                review = {"commit": coremqtt_lock.COMMIT}
+                review = coremqtt_lock.COMMIT
             if item.source_lock == mbedtls_lock.LOCK_NAME:
-                review = {"commit": mbedtls_lock.record(
-                    mbedtls_lock.load_lock(), item.path)["commit"]}
-            if item.identifier == "freertos" or item.parent is not None:
-                review = {"commit": self.git(ROOT / item.path,
-                                              "rev-parse", "HEAD")}
+                review = mbedtls_lock.record(
+                    mbedtls_lock.load_lock(), item.path)["commit"]
+            if item.parent is not None:
+                review = self.git(ROOT / item.path, "rev-parse", "HEAD")
             if review is not None:
-                # Fixed device pins use real local official Git objects. A
-                # fabricated fixture commit must never relax the source lock.
                 checkout.parent.mkdir(parents=True, exist_ok=True)
                 self.git(self.root, "clone", "--quiet", "--shared",
                          str(ROOT / item.path), str(checkout))
                 self.git(checkout, "remote", "set-url", "origin", item.fetch_url)
-                self.git(checkout, "checkout", "--quiet", "--detach",
-                         review["commit"])
+                self.git(checkout, "checkout", "--quiet", "--detach", review)
                 if item.source_lock is not None:
                     self.write(self.root / item.source_lock,
                                (ROOT / item.source_lock).read_bytes())
-                for device in cmsis_device_lock.REVIEWED_DEVICES.values():
-                    if device["directory"] == item.path:
-                        self.write(self.root / device["lock_name"],
-                                   (ROOT / device["lock_name"]).read_bytes())
                 continue
             checkout.mkdir(parents=True)
             self.git(checkout, "init", "--quiet")
             self.git(checkout, "remote", "add", "origin", item.fetch_url)
-            paths = [item.notice]
+            paths = {item.notice}
             if item.identifier == "threadx":
-                paths.extend(self.threadx_lock["files"])
-            elif item.identifier == "stm32g4_cmsis":
-                paths.extend(self.g4_lock["files"])
+                paths.update(self.threadx_lock["files"])
             for name in paths:
                 self.write(checkout / name, (ROOT / item.path / name).read_bytes())
             self.git(checkout, "add", ".")
@@ -345,40 +354,66 @@ class DependencyInventoryGitTests(unittest.TestCase):
             if item.identifier == "threadx":
                 self.threadx_lock["commit"] = self.git(checkout, "rev-parse", "HEAD")
                 self.git(checkout, "tag", self.threadx_lock["tag"])
-            elif item.identifier == "stm32g4_cmsis":
-                self.g4_lock["commit"] = self.git(checkout, "rev-parse", "HEAD")
         self.write(self.root / "dependencies/threadx.lock.json",
                    (json.dumps(self.threadx_lock) + "\n").encode())
-        self.write(self.root / "dependencies/stm32g4.lock.json",
-                   (json.dumps(self.g4_lock) + "\n").encode())
-        for name in ("dependencies/googletest.lock.json",
-                     "dependencies/toolchains.lock.json", "dependencies/environment.lock.json",
-                     "dependencies/development-tools.txt", "dependencies/environment-tools.txt",
-                     "dependencies/actions.lock.json", "vendors/gigadevice/gd32f4xx/source.lock.json"):
-            self.write(self.root / name, (ROOT / name).read_bytes())
-        from tools.maintenance.freertos_transport import REVIEW_FILES
-        for name in REVIEW_FILES:
-            if (ROOT / name).is_file():
-                self.write(self.root / name, (ROOT / name).read_bytes())
-        for notice in (ROOT / "vendors/gigadevice/gd32f4xx/LICENSES").iterdir():
-            self.write(self.root / "vendors/gigadevice/gd32f4xx/LICENSES" / notice.name,
-                       notice.read_bytes())
         self.git(self.root, "add", ".")
         self.commit(self.root, "actual parent committed gitlinks")
 
-    def write(self, path, data):
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(data)
+    def test_actual_fixture_inventory_observes_pins_without_mutation(self):
+        before = self.git(self.root, "rev-parse", "HEAD")
+        result = proposals.inventory(self.root)
+        self.assertEqual(result["owner"], "codex")
+        self.assertEqual(result["mode"], "weekly_read_only")
+        self.assertEqual(result["source_revision"], before)
+        self.assertEqual(self.git(self.root, "rev-parse", "HEAD"), before)
+        self.assertEqual(self.git(self.root, "status", "--porcelain"), "")
+        for key in ("source_dirty", "locks_changed", "upgrade_approved",
+                    "software_qualified"):
+            self.assertFalse(result[key], key)
+        self.assertEqual(result["network_reads"], 0)
+        observed = {item["path"] for item in result["dependencies"]
+                    if "path" in item}
+        self.assertEqual(observed, {item.path for item in self.entries})
 
-    def git(self, path, *arguments):
-        result = subprocess.run(["git", "-C", str(path), *arguments], capture_output=True,
-                                text=True, env=self.environment, timeout=20)
-        self.assertEqual(result.returncode, 0, result.stderr)
-        return result.stdout.strip()
+    def test_host_parser_inventory_records_its_locked_host_source_closure(self):
+        inventory = proposals.inventory(self.root)
+        for parser in source_catalogue.host_configuration_sources():
+            with self.subTest(parser=parser.identifier):
+                record = next(item for item in inventory["dependencies"]
+                              if item["id"] == parser.identifier)
+                lock = json.loads((self.root / parser.source_lock).read_text())
+                self.assertEqual(record["revision"], lock["commit"])
+                self.assertEqual(record["upstream_url"], parser.upstream_url)
+                observed = {Path(item["path"]) for item in record["identities"]}
+                self.assertLessEqual({self.root / parser.path / name
+                                      for name in lock["files"]}, observed)
+                self.assertIn(self.root / parser.source_lock, observed)
 
-    def commit(self, path, message):
-        self.git(path, "-c", "user.name=Dependency test", "-c",
-                 "user.email=dependency-test@local.invalid", "commit", "--quiet", "-m", message)
+    def test_host_parser_rehashed_omission_and_hidden_source_change_reject(self):
+        parser = source_catalogue.dependency("tomlc99")
+        lock_path = self.root / parser.source_lock
+        original_lock = lock_path.read_bytes()
+        lock = json.loads(original_lock)
+        lock["files"].pop("toml.c")
+        lock_path.write_text(json.dumps(lock))
+        with self.assertRaisesRegex(ValueError, "Host parser"):
+            proposals.inventory(self.root)
+        lock_path.write_bytes(original_lock)
+        checkout = self.root / parser.path
+        source = checkout / "toml.c"
+        original_source = source.read_bytes()
+        self.git(checkout, "update-index", "--skip-worktree", "toml.c")
+        source.write_bytes(original_source + b"\n/* hidden changed bytes */\n")
+        self.assertEqual(self.git(checkout, "status", "--porcelain"), "")
+        with self.assertRaisesRegex(ValueError, "Host parser"):
+            proposals.inventory(self.root)
+        lock = json.loads(original_lock)
+        lock["files"]["toml.c"] = {
+            "bytes": source.stat().st_size,
+            "sha256": hashlib.sha256(source.read_bytes()).hexdigest()}
+        lock_path.write_text(json.dumps(lock))
+        with self.assertRaisesRegex(ValueError, "Host parser"):
+            proposals.inventory(self.root)
 
     def test_googletest_inventory_records_gitlink_and_upstream_license(self):
         result = proposals.inventory(self.root)
@@ -517,133 +552,14 @@ class DependencyInventoryGitTests(unittest.TestCase):
         self.git(checkout, "update-index", "--no-assume-unchanged", relative)
         self.assertFalse(proposals.inventory(self.root)["source_dirty"])
 
-    def test_five_committed_gitlinks_observe_actual_g4_origin_license_and_sources(self):
-        result = proposals.inventory(self.root)
-        record = next(x for x in result["dependencies"] if x["id"] == "stm32g4_cmsis")
-        self.assertEqual(record["revision"], self.g4_lock["commit"])
-        self.assertEqual(record["upstream_url"], self.g4_lock["repository"])
-        observed = {Path(x["path"]).relative_to(self.root).as_posix()
-                    for x in record["identities"]}
-        required = {".gitmodules", "dependencies/stm32g4.lock.json"}
-        required.update("vendors/st/cmsis_device_g4/" + name
-                        for name in self.g4_lock["files"])
-        self.assertEqual(observed, required)
-        self.assertFalse(result["software_qualified"])
 
-    def test_reviewed_device_gitlinks_keep_exact_official_source_identities(self):
-        result = proposals.inventory(self.root)
-        self.assertEqual(len([record for record in result["dependencies"]
-                              if record.get("path")]),
-                         len(source_catalogue.ALL_DEPENDENCIES))
-        for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
-            with self.subTest(part=part):
-                record = next(record for record in result["dependencies"]
-                              if record.get("path") == review["directory"])
-                self.assertEqual(record["revision"], review["commit"])
-                self.assertEqual(record["upstream_url"], review["origin"])
-                observed = {Path(item["path"]).relative_to(self.root).as_posix()
-                            for item in record["identities"]}
-                expected = {".gitmodules"}
-                for selected in cmsis_device_lock.REVIEWED_DEVICES.values():
-                    if selected["directory"] == review["directory"]:
-                        expected.add(selected["lock_name"])
-                        expected.update(selected["directory"] + "/" + name
-                                        for name in selected["files"])
-                self.assertEqual(observed, expected)
-        self.assertFalse(result["source_dirty"])
-        self.assertFalse(result["software_qualified"])
 
-    def test_h5_inventory_observes_both_exact_official_source_closures(self):
-        result = proposals.inventory(self.root)
-        for source, names in ((stm32h5_device_lock, stm32h5_device_lock.FILES),
-                              (stm32h5_hal_lock,
-                               stm32h5_hal_lock.PROFILE.selected_files)):
-            with self.subTest(directory=source.DIRECTORY):
-                record = next(item for item in result["dependencies"]
-                              if item.get("path") == source.DIRECTORY)
-                expected = {".gitmodules", source.LOCK_NAME}
-                expected.update(source.DIRECTORY + "/" + name
-                                for name in names)
-                self.assertEqual({Path(item["path"]).relative_to(
-                    self.root).as_posix() for item in record["identities"]},
-                    expected)
-        self.assertFalse(result["source_dirty"])
-        self.assertFalse(result["software_qualified"])
 
-    def test_missing_secondary_h747_review_cannot_disappear_from_inventory(self):
-        self.assertFalse(proposals.inventory(self.root)["software_qualified"])
-        lock = self.root / "dependencies/stm32h747.lock.json"
-        lock.unlink()
-        with self.assertRaises((OSError, ValueError)):
-            proposals.inventory(self.root)
 
-    def test_secondary_h747_review_commit_must_match_actual_h7_gitlink(self):
-        self.assertFalse(proposals.inventory(self.root)["software_qualified"])
-        lock = self.root / "dependencies/stm32h747.lock.json"
-        value = json.loads(lock.read_bytes())
-        value["commit"] = "0" * 40
-        lock.write_text(json.dumps(value) + "\n")
-        with self.assertRaisesRegex(ValueError, "reviewed|Reviewed|Gitlink"):
-            proposals.inventory(self.root)
 
-    def test_secondary_h747_identity_cannot_substitute_primary_h743_review(self):
-        self.assertFalse(proposals.inventory(self.root)["software_qualified"])
-        lock = self.root / "dependencies/stm32h747.lock.json"
-        lock.write_bytes((self.root /
-                          "dependencies/stm32h7.lock.json").read_bytes())
-        with self.assertRaisesRegex(ValueError, "selector|identity"):
-            proposals.inventory(self.root)
 
-    def test_reviewed_device_inventory_rejects_rehashed_omission_and_foreign_origin(self):
-        for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
-            with self.subTest(part=part):
-                path = self.root / review["lock_name"]
-                original = path.read_bytes()
-                changed = json.loads(original)
-                del changed["files"][next(name for name in review["files"]
-                                          if name.endswith("xx.h"))]
-                path.write_text(json.dumps(changed))
-                with self.assertRaises(ValueError):
-                    proposals.inventory(self.root)
-                path.write_bytes(original)
-                checkout = self.root / review["directory"]
-                self.git(checkout, "remote", "set-url", "origin",
-                         "https://example.com/foreign-device.git")
-                with self.assertRaises(ValueError):
-                    proposals.inventory(self.root)
-                self.git(checkout, "remote", "set-url", "origin",
-                         source_catalogue.dependency(review["directory"]).fetch_url)
-                self.assertFalse(proposals.inventory(self.root)["source_dirty"])
 
-    def test_reviewed_device_inventory_requires_committed_gitlinks(self):
-        for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
-            with self.subTest(part=part):
-                self.git(self.root, "rm", "--cached", review["directory"])
-                self.commit(self.root, "actual parent without device Gitlink")
-                with self.assertRaisesRegex(ValueError, "Missing committed source Gitlink"):
-                    proposals.inventory(self.root)
-                self.git(self.root, "add", review["directory"])
-                self.commit(self.root, "restore exact official device Gitlink")
-                self.assertFalse(proposals.inventory(self.root)["source_dirty"])
 
-    def test_g4_uncommitted_gitlink_foreign_origin_and_rehashed_omission_reject(self):
-        path = self.root / "dependencies/stm32g4.lock.json"
-        changed = copy.deepcopy(self.g4_lock)
-        del changed["files"]["Include/stm32g474xx.h"]
-        path.write_text(json.dumps(changed))
-        with self.assertRaises(ValueError):
-            proposals.inventory(self.root)
-        path.write_text(json.dumps(self.g4_lock) + "\n")
-        self.git(self.root / "vendors/st/cmsis_device_g4", "remote", "set-url", "origin",
-                 "https://example.com/g4.git")
-        with self.assertRaises(ValueError):
-            proposals.inventory(self.root)
-        self.git(self.root / "vendors/st/cmsis_device_g4", "remote", "set-url", "origin",
-                 source_catalogue.dependency("stm32g4_cmsis").fetch_url)
-        self.git(self.root, "rm", "--cached", "vendors/st/cmsis_device_g4")
-        self.commit(self.root, "actual parent without G4 gitlink")
-        with self.assertRaisesRegex(ValueError, "Missing committed source Gitlink"):
-            proposals.inventory(self.root)
 
     def test_checkout_change_and_foreign_origin_reject_without_repair(self):
         file = self.root / "ext/threadx" / self.threadx_lock["common"][0]
@@ -679,6 +595,118 @@ class DependencyInventoryGitTests(unittest.TestCase):
         altered["commit"] = "a" * 40
         path.write_text(json.dumps(altered))
         with self.assertRaises(ValueError):
+            proposals.inventory(self.root)
+
+
+class DependencyInventorySelectorsTests(_InventoryGitFixture):
+    """One real Gitlink must close every independently reviewed selector."""
+
+    def setUp(self):
+        super().setUp()
+        self.dependency = source_catalogue.SourceDependency(
+            "fixture_device", "vendors/fixture/device",
+            "https://github.com/example/fixture-device.git",
+            "https://github.com/example/fixture-device-mirror.git",
+            "inventory", "LICENSE.md", "dependencies/primary.lock.json")
+        self.catalogue((self.dependency,))
+        self.checkout = self.root / self.dependency.path
+        files = {"files": dict.fromkeys(
+            ("LICENSE.md", "Include/primaryxx.h", "Include/secondaryxx.h"))}
+        write_files(self.checkout, files)
+        self.git(self.checkout, "init", "--quiet")
+        self.git(self.checkout, "remote", "add", "origin",
+                 self.dependency.fetch_url)
+        self.git(self.checkout, "add", ".")
+        self.commit(self.checkout, "synthetic reviewed selector sources")
+        pin = self.git(self.checkout, "rev-parse", "HEAD")
+        reviews = {}
+        for name in ("primary", "secondary"):
+            part = "FIXTURE_" + name.upper()
+            names = frozenset({"LICENSE.md", "Include/" + name + "xx.h"})
+            review = {"origin": self.dependency.upstream_url,
+                      "commit": pin, "directory": self.dependency.path,
+                      "lock_name": "dependencies/" + name + ".lock.json",
+                      "files": names}
+            reviews[part] = review
+            lock = {"schema_version": 1, "kind": "nexus-reviewed-device-source",
+                    "repository": review["origin"], "commit": pin,
+                    "selected_part": part,
+                    "files": {key: files["files"][key] for key in sorted(names)},
+                    "license": {"path": "LICENSE.md", "expression": "Apache-2.0"}}
+            self.write(self.root / review["lock_name"],
+                       (json.dumps(lock) + "\n").encode())
+        patch = mock_patch.object(cmsis_device_lock, "REVIEWED_DEVICES", reviews)
+        patch.start()
+        self.addCleanup(patch.stop)
+        self.git(self.root, "add", ".")
+        self.commit(self.root, "parent owns one reviewed selector Gitlink")
+        self.primary = self.root / "dependencies/primary.lock.json"
+        self.secondary = self.root / "dependencies/secondary.lock.json"
+
+    def verified(self):
+        result = proposals.inventory(self.root)
+        self.assertFalse(result["source_dirty"])
+        self.assertFalse(result["software_qualified"])
+        return next(item for item in result["dependencies"]
+                    if item.get("id") == self.dependency.identifier)
+
+    def test_both_selector_locks_and_source_closures_are_observed(self):
+        record = self.verified()
+        observed = {Path(item["path"]).relative_to(self.root).as_posix()
+                    for item in record["identities"]}
+        self.assertEqual(observed, {
+            ".gitmodules", "dependencies/primary.lock.json",
+            "dependencies/secondary.lock.json",
+            "vendors/fixture/device/LICENSE.md",
+            "vendors/fixture/device/Include/primaryxx.h",
+            "vendors/fixture/device/Include/secondaryxx.h"})
+        self.assertEqual(record["revision"],
+                         self.git(self.checkout, "rev-parse", "HEAD"))
+
+    def test_missing_secondary_lock_cannot_disappear(self):
+        self.verified()
+        self.secondary.unlink()
+        with self.assertRaisesRegex(ValueError, r"secondary\.lock\.json"):
+            proposals.inventory(self.root)
+
+    def test_secondary_commit_must_match_review_and_gitlink(self):
+        self.verified()
+        lock = json.loads(self.secondary.read_text())
+        lock["commit"] = "0" * 40
+        self.secondary.write_text(json.dumps(lock))
+        with self.assertRaisesRegex(ValueError,
+                                    "Reviewed official origin, part and commit"):
+            proposals.inventory(self.root)
+
+    def test_primary_selector_cannot_substitute_secondary(self):
+        self.verified()
+        self.secondary.write_bytes(self.primary.read_bytes())
+        with self.assertRaisesRegex(ValueError, "selector identity changed"):
+            proposals.inventory(self.root)
+
+    def test_secondary_bytes_hidden_from_git_status_are_rechecked(self):
+        self.verified()
+        name = "Include/secondaryxx.h"
+        self.git(self.checkout, "update-index", "--assume-unchanged", name)
+        source = self.checkout / name
+        source.write_bytes(source.read_bytes() + b"changed secondary bytes\n")
+        self.assertEqual(self.git(self.checkout, "status", "--porcelain"), "")
+        with self.assertRaisesRegex(ValueError, "Device source/license identity"):
+            proposals.inventory(self.root)
+
+    def test_reviewed_source_origin_cannot_change(self):
+        self.verified()
+        self.git(self.checkout, "remote", "set-url", "origin",
+                 "https://github.com/example/foreign-device.git")
+        with self.assertRaisesRegex(ValueError,
+                                    "Source checkout differs.*locked clean"):
+            proposals.inventory(self.root)
+
+    def test_reviewed_source_requires_a_committed_parent_gitlink(self):
+        self.verified()
+        self.git(self.root, "rm", "--cached", self.dependency.path)
+        self.commit(self.root, "parent no longer owns reviewed source")
+        with self.assertRaisesRegex(ValueError, "Missing committed source Gitlink"):
             proposals.inventory(self.root)
 
 

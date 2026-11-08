@@ -13,8 +13,9 @@
             "inherits": "nexus-base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native.toml",
-                "NEXUS_BUILD_TESTS": "ON"
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/support/native/assemblies/native.toml",
+                "NEXUS_BUILD_TESTS": "ON",
+                "NEXUS_TEST_SUPPORT": "ON"
             }
         },
         {

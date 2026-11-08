@@ -4,17 +4,17 @@
 
 本文说明通用平台如何接入 CPU、SoC、Board、外部器件、协议和组件，以及外部工程如何形成可审核的固件。总体边界见 [下一代平台设计](next-generation-platform.md)，开发、验证和维护流程见 [工程手册](engineering-handbook.md)。
 
-首发范围是 STM32F407ZGT6 启明 V3.1、STM32F407VET6 天空星青春版、GD32F470ZGT6 梁山派，以及裸机和 FreeRTOS 两种后端。现在不连接硬件；源资料、软件实现、编译链接、模型行为和物理资格必须分开陈述。未知的实际 PCB revision、跳线、电气或器件型号保持未知。
+当前生产入口只有 STM32F4，已迁入 F407VE／ZG 及四个独立 Board 包。现在不连接硬件；源资料、软件实现、编译链接、模型行为和物理资格必须分开陈述。未知的实际 PCB revision、跳线、电气或器件型号保持未知。
 
 ## 1. 第一原则与工具边界
 
 接入不是把所有硬件描述转换为一个运行时设备树。它是提交有限事实、选择已维护能力、检查资源，再显式装配静态对象。
 
 - 使用 C11、CMake、Ninja、TOML 装配输入、JSON 硬件事实和一个窄 Python 校验/生成工具。核心默认不需要 heap、运行时字符串查找、自动探测或后台 worker。
-- 默认入口是外部工程的 `assembly.toml`。硬件输入分为 SoC、Board、assembly 三类，一次验证建立冻结 typed IR；`resolved.json` 是其权威 JSON 投影。
+- 默认入口是外部工程的 `assembly.toml`。硬件输入分为 SoC、Board、assembly 三类，一次验证建立冻结 typed IR；`resolved.json` 是其单向审计投影。
 - CMake 仍是代码目标和代码依赖的权威。生成器不生成组件依赖图、业务线程、产品 main 或调度策略。
 - 实例选择使用 TOML schema 2，SoC/Board 事实保持 JSON。工具只解析这一个装配输入；Kconfig、CMake cache 和旧生成头不形成平行配置权威。
-- 目录可采用 `core/ arch/ soc/ drivers/ io/ os/ components/ tools/ tests/`；Board 可位于独立 package。层名说明职责，不要求每个层、端口或对象成为一个独立 translation unit。
+- 目录可采用 `core/ arch/ soc/ io/ os/ components/ tools/ tests/`；Board 可位于独立 package。层名说明职责，不要求每个层、端口或对象成为一个独立 translation unit。
 - 未维护的能力不因 SDK 有宏、路由表有 AF 值、同系列有示例而自动可用。新路由、新 DMA 模式、新控制器分别接入。
 
 ## 2. 各类接入拥有的事实
@@ -43,94 +43,22 @@ SoC provider 实现公共 IO/核心合同，并使用 Arch。器件 driver 使�
 soc/<vendor>/<family>/
   soc.json                 # 精确 SKU、内存、时钟与控制器事实
   routes.json              # 已复核路由及模式的有限 allowlist
-  descriptor.py            # 本家族只读元数据；不导入 configure 行为
   CMakeLists.txt           # 私有 SDK/provider 的显式目标依赖
-  configure/              # 家族能力、准入、构造与生命周期生成
   private/                 # 私有 SDK 接口与硬件实现
   ...                      # startup、controller、clock/IRQ、linker 实现
 ```
 
-family 目录可以复用代码，`soc.json` 仍分别定义 STM32F407VET6、STM32F407ZGT6、GD32F470ZGT6。型号、封装、Flash、SRAM 域和 IRQ 表不能被一个家族字符串代替。新增型号不等于已有所有 controller 都支持该型号。
+系列目录复用代码，`soc.json` 分别定义 STM32F407VET6、STM32F407ZGT6 的精确物理事实；`devices.json` 记录官方器件宏、启动和 IRQ 编译事实。型号、封装、Flash、SRAM 域和 IRQ 表不能被家族字符串代替，编译目录不扩大运行时模式支持。
 
-当前厂家目录为 `stm32` 与 `gd32`，例如 `soc/stm32/stm32f407` 和
-`soc/gd32/gd32f470`。已核实的共享 IP 算法位于 `drivers/<kind>/<ip>/`，由所选
-SoC target 私有选编；`soc/common` 保留跨厂家 SoC 协作合同，STM32 identity helper
-位于 `soc/stm32/common`。`soc/native/drivers` 实现独立主机模型。
-`source_directory` 由同一维护中的
-family descriptor 给出，配置仍使用原 family 标识；物理目录不构成第二份配置权威。
-CPU 实现按 ISA 位于 `arch/arm/cortex_m` 或 `arch/native`，公共头路径保持稳定。
-
-八个 provider 的生产配置模块随 SoC 放置；Native 使用 `soc/native/configure`。
-各自的数据型 `descriptor.py` 位于 SoC package 根目录，不放入 `configure/`。
-`tools/configure/providers/descriptor.py` 保留冻结的通用 `FamilyDescriptor` 和显式
-family→模块映射；provider loader 委托这个入口，不另建 eager registry。
-单次 `descriptor.maintained()` 查找只加载所选元数据，核对精确类型、family 和模块身份，
-不加载配置行为。显式 `families()` 枚举、初始源码快照或 SDK 清单允许读取全部
-元数据，不能将局部查找约束误写为整个生成器只读一个数据片段。
-共享 leaf 合同、通用解析、资源仲裁、typed IR 与原子 bundle 仍在
-`tools/configure`；配置测试位于 `tools/configure/tests/providers/<family>`。
-模块位置不增加运行时注册、转发、分配或任务，也不改变 CMake 的源码依赖权威。
-
-`routes.json` 每条记录至少绑定精确 SKU、controller、pin/AF、clock domain、IRQ、允许传输模式、允许 DMA route 和来源。可复用路由记录，但必须限定适用 SKU/封装。源资料复核与实板资格采用不同字段。
-
-### Board package
-
-已经有 SoC 实现时，新 Board 默认只需要：
-
-```text
-boards/<board-id>/
-  board.json               # 实际晶振、接线、电气、revision、资料来源
-  README.md                # 跳线/连接器与已知限制
-  board.c                  # 可选：特殊电源/复位/安全初值动作
-```
-
-Board 不复制 SDK、HAL、RTOS port 或链接器脚本。普通 GPIO 初始电平与 pin binding 可直接表达为数据；只有无法用已维护数据合同表达的有界电气动作才增加 `board.c`。这种代码仍须通过中性硬件端口工作。
-
-Board 的晶振声明必须匹配已维护的固定时钟 profile。一个新的晶振数值不会自动
-生成任意 PLL、电源、Flash wait-state 或外设 kernel clock 组合；需要新组合时，
-先为精确 SoC 实现并验证相应 profile，再允许 Board 装配选择。当前软件能力与
-物理频率、供电和唤醒测量分别取得，不从配置解析成功推导实板资格。
-
-下面是字段示意，`example-board` 并非声称存在或已经维护的 Board：
-
-```json
-{
-  "schema_version": 1,
-  "id": "example-board",
-  "soc": "STM32F407ZGT6",
-  "soc_family": "stm32f407",
-  "source_revision": "document-revision",
-  "physical_pcb_revision": null,
-  "clocks": {"hse_hz": 8000000},
-  "bindings": [],
-  "reserved_resources": [],
-  "unknowns": ["physical PCB identity and connector wiring pending"],
-  "provenance": []
-}
-```
-
-模板中的晶振数值必须换成该 Board 的资料事实。空 `bindings` 不提供 UART/SPI/I2C/RS485；把真实 wiring 加入其中之前，须核实连接器、引脚、电平、跳线与 SoC reviewed route。Board 引用 SoC 的内存事实，不再独立维护一份可漂移的 RAM/Flash 大小。
-
-### 外部 assembly
-
-外部 `nexus-examples` 或私有产品工程提供 `assembly.toml`，选择一个 Board package、OS 后端、时钟 profile、需要的资源和器件实例。以下最小示意没有声明任何外设实例：
-
-<!-- nexus-toml-fragment: external Board paths and clock profile must be supplied. -->
-
-```toml
-schema = 2
-board_package = "./boards/example-board"
-backend = "baremetal"
-clock = "selected-profile-id"
-
-[memory]
-main_stack_bytes = 4096
-libc_heap_bytes = 0
-```
-
-`selected-profile-id` 是需替换的示意值；未知 profile 必须拒绝。`[uart.link0]` 等类别实例表只选择 Board 已声明且 SoC 已维护的 binding，明确 polling/IRQ/DMA 模式、必要 ring 容量和 IRQ priority。`[spi_device.sensor0]`、`[i2c_device.sensor0]` 显式绑定 controller 与 CS/address，不生成 worker。factory 分别返回 controller 和 child 的 immutable face。
-
-没有外部产品 layout 时，镜像只能采用已维护的全物理 Flash 默认布局，平台不预留“通用产品存储”。产品 layout 若被选择，其完整内容成为 assembly 的 declared input，由同一解析路径进入 resolved IR。
+当前生产源码只有 `soc/stm32/stm32f4/`，私有共享 IP 位于其 `drivers/ip/`。
+Board／SoC 不放 Python 插件；当前 F4 配置适配集中在 `tools/configure/stm32f4/`，
+通用 schema、resolver、typed IR 与原子输出仍由公共工具维护。Native 仅在
+`tests/support/native/`，必须显式启用测试 scope；不会进入生产支持枚举。
+CPU 实现按 ISA 位于 `arch/arm/cortex_m/` 或 `arch/native/`，公共头路径保持稳定。
+默认生成入口连接 Core 的手写 C 整平台生命周期和 F4 的 System／共享资源 C 协调器。
+主机保留事实校验与静态连接，不维护硬件算法或启动／撤回控制流。Host C11 是独立
+可选试点，其全面替换不作为固件 C 化或交付前置。实际生成 factory、C 模型与 ARM
+镜像分别验收，不能用目录调整或源码存在宣布整条链路通过。
 
 ## 4. 解析、生成与 CMake 装配
 
@@ -185,7 +113,7 @@ Board 提供实际 HSE/LSE、电气条件和必要跳线事实；SoC 提供合�
 
 静态 DMA buffer 可用 linker section、alignment 和 map 检查；调用者动态传入的指针仍须在执行时验证可达域与对齐。编译检查不能替代 borrow/settlement 生命周期。内存预算区分 MSP、任务栈、OS 对象、IO buffer、组件 workspace 和可选 libc heap。
 
-Flash 布局使用精确料号的 erase geometry，拒绝越界、重叠、重复 ID 和不满足擦除边界的 region，并且只允许一个 image。`resolved.flash` 保留完整物理几何，`resolved.layout` 选择链接镜像窗口；窗口不创建 Flash ACL 或产品写权限。所选 STM32F407VET6/ZGT6 与 GD32F470ZGT6 支持经过审查的偏移镜像、512 字节向量对齐、实际 vendor vector symbol 和配套 startup/ELF/BIN 检查；其他 SoC 仍要求复位地址镜像。准确字段和边界见[装配参考](../reference/configuration/assembly.md#physical-flash-and-the-selected-image)。
+Flash 布局使用精确料号的 erase geometry，拒绝越界、重叠、重复 ID 和不满足擦除边界的 region，并且只允许一个 image。`resolved.flash` 保留完整物理几何，`resolved.layout` 选择链接镜像窗口；窗口不创建 Flash ACL 或产品写权限。所选 STM32F407VET6/ZGT6 支持经过审查的偏移镜像、512 字节向量对齐、实际 vendor vector symbol 和配套 startup/ELF/BIN 检查。准确字段和边界见[装配参考](../reference/configuration/assembly.md#physical-flash-and-the-selected-image)。
 
 偏移链接只建立软件镜像边界。外部产品仍须提供进入 Reset_Handler 的有效启动路径、初始机器状态、认证、激活及恢复政策。现有 F407 running-image handoff 保留 PRIMASK=1，startup 不主动解除屏蔽；裸机或 FreeRTOS 链接结果不建立通用运行态交接或 FreeRTOS handoff 资格。
 

@@ -1,4 +1,5 @@
 """Backend-specific assembly policy, resource claims and emitted contracts."""
+from tools.configure.tests.native_fixture import native_fixture
 import json
 from pathlib import Path
 import tempfile
@@ -16,12 +17,11 @@ class KernelAssemblyTests(unittest.TestCase):
 
     def assembly(self, *, board="stm32f407_qiming_v31", backend="threadx",
                  options="", uart=True):
-        clock = {"native_reference": "model",
-                 "gd32f470_liangshan": "hxtal25-pll200"}.get(board, "hse8-pll168")
+        clock = "model" if board == "native_reference" else "hse8-pll168"
         content = (f'schema=2\nboard="{board}"\nbackend="{backend}"\n'
                    f'clock="{clock}"\n[memory]\nmain_stack_bytes=2048\n')
         if uart:
-            binding = "console" if board == "gd32f470_liangshan" else "uart1"
+            binding = "uart1"
             content += (f'[uart.link]\nbinding="{binding}"\nmode="irq"\n'
                         'baud=115200\nrx={format="events",capacity=16}\n'
                         'irq={priority=5,calls_os=true}\n')
@@ -39,11 +39,10 @@ class KernelAssemblyTests(unittest.TestCase):
                 return {"path": relative, "commit": "1" * 40}
             return identity(root, relative, expected)
         with patch.object(gate, "dependency_identity", side_effect=dependency):
-            return gate.resolve_ir(path)
+            return gate.resolve_ir(path, test_support=native_fixture(path))
 
     def test_threadx_assembly_retains_distinct_type_claims_and_source_identity(self):
-        for board in ("stm32f407_qiming_v31", "stm32f407ve_sky_qingchun",
-                      "gd32f470_liangshan"):
+        for board in ('stm32f407_qiming_v31', 'stm32f407ve_sky_qingchun'):
             with self.subTest(board=board):
                 result = self.resolve(self.assembly(board=board))
                 self.assertEqual(result.kernel.backend, "threadx")
@@ -134,7 +133,7 @@ class KernelAssemblyTests(unittest.TestCase):
 
     def test_baremetal_physical_basepri_is_not_a_configured_kernel_policy(self):
         source = gate.ROOT / "tests/contracts/can_assembly/stm32-first.toml"
-        result = gate.resolve_ir(source)
+        result = gate.resolve_ir(source, test_support=native_fixture(source))
         self.assertEqual(result.cpu_profile.irq.mask_kind, "basepri")
         self.assertIsNone(result.kernel)
         output = self.root / "can-baremetal"

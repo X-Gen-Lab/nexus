@@ -1,4 +1,5 @@
 """Normal typed SG/VLAN/PTP selection; real provider tests execute hardware."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 import json
 from pathlib import Path
@@ -32,12 +33,10 @@ class EthernetFramesConfiguration(unittest.TestCase):
                 content = content.replace(before, after)
             assembly = path / 'assembly.toml'
             assembly.write_text(content)
-            return configure.resolve_ir(assembly)
+            return configure.resolve_ir(assembly, test_support=native_fixture(assembly))
 
     def test_exact_zg_parts_freeze_storage_and_derive_a_counter_domain(self):
-        for family, part, controller in (
-                ('f407zg', 'STM32F407ZGT6', 'ETH'),
-                ('gd470', 'GD32F470ZGT6', 'ENET')):
+        for family, part, controller in (('f407zg', 'STM32F407ZGT6', 'ETH'),):
             with self.subTest(family=family):
                 result = self.resolve(family)
                 item, = result.controllers
@@ -56,7 +55,7 @@ class EthernetFramesConfiguration(unittest.TestCase):
                 self.assertFalse(result.physical_qualified)
 
     def test_factory_uses_distinct_frame_face_and_paired_mdio_without_io(self):
-        for family in ('f407zg', 'gd470'):
+        for family in ('f407zg',):
             with self.subTest(family=family):
                 header, source = factory.emit(self.resolve(family))
                 self.assertIn('const nx_eth_frames_port_t* '
@@ -71,7 +70,7 @@ class EthernetFramesConfiguration(unittest.TestCase):
                 self.assertNotIn('NX_PLATFORM_REGISTER_WRITE', source)
 
     def test_enhanced_storage_ops_epochs_and_actual_private_constructor(self):
-        for family, prefix in (('f407zg', 'stm32'), ('gd470', 'gd32')):
+        for family, prefix in (('f407zg', 'stm32'),):
             with self.subTest(family=family):
                 source = bindings.emit(self.resolve(family))[1]
                 for direction in ('tx', 'rx'):
@@ -87,8 +86,10 @@ class EthernetFramesConfiguration(unittest.TestCase):
                 self.assertIn(f'static const nx_{prefix}_eth_frames_cold_config_t',
                               source)
                 self.assertIn('.clock_domain = 1u', source)
-                self.assertIn(f'nx_{prefix}_eth_resources_capture('
-                              '&s_nx_eth_resources, true)', source)
+                self.assertIn('.ethernet = &s_nx_eth_resources,', source)
+                self.assertIn(f'.ethernet_capture = '
+                              f'nx_{prefix}_eth_resources_capture,', source)
+                self.assertIn('.ethernet_frames = true', source)
                 self.assertNotIn(f'nx_{prefix}_eth_frames_initialize(', source)
                 self.assertNotIn('s_nx_port_mac.rx_epoch', source)
                 self.assertNotIn('s_nx_port_mac.clock_epoch', source)
@@ -97,7 +98,7 @@ class EthernetFramesConfiguration(unittest.TestCase):
                 self.assertNotIn('dp83848', source.lower())
 
     def test_actual_selected_traits_keep_frame_units_and_optional_stamps(self):
-        for family in ('f407zg', 'gd470'):
+        for family in ('f407zg',):
             with self.subTest(family=family):
                 records = selected_contracts.for_configuration(
                     self.resolve(family))
@@ -119,7 +120,7 @@ class EthernetFramesConfiguration(unittest.TestCase):
                 self.assertFalse(frame.physical_qualified)
 
     def test_sg_storage_requires_real_strides_and_complete_rx_capacity(self):
-        for family in ('f407zg', 'gd470'):
+        for family in ('f407zg',):
             for before, after in (
                     ('tx_count = 8', 'tx_count = 0'),
                     ('rx_count = 8', 'rx_count = true'),
@@ -135,7 +136,7 @@ class EthernetFramesConfiguration(unittest.TestCase):
                         self.resolve(family, ((before, after),))
 
     def test_observed_clock_or_phy_qualification_cannot_be_authored(self):
-        for family in ('f407zg', 'gd470'):
+        for family in ('f407zg',):
             for option in ('clock_domain = 1', 'clock_epoch = 1',
                            'hardware_qualified = true', 'phy_address = 0'):
                 with self.subTest(family=family, option=option):
@@ -144,7 +145,7 @@ class EthernetFramesConfiguration(unittest.TestCase):
                                                'tx_count = 8\n' + option),))
 
     def test_mode_and_address_cannot_silently_fall_back_to_raw_ethernet(self):
-        for family in ('f407zg', 'gd470'):
+        for family in ('f407zg',):
             for before, after in (
                     ('mode = "rmii-vlan-sg-ptp"', 'mode = "raw-rmii"'),
                     ('address = [2, 0, 0, 0, 0, 1]',
@@ -161,7 +162,7 @@ class EthernetFramesConfiguration(unittest.TestCase):
                          board.update(soc='STM32F407VET6'))
 
     def test_two_frame_owners_conflict_on_one_physical_controller(self):
-        for family in ('f407zg', 'gd470'):
+        for family in ('f407zg',):
             fixture = self.fixture(family).read_text()
             _, instance = fixture.split('[eth_frames.mac]', 1)
             extra = ('\n[eth_frames.other]' + instance.replace(
@@ -173,12 +174,14 @@ class EthernetFramesConfiguration(unittest.TestCase):
 
     def test_default_and_ordinary_raw_modes_do_not_gain_enhanced_state(self):
         default = configure.resolve_ir(configure.ROOT /
-                    'tools/configure/assemblies/qiming-baremetal.toml')
+                    'tools/configure/assemblies/qiming-baremetal.toml', test_support=native_fixture(configure.ROOT /
+                    'tools/configure/assemblies/qiming-baremetal.toml'))
         self.assertNotIn('s_nx_eth_frames_', bindings.emit(default)[1])
-        for label in ('stm32-zg', 'gd32'):
+        for label in ('stm32-zg',):
             with self.subTest(label=label):
                 result = configure.resolve_ir(configure.ROOT /
-                    ('tests/contracts/ethernet_assembly/' + label + '.toml'))
+                    ('tests/contracts/ethernet_assembly/' + label + '.toml'), test_support=native_fixture(configure.ROOT /
+                    ('tests/contracts/ethernet_assembly/' + label + '.toml')))
                 record, = [row for row in
                             selected_contracts.for_configuration(result)
                             if row.public_class == 'eth']

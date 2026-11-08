@@ -1,4 +1,5 @@
 """Explicit provider selection in Board-first authoring commands."""
+from tools.configure.tests.native_fixture import native_fixture, with_native_support
 from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
@@ -28,7 +29,7 @@ class ExternalProviderAuthoringTests(unittest.TestCase):
         output, errors = io.StringIO(), io.StringIO()
         with redirect_stdout(output), redirect_stderr(errors):
             try:
-                status = configure.main(list(arguments))
+                status = configure.main(with_native_support(list(arguments)))
             except SystemExit as error:
                 status = error.code
         return status, output.getvalue(), errors.getvalue()
@@ -88,7 +89,7 @@ class ExternalProviderAuthoringTests(unittest.TestCase):
         relocated = self.root.with_name(self.root.name + " relocated")
         self.root.rename(relocated)
         self.addCleanup(shutil.rmtree, relocated, ignore_errors=True)
-        resolved = configure.resolve_ir(relocated / output)
+        resolved = configure.resolve_ir(relocated / output, test_support=native_fixture(relocated / output))
         self.assertEqual(resolved.soc_family, "partner_model")
         self.assertEqual(resolved.controllers[0].kind, "gpio")
 

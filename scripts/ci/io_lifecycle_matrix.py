@@ -24,9 +24,9 @@ MAX_METADATA_BYTES = 32 * 1024 * 1024
 # wrappers and all other hardware TUs still require the property target itself.
 # These are evidence-owner constraints, never a source selection/build graph.
 SHARED_ENGINE_OWNERS = {
-    "drivers/can/classic_can/can_controller.c": "nexus_can_native_engine",
-    "drivers/usb/fs_device_pio/usb_device_controller.c": "nexus_usb_native_engine",
-    "drivers/ethernet/legacy_mac/eth_mac.c": "nexus_eth_native_engine",
+    "soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c": "nexus_can_native_engine",
+    "soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c": "nexus_usb_native_engine",
+    "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c": "nexus_eth_native_engine",
 }
 
 
@@ -154,7 +154,8 @@ def build_inputs(root, build, catalogue, *, complete=False):
         raise ValueError("Duplicate Google executable basename")
     targets = {row["target"] for row in data["properties"]}
     if not targets.issubset(binaries):
-        raise ValueError("Catalogue target is not in the actual CMake graph")
+        raise ValueError("Catalogue target is not in the actual CMake graph: " +
+                         ", ".join(sorted(targets - binaries.keys())))
     binary_ids = {}
     for name in sorted(binaries):
         path = checked_binary(binaries[name], build)
@@ -243,11 +244,12 @@ def build_inputs(root, build, catalogue, *, complete=False):
             source_name = (root / source).resolve().relative_to(
                 root.resolve()).as_posix()
             if (source == row["test_source"] or
-                    source_name.startswith(("soc/", "drivers/"))):
+                    source_name.startswith(("soc/stm32/stm32f4/",
+                                            "tests/support/native/drivers/"))):
                 # Native models and explicitly reviewed engines may be shared;
                 # concrete providers and test bodies retain target-local builds.
                 owner = ("nexus_io_native" if source != row["test_source"] and
-                         source_name.startswith("soc/native/drivers/") else row["target"])
+                         source_name.startswith("tests/support/native/drivers/") else row["target"])
                 owners = {owner}
                 if source != row["test_source"] and source_name in SHARED_ENGINE_OWNERS:
                     owners.add(SHARED_ENGINE_OWNERS[source_name])

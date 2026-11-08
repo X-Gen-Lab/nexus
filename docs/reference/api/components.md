@@ -252,8 +252,7 @@ the existing MAC/TX withdrawal obligations. Failed drain never revokes a loan.
 
 Slot count is metadata capacity, not a provider capability or an ACK-progress
 promise. Concurrent acquisition also requires independent provider loans and
-enough descriptors for the actual frames. The maintained enhanced F407 and
-GD470 MAC engine supports independent held RX heads and reverse-order release
+enough descriptors for the actual frames. The maintained enhanced F407 MAC engine supports independent held RX heads and reverse-order release
 in software models; this fact does not establish universal capacity, lossless
 operation or progress under arbitrary retained traffic. Products budget and
 release loans for their selected frame geometry and workload.
@@ -272,14 +271,13 @@ counts are not a complete SRAM measurement.
 C11 link-only external development probes use two frame slots, four pieces,
 a 2048 B main stack and zero libc heap. The selected images pass a 32 KiB SRAM
 budget. The copied-profile BIN bytes and caller storage match the same source
-baseline with the common TX-outcome improvement, for both reference chips.
+baseline with the common TX-outcome improvement in this historical fixture.
 
 | Link-only reference | Copied RX flash / SRAM (B) | Loaned RX flash / SRAM (B) |
 | --- | --- | --- |
 | STM32F407VE | 32616 / 35416 | 33244 / 24344 |
-| GD32F470ZG | 33920 / 35388 | 34548 / 24316 |
 
-These probes do not provide a real MAC descriptor ring or payload buffers.
+These historical probes do not qualify current source or provide a real MAC descriptor ring or payload buffers.
 The selected adapter costs 628 B more Flash and 11072 B less total SRAM in this
 exact fixture. Reducing the selected pool from 24 to two blocks saves 11616 B
 with unchanged adapter behavior and layout. These are image/link measurements;

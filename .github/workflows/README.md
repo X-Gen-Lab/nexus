@@ -9,10 +9,10 @@ required-job 汇总拒绝失败、取消和无依据 skip。修改 workflow 需�
 
 | 工作流 | 实际责任 |
 | --- | --- |
-| `build-matrix.yml` | Debug、Release、ASan／UBSan、TSan 各执行完整 CTest／Google 用例；六个精确 Board／backend ARM 装配；CPU runtime、kernel profile、OS 静态成本、MPU／TrustZone 双镜像和软件外设夹具 |
+| `build-matrix.yml` | Debug、Release、ASan／UBSan、TSan 各执行完整 CTest／Google 用例；四个精确 F4 Board／backend ARM 装配；CPU runtime、kernel profile、OS 静态成本、MPU／TrustZone 双镜像和软件外设夹具 |
 | `quality-checks.yml` | 与 hook 相同的 staged 风格规则；实际 compile database 上 clang-tidy／cppcheck；缺工具或空范围失败 |
 | `enterprise-tools.yml` | 配置、产物篡改、预算、HIL 准入、真实 SDK 搬移与失败边界 |
-| `performance.yml` | 三板 O2／Os／O3 与可选 LTO 的最小镜像、GC、预算比较，不推断周期 |
+| `performance.yml` | F4 双板 O2／Os／O3 与可选 LTO 的最小镜像、GC、预算比较，不推断周期 |
 | `release.yml` | 精确 SHA SDK 打包与严格消费者；可信 main 上按版本策略预览发布，要求新的完整 CI、匹配既有 tag、资产和 provenance |
 | `security.yml` | 实际解析的 Python 依赖审计、Native CodeQL 构建上下文与秘密扫描 |
 | `docs-build.yml` | 公开 Doxygen、严格中英文 Sphinx、锁定工具与待发布字节验证 |
@@ -20,6 +20,11 @@ required-job 汇总拒绝失败、取消和无依据 skip。修改 workflow 需�
 
 一份 TOML 生成原子配置、typed factory ID、共享只读接口、固定绑定与物理内存输入，
 CMake 拥有源码图。SDK／SoC 头私有编译，startup／system object 只装一次。
+完整 Native 合同包含 Host C 配置器的实际 ARM 编译检查，Native、静态分析与 C++
+CodeQL 作业均准备同一锁定 ARM 工具链。CI 身份绑定 setup 的真实 preset receipt，
+并上传该原件；Native 测试闭包允许编译器检查和多配置矩阵，ARM 装配仍逐一匹配
+所选 TOML／Board。未选 vendor 库存保留原始 Git 状态，不增加默认验证依赖。
+
 显式准备按声明闭包初始化固定递归 FreeRTOS、CMSIS、ThreadX 等源码；SDK 打包
 要求完整闭包，ARM 使用摘要锁定的 GNU 归档。最小 ARM 准备与配置期 lwIP 校验
 不一致的问题单独记录在 [#52](https://github.com/X-Gen-Lab/nexus/issues/52)。

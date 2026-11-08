@@ -1,4 +1,5 @@
 """One FSMC owner statically connects exact reviewed external bank faces."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 import json
 from pathlib import Path
@@ -49,7 +50,7 @@ class F407FSMCConfigurationTests(unittest.TestCase):
 
     def test_one_bus_three_public_classes_and_one_exact_pad_union(self):
         with tempfile.TemporaryDirectory() as temporary:
-            result = gate.resolve_ir(self.fixture(Path(temporary)))
+            result = gate.resolve_ir(self.fixture(Path(temporary)), test_support=native_fixture(self.fixture(Path(temporary))))
             bus, = result.controllers
             self.assertEqual((bus.kind, bus.mode), ("external_bus", "async16"))
             self.assertEqual(len(bus.pins), 41)
@@ -92,14 +93,16 @@ class F407FSMCConfigurationTests(unittest.TestCase):
             with self.subTest(sram=sram, lcd=lcd):
                 with tempfile.TemporaryDirectory() as temporary:
                     result = gate.resolve_ir(self.fixture(Path(temporary),
-                                                          sram=sram, lcd=lcd))
+                                                          sram=sram, lcd=lcd), test_support=native_fixture(self.fixture(Path(temporary),
+                                                          sram=sram, lcd=lcd)))
                     self.assertEqual(len(result.controllers[0].pins), count)
 
     def test_empty_external_bus_is_not_a_selected_hardware_transport(self):
         with tempfile.TemporaryDirectory() as temporary:
             with self.assertRaisesRegex(ValueError, "(?i)(bank|endpoint|child)"):
                 gate.resolve_ir(self.fixture(Path(temporary),
-                                             sram=False, lcd=False))
+                                             sram=False, lcd=False), test_support=native_fixture(self.fixture(Path(temporary),
+                                             sram=False, lcd=False)))
 
     def test_same_physical_bank_cannot_be_selected_twice(self):
         extra = ('[memory_window.alias]\ncontroller="ext0"\nbinding="sram0"\nmode="cpu-window"\n'
@@ -107,7 +110,7 @@ class F407FSMCConfigurationTests(unittest.TestCase):
                  'write_timing={address_setup=2,address_hold=1,data_setup=9,bus_turn=1}\n')
         with tempfile.TemporaryDirectory() as temporary:
             with self.assertRaisesRegex(ValueError, "(?i)(bank|conflict|owned)"):
-                gate.resolve_ir(self.fixture(Path(temporary), extra=extra))
+                gate.resolve_ir(self.fixture(Path(temporary), extra=extra), test_support=native_fixture(self.fixture(Path(temporary), extra=extra)))
 
     def test_timing_limits_and_foreign_controller_reject(self):
         for timing in ('address_setup=16,address_hold=1,data_setup=9,bus_turn=1',
@@ -117,13 +120,13 @@ class F407FSMCConfigurationTests(unittest.TestCase):
             with self.subTest(timing=timing):
                 with tempfile.TemporaryDirectory() as temporary:
                     with self.assertRaises(ValueError):
-                        gate.resolve_ir(self.fixture(Path(temporary), timing=timing))
+                        gate.resolve_ir(self.fixture(Path(temporary), timing=timing), test_support=native_fixture(self.fixture(Path(temporary), timing=timing)))
 
     def test_gpio_conflict_and_controller_parent_reservation_are_rejected(self):
         extra = '[gpio.other]\nbinding="busy-pad"\nmode="output"\n'
         with tempfile.TemporaryDirectory() as temporary:
             with self.assertRaisesRegex(ValueError, "(?i)(conflict|owned)"):
-                gate.resolve_ir(self.fixture(Path(temporary), extra=extra))
+                gate.resolve_ir(self.fixture(Path(temporary), extra=extra), test_support=native_fixture(self.fixture(Path(temporary), extra=extra)))
         for key in ("controller:FSMC", "ip:FSMC"):
             with self.subTest(key=key):
                 with tempfile.TemporaryDirectory() as temporary:
@@ -134,18 +137,18 @@ class F407FSMCConfigurationTests(unittest.TestCase):
                     board["reserved_resources"].append(key)
                     path.write_text(json.dumps(board))
                     with self.assertRaisesRegex(ValueError, "(?i)(conflict|owned)"):
-                        gate.resolve_ir(assembly)
+                        gate.resolve_ir(assembly, test_support=native_fixture(assembly))
 
     def test_startup_memory_is_explicit_and_cannot_be_a_whole_bank_loan(self):
         with tempfile.TemporaryDirectory() as temporary:
-            result = gate.resolve_ir(self.fixture(Path(temporary), memory_mode="startup-memory"))
+            result = gate.resolve_ir(self.fixture(Path(temporary), memory_mode="startup-memory"), test_support=native_fixture(self.fixture(Path(temporary), memory_mode="startup-memory")))
             child = next(item for item in result.devices if item.id == "ram0")
             self.assertEqual(child.options.mode, "startup-memory")
             _, source = bindings.emit(result)
             self.assertIn("nx_stm32_fsmc_adopt_boot", source)
             self.assertIn("&g_nx_stm32_sram_boot_plan", source)
             self.assertNotIn("nx_stm32_fsmc_prepare(", source)
-            excluded = set(maintained("stm32f407").GPIO_PHASE.excluded_pins(result))
+            excluded = set(maintained("stm32f4").GPIO_PHASE.excluded_pins(result))
             self.assertEqual(len(excluded), 40)
             self.assertNotIn("PG12", excluded)
 
@@ -154,7 +157,7 @@ class F407FSMCConfigurationTests(unittest.TestCase):
             with self.subTest(extra=extra):
                 with tempfile.TemporaryDirectory() as temporary:
                     with self.assertRaisesRegex(ValueError, "(?i)(unknown|missing)"):
-                        gate.resolve_ir(self.fixture(Path(temporary), extra=extra))
+                        gate.resolve_ir(self.fixture(Path(temporary), extra=extra), test_support=native_fixture(self.fixture(Path(temporary), extra=extra)))
 
     def test_both_qiming_profiles_use_real_board_choices_and_exact_pin_union(self):
         for board in ("stm32f407zg_qiming_core", "stm32f407zg_qiming_v41"):
@@ -162,7 +165,8 @@ class F407FSMCConfigurationTests(unittest.TestCase):
                                     ("sram-window", 40)):
                 with self.subTest(board=board, profile=profile):
                     result = gate.resolve_ir(gate.ROOT / "boards" / board /
-                                             "assemblies" / (profile + ".toml"))
+                                             "assemblies" / (profile + ".toml"), test_support=native_fixture(gate.ROOT / "boards" / board /
+                                             "assemblies" / (profile + ".toml")))
                     bus = next(item for item in result.controllers
                                if item.kind == "external_bus")
                     self.assertEqual(len(bus.pins), count)
@@ -182,7 +186,7 @@ class F407FSMCConfigurationTests(unittest.TestCase):
             with self.subTest(board=board):
                 path = (gate.ROOT / "boards" / board /
                         "assemblies/display-touch.toml")
-                result = gate.resolve_ir(path)
+                result = gate.resolve_ir(path, test_support=native_fixture(path))
                 bus = next(item for item in result.controllers
                            if item.kind == "external_bus")
                 self.assertEqual({pin["pin"] for pin in bus.pins}, expected)
@@ -236,15 +240,16 @@ class F407FSMCConfigurationTests(unittest.TestCase):
                     if sram:
                         with self.assertRaisesRegex(ValueError,
                                                     "(?i)(conflict|owned|reserved)"):
-                            gate.resolve_ir(assembly)
+                            gate.resolve_ir(assembly, test_support=native_fixture(assembly))
                     else:
-                        result = gate.resolve_ir(assembly)
+                        result = gate.resolve_ir(assembly, test_support=native_fixture(assembly))
                         self.assertEqual(len(result.controllers[0].pins), 20)
         with tempfile.TemporaryDirectory() as temporary:
             extra = '[gpio.other]\nbinding="busy-pad"\nmode="output"\n'
             with self.assertRaisesRegex(ValueError, "(?i)(conflict|owned)"):
                 gate.resolve_ir(self.fixture(Path(temporary), sram=False,
-                                             extra=extra))
+                                             extra=extra), test_support=native_fixture(self.fixture(Path(temporary), sram=False,
+                                             extra=extra)))
 
     def test_lcd_reference_read_phases_cover_general_ili9341_frame_memory(self):
         # ILI9341_DS_V1.11 section 18.3.1 p238: FM low355/high90/cycle450ns.
@@ -255,7 +260,8 @@ class F407FSMCConfigurationTests(unittest.TestCase):
             for profile in ("display-touch", "display-touch-sram"):
                 with self.subTest(board=board, profile=profile):
                     result = gate.resolve_ir(gate.ROOT / "boards" / board /
-                                             "assemblies" / (profile + ".toml"))
+                                             "assemblies" / (profile + ".toml"), test_support=native_fixture(gate.ROOT / "boards" / board /
+                                             "assemblies" / (profile + ".toml")))
                     lcd = next(item for item in result.devices
                                if item.driver == "parallel16-endpoint")
                     timing = lcd.options.read_timing

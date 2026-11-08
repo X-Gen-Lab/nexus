@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 6192e0020a97003295af1a766d8e1d65e290729acdcd2cebe0d8c32b0f8fc60d\nX-Nexus-Reviewed: true\n"
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 78ed21136b8eecb64162fa8b7b792e80930c4c78b19e0d24f3cb4123ae88c9fb\nX-Nexus-Reviewed: true\n"
 
 msgid "Core: requests, status and time"
 msgstr "Core：请求、状态与时间"
@@ -436,3 +436,62 @@ msgstr "[out] 独立的扩展后经过时间，单位微秒。"
 
 msgid "SUCCESS, INVALID for NULL/overlapping output, STATE for an uninitialized clock, or EXHAUSTED. Failure changes neither extension state nor output."
 msgstr "SUCCESS；输出为 NULL／重叠时返回 INVALID；时钟未初始化时返回 STATE；或返回 EXHAUSTED。失败不改变扩展状态或输出。"
+
+#: docs/reference/api/core.md:12
+msgid "Cold lifecycle entry points"
+msgstr "冷态生命周期入口"
+
+#: docs/reference/api/core.md:0
+msgid "Scope"
+msgstr "范围"
+
+#: docs/reference/api/core.md:0
+msgid "Public entry and contract"
+msgstr "公共入口与合同"
+
+#: docs/reference/api/core.md:0
+msgid "Reversible resource transactions"
+msgstr "可撤销资源事务"
+
+#: docs/reference/api/core.md:0
+msgid ""
+"[`lifecycle.h`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/core/include/nexus/core/lifecycle.h): `nx_lifecycle_start/stop` "
+"admits a static resource plan and retries retained reverse cleanup."
+msgstr ""
+"[`lifecycle.h`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/core/include/nexus/core/lifecycle.h)：`nx_lifecycle_start/stop` "
+"对静态资源计划执行准入，并重试保留的逆序清理责任。"
+
+#: docs/reference/api/core.md:0
+msgid "Complete platform coordination"
+msgstr "整平台协调"
+
+#: docs/reference/api/core.md:0
+msgid ""
+"[`platform_lifecycle.h`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/core/include/nexus/core/platform_lifecycle.h): "
+"`nx_platform_lifecycle_start/stop` coordinates System, shared resources and "
+"physical controllers, with independent primary/cleanup results and optional "
+"call-scoped diagnostics."
+msgstr ""
+"[`platform_lifecycle.h`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-"
+"SOURCE/core/include/nexus/core/platform_lifecycle.h)：`nx_platform_lifecycle_start/stop`"
+" 协调 System、共享资源和物理 controller，提供独立的 primary／cleanup 结果与可选调用期诊断。"
+
+#: docs/reference/api/core.md:19
+msgid ""
+"The [Core contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/core/README.md) explains both mechanisms and their "
+"failure boundaries. Callers provide zero-initialized state, keep plans and "
+"owner receipts alive, serialize lifecycle calls and join users before stop. "
+"Factory lookup and ordinary I/O do not pass through either lifecycle engine."
+" Complete types, callback requirements and C/C++ declarations remain in the "
+"linked public headers; neither mechanism starts a scheduler or establishes "
+"physical support."
+msgstr ""
+"[Core 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/core/README.md)说明两种机制及其失败边界。调用者提供首次清零的状态，保持 plan 与 owner "
+"收条存活，串行执行生命周期调用，并在 stop 前等待退出使用者。factory 查询与正常 I/O 不经过这两个生命周期引擎。完整类型、回调要求和 "
+"C／C++ 声明由链接的公共头定义；这两种机制均不启动 scheduler，也不建立物理支持。"

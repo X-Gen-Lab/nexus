@@ -1,33 +1,21 @@
 """Reviewed reference indices reject fictitious identity and qualification."""
 from tools.configure.providers.descriptor import source_directory
 import copy
-import hashlib
 import json
-import os
-from pathlib import Path
-import shutil
-import subprocess
-import tempfile
 import unittest
-from unittest.mock import patch
 
 from tools.configure import configure as gate, fact_references
 
 
 class FactReferenceContractTests(unittest.TestCase):
-    def test_g474_cannot_omit_its_exact_official_reference_index(self):
-        soc = gate.load(gate.ROOT / "soc/stm32/stm32g474/soc.json")
-        soc.pop("references", None)
-        with self.assertRaisesRegex(ValueError, "references"):
-            gate.validate_soc(soc, "STM32G474RET6")
 
-    def references(self, family="stm32f407"):
+    def references(self, family='stm32f4'):
         package = gate.ROOT / source_directory(family)
         return (json.loads((package / "references.json").read_text()),
                 json.loads((package / "soc.json").read_text())["variants"])
 
     def test_pin_source_keeps_errata_and_hardware_limits_explicit(self):
-        for family in ("stm32f407", "gd32f470", "stm32g474"):
+        for family in ('stm32f4',):
             with self.subTest(family=family):
                 data, variants = self.references(family)
                 before = copy.deepcopy(data)
@@ -108,87 +96,6 @@ class FactReferenceContractTests(unittest.TestCase):
 
 
 
-class ReferenceInputClosureTests(unittest.TestCase):
-    def setUp(self):
-        temporary = tempfile.TemporaryDirectory()
-        self.addCleanup(temporary.cleanup)
-        self.root = Path(temporary.name)
-        # The imported Device headers now consume the separately pinned Core.
-        # Keep a real clean child checkout and parent stage-0 Gitlink so these
-        # tests still exercise production input closure without replacing it.
-        environment = {key: value for key, value in os.environ.items()
-                       if not key.startswith("GIT_")}
-
-        def git(*arguments):
-            return subprocess.run(["git", *map(str, arguments)], check=True,
-                                  capture_output=True, text=True,
-                                  env=environment, timeout=30).stdout.strip()
-
-        core = "vendors/arm/CMSIS_6"
-        checkout = self.root / core
-        checkout.parent.mkdir(parents=True)
-        git("-C", self.root, "init", "--quiet")
-        git("clone", "--quiet", "--shared", "--sparse",
-            gate.ROOT / core, checkout)
-        git("-C", checkout, "sparse-checkout", "set", "CMSIS/Core/Include")
-        commit = git("-C", checkout, "rev-parse", "HEAD")
-        git("-C", self.root, "update-index", "--add", "--cacheinfo",
-            "160000," + commit + "," + core)
-        for relative in ("dependencies/platform-compatibility.json",
-                         "soc/gd32/gd32f470/soc.json", "soc/gd32/gd32f470/routes.json",
-                         "soc/gd32/gd32f470/references.json",
-                         "boards/gd32f470_liangshan/board.json"):
-            destination = self.root / relative
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(gate.ROOT / relative, destination)
-        vendor = "vendors/gigadevice/gd32f4xx"
-        shutil.copytree(gate.ROOT / vendor, self.root / vendor)
-        soc_path = self.root / "soc/gd32/gd32f470/soc.json"
-        soc = json.loads(soc_path.read_text())
-        soc["references"] = "references.json"
-        soc_path.write_text(json.dumps(soc))
-        self.references = self.root / "soc/gd32/gd32f470/references.json"
-        self.assembly = self.root / "assembly.toml"
-        self.assembly.write_text('schema=2\nboard="gd32f470_liangshan"\n'
-                                 'backend="baremetal"\nclock="hxtal25-pll200"\n'
-                                 '[memory]\nmain_stack_bytes=2048\n')
-
-    def test_reference_index_is_bound_to_resolved_identity_and_input_closure(self):
-        result = gate.resolve_ir(self.assembly, self.root)
-        self.assertEqual(result.to_dict()["fact_references"],
-                         json.loads(self.references.read_text()))
-        inputs = {item["path"]: item["sha256"] for item in result.inputs}
-        self.assertEqual(inputs["soc/gd32/gd32f470/references.json"],
-                         hashlib.sha256(self.references.read_bytes()).hexdigest())
-        before = result.configuration_sha256
-        data = json.loads(self.references.read_text())
-        data["documents"]["datasheet"]["revision"] += "-fixture"
-        self.references.write_text(json.dumps(data))
-        self.assertNotEqual(before, gate.resolve_ir(
-            self.assembly, self.root).configuration_sha256)
-
-    def test_reference_change_during_generation_revokes_old_bundle(self):
-        output = self.root / "generated"
-        generate = gate.generate
-        gate.configure(self.assembly, output, self.root)
-
-        def changed(result, destination):
-            generate(result, destination)
-            self.references.write_bytes(self.references.read_bytes() + b"\n")
-
-        with patch.object(gate, "generate", side_effect=changed):
-            with self.assertRaisesRegex(ValueError, "Input changed during"):
-                gate.configure(self.assembly, output, self.root)
-        self.assertFalse(output.exists())
-
-    def test_qualification_claim_in_reference_cannot_publish_a_bundle(self):
-        data = json.loads(self.references.read_text())
-        data["errata_review"]["hardware_qualification"] = "passed"
-        self.references.write_text(json.dumps(data))
-        output = self.root / "generated"
-        with self.assertRaisesRegex(ValueError, "qualification"):
-            gate.configure(self.assembly, output, self.root)
-        self.assertFalse(output.exists())
 
 
 

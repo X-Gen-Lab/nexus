@@ -12,13 +12,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#ifdef NEXUS_I2C_STM32_TEST
 #include "stm32f407_provider.h"
-#else
-#include "gd32f470_provider.h"
-#include "gd32f4xx.h"
-#include "private/system.h"
-#endif
 }
 #include <cstring>
 #include <gmock/gmock.h>
@@ -49,7 +43,6 @@ size_t model_stall_after;
 std::vector<nx_i2c_message_t> model_messages;
 testing::MockFunction<void(size_t, bool)>* model_boundary;
 
-#ifdef NEXUS_I2C_STM32_TEST
 using State = nx_stm32_i2c_state_t;
 using EndpointState = nx_stm32_i2c_endpoint_state_t;
 constexpr uint32_t ack = I2C_CR1_ACK;
@@ -67,25 +60,6 @@ volatile uint32_t& control(State* port) {
 volatile uint32_t& status(State* port) {
     return port->registers->SR1;
 }
-#else
-using State = nx_gd32_i2c_state_t;
-using EndpointState = nx_gd32_i2c_endpoint_state_t;
-constexpr uint32_t ack = I2C_CTL0_ACKEN;
-constexpr uint32_t pos = I2C_CTL0_POAP;
-constexpr uint32_t start = I2C_CTL0_START;
-constexpr uint32_t stop = I2C_CTL0_STOP;
-constexpr uint32_t rbne = I2C_STAT0_RBNE;
-constexpr uint32_t btc = I2C_STAT0_BTC;
-constexpr uint32_t nack = I2C_STAT0_AERR;
-constexpr uint32_t arbitration = I2C_STAT0_LOSTARB;
-constexpr uint32_t bus_error = I2C_STAT0_BERR;
-volatile uint32_t& control(State* port) {
-    return I2C_CTL0(port->controller->registers);
-}
-volatile uint32_t& status(State* port) {
-    return I2C_STAT0(port->controller->registers);
-}
-#endif
 
 class I2CRegisters : public testing::Test {
   protected:
@@ -96,12 +70,8 @@ class I2CRegisters : public testing::Test {
     testing::StrictMock<testing::MockFunction<void(size_t, bool)>> boundary;
     uint8_t data[256] = {};
     size_t transferred = 0;
-#ifdef NEXUS_I2C_STM32_TEST
     I2C_TypeDef registers = {};
     GPIO_TypeDef lines = {};
-#else
-    void* mapping = MAP_FAILED;
-#endif
 
     void SetUp() override {
         model_time = 0;
@@ -125,7 +95,6 @@ class I2CRegisters : public testing::Test {
         model_messages.clear();
         model_boundary = &boundary;
         std::memset(data, 0xCC, sizeof(data));
-#ifdef NEXUS_I2C_STM32_TEST
         state.registers = &registers;
         state.line_gpio = &lines;
         state.line_mask = (1U << 6U) | (1U << 7U);
@@ -136,29 +105,10 @@ class I2CRegisters : public testing::Test {
         endpoint_state = {&state, 0x50};
         endpoint = {&nx_stm32_i2c_endpoint_ops, &endpoint_state};
         port = {&nx_stm32_i2c_ops, &state};
-#else
-        mapping =
-            mmap(reinterpret_cast<void*>(UINT32_C(0x40000000)), 0x80000,
-                 PROT_READ | PROT_WRITE,
-                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
-        ASSERT_EQ(mapping, reinterpret_cast<void*>(UINT32_C(0x40000000)));
-        ASSERT_EQ(nx_gd32_i2c_initialize_at(
-                      &state, &endpoint_state, &nx_gd32_i2c1_controller, 0x50,
-                      100000, GPIOB, GPIO_PIN_10 | GPIO_PIN_11),
-                  NX_SUCCESS);
-        GPIO_ISTAT(GPIOB) = GPIO_PIN_10 | GPIO_PIN_11;
-        endpoint = {&nx_gd32_i2c_endpoint_ops, &endpoint_state};
-        port = {&nx_gd32_i2c_ops, &state};
-#endif
     }
 
     void TearDown() override {
         model_boundary = nullptr;
-#ifndef NEXUS_I2C_STM32_TEST
-        if (mapping != MAP_FAILED) {
-            EXPECT_EQ(munmap(mapping, 0x80000), 0);
-        }
-#endif
     }
 
     nx_result_t transact(std::vector<nx_i2c_message_t> messages,
@@ -224,52 +174,6 @@ extern "C" bool nx_arch_cycle_snapshot(uint32_t* cycles) {
     (void)cycles;
     return false;
 }
-#ifndef NEXUS_I2C_STM32_TEST
-/** \brief Model selected clock acquisition with the official register layout.
- */
-extern "C" void rcu_periph_clock_enable(rcu_periph_enum clock) {
-    RCU_REG_VAL(clock) |= BIT(RCU_BIT_POS(clock));
-}
-/** \brief Model release of only the selected controller clock. */
-extern "C" void rcu_periph_clock_disable(rcu_periph_enum clock) {
-    RCU_REG_VAL(clock) &= ~BIT(RCU_BIT_POS(clock));
-}
-/** \brief Model local reset without pretending external wires are released. */
-extern "C" void i2c_deinit(uint32_t registers) {
-    std::memset(reinterpret_cast<void*>(static_cast<uintptr_t>(registers)), 0,
-                0x28);
-}
-/** \brief SDK ACK changes retain all independently modeled status facts. */
-extern "C" void i2c_ack_config(uint32_t registers, uint32_t ack) {
-    I2C_CTL0(registers) =
-        (I2C_CTL0(registers) & ~static_cast<uint32_t>(I2C_CTL0_ACKEN)) | ack;
-}
-/** \brief The bus model, not the SDK START request, supplies progress. */
-extern "C" void i2c_start_on_bus(uint32_t registers) {
-    I2C_CTL0(registers) |= static_cast<uint32_t>(I2C_CTL0_START);
-}
-/** \brief STOP remains independently observable until modeled withdrawal. */
-extern "C" void i2c_stop_on_bus(uint32_t registers) {
-    I2C_CTL0(registers) |= static_cast<uint32_t>(I2C_CTL0_STOP);
-}
-/** \brief Unselected GPIO reads retain their exact SDK-width boundary. */
-extern "C" uint16_t gpio_input_port_get(uint32_t registers) {
-    return static_cast<uint16_t>(GPIO_ISTAT(registers));
-}
-/** \brief Unselected GPIO latch reads do not toggle or drive a pin. */
-extern "C" uint16_t gpio_output_port_get(uint32_t registers) {
-    return static_cast<uint16_t>(GPIO_OCTL(registers));
-}
-/** \brief Unselected fixture pin setup is outside this transaction model. */
-extern "C" void gpio_af_set(uint32_t, uint32_t, uint32_t) {
-}
-/** \brief Unselected fixture output setup is outside this transaction model. */
-extern "C" void gpio_output_options_set(uint32_t, uint8_t, uint32_t, uint32_t) {
-}
-/** \brief Unselected fixture mode setup is outside this transaction model. */
-extern "C" void gpio_mode_set(uint32_t, uint32_t, uint32_t, uint32_t) {
-}
-#endif
 
 /** \brief Drive SB, ADDR and receive facts in response to real register writes.
  */
@@ -284,25 +188,15 @@ extern "C" void nx_i2c_model_poll(void* raw) {
          model_received >= model_stall_after)) {
         if (!model_hold_stop) {
             control(state) &= ~stop;
-#ifdef NEXUS_I2C_STM32_TEST
             if (!model_hold_master) {
                 state->registers->SR2 = 0;
             }
-#else
-            if (!model_hold_master) {
-                I2C_STAT1(state->controller->registers) = 0;
-            }
-#endif
         }
         return;
     }
     if (model_error != 0 && model_received >= model_error_after) {
         if (model_error == arbitration) {
-#ifdef NEXUS_I2C_STM32_TEST
             state->registers->SR2 &= ~static_cast<uint32_t>(I2C_SR2_MSL);
-#else
-            I2C_STAT1(state->controller->registers) &= ~I2C_STAT1_MASTER;
-#endif
         }
         status(state) = model_error;
         return;
@@ -317,11 +211,7 @@ extern "C" void nx_i2c_model_poll(void* raw) {
             ADD_FAILURE() << "START was requested again after hardware set SB";
             control(state) &= ~start;
         }
-#ifdef NEXUS_I2C_STM32_TEST
         status(state) = I2C_SR1_SB;
-#else
-        status(state) = I2C_STAT0_SBSEND;
-#endif
         return;
     }
     if ((control(state) & start) != 0 && model_remaining == 0) {
@@ -331,30 +221,16 @@ extern "C" void nx_i2c_model_poll(void* raw) {
         ++model_starts;
         control(state) &= ~start;
         model_sb_pending = true;
-#ifdef NEXUS_I2C_STM32_TEST
         status(state) = I2C_SR1_SB;
-#else
-        status(state) = I2C_STAT0_SBSEND;
-#endif
         return;
     }
     if (model_address) {
-#ifdef NEXUS_I2C_STM32_TEST
         status(state) = I2C_SR1_ADDR;
         state->registers->SR2 = I2C_SR2_MSL | I2C_SR2_BUSY;
-#else
-        status(state) = I2C_STAT0_ADDSEND;
-        I2C_STAT1(state->controller->registers) =
-            I2C_STAT1_MASTER | I2C_STAT1_I2CBSY;
-#endif
         return;
     }
     status(state) = rbne | btc;
-#ifdef NEXUS_I2C_STM32_TEST
     status(state) |= I2C_SR1_TXE;
-#else
-    status(state) |= I2C_STAT0_TBE;
-#endif
 }
 
 /** \brief Hardware clears SB only after address DATA is actually written. */
@@ -369,11 +245,7 @@ extern "C" void nx_i2c_model_write(void* raw, uint32_t value) {
         model_sb_pending = false;
         model_address = true;
     }
-#ifdef NEXUS_I2C_STM32_TEST
     state->registers->DR = value;
-#else
-    I2C_DATA(state->controller->registers) = value;
-#endif
 }
 
 /** \brief Observe ACK/POS at the mandatory address release boundary. */
@@ -421,11 +293,7 @@ extern "C" uint8_t nx_i2c_model_read(void* raw) {
         model_message + 1 == model_messages.size()) {
         /* Hardware may complete STOP before task code runs again. */
         control(state) &= ~stop;
-#ifdef NEXUS_I2C_STM32_TEST
         state->registers->SR2 = 0;
-#else
-        I2C_STAT1(state->controller->registers) = 0;
-#endif
         model_stop_completed = true;
     }
     if (model_remaining == 0 && model_restart_on_last_read &&
@@ -436,11 +304,7 @@ extern "C" uint8_t nx_i2c_model_read(void* raw) {
         ++model_message;
         ++model_starts;
         model_sb_pending = true;
-#ifdef NEXUS_I2C_STM32_TEST
         status(state) = I2C_SR1_SB;
-#else
-        status(state) = I2C_STAT0_SBSEND;
-#endif
     }
     return static_cast<uint8_t>(++model_received);
 }
@@ -502,11 +366,7 @@ TEST_F(I2CRegisters, NackArbitrationAndBusErrorPreserveCompletedReadPrefix) {
         EXPECT_FALSE(state.active);
         model_error = 0;
         control(&state) &= ~(stop | start);
-#ifdef NEXUS_I2C_STM32_TEST
         state.registers->SR2 = 0;
-#else
-        I2C_STAT1(state.controller->registers) = 0;
-#endif
         ASSERT_EQ(nx_i2c_port_recover(&port), NX_SUCCESS);
         std::memset(data, 0xCC, sizeof(data));
     }
@@ -571,17 +431,11 @@ TEST_F(I2CRegisters, StuckStopCannotReportSuccessAndRequiresRecovery) {
     EXPECT_NE(transact({{data, 4, true}}, 40), NX_SUCCESS);
     EXPECT_EQ(transferred, 4U);
     EXPECT_FALSE(state.active);
-#ifdef NEXUS_I2C_STM32_TEST
     EXPECT_TRUE(state.fault);
-#else
-    EXPECT_TRUE(state.faulted);
-#endif
     model_hold_stop = false;
-#ifdef NEXUS_I2C_STM32_TEST
     /* Controller reset does not establish released external lines. */
     EXPECT_EQ(nx_i2c_port_recover(&port), NX_ERROR_IO);
     state.registers->SR2 = 0;
-#endif
     ASSERT_EQ(nx_i2c_port_recover(&port), NX_SUCCESS);
     model_time = 0;
     model_message = 0;
@@ -654,26 +508,15 @@ TEST_F(I2CRegisters,
 
 TEST_F(I2CRegisters, RecoveryRequiresBothReleasedLinesWhenBusyFlagIsClear) {
     for (unsigned line = 0; line < 2; ++line) {
-#ifdef NEXUS_I2C_STM32_TEST
         state.registers->SR2 = 0;
         lines.IDR = state.line_mask & ~(1U << (6U + line));
-#else
-        I2C_STAT1(state.controller->registers) = 0;
-        GPIO_ISTAT(GPIOB) = state.line_mask & ~(1U << (10U + line));
-#endif
         EXPECT_EQ(nx_i2c_port_recover(&port), NX_ERROR_IO);
-#ifdef NEXUS_I2C_STM32_TEST
         EXPECT_TRUE(state.fault);
         lines.IDR = state.line_mask;
-#else
-        EXPECT_TRUE(state.faulted);
-        GPIO_ISTAT(GPIOB) = state.line_mask;
-#endif
         ASSERT_EQ(nx_i2c_port_recover(&port), NX_SUCCESS);
     }
 }
 
-#ifdef NEXUS_I2C_STM32_TEST
 TEST_F(I2CRegisters, MissingLineFactsRejectInitializationAndRecovery) {
     state.line_gpio = nullptr;
     const uint32_t before = control(&state);
@@ -686,22 +529,15 @@ TEST_F(I2CRegisters, MissingLineFactsRejectInitializationAndRecovery) {
     EXPECT_EQ(nx_i2c_port_recover(&port), NX_ERROR_INVALID);
     EXPECT_EQ(control(&state), before);
 }
-#endif
 
 TEST(I2CPollingIdentity, ColdChildrenMatchExactControllerWithoutPortAccess) {
     State first = {};
     State second = {};
     EndpointState child = {&first, 0x50};
     EndpointState other_address = {&first, 0x51};
-#ifdef NEXUS_I2C_STM32_TEST
     const nx_i2c_ops_t* operations = &nx_stm32_i2c_ops;
     const nx_i2c_endpoint_ops_t* endpoint_operations =
         &nx_stm32_i2c_endpoint_ops;
-#else
-    const nx_i2c_ops_t* operations = &nx_gd32_i2c_ops;
-    const nx_i2c_endpoint_ops_t* endpoint_operations =
-        &nx_gd32_i2c_endpoint_ops;
-#endif
     const nx_i2c_port_t first_face = {operations, &first};
     const nx_i2c_port_t same_context = {operations, &first};
     const nx_i2c_port_t second_face = {operations, &second};
@@ -731,15 +567,9 @@ TEST(I2CPollingIdentity, ColdChildrenMatchExactControllerWithoutPortAccess) {
 TEST(I2CPollingIdentity, ForeignControllerMethodsAndMissingBindingsReject) {
     State state = {};
     EndpointState child = {&state, 0x50};
-#ifdef NEXUS_I2C_STM32_TEST
     const nx_i2c_ops_t* operations = &nx_stm32_i2c_ops;
     const nx_i2c_endpoint_ops_t* endpoint_operations =
         &nx_stm32_i2c_endpoint_ops;
-#else
-    const nx_i2c_ops_t* operations = &nx_gd32_i2c_ops;
-    const nx_i2c_endpoint_ops_t* endpoint_operations =
-        &nx_gd32_i2c_endpoint_ops;
-#endif
     const nx_i2c_ops_t foreign_operations = *operations;
     const nx_i2c_port_t matching = {operations, &state};
     const nx_i2c_port_t foreign = {&foreign_operations, &state};
@@ -762,13 +592,8 @@ TEST(I2CPollingIdentity, ForeignControllerMethodsAndMissingBindingsReject) {
 TEST(I2CPollingIdentity, FixedNonreservedAddressIsValidatedWithoutStartup) {
     State state = {};
     EndpointState child = {&state, 8U};
-#ifdef NEXUS_I2C_STM32_TEST
     const nx_i2c_port_t port = {&nx_stm32_i2c_ops, &state};
     const nx_i2c_endpoint_t face = {&nx_stm32_i2c_endpoint_ops, &child};
-#else
-    const nx_i2c_port_t port = {&nx_gd32_i2c_ops, &state};
-    const nx_i2c_endpoint_t face = {&nx_gd32_i2c_endpoint_ops, &child};
-#endif
     EXPECT_TRUE(nx_i2c_endpoint_on_port(&face, &port));
     child.address = 119U;
     EXPECT_TRUE(nx_i2c_endpoint_on_port(&face, &port));

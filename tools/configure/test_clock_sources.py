@@ -1,4 +1,5 @@
 """Clock input identity never invents an external Board oscillator."""
+from tools.configure.tests.device_fixture import load_soc_facts
 from tools.configure.providers.descriptor import source_directory
 import unittest
 
@@ -6,35 +7,41 @@ from tools.configure import configure as gate
 
 
 class ClockSourceContractTests(unittest.TestCase):
-    def test_h743_rejects_non_object_profiles_as_configuration_errors(self):
-        from tools.configure.providers import maintained
-        provider = maintained("stm32h743")
-        for value in (None, 123, True, [], "invalid"):
-            with self.subTest(value=value):
-                with self.assertRaisesRegex(gate.ConfigurationError,
-                                            "Clock profile must be an object"):
-                    provider.normalize_clock(value)
-                facts = gate.load(gate.ROOT / "soc/stm32/stm32h743/soc.json")
-                facts["clock_profiles"]["hsi64-fixed-cache-off"] = value
-                with self.assertRaisesRegex(gate.ConfigurationError,
-                                            "Clock profile must be an object"):
-                    gate.validate_soc(facts, "STM32H743ZIT6")
 
-    def test_domain_shape_alone_does_not_authorize_family_clock_policy(self):
-        from tools.configure import clocks
-        facts = gate.load(gate.ROOT / "soc/stm32/stm32h743/soc.json")
-        profile = facts["clock_profiles"]["hsi64-pll384-cache-off"]
-        with self.assertRaisesRegex(ValueError, "Clock"):
-            clocks.normalize(profile)
-        with self.assertRaisesRegex(ValueError, "Clock"):
-            clocks.plan("hsi64-pll384-cache-off", profile)
+
+    def test_uart_spi_clock_domains_bind_to_reviewed_apb_facts(self):
+        from tools.configure.stm32f4.hardware import CONTROLLER_BINDINGS
+        soc = load_soc_facts(gate.ROOT / source_directory("stm32f4") / "soc.json")
+        for binding in CONTROLLER_BINDINGS:
+            if binding.kind not in {"uart", "spi"}:
+                continue
+            with self.subTest(controller=binding.controller):
+                domain = soc["controllers"][binding.controller]["clock_domain"]
+                self.assertEqual(domain, f"apb{binding.apb}")
+                for clock in soc["clock_profiles"].values():
+                    self.assertGreater(clock[domain + "_hz"], 0)
+        gate.validate_soc(soc, "STM32F407ZGT6")
+
+    def test_missing_uart_spi_clock_domain_is_rejected(self):
+        for controller in ("USART1", "SPI2"):
+            soc = load_soc_facts(gate.ROOT / source_directory("stm32f4") / "soc.json")
+            soc["controllers"][controller].pop("clock_domain", None)
+            with self.subTest(controller=controller), self.assertRaisesRegex(
+                    ValueError, "clock domain"):
+                gate.validate_soc(soc, "STM32F407ZGT6")
+
+    def test_unknown_or_wrong_reviewed_clock_domain_is_rejected(self):
+        for domain in ("ahb", "apb1", False):
+            soc = load_soc_facts(gate.ROOT / source_directory("stm32f4") / "soc.json")
+            soc["controllers"]["USART1"]["clock_domain"] = domain
+            with self.subTest(domain=domain), self.assertRaisesRegex(
+                    ValueError, "clock domain"):
+                gate.validate_soc(soc, "STM32F407ZGT6")
 
     def test_existing_hse_facts_accept_one_explicit_source_identity(self):
-        for family, part in (("stm32f407", "STM32F407ZGT6"),
-                             ("gd32f470", "GD32F470ZGT6"),
-                             ("stm32g474", "STM32G474RET6")):
+        for family, part in (("stm32f4", "STM32F407ZGT6"),):
             with self.subTest(family=family):
-                soc = gate.load(gate.ROOT / source_directory(family) / "soc.json")
+                soc = load_soc_facts(gate.ROOT / source_directory(family) / "soc.json")
                 for profile in soc["clock_profiles"].values():
                     profile["source"] = "hse"
                     profile["input_hz"] = profile.pop("hse_hz")

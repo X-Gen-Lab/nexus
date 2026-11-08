@@ -25,22 +25,19 @@ class CmsisCoreProbeTests(unittest.TestCase):
         cls.result = probe.execute(ROOT, cls.output / "matrix", cls.compiler,
                                    cls.cxx)
 
-    def test_real_device_core_matrix_closes_c_and_cpp_and_security_contexts(
+    def test_real_f4_device_core_matrix_closes_c_and_cpp(
             self):
         self.assertEqual(self.result["status"], "passed")
         self.assertEqual(self.result["core_commit"], probe.CORE_COMMIT)
-        self.assertEqual(len(self.result["probes"]), 16)
+        self.assertEqual(len(self.result["probes"]), 2)
         self.assertFalse(self.result["software_qualified"])
         self.assertEqual(self.result["physical_status"], "not_executed")
         self.assertEqual({item["language"] for item in self.result["probes"]},
                          {"c11", "c++17"})
         self.assertEqual({item["family"] for item in self.result["probes"]},
-                         {"stm32f103", "stm32f407", "stm32g474", "stm32h743",
-                          "stm32u575", "gd32f303", "gd32f470"})
-        secure = [item for item in self.result["probes"]
-                  if item["family"] == "stm32u575"]
-        self.assertEqual({item["security"] for item in secure},
-                         {"secure", "nonsecure"})
+                         {"stm32f4"})
+        self.assertEqual({item["security"] for item in self.result["probes"]},
+                         {"single"})
         for item in self.result["probes"]:
             with self.subTest(profile=item["profile"],
                               language=item["language"]):
@@ -66,8 +63,7 @@ class CmsisCoreProbeTests(unittest.TestCase):
 
     def test_system_marked_legacy_vendor_core_is_rejected_by_real_compiler(
             self):
-        profile = next(item for item in probe.PROFILES
-                       if item.family == "gd32f470")
+        profile = probe.PROFILES[0]
         output = self.output / "legacy"
         output.mkdir()
         source = output / "probe.c"

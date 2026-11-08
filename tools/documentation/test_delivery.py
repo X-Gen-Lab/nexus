@@ -1,6 +1,7 @@
 """Documentation packages bind actual bytes and reject unsafe restoration."""
 
 import functools
+import copy
 import csv
 import hashlib
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -18,6 +19,60 @@ from tools.documentation import delivery
 
 
 class DeliveryTests(unittest.TestCase):
+    def test_documentation_keeps_unmaterialized_gitlinks_without_qualification(self):
+        commit = self.git('rev-parse', 'HEAD').decode().strip()
+        (self.source / '.gitmodules').write_text(
+            '[submodule "dormant"]\n path = vendors/dormant\n'
+            ' url = https://example.invalid/dormant.git\n')
+        self.git('add', '.gitmodules')
+        self.git('update-index', '--add', '--cacheinfo',
+                 '160000', commit, 'vendors/dormant')
+        (self.source / 'vendors/dormant').mkdir(parents=True)
+        self.git('-c', 'user.name=Test', '-c', 'user.email=test@example.com',
+                 'commit', '-qm', 'Record dormant inventory')
+        metadata_path = self.build / 'documentation-build.json'
+        metadata = json.loads(metadata_path.read_text())
+        metadata['source'] = delivery.observe_git_source(self.source)
+        metadata_path.write_text(json.dumps(metadata))
+        result = self.package()
+        manifest = delivery.verify(result['directory'])
+        for name in ('documentation_source', 'code_source'):
+            self.assertTrue(any(line.startswith('-') for line in
+                                manifest[name]['submodules']))
+        self.assertEqual(manifest['qualification_references'], [])
+        self.assertEqual(manifest['physical_status'], 'not_executed')
+
+    def test_only_current_documentation_accepts_unmaterialized_pins(self):
+        manifest = delivery.verify(self.package()['directory'])
+        line = '-' + 'a' * 40 + ' vendors/dormant'
+        for name in ('documentation_source', 'code_source'):
+            manifest[name]['submodules'] = [line]
+        delivery._manifest_identity(manifest)
+        legacy = copy.deepcopy(manifest)
+        legacy['schema_version'] = 1
+        with self.assertRaisesRegex(ValueError, 'submodule'):
+            delivery._manifest_identity(legacy)
+        for marker in ('+', 'U'):
+            changed = copy.deepcopy(manifest)
+            for name in ('documentation_source', 'code_source'):
+                changed[name]['submodules'] = [marker + line[1:]]
+            with self.subTest(marker=marker), \
+                    self.assertRaisesRegex(ValueError, 'submodule'):
+                delivery._manifest_identity(changed)
+
+    def test_documentation_does_not_relax_candidate_dependency_validation(self):
+        from tools.evidence import candidate
+        path = self.base / 'candidate.json'
+        projection = self.candidate_projection(path, 'a')
+        projection['source']['submodules'] = [
+            '-' + 'a' * 40 + ' vendors/dormant']
+        with patch.object(candidate, 'verified_projection',
+                          return_value=projection):
+            with self.assertRaisesRegex(ValueError, 'dependency'):
+                delivery.package(self.build, self.base / 'output',
+                    source_root=self.source, release_id='1.0.0-docs-test',
+                    qualification_references=(path,))
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)

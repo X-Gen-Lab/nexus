@@ -6,12 +6,12 @@ owns static controller storage; no registry, pool, allocator, worker or OS lock
 is introduced. An unselected mode has no instance storage. Default-image removal
 is a separate whole-ELF assembly gate, not a conclusion from an object size.
 
-| Mode | STM32F407 silicon route | GD32F470 silicon route |
-|---|---|---|
-| Input capture | TIM4 CH1, PB6 AF2 | TIMER3 CH0, PB6 AF2 |
-| Complementary PWM | TIM1 CH1 PA8, CH1N PB13, BKIN PB12, AF1 | TIMER0 CH0 PA8, CH0_ON PB13, BRKIN PB12, AF1 |
+| Mode | STM32F407 silicon route |
+|---|---|
+| Input capture | TIM4 CH1, PB6 AF2 |
+| Complementary PWM | TIM1 CH1 PA8, CH1N PB13, BKIN PB12, AF1 |
 
-The reviewed STM32F407 and GD32F470 datasheets establish these alternate
+The reviewed STM32F407 datasheet establishes these alternate
 functions. They do not establish a connector, external load, safe electrical
 level or PCB revision. External Board facts must authorize the actual route.
 The main clock is the established fixed SoC profile; dynamic reclocking is
@@ -23,7 +23,7 @@ them until stop and publisher quiescence. Its sole immutable configuration
 defines exact timer clock, integer prescaler, channel, filter or complementary
 output policy. `exclusive` is explicit authority over the whole timer, including
 clock-gated peer writers; a disabled register is not proof of absent ownership.
-The TIM1/TIMER0 break vectors are shared with TIM9/TIMER8. Assembly must reserve
+The TIM1 break vector is shared with TIM9. Assembly must reserve
 that shared resource or supply reviewed static dispatch; a provider never changes
 the NVIC vector on behalf of a peer. A cold configuration failure must be cleaned
 up by its acquisition owner before releasing leases or publishing a factory face.

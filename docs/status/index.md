@@ -5,23 +5,21 @@ audience: consumer
 source_language: en
 ---
 
-# Status and evidence
+# Current scope and recorded evidence
 
-Use these maintained records to locate implementation, software verification and physical work. Their recorded source IDs and configurations remain unchanged; this website build creates documentation evidence only.
-
-Start with the {ref}`0.2.1 software preview <sdk-preview-v021>`,
-the {ref}`sealed candidate baseline <sealed-cold-lifecycle-baseline>`
-and [iteration entry points](roadmap.md). These describe separate delivery scopes;
-a newer version does not inherit an older candidate's qualification.
+Current production MCU support is the F4 package. Read exact support and current
+execution separately: source presence and a historical result do not qualify a
+new revision. Physical HIL remains not executed.
 
 ```{toctree}
 :maxdepth: 2
 
 support
-release-0.1.0
-software-verification
-documentation-acceptance
 hardware
 ledgers
 roadmap
 ```
+
+Original release, software and documentation records remain available through
+[the fixed pre-refactor source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status).
+They are historical evidence, not current-site implementation claims.

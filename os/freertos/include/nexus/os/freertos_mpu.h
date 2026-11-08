@@ -37,17 +37,10 @@ typedef struct {
  * \note            Zero-initialize in privileged RAM before first start.
  *                  The TCB includes the real port context and protected stack.
  *                  One privileged lifecycle owner serializes start/delete.
- * \note            The GPIO profile requires cold zero-initialization and keeps
- *                  the task epoch across deletion; never reset that history.
  */
 typedef struct {
     StaticTask_t control;
     TaskHandle_t handle;
-#if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
-    uint64_t epoch;
-    uint8_t gpio_pinned;
-    uint8_t closing;
-#endif
 } nx_freertos_mpu_task_t;
 
 /**
@@ -76,7 +69,6 @@ typedef struct {
  * \param[in,out]   task: Cold or live-free metadata in protected linker RAM.
  * \param[in]       config: Validated user entry, stack and data mappings.
  * \return          Success or INVALID/CONTEXT/STATE/BUSY/IO before admission.
- *                  The GPIO profile also rejects task epoch OVERFLOW.
  * \note            Privileged Thread only, scheduler not suspended, no manual
  *                  masks. Rejection retains no references and calls no kernel
  *                  creation API. Actual linker bounds and MPU_TYPE are checked.
@@ -94,9 +86,6 @@ nx_result_t nx_freertos_mpu_task_start(nx_freertos_mpu_task_t* task,
  * \note            One privileged lifecycle owner stops external access first.
  *                  Kernel deletion synchronously removes scheduler references.
  *                  Self deletion is rejected; no hidden reaper.
- * \note            The GPIO profile returns BUSY while its authority pins the
- *                  task. Close and join before deletion. A closing marker
- *                  prevents reopen during kernel deletion; the epoch survives.
  */
 nx_result_t
 nx_freertos_mpu_task_delete(nx_freertos_mpu_task_t* task) PRIVILEGED_FUNCTION;

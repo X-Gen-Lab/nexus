@@ -37,3 +37,15 @@ candidate 或物理资格。
 GoogleMock 替换依赖端口并调用真实 API，检查存储、准入、取消、隔离、实例独立、
 通知和 DMA 排空。Python 工具使用 stdlib unittest，同样要求非空执行，无 skipped
 或 expected-failure 用例。
+
+默认工具域只读取当前选中的 Native／STM32F4 依赖。非 F4 库存校验器使用独立
+合成文件和对应 fixture 摘要，保留损坏、来源、提交、dirty、symlink 等拒绝合同，
+不把这些单测称为实际厂商 SDK 资格。退役平台的原 checkout 集成案例退出默认范围；
+当前 F4 的真实 SDK、CLI 和头文件编译回归继续执行。所有 vendor、Gitlink、来源锁
+与许可证原件保持不变。
+
+库存维护的 Git 集成测试使用独立 catalogue fixture 和真实 Git／校验器，明确区别
+于生产完整库存及 Native 的准备闭包；完整 FreeRTOS 子图由独立 transport 合同负责。
+同一 Gitlink 的多份审核锁使用合成 selector 数据验证缺失、身份冒用及隐藏字节修改。
+验证默认依赖边界时，须实际使用未物化库存 checkout 的环境；仅拦截 Python 文件
+读取无法覆盖外部 Git 子进程。

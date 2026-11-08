@@ -10,24 +10,10 @@ extern "C" {
 #include "eth_frames_mac.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#ifdef NX_ETH_FRAMES_FACTORY_STM32
 #include "stm32f407_eth_frames_cold.h"
 #include "stm32f407_system.h"
 nx_stm32_system_t g_nx_stm32_system;
 NVIC_Type g_nx_eth_frames_factory_nvic;
-#else
-#include "gd32f470_eth_frames_cold.h"
-#include "gd32f4xx_pmu.h"
-#include "gd32f4xx_rcu.h"
-#include "private/system.h"
-extern uint32_t SystemCoreClock;
-NVIC_Type g_gd32_model_nvic;
-SCB_Type g_gd32_model_scb;
-SysTick_Type g_gd32_model_systick;
-uint32_t g_gd32_model_mask;
-bool g_gd32_model_isr;
-extern const uint32_t __gVectors[] = {0U};
-#endif
 }
 #include <cstdlib>
 #include <cstring>
@@ -36,7 +22,6 @@ extern const uint32_t __gVectors[] = {0U};
 #include <sys/mman.h>
 #include <vector>
 namespace {
-#ifdef NX_ETH_FRAMES_FACTORY_STM32
 using FramesColdConfig = nx_stm32_eth_frames_cold_config_t;
 using FramesPinReceipt = nx_stm32_eth_pin_receipt_t;
 using FramesResourceReceipt = nx_stm32_eth_resource_receipt_t;
@@ -50,21 +35,6 @@ static volatile uint32_t& ColdGpioClocks() {
 }
 constexpr uint32_t ColdGpioMask =
     RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIOGEN;
-#else
-using FramesColdConfig = nx_gd32_eth_frames_cold_config_t;
-using FramesPinReceipt = nx_gd32_eth_pin_receipt_t;
-using FramesResourceReceipt = nx_gd32_eth_resource_receipt_t;
-using FramesPinConfig = nx_gd32_platform_pin_config_t;
-constexpr auto FramesColdPrepare = nx_gd32_eth_frames_cold_prepare;
-constexpr auto FramesColdClose = nx_gd32_eth_frames_cold_close;
-constexpr auto FramesResourcesCapture = nx_gd32_eth_resources_capture;
-constexpr auto FramesResourcesClose = nx_gd32_eth_resources_close;
-static volatile uint32_t& ColdGpioClocks() {
-    return RCU_AHB1EN;
-}
-constexpr uint32_t ColdGpioMask =
-    RCU_AHB1EN_PAEN | RCU_AHB1EN_PCEN | RCU_AHB1EN_PGEN;
-#endif
 } /* namespace */
 
 namespace {
@@ -109,18 +79,6 @@ void ClockFacts() {
     uint32_t configuration = Reg(UINT32_C(0x40023808));
     Reg(UINT32_C(0x40023808)) =
         (configuration & ~UINT32_C(0x0c)) | ((configuration & 3U) << 2U);
-#ifndef NX_ETH_FRAMES_FACTORY_STM32
-    if ((PMU_CTL & PMU_CTL_HDEN) != 0U) {
-        PMU_CS |= PMU_CS_HDRF;
-    } else {
-        PMU_CS &= ~(uint32_t)PMU_CS_HDRF;
-    }
-    if ((PMU_CTL & PMU_CTL_HDS) != 0U) {
-        PMU_CS |= PMU_CS_HDSRF;
-    } else {
-        PMU_CS &= ~(uint32_t)PMU_CS_HDSRF;
-    }
-#endif
 }
 class EthernetFramesFactory : public testing::Test {
   protected:
@@ -149,22 +107,12 @@ class EthernetFramesFactory : public testing::Test {
         std::memset(NVIC, 0, sizeof(*NVIC));
         Reg(UINT32_C(0x40023800)) = 3U;
         Reg(UINT32_C(0x40023804)) = UINT32_C(0x24003010);
-#ifdef NX_ETH_FRAMES_FACTORY_STM32
         RCC->CR |= 16U << RCC_CR_HSITRIM_Pos;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
         g_nx_stm32_system.flash = FLASH;
         g_nx_stm32_system.power = PWR;
         g_nx_stm32_system.timer = TIM2;
-#else
-        RCU_CTL |= 16U << 3U;
-        SystemCoreClock = 16000000U;
-        g_gd32_model_mask = 0U;
-        g_gd32_model_isr = false;
-        NVIC->priority_group = 3U;
-        std::memset(SCB, 0, sizeof(*SCB));
-        std::memset(SysTick, 0, sizeof(*SysTick));
-#endif
         face = nx_factory_eth_frames(NX_ETH_FRAMES_ID_MAC);
         ASSERT_NE(nullptr, face);
         mac = static_cast<nx_eth_frames_mac_t*>(face->context);
@@ -234,7 +182,6 @@ extern "C" void nx_eth_frames_factory_register_write(volatile uint32_t* reg,
     ++hardware->clock_writes;
     *reg = value;
 }
-#ifdef NX_ETH_FRAMES_FACTORY_STM32
 extern "C" uint16_t nx_eth_frames_factory_flash_kib(void) {
     return 1024U;
 }
@@ -275,33 +222,6 @@ extern "C" int nx_stm32_system_model_irq_control(int irq, bool enabled) {
     NVIC->ISPR[index / 32U] &= ~bit;
     return 0;
 }
-#else
-extern "C" void nx_gd32_model_clock_poll(void) {
-    ClockFacts();
-}
-extern "C" void nx_gd32_system_model_write(volatile uint32_t* reg,
-                                           uint32_t value) {
-    ++hardware->clock_writes;
-    *reg = value;
-}
-extern "C" void nx_gd32_timebase_model_write(volatile uint32_t* reg,
-                                             uint32_t value) {
-    ++hardware->clock_writes;
-    if (reg == &TIMER_INTF(TIMER1)) {
-        *reg &= value;
-    } else {
-        *reg = value;
-    }
-    if (reg == &TIMER_SWEVG(TIMER1) && (value & TIMER_SWEVG_UPG) != 0U) {
-        TIMER_INTF(TIMER1) |= TIMER_INTF_UPIF;
-        TIMER_CNT(TIMER1) = 0U;
-    }
-}
-extern "C" void nx_gd32_timebase_model_disable_irq(unsigned irq) {
-    const uint32_t bit = 1U << (irq % 32U);
-    NVIC->ISER[irq / 32U] &= ~bit;
-}
-#endif
 extern "C" uint32_t nx_eth_frames_model_read(uintptr_t base, unsigned offset) {
     ++hardware->mac_reads;
     return reinterpret_cast<uint32_t*>(base)[offset / 4U];
@@ -328,15 +248,9 @@ extern "C" void nx_eth_frames_model_write(uintptr_t base, unsigned offset,
 extern "C" void nx_eth_frames_model_poll(void* context) {
     auto* selected = static_cast<nx_eth_frames_mac_t*>(context);
     auto* regs = reinterpret_cast<uint32_t*>(selected->registers);
-#ifdef NX_ETH_FRAMES_FACTORY_STM32
     if ((TIM2->CR1 & TIM_CR1_CEN) != 0U) {
         ++TIM2->CNT;
     }
-#else
-    if ((TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) != 0U) {
-        ++TIMER_CNT(TIMER1);
-    }
-#endif
     if ((regs[0x1000U / 4U] & 1U) != 0U && !hardware->hold_mac_reset) {
         std::memset(regs, 0, 0x1060U);
     }
@@ -411,13 +325,8 @@ TEST_F(EthernetFramesFactory,
     EXPECT_LT(reinterpret_cast<uintptr_t>(mac->rx_slots[7].data) +
                   mac->rx_slots[7].capacity,
               0x20020000U);
-#ifdef NX_ETH_FRAMES_FACTORY_STM32
     EXPECT_EQ(168000000U, g_nx_stm32_system.core_hz);
     EXPECT_EQ(83U, TIM2->PSC);
-#else
-    EXPECT_EQ(200000000U, SystemCoreClock);
-    EXPECT_EQ(99U, TIMER_PSC(TIMER1));
-#endif
 }
 TEST_F(EthernetFramesFactory,
        GeneratedWholeFramePreservesVlanAndHardwareCapture) {

@@ -23,13 +23,14 @@ class TargetLanguagePolicyTests(unittest.TestCase):
             directory = Path(value)
             source = directory / "source"
             source.mkdir()
-            assembly = (PLATFORM_ROOT / "tools/configure/assemblies"
+            assembly = (PLATFORM_ROOT / "tests/support/native/assemblies"
                         / "native-empty.toml")
             (source / "CMakeLists.txt").write_text(
                 "cmake_minimum_required(VERSION 3.31)\n"
                 "project(parent_language C CXX ASM)\n"
                 f'set(NEXUS_ASSEMBLY_FILE "{assembly}" CACHE FILEPATH "")\n'
                 'set(NEXUS_BUILD_TESTS OFF CACHE BOOL "")\n'
+                'set(NEXUS_TEST_SUPPORT ON CACHE BOOL "")\n'
                 'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "")\n'
                 "set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n"
                 f'add_subdirectory("{PLATFORM_ROOT}" nexus EXCLUDE_FROM_ALL)\n'

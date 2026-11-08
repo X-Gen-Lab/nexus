@@ -95,7 +95,10 @@ jobs:
           expected-commit: ${{ github.sha }}
           output: build/job-identities/tooling
           require-dependencies: 'true'
+          dependency-preparation: build/setup-dependencies.json
+          dependency-preset: native-debug
           artifacts: |
+            build/setup-dependencies.json
             build/quality/tool-contracts.log
             build/quality/tools-contracts.json
             build/quality/tools-freertos.json
@@ -116,6 +119,7 @@ jobs:
         with:
           name: tool-contracts
           path: |
+            build/setup-dependencies.json
             build/quality/tool-contracts.log
             build/quality/tools-contracts.json
             build/quality/tools-freertos.json

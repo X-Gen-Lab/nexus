@@ -1,11 +1,12 @@
 """Exact extra UARTs keep APB, vector and no-DMA admission independent."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 import json
 from pathlib import Path
 import tempfile
 import unittest
 
-from soc.stm32.stm32f407.configure import preflight
+from tools.configure.stm32f4 import preflight
 from tools.configure import bindings, configure as gate
 from tools.configure.providers import hardware
 
@@ -16,7 +17,7 @@ class F407UartInstanceTests(unittest.TestCase):
                 ("USART3", 1, 39), ("UART4", 1, 52),
                 ("UART5", 1, 53), ("USART6", 2, 71)):
             with self.subTest(controller=controller):
-                selected = hardware.maintained("stm32f407", controller)
+                selected = hardware.maintained('stm32f4', controller)
                 self.assertEqual(selected.kind, "uart")
                 self.assertEqual(selected.apb, apb)
                 self.assertEqual(selected.irqs, ((controller, irq),))
@@ -31,7 +32,7 @@ class F407UartInstanceTests(unittest.TestCase):
             for mode in ("dma-tx", "rx-dma-idle", "rx-dma-continuous",
                          "dma-duplex", "dma-duplex-continuous"):
                 with self.subTest(controller=controller, mode=mode):
-                    selected = hardware.maintained("stm32f407", controller)
+                    selected = hardware.maintained('stm32f4', controller)
                     self.assertIsNone(selected.dma(mode))
 
     def test_unreviewed_uart_name_does_not_infer_a_clock_gate(self):
@@ -60,7 +61,7 @@ class F407UartInstanceTests(unittest.TestCase):
                 'mode="irq-byte-event"\nbaud=115200\n'
                 '[uart.serial2.rx]\nformat="bytes"\ncapacity=16\n'
                 '[uart.serial2.irq]\npriority=5\n')
-            result = gate.resolve_ir(assembly)
+            result = gate.resolve_ir(assembly, test_support=native_fixture(assembly))
             selected, = result.controllers
             self.assertEqual(selected.controller, "USART2")
             self.assertEqual(selected.mode, "irq-byte-event")

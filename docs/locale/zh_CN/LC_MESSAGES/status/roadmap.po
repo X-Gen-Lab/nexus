@@ -1,4 +1,4 @@
-# Exact changed messages reviewed against canonical source.
+# Reviewed against the exact current canonical source and gettext messages.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -10,76 +10,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 20c9a1116c36f92eca98962eab47d915494e8c5bc34008c98f04197c1680441f\n"
+"X-Nexus-Source-SHA256: a0fecb0e9759ca711000465488b7a57fc10f0e5dc4b3c2531ca5c537ce2d29a0\n"
 
-msgid "迭代方向与进入条件"
-msgstr "迭代方向与进入条件"
+#: docs/status/roadmap.md:9
+msgid "当前迭代与进入条件"
+msgstr "当前迭代与进入条件"
 
-msgid "顺序"
-msgstr "顺序"
+#: docs/status/roadmap.md:11
+msgid ""
+"本轮集中打磨 F4，不扩展其他生产系列。优先完成现有 F407 行为保全、精确型号事实、 共享 IP 归并和失效工具清理；然后逐模式复用官方 "
+"HAL／LL，收敛生成行为与 Host 工具。"
+msgstr ""
+"本轮集中打磨 F4，不扩展其他生产系列。优先完成现有 F407 行为保全、精确型号事实、 共享 IP 归并和失效工具清理；然后逐模式复用官方 "
+"HAL／LL，收敛生成行为与 Host 工具。"
 
-msgid "下一轮从{ref}`0.2.1 软件预览 <sdk-preview-v021>`继续，历史{ref}`封存候选 <sealed-cold-lifecycle-baseline>`保留原身份。71 个规划入口与依赖见[后续迭代](../delivery/next-iterations.md)；状态和退出只在[原交付台账](ledgers/platform-delivery-completion.md)维护，本页不计算完成率。"
-msgstr "下一轮从{ref}`0.2.1 软件预览 <sdk-preview-v021>`继续，历史{ref}`封存候选 <sealed-cold-lifecycle-baseline>`保留原身份。71 个规划入口与依赖见[后续迭代](../delivery/next-iterations.md)；状态和退出只在[原交付台账](ledgers/platform-delivery-completion.md)维护，本页不计算完成率。"
+#: docs/status/roadmap.md:14
+msgid "其他 F4 型号需要独立事实和差异验证；系列目录、官方宏或代表器件通过不构成整个 系列完成。实板接入后再执行真实 HIL，当前状态保持未执行。"
+msgstr ""
+"其他 F4 型号需要独立事实和差异验证；系列目录、官方宏或代表器件通过不构成整个 系列完成。实板接入后再执行真实 HIL，当前状态保持未执行。"
 
-msgid "主要交付"
-msgstr "主要交付"
-
-msgid "进入与退出条件"
-msgstr "进入与退出条件"
-
-msgid "先行软件"
-msgstr "先行软件"
-
-msgid "基线导航、配置说明、计划预览与完整开发操作"
-msgstr "基线导航、配置说明、计划预览与完整开发操作"
-
-msgid "B、C01、T01、X01；复用现有能力，不重新创建台账或测试框架"
-msgstr "B、C01、T01、X01；复用现有能力，不重新创建台账或测试框架"
-
-msgid "独立接入"
-msgstr "独立接入"
-
-msgid "外置 SoC/provider、CMake 与安装版 SDK"
-msgstr "外置 SoC/provider、CMake 与安装版 SDK"
-
-msgid "P；显式包身份贯穿解析、查询、生成和构建，包外夹具实际通过"
-msgstr "P；显式包身份贯穿解析、查询、生成和构建，包外夹具实际通过"
-
-msgid "实际使用"
-msgstr "实际使用"
-
-msgid "工业控制与有界安全联网参考系统"
-msgstr "工业控制与有界安全联网参考系统"
-
-msgid "D/R/N/S/E；先固定精确组合和预算，完成失败、关闭与恢复"
-msgstr "D/R/N/S/E；先固定精确组合和预算，完成失败、关闭与恢复"
-
-msgid "设备接入后"
-msgstr "设备接入后"
-
-msgid "首发三板、来源参考板的 station 与逐模式实测"
-msgstr "首发三板、来源参考板的 station 与逐模式实测"
-
-msgid "H；按[HIL 状态](hardware.md)与原 station 合同，工装不等于物理执行"
-msgstr "H；按[HIL 状态](hardware.md)与原 station 合同，工装不等于物理执行"
-
-msgid "集成退出"
-msgstr "集成退出"
-
-msgid "当前 clean source 候选、SDK、双语文档与发布"
-msgstr "当前 clean source 候选、SDK、双语文档与发布"
-
-msgid "L；实际完整计划与独立断网复现，不继承预览或旧候选资格"
-msgstr "L；实际完整计划与独立断网复现，不继承预览或旧候选资格"
-
-msgid "条件扩展"
-msgstr "条件扩展"
-
-msgid "精确 PM、第二传感器、文件系统及高级 SoC 模式"
-msgstr "精确 PM、第二传感器、文件系统及高级 SoC 模式"
-
-msgid "R04/R05/S06 与原 SoC 退出；由真实需求和硬件合同进入"
-msgstr "R04/R05/S06 与原 SoC 退出；由真实需求和硬件合同进入"
-
-msgid "Codex 负责所有维护领域，不要求补实名账号。高风险改动保留独立审查；新增行为和修复先实际 RED，再 GREEN，C 合同使用 GoogleTest/GoogleMock。服务端规则以实际回读判断，产品策略与私有数据留外部工程。"
-msgstr "Codex 负责所有维护领域，不要求补实名账号。高风险改动保留独立审查；新增行为和修复先实际 RED，再 GREEN，C 合同使用 GoogleTest/GoogleMock。服务端规则以实际回读判断，产品策略与私有数据留外部工程。"
+#: docs/status/roadmap.md:17
+msgid ""
+"后续退出见[迭代边界](../delivery/next-iterations.md)。新行为执行真实 RED→GREEN， C 合同使用 "
+"GoogleTest／GoogleMock，普通提交保留完整门禁和高风险独立审查。旧专项 "
+"[原记录](ledgers.md)保留身份，不重新计算为本轮完成率。"
+msgstr ""
+"后续退出见[迭代边界](../delivery/next-iterations.md)。新行为执行真实 RED→GREEN， C 合同使用 "
+"GoogleTest／GoogleMock，普通提交保留完整门禁和高风险独立审查。旧专项 "
+"[原记录](ledgers.md)保留身份，不重新计算为本轮完成率。"

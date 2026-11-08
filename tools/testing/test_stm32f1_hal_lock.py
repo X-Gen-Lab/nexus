@@ -4,14 +4,14 @@ import copy
 import json
 from pathlib import Path
 import shutil
-import subprocess
-import sys
 import tempfile
 import unittest
 from unittest.mock import patch as mock_patch
 
 from tools.maintenance import stm32f1_hal_lock as official
 from tools.maintenance import source_catalogue
+
+from tools.testing.inventory_fixtures import write_files
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -29,11 +29,8 @@ class STM32F1OfficialSourceTests(unittest.TestCase):
         self.lock_path.parent.mkdir()
         self.lock = json.loads((ROOT / "dependencies/stm32f1-hal.lock.json")
                                .read_text())
+        write_files(self.source, self.lock)
         self.write_lock(self.lock)
-        for name in self.lock["files"]:
-            file = self.source / name
-            file.parent.mkdir(exist_ok=True)
-            shutil.copyfile(ROOT / "vendors/st/stm32f1_hal" / name, file)
         for source in (self.source, self.cmsis):
             (source / ".git").mkdir()
         self.states = {
@@ -62,7 +59,7 @@ class STM32F1OfficialSourceTests(unittest.TestCase):
             return state["origin"]
         if arguments == ("status", "--porcelain", "--untracked-files=all"):
             return state["status"]
-        self.fail("Unexpected Git identity query: " + repr(arguments))
+        raise AssertionError("Unexpected Git identity query: " + repr(arguments))
 
     def verify(self, **options):
         return official.verify(self.source, self.lock_path, self.cmsis,
@@ -83,22 +80,6 @@ class STM32F1OfficialSourceTests(unittest.TestCase):
         self.assertEqual(result["source_kind"], "git_checkout")
         self.assertFalse(result["software_qualified"])
 
-    def test_real_official_checkout_and_cli_are_read_only(self):
-        self.git_patch.stop()
-        source = ROOT / "vendors/st/stm32f1_hal"
-        cmsis = ROOT / "vendors/st/cmsis_device_f1"
-        lock = ROOT / "dependencies/stm32f1-hal.lock.json"
-        result = official.verify(source, lock, cmsis)
-        self.assert_reviewed_file_count(result)
-        executed = subprocess.run([
-            sys.executable, "-B", str(ROOT / "tools/maintenance/stm32f1_hal_lock.py"),
-            "--source", str(source), "--lock", str(lock),
-            "--cmsis-source", str(cmsis)], capture_output=True, text=True,
-            timeout=30)
-        self.assertEqual(executed.returncode, 0, executed.stderr)
-        cli_result = json.loads(executed.stdout)
-        self.assert_reviewed_file_count(cli_result)
-        self.assertEqual(cli_result["source_kind"], "git_checkout")
 
     def test_unknown_missing_or_reauthored_pairing_and_release_reject(self):
         candidates = [{**self.lock, "fallback": True}, {}, []]

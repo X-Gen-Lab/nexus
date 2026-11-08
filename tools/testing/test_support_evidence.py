@@ -1,4 +1,5 @@
 """Exact support queries associate verified bytes without widening their scope."""
+from tools.configure.tests.native_fixture import native_fixture, with_native_support
 
 import copy
 from contextlib import redirect_stderr, redirect_stdout
@@ -23,7 +24,7 @@ class SelectedEvidenceTests(unittest.TestCase):
     """Git and candidate I/O are ports; resolution and association remain real."""
 
     def setUp(self):
-        self.resolved = configure.resolve_ir(ASSEMBLY, ROOT).to_dict()
+        self.resolved = configure.resolve_ir(ASSEMBLY, ROOT, test_support=native_fixture(ASSEMBLY)).to_dict()
         self.source = {"root": str(ROOT), "commit": "1" * 40,
                        "tree": "2" * 40, "dirty": False, "submodules": []}
         # This model projection isolates the association boundary. It is never
@@ -50,7 +51,7 @@ class SelectedEvidenceTests(unittest.TestCase):
                 patch.object(identity, "observe_git_source",
                              side_effect=observations or [self.source, self.source]):
             return capabilities.selection(ASSEMBLY, ROOT,
-                                          candidate_path=Path("/model/candidate.json"))
+                                          candidate_path=Path("/model/candidate.json"), test_support=native_fixture(ASSEMBLY))
 
     def test_same_source_and_configuration_reference_exact_software_scopes(self):
         result = self.query()
@@ -130,7 +131,7 @@ class SelectedEvidenceTests(unittest.TestCase):
                 patch.object(identity, "observe_git_source", return_value=self.source):
             with self.assertRaisesRegex(EvidenceError, "changed raw receipt"):
                 capabilities.selection(ASSEMBLY, ROOT,
-                                       candidate_path=Path("/model/candidate.json"))
+                                       candidate_path=Path("/model/candidate.json"), test_support=native_fixture(ASSEMBLY))
 
     def test_source_change_during_query_rejects_the_report(self):
         changed = {**self.source, "tree": "9" * 40}
@@ -140,7 +141,7 @@ class SelectedEvidenceTests(unittest.TestCase):
     def test_no_evidence_does_not_observe_git_or_change_default_status(self):
         with patch.object(identity, "observe_git_source",
                           side_effect=AssertionError("unrequested Git observation")):
-            result = capabilities.selection(ASSEMBLY, ROOT)
+            result = capabilities.selection(ASSEMBLY, ROOT, test_support=native_fixture(ASSEMBLY))
         self.assertNotIn("evidence", result)
         self.assertNotIn("current_source", result)
         self.assertEqual(result["validation"]["software_candidate"], "not_assessed")
@@ -150,15 +151,15 @@ class SelectedEvidenceTests(unittest.TestCase):
                           ["--write", "--candidate", "/model/candidate.json"]):
             with self.subTest(arguments=arguments), redirect_stderr(io.StringIO()):
                 with self.assertRaises(SystemExit) as raised:
-                    capabilities.main(arguments)
+                    capabilities.main(with_native_support(arguments))
                 self.assertEqual(raised.exception.code, 2)
         stream = io.StringIO()
         with patch.object(candidate, "verified_projection", create=True,
                           return_value=self.reference), \
                 patch.object(identity, "observe_git_source", return_value=self.source), \
                 redirect_stdout(stream):
-            result = capabilities.main(["--assembly", str(ASSEMBLY),
-                                        "--candidate", "/model/candidate.json"])
+            result = capabilities.main(with_native_support(["--assembly", str(ASSEMBLY),
+                                        "--candidate", "/model/candidate.json"]))
         self.assertEqual(result, 0)
         self.assertEqual(json.loads(stream.getvalue())["evidence"]["relation"],
                          "exact_source_and_configuration")
@@ -168,8 +169,8 @@ class SelectedEvidenceTests(unittest.TestCase):
             stream = io.StringIO()
             with patch.object(identity, "observe_git_source", return_value=self.source), \
                     redirect_stdout(stream), redirect_stderr(io.StringIO()):
-                result = capabilities.main(["--assembly", str(ASSEMBLY),
-                    "--candidate", str(Path(directory) / "missing.json")])
+                result = capabilities.main(with_native_support(["--assembly", str(ASSEMBLY),
+                    "--candidate", str(Path(directory) / "missing.json")]))
             self.assertEqual(result, 1)
             self.assertEqual(stream.getvalue(), "")
 

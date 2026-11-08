@@ -9,14 +9,8 @@
 extern "C" {
 #include "can.h"
 #include "nexus/io/native/model.h"
-#ifdef NX_CAN_SOC_STM32
 #include "stm32f407_can.h"
 #include "stm32f407xx.h"
-#else
-#include "gd32f470_can.h"
-#include "gd32f4xx_can.h"
-#include "gd32f4xx_rcu.h"
-#endif
 }
 #include <cstring>
 #include <gtest/gtest.h>
@@ -39,11 +33,7 @@ class CanSoc : public testing::Test {
     nx_native_can_registers_t* hardware = nullptr;
 
     nx_result_t Initialize(nx_can_controller_t* state) {
-#ifdef NX_CAN_SOC_STM32
         return nx_stm32_can_initialize(state);
-#else
-        return nx_gd32_can_initialize(state);
-#endif
     }
     nx_result_t SelectController(unsigned index) {
         nx_result_t result = nx_can_port_stop(&port);
@@ -67,13 +57,8 @@ class CanSoc : public testing::Test {
         domain.filters = filters;
         domain.filter_count = 2U;
         domain.split = 14U;
-#ifdef NX_CAN_SOC_STM32
         ASSERT_EQ(nx_stm32_can_domain_initialize(&domain), NX_SUCCESS);
         controller.timing = {500000U, 6U, 11U, 2U, 2U};
-#else
-        ASSERT_EQ(nx_gd32_can_domain_initialize(&domain), NX_SUCCESS);
-        controller.timing = {500000U, 5U, 16U, 3U, 2U};
-#endif
         hardware = reinterpret_cast<nx_native_can_registers_t*>(domain.primary);
         hardware->registers[2] = 7U << 26U;
         controller.domain = &domain;
@@ -81,11 +66,7 @@ class CanSoc : public testing::Test {
         controller.capacity = 8U;
         controller.poll_limit = 4U;
         controller.drain_timeout_us = 20U;
-#ifdef NX_CAN_SOC_STM32
         controller.irq_policy = {NX_IRQ_KERNEL_BASEPRI, 82U, 4U, 5U};
-#else
-        controller.irq_policy = {NX_IRQ_KERNEL_BASEPRI, 91U, 4U, 5U};
-#endif
         for (unsigned i = 0; i < 4U; ++i) {
             controller.sources[i].priority = 5U;
         }
@@ -109,21 +90,12 @@ class CanSoc : public testing::Test {
 };
 
 TEST_F(CanSoc, ActualSdkClockModeTimingAndVectorsMatchTheMechanism) {
-#ifdef NX_CAN_SOC_STM32
     EXPECT_EQ(controller.registers, CAN1_BASE);
     EXPECT_EQ(controller.clock_hz, 42000000U);
     EXPECT_NE(RCC->APB1ENR & RCC_APB1ENR_CAN1EN, 0U);
     EXPECT_EQ(CAN1->BTR, 5U | 10U << 16U | 1U << 20U | 1U << 24U);
     EXPECT_NE(CAN1->MCR & CAN_MCR_NART, 0U);
     EXPECT_EQ(CAN1->MCR & CAN_MCR_ABOM, 0U);
-#else
-    EXPECT_EQ(controller.registers, CAN0);
-    EXPECT_EQ(controller.clock_hz, 50000000U);
-    EXPECT_NE(RCU_APB1EN & RCU_APB1EN_CAN0EN, 0U);
-    EXPECT_EQ(CAN_BT(CAN0), 4U | 15U << 16U | 2U << 20U | 1U << 24U);
-    EXPECT_NE(CAN_CTL(CAN0) & CAN_CTL_ARD, 0U);
-    EXPECT_EQ(CAN_CTL(CAN0) & CAN_CTL_ABOR, 0U);
-#endif
     EXPECT_EQ(hardware->enabled_irqs, 15U);
     for (unsigned i = 0; i < 4U; ++i) {
         EXPECT_EQ(controller.sources[i].irq_number, 19U + i);
@@ -131,19 +103,11 @@ TEST_F(CanSoc, ActualSdkClockModeTimingAndVectorsMatchTheMechanism) {
 }
 TEST_F(CanSoc, MailboxPackingAndSdkCompletionProveActualWireSuccess) {
     ASSERT_EQ(nx_can_port_submit(&port, &request), NX_SUCCESS);
-#ifdef NX_CAN_SOC_STM32
     EXPECT_EQ(CAN1->sTxMailBox[0].TIR, (frame.id << 3U) | 5U);
     EXPECT_EQ(CAN1->sTxMailBox[0].TDLR, 0x04030201U);
     EXPECT_EQ(CAN1->sTxMailBox[0].TDHR, 0x08070605U);
     CAN1->sTxMailBox[0].TIR &= ~static_cast<uint32_t>(CAN_TI0R_TXRQ);
     CAN1->TSR |= CAN_TSR_RQCP0 | CAN_TSR_TXOK0 | CAN_TSR_TME0;
-#else
-    EXPECT_EQ(CAN_TMI(CAN0, 0U), (frame.id << 3U) | 5U);
-    EXPECT_EQ(CAN_TMDATA0(CAN0, 0U), 0x04030201U);
-    EXPECT_EQ(CAN_TMDATA1(CAN0, 0U), 0x08070605U);
-    CAN_TMI(CAN0, 0U) &= ~CAN_TMI_TEN;
-    CAN_TSTAT(CAN0) |= CAN_TSTAT_MTF0 | CAN_TSTAT_MTFNERR0 | CAN_TSTAT_TME0;
-#endif
     nx_can_controller_irq(&controller);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(request.base.result, NX_SUCCESS);
@@ -158,25 +122,8 @@ TEST_F(CanSoc, MaximumExtendedIdentifierRespectsExactFamilyMailboxRestriction) {
         maximum.id = 0x1FFFFFFFU;
         ASSERT_EQ(nx_can_tx_prepare(&second_request, &maximum, 200U),
                   NX_SUCCESS);
-#ifdef NX_CAN_SOC_STM32
         ASSERT_EQ(nx_can_port_submit(&port, &second_request), NX_SUCCESS);
         EXPECT_EQ(controller.slots[1].request, &second_request);
-#else
-        unsigned char hardware_before[sizeof(*hardware)];
-        unsigned char request_before[sizeof(second_request)];
-        std::memcpy(hardware_before, hardware, sizeof(hardware_before));
-        std::memcpy(request_before, &second_request, sizeof(request_before));
-        EXPECT_EQ(nx_can_port_submit(&port, &second_request), NX_ERROR_BUSY);
-        EXPECT_EQ(
-            std::memcmp(hardware_before, hardware, sizeof(hardware_before)), 0);
-        EXPECT_EQ(std::memcmp(request_before, &second_request,
-                              sizeof(request_before)),
-                  0);
-        EXPECT_EQ(nx_request_state(&second_request.base), NX_REQUEST_READY);
-        EXPECT_EQ(controller.snapshot.pending, 1U);
-        EXPECT_EQ(controller.slots[1].request, nullptr);
-        EXPECT_EQ(controller.slots[2].request, nullptr);
-#endif
         ASSERT_EQ(nx_can_port_stop(&port), NX_SUCCESS);
     }
 }
@@ -205,32 +152,16 @@ TEST_F(CanSoc, MaximumExtendedRemoteIdentifierUsesTheSamePhysicalRestriction) {
         maximum.kind = NX_CAN_REMOTE;
         ASSERT_EQ(nx_can_tx_prepare(&second_request, &maximum, 200U),
                   NX_SUCCESS);
-#ifdef NX_CAN_SOC_STM32
         ASSERT_EQ(nx_can_port_submit(&port, &second_request), NX_SUCCESS);
         EXPECT_EQ(controller.slots[1].request, &second_request);
-#else
-        EXPECT_EQ(nx_can_port_submit(&port, &second_request), NX_ERROR_BUSY);
-        EXPECT_EQ(nx_request_state(&second_request.base), NX_REQUEST_READY);
-        EXPECT_EQ(controller.snapshot.pending, 1U);
-#endif
         ASSERT_EQ(nx_can_port_stop(&port), NX_SUCCESS);
     }
 }
 TEST_F(CanSoc, FifoOrderAdmissionMatchesReviewedFamilyAbortGuarantees) {
     ASSERT_EQ(nx_can_port_stop(&port), NX_SUCCESS);
     controller.fifo_order = true;
-#ifdef NX_CAN_SOC_STM32
     ASSERT_EQ(Initialize(&controller), NX_SUCCESS);
     EXPECT_NE(hardware->registers[0] & 4U, 0U);
-#else
-    unsigned char hardware_before[sizeof(*hardware)];
-    std::memcpy(hardware_before, hardware, sizeof(hardware_before));
-    EXPECT_EQ(Initialize(&controller), NX_ERROR_UNSUPPORTED);
-    EXPECT_EQ(std::memcmp(hardware_before, hardware, sizeof(hardware_before)),
-              0);
-    EXPECT_EQ(domain.active_mask, 0U);
-    EXPECT_FALSE(controller.snapshot.started);
-#endif
 }
 TEST_F(CanSoc, UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion) {
     hardware->hold_abort = true;
@@ -260,15 +191,9 @@ TEST_F(CanSoc, SecondControllerDependsOnPrimaryClockWithoutResettingPeer) {
     EXPECT_EQ(nx_can_filter_domain_stop(&domain), NX_ERROR_BUSY);
     EXPECT_EQ(hardware->registers[0x31CU / 4U], 0U);
     ASSERT_EQ(nx_can_port_stop(&port), NX_SUCCESS);
-#ifdef NX_CAN_SOC_STM32
     EXPECT_EQ(RCC->APB1ENR & (RCC_APB1ENR_CAN1EN | RCC_APB1ENR_CAN2EN),
               RCC_APB1ENR_CAN1EN | RCC_APB1ENR_CAN2EN);
     EXPECT_EQ(CAN1->sFilterRegister[14].FR1, 0x321U << 21U);
-#else
-    EXPECT_EQ(RCU_APB1EN & (RCU_APB1EN_CAN0EN | RCU_APB1EN_CAN1EN),
-              RCU_APB1EN_CAN0EN | RCU_APB1EN_CAN1EN);
-    EXPECT_EQ(CAN_FDATA0(CAN0, 14U), 0x321U << 21U);
-#endif
     EXPECT_EQ(domain.active_mask, 2U);
     nx_can_port_t peer_port = {&nx_classic_can_ops, &peer};
     EXPECT_EQ(nx_can_port_stop(&peer_port), NX_SUCCESS);

@@ -1,4 +1,5 @@
 """Persisted enhanced selections traverse the normal atomic bundle path."""
+from tools.configure.tests.native_fixture import native_fixture
 from pathlib import Path
 import tempfile
 import unittest
@@ -28,29 +29,13 @@ class IOEvolutionFixtures(unittest.TestCase):
                 self.assertEqual(variables["NEXUS_IO_EVOLUTION_FIXTURE"], "ON")
 
     def test_all_enhanced_fixtures_generate_real_typed_factories(self):
-        fixtures = {
-            "native-uart9n1": "nx_factory_uart_word(",
-            "f407-uart9n1-probe": "nx_factory_uart_word_irq_probe(",
-            "gd470-uart9n1-probe": "nx_factory_uart_word_irq_probe(",
-            "native-spi-dma-transaction": "nx_factory_spi_dma_owner_binding(",
-            "f407-uart7e2": "nx_factory_uart(",
-            "f407-uart9n1": "nx_factory_uart_word(",
-            "gd470-uart7e2": "nx_factory_uart(",
-            "gd470-uart9n1": "nx_factory_uart_word(",
-            "f407-spi-transaction": "nx_factory_spi_transaction_device(",
-            "gd470-spi-transaction": "nx_factory_spi_transaction_device(",
-            "f407-spi-dma-transaction": "nx_factory_spi_dma_transaction(",
-            "gd470-spi-dma-transaction": "nx_factory_spi_dma_transaction(",
-            "g474-i2c-long-timing": "nx_factory_i2c_long_device(",
-            "h743-i2c-long-timing": "nx_factory_i2c_long_device(",
-            "u575-i2c-long-timing": "nx_factory_i2c_long_device(",
-        }
+        fixtures = {'native-uart9n1': 'nx_factory_uart_word(', 'f407-uart9n1-probe': 'nx_factory_uart_word_irq_probe(', 'native-spi-dma-transaction': 'nx_factory_spi_dma_owner_binding(', 'f407-uart7e2': 'nx_factory_uart(', 'f407-uart9n1': 'nx_factory_uart_word(', 'f407-spi-transaction': 'nx_factory_spi_transaction_device(', 'f407-spi-dma-transaction': 'nx_factory_spi_dma_transaction('}
         root = configure.ROOT / "tests/contracts/io_evolution_assembly"
         with tempfile.TemporaryDirectory() as temporary:
             for name, getter in fixtures.items():
                 with self.subTest(fixture=name):
                     output = Path(temporary) / name
-                    configure.configure(root / (name + ".toml"), output)
+                    configure.configure(root / (name + ".toml"), output, test_support=native_fixture(root / (name + ".toml")))
                     self.assertTrue((output / ".nexus-config-bundle").is_file())
                     self.assertTrue((output / "resolved.json").is_file())
                     header = (output / "nexus_factory.h").read_text()

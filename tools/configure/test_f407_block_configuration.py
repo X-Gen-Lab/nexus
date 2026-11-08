@@ -1,4 +1,5 @@
 """F407 SDIO owns a socket, while media discovery remains explicit at runtime."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 import json
 from pathlib import Path
@@ -33,7 +34,7 @@ class F407BlockConfigurationTests(unittest.TestCase):
 
     def test_exact_socket_produces_static_factory_without_media_activation(self):
         with tempfile.TemporaryDirectory() as temporary:
-            result = gate.resolve_ir(self.fixture(Path(temporary)))
+            result = gate.resolve_ir(self.fixture(Path(temporary)), test_support=native_fixture(self.fixture(Path(temporary))))
             selected, = result.controllers
             self.assertEqual((selected.kind, selected.controller, selected.mode),
                              ("block", "SDIO", "sdio-poll"))
@@ -60,7 +61,7 @@ class F407BlockConfigurationTests(unittest.TestCase):
 
     def test_one_bit_mode_still_reserves_the_complete_six_pad_socket(self):
         with tempfile.TemporaryDirectory() as temporary:
-            result = gate.resolve_ir(self.fixture(Path(temporary), width=1))
+            result = gate.resolve_ir(self.fixture(Path(temporary), width=1), test_support=native_fixture(self.fixture(Path(temporary), width=1)))
             selected, = result.controllers
             self.assertEqual([pin["pin"] for pin in selected.pins],
                              ["PC8", "PC9", "PC10", "PC11", "PC12", "PD2"])
@@ -77,7 +78,8 @@ class F407BlockConfigurationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             with self.assertRaisesRegex(ValueError, "(?i)(conflict|owned)"):
                 gate.resolve_ir(self.fixture(Path(temporary), width=1,
-                                             extra=extra))
+                                             extra=extra), test_support=native_fixture(self.fixture(Path(temporary), width=1,
+                                             extra=extra)))
 
     def test_nonphysical_width_and_boolean_or_unbounded_limits_are_rejected(self):
         for width, maximum, extra in ((2, 8, ""), (4, 33, ""),
@@ -88,7 +90,10 @@ class F407BlockConfigurationTests(unittest.TestCase):
                         gate.resolve_ir(self.fixture(Path(temporary),
                                                      width=width,
                                                      maximum=maximum,
-                                                     extra=extra))
+                                                     extra=extra), test_support=native_fixture(self.fixture(Path(temporary),
+                                                     width=width,
+                                                     maximum=maximum,
+                                                     extra=extra)))
 
 
 if __name__ == "__main__":

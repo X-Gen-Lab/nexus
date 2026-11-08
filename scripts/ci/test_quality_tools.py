@@ -337,7 +337,7 @@ class RequiredAnalysisTests(unittest.TestCase):
     def test_shared_driver_in_actual_cmake_database_is_owned(self):
         self.assertIsNotNone(shutil.which("cmake"),
                              "CMake is required for the real database contract")
-        source = self.root / "drivers/i2c/i2c_v1_async/i2c_v1_async.c"
+        source = self.root / "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
         source.parent.mkdir(parents=True)
         source.write_text("int shared_driver;\n")
         external = self.root / "vendors/fixture/driver.c"
@@ -348,7 +348,7 @@ class RequiredAnalysisTests(unittest.TestCase):
             "project(shared_driver_analysis_scope C)\n"
             "set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n"
             "add_library(owned OBJECT components/sample.c "
-            "drivers/i2c/i2c_v1_async/i2c_v1_async.c)\n"
+            "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c)\n"
             "add_library(external OBJECT vendors/fixture/driver.c)\n")
         configured = subprocess.run(
             ["cmake", "-S", str(self.root), "-B", str(self.build)],
@@ -364,11 +364,11 @@ class RequiredAnalysisTests(unittest.TestCase):
                       if entry["file"] == str(source))
         self.assertEqual(driver["nexus_analysis_scope"], "production")
         self.assertEqual(driver["nexus_production_source"],
-                         "drivers/i2c/i2c_v1_async/i2c_v1_async.c")
+                         "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c")
         self.assertEqual(quality_tools.compilation_entry(driver), actual)
 
     def test_tidy_header_filter_includes_shared_driver_headers(self):
-        header = self.root / "drivers/i2c/i2c_v1_async/i2c_v1_async.h"
+        header = self.root / "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.h"
         header.parent.mkdir(parents=True)
         header.write_text("extern int shared_driver;\n")
         self.assertEqual(quality_tools.run("tidy", self.root, self.build,
@@ -408,17 +408,17 @@ class RequiredAnalysisTests(unittest.TestCase):
                          "tests/contracts/os_freertos_runtime/posix_idle.c")
 
     def test_register_models_use_actual_production_compilation_entries(self):
-        source = self.root / "soc/gd32/gd32f470/drivers/uart.c"
+        source = self.root / "soc/stm32/stm32f4/drivers/uart.c"
         source.parent.mkdir(parents=True)
         source.write_text("int production_driver;\n")
-        model = self.root / "tests/contracts/gd32_io_test.c"
+        model = self.root / "tests/contracts/stm32_io_test.c"
         model.parent.mkdir(parents=True)
         model.write_text("int model_test;\n")
         entries = [
             {"file": str(source), "directory": str(self.root),
              "arguments": ["cc", "-DNX_REGISTER_MODEL=1", "-c", str(source)]},
             {"file": str(source), "directory": str(self.root),
-             "arguments": ["cc", "-DGD32F470=1", "-c", str(source)]},
+             "arguments": ["cc", "-DSTM32F407xx=1", "-c", str(source)]},
             {"file": str(model), "directory": str(self.root),
              "arguments": ["cc", "-c", str(model)]},
         ]
@@ -426,7 +426,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         selected = quality_tools.commands(self.root, self.build)
         self.assertEqual(len(selected), 2)
         self.assertEqual(selected[0]["arguments"][1], "-DNX_REGISTER_MODEL=1")
-        self.assertEqual(selected[1]["arguments"][1], "-DGD32F470=1")
+        self.assertEqual(selected[1]["arguments"][1], "-DSTM32F407xx=1")
         self.assertTrue(all(e["nexus_analysis_scope"] == "production" for e in selected))
 
     def test_malformed_database_fails(self):
@@ -881,6 +881,31 @@ class RequiredAnalysisTests(unittest.TestCase):
                                                   '-I', 'system headers'])
         self.assertEqual(entry, original)
         self.assertNotIn('command', projected)
+
+    def test_quoted_definitions_use_a_lossless_cppcheck_command(self):
+        for system in ([], ['-isystem', 'system headers']):
+            for definitions in (['-DPATH="/work/a b"'],
+                                ['-D', 'PATH="/work/a b"']):
+                argv = ['cc', *definitions, *system, '-std=c11', '-c',
+                        str(self.source), '-o', 'sample.o']
+                for mode in ('arguments', 'command'):
+                    with self.subTest(system=system, mode=mode,
+                                      definitions=definitions):
+                        entry = {'directory': str(self.root),
+                                 'file': str(self.source),
+                                 mode: argv if mode == 'arguments'
+                                 else shlex.join(argv)}
+                        original = json.loads(json.dumps(entry))
+                        projected = quality_tools.cppcheck_compilation_entry(entry)
+                        # Cppcheck 2.13 strips literal quotes from its argv
+                        # import. Command text retains them without changing
+                        # the compiler's argument values or include priority.
+                        self.assertNotIn('arguments', projected)
+                        self.assertEqual(shlex.split(projected['command']),
+                            ['cc', *definitions, '-std=c11', '-c',
+                             str(self.source), '-o', 'sample.o',
+                             *(['-I', 'system headers'] if system else [])])
+                        self.assertEqual(entry, original)
 
     def test_missing_system_include_argument_fails_before_analysis(self):
         entry = {'directory': str(self.root), 'file': str(self.source),

@@ -73,8 +73,10 @@ visibility／tree 变化均拒绝，既有 CI、tag 和 byte check 同时有效�
 任意归档内容，也不能锁住管理员在上传中改变可见性。
 
 当前精确 consumer 计划由 `transport.py` 的 `CONSUMER_POLICY`、`consumer_plan()`
-和 `consumer_layout()` 唯一维护，包括 Native external-provider lifecycle consumer。
-当前 policy 为 `nexus-sdk-consumers-v16`；不要从旧 root／image 数推导它通过。执行
+和 `consumer_layout()` 唯一维护，包括显式 Native host-test consumer；生产 MCU
+选择仅为 F4 的精确 F407 模式。
+保留的其他 vendor SDK 不扩大计划；读取实现中的完整选择，不维护平行列表。
+当前 policy 为 `nexus-sdk-consumers-v17`；不要从旧 root／image 数推导它通过。执行
 必须核对相同 source 的 producer report、实际命令收条和 transport manifest。
 
 新 transport manifest 为 schema `2`，包含同一 policy identity。更改计划同时审查
@@ -104,36 +106,10 @@ unborn `git init` fixture；历史、remotes、index、active hooks 和外来 Gi
 | policy-v12 | 54 roots／57 images／222 commands（含初次 SDK 验证），增加四个 common-services profile |
 | policy-v13 | 保留 v12，增加 Native 和 F407 两个 secure-services profile |
 
-v7 [copy assembly](../configure/assemblies/u575-lpdma-copy-stop2.toml)和
-`u575-lpdma-copy` public C11 smoke 是有界复制链接，不执行物理 Stop2。v8 的
-[assembly](../configure/assemblies/u575-lptim1-lpbam-stop2.toml)与
-[consumer](../../cmake/package/verification/io_evolution/consumers/u575-lptim1-lpbam.c)
-只承诺一组有限 SRAM4 CCR1／RCR=0／ARR tuple；不是重复或通用 LPBAM program。
-start／stop、部分失败和复合释放见[合同](../../docs/design/u575-lptim1-lpbam.md)。
-
-v9 [MPU assembly](../configure/assemblies/u575-mpu-gpio-write.toml)与
-[consumer](../../cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c)，
-v10 [I2S assembly](../configure/assemblies/sky-i2s2-slave-tx.toml)与
-[consumer](../../cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c)
-是公共软件选择，不建立物理 MPU 隔离或外部音频资格。v11 的 `h743 high` 使用
-[canonical assembly](../configure/assemblies/h743-high-peripherals.toml)，
-consumer name 和 `h743-high` smoke 不变；同数量的 v10 transport 仍不能满足 v11。
-
-v12 的 `native services`、`external services`、`f407 services`、`gd470 services`
-使用[同一 C11 场景](../../cmake/package/verification/common_services/services.c)，
-执行 Settings commit／reopen／read、wait-select arm／wait／recheck 和 ARP receive／
-reply 的 live lwIP netif 模型。外部 Native 复制自己相对 Board／SoC package，通过
-`Nexus_DIR` 找 SDK；两 ARM profile 独立声明 128 KiB Flash、64 KiB static RAM、
-2 KiB MSP，不改旧默认。执行域与 image suffix 来自明确 profile，而非名字前缀。
-
-v13 的[secure 场景](../../cmake/package/verification/secure_services/README.md)在
-Native Linux 执行实际 host entropy、PSA runtime、有限 TLS handshake WANT、MQTT
-init／deinit 与 lwIP pool lifecycle，使用公开 synthetic CA 和受控 fixture UTC，
-不导出 client private key／identity。F407 链接明确 RNG／TLS／MQTT／pool，预算为
-512 KiB Flash、112 KiB static RAM、8 KiB MSP、零 libc heap，不在硬件运行。
-每个 C 单元检查 C11 与 CPU／enum ABI，public-only caller 不继承 vendor storage
-头；两个 profile 核对 canonical source、配置、实际 backend 符号和安装 prefix。
-有限 WANT 或 ARM ELF 不等于认证 TLS／mTLS／broker 交换；后者另属 N09 host fixture。
+历史表及各版 consumer 的完整合同保留在
+[固定旧源码](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/tools/release/README.md)。
+这些是冻结的过去身份，既不进入当前消费计划，也不作为已删除文件的本地入口。
+恢复旧原件必须匹配其原 policy、源码与 hash-pinned helper，不能回退到当前选择。
 
 ## 归档、恢复与持久保留
 

@@ -9,15 +9,15 @@ class ThreadXGateTest(unittest.TestCase):
     def gate(self):
         return importlib.import_module('os_threadx')
 
-    def test_six_board_policy_links_and_one_distinct_missing_hook(self):
+    def test_f4_board_policy_links_and_one_distinct_missing_hook(self):
         rows = self.gate().matrix()
-        self.assertEqual(len(rows), 7)
-        self.assertEqual(len({row['name'] for row in rows}), 7)
+        self.assertEqual(len(rows), 5)
+        self.assertEqual(len({row['name'] for row in rows}), 5)
         self.assertEqual(sum(row['rejection'] for row in rows), 1)
         self.assertEqual({(row['board'], row['mask']) for row in rows
                           if not row['rejection']},
                          {(board, mask) for board in
-                          ('qiming', 'sky', 'liangshan') for mask in
+                          ('qiming', 'sky') for mask in
                           ('basepri', 'primask')})
 
     def test_negative_requires_exact_link_failure_and_no_elf(self):

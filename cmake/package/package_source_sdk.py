@@ -25,7 +25,7 @@ SOURCE_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(SOURCE_ROOT))
 try:
     from tools.maintenance.source_catalogue import (
-        ALL_DEPENDENCIES, SOURCE_DEPENDENCIES, children, declared_modules,
+        children, declared_modules,
         dependency, relative_path, verify_alias_identities,
         verify_gitlinks,
     )
@@ -38,7 +38,6 @@ try:
     )
     from tools.configure.metadata import load_policy, parse_json, snapshot
     from tools.configure import dependencies as configuration_dependencies
-    from tools.configure import integration_package
     from tools.configure.providers import descriptor as provider_descriptors
 except ImportError as error:
     # Missing verifier modules are an incomplete SDK, including after an
@@ -52,8 +51,9 @@ except ImportError as error:
 ROOT_FILES = {"CMakeLists.txt", "LICENSE", "README.md", "AGENTS.md", ".gitmodules",
               ".clang-format", ".editorconfig", ".clang-format-dirs"}
 ROOT_DIRS = {"arch", "boards", "cmake", "dependencies", "core", "io", "os",
-             "components", "drivers", "tools", "scripts", "soc"}
-REQUIRED_DEPENDENCIES = tuple(item.path for item in SOURCE_DEPENDENCIES)
+             "components", "tools", "scripts", "soc"}
+REQUIRED_DEPENDENCIES = ("vendors/arm/CMSIS_6", "vendors/st/cmsis_device_f4",
+                         "vendors/st/stm32f4_hal")
 CMSIS_CORE_DIRECTORY = "vendors/arm/CMSIS_6"
 CMSIS_CORE_REQUIRED_HEADERS = (
     "core_cm0.h", "core_cm0plus.h", "core_cm3.h", "core_cm4.h",
@@ -61,14 +61,172 @@ CMSIS_CORE_REQUIRED_HEADERS = (
     "core_cm85.h", "cmsis_compiler.h", "cmsis_gcc.h", "cmsis_version.h",
     "m-profile/armv7m_mpu.h", "m-profile/armv8m_mpu.h",
     "m-profile/armv7m_cachel1.h", "m-profile/cmsis_gcc_m.h", "tz_context.h")
-OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock, stm32g4_hal_lock,
-                    stm32h5_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock)
+OFFICIAL_DRIVERS = (stm32f4_hal_lock,)
+FREERTOS_REQUIRED_FILES = (
+    'ext/freertos/.gitmodules',
+    'ext/freertos/LICENSE.md',
+    'ext/freertos/include/FreeRTOS.h',
+    'ext/freertos/include/deprecated_definitions.h',
+    'ext/freertos/include/event_groups.h',
+    'ext/freertos/include/list.h',
+    'ext/freertos/include/mpu_prototypes.h',
+    'ext/freertos/include/mpu_syscall_numbers.h',
+    'ext/freertos/include/mpu_wrappers.h',
+    'ext/freertos/include/portable.h',
+    'ext/freertos/include/projdefs.h',
+    'ext/freertos/include/queue.h',
+    'ext/freertos/include/semphr.h',
+    'ext/freertos/include/stack_macros.h',
+    'ext/freertos/include/stream_buffer.h',
+    'ext/freertos/include/task.h',
+    'ext/freertos/include/timers.h',
+    'ext/freertos/list.c',
+    'ext/freertos/portable/GCC/ARM_CM0/port.c',
+    'ext/freertos/portable/GCC/ARM_CM0/portasm.c',
+    'ext/freertos/portable/GCC/ARM_CM0/portasm.h',
+    'ext/freertos/portable/GCC/ARM_CM0/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM23/non_secure/port.c',
+    'ext/freertos/portable/GCC/ARM_CM23/non_secure/portasm.c',
+    'ext/freertos/portable/GCC/ARM_CM23/non_secure/portasm.h',
+    'ext/freertos/portable/GCC/ARM_CM23/non_secure/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM23/non_secure/portmacrocommon.h',
+    'ext/freertos/portable/GCC/ARM_CM23/secure/secure_context.h',
+    'ext/freertos/portable/GCC/ARM_CM23/secure/secure_context_port.c',
+    'ext/freertos/portable/GCC/ARM_CM23/secure/secure_init.h',
+    'ext/freertos/portable/GCC/ARM_CM23/secure/secure_port_macros.h',
+    'ext/freertos/portable/GCC/ARM_CM23_NTZ/non_secure/mpu_wrappers_v2_asm.c',
+    'ext/freertos/portable/GCC/ARM_CM23_NTZ/non_secure/port.c',
+    'ext/freertos/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c',
+    'ext/freertos/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.h',
+    'ext/freertos/portable/GCC/ARM_CM23_NTZ/non_secure/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM23_NTZ/non_secure/portmacrocommon.h',
+    'ext/freertos/portable/GCC/ARM_CM3/port.c',
+    'ext/freertos/portable/GCC/ARM_CM3/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM33/non_secure/port.c',
+    'ext/freertos/portable/GCC/ARM_CM33/non_secure/portasm.c',
+    'ext/freertos/portable/GCC/ARM_CM33/non_secure/portasm.h',
+    'ext/freertos/portable/GCC/ARM_CM33/non_secure/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM33/non_secure/portmacrocommon.h',
+    'ext/freertos/portable/GCC/ARM_CM33/secure/secure_context.h',
+    'ext/freertos/portable/GCC/ARM_CM33/secure/secure_context_port.c',
+    'ext/freertos/portable/GCC/ARM_CM33/secure/secure_init.h',
+    'ext/freertos/portable/GCC/ARM_CM33/secure/secure_port_macros.h',
+    'ext/freertos/portable/GCC/ARM_CM33_NTZ/non_secure/mpu_wrappers_v2_asm.c',
+    'ext/freertos/portable/GCC/ARM_CM33_NTZ/non_secure/port.c',
+    'ext/freertos/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c',
+    'ext/freertos/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.h',
+    'ext/freertos/portable/GCC/ARM_CM33_NTZ/non_secure/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM33_NTZ/non_secure/portmacrocommon.h',
+    'ext/freertos/portable/GCC/ARM_CM3_MPU/mpu_wrappers_v2_asm.c',
+    'ext/freertos/portable/GCC/ARM_CM3_MPU/port.c',
+    'ext/freertos/portable/GCC/ARM_CM3_MPU/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM4F/port.c',
+    'ext/freertos/portable/GCC/ARM_CM4F/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM4_MPU/mpu_wrappers_v2_asm.c',
+    'ext/freertos/portable/GCC/ARM_CM4_MPU/port.c',
+    'ext/freertos/portable/GCC/ARM_CM4_MPU/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM55/non_secure/port.c',
+    'ext/freertos/portable/GCC/ARM_CM55/non_secure/portasm.c',
+    'ext/freertos/portable/GCC/ARM_CM55/non_secure/portasm.h',
+    'ext/freertos/portable/GCC/ARM_CM55/non_secure/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM55/non_secure/portmacrocommon.h',
+    'ext/freertos/portable/GCC/ARM_CM55/secure/secure_context.h',
+    'ext/freertos/portable/GCC/ARM_CM55/secure/secure_context_port.c',
+    'ext/freertos/portable/GCC/ARM_CM55/secure/secure_init.h',
+    'ext/freertos/portable/GCC/ARM_CM55/secure/secure_port_macros.h',
+    'ext/freertos/portable/GCC/ARM_CM55_NTZ/non_secure/mpu_wrappers_v2_asm.c',
+    'ext/freertos/portable/GCC/ARM_CM55_NTZ/non_secure/port.c',
+    'ext/freertos/portable/GCC/ARM_CM55_NTZ/non_secure/portasm.c',
+    'ext/freertos/portable/GCC/ARM_CM55_NTZ/non_secure/portasm.h',
+    'ext/freertos/portable/GCC/ARM_CM55_NTZ/non_secure/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM55_NTZ/non_secure/portmacrocommon.h',
+    'ext/freertos/portable/GCC/ARM_CM7/r0p1/port.c',
+    'ext/freertos/portable/GCC/ARM_CM7/r0p1/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM85/non_secure/port.c',
+    'ext/freertos/portable/GCC/ARM_CM85/non_secure/portasm.c',
+    'ext/freertos/portable/GCC/ARM_CM85/non_secure/portasm.h',
+    'ext/freertos/portable/GCC/ARM_CM85/non_secure/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM85/non_secure/portmacrocommon.h',
+    'ext/freertos/portable/GCC/ARM_CM85/secure/secure_context.h',
+    'ext/freertos/portable/GCC/ARM_CM85/secure/secure_context_port.c',
+    'ext/freertos/portable/GCC/ARM_CM85/secure/secure_init.h',
+    'ext/freertos/portable/GCC/ARM_CM85/secure/secure_port_macros.h',
+    'ext/freertos/portable/GCC/ARM_CM85_NTZ/non_secure/mpu_wrappers_v2_asm.c',
+    'ext/freertos/portable/GCC/ARM_CM85_NTZ/non_secure/port.c',
+    'ext/freertos/portable/GCC/ARM_CM85_NTZ/non_secure/portasm.c',
+    'ext/freertos/portable/GCC/ARM_CM85_NTZ/non_secure/portasm.h',
+    'ext/freertos/portable/GCC/ARM_CM85_NTZ/non_secure/portmacro.h',
+    'ext/freertos/portable/GCC/ARM_CM85_NTZ/non_secure/portmacrocommon.h',
+    'ext/freertos/queue.c',
+    'ext/freertos/tasks.c',
+)
+
+MANIFEST = ".nexus-source-sdk.json"
 REQUIRED_FILES = (
+    'soc/stm32/stm32f4/devices.json',
+    '.gitmodules',
+    'CMakeLists.txt',
+    'LICENSE',
+    'arch/CMakeLists.txt',
+    'arch/arm/cortex_m/nx_arch_cache.c',
+    'arch/arm/cortex_m/nx_arch_cache_control.c',
+    'arch/arm/cortex_m/nx_arch_cortex_m.c',
+    'arch/arm/cortex_m/nx_arch_mpu.c',
+    'arch/arm/cortex_m/nx_arch_nonsecure.c',
+    'arch/arm/cortex_m/nx_arch_security.c',
+    'arch/arm/cortex_m/nx_arch_sleep.c',
+    'arch/arm/cortex_m/private/cache_control.h',
+    'arch/arm/cortex_m/private/compiler.h',
+    'arch/arm/cortex_m/private/mechanisms.h',
+    'arch/arm/cortex_m/private/nonsecure.h',
+    'arch/arm/cortex_m/private/registers.h',
+    'arch/arm/cortex_m/private/sleep.h',
+    'arch/include/nexus/arch/arch.h',
+    'arch/include/nexus/arch/atomic.h',
+    'arch/include/nexus/arch/cache.h',
+    'arch/include/nexus/arch/cache_control.h',
+    'arch/include/nexus/arch/features.h',
+    'arch/include/nexus/arch/mpu.h',
+    'arch/include/nexus/arch/nonsecure.h',
+    'arch/include/nexus/arch/security.h',
+    'arch/include/nexus/arch/sleep.h',
+    'arch/native/nx_arch_native.c',
+    'boards/stm32f407_qiming_v31/board.json',
+    'boards/stm32f407ve_sky_qingchun/board.json',
+    'boards/stm32f407zg_qiming_core/README.md',
+    'boards/stm32f407zg_qiming_core/assemblies/minimal.toml',
+    'boards/stm32f407zg_qiming_core/assemblies/touch-nor.toml',
+    'boards/stm32f407zg_qiming_core/board.json',
+    'boards/stm32f407zg_qiming_v41/README.md',
+    'boards/stm32f407zg_qiming_v41/assemblies/minimal.toml',
+    'boards/stm32f407zg_qiming_v41/assemblies/sdio.toml',
+    'boards/stm32f407zg_qiming_v41/assemblies/touch-nor.toml',
+    'boards/stm32f407zg_qiming_v41/board.json',
+    'cmake/package/NexusConfig.cmake.in',
+    'cmake/package/NexusConfigVersion.cmake.in',
+    'cmake/package/package_source_sdk.py',
+    'cmake/package/verification/common_services/f407.toml',
+    'cmake/package/verification/common_services/native.toml',
+    'cmake/package/verification/common_services/services.c',
+    'cmake/package/verification/device_tmp117/f407.toml',
+    'cmake/package/verification/device_tmp117/native.toml',
+    'cmake/package/verification/device_tmp117/services.c',
+    'cmake/package/verification/image_window/assembly.toml',
+    'cmake/package/verification/image_window/layout.json',
+    'cmake/package/verification/image_window/main.c',
+    'cmake/package/verification/io_evolution/boards/f407zg-eth-frames/board.json',
+    'cmake/package/verification/io_evolution/consumers/ethernet-frames.c',
+    'cmake/package/verification/io_evolution/consumers/f407-handoff.c',
+    'cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c',
+    'cmake/package/verification/io_evolution/consumers/native-time-empty.c',
+    'cmake/package/verification/io_evolution/consumers/native-time-pair.c',
+    'cmake/package/verification/io_evolution/f407zg-eth-frames.toml',
+    'cmake/package/verification/io_evolution/native-time-empty.toml',
+    'cmake/package/verification/io_evolution/native-time-pair.toml',
     'cmake/package/verification/loaned_rx/application.c',
     'cmake/package/verification/loaned_rx/application.h',
     'cmake/package/verification/loaned_rx/composition.c',
     'cmake/package/verification/loaned_rx/f407.toml',
-    'cmake/package/verification/loaned_rx/gd470.toml',
     'cmake/package/verification/mcuboot_boot/assembly.toml',
     'cmake/package/verification/mcuboot_boot/layout.json',
     'cmake/package/verification/mcuboot_boot/main.c',
@@ -79,6 +237,83 @@ REQUIRED_FILES = (
     'cmake/package/verification/mcuboot_control/f407.toml',
     'cmake/package/verification/mcuboot_control/native.c',
     'cmake/package/verification/mcuboot_control/native.toml',
+    'cmake/package/verification/secure_services/f407/application.c',
+    'cmake/package/verification/secure_services/f407/application.h',
+    'cmake/package/verification/secure_services/f407/assembly.toml',
+    'cmake/package/verification/secure_services/f407/composition.c',
+    'cmake/package/verification/secure_services/native/application.c',
+    'cmake/package/verification/secure_services/native/application.h',
+    'cmake/package/verification/secure_services/native/assembly.toml',
+    'cmake/package/verification/secure_services/native/composition.c',
+    'cmake/package/verification/secure_services/public_ca.h',
+    'cmake/package/verify_consumers.py',
+    'cmake/platform/CMSISCore.cmake',
+    'cmake/platform/Components.cmake',
+    'cmake/platform/Configure.cmake',
+    'cmake/platform/ControllerModes.cmake',
+    'cmake/platform/Firmware.cmake',
+    'cmake/platform/Options.cmake',
+    'cmake/platform/Provider.cmake',
+    'cmake/platform/Runtime.cmake',
+    'cmake/platform/SDK.cmake',
+    'cmake/platform/STM32FSMC.cmake',
+    'cmake/platform/STM32Official.cmake',
+    'cmake/platform/STM32SDIO.cmake',
+    'cmake/platform/TargetPolicy.cmake',
+    'cmake/platform/Workload.cmake',
+    'cmake/toolchains/arm-gcc.cmake',
+    'components/CMakeLists.txt',
+    'components/amp_ipc/CMakeLists.txt',
+    'components/amp_ipc/include/nexus/components/amp_ipc.h',
+    'components/amp_ipc/include/nexus/components/amp_ipc_storage.h',
+    'components/amp_ipc/src/amp_ipc.c',
+    'components/at24c02/CMakeLists.txt',
+    'components/at24c02/include/nexus/components/at24c02.h',
+    'components/at24c02/references.json',
+    'components/at24c02/src/at24c02.c',
+    'components/bmp280/include/nexus/components/bmp280.h',
+    'components/bmp280/include/nexus/components/bmp280_spi.h',
+    'components/bmp280/src/bmp280.c',
+    'components/bmp280/src/spi_transport.c',
+    'components/bus_owner/include/nexus/components/bus_owner.h',
+    'components/bus_owner/include/nexus/components/spi_async_owner.h',
+    'components/bus_owner/include/nexus/components/spi_dma_owner.h',
+    'components/bus_owner/include/nexus/components/spi_owner.h',
+    'components/bus_owner/include/nexus/components/uart_owner.h',
+    'components/bus_owner/src/bus_owner.c',
+    'components/bus_owner/src/spi_async_owner.c',
+    'components/bus_owner/src/spi_dma_owner.c',
+    'components/bus_owner/src/spi_owner.c',
+    'components/bus_owner/src/uart_owner.c',
+    'components/clock_domain/CMakeLists.txt',
+    'components/clock_domain/include/nexus/components/clock_domain.h',
+    'components/clock_domain/private/clock_domain_impl.h',
+    'components/clock_domain/src/clock_domain.c',
+    'components/dp83848/CMakeLists.txt',
+    'components/dp83848/include/nexus/dp83848/dp83848.h',
+    'components/dp83848/src/dp83848.c',
+    'components/ds18b20/CMakeLists.txt',
+    'components/ds18b20/include/nexus/components/ds18b20.h',
+    'components/ds18b20/src/ds18b20.c',
+    'components/i3c_controller/CMakeLists.txt',
+    'components/i3c_controller/include/nexus/components/i3c_controller.h',
+    'components/i3c_controller/include/nexus/components/i3c_controller_storage.h',
+    'components/i3c_controller/src/i3c_controller.c',
+    'components/ili9341/CMakeLists.txt',
+    'components/ili9341/include/nexus/components/ili9341.h',
+    'components/ili9341/src/ili9341.c',
+    'components/infrared/CMakeLists.txt',
+    'components/infrared/include/nexus/components/infrared.h',
+    'components/infrared/src/infrared.c',
+    'components/log/include/nexus/components/log.h',
+    'components/log/src/log.c',
+    'components/mapped_storage/CMakeLists.txt',
+    'components/mapped_storage/include/nexus/components/mapped_storage.h',
+    'components/mapped_storage/include/nexus/components/mapped_storage_owner.h',
+    'components/mapped_storage/include/nexus/components/native_mapped_storage.h',
+    'components/mapped_storage/src/mapped_storage.c',
+    'components/mapped_storage/src/mapped_storage_owner.c',
+    'components/mapped_storage/src/native_mapped_storage.c',
     'components/mcuboot/CMakeLists.txt',
     'components/mcuboot/README.md',
     'components/mcuboot/include/nexus/components/mcuboot_control.h',
@@ -91,619 +326,719 @@ REQUIRED_FILES = (
     'components/mcuboot/profile/sysflash/sysflash.h',
     'components/mcuboot/src/flash_map_backend.c',
     'components/mcuboot/src/mcuboot_control.c',
-
-    'components/network/Profiles.cmake',
-    'components/network/include/nexus/network/lwip_loaned_rx.h',
-    'components/network/include/nexus/network/lwip_loaned_rx_storage.h',
-    'components/tmp117/CMakeLists.txt',
-    'components/tmp117/include/nexus/components/tmp117.h',
-    'components/tmp117/include/nexus/components/tmp117_i2c.h',
-    'components/tmp117/src/tmp117.c',
-    'components/tmp117/src/i2c_transport.c',
-    'cmake/package/verification/device_tmp117/native.toml',
-    'cmake/package/verification/device_tmp117/f407.toml',
-    'cmake/package/verification/device_tmp117/services.c',
-    'cmake/package/verification/image_window/assembly.toml',
-    'cmake/package/verification/image_window/layout.json',
-    'cmake/package/verification/image_window/main.c',
-    'cmake/package/verification/secure_services/f407/application.c',
-    'cmake/package/verification/secure_services/f407/application.h',
-    'cmake/package/verification/secure_services/f407/assembly.toml',
-    'cmake/package/verification/secure_services/f407/composition.c',
-    'cmake/package/verification/secure_services/native/application.c',
-    'cmake/package/verification/secure_services/native/application.h',
-    'cmake/package/verification/secure_services/native/assembly.toml',
-    'cmake/package/verification/secure_services/native/composition.c',
-    'cmake/package/verification/secure_services/public_ca.h',
-    'components/network/include/nexus/network/byte_stream.h',
-    'components/tls/CMakeLists.txt',
-    'components/tls/README.md',
-    'components/tls/include/nexus/tls/tls.h',
-    'components/tls/include/nexus/tls/storage.h',
-    'components/tls/src/tls.c',
-    'components/tls/profile/tls-user.h',
-    'components/tls/profile/crypto-user.h',
+    'components/modbus/include/nexus/components/modbus_rtu.h',
+    'components/modbus/src/modbus_rtu.c',
     'components/mqtt/CMakeLists.txt',
     'components/mqtt/README.md',
     'components/mqtt/include/nexus/mqtt/client.h',
     'components/mqtt/include/nexus/mqtt/core_mqtt_storage.h',
     'components/mqtt/port/core_mqtt_config.h',
     'components/mqtt/src/client.c',
-    'io/include/nexus/io/entropy.h',
-    'io/src/api/entropy.c',
-    'soc/stm32/stm32f407/Entropy.cmake',
-    'soc/stm32/stm32f407/entropy_instance.c',
-    'soc/stm32/stm32f407/drivers/entropy.c',
-    'soc/stm32/stm32f407/memory_init.c',
-    'soc/stm32/stm32f407/include/nexus/soc/stm32f407_entropy.h',
-    'soc/stm32/stm32f407/private/stm32f407_entropy.h',
-    'cmake/package/verification/common_services/native.toml',
-    'cmake/package/verification/common_services/f407.toml',
-    'cmake/package/verification/common_services/gd470.toml',
-    'cmake/package/verification/common_services/services.c',
-    'tools/maintenance/lwip_lock.py',
-    'dependencies/lwip.lock.json',
-    'ext/lwip/NEXUS_CURATED_SOURCE.md',
     'components/network/CMakeLists.txt',
+    'components/network/Profiles.cmake',
+    'components/network/include/nexus/network/byte_stream.h',
     'components/network/include/nexus/network/lwip_adapter.h',
+    'components/network/include/nexus/network/lwip_loaned_rx.h',
+    'components/network/include/nexus/network/lwip_loaned_rx_storage.h',
     'components/network/include/nexus/network/lwip_storage.h',
     'components/network/include/nexus/network/lwip_tcp.h',
     'components/network/include/nexus/network/lwip_tcp_storage.h',
-    'components/network/src/lwip_tcp.c',
-    'components/network/port/lwipopts.h',
     'components/network/port/arch/cc.h',
+    'components/network/port/lwipopts.h',
     'components/network/src/lwip_adapter.c',
+    'components/network/src/lwip_tcp.c',
+    'components/onewire/CMakeLists.txt',
+    'components/onewire/include/nexus/components/onewire.h',
+    'components/onewire/src/crc8.c',
+    'components/onewire/src/onewire.c',
+    'components/owner_observer/CMakeLists.txt',
+    'components/owner_observer/include/nexus/components/owner_observer.h',
+    'components/owner_observer/src/owner_observer.c',
     'components/settings/include/nexus/components/settings.h',
     'components/settings/src/settings.c',
-    'io/include/nexus/io/usb_profile.h',
-    'io/include/nexus/io/usb_activation.h',
-    'io/src/mechanisms/usb_profile.c',
+    'components/soc/CMakeLists.txt',
+    'components/soc/stm32/CMakeLists.txt',
+    'components/soc/stm32/stm32f407_handoff/CMakeLists.txt',
+    'components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h',
+    'components/software_i2c/CMakeLists.txt',
+    'components/software_i2c/README.md',
+    'components/software_i2c/include/nexus/components/software_i2c.h',
+    'components/software_i2c/include/nexus/components/software_sccb.h',
+    'components/software_i2c/references.json',
+    'components/software_i2c/src/software_i2c.c',
+    'components/software_spi/CMakeLists.txt',
+    'components/software_spi/include/nexus/components/software_spi.h',
+    'components/software_spi/src/software_spi.c',
+    'components/storage/include/nexus/components/file_flash.h',
+    'components/storage/include/nexus/components/flash_storage.h',
+    'components/storage/include/nexus/components/storage.h',
+    'components/storage/src/file_flash.c',
+    'components/storage/src/flash_storage.c',
+    'components/storage/src/storage.c',
+    'components/tls/CMakeLists.txt',
+    'components/tls/README.md',
+    'components/tls/include/nexus/tls/storage.h',
+    'components/tls/include/nexus/tls/tls.h',
+    'components/tls/profile/crypto-user.h',
+    'components/tls/profile/tls-user.h',
+    'components/tls/src/tls.c',
+    'components/tmp117/CMakeLists.txt',
+    'components/tmp117/include/nexus/components/tmp117.h',
+    'components/tmp117/include/nexus/components/tmp117_i2c.h',
+    'components/tmp117/src/i2c_transport.c',
+    'components/tmp117/src/tmp117.c',
     'components/usb_control/CMakeLists.txt',
+    'components/usb_control/include/nexus/components/usb_acm.h',
     'components/usb_control/include/nexus/components/usb_control.h',
     'components/usb_control/include/nexus/components/usb_descriptors.h',
-    'components/usb_control/include/nexus/components/usb_acm.h',
+    'components/usb_control/src/usb_acm.c',
     'components/usb_control/src/usb_control.c',
     'components/usb_control/src/usb_descriptors.c',
-    'components/usb_control/src/usb_acm.c',
-    "CMakeLists.txt", "LICENSE", ".gitmodules", "dependencies/toolchains.lock.json",
-    "cmake/platform/CMSISCore.cmake",
-    "dependencies/environment.lock.json", "core/include/nexus/core/request.h",
-    "arch/include/nexus/arch/arch.h", "arch/arm/cortex_m/nx_arch_cortex_m.c",
-    "arch/arm/cortex_m/private/compiler.h",
-    "arch/arm/cortex_m/private/registers.h", "arch/native/nx_arch_native.c",
-    "arch/include/nexus/arch/atomic.h", "arch/include/nexus/arch/features.h",
-    "arch/include/nexus/arch/cache.h", "arch/include/nexus/arch/mpu.h",
-    "arch/include/nexus/arch/security.h", "arch/arm/cortex_m/private/mechanisms.h",
-    "arch/arm/cortex_m/nx_arch_cache.c", "arch/arm/cortex_m/nx_arch_mpu.c",
-    "arch/arm/cortex_m/nx_arch_security.c",
-    "arch/include/nexus/arch/cache_control.h",
-    "arch/arm/cortex_m/nx_arch_cache_control.c",
-    "arch/arm/cortex_m/private/cache_control.h",
-    "arch/include/nexus/arch/nonsecure.h",
-    "arch/arm/cortex_m/nx_arch_nonsecure.c",
-    "arch/arm/cortex_m/private/nonsecure.h",
-    "arch/include/nexus/arch/sleep.h", "arch/arm/cortex_m/nx_arch_sleep.c",
-    "arch/arm/cortex_m/private/sleep.h",
-    "core/include/nexus/core/memory.h",
-    "core/include/nexus/core/request_observer.h", "core/src/request_observer.c",
-    "io/include/nexus/io/stream_budget.h", "io/src/mechanisms/stream_budget.c",
-    "io/include/nexus/io/diagnostic.h", "io/src/mechanisms/diagnostic.c",
-    "components/owner_observer/CMakeLists.txt",
-    "components/owner_observer/include/nexus/components/owner_observer.h",
-    "components/owner_observer/src/owner_observer.c",
-    "soc/gd32/gd32f470/memory_init.c", "soc/gd32/gd32f470/private/memory_init.h",
-    "core/src/request.c", "io/include/nexus/io/fwd.h",
-    "io/include/nexus/io/gpio.h",
-    "io/include/nexus/io/uart.h", "os/freertos/include/FreeRTOSConfig.h",
-    "boards/stm32f407_qiming_v31/board.json",
-    "boards/stm32f407ve_sky_qingchun/board.json",
-    "boards/gd32f470_liangshan/board.json",
-    "cmake/platform/Firmware.cmake",
-    "cmake/platform/TargetPolicy.cmake", "cmake/platform/Components.cmake",
-    "tools/configure/matrix.py",
-    "tools/configure/assemblies/catalogue.json",
-    "tools/dev/dev.py", "tools/dev/presets.py", "tools/dev/process.py",
-    "tools/dev/change_paths.py",
-    "tools/dev/projects.py", "tools/dev/device.py", "tools/dev/timings.py",
-    "tools/dev/cache.py", "tools/dev/dependencies.py",
-    "tools/dev/qualification.py", "tools/dev/provenance.py",
-    "tools/dev/plan.py", "tools/dev/artifacts.py",
-    "tools/configure/integration_package.py",
-    "tools/evidence/store.py",
-    "tools/evidence/environment.py", "tools/evidence/recipe.py",
-    "tools/maintenance/stm32_ll_lock.py", "cmake/platform/Workload.cmake",
-    "dependencies/platform-compatibility.json",
-    "os/freertos/tick.c", "os/freertos/include/nexus/os/tick.h",
-    "os/CMakeLists.txt", "os/diagnostic.c",
-    "os/include/nexus/os/diagnostic.h", "os/freertos/CMakeLists.txt",
-    "os/freertos/freertos.c", "os/freertos/hooks.c",
-    "os/freertos/include/nexus/os/freertos.h",
-    "os/freertos/lowpower.c", "os/freertos/diagnostics.c",
-    "os/freertos/include/nexus/os/lowpower.h",
-    "os/freertos/include/nexus/os/freertos_diagnostics.h",
-    "os/freertos/include/nexus/os/freertos_mpu.h",
-    "os/freertos/include/nexus/os/freertos_mpu_gpio.h",
-    "os/freertos/include/nexus/os/freertos_user.h",
-    "os/freertos/include/nexus/os/secure_context.h",
-    "os/freertos/mpu/prepare_port.py", "os/freertos/mpu/private.h",
-    "os/freertos/mpu/task.c", "os/freertos/mpu/layout.c",
-    "os/freertos/mpu/syscalls.c", "os/freertos/mpu/gpio.c",
-    "os/freertos/mpu/guard.c", "os/freertos/mpu/guard_arm.c",
-    "os/freertos/mpu/guard.h",
-    "os/freertos/secure/Integration.cmake",
-    "os/freertos/secure/CMakeLists.txt",
-    "os/freertos/secure/config/FreeRTOSConfig.h",
-    "os/freertos/secure/private/hardware.h",
-    "os/freertos/secure/context.c", "os/freertos/secure/init.c",
-    "cmake/platform/Runtime.cmake", "os/freertos/prepare_m7_integer.py",
-    "tools/configure/assemblies/native.toml",
-    "tools/configure/assemblies/qiming-baremetal-uart-dma.toml",
-    "tools/configure/assemblies/sky-baremetal.toml",
-    "tools/configure/assemblies/liangshan-baremetal.toml",
-    "tools/measurement/workload.c",
-    "ext/freertos/tasks.c", "ext/freertos/queue.c", "ext/freertos/list.c",
-    "ext/freertos/LICENSE.md", "ext/freertos/.gitmodules",
-    "vendors/arm/CMSIS_6/CMSIS/Core/Include/core_cm4.h", "vendors/arm/CMSIS_6/LICENSE",
-    "vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s",
-    "vendors/st/cmsis_device_f4/LICENSE.md",
-    "vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S",
-    "vendors/gigadevice/gd32f4xx/source.lock.json",
-    "cmake/package/NexusConfig.cmake.in", "cmake/package/NexusConfigVersion.cmake.in",
-    )
-REQUIRED_FILES += tuple(item.path + "/" + item.notice
-                        for item in ALL_DEPENDENCIES
-                        if item.scope == "runtime"
-                        and item.path + "/" + item.notice not in REQUIRED_FILES)
-MANIFEST = ".nexus-source-sdk.json"
-IO_EVOLUTION_VERIFICATION_FILES = tuple(
-    "cmake/package/verification/io_evolution/" + name for name in (
-        "consumers/h743-spi-dma.c", "consumers/h743-runtime-clock.c",
-        "consumers/f407-handoff.c", "consumers/f407-i2s2-slave-tx.c",
-        "consumers/u575-lpdma-copy.c",
-        "consumers/u575-lptim1-lpbam.c", "consumers/u575-mpu-gpio.c",
-        "consumers/h743-uart-continuous.c", "consumers/u575-lptim.c",
-        "consumers/u575-rtc.c", "consumers/u575-retained-time.c", "consumers/u575-stop2.c", "consumers/user-io-async.c",
-        "consumers/h743-uart-duplex-continuous.c",
-        "h743-high-empty.toml", "h743-high-uart.toml",
-        "u575-uart-gpdma.toml",
-        "g474-can-fd-loopback.toml", "g474-can-fd-normal.toml",
-        "g474-pwm-adc.toml", "boards/g474-fdcan/board.json",
-        "boards/g474-pwm-adc/board.json", "consumers/h743-high.c",
-        "consumers/u575-uart-gpdma.c", "consumers/g474-can-fd.c",
-        "consumers/g474-pwm-adc.c",
-        "g474-adc-group-regular-software.toml",
-        "g474-adc-group-regular-timer.toml",
-        "g474-adc-group-injected-software.toml",
-        "g474-adc-group-injected-timer.toml",
-        "boards/g474-adc-group/board.json", "consumers/g474-adc-group.c",
-        "h743-uart-fifo.toml", "u575-uart-fifo.toml",
-        "consumers/uart-fifo.c", "f407zg-eth-frames.toml",
-        "gd470-eth-frames.toml", "boards/f407zg-eth-frames/board.json",
-        "boards/gd470-eth-frames/board.json", "consumers/ethernet-frames.c",
-        "h743-uart-rtscts.toml", "u575-uart-rtscts.toml",
-        "g474-pwm-shared.toml", "boards/g474-pwm-shared/board.json",
-        "consumers/g474-pwm-shared.c",
-        "boards/g474-pin-states/board.json", "consumers/pin-states.c",
-        "native-time-pair.toml", "native-time-empty.toml",
-        "consumers/native-time-pair.c", "consumers/native-time-empty.c"))
-REQUIRED_FILES += (
-                   "tools/configure/assemblies/g474-pin-states.toml",
-                   "tools/configure/assemblies/h743-high-peripherals.toml",
-                   *IO_EVOLUTION_VERIFICATION_FILES)
-REQUIRED_FILES += ("drivers/uart/usart_fifo/uart_fifo_impl.h",)
-REQUIRED_FILES += ("drivers/uart/usart_fifo/uart_fifo_profile.h",)
-REQUIRED_FILES += (
-    "io/private/stream_profile_storage.h",
-    "io/src/mechanisms/adc_stream_profile.c",
-    "io/src/mechanisms/stream_profile_storage.c",
+    'components/user_io_broker/CMakeLists.txt',
+    'components/user_io_broker/include/nexus/components/user_io_async.h',
+    'components/user_io_broker/include/nexus/components/user_io_async_storage.h',
+    'components/user_io_broker/include/nexus/components/user_io_broker.h',
+    'components/user_io_broker/private/user_io_broker_impl.h',
+    'components/user_io_broker/src/user_io_async.c',
+    'components/user_io_broker/src/user_io_broker.c',
+    'components/w25/CMakeLists.txt',
+    'components/w25/include/nexus/components/w25.h',
+    'components/w25/src/w25.c',
+    'components/xpt2046/CMakeLists.txt',
+    'components/xpt2046/include/nexus/components/xpt2046.h',
+    'components/xpt2046/src/xpt2046.c',
+    'core/CMakeLists.txt',
+    'core/include/nexus/core/fault.h',
+    'core/include/nexus/core/lifecycle.h',
+    'core/include/nexus/core/memory.h',
+    'core/include/nexus/core/platform_lifecycle.h',
+    'core/include/nexus/core/request.h',
+    'core/include/nexus/core/request_observer.h',
+    'core/include/nexus/core/silicon.h',
+    'core/include/nexus/core/stack_observation.h',
+    'core/include/nexus/core/status.h',
+    'core/include/nexus/core/time.h',
+    'core/src/fault.c',
+    'core/src/lifecycle.c',
+    'core/src/platform_lifecycle.c',
+    'core/private/platform_lifecycle_impl.h',
+    'core/src/request.c',
+    'core/src/request_observer.c',
+    'core/src/silicon.c',
+    'core/src/stack_observation.c',
+    'core/src/time.c',
+    'dependencies/coremqtt.lock.json',
+    'dependencies/environment.lock.json',
+    'dependencies/lwip.lock.json',
+    'dependencies/mbedtls.lock.json',
+    'dependencies/mcuboot.lock.json',
+    'dependencies/platform-compatibility.json',
+    'dependencies/stm32f1-hal.lock.json',
+    'dependencies/stm32f1.lock.json',
+    'dependencies/stm32f4-hal.lock.json',
+    'dependencies/stm32g4-hal.lock.json',
+    'dependencies/stm32g4.lock.json',
+    'dependencies/stm32h5-hal.lock.json',
+    'dependencies/stm32h5.lock.json',
+    'dependencies/stm32h7-hal.lock.json',
+    'dependencies/stm32h7.lock.json',
+    'dependencies/stm32h747.lock.json',
+    'dependencies/stm32u5-hal.lock.json',
+    'dependencies/stm32u5.lock.json',
+    'dependencies/threadx.lock.json',
+    'dependencies/toolchains.lock.json',
+    'io/CMakeLists.txt',
+    'io/include/nexus/io/adc.h',
+    'io/include/nexus/io/adc_format.h',
+    'io/include/nexus/io/adc_group.h',
+    'io/include/nexus/io/adc_observer.h',
+    'io/include/nexus/io/advanced_pwm.h',
+    'io/include/nexus/io/block.h',
+    'io/include/nexus/io/can.h',
+    'io/include/nexus/io/can_fd.h',
+    'io/include/nexus/io/cycle_probe.h',
+    'io/include/nexus/io/diagnostic.h',
+    'io/include/nexus/io/dma.h',
+    'io/include/nexus/io/encoder.h',
+    'io/include/nexus/io/entropy.h',
+    'io/include/nexus/io/ethernet.h',
+    'io/include/nexus/io/ethernet_frames.h',
+    'io/include/nexus/io/external_bus.h',
+    'io/include/nexus/io/exti.h',
+    'io/include/nexus/io/flash.h',
+    'io/include/nexus/io/frame_stream.h',
+    'io/include/nexus/io/fwd.h',
+    'io/include/nexus/io/gpio.h',
+    'io/include/nexus/io/i2c.h',
+    'io/include/nexus/io/i2c_bus_clear.h',
+    'io/include/nexus/io/i2c_long.h',
+    'io/include/nexus/io/mdio.h',
+    'io/include/nexus/io/memory_window.h',
+    'io/include/nexus/io/native/model.h',
+    'io/include/nexus/io/native/spi_dma_model.h',
+    'io/include/nexus/io/observation.h',
+    'io/include/nexus/io/parallel16.h',
+    'io/include/nexus/io/pwm_adc.h',
+    'io/include/nexus/io/pwm_group.h',
+    'io/include/nexus/io/spi.h',
+    'io/include/nexus/io/spi_dma_owner_binding.h',
+    'io/include/nexus/io/spi_dma_transaction.h',
+    'io/include/nexus/io/spi_transaction.h',
+    'io/include/nexus/io/stream.h',
+    'io/include/nexus/io/stream_budget.h',
+    'io/include/nexus/io/stream_profile.h',
+    'io/include/nexus/io/timer.h',
+    'io/include/nexus/io/timer_capture.h',
+    'io/include/nexus/io/uart.h',
+    'io/include/nexus/io/uart_format.h',
+    'io/include/nexus/io/uart_rs485.h',
+    'io/include/nexus/io/uart_word.h',
+    'io/include/nexus/io/usb_activation.h',
+    'io/include/nexus/io/usb_device.h',
+    'io/include/nexus/io/usb_profile.h',
+    'io/include/nexus/io/wake.h',
+    'io/include/nexus/io/watchdog.h',
+    'io/private/can_fd_impl.h',
+    'io/private/can_validation.h',
+    'io/private/eth_frames_validation.h',
+    'io/private/eth_validation.h',
+    'io/private/spi_dma_sequence.h',
+    'io/private/spi_dma_sequence_owner.h',
+    'io/private/stream_profile_storage.h',
+    'io/src/api/adc.c',
+    'io/src/api/adc_group.c',
+    'io/src/api/advanced_pwm.c',
+    'io/src/api/block.c',
+    'io/src/api/can.c',
+    'io/src/api/can_fd.c',
+    'io/src/api/encoder.c',
+    'io/src/api/entropy.c',
+    'io/src/api/ethernet.c',
+    'io/src/api/ethernet_frames.c',
+    'io/src/api/external_bus.c',
+    'io/src/api/exti.c',
+    'io/src/api/flash.c',
+    'io/src/api/gpio.c',
+    'io/src/api/i2c.c',
+    'io/src/api/mdio.c',
+    'io/src/api/memory_window.c',
+    'io/src/api/parallel16.c',
+    'io/src/api/pwm_adc.c',
+    'io/src/api/pwm_group.c',
+    'io/src/api/spi.c',
+    'io/src/api/timer.c',
+    'io/src/api/timer_capture.c',
+    'io/src/api/uart.c',
+    'io/src/api/uart_word.c',
+    'io/src/api/usb_device.c',
+    'io/src/api/watchdog.c',
+    'io/src/mechanisms/adc_format.c',
+    'io/src/mechanisms/adc_observer.c',
+    'io/src/mechanisms/adc_stream_profile.c',
+    'io/src/mechanisms/cycle_probe.c',
+    'io/src/mechanisms/diagnostic.c',
+    'io/src/mechanisms/dma.c',
+    'io/src/mechanisms/flash_region.c',
+    'io/src/mechanisms/frame_stream.c',
+    'io/src/mechanisms/i2c_bus_clear.c',
+    'io/src/mechanisms/i2c_long.c',
+    'io/src/mechanisms/observation.c',
+    'io/src/mechanisms/spi_dma_owner_binding.c',
+    'io/src/mechanisms/spi_dma_sequence.c',
+    'io/src/mechanisms/spi_dma_transaction.c',
+    'io/src/mechanisms/spi_transaction.c',
+    'io/src/mechanisms/stream.c',
+    'io/src/mechanisms/stream_budget.c',
+    'io/src/mechanisms/stream_profile.c',
+    'io/src/mechanisms/stream_profile_storage.c',
+    'io/src/mechanisms/uart_rs485.c',
+    'io/src/mechanisms/usb_profile.c',
+    'io/src/mechanisms/wake.c',
+    'os/CMakeLists.txt',
+    'os/baremetal/notify.c',
+    'os/diagnostic.c',
+    'os/freertos/CMakeLists.txt',
+    'os/freertos/diagnostics.c',
+    'os/freertos/freertos.c',
+    'os/freertos/hooks.c',
+    'os/freertos/include/FreeRTOSConfig.h',
+    'os/freertos/include/nexus/os/freertos.h',
+    'os/freertos/include/nexus/os/freertos_diagnostics.h',
+    'os/freertos/include/nexus/os/freertos_mpu.h',
+    'os/freertos/include/nexus/os/freertos_stack.h',
+    'os/freertos/include/nexus/os/freertos_user.h',
+    'os/freertos/include/nexus/os/lowpower.h',
+    'os/freertos/include/nexus/os/secure_context.h',
+    'os/freertos/include/nexus/os/tick.h',
+    'os/freertos/lowpower.c',
+    'os/freertos/mpu/guard.c',
+    'os/freertos/mpu/guard.h',
+    'os/freertos/mpu/guard_arm.c',
+    'os/freertos/mpu/layout.c',
+    'os/freertos/mpu/patches/arm_cm3_mpu-port.patch',
+    'os/freertos/mpu/patches/arm_cm4_mpu-port.patch',
+    'os/freertos/mpu/patches/v7-veneers.patch',
+    'os/freertos/mpu/patches/v8-baseline-assembly.patch',
+    'os/freertos/mpu/patches/v8-baseline-veneers.patch',
+    'os/freertos/mpu/patches/v8-mainline-assembly.patch',
+    'os/freertos/mpu/patches/v8-mainline-veneers.patch',
+    'os/freertos/mpu/patches/v8-port.patch',
+    'os/freertos/mpu/prepare_port.py',
+    'os/freertos/mpu/private.h',
+    'os/freertos/mpu/syscalls.c',
+    'os/freertos/mpu/task.c',
+    'os/freertos/patches/m7-integer-port.c.patch',
+    'os/freertos/patches/m7-integer-portmacro.h.patch',
+    'os/freertos/prepare_m7_integer.py',
+    'os/freertos/private/timebase_lowpower.h',
+    'os/freertos/secure/CMakeLists.txt',
+    'os/freertos/secure/Integration.cmake',
+    'os/freertos/secure/config/FreeRTOSConfig.h',
+    'os/freertos/secure/context.c',
+    'os/freertos/secure/init.c',
+    'os/freertos/secure/private/hardware.h',
+    'os/freertos/stack_snapshot.c',
+    'os/freertos/tick.c',
+    'os/freertos/timebase_lowpower.c',
+    'os/include/nexus/os/baremetal.h',
+    'os/include/nexus/os/diagnostic.h',
+    'os/include/nexus/os/wait.h',
+    'os/native/include/nexus/os/native.h',
+    'os/native/native.c',
+    'os/reviewed_patch.py',
+    'os/threadx/CMakeLists.txt',
+    'os/threadx/Kernel.cmake',
+    'os/threadx/config/tx_user.h',
+    'os/threadx/include/nexus/os/threadx.h',
+    'os/threadx/m4.c',
+    'os/threadx/m4_vectors.S',
+    'os/threadx/patches/linux-lowlevel.patch',
+    'os/threadx/patches/linux-scheduler.patch',
+    'os/threadx/prepare_linux.py',
+    'os/threadx/private/irq_model.h',
+    'os/threadx/private/m4_model.h',
+    'os/threadx/threadx.c',
+    'os/wait.c',
+    'scripts/ci/io_lifecycle_matrix.py',
+    'scripts/ci/native_contracts.py',
+    'scripts/ci/tdd_gate.py',
+    'scripts/ci/vendor_import_identity.py',
+    'scripts/ci/verify_vendor_source.py',
+    'scripts/validation/junit.py',
+    'soc/stm32/stm32f4/CMakeLists.txt',
+    'soc/stm32/stm32f4/Entropy.cmake',
+    'soc/stm32/stm32f4/README.md',
+    'soc/stm32/stm32f4/drivers/adc.c',
+    'soc/stm32/stm32f4/drivers/adc_continuous.c',
+    'soc/stm32/stm32f4/drivers/adc_stream.c',
+    'soc/stm32/stm32f4/drivers/advanced_pwm.c',
+    'soc/stm32/stm32f4/drivers/can.c',
+    'soc/stm32/stm32f4/drivers/entropy.c',
+    'soc/stm32/stm32f4/drivers/ethernet.c',
+    'soc/stm32/stm32f4/drivers/ethernet_frames.c',
+    'soc/stm32/stm32f4/drivers/exti.c',
+    'soc/stm32/stm32f4/drivers/flash.c',
+    'soc/stm32/stm32f4/drivers/fsmc.c',
+    'soc/stm32/stm32f4/drivers/fsmc_boot.c',
+    'soc/stm32/stm32f4/drivers/gpio.c',
+    'soc/stm32/stm32f4/drivers/i2c.c',
+    'soc/stm32/stm32f4/drivers/i2c_async.c',
+    'soc/stm32/stm32f4/drivers/i2c_cold.c',
+    'soc/stm32/stm32f4/drivers/i2s2_slave_tx.c',
+    'soc/stm32/stm32f4/drivers/ip/advanced_timer/advanced_pwm_impl.h',
+    'soc/stm32/stm32f4/drivers/ip/advanced_timer/timer_advanced_controller.h',
+    'soc/stm32/stm32f4/drivers/ip/advanced_timer/timer_capture_impl.h',
+    'soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c',
+    'soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.h',
+    'soc/stm32/stm32f4/drivers/ip/classic_can/cortex_m_port.h',
+    'soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c',
+    'soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.h',
+    'soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c',
+    'soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.h',
+    'soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c',
+    'soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.h',
+    'soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c',
+    'soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.h',
+    'soc/stm32/stm32f4/drivers/platform_cold.c',
+    'soc/stm32/stm32f4/drivers/rtc.c',
+    'soc/stm32/stm32f4/drivers/sdio.c',
+    'soc/stm32/stm32f4/drivers/spi.c',
+    'soc/stm32/stm32f4/drivers/spi_dma.c',
+    'soc/stm32/stm32f4/drivers/timer.c',
+    'soc/stm32/stm32f4/drivers/timer_capture.c',
+    'soc/stm32/stm32f4/drivers/uart.c',
+    'soc/stm32/stm32f4/drivers/uart_cold.c',
+    'soc/stm32/stm32f4/drivers/uart_dma.c',
+    'soc/stm32/stm32f4/drivers/uart_duplex.c',
+    'soc/stm32/stm32f4/drivers/uart_hal.c',
+    'soc/stm32/stm32f4/drivers/uart_receive.c',
+    'soc/stm32/stm32f4/drivers/uart_stream.c',
+    'soc/stm32/stm32f4/drivers/uart_word.c',
+    'soc/stm32/stm32f4/drivers/usb_device.c',
+    'soc/stm32/stm32f4/drivers/watchdog.c',
+    'soc/stm32/stm32f4/entropy_instance.c',
+    'soc/stm32/stm32f4/handoff.c',
+    'soc/stm32/stm32f4/include/nexus/soc/stm32f407_entropy.h',
+    'soc/stm32/stm32f4/memory_init.c',
+    'soc/stm32/stm32f4/private/fsmc_hal/README.md',
+    'soc/stm32/stm32f4/private/fsmc_hal/stm32f4xx_hal_conf.h',
+    'soc/stm32/stm32f4/private/hal/stm32f4xx_hal_conf.h',
+    'soc/stm32/stm32f4/private/memory_init.h',
+    'soc/stm32/stm32f4/private/sdio_hal/stm32f4xx_hal_conf.h',
+    'soc/stm32/stm32f4/private/stm32_identity.h',
+    'soc/stm32/stm32f4/private/stm32f407_basic_cold.h',
+    'soc/stm32/stm32f4/private/stm32f407_can.h',
+    'soc/stm32/stm32f4/private/stm32f407_can_cold.h',
+    'soc/stm32/stm32f4/private/stm32f407_control_cold.h',
+    'soc/stm32/stm32f4/private/stm32f407_dma.h',
+    'soc/stm32/stm32f4/private/stm32f407_entropy.h',
+    'soc/stm32/stm32f4/private/stm32f407_eth.h',
+    'soc/stm32/stm32f4/private/stm32f407_eth_cold.h',
+    'soc/stm32/stm32f4/private/stm32f407_eth_frames.h',
+    'soc/stm32/stm32f4/private/stm32f407_eth_frames_cold.h',
+    'soc/stm32/stm32f4/private/stm32f407_fsmc.h',
+    'soc/stm32/stm32f4/private/stm32f407_fsmc_profile.h',
+    'soc/stm32/stm32f4/private/stm32f407_hal_atomic.h',
+    'soc/stm32/stm32f4/private/stm32f407_hal_profile.h',
+    'soc/stm32/stm32f4/private/stm32f407_handoff_hw.h',
+    'soc/stm32/stm32f4/private/stm32f407_i2c_async.h',
+    'soc/stm32/stm32f4/private/stm32f407_i2c_cold.h',
+    'soc/stm32/stm32f4/private/stm32f407_i2c_port.h',
+    'soc/stm32/stm32f4/private/stm32f407_i2s2_slave_tx.h',
+    'soc/stm32/stm32f4/private/stm32f407_lowpower.h',
+    'soc/stm32/stm32f4/private/stm32f407_packet_cold.h',
+    'soc/stm32/stm32f4/private/stm32f407_platform_cold.h',
+    'soc/stm32/stm32f4/private/stm32f407_provider.h',
+    'soc/stm32/stm32f4/private/stm32f407_rtc.h',
+    'soc/stm32/stm32f4/private/stm32f407_sdio.h',
+    'soc/stm32/stm32f4/private/stm32f407_sleep.h',
+    'soc/stm32/stm32f4/private/stm32f407_spi_cold.h',
+    'soc/stm32/stm32f4/private/stm32f407_sram_boot.h',
+    'soc/stm32/stm32f4/private/stm32f407_stream.h',
+    'soc/stm32/stm32f4/private/stm32f407_system.h',
+    'soc/stm32/stm32f4/private/stm32f407_timer_advanced.h',
+    'soc/stm32/stm32f4/private/stm32f407_timer_cold.h',
+    'soc/stm32/stm32f4/private/stm32f407_uart_cold.h',
+    'soc/stm32/stm32f4/private/stm32f407_uart_hal.h',
+    'soc/stm32/stm32f4/private/stm32f407_uart_receive.h',
+    'soc/stm32/stm32f4/private/stm32f407_uart_word.h',
+    'soc/stm32/stm32f4/private/stm32f407_usb_clock.h',
+    'soc/stm32/stm32f4/private/stm32f407_usb_cold.h',
+    'soc/stm32/stm32f4/private/stm32f407_usb_device.h',
+    'soc/stm32/stm32f4/private/uart_control.h',
+    'soc/stm32/stm32f4/references.json',
+    'soc/stm32/stm32f4/routes.json',
+    'soc/stm32/stm32f4/sleep.c',
+    'soc/stm32/stm32f4/soc.json',
+    'soc/stm32/stm32f4/sram_boot.c',
+    'soc/stm32/stm32f4/system.c',
+    'soc/stm32/stm32f4/timebase_lowpower.c',
+    'soc/stm32/stm32f4/usb_clock.c',
+    'tools/__init__.py',
+    'tools/configure/__init__.py',
+    'tools/configure/adc.py',
+    'tools/configure/assemblies/catalogue.json',
+    'tools/configure/assemblies/qiming-baremetal-uart-dma.toml',
+    'tools/configure/assemblies/qiming-i2s2-slave-tx.toml',
+    'tools/configure/assemblies/sky-baremetal.toml',
+    'tools/configure/assemblies/sky-i2s2-slave-tx.toml',
+    'tools/configure/assembly.schema.json',
+    'tools/configure/authored.py',
+    'tools/configure/bindings.py',
+    'tools/configure/board_hardware.py',
+    'tools/configure/bundle.py',
+    'tools/configure/calls.py',
+    'tools/configure/can.py',
+    'tools/configure/clocks.py',
+    'tools/configure/configure.py',
+    'tools/configure/contracts.py',
+    'tools/configure/coupled_io.py',
+    'tools/configure/cpu.py',
+    'tools/configure/dependencies.py',
+    'tools/configure/dma_topology.py',
+    'tools/configure/documentation.py',
+    'tools/configure/emission.py',
+    'tools/configure/enhanced_endpoints.py',
+    'tools/configure/ethernet.py',
+    'tools/configure/experience.py',
+    'tools/configure/exti.py',
+    'tools/configure/fact_references.py',
+    'tools/configure/factory.py',
+    'tools/configure/gpio_electrical.py',
+    'tools/configure/gpio_phase.py',
+    'tools/configure/i2c_timing.py',
+    'tools/configure/i2c_timing_selection.py',
+    'tools/configure/i2s2.py',
+    'tools/configure/integration_package.py',
+    'tools/configure/io_traits.py',
+    'tools/configure/ir.py',
+    'tools/configure/records.py',
+    'tools/configure/kernel.py',
+    'tools/configure/lowpower.py',
+    'tools/configure/matrix.py',
+    'tools/configure/memory.py',
+    'tools/configure/metadata.py',
+    'tools/configure/onboarding.py',
+    'tools/configure/physical_facts.py',
+    'tools/configure/pin_states.py',
+    'tools/configure/providers/__init__.py',
+    'tools/configure/providers/common.py',
+    'tools/configure/providers/descriptor.py',
+    'tools/configure/providers/hardware.py',
+    'tools/configure/resource_graph.py',
+    'tools/configure/rtc.py',
+    'tools/configure/runtime.py',
+    'tools/configure/runtime_power.py',
+    'tools/configure/sdk.py',
+    'tools/configure/secondary_controllers.py',
+    'tools/configure/selected_contracts.py',
+    'tools/configure/selection.py',
+    'tools/configure/soc-package.schema.json',
+    'tools/configure/stm32f4/__init__.py',
+    'tools/configure/stm32f4/bindings.py',
+    'tools/configure/stm32f4/block.py',
+    'tools/configure/stm32f4/can.py',
+    'tools/configure/stm32f4/contract.py',
+    'tools/configure/stm32f4_descriptor.py',
+    'tools/configure/stm32f4/emission.py',
+    'tools/configure/stm32f4/fsmc.py',
+    'tools/configure/stm32f4/gpio.py',
+    'tools/configure/stm32f4/hardware.py',
+    'tools/configure/stm32f4/i2s2.py',
+    'tools/configure/stm32f4/integration.py',
+    'tools/configure/stm32f4/packet.py',
+    'tools/configure/stm32f4/preflight.py',
+    'tools/configure/stm32f4/rtc.py',
+    'tools/configure/stm32f4/sram.py',
+    'tools/configure/stm32f4/timer.py',
+    'tools/configure/stream_profiles.py',
+    'tools/configure/threadx.py',
+    'tools/configure/timer_advanced.py',
+    'tools/configure/trigger_graph.py',
+    'tools/configure/uart_formats.py',
+    'tools/configure/usb_device.py',
+    'tools/configure/usb_profiles.py',
+    'tools/dev/artifacts.py',
+    'tools/dev/cache.py',
+    'tools/dev/change_paths.py',
+    'tools/dev/dependencies.py',
+    'tools/dev/dev.py',
+    'tools/dev/device.py',
+    'tools/dev/plan.py',
+    'tools/dev/presets.py',
+    'tools/dev/process.py',
+    'tools/dev/projects.py',
+    'tools/dev/provenance.py',
+    'tools/dev/qualification.py',
+    'tools/dev/timings.py',
+    'tools/evidence/candidate.py',
+    'tools/evidence/common.py',
+    'tools/evidence/consumer.py',
+    'tools/evidence/container.py',
+    'tools/evidence/environment.py',
+    'tools/evidence/identity.py',
+    'tools/evidence/inputs.py',
+    'tools/evidence/legacy_sdk.py',
+    'tools/evidence/native_proof.py',
+    'tools/evidence/proof.py',
+    'tools/evidence/qualification.py',
+    'tools/evidence/recipe.py',
+    'tools/evidence/reproduce.py',
+    'tools/evidence/storage.py',
+    'tools/evidence/store.py',
+    'tools/hil/admit.py',
+    'tools/hil/measure.py',
+    'tools/hil/power.py',
+    'tools/hil/prepare.py',
+    'tools/hil/threadx.py',
+    'tools/hil/workloads.py',
+    'tools/maintenance/capabilities.py',
+    'tools/maintenance/cmsis_device_lock.py',
+    'tools/maintenance/coremqtt_lock.py',
+    'tools/maintenance/dependency_proposals.py',
+    'tools/maintenance/freertos_transport.py',
+    'tools/maintenance/lwip_lock.py',
+    'tools/maintenance/mbedtls_lock.py',
+    'tools/maintenance/mcuboot_lock.py',
+    'tools/maintenance/source_catalogue.py',
+    'tools/maintenance/stm32_ll_lock.py',
+    'tools/maintenance/stm32f1_hal_lock.py',
+    'tools/maintenance/stm32f4_hal_lock.py',
+    'tools/maintenance/stm32g4_hal_lock.py',
+    'tools/maintenance/stm32g4_lock.py',
+    'tools/maintenance/stm32h5_device_lock.py',
+    'tools/maintenance/stm32h5_hal_lock.py',
+    'tools/maintenance/stm32h7_hal_lock.py',
+    'tools/maintenance/stm32u5_hal_lock.py',
+    'tools/maintenance/support.py',
+    'tools/maintenance/threadx_lock.py',
+    'tools/measurement/elf.py',
+    'tools/measurement/resources.py',
+    'tools/measurement/retention.py',
+    'tools/measurement/workload.c',
+    'tools/release/transport.py',
 )
 REQUIRED_FILES += (
-    "io/include/nexus/io/ethernet_frames.h",
-    "drivers/ethernet/legacy_mac/eth_frames_mac.h", "io/private/eth_frames_validation.h",
-    "io/src/api/ethernet_frames.c", "drivers/ethernet/legacy_mac/eth_frames_mac.c",
-    "soc/native/drivers/ethernet_frames.c", "soc/native/drivers/ethernet_frames.h",
-    "soc/native/drivers/ethernet_frames_access.h")
-REQUIRED_FILES += (
-    "soc/stm32/stm32g474/reviews/adc-group.json",
-    "io/include/nexus/io/adc_group.h", "io/src/api/adc_group.c")
-# Required payload identity is separate from CMake's production source graph.
-# Every exposed kernel profile must survive a rehashed omission attempt.
-for _port in ("ARM_CM0", "ARM_CM3", "ARM_CM4F", "ARM_CM7/r0p1",
-              "ARM_CM3_MPU", "ARM_CM4_MPU",
-              "ARM_CM23_NTZ/non_secure", "ARM_CM33_NTZ/non_secure",
-              "ARM_CM55_NTZ/non_secure", "ARM_CM85_NTZ/non_secure",
-              "ARM_CM23/non_secure", "ARM_CM33/non_secure",
-              "ARM_CM55/non_secure", "ARM_CM85/non_secure"):
-    REQUIRED_FILES += tuple(f"ext/freertos/portable/GCC/{_port}/{name}"
-                            for name in ("port.c", "portmacro.h"))
-    if _port in {"ARM_CM0", "ARM_CM23_NTZ/non_secure",
-                  "ARM_CM33_NTZ/non_secure", "ARM_CM55_NTZ/non_secure",
-                  "ARM_CM85_NTZ/non_secure", "ARM_CM23/non_secure",
-                  "ARM_CM33/non_secure", "ARM_CM55/non_secure",
-                  "ARM_CM85/non_secure"}:
-        REQUIRED_FILES += tuple(f"ext/freertos/portable/GCC/{_port}/{name}"
-                                for name in ("portasm.c", "portasm.h"))
-    if _port.endswith("/non_secure"):
-        REQUIRED_FILES += (f"ext/freertos/portable/GCC/{_port}/portmacrocommon.h",)
-    if _port in {"ARM_CM3_MPU", "ARM_CM4_MPU", "ARM_CM23_NTZ/non_secure",
-                  "ARM_CM33_NTZ/non_secure", "ARM_CM55_NTZ/non_secure",
-                  "ARM_CM85_NTZ/non_secure"}:
-        REQUIRED_FILES += (f"ext/freertos/portable/GCC/{_port}/mpu_wrappers_v2_asm.c",)
-for _core in (23, 33, 55, 85):
-    REQUIRED_FILES += tuple(
-        f"ext/freertos/portable/GCC/ARM_CM{_core}/secure/{name}"
-        for name in ("secure_context_port.c", "secure_context.h",
-                     "secure_init.h", "secure_port_macros.h"))
-REQUIRED_FILES += tuple(f"ext/freertos/include/{name}" for name in (
-    "FreeRTOS.h", "task.h", "queue.h", "list.h", "semphr.h", "portable.h",
-    "projdefs.h", "stack_macros.h", "mpu_prototypes.h", "mpu_wrappers.h",
-    "mpu_syscall_numbers.h", "deprecated_definitions.h", "timers.h",
-    "event_groups.h", "stream_buffer.h"))
-REQUIRED_FILES += (
-    "dependencies/threadx.lock.json",
-    "os/threadx/CMakeLists.txt",
-    "os/threadx/Kernel.cmake", "os/threadx/threadx.c", "os/threadx/m4.c",
-    "os/threadx/m4_vectors.S", "os/threadx/prepare_linux.py",
-    "os/threadx/config/tx_user.h", "os/threadx/include/nexus/os/threadx.h")
-# The reviewed lock remains the one ThreadX graph authority. Rehashed SDK
-# omissions cannot remove required kernel payloads from a different file map.
-_threadx_lock = parse_json((SOURCE_ROOT / "dependencies/threadx.lock.json").read_bytes())
-threadx_lock.contract(_threadx_lock)
-REQUIRED_FILES += tuple("ext/threadx/" + name for name in _threadx_lock["files"])
-REQUIRED_FILES += ("ext/threadx/" + _threadx_lock["license"]["path"],)
-_tls_lock = mbedtls_lock.load_lock(SOURCE_ROOT / mbedtls_lock.LOCK_NAME)
-REQUIRED_FILES += (mbedtls_lock.LOCK_NAME,
-                   "tools/maintenance/mbedtls_lock.py")
-REQUIRED_FILES += tuple(item.path + "/" + name
-                        for item in mbedtls_lock.mounts()
-                        for name in mbedtls_lock.record(
-                            _tls_lock, item.identifier)["files"])
-_lwip_lock = parse_json((SOURCE_ROOT / "dependencies/lwip.lock.json").read_bytes())
-lwip_lock.contract(_lwip_lock)
-REQUIRED_FILES += tuple("ext/lwip/" + name for name in _lwip_lock["files"])
-_mqtt_lock = parse_json((SOURCE_ROOT / "dependencies/coremqtt.lock.json").read_bytes())
-coremqtt_lock.contract(_mqtt_lock)
-REQUIRED_FILES += ("dependencies/coremqtt.lock.json",
-                   "tools/maintenance/coremqtt_lock.py")
-REQUIRED_FILES += tuple("ext/coremqtt/" + name for name in _mqtt_lock["files"])
-_mcuboot_lock = parse_json((SOURCE_ROOT / "dependencies/mcuboot.lock.json").read_bytes())
-mcuboot_lock.contract(_mcuboot_lock)
-REQUIRED_FILES += ("dependencies/mcuboot.lock.json",
-                   "tools/maintenance/mcuboot_lock.py")
-REQUIRED_FILES += tuple("ext/mcuboot/" + name for name in _mcuboot_lock["files"])
-
-REQUIRED_FILES += ("dependencies/stm32g4.lock.json",
-                   )
-_g4_lock = parse_json((SOURCE_ROOT / "dependencies/stm32g4.lock.json").read_bytes())
-stm32g4_lock.contract(_g4_lock)
-REQUIRED_FILES += tuple("vendors/st/cmsis_device_g4/" + name
-                        for name in _g4_lock["files"])
-REQUIRED_FILES += ("cmake/platform/STM32Official.cmake",)
-REQUIRED_FILES += ("soc/stm32/stm32u575/private/hal/stm32u5xx_hal_conf.h",)
-for _official in OFFICIAL_DRIVERS:
-    REQUIRED_FILES += (_official.LOCK_NAME,
-                       "tools/maintenance/" + _official.__name__.split(".")[-1] + ".py")
-    _official_lock = parse_json((SOURCE_ROOT / _official.LOCK_NAME).read_bytes())
-    _official.contract(_official_lock)
-    REQUIRED_FILES += tuple(_official.DIRECTORY + "/" + name
-                            for name in _official_lock["files"])
-# Complete declared platform surfaces must remain present after an attacker
-# removes a payload and rehashes its file map. This is a required-source identity
-# contract, not another build graph: CMake still owns every selected target.
-# Explicit names make omissions fail closed; scanning an installed SDK would
-# derive a reduced requirement from precisely the missing files being checked.
-REQUIRED_FILES += (
-    "core/CMakeLists.txt", "core/src/time.c", "core/src/fault.c",
-    "core/src/stack_observation.c", "io/CMakeLists.txt",
-    "tools/configure/assembly.schema.json",
-    "cmake/platform/Configure.cmake", "cmake/platform/ControllerModes.cmake",
-    "cmake/platform/Options.cmake", "cmake/platform/SDK.cmake",
-    "tools/maintenance/dependency_proposals.py",
-    "os/freertos/timebase_lowpower.c",
-    "os/freertos/private/timebase_lowpower.h", "os/freertos/stack_snapshot.c",
-    "os/freertos/include/nexus/os/freertos_stack.h",
-    "os/threadx/private/irq_model.h", "os/threadx/private/m4_model.h",
-    )
-REQUIRED_FILES += tuple("core/include/nexus/core/" + name + ".h" for name in (
-    "fault", "memory", "request", "request_observer", "stack_observation",
-    "silicon", "status", "time"))
-REQUIRED_FILES += ("core/src/silicon.c", "soc/stm32/common/stm32_identity.h")
-REQUIRED_FILES += tuple("io/include/nexus/io/" + name + ".h" for name in (
-    "adc", "adc_format", "adc_observer", "advanced_pwm", "can", "can_fd", "cycle_probe",
-    "dma", "encoder",
-    "ethernet",
-    "exti", "flash", "gpio", "i2c", "i2c_bus_clear", "mdio", "native/model",
-    "i2c_long", "observation", "pwm_adc", "pwm_group", "spi_transaction",
-    "spi_dma_transaction", "spi_dma_owner_binding", "uart_format", "uart_word",
-    "native/spi_dma_model", "spi", "stream", "stream_budget", "stream_profile", "timer",
-    "timer_capture", "uart", "uart_rs485", "usb_device", "wake", "watchdog"))
-REQUIRED_FILES += tuple("io/src/api/" + name + ".c" for name in (
-    "adc", "advanced_pwm", "can", "can_fd", "encoder", "ethernet", "exti",
-    "flash", "gpio", "i2c", "mdio", "pwm_adc", "pwm_group", "spi", "uart_word",
-    "timer", "timer_capture", "uart", "usb_device", "watchdog"))
-REQUIRED_FILES += (
-    "drivers/CMakeLists.txt",
-    "drivers/can/classic_can/can_controller.c",
-    "drivers/ethernet/legacy_mac/eth_mac.c",
-    "drivers/usb/fs_device_pio/usb_device_controller.c")
-REQUIRED_FILES += tuple("io/src/mechanisms/" + name + ".c" for name in (
-    "adc_format", "adc_observer", "cycle_probe", "dma", "flash_region",
-    "i2c_bus_clear", "i2c_long", "observation", "spi_transaction",
-    "spi_dma_transaction", "spi_dma_sequence", "spi_dma_owner_binding",
-    "stream", "stream_budget", "stream_profile", "uart_rs485", "wake"))
-REQUIRED_FILES += tuple("io/private/" + name + ".h" for name in (
-    "can_fd_impl", "can_validation", "eth_validation", "spi_dma_sequence",
-    "spi_dma_sequence_owner"))
-REQUIRED_FILES += (
-    "drivers/can/classic_can/can_controller.h",
-    "drivers/can/classic_can/cortex_m_port.h",
-    "drivers/ethernet/legacy_mac/eth_mac.h",
-    "drivers/timer/advanced_timer/advanced_pwm_impl.h",
-    "drivers/timer/advanced_timer/timer_advanced_controller.h",
-    "drivers/timer/advanced_timer/timer_capture_impl.h",
-    "drivers/usb/fs_device_pio/usb_device_controller.h")
-REQUIRED_FILES += tuple("soc/native/drivers/" + name + ".c" for name in (
-    "adc", "can", "ethernet", "exti", "flash", "gpio", "i2c", "spi",
-    "spi_async", "spi_dma_transaction", "stream", "time", "timer", "uart", "uart_word",
-    "usb_device", "watchdog"))
-REQUIRED_FILES += tuple("soc/native/drivers/" + name + ".h" for name in (
-    "can", "can_access", "ethernet", "ethernet_access", "provider",
-    "spi_dma_provider", "uart_word_provider",
-    "usb_device", "usb_device_access"))
-for _family in ("stm32f407", "gd32f470"):
-    REQUIRED_FILES += tuple(provider_descriptors.source_directory(_family) + "/" + name for name in (
-        "CMakeLists.txt", "system.c", "sleep.c", "timebase_lowpower.c",
-        "usb_clock.c"))
-    REQUIRED_FILES += tuple(provider_descriptors.source_directory(_family) + "/drivers/" + name + ".c"
-                            for name in (
-        "adc", "adc_continuous", "adc_stream", "advanced_pwm", "can",
-        "ethernet", "exti", "flash", "gpio", "i2c", "i2c_async", "spi",
-        "spi_dma", "timer", "timer_capture", "uart", "uart_dma",
-        "uart_receive", "uart_duplex", "uart_stream", "uart_word", "usb_device", "watchdog"))
-    REQUIRED_FILES += tuple(provider_descriptors.source_directory(_family) + "/private/" + _family + "_"
-                            + name + ".h" for name in (
-        "can", "dma", "eth", "i2c_async", "lowpower", "provider", "sleep",
-        "timer_advanced", "uart_receive", "uart_word", "usb_clock", "usb_device"))
-REQUIRED_FILES += ("soc/common/uart_control.h",)
-REQUIRED_FILES += (
-    "soc/stm32/stm32f407/private/stm32f407_system.h",
-    "soc/stm32/stm32f407/private/stm32f407_stream.h",
-    "soc/stm32/stm32f407/drivers/uart_hal.c",
-    "soc/stm32/stm32f407/private/stm32f407_uart_hal.h",
-    "soc/stm32/stm32f407/private/stm32f407_hal_atomic.h",
-    "soc/stm32/stm32f407/private/stm32f407_hal_profile.h",
-    "soc/stm32/stm32f407/private/hal/stm32f4xx_hal_conf.h",
-    "soc/gd32/gd32f470/timebase.c", "soc/gd32/gd32f470/private/system.h",
-    "soc/gd32/gd32f470/private/gd32f470_adc_stream.h",
-    "soc/gd32/gd32f470/private/gd32f470_spi_dma.h",
-    "soc/gd32/gd32f470/private/gd32f470_uart_stream.h",
-    "soc/gd32/gd32f470/private/gd32f4xx_libopt.h", "soc/gd32/gd32f470/private/usb_conf.h")
-# Exact Board packages and optional device mechanisms ship with their CMake
-# and private integration closure; a rehashed omission is still incomplete.
-REQUIRED_FILES += tuple(
-    "boards/" + board + "/" + name
-    for board in ("stm32f407zg_qiming_core", "stm32f407zg_qiming_v41")
-    for name in ("board.json", "README.md", "assemblies/minimal.toml",
-                 "assemblies/touch-nor.toml"))
-REQUIRED_FILES += ("boards/stm32f407zg_qiming_v41/assemblies/sdio.toml",)
-REQUIRED_FILES += tuple(
-    "components/" + component + "/" + name
-    for component in ("at24c02", "w25", "ili9341", "xpt2046",
-                      "software_spi", "software_i2c", "infrared",
-                      "onewire", "ds18b20")
-    for name in ("CMakeLists.txt", "src/" + component + ".c",
-                 "include/nexus/components/" + component + ".h"))
-REQUIRED_FILES += (
-    "components/software_i2c/include/nexus/components/software_sccb.h",
-    "components/software_i2c/README.md",
-    "components/software_i2c/references.json",
-    "components/onewire/src/crc8.c",
-    "components/at24c02/references.json",
-    "io/include/nexus/io/block.h", "io/src/api/block.c",
-    "cmake/platform/STM32FSMC.cmake", "cmake/platform/STM32SDIO.cmake")
-REQUIRED_FILES += tuple("io/include/nexus/io/" + name + ".h"
-                        for name in ("external_bus", "parallel16",
-                                     "memory_window"))
-REQUIRED_FILES += tuple("io/src/api/" + name + ".c"
-                        for name in ("external_bus", "parallel16",
-                                     "memory_window"))
-REQUIRED_FILES += tuple(
-    "soc/stm32/stm32f407/" + name
-    for name in ("drivers/fsmc.c", "drivers/rtc.c", "drivers/sdio.c",
-                 "private/stm32f407_fsmc.h", "private/stm32f407_rtc.h",
-                 "private/stm32f407_sdio.h",
-                 "private/fsmc_hal/stm32f4xx_hal_conf.h",
-                 "private/sdio_hal/stm32f4xx_hal_conf.h"))
-REQUIRED_FILES += (
-    "components/amp_ipc/CMakeLists.txt",
-    "components/amp_ipc/src/amp_ipc.c",
-    "components/amp_ipc/include/nexus/components/amp_ipc.h",
-    "components/amp_ipc/include/nexus/components/amp_ipc_storage.h",
-    "components/soc/stm32/stm32f407_handoff/CMakeLists.txt",
-    "components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
-    "soc/stm32/stm32f407/handoff.c",
-    "soc/stm32/stm32f407/private/stm32f407_handoff_hw.h",
-    "cmake/package/verification/io_evolution/consumers/f407-handoff.c")
-REQUIRED_FILES += (
-    "components/user_io_broker/include/nexus/components/user_io_async.h",
-    "components/user_io_broker/include/nexus/components/user_io_async_storage.h",
-    "components/user_io_broker/src/user_io_async.c",
-    "cmake/package/verification/io_evolution/consumers/user-io-async.c")
-REQUIRED_FILES += (
-    "components/soc/stm32/stm32u575_stop2/README.md",
-    )
-REQUIRED_FILES += (
-    "io/include/nexus/io/frame_stream.h", "io/src/mechanisms/frame_stream.c",
-    "components/soc/stm32/stm32h743_frame_dma2d/CMakeLists.txt",
-    "components/soc/stm32/stm32h743_frame_dma2d/include/nexus/components/frame_dma2d.h",
-    "components/soc/stm32/stm32h743_frame_dma2d/src/h743_frame_dma2d.c")
-REQUIRED_FILES += (
-    "components/i3c_controller/CMakeLists.txt",
-    "components/i3c_controller/src/i3c_controller.c",
-    "components/i3c_controller/include/nexus/components/i3c_controller.h",
-    "components/i3c_controller/include/nexus/components/i3c_controller_storage.h")
-for _component, _include, _private in (
-        ("clock_domain", "nexus/components/clock_domain.h", "clock_domain_impl.h"),
-        ("user_io_broker", "nexus/components/user_io_broker.h", "user_io_broker_impl.h"),
-        ("dp83848", "nexus/dp83848/dp83848.h", None)):
-    REQUIRED_FILES += tuple("components/" + _component + "/" + name for name in (
-        "CMakeLists.txt", "src/" + _component + ".c", "include/" + _include))
-    if _private is not None:
-        REQUIRED_FILES += ("components/" + _component + "/private/" + _private,)
-# The standalone Secure mechanism includes its complete private hardware port.
-REQUIRED_FILES += tuple("soc/stm32/stm32u575/" + name for name in (
-    "security.c", "private/stm32u575_security.h",
-    "private/stm32u575_security_hw.h"))
-# Public measurement references are part of the supported SDK input surface.
-# A rehashed omission must not turn a complete SDK into a reduced profile set.
-REQUIRED_FILES += tuple(
-    f"tools/configure/assemblies/nucleo-{chip}-{backend}-{mode}.toml"
-    for chip in ("h743", "u575")
-    for backend in ("baremetal", "freertos")
-    for mode in ("empty", "uart"))
-# These shared inputs are opened by the default target graph even when no
-# optional device is selected. Keep its exported components and actual resource
-# observers complete as well; a rehashed map alone cannot prove their presence.
-REQUIRED_FILES += (
-    "arch/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
-    "cmake/package/verify_consumers.py", "tools/release/transport.py",
-    "components/CMakeLists.txt", "components/soc/CMakeLists.txt",
-    "components/soc/stm32/CMakeLists.txt",
-    "os/wait.c", "os/baremetal/notify.c", "os/native/native.c",
-    "os/include/nexus/os/wait.h", "os/include/nexus/os/baremetal.h",
-    "os/native/include/nexus/os/native.h",
-    "tools/measurement/resources.py", "tools/measurement/retention.py",
-    "tools/measurement/elf.py", "tools/evidence/common.py",
-    "tools/evidence/identity.py")
-# Public support and candidate entry points retain their imported validators.
-# These are host source inputs, not test cases or a second source build graph.
-REQUIRED_FILES += (
-    "tools/maintenance/capabilities.py", "tools/maintenance/support.py",
-    "tools/evidence/candidate.py", "tools/evidence/proof.py",
-    "tools/evidence/native_proof.py", "tools/evidence/legacy_sdk.py",
-    "tools/evidence/consumer.py", "tools/evidence/container.py",
-    "tools/evidence/inputs.py", "tools/evidence/qualification.py",
-    "tools/evidence/reproduce.py", "tools/evidence/storage.py",
-    "tools/configure/documentation.py",
-    "tools/hil/admit.py", "tools/hil/h743_duplex.py",
-    "tools/hil/measure.py", "tools/hil/power.py", "tools/hil/prepare.py",
-    "tools/hil/selected_modes.py", "tools/hil/threadx.py",
-    "tools/hil/workloads.py",
-    "scripts/ci/io_lifecycle_matrix.py", "scripts/ci/native_contracts.py",
-    "scripts/ci/tdd_gate.py", "scripts/validation/junit.py",
-    "tools/testing/run_tool_tests.py")
-REQUIRED_FILES += tuple("components/bus_owner/src/" + name + ".c" for name in (
-    "bus_owner", "spi_owner", "spi_async_owner", "spi_dma_owner", "uart_owner"))
-REQUIRED_FILES += tuple("components/bus_owner/include/nexus/components/" + name
-                        + ".h" for name in (
-    "bus_owner", "spi_owner", "spi_async_owner", "spi_dma_owner", "uart_owner"))
-REQUIRED_FILES += (
-    "components/bmp280/src/bmp280.c", "components/bmp280/src/spi_transport.c",
-    "components/bmp280/include/nexus/components/bmp280.h",
-    "components/bmp280/include/nexus/components/bmp280_spi.h",
-    "components/log/src/log.c", "components/log/include/nexus/components/log.h",
-    "components/modbus/src/modbus_rtu.c",
-    "components/modbus/include/nexus/components/modbus_rtu.h")
-REQUIRED_FILES += tuple("components/storage/src/" + name + ".c" for name in (
-    "storage", "flash_storage", "file_flash"))
-REQUIRED_FILES += tuple("components/storage/include/nexus/components/" + name
-                        + ".h" for name in (
-    "storage", "flash_storage", "file_flash"))
-REQUIRED_FILES += ("components/mapped_storage/CMakeLists.txt",)
-REQUIRED_FILES += tuple("components/mapped_storage/src/" + name + ".c"
-                        for name in ("mapped_storage", "mapped_storage_owner",
-                                     "native_mapped_storage"))
-REQUIRED_FILES += tuple("components/mapped_storage/include/nexus/components/"
-                        + name + ".h" for name in (
-                            "mapped_storage", "mapped_storage_owner",
-                            "native_mapped_storage"))
-REQUIRED_FILES += tuple(CMSIS_CORE_DIRECTORY + "/CMSIS/Core/Include/" + name
-                        for name in CMSIS_CORE_REQUIRED_HEADERS)
-for _review in cmsis_device_lock.REVIEWED_DEVICES.values():
-    REQUIRED_FILES += (_review["lock_name"],)
-    REQUIRED_FILES += tuple(_review["directory"] + "/" + name
-                            for name in sorted(_review["files"]))
-REQUIRED_FILES += (stm32h5_device_lock.LOCK_NAME,
-                   "tools/maintenance/stm32h5_device_lock.py")
-REQUIRED_FILES += tuple(stm32h5_device_lock.DIRECTORY + "/" + name
-                        for name in sorted(stm32h5_device_lock.FILES))
-REQUIRED_FILES += (
-    "components/soc/stm32/stm32h563_i3c/CMakeLists.txt",
-    "components/soc/stm32/stm32h563_i3c/private/stm32h563_i3c_port.h",
-    "components/soc/stm32/stm32h563_i3c/src/stm32h563_i3c_port.c",
-    "components/soc/stm32/stm32h743_w25q128/CMakeLists.txt",
-    "components/soc/stm32/stm32h743_w25q128/README.md",
-    "components/soc/stm32/stm32h743_w25q128/private/hal_platform.h",
-    "components/soc/stm32/stm32h743_w25q128/private/stm32h7xx_hal_conf.h",
-    "soc/stm32/stm32h743/drivers/w25q128_mapped.c",
-    "soc/stm32/stm32h743/private/stm32h743_w25q128.h",
-    "components/soc/stm32/stm32h747_amp/CMakeLists.txt",
-    "components/soc/stm32/stm32h747_amp/README.md",
-    "components/soc/stm32/stm32h747_amp/include/nexus/components/stm32h747_amp.h",
-    "components/soc/stm32/stm32h747_amp/private/hardware.h",
-    "components/soc/stm32/stm32h747_amp/src/stm32h747_amp.c",
-    "components/soc/stm32/stm32h747_amp/src/hardware.c")
-# Reuse the generator closure; SDK-only entry points remain explicit above.
-for _mode in ("platform", "runtime"):
-    REQUIRED_FILES += tuple(configuration_dependencies.source_names(
-        _mode, None, sdk=True))
-for _descriptor in provider_descriptors.families():
-    REQUIRED_FILES += _descriptor.fact_files + _descriptor.owned_payload
-REQUIRED_FILES += (
-    "os/reviewed_patch.py",
-    "os/freertos/patches/m7-integer-port.c.patch",
-    "os/freertos/patches/m7-integer-portmacro.h.patch",
-    "os/threadx/patches/linux-lowlevel.patch",
-    "os/threadx/patches/linux-scheduler.patch",
+    'components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt',
+    'components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h',
+    'io/src/api/rtc.c',
+    'io/include/nexus/io/lptim.h',
+    'io/include/nexus/io/rtc.h',
+    'io/include/nexus/io/native/rtc_lptim_model.h',
+    'io/src/api/lptim.c',
+    'io/private/rtc_lptim_internal.h',
 )
-REQUIRED_FILES += tuple("os/freertos/mpu/patches/" + name + ".patch"
-                        for name in (
-                            "arm_cm3_mpu-port", "arm_cm4_mpu-port", "v8-port",
-                            "v8-baseline-assembly", "v8-mainline-assembly",
-                            "v7-veneers", "v8-baseline-veneers",
-                            "v8-mainline-veneers", "gpio-numbers",
-                            "gpio-veneers"))
-EXTERNAL_PACKAGE_FIXTURES = (
-    ("cmake/package/verification/common_services/external",
-     ("assembly.toml", "board/board.json")),
-    ("cmake/package/verification/external_provider",
-     ("CMakeLists.txt", "README.md", "assembly.toml", "consumer.c",
-      "lifecycle_test.cpp", "board/board.json")),
+
+HOST_SUPPORT_FILES = (
+    'tests/__init__.py',
+    'tests/support/__init__.py',
+    'tests/support/native/CMakeLists.txt',
+    'tests/support/native/README.md',
+    'tests/support/native/__init__.py',
+    'tests/support/native/assemblies/native-empty.toml',
+    'tests/support/native/assemblies/native-gpio.toml',
+    'tests/support/native/assemblies/native-spi.toml',
+    'tests/support/native/assemblies/native-step-debug.toml',
+    'tests/support/native/assemblies/native-uart.toml',
+    'tests/support/native/assemblies/native.toml',
+    'tests/support/native/board/board.json',
+    'tests/support/native/configure/__init__.py',
+    'tests/support/native/configure/bindings.py',
+    'tests/support/native/configure/contract.py',
+    'tests/support/native/configure/emission.py',
+    'tests/support/native/descriptor.py',
+    'tests/support/native/drivers/adc.c',
+    'tests/support/native/drivers/can.c',
+    'tests/support/native/drivers/can.h',
+    'tests/support/native/drivers/can_access.h',
+    'tests/support/native/drivers/ethernet.c',
+    'tests/support/native/drivers/ethernet.h',
+    'tests/support/native/drivers/ethernet_access.h',
+    'tests/support/native/drivers/ethernet_frames.c',
+    'tests/support/native/drivers/ethernet_frames.h',
+    'tests/support/native/drivers/ethernet_frames_access.h',
+    'tests/support/native/drivers/exti.c',
+    'tests/support/native/drivers/flash.c',
+    'tests/support/native/drivers/gpio.c',
+    'tests/support/native/drivers/i2c.c',
+    'tests/support/native/drivers/provider.h',
+    'tests/support/native/drivers/rtc_lptim.c',
+    'tests/support/native/drivers/rtc_lptim_provider.h',
+    'tests/support/native/drivers/spi.c',
+    'tests/support/native/drivers/spi_async.c',
+    'tests/support/native/drivers/spi_dma_provider.h',
+    'tests/support/native/drivers/spi_dma_transaction.c',
+    'tests/support/native/drivers/stream.c',
+    'tests/support/native/drivers/time.c',
+    'tests/support/native/drivers/timer.c',
+    'tests/support/native/drivers/uart.c',
+    'tests/support/native/drivers/uart_word.c',
+    'tests/support/native/drivers/uart_word_provider.h',
+    'tests/support/native/drivers/usb_device.c',
+    'tests/support/native/drivers/usb_device.h',
+    'tests/support/native/drivers/usb_device_access.h',
+    'tests/support/native/drivers/watchdog.c',
+    'tests/support/native/routes.json',
+    'tests/support/native/soc.json',
+)
+IO_EVOLUTION_VERIFICATION_FILES = (
+    'cmake/package/verification/io_evolution/boards/f407zg-eth-frames/board.json',
+    'cmake/package/verification/io_evolution/consumers/ethernet-frames.c',
+    'cmake/package/verification/io_evolution/consumers/f407-handoff.c',
+    'cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c',
+    'cmake/package/verification/io_evolution/consumers/native-time-empty.c',
+    'cmake/package/verification/io_evolution/consumers/native-time-pair.c',
+    'cmake/package/verification/io_evolution/f407zg-eth-frames.toml',
+    'cmake/package/verification/io_evolution/native-time-empty.toml',
+    'cmake/package/verification/io_evolution/native-time-pair.toml',
 )
 
 
-def external_fixture_files(root):
-    """Project trusted fixture inputs without executing provider host code."""
-    root = Path(root).resolve()
-    names = []
-    for relative, authored in EXTERNAL_PACKAGE_FIXTURES:
-        fixture = root / relative
-        names.extend(relative + "/" + name for name in authored)
-        try:
-            manifest = integration_package.load_manifest(fixture / "provider",
-                                                         root=root)
-        except ValueError as error:
-            raise SDKError("External SDK fixture rejected: " +
-                           str(error)) from error
-        names.extend(path.relative_to(root).as_posix()
-                     for path in manifest.inputs)
-    return tuple(dict.fromkeys(names))
+# Host consumption is an explicit SDK feature, not another production SoC.
+_HOST_VERIFICATION_FILES = tuple(name for name in REQUIRED_FILES
+    if name.startswith("cmake/package/verification/") and (
+        "/native/" in name or PurePosixPath(name).name.startswith("native")))
+REQUIRED_FILES = tuple(name for name in REQUIRED_FILES
+                       if name not in _HOST_VERIFICATION_FILES)
+HOST_SUPPORT_FILES = tuple(dict.fromkeys((*HOST_SUPPORT_FILES,
+                                          *_HOST_VERIFICATION_FILES)))
+
+# Generator code identity has one authority; packaging consumes its closure.
+REQUIRED_FILES = tuple(dict.fromkeys((*REQUIRED_FILES,
+    *(name for mode in ("platform", "runtime")
+      for name in configuration_dependencies.source_names(mode, None, sdk=True)))))
+
+for _provider in provider_descriptors.families():
+    REQUIRED_FILES = tuple(dict.fromkeys((*REQUIRED_FILES,
+        *_provider.fact_files, *_provider.owned_payload)))
 
 
-def required_files(root):
-    """Combine platform requirements with each verified package projection."""
-    return tuple(dict.fromkeys((*REQUIRED_FILES, *external_fixture_files(root))))
+def source_profile(*, backend="baremetal", components=(), host_support=False):
+    """One canonical, explicit supplier scope for a relocatable F4 SDK."""
+    if type(host_support) is not bool:
+        raise SDKError("SDK host support requires an explicit boolean")
+    try:
+        from tools.maintenance.source_catalogue import runtime_selection
+        runtime_selection("stm32f4", backend=backend, components=components)
+    except ValueError as error:
+        raise SDKError("Invalid source SDK selection: " + str(error)) from error
+    return {"backend": backend, "components": sorted(components),
+            "host_support": host_support}
 
 
-REQUIRED_FILES += ("cmake/platform/Provider.cmake",
-                   "tools/configure/soc-package.schema.json")
-REQUIRED_FILES += tuple(relative + "/" + name
-                        for relative, authored in EXTERNAL_PACKAGE_FIXTURES
-                        for name in (*authored, "provider/nexus-soc.json"))
-REQUIRED_FILES = tuple(dict.fromkeys(REQUIRED_FILES))
+def checked_profile(value):
+    if not isinstance(value, dict) or set(value) != {
+            "backend", "components", "host_support"}:
+        raise SDKError("Source SDK requires its exact dependency selection")
+    result = source_profile(**value)
+    if result != value:
+        raise SDKError("Source SDK dependency selection is not canonical")
+    return result
+
+
+def dependency_required_files(root, profile):
+    """Derive supplier payload requirements from the same reviewed locks."""
+    names = set()
+    for path, item in runtime_dependency_closure(profile).items():
+        names.add(path + "/" + item.notice)
+        if path == CMSIS_CORE_DIRECTORY:
+            names.update(path + "/CMSIS/Core/Include/" + name
+                         for name in CMSIS_CORE_REQUIRED_HEADERS)
+        elif path == "vendors/st/cmsis_device_f4":
+            names.update(path + "/" + name for name in (
+                "Include/stm32f4xx.h", "Include/stm32f407xx.h",
+                "Include/system_stm32f4xx.h",
+                "Source/Templates/gcc/startup_stm32f407xx.s"))
+        elif path == stm32f4_hal_lock.DIRECTORY:
+            lock = parse_json(regular(root, stm32f4_hal_lock.LOCK_NAME).read_bytes())
+            names.update(path + "/" + name for name in stm32f4_hal_lock.contract(lock))
+        elif path == "ext/freertos":
+            names.update(FREERTOS_REQUIRED_FILES)
+        elif path == "ext/threadx":
+            lock = parse_json(regular(root, "dependencies/threadx.lock.json").read_bytes())
+            names.update(path + "/" + name for name in threadx_lock.contract(lock))
+        elif path in {"ext/lwip", "ext/coremqtt", "ext/mcuboot"}:
+            verifier = {"ext/lwip": lwip_lock, "ext/coremqtt": coremqtt_lock,
+                        "ext/mcuboot": mcuboot_lock}[path]
+            lock_path = dependency(path).source_lock
+            lock = parse_json(regular(root, lock_path).read_bytes())
+            names.update(path + "/" + name for name in verifier.contract(lock)["files"])
+        elif path in {mount.path for mount in mbedtls_lock.mounts()}:
+            lock = mbedtls_lock.load_lock(root / mbedtls_lock.LOCK_NAME)
+            names.update(path + "/" + name for name in mbedtls_lock.record(lock, path)["files"])
+    return tuple(sorted(names))
+
+
+def required_files(root, profile=None):
+    """Require current platform sources and the explicitly selected suppliers."""
+    profile = source_profile() if profile is None else checked_profile(profile)
+    return tuple(dict.fromkeys((*REQUIRED_FILES,
+        *(HOST_SUPPORT_FILES if profile["host_support"] else ()),
+        *dependency_required_files(Path(root), profile))))
+
+
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")
-
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()
@@ -897,29 +1232,30 @@ def dependency_entries(root, dependency):
     return entries
 
 
-def selected(name, *, root=SOURCE_ROOT):
-    if any(name.startswith(relative + "/")
-           for relative, _ in EXTERNAL_PACKAGE_FIXTURES):
-        return name in external_fixture_files(root)
-    # Only reviewed public smoke programs and their canonical software-reference
-    # inputs belong in this namespace, including the explicit Native time pair.
-    # Arbitrary host tests and private products do not.
-    if name.startswith("cmake/package/verification/io_evolution/"):
-        return name in IO_EVOLUTION_VERIFICATION_FILES
-    # Historical audit archives belong to the repository, not the source SDK.
-    if name.startswith("tools/testing/evidence/"):
+def selected(name, *, root=SOURCE_ROOT, profile=None):
+    profile = source_profile() if profile is None else checked_profile(profile)
+    if name in HOST_SUPPORT_FILES or name.startswith("tests/"):
+        return profile["host_support"] and name in HOST_SUPPORT_FILES
+    if name.startswith("cmake/package/verification/external_provider/") or name.startswith(
+            "cmake/package/verification/common_services/external/"):
         return False
-    # Host frameworks and checkout presets do not become firmware dependencies.
-    # The SDK excludes the root preset index, so its includes are not payload.
-    # Reviewed host locks remain in provenance without host-only payloads.
+    if name.startswith("cmake/package/verification/io_evolution/"):
+        if "native-time-" in name and not profile["host_support"]:
+            return False
+        return name in IO_EVOLUTION_VERIFICATION_FILES
+    if name.startswith(("tools/testing/", "tools/configure/tests/",
+                        "tools/nxconfig/")):
+        return False
+    if name.startswith(("tools/configure/test_", "scripts/ci/test_")):
+        return False
     if name.startswith(("dependencies/source/", "cmake/testing/", "cmake/presets/")):
         return False
-    return (name in ROOT_FILES or name.split("/", 1)[0] in ROOT_DIRS
-            or any(name.startswith(directory + "/")
-                   for directory in reviewed_import_directories()))
+    if re.search(r"(?:^|/)(?:gd32|gd470|g474|h563|h743|h747|u575)", name):
+        return False
+    return name in ROOT_FILES or name.split("/", 1)[0] in ROOT_DIRS
 
 
-def snapshot_files(source, entries, development_fixture=False):
+def snapshot_files(source, entries, development_fixture=False, *, profile=None):
     """Select committed sources, or an explicit nonpublishable worktree view.
 
     Staged additions are tracked by the index but absent from HEAD and from
@@ -927,30 +1263,33 @@ def snapshot_files(source, entries, development_fixture=False):
     development overlay; publishable payloads retain committed-blob identity.
     """
     names = {name for name, (_, kind, _) in entries.items()
-             if kind == "blob" and selected(name, root=source)}
+             if kind == "blob" and selected(name, root=source, profile=profile)}
     if development_fixture:
         names.update(name.decode() for name in git(
             source, "ls-files", "--cached", "--others", "--exclude-standard",
             "-z", parent_index=True).split(b"\0")
-                     if name and selected(name.decode(), root=source))
+                     if name and selected(name.decode(), root=source, profile=profile))
     return names
 
 
-def runtime_dependency_closure():
-    """Expand only catalogue-owned descendants of required runtime sources."""
+def runtime_dependency_closure(profile=None):
+    """Expand only the selected F4 suppliers and required nested sources."""
+    from tools.maintenance.source_catalogue import runtime_selection
+    profile = source_profile() if profile is None else checked_profile(profile)
     records = {}
 
     def append(item):
-        if item.path in records:
-            raise SDKError("Duplicate dependency identity")
-        if item.scope != "runtime":
-            raise SDKError("Host-only dependency cannot enter the source SDK")
+        if item.path in records or item.scope != "runtime":
+            raise SDKError("Invalid or duplicate runtime supplier selection")
         records[item.path] = item
-        for child in children(item.path):
-            append(child)
+        # F4 uses the built-in kernel port, not third-party port repositories.
+        if item.identifier != "freertos":
+            for child in children(item.path):
+                append(child)
 
-    for path in REQUIRED_DEPENDENCIES:
-        append(dependency(path))
+    for item in runtime_selection("stm32f4", backend=profile["backend"],
+                                  components=profile["components"]):
+        append(item)
     return records
 
 
@@ -974,14 +1313,14 @@ def dependency_declarations(root, item, entries=None):
             raise SDKError("Unregistered or changed recursive dependency Gitlink") from error
 
 
-def dependency_records(root, entries):
+def dependency_records(root, entries, profile=None):
     declared_modules(regular(root, ".gitmodules").read_bytes())
     try:
         verify_gitlinks({name: row[2] for name, row in entries.items()
                          if row[1] == "commit"}, None)
     except ValueError as error:
         raise SDKError("Unregistered or missing top-level dependency Gitlink") from error
-    closure = runtime_dependency_closure()
+    closure = runtime_dependency_closure(profile)
     records = []
     parent_entries = {None: entries}
     for path, item in closure.items():
@@ -1007,7 +1346,7 @@ def dependency_records(root, entries):
         parent_entries[path] = committed
         if item.identifier == "freertos":
             freertos_transport.verify(root, selected_commit=actual,
-                                      require_git=True)
+                                      require_git=True, require_children=False)
         records.append({"path": path, "commit": actual,
                         "tree": git(checkout, "rev-parse", "HEAD^{tree}")
                         .decode().strip()})
@@ -1079,7 +1418,43 @@ def validate_import_records(identity):
     return records
 
 
-def prepare(source, output, development_fixture=False):
+def verify_selected_dependencies(root, records, *, source_sdk=False):
+    """Run full byte/provenance admission only for packaged suppliers."""
+    records = {record["path"]: record for record in records}
+    if "ext/freertos" in records:
+        freertos_transport.verify(root, selected_commit=records["ext/freertos"]["commit"],
+                                  require_git=not source_sdk, require_children=False)
+    if "ext/threadx" in records:
+        threadx_lock.verify(root / "ext/threadx", root / "dependencies/threadx.lock.json",
+                            "linux", **({"packaged_commit": records["ext/threadx"]["commit"]}
+                                        if source_sdk else {}))
+    for path, verifier, lock_name in (
+            ("ext/lwip", lwip_lock, "dependencies/lwip.lock.json"),
+            ("ext/coremqtt", coremqtt_lock, "dependencies/coremqtt.lock.json"),
+            ("ext/mcuboot", mcuboot_lock, "dependencies/mcuboot.lock.json")):
+        if path not in records:
+            continue
+        record = records[path]
+        if source_sdk and (record["commit"] != verifier.COMMIT or record["tree"] != verifier.TREE):
+            raise SDKError("Source SDK supplier identity differs from reviewed source: " + path)
+        verifier.verify(root / path, root / lock_name,
+                        **({"source_sdk": True} if source_sdk else {}))
+    if "ext/mbedtls" in records:
+        mbedtls_lock.verify(root / "ext/mbedtls", root / mbedtls_lock.LOCK_NAME,
+                            **({"source_sdk": True, "dependency_records": list(records.values())}
+                                if source_sdk else {}))
+    for official in OFFICIAL_DRIVERS:
+        if official.DIRECTORY not in records:
+            continue
+        arguments = ({"packaged_commit": records[official.DIRECTORY]["commit"],
+                      "packaged_cmsis_commit": records[official.CMSIS_DIRECTORY]["commit"]}
+                     if source_sdk else {})
+        official.verify(root / official.DIRECTORY, root / official.LOCK_NAME,
+                        root / official.CMSIS_DIRECTORY, **arguments)
+
+
+def prepare(source, output, development_fixture=False, *, profile=None):
+    profile = source_profile() if profile is None else checked_profile(profile)
     source = source.resolve()
     output = output.absolute()
     if output != output.resolve():
@@ -1098,29 +1473,8 @@ def prepare(source, output, development_fixture=False):
         raise SDKError("Publishable source SDK preparation rejects a dirty source checkout")
     entries = tree_entries(source)
     dependency_graph, index = dependency_snapshot(source, development_fixture)
-    dependencies = dependency_records(source, dependency_graph)
-    threadx_lock.verify(source / "ext/threadx", source / "dependencies/threadx.lock.json", "linux")
-    lwip_lock.verify(source / "ext/lwip",
-                     source / "dependencies/lwip.lock.json")
-    mbedtls_lock.verify(source / "ext/mbedtls",
-                        source / mbedtls_lock.LOCK_NAME)
-    coremqtt_lock.verify(source / "ext/coremqtt",
-                          source / "dependencies/coremqtt.lock.json")
-    mcuboot_lock.verify(source / "ext/mcuboot",
-                         source / "dependencies/mcuboot.lock.json")
-    stm32g4_lock.verify(source / "vendors/st/cmsis_device_g4",
-                       source / "dependencies/stm32g4.lock.json")
-    stm32h5_device_lock.verify(source / stm32h5_device_lock.DIRECTORY,
-                               source / stm32h5_device_lock.LOCK_NAME)
-    for official in OFFICIAL_DRIVERS:
-        official.verify(source / official.DIRECTORY,
-                        source / official.LOCK_NAME,
-                        source / official.CMSIS_DIRECTORY)
-    for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
-        observed = cmsis_device_lock.verify(source / review["directory"],
-                                            source / review["lock_name"])
-        if observed["selected_part"] != part:
-            raise SDKError("Reviewed device lock selector differs from its path")
+    dependencies = dependency_records(source, dependency_graph, profile)
+    verify_selected_dependencies(source, dependencies)
     sys.path.insert(0, str(source / "scripts/ci"))
     from vendor_import_identity import reviewed_import
     imports = [reviewed_import(source / directory, source)
@@ -1131,7 +1485,7 @@ def prepare(source, output, development_fixture=False):
     sdk.mkdir(parents=True)
     files = {}
     try:
-        names = snapshot_files(source, entries, development_fixture)
+        names = snapshot_files(source, entries, development_fixture, profile=profile)
         source_blobs = {} if development_fixture else committed_blobs(source, {name: entries[name] for name in names})
         for name in sorted(names):
             entry = entries.get(name)
@@ -1152,11 +1506,11 @@ def prepare(source, output, development_fixture=False):
                     raise SDKError("Dependencies require regular tracked files")
                 relative = dep + "/" + name
                 files[relative] = copy_file(source, sdk, relative, blobs[name], mode == "100755")
-        for name in required_files(source):
+        for name in required_files(source, profile):
             if name not in files:
                 raise SDKError(f"Source SDK is incomplete: {name}")
         verify_preparation_snapshot(source, revision, index)
-        manifest = {"schema": 1, "kind": "nexus-installed-source-sdk",
+        manifest = {"schema": 2, "profile": profile, "kind": "nexus-installed-source-sdk",
                     "source_revision": revision, "source_tree": source_tree,
                     "publishable": not development_fixture, "source_dirty": dirty,
                     "files_sha256": files, "dependencies": dependencies,
@@ -1176,7 +1530,7 @@ def prepare(source, output, development_fixture=False):
         (sdk / MANIFEST).write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
         verify(sdk)
         verify_preparation_snapshot(source, revision, index)
-        if dependency_records(source, dependency_graph) != dependencies:
+        if dependency_records(source, dependency_graph, profile) != dependencies:
             raise SDKError("Source dependencies changed while preparing the package")
         temporary.rename(output)
     except BaseException:
@@ -1194,10 +1548,11 @@ def verify(root):
     raw_identity, first_identity = stable_file(root, MANIFEST)
     checked = {(root, MANIFEST): first_identity}
     identity = json.loads(raw_identity, object_pairs_hook=object_pairs)
-    fields = {"schema", "kind", "source_revision", "source_tree", "publishable", "source_dirty",
+    fields = {"schema", "profile", "kind", "source_revision", "source_tree", "publishable", "source_dirty",
               "files_sha256", "dependencies", "reviewed_imports", "toolchains_lock_sha256", "snapshot_sha256",
               "package_files_sha256"}
-    if set(identity) != fields or identity["schema"] != 1 or identity["kind"] != "nexus-installed-source-sdk":
+    if (set(identity) != fields or type(identity["schema"]) is not int or
+            identity["schema"] != 2 or identity["kind"] != "nexus-installed-source-sdk"):
         raise SDKError("Unsupported installed source SDK identity")
     if any(not isinstance(identity[key], str) or not HEX40.fullmatch(identity[key]) for key in ("source_revision", "source_tree")):
         raise SDKError("Invalid source Git identity")
@@ -1210,7 +1565,17 @@ def verify(root):
         raise SDKError("Source SDK requires a complete file identity")
     # Missing mandatory names already disqualify the manifest. Reject before
     # reading payload bytes; accepted manifests still undergo every check below.
-    if any(name not in files for name in REQUIRED_FILES):
+    raw_profile = identity["profile"]
+    if not isinstance(raw_profile, dict) or set(raw_profile) != {
+            "backend", "components", "host_support"} or type(
+                raw_profile["host_support"]) is not bool:
+        raise SDKError("Source SDK requires its exact dependency selection")
+    early_required = (*REQUIRED_FILES,
+        *(HOST_SUPPORT_FILES if raw_profile["host_support"] else ()))
+    if any(name not in files for name in early_required):
+        raise SDKError("Installed source SDK is missing required sources/licenses")
+    profile = checked_profile(raw_profile)
+    if any(name not in files for name in required_files(root, profile)):
         raise SDKError("Installed source SDK is missing required sources/licenses")
     for name, expected in files.items():
         if not isinstance(expected, str) or not HEX64.fullmatch(expected):
@@ -1256,9 +1621,13 @@ def verify(root):
         if not any(name.startswith(path + "/") for name in files):
             raise SDKError("Dependency provenance has no packaged source")
         paths.add(path)
-    closure = runtime_dependency_closure()
+    closure = runtime_dependency_closure(profile)
     if paths != set(closure):
         raise SDKError("Source SDK dependency set differs from the reviewed catalogue")
+    for name in files:
+        if name.startswith(("vendors/", "ext/")) and not any(
+                name.startswith(path + "/") for path in closure):
+            raise SDKError("Unselected supplier payload in source SDK: " + name)
     try:
         verify_alias_identities(records)
     except ValueError as error:
@@ -1266,64 +1635,7 @@ def verify(root):
     declared_modules(regular(root, ".gitmodules").read_bytes())
     for item in closure.values():
         dependency_declarations(root, item)
-    freertos = next(record for record in records
-                    if record["path"] == "ext/freertos")
-    # Package preparation proves the Git parent/tree contract. Without Git,
-    # verify only exported materials and their selected identity. Consumers
-    # authenticate the archive externally before executing SDK-owned tools.
-    freertos_transport.verify(root, selected_commit=freertos["commit"],
-                              require_git=False)
-    threadx = next(record for record in records if record["path"] == "ext/threadx")
-    threadx_lock.verify(root / "ext/threadx", root / "dependencies/threadx.lock.json",
-                        "linux", packaged_commit=threadx["commit"])
-    lwip = next(record for record in records if record["path"] == "ext/lwip")
-    if lwip["commit"] != lwip_lock.COMMIT or lwip["tree"] != lwip_lock.TREE:
-        raise SDKError("Source SDK lwIP Git identity differs from reviewed source")
-    lwip_lock.verify(root / "ext/lwip", root / "dependencies/lwip.lock.json",
-                     source_sdk=True)
-    mbedtls_lock.verify(root / "ext/mbedtls", root / mbedtls_lock.LOCK_NAME,
-                        source_sdk=True, dependency_records=records)
-    mqtt = next(record for record in records if record["path"] == "ext/coremqtt")
-    if mqtt["commit"] != coremqtt_lock.COMMIT or mqtt["tree"] != coremqtt_lock.TREE:
-        raise SDKError("Source SDK coreMQTT identity differs from reviewed source")
-    coremqtt_lock.verify(root / "ext/coremqtt",
-                          root / "dependencies/coremqtt.lock.json", source_sdk=True)
-    mcuboot = next(record for record in records if record["path"] == "ext/mcuboot")
-    if (mcuboot["commit"] != mcuboot_lock.COMMIT or
-            mcuboot["tree"] != mcuboot_lock.TREE):
-        raise SDKError("Source SDK MCUboot identity differs from reviewed source")
-    mcuboot_lock.verify(root / "ext/mcuboot",
-                         root / "dependencies/mcuboot.lock.json", source_sdk=True)
-    g4 = next(record for record in records
-              if record["path"] == "vendors/st/cmsis_device_g4")
-    stm32g4_lock.verify(root / "vendors/st/cmsis_device_g4",
-                       root / "dependencies/stm32g4.lock.json",
-                       packaged_commit=g4["commit"])
-    h5 = next(record for record in records
-              if record["path"] == stm32h5_device_lock.DIRECTORY)
-    stm32h5_device_lock.verify(root / stm32h5_device_lock.DIRECTORY,
-                               root / stm32h5_device_lock.LOCK_NAME,
-                               packaged_commit=h5["commit"])
-    for official in OFFICIAL_DRIVERS:
-        driver = next(record for record in records
-                      if record["path"] == official.DIRECTORY)
-        cmsis = next(record for record in records
-                     if record["path"] == official.CMSIS_DIRECTORY)
-        official.verify(root / official.DIRECTORY,
-                        root / official.LOCK_NAME,
-                        root / official.CMSIS_DIRECTORY,
-                        packaged_commit=driver["commit"],
-                        packaged_cmsis_commit=cmsis["commit"])
-    for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
-        matching = [record for record in records
-                    if record["path"] == review["directory"]]
-        if len(matching) != 1:
-            raise SDKError("Source SDK lacks its exact reviewed device dependency")
-        observed = cmsis_device_lock.verify(
-            root / review["directory"], root / review["lock_name"],
-            packaged_commit=matching[0]["commit"])
-        if observed["selected_part"] != part:
-            raise SDKError("Reviewed device lock selector differs from its path")
+    verify_selected_dependencies(root, records, source_sdk=True)
     sys.path.insert(0, str(root / "scripts/ci"))
     from vendor_import_identity import validate_import_record
     from verify_vendor_source import verify as verify_vendor_import
@@ -1345,7 +1657,7 @@ def verify(root):
                          if path.is_file() or path.is_symlink()}
         if actual_import != expected:
             raise SDKError("Source SDK contains files outside the reviewed import")
-    for name in required_files(root):
+    for name in required_files(root, profile):
         if name not in files:
             raise SDKError("Installed source SDK is missing required "
                            "sources/licenses: " + name)
@@ -1383,14 +1695,21 @@ def main(argv=None):
     parser.add_argument("--output", type=Path)
     parser.add_argument("--development-fixture", action="store_true")
     parser.add_argument("--verify", type=Path)
+    parser.add_argument("--backend", choices=("baremetal", "freertos", "threadx"),
+                        default="baremetal")
+    parser.add_argument("--component", action="append", default=[])
+    parser.add_argument("--host-support", action="store_true")
     args = parser.parse_args(argv)
     try:
         if args.verify:
-            if args.source or args.output or args.development_fixture:
+            if (args.source or args.output or args.development_fixture or args.component or
+                    args.host_support or args.backend != "baremetal"):
                 raise SDKError("Verification cannot also prepare a source package")
             result = verify(args.verify)
         elif args.source and args.output:
-            result = prepare(args.source, args.output, args.development_fixture)
+            result = prepare(args.source, args.output, args.development_fixture,
+                             profile=source_profile(backend=args.backend,
+                                 components=args.component, host_support=args.host_support))
         else:
             raise SDKError("Use --source/--output to prepare, or --verify to inspect")
     except (SDKError, OSError, ValueError, TypeError, KeyError) as exc:

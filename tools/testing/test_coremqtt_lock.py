@@ -166,7 +166,8 @@ class CoreMQTTGitAndSDKTests(unittest.TestCase):
         self.assertEqual(set(sdk.dependency_entries(ROOT, 'ext/coremqtt')),
                          set(self.lock['files']))
         self.assertTrue({'ext/coremqtt/' + name for name in self.lock['files']}
-                        .issubset(sdk.REQUIRED_FILES))
+                        .issubset(sdk.required_files(ROOT, sdk.source_profile(
+                            components=("mqtt",)))))
 
     def test_inventory_retains_the_official_parent_and_current_closed_sources(self):
         from tools.maintenance import dependency_proposals as proposals

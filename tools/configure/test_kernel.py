@@ -1,4 +1,6 @@
 """Maintained kernel policy, startup frame and Tick admission regressions."""
+from tools.configure.tests.device_fixture import load_soc_facts
+from tools.configure.tests.native_fixture import native_fixture
 import importlib
 import json
 from pathlib import Path
@@ -286,7 +288,7 @@ class KernelAssemblyTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory(prefix="kernel profile ")
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
-        soc = json.loads((ROOT / "soc/stm32/stm32f407/soc.json").read_text())
+        soc = load_soc_facts(ROOT / "soc/stm32/stm32f4/soc.json")
         self.facts = self.root / "cpu.json"
         self.facts.write_text(json.dumps({"schema_version": 1, "cpu": soc["cpu"],
                                          "irq": soc["irq"], "clock_hz": 168000000}))
@@ -334,13 +336,13 @@ class KernelAssemblyTests(unittest.TestCase):
         assembly = self.root / "platform.toml"
         text = (ROOT / "tools/configure/assemblies/qiming-freertos-empty.toml").read_text()
         assembly.write_text(text + '\n[os]\nprofile="minimal"\nsyscall_priority=7\n')
-        result = configure.resolve_ir(assembly)
+        result = configure.resolve_ir(assembly, test_support=native_fixture(assembly))
         self.assertEqual(result.kernel.profile, "minimal")
         self.assertEqual(result.irq.syscall_priority, 7)
         self.assertEqual(result.cpu_profile.irq.syscall_priority, 7)
 
     def test_missing_maintained_soc_mpu_fact_is_a_clear_configuration_rejection(self):
-        soc = json.loads((ROOT / "soc/stm32/stm32f407/soc.json").read_text())
+        soc = load_soc_facts(ROOT / "soc/stm32/stm32f4/soc.json")
         soc["cpu"].pop("mpu_regions")
         with self.assertRaisesRegex(ValueError, "capabilities differ"):
             configure.validate_soc(soc, "STM32F407ZGT6")

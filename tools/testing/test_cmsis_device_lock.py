@@ -1,9 +1,8 @@
-"""Reviewed H7/U5 sources require stable official or complete SDK identity."""
+"""Retained CMSIS inventory keeps source identity and verifier contracts."""
 from __future__ import annotations
 from dataclasses import replace
 import copy
 import io
-import importlib.util
 import json
 from pathlib import Path
 import shutil
@@ -13,6 +12,8 @@ import tempfile
 import unittest
 from unittest.mock import patch as mock_patch
 from tools.maintenance import cmsis_device_lock, source_catalogue
+
+from tools.testing.inventory_fixtures import write_files
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -27,13 +28,9 @@ class DeviceLockContracts:
         self.folder = Path(self.temporary.name)
         self.source = self.folder / "official source"
         self.source.mkdir()
-        self.original = ROOT / "vendors/st" / ("cmsis_device_" + self.family)
         name = "stm32" + self.family + ".lock.json"
         self.lock = json.loads((ROOT / "dependencies" / name).read_text())
-        for name in self.lock["files"]:
-            file = self.source / name
-            file.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(self.original / name, file)
+        write_files(self.source, self.lock)
         # Git is an external read-only identity port. Tests do not manufacture
         # commits or change the real complete upstream checkout.
         (self.source / ".git").mkdir()
@@ -63,7 +60,7 @@ class DeviceLockContracts:
             return self.git_state["origin"]
         if arguments == ("status", "--porcelain", "--untracked-files=all"):
             return self.git_state["status"]
-        self.fail("Unexpected Git identity command: " + repr(arguments))
+        raise AssertionError("Unexpected Git identity command: " + repr(arguments))
 
     def verify(self, **options):
         return cmsis_device_lock.verify(self.source, self.lock_path, **options)
@@ -115,22 +112,6 @@ class DeviceLockContracts:
         with self.assertRaises(ValueError):
             self.verify()
 
-    def test_real_official_whole_checkout_and_cli_verify_read_only(self):
-        self.git_patch.stop()
-        name = "stm32" + self.family + ".lock.json"
-        lock_path = ROOT / "dependencies" / name
-        result = cmsis_device_lock.verify(self.original, lock_path)
-        self.assertEqual(result["verified_files"],
-                         len(self.lock["files"]))
-        command = [sys.executable, "-B", str(ROOT /
-                   "tools/maintenance/cmsis_device_lock.py"),
-                   "--source", str(self.original), "--lock", str(lock_path)]
-        executed = subprocess.run(command, capture_output=True, text=True,
-                                  timeout=30)
-        self.assertEqual(executed.returncode, 0,
-                         executed.stdout + executed.stderr)
-        self.assertEqual(json.loads(executed.stdout)["source_kind"],
-                         "git_checkout")
 
     def test_empty_unknown_and_missing_lock_fields_reject(self):
         for value in ({}, [], {**self.lock, "fallback": True}):
@@ -433,16 +414,10 @@ class STM32F1LockTests(DeviceLockContracts, unittest.TestCase):
 class STM32H7LockTests(DeviceLockContracts, unittest.TestCase):
     family = "h7"
 
-    def test_axi_boot_reference_is_in_verified_and_packaged_closure(self):
+    def test_axi_boot_reference_remains_in_reviewed_inventory_lock(self):
         name = "Source/Templates/system_stm32h7xx.c"
         self.assertIn(name, self.lock["files"])
         self.assertIn(name, cmsis_device_lock.contract(self.lock))
-        path = ROOT / "cmake/package/package_source_sdk.py"
-        spec = importlib.util.spec_from_file_location("boot_reference_sdk", path)
-        package_source_sdk = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(package_source_sdk)
-        self.assertIn("vendors/st/cmsis_device_h7/" + name,
-                      package_source_sdk.REQUIRED_FILES)
 
 
 class STM32U5LockTests(DeviceLockContracts, unittest.TestCase):
@@ -460,18 +435,6 @@ class STM32H747ReferenceLockTests(unittest.TestCase):
         self.assertEqual(cmsis_device_lock.contract(lock), expected)
         self.assertNotIn("Include/stm32h747xx.h",
             cmsis_device_lock.REVIEWED_DEVICES["STM32H743ZIT6"]["files"])
-
-    def test_source_sdk_preserves_both_reviewed_device_closures(self):
-        specification = importlib.util.spec_from_file_location(
-            "h747_reference_sdk", ROOT / "cmake/package/package_source_sdk.py")
-        sdk = importlib.util.module_from_spec(specification)
-        specification.loader.exec_module(sdk)
-        names = sdk.dependency_entries(ROOT, "vendors/st/cmsis_device_h7")
-        self.assertIn("Include/stm32h743xx.h", names)
-        self.assertIn("Include/stm32h747xx.h", names)
-        self.assertIn("Source/Templates/gcc/startup_stm32h747xx.s", names)
-        self.assertNotIn("Include/stm32h750xx.h", names)
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -33,7 +33,7 @@ from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
 from tools.configure.ir import (
     CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
     EndpointIR, FactoryOptions, FlashRegionIR, MemoryBudgetIR, PhysicalPartIR, PwmSharedOwnerIR,
-    RuntimePowerIR, freeze, thaw)
+    RuntimePowerIR, VendorDeviceIR, freeze, thaw)
 from tools.configure import resource_graph, trigger_graph, dma_topology, board_hardware, gpio_electrical
 from tools.configure.contracts import (
     COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS,
@@ -45,7 +45,7 @@ from tools.configure.selection import (
     validate_selection, validate_controller_execution, normalize_controller)
 from tools.configure.providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                mode_traits, route_dma,
-                               sequence)
+                               sequence, vendor_device_catalog)
 
 ROOT = Path(__file__).resolve().parents[2]
 UINT32_MAX = (1 << 32) - 1
@@ -262,7 +262,9 @@ def contained_file(package, name):
 def _validate_physical_variant(value, provider, policy):
     """Validate each maintained part before any route can refer to its facts."""
     variant = obj(value, {"package", "flash", "memory"},
-                  {"pins", "pad_conditions"}, "variant")
+                  {"pins", "pad_conditions", "device"}, "variant")
+    if "device" in variant:
+        identity(variant["device"], "device catalog ID")
     if not provider.MODEL or "pins" in variant:
         physical_facts.package_pins(
             variant.get("pins"), variant.get("pad_conditions", {}),
@@ -346,9 +348,18 @@ def validate_soc(soc, part, provider=None):
         identity(name, "controller")
         obj(controller, {"kind", "modes", "irq", "pins"},
             {"resources", "max_hz", "irq_numbers", "channel_count", "clock_hz",
-             "fifo_words", "endpoint_numbers", "interfaces", "message_ram_words"}, name)
+             "clock_domain", "fifo_words", "endpoint_numbers", "interfaces",
+             "message_ram_words"}, name)
         if controller["kind"] not in KINDS:
             fail(f"Unmaintained controller kind: {controller['kind']}")
+        binding = next((item for item in getattr(provider, "CONTROLLER_BINDINGS", ())
+                        if item.controller == name), None)
+        domain = controller.get("clock_domain")
+        if "clock_domain" in controller and domain not in ("apb1", "apb2"):
+            fail(f"Unknown controller clock domain: {name}")
+        if (binding is not None and controller["kind"] in ("uart", "spi") and
+                domain != f"apb{binding.apb}"):
+            fail(f"Controller clock domain differs from reviewed APB facts: {name}")
         for field in ("modes", "irq", "pins"):
             values = sequence(controller[field], f"{name}.{field}")
             unique(values, f"{name}.{field}")
@@ -394,13 +405,14 @@ def validate_soc(soc, part, provider=None):
     return variant
 
 
-def load_assembly(path, root=ROOT, snapshots=None):
+def load_assembly(path, root=ROOT, snapshots=None, *, test_support=False):
     """Normalize one explicit authored input; no validation or format fallback."""
     path = path.resolve()
     snapshots = {} if snapshots is None else snapshots
     if path.suffix == ".toml":
         from tools.configure import authored
-        return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+        return authored.read(path, snapshots, root.resolve(), fail, obj, integer,
+                             text, test_support=test_support)
     fail("Assembly must use authored TOML (.toml)")
 
 
@@ -650,7 +662,6 @@ class _MemoryResolution:
     budget: MemoryBudgetIR
     default_ram: Mapping
     regions: tuple[Mapping, ...]
-    gpio_user: bool
 
 
 @dataclass(frozen=True)
@@ -667,16 +678,15 @@ class _SourceResolution:
     inputs: tuple[Path, ...]
 
 
-def _resolve_memory(assembly, variant, provider, part, kernel_profile):
+def _resolve_memory(assembly, variant, provider, part):
     """Admit budgets and optional domains against exact physical capacity."""
-    from tools.configure.ir import (MemoryRegionBudgetIR,
-                                    MpuMemoryReservationsIR, freeze, thaw)
+    from tools.configure.ir import MemoryRegionBudgetIR, freeze, thaw
     budgets = obj(thaw(assembly.memory_budgets), {"main_stack_bytes"},
                   {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes",
-                   "image_prefix_bytes", "image_suffix_bytes", "regions", "mpu"},
+                   "image_prefix_bytes", "image_suffix_bytes", "regions"},
                   "memory budgets")
     for name, value in budgets.items():
-        if name in {"regions", "mpu"}:
+        if name == "regions":
             continue
         integer(value, 0 if name in {"libc_heap_bytes", "image_prefix_bytes",
                                      "image_suffix_bytes"} else 1,
@@ -684,33 +694,6 @@ def _resolve_memory(assembly, variant, provider, part, kernel_profile):
     if budgets["main_stack_bytes"] % 8:
         fail("Main stack must have 8-byte alignment")
     ram = next(region for region in variant["memory"] if region["linker"])
-    gpio_user = (assembly.backend == "freertos" and
-                 kernel_profile.user_io == "gpio-write")
-    if gpio_user:
-        provider.validate_user_io_context(assembly, part)
-    if ("mpu" in budgets) != gpio_user:
-        fail("Explicit protected MPU reservations require GPIO user I/O")
-    if gpio_user:
-        fields = {"privileged_flash_bytes", "user_flash_bytes",
-                  "syscall_flash_bytes", "privileged_ram_bytes",
-                  "user_ram_bytes"}
-        reservations = obj(budgets["mpu"], fields, (), "MPU reservations")
-        for name, value in reservations.items():
-            integer(value, 32, UINT32_MAX, "MPU reservation " + name)
-            if value % 32:
-                fail("MPU reservations require exact 32-byte granules")
-        if (sum(reservations[name] for name in (
-                "privileged_flash_bytes", "user_flash_bytes",
-                "syscall_flash_bytes")) > variant["flash"]["size"] or
-                reservations["privileged_ram_bytes"] +
-                reservations["user_ram_bytes"] > ram["size"]):
-            fail("MPU reservations exceed physical Flash/SRAM1")
-        if (budgets.get("regions") or budgets["main_stack_bytes"] +
-                budgets.get("libc_heap_bytes", 0) >=
-                reservations["privileged_ram_bytes"] or
-                budgets.get("static_ram_bytes", ram["size"]) >
-                reservations["privileged_ram_bytes"]):
-            fail("MPU privileged reservations cannot cover optional RAM or exhaust MSP")
     if budgets["main_stack_bytes"] + budgets.get("libc_heap_bytes", 0) >= ram["size"]:
         fail("Reserved stack/heap exhaust default RAM")
     if budgets.get("static_ram_bytes", ram["size"]) > ram["size"]:
@@ -731,10 +714,9 @@ def _resolve_memory(assembly, variant, provider, part, kernel_profile):
         budgets.get("static_ram_bytes"), budgets.get("flash_load_bytes"),
         tuple(MemoryRegionBudgetIR(name, item["limit_bytes"])
               for name, item in sorted(budgets.get("regions", {}).items())),
-        MpuMemoryReservationsIR(**budgets["mpu"]) if "mpu" in budgets else None,
         budgets.get("image_prefix_bytes", 0), budgets.get("image_suffix_bytes", 0))
     return _MemoryResolution(memory_budget, freeze(ram),
-                             freeze(selected_memory), gpio_user)
+                             freeze(selected_memory))
 
 
 def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read,
@@ -835,6 +817,32 @@ def _resolve_source_dependencies(soc, provider, family, root, backend, read,
     return _SourceResolution(freeze(source_dependencies), tuple(inputs))
 
 
+def catalog_soc_facts(soc, part, catalog):
+    """Derive one part's compile and IRQ facts without reading vendor sources."""
+    devices = vendor_device_catalog(catalog)
+    if "irq" in soc:
+        fail("Catalog-backed SoC cannot repeat IRQ facts")
+    variants = soc.get("variants")
+    if not isinstance(variants, Mapping) or part not in variants:
+        fail(f"Unmaintained exact part: {part}")
+    for physical in variants.values():
+        if not isinstance(physical, Mapping):
+            fail("Physical variant requires device catalog ID")
+        selected_id = identity(physical.get("device"), "device catalog ID")
+        if selected_id not in devices:
+            fail(f"Unknown device catalog ID: {selected_id}")
+    selected = devices[variants[part]["device"]]
+    lock = soc.get("source_lock")
+    if isinstance(lock, Mapping) and (
+            catalog["sdk"]["commit"] != lock.get("cmsis_device_f4") or
+            catalog["sdk"]["core_commit"] != lock.get("cmsis_core")):
+        fail("Device catalog source identity differs from SoC source lock")
+    # These local derived facts are not another authored IRQ authority.
+    normalized = {**soc, "irq": {"priority_bits": selected.priority_bits,
+                                "external_count": selected.external_irq_count}}
+    return normalized, VendorDeviceIR(selected.macro, selected.startup)
+
+
 @dataclass(frozen=True)
 class _FactResolution:
     """One selected fact owner, with exact identity derived from Board data."""
@@ -847,6 +855,7 @@ class _FactResolution:
     inputs: tuple[Path, ...]
     provider_context: integration_package.ProviderContext
     hardware: board_hardware.BoardHardwareIR | None
+    vendor_device: VendorDeviceIR | None
 
     @property
     def family(self):
@@ -861,7 +870,8 @@ class _FactResolution:
         return self.soc["variants"][self.part]
 
 
-def _resolve_facts(assembly, *, root, assembly_directory, read) -> _FactResolution:
+def _resolve_facts(assembly, *, root, assembly_directory, read,
+                    test_support=False) -> _FactResolution:
     """Select and admit one Board/SoC package before execution choices.
 
     JSON facts remain read-only leaves. Their input paths stay with the single
@@ -880,15 +890,23 @@ def _resolve_facts(assembly, *, root, assembly_directory, read) -> _FactResoluti
     family = identity(board["soc_family"], "SoC family")
     context = integration_package.select(
         assembly.soc_package, family=family, root=root,
-        assembly_directory=assembly_directory)
+        assembly_directory=assembly_directory, test_support=test_support)
     provider = context.provider
     part = identity(board["soc"], "exact part")
     soc_dir = context.source_directory
+    source_owner = root / ("tests/support/native" if family == "native" and
+                           test_support else "soc")
     if (not context.external and (soc_dir.is_symlink() or
-            not soc_dir.resolve().is_relative_to(root / "soc"))):
+            not soc_dir.resolve().is_relative_to(source_owner))):
         fail("SoC package escapes owned source")
     soc_path, routes_path = soc_dir / "soc.json", soc_dir / "routes.json"
     soc, routes_doc = read(soc_path), read(routes_path)
+    catalog_path = None
+    vendor_device = None
+    if context.descriptor.device_catalog is not None:
+        catalog_path = contained_file(soc_dir, context.descriptor.device_catalog)
+        catalog = read(catalog_path)
+        soc, vendor_device = catalog_soc_facts(soc, part, catalog)
     if context.external and "source_lock" in soc:
         fail("External SDK sources must be bound by package inputs; "
              "Nexus source_lock belongs to internal integrations")
@@ -908,6 +926,8 @@ def _resolve_facts(assembly, *, root, assembly_directory, read) -> _FactResoluti
                                      assembly.hardware)
     bindings = resolve_bindings(board, routes, part, hardware)
     inputs = [board_path, soc_path, routes_path, *context.inputs]
+    if catalog_path is not None:
+        inputs.append(catalog_path)
     if reference_path is not None:
         inputs.append(reference_path)
     for name in sequence(board.get("inputs", []), "declared Board inputs"):
@@ -916,7 +936,7 @@ def _resolve_facts(assembly, *, root, assembly_directory, read) -> _FactResoluti
         board=freeze(board), soc=freeze(soc), routes=freeze(routes),
         bindings=freeze(bindings), provider=provider,
         references=freeze(references), inputs=tuple(inputs),
-        provider_context=context, hardware=hardware)
+        provider_context=context, hardware=hardware, vendor_device=vendor_device)
 
 
 @dataclass(frozen=True)
@@ -945,7 +965,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
     family, part = board["soc_family"], board["soc"]
     backend = assembly.backend
     host = soc["cpu"]["arch"] == "native"
-    ram, gpio_user = memory.default_ram, memory.gpio_user
+    ram = memory.default_ram
     controller_selections = thaw(assembly.controllers)
     endpoint_selections = thaw(assembly.devices)
     claims, claim_list, claim = resource_claims(provider)
@@ -1131,8 +1151,6 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             provider.EXTERNAL_BUS.complete_controller(
                 controller, children, claim=claim, bindings=bindings, routes=routes)
         enhanced_endpoints.complete_controller(controller, children, provider)
-    if gpio_user:
-        provider.validate_user_io_context(assembly, part, selected=selected)
     aliases = {"controller:" + item["controller"]:
                "ip:" + item["controller"] + "/control"
                for item in selected if item["kind"] == "external_bus"}
@@ -1156,7 +1174,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                 if adc_group_contract is not None else ()))
 
 
-def _resolve(assembly_path, root=ROOT, *, input_paths=None):
+def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
     """Validate all input facts before producing the sole resolved decision."""
     root = root.resolve()
     verified_sdk = sdk.verify(root)
@@ -1173,14 +1191,16 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     policy_path = contained_file(root, metadata.POLICY)
     platform_metadata = metadata.policy_contract(
         read(policy_path), expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
-    assembly = load_assembly(assembly_path, root, snapshots)
+    assembly = load_assembly(assembly_path, root, snapshots,
+                             test_support=test_support)
     factory_options = obj(thaw(assembly.factory) if assembly.factory is not None else {}, (),
                           {"capabilities"}, "factory policy")
     if ("capabilities" in factory_options and
             type(factory_options["capabilities"]) is not bool):
         fail("Factory capabilities must be boolean")
     facts = _resolve_facts(assembly, root=root,
-                           assembly_directory=assembly_path.parent, read=read)
+                           assembly_directory=assembly_path.parent, read=read,
+                           test_support=test_support)
     board, soc, routes = facts.board, facts.soc, facts.routes
     family, part, provider = facts.family, facts.part, facts.provider
     variant, references = facts.variant, facts.references
@@ -1212,7 +1232,7 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
                                     clock["core_hz"])
     if (backend == "freertos" and kernel_profile.lowpower_port == "timebase" and
             not provider.TIMEBASE_ALARM):
-        fail("Timebase lowpower requires the maintained STM32F407/GD32F470 SoC alarm")
+        fail("Timebase lowpower requires the maintained STM32F407 SoC alarm")
     cpu_profile = kernel.bind(cpu_profile, kernel_profile)
     irq_profile = cpu_profile.irq
     if assembly.abi is not None and assembly.abi != cpu_abi(soc["cpu"]):
@@ -1220,8 +1240,7 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
     optimization = assembly.optimization
     if optimization not in {"O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
         fail(f"Unsupported optimization profile: {optimization}")
-    selected_memory = _resolve_memory(assembly, variant, provider, part,
-                                      kernel_profile)
+    selected_memory = _resolve_memory(assembly, variant, provider, part)
     bindings = facts.bindings
     device_graph = _resolve_device_graph(
         assembly, root=root, soc=soc, board=board, routes=routes,
@@ -1262,7 +1281,8 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None):
         clock_plan=(ClockPlanIR.from_validated(clock_plan)
                     if clock_plan is not None else None),
         physical_part=PhysicalPartIR(part, variant["package"],
-            freeze(variant["flash"]), selected_memory.regions),
+            freeze(variant["flash"]), selected_memory.regions,
+            facts.vendor_device),
         clock=freeze(clock), clock_profile=assembly.clock_profile,
         layout=selected_layout.layout, board_bindings=freeze(bindings),
         routes=freeze(routes), platform_metadata=freeze(platform_metadata),
@@ -1298,10 +1318,12 @@ def c_id(value):
 normalize_resource = resource_graph.normalize_resource
 
 
-def resolve_ir(assembly_path, root=ROOT, *, input_paths=None):
+def resolve_ir(assembly_path, root=ROOT, *, input_paths=None,
+               test_support=False):
     """Return the immutable typed resolution consumed by every emitter."""
     try:
-        return _resolve(assembly_path, root, input_paths=input_paths)
+        return _resolve(assembly_path, root, input_paths=input_paths,
+                        test_support=test_support)
     except ConfigurationError as error:
         raise ConfigurationError(f"{assembly_path}: {error}",
                                  **error.details) from error
@@ -1313,7 +1335,7 @@ def generate(result, output):
     return emit_bundle(result, output)
 
 
-def protected_inputs(assembly, root):
+def protected_inputs(assembly, root, *, test_support=False):
     """Read only path selectors before withdrawing an owned public bundle.
 
     Malformed authored bytes still invalidate previous output. This preflight
@@ -1333,7 +1355,12 @@ def protected_inputs(assembly, root):
     if isinstance(soc_package, str):
         paths.append(assembly.parent / soc_package)
     if isinstance(raw.get("board"), str):
-        package = str(root / "boards" / raw["board"])
+        from tools.configure import authored
+        try:
+            package = str(authored.builtin_board_directory(
+                root, raw["board"], fail, test_support=test_support))
+        except ConfigurationError:
+            return paths
     if isinstance(package, str):
         directory = (assembly.parent / package).resolve()
         paths.append(directory)
@@ -1341,7 +1368,8 @@ def protected_inputs(assembly, root):
             board = json.loads((directory / "board.json").read_text(encoding="utf-8"))
             family = board.get("soc_family")
             if isinstance(family, str):
-                paths.append(root / descriptor.maintained(family).source_directory)
+                paths.append(root / descriptor.maintained(
+                    family, test_support=test_support).source_directory)
         except (OSError, ValueError, AttributeError):
             # This probe only protects output paths; resolve validates the
             # complete Board and reports malformed or unsupported facts.
@@ -1351,10 +1379,13 @@ def protected_inputs(assembly, root):
     return paths
 
 
-def configure(assembly, output, root=ROOT):
-    inputs = protected_inputs(assembly, root)
+def configure(assembly, output, root=ROOT, *, test_support=False):
+    inputs = protected_inputs(assembly, root, test_support=test_support)
     packages = [root / name for name in (
         "soc", "drivers", "boards", "dependencies", "vendors", "ext")]
+    if test_support:
+        packages.extend((root / "tests/support/native",
+                         ROOT / "tests/support/native"))
     packages.extend(ROOT / name for name in (
         "soc", "drivers", "tools/configure", "tools/maintenance", "scripts/ci"))
     packages.extend(path for path in inputs if Path(path).is_dir() and
@@ -1362,9 +1393,11 @@ def configure(assembly, output, root=ROOT):
     with bundle.transaction(output, ".nexus-config-bundle",
                             inputs=inputs, packages=packages, fail=fail) as temporary:
         initial_code_paths, initial_code_identity = dependencies.snapshot(
-            mode="platform", sdk=sdk.installed(root))
+            mode="platform", sdk=sdk.installed(root),
+            test_support=test_support)
         input_paths = {}
-        result = resolve_ir(assembly, root, input_paths=input_paths)
+        result = resolve_ir(assembly, root, input_paths=input_paths,
+                            test_support=test_support)
         dependencies.verify(initial_code_paths, initial_code_identity)
         code_paths, code_identity = dependencies.selected(
             initial_code_paths, initial_code_identity, family=result.soc_family,

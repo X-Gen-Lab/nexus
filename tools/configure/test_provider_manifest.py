@@ -62,7 +62,7 @@ class ProviderManifestTests(unittest.TestCase):
             sys.executable, "-c",
             "import sys; from tools.configure.integration_package import load_manifest; "
             "load_manifest(sys.argv[1]); "
-            "assert not [name for name in sys.modules if name.startswith('soc.')], "
+            "assert not [name for name in sys.modules if name.startswith('soc.')], " +
             "'Static external metadata imported unselected builtin source'",
             str(self.package)], cwd=external_tests.ROOT,
             capture_output=True, text=True, timeout=30)
@@ -160,7 +160,9 @@ class ProviderManifestTests(unittest.TestCase):
         selected_paths, selected_identity = dependencies.selected(
             paths, identity, family=result.soc_family, context=result.provider_context)
         builtins = {name for family in external_tests.configure.descriptor.families()
-                    for name in family.configuration_modules}
+                    for name in family.configuration_modules
+                    if name.startswith(family.configuration_directory + "/")
+                    or name == family.descriptor_path}
         self.assertFalse(set(selected_paths) & builtins,
                          "External final identity must exclude unselected builtin behavior")
         self.assertIn("tools/configure/integration_package.py", selected_paths)
@@ -184,7 +186,7 @@ class ProviderManifestTests(unittest.TestCase):
                 initial_paths, initial, family=result.soc_family,
                 context=result.provider_context)
             self.assertTrue(set(dependencies.SDK).issubset(selected_paths))
-            leaf = generator / "soc/stm32/stm32h743/configure/contract.py"
+            leaf = generator / "tools/configure/stm32f4/contract.py"
             leaf.write_bytes(leaf.read_bytes() + b"\n# unselected leaf changed\n")
             with self.assertRaisesRegex(ValueError, "changed during generation"):
                 dependencies.verify(initial_paths, initial)

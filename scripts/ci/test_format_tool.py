@@ -54,6 +54,17 @@ class FormatToolTests(unittest.TestCase):
         for path in ("vendors/sdk/a.c", "ext/library/a.h", "soc/chip/vendor/a.c"):
             self.assertTrue(FORMAT.should_exclude(REPO / path, REPO, exclusions))
 
+    def test_repo_format_roots_exist_in_a_clean_checkout(self):
+        includes, _, _ = FORMAT.parse_format_config(
+            REPO / ".clang-format-dirs")
+        tracked = FORMAT.tracked_source_files(REPO)
+        for name in includes:
+            with self.subTest(directory=name):
+                owned = [path for path in tracked
+                         if path.is_relative_to(REPO / name)]
+                self.assertGreater(len(owned), 0,
+                                   "Format root has no tracked file: " + name)
+
     def test_formatted_content_is_bytes_independent_of_locale(self):
         contents = "/* 中文注释 */\r\n".encode("utf-8")
         with patch.object(FORMAT.subprocess, "run", return_value=

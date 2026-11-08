@@ -1,6 +1,6 @@
 """Support queries replay original phase evidence without executing producers."""
+from tools.configure.tests.native_fixture import native_fixture
 
-import copy
 from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
@@ -36,7 +36,7 @@ class SupportStageTests(unittest.TestCase):
         self.directory = Path(self.temporary.name)
         self.source = {"root": str(ROOT), "commit": "1" * 40,
                        "tree": "2" * 40, "dirty": False, "submodules": []}
-        self.resolved = configure.resolve_ir(ASSEMBLY, ROOT).to_dict()
+        self.resolved = configure.resolve_ir(ASSEMBLY, ROOT, test_support=native_fixture(ASSEMBLY)).to_dict()
         self.config = self.directory / "resolved.json"
         atomic_json(self.config, self.resolved)
         self.artifacts = {}
@@ -71,7 +71,7 @@ class SupportStageTests(unittest.TestCase):
         atomic_json(self.manifest_path, self.manifest)
         with patch.object(identity, "observe_git_source", return_value=self.source):
             return capabilities.selection(ASSEMBLY, ROOT,
-                manifest_path=self.manifest_path, **kwargs)
+                manifest_path=self.manifest_path, **kwargs, test_support=native_fixture(ASSEMBLY))
 
     def test_actual_preparation_is_verified_without_promoting_arm_or_hardware(self):
         self.preparation()
@@ -127,7 +127,7 @@ class SupportStageTests(unittest.TestCase):
         other = ROOT / "tools/configure/assemblies/sky-baremetal-uart.toml"
         atomic_json(self.manifest_path, self.manifest)
         with patch.object(identity, "observe_git_source", return_value=self.source):
-            result = capabilities.selection(other, ROOT, manifest_path=self.manifest_path)
+            result = capabilities.selection(other, ROOT, manifest_path=self.manifest_path, test_support=native_fixture(other))
         self.assertEqual(result["staged_evidence"]["hil_tooling"]["status"],
                          "configuration_mismatch")
         self.assertEqual(result["validation"]["hil_tooling"], "not_assessed")
@@ -142,9 +142,9 @@ class SupportStageTests(unittest.TestCase):
                             "iterations": {"exact": leaf, "unbound": {"status": "passed"}}})
         with patch.object(identity, "observe_git_source", return_value=self.source):
             result = capabilities.selection(ASSEMBLY, ROOT, results_index=index,
-                record_pointer="/iterations/exact", verify_record=True)
+                record_pointer="/iterations/exact", verify_record=True, test_support=native_fixture(ASSEMBLY))
             unbound = capabilities.selection(ASSEMBLY, ROOT, results_index=index,
-                record_pointer="/iterations/unbound", verify_record=True)
+                record_pointer="/iterations/unbound", verify_record=True, test_support=native_fixture(ASSEMBLY))
         self.assertEqual(result["staged_evidence"]["hil_tooling"]["status"], "verified")
         self.assertNotIn("staged_evidence", unbound)
         self.assertEqual(unbound["validation"]["hil_tooling"], "not_assessed")
@@ -158,7 +158,7 @@ class SupportStageTests(unittest.TestCase):
         self.manifest_path.write_text("{}\n")
         with patch.object(identity, "observe_git_source", return_value=self.source):
             result = capabilities.selection(ASSEMBLY, ROOT, results_index=index,
-                                           record_pointer="", verify_record=True)
+                                           record_pointer="", verify_record=True, test_support=native_fixture(ASSEMBLY))
         self.assertEqual(result["staged_evidence"]["manifest"]["status"], "corrupt")
         self.assertEqual(result["validation"]["hil_tooling"], "not_assessed")
 
@@ -234,7 +234,7 @@ class SupportStageTests(unittest.TestCase):
             "consumer_id": "incorrect", "plan_sha256": "a" * 64}}})
         with patch.object(identity, "observe_git_source", return_value=self.source):
             result = capabilities.selection(ASSEMBLY, ROOT, results_index=index,
-                                           record_pointer="", verify_record=True)
+                                           record_pointer="", verify_record=True, test_support=native_fixture(ASSEMBLY))
         self.assertEqual(result["staged_evidence"]["sdk_consumer"]["status"], "corrupt")
         self.assertEqual(result["validation"]["installed_sdk"], "not_assessed")
 
@@ -250,7 +250,7 @@ class SupportStageTests(unittest.TestCase):
         with patch.object(identity, "observe_git_source", return_value=self.source), \
                 patch.object(candidate, "verified_projection", return_value=reference) as verifier:
             result = capabilities.selection(ASSEMBLY, ROOT, results_index=index,
-                record_pointer="", verify_record=True, legacy_replay=True)
+                record_pointer="", verify_record=True, legacy_replay=True, test_support=native_fixture(ASSEMBLY))
         self.assertEqual(verifier.call_args.kwargs, {"legacy_replay": True})
         self.assertEqual(result["staged_evidence"]["software_candidate"]["status"],
                          "legacy_read_only")
@@ -258,7 +258,7 @@ class SupportStageTests(unittest.TestCase):
             self.assertEqual(result["validation"][name], "not_assessed")
 
     def test_reference_fixture_cannot_be_relabelled_as_physical_execution(self):
-        fixture = ROOT / "tools/hil/fixtures/stm32h743_hsi_selected_reference.json"
+        fixture = ROOT / "tools/hil/fixtures/stm32f407zg_qiming_core.json"
         unused = self.directory / "station.json"
         atomic_json(unused, {})
         admission = self.directory / "admission.json"
@@ -359,7 +359,7 @@ class SupportStageTests(unittest.TestCase):
         self.manifest.update(source=source,
                              qualifications=[file_identity(report_path)])
         atomic_json(self.manifest_path, self.manifest)
-        result = capabilities.selection(ASSEMBLY, ROOT)
+        result = capabilities.selection(ASSEMBLY, ROOT, test_support=native_fixture(ASSEMBLY))
         query = support.Query(result, self.resolved, source)
         references = query.load_manifest(self.manifest_path)
         for index, reference in enumerate(references):
@@ -384,7 +384,7 @@ class SupportStageTests(unittest.TestCase):
         empty.write_bytes(b"")
         sdk = support.proof.sdk_file_identity(empty)
         stream = {**sdk, "role": "execution_stream"}
-        result = capabilities.selection(ASSEMBLY, ROOT)
+        result = capabilities.selection(ASSEMBLY, ROOT, test_support=native_fixture(ASSEMBLY))
         query = support.Query(result, self.resolved, self.source)
         query.remember(sdk)
         query.remember(stream)
@@ -404,7 +404,7 @@ class SupportStageTests(unittest.TestCase):
                                      "exit_code": 0, "raw": role}]}
             report_path = self.directory / "empty-qualification.json"
             atomic_json(report_path, report)
-            fresh = support.Query(capabilities.selection(ASSEMBLY, ROOT),
+            fresh = support.Query(capabilities.selection(ASSEMBLY, ROOT, test_support=native_fixture(ASSEMBLY)),
                                   self.resolved, self.source)
             fresh.load_manifest(self.manifest_path)
             fresh.qualification(file_identity(report_path), 0)

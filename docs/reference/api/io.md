@@ -190,7 +190,7 @@ read failure. It does not allocate, create a worker or establish entropy quality
 it is not a DRBG. A source's existence does not authorize full entropy credit
 for a cryptographic library. See the explicit
 {ref}`F407 constructor <stm32f407-entropy-construction>` for its
-clock and shutdown prerequisites. GD32 entropy is not implemented.
+clock and shutdown prerequisites. Other retained SDKs do not grant an entropy provider.
 
 ```{doxygenfile} io/include/nexus/io/entropy.h
 :project: nexus

@@ -20,7 +20,7 @@ source_language: zh_CN
 | OSAL | [OS 等待与停机](../guides/os-shutdown.md)、[当前 OS API](api/os.md) | 后端差异、静态存储、deadline、publisher 与 join |
 | Kconfig 平台／外设／OS 宏 | [配置参考](configuration/index.md)、[迁移指南](../guides/migration.md) | 单 authored TOML、不可变 IR、拒绝规则与精确 mode |
 | 旧 build／flash 教程 | [首次构建](../tutorials/index.md)、[支持范围](../status/support.md) | 实际工具版本、Board、SDK 和产物身份 |
-| 历史软件数量或通过记录 | [精确证据入口](../status/software-verification.md) | 原 source、scope、receipt；文档更新不继承资格 |
+| 历史软件数量或通过记录 | [精确证据入口](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-verification.md) | 原 source、scope、receipt；文档更新不继承资格 |
 
 迁移应同时改变配置、接口访问、存储所有权与停止流程，然后对迁移后的源码与
 装配重新验证。旧参数、旧 object ID 和相邻配置的结果不能继承到新 bundle。

@@ -8,32 +8,17 @@
  */
 #include "usb_factory_activation_test.h"
 #include "usb_factory_fixture.h"
-#ifdef NX_USB_FACTORY_STM32
 extern "C" {
 #include "stm32f407_usb_cold.h"
 }
-#else
-extern "C" {
-#include "gd32f470_usb_cold.h"
-}
-#endif
 
 namespace {
-#ifdef NX_USB_FACTORY_STM32
 using UsbColdConfig = nx_stm32_usb_cold_config_t;
 using UsbClockState = nx_stm32_usb_clock_state_t;
 using UsbPinConfig = nx_stm32_platform_pin_config_t;
 using UsbEndpointPlan = nx_stm32_usb_endpoint_config_t;
 constexpr auto UsbColdPrepare = nx_stm32_usb_cold_prepare;
 constexpr auto UsbColdClose = nx_stm32_usb_cold_close;
-#else
-using UsbColdConfig = nx_gd32_usb_cold_config_t;
-using UsbClockState = nx_gd32_usb_clock_state_t;
-using UsbPinConfig = nx_gd32_platform_pin_config_t;
-using UsbEndpointPlan = nx_gd32_usb_endpoint_config_t;
-constexpr auto UsbColdPrepare = nx_gd32_usb_cold_prepare;
-constexpr auto UsbColdClose = nx_gd32_usb_cold_close;
-#endif
 } /* namespace */
 
 TEST_F(UsbFactory, BasePreflightRejectsBeforeClockPinAndControllerEffects) {
@@ -223,7 +208,6 @@ TEST_F(UsbFactory, ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction) {
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
     state->snapshot.epoch = original;
 }
-#ifdef NX_USB_FACTORY_STM32
 TEST_F(UsbFactory, RefusedOwnedGpioGateWithdrawalRetainsPlatformUntilReadback) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
     ASSERT_NE(RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN, 0U);
@@ -235,7 +219,6 @@ TEST_F(UsbFactory, RefusedOwnedGpioGateWithdrawalRetainsPlatformUntilReadback) {
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
     EXPECT_EQ(RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN, 0U);
 }
-#endif
 
 TEST_F(UsbFactory, CColdRejectsMissingStaticConfigBeforeHardwareOrStorage) {
     const auto* bytes = static_cast<const uint8_t*>(clocks);

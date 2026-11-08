@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class IOSourceSelectionTests(unittest.TestCase):
-    def sources(self, kinds=(), *, family="stm32f407", components=(),
+    def sources(self, kinds=(), *, family="stm32f4", components=(),
                 external_component=False, required_target=None):
         with tempfile.TemporaryDirectory(prefix="nexus io sources ") as folder:
             root = Path(folder)
@@ -20,6 +20,7 @@ class IOSourceSelectionTests(unittest.TestCase):
 project(io_source_contract LANGUAGES C)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(NEXUS_SOC_FAMILY "{family}")
+set(NEXUS_TEST_SUPPORT {"ON" if family == "native" else "OFF"})
 set(NEXUS_SELECTED_KINDS "{';'.join(kinds)}")
 set(NEXUS_SELECTED_COMPONENTS "{';'.join(components)}")
 add_library(nexus_core INTERFACE)
@@ -90,7 +91,7 @@ target_link_libraries(consumer PRIVATE {required_target})
             if external_component:
                 result = subprocess.run(
                     [cmake, "--build", str(root / "build"), "--target",
-                     "consumer", "--parallel", "2"], env=environment,
+                     "consumer", "--parallel", "1"], env=environment,
                     capture_output=True, text=True, timeout=60)
                 self.assertEqual(result.returncode, 0,
                                  result.stdout + result.stderr)
@@ -128,9 +129,9 @@ target_link_libraries(consumer PRIVATE {required_target})
 
     def test_uart_retains_stream_word_and_rs485_gpio_dependencies(self):
         sources = self.sources(("uart",))
-        self.assertTrue({"src/api/uart.c", "src/api/uart_word.c",
+        self.assertLessEqual({"src/api/uart.c", "src/api/uart_word.c",
                          "src/mechanisms/stream_profile.c",
-                         "src/mechanisms/dma.c"} <= sources)
+                         "src/mechanisms/dma.c"}, sources)
         self.assertEqual({name for name in sources if name.startswith("src/api/")},
                          {"src/api/uart.c", "src/api/uart_word.c",
                           "src/api/gpio.c", "src/api/pin_state.c"})

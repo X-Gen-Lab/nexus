@@ -107,10 +107,12 @@ def check_document(document, root=configure.ROOT, *, contents=None):
 
 def check(root=configure.ROOT):
     """Check maintained design/delivery/configuration docs, never archives."""
+    from tools.documentation import check as current_docs
     root = Path(root).resolve()
     paths = {root / "tools/configure/README.md"}
     for directory in ("docs/design", "docs/delivery"):
-        paths.update((root / directory).rglob("*.md"))
+        paths.update(path for path in (root / directory).rglob("*.md")
+                     if current_docs.is_source(root, path))
     records = []
     for path in sorted(paths):
         if path.is_file():

@@ -16,7 +16,7 @@ class RuntimeAssemblyTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         self.facts = self.root / "cpu.json"
-        soc = json.loads((ROOT / "soc/native/soc.json").read_text())
+        soc = json.loads((ROOT / "tests/support/native/soc.json").read_text())
         self.hardware = {"schema_version": 1, "cpu": soc["cpu"],
                          "irq": soc["irq"], "clock_hz": 1000000}
         self.facts.write_text(json.dumps(self.hardware) + "\n")

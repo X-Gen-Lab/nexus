@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "stm32-zg-usb-software-pin-contract",
   "soc": "STM32F407ZGT6",
-  "soc_family": "stm32f407",
+  "soc_family": "stm32f4",
   "source_revision": "software-only-internal-FS-PHY-PA11-PA12-contract",
   "physical_pcb_revision": null,
   "clocks": {

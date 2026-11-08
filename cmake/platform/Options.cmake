@@ -11,6 +11,8 @@ set_target_properties(nexus_build_options PROPERTIES
     NEXUS_SOURCE_DIR "${NEXUS_SOURCE_DIR}" NEXUS_CONFIG_DIR "${NEXUS_CONFIG_DIR}")
 add_library(nexus_abi_options INTERFACE)
 add_library(nexus_owned_warnings INTERFACE)
+add_library(nexus_sanitizer_options INTERFACE)
+target_link_libraries(nexus_build_options INTERFACE nexus_sanitizer_options)
 # The sole CPU resolver owns ABI combinations and optional instruction flags.
 # CMake consumes the validated canonical list, never guesses an FPU or port.
 if(NOT NEXUS_CPU_ARCH STREQUAL "native" AND
@@ -153,12 +155,12 @@ if(NEXUS_ENABLE_SANITIZERS OR NEXUS_ENABLE_THREAD_SANITIZER)
     endif()
 endif()
 if(NEXUS_ENABLE_SANITIZERS)
-    target_compile_options(nexus_build_options INTERFACE
+    target_compile_options(nexus_sanitizer_options INTERFACE
         -fsanitize=address,undefined -fno-omit-frame-pointer)
-    target_link_options(nexus_build_options INTERFACE -fsanitize=address,undefined)
+    target_link_options(nexus_sanitizer_options INTERFACE -fsanitize=address,undefined)
 endif()
 if(NEXUS_ENABLE_THREAD_SANITIZER)
-    target_compile_options(nexus_build_options INTERFACE
+    target_compile_options(nexus_sanitizer_options INTERFACE
         -fsanitize=thread -fno-omit-frame-pointer)
-    target_link_options(nexus_build_options INTERFACE -fsanitize=thread)
+    target_link_options(nexus_sanitizer_options INTERFACE -fsanitize=thread)
 endif()

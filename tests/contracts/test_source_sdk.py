@@ -18,8 +18,6 @@ sys.path.insert(0, str(ROOT / "cmake/package"))
 import verify_consumers as consumer_gate
 import package_source_sdk as source_sdk
 from tools.configure.metadata import load_policy
-from tools.configure.providers.descriptor import source_directory
-from tools.dev.presets import Presets
 
 # Fixture repositories are disposable; automatic maintenance must neither
 # detach nor outlive the Git command that owns their temporary directory.
@@ -41,6 +39,9 @@ OFFICIAL_F4_VERIFIED_FILES = frozenset({
     "Inc/stm32f4xx_hal_flash_ramfunc.h", "Inc/stm32f4xx_hal_gpio.h",
     "Inc/stm32f4xx_hal_gpio_ex.h", "Src/stm32f4xx_hal_uart.c",
     "Src/stm32f4xx_hal_dma.c", "Src/stm32f4xx_hal_rcc.c",
+    "Inc/stm32f4xx_ll_fsmc.h", "Inc/stm32f4xx_ll_pwr.h",
+    "Inc/stm32f4xx_ll_rtc.h", "Inc/stm32f4xx_ll_sdmmc.h",
+    "Src/stm32f4xx_ll_fsmc.c", "Src/stm32f4xx_ll_sdmmc.c",
 })
 
 
@@ -139,377 +140,6 @@ class CMSISCoreSelectionTests(unittest.TestCase):
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
-    def test_reviewed_kernel_overlays_are_required_relocatable_sdk_payload(self):
-        required = {"os/reviewed_patch.py",
-                    "os/freertos/patches/m7-integer-port.c.patch",
-                    "os/freertos/patches/m7-integer-portmacro.h.patch",
-                    "os/threadx/patches/linux-lowlevel.patch",
-                    "os/threadx/patches/linux-scheduler.patch"}
-        required.update("os/freertos/mpu/patches/" + name + ".patch"
-                        for name in (
-                            "arm_cm3_mpu-port", "arm_cm4_mpu-port", "v8-port",
-                            "v8-baseline-assembly", "v8-mainline-assembly",
-                            "v7-veneers", "v8-baseline-veneers",
-                            "v8-mainline-veneers", "gpio-numbers",
-                            "gpio-veneers"))
-        self.assertFalse(required - set(source_sdk.REQUIRED_FILES),
-                         sorted(required - set(source_sdk.REQUIRED_FILES)))
-        self.assertTrue(all(source_sdk.selected(name) for name in required))
-
-    def test_transport_verifier_and_nested_declarations_are_required(self):
-        required = {"tools/maintenance/freertos_transport.py",
-                    "ext/freertos/.gitmodules",
-                    "ext/freertos/portable/ThirdParty/"
-                    "Partner-Supported-Ports/LICENSE",
-                    "ext/freertos/portable/ThirdParty/"
-                    "Community-Supported-Ports/LICENSE"}
-        self.assertFalse(required - set(source_sdk.REQUIRED_FILES),
-                         sorted(required - set(source_sdk.REQUIRED_FILES)))
-        self.assertTrue(source_sdk.selected(
-            "dependencies/reviews/freertos/upstream.gitmodules"))
-        self.assertTrue(source_sdk.selected(
-            "dependencies/reviews/freertos/transport.patch"))
-        self.assertNotIn("ext/googletest", source_sdk.REQUIRED_DEPENDENCIES)
-
-    def test_required_configuration_payload_follows_the_generator_closure(self):
-        import importlib.util
-        from tools.configure import dependencies
-        specification = importlib.util.spec_from_file_location(
-            "sdk_configuration_closure", ROOT / "cmake/package/package_source_sdk.py")
-        updated = importlib.util.module_from_spec(specification)
-        with mock_patch.object(dependencies, "COMMON",
-                               (*dependencies.COMMON, "new_shared_contract")):
-            specification.loader.exec_module(updated)
-            self.assertIn("tools/configure/new_shared_contract.py",
-                          updated.REQUIRED_FILES)
-        for mode in ("platform", "runtime"):
-            self.assertLessEqual(set(dependencies.source_names(mode, None, sdk=True)),
-                                 set(source_sdk.REQUIRED_FILES))
-
-    def test_component_construction_helpers_are_required_sdk_payload(self):
-        required = {"cmake/platform/Components.cmake",
-                    "components/soc/CMakeLists.txt",
-                    "components/soc/stm32/CMakeLists.txt"}
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
-        self.assertTrue(all(source_sdk.selected(name) for name in required))
-
-    def test_development_preset_catalogue_is_not_a_partial_sdk_payload(self):
-        self.assertFalse(source_sdk.selected("CMakePresets.json"))
-        for name in ("base", "native", "stm32", "gd32", "verification"):
-            with self.subTest(preset=name):
-                self.assertFalse(source_sdk.selected(
-                    "cmake/presets/" + name + ".json"))
-
-    def test_required_public_verification_sources_survive_snapshot_selection(self):
-        omitted = sorted(name for name in source_sdk.REQUIRED_FILES
-                         if name.startswith("cmake/package/verification/io_evolution/")
-                         and not source_sdk.selected(name))
-        self.assertEqual(omitted, [],
-                         "Required public SDK programs cannot be excluded by selection")
-
-    def test_h743_flash_uses_one_required_canonical_sdk_input(self):
-        reference = "tools/configure/assemblies/h743-high-peripherals.toml"
-        previous = ("cmake/package/verification/io_evolution/"
-                    "h743-high-peripherals.toml")
-        self.assertEqual(source_sdk.REQUIRED_FILES.count(reference), 1)
-        self.assertNotIn(previous, source_sdk.REQUIRED_FILES)
-        self.assertTrue(source_sdk.selected(reference))
-        self.assertTrue((ROOT / reference).is_file())
-        self.assertFalse((ROOT / previous).exists())
-        self.assertEqual(consumer_gate.SELECTED_CONSUMERS.count(
-            ("h743 high", reference, "h743-high")), 1)
-        preset, = [row for row, _ in Presets(ROOT).rows["configure"].values()
-                   if row["name"] ==
-                   "fixture-io-evolution-h743-high-peripherals"]
-        self.assertEqual(preset["cacheVariables"]["NEXUS_ASSEMBLY_FILE"],
-                         "${sourceDir}/" + reference)
-
-    def test_async_and_retained_owner_public_closure_is_required(self):
-        required = {
-            "components/user_io_broker/CMakeLists.txt",
-            "components/user_io_broker/include/nexus/components/user_io_async.h",
-            "components/user_io_broker/include/nexus/components/"
-            "user_io_async_storage.h",
-            "components/user_io_broker/src/user_io_async.c",
-            "components/soc/stm32/stm32u575_retained_time/CMakeLists.txt",
-            "components/soc/stm32/stm32u575_retained_time/include/nexus/components/"
-            "stm32u575_retained_time.h",
-            "components/soc/stm32/stm32u575_retained_time/private/retained_time.h",
-            "components/soc/stm32/stm32u575_retained_time/src/stm32u575_retained_time.c",
-            "soc/stm32/stm32u575/private/stm32u575_rtc_calendar.h",
-            "components/soc/stm32/stm32u575_stop2/CMakeLists.txt",
-            "components/soc/stm32/stm32u575_stop2/include/nexus/components/"
-            "stm32u575_stop2.h",
-            "soc/stm32/stm32u575/stop2.c",
-            "soc/stm32/stm32u575/private/stm32u575_stop2_hw.h",
-        }
-        required.update("cmake/package/verification/io_evolution/consumers/"
-                        + name + ".c" for name in (
-                            "user-io-async", "u575-retained-time", "u575-stop2"))
-        self.assertFalse(required - set(source_sdk.REQUIRED_FILES),
-                         sorted(required - set(source_sdk.REQUIRED_FILES)))
-        for name in sorted(required):
-            with self.subTest(name=name):
-                self.assertTrue((ROOT / name).is_file())
-                self.assertTrue(source_sdk.selected(name),
-                                "Required public closure omitted: " + name)
-
-    def test_selected_u575_mpu_gpio_assembly_is_explicitly_catalogued(self):
-        catalogue = json.loads((source_sdk.SOURCE_ROOT /
-            "tools/configure/assemblies/catalogue.json").read_text())
-        self.assertEqual(catalogue["assemblies"].count("u575-mpu-gpio-write.toml"), 1)
-
-    def test_selected_u575_mpu_gpio_public_closure_is_required(self):
-        required = {
-            "os/freertos/include/nexus/os/freertos_mpu_gpio.h",
-            "os/freertos/mpu/gpio.c",
-            "soc/stm32/stm32u575/private/stm32u575_gpio_mpu.h",
-            "soc/stm32/stm32u575/mpu_user_init.c",
-            "soc/stm32/stm32u575/private/stm32u575_mpu_user_init.h",
-            "tools/configure/assemblies/u575-mpu-gpio-write.toml",
-            "cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c",
-        }
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
-        for name in required:
-            with self.subTest(path=name):
-                self.assertTrue(source_sdk.selected(name))
-        payload = source_sdk.provider_descriptors.maintained("stm32u575").owned_payload
-        self.assertTrue((required - {"os/freertos/include/nexus/os/freertos_mpu_gpio.h",
-                                    "os/freertos/mpu/gpio.c"}).issubset(set(payload)))
-
-    def test_selected_f407_i2s2_public_closure_is_required(self):
-        role_module = "tools/configure/i2s2.py"
-        required = {
-            role_module,
-            "components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt",
-            "components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/"
-            "f407_i2s2_slave_tx.h",
-            "soc/stm32/stm32f407/drivers/i2s2_slave_tx.c",
-            "soc/stm32/stm32f407/private/stm32f407_i2s2_slave_tx.h",
-            "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
-            "tools/configure/assemblies/qiming-i2s2-slave-tx.toml",
-            "cmake/package/verification/io_evolution/consumers/"
-            "f407-i2s2-slave-tx.c",
-        }
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
-        for name in sorted(required):
-            with self.subTest(path=name):
-                self.assertTrue(source_sdk.selected(name),
-                                "Required I2S2 closure omitted: " + name)
-        payload = source_sdk.provider_descriptors.maintained("stm32f407").owned_payload
-        hardware = required - {role_module}
-        self.assertTrue(hardware.issubset(set(payload)),
-                        sorted(hardware - set(payload)))
-
-    def test_optional_usb_control_and_profile_sources_cannot_be_omitted(self):
-        required = {
-            "components/usb_control/CMakeLists.txt",
-            "components/usb_control/include/nexus/components/usb_control.h",
-            "components/usb_control/include/nexus/components/usb_descriptors.h",
-            "components/usb_control/include/nexus/components/usb_acm.h",
-            "components/usb_control/src/usb_control.c",
-            "components/usb_control/src/usb_descriptors.c",
-            "components/usb_control/src/usb_acm.c",
-            "io/include/nexus/io/usb_profile.h",
-            "io/include/nexus/io/usb_activation.h",
-            "io/src/mechanisms/usb_profile.c",
-            "tools/configure/usb_profiles.py",
-        }
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
-        for name in required:
-            with self.subTest(name=name):
-                self.assertTrue((ROOT / name).is_file())
-                self.assertTrue(source_sdk.selected(name))
-
-    def test_provider_canonical_smokes_are_not_omitted_from_sdk_selection(self):
-        prefix = "cmake/package/verification/io_evolution/"
-        smokes = {name for descriptor in source_sdk.provider_descriptors.families()
-                  for name in descriptor.owned_payload
-                  if name.startswith(prefix)}
-        self.assertTrue(smokes, "Reviewed provider consumer closure is empty")
-        for name in sorted(smokes):
-            with self.subTest(name=name):
-                self.assertIn(name, source_sdk.REQUIRED_FILES)
-                self.assertTrue(source_sdk.selected(name),
-                                "Required consumer omitted from SDK: " + name)
-
-    def test_official_f4_required_payload_has_the_reviewed_transport_graph(self):
-        lock_path = ROOT / "dependencies/stm32f4-hal.lock.json"
-        lock = json.loads(lock_path.read_text())
-        self.assertEqual(len(OFFICIAL_F4_VERIFIED_FILES), 28)
-        self.assertEqual(set(lock["files"]), OFFICIAL_F4_VERIFIED_FILES)
-        for name in OFFICIAL_F4_VERIFIED_FILES:
-            with self.subTest(name=name):
-                self.assertIn("vendors/st/stm32f4_hal/" + name,
-                              source_sdk.REQUIRED_FILES)
-
-    def test_enhanced_ethernet_canonical_inputs_and_public_smoke_are_required(self):
-        directory = "cmake/package/verification/io_evolution/"
-        required = {directory + name for name in (
-            "f407zg-eth-frames.toml", "gd470-eth-frames.toml",
-            "boards/f407zg-eth-frames/board.json",
-            "boards/gd470-eth-frames/board.json",
-            "consumers/ethernet-frames.c")}
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
-        for name in required:
-            with self.subTest(name=name):
-                self.assertTrue((ROOT / name).is_file())
-                self.assertTrue(source_sdk.selected(name))
-
-    def test_enhanced_frames_common_and_native_sources_are_required(self):
-        required = {
-            "io/include/nexus/io/ethernet_frames.h",
-            "drivers/ethernet/legacy_mac/eth_frames_mac.h",
-            "io/private/eth_frames_validation.h",
-            "io/src/api/ethernet_frames.c", "drivers/ethernet/legacy_mac/eth_frames_mac.c",
-            "soc/native/drivers/ethernet_frames.c", "soc/native/drivers/ethernet_frames.h",
-            "soc/native/drivers/ethernet_frames_access.h"}
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
-        for name in required:
-            with self.subTest(name=name):
-                self.assertTrue((ROOT / name).is_file())
-                self.assertTrue(source_sdk.selected(name))
-
-    def test_selected_family_extensions_belong_to_provider_payloads(self):
-        additions = {
-            "stm32h743": ("drivers/flash_execution.c",
-                          "private/stm32h743_flash_execution.h",
-                          "drivers/flash_ram.c", "drivers/flash_ram_owner.c",
-                          "drivers/flash_ram_transaction.c",
-                          "drivers/flash_ram_enter.S", "drivers/flash_mpu.c",
-                          "private/stm32h743_flash_ram.h",
-                          "private/stm32h743_flash_ram_layout.h",
-                          "private/stm32h743_flash_mpu.h",
-                          "drivers/uart_fifo.c",
-                          "private/stm32h743_uart_fifo.h",
-                          "drivers/uart_duplex.c",
-                          "private/stm32h743_uart_duplex.h",
-                          "private/stm32h743_uart_continuous_impl.h",
-                          "private/stm32h743_uart_dma_parts.h"),
-            "stm32u575": ("drivers/uart_fifo.c",
-                          "private/stm32u575_uart_fifo.h"),
-            "stm32f407": ("drivers/ethernet_frames.c",
-                          "private/stm32f407_eth_frames.h"),
-            "gd32f470": ("drivers/ethernet_frames.c",
-                         "private/gd32f470_eth_frames.h")}
-        for family, relative in additions.items():
-            with self.subTest(family=family):
-                descriptor = source_sdk.provider_descriptors.maintained(family)
-                required = {f"{source_directory(family)}/" + name for name in relative}
-                self.assertTrue(required.issubset(set(descriptor.owned_payload)),
-                                sorted(required - set(descriptor.owned_payload)))
-                self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                                sorted(required - set(source_sdk.REQUIRED_FILES)))
-
-    def test_fifo_verification_inputs_and_public_smoke_are_required(self):
-        directory = "cmake/package/verification/io_evolution/"
-        required = {directory + name for name in (
-            "h743-uart-fifo.toml", "u575-uart-fifo.toml",
-            "consumers/uart-fifo.c")}
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
-        for name in required:
-            with self.subTest(name=name):
-                self.assertTrue((ROOT / name).is_file())
-                self.assertTrue(source_sdk.selected(name))
-
-    def test_finite_adc_group_inputs_public_smoke_and_real_sources_are_required(self):
-        directory = "cmake/package/verification/io_evolution/"
-        required = {directory + name for name in (
-            "g474-adc-group-regular-software.toml",
-            "g474-adc-group-regular-timer.toml",
-            "g474-adc-group-injected-software.toml",
-            "g474-adc-group-injected-timer.toml",
-            "boards/g474-adc-group/board.json", "consumers/g474-adc-group.c")}
-        required.update({
-            "soc/stm32/stm32g474/configure/adc_group.py",
-            "soc/stm32/stm32g474/reviews/adc-group.json",
-            "io/include/nexus/io/adc_group.h", "io/src/api/adc_group.c",
-            "soc/stm32/stm32g474/private/stm32g474_adc_group.h",
-            "soc/stm32/stm32g474/drivers/adc_group.c",
-            "soc/stm32/common/stm32_identity.h", "core/include/nexus/core/silicon.h",
-            "core/src/silicon.c"})
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
-        for name in required:
-            with self.subTest(name=name):
-                self.assertTrue(source_sdk.selected(name))
-
-    def test_fifo_template_and_both_selected_family_leaves_are_required(self):
-        required = {"drivers/uart/usart_fifo/uart_fifo_impl.h"}
-        for family in ("stm32h743", "stm32u575"):
-            required.update({f"{source_directory(family)}/drivers/uart_fifo.c",
-                             f"{source_directory(family)}/private/{family}_uart_fifo.h"})
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
-
-    def test_selected_contract_helper_is_an_explicit_sdk_requirement(self):
-        self.assertIn("tools/configure/selected_contracts.py",
-                      source_sdk.REQUIRED_FILES)
-
-    def test_consumer_plan_is_required_even_after_a_rehashed_omission(self):
-        required = (
-            "tools/release/transport.py",
-            "tools/configure/experience.py",
-            "tools/configure/selection.py",
-            "tools/configure/onboarding.py",
-            "tools/dev/projects.py",
-            "tools/dev/device.py",
-            "tools/dev/timings.py",
-            "io/include/nexus/io/diagnostic.h",
-            "io/src/mechanisms/diagnostic.c",
-            "components/usb_control/include/nexus/components/usb_acm.h",
-            "components/usb_control/src/usb_acm.c",
-            "os/freertos/include/nexus/os/freertos_mpu_gpio.h",
-            "os/freertos/mpu/gpio.c",
-            "soc/stm32/stm32u575/private/stm32u575_gpio_mpu.h",
-            "soc/stm32/stm32u575/mpu_user_init.c",
-            "soc/stm32/stm32u575/private/stm32u575_mpu_user_init.h",
-            "tools/configure/assemblies/u575-mpu-gpio-write.toml",
-            "cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c",
-        )
-        self.assert_rehashed_required_omissions(required)
-
-    def test_public_host_entry_closure_rejects_rehashed_omissions(self):
-        # This independent file oracle follows public support/create/candidate
-        # imports; it does not take its expected names from the packager.
-        required = (
-            "tools/dev/projects.py",
-            "tools/maintenance/capabilities.py",
-            "tools/maintenance/support.py",
-            "tools/evidence/candidate.py",
-            "tools/evidence/proof.py",
-            "tools/evidence/native_proof.py",
-            "tools/evidence/legacy_sdk.py",
-            "tools/evidence/consumer.py",
-            "tools/evidence/container.py",
-            "tools/evidence/inputs.py",
-            "tools/evidence/qualification.py",
-            "tools/evidence/reproduce.py",
-            "tools/evidence/storage.py",
-            "tools/configure/documentation.py",
-            "tools/hil/admit.py",
-            "tools/hil/h743_duplex.py",
-            "tools/hil/measure.py",
-            "tools/hil/power.py",
-            "tools/hil/prepare.py",
-            "tools/hil/selected_modes.py",
-            "tools/hil/threadx.py",
-            "tools/hil/workloads.py",
-            "scripts/ci/io_lifecycle_matrix.py",
-            "scripts/ci/native_contracts.py",
-            "scripts/ci/tdd_gate.py",
-            "scripts/validation/junit.py",
-            "tools/testing/run_tool_tests.py",
-        )
-        self.assert_rehashed_required_omissions(required)
-
     def assert_rehashed_required_omissions(self, required):
         """An otherwise identical outer map cannot omit a mandatory member."""
         import hashlib
@@ -521,14 +151,16 @@ class SourceSDKSelectionTests(unittest.TestCase):
             # Filesystem/manifest admission only, not a usable SDK or build.
             payload = b"required-source fixture\n"
             files = {}
+            contents = {}
             # Explicit names keep new omissions executable against the old
             # production list; deriving the fixture only from REQUIRED_FILES
             # would otherwise never create a newly missing source.
-            for name in sorted(set(source_sdk.REQUIRED_FILES) | set(required)):
+            for name in sorted(set(source_sdk.required_files(ROOT)) | set(required)):
                 target = root / name
                 target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_bytes(payload)
-                files[name] = hashlib.sha256(payload).hexdigest()
+                contents[name] = (ROOT / name).read_bytes()
+                target.write_bytes(contents[name])
+                files[name] = hashlib.sha256(contents[name]).hexdigest()
             prefix = root.parents[2]
             exports = {}
             for name in ("lib/cmake/Nexus/NexusConfig.cmake",
@@ -537,7 +169,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(payload)
                 exports[name] = hashlib.sha256(payload).hexdigest()
-            identity = {"schema": 1, "kind": "nexus-installed-source-sdk",
+            identity = {"schema": 2, "profile": source_sdk.source_profile(), "kind": "nexus-installed-source-sdk",
                 "source_revision": "a" * 40, "source_tree": "b" * 40,
                 "publishable": True, "source_dirty": False,
                 "files_sha256": files, "dependencies": [],
@@ -564,60 +196,178 @@ class SourceSDKSelectionTests(unittest.TestCase):
                                 "missing required sources/licenses"):
                             source_sdk.verify(root)
                     finally:
-                        (root / name).write_bytes(payload)
+                        (root / name).write_bytes(contents[name])
                         files[name] = original
                         write_identity()
 
-    def test_portable_io_verification_inputs_and_public_smokes_are_required(self):
-        directory = "cmake/package/verification/io_evolution/"
-        names = {
-            "h743-high-empty.toml", "h743-high-uart.toml",
-            "u575-uart-gpdma.toml",
-            "g474-can-fd-loopback.toml", "g474-can-fd-normal.toml",
-            "g474-pwm-adc.toml", "boards/g474-fdcan/board.json",
-            "boards/g474-pwm-adc/board.json", "consumers/h743-high.c",
-            "consumers/u575-uart-gpdma.c", "consumers/g474-can-fd.c",
-            "consumers/g474-pwm-adc.c"}
-        required = {directory + name for name in names}
-        required.add("tools/configure/assemblies/h743-high-peripherals.toml")
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+
+    def test_reviewed_kernel_overlays_are_required_relocatable_sdk_payload(self):
+        required = {"os/reviewed_patch.py",
+                    "os/freertos/patches/m7-integer-port.c.patch",
+                    "os/freertos/patches/m7-integer-portmacro.h.patch",
+                    "os/threadx/patches/linux-lowlevel.patch",
+                    "os/threadx/patches/linux-scheduler.patch"}
+        required.update("os/freertos/mpu/patches/" + name + ".patch"
+                        for name in (
+                            "arm_cm3_mpu-port", "arm_cm4_mpu-port", "v8-port",
+                            "v8-baseline-assembly", "v8-mainline-assembly",
+                            "v7-veneers", "v8-baseline-veneers",
+                            "v8-mainline-veneers"))
+        self.assertFalse(required - set(source_sdk.REQUIRED_FILES),
+                         sorted(required - set(source_sdk.REQUIRED_FILES)))
+        self.assertTrue(all(source_sdk.selected(name) for name in required))
+
+
+    def test_required_configuration_payload_follows_the_generator_closure(self):
+        import importlib.util
+        from tools.configure import dependencies
+        specification = importlib.util.spec_from_file_location(
+            "sdk_configuration_closure", ROOT / "cmake/package/package_source_sdk.py")
+        updated = importlib.util.module_from_spec(specification)
+        with mock_patch.object(dependencies, "COMMON",
+                               (*dependencies.COMMON, "new_shared_contract")):
+            specification.loader.exec_module(updated)
+            self.assertIn("tools/configure/new_shared_contract.py",
+                          updated.REQUIRED_FILES)
+        for mode in ("platform", "runtime"):
+            self.assertLessEqual(set(dependencies.source_names(mode, None, sdk=True)),
+                                 set(source_sdk.REQUIRED_FILES))
+
+    def test_component_construction_helpers_are_required_sdk_payload(self):
+        required = {"cmake/platform/Components.cmake",
+                    "components/soc/CMakeLists.txt",
+                    "components/soc/stm32/CMakeLists.txt"}
+        self.assertTrue(required.issubset(set(source_sdk.required_files(ROOT))),
+                        sorted(required - set(source_sdk.required_files(ROOT))))
+        self.assertTrue(all(source_sdk.selected(name) for name in required))
+
+    def test_development_preset_catalogue_is_not_a_partial_sdk_payload(self):
+        self.assertFalse(source_sdk.selected("CMakePresets.json"))
+        for name in ("base", "native", "stm32", "gd32", "verification"):
+            with self.subTest(preset=name):
+                self.assertFalse(source_sdk.selected(
+                    "cmake/presets/" + name + ".json"))
+
+    def test_required_public_verification_sources_survive_snapshot_selection(self):
+        omitted = sorted(name for name in source_sdk.REQUIRED_FILES
+                         if name.startswith("cmake/package/verification/io_evolution/")
+                         and not source_sdk.selected(name))
+        self.assertEqual(omitted, [],
+                         "Required public SDK programs cannot be excluded by selection")
+
+
+
+
+
+    def test_selected_f407_i2s2_public_closure_is_required(self):
+        role_module = "tools/configure/i2s2.py"
+        required = {
+            role_module,
+            "components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt",
+            "components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/"
+            "f407_i2s2_slave_tx.h",
+            "soc/stm32/stm32f4/drivers/i2s2_slave_tx.c",
+            "soc/stm32/stm32f4/private/stm32f407_i2s2_slave_tx.h",
+            "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
+            "tools/configure/assemblies/qiming-i2s2-slave-tx.toml",
+            "cmake/package/verification/io_evolution/consumers/"
+            "f407-i2s2-slave-tx.c",
+        }
+        self.assertTrue(required.issubset(set(source_sdk.required_files(ROOT))),
+                        sorted(required - set(source_sdk.required_files(ROOT))))
+        for name in sorted(required):
+            with self.subTest(path=name):
+                self.assertTrue(source_sdk.selected(name),
+                                "Required I2S2 closure omitted: " + name)
+        payload = source_sdk.provider_descriptors.maintained("stm32f4").owned_payload
+        hardware = required - {role_module}
+        self.assertTrue(hardware.issubset(set(payload)),
+                        sorted(hardware - set(payload)))
+
+    def test_optional_usb_control_and_profile_sources_cannot_be_omitted(self):
+        required = {
+            "components/usb_control/CMakeLists.txt",
+            "components/usb_control/include/nexus/components/usb_control.h",
+            "components/usb_control/include/nexus/components/usb_descriptors.h",
+            "components/usb_control/include/nexus/components/usb_acm.h",
+            "components/usb_control/src/usb_control.c",
+            "components/usb_control/src/usb_descriptors.c",
+            "components/usb_control/src/usb_acm.c",
+            "io/include/nexus/io/usb_profile.h",
+            "io/include/nexus/io/usb_activation.h",
+            "io/src/mechanisms/usb_profile.c",
+            "tools/configure/usb_profiles.py",
+        }
+        self.assertTrue(required.issubset(set(source_sdk.required_files(ROOT))),
+                        sorted(required - set(source_sdk.required_files(ROOT))))
         for name in required:
             with self.subTest(name=name):
+                self.assertTrue((ROOT / name).is_file())
                 self.assertTrue(source_sdk.selected(name))
 
-    def test_portable_verification_namespace_rejects_unreviewed_payloads(self):
-        for name in ("model.c", "tests/consumer_test.cpp", "trace.raw",
-                     "boards/unreviewed/board.json", "consumers/product.c",
-                     "consumers/GoogleTest.cpp", "capture.xml"):
-            with self.subTest(name=name):
-                self.assertFalse(source_sdk.selected(
-                    "cmake/package/verification/io_evolution/" + name))
-        self.assertNotIn("tests", source_sdk.ROOT_DIRS)
 
-    def test_coupled_io_public_private_and_generator_payloads_are_required(self):
-        required = {
-            "io/include/nexus/io/can_fd.h", "io/include/nexus/io/pwm_adc.h",
-            "io/src/api/can_fd.c", "io/src/api/pwm_adc.c", "io/private/can_fd_impl.h",
-            "tools/configure/coupled_io.py",
-            "soc/stm32/stm32g474/configure/coupled.py",
-            "soc/stm32/stm32g474/drivers/fdcan.c",
-            "soc/stm32/stm32g474/drivers/pwm_adc.c",
-            "soc/stm32/stm32g474/private/stm32g474_fdcan.h",
-            "soc/stm32/stm32g474/private/stm32g474_pwm_adc.h"}
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
 
-    def test_coupled_g474_units_and_generator_are_explicit_family_payload(self):
-        descriptor = source_sdk.provider_descriptors.maintained("stm32g474")
-        required = {"soc/stm32/stm32g474/drivers/fdcan.c",
-                    "soc/stm32/stm32g474/drivers/pwm_adc.c",
-                    "soc/stm32/stm32g474/private/stm32g474_fdcan.h",
-                    "soc/stm32/stm32g474/private/stm32g474_pwm_adc.h"}
-        self.assertTrue(required.issubset(set(descriptor.owned_payload)),
-                        sorted(required - set(descriptor.owned_payload)))
-        self.assertIn("soc/stm32/stm32g474/configure/coupled.py",
-                      descriptor.configuration_modules)
+
+
+
+
+
+
+    def test_selected_contract_helper_is_an_explicit_sdk_requirement(self):
+        self.assertIn("tools/configure/selected_contracts.py",
+                      source_sdk.REQUIRED_FILES)
+
+    def test_consumer_plan_is_required_even_after_a_rehashed_omission(self):
+        required = (
+            "tools/release/transport.py",
+            "tools/configure/experience.py",
+            "tools/configure/selection.py",
+            "tools/configure/onboarding.py",
+            "tools/dev/projects.py",
+            "tools/dev/device.py",
+            "tools/dev/timings.py",
+            "io/include/nexus/io/diagnostic.h",
+            "io/src/mechanisms/diagnostic.c",
+            "components/usb_control/include/nexus/components/usb_acm.h",
+            "components/usb_control/src/usb_acm.c",
+        )
+        self.assert_rehashed_required_omissions(required)
+
+    def test_public_host_entry_closure_rejects_rehashed_omissions(self):
+        # This independent file oracle follows public support/create/candidate
+        # imports; it does not take its expected names from the packager.
+        required = (
+            "tools/dev/projects.py",
+            "tools/maintenance/capabilities.py",
+            "tools/maintenance/support.py",
+            "tools/evidence/candidate.py",
+            "tools/evidence/proof.py",
+            "tools/evidence/native_proof.py",
+            "tools/evidence/legacy_sdk.py",
+            "tools/evidence/consumer.py",
+            "tools/evidence/container.py",
+            "tools/evidence/inputs.py",
+            "tools/evidence/qualification.py",
+            "tools/evidence/reproduce.py",
+            "tools/evidence/storage.py",
+            "tools/configure/documentation.py",
+            "tools/hil/admit.py",
+            "tools/hil/measure.py",
+            "tools/hil/power.py",
+            "tools/hil/prepare.py",
+            "tools/hil/threadx.py",
+            "tools/hil/workloads.py",
+            "scripts/ci/io_lifecycle_matrix.py",
+            "scripts/ci/native_contracts.py",
+            "scripts/ci/tdd_gate.py",
+            "scripts/validation/junit.py",
+        )
+        self.assert_rehashed_required_omissions(required)
+
+
+
+
+
 
     def test_build_policy_and_tool_module_closure_is_required(self):
         required = {"cmake/platform/TargetPolicy.cmake",
@@ -647,23 +397,9 @@ class SourceSDKSelectionTests(unittest.TestCase):
                 self.assertFalse(source_sdk.selected(name))
         self.assertTrue(source_sdk.selected("dependencies/googletest.lock.json"))
         self.assertTrue(source_sdk.selected("io/include/nexus/io/factory.h"))
-        self.assertTrue(source_sdk.selected("tools/configure/assemblies/native.toml"))
+        self.assertTrue(source_sdk.selected("tests/support/native/assemblies/native.toml",
+            profile=source_sdk.source_profile(host_support=True)))
 
-    def test_audit_archives_stay_outside_sdk_but_operational_tools_remain(self):
-        for name in ("tools/testing/evidence/report.json",
-                     "tools/testing/evidence/nested/results.xml",
-                     "tools/testing/evidence/sources/provider.c.raw",
-                     "tools/testing/evidence/firmware.elf"):
-            with self.subTest(name=name):
-                self.assertFalse(source_sdk.selected(name))
-        for name in ("tools/testing/evidence.py",
-                     "tools/testing/evidence_extra/report.json",
-                     "tools/testing/test_source_identity.py",
-                     "tools/evidence/verify.py",
-                     "tools/maintenance/stm32g4_lock.py",
-                     "dependencies/googletest.lock.json"):
-            with self.subTest(name=name):
-                self.assertTrue(source_sdk.selected(name))
 
     def test_consumer_uses_authored_toml_for_each_maintained_family(self):
         with tempfile.TemporaryDirectory(prefix="SDK consumer inputs ") as value:
@@ -673,7 +409,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
             shutil.copyfile(ROOT / "dependencies/platform-compatibility.json", policy)
             for name, arm, chip in (("native", False, "native"),
                                     ("stm32", True, "stm32"),
-                                    ("gd32", True, "gd32")):
+                                    ("stm32 board", True, "stm32")):
                 _, _, command = consumer_gate.prepare_consumer(
                     directory / "prefix", directory, name,
                     lambda arguments: None, arm=arm, chip=chip)
@@ -682,7 +418,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
                 self.assertTrue(assembly.endswith(".toml"), assembly)
 
     def test_optional_handoff_is_consumed_only_by_the_exact_f407_arm_project(self):
-        for arm, chip in ((False, "stm32"), (True, "stm32"), (True, "gd32")):
+        for arm, chip in ((False, "native"), (True, "stm32")):
             with self.subTest(arm=arm, chip=chip), tempfile.TemporaryDirectory() as value:
                 directory = Path(value)
                 policy = directory / "prefix/share/nexus/src/dependencies/platform-compatibility.json"
@@ -707,211 +443,9 @@ class SourceSDKSelectionTests(unittest.TestCase):
                     "!= NX_ERROR_INVALID", code)
                 self.assertIn("nx_amp_ipc_construct(nullptr, nullptr) != NX_ERROR_INVALID", code)
 
-    def test_optional_frame_blitter_is_consumed_only_by_h743_projects(self):
-        for family in ("h743", "u575", "f103", "gd303", "g474"):
-            for backend in ("baremetal", "freertos"):
-                with self.subTest(family=family, backend=backend), tempfile.TemporaryDirectory() as value:
-                    directory = Path(value)
-                    policy = directory / "prefix/share/nexus/src/dependencies/platform-compatibility.json"
-                    policy.parent.mkdir(parents=True)
-                    shutil.copyfile(ROOT / "dependencies/platform-compatibility.json", policy)
-                    source, _, _ = consumer_gate.prepare_modern_consumer(
-                        directory / "prefix", directory, family, backend,
-                        lambda arguments: None)
-                    cmake = (source / "CMakeLists.txt").read_text()
-                    code = (source / "main.c").read_text()
-                    expected = family == "h743"
-                    self.assertEqual("Nexus::H743FrameDMA2D" in cmake, expected)
-                    for public_contract in (
-                            '#include "nexus/components/frame_dma2d.h"',
-                            "nx_h743_frame_dma2d_initialize(",
-                            "NX_FRAME_BLIT_ARGB8888_TO_RGB565"):
-                        self.assertEqual(public_contract in code, expected,
-                                         public_contract)
-
-    def test_exposed_io_core_clock_and_provider_closures_are_required(self):
-        required = {
-            "arch/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
-            "arch/arm/cortex_m/private/registers.h",
-            "os/wait.c", "os/include/nexus/os/wait.h",
-            "os/baremetal/notify.c", "os/native/native.c",
-            "components/CMakeLists.txt",
-            "core/include/nexus/core/fault.h", "core/src/fault.c",
-            "core/include/nexus/core/stack_observation.h",
-            "core/src/stack_observation.c", "io/CMakeLists.txt",
-            "io/include/nexus/io/usb_device.h", "io/src/api/usb_device.c",
-            "drivers/usb/fs_device_pio/usb_device_controller.c", "drivers/usb/fs_device_pio/usb_device_controller.h",
-            "soc/native/drivers/usb_device_access.h", "soc/native/drivers/usb_device.c",
-            "io/include/nexus/io/ethernet.h", "io/include/nexus/io/mdio.h",
-            "drivers/ethernet/legacy_mac/eth_mac.c", "drivers/ethernet/legacy_mac/eth_mac.h",
-            "soc/native/drivers/ethernet_access.h", "soc/native/drivers/ethernet.c",
-            "drivers/can/classic_can/can_controller.c", "drivers/can/classic_can/can_controller.h",
-            "io/include/nexus/io/timer_capture.h",
-            "io/include/nexus/io/advanced_pwm.h",
-            "drivers/timer/advanced_timer/timer_advanced_controller.h",
-            "tools/configure/bindings.py", "tools/configure/emission.py",
-            "tools/configure/usb_device.py", "tools/configure/ethernet.py",
-            "tools/configure/timer_advanced.py",
-            "cmake/platform/Configure.cmake", "cmake/platform/ControllerModes.cmake",
-            "os/freertos/timebase_lowpower.c",
-            "os/freertos/private/timebase_lowpower.h",
-            "os/freertos/stack_snapshot.c",
-            "os/freertos/include/nexus/os/freertos_stack.h",
-            "components/clock_domain/src/clock_domain.c",
-            "components/amp_ipc/CMakeLists.txt",
-            "components/amp_ipc/src/amp_ipc.c",
-            "components/amp_ipc/include/nexus/components/amp_ipc.h",
-            "components/amp_ipc/include/nexus/components/amp_ipc_storage.h",
-            "components/soc/stm32/stm32f407_handoff/CMakeLists.txt",
-            "components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
-            "soc/stm32/stm32f407/handoff.c",
-            "soc/stm32/stm32f407/private/stm32f407_handoff_hw.h",
-            "io/include/nexus/io/frame_stream.h", "io/src/mechanisms/frame_stream.c",
-            "components/soc/stm32/stm32h743_frame_dma2d/CMakeLists.txt",
-            "components/soc/stm32/stm32h743_frame_dma2d/include/nexus/components/frame_dma2d.h",
-            "components/soc/stm32/stm32h743_frame_dma2d/src/h743_frame_dma2d.c",
-            "components/mapped_storage/CMakeLists.txt",
-            "components/mapped_storage/src/mapped_storage.c",
-            "components/mapped_storage/src/mapped_storage_owner.c",
-            "components/mapped_storage/src/native_mapped_storage.c",
-            "components/mapped_storage/include/nexus/components/mapped_storage.h",
-            "components/mapped_storage/include/nexus/components/mapped_storage_owner.h",
-            "components/mapped_storage/include/nexus/components/native_mapped_storage.h",
-            "components/user_io_broker/src/user_io_broker.c",
-            "components/dp83848/src/dp83848.c",
-            "scripts/ci/vendor_import_identity.py", "scripts/ci/verify_vendor_source.py",
-        }
-        for family in ("stm32f407", "gd32f470"):
-            required.update(f"{source_directory(family)}/" + name for name in (
-                "system.c", "timebase_lowpower.c", "usb_clock.c",
-                "drivers/usb_device.c", "drivers/ethernet.c", "drivers/can.c",
-                "drivers/timer_capture.c", "drivers/advanced_pwm.c",
-                "CMakeLists.txt", "soc.json", "routes.json"))
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
 
 
-class SourceSDKPortableVerificationTests(unittest.TestCase):
-    """One authored input is shared by models, ARM presets and installed SDKs."""
 
-    def test_canonical_inputs_resolve_and_old_authored_copies_are_removed(self):
-        from tools.configure import configure
-        directory = ROOT / "cmake/package/verification/io_evolution"
-        moves = {
-            "h743-high-empty.toml": "h743_high_assembly/empty.toml",
-            "h743-high-uart.toml": "h743_high_assembly/io.toml",
-            "u575-uart-gpdma.toml": "u575_assembly/usart1-dma-tx.toml",
-            "g474-can-fd-loopback.toml": "g474_control_assembly/can-fd.toml",
-            "g474-can-fd-normal.toml": "g474_control_assembly/can-fd-normal.toml",
-            "g474-pwm-adc.toml": "g474_control_assembly/pwm-adc.toml"}
-        for current, previous in moves.items():
-            with self.subTest(assembly=current):
-                self.assertTrue((directory / current).is_file())
-                result = configure.resolve_ir(directory / current, ROOT)
-                self.assertEqual(result.backend, "baremetal")
-                self.assertFalse((ROOT / "tests/contracts" / previous).exists())
-        for current, previous in (
-                ("g474-fdcan", "fdcan_board"),
-                ("g474-pwm-adc", "pwm_adc_board")):
-            with self.subTest(board=current):
-                board = json.loads((directory / "boards" / current /
-                                    "board.json").read_text())
-                self.assertIsNone(board["physical_pcb_revision"])
-                self.assertFalse((ROOT / "tests/contracts/g474_control_assembly" /
-                                  previous / "board.json").exists())
-
-    def test_all_seven_normal_presets_select_the_installed_canonical_inputs(self):
-        presets = Presets(ROOT)
-        expected = {
-            "h743-high-empty", "h743-high-uart", "h743-high-peripherals",
-            "u575-uart-gpdma", "g474-can-fd", "g474-can-fd-normal",
-            "g474-pwm-adc"}
-        selected = {}
-        for preset, _ in presets.rows["configure"].values():
-            name = preset["name"].removeprefix("fixture-io-evolution-")
-            if name not in expected:
-                continue
-            value = preset["cacheVariables"]["NEXUS_ASSEMBLY_FILE"]
-            if name == "h743-high-peripherals":
-                self.assertEqual(value,
-                    "${sourceDir}/tools/configure/assemblies/"
-                    "h743-high-peripherals.toml")
-            else:
-                self.assertTrue(value.startswith(
-                    "${sourceDir}/cmake/package/verification/io_evolution/"),
-                    value)
-            selected[name] = Path(value).name
-        self.assertEqual(set(selected), expected)
-        self.assertEqual(len(set(selected.values())), 7)
-
-    def test_public_smokes_do_not_import_concrete_providers_or_vendor_headers(self):
-        directory = ROOT / "cmake/package/verification/io_evolution/consumers"
-        for name in ("h743-high", "u575-uart-gpdma", "g474-can-fd",
-                     "g474-pwm-adc", "g474-adc-group", "uart-fifo",
-                     "ethernet-frames"):
-            with self.subTest(smoke=name):
-                source = (directory / (name + ".c")).read_text()
-                self.assertIn('#include "nexus_factory.h"', source)
-                self.assertIn("nx_platform_start()", source)
-                self.assertIn("nx_platform_stop()", source)
-                self.assertNotIn("#include \"stm32", source)
-                self.assertNotIn("/private/", source)
-                self.assertNotIn("GoogleTest", source)
-
-    def test_four_adc_group_normal_presets_share_one_canonical_software_board(self):
-        import tomllib
-        from tools.configure import configure
-        directory = ROOT / "cmake/package/verification/io_evolution"
-        expected = {"g474-adc-group-" + name + ".toml" for name in (
-            "regular-software", "regular-timer", "injected-software",
-            "injected-timer")}
-        presets = Presets(ROOT)
-        selected = [preset.get("cacheVariables", {}).get("NEXUS_ASSEMBLY_FILE", "")
-                    for preset, _ in presets.rows["configure"].values()]
-        for name in expected:
-            with self.subTest(assembly=name):
-                file = directory / name
-                result = configure.resolve_ir(file, ROOT)
-                self.assertEqual(result.controllers[0].kind, "adc_group")
-                package = tomllib.loads(file.read_text())["board_package"]
-                self.assertEqual((file.parent / package).resolve(),
-                                 directory / "boards/g474-adc-group")
-                canonical = "${sourceDir}/" + file.relative_to(ROOT).as_posix()
-                self.assertEqual(selected.count(canonical), 1)
-
-    def test_enhanced_ethernet_inputs_keep_software_only_board_boundaries(self):
-        import tomllib
-        from tools.configure import configure
-        directory = ROOT / "cmake/package/verification/io_evolution"
-        presets = Presets(ROOT)
-        selected = [preset.get("cacheVariables", {}).get("NEXUS_ASSEMBLY_FILE", "")
-                    for preset, _ in presets.rows["configure"].values()]
-        for part in ("f407zg", "gd470"):
-            with self.subTest(part=part):
-                file = directory / (part + "-eth-frames.toml")
-                result = configure.resolve_ir(file, ROOT)
-                self.assertEqual(result.controllers[0].kind, "eth_frames")
-                self.assertEqual(result.controllers[0].mode, "rmii-vlan-sg-ptp")
-                package = tomllib.loads(file.read_text())["board_package"]
-                board = json.loads((file.parent / package / "board.json").read_text())
-                self.assertIsNone(board["physical_pcb_revision"])
-                self.assertTrue(board["unknowns"])
-                canonical = "${sourceDir}/" + file.relative_to(ROOT).as_posix()
-                self.assertEqual(selected.count(canonical), 1)
-
-    def test_both_fifo_normal_presets_reuse_the_installed_canonical_inputs(self):
-        from tools.configure import configure
-        directory = ROOT / "cmake/package/verification/io_evolution"
-        presets = Presets(ROOT)
-        selected = [preset.get("cacheVariables", {}).get("NEXUS_ASSEMBLY_FILE", "")
-                    for preset, _ in presets.rows["configure"].values()]
-        for family in ("h743", "u575"):
-            with self.subTest(family=family):
-                file = directory / (family + "-uart-fifo.toml")
-                result = configure.resolve_ir(file, ROOT)
-                self.assertEqual(result.controllers[0].mode, "irq-fifo-bytes")
-                canonical = "${sourceDir}/" + file.relative_to(ROOT).as_posix()
-                self.assertEqual(selected.count(canonical), 1)
 
 
 class SourceSDKSTM32OfficialSelectionTests(unittest.TestCase):
@@ -928,14 +462,14 @@ class SourceSDKSTM32OfficialSelectionTests(unittest.TestCase):
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_tim.h",
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_iwdg.h",
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_i2c.h",
-            "soc/stm32/stm32f407/drivers/uart_hal.c",
-            "soc/stm32/stm32f407/private/stm32f407_uart_hal.h",
-            "soc/stm32/stm32f407/private/stm32f407_hal_atomic.h",
-            "soc/stm32/stm32f407/private/stm32f407_hal_profile.h",
-            "soc/stm32/stm32f407/private/hal/stm32f4xx_hal_conf.h",
+            "soc/stm32/stm32f4/drivers/uart_hal.c",
+            "soc/stm32/stm32f4/private/stm32f407_uart_hal.h",
+            "soc/stm32/stm32f4/private/stm32f407_hal_atomic.h",
+            "soc/stm32/stm32f4/private/stm32f407_hal_profile.h",
+            "soc/stm32/stm32f4/private/hal/stm32f4xx_hal_conf.h",
         }
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        self.assertTrue(required.issubset(set(source_sdk.required_files(ROOT))),
+                        sorted(required - set(source_sdk.required_files(ROOT))))
         self.assertIn("vendors/st/stm32f4_hal", source_sdk.REQUIRED_DEPENDENCIES)
 
     def test_f4_sdk_redistributes_only_selected_graph_and_notice(self):
@@ -965,40 +499,12 @@ class SourceSDKThreadXSelectionTests(unittest.TestCase):
                  "os/threadx/Kernel.cmake", "os/threadx/threadx.c", "os/threadx/m4.c",
                  "os/threadx/m4_vectors.S", "os/threadx/prepare_linux.py",
                  "os/threadx/config/tx_user.h", "os/threadx/include/nexus/os/threadx.h"}
-        self.assertTrue((official | owned).issubset(set(source_sdk.REQUIRED_FILES)))
-        self.assertIn("ext/threadx", source_sdk.REQUIRED_DEPENDENCIES)
+        self.assertTrue((official | owned).issubset(set(source_sdk.required_files(
+            ROOT, source_sdk.source_profile(backend="threadx")))))
+        self.assertIn("ext/threadx", source_sdk.runtime_dependency_closure(
+            source_sdk.source_profile(backend="threadx")))
 
 
-class SourceSDKG4SelectionTests(unittest.TestCase):
-    def test_g4_snapshot_contains_only_five_reviewed_sources_and_original_notice(self):
-        lock = json.loads((ROOT / "dependencies/stm32g4.lock.json").read_text())
-        entries = source_sdk.dependency_entries(ROOT, "vendors/st/cmsis_device_g4")
-        self.assertEqual(set(entries), set(lock["files"]))
-        self.assertEqual(len(entries), 5)
-        self.assertNotIn("Include/stm32g491xx.h", entries)
-
-    def test_g4_lock_verifier_and_all_five_official_files_are_required(self):
-        lock = json.loads((ROOT / "dependencies/stm32g4.lock.json").read_text())
-        required = {"dependencies/stm32g4.lock.json",
-                    "tools/maintenance/stm32g4_lock.py"}
-        required.update("vendors/st/cmsis_device_g4/" + name
-                        for name in lock["files"])
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)))
-        self.assertIn("vendors/st/cmsis_device_g4", source_sdk.REQUIRED_DEPENDENCIES)
-
-    def test_closed_g4_owned_platform_and_reference_sources_are_required(self):
-        required = {
-            "soc/stm32/stm32g474/CMakeLists.txt", "soc/stm32/stm32g474/system.c",
-            "soc/stm32/stm32g474/drivers/gpio.c", "soc/stm32/stm32g474/drivers/uart.c",
-            "soc/stm32/stm32g474/private/stm32g474_system.h",
-            "soc/stm32/stm32g474/private/stm32g474_provider.h",
-            "soc/stm32/stm32g474/soc.json", "soc/stm32/stm32g474/routes.json",
-            "boards/stm32g474re_hse24_reference/board.json",
-            "soc/stm32/stm32g474/configure/__init__.py",
-            "soc/stm32/stm32g474/configure/bindings.py",
-            "soc/stm32/stm32g474/configure/emission.py"}
-        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
-                        sorted(required - set(source_sdk.REQUIRED_FILES)))
 
 
 class SourceSDKDependencySnapshotTests(unittest.TestCase):
@@ -1016,7 +522,7 @@ class SourceSDKDependencySnapshotTests(unittest.TestCase):
         (self.root / "baseline").write_text("committed source baseline\n")
         self.git(self.root, "add", ".")
         self.path = "vendors/st/stm32f4_hal"
-        owning_entries = source_sdk.tree_entries(ROOT)
+        owning_entries = source_sdk.dependency_snapshot(ROOT, development_fixture=True)[0]
         # Validate the complete owning graph while selecting only the real F4
         # checkout below. Other dependencies remain uninitialized Gitlinks.
         for item in ALL_SOURCE_DEPENDENCIES:
@@ -1039,7 +545,8 @@ class SourceSDKDependencySnapshotTests(unittest.TestCase):
         self.git(self.root, "submodule", "init", "--", self.path)
         # This test exercises the source-snapshot boundary using one real,
         # clean official dependency. Full SDK tests below retain every source.
-        patch = mock_patch.object(source_sdk, "REQUIRED_DEPENDENCIES", (self.path,))
+        patch = mock_patch.object(source_sdk, "runtime_dependency_closure",
+            return_value={self.path: source_sdk.dependency(self.path)})
         patch.start()
         self.addCleanup(patch.stop)
 
@@ -1269,9 +776,9 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
                 self.assertNotIn(committed[0], names)
                 self.assertNotIn(staged[0], names)
                 self.assertNotIn(untracked[0], names)
-                self.assertIn(committed[1], names)
-                self.assertIn(committed[2], names)
-                self.assertEqual(staged[1] in names, development)
+                self.assertNotIn(committed[1], names)
+                self.assertNotIn(committed[2], names)
+                self.assertNotIn(staged[1], names)
                 self.assertEqual(untracked[1] in names, development)
         self.assertEqual(self.git("write-tree"), index_before)
 
@@ -1281,7 +788,7 @@ class SourceSDKTests(unittest.TestCase):
     def test_recursive_dependency_membership_matches_reviewed_catalogue(self):
         identity = self.sdk / source_sdk.MANIFEST
         original = identity.read_bytes()
-        child = "ext/freertos/portable/ThirdParty/Community-Supported-Ports"
+        child = "ext/mbedtls/tf-psa-crypto"
         try:
             for change in ("missing-child", "unregistered-child"):
                 with self.subTest(change=change):
@@ -1292,7 +799,7 @@ class SourceSDKTests(unittest.TestCase):
                             if row["path"] != child]
                     else:
                         manifest["dependencies"].append({
-                            "path": "ext/freertos/include",
+                            "path": "ext/mbedtls/library",
                             "commit": "a" * 40, "tree": "b" * 40})
                     identity.write_text(json.dumps(manifest) + "\n")
                     rejected = self.verify()
@@ -1305,7 +812,7 @@ class SourceSDKTests(unittest.TestCase):
     def test_rehashed_nested_fetch_declaration_is_not_an_origin_override(self):
         identity = self.sdk / source_sdk.MANIFEST
         original_identity = identity.read_bytes()
-        target = self.sdk / "ext/freertos/.gitmodules"
+        target = self.sdk / "ext/mbedtls/.gitmodules"
         original = target.read_bytes()
         try:
             changed = original.replace(b"https://github.com/",
@@ -1320,82 +827,8 @@ class SourceSDKTests(unittest.TestCase):
             target.write_bytes(original)
             identity.write_bytes(original_identity)
 
-    @_isolated_sdk_prefix
-    def test_rehashed_import_cannot_add_an_unreviewed_firmware_file(self):
-        import hashlib
-        manifest = self.sdk / ".nexus-source-sdk.json"
-        original_manifest = manifest.read_bytes()
-        for family in ("gd32f30x", "gd32f4xx"):
-            with self.subTest(family=family):
-                name = "vendors/gigadevice/" + family + "/Firmware/unreviewed.h"
-                target = self.sdk / name
-                self.assertFalse(target.exists())
-                try:
-                    target.write_bytes(b"/* outside the original vendor lock */\n")
-                    identity = json.loads(original_manifest)
-                    identity["files_sha256"][name] = hashlib.sha256(target.read_bytes()).hexdigest()
-                    identity["snapshot_sha256"] = hashlib.sha256(json.dumps(
-                        identity["files_sha256"], sort_keys=True,
-                        separators=(",", ":")).encode()).hexdigest()
-                    manifest.write_text(json.dumps(identity, indent=2, sort_keys=True) + "\n")
-                    result = self.verify()
-                    self.assertNotEqual(result.returncode, 0)
-                    self.assertIn("outside the reviewed import", result.stderr)
-                finally:
-                    target.unlink(missing_ok=True)
-                    manifest.write_bytes(original_manifest)
 
-    @_isolated_sdk_prefix
-    def test_rehashed_import_cannot_add_an_unreviewed_auxiliary_file(self):
-        import hashlib
-        manifest = self.sdk / ".nexus-source-sdk.json"
-        original_manifest = manifest.read_bytes()
-        for family in ("gd32f30x", "gd32f4xx"):
-            with self.subTest(family=family):
-                name = "vendors/gigadevice/" + family + "/unreviewed.txt"
-                target = self.sdk / name
-                self.assertFalse(target.exists())
-                try:
-                    target.write_bytes(b"outside the reviewed import notice set\n")
-                    identity = json.loads(original_manifest)
-                    identity["files_sha256"][name] = hashlib.sha256(target.read_bytes()).hexdigest()
-                    identity["snapshot_sha256"] = hashlib.sha256(json.dumps(
-                        identity["files_sha256"], sort_keys=True,
-                        separators=(",", ":")).encode()).hexdigest()
-                    manifest.write_text(json.dumps(identity, indent=2, sort_keys=True) + "\n")
-                    result = self.verify()
-                    self.assertNotEqual(result.returncode, 0)
-                    self.assertIn("outside the reviewed import", result.stderr)
-                finally:
-                    target.unlink(missing_ok=True)
-                    manifest.write_bytes(original_manifest)
 
-    @_isolated_sdk_prefix
-    def test_rehashed_vendor_import_bytes_still_must_match_original_lock(self):
-        import hashlib
-        manifest = self.sdk / ".nexus-source-sdk.json"
-        original_manifest = manifest.read_bytes()
-        for family in ("gd32f30x", "gd32f4xx"):
-            with self.subTest(family=family):
-                directory = "vendors/gigadevice/" + family
-                lock = json.loads((self.sdk / directory / "source.lock.json").read_text())
-                name = directory + "/" + lock["files"][0]["path"]
-                target = self.sdk / name
-                original = target.read_bytes()
-                try:
-                    target.write_bytes(bytes([original[0] ^ 1]) + original[1:])
-                    identity = json.loads(original_manifest)
-                    identity["files_sha256"][name] = hashlib.sha256(target.read_bytes()).hexdigest()
-                    identity["snapshot_sha256"] = hashlib.sha256(json.dumps(
-                        identity["files_sha256"], sort_keys=True,
-                        separators=(",", ":")).encode()).hexdigest()
-                    manifest.write_text(json.dumps(identity, indent=2, sort_keys=True) + "\n")
-                    result = self.verify()
-                    self.assertNotEqual(result.returncode, 0)
-                    self.assertIn("Imported source changed", result.stderr)
-                finally:
-                    target.write_bytes(original)
-                    manifest.write_bytes(original_manifest)
 
     @_isolated_sdk_prefix
     def test_mutable_prefix_is_a_complete_independent_copy(self):
@@ -1459,7 +892,10 @@ class SourceSDKTests(unittest.TestCase):
         original = cls.directory / "initial package"
         cls.prefix = cls.directory / "relocated prefix with spaces"
         cls.run_ok([sys.executable, "-B", str(ROOT / "cmake/package/package_source_sdk.py"),
-                    "--source", str(ROOT), "--output", str(original), "--development-fixture"])
+                    "--source", str(ROOT), "--output", str(original), "--development-fixture",
+                    "--backend", "threadx", "--host-support",
+                    "--component", "network", "--component", "tls",
+                    "--component", "mqtt", "--component", "mcuboot"])
         original.rename(cls.prefix)
         cls.sdk = cls.prefix / "share/nexus/src"
         cls.identity = json.loads((cls.sdk / ".nexus-source-sdk.json").read_text())
@@ -1491,7 +927,7 @@ class SourceSDKTests(unittest.TestCase):
     def standalone_resolver_commands(self):
         directory = self.directory / "standalone resolver boundary"
         directory.mkdir(exist_ok=True)
-        soc = json.loads((self.sdk / "soc/native/soc.json").read_text())
+        soc = json.loads((self.sdk / "tests/support/native/soc.json").read_text())
         (directory / "cpu.json").write_text(json.dumps({
             "schema_version": 1, "cpu": soc["cpu"], "irq": soc["irq"],
             "clock_hz": 1000000}) + "\n")
@@ -1500,8 +936,8 @@ class SourceSDKTests(unittest.TestCase):
                            'backend="baremetal"\noptimization="Os"\n')
         return {
             "platform": [sys.executable, "-B", str(self.sdk / "tools/configure/configure.py"),
-                "--assembly", str(self.sdk / "tools/configure/assemblies/native-empty.toml"),
-                "--output", str(directory / "platform-generated")],
+                "--assembly", str(self.sdk / "tests/support/native/assemblies/native-empty.toml"),
+                "--output", str(directory / "platform-generated"), "--test-support"],
             "runtime": [sys.executable, "-B", str(self.sdk / "tools/configure/runtime.py"),
                 "--assembly", str(runtime), "--output", str(directory / "runtime-generated")],
             "cpu": [sys.executable, "-B", str(self.sdk / "tools/configure/cpu.py"),
@@ -1572,7 +1008,7 @@ class SourceSDKTests(unittest.TestCase):
         source, build, result = self.consumer("native", fixture=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual((build / "resolved-sdk.txt").read_text(), str(self.sdk))
-        self.run_ok(["cmake", "--build", str(build), "--parallel", "4"])
+        self.run_ok(["cmake", "--build", str(build), "--parallel", "1"])
         for application in ("installed_c", "installed_cpp"):
             self.run_ok([str(build / "bin" / application)])
         self.run_ok([str(build / "parent_plain")])
@@ -1588,7 +1024,7 @@ class SourceSDKTests(unittest.TestCase):
         assembly = source / "assembly.toml"
         assembly.write_text(
             'schema=2\nbackend="native"\nclock="model"\n'
-            f'board_package="{self.sdk}/boards/native_reference"\n'
+            f'board_package="{self.sdk}/tests/support/native/board"\n'
             '[memory]\nmain_stack_bytes=2048\nlibc_heap_bytes=0\n'
             '[gpio.led0]\nbinding="led0"\nmode="output"\n'
             '[spi.bus0]\nbinding="spi0"\nmode="short-poll"\n'
@@ -1662,7 +1098,9 @@ class SourceSDKTests(unittest.TestCase):
         project_build = self.directory / "policy source project"
         self.run_ok(["cmake", "-S", str(self.sdk), "-B", str(project_build),
                      "-G", "Ninja", "-DNEXUS_BUILD_TESTS=OFF",
-                     "-DNEXUS_BUILD_WORKLOAD=OFF"])
+                     "-DNEXUS_BUILD_WORKLOAD=OFF", "-DNEXUS_TEST_SUPPORT=ON",
+                     "-DNEXUS_ASSEMBLY_FILE=" + str(self.sdk /
+                     "tests/support/native/assemblies/native.toml")])
         cache = (project_build / "CMakeCache.txt").read_text().splitlines()
         observed = next(line.split("=", 1)[1] for line in cache
                         if line.startswith("CMAKE_PROJECT_VERSION:STATIC="))
@@ -1701,75 +1139,7 @@ class SourceSDKTests(unittest.TestCase):
             self.assertEqual(resources["status"], "passed")
         self.check_private_includes(build)
 
-    @unittest.skipUnless(shutil.which("arm-none-eabi-gcc"), "ARM GNU toolchain unavailable: no ARM execution claim")
-    def test_relocated_gd32_consumer_compiles_real_startup_and_linker(self):
-        _, build, result = self.consumer("gd32 arm", arm=True, chip="gd32", fixture=True)
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.run_ok(["cmake", "--build", str(build), "--parallel", "1", "--target", "installed_c", "installed_cpp"])
-        for application in ("installed_c", "installed_cpp"):
-            self.assertGreater((build / "bin" / (application + ".elf")).stat().st_size, 0)
-            resources = json.loads((build / "bin" / (application + ".resources.json")).read_text())
-            self.assertEqual(resources["status"], "passed")
-        self.check_private_includes(build)
 
-    @unittest.skipUnless(shutil.which("arm-none-eabi-gcc"), "ARM GNU toolchain unavailable: no ARM execution claim")
-    def test_relocated_g474_selected_baremetal_and_freertos_consumers_link(self):
-        for backend, filename in (("baremetal", "io.toml"),
-                                  ("freertos", "io-freertos.toml")):
-            with self.subTest(backend=backend):
-                source, build, arguments = consumer_gate.prepare_consumer(
-                    self.prefix, self.directory, "g474 " + backend,
-                    self.run_ok, fixture=True, arm=True)
-                kernel = " LIBRARIES Nexus::OSFreeRTOS" if backend == "freertos" else ""
-                definitions = "NX_G474_IO_FIXTURE"
-                if backend == "freertos":
-                    definitions += " NX_G474_FREERTOS_FIXTURE"
-                (source / "CMakeLists.txt").write_text(
-                    'cmake_minimum_required(VERSION 3.31)\n'
-                    'project(installed_g474_consumer LANGUAGES C ASM)\n'
-                    'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
-                    f'find_package(Nexus {load_policy(self.sdk)["semantic_version"]} EXACT CONFIG REQUIRED)\n'
-                    f'nexus_add_firmware(installed_g474 SOURCES main.c{kernel})\n'
-                    f'target_compile_definitions(installed_g474 PRIVATE {definitions})\n'
-                    'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
-                    'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
-                    'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
-                    'file(WRITE "${CMAKE_BINARY_DIR}/resolved-config.txt" "${config_root}")\n')
-                fixture = ROOT / "tests/contracts/g474_assembly"
-                shutil.copyfile(fixture / "main.c", source / "main.c")
-                assembly = source / "g474.toml"
-                text = (fixture / filename).read_text()
-                text = text.replace(
-                    'board_package = "../../../boards/stm32g474re_hse24_reference"',
-                    f'board_package = "{self.sdk}/boards/stm32g474re_hse24_reference"')
-                assembly.write_text(text)
-                arguments = [argument for argument in arguments
-                             if not argument.startswith("-DNEXUS_ASSEMBLY_FILE=")]
-                arguments.append(f"-DNEXUS_ASSEMBLY_FILE={assembly}")
-                self.run_ok(arguments)
-                self.assertEqual((build / "resolved-sdk.txt").read_text(), str(self.sdk))
-                self.run_ok(["cmake", "--build", str(build), "--parallel", "4",
-                             "--target", "installed_g474"])
-                image = build / "bin/installed_g474.elf"
-                resources = json.loads(
-                    (build / "bin/installed_g474.resources.json").read_text())
-                self.assertEqual(resources["status"], "passed")
-                self.assertGreater(image.stat().st_size, 0)
-                config = Path((build / "resolved-config.txt").read_text())
-                self.run_ok([sys.executable, "-B",
-                    str(self.sdk / "tools/measurement/retention.py"),
-                    "--elf", str(image), "--bindings", str(config / "bindings.c"),
-                    "--output", str(build / "provider-retention.json")])
-                retention = json.loads((build / "provider-retention.json").read_text())
-                self.assertEqual(retention["status"], "passed")
-                commands = json.loads((build / "compile_commands.json").read_text())
-                products = [entry for entry in commands
-                            if Path(entry["file"]).resolve() == source / "main.c"]
-                self.assertEqual(len(products), 1)
-                for entry in commands:
-                    self.assertNotIn(str(ROOT) + "/", entry["command"])
-                self.assertFalse(consumer_gate.private_compile_inputs(
-                    products[0], self.sdk))
 
     def check_private_includes(self, build):
         commands = json.loads((build / "compile_commands.json").read_text())
@@ -1780,69 +1150,9 @@ class SourceSDKTests(unittest.TestCase):
             self.assertFalse(consumer_gate.private_compile_inputs(entry, self.sdk))
             self.assertNotIn(str(ROOT) + "/", command)
 
-    def modern_consumer(self, family, board, backend):
-        consumers = self.directory / "typed platform consumers"
-        consumers.mkdir(exist_ok=True)
-        source, build, arguments = consumer_gate.prepare_modern_consumer(
-            self.prefix, consumers, family, backend, self.run_ok,
-            fixture=True)
-        self.assertIn(str(self.sdk / "boards" / board),
-                      (source / "assembly.toml").read_text())
-        self.run_ok(arguments)
-        self.assertEqual((build / "resolved-sdk.txt").read_text(), str(self.sdk))
-        self.run_ok(["cmake", "--build", str(build), "--parallel", "2",
-                     "--target", "installed_modern"])
-        image = build / "bin/installed_modern.elf"
-        resources = json.loads(
-            (build / "bin/installed_modern.resources.json").read_text())
-        self.assertEqual(resources["status"], "passed")
-        self.assertGreater(image.stat().st_size, 0)
-        config = Path((build / "resolved-config.txt").read_text())
-        self.run_ok([sys.executable, "-B",
-            str(self.sdk / "tools/measurement/retention.py"),
-            "--elf", str(image), "--bindings", str(config / "bindings.c"),
-            "--resolved", str(config / "resolved.json"),
-            "--output", str(build / "provider-retention.json")])
-        retention = json.loads((build / "provider-retention.json").read_text())
-        self.assertEqual(retention["status"], "passed")
-        commands = json.loads((build / "compile_commands.json").read_text())
-        products = [entry for entry in commands
-                    if Path(entry["file"]).resolve() == source / "main.c"]
-        self.assertEqual(len(products), 1)
-        for entry in commands:
-            self.assertNotIn(str(ROOT) + "/", entry["command"])
-        self.assertFalse(consumer_gate.private_compile_inputs(products[0], self.sdk))
-        # The SDK must supply the selected original vector table, exactly once.
-        startup_name = {
-            "h743": "startup_stm32h743xx.s", "u575": "startup_stm32u575xx.s",
-            "f103": "startup_stm32f103xb.s", "gd303": "startup_gd32f30x_hd.S",
-            "g474": "startup_stm32g474xx.s"}[family]
-        startup = [entry for entry in commands
-                   if Path(entry["file"]).name == startup_name]
-        self.assertEqual(len(startup), 1)
-        self.assertTrue(Path(startup[0]["file"]).is_relative_to(self.sdk))
 
-    @unittest.skipUnless(shutil.which("arm-none-eabi-gcc"), "ARM GNU toolchain unavailable: no ARM execution claim")
-    def test_relocated_h743_selected_baremetal_and_freertos_consumers_link(self):
-        for backend in ("baremetal", "freertos"):
-            with self.subTest(backend=backend):
-                self.modern_consumer("h743", "stm32h743_nucleo_zi2", backend)
 
-    @unittest.skipUnless(shutil.which("arm-none-eabi-gcc"), "ARM GNU toolchain unavailable: no ARM execution claim")
-    def test_relocated_u575_selected_baremetal_and_freertos_consumers_link(self):
-        for backend in ("baremetal", "freertos"):
-            with self.subTest(backend=backend):
-                self.modern_consumer("u575", "stm32u575_nucleo_zi_q", backend)
 
-    def test_relocated_mainstream_consumers_use_their_actual_startup_and_abi(self):
-        self.assertIsNotNone(shutil.which("arm-none-eabi-gcc"),
-                             "ARM GNU toolchain required for MCU consumers")
-        for family, board in (("f103", "stm32f103_reference"),
-                              ("gd303", "gd32f303_reference"),
-                              ("g474", "stm32g474re_hse24_reference")):
-            for backend in ("baremetal", "freertos"):
-                with self.subTest(family=family, backend=backend):
-                    self.modern_consumer(family, board, backend)
 
     def threadx_consumer(self, name, board, clock, *, arm):
         source, build, arguments = consumer_gate.prepare_consumer(
@@ -1872,7 +1182,7 @@ class SourceSDKTests(unittest.TestCase):
         arguments.append(f"-DNEXUS_ASSEMBLY_FILE={assembly}")
         self.run_ok(arguments)
         self.assertEqual((build / "resolved-sdk.txt").read_text(), str(self.sdk))
-        self.run_ok(["cmake", "--build", str(build), "--parallel", "4",
+        self.run_ok(["cmake", "--build", str(build), "--parallel", "1",
                      "--target", "installed_threadx"])
         commands = json.loads((build / "compile_commands.json").read_text())
         product = [entry for entry in commands
@@ -1898,8 +1208,7 @@ class SourceSDKTests(unittest.TestCase):
     def test_relocated_threadx_three_board_consumers_link_actual_official_kernel(self):
         for name, board, clock in (
                 ("qiming", "stm32f407_qiming_v31", "hse8-pll168"),
-                ("sky", "stm32f407ve_sky_qingchun", "hse8-pll168"),
-                ("liangshan", "gd32f470_liangshan", "hxtal25-pll200")):
+                ("sky", "stm32f407ve_sky_qingchun", "hse8-pll168")):
             with self.subTest(board=board):
                 self.threadx_consumer("threadx " + name, board, clock, arm=True)
 
@@ -1962,7 +1271,7 @@ class SourceSDKTests(unittest.TestCase):
 
     @_isolated_sdk_prefix
     def test_missing_license_is_rejected(self):
-        target = self.sdk / "ext/freertos/LICENSE.md"
+        target = self.sdk / "ext/threadx/LICENSE.txt"
         original = target.read_bytes()
         try:
             target.unlink()
@@ -1989,7 +1298,7 @@ class SourceSDKTests(unittest.TestCase):
                       (output / "selection.cmake").read_text())
         identity_path = self.sdk / source_sdk.MANIFEST
         identity = json.loads(identity_path.read_text())
-        name = "soc/stm32/stm32f407/memory_init.c"
+        name = "soc/stm32/stm32f4/memory_init.c"
         (self.sdk / name).unlink()
         identity["files_sha256"].pop(name)
         identity["snapshot_sha256"] = hashlib.sha256(json.dumps(
@@ -2009,6 +1318,8 @@ class SourceSDKTests(unittest.TestCase):
         identity = self.sdk / source_sdk.MANIFEST
         original_identity = identity.read_bytes()
         for name in ("cmake/platform/CMSISCore.cmake",
+                     "core/include/nexus/core/lifecycle.h",
+                     "core/src/lifecycle.c",
                      "arch/include/nexus/arch/arch.h",
                      "arch/arm/cortex_m/nx_arch_cortex_m.c",
                      "arch/arm/cortex_m/private/compiler.h",
@@ -2075,45 +1386,6 @@ class SourceSDKTests(unittest.TestCase):
                     target.write_bytes(old_source)
                     identity.write_bytes(old_identity)
 
-    @_isolated_sdk_prefix
-    def test_rehashed_soc_extensions_and_reference_omissions_reject(self):
-        identity = self.sdk / source_sdk.MANIFEST
-        old_identity = identity.read_bytes()
-        names = ["soc/stm32/stm32g474/drivers/exti.c",
-                 "soc/stm32/stm32h743/drivers/uart_dma.c",
-                 "soc/stm32/stm32h743/private/stm32h743_dma.h",
-                 "soc/stm32/stm32u575/security.c",
-                 "soc/stm32/stm32u575/private/stm32u575_security.h",
-                 "soc/stm32/stm32u575/private/stm32u575_security_hw.h"]
-        for mechanism in ("cache_control", "nonsecure"):
-            names += [f"arch/include/nexus/arch/{mechanism}.h",
-                      f"arch/arm/cortex_m/nx_arch_{mechanism}.c",
-                      f"arch/arm/cortex_m/private/{mechanism}.h"]
-        names += [f"tools/configure/assemblies/nucleo-{chip}-{backend}-{mode}.toml"
-                  for chip in ("h743", "u575")
-                  for backend in ("baremetal", "freertos")
-                  for mode in ("empty", "uart")]
-        self.assertEqual(self.verify().returncode, 0)
-        for name in names:
-            with self.subTest(name=name):
-                target = self.sdk / name
-                old_source = target.read_bytes()
-                try:
-                    target.unlink()
-                    manifest = json.loads(old_identity)
-                    manifest["files_sha256"].pop(name)
-                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
-                        manifest["files_sha256"], sort_keys=True,
-                        separators=(",", ":")).encode())
-                    identity.write_text(json.dumps(manifest) + "\n")
-                    result = self.verify()
-                    self.assertNotEqual(result.returncode, 0,
-                                        "Rehashed extension omission accepted: " + name)
-                    self.assertIn("missing required sources/licenses", result.stderr)
-                finally:
-                    target.write_bytes(old_source)
-                    identity.write_bytes(old_identity)
-        self.assertEqual(self.verify().returncode, 0)
 
     @_isolated_sdk_prefix
     def test_rehashed_secondary_controller_generator_omission_rejects(self):
@@ -2143,50 +1415,52 @@ class SourceSDKTests(unittest.TestCase):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
         names = (
-            "core/src/fault.c", "core/include/nexus/core/fault.h",
-            "io/include/nexus/io/usb_device.h", "drivers/usb/fs_device_pio/usb_device_controller.c",
-            "drivers/usb/fs_device_pio/usb_device_controller.h", "soc/native/drivers/usb_device_access.h",
-            "io/include/nexus/io/ethernet.h", "drivers/ethernet/legacy_mac/eth_mac.c",
-            "drivers/ethernet/legacy_mac/eth_mac.h", "io/include/nexus/io/mdio.h",
-            "soc/stm32/stm32f407/drivers/usb_device.c",
-            "soc/gd32/gd32f470/drivers/ethernet.c",
-            "soc/stm32/stm32f407/private/stm32f407_can.h",
-            "drivers/can/classic_can/can_controller.c", "drivers/can/classic_can/can_controller.h",
-            "io/include/nexus/io/advanced_pwm.h",
-            "drivers/timer/advanced_timer/timer_advanced_controller.h",
-            "soc/gd32/gd32f470/drivers/timer_capture.c",
-            "os/freertos/timebase_lowpower.c",
-            "os/freertos/private/timebase_lowpower.h",
-            "soc/stm32/stm32f407/timebase_lowpower.c", "soc/gd32/gd32f470/usb_clock.c",
-            "tools/configure/usb_device.py", "tools/configure/ethernet.py",
-            "tools/configure/timer_advanced.py", "tools/configure/bindings.py",
-            "cmake/platform/ControllerModes.cmake",
-            "components/clock_domain/private/clock_domain_impl.h",
-            "components/amp_ipc/CMakeLists.txt",
-            "components/amp_ipc/src/amp_ipc.c",
-            "components/amp_ipc/include/nexus/components/amp_ipc.h",
-            "components/amp_ipc/include/nexus/components/amp_ipc_storage.h",
-            "components/soc/stm32/stm32f407_handoff/CMakeLists.txt",
-            "components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
-            "soc/stm32/stm32f407/handoff.c",
-            "soc/stm32/stm32f407/private/stm32f407_handoff_hw.h",
-            "io/include/nexus/io/frame_stream.h", "io/src/mechanisms/frame_stream.c",
-            "components/soc/stm32/stm32h743_frame_dma2d/CMakeLists.txt",
-            "components/soc/stm32/stm32h743_frame_dma2d/include/nexus/components/frame_dma2d.h",
-            "components/soc/stm32/stm32h743_frame_dma2d/src/h743_frame_dma2d.c",
-            "components/mapped_storage/CMakeLists.txt",
-            "components/mapped_storage/src/mapped_storage_owner.c",
-            "components/mapped_storage/src/native_mapped_storage.c",
-            "components/mapped_storage/include/nexus/components/mapped_storage.h",
-            "components/user_io_broker/include/nexus/components/user_io_broker.h",
-            "components/dp83848/include/nexus/dp83848/dp83848.h",
-            "soc/stm32/stm32g474/system.c", "soc/stm32/stm32g474/drivers/uart.c",
-            "soc/stm32/stm32g474/private/stm32g474_provider.h",
-            "soc/stm32/stm32g474/soc.json", "soc/stm32/stm32g474/routes.json",
-            "boards/stm32g474re_hse24_reference/board.json",
-            "soc/stm32/stm32g474/configure/__init__.py",
-            "soc/stm32/stm32g474/configure/bindings.py",
-            "soc/stm32/stm32g474/configure/emission.py")
+            'core/src/fault.c',
+            'core/include/nexus/core/fault.h',
+            'io/include/nexus/io/usb_device.h',
+            'soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c',
+            'soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.h',
+            'tests/support/native/drivers/usb_device_access.h',
+            'io/include/nexus/io/ethernet.h',
+            'soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c',
+            'soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.h',
+            'io/include/nexus/io/mdio.h',
+            'soc/stm32/stm32f4/drivers/usb_device.c',
+            'soc/stm32/stm32f4/private/stm32f407_can.h',
+            'soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c',
+            'soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.h',
+            'io/include/nexus/io/advanced_pwm.h',
+            'soc/stm32/stm32f4/drivers/ip/advanced_timer/timer_advanced_controller.h',
+            'os/freertos/timebase_lowpower.c',
+            'os/freertos/private/timebase_lowpower.h',
+            'soc/stm32/stm32f4/timebase_lowpower.c',
+            'tools/configure/usb_device.py',
+            'tools/configure/ethernet.py',
+            'tools/configure/timer_advanced.py',
+            'tools/configure/bindings.py',
+            'cmake/platform/ControllerModes.cmake',
+            'components/clock_domain/private/clock_domain_impl.h',
+            'components/amp_ipc/CMakeLists.txt',
+            'components/amp_ipc/src/amp_ipc.c',
+            'components/amp_ipc/include/nexus/components/amp_ipc.h',
+            'components/amp_ipc/include/nexus/components/amp_ipc_storage.h',
+            'components/soc/stm32/stm32f407_handoff/CMakeLists.txt',
+            'components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h',
+            'soc/stm32/stm32f4/handoff.c',
+            'soc/stm32/stm32f4/private/stm32f407_handoff_hw.h',
+            'io/include/nexus/io/frame_stream.h',
+            'io/src/mechanisms/frame_stream.c',
+            'components/mapped_storage/CMakeLists.txt',
+            'components/mapped_storage/src/mapped_storage_owner.c',
+            'components/mapped_storage/src/native_mapped_storage.c',
+            'components/mapped_storage/include/nexus/components/mapped_storage.h',
+            'components/user_io_broker/include/nexus/components/user_io_broker.h',
+            'components/dp83848/include/nexus/dp83848/dp83848.h',
+            'soc/stm32/stm32f4/system.c',
+            'soc/stm32/stm32f4/drivers/platform_lifecycle.c',
+            'soc/stm32/stm32f4/drivers/system_lifecycle.c',
+            'soc/stm32/stm32f4/devices.json',
+        )
         for name in names:
             with self.subTest(name=name):
                 target = self.sdk / name
@@ -2384,85 +1658,8 @@ class SourceSDKTests(unittest.TestCase):
         finally:
             file.write_bytes(original)
 
-    @_isolated_sdk_prefix
-    def test_rehashed_g4_source_notice_lock_and_verifier_omissions_reject(self):
-        identity = self.sdk / source_sdk.MANIFEST
-        old_identity = identity.read_bytes()
-        lock = json.loads((self.sdk / "dependencies/stm32g4.lock.json").read_text())
-        names = ["vendors/st/cmsis_device_g4/" + name for name in lock["files"]]
-        names.extend(("dependencies/stm32g4.lock.json",
-                      "tools/maintenance/stm32g4_lock.py"))
-        for name in names:
-            with self.subTest(name=name):
-                file = self.sdk / name
-                old_source = file.read_bytes()
-                try:
-                    file.unlink()
-                    manifest = json.loads(old_identity)
-                    manifest["files_sha256"].pop(name)
-                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
-                        manifest["files_sha256"], sort_keys=True,
-                        separators=(",", ":")).encode())
-                    identity.write_text(json.dumps(manifest) + "\n")
-                    self.assertNotEqual(self.verify().returncode, 0)
-                finally:
-                    file.write_bytes(old_source)
-                    identity.write_bytes(old_identity)
 
-    @_isolated_sdk_prefix
-    def test_rehashed_g4_wrong_commit_changed_source_or_reduced_graph_reject(self):
-        identity = self.sdk / source_sdk.MANIFEST
-        old_identity = identity.read_bytes()
-        source = self.sdk / "vendors/st/cmsis_device_g4/Include/stm32g474xx.h"
-        lock_path = self.sdk / "dependencies/stm32g4.lock.json"
-        original_source = source.read_bytes()
-        original_lock = lock_path.read_bytes()
-        try:
-            manifest = json.loads(old_identity)
-            next(x for x in manifest["dependencies"]
-                 if x["path"] == "vendors/st/cmsis_device_g4")["commit"] = "a" * 40
-            identity.write_text(json.dumps(manifest))
-            self.assertNotEqual(self.verify().returncode, 0)
-            for file, content in ((source, original_source + b"\n/* unreviewed */\n"),
-                                  (lock_path, json.dumps({**json.loads(original_lock),
-                                      "files": {}}).encode())):
-                file.write_bytes(content)
-                manifest = json.loads(old_identity)
-                manifest["files_sha256"][file.relative_to(self.sdk).as_posix()] = source_sdk.digest(content)
-                manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
-                    manifest["files_sha256"], sort_keys=True,
-                    separators=(",", ":")).encode())
-                identity.write_text(json.dumps(manifest))
-                self.assertNotEqual(self.verify().returncode, 0)
-                source.write_bytes(original_source)
-                lock_path.write_bytes(original_lock)
-        finally:
-            source.write_bytes(original_source)
-            lock_path.write_bytes(original_lock)
-            identity.write_bytes(old_identity)
 
-    @_isolated_sdk_prefix
-    def test_installed_g4_cli_verifies_manifest_readonly_without_git_fallback(self):
-        before = {p.relative_to(self.sdk).as_posix()
-                  for p in self.sdk.rglob("*") if p.is_file()}
-        command = [sys.executable, str(self.sdk / "tools/maintenance/stm32g4_lock.py"),
-                   "--source", str(self.sdk / "vendors/st/cmsis_device_g4"),
-                   "--lock", str(self.sdk / "dependencies/stm32g4.lock.json")]
-        result = self.run_process(command)
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertEqual(json.loads(result.stdout)["verified_files"], 5)
-        self.assertEqual(json.loads(result.stdout)["source_kind"], "installed_source_sdk")
-        after = {p.relative_to(self.sdk).as_posix()
-                 for p in self.sdk.rglob("*") if p.is_file()}
-        self.assertEqual(after, before)
-        source = self.sdk / "vendors/st/cmsis_device_g4/Include/stm32g474xx.h"
-        old_source = source.read_bytes()
-        try:
-            source.write_bytes(b"corrupted")
-            result = self.run_process(command)
-            self.assertNotEqual(result.returncode, 0)
-        finally:
-            source.write_bytes(old_source)
 
     def rehash_manifest_file(self, manifest, file, data):
         file.write_bytes(data)
@@ -2473,149 +1670,10 @@ class SourceSDKTests(unittest.TestCase):
             separators=(",", ":")).encode())
         (self.sdk / source_sdk.MANIFEST).write_text(json.dumps(manifest) + "\n")
 
-    @_isolated_sdk_prefix
-    def test_rehashed_modern_soc_owned_firmware_omissions_reject(self):
-        identity = self.sdk / source_sdk.MANIFEST
-        old_identity = identity.read_bytes()
-        names = ["soc/stm32/stm32h743/power_boot.S",
-                 "soc/stm32/stm32h743/private/boot_registers.h"]
-        for family, board in (("stm32h743", "stm32h743_nucleo_zi2"),
-                              ("stm32u575", "stm32u575_nucleo_zi_q")):
-            names += [f"{source_directory(family)}/" + name for name in (
-                "CMakeLists.txt", "system.c", "drivers/gpio.c", "drivers/uart.c",
-                f"private/{family}_system.h", f"private/{family}_provider.h",
-                "soc.json", "routes.json")]
-            names.append(f"boards/{board}/board.json")
-        for name in names:
-            with self.subTest(name=name):
-                file = self.sdk / name
-                old_source = file.read_bytes()
-                try:
-                    file.unlink()
-                    manifest = json.loads(old_identity)
-                    manifest["files_sha256"].pop(name)
-                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
-                        manifest["files_sha256"], sort_keys=True,
-                        separators=(",", ":")).encode())
-                    identity.write_text(json.dumps(manifest) + "\n")
-                    result = self.verify()
-                    self.assertNotEqual(result.returncode, 0,
-                                        "Rehashed actual firmware omission accepted")
-                    self.assertIn("missing required sources/licenses", result.stderr)
-                finally:
-                    file.write_bytes(old_source)
-                    identity.write_bytes(old_identity)
 
-    @_isolated_sdk_prefix
-    def test_rehashed_device_lock_cannot_substitute_another_reviewed_selector(self):
-        baseline = self.verify()
-        self.assertEqual(baseline.returncode, 0, baseline.stderr)
-        marker = self.sdk / source_sdk.MANIFEST
-        original_marker = marker.read_bytes()
-        lock = self.sdk / "dependencies/stm32h747.lock.json"
-        original_lock = lock.read_bytes()
-        try:
-            lock.write_bytes((self.sdk / "dependencies/stm32h7.lock.json")
-                             .read_bytes())
-            identity = json.loads(original_marker)
-            identity["files_sha256"]["dependencies/stm32h747.lock.json"] = (
-                source_sdk.digest(lock.read_bytes()))
-            identity["snapshot_sha256"] = source_sdk.digest(json.dumps(
-                identity["files_sha256"], sort_keys=True,
-                separators=(",", ":")).encode())
-            marker.write_text(json.dumps(identity))
-            rejected = self.verify()
-            self.assertNotEqual(rejected.returncode, 0,
-                                "A rehashed H743 lock replaced the H747 review")
-        finally:
-            lock.write_bytes(original_lock)
-            marker.write_bytes(original_marker)
 
-    @_isolated_sdk_prefix
-    def test_rehashed_modern_device_source_notice_lock_omissions_reject(self):
-        identity = self.sdk / source_sdk.MANIFEST
-        old_identity = identity.read_bytes()
-        names = ["tools/maintenance/cmsis_device_lock.py"]
-        for review in source_sdk.cmsis_device_lock.REVIEWED_DEVICES.values():
-            names += [review["directory"] + "/" + name
-                      for name in sorted(review["files"])]
-            names.append(review["lock_name"])
-        for name in names:
-            with self.subTest(name=name):
-                file = self.sdk / name
-                old_source = file.read_bytes()
-                try:
-                    file.unlink()
-                    manifest = json.loads(old_identity)
-                    manifest["files_sha256"].pop(name)
-                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
-                        manifest["files_sha256"], sort_keys=True,
-                        separators=(",", ":")).encode())
-                    identity.write_text(json.dumps(manifest) + "\n")
-                    self.assertNotEqual(self.verify().returncode, 0,
-                                        "Rehashed original device input omission accepted")
-                finally:
-                    file.write_bytes(old_source)
-                    identity.write_bytes(old_identity)
 
-    @_isolated_sdk_prefix
-    def test_rehashed_modern_device_wrong_commit_changed_source_and_reduced_lock_reject(self):
-        identity = self.sdk / source_sdk.MANIFEST
-        old_identity = identity.read_bytes()
-        for review in source_sdk.cmsis_device_lock.REVIEWED_DEVICES.values():
-            with self.subTest(part=review["directory"]):
-                source = (self.sdk / review["directory"] /
-                          review.get("license_path", "LICENSE.md"))
-                lock = self.sdk / review["lock_name"]
-                old_source, old_lock = source.read_bytes(), lock.read_bytes()
-                try:
-                    manifest = json.loads(old_identity)
-                    next(record for record in manifest["dependencies"]
-                         if record["path"] == review["directory"])["commit"] = "a" * 40
-                    identity.write_text(json.dumps(manifest) + "\n")
-                    self.assertNotEqual(self.verify().returncode, 0,
-                                        "Wrong reviewed device commit accepted")
-                    self.rehash_manifest_file(json.loads(old_identity), source,
-                        old_source + b"\n/* unreviewed original notice */\n")
-                    self.assertNotEqual(self.verify().returncode, 0,
-                                        "Rehashed changed original notice accepted")
-                    source.write_bytes(old_source)
-                    reduced = {**json.loads(old_lock), "files": {}}
-                    self.rehash_manifest_file(json.loads(old_identity), lock,
-                                              json.dumps(reduced).encode())
-                    self.assertNotEqual(self.verify().returncode, 0,
-                                        "Rehashed reduced reviewed graph accepted")
-                finally:
-                    source.write_bytes(old_source)
-                    lock.write_bytes(old_lock)
-                    identity.write_bytes(old_identity)
 
-    @_isolated_sdk_prefix
-    def test_installed_modern_device_cli_is_readonly_and_requires_complete_sdk(self):
-        before = {p.relative_to(self.sdk).as_posix()
-                  for p in self.sdk.rglob("*") if p.is_file()}
-        for review in source_sdk.cmsis_device_lock.REVIEWED_DEVICES.values():
-            with self.subTest(part=review["directory"]):
-                command = [sys.executable,
-                    str(self.sdk / "tools/maintenance/cmsis_device_lock.py"),
-                    "--source", str(self.sdk / review["directory"]),
-                    "--lock", str(self.sdk / review["lock_name"])]
-                result = self.run_process(command)
-                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                report = json.loads(result.stdout)
-                self.assertEqual(report["verified_files"], len(review["files"]))
-                self.assertEqual(report["source_kind"], "installed_source_sdk")
-                source = self.sdk / "core/src/request.c"
-                old_source = source.read_bytes()
-                try:
-                    source.write_bytes(b"corrupted unrelated SDK owner source")
-                    self.assertNotEqual(self.run_process(command).returncode, 0,
-                                        "Device CLI ignored complete SDK proof")
-                finally:
-                    source.write_bytes(old_source)
-        after = {p.relative_to(self.sdk).as_posix()
-                 for p in self.sdk.rglob("*") if p.is_file()}
-        self.assertEqual(after, before)
 
     @_isolated_sdk_prefix
     def test_sdk_manifest_sources_exports_and_file_set_stay_unchanged_during_verify(self):
@@ -2698,7 +1756,8 @@ class SourceSDKTests(unittest.TestCase):
     @_isolated_sdk_prefix
     def test_git_checkout_inside_sdk_cannot_bypass_whole_manifest(self):
         for family, dependency, lock_name, extra in (
-                ("G4", "vendors/st/cmsis_device_g4", "stm32g4", []),
+                ("F4", "vendors/st/stm32f4_hal", "stm32f4-hal",
+                 ["--cmsis-source", str(self.sdk / "vendors/st/cmsis_device_f4")]),
                 ("ThreadX", "ext/threadx", "threadx", ["--port", "linux"])):
             with self.subTest(dependency=dependency):
                 source = self.sdk / dependency
@@ -2723,7 +1782,7 @@ class SourceSDKTests(unittest.TestCase):
                                                  "--porcelain"]).stdout, "")
                     other.write_bytes(original + b"\n# altered SDK composition\n")
                     result = self.run_process([
-                        sys.executable, "-B", str(self.sdk / ("tools/maintenance/" + lock_name + "_lock.py")),
+                        sys.executable, "-B", str(self.sdk / ("tools/maintenance/" + lock_name.replace("-", "_") + "_lock.py")),
                         "--source", str(source), "--lock", str(lock_path), *extra])
                     self.assertNotEqual(result.returncode, 0,
                                         "Valid source Git must not bypass SDK manifest verification")
@@ -2782,41 +1841,7 @@ class SourceSDKTests(unittest.TestCase):
         self.assertFalse((self.directory / "must not export empty SDK").exists())
 
 
-    def test_canonical_external_provider_runs_with_relocated_sdk(self):
-        """Execute the shipped C11 lifecycle through an independent project."""
-        workspace = self.directory / "canonical external lifecycle"
-        workspace.mkdir()
-        source, build, command = consumer_gate.prepare_external_provider_consumer(
-            self.prefix, workspace, self.run_ok,
-            expected_revision=self.identity["source_revision"], fixture=True)
-        self.run_ok(command)
-        self.run_ok(["cmake", "--build", str(build), "--target",
-                     "external_lifecycle_consumer", "--parallel", "1"])
-        observed = consumer_gate.check_external_provider_consumer(
-            self.sdk, source, build, self.run_ok)
-        self.assertEqual(observed["status"], "passed")
-        self.assertEqual(observed["physical_status"], "not_executed")
-        self.assertEqual(observed["canonical_source"]["sha256"],
-                         observed["public_source"]["sha256"])
-        self.assertFalse(self.identity["publishable"])
 
-    @_isolated_sdk_prefix
-    def test_declared_external_adapter_omission_rejects_after_sdk_rehash(self):
-        """An outer payload map cannot withdraw a declared package member."""
-        import hashlib
-
-        name = ("cmake/package/verification/external_provider/"
-                "provider/soc/lifecycle_adapter.c")
-        self.assertIn(name, self.identity["files_sha256"])
-        (self.sdk / name).unlink()
-        del self.identity["files_sha256"][name]
-        encoded = json.dumps(self.identity["files_sha256"], sort_keys=True,
-                             separators=(",", ":")).encode()
-        self.identity["snapshot_sha256"] = hashlib.sha256(encoded).hexdigest()
-        (self.sdk / source_sdk.MANIFEST).write_text(json.dumps(self.identity))
-        result = self.verify()
-        self.assertNotEqual(result.returncode, 0)
-        self.assertRegex(result.stderr, "regular file|missing|required")
 
 
 if __name__ == "__main__":

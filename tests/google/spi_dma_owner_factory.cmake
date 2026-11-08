@@ -5,7 +5,7 @@ set(spi_owner_factory_bundle "${CMAKE_CURRENT_BINARY_DIR}/native-spi-dma-factory
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     "${spi_owner_factory_input}")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-    "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
+    "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
     --source-root "${NEXUS_SOURCE_DIR}" --assembly "${spi_owner_factory_input}"
     --output "${spi_owner_factory_bundle}" RESULT_VARIABLE spi_owner_factory_result
     OUTPUT_VARIABLE spi_owner_factory_output ERROR_VARIABLE spi_owner_factory_error)
@@ -18,5 +18,5 @@ nexus_google_test(nexus_native_spi_dma_factory_test
     SOURCES native_spi_dma_factory_test.cpp
         "${spi_owner_factory_bundle}/bindings.c"
     LIBRARIES Nexus::SPIDMATransactionOwner Nexus::NativeModel Nexus::Arch
-    INCLUDES "${spi_owner_factory_bundle}" "${NEXUS_SOURCE_DIR}/soc/native/drivers"
+    INCLUDES "${spi_owner_factory_bundle}" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
         "${NEXUS_SOURCE_DIR}/io/private")

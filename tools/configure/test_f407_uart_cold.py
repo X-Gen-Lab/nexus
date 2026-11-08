@@ -1,4 +1,5 @@
 """Selected F407 UART construction keeps hardware lifecycle in C."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import replace
 from pathlib import Path
 import tempfile
@@ -21,17 +22,17 @@ class F407UartColdTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "assembly.toml"
             path.write_text(content)
-            return gate.resolve_ir(path)
+            return gate.resolve_ir(path, test_support=native_fixture(path))
 
     def test_dma_tx_selects_hal_state_ops_and_same_retained_cold_resources(
             self):
-        provider = maintained("stm32f407")
+        provider = maintained("stm32f4")
         for relative in (
                 "tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml",
                 "tests/contracts/multi_controller_assembly/stm32-zg.toml",
                 "tests/contracts/multi_controller_assembly/"
                 "stm32-ve-freertos.toml"):
-            result = gate.resolve_ir(gate.ROOT / relative)
+            result = gate.resolve_ir(gate.ROOT / relative, test_support=native_fixture(gate.ROOT / relative))
             header, source = bindings.emit(result)
             self.assertIn('#include "stm32f407_uart_hal.h"', source)
             for private in ("HAL_", "UART_HandleTypeDef", "uart_hal"):
@@ -90,7 +91,7 @@ class F407UartColdTests(unittest.TestCase):
         # This isolated constructor input does not expand the authored gate.
         changed = replace(item, options=replace(
             item.options, frame=UartFrameOptions(7, "even", 2, "none")))
-        provider = maintained("stm32f407")
+        provider = maintained("stm32f4")
         constructed = provider.constructor(
             changed, result, result.board_bindings, result.routes,
             result.devices)
@@ -105,14 +106,16 @@ class F407UartColdTests(unittest.TestCase):
                                   'stop_bits=2\nflow="none"')
 
     def test_other_uart_modes_keep_their_existing_concrete_owners(self):
-        provider = maintained("stm32f407")
+        provider = maintained("stm32f4")
         for suffix, implementation in (
                 ("irq", "uart"), ("rx-dma-idle", "uart_receive"),
                 ("dma-duplex", "uart_duplex"),
                 ("dma-duplex-continuous", "uart_duplex")):
             result = gate.resolve_ir(gate.ROOT / (
                 "tests/contracts/uart_rx_compact_assembly/f407-" + suffix +
-                ".toml"))
+                ".toml"), test_support=native_fixture(gate.ROOT / (
+                "tests/contracts/uart_rx_compact_assembly/f407-" + suffix +
+                ".toml")))
             item, = result.controllers
             with self.subTest(mode=item.mode):
                 self.assertEqual(provider.mode_implementation(
@@ -140,8 +143,8 @@ class F407UartColdTests(unittest.TestCase):
         seen = set()
         for relative in inputs:
             with self.subTest(assembly=relative):
-                result = gate.resolve_ir(gate.ROOT / relative)
-                provider = maintained("stm32f407")
+                result = gate.resolve_ir(gate.ROOT / relative, test_support=native_fixture(gate.ROOT / relative))
+                provider = maintained("stm32f4")
                 for item in result.controllers:
                     if item.kind != "uart":
                         continue

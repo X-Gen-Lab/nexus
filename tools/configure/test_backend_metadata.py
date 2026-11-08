@@ -25,7 +25,7 @@ class BackendMetadataTest(unittest.TestCase):
     def test_names_do_not_authorize_an_unreviewed_board(self):
         metadata.policy_contract(self.policy())
         with self.assertRaises(ValueError):
-            threadx.validate_platform('unknown-pcb', 'stm32f407')
+            threadx.validate_platform('unknown-pcb', 'stm32f4')
 
     def test_original_policy_shape_remains_accepted(self):
         policy = self.policy()

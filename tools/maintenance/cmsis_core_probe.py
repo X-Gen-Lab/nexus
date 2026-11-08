@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile exact maintained Device headers against the single CMSIS Core 6.4.
+"""Compile the selected F407 Device headers against the single CMSIS Core 6.4.
 
 Full GCC dependency files include SYSTEM headers. Successful compilation alone
 does not admit a foreign, legacy or mixed Core, or establish physical support.
@@ -44,23 +44,8 @@ class Profile:
 
 
 PROFILES = (
-    Profile("stm32f103", "vendors/st/cmsis_device_f1/Include", "stm32f1xx.h",
-            "stm32f103xb.h", "STM32F103xB", 3, "none"),
-    Profile("stm32f407", "vendors/st/cmsis_device_f4/Include", "stm32f4xx.h",
+    Profile("stm32f4", "vendors/st/cmsis_device_f4/Include", "stm32f4xx.h",
             "stm32f407xx.h", "STM32F407xx", 4),
-    Profile("stm32g474", "vendors/st/cmsis_device_g4/Include", "stm32g4xx.h",
-            "stm32g474xx.h", "STM32G474xx", 4),
-    Profile("stm32h743", "vendors/st/cmsis_device_h7/Include", "stm32h7xx.h",
-            "stm32h743xx.h", "STM32H743xx", 7, "fpv5-d16"),
-    *(Profile("stm32u575", "vendors/st/cmsis_device_u5/Include", "stm32u5xx.h",
-              "stm32u575xx.h", "STM32U575xx", 33, "fpv5-sp-d16", state)
-      for state in ("secure", "nonsecure")),
-    Profile("gd32f303",
-            "vendors/gigadevice/gd32f30x/Firmware/CMSIS/GD/GD32F30x/Include",
-            "gd32f30x.h", "gd32f30x.h", "GD32F30X_HD", 4),
-    Profile("gd32f470",
-            "vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include",
-            "gd32f4xx.h", "gd32f4xx.h", "GD32F470", 4),
 )
 
 
@@ -171,14 +156,6 @@ def compile_command(root, profile, language, compiler, source_path, output):
         argv.append("-mcmse")
     argv += ["-D" + profile.define, "-isystem", str(root / CORE_INCLUDE),
              "-isystem", str(root / profile.directory)]
-    if profile.family.startswith("gd32"):
-        vendor = "gd32f30x" if profile.family == "gd32f303" else "gd32f4xx"
-        peripheral = "GD32F30x" if vendor == "gd32f30x" else "GD32F4xx"
-        argv += ["-I", str(root / "soc/gd32" / profile.family / "private"),
-                 "-isystem", str(root / "vendors/gigadevice" / vendor /
-                                  "Firmware" /
-                                  (peripheral +
-                                   "_standard_peripheral/Include"))]
     return [*argv, "-MD", "-MF", str(output / "probe.d"), "-MT", "cmsis_probe",
             "-c", str(source_path), "-o", str(output / "probe.o")]
 

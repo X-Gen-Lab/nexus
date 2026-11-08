@@ -77,6 +77,7 @@ jobs:
         with:
           os: ubuntu-latest
           preset: native-debug
+          arm: 'true'
       - name: Trace the actual native build
         if: matrix.language == 'cpp'
         run: |

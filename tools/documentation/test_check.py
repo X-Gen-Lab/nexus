@@ -185,7 +185,7 @@ class DocumentationCheckTests(unittest.TestCase):
 
     def test_rst_toml_uses_the_real_resolver_and_rejects_bad_mode(self):
         from tools.configure import configure, documentation
-        source = (configure.ROOT / "tools/configure/assemblies/native-gpio.toml").read_text()
+        source = (configure.ROOT / "tools/configure/assemblies/qiming-baremetal-gpio.toml").read_text()
         rst = ".. code-block:: toml\n\n" + "\n".join("    " + line for line in source.splitlines()) + "\n"
         converted = check.configuration_content(rst, ".rst")
         path = self.root / "docs/example.rst"
@@ -251,11 +251,11 @@ class DottedDocnameRegression(unittest.TestCase):
             docs = root / "docs"
             (docs / "status").mkdir(parents=True)
             (docs / "index.md").write_text(
-                "# Start\n\n```{toctree}\nstatus/release-0.1.0\n"
+                "# Start\n\n```{toctree}\nstatus/release-0.2.1\n"
                 "Migration <status/migration.v2>\nstatus/explicit-0.1.0.md\n"
                 "status/explicit-v2.0.rst\n```\n")
             for name, contents in (
-                    ("release-0.1.0.md", "# Release\n"),
+                    ("release-0.2.1.md", "# Release\n"),
                     ("migration.v2.rst", "Migration\n=========\n"),
                     ("explicit-0.1.0.md", "# Explicit Markdown\n"),
                     ("explicit-v2.0.rst", "Explicit RST\n============\n")):

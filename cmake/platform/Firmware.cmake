@@ -1,6 +1,5 @@
 # Explicit application sources; startup and hardware binding are common platform.
 include("${CMAKE_CURRENT_LIST_DIR}/TargetPolicy.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/H743FlashRam.cmake")
 
 function(nexus_add_firmware target)
     foreach(keyword SOURCES LIBRARIES)
@@ -102,7 +101,5 @@ function(nexus_add_firmware target)
                 --budget "${NEXUS_CONFIG_DIR}/resource-budget.json"
                 --report "${resources}"
             VERBATIM)
-        nexus_h743_flash_ram_audit(${target} "${NEXUS_SOURCE_DIR}"
-            "${NEXUS_CONFIG_DIR}" "${NEXUS_SOC_FAMILY}")
     endif()
 endfunction()

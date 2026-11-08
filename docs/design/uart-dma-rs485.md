@@ -3,7 +3,10 @@
 UART 公共面继续使用 `nx_uart_port_t` 和共享只读 `nx_uart_ops_t`。实例由配置
 生成，调用方只保存接口和上下文。新机制按模式选择；既有 IRQ、`dma-tx`、
 `irq-blocks` 的状态结构和默认 ops 槽数没有增加。生产代码仍为 C11，没有
-heap、设备扫描、隐藏 worker 或默认 OS 锁。
+heap、设备扫描、隐藏 worker 或默认 OS 锁。生产 owner 是
+`soc/stm32/stm32f4/`，当前精确芯片范围为 STM32F407VET6／ZGT6；不由家族目录
+推导其他 F4 器件或全部 UART 模式已适配。Native 仅在 `tests/support/native/`
+提供显式启用的主机测试支撑。
 
 ## 模式与精确资源
 
@@ -14,28 +17,24 @@ heap、设备扫描、隐藏 worker 或默认 OS 锁。
 | `rx-dma-continuous` | IRQ | 双缓冲 DMA | 两个预置目标与第三个可用替换块 |
 | `dma-duplex-continuous` | DMA | 双缓冲 DMA | 双向独立引擎，连续接收使用相同贷款协议 |
 
-首批只接入 STM32F407 USART1 和 GD32F470 USART0。STM32 RX 是 DMA2 stream2
-channel4，TX 是 DMA2 stream7 channel4；GD32 RX 是物理 DMA1 channel2
-selector4，TX 是物理 DMA1 channel7 selector4。控制器编号来自芯片手册，
+这里的接收／双向 DMA 模式只接入 STM32F407 USART1。RX 是 DMA2 stream2
+channel4，TX 是 DMA2 stream7 channel4。其他 UART 的 IRQ／有限 TX DMA 能力
+须按其独立配置合同选择，不能推导其已支持这里的接收模式。控制器编号来自芯片手册，
 不能把公共 opaque resource ID 的编码当成物理 DMA 编号。配置必须独占 UART、
 DMA 目标、向量、时钟和引脚，冲突在生成阶段拒绝。
 
 接收块容量为 1～65535 字节。连续模式至少有三个等容量块；有限模式允许
-不同容量。DMA 目标必须落在已授权、可写且 DMA 可到达的区域；两款芯片的
-CCM 不属于接收 DMA 可达 SRAM。两款 MCU 没有 CPU D-cache，这些 provider
-不执行虚构的 cache clean/invalidate。以后接入带 cache 的 MCU，需要新的
-域和维护合同，不能复用这里的无 cache 假设。
+不同容量。DMA 目标必须落在已授权、可写且 DMA 可到达的区域；F407 的
+CCM 不属于接收 DMA 可达 SRAM。F407 没有 CPU D-cache，当前 provider
+不执行 cache clean/invalidate。其他芯片的接入必须重新核对内存域和缓存维护
+合同，不能复用这里的无 cache 假设。
 
-STM32F407 与 GD32F470 的 RX-only 使用独立紧凑接收状态，保留普通 UART
-前缀的 IRQ TX 能力；只有 duplex 在同一接收 owner 后附加 TX-DMA 扩展。
-两者复用接收贷款算法，使用各自只读 ops 和直接 TX 调用，没有可选实现
-指针或运行时 `dma_transmit` 判断。RX-only 不取得或撤销 TX-DMA 目标，
-其链接不保留 TX-DMA ops；普通 IRQ 状态与默认 ops 槽数保持不变。上述是
-这两款 provider 的结构事实，不是所有芯片的固定 RAM／Flash 成本：
-2026-10-17 IO23 成对 ARM ELF 中，所选 RX-only 状态分别由 200 降至 184
-字节、由 184 降至 168 字节，duplex 状态保持 200／184 字节。数值仅适用
-当次配置与工具链，不能替代其他修订、实例或芯片的实际 ELF 测量，也不
-代表零 Flash 开销或已测得 IRQ 周期。
+STM32F407 的 RX-only 使用独立紧凑接收状态，保留普通 UART 前缀的 IRQ TX
+能力；只有 duplex 在同一接收 owner 后附加 TX-DMA 扩展。两种模式复用接收
+贷款算法，使用各自只读 ops 和直接 TX 调用，没有可选实现指针或运行时
+`dma_transmit` 判断。RX-only 不取得或撤销 TX-DMA 目标，其链接不保留 TX-DMA
+ops；普通 IRQ 状态与默认 ops 槽数保持不变。这些是所选 F407 实现的结构合同，
+具体 RAM／Flash 成本仍以当前配置、工具链与 ARM ELF 为准，不是整个家族的常数。
 
 ## 块所有权与连续接收
 
@@ -87,15 +86,12 @@ stream admission，可能返回 BUSY：已发布、已借用的块必须由 cons
 service 不重新启动 RX。完整 `stop` 也先关闭 TX admission，只有 RX 排空
 后才能停底层时钟。失败时不能销毁或更换 owner。
 
-GD32 IRQ TX 取消使用共享 USART reset，额外先排空正在运行的 RX；RX EN
-拒绝停止时保留 TX/RX 贷款并推迟 reset。reset 后恢复已选择的硬件流控位。
-
 ## RTS/CTS 与 RS485
 
-`nx_*_uart_flow_configure` 是显式可选冷配置。STM32 设置 CR3 RTSE/CTSE，
-GD32 设置 CTL2 RTSEN/CTSEN，读回失败会回滚。它在初始化后、活动 TX/RX
-开始前调用，不能修改正在运行的借用。芯片可用信号为 PA11 CTS、PA12 RTS、
-AF7；这些芯片事实不代表当前三块开发板已经接线或外部设备支持握手。
+`nx_stm32_uart_flow_configure` 是显式可选冷配置，设置 CR3 RTSE/CTSE，
+读回失败会回滚。它在初始化后、活动 TX/RX 开始前调用，不能修改正在运行的
+借用。USART1 的可用信号为 PA11 CTS、PA12 RTS、AF7；这些芯片事实不代表当前
+四块开发板已经接线或外部设备支持握手，也不授权与 CAN／USB 复用引脚并选。
 板级必须审核 PCB、GPIO 权限、电压、复用与 peer 行为再绑定。硬件 RTS
 反映 UART 数据寄存器的接收状态，不代表软件块池剩余容量，不能替代协议
 背压或在无 FREE 块时自动保证不丢数据。
@@ -127,16 +123,16 @@ status/data 清除竞态、epoch 耗尽、双向取消、flow 配置、RS485 set
 和 DE 失败。Native adapter 另验证真实请求生命周期。这些结果建立软件
 合同，不证明电气波形、总线仲裁或物理延迟。
 
-同一 no-LTO Release RX-only 开发 fixture 的分表前后 ARM ELF 实测，STM32
-text 减少 2310 字节、GD32 减少 2262 字节，两者 bss 减少 8 字节。它只说明
-该中间分表 fixture 的 section GC 成本，不能继承为最终源码、任意应用或
-所有模式的预算。最终候选必须重新绑定配置、源码、ELF/map/nm 与工具身份。
+当前 F4 接收、双向与 TX DMA 实现分别位于
+`soc/stm32/stm32f4/drivers/uart_receive.c`、`uart_duplex.c` 和 `uart_dma.c`，
+冷态资源归还由同目录的 `uart_cold.c` 管理。公共 RS485 adapter 在 `io/src/`
+实现，Native 叶模型位于 `tests/support/native/drivers/`。模式与 factory 装配测试、
+寄存器模型和 ARM 链接分别验证对应合同。
 
-终止错误修复后，同一 fixture 的新一轮生产图 ARM 链接为 STM32 text 7866
-字节、GD32 text 9932 字节，相对旧基线分别减少 2218、2174 字节，bss 仍
-各减少 8 字节。最终十四个 mode fixture 都已链接，RX-only 的 nm 中没有
-任何 `nx_*_uart_dma_*` symbol，duplex 保留真实 TX-DMA 方法。该结果仍是
-软件开发构建证据，候选签封和实板验证分别执行。
+历史成对开发 ELF 只描述其记录的固定源码、配置和工具身份；跨系列计数、状态
+大小或 text 差值不能继承为本轮 F4 候选预算。当前候选必须重新绑定配置、源码、
+ELF／map／nm 与工具身份，并验证 RX-only 不保留 TX-DMA 实现、duplex 保留所需
+独立引擎。结构复用不证明零 Flash 开销，也不证明实际 IRQ 周期。
 
 当前没有连接实板，所有物理验收均未执行。实板退出条件包括：两个引擎
 并行的最大 baud/负载，最坏 IRQ 与 service 延迟，目标换址和 wrap 压力，

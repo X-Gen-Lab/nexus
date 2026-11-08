@@ -1,4 +1,5 @@
 """F407 I2C constructors describe static resources for concrete C lifecycle."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import replace
 import unittest
 
@@ -17,8 +18,9 @@ class F407I2CColdTests(unittest.TestCase):
                 "multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml"):
             with self.subTest(assembly=relative):
                 result = gate.resolve_ir(gate.ROOT / "tests/contracts" /
-                                         relative)
-                provider = maintained("stm32f407")
+                                         relative, test_support=native_fixture(gate.ROOT / "tests/contracts" /
+                                         relative))
+                provider = maintained("stm32f4")
                 for item in result.controllers:
                     if item.kind != "i2c":
                         continue
@@ -43,11 +45,12 @@ class F407I2CColdTests(unittest.TestCase):
 
     def test_missing_integration_rejects_before_emission(self):
         result = gate.resolve_ir(gate.ROOT /
-            "tests/contracts/stm32_assembly/zg-i2c-dma.toml")
+            "tests/contracts/stm32_assembly/zg-i2c-dma.toml", test_support=native_fixture(gate.ROOT /
+            "tests/contracts/stm32_assembly/zg-i2c-dma.toml"))
         item = next(item for item in result.controllers if item.kind == "i2c")
         changed = replace(item, integration=None)
         with self.assertRaisesRegex(ValueError, "integration"):
-            maintained("stm32f407").constructor(
+            maintained("stm32f4").constructor(
                 changed, result, result.board_bindings, result.routes,
                 result.devices)
 

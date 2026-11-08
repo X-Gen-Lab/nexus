@@ -11,7 +11,6 @@ extern "C" {
 #include "nexus/arch/arch.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#ifdef NX_MULTI_FACTORY_STM32
 #include "stm32f407_dma.h"
 #include "stm32f407_uart_hal.h"
 #define UART_STATE             nx_stm32_uart_hal_state_t
@@ -34,32 +33,6 @@ void DMA2_Stream0_IRQHandler(void);
 void DMA2_Stream3_IRQHandler(void);
 void DMA1_Stream3_IRQHandler(void);
 void DMA1_Stream4_IRQHandler(void);
-#else
-#include "gd32f470_dma.h"
-#include "gd32f470_spi_dma.h"
-#include "gd32f4xx_dma.h"
-#include "gd32f4xx_gpio.h"
-#include "gd32f4xx_rcu.h"
-#include "gd32f4xx_usart.h"
-#define UART_STATE             nx_gd32_uart_dma_state_t
-#define SPI_STATE              nx_gd32_spi_dma_state_t
-#define DEVICE_STATE           nx_gd32_spi_dma_endpoint_state_t
-#define GPIO_GATE              RCU_AHB1EN
-#define PRIMARY_UART_IRQ       USART0_IRQn
-#define SECONDARY_UART_IRQ     USART1_IRQn
-#define PRIMARY_UART_DMA_IRQ   DMA1_Channel7_IRQn
-#define SECONDARY_UART_DMA_IRQ DMA0_Channel6_IRQn
-#define SECONDARY_SPI_RX_IRQ   DMA1_Channel2_IRQn
-#define SECONDARY_I2C_EV_IRQ   I2C1_EV_IRQn
-#define SECONDARY_I2C_RX_IRQ   DMA0_Channel2_IRQn
-#define SECONDARY_I2C_TX_IRQ   DMA0_Channel7_IRQn
-void USART0_IRQHandler(void);
-void USART1_IRQHandler(void);
-void DMA1_Channel3_IRQHandler(void);
-void DMA1_Channel4_IRQHandler(void);
-void DMA1_Channel2_IRQHandler(void);
-void DMA1_Channel5_IRQHandler(void);
-#endif
 }
 #include <cstring>
 #include <gmock/gmock.h>
@@ -79,7 +52,7 @@ class MultipleAssemblyPorts {
     MOCK_METHOD(void, Restore, (unsigned, unsigned));
 };
 extern "C" {
-NVIC_Type g_gd32_model_nvic;
+NVIC_Type g_f4_model_nvic;
 }
 static MultipleAssemblyPorts* s_ports;
 static volatile uint32_t* s_refused;
@@ -98,9 +71,6 @@ static unsigned s_refused_pin_port;
 static unsigned s_refused_pin_number;
 static unsigned s_pin_restores[9][16];
 static bool s_privileged;
-#ifndef NX_MULTI_FACTORY_STM32
-static bool s_refuse_failed_uart_withdrawal;
-#endif
 
 extern "C" bool nx_multi_factory_is_privileged(void) {
     return s_privileged;
@@ -231,10 +201,6 @@ extern "C" void nx_multi_factory_priority_write(volatile uint8_t* address,
 extern "C" nx_time_us_t nx_time_now_us(void) {
     return s_now;
 }
-extern "C" uint64_t nx_gd32_now_us(void) {
-    return s_now;
-}
-#ifdef NX_MULTI_FACTORY_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
 /* The hardware model supplies the same fixed HCLK observed by real RCC C. */
@@ -299,38 +265,6 @@ extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* port, uint8_t pin,
                                               uint8_t pull, bool drain) {
     return configure_pin(port_index(port), pin, mode, af, pull, drain);
 }
-#else
-extern "C" nx_result_t nx_gd32_soc_preflight(void) {
-    return s_ports->Preflight();
-}
-extern "C" int nx_gd32_soc_start(void) {
-    return s_ports->Start();
-}
-extern "C" int nx_gd32_soc_stop(void) {
-    return s_ports->Stop();
-}
-extern "C" nx_result_t nx_gd32_gpio_clock_enable(unsigned index) {
-    nx_result_t status = s_ports->Clock(index);
-    if (status == NX_SUCCESS)
-        GPIO_GATE |= 1U << index;
-    return status;
-}
-static unsigned port_index(uint32_t port) {
-    return (port - GPIOA) / 0x400U;
-}
-extern "C" uint16_t nx_gd32_pin_capture(uint32_t port, unsigned pin) {
-    return capture_pin(port_index(port), pin);
-}
-extern "C" void nx_gd32_pin_restore(uint32_t port, unsigned pin,
-                                    uint16_t saved) {
-    restore_pin(port_index(port), pin, saved);
-}
-extern "C" nx_result_t nx_gd32_pin_configure(uint32_t port, unsigned pin,
-                                             uint8_t mode, uint8_t af,
-                                             uint8_t pull, bool drain) {
-    return configure_pin(port_index(port), pin, mode, af, pull, drain);
-}
-#endif
 
 /** \brief The bank-local W1C layout is identical in both pinned SDKs. */
 extern "C" void nx_multi_factory_dma_ack(volatile uint32_t* clear,
@@ -348,13 +282,6 @@ extern "C" void nx_multi_factory_irq_enable(int irq) {
     if (irq >= 0 && irq < 240)
         nx_multi_factory_write(&NVIC->ISER[(unsigned)irq / 32U],
                                1U << ((unsigned)irq % 32U));
-#ifndef NX_MULTI_FACTORY_STM32
-    if (s_refuse_failed_uart_withdrawal && irq == SECONDARY_UART_IRQ) {
-        NVIC->IPR[(unsigned)irq] = 0U;
-        s_refused = &USART_CTL0(USART1);
-        s_hold = USART_CTL0_UEN;
-    }
-#endif
 }
 extern "C" void nx_multi_factory_irq_disable(int irq) {
     if (irq >= 0 && irq < 240)
@@ -381,13 +308,11 @@ extern "C" void nx_multi_factory_spi_reset(volatile uint32_t* reg,
         *reg |= mask;
     else
         *reg &= ~mask;
-#ifdef NX_MULTI_FACTORY_STM32
     SPI_TypeDef* spi = reg == &RCC->APB2RSTR ? SPI1 : SPI2;
     if (active) {
         spi->CR1 = spi->CR2 = 0U;
         spi->SR = SPI_SR_TXE;
     }
-#endif
 }
 extern "C" uint8_t nx_multi_factory_i2c_read(void* context) {
     nx_i2c_v1_state_t* state = static_cast<nx_i2c_v1_state_t*>(context);
@@ -421,24 +346,13 @@ class MultipleFactory : public testing::Test {
     nx_spi_request_t spi_requests[2]{};
     uint8_t* payload;
     uint32_t uart_status(unsigned index) {
-#ifdef NX_MULTI_FACTORY_STM32
         return (index == 0U ? USART1 : USART2)->SR;
-#else
-        return USART_STAT0(index == 0U ? USART0 : USART1);
-#endif
     }
     void uart_wire_idle(unsigned index) {
-#ifdef NX_MULTI_FACTORY_STM32
         (index == 0U ? USART1 : USART2)->SR |= USART_SR_TC;
         if (uart_states[index]->uart.initialized)
             (index == 0U ? USART1_IRQHandler : USART2_IRQHandler)();
-#else
-        USART_STAT0(index == 0U ? USART0 : USART1) |= USART_STAT0_TC;
-        if (uart_states[index]->uart.initialized)
-            (index == 0U ? USART0_IRQHandler : USART1_IRQHandler)();
-#endif
     }
-#ifdef NX_MULTI_FACTORY_STM32
     /** \brief Complete the modeled DMA stream before delivering its vector.
      * \note The HAL abort owner also joins this hardware terminal observation;
      *       UART TC alone cannot stand in for a disabled DMA's completion IRQ.
@@ -454,67 +368,32 @@ class MultipleFactory : public testing::Test {
         /* Apply the actual HAL handler's write-only flag-clear command. */
         nx_multi_factory_dma_ack(&engine->HIFCR, engine->HIFCR);
     }
-#endif
     volatile uint32_t* uart_engine(unsigned index) {
-#ifdef NX_MULTI_FACTORY_STM32
         return index == 0U ? &DMA2_Stream7->CR : &DMA1_Stream6->CR;
-#else
-        return index == 0U ? &DMA_CH7CTL(DMA1) : &DMA_CH6CTL(DMA0);
-#endif
     }
     volatile uint32_t* spi_engine(unsigned index, bool receive) {
-#ifdef NX_MULTI_FACTORY_STM32
         return index == 0U ? (receive ? &DMA2_Stream0->CR : &DMA2_Stream3->CR)
                            : (receive ? &DMA1_Stream3->CR : &DMA1_Stream4->CR);
-#else
-        return index == 0U ? (receive ? &DMA_CH3CTL(DMA1) : &DMA_CH4CTL(DMA1))
-                           : (receive ? &DMA_CH2CTL(DMA1) : &DMA_CH5CTL(DMA1));
-#endif
     }
     volatile uint32_t& spi_flags(unsigned index, bool receive) {
-#ifdef NX_MULTI_FACTORY_STM32
         return index == 0U ? DMA2->LISR : (receive ? DMA1->LISR : DMA1->HISR);
-#else
-        (void)index;
-        return receive ? DMA_INTF0(DMA1) : DMA_INTF1(DMA1);
-#endif
     }
     uint32_t spi_completion(unsigned index, bool receive) {
-#ifdef NX_MULTI_FACTORY_STM32
         unsigned shift =
             index == 0U ? (receive ? 0U : 22U) : (receive ? 22U : 0U);
-#else
-        unsigned shift =
-            index == 0U ? (receive ? 22U : 0U) : (receive ? 16U : 6U);
-#endif
         return 0x20U << shift;
     }
     void spi_irq(unsigned index, bool receive) {
-#ifdef NX_MULTI_FACTORY_STM32
         if (index == 0U)
             (receive ? DMA2_Stream0_IRQHandler : DMA2_Stream3_IRQHandler)();
         else
             (receive ? DMA1_Stream3_IRQHandler : DMA1_Stream4_IRQHandler)();
-#else
-        if (index == 0U)
-            (receive ? DMA1_Channel3_IRQHandler : DMA1_Channel4_IRQHandler)();
-        else
-            (receive ? DMA1_Channel2_IRQHandler : DMA1_Channel5_IRQHandler)();
-#endif
     }
     unsigned secondary_cs_port() {
-#ifdef NX_MULTI_FACTORY_STM32
         return 4U;
-#else
-        return 1U;
-#endif
     }
     uint32_t secondary_cs_mask() {
-#ifdef NX_MULTI_FACTORY_STM32
         return 8U;
-#else
-        return 1U;
-#endif
     }
     bool irq_enabled(IRQn_Type irq) {
         return (NVIC->ISER[(unsigned)irq / 32U] &
@@ -532,7 +411,7 @@ class MultipleFactory : public testing::Test {
         ASSERT_EQ(memory, reinterpret_cast<void*>(UINT32_C(0x20000000)));
         payload = static_cast<uint8_t*>(memory) + 0x1000U;
         std::memset(payload, 0x36, 128U);
-        g_gd32_model_nvic = {};
+        g_f4_model_nvic = {};
         s_ports = &ports;
         s_refused = s_held_engine = nullptr;
         s_priority_refused = nullptr;
@@ -543,26 +422,17 @@ class MultipleFactory : public testing::Test {
         s_refused_pin_number = 16U;
         std::memset(s_pin_restores, 0, sizeof(s_pin_restores));
         s_privileged = true;
-#ifndef NX_MULTI_FACTORY_STM32
-        s_refuse_failed_uart_withdrawal = false;
-#endif
         s_now = 100U;
         ON_CALL(ports, Preflight()).WillByDefault(Return(NX_SUCCESS));
         ON_CALL(ports, Start()).WillByDefault(Return(0));
         ON_CALL(ports, Stop()).WillByDefault(Return(0));
         ON_CALL(ports, Clock(_)).WillByDefault(Return(NX_SUCCESS));
         ON_CALL(ports, Configure(_, _, _)).WillByDefault(Return(NX_SUCCESS));
-#ifdef NX_MULTI_FACTORY_STM32
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
         RCC->CFGR = RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
         SPI1->SR = SPI2->SR = SPI_SR_TXE;
         GPIOB->IDR = 0xffffU;
-#else
-        RCU_CFG0 = RCU_APB1_CKAHB_DIV4 | RCU_APB2_CKAHB_DIV2;
-        SPI_STAT(SPI4) = SPI_STAT(SPI0) = SPI_STAT_TBE;
-        GPIO_ISTAT(GPIOB) = 0xffffU;
-#endif
         uarts[0] = nx_factory_uart(NX_UART_ID_PRIMARY_UART);
         uarts[1] = nx_factory_uart(NX_UART_ID_SECONDARY_UART);
         spis[0] = nx_factory_spi(NX_SPI_ID_PRIMARY_SPI);
@@ -584,9 +454,6 @@ class MultipleFactory : public testing::Test {
         }
     }
     void TearDown() override {
-#ifndef NX_MULTI_FACTORY_STM32
-        s_refuse_failed_uart_withdrawal = false;
-#endif
         s_refused = s_held_engine = nullptr;
         s_priority_refused = nullptr;
         s_restore_refused = s_gpio_restore_refused = false;
@@ -599,11 +466,7 @@ class MultipleFactory : public testing::Test {
             uart_wire_idle(index);
             *spi_engine(index, false) &= ~1U;
             *spi_engine(index, true) &= ~1U;
-#ifdef NX_MULTI_FACTORY_STM32
             (index == 0U ? SPI1 : SPI2)->SR = SPI_SR_TXE;
-#else
-            SPI_STAT(index == 0U ? SPI4 : SPI0) = SPI_STAT_TBE;
-#endif
         }
         EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
         EXPECT_EQ(munmap(mapping, 0x80000U), 0);
@@ -832,24 +695,6 @@ TEST_F(MultipleFactory, FailedSecondaryPinPrepareRestoresThePartialLease) {
     (void)testing::Mock::VerifyAndClearExpectations(&ports);
     EXPECT_EQ(nx_platform_start().primary, NX_SUCCESS);
 }
-#ifndef NX_MULTI_FACTORY_STM32
-TEST_F(MultipleFactory, FailedUartPreparationKeepsItsUndrainedHardwareLease) {
-    s_refuse_failed_uart_withdrawal = true;
-    const auto result = nx_platform_start();
-    EXPECT_EQ(result.primary, NX_ERROR_IO);
-    EXPECT_EQ(result.cleanup, NX_ERROR_BUSY);
-    EXPECT_EQ(result.remaining_effects, 1U);
-    EXPECT_TRUE(uart_states[1]->uart.initialized);
-    EXPECT_TRUE(uart_states[1]->uart.stopping);
-    EXPECT_NE(USART_CTL0(USART1) & USART_CTL0_UEN, 0U);
-    EXPECT_NE(RCU_APB1EN & RCU_APB1EN_USART1EN, 0U);
-    EXPECT_EQ((gpio(0U, 0U) >> 4U) & 3U, 2U);
-    s_refuse_failed_uart_withdrawal = false;
-    s_refused = nullptr;
-    EXPECT_EQ(nx_uart_port_stop(uarts[1]), NX_SUCCESS);
-    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
-}
-#endif
 
 TEST_F(MultipleFactory, RefusedSelectedVectorJoinRetainsResourcesUntilRetry) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
@@ -923,17 +768,10 @@ TEST_F(MultipleFactory, StopProvesInactiveCsBeforeRestoringAnySelectedSpiPin) {
     s_refused = &gpio(port, 24U);
     s_hold = secondary_cs_mask();
     EXPECT_CALL(ports, Restore(_, _)).Times(testing::AnyNumber());
-#ifdef NX_MULTI_FACTORY_STM32
     EXPECT_CALL(ports, Restore(1U, 13U)).Times(0);
     EXPECT_CALL(ports, Restore(1U, 14U)).Times(0);
     EXPECT_CALL(ports, Restore(1U, 15U)).Times(0);
     EXPECT_CALL(ports, Restore(4U, 3U)).Times(0);
-#else
-    EXPECT_CALL(ports, Restore(0U, 5U)).Times(0);
-    EXPECT_CALL(ports, Restore(0U, 6U)).Times(0);
-    EXPECT_CALL(ports, Restore(0U, 7U)).Times(0);
-    EXPECT_CALL(ports, Restore(1U, 0U)).Times(0);
-#endif
     EXPECT_EQ(nx_platform_stop(), NX_ERROR_IO);
     EXPECT_EQ(nx_platform_start().primary, NX_ERROR_STATE);
     (void)testing::Mock::VerifyAndClearExpectations(&ports);
@@ -1059,10 +897,8 @@ TEST_F(MultipleFactory, TwoDmaUartRequestsUseSeparateReviewedEngines) {
     EXPECT_NE(nx_request_state(&uart_requests[1].base), NX_REQUEST_SETTLED);
     s_held_engine = nullptr;
     *uart_engine(1U) &= ~1U;
-#ifdef NX_MULTI_FACTORY_STM32
     uart_memory_complete(0U);
     uart_memory_complete(1U);
-#endif
     uart_wire_idle(0U);
     uart_wire_idle(1U);
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);

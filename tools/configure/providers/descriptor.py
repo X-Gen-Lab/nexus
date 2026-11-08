@@ -22,11 +22,13 @@ class FamilyDescriptor:
     vendor: str
     source_directory: str
     configuration_directory: str
+    descriptor_path: str | None = None
     git_modules: tuple = ()
     import_lock: str | None = None
     references: str | None = None
     owned_payload: tuple = ()
     configuration_helpers: tuple = ()
+    device_catalog: str | None = None
 
     @property
     def git_dependencies(self):
@@ -44,33 +46,31 @@ class FamilyDescriptor:
                          if str(parent) != ".")
         modules = tuple(f"{directory}/{name}" for name in (
             "__init__.py", "contract.py", "bindings.py", "emission.py"))
-        local = (self.source_directory + "/descriptor.py",)
+        local = (self.descriptor_path or
+                 self.source_directory + "/descriptor.py",)
         return packages + local + modules + self.configuration_helpers
 
     @property
     def fact_files(self):
         directory = self.source_directory
         names = ("soc.json", "routes.json")
+        if self.device_catalog is not None:
+            names += (self.device_catalog,)
         if self.references is not None:
             names += (self.references,)
         return tuple(f"{directory}/{name}" for name in names)
 
 
 _DESCRIPTOR_MODULES = MappingProxyType({
-    "native": "soc.native.descriptor",
-    "stm32f103": "soc.stm32.stm32f103.descriptor",
-    "stm32f407": "soc.stm32.stm32f407.descriptor",
-    "gd32f470": "soc.gd32.gd32f470.descriptor",
-    "gd32f303": "soc.gd32.gd32f303.descriptor",
-    "stm32g474": "soc.stm32.stm32g474.descriptor",
-    "stm32h743": "soc.stm32.stm32h743.descriptor",
-    "stm32u575": "soc.stm32.stm32u575.descriptor",
+    "stm32f4": "tools.configure.stm32f4_descriptor",
 })
 
 
-def maintained(family):
-    """Load exact local metadata, never infer or discover a family module."""
+def maintained(family, *, test_support=False):
+    """Load one production family or an explicitly requested host fixture."""
     selected = _DESCRIPTOR_MODULES.get(family)
+    if family == "native" and test_support:
+        selected = "tests.support.native.descriptor"
     if selected is None:
         fail(f"Unmaintained SoC integration descriptor: {family}")
     module = import_module(selected)

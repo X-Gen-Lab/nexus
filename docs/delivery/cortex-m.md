@@ -4,10 +4,8 @@ Nexus 的 CPU 软件层支持 M0、M0+、M3、M4、M7、M23、M33、M55、M85。
 同一不可变 CPU profile 解析器驱动 Core、Arch、原子操作及裸机/FreeRTOS
 运行时配置；DSP、FPU、MVE、cache、MPU、DWT、security 和 SAU 均显式声明。
 选择某个内核不生成新 SoC、Board、向量表、启动、驱动、链接布局或 typed factory。
-STM32F407/GD32F470 三板维护首发模式；G474、H743、U575 另有精确
-GPIO／IRQ UART／timebase 参考装配，G474 增加 selected EXTI，H743 增加固定
-Cache 配置和有限 UART TX DMA；U575 另有独立无 OS 的同步双域 GPIO 参考。
-选择 CPU 本身不建立这些 SoC 机制，也不扩大它们的外设范围。全部实板 HIL 未执行。
+当前生产 SoC 只有 F4，具体实现限定 F407VE／ZG。CPU 软件能力不生成这些芯片
+的时钟、IRQ、DMA 或板级接线；其他系列 SDK 保留也不代表生产支持。实板 HIL 未执行。
 
 详细所有权、上下文与拒绝语义见 [Arch 契约](../design/arch-contracts.md)，
 OS 生命周期见 [OS 适配](../../os/README.md)，精确整平台范围见
@@ -80,10 +78,8 @@ runtime 使用实际 FreeRTOS MPU port，软件与实板安全验收仍分别记
 
 `nonsecure.h` 提供 Secure 特权 Thread 的完整跨度 CMSE 权限观察，按 NS
 非特权 read/read-write 校验归属和 MPU；其他 image 明确拒绝。观察不复制或 pin
-内存，不鉴别调用者、不排除 MMIO／DMA，也不冻结映射。U575 独立双域参考通过
-冷归属 owner、固定 world principal 和同步输入快照／输出预验证补齐有限 gateway
-前提，不接入 NS RTOS 或异步用户 DMA；见
-[U575 双域合同](../design/u575-trustzone-contract.md)。
+内存，不鉴别调用者、不排除 MMIO／DMA，也不冻结映射。具体集成必须补齐真实
+归属、调用者与存储稳定性证明；当前 F4 生产包不声明 TrustZone gateway。
 
 ## FreeRTOS 软件合同
 
@@ -227,11 +223,10 @@ python scripts/ci/cortex_runtime.py --compiler arm-none-eabi-gcc \
 ```
 
 这些命令建立实际执行范围内的 CPU primitive／runtime 软件证据。具体
-F407/F470 平台、G474/H743/U575 参考装配与物理 station 有各自门禁；
+当前 F4 整平台与物理 station 有各自门禁；
 编译命令不建立实板证据。
 可选 feature 组合按实际执行范围记录，单个组合通过不继承给所有可能组合。
-当前开发执行目录为 `/workspace/nexus-all-cortex-evidence`；最终通过数与源码身份
-由实际报告核对，不引用之前版本的 counts。
+最终通过数与源码身份由本次实际报告核对，不引用旧工作目录或之前版本的 counts。
 
 本轮没有新增真实 Board，没有执行物理 HIL。IRQ latency、FPU/MVE context
 切换、cache/DMA coherence、MPU/SAU 行为、安全世界协作、stack high-water、时钟

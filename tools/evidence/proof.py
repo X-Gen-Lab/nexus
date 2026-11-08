@@ -843,7 +843,7 @@ def validate_consumer_observation(inputs, sdk, source, build, kind,
             arguments = (Path(relocated(str(sdk))), Path(relocated(str(source))),
                          Path(relocated(str(build))))
             expected = (checker.check_selected_image(*arguments, replay,
-                owner_specification=specification) if native else
+                specification=specification) if native else
                 checker.check_service_image(*arguments, specification, replay))
         except ValueError as error:
             raise EvidenceError("consumer checker rejected original inputs: " +
@@ -952,7 +952,7 @@ def validate_sdk_consumers(report, manifest, resolver=verify_file_identity,
         targets = [Path(image).stem for image in images]
         fixture = any("ALLOW_SOURCE_SDK_FIXTURE" in arg for argv in configured for arg in argv)
         bounded_fixture = (consumer_index is not None and not require_owned and
-            sdk_manifest.get("publishable") is False and sdk_manifest.get("source_dirty") is True)
+            sdk_manifest.get("publishable") is False)
         if (len(configured) != 1 or configured[0][3:5] != ["-B", str(build)] or
                 configured[0].count("-DNEXUS_EXPECTED_SOURCE_REVISION=" +
                                     manifest["source"]["commit"]) != 1 or

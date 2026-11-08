@@ -17,7 +17,7 @@ BRIDGE = SHIM / "compiler.h"
 CORE_MODULE = ROOT / "cmake/platform/CMSISCore.cmake"
 CORE = ROOT / "vendors/arm/CMSIS_6/CMSIS/Core/Include"
 DEVICE = ROOT / "vendors/st/cmsis_device_f4/Include"
-MOCK_CORE = ROOT / "tests/contracts/gd32_model"
+MOCK_CORE = ROOT / "tests/support/f4_cpu"
 
 
 class CMSISHostModelTests(unittest.TestCase):

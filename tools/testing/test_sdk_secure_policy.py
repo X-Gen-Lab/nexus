@@ -1,7 +1,6 @@
 """Secure source SDK consumers extend one exact reviewed policy."""
 
 from dataclasses import replace
-import hashlib
 import importlib.util
 import json
 import shutil
@@ -15,8 +14,6 @@ from tools.configure import configure
 from tools.evidence.common import file_identity
 
 ROOT = Path(__file__).resolve().parents[2]
-V12_LAYOUT_SHA256 = (
-    "d2bfea74fe3e8eb8e95da84b60d9a6d6076a216d48883e9f4d82ecd65a72ff05")
 
 
 class SDKSecurePolicyTests(unittest.TestCase):
@@ -27,17 +24,9 @@ class SDKSecurePolicyTests(unittest.TestCase):
         cls.consumers = importlib.util.module_from_spec(specification)
         specification.loader.exec_module(cls.consumers)
 
-    def test_current_policy_preserves_the_complete_v12_layout_prefix(self):
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v16")
-        layout = transport.consumer_layout()
-        encoded = json.dumps(layout[:54], separators=(",", ":")).encode()
-        self.assertEqual(hashlib.sha256(encoded).hexdigest(), V12_LAYOUT_SHA256)
-        self.assertEqual(len(layout), 65)
-        self.assertEqual(len(transport.IMAGES), 68)
-        self.assertEqual(len(transport.FIXTURES), 65)
-
     def test_secure_profiles_have_explicit_reviewed_execution_domains(self):
-        profiles = transport.SERVICE_CONSUMERS[4:6]
+        profiles = tuple(item for item in transport.SERVICE_CONSUMERS
+                         if item.scenario == "secure_services")
         self.assertEqual([item.name for item in profiles],
                          ["native secure services", "f407 secure services"])
         self.assertEqual([item.domain for item in profiles],
@@ -45,7 +34,9 @@ class SDKSecurePolicyTests(unittest.TestCase):
         self.assertEqual([item.arm for item in profiles], [False, True])
         self.assertEqual([item.scenario for item in profiles],
                          ["secure_services", "secure_services"])
-        self.assertEqual(transport.consumer_plan()[54:56],
+        self.assertEqual(tuple(entry for entry in transport.consumer_plan()
+                               if entry[0] == "services" and
+                               entry[1].scenario == "secure_services"),
                          tuple(("services", item) for item in profiles))
         for profile in profiles:
             changed = replace(profile, scenario="unreviewed")
@@ -63,7 +54,6 @@ class SDKSecurePolicyTests(unittest.TestCase):
         del files[expected]
         with self.assertRaisesRegex(ValueError, "roots and images"):
             transport.consumer_images(files, directories)
-
 
     def prefix(self, base):
         prefix = base / "prefix"
@@ -85,7 +75,8 @@ class SDKSecurePolicyTests(unittest.TestCase):
         return result
 
     def test_preparation_preserves_public_and_composition_boundaries(self):
-        for profile in transport.SERVICE_CONSUMERS[4:6]:
+        for profile in tuple(item for item in transport.SERVICE_CONSUMERS
+                         if item.scenario == "secure_services"):
             with self.subTest(profile=profile.name), tempfile.TemporaryDirectory() as tmp:
                 base = Path(tmp)
                 prefix, _ = self.prefix(base)
@@ -106,7 +97,7 @@ class SDKSecurePolicyTests(unittest.TestCase):
                 for source_file in source.glob("*.c"):
                     self.assertNotIn("test_key", source_file.read_text())
                     self.assertNotIn("test_client", source_file.read_text())
-                resolved = configure.resolve_ir(source / "assembly.toml", root=ROOT)
+                resolved = configure.resolve_ir(source / "assembly.toml", root=ROOT, test_support=True)
                 self.assertEqual(resolved.cpu["arch"],
                                  "cortex-m4" if profile.arm else "native")
                 if profile.arm:
@@ -117,7 +108,8 @@ class SDKSecurePolicyTests(unittest.TestCase):
                                      524288)
 
     def image_fixture(self, base, arm=False):
-        profile = transport.SERVICE_CONSUMERS[5 if arm else 4]
+        profile = next(item for item in transport.SERVICE_CONSUMERS
+                       if item.scenario == "secure_services" and item.arm == arm)
         prefix, sdk = self.prefix(base)
         source, build, _ = self.consumers.prepare_service_consumer(
             prefix, base, profile, self.execute,
@@ -128,7 +120,7 @@ class SDKSecurePolicyTests(unittest.TestCase):
         (build / "resolved-sdk.txt").write_text(str(sdk))
         (build / "resolved-config.txt").write_text(str(config))
         (config / "bindings.c").write_text("/* external compiler fixture */\n")
-        resolved = configure.resolve_ir(source / "assembly.toml", root=ROOT)
+        resolved = configure.resolve_ir(source / "assembly.toml", root=ROOT, test_support=True)
         (config / "resolved.json").write_text(json.dumps(resolved.to_dict()))
         flags = ["-std=c11"]
         if arm:
@@ -222,7 +214,6 @@ class SDKSecurePolicyTests(unittest.TestCase):
                 self.consumers.check_service_image(sdk, source, build, profile, execute)
             self.assertEqual(calls, [])
 
-
     def test_secure_checker_requires_one_real_composition_and_no_cpp(self):
         for fault in ("missing_composition", "cpp"):
             with self.subTest(fault=fault), tempfile.TemporaryDirectory() as tmp:
@@ -240,7 +231,6 @@ class SDKSecurePolicyTests(unittest.TestCase):
                     self.consumers.check_service_image(sdk, source, build,
                                                        profile, execute)
                 self.assertEqual(calls, [])
-
 
     def test_secure_arm_owner_is_explicit_and_heap_cpp_bodies_are_rejected(self):
         for forbidden in ("malloc", "_sbrk_r", "__cxa_guard_acquire", "_Znwm"):

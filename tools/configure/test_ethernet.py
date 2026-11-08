@@ -1,4 +1,5 @@
 """Selected RMII MAC and paired MDIO faces preserve exact cold ownership."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 import json
 from pathlib import Path
@@ -24,9 +25,9 @@ class EthernetConfigurationTests(unittest.TestCase):
         return path
 
     def test_two_exact_zg_parts_have_one_mac_and_no_stream_dma_claim(self):
-        for label in ("stm32-zg", "gd32"):
+        for label in ('stm32-zg',):
             with self.subTest(label=label):
-                result = gate.resolve_ir(self.assembly(label))
+                result = gate.resolve_ir(self.assembly(label), test_support=native_fixture(self.assembly(label)))
                 self.assertFalse(result.physical_qualified)
                 self.assertEqual(len(result.controllers), 1)
                 self.assertEqual(result.controllers[0].options.address,
@@ -34,7 +35,7 @@ class EthernetConfigurationTests(unittest.TestCase):
                 with self.assertRaises(FrozenInstanceError):
                     result.controllers[0].options.rx_count = 3
                 claims = {item.key for item in result.claims}
-                self.assertIn("irq:ENET" if label == "gd32" else "irq:ETH", claims)
+                self.assertIn("irq:ETH", claims)
                 self.assertIn("pin:PG14", claims)
                 self.assertIn("clock:ETHMAC", claims)
                 self.assertIn("controller:SYSCFG_RMII", claims)
@@ -42,7 +43,7 @@ class EthernetConfigurationTests(unittest.TestCase):
 
     def test_exact_chosen_storage_and_paired_readonly_faces_share_one_context(self):
         output = self.root / "generated"
-        gate.configure(self.assembly(), output)
+        gate.configure(self.assembly(), output, test_support=native_fixture(self.assembly()))
         source = (output / "bindings.c").read_text()
         header = (output / "nexus_factory.h").read_text()
         self.assertIn("nx_factory_eth(", header)
@@ -62,7 +63,8 @@ class EthernetConfigurationTests(unittest.TestCase):
                       "[2,0,0,0,0,256]", "[true,0,0,0,0,1]"):
             with self.subTest(value=value), self.assertRaisesRegex(ValueError, "Ethernet"):
                 gate.resolve_ir(self.assembly(change=lambda text: text.replace(
-                    "[2,0,0,0,0,1]", value)))
+                    "[2,0,0,0,0,1]", value)), test_support=native_fixture(self.assembly(change=lambda text: text.replace(
+                    "[2,0,0,0,0,1]", value))))
 
     def test_count_buffer_alignment_and_finite_budgets_reject_before_emission(self):
         for before, after in (("tx_count=2", "tx_count=0"),
@@ -74,21 +76,18 @@ class EthernetConfigurationTests(unittest.TestCase):
                               ("init_timeout_us=5000", "init_timeout_us=0"),
                               ("drain_timeout_us=1000", "drain_timeout_us=0")):
             with self.subTest(after=after), self.assertRaisesRegex(ValueError, "Ethernet"):
-                gate.resolve_ir(self.assembly(change=lambda text: text.replace(before, after)))
+                gate.resolve_ir(self.assembly(change=lambda text: text.replace(before, after)), test_support=native_fixture(self.assembly(change=lambda text: text.replace(before, after))))
 
-    def test_failed_mac_cold_is_counted_before_typed_prepare_and_close(self):
+    def test_failed_mac_cold_retains_typed_prepare_and_close_responsibility(self):
         output = self.root / "generated"
-        gate.configure(self.assembly(), output)
+        gate.configure(self.assembly(), output, test_support=native_fixture(self.assembly()))
         source = (output / "bindings.c").read_text()
-        start = source.index("nx_platform_start_result_t nx_platform_start")
-        prepare = source.index("result.primary = nx_stm32_eth_cold_prepare(", start)
-        self.assertLess(source.index("s_nx_platform_initialized = 1u;", start),
-                        prepare)
-        self.assertIn("&s_nx_port_mac, &s_nx_eth_config_mac, "
-                      "&s_nx_eth_receipt_mac", source[prepare:])
-        close = source.index("nx_stm32_eth_cold_close(")
-        resources = source.index("nx_stm32_eth_resources_close(", close)
-        self.assertLess(close, resources)
+        self.assertIn("(nx_lifecycle_acquisition_t){ "
+                      "nx_stm32_eth_cold_prepare(&s_nx_port_mac, "
+                      "&s_nx_eth_config_mac, &s_nx_eth_receipt_mac), true }",
+                      source)
+        self.assertIn("nx_stm32_eth_cold_close(", source)
+        self.assertIn(".ethernet_close = nx_stm32_eth_resources_close,", source)
         self.assertIn("static const nx_stm32_eth_cold_config_t", source)
         self.assertNotIn("nx_stm32_eth_initialize(", source)
         self.assertNotIn("nx_stm32_pin_restore(", source)
@@ -105,11 +104,11 @@ class EthernetConfigurationTests(unittest.TestCase):
         end = content.index("\n", start)
         path.write_text(content[:start] + 'board_package="board"' + content[end:])
         with self.assertRaisesRegex(ValueError, "reviewed exact-part route"):
-            gate.resolve_ir(path)
+            gate.resolve_ir(path, test_support=native_fixture(path))
 
     def test_default_platform_has_no_mac_ring_phy_or_mdio_context(self):
         output = self.root / "generated"
-        gate.configure(gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml", output)
+        gate.configure(gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml", output, test_support=native_fixture(gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml"))
         source = (output / "bindings.c").read_text()
         self.assertNotIn("s_nx_eth_", source)
         self.assertNotIn("nx_eth_mac_ops", source)

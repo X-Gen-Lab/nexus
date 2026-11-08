@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 COMMON = (
-    "__init__", "bundle", "dependencies", "contracts", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "i2s2",
+    "__init__", "bundle", "dependencies", "contracts", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "records", "i2s2",
     "threadx", "lowpower", "providers/__init__", "providers/common",
     "providers/descriptor", "calls",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",
@@ -16,7 +16,7 @@ COMMON = (
 PLATFORM = (
     "configure", "selection", "onboarding", "authored", "bindings", "emission", "experience", "can", "memory",
     "usb_device", "ethernet", "timer_advanced", "secondary_controllers", "coupled_io",
-    "fact_references", "clocks", "physical_facts", "preflight", "gpio_phase",
+    "fact_references", "clocks", "physical_facts", "gpio_phase",
     "i2c_timing", "i2c_timing_selection", "pin_states", "runtime_power",
     "adc", "exti", "board_hardware", "gpio_electrical", "rtc",
     "providers/hardware",
@@ -34,7 +34,8 @@ SDK = (
 )
 
 
-def source_names(mode, family, *, sdk=False, external=False):
+def source_names(mode, family, *, sdk=False, external=False,
+                 test_support=False):
     """Return declared generator inputs for freshness and SDK admission."""
     if mode not in {"platform", "runtime"}:
         raise ValueError("Unknown configuration-code dependency scope")
@@ -49,7 +50,10 @@ def source_names(mode, family, *, sdk=False, external=False):
         names.extend("tools/configure/" + name + ".py" for name in PLATFORM)
         providers = (() if external else
                      descriptor.families() if family is None else
-                     (descriptor.maintained(family),))
+                     (descriptor.maintained(family,
+                                            test_support=test_support),))
+        if family is None and test_support and not external:
+            providers += (descriptor.maintained("native", test_support=True),)
         for provider in providers:
             names.extend(provider.configuration_modules)
             if provider.import_lock is not None:
@@ -65,9 +69,10 @@ def _identity(mode, records):
             "sha256": digest, "files": records}
 
 
-def snapshot(*, mode, family=None, sdk=False):
+def snapshot(*, mode, family=None, sdk=False, test_support=False):
     """Bind code before resolution; unknown family binds all maintained code."""
-    paths = {name: str(ROOT / name) for name in source_names(mode, family, sdk=sdk)}
+    paths = {name: str(ROOT / name) for name in source_names(
+        mode, family, sdk=sdk, test_support=test_support)}
     records = [{"path": name,
                 "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest()}
                for name, path in paths.items()]
@@ -78,7 +83,10 @@ def selected(paths, identity, *, family, context=None):
     """Retain the pre-resolution bytes of the selected family, never rehash."""
     names = source_names("platform", family,
                          sdk="cmake/package/package_source_sdk.py" in paths,
-                         external=context is not None and context.external)
+                         external=context is not None and context.external,
+                         test_support=(family == "native" and
+                                       context is not None and
+                                       not context.external))
     records = {record["path"]: record for record in identity["files"]}
     if not set(names).issubset(records):
         raise ValueError("Configuration code dependency closure changed during resolution")

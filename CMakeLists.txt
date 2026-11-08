@@ -29,15 +29,14 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+option(NEXUS_TEST_SUPPORT "Enable explicit host-only test assemblies" OFF)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${NEXUS_BINARY_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${NEXUS_BINARY_DIR}/bin")
 set(NEXUS_ASSEMBLY_FILE "" CACHE FILEPATH "One external authored TOML assembly")
 if(NOT NEXUS_ASSEMBLY_FILE)
-    if(NOT PROJECT_IS_TOP_LEVEL)
-        message(FATAL_ERROR "External consumers must set NEXUS_ASSEMBLY_FILE")
-    endif()
-    set(NEXUS_ASSEMBLY_FILE
-        "${NEXUS_SOURCE_DIR}/tools/configure/assemblies/native.toml")
+    message(FATAL_ERROR
+        "Select an STM32F4 assembly with a maintained preset or "
+        "NEXUS_ASSEMBLY_FILE; host models require NEXUS_TEST_SUPPORT")
 endif()
 foreach(legacy NEXUS_CONFIG_FILE NEXUS_PLATFORM NEXUS_OSAL_BACKEND
                NEXUS_BOARD_DIR NEXUS_FLASH_LAYOUT_FILE)
@@ -54,17 +53,23 @@ include("${NEXUS_SOURCE_DIR}/cmake/platform/Firmware.cmake")
 
 add_subdirectory(core)
 add_subdirectory(arch)
-add_subdirectory(drivers)
 add_subdirectory(io)
 add_subdirectory(os)
 add_subdirectory(components EXCLUDE_FROM_ALL)
 include("${NEXUS_SOURCE_DIR}/cmake/platform/Components.cmake")
 nexus_resolve_components(nexus_component_targets ${NEXUS_SELECTED_COMPONENTS})
 if(NEXUS_SOC_FAMILY STREQUAL "native")
+    if(NOT NEXUS_TEST_SUPPORT)
+        message(FATAL_ERROR "Native models require NEXUS_TEST_SUPPORT")
+    endif()
     add_subdirectory("${NEXUS_SOC_SOURCE_DIRECTORY}"
-        "${NEXUS_BINARY_DIR}/soc/${NEXUS_SOC_FAMILY}")
+        "${NEXUS_BINARY_DIR}/tests/support/native")
     set(nexus_provider nexus_io_native)
 else()
+    if(NOT NEXUS_SOC_FAMILY STREQUAL "stm32f4" AND
+            NOT (NEXUS_TEST_SUPPORT AND NEXUS_CPU_ARCH STREQUAL "native"))
+        message(FATAL_ERROR "Only the STM32F4 production SoC is maintained")
+    endif()
     add_subdirectory("${NEXUS_SOC_SOURCE_DIRECTORY}"
         "${NEXUS_BINARY_DIR}/soc/${NEXUS_SOC_FAMILY}")
     set(nexus_provider "nexus_soc_${NEXUS_SOC_FAMILY}")
@@ -73,10 +78,14 @@ include("${NEXUS_SOURCE_DIR}/cmake/platform/Provider.cmake")
 nexus_validate_selected_provider("${nexus_provider}")
 add_library(nexus_platform STATIC "${NEXUS_CONFIG_DIR}/bindings.c")
 target_include_directories(nexus_platform PUBLIC "${NEXUS_CONFIG_DIR}"
-    PRIVATE "${NEXUS_SOURCE_DIR}/io/private")
+    PRIVATE "${NEXUS_SOURCE_DIR}/io/private"
+        "${NEXUS_SOURCE_DIR}/core/private")
 target_link_libraries(nexus_platform PUBLIC ${nexus_provider}
-    PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch
-        Nexus::DriverPrivateHeaders)
+    PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)
+foreach(ip classic_can fs_device_pio legacy_mac advanced_timer i2c_v1_async)
+    target_include_directories(nexus_platform PRIVATE
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/${ip}")
+endforeach()
 if(NEXUS_RUNTIME_POWER)
     target_link_libraries(nexus_platform PUBLIC Nexus::ClockDomain)
     target_include_directories(nexus_platform PRIVATE
@@ -107,6 +116,8 @@ set_target_properties(nexus_platform PROPERTIES
     NEXUS_CONFIG_DIR "${NEXUS_CONFIG_DIR}"
     NEXUS_SOC_FAMILY "${NEXUS_SOC_FAMILY}"
     NEXUS_CPU_ARCH "${NEXUS_CPU_ARCH}"
+    NEXUS_STM32_DEVICE "${NEXUS_STM32_DEVICE}"
+    NEXUS_STM32_STARTUP "${NEXUS_STM32_STARTUP}"
     NEXUS_BACKEND "${NEXUS_BACKEND}"
     NEXUS_COMPONENT_TARGETS "${nexus_component_targets}"
     NEXUS_STARTUP_SOURCE "${NEXUS_STARTUP_SOURCE}"
@@ -115,7 +126,8 @@ set_target_properties(nexus_platform PROPERTIES
     NEXUS_SYSTEM_VENDOR_INCLUDES "${NEXUS_SYSTEM_VENDOR_INCLUDES}"
     NEXUS_SYSTEM_COMPILE_DEFINITIONS "${NEXUS_SYSTEM_COMPILE_DEFINITIONS}")
 if(NEXUS_SOC_FAMILY STREQUAL "native")
-    target_include_directories(nexus_platform PRIVATE "${NEXUS_SOURCE_DIR}/soc/native/drivers")
+    target_include_directories(nexus_platform PRIVATE
+        "${NEXUS_SOURCE_DIR}/tests/support/native/drivers")
 endif()
 add_library(Nexus::Platform ALIAS nexus_platform)
 option(NEXUS_BUILD_TESTS "Build maintained host behavior tests" ${PROJECT_IS_TOP_LEVEL})

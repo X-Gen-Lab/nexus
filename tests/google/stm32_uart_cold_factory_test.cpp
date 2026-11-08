@@ -19,12 +19,12 @@ nx_stm32_system_t g_nx_stm32_system;
 #ifdef NX_COLD_HAL
 alignas(16) uint8_t g_nx_stm32_scs_model[0x2000U] = {};
 #else
-NVIC_Type g_gd32_model_nvic;
-SCB_Type g_gd32_model_scb;
-SysTick_Type g_gd32_model_systick;
+NVIC_Type g_f4_model_nvic;
+SCB_Type g_f4_model_scb;
+SysTick_Type g_f4_model_systick;
 #endif
-uint32_t g_gd32_model_mask;
-bool g_gd32_model_isr;
+uint32_t g_f4_model_mask;
+bool g_f4_model_isr;
 }
 #include <array>
 #include <cstring>
@@ -113,12 +113,12 @@ class UartColdFactory : public testing::Test {
         SystemCoreClock = 168000000U;
         RCC->CFGR = RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
 #else
-        g_gd32_model_nvic = {};
-        g_gd32_model_scb = {};
-        g_gd32_model_systick = {};
+        g_f4_model_nvic = {};
+        g_f4_model_scb = {};
+        g_f4_model_systick = {};
 #endif
-        g_gd32_model_mask = 0U;
-        g_gd32_model_isr = false;
+        g_f4_model_mask = 0U;
+        g_f4_model_isr = false;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
         privileged = true;
@@ -143,8 +143,8 @@ class UartColdFactory : public testing::Test {
     }
     void TearDown() override {
         privileged = true;
-        g_gd32_model_mask = 0U;
-        g_gd32_model_isr = false;
+        g_f4_model_mask = 0U;
+        g_f4_model_isr = false;
         refused = nullptr;
         refused_priority = -1;
         if (mmio != MAP_FAILED) {
@@ -532,10 +532,10 @@ extern "C" bool nx_arch_is_privileged(void) {
     return privileged;
 }
 extern "C" bool nx_arch_in_isr(void) {
-    return g_gd32_model_isr;
+    return g_f4_model_isr;
 }
 extern "C" bool nx_arch_irq_is_masked(void) {
-    return g_gd32_model_mask != 0U;
+    return g_f4_model_mask != 0U;
 }
 extern "C" void nx_arch_dsb(void) {
 }
@@ -544,12 +544,12 @@ extern "C" void nx_arch_dmb(void) {
 extern "C" void nx_arch_isb(void) {
 }
 extern "C" nx_arch_irq_state_t nx_arch_irq_save(void) {
-    const nx_arch_irq_state_t previous{g_gd32_model_mask};
-    g_gd32_model_mask = 1U;
+    const nx_arch_irq_state_t previous{g_f4_model_mask};
+    g_f4_model_mask = 1U;
     return previous;
 }
 extern "C" void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
-    g_gd32_model_mask = previous.value;
+    g_f4_model_mask = previous.value;
 }
 extern "C" nx_time_us_t nx_time_now_us(void) {
     return ++now;

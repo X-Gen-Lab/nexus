@@ -9,20 +9,15 @@
 extern "C" {
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#if defined(NX_FLASH_PROGRAM_STM32)
 #include "stm32f407_provider.h"
 nx_stm32_system_t g_nx_stm32_system;
-#else
-#include "gd32f470_provider.h"
-#endif
-NVIC_Type g_gd32_model_nvic;
+NVIC_Type g_f4_model_nvic;
 }
 #include <cstring>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
 
 static unsigned system_calls;
-#if defined(NX_FLASH_PROGRAM_STM32)
 /** \brief Model only identity and system ports; real factory/I/O remain. */
 extern "C" nx_result_t nx_stm32_validate_identity(uint32_t) {
     ++system_calls;
@@ -41,24 +36,9 @@ extern "C" int nx_stm32_system_stop(nx_stm32_system_t*, uint32_t) {
     ++system_calls;
     return 0;
 }
-#else
-/** \brief Reviewed fixed clock ports are external to this factory test. */
-extern "C" nx_result_t nx_gd32_soc_preflight(void) {
-    ++system_calls;
-    return NX_SUCCESS;
-}
-extern "C" int nx_gd32_soc_start(void) {
-    ++system_calls;
-    return 0;
-}
-extern "C" int nx_gd32_soc_stop(void) {
-    ++system_calls;
-    return 0;
-}
-#endif
 
 TEST(PhysicalFlashFactory, CapabilitiesMatchActualConstructedPhysicalGeometry) {
-    g_gd32_model_nvic = {};
+    g_f4_model_nvic = {};
     const uintptr_t addresses[3]{0x08000000U, 0x40000000U, 0x1fff7000U};
     const size_t sizes[3]{1048576U, 0x80000U, 4096U};
     void* mappings[3]{};
@@ -69,9 +49,6 @@ TEST(PhysicalFlashFactory, CapabilitiesMatchActualConstructedPhysicalGeometry) {
                  MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(reinterpret_cast<void*>(addresses[i]), mappings[i]);
     }
-#if !defined(NX_FLASH_PROGRAM_STM32)
-    *reinterpret_cast<uint32_t*>(uintptr_t(0x1fff7a20U)) = 1024U << 16U;
-#endif
     system_calls = 0U;
     const auto* face = nx_factory_flash(NX_FLASH_ID_PHYSICAL);
     const auto* capability = nx_factory_flash_capability(NX_FLASH_ID_PHYSICAL);
@@ -84,11 +61,7 @@ TEST(PhysicalFlashFactory, CapabilitiesMatchActualConstructedPhysicalGeometry) {
     const auto* geometry = nx_flash_port_geometry(face);
     ASSERT_NE(nullptr, geometry);
     EXPECT_EQ(geometry->program_unit, capability->unit_bytes);
-#if defined(NX_FLASH_PROGRAM_STM32)
     EXPECT_EQ(4U, capability->unit_bytes);
-#else
-    EXPECT_EQ(2U, capability->unit_bytes);
-#endif
     EXPECT_EQ(1U, capability->buffer_alignment);
     EXPECT_EQ(0U, geometry->program_flags);
     EXPECT_EQ(1048576U, geometry->size);

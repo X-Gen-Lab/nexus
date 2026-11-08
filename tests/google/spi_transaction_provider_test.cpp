@@ -1,6 +1,6 @@
 /**
  * \file            spi_transaction_provider_test.cpp
- * \brief           Production STM32F407 and GD32F470 whole-CS word transfers
+ * \brief           Production STM32F4 whole-CS word transfers
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-17
@@ -8,19 +8,10 @@
  */
 extern "C" {
 #include "nexus/io/spi_transaction.h"
-#if defined(NX_SPI_TRANSACTION_STM32)
 #include "stm32f407_provider.h"
 extern const nx_spi_transaction_ops_t nx_stm32_spi_transaction_ops;
 nx_stm32_system_t g_nx_stm32_system;
 GPIO_TypeDef g_nx_stm32_gpioa_model;
-#else
-#include "gd32f470_provider.h"
-#include "gd32f4xx.h"
-extern const nx_spi_transaction_ops_t nx_gd32_spi_transaction_ops;
-extern uint64_t g_gd32_model_now;
-extern bool g_gd32_model_isr;
-extern uint32_t g_gd32_model_mask;
-#endif
 }
 #include <gtest/gtest.h>
 #include <sys/mman.h>
@@ -34,18 +25,11 @@ bool selected;
 uint8_t expected_bits;
 class SPITransactionProvider : public testing::Test {
   protected:
-#if defined(NX_SPI_TRANSACTION_STM32)
     nx_stm32_spi_state_t state{SPI1, RCC, 84000000U, false, false};
     nx_stm32_gpio_state_t cs{GPIOC, 1U, true, true};
     nx_stm32_spi_endpoint_state_t child{&state, &cs, 1U, 1000000U, 0U};
     nx_spi_transaction_endpoint_t endpoint{&nx_stm32_spi_transaction_ops,
                                            &child};
-#else
-    nx_gd32_spi_state_t state{};
-    nx_gd32_spi_endpoint_state_t child{};
-    nx_spi_transaction_endpoint_t endpoint{&nx_gd32_spi_transaction_ops,
-                                           &child};
-#endif
     void* mapping = MAP_FAILED;
     size_t transferred = 99U;
     void SetUp() override {
@@ -58,17 +42,8 @@ class SPITransactionProvider : public testing::Test {
         selected = false;
         fail_after = SIZE_MAX;
         expected_bits = 8U;
-#if defined(NX_SPI_TRANSACTION_STM32)
         g_nx_stm32_gpioa_model = {};
         SPI1->SR = SPI_SR_TXE | SPI_SR_RXNE;
-#else
-        g_gd32_model_now = 0U;
-        g_gd32_model_isr = false;
-        g_gd32_model_mask = 0U;
-        ASSERT_EQ(nx_gd32_spi_initialize(&state, &child, 1000000U, 0U),
-                  NX_SUCCESS);
-        SPI_STAT(SPI4) = SPI_STAT_TBE | SPI_STAT_RBNE;
-#endif
     }
     void TearDown() override {
         EXPECT_FALSE(selected);
@@ -143,12 +118,8 @@ TEST_F(SPITransactionProvider, MidTransactionFaultResetsBeforeCsRelease) {
     EXPECT_EQ(rx[1], 0xAAU);
     EXPECT_EQ(words.size(), 2U);
     EXPECT_FALSE(state.active);
-#if defined(NX_SPI_TRANSACTION_STM32)
     EXPECT_EQ(SPI1->CR1 & SPI_CR1_SPE, 0U);
     EXPECT_TRUE(state.fault);
-#else
-    EXPECT_EQ(SPI_CTL0(SPI4) & SPI_CTL0_SPIEN, 0U);
-#endif
 }
 } /* namespace */
 
@@ -158,7 +129,6 @@ extern "C" void nx_spi_transaction_model_write(void* raw, uint16_t word,
                                                uint8_t bits) {
     EXPECT_TRUE(selected);
     EXPECT_EQ(bits, expected_bits);
-#if defined(NX_SPI_TRANSACTION_STM32)
     auto* state = static_cast<nx_stm32_spi_state_t*>(raw);
     EXPECT_TRUE(state->active);
     EXPECT_EQ((state->registers->CR1 & SPI_CR1_DFF) != 0U, bits == 16U);
@@ -166,16 +136,6 @@ extern "C" void nx_spi_transaction_model_write(void* raw, uint16_t word,
     if (words.size() == fail_after) {
         state->registers->SR |= SPI_SR_MODF;
     }
-#else
-    auto* state = static_cast<nx_gd32_spi_state_t*>(raw);
-    EXPECT_TRUE(state->active);
-    EXPECT_EQ((SPI_CTL0(state->controller->registers) & SPI_CTL0_FF16) != 0U,
-              bits == 16U);
-    SPI_DATA(state->controller->registers) = word;
-    if (words.size() == fail_after) {
-        SPI_STAT(state->controller->registers) |= SPI_STAT_CONFERR;
-    }
-#endif
     words.push_back(word);
 }
 /** \brief One whole-CS interval must surround every data-register access. */
@@ -184,8 +144,3 @@ extern "C" void nx_spi_transaction_model_cs(bool active) {
     selected = active;
     selections.push_back(active);
 }
-#if !defined(NX_SPI_TRANSACTION_STM32)
-/** \brief The shared GD32 MMIO fixture has no selected UART publisher. */
-extern "C" void USART0_IRQHandler(void) {
-}
-#endif

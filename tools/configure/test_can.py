@@ -1,4 +1,5 @@
 """CAN assembly selects exact resources and immutable shared filter ownership."""
+from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 import json
 from pathlib import Path
@@ -6,7 +7,6 @@ import tempfile
 import unittest
 
 from tools.configure import configure as gate
-from tools.configure.providers import maintained
 
 
 class CanConfigurationTests(unittest.TestCase):
@@ -39,7 +39,7 @@ class CanConfigurationTests(unittest.TestCase):
         return path
 
     def test_two_controllers_share_one_immutable_domain_and_distinct_exact_irqs(self):
-        ir = gate.resolve_ir(self.authored(second=True))
+        ir = gate.resolve_ir(self.authored(second=True), test_support=native_fixture(self.authored(second=True)))
         self.assertEqual(ir.can_domain.split, 14)
         self.assertEqual(len(ir.can_domain.filters), 2)
         with self.assertRaises(FrozenInstanceError):
@@ -53,49 +53,16 @@ class CanConfigurationTests(unittest.TestCase):
             self.assertIn('irq:' + vector, claims)
         self.assertFalse(any(name.startswith('dma:') for name in claims))
 
-    def test_constructor_rejects_a_foreign_vendor_binding(self):
-        for fixture, foreign in (("stm32-first.toml", "gd32"),
-                                 ("gd32-first.toml", "stm32")):
-            with self.subTest(fixture=fixture):
-                result = gate.resolve_ir(gate.ROOT /
-                    "tests/contracts/can_assembly" / fixture)
-                item = next(item for item in result.controllers
-                            if item.kind == "can")
-                with self.assertRaisesRegex(ValueError, "provider"):
-                    maintained("stm32f407" if foreign == "stm32" else
-                               "gd32f470").constructor(
-                        item, result, result.board_bindings, result.routes,
-                        result.devices)
 
-    def test_gd470_fifo_transmit_order_is_rejected_before_any_bundle_is_published(self):
-        fixture = gate.ROOT / 'tests/contracts/can_assembly/gd32-first.toml'
-        base = fixture.read_text().replace('board_package="gd32_board"',
-            'board_package="' + str(fixture.parent / 'gd32_board') + '"')
-        for operation in ('loopback', 'normal', 'silent-loopback'):
-            with self.subTest(operation=operation):
-                content = base.replace('fifo_order=false', 'fifo_order=true')
-                content = content.replace('operation="loopback"',
-                                          f'operation="{operation}"')
-                path = self.root / 'gd470.toml'
-                path.write_text(content)
-                output = self.root / 'rejected'
-                with self.assertRaisesRegex(ValueError, 'CAN.*fifo_order'):
-                    gate.configure(path, output)
-                self.assertFalse(output.exists())
 
-    def test_stm32_retains_reviewed_fifo_order_and_gd470_fixtures_select_priority(self):
-        self.assertTrue(gate.resolve_ir(self.authored()).controllers[0].options.fifo_order)
-        for name in ('gd32-first.toml', 'gd32-both.toml'):
-            with self.subTest(name=name):
-                selected = gate.resolve_ir(gate.ROOT / 'tests/contracts/can_assembly' / name)
-                self.assertTrue(selected.controllers)
-                self.assertTrue(all(not item.options.fifo_order
-                                    for item in selected.controllers))
+    def test_stm32_retains_reviewed_fifo_order(self):
+        result = gate.resolve_ir(self.authored())
+        self.assertTrue(result.controllers[0].options.fifo_order)
 
     def test_generated_factory_and_partial_start_cleanup_are_explicit(self):
         path = self.authored(second=True)
         output = self.root / 'generated'
-        gate.configure(path, output)
+        gate.configure(path, output, test_support=native_fixture(path))
         source = (output / 'bindings.c').read_text()
         header = (output / 'nexus_factory.h').read_text()
         self.assertIn('nx_factory_can(', header)
@@ -107,11 +74,10 @@ class CanConfigurationTests(unittest.TestCase):
         self.assertIn('.domain = &s_nx_can_domain,', source)
         self.assertNotIn('static nx_result_t prepare_bus0', source)
         self.assertNotIn('static nx_result_t stop_bus0', source)
-        marker = 'result.primary = nx_stm32_can_prepare(&s_nx_port_bus1,'
-        begin = source.index('nx_platform_start_result_t nx_platform_start')
-        prior = source.rfind('s_nx_platform_initialized = 2u;', begin,
-                            source.index(marker))
-        self.assertGreater(prior, begin)
+        self.assertIn('(nx_lifecycle_acquisition_t){ '
+                      'nx_stm32_can_prepare(&s_nx_port_bus1, '
+                      '&s_nx_can_config_bus1, &s_nx_can_pin_leases_bus1), '
+                      'true }', source)
 
     def test_timing_requires_exact_apb_bitrate_and_valid_sampling_segments(self):
         for previous, replacement in (('prescaler=6', 'prescaler=7'),
@@ -121,7 +87,7 @@ class CanConfigurationTests(unittest.TestCase):
                 path = self.authored()
                 path.write_text(path.read_text().replace(previous, replacement))
                 with self.assertRaisesRegex(ValueError, 'CAN'):
-                    gate.resolve_ir(path)
+                    gate.resolve_ir(path, test_support=native_fixture(path))
 
     def test_filter_bank_owner_split_format_and_duplicate_claim_are_checked(self):
         for previous, replacement in (('bank=0', 'bank=14'),
@@ -132,24 +98,24 @@ class CanConfigurationTests(unittest.TestCase):
                 path = self.authored()
                 path.write_text(path.read_text().replace(previous, replacement))
                 with self.assertRaisesRegex(ValueError, 'CAN'):
-                    gate.resolve_ir(path)
+                    gate.resolve_ir(path, test_support=native_fixture(path))
         path = self.authored(second=True)
         path.write_text(path.read_text().replace('bank=14', 'bank=0'))
         with self.assertRaisesRegex(ValueError, 'CAN'):
-            gate.resolve_ir(path)
+            gate.resolve_ir(path, test_support=native_fixture(path))
 
     def test_derived_capability_uses_actual_common_io_operations_source(self):
         from tools.maintenance import capabilities
         rows = capabilities.collect(gate.ROOT)
         selected = [row for row in rows if row["kind"] == "can"]
-        self.assertEqual(len(selected), 4)
+        self.assertEqual(len(selected), 2)
         for row in selected:
-            self.assertEqual(row["exports"], ["drivers/can/classic_can/can_controller.c"])
+            self.assertEqual(row["exports"], ["soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c"])
             self.assertTrue(row["fixtures"])
 
     def test_no_can_configuration_produces_no_domain_state_or_driver_calls(self):
         output = self.root / 'empty'
-        gate.configure(gate.ROOT / 'tools/configure/assemblies/qiming-baremetal.toml', output)
+        gate.configure(gate.ROOT / 'tools/configure/assemblies/qiming-baremetal.toml', output, test_support=native_fixture(gate.ROOT / 'tools/configure/assemblies/qiming-baremetal.toml'))
         source = (output / 'bindings.c').read_text()
         self.assertNotIn('static nx_can_filter_domain_t', source)
         self.assertNotIn('nx_stm32_can_initialize', source)
@@ -163,7 +129,7 @@ class CanConfigurationTests(unittest.TestCase):
                 path = self.authored()
                 path.write_text(path.read_text().replace(previous, replacement))
                 with self.assertRaisesRegex(ValueError, 'CAN'):
-                    gate.resolve_ir(path)
+                    gate.resolve_ir(path, test_support=native_fixture(path))
 
     def test_second_controller_cannot_touch_reserved_primary_filter_domain(self):
         path = self.authored(second=True)
@@ -182,7 +148,7 @@ class CanConfigurationTests(unittest.TestCase):
         path.write_text(content.replace('board="stm32f407_qiming_v31"',
                                         'board_package="board"'))
         with self.assertRaisesRegex(ValueError, 'CAN.*reserved'):
-            gate.resolve_ir(path)
+            gate.resolve_ir(path, test_support=native_fixture(path))
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 """Selected USB-specific profile generation and metadata opt-out."""
+from tools.configure.tests.native_fixture import native_fixture
 
 import json
 from pathlib import Path
@@ -24,12 +25,12 @@ class UsbProfileGenerationTests(unittest.TestCase):
         assembly = self.root / (family + str(capabilities) + ".toml")
         assembly.write_text(text)
         output = self.root / (family + str(capabilities))
-        configure.configure(assembly, output)
+        configure.configure(assembly, output, test_support=native_fixture(assembly))
         return ((output / "nexus_factory.h").read_text(),
                 (output / "bindings.c").read_text())
 
     def test_selected_usb_has_a_distinct_typed_usb_profile_getter(self):
-        for family in ("stm32-zg", "stm32-ve", "gd32"):
+        for family in ('stm32-zg', 'stm32-ve'):
             with self.subTest(family=family):
                 header, source = self.generate(family)
                 self.assertIn("nx_factory_usb_profile", header)
@@ -40,7 +41,7 @@ class UsbProfileGenerationTests(unittest.TestCase):
                 self.assertIn("nx_factory_usb_endpoint_capability", header)
 
     def test_capabilities_false_does_not_emit_usb_profile_storage_or_api(self):
-        for family in ("stm32-zg", "gd32"):
+        for family in ('stm32-zg',):
             with self.subTest(family=family):
                 header, source = self.generate(family, capabilities=False)
                 self.assertNotIn("nx_factory_usb_profile", header)
@@ -49,7 +50,7 @@ class UsbProfileGenerationTests(unittest.TestCase):
 
 
     def test_activation_getter_is_independent_of_optional_rom_profiles(self):
-        for family in ("stm32-zg", "stm32-ve", "gd32"):
+        for family in ('stm32-zg', 'stm32-ve'):
             for capabilities in (False, True):
                 with self.subTest(family=family, capabilities=capabilities):
                     header, source = self.generate(family, capabilities)

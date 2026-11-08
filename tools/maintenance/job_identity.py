@@ -216,7 +216,12 @@ def capture(*, root: Path, job: str, result: str, expected_commit: str,
             configuration = {'artifact': selected[path],
                              'validation': 'invalid', 'error': str(error)}
         configurations.append(configuration)
-    if result == 'success' and dependency_scope is not None:
+    if (result == 'success' and dependency_scope is not None and
+            dependency_scope['scope'] == 'arm'):
+        # An ARM preset owns one authored Board/assembly. Native preparation
+        # owns the complete test dependency closure, including compiler-only
+        # jobs and matrices with distinct configurations; it does not qualify
+        # those configurations. Each discovered input above is still verified.
         if not configurations:
             raise EvidenceError('selected scope requires an actual resolved configuration')
         for configuration in configurations:

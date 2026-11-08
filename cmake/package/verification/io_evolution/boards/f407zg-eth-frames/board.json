@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "f407zg-enhanced-ethernet-software-pad-contract",
   "soc": "STM32F407ZGT6",
-  "soc_family": "stm32f407",
+  "soc_family": "stm32f4",
   "source_revision": "software-only-enhanced-RMII-A-C-G-pad-contract",
   "physical_pcb_revision": null,
   "clocks": {

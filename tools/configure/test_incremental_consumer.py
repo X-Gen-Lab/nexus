@@ -14,7 +14,7 @@ class IncrementalConsumerTests(unittest.TestCase):
             root = Path(name)
             assembly = root / "assembly.toml"
             assembly.write_text((configure.ROOT /
-                "tools/configure/assemblies/native-empty.toml").read_text())
+                "tests/support/native/assemblies/native-empty.toml").read_text())
             (root / "main.c").write_text(
                 '#include "nexus_config.h"\n'
                 'int main(void) { return NEXUS_MAIN_STACK_BYTES == 0u; }\n')
@@ -22,6 +22,7 @@ class IncrementalConsumerTests(unittest.TestCase):
                 'cmake_minimum_required(VERSION 3.31)\n'
                 'project(NexusIncremental LANGUAGES C ASM)\n'
                 'set(NEXUS_BUILD_TESTS OFF CACHE BOOL "")\n'
+                'set(NEXUS_TEST_SUPPORT ON CACHE BOOL "")\n'
                 'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "")\n'
                 'set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")\n'
                 'add_subdirectory("' + configure.ROOT.as_posix() + '" nexus)\n'

@@ -1,58 +1,19 @@
-# SoC 芯片集成与私有实现
+# SoC：STM32F4 系列支持包
 
-本层负责精确芯片的启动、时钟、时间域、内存、IRQ／DMA，以及公共 I/O 的具体实现。
-MCU 源码按厂家和已维护系列组织；`stm32f407`、`gd32f470` 等公共系列标识保持独立，
-不可变 family descriptor 给出唯一源码目录。目录层级不新增配置权威或运行时注册表。
+当前生产入口只有 [STM32F4](stm32/stm32f4/README.md)。已迁入的实现限定 F407VE／ZG，
+其他 F4 型号仍需精确事实、模式实现与验证，不能由目录名或 SDK 宏推定支持。
 
-## 目录与阅读入口
+SoC 拥有启动、时钟、内存、IRQ／DMA、资源收条和控制器私有状态；公共产品接口使用
+Nexus 类型，官方 HAL／LL、Handle 与 Device 类型保持私有。共享 IP 实现已归入
+`stm32/stm32f4/drivers/ip/`，不会产生额外运行时转发。
 
-```text
-soc/
-  common/                     跨厂家 SoC 协作合同
-  native/
-    configure/                Native 能力策略与静态装配
-    drivers/                  独立主机设备模型
-  stm32/
-    common/                   STM32 身份读取辅助
-    stm32f103/  stm32f407/  stm32g474/  stm32h743/  stm32u575/
-  gd32/
-    gd32f303/  gd32f470/
-```
+芯片与路线数据由 JSON 维护，PCB 接线由 [Board](../boards/README.md) 声明。配置工具
+集中在 `tools/configure/`；本目录不再包含 Python 生成插件。当前工具语言及尚待迁入
+手写 C 的冷态装配流程见[当前架构](../docs/delivery/architecture.md)。
 
-| 实现 | 精确范围入口 |
-| --- | --- |
-| [STM32F103](stm32/stm32f103/README.md) | F103RBT6 的所选模式 |
-| [STM32F407](stm32/stm32f407/README.md) | F407VET6／ZGT6；密度与封装分别验证 |
-| [STM32G474](stm32/stm32g474/README.md) | G474RET6 参考与独立模式 |
-| [STM32H743](stm32/stm32h743/README.md) | H743ZIT6 固定 clock／Cache／revision 切片 |
-| [STM32U575](stm32/stm32u575/README.md) | U575ZIT6Q 单状态及独立双域参考 |
-| [GD32F303](gd32/gd32f303/README.md) | GD32F303RCT6 精确封装参考 |
-| [GD32F470](gd32/gd32f470/README.md) | GD32F470ZGT6 精确实现 |
-| [Native](native/README.md) | 主机行为模型，不建立 MCU 资格 |
+`vendors/` 原位保留全部来源，只有当前选择的依赖进入构建。Native 模型已迁入
+[测试支撑](../tests/support/native/README.md)，必须显式启用测试 scope。
 
-## 事实、装配与硬件行为
-
-各 MCU family 拥有 `soc.json`、`routes.json`、私有 controller 状态、选定驱动源码
-和明确的 CMake target。其 `configure/` 负责系列能力、准入、静态构造描述及生命周期
-调用顺序。配置测试仍位于 `tools/configure/tests/providers/<family>/`；共享解析、
-不可变 IR、资源仲裁与 bundle 事务由 `tools/configure/` 维护。
-
-实际硬件算法直接由本 family 的 C 代码持有。启动、clock、timebase、memory 和
-power 也留在本层。可复用 IP 算法进入 [drivers](../drivers/README.md)，但每个 wrapper
-仍须检查真实厂商布局、bit、clock、IRQ／DMA 和 errata；外设同名不证明硬件等价。
-
-![FIG-31：共享 IP 与精确 SoC 源码归属](../docs/assets/diagrams/driver-source-ownership.svg)
-
-图表示源码和维护责任，不增加运行时转发层。`common/uart_control.h` 是跨厂家协作
-合同；`stm32/common/stm32_identity.h` 是 STM32 身份辅助，两者都不是通用外设算法。
-
-## 接入和验证边界
-
-[Board 包](../boards/README.md)授权已审 PCB 绑定。新增 Board 不会自动开放新时钟树；
-须选择精确已维护 clock profile，或实现并验证新的 profile。未维护的振荡源、domain、
-mode 和 silicon revision 必须明确拒绝。
-
-接入顺序见 [provider 指南](../docs/guides/provider-porting.md)，可选路线和模式见
-[派生能力矩阵](../docs/delivery/capabilities.md)，实际证据见
-[资格说明](../docs/reference/platforms/qualification.md)。CPU 支持、SDK 宏或目录存在
-均不建立整系列支持；MCU 实板 HIL 仍为 `not_executed`。
+新增器件先维护精确型号、器件宏、封装、存储、启动与资源路线，再复用已验证硬件
+profile；新增硬件行为写 C 和合同测试。配置成功、ARM 链接和物理 HIL 各自提供证据，
+不互相替代。当前 HIL 为 `not_executed`，详见[支持范围](../docs/delivery/support.md)。

@@ -33,7 +33,7 @@
             "name": "native-step-debug",
             "displayName": "Native single-step debug (Og and debug symbols)",
             "cacheVariables": {
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native-step-debug.toml"
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/support/native/assemblies/native-step-debug.toml"
             },
             "inherits": "nexus-native"
         }

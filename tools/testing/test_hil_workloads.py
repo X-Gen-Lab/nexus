@@ -102,9 +102,9 @@ class HilWorkloadTests(unittest.TestCase):
             "plan", "--fixture", str(fixture), "--resolved", str(resolved),
             "--report", str(report), *map(str, extra)])
 
-    def test_twenty_five_cases_cover_requested_items_without_measurements(self):
+    def test_current_cases_keep_explicit_acquisition_without_measurements(self):
         report = self.plan()
-        self.assertEqual(len(report["cases"]), 30)
+        self.assertEqual(len(report["cases"]), 23)
         self.assertEqual({item["work_item"] for item in report["cases"]},
                          set(range(47, 58)) | set(range(25, 31)) | {7, 12, 14, 15})
         self.assertEqual(report["status"], "prepared_unbound")
@@ -390,7 +390,7 @@ class HilWorkloadTests(unittest.TestCase):
         self.assertEqual(template["kind"], "hil_workload")
         self.assertIsNone(template["board"])
         self.assertIsNone(template["part"])
-        self.assertEqual(len(template["cases"]), 30)
+        self.assertEqual(len(template["cases"]), 23)
         with self.assertRaises(EvidenceError):
             self.validate(template)
 

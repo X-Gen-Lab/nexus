@@ -13,6 +13,8 @@ import unittest.mock
 
 from scripts.ci import provider_assemblies as gate
 from tools.evidence.common import EvidenceError
+from tools.evidence import identity as source_identity
+from tools.configure import configure
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -20,6 +22,45 @@ USB = ROOT / "tests/contracts/usb_assembly/stm32-zg.toml"
 
 
 class FixtureAdmission(unittest.TestCase):
+    def test_unselected_inventory_does_not_mask_real_tool_admission(self):
+        source = source_identity.observe_git_source(ROOT)
+        path = 'vendors/st/cmsis_device_u5'
+        source['submodules'] = [
+            '-' + line[1:].split()[0] + ' ' + path
+            if line.split()[1] == path else line
+            for line in source['submodules']]
+        self.assertTrue(any(line.startswith('-') and path in line
+                            for line in source['submodules']))
+        environment = {key: value for key, value in os.environ.items()
+                       if not key.startswith('GIT_')}
+        with tempfile.TemporaryDirectory() as directory, \
+                unittest.mock.patch.dict(os.environ, environment, clear=True), \
+                unittest.mock.patch.object(source_identity,
+                    'observe_git_source', return_value=source), \
+                unittest.mock.patch.object(gate.arch_compile, 'tools',
+                    side_effect=EvidenceError('tool admission reached')):
+            output = Path(directory) / 'audit'
+            self.assertEqual(gate.run(ROOT, [USB], 'missing-compiler', output), 1)
+            report = json.loads((output / 'report.json').read_text())
+        self.assertEqual(report['error'], 'tool admission reached')
+        self.assertEqual(report['source_before'], source)
+        self.assertEqual(report['status'], 'failed')
+
+    def test_missing_selected_sdk_rejects_before_source_observation(self):
+        environment = {key: value for key, value in os.environ.items()
+                       if not key.startswith('GIT_')}
+        with tempfile.TemporaryDirectory() as directory, \
+                unittest.mock.patch.dict(os.environ, environment, clear=True), \
+                unittest.mock.patch.object(configure, 'dependency_identity',
+                    side_effect=configure.ConfigurationError('selected SDK missing')), \
+                unittest.mock.patch.object(source_identity,
+                    'observe_git_source') as observe:
+            output = Path(directory) / 'audit'
+            self.assertEqual(gate.run(ROOT, [USB], 'missing-compiler', output), 1)
+            report = json.loads((output / 'report.json').read_text())
+        self.assertIn('selected SDK missing', report['error'])
+        observe.assert_not_called()
+
     def test_empty_matrix_is_a_failure(self):
         with self.assertRaisesRegex(EvidenceError, "nonempty"):
             gate.validate_fixtures(ROOT, [])
@@ -34,7 +75,7 @@ class FixtureAdmission(unittest.TestCase):
 
     def test_real_authored_input_is_resolved_without_rewriting(self):
         before = USB.read_bytes()
-        rows = gate.validate_fixtures(ROOT, [USB], family="stm32f407")
+        rows = gate.validate_fixtures(ROOT, [USB], family="stm32f4")
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["resolved"]["part"], "STM32F407ZGT6")
         self.assertEqual(rows[0]["resolved"]["backend"], "baremetal")
@@ -65,16 +106,16 @@ class FixtureAdmission(unittest.TestCase):
 class ExplicitProjectAdmission(unittest.TestCase):
     def setUp(self):
         self.assembly = ROOT / (
-            "tools/configure/assemblies/nucleo-h743-baremetal-uart.toml")
-        self.project = ROOT / "tests/contracts/h743_assembly"
+            "tools/configure/assemblies/qiming-baremetal-uart.toml")
+        self.project = ROOT / "tests/contracts/stm32_assembly"
 
     def test_canonical_input_uses_the_explicit_owned_project(self):
         before = self.assembly.read_bytes()
         rows = gate.validate_fixtures(
-            ROOT, [self.assembly], project=self.project, family="stm32h743")
+            ROOT, [self.assembly], project=self.project, family="stm32f4")
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["project"], str(self.project))
-        self.assertEqual(rows[0]["resolved"]["part"], "STM32H743ZIT6")
+        self.assertEqual(rows[0]["resolved"]["part"], "STM32F407ZGT6")
         self.assertEqual(self.assembly.read_bytes(), before)
 
     def test_canonical_input_without_project_remains_rejected(self):
@@ -120,9 +161,11 @@ class ExplicitProjectAdmission(unittest.TestCase):
                 gate.validate_fixtures(ROOT, [source], project=self.project)
 
     def test_native_canonical_is_not_an_arm_fixture(self):
-        source = self.assembly.with_name("native.toml")
-        with self.assertRaisesRegex(EvidenceError, "host model"):
-            gate.validate_fixtures(ROOT, [source], project=self.project)
+        with tempfile.TemporaryDirectory(dir=ROOT / "tests/contracts") as directory:
+            source = Path(directory) / "native.toml"
+            source.write_text((ROOT / "tests/support/native/assemblies/native.toml").read_text())
+            with self.assertRaisesRegex(EvidenceError, "host model"):
+                gate.validate_fixtures(ROOT, [source], project=self.project)
 
     def test_explicit_canonical_input_requires_schema_two(self):
         with tempfile.NamedTemporaryFile(
@@ -416,12 +459,12 @@ class OutputAdmission(unittest.TestCase):
 
     def test_wrong_built_configuration_is_rejected(self):
         with self.assertRaisesRegex(EvidenceError, "configuration"):
-            gate.require_configuration({"configuration_sha256": "a", "soc_family": "stm32f407"},
-                                       {"configuration_sha256": "b", "soc_family": "stm32f407"})
+            gate.require_configuration({"configuration_sha256": "a", "soc_family": "stm32f4"},
+                                       {"configuration_sha256": "b", "soc_family": "stm32f4"})
 
     def test_wrong_built_family_is_rejected_even_if_hash_is_claimed_equal(self):
         with self.assertRaisesRegex(EvidenceError, "family"):
-            gate.require_configuration({"configuration_sha256": "a", "soc_family": "stm32f407"},
+            gate.require_configuration({"configuration_sha256": "a", "soc_family": "stm32f4"},
                                        {"configuration_sha256": "a", "soc_family": "gd32f470"})
 
     def test_budget_failure_is_never_admitted(self):

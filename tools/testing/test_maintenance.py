@@ -6,6 +6,7 @@ import io
 import json
 from pathlib import Path
 import tempfile
+import tomllib
 import unittest
 
 from tools.maintenance import capabilities, ownership
@@ -38,61 +39,51 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
     def test_current_matrix_uses_actual_resolver_and_preserves_scope(self):
         rows = capabilities.collect(ROOT)
         self.assertTrue(rows)
-        uart_dma = [row for row in rows if row["family"] == "stm32f407"
+        uart_dma = [row for row in rows if row["family"] == "stm32f4"
                     and row["controller"] == "USART1"
                     and row["mode"] == "dma-tx"]
         self.assertEqual(len(uart_dma), 1)
         self.assertEqual(uart_dma[0]["exports"],
-                         ["soc/stm32/stm32f407/drivers/uart_hal.c"])
+                         ["soc/stm32/stm32f4/drivers/uart_hal.c"])
         self.assertTrue(uart_dma[0]["fixtures"])
-        spi = next(row for row in rows if row["family"] == "stm32f407"
+        spi = next(row for row in rows if row["family"] == "stm32f4"
                    and row["controller"] == "SPI1" and row["mode"] == "dma")
         self.assertEqual(set(spi["boards"]), {
             "stm32f407zg-qiming-core", "stm32f407zg-qiming-v41"})
 
     def test_selected_shared_ip_exports_keep_the_actual_driver_path(self):
         rows = capabilities.collect(ROOT)
-        selected = [row for row in rows if row["family"] == "stm32f407"
+        selected = [row for row in rows if row["family"] == "stm32f4"
                     and row["kind"] == "i2c" and row["exports"]
                     and row["mode"] in {"irq-messages", "dma-messages"}]
         self.assertTrue(selected)
         for row in selected:
             with self.subTest(mode=row["mode"]):
                 self.assertEqual(row["exports"],
-                                 ["drivers/i2c/i2c_v1_async/i2c_v1_async.c"])
+                                 ["soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"])
 
-    def test_native_selected_models_preserve_real_ops_and_no_physical_claim(self):
+    def test_native_models_require_explicit_scope_outside_production_matrix(self):
         rows = capabilities.collect(ROOT)
-        selected = [row for row in rows if row["family"] == "native"]
-        self.assertTrue(selected, "Selected Native models require source provenance")
-        fixture = "cmake/package/verification/io_evolution/native-time-pair.toml"
-        for controller, kind, mode in (
-                ("RTC0", "rtc", "calendar-alarm"),
-                ("RTC1", "rtc", "calendar-alarm"),
-                ("LPTIM0", "lptim", "counter16-oneshot"),
-                ("LPTIM1", "lptim", "counter16-oneshot")):
-            with self.subTest(controller=controller):
-                values = [row for row in selected if
-                          (row["controller"], row["kind"], row["mode"]) ==
-                          (controller, kind, mode)]
-                self.assertEqual(len(values), 1)
-                row = values[0]
-                self.assertEqual(row["implementation"], "MODEL")
-                self.assertIs(row["physical_qualified"], False)
-                self.assertEqual(row["routes"], [])
-                self.assertEqual(row["boards"], [])
-                self.assertEqual(row["exports"], ["soc/native/drivers/rtc_lptim.c"])
-                self.assertIn(fixture, row["fixtures"])
-        empty = "cmake/package/verification/io_evolution/native-time-empty.toml"
-        self.assertFalse(any(empty in row["fixtures"] for row in rows),
-                         "Empty selection must not invent provider evidence")
-        for row in selected:
-            self.assertEqual(row["implementation"], "MODEL")
-            self.assertIs(row["physical_qualified"], False)
-            self.assertTrue(row["fixtures"])
-            self.assertTrue(row["exports"])
-        rendered = capabilities.render(selected)
-        self.assertIn("native (MODEL; physical=false)", rendered)
+        self.assertEqual({row["family"] for row in rows}, {"stm32f4"})
+        fixture = ROOT / "cmake/package/verification/io_evolution/native-time-pair.toml"
+        with self.assertRaisesRegex(ValueError, "explicit test support"):
+            capabilities.selection(fixture, ROOT)
+        selected = capabilities.selection(fixture, ROOT, test_support=True)
+        self.assertIs(selected["physical_qualified"], False)
+        self.assertEqual({(item["controller"], item["kind"], item["mode"])
+                          for item in selected["controllers"]}, {
+            ("RTC0", "rtc", "calendar-alarm"),
+            ("RTC1", "rtc", "calendar-alarm"),
+            ("LPTIM0", "lptim", "counter16-oneshot"),
+            ("LPTIM1", "lptim", "counter16-oneshot")})
+        for item in selected["controllers"]:
+            self.assertTrue(item["contract"]["model"])
+            self.assertEqual(item["contract"]["provider"], "native")
+            self.assertIn("MODEL", item["contract"]["features"])
+        empty = ROOT / "cmake/package/verification/io_evolution/native-time-empty.toml"
+        self.assertEqual(capabilities.selection(
+            empty, ROOT, test_support=True)["controllers"], [])
+        rendered = capabilities.render(rows)
         self.assertNotIn("| native |", rendered)
 
     def test_checked_document_matches_facts_and_selected_implementation(self):
@@ -106,8 +97,13 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         self.assertTrue(fixtures)
         rows = capabilities.collect(ROOT)
         for fixture in fixtures:
-            resolved = capabilities.configure.resolve_ir(fixture, ROOT)
+            host = tomllib.loads(fixture.read_text())["backend"] == "native"
+            resolved = capabilities.configure.resolve_ir(
+                fixture, ROOT, test_support=host)
             relative = fixture.relative_to(ROOT).as_posix()
+            if host:
+                self.assertFalse(any(relative in row["fixtures"] for row in rows))
+                continue
             for item in resolved.controllers:
                 with self.subTest(fixture=fixture.name, device=item.id):
                     selected = [row for row in rows if
@@ -119,31 +115,6 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
                     self.assertIn(relative, selected[0]["fixtures"])
                     self.assertTrue(selected[0]["exports"])
 
-    def test_alternate_interface_uses_its_exact_route_and_source_on_one_timer(self):
-        rows = capabilities.collect(ROOT)
-        timer = [row for row in rows if row["family"] == "stm32g474" and
-                 row["controller"] == "TIM3"]
-        self.assertEqual({(row["kind"], row["mode"]) for row in timer},
-                         {("pwm", "fixed-pwm"),
-                          ("pwm", "shared-fixed-pwm"),
-                          ("encoder", "quadrature")})
-        encoder = next(row for row in timer if row["kind"] == "encoder")
-        pwm = next(row for row in timer if row["mode"] == "fixed-pwm")
-        shared = next(row for row in timer
-                      if row["mode"] == "shared-fixed-pwm")
-        self.assertEqual(encoder["routes"], ["tim3-encoder-pa6-pa7"])
-        self.assertEqual(pwm["routes"], ["tim3-ch1-pa6"])
-        self.assertEqual(shared["routes"], ["tim3-ch1-pa6", "tim3-ch2-pa7"])
-        self.assertEqual(shared["exports"],
-                         ["soc/stm32/stm32g474/drivers/pwm_shared.c"])
-        self.assertIn("cmake/package/verification/io_evolution/"
-                      "g474-pwm-shared.toml",
-                      shared["fixtures"])
-        self.assertEqual(encoder["exports"],
-                         ["soc/stm32/stm32g474/drivers/encoder.c"])
-        self.assertIn("tests/contracts/g474_control_assembly/encoder.toml",
-                      encoder["fixtures"])
-        self.assertEqual(encoder["boards"], [])
 
 
 class AgentMaintenanceTests(unittest.TestCase):

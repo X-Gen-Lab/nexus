@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: f5455691f26b001ea0a0f0f93689c1a7155b827f52cffcb2966bbeb99247aded\n"
+"X-Nexus-Source-SHA256: 8a99d6d246b802d52564634fc3baed589cefec054ae69ac2e4aa37b788e7f8e0\n"
 
 #: docs/reference/documentation-delivery.md:1
 msgid "文档包、发布与独立恢复"
@@ -103,18 +103,8 @@ msgstr ""
 " for offline reading must already be in the package."
 
 #: docs/reference/documentation-delivery.md:24
-msgid ""
-"构建记录采用 schema 1，`kind` 为 `nexus_documentation_build`。其 `source` 使用 "
-"`tools.evidence.identity.observe_git_source()` 的实际观测结果，`tools` 保存实际工具 "
-"版本，`languages` 固定为 `en`、`zh_CN`。交付工具拒绝脏源码、缺失或偏离锁定版本 的 "
-"submodule，以及与当前源码不一致的陈旧构建。"
-msgstr ""
-"The build record uses schema 1 and `kind` `nexus_documentation_build`. Its "
-"`source` contains actual observations from "
-"`tools.evidence.identity.observe_git_source()`, `tools` records observed "
-"tool versions, and `languages` is fixed to `en` and `zh_CN`. Delivery "
-"rejects dirty source, missing or mismatched pinned submodules, and stale "
-"builds that do not match the current source."
+msgid "构建记录采用 schema 1，`kind` 为 `nexus_documentation_build`。其 `source` 使用 `tools.evidence.identity.observe_git_source()` 的实际观测结果，`tools` 保存实际工具 版本，`languages` 固定为 `en`、`zh_CN`。交付工具拒绝脏源码、已初始化后偏离锁定 版本或冲突的 submodule，以及与当前源码不一致的陈旧构建。schema 2 文档包保留 尚未物化的 `-` gitlink，只绑定文档来源，不证明厂商 SDK 完整或固件通过；旧 schema 1 包和软件候选引用继续采用原来的严格依赖要求。"
+msgstr "The build record uses schema 1 and `kind` `nexus_documentation_build`. Its `source` contains actual observations from `tools.evidence.identity.observe_git_source()`, `tools` records observed tool versions, and `languages` is fixed to `en` and `zh_CN`. Delivery rejects dirty source, initialized submodules that differ from their pins or conflict, and stale builds that do not match the current source. A schema-2 documentation package retains unmaterialized `-` gitlinks to bind documentation origins; it does not establish vendor SDK completeness or firmware qualification. Legacy schema-1 packages and software candidate references retain their original strict dependency requirements."
 
 #: docs/reference/documentation-delivery.md:29
 msgid ""

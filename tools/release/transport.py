@@ -22,124 +22,22 @@ ARCHIVE = "consumer-raw.tar.gz"
 MANIFEST = "consumer-raw-manifest.json"
 # The producer and standalone transport share this reviewed immutable plan.
 # A report may describe these identities, never authorize another fixture set.
-CONSUMER_POLICY = "nexus-sdk-consumers-v16"
-BASE_CONSUMERS = (("native", False, "native"),
-                  ("stm32", True, "stm32"), ("gd32", True, "gd32"))
-MODERN_CONSUMERS = tuple((family, backend)
-    for family in ("h743", "u575", "f103", "gd303", "g474")
-    for backend in ("baremetal", "freertos"))
+CONSUMER_POLICY = "nexus-sdk-consumers-v17"
+BASE_CONSUMERS = (("native", False, "native"), ("stm32", True, "stm32"))
+MODERN_CONSUMERS = ()
 SELECTED_CONSUMERS = (
-    ("h743 high",
-     "tools/configure/assemblies/h743-high-peripherals.toml",
-     "h743-high"),
-    ("u575 gpdma",
-     "cmake/package/verification/io_evolution/u575-uart-gpdma.toml",
-     "u575-uart-gpdma"),
-    ("g474 fd normal",
-     "cmake/package/verification/io_evolution/g474-can-fd-normal.toml",
-     "g474-can-fd"),
-    ("g474 fd loopback",
-     "cmake/package/verification/io_evolution/g474-can-fd-loopback.toml",
-     "g474-can-fd"),
-    ("g474 pwm adc",
-     "cmake/package/verification/io_evolution/g474-pwm-adc.toml",
-     "g474-pwm-adc"),
-    ("g474 adc regular software",
-     "cmake/package/verification/io_evolution/g474-adc-group-regular-software.toml",
-     "g474-adc-group"),
-    ("g474 adc regular timer",
-     "cmake/package/verification/io_evolution/g474-adc-group-regular-timer.toml",
-     "g474-adc-group"),
-    ("g474 adc injected software",
-     "cmake/package/verification/io_evolution/g474-adc-group-injected-software.toml",
-     "g474-adc-group"),
-    ("g474 adc injected timer",
-     "cmake/package/verification/io_evolution/g474-adc-group-injected-timer.toml",
-     "g474-adc-group"),
-    ("h743 fifo",
-     "cmake/package/verification/io_evolution/h743-uart-fifo.toml",
-     "uart-fifo"),
-    ("u575 fifo",
-     "cmake/package/verification/io_evolution/u575-uart-fifo.toml",
-     "uart-fifo"),
-    ("f407 frames",
-     "cmake/package/verification/io_evolution/f407zg-eth-frames.toml",
-     "ethernet-frames"),
-    ("gd470 frames",
-     "cmake/package/verification/io_evolution/gd470-eth-frames.toml",
-     "ethernet-frames"),
-    ("h743 rtscts",
-     "cmake/package/verification/io_evolution/h743-uart-rtscts.toml",
-     "uart-fifo"),
-    ("u575 rtscts",
-     "cmake/package/verification/io_evolution/u575-uart-rtscts.toml",
-     "uart-fifo"),
-    ("g474 shared pwm",
-     "cmake/package/verification/io_evolution/g474-pwm-shared.toml",
-     "g474-pwm-shared"),
-    ("native time pair",
-     "cmake/package/verification/io_evolution/native-time-pair.toml",
-     "native-time-pair"),
-    ("native time empty",
-     "cmake/package/verification/io_evolution/native-time-empty.toml",
-     "native-time-empty"),
-    ("h743 runtime clock",
-     "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
-     "h743-runtime-clock"),
-    ("h743 spi dma",
-     "tools/configure/assemblies/h743-spi-dma.toml",
-     "h743-spi-dma"),
-    ("h743 spi dma cache on",
-     "tools/configure/assemblies/h743-spi-dma-cache-on.toml",
-     "h743-spi-dma"),
-    ("u575 uart chain",
-     "tools/configure/assemblies/u575-uart-chain.toml",
-     "u575-uart-gpdma"),
-    ("u575 rtc run",
-     "tools/configure/assemblies/u575-rtc-run.toml",
-     "u575-rtc"),
-    ("u575 lptim run",
-     "tools/configure/assemblies/u575-lptim-run.toml",
-     "u575-lptim"),
-    ("h743 uart continuous",
-     "tools/configure/assemblies/h743-uart-continuous.toml",
-     "h743-uart-continuous"),
-    ("h743 uart continuous cache on",
-     "tools/configure/assemblies/h743-uart-continuous-cache-on.toml",
-     "h743-uart-continuous"),
-    ("h743 uart duplex continuous",
-     "tools/configure/assemblies/h743-uart-duplex-continuous.toml",
-     "h743-uart-duplex-continuous"),
-    ("h743 uart duplex continuous cache on",
-     "tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml",
-     "h743-uart-duplex-continuous"),
-    ("h743 spi dma uart tx",
-     "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
-     "h743-spi-dma"),
-    ("h743 spi dma uart rx",
-     "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
-     "h743-spi-dma"),
-    ("g474 pin states",
-     "tools/configure/assemblies/g474-pin-states.toml",
-     "pin-states"),
-    ("u575 retained time",
-     "tools/configure/assemblies/nucleo-u575-baremetal-empty.toml",
-     "u575-retained-time"),
-    ("u575 stop2",
-     "tools/configure/assemblies/nucleo-u575-baremetal-empty.toml",
-     "u575-stop2"),
-    ("u575 lpdma copy",
-     "tools/configure/assemblies/u575-lpdma-copy-stop2.toml",
-     "u575-lpdma-copy"),
-    ("u575 lptim1 lpbam",
-     "tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml",
-     "u575-lptim1-lpbam"),
-    ("u575 mpu gpio",
-     "tools/configure/assemblies/u575-mpu-gpio-write.toml",
-     "u575-mpu-gpio"),
-    ("f407 i2s2 slave tx",
-     "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
-     "f407-i2s2-slave-tx"),
+    ('f407 frames',
+     'cmake/package/verification/io_evolution/f407zg-eth-frames.toml',
+     'ethernet-frames'),
+    ('native time pair',
+     'cmake/package/verification/io_evolution/native-time-pair.toml',
+     'native-time-pair'),
+    ('native time empty',
+     'cmake/package/verification/io_evolution/native-time-empty.toml',
+     'native-time-empty'),
+    ('f407 i2s2 slave tx',
+     'tools/configure/assemblies/sky-i2s2-slave-tx.toml',
+     'f407-i2s2-slave-tx'),
 )
 
 
@@ -156,10 +54,7 @@ class ServiceConsumer:
 
 SERVICE_CONSUMERS = (
     ServiceConsumer("native services", "native.toml", "native-services", False),
-    ServiceConsumer("external services", "external/assembly.toml",
-                    "external-package", False),
     ServiceConsumer("f407 services", "f407.toml", "arm-services", True),
-    ServiceConsumer("gd470 services", "gd470.toml", "arm-services", True),
     ServiceConsumer("native secure services", "native/assembly.toml",
                     "native-secure", False, "secure_services"),
     ServiceConsumer("f407 secure services", "f407/assembly.toml",
@@ -172,22 +67,18 @@ SERVICE_CONSUMERS = (
                     "image_window"),
     ServiceConsumer("f407 loaned rx", "f407.toml", "arm-loaned-rx", True,
                     "loaned_rx"),
-    ServiceConsumer("gd470 loaned rx", "gd470.toml", "arm-loaned-rx", True,
-                    "loaned_rx"),
     ServiceConsumer("native mcuboot control", "native.toml", "native-boot-control",
                     False, "mcuboot_control"),
     ServiceConsumer("f407 mcuboot control", "f407.toml", "arm-boot-control",
                     True, "mcuboot_control"),
     ServiceConsumer("f407 mcuboot boot", "assembly.toml", "arm-boot", True,
                     "mcuboot_boot"),
-    ServiceConsumer("external provider", "assembly.toml", "external-provider",
-                    False, "external_provider"),
 )
 NATIVE_TIME_SMOKES = frozenset({"native-time-pair", "native-time-empty"})
 
 
 def selected_domain(specification):
-    """Classify only a reviewed legacy smoke, never a display-name prefix."""
+    """Classify reviewed host-time or F4 consumers by their exact identity."""
     if tuple(specification) not in SELECTED_CONSUMERS:
         raise ValueError("Selected consumer differs from the reviewed plan")
     return ("native-time" if specification[2] in NATIVE_TIME_SMOKES
@@ -212,9 +103,8 @@ def consumer_layout():
               selected_domain(specification) == "arm-provider")
              for specification in SELECTED_CONSUMERS
              for name in (specification[0],)]
-    rows += [(item.name, ("external_lifecycle_consumer",)
-              if item.scenario == "external_provider" else ("installed_services",),
-              item.arm) for item in SERVICE_CONSUMERS]
+    rows += [(item.name, ("installed_services",), item.arm)
+             for item in SERVICE_CONSUMERS]
     return tuple((name + " source", name + " build",
                   tuple(name + " build/bin/" + target + (".elf" if arm else "")
                         for target in targets))

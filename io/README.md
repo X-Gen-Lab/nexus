@@ -20,13 +20,13 @@ I/O 为应用和组件提供公共 C11 类型，为 SoC 的具体实现规定操
 | `src/api/` | 检查并分派到选定只读接口对象 |
 | `src/mechanisms/` | 流、DMA 排空、唤醒、事务和观察 |
 | `private/` | 无硬件依赖的验证、序列身份和日历 |
-| `../drivers/` | SoC 私有选编的受审 IP 引擎／模板 |
-| `../soc/native/drivers/` | 实现同一接口对象的独立宿主模型 |
-| `../soc/<vendor>/<family>/drivers/` | 精确 MCU 具体实现和模式 |
+| `../soc/stm32/stm32f4/drivers/ip/` | F4 私有选编的受审 IP 算法 |
+| `../tests/support/native/drivers/` | 显式测试 scope 的独立宿主模型 |
+| `../soc/stm32/stm32f4/drivers/` | 当前 F407VE／ZG 具体实现和模式 |
 
 物理 Platform 按 CMake 源码合同编译选定控制器域与组件依赖；空装配仍有时间戳
-和诊断辅助。Native 与仅复用 CPU 的 Runtime
-保留公共合同以接纳调用者自定义实现。所有配置组合可见公共头，未选操作
+和诊断辅助。显式 Native 测试模型与仅复用 CPU 的 Runtime
+保留公共合同以接纳调用者自定义实现，不新增生产 SoC。所有配置组合可见公共头，未选操作
 不成为第二个隐式具体实现；编译选择与最终 ELF GC 分别测量。
 
 组件目标自己声明 I/O 域依赖。如 `Nexus::TMP117I2C` 链接

@@ -9,23 +9,19 @@ is unchanged; the additional routes consume only selected instances.
 | Provider | First route | Second route |
 |---|---|---|
 | STM32 UART | USART1, APB2 84 MHz, DMA2 stream7 channel4 | USART2, APB1 42 MHz, DMA1 stream6 channel4 |
-| GD32 UART | USART0, APB2 100 MHz, literal DMA1 channel7 selector4 | USART1, APB1 50 MHz, literal DMA0 channel6 selector4 |
 | STM32 SPI | SPI1, APB2 84 MHz, DMA2 RXstream0/TXstream3 channel3 | SPI2, APB1 42 MHz, DMA1 RXstream3/TXstream4 channel0 |
-| GD32 SPI | SPI4, APB2 100 MHz, literal DMA1 RXchannel3/TXchannel4 selector2 | SPI0, APB2 100 MHz, literal DMA1 RXchannel2/TXchannel5 selector3 |
 
-Reviewed silicon AFs are USART2/USART1 PA2/PA3 AF7, SPI2 PB13/PB14/PB15 AF5,
-and SPI0 PA5/PA6/PA7 AF5. These facts do not supply external Board wiring,
+Reviewed silicon AFs are USART2 PA2/PA3 AF7, USART1 PA9/PA10 AF7,
+SPI2 PB13/PB14/PB15 AF5,
+and SPI1 PA5/PA6/PA7 AF5. These facts do not supply external Board wiring,
 connectors, electrical pull-ups or qualification. Typed configuration remains
 the single assembly authority. The second UART TX conflicts with the first
-I2C TX engine and must be rejected in resource resolution. GD literal DMA0/1
-is distinct from public opaque controller IDs 1/2.
+I2C TX engine and must be rejected in resource resolution.
 
 STM UART initialization uses retained exact IRQ, DMA, stream and clock facts.
 STM SPI initialization validates the selected bus, clock and engine pointers;
 an idle bus whose DMA vectors remain enabled cannot be acquired by another
-cold object. GD cold `_initialize_at` methods select only the two maintained
-readonly controller descriptors. Existing primary initializers remain thin
-wrappers. Duplicate/live hardware, retained enabled DMA publishers and unsupported
+cold object. Existing primary initializers remain thin wrappers. Duplicate/live hardware, retained enabled DMA publishers and unsupported
 tuples reject before effects. A disabled engine still has an owner while its
 vector lease is enabled; cold acquisition preserves that owner's flags/priority.
 

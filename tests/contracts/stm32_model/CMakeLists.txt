@@ -1,6 +1,6 @@
 # Compile real provider sources against deterministic register/event models.
 include("${NEXUS_SOURCE_DIR}/tests/cmake/CMSISHostModel.cmake")
-set(stm32_root "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407")
+set(stm32_root "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 set(stm32_device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 nexus_cmsis_core_include(stm32_cmsis)
 add_executable(contract_stm32_system_model
@@ -17,8 +17,8 @@ execute_process(COMMAND "${Python3_EXECUTABLE}"
     "${NEXUS_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/stm32_constructors.h"
     COMMAND_ERROR_IS_FATAL ANY)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/configure/bindings.py"
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/configure/emission.py"
+    "${NEXUS_SOURCE_DIR}/tools/configure/stm32f4/bindings.py"
+    "${NEXUS_SOURCE_DIR}/tools/configure/stm32f4/emission.py"
     "${NEXUS_SOURCE_DIR}/tools/configure/calls.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/generate_constructors.py")
 add_executable(contract_stm32_constructor_model
@@ -36,7 +36,9 @@ foreach(target contract_stm32_system_model contract_stm32_io_model
     target_compile_options(${target} PRIVATE
         "-include${NEXUS_SOURCE_DIR}/tests/google/stm32_official_model.h")
     target_include_directories(${target} PRIVATE
-        "${stm32_root}/private" "${NEXUS_SOURCE_DIR}/arch/include")
+        "${stm32_root}/private"
+        "${stm32_root}/drivers/ip/i2c_v1_async"
+        "${NEXUS_SOURCE_DIR}/arch/include")
     target_include_directories(${target} SYSTEM PRIVATE
         "${stm32_device}" "${stm32_cmsis}")
     nexus_use_cmsis_core(${target})

@@ -254,14 +254,16 @@ def differences(before, after):
 
 
 def board_catalogue(gate, root, *, board=None, board_package=None,
-                    soc_package=None):
+                    soc_package=None, test_support=False):
     """Read reviewed routes without inventing a backend, clock or assembly."""
     root = root.resolve()
     gate.sdk.verify(root)
     if board is not None:
         if not gate.IDENTIFIER.fullmatch(board):
             gate.fail("Board id cannot be a path; use explicit board_package")
-        directory = root / "boards" / board
+        from tools.configure import authored
+        directory = authored.builtin_board_directory(
+            root, board, gate.fail, test_support=test_support)
     else:
         directory = Path(board_package)
     directory = gate.board_directory(directory)
@@ -277,17 +279,24 @@ def board_catalogue(gate, root, *, board=None, board_package=None,
     family = gate.identity(board_data["soc_family"], "SoC family")
     context = gate.integration_package.select(
         str(soc_package) if soc_package is not None else None,
-        family=family, root=root, assembly_directory=Path.cwd())
+        family=family, root=root, assembly_directory=Path.cwd(),
+        test_support=test_support)
     provider = context.provider
     part = gate.identity(board_data["soc"], "exact part")
     soc_dir = context.source_directory
+    source_owner = root / ("tests/support/native" if family == "native" and
+                           test_support else "soc")
     if (not context.external and (soc_dir.is_symlink() or
-            not soc_dir.resolve().is_relative_to(root / "soc"))):
+            not soc_dir.resolve().is_relative_to(source_owner))):
         gate.fail("SoC package escapes owned source")
     soc = read(gate.contained_file(soc_dir, "soc.json"))
     if context.external and "source_lock" in soc:
         gate.fail("External SDK sources must be bound by package inputs; "
                   "Nexus source_lock belongs to internal integrations")
+    if context.descriptor.device_catalog is not None:
+        catalog = read(gate.contained_file(
+            soc_dir, context.descriptor.device_catalog))
+        soc, _ = gate.catalog_soc_facts(soc, part, catalog)
     gate.validate_soc(soc, part, provider)
     if soc["id"] != family:
         gate.fail("Board SoC family differs from the package identity")
@@ -324,15 +333,16 @@ def binding_facts(gate, result, root):
     """Read the exact SoC bytes bound by IR without changing its identity."""
     data = project(result)
     context = getattr(result, "provider_context", None)
+    selected = (context.descriptor if context is not None else
+                gate.descriptor.maintained(data["soc_family"]))
     relative = ("soc-package/" + context.identity["id"] + "/" +
                 context.descriptor.source_directory + "/soc.json"
                 if context is not None and context.external else
-                gate.descriptor.maintained(data["soc_family"]).source_directory
-                + "/soc.json")
+                selected.source_directory + "/soc.json")
     expected = next((item["sha256"] for item in data["inputs"]
                      if item["path"] == relative), None)
-    path = (context.source_directory / "soc.json" if context is not None and
-            context.external else gate.contained_file(root.resolve(), relative))
+    path = (context.source_directory / "soc.json" if context is not None else
+            gate.contained_file(root.resolve(), relative))
     snapshot = {}
     facts = gate.load(path, snapshot)
     actual = hashlib.sha256(snapshot[path]).hexdigest()
@@ -493,6 +503,8 @@ def run(gate, argv=None):
                else "generate")
     parser = argparse.ArgumentParser(description=gate.__doc__)
     parser.add_argument("--source-root", type=Path, default=gate.ROOT)
+    parser.add_argument("--test-support", action="store_true",
+                        help="enable explicit host-model test assembly")
     parser.add_argument("--diagnostics-json", action="store_true",
                         help="write configuration rejections as JSON on stderr")
     parser.add_argument("--assembly", type=Path,
@@ -527,7 +539,8 @@ def run(gate, argv=None):
     def resolve(path):
         nonlocal context
         context = path
-        return gate.resolve_ir(path, args.source_root)
+        return gate.resolve_ir(path, args.source_root,
+                               test_support=args.test_support)
 
     try:
         if command == "init":
@@ -542,17 +555,20 @@ def run(gate, argv=None):
             # Own the path only after exclusive create succeeds. A failed
             # write or validation then removes only our incomplete file.
             stream = args.output.open("x", encoding="utf-8")
+            validated = False
             try:
                 with stream:
                     stream.write(contents)
                 result = resolve(args.output)
-            except BaseException:
+                validated = True
+            finally:
                 # Control exceptions must also withdraw our incomplete file.
-                args.output.unlink(missing_ok=True)
-                raise
+                if not validated:
+                    args.output.unlink(missing_ok=True)
         elif command == "generate":
             result = gate.configure(args.assembly, args.output,
-                                    args.source_root)
+                                    args.source_root,
+                                    test_support=args.test_support)
         elif command == "list-bindings":
             if args.assembly is not None and args.soc_package is not None:
                 gate.fail("--assembly owns soc_package; --soc-package requires "
@@ -562,13 +578,17 @@ def run(gate, argv=None):
                 gate.fail("Select exactly one --assembly, --board "
                           "or --board-package")
             if args.assembly is None:
+                from tools.configure import authored
                 directory = (args.board_package if args.board_package else
-                             args.source_root / "boards" / args.board)
+                             authored.builtin_board_directory(
+                                 args.source_root, args.board, gate.fail,
+                                 test_support=args.test_support))
                 context = directory / "board.json"
             result = (resolve(args.assembly) if args.assembly is not None else
                       board_catalogue(gate, args.source_root, board=args.board,
                                       board_package=args.board_package,
-                                      soc_package=args.soc_package))
+                                      soc_package=args.soc_package,
+                                      test_support=args.test_support))
             if args.assembly is not None:
                 result = binding_facts(gate, result, args.source_root)
         else:

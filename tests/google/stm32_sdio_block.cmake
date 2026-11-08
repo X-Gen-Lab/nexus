@@ -4,14 +4,14 @@ nexus_google_test(nexus_block_port_test SOURCES block_port_test.cpp
 
 nexus_google_test(nexus_stm32_sdio_block_test STM32F4_LL
     SOURCES stm32_sdio_block_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/sdio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/sdio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
     LIBRARIES Nexus::IO
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
         "${NEXUS_SOURCE_DIR}/arch/include"
         "${NEXUS_SOURCE_DIR}/tests/google"
-        "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
+        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
 target_include_directories(nexus_stm32_sdio_block_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 target_compile_definitions(nexus_stm32_sdio_block_test PRIVATE STM32F407xx)

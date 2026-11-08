@@ -1,0 +1,26 @@
+{
+  "commit": "62ce93ceb713dc49909d0fef1411f9d37bef83f2",
+  "fetch_repository": "https://github.com/X-Gen-Lab/tomlc99.git",
+  "files": {
+    "LICENSE": {
+      "bytes": 1091,
+      "sha256": "65208711da5db7c659d3739062ea6ab9ab1322409e095fafa3b7de87d44ddcec"
+    },
+    "toml.c": {
+      "bytes": 56470,
+      "sha256": "1ed386df52a6d7a9ee8341c35af6689e15ecc78e053e246ede1a2eb937171e26"
+    },
+    "toml.h": {
+      "bytes": 6966,
+      "sha256": "54743ee323a09a99f53e409de0e14890db0bd5afcd5ac7f0b867e6e238eb594a"
+    }
+  },
+  "kind": "nexus-host-config-parser",
+  "license": {
+    "expression": "MIT",
+    "path": "LICENSE"
+  },
+  "release": "reviewed-toml-1.0",
+  "repository": "https://github.com/cktan/tomlc99.git",
+  "schema_version": 1
+}

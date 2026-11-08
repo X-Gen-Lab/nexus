@@ -140,7 +140,7 @@ class JobIdentityTests(unittest.TestCase):
         self.git('add', str(policy))
         self.git('commit', '-qm', 'declare actual compatibility policy')
         self.commit = self.git('rev-parse', 'HEAD')
-        native = json.loads((metadata.ROOT / 'soc/native/soc.json').read_text())
+        native = json.loads((metadata.ROOT / 'tests/support/native/soc.json').read_text())
         facts = self.artifacts / 'cpu.json'
         facts.write_text(json.dumps({'schema_version': 1, 'cpu': native['cpu'],
                                      'irq': native['irq'], 'clock_hz': 1000000}))

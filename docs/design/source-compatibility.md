@@ -47,7 +47,7 @@ exact 匹配和 authored schema `2`；版本值不把旧 SDK／候选的资格�
 `0.1.0` 是 2026-10-15（Asia/Shanghai）首个公开源码 SDK 开发者预览版。
 之前源码快照中的 `1.0.0` 是公开发行前的版本值；2026-01-12 第一阶段的旧
 `0.1.0` 文字保留为历史里程碑。该已发布版本的范围和原始证据见
-[0.1.0 历史发行状态](../status/release-0.1.0.md)，准确 source／tree 以其发行
+[0.1.0 历史发行状态](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/release-0.1.0.md)，准确 source／tree 以其发行
 manifest 为准。既有 tag、发行附件和证据保持原始身份，不随当前开发版本改写。
 
 factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face，

@@ -35,6 +35,8 @@ class LwIPProfilesTests(unittest.TestCase):
             f'set(Python3_EXECUTABLE "{Path(sys.executable).as_posix()}")\n'
             'add_library(fixture_config INTERFACE)\n'
             'add_library(Nexus::Config ALIAS fixture_config)\n'
+            'set_property(TARGET fixture_config PROPERTY NEXUS_SOURCE_DIR "'
+            + ROOT.as_posix() + '")\n'
             'add_library(fixture_io INTERFACE)\n'
             'add_library(Nexus::IO ALIAS fixture_io)\n'
             'add_library(fixture_io_ethernet_frames INTERFACE)\n'
@@ -44,6 +46,7 @@ class LwIPProfilesTests(unittest.TestCase):
             'add_library(nexus_owned_warnings INTERFACE)\n'
             f'include("{ROOT.as_posix()}/cmake/platform/TargetPolicy.cmake")\n'
             f'add_subdirectory("{NETWORK_COMPONENT.as_posix()}" network)\n'
+            'nexus_add_lwip()\n'
             'add_executable(consumer main.c)\n'
             'target_link_libraries(consumer PRIVATE ' + libraries + ')\n')
         return subprocess.run([

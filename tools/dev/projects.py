@@ -137,7 +137,7 @@ def _selection(source_root, sdk_prefix, interpreter):
     return source, selected, snapshot
 
 
-def _commands(output, source, selected, resolved):
+def _commands(output, source, selected, resolved, *, test_support):
     build = output / "build"
     configure = ["cmake", "-S", str(output), "-B", str(build), "-G", "Ninja",
                  "-DCMAKE_BUILD_TYPE=Debug", "-DNEXUS_BUILD_TESTS=OFF",
@@ -146,6 +146,10 @@ def _commands(output, source, selected, resolved):
                      else "-DNexus_DIR=" + str(Path(selected["sdk_prefix"]) /
                                               "lib/cmake/Nexus"))
     native = resolved["cpu"]["arch"] == "native"
+    if native and not test_support:
+        raise ValueError("Native projects require explicit test support")
+    if test_support:
+        configure.append("-DNEXUS_TEST_SUPPORT=ON")
     if not native:
         toolchain = _path(source / "cmake/toolchains/arm-gcc.cmake")
         file_identity(toolchain)
@@ -196,8 +200,10 @@ def _owned_output(output, identity):
 
 
 def create(templates, revision, template, output, *, source_root=None,
-           sdk_prefix=None):
+           sdk_prefix=None, test_support=False):
     """Validate first; rollback only the directory exclusively created here."""
+    if type(test_support) is not bool:
+        raise ValueError("Project test support must be an explicit boolean")
     root, output = _path(templates), _path(output)
     if (not isinstance(revision, str)
             or not re.fullmatch(r"[0-9a-f]{40}", revision)):
@@ -292,6 +298,8 @@ def create(templates, revision, template, output, *, source_root=None,
             arguments = [str(interpreter), "-I", "-B", str(resolver), "generate",
                          "--assembly", str(output / "assembly.toml"),
                          "--output", str(bundle), "--source-root", str(source_root)]
+            if test_support:
+                arguments.append("--test-support")
             _execute(arguments, source_root)
             resolved = load_json(bundle / "resolved.json")
             input_paths = load_json(bundle / "input_paths.json")
@@ -319,7 +327,8 @@ def create(templates, revision, template, output, *, source_root=None,
             if generator.is_file():
                 result["validation"]["generator"] = load_json(generator)
             result["commands"] = _commands(
-                output, source_root, selected_platform, resolved)
+                output, source_root, selected_platform, resolved,
+                test_support=test_support)
         _unchanged([*source_snapshot, interpreter_identity])
         if (_git(root, "rev-parse", "HEAD").decode().strip() != revision or
                 (root / "templates/manifest.json").read_bytes() != raw or
@@ -354,11 +363,14 @@ def main(argv=None):
     sources = parser.add_mutually_exclusive_group()
     sources.add_argument("--source", type=Path)
     sources.add_argument("--sdk-prefix", type=Path)
+    parser.add_argument("--test-support", action="store_true",
+                        help="explicitly enable Native test model projects")
     parser.add_argument("--json", action="store_true")
     arguments = parser.parse_args(argv)
     result = create(arguments.templates, arguments.revision,
                     arguments.template, arguments.output,
-                    source_root=arguments.source, sdk_prefix=arguments.sdk_prefix)
+                    source_root=arguments.source, sdk_prefix=arguments.sdk_prefix,
+                    test_support=arguments.test_support)
     if arguments.json:
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0

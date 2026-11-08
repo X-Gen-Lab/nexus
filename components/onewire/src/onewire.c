@@ -317,8 +317,8 @@ nx_result_t nx_onewire_exchange(nx_onewire_t* o, const uint8_t* tx,
         rx[i] = 0U;
     r = reset_presence(o, deadline);
     for (size_t i = 0U; r == NX_SUCCESS && i < bytes * 8U; ++i)
-        r = bit_slot(o, false, ((tx[i / 8U] >> (i % 8U)) & 1U) != 0U, deadline,
-                     NULL);
+        r = bit_slot(o, false, (((unsigned)tx[i / 8U] >> (i % 8U)) & 1U) != 0U,
+                     deadline, NULL);
     for (size_t i = 0U; r == NX_SUCCESS && i < bits; ++i) {
         bool bit = false;
         r = bit_slot(o, true, false, deadline, &bit);

@@ -1173,54 +1173,6 @@
           "minimum": 0,
           "description": "Reserved main stack in bytes, not measured high-water."
         },
-        "mpu": {
-          "type": "object",
-          "properties": {
-            "privileged_flash_bytes": {
-              "type": "integer",
-              "minimum": 32,
-              "maximum": 4294967295,
-              "multipleOf": 32,
-              "description": "Explicit storage size in bytes."
-            },
-            "privileged_ram_bytes": {
-              "type": "integer",
-              "minimum": 32,
-              "maximum": 4294967295,
-              "multipleOf": 32,
-              "description": "Explicit storage size in bytes."
-            },
-            "syscall_flash_bytes": {
-              "type": "integer",
-              "minimum": 32,
-              "maximum": 4294967295,
-              "multipleOf": 32,
-              "description": "Explicit storage size in bytes."
-            },
-            "user_flash_bytes": {
-              "type": "integer",
-              "minimum": 32,
-              "maximum": 4294967295,
-              "multipleOf": 32,
-              "description": "Explicit storage size in bytes."
-            },
-            "user_ram_bytes": {
-              "type": "integer",
-              "minimum": 32,
-              "maximum": 4294967295,
-              "multipleOf": 32,
-              "description": "Explicit storage size in bytes."
-            }
-          },
-          "required": [
-            "privileged_flash_bytes",
-            "privileged_ram_bytes",
-            "syscall_flash_bytes",
-            "user_flash_bytes",
-            "user_ram_bytes"
-          ],
-          "additionalProperties": false
-        },
         "regions": {
           "type": "object",
           "additionalProperties": {
@@ -1450,12 +1402,6 @@
               "enum": [
                 "custom",
                 "timebase"
-              ]
-            },
-            "user_io": {
-              "enum": [
-                "none",
-                "gpio-write"
               ]
             }
           },
@@ -2545,12 +2491,6 @@
                 "enum": [
                   "custom",
                   "timebase"
-                ]
-              },
-              "user_io": {
-                "enum": [
-                  "none",
-                  "gpio-write"
                 ]
               }
             },

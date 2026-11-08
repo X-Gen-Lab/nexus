@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "stm32f407zg-qiming-core",
   "soc": "STM32F407ZGT6",
-  "soc_family": "stm32f407",
+  "soc_family": "stm32f4",
   "source_revision": "schematic-2020-05-05",
   "physical_pcb_revision": null,
   "clocks": {

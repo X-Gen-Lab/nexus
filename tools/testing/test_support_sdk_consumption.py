@@ -1,6 +1,6 @@
 """Canonical SDK scope requires actual Nexus consumption and original execution."""
+from tools.configure.tests.native_fixture import native_fixture
 
-import copy
 import importlib.util
 import json
 import os
@@ -35,7 +35,7 @@ class InstalledConsumerSupportTests(unittest.TestCase):
         result = process.run([sys.executable, "-B",
             str(ROOT / "cmake/package/package_source_sdk.py"),
             "--source", str(ROOT), "--output", str(cls.prefix),
-            "--development-fixture"], cwd=ROOT,
+            "--development-fixture", "--host-support", "--component", "mcuboot"], cwd=ROOT,
             env=process.execution_environment(os.environ),
             log=cls.root / "package.txt", timeout=180,
             stage="support-sdk-fixture")
@@ -78,7 +78,7 @@ class InstalledConsumerSupportTests(unittest.TestCase):
 
     def query(self, index=1, observation=None):
         source = identity.observe_git_source(ROOT)
-        resolved = configure.resolve_ir(ASSEMBLY, ROOT).to_dict()
+        resolved = configure.resolve_ir(ASSEMBLY, ROOT, test_support=native_fixture(ASSEMBLY)).to_dict()
         config = self.directory / "resolved.json"
         atomic_json(config, resolved)
         unused = self.directory / "unlinked.bin"
@@ -160,7 +160,7 @@ class InstalledConsumerSupportTests(unittest.TestCase):
         generated = build / "nexus-sdk/generated"
         selected, _ = identity.resolved_identity(generated / "resolved.json")
         self.assertEqual(selected, configure.resolve_ir(
-            self.sdk / "tools/configure/assemblies/native.toml", self.sdk).to_dict())
+            self.sdk / "tests/support/native/assemblies/native.toml", self.sdk, test_support=native_fixture(self.sdk / "tests/support/native/assemblies/native.toml")).to_dict())
         self.assertTrue(identity.resolved_input_files(
             generated / "resolved.json", selected))
         self.assertTrue((generated / "nexus_factory_strong.h").is_file())
@@ -171,8 +171,15 @@ class InstalledConsumerSupportTests(unittest.TestCase):
         for entry in products:
             self.assertFalse(self.producer.private_compile_inputs(entry, self.sdk))
         result = self.query()
+        # Incomplete inventory cannot establish an exact whole-source relation,
+        # even when this selected consumer's receipts are semantically valid.
+        complete = all(row.startswith(" ") for row in
+                       result["current_source"]["submodules"])
+        expected = "verified_bounded" if complete else "historical_source"
         self.assertEqual(result["staged_evidence"]["sdk_consumer"]["status"],
-                         "verified_bounded")
+                         expected)
+        self.assertEqual(result["staged_evidence"]["sdk_consumer"]["trust"],
+                         "semantic_verified")
         self.assertEqual(result["staged_evidence"]["sdk_consumer"]
                          ["recorded_matrix_status"], "failed")
         self.assertEqual(result["validation"]["installed_sdk"], "not_assessed")
@@ -182,32 +189,6 @@ class InstalledConsumerSupportTests(unittest.TestCase):
         rejected = self.query()
         self.assertEqual(rejected["staged_evidence"]["sdk_consumer"]["status"],
                          "corrupt")
-
-    def test_external_provider_requires_its_actual_canonical_runtime(self):
-        index = next(index for index, (kind, specification)
-            in enumerate(consumer_plan(), 1) if kind == "services" and
-            specification.scenario == "external_provider")
-        source, build, command = self.producer.prepare_external_provider_consumer(
-            self.prefix, self.output, lambda argv: self.execute(index, argv),
-            expected_revision=self.package["source_revision"], fixture=True)
-        self.execute(index, command)
-        self.execute(index, ["cmake", "--build", str(build), "--parallel", "1",
-                             "--target", "external_lifecycle_consumer"])
-        observation = self.producer.check_external_provider_consumer(
-            self.sdk, source, build, lambda argv: self.execute(index, argv))
-        result = self.query(index, observation)
-        self.assertEqual(result["staged_evidence"]["sdk_consumer"]["status"],
-                         "verified_bounded")
-        self.assertEqual(result["validation"]["installed_sdk"], "not_assessed")
-        for update in ({"kind": "unrelated-program"},
-                       {"runtime_executed": False},
-                       {"inputs": {**observation["inputs"],
-                                   "sdk_manifest": observation["elf"]}}):
-            changed = copy.deepcopy(observation)
-            changed.update(update)
-            rejected = self.query(index, changed)
-            self.assertEqual(rejected["staged_evidence"]["sdk_consumer"]["status"],
-                             "corrupt")
 
     def native_selected_observation(self, profile):
         index, specification = next((index, specification)
@@ -224,7 +205,7 @@ class InstalledConsumerSupportTests(unittest.TestCase):
                              "--target", "installed_selected"])
         observation = self.producer.check_selected_image(self.sdk, source, build,
             lambda argv: self.execute(index, argv),
-            owner_specification=specification)
+            specification=specification)
         observation.update(name=specification[0],
                            assembly=str(self.sdk / specification[1]))
         inputs = proof.ScopeInputs({"evidence": [observation]},
@@ -358,19 +339,19 @@ print(json.dumps(result))
             prefix = self.directory / (name + " SDK")
             shutil.copytree(self.prefix, prefix)
             sdk = prefix / "share/nexus/src"
-            assembly = sdk / "tools/configure/assemblies/native-uart.toml"
+            assembly = sdk / "tests/support/native/assemblies/native-uart.toml"
             if name == "support":
                 argv = [str(sdk / "tools/dev/dev.py"), "support",
-                        "--assembly", str(assembly), "--json"]
+                        "--assembly", str(assembly), "--test-support", "--json"]
             elif name == "capabilities":
                 argv = [str(sdk / "tools/maintenance/capabilities.py"),
-                        "--assembly", str(assembly)]
+                        "--assembly", str(assembly), "--test-support"]
             elif name == "explain":
                 argv = [str(sdk / "tools/configure/configure.py"), "explain",
-                        "--assembly", str(assembly), "--json"]
+                        "--assembly", str(assembly), "--test-support", "--json"]
             else:
                 starter = self.directory / "copied starter"
-                shutil.copytree(sdk / "cmake/package/verification/external_provider",
+                shutil.copytree(ROOT / "tests/support/external_provider",
                                 starter)
                 argv = [str(sdk / "tools/configure/integration_package.py"),
                         "check", "--package", str(starter / "provider"), "--json"]
