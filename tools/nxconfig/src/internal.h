@@ -14,7 +14,7 @@
 #include <toml.h>
 
 #define NXCONFIG_INPUT_COUNT 5U
-#define NXCONFIG_MAX_INPUT   (4U * 1024U * 1024U)
+#define NXCONFIG_MAX_INPUT   UINT32_C(4194304)
 
 typedef struct {
     char* path;

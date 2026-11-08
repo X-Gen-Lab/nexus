@@ -19,6 +19,7 @@ extern "C" {
 #include <gtest/gtest.h>
 #include <iterator>
 #include <string>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <vector>
@@ -251,6 +252,40 @@ TEST_F(HostConfiguration, UnownedOutputAndChangedInputsAreRejected) {
     EXPECT_EQ(nxconfig_emit(assembly, output.c_str(), &diagnostic),
               NXCONFIG_IO);
     EXPECT_FALSE(fs::exists(output));
+}
+
+TEST_F(HostConfiguration, GeneratedFilesRemainPrivateWithAnOpenProcessMask) {
+    ASSERT_EQ(resolve(authored(base())), NXCONFIG_OK);
+    struct Mask {
+        mode_t previous = umask(0);
+        ~Mask() {
+            umask(previous);
+        }
+    } mask;
+    const auto output = temporary / "generated";
+    ASSERT_EQ(nxconfig_emit(assembly, output.c_str(), &diagnostic),
+              NXCONFIG_OK);
+    for (const auto& entry : fs::directory_iterator(output)) {
+        EXPECT_EQ(fs::status(entry).permissions() &
+                      (fs::perms::group_all | fs::perms::others_all),
+                  fs::perms::none)
+            << entry.path();
+    }
+}
+
+TEST_F(HostConfiguration, OutputParentCannotAdmitForeignWriters) {
+    ASSERT_EQ(resolve(authored(base())), NXCONFIG_OK);
+    const auto parent = temporary / "shared";
+    fs::create_directory(parent);
+    for (const auto writers :
+         {fs::perms::group_write, fs::perms::others_write}) {
+        fs::permissions(parent, fs::perms::owner_all | writers);
+        const auto output = parent / "generated";
+        EXPECT_EQ(nxconfig_emit(assembly, output.c_str(), &diagnostic),
+                  NXCONFIG_IO);
+        EXPECT_FALSE(fs::exists(output));
+        fs::remove_all(output);
+    }
 }
 
 TEST_F(HostConfiguration,
@@ -529,12 +564,13 @@ TEST_F(HostConfiguration, MissingParserLockEntryCannotBypassIntegrity) {
     cJSON_free(encoded);
     cJSON_Delete(lock);
     const auto log = temporary / "cmake.log";
-    EXPECT_NE(execute({NXCONFIG_TEST_CMAKE, "-S",
-                       (source / "tools/nxconfig").string(), "-B",
-                       (temporary / "build").string(), "-G", "Ninja",
-                       "-DCMAKE_MAKE_PROGRAM=" NXCONFIG_TEST_NINJA},
-                      log),
-              0);
+    EXPECT_NE(
+        execute({NXCONFIG_TEST_CMAKE, "-S",
+                 (source / "tools/nxconfig").string(), "-B",
+                 (temporary / "build").string(), "-G", "Ninja",
+                 std::string("-DCMAKE_MAKE_PROGRAM=") + NXCONFIG_TEST_NINJA},
+                log),
+        0);
     EXPECT_THAT(read(log), HasSubstr("exact parser input set"));
 }
 

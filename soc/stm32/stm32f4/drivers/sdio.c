@@ -293,12 +293,12 @@ static nx_result_t fifo_transfer(void* data, uint32_t words, bool reading,
                                                       : NX_ERROR_IO;
         if (reading && (status & SDIO_STA_RXDAVL) != 0U && copied < words) {
             uint32_t word = NX_SDIO_FIFO_READ(SDIO);
-            memcpy(buffer + copied * 4U, &word, sizeof(word));
+            memcpy(buffer + (size_t)copied * sizeof(word), &word, sizeof(word));
             ++copied;
         } else if (!reading && (status & SDIO_STA_TXFIFOHE) != 0U &&
                    copied < words) {
             uint32_t word;
-            memcpy(&word, buffer + copied * 4U, sizeof(word));
+            memcpy(&word, buffer + (size_t)copied * sizeof(word), sizeof(word));
             if (NX_SDIO_FIFO_WRITE(SDIO, &word) != HAL_OK)
                 return NX_ERROR_IO;
             ++copied;

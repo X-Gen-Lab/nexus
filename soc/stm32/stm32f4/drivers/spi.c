@@ -500,6 +500,7 @@ static nx_result_t transaction_transfer(void* context,
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
+    /* Bound the entire CPU transaction before acquiring CS or touching SPI. */
     size_t total = 0U;
     for (size_t i = 0U; i < count; ++i) {
         total += segments[i].words;
@@ -516,6 +517,7 @@ static nx_result_t transaction_transfer(void* context,
     if (nx_deadline_expired(deadline, nx_time_now_us())) {
         return NX_ERROR_TIMEOUT;
     }
+    /* Round down the wire rate so this endpoint never exceeds its limit. */
     uint32_t divisor = 2U;
     uint32_t baud = 0U;
     while (port->clock_hz / divisor > endpoint->frequency_hz &&
@@ -574,6 +576,7 @@ static nx_result_t transaction_transfer(void* context,
             ++*transferred;
         }
     }
+    /* RXNE proves each received word; BSY separately proves wire completion. */
     if (result == NX_SUCCESS) {
         result = wait_status(port, SPI_SR_BSY, 0U, deadline);
     }
@@ -582,6 +585,7 @@ static nx_result_t transaction_transfer(void* context,
     } else {
         abort_controller(port);
     }
+    /* Deassert CS on every path while preserving the primary transfer error. */
     nx_result_t release =
         nx_stm32_gpio_write(endpoint->cs, endpoint->cs_mask, 0U);
     NX_STM32_SPI_TRANSACTION_CS(false);

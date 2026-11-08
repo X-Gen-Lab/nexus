@@ -230,6 +230,7 @@ nx_stm32_uart_hal_initialize(nx_stm32_uart_hal_state_t* state,
     if ((config->uart.registers->CR2 & USART_CR2_LBDIE) != 0U ||
         (config->uart.registers->CR3 & USART_CR3_CTSIE) != 0U)
         return NX_ERROR_BUSY;
+    /* Retain the cold tuple so a failed HAL start can be stopped explicitly. */
     state->config = config;
     state->uart.registers = config->uart.registers;
     state->uart.irq = config->uart.vectors[0];
@@ -265,6 +266,7 @@ nx_stm32_uart_hal_initialize(nx_stm32_uart_hal_state_t* state,
     state->handle.Init.OverSampling = UART_OVERSAMPLING_16;
     state->handle.MspInitCallback = callback_noop;
     state->handle.MspDeInitCallback = callback_noop;
+    /* HAL callbacks recover the private owner through this reciprocal link. */
     state->handle.hdmatx = &state->dma;
     state->dma.Instance = config->transmit.registers;
     state->dma.Parent = &state->handle;
@@ -277,6 +279,7 @@ nx_stm32_uart_hal_initialize(nx_stm32_uart_hal_state_t* state,
     state->dma.Init.Mode = DMA_NORMAL;
     state->dma.Init.Priority = DMA_PRIORITY_HIGH;
     state->dma.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    /* Synchronous HAL callbacks remain inside the protected owner depth. */
     state->hal_depth = 1U;
     HAL_StatusTypeDef status = HAL_DMA_Init(&state->dma);
     if (status == HAL_OK)
@@ -297,6 +300,7 @@ nx_stm32_uart_hal_initialize(nx_stm32_uart_hal_state_t* state,
     leave_hal(state);
     if (status != HAL_OK || !initialized_hardware(state))
         return NX_ERROR_IO;
+    /* Expose IRQ admission only after callbacks and hardware agree. */
     LL_USART_EnableIT_RXNE(state->handle.Instance);
     LL_USART_EnableIT_PE(state->handle.Instance);
     LL_USART_EnableIT_ERROR(state->handle.Instance);

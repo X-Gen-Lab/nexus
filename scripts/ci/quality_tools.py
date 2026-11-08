@@ -504,6 +504,21 @@ def system_include_arguments(entry: dict) -> tuple[list[str], list[str]]:
     return normal, systems
 
 
+def cppcheck_quote_transport(entry: dict) -> dict:
+    """Keep literal quotes through Cppcheck 2.13's command database import.
+
+    Its argv importer removes quotes from string-valued -D operands. POSIX
+    command text preserves those tokens; shlex.join changes their transport,
+    not their compiler values. The original entry remains the query authority.
+    """
+    result = compilation_entry(entry)
+    arguments = compilation_arguments(result)
+    if any('"' in argument for argument in arguments):
+        result.pop("arguments", None)
+        result["command"] = shlex.join(arguments)
+    return result
+
+
 def cppcheck_compilation_entry(entry: dict) -> dict:
     """Project GNU system includes into Cppcheck's supported -I arguments.
 
@@ -519,7 +534,7 @@ def cppcheck_compilation_entry(entry: dict) -> dict:
         entry.pop("command", None)
     normal, systems = system_include_arguments(entry)
     if not systems:
-        return compilation_entry(entry)
+        return cppcheck_quote_transport(entry)
     cwd = Path(entry["directory"])
     system_paths = {(cwd / path).resolve() for path in systems}
     preserved = []
@@ -550,7 +565,7 @@ def cppcheck_compilation_entry(entry: dict) -> dict:
     projected = compilation_entry(entry)
     projected.pop("command", None)
     projected["arguments"] = preserved + [arg for path in systems for arg in ("-I", path)]
-    return projected
+    return cppcheck_quote_transport(projected)
 
 
 def external_system_headers(root: Path, entry: dict) -> list[dict]:

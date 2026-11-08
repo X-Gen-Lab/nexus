@@ -112,6 +112,7 @@ uint32_t nx_native_usb_read(uintptr_t base, uint32_t offset) {
 void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
     nx_native_usb_hardware_t* hw = (nx_native_usb_hardware_t*)base;
     ++hw->mmio_writes;
+    /* FIFO writes consume model space; no physical USB transfer occurs here. */
     if (offset >= 0x1000U) {
         unsigned ep = offset / 0x1000U - 1U;
         if (ep < 4U && hw->tx_count[ep] < 16U) {
@@ -136,6 +137,7 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
             (value & ~held) | (hw->registers[offset / 4U] & held);
         return;
     }
+    /* Reset and flush acknowledgements can be independently withheld. */
     if (offset == 0x10U) {
         uint32_t command = value;
         if (!hw->hold_reset) {
@@ -181,6 +183,7 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
         hw->registers[offset / 4U] = result;
         return;
     }
+    /* Endpoint commands self-clear and acknowledge NAK/disable separately. */
     bool in = offset >= 0x900U && offset < 0x980U;
     bool out = offset >= 0xB00U && offset < 0xB80U;
     if ((in || out) && offset % 32U == 0U) {
@@ -236,6 +239,7 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
         return;
     }
     hw->registers[offset / 4U] = value;
+    /* Reentrant callbacks exercise source-disable and publication ordering. */
     if (offset == 8U && value == 0U && hw->on_source_disable != NULL) {
         hw->on_source_disable(hw->disable_context);
     }

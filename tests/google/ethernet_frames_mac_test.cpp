@@ -721,6 +721,7 @@ TEST_F(EthernetFramesMac,
 }
 TEST_F(EthernetFramesMac,
        IndependentReceiveLoansReleaseInReverseAndRejectAStaleEpoch) {
+    /* Keep two live descriptor loans independent across several IRQ passes. */
     Start();
     RxFrame(0U, 300U);
     rxslots[0].data[0] = 0xa1U;
@@ -742,6 +743,7 @@ TEST_F(EthernetFramesMac,
     EXPECT_EQ(256U, first_views[0].length);
     EXPECT_EQ(44U, first_views[1].length);
 
+    /* Immutable byte snapshots catch an early recycle of either fragment. */
     RxFrame(2U, 300U);
     rxslots[2].data[0] = 0xb1U;
     rxslots[3].data[0] = 0xb2U;
@@ -776,6 +778,7 @@ TEST_F(EthernetFramesMac,
     EXPECT_EQ(0, std::memcmp(second_tail.data(), second_views[1].data,
                              second_tail.size()));
 
+    /* Releasing the second loan cannot return the first loan to the MAC. */
     ASSERT_EQ(NX_SUCCESS, Release(&second_loan));
     ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_state(&port, &snapshot));
     EXPECT_EQ(1U, snapshot.mac.held_rx);
@@ -810,6 +813,8 @@ TEST_F(EthernetFramesMac,
     ASSERT_EQ(NX_SUCCESS, Acquire(&current, current_views, 2U));
     EXPECT_EQ(first_loan.first_slot, current.first_slot);
     EXPECT_GT(current.epoch, first_loan.epoch);
+    /* The same descriptor head receives a new epoch; old receipts stay stale.
+     */
     auto stale = current;
     stale.epoch = first_loan.epoch;
     EXPECT_EQ(NX_ERROR_STATE, Release(&stale));

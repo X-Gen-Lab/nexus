@@ -551,9 +551,15 @@ static bool write_file(const char* directory, size_t index,
     int length = snprintf(path, sizeof(path), "%s/%s", directory, names[index]);
     if (length <= 0 || (size_t)length >= sizeof(path))
         return false;
-    FILE* output = fopen(path, "wx");
-    if (output == NULL)
+    int descriptor =
+        open(path, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, 0600);
+    if (descriptor < 0)
         return false;
+    FILE* output = fdopen(descriptor, "w");
+    if (output == NULL) {
+        (void)close(descriptor);
+        return false;
+    }
     bool valid = true;
     switch (index) {
         case 0U:
@@ -632,7 +638,7 @@ static bool owned(const char* directory) {
     size_t prefix = strlen(directory);
     if (!valid || prefix > sizeof(path) - sizeof(suffix))
         return false;
-    memcpy(path, directory, prefix);
+    memcpy(path, directory, prefix + 1U);
     memcpy(path + prefix, suffix, sizeof(suffix));
     FILE* input = fopen(path, "r");
     if (input == NULL)
@@ -681,6 +687,20 @@ static bool equal_file(const char* left, const char* right, const char* name) {
     return equal;
 }
 
+/** \brief Reject directly shared parents before cooperative publication. */
+static bool private_parent(const char* path) {
+    int descriptor =
+        open(path, O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
+    if (descriptor < 0)
+        return false;
+    struct stat status;
+    bool valid = fstat(descriptor, &status) == 0 &&
+                 status.st_uid == geteuid() &&
+                 (status.st_mode & (S_IWGRP | S_IWOTH)) == 0;
+    (void)close(descriptor);
+    return valid;
+}
+
 nxconfig_result_t nxconfig_emit(const nxconfig_assembly_t* assembly,
                                 const char* output_directory,
                                 nxconfig_diagnostic_t* diagnostic) {
@@ -713,7 +733,8 @@ nxconfig_result_t nxconfig_emit(const nxconfig_assembly_t* assembly,
     } else
         parent = realpath(".", NULL);
     char destination[4096], lock_path[4096], stage[4096];
-    int length = parent != NULL ? snprintf(destination, sizeof(destination),
+    bool trusted_parent = parent != NULL && private_parent(parent);
+    int length = trusted_parent ? snprintf(destination, sizeof(destination),
                                            "%s/%s", parent, base)
                                 : -1;
     int lock_length = parent != NULL
@@ -730,9 +751,9 @@ nxconfig_result_t nxconfig_emit(const nxconfig_assembly_t* assembly,
         (size_t)length >= sizeof(destination) ||
         (size_t)lock_length >= sizeof(lock_path) ||
         (size_t)stage_length >= sizeof(stage))
-        return nxconfig_error(diagnostic, NXCONFIG_IO, output_directory,
-                              "output",
-                              "Output parent is missing or path too long");
+        return nxconfig_error(
+            diagnostic, NXCONFIG_IO, output_directory, "output",
+            "Output parent is missing, shared or path too long");
     for (size_t i = 0U; i < assembly->input_count; ++i) {
         const char* path = assembly->inputs[i].path;
         if (strncmp(path, destination, (size_t)length) == 0 &&
@@ -763,13 +784,11 @@ nxconfig_result_t nxconfig_emit(const nxconfig_assembly_t* assembly,
     bool equal = valid && exists;
     for (size_t i = 0U; equal && i < sizeof(names) / sizeof(names[0]); ++i)
         equal = equal_file(stage, destination, names[i]);
-    if (valid && !equal) {
-        if (exists)
-            valid = syscall(SYS_renameat2, AT_FDCWD, stage, AT_FDCWD,
-                            destination, RENAME_EXCHANGE) == 0;
-        else
-            valid = rename(stage, destination) == 0;
-    }
+    /* A first publication cannot overwrite an entry appearing after preflight.
+     * Existing owned bundles exchange under the same private-parent lock. */
+    if (valid && !equal)
+        valid = syscall(SYS_renameat2, AT_FDCWD, stage, AT_FDCWD, destination,
+                        exists ? RENAME_EXCHANGE : RENAME_NOREPLACE) == 0;
     if (exists || equal || !valid)
         remove_owned(stage);
     (void)close(lock);

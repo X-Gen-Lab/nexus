@@ -334,6 +334,7 @@ void nx_i2c_v1_irq(nx_i2c_v1_state_t* state) {
         nx_arch_irq_restore(mask);
         return;
     }
+    /* Capture a publisher before restoring the incoming interrupt mask. */
     const nx_irq_wake_t* wake = state->wake;
     if (wake != NULL && state->wake_publishers != UINT16_MAX) {
         state->wake_publishers++;
@@ -368,6 +369,7 @@ void nx_i2c_v1_irq(nx_i2c_v1_state_t* state) {
                     message->length > 1U) {
                     state->registers[CTL1] |= DMA_LAST;
                 }
+                /* Commit ACK/POS and DMA LAST before releasing ADDR stretch. */
                 clear_address(state);
                 if (state->dma != NULL) {
                     state->phase = message->read ? NX_I2C_V1_DMA_READ
@@ -403,6 +405,8 @@ void nx_i2c_v1_irq(nx_i2c_v1_state_t* state) {
                 }
             } else if (state->phase == NX_I2C_V1_READ_ONE &&
                        (flags & RXNE) != 0U) {
+                /* Short reads order STOP before the final DR access sequence.
+                 */
                 message->data[state->index++] = NX_I2C_V1_READ_DATA(state);
                 ++state->transferred;
                 next_message(state);
@@ -437,6 +441,7 @@ void nx_i2c_v1_irq(nx_i2c_v1_state_t* state) {
         }
     }
     nx_arch_irq_restore(mask);
+    /* Notification is a hint; join the publisher after signaling returns. */
     (void)nx_irq_wake_signal(wake);
     if (wake != NULL) {
         mask = nx_arch_irq_save();

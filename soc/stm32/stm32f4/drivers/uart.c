@@ -620,6 +620,8 @@ nx_result_t nx_stm32_uart_format_configure(nx_stm32_uart_state_t* state,
     if (!state->initialized || state->closing) {
         return NX_ERROR_STATE;
     }
+    /* Exclude the RX producer while checking idle state and changing framing.
+     */
     nx_arch_irq_state_t saved = nx_arch_irq_save();
     if (state->active != NULL || state->rx_count != 0U ||
         (state->registers->CR3 & (USART_CR3_DMAR | USART_CR3_DMAT)) != 0U ||
@@ -627,6 +629,7 @@ nx_result_t nx_stm32_uart_format_configure(nx_stm32_uart_state_t* state,
         nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
     }
+    /* Snapshot the complete old tuple before withdrawing UE. */
     uint32_t old1 = state->registers->CR1;
     uint32_t old2 = state->registers->CR2;
     uint32_t old3 = state->registers->CR3;
@@ -664,6 +667,7 @@ nx_result_t nx_stm32_uart_format_configure(nx_stm32_uart_state_t* state,
         nx_arch_irq_restore(saved);
         return NX_ERROR_IO;
     }
+    /* Keep UE clear until every new frame register has been read back. */
     NX_UART_REG_WRITE(&state->registers->CR2, selected2);
     NX_UART_REG_WRITE(&state->registers->CR3, selected3);
     NX_UART_REG_WRITE(&state->registers->CR1,
@@ -687,6 +691,8 @@ nx_result_t nx_stm32_uart_format_configure(nx_stm32_uart_state_t* state,
         NX_UART_REG_WRITE(&state->registers->CR1,
                           old1 & ~(uint32_t)USART_CR1_UE);
         nx_arch_dsb();
+        /* Rollback also requires UE clear; failure retains the recovery lease.
+         */
         bool restored = (state->registers->CR1 & USART_CR1_UE) == 0U;
         if (restored) {
             NX_UART_REG_WRITE(&state->registers->CR2, old2);

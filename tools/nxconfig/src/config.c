@@ -298,9 +298,9 @@ static bool name_valid(const char* id) {
 void nxconfig_identifier(const char* input, char* output, bool uppercase) {
     do {
         unsigned char value = (unsigned char)*input++;
-        *output++ = value == '-' ? '_'
-                    : uppercase  ? (char)toupper(value)
-                                 : (char)value;
+        *output++ = (char)(value == '-' ? '_'
+                           : uppercase  ? toupper(value)
+                                        : value);
         if (value == 0U)
             break;
     } while (true);
@@ -904,6 +904,7 @@ nxconfig_result_t nxconfig_resolve(const char* source_root,
     if (source_root == NULL || assembly_path == NULL)
         return nxconfig_error(diagnostic, NXCONFIG_INVALID, assembly_path,
                               "input", "Missing input path");
+    /* The opaque owner keeps all parser storage until full resolution ends. */
     nxconfig_assembly_t* assembly = calloc(1U, sizeof(*assembly));
     if (assembly == NULL)
         return nxconfig_error(diagnostic, NXCONFIG_MEMORY, assembly_path,
@@ -922,6 +923,7 @@ nxconfig_result_t nxconfig_resolve(const char* source_root,
         if (assembly->authored == NULL)
             valid = fail(&resolver, NXCONFIG_INVALID, error);
     }
+    /* Reject unknown authoring keys before interpreting any platform choice. */
     static const char* const allowed[] = {
         "schema", "board",        "board_package", "backend",
         "clock",  "optimization", "memory",        "hardware",
@@ -941,6 +943,7 @@ nxconfig_result_t nxconfig_resolve(const char* source_root,
             valid = fail(&resolver, NXCONFIG_UNSUPPORTED,
                          "Host C slice currently implements baremetal only");
     }
+    /* A named Board and an external Board package are mutually exclusive. */
     char path[4096];
     if (valid) {
         bool named = toml_key_exists(assembly->authored, "board");
@@ -986,6 +989,8 @@ nxconfig_result_t nxconfig_resolve(const char* source_root,
         if (!valid && resolver.diagnostic->code == NXCONFIG_OK)
             (void)fail(&resolver, NXCONFIG_INVALID, "Fact path too long");
     }
+    /* Publish one complete owner only after facts, resources and endpoints
+     * join. */
     if (valid)
         valid = platform(&resolver) && hardware_choices(&resolver) &&
                 controllers(&resolver, "gpio", NXCONFIG_GPIO) &&

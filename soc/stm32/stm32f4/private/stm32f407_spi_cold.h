@@ -63,7 +63,9 @@ nx_result_t nx_stm32_spi_admit(const nx_stm32_spi_state_t* port,
                                const nx_stm32_spi_cold_receipt_t* receipt);
 
 /** \brief Assemble a cold polling controller and its exact static endpoints.
- * \param[in,out] port: Serialized unmasked privileged task, initially cold.
+ * \param[in,out] port: Stable static owner, initially cold, used by a
+ * serialized unmasked privileged task. Endpoints retain this binding after
+ * close; the controller must outlive every endpoint interface.
  * \param[in] config: Static selected resources with disjoint snapshot slots.
  * \param[in,out] receipt: Static cold effects retained through failed cleanup.
  * \return Success or error; failed pad withdrawal retains the Platform lease.

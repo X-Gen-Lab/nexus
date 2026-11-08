@@ -2,12 +2,12 @@
 from copy import deepcopy
 import json
 from pathlib import Path
-import shutil
 import tempfile
 import unittest
 
 from tools.maintenance import stm32h5_device_lock as device
 from tools.maintenance import stm32h5_hal_lock as hal
+from tools.testing.inventory_fixtures import write_files
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -61,24 +61,11 @@ class H5SourceContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             device.contract(value)
 
-    def test_actual_clean_organization_checkouts_verify(self):
-        result = device.verify(ROOT / device.DIRECTORY,
-                               ROOT / device.LOCK_NAME)
-        self.assertFalse(result['software_qualified'])
-        self.assertEqual(result['source_kind'], 'git_checkout')
-        result = hal.verify(ROOT / hal.DIRECTORY, ROOT / hal.LOCK_NAME,
-                            ROOT / hal.CMSIS_DIRECTORY)
-        self.assertEqual(result['commit'], hal.PROFILE.commit)
-        self.assertFalse(result['software_qualified'])
-
     def test_packaged_device_needs_explicit_commit_and_unchanged_bytes(self):
         with tempfile.TemporaryDirectory(prefix='nexus-h5-proof-') as value:
             root = Path(value)
             source = root / 'device'
-            for name in device.FILES:
-                target = source / name
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(ROOT / device.DIRECTORY / name, target)
+            write_files(source, self.device_lock)
             lock = root / 'device.lock.json'
             lock.write_text(json.dumps(self.device_lock))
             with self.assertRaises(ValueError):

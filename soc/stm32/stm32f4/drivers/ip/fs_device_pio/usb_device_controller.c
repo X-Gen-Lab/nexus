@@ -729,6 +729,8 @@ static void finish(nx_usb_endpoint_t* ep, nx_result_t result, size_t count) {
  * proof. */
 static void progress(nx_usb_controller_t* c) {
     uintptr_t base = c->registers;
+    /* Retain each request until wire and FIFO withdrawal have both completed.
+     */
     nx_time_us_t now = nx_time_now_us();
     for (size_t i = 0U; i < c->endpoint_count; ++i) {
         nx_usb_endpoint_t* ep = &c->endpoints[i];
@@ -769,6 +771,7 @@ static void progress(nx_usb_controller_t* c) {
             begin_drain(ep, NX_ERROR_IO);
             state = NX_REQUEST_DRAINING;
         }
+        /* Observed completion wins a concurrent deadline or cancellation. */
         if (state == NX_REQUEST_ACTIVE && now >= ep->request->base.deadline) {
             begin_drain(ep, NX_ERROR_TIMEOUT);
             state = NX_REQUEST_DRAINING;
@@ -806,6 +809,8 @@ static void progress(nx_usb_controller_t* c) {
     for (size_t i = 0U; i < c->endpoint_count; ++i) {
         pending = pending || c->endpoints[i].request != NULL;
     }
+    /* Reset cannot reprogram endpoints while any accepted request is borrowed.
+     */
     if (c->reset_pending && !pending) {
         if (hot_flush(c, (0x10U << 6U) | 32U) && hot_flush(c, 16U) &&
             clear_halts(c, true) && reset_nonzero_endpoints(c)) {
@@ -823,6 +828,7 @@ static void progress(nx_usb_controller_t* c) {
             }
         }
     }
+    /* Release global OUT NAK only after all OUT withdrawal duties are gone. */
     bool draining_out = false;
     for (size_t i = 0U; i < c->endpoint_count; ++i) {
         nx_usb_endpoint_t* ep = &c->endpoints[i];

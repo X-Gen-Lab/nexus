@@ -154,7 +154,7 @@ static nx_result_t pins_valid(const nx_stm32_fsmc_config_t* config,
         if (pin->port_index < 3U || pin->port_index > 6U || pin->pin > 15U ||
             pin->registers !=
                 (GPIO_TypeDef*)(uintptr_t)(GPIOA_BASE +
-                                           (uint32_t)pin->port_index *
+                                           (uintptr_t)pin->port_index *
                                                UINT32_C(0x400)) ||
             ((adopting_boot && boot_pin(pin))
                  ? pin->snapshot != NULL

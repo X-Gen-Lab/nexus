@@ -151,7 +151,8 @@ static uint16_t pad_mask(unsigned bank) {
     }
 }
 static GPIO_TypeDef* pad_bank(unsigned bank) {
-    return (GPIO_TypeDef*)(uintptr_t)(GPIOD_BASE + bank * UINT32_C(0x400));
+    return (GPIO_TypeDef*)(uintptr_t)(GPIOD_BASE +
+                                      (uintptr_t)bank * UINT32_C(0x400));
 }
 static bool gates_present(void) {
     return (NX_SRAM_BOOT_READ(&RCC->AHB1ENR) & GPIO_CLOCKS) == GPIO_CLOCKS &&
@@ -177,11 +178,11 @@ static bool reset_pads_and_banks(void) {
                 return false;
         }
         uint32_t control = bank ? UINT32_C(0x30d2) : UINT32_C(0x30db);
-        if ((NX_SRAM_BOOT_READ(&FSMC_Bank1->BTCR[bank * 2U]) &
+        if ((NX_SRAM_BOOT_READ(&FSMC_Bank1->BTCR[(size_t)bank * 2U]) &
              BANK_CONTROL_MASK) != (control & BANK_CONTROL_MASK) ||
-            NX_SRAM_BOOT_READ(&FSMC_Bank1->BTCR[bank * 2U + 1U]) !=
+            NX_SRAM_BOOT_READ(&FSMC_Bank1->BTCR[(size_t)bank * 2U + 1U]) !=
                 UINT32_C(0x0fffffff) ||
-            (NX_SRAM_BOOT_READ(&FSMC_Bank1E->BWTR[bank * 2U]) &
+            (NX_SRAM_BOOT_READ(&FSMC_Bank1E->BWTR[(size_t)bank * 2U]) &
              WRITE_TIMING_MASK) != (UINT32_C(0x0fffffff) & WRITE_TIMING_MASK))
             return false;
     }

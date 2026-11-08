@@ -35,7 +35,7 @@ class ImageArtifactTests(unittest.TestCase):
             self.root = Path(temporary.name)
 
     def fixture(self, *, offset=0x20000, size=0x20000, outside=None,
-                family="stm32f407", vector_prefix=False):
+                family="stm32f4", vector_prefix=False):
         compiler = os.environ.get("NEXUS_ARM_GCC") or shutil.which("arm-none-eabi-gcc")
         self.assertIsNotNone(compiler, "Prepared ARM compiler required")
         path = self.root / "image"

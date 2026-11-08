@@ -67,15 +67,24 @@ class HilAdmissionTests(unittest.TestCase):
                 "raw": self.identity} for name in admission["required_tests"]],
             "metrics": {"latency": {"value": 20, "unit": "us", "raw": self.identity}}}
 
-    def test_three_actual_templates_are_unqualified(self):
+    def test_current_f4_templates_keep_exact_scope_and_remain_unqualified(self):
         fixtures = list(Path("tools/hil/fixtures").glob("*.json"))
-        actual = [path for path in fixtures if path.name != "station.template.json"
-                  and json.loads(path.read_text()).get("scope") != "software_reference"]
-        self.assertEqual(len(actual), 3)
+        actual = [path for path in fixtures
+                  if path.name != "station.template.json"]
+        expected = {
+            ("stm32f407zg-qiming-v31", "STM32F407ZGT6", None),
+            ("stm32f407ve-sky-qingchun", "STM32F407VET6", None),
+            ("stm32f407zg-qiming-core", "STM32F407ZGT6", "software_reference"),
+            ("stm32f407zg-qiming-v41", "STM32F407ZGT6", "software_reference"),
+        }
+        observed = set()
         for path in actual:
             value = json.loads(path.read_text())
             validate_fixture(value)
+            observed.add((value["board"], value["part"], value.get("scope")))
             self.assertEqual(value["physical_status"], "not_executed")
+        self.assertEqual(observed, expected)
+        self.assertEqual(len(actual), len(expected))
 
     def test_empty_station_is_rejected(self):
         station = json.loads(Path("tools/hil/fixtures/station.template.json").read_text())

@@ -263,6 +263,7 @@ nx_result_t nx_can_controller_initialize(nx_can_controller_t* controller) {
         !timing_valid(controller) || !filters_valid(controller->domain)) {
         return NX_ERROR_INVALID;
     }
+    /* Event storage cannot overlap its controller or shared filter policy. */
     size_t bytes = controller->capacity * sizeof(nx_can_event_t);
     if (overlap(controller->events, bytes, controller, sizeof(*controller)) ||
         overlap(controller->events, bytes, controller->domain,
@@ -289,6 +290,7 @@ nx_result_t nx_can_controller_initialize(nx_can_controller_t* controller) {
             return result;
         }
     }
+    /* CAN2 also depends on the primary domain clock and shared filter owner. */
     uint32_t clocks =
         domain->primary_clock_mask |
         (controller->index == 1U ? domain->secondary_clock_mask : 0U);
@@ -342,6 +344,8 @@ nx_result_t nx_can_controller_initialize(nx_can_controller_t* controller) {
         controller->snapshot.closing = true;
         return NX_ERROR_IO;
     }
+    /* Initialize all software publication state before opening IRQ admission.
+     */
     controller->snapshot = (nx_can_state_t){.started = true};
     controller->publishers = 0U;
     controller->head = 0U;

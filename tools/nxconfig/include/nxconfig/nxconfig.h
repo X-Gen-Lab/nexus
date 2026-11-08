@@ -156,8 +156,11 @@ nxconfig_spi_endpoint(const nxconfig_assembly_t* assembly, size_t index);
 
 /** \brief Publish only static C instances and fixed connection metadata.
  * \param[in] assembly: Successfully resolved immutable owner.
- * \param[in] output_directory: Dedicated output; unowned files are never
- * erased. \param[out] diagnostic: Optional call-scoped error, never retained.
+ * \param[in] output_directory: Dedicated output in an existing parent owned
+ * by the current user, without group/other write access. Files use mode 0600;
+ * unowned files are never erased. Writers must honor the lock; parent and
+ * ancestor paths must remain stable throughout the call.
+ * \param[out] diagnostic: Optional call-scoped error, never retained.
  * \return Success after complete publication; changed inputs are rejected.
  * \note Host-only. Emits no register algorithm, startup or scheduler behavior.
  */

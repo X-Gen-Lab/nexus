@@ -171,8 +171,15 @@ class InstalledConsumerSupportTests(unittest.TestCase):
         for entry in products:
             self.assertFalse(self.producer.private_compile_inputs(entry, self.sdk))
         result = self.query()
+        # Incomplete inventory cannot establish an exact whole-source relation,
+        # even when this selected consumer's receipts are semantically valid.
+        complete = all(row.startswith(" ") for row in
+                       result["current_source"]["submodules"])
+        expected = "verified_bounded" if complete else "historical_source"
         self.assertEqual(result["staged_evidence"]["sdk_consumer"]["status"],
-                         "verified_bounded")
+                         expected)
+        self.assertEqual(result["staged_evidence"]["sdk_consumer"]["trust"],
+                         "semantic_verified")
         self.assertEqual(result["staged_evidence"]["sdk_consumer"]
                          ["recorded_matrix_status"], "failed")
         self.assertEqual(result["validation"]["installed_sdk"], "not_assessed")

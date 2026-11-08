@@ -882,6 +882,31 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.assertEqual(entry, original)
         self.assertNotIn('command', projected)
 
+    def test_quoted_definitions_use_a_lossless_cppcheck_command(self):
+        for system in ([], ['-isystem', 'system headers']):
+            for definitions in (['-DPATH="/work/a b"'],
+                                ['-D', 'PATH="/work/a b"']):
+                argv = ['cc', *definitions, *system, '-std=c11', '-c',
+                        str(self.source), '-o', 'sample.o']
+                for mode in ('arguments', 'command'):
+                    with self.subTest(system=system, mode=mode,
+                                      definitions=definitions):
+                        entry = {'directory': str(self.root),
+                                 'file': str(self.source),
+                                 mode: argv if mode == 'arguments'
+                                 else shlex.join(argv)}
+                        original = json.loads(json.dumps(entry))
+                        projected = quality_tools.cppcheck_compilation_entry(entry)
+                        # Cppcheck 2.13 strips literal quotes from its argv
+                        # import. Command text retains them without changing
+                        # the compiler's argument values or include priority.
+                        self.assertNotIn('arguments', projected)
+                        self.assertEqual(shlex.split(projected['command']),
+                            ['cc', *definitions, '-std=c11', '-c',
+                             str(self.source), '-o', 'sample.o',
+                             *(['-I', 'system headers'] if system else [])])
+                        self.assertEqual(entry, original)
+
     def test_missing_system_include_argument_fails_before_analysis(self):
         entry = {'directory': str(self.root), 'file': str(self.source),
                  'arguments': ['cc', '-c', str(self.source), '-isystem']}

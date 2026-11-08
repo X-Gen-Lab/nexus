@@ -1,4 +1,4 @@
-"""Boundary tests for actual optional-memory matrix orchestration."""
+"""F407 memory matrix preserves compiler inputs and precise failure evidence."""
 from pathlib import Path
 import json
 import subprocess
@@ -6,7 +6,7 @@ import sys
 import tempfile
 import unittest
 
-from scripts.ci import gd32_memory, memory_budget
+from scripts.ci import stm32_memory as memory_matrix, memory_budget
 
 
 class MemoryMatrixTests(unittest.TestCase):
@@ -21,7 +21,7 @@ class MemoryMatrixTests(unittest.TestCase):
             obj.write_bytes(b'original actual object')
             entry = {'arguments': ['gcc', '-std=c11', '-MMD', '-MP', '-MT',
                 'actual.o', '-MF', str(depfile), '-o', str(obj), '-c', str(source)]}
-            result = subprocess.run(gd32_memory.preprocessing_command(entry),
+            result = subprocess.run(memory_matrix.preprocessing_command(entry),
                 capture_output=True, text=True, check=False)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn('unsigned live;', result.stdout)
@@ -38,7 +38,7 @@ class MemoryMatrixTests(unittest.TestCase):
             obj.write_bytes(b'original actual object')
             entry = {'arguments': ['gcc', '-std=c11', '-o' + str(obj),
                                   '-c', str(source)]}
-            result = subprocess.run(gd32_memory.preprocessing_command(entry),
+            result = subprocess.run(memory_matrix.preprocessing_command(entry),
                 capture_output=True, text=True, check=False)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(obj.read_bytes(), b'original actual object')
@@ -48,16 +48,16 @@ class MemoryMatrixTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             source = Path(temporary) / 'source.c'
             source.write_text('original source\n')
-            identities = [gd32_memory.arch_compile.digest(source)]
-            gd32_memory.verify_inputs(identities)
+            identities = [memory_matrix.arch_compile.digest(source)]
+            memory_matrix.verify_inputs(identities)
             source.write_text('changed source\n')
             with self.assertRaisesRegex(ValueError, 'source changed'):
-                gd32_memory.verify_inputs(identities)
+                memory_matrix.verify_inputs(identities)
 
     def test_missing_tool_retains_actual_failure_report(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = Path(temporary) / 'missing'
-            status = gd32_memory.run(gd32_memory.ROOT,
+            status = memory_matrix.run(memory_matrix.ROOT,
                 '/nonexistent/arm-none-eabi-gcc', output)
             self.assertEqual(status, 1)
             report = json.loads((output / 'report.json').read_text())
@@ -72,13 +72,13 @@ class MemoryMatrixTests(unittest.TestCase):
             report = output / 'report.json'
             report.write_bytes(b'original failed evidence')
             with self.assertRaisesRegex(ValueError, 'must be fresh'):
-                gd32_memory.run(gd32_memory.ROOT,
+                memory_matrix.run(memory_matrix.ROOT,
                     '/nonexistent/arm-none-eabi-gcc', output)
             self.assertEqual(report.read_bytes(), b'original failed evidence')
 
     def test_real_expected_nonzero_keeps_raw_diagnostics(self):
         with tempfile.TemporaryDirectory() as temporary:
-            recorder = gd32_memory.arch_compile.Recorder(Path(temporary))
+            recorder = memory_matrix.arch_compile.Recorder(Path(temporary))
             record = memory_budget.rejected(recorder,
                 [sys.executable, '-c',
                  'import sys; print("expected refusal"); sys.exit(1)'],
@@ -89,7 +89,7 @@ class MemoryMatrixTests(unittest.TestCase):
 
     def test_unrelated_nonzero_is_never_accepted_as_expected_refusal(self):
         with tempfile.TemporaryDirectory() as temporary:
-            recorder = gd32_memory.arch_compile.Recorder(Path(temporary))
+            recorder = memory_matrix.arch_compile.Recorder(Path(temporary))
             with self.assertRaisesRegex(ValueError, 'different reason'):
                 memory_budget.rejected(recorder, [sys.executable, '-c',
                     'import sys; print("unrelated error"); sys.exit(1)'],
@@ -97,7 +97,7 @@ class MemoryMatrixTests(unittest.TestCase):
 
     def test_success_with_refusal_text_is_still_unexpected_acceptance(self):
         with tempfile.TemporaryDirectory() as temporary:
-            recorder = gd32_memory.arch_compile.Recorder(Path(temporary))
+            recorder = memory_matrix.arch_compile.Recorder(Path(temporary))
             with self.assertRaisesRegex(ValueError, 'unexpectedly accepted'):
                 memory_budget.rejected(recorder, [sys.executable, '-c',
                     'print("expected refusal")'], 'false-negative',

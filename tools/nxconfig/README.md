@@ -62,20 +62,25 @@ cmake -S tools/nxconfig -B /tmp/nexus-nxconfig -G Ninja
 cmake --build /tmp/nexus-nxconfig --parallel 1
 /tmp/nexus-nxconfig/nxconfig inspect --source-root "$PWD" \
   --assembly tools/configure/assemblies/qiming-baremetal.toml
+mkdir -p build/nxconfig
+chmod 700 build/nxconfig
 /tmp/nexus-nxconfig/nxconfig generate --source-root "$PWD" \
   --assembly tools/configure/assemblies/qiming-baremetal.toml \
-  --output /tmp/nexus-generated
+  --output build/nxconfig/generated
 ```
 
-`--output` 的父目录需已存在，输出目录须专用。首次生成接受不存在的目录；后续
+`--output` 的父目录需已存在、由当前用户持有，且组及其他用户没有写权限；输出
+目录须专用。生成文件显式使用 `0600`，不依赖进程 umask。首次生成接受不存在的目录；后续
 更新只接受拥有正确标记且不含外来文件的目录。输入文件须为普通文件，拒绝最终
 路径的符号链接。生成前后都核对原始输入字节；变化会拒绝发布。每个输入的角色、
 长度和 SHA-256 写入 manifest，路径位置不影响相同输入的输出字节。
 
 生成器在同一父目录写完整 staging，刷新各文件，再以 Linux `renameat2` exchange
-替换已有 bundle；首次发布使用原子 rename。同一路径有文件锁，已拥有 bundle 的
+替换已有 bundle；首次发布使用原子 `RENAME_NOREPLACE`，拒绝覆盖预检后出现的
+目标。同一路径有文件锁，已拥有 bundle 的
 完整切换不暴露一半新文件。等价输出保留所有文件时间戳。外来文件、符号链接或
-输入重叠均拒绝。文件锁只协调遵循协议的生成者；同目录中的恶意外部 rename 不在保证范围内。
+输入重叠均拒绝。父目录及其祖先路径必须在调用期间保持稳定。文件锁只协调遵循
+协议的生成者；恶意外部 rename、祖先目录重绑定或同 UID 篡改不在保证范围内。
 该边界用于构建一致性，不是执行不可信 provider 的沙箱。
 
 ## 验证与后续迁移

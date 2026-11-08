@@ -59,7 +59,7 @@ class STM32F1OfficialSourceTests(unittest.TestCase):
             return state["origin"]
         if arguments == ("status", "--porcelain", "--untracked-files=all"):
             return state["status"]
-        self.fail("Unexpected Git identity query: " + repr(arguments))
+        raise AssertionError("Unexpected Git identity query: " + repr(arguments))
 
     def verify(self, **options):
         return official.verify(self.source, self.lock_path, self.cmsis,
