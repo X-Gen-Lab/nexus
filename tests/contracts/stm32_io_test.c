@@ -478,7 +478,8 @@ static void i2c_test(void) {
                                  .rate_hz = 100000U};
     const nx_i2c_port_t port_api = {&nx_stm32_i2c_ops, &port};
     (void)port_api;
-    nx_stm32_i2c_endpoint_state_t endpoint = {.port = &port, .address = 0x50U};
+    nx_stm32_i2c_endpoint_state_t endpoint = {
+        .port = &port, .address = 0x50U, .address_bits = 7U};
     const nx_i2c_endpoint_t endpoint_api = {&nx_stm32_i2c_endpoint_ops,
                                             &endpoint};
     (void)endpoint_api;

@@ -157,10 +157,17 @@ class EndpointPolicy:
     spi_dma: tuple[tuple[str, ...] | None, str] | None = None
     model_async_echo: bool = False
     spi_lsb_first: bool = False
+    i2c_ten_bit: bool = False
 
     def validate(self, device, controller):
         driver, kind, mode = (device["driver"], controller["kind"],
                               controller["mode"])
+        if kind == "i2c":
+            width = device.get("address_bits", 7)
+            if type(width) is not int or width not in (7, 10):
+                fail("I2C address_bits must be exactly 7 or 10")
+            if width == 10 and not self.i2c_ten_bit:
+                fail("I2C requires a reviewed 10-bit endpoint provider")
         if "lsb_first" in device:
             if type(device["lsb_first"]) is not bool:
                 fail("SPI lsb_first must be a boolean")

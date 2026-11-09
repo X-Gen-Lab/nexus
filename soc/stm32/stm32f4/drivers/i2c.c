@@ -259,8 +259,8 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
                                               size_t* transferred) {
     const nx_stm32_i2c_endpoint_state_t* endpoint = context;
     if (endpoint == NULL || endpoint->port == NULL ||
-        endpoint->address > 0x7FU || messages == NULL || count == 0U ||
-        transferred == NULL) {
+        !nx_i2c_v1_address_valid(endpoint->address, endpoint->address_bits) ||
+        messages == NULL || count == 0U || transferred == NULL) {
         return NX_ERROR_INVALID;
     }
     *transferred = 0U;
@@ -289,6 +289,11 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
         (port->registers->CR1 & I2C_CR1_PE) == 0U) {
         return NX_ERROR_STATE;
     }
+    if (endpoint->address_bits == 10U &&
+        !nx_i2c_v1_ten_timing((uint16_t)port->registers->CCR,
+                              (uint8_t)port->peripheral_mhz)) {
+        return NX_ERROR_UNSUPPORTED;
+    }
     if (nx_deadline_expired(deadline, nx_time_now_us())) {
         return NX_ERROR_TIMEOUT;
     }
@@ -310,8 +315,36 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
             (port->registers->CR1 & ~(uint32_t)(I2C_CR1_POS | I2C_CR1_START)) |
             I2C_CR1_ACK;
         start_requested = false;
-        NX_STM32_I2C_WRITE_DATA(port, ((uint32_t)endpoint->address << 1U) |
-                                          (messages[message].read ? 1U : 0U));
+        if (endpoint->address_bits == 10U) {
+            uint32_t header =
+                0xF0U | (((uint32_t)endpoint->address >> 7U) & 6U);
+            NX_STM32_I2C_WRITE_DATA(port, header);
+            result = wait_flag(port, I2C_SR1_ADD10, deadline);
+            if (result != NX_SUCCESS) {
+                break;
+            }
+            NX_STM32_I2C_WRITE_DATA(port, endpoint->address & 0xFFU);
+            result = wait_flag(port, I2C_SR1_ADDR, deadline);
+            if (result != NX_SUCCESS) {
+                break;
+            }
+            if (messages[message].read) {
+                /* The first ADDR is transmitter-side: release it solely for
+                 * the internal repeated START, without consuming payload. */
+                clear_address(port);
+                LL_I2C_GenerateStartCondition(port->registers);
+                result = wait_flag(port, I2C_SR1_SB, deadline);
+                if (result != NX_SUCCESS) {
+                    break;
+                }
+                port->registers->CR1 &= ~(uint32_t)I2C_CR1_START;
+                NX_STM32_I2C_WRITE_DATA(port, header | 1U);
+            }
+        } else {
+            NX_STM32_I2C_WRITE_DATA(port,
+                                    ((uint32_t)endpoint->address << 1U) |
+                                        (messages[message].read ? 1U : 0U));
+        }
         result = wait_flag(port, I2C_SR1_ADDR, deadline);
         if (result != NX_SUCCESS) {
             break;
@@ -400,7 +433,7 @@ static bool on_port(const void* context, const nx_i2c_port_t* port) {
     const nx_stm32_i2c_endpoint_state_t* endpoint = context;
     return endpoint != NULL && port != NULL && port->ops == &nx_stm32_i2c_ops &&
            port->context != NULL && endpoint->port == port->context &&
-           endpoint->address >= 8U && endpoint->address <= 119U;
+           nx_i2c_v1_address_valid(endpoint->address, endpoint->address_bits);
 }
 
 /** \brief One shared immutable method table for this execution mode. */

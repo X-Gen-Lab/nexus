@@ -100,6 +100,7 @@ def emit_controllers(controllers):
             ' * Parity zero means none. Cache line applies to provider policy;',
             ' * it does not assert that cache is enabled. Unknown timestamp',
             ' * means no usable source described, never event time zero.',
+            ' * I2C address_bits zero means width belongs to each endpoint.',
             ' */',
             'typedef struct {',
             *[f"    uint32_t {name};" for name in _FIELDS[kind]],

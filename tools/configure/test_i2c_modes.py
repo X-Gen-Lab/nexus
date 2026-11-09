@@ -99,6 +99,66 @@ class I2cAsyncConfigurationTests(unittest.TestCase):
                                                   priority=priority), test_support=native_fixture(self.authored('stm32f4', "irq-messages",
                                                   priority=priority)))
 
+    def test_ten_bit_endpoints_share_controller_with_seven_bit_peers(self):
+        from tools.configure import selected_contracts
+        for mode in ("poll-messages", "irq-messages", "dma-messages"):
+            with self.subTest(mode=mode):
+                path = self.authored('stm32f4', mode, irq=mode != "poll-messages")
+                text = path.read_text().replace('max_hz=100000', 'max_hz=80000')
+                text += ('[i2c_device.wide]\ncontroller="bus"\n'
+                         'driver="i2c-endpoint"\naddress=80\naddress_bits=10\n')
+                path.write_text(text)
+                ir = gate.resolve_ir(path, test_support=native_fixture(path))
+                self.assertEqual([device.options.address_bits for device in ir.devices], [7, 10])
+                for device in ir.devices:
+                    facts = selected_contracts.describe(ir.controllers[0], device)
+                    self.assertEqual(facts.fields['address_bits'], device.options.address_bits)
+                output = self.root / mode
+                gate.configure(path, output, test_support=native_fixture(path))
+                source = (output / 'bindings.c').read_text()
+                self.assertIn('.address_bits = 7u', source)
+                self.assertIn('.address_bits = 10u', source)
+                path.write_text(text.replace('address=80\naddress_bits=10', 'address=1024\naddress_bits=10'))
+                with self.assertRaisesRegex(ValueError, '10-bit I2C address'):
+                    gate.resolve_ir(path, test_support=native_fixture(path))
+
+    def test_ten_bit_rejects_unsafe_repeated_start_timing_and_duplicates(self):
+        path = self.authored('stm32f4', 'irq-messages')
+        text = path.read_text().replace('address=80', 'address=683\naddress_bits=10')
+        for rate in (88001, 100000):
+            with self.subTest(rate=rate):
+                path.write_text(text.replace('max_hz=100000', f'max_hz={rate}'))
+                with self.assertRaisesRegex(ValueError, 'repeated START'):
+                    gate.resolve_ir(path, test_support=native_fixture(path))
+        for rate in (88000, 100001, 400000):
+            with self.subTest(rate=rate):
+                path.write_text(text.replace('max_hz=100000', f'max_hz={rate}'))
+                ir = gate.resolve_ir(path, test_support=native_fixture(path))
+                self.assertEqual(683, ir.devices[0].options.address)
+        path.write_text(text.replace('max_hz=100000', 'max_hz=80000') +
+                        '[i2c_device.duplicate]\ncontroller="bus"\n'
+                        'driver="i2c-endpoint"\naddress=683\naddress_bits=10\n')
+        with self.assertRaisesRegex(ValueError, 'Duplicate I2C address'):
+            gate.resolve_ir(path, test_support=native_fixture(path))
+
+    def test_endpoint_width_is_an_exact_integer_and_native_stays_seven_bit(self):
+        from tools.configure import authored
+        width = authored.editor_schema()['properties']['i2c_device'][
+            'additionalProperties']['properties']['address_bits']
+        self.assertEqual(width, {'type': 'integer', 'enum': [7, 10], 'default': 7})
+        path = self.authored('stm32f4', 'poll-messages', irq=False)
+        text = path.read_text()
+        for width in ('true', '8', '0'):
+            with self.subTest(width=width):
+                path.write_text(text + f'address_bits={width}\n')
+                with self.assertRaisesRegex(ValueError, 'address_bits'):
+                    gate.resolve_ir(path, test_support=native_fixture(path))
+        from tools.configure.providers.common import EndpointPolicy
+        with self.assertRaisesRegex(ValueError, 'reviewed.*10-bit'):
+            EndpointPolicy().validate(
+                {'driver': 'i2c-endpoint', 'address': 683, 'address_bits': 10},
+                {'kind': 'i2c', 'mode': 'poll-messages'})
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -103,7 +103,8 @@ def instance_declarations(item, result):
         if kind == "i2c":
             child = next((device for device in result.devices if device.controller == item.id), None)
             if child is not None:
-                initializer = f" = {{ .port = &s_nx_port_{name}, .address = {child.options.address}u }}"
+                initializer = (f" = {{ .port = &s_nx_port_{name}, .address = {child.options.address}u,"
+                               f" .address_bits = {child.options.address_bits}u }}")
         source.append('static nx_stm32'
                       f"_{implementation(item)}_endpoint_state_t "
                       f"s_nx_endpoint_{name}{initializer};")

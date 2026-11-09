@@ -134,7 +134,8 @@ typedef struct {
 } nx_stm32_i2c_state_t;
 typedef struct {
     nx_stm32_i2c_state_t* port;
-    uint8_t address;
+    uint16_t address;
+    uint8_t address_bits;
 } nx_stm32_i2c_endpoint_state_t;
 typedef struct {
     FLASH_TypeDef* registers;

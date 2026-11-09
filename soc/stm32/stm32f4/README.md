@@ -73,7 +73,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | GPIO | 单 port 的 16-bit 授权 mask；原子 BSRR set/reset；串行 toggle；先初值后 mode |
 | UART | 六个实例共用 IRQ bytes/events、独立 9N1 words、IRQ blocks、HAL 有限 TX DMA、有限／连续 RX DMA 和 DMA duplex；真实 TC、显式 loss、drain、quarantine |
 | SPI | SPI1／2／3 共用短 polling／有限全双工 DMA；每端点 MSB／LSB-first master、mode0–3；普通 byte face 为 8 位，增强 polling 事务支持 8／16 位 word，三个控制器均可选择增强 DMA 事务；polling 最多 256 words，DMA 每段最多 65535 words |
-| I2C | I2C1／2／3 polling/IRQ/DMA；42 MHz PCLK、名义 5129 Hz–400 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
+| I2C | I2C1／2／3 polling/IRQ/DMA；42 MHz PCLK、名义 5129 Hz–400 kHz；显式 7／10-bit endpoint、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误；10-bit 受下述勘误时序准入约束 |
 | Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
@@ -181,7 +181,8 @@ RM0090 §13.3.2／§13.13.16 区分每个转换器的数字接口 gate 和共享
 整个冷态准备与其他 ADC 启动必须串行；不提供动态调频、并发热接入或共享 ADCRST。
 停止一个实例不改写 CCR，也不关闭其他实例的 gate。
 
-软件采样在 ADON 写入经过 DSB 和回读确认后起算 3 µs 稳定期。结束时独立回读停止
+regular 软件采样在 ADON 写入经过 DSB 和回读确认后，遵循下述外部 4 µs／
+内部 11 µs 稳定期。结束时独立回读停止
 结果；失败返回 IO 并保留设备清理责任，新采样返回 BUSY，平台责任者须重试关闭。
 返回时不再访问调用者的样本或 count，已完成前缀仍由 count 描述。转换器、接口
 gate、临时观察 gate、TIM3 和 DMA IRQ 分开记录责任，复用现有状态字节，不增加
@@ -263,6 +264,20 @@ I2C 的 `max_hz` 默认 100000，允许名义 5129–400000 Hz。公共 C 时序
 寄存器内容。请求、通知发布者或 DMA 尚未退出时先返回 BUSY，不复位硬件。
 新增 CCR 使用现有 state padding，ARM 可变状态仍为 64 字节；每个只读冷配置增加
 4 字节。polling 与异步模式不增加 heap、队列或 worker。
+
+I2C endpoint 的 `address_bits` 默认 7，地址限于 8–119；显式 10 时允许 0–1023。
+同一 bus 可连接两种宽度，重复身份包含宽度。依据 RM0090 §27.3.3，10-bit read
+先发送 header-W 与低字节，清除 transmitter ADDR 后再请求内部 repeated START，
+最后发送 header-R；仅最终 ADDR 进入既有 ACK／POS／DMA 接收窗口。地址字节不计入
+payload，内部 restart 不重新编程 DMA stream。NACK、仲裁、取消和 timeout 继续
+进入同一 drain；硬件或 publisher 未退出时保留借用，不隐式重放事务。
+
+ES0182 Rev19 §2.10.4 的 Standard-mode repeated START 限制与 PCLK 无关。
+因此 10-bit 只准入 `max_hz <= 88000` 或显式 Fast `max_hz > 100000`，C 入口也校验
+实际 CCR；默认 100 kHz 配置须显式修改后才能选 10-bit。该选择不建立物理时序资格。
+ARM 实际编译比较：endpoint 仍为 8 字节、异步 state 仍为 64 字节。控制器 trait 的
+`address_bits=0` 表示宽度归 endpoint；具名 endpoint 的 selected contract 返回 7 或 10。
+Native 未因此取得 10-bit 支持，I2C target／SMBus／PEC 也未由 master 扩展推定实现。
 
 I2C3 固定 PA8 SCL／PC9 SDA AF4、APB1 42 MHz，DMA1 RX stream2／TX stream4
 channel3，EV／ER IRQ 为 72／73。C 冷态 owner 从 controller 身份取得两个 GPIO

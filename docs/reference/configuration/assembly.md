@@ -63,6 +63,24 @@ include it and use nominal references such as `NX_UART_REF_UART0` with
 the interface faces. Factory getters return existing static objects and do not
 start hardware.
 
+## I2C endpoint address width
+
+An `i2c_device` has `address_bits = 7` by default, with an address from 8 to
+119. Reviewed STM32F407 polling, IRQ and DMA message providers also accept
+`address_bits = 10`, with an address from 0 to 1023. Width is an exact integer;
+unknown widths and booleans reject. A controller may have both widths, and
+duplicate endpoint checks include the width. Native does not acquire 10-bit
+support from the schema. Controller metadata uses `address_bits = 0` when the
+width belongs to each endpoint; the endpoint selected contract reports 7 or 10.
+
+A 10-bit read includes its own repeated START before the read header. ES0182
+Rev19 section 2.10.4 therefore restricts the maintained F407 10-bit profile to
+`max_hz <= 88000` in Standard mode or explicit Fast mode with
+`max_hz > 100000`. The default 100 kHz profile must be changed explicitly;
+42 MHz PCLK is not an erratum exemption. Firmware also checks the actual CCR
+before borrowing storage or starting hardware. The authored ceiling and ARM
+link checks do not qualify physical rise times, target devices or bus timing.
+
 ## ADC raw resolution and scan timing
 
 For the maintained F407 ADC1 modes, `resolution_bits` selects 6, 8, 10 or 12

@@ -216,7 +216,7 @@ ADC_GROUP = None
 PWM_SHARED = None
 ENDPOINT_POLICY = common.EndpointPolicy(
     spi_transaction=True, spi_dma=(("SPI1", "SPI2", "SPI3"), "dma"),
-    spi_lsb_first=True)
+    spi_lsb_first=True, i2c_ten_bit=True)
 TIMEBASE_ALARM = True
 
 

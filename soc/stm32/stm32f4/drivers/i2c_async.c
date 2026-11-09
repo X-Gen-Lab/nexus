@@ -113,6 +113,8 @@ _Static_assert(I2C_SR1_SB == (UINT32_C(1) << 0U), "I2C/DMA I2C_SR1_SB mask");
 _Static_assert(I2C_SR1_ADDR == (UINT32_C(1) << 1U),
                "I2C/DMA I2C_SR1_ADDR mask");
 _Static_assert(I2C_SR1_BTF == (UINT32_C(1) << 2U), "I2C/DMA I2C_SR1_BTF mask");
+_Static_assert(I2C_SR1_ADD10 == (UINT32_C(1) << 3U),
+               "I2C/DMA I2C_SR1_ADD10 mask");
 _Static_assert(I2C_SR1_RXNE == (UINT32_C(1) << 6U),
                "I2C/DMA I2C_SR1_RXNE mask");
 _Static_assert(I2C_SR1_TXE == (UINT32_C(1) << 7U), "I2C/DMA I2C_SR1_TXE mask");

@@ -211,6 +211,9 @@ def editor_schema():
             from tools.configure.adc import RESOLUTION_BITS
             properties["resolution_bits"] = {
                 "type": "integer", "enum": list(RESOLUTION_BITS), "default": 12}
+        if "address_bits" in fields:
+            properties["address_bits"] = {
+                "type": "integer", "enum": [7, 10], "default": 7}
         for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing",
                              "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b", "lsb_first"}:
             properties[name] = {"type": "boolean"}

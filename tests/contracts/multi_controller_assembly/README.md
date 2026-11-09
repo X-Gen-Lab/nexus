@@ -84,3 +84,10 @@ TIM3／4／5 的原始正交计数，分别使用 x2 TI1／x2 TI2／x4 TI12。�
 三个独立 ADC 的软件注入组，覆盖内部输入、重复 rank 和非默认分辨率。重复采样不隐式
 平均；ZG 的 TIM3 PWM 独立运行，不声称与注入采样相位对齐。全部数据为 raw count，
 由已有静态 factory 与同一 ADC state／config 连接，不引入额外实例存储或任务。
+
+`stm32-ve-i2c-tenbit-baremetal.toml` 与 `stm32-zg-i2c-tenbit-freertos.toml`
+使用三个独立 I2C controller，交叉覆盖 polling／IRQ／DMA 和 7／10-bit endpoint。
+7-bit 与 10-bit 的相同数值地址属于不同身份；10-bit 地址字节不计入 payload。
+VE 的 I2C3 DMA 与 ZG 的 I2C1／2 DMA 使用不冲突的 stream，不隐式替换路线。
+Standard 10-bit profile 限制在名义 88 kHz 以内；Fast profile 显式选择 400 kHz
+上限，不据此授予上拉、电容、目标器件或重复 START 物理时序资格。

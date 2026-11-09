@@ -44,7 +44,8 @@ bool enabled(IRQn_Type irq) {
 class I2CMultiple : public testing::Test {
   protected:
     nx_i2c_v1_state_t states[2]{};
-    nx_i2c_v1_endpoint_t endpoints[2]{{&states[0], 0x50U}, {&states[1], 0x51U}};
+    nx_i2c_v1_endpoint_t endpoints[2]{{&states[0], 0x50U, 7U},
+                                      {&states[1], 0x51U, 7U}};
     nx_i2c_port_t buses[2]{{&nx_i2c_v1_async_ops, &states[0]},
                            {&nx_i2c_v1_async_ops, &states[1]}};
     nx_i2c_endpoint_t devices[2]{

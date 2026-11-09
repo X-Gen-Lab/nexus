@@ -1194,6 +1194,14 @@
             "type": "integer",
             "minimum": 0
           },
+          "address_bits": {
+            "type": "integer",
+            "enum": [
+              7,
+              10
+            ],
+            "default": 7
+          },
           "controller": {
             "type": "string",
             "description": "Authored controller instance id, not an endpoint id."

@@ -163,7 +163,9 @@ def _format(item, provider, shape):
                       "spi_dma_transaction" else 8,
                       configured_max_hz=options.max_hz)
     elif kind == "i2c":
-        fields = dict(address_bits=7, configured_max_hz=options.max_hz)
+        # Zero identifies endpoint-owned widths on a mixed-width controller.
+        fields = dict(address_bits=0 if provider.ENDPOINT_POLICY.i2c_ten_bit else 7,
+                      configured_max_hz=options.max_hz)
     elif kind == "adc":
         fields = dict(storage_bits=16, signed_samples=0,
                       scan_channels=len(options.channels))
@@ -290,6 +292,9 @@ def describe(item, endpoint=None, *, public_class=None):
     if selected_limits is not None:
         limits.update(selected_limits(item, shape))
     formatted = _format(item, provider, shape)
+    if endpoint is not None and kind == "i2c":
+        formatted["fields"] = {**formatted["fields"],
+                               "address_bits": endpoint.options.address_bits}
     if kind == "external_bus" and selected == "memory_window":
         formatted["fields"] = dict(
             window_address=endpoint.options.address,

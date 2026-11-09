@@ -45,7 +45,7 @@ class I2cDefaultLeaf : public testing::Test {
     I2C_TypeDef registers{};
     uint32_t lines = 3U;
     nx_i2c_v1_state_t state{};
-    nx_i2c_v1_endpoint_t endpoint_state{&state, 0x50U};
+    nx_i2c_v1_endpoint_t endpoint_state{&state, 0x50U, 7U};
     nx_i2c_port_t bus{&nx_i2c_v1_async_ops, &state};
     nx_i2c_endpoint_t endpoint{&nx_i2c_v1_async_endpoint_ops, &endpoint_state};
     nx_i2c_request_t request{};

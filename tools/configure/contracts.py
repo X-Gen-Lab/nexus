@@ -204,7 +204,7 @@ CONTROLLER_SELECTION_FIELDS = frozenset().union(
 ENDPOINT_FIELDS = MappingProxyType({
     "spi": frozenset(("controller", "driver", "cs_binding", "mode", "max_hz",
                       "model_bytes", "lsb_first")),
-    "i2c": frozenset(("controller", "driver", "address", "model_bytes")),
+    "i2c": frozenset(("controller", "driver", "address", "model_bytes", "address_bits")),
 })
 EXTERNAL_ENDPOINT_FIELDS = frozenset((
     "controller", "binding", "read_timing", "write_timing"))

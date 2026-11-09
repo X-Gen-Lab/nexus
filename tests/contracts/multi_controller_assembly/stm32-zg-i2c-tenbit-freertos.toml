@@ -1,0 +1,54 @@
+# Two independent DMA controllers and an IRQ peer; no physical target claim.
+schema = 2
+board_package = "stm32-zg-board"
+backend = "freertos"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[i2c.first]
+binding = "primary-i2c"
+mode = "dma-messages"
+max_hz = 80000
+[i2c.first.irq]
+priority = 5
+calls_os = false
+
+[i2c_device.first_target]
+controller = "first"
+address = 0
+address_bits = 10
+
+[i2c.second]
+binding = "secondary-i2c"
+mode = "dma-messages"
+max_hz = 400000
+[i2c.second.irq]
+priority = 5
+calls_os = false
+
+[i2c_device.second_target]
+controller = "second"
+address = 683
+address_bits = 10
+
+[i2c.third]
+binding = "i2c3"
+mode = "irq-messages"
+max_hz = 88000
+[i2c.third.irq]
+priority = 5
+calls_os = false
+
+[i2c_device.third_target]
+controller = "third"
+address = 1023
+address_bits = 10

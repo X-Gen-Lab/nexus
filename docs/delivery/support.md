@@ -148,6 +148,16 @@ stream0 RX channel0；I2C3 使用 stream4 TX／stream2 RX channel3。共享物�
 时配置拒绝，不自动替换路线。增强 SPI DMA 事务的每段完成都保持同一 CS，取消和
 停止失败保留整条请求与借用，直到所选引擎、线端和 CS 均已撤回。
 
+I2C1／2／3 的 polling／IRQ／DMA 支持显式 7／10-bit master endpoint。
+`address_bits` 默认 7，地址为 8–119；显式 10 时为 0–1023，两种宽度可共用控制器。
+10-bit read 先完成 transmitter 地址前缀，再以内部 repeated START 发送 header-R；
+只有最终 ADDR 才释放接收窗口及 DMA 请求，地址字节不计入 payload。
+依据 ES0182 Rev19 §2.10.4，10-bit Standard profile 要求 `max_hz <= 88000`，
+或显式选择 Fast `max_hz > 100000`；C 入口另校验实际 CCR，42 MHz PCLK 不豁免勘误。
+现有 drain／quarantine 合同保持不变，ARM endpoint 8 字节及异步 state 64 字节不增长。
+软件装配为 `tests/contracts/multi_controller_assembly/*i2c-tenbit*.toml`，不证明物理
+target、上拉、电容或重复 START 时序，也不提供 I2C target／SMBus／PEC。
+
 ADC1 使用 DMA2 stream4 channel0，ADC2 使用 stream2 channel1，ADC3 使用
 stream1 channel2；有限和连续模式均按所选 lane 解释并清除标志。TIM3 是独占触发源，
 不同 ADC 的 DMA stream 不冲突也不能同时取得同一 TIM3。软件参考装配见

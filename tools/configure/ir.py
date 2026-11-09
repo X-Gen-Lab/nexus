@@ -835,12 +835,14 @@ class SpiDMATransactionEndpointOptions:
 class I2cEndpointOptions:
     address: int
     model_bytes: int | None
+    address_bits: int = 7
 
 
 @dataclass(frozen=True)
 class I2cLongEndpointOptions:
     address: int
     model_bytes: int | None
+    address_bits: int = 7
 
 
 @dataclass(frozen=True)
@@ -907,7 +909,8 @@ class EndpointIR(Record):
             option_type = (I2cLongEndpointOptions
                            if values["driver"] == "i2c-long-endpoint"
                            else I2cEndpointOptions)
-            options = option_type(values["address"], values.get("model_bytes"))
+            options = option_type(values["address"], values.get("model_bytes"),
+                                  values.get("address_bits", 7))
         elif kind == "usb_device":
             options = UsbEndpointOptions(values["endpoint_index"], *(values[key]
                 for key in ("number", "direction", "transfer", "max_packet",

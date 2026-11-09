@@ -49,6 +49,23 @@ static inline bool nx_i2c_v1_timing(uint8_t mhz, uint32_t maximum_hz,
     return true;
 }
 
+/** \brief Pure endpoint admission; width zero never selects an implicit mode.
+ */
+static inline bool nx_i2c_v1_address_valid(uint16_t address, uint8_t bits) {
+    return bits == 7U ? address >= 8U && address <= 119U
+                      : bits == 10U && address <= 1023U;
+}
+
+/** \brief ES0182 2.10.4 excludes 88--100 kHz Standard repeated STARTs.
+ * \note Check the actual CCR profile, including direct C callers. Fast-mode
+ *       timing has its separate electrical Board qualification.
+ */
+static inline bool nx_i2c_v1_ten_timing(uint16_t ccr, uint8_t mhz) {
+    uint32_t divisor = (uint32_t)ccr & 0xFFFU;
+    return divisor != 0U && ((ccr & 0x8000U) != 0U ||
+                             divisor * 176000U >= (uint32_t)mhz * 1000000U);
+}
+
 /** \brief Cold physical DMA facts, never a runtime stream allocator. */
 typedef struct {
     volatile uint32_t* control;
@@ -74,6 +91,9 @@ typedef struct {
 typedef enum {
     NX_I2C_V1_IDLE,
     NX_I2C_V1_START,
+    NX_I2C_V1_TEN_LOW,
+    NX_I2C_V1_TEN_ADDRESS,
+    NX_I2C_V1_TEN_READ_START,
     NX_I2C_V1_ADDRESS,
     NX_I2C_V1_WRITE,
     NX_I2C_V1_WRITE_ACK,
@@ -111,7 +131,8 @@ typedef struct {
     uint8_t message;
     nx_result_t terminal;
     nx_i2c_v1_phase_t phase;
-    uint8_t address;
+    uint16_t address;
+    uint8_t address_bits;
     uint8_t peripheral_mhz;
     uint16_t wake_publishers;
     bool initialized;
@@ -122,7 +143,8 @@ typedef struct {
 /** \brief Immutable addressed child with exact controller identity. */
 typedef struct {
     nx_i2c_v1_state_t* port;
-    uint8_t address;
+    uint16_t address;
+    uint8_t address_bits;
 } nx_i2c_v1_endpoint_t;
 
 #ifdef __cplusplus

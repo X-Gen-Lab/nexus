@@ -186,7 +186,8 @@ def _i2c_constructor(item, result, devices):
                     f"s_nx_endpoint_{child_name}")
         if index:
             definitions += [f"static nx_stm32_{implementation}_endpoint_state_t {endpoint} = {{",
-                            f"    .port = &s_nx_port_{name}, .address = {child.options.address}u", "};"]
+                            f"    .port = &s_nx_port_{name}, .address = {child.options.address}u,",
+                            f"    .address_bits = {child.options.address_bits}u", "};"]
         definitions += _endpoint_face("i2c", child_name, endpoint,
                                       implementation)
     if asynchronous:
