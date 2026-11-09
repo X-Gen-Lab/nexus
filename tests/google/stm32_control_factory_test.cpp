@@ -244,43 +244,130 @@ TEST_F(ControlFactory, ActiveTouchPublisherPreventsColdAdmissionAndFinalClose) {
 
 #ifdef NX_CONTROL_PWM
 TEST_F(ControlFactory, FixedPwmUsesEveryReviewedChannelAndSelectedTimer) {
-    for (TIM_TypeDef* timer : {TIM3, TIM5}) {
-        for (uint8_t channel = 1U; channel <= 4U; ++channel) {
-            SCOPED_TRACE(timer == TIM3 ? "TIM3" : "TIM5");
+    const struct {
+        TIM_TypeDef* timer;
+        GPIO_TypeDef* gpio;
+        uint32_t gate;
+        uint8_t first_pin;
+        uint8_t channels;
+        uint8_t af;
+        bool apb2;
+    } timers[]{
+        {TIM3, GPIOA, RCC_APB1ENR_TIM3EN, 6U, 4U, 2U, false},
+        {TIM4, GPIOB, RCC_APB1ENR_TIM4EN, 6U, 4U, 2U, false},
+        {TIM5, GPIOA, RCC_APB1ENR_TIM5EN, 0U, 4U, 2U, false},
+        {TIM9, GPIOA, RCC_APB2ENR_TIM9EN, 2U, 2U, 3U, true},
+        {TIM10, GPIOB, RCC_APB2ENR_TIM10EN, 8U, 1U, 3U, true},
+        {TIM11, GPIOB, RCC_APB2ENR_TIM11EN, 9U, 1U, 3U, true},
+        {TIM12, GPIOB, RCC_APB1ENR_TIM12EN, 14U, 2U, 9U, false},
+        {TIM13, GPIOA, RCC_APB1ENR_TIM13EN, 6U, 1U, 9U, false},
+        {TIM14, GPIOA, RCC_APB1ENR_TIM14EN, 7U, 1U, 9U, false},
+    };
+    for (const auto& selected : timers) {
+        for (uint8_t channel = 1U; channel <= selected.channels; ++channel) {
+            SCOPED_TRACE(reinterpret_cast<uintptr_t>(selected.timer));
             SCOPED_TRACE(static_cast<unsigned>(channel));
-            const bool first = timer == TIM3;
-            GPIO_TypeDef* bank = first && channel > 2U ? GPIOB : GPIOA;
+            const bool tim3_upper = selected.timer == TIM3 && channel > 2U;
+            GPIO_TypeDef* bank = tim3_upper ? GPIOB : selected.gpio;
             const uint8_t pin = static_cast<uint8_t>(
-                first ? (channel <= 2U ? channel + 5U : channel - 3U)
-                      : channel - 1U);
-            const uint32_t period = first ? 1000U : 65537U;
-            const uint32_t clock =
-                first ? RCC_APB1ENR_TIM3EN : RCC_APB1ENR_TIM5EN;
+                tim3_upper ? channel - 3U : selected.first_pin + channel - 1U);
+            const uint32_t period = selected.timer == TIM5 ? 65537U : 1000U;
             nx_stm32_pwm_state_t state{};
             nx_stm32_gpio_state_t inactive{};
             const nx_stm32_pwm_config_t config{
-                period, 1U, 1000000U, 83U, false, timer, bank, channel, pin};
-            RCC->APB1ENR = RCC_APB1ENR_TIM4EN;
+                period,   1U,
+                1000000U, static_cast<uint16_t>(selected.apb2 ? 167U : 83U),
+                false,    selected.timer,
+                bank,     channel,
+                pin};
+            RCC->APB1ENR = RCC_APB1ENR_TIM6EN;
+            RCC->APB2ENR = RCC_APB2ENR_TIM8EN;
             const auto result =
                 nx_stm32_pwm_prepare(&state, &inactive, &config);
             EXPECT_EQ(NX_SUCCESS, result);
-            if (result != NX_SUCCESS) {
+            if (result != NX_SUCCESS)
                 continue;
-            }
-            EXPECT_EQ(timer, state.registers);
+            EXPECT_EQ(selected.timer, state.registers);
             EXPECT_EQ(bank, inactive.registers);
             EXPECT_EQ(1U << pin, state.inactive_mask);
             EXPECT_EQ(channel, state.channel);
-            EXPECT_EQ(RCC_APB1ENR_TIM4EN | clock, RCC->APB1ENR);
-            EXPECT_EQ(period - 1U, timer->ARR);
+            EXPECT_EQ(RCC_APB1ENR_TIM6EN | (selected.apb2 ? 0U : selected.gate),
+                      RCC->APB1ENR);
+            EXPECT_EQ(RCC_APB2ENR_TIM8EN | (selected.apb2 ? selected.gate : 0U),
+                      RCC->APB2ENR);
+            EXPECT_EQ(period - 1U, selected.timer->ARR);
             const nx_pwm_port_t face{&nx_stm32_pwm_ops, &state};
             ASSERT_EQ(NX_SUCCESS, nx_pwm_port_start(&face));
-            EXPECT_NE(0U, timer->CCER & (1U << ((channel - 1U) * 4U)));
+            EXPECT_NE(0U, selected.timer->CCER & (1U << ((channel - 1U) * 4U)));
             EXPECT_EQ(2U, (bank->MODER >> (pin * 2U)) & 3U);
+            EXPECT_EQ(selected.af,
+                      (bank->AFR[pin / 8U] >> ((pin % 8U) * 4U)) & 15U);
             EXPECT_EQ(NX_SUCCESS, nx_stm32_pwm_close(&state, &inactive));
-            EXPECT_EQ(RCC_APB1ENR_TIM4EN, RCC->APB1ENR);
+            EXPECT_EQ(RCC_APB1ENR_TIM6EN, RCC->APB1ENR);
+            EXPECT_EQ(RCC_APB2ENR_TIM8EN, RCC->APB2ENR);
         }
     }
+}
+
+TEST_F(ControlFactory, Apb2PwmRefusedGateRetainsOnlyItsCleanupResponsibility) {
+    nx_stm32_pwm_state_t state{};
+    nx_stm32_gpio_state_t inactive{};
+    const nx_stm32_pwm_config_t config{1000U, 1U,    1000000U, 167U, false,
+                                       TIM10, GPIOB, 1U,       8U};
+    RCC->APB2ENR = RCC_APB2ENR_SYSCFGEN;
+    refused = &RCC->APB2ENR;
+    held_bits = RCC_APB2ENR_TIM10EN;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_pwm_prepare(&state, &inactive, &config));
+    EXPECT_EQ(TIM10, state.registers);
+    EXPECT_NE(0U, state.cold_effects);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_pwm_close(&state, &inactive));
+    EXPECT_EQ(RCC_APB2ENR_SYSCFGEN, RCC->APB2ENR);
+    refused = nullptr;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_pwm_prepare(&state, &inactive, &config));
+    refused = &RCC->APB2ENR;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_pwm_close(&state, &inactive));
+    EXPECT_NE(0U, state.cold_effects);
+    EXPECT_EQ(RCC_APB2ENR_SYSCFGEN | RCC_APB2ENR_TIM10EN, RCC->APB2ENR);
+    refused = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_pwm_close(&state, &inactive));
+    EXPECT_EQ(0U, state.cold_effects);
+    EXPECT_EQ(RCC_APB2ENR_SYSCFGEN, RCC->APB2ENR);
+}
+
+TEST_F(ControlFactory, SmallPwmTimersRejectAbsentChannelsAndWrongDividers) {
+    const struct {
+        TIM_TypeDef* timer;
+        GPIO_TypeDef* gpio;
+        uint8_t channel;
+        uint8_t pin;
+        uint16_t psc;
+    } absent[]{
+        {TIM9, GPIOA, 3U, 4U, 167U},  {TIM10, GPIOB, 2U, 8U, 167U},
+        {TIM11, GPIOB, 2U, 9U, 167U}, {TIM12, GPIOB, 3U, 16U, 83U},
+        {TIM13, GPIOA, 2U, 6U, 83U},  {TIM14, GPIOA, 2U, 7U, 83U},
+    };
+    for (const auto& selected : absent) {
+        nx_stm32_pwm_state_t state{};
+        nx_stm32_gpio_state_t inactive{};
+        const nx_stm32_pwm_config_t config{1000U,         1U,
+                                           1000000U,      selected.psc,
+                                           false,         selected.timer,
+                                           selected.gpio, selected.channel,
+                                           selected.pin};
+        const auto* bytes = static_cast<const uint8_t*>(mmio);
+        const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+        EXPECT_EQ(NX_ERROR_INVALID,
+                  nx_stm32_pwm_prepare(&state, &inactive, &config));
+        EXPECT_EQ(0, std::memcmp(bytes, before.data(), before.size()));
+        EXPECT_EQ(0U, state.cold_effects);
+    }
+    nx_stm32_pwm_state_t state{};
+    nx_stm32_gpio_state_t inactive{};
+    const nx_stm32_pwm_config_t wrong_apb{1000U, 1U,    1000000U, 83U, false,
+                                          TIM9,  GPIOA, 1U,       2U};
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_pwm_prepare(&state, &inactive, &wrong_apb));
+    EXPECT_EQ(0U, RCC->APB1ENR | RCC->APB2ENR);
 }
 
 TEST_F(ControlFactory, InvalidPwmRouteRejectsBeforeClockOrPadChanges) {

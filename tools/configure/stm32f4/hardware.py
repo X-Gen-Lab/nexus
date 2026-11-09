@@ -1,5 +1,6 @@
 """Exact F407 controller banks, ordered DMA paths and SDK vector assertions."""
 from types import MappingProxyType
+from dataclasses import dataclass
 
 from tools.configure.providers.hardware import (
     ControllerBinding, fixed_dma_bindings, i2c_binding, spi_binding, uart_binding)
@@ -20,10 +21,31 @@ ADC_INTERNAL_CHANNELS = MappingProxyType({"ADC1": (16, 17, 18)})
 
 DAC_PIN_CHANNELS = MappingProxyType({("DAC", "PA4"): 1,
                                    ("DAC", "PA5"): 2})
+
+
+@dataclass(frozen=True)
+class PwmTimer:
+    """Fixed F407 bus and alternate-function facts for general PWM timers."""
+
+    apb: int
+    clock_hz: int
+    af: int
+
+
+PWM_TIMERS = MappingProxyType({
+    **{name: PwmTimer(1, 84000000, 2) for name in ('TIM3', 'TIM4', 'TIM5')},
+    **{name: PwmTimer(2, 168000000, 3) for name in ('TIM9', 'TIM10', 'TIM11')},
+    **{name: PwmTimer(1, 84000000, 9) for name in ('TIM12', 'TIM13', 'TIM14')},
+})
 PWM_PIN_CHANNELS = MappingProxyType({
     ("TIM3", "PA6"): 1, ("TIM3", "PA7"): 2,
     ("TIM3", "PB0"): 3, ("TIM3", "PB1"): 4,
     **{("TIM5", f"PA{channel - 1}"): channel for channel in range(1, 5)},
+    **{("TIM4", f"PB{channel + 5}"): channel for channel in range(1, 5)},
+    ("TIM9", "PA2"): 1, ("TIM9", "PA3"): 2,
+    ("TIM10", "PB8"): 1, ("TIM11", "PB9"): 1,
+    ("TIM12", "PB14"): 1, ("TIM12", "PB15"): 2,
+    ("TIM13", "PA6"): 1, ("TIM14", "PA7"): 1,
 })
 # RM0090 Rev22 Tables42/43 and section14.3.7: one request for a packed pair.
 DAC_DMA_ROUTES = MappingProxyType({

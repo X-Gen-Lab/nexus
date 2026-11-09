@@ -113,6 +113,48 @@
       "id": "adc-internal",
       "controller": "ADC1",
       "route": "adc1-internal"
+    },
+    {
+      "id": "pwm4",
+      "controller": "TIM4",
+      "route": "tim4-ch1-pb6",
+      "initial": 0
+    },
+    {
+      "id": "pwm9",
+      "controller": "TIM9",
+      "route": "tim9-ch1-pa2",
+      "initial": 0
+    },
+    {
+      "id": "pwm10",
+      "controller": "TIM10",
+      "route": "tim10-ch1-pb8",
+      "initial": 0
+    },
+    {
+      "id": "pwm11",
+      "controller": "TIM11",
+      "route": "tim11-ch1-pb9",
+      "initial": 0
+    },
+    {
+      "id": "pwm12",
+      "controller": "TIM12",
+      "route": "tim12-ch1-pb14",
+      "initial": 0
+    },
+    {
+      "id": "pwm13",
+      "controller": "TIM13",
+      "route": "tim13-ch1-pa6",
+      "initial": 0
+    },
+    {
+      "id": "pwm14",
+      "controller": "TIM14",
+      "route": "tim14-ch1-pa7",
+      "initial": 0
     }
   ],
   "reserved_resources": [],

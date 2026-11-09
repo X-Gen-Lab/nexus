@@ -45,10 +45,15 @@ def validate_soc(soc, provider):
         policy = getattr(provider, "TIMER_ADVANCED", None)
         facts = policy.binding(kind) if policy is not None else None
         mode = "edge-capture" if kind == "timer_capture" else "complementary-pwm"
+        pins = [pin for pin, _, _ in facts.pins] if facts is not None else []
+        if 'pwm' in getattr(provider, 'CONTROLLER_INTERFACES', {}).get(name, {}):
+            pins = list(dict.fromkeys(pins + [
+                pin for controller, pin in provider.PWM_PIN_CHANNELS
+                if controller == name]))
         if (facts is None or name != facts.controller or item["modes"] != [mode] or
                 item["irq"] != [facts.vector] or item.get("irq_numbers") != [facts.irq] or
                 type(item.get("clock_hz")) is not int or item["clock_hz"] != facts.clock_hz or
-                item["pins"] != [pin for pin, _, _ in facts.pins] or
+                item["pins"] != pins or
                 item.get("resources") != list(facts.resources)):
             fail("Timer controller, shared vector, clock or pin facts differ from the SDK")
 

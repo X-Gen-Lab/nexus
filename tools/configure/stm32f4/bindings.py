@@ -10,7 +10,7 @@ from tools.configure.providers import hardware
 from tools.configure import timer_advanced, secondary_controllers
 from .contract import (ADC_PIN_CHANNELS, FLASH_PROGRAM_UNIT, LIMITS,
                        PARTS, mode_implementation)
-from .hardware import PWM_PIN_CHANNELS, ADC_INTERNAL_CHANNELS
+from .hardware import PWM_PIN_CHANNELS, PWM_TIMERS, ADC_INTERNAL_CHANNELS
 
 _PULL_VALUES = MappingProxyType({"none": 0, "up": 1, "down": 2})
 _OUTPUT_TYPES = MappingProxyType({"push-pull": 0, "open-drain": 1})
@@ -255,7 +255,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         wire = item.pins[0]["pin"]
         channel = PWM_PIN_CHANNELS.get((item.controller, wire))
         if channel is None:
-            raise ValueError("Fixed PWM requires a reviewed TIM3/TIM5 route")
+            raise ValueError("Fixed PWM requires a reviewed general timer route")
         pin = int(wire[2:])
         period, duty, tick = (item.options.period_ticks, item.options.duty_ticks,
                               item.options.tick_hz)
@@ -263,7 +263,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             raise ValueError("PWM requires explicit period/duty/tick_hz")
         if not 1 <= period <= LIMITS["pwm_period"] or not 0 <= duty <= period or tick <= 0:
             raise ValueError("Invalid fixed PWM counts")
-        timer_hz = LIMITS["timer_hz"]
+        timer_hz = PWM_TIMERS[item.controller].clock_hz
         if timer_hz % tick != 0 or not 1 <= timer_hz // tick <= 65536:
             raise ValueError("PWM tick_hz is not an exact reviewed divider")
         if item.initial not in (0, 1 << pin):

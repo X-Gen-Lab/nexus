@@ -67,3 +67,9 @@ face／ops；不支持两个 timer 的隐式同步或一个 timer 的多 owner �
 通道 16／17／18 使用 480-cycle acquisition，不取得 GPIO；连续模式仍独占 TIM3
 及 DMA2 stream4 channel0，存储由调用方提供。factory 保留真实接口，换算、校准和
 物理温度／电压资格不属于这些链接夹具。
+
+`stm32-ve-pwm-family-baremetal.toml` 和 `stm32-zg-pwm-family-freertos.toml` 同时选择
+九个独立的 TIM3／4／5／9／10／11／12／13／14 PWM controller，每个仅选一路。
+TIM9 使用 168 MHz tick、PSC=0；其他实例保留各自整数分频。TIM4 不同时取得 capture，
+也不选择占用 TIM9 的 TIM1 advanced PWM。它们链接真实静态 factory 与共享 ops，
+不代表硬件波形、时钟精度或电气输出资格。

@@ -183,6 +183,21 @@ typedef struct {
     bool running;
     uint8_t cold_effects;
 } nx_stm32_pwm_state_t;
+
+/** \brief Identify the fixed APB2 clock domain of small F407 PWM timers. */
+static inline bool nx_stm32_pwm_apb2(const TIM_TypeDef* registers) {
+    return registers == TIM9 || registers == TIM10 || registers == TIM11;
+}
+
+/** \brief Select the reviewed timer alternate function without extra state. */
+static inline uint32_t nx_stm32_pwm_af(const TIM_TypeDef* registers) {
+    return nx_stm32_pwm_apb2(registers)
+               ? 3U
+               : (registers == TIM12 || registers == TIM13 || registers == TIM14
+                      ? 9U
+                      : 2U);
+}
+
 enum {
     NX_STM32_ADC_CLOCK = 1U,
     NX_STM32_ADC_TIMER = 2U,

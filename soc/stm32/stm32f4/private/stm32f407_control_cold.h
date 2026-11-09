@@ -23,7 +23,7 @@ typedef struct {
     uint8_t pull;
 } nx_stm32_exti_config_t;
 
-/** \brief Exact TIM3/TIM5 channel, counts and declared pad inactive level. */
+/** \brief Exact general timer channel, counts and declared pad idle level. */
 typedef struct {
     uint32_t period_ticks;
     uint32_t duty_ticks;
@@ -36,7 +36,7 @@ typedef struct {
     uint8_t pin;
 } nx_stm32_pwm_config_t;
 
-/** \brief Reviewed AF2 outputs; package and Board authority remain separate. */
+/** \brief Reviewed outputs; package and Board authority remain separate. */
 static inline bool
 nx_stm32_pwm_route_valid(const nx_stm32_pwm_config_t* config) {
     if (config->channel < 1U || config->channel > 4U)
@@ -47,15 +47,49 @@ nx_stm32_pwm_route_valid(const nx_stm32_pwm_config_t* config) {
                                      : config->gpio == GPIOB &&
                                            config->pin == config->channel - 3U;
     }
-    return config->registers == TIM5 && config->gpio == GPIOA &&
-           config->pin == config->channel - 1U;
+    if (config->registers == TIM4)
+        return config->gpio == GPIOB && config->pin == config->channel + 5U;
+    if (config->registers == TIM5)
+        return config->gpio == GPIOA && config->pin == config->channel - 1U;
+    if (config->registers == TIM9)
+        return config->channel <= 2U && config->gpio == GPIOA &&
+               config->pin == config->channel + 1U;
+    if (config->registers == TIM12)
+        return config->channel <= 2U && config->gpio == GPIOB &&
+               config->pin == config->channel + 13U;
+    if (config->channel != 1U)
+        return false;
+    return (config->registers == TIM10 && config->gpio == GPIOB &&
+            config->pin == 8U) ||
+           (config->registers == TIM11 && config->gpio == GPIOB &&
+            config->pin == 9U) ||
+           (config->registers == TIM13 && config->gpio == GPIOA &&
+            config->pin == 6U) ||
+           (config->registers == TIM14 && config->gpio == GPIOA &&
+            config->pin == 7U);
 }
 
-/** \brief One selected APB1 gate, also retained after failed preparation. */
+/** \brief One selected gate, also retained after failed preparation. */
 static inline uint32_t nx_stm32_pwm_gate(const TIM_TypeDef* registers) {
-    return registers == TIM3   ? RCC_APB1ENR_TIM3EN
-           : registers == TIM5 ? RCC_APB1ENR_TIM5EN
-                               : 0U;
+    if (registers == TIM3)
+        return RCC_APB1ENR_TIM3EN;
+    if (registers == TIM4)
+        return RCC_APB1ENR_TIM4EN;
+    if (registers == TIM5)
+        return RCC_APB1ENR_TIM5EN;
+    if (registers == TIM9)
+        return RCC_APB2ENR_TIM9EN;
+    if (registers == TIM10)
+        return RCC_APB2ENR_TIM10EN;
+    if (registers == TIM11)
+        return RCC_APB2ENR_TIM11EN;
+    if (registers == TIM12)
+        return RCC_APB1ENR_TIM12EN;
+    if (registers == TIM13)
+        return RCC_APB1ENR_TIM13EN;
+    if (registers == TIM14)
+        return RCC_APB1ENR_TIM14EN;
+    return 0U;
 }
 
 /** \brief Immutable independent ADC1/2/3 ranks and nominal reference.
@@ -178,21 +212,24 @@ nx_stm32_pwm_prepare(nx_stm32_pwm_state_t* port,
     if (port == NULL || inactive == NULL || config == NULL ||
         !nx_stm32_pwm_route_valid(config) || config->period_ticks == 0U ||
         (config->registers != TIM5 && config->period_ticks > 65535U) ||
-        config->duty_ticks > config->period_ticks || config->tick_hz == 0U ||
-        UINT32_C(84000000) / config->tick_hz !=
-            (uint32_t)config->prescaler + 1U ||
-        UINT32_C(84000000) % config->tick_hz != 0U)
+        config->duty_ticks > config->period_ticks || config->tick_hz == 0U)
         return NX_ERROR_INVALID;
+    const bool apb2 = nx_stm32_pwm_apb2(config->registers);
+    const uint32_t source_hz = apb2 ? UINT32_C(168000000) : UINT32_C(84000000);
+    if (source_hz / config->tick_hz != (uint32_t)config->prescaler + 1U ||
+        source_hz % config->tick_hz != 0U)
+        return NX_ERROR_INVALID;
+    volatile uint32_t* clock = apb2 ? &RCC->APB2ENR : &RCC->APB1ENR;
     const uint32_t gate = nx_stm32_pwm_gate(config->registers);
     if (port->initialized || inactive->initialized ||
-        port->cold_effects != 0U || (RCC->APB1ENR & gate) != 0U)
+        port->cold_effects != 0U || (*clock & gate) != 0U)
         return NX_ERROR_BUSY;
     /* Retain exact gate identity before the first fallible acquisition. */
     port->registers = config->registers;
     port->cold_effects = 1U;
-    NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR | gate);
+    NX_PLATFORM_REGISTER_WRITE(*clock, *clock | gate);
     nx_arch_dsb();
-    if ((RCC->APB1ENR & gate) == 0U)
+    if ((*clock & gate) == 0U)
         return NX_ERROR_IO;
     TIM_TypeDef* timer = config->registers;
     const uint32_t channel = 1U << ((config->channel - 1U) * 4U);
@@ -233,7 +270,9 @@ static inline nx_result_t nx_stm32_pwm_close(nx_stm32_pwm_state_t* port,
     const uint32_t gate = nx_stm32_pwm_gate(port->registers);
     if (gate == 0U)
         return NX_ERROR_STATE;
-    if (port->initialized && (RCC->APB1ENR & gate) == 0U)
+    volatile uint32_t* clock =
+        nx_stm32_pwm_apb2(port->registers) ? &RCC->APB2ENR : &RCC->APB1ENR;
+    if (port->initialized && (*clock & gate) == 0U)
         return NX_ERROR_IO;
     if (port->initialized) {
         nx_result_t result = nx_stm32_pwm_ops.stop(port);
@@ -243,12 +282,11 @@ static inline nx_result_t nx_stm32_pwm_close(nx_stm32_pwm_state_t* port,
         inactive->initialized = false;
     }
     if ((port->cold_effects & 1U) != 0U) {
-        if ((RCC->APB1ENR & gate) != 0U &&
-            (port->registers->CCER & 0x1111U) != 0U)
+        if ((*clock & gate) != 0U && (port->registers->CCER & 0x1111U) != 0U)
             return NX_ERROR_BUSY;
-        NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR & ~gate);
+        NX_PLATFORM_REGISTER_WRITE(*clock, *clock & ~gate);
         nx_arch_dsb();
-        if ((RCC->APB1ENR & gate) != 0U)
+        if ((*clock & gate) != 0U)
             return NX_ERROR_IO;
         port->cold_effects &= (uint8_t)~1U;
     }

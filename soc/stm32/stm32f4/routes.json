@@ -4416,6 +4416,246 @@
           "controller:TIM3"
         ]
       }
+    },
+    {
+      "id": "tim4-ch1-pb6",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM4",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "ch1",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
+    },
+    {
+      "id": "tim4-ch2-pb7",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM4",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PB7",
+          "function": "ch2",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
+    },
+    {
+      "id": "tim4-ch3-pb8",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM4",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PB8",
+          "function": "ch3",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
+    },
+    {
+      "id": "tim4-ch4-pb9",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM4",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PB9",
+          "function": "ch4",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
+    },
+    {
+      "id": "tim9-ch1-pa2",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM9",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "ch1",
+          "af": 3
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
+    },
+    {
+      "id": "tim9-ch2-pa3",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM9",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA3",
+          "function": "ch2",
+          "af": 3
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
+    },
+    {
+      "id": "tim10-ch1-pb8",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM10",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PB8",
+          "function": "ch1",
+          "af": 3
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
+    },
+    {
+      "id": "tim11-ch1-pb9",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM11",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PB9",
+          "function": "ch1",
+          "af": 3
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
+    },
+    {
+      "id": "tim12-ch1-pb14",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM12",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PB14",
+          "function": "ch1",
+          "af": 9
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
+    },
+    {
+      "id": "tim12-ch2-pb15",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM12",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PB15",
+          "function": "ch2",
+          "af": 9
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
+    },
+    {
+      "id": "tim13-ch1-pa6",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM13",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "ch1",
+          "af": 9
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
+    },
+    {
+      "id": "tim14-ch1-pa7",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM14",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA7",
+          "function": "ch1",
+          "af": 9
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
     }
   ]
 }

@@ -3,14 +3,17 @@ import re
 
 from tools.configure.providers import hardware
 from tools.configure.providers.common import fail, owned_claims
+from .hardware import PWM_TIMERS
 
 
 def _clock(controller):
     """Name a maintained exclusive gate, not an inferred silicon topology."""
     if controller.startswith(('USART', 'UART', 'SPI', 'I2C')):
         bus = hardware.maintained('stm32f4', controller).apb
-    elif re.fullmatch('TIM[1345679]', controller):
-        bus = 2 if controller in {'TIM1', 'TIM9'} else 1
+    elif controller in PWM_TIMERS:
+        bus = PWM_TIMERS[controller].apb
+    elif controller in {'TIM1', 'TIM6', 'TIM7'}:
+        bus = 2 if controller == 'TIM1' else 1
     elif controller == 'DAC':
         bus = 1
     elif controller in {'CAN1', 'CAN2'}:
@@ -48,7 +51,7 @@ def admission_declarations(result, pins, pin_count):
             exti |= 1 << line
     for item in claims:
         timer = item.key.removeprefix('controller:')
-        if re.fullmatch('TIM[1345679]', timer):
+        if timer in PWM_TIMERS or timer in {'TIM1', 'TIM6', 'TIM7'}:
             clocks.add(_clock(timer))
     if result.can_domain is not None:
         clocks.add(_clock('CAN1'))

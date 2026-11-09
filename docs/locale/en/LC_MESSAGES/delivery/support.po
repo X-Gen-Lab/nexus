@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 99f8fbea9fc2a5848c3fb82986a89f368b0505bff3fd4ee88d3f03e5d39932f2\n"
+"X-Nexus-Source-SHA256: 8a16c205963e4c4afbec762298afee45c7c36601df06911f8ec3a8a7fd3f2363\n"
 
 #: docs/delivery/support.md:8
 msgid "当前精确支持范围"
@@ -529,24 +529,6 @@ msgstr ""
 " no implicit timebase sharing"
 
 msgid ""
-"普通 PWM 的已审 AF2 引脚为 TIM3 PA6／PA7／PB0／PB1、TIM5 PA0／PA1／PA2／PA3， 分别对应 "
-"CH1–4。period 表示完整周期，ARR=period−1；duty 可达 period，计数上限 保证 CCR 能表达 100%。set 只暂存"
-" duty，在 update event 生效；周期与 PSC 保持固定。 每个控制器由一路 owner 独占；两个独立 timer "
-"不提供同步更新，TIM3 仍与 ADC trigger 冲突。冷态 C 校验精确 timer、pad、channel "
-"和位宽，启钟／撤回失败保留正确清理身份； 已有 GPIO owner 不被覆盖。软件参考装配不授权 PCB 接线或实际输出时序。"
-msgstr ""
-"The reviewed AF2 pads are TIM3 PA6/PA7/PB0/PB1 and TIM5 PA0/PA1/PA2/PA3, "
-"respectively CH1–4. A period represents a complete cycle and ARR=period−1; "
-"duty may equal the period, with limits ensuring that CCR can represent 100%."
-" Set only stages duty until an update event; period and PSC remain fixed. "
-"Each controller has one exclusive channel owner. Independent timers do not "
-"provide synchronized updates, and TIM3 still conflicts with ADC triggering. "
-"Cold C validates the exact timer, pad, channel and counter width. Failed "
-"clock acquisition or release retains the correct cleanup identity; an "
-"existing GPIO owner is never overwritten. Software fixtures do not authorize"
-" PCB wiring or physical output timing."
-
-msgid ""
 "ADC1 的内部通道 16／17／18 分别返回温度、VREFINT、VBAT／2 的原始计数。 `adc1-internal` route 不取得 "
 "GPIO；四种现有采样模式共用静态序列，内部输入固定选择 `sample_times=7` 的 480-cycle "
 "acquisition。温度、电压换算和校准由应用负责， `reference_mv` 仍是名义值。冷态拒绝接管已启用的所需模拟路径，仅撤回本次取得的 "
@@ -566,3 +548,112 @@ msgstr ""
 "containing internal inputs. Software references are in "
 "`tests/contracts/multi_controller_assembly/*adc-internal*.toml`; they "
 "establish no physical sampling qualification."
+
+msgid "普通 PWM 共用一套 C 实现；以下按通道顺序列出已审路线，仍须由 Board 显式授权。"
+msgstr ""
+"General PWM shares one C implementation. The reviewed routes below list pads"
+" in channel order and still require explicit Board authorization."
+
+msgid ""
+"period 表示完整周期，ARR=period−1；TIM5 上限为 UINT32_MAX，其他已审 timer 为 65535，duty 可达 "
+"period，保留 CCR 表达 100% 的空间。set 只暂存 duty，在 update event 生效；周期与 PSC "
+"保持固定。每个控制器由一路 owner 独占，不隐式共享时基或 同步多个 timer。TIM3 与 ADC trigger、TIM4 与 capture"
+" 互斥；现有 TIM1 advanced PWM 仍保守独占共享 vector 的 TIM9。冷态 C 校验精确 "
+"timer、pad、channel、分频和 位宽，启钟／撤回失败保留所选 APB gate 的清理责任；已有 GPIO owner 不被覆盖。 "
+"`tests/contracts/multi_controller_assembly/*pwm-family*.toml` 同时链接九个独立实例， "
+"不授权 PCB 接线或实际输出时序。"
+msgstr ""
+"The period is a complete cycle, with ARR=period-1. The upper bound is "
+"UINT32_MAX for TIM5 and 65535 for the other reviewed timers; duty may equal "
+"period, reserving CCR representation for 100% output. Set stages duty until "
+"an update event; period and PSC stay fixed. Each controller has one "
+"exclusive channel owner, with no implicit time-base sharing or cross-timer "
+"synchronization. TIM3 conflicts with ADC triggering and TIM4 with capture; "
+"the existing TIM1 advanced PWM conservatively reserves TIM9 on its shared "
+"vector. Cold C validates the exact timer, pad, channel, divider and width. "
+"Failed clock acquisition/withdrawal retains the selected APB gate cleanup "
+"responsibility, and existing GPIO owners are preserved. The "
+"`tests/contracts/multi_controller_assembly/*pwm-family*.toml` fixtures link "
+"nine independent instances; they establish no PCB wiring or physical output "
+"timing qualification."
+
+msgid "168 MHz"
+msgstr "168 MHz"
+
+msgid "2"
+msgstr "2"
+
+msgid "3"
+msgstr "3"
+
+msgid "84 MHz"
+msgstr "84 MHz"
+
+msgid "9"
+msgstr "9"
+
+msgid "AF"
+msgstr "AF"
+
+msgid "CH1–2：PA2／PA3"
+msgstr "CH1–2: PA2/PA3"
+
+msgid "CH1–2：PB14／PB15"
+msgstr "CH1–2: PB14/PB15"
+
+msgid "CH1–4：PA0／PA1／PA2／PA3"
+msgstr "CH1–4: PA0/PA1/PA2/PA3"
+
+msgid "CH1–4：PA6／PA7／PB0／PB1"
+msgstr "CH1–4: PA6/PA7/PB0/PB1"
+
+msgid "CH1–4：PB6／PB7／PB8／PB9"
+msgstr "CH1–4: PB6/PB7/PB8/PB9"
+
+msgid "CH1：PA6"
+msgstr "CH1: PA6"
+
+msgid "CH1：PA7"
+msgstr "CH1: PA7"
+
+msgid "CH1：PB8"
+msgstr "CH1: PB8"
+
+msgid "CH1：PB9"
+msgstr "CH1: PB9"
+
+msgid "TIM10"
+msgstr "TIM10"
+
+msgid "TIM11"
+msgstr "TIM11"
+
+msgid "TIM12"
+msgstr "TIM12"
+
+msgid "TIM13"
+msgstr "TIM13"
+
+msgid "TIM14"
+msgstr "TIM14"
+
+msgid "TIM3"
+msgstr "TIM3"
+
+msgid "TIM4"
+msgstr "TIM4"
+
+msgid "TIM5"
+msgstr "TIM5"
+
+msgid "TIM9"
+msgstr "TIM9"
+
+msgid "Timer"
+msgstr "Timer"
+
+msgid "固定 timer clock"
+msgstr "Fixed timer clock"
+
+msgid "通道与引脚"
+msgstr "Channels and pads"

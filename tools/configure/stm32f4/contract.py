@@ -6,7 +6,7 @@ from types import MappingProxyType
 
 from tools.configure.providers import common, descriptor
 from .hardware import (ADC_PIN_CHANNELS, ADC_INTERNAL_CHANNELS,
-                       DAC_PIN_CHANNELS, PWM_PIN_CHANNELS,
+                       DAC_PIN_CHANNELS, PWM_PIN_CHANNELS, PWM_TIMERS,
                        FIXED_DMA as _FIXED_DMA)
 from tools.configure.adc import RESOLUTION_BITS
 
@@ -51,6 +51,7 @@ OFFSET_IMAGE_VECTOR_SYMBOL = 'g_pfnVectors'
 FACT_REFERENCES = descriptor.maintained("stm32f4").references
 ETH_CONTROLLER = 'ETH'
 CONTROLLER_INTERFACES = MappingProxyType({
+    'TIM4': MappingProxyType({'pwm': ('fixed-pwm',)}),
     'ETH': MappingProxyType({
         'eth_frames': ('rmii-vlan-sg-ptp',)}),
     'FSMC': MappingProxyType({
@@ -143,14 +144,16 @@ def validate_selection(selection, route):
         pins = route["pins"]
         channel = (PWM_PIN_CHANNELS.get((route["controller"], pins[0]["pin"]))
                    if len(pins) == 1 else None)
-        if (channel is None or pins[0]["function"] != f"ch{channel}" or
-                pins[0].get("af") != 2):
-            common.fail("PWM requires a reviewed TIM3/TIM5 channel route")
+        timer = PWM_TIMERS.get(route["controller"])
+        if (timer is None or channel is None or
+                pins[0]["function"] != f"ch{channel}" or
+                pins[0].get("af") != timer.af):
+            common.fail("PWM requires a reviewed general timer channel route")
         common.integer(selection["period_ticks"], 1,
                        0xFFFFFFFF if route["controller"] == "TIM5" else 65535,
                        "PWM period")
         tick = selection["tick_hz"]
-        clock = LIMITS["timer_hz"]
+        clock = timer.clock_hz
         if clock % tick or not 1 <= clock // tick <= 65536:
             common.fail("PWM tick_hz is not an exact maintained timer divider")
     elif kind == "spi":

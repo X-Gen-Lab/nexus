@@ -189,6 +189,33 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
         self.assertIn('.channel = 4u, .pin = 3u', source)
         self.assertIn('.period_ticks = 4294967295u', source)
 
+    def test_general_pwm_timers_use_exact_channels_and_apb_clock_domains(self):
+        path = self.pwm5_assembly()
+        text = path.read_text().replace('period_ticks=4294967295',
+                                        'period_ticks=1000').replace(
+                                            'duty_ticks=65536', 'duty_ticks=250')
+        board_path = self.directory / 'pwm-board/board.json'
+        board = json.loads(board_path.read_text())
+        binding = next(b for b in board['bindings'] if b['id'] == 'under-test-pwm5')
+        for timer, channel, pin, apb, psc in (
+                ('TIM4', 4, 'pb9', 1, 83), ('TIM9', 2, 'pa3', 2, 167),
+                ('TIM10', 1, 'pb8', 2, 167), ('TIM11', 1, 'pb9', 2, 167),
+                ('TIM12', 2, 'pb15', 1, 83), ('TIM13', 1, 'pa6', 1, 83),
+                ('TIM14', 1, 'pa7', 1, 83)):
+            with self.subTest(timer=timer):
+                binding.update(controller=timer,
+                               route=f'{timer.lower()}-ch{channel}-{pin}')
+                board_path.write_text(json.dumps(board))
+                path.write_text(text)
+                result = gate.resolve_ir(path)
+                self.assertEqual(timer, result.controllers[0].controller)
+                output = self.directory / timer
+                gate.configure(path, output)
+                source = (output / 'bindings.c').read_text()
+                self.assertIn(f'.prescaler = {psc}u', source)
+                self.assertIn(f'.registers = {timer}', source)
+                self.assertIn(f'RCC_APB{apb}ENR_{timer}EN', source)
+
     def test_pwm_counter_width_and_pin_routes_reject_before_construction(self):
         original = self.pwm5_assembly()
         text = original.read_text()

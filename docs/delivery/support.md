@@ -157,9 +157,25 @@ FreeRTOS；它们不授权实际 Board 接线。
 [重构前固定源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)。
 本次重构不能继承旧候选、软件计数或实板结果。
 
-普通 PWM 的已审 AF2 引脚为 TIM3 PA6／PA7／PB0／PB1、TIM5 PA0／PA1／PA2／PA3，
-分别对应 CH1–4。period 表示完整周期，ARR=period−1；duty 可达 period，计数上限
-保证 CCR 能表达 100%。set 只暂存 duty，在 update event 生效；周期与 PSC 保持固定。
-每个控制器由一路 owner 独占；两个独立 timer 不提供同步更新，TIM3 仍与 ADC trigger
-冲突。冷态 C 校验精确 timer、pad、channel 和位宽，启钟／撤回失败保留正确清理身份；
-已有 GPIO owner 不被覆盖。软件参考装配不授权 PCB 接线或实际输出时序。
+普通 PWM 共用一套 C 实现；以下按通道顺序列出已审路线，仍须由 Board 显式授权。
+
+| Timer | 通道与引脚 | AF | 固定 timer clock |
+| --- | --- | --- | --- |
+| TIM3 | CH1–4：PA6／PA7／PB0／PB1 | 2 | 84 MHz |
+| TIM4 | CH1–4：PB6／PB7／PB8／PB9 | 2 | 84 MHz |
+| TIM5 | CH1–4：PA0／PA1／PA2／PA3 | 2 | 84 MHz |
+| TIM9 | CH1–2：PA2／PA3 | 3 | 168 MHz |
+| TIM10 | CH1：PB8 | 3 | 168 MHz |
+| TIM11 | CH1：PB9 | 3 | 168 MHz |
+| TIM12 | CH1–2：PB14／PB15 | 9 | 84 MHz |
+| TIM13 | CH1：PA6 | 9 | 84 MHz |
+| TIM14 | CH1：PA7 | 9 | 84 MHz |
+
+period 表示完整周期，ARR=period−1；TIM5 上限为 UINT32_MAX，其他已审 timer 为
+65535，duty 可达 period，保留 CCR 表达 100% 的空间。set 只暂存 duty，在 update
+event 生效；周期与 PSC 保持固定。每个控制器由一路 owner 独占，不隐式共享时基或
+同步多个 timer。TIM3 与 ADC trigger、TIM4 与 capture 互斥；现有 TIM1 advanced
+PWM 仍保守独占共享 vector 的 TIM9。冷态 C 校验精确 timer、pad、channel、分频和
+位宽，启钟／撤回失败保留所选 APB gate 的清理责任；已有 GPIO owner 不被覆盖。
+`tests/contracts/multi_controller_assembly/*pwm-family*.toml` 同时链接九个独立实例，
+不授权 PCB 接线或实际输出时序。
