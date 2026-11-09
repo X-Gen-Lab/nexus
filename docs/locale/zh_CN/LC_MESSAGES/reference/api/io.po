@@ -3983,8 +3983,8 @@ msgid ""
 msgstr "维护范围内的有限消息准入边界，访问硬件之前检查。"
 
 #: docs/reference/api/io.md:251
-msgid "Execute a polling 7-bit-address message transaction."
-msgstr "执行一个轮询、7 位地址消息事务。"
+msgid "Execute a polling transaction at the endpoint's address."
+msgstr "在端点的地址上执行轮询事务。"
 
 #: docs/reference/api/io.md:251
 msgid ""
