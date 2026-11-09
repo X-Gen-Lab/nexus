@@ -810,6 +810,7 @@ class SpiEndpointOptions:
     max_hz: int
     cs_binding: str | None
     model_bytes: int | None
+    lsb_first: bool = False
 
 
 @dataclass(frozen=True)
@@ -818,6 +819,7 @@ class SpiTransactionEndpointOptions:
     max_hz: int
     cs_binding: str | None
     model_bytes: int | None
+    lsb_first: bool = False
 
 
 @dataclass(frozen=True)
@@ -826,6 +828,7 @@ class SpiDMATransactionEndpointOptions:
     max_hz: int
     cs_binding: str | None
     model_bytes: int | None
+    lsb_first: bool = False
 
 
 @dataclass(frozen=True)
@@ -898,7 +901,8 @@ class EndpointIR(Record):
                                    values["driver"], SpiEndpointOptions)
             options = option_type(values.get("mode", 0),
                 values.get("max_hz", controller.options.max_hz),
-                values.get("cs_binding"), values.get("model_bytes"))
+                values.get("cs_binding"), values.get("model_bytes"),
+                values.get("lsb_first", False))
         elif kind == "i2c":
             option_type = (I2cLongEndpointOptions
                            if values["driver"] == "i2c-long-endpoint"

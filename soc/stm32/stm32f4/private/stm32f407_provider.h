@@ -113,6 +113,7 @@ struct nx_stm32_spi_endpoint_state {
     uint32_t cs_mask;
     uint32_t frequency_hz;
     uint8_t mode;
+    bool lsb_first;
 };
 
 /** \brief Check the selected CS output latch, retaining failed withdrawal.

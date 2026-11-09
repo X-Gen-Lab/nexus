@@ -90,7 +90,7 @@ class SPIDMAProviderSequence : public testing::Test {
         state.dma = DMA2;
         state.rx = DMA2_Stream0;
         state.tx = DMA2_Stream3;
-        child.endpoint = {&state.spi, &cs, 1U, 1000000U, 0U};
+        child.endpoint = {&state.spi, &cs, 1U, 1000000U, 0U, false};
         child.dma = &state;
         ASSERT_EQ(nx_stm32_spi_dma_initialize(&state), NX_SUCCESS);
         STATUS = TXEMPTY;
@@ -128,6 +128,21 @@ class SPIDMAProviderSequence : public testing::Test {
     }
 };
 #if !defined(NX_SPI_DMA_OWNER_TEST)
+TEST_F(SPIDMAProviderSequence, BitOrderPersistsAcrossAllHardwareSegments) {
+    child.endpoint.lsb_first = true;
+    ASSERT_EQ(NX_SUCCESS, nx_spi_dma_transaction_submit(&endpoint, &request));
+    EXPECT_NE(0U, WIRE_CONTROL & SPI_CR1_LSBFIRST);
+    Complete();
+    nx_spi_dma_transaction_service(&port);
+    EXPECT_NE(0U, WIRE_CONTROL & SPI_CR1_LSBFIRST);
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    Complete();
+    nx_spi_dma_transaction_service(&port);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(0x1234U, tx[0]);
+    EXPECT_EQ(0xABCDU, tx[1]);
+}
+
 class AdditionalSPISequence : public SPIDMAProviderSequence,
                               public testing::WithParamInterface<unsigned> {
   protected:

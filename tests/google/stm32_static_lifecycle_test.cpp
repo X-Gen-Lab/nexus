@@ -54,8 +54,8 @@ class STM32StaticLifecycle : public testing::Test {
                                           {GPIOA, &snapshots[3], 0U, 6U, 5U},
                                           {GPIOA, &snapshots[4], 0U, 7U, 5U},
                                           {GPIOB, &snapshots[5], 1U, 0U, 0U}};
-    nx_stm32_spi_endpoint_config_t endpoint_config{&endpoint, &cs, 1000000U,
-                                                   0U};
+    nx_stm32_spi_endpoint_config_t endpoint_config{&endpoint, &cs, 1000000U, 0U,
+                                                   false};
     nx_stm32_spi_config_t spi_config{SPI1, 84000000U,        spi_pins,
                                      4U,   &endpoint_config, 1U};
     const nx_stm32f4_spi_lifecycle_config_t spi_binding{&spi_config,
@@ -134,7 +134,9 @@ TEST_F(STM32StaticLifecycle, EveryPerKindAdmissionHasNoHardwareOrStateEffects) {
 
 TEST_F(STM32StaticLifecycle,
        ExactPlanStartsRealDriversAndRestoresSharedResources) {
+    endpoint_config.lsb_first = true;
     ASSERT_EQ(nx_lifecycle_start(&plan, &engine), NX_SUCCESS);
+    EXPECT_TRUE(endpoint.lsb_first);
     EXPECT_TRUE(pin_receipt.captured);
     EXPECT_TRUE(gpio.initialized);
     EXPECT_TRUE(uart.initialized);

@@ -133,6 +133,35 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 self.assertIn(f"DMA1_Stream{stream}_IRQHandler", source)
                 self.assertNotIn("DMA2_Stream3_IRQHandler", source)
 
+    def test_spi_bit_order_is_an_explicit_endpoint_property(self):
+        for mode, driver in (("short-poll", "spi-endpoint"),
+                             ("short-poll", "spi-transaction"),
+                             ("dma", "spi-endpoint"),
+                             ("dma", "spi-dma-transaction")):
+            with self.subTest(mode=mode, driver=driver):
+                path = self.spi3_assembly(mode)
+                path.write_text(path.read_text().replace(
+                    '[spi_device.sensor]\n',
+                    f'[spi_device.sensor]\ndriver="{driver}"\nlsb_first=true\n'))
+                result = gate.resolve_ir(path)
+                self.assertTrue(result.devices[0].options.lsb_first)
+                output = self.directory / (mode + "-" + driver)
+                gate.configure(path, output)
+                self.assertIn('0u, true }', (output / 'bindings.c').read_text())
+
+    def test_spi_bit_order_rejects_non_booleans_and_fixed_msb_drivers(self):
+        for driver, value in (("spi-endpoint", "1"),
+                              ("spi-transaction", '"true"'),
+                              ("spi-endpoint", "[]"),
+                              ("bmp280", "true")):
+            with self.subTest(driver=driver, value=value):
+                path = self.spi3_assembly("short-poll")
+                path.write_text(path.read_text().replace(
+                    '[spi_device.sensor]\n',
+                    f'[spi_device.sensor]\ndriver="{driver}"\nlsb_first={value}\n'))
+                with self.assertRaisesRegex(ValueError, 'lsb_first|LSB-first'):
+                    gate.resolve_ir(path)
+
     def test_spi3_dma_conflicts_with_i2c1_before_emitting_hardware(self):
         with self.assertRaisesRegex(ValueError, "DMA1:stream0"):
             gate.resolve_ir(self.spi3_assembly("dma", peer=True))

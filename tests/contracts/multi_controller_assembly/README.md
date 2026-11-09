@@ -26,6 +26,8 @@
 polling controller；`stm32-zg-buses-dma-freertos.toml` 改选三个 SPI 的增强 DMA
 事务并保留三个 I2C polling。三个 SPI 的 CS 独立，factory 保留所有增强面及其真实
 端口；不使用未选中的普通 endpoint 代替，ELF 检查实际保留情况。
+这两份装配的 SPI1 为默认 MSB-first，SPI2／3 endpoint 显式选择 `lsb_first=true`；
+位序选择属于端点，不改变 controller／DMA lane、word 宽度或 buffer 内容。
 
 `stm32-ve-uart6-irq-words-baremetal.toml` 选择六路独立 9N1 word face；
 `stm32-zg-uart6-irq-blocks-freertos.toml` 选择六路 IRQ block face。这两种模式均不

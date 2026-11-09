@@ -75,7 +75,7 @@ def _spi_constructor(item, result, board_bindings, routes, devices, *, paired=Fa
         base = endpoint + (".endpoint" if dma else "")
         endpoint_records.append(
             f"    {{ &{base}, &{chip_select}, {child.options.max_hz}u, "
-            f"{child.options.mode}u }}")
+            f"{child.options.mode}u, {str(child.options.lsb_first).lower()} }}")
     definitions += [f"static uint16_t {saved}[{len(pin_records)}];",
                     f"static const nx_stm32_spi_pin_config_t s_nx_spi_pins_{name}[] = {{"]
     snapshots = {}

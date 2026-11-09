@@ -188,7 +188,8 @@ static nx_result_t configuration(nx_stm32_spi_dma_endpoint_state_t* device,
     }
     *control = SPI_CR1_MSTR | SPI_CR1_SSM | SPI_CR1_SSI | (baud_bits << 3U) |
                ((endpoint->mode & 1U) != 0U ? SPI_CR1_CPHA : 0U) |
-               ((endpoint->mode & 2U) != 0U ? SPI_CR1_CPOL : 0U);
+               ((endpoint->mode & 2U) != 0U ? SPI_CR1_CPOL : 0U) |
+               (endpoint->lsb_first ? SPI_CR1_LSBFIRST : 0U);
     return NX_SUCCESS;
 }
 
@@ -717,8 +718,8 @@ nx_stm32_spi_dma_pair_prepare(nx_stm32_spi_dma_state_t* state,
         *entry->chip_select =
             (nx_stm32_gpio_state_t){pin->registers, 1U << pin->pin, true, true};
         *entry->endpoint = (nx_stm32_spi_endpoint_state_t){
-            &state->spi, entry->chip_select, 1U << pin->pin,
-            entry->frequency_hz, entry->mode};
+            &state->spi,         entry->chip_select, 1U << pin->pin,
+            entry->frequency_hz, entry->mode,        entry->lsb_first};
         ((nx_stm32_spi_dma_endpoint_state_t*)entry->endpoint)->dma = state;
     }
     nx_result_t status = nx_stm32_spi_dma_initialize(state);

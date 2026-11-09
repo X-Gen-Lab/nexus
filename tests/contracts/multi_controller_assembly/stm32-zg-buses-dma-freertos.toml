@@ -35,6 +35,7 @@ priority = 5
 calls_os = false
 
 [spi_device.device2]
+lsb_first = true
 driver = "spi-dma-transaction"
 controller = "bus2"
 cs_binding = "secondary-cs"
@@ -50,6 +51,7 @@ priority = 5
 calls_os = false
 
 [spi_device.device3]
+lsb_first = true
 driver = "spi-dma-transaction"
 controller = "bus3"
 cs_binding = "third-cs"

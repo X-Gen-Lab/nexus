@@ -212,8 +212,13 @@ def editor_schema():
             properties["resolution_bits"] = {
                 "type": "integer", "enum": list(RESOLUTION_BITS), "default": 12}
         for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing",
-                             "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b"}:
+                             "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b", "lsb_first"}:
             properties[name] = {"type": "boolean"}
+        if "lsb_first" in fields:
+            properties["lsb_first"].update(
+                default=False,
+                description="Shift each SPI frame LSB first; false keeps MSB "
+                            "first. Requires a reviewed endpoint provider.")
         if "timing" in fields:
             properties["timing"] = record(
                 {"prescaler", "segment1", "segment2", "sjw"},

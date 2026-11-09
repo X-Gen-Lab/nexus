@@ -1,9 +1,7 @@
 /**
  * \file            spi.c
- * \brief           Fixed SPI1 short polling transactions with explicit CS drain
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-10-09
+ * \brief           Shared STM32F4 short polling transactions with explicit CS
+ * drain \author          Nexus Team \version         1.0.0 \date 2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/io/spi_transaction.h"
@@ -257,6 +255,7 @@ nx_result_t nx_stm32_spi_cold_acquire(nx_stm32_spi_state_t* port,
                 endpoint->endpoint->cs_mask = cs->mask;
                 endpoint->endpoint->mode = endpoint->mode;
                 endpoint->endpoint->frequency_hz = endpoint->frequency_hz;
+                endpoint->endpoint->lsb_first = endpoint->lsb_first;
             }
         }
         if (status != NX_SUCCESS)
@@ -432,7 +431,8 @@ nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
     port->registers->CR1 = SPI_CR1_MSTR | SPI_CR1_SSM | SPI_CR1_SSI |
                            (baud_bits << 3U) |
                            ((endpoint->mode & 1U) != 0U ? SPI_CR1_CPHA : 0U) |
-                           ((endpoint->mode & 2U) != 0U ? SPI_CR1_CPOL : 0U);
+                           ((endpoint->mode & 2U) != 0U ? SPI_CR1_CPOL : 0U) |
+                           (endpoint->lsb_first ? SPI_CR1_LSBFIRST : 0U);
     port->registers->CR2 = 0U;
     LL_SPI_Enable(port->registers);
     nx_result_t result = nx_stm32_spi_select(endpoint, true);
@@ -593,7 +593,8 @@ static nx_result_t transaction_transfer(void* context,
                            (baud << 3U) |
                            (word_bits == 16U ? SPI_CR1_DFF : 0U) |
                            ((endpoint->mode & 1U) != 0U ? SPI_CR1_CPHA : 0U) |
-                           ((endpoint->mode & 2U) != 0U ? SPI_CR1_CPOL : 0U);
+                           ((endpoint->mode & 2U) != 0U ? SPI_CR1_CPOL : 0U) |
+                           (endpoint->lsb_first ? SPI_CR1_LSBFIRST : 0U);
     port->registers->CR2 = 0U;
     LL_SPI_Enable(port->registers);
     nx_result_t result = nx_stm32_spi_select(endpoint, true);

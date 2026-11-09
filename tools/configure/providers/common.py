@@ -156,10 +156,17 @@ class EndpointPolicy:
     i2c_long: bool = False
     spi_dma: tuple[tuple[str, ...] | None, str] | None = None
     model_async_echo: bool = False
+    spi_lsb_first: bool = False
 
     def validate(self, device, controller):
         driver, kind, mode = (device["driver"], controller["kind"],
                               controller["mode"])
+        if "lsb_first" in device:
+            if type(device["lsb_first"]) is not bool:
+                fail("SPI lsb_first must be a boolean")
+            if device["lsb_first"] and (not self.spi_lsb_first or driver not in {
+                    "spi-endpoint", "spi-transaction", "spi-dma-transaction"}):
+                fail("SPI LSB-first requires a reviewed endpoint provider")
         if driver == "spi-transaction":
             if kind != "spi":
                 fail("SPI transaction requires its SPI controller")

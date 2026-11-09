@@ -96,6 +96,22 @@ class Stm32SpiDma : public testing::Test {
     }
 };
 
+TEST_F(Stm32SpiDma, HardwareBitOrderDoesNotReverseMemoryOrChangeDmaWidth) {
+    for (bool lsb : {true, false}) {
+        device.endpoint.lsb_first = lsb;
+        ASSERT_EQ(NX_SUCCESS, nx_spi_endpoint_submit(&endpoint, &request));
+        EXPECT_EQ(lsb, (spi.CR1 & SPI_CR1_LSBFIRST) != 0U);
+        EXPECT_EQ(0U, tx.CR & (DMA_SxCR_MSIZE | DMA_SxCR_PSIZE));
+        EXPECT_EQ(source[0], 1U);
+        EXPECT_EQ(tx.NDTR, sizeof(source));
+        CompleteMemory();
+        nx_spi_port_service(&bus);
+        ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+        ASSERT_EQ(NX_SUCCESS, nx_spi_request_prepare(&request, source,
+                                                     destination, 4U, 1000U));
+    }
+}
+
 TEST_F(Stm32SpiDma, RefusedAssertIsAcceptedWithoutStartingEitherEngine) {
     tx.NDTR = 60000U;
     rx.NDTR = 60000U;

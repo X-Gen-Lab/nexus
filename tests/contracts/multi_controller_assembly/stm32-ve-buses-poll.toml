@@ -29,6 +29,7 @@ mode = "short-poll"
 max_hz = 1000000
 
 [spi_device.device2]
+lsb_first = true
 driver = "spi-transaction"
 controller = "bus2"
 cs_binding = "secondary-cs"
@@ -41,6 +42,7 @@ mode = "short-poll"
 max_hz = 1000000
 
 [spi_device.device3]
+lsb_first = true
 driver = "spi-transaction"
 controller = "bus3"
 cs_binding = "third-cs"

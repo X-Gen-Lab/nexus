@@ -97,8 +97,8 @@ class SPIMultiple : public testing::Test {
             states[i].dma = i == 0U ? DMA2 : DMA1;
             states[i].rx = i == 0U ? DMA2_Stream0 : DMA1_Stream3;
             states[i].tx = i == 0U ? DMA2_Stream3 : DMA1_Stream4;
-            children[i].endpoint = {&states[i].spi, &cs[i], 1U << i, 1000000U,
-                                    0U};
+            children[i].endpoint = {&states[i].spi, &cs[i], 1U << i,
+                                    1000000U,       0U,     false};
             children[i].dma = &states[i];
             nx_request_initialize(&requests[i].base);
             ASSERT_EQ(nx_spi_request_prepare(&requests[i], tx[i], rx[i],
@@ -410,7 +410,7 @@ TEST_F(SPIMultiple, ThirdColdPollingAcquiresAndRestoresOnlyItsClock) {
                                               {GPIOC, &saved[2], 2U, 12U, 6U},
                                               {GPIOC, &saved[3], 2U, 13U, 0U}};
     const nx_stm32_spi_endpoint_config_t endpoints[] = {
-        {&endpoint, &select, 1000000U, 0U}};
+        {&endpoint, &select, 1000000U, 0U, true}};
     const nx_stm32_spi_config_t config = {SPI3, 42000000U, pins,
                                           4U,   endpoints, 1U};
     RCC->APB1ENR = RCC_APB1ENR_SPI2EN;
@@ -418,6 +418,7 @@ TEST_F(SPIMultiple, ThirdColdPollingAcquiresAndRestoresOnlyItsClock) {
     ASSERT_EQ(nx_stm32_spi_prepare(&port, &config, &receipt), NX_SUCCESS);
     EXPECT_EQ(RCC->APB1ENR, RCC_APB1ENR_SPI2EN | RCC_APB1ENR_SPI3EN);
     EXPECT_EQ(endpoint.port, &port);
+    EXPECT_TRUE(endpoint.lsb_first);
     EXPECT_EQ(nx_stm32_spi_close(&port, &config, &receipt), NX_SUCCESS);
     EXPECT_EQ(RCC->APB1ENR, RCC_APB1ENR_SPI2EN);
     EXPECT_FALSE(select.initialized);

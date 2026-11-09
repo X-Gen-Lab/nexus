@@ -121,7 +121,10 @@ SPI1／2／3 共用轮询和有限全双工 DMA 实现，均可选择 8／16 位
 RM0090 §27.6.8 要求特定 PCLK 条件才能达到 400 kHz；固定 42 MHz 下，
 `max_hz=400000` 选择 CCR=36，名义约 388.9 kHz。时钟容差、上拉和总线电容仍须实板验证。
 异步恢复保留取得的时序与 wake；请求、通知发布者或 DMA 尚未退出时返回 BUSY，
-不会先复位硬件。SPI3 的 AF6 路线是
+不会先复位硬件。SPI endpoint 的 `lsb_first` 默认 false，可显式选择 true，
+覆盖三个控制器的普通 byte face、8／16 位增强 polling 与 DMA；只在空闲后修改
+硬件位序，不反转或复制 buffer。I2S／TI 和固定 MSB 的 BMP280 不使用该选择。
+SPI3 的 AF6 路线是
 PC10／11／12 或 PB3／4／5；I2C3 是 PA8 SCL 与 PC9 SDA AF4，恢复检查两条真实
 输入。SPI2 使用 DMA1 stream4 TX／stream3 RX channel0，SPI3 使用 stream5 TX／
 stream0 RX channel0；I2C3 使用 stream4 TX／stream2 RX channel3。共享物理 stream

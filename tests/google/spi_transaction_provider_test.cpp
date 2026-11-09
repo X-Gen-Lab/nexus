@@ -24,11 +24,12 @@ std::vector<bool> selections;
 size_t fail_after;
 bool selected;
 uint8_t expected_bits;
+bool expected_lsb_first;
 class SPITransactionProvider : public testing::Test {
   protected:
     nx_stm32_spi_state_t state{SPI1, RCC, 84000000U, false, false, nullptr};
     nx_stm32_gpio_state_t cs{GPIOC, 1U, true, true};
-    nx_stm32_spi_endpoint_state_t child{&state, &cs, 1U, 1000000U, 0U};
+    nx_stm32_spi_endpoint_state_t child{&state, &cs, 1U, 1000000U, 0U, false};
     nx_spi_transaction_endpoint_t endpoint{&nx_stm32_spi_transaction_ops,
                                            &child};
     void* mapping = MAP_FAILED;
@@ -44,6 +45,7 @@ class SPITransactionProvider : public testing::Test {
         selected = false;
         fail_after = SIZE_MAX;
         expected_bits = 8U;
+        expected_lsb_first = false;
         g_nx_stm32_gpioa_model = {};
         SPI1->SR = SPI_SR_TXE | SPI_SR_RXNE;
         GPIOC->ODR = 1U;
@@ -83,6 +85,33 @@ TEST_F(SPITransactionProvider, Apb1ControllersReuseEightAndSixteenBitPhases) {
         EXPECT_EQ(2U, transferred);
         EXPECT_EQ(0U, registers->CR1 & SPI_CR1_SPE);
         EXPECT_EQ(SPI_CR1_SPE | SPI_CR1_CPHA, SPI1->CR1);
+    }
+}
+
+TEST_F(SPITransactionProvider, BitOrderChangesOnlyTheSelectedEndpoint) {
+    uint8_t byte = 0x96U;
+    uint8_t received = 0U;
+    const nx_spi_segment_t segment{nullptr, nullptr, 1U, 0xA55AU};
+    child.lsb_first = true;
+    nx_stm32_spi_endpoint_state_t other = child;
+    other.lsb_first = false;
+    for (auto* selected_child : {&child, &other, &child}) {
+        expected_lsb_first = selected_child->lsb_first;
+        expected_bits = 8U;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_spi_endpoint_transfer(
+                                  selected_child, &byte, &received, 1U,
+                                  nx_time_now_us() + 10000U, &transferred));
+        EXPECT_EQ(expected_lsb_first, (SPI1->CR1 & SPI_CR1_LSBFIRST) != 0U);
+        expected_bits = 16U;
+        const nx_spi_transaction_endpoint_t face{&nx_stm32_spi_transaction_ops,
+                                                 selected_child};
+        ASSERT_EQ(NX_SUCCESS, nx_spi_transaction_transfer(
+                                  &face, &segment, 1U, 16U,
+                                  nx_time_now_us() + 10000U, &transferred));
+        EXPECT_EQ(0xA55AU, words.back());
+        EXPECT_TRUE(child.lsb_first);
+        EXPECT_FALSE(other.lsb_first);
+        EXPECT_EQ(0U, SPI1->CR1 & SPI_CR1_SPE);
     }
 }
 
@@ -169,7 +198,8 @@ TEST_F(SPITransactionProvider, RefusedAssertNeverClocksAPayloadWord) {
 
 TEST_F(SPITransactionProvider, CloseRetriesOnlyTheCsThatStillOwnsItsPad) {
     nx_stm32_gpio_state_t other_cs{GPIOC, 2U, true, true};
-    nx_stm32_spi_endpoint_state_t other{&state, &other_cs, 2U, 1000000U, 0U};
+    nx_stm32_spi_endpoint_state_t other{&state,   &other_cs, 2U,
+                                        1000000U, 0U,        false};
     uint16_t snapshots[5]{};
     const nx_stm32_spi_pin_config_t pins[]{{GPIOC, snapshots, 2U, 3U, 5U},
                                            {GPIOC, snapshots + 1U, 2U, 4U, 5U},
@@ -177,7 +207,8 @@ TEST_F(SPITransactionProvider, CloseRetriesOnlyTheCsThatStillOwnsItsPad) {
                                            {GPIOC, snapshots + 3U, 2U, 0U, 0U},
                                            {GPIOC, snapshots + 4U, 2U, 1U, 0U}};
     const nx_stm32_spi_endpoint_config_t endpoints[]{
-        {&child, &cs, 1000000U, 0U}, {&other, &other_cs, 1000000U, 0U}};
+        {&child, &cs, 1000000U, 0U, false},
+        {&other, &other_cs, 1000000U, 0U, false}};
     const nx_stm32_spi_config_t config{SPI1, 84000000U, pins,
                                        5U,   endpoints, 2U};
     nx_stm32_spi_cold_receipt_t receipt{};
@@ -237,6 +268,8 @@ extern "C" void nx_spi_transaction_model_write(void* raw, uint16_t word,
     auto* state = static_cast<nx_stm32_spi_state_t*>(raw);
     EXPECT_TRUE(state->active);
     EXPECT_EQ((state->registers->CR1 & SPI_CR1_DFF) != 0U, bits == 16U);
+    EXPECT_EQ((state->registers->CR1 & SPI_CR1_LSBFIRST) != 0U,
+              expected_lsb_first);
     state->registers->DR = word;
     if (words.size() == fail_after) {
         state->registers->SR |= SPI_SR_MODF;

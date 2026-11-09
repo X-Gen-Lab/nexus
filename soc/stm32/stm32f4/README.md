@@ -72,7 +72,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | --- | --- |
 | GPIO | 单 port 的 16-bit 授权 mask；原子 BSRR set/reset；串行 toggle；先初值后 mode |
 | UART | 六个实例共用 IRQ bytes/events、独立 9N1 words、IRQ blocks、HAL 有限 TX DMA、有限／连续 RX DMA 和 DMA duplex；真实 TC、显式 loss、drain、quarantine |
-| SPI | SPI1／2／3 共用短 polling／有限全双工 DMA；MSB-first master、mode0–3；普通 byte face 为 8 位，增强 polling 事务支持 8／16 位 word，三个控制器均可选择增强 DMA 事务；polling 最多 256 words，DMA 每段最多 65535 words |
+| SPI | SPI1／2／3 共用短 polling／有限全双工 DMA；每端点 MSB／LSB-first master、mode0–3；普通 byte face 为 8 位，增强 polling 事务支持 8／16 位 word，三个控制器均可选择增强 DMA 事务；polling 最多 256 words，DMA 每段最多 65535 words |
 | I2C | I2C1／2／3 polling/IRQ/DMA；42 MHz PCLK、名义 5129 Hz–400 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
 | Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
@@ -143,6 +143,13 @@ TIM2 epoch，`SystemCoreClock` 在失败清理中追踪确认的 HCLK，不启�
 另选有限或连续双缓冲 provider。拒绝 `dma-tx`＋IRQ blocks；双向显式选 `dma-duplex`
 或 `dma-duplex-continuous`。连续模式不覆盖 READY/BORROWED，缺 replacement 时停止
 并报告 loss，不虚构错过事件的准确次数。
+
+SPI endpoint 可通过 `[spi_device.<id>]` 的 `lsb_first = true` 选择硬件 LSB-first，
+默认 false 为 MSB-first。三个控制器的普通 byte face、8／16 位增强 polling 和 DMA
+事务均使用同一冷配置；端点间可以有不同位序，只在线端与引擎空闲后写 CR1，不在
+传输中改变格式。内存中的字节或 `uint16_t` 数值保持不变，不隐式反转、复制或改动
+DMA 宽度。该选择不用于 I2S／TI；固定 MSB 的 BMP280 驱动拒绝 LSB 配置。
+新字段使用既有 padding，ARM endpoint state／只读配置仍分别为 20／16 字节。
 
 SPI 每次 CS 命令都在原子 BSRR 写入后以 DSB 和官方 LL 读取 ODR，核验本 CS latch；
 这不证明外部引脚电压。通用 GPIO 写热路径不增加屏障。polling 返回后不再访问调用者

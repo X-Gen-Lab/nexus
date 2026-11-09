@@ -2082,6 +2082,11 @@
           "driver": {
             "type": "string"
           },
+          "lsb_first": {
+            "type": "boolean",
+            "default": false,
+            "description": "Shift each SPI frame LSB first; false keeps MSB first. Requires a reviewed endpoint provider."
+          },
           "max_hz": {
             "type": "integer",
             "minimum": 0,
