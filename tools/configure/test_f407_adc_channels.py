@@ -198,6 +198,58 @@ class F407AdcChannelTests(unittest.TestCase):
             result = gate.resolve_ir(assembly)
             self.assertEqual(result.controllers[2].pins[0]["pin"], "PF6")
 
+    def dma_assembly(self, directory, density, controller, mode, peer=False):
+        fixture = gate.ROOT / "tests/contracts/adc_external_assembly"
+        board = gate.load(fixture / f"{density}_board/board.json")
+        (directory / "board.json").write_text(json.dumps(board))
+        binding, channel = ("independent2", 8) if controller == "ADC2" else (
+            "independent3", 10 if density == "ve" else 4)
+        source = ('schema=2\nboard_package="."\nbackend="baremetal"\n'
+                  'clock="hse8-pll168"\noptimization="Os"\n'
+                  '[memory]\nmain_stack_bytes=2048\nlibc_heap_bytes=0\n'
+                  'flash_load_limit_bytes=65536\nstatic_ram_limit_bytes=32768\n'
+                  '[adc.input]\nbinding=' + json.dumps(binding) + '\nmode=' +
+                  json.dumps(mode) + f'\nchannels=[{channel}]\nsample_times=[7]\n'
+                  'reference_mv=3300\n[adc.input.irq]\npriority=5\n')
+        if peer:
+            source += ('[adc.peer]\nbinding="independent3"\n'
+                       'mode="trigger-dma"\nchannels=[10]\nsample_times=[7]\n'
+                       'reference_mv=3300\n[adc.peer.irq]\npriority=5\n')
+        assembly = directory / "assembly.toml"
+        assembly.write_text(source)
+        return assembly
+
+    def test_secondary_dma_modes_use_exact_lanes_and_keep_the_timer_exclusive(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            for density in ("ve", "zg"):
+                for controller, lane, request in (("ADC2", 2, 1), ("ADC3", 1, 2)):
+                    for mode in ("trigger-dma", "trigger-dma-continuous"):
+                        with self.subTest(density=density, controller=controller,
+                                          mode=mode):
+                            assembly = self.dma_assembly(
+                                directory, density, controller, mode)
+                            result = gate.resolve_ir(assembly)
+                            selected, = result.controllers
+                            self.assertEqual(selected.controller, controller)
+                            self.assertEqual([(item.engine, item.lane, item.request)
+                                              for item in selected.integration.dma],
+                                             [("DMA2", lane, request)])
+                            self.assertIn("controller:TIM3",
+                                          {item.key for item in result.claims})
+                            source = bindings.emit(result)[1]
+                            self.assertIn(f"void DMA2_Stream{lane}_IRQHandler(void)",
+                                          source)
+                            self.assertNotIn("void DMA2_Stream4_IRQHandler(void)",
+                                             source)
+
+    def test_distinct_adc_dma_lanes_do_not_authorize_two_tim3_trigger_owners(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            assembly = self.dma_assembly(Path(temporary), "ve", "ADC2",
+                                         "trigger-dma", peer=True)
+            with self.assertRaisesRegex(ValueError, "controller:TIM3"):
+                gate.resolve_ir(assembly)
+
 
 if __name__ == "__main__":
     unittest.main()

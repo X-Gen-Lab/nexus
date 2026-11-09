@@ -62,6 +62,13 @@ class I2CCold : public testing::Test {
     nx_result_t Close() {
         return nx_stm32_i2c_close(&state, &config, &receipt);
     }
+    void Third() {
+        config.registers = I2C3;
+        pins[0].pin = 8U;
+        pins[1].pin = 9U;
+        GPIOA->IDR = 1U << 8U;
+        GPIOC->IDR = 1U << 9U;
+    }
 };
 
 TEST_F(I2CCold, StaticFactsRejectBeforeAnyHardwareEffect) {
@@ -431,6 +438,149 @@ TEST_F(I2CCold, SecondControllerKeepsFirstControllerIndependent) {
     EXPECT_NE(0U, I2C1->CR1 & I2C_CR1_PE);
     EXPECT_NE(0U, RCC->APB1ENR & RCC_APB1ENR_I2C1EN);
     EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&first, &config, &receipt));
+}
+
+TEST_F(I2CCold, ThirdPollingRestoresBothBanksAndEveryInitialGateCombination) {
+    Third();
+    GPIOA->MODER = 0xA59AA55AU;
+    GPIOC->MODER = 0x5AA55AA5U;
+    GPIOA->AFR[1] = 0x12345678U;
+    GPIOC->AFR[1] = 0x87654321U;
+    const auto first_mode = GPIOA->MODER;
+    const auto second_mode = GPIOC->MODER;
+    const auto first_af = GPIOA->AFR[1];
+    const auto second_af = GPIOC->AFR[1];
+    for (unsigned initial = 0U; initial < 8U; ++initial) {
+        SCOPED_TRACE(initial);
+        const uint32_t gpio = RCC_AHB1ENR_GPIOBEN |
+                              ((initial & 1U) ? RCC_AHB1ENR_GPIOAEN : 0U) |
+                              ((initial & 2U) ? RCC_AHB1ENR_GPIOCEN : 0U);
+        const uint32_t peripheral = RCC_APB1ENR_I2C1EN | RCC_APB1ENR_I2C2EN |
+                                    ((initial & 4U) ? RCC_APB1ENR_I2C3EN : 0U);
+        RCC->AHB1ENR = gpio;
+        RCC->APB1ENR = peripheral;
+        ASSERT_EQ(NX_SUCCESS, Prepare());
+        EXPECT_EQ(2U, (GPIOA->MODER >> 16U) & 3U);
+        EXPECT_EQ(2U, (GPIOC->MODER >> 18U) & 3U);
+        EXPECT_EQ(4U, GPIOA->AFR[1] & 15U);
+        EXPECT_EQ(4U, (GPIOC->AFR[1] >> 4U) & 15U);
+        EXPECT_NE(0U, GPIOA->OTYPER & (1U << 8U));
+        EXPECT_NE(0U, GPIOC->OTYPER & (1U << 9U));
+        ASSERT_EQ(NX_SUCCESS, Close());
+        EXPECT_EQ(gpio, RCC->AHB1ENR);
+        EXPECT_EQ(peripheral, RCC->APB1ENR);
+        EXPECT_EQ(first_mode, GPIOA->MODER);
+        EXPECT_EQ(second_mode, GPIOC->MODER);
+        EXPECT_EQ(first_af, GPIOA->AFR[1]);
+        EXPECT_EQ(second_af, GPIOC->AFR[1]);
+    }
+    EXPECT_EQ(6U, sizeof(receipt));
+}
+
+TEST_F(I2CCold, ThirdFailedSecondBankWithdrawalRetainsBothClockLeases) {
+    Third();
+    ASSERT_EQ(NX_SUCCESS, Prepare());
+    refused = &GPIOC->MODER;
+    EXPECT_EQ(NX_ERROR_IO, Close());
+    EXPECT_NE(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
+    EXPECT_EQ(RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN, RCC->AHB1ENR);
+    EXPECT_NE(0U, RCC->APB1ENR & RCC_APB1ENR_I2C3EN);
+    refused = nullptr;
+    ASSERT_EQ(NX_SUCCESS, Close());
+    EXPECT_EQ(0U, RCC->AHB1ENR);
+    EXPECT_EQ(0U, RCC->APB1ENR);
+    EXPECT_EQ(0U, receipt.effects);
+}
+
+TEST_F(I2CCold, ThirdRecoveryObservesSclAndSdaOnTheirActualBanks) {
+    Third();
+    ASSERT_EQ(NX_SUCCESS, Prepare());
+    GPIOA->IDR |= 1U << 9U;
+    GPIOC->IDR |= 1U << 8U;
+    GPIOC->IDR &= ~(1U << 9U);
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_i2c_recover(&state));
+    GPIOC->IDR |= 1U << 9U;
+    GPIOA->IDR &= ~(1U << 8U);
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_i2c_recover(&state));
+    GPIOA->IDR |= 1U << 8U;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_recover(&state));
+    ASSERT_EQ(NX_SUCCESS, Close());
+    config.asynchronous = true;
+    nx_i2c_v1_state_t async{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    GPIOC->IDR &= ~(1U << 9U);
+    EXPECT_EQ(NX_ERROR_IO, nx_i2c_v1_async_ops.recover(&async));
+    GPIOC->IDR |= 1U << 9U;
+    GPIOA->IDR &= ~(1U << 8U);
+    EXPECT_EQ(NX_ERROR_IO, nx_i2c_v1_async_ops.recover(&async));
+    GPIOA->IDR |= 1U << 8U;
+    EXPECT_EQ(NX_SUCCESS, nx_i2c_v1_async_ops.recover(&async));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&async, &config, &receipt));
+}
+
+TEST_F(I2CCold, ThirdDmaOwnsOnlyItsExactPublishersAndRestoresPriorities) {
+    Third();
+    config.asynchronous = true;
+    const nx_dma_memory_region_t region{
+        0x20000000U, 1024U, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
+    nx_i2c_v1_dma_t dma = NX_STM32_I2C2_DMA(&region, 1U);
+    dma.tx = {&DMA1_Stream4->CR,
+              &DMA1_Stream4->NDTR,
+              &DMA1_Stream4->PAR,
+              &DMA1_Stream4->M0AR,
+              &DMA1_Stream4->FCR,
+              &DMA1->HISR,
+              &DMA1->HIFCR,
+              (3U << 25U) | (1U << 16U) | DMA_SxCR_MINC | DMA_SxCR_DIR_0 |
+                  DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE,
+              0U};
+    dma.rx.configuration = (3U << 25U) | (1U << 16U) | DMA_SxCR_MINC |
+                           DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
+    config.dma = &dma;
+    const IRQn_Type vectors[] = {I2C3_EV_IRQn, I2C3_ER_IRQn, DMA1_Stream2_IRQn,
+                                 DMA1_Stream4_IRQn};
+    for (size_t i = 0U; i < 4U; ++i)
+        NVIC->IPR[vectors[i]] = (uint8_t)(0x91U + i);
+    nx_i2c_v1_state_t async{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    for (auto irq : vectors) {
+        EXPECT_EQ(1U, NVIC_GetEnableIRQ(irq));
+        EXPECT_EQ(0x50U, NVIC->IPR[irq]);
+    }
+    EXPECT_EQ(0U, NVIC_GetEnableIRQ(I2C2_EV_IRQn));
+    EXPECT_EQ(0U, NVIC_GetEnableIRQ(DMA1_Stream7_IRQn));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&async, &config, &receipt));
+    for (size_t i = 0U; i < 4U; ++i) {
+        EXPECT_EQ(0U, NVIC_GetEnableIRQ(vectors[i]));
+        EXPECT_EQ(0x91U + i, NVIC->IPR[vectors[i]]);
+    }
+}
+
+TEST_F(I2CCold, ThirdForeignPublisherRejectsBeforeClocksOrPads) {
+    Third();
+    config.asynchronous = true;
+    const IRQn_Type vectors[] = {I2C3_EV_IRQn, I2C3_ER_IRQn};
+    for (auto irq : vectors) {
+        for (bool active : {false, true}) {
+            SCOPED_TRACE(irq);
+            SCOPED_TRACE(active);
+            const unsigned index = (unsigned)irq;
+            volatile uint32_t* bank =
+                active ? const_cast<volatile uint32_t*>(NVIC->IABR)
+                       : NVIC->ISPR;
+            bank[index / 32U] = 1U << (index % 32U);
+            nx_i2c_v1_state_t async{};
+            EXPECT_EQ(NX_ERROR_BUSY,
+                      nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+            EXPECT_EQ(0U, receipt.effects);
+            EXPECT_EQ(0U, RCC->AHB1ENR);
+            EXPECT_EQ(0U, RCC->APB1ENR);
+            EXPECT_EQ(1U << (index % 32U), bank[index / 32U]);
+            bank[index / 32U] = 0U;
+        }
+    }
 }
 
 extern "C" bool nx_arch_in_isr(void) {

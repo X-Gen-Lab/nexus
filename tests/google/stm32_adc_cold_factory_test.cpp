@@ -323,12 +323,15 @@ TEST_F(AdcColdFactory, CommonClockCannotBeRetunedWithAnyConverterEnabled) {
     EXPECT_EQ(ADC_CR2_ADON, ADC2->CR2);
 }
 
-TEST_F(AdcColdFactory, SecondaryConvertersNeverAcquireTheAdc1DmaPath) {
+TEST_F(AdcColdFactory, SecondaryConvertersSelectTheirOwnDmaStreams) {
     const uint8_t channels[]{0U};
     const uint8_t samples[]{7U};
     const nx_dma_memory_region_t region{UINT32_C(0x20000000), 1024U,
                                         NX_DMA_MEMORY_WRITE};
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_DMA2EN;
+    NVIC_EnableIRQ(DMA2_Stream4_IRQn);
     for (auto* converter : {ADC2, ADC3}) {
+        SCOPED_TRACE(converter == ADC2 ? "ADC2" : "ADC3");
         nx_stm32_adc_stream_config_t config{};
         config.adc.channels = channels;
         config.adc.sample_times = samples;
@@ -339,13 +342,95 @@ TEST_F(AdcColdFactory, SecondaryConvertersNeverAcquireTheAdc1DmaPath) {
         config.region_count = 1U;
         config.priority = 5U;
         nx_stm32_adc_stream_state_t state{};
-        EXPECT_EQ(NX_ERROR_UNSUPPORTED,
-                  nx_stm32_adc_stream_cold_begin(&state, &config));
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_stream_prepare(&state, &config));
+        auto* expected = converter == ADC2 ? DMA2_Stream2 : DMA2_Stream1;
+        auto irq = converter == ADC2 ? DMA2_Stream2_IRQn : DMA2_Stream1_IRQn;
+        EXPECT_EQ(converter, state.adc.registers);
+        EXPECT_EQ(expected, state.memory);
+        EXPECT_EQ(1U, NVIC_GetEnableIRQ(irq));
+        EXPECT_EQ(5U, NVIC_GetPriority(irq));
+        EXPECT_EQ(NX_SUCCESS, nx_stm32_adc_stream_close(&state));
         EXPECT_EQ(0U, state.adc.cold_effects);
+        EXPECT_EQ(0U, NVIC_GetEnableIRQ(irq));
+        EXPECT_EQ(1U, NVIC_GetEnableIRQ(DMA2_Stream4_IRQn));
         EXPECT_EQ(0U, RCC->APB2ENR);
         EXPECT_EQ(0U, RCC->APB1ENR);
-        EXPECT_EQ(0U, GPIOA->MODER);
-        EXPECT_EQ(NX_SUCCESS, nx_stm32_adc_cold_finish(&state.adc));
+    }
+    NVIC_DisableIRQ(DMA2_Stream4_IRQn);
+}
+
+TEST_F(AdcColdFactory, SecondaryDmaPreservesForeignPendingAndActivePublishers) {
+    const uint8_t channels[]{0U};
+    const uint8_t samples[]{7U};
+    const nx_dma_memory_region_t region{0x20000000U, 1024U,
+                                        NX_DMA_MEMORY_WRITE};
+    for (auto* converter : {ADC2, ADC3}) {
+        const auto irq =
+            converter == ADC2 ? DMA2_Stream2_IRQn : DMA2_Stream1_IRQn;
+        const unsigned index = static_cast<unsigned>(irq);
+        const uint32_t bit = 1U << (index % 32U);
+        const nx_stm32_adc_stream_config_t config{
+            {channels, samples, 1U, 3300U, 0U, converter}, &region, 1U, 5U};
+        for (bool active : {false, true}) {
+            SCOPED_TRACE(index);
+            SCOPED_TRACE(active);
+            auto* facts = active ? g_f4_model_nvic.IABR : g_f4_model_nvic.ISPR;
+            facts[index / 32U] = bit;
+            nx_stm32_adc_stream_state_t state{};
+            EXPECT_EQ(NX_ERROR_BUSY,
+                      nx_stm32_adc_stream_prepare(&state, &config));
+            EXPECT_EQ(NX_SUCCESS, nx_stm32_adc_stream_close(&state));
+            EXPECT_EQ(bit, facts[index / 32U]);
+            EXPECT_EQ(0U, RCC->APB2ENR);
+            EXPECT_EQ(0U, RCC->APB1ENR);
+            facts[index / 32U] = 0U;
+        }
+    }
+}
+
+TEST_F(AdcColdFactory, SecondaryDmaPublishesOnlyItsOwnCompletedDetachedBlock) {
+    const uint8_t channels[]{0U};
+    const uint8_t timing[]{7U};
+    uint16_t data[4]{};
+    const nx_dma_memory_region_t region{reinterpret_cast<uintptr_t>(data),
+                                        sizeof(data), NX_DMA_MEMORY_WRITE};
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_DMA2EN;
+    for (auto* converter : {ADC2, ADC3}) {
+        SCOPED_TRACE(converter == ADC2 ? "ADC2" : "ADC3");
+        const unsigned shift = converter == ADC2 ? 16U : 6U;
+        const unsigned channel = converter == ADC2 ? 1U : 2U;
+        const nx_stm32_adc_stream_config_t config{
+            {channels, timing, 1U, 3300U, 0U, converter}, &region, 1U, 5U};
+        nx_stm32_adc_stream_state_t state{};
+        nx_stream_slot_t slot{};
+        slot.data = reinterpret_cast<uint8_t*>(data);
+        slot.capacity = sizeof(data);
+        nx_stream_t stream{};
+        ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, &slot, 1U));
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_stream_prepare(&state, &config));
+        const nx_adc_port_t face{&nx_stm32_adc_stream_ops, &state};
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_start(&face, &stream, 1000U));
+        EXPECT_EQ(channel, (state.memory->CR & DMA_SxCR_CHSEL) >> 25U);
+        EXPECT_EQ(4U, state.memory->NDTR);
+        now += 3U;
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_service(&face));
+        DMA2->HISR = 0x20U;
+        DMA2->LISR = 0x20U;
+        nx_stm32_adc_stream_irq(&state);
+        nx_stream_block_t block{};
+        EXPECT_EQ(NX_ERROR_EMPTY, nx_stream_acquire(&stream, &block));
+        state.memory->NDTR = 0U;
+        DMA2->LISR |= 0x20U << shift;
+        nx_stm32_adc_stream_irq(&state);
+        EXPECT_EQ(0x3DU << shift, DMA2->LIFCR);
+        EXPECT_EQ(0x20U, DMA2->HISR);
+        EXPECT_EQ(0U, state.memory->CR & DMA_SxCR_EN);
+        EXPECT_EQ(0U, TIM3->CR1 & TIM_CR1_CEN);
+        ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &block));
+        EXPECT_EQ(sizeof(data), block.length);
+        EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_adc_stream_close(&state));
+        ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_stream_close(&state));
     }
 }
 

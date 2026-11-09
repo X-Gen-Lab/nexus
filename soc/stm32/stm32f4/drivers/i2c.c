@@ -1,12 +1,13 @@
 /**
  * \file            i2c.c
- * \brief           STM32F407 I2C1 standard-mode messages and bounded abort
+ * \brief           STM32F407 standard-mode I2C messages and bounded abort
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_i2c_cold.h"
+#include "stm32f407_i2c_port.h"
 #include "stm32f407_provider.h"
 #include "stm32f4xx_ll_i2c.h"
 
@@ -32,7 +33,7 @@ nx_result_t nx_stm32_i2c_prepare(nx_stm32_i2c_state_t* port,
     if (result != NX_SUCCESS)
         return result;
     port->registers = config->registers;
-    port->line_gpio = GPIOB;
+    port->line_gpio = config->registers == I2C3 ? GPIOA : GPIOB;
     port->line_mask = (1U << config->pins[0].pin) | (1U << config->pins[1].pin);
     port->peripheral_mhz = config->clock_hz / 1000000U;
     port->rate_hz = 100000U;
@@ -378,7 +379,8 @@ nx_result_t nx_stm32_i2c_recover(void* context) {
     NX_STM32_IO_POLL(2U, port);
     if (result == NX_SUCCESS &&
         ((port->registers->SR2 & I2C_SR2_BUSY) != 0U ||
-         (port->line_gpio->IDR & port->line_mask) != port->line_mask)) {
+         !nx_stm32_i2c_lines_high(port->registers, &port->line_gpio->IDR,
+                                  port->line_mask))) {
         port->fault = true;
         return NX_ERROR_IO;
     }

@@ -84,6 +84,8 @@ class SPIMultiple : public testing::Test {
         error_status = nullptr;
         error_mask = 0U;
         resets.clear();
+        g_nx_stm32_system = {};
+        g_nx_stm32_system.rcc = RCC;
         regions[0] = {(uintptr_t)tx, sizeof(tx), NX_DMA_MEMORY_READ};
         regions[1] = {(uintptr_t)rx, sizeof(rx), NX_DMA_MEMORY_WRITE};
         for (unsigned i = 0U; i < 2U; ++i) {
@@ -126,6 +128,21 @@ class SPIMultiple : public testing::Test {
     void Both() {
         ASSERT_EQ(Initialize(0U), NX_SUCCESS);
         ASSERT_EQ(Initialize(1U), NX_SUCCESS);
+    }
+    void Third() {
+        spis[1] = SPI3;
+        states[1].spi.registers = SPI3;
+        states[1].rx = DMA1_Stream0;
+        states[1].tx = DMA1_Stream5;
+        rx_controls[1] = &DMA1_Stream0->CR;
+        tx_controls[1] = &DMA1_Stream5->CR;
+        rx_counts[1] = &DMA1_Stream0->NDTR;
+        tx_counts[1] = &DMA1_Stream5->NDTR;
+        rx_flags[1] = &DMA1->LISR;
+        tx_flags[1] = &DMA1->HISR;
+        peripheral[1] = &DMA1_Stream5->PAR;
+        rx_shifts[1] = 0U;
+        tx_shifts[1] = 6U;
     }
     void SubmitBoth(uint8_t flags = 0U) {
         for (unsigned i = 0U; i < 2U; ++i)
@@ -320,6 +337,91 @@ TEST_F(SPIMultiple, SecondaryPollingRecoveryPulsesApb1AndPreservesPrimaryWire) {
     EXPECT_EQ(RCC->APB2RSTR, RCC_APB2RSTR_USART1RST);
     EXPECT_EQ(RCC->APB1RSTR, RCC_APB1RSTR_I2C1RST);
 }
+TEST_F(SPIMultiple, ThirdControllerUsesItsOwnVectorsAndRequestSelector) {
+    Third();
+    ASSERT_EQ(Initialize(1U), NX_SUCCESS);
+    EXPECT_TRUE(Enabled(DMA1_Stream0_IRQn));
+    EXPECT_TRUE(Enabled(DMA1_Stream5_IRQn));
+    EXPECT_FALSE(Enabled(DMA1_Stream3_IRQn));
+    EXPECT_FALSE(Enabled(DMA1_Stream4_IRQn));
+    ASSERT_EQ(nx_spi_endpoint_submit(&devices[1], &requests[1]), NX_SUCCESS);
+    EXPECT_EQ(*peripheral[1], (uint32_t)(uintptr_t)&SPI3->DR);
+    EXPECT_EQ((*rx_controls[1] >> 25U) & 7U, 0U);
+    EXPECT_EQ((*tx_controls[1] >> 25U) & 7U, 0U);
+}
+TEST_F(SPIMultiple, ThirdRejectsRetainedPendingOrActivePublishers) {
+    Third();
+    for (unsigned irq :
+         {unsigned(DMA1_Stream0_IRQn), unsigned(DMA1_Stream5_IRQn)}) {
+        for (bool active : {false, true}) {
+            g_f4_model_nvic = {};
+            states[1].initialized = false;
+            uint32_t bit = 1UL << (irq % 32U);
+            volatile uint32_t* status = active ? NVIC->IABR : NVIC->ISPR;
+            status[irq / 32U] = bit;
+            EXPECT_EQ(Initialize(1U), NX_ERROR_BUSY);
+            EXPECT_FALSE(states[1].initialized);
+            EXPECT_EQ(status[irq / 32U], bit);
+            EXPECT_FALSE(Enabled(DMA1_Stream0_IRQn));
+            EXPECT_FALSE(Enabled(DMA1_Stream5_IRQn));
+        }
+    }
+    g_f4_model_nvic = {};
+    states[1].initialized = false;
+}
+TEST_F(SPIMultiple, ThirdCompletionPreservesSharedBankNeighbourFlags) {
+    Third();
+    ASSERT_NO_FATAL_FAILURE(Both());
+    ASSERT_NO_FATAL_FAILURE(SubmitBoth());
+    DMA1->LISR = 0x20U << 22U;
+    DMA1->HISR = 0x20U;
+    Complete(1U);
+    STATUS(1U) = TX_EMPTY;
+    nx_spi_port_service(&ports[1]);
+    EXPECT_EQ(nx_request_state(&requests[1].base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(requests[1].base.result, NX_SUCCESS);
+    EXPECT_EQ(DMA1->LISR, 0x20U << 22U);
+    EXPECT_EQ(DMA1->HISR, 0x20U);
+    EXPECT_EQ(nx_request_state(&requests[0].base), NX_REQUEST_ACTIVE);
+}
+TEST_F(SPIMultiple, ThirdRecoveryResetsOnlyItsOwnApb1Bit) {
+    Third();
+    SPI2->CR1 = SPI_CR1_SPE;
+    SPI2->SR = SPI_SR_BSY;
+    RCC->APB1RSTR = RCC_APB1RSTR_I2C1RST;
+    states[1].spi.fault = true;
+    STATUS(1U) = ERROR;
+    ASSERT_EQ(nx_stm32_spi_recover(&states[1].spi), NX_SUCCESS);
+    ASSERT_EQ(resets.size(), 2U);
+    EXPECT_EQ(resets[0], &RCC->APB1RSTR);
+    EXPECT_EQ(RCC->APB1RSTR, RCC_APB1RSTR_I2C1RST);
+    EXPECT_EQ(SPI2->CR1, SPI_CR1_SPE);
+    EXPECT_EQ(SPI2->SR, SPI_SR_BSY);
+    EXPECT_EQ(STATUS(1U), SPI_SR_TXE);
+}
+TEST_F(SPIMultiple, ThirdColdPollingAcquiresAndRestoresOnlyItsClock) {
+    nx_stm32_spi_state_t port{};
+    nx_stm32_spi_cold_receipt_t receipt{};
+    nx_stm32_spi_endpoint_state_t endpoint{};
+    nx_stm32_gpio_state_t select{};
+    uint16_t saved[4]{};
+    const nx_stm32_spi_pin_config_t pins[] = {{GPIOC, &saved[0], 2U, 10U, 6U},
+                                              {GPIOC, &saved[1], 2U, 11U, 6U},
+                                              {GPIOC, &saved[2], 2U, 12U, 6U},
+                                              {GPIOC, &saved[3], 2U, 13U, 0U}};
+    const nx_stm32_spi_endpoint_config_t endpoints[] = {
+        {&endpoint, &select, 1000000U, 0U}};
+    const nx_stm32_spi_config_t config = {SPI3, 42000000U, pins,
+                                          4U,   endpoints, 1U};
+    RCC->APB1ENR = RCC_APB1ENR_SPI2EN;
+    GPIOC->ODR = 1U << 13U;
+    ASSERT_EQ(nx_stm32_spi_prepare(&port, &config, &receipt), NX_SUCCESS);
+    EXPECT_EQ(RCC->APB1ENR, RCC_APB1ENR_SPI2EN | RCC_APB1ENR_SPI3EN);
+    EXPECT_EQ(endpoint.port, &port);
+    EXPECT_EQ(nx_stm32_spi_close(&port, &config, &receipt), NX_SUCCESS);
+    EXPECT_EQ(RCC->APB1ENR, RCC_APB1ENR_SPI2EN);
+    EXPECT_FALSE(select.initialized);
+}
 } /* namespace */
 
 /** \brief W1C only the written selected DMA mask, including shared banks. */
@@ -347,7 +449,9 @@ extern "C" void nx_spi_multi_reset(volatile uint32_t* reset, uint32_t mask,
     resets.push_back(reset);
     if (active) {
         *reset |= mask;
-        SPI_TypeDef* selected = reset == &RCC->APB1RSTR ? SPI2 : SPI1;
+        SPI_TypeDef* selected = reset == &RCC->APB2RSTR        ? SPI1
+                                : mask == RCC_APB1RSTR_SPI3RST ? SPI3
+                                                               : SPI2;
         selected->CR1 = 0U;
         selected->CR2 = 0U;
         selected->SR = SPI_SR_TXE;

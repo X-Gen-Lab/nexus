@@ -1121,7 +1121,9 @@
       "kind": "adc",
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
       "irq": [],
       "pins": [
@@ -1147,7 +1149,9 @@
       "kind": "adc",
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
       "irq": [],
       "pins": [
@@ -1168,6 +1172,47 @@
         "PF4",
         "PF5"
       ]
+    },
+    "SPI3": {
+      "kind": "spi",
+      "clock_domain": "apb1",
+      "modes": [
+        "short-poll",
+        "dma"
+      ],
+      "irq": [],
+      "pins": [
+        "PC10",
+        "PC11",
+        "PC12",
+        "PB3",
+        "PB4",
+        "PB5"
+      ],
+      "clock_hz": 42000000,
+      "max_hz": 21000000
+    },
+    "I2C3": {
+      "kind": "i2c",
+      "modes": [
+        "poll-messages",
+        "irq-messages",
+        "dma-messages"
+      ],
+      "pins": [
+        "PA8",
+        "PC9"
+      ],
+      "irq": [
+        "I2C3_EV",
+        "I2C3_ER"
+      ],
+      "clock_hz": 42000000,
+      "irq_numbers": {
+        "I2C3_EV": 72,
+        "I2C3_ER": 73
+      },
+      "max_hz": 100000
     }
   },
   "reserved_resources": [

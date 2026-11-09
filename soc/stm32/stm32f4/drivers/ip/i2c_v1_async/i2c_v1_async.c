@@ -63,6 +63,10 @@ _Static_assert(NX_I2C_MAX_MESSAGES <= UINT8_MAX &&
 #ifndef NX_I2C_V1_WRITE_DATA
 #define NX_I2C_V1_WRITE_DATA(state, value) ((state)->registers[DATA] = (value))
 #endif
+#ifndef NX_I2C_V1_LINES_HIGH
+#define NX_I2C_V1_LINES_HIGH(state)                                            \
+    ((*(state)->line_inputs & (state)->line_mask) == (state)->line_mask)
+#endif
 #ifndef NX_I2C_V1_ADDRESS_CLEARED
 #define NX_I2C_V1_ADDRESS_CLEARED(state) ((void)(state))
 #endif
@@ -656,7 +660,7 @@ static nx_result_t recover(void* context) {
         return NX_ERROR_BUSY;
     }
     if (!wire_idle(state) || (state->registers[STAT1] & BUS_BUSY) != 0U ||
-        (*state->line_inputs & state->line_mask) != state->line_mask) {
+        !NX_I2C_V1_LINES_HIGH(state)) {
         return NX_ERROR_IO;
     }
     state->registers[CTL0] = 1U << 15U;

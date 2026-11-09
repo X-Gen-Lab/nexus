@@ -23,7 +23,7 @@ typedef struct {
     bool loss_latched;
 } nx_stm32_uart_stream_state_t;
 
-/** \brief Discrete ADC1 scan blocks, DMA2 stream4 channel0 and TIM3 TRGO. */
+/** \brief Discrete independent ADC scan blocks on an exclusive TIM3 TRGO. */
 typedef struct {
     nx_stm32_adc_state_t adc;
     TIM_TypeDef* timer;
@@ -64,6 +64,45 @@ typedef struct {
     bool halted;
 } nx_stm32_adc_continuous_state_t;
 
+/** \brief Exact RM0090 Table44 routes, without per-instance route storage. */
+static inline DMA_Stream_TypeDef*
+nx_stm32_adc_dma_memory(const ADC_TypeDef* adc) {
+    return adc == ADC2   ? DMA2_Stream2
+           : adc == ADC3 ? DMA2_Stream1
+                         : DMA2_Stream4;
+}
+
+/** \brief The selected converter has one fixed DMA publisher. */
+static inline IRQn_Type nx_stm32_adc_dma_irq(const ADC_TypeDef* adc) {
+    return adc == ADC2   ? DMA2_Stream2_IRQn
+           : adc == ADC3 ? DMA2_Stream1_IRQn
+                         : DMA2_Stream4_IRQn;
+}
+
+/** \brief Channel selectors are register encodings, not stream indexes. */
+static inline uint32_t nx_stm32_adc_dma_channel(const ADC_TypeDef* adc) {
+    return adc == ADC2 ? DMA_SxCR_CHSEL_0 : adc == ADC3 ? DMA_SxCR_CHSEL_1 : 0U;
+}
+
+/** \brief Normalize one stream's status before interpreting completion. */
+static inline uint32_t
+nx_stm32_adc_dma_flags(const nx_stm32_adc_stream_state_t* state) {
+    return state->adc.registers == ADC2   ? (state->dma->LISR >> 16U) & 0x3DU
+           : state->adc.registers == ADC3 ? (state->dma->LISR >> 6U) & 0x3DU
+                                          : state->dma->HISR & 0x3DU;
+}
+
+/** \brief W1C only this lane, preserving every neighbouring DMA owner. */
+static inline void
+nx_stm32_adc_dma_ack(const nx_stm32_adc_stream_state_t* state, uint32_t flags) {
+    if (state->adc.registers == ADC2)
+        state->dma->LIFCR = flags << 16U;
+    else if (state->adc.registers == ADC3)
+        state->dma->LIFCR = flags << 6U;
+    else
+        state->dma->HIFCR = flags;
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -94,7 +133,7 @@ nx_result_t nx_stm32_adc_stream_blocks(nx_stm32_adc_stream_state_t* state,
 void nx_stm32_adc_stream_sequence(nx_stm32_adc_stream_state_t* state);
 
 /**
- * \brief           Initialize only the selected static ADC1/TIM3/DMA2 route.
+ * \brief           Initialize only the selected static ADC/TIM3/DMA2 route.
  *
  * \param[in,out]   state: Fresh exact registers, channel/sample facts and
  *                  clocks.
@@ -111,7 +150,7 @@ nx_result_t nx_stm32_adc_stream_initialize(nx_stm32_adc_stream_state_t* state);
  *
  * \param[in,out]   state: Exact static instance kept through successful stop.
  *
- * \note            DMA2 stream4 vector only; explicit task stream_service
+ * \note            The selected DMA2 vector only; explicit task stream_service
  *                  resumes the next free block. Trigger gaps are part of this
  *                  mode.
  */

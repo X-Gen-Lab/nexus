@@ -43,6 +43,101 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 self.assertIn("pin:PB10", claims)
                 self.assertIn("pin:PB11", claims)
 
+    def spi3_assembly(self, mode, peer=False):
+        board = json.loads((self.fixtures / "stm32-ve-board/board.json").read_text())
+        board["bindings"].append({"id": "third-spi", "controller": "SPI3",
+                                  "route": "spi3-pc10-pc11-pc12"})
+        package = self.directory / "board"
+        package.mkdir(exist_ok=True)
+        (package / "board.json").write_text(json.dumps(board))
+        text = ('schema = 2\nboard_package = ' + json.dumps(str(package)) +
+                '\nbackend = "baremetal"\nclock = "hse8-pll168"\n'
+                '[memory]\nmain_stack_bytes = 2048\nlibc_heap_bytes = 0\n'
+                'static_ram_limit_bytes = 16384\nflash_load_limit_bytes = 65536\n'
+                '[spi.third]\nbinding = "third-spi"\nmode = ' + json.dumps(mode) +
+                '\nmax_hz = 1000000\n')
+        if mode == "dma":
+            text += '[spi.third.irq]\npriority = 5\ncalls_os = false\n'
+        text += ('[spi_device.sensor]\ncontroller = "third"\nmode = 0\n'
+                 'max_hz = 1000000\ncs_binding = "primary-cs"\n')
+        if peer:
+            text += ('[i2c.peer]\nbinding = "primary-i2c"\n'
+                     'mode = "dma-messages"\nmax_hz = 100000\n'
+                     '[i2c.peer.irq]\npriority = 5\ncalls_os = false\n'
+                     '[i2c_device.peer_sensor]\ncontroller = "peer"\naddress = 80\n')
+        path = self.directory / "spi3.toml"
+        path.write_text(text)
+        return path
+
+    def test_spi3_constructs_standalone_polling_and_dma_instances(self):
+        for mode in ("short-poll", "dma"):
+            with self.subTest(mode=mode):
+                path = self.spi3_assembly(mode)
+                result = gate.resolve_ir(path)
+                self.assertEqual([item.controller for item in result.controllers], ["SPI3"])
+                self.assertEqual(result.controllers[0].integration.clock_hz, 42000000)
+                output = self.directory / mode
+                gate.configure(path, output)
+                source = (output / "bindings.c").read_text()
+                self.assertIn(".registers = SPI3", source)
+                if mode == "dma":
+                    self.assertIn("void DMA1_Stream0_IRQHandler(void)", source)
+                    self.assertIn("void DMA1_Stream5_IRQHandler(void)", source)
+                    self.assertNotIn("void DMA2_Stream0_IRQHandler(void)", source)
+
+    def test_spi3_dma_conflicts_with_i2c1_before_emitting_hardware(self):
+        with self.assertRaisesRegex(ValueError, "DMA1:stream0"):
+            gate.resolve_ir(self.spi3_assembly("dma", peer=True))
+
+    def i2c3_assembly(self, mode, peer=False):
+        board = json.loads((self.fixtures / "stm32-ve-board/board.json").read_text())
+        board["bindings"].append({"id": "third-i2c", "controller": "I2C3",
+                                  "route": "i2c3-pa8-pc9"})
+        package = self.directory / "board"
+        package.mkdir(exist_ok=True)
+        (package / "board.json").write_text(json.dumps(board))
+        text = ('schema = 2\nboard_package = ' + json.dumps(str(package)) +
+                '\nbackend = "baremetal"\nclock = "hse8-pll168"\n'
+                '[memory]\nmain_stack_bytes = 2048\nlibc_heap_bytes = 0\n'
+                'static_ram_limit_bytes = 16384\nflash_load_limit_bytes = 65536\n'
+                '[i2c.third]\nbinding = "third-i2c"\nmode = ' + json.dumps(mode) +
+                '\nmax_hz = 100000\n')
+        if mode != "poll-messages":
+            text += '[i2c.third.irq]\npriority = 5\ncalls_os = false\n'
+        text += '[i2c_device.sensor]\ncontroller = "third"\naddress = 80\n'
+        if peer:
+            text += ('[i2c.peer]\nbinding = "secondary-i2c"\n'
+                     'mode = "dma-messages"\nmax_hz = 100000\n'
+                     '[i2c.peer.irq]\npriority = 5\ncalls_os = false\n'
+                     '[i2c_device.peer_sensor]\ncontroller = "peer"\naddress = 80\n')
+        path = self.directory / "i2c3.toml"
+        path.write_text(text)
+        return path
+
+    def test_i2c3_constructs_two_bank_polling_irq_and_dma_instances(self):
+        for mode in ("poll-messages", "irq-messages", "dma-messages"):
+            with self.subTest(mode=mode):
+                path = self.i2c3_assembly(mode)
+                result = gate.resolve_ir(path)
+                self.assertEqual([item.controller for item in result.controllers], ["I2C3"])
+                claims = {item.key for item in result.claims}
+                self.assertTrue({"pin:PA8", "pin:PC9"} <= claims)
+                output = self.directory / mode
+                gate.configure(path, output)
+                source = (output / "bindings.c").read_text()
+                self.assertIn(".registers = I2C3", source)
+                if mode != "poll-messages":
+                    self.assertIn("void I2C3_EV_IRQHandler(void)", source)
+                    self.assertIn("void I2C3_ER_IRQHandler(void)", source)
+                if mode == "dma-messages":
+                    self.assertIn("NX_STM32_I2C3_DMA(", source)
+                    self.assertIn("void DMA1_Stream2_IRQHandler(void)", source)
+                    self.assertIn("void DMA1_Stream4_IRQHandler(void)", source)
+
+    def test_i2c3_dma_rejects_i2c2_rx_stream_collision(self):
+        with self.assertRaisesRegex(ValueError, "DMA1:stream2"):
+            gate.resolve_ir(self.i2c3_assembly("dma-messages", peer=True))
+
     def test_secondary_facts_keep_independent_sdk_assertions(self):
         for directory, part, controller in (('soc/stm32/stm32f4', 'STM32F407ZGT6', 'USART2'),):
             facts = load_soc_facts(gate.ROOT / directory / "soc.json")

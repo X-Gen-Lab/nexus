@@ -36,13 +36,19 @@ CONTROLLER_BINDINGS = (
     ControllerBinding("USART6", "uart", 2, (("USART6", 71),), ()),
     spi_binding("SPI1", 2, "dma", (2, 3, 3), (2, 0, 3)),
     spi_binding("SPI2", 1, "dma", (1, 4, 0), (1, 3, 0)),
+    spi_binding("SPI3", 1, "dma", (1, 5, 0), (1, 0, 0)),
     i2c_binding("I2C1", 31, (1, 0, 1), (1, 6, 1)),
     i2c_binding("I2C2", 33, (1, 2, 7), (1, 7, 7)),
+    i2c_binding("I2C3", 72, (1, 2, 3), (1, 4, 3)),
     ControllerBinding("ADC1", "adc", 2, (), (
         ("trigger-dma", ((2, 4, 0),)),
         ("trigger-dma-continuous", ((2, 4, 0),)))),
-    ControllerBinding("ADC2", "adc", 2, (), ()),
-    ControllerBinding("ADC3", "adc", 2, (), ()),
+    ControllerBinding("ADC2", "adc", 2, (), (
+        ("trigger-dma", ((2, 2, 1),)),
+        ("trigger-dma-continuous", ((2, 2, 1),)))),
+    ControllerBinding("ADC3", "adc", 2, (), (
+        ("trigger-dma", ((2, 1, 2),)),
+        ("trigger-dma-continuous", ((2, 1, 2),)))),
 )
 DMA_IRQS = ((1, (11, 12, 13, 14, 15, 16, 17, 47)),
             (2, (56, 57, 58, 59, 60, 68, 69, 70)))
@@ -74,6 +80,14 @@ SECONDARY_FACTS = MappingProxyType({
     "SPI2": MappingProxyType({
         "kind": "spi", "modes": ("dma",),
         "pins": ("PB13", "PB14", "PB15"), "irq": (),
+        "clock_hz": 42000000}),
+    "SPI3": MappingProxyType({
+        "kind": "spi", "modes": ("short-poll", "dma"),
+        "pins": ("PC10", "PC11", "PC12", "PB3", "PB4", "PB5"),
+        "irq": (), "clock_hz": 42000000}),
+    "I2C3": MappingProxyType({
+        "kind": "i2c", "modes": ("poll-messages", "irq-messages", "dma-messages"),
+        "pins": ("PA8", "PC9"), "irq": ("I2C3_EV", "I2C3_ER"),
         "clock_hz": 42000000}),
     "I2C2": MappingProxyType({
         "kind": "i2c", "modes": ("irq-messages", "dma-messages"),

@@ -3,7 +3,7 @@
   "id": "stm32-ve-multi-controller-software-contract",
   "soc": "STM32F407VET6",
   "soc_family": "stm32f4",
-  "source_revision": "software-only-reviewed-secondary-pad-contract",
+  "source_revision": "software-only-reviewed-controller-pad-contract",
   "physical_pcb_revision": null,
   "clocks": {
     "hse_hz": 8000000
@@ -50,6 +50,26 @@
       "controller": "GPIOE",
       "route": "gpio-pe4",
       "initial": 16
+    },
+    {
+      "id": "spi3",
+      "controller": "SPI3",
+      "route": "spi3-pc10-pc11-pc12"
+    },
+    {
+      "id": "i2c3",
+      "controller": "I2C3",
+      "route": "i2c3-pa8-pc9"
+    },
+    {
+      "id": "adc2",
+      "controller": "ADC2",
+      "route": "adc2-ch8-pb0"
+    },
+    {
+      "id": "adc3",
+      "controller": "ADC3",
+      "route": "adc3-ch10-pc0"
     }
   ],
   "reserved_resources": [],
@@ -60,7 +80,7 @@
   "provenance": [
     {
       "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
-      "scope": "Reviewed silicon AF pads only; DMA exact tuples follow GD32F4xx User Manual Table 10-2/10-3 or STM32 RM0090 Table 43, and frozen SDK provider validation. Not a PCB or external-device wiring claim."
+      "scope": "Reviewed F407 silicon AF/analog pads only; exact DMA tuples follow RM0090 Rev22 Tables43/44 and the locked SDK. No PCB or external-device wiring claim."
     }
   ]
 }

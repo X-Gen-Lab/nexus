@@ -2631,9 +2631,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-scan-pa0-pa1",
@@ -2656,9 +2669,22 @@
         }
       ],
       "modes": [
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch1-pa1",
@@ -2677,9 +2703,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch2-pa2",
@@ -2698,9 +2737,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch3-pa3",
@@ -2719,9 +2771,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch4-pa4",
@@ -2740,9 +2805,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch5-pa5",
@@ -2761,9 +2839,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch6-pa6",
@@ -2782,9 +2873,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch7-pa7",
@@ -2803,9 +2907,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch8-pb0",
@@ -2824,9 +2941,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch9-pb1",
@@ -2845,9 +2975,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch10-pc0",
@@ -2866,9 +3009,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch11-pc1",
@@ -2887,9 +3043,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch12-pc2",
@@ -2908,9 +3077,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch13-pc3",
@@ -2929,9 +3111,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch14-pc4",
@@ -2950,9 +3145,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-ch15-pc5",
@@ -2971,9 +3179,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc2-scan-external16",
@@ -3066,9 +3287,22 @@
         }
       ],
       "modes": [
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream2:channel1"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch0-pa0",
@@ -3087,9 +3321,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch1-pa1",
@@ -3108,9 +3355,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch2-pa2",
@@ -3129,9 +3389,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch3-pa3",
@@ -3150,9 +3423,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch4-pf6",
@@ -3170,9 +3456,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch5-pf7",
@@ -3190,9 +3489,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch6-pf8",
@@ -3210,9 +3522,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch7-pf9",
@@ -3230,9 +3555,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch8-pf10",
@@ -3250,9 +3588,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch9-pf3",
@@ -3270,9 +3621,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch10-pc0",
@@ -3291,9 +3655,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch11-pc1",
@@ -3312,9 +3689,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch12-pc2",
@@ -3333,9 +3723,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch13-pc3",
@@ -3354,9 +3757,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch14-pf4",
@@ -3374,9 +3790,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-ch15-pf5",
@@ -3394,9 +3823,22 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-scan-external8",
@@ -3448,9 +3890,22 @@
         }
       ],
       "modes": [
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "adc3-scan-external16",
@@ -3542,9 +3997,125 @@
         }
       ],
       "modes": [
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
-      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim"
+      "source": "DS8626 Rev12 Table7, ADC12/ADC3 input mapping and LQFP100/LQFP144 pinouts; RM0090 Rev22 sections13.3.2 and13.13.16, independent ADC and shared prescaler; silicon pads only, no PCB wiring or HIL claim; RM0090 Rev22 Table44 and section13.3.22, exact independent ADC DMA and exclusive TIM3 TRGO",
+      "dma": [
+        "DMA2:stream1:channel2"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "spi3-pc10-pc11-pc12",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "SPI3",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PC10",
+          "function": "sck",
+          "af": 6
+        },
+        {
+          "pin": "PC11",
+          "function": "miso",
+          "af": 6
+        },
+        {
+          "pin": "PC12",
+          "function": "mosi",
+          "af": 6
+        }
+      ],
+      "modes": [
+        "short-poll",
+        "dma"
+      ],
+      "source": "DS8626 Rev12 Table9 AF6 and LQFP100/LQFP144 pinouts; RM0090 Rev22 DMA request Table43, SPI3_RX DMA1 Stream0 channel0, SPI3_TX DMA1 Stream5 channel0; silicon route only",
+      "dma": [
+        "DMA1:stream5:channel0",
+        "DMA1:stream0:channel0"
+      ]
+    },
+    {
+      "id": "spi3-pb3-pb4-pb5",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "SPI3",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PB3",
+          "function": "sck",
+          "af": 6
+        },
+        {
+          "pin": "PB4",
+          "function": "miso",
+          "af": 6
+        },
+        {
+          "pin": "PB5",
+          "function": "mosi",
+          "af": 6
+        }
+      ],
+      "modes": [
+        "short-poll",
+        "dma"
+      ],
+      "source": "DS8626 Rev12 Table9 AF6 and LQFP100/LQFP144 pinouts; RM0090 Rev22 DMA request Table43, SPI3_RX DMA1 Stream0 channel0, SPI3_TX DMA1 Stream5 channel0; silicon route only",
+      "dma": [
+        "DMA1:stream5:channel0",
+        "DMA1:stream0:channel0"
+      ]
+    },
+    {
+      "id": "i2c3-pa8-pc9",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "I2C3",
+      "kind": "i2c",
+      "pins": [
+        {
+          "pin": "PA8",
+          "function": "scl",
+          "af": 4
+        },
+        {
+          "pin": "PC9",
+          "function": "sda",
+          "af": 4
+        }
+      ],
+      "modes": [
+        "poll-messages",
+        "irq-messages",
+        "dma-messages"
+      ],
+      "source": "DS8626 Rev12 Table9 AF4 and LQFP100/LQFP144 pinouts; RM0090 Rev22 Table43, I2C3_RX DMA1 Stream2 channel3, I2C3_TX DMA1 Stream4 channel3; silicon route only",
+      "mode_dma": {
+        "dma-messages": [
+          "DMA1:stream2:channel3",
+          "DMA1:stream4:channel3"
+        ]
+      }
     }
   ]
 }

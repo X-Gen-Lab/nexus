@@ -37,13 +37,15 @@
 /** \brief Selected register identity determines the immutable reviewed route.
  */
 static bool primary(const nx_stm32_spi_dma_state_t* state) {
-    return state->spi.registers != SPI2;
+    return state->spi.registers != SPI2 && state->spi.registers != SPI3;
 }
 /** \brief Each selected engine's vector is independent of DMA request
  * selectors. */
 static IRQn_Type dma_irq(const nx_stm32_spi_dma_state_t* state, bool receive) {
     if (primary(state))
         return receive ? DMA2_Stream0_IRQn : DMA2_Stream3_IRQn;
+    if (state->spi.registers == SPI3)
+        return receive ? DMA1_Stream0_IRQn : DMA1_Stream5_IRQn;
     return receive ? DMA1_Stream3_IRQn : DMA1_Stream4_IRQn;
 }
 /** \brief The second pair straddles low and high status banks. */
@@ -51,6 +53,8 @@ static uint32_t flag_shift(const nx_stm32_spi_dma_state_t* state,
                            bool receive) {
     if (primary(state))
         return receive ? 0U : 22U;
+    if (state->spi.registers == SPI3)
+        return receive ? 0U : 6U;
     return receive ? 22U : 0U;
 }
 /** \brief Observe only the exact engine's retained terminal group. */
@@ -92,6 +96,17 @@ static void detach(nx_stm32_spi_dma_state_t* state, bool receive) {
     acknowledge_bits(state, receive, flags(state, receive) & 0x30U);
 }
 
+/** \brief RM0090 fixed full-duplex routes, without per-instance metadata. */
+static bool route_valid(SPI_TypeDef* registers, DMA_TypeDef* dma,
+                        DMA_Stream_TypeDef* tx, DMA_Stream_TypeDef* rx) {
+    if (registers == SPI1)
+        return dma == DMA2 && tx == DMA2_Stream3 && rx == DMA2_Stream0;
+    if (registers == SPI2)
+        return dma == DMA1 && tx == DMA1_Stream4 && rx == DMA1_Stream3;
+    return registers == SPI3 && dma == DMA1 && tx == DMA1_Stream5 &&
+           rx == DMA1_Stream0;
+}
+
 /** \brief Refuse alternate controller routes before acquiring any request. */
 nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state) {
     if (state == NULL || state->spi.registers == NULL ||
@@ -106,11 +121,9 @@ nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state) {
     }
 #ifndef NEXUS_STM32_MODEL
     bool first = state->spi.registers == SPI1;
-    if ((!first && state->spi.registers != SPI2) || state->spi.rcc != RCC ||
-        state->spi.clock_hz != (first ? 84000000U : 42000000U) ||
-        state->dma != (first ? DMA2 : DMA1) ||
-        state->tx != (first ? DMA2_Stream3 : DMA1_Stream4) ||
-        state->rx != (first ? DMA2_Stream0 : DMA1_Stream3)) {
+    if (!route_valid(state->spi.registers, state->dma, state->tx, state->rx) ||
+        state->spi.rcc != RCC ||
+        state->spi.clock_hz != (first ? 84000000U : 42000000U)) {
         return NX_ERROR_UNSUPPORTED;
     }
 #endif
@@ -123,8 +136,12 @@ nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state) {
     /* An idle peripheral still has an owner while its vectors are retained. */
     unsigned rx_vector = (unsigned)dma_irq(state, true);
     unsigned tx_vector = (unsigned)dma_irq(state, false);
-    if ((NVIC->ISER[rx_vector / 32U] & (1UL << (rx_vector % 32U))) != 0U ||
-        (NVIC->ISER[tx_vector / 32U] & (1UL << (tx_vector % 32U))) != 0U) {
+    if (((NVIC->ISER[rx_vector / 32U] | NVIC->ISPR[rx_vector / 32U] |
+          NVIC->IABR[rx_vector / 32U]) &
+         (1UL << (rx_vector % 32U))) != 0U ||
+        ((NVIC->ISER[tx_vector / 32U] | NVIC->ISPR[tx_vector / 32U] |
+          NVIC->IABR[tx_vector / 32U]) &
+         (1UL << (tx_vector % 32U))) != 0U) {
         return NX_ERROR_BUSY;
     }
 #endif
@@ -568,11 +585,8 @@ nx_result_t nx_stm32_spi_dma_prepare(nx_stm32_spi_dma_state_t* state,
     if (config == NULL || config->regions == NULL ||
         config->region_count == 0U || config->priority > 15U)
         return NX_ERROR_INVALID;
-    bool first = config->spi.registers == SPI1;
-    if ((!first && config->spi.registers != SPI2) ||
-        config->dma != (first ? DMA2 : DMA1) ||
-        config->tx != (first ? DMA2_Stream3 : DMA1_Stream4) ||
-        config->rx != (first ? DMA2_Stream0 : DMA1_Stream3))
+    if (!route_valid(config->spi.registers, config->dma, config->tx,
+                     config->rx))
         return NX_ERROR_UNSUPPORTED;
     nx_result_t result =
         nx_stm32_spi_cold_acquire(&state->spi, &config->spi, receipt);
@@ -618,10 +632,8 @@ static bool pair_config(const nx_stm32_spi_dma_config_t* config) {
         config->spi.pin_count > 16U || config->regions == NULL ||
         config->region_count == 0U || config->priority > 15U)
         return false;
-    bool first = config->spi.registers == SPI1;
-    return config->dma == (first ? DMA2 : DMA1) &&
-           config->tx == (first ? DMA2_Stream3 : DMA1_Stream4) &&
-           config->rx == (first ? DMA2_Stream0 : DMA1_Stream3);
+    return route_valid(config->spi.registers, config->dma, config->tx,
+                       config->rx);
 }
 
 nx_result_t
@@ -637,8 +649,13 @@ nx_stm32_spi_dma_pair_prepare(nx_stm32_spi_dma_state_t* state,
         state->active != NULL || state->spi.active || state->wake != NULL)
         return NX_ERROR_BUSY;
     const bool first = config->spi.registers == SPI1;
-    const unsigned vectors[2] = {first ? DMA2_Stream3_IRQn : DMA1_Stream4_IRQn,
-                                 first ? DMA2_Stream0_IRQn : DMA1_Stream3_IRQn};
+    const bool third = config->spi.registers == SPI3;
+    const unsigned vectors[2] = {first   ? DMA2_Stream3_IRQn
+                                 : third ? DMA1_Stream5_IRQn
+                                         : DMA1_Stream4_IRQn,
+                                 first   ? DMA2_Stream0_IRQn
+                                 : third ? DMA1_Stream0_IRQn
+                                         : DMA1_Stream3_IRQn};
     for (unsigned i = 0U; i < 2U; ++i) {
         const unsigned irq = vectors[i];
         const uint32_t mask = 1UL << (irq % 32U);
@@ -652,7 +669,9 @@ nx_stm32_spi_dma_pair_prepare(nx_stm32_spi_dma_state_t* state,
     if (config->kernel_bound && NVIC_GetPriorityGrouping() > 3U)
         return NX_ERROR_PERMISSION;
     volatile uint32_t* gate = first ? &RCC->APB2ENR : &RCC->APB1ENR;
-    const uint32_t mask = first ? RCC_APB2ENR_SPI1EN : RCC_APB1ENR_SPI2EN;
+    const uint32_t mask = first   ? RCC_APB2ENR_SPI1EN
+                          : third ? RCC_APB1ENR_SPI3EN
+                                  : RCC_APB1ENR_SPI2EN;
     cold->clock_added = ~*gate & mask;
     NX_PLATFORM_REGISTER_WRITE(*gate, *gate | mask);
     nx_arch_dsb();
@@ -734,8 +753,13 @@ nx_result_t nx_stm32_spi_dma_pair_close(nx_stm32_spi_dma_state_t* state,
         cold->constructed = false;
     }
     const bool first = config->spi.registers == SPI1;
-    const unsigned vectors[2] = {first ? DMA2_Stream3_IRQn : DMA1_Stream4_IRQn,
-                                 first ? DMA2_Stream0_IRQn : DMA1_Stream3_IRQn};
+    const bool third = config->spi.registers == SPI3;
+    const unsigned vectors[2] = {first   ? DMA2_Stream3_IRQn
+                                 : third ? DMA1_Stream5_IRQn
+                                         : DMA1_Stream4_IRQn,
+                                 first   ? DMA2_Stream0_IRQn
+                                 : third ? DMA1_Stream0_IRQn
+                                         : DMA1_Stream3_IRQn};
     if (cold->vectors) {
         for (unsigned i = 0U; i < 2U; ++i) {
             const unsigned irq = vectors[i];

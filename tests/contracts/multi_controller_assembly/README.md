@@ -1,7 +1,7 @@
 # 多控制器软件装配
 
-软件 Board 明确选择 F407ZGT6、F407VET6、GD470ZGT6 硅片 pad，PCB、外部线、pull、
-电压与物理资格未知。每料号六份手写 TOML，runner 不改 backend 或临时编装配：
+软件 Board 明确选择 F407ZGT6、F407VET6 硅片 pad，PCB、外部线、pull、
+电压与物理资格未知。以下手写 TOML 保留各自模式和后端，不运行时改写装配：
 
 | 后缀 | 控制器图 | 后端 |
 | --- | --- | --- |
@@ -11,10 +11,20 @@
 | `-i2c-pair-freertos.toml` | 同一 I2C DMA pair | FreeRTOS |
 | `-i2c-pair-irq.toml` | 两 I2C 有限 message IRQ | baremetal |
 | `-i2c-pair-irq-freertos.toml` | 同一 I2C IRQ pair | FreeRTOS |
+| `stm32-ve-tertiary.toml` | SPI3 DMA、I2C3 DMA、ADC2 有限 DMA | baremetal |
+| `stm32-ve-tertiary-freertos.toml` | SPI3 DMA、I2C3 IRQ、ADC2 连续 DMA | FreeRTOS |
+| `stm32-zg-tertiary.toml` | SPI3 polling、I2C3 polling、ADC3 连续 DMA | baremetal |
+| `stm32-zg-tertiary-freertos.toml` | SPI3 DMA、I2C3 DMA、ADC3 有限 DMA | FreeRTOS |
 
-secondary UART TX 与 primary I2C TX 共用 STM DMA1／GD DMA0 的物理 stream6，
+secondary UART TX 与 primary I2C TX 共用 DMA1 的物理 stream6，
 即使 selector 不同也冲突，resolver 拒绝同时选择；五路图改选 secondary I2C。
 不同 bus 的同地址 endpoint 保持独立身份／context。
+
+SPI3 在 VE 使用 PC10／11／12，在 ZG 使用 PB3／4／5，均为 AF6；I2C3 使用
+PA8／PC9 AF4。SPI3 占 DMA1 stream5 TX／stream0 RX，I2C3 占 DMA1 stream4 TX／
+stream2 RX。ADC2 独占 DMA2 stream2 channel1，ADC3 独占 stream1 channel2；它们的
+TIM3 触发源不能与其他 ADC stream 或 PWM owner 共享。ZG 的 ADC3 参考输入是
+PF6，VE 是 PC0；这些选择不授权任何真实 PCB 接线。
 
 CMake 读 `NEXUS_SOURCE_ROOT` 和一份 `NEXUS_ASSEMBLY_FILE`，调用生产
 `nexus_add_firmware`。main 通过 typed factory 保留全部 controller／endpoint，

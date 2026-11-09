@@ -34,7 +34,7 @@ def _spi_constructor(item, result, board_bindings, routes, devices, *, paired=Fa
     selected = item.integration
     if selected is None or selected.clock_hz is None:
         raise ValueError("SPI requires its resolved controller integration")
-    if item.controller not in {"SPI1", "SPI2"} or len(item.pins) != 3:
+    if item.controller not in {"SPI1", "SPI2", "SPI3"} or len(item.pins) != 3:
         raise ValueError("SPI requires its reviewed three-pad controller route")
     name = _symbol(item.id)
     dma = item.mode == "dma"

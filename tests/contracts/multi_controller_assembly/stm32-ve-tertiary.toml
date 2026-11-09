@@ -1,0 +1,47 @@
+schema = 2
+board_package = "stm32-ve-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[spi.third_spi]
+binding = "spi3"
+mode = "dma"
+max_hz = 1000000
+[spi.third_spi.irq]
+priority = 5
+calls_os = false
+
+[spi_device.sensor_spi]
+controller = "third_spi"
+mode = 0
+max_hz = 1000000
+cs_binding = "primary-cs"
+
+[i2c.third_i2c]
+binding = "i2c3"
+mode = "dma-messages"
+max_hz = 100000
+[i2c.third_i2c.irq]
+priority = 5
+calls_os = false
+
+[i2c_device.sensor_i2c]
+controller = "third_i2c"
+address = 80
+
+[adc.analog]
+binding = "adc2"
+mode = "trigger-dma"
+channels = [8]
+sample_times = [7]
+reference_mv = 3300
+[adc.analog.irq]
+priority = 5
+calls_os = false

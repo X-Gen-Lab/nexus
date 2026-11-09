@@ -26,7 +26,7 @@ nx_result_t nx_stm32_i2c_async_prepare(nx_i2c_v1_state_t* port,
     if (result != NX_SUCCESS)
         return result;
     port->registers = (volatile uint32_t*)config->registers;
-    port->line_inputs = &GPIOB->IDR;
+    port->line_inputs = config->registers == I2C3 ? &GPIOA->IDR : &GPIOB->IDR;
     port->line_mask = (1U << config->pins[0].pin) | (1U << config->pins[1].pin);
     port->peripheral_mhz = (uint8_t)(config->clock_hz / 1000000U);
     port->dma = config->dma;
@@ -137,18 +137,24 @@ static bool first_controller(const nx_i2c_v1_state_t* state) {
 }
 /** \brief No shared vector registry or per-byte interrupt indirection. */
 static IRQn_Type event_irq(const nx_i2c_v1_state_t* state) {
-    return first_controller(state) ? I2C1_EV_IRQn : I2C2_EV_IRQn;
+    return first_controller(state)                        ? I2C1_EV_IRQn
+           : state->registers == (volatile uint32_t*)I2C2 ? I2C2_EV_IRQn
+                                                          : I2C3_EV_IRQn;
 }
 /** \brief Error source belongs to the same retained controller identity. */
 static IRQn_Type error_irq(const nx_i2c_v1_state_t* state) {
-    return first_controller(state) ? I2C1_ER_IRQn : I2C2_ER_IRQn;
+    return first_controller(state)                        ? I2C1_ER_IRQn
+           : state->registers == (volatile uint32_t*)I2C2 ? I2C2_ER_IRQn
+                                                          : I2C3_ER_IRQn;
 }
 /** \brief DMA stream ownership and request selectors remain distinct facts. */
 static IRQn_Type dma_irq(const nx_i2c_v1_state_t* state, bool receive) {
     if (first_controller(state)) {
         return receive ? DMA1_Stream0_IRQn : DMA1_Stream6_IRQn;
     }
-    return receive ? DMA1_Stream2_IRQn : DMA1_Stream7_IRQn;
+    return receive                                        ? DMA1_Stream2_IRQn
+           : state->registers == (volatile uint32_t*)I2C2 ? DMA1_Stream7_IRQn
+                                                          : DMA1_Stream4_IRQn;
 }
 
 /** \brief Clear only pending publishers owned by this selected controller. */
@@ -242,15 +248,20 @@ nx_result_t nx_stm32_i2c_async_initialize(nx_i2c_v1_state_t* state,
         return NX_ERROR_INVALID;
     }
     if ((state->registers != (volatile uint32_t*)I2C1 &&
-         state->registers != (volatile uint32_t*)I2C2) ||
+         state->registers != (volatile uint32_t*)I2C2 &&
+         state->registers != (volatile uint32_t*)I2C3) ||
         state->peripheral_mhz != 42U) {
         return NX_ERROR_UNSUPPORTED;
     }
-    bool known_lines = state->line_inputs == &GPIOB->IDR &&
-                       (first_controller(state)
-                            ? (state->line_mask == ((1U << 6U) | (1U << 7U)) ||
-                               state->line_mask == ((1U << 8U) | (1U << 9U)))
-                            : state->line_mask == ((1U << 10U) | (1U << 11U)));
+    bool third = state->registers == (volatile uint32_t*)I2C3;
+    bool known_lines =
+        third ? state->line_inputs == &GPIOA->IDR &&
+                    state->line_mask == ((1U << 8U) | (1U << 9U))
+              : state->line_inputs == &GPIOB->IDR &&
+                    (first_controller(state)
+                         ? (state->line_mask == ((1U << 6U) | (1U << 7U)) ||
+                            state->line_mask == ((1U << 8U) | (1U << 9U)))
+                         : state->line_mask == ((1U << 10U) | (1U << 11U)));
     if (!known_lines) {
         return NX_ERROR_UNSUPPORTED;
     }
@@ -258,7 +269,8 @@ nx_result_t nx_stm32_i2c_async_initialize(nx_i2c_v1_state_t* state,
         const nx_i2c_v1_dma_t expected =
             first_controller(state)
                 ? (nx_i2c_v1_dma_t)NX_STM32_I2C1_DMA(NULL, 0U)
-                : (nx_i2c_v1_dma_t)NX_STM32_I2C2_DMA(NULL, 0U);
+            : third ? (nx_i2c_v1_dma_t)NX_STM32_I2C3_DMA(NULL, 0U)
+                    : (nx_i2c_v1_dma_t)NX_STM32_I2C2_DMA(NULL, 0U);
         if (!same_engine(&state->dma->tx, &expected.tx) ||
             !same_engine(&state->dma->rx, &expected.rx)) {
             return NX_ERROR_UNSUPPORTED;

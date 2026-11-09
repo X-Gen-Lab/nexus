@@ -1,6 +1,6 @@
 /**
  * \file            adc_continuous.c
- * \brief           ADC1 continuous double-buffer DMA with proved target loans
+ * \brief           Continuous ADC double-buffer DMA with proved target loans
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-11
@@ -14,7 +14,8 @@
 #define NX_STM32_DMA_DISABLE(stream, mask) ((stream)->CR &= ~(uint32_t)(mask))
 #endif
 #ifndef NX_STM32_ADC_CONTINUOUS_ACK
-#define NX_STM32_ADC_CONTINUOUS_ACK(dma, flags) ((dma)->HIFCR = (flags))
+#define NX_STM32_ADC_CONTINUOUS_ACK(base, flags)                               \
+    nx_stm32_adc_dma_ack((base), (flags))
 #endif
 #ifndef NX_STM32_ADC_CONTINUOUS_TARGET
 #define NX_STM32_ADC_CONTINUOUS_TARGET(memory, bank, address)                  \
@@ -27,11 +28,11 @@
     } while (0)
 #endif
 
-/** \brief Clear exactly stream4 facts, never another DMA owner. */
+/** \brief Clear exactly the selected lane, never another DMA owner. */
 static void acknowledge(nx_stm32_adc_stream_state_t* base, uint32_t flags) {
-    NX_STM32_ADC_CONTINUOUS_ACK(base->dma, flags);
+    NX_STM32_ADC_CONTINUOUS_ACK(base, flags);
 #ifndef NEXUS_STM32_MODEL
-    NVIC_ClearPendingIRQ(DMA2_Stream4_IRQn);
+    NVIC_ClearPendingIRQ(nx_stm32_adc_dma_irq(base->adc.registers));
 #endif
 }
 
@@ -131,9 +132,10 @@ static nx_result_t arm(nx_stm32_adc_continuous_state_t* state) {
     base->memory->NDTR =
         (uint32_t)(state->targets[0].capacity / sizeof(uint16_t));
     base->memory->FCR = DMA_SxFCR_FEIE;
-    base->memory->CR = DMA_SxCR_DBM | DMA_SxCR_CIRC | DMA_SxCR_MINC |
-                       DMA_SxCR_PSIZE_0 | DMA_SxCR_MSIZE_0 | DMA_SxCR_PL_1 |
-                       DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
+    base->memory->CR = nx_stm32_adc_dma_channel(adc) | DMA_SxCR_DBM |
+                       DMA_SxCR_CIRC | DMA_SxCR_MINC | DMA_SxCR_PSIZE_0 |
+                       DMA_SxCR_MSIZE_0 | DMA_SxCR_PL_1 | DMA_SxCR_TCIE |
+                       DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
     nx_arch_dsb();
     base->memory->CR |= DMA_SxCR_EN;
     adc->CR2 = ADC_CR2_ADON | ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTSEL_3;
@@ -237,7 +239,7 @@ void nx_stm32_adc_continuous_irq(nx_stm32_adc_continuous_state_t* state) {
         return;
     }
     nx_stm32_adc_stream_state_t* base = &state->base;
-    uint32_t flags = base->dma->HISR & 0x3DU;
+    uint32_t flags = nx_stm32_adc_dma_flags(base);
     if ((flags & 0x2DU) == 0U) {
         return;
     }
@@ -272,7 +274,7 @@ void nx_stm32_adc_continuous_irq(nx_stm32_adc_continuous_state_t* state) {
                 base->memory->M1AR != old &&
                 ((base->memory->CR & DMA_SxCR_CT) != 0U ? 1U : 0U) == active &&
                 (base->memory->CR & DMA_SxCR_EN) != 0U &&
-                (base->dma->HISR & 0x2DU) == 0U &&
+                (nx_stm32_adc_dma_flags(base) & 0x2DU) == 0U &&
                 (base->adc.registers->SR & ADC_SR_OVR) == 0U;
             if (detached) {
                 result = state->observer == NULL

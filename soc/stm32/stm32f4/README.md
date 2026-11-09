@@ -72,13 +72,13 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | --- | --- |
 | GPIO | 单 port 的 16-bit 授权 mask；原子 BSRR set/reset；串行 toggle；先初值后 mode |
 | UART | USART1 IRQ bytes/events、IRQ RX blocks、有限 TX DMA、RX DMA/IDLE、有限／连续 duplex 和连续 RX blocks；USART2 有限 TX DMA 与 IRQ bytes/events；USART3/UART4/UART5/USART6 已审 IRQ bytes/events；真实 TC、显式 loss、drain、quarantine |
-| SPI | SPI1 短 polling／有限全双工 DMA，SPI2 有限 DMA；MSB-first master、mode0–3；普通 byte face 为 8 位，增强事务支持 8／16 位 word；polling 最多 256 words，DMA 每段最多 65535 words |
-| I2C | I2C1 polling/IRQ/DMA、I2C2 IRQ/DMA；42 MHz／100 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
+| SPI | SPI1／SPI3 短 polling／有限全双工 DMA，SPI2 有限 DMA；MSB-first master、mode0–3；普通 byte face 为 8 位，增强 polling 事务支持 8／16 位 word，增强 DMA 事务限 SPI1；polling 最多 256 words，DMA 每段最多 65535 words |
+| I2C | I2C1／I2C3 polling/IRQ/DMA、I2C2 IRQ/DMA；42 MHz／100 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
 | Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
 | PWM | TIM3 通道、固定共享 PSC/ARR、period1–65535、duty0–period、shadow update；stop 建立 GPIO inactive |
-| ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；独立 6／8／10／12-bit 软件 shot/scan、最多 16 ranks；ADC1 另有 TIM3 触发有限／连续 DMA block |
+| ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；独立 6／8／10／12-bit 软件 shot/scan、最多 16 ranks；各转换器均有独占 TIM3 触发有限／连续 DMA block |
 | DAC | PA4／PA5 单／双通道，CPU direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA；u8／u12-right／u12-left |
 | CRC | 多项式 0x04C11DB7、初值 0xffffffff、32 位字输入；同步计算、独占 controller、失败输出保持 |
 | CAN | CAN1/CAN2 Classic CAN IRQ、三邮箱、共享 filter domain；无 CAN FD |
@@ -170,8 +170,11 @@ gate、临时观察 gate、TIM3 和 DMA IRQ 分开记录责任，复用现有状
 
 `tests/contracts/adc_external_assembly/` 提供两种密度的软件参考装配，使用三个
 GPIO bank 的 16-rank 反向序列，以及 VE／ZG 的三转换器独立实例装配；不代表实际
-板卡接线。内部输入、注入组和同步多 ADC 模式继续未实现。ADC2／3 的 DMA 模式在
-配置和 C 冷入口均拒绝，不从芯片硬件能力推导当前软件支持。
+板卡接线。内部输入、注入组和同步多 ADC 模式继续未实现。ADC1／2／3 分别使用
+DMA2 stream4 channel0／stream2 channel1／stream1 channel2，复用有限和连续 C
+实现与只读 ops，不增加每实例 route 字段。TIM3 仍是独占触发源，不允许独立 stream
+实例暗中共享。VE／ZG 的 DMA 组合参考见
+`tests/contracts/multi_controller_assembly/*tertiary*.toml`。
 
 有限 ADC `trigger-dma` 在发布完整块前停 trigger／conversion／DMA，稳定后由显式
 service rearm，块间可有间隙。消费者借用不能被覆盖，未释放时 stop 保持 BUSY；
@@ -183,6 +186,15 @@ lock、通用设备引用或预留 copy pool。UART IRQ 搬运字节和事实，
 传输 deadline，并在 cancel／stop 期间持续运行。晚到 TC 可以结清隔离传输，但在此
 之前 request 保持借用。SETTLED 后无 IRQ／provider 引用，adapter／observer 还需
 独立排空。
+
+SPI3 的 AF6 pad 是 PC10／11／12 或 PB3／4／5，APB1 为 42 MHz；固定 DMA1
+TX stream5 channel0、RX stream0 channel0。初始化先检查选中 vector 的 enable、
+pending 和 active，再取得 publisher；恢复只脉冲 SPI3 的 APB1 reset 位。
+
+I2C3 固定 PA8 SCL／PC9 SDA AF4、APB1 42 MHz，DMA1 RX stream2／TX stream4
+channel3，EV／ER IRQ 为 72／73。C 冷态 owner 从 controller 身份取得两个 GPIO
+bank，逆序恢复每个引脚，再恢复原有三个 gate 位；6 字节 receipt 与热路径状态均
+不增长。失败保留原 gate／snapshot 和撤回责任，后续 close 可重试。
 
 I2C recover 同时检查 BUSY 与已保留 SCL/SDA GPIO 实时输入；即使 BUSY 清除，只要
 线路低就返回 IO。局部 reset 不打 GPIO 恢复脉冲、不重放事务、不保证未来总线可用；

@@ -109,6 +109,14 @@ class I2CMultiple : public testing::Test {
         ASSERT_EQ(INITIALIZE(&states[0], 5U), NX_SUCCESS);
         ASSERT_EQ(INITIALIZE(&states[1], 6U), NX_SUCCESS);
     }
+    void Third() {
+        states[1].registers = (volatile uint32_t*)I2C3;
+        states[1].line_inputs = &GPIOA->IDR;
+        states[1].line_mask = (1U << 8U) | (1U << 9U);
+        GPIOA->IDR = 1U << 8U;
+        GPIOC->IDR = 1U << 9U;
+        dma[1] = nx_i2c_v1_dma_t NX_STM32_I2C3_DMA(regions, 1U);
+    }
     void Submit(unsigned i) {
         ASSERT_EQ(nx_i2c_request_prepare(&requests[i], &messages[i], 1U, 1000U),
                   NX_SUCCESS);
@@ -323,6 +331,49 @@ TEST_F(I2CMultiple, FiniteDmaCompletionPreservesPeerFlagsEngineAndBorrow) {
     EXPECT_EQ(states[0].active, nullptr);
     EXPECT_EQ(states[1].active, &requests[1]);
     EXPECT_EQ(requests[0].base.result, NX_SUCCESS);
+}
+
+TEST_F(I2CMultiple, ThirdTxAndRxPreserveNeighboursAndWaitForWireCompletion) {
+    Third();
+    ASSERT_NO_FATAL_FAILURE(Both());
+    for (bool receive : {false, true}) {
+        SCOPED_TRACE(receive);
+        I2C3->SR2 = 0U;
+        messages[1].read = receive;
+        nx_request_initialize(&requests[1].base);
+        ASSERT_EQ(NX_SUCCESS, nx_i2c_request_prepare(&requests[1], &messages[1],
+                                                     1U, 1000U));
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_i2c_endpoint_submit(&devices[1], &requests[1]));
+        I2C3->SR2 = I2C_SR2_MSL | I2C_SR2_BUSY;
+        I2C3->SR1 = I2C_SR1_SB;
+        nx_i2c_v1_irq(&states[1]);
+        I2C3->SR1 = I2C_SR1_ADDR;
+        nx_i2c_v1_irq(&states[1]);
+        const auto& engine = receive ? dma[1].rx : dma[1].tx;
+        EXPECT_NE(0U, *engine.control & DMA_SxCR_EN);
+        EXPECT_EQ(3U, *engine.count);
+        EXPECT_EQ(3U, (*engine.control & DMA_SxCR_CHSEL) >> 25U);
+        const uint32_t neighbour = 0x20U << (receive ? 0U : 16U);
+        auto* flags = const_cast<volatile uint32_t*>(engine.flags);
+        *flags = neighbour | (0x20U << engine.flag_shift);
+        *engine.count = 0U;
+        nx_i2c_v1_dma_irq(&states[1], receive);
+        EXPECT_EQ(neighbour, *flags);
+        EXPECT_EQ(&requests[1], states[1].active);
+        EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&requests[1].base));
+        if (!receive) {
+            I2C3->SR1 = I2C_SR1_BTF;
+            nx_i2c_v1_irq(&states[1]);
+        }
+        EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&requests[1].base));
+        Wire(1U);
+        EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&requests[1].base));
+        EXPECT_EQ(NX_SUCCESS, requests[1].base.result);
+        EXPECT_EQ(3U, requests[1].base.transferred);
+        EXPECT_TRUE(enabled(RX0));
+        EXPECT_TRUE(enabled(TX0));
+    }
 }
 
 TEST_F(I2CMultiple, FailedSecondaryDmaDrainRetainsItsBorrowOnly) {

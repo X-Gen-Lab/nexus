@@ -20,12 +20,11 @@
 #define NX_STM32_DMA_DISABLE(stream, mask) ((stream)->CR &= ~(uint32_t)(mask))
 #endif
 
-/** \brief The fixed ADC1 request uses DMA2 stream4 channel0, status high
- * bits0..5. */
+/** \brief Acknowledge only the selected converter's fixed DMA2 lane. */
 static void acknowledge(nx_stm32_adc_stream_state_t* state) {
-    state->dma->HIFCR = 0x3DU;
+    nx_stm32_adc_dma_ack(state, 0x3DU);
 #ifndef NEXUS_STM32_MODEL
-    NVIC_ClearPendingIRQ(DMA2_Stream4_IRQn);
+    NVIC_ClearPendingIRQ(nx_stm32_adc_dma_irq(state->adc.registers));
 #endif
 }
 
@@ -68,13 +67,15 @@ nx_result_t nx_stm32_adc_stream_initialize(nx_stm32_adc_stream_state_t* state) {
         return NX_ERROR_CONTEXT;
     }
 #ifndef NEXUS_STM32_MODEL
-    if (state->adc.registers != ADC1 || state->timer != TIM3 ||
-        state->dma != DMA2 || state->memory != DMA2_Stream4) {
+    if ((state->adc.registers != ADC1 && state->adc.registers != ADC2 &&
+         state->adc.registers != ADC3) ||
+        state->timer != TIM3 || state->dma != DMA2 ||
+        state->memory != nx_stm32_adc_dma_memory(state->adc.registers)) {
         return NX_ERROR_UNSUPPORTED;
     }
-    if (NVIC_GetEnableIRQ(DMA2_Stream4_IRQn) != 0U ||
-        NVIC_GetPendingIRQ(DMA2_Stream4_IRQn) != 0U ||
-        NVIC_GetActive(DMA2_Stream4_IRQn) != 0U) {
+    IRQn_Type irq = nx_stm32_adc_dma_irq(state->adc.registers);
+    if (NVIC_GetEnableIRQ(irq) != 0U || NVIC_GetPendingIRQ(irq) != 0U ||
+        NVIC_GetActive(irq) != 0U) {
         return NX_ERROR_BUSY;
     }
 #endif
@@ -92,8 +93,8 @@ nx_result_t nx_stm32_adc_stream_initialize(nx_stm32_adc_stream_state_t* state) {
     acknowledge(state);
 #ifndef NEXUS_STM32_MODEL
     state->adc.cold_effects |= NX_STM32_ADC_IRQ;
-    NVIC_SetPriority(DMA2_Stream4_IRQn, 5U);
-    NVIC_EnableIRQ(DMA2_Stream4_IRQn);
+    NVIC_SetPriority(irq, 5U);
+    NVIC_EnableIRQ(irq);
 #endif
     return NX_SUCCESS;
 }
@@ -206,9 +207,9 @@ static void arm(nx_stm32_adc_stream_state_t* state) {
     state->memory->M0AR = (uint32_t)(uintptr_t)state->fill.data;
     state->memory->NDTR = (uint32_t)(state->fill.capacity / sizeof(uint16_t));
     state->memory->FCR = 0U;
-    state->memory->CR = DMA_SxCR_MINC | DMA_SxCR_PSIZE_0 | DMA_SxCR_MSIZE_0 |
-                        DMA_SxCR_PL_1 | DMA_SxCR_TCIE | DMA_SxCR_TEIE |
-                        DMA_SxCR_DMEIE;
+    state->memory->CR = nx_stm32_adc_dma_channel(adc) | DMA_SxCR_MINC |
+                        DMA_SxCR_PSIZE_0 | DMA_SxCR_MSIZE_0 | DMA_SxCR_PL_1 |
+                        DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
     nx_arch_dsb();
     state->memory->CR |= DMA_SxCR_EN;
     adc->CR2 = ADC_CR2_ADON | ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTSEL_3;
@@ -301,7 +302,7 @@ void nx_stm32_adc_stream_irq(nx_stm32_adc_stream_state_t* state) {
         state->stopping) {
         return;
     }
-    uint32_t status = state->dma->HISR & 0x3DU;
+    uint32_t status = nx_stm32_adc_dma_flags(state);
     if ((status & 0x2DU) == 0U) {
         return;
     }
@@ -413,8 +414,8 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     if (!state->adc.initialized) {
         return NX_ERROR_STATE;
     }
-    nx_result_t result =
-        nx_stm32_irq_wake_validate(wake, DMA2_Stream4_IRQn, syscall_ceiling);
+    nx_result_t result = nx_stm32_irq_wake_validate(
+        wake, nx_stm32_adc_dma_irq(state->adc.registers), syscall_ceiling);
     if (result == NX_SUCCESS) {
         nx_arch_irq_state_t saved = nx_arch_irq_save();
         state->wake = wake;

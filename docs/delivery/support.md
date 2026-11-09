@@ -39,8 +39,8 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 |---|---|
 | GPIO／EXTI | 受审引脚、静态电气与事件存储；不存在自动消抖政策 |
 | UART | IRQ byte/event、word 与明确 block／DMA 模式分别选择；有限 TX、有限 RX、连续 RX 和双向模式不自动互相授权 |
-| SPI／I2C | 受审 polling／异步／DMA 路径与显式 endpoint；不能从 controller 存在推定任意 route 或速率 |
-| ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入，独立 shot／scan 最多 16 ranks；触发 DMA 仍只开放 ADC1；Timer 资源冲突须通过准入 |
+| SPI／I2C | SPI1／3 polling 与 DMA、SPI2 DMA；I2C1／3 polling／IRQ／DMA、I2C2 IRQ／DMA；显式 endpoint 与受审路线 |
+| ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入，独立 shot／scan 最多 16 ranks；三个转换器均有有限／连续 DMA，分别独占 TIM3 |
 | DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码 |
 | Flash／IWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
 | CRC／芯片身份 | 固定多项式 CRC-32 字序列；实际 UID、device／revision ID 和半字 Flash 容量；不建立认证或订货号推断 |
@@ -61,9 +61,9 @@ PF4／5 的通道 14／15。序列可以重新排序或重复同一输入，最�
 注入组和同步多 ADC 模式尚未接入。16-rank 与三独立实例参考装配见
 `tests/contracts/adc_external_assembly/`，不授予真实 PCB 或物理采样资格。
 
-三个 ADC 的 `resolution_bits` 均可选择 6／8／10／12，默认 12。ADC1 的 poll、有限
-和连续 DMA 共用该静态选择，转换周期与触发速率准入随之变化。DMA 仍使用 halfword，样本仍是
-右对齐的 `uint16_t` 原始计数；分辨率选择不自动建立模拟精度或实际吞吐资格。
+三个 ADC 的 `resolution_bits` 均可选择 6／8／10／12，默认 12。各转换器的 poll、
+有限和连续 DMA 共用该静态选择，转换周期与触发速率准入随之变化。DMA 仍使用
+halfword，样本仍是右对齐的 `uint16_t` 原始计数；分辨率选择不建立模拟精度或实际吞吐资格。
 
 共享 ADCCLK 固定为 PCLK2／4，即 21 MHz。冷态改分频前先取得数字接口观察责任，
 确认所有 ADC 已关闭，再撤回本次临时 gate；匹配分频时不写 CCR。准备与其他 ADC
@@ -107,6 +107,17 @@ stop 与 W1C 回读恢复。软件模型和 ARM 链接不授予物理输出性�
 16 位 Flash 容量，不补用配置值、不开时钟、不分配常驻状态。身份数据不代替硅片
 启动准入，也不证明完整订货号／封装或认证秘密。Native 显式返回 UNSUPPORTED；
 模型与 ARM 链接仍不能证明物理身份、吞吐或实板功能。
+
+SPI3 的受审 AF6 路线是 PC10／11／12 或 PB3／4／5；I2C3 是 PA8 SCL 与 PC9 SDA
+AF4，恢复检查两条真实输入，不用同一 GPIO bank 的邻位代替。SPI3 使用 DMA1
+stream5 TX／stream0 RX channel0；I2C3 使用 stream4 TX／stream2 RX channel3。
+与其他实例重用物理 stream 时配置拒绝，不自动替换路线。
+
+ADC1 使用 DMA2 stream4 channel0，ADC2 使用 stream2 channel1，ADC3 使用
+stream1 channel2；有限和连续模式均按所选 lane 解释并清除标志。TIM3 是独占触发源，
+不同 ADC 的 DMA stream 不冲突也不能同时取得同一 TIM3。软件参考装配见
+`tests/contracts/multi_controller_assembly/*tertiary*.toml`，覆盖 VE／ZG 和裸机／
+FreeRTOS；它们不授权实际 Board 接线。
 
 ## 选择、证据与保留依赖
 

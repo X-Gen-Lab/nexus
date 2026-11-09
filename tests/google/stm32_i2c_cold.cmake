@@ -13,6 +13,6 @@ target_include_directories(nexus_stm32_i2c_cold_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 nexus_use_cmsis_core(nexus_stm32_i2c_cold_test)
 target_compile_definitions(nexus_stm32_i2c_cold_test PRIVATE
-    STM32F407xx)
+    STM32F407xx NX_I2C_V1_PORT_HEADER="stm32f407_i2c_port.h")
 target_compile_options(nexus_stm32_i2c_cold_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_i2c_cold_model.h")

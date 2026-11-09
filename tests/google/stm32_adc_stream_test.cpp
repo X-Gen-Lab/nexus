@@ -17,6 +17,7 @@ extern "C" {
 }
 #include "nexus/io/native/model.h"
 #include <gtest/gtest.h>
+#include <sys/mman.h>
 
 #undef nx_arch_dsb
 static ADC_TypeDef* s_power_adc;
@@ -87,13 +88,21 @@ static DMA_TypeDef* s_target_dma;
 /** \brief Model only W1C status, including facts arriving after
  * acknowledgement.
  */
-extern "C" void nx_stm32_adc_model_ack(void* raw, uint32_t flags) {
+extern "C" void nx_stm32_adc_model_ack(void* raw, void* converter,
+                                       uint32_t flags) {
     auto* dma = static_cast<DMA_TypeDef*>(raw);
+    const unsigned shift = converter == ADC2   ? 16U
+                           : converter == ADC3 ? 6U
+                                               : 0U;
+    volatile uint32_t* status =
+        converter == ADC2 || converter == ADC3 ? &dma->LISR : &dma->HISR;
+    volatile uint32_t* clear =
+        converter == ADC2 || converter == ADC3 ? &dma->LIFCR : &dma->HIFCR;
     if (s_error_ack) {
-        dma->HISR |= 1U << 3U;
+        *status |= 1U << (shift + 3U);
     }
-    dma->HIFCR = flags;
-    dma->HISR &= ~flags;
+    *clear = flags << shift;
+    *status &= ~(flags << shift);
 }
 /** \brief Refuse a write or advance CT at the real hardware store boundary. */
 extern "C" void nx_stm32_adc_model_target(void* raw, unsigned bank,
@@ -602,6 +611,72 @@ TEST_F(Stm32AdcContinuous, TwoPrepostedTargetsStayInvisibleUntilSwapped) {
     ASSERT_EQ(nx_stream_release(&stream, &block), NX_SUCCESS);
     EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
 }
+
+class SecondaryAdcContinuous : public Stm32AdcContinuous,
+                               public testing::WithParamInterface<unsigned> {
+  protected:
+    void* mmio = MAP_FAILED;
+    unsigned Shift() const {
+        return GetParam() == 2U ? 16U : 6U;
+    }
+    void SetUp() override {
+        Stm32AdcContinuous::SetUp();
+        mmio = mmap(reinterpret_cast<void*>(0x40012000U), 0x1000U,
+                    PROT_READ | PROT_WRITE,
+                    MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
+        ASSERT_EQ(mmio, reinterpret_cast<void*>(0x40012000U));
+        state.base.adc.registers = GetParam() == 2U ? ADC2 : ADC3;
+        state.base.adc.initialized = false;
+        s_power_adc = state.base.adc.registers;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_continuous_initialize(&state));
+    }
+    void TearDown() override {
+        if (mmio != MAP_FAILED) {
+            EXPECT_EQ(0, munmap(mmio, 0x1000U));
+        }
+    }
+};
+
+TEST_P(SecondaryAdcContinuous, OnlyItsOwnLaneCanPublishAReplacedTarget) {
+    Ready();
+    EXPECT_EQ(GetParam() - 1U, (memory.CR & DMA_SxCR_CHSEL) >> 25U);
+    memory.CR |= DMA_SxCR_CT;
+    dma.HISR = 0x20U;
+    dma.LISR = 0x20U;
+    nx_stm32_adc_continuous_irq(&state);
+    nx_stream_block_t block{};
+    EXPECT_EQ(NX_ERROR_EMPTY, nx_stream_acquire(&stream, &block));
+    dma.LISR |= 0x20U << Shift();
+    nx_stm32_adc_continuous_irq(&state);
+    EXPECT_EQ(0x20U << Shift(), dma.LIFCR);
+    EXPECT_EQ(0x20U, dma.LISR);
+    EXPECT_EQ(0x20U, dma.HISR);
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &block));
+    EXPECT_EQ(reinterpret_cast<uint8_t*>(samples[0]), block.data);
+    EXPECT_NE(memory.M0AR,
+              static_cast<uint32_t>(reinterpret_cast<uintptr_t>(block.data)));
+    ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
+    EXPECT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+}
+
+TEST_P(SecondaryAdcContinuous, DmaErrorAndFailedDrainKeepAllOutstandingLoans) {
+    Ready();
+    s_hold_dma_enable = true;
+    dma.LISR = 0x08U << Shift();
+    nx_stm32_adc_continuous_irq(&state);
+    EXPECT_TRUE(state.halted);
+    EXPECT_EQ(2U, stream.outstanding);
+    nx_stream_block_t block{};
+    EXPECT_EQ(NX_ERROR_EMPTY, nx_stream_acquire(&stream, &block));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_adc_port_stream_stop(&port));
+    EXPECT_EQ(2U, stream.outstanding);
+    s_hold_dma_enable = false;
+    EXPECT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+    EXPECT_EQ(0U, stream.outstanding);
+}
+
+INSTANTIATE_TEST_SUITE_P(IndependentConverters, SecondaryAdcContinuous,
+                         testing::Values(2U, 3U));
 
 TEST_F(Stm32AdcContinuous, HeldConsumerForcesStopAndExplicitWarmResume) {
     Ready();

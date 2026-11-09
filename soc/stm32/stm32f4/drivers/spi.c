@@ -71,7 +71,9 @@ static volatile uint32_t* cold_gate(const nx_stm32_spi_config_t* config) {
 }
 
 static uint32_t cold_gate_mask(const nx_stm32_spi_config_t* config) {
-    return config->registers == SPI1 ? RCC_APB2ENR_SPI1EN : RCC_APB1ENR_SPI2EN;
+    return config->registers == SPI1   ? RCC_APB2ENR_SPI1EN
+           : config->registers == SPI2 ? RCC_APB1ENR_SPI2EN
+                                       : RCC_APB1ENR_SPI3EN;
 }
 
 /** \brief Withdraw electrical drive before altering a saved latch or mux. */
@@ -93,7 +95,8 @@ bool nx_stm32_spi_config_valid(const nx_stm32_spi_config_t* config) {
         config->endpoint_count == 0U ||
         config->endpoint_count > SIZE_MAX - 3U ||
         config->pin_count != 3U + config->endpoint_count ||
-        (config->registers != SPI1 && config->registers != SPI2) ||
+        (config->registers != SPI1 && config->registers != SPI2 &&
+         config->registers != SPI3) ||
         config->clock_hz != (config->registers == SPI1 ? 84000000U : 42000000U))
         return false;
     for (size_t i = 0U; i < config->pin_count; ++i) {
@@ -336,10 +339,12 @@ nx_result_t nx_stm32_spi_close(nx_stm32_spi_state_t* port,
 
 /** \brief Pulse only the retained controller's actual APB reset domain. */
 static void reset_controller(nx_stm32_spi_state_t* port) {
-    bool second = port->registers == SPI2;
+    bool first = port->registers != SPI2 && port->registers != SPI3;
     volatile uint32_t* reset =
-        second ? &port->rcc->APB1RSTR : &port->rcc->APB2RSTR;
-    uint32_t mask = second ? RCC_APB1RSTR_SPI2RST : RCC_APB2RSTR_SPI1RST;
+        first ? &port->rcc->APB2RSTR : &port->rcc->APB1RSTR;
+    uint32_t mask = first                     ? RCC_APB2RSTR_SPI1RST
+                    : port->registers == SPI2 ? RCC_APB1RSTR_SPI2RST
+                                              : RCC_APB1RSTR_SPI3RST;
     NX_STM32_SPI_RESET(reset, mask, true);
     nx_arch_dsb();
     NX_STM32_SPI_RESET(reset, mask, false);

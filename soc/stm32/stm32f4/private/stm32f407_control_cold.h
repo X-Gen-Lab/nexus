@@ -46,7 +46,7 @@ typedef struct {
     ADC_TypeDef* registers;
 } nx_stm32_adc_config_t;
 
-/** \brief Exact ADC1/TIM3/DMA2 stream four selection, without mode dispatch. */
+/** \brief Exact converter/TIM3/DMA2 selection, without mode dispatch. */
 typedef struct {
     nx_stm32_adc_config_t adc;
     const nx_dma_memory_region_t* regions;
@@ -370,7 +370,7 @@ nx_stm32_adc_stream_cold_begin(nx_stm32_adc_stream_state_t* port,
     if (port == NULL || config == NULL || config->regions == NULL ||
         config->region_count == 0U || config->priority > 15U)
         return NX_ERROR_INVALID;
-    if (config->adc.registers != ADC1)
+    if (nx_stm32_adc_clock(config->adc.registers) == 0U)
         return NX_ERROR_UNSUPPORTED;
     if ((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) != 0U)
         return NX_ERROR_BUSY;
@@ -384,7 +384,7 @@ nx_stm32_adc_stream_cold_begin(nx_stm32_adc_stream_state_t* port,
         return NX_ERROR_IO;
     port->timer = TIM3;
     port->dma = DMA2;
-    port->memory = DMA2_Stream4;
+    port->memory = nx_stm32_adc_dma_memory(config->adc.registers);
     port->regions = config->regions;
     port->region_count = config->region_count;
     port->timer_clock_hz = 84000000U;
@@ -395,10 +395,11 @@ nx_stm32_adc_stream_cold_begin(nx_stm32_adc_stream_state_t* port,
 /** \brief Publish the selected IRQ only after the actual stream initialized. */
 static inline nx_result_t
 nx_stm32_adc_stream_cold_publish(const nx_stm32_adc_stream_config_t* config) {
-    NVIC_SetPriority(DMA2_Stream4_IRQn, config->priority);
+    IRQn_Type irq = nx_stm32_adc_dma_irq(config->adc.registers);
+    NVIC_SetPriority(irq, config->priority);
     nx_arch_dsb();
-    return NVIC_GetPriority(DMA2_Stream4_IRQn) == config->priority &&
-                   NVIC_GetEnableIRQ(DMA2_Stream4_IRQn) != 0U
+    return NVIC_GetPriority(irq) == config->priority &&
+                   NVIC_GetEnableIRQ(irq) != 0U
                ? NX_SUCCESS
                : NX_ERROR_IO;
 }
@@ -438,12 +439,12 @@ nx_stm32_adc_stream_cold_finish(nx_stm32_adc_stream_state_t* port) {
     if (port == NULL)
         return NX_ERROR_INVALID;
     if ((port->adc.cold_effects & NX_STM32_ADC_IRQ) != 0U) {
-        NVIC_DisableIRQ(DMA2_Stream4_IRQn);
-        NVIC_ClearPendingIRQ(DMA2_Stream4_IRQn);
+        IRQn_Type irq = nx_stm32_adc_dma_irq(port->adc.registers);
+        NVIC_DisableIRQ(irq);
+        NVIC_ClearPendingIRQ(irq);
         nx_arch_dsb();
-        if (NVIC_GetEnableIRQ(DMA2_Stream4_IRQn) != 0U ||
-            NVIC_GetPendingIRQ(DMA2_Stream4_IRQn) != 0U ||
-            NVIC_GetActive(DMA2_Stream4_IRQn) != 0U)
+        if (NVIC_GetEnableIRQ(irq) != 0U || NVIC_GetPendingIRQ(irq) != 0U ||
+            NVIC_GetActive(irq) != 0U)
             return NX_ERROR_BUSY;
         port->adc.cold_effects &= (uint8_t)~NX_STM32_ADC_IRQ;
     }

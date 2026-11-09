@@ -18,7 +18,7 @@ typedef struct {
     uint8_t pin;
 } nx_stm32_i2c_pin_config_t;
 
-/** \brief Immutable selected controller, GPIOB AF4 and publisher facts. */
+/** \brief Immutable selected controller, reviewed AF4 pads and publishers. */
 typedef struct {
     I2C_TypeDef* registers;
     const nx_stm32_i2c_pin_config_t* pins;
@@ -31,13 +31,13 @@ typedef struct {
 /** \brief Semantic effects; clock bits preserve the original enabled state. */
 enum {
     NX_STM32_I2C_COLD_OWNED = 1U << 0U,
-    NX_STM32_I2C_COLD_PERIPHERAL_CLOCK = (1U << 1U) | (1U << 2U),
-    NX_STM32_I2C_COLD_GPIO_CLOCK = 1U << 3U,
-    NX_STM32_I2C_COLD_VECTORS = 1U << 4U,
-    NX_STM32_I2C_COLD_PREPARED = 1U << 5U
+    NX_STM32_I2C_COLD_PERIPHERAL_CLOCK = 1U << 1U,
+    NX_STM32_I2C_COLD_VECTORS = 1U << 2U,
+    NX_STM32_I2C_COLD_PREPARED = 1U << 3U,
+    NX_STM32_I2C_COLD_GPIO_CLOCK = 7U << 4U
 };
 
-/** \brief Retain exact publisher bytes and two original gate facts in six
+/** \brief Retain exact publisher bytes and selected original gates in six
  * bytes. \note Lifecycle calls serialize this private receipt; IRQs never
  * modify it. Pad values live only in the existing Platform-owned snapshot
  * slots.
@@ -78,7 +78,7 @@ nx_stm32_i2c_cold_verify(const nx_stm32_i2c_config_t* config,
                          const nx_stm32_i2c_cold_receipt_t* receipt);
 
 /** \brief Acquire async pads, gates and initially idle IRQ/DMA publishers.
- * \param[in] config: Exact asynchronous I2C1/I2C2 static resources.
+ * \param[in] config: Exact asynchronous I2C1/2/3 static resources.
  * \param[in,out] receipt: Initially clear; retained after failed restoration.
  * \return Success or failure preserving any remaining cleanup obligation.
  * \note Privileged unmasked Thread context; Platform serializes shared gates
@@ -112,7 +112,7 @@ nx_stm32_i2c_async_cold_verify(const nx_stm32_i2c_config_t* config,
 
 /** \brief Prepare a cold polling owner without a generated hardware body.
  * \param[in,out] port: Serialized initially cold owner.
- * \param[in] config: Exact I2C1 standard-mode static resources.
+ * \param[in] config: Exact standard-mode static resources.
  * \param[in,out] receipt: Retained through failed cleanup.
  * \return Success or failure; close retries any remaining acquired effects.
  */
@@ -133,7 +133,7 @@ nx_result_t nx_stm32_i2c_close(nx_stm32_i2c_state_t* port,
 
 /** \brief Prepare an exact IRQ or finite-DMA owner in unmasked Thread mode.
  * \param[in,out] port: Initially cold owner, no outstanding calls or loans.
- * \param[in] config: Immutable I2C1/I2C2 resources and publisher priority.
+ * \param[in] config: Immutable I2C1/2/3 resources and publisher priority.
  * \param[in,out] receipt: Retained through failed cleanup.
  * \return Success or failure; close retains any unproved withdrawal.
  */
