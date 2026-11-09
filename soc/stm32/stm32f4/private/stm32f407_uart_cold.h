@@ -82,6 +82,11 @@ void nx_stm32_uart_cold_bind(nx_stm32_uart_state_t* state,
 /** \brief Validate only exact selected DMA routes without hardware effects. */
 bool nx_stm32_uart_cold_dma_valid(const nx_stm32_uart_dma_cold_config_t* config,
                                   bool receive, bool transmit);
+/** \brief Match immutable DMA facts independently of cold pad acquisition. */
+bool nx_stm32_uart_dma_route_valid(
+    const nx_stm32_uart_dma_cold_config_t* config, bool receive, bool transmit);
+/** \brief Observe gates for an admitted route without acquiring ownership. */
+bool nx_stm32_uart_dma_powered(const nx_stm32_uart_dma_cold_config_t* config);
 /** \brief Apply and read back selected priority and enabled publisher facts.
  * \param[in] config: The unchanged resources supplied to acquisition.
  * \param[in] receipt: Same retained resource observations.

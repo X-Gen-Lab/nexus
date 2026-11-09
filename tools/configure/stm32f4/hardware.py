@@ -30,10 +30,10 @@ DAC_DMA_ROUTES = MappingProxyType({
 CONTROLLER_BINDINGS = (
     uart_binding("USART1", 2, 37, (2, 7, 4), (2, 2, 4)),
     uart_binding("USART2", 1, 38, (1, 6, 4)),
-    ControllerBinding("USART3", "uart", 1, (("USART3", 39),), ()),
-    ControllerBinding("UART4", "uart", 1, (("UART4", 52),), ()),
-    ControllerBinding("UART5", "uart", 1, (("UART5", 53),), ()),
-    ControllerBinding("USART6", "uart", 2, (("USART6", 71),), ()),
+    uart_binding("USART3", 1, 39, (1, 3, 4)),
+    uart_binding("UART4", 1, 52, (1, 4, 4)),
+    uart_binding("UART5", 1, 53, (1, 7, 4)),
+    uart_binding("USART6", 2, 71, (2, 6, 5)),
     spi_binding("SPI1", 2, "dma", (2, 3, 3), (2, 0, 3)),
     spi_binding("SPI2", 1, "dma", (1, 4, 0), (1, 3, 0)),
     spi_binding("SPI3", 1, "dma", (1, 5, 0), (1, 0, 0)),
@@ -62,19 +62,19 @@ SECONDARY_FACTS = MappingProxyType({
         "pins": ("PA2", "PA3"),
         "irq": ("USART2_IRQn",), "clock_hz": 42000000}),
     "USART3": MappingProxyType({
-        "kind": "uart", "modes": ("irq-byte-event",),
+        "kind": "uart", "modes": ("irq-byte-event", "dma-tx"),
         "pins": ("PB10", "PB11"), "irq": ("USART3_IRQn",),
         "clock_hz": 42000000}),
     "UART4": MappingProxyType({
-        "kind": "uart", "modes": ("irq-byte-event",),
+        "kind": "uart", "modes": ("irq-byte-event", "dma-tx"),
         "pins": ("PA0", "PA1"), "irq": ("UART4_IRQn",),
         "clock_hz": 42000000}),
     "UART5": MappingProxyType({
-        "kind": "uart", "modes": ("irq-byte-event",),
+        "kind": "uart", "modes": ("irq-byte-event", "dma-tx"),
         "pins": ("PC12", "PD2"), "irq": ("UART5_IRQn",),
         "clock_hz": 42000000}),
     "USART6": MappingProxyType({
-        "kind": "uart", "modes": ("irq-byte-event",),
+        "kind": "uart", "modes": ("irq-byte-event", "dma-tx"),
         "pins": ("PC6", "PC7"), "irq": ("USART6_IRQn",),
         "clock_hz": 84000000}),
     "SPI2": MappingProxyType({

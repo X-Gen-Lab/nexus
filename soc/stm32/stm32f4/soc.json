@@ -856,7 +856,8 @@
       "kind": "uart",
       "clock_domain": "apb1",
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "dma-tx"
       ],
       "irq": [
         "USART3_IRQn"
@@ -875,7 +876,8 @@
       "kind": "uart",
       "clock_domain": "apb1",
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "dma-tx"
       ],
       "irq": [
         "UART4_IRQn"
@@ -894,7 +896,8 @@
       "kind": "uart",
       "clock_domain": "apb1",
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "dma-tx"
       ],
       "irq": [
         "UART5_IRQn"
@@ -913,7 +916,8 @@
       "kind": "uart",
       "clock_domain": "apb2",
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "dma-tx"
       ],
       "irq": [
         "USART6_IRQn"

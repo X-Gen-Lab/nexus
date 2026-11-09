@@ -146,20 +146,10 @@ static nx_result_t configuration(const nx_stm32_uart_dma_cold_config_t* config,
         config->resources.regions == NULL ||
         config->resources.region_count == 0U)
         return NX_ERROR_INVALID;
-    bool primary = config->uart.registers == USART1;
-    if ((!primary && config->uart.registers != USART2) ||
-        config->uart.clock_hz != (primary ? 84000000U : 42000000U) ||
-        config->uart.baud > config->uart.clock_hz / 16U ||
+    if (!nx_stm32_uart_dma_route_valid(config, false, true) ||
+        config->continuous || config->uart.baud > config->uart.clock_hz / 16U ||
         nx_stm32_hal_brr16(config->uart.clock_hz, config->uart.baud) >
-            UINT16_MAX ||
-        config->resources.dma != (primary ? DMA2 : DMA1) ||
-        config->transmit.registers != (primary ? DMA2_Stream7 : DMA1_Stream6) ||
-        config->transmit.irq !=
-            (primary ? DMA2_Stream7_IRQn : DMA1_Stream6_IRQn) ||
-        config->transmit.stream != (primary ? 7U : 6U) ||
-        config->transmit.channel != 4U ||
-        config->uart.vectors[0] != (primary ? USART1_IRQn : USART2_IRQn) ||
-        config->uart.vectors[1] != config->transmit.irq)
+            UINT16_MAX)
         return NX_ERROR_UNSUPPORTED;
     *format = config->uart.format == NULL
                   ? (nx_uart_format_t){8U, NX_UART_PARITY_NONE, NX_UART_STOP_1,
@@ -221,11 +211,7 @@ nx_stm32_uart_hal_initialize(nx_stm32_uart_hal_state_t* state,
         state->hal_depth != 0U || state->masked_vectors != 0U ||
         (config->transmit.registers->CR & DMA_SxCR_EN) != 0U)
         return NX_ERROR_BUSY;
-    bool primary = config->uart.registers == USART1;
-    if (((primary ? RCC->APB2ENR : RCC->APB1ENR) &
-         (primary ? RCC_APB2ENR_USART1EN : RCC_APB1ENR_USART2EN)) == 0U ||
-        (RCC->AHB1ENR & (primary ? RCC_AHB1ENR_DMA2EN : RCC_AHB1ENR_DMA1EN)) ==
-            0U)
+    if (!nx_stm32_uart_dma_powered(config))
         return NX_ERROR_STATE;
     if ((config->uart.registers->CR2 & USART_CR2_LBDIE) != 0U ||
         (config->uart.registers->CR3 & USART_CR3_CTSIE) != 0U)
@@ -270,7 +256,8 @@ nx_stm32_uart_hal_initialize(nx_stm32_uart_hal_state_t* state,
     state->handle.hdmatx = &state->dma;
     state->dma.Instance = config->transmit.registers;
     state->dma.Parent = &state->handle;
-    state->dma.Init.Channel = DMA_CHANNEL_4;
+    state->dma.Init.Channel = (uint32_t)config->transmit.channel
+                              << DMA_SxCR_CHSEL_Pos;
     state->dma.Init.Direction = DMA_MEMORY_TO_PERIPH;
     state->dma.Init.PeriphInc = DMA_PINC_DISABLE;
     state->dma.Init.MemInc = DMA_MINC_ENABLE;

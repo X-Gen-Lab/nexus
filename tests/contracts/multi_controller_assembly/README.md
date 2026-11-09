@@ -15,6 +15,8 @@
 | `stm32-ve-tertiary-freertos.toml` | SPI3 DMA、I2C3 IRQ、ADC2 连续 DMA | FreeRTOS |
 | `stm32-zg-tertiary.toml` | SPI3 polling、I2C3 polling、ADC3 连续 DMA | baremetal |
 | `stm32-zg-tertiary-freertos.toml` | SPI3 DMA、I2C3 DMA、ADC3 有限 DMA | FreeRTOS |
+| `stm32-ve-uart6.toml` | 六个 UART 有限 TX DMA 与独立 IRQ RX events | baremetal |
+| `stm32-zg-uart6-freertos.toml` | 同上六个独立 UART controller | FreeRTOS |
 
 secondary UART TX 与 primary I2C TX 共用 DMA1 的物理 stream6，
 即使 selector 不同也冲突，resolver 拒绝同时选择；五路图改选 secondary I2C。

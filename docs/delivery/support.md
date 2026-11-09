@@ -50,9 +50,12 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 | SDIO／FSMC | 所选 polling SDIO、外部窗口与 parallel16；启动 SRAM 为永久 boot owner |
 | 可选器件 | ILI9341 parallel16、XPT2046、W25 等通过公共端口访问，板级供电和产品策略外置 |
 
-F407 `dma-tx` 的所选 UART transport 使用官方 HAL 有限 TX 与分离 LL IRQ RX，
-Handle 私有且由同一 owner 管理。其他模式保留各自明确实现，不能宣称整套 UART
-或全部外设已完成 HAL 替代。
+六个 UART 的 `dma-tx` 共用官方 HAL 有限 TX 和分离 LL IRQ RX，支持 byte／event
+接收。USART1 使用 DMA2 stream7 channel4，USART2／3 使用 DMA1 stream6／3
+channel4，UART4／5 使用 DMA1 stream4／7 channel4，USART6 使用 DMA2 stream6
+channel5。每个实例只取得自己的 gate、pad、IRQ 和 Handle，TC 与 DMA 完成分开
+观察；没有额外实例状态。IRQ words／blocks、RX DMA 和 DMA duplex 仍保留原有
+USART1 范围，不能从有限 TX 推导其他模式已接入。
 
 ADC1／2 通道对应 PA0--7、PB0--1、PC0--5。ADC3 在 VE 开放 PA0--3 的通道 0--3
 和 PC0--3 的通道 10--13；ZG 另有 PF6--10 的通道 4--8、PF3 的通道 9 和

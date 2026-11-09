@@ -71,7 +71,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | 接口 | 执行与限制 |
 | --- | --- |
 | GPIO | 单 port 的 16-bit 授权 mask；原子 BSRR set/reset；串行 toggle；先初值后 mode |
-| UART | USART1 IRQ bytes/events、IRQ RX blocks、有限 TX DMA、RX DMA/IDLE、有限／连续 duplex 和连续 RX blocks；USART2 有限 TX DMA 与 IRQ bytes/events；USART3/UART4/UART5/USART6 已审 IRQ bytes/events；真实 TC、显式 loss、drain、quarantine |
+| UART | 六个实例共用 IRQ bytes/events 与 HAL 有限 TX DMA；USART1 另有 IRQ words／RX blocks、RX DMA/IDLE、有限／连续 duplex 和连续 RX blocks；真实 TC、显式 loss、drain、quarantine |
 | SPI | SPI1／SPI3 短 polling／有限全双工 DMA，SPI2 有限 DMA；MSB-first master、mode0–3；普通 byte face 为 8 位，增强 polling 事务支持 8／16 位 word，增强 DMA 事务限 SPI1；polling 最多 256 words，DMA 每段最多 65535 words |
 | I2C | I2C1／I2C3 polling/IRQ/DMA、I2C2 IRQ/DMA；42 MHz／100 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
 | Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |
@@ -101,6 +101,23 @@ IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征�
 [派生矩阵](../../../../docs/delivery/capabilities.md)。
 
 ## UART、DMA 与执行进度
+
+有限 `dma-tx` 复用同一个 ST HAL owner 与只读 ops；冷态 C 事实集中维护精确的时钟、
+pad、TX stream、IRQ 和 selector，HAL admission 与资源取得复用相同路由校验。
+六个实例没有新增可变字段，不使用 TX-only 模式中未选择的 RX DMA／continuous
+配置。GPIO 快照只属于冷态 lease；已经取得资源的直接 HAL 初始化无需重复持有快照。
+
+| 实例 | TX DMA | APB 时钟 |
+| --- | --- | --- |
+| USART1 | DMA2 stream7 channel4 | 84 MHz |
+| USART2 | DMA1 stream6 channel4 | 42 MHz |
+| USART3 | DMA1 stream3 channel4 | 42 MHz |
+| UART4 | DMA1 stream4 channel4 | 42 MHz |
+| UART5 | DMA1 stream7 channel4 | 42 MHz |
+| USART6 | DMA2 stream6 channel5 | 84 MHz |
+
+`tests/contracts/multi_controller_assembly/*uart6*.toml` 提供 VE 裸机与 ZG FreeRTOS
+六实例同时链接参考，保留六个独立 context 和一个共享 ops 表；不授权 PCB 接线。
 
 额外 byte/event 路线为 USART3 PB10/PB11 AF7、UART4 PA0/PA1 AF8、UART5 PC12/PD2
 AF8、USART6 PC6/PC7 AF8。USART2/3、UART4/5 从 APB1 取得 42 MHz，USART1/6 从

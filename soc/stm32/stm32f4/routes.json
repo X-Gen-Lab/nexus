@@ -1206,6 +1206,7 @@
     {
       "id": "usart3-pb10-pb11",
       "variants": [
+        "STM32F407VET6",
         "STM32F407ZGT6"
       ],
       "controller": "USART3",
@@ -1223,13 +1224,20 @@
         }
       ],
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "dma-tx"
       ],
-      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification."
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification.; finite TX route verified against RM0090 Rev22 Tables43/44 and the locked ST HAL; no receive-DMA qualification; DS8626 Rev12 Table9 and bonded LQFP100/LQFP144 pads",
+      "mode_dma": {
+        "dma-tx": [
+          "DMA1:stream3:channel4"
+        ]
+      }
     },
     {
       "id": "uart4-pa0-pa1",
       "variants": [
+        "STM32F407VET6",
         "STM32F407ZGT6"
       ],
       "controller": "UART4",
@@ -1247,13 +1255,20 @@
         }
       ],
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "dma-tx"
       ],
-      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification."
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification.; finite TX route verified against RM0090 Rev22 Tables43/44 and the locked ST HAL; no receive-DMA qualification; DS8626 Rev12 Table9 and bonded LQFP100/LQFP144 pads",
+      "mode_dma": {
+        "dma-tx": [
+          "DMA1:stream4:channel4"
+        ]
+      }
     },
     {
       "id": "uart5-pc12-pd2",
       "variants": [
+        "STM32F407VET6",
         "STM32F407ZGT6"
       ],
       "controller": "UART5",
@@ -1271,13 +1286,20 @@
         }
       ],
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "dma-tx"
       ],
-      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification."
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification.; finite TX route verified against RM0090 Rev22 Tables43/44 and the locked ST HAL; no receive-DMA qualification; DS8626 Rev12 Table9 and bonded LQFP100/LQFP144 pads",
+      "mode_dma": {
+        "dma-tx": [
+          "DMA1:stream7:channel4"
+        ]
+      }
     },
     {
       "id": "usart6-pc6-pc7",
       "variants": [
+        "STM32F407VET6",
         "STM32F407ZGT6"
       ],
       "controller": "USART6",
@@ -1295,9 +1317,15 @@
         }
       ],
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "dma-tx"
       ],
-      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification."
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification.; finite TX route verified against RM0090 Rev22 Tables43/44 and the locked ST HAL; no receive-DMA qualification; DS8626 Rev12 Table9 and bonded LQFP100/LQFP144 pads",
+      "mode_dma": {
+        "dma-tx": [
+          "DMA2:stream6:channel5"
+        ]
+      }
     },
     {
       "id": "gpio-input-pb2",

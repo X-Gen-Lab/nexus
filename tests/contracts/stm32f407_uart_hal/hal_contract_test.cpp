@@ -286,6 +286,23 @@ TEST_F(F407HalContract, ExpiredRequestRejectsBeforeHalRetainsPayload) {
     EXPECT_EQ(DMA2_Stream7->CR, before);
 }
 
+TEST_F(F407HalContract, TxOnlyConfigurationRejectsReceiveOrContinuousDma) {
+    USART1->SR = USART_SR_TC;
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_stop(&port));
+    for (bool receive : {false, true}) {
+        SCOPED_TRACE(receive);
+        state = {};
+        config.continuous = !receive;
+        config.receive = receive ? DMA2_Stream2 : nullptr;
+        EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+                  nx_stm32_uart_hal_initialize(&state, &config));
+        if (state.uart.initialized) {
+            USART1->SR = USART_SR_TC;
+            EXPECT_EQ(NX_SUCCESS, nx_uart_port_stop(&port));
+        }
+    }
+}
+
 TEST_F(F407HalContract, MaskedOwnerRejectsWithoutChangingIncomingMask) {
     const nx_arch_irq_state_t saved = nx_arch_irq_save();
     EXPECT_EQ(nx_uart_port_submit(&port, &request), NX_ERROR_CONTEXT);
@@ -1152,6 +1169,183 @@ TEST_F(F407HalCold, IndependentUsartOwnersKeepPrivateHandlesAndLeases) {
     EXPECT_EQ(state.handle.hdmatx, &state.dma);
     EXPECT_EQ(state.dma.Parent, &state.handle);
 }
+
+class F4ExtraHal : public F407HalContract,
+                   public testing::WithParamInterface<unsigned> {
+  protected:
+    nx_stm32_uart_hal_state_t second{};
+    nx_stm32_uart_dma_cold_config_t other{};
+    nx_stm32_uart_cold_receipt_t receipt{};
+    uint16_t snapshots[2]{};
+    nx_stm32_platform_pin_config_t pins[2]{};
+    IRQn_Type irqs[2]{};
+    uint32_t gate{};
+    unsigned shift{};
+    bool apb2{};
+
+    void SetUp() override {
+        F407HalContract::SetUp();
+        ASSERT_FALSE(HasFatalFailure());
+        other = config;
+        other.uart.pins = pins;
+        other.uart.vectors = irqs;
+        other.uart.rx_storage = payload + 0x600U;
+        other.uart.priority = 6U;
+        other.uart.clock_hz = 42000000U;
+        other.resources.dma = DMA1;
+        switch (GetParam()) {
+            case 0U:
+                other.uart.registers = USART3;
+                other.transmit = {DMA1_Stream3, DMA1_Stream3_IRQn, 3U, 4U};
+                irqs[0] = USART3_IRQn;
+                pins[0] = {GPIOB, &snapshots[0], 1U, 10U};
+                pins[1] = {GPIOB, &snapshots[1], 1U, 11U};
+                gate = RCC_APB1ENR_USART3EN;
+                shift = 22U;
+                break;
+            case 1U:
+                other.uart.registers = UART4;
+                other.transmit = {DMA1_Stream4, DMA1_Stream4_IRQn, 4U, 4U};
+                irqs[0] = UART4_IRQn;
+                pins[0] = {GPIOA, &snapshots[0], 0U, 0U};
+                pins[1] = {GPIOA, &snapshots[1], 0U, 1U};
+                gate = RCC_APB1ENR_UART4EN;
+                shift = 0U;
+                break;
+            case 2U:
+                other.uart.registers = UART5;
+                other.transmit = {DMA1_Stream7, DMA1_Stream7_IRQn, 7U, 4U};
+                irqs[0] = UART5_IRQn;
+                pins[0] = {GPIOC, &snapshots[0], 2U, 12U};
+                pins[1] = {GPIOD, &snapshots[1], 3U, 2U};
+                gate = RCC_APB1ENR_UART5EN;
+                shift = 22U;
+                break;
+            default:
+                other.uart.registers = USART6;
+                other.transmit = {DMA2_Stream6, DMA2_Stream6_IRQn, 6U, 5U};
+                irqs[0] = USART6_IRQn;
+                pins[0] = {GPIOC, &snapshots[0], 2U, 6U};
+                pins[1] = {GPIOC, &snapshots[1], 2U, 7U};
+                other.uart.clock_hz = 84000000U;
+                other.resources.dma = DMA2;
+                gate = RCC_APB2ENR_USART6EN;
+                shift = 16U;
+                apb2 = true;
+                break;
+        }
+        irqs[1] = other.transmit.irq;
+        RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN |
+                        RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIODEN |
+                        RCC_AHB1ENR_DMA1EN;
+    }
+    void Power() {
+        if (apb2)
+            RCC->APB2ENR |= gate;
+        else
+            RCC->APB1ENR |= gate;
+    }
+};
+
+TEST_P(F4ExtraHal, ColdLeaseRestoresPadsAndPreservesTheFirstLiveOwner) {
+    uint16_t before[2]{};
+    for (unsigned i = 0U; i < 2U; ++i) {
+        before[i] = nx_stm32_pin_capture(pins[i].registers, pins[i].pin);
+        NVIC->IPR[static_cast<unsigned>(irqs[i])] = (uint8_t)(0xA1U + i);
+    }
+    const auto apb1 = RCC->APB1ENR;
+    const auto apb2_before = RCC->APB2ENR;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_uart_hal_cold_prepare(&second, &other, &receipt));
+    EXPECT_EQ(other.uart.registers, second.handle.Instance);
+    EXPECT_EQ(&second.dma, second.handle.hdmatx);
+    EXPECT_EQ(&second.handle, second.dma.Parent);
+    EXPECT_EQ((other.uart.clock_hz + 57600U) / 115200U,
+              other.uart.registers->BRR);
+    for (auto irq : irqs) {
+        EXPECT_NE(0U, NVIC_GetEnableIRQ(irq));
+        EXPECT_EQ(6U, NVIC_GetPriority(irq));
+    }
+    other.uart.registers->SR = USART_SR_TC;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_uart_hal_cold_close(&second, &other, &receipt));
+    EXPECT_EQ(apb1, RCC->APB1ENR);
+    EXPECT_EQ(apb2_before, RCC->APB2ENR);
+    for (unsigned i = 0U; i < 2U; ++i) {
+        EXPECT_EQ(before[i],
+                  nx_stm32_pin_capture(pins[i].registers, pins[i].pin));
+        EXPECT_EQ(0U, NVIC_GetEnableIRQ(irqs[i]));
+        EXPECT_EQ(0xA1U + i, NVIC->IPR[static_cast<unsigned>(irqs[i])]);
+    }
+    EXPECT_TRUE(state.uart.initialized);
+    EXPECT_NE(0U, NVIC_GetEnableIRQ(USART1_IRQn));
+    EXPECT_EQ(&state.dma, state.handle.hdmatx);
+}
+
+TEST_P(F4ExtraHal, MemoryCompletionKeepsRxAndTheBorrowUntilObservedWireTc) {
+    Power();
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_hal_initialize(&second, &other));
+    nx_uart_port_t second_port{&nx_stm32_uart_hal_ops, &second};
+    nx_uart_tx_request_t transfer{};
+    nx_request_initialize(&transfer.base);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_uart_tx_prepare(&transfer, payload + 32U, 4U, 1000U));
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&second_port, &transfer));
+    EXPECT_EQ(other.transmit.channel,
+              (other.transmit.registers->CR & DMA_SxCR_CHSEL) >> 25U);
+    auto* flags = other.transmit.stream < 4U ? &other.resources.dma->LISR
+                                             : &other.resources.dma->HISR;
+    auto* clear = other.transmit.stream < 4U ? &other.resources.dma->LIFCR
+                                             : &other.resources.dma->HIFCR;
+    const uint32_t neighbour = 0x20U << (shift == 0U ? 6U : 0U);
+    *flags = neighbour | (0x20U << shift);
+    other.transmit.registers->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+    other.transmit.registers->NDTR = 0U;
+    bool previous = nx_hal_test_isr(true);
+    nx_stm32_uart_hal_dma_irq(&second);
+    nx_hal_test_isr(previous);
+    EXPECT_EQ(0x20U << shift, *clear);
+    EXPECT_EQ(0U, *clear & neighbour);
+    *flags &= ~(0x20U << shift);
+    nx_uart_port_service(&second_port);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&transfer.base));
+    other.uart.registers->DR = 0x5AU;
+    other.uart.registers->SR = USART_SR_RXNE | USART_SR_TC;
+    previous = nx_hal_test_isr(true);
+    nx_stm32_uart_hal_irq(&second);
+    nx_hal_test_isr(previous);
+    other.uart.registers->SR &= ~static_cast<uint32_t>(USART_SR_RXNE);
+    nx_uart_rx_event_t event{};
+    size_t count{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_uart_port_read_events(&second_port, &event, 1U, &count));
+    EXPECT_EQ(1U, count);
+    EXPECT_EQ(0x5AU, event.byte);
+    nx_uart_port_service(&second_port);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&transfer.base));
+    EXPECT_EQ(NX_SUCCESS, transfer.base.result);
+    EXPECT_EQ(4U, transfer.base.transferred);
+    EXPECT_EQ(0U, other.transmit.registers->M0AR);
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_stop(&second_port));
+    EXPECT_TRUE(state.uart.initialized);
+}
+
+TEST_P(F4ExtraHal, MissingClockAndWrongSelectorRejectWithoutAcquiringOwner) {
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32_uart_hal_initialize(&second, &other));
+    EXPECT_FALSE(second.uart.initialized);
+    EXPECT_EQ(nullptr, second.config);
+    EXPECT_EQ(0U, other.uart.registers->CR1);
+    Power();
+    other.transmit.channel ^= 1U;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_stm32_uart_hal_initialize(&second, &other));
+    EXPECT_EQ(nullptr, second.config);
+    EXPECT_EQ(0U, other.transmit.registers->CR);
+    EXPECT_TRUE(state.uart.initialized);
+}
+
+INSTANTIATE_TEST_SUITE_P(OtherF407Controllers, F4ExtraHal,
+                         testing::Values(0U, 1U, 2U, 3U));
 
 TEST_F(F407HalContract, RequestMetadataCannotMutateTheDeclaredDmaAuthority) {
     ASSERT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);

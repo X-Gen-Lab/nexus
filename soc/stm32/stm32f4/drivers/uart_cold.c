@@ -32,24 +32,98 @@ typedef struct {
     uint8_t rx_pin;
     uint8_t alternate;
     bool apb2;
+    DMA_TypeDef* dma;
+    nx_stm32_uart_tx_cold_config_t transmit;
 } nx_stm32_uart_cold_hardware_t;
 
 /* DS8626 alternate functions and RM0090 APB clocks. This readonly cold table
  * adds no per-instance state or byte-path lookup. Only listed pad pairs are
  * admitted; additional silicon alternatives need independent route review. */
 static const nx_stm32_uart_cold_hardware_t s_nx_uart_hardware[] = {
-    {USART1, GPIOA, GPIOA, 84000000U, RCC_APB2ENR_USART1EN, USART1_IRQn, 0U, 9U,
-     0U, 10U, 7U, true},
-    {USART2, GPIOA, GPIOA, 42000000U, RCC_APB1ENR_USART2EN, USART2_IRQn, 0U, 2U,
-     0U, 3U, 7U, false},
-    {USART3, GPIOB, GPIOB, 42000000U, RCC_APB1ENR_USART3EN, USART3_IRQn, 1U,
-     10U, 1U, 11U, 7U, false},
-    {UART4, GPIOA, GPIOA, 42000000U, RCC_APB1ENR_UART4EN, UART4_IRQn, 0U, 0U,
-     0U, 1U, 8U, false},
-    {UART5, GPIOC, GPIOD, 42000000U, RCC_APB1ENR_UART5EN, UART5_IRQn, 2U, 12U,
-     3U, 2U, 8U, false},
-    {USART6, GPIOC, GPIOC, 84000000U, RCC_APB2ENR_USART6EN, USART6_IRQn, 2U, 6U,
-     2U, 7U, 8U, true},
+    {USART1,
+     GPIOA,
+     GPIOA,
+     84000000U,
+     RCC_APB2ENR_USART1EN,
+     USART1_IRQn,
+     0U,
+     9U,
+     0U,
+     10U,
+     7U,
+     true,
+     DMA2,
+     {DMA2_Stream7, DMA2_Stream7_IRQn, 7U, 4U}},
+    {USART2,
+     GPIOA,
+     GPIOA,
+     42000000U,
+     RCC_APB1ENR_USART2EN,
+     USART2_IRQn,
+     0U,
+     2U,
+     0U,
+     3U,
+     7U,
+     false,
+     DMA1,
+     {DMA1_Stream6, DMA1_Stream6_IRQn, 6U, 4U}},
+    {USART3,
+     GPIOB,
+     GPIOB,
+     42000000U,
+     RCC_APB1ENR_USART3EN,
+     USART3_IRQn,
+     1U,
+     10U,
+     1U,
+     11U,
+     7U,
+     false,
+     DMA1,
+     {DMA1_Stream3, DMA1_Stream3_IRQn, 3U, 4U}},
+    {UART4,
+     GPIOA,
+     GPIOA,
+     42000000U,
+     RCC_APB1ENR_UART4EN,
+     UART4_IRQn,
+     0U,
+     0U,
+     0U,
+     1U,
+     8U,
+     false,
+     DMA1,
+     {DMA1_Stream4, DMA1_Stream4_IRQn, 4U, 4U}},
+    {UART5,
+     GPIOC,
+     GPIOD,
+     42000000U,
+     RCC_APB1ENR_UART5EN,
+     UART5_IRQn,
+     2U,
+     12U,
+     3U,
+     2U,
+     8U,
+     false,
+     DMA1,
+     {DMA1_Stream7, DMA1_Stream7_IRQn, 7U, 4U}},
+    {USART6,
+     GPIOC,
+     GPIOC,
+     84000000U,
+     RCC_APB2ENR_USART6EN,
+     USART6_IRQn,
+     2U,
+     6U,
+     2U,
+     7U,
+     8U,
+     true,
+     DMA2,
+     {DMA2_Stream6, DMA2_Stream6_IRQn, 6U, 5U}},
 };
 
 /** \brief Match one reviewed controller without authorizing an inferred bank.
@@ -79,8 +153,7 @@ static bool config_valid(const nx_stm32_uart_cold_config_t* config) {
         return false;
     bool primary = config->registers == USART1;
     if (config->clock_hz != selected->clock_hz ||
-        config->vectors[0] != selected->irq ||
-        (!primary && config->registers != USART2 && config->vector_count != 1U))
+        config->vectors[0] != selected->irq)
         return false;
     for (size_t i = 0U; i < 2U; ++i) {
         const nx_stm32_platform_pin_config_t* pin = &config->pins[i];
@@ -96,8 +169,7 @@ static bool config_valid(const nx_stm32_uart_cold_config_t* config) {
         return false;
     for (size_t i = 0U; i < config->vector_count; ++i) {
         IRQn_Type irq = config->vectors[i];
-        if (irq != config->vectors[0] &&
-            irq != (primary ? DMA2_Stream7_IRQn : DMA1_Stream6_IRQn) &&
+        if (irq != config->vectors[0] && irq != selected->transmit.irq &&
             (!primary || irq != DMA2_Stream2_IRQn))
             return false;
         for (size_t j = 0U; j < i; ++j) {
@@ -224,30 +296,48 @@ void nx_stm32_uart_cold_bind(nx_stm32_uart_state_t* state,
     state->profile = config->profile;
 }
 
-bool nx_stm32_uart_cold_dma_valid(const nx_stm32_uart_dma_cold_config_t* config,
-                                  bool receive, bool transmit) {
-    if (config == NULL || !config_valid(&config->uart) ||
+bool nx_stm32_uart_dma_route_valid(
+    const nx_stm32_uart_dma_cold_config_t* config, bool receive,
+    bool transmit) {
+    if (config == NULL || config->uart.vectors == NULL ||
         config->resources.regions == NULL ||
         config->resources.region_count == 0U ||
         config->uart.vector_count !=
             1U + (receive ? 1U : 0U) + (transmit ? 1U : 0U))
         return false;
-    bool primary = config->uart.registers == USART1;
-    if ((!primary && config->uart.registers != USART2) ||
-        config->resources.dma != (primary ? DMA2 : DMA1) ||
-        (receive && (!primary || config->receive != DMA2_Stream2 ||
-                     config->uart.vectors[1] != DMA2_Stream2_IRQn)))
+    const nx_stm32_uart_cold_hardware_t* selected = hardware(&config->uart);
+    if (selected == NULL || config->uart.clock_hz != selected->clock_hz ||
+        config->uart.vectors[0] != selected->irq ||
+        config->resources.dma != selected->dma ||
+        (!receive && config->receive != NULL) ||
+        (receive &&
+         (config->uart.registers != USART1 || config->receive != DMA2_Stream2 ||
+          config->uart.vectors[1] != DMA2_Stream2_IRQn)))
         return false;
     if (transmit &&
-        (config->transmit.registers !=
-             (primary ? DMA2_Stream7 : DMA1_Stream6) ||
-         config->transmit.irq !=
-             (primary ? DMA2_Stream7_IRQn : DMA1_Stream6_IRQn) ||
-         config->transmit.stream != (primary ? 7U : 6U) ||
-         config->transmit.channel != 4U ||
+        (config->transmit.registers != selected->transmit.registers ||
+         config->transmit.irq != selected->transmit.irq ||
+         config->transmit.stream != selected->transmit.stream ||
+         config->transmit.channel != selected->transmit.channel ||
          config->uart.vectors[receive ? 2U : 1U] != config->transmit.irq))
         return false;
     return true;
+}
+
+bool nx_stm32_uart_cold_dma_valid(const nx_stm32_uart_dma_cold_config_t* config,
+                                  bool receive, bool transmit) {
+    return config != NULL && config_valid(&config->uart) &&
+           nx_stm32_uart_dma_route_valid(config, receive, transmit);
+}
+
+bool nx_stm32_uart_dma_powered(const nx_stm32_uart_dma_cold_config_t* config) {
+    const nx_stm32_uart_cold_hardware_t* selected =
+        config == NULL ? NULL : hardware(&config->uart);
+    return selected != NULL &&
+           ((selected->apb2 ? RCC->APB2ENR : RCC->APB1ENR) & selected->gate) !=
+               0U &&
+           (RCC->AHB1ENR & (selected->dma == DMA2 ? RCC_AHB1ENR_DMA2EN
+                                                  : RCC_AHB1ENR_DMA1EN)) != 0U;
 }
 
 nx_result_t

@@ -70,6 +70,26 @@
       "id": "adc3",
       "controller": "ADC3",
       "route": "adc3-ch4-pf6"
+    },
+    {
+      "id": "usart3",
+      "controller": "USART3",
+      "route": "usart3-pb10-pb11"
+    },
+    {
+      "id": "uart4",
+      "controller": "UART4",
+      "route": "uart4-pa0-pa1"
+    },
+    {
+      "id": "uart5",
+      "controller": "UART5",
+      "route": "uart5-pc12-pd2"
+    },
+    {
+      "id": "usart6",
+      "controller": "USART6",
+      "route": "usart6-pc6-pc7"
     }
   ],
   "reserved_resources": [],
