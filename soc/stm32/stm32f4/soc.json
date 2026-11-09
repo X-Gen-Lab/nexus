@@ -517,7 +517,12 @@
       ],
       "resources": [
         "timer:TIM3"
-      ]
+      ],
+      "interfaces": {
+        "encoder": [
+          "quadrature"
+        ]
+      }
     },
     "ADC1": {
       "kind": "adc",
@@ -707,6 +712,9 @@
       "interfaces": {
         "pwm": [
           "fixed-pwm"
+        ],
+        "encoder": [
+          "quadrature"
         ]
       }
     },
@@ -1275,7 +1283,12 @@
       ],
       "resources": [
         "timer:TIM5"
-      ]
+      ],
+      "interfaces": {
+        "encoder": [
+          "quadrature"
+        ]
+      }
     },
     "TIM9": {
       "kind": "pwm",

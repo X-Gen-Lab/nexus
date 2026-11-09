@@ -39,6 +39,12 @@ int main(void) {
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_adc(id);
     }
+#ifdef NX_FIXTURE_ENCODER
+    s_identity_count = NX_ENCODER_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_encoder(id);
+    }
+#endif
     s_identity_count = NX_SPI_DEVICE_ID_COUNT;
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_spi_device(id);

@@ -15,6 +15,9 @@ DESCRIPTOR = FamilyDescriptor(
     ),
     references="references.json",
     owned_payload=(
+        "soc/stm32/stm32f4/drivers/encoder.c",
+        "soc/stm32/stm32f4/private/stm32f4_encoder.h",
+        "soc/stm32/stm32f4/private/stm32f407_timer_hardware.h",
         "soc/stm32/stm32f4/drivers/chip.c",
         "soc/stm32/stm32f4/drivers/crc.c",
         "soc/stm32/stm32f4/private/stm32f4_crc.h",
@@ -67,6 +70,7 @@ DESCRIPTOR = FamilyDescriptor(
         "soc/stm32/stm32f4/private/stm32f407_eth_frames.h",
     ),
     configuration_helpers=(
+        "tools/configure/stm32f4/encoder.py",
         "tools/configure/stm32f4/dac.py",
         "tools/configure/stm32f4/sram.py",
         "tools/configure/stm32f4/fsmc.py",

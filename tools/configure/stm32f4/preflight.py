@@ -31,7 +31,7 @@ def admission_declarations(result, pins, pin_count):
     claims = tuple(owned_claims(result, owners))
     clocks = set()
     for item in result.controllers:
-        if item.kind in {'uart', 'spi', 'i2c', 'pwm', 'timer_capture', 'advanced_pwm', 'can', 'dac'}:
+        if item.kind in {'uart', 'spi', 'i2c', 'pwm', 'encoder', 'timer_capture', 'advanced_pwm', 'can', 'dac'}:
             clocks.add(_clock(item.controller))
         elif item.kind == 'adc':
             register = 'RCC->APB2ENR'

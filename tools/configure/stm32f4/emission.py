@@ -35,6 +35,8 @@ def includes(result):
     source.append('#include "stm32f407_platform_cold.h"')
     if any(item.kind == "crc" for item in selections):
         source.append('#include "stm32f4_crc.h"')
+    if any(item.kind == "encoder" for item in selections):
+        source.append('#include "stm32f4_encoder.h"')
     if any(item.kind == "dac" for item in selections):
         source.append('#include "stm32f407_dac.h"')
     if any(implementation(item) == "dac_dma" for item in selections):

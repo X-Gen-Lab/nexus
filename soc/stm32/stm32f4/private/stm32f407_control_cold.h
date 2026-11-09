@@ -69,29 +69,6 @@ nx_stm32_pwm_route_valid(const nx_stm32_pwm_config_t* config) {
             config->pin == 7U);
 }
 
-/** \brief One selected gate, also retained after failed preparation. */
-static inline uint32_t nx_stm32_pwm_gate(const TIM_TypeDef* registers) {
-    if (registers == TIM3)
-        return RCC_APB1ENR_TIM3EN;
-    if (registers == TIM4)
-        return RCC_APB1ENR_TIM4EN;
-    if (registers == TIM5)
-        return RCC_APB1ENR_TIM5EN;
-    if (registers == TIM9)
-        return RCC_APB2ENR_TIM9EN;
-    if (registers == TIM10)
-        return RCC_APB2ENR_TIM10EN;
-    if (registers == TIM11)
-        return RCC_APB2ENR_TIM11EN;
-    if (registers == TIM12)
-        return RCC_APB1ENR_TIM12EN;
-    if (registers == TIM13)
-        return RCC_APB1ENR_TIM13EN;
-    if (registers == TIM14)
-        return RCC_APB1ENR_TIM14EN;
-    return 0U;
-}
-
 /** \brief Immutable independent ADC1/2/3 ranks and nominal reference.
  * \note ADC3 uses its distinct pad map. Board facts authorize bonded pins.
  *       One channel has one sample time even when repeated in the sequence.
@@ -214,13 +191,13 @@ nx_stm32_pwm_prepare(nx_stm32_pwm_state_t* port,
         (config->registers != TIM5 && config->period_ticks > 65535U) ||
         config->duty_ticks > config->period_ticks || config->tick_hz == 0U)
         return NX_ERROR_INVALID;
-    const bool apb2 = nx_stm32_pwm_apb2(config->registers);
+    const bool apb2 = nx_stm32_timer_apb2(config->registers);
     const uint32_t source_hz = apb2 ? UINT32_C(168000000) : UINT32_C(84000000);
     if (source_hz / config->tick_hz != (uint32_t)config->prescaler + 1U ||
         source_hz % config->tick_hz != 0U)
         return NX_ERROR_INVALID;
     volatile uint32_t* clock = apb2 ? &RCC->APB2ENR : &RCC->APB1ENR;
-    const uint32_t gate = nx_stm32_pwm_gate(config->registers);
+    const uint32_t gate = nx_stm32_timer_gate(config->registers);
     if (port->initialized || inactive->initialized ||
         port->cold_effects != 0U || (*clock & gate) != 0U)
         return NX_ERROR_BUSY;
@@ -267,11 +244,11 @@ static inline nx_result_t nx_stm32_pwm_close(nx_stm32_pwm_state_t* port,
         return NX_ERROR_INVALID;
     if (port->cold_effects == 0U)
         return port->initialized ? NX_ERROR_BUSY : NX_SUCCESS;
-    const uint32_t gate = nx_stm32_pwm_gate(port->registers);
+    const uint32_t gate = nx_stm32_timer_gate(port->registers);
     if (gate == 0U)
         return NX_ERROR_STATE;
     volatile uint32_t* clock =
-        nx_stm32_pwm_apb2(port->registers) ? &RCC->APB2ENR : &RCC->APB1ENR;
+        nx_stm32_timer_apb2(port->registers) ? &RCC->APB2ENR : &RCC->APB1ENR;
     if (port->initialized && (*clock & gate) == 0U)
         return NX_ERROR_IO;
     if (port->initialized) {

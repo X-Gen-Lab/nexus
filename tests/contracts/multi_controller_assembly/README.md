@@ -73,3 +73,9 @@ face／ops；不支持两个 timer 的隐式同步或一个 timer 的多 owner �
 TIM9 使用 168 MHz tick、PSC=0；其他实例保留各自整数分频。TIM4 不同时取得 capture，
 也不选择占用 TIM9 的 TIM1 advanced PWM。它们链接真实静态 factory 与共享 ops，
 不代表硬件波形、时钟精度或电气输出资格。
+
+`stm32-ve-encoders-baremetal.toml` 和 `stm32-zg-encoders-freertos.toml` 同时选择
+TIM3／4／5 的原始正交计数，分别使用 x2 TI1／x2 TI2／x4 TI12。两个输入由 Board
+显式授权，各 timer 与自己的 PWM／capture personality 互斥。平台只 prepare，
+不隐式 start；原始回卷、filter code 和软件观察时间不替代产品的累计位置／速度策略，
+不建立物理传感器资格。

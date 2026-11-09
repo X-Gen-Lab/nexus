@@ -538,6 +538,9 @@ def _uart_constructor(item, result):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed STM32 instance, including its rollback and stop."""
     item = controller_ir(item, "stm32f4")
+    if item.kind == "encoder":
+        from .encoder import constructor as encoder_constructor
+        return encoder_constructor(item)
     if item.kind == "crc":
         state = Address("s_nx_port_" + _symbol(item.id))
         return Construction(state_type="nx_stm32_crc_state_t", definitions=(),

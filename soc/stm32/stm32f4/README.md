@@ -85,6 +85,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | USB | OTG FS device PIO endpoint，独立 USB48 owner；无 Host/HS/DMA/class stack |
 | Ethernet | Raw RMII frame/MDIO、调用者 descriptor／RX loan；IP／协议策略外置 |
 | Timer capture | 已审 TIM4 edge-capture 路线和有界事件 |
+| Encoder | TIM3／4／5 的独占 TI1／TI2 原始 modulo position，x2／x4、两路 filter 与反相；停止保留位置，不建立累计计数或 IRQ |
 | Advanced PWM | 已审 TIM1 互补输出／deadtime／break，功率级电气安全外部验收 |
 
 IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征；当前没有
@@ -263,6 +264,21 @@ bank，逆序恢复每个引脚，再恢复原有三个 gate 位；6 字节 rece
 I2C recover 同时检查 BUSY 与已保留 SCL/SDA GPIO 实时输入；即使 BUSY 清除，只要
 线路低就返回 IO。局部 reset 不打 GPIO 恢复脉冲、不重放事务、不保证未来总线可用；
 缺线路事实时在寄存器写入前拒绝。
+
+## 原始 Encoder 与资源归属
+
+`drivers/encoder.c` 复用官方 LL，提供 TIM3／4／5 的硬件 x2 TI1／x2 TI2／x4 TI12
+原始计数。引脚固定为 PA6／PA7、PB6／PB7、PA0／PA1，均为 AF2；filter code 为
+0–15，kernel clock 为固定 84 MHz。counter 在 prepare 后保持停止，stop 不清零 CNT；
+read 仅返回 16／16／32-bit modulo count 和软件观察时间，不维护累计位置或速度。
+
+每个实例只保留只读 descriptor 指针、cold receipt 和 initialized。当前 ARM ABI 下
+可变 state 为 8 字节，只读 config 为 12 字节；face／共享 ops 与公共 pin lease 另计。
+编码器不创建 IRQ、DMA、ring 或 worker，与相同 timer 的 PWM／capture 互斥。
+取得前拒绝外来 clock／vector／活动 controller；部分失败和关闭失败保留精确责任。
+完整 close 证明 counter／inputs／DIER 已退出后再撤 clock，最终 GPIO 恢复仍由
+Platform 的两份 pin lease 负责。APB／AF／gate 事实与 PWM 共用同一私有 C 头，
+不增加运行时表、查找层或实例字段。
 
 ## DAC 输出与触发所有权
 

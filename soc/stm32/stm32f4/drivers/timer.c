@@ -92,7 +92,7 @@ nx_result_t nx_stm32_pwm_start(void* context) {
         return NX_ERROR_STATE;
     }
     GPIO_TypeDef* gpio = port->inactive_gpio->registers;
-    const uint32_t alternate = nx_stm32_pwm_af(port->registers);
+    const uint32_t alternate = nx_stm32_timer_af(port->registers);
     for (unsigned pin = 0U; pin < 16U; ++pin) {
         if ((port->inactive_mask & (1U << pin)) != 0U) {
             uint32_t selected = 1U << pin;

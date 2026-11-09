@@ -42,3 +42,19 @@ foreach(control_kind adc pwm exti)
     target_compile_options(${control_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_control_cold_model.h")
 endforeach()
+
+# One real raw encoder implementation, shared across timer widths and modes.
+nexus_google_test(nexus_stm32_encoder_test STM32F4_LL
+    SOURCES stm32_encoder_test.cpp
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/encoder.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+    LIBRARIES Nexus::IO Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
+target_include_directories(nexus_stm32_encoder_test SYSTEM PRIVATE
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+target_compile_definitions(nexus_stm32_encoder_test PRIVATE STM32F407xx
+    nx_arch_is_privileged=nx_encoder_model_privileged
+    nx_arch_in_isr=nx_encoder_model_isr
+    nx_arch_irq_is_masked=nx_encoder_model_masked
+    nx_arch_dsb=nx_encoder_model_dsb)

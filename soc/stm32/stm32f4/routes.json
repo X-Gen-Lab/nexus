@@ -4656,6 +4656,81 @@
         "fixed-pwm"
       ],
       "source": "DS8626 Rev12 Table9; RM0090 Rev22 general-purpose timers TIM2-5 and TIM9-14; exact F407VE/ZG only"
+    },
+    {
+      "id": "tim3-encoder-pa6-pa7",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM3",
+      "kind": "encoder",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "ti1",
+          "af": 2
+        },
+        {
+          "pin": "PA7",
+          "function": "ti2",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "quadrature"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 section18.3 encoder interface; F407VE/ZG only"
+    },
+    {
+      "id": "tim4-encoder-pb6-pb7",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM4",
+      "kind": "encoder",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "ti1",
+          "af": 2
+        },
+        {
+          "pin": "PB7",
+          "function": "ti2",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "quadrature"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 section18.3 encoder interface; F407VE/ZG only"
+    },
+    {
+      "id": "tim5-encoder-pa0-pa1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM5",
+      "kind": "encoder",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "ti1",
+          "af": 2
+        },
+        {
+          "pin": "PA1",
+          "function": "ti2",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "quadrature"
+      ],
+      "source": "DS8626 Rev12 Table9; RM0090 Rev22 section18.3 encoder interface; F407VE/ZG only"
     }
   ]
 }

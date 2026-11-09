@@ -51,7 +51,9 @@ OFFSET_IMAGE_VECTOR_SYMBOL = 'g_pfnVectors'
 FACT_REFERENCES = descriptor.maintained("stm32f4").references
 ETH_CONTROLLER = 'ETH'
 CONTROLLER_INTERFACES = MappingProxyType({
-    'TIM4': MappingProxyType({'pwm': ('fixed-pwm',)}),
+    'TIM3': MappingProxyType({'encoder': ('quadrature',)}),
+    'TIM4': MappingProxyType({'pwm': ('fixed-pwm',), 'encoder': ('quadrature',)}),
+    'TIM5': MappingProxyType({'encoder': ('quadrature',)}),
     'ETH': MappingProxyType({
         'eth_frames': ('rmii-vlan-sg-ptp',)}),
     'FSMC': MappingProxyType({
@@ -79,6 +81,7 @@ SPI_REQUIRES_ENDPOINT = True
 PIN_ELECTRICAL = True
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
+    ('encoder', 'quadrature'): 'encoder',
     ('crc', 'crc32-words'): 'crc',
     ('dac', 'direct'): 'dac',
     ('dac', 'triggered'): 'dac',
@@ -135,6 +138,9 @@ def validate_selection(selection, route):
     elif kind == "block":
         from .block import validate
         validate(selection)
+    elif kind == "encoder":
+        from .encoder import validate
+        validate(selection, route)
     elif kind == "adc" and common.mode_traits(kind, selection["mode"]).dma:
         if (route["controller"], selection["mode"]) not in _FIXED_DMA:
             common.fail("ADC DMA requires a reviewed converter/TIM3 path")

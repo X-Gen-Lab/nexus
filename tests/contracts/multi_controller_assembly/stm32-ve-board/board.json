@@ -155,6 +155,21 @@
       "controller": "TIM14",
       "route": "tim14-ch1-pa7",
       "initial": 0
+    },
+    {
+      "id": "encoder3",
+      "controller": "TIM3",
+      "route": "tim3-encoder-pa6-pa7"
+    },
+    {
+      "id": "encoder4",
+      "controller": "TIM4",
+      "route": "tim4-encoder-pb6-pb7"
+    },
+    {
+      "id": "encoder5",
+      "controller": "TIM5",
+      "route": "tim5-encoder-pa0-pa1"
     }
   ],
   "reserved_resources": [],

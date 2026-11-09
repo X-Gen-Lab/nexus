@@ -42,6 +42,7 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 | SPI／I2C | SPI1／2／3 polling、普通与增强 DMA 事务；I2C1／2／3 polling／IRQ／DMA；显式 endpoint 与受审路线 |
 | PWM | TIM3／TIM5 的 CH1–4 中各显式选择一路；固定 84 MHz timer clock 与 PSC／ARR；TIM3 周期 1–65535，TIM5 周期 1–4294967295；无隐式共享时基 |
 | ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；独立 shot／scan 最多 16 ranks，三个转换器均有独占 TIM3 的有限／连续 DMA |
+| Encoder | TIM3／4／5 独占 TI1／TI2 原始正交计数；x2 TI1、x2 TI2、x4 TI12，独立输入反相与 4-bit filter；无 IRQ／DMA／累计位置策略 |
 | DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码 |
 | Flash／IWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
 | CRC／芯片身份 | 固定多项式 CRC-32 字序列；实际 UID、device／revision ID 和半字 Flash 容量；不建立认证或订货号推断 |
@@ -179,3 +180,15 @@ PWM 仍保守独占共享 vector 的 TIM9。冷态 C 校验精确 timer、pad、
 位宽，启钟／撤回失败保留所选 APB gate 的清理责任；已有 GPIO owner 不被覆盖。
 `tests/contracts/multi_controller_assembly/*pwm-family*.toml` 同时链接九个独立实例，
 不授权 PCB 接线或实际输出时序。
+
+Encoder 复用现有公共接口与 typed factory：TIM3 为 PA6／PA7、TIM4 为 PB6／PB7、
+TIM5 为 PA0／PA1，均为 AF2。计数宽度分别为 16／16／32 bits，filter clock 固定
+84 MHz；`counting` 选择 `x2-ti1`／`x2-ti2`／`x4-ti12`，两路 filter code 为 0–15。
+每个 encoder 独占整个 timer，与同一控制器的 PWM／capture 互斥。
+
+准备成功时 counter 仍关闭；应用显式 start。stop 保留原始 modulo position，
+完整 close 先证明输入／counter／DMA 请求和中断源已停止，再撤回本次 clock；失败保留
+静态 descriptor 与清理责任。read 的时间是软件观察时刻，不代表某条边沿；不能恢复
+漏采的整圈，方向历史、速度、机械零点和累计位置由产品决定。代码不建立 ring、
+任务、IRQ 或 DMA。示例为 `tests/contracts/multi_controller_assembly/*encoders*.toml`；
+filter code 不构成实测抗噪或物理边沿速率保证。

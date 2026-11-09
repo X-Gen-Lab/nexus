@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 2436202aaacee73223ef62defef347bef6341fc994e27a07a2ca255af510ce8e\n"
+"X-Nexus-Source-SHA256: ab3caf9074e1ce5c98340dd66d2e949d91add21bd28051a5b3e2d50efb9e6b70\n"
 
 #: docs/delivery/capabilities.md:8
 msgid "当前派生能力矩阵"
@@ -1710,3 +1710,30 @@ msgstr "`tim4-ch1-pb6`, `tim4-ch2-pb7`, `tim4-ch3-pb8`, `tim4-ch4-pb9`"
 
 msgid "`tim9-ch1-pa2`, `tim9-ch2-pa3`"
 msgstr "`tim9-ch1-pa2`, `tim9-ch2-pa3`"
+
+msgid "`soc/stm32/stm32f4/drivers/encoder.c`"
+msgstr "`soc/stm32/stm32f4/drivers/encoder.c`"
+
+msgid ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-encoders-"
+"baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-"
+"encoders-freertos.toml`"
+msgstr ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-encoders-"
+"baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-"
+"encoders-freertos.toml`"
+
+msgid "`tim3-encoder-pa6-pa7`"
+msgstr "`tim3-encoder-pa6-pa7`"
+
+msgid "`tim4-encoder-pb6-pb7`"
+msgstr "`tim4-encoder-pb6-pb7`"
+
+msgid "`tim5-encoder-pa0-pa1`"
+msgstr "`tim5-encoder-pa0-pa1`"
+
+msgid "encoder"
+msgstr "encoder"
+
+msgid "quadrature"
+msgstr "quadrature"

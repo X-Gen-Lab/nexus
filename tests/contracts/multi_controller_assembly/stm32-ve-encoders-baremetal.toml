@@ -1,0 +1,42 @@
+# Raw hardware counters; software assembly, no sensor qualification.
+schema = 2
+board_package = "stm32-ve-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[encoder.position3]
+binding = "encoder3"
+mode = "quadrature"
+counting = "x2-ti1"
+filter_a = 1
+filter_b = 2
+invert_a = false
+invert_b = true
+exclusive = true
+
+[encoder.position4]
+binding = "encoder4"
+mode = "quadrature"
+counting = "x2-ti2"
+filter_a = 4
+filter_b = 5
+invert_a = true
+invert_b = false
+exclusive = true
+
+[encoder.position5]
+binding = "encoder5"
+mode = "quadrature"
+counting = "x4-ti12"
+filter_a = 0
+filter_b = 15
+invert_a = false
+invert_b = false
+exclusive = true
