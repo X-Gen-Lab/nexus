@@ -61,3 +61,9 @@ quiescence 后才恢复 pad；每个 active-low CS 在同组任一引脚恢复�
 TIM3 与 TIM5 PWM。软件 Board 分别授权 CH3／CH4 和 CH4／CH1；VE 的 TIM5 使用
 UINT32_MAX 周期，ZG 使用 70000。每个控制器只选择一路，保留 factory 真正的 PWM
 face／ops；不支持两个 timer 的隐式同步或一个 timer 的多 owner 共享。
+
+`stm32-ve-adc-internal-baremetal.toml` 和
+`stm32-zg-adc-internal-freertos.toml` 分别选择 ADC1 的内部 raw scan 和连续 DMA。
+通道 16／17／18 使用 480-cycle acquisition，不取得 GPIO；连续模式仍独占 TIM3
+及 DMA2 stream4 channel0，存储由调用方提供。factory 保留真实接口，换算、校准和
+物理温度／电压资格不属于这些链接夹具。

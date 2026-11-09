@@ -16,6 +16,63 @@
 #define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
 #endif
 
+nx_result_t nx_stm32_adc_sequence_validate(ADC_TypeDef* registers,
+                                           const uint8_t* channels,
+                                           const uint8_t* sample_times,
+                                           size_t count) {
+    if (registers == NULL || channels == NULL || sample_times == NULL ||
+        count == 0U || count > 16U)
+        return NX_ERROR_INVALID;
+    for (size_t i = 0U; i < count; ++i) {
+        if (channels[i] > 18U || sample_times[i] > 7U ||
+            (channels[i] > 15U && (registers != ADC1 || sample_times[i] != 7U)))
+            return NX_ERROR_UNSUPPORTED;
+        for (size_t j = 0U; j < i; ++j) {
+            if (channels[i] == channels[j] &&
+                sample_times[i] != sample_times[j])
+                return NX_ERROR_UNSUPPORTED;
+        }
+    }
+    return NX_SUCCESS;
+}
+
+uint32_t nx_stm32_adc_internal_mask(const nx_stm32_adc_state_t* port) {
+    uint32_t mask = 0U;
+    for (size_t i = 0U; i < port->channel_count; ++i) {
+        if (port->channels[i] == 16U || port->channels[i] == 17U)
+            mask |= ADC_CCR_TSVREFE;
+        else if (port->channels[i] == 18U)
+            mask |= ADC_CCR_VBATE;
+    }
+    return mask;
+}
+
+nx_result_t nx_stm32_adc_internal_prepare(nx_stm32_adc_state_t* port) {
+    const uint32_t mask = nx_stm32_adc_internal_mask(port);
+    if (mask == 0U)
+        return NX_SUCCESS;
+    if ((port->common->CCR & mask) != 0U)
+        return NX_ERROR_BUSY;
+    /* Retain ownership before the first fallible write. Preserve unrelated
+     * common paths and clock fields; only this acquired mask is released. */
+    port->cold_effects |= NX_STM32_ADC_INTERNAL;
+    NX_PLATFORM_REGISTER_WRITE(port->common->CCR, port->common->CCR | mask);
+    nx_arch_dsb();
+    return (port->common->CCR & mask) == mask ? NX_SUCCESS : NX_ERROR_IO;
+}
+
+nx_result_t nx_stm32_adc_internal_close(nx_stm32_adc_state_t* port) {
+    if ((port->cold_effects & NX_STM32_ADC_INTERNAL) == 0U)
+        return NX_SUCCESS;
+    const uint32_t mask = nx_stm32_adc_internal_mask(port);
+    NX_PLATFORM_REGISTER_WRITE(port->common->CCR, port->common->CCR & ~mask);
+    nx_arch_dsb();
+    if ((port->common->CCR & mask) != 0U)
+        return NX_ERROR_IO;
+    port->cold_effects &= (uint8_t)~NX_STM32_ADC_INTERNAL;
+    return NX_SUCCESS;
+}
+
 /** \brief Release only interface clocks temporarily acquired for observation.
  */
 nx_result_t nx_stm32_adc_probe_close(nx_stm32_adc_state_t* port) {
@@ -113,17 +170,14 @@ nx_result_t nx_stm32_adc_initialize(nx_stm32_adc_state_t* port) {
     if (port->resolution > 3U) {
         return NX_ERROR_UNSUPPORTED;
     }
-    for (size_t i = 0U; i < port->channel_count; ++i) {
-        if (port->channels[i] > 15U || port->sample_times[i] > 7U) {
-            return NX_ERROR_UNSUPPORTED;
-        }
-        for (size_t j = 0U; j < i; ++j) {
-            if (port->channels[i] == port->channels[j] &&
-                port->sample_times[i] != port->sample_times[j]) {
-                return NX_ERROR_UNSUPPORTED;
-            }
-        }
-    }
+    nx_result_t sequence =
+        nx_stm32_adc_sequence_validate(port->registers, port->channels,
+                                       port->sample_times, port->channel_count);
+    if (sequence != NX_SUCCESS)
+        return sequence;
+    if (nx_stm32_adc_internal_mask(port) != 0U &&
+        (port->cold_effects & NX_STM32_ADC_INTERNAL) == 0U)
+        return NX_ERROR_STATE;
     if ((port->common->CCR & (ADC_CCR_MULTI | ADC_CCR_DMA | ADC_CCR_DDS)) !=
             0U ||
         LL_ADC_GetCommonClock(port->common) != LL_ADC_CLOCK_SYNC_PCLK_DIV4) {
@@ -193,7 +247,8 @@ nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
         (void)nx_stm32_adc_quiesce(port);
         return NX_ERROR_IO;
     }
-    nx_time_us_t stable = nx_deadline_after(nx_time_now_us(), 3U);
+    nx_time_us_t stable = nx_deadline_after(
+        nx_time_now_us(), nx_stm32_adc_startup_delay_us(port));
     while (!nx_deadline_expired(stable, nx_time_now_us())) {
         NX_STM32_IO_POLL(5U, port);
     }

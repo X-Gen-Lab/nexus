@@ -1,4 +1,4 @@
-"""F407 external channels and ranks follow the reviewed physical pad map."""
+"""F407 raw ranks follow reviewed external pads and internal analog paths."""
 import json
 from pathlib import Path
 import tempfile
@@ -22,6 +22,49 @@ class F407AdcChannelTests(unittest.TestCase):
                     "sample_times": list(samples or [7] * len(channels)),
                     "reference_mv": 3300}
         return selected, route
+
+    def test_internal_adc1_sources_resolve_without_gpio_claims(self):
+        selected, route = self.selection([], [16, 17, 18])
+        adc.validate_selection(selected, route, contract)
+        contract.validate_selection(selected, route)
+        self.assertEqual([], adc.selected_route(selected, route, contract)['pins'])
+
+    def test_internal_sources_reject_other_converters_and_short_acquisition(self):
+        for controller, sample in (("ADC1", 6), ("ADC2", 7), ("ADC3", 7)):
+            with self.subTest(controller=controller, sample=sample):
+                selected, route = self.selection(
+                    [], [16, 17, 18], [sample] * 3, controller=controller)
+                with self.assertRaises(ValueError):
+                    adc.validate_selection(selected, route, contract)
+                    contract.validate_selection(selected, route)
+
+    def test_internal_sources_have_a_complete_pinless_static_assembly(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            board = gate.load(gate.ROOT / 'tests/contracts/multi_controller_assembly/stm32-ve-board/board.json')
+            board['bindings'] = [{'id': 'internal', 'controller': 'ADC1',
+                                   'route': 'adc1-internal'}]
+            (directory / 'board').mkdir()
+            (directory / 'board/board.json').write_text(json.dumps(board))
+            for mode in ('single-shot', 'low-rate-scan', 'trigger-dma',
+                         'trigger-dma-continuous'):
+                with self.subTest(mode=mode):
+                    channels = [17] if mode == 'single-shot' else [16, 17, 18]
+                    text = ('schema=2\nboard_package="board"\nbackend="baremetal"\n'
+                            'clock="hse8-pll168"\n[memory]\nmain_stack_bytes=2048\n'
+                            '[adc.internal]\nbinding="internal"\nmode=' + json.dumps(mode) +
+                            '\nchannels=' + json.dumps(channels) + '\nsample_times=' +
+                            json.dumps([7] * len(channels)) + '\nreference_mv=3300\n')
+                    if mode.startswith('trigger-'):
+                        text += '[adc.internal.irq]\npriority=5\ncalls_os=false\n'
+                    path = directory / 'assembly.toml'
+                    path.write_text(text)
+                    result = gate.resolve_ir(path)
+                    self.assertEqual(result.controllers[0].pins, ())
+                    self.assertFalse(any(c.key.startswith('pin:') for c in result.claims))
+                    output = directory / mode
+                    gate.configure(path, output)
+                    self.assertIn('.registers = ADC1', (output / 'bindings.c').read_text())
 
     def test_all_external_pad_mappings_accept_a_single_shot(self):
         for channel, pin in enumerate(self.PINS):
@@ -65,7 +108,7 @@ class F407AdcChannelTests(unittest.TestCase):
 
     def test_an_unconnected_channel_or_wrong_bank_is_rejected(self):
         for pins, channels in ((["PC0"], [0]), (["PB0"], [0]),
-                               (["PA0"], [16]), (["PC6"], [6])):
+                               (["PA0"], [19]), (["PC6"], [6])):
             with self.subTest(pins=pins, channels=channels):
                 selected, route = self.selection(pins, channels,
                                                   mode="single-shot")

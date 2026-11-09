@@ -78,7 +78,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
 | PWM | TIM3 CH1–4、TIM5 CH1–4 中显式选择一路；固定 PSC/ARR；TIM3 period1–65535，TIM5 period1–4294967295；duty0–period、shadow update；stop 建立 GPIO inactive |
-| ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；独立 6／8／10／12-bit 软件 shot/scan、最多 16 ranks；各转换器均有独占 TIM3 触发有限／连续 DMA block |
+| ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；独立 6／8／10／12-bit 软件 shot/scan、最多 16 ranks；各转换器均有独占 TIM3 触发有限／连续 DMA block |
 | DAC | PA4／PA5 单／双通道，CPU direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA；u8／u12-right／u12-left |
 | CRC | 多项式 0x04C11DB7、初值 0xffffffff、32 位字输入；同步计算、独占 controller、失败输出保持 |
 | CAN | CAN1/CAN2 Classic CAN IRQ、三邮箱、共享 filter domain；无 CAN FD |
@@ -94,7 +94,7 @@ IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征�
 独立核心板和 V4.1 包各自保留原理图与跳线身份，不替换旧 V3.1。内部 Flash／IWDG
 可以显式选择，但不会预留存储或在 startup 启狗。SoC AF 路线不证明 Board 接线、
 外部上拉、器件实装或物理支持，用户必须提供已审绑定。I2C GPIO bus-clear 为独立
-通用组件；内部 ADC channel 和未声明模式仍拒绝或不在 schema 内。
+通用组件；未声明的 ADC 模式仍拒绝或不在 schema 内。
 
 已选 erase-aligned offset image 有明确 startup／vector／linker／ELF/BIN 检查，
 不包含 boot 认证、激活或运行镜像 handoff 资格。精确 mode／Board／生产源码见
@@ -197,11 +197,24 @@ gate、临时观察 gate、TIM3 和 DMA IRQ 分开记录责任，复用现有状
 
 `tests/contracts/adc_external_assembly/` 提供两种密度的软件参考装配，使用三个
 GPIO bank 的 16-rank 反向序列，以及 VE／ZG 的三转换器独立实例装配；不代表实际
-板卡接线。内部输入、注入组和同步多 ADC 模式继续未实现。ADC1／2／3 分别使用
+板卡接线。注入组和同步多 ADC 模式继续未实现。ADC1／2／3 分别使用
 DMA2 stream4 channel0／stream2 channel1／stream1 channel2，复用有限和连续 C
 实现与只读 ops，不增加每实例 route 字段。TIM3 仍是独占触发源，不允许独立 stream
 实例暗中共享。VE／ZG 的 DMA 组合参考见
 `tests/contracts/multi_controller_assembly/*tertiary*.toml`。
+
+F407 的 ADC1 内部通道 16 为温度、17 为 VREFINT、18 为 VBAT／2。pinless
+`adc1-internal` route 共用现有 shot／scan／有限和连续 DMA，不取得 GPIO，也不新增
+运行时字段；静态 channels 与已有 cold receipt bit 表达路径身份和清理责任。
+21 MHz ADCCLK 下，内部输入只准入 480-cycle sample time。温度、电压和校准不进入
+驱动，返回值保持原始计数，`reference_mv` 不代表实测 VDDA。
+
+冷态 prepare 先拒绝已有的所需 TSVREFE／VBATE，取得前记录责任，写后独立回读。
+close 先证明 ADC 停止，再只撤回所取模拟路径，最后释放 clock；任一步拒绝保留责任，
+其他未取得路径保持原值。为覆盖整微秒时间戳的取整，ADON 后外部输入等待 4 μs，
+含内部输入等待 11 μs，三个执行模式使用同一 helper，不保留额外启动时间戳。
+这遵循 RM0090 Rev22 §13.10／13.11 与 DS8626 Rev12 的启动和采样时间要求，
+不承诺实际模拟精度、功耗或 VBAT 测量条件。
 
 有限 ADC `trigger-dma` 在发布完整块前停 trigger／conversion／DMA，稳定后由显式
 service rearm，块间可有间隙。消费者借用不能被覆盖，未释放时 stop 保持 BUSY；

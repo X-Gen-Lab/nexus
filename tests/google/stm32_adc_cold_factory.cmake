@@ -44,3 +44,9 @@ foreach(adc_variant ve zg ve6 zg10)
     target_compile_options(${adc_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_adc_cold_model.h")
 endforeach()
+
+# Internal analog contracts run once for the shared F407 implementation.
+target_compile_definitions(nexus_stm32_adc_ve_cold_factory_test PRIVATE
+    NX_ADC_INTERNAL_CONTRACT)
+target_sources(nexus_stm32_adc_ve_cold_factory_test PRIVATE
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_continuous.c")

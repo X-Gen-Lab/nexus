@@ -34,6 +34,12 @@ uint32_t refuse_probe_release;
 unsigned starts;
 unsigned stops;
 nx_time_us_t now;
+#if defined(NX_ADC_INTERNAL_CONTRACT)
+bool fractional_clock;
+uint64_t clock_ns;
+uint64_t enabled_ns;
+uint64_t conversion_ns;
+#endif
 constexpr uint32_t original_ahb1 = RCC_AHB1ENR_GPIODEN;
 
 class AdcColdFactory : public testing::Test {
@@ -60,6 +66,10 @@ class AdcColdFactory : public testing::Test {
         refuse_probe_enable = refuse_probe_release = 0U;
         starts = stops = 0U;
         now = 100U;
+#if defined(NX_ADC_INTERNAL_CONTRACT)
+        fractional_clock = false;
+        clock_ns = enabled_ns = conversion_ns = 0U;
+#endif
         RCC->AHB1ENR = original_ahb1;
     }
     void TearDown() override {
@@ -89,6 +99,180 @@ class AdcColdFactory : public testing::Test {
     }
 };
 } /* namespace */
+
+#if defined(NX_ADC_INTERNAL_CONTRACT)
+TEST_F(AdcColdFactory, StartupWaitCoversTheFractionalMicrosecondPhase) {
+    const uint8_t channels[]{0U};
+    const uint8_t timing[]{7U};
+    const nx_stm32_adc_config_t config{channels, timing, 1U, 3300U, 0U, ADC1};
+    nx_stm32_adc_state_t state{};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_prepare(&state, &config));
+    fractional_clock = true;
+    clock_ns = now * 1000U;
+    const nx_adc_port_t face{&nx_stm32_adc_ops, &state};
+    uint16_t sample{};
+    size_t count{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_adc_port_sample(&face, &sample, 1U, now + 1000U, &count));
+    EXPECT_NE(0U, enabled_ns);
+    EXPECT_GE(conversion_ns - enabled_ns, 3000U);
+    fractional_clock = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_adc_close(&state));
+}
+
+TEST_F(AdcColdFactory, InternalRawScanUsesNoPadsAndWaitsForItsSource) {
+    const uint8_t channels[]{16U, 17U, 18U};
+    const uint8_t timing[]{7U, 7U, 7U};
+    const nx_stm32_adc_config_t config{channels, timing, 3U, 3300U, 0U, ADC1};
+    nx_stm32_adc_state_t state{};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_prepare(&state, &config));
+    const uint32_t paths = ADC_CCR_TSVREFE | ADC_CCR_VBATE;
+    EXPECT_EQ(paths, ADC->CCR & paths);
+    EXPECT_EQ(original_ahb1, RCC->AHB1ENR);
+    EXPECT_EQ(0U, GPIOA->MODER | GPIOB->MODER | GPIOC->MODER);
+    fractional_clock = true;
+    clock_ns = now * 1000U;
+    const nx_adc_port_t face{&nx_stm32_adc_ops, &state};
+    uint16_t data[3]{};
+    size_t count{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_adc_port_sample(&face, data, 3U, now + 1000U, &count));
+    EXPECT_GE(conversion_ns - enabled_ns, 10000U);
+    EXPECT_EQ(3U, count);
+    EXPECT_EQ(1700U, data[0]);
+    EXPECT_EQ(1800U, data[1]);
+    EXPECT_EQ(1900U, data[2]);
+    fractional_clock = false;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_close(&state));
+    EXPECT_EQ(0U, ADC->CCR & paths);
+    EXPECT_EQ(original_ahb1, RCC->AHB1ENR);
+}
+
+TEST_F(AdcColdFactory, InternalAnalogOwnershipSurvivesRefusedRelease) {
+    const uint8_t channel[]{17U};
+    const uint8_t timing[]{7U};
+    const nx_stm32_adc_config_t config{channel, timing, 1U, 3300U, 0U, ADC1};
+    nx_stm32_adc_state_t state{};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_prepare(&state, &config));
+    refused = &ADC->CCR;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_adc_close(&state));
+    EXPECT_NE(0U, ADC->CCR & ADC_CCR_TSVREFE);
+    EXPECT_NE(0U, RCC->APB2ENR & RCC_APB2ENR_ADC1EN);
+    EXPECT_NE(0U, state.cold_effects);
+    refused = nullptr;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_close(&state));
+    EXPECT_EQ(0U, ADC->CCR & ADC_CCR_TSVREFE);
+    EXPECT_EQ(0U, state.cold_effects);
+}
+
+TEST_F(AdcColdFactory, RefusedSourceEnableDoesNotLeaveAnUntrackedEffect) {
+    const uint8_t channel[]{16U};
+    const uint8_t timing[]{7U};
+    const nx_stm32_adc_config_t config{channel, timing, 1U, 3300U, 0U, ADC1};
+    nx_stm32_adc_state_t state{};
+    ADC->CCR = ADC_CCR_ADCPRE_0;
+    refused = &ADC->CCR;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_adc_prepare(&state, &config));
+    EXPECT_NE(0U, state.cold_effects);
+    EXPECT_FALSE(state.initialized);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_close(&state));
+    EXPECT_EQ(0U, state.cold_effects);
+    EXPECT_EQ(0U, RCC->APB2ENR);
+    refused = nullptr;
+}
+
+TEST_F(AdcColdFactory, AnalogReleaseWaitsForPowerdownAndPreservesUnownedPath) {
+    const uint8_t channel[]{17U};
+    const uint8_t timing[]{7U};
+    const nx_stm32_adc_config_t config{channel, timing, 1U, 3300U, 0U, ADC1};
+    nx_stm32_adc_state_t state{};
+    ADC->CCR = ADC_CCR_ADCPRE_0 | ADC_CCR_VBATE;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_prepare(&state, &config));
+    ADC1->CR2 = ADC_CR2_ADON;
+    refuse_powerdown = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_adc_close(&state));
+    EXPECT_NE(0U, ADC->CCR & ADC_CCR_TSVREFE);
+    EXPECT_NE(0U, ADC->CCR & ADC_CCR_VBATE);
+    refuse_powerdown = false;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_close(&state));
+    EXPECT_EQ(0U, ADC->CCR & ADC_CCR_TSVREFE);
+    EXPECT_NE(0U, ADC->CCR & ADC_CCR_VBATE);
+}
+
+TEST_F(AdcColdFactory,
+       InternalSourcesRejectOtherConvertersAndShortAcquisition) {
+    const uint8_t channel[]{16U};
+    for (auto* adc : {ADC1, ADC2, ADC3}) {
+        const uint8_t timing[]{static_cast<uint8_t>(adc == ADC1 ? 6U : 7U)};
+        const nx_stm32_adc_config_t config{channel, timing, 1U, 3300U, 0U, adc};
+        nx_stm32_adc_state_t state{};
+        EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_adc_prepare(&state, &config));
+        EXPECT_EQ(0U, RCC->APB2ENR);
+        EXPECT_EQ(0U, ADC->CCR);
+        EXPECT_EQ(0U, state.cold_effects);
+    }
+}
+
+TEST_F(AdcColdFactory, InternalDmaModesRetainAnalogPowerUntilControllerClose) {
+    const uint8_t channels[]{16U, 17U, 18U};
+    const uint8_t timing[]{7U, 7U, 7U};
+    uint16_t storage[3][3]{};
+    const nx_dma_memory_region_t region{reinterpret_cast<uintptr_t>(storage),
+                                        sizeof(storage), NX_DMA_MEMORY_WRITE};
+    const nx_stm32_adc_stream_config_t config{
+        {channels, timing, 3U, 3300U, 0U, ADC1}, &region, 1U, 5U};
+    RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
+    for (bool continuous : {false, true}) {
+        SCOPED_TRACE(continuous);
+        nx_stm32_adc_continuous_state_t state{};
+        nx_stream_slot_t slots[3]{};
+        for (unsigned index = 0U; index < 3U; ++index) {
+            slots[index].data = reinterpret_cast<uint8_t*>(storage[index]);
+            slots[index].capacity = sizeof(storage[index]);
+        }
+        nx_stream_t stream{};
+        ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, slots, 3U));
+        ASSERT_EQ(NX_SUCCESS,
+                  continuous
+                      ? nx_stm32_adc_continuous_prepare(&state, &config)
+                      : nx_stm32_adc_stream_prepare(&state.base, &config));
+        const nx_adc_port_t face{continuous ? &nx_stm32_adc_continuous_ops
+                                            : &nx_stm32_adc_stream_ops,
+                                 continuous ? static_cast<void*>(&state)
+                                            : static_cast<void*>(&state.base)};
+        const auto start = now;
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_start(&face, &stream, 1000U));
+        EXPECT_GE(state.base.ready_at - start, 11U);
+        EXPECT_EQ(0U, TIM3->CR1 & TIM_CR1_CEN);
+        now += 12U;
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_service(&face));
+        EXPECT_NE(0U, TIM3->CR1 & TIM_CR1_CEN);
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&face));
+        EXPECT_NE(0U, ADC->CCR & ADC_CCR_TSVREFE);
+        EXPECT_NE(0U, ADC->CCR & ADC_CCR_VBATE);
+        ASSERT_EQ(NX_SUCCESS, continuous
+                                  ? nx_stm32_adc_continuous_close(&state)
+                                  : nx_stm32_adc_stream_close(&state.base));
+        EXPECT_EQ(0U, ADC->CCR & (ADC_CCR_TSVREFE | ADC_CCR_VBATE));
+        EXPECT_EQ(0U, RCC->APB2ENR);
+    }
+}
+
+TEST_F(AdcColdFactory, InternalPathDoesNotAdoptPreexistingAnalogOwnership) {
+    const uint8_t channel[]{17U};
+    const uint8_t timing[]{7U};
+    const nx_stm32_adc_config_t config{channel, timing, 1U, 3300U, 0U, ADC1};
+    nx_stm32_adc_state_t state{};
+    ADC->CCR = ADC_CCR_ADCPRE_0 | ADC_CCR_TSVREFE;
+    ADC1->CR2 = ADC_CR2_ALIGN;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_adc_prepare(&state, &config));
+    EXPECT_NE(0U, ADC->CCR & ADC_CCR_TSVREFE);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_close(&state));
+    EXPECT_NE(0U, ADC->CCR & ADC_CCR_TSVREFE);
+    EXPECT_EQ(ADC_CR2_ALIGN, ADC1->CR2);
+    EXPECT_EQ(0U, RCC->APB2ENR);
+}
+#endif
 
 TEST_F(AdcColdFactory, LookupIsPureAndStopRestoresAllThreeBanks) {
     const auto* port = nx_factory_adc(static_cast<nx_adc_id_t>(0));
@@ -565,6 +749,14 @@ extern "C" bool nx_arch_irq_is_masked(void) {
     return g_f4_model_mask != 0U;
 }
 extern "C" void nx_arch_dsb(void) {
+#if defined(NX_ADC_INTERNAL_CONTRACT)
+    if (fractional_clock && enabled_ns == 0U &&
+        (ADC1->CR2 & ADC_CR2_ADON) != 0U) {
+        /* Enable near a tick boundary; the public clock reports whole us. */
+        clock_ns = ((clock_ns + 999U) / 1000U) * 1000U + 950U;
+        enabled_ns = clock_ns;
+    }
+#endif
     if (refuse_restore && (GPIOB->MODER & 3U) == 0U)
         GPIOB->MODER |= 3U;
     if (refuse_powerdown && ADC1->CR2 == 0U)
@@ -583,6 +775,13 @@ extern "C" void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
     g_f4_model_mask = previous.value;
 }
 extern "C" nx_time_us_t nx_time_now_us(void) {
+#if defined(NX_ADC_INTERNAL_CONTRACT)
+    if (fractional_clock) {
+        clock_ns += 10U;
+        now = clock_ns / 1000U;
+        return now;
+    }
+#endif
     return ++now;
 }
 extern "C" void nx_stm32_adc_cold_model_poll(unsigned kind, void* raw) {
@@ -590,6 +789,10 @@ extern "C" void nx_stm32_adc_cold_model_poll(unsigned kind, void* raw) {
     auto* state = static_cast<nx_stm32_adc_state_t*>(raw);
     auto* adc = state->registers;
     if ((adc->CR2 & ADC_CR2_SWSTART) != 0U) {
+#if defined(NX_ADC_INTERNAL_CONTRACT)
+        if (fractional_clock && conversion_ns == 0U)
+            conversion_ns = clock_ns;
+#endif
         const unsigned bits = 12U - 2U * state->resolution;
         adc->DR = (100U + 100U * (adc->SQR3 & 31U)) & ((1U << bits) - 1U);
         adc->CR2 &= ~static_cast<uint32_t>(ADC_CR2_SWSTART);

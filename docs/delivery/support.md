@@ -41,7 +41,7 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 | UART | IRQ byte/event、word 与明确 block／DMA 模式分别选择；有限 TX、有限 RX、连续 RX 和双向模式不自动互相授权 |
 | SPI／I2C | SPI1／2／3 polling、普通与增强 DMA 事务；I2C1／2／3 polling／IRQ／DMA；显式 endpoint 与受审路线 |
 | PWM | TIM3／TIM5 的 CH1–4 中各显式选择一路；固定 84 MHz timer clock 与 PSC／ARR；TIM3 周期 1–65535，TIM5 周期 1–4294967295；无隐式共享时基 |
-| ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入，独立 shot／scan 最多 16 ranks；三个转换器均有有限／连续 DMA，分别独占 TIM3 |
+| ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；独立 shot／scan 最多 16 ranks，三个转换器均有独占 TIM3 的有限／连续 DMA |
 | DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码 |
 | Flash／IWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
 | CRC／芯片身份 | 固定多项式 CRC-32 字序列；实际 UID、device／revision ID 和半字 Flash 容量；不建立认证或订货号推断 |
@@ -65,9 +65,17 @@ stream7／0 channel4；USART6 DMA2 stream6／1 channel5。只读 C 硬件事实�
 ADC1／2 通道对应 PA0--7、PB0--1、PC0--5。ADC3 在 VE 开放 PA0--3 的通道 0--3
 和 PC0--3 的通道 10--13；ZG 另有 PF6--10 的通道 4--8、PF3 的通道 9 和
 PF4／5 的通道 14／15。序列可以重新排序或重复同一输入，最多 16 ranks，重复
-输入的 sample time 必须一致；每个使用的引脚都须有明确 Board route。内部输入、
+输入的 sample time 必须一致；每个使用的引脚都须有明确 Board route。
 注入组和同步多 ADC 模式尚未接入。16-rank 与三独立实例参考装配见
 `tests/contracts/adc_external_assembly/`，不授予真实 PCB 或物理采样资格。
+
+ADC1 的内部通道 16／17／18 分别返回温度、VREFINT、VBAT／2 的原始计数。
+`adc1-internal` route 不取得 GPIO；四种现有采样模式共用静态序列，内部输入固定选择
+`sample_times=7` 的 480-cycle acquisition。温度、电压换算和校准由应用负责，
+`reference_mv` 仍是名义值。冷态拒绝接管已启用的所需模拟路径，仅撤回本次取得的
+TSVREFE／VBATE；失败保留 clock 与清理责任。1 MHz 时间域的启动等待包含取整裕量：
+外部输入 4 μs，含内部输入 11 μs。软件参考见
+`tests/contracts/multi_controller_assembly/*adc-internal*.toml`；不建立物理采样资格。
 
 三个 ADC 的 `resolution_bits` 均可选择 6／8／10／12，默认 12。各转换器的 poll、
 有限和连续 DMA 共用该静态选择，转换周期与触发速率准入随之变化。DMA 仍使用

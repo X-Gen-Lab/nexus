@@ -4388,6 +4388,34 @@
         "fixed-pwm"
       ],
       "source": "DS8626 Rev12 Table9 alternate-function mapping; RM0090 Rev22 section18 general-purpose timers"
+    },
+    {
+      "id": "adc1-internal",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [],
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "source": "RM0090 Rev22 sections13.10/13.11 ADC1 channels16/17/18; DS8626 Rev12 internal-source characteristics",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      }
     }
   ]
 }

@@ -16,6 +16,7 @@ ADC_PIN_CHANNELS = MappingProxyType({
         ("PA0", "PA1", "PA2", "PA3", "PF6", "PF7", "PF8", "PF9", "PF10",
          "PF3", "PC0", "PC1", "PC2", "PC3", "PF4", "PF5"))},
 })
+ADC_INTERNAL_CHANNELS = MappingProxyType({"ADC1": (16, 17, 18)})
 
 DAC_PIN_CHANNELS = MappingProxyType({("DAC", "PA4"): 1,
                                    ("DAC", "PA5"): 2})

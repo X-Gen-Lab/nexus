@@ -10,7 +10,7 @@ from tools.configure.providers import hardware
 from tools.configure import timer_advanced, secondary_controllers
 from .contract import (ADC_PIN_CHANNELS, FLASH_PROGRAM_UNIT, LIMITS,
                        PARTS, mode_implementation)
-from .hardware import PWM_PIN_CHANNELS
+from .hardware import PWM_PIN_CHANNELS, ADC_INTERNAL_CHANNELS
 
 _PULL_VALUES = MappingProxyType({"none": 0, "up": 1, "down": 2})
 _OUTPUT_TYPES = MappingProxyType({"push-pull": 0, "open-drain": 1})
@@ -285,8 +285,9 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         reference = item.options.reference_mv
         reviewed = {ADC_PIN_CHANNELS.get((item.controller, pin["pin"]))
                     for pin in item.pins}
+        internal = frozenset(ADC_INTERNAL_CHANNELS.get(item.controller, ()))
         if (None in reviewed or not channels or len(channels) > 16 or
-                set(channels) != reviewed):
+                set(channels) - internal != reviewed):
             raise ValueError("ADC channel sequence must match its reviewed analog pins")
         if len(sampling) != len(channels) or not all(
                 isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 7

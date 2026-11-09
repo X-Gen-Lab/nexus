@@ -5,7 +5,8 @@ from tools.configure.calls import Symbol
 from types import MappingProxyType
 
 from tools.configure.providers import common, descriptor
-from .hardware import (ADC_PIN_CHANNELS, DAC_PIN_CHANNELS, PWM_PIN_CHANNELS,
+from .hardware import (ADC_PIN_CHANNELS, ADC_INTERNAL_CHANNELS,
+                       DAC_PIN_CHANNELS, PWM_PIN_CHANNELS,
                        FIXED_DMA as _FIXED_DMA)
 from tools.configure.adc import RESOLUTION_BITS
 
@@ -155,6 +156,11 @@ def validate_selection(selection, route):
     elif kind == "spi":
         common.integer(selection.get("max_hz", 1000000), *LIMITS["spi_hz"],
                        "SPI max_hz")
+    if kind == "adc":
+        internal = ADC_INTERNAL_CHANNELS.get(route["controller"], ())
+        if any(channel in internal and sample != 7 for channel, sample in
+               zip(selection["channels"], selection["sample_times"])):
+            common.fail("Internal ADC sources require the reviewed 480-cycle acquisition")
 
 
 def mode_implementation(kind, mode):

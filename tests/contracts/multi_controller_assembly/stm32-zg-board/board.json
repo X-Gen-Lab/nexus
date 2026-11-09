@@ -108,6 +108,11 @@
       "controller": "TIM5",
       "route": "tim5-ch1-pa0",
       "initial": 0
+    },
+    {
+      "id": "adc-internal",
+      "controller": "ADC1",
+      "route": "adc1-internal"
     }
   ],
   "reserved_resources": [],

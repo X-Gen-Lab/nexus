@@ -215,7 +215,8 @@ static void arm(nx_stm32_adc_stream_state_t* state) {
     adc->CR2 = ADC_CR2_ADON | ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTSEL_3;
     nx_arch_dsb();
     (void)adc->CR2;
-    state->ready_at = nx_deadline_after(nx_time_now_us(), 3U);
+    state->ready_at = nx_deadline_after(
+        nx_time_now_us(), nx_stm32_adc_startup_delay_us(&state->adc));
     state->warming = true;
 }
 

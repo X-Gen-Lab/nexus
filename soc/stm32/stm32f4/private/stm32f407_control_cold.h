@@ -268,6 +268,8 @@ static inline uint32_t nx_stm32_adc_clock(const ADC_TypeDef* registers) {
  */
 static inline nx_result_t nx_stm32_adc_pin(ADC_TypeDef* registers,
                                            uint8_t channel) {
+    if (registers == ADC1 && channel >= 16U && channel <= 18U)
+        return NX_SUCCESS;
     GPIO_TypeDef* gpio;
     uint8_t pin;
     if (registers == ADC3) {
@@ -300,15 +302,11 @@ nx_stm32_adc_cold_begin(nx_stm32_adc_state_t* port,
         return NX_ERROR_INVALID;
     if (config->resolution > 3U)
         return NX_ERROR_UNSUPPORTED;
-    for (size_t i = 0U; i < config->channel_count; ++i) {
-        if (config->channels[i] > 15U || config->sample_times[i] > 7U)
-            return NX_ERROR_UNSUPPORTED;
-        for (size_t j = 0U; j < i; ++j) {
-            if (config->channels[i] == config->channels[j] &&
-                config->sample_times[i] != config->sample_times[j])
-                return NX_ERROR_UNSUPPORTED;
-        }
-    }
+    nx_result_t sequence = nx_stm32_adc_sequence_validate(
+        config->registers, config->channels, config->sample_times,
+        config->channel_count);
+    if (sequence != NX_SUCCESS)
+        return sequence;
     uint32_t clock = nx_stm32_adc_clock(config->registers);
     if (port->initialized || port->active || port->cold_effects != 0U ||
         (RCC->APB2ENR & clock) != 0U)
@@ -327,6 +325,8 @@ nx_stm32_adc_cold_begin(nx_stm32_adc_state_t* port,
         return NX_ERROR_IO;
     if ((port->registers->CR2 & ADC_CR2_ADON) != 0U)
         return NX_ERROR_BUSY;
+    if ((port->common->CCR & nx_stm32_adc_internal_mask(port)) != 0U)
+        return NX_ERROR_BUSY;
     nx_result_t common = nx_stm32_adc_common_prepare(port);
     if (common != NX_SUCCESS)
         return common;
@@ -337,7 +337,7 @@ nx_stm32_adc_cold_begin(nx_stm32_adc_state_t* port,
         if (status != NX_SUCCESS)
             return status;
     }
-    return NX_SUCCESS;
+    return nx_stm32_adc_internal_prepare(port);
 }
 
 /** \brief Stop only acquired ADC effects; failed readback retains the owner. */
@@ -360,6 +360,12 @@ static inline nx_result_t nx_stm32_adc_cold_finish(nx_stm32_adc_state_t* port) {
         port->initialized = false;
         port->cold_effects &= (uint8_t)~NX_STM32_ADC_CONVERTER;
     }
+    if ((port->cold_effects & NX_STM32_ADC_INTERNAL) != 0U &&
+        (RCC->APB2ENR & clock) == 0U)
+        return NX_ERROR_IO;
+    nx_result_t internal = nx_stm32_adc_internal_close(port);
+    if (internal != NX_SUCCESS)
+        return internal;
     nx_result_t probes = nx_stm32_adc_probe_close(port);
     if (probes != NX_SUCCESS)
         return probes;
