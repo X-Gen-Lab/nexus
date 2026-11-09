@@ -41,6 +41,7 @@ static bool config_valid(const nx_stm32_i2c_config_t* config) {
         config->pins[0].snapshot == NULL || config->pins[1].snapshot == NULL ||
         config->pins[0].snapshot == config->pins[1].snapshot ||
         config->clock_hz != 42000000U || config->priority > 15U ||
+        config->max_hz < 5129U || config->max_hz > 400000U ||
         (config->registers != I2C1 && config->registers != I2C2 &&
          config->registers != I2C3) ||
         (!config->asynchronous && config->dma != NULL))

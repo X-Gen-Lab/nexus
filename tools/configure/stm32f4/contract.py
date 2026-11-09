@@ -68,6 +68,7 @@ DMA_VECTOR = 'Stream'
 DMA_TOPOLOGY = (frozenset((1, 2)), range(8), range(8))
 LIMITS = MappingProxyType({
     'uart_baud': (1282, 1000000), 'spi_hz': (328125, 42000000),
+    'i2c_hz': (5129, 400000),
     'timer_hz': 84000000, 'pwm_period': 65535,
     'adc_resolution_bits': RESOLUTION_BITS,
 })

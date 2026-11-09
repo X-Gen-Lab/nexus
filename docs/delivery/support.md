@@ -116,7 +116,12 @@ stop 与 W1C 回读恢复。软件模型和 ARM 链接不授予物理输出性�
 模型与 ARM 链接仍不能证明物理身份、吞吐或实板功能。
 
 SPI1／2／3 共用轮询和有限全双工 DMA 实现，均可选择 8／16 位增强事务；I2C1／2／3
-共用 100 kHz 轮询实现，各自也提供受审 IRQ／DMA 模式。SPI3 的 AF6 路线是
+共用 polling、IRQ 和 DMA 的 C 时序计算，`max_hz` 默认 100000，名义范围为
+5129–400000 Hz。CCR 向上取整；Fast-mode 使用 2:1 duty 与 300 ns TRISE 公式。
+RM0090 §27.6.8 要求特定 PCLK 条件才能达到 400 kHz；固定 42 MHz 下，
+`max_hz=400000` 选择 CCR=36，名义约 388.9 kHz。时钟容差、上拉和总线电容仍须实板验证。
+异步恢复保留取得的时序与 wake；请求、通知发布者或 DMA 尚未退出时返回 BUSY，
+不会先复位硬件。SPI3 的 AF6 路线是
 PC10／11／12 或 PB3／4／5；I2C3 是 PA8 SCL 与 PC9 SDA AF4，恢复检查两条真实
 输入。SPI2 使用 DMA1 stream4 TX／stream3 RX channel0，SPI3 使用 stream5 TX／
 stream0 RX channel0；I2C3 使用 stream4 TX／stream2 RX channel3。共享物理 stream

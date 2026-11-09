@@ -172,6 +172,7 @@ def _i2c_constructor(item, result, devices):
                     f"    .registers = {item.controller}, .pins = s_nx_i2c_pins_{name},",
                     f"    .dma = {'&s_nx_i2c_dma_' + name if dma else 'NULL'},",
                     f"    .clock_hz = {selected.clock_hz}u,",
+                    f"    .max_hz = {item.options.max_hz}u,",
                     f"    .priority = {selected.irq.priority if asynchronous else 0}u,",
                     f"    .asynchronous = {'true' if asynchronous else 'false'}", "};"]
     implementation = "i2c_async" if asynchronous else "i2c"

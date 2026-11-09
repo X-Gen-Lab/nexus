@@ -22,6 +22,12 @@ nx_result_t nx_stm32_i2c_async_prepare(nx_i2c_v1_state_t* port,
     if (port->registers != NULL || port->active != NULL || port->initialized ||
         port->wake != NULL || port->wake_publishers != 0U)
         return NX_ERROR_BUSY;
+    uint16_t ccr;
+    uint8_t rise;
+    if (config->clock_hz != 42000000U ||
+        !nx_i2c_v1_timing(42U, config->max_hz, &ccr, &rise)) {
+        return NX_ERROR_UNSUPPORTED;
+    }
     nx_result_t result = nx_stm32_i2c_async_cold_acquire(config, receipt);
     if (result != NX_SUCCESS)
         return result;
@@ -30,6 +36,7 @@ nx_result_t nx_stm32_i2c_async_prepare(nx_i2c_v1_state_t* port,
     port->line_mask = (1U << config->pins[0].pin) | (1U << config->pins[1].pin);
     port->peripheral_mhz = (uint8_t)(config->clock_hz / 1000000U);
     port->dma = config->dma;
+    port->timing_ccr = ccr;
     result = nx_stm32_i2c_async_initialize(port, config->priority);
     if (result == NX_SUCCESS) {
         receipt->effects |= NX_STM32_I2C_COLD_PREPARED;
@@ -307,3 +314,6 @@ nx_result_t nx_stm32_i2c_async_initialize(nx_i2c_v1_state_t* state,
 #endif
     return NX_SUCCESS;
 }
+
+_Static_assert(I2C_CCR_FS == 0x8000U && I2C_CCR_CCR == 0xFFFU,
+               "I2C V1 clock mode and count layout");

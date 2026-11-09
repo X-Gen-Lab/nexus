@@ -31,6 +31,11 @@ polling controller；`stm32-zg-buses-dma-freertos.toml` 改选三个 SPI 的增�
 `stm32-zg-uart6-irq-blocks-freertos.toml` 选择六路 IRQ block face。这两种模式均不
 取得 DMA，word face 不替代 byte face。block 的存储由消费者在 `rx_start` 显式提供。
 
+`stm32-ve-i2c3-fast-poll-baremetal.toml` 选择三个 polling I2C，名义最大速率分别为
+400000／350000／100001 Hz，覆盖向上取整分频；
+`stm32-zg-i2c3-fast-async-freertos.toml` 选择 I2C1／2 IRQ 与 I2C3 DMA，均为
+400000 Hz。它们不证明上拉、电容或实际 SCL 波形，旧参考装配保持各自配置。
+
 secondary UART TX 与 primary I2C TX 共用 DMA1 的物理 stream6，
 即使 selector 不同也冲突，resolver 拒绝同时选择；五路图改选 secondary I2C。
 不同 bus 的同地址 endpoint 保持独立身份／context。

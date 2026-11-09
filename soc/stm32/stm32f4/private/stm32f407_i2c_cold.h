@@ -26,6 +26,7 @@ typedef struct {
     uint32_t clock_hz;
     uint8_t priority;
     bool asynchronous;
+    uint32_t max_hz;
 } nx_stm32_i2c_config_t;
 
 /** \brief Semantic effects; clock bits preserve the original enabled state. */

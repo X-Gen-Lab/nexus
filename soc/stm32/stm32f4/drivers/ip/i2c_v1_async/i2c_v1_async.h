@@ -1,12 +1,53 @@
 /**
  * \file            i2c_v1_async.h
- * \brief           Private shared STM32F407/GD32F470 register algorithm
+ * \brief           Private reviewed STM32F4 I2C V1 register algorithm
  * \author          Nexus Team
  */
 #ifndef NEXUS_I2C_V1_ASYNC_H
 #define NEXUS_I2C_V1_ASYNC_H
 #include "nexus/io/dma.h"
 #include "nexus/io/i2c.h"
+
+/** \brief Resolve clock counts under the authored nominal SCL maximum.
+ * \param[in] mhz: Reviewed nominal whole-MHz PCLK, between 2 and 50.
+ * \param[in] maximum_hz: Nonzero nominal SCL ceiling, at most 400 kHz.
+ * \param[out] ccr: Standard or Fast-mode duty-2 CCR on success only.
+ * \param[out] rise: ST's standard 1 us or Fast-mode 300 ns TRISE formula.
+ * \return True for a representable 12-bit divisor; otherwise no outputs.
+ * \note Pure arithmetic, no hardware or retained references. Rounding the
+ *       divider upward respects the nominal maximum; oscillator tolerance
+ *       and electrical rise times require separate Board qualification.
+ */
+static inline bool nx_i2c_v1_timing(uint8_t mhz, uint32_t maximum_hz,
+                                    uint16_t* ccr, uint8_t* rise) {
+    if (mhz < 2U || mhz > 50U || maximum_hz == 0U || maximum_hz > 400000U ||
+        ccr == NULL || rise == NULL) {
+        return false;
+    }
+    bool fast = maximum_hz > 100000U;
+    if (fast && mhz < 4U) {
+        return false;
+    }
+    uint32_t clocks = (uint32_t)mhz * 1000000U;
+    uint32_t denominator = maximum_hz * (fast ? 3U : 2U);
+    uint32_t count =
+        clocks / denominator + (clocks % denominator != 0U ? 1U : 0U);
+    /* RM0090 27.6.8 requires a multiple of 10 MHz to reach 400 kHz.
+     * Other clocks stay strictly below that boundary. */
+    if (fast && mhz % 10U != 0U) {
+        uint32_t minimum = clocks / 1200000U + 1U;
+        if (count < minimum) {
+            count = minimum;
+        }
+    }
+    if (count < (fast ? 1U : 4U) || count > 0xFFFU) {
+        return false;
+    }
+    *ccr = (uint16_t)(count | (fast ? 0x8000U : 0U));
+    *rise =
+        (uint8_t)(fast ? (uint32_t)mhz * 3U / 10U + 1U : (uint32_t)mhz + 1U);
+    return true;
+}
 
 /** \brief Cold physical DMA facts, never a runtime stream allocator. */
 typedef struct {
@@ -65,6 +106,8 @@ typedef struct {
     nx_result_t (*stop_irqs)(void*);
     uint16_t index;
     uint16_t transferred;
+    /** \brief Cold CCR profile retained through recovery, never IRQ-mutated. */
+    uint16_t timing_ccr;
     uint8_t message;
     nx_result_t terminal;
     nx_i2c_v1_phase_t phase;

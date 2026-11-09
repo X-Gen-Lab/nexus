@@ -1,0 +1,39 @@
+# Three-controller timing fixture; no physical Board qualification.
+schema = 2
+board_package = "stm32-ve-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[i2c.bus1]
+binding = "primary-i2c"
+mode = "poll-messages"
+max_hz = 400000
+
+[i2c_device.sensor1]
+controller = "bus1"
+address = 80
+
+[i2c.bus2]
+binding = "secondary-i2c"
+mode = "poll-messages"
+max_hz = 350000
+
+[i2c_device.sensor2]
+controller = "bus2"
+address = 80
+
+[i2c.bus3]
+binding = "i2c3"
+mode = "poll-messages"
+max_hz = 100001
+
+[i2c_device.sensor3]
+controller = "bus3"
+address = 80

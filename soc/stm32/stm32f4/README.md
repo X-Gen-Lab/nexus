@@ -73,7 +73,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | GPIO | 单 port 的 16-bit 授权 mask；原子 BSRR set/reset；串行 toggle；先初值后 mode |
 | UART | 六个实例共用 IRQ bytes/events、独立 9N1 words、IRQ blocks、HAL 有限 TX DMA、有限／连续 RX DMA 和 DMA duplex；真实 TC、显式 loss、drain、quarantine |
 | SPI | SPI1／2／3 共用短 polling／有限全双工 DMA；MSB-first master、mode0–3；普通 byte face 为 8 位，增强 polling 事务支持 8／16 位 word，三个控制器均可选择增强 DMA 事务；polling 最多 256 words，DMA 每段最多 65535 words |
-| I2C | I2C1／2／3 polling/IRQ/DMA；42 MHz／100 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
+| I2C | I2C1／2／3 polling/IRQ/DMA；42 MHz PCLK、名义 5129 Hz–400 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
 | Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
@@ -210,6 +210,16 @@ lock、通用设备引用或预留 copy pool。UART IRQ 搬运字节和事实，
 SPI3 的 AF6 pad 是 PC10／11／12 或 PB3／4／5，APB1 为 42 MHz；固定 DMA1
 TX stream5 channel0、RX stream0 channel0。初始化先检查选中 vector 的 enable、
 pending 和 active，再取得 publisher；恢复只脉冲 SPI3 的 APB1 reset 位。
+
+I2C 的 `max_hz` 默认 100000，允许名义 5129–400000 Hz。公共 C 时序计算向上取整
+12-bit CCR，使非整除配置也不超过所选名义上限；超过 100 kHz 时使用 Fast-mode
+2:1 duty 和 300 ns TRISE 公式。依据 RM0090 §27.6.8，固定 42 MHz PCLK 下
+`max_hz=400000` 选择 CCR=36，名义约 388.9 kHz，不声称达到精确 400 kHz。
+该计算不保证实际时钟误差、上拉和总线电容满足规范。
+冷态取得后保存 CCR；局部 recover 复用该配置并保留已挂接的 wake，不继承可能损坏的
+寄存器内容。请求、通知发布者或 DMA 尚未退出时先返回 BUSY，不复位硬件。
+新增 CCR 使用现有 state padding，ARM 可变状态仍为 64 字节；每个只读冷配置增加
+4 字节。polling 与异步模式不增加 heap、队列或 worker。
 
 I2C3 固定 PA8 SCL／PC9 SDA AF4、APB1 42 MHz，DMA1 RX stream2／TX stream4
 channel3，EV／ER IRQ 为 72／73。C 冷态 owner 从 controller 身份取得两个 GPIO

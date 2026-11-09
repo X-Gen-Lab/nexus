@@ -36,7 +36,7 @@ nx_result_t nx_stm32_i2c_prepare(nx_stm32_i2c_state_t* port,
     port->line_gpio = config->registers == I2C3 ? GPIOA : GPIOB;
     port->line_mask = (1U << config->pins[0].pin) | (1U << config->pins[1].pin);
     port->peripheral_mhz = config->clock_hz / 1000000U;
-    port->rate_hz = 100000U;
+    port->rate_hz = config->max_hz;
     result = nx_stm32_i2c_initialize(port);
     if (result == NX_SUCCESS) {
         receipt->effects |= NX_STM32_I2C_COLD_PREPARED;
@@ -89,19 +89,22 @@ nx_result_t nx_stm32_i2c_close(nx_stm32_i2c_state_t* port,
 #define NX_STM32_I2C_ADDRESS_CLEARED(port) ((void)(port))
 #endif
 
-/** \brief Apply only the reviewed 42 MHz / 100 kHz standard-mode profile. */
+/** \brief Apply reviewed 42 MHz standard/Fast timing without overspeed. */
 nx_result_t nx_stm32_i2c_initialize(nx_stm32_i2c_state_t* port) {
     if (port == NULL || port->registers == NULL || port->line_gpio == NULL ||
         port->line_mask == 0U || (port->line_mask & ~UINT32_C(0xFFFF)) != 0U) {
         return NX_ERROR_INVALID;
     }
-    if (port->peripheral_mhz != 42U || port->rate_hz != 100000U) {
+    uint16_t ccr;
+    uint8_t rise;
+    if (port->peripheral_mhz != 42U ||
+        !nx_i2c_v1_timing(42U, port->rate_hz, &ccr, &rise)) {
         return NX_ERROR_UNSUPPORTED;
     }
     port->registers->CR1 = 0U;
     port->registers->CR2 = 42U;
-    port->registers->CCR = 210U;
-    port->registers->TRISE = 43U;
+    port->registers->CCR = ccr;
+    port->registers->TRISE = rise;
     port->registers->OAR1 = (1U << 14U);
     LL_I2C_Enable(port->registers);
     port->active = false;

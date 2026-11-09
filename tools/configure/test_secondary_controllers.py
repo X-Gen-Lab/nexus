@@ -182,6 +182,28 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                     self.assertIn("void DMA1_Stream2_IRQHandler(void)", source)
                     self.assertIn("void DMA1_Stream4_IRQHandler(void)", source)
 
+    def test_i2c_fast_mode_uses_the_authored_static_ceiling(self):
+        for mode in ("poll-messages", "irq-messages", "dma-messages"):
+            with self.subTest(mode=mode):
+                path = self.i2c3_assembly(mode)
+                path.write_text(path.read_text().replace(
+                    'max_hz = 100000', 'max_hz = 400000'))
+                result = gate.resolve_ir(path)
+                self.assertEqual(result.controllers[0].options.max_hz, 400000)
+                output = self.directory / ("fast-" + mode)
+                gate.configure(path, output)
+                source = (output / "bindings.c").read_text()
+                self.assertIn(".max_hz = 400000u", source)
+
+    def test_i2c_rate_bounds_reject_before_static_construction(self):
+        for rate in (0, 5128, 400001):
+            with self.subTest(rate=rate):
+                path = self.i2c3_assembly("irq-messages")
+                path.write_text(path.read_text().replace(
+                    'max_hz = 100000', f'max_hz = {rate}'))
+                with self.assertRaises(ValueError):
+                    gate.resolve_ir(path)
+
     def test_i2c3_dma_rejects_i2c2_rx_stream_collision(self):
         with self.assertRaisesRegex(ValueError, "DMA1:stream2"):
             gate.resolve_ir(self.i2c3_assembly("dma-messages", peer=True))

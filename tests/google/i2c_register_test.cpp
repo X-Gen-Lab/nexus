@@ -309,6 +309,43 @@ extern "C" uint8_t nx_i2c_model_read(void* raw) {
     return static_cast<uint8_t>(++model_received);
 }
 
+TEST_F(I2CRegisters, FastModeUsesWholeClockCountsWithoutExceedingTheCeiling) {
+    for (uint32_t rate : {400000U, 350000U, 100001U, 5129U}) {
+        SCOPED_TRACE(rate);
+        State cold{};
+        cold.registers = &registers;
+        cold.line_gpio = &lines;
+        cold.line_mask = state.line_mask;
+        cold.peripheral_mhz = 42U;
+        cold.rate_hz = rate;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_initialize(&cold));
+        const uint32_t divider = registers.CCR & 0xFFFU;
+        const bool fast = (registers.CCR & I2C_CCR_FS) != 0U;
+        ASSERT_NE(0U, divider);
+        EXPECT_LE(42000000U, rate * (fast ? 3U : 2U) * divider);
+        EXPECT_EQ(rate > 100000U, fast);
+        EXPECT_EQ(fast ? 13U : 43U, registers.TRISE);
+        if (rate == 400000U) {
+            EXPECT_EQ(I2C_CCR_FS | 36U, registers.CCR);
+            EXPECT_LT(42000000U, 400000U * 3U * divider);
+        }
+    }
+}
+
+TEST_F(I2CRegisters, UnrepresentableClockCeilingRejectsBeforeRegisterStores) {
+    const I2C_TypeDef before = registers;
+    for (uint32_t rate : {0U, 5128U, 400001U, UINT32_MAX}) {
+        State cold{};
+        cold.registers = &registers;
+        cold.line_gpio = &lines;
+        cold.line_mask = state.line_mask;
+        cold.peripheral_mhz = 42U;
+        cold.rate_hz = rate;
+        EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_i2c_initialize(&cold));
+        EXPECT_EQ(0, std::memcmp(&before, &registers, sizeof(before)));
+    }
+}
+
 TEST_F(I2CRegisters, ReceivesThreeFourAndMaximumLengthWithExactPrefix) {
     for (size_t length : {1U, 2U, 3U, 4U, 256U}) {
         SCOPED_TRACE(length);

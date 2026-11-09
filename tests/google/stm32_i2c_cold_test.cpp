@@ -27,7 +27,8 @@ class I2CCold : public testing::Test {
     void* peripherals = MAP_FAILED;
     uint16_t snapshots[2]{};
     nx_stm32_i2c_pin_config_t pins[2]{{&snapshots[0], 6U}, {&snapshots[1], 7U}};
-    nx_stm32_i2c_config_t config{I2C1, pins, nullptr, 42000000U, 5U, false};
+    nx_stm32_i2c_config_t config{I2C1, pins,  nullptr, 42000000U,
+                                 5U,   false, 100000U};
     nx_stm32_i2c_cold_receipt_t receipt{};
     nx_stm32_i2c_state_t state{};
 
@@ -78,6 +79,50 @@ TEST_F(I2CCold, StaticFactsRejectBeforeAnyHardwareEffect) {
     EXPECT_EQ(0U, RCC->AHB1ENR);
     EXPECT_EQ(nullptr, state.registers);
     EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
+}
+
+TEST_F(I2CCold, FastProfileUsesEveryControllerAndRestoresItsColdResources) {
+    const nx_dma_memory_region_t region{
+        0x20000000U, 0x20000U, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
+    const nx_i2c_v1_dma_t dma[] = {NX_STM32_I2C1_DMA(&region, 1U),
+                                   NX_STM32_I2C2_DMA(&region, 1U),
+                                   NX_STM32_I2C3_DMA(&region, 1U)};
+    I2C_TypeDef* const controllers[] = {I2C1, I2C2, I2C3};
+    for (unsigned index = 0U; index < 3U; ++index) {
+        for (unsigned mode = 0U; mode < 3U; ++mode) {
+            SCOPED_TRACE(index);
+            SCOPED_TRACE(mode);
+            config.registers = controllers[index];
+            config.max_hz = 400000U;
+            config.asynchronous = mode != 0U;
+            config.dma = mode == 2U ? &dma[index] : nullptr;
+            pins[0].pin = index == 0U ? 6U : index == 1U ? 10U : 8U;
+            pins[1].pin = index == 0U ? 7U : index == 1U ? 11U : 9U;
+            GPIOB->IDR |= (1U << pins[0].pin) | (1U << pins[1].pin);
+            GPIOA->IDR = 1U << 8U;
+            GPIOC->IDR = 1U << 9U;
+            nx_i2c_v1_state_t async{};
+            ASSERT_EQ(NX_SUCCESS, mode == 0U ? Prepare()
+                                             : nx_stm32_i2c_async_prepare(
+                                                   &async, &config, &receipt));
+            EXPECT_EQ(0x8024U, config.registers->CCR);
+            EXPECT_EQ(13U, config.registers->TRISE);
+            if (mode != 0U) {
+                config.registers->CCR = 0U;
+                config.registers->TRISE = 0U;
+                const nx_i2c_port_t bus{&nx_i2c_v1_async_ops, &async};
+                ASSERT_EQ(NX_SUCCESS, nx_i2c_port_recover(&bus));
+                EXPECT_EQ(0x8024U, config.registers->CCR);
+                EXPECT_EQ(13U, config.registers->TRISE);
+            }
+            ASSERT_EQ(NX_SUCCESS, mode == 0U ? Close()
+                                             : nx_stm32_i2c_async_close(
+                                                   &async, &config, &receipt));
+            EXPECT_EQ(0U, receipt.effects);
+            EXPECT_EQ(0U, RCC->APB1ENR);
+            EXPECT_EQ(0U, RCC->AHB1ENR);
+        }
+    }
 }
 
 TEST_F(I2CCold, ContextRejectsBeforeClockOrPinChanges) {
@@ -425,8 +470,8 @@ TEST_F(I2CCold, SecondControllerKeepsFirstControllerIndependent) {
     uint16_t other_snapshots[2]{};
     nx_stm32_i2c_pin_config_t other_pins[2]{{&other_snapshots[0], 10U},
                                             {&other_snapshots[1], 11U}};
-    nx_stm32_i2c_config_t other_config{I2C2,      other_pins, nullptr,
-                                       42000000U, 5U,         true};
+    nx_stm32_i2c_config_t other_config{I2C2, other_pins, nullptr, 42000000U,
+                                       5U,   true,       100000U};
     nx_stm32_i2c_cold_receipt_t other_receipt{};
     nx_i2c_v1_state_t second{};
     GPIOB->IDR |= 0xC00U;
@@ -448,8 +493,8 @@ TEST_F(I2CCold, SecondPollingKeepsLiveFirstOwnerThroughFailedGateRelease) {
     uint16_t saved[2]{};
     const nx_stm32_i2c_pin_config_t other_pins[]{{&saved[0], 10U},
                                                  {&saved[1], 11U}};
-    const nx_stm32_i2c_config_t selected{I2C2,      other_pins, nullptr,
-                                         42000000U, 5U,         false};
+    const nx_stm32_i2c_config_t selected{I2C2, other_pins, nullptr, 42000000U,
+                                         5U,   false,      100000U};
     nx_stm32_i2c_state_t other{};
     nx_stm32_i2c_cold_receipt_t acquired{};
     GPIOB->IDR |= 0xC00U;
