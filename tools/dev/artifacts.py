@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from tools.dev.qualification import verify_provenance
+from tools.dev.provenance import verify_provenance
 from tools.evidence.common import (
     file_identity, load_json, separate_outputs, verify_file_identity,
 )

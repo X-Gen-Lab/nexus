@@ -8,7 +8,6 @@ startup／vector、provider保留、Source SDK移动，以及明确模式的ARM�
 | --- | --- |
 | CPU／kernel | `cortex_runtime/`、`os_kernel_profile/`、`os_mpu/`、`os_secure_runtime/` |
 | 资源成本 | `os_resources/`、`os_wait_cost/`、`io_storage_cost/` |
-| 精确SoC装配 | `stm32_assembly/`、`gd32_assembly/`、`g474_assembly/`、`h743_assembly/`、`u575_assembly/` |
 | 多控制器与冷态 | `multi_controller/`、`multi_controller_assembly/`、`physical_platform_assembly/` |
 | 外部消费 | `test_source_sdk.py`、`external_provider_lifecycle/` |
 | 协议互通 | `mqtt_tls_interop/`、`lwip_mqtt_interop/` |

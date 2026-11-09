@@ -47,8 +47,7 @@ schema-2 TOML + SoC／Board JSON
 
 factory 不分配、不初始化、不探测硬件；新工程使用 `nexus_factory_strong.h`。
 CMake 拥有唯一源码和链接图。当前配置工具仍集中在 `tools/configure/` 使用主机
-Python；Host C11 工具与剩余生成生命周期的 C 收敛属于后续工作，不能把移动文件
-称为已经完成语言和行为迁移。
+Python，负责配置校验与静态连接；固件中的硬件算法和生命周期直接使用 C。
 
 基础固件保持静态定容和无默认堆。平台不启动 scheduler，也不创建产品 worker；
 应用提供任务、缓冲区、执行者、service 进度与停机策略。

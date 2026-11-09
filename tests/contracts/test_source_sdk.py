@@ -28,7 +28,9 @@ OFFICIAL_F4_VERIFIED_FILES = frozenset({
     "Inc/Legacy/stm32_hal_legacy.h", "Inc/stm32f4xx_hal_def.h",
     "Inc/stm32f4xx_hal_eth.h", "Inc/stm32f4xx_ll_adc.h",
     "Inc/stm32f4xx_ll_bus.h", "Inc/stm32f4xx_ll_rcc.h",
-    "Inc/stm32f4xx_ll_rng.h",
+    "Inc/stm32f4xx_ll_rng.h", "Inc/stm32f4xx_ll_crc.h",
+    "Inc/stm32f4xx_ll_dac.h", "Inc/stm32f4xx_ll_dma.h",
+    "Inc/stm32f4xx_ll_system.h", "Inc/stm32f4xx_ll_utils.h",
     "Inc/stm32f4xx_ll_gpio.h", "Inc/stm32f4xx_ll_i2c.h",
     "Inc/stm32f4xx_ll_iwdg.h", "Inc/stm32f4xx_ll_spi.h",
     "Inc/stm32f4xx_ll_tim.h", "Inc/stm32f4xx_ll_usart.h", "LICENSE.md",
@@ -319,7 +321,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
 
     def test_consumer_plan_is_required_even_after_a_rehashed_omission(self):
         required = (
-            "tools/release/transport.py",
+            "tools/maintenance/consumer_profiles.py",
             "tools/configure/experience.py",
             "tools/configure/selection.py",
             "tools/configure/onboarding.py",
@@ -334,40 +336,17 @@ class SourceSDKSelectionTests(unittest.TestCase):
         self.assert_rehashed_required_omissions(required)
 
     def test_public_host_entry_closure_rejects_rehashed_omissions(self):
-        # This independent file oracle follows public support/create/candidate
-        # imports; it does not take its expected names from the packager.
+        # Independent build-facing oracle: deleting/re-hashing a required
+        # source cannot reduce SDK integrity or break public developer tools.
         required = (
-            "tools/dev/projects.py",
+            "tools/dev/projects.py", "tools/dev/provenance.py",
             "tools/maintenance/capabilities.py",
-            "tools/maintenance/support.py",
-            "tools/evidence/candidate.py",
-            "tools/evidence/proof.py",
-            "tools/evidence/native_proof.py",
-            "tools/evidence/legacy_sdk.py",
-            "tools/evidence/consumer.py",
-            "tools/evidence/container.py",
-            "tools/evidence/inputs.py",
-            "tools/evidence/qualification.py",
-            "tools/evidence/reproduce.py",
-            "tools/evidence/storage.py",
+            "tools/maintenance/consumer_profiles.py",
+            "tools/evidence/common.py", "tools/evidence/identity.py",
             "tools/configure/documentation.py",
-            "tools/hil/admit.py",
-            "tools/hil/measure.py",
-            "tools/hil/power.py",
-            "tools/hil/prepare.py",
-            "tools/hil/threadx.py",
-            "tools/hil/workloads.py",
-            "scripts/ci/io_lifecycle_matrix.py",
-            "scripts/ci/native_contracts.py",
-            "scripts/ci/tdd_gate.py",
             "scripts/validation/junit.py",
         )
         self.assert_rehashed_required_omissions(required)
-
-
-
-
-
 
     def test_build_policy_and_tool_module_closure_is_required(self):
         required = {"cmake/platform/TargetPolicy.cmake",
@@ -375,9 +354,8 @@ class SourceSDKSelectionTests(unittest.TestCase):
                     "tools/configure/contracts.py", "tools/configure/matrix.py",
                     "tools/dev/dev.py", "tools/dev/presets.py", "tools/dev/process.py",
                     "tools/dev/change_paths.py", "tools/dev/cache.py",
-                    "tools/dev/dependencies.py", "tools/dev/qualification.py",
-                    "tools/evidence/store.py", "tools/evidence/environment.py",
-                    "tools/evidence/recipe.py"}
+                    "tools/dev/dependencies.py", "tools/dev/provenance.py",
+                    "tools/evidence/common.py", "tools/evidence/identity.py"}
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)))
 
     def test_metadata_and_memory_generation_are_required_sdk_payload(self):
@@ -712,7 +690,7 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
         self.write("arch/arm/cortex_m/staged.c", "int staged_source;\n")
         self.write("docs/staged.txt", "nonselected staged source\n")
         self.git("add", "arch/arm/cortex_m/staged.c", "docs/staged.txt")
-        self.write("tools/untracked.py", "untracked_source = True\n")
+        self.write("tools/configure/configure.py", "untracked_source = True\n")
         self.write("docs/untracked.txt", "nonselected untracked source\n")
         self.write("dependencies/source/host-framework.tar.gz", "host only\n")
 
@@ -735,7 +713,7 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
             self.repository, self.entries, development_fixture=True)
         self.assertEqual(names, {
             "core/committed.c", "arch/arm/cortex_m/staged.c",
-            "tools/untracked.py"})
+            "tools/configure/configure.py"})
         self.assertEqual(self.git("write-tree"), before)
 
     def test_publishable_snapshot_uses_only_original_committed_blobs(self):
@@ -765,7 +743,7 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
             self.write(name, "staged SDK selection fixture\n")
         self.git("add", *staged)
         untracked = ("tools/testing/evidence/untracked/provider.c.raw",
-                     "tools/evidence/verify.py")
+                     "tools/evidence/identity.py")
         for name in untracked:
             self.write(name, "untracked SDK selection fixture\n")
         index_before = self.git("write-tree")
@@ -1364,9 +1342,8 @@ class SourceSDKTests(unittest.TestCase):
                      "tools/configure/contracts.py", "tools/dev/dev.py",
                      "tools/dev/presets.py", "tools/dev/process.py",
                      "tools/dev/cache.py", "tools/dev/dependencies.py",
-                     "tools/dev/qualification.py", "tools/evidence/store.py",
-                     "tools/evidence/environment.py", "tools/evidence/recipe.py",
-                     "tools/release/transport.py"):
+                     "tools/dev/provenance.py", "tools/evidence/identity.py",
+                     "tools/maintenance/consumer_profiles.py"):
             with self.subTest(name=name):
                 target = self.sdk / name
                 old_source = target.read_bytes()

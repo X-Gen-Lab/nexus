@@ -178,10 +178,6 @@ class DocumentationCheckTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "SVG"):
             check.validate_svg(path)
 
-    def test_ledger_cycle_and_missing_dependency_are_rejected(self):
-        path = self.write("tasks.csv", "task_id,dependencies\nDOC-01,DOC-02\nDOC-02,DOC-01\n")
-        with self.assertRaisesRegex(ValueError, "cycle"):
-            check.validate_ledger(path)
 
     def test_rst_toml_uses_the_real_resolver_and_rejects_bad_mode(self):
         from tools.configure import configure, documentation
@@ -194,9 +190,6 @@ class DocumentationCheckTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unsupported mode"):
             documentation.check_document(path, configure.ROOT,
                 contents=converted.replace('mode = "output"', 'mode = "unsupported"'))
-        path.write_text("task_id,dependencies\nDOC-01,DOC-99\n")
-        with self.assertRaisesRegex(ValueError, "dependency"):
-            check.validate_ledger(path)
 
     def test_required_translation_rejects_missing_stale_or_unreviewed(self):
         import hashlib

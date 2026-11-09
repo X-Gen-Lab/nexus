@@ -178,7 +178,7 @@ receipts are preserved and do not make those archives downloadable.
 Physical MCU HIL remains `not_executed`. Source distribution, host models, ARM
 linking and documentation publication do not establish physical timing,
 electrical safety, signed product qualification, certification or LTS. See the
-[release guide](docs/status/release-0.1.0.md) for exact support, verification and
+[release guide](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/status/release-0.1.0.md) for exact support, verification and
 remaining acceptance, and [delivery](docs/delivery/README.md) for original records.
 
 ## Pre-refactor working history (superseded)

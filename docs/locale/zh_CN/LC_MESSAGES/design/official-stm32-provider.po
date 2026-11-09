@@ -1,4 +1,4 @@
-# Reviewed against the exact current canonical source and gettext messages.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,13 +7,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 1d75fac6021129480e8e9c9ee1fe4b3bbcd65400c78ac93fc1645f95603be0b4\n"
+"X-Nexus-Source-SHA256: 62d17f66bb05cc77162eda66eab47bcb9fd0d9d3a83de9312524cf434a42d568\n"
 
-#: docs/design/official-stm32-provider.md:9
 msgid "Official STM32F4 drivers and Nexus contracts"
 msgstr "官方 STM32F4 驱动与 Nexus 合同"
 
-#: docs/design/official-stm32-provider.md:11
 msgid ""
 "Current production integration is `soc/stm32/stm32f4/`, with concrete "
 "F407VE/ZG implementations. Reuse the locked official F4 HAL/LL and CMSIS "
@@ -24,121 +22,114 @@ msgstr ""
 "当前生产集成为 `soc/stm32/stm32f4/`，具体实现限于 F407VE/ZG。复用锁定的官方 F4 HAL/LL 和 CMSIS "
 "Device 源码；厂商类型和 Handle 保持私有。其他 F4 宏或 SDK 目录不能证明已具备受维护模式、Board 路线或物理结果。"
 
-#: docs/design/official-stm32-provider.md:16
 msgid "Responsibility boundary"
 msgstr "职责边界"
 
-#: docs/design/official-stm32-provider.md:0
 msgid "Owner"
 msgstr "责任方"
 
-#: docs/design/official-stm32-provider.md:0
 msgid "Responsibility"
 msgstr "责任"
 
-#: docs/design/official-stm32-provider.md:0
 msgid "Official HAL/LL"
 msgstr "官方 HAL/LL"
 
-#: docs/design/official-stm32-provider.md:0
 msgid "Selected hardware operations and peripheral state handling"
 msgstr "所选硬件操作与外设状态处理"
 
-#: docs/design/official-stm32-provider.md:0
 msgid "F4 C implementation"
 msgstr "F4 C 实现"
 
-#: docs/design/official-stm32-provider.md:0
 msgid ""
-"Resource admission, static binding, deadlines, borrows, callbacks, drain and "
-"lifecycle"
+"Resource admission, static binding, deadlines, borrows, callbacks, drain and"
+" lifecycle"
 msgstr "资源接纳、静态绑定、deadline、借用、回调、排空和生命周期"
 
-#: docs/design/official-stm32-provider.md:0
 msgid "F4 facts"
 msgstr "F4 事实"
 
-#: docs/design/official-stm32-provider.md:0
 msgid "Exact part, device macro, memory, startup, IRQ/DMA and reviewed routes"
 msgstr "精确料号、设备宏、内存、启动、IRQ/DMA 与经审阅的路线"
 
-#: docs/design/official-stm32-provider.md:0
 msgid "Board"
 msgstr "Board"
 
-#: docs/design/official-stm32-provider.md:0
 msgid "Actual wiring, oscillators, initial levels and electrical conditions"
 msgstr "实际接线、晶振、初始电平与电气条件"
 
-#: docs/design/official-stm32-provider.md:0
 msgid "Public I/O"
 msgstr "公共 I/O"
 
-#: docs/design/official-stm32-provider.md:0
-msgid "Stable Nexus types, checked dispatch and hardware-independent contracts"
+msgid ""
+"Stable Nexus types, checked dispatch and hardware-independent contracts"
 msgstr "稳定的 Nexus 类型、经检查的分派与硬件无关合同"
 
-#: docs/design/official-stm32-provider.md:0
 msgid "External product"
 msgstr "外部产品"
 
-#: docs/design/official-stm32-provider.md:0
 msgid "Tasks, execution progress, private regions and recovery policy"
 msgstr "任务、执行推进、私有区域与恢复策略"
 
-#: docs/design/official-stm32-provider.md:27
 msgid ""
-"One live hardware behavior domain has one transport owner. HAL and a private "
-"state machine must not independently drive the same transfer, DMA or "
-"interrupt sources. A hybrid mode needs explicit ownership boundaries, not two"
-" competing executors. Direct access requires a specific SDK gap, erratum, "
-"atomic ordering contract or demonstrated resource budget."
+"One live hardware behavior domain has one transport owner. HAL and a private"
+" state machine must not independently drive the same transfer, DMA or "
+"interrupt sources. A hybrid mode needs explicit ownership boundaries, not "
+"two competing executors. Direct access requires a specific SDK gap, erratum,"
+" atomic ordering contract or demonstrated resource budget."
 msgstr ""
 "一个活动硬件行为域只有一个传输所有者。HAL 与私有状态机不得独立驱动同一传输、DMA "
 "或中断源。混合模式需要明确所有权边界，不能有两个竞争执行器。直接访问必须有明确的 SDK 缺口、勘误、原子顺序合同或经证实的资源预算依据。"
 
-#: docs/design/official-stm32-provider.md:33
 msgid "Build-time provider contract"
 msgstr "构建期 provider 合同"
 
-#: docs/design/official-stm32-provider.md:35
 msgid ""
 "One schema-2 TOML selects a complete assembly. Reviewed JSON facts resolve "
-"into immutable named IR; the generator creates exact storage, configuration, "
-"interface faces, typed factory identities and fixed connections. CMake owns "
-"the actual source and link graph. Do not duplicate source lists in a "
+"into immutable named IR; the generator creates exact storage, configuration,"
+" interface faces, typed factory identities and fixed connections. CMake owns"
+" the actual source and link graph. Do not duplicate source lists in a "
 "manifest."
 msgstr ""
 "一个 schema-2 TOML 选择完整 assembly。经审阅的 JSON 事实解析为不可变具名 IR；生成器创建精确存储、配置、接口面、类型化 "
 "factory 身份与固定连接。CMake 负责真实的源码及链接图。不得在 manifest 中重复维护源码列表。"
 
-#: docs/design/official-stm32-provider.md:40
 msgid ""
-"Each image chooses one exact CMSIS device macro and matching startup. Compile"
-" only selected HAL modules and required dependencies, with a consistent "
-"private configuration and callback ABI. Do not enable every module or modify "
-"vendor files. All other inventoried vendor sources remain retained and "
-"unselected."
+"Each image chooses one exact CMSIS device macro and matching startup. "
+"Compile only selected HAL modules and required dependencies, with a "
+"consistent private configuration and callback ABI. Do not enable every "
+"module or modify vendor files. All other inventoried vendor sources remain "
+"retained and unselected."
 msgstr ""
 "每个镜像选择一个精确 CMSIS 设备宏及匹配的启动文件。仅编译所选 HAL 模块和必需依赖，并保持一致的私有配置与回调 "
 "ABI。不得启用全部模块或修改厂商文件。其余已盘点厂商源码继续保留且不被选用。"
 
-#: docs/design/official-stm32-provider.md:50
+msgid ""
+"Default host generation remains centralized Python; Board and SoC trees "
+"contain no Python plugins. The generator emits static configuration and "
+"fixed typed connections. Core's C platform lifecycle engine owns startup, "
+"stop, rollback and diagnostics; F4's `platform_coordinator.c` owns System "
+"and shared-resource sequencing with the concrete owners' original receipts. "
+"The centralized host configuration implementation is not linked into "
+"firmware. Generated factories, C models, linked ARM images and physical "
+"behavior retain their separate validation boundaries."
+msgstr ""
+"默认主机生成器集中使用 Python；Board 和 SoC 树不包含 Python 插件。生成器输出静态配置和固定的类型化连接。Core 的 C "
+"平台生命周期引擎负责启动、停止、回滚和诊断；F4 的 `platform_coordinator.c` 使用具体 owner 的原始记录协调 "
+"System 和共享资源。集中式主机配置实现不链接到固件。生成 factory、C 模型、ARM 镜像和物理行为保留独立的验证边界。"
+
 msgid "Selected F407 HAL UART transport"
 msgstr "所选 F407 HAL UART transport"
 
-#: docs/design/official-stm32-provider.md:52
 msgid ""
 "The current finite `dma-tx` selection combines official HAL TX with a "
-"disjoint LL IRQ byte/event receiver under one private static owner. Handles, "
-"DMA state and callbacks stay private. Other UART modes retain their explicit "
-"engines; this selection does not establish whole-library or all-mode HAL "
-"replacement."
+"disjoint LL IRQ byte/event receiver under one private static owner. Handles,"
+" DMA state and callbacks stay private. Other UART modes retain their "
+"explicit engines; this selection does not establish whole-library or all-"
+"mode HAL replacement."
 msgstr ""
 "当前有限 `dma-tx` 选择，在同一个私有静态所有者下组合官方 HAL TX 与职责不重叠的 LL IRQ 字节/事件接收。Handle、DMA "
 "状态及回调保持私有。其他 UART 模式保留各自明确的引擎；此选择不代表已完成整个库或全部模式的 HAL 替换。"
 
-#: docs/design/official-stm32-provider.md:57
 msgid ""
 "DMA completion is distinct from UART wire TC. A callback, successful abort "
 "call or timeout does not authorize reuse of a request or buffer. Detach "
@@ -149,7 +140,6 @@ msgstr ""
 "DMA 完成与 UART 线路 TC 分别表示不同事实。回调、成功的 abort 调用或超时，都不允许复用请求或缓冲区。必须移除真实 DMA、IRQ "
 "和回调引用，证明所需外设已排空，再将 SETTLED 发布为 provider 对请求的最后一次访问。退出失败时保留同一存储和恢复责任。"
 
-#: docs/design/official-stm32-provider.md:63
 msgid ""
 "Do not unconditionally call `HAL_Init()`: default SysTick setup and NVIC "
 "grouping must respect Platform and RTOS ownership. Use the maintained time "
@@ -158,22 +148,19 @@ msgstr ""
 "不得无条件调用 `HAL_Init()`：默认 SysTick 设置与 NVIC 分组必须遵守 Platform 和 RTOS "
 "所有权。使用受维护的时间域，并在进入内核 API 前验证对应的内核 ISR 优先级上限。"
 
-#: docs/design/official-stm32-provider.md:67
 msgid "Replace a mode and verify it"
 msgstr "替换并验证一个模式"
 
-#: docs/design/official-stm32-provider.md:69
 msgid ""
 "Start from a complete selected mode and its tests. Preserve RX duties, "
-"instance isolation, cancellation, deadlines, partial-start cleanup, late IRQ "
-"and failed drain. Switch the complete behavior domain to its chosen "
-"implementation before removing the old path; a successful TX fixture alone is"
-" insufficient."
+"instance isolation, cancellation, deadlines, partial-start cleanup, late IRQ"
+" and failed drain. Switch the complete behavior domain to its chosen "
+"implementation before removing the old path; a successful TX fixture alone "
+"is insufficient."
 msgstr ""
 "从一个完整所选模式及其测试开始。保留 RX 责任、实例隔离、取消、deadline、部分启动后的清理、迟到 IRQ "
 "和排空失败处理。先将完整行为域切换到选定实现，再移除旧路径；仅通过 TX fixture 不足以完成替换。"
 
-#: docs/design/official-stm32-provider.md:74
 msgid ""
 "Compare actual ELF/map and hot paths under the same toolchain and "
 "configuration. Directory consolidation itself does not reduce dispatch or "
@@ -185,21 +172,19 @@ msgstr ""
 "与热路径。目录归并本身不会减少分派或保证代码更小。参阅[当前支持](../delivery/support.md)、[所有权](../explanation/ownership.md)和"
 " [provider 指南](../guides/provider-porting.md)。物理 HIL 尚未执行。"
 
-#: docs/design/official-stm32-provider.md:80
 msgid "Cortex-M4F short-ISR constraint"
 msgstr "Cortex-M4F 短 ISR 约束"
 
-#: docs/design/official-stm32-provider.md:82
 msgid ""
 "F407 ES0182 Rev19 section2.1.2 explicitly lists Arm776924 for every listed "
 "cut. The exact chip errata, emitted instructions and selected FPU context "
 "remain integration obligations; another CPU name does not grant the same "
 "workaround."
 msgstr ""
-"F407 ES0182 Rev19 section2.1.2 明确列出 Arm776924，适用于其中列明的全部芯片修订。精确芯片勘误、实际生成指令和所选"
-" FPU 上下文仍是接入责任；其他 CPU 名称不能直接授权使用相同规避方法。"
+"F407 ES0182 Rev19 section2.1.2 明确列出 "
+"Arm776924，适用于其中列明的全部芯片修订。精确芯片勘误、实际生成指令和所选 FPU 上下文仍是接入责任；其他 CPU "
+"名称不能直接授权使用相同规避方法。"
 
-#: docs/design/official-stm32-provider.md:86
 msgid ""
 "The failure requires an enabled FPU and lazy context saving, an interrupted "
 "`VDIV` or `VSQRT` whose destination is s0–s15, a handler without floating-"
@@ -214,57 +199,38 @@ msgstr ""
 "被中断；处理程序没有浮点指令；并且在被中断指令之后的十四个周期内发生异常返回。厂商提供的充分指令数规避措施是：**每个 ISR "
 "实际执行超过两条指令，不计异常返回指令**。外部栈内存的等待状态是来源文档给出的另一种条件；本平台采用内部 SRAM 的配置不提供该前提。"
 
-#: docs/design/official-stm32-provider.md:94
 msgid ""
 "F407 startup enables CP10/CP11. Its selected FreeRTOS CM4F port explicitly "
-"enables ASPEN/LSPEN. An integer-only current workload therefore does not make"
-" the platform FPU-disabled or exclude floating-point application code. Do not"
-" silently clear LSPEN in startup: the kernel re-enables it and its "
+"enables ASPEN/LSPEN. An integer-only current workload therefore does not "
+"make the platform FPU-disabled or exclude floating-point application code. "
+"Do not silently clear LSPEN in startup: the kernel re-enables it and its "
 "context/stack ABI requires a separately reviewed decision."
 msgstr ""
 "F407 启动开启 CP10／CP11，所选 FreeRTOS CM4F port 明确开启 "
 "ASPEN／LSPEN。因此当前负载只使用整数，并不表示平台禁用 FPU，也不排除应用浮点代码。不得在启动中悄然清除 "
 "LSPEN：内核会再次开启它，其上下文／栈 ABI 需要单独审查决策。"
 
-#: docs/design/official-stm32-provider.md:100
 msgid ""
 "Review the actual installed vector table and reachable instruction prefixes "
-"in each emitted configuration. A thin `ldr` plus tail branch needs its callee"
-" examined; unreachable `nop` alignment and literal-pool words are not "
+"in each emitted configuration. A thin `ldr` plus tail branch needs its "
+"callee examined; unreachable `nop` alignment and literal-pool words are not "
 "executed work. A default nonreturning fault loop is distinct from an empty "
 "returning handler. Apply the same rule to external handlers, "
-"spurious/disabled-state fast paths, aliases and compiler/LTO changes. Source "
-"line counts and nominal clock frequency cannot prove this condition."
+"spurious/disabled-state fast paths, aliases and compiler/LTO changes. Source"
+" line counts and nominal clock frequency cannot prove this condition."
 msgstr ""
 "审查每份生成配置实际安装的向量表与可达指令前缀。仅有 `ldr` 加尾跳转的薄处理程序还需要检查被调用方；不可达的 `nop` "
 "对齐填充和字面量池数据不属于已执行工作。默认的不返回故障循环与空的可返回处理程序不同。外部处理程序、伪中断或禁用状态的快速路径、别名及编译器/LTO "
 "变更同样适用此规则。源码行数和标称时钟频率不能证明满足这个条件。"
 
-#: docs/design/official-stm32-provider.md:108
 msgid ""
 "Selected-image software review belongs with its actual ELF, resolved input, "
-"compiler commands and disassembly. It proves only those installed paths, not "
-"every declared mode or a connected device result. A new or replacement "
-"external ISR that can return within the excluded short prefix remains an open"
-" integration condition until its emitted path or another exact workaround is "
-"reviewed."
+"compiler commands and disassembly. It proves only those installed paths, not"
+" every declared mode or a connected device result. A new or replacement "
+"external ISR that can return within the excluded short prefix remains an "
+"open integration condition until its emitted path or another exact "
+"workaround is reviewed."
 msgstr ""
 "所选镜像的软件审查必须对应其实际 ELF、resolved "
 "输入、编译命令和反汇编。审查只证明这些已安装路径，不证明所有声明模式或已连接设备的结果。新增或替换的外部 ISR "
 "若仍可能沿上述未满足规避条件的短指令路径返回，就继续保留为集成待办，直到审查其实际生成路径或另一项精确规避措施。"
-
-#: docs/design/official-stm32-provider.md:45
-msgid ""
-"Default host generation remains centralized Python; Board and SoC trees "
-"contain no Python plugins. The generator emits static configuration and "
-"fixed typed connections. Core's C platform lifecycle engine owns startup, "
-"stop, rollback and diagnostics; F4's `platform_coordinator.c` owns System "
-"and shared-resource sequencing with the concrete owners' original receipts. "
-"The Host C11 tool is an optional host pilot, not a prerequisite for firmware"
-" behavior in C or delivery. Generated factories, C models, linked ARM images"
-" and physical behavior retain their separate validation boundaries."
-msgstr ""
-"默认主机生成仍集中使用 Python；Board 和 SoC 树没有 Python 插件。生成器输出静态配置与固定 typed "
-"connection。Core 的 C 整平台生命周期引擎负责启动、停止、回滚与诊断；F4 的 `platform_coordinator.c` "
-"使用具体 owner 原有的收条维护 System 和共享资源顺序。Host C11 工具是可选主机试点，不是固件行为采用 C 或交付的前置条件。生成 "
-"factory、C 模型、已链接 ARM 镜像和物理行为保持各自的验证边界。"

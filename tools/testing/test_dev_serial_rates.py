@@ -17,7 +17,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.dev import device
-from tools.hil import serial_echo
+from tools.dev import serial as serial_echo
 
 
 class DeveloperSerialRateTests(unittest.TestCase):
@@ -215,7 +215,7 @@ import sys
 import termios
 sys.path.insert(0, sys.argv[1])
 from tools.dev import device
-from tools.hil import serial_echo
+from tools.dev import serial as serial_echo
 serial_echo._alias_target = lambda name: Path(sys.argv[2])
 original_device = serial_echo._device
 @contextmanager
@@ -384,7 +384,7 @@ import json
 import runpy
 import sys
 sys.path.insert(0, sys.argv[1])
-from tools.hil import serial_echo
+from tools.dev import serial as serial_echo
 replacement = Path(sys.argv[2])
 serial_echo._alias_target = lambda name: replacement
 arguments = json.loads(sys.argv[3])

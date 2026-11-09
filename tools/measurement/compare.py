@@ -10,15 +10,16 @@ import re
 from pathlib import Path
 import shutil
 import subprocess
+import signal
+import time
 import sys
 import tomllib
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.evidence.common import (EvidenceError, atomic_json, file_identity,
-    regular_file)
+    regular_file, command)
 from tools.evidence.identity import git_source, resolved_identity
-from tools.evidence.reproduce import run_logged
 from tools.measurement.resources import (measure, resolved_float_abi,
                                          validate_elf_configuration)
 from tools.measurement.elf import Elf32
@@ -26,6 +27,77 @@ from tools.measurement.interfaces import inspect_interfaces
 
 WORKLOADS = ("empty", "gpio", "uart", "spi")
 OPTIMIZATIONS = ("O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto")
+
+
+def run_logged(argv: list[str], log: Path, *, timeout_s: int = 900,
+               cwd: Path | None = None) -> dict:
+    """Retain actual stdout/stderr and nonzero status, including tool failure."""
+    command(argv)
+    if type(timeout_s) is not int or not 0 < timeout_s <= 1800:
+        raise EvidenceError("invalid build command timeout")
+    log.parent.mkdir(parents=True, exist_ok=True)
+    started = time.monotonic()
+    process = None
+    def stop():
+        if process is None:
+            return
+        if os.name == "posix":
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                # The group already exited; the wait below still reaps the child.
+                pass
+        elif process.poll() is None:
+            process.kill()
+        process.wait(timeout=10)
+    try:
+        with log.open("wb") as output:
+            process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=output,
+                stderr=subprocess.STDOUT, start_new_session=os.name == "posix",
+                cwd=cwd)
+            while process.poll() is None:
+                if time.monotonic() - started >= timeout_s:
+                    raise subprocess.TimeoutExpired(argv, timeout_s)
+                if os.fstat(output.fileno()).st_size > 32 * 1024 * 1024:
+                    raise EvidenceError("command raw log exceeded 32 MiB bound")
+                try:
+                    process.wait(timeout=0.05)
+                except subprocess.TimeoutExpired:
+                    # Polling continues to enforce the deadline and log-size bound.
+                    pass
+            if os.fstat(output.fileno()).st_size > 32 * 1024 * 1024:
+                raise EvidenceError("command raw log exceeded 32 MiB bound")
+        exit_code = process.returncode
+        failure = None
+        if os.name == "posix":
+            try:
+                os.killpg(process.pid, 0)
+            except ProcessLookupError:
+                # No group remains after parent exit, so there is no orphan to kill.
+                pass
+            else:
+                stop()
+                exit_code, failure = 125, "command left background processes"
+    except subprocess.TimeoutExpired:
+        stop()
+        exit_code, failure = 124, "build command timed out"
+    except EvidenceError as error:
+        stop()
+        exit_code, failure = 125, str(error)
+    except OSError as error:
+        stop()
+        log.write_text("adapter executable unavailable\n")
+        exit_code, failure = 127, str(error)
+    except BaseException:
+        # Cancellation must not leave a compiler or hardware adapter running.
+        stop()
+        raise
+    # A success with no output still has a nonempty command execution record.
+    if not log.stat().st_size:
+        log.write_text("command produced no stdout/stderr\n")
+    return {"argv": argv, "exit_code": exit_code, "failure": failure,
+            "elapsed_s": time.monotonic() - started, "raw": file_identity(log)}
+
 
 
 def profile_input(source: Path, assembly_path: Path, workload: str,

@@ -18,7 +18,6 @@ tutorials/index
 guides/index
 reference/index
 explanation/index
-status/index
 development/index
 design/index
 delivery/index

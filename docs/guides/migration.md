@@ -79,8 +79,8 @@ mapped to a replacement. Existing F407 assemblies now select `stm32f4` with an
 exact part. Public C interfaces remain the consumption boundary.
 
 Board and SoC trees contain no Python plugins. Current generation is centralized
-under `tools/configure/stm32f4/`; Host C11 generation and remaining handwritten C
-lifecycle consolidation are separate follow-up work. Native fixtures live under
+under `tools/configure/stm32f4/`; firmware hardware algorithms and lifecycle
+remain handwritten C. Native fixtures live under
 `tests/support/native/` and require explicit test support.
 
 Private F4 IP belongs to `soc/stm32/stm32f4/drivers/ip/`; there is no root MCU

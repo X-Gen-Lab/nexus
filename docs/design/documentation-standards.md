@@ -2,7 +2,7 @@
 
 本标准用于新增和修改的平台文档。目标是让读者明确任务、条件、操作和结果，
 能够沿文档完成使用、接入、维护或验收。既有页面按
-[实施台账](documentation-system-execution.csv)逐批审查；本标准的存在不表示
+[实施台账](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/documentation-system-execution.csv)逐批审查；本标准的存在不表示
 正文迁移、图册、自动检查、翻译或发布已经完成。
 
 必须/不得表示合同要求；应/不应表示默认做法，例外需有理由；可以表示允许的

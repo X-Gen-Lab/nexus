@@ -687,7 +687,7 @@ class DeveloperWorkflowTests(unittest.TestCase):
 
     def test_real_configure_and_noop_build_capture_verified_provenance(self):
         from tools.dev import dev
-        from tools.dev.qualification import verify_provenance
+        from tools.dev.provenance import verify_provenance
         from contextlib import redirect_stdout, redirect_stderr
         import io
         with tempfile.TemporaryDirectory() as directory:
@@ -790,7 +790,7 @@ class DeveloperWorkflowTests(unittest.TestCase):
         self.assertEqual(result, 2)
         self.assertIn("Missing arm-none-eabi-gcc required for arm", output.getvalue())
 
-    def test_dispatch_keeps_prepare_opt_in_network_and_candidate_endpoint(self):
+    def test_dispatch_keeps_prepare_network_opt_in_and_preset_scope(self):
         from tools.dev import dev
         with patch.object(dev, "execute", return_value=7) as execute:
             result = dev.main(["prepare", "--scope", "arm", "--family", "stm32f4"])
@@ -805,10 +805,7 @@ class DeveloperWorkflowTests(unittest.TestCase):
         self.assertEqual(execute.call_args.args[0], [sys.executable,
             "tools/dev/dependencies.py", "prepare", "--preset",
             "stm32-qiming-baremetal", "--scope", "preset"])
-        with patch.object(dev, "execute", return_value=0) as execute:
-            self.assertEqual(dev.main(["candidate", "--plan", "candidate.json",
-                                       "--output", "out"]), 0)
-        self.assertIn("--require-candidate", execute.call_args.args[0])
+
 
     def test_focused_test_follows_test_configure_mapping_and_labels_receipt(self):
         from contextlib import redirect_stdout

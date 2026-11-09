@@ -11,10 +11,30 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 SUITES = {"testing": "tools/testing", "configure": "tools/configure",
           "ci": "scripts/ci", "workflows": ".github/workflows"}
-# Ordinary commits retain the four existing complete domains above. Full CI
-# additionally owns relocated SDK/build contracts and the kernel-source overlay.
+# Full CI additionally owns standalone SDK/build contracts and the kernel overlay.
 CI_SUITES = {**SUITES, "contracts": "tests/contracts",
              "freertos": "os/freertos"}
+
+
+def changed_suites(names):
+    """Conservatively select affected complete tool domains, including deletes."""
+    from tools.dev.change_paths import behavioral
+    selected = set()
+    for name in names:
+        if name.startswith((".github/", "scripts/ci/")):
+            selected.update(("ci", "workflows", "testing"))
+        elif name.startswith("tools/configure/"):
+            selected.update(("configure", "testing"))
+        elif (name.startswith(("cmake/", "dependencies/", "scripts/setup/"))
+              or name in {"CMakeLists.txt", "CMakePresets.json", "AGENTS.md",
+                          ".pre-commit-config.yaml"}):
+            return tuple(SUITES)
+        elif name.startswith(("tools/", "tests/", "core/", "arch/", "os/",
+                              "io/", "soc/", "boards/", "components/")):
+            selected.add("testing")
+        elif behavioral(name):
+            return tuple(SUITES)
+    return tuple(suite for suite in SUITES if suite in selected)
 
 
 def execute(suite):

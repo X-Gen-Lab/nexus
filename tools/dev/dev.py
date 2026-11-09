@@ -49,37 +49,6 @@ def execute(command, environment):
     return ExecutionResult(result.returncode, result.receipt_path)
 
 
-def qualification_environment(arguments, environment):
-    """Cover the whole forwarded plan while preserving explicit caller limits."""
-    if ("NEXUS_COMMAND_TIMEOUT" in environment or
-            any(argument in ("-h", "--help") for argument in arguments)):
-        return environment
-    selected = None
-    for index, argument in enumerate(arguments):
-        if argument == "--":
-            break
-        if argument == "--plan":
-            if (index + 1 == len(arguments) or
-                    arguments[index + 1].startswith("-")):
-                return environment
-            selected = arguments[index + 1]
-        elif argument.startswith("--plan="):
-            selected = argument.split("=", 1)[1]
-    if not selected:
-        return environment
-    from tools.dev.qualification import validate_plan
-    from tools.evidence.common import load_json
-    try:
-        plan = validate_plan(load_json(ROOT / selected))
-    except (OSError, ValueError, KeyError, TypeError):
-        # The owned CLI retains plan/argument diagnostics and failure codes.
-        return environment
-    budget = sum(stage.get("timeout_s", 1800) for stage in plan["stages"])
-    result = dict(environment)
-    # Retain the ordinary floor and allow finite process startup/exit overhead.
-    result["NEXUS_COMMAND_TIMEOUT"] = str(max(1800, budget + 60))
-    return result
-
 
 def maintenance_checks(environment):
     for script in ("capabilities.py", "ownership.py"):
@@ -145,7 +114,7 @@ def doctor(environment, native):
     parser = argparse.ArgumentParser(prog="dev.py doctor")
     parser.add_argument("--target",
                         choices=("tools", "native", "arm", "contracts",
-                                 "candidate", "docs", "workflows"),
+                                 "docs", "workflows"),
                         default="tools")
     args, remaining = parser.parse_known_args(native)
     if args.target == "workflows":
@@ -156,7 +125,7 @@ def doctor(environment, native):
                        + remaining, environment)
     if remaining:
         raise ValueError("Unknown doctor arguments: " + " ".join(remaining))
-    if args.target in {"contracts", "candidate"}:
+    if args.target == "contracts":
         from tools.configure import authored
         schema = ROOT / "tools/configure/assembly.schema.json"
         if json.loads(schema.read_text()) != authored.editor_schema():
@@ -190,7 +159,6 @@ def doctor(environment, native):
         "tools": (), "native": ("gcc", "g++"),
         "arm": ("arm-none-eabi-gcc",),
         "contracts": ("gcc", "g++", "arm-none-eabi-gcc"),
-        "candidate": ("gcc", "g++", "arm-none-eabi-gcc"),
     }[args.target]
     for name in ("gcc", "g++", "arm-none-eabi-gcc"):
         compiler = shutil.which(name, path=environment["PATH"])
@@ -208,17 +176,6 @@ def doctor(environment, native):
         if name in required and actual != expected:
             raise ValueError(f"{name} differs from locked {expected}: {actual}")
         print(f"{name}: {actual} ({compiler})")
-    if args.target == "candidate":
-        docker = executable("docker")
-        observed = subprocess.run([docker, "image", "inspect", "--format",
-                                   "{{.Id}}",
-                                   lock["qualified_oci"]["config_digest"]],
-                                  capture_output=True, text=True, check=True,
-                                  timeout=30)
-        if observed.stdout.strip() != lock["qualified_oci"]["config_digest"]:
-            raise ValueError("Candidate OCI differs from locked image identity")
-        print("Candidate environment is available; qualification requires "
-              "toolchain-tree and source identities in the execution plan")
     if identity is not None:
         print("Verified source SDK: " + identity["source_revision"])
         print("Tool diagnosis only: repository review/documentation "
@@ -231,9 +188,9 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("configure", "build", "test",
                                           "check", "doctor", "prepare",
-                                          "qualify", "candidate", "cache", "docs",
+                                          "cache", "docs",
                                           "create", "flash", "debug", "monitor",
-                                          "timings", "plan", "artifacts", "support"))
+                                          "timings", "artifacts", "support"))
     parser.add_argument("--preset")
     args, native = parser.parse_known_args(argv)
     try:
@@ -248,12 +205,6 @@ def main(argv=None):
                                  "--preset does not identify a build")
             from tools.dev import artifacts
             return artifacts.main(native)
-        if args.action == "plan":
-            if args.preset is not None:
-                raise ValueError("plan previews the complete selected plan; "
-                                 "--preset filtering is not supported")
-            from tools.dev import plan
-            return plan.main(native, root=ROOT)
         args.preset = args.preset or "native-debug"
         environment = process.execution_environment(os.environ)
         # Prefer the pinned local tools without requiring shell activation.
@@ -274,9 +225,8 @@ def main(argv=None):
                            environment)
         if args.action == "doctor":
             return doctor(environment, native)
-        if args.action in ("prepare", "qualify", "candidate", "cache"):
-            modules = {"prepare": "dependencies", "qualify": "qualification",
-                       "candidate": "qualification", "cache": "cache"}
+        if args.action in ("prepare", "cache"):
+            modules = {"prepare": "dependencies", "cache": "cache"}
             command = [sys.executable,
                        "tools/dev/" + modules[args.action] + ".py"]
             if args.action == "prepare":
@@ -285,10 +235,6 @@ def main(argv=None):
                 if not any(arg == "--scope" or arg.startswith("--scope=")
                            for arg in native):
                     command += ["--scope", "preset"]
-            if args.action == "candidate":
-                command.append("--require-candidate")
-            if args.action in ("qualify", "candidate"):
-                environment = qualification_environment(native, environment)
             return execute(command + native, environment)
         if args.action == "check":
             if native:
@@ -353,7 +299,7 @@ def main(argv=None):
             print(f"Validated fresh {scope} execution: "
                   f"{evidence['passed']} test cases; full contract "
                   "qualification "
-                  "uses check or a qualification plan")
+                  "uses check")
             return 0
         result = execute(command + native, environment)
         if result == 0:

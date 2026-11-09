@@ -148,7 +148,7 @@ MCU 实板 HIL 继续为 `not_executed`。通用 bootloader 交接、动态变�
 
 MCU 实板 HIL 保持 `not_executed`。源码分发、host 模型、ARM 链接和文档发布
 不建立物理时序、电气安全、签名产品资格、认证或 LTS。精确支持、核验和剩余
-验收见[发行指南](docs/status/release-0.1.0.md)，原始记录见
+验收见[发行指南](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/status/release-0.1.0.md)，原始记录见
 [当前交付](docs/delivery/README.md)。
 
 ## 重构前历史（已被替代）

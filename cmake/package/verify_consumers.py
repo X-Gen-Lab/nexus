@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.configure.metadata import load_policy  # noqa: E402
 from tools.dev import process  # noqa: E402
 from tools.evidence.common import file_identity, regular_file  # noqa: E402
-from tools.release.transport import (BASE_CONSUMERS, MODERN_CONSUMERS,
+from tools.maintenance.consumer_profiles import (BASE_CONSUMERS, MODERN_CONSUMERS,
                                      SELECTED_CONSUMERS, SERVICE_CONSUMERS,
                                      ServiceConsumer, consumer_plan,
                                      selected_domain)  # noqa: E402

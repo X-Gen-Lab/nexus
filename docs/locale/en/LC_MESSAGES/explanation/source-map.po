@@ -1,19 +1,17 @@
-# Reviewed against the exact current canonical source and gettext messages.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus documentation\n"
+"Project-Id-Version: Nexus source documentation\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 9b489263c9eec84c2ff97414a2cd874fa1200f0ebfb4cdac54db73dfd324c723\n"
+"X-Nexus-Source-SHA256: b97ed22337e36d9ecf6a1ac8869c7e366fc6761818ed74dfa29ce1b46692f757\n"
 
-#: docs/explanation/source-map.md:8
 msgid "当前源码与维护边界"
 msgstr "Current source and maintenance boundaries"
 
-#: docs/explanation/source-map.md:10
 msgid ""
 "本页定位当前实现，不复制各目录的完整合同。生产 MCU 入口只有 STM32F4，已迁入 F407VE／ZG；其他 SDK "
 "原位保留。目录、实现、执行记录和物理资格分别说明。"
@@ -24,19 +22,15 @@ msgstr ""
 "implementations, execution records and physical qualification are described "
 "separately."
 
-#: docs/explanation/source-map.md:0
 msgid "维护问题"
 msgstr "Maintenance question"
 
-#: docs/explanation/source-map.md:0
 msgid "权威入口"
 msgstr "Authoritative entry point"
 
-#: docs/explanation/source-map.md:0
 msgid "请求、deadline 与借用"
 msgstr "Requests, deadlines and borrowing"
 
-#: docs/explanation/source-map.md:0
 msgid ""
 "[Core](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/core/README.md)"
@@ -44,11 +38,9 @@ msgstr ""
 "[Core](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/core/README.md)"
 
-#: docs/explanation/source-map.md:0
 msgid "CPU 原语与上下文"
 msgstr "CPU primitives and context"
 
-#: docs/explanation/source-map.md:0
 msgid ""
 "[Arch](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/arch/README.md)"
@@ -56,11 +48,9 @@ msgstr ""
 "[Arch](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/arch/README.md)"
 
-#: docs/explanation/source-map.md:0
 msgid "公共 face、ops 与通用机制"
 msgstr "Public faces, ops and generic mechanisms"
 
-#: docs/explanation/source-map.md:0
 msgid ""
 "[I/O](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/io/README.md)"
@@ -68,11 +58,9 @@ msgstr ""
 "[I/O](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/io/README.md)"
 
-#: docs/explanation/source-map.md:0
 msgid "F4 启动、时钟和外设实现"
 msgstr "F4 startup, clocks and peripheral implementations"
 
-#: docs/explanation/source-map.md:0
 msgid ""
 "[F4 支持包](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/soc/stm32/stm32f4/README.md)"
@@ -80,11 +68,9 @@ msgstr ""
 "[F4 support package](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 
-#: docs/explanation/source-map.md:0
 msgid "PCB 接线与电气条件"
 msgstr "PCB wiring and electrical conditions"
 
-#: docs/explanation/source-map.md:0
 msgid ""
 "[Board](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/boards/README.md)"
@@ -92,11 +78,9 @@ msgstr ""
 "[Board](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/boards/README.md)"
 
-#: docs/explanation/source-map.md:0
 msgid "等待、任务和内核责任"
 msgstr "Waits, tasks and kernel responsibilities"
 
-#: docs/explanation/source-map.md:0
 msgid ""
 "[OS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/os/README.md)"
@@ -104,11 +88,9 @@ msgstr ""
 "[OS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/os/README.md)"
 
-#: docs/explanation/source-map.md:0
 msgid "外部器件与可选机制"
 msgstr "External devices and optional mechanisms"
 
-#: docs/explanation/source-map.md:0
 msgid ""
 "[组件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/components/README.md)"
@@ -116,11 +98,9 @@ msgstr ""
 "[Components](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/components/README.md)"
 
-#: docs/explanation/source-map.md:0
 msgid "配置与构建"
 msgstr "Configuration and build"
 
-#: docs/explanation/source-map.md:0
 msgid ""
 "[工具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tools/README.md)、[CMake](https://github.com/X-Gen-"
@@ -130,11 +110,9 @@ msgstr ""
 "SOURCE/tools/README.md), [CMake](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/README.md)"
 
-#: docs/explanation/source-map.md:0
 msgid "模型、链接与执行证据"
 msgstr "Models, linking and execution evidence"
 
-#: docs/explanation/source-map.md:0
 msgid ""
 "[测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/README.md)、[交付边界](../delivery/README.md)"
@@ -142,16 +120,34 @@ msgstr ""
 "[Tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/README.md), [delivery boundaries](../delivery/README.md)"
 
-#: docs/explanation/source-map.md:40
 msgid ""
 "顶层共享 MCU `drivers/` 已归入 F4，不增加运行时转发。ILI9341、XPT2046、W25 继续通过公共 I/O "
 "访问设备，留在组件目录，不随 MCU 支持包迁移。"
 msgstr ""
 "Shared MCU sources formerly under root `drivers/` now belong to F4, without "
-"extra runtime forwarding. ILI9341, XPT2046 and W25 continue to use public I/O"
-" and remain in components rather than moving with the MCU support package."
+"extra runtime forwarding. ILI9341, XPT2046 and W25 continue to use public "
+"I/O and remain in components rather than moving with the MCU support "
+"package."
 
-#: docs/explanation/source-map.md:47
+msgid ""
+"Board 和 SoC 不再加载本地 Python 插件。默认 Python 工具集中校验事实并生成静态连接； Core "
+"`private/platform_lifecycle_impl.h` 维护整平台启动、停止、回滚与诊断，F4 "
+"`private/stm32f4_platform_lifecycle_impl.h` 维护 System 与共享资源的 C 协调；各自的 `.c` "
+"公共入口复用同一实现，固定装配让编译器看到常量并裁剪分支。主机只维护 一套配置实现，其代码不进入 MCU 镜像。实际生成 factory、模型与 ARM"
+" 产物 各自验证，不能把源码移动视为整条链路已经验收。 Native 必须显式启用测试 scope，不进入生产系列目录或能力聚合表。"
+msgstr ""
+"Board and SoC no longer load local Python plugins. Centralized Python tools "
+"validate facts and generate static connections. Core "
+"`private/platform_lifecycle_impl.h` owns platform startup, stop, rollback "
+"and diagnostics; F4 `private/stm32f4_platform_lifecycle_impl.h` owns C "
+"coordination for System and shared resources. Their public `.c` entry points"
+" reuse the same implementation; fixed assemblies expose constants to the "
+"compiler for pruning. The host has one configuration implementation, whose "
+"code is not linked into the MCU image. Generated factories, models and ARM "
+"artifacts require separate validation; moving source does not establish "
+"complete-path acceptance. Native requires explicit test scope and does not "
+"enter production family directories or capability tables."
+
 msgid ""
 "精确支持见[支持参考](../reference/platforms/support.md)。重构前的目录与执行范围可从 "
 "[固定旧源码](https://github.com/X-Gen-"
@@ -161,28 +157,6 @@ msgstr ""
 "See the [support reference](../reference/platforms/support.md) for exact "
 "support. Pre-refactor directories and execution scopes remain traceable at "
 "the [fixed prior source](https://github.com/X-Gen-"
-"Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18). Old records retain "
-"their original identities and do not establish software candidates or "
+"Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18). Old records retain"
+" their original identities and do not establish software candidates or "
 "physical-board qualification for this refactor."
-
-#: docs/explanation/source-map.md:43
-msgid ""
-"Board 和 SoC 不再加载本地 Python 插件。默认 Python 工具集中校验事实并生成静态连接； Core "
-"`private/platform_lifecycle_impl.h` 维护整平台启动、停止、回滚与诊断，F4 "
-"`private/stm32f4_platform_lifecycle_impl.h` 维护 System 与共享资源的 C 协调；各自的 "
-"`.c` 公共入口复用同一实现，固定装配让编译器看到常量并裁剪分支。Host C11 工具是可选主机试点，不是固件 C 化或交付前置。实际生成 "
-"factory、模型与 ARM 产物 各自验证，不能把源码移动视为整条链路已经验收。 Native 必须显式启用测试 "
-"scope，不进入生产系列目录或能力聚合表。"
-msgstr ""
-"Board and SoC packages no longer load local Python plugins. The default "
-"centralized Python tool validates facts and emits static connections. "
-"Core's `private/platform_lifecycle_impl.h` maintains platform startup, "
-"stop, rollback and diagnostics; F4's "
-"`private/stm32f4_platform_lifecycle_impl.h` coordinates System and "
-"shared resources. Their public `.c` entries reuse the same "
-"implementation, while fixed assemblies expose constants for compiler "
-"branch folding. The Host C11 tool is an optional host pilot, not a "
-"prerequisite for C firmware or delivery. Generated factories, models and"
-" ARM artifacts are validated separately; moving source does not qualify "
-"the entire chain. Native requires explicit test scope and does not enter"
-" the production series directory or capability aggregate."

@@ -1,51 +1,13 @@
-# 宿主 TDD 与合同执行
+# 平台工具回归
 
-新增公共 C API／provider 行为使用 GoogleTest／GoogleMock，固件保持 C11。
-框架来自 `ext/googletest`，由 `dependencies/googletest.lock.json` 和 Gitlink 锁定。
-先执行 `python tools/dev/dev.py prepare --scope native --allow-network` 或
-`git submodule update --init --recursive ext/googletest`。配置只读本地框架，拒绝
-缺失、修改、错误 pin，不下载依赖。固件和 SDK 消费不要求宿主框架。
-
-所选组织 fork 基于上游 1.16.0（`6910c9d9165801d8827d628cb72eb7ea9dd538c5`），
-修复 `RE` 所有权：禁用 copy-assignment、保留深拷贝构造，避免 POSIX 正则状态浅拷贝。
-lock／Gitlink 选补丁提交，`upstream_commit`／官方 URL 记来源，`.gitmodules`
-选已审组织检索路径。该补丁仅作用宿主测试。
-
-从仓库根执行与 CI 相同门禁：
+保留配置、构建、依赖来源、SDK、资源测量、进程清理和 HIL 工装的真实故障回归。
+候选晋升、历史归档恢复和重复任务台账已退出当前维护范围。
 
 ```sh
-python scripts/ci/tdd_gate.py --all --preset native-debug
+python tools/testing/run_tool_tests.py --suite testing --report build/quality/tools-testing.json
 ```
 
-门禁执行 `testing`／`configure`／`ci`／`workflows` 四个完整工具域，构建
-`nexus_google_contracts`，发现各程序全部用例后无 filter／shard 执行。新 XML 必须
-是已完成通过、且身份与数量匹配 discovery；空、陈旧、跳过、失败、部分执行均不能
-验收。原始命令结果位于 `build/<preset>/tdd/`，`execution.json` 是开发记录。
-
-行为变更的 commit hook 调相同 gate，包括适用 tools／scripts 输入。较长 SDK／合同
-和 FreeRTOS 工具测试有自己的 CI 域。gate 前后检查 staged 与未暂存／未跟踪行为，
-要求 index tree 不变；迟到源码或暂存修改拒绝本次摘要。pre-commit 临时 stash 已
-跟踪的未暂存编辑，读取当前 `.pre-commit-config.yaml`，新 gate 定义无需重装 hook；
-CI 独立执行。子 configure／build／test 清除 Git 仓库局部环境，子模块使用自己的
-index；gate 自身保留实际提交 index 做快照检查。
-
-`evidence/` 记录选定 RED／GREEN。有些初期 RED 是新接口编译／链接失败；UART
-owner、IRQ wake、stream storage、staged execution 另有真实行为失败。早期 owner
-回归在实现后添加，仅有 GREEN。记录不能证明每次历史编辑都先 RED，也不建立 clean
-candidate 或物理资格。
-
-GoogleMock 替换依赖端口并调用真实 API，检查存储、准入、取消、隔离、实例独立、
-通知和 DMA 排空。Python 工具使用 stdlib unittest，同样要求非空执行，无 skipped
-或 expected-failure 用例。
-
-默认工具域只读取当前选中的 Native／STM32F4 依赖。非 F4 库存校验器使用独立
-合成文件和对应 fixture 摘要，保留损坏、来源、提交、dirty、symlink 等拒绝合同，
-不把这些单测称为实际厂商 SDK 资格。退役平台的原 checkout 集成案例退出默认范围；
-当前 F4 的真实 SDK、CLI 和头文件编译回归继续执行。所有 vendor、Gitlink、来源锁
-与许可证原件保持不变。
-
-库存维护的 Git 集成测试使用独立 catalogue fixture 和真实 Git／校验器，明确区别
-于生产完整库存及 Native 的准备闭包；完整 FreeRTOS 子图由独立 transport 合同负责。
-同一 Gitlink 的多份审核锁使用合成 selector 数据验证缺失、身份冒用及隐藏字节修改。
-验证默认依赖边界时，须实际使用未物化库存 checkout 的环境；仅拦截 Python 文件
-读取无法覆盖外部 Git 子进程。
+普通提交运行受影响的完整工具域；完整 CI 分别运行 testing、configure、ci、
+workflows、contracts、freertos。工具测试不按 Native 编译模式重复。
+每次要求非空发现、完整执行、零跳过及真实返回码，旧报告不能建立本次通过。
+新增工具行为先记录 RED 再实现 GREEN。纯粹删除废弃功能不新增镜像式测试。

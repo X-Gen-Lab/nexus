@@ -91,12 +91,12 @@ The original vendor checkout is unchanged.
 Development evidence separates 25 GoogleTest cases inside the real official
 kernel, production mechanism tests with mocked external CPU/IRQ/libc boundaries,
 configuration Python tests and actual ARM object size probes. The original development record is not retained at its former repository path.
-The retained [integration follow-up](../../tests/evidence/threadx-integration/README.md)
+The retained [integration follow-up](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/tests/evidence/threadx-integration/README.md)
 contains its own actual source snapshots and raw execution; it does not qualify
 final clean source, SDK consumption or HIL and does not replace missing original bytes. Follow-up
 PRIMASK/configuration records retain their own raw bytes and commands; original
 RED/GREEN records are not rewritten as the implementation evolves. The
-[follow-up record](../../tests/evidence/threadx-integration/README.md) contains
+[follow-up record](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/tests/evidence/threadx-integration/README.md) contains
 50 fresh cases: 30 real-kernel service cases, six real-kernel bootstrap cases and
 14 production mechanisms with mocked external boundaries. It also records six
 three-Board policy links, one precise missing-Tick rejection and three CPU-only

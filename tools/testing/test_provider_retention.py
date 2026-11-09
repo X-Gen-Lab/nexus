@@ -880,5 +880,14 @@ class ArrayContextTests(unittest.TestCase):
 
 
 
+
+class RetentionInputClosureTests(unittest.TestCase):
+    def test_protected_component_inputs_are_actual_current_sources(self):
+        from tools.measurement.retention import component_owner_input_paths
+        root = Path(__file__).resolve().parents[2]
+        missing = sorted(str(path) for path in component_owner_input_paths(root)
+                         if not path.is_file())
+        self.assertEqual(missing, [])
+
 if __name__ == "__main__":
     unittest.main()

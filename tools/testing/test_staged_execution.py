@@ -10,7 +10,6 @@ import unittest
 from unittest.mock import patch
 
 from scripts.ci import tdd_gate
-from scripts.ci import io_lifecycle_matrix
 
 
 class StagedExecutionTests(unittest.TestCase):
@@ -69,9 +68,6 @@ class StagedExecutionTests(unittest.TestCase):
         output = io.StringIO()
         with patch.object(tdd_gate, "ROOT", self.root), \
                 patch.object(tdd_gate, "execute", side_effect=execute), \
-                patch.object(io_lifecycle_matrix, "capture"), \
-                patch.object(io_lifecycle_matrix, "capture_complete"), \
-                patch.object(io_lifecycle_matrix, "audit", return_value={}), \
                 patch.dict("os.environ", {}, clear=True), \
                 redirect_stdout(output), redirect_stderr(output):
             result = tdd_gate.main(arguments if arguments is not None
@@ -116,6 +112,12 @@ class StagedExecutionTests(unittest.TestCase):
 
     def test_supplied_docs_subset_cannot_hide_staged_source(self):
         self.assert_index_executed(["--staged", "README.md"])
+
+    def test_renaming_source_to_documentation_keeps_the_deleted_source_side(self):
+        self.commit_initial_index()
+        self.git("mv", "core/state.c", "README.md")
+        self.assertIn("core/state.c", tdd_gate.staged_paths(self.root))
+        self.assert_index_executed(["--staged"])
 
     def test_staged_source_deletion_still_requires_execution(self):
         self.commit_initial_index()

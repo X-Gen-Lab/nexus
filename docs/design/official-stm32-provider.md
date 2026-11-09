@@ -46,8 +46,8 @@ Default host generation remains centralized Python; Board and SoC trees contain
 no Python plugins. The generator emits static configuration and fixed typed
 connections. Core's C platform lifecycle engine owns startup, stop, rollback and
 diagnostics; F4's `platform_coordinator.c` owns System and shared-resource
-sequencing with the concrete owners' original receipts. The Host C11 tool is an
-optional host pilot, not a prerequisite for firmware behavior in C or delivery.
+sequencing with the concrete owners' original receipts. The centralized host
+configuration implementation is not linked into firmware.
 Generated factories, C models, linked ARM images and physical behavior retain
 their separate validation boundaries.
 

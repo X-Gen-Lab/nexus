@@ -10,28 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class SourceCatalogueTests(unittest.TestCase):
-    def test_host_config_scope_does_not_reclassify_parsers_as_runtime(self):
-        selected = catalogue.host_configuration_sources()
-        self.assertEqual({item.identifier for item in selected}, {
-            "tomlc99", "cjson"})
-        self.assertTrue(all(item.scope == "inventory" for item in selected))
-        self.assertFalse(set(selected).intersection(catalogue.SOURCE_DEPENDENCIES))
 
-    def test_host_config_parsers_are_explicit_inventory_sources(self):
-        expected = {
-            'tomlc99': ('ext/tomlc99',
-                        'https://github.com/X-Gen-Lab/tomlc99.git'),
-            'cjson': ('ext/cjson',
-                      'https://github.com/X-Gen-Lab/cJSON.git'),
-        }
-        for name, (path, transport) in expected.items():
-            with self.subTest(dependency=name):
-                entry = catalogue.dependency(name)
-                self.assertEqual(entry.path, path)
-                self.assertEqual(entry.fetch_url, transport)
-                self.assertEqual(entry.scope, 'inventory')
-                self.assertNotIn(entry, catalogue.SOURCE_DEPENDENCIES)
-                self.assertTrue((ROOT / entry.source_lock).is_file())
 
     def test_runtime_scope_excludes_google_and_keeps_nested_sources_explicit(self):
         self.assertEqual({item.identifier for item in catalogue.SOURCE_DEPENDENCIES}, {

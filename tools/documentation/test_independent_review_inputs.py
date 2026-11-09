@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.documentation import cli, results
+from tools.documentation import cli
 
 
 class LiteralFilenameReviewTests(unittest.TestCase):
@@ -97,25 +97,6 @@ class LiteralFilenameReviewTests(unittest.TestCase):
             self.assertNotEqual(result, 0)
             self.assertEqual(json.loads(report.read_text())["status"], "failed")
 
-
-class RetainedIndexUrlReviewTests(unittest.TestCase):
-    def test_immutable_storage_url_rejects_a_non_numeric_port(self):
-        source_root = Path(__file__).resolve().parents[2]
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            for name in (results.INDEX_PATH, results.TASK_AUTHORITY,
-                         results.QUALIFIED_INDEX):
-                target = root / name
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(source_root / name, target)
-            path = root / results.INDEX_PATH
-            document = json.loads(path.read_text(encoding="utf-8"))
-            old = document["evidence_delivery"]["parts_url"]
-            document["evidence_delivery"]["parts_url"] = old.replace(
-                "raw.githubusercontent.com/",
-                "raw.githubusercontent.com:not-a-port/")
-            path.write_text(json.dumps(document), encoding="utf-8")
-            self.assertTrue(results.validate(root))
 
 
 if __name__ == "__main__":

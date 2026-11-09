@@ -47,8 +47,8 @@ The [source map](source-map.md) links authoritative layer contracts. Board and
 SoC directories contain no Python plugins. The default host generator uses Python
 for validation and static connections. Core's handwritten C platform coordinator
 owns startup, stop, rollback and diagnostics; F4's private C coordinator owns
-System and shared-resource sequencing. The independent Host C11 tool is an optional
-pilot, not a prerequisite for firmware behavior in C or software delivery.
+System and shared-resource sequencing. There is one maintained host configuration
+implementation; its code is not linked into firmware.
 
 All vendor sources, Gitlinks, locks and licenses remain available. Only selected
 dependencies enter preparation, verification, compilation or Source SDK output.

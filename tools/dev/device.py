@@ -16,7 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.dev import process
-from tools.dev.qualification import verify_provenance
+from tools.dev.provenance import verify_provenance
 from tools.evidence.common import (
     fields, file_identity, identifier, load_json, parse_json,
     verify_file_identity,
@@ -136,7 +136,7 @@ def plan(action, target_path, provenance_path=None, *, elf=None, timeout=300,
     if action == "monitor":
         if not sys.platform.startswith("linux"):
             raise ValueError("Developer serial monitoring requires Linux")
-        from tools.hil.serial_echo import _baud_constant
+        from tools.dev.serial import _baud_constant
         serial = target["serial"]
         fields(serial, {"path", "baudrate"})
         name = serial["path"]
@@ -205,7 +205,7 @@ def plan(action, target_path, provenance_path=None, *, elf=None, timeout=300,
 def _monitor_snapshot(serial):
     """Hold the original terminal without configuring or consuming its input."""
     import termios
-    from tools.hil.serial_echo import _alias_target
+    from tools.dev.serial import _alias_target
 
     target = _alias_target(serial["path"])
     expected = target.stat()
@@ -259,7 +259,7 @@ def _restore_monitor(snapshot, *, withdrawal_confirmed, phase_control):
     """
     import fcntl
     import termios
-    from tools.hil.serial_echo import (
+    from tools.dev.serial import (
         _advance_monitor_phase, _alias_target, _read_monitor_phase,
     )
 
@@ -381,7 +381,7 @@ def execute(prepared, output):
             snapshot = (_monitor_snapshot(prepared["serial"])
                         if prepared["action"] == "monitor" else None)
             if snapshot is not None:
-                from tools.hil.serial_echo import _begin_monitor_phase
+                from tools.dev.serial import _begin_monitor_phase
                 binding = {"path": str(snapshot["target"]),
                            **dict(zip(("st_dev", "st_ino", "st_rdev"),
                                       snapshot["identity"]))}
@@ -455,7 +455,7 @@ def _monitor(name, duration, baudrate=115200, *, expected_device=None,
     """Reuse the existing stable-identity/exclusive/restore serial primitive."""
     import select
     import time
-    from tools.hil.serial_echo import _device
+    from tools.dev.serial import _device
     if type(duration) is not int or not 1 <= duration <= 3600:
         raise ValueError("Monitor duration must be 1..3600 seconds")
     maximum = 16 * 1024 * 1024

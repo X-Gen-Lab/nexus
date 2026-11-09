@@ -189,7 +189,7 @@ retention checks and both corrected caller-face audits also passed. One
 relocated, nonpublishable development Source SDK passed export, rename,
 verification, a public C11 consumer link, the selected-image audit and
 reverification; this covered one VE image. The
-[source-bound evidence](../../tools/testing/evidence/f407-i2s2-20261020/README.md) records
+[source-bound evidence](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/tools/testing/evidence/f407-i2s2-20261020/README.md) records
 full-image resources rather than isolated driver cost. This is partial
 development evidence: it does not qualify the full v10 matrix, clean main,
 formal/OCI delivery or physical HIL. The API and full-site build receipts and the final commit gate must be

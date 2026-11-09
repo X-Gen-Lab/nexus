@@ -735,25 +735,22 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          retained)
         self.assertEqual(len(commands), len(retained))
 
-    def test_producer_uses_the_standalone_transport_plan_without_a_copy(self):
-        from tools.release import transport
+    def test_verifier_uses_one_consumer_plan_without_a_copy(self):
+        from tools.maintenance import consumer_profiles
         for name in ("BASE_CONSUMERS", "MODERN_CONSUMERS", "SELECTED_CONSUMERS",
                      "SERVICE_CONSUMERS"):
-            self.assertIs(getattr(self.consumer, name), getattr(transport, name))
+            self.assertIs(getattr(self.consumer, name), getattr(consumer_profiles, name))
         expected = {
             (name, ("tools/configure/assemblies/" if stem in
                     self.CANONICAL_ASSEMBLIES else
                     "cmake/package/verification/io_evolution/") + stem +
              ".toml", smoke)
             for name, stem, smoke in self.SELECTED_INPUTS}
-        self.assertEqual(set(transport.SELECTED_CONSUMERS), expected)
-        self.assertEqual(len(transport.SELECTED_CONSUMERS), len(expected))
+        self.assertEqual(set(consumer_profiles.SELECTED_CONSUMERS), expected)
+        self.assertEqual(len(consumer_profiles.SELECTED_CONSUMERS), len(expected))
         status, _ = self.execute(("--parallel", "1"))
         self.assertEqual(status, 0)
         self.assert_complete_matrix()
-        sources = {path.name for path in self.output.glob("* source")}
-        self.assertEqual(sources, {source for source, _, _ in
-                                   transport.consumer_layout()})
 
 
     def test_selected_owner_smokes_link_explicit_public_components(self):

@@ -12,7 +12,7 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from tools.documentation import cli, install, status
+from tools.documentation import cli, install
 from tools.dev import dev
 
 
@@ -357,13 +357,6 @@ class DocumentationCommandTests(unittest.TestCase):
             result = cli.main(["check"], root=self.root)
         self.assertNotEqual(result, 0)
 
-    def test_fast_check_rejects_malformed_results_index(self):
-        index = self.root / "docs/status/documentation-results.json"
-        index.parent.mkdir()
-        index.write_text("{ broken json\n")
-        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-            result = cli.main(["check"], root=self.root)
-        self.assertNotEqual(result, 0)
 
     def test_generated_svg_normalization_preserves_local_elements(self):
         folder = self.root / "output"
@@ -608,61 +601,8 @@ class DocumentationWorkspaceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "doxygen failed.*7"):
                 cli.build(self.root, destination, tool_prefix=self.prefix)
 
-    def maintained_ledgers(self):
-        """Use real registered CSVs and derived views, not a status mock."""
-        design = self.root / "docs/design"
-        design.mkdir(exist_ok=True)
-        row = {"task_id": "TASK-01", "priority": "P1", "phase": "D1",
-               "task": "Original task", "dependencies": "",
-               "implementation_status": "implemented",
-               "validation_status": "development_passed",
-               "exit_condition": "Exact source and scope"}
-        for filename, _, _ in status.SPECIFICATIONS:
-            with (design / filename).open("w", newline="") as stream:
-                writer = csv.DictWriter(stream, fieldnames=list(row))
-                writer.writeheader()
-                writer.writerow(row)
-        (design / "documentation-migration.csv").write_text(
-            "source_path,reader_task,authority_source,actual_site_paths\n")
-        reference = self.root / "docs/reference"
-        reference.mkdir(exist_ok=True)
-        (reference / "redirects.csv").write_text(
-            "old_url,target_url,semantics\n")
-        status.generate(self.root)
-        self.assertEqual(status.generate(self.root, check=True)["errors"], [])
-        return design / "io-evolution-execution.csv"
 
-    def test_build_rejects_changed_ledger_before_external_commands(self):
-        source = self.maintained_ledgers()
-        view = self.root / "docs/status/ledgers/io-evolution.md"
-        original_view = view.read_bytes()
-        source.write_text(source.read_text().replace("Original task",
-                                                     "Changed task"))
-        with self.assertRaisesRegex(ValueError,
-                                    "missing or stale ledger view: .*io-evolution"):
-            cli.build(self.root, self.external, tool_prefix=self.prefix)
-        self.run.assert_not_called()
-        self.diagrams.assert_not_called()
-        self.assertEqual(view.read_bytes(), original_view)
-        failure = next((self.external.parent / "documentation-attempts").glob(
-            "*/documentation-build-failure.json"))
-        self.assertEqual(json.loads(failure.read_text())["status"], "failed")
-        self.assertFalse((self.external / "documentation-build.json").exists())
 
-    def test_unstaged_check_rejects_missing_maintained_view_directory(self):
-        self.maintained_ledgers()
-        folder = self.root / "docs/status/ledgers"
-        for view in folder.iterdir():
-            view.unlink()
-        folder.rmdir()
-        cli.check.scan.return_value = {"errors": [], "pages": 1}
-        errors = io.StringIO()
-        with redirect_stdout(io.StringIO()), redirect_stderr(errors):
-            result = cli.main(["check"], root=self.root)
-        self.assertEqual(result, 1)
-        self.assertIn("missing or stale ledger view", errors.getvalue())
-        self.assertFalse(folder.exists())
-        self.run.assert_not_called()
 
     def test_external_build_does_not_write_source_build_directory(self):
         self.failed_build(self.external)

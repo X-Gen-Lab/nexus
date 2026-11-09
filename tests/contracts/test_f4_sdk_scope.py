@@ -42,14 +42,6 @@ class F4SourceSDKScopeTests(unittest.TestCase):
         self.assertFalse(sdk.selected("tests/google/CMakeLists.txt",
                                      profile=sdk.source_profile(host_support=True)))
 
-    def test_unselected_host_c_trial_is_not_exported_as_an_sdk_tool(self):
-        sdk = load_sdk()
-        for name in ("tools/nxconfig/CMakeLists.txt",
-                     "tools/nxconfig/src/main.c"):
-            with self.subTest(path=name):
-                self.assertFalse(sdk.selected(name))
-                self.assertFalse(sdk.selected(name, profile=sdk.source_profile(
-                    host_support=True)))
 
     def test_prepared_sdk_contains_only_its_selected_supplier_payload(self):
         sdk = load_sdk()
@@ -62,8 +54,7 @@ class F4SourceSDKScopeTests(unittest.TestCase):
             self.assertEqual({item["path"] for item in identity["dependencies"]}, {
                 "vendors/arm/CMSIS_6", "vendors/st/cmsis_device_f4",
                 "vendors/st/stm32f4_hal"})
-            self.assertFalse(any(path.startswith(("tools/nxconfig/",
-                "ext/tomlc99/", "ext/cjson/", "tests/"))
+            self.assertFalse(any(path.startswith(("ext/tomlc99/", "ext/cjson/", "tests/"))
                 for path in identity["files_sha256"]))
 
 

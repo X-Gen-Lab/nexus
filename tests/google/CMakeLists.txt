@@ -59,7 +59,6 @@ endfunction()
 include("${CMAKE_CURRENT_SOURCE_DIR}/dac.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/crc.cmake")
 
-include("${CMAKE_CURRENT_LIST_DIR}/nxconfig.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/native_cold.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/stm32_i2c_cold.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/stm32_platform_cold.cmake")

@@ -1,20 +1,18 @@
-# Reviewed against the exact current canonical source and gettext messages.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus source docs\n"
+"Project-Id-Version: Nexus source documentation\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: e8612c42b70deadbce07c257ce6b322e62e2551b7e37b1c4961c03d5527fbcb6\n"
+"X-Nexus-Source-SHA256: b95965eba6442cfe554e20743c0a45bd833ff429a7835d4b82aa33cc29615ede\n"
 
-#: docs/guides/migration.md:9
 msgid "Migrate legacy configuration and interface access"
 msgstr "迁移旧配置与接口访问"
 
-#: docs/guides/migration.md:11
 msgid ""
 "Use this guide to migrate an older HAL/OSAL/Kconfig consumer to the current "
 "Source SDK generation. Keep a fixed source revision while migrating. The "
@@ -27,101 +25,79 @@ msgstr ""
 "多态接口，改变实例生成和所有权，不以运行时服务注册表替代接口。[兼容合同](../design/source-"
 "compatibility.md)拥有版本与接口 epoch 行为。"
 
-#: docs/guides/migration.md:18
 msgid ""
 "Obtain the [fixed source and recursive dependencies](source-checkout.md) "
 "first; keep the old consumer in its own checkout while validating the new "
 "one."
 msgstr "先取得[固定源码与递归依赖](source-checkout.md)；验证新消费工程时，将旧消费工程保留在自己的 checkout 中。"
 
-#: docs/guides/migration.md:0
 msgid "Legacy pattern"
 msgstr "旧模式"
 
-#: docs/guides/migration.md:0
 msgid "Current migration action"
 msgstr "当前迁移动作"
 
-#: docs/guides/migration.md:0
 msgid "Kconfig or cache macros selecting instances"
 msgstr "用 Kconfig 或缓存宏选择实例"
 
-#: docs/guides/migration.md:0
 msgid "Write one complete schema-2 TOML assembly"
 msgstr "编写一份完整 schema-2 TOML 装配"
 
-#: docs/guides/migration.md:0
 msgid "Macro-driven object construction during lookup"
 msgstr "查找期间以宏构造对象"
 
-#: docs/guides/migration.md:0
 msgid "Use generated static objects; factory lookup only returns identity"
 msgstr "使用生成静态对象；factory 查找仅返回身份"
 
-#: docs/guides/migration.md:0
 msgid "HAL/OSAL implementation pointers in products"
 msgstr "产品持有 HAL/OSAL 实现指针"
 
-#: docs/guides/migration.md:0
 msgid "Include public Nexus APIs and generated `nexus_factory.h`"
 msgstr "包含公共 Nexus API 和生成的 `nexus_factory.h`"
 
-#: docs/guides/migration.md:0
 msgid "First SPI/I2C child used as bus"
 msgstr "以首个 SPI/I2C 子端点充当总线"
 
-#: docs/guides/migration.md:0
 msgid "Obtain controller and endpoint separately with their typed getters"
 msgstr "通过各自类型化获取函数分别取得控制器和端点"
 
-#: docs/guides/migration.md:0
 msgid "Global maximum pools or default task"
 msgstr "全局最大池或默认任务"
 
-#: docs/guides/migration.md:0
 msgid "Provide exact selected buffers, slots and application workers"
 msgstr "明确提供所选缓冲区、槽和应用执行任务"
 
-#: docs/guides/migration.md:0
 msgid "Cancel/timeout followed by immediate reuse"
 msgstr "Cancel/超时后立即复用"
 
-#: docs/guides/migration.md:0
 msgid "Keep borrow until acquire-observed SETTLED and observer drain"
 msgstr "保持借用到 acquire 观察 SETTLED 并排空观察者"
 
-#: docs/guides/migration.md:0
 msgid "Platform-owned product partition or policy"
 msgstr "平台拥有产品分区或策略"
 
-#: docs/guides/migration.md:0
 msgid "Move reservations, roles and recovery to the external product"
 msgstr "将预留、角色和恢复移入外部产品"
 
-#: docs/guides/migration.md:31
 msgid "Move one complete assembly"
 msgstr "迁移一份完整装配"
 
-#: docs/guides/migration.md:33
 msgid ""
 "Inspect this maintained F407ZG assembly; it is complete, not a fragment:"
 msgstr "检查这份受维护的 F407ZG 装配；它是完整输入，不是片段："
 
-#: docs/guides/migration.md:35
 msgid "Current schema-2 F407ZG UART input."
 msgstr "当前 schema-2 F407ZG UART 输入。"
 
-#: docs/guides/migration.md:40
 msgid ""
 "From the repository root, execute the actual parser and generation path:"
 msgstr "从仓库根执行实际 parser 与生成路径："
 
-#: docs/guides/migration.md:47
 msgid ""
 "Use a new output path you own. Check `resolved.json` and generated headers; "
 "never author the resolved output or reuse stale generated files after a "
-"failure. Legacy schema-1 JSON is no longer a platform input. Convert it to a "
-"complete schema-2 TOML assembly; generated `resolved.json` remains audit "
+"failure. Legacy schema-1 JSON is no longer a platform input. Convert it to a"
+" complete schema-2 TOML assembly; generated `resolved.json` remains audit "
 "output only. A failed TOML does not fall back to JSON, Kconfig, old headers "
 "or cache values. Frozen historical evidence remains verifiable under its "
 "original format; this read-only retention does not reopen old configuration "
@@ -131,11 +107,9 @@ msgstr ""
 "JSON 已不再是平台输入，必须迁为完整 schema-2 TOML assembly；生成的 `resolved.json` 只作审计输出。TOML "
 "失败不会回退到 JSON、Kconfig、旧头文件或 cache 值。冻结历史证据仍可按原格式校验；只读保留不重新开放旧配置或生成路径。"
 
-#: docs/guides/migration.md:55
 msgid "Move access and lifecycle together"
 msgstr "同时迁移访问与生命周期"
 
-#: docs/guides/migration.md:57
 msgid ""
 "Use compact typed IDs from the current assembly and check getter NULL "
 "results. Getter names and ID constants are generated from authored instance "
@@ -149,18 +123,16 @@ msgstr ""
 "ABI。可选名义强类型 ID 与 capability 记录必须明确配置。通过 `nx_platform_start()` 启动硬件，同时检查 "
 "primary 和 cleanup 结果。成功启动后，日常 I/O 直接使用返回接口面。"
 
-#: docs/guides/migration.md:64
 msgid ""
 "Convert synchronous and asynchronous calls according to their actual mode. "
 "For accepted requests, migrate storage lifetime, service/wait progress, "
 "cancellation, settlement and shutdown together. [The async "
-"tutorial](../tutorials/async-io.md) executes these failure paths; replacing a"
-" function spelling alone is insufficient."
+"tutorial](../tutorials/async-io.md) executes these failure paths; replacing "
+"a function spelling alone is insufficient."
 msgstr ""
 "依据实际模式转换同步与异步调用。对于已接受的请求，同时迁移存储生命周期、service/wait "
 "进度、取消、结束与停机。[异步教程](../tutorials/async-io.md)执行这些失败路径；只替换函数名不足以完成迁移。"
 
-#: docs/guides/migration.md:69
 msgid ""
 "Build an independent relocated [SDK consumer](../tutorials/source-sdk.md), "
 "then link the exact MCU configuration with the locked compiler. Retain "
@@ -171,11 +143,9 @@ msgstr ""
 "构建独立搬移的 [SDK 消费者](../tutorials/source-sdk.md)，再用锁定编译器链接精确 MCU "
 "配置。保留迁移源码/配置的证据。旧 HAL/OSAL 文档保持历史身份；redirect 不使旧 API 合同等同于新合同。"
 
-#: docs/guides/migration.md:74
 msgid "Update private source integrations"
 msgstr "更新私有源码接入"
 
-#: docs/guides/migration.md:76
 msgid ""
 "Production ownership is now one `soc/stm32/stm32f4/` package. Its concrete "
 "implementations remain F407VE/ZG; obsolete family names are rejected rather "
@@ -185,25 +155,23 @@ msgstr ""
 "生产源码现归属于一个 `soc/stm32/stm32f4/` 包。具体实现仍限 F407VE/ZG；旧系列名直接拒绝，不映射到替代项。已有 F407 "
 "assembly 现选择 `stm32f4` 并指定精确料号。公共 C 接口仍是消费边界。"
 
-#: docs/guides/migration.md:81
 msgid ""
 "Board and SoC trees contain no Python plugins. Current generation is "
-"centralized under `tools/configure/stm32f4/`; Host C11 generation and "
-"remaining handwritten C lifecycle consolidation are separate follow-up work. "
-"Native fixtures live under `tests/support/native/` and require explicit test "
-"support."
+"centralized under `tools/configure/stm32f4/`; firmware hardware algorithms "
+"and lifecycle remain handwritten C. Native fixtures live under "
+"`tests/support/native/` and require explicit test support."
 msgstr ""
-"Board 和 SoC 树不含 Python 插件。当前生成实现集中在 `tools/configure/stm32f4/` 下；Host C11 "
-"生成与剩余手写 C 生命周期收敛分别是后续工作。Native fixture 位于 `tests/support/native/`，须显式启用测试支持。"
+"Board 和 SoC 树不包含 Python 插件。当前生成逻辑集中在 "
+"`tools/configure/stm32f4/`；固件硬件算法和生命周期仍直接采用手写 C。Native 测试支撑位于 "
+"`tests/support/native/`，必须显式启用测试范围。"
 
-#: docs/guides/migration.md:86
 msgid ""
 "Private F4 IP belongs to `soc/stm32/stm32f4/drivers/ip/`; there is no root "
 "MCU `drivers/` directory. Update private includes, configuration inputs, "
 "CMake source selection and SDK payload together. The [source "
-"map](../explanation/source-map.md) and [provider guide](provider-porting.md) "
-"describe current ownership. Original cross-family layouts remain traceable at"
-" the [fixed prior source](https://github.com/X-Gen-"
+"map](../explanation/source-map.md) and [provider guide](provider-porting.md)"
+" describe current ownership. Original cross-family layouts remain traceable "
+"at the [fixed prior source](https://github.com/X-Gen-"
 "Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)."
 msgstr ""
 "私有 F4 IP 归属 `soc/stm32/stm32f4/drivers/ip/`；顶层不再有 MCU `drivers/` 目录。私有 "
@@ -212,10 +180,9 @@ msgstr ""
 "porting.md)说明当前归属。原始跨系列布局可从[固定旧源码](https://github.com/X-Gen-"
 "Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)追溯。"
 
-#: docs/guides/migration.md:92
 msgid ""
-"Resolve the actual assembly, exercise complete provider contracts and build a"
-" relocated consumer. Source movement establishes neither new modes nor "
+"Resolve the actual assembly, exercise complete provider contracts and build "
+"a relocated consumer. Source movement establishes neither new modes nor "
 "physical qualification; no previous candidate transfers to this revision."
 msgstr ""
 "解析真实 assembly，执行完整 provider 合同并构建可搬移消费者。源码移动既不建立新模式，也不赋予物理资格；原候选不能转移到本次修订。"

@@ -1,4 +1,4 @@
-# Reviewed against the exact current canonical source and gettext messages.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,13 +7,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 97359708077ba4f8ff5974506cf87d91d8d2365090577198bcec0278675903c9\n"
+"X-Nexus-Source-SHA256: 01d1c48569fad628199b16e89592b6a2306e63d2b19152ee797f7a12158b7897\n"
 
-#: docs/delivery/README.md:8
 msgid "当前平台交付边界"
 msgstr "Current platform delivery boundaries"
 
-#: docs/delivery/README.md:10
 msgid ""
 "当前重构将生产 SoC 收敛为 STM32F4，现有 F407VE／ZG 及四个 Board 包迁入系列入口。 全部 vendor "
 "来源保留；Native 移到显式测试支撑。应用任务、产品策略和私有 PCB 继续由外部工程维护。"
@@ -24,15 +22,13 @@ msgstr ""
 "support. Application tasks, product policies and private PCBs remain in "
 "external projects."
 
-#: docs/delivery/README.md:14
 msgid ""
-"本页说明当前阅读与验收入口，不把源码存在、文档构建或历史软件结果写成本次通过。 默认 F407 "
-"路径的启动、停止、失败回滚、共享资源及诊断已由手写 C 维护，生成器负责 静态连接。后续主线是精确 F4 "
-"型号扩展、所需运行期能力和真实测量，按实际回归与源码 身份验收。当前物理 HIL 为 "
+"本页说明当前阅读与验收入口，不把源码存在、文档构建或历史软件结果写成本次通过。 默认 F407 路径的启动、停止、失败回滚、共享资源及诊断已由手写 C "
+"维护，生成器负责 静态连接。后续主线是精确 F4 型号扩展、所需运行期能力和真实测量，按实际回归与源码 身份验收。当前物理 HIL 为 "
 "`not_executed`，本次重构没有自动建立软件候选。"
 msgstr ""
-"This page identifies current reading and acceptance entry points. Source"
-" presence, documentation builds and historical software results are not "
+"This page identifies current reading and acceptance entry points. Source "
+"presence, documentation builds and historical software results are not "
 "recorded as passes for this iteration. The default F407 startup, stop, "
 "failure rollback, shared resources and diagnostics are maintained in "
 "handwritten C; the generator provides static connections. Further work "
@@ -41,70 +37,47 @@ msgstr ""
 "Physical HIL remains `not_executed`; this refactor creates no software "
 "candidate automatically."
 
-#: docs/delivery/README.md:18
-msgid ""
-"[Host C11 配置器](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/nxconfig/README.md)是在 PC 上运行的可选试点，默认平台 配置仍使用 "
-"Python。试点不进入固件，其全面替换不作为平台使用、固件 C 化或软件 交付的前置条件。它改变的是主机工具实现，不直接改变 MCU "
-"热路径或资源占用。"
+msgid "主机配置统一由 `tools/configure/` 维护；配置代码不进入 MCU 镜像。"
 msgstr ""
-"The [Host C11 configuration tool](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/nxconfig/README.md) is an "
-"optional pilot that runs on a PC; the default platform configuration still "
-"uses Python. The pilot does not enter firmware. Replacing the host tool "
-"completely is not a prerequisite for using the platform, moving firmware "
-"behavior to C, or delivering software. It changes the host tool "
-"implementation and does not directly change MCU hot paths or resource use."
+"Host configuration is maintained in `tools/configure/`; its code is not "
+"linked into the MCU image."
 
-#: docs/delivery/README.md:0
 msgid "入口"
 msgstr "Entry point"
 
-#: docs/delivery/README.md:0
 msgid "用途"
 msgstr "Purpose"
 
-#: docs/delivery/README.md:0
 msgid "[当前架构](architecture.md)"
 msgstr "[Current architecture](architecture.md)"
 
-#: docs/delivery/README.md:0
 msgid "目录、依赖、运行路径和状态责任"
 msgstr "Directories, dependencies, runtime paths and state ownership"
 
-#: docs/delivery/README.md:0
 msgid "[精确支持](support.md)"
 msgstr "[Exact support](support.md)"
 
-#: docs/delivery/README.md:0
 msgid "型号、板卡、模式与限制"
 msgstr "Parts, boards, modes and limitations"
 
-#: docs/delivery/README.md:0
 msgid "[能力矩阵](capabilities.md)"
 msgstr "[Capability matrix](capabilities.md)"
 
-#: docs/delivery/README.md:0
 msgid "事实、路线、装配与实际生产定义关联"
 msgstr "Facts, routes, assemblies and actual production definitions"
 
-#: docs/delivery/README.md:0
 msgid "[源码定位](../explanation/source-map.md)"
 msgstr "[Source map](../explanation/source-map.md)"
 
-#: docs/delivery/README.md:0
 msgid "各层权威入口与源码归属"
 msgstr "Authoritative layer entry points and source ownership"
 
-#: docs/delivery/README.md:0
 msgid "[资格边界](../reference/platforms/qualification.md)"
 msgstr "[Qualification boundaries](../reference/platforms/qualification.md)"
 
-#: docs/delivery/README.md:0
 msgid "模型、ARM、SDK、候选和物理验收分开"
 msgstr "Separate model, ARM, SDK, candidate and physical acceptance"
 
-#: docs/delivery/README.md:0
 msgid ""
 "[软件证据导航](https://github.com/X-Gen-"
 "Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-"
@@ -114,12 +87,10 @@ msgstr ""
 "Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-"
 "verification.md)"
 
-#: docs/delivery/README.md:0
 msgid "按原源码与配置读取执行记录"
 msgstr ""
 "Read execution records against their original source and configuration"
 
-#: docs/delivery/README.md:27
 msgid ""
 "当前源码版本号保持 0.2.1；已发布版本仍以 [GitHub Releases](https://github.com/X-Gen-"
 "Lab/nexus/releases)和其固定 manifest 为准。 重构不移动旧标签，不重新标记旧产物。"
@@ -129,7 +100,6 @@ msgstr ""
 "fixed manifests. The refactor does not move existing tags or relabel old "
 "artifacts."
 
-#: docs/delivery/README.md:31
 msgid ""
 "退出平台的原始实现和记录可从 [重构前固定源码](https://github.com/X-Gen-"
 "Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18) "

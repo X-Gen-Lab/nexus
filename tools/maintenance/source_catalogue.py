@@ -12,6 +12,11 @@ import re
 from typing import Literal
 
 
+DEPENDENCY_UPGRADE_GATES = ("license_review", "configuration", "host_models", "cortex_runtime",
+         "board_arm", "resource_budgets", "installed_sdk",
+         "offline_reproduction", "static_analysis")
+
+
 @dataclass(frozen=True)
 class SourceDependency:
     identifier: str
@@ -275,11 +280,6 @@ SOURCE_DEPENDENCIES = tuple(item for item in ALL_SOURCE_DEPENDENCIES
                             if item.scope == "runtime")
 HOST_TEST_DEPENDENCIES = tuple(item for item in ALL_SOURCE_DEPENDENCIES
                                if item.scope == "host-test")
-
-
-def host_configuration_sources():
-    """Select build-host parser sources without making them MCU dependencies."""
-    return tuple(dependency(name) for name in ("tomlc99", "cjson"))
 
 
 def runtime_selection(family, *, backend, components=(), test_support=False):

@@ -45,8 +45,8 @@ class PresetDependencySelectionTests(unittest.TestCase):
         selected = required_submodules("native", "native", "native")
         self.assertIn("ext/googletest", selected)
         self.assertIn("vendors/st/cmsis_device_f4", selected)
-        self.assertIn("ext/tomlc99", selected)
-        self.assertIn("ext/cjson", selected)
+        self.assertNotIn("ext/tomlc99", selected)
+        self.assertNotIn("ext/cjson", selected)
         self.assertNotIn("vendors/st/cmsis_device_h7", selected)
         self.assertNotIn("vendors/st/stm32u5_hal", selected)
 
@@ -97,20 +97,7 @@ class PresetDependencySelectionTests(unittest.TestCase):
         self.assertEqual(receipt["components"], ["network", "tls"])
         self.assertTrue(receipt["host_support"])
 
-    def test_host_configuration_has_its_own_source_scope(self):
-        from tools.dev.dependencies import required_submodules
-        self.assertEqual(set(required_submodules("host-config")), {
-            "ext/tomlc99", "ext/cjson"})
 
-    def test_host_configuration_cli_preserves_its_scope(self):
-        from tools.dev import dependencies
-        with mock.patch.object(dependencies, "prepare", return_value={
-                "status": "verified"}) as prepare:
-            self.assertEqual(dependencies.main([
-                "prepare", "--scope", "host-config"]), 0)
-        prepare.assert_called_once_with(dependencies.ROOT, "host-config",
-            family=None, backend="baremetal", components=(),
-            host_support=False, allow_network=False)
 
 
 class DormantNetworkTests(unittest.TestCase):

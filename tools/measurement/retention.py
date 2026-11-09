@@ -659,7 +659,7 @@ def secure_service_symbols(arm):
 
 def secure_owner_inputs(root, consumer):
     """Protect and compare exact canonical C/header/assembly inputs."""
-    from tools.release.transport import SERVICE_CONSUMERS
+    from tools.maintenance.consumer_profiles import SERVICE_CONSUMERS
     choices = [item for item in SERVICE_CONSUMERS
                if item.scenario == "secure_services" and item.domain == "arm-secure"]
     if len(choices) != 1 or consumer is None or Path(consumer).name != "application.c":
@@ -737,7 +737,7 @@ def component_owner_object(elf, name):
 def component_owner_input_paths(root):
     """Protect all optional source contracts before mutating the output."""
     paths = {root / "core/include/nexus/core/time.h",
-             root / "tools/release/transport.py"}
+             root / "tools/maintenance/consumer_profiles.py"}
     paths.update((root / "io/include/nexus/io").glob("*.h"))
     paths.update((root / "components").rglob("include/nexus/components/*.h"))
     paths.update((root / "components").rglob("src/*.c"))

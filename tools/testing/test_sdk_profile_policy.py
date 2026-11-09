@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.release import transport
+from tools.maintenance import consumer_profiles
 from tools.configure import configure
 from tools.evidence.common import file_identity
 
@@ -29,7 +29,7 @@ class SDKProfilePolicyTests(unittest.TestCase):
             setattr(cls, name, module)
 
     def profile(self, name):
-        return next(item for item in transport.SERVICE_CONSUMERS
+        return next(item for item in consumer_profiles.SERVICE_CONSUMERS
                     if item.name == name)
 
     def prepared(self, directory, name):

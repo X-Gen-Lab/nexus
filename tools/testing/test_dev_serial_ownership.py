@@ -13,7 +13,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.dev import device
-from tools.hil import serial_echo
+from tools.dev import serial as serial_echo
 from tools.testing import test_dev_serial_rates as serial_tests
 
 
@@ -51,7 +51,7 @@ import json
 import runpy
 import sys
 sys.path.insert(0, sys.argv[1])
-from tools.hil import serial_echo
+from tools.dev import serial as serial_echo
 target = Path(sys.argv[2])
 serial_echo._alias_target = lambda name: target
 arguments = json.loads(sys.argv[3])
@@ -243,7 +243,7 @@ import runpy
 import select
 import sys
 sys.path.insert(0, sys.argv[1])
-from tools.hil import serial_echo
+from tools.dev import serial as serial_echo
 target = Path(sys.argv[2])
 serial_echo._alias_target = lambda name: target
 arguments = json.loads(sys.argv[3])

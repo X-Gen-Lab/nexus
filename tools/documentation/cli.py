@@ -116,24 +116,8 @@ def _safe_report(root, path):
     return path
 
 
-def _delivery_report_path(args):
-    """Keep command results outside the bytes being verified or published."""
-    protected = ([args.build, args.output, *args.qualification_reference]
-                 if args.action == "package" else [args.path])
-    if args.action == "restore":
-        protected.append(args.output)
-    for source in protected:
-        source = source.resolve()
-        if args.report == source or args.report.is_relative_to(source):
-            raise ValueError("delivery report cannot overlap command inputs or outputs")
 
 
-def _delivery_result(action, *, result=None, error=None):
-    """Describe command completion without granting firmware qualification."""
-    return {"schema_version": 1, "kind": "nexus_documentation_delivery_result",
-            "action": action, "status": "failed" if error else "passed",
-            "qualification": False, "result": result,
-            "errors": [str(error)] if error else []}
 
 
 def normalize_generated_svg(folder):
@@ -202,13 +186,6 @@ def run_tests(root, report, tool_prefix=None):
         raise
 
 
-def _check_status_views(root, report):
-    """Share scan's authority gate, including explicit custom scan callers."""
-    if "maintained_sources" not in report:
-        result = check.validate_maintained_sources(root)
-        report["maintained_sources"] = result
-        report["errors"].extend(result["errors"])
-    report["status"] = "failed" if report["errors"] else "passed"
 
 
 def build(root, destination, *, language="all", tool_prefix=None, timeout=600):
@@ -235,7 +212,6 @@ def build(root, destination, *, language="all", tool_prefix=None, timeout=600):
                 "qualification": False}
     try:
         report = check.scan(root)
-        _check_status_views(root, report)
         _record(workspace / "source-check.json", report)
         if report["errors"]:
             raise ValueError("documentation source check failed: " + "\n".join(report["errors"]))
@@ -290,9 +266,6 @@ def build(root, destination, *, language="all", tool_prefix=None, timeout=600):
         shutil.copyfile(root / "LICENSE", licenses / "LICENSE.txt")
         shutil.copytree(prefix / "licenses", licenses / "documentation-tools")
         shutil.copytree(root / "docs/assets/diagrams", output / "sources/diagrams")
-        if languages == ["en", "zh_CN"]:
-            from tools.documentation import delivery
-            delivery.install_alias_catalog(output, root)
         after = observe_git_source(root)
         if after != source:
             raise ValueError("source identity changed during documentation build")
@@ -309,12 +282,9 @@ def build(root, destination, *, language="all", tool_prefix=None, timeout=600):
 def main(arguments=None, *, root=ROOT):
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="action", required=True)
-    for name in ("check", "build", "doctor", "package", "preview", "verify", "restore", "test"):
+    for name in ("check", "build", "doctor", "preview", "test"):
         command = sub.add_parser(name)
         command.add_argument("--tool-prefix", type=Path)
-        if name in {"package", "verify", "restore"}:
-            command.add_argument("--report", type=Path,
-                                 help="Atomically write the command result as JSON")
         if name == "check":
             command.add_argument("--staged", action="store_true")
             command.add_argument("--external", action="store_true")
@@ -327,34 +297,16 @@ def main(arguments=None, *, root=ROOT):
             command.add_argument("--output", type=Path, default=Path(root) / "build/documentation")
             command.add_argument("--language", choices=("en", "zh_CN", "all"), default="all")
             command.add_argument("--timeout", type=float, default=600)
-        elif name == "package":
-            command.add_argument("--build", type=Path, default=Path(root) / "build/documentation")
-            command.add_argument("--output", type=Path,
-                default=Path(root).parent / ".nexus-documentation-artifacts" / Path(root).name / "packages")
-            command.add_argument("--release-id")
-            command.add_argument("--qualification-reference", type=Path,
-                                 action="append", default=[],
-                                 help="Verify and reference an original sealed candidate; repeat for multiple scopes")
         elif name == "preview":
             command.add_argument("--build", type=Path, default=Path(root) / "build/documentation")
             command.add_argument("--host", default="127.0.0.1")
             command.add_argument("--port", type=int, default=8000)
-        elif name in {"verify", "restore"}:
-            command.add_argument("path", type=Path)
-            command.add_argument("--expected-manifest-sha256",
-                                 help="Require the original manifest digest")
-            if name == "restore":
-                command.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(arguments)
     root = Path(root).resolve()
     failure_report = None
     try:
         if getattr(args, "report", None):
             args.report = _safe_report(root, args.report)
-            if args.action in {"package", "verify", "restore"}:
-                _delivery_report_path(args)
-                failure_report = args.report
-                args.report.unlink(missing_ok=True)
             if args.action == "check":
                 failure_report = args.report
                 args.report.unlink(missing_ok=True)
@@ -371,7 +323,6 @@ def main(arguments=None, *, root=ROOT):
                 locked = json.loads((root / "dependencies/docs-tools.lock.json").read_text())
                 install.validate_lock(locked)
                 install.verify_requirements(root / "dependencies/docs-python-linux-cp312.txt", locked)
-            _check_status_views(root, report)
             if args.full:
                 from tools.documentation import diagrams, install
                 diagram_report = diagrams.check(root,
@@ -395,25 +346,6 @@ def main(arguments=None, *, root=ROOT):
         elif args.action == "build":
             build(root, args.output, language=args.language,
                   tool_prefix=args.tool_prefix, timeout=args.timeout)
-        elif args.action == "package":
-            from tools.documentation import delivery
-            revision = observe_git_source(root)["commit"]
-            release_id = args.release_id or "docs-" + revision[:12]
-            record = delivery.package(args.build, args.output,
-                source_root=root, release_id=release_id,
-                qualification_references=args.qualification_reference)
-            if args.report:
-                _record(args.report, _delivery_result(args.action, result=record))
-            print(json.dumps(record, indent=2))
-        elif args.action in {"verify", "restore"}:
-            from tools.documentation import delivery
-            options = {"expected_manifest_sha256": args.expected_manifest_sha256}
-            record = (delivery.verify(args.path, **options)
-                      if args.action == "verify" else
-                      delivery.restore(args.path, args.output, **options))
-            if args.report:
-                _record(args.report, _delivery_result(args.action, result=record))
-            print(json.dumps(record, indent=2))
         elif args.action == "preview":
             if not (args.build / "documentation-build.json").is_file():
                 raise ValueError("preview requires a completed documentation build")
@@ -433,12 +365,11 @@ def main(arguments=None, *, root=ROOT):
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         if failure_report is not None:
             try:
-                record = (_delivery_result(args.action, error=error)
-                          if args.action in {"package", "verify", "restore"} else {
+                record = {
                     "schema_version": 1,
                     "kind": "nexus_documentation_source_check",
                     "status": "failed", "errors": [str(error)],
-                    "admission_completed": False, "qualification": False})
+                    "admission_completed": False, "qualification": False}
                 _record(failure_report, record)
             except OSError as report_error:
                 print("Failure report could not be written: "

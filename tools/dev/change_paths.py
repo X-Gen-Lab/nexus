@@ -8,6 +8,7 @@ import subprocess
 import sys
 
 BEHAVIOR_DOCUMENTS = {
+    "AGENTS.md",
     "CONTRIBUTING.md", "CONTRIBUTING_CN.md",
     ".kiro/steering/comment-standards.md",
     "docs/sphinx/development/coding_standards.rst",

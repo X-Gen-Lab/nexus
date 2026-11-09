@@ -626,9 +626,6 @@ REQUIRED_FILES = (
     'os/threadx/private/m4_model.h',
     'os/threadx/threadx.c',
     'os/wait.c',
-    'scripts/ci/io_lifecycle_matrix.py',
-    'scripts/ci/native_contracts.py',
-    'scripts/ci/tdd_gate.py',
     'scripts/ci/vendor_import_identity.py',
     'scripts/ci/verify_vendor_source.py',
     'scripts/validation/junit.py',
@@ -831,38 +828,18 @@ REQUIRED_FILES = (
     'tools/dev/dependencies.py',
     'tools/dev/dev.py',
     'tools/dev/device.py',
-    'tools/dev/plan.py',
     'tools/dev/presets.py',
     'tools/dev/process.py',
     'tools/dev/projects.py',
     'tools/dev/provenance.py',
-    'tools/dev/qualification.py',
+    'tools/dev/serial.py',
     'tools/dev/timings.py',
-    'tools/evidence/candidate.py',
     'tools/evidence/common.py',
-    'tools/evidence/consumer.py',
-    'tools/evidence/container.py',
-    'tools/evidence/environment.py',
     'tools/evidence/identity.py',
-    'tools/evidence/inputs.py',
-    'tools/evidence/legacy_sdk.py',
-    'tools/evidence/native_proof.py',
-    'tools/evidence/proof.py',
-    'tools/evidence/qualification.py',
-    'tools/evidence/recipe.py',
-    'tools/evidence/reproduce.py',
-    'tools/evidence/storage.py',
-    'tools/evidence/store.py',
-    'tools/hil/admit.py',
-    'tools/hil/measure.py',
-    'tools/hil/power.py',
-    'tools/hil/prepare.py',
-    'tools/hil/threadx.py',
-    'tools/hil/workloads.py',
     'tools/maintenance/capabilities.py',
     'tools/maintenance/cmsis_device_lock.py',
+    'tools/maintenance/consumer_profiles.py',
     'tools/maintenance/coremqtt_lock.py',
-    'tools/maintenance/dependency_proposals.py',
     'tools/maintenance/freertos_transport.py',
     'tools/maintenance/lwip_lock.py',
     'tools/maintenance/mbedtls_lock.py',
@@ -877,13 +854,11 @@ REQUIRED_FILES = (
     'tools/maintenance/stm32h5_hal_lock.py',
     'tools/maintenance/stm32h7_hal_lock.py',
     'tools/maintenance/stm32u5_hal_lock.py',
-    'tools/maintenance/support.py',
     'tools/maintenance/threadx_lock.py',
     'tools/measurement/elf.py',
     'tools/measurement/resources.py',
     'tools/measurement/retention.py',
     'tools/measurement/workload.c',
-    'tools/release/transport.py',
 )
 REQUIRED_FILES += (
     'components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt',
@@ -1244,6 +1219,15 @@ def selected(name, *, root=SOURCE_ROOT, profile=None):
     profile = source_profile() if profile is None else checked_profile(profile)
     if name in HOST_SUPPORT_FILES or name.startswith("tests/"):
         return profile["host_support"] and name in HOST_SUPPORT_FILES
+    # Export the checked build-tool closure, not the repository's maintainer
+    # test, publication, documentation or benchmark command surface.
+    if (name.startswith("tools/configure/assemblies/")
+            and name.endswith(".toml")):
+        return True
+    if name.startswith("tools/"):
+        return name in REQUIRED_FILES or name in {"tools/__init__.py", "tools/README.md"}
+    if name.startswith("scripts/ci/"):
+        return name in REQUIRED_FILES
     if name.startswith("cmake/package/verification/external_provider/") or name.startswith(
             "cmake/package/verification/common_services/external/"):
         return False
@@ -1251,11 +1235,6 @@ def selected(name, *, root=SOURCE_ROOT, profile=None):
         if "native-time-" in name and not profile["host_support"]:
             return False
         return name in IO_EVOLUTION_VERIFICATION_FILES
-    if name.startswith(("tools/testing/", "tools/configure/tests/",
-                        "tools/nxconfig/")):
-        return False
-    if name.startswith(("tools/configure/test_", "scripts/ci/test_")):
-        return False
     if name.startswith(("dependencies/source/", "cmake/testing/", "cmake/presets/")):
         return False
     if re.search(r"(?:^|/)(?:gd32|gd470|g474|h563|h743|h747|u575)", name):

@@ -25,7 +25,7 @@ from tools.configure.metadata import (  # noqa: E402
 )
 from tools.maintenance.source_catalogue import (  # noqa: E402
     ALL_DEPENDENCIES, declared_modules, relative_path, verify_alias_identities,
-    verify_gitlinks,
+    verify_gitlinks, DEPENDENCY_UPGRADE_GATES as GATES,
 )
 from tools.maintenance import (  # noqa: E402
     cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
@@ -35,9 +35,6 @@ from tools.maintenance import (  # noqa: E402
     coremqtt_lock, mcuboot_lock,
 )
 
-GATES = ("license_review", "configuration", "host_models", "cortex_runtime",
-         "board_arm", "resource_budgets", "installed_sdk",
-         "offline_reproduction", "static_analysis")
 WORKLOADS = {
     "license_review": "Codex independent review of source origin, all redistributed files and exact license/notice changes",
     "configuration": "All resolver/kernel/configuration boundary tests and generated input-closure/schema/epoch checks",
