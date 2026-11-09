@@ -15,7 +15,7 @@ foreach(required "${stm32_device}/Include/${stm32_device_header}.h"
     endif()
 endforeach()
 include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/ControllerModes.cmake")
-set(stm32_sources drivers/platform_coordinator.c drivers/platform_lifecycle.c
+set(stm32_sources reset.c drivers/platform_coordinator.c drivers/platform_lifecycle.c
     drivers/system_lifecycle.c drivers/chip.c
     drivers/lifecycle_pins.c)
 set(stm32_uart_hal OFF)
@@ -31,6 +31,13 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm encoder adc dac crc can u
         list(APPEND stm32_sources drivers/ethernet_frames.c)
     elseif(kind STREQUAL "pwm")
         list(APPEND stm32_sources drivers/timer.c)
+    elseif(kind STREQUAL "watchdog")
+        if("independent" IN_LIST modes)
+            list(APPEND stm32_sources drivers/watchdog.c)
+        endif()
+        if("window" IN_LIST modes)
+            list(APPEND stm32_sources drivers/window_watchdog.c)
+        endif()
     elseif(kind STREQUAL "block")
         list(APPEND stm32_sources drivers/sdio.c)
     elseif(kind STREQUAL "external_bus")

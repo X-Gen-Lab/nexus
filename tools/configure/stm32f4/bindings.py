@@ -389,9 +389,17 @@ def _gpio_constructor(item):
 
 
 def _basic_constructor(item, result):
-    """Keep immutable Flash geometry and fixed IWDG binding declarative."""
+    """Keep Flash geometry and both watchdog lifecycle connections declarative."""
     name = _symbol(item.id)
     state = Address(f"s_nx_port_{name}")
+    if item.kind == "watchdog" and item.mode == "window":
+        arguments = (state, item.options.window_ticks)
+        return Construction(
+            state_type="nx_stm32_window_watchdog_state_t", definitions=(),
+            admission=(DirectCall("nx_stm32_window_watchdog_admit", arguments),),
+            initialize=DirectCall("nx_stm32_window_watchdog_prepare", arguments),
+            stop=(DirectCall("nx_stm32_window_watchdog_stop", (state,)),),
+            retain_on_failed_init=True)
     if item.kind == "watchdog":
         return Construction(
             state_type="nx_stm32_watchdog_state_t", definitions=(),

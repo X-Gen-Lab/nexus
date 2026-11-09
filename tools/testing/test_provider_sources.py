@@ -21,7 +21,8 @@ class ProviderSourceSelectionTests(unittest.TestCase):
             (directory / "drivers" / name).as_posix() for name in (
                 "platform_coordinator.c", "platform_lifecycle.c",
                 "system_lifecycle.c", "platform_cold.c",
-                "lifecycle_pins.c", "chip.c")}
+                "lifecycle_pins.c", "chip.c")} | {
+            (directory / "reset.c").as_posix()}
 
     def configure_sources(self, family, controllers):
         """Inspect production targets without claiming an ARM link proof."""
@@ -153,6 +154,17 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 expected = {"flash.c", "watchdog.c", "platform_cold.c"}
                 self.assertEqual(sdk, set())
                 self.assertEqual(provider, self.private_sources(family, expected))
+
+    def test_window_watchdog_keeps_reset_but_selects_independent_only_on_request(self):
+        for modes in (("window",), ("independent", "window")):
+            with self.subTest(modes=modes):
+                provider, sdk = self.configure_sources(
+                    "stm32f4", [("watchdog", mode) for mode in modes])
+                expected = {"window_watchdog.c", "platform_cold.c"}
+                if "independent" in modes:
+                    expected.add("watchdog.c")
+                self.assertEqual(provider, self.private_sources("stm32f4", expected))
+                self.assertEqual(sdk, set())
 
     def test_multiple_instances_share_one_compilation_unit(self):
         for family in ("stm32f4",):

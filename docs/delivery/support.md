@@ -40,11 +40,11 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 | GPIO／EXTI | 受审引脚、静态电气与事件存储；不存在自动消抖政策 |
 | UART | IRQ byte/event、word 与明确 block／DMA 模式分别选择；有限 TX、有限 RX、连续 RX 和双向模式不自动互相授权 |
 | SPI／I2C | SPI1／2／3 polling、普通与增强 DMA 事务；I2C1／2／3 polling／IRQ／DMA；显式 endpoint 与受审路线 |
-| PWM | TIM3／TIM5 的 CH1–4 中各显式选择一路；固定 84 MHz timer clock 与 PSC／ARR；TIM3 周期 1–65535，TIM5 周期 1–4294967295；无隐式共享时基 |
+| PWM | TIM3／4／5／9／10／11／12／13／14 的 20 个已审通道，各 controller 显式选择一路；APB1 timer 84 MHz、APB2 timer 168 MHz；TIM5 32-bit，其他 16-bit；无隐式共享时基 |
 | ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；普通 shot／scan 最多 16 ranks、软件注入组最多 4 ranks；三个转换器均有独占 TIM3 的有限／连续 DMA |
 | Encoder | TIM3／4／5 独占 TI1／TI2 原始正交计数；x2 TI1、x2 TI2、x4 TI12，独立输入反相与 4-bit filter；无 IRQ／DMA／累计位置策略 |
 | DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码 |
-| Flash／IWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
+| Flash／IWDG／WWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
 | CRC／芯片身份 | 固定多项式 CRC-32 字序列；实际 UID、device／revision ID 和半字 Flash 容量；不建立认证或订货号推断 |
 | Classic CAN | 所选 mailbox 与共享 filter domain；不提供 CAN FD |
 | USB | 所选 OTG FS device PIO；不由此授予 Host、HS、DMA 或全部 class stack |
@@ -163,6 +163,15 @@ stream1 channel2；有限和连续模式均按所选 lane 解释并清除标志�
 不同 ADC 的 DMA stream 不冲突也不能同时取得同一 TIM3。软件参考装配见
 `tests/contracts/multi_controller_assembly/*tertiary*.toml`，覆盖 VE／ZG 和裸机／
 FreeRTOS；它们不授权实际 Board 接线。
+
+WWDG 通过既有 watchdog 接口、静态 factory 和独立 C owner 接入。prepare 不启狗，
+显式 enable 先证明 CFR／debug 配置，再以单次 CR 写入激活；未证实的激活也保留不可逆
+责任。`window_ticks` 为 1–62，默认 1；名义 42 MHz PCLK1 的 1／2／4／8 分频须保留
+至少一个 `0x40<T<W` 合法计数，不能容纳窗口的 timeout 明确拒绝。早喂 BUSY、迟喂
+STATE，均不 reload 或等待。未激活时按 CFR→debug→Sleep→gate 逆序恢复，失败保留
+清理收条且禁止再次 enable；激活后 stop 保留 System。实际物理 bounds 仍为 0/0 unknown，
+不提供 EWI、STOP／Standby、自动喂狗或物理复位资格。复位原因是独立 SoC 能力，不依赖
+选择 IWDG。两份参考为 `*wwdg-baremetal.toml` 与 `*watchdogs-freertos.toml`。
 
 ## 选择、证据与保留依赖
 

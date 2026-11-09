@@ -76,6 +76,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | I2C | I2C1／2／3 polling/IRQ/DMA；42 MHz PCLK、名义 5129 Hz–400 kHz；显式 7／10-bit endpoint、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误；10-bit 受下述勘误时序准入约束 |
 | Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
+| WWDG | 固定 42 MHz PCLK1，1／2／4／8 分频，显式 window_ticks；prepare 不启狗，单次 CR 激活、早／迟喂狗拒绝、失败关闭留责；无 EWI／STOP／Standby 覆盖 |
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
 | PWM | TIM3／4／5／9／10／11／12／13／14 按各自通道数显式选择一路；固定 PSC/ARR；TIM5 为 32-bit counts，其他为 16-bit；duty0–period、shadow update；stop 建立 GPIO inactive |
 | ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；6／8／10／12-bit 普通软件 shot/scan 最多 16 ranks、软件注入组最多 4 ranks；各转换器均有独占 TIM3 触发有限／连续 DMA block |
@@ -100,6 +101,36 @@ IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征�
 已选 erase-aligned offset image 有明确 startup／vector／linker／ELF/BIN 检查，
 不包含 boot 认证、激活或运行镜像 handoff 资格。精确 mode／Board／生产源码见
 [派生矩阵](../../../../docs/delivery/capabilities.md)。
+
+## 窗口看门狗与复位来源
+
+`watchdog` 的 `window` 模式通过同一公共接口与 typed factory 提供 WWDG。
+无写 admit 位于 System 启动前；prepare 在 System 建立真实 ON／RDY／SW／SWS 时钟
+profile 后取得 gate 与 Sleep clock。它拒绝外来 gate、reset、vector、WDGA 或 EWI，
+不会在 startup 启狗。复位原因从 IWDG 拆入 SoC `reset.c`，只选择 WWDG 也能调用
+`nx_reset_cause()`，不需要链接 IWDG transport。
+
+`window_ticks` 为 reload 后至少经过的 counter decrement 数，范围 1–62，默认 1。
+显式 enable 以 64-bit 向上取整选择 1／2／4／8 分频和 1–64 steps；
+`R=0x3f+steps`、`W=R-window_ticks+1`，只准入 `0x40<T<W` 的喂狗窗口。
+`steps>=window_ticks+2` 保证至少一个合法计数；过短或过长的 timeout 返回
+UNSUPPORTED，不静默延长。prescaler 相位未知，ticks 不能换成保证的微秒；查询保留
+enabled／irreversible 事实，而物理 timeout bounds 为 0/0 unknown。
+
+enable 先写并核对 CFR 与 CPU debug freeze，最后一次 CR 写同时提供 WDGA 与
+有效 T6／reload。官方 HAL 的先激活顺序和 LL_Enable 的旧 counter RMW 不满足该合同，
+因此原子激活与带回读的资源事务直接由 C 维护；读数与位定义继续复用官方 LL／CMSIS。
+写前记录不可逆责任，不能以失败回读推定可关停，也不隐式重试。feed 在最短 IRQ mask
+窗口内读取并检查实际 counter／window：早喂返回 BUSY，迟喂返回 STATE，均不写入或等待。
+
+未激活的 close 依次恢复 CFR、debug、Sleep clock、运行 gate；回读失败保留对应收条，
+并立即撤销再次激活的准入。已激活或未证实激活的 stop 返回 UNSUPPORTED，真实 Core
+生命周期因此保留 System。只有产品显式选择喂狗／复位策略；没有默认任务、自动喂狗、
+EWI 或 STOP／Standby 保证。软件参考为 `*wwdg*.toml` 与 `*watchdogs*.toml`，不建立
+物理复位、窗口时限或安全认证。
+
+外来 EWI enable 为 sticky 位，只能由硬件 reset 清除；该模式不会把普通写入伪装成
+可撤回 EWI 的恢复。遇到未取得的 EWI／vector 时保持 BUSY 与现有责任。
 
 ## UART、DMA 与执行进度
 

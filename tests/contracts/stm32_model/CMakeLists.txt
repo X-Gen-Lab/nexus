@@ -6,6 +6,7 @@ nexus_cmsis_core_include(stm32_cmsis)
 add_executable(contract_stm32_system_model
     "${stm32_root}/system.c" "../stm32_system_test.c")
 add_executable(contract_stm32_io_model
+    "${stm32_root}/reset.c"
     "${stm32_root}/drivers/gpio.c" "${stm32_root}/drivers/uart.c"
     "${stm32_root}/drivers/spi.c" "${stm32_root}/drivers/i2c.c"
     "${stm32_root}/drivers/i2c_cold.c"

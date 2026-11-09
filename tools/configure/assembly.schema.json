@@ -2512,6 +2512,13 @@
           "mode": {
             "type": "string",
             "description": "Explicit maintained mode; the product owns service and shutdown."
+          },
+          "window_ticks": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 62,
+            "default": 1,
+            "description": "Minimum WWDG counter decrements before feeding; the hardware divider is selected at enable."
           }
         },
         "required": [

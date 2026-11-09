@@ -33,6 +33,8 @@ def includes(result):
     source = []
     source.append('#include "stm32f407_provider.h"')
     source.append('#include "stm32f407_platform_cold.h"')
+    if any(item.kind == "watchdog" and item.mode == "window" for item in selections):
+        source.append('#include "stm32f407_window_watchdog.h"')
     if any(item.kind == "crc" for item in selections):
         source.append('#include "stm32f4_crc.h"')
     if any(item.kind == "encoder" for item in selections):

@@ -112,6 +112,7 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('i2c', 'dma-messages'): 'i2c_async',
     ('flash', 'poll-word'): 'flash',
     ('watchdog', 'independent'): 'watchdog',
+    ('watchdog', 'window'): 'window_watchdog',
     ('exti', 'edge-event'): 'exti',
     ('pwm', 'fixed-pwm'): 'pwm',
     ('adc', 'low-rate-scan'): 'adc',
@@ -133,6 +134,10 @@ def validate_selection(selection, route):
     """Validate limits of the implemented provider, not theoretical silicon."""
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
+    if kind == "watchdog" and selection["mode"] == "window":
+        if route["controller"] != "WWDG":
+            common.fail("Window watchdog requires its exact WWDG controller")
+        common.integer(selection.get("window_ticks", 1), 1, 62, "WWDG window_ticks")
     if kind == "rtc":
         from .rtc import validate
         validate(selection, route)

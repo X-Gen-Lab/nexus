@@ -170,6 +170,16 @@
       "id": "encoder5",
       "controller": "TIM5",
       "route": "tim5-encoder-pa0-pa1"
+    },
+    {
+      "id": "wwdg",
+      "controller": "WWDG",
+      "route": "wwdg"
+    },
+    {
+      "id": "iwdg",
+      "controller": "IWDG",
+      "route": "iwdg"
     }
   ],
   "reserved_resources": [],

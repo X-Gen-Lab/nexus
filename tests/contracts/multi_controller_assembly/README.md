@@ -91,3 +91,9 @@ TIM3／4／5 的原始正交计数，分别使用 x2 TI1／x2 TI2／x4 TI12。�
 VE 的 I2C3 DMA 与 ZG 的 I2C1／2 DMA 使用不冲突的 stream，不隐式替换路线。
 Standard 10-bit profile 限制在名义 88 kHz 以内；Fast profile 显式选择 400 kHz
 上限，不据此授予上拉、电容、目标器件或重复 START 物理时序资格。
+
+`stm32-ve-wwdg-baremetal.toml` 仅选择 WWDG，
+`stm32-zg-watchdogs-freertos.toml` 同时选择 IWDG 与 WWDG。prepare 不启狗，产品显式
+调用 enable。`window_ticks` 为必须经过的 WWDG decrement 数，不是微秒；62 的极限
+只适用于仍保留合法喂狗计数的 timeout。两种看门狗使用同一公共接口与独立静态身份，
+不自动喂狗、启动任务或授予物理复位／时间窗资格。

@@ -328,6 +328,20 @@
       "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
     },
     {
+      "id": "wwdg",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "WWDG",
+      "kind": "watchdog",
+      "pins": [],
+      "modes": [
+        "window"
+      ],
+      "source": "RM0090 Rev22 chapter22; DS8626 Rev12; official STM32F407xx IRQ definitions"
+    },
+    {
       "id": "adc1-scan-pa0-pa1",
       "variants": [
         "STM32F407VET6",

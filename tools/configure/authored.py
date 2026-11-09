@@ -214,6 +214,9 @@ def editor_schema():
         if "address_bits" in fields:
             properties["address_bits"] = {
                 "type": "integer", "enum": [7, 10], "default": 7}
+        if "window_ticks" in fields:
+            properties["window_ticks"] = {
+                "type": "integer", "minimum": 1, "maximum": 62, "default": 1}
         for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing",
                              "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b", "lsb_first"}:
             properties[name] = {"type": "boolean"}
@@ -338,6 +341,8 @@ def editor_schema():
 def explain_schema(schema):
     """Attach editor help to the same fields without duplicating constraints."""
     descriptions = {
+        "window_ticks": ("Minimum WWDG counter decrements before feeding; "
+                         "the hardware divider is selected at enable."),
         "binding": "Exact reviewed Board binding; no route fallback.",
         "controller": "Authored controller instance id, not an endpoint id.",
         "mode": ("Explicit maintained mode; the product owns service "

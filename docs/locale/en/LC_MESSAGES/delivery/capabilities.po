@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 1a1f820c8360509f8ad94916f96e9f4052b5fcb623e8b410e90ceff178143f60\n"
+"X-Nexus-Source-SHA256: 24c4293c9a633e11433ad239ae50b24052ace3bc3809b9a02f943c7eefaca686\n"
 
 #: docs/delivery/capabilities.md:8
 msgid "当前派生能力矩阵"
@@ -842,16 +842,6 @@ msgstr "independent"
 #: docs/delivery/capabilities.md:0
 msgid "`iwdg`"
 msgstr "`iwdg`"
-
-#: docs/delivery/capabilities.md:0
-msgid ""
-"`tests/contracts/physical_platform_assembly/f407-pinless-arm.toml`, "
-"`tests/contracts/stm32_assembly/ve-watchdog.toml`, "
-"`tests/contracts/stm32_assembly/zg-watchdog.toml`"
-msgstr ""
-"`tests/contracts/physical_platform_assembly/f407-pinless-arm.toml`, "
-"`tests/contracts/stm32_assembly/ve-watchdog.toml`, "
-"`tests/contracts/stm32_assembly/zg-watchdog.toml`"
 
 #: docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f4/drivers/watchdog.c`"
@@ -1775,3 +1765,33 @@ msgstr ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-tertiary-freertos.toml`,"
 " `tests/contracts/multi_controller_assembly/stm32-zg-i2c-tenbit-"
 "freertos.toml`"
+
+msgid "WWDG"
+msgstr "WWDG"
+
+msgid "`soc/stm32/stm32f4/drivers/window_watchdog.c`"
+msgstr "`soc/stm32/stm32f4/drivers/window_watchdog.c`"
+
+msgid ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-wwdg-baremetal.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-watchdogs-freertos.toml`"
+msgstr ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-wwdg-baremetal.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-watchdogs-freertos.toml`"
+
+msgid ""
+"`tests/contracts/multi_controller_assembly/stm32-zg-watchdogs-"
+"freertos.toml`, `tests/contracts/physical_platform_assembly/f407-pinless-"
+"arm.toml`, `tests/contracts/stm32_assembly/ve-watchdog.toml`, "
+"`tests/contracts/stm32_assembly/zg-watchdog.toml`"
+msgstr ""
+"`tests/contracts/multi_controller_assembly/stm32-zg-watchdogs-"
+"freertos.toml`, `tests/contracts/physical_platform_assembly/f407-pinless-"
+"arm.toml`, `tests/contracts/stm32_assembly/ve-watchdog.toml`, "
+"`tests/contracts/stm32_assembly/zg-watchdog.toml`"
+
+msgid "`wwdg`"
+msgstr "`wwdg`"
+
+msgid "window"
+msgstr "window"

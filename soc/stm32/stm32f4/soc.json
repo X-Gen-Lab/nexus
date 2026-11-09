@@ -488,6 +488,22 @@
       "irq": [],
       "pins": []
     },
+    "WWDG": {
+      "kind": "watchdog",
+      "modes": [
+        "window"
+      ],
+      "irq": [
+        "WWDG_IRQn"
+      ],
+      "irq_numbers": {
+        "WWDG_IRQn": 0
+      },
+      "resources": [
+        "irq:WWDG_IRQn"
+      ],
+      "pins": []
+    },
     "EXTI0": {
       "kind": "exti",
       "modes": [

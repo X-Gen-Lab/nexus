@@ -8690,30 +8690,6 @@ msgid "watchdog.h"
 msgstr "watchdog.h"
 
 #: docs/reference/api/io.md:491
-msgid "Irreversible IWDG effects and neutral hardware reset causes."
-msgstr "不可逆 IWDG 效果与中立硬件复位原因。"
-
-#: docs/reference/api/io.md:491
-msgid ""
-"Enable IWDG and report its effect and known timing bounds; activation is "
-"irreversible."
-msgstr "启用 IWDG，并报告其生效状态及已知的时间范围；激活不可逆。"
-
-#: docs/reference/api/io.md:491
-msgid ""
-"Success establishes nominal hardware programming, not a guaranteed deadline. "
-"Both timeout bounds remain zero when oscillator limits are unknown. A product"
-" requiring bounded timing must admit the oscillator profile before "
-"activation. Enable runs in a privileged task and is serialized with feed, "
-"state and platform stop. Install IRQ feeding only after this call returns; "
-"activation does not support a concurrent reload during shadow-register "
-"programming."
-msgstr ""
-"成功证明标称硬件编程已完成，不保证时限。振荡器界限未知时，两个超时界限均保持零。需要有界时序的产品必须在激活前准入振荡器配置。Enable "
-"在特权任务中执行，并与 feed、state 和 platform stop 串行化。仅在本调用返回后才可安装 IRQ "
-"喂狗；激活不支持在影子寄存器编程期间并发重载。"
-
-#: docs/reference/api/io.md:491
 msgid "[inout] Fixed provider; product owns feed/recovery policy."
 msgstr "[inout] 固定 provider；产品拥有喂狗和恢复策略。"
 
@@ -8744,16 +8720,8 @@ msgstr ""
 "访问调试控制的提供者在激活前以 UNSUPPORTED 拒绝 true；它既不查询，也不改变外部调试器控制。"
 
 #: docs/reference/api/io.md:491
-msgid "Feed an enabled IWDG without changing product health policy."
-msgstr "喂已启用 IWDG，不改变产品健康策略。"
-
-#: docs/reference/api/io.md:491
 msgid "[inout] Fixed enabled provider with one serialized feed owner."
 msgstr "[inout] 固定且已启用的 provider，只有一个串行化喂狗所有者。"
-
-#: docs/reference/api/io.md:491
-msgid "Success or INVALID/STATE; bounded task/IRQ, no allocation."
-msgstr "成功或 INVALID/STATE；任务/IRQ 中有界，不分配。"
 
 #: docs/reference/api/io.md:491
 msgid "Query current watchdog effect and timeout uncertainty."
@@ -8768,15 +8736,6 @@ msgid "[out] Current hardware/remembered initialization state."
 msgstr "[out] 当前硬件状态或已记忆的初始化状态。"
 
 #: docs/reference/api/io.md:491
-msgid ""
-"Success or INVALID; UNSUPPORTED retains observed hardware effects with both "
-"timeout bounds zero when those bounds cannot be established. Never infer a "
-"disabled watchdog from a failed query or unknown timeout."
-msgstr ""
-"成功或 INVALID；不能确定超时界限时，UNSUPPORTED "
-"保留已观测硬件副作用，并将两个超时界限保持为零。绝不能因查询失败或超时未知而推断看门狗已禁用。"
-
-#: docs/reference/api/io.md:491
 msgid "Read latched boot reset causes captured before clearing flags."
 msgstr "读取清除标志前捕获的锁存启动复位原因。"
 
@@ -8787,24 +8746,6 @@ msgstr "不隐式确认、不重启，也不作产品分类。"
 #: docs/reference/api/io.md:491
 msgid "Bitmask of NX_RESET_*; multiple causes may be reported."
 msgstr "NX_RESET_* 位掩码；可同时报告多个原因。"
-
-#: docs/reference/api/io.md:491
-msgid "Hardware-selected timeout bounds, including declared LSI uncertainty."
-msgstr "硬件选定的超时边界，包含声明的 LSI 不确定性。"
-
-#: docs/reference/api/io.md:491
-msgid ""
-"A zero minimum and maximum mean the timeout bounds are unknown, for example "
-"while hardware shadow updates remain pending or no oscillator limits have "
-"been reviewed. The enabled and irreversible facts remain valid. debug_freeze "
-"reports the provider-supported firmware configuration. Providers with CPU-"
-"readable debug control observe its setting. A provider without CPU debug-"
-"control access supports false only; that value does not observe or describe "
-"an external debugger's setting."
-msgstr ""
-"最小值和最大值均为零表示超时边界未知，例如硬件影子寄存器更新尚未完成，或振荡器限制尚未复核。enabled 和 irreversible "
-"事实仍然有效。debug_freeze 报告提供者支持的固件配置。能够由 CPU 读取调试控制的提供者会观察该设置。不具备 CPU "
-"调试控制访问能力的提供者仅支持 false；该值既未观察，也不描述外部调试器的设置。"
 
 
 #: ../../../../docs/reference/api/io.md:14
@@ -8851,3 +8792,68 @@ msgstr ""
 "时仅输出时钟。非空区间含 words 个元素；16 位区间须按 uint16_t 对齐。描述符和 TX 存储在返回前保持不变。RX 不得与描述符、TX "
 "存储、其他 RX 区间或完成输出重叠。16 位元素是以本机格式存储的 uint16_t "
 "数值，所选位序控制线上串行化顺序。不进行字节序转换，不存在隐式临时 buffer。普通字节区间 SPI 接口保持独立。"
+
+msgid ""
+"A zero minimum and maximum mean the timeout bounds are unknown, for example "
+"while hardware shadow updates remain pending or no oscillator limits have "
+"been reviewed. The enabled and irreversible facts remain valid. debug_freeze"
+" reports the provider-supported firmware configuration. Providers with CPU-"
+"readable debug control observe its setting. A provider without CPU debug-"
+"control access supports false only; that value does not observe or describe "
+"an external debugger's setting. An unproved activation write may retain "
+"enabled and irreversible effects; the provider never retries it implicitly "
+"or infers safe shutdown from failed readback."
+msgstr ""
+"最小值和最大值均为零表示超时边界未知，例如硬件影子寄存器更新尚未完成，或振荡器限制尚未复核。enabled 和 irreversible "
+"事实仍然有效。debug_freeze 报告提供者支持的固件配置。能够由 CPU 读取调试控制的提供者会观察该设置。不具备 CPU "
+"调试控制访问能力的提供者仅支持 false；该值既未观察，也不描述外部调试器的设置。 未证实的激活写入也可保留 enabled 与 "
+"irreversible 效应；provider 不会隐式重试，也不会依据回读失败推断能够安全关闭。"
+
+msgid ""
+"Enable the selected watchdog and report its effect and known timing bounds; "
+"activation is irreversible."
+msgstr "启用所选看门狗，报告其效应及已知时间界限；激活不可逆。"
+
+msgid "Feed an enabled watchdog without changing product health policy."
+msgstr "对已启用的看门狗执行喂狗，不改变产品健康策略。"
+
+msgid ""
+"Hardware-selected timeout bounds, including declared clock uncertainty."
+msgstr "硬件所选 timeout 界限，包含已声明的时钟不确定性。"
+
+msgid "Irreversible watchdog effects and neutral hardware reset causes."
+msgstr "不可逆的看门狗效应与中立的硬件复位原因。"
+
+msgid ""
+"Success establishes nominal hardware programming, not a guaranteed deadline."
+" Both timeout bounds remain zero when oscillator limits are unknown. A "
+"product requiring bounded timing must admit the oscillator profile before "
+"activation. Enable runs in a privileged task and is serialized with feed, "
+"state and platform stop. Install IRQ feeding only after this call returns; "
+"activation does not support a concurrent reload during shadow-register "
+"programming. A window provider rejects timeouts that leave no admitted feed "
+"window. Counter ticks and unknown prescaler phase do not establish an exact "
+"wall-clock interval."
+msgstr ""
+"成功证明标称硬件编程已完成，不保证时限。振荡器界限未知时，两个超时界限均保持零。需要有界时序的产品必须在激活前准入振荡器配置。Enable "
+"在特权任务中执行，并与 feed、state 和 platform stop 串行化。仅在本调用返回后才可安装 IRQ "
+"喂狗；激活不支持在影子寄存器编程期间并发重载。 窗口 provider 会拒绝不能留下合法喂狗窗口的 timeout。计数器 tick "
+"与未知预分频相位不能建立精确的实际时间间隔。"
+
+msgid ""
+"Success or INVALID/CONTEXT/STATE; UNSUPPORTED retains observed hardware "
+"effects with both timeout bounds zero when those bounds cannot be "
+"established. Never infer a disabled watchdog from a failed query or unknown "
+"timeout."
+msgstr ""
+"成功或 INVALID/CONTEXT/STATE；无法建立时限界限时，UNSUPPORTED 仍保留已观察到的硬件效应，并把两个 timeout "
+"界限保持为零。绝不能根据查询失败或未知 timeout 推断看门狗已经关闭。"
+
+msgid ""
+"Success, INVALID/CONTEXT, or STATE when no feed is admitted. A window "
+"provider returns BUSY for an early feed and STATE for its guarded late "
+"boundary; neither reloads or waits. Task/IRQ execution is bounded and "
+"allocation-free."
+msgstr ""
+"成功；INVALID/CONTEXT，或未准入喂狗时的 STATE。窗口 provider 对过早喂狗返回 BUSY，对受保护的迟喂边界返回 "
+"STATE；两者都不会 reload 或等待。任务／IRQ 执行有界且不分配内存。"

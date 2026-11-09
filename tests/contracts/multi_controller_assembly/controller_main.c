@@ -39,6 +39,10 @@ int main(void) {
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_adc(id);
     }
+    s_identity_count = NX_WATCHDOG_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_watchdog(id);
+    }
 #ifdef NX_FIXTURE_ENCODER
     s_identity_count = NX_ENCODER_ID_COUNT;
     for (uint16_t id = 0U; id < s_identity_count; ++id) {

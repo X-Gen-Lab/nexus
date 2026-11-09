@@ -584,12 +584,18 @@ class CanFdOptions:
     irq: IrqOptions
 
 
+@dataclass(frozen=True)
+class WindowWatchdogOptions:
+    window_ticks: int
+
+
 ControllerOptions = (GpioOptions | BlockOptions | PinStateOptions | UartOptions | SpiOptions | I2cOptions |
                      ExtiOptions | PwmOptions | PwmGroupOptions | EncoderOptions | AdcOptions | DacOptions | CanOptions |
                      UsbDeviceOptions | EthernetOptions | EthernetFramesOptions |
                      TimerCaptureOptions |
                      AdvancedPwmOptions | PwmAdcOptions | CanFdOptions |
-                     AdcGroupOptions | LptimOptions | RtcOptions | ExternalBusOptions | NoOptions)
+                     AdcGroupOptions | LptimOptions | RtcOptions | ExternalBusOptions |
+                     WindowWatchdogOptions | NoOptions)
 
 
 def mode_options(values):
@@ -711,6 +717,8 @@ def mode_options(values):
                               values["poll_limit"],
                               RtcCalendarOptions(**initial)
                               if initial is not None else None)
+    if kind == "watchdog" and values["mode"] == "window":
+        return WindowWatchdogOptions(values.get("window_ticks", 1))
     if kind in {"flash", "watchdog", "rtc", "crc"}:
         return NoOptions()
     raise ValueError(f"Unmaintained controller decision: {kind}")

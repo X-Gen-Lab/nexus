@@ -416,6 +416,7 @@ _MODE_TRAITS = MappingProxyType({
     ("flash", "poll-byte"): ModeTraits(polling=True),
     ("flash", "poll-word"): ModeTraits(polling=True),
     ("watchdog", "independent"): ModeTraits(),
+    ("watchdog", "window"): ModeTraits(),
     ("exti", "edge-event"): ModeTraits(irq=True),
     ("pwm", "fixed-pwm"): ModeTraits(),
     ("pwm", "shared-fixed-pwm"): ModeTraits(),

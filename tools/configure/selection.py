@@ -102,6 +102,9 @@ def validate_selection(selection, route, provider, ram_size):
     elif kind == "dac":
         from tools.configure import dac
         dac.validate_selection(selection, route, provider)
+    elif kind == "watchdog":
+        if selection["mode"] != "window" and "window_ticks" in selection:
+            fail("window_ticks requires the window watchdog mode")
     elif kind == "i2c":
         from tools.configure import i2c_timing_selection
         i2c_timing_selection.validate_selection(selection, provider)
