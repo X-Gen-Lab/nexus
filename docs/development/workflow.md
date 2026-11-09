@@ -66,30 +66,20 @@ Automation proves execution, while retained development logs document historical
 RED/GREEN order. Pure prose or diagram edits need corresponding document checks
 and semantic review rather than mirrored implementation tests.
 
-## Associate a complete local software plan with a pull request
+## Run local validation when Actions is unavailable
 
-When GitHub Actions is unavailable, `tools/maintenance/local_ci.py` checks an
-existing execution of the maintained `tools/dev/plans/software.json`. The default
-mode is read-only: it verifies actual complete stages, command receipts, clean
-source, inputs and the same plan before reporting the exact source and scope.
-It does not run the plan or convert interrupted or partial reports into success.
+Use the same maintained entry points as CI. The complete TDD gate above runs
+Native GoogleTest and all four tool domains; independent runtime validation uses
+`native_contracts.py` after configuring and building each of `native-debug`,
+`native-release`, `native-asan` and `native-tsan`. The retained contract suite,
+strict bilingual documentation build and independent Source SDK consumers verify
+their separate boundaries. See the [engineering handbook](../design/engineering-handbook.md)
+for scope and concurrency rules.
 
-```sh
-python tools/maintenance/local_ci.py --report /path/to/software/report.json
-```
-
-Explicit `--publish` uses an already configured authorized GitHub credential and
-an existing open PR. It checks the PR head/base twice and publishes only to the
-verified head SHA under `nexus/local-software-plan`; a later head cannot inherit
-that status. Its retained receipt distinguishes pending, confirmed and unconfirmed
-publication. Observations do not form an atomic GitHub merge transaction.
-
-This status establishes only the maintained local plan scope. It is not a GitHub
-Actions job, a sealed software candidate, a configured branch rule or a product
-release. Server rules need their own real readback; independent agent review does
-not invent a CODEOWNERS account or a human approval. The existing release workflow
-still requires its declared final-main CI jobs and trusted publication checks;
-a local status cannot silently replace those requirements.
+Record actual source commit, configuration, tool identities, commands, exit codes
+and fresh reports in the pull request. A failed, partial or interrupted run keeps
+its real result. Local execution does not establish a GitHub Actions status,
+server branch rule, software release or physical HIL result.
 
 ## Keep feedback fast and evidence complete
 

@@ -8,11 +8,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 2ba502eb632a4b1f350ba5941b0a8ce8b089c1d46c82f04fc5c6d83984d4de14\n"
+"X-Nexus-Source-SHA256: 00324222ed51afe19250a18cbe9183c0e11b47fb0da9103a4e512aa481f44bd2\n"
 
+#: ../../../docs/development/workflow.md:9
 msgid "Develop with TDD and normal commit gates"
 msgstr "使用 TDD 与正常提交门禁开发"
 
+#: ../../../docs/development/workflow.md:11
 msgid ""
 "This workflow preserves current C11 architecture, formatting and explicit "
 "evidence. Codex owns platform maintenance; independent agents review high-"
@@ -22,15 +24,18 @@ msgstr ""
 "本工作流保留当前 C11 架构、格式与显式证据。Codex 负责平台维护；独立 agent 审查高风险变更。虚构人员或本地文件都不能建立 GitHub "
 "分支保护。"
 
+#: ../../../docs/development/workflow.md:15
 msgid "Install and check tools"
 msgstr "安装并检查工具"
 
+#: ../../../docs/development/workflow.md:17
 msgid ""
 "First complete the [fixed source and recursive dependency "
 "guide](../guides/source-checkout.md). From that repository root, install the"
 " maintenance tools:"
 msgstr "先完成[固定源码与递归依赖指南](../guides/source-checkout.md)。然后从该仓库根目录安装维护工具："
 
+#: ../../../docs/development/workflow.md:26
 msgid ""
 "Windows uses `.venv/Scripts/python.exe`. Installation establishes pre-commit"
 " and commit-msg hooks. Hooks inspect staged inputs without staging or "
@@ -40,9 +45,11 @@ msgstr ""
 "Windows 使用 `.venv/Scripts/python.exe`。安装建立 pre-commit 和 commit-msg "
 "钩子。钩子检查暂存输入，不替用户暂存，也不静默修复文件。保留未暂存工作和真实失败诊断；不得绕过钩子。"
 
+#: ../../../docs/development/workflow.md:30
 msgid "Prepare the pinned host test framework"
 msgstr "准备锁定的主机测试框架"
 
+#: ../../../docs/development/workflow.md:32
 msgid ""
 "GoogleTest and GoogleMock are provided by the Git submodule "
 "`ext/googletest`. The lock records official version 1.16.0 at upstream base "
@@ -60,6 +67,7 @@ msgstr ""
 "复制赋值的所有权修复。依赖清单分别记录官方 upstream 基线与所选补丁。 上面的递归 checkout 包含该子模块。对于已有 "
 "checkout，请在运行测试前显式准备 Native 依赖范围："
 
+#: ../../../docs/development/workflow.md:40
 msgid ""
 "To initialize only this submodule, use `git submodule update --init "
 "--recursive ext/googletest` instead. Preparation may use the network; CMake "
@@ -74,9 +82,11 @@ msgstr ""
 "配置只使用已准备的本地源码，缺失、版本与锁定值不符或存在本地修改均失败。配置过程不获取依赖，也不使用系统安装替代。框架只进入主机测试目标图；ARM "
 "构建和固件 SDK 消费者不需要它。"
 
+#: ../../../docs/development/workflow.md:48
 msgid "Execute RED, GREEN and review"
 msgstr "执行 RED、GREEN 与评审"
 
+#: ../../../docs/development/workflow.md:50
 msgid ""
 "For new C behavior or defect fixes, first add a meaningful "
 "GoogleTest/GoogleMock regression. Execute it and retain the expected failure"
@@ -90,6 +100,7 @@ msgstr ""
 " GREEN，再重构。Mock 外部端口／MMIO，而不是被测实现。覆盖相关拒绝、取消、排空、溢出、隔离保留和实例隔离。Python 生产工具使用标准库"
 " unittest，遵循相同实际 RED／GREEN 规则。"
 
+#: ../../../docs/development/workflow.md:61
 msgid ""
 "The full gate builds the pinned offline framework and executes discovered "
 "cases with fresh reports and no filters/shards. Empty, skipped, partial, "
@@ -104,49 +115,42 @@ msgstr ""
 "filter／shard。空、跳过、部分、陈旧或变化输入均失败。钩子核对暂存树保持不变；CI 独立执行门禁。框架仅用于主机 C++17；固件保持 "
 "C11。自动化证明执行，保留的开发日志记录历史 RED／GREEN 顺序。纯正文或图源修改需要对应文档检查和语义审查，不需要镜像实现测试。"
 
-msgid "Associate a complete local software plan with a pull request"
-msgstr "将完整本地软件计划关联到 Pull Request"
+#: ../../../docs/development/workflow.md:69
+msgid "Run local validation when Actions is unavailable"
+msgstr "Actions 不可用时执行本地验证"
 
+#: ../../../docs/development/workflow.md:71
 msgid ""
-"When GitHub Actions is unavailable, `tools/maintenance/local_ci.py` checks "
-"an existing execution of the maintained `tools/dev/plans/software.json`. The"
-" default mode is read-only: it verifies actual complete stages, command "
-"receipts, clean source, inputs and the same plan before reporting the exact "
-"source and scope. It does not run the plan or convert interrupted or partial"
-" reports into success."
+"Use the same maintained entry points as CI. The complete TDD gate above runs"
+" Native GoogleTest and all four tool domains; independent runtime validation"
+" uses `native_contracts.py` after configuring and building each of `native-"
+"debug`, `native-release`, `native-asan` and `native-tsan`. The retained "
+"contract suite, strict bilingual documentation build and independent Source "
+"SDK consumers verify their separate boundaries. See the [engineering "
+"handbook](../design/engineering-handbook.md) for scope and concurrency "
+"rules."
 msgstr ""
-"GitHub Actions 不可用时，`tools/maintenance/local_ci.py` 校验维护中的 "
-"`tools/dev/plans/software.json` "
-"的既有执行。默认只读：报告精确源码与范围前，检查实际完整阶段、命令收条、干净源码、输入以及同一计划。它不运行计划，也不把中断或部分报告改成成功。"
+"使用与 CI 相同的维护入口。上述完整 TDD 门禁执行 Native GoogleTest 和四个完整工具域；独立运行验证先分别配置、构建 "
+"`native-debug`、`native-release`、`native-asan` 和 `native-tsan`，再执行 "
+"`native_contracts.py`。保留的合同测试、严格双语文档构建和独立 Source SDK "
+"消费者分别验证各自边界。范围及并发规则见[工程手册](../design/engineering-handbook.md)。"
 
+#: ../../../docs/development/workflow.md:79
 msgid ""
-"Explicit `--publish` uses an already configured authorized GitHub credential"
-" and an existing open PR. It checks the PR head/base twice and publishes "
-"only to the verified head SHA under `nexus/local-software-plan`; a later "
-"head cannot inherit that status. Its retained receipt distinguishes pending,"
-" confirmed and unconfirmed publication. Observations do not form an atomic "
-"GitHub merge transaction."
+"Record actual source commit, configuration, tool identities, commands, exit "
+"codes and fresh reports in the pull request. A failed, partial or "
+"interrupted run keeps its real result. Local execution does not establish a "
+"GitHub Actions status, server branch rule, software release or physical HIL "
+"result."
 msgstr ""
-"显式 `--publish` 使用已配置且获授权的 GitHub 凭据和既有开放 PR。它两次核对 PR head/base，只向已验证 head "
-"SHA 发布 `nexus/local-software-plan`；后来的 head 不能继承该状态。保留的收条区分 "
-"pending、confirmed 和 unconfirmed 发布。两次观察不构成原子的 GitHub 合并事务。"
+"在 PR 中记录实际源码提交、配置、工具身份、命令、退出码和新生成的报告。失败、部分完成或中断的执行保留真实结果。本地执行不建立 GitHub "
+"Actions 状态、服务端分支规则、软件发布或物理 HIL 结果。"
 
-msgid ""
-"This status establishes only the maintained local plan scope. It is not a "
-"GitHub Actions job, a sealed software candidate, a configured branch rule or"
-" a product release. Server rules need their own real readback; independent "
-"agent review does not invent a CODEOWNERS account or a human approval. The "
-"existing release workflow still requires its declared final-main CI jobs and"
-" trusted publication checks; a local status cannot silently replace those "
-"requirements."
-msgstr ""
-"此状态只证明维护中的本地计划范围。它不是 GitHub Actions job、封存软件候选、已配置分支规则或产品发布。服务器规则需单独实际回读；独立 "
-"agent 审查不虚构 CODEOWNERS 账号或人工批准。现有 release workflow 仍要求其声明的最终 main CI jobs "
-"和可信发布检查；本地状态不能悄悄替代这些要求。"
-
+#: ../../../docs/development/workflow.md:84
 msgid "Keep feedback fast and evidence complete"
 msgstr "快速反馈与完整证据"
 
+#: ../../../docs/development/workflow.md:86
 msgid ""
 "Use a focused development run for the behavior being changed, then execute "
 "the normal complete acceptance gates for the final source. Discover the "
@@ -157,6 +161,7 @@ msgstr ""
 "先对修改的行为执行定向开发测试，再对最终源码执行正常完整验收门禁。发现已维护的测试名称，不增加重复测试程序。保留原始 RED 失败、GREEN "
 "结果和实际命令。过滤执行或缓存结果不能使完整候选通过验收。"
 
+#: ../../../docs/development/workflow.md:92
 msgid ""
 "`python tools/dev/dev.py timings /path/to/receipts` summarizes existing "
 "process receipts without rerunning work. Separate preparation, "
@@ -169,6 +174,7 @@ msgstr ""
 "receipt，不重新运行工作。分别观察准备、配置、编译、测试、文档和 SDK 消费。保留失败／取消的尝试以及未观测的 CPU 或 "
 "RSS；重叠的墙钟时间不能相加作为总耗时。比较等价源码、工具与配置范围后再归因提速。"
 
+#: ../../../docs/development/workflow.md:98
 msgid ""
 "On Linux, a normally reaped process, including a nonzero exit, can have "
 "`resource_usage` observed by `wait4`: user/system CPU seconds and "
@@ -182,6 +188,7 @@ msgstr ""
 "`maximum_process_rss_bytes`。范围是被等待的进程及其已经回收的后代。RSS "
 "值是观测到的最大单进程峰值，不是整个进程树的同时占用。超时、取消、启动失败、旧收据和其他平台保留未知值，不从墙钟耗时估算。"
 
+#: ../../../docs/development/workflow.md:106
 msgid ""
 "The timings summary exposes `measured_resource_attempts` and "
 "`maximum_observed_process_rss_bytes` while preserving each original receipt."
@@ -198,6 +205,7 @@ msgstr ""
 "仍为未知，因为嵌套收据可能重复计算工作，这些观测也不能建立全局内存峰值或缓存行为。分别比较同一工具链、源码和 profile 下的 cold 与 "
 "warm 尝试；小型工具回归的测量不能量化全项目构建收益。"
 
+#: ../../../docs/development/workflow.md:114
 msgid ""
 "Choose an explicit finite compiler budget for available RAM and disk, not "
 "just CPU count. Reuse verified source/tool preparation and ordinary "
@@ -210,6 +218,7 @@ msgstr ""
 "根据可用 RAM 与磁盘显式选择有限编译并发预算，不能只看 CPU "
 "数量。复用已验证的源码／工具准备与正常增量构建；按正常规则使改变的配置、依赖和生成输入失效。不得缓存验收报告、恢复不相容的对象或同时修改同一构建树。完整门禁发现、实际退出码、输出身份及失败／取消保留仍为必需。"
 
+#: ../../../docs/development/workflow.md:121
 msgid ""
 "The commit gate configures and builds once for unchanged staged inputs, then"
 " runs all Native GoogleTest cases and affected complete tool domains. "
@@ -220,6 +229,7 @@ msgstr ""
 "提交门禁对未变更的暂存输入只配置、构建一次，然后执行全部 Native GoogleTest "
 "和受影响的完整工具域。构建或配置策略变更执行所有工具域。完整 CI 将四种 Native 模式和所有维护中的工具域分开执行，避免逐模式重复工具测试。"
 
+#: ../../../docs/development/workflow.md:126
 msgid ""
 "Before deleting a test, identify its behavioral obligation and independent "
 "remaining coverage. Remove only an obsolete behavior or a demonstrated "
@@ -233,9 +243,11 @@ msgstr ""
 "删除测试前，指出其行为责任和仍存在的独立覆盖。仅删除过时行为或已经证明重复覆盖同一合同的测试。保留检查拒绝所有权、借用保留、实例隔离、取消、IRQ "
 "顺序、真实厂家行为或外部 SDK 消费的测试。照着实现编写的通过断言本身不能作为独立替代。审查未找到可安全删除的测试时应保留；减少测试数量不是优化目标。"
 
+#: ../../../docs/development/workflow.md:134
 msgid "Preserve style and scope"
 msgstr "保留风格与范围"
 
+#: ../../../docs/development/workflow.md:136
 msgid ""
 "Use the unchanged `.clang-format` and `.editorconfig`: 80 columns, four "
 "spaces, attached braces, type-attached pointer stars and backslash Doxygen "
@@ -247,6 +259,7 @@ msgstr ""
 "使用未改变的 `.clang-format` 和 `.editorconfig`：80 列、四空格、附着大括号、类型侧指针星号和反斜杠 Doxygen "
 "注释。公共头文件说明上下文、截止时间、所有权和失败。源注释解释不变量和硬件顺序，不重复声明参数。新增／修改文件通过整文件检查；已有冻结欠账只能减少。"
 
+#: ../../../docs/development/workflow.md:142
 msgid ""
 "Commit one reviewable change with Conventional Commits. Review "
 "interface/configuration changes together with diagrams, examples, "

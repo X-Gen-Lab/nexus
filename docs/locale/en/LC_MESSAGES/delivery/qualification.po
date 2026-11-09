@@ -7,154 +7,132 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: bf4ecaabdef713108eb670ceb7daa608ff569267d6ad84c72b022ac6a159d91b\n"
+"X-Nexus-Source-SHA256: 2260a84754c9a731312d4807adf8fb609c939a69f8ef8933d3343bcc590ef189\n"
 
-#: docs/delivery/qualification.md:1
-msgid "软件候选与物理资格"
-msgstr "Software candidates and physical qualification"
+#: ../../../docs/delivery/qualification.md:1
+msgid "软件验证与物理资格"
+msgstr "Software validation and physical qualification"
 
-#: docs/delivery/qualification.md:3
+#: ../../../docs/delivery/qualification.md:3
 msgid ""
-"平台机制已经实现，当前 [开发验证记录](https://github.com/X-Gen-"
-"Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/delivery/verification.md)"
-" 说明真实执行的范围。 **最终 clean-source SDK／离线双构建／候选封存与物理 HIL 是独立阶段**，不能因 代码完成、CI 定义或某个"
-" hash 存在就记录为 passed。"
+"本页区分平台软件、Source SDK、文档与物理验收的执行范围。各阶段记录自己的源码、 配置、工具和真实结果；代码、CI 定义或 hash "
+"存在不能代替执行。"
 msgstr ""
-"Platform mechanisms are implemented. The [development verification "
-"record](https://github.com/X-Gen-"
-"Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/delivery/verification.md)"
-" describes its actual execution scope. **Final clean-source SDK, independent "
-"offline dual builds, candidate sealing and physical HIL are separate "
-"stages**; code completion, CI definitions or the existence of a hash cannot "
-"record them as passed."
+"This page separates execution scopes for platform software, Source SDKs, "
+"documentation and physical acceptance. Each stage records its own source, "
+"configuration, tools and actual result; code, CI definitions and hashes do "
+"not replace execution."
 
-#: docs/delivery/qualification.md:0
+#: ../../../docs/delivery/qualification.md:0
 msgid "阶段"
 msgstr "Stage"
 
-#: docs/delivery/qualification.md:0
+#: ../../../docs/delivery/qualification.md:0
 msgid "必需的输入与执行"
 msgstr "Required inputs and execution"
 
-#: docs/delivery/qualification.md:0
-msgid "当前记录原则"
-msgstr "Current recording rule"
+#: ../../../docs/delivery/qualification.md:0
+msgid "结果边界"
+msgstr "Result boundary"
 
-#: docs/delivery/qualification.md:0
-msgid "开发验证"
-msgstr "Development verification"
+#: ../../../docs/delivery/qualification.md:0
+msgid "平台软件"
+msgstr "Platform software"
 
-#: docs/delivery/qualification.md:0
-msgid "实际 compiler、生产 TU 模型、ARM ELF、资源报告、fresh tests"
+#: ../../../docs/delivery/qualification.md:0
+msgid "真实生产 C 路径、模型、ARM ELF、资源预算和 fresh tests"
 msgstr ""
-"Actual compiler, production-TU models, ARM ELF, resource reports and fresh "
+"Actual production C paths, models, ARM ELFs, resource budgets and fresh "
 "tests"
 
-#: docs/delivery/qualification.md:0
-msgid "已执行项记录 raw path；dirty workspace 明确是开发证据"
+#: ../../../docs/delivery/qualification.md:0
+msgid "每项绑定实际源码、配置和工具；dirty workspace 只作开发记录"
 msgstr ""
-"Executed items record raw paths; dirty workspaces are explicitly development "
-"evidence"
+"Each result binds actual source, configuration and tools; a dirty workspace "
+"provides development records only"
 
-#: docs/delivery/qualification.md:0
+#: ../../../docs/delivery/qualification.md:0
 msgid "源码 SDK"
 msgstr "Source SDK"
 
-#: docs/delivery/qualification.md:0
-msgid "clean HEAD、locked dependencies、许可 manifest、移动路径独立 consumer"
+#: ../../../docs/delivery/qualification.md:0
+msgid "clean HEAD、锁定依赖、许可 manifest、独立 consumer"
 msgstr ""
-"Clean HEAD, locked dependencies, license manifest and independently relocated"
-" consumer"
+"Clean HEAD, locked dependencies, license manifest and independent consumers"
 
-#: docs/delivery/qualification.md:0
-msgid "必须用当前新包实际 configure/build/run/link"
-msgstr "Actually configure/build/run/link using the current new package"
-
-#: docs/delivery/qualification.md:0
-msgid "正式软件资格"
-msgstr "Formal software qualification"
-
-#: docs/delivery/qualification.md:0
-msgid "source/config/dependency/tool/ELF 同身份；非零 fresh tests 与 budget"
+#: ../../../docs/delivery/qualification.md:0
+msgid "从当前新包实际 configure/build/run/link，核对完整文件映射"
 msgstr ""
-"Matching source/config/dependency/tool/ELF identities; nonzero fresh tests "
-"and budgets"
+"Actually configure, build, run or link from the newly exported package and "
+"verify the complete file map"
 
-#: docs/delivery/qualification.md:0
-msgid "`tools/evidence/qualification.py` 不接受空报告、错 scope 或失效证据"
+#: ../../../docs/delivery/qualification.md:0
+msgid "文档"
+msgstr "Documentation"
+
+#: ../../../docs/delivery/qualification.md:0
+msgid "当前正文、已审翻译、架构图、锁定工具和严格双语构建"
 msgstr ""
-"`tools/evidence/qualification.py` rejects empty reports, wrong scope and "
-"invalid evidence"
+"Current prose, reviewed translations, architecture diagrams, locked tools "
+"and strict bilingual builds"
 
-#: docs/delivery/qualification.md:0
-msgid "离线复现"
-msgstr "Offline reproduction"
-
-#: docs/delivery/qualification.md:0
-msgid "密封 OCI/toolchain，两个独立 fresh roots，正式 build network=none"
+#: ../../../docs/delivery/qualification.md:0
+msgid "只建立文档构建结果，不建立部署或固件资格"
 msgstr ""
-"Sealed OCI/toolchain, two independent fresh roots, formal build network=none"
+"Establishes documentation build results only, without deployment or firmware"
+" qualification"
 
-#: docs/delivery/qualification.md:0
-msgid "`reproduce.py` 真实执行并比较 ELF/BIN；map 保留原始字节；recipe 或摘要不代替执行"
-msgstr ""
-"`reproduce.py` actually executes and compares ELF/BIN; maps retain raw bytes;"
-" recipes/digests cannot replace execution"
-
-#: docs/delivery/qualification.md:0
-msgid "候选封存"
-msgstr "Candidate sealing"
-
-#: docs/delivery/qualification.md:0
-msgid "同一 source/config/artifact 的 qualification、reproduction 与 SDK"
-msgstr ""
-"Qualification, reproduction and SDK for the same source/config/artifact"
-
-#: docs/delivery/qualification.md:0
-msgid "`candidate.py`/`proof.py` 验证后封存；不自动创建产品发布"
-msgstr ""
-"`candidate.py`/`proof.py` verify before sealing; no automatic product release"
-
-#: docs/delivery/qualification.md:0
+#: ../../../docs/delivery/qualification.md:0
 msgid "物理 HIL"
 msgstr "Physical HIL"
 
-#: docs/delivery/qualification.md:0
-msgid "实际 PCB/UID/probe/serial/power/station、同候选 image 与预算"
+#: ../../../docs/delivery/qualification.md:0
+msgid "实际 PCB/UID/probe/serial/power/station、同一 image 与预算"
 msgstr ""
-"Actual PCB/UID/probe/serial/power/station, matching candidate image and "
-"budgets"
+"Actual PCB, UID, probe, serial, power and station, with the same image and "
+"budget"
 
-#: docs/delivery/qualification.md:0
-msgid "当前硬件未接入，全部 MCU 目标 `not_executed`"
-msgstr "Hardware is not connected; every MCU target is `not_executed`"
+#: ../../../docs/delivery/qualification.md:0
+msgid "当前硬件未接入，MCU 目标保持 `not_executed`"
+msgstr "Equipment is not connected; MCU targets remain `not_executed`"
 
-#: docs/delivery/qualification.md:16
+#: ../../../docs/delivery/qualification.md:13
+msgid ""
+"原始命令、报告与产物保存在构建输出或外部交付位置，PR 链接准确源码与实际执行范围。 "
+"当前仓库不再维护候选封存、promotion、归档恢复或隔离复现引擎；历史流程从固定源码追溯。"
+msgstr ""
+"Keep original commands, reports and artifacts in build outputs or an "
+"external delivery location; the PR links exact source and actual execution "
+"scope. This repository no longer maintains candidate sealing, promotion, "
+"archive recovery or isolated reproduction engines; historical workflows "
+"remain traceable through fixed source revisions."
+
+#: ../../../docs/delivery/qualification.md:16
 msgid ""
 "HIL fixture 和 station template 位于 `tools/hil/fixtures/`。空 station、错误 "
 "Board/PCB/芯片／probe／image/config、失效工具文件或不完整预算会被准入拒绝。 "
 "准备工装不等于已经刷写、串口测试、测量波形或完成掉电试验。"
 msgstr ""
 "HIL fixtures and station templates are in `tools/hil/fixtures/`. Admission "
-"rejects empty stations, incorrect Board/PCB/chip/probe/image/config, invalid "
-"tool files or incomplete budgets. Preparing fixtures is not flashing, serial "
-"testing, waveform measurement or completed power-cut testing."
+"rejects empty stations, incorrect Board/PCB/chip/probe/image/config, invalid"
+" tool files or incomplete budgets. Preparing fixtures is not flashing, "
+"serial testing, waveform measurement or completed power-cut testing."
 
-#: docs/delivery/qualification.md:20
+#: ../../../docs/delivery/qualification.md:20
 msgid ""
 "当前重构的生产 SoC 只维护 F4，具体实现限定 F407VE／ZG。已有其他系列的原始 "
 "执行记录保留原源码身份，不成为本轮验收输入。ThreadX、FreeRTOS、Native 内核、 寄存器模型、ARM "
 "链接与物理执行分别判断；链接程序存在不证明 scheduler 已运行。 本轮必须重新取得适用的软件结果，不能复用历史测试数量或候选通过值。"
 msgstr ""
-"The current refactor maintains only F4 production SoC integration, limited to"
-" F407VE/ZG. Original execution records for other series retain their source "
-"identities and are not inputs to this acceptance. Judge ThreadX, FreeRTOS, "
-"Native kernels, register models, ARM links and physical execution "
+"The current refactor maintains only F4 production SoC integration, limited "
+"to F407VE/ZG. Original execution records for other series retain their "
+"source identities and are not inputs to this acceptance. Judge ThreadX, "
+"FreeRTOS, Native kernels, register models, ARM links and physical execution "
 "independently; a linked program does not prove a running scheduler. This "
 "iteration must obtain applicable software results afresh, without reusing "
 "historical test counts or candidate passes."
 
-#: docs/delivery/qualification.md:25
+#: ../../../docs/delivery/qualification.md:25
 msgid ""
 "USB 的 packet/clock/factory 模型与软件 Board ELF 不提供 VBUS、connector、PHY、 "
 "enumeration 或 flush 周期的物理证明。浅 Sleep 的 1 MHz timer 模型只建立被执行 的量化相位合同，真实 "
@@ -164,31 +142,32 @@ msgid ""
 "route、最终候选与物理执行是不同退出条件。"
 msgstr ""
 "USB packet/clock/factory models and software-Board ELFs do not physically "
-"prove VBUS, connector, PHY, enumeration or flush cycles. The shallow-Sleep 1 "
-"MHz timer model establishes only the executed quantization-phase contract; "
+"prove VBUS, connector, PHY, enumeration or flush cycles. The shallow-Sleep 1"
+" MHz timer model establishes only the executed quantization-phase contract; "
 "actual clock/PLL/wake/IRQ/catch-up/power require measurement on the same "
 "image. Ethernet descriptor OWN/loan, capture/break and caller-memory-pin "
-"software models likewise establish no electrical, throughput, edge-aperture, "
-"power-stage safety or MPU/TZ userspace isolation. Public API, mode "
+"software models likewise establish no electrical, throughput, edge-aperture,"
+" power-stage safety or MPU/TZ userspace isolation. Public API, mode "
 "configuration, SoC provider, reviewed Board route, final candidate and "
 "physical execution have different exit conditions."
 
-#: docs/delivery/qualification.md:32
+#: ../../../docs/delivery/qualification.md:32
 msgid ""
 "可返回任务只有真实 kernel detach 后才归还存储；prestart discard 只属于已证明 的启动前 scope。scheduler "
 "启动尝试后返回是 retaining fail-stop，不能将内核 返回值解释为从未启动，或撤销可能已经运行的任务、DMA、时钟和外部效果。 停止 "
-"I/O 后仍运行的内核继续保留 clock/Tick；产品 reset、设备 safe outputs 和 完整 scheduler-stop port "
-"是外部责任。平台不做自动故障恢复或安全认证声明。"
+"I/O 后仍运行的内核继续保留 clock/Tick；产品 reset、设备 safe outputs 和 完整 scheduler-stop port"
+" 是外部责任。平台不做自动故障恢复或安全认证声明。"
 msgstr ""
 "Returning tasks release storage only after actual kernel detach. Prestart "
-"discard applies only to proven prestart scope. A scheduler-start attempt that"
-" returns is a retaining fail-stop; kernel return cannot mean never started or"
-" revoke tasks, DMA, clocks and external effects that may have run. A kernel "
-"still running after I/O stop retains clock/Tick. Product reset, safe device "
-"outputs and a complete scheduler-stop port are external responsibilities. The"
-" platform claims no automatic fault recovery or safety certification."
+"discard applies only to proven prestart scope. A scheduler-start attempt "
+"that returns is a retaining fail-stop; kernel return cannot mean never "
+"started or revoke tasks, DMA, clocks and external effects that may have run."
+" A kernel still running after I/O stop retains clock/Tick. Product reset, "
+"safe device outputs and a complete scheduler-stop port are external "
+"responsibilities. The platform claims no automatic fault recovery or safety "
+"certification."
 
-#: docs/delivery/qualification.md:38
+#: ../../../docs/delivery/qualification.md:38
 msgid ""
 "Core 的 `nx_fault_observe` 是无默认状态的 best-effort 观察窄端口。FreeRTOS 和 ThreadX 在 "
 "retaining fail-stop 路径提供实际 domain/reason/静态源码位置，然后仍 保留全部借用。故障上下文可能已 "
@@ -199,47 +178,31 @@ msgstr ""
 "Core `nx_fault_observe` is a best-effort observation narrow port with no "
 "default state. FreeRTOS/ThreadX retaining fail-stop paths supply actual "
 "domain/reason/static source position and retain all borrows. Fault context "
-"may be masked, ISR, unprivileged or stack-corrupted. Observers cannot assume "
-"a working kernel/clock/transport, release borrows, take OS locks or replay "
+"may be masked, ISR, unprivileged or stack-corrupted. Observers cannot assume"
+" a working kernel/clock/transport, release borrows, take OS locks or replay "
 "requests. Returning hooks still proceed with halt. Fault logging, external "
-"safe output and controlled reset are separately accepted; host death tests do"
-" not imply executed physical exception handling or safe outputs."
+"safe output and controlled reset are separately accepted; host death tests "
+"do not imply executed physical exception handling or safe outputs."
 
-#: docs/delivery/qualification.md:45
+#: ../../../docs/delivery/qualification.md:45
 msgid ""
-"最终候选包应保留准确原始命令、退出码、JUnit／model／预算与 binary 身份，支持 "
-"再次校验。给当前源码补一份介绍文档不会继承过去的测试资格；源码或产物变化需 重新执行适用检查。普通 CI 与 source SDK workflow "
-"也不自动完成产品 promotion。"
+"验证记录应保留原始命令、退出码、JUnit、模型、预算与 binary 身份。源码或产物 变化后重新执行适用检查，文档更新不继承历史资格。CI 与 "
+"SDK 消费也不自动完成 产品发布。"
 msgstr ""
-"Final candidate packages retain exact raw commands, exit codes, "
-"JUnit/model/budget and binary identities for revalidation. Adding "
-"introductory documentation does not inherit past test qualification; changed "
-"source/artifacts require applicable checks to run again. Ordinary CI and "
-"source-SDK workflows do not automatically promote products."
+"Validation records retain original commands, exit codes, JUnit, models, "
+"budgets and binary identities. Re-execute applicable checks after source or "
+"artifact changes; documentation updates do not inherit historical "
+"qualification. CI and SDK consumption do not automatically perform a product"
+" release."
 
-#: docs/delivery/qualification.md:49
+#: ../../../docs/delivery/qualification.md:49
 msgid ""
 "实板接入后优先复核安全输出、clock/reset、UART TC/cancel/RX loss、SPI/I2C、Flash "
 "掉电、watchdog、EXTI/PWM/ADC，再测 cycles/latency/high-water 与长期负载。私有 "
 "产品策略、现场部署、密钥与制造许可由外部工程承接。"
 msgstr ""
 "After hardware connection, first check safe outputs, clock/reset, UART "
-"TC/cancel/RX loss, SPI/I2C, Flash power cuts, watchdog and EXTI/PWM/ADC; then"
-" measure cycles/latency/high-water and sustained load. External projects own "
-"private product policies, field deployment, keys and manufacturing "
+"TC/cancel/RX loss, SPI/I2C, Flash power cuts, watchdog and EXTI/PWM/ADC; "
+"then measure cycles/latency/high-water and sustained load. External projects"
+" own private product policies, field deployment, keys and manufacturing "
 "permissions."
-
-#: docs/delivery/qualification.md:53
-msgid ""
-"实施台账的 `implemented` 记录代码与工具已经落入源码； `qualification_record_authority` "
-"表示实际验收由该源码 HEAD 的外部交付证据决定。 它不在源码中自报 passed。正式执行写入 `nexus-"
-"delivery/<HEAD>/`，候选的 `candidate.json`、六类 qualification 和原始报告一起给出最终状态。 "
-"这样提交后的验收能绑定准确 HEAD，后续文档提交也不能继承旧资格。"
-msgstr ""
-"Ledger `implemented` records that code/tools exist in source. "
-"`qualification_record_authority` means actual acceptance is determined by "
-"external delivery evidence for that source HEAD, not self-reported passed "
-"status in source. Formal execution writes to `nexus-delivery/<HEAD>/`; "
-"candidate `candidate.json`, six qualification classes and raw reports "
-"together determine final status. Post-commit acceptance can thus bind exact "
-"HEAD, and later documentation commits cannot inherit old qualification."

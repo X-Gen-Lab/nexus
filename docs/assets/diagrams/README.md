@@ -104,11 +104,11 @@ TOML、硬件事实、typed IR 和原子 bundle；失败不发布可用半成品
 
 [可编辑 DOT](qualification-evidence.dot)。
 
-## FIG-12 文档SDK与证据发布恢复
+## FIG-12 文档、SDK 与实板验证边界
 
-交付、验证与恢复流程参考；实际发布和下载需要独立执行记录。
+文档构建、独立 SDK 消费与实板执行各自记录结果，软件检查不自动建立部署或物理资格。
 
-![FIG-12：文档SDK与证据发布恢复](release-recovery.svg)
+![FIG-12：文档、SDK 与实板验证边界](release-recovery.svg)
 
 [可编辑 DOT](release-recovery.dot)。
 

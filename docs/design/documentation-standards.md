@@ -124,7 +124,7 @@ ID用于目录和迁移；公共anchor使用标准显式target/label，不能依
 | FIG-09 | CPU/内存/DMA/Cache | 精确配置、可达域、完整cache line与维护时点 |
 | FIG-10 | SDK消费 | 实际外部工程、搬移、配置/链接/运行和产物检查 |
 | FIG-11 | 软件与HIL证据 | 各自实际取得，再按scope准入；不自动生成物理资格 |
-| FIG-12 | 文档/SDK发布与恢复 | 身份、不可变版本、离线包、下载和独立恢复 |
+| FIG-12 | 文档、SDK 与实板验证边界 | 当前构建入口、独立消费、原始报告与未执行的物理边界 |
 | FIG-13 | Cortex-M能力分层 | 原语、Runtime、SoC接入、实板资格分别表达 |
 | FIG-15 | 连续流与丢块 | producer/block/consumer、overrun和停止排空；服务预算 |
 

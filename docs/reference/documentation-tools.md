@@ -92,8 +92,6 @@ build/docs-tools/venv/bin/python tools/dev/dev.py docs check \
     --report build/docs-check.json
 build/docs-tools/venv/bin/python tools/dev/dev.py docs build \
     --tool-prefix build/docs-tools --language all --output build/documentation
-build/docs-tools/venv/bin/python tools/dev/dev.py docs package \
-    --build build/documentation --output ../nexus-documentation-packages
 ```
 
 `install.environment(prefix)` returns a verified subprocess environment with the
@@ -127,7 +125,7 @@ theme. At 390 CSS pixels it checks long signatures, unchanged symbols and anchor
 complete code and table content with internal scrolling, and an unclipped page.
 Missing tools or failed checks return nonzero. A successful receipt qualifies
 only that fixture and observed browser; full-site responsive acceptance and
-archive verification remain separate.
+deployment remain separate.
 
 ## Search the current site
 
@@ -142,20 +140,11 @@ qualification records retain their frozen source and language scope.
 
 ## CI permission boundary
 
-`docs-build.yml` has only `contents: read`. It prepares tools explicitly, runs
-source checks, builds both languages, packages offline output and records observed
-job identity. A failed build has no successful documentation upload.
-The package producer writes outside the source checkout. CI then copies the
-verified result to fresh ignored upload staging, compares the archive digest and
-verifies the copied manifest and payload before the existing job-identity gate.
-The staging copy does not rebuild or replace the original package.
-
-`docs-publish.yml` runs only for the reviewed `docs-delivery` branch. Its read-only
-job verifies the prepared public bytes and publication receipt before uploading a
-Pages artifact. The separate deployment job alone has Pages and OIDC write
-permissions and uses the `nexus-documentation` environment. It never checks out
-or executes external pull-request source code. Deployment branch rules and
-actual remote execution remain independently observable repository state.
+`docs-build.yml` has only `contents: read`. It prepares the locked tools,
+checks source, executes the documentation tool suite and builds both languages.
+Only successful build output and actual reports enter its CI artifact. Artifact
+upload does not establish deployment or firmware acceptance. Pages publication,
+archive recovery and software candidate promotion are outside this workflow.
 
 ## License and upgrade handling
 
@@ -166,10 +155,10 @@ copied from the verified wheel; the five upstream wheels which omit license text
 use checked-in texts extracted from their exact verified source distributions.
 The lock records source archive digest, member and extracted text digest. The
 Doxygen archive carries its complete license text. Preparation copies these
-texts into `prefix/licenses/`; packaging retains the applicable license payload.
+texts into `prefix/licenses/`; retain that license payload when redistributing tools.
 
 To upgrade, review upstream changes and licenses, resolve one new exact closure,
 update both lock and hash requirements, execute a fresh online preparation and
-an independent offline preparation, then run strict bilingual build, diagram
-freshness, package verification and restoration. Retain raw failures and results;
+an independent offline preparation, then run documentation tool tests, strict
+bilingual builds and diagram freshness checks. Retain raw failures and results;
 an updated version string alone is insufficient acceptance evidence.

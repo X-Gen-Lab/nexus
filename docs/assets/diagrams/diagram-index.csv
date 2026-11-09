@@ -9,7 +9,7 @@ FIG-07,UART与SPI有限DMA时序,reference,dma-completion.dot,dma-completion.svg
 FIG-08,wait wake与外部退出,current,wait-wake-shutdown.dot,wait-wake-shutdown.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-50,ready-arm-ready-wait-ready与实际执行/join责任
 FIG-10,Source SDK独立消费,current,source-sdk-consumer.dot,source-sdk-consumer.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-52,实际公开入口和consumer；搬移完整prefix，Native run/ARM link分开
 FIG-11,软件与HIL证据关系,current,qualification-evidence.dot,qualification-evidence.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-53,实际scope evidence独立取得；HIL tooling不是物理测量
-FIG-12,文档SDK与证据发布恢复,reference,release-recovery.dot,release-recovery.svg,rendered,reference_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-54,交付流程参考；公开发布/下载需真实receipt，不从流程图推断发生
+FIG-12,文档、SDK与实板验证边界,current,release-recovery.dot,release-recovery.svg,rendered,source_reviewed,tools/documentation/cli.py; cmake/package/package_source_sdk.py; cmake/package/verify_consumers.py; tools/hil/,DOC-54,文档构建、独立SDK消费与物理执行分别验收，不推导部署或发布
 FIG-13,Cortex-M能力分层,current,cortex-m-capabilities.dot,cortex-m-capabilities.svg,rendered,source_reviewed,arch/arm/cortex_m; cmake/platform/Runtime.cmake; soc/stm32/stm32f4,DOC-55,通用 CPU 软件能力、Runtime 与当前 F4 整平台及物理资格分别记录
 FIG-15,连续RX与可见丢块,reference,continuous-stream.dot,continuous-stream.svg,rendered,reference_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-57,F407 USART1连续RX；预置FIFO贷款、loss和停止责任
 FIG-16,当前 I/O 装配与执行,current,io-evolution.dot,io-evolution.svg,rendered,source_reviewed,c4249e98 baseline + IO evolution sources in io-evolution.md,IO-01;IO-02;IO-03;IO-09;IO-11;IO-12;IO-21,构建期计划与运行调用分别标记；可选机制；逐模式执行状态由42项台账维护；不建立HIL资格

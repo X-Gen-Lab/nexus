@@ -7,11 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 41e3849c41ae204318bc3400b67ccdbb382929b1922d12e0c9de95f6ca6ec6e7\n"
+"X-Nexus-Source-SHA256: 3f7b4aac982f786b805fcf4ae0f341662e0d8111562cd05b2f494b02dab45203\n"
 
+#: ../../../docs/design/build-system.md:1
 msgid "Build system maintenance contract"
 msgstr "构建系统维护合同"
 
+#: ../../../docs/design/build-system.md:3
 msgid ""
 "Nexus uses one authored TOML assembly, a validated immutable configuration "
 "IR, static instances and typed factory, and one CMake software target graph."
@@ -21,6 +23,7 @@ msgstr ""
 "Nexus 使用唯一作者 TOML 装配、验证的不可变配置 IR、静态实例／类型化 factory 和唯一 CMake 软件目标图。Ninja "
 "执行声明图；产品持有应用源码及组合。"
 
+#: ../../../docs/design/build-system.md:7
 msgid ""
 "The [48-item execution ledger](https://github.com/X-Gen-"
 "Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/build-"
@@ -34,6 +37,7 @@ msgstr ""
 "system-"
 "execution.csv)保留请求的退出条件。实现、已执行软件验证、环境分发及物理验收证据独立。历史源码资格不能为修改后的构建工具建立资格。"
 
+#: ../../../docs/design/build-system.md:12
 msgid ""
 "Configuration publication is a single-writer transaction. It protects every "
 "authored and fact input before changing owned output. A rejected or "
@@ -44,6 +48,7 @@ msgid ""
 msgstr ""
 "配置发布是单写入者事务，在修改所属输出前保护所有作者输入和事实输入。拒绝或中断不能把先前配置作为当前配置暴露。相同成功生成保留内容与时间戳，普通重配置不迫使无关编译。配置摘要不是编译器或生成器源码身份。"
 
+#: ../../../docs/design/build-system.md:19
 msgid ""
 "CMake owns source lists and target dependencies. The resolver emits selected"
 " facts and its configuration-code dependencies, never a parallel software "
@@ -65,6 +70,7 @@ msgstr ""
 "unit。ABI、优化、诊断及固件链接策略具有显式 target 边界。固件 target 保证声明的交付输出与资源检查。外部应用告警由 "
 "consumer 策略决定。"
 
+#: ../../../docs/design/build-system.md:31
 msgid ""
 "Developer presets and native CMake/CTest remain the normal build interface. "
 "Focused tests are development feedback. Commit gates and formal "
@@ -76,6 +82,7 @@ msgstr ""
 "suite，生成 fresh 报告。全部 runner 保留真实 command exit、有界并发、deadline 和 process "
 "cleanup。"
 
+#: ../../../docs/design/build-system.md:36
 msgid ""
 "Preparation may retrieve dependencies. Formal reproducibility uses two fresh"
 " network-disabled builds with the same verified source SDK and recorded "
@@ -87,6 +94,7 @@ msgstr ""
 "准备阶段可取得依赖。正式可复现性要求同一验证 source SDK、记录的环境和工具链字节进行两次全新禁网构建。Compiler cache "
 "只改善开发，不能证明 fresh-build 可复现。持久证据保留原记录、member identity 和失败尝试，不改变历史状态。"
 
+#: ../../../docs/design/build-system.md:42
 msgid ""
 "Behavioral fixes use actual RED then GREEN execution. Python tools use "
 "unittest; C/C++ contracts use the pinned GoogleTest/GoogleMock host "
@@ -99,6 +107,7 @@ msgstr ""
 "主机框架。CMake graph/policy 缺陷需真实小型 consumer build 与产物观察。固件保持 C11，无 host test "
 "runtime。本维护遵循正常 commit hook 和独立审查。"
 
+#: ../../../docs/design/build-system.md:48
 msgid ""
 "The following support matrix records observed host tools and declared locks."
 " The final clean-source software gates and eight exact offline candidates "
@@ -113,71 +122,92 @@ msgstr ""
 "Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/delivery/build-"
 "system-verification.md)中。主机观测保留各自的范围；源码资格使用记录中的代码提交，不会自动跟随后续文档 HEAD。"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Host or execution path"
 msgstr "Host 或执行路径"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Maintained boundary"
 msgstr "维护边界"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Current evidence"
 msgstr "当前证据"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Linux x86_64 development host"
 msgstr "Linux x86_64 开发主机"
 
+#: ../../../docs/design/build-system.md:0
 msgid ""
 "Configuration, Ninja, Native/ARM consumers, offline tools and evidence "
 "transport"
 msgstr "配置、Ninja、Native/ARM consumer、离线工具与证据传输"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Actual local execution; Linux 6.18.44 and glibc 2.41 observed"
 msgstr "真实本地执行；观察到 Linux 6.18.44、glibc 2.41"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Linux descendant cancellation"
 msgstr "Linux 子孙进程取消"
 
+#: ../../../docs/design/build-system.md:0
 msgid ""
 "Bounded `/proc` inspection, group/descendant freeze, kill and terminal-state"
 " observation"
 msgstr "有界 `/proc` 检查、group/descendant freeze、kill 和 terminal-state 观察"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Actual nested-process and hostile signal-handler regressions"
 msgstr "真实嵌套进程及恶意 signal-handler 回归"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Linux/amd64 OCI artifact"
 msgstr "Linux/amd64 OCI 产物"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Sealed manifest, config and layer bytes; local offline load"
 msgstr "封存 manifest/config/layer 字节；本地离线 load"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Actual export, independent archive restore and Docker load/inspect"
 msgstr "真实 export、独立 archive restore 和 Docker load/inspect"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Windows development paths"
 msgstr "Windows 开发路径"
 
+#: ../../../docs/design/build-system.md:0
 msgid ""
 "Bootstrap selects `.venv/Scripts`; CMake and tool paths remain explicit"
 msgstr "Bootstrap 选 `.venv/Scripts`；CMake 和 tool 路径显式"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Integration not executed in this maintenance run"
 msgstr "本轮维护未执行集成"
 
+#: ../../../docs/design/build-system.md:0
 msgid "macOS development paths"
 msgstr "macOS 开发路径"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Python/CMake tooling entry points; host-specific compiler setup"
 msgstr "Python/CMake 工具入口；host-specific compiler setup"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Other hosts or cross-host ARM distributions"
 msgstr "其他 host 或跨主机 ARM 分发"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Require a separately reviewed tool lock and execution matrix"
 msgstr "需独立已审 tool lock 和执行矩阵"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Not established by Linux archive identities"
 msgstr "Linux archive 身份不建立此资格"
 
+#: ../../../docs/design/build-system.md:63
 msgid ""
 "Linux descendant cleanup depends on Linux process observation. Generic "
 "process termination paths on other hosts do not establish the same nested-"
@@ -187,99 +217,131 @@ msgstr ""
 "Linux descendant cleanup 依赖 Linux 进程观察，其他 host "
 "通用终止路径不建立同样嵌套进程验收。Windows/macOS 路径处理是实现边界，不是集成测试结果。"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Tool"
 msgstr "工具"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Declared requirement or lock"
 msgstr "声明要求或 lock"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Actual local observation"
 msgstr "真实本地观察"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Python"
 msgstr "Python"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Minimum 3.11; local lock 3.12.14"
 msgstr "最低 3.11；本地 lock 3.12.14"
 
+#: ../../../docs/design/build-system.md:0
 msgid "CPython 3.12.14"
 msgstr "CPython 3.12.14"
 
+#: ../../../docs/design/build-system.md:0
 msgid "CMake"
 msgstr "CMake"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Minimum 3.31; tool lock 3.31.6"
 msgstr "最低 3.31；tool lock 3.31.6"
 
+#: ../../../docs/design/build-system.md:0
 msgid "3.31.6"
 msgstr "3.31.6"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Ninja"
 msgstr "Ninja"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Tool lock 1.13.2; single configuration"
 msgstr "Tool lock 1.13.2；single configuration"
 
+#: ../../../docs/design/build-system.md:0
 msgid "`1.13.2.git.kitware.jobserver-pipe-1`"
 msgstr "`1.13.2.git.kitware.jobserver-pipe-1`"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Native compiler"
 msgstr "Native 编译器"
 
+#: ../../../docs/design/build-system.md:0
 msgid "GNU 14.2.0 in the environment lock"
 msgstr "环境 lock 中 GNU 14.2.0"
 
+#: ../../../docs/design/build-system.md:0
 msgid "GCC/G++ 14.2.0, Debian 14.2.0-19"
 msgstr "GCC/G++ 14.2.0，Debian 14.2.0-19"
 
+#: ../../../docs/design/build-system.md:0
 msgid "ARM compiler"
 msgstr "ARM 编译器"
 
+#: ../../../docs/design/build-system.md:0
 msgid "GNU Arm 14.3.rel1, Linux x86_64 archive lock"
 msgstr "GNU Arm 14.3.rel1，Linux x86_64 archive lock"
 
+#: ../../../docs/design/build-system.md:0
 msgid "GCC 14.3.1, build dated 20250623"
 msgstr "GCC 14.3.1，构建日期 20250623"
 
+#: ../../../docs/design/build-system.md:0
 msgid "clang-format"
 msgstr "clang-format"
 
+#: ../../../docs/design/build-system.md:0
 msgid "14.0.6"
 msgstr "14.0.6"
 
+#: ../../../docs/design/build-system.md:0
 msgid "pre-commit"
 msgstr "pre-commit"
 
+#: ../../../docs/design/build-system.md:0
 msgid "4.3.0"
 msgstr "4.3.0"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Optional ccache"
 msgstr "可选 ccache"
 
+#: ../../../docs/design/build-system.md:0
 msgid "4.14.1, Linux x86_64 static distribution"
 msgstr "4.14.1，Linux x86_64 静态分发"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Actual binary and cache hit/miss validation"
 msgstr "真实 binary 与 cache hit/miss 校验"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Git"
 msgstr "Git"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Source and submodule identity tooling"
 msgstr "源码与 submodule 身份工具"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Host 2.52.0; recorded OCI artifact 2.47.3"
 msgstr "Host 2.52.0；记录 OCI 产物 2.47.3"
 
+#: ../../../docs/design/build-system.md:0
 msgid "GoogleTest/GoogleMock"
 msgstr "GoogleTest/GoogleMock"
 
+#: ../../../docs/design/build-system.md:0
 msgid "1.16.0, pinned Git submodule `ext/googletest` and matching lock commit"
 msgstr "1.16.0，锁定 Git 子模块 `ext/googletest`，与依赖锁中的 commit 一致"
 
+#: ../../../docs/design/build-system.md:0
 msgid "Host-only framework; final full-source execution separately recorded"
 msgstr "仅主机框架；最终 full-source 执行另行记录"
 
+#: ../../../docs/design/build-system.md:81
 msgid ""
 "Ninja single-configuration builds are maintained. Ninja Multi-Config is "
 "explicitly rejected; other generators have no implied acceptance. C11 "
@@ -289,6 +351,7 @@ msgstr ""
 "维护 Ninja single-configuration，明确拒绝 Ninja Multi-Config；其他 generator "
 "无隐含验收。固件保持 C11。Native test target 启用 C++17，不把测试运行时链接进固件。"
 
+#: ../../../docs/design/build-system.md:86
 msgid ""
 "The Linux x86_64 CP312 offline tool closure contains 15 hash-locked wheels, "
 "including the Setuptools build backend required by isolated local pre-commit"
@@ -306,6 +369,7 @@ msgstr ""
 "gate 另行执行当前源码。CP311 wheel 字节按 15-wheel lock 校验，但 CP311 安装未执行。最低 Python 版本和 "
 "wheel 清单不能替代该缺失结果。"
 
+#: ../../../docs/design/build-system.md:96
 msgid ""
 "The recorded OCI artifact uses Python 3.12.15 and Git 2.47.3, distinct from "
 "the current host versions. Its manifest is "
@@ -327,6 +391,7 @@ msgstr ""
 "`44d2fe14e401730074302ad87bdef9762a6cfe12de4bebc6853d181fd51c74fd`。Toolchain／OCI"
 " transport 执行保留自身 tool-source 身份，结果不能转移为后续 tool 变更的 source qualification。"
 
+#: ../../../docs/design/build-system.md:107
 msgid ""
 "Fixed base/frontend digests, Debian snapshot selection, five APT package "
 "versions and hash-required Python inputs are declared in the recipe lock. "
@@ -338,6 +403,7 @@ msgstr ""
 "hash-required Python 输入。已观察 OCI 字节重建尚未成功执行，`recipe_reproducible` 保持 "
 "`false`。验证产物复用与声明 recipe 输入是独立验收状态。"
 
+#: ../../../docs/design/build-system.md:113
 msgid ""
 "The execution ledger keeps all 48 requested requirements and exit conditions"
 " unchanged. Its updated paths bind the implementation, original RED/GREEN "
@@ -356,15 +422,17 @@ msgstr ""
 "Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/delivery/build-"
 "system-results.json)。历史测量保留其源码与精确选择，不继承后续 HEAD 的状态。"
 
+#: ../../../docs/design/build-system.md:120
 msgid ""
 "Automatic developer provenance binds a unique immutable command-attempt "
-"receipt and checks its command and working directory. Complete current "
-"contracts and actual candidate plan execution establish this association; a "
-"shared latest report name cannot substitute for an exact attempt."
+"receipt and checks its command and working directory. Current contract tests"
+" verify that association. Candidate-plan executions below are historical "
+"records; their retired orchestration is not a current acceptance mechanism. "
+"A shared latest report name cannot substitute for an exact attempt."
 msgstr ""
-"自动开发 provenance 绑定唯一不可变 command-attempt receipt 并核对命令与工作目录。完整当前合同与真实 "
-"candidate plan 执行建立该关联；共享 latest 报告名不能替代精确 attempt。"
+"开发工具的自动来源记录绑定唯一、不可变的命令尝试收条，并核对命令及工作目录。当前合同测试验证这一关联。下文候选计划的执行属于历史记录，其已退役的编排不构成当前验收机制。共享的最新报告名称不能代替准确的执行尝试。"
 
+#: ../../../docs/design/build-system.md:126
 msgid ""
 "BLD-18 retains full SDK byte checks at each consumption boundary after "
 "measurement, with no parent marker or persistent verification bypass. BLD-31"
@@ -376,6 +444,7 @@ msgstr ""
 "bypass。BLD-31 测量声明／实际编译单元和精确选定镜像成本后保留公共静态库。其 `decision_verified` "
 "状态记录测量选择，而非推测性 source split。"
 
+#: ../../../docs/design/build-system.md:132
 msgid ""
 "BLD-38 records actual fixed-checker candidate plans and genuine failed-"
 "checker execution. The original orchestration exit condition remains "
@@ -388,6 +457,7 @@ msgstr ""
 " 72-stage 软件 plan 未经单次完整 plan invocation 执行；分别执行的 full gate 另记。BLD-39 验证 "
 "dependency-upgrade evidence 合同，不声称真实 vendor dependency 升级。"
 
+#: ../../../docs/design/build-system.md:139
 msgid ""
 "BLD-40 covers actual CP312 offline installation and isolated hook "
 "preparation; CP311 installation remains unexecuted. BLD-41 covers actual "
@@ -404,6 +474,7 @@ msgstr ""
 "`recipe_reproducible=false`。BLD-44 覆盖真实新源码 archive proof 与独立仅 archive 验证。本地 "
 "archive 保留和 durable hard-link 名称不建立异地存储、发布或 release。"
 
+#: ../../../docs/design/build-system.md:147
 msgid ""
 "The host observations retain their recorded source scopes in "
 "`/workspace/nexus-build-maintenance-20261012/documentation/host-tool-"

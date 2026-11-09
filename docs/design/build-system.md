@@ -118,8 +118,9 @@ records and the final-source software gates in the
 retain their source and exact selections instead of inheriting a later HEAD.
 
 Automatic developer provenance binds a unique immutable command-attempt receipt
-and checks its command and working directory. Complete current contracts and
-actual candidate plan execution establish this association; a shared latest
+and checks its command and working directory. Current contract tests verify
+that association. Candidate-plan executions below are historical records; their
+retired orchestration is not a current acceptance mechanism. A shared latest
 report name cannot substitute for an exact attempt.
 
 BLD-18 retains full SDK byte checks at each consumption boundary after
