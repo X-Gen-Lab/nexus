@@ -127,6 +127,82 @@ class SPIDMAProviderSequence : public testing::Test {
         IRQ(&state, false);
     }
 };
+#if !defined(NX_SPI_DMA_OWNER_TEST)
+class AdditionalSPISequence : public SPIDMAProviderSequence,
+                              public testing::WithParamInterface<unsigned> {
+  protected:
+    void SetUp() override {
+        SPIDMAProviderSequence::SetUp();
+        ASSERT_FALSE(HasFatalFailure());
+        const nx_spi_port_t raw{&nx_stm32_spi_dma_ops, &state};
+        ASSERT_EQ(NX_SUCCESS, nx_spi_port_stop(&raw));
+        state.spi.registers = GetParam() == 2U ? SPI2 : SPI3;
+        state.spi.clock_hz = 42000000U;
+        state.dma = DMA1;
+        state.rx = GetParam() == 2U ? DMA1_Stream3 : DMA1_Stream0;
+        state.tx = GetParam() == 2U ? DMA1_Stream4 : DMA1_Stream5;
+        state.spi.registers->SR = TXEMPTY;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_spi_dma_initialize(&state));
+    }
+    void TearDown() override {
+        if (sequence.active != nullptr) {
+            (void)nx_spi_dma_transaction_cancel(&port, &request);
+            held = nullptr;
+            state.rx->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+            state.tx->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+            state.spi.registers->SR = TXEMPTY;
+            nx_spi_dma_transaction_service(&port);
+        }
+        SPIDMAProviderSequence::TearDown();
+    }
+    void CompleteSelected() {
+        state.rx->NDTR = 0U;
+        state.tx->NDTR = 0U;
+        DMA1->LISR |= 0x20U << (GetParam() == 2U ? 22U : 0U);
+        DMA1->HISR |= 0x20U << (GetParam() == 2U ? 0U : 6U);
+        nx_stm32_spi_dma_irq(&state, true);
+        nx_stm32_spi_dma_irq(&state, false);
+    }
+};
+TEST_P(AdditionalSPISequence, HalfwordPhasesShareOneCsAndUseBothActualBanks) {
+    ASSERT_EQ(NX_SUCCESS, nx_spi_dma_transaction_submit(&endpoint, &request));
+    EXPECT_EQ(1U << DMA_SxCR_MSIZE_Pos, state.rx->CR & DMA_SxCR_MSIZE);
+    EXPECT_EQ(1U << DMA_SxCR_PSIZE_Pos, state.tx->CR & DMA_SxCR_PSIZE);
+    EXPECT_EQ(0U, state.rx->CR & DMA_SxCR_CHSEL);
+    EXPECT_EQ(0U, state.tx->CR & DMA_SxCR_CHSEL);
+    EXPECT_EQ(1U << 16U, CS);
+    for (size_t phase = 0U; phase < 2U; ++phase) {
+        CompleteSelected();
+        nx_spi_dma_transaction_service(&port);
+    }
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_SUCCESS, request.base.result);
+    EXPECT_EQ(2U, request.base.transferred);
+    EXPECT_EQ(1U, CS);
+}
+TEST_P(AdditionalSPISequence, CancellationRetainsTheRealEngineAndWholeChain) {
+    ASSERT_EQ(NX_SUCCESS, nx_spi_dma_transaction_submit(&endpoint, &request));
+    CompleteSelected();
+    nx_spi_dma_transaction_service(&port);
+    ASSERT_EQ(1U, sequence.phase);
+    held = &state.rx->CR;
+    ASSERT_EQ(NX_SUCCESS, nx_spi_dma_transaction_cancel(&port, &request));
+    nx_spi_dma_transaction_service(&port);
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, sequence.active);
+    EXPECT_EQ(1U << 16U, CS);
+    held = nullptr;
+    state.rx->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+    nx_spi_dma_transaction_service(&port);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(1U, request.base.transferred);
+    EXPECT_EQ(1U, CS);
+}
+INSTANTIATE_TEST_SUITE_P(ReviewedApb1Controllers, AdditionalSPISequence,
+                         testing::Values(2U, 3U));
+#endif
+
 TEST_F(SPIDMAProviderSequence, RefusedFirstCsStillBorrowsUntilCheckedRelease) {
     g_nx_spi_cs_fault_odr = &GPIOC->ODR;
     g_nx_spi_cs_hold_high = 1U;

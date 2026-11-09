@@ -39,7 +39,7 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 |---|---|
 | GPIO／EXTI | 受审引脚、静态电气与事件存储；不存在自动消抖政策 |
 | UART | IRQ byte/event、word 与明确 block／DMA 模式分别选择；有限 TX、有限 RX、连续 RX 和双向模式不自动互相授权 |
-| SPI／I2C | SPI1／3 polling 与 DMA、SPI2 DMA；I2C1／3 polling／IRQ／DMA、I2C2 IRQ／DMA；显式 endpoint 与受审路线 |
+| SPI／I2C | SPI1／2／3 polling、普通与增强 DMA 事务；I2C1／2／3 polling／IRQ／DMA；显式 endpoint 与受审路线 |
 | ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入，独立 shot／scan 最多 16 ranks；三个转换器均有有限／连续 DMA，分别独占 TIM3 |
 | DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码 |
 | Flash／IWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
@@ -114,10 +114,13 @@ stop 与 W1C 回读恢复。软件模型和 ARM 链接不授予物理输出性�
 启动准入，也不证明完整订货号／封装或认证秘密。Native 显式返回 UNSUPPORTED；
 模型与 ARM 链接仍不能证明物理身份、吞吐或实板功能。
 
-SPI3 的受审 AF6 路线是 PC10／11／12 或 PB3／4／5；I2C3 是 PA8 SCL 与 PC9 SDA
-AF4，恢复检查两条真实输入，不用同一 GPIO bank 的邻位代替。SPI3 使用 DMA1
-stream5 TX／stream0 RX channel0；I2C3 使用 stream4 TX／stream2 RX channel3。
-与其他实例重用物理 stream 时配置拒绝，不自动替换路线。
+SPI1／2／3 共用轮询和有限全双工 DMA 实现，均可选择 8／16 位增强事务；I2C1／2／3
+共用 100 kHz 轮询实现，各自也提供受审 IRQ／DMA 模式。SPI3 的 AF6 路线是
+PC10／11／12 或 PB3／4／5；I2C3 是 PA8 SCL 与 PC9 SDA AF4，恢复检查两条真实
+输入。SPI2 使用 DMA1 stream4 TX／stream3 RX channel0，SPI3 使用 stream5 TX／
+stream0 RX channel0；I2C3 使用 stream4 TX／stream2 RX channel3。共享物理 stream
+时配置拒绝，不自动替换路线。增强 SPI DMA 事务的每段完成都保持同一 CS，取消和
+停止失败保留整条请求与借用，直到所选引擎、线端和 CS 均已撤回。
 
 ADC1 使用 DMA2 stream4 channel0，ADC2 使用 stream2 channel1，ADC3 使用
 stream1 channel2；有限和连续模式均按所选 lane 解释并清除标志。TIM3 是独占触发源，

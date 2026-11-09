@@ -33,6 +33,22 @@ int main(void) {
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_spi_device(id);
     }
+#ifdef NX_FIXTURE_SPI_TRANSACTION
+    s_identity_count = NX_SPI_TRANSACTION_DEVICE_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_spi_transaction_device(id);
+    }
+#endif
+#ifdef NX_FIXTURE_SPI_DMA_TRANSACTION
+    s_identity_count = NX_SPI_DMA_TRANSACTION_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_spi_dma_transaction(id);
+    }
+    s_identity_count = NX_SPI_DMA_TRANSACTION_DEVICE_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_spi_dma_transaction_device(id);
+    }
+#endif
     s_identity_count = NX_I2C_DEVICE_ID_COUNT;
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_i2c_device(id);

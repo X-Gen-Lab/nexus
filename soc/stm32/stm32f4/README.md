@@ -72,8 +72,8 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | --- | --- |
 | GPIO | 单 port 的 16-bit 授权 mask；原子 BSRR set/reset；串行 toggle；先初值后 mode |
 | UART | 六个实例共用 IRQ bytes/events、HAL 有限 TX DMA、有限／连续 RX DMA 和 DMA duplex；USART1 另有 IRQ words／IRQ blocks；真实 TC、显式 loss、drain、quarantine |
-| SPI | SPI1／SPI3 短 polling／有限全双工 DMA，SPI2 有限 DMA；MSB-first master、mode0–3；普通 byte face 为 8 位，增强 polling 事务支持 8／16 位 word，增强 DMA 事务限 SPI1；polling 最多 256 words，DMA 每段最多 65535 words |
-| I2C | I2C1／I2C3 polling/IRQ/DMA、I2C2 IRQ/DMA；42 MHz／100 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
+| SPI | SPI1／2／3 共用短 polling／有限全双工 DMA；MSB-first master、mode0–3；普通 byte face 为 8 位，增强 polling 事务支持 8／16 位 word，三个控制器均可选择增强 DMA 事务；polling 最多 256 words，DMA 每段最多 65535 words |
+| I2C | I2C1／2／3 polling/IRQ/DMA；42 MHz／100 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
 | Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |

@@ -154,7 +154,7 @@ class EndpointPolicy:
 
     spi_transaction: bool = False
     i2c_long: bool = False
-    spi_dma: tuple[str | None, str] | None = None
+    spi_dma: tuple[tuple[str, ...] | None, str] | None = None
     model_async_echo: bool = False
 
     def validate(self, device, controller):
@@ -174,7 +174,7 @@ class EndpointPolicy:
             if (kind != "spi" or self.spi_dma is None or
                     mode != self.spi_dma[1] or
                     (self.spi_dma[0] is not None and
-                     controller["controller"] != self.spi_dma[0])):
+                     controller["controller"] not in self.spi_dma[0])):
                 fail("SPI DMA transaction requires a reviewed DMA mode")
         if self.model_async_echo and mode == "async-model":
             if driver != "spi-dma-transaction" or "model_bytes" in device:

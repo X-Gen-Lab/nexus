@@ -90,6 +90,12 @@
       "id": "usart6",
       "controller": "USART6",
       "route": "usart6-pc6-pc7"
+    },
+    {
+      "id": "third-cs",
+      "controller": "GPIOB",
+      "route": "gpio-pb2",
+      "initial": 4
     }
   ],
   "reserved_resources": [],

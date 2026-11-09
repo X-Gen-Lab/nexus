@@ -85,6 +85,54 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                     self.assertIn("void DMA1_Stream5_IRQHandler(void)", source)
                     self.assertNotIn("void DMA2_Stream0_IRQHandler(void)", source)
 
+    def secondary_binding(self, assembly, binding_id, controller, route):
+        board_path = self.directory / "board/board.json"
+        board = json.loads(board_path.read_text())
+        entry = next(x for x in board["bindings"] if x["id"] == binding_id)
+        entry.update(controller=controller, route=route)
+        board_path.write_text(json.dumps(board))
+        return gate.resolve_ir(assembly)
+
+    def test_secondary_spi_and_i2c_polling_use_the_existing_c_owner(self):
+        for kind, make, mode, binding, controller, route in (
+                ("spi", self.spi3_assembly, "short-poll", "third-spi",
+                 "SPI2", "spi2-pb13-pb14-pb15"),
+                ("i2c", self.i2c3_assembly, "poll-messages", "third-i2c",
+                 "I2C2", "i2c2-pb10-pb11")):
+            with self.subTest(controller=controller):
+                path = make(mode)
+                result = self.secondary_binding(path, binding, controller, route)
+                selected, = result.controllers
+                self.assertEqual(selected.controller, controller)
+                self.assertEqual(selected.integration.clock_hz, 42000000)
+                self.assertEqual(selected.integration.dma, ())
+                output = self.directory / kind
+                gate.configure(path, output)
+                source = (output / "bindings.c").read_text()
+                self.assertIn(f".registers = {controller}", source)
+                self.assertNotIn(f"void {controller}_IRQHandler(void)", source)
+
+    def test_spi2_and_spi3_dma_transactions_use_the_selected_engine(self):
+        for controller, route, stream in (
+                ("SPI2", "spi2-pb13-pb14-pb15", 4),
+                ("SPI3", "spi3-pc10-pc11-pc12", 5)):
+            with self.subTest(controller=controller):
+                path = self.spi3_assembly("dma")
+                path.write_text(path.read_text().replace(
+                    '[spi_device.sensor]\n',
+                    '[spi_device.sensor]\ndriver="spi-dma-transaction"\n'))
+                result = self.secondary_binding(
+                    path, "third-spi", controller, route)
+                selected, = result.controllers
+                self.assertEqual(selected.interface_kind, "spi_dma_transaction")
+                output = self.directory / controller
+                gate.configure(path, output)
+                source = (output / "bindings.c").read_text()
+                self.assertIn("nx_spi_dma_sequence_state_t", source)
+                self.assertIn(f".registers = {controller}", source)
+                self.assertIn(f"DMA1_Stream{stream}_IRQHandler", source)
+                self.assertNotIn("DMA2_Stream3_IRQHandler", source)
+
     def test_spi3_dma_conflicts_with_i2c1_before_emitting_hardware(self):
         with self.assertRaisesRegex(ValueError, "DMA1:stream0"):
             gate.resolve_ir(self.spi3_assembly("dma", peer=True))

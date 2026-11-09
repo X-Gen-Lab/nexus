@@ -184,7 +184,7 @@ def builtin_cs(controller):
 ADC_GROUP = None
 PWM_SHARED = None
 ENDPOINT_POLICY = common.EndpointPolicy(
-    spi_transaction=True, spi_dma=("SPI1", "dma"))
+    spi_transaction=True, spi_dma=(("SPI1", "SPI2", "SPI3"), "dma"))
 TIMEBASE_ALARM = True
 
 

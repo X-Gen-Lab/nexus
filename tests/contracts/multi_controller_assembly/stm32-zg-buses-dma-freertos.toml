@@ -1,0 +1,84 @@
+# Six-controller software fixture; no physical board qualification.
+schema = 2
+board_package = "stm32-zg-board"
+backend = "freertos"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[spi.bus1]
+binding = "primary-spi"
+mode = "dma"
+max_hz = 1000000
+[spi.bus1.irq]
+priority = 5
+calls_os = false
+
+[spi_device.device1]
+driver = "spi-dma-transaction"
+controller = "bus1"
+cs_binding = "primary-cs"
+mode = 0
+max_hz = 1000000
+
+[spi.bus2]
+binding = "secondary-spi"
+mode = "dma"
+max_hz = 1000000
+[spi.bus2.irq]
+priority = 5
+calls_os = false
+
+[spi_device.device2]
+driver = "spi-dma-transaction"
+controller = "bus2"
+cs_binding = "secondary-cs"
+mode = 0
+max_hz = 1000000
+
+[spi.bus3]
+binding = "spi3"
+mode = "dma"
+max_hz = 1000000
+[spi.bus3.irq]
+priority = 5
+calls_os = false
+
+[spi_device.device3]
+driver = "spi-dma-transaction"
+controller = "bus3"
+cs_binding = "third-cs"
+mode = 0
+max_hz = 1000000
+
+[i2c.i2c1]
+binding = "primary-i2c"
+mode = "poll-messages"
+max_hz = 100000
+
+[i2c_device.sensor1]
+controller = "i2c1"
+address = 80
+
+[i2c.i2c2]
+binding = "secondary-i2c"
+mode = "poll-messages"
+max_hz = 100000
+
+[i2c_device.sensor2]
+controller = "i2c2"
+address = 80
+
+[i2c.i2c3]
+binding = "i2c3"
+mode = "poll-messages"
+max_hz = 100000
+
+[i2c_device.sensor3]
+controller = "i2c3"
+address = 80

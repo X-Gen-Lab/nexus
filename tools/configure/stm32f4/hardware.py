@@ -83,7 +83,7 @@ SECONDARY_FACTS = MappingProxyType({
         "pins": ("PC6", "PC7"), "irq": ("USART6_IRQn",),
         "clock_hz": 84000000}),
     "SPI2": MappingProxyType({
-        "kind": "spi", "modes": ("dma",),
+        "kind": "spi", "modes": ("short-poll", "dma"),
         "pins": ("PB13", "PB14", "PB15"), "irq": (),
         "clock_hz": 42000000}),
     "SPI3": MappingProxyType({
@@ -95,7 +95,7 @@ SECONDARY_FACTS = MappingProxyType({
         "pins": ("PA8", "PC9"), "irq": ("I2C3_EV", "I2C3_ER"),
         "clock_hz": 42000000}),
     "I2C2": MappingProxyType({
-        "kind": "i2c", "modes": ("irq-messages", "dma-messages"),
+        "kind": "i2c", "modes": ("poll-messages", "irq-messages", "dma-messages"),
         "pins": ("PB10", "PB11"), "irq": ("I2C2_EV", "I2C2_ER"),
         "clock_hz": 42000000}),
 })

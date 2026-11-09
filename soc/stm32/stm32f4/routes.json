@@ -663,9 +663,10 @@
         }
       ],
       "modes": [
+        "short-poll",
         "dma"
       ],
-      "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK",
+      "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK; polling shares the reviewed C controller implementation",
       "dma": [
         "DMA1:stream4:channel0",
         "DMA1:stream3:channel0"
@@ -692,10 +693,11 @@
         }
       ],
       "modes": [
+        "poll-messages",
         "irq-messages",
         "dma-messages"
       ],
-      "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK",
+      "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK; polling shares the reviewed C controller implementation",
       "mode_dma": {
         "dma-messages": [
           "DMA1:stream2:channel7",

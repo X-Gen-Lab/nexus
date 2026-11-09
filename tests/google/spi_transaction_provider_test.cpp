@@ -63,6 +63,29 @@ class SPITransactionProvider : public testing::Test {
                                            &transferred);
     }
 };
+TEST_F(SPITransactionProvider, Apb1ControllersReuseEightAndSixteenBitPhases) {
+    const uint16_t command[]{0x1234U, 0xABCDU};
+    uint16_t response[2]{};
+    SPI1->CR1 = SPI_CR1_SPE | SPI_CR1_CPHA;
+    for (SPI_TypeDef* registers : {SPI2, SPI3}) {
+        state.registers = registers;
+        state.clock_hz = 42000000U;
+        registers->SR = SPI_SR_TXE | SPI_SR_RXNE;
+        words.clear();
+        const nx_spi_segment_t phases[]{{command, nullptr, 2U, 0U},
+                                        {nullptr, response, 2U, 0xA55AU}};
+        ASSERT_EQ(NX_SUCCESS, Transfer(phases, 2U, 16U));
+        EXPECT_EQ(4U, transferred);
+        EXPECT_EQ(4U, words.size());
+        EXPECT_EQ(0xA55AU, response[0]);
+        const nx_spi_segment_t bytes{command, response, 2U, 0U};
+        ASSERT_EQ(NX_SUCCESS, Transfer(&bytes, 1U));
+        EXPECT_EQ(2U, transferred);
+        EXPECT_EQ(0U, registers->CR1 & SPI_CR1_SPE);
+        EXPECT_EQ(SPI_CR1_SPE | SPI_CR1_CPHA, SPI1->CR1);
+    }
+}
+
 TEST_F(SPITransactionProvider, ThreePhasesKeepOneCsAndOneWordWidth) {
     const uint8_t command[]{0x9FU, 0x11U};
     uint8_t response[2]{};

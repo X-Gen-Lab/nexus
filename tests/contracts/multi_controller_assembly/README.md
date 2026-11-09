@@ -22,6 +22,11 @@
 两个后端和有限／连续 RX、有限／连续 duplex。每份六路同时选择，TIM／其他外设
 未授权使用同一 DMA lane。所有 RX blocks 由消费者显式提供，不隐式建立池或任务。
 
+`stm32-ve-buses-poll.toml` 同时选择三个 SPI 的增强 polling endpoint 和三个 I2C
+polling controller；`stm32-zg-buses-dma-freertos.toml` 改选三个 SPI 的增强 DMA
+事务并保留三个 I2C polling。三个 SPI 的 CS 独立，factory 保留所有增强面及其真实
+端口；不使用未选中的普通 endpoint 代替，ELF 检查实际保留情况。
+
 secondary UART TX 与 primary I2C TX 共用 DMA1 的物理 stream6，
 即使 selector 不同也冲突，resolver 拒绝同时选择；五路图改选 secondary I2C。
 不同 bus 的同地址 endpoint 保持独立身份／context。

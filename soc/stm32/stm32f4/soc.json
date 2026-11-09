@@ -746,6 +746,7 @@
       "kind": "spi",
       "clock_domain": "apb1",
       "modes": [
+        "short-poll",
         "dma"
       ],
       "irq": [],
@@ -760,6 +761,7 @@
     "I2C2": {
       "kind": "i2c",
       "modes": [
+        "poll-messages",
         "irq-messages",
         "dma-messages"
       ],

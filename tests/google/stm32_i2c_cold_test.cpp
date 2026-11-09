@@ -440,6 +440,37 @@ TEST_F(I2CCold, SecondControllerKeepsFirstControllerIndependent) {
     EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&first, &config, &receipt));
 }
 
+TEST_F(I2CCold, SecondPollingKeepsLiveFirstOwnerThroughFailedGateRelease) {
+    config.asynchronous = true;
+    nx_i2c_v1_state_t first{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_i2c_async_prepare(&first, &config, &receipt));
+    uint16_t saved[2]{};
+    const nx_stm32_i2c_pin_config_t other_pins[]{{&saved[0], 10U},
+                                                 {&saved[1], 11U}};
+    const nx_stm32_i2c_config_t selected{I2C2,      other_pins, nullptr,
+                                         42000000U, 5U,         false};
+    nx_stm32_i2c_state_t other{};
+    nx_stm32_i2c_cold_receipt_t acquired{};
+    GPIOB->IDR |= 0xC00U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_prepare(&other, &selected, &acquired));
+    EXPECT_EQ(I2C2, other.registers);
+    EXPECT_EQ(0xC00U, other.line_mask);
+    refused = &RCC->APB1ENR;
+    EXPECT_NE(NX_SUCCESS, nx_stm32_i2c_close(&other, &selected, &acquired));
+    EXPECT_NE(0U, acquired.effects);
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_stm32_i2c_prepare(&other, &selected, &acquired));
+    EXPECT_TRUE(first.initialized);
+    EXPECT_NE(0U, I2C1->CR1 & I2C_CR1_PE);
+    EXPECT_NE(0U, RCC->APB1ENR & RCC_APB1ENR_I2C1EN);
+    refused = nullptr;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_close(&other, &selected, &acquired));
+    EXPECT_EQ(0U, RCC->APB1ENR & RCC_APB1ENR_I2C2EN);
+    EXPECT_NE(0U, RCC->APB1ENR & RCC_APB1ENR_I2C1EN);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&first, &config, &receipt));
+}
+
 TEST_F(I2CCold, ThirdPollingRestoresBothBanksAndEveryInitialGateCombination) {
     Third();
     GPIOA->MODER = 0xA59AA55AU;

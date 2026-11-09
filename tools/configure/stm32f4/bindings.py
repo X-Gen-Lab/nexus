@@ -38,8 +38,8 @@ def _spi_constructor(item, result, board_bindings, routes, devices, *, paired=Fa
         raise ValueError("SPI requires its reviewed three-pad controller route")
     name = _symbol(item.id)
     dma = item.mode == "dma"
-    if item.mode not in {"short-poll", "dma"} or (item.controller == "SPI2" and not paired):
-        raise ValueError("SPI requires its maintained polling or paired DMA mode")
+    if item.mode not in {"short-poll", "dma"}:
+        raise ValueError("SPI requires its maintained polling or DMA mode")
     implementation = "spi_dma" if dma else "spi"
     children = [child for child in devices if child.controller == item.id]
     if not children:
