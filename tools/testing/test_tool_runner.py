@@ -174,6 +174,16 @@ class ToolRunnerTests(unittest.TestCase):
 
 
 class ChangedDomainTests(unittest.TestCase):
+    def test_documentation_does_not_select_behavioral_tool_domains(self):
+        self.assertEqual(run_tool_tests.changed_suites([
+            ".github/workflows/README.md", "tools/configure/README.md",
+            "cmake/package/README.md"]), ())
+
+    def test_workflow_readme_does_not_expand_a_production_change(self):
+        self.assertEqual(run_tool_tests.changed_suites([
+            ".github/workflows/README.md", "core/src/time.c"]),
+            ("testing",))
+
     def test_complete_domains_follow_actual_changes_and_deletions(self):
         self.assertEqual(run_tool_tests.changed_suites(["soc/stm32/driver.c"]),
                          ("testing",))

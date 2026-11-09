@@ -21,6 +21,8 @@ def changed_suites(names):
     from tools.dev.change_paths import behavioral
     selected = set()
     for name in names:
+        if not behavioral(name):
+            continue
         if name.startswith((".github/", "scripts/ci/")):
             selected.update(("ci", "workflows", "testing"))
         elif name.startswith("tools/configure/"):

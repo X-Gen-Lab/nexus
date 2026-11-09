@@ -32,7 +32,7 @@ def classify(names):
                     or path.name == "Doxyfile"
                     or path.name.startswith("Doxyfile."))
         result["docs"] |= document
-        result["workflows"] |= workflow
+        result["workflows"] |= workflow and not document
         result["code"] |= name in BEHAVIOR_DOCUMENTS or not document
     return result
 

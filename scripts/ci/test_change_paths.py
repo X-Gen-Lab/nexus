@@ -107,6 +107,16 @@ class ChangePathsTests(unittest.TestCase):
                 self.assertTrue(decisions["build-test"])
                 self.assertTrue(decisions["code-quality"])
 
+    def test_workflow_documentation_requires_docs_without_code_execution(self):
+        for path in (".github/workflows/README.md",
+                     ".github/actions/setup-build/README.md"):
+            with self.subTest(path=path):
+                self.assertEqual(classify_paths([path]), {
+                    "code": False, "docs": True, "workflows": False})
+                self.assertFalse(behavioral(path))
+                self.assertFalse(self.decisions([("modified", path)])["build-test"])
+                self.assertTrue(self.decisions([("modified", path)])["docs"])
+
     def test_invalid_repository_paths_fail_instead_of_approximating(self):
         for path in ("", "../src/file.c", "/src/file.c", "src/../file.c",
                      "src//file.c", "src/./file.c", "src/file\0.c"):

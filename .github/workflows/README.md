@@ -6,7 +6,7 @@
 
 | 工作流 | 责任 |
 |---|---|
-| build-matrix.yml | 四种 Native CTest／GoogleTest 模式、Arch／OS 编译检查、F4 板卡与外设装配、独立 Source SDK 消费者 |
+| build-matrix.yml | 四种 Native CTest／GoogleTest 模式、Arch／OS 编译检查、F4 板卡与外设装配 |
 | enterprise-tools.yml | 六个完整工具域，覆盖配置、构建、依赖、SDK、预算和 HIL 工装 |
 | quality-checks.yml | 与 hook 共用格式和注释规则；在真实编译数据库上运行静态分析 |
 | docs-build.yml | 锁定工具、文档测试、Doxygen 和严格中英文站点构建 |
@@ -23,7 +23,8 @@ CI 的完整 Native runtime 另由 `scripts/ci/native_contracts.py` 校验。
 
 ARM 装配通过 `provider_assemblies.py` 检查实际来源、链接和预算。
 `declared_io_assembly` 与 I/O evolution 的精确配置保留真实编译入口。
-SDK job 打包所选后端并构建独立消费者。四个 Board 的 HIL prepare 只准备未绑定工装，
+SDK 的文件闭包和独立消费由 contracts 工具域验证，不在各 Native 模式重复。
+四个 Board 的 HIL prepare 只准备未绑定工装，
 不能建立物理通过状态。
 
 保留原始失败日志、JUnit、配置、ELF／BIN／map 和 SDK 验证结果。
