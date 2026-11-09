@@ -18,6 +18,10 @@
 | `stm32-ve-uart6.toml` | 六个 UART 有限 TX DMA 与独立 IRQ RX events | baremetal |
 | `stm32-zg-uart6-freertos.toml` | 同上六个独立 UART controller | FreeRTOS |
 
+四份 `*uart6-*-baremetal.toml`／`*uart6-*-freertos.toml` 交叉覆盖两种精确芯片、
+两个后端和有限／连续 RX、有限／连续 duplex。每份六路同时选择，TIM／其他外设
+未授权使用同一 DMA lane。所有 RX blocks 由消费者显式提供，不隐式建立池或任务。
+
 secondary UART TX 与 primary I2C TX 共用 DMA1 的物理 stream6，
 即使 selector 不同也冲突，resolver 拒绝同时选择；五路图改选 secondary I2C。
 不同 bus 的同地址 endpoint 保持独立身份／context。

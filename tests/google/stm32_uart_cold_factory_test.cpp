@@ -284,6 +284,84 @@ TEST_F(UartColdFactory, EmptyReceiptDoesNotEraseUnownedColdStorage) {
     EXPECT_EQ(0U, writes);
 }
 
+#if NX_COLD_RX
+TEST_F(UartColdFactory, AdditionalDmaOwnersWithdrawTheirActualNvicAndPads) {
+    const uint32_t original_gates = RCC->AHB1ENR;
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN |
+                    RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIODEN |
+                    RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
+    for (size_t i = 1U; i < 6U; ++i) {
+        SCOPED_TRACE(i);
+        const auto& selected = nx_stm32_uart_hardware[i];
+        selected.registers->SR = USART_SR_TC | USART_SR_TXE;
+        uint16_t snapshots[2]{};
+        const nx_stm32_platform_pin_config_t pins[] = {
+            {selected.tx_gpio, &snapshots[0], selected.tx_port,
+             selected.tx_pin},
+            {selected.rx_gpio, &snapshots[1], selected.rx_port,
+             selected.rx_pin}};
+        std::array<IRQn_Type, 2U + NX_COLD_TX> publishers {
+            selected.irq, selected.receive_irq,
+#if NX_COLD_TX
+                selected.transmit.irq,
+#endif
+        };
+        const nx_dma_memory_region_t memory{
+            UINT32_C(0x20000000), UINT32_C(0x20000),
+            NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
+        ColdConfig config{};
+        config.uart = {selected.registers,
+                       pins,
+                       publishers.data(),
+                       nullptr,
+                       nullptr,
+                       0U,
+                       selected.clock_hz,
+                       115200U,
+                       NX_UART_RX_BLOCKS,
+                       (uint8_t)publishers.size(),
+                       5U,
+                       false,
+                       false};
+        config.resources = {selected.dma, &memory, 1U};
+        config.receive = selected.receive;
+#if NX_COLD_TX
+        config.transmit = selected.transmit;
+#endif
+        for (IRQn_Type irq : publishers)
+            NVIC->IPR[(unsigned)irq] = 0xB0U;
+        ColdState state{};
+        nx_stm32_uart_cold_receipt_t receipt{};
+        config.receive = DMA2_Stream4;
+        const unsigned before = writes;
+        EXPECT_EQ(NX_ERROR_INVALID, COLD_PREPARE(&state, &config, &receipt));
+        EXPECT_EQ(before, writes);
+        config.receive = selected.receive;
+        ASSERT_EQ(NX_SUCCESS, COLD_PREPARE(&state, &config, &receipt));
+        for (IRQn_Type irq : publishers) {
+            EXPECT_TRUE(Enabled(irq));
+            EXPECT_EQ(0x50U, NVIC->IPR[(unsigned)irq]);
+        }
+        const unsigned rx_irq = (unsigned)selected.receive_irq;
+        refused = &NVIC->ICER[rx_irq / 32U];
+        held_bits = 1U << (rx_irq % 32U);
+        EXPECT_NE(NX_SUCCESS, COLD_CLOSE(&state, &config, &receipt));
+        EXPECT_TRUE(Enabled(selected.receive_irq));
+        EXPECT_NE(0U, receipt.effects);
+        EXPECT_EQ(NX_ERROR_BUSY, COLD_PREPARE(&state, &config, &receipt));
+        refused = nullptr;
+        ASSERT_EQ(NX_SUCCESS, COLD_CLOSE(&state, &config, &receipt));
+        for (IRQn_Type irq : publishers) {
+            EXPECT_FALSE(Enabled(irq));
+            EXPECT_EQ(0xB0U, NVIC->IPR[(unsigned)irq]);
+        }
+        EXPECT_EQ(0U, receipt.effects);
+        EXPECT_EQ(0U, receipt.clock_added);
+    }
+    RCC->AHB1ENR = original_gates;
+}
+#endif
+
 #if !NX_COLD_RX && !NX_COLD_TX && !defined(NX_COLD_WORDS) &&                   \
     !defined(NX_COLD_BLOCKS)
 namespace {

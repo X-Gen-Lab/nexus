@@ -104,7 +104,8 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             with self.subTest(family=family):
                 provider, sdk = self.configure_sources(
                     family, [("uart", "irq-byte-event")])
-                expected = {"gpio.c", "uart.c", "uart_cold.c", "lifecycle_uart.c",
+                expected = {"gpio.c", "uart.c", "uart_cold.c",
+                            "uart_hardware.c", "lifecycle_uart.c",
                             "platform_cold.c"}
                 self.assertEqual(provider, self.private_sources(family, expected))
 
@@ -114,6 +115,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 provider, sdk = self.configure_sources(
                     family, [("uart", "dma-tx"), ("spi", spi_mode)])
                 expected = {"gpio.c", "uart.c", "uart_hal.c", "uart_cold.c",
+                            "uart_hardware.c",
                             "lifecycle_uart.c", "spi.c", "spi_dma.c",
                             "lifecycle_spi.c", "platform_cold.c"}
                 self.assertEqual(provider, self.private_sources(family, expected))
@@ -124,6 +126,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 provider, _ = self.configure_sources(
                     family, [("uart", "irq-blocks"), ("adc", "trigger-dma")])
                 expected = {"gpio.c", "uart.c", "uart_stream.c", "uart_cold.c",
+                            "uart_hardware.c",
                             "lifecycle_uart.c",
                             "adc.c", "adc_stream.c", "platform_cold.c"}
                 self.assertEqual(provider, self.private_sources(family, expected))
@@ -158,6 +161,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                     family, [("uart", "irq-byte-event"),
                              ("uart", "irq-blocks")])
                 expected = {"gpio.c", "uart.c", "uart_stream.c", "uart_cold.c",
+                            "uart_hardware.c",
                             "lifecycle_uart.c",
                             "platform_cold.c"}
                 self.assertEqual(provider, self.private_sources(family, expected))

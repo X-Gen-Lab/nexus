@@ -49,6 +49,8 @@ DESCRIPTOR = FamilyDescriptor(
         "soc/stm32/stm32f4/drivers/lifecycle_spi.c",
         "soc/stm32/stm32f4/private/stm32f4_lifecycle.h",
         "soc/stm32/stm32f4/drivers/uart_cold.c",
+        "soc/stm32/stm32f4/drivers/uart_hardware.c",
+        "soc/stm32/stm32f4/private/stm32f407_uart_hardware.h",
         "soc/stm32/stm32f4/private/stm32f407_uart_cold.h",
         "soc/stm32/stm32f4/private/stm32f407_control_cold.h",
         "soc/stm32/stm32f4/private/stm32f407_can_cold.h",

@@ -71,7 +71,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | 接口 | 执行与限制 |
 | --- | --- |
 | GPIO | 单 port 的 16-bit 授权 mask；原子 BSRR set/reset；串行 toggle；先初值后 mode |
-| UART | 六个实例共用 IRQ bytes/events 与 HAL 有限 TX DMA；USART1 另有 IRQ words／RX blocks、RX DMA/IDLE、有限／连续 duplex 和连续 RX blocks；真实 TC、显式 loss、drain、quarantine |
+| UART | 六个实例共用 IRQ bytes/events、HAL 有限 TX DMA、有限／连续 RX DMA 和 DMA duplex；USART1 另有 IRQ words／IRQ blocks；真实 TC、显式 loss、drain、quarantine |
 | SPI | SPI1／SPI3 短 polling／有限全双工 DMA，SPI2 有限 DMA；MSB-first master、mode0–3；普通 byte face 为 8 位，增强 polling 事务支持 8／16 位 word，增强 DMA 事务限 SPI1；polling 最多 256 words，DMA 每段最多 65535 words |
 | I2C | I2C1／I2C3 polling/IRQ/DMA、I2C2 IRQ/DMA；42 MHz／100 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
 | Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |
@@ -103,27 +103,30 @@ IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征�
 ## UART、DMA 与执行进度
 
 有限 `dma-tx` 复用同一个 ST HAL owner 与只读 ops；冷态 C 事实集中维护精确的时钟、
-pad、TX stream、IRQ 和 selector，HAL admission 与资源取得复用相同路由校验。
+pad、TX／RX stream、IRQ 和 selector，HAL admission、接收引擎与资源取得复用
+`uart_hardware.c` 中的只读事实，不维护每实例路由副本。
 六个实例没有新增可变字段，不使用 TX-only 模式中未选择的 RX DMA／continuous
 配置。GPIO 快照只属于冷态 lease；已经取得资源的直接 HAL 初始化无需重复持有快照。
 
-| 实例 | TX DMA | APB 时钟 |
-| --- | --- | --- |
-| USART1 | DMA2 stream7 channel4 | 84 MHz |
-| USART2 | DMA1 stream6 channel4 | 42 MHz |
-| USART3 | DMA1 stream3 channel4 | 42 MHz |
-| UART4 | DMA1 stream4 channel4 | 42 MHz |
-| UART5 | DMA1 stream7 channel4 | 42 MHz |
-| USART6 | DMA2 stream6 channel5 | 84 MHz |
+| 实例 | TX／RX DMA stream | selector | APB 时钟 |
+| --- | --- | --- | --- |
+| USART1 | DMA2 stream7／2 | 4 | 84 MHz |
+| USART2 | DMA1 stream6／5 | 4 | 42 MHz |
+| USART3 | DMA1 stream3／1 | 4 | 42 MHz |
+| UART4 | DMA1 stream4／2 | 4 | 42 MHz |
+| UART5 | DMA1 stream7／0 | 4 | 42 MHz |
+| USART6 | DMA2 stream6／1 | 5 | 84 MHz |
 
-`tests/contracts/multi_controller_assembly/*uart6*.toml` 提供 VE 裸机与 ZG FreeRTOS
-六实例同时链接参考，保留六个独立 context 和一个共享 ops 表；不授权 PCB 接线。
+`tests/contracts/multi_controller_assembly/*uart6*.toml` 覆盖两种封装、裸机／FreeRTOS 和四种 RX DMA／duplex
+模式的六实例链接参考。每种模式共享一张只读 ops 表，六个 context 独立；不授权 PCB 接线。
 
 额外 byte/event 路线为 USART3 PB10/PB11 AF7、UART4 PA0/PA1 AF8、UART5 PC12/PD2
 AF8、USART6 PC6/PC7 AF8。USART2/3、UART4/5 从 APB1 取得 42 MHz，USART1/6 从
 APB2 取得 84 MHz。冷准入在取得资源前检查精确引脚、两个 GPIO bank、clock、gate 和
 IRQ。小型只读 cold descriptor 表不在字节热路径使用，不增加可变实例状态。
-DMA 仍只开放 USART1 和所选 USART2 有限 TX；新增 IRQ 路线不授予其他 DMA 模式。
+RX DMA 根据实际 lane 选择低／高 status bank、W1C mask、channel 与 vector；
+duplex 的 TX 和 RX 独立清理，停止失败不释放借用。表中只开放固定路线，不能据此
+推导未选择的 UART 协议、其他 DMA stream 或引脚已具备资格。
 
 `dma-tx` 的一个 owner 组合官方 HAL 有限 TX 与分离 LL IRQ-byte/event RX，所选
 单元 callback ABI 都为 1，实例共享只读 ops。RX 不交 HAL，TX abort 不改变 RX

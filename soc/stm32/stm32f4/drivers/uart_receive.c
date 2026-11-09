@@ -6,6 +6,7 @@
  * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_uart_hardware.h"
 #include "stm32f407_uart_receive.h"
 /* Keep the selected RX-only IRQ local while duplex shares the same body. */
 #if defined(__GNUC__) || defined(__clang__)
@@ -19,7 +20,7 @@
 #endif
 
 #ifndef NX_STM32_UART_RECEIVE_ACK
-#define NX_STM32_UART_RECEIVE_ACK(dma, flags) ((dma)->LIFCR = (flags) << 16U)
+#define NX_STM32_UART_RECEIVE_ACK(clear, mask) (*(clear) = (uint32_t)(mask))
 #endif
 #ifndef NX_STM32_UART_RECEIVE_TARGET
 #define NX_STM32_UART_RECEIVE_TARGET(engine, bank, address)                    \
@@ -42,21 +43,22 @@
 #define RX_MEMORY0(s)       ((s)->receive->M0AR)
 #define RX_PERIPHERAL(s)    ((s)->receive->PAR)
 #define RX_FIFO(s)          ((s)->receive->FCR)
-#define RX_FLAGS(s)         (((s)->resources.dma->LISR >> 16U) & 0x3DU)
-#define RX_ACK(s, flags)    NX_STM32_UART_RECEIVE_ACK((s)->resources.dma, (flags))
+#define RX_FLAGS(s)         receive_flags(s)
+#define RX_ACK(s, flags)    receive_ack((s), (flags))
 #define RX_DISABLE(s, mask) NX_STM32_DMA_DISABLE((s)->receive, (mask))
 #define RX_ENABLE           DMA_SxCR_EN
 #define RX_INTERRUPTS       (DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE)
-#define RX_SELECTION        (4U << DMA_SxCR_CHSEL_Pos)
-#define RX_INCREMENT        DMA_SxCR_MINC
-#define RX_PRIORITY         DMA_SxCR_PL_1
-#define RX_IRQ              DMA2_Stream2_IRQn
-#define TX_DMA_IRQ          DMA2_Stream7_IRQn
-#define UART_IRQ(s)         ((s)->uart.irq)
-#define UART_CR1(s)         ((s)->uart.registers->CR1)
-#define UART_CR3(s)         ((s)->uart.registers->CR3)
-#define UART_STATUS(s)      ((s)->uart.registers->SR)
-#define UART_DATA(s)        ((s)->uart.registers->DR)
+#define RX_SELECTION(s)                                                        \
+    ((uint32_t)rx_hardware(s)->transmit.channel << DMA_SxCR_CHSEL_Pos)
+#define RX_INCREMENT   DMA_SxCR_MINC
+#define RX_PRIORITY    DMA_SxCR_PL_1
+#define RX_IRQ(s)      (rx_hardware(s)->receive_irq)
+#define TX_DMA_IRQ(s)  (rx_hardware(s)->transmit.irq)
+#define UART_IRQ(s)    ((s)->uart.irq)
+#define UART_CR1(s)    ((s)->uart.registers->CR1)
+#define UART_CR3(s)    ((s)->uart.registers->CR3)
+#define UART_STATUS(s) ((s)->uart.registers->SR)
+#define UART_DATA(s)   ((s)->uart.registers->DR)
 #ifndef NX_STM32_UART_RECEIVE_DATA
 #define NX_STM32_UART_RECEIVE_DATA(uart) ((uart)->DR)
 #endif
@@ -77,14 +79,39 @@
 #define WAKE_VALIDATE               nx_stm32_irq_wake_validate
 #define TX_CANCEL_TC(state, status) ((void)(state), (void)(status))
 #ifdef NEXUS_STM32_MODEL
-#define RX_VECTOR_STOP() ((void)0)
+#define RX_VECTOR_STOP(s) ((void)(s))
 #else
-#define RX_VECTOR_STOP()                                                       \
+#define RX_VECTOR_STOP(s)                                                      \
     do {                                                                       \
-        NVIC_DisableIRQ(RX_IRQ);                                               \
-        NVIC_ClearPendingIRQ(RX_IRQ);                                          \
+        NVIC_DisableIRQ(RX_IRQ(s));                                            \
+        NVIC_ClearPendingIRQ(RX_IRQ(s));                                       \
     } while (0)
 #endif
+
+/** \brief IRQ identity selects readonly facts without extra instance fields. */
+static inline const nx_stm32_uart_hardware_t*
+rx_hardware(const nx_stm32_uart_receive_state_t* state) {
+    return nx_stm32_uart_hardware_for_irq(state->uart.irq);
+}
+
+/** \brief Decode only the selected stream's six hardware status bits. */
+static inline uint32_t
+receive_flags(const nx_stm32_uart_receive_state_t* state) {
+    const nx_stm32_uart_hardware_t* selected = rx_hardware(state);
+    uint32_t status = selected->receive_high ? state->resources.dma->HISR
+                                             : state->resources.dma->LISR;
+    return (status >> selected->receive_shift) & 0x3DU;
+}
+
+/** \brief W1C receives an exact register and mask, never a neighboring lane. */
+static inline void receive_ack(nx_stm32_uart_receive_state_t* state,
+                               uint32_t flags) {
+    const nx_stm32_uart_hardware_t* selected = rx_hardware(state);
+    volatile uint32_t* clear = selected->receive_high
+                                   ? &state->resources.dma->HIFCR
+                                   : &state->resources.dma->LIFCR;
+    NX_STM32_UART_RECEIVE_ACK(clear, flags << selected->receive_shift);
+}
 
 /** \brief Validate fixed cold facts before either independent constructor. */
 nx_result_t
@@ -98,12 +125,14 @@ nx_stm32_uart_receive_prepare(nx_stm32_uart_receive_state_t* state) {
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
-    if (state->uart.irq != USART1_IRQn) {
+    const nx_stm32_uart_hardware_t* selected = rx_hardware(state);
+    if (selected == NULL) {
         return NX_ERROR_UNSUPPORTED;
     }
 #ifndef NEXUS_STM32_MODEL
-    if (state->receive != DMA2_Stream2 || state->resources.dma != DMA2 ||
-        state->uart.registers != USART1) {
+    if (state->receive != selected->receive ||
+        state->resources.dma != selected->dma ||
+        state->uart.registers != selected->registers) {
         return NX_ERROR_UNSUPPORTED;
     }
 #endif
@@ -126,9 +155,9 @@ void nx_stm32_uart_receive_finish_initialize(
     state->fault = false;
     state->stopping = false;
 #ifndef NEXUS_STM32_MODEL
-    NVIC_SetPriority(RX_IRQ, 5U);
-    NVIC_ClearPendingIRQ(RX_IRQ);
-    NVIC_EnableIRQ(RX_IRQ);
+    NVIC_SetPriority(RX_IRQ(state), priority);
+    NVIC_ClearPendingIRQ(RX_IRQ(state));
+    NVIC_EnableIRQ(RX_IRQ(state));
 #endif
 }
 
@@ -137,6 +166,9 @@ nx_result_t
 nx_stm32_uart_receive_initialize(nx_stm32_uart_receive_state_t* state,
                                  uint32_t clock_hz) {
     nx_result_t result = nx_stm32_uart_receive_prepare(state);
+    if (result == NX_SUCCESS && clock_hz != rx_hardware(state)->clock_hz) {
+        return NX_ERROR_UNSUPPORTED;
+    }
     if (result == NX_SUCCESS) {
         result = nx_stm32_uart_initialize(&state->uart, clock_hz);
         if (result == NX_SUCCESS) {
@@ -255,7 +287,7 @@ static void arm(nx_stm32_uart_receive_state_t* state) {
     state->expected_bank = 0U;
     RX_COUNT(state) = (uint32_t)fill->capacity;
     RX_FIFO(state) = 0U;
-    RX_CONTROL(state) = RX_SELECTION | RX_INCREMENT | RX_PRIORITY |
+    RX_CONTROL(state) = RX_SELECTION(state) | RX_INCREMENT | RX_PRIORITY |
                         RX_INTERRUPTS | (state->continuous ? RX_DOUBLE : 0U);
     state->boundary = 0U;
     state->fault = false;
@@ -514,7 +546,7 @@ static nx_result_t irq_stop(void* context) {
     if (result == NX_SUCCESS) {
         result = nx_stm32_uart_stop(context);
         if (result == NX_SUCCESS) {
-            nx_stm32_uart_receive_vector_stop();
+            nx_stm32_uart_receive_vector_stop(state);
         }
     }
     return result;
@@ -535,12 +567,12 @@ nx_stm32_uart_receive_attach_wake(nx_stm32_uart_receive_state_t* state,
         return NX_ERROR_STATE;
     }
     GUARD_TYPE saved = GUARD_ENTER();
-    nx_result_t result = WAKE_VALIDATE(wake, RX_IRQ, syscall_ceiling);
+    nx_result_t result = WAKE_VALIDATE(wake, RX_IRQ(state), syscall_ceiling);
     if (result == NX_SUCCESS) {
         result = WAKE_VALIDATE(wake, UART_IRQ(state), syscall_ceiling);
     }
     if (result == NX_SUCCESS && duplex) {
-        result = WAKE_VALIDATE(wake, TX_DMA_IRQ, syscall_ceiling);
+        result = WAKE_VALIDATE(wake, TX_DMA_IRQ(state), syscall_ceiling);
     }
     if (result == NX_SUCCESS) {
         state->uart.wake = wake;
@@ -714,6 +746,6 @@ nx_stm32_uart_receive_tx_validate(void* context,
 }
 
 /** \brief Exact RX publisher withdrawal shared with the duplex owner. */
-void nx_stm32_uart_receive_vector_stop(void) {
-    RX_VECTOR_STOP();
+void nx_stm32_uart_receive_vector_stop(nx_stm32_uart_receive_state_t* state) {
+    RX_VECTOR_STOP(state);
 }

@@ -1,4 +1,4 @@
-"""Exact extra UARTs keep APB, vector and no-DMA admission independent."""
+"""Exact UARTs keep APB, vector and DMA resource admission independent."""
 from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 import json
@@ -27,13 +27,19 @@ class F407UartInstanceTests(unittest.TestCase):
                 with self.assertRaises(FrozenInstanceError):
                     selected.apb = 3 - apb
 
-    def test_new_tx_routes_do_not_authorize_an_unreviewed_receive_dma_path(self):
-        for controller in ("USART3", "UART4", "UART5", "USART6"):
+    def test_all_receive_routes_use_the_reviewed_stream_and_selector(self):
+        for name, engine, tx, rx, channel in (
+                ("USART1", 2, 7, 2, 4), ("USART2", 1, 6, 5, 4),
+                ("USART3", 1, 3, 1, 4), ("UART4", 1, 4, 2, 4),
+                ("UART5", 1, 7, 0, 4), ("USART6", 2, 6, 1, 5)):
             for mode in ("rx-dma-idle", "rx-dma-continuous",
                          "dma-duplex", "dma-duplex-continuous"):
-                with self.subTest(controller=controller, mode=mode):
-                    selected = hardware.maintained('stm32f4', controller)
-                    self.assertIsNone(selected.dma(mode))
+                with self.subTest(controller=name, mode=mode):
+                    routes = ((engine, rx, channel),)
+                    if mode.startswith("dma-duplex"):
+                        routes = ((engine, tx, channel),) + routes
+                    self.assertEqual(hardware.maintained('stm32f4', name).dma(mode),
+                                     routes)
 
     def test_all_six_finite_dma_transmitters_generate_their_exact_static_route(self):
         routes = (("USART1", "usart1-pa9-pa10", 2, 7, 4),
@@ -76,6 +82,54 @@ class F407UartInstanceTests(unittest.TestCase):
                             self.assertIn("nx_stm32_uart_hal_cold_prepare", source)
                             self.assertIn(f"DMA{engine}_Stream{stream}_IRQHandler", source)
                             self.assertIn(f"{stream}u, {channel}u", source)
+
+    def test_six_dma_receivers_generate_each_public_mode(self):
+        source = gate.ROOT / "tests/contracts/multi_controller_assembly"
+        cases = (("USART1", "primary-uart", 2, 7, 2, 4),
+                 ("USART2", "secondary-uart", 1, 6, 5, 4),
+                 ("USART3", "usart3", 1, 3, 1, 4),
+                 ("UART4", "uart4", 1, 4, 2, 4),
+                 ("UART5", "uart5", 1, 7, 0, 4),
+                 ("USART6", "usart6", 2, 6, 1, 5))
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            for board_name in ("stm32-ve-board", "stm32-zg-board"):
+                board = gate.load(source / board_name / "board.json")
+                (directory / "board.json").write_text(json.dumps(board))
+                for backend in ("baremetal", "freertos"):
+                    for mode in ("rx-dma-idle", "rx-dma-continuous",
+                                 "dma-duplex", "dma-duplex-continuous"):
+                        with self.subTest(board=board_name, backend=backend,
+                                          mode=mode):
+                            text = ('schema=2\nboard_package="."\nbackend=' +
+                                    json.dumps(backend) +
+                                    '\nclock="hse8-pll168"\noptimization="Os"\n'
+                                    '[memory]\nmain_stack_bytes=2048\n'
+                                    'libc_heap_bytes=0\n'
+                                    'flash_load_limit_bytes=65536\n'
+                                    'static_ram_limit_bytes=32768\n')
+                            for _, binding, *_ in cases:
+                                text += (f'[uart.{binding}]\nbinding="{binding}"\n'
+                                         f'mode="{mode}"\nbaud=115200\n'
+                                         f'[uart.{binding}.rx]\nformat="blocks"\n'
+                                         f'[uart.{binding}.irq]\npriority=5\n')
+                            assembly = directory / "assembly.toml"
+                            assembly.write_text(text)
+                            result = gate.resolve_ir(assembly)
+                            self.assertEqual(len(result.controllers), 6)
+                            generated = bindings.emit(result)[1]
+                            for name, _, engine, tx, rx, channel in cases:
+                                item = next(x for x in result.controllers
+                                            if x.controller == name)
+                                expected = [(f"DMA{engine}", rx, channel)]
+                                if mode.startswith("dma-duplex"):
+                                    expected.insert(0, (f"DMA{engine}", tx, channel))
+                                self.assertEqual(
+                                    [(x.engine, x.lane, x.request)
+                                     for x in item.integration.dma], expected)
+                                self.assertIn(f"DMA{engine}_Stream{rx}_IRQHandler",
+                                              generated)
+                            self.assertNotIn("HAL_UART", generated)
 
     def test_unreviewed_uart_name_does_not_infer_a_clock_gate(self):
         with self.assertRaisesRegex(ValueError, "Unmaintained controller"):

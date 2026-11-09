@@ -9,6 +9,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             "${hal_contract}/dma_flags_port.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hal.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"

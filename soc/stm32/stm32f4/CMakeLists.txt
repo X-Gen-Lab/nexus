@@ -43,7 +43,7 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc dac crc can usb_devic
         list(APPEND stm32_sources drivers/gpio.c)
     endif()
     if(kind STREQUAL "uart")
-        list(APPEND stm32_sources drivers/uart_cold.c drivers/lifecycle_uart.c)
+        list(APPEND stm32_sources drivers/uart_cold.c drivers/uart_hardware.c drivers/lifecycle_uart.c)
         if("irq-words" IN_LIST modes)
             list(APPEND stm32_sources drivers/uart_word.c)
         endif()

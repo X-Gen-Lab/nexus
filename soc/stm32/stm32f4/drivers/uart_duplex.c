@@ -128,7 +128,7 @@ static nx_result_t stop(void* context) {
         if (result == NX_SUCCESS) {
             result = nx_stm32_uart_stop(&state->receive.uart);
             if (result == NX_SUCCESS) {
-                nx_stm32_uart_receive_vector_stop();
+                nx_stm32_uart_receive_vector_stop(&state->receive);
             }
         }
     }

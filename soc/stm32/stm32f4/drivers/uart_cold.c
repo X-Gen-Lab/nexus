@@ -18,124 +18,17 @@
 #define NX_UART_COLD_VECTORS 4U
 #define NX_UART_COLD_OWNED   8U
 
-/** \brief Immutable reviewed pads, clocks and publishers for cold admission. */
-typedef struct {
-    USART_TypeDef* registers;
-    GPIO_TypeDef* tx_gpio;
-    GPIO_TypeDef* rx_gpio;
-    uint32_t clock_hz;
-    uint32_t gate;
-    IRQn_Type irq;
-    uint8_t tx_port;
-    uint8_t tx_pin;
-    uint8_t rx_port;
-    uint8_t rx_pin;
-    uint8_t alternate;
-    bool apb2;
-    DMA_TypeDef* dma;
-    nx_stm32_uart_tx_cold_config_t transmit;
-} nx_stm32_uart_cold_hardware_t;
-
-/* DS8626 alternate functions and RM0090 APB clocks. This readonly cold table
- * adds no per-instance state or byte-path lookup. Only listed pad pairs are
- * admitted; additional silicon alternatives need independent route review. */
-static const nx_stm32_uart_cold_hardware_t s_nx_uart_hardware[] = {
-    {USART1,
-     GPIOA,
-     GPIOA,
-     84000000U,
-     RCC_APB2ENR_USART1EN,
-     USART1_IRQn,
-     0U,
-     9U,
-     0U,
-     10U,
-     7U,
-     true,
-     DMA2,
-     {DMA2_Stream7, DMA2_Stream7_IRQn, 7U, 4U}},
-    {USART2,
-     GPIOA,
-     GPIOA,
-     42000000U,
-     RCC_APB1ENR_USART2EN,
-     USART2_IRQn,
-     0U,
-     2U,
-     0U,
-     3U,
-     7U,
-     false,
-     DMA1,
-     {DMA1_Stream6, DMA1_Stream6_IRQn, 6U, 4U}},
-    {USART3,
-     GPIOB,
-     GPIOB,
-     42000000U,
-     RCC_APB1ENR_USART3EN,
-     USART3_IRQn,
-     1U,
-     10U,
-     1U,
-     11U,
-     7U,
-     false,
-     DMA1,
-     {DMA1_Stream3, DMA1_Stream3_IRQn, 3U, 4U}},
-    {UART4,
-     GPIOA,
-     GPIOA,
-     42000000U,
-     RCC_APB1ENR_UART4EN,
-     UART4_IRQn,
-     0U,
-     0U,
-     0U,
-     1U,
-     8U,
-     false,
-     DMA1,
-     {DMA1_Stream4, DMA1_Stream4_IRQn, 4U, 4U}},
-    {UART5,
-     GPIOC,
-     GPIOD,
-     42000000U,
-     RCC_APB1ENR_UART5EN,
-     UART5_IRQn,
-     2U,
-     12U,
-     3U,
-     2U,
-     8U,
-     false,
-     DMA1,
-     {DMA1_Stream7, DMA1_Stream7_IRQn, 7U, 4U}},
-    {USART6,
-     GPIOC,
-     GPIOC,
-     84000000U,
-     RCC_APB2ENR_USART6EN,
-     USART6_IRQn,
-     2U,
-     6U,
-     2U,
-     7U,
-     8U,
-     true,
-     DMA2,
-     {DMA2_Stream6, DMA2_Stream6_IRQn, 6U, 5U}},
-};
-
 /** \brief Match one reviewed controller without authorizing an inferred bank.
  */
-static const nx_stm32_uart_cold_hardware_t*
+static const nx_stm32_uart_hardware_t*
 hardware(const nx_stm32_uart_cold_config_t* config) {
     if (config == NULL)
         return NULL;
     for (size_t i = 0U;
-         i < sizeof(s_nx_uart_hardware) / sizeof(s_nx_uart_hardware[0]); ++i) {
-        if (config->registers == s_nx_uart_hardware[i].registers)
-            return &s_nx_uart_hardware[i];
+         i < sizeof(nx_stm32_uart_hardware) / sizeof(nx_stm32_uart_hardware[0]);
+         ++i) {
+        if (config->registers == nx_stm32_uart_hardware[i].registers)
+            return &nx_stm32_uart_hardware[i];
     }
     return NULL;
 }
@@ -146,12 +39,11 @@ bool nx_stm32_uart_cold_context(void) {
 }
 
 static bool config_valid(const nx_stm32_uart_cold_config_t* config) {
-    const nx_stm32_uart_cold_hardware_t* selected = hardware(config);
+    const nx_stm32_uart_hardware_t* selected = hardware(config);
     if (config == NULL || config->pins == NULL || config->vectors == NULL ||
         config->vector_count == 0U || config->vector_count > 3U ||
         config->priority > 15U || config->baud == 0U || selected == NULL)
         return false;
-    bool primary = config->registers == USART1;
     if (config->clock_hz != selected->clock_hz ||
         config->vectors[0] != selected->irq)
         return false;
@@ -170,7 +62,7 @@ static bool config_valid(const nx_stm32_uart_cold_config_t* config) {
     for (size_t i = 0U; i < config->vector_count; ++i) {
         IRQn_Type irq = config->vectors[i];
         if (irq != config->vectors[0] && irq != selected->transmit.irq &&
-            (!primary || irq != DMA2_Stream2_IRQn))
+            irq != selected->receive_irq)
             return false;
         for (size_t j = 0U; j < i; ++j) {
             if (irq == config->vectors[j])
@@ -305,14 +197,13 @@ bool nx_stm32_uart_dma_route_valid(
         config->uart.vector_count !=
             1U + (receive ? 1U : 0U) + (transmit ? 1U : 0U))
         return false;
-    const nx_stm32_uart_cold_hardware_t* selected = hardware(&config->uart);
+    const nx_stm32_uart_hardware_t* selected = hardware(&config->uart);
     if (selected == NULL || config->uart.clock_hz != selected->clock_hz ||
         config->uart.vectors[0] != selected->irq ||
         config->resources.dma != selected->dma ||
         (!receive && config->receive != NULL) ||
-        (receive &&
-         (config->uart.registers != USART1 || config->receive != DMA2_Stream2 ||
-          config->uart.vectors[1] != DMA2_Stream2_IRQn)))
+        (receive && (config->receive != selected->receive ||
+                     config->uart.vectors[1] != selected->receive_irq)))
         return false;
     if (transmit &&
         (config->transmit.registers != selected->transmit.registers ||
@@ -331,7 +222,7 @@ bool nx_stm32_uart_cold_dma_valid(const nx_stm32_uart_dma_cold_config_t* config,
 }
 
 bool nx_stm32_uart_dma_powered(const nx_stm32_uart_dma_cold_config_t* config) {
-    const nx_stm32_uart_cold_hardware_t* selected =
+    const nx_stm32_uart_hardware_t* selected =
         config == NULL ? NULL : hardware(&config->uart);
     return selected != NULL &&
            ((selected->apb2 ? RCC->APB2ENR : RCC->APB1ENR) & selected->gate) !=

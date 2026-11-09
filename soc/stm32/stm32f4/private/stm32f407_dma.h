@@ -15,8 +15,8 @@
 /**
  * \brief           Exact caller-owned DMA TX instance; no stream allocator.
  *
- * \note            USART1 uses DMA2 stream7 channel4; USART2 uses DMA1 stream6
- *                  channel4. Clock and pin resources
+ * \note            The shared readonly UART hardware table selects reviewed
+ *                  stream/channel facts. Clock and pin resources
  *                  remain owned by the platform assembly. Buffer domains
  *                  exclude CPU-only CCM. RX uses the existing independent IRQ
  *                  ring.

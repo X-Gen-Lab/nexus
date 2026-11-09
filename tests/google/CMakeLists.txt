@@ -240,6 +240,7 @@ target_compile_definitions(nexus_irq_wake_stm32_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 
 target_sources(nexus_stm32_uart_dma_test PRIVATE
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_dma.c")
 
 target_compile_options(nexus_stm32_uart_dma_test PRIVATE
@@ -270,7 +271,8 @@ target_include_directories(nexus_stm32_spi_dma_test PRIVATE
 nexus_google_test(nexus_stm32_uart_receive_test STM32F4_LL
     SOURCES stm32_uart_receive_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_dma.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_dma.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_receive.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_duplex.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch

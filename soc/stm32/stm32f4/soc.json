@@ -726,7 +726,11 @@
       "clock_domain": "apb1",
       "modes": [
         "dma-tx",
-        "irq-byte-event"
+        "irq-byte-event",
+        "rx-dma-idle",
+        "rx-dma-continuous",
+        "dma-duplex",
+        "dma-duplex-continuous"
       ],
       "irq": [
         "USART2_IRQn"
@@ -857,7 +861,11 @@
       "clock_domain": "apb1",
       "modes": [
         "irq-byte-event",
-        "dma-tx"
+        "dma-tx",
+        "rx-dma-idle",
+        "rx-dma-continuous",
+        "dma-duplex",
+        "dma-duplex-continuous"
       ],
       "irq": [
         "USART3_IRQn"
@@ -877,7 +885,11 @@
       "clock_domain": "apb1",
       "modes": [
         "irq-byte-event",
-        "dma-tx"
+        "dma-tx",
+        "rx-dma-idle",
+        "rx-dma-continuous",
+        "dma-duplex",
+        "dma-duplex-continuous"
       ],
       "irq": [
         "UART4_IRQn"
@@ -897,7 +909,11 @@
       "clock_domain": "apb1",
       "modes": [
         "irq-byte-event",
-        "dma-tx"
+        "dma-tx",
+        "rx-dma-idle",
+        "rx-dma-continuous",
+        "dma-duplex",
+        "dma-duplex-continuous"
       ],
       "irq": [
         "UART5_IRQn"
@@ -917,7 +933,11 @@
       "clock_domain": "apb2",
       "modes": [
         "irq-byte-event",
-        "dma-tx"
+        "dma-tx",
+        "rx-dma-idle",
+        "rx-dma-continuous",
+        "dma-duplex",
+        "dma-duplex-continuous"
       ],
       "irq": [
         "USART6_IRQn"

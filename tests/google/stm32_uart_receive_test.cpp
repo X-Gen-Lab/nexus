@@ -1,9 +1,7 @@
 /**
  * \file            stm32_uart_receive_test.cpp
- * \brief           Real USART1 receive DMA loan and IDLE register contracts
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-10-11
+ * \brief           Real UART receive DMA loan, route and IDLE register
+ * contracts \author          Nexus Team \version         1.0.0 \date 2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
@@ -14,12 +12,16 @@ extern "C" {
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+GPIO_TypeDef g_nx_stm32_gpioa_model;
+
 static DMA_Stream_TypeDef* s_refuse_disable;
 static DMA_Stream_TypeDef* s_receive_engine;
 static DMA_TypeDef* s_receive_dma;
 static USART_TypeDef* s_receive_uart;
 static bool s_error_during_disable;
 static bool s_uart_error_during_disable;
+static unsigned s_receive_shift;
+static bool s_receive_high;
 
 /** \brief Keep the selected engine enabled without fabricating quiescence. */
 extern "C" void nx_stm32_dma_model_disable(void* raw, uint32_t mask) {
@@ -28,7 +30,9 @@ extern "C" void nx_stm32_dma_model_disable(void* raw, uint32_t mask) {
         mask &= ~static_cast<uint32_t>(DMA_SxCR_EN);
     }
     if (engine == s_receive_engine && s_error_during_disable) {
-        const_cast<uint32_t&>(s_receive_dma->LISR) |= 1U << 19U;
+        volatile uint32_t* flags =
+            s_receive_high ? &s_receive_dma->HISR : &s_receive_dma->LISR;
+        *flags |= 8U << s_receive_shift;
         s_error_during_disable = false;
     }
     if (engine == s_receive_engine && s_uart_error_during_disable) {
@@ -61,15 +65,24 @@ extern "C" void nx_stm32_uart_receive_model_target(void* raw, unsigned bank,
     (void)raw;
     s_hardware->Target(bank, target);
 }
-extern "C" void nx_stm32_uart_receive_model_ack(void* raw, uint32_t flags) {
-    auto* dma = static_cast<DMA_TypeDef*>(raw);
-    s_hardware->Acknowledge(flags);
+extern "C" void nx_stm32_uart_receive_model_tx_ack(volatile uint32_t* clear,
+                                                   uint32_t mask) {
+    auto* status = reinterpret_cast<volatile uint32_t*>(
+        reinterpret_cast<uintptr_t>(clear) - 2U * sizeof(uint32_t));
+    *clear = mask;
+    *status &= ~mask;
+}
+extern "C" void nx_stm32_uart_receive_model_ack(volatile uint32_t* clear,
+                                                uint32_t mask) {
+    s_hardware->Acknowledge(mask >> s_receive_shift);
+    auto* status = reinterpret_cast<volatile uint32_t*>(
+        reinterpret_cast<uintptr_t>(clear) - 2U * sizeof(uint32_t));
     if (s_error_before_ack) {
-        const_cast<uint32_t&>(dma->LISR) |= 1U << 19U;
+        *status |= 8U << s_receive_shift;
         s_error_before_ack = false;
     }
-    dma->LIFCR = flags << 16U;
-    const_cast<uint32_t&>(dma->LISR) &= ~(flags << 16U);
+    *clear = mask;
+    *status &= ~mask;
 }
 
 class Stm32UartReceive : public testing::Test {
@@ -99,6 +112,8 @@ class Stm32UartReceive : public testing::Test {
 
     void SetUp() override {
         s_hardware = &hardware;
+        s_receive_shift = 16U;
+        s_receive_high = false;
         s_error_before_ack = false;
         s_error_during_disable = false;
         s_uart_error_during_disable = false;
@@ -144,6 +159,159 @@ TEST_F(Stm32UartReceive, StartProgramsCallerBufferWithoutCpuPayloadCopy) {
     EXPECT_EQ(uart.CR1 & USART_CR1_RXNEIE, 0U);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
 }
+
+class OtherUartReceive : public Stm32UartReceive,
+                         public testing::WithParamInterface<unsigned> {
+  protected:
+    unsigned shift{};
+    bool high{};
+    void SetUp() override {
+        Stm32UartReceive::SetUp();
+        ASSERT_FALSE(HasFatalFailure());
+        uart.SR = USART_SR_TC;
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_stop(&port));
+        const IRQn_Type irqs[] = {USART2_IRQn, USART3_IRQn, UART4_IRQn,
+                                  UART5_IRQn, USART6_IRQn};
+        const unsigned shifts[] = {6U, 6U, 16U, 0U, 6U};
+        state.uart.irq = irqs[GetParam()];
+        shift = shifts[GetParam()];
+        high = GetParam() == 0U;
+        s_receive_shift = shift;
+        s_receive_high = high;
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_stm32_uart_receive_initialize(
+                      &state, GetParam() == 4U ? 84000000U : 42000000U));
+    }
+    void OpenDuplex() {
+        uart.SR = USART_SR_TC;
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_stop(&port));
+        duplex.receive = state;
+        const unsigned streams[] = {6U, 3U, 4U, 7U, 6U};
+        const IRQn_Type irqs[] = {DMA1_Stream6_IRQn, DMA1_Stream3_IRQn,
+                                  DMA1_Stream4_IRQn, DMA1_Stream7_IRQn,
+                                  DMA2_Stream6_IRQn};
+        duplex.transmit.stream = (uint8_t)streams[GetParam()];
+        duplex.transmit.channel = GetParam() == 4U ? 5U : 4U;
+        duplex.transmit.dma_irq = irqs[GetParam()];
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_stm32_uart_duplex_initialize(
+                      &duplex, GetParam() == 4U ? 84000000U : 42000000U));
+    }
+    volatile uint32_t* Flags() {
+        return high ? &dma.HISR : &dma.LISR;
+    }
+};
+
+TEST_P(OtherUartReceive, FiniteCompletionPreservesAdjacentLaneAndConsumerLoan) {
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    EXPECT_EQ(GetParam() == 4U ? 5U : 4U,
+              (receive.CR & DMA_SxCR_CHSEL) >> DMA_SxCR_CHSEL_Pos);
+    receive.NDTR = 0U;
+    const uint32_t neighbour = 0x20U << (shift == 0U ? 6U : 0U);
+    *Flags() = neighbour | (0x20U << shift);
+    nx_stm32_uart_receive_dma_irq(&state);
+    EXPECT_EQ(neighbour, *Flags());
+    nx_stream_block_t block{};
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &block));
+    EXPECT_EQ(payload[0], block.data);
+    EXPECT_EQ(sizeof(payload[0]), block.length);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_rx_stop(&port));
+    ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_rx_stop(&port));
+}
+
+TEST_P(OtherUartReceive, ContinuousCompletionReplacesOnlyTheInactiveTarget) {
+    state.continuous = true;
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    receive.CR |= DMA_SxCR_CT;
+    receive.NDTR = sizeof(payload[0]);
+    *Flags() = 0x20U << shift;
+    nx_stm32_uart_receive_dma_irq(&state);
+    nx_stream_block_t block{};
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &block));
+    EXPECT_EQ(payload[0], block.data);
+    EXPECT_EQ(address(payload[2]), receive.M0AR);
+    EXPECT_EQ(address(payload[1]), receive.M1AR);
+    EXPECT_NE(0U, receive.CR & DMA_SxCR_EN);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_rx_stop(&port));
+    ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_rx_stop(&port));
+}
+
+TEST_P(OtherUartReceive, DuplexUsesItsOwnTransmitSelectorAndBothDmaBanks) {
+    OpenDuplex();
+    ASSERT_FALSE(HasFatalFailure());
+    const nx_uart_port_t both{&nx_stm32_uart_duplex_ops, &duplex};
+    nx_uart_tx_request_t request{};
+    nx_request_initialize(&request.base);
+    ASSERT_EQ(NX_SUCCESS, nx_uart_tx_prepare(&request, payload[2], 4U, 1000U));
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&both, &request));
+    EXPECT_EQ(duplex.transmit.channel,
+              (transmit.CR & DMA_SxCR_CHSEL) >> DMA_SxCR_CHSEL_Pos);
+    transmit.CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+    transmit.NDTR = 0U;
+    const unsigned tx_shift[] = {16U, 22U, 0U, 22U, 16U};
+    auto* flags = duplex.transmit.stream < 4U ? &dma.LISR : &dma.HISR;
+    *flags = 0x20U << tx_shift[GetParam()];
+    nx_stm32_uart_duplex_dma_irq(&duplex);
+    nx_uart_port_service(&both);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
+    uart.SR = USART_SR_TC;
+    nx_stm32_uart_duplex_irq(&duplex);
+    nx_uart_port_service(&both);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_SUCCESS, request.base.result);
+    EXPECT_EQ(4U, request.base.transferred);
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_stop(&both));
+}
+
+TEST_P(OtherUartReceive, ErrorRetainsTheBorrowUntilItsOwnEngineReallyStops) {
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    receive.NDTR = 3U;
+    s_refuse_disable = &receive;
+    const uint32_t neighbour = 0x20U << (shift == 0U ? 6U : 0U);
+    *Flags() = neighbour | (8U << shift);
+    nx_stm32_uart_receive_dma_irq(&state);
+    EXPECT_EQ(1U, stream.outstanding);
+    EXPECT_EQ(NX_STREAM_SLOT_FILLING, slots[0].state);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_rx_stop(&port));
+    s_refuse_disable = nullptr;
+    nx_uart_port_service(&port);
+    EXPECT_EQ(0U, stream.outstanding);
+    EXPECT_EQ(NX_STREAM_SLOT_FREE, slots[0].state);
+    EXPECT_EQ(1U, stream.losses);
+    EXPECT_EQ(neighbour, *Flags());
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_rx_stop(&port));
+}
+
+TEST_P(OtherUartReceive, DuplexCancelWaitsForDrainWithoutClearingReceiveFacts) {
+    OpenDuplex();
+    ASSERT_FALSE(HasFatalFailure());
+    const nx_uart_port_t both{&nx_stm32_uart_duplex_ops, &duplex};
+    nx_uart_tx_request_t request{};
+    nx_request_initialize(&request.base);
+    ASSERT_EQ(NX_SUCCESS, nx_uart_tx_prepare(&request, payload[2], 4U, 1000U));
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&both, &request));
+    *Flags() = 0x20U << shift;
+    s_refuse_disable = &transmit;
+    uart.SR = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_cancel(&both, &request));
+    nx_uart_port_service(&both);
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(0x20U << shift, *Flags());
+    s_refuse_disable = nullptr;
+    transmit.CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+    uart.SR = USART_SR_TC;
+    nx_stm32_uart_duplex_irq(&duplex);
+    nx_uart_port_service(&both);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(0x20U << shift, *Flags());
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_stop(&both));
+}
+
+INSTANTIATE_TEST_SUITE_P(AdditionalF407Uarts, OtherUartReceive,
+                         testing::Values(0U, 1U, 2U, 3U, 4U));
 
 TEST_F(Stm32UartReceive,
        CompactReceiveStateKeepsIrqTxWithoutOwningTheTxDmaLane) {

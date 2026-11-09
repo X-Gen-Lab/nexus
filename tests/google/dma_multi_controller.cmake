@@ -16,6 +16,9 @@ foreach(dma_multi_kind uart spi)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c")
         target_include_directories(${dma_multi_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/io/private")
+    else()
+        target_sources(${dma_multi_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c")
     endif()
     target_compile_options(${dma_multi_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/${dma_multi_kind}_multi_controller_model.h")

@@ -8,6 +8,7 @@
 
 #include "stm32f407_platform_cold.h"
 #include "stm32f407_stream.h"
+#include "stm32f407_uart_hardware.h"
 #include "stm32f407_uart_receive.h"
 #include "stm32f407_uart_word.h"
 #include <string.h>
@@ -32,14 +33,6 @@ typedef struct {
     bool kernel_bound;
     bool preload_tx;
 } nx_stm32_uart_cold_config_t;
-
-/** \brief Static DMA transmit route; completion facts remain in the owner. */
-typedef struct {
-    DMA_Stream_TypeDef* registers;
-    IRQn_Type irq;
-    uint8_t stream;
-    uint8_t channel;
-} nx_stm32_uart_tx_cold_config_t;
 
 /** \brief Selected DMA data, independent of request and producer storage. */
 typedef struct {

@@ -18,6 +18,7 @@ foreach(cold_uart_mode irq irq-words irq-blocks dma-tx rx-dma-idle
     nexus_google_configuration_inputs("${cold_uart_bundle}")
     set(cold_uart_sources
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
@@ -108,6 +109,7 @@ nexus_google_configuration_inputs("${qiming_uart_bundle}")
 nexus_google_test(nexus_stm32_qiming_multi_uart_cold_factory_test STM32F4_LL
     SOURCES stm32_uart_cold_factory_test.cpp "${qiming_uart_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"

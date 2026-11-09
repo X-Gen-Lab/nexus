@@ -110,7 +110,7 @@ nx_stm32_uart_receive_attach_wake(nx_stm32_uart_receive_state_t* state,
                                   bool duplex);
 bool nx_stm32_uart_receive_irq_facts(nx_stm32_uart_receive_state_t* state,
                                      uint32_t status);
-void nx_stm32_uart_receive_vector_stop(void);
+void nx_stm32_uart_receive_vector_stop(nx_stm32_uart_receive_state_t* state);
 
 #ifdef __cplusplus
 }

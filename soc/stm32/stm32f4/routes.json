@@ -610,12 +610,32 @@
       ],
       "modes": [
         "dma-tx",
-        "irq-byte-event"
+        "irq-byte-event",
+        "rx-dma-idle",
+        "rx-dma-continuous",
+        "dma-duplex",
+        "dma-duplex-continuous"
       ],
-      "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK",
+      "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK; RX and duplex routes: RM0090 Rev22 Tables43/44, selected fixed streams only",
       "dma": [
         "DMA1:stream6:channel4"
-      ]
+      ],
+      "mode_dma": {
+        "rx-dma-idle": [
+          "DMA1:stream5:channel4"
+        ],
+        "rx-dma-continuous": [
+          "DMA1:stream5:channel4"
+        ],
+        "dma-duplex": [
+          "DMA1:stream6:channel4",
+          "DMA1:stream5:channel4"
+        ],
+        "dma-duplex-continuous": [
+          "DMA1:stream6:channel4",
+          "DMA1:stream5:channel4"
+        ]
+      }
     },
     {
       "id": "spi2-pb13-pb14-pb15",
@@ -1225,12 +1245,30 @@
       ],
       "modes": [
         "irq-byte-event",
-        "dma-tx"
+        "dma-tx",
+        "rx-dma-idle",
+        "rx-dma-continuous",
+        "dma-duplex",
+        "dma-duplex-continuous"
       ],
-      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification.; finite TX route verified against RM0090 Rev22 Tables43/44 and the locked ST HAL; no receive-DMA qualification; DS8626 Rev12 Table9 and bonded LQFP100/LQFP144 pads",
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification.; finite TX route verified against RM0090 Rev22 Tables43/44 and the locked ST HAL; DS8626 Rev12 Table9 and bonded LQFP100/LQFP144 pads; RX and duplex routes: RM0090 Rev22 Tables43/44, selected fixed streams only",
       "mode_dma": {
         "dma-tx": [
           "DMA1:stream3:channel4"
+        ],
+        "rx-dma-idle": [
+          "DMA1:stream1:channel4"
+        ],
+        "rx-dma-continuous": [
+          "DMA1:stream1:channel4"
+        ],
+        "dma-duplex": [
+          "DMA1:stream3:channel4",
+          "DMA1:stream1:channel4"
+        ],
+        "dma-duplex-continuous": [
+          "DMA1:stream3:channel4",
+          "DMA1:stream1:channel4"
         ]
       }
     },
@@ -1256,12 +1294,30 @@
       ],
       "modes": [
         "irq-byte-event",
-        "dma-tx"
+        "dma-tx",
+        "rx-dma-idle",
+        "rx-dma-continuous",
+        "dma-duplex",
+        "dma-duplex-continuous"
       ],
-      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification.; finite TX route verified against RM0090 Rev22 Tables43/44 and the locked ST HAL; no receive-DMA qualification; DS8626 Rev12 Table9 and bonded LQFP100/LQFP144 pads",
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification.; finite TX route verified against RM0090 Rev22 Tables43/44 and the locked ST HAL; DS8626 Rev12 Table9 and bonded LQFP100/LQFP144 pads; RX and duplex routes: RM0090 Rev22 Tables43/44, selected fixed streams only",
       "mode_dma": {
         "dma-tx": [
           "DMA1:stream4:channel4"
+        ],
+        "rx-dma-idle": [
+          "DMA1:stream2:channel4"
+        ],
+        "rx-dma-continuous": [
+          "DMA1:stream2:channel4"
+        ],
+        "dma-duplex": [
+          "DMA1:stream4:channel4",
+          "DMA1:stream2:channel4"
+        ],
+        "dma-duplex-continuous": [
+          "DMA1:stream4:channel4",
+          "DMA1:stream2:channel4"
         ]
       }
     },
@@ -1287,12 +1343,30 @@
       ],
       "modes": [
         "irq-byte-event",
-        "dma-tx"
+        "dma-tx",
+        "rx-dma-idle",
+        "rx-dma-continuous",
+        "dma-duplex",
+        "dma-duplex-continuous"
       ],
-      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification.; finite TX route verified against RM0090 Rev22 Tables43/44 and the locked ST HAL; no receive-DMA qualification; DS8626 Rev12 Table9 and bonded LQFP100/LQFP144 pads",
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification.; finite TX route verified against RM0090 Rev22 Tables43/44 and the locked ST HAL; DS8626 Rev12 Table9 and bonded LQFP100/LQFP144 pads; RX and duplex routes: RM0090 Rev22 Tables43/44, selected fixed streams only",
       "mode_dma": {
         "dma-tx": [
           "DMA1:stream7:channel4"
+        ],
+        "rx-dma-idle": [
+          "DMA1:stream0:channel4"
+        ],
+        "rx-dma-continuous": [
+          "DMA1:stream0:channel4"
+        ],
+        "dma-duplex": [
+          "DMA1:stream7:channel4",
+          "DMA1:stream0:channel4"
+        ],
+        "dma-duplex-continuous": [
+          "DMA1:stream7:channel4",
+          "DMA1:stream0:channel4"
         ]
       }
     },
@@ -1318,12 +1392,30 @@
       ],
       "modes": [
         "irq-byte-event",
-        "dma-tx"
+        "dma-tx",
+        "rx-dma-idle",
+        "rx-dma-continuous",
+        "dma-duplex",
+        "dma-duplex-continuous"
       ],
-      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification.; finite TX route verified against RM0090 Rev22 Tables43/44 and the locked ST HAL; no receive-DMA qualification; DS8626 Rev12 Table9 and bonded LQFP100/LQFP144 pads",
+      "source": "STM32F405xx/STM32F407xx DS8626 LQFP144 alternate functions; RM0090 USART/UART and selected official STM32F407xx CMSIS vectors. Uploaded core and V4.1 UART nets only; no physical connector or waveform qualification.; finite TX route verified against RM0090 Rev22 Tables43/44 and the locked ST HAL; DS8626 Rev12 Table9 and bonded LQFP100/LQFP144 pads; RX and duplex routes: RM0090 Rev22 Tables43/44, selected fixed streams only",
       "mode_dma": {
         "dma-tx": [
           "DMA2:stream6:channel5"
+        ],
+        "rx-dma-idle": [
+          "DMA2:stream1:channel5"
+        ],
+        "rx-dma-continuous": [
+          "DMA2:stream1:channel5"
+        ],
+        "dma-duplex": [
+          "DMA2:stream6:channel5",
+          "DMA2:stream1:channel5"
+        ],
+        "dma-duplex-continuous": [
+          "DMA2:stream6:channel5",
+          "DMA2:stream1:channel5"
         ]
       }
     },

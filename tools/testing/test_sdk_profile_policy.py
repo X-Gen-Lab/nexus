@@ -145,6 +145,15 @@ class SDKProfilePolicyTests(unittest.TestCase):
                     sdk, source, build, profile, execute)
             self.assertEqual(calls, [])
 
+    def test_uart_hardware_facts_are_required_for_both_sdk_backends(self):
+        expected = {'soc/stm32/stm32f4/drivers/uart_hardware.c',
+                    'soc/stm32/stm32f4/private/stm32f407_uart_hardware.h'}
+        for backend in ('baremetal', 'freertos'):
+            with self.subTest(backend=backend):
+                profile = self.packager.source_profile(backend=backend)
+                self.assertLessEqual(expected, set(
+                    self.packager.required_files(ROOT, profile)))
+
     def test_mcuboot_all_eighty_locked_sources_are_required(self):
         lock = json.loads((ROOT / 'dependencies/mcuboot.lock.json').read_text())
         self.assertEqual(len(lock['files']), 80)

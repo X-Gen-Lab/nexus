@@ -14,6 +14,7 @@ nexus_google_configuration_inputs("${qiming_rs485_bundle}")
 nexus_google_test(nexus_qiming_rs485_factory_test STM32F4_LL
     SOURCES qiming_rs485_factory_test.cpp "${qiming_rs485_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"

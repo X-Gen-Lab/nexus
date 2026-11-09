@@ -13,6 +13,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_dma.h"
+#include "stm32f407_uart_hardware.h"
 #include "stm32f4xx_ll_usart.h"
 
 #ifndef NX_STM32_DMA_DISABLE
@@ -22,19 +23,26 @@
 #define NX_STM32_UART_DMA_ACK(clear, mask) (*(clear) = (uint32_t)(mask))
 #endif
 
-/** \brief Read the exact selected high status bank. */
+/** \brief Each bank contains stream pairs at shifts 0/6 and 16/22. */
+static inline unsigned shift(uint8_t stream) {
+    return ((stream & 2U) != 0U ? 16U : 0U) + ((stream & 1U) != 0U ? 6U : 0U);
+}
+
+/** \brief Read only the selected transmit lane from its actual status bank. */
 static uint32_t flags(const nx_stm32_uart_dma_resources_t* resources,
                       nx_stm32_uart_tx_dma_extension_t* transmit) {
-    return (resources->dma->HISR >> (transmit->stream == 7U ? 22U : 16U)) &
-           0x3DU;
+    uint32_t status =
+        transmit->stream < 4U ? resources->dma->LISR : resources->dma->HISR;
+    return (status >> shift(transmit->stream)) & 0x3DU;
 }
 
 /** \brief Acknowledge this TX source only. */
 static void acknowledge_bits(const nx_stm32_uart_dma_resources_t* resources,
                              nx_stm32_uart_tx_dma_extension_t* transmit,
                              uint32_t observed) {
-    NX_STM32_UART_DMA_ACK(&resources->dma->HIFCR,
-                          observed << (transmit->stream == 7U ? 22U : 16U));
+    volatile uint32_t* clear =
+        transmit->stream < 4U ? &resources->dma->LIFCR : &resources->dma->HIFCR;
+    NX_STM32_UART_DMA_ACK(clear, observed << shift(transmit->stream));
 #ifndef NEXUS_STM32_MODEL
     NVIC_ClearPendingIRQ(transmit->dma_irq);
 #endif
@@ -72,18 +80,18 @@ nx_result_t nx_stm32_uart_dma_initialize_parts(
     if (uart->profile == NX_UART_RX_BLOCKS && !blocks) {
         return NX_ERROR_UNSUPPORTED;
     }
-    bool primary = uart->irq == USART1_IRQn;
-    if ((!primary && uart->irq != USART2_IRQn) || transmit->channel != 4U ||
-        transmit->stream != (primary ? 7U : 6U) ||
-        transmit->dma_irq !=
-            (primary ? DMA2_Stream7_IRQn : DMA1_Stream6_IRQn) ||
-        clock_hz != (primary ? 84000000U : 42000000U)) {
+    const nx_stm32_uart_hardware_t* selected =
+        nx_stm32_uart_hardware_for_irq(uart->irq);
+    if (selected == NULL || transmit->channel != selected->transmit.channel ||
+        transmit->stream != selected->transmit.stream ||
+        transmit->dma_irq != selected->transmit.irq ||
+        clock_hz != selected->clock_hz) {
         return NX_ERROR_UNSUPPORTED;
     }
 #ifndef NEXUS_STM32_MODEL
-    if (resources->dma != (primary ? DMA2 : DMA1) ||
-        transmit->tx != (primary ? DMA2_Stream7 : DMA1_Stream6) ||
-        uart->registers != (primary ? USART1 : USART2)) {
+    if (resources->dma != selected->dma ||
+        transmit->tx != selected->transmit.registers ||
+        uart->registers != selected->registers) {
         return NX_ERROR_UNSUPPORTED;
     }
 #endif
