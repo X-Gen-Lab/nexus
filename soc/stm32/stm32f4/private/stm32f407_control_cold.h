@@ -416,6 +416,22 @@ static inline nx_result_t nx_stm32_adc_close(nx_stm32_adc_state_t* port) {
     return nx_stm32_adc_cold_finish(port);
 }
 
+/** \brief Admit one to four ranks before acquiring the common ADC owner. */
+static inline nx_result_t
+nx_stm32_adc_injected_prepare(nx_stm32_adc_state_t* port,
+                              const nx_stm32_adc_config_t* config) {
+    if (config == NULL || config->channel_count == 0U ||
+        config->channel_count > 4U)
+        return NX_ERROR_INVALID;
+    return nx_stm32_adc_prepare(port, config);
+}
+
+/** \brief The same converter and analog-path owner performs final release. */
+static inline nx_result_t
+nx_stm32_adc_injected_close(nx_stm32_adc_state_t* port) {
+    return nx_stm32_adc_close(port);
+}
+
 /** \brief Bind exact stream resources; no block is borrowed during preparation.
  */
 static inline nx_result_t

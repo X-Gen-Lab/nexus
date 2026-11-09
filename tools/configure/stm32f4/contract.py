@@ -123,6 +123,7 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('uart', 'dma-duplex-continuous'): 'uart_duplex',
     ('spi', 'dma'): 'spi_dma',
     ('adc', 'single-shot'): 'adc',
+    ('adc', 'injected-shot'): 'adc_injected',
     ('adc', 'trigger-dma'): 'adc_stream',
     ('adc', 'trigger-dma-continuous'): 'adc_continuous',
 })
@@ -166,6 +167,8 @@ def validate_selection(selection, route):
         common.integer(selection.get("max_hz", 1000000), *LIMITS["spi_hz"],
                        "SPI max_hz")
     if kind == "adc":
+        if selection['mode'] == 'injected-shot' and len(selection['channels']) > 4:
+            common.fail('Injected ADC requires at most four ranks')
         internal = ADC_INTERNAL_CHANNELS.get(route["controller"], ())
         if any(channel in internal and sample != 7 for channel, sample in
                zip(selection["channels"], selection["sample_times"])):

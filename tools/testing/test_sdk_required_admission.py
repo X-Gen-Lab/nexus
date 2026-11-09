@@ -100,6 +100,7 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
             "soc/stm32/stm32f4/drivers/rtc.c",
             "soc/stm32/stm32f4/drivers/sdio.c",
             "soc/stm32/stm32f4/drivers/encoder.c",
+            "soc/stm32/stm32f4/drivers/adc_injected.c",
             "soc/stm32/stm32f4/private/stm32f4_encoder.h",
             "soc/stm32/stm32f4/private/stm32f407_timer_hardware.h",
             "tools/configure/stm32f4/encoder.py",

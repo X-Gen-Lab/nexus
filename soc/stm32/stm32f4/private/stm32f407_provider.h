@@ -389,6 +389,7 @@ nx_result_t nx_stm32_pwm_start(void* context);
 nx_result_t nx_stm32_pwm_stop(void* context);
 nx_result_t nx_stm32_pwm_state(const void* context, nx_pwm_state_t* state);
 extern const nx_adc_ops_t nx_stm32_adc_ops;
+extern const nx_adc_ops_t nx_stm32_adc_injected_ops;
 nx_result_t nx_stm32_adc_info(const void* context, nx_adc_info_t* info);
 nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
                                 size_t capacity, nx_time_us_t deadline,

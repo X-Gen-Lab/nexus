@@ -530,7 +530,8 @@
         "single-shot",
         "low-rate-scan",
         "trigger-dma",
-        "trigger-dma-continuous"
+        "trigger-dma-continuous",
+        "injected-shot"
       ],
       "irq": [],
       "pins": [
@@ -1178,7 +1179,8 @@
         "single-shot",
         "low-rate-scan",
         "trigger-dma",
-        "trigger-dma-continuous"
+        "trigger-dma-continuous",
+        "injected-shot"
       ],
       "irq": [],
       "pins": [
@@ -1206,7 +1208,8 @@
         "single-shot",
         "low-rate-scan",
         "trigger-dma",
-        "trigger-dma-continuous"
+        "trigger-dma-continuous",
+        "injected-shot"
       ],
       "irq": [],
       "pins": [

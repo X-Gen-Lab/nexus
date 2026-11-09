@@ -315,7 +315,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             definitions += ["    },", f"    .regions = s_nx_dma_regions_{name},",
                             f"    .region_count = {count}u, .priority = {item.options.irq.priority}u"]
         definitions += ["};"]
-        selected = "adc_continuous" if traits.continuous else "adc_stream" if dma else "adc"
+        selected = ("adc_continuous" if traits.continuous else "adc_stream" if dma
+                    else "adc_injected" if item.mode == "injected-shot" else "adc")
         initialize = DirectCall(f"nx_stm32_{selected}_prepare", (state, Address(config)))
         stop = DirectCall(f"nx_stm32_{selected}_close", (state,))
         if dma:
@@ -328,7 +329,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         raise ValueError(f"No maintained STM32 constructor for {kind}")
     from .contract import mode_implementation
     return Construction(
-        state_type=f"nx_stm32_{mode_implementation(item.kind, item.mode)}_state_t",
+        state_type=("nx_stm32_adc_state_t" if kind == "adc" and not traits.dma else
+                    f"nx_stm32_{mode_implementation(item.kind, item.mode)}_state_t"),
         definitions=definitions, initialize=initialize,
         stop=[stop], retain_on_failed_init=True)
 

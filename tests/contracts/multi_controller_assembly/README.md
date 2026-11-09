@@ -79,3 +79,8 @@ TIM3／4／5 的原始正交计数，分别使用 x2 TI1／x2 TI2／x4 TI12。�
 显式授权，各 timer 与自己的 PWM／capture personality 互斥。平台只 prepare，
 不隐式 start；原始回卷、filter code 和软件观察时间不替代产品的累计位置／速度策略，
 不建立物理传感器资格。
+
+`stm32-ve-adc-injected-baremetal.toml` 与 `stm32-zg-adc-injected-freertos.toml` 选择
+三个独立 ADC 的软件注入组，覆盖内部输入、重复 rank 和非默认分辨率。重复采样不隐式
+平均；ZG 的 TIM3 PWM 独立运行，不声称与注入采样相位对齐。全部数据为 raw count，
+由已有静态 factory 与同一 ADC state／config 连接，不引入额外实例存储或任务。

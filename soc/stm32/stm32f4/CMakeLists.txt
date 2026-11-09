@@ -95,6 +95,9 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm encoder adc dac crc can u
             list(APPEND stm32_sources drivers/dac_dma.c)
         endif()
     elseif(kind STREQUAL "adc")
+        if("injected-shot" IN_LIST modes)
+            list(APPEND stm32_sources drivers/adc_injected.c)
+        endif()
         if("trigger-dma" IN_LIST modes
             OR "trigger-dma-continuous" IN_LIST modes)
             list(APPEND stm32_sources drivers/adc_stream.c)

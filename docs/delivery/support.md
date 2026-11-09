@@ -41,7 +41,7 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 | UART | IRQ byte/event、word 与明确 block／DMA 模式分别选择；有限 TX、有限 RX、连续 RX 和双向模式不自动互相授权 |
 | SPI／I2C | SPI1／2／3 polling、普通与增强 DMA 事务；I2C1／2／3 polling／IRQ／DMA；显式 endpoint 与受审路线 |
 | PWM | TIM3／TIM5 的 CH1–4 中各显式选择一路；固定 84 MHz timer clock 与 PSC／ARR；TIM3 周期 1–65535，TIM5 周期 1–4294967295；无隐式共享时基 |
-| ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；独立 shot／scan 最多 16 ranks，三个转换器均有独占 TIM3 的有限／连续 DMA |
+| ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；普通 shot／scan 最多 16 ranks、软件注入组最多 4 ranks；三个转换器均有独占 TIM3 的有限／连续 DMA |
 | Encoder | TIM3／4／5 独占 TI1／TI2 原始正交计数；x2 TI1、x2 TI2、x4 TI12，独立输入反相与 4-bit filter；无 IRQ／DMA／累计位置策略 |
 | DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码 |
 | Flash／IWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
@@ -67,11 +67,11 @@ ADC1／2 通道对应 PA0--7、PB0--1、PC0--5。ADC3 在 VE 开放 PA0--3 的�
 和 PC0--3 的通道 10--13；ZG 另有 PF6--10 的通道 4--8、PF3 的通道 9 和
 PF4／5 的通道 14／15。序列可以重新排序或重复同一输入，最多 16 ranks，重复
 输入的 sample time 必须一致；每个使用的引脚都须有明确 Board route。
-注入组和同步多 ADC 模式尚未接入。16-rank 与三独立实例参考装配见
+同步多 ADC 模式尚未接入。16-rank 与三独立实例参考装配见
 `tests/contracts/adc_external_assembly/`，不授予真实 PCB 或物理采样资格。
 
 ADC1 的内部通道 16／17／18 分别返回温度、VREFINT、VBAT／2 的原始计数。
-`adc1-internal` route 不取得 GPIO；四种现有采样模式共用静态序列，内部输入固定选择
+`adc1-internal` route 不取得 GPIO；现有采样模式共用静态序列，内部输入固定选择
 `sample_times=7` 的 480-cycle acquisition。温度、电压换算和校准由应用负责，
 `reference_mv` 仍是名义值。冷态拒绝接管已启用的所需模拟路径，仅撤回本次取得的
 TSVREFE／VBATE；失败保留 clock 与清理责任。1 MHz 时间域的启动等待包含取整裕量：
@@ -81,6 +81,13 @@ TSVREFE／VBATE；失败保留 clock 与清理责任。1 MHz 时间域的启动�
 三个 ADC 的 `resolution_bits` 均可选择 6／8／10／12，默认 12。各转换器的 poll、
 有限和连续 DMA 共用该静态选择，转换周期与触发速率准入随之变化。DMA 仍使用
 halfword，样本仍是右对齐的 `uint16_t` 原始计数；分辨率选择不建立模拟精度或实际吞吐资格。
+
+`injected-shot` 独占所选 ADC，以一次 JSWSTART 执行 1–4 ranks，顺序读取 JDR1–4。
+保留 6／8／10／12-bit 原始计数，offset 固定为零；全部采样和停止成功后才发布
+samples／count，超时或停止失败保持 count=0，失败清理责任仍由实例保留。
+不提供同一 ADC 的 regular／DMA 联合、自动注入或外部触发，不建立额外实例状态。
+软件参考 `tests/contracts/multi_controller_assembly/*adc-injected*.toml` 同时选择
+三个转换器；ZG 还选择独立 TIM3 PWM，二者没有相位同步关系。
 
 共享 ADCCLK 固定为 PCLK2／4，即 21 MHz。冷态改分频前先取得数字接口观察责任，
 确认所有 ADC 已关闭，再撤回本次临时 gate；匹配分频时不写 CCR。准备与其他 ADC

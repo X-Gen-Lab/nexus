@@ -29,6 +29,13 @@ class F407AdcChannelTests(unittest.TestCase):
         contract.validate_selection(selected, route)
         self.assertEqual([], adc.selected_route(selected, route, contract)['pins'])
 
+    def test_injected_groups_reject_more_than_four_ranks(self):
+        selected, route = self.selection(self.PINS[:5], list(range(5)),
+                                         mode='injected-shot')
+        adc.validate_selection(selected, route, contract)
+        with self.assertRaisesRegex(ValueError, 'four ranks'):
+            contract.validate_selection(selected, route)
+
     def test_internal_sources_reject_other_converters_and_short_acquisition(self):
         for controller, sample in (("ADC1", 6), ("ADC2", 7), ("ADC3", 7)):
             with self.subTest(controller=controller, sample=sample):
@@ -47,7 +54,7 @@ class F407AdcChannelTests(unittest.TestCase):
             (directory / 'board').mkdir()
             (directory / 'board/board.json').write_text(json.dumps(board))
             for mode in ('single-shot', 'low-rate-scan', 'trigger-dma',
-                         'trigger-dma-continuous'):
+                         'trigger-dma-continuous', 'injected-shot'):
                 with self.subTest(mode=mode):
                     channels = [17] if mode == 'single-shot' else [16, 17, 18]
                     text = ('schema=2\nboard_package="board"\nbackend="baremetal"\n'

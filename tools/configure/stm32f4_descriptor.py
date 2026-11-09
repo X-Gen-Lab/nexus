@@ -15,6 +15,7 @@ DESCRIPTOR = FamilyDescriptor(
     ),
     references="references.json",
     owned_payload=(
+        "soc/stm32/stm32f4/drivers/adc_injected.c",
         "soc/stm32/stm32f4/drivers/encoder.c",
         "soc/stm32/stm32f4/private/stm32f4_encoder.h",
         "soc/stm32/stm32f4/private/stm32f407_timer_hardware.h",

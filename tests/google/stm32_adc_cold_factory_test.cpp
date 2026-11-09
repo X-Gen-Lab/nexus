@@ -39,6 +39,9 @@ bool fractional_clock;
 uint64_t clock_ns;
 uint64_t enabled_ns;
 uint64_t conversion_ns;
+bool injected_complete;
+unsigned injected_launches;
+uint32_t injected_sequence;
 #endif
 constexpr uint32_t original_ahb1 = RCC_AHB1ENR_GPIODEN;
 
@@ -69,6 +72,9 @@ class AdcColdFactory : public testing::Test {
 #if defined(NX_ADC_INTERNAL_CONTRACT)
         fractional_clock = false;
         clock_ns = enabled_ns = conversion_ns = 0U;
+        injected_complete = true;
+        injected_launches = 0U;
+        injected_sequence = 0U;
 #endif
         RCC->AHB1ENR = original_ahb1;
     }
@@ -211,6 +217,124 @@ TEST_F(AdcColdFactory,
         EXPECT_EQ(0U, ADC->CCR);
         EXPECT_EQ(0U, state.cold_effects);
     }
+}
+
+TEST_F(AdcColdFactory, InjectedGroupsUseEveryRankAndEachConverterJdr) {
+    const uint8_t channels[]{3U, 2U, 1U, 0U};
+    const uint8_t timings[]{7U, 6U, 5U, 4U};
+    for (auto* adc : {ADC1, ADC2, ADC3}) {
+        for (size_t ranks = 1U; ranks <= 4U; ++ranks) {
+            nx_stm32_adc_state_t state{};
+            const nx_stm32_adc_config_t config{channels,
+                                               timings,
+                                               ranks,
+                                               3300U,
+                                               static_cast<uint8_t>(ranks - 1U),
+                                               adc};
+            ASSERT_EQ(NX_SUCCESS,
+                      nx_stm32_adc_injected_prepare(&state, &config));
+            const nx_adc_port_t face{&nx_stm32_adc_injected_ops, &state};
+            uint16_t samples[4]{};
+            size_t count = 0U;
+            injected_launches = 0U;
+            adc->JOFR1 = adc->JOFR2 = adc->JOFR3 = adc->JOFR4 = 7U;
+            ASSERT_EQ(NX_SUCCESS, nx_adc_port_sample(&face, samples, 4U,
+                                                     now + 200U, &count));
+            EXPECT_EQ(ranks, count);
+            EXPECT_EQ(1U, injected_launches);
+            uint32_t expected = static_cast<uint32_t>(ranks - 1U) << 20U;
+            for (size_t i = 0U; i < ranks; ++i) {
+                expected |= static_cast<uint32_t>(channels[i])
+                            << ((i + 4U - ranks) * 5U);
+                const unsigned bits =
+                    12U - 2U * static_cast<unsigned>(ranks - 1U);
+                EXPECT_EQ((321U + i * 111U) & ((1U << bits) - 1U), samples[i]);
+            }
+            EXPECT_EQ(expected, injected_sequence);
+            EXPECT_EQ(ranks - 1U, (adc->CR1 & ADC_CR1_RES) >> ADC_CR1_RES_Pos);
+            EXPECT_EQ(0U, adc->JOFR1);
+            if (ranks >= 2U) {
+                EXPECT_EQ(0U, adc->JOFR2);
+            }
+            if (ranks >= 3U) {
+                EXPECT_EQ(0U, adc->JOFR3);
+            }
+            if (ranks >= 4U) {
+                EXPECT_EQ(0U, adc->JOFR4);
+            }
+            EXPECT_EQ(0U, adc->SQR1 | adc->SQR2 | adc->SQR3);
+            EXPECT_EQ(0U, adc->CR2);
+            ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_injected_close(&state));
+        }
+    }
+}
+
+TEST_F(AdcColdFactory, InjectedInternalRanksUseAnalogLeaseAndStartupMargin) {
+    const uint8_t channels[]{16U, 17U, 18U};
+    const uint8_t timings[]{7U, 7U, 7U};
+    const nx_stm32_adc_config_t config{channels, timings, 3U, 3300U, 0U, ADC1};
+    nx_stm32_adc_state_t state{};
+    fractional_clock = true;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_injected_prepare(&state, &config));
+    const nx_adc_port_t face{&nx_stm32_adc_injected_ops, &state};
+    uint16_t samples[3]{};
+    size_t count = 0U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_adc_port_sample(&face, samples, 3U, now + 100U, &count));
+    EXPECT_EQ(1U, injected_launches);
+    EXPECT_GE(conversion_ns - enabled_ns, 10000U);
+    EXPECT_EQ(321U, samples[0]);
+    EXPECT_EQ(432U, samples[1]);
+    EXPECT_EQ(543U, samples[2]);
+    EXPECT_EQ(0U, GPIOA->MODER | GPIOB->MODER | GPIOC->MODER);
+    EXPECT_NE(0U, ADC->CCR & ADC_CCR_TSVREFE);
+    EXPECT_NE(0U, ADC->CCR & ADC_CCR_VBATE);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_injected_close(&state));
+    EXPECT_EQ(0U, ADC->CCR & (ADC_CCR_TSVREFE | ADC_CCR_VBATE));
+}
+
+TEST_F(AdcColdFactory, InjectedOversizeRejectsBeforeClockOrControllerEffects) {
+    const uint8_t channels[]{0U, 1U, 2U, 3U, 4U};
+    const uint8_t timings[]{7U, 7U, 7U, 7U, 7U};
+    const nx_stm32_adc_config_t config{channels, timings, 5U, 3300U, 0U, ADC1};
+    nx_stm32_adc_state_t state{};
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_adc_injected_prepare(&state, &config));
+    EXPECT_EQ(0U, RCC->APB2ENR);
+    EXPECT_EQ(0U, state.cold_effects);
+    EXPECT_EQ(0U, GPIOA->MODER);
+    if (state.cold_effects != 0U) {
+        EXPECT_EQ(NX_SUCCESS, nx_stm32_adc_injected_close(&state));
+    }
+}
+
+TEST_F(AdcColdFactory, InjectedTimeoutAndRefusedPowerdownKeepCleanupOnly) {
+    const uint8_t channels[]{0U, 1U};
+    const uint8_t timings[]{7U, 7U};
+    const nx_stm32_adc_config_t config{channels, timings, 2U, 3300U, 0U, ADC1};
+    nx_stm32_adc_state_t state{};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_injected_prepare(&state, &config));
+    const nx_adc_port_t face{&nx_stm32_adc_injected_ops, &state};
+    uint16_t samples[]{0xa5a5U, 0x5a5aU};
+    size_t count = 0U;
+    injected_complete = false;
+    EXPECT_EQ(NX_ERROR_TIMEOUT,
+              nx_adc_port_sample(&face, samples, 2U, now + 100U, &count));
+    EXPECT_EQ(0U, count);
+    EXPECT_FALSE(state.active);
+    EXPECT_EQ(0xa5a5U, samples[0]);
+    EXPECT_EQ(0x5a5aU, samples[1]);
+    injected_complete = true;
+    refuse_powerdown = true;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_adc_port_sample(&face, samples, 2U, now + 100U, &count));
+    EXPECT_EQ(0U, count);
+    EXPECT_TRUE(state.active);
+    EXPECT_EQ(0xa5a5U, samples[0]);
+    EXPECT_EQ(0x5a5aU, samples[1]);
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_adc_injected_close(&state));
+    EXPECT_NE(0U, RCC->APB2ENR & RCC_APB2ENR_ADC1EN);
+    refuse_powerdown = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_adc_injected_close(&state));
 }
 
 TEST_F(AdcColdFactory, InternalDmaModesRetainAnalogPowerUntilControllerClose) {
@@ -788,6 +912,24 @@ extern "C" void nx_stm32_adc_cold_model_poll(unsigned kind, void* raw) {
     EXPECT_EQ(5U, kind);
     auto* state = static_cast<nx_stm32_adc_state_t*>(raw);
     auto* adc = state->registers;
+#if defined(NX_ADC_INTERNAL_CONTRACT)
+    if ((adc->CR2 & ADC_CR2_JSWSTART) != 0U) {
+        ++injected_launches;
+        injected_sequence = adc->JSQR;
+        if (fractional_clock && conversion_ns == 0U)
+            conversion_ns = clock_ns;
+        adc->CR2 &= ~static_cast<uint32_t>(ADC_CR2_JSWSTART);
+        if (injected_complete) {
+            const unsigned bits = 12U - 2U * state->resolution;
+            const uint32_t mask = (1U << bits) - 1U;
+            adc->JDR1 = 321U & mask;
+            adc->JDR2 = 432U & mask;
+            adc->JDR3 = 543U & mask;
+            adc->JDR4 = 654U & mask;
+            adc->SR |= ADC_SR_JEOC;
+        }
+    }
+#endif
     if ((adc->CR2 & ADC_CR2_SWSTART) != 0U) {
 #if defined(NX_ADC_INTERNAL_CONTRACT)
         if (fractional_clock && conversion_ns == 0U)

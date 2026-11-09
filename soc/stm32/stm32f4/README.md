@@ -78,7 +78,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
 | PWM | TIM3／4／5／9／10／11／12／13／14 按各自通道数显式选择一路；固定 PSC/ARR；TIM5 为 32-bit counts，其他为 16-bit；duty0–period、shadow update；stop 建立 GPIO inactive |
-| ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；独立 6／8／10／12-bit 软件 shot/scan、最多 16 ranks；各转换器均有独占 TIM3 触发有限／连续 DMA block |
+| ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；6／8／10／12-bit 普通软件 shot/scan 最多 16 ranks、软件注入组最多 4 ranks；各转换器均有独占 TIM3 触发有限／连续 DMA block |
 | DAC | PA4／PA5 单／双通道，CPU direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA；u8／u12-right／u12-left |
 | CRC | 多项式 0x04C11DB7、初值 0xffffffff、32 位字输入；同步计算、独占 controller、失败输出保持 |
 | CAN | CAN1/CAN2 Classic CAN IRQ、三邮箱、共享 filter domain；无 CAN FD |
@@ -198,7 +198,7 @@ gate、临时观察 gate、TIM3 和 DMA IRQ 分开记录责任，复用现有状
 
 `tests/contracts/adc_external_assembly/` 提供两种密度的软件参考装配，使用三个
 GPIO bank 的 16-rank 反向序列，以及 VE／ZG 的三转换器独立实例装配；不代表实际
-板卡接线。注入组和同步多 ADC 模式继续未实现。ADC1／2／3 分别使用
+板卡接线。同步多 ADC 模式继续未实现。ADC1／2／3 分别使用
 DMA2 stream4 channel0／stream2 channel1／stream1 channel2，复用有限和连续 C
 实现与只读 ops，不增加每实例 route 字段。TIM3 仍是独占触发源，不允许独立 stream
 实例暗中共享。VE／ZG 的 DMA 组合参考见
@@ -216,6 +216,14 @@ close 先证明 ADC 停止，再只撤回所取模拟路径，最后释放 clock
 含内部输入等待 11 μs，三个执行模式使用同一 helper，不保留额外启动时间戳。
 这遵循 RM0090 Rev22 §13.10／13.11 与 DS8626 Rev12 的启动和采样时间要求，
 不承诺实际模拟精度、功耗或 VBAT 测量条件。
+
+`drivers/adc_injected.c` 以同一 ADC state／cold config 和共享只读 ops 实现
+`injected-shot`。一次软件触发完成 1–4 ranks，短组按 RM0090 的 JSQR 位置排列，
+通过官方 LL 取得 JDR1–4，offset 归零；不使用 regular SQR／DR，也不取得 TIM3。
+采样值暂存于有界的 8 字节栈数组；全部采样、deadline 和停止均成功后才发布。
+超时或停止失败不发布部分数据，不保留调用者指针；停止失败保留 controller 清理责任。
+该模式不增加实例 RAM，不与同一 ADC 的 regular／DMA 同时使用，不提供自动注入、
+外部注入 trigger 或非零 offset。内部输入沿用原有模拟路径 owner 与启动等待。
 
 有限 ADC `trigger-dma` 在发布完整块前停 trigger／conversion／DMA，稳定后由显式
 service rearm，块间可有间隙。消费者借用不能被覆盖，未释放时 stop 保持 BUSY；
