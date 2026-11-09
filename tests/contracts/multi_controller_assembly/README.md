@@ -27,6 +27,10 @@ polling controller；`stm32-zg-buses-dma-freertos.toml` 改选三个 SPI 的增�
 事务并保留三个 I2C polling。三个 SPI 的 CS 独立，factory 保留所有增强面及其真实
 端口；不使用未选中的普通 endpoint 代替，ELF 检查实际保留情况。
 
+`stm32-ve-uart6-irq-words-baremetal.toml` 选择六路独立 9N1 word face；
+`stm32-zg-uart6-irq-blocks-freertos.toml` 选择六路 IRQ block face。这两种模式均不
+取得 DMA，word face 不替代 byte face。block 的存储由消费者在 `rx_start` 显式提供。
+
 secondary UART TX 与 primary I2C TX 共用 DMA1 的物理 stream6，
 即使 selector 不同也冲突，resolver 拒绝同时选择；五路图改选 secondary I2C。
 不同 bus 的同地址 endpoint 保持独立身份／context。

@@ -57,8 +57,9 @@ USART1 DMA2 stream7／2 channel4；USART2 DMA1 stream6／5 channel4；USART3
 DMA1 stream3／1 channel4；UART4 DMA1 stream4／2 channel4；UART5 DMA1
 stream7／0 channel4；USART6 DMA2 stream6／1 channel5。只读 C 硬件事实表同时用于
 冷态准入、标志位和 IRQ 选择，不增加可变实例字段。TC 与 DMA 完成分别观察，撤回
-失败继续保留借用，W1C 只清理所选 stream。IRQ words／blocks 仍限定 USART1；
-其他可选 UART 模式、替代引脚和 DMA 路线必须另外接入。
+失败继续保留借用，W1C 只清理所选 stream。六路也支持独立 9N1 的 `irq-words`
+和由调用者提供存储的 `irq-blocks`；9 位数据不经过 byte 接口。其他可选 UART
+模式、替代引脚和 DMA 路线必须另外接入。
 
 ADC1／2 通道对应 PA0--7、PB0--1、PC0--5。ADC3 在 VE 开放 PA0--3 的通道 0--3
 和 PC0--3 的通道 10--13；ZG 另有 PF6--10 的通道 4--8、PF3 的通道 9 和

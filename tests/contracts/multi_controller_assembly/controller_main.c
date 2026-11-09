@@ -17,6 +17,12 @@ int main(void) {
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_uart(id);
     }
+#ifdef NX_FIXTURE_UART_WORD
+    s_identity_count = NX_UART_WORD_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_uart_word(id);
+    }
+#endif
     s_identity_count = NX_SPI_ID_COUNT;
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_spi(id);

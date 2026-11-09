@@ -16,7 +16,9 @@ PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
                             "eth", "eth_frames"))
 CLASSIC_CAN_MAILBOXES = 3
 
-UART_FORMATS = UartFormatPolicy(words=("USART1",), irq_probe=True, byte_frames=True)
+UART_FORMATS = UartFormatPolicy(
+    words=("USART1", "USART2", "USART3", "UART4", "UART5", "USART6"),
+    irq_probe=True, byte_frames=True)
 
 # Exact shared admission helper used by the byte-mode transport itself.
 UART_TX_VALIDATORS = MappingProxyType({

@@ -131,6 +131,49 @@ class F407UartInstanceTests(unittest.TestCase):
                                               generated)
                             self.assertNotIn("HAL_UART", generated)
 
+    def test_all_six_irq_words_and_blocks_are_static_non_dma_profiles(self):
+        fixtures = gate.ROOT / "tests/contracts/multi_controller_assembly"
+        binding_names = ("primary-uart", "secondary-uart", "usart3",
+                    "uart4", "uart5", "usart6")
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            for part in ("ve", "zg"):
+                board = gate.load(fixtures / f"stm32-{part}-board/board.json")
+                (directory / "board.json").write_text(json.dumps(board))
+                for backend in ("baremetal", "freertos"):
+                    for mode in ("irq-words", "irq-blocks"):
+                        with self.subTest(part=part, backend=backend, mode=mode):
+                            text = ('schema=2\nboard_package="."\nbackend=' +
+                                    json.dumps(backend) +
+                                    '\nclock="hse8-pll168"\noptimization="Os"\n'
+                                    '[memory]\nmain_stack_bytes=2048\n'
+                                    'libc_heap_bytes=0\n'
+                                    'flash_load_limit_bytes=65536\n'
+                                    'static_ram_limit_bytes=32768\n')
+                            for i, binding in enumerate(binding_names, 1):
+                                text += (f'[uart.serial{i}]\nbinding="{binding}"\n'
+                                         f'mode="{mode}"\nbaud=115200\n'
+                                         f'[uart.serial{i}.rx]\n')
+                                if mode == "irq-words":
+                                    text += ('format="words"\ncapacity=4\n'
+                                             f'[uart.serial{i}.frame]\n'
+                                             'data_bits=9\nparity="none"\n'
+                                             'stop_bits=1\nflow="none"\n')
+                                else:
+                                    text += 'format="blocks"\n'
+                                text += f'[uart.serial{i}.irq]\npriority=5\n'
+                            assembly = directory / "assembly.toml"
+                            assembly.write_text(text)
+                            result = gate.resolve_ir(assembly)
+                            self.assertEqual(len(result.controllers), 6)
+                            for item in result.controllers:
+                                self.assertEqual(item.integration.dma, ())
+                            generated = bindings.emit(result)[1]
+                            self.assertNotIn("void DMA", generated)
+                            suffix = "word" if mode == "irq-words" else "stream"
+                            self.assertIn(f"nx_stm32_uart_{suffix}_cold_prepare",
+                                          generated)
+
     def test_unreviewed_uart_name_does_not_infer_a_clock_gate(self):
         with self.assertRaisesRegex(ValueError, "Unmaintained controller"):
             preflight._clock("UART7")

@@ -24,6 +24,16 @@ if(fixture_device_count GREATER 0)
         endif()
     endforeach()
 endif()
+string(JSON fixture_controller_count LENGTH "${fixture_resolved}" controllers)
+if(fixture_controller_count GREATER 0)
+    math(EXPR fixture_controller_last "${fixture_controller_count} - 1")
+    foreach(index RANGE 0 ${fixture_controller_last})
+        string(JSON fixture_mode GET "${fixture_resolved}" controllers ${index} mode)
+        if(fixture_mode STREQUAL "irq-words")
+            target_compile_definitions(multi_controller_fixture PRIVATE NX_FIXTURE_UART_WORD)
+        endif()
+    endforeach()
+endif()
 add_custom_command(TARGET multi_controller_fixture POST_BUILD
     COMMAND "${Python3_EXECUTABLE}" -B
         "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py"

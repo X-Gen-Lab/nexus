@@ -362,6 +362,83 @@ TEST_F(UartColdFactory, AdditionalDmaOwnersWithdrawTheirActualNvicAndPads) {
 }
 #endif
 
+#if defined(NX_COLD_WORDS) || defined(NX_COLD_BLOCKS)
+TEST_F(UartColdFactory, AdditionalIrqProfilesReceiveThroughTheirOwnPublisher) {
+    const uint32_t original_gates = RCC->AHB1ENR;
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN |
+                    RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIODEN;
+    for (size_t i = 1U; i < 6U; ++i) {
+        SCOPED_TRACE(i);
+        const auto& selected = nx_stm32_uart_hardware[i];
+        uint16_t snapshots[2]{};
+        const nx_stm32_platform_pin_config_t pins[] = {
+            {selected.tx_gpio, &snapshots[0], selected.tx_port,
+             selected.tx_pin},
+            {selected.rx_gpio, &snapshots[1], selected.rx_port,
+             selected.rx_pin}};
+        ColdConfig config{};
+        config.registers = selected.registers;
+        config.pins = pins;
+        config.vectors = &selected.irq;
+        config.vector_count = 1U;
+        config.clock_hz = selected.clock_hz;
+        config.baud = 115200U;
+        config.priority = 5U;
+#ifdef NX_COLD_WORDS
+        uint16_t received[4]{};
+        config.rx_storage = received;
+        config.rx_capacity = 4U;
+#else
+        config.profile = NX_UART_RX_BLOCKS;
+#endif
+        selected.registers->SR = USART_SR_TC | USART_SR_TXE;
+        ColdState state{};
+        nx_stm32_uart_cold_receipt_t receipt{};
+        NVIC->IPR[(unsigned)selected.irq] = 0xB0U;
+        ASSERT_EQ(NX_SUCCESS, COLD_PREPARE(&state, &config, &receipt));
+        EXPECT_TRUE(Enabled(selected.irq));
+        EXPECT_EQ(0x50U, NVIC->IPR[(unsigned)selected.irq]);
+#ifdef NX_COLD_WORDS
+        const nx_uart_word_port_t face{&nx_stm32_uart_word_ops, &state};
+        EXPECT_NE(0U, selected.registers->CR1 & USART_CR1_M);
+        selected.registers->DR = 0x1ABU;
+        selected.registers->SR = USART_SR_RXNE;
+        nx_stm32_uart_word_irq(&state);
+        uint16_t word{};
+        size_t count{};
+        ASSERT_EQ(NX_SUCCESS, nx_uart_word_port_read(&face, &word, 1U, &count));
+        EXPECT_EQ(1U, count);
+        EXPECT_EQ(0x1ABU, word);
+#else
+        const nx_uart_port_t face{&nx_stm32_uart_stream_ops, &state};
+        uint8_t data[2]{};
+        nx_stream_slot_t slot{};
+        slot.data = data;
+        slot.capacity = sizeof(data);
+        nx_stream_t stream{};
+        ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, &slot, 1U));
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&face, &stream));
+        selected.registers->DR = 0xABU;
+        selected.registers->SR = USART_SR_RXNE | USART_SR_IDLE;
+        nx_stm32_uart_stream_irq(&state);
+        nx_stream_block_t block{};
+        ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &block));
+        EXPECT_EQ(1U, block.length);
+        EXPECT_EQ(0xABU, block.data[0]);
+        EXPECT_EQ(NX_ERROR_BUSY, COLD_CLOSE(&state, &config, &receipt));
+        EXPECT_NE(0U, receipt.effects);
+        ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
+#endif
+        selected.registers->SR = USART_SR_TC | USART_SR_TXE;
+        ASSERT_EQ(NX_SUCCESS, COLD_CLOSE(&state, &config, &receipt));
+        EXPECT_FALSE(Enabled(selected.irq));
+        EXPECT_EQ(0xB0U, NVIC->IPR[(unsigned)selected.irq]);
+        EXPECT_EQ(0U, receipt.effects);
+    }
+    RCC->AHB1ENR = original_gates;
+}
+#endif
+
 #if !NX_COLD_RX && !NX_COLD_TX && !defined(NX_COLD_WORDS) &&                   \
     !defined(NX_COLD_BLOCKS)
 namespace {

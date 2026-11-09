@@ -71,7 +71,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | 接口 | 执行与限制 |
 | --- | --- |
 | GPIO | 单 port 的 16-bit 授权 mask；原子 BSRR set/reset；串行 toggle；先初值后 mode |
-| UART | 六个实例共用 IRQ bytes/events、HAL 有限 TX DMA、有限／连续 RX DMA 和 DMA duplex；USART1 另有 IRQ words／IRQ blocks；真实 TC、显式 loss、drain、quarantine |
+| UART | 六个实例共用 IRQ bytes/events、独立 9N1 words、IRQ blocks、HAL 有限 TX DMA、有限／连续 RX DMA 和 DMA duplex；真实 TC、显式 loss、drain、quarantine |
 | SPI | SPI1／2／3 共用短 polling／有限全双工 DMA；MSB-first master、mode0–3；普通 byte face 为 8 位，增强 polling 事务支持 8／16 位 word，三个控制器均可选择增强 DMA 事务；polling 最多 256 words，DMA 每段最多 65535 words |
 | I2C | I2C1／2／3 polling/IRQ/DMA；42 MHz／100 kHz；7-bit 地址、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误 |
 | Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |

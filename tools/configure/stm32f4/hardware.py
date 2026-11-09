@@ -59,27 +59,32 @@ CONTROLLER_PAIRS = MappingProxyType({
 SECONDARY_FACTS = MappingProxyType({
     "USART2": MappingProxyType({
         "kind": "uart", "modes": ("dma-tx", "irq-byte-event", "rx-dma-idle",
-                  "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous"),
+                  "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous",
+                  "irq-words", "irq-blocks"),
         "pins": ("PA2", "PA3"),
         "irq": ("USART2_IRQn",), "clock_hz": 42000000}),
     "USART3": MappingProxyType({
         "kind": "uart", "modes": ("irq-byte-event", "dma-tx", "rx-dma-idle",
-                  "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous"),
+                  "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous",
+                  "irq-words", "irq-blocks"),
         "pins": ("PB10", "PB11"), "irq": ("USART3_IRQn",),
         "clock_hz": 42000000}),
     "UART4": MappingProxyType({
         "kind": "uart", "modes": ("irq-byte-event", "dma-tx", "rx-dma-idle",
-                  "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous"),
+                  "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous",
+                  "irq-words", "irq-blocks"),
         "pins": ("PA0", "PA1"), "irq": ("UART4_IRQn",),
         "clock_hz": 42000000}),
     "UART5": MappingProxyType({
         "kind": "uart", "modes": ("irq-byte-event", "dma-tx", "rx-dma-idle",
-                  "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous"),
+                  "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous",
+                  "irq-words", "irq-blocks"),
         "pins": ("PC12", "PD2"), "irq": ("UART5_IRQn",),
         "clock_hz": 42000000}),
     "USART6": MappingProxyType({
         "kind": "uart", "modes": ("irq-byte-event", "dma-tx", "rx-dma-idle",
-                  "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous"),
+                  "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous",
+                  "irq-words", "irq-blocks"),
         "pins": ("PC6", "PC7"), "irq": ("USART6_IRQn",),
         "clock_hz": 84000000}),
     "SPI2": MappingProxyType({
