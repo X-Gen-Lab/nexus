@@ -162,6 +162,53 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'lsb_first|LSB-first'):
                     gate.resolve_ir(path)
 
+    def pwm5_assembly(self):
+        board = json.loads((self.fixtures / 'stm32-ve-board/board.json').read_text())
+        board['bindings'].append({'id': 'under-test-pwm5', 'controller': 'TIM5',
+                                  'route': 'tim5-ch4-pa3', 'initial': 0})
+        package = self.directory / 'pwm-board'
+        package.mkdir()
+        (package / 'board.json').write_text(json.dumps(board))
+        path = self.directory / 'pwm.toml'
+        path.write_text('schema=2\nboard_package=' + json.dumps(str(package)) +
+                        '\nbackend="baremetal"\nclock="hse8-pll168"\n'
+                        '[memory]\nmain_stack_bytes=2048\n'
+                        '[pwm.output]\nbinding="under-test-pwm5"\nmode="fixed-pwm"\n'
+                        'period_ticks=4294967295\nduty_ticks=65536\n'
+                        'tick_hz=1000000\n')
+        return path
+
+    def test_tim5_resolves_a_full_width_pwm_without_using_tim3(self):
+        path = self.pwm5_assembly()
+        result = gate.resolve_ir(path)
+        self.assertEqual(result.controllers[0].controller, 'TIM5')
+        output = self.directory / 'tim5-bundle'
+        gate.configure(path, output)
+        source = (output / 'bindings.c').read_text()
+        self.assertIn('.registers = TIM5, .gpio = GPIOA', source)
+        self.assertIn('.channel = 4u, .pin = 3u', source)
+        self.assertIn('.period_ticks = 4294967295u', source)
+
+    def test_pwm_counter_width_and_pin_routes_reject_before_construction(self):
+        original = self.pwm5_assembly()
+        text = original.read_text()
+        board_path = self.directory / 'pwm-board/board.json'
+        board = json.loads(board_path.read_text())
+        for field, value in (('period_ticks', 4294967296),
+                              ('duty_ticks', 4294967296)):
+            with self.subTest(field=field):
+                old = '4294967295' if field == 'period_ticks' else '65536'
+                original.write_text(text.replace(f'{field}={old}',
+                                                 f'{field}={value}'))
+                with self.assertRaisesRegex(ValueError, 'PWM'):
+                    gate.resolve_ir(original)
+        original.write_text(text)
+        binding = next(b for b in board['bindings'] if b['id'] == 'under-test-pwm5')
+        binding.update(controller='TIM3', route='tim3-ch1-pa6')
+        board_path.write_text(json.dumps(board))
+        with self.assertRaisesRegex(ValueError, 'PWM period'):
+            gate.resolve_ir(original)
+
     def test_spi3_dma_conflicts_with_i2c1_before_emitting_hardware(self):
         with self.assertRaisesRegex(ValueError, "DMA1:stream0"):
             gate.resolve_ir(self.spi3_assembly("dma", peer=True))

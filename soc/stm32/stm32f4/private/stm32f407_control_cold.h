@@ -23,14 +23,40 @@ typedef struct {
     uint8_t pull;
 } nx_stm32_exti_config_t;
 
-/** \brief Exact TIM3 channel one counts and declared PA6 inactive level. */
+/** \brief Exact TIM3/TIM5 channel, counts and declared pad inactive level. */
 typedef struct {
     uint32_t period_ticks;
     uint32_t duty_ticks;
     uint32_t tick_hz;
     uint16_t prescaler;
     bool inactive_high;
+    TIM_TypeDef* registers;
+    GPIO_TypeDef* gpio;
+    uint8_t channel;
+    uint8_t pin;
 } nx_stm32_pwm_config_t;
+
+/** \brief Reviewed AF2 outputs; package and Board authority remain separate. */
+static inline bool
+nx_stm32_pwm_route_valid(const nx_stm32_pwm_config_t* config) {
+    if (config->channel < 1U || config->channel > 4U)
+        return false;
+    if (config->registers == TIM3) {
+        return config->channel <= 2U ? config->gpio == GPIOA &&
+                                           config->pin == config->channel + 5U
+                                     : config->gpio == GPIOB &&
+                                           config->pin == config->channel - 3U;
+    }
+    return config->registers == TIM5 && config->gpio == GPIOA &&
+           config->pin == config->channel - 1U;
+}
+
+/** \brief One selected APB1 gate, also retained after failed preparation. */
+static inline uint32_t nx_stm32_pwm_gate(const TIM_TypeDef* registers) {
+    return registers == TIM3   ? RCC_APB1ENR_TIM3EN
+           : registers == TIM5 ? RCC_APB1ENR_TIM5EN
+                               : 0U;
+}
 
 /** \brief Immutable independent ADC1/2/3 ranks and nominal reference.
  * \note ADC3 uses its distinct pad map. Board facts authorize bonded pins.
@@ -150,36 +176,42 @@ nx_stm32_pwm_prepare(nx_stm32_pwm_state_t* port,
     if (!nx_stm32_control_cold_context())
         return NX_ERROR_CONTEXT;
     if (port == NULL || inactive == NULL || config == NULL ||
-        config->period_ticks == 0U || config->period_ticks > 65535U ||
+        !nx_stm32_pwm_route_valid(config) || config->period_ticks == 0U ||
+        (config->registers != TIM5 && config->period_ticks > 65535U) ||
         config->duty_ticks > config->period_ticks || config->tick_hz == 0U ||
         UINT32_C(84000000) / config->tick_hz !=
             (uint32_t)config->prescaler + 1U ||
         UINT32_C(84000000) % config->tick_hz != 0U)
         return NX_ERROR_INVALID;
-    if (port->initialized || port->cold_effects != 0U ||
-        (RCC->APB1ENR & RCC_APB1ENR_TIM3EN) != 0U)
+    const uint32_t gate = nx_stm32_pwm_gate(config->registers);
+    if (port->initialized || inactive->initialized ||
+        port->cold_effects != 0U || (RCC->APB1ENR & gate) != 0U)
         return NX_ERROR_BUSY;
+    /* Retain exact gate identity before the first fallible acquisition. */
+    port->registers = config->registers;
     port->cold_effects = 1U;
-    NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR | RCC_APB1ENR_TIM3EN);
+    NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR | gate);
     nx_arch_dsb();
-    if ((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) == 0U)
+    if ((RCC->APB1ENR & gate) == 0U)
         return NX_ERROR_IO;
-    if ((TIM3->CCER & 1U) != 0U || ((TIM3->CR1 & TIM_CR1_CEN) != 0U &&
-                                    (TIM3->PSC != config->prescaler ||
-                                     TIM3->ARR != config->period_ticks - 1U)))
+    TIM_TypeDef* timer = config->registers;
+    const uint32_t channel = 1U << ((config->channel - 1U) * 4U);
+    if ((timer->CCER & channel) != 0U ||
+        ((timer->CR1 & TIM_CR1_CEN) != 0U &&
+         (timer->PSC != config->prescaler ||
+          timer->ARR != config->period_ticks - 1U)))
         return NX_ERROR_BUSY;
-    inactive->registers = GPIOA;
-    inactive->mask = 1U << 6U;
+    inactive->registers = config->gpio;
+    inactive->mask = 1U << config->pin;
     inactive->output = true;
     nx_result_t result = nx_stm32_gpio_initialize(
-        inactive, config->inactive_high ? 1U << 6U : 0U);
+        inactive, config->inactive_high ? inactive->mask : 0U);
     if (result != NX_SUCCESS)
         return result;
-    port->registers = TIM3;
     port->inactive_gpio = inactive;
-    port->inactive_mask = 1U << 6U;
+    port->inactive_mask = inactive->mask;
     port->inactive_high = config->inactive_high;
-    port->channel = 1U;
+    port->channel = config->channel;
     port->period_ticks = config->period_ticks;
     port->duty_ticks = config->duty_ticks;
     port->tick_hz = config->tick_hz;
@@ -198,7 +230,10 @@ static inline nx_result_t nx_stm32_pwm_close(nx_stm32_pwm_state_t* port,
         return NX_ERROR_INVALID;
     if (port->cold_effects == 0U)
         return port->initialized ? NX_ERROR_BUSY : NX_SUCCESS;
-    if (port->initialized && (RCC->APB1ENR & RCC_APB1ENR_TIM3EN) == 0U)
+    const uint32_t gate = nx_stm32_pwm_gate(port->registers);
+    if (gate == 0U)
+        return NX_ERROR_STATE;
+    if (port->initialized && (RCC->APB1ENR & gate) == 0U)
         return NX_ERROR_IO;
     if (port->initialized) {
         nx_result_t result = nx_stm32_pwm_ops.stop(port);
@@ -208,12 +243,12 @@ static inline nx_result_t nx_stm32_pwm_close(nx_stm32_pwm_state_t* port,
         inactive->initialized = false;
     }
     if ((port->cold_effects & 1U) != 0U) {
-        if ((TIM3->CCER & 0x1111U) != 0U)
+        if ((RCC->APB1ENR & gate) != 0U &&
+            (port->registers->CCER & 0x1111U) != 0U)
             return NX_ERROR_BUSY;
-        NX_PLATFORM_REGISTER_WRITE(
-            RCC->APB1ENR, RCC->APB1ENR & ~(uint32_t)RCC_APB1ENR_TIM3EN);
+        NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR & ~gate);
         nx_arch_dsb();
-        if ((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) != 0U)
+        if ((RCC->APB1ENR & gate) != 0U)
             return NX_ERROR_IO;
         port->cold_effects &= (uint8_t)~1U;
     }

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 55c7922ce9acb30a1f1b051bdcf7e9b58ba53a0f4b3a9b5870bfd72a2b6a8c67\n"
+"X-Nexus-Source-SHA256: 7316d88184c45098846fc6db9b2101d2287f01ec6547efb34829fb4328945d50\n"
 
 #: docs/delivery/capabilities.md:8
 msgid "当前派生能力矩阵"
@@ -1108,18 +1108,6 @@ msgid "fixed-pwm"
 msgstr "fixed-pwm"
 
 #: docs/delivery/capabilities.md:0
-msgid "`tim3-ch1-pa6`"
-msgstr "`tim3-ch1-pa6`"
-
-#: docs/delivery/capabilities.md:0
-msgid ""
-"`tests/contracts/stm32_assembly/ve-pwm.toml`, "
-"`tests/contracts/stm32_assembly/zg-pwm.toml`"
-msgstr ""
-"`tests/contracts/stm32_assembly/ve-pwm.toml`, "
-"`tests/contracts/stm32_assembly/zg-pwm.toml`"
-
-#: docs/delivery/capabilities.md:0
 msgid "`soc/stm32/stm32f4/drivers/timer.c`"
 msgstr "`soc/stm32/stm32f4/drivers/timer.c`"
 
@@ -1613,3 +1601,30 @@ msgstr ""
 "`tests/contracts/io_evolution_assembly/f407-uart9n1.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-ve-uart6-irq-words-"
 "baremetal.toml`"
+
+msgid "TIM5"
+msgstr "TIM5"
+
+msgid ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-pwm35-baremetal.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-pwm35-freertos.toml`"
+msgstr ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-pwm35-baremetal.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-pwm35-freertos.toml`"
+
+msgid ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-pwm35-baremetal.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-pwm35-freertos.toml`, "
+"`tests/contracts/stm32_assembly/ve-pwm.toml`, "
+"`tests/contracts/stm32_assembly/zg-pwm.toml`"
+msgstr ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-pwm35-baremetal.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-pwm35-freertos.toml`, "
+"`tests/contracts/stm32_assembly/ve-pwm.toml`, "
+"`tests/contracts/stm32_assembly/zg-pwm.toml`"
+
+msgid "`tim3-ch1-pa6`, `tim3-ch2-pa7`, `tim3-ch3-pb0`, `tim3-ch4-pb1`"
+msgstr "`tim3-ch1-pa6`, `tim3-ch2-pa7`, `tim3-ch3-pb0`, `tim3-ch4-pb1`"
+
+msgid "`tim5-ch1-pa0`, `tim5-ch2-pa1`, `tim5-ch3-pa2`, `tim5-ch4-pa3`"
+msgstr "`tim5-ch1-pa0`, `tim5-ch2-pa1`, `tim5-ch3-pa2`, `tim5-ch4-pa3`"

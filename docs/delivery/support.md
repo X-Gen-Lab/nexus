@@ -40,6 +40,7 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 | GPIO／EXTI | 受审引脚、静态电气与事件存储；不存在自动消抖政策 |
 | UART | IRQ byte/event、word 与明确 block／DMA 模式分别选择；有限 TX、有限 RX、连续 RX 和双向模式不自动互相授权 |
 | SPI／I2C | SPI1／2／3 polling、普通与增强 DMA 事务；I2C1／2／3 polling／IRQ／DMA；显式 endpoint 与受审路线 |
+| PWM | TIM3／TIM5 的 CH1–4 中各显式选择一路；固定 84 MHz timer clock 与 PSC／ARR；TIM3 周期 1–65535，TIM5 周期 1–4294967295；无隐式共享时基 |
 | ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入，独立 shot／scan 最多 16 ranks；三个转换器均有有限／连续 DMA，分别独占 TIM3 |
 | DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码 |
 | Flash／IWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
@@ -147,3 +148,10 @@ FreeRTOS；它们不授权实际 Board 接线。
 退出的其他 MCU 适配仅保留历史追溯，原始范围见
 [重构前固定源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)。
 本次重构不能继承旧候选、软件计数或实板结果。
+
+普通 PWM 的已审 AF2 引脚为 TIM3 PA6／PA7／PB0／PB1、TIM5 PA0／PA1／PA2／PA3，
+分别对应 CH1–4。period 表示完整周期，ARR=period−1；duty 可达 period，计数上限
+保证 CCR 能表达 100%。set 只暂存 duty，在 update event 生效；周期与 PSC 保持固定。
+每个控制器由一路 owner 独占；两个独立 timer 不提供同步更新，TIM3 仍与 ADC trigger
+冲突。冷态 C 校验精确 timer、pad、channel 和位宽，启钟／撤回失败保留正确清理身份；
+已有 GPIO owner 不被覆盖。软件参考装配不授权 PCB 接线或实际输出时序。

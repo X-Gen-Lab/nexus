@@ -56,3 +56,8 @@ CMake 读 `NEXUS_SOURCE_ROOT` 和一份 `NEXUS_ASSEMBLY_FILE`，调用生产
 生成冷装配持有 clock／pin／NVIC lease，失败构造也参与逆序清理。实际撤源与 NVIC
 quiescence 后才恢复 pad；每个 active-low CS 在同组任一引脚恢复前先观察 inactive。
 撤回拒绝保留 lease、阻止 restart，直到显式清理成功。日常 I/O 仍直接调用共享表。
+
+`stm32-ve-pwm35-baremetal.toml` 和 `stm32-zg-pwm35-freertos.toml` 同时选择独立的
+TIM3 与 TIM5 PWM。软件 Board 分别授权 CH3／CH4 和 CH4／CH1；VE 的 TIM5 使用
+UINT32_MAX 周期，ZG 使用 70000。每个控制器只选择一路，保留 factory 真正的 PWM
+face／ops；不支持两个 timer 的隐式同步或一个 timer 的多 owner 共享。

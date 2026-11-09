@@ -1,0 +1,26 @@
+# Independent fixed PWM timers; software routes, no PCB qualification.
+schema = 2
+board_package = "stm32-zg-board"
+backend = "freertos"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[pwm.fast]
+binding = "pwm3"
+mode = "fixed-pwm"
+tick_hz = 1000000
+period_ticks = 1000
+duty_ticks = 250
+
+[pwm.slow]
+binding = "pwm5"
+mode = "fixed-pwm"
+tick_hz = 1000000
+period_ticks = 70000
+duty_ticks = 65536

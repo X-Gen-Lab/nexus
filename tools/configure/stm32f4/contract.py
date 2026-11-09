@@ -5,7 +5,8 @@ from tools.configure.calls import Symbol
 from types import MappingProxyType
 
 from tools.configure.providers import common, descriptor
-from .hardware import ADC_PIN_CHANNELS, DAC_PIN_CHANNELS, FIXED_DMA as _FIXED_DMA
+from .hardware import (ADC_PIN_CHANNELS, DAC_PIN_CHANNELS, PWM_PIN_CHANNELS,
+                       FIXED_DMA as _FIXED_DMA)
 from tools.configure.adc import RESOLUTION_BITS
 
 PARTS = MappingProxyType({
@@ -69,7 +70,7 @@ DMA_TOPOLOGY = (frozenset((1, 2)), range(8), range(8))
 LIMITS = MappingProxyType({
     'uart_baud': (1282, 1000000), 'spi_hz': (328125, 42000000),
     'i2c_hz': (5129, 400000),
-    'timer_hz': 84000000, 'pwm_period': 65535,
+    'timer_hz': 84000000, 'pwm_period': 0xFFFFFFFF,
     'adc_resolution_bits': RESOLUTION_BITS,
 })
 SPI_REQUIRES_ENDPOINT = True
@@ -138,6 +139,15 @@ def validate_selection(selection, route):
     elif kind == "uart":
         common.integer(selection["baud"], *LIMITS["uart_baud"], "UART baud")
     elif kind == "pwm":
+        pins = route["pins"]
+        channel = (PWM_PIN_CHANNELS.get((route["controller"], pins[0]["pin"]))
+                   if len(pins) == 1 else None)
+        if (channel is None or pins[0]["function"] != f"ch{channel}" or
+                pins[0].get("af") != 2):
+            common.fail("PWM requires a reviewed TIM3/TIM5 channel route")
+        common.integer(selection["period_ticks"], 1,
+                       0xFFFFFFFF if route["controller"] == "TIM5" else 65535,
+                       "PWM period")
         tick = selection["tick_hz"]
         clock = LIMITS["timer_hz"]
         if clock % tick or not 1 <= clock // tick <= 65536:

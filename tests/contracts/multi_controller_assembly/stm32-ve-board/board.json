@@ -96,6 +96,18 @@
       "controller": "GPIOB",
       "route": "gpio-pb2",
       "initial": 4
+    },
+    {
+      "id": "pwm3",
+      "controller": "TIM3",
+      "route": "tim3-ch3-pb0",
+      "initial": 0
+    },
+    {
+      "id": "pwm5",
+      "controller": "TIM5",
+      "route": "tim5-ch4-pa3",
+      "initial": 0
     }
   ],
   "reserved_resources": [],

@@ -242,6 +242,134 @@ TEST_F(ControlFactory, ActiveTouchPublisherPreventsColdAdmissionAndFinalClose) {
 }
 #endif
 
+#ifdef NX_CONTROL_PWM
+TEST_F(ControlFactory, FixedPwmUsesEveryReviewedChannelAndSelectedTimer) {
+    for (TIM_TypeDef* timer : {TIM3, TIM5}) {
+        for (uint8_t channel = 1U; channel <= 4U; ++channel) {
+            SCOPED_TRACE(timer == TIM3 ? "TIM3" : "TIM5");
+            SCOPED_TRACE(static_cast<unsigned>(channel));
+            const bool first = timer == TIM3;
+            GPIO_TypeDef* bank = first && channel > 2U ? GPIOB : GPIOA;
+            const uint8_t pin = static_cast<uint8_t>(
+                first ? (channel <= 2U ? channel + 5U : channel - 3U)
+                      : channel - 1U);
+            const uint32_t period = first ? 1000U : 65537U;
+            const uint32_t clock =
+                first ? RCC_APB1ENR_TIM3EN : RCC_APB1ENR_TIM5EN;
+            nx_stm32_pwm_state_t state{};
+            nx_stm32_gpio_state_t inactive{};
+            const nx_stm32_pwm_config_t config{
+                period, 1U, 1000000U, 83U, false, timer, bank, channel, pin};
+            RCC->APB1ENR = RCC_APB1ENR_TIM4EN;
+            const auto result =
+                nx_stm32_pwm_prepare(&state, &inactive, &config);
+            EXPECT_EQ(NX_SUCCESS, result);
+            if (result != NX_SUCCESS) {
+                continue;
+            }
+            EXPECT_EQ(timer, state.registers);
+            EXPECT_EQ(bank, inactive.registers);
+            EXPECT_EQ(1U << pin, state.inactive_mask);
+            EXPECT_EQ(channel, state.channel);
+            EXPECT_EQ(RCC_APB1ENR_TIM4EN | clock, RCC->APB1ENR);
+            EXPECT_EQ(period - 1U, timer->ARR);
+            const nx_pwm_port_t face{&nx_stm32_pwm_ops, &state};
+            ASSERT_EQ(NX_SUCCESS, nx_pwm_port_start(&face));
+            EXPECT_NE(0U, timer->CCER & (1U << ((channel - 1U) * 4U)));
+            EXPECT_EQ(2U, (bank->MODER >> (pin * 2U)) & 3U);
+            EXPECT_EQ(NX_SUCCESS, nx_stm32_pwm_close(&state, &inactive));
+            EXPECT_EQ(RCC_APB1ENR_TIM4EN, RCC->APB1ENR);
+        }
+    }
+}
+
+TEST_F(ControlFactory, InvalidPwmRouteRejectsBeforeClockOrPadChanges) {
+    for (unsigned invalid = 0U; invalid < 4U; ++invalid) {
+        SCOPED_TRACE(invalid);
+        nx_stm32_pwm_state_t state{};
+        nx_stm32_gpio_state_t inactive{};
+        nx_stm32_pwm_config_t config{1000U, 0U,    1000000U, 83U, false,
+                                     TIM3,  GPIOA, 1U,       6U};
+        if (invalid == 0U)
+            config.registers = TIM4;
+        if (invalid == 1U)
+            config.gpio = GPIOB;
+        if (invalid == 2U)
+            config.channel = 0U;
+        if (invalid == 3U)
+            config.pin = 5U;
+        const auto* bytes = static_cast<const uint8_t*>(mmio);
+        const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+        const auto result = nx_stm32_pwm_prepare(&state, &inactive, &config);
+        EXPECT_EQ(NX_ERROR_INVALID, result);
+        EXPECT_EQ(0, std::memcmp(bytes, before.data(), before.size()));
+        if (result == NX_SUCCESS) {
+            EXPECT_EQ(NX_SUCCESS, nx_stm32_pwm_close(&state, &inactive));
+        }
+    }
+}
+
+TEST_F(ControlFactory, Tim5PreservesFullWidthPeriodAndFullDuty) {
+    nx_stm32_pwm_state_t state{};
+    nx_stm32_gpio_state_t inactive{};
+    const nx_stm32_pwm_config_t config{UINT32_MAX, 0U,    1000000U, 83U, false,
+                                       TIM5,       GPIOA, 4U,       3U};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_pwm_prepare(&state, &inactive, &config));
+    const nx_pwm_port_t face{&nx_stm32_pwm_ops, &state};
+    EXPECT_EQ(UINT32_MAX - 1U, TIM5->ARR);
+    ASSERT_EQ(NX_SUCCESS, nx_pwm_port_set(&face, UINT32_MAX, UINT32_MAX));
+    EXPECT_EQ(UINT32_MAX, TIM5->CCR4);
+    nx_pwm_state_t observed{};
+    ASSERT_EQ(NX_SUCCESS, nx_pwm_port_state(&face, &observed));
+    EXPECT_EQ(UINT32_MAX, observed.period_ticks);
+    EXPECT_EQ(UINT32_MAX, observed.duty_ticks);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_pwm_close(&state, &inactive));
+}
+
+TEST_F(ControlFactory, ForeignInactiveGpioRejectsBeforeTimerAcquisition) {
+    nx_stm32_pwm_state_t state{};
+    nx_stm32_gpio_state_t inactive{GPIOB, 1U, true, true};
+    const nx_stm32_pwm_config_t config{1000U, 1U,    1000000U, 83U, false,
+                                       TIM5,  GPIOA, 4U,       3U};
+    const auto original = inactive;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_pwm_prepare(&state, &inactive, &config));
+    EXPECT_EQ(0U, RCC->APB1ENR);
+    EXPECT_EQ(0U, RCC->AHB1ENR);
+    EXPECT_EQ(nullptr, state.registers);
+    EXPECT_EQ(0, std::memcmp(&original, &inactive, sizeof(original)));
+    if (state.cold_effects != 0U) {
+        EXPECT_EQ(NX_SUCCESS, nx_stm32_pwm_close(&state, &inactive));
+    }
+}
+
+TEST_F(ControlFactory, Tim5ClockFailureRetainsOnlyItsOwnCleanup) {
+    nx_stm32_pwm_state_t state{};
+    nx_stm32_gpio_state_t inactive{};
+    const nx_stm32_pwm_config_t config{1000U, 1U,    1000000U, 83U, false,
+                                       TIM5,  GPIOA, 4U,       3U};
+    RCC->APB1ENR = RCC_APB1ENR_TIM3EN;
+    TIM3->CR1 = TIM_CR1_CEN;
+    TIM3->CCER = TIM_CCER_CC1E;
+    refused = &RCC->APB1ENR;
+    held_bits = RCC_APB1ENR_TIM5EN;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_pwm_prepare(&state, &inactive, &config));
+    EXPECT_EQ(TIM5, state.registers);
+    EXPECT_NE(0U, state.cold_effects);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_pwm_close(&state, &inactive));
+    EXPECT_EQ(0U, state.cold_effects);
+    refused = nullptr;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_pwm_prepare(&state, &inactive, &config));
+    refused = &RCC->APB1ENR;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_pwm_close(&state, &inactive));
+    EXPECT_NE(0U, state.cold_effects);
+    refused = nullptr;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_pwm_close(&state, &inactive));
+    EXPECT_EQ(RCC_APB1ENR_TIM3EN, RCC->APB1ENR);
+    EXPECT_EQ(TIM_CR1_CEN, TIM3->CR1);
+    EXPECT_EQ(TIM_CCER_CC1E, TIM3->CCER);
+}
+#endif
+
 TEST_F(ControlFactory, RejectedForeignControllerCannotBeStoppedOrReleased) {
     *Gate() |= Mask();
 #ifdef NX_CONTROL_PWM
@@ -254,7 +382,8 @@ TEST_F(ControlFactory, RejectedForeignControllerCannotBeStoppedOrReleased) {
     state.inactive_gpio = &inactive;
     state.inactive_mask = 1U << 6U;
     state.initialized = true;
-    const nx_stm32_pwm_config_t config = {1000U, 0U, 1000000U, 83U, false};
+    const nx_stm32_pwm_config_t config = {1000U, 0U,    1000000U, 83U, false,
+                                          TIM3,  GPIOA, 1U,       6U};
 #elif defined(NX_CONTROL_EXTI)
     nx_exti_event_t events[2] = {};
     nx_stm32_exti_state_t state = {};

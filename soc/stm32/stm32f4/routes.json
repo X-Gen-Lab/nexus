@@ -4248,6 +4248,146 @@
           "DMA1:stream4:channel3"
         ]
       }
+    },
+    {
+      "id": "tim3-ch2-pa7",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM3",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA7",
+          "function": "ch2",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9 alternate-function mapping; RM0090 Rev22 section18 general-purpose timers"
+    },
+    {
+      "id": "tim3-ch3-pb0",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM3",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PB0",
+          "function": "ch3",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9 alternate-function mapping; RM0090 Rev22 section18 general-purpose timers"
+    },
+    {
+      "id": "tim3-ch4-pb1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM3",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PB1",
+          "function": "ch4",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9 alternate-function mapping; RM0090 Rev22 section18 general-purpose timers"
+    },
+    {
+      "id": "tim5-ch1-pa0",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM5",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "ch1",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9 alternate-function mapping; RM0090 Rev22 section18 general-purpose timers"
+    },
+    {
+      "id": "tim5-ch2-pa1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM5",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "ch2",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9 alternate-function mapping; RM0090 Rev22 section18 general-purpose timers"
+    },
+    {
+      "id": "tim5-ch3-pa2",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM5",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "ch3",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9 alternate-function mapping; RM0090 Rev22 section18 general-purpose timers"
+    },
+    {
+      "id": "tim5-ch4-pa3",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM5",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA3",
+          "function": "ch4",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS8626 Rev12 Table9 alternate-function mapping; RM0090 Rev22 section18 general-purpose timers"
     }
   ]
 }

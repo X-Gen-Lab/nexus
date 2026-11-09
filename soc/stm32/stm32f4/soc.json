@@ -510,7 +510,10 @@
       ],
       "irq": [],
       "pins": [
-        "PA6"
+        "PA6",
+        "PA7",
+        "PB0",
+        "PB1"
       ],
       "resources": [
         "timer:TIM3"
@@ -1249,6 +1252,22 @@
         "I2C3_ER": 73
       },
       "max_hz": 400000
+    },
+    "TIM5": {
+      "kind": "pwm",
+      "modes": [
+        "fixed-pwm"
+      ],
+      "irq": [],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3"
+      ],
+      "resources": [
+        "timer:TIM5"
+      ]
     }
   },
   "reserved_resources": [

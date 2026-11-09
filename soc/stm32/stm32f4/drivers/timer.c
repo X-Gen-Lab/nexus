@@ -1,6 +1,6 @@
 /**
  * \file            timer.c
- * \brief           General-purpose fixed-base TIM3 PWM without capture or DMA
+ * \brief           Shared fixed-base TIM3/TIM5 PWM without capture or DMA
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-09
@@ -32,8 +32,9 @@ nx_result_t nx_stm32_pwm_initialize(nx_stm32_pwm_state_t* port) {
     if (port == NULL || port->registers == NULL ||
         port->inactive_gpio == NULL || port->channel == 0U ||
         port->channel > 4U || port->period_ticks == 0U ||
-        port->period_ticks > 65535U || port->duty_ticks > port->period_ticks ||
-        port->tick_hz == 0U || port->inactive_mask == 0U) {
+        (port->registers != TIM5 && port->period_ticks > 65535U) ||
+        port->duty_ticks > port->period_ticks || port->tick_hz == 0U ||
+        port->inactive_mask == 0U) {
         return NX_ERROR_INVALID;
     }
     TIM_TypeDef* regs = port->registers;
@@ -69,7 +70,8 @@ nx_result_t nx_stm32_pwm_set(void* context, uint32_t period_ticks,
                              uint32_t duty_ticks) {
     nx_stm32_pwm_state_t* port = context;
     if (port == NULL || !port->initialized || period_ticks == 0U ||
-        period_ticks > 65535U || duty_ticks > period_ticks) {
+        (port->registers != TIM5 && period_ticks > 65535U) ||
+        duty_ticks > period_ticks) {
         return NX_ERROR_INVALID;
     }
     if (period_ticks != port->period_ticks ||

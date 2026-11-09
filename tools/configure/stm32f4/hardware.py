@@ -19,6 +19,11 @@ ADC_PIN_CHANNELS = MappingProxyType({
 
 DAC_PIN_CHANNELS = MappingProxyType({("DAC", "PA4"): 1,
                                    ("DAC", "PA5"): 2})
+PWM_PIN_CHANNELS = MappingProxyType({
+    ("TIM3", "PA6"): 1, ("TIM3", "PA7"): 2,
+    ("TIM3", "PB0"): 3, ("TIM3", "PB1"): 4,
+    **{("TIM5", f"PA{channel - 1}"): channel for channel in range(1, 5)},
+})
 # RM0090 Rev22 Tables42/43 and section14.3.7: one request for a packed pair.
 DAC_DMA_ROUTES = MappingProxyType({
     1: ("DMA1:stream5:channel7",),

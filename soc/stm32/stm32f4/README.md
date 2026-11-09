@@ -77,7 +77,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
-| PWM | TIM3 通道、固定共享 PSC/ARR、period1–65535、duty0–period、shadow update；stop 建立 GPIO inactive |
+| PWM | TIM3 CH1–4、TIM5 CH1–4 中显式选择一路；固定 PSC/ARR；TIM3 period1–65535，TIM5 period1–4294967295；duty0–period、shadow update；stop 建立 GPIO inactive |
 | ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；独立 6／8／10／12-bit 软件 shot/scan、最多 16 ranks；各转换器均有独占 TIM3 触发有限／连续 DMA block |
 | DAC | PA4／PA5 单／双通道，CPU direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA；u8／u12-right／u12-left |
 | CRC | 多项式 0x04C11DB7、初值 0xffffffff、32 位字输入；同步计算、独占 controller、失败输出保持 |
@@ -207,6 +207,17 @@ DMA2 stream4 channel0／stream2 channel1／stream1 channel2，复用有限和连
 service rearm，块间可有间隙。消费者借用不能被覆盖，未释放时 stop 保持 BUSY；
 TIM3 与 PWM 独占冲突。独立 `trigger-dma-continuous` 维护双缓冲和 replacement，
 进度不足时停止而非覆盖消费者。
+
+普通 PWM 的 TIM3 选择 PA6／PA7／PB0／PB1，TIM5 选择 PA0／PA1／PA2／PA3，
+分别对应 CH1–4，均为 AF2，timer clock 固定 84 MHz。每个控制器显式取得一路通道，
+不提供隐式的多通道时基共享；TIM3 与 ADC trigger owner 仍互斥，TIM2 保留给单调时钟。
+
+`period_ticks` 表示完整周期，ARR 为 period−1。上限保留了 CCR 表达 100% duty 的
+空间：TIM3 为 65535，TIM5 为 UINT32_MAX。set 只更新 duty 的预装载，不改变周期
+或 PSC；state 报告已暂存值，实际输出在 update event 生效。长周期不会自动插入
+更新事件或额外任务。冷配置含精确 timer／GPIO／channel／pin，C 在启钟前校验；
+启钟或撤回失败保留选中 timer 的清理责任，不修改其他 timer。已初始化的外部 GPIO
+对象不能被重新绑定。运行时 state 未增加字段；该扩展增加只读静态配置。
 
 每个 port 只有一个执行者，不引入 heap、registry、字符串查找、默认 worker、OS
 lock、通用设备引用或预留 copy pool。UART IRQ 搬运字节和事实，task service 观察

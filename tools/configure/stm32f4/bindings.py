@@ -10,6 +10,7 @@ from tools.configure.providers import hardware
 from tools.configure import timer_advanced, secondary_controllers
 from .contract import (ADC_PIN_CHANNELS, FLASH_PROGRAM_UNIT, LIMITS,
                        PARTS, mode_implementation)
+from .hardware import PWM_PIN_CHANNELS
 
 _PULL_VALUES = MappingProxyType({"none": 0, "up": 1, "down": 2})
 _OUTPUT_TYPES = MappingProxyType({"push-pull": 0, "open-drain": 1})
@@ -249,24 +250,31 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         initialize = DirectCall("nx_stm32_exti_prepare", (state, Address(config)))
         stop = DirectCall("nx_stm32_exti_close", (state,))
     elif kind == "pwm":
-        if item.controller != "TIM3" or [pin["pin"] for pin in item.pins] != ["PA6"]:
-            raise ValueError("Only reviewed TIM3 CH1 PA6 PWM route is maintained")
+        if len(item.pins) != 1:
+            raise ValueError("Fixed PWM requires one reviewed channel pad")
+        wire = item.pins[0]["pin"]
+        channel = PWM_PIN_CHANNELS.get((item.controller, wire))
+        if channel is None:
+            raise ValueError("Fixed PWM requires a reviewed TIM3/TIM5 route")
+        pin = int(wire[2:])
         period, duty, tick = (item.options.period_ticks, item.options.duty_ticks,
                               item.options.tick_hz)
         if not all(isinstance(value, int) for value in (period, duty, tick)):
             raise ValueError("PWM requires explicit period/duty/tick_hz")
         if not 1 <= period <= LIMITS["pwm_period"] or not 0 <= duty <= period or tick <= 0:
-            raise ValueError("Invalid fixed TIM3 PWM counts")
+            raise ValueError("Invalid fixed PWM counts")
         timer_hz = LIMITS["timer_hz"]
         if timer_hz % tick != 0 or not 1 <= timer_hz // tick <= 65536:
-            raise ValueError("PWM tick_hz is not an exact reviewed TIM3 divider")
-        if item.initial not in (0, 64):
-            raise ValueError("PWM idle must be explicit PA6 masked output level")
+            raise ValueError("PWM tick_hz is not an exact reviewed divider")
+        if item.initial not in (0, 1 << pin):
+            raise ValueError("PWM idle must be the exact masked output level")
         definitions += [f"static nx_stm32_gpio_state_t s_nx_idle_{name};",
                         f"static const nx_stm32_pwm_config_t {config} = {{",
                         f"    .period_ticks = {period}u, .duty_ticks = {duty}u,",
                         f"    .tick_hz = {tick}u, .prescaler = {timer_hz // tick - 1}u,",
-                        f"    .inactive_high = {str(bool(item.initial)).lower()}", "};"]
+                        f"    .inactive_high = {str(bool(item.initial)).lower()},",
+                        f"    .registers = {item.controller}, .gpio = GPIO{wire[1]},",
+                        f"    .channel = {channel}u, .pin = {pin}u", "};"]
         inactive = Address(f"s_nx_idle_{name}")
         initialize = DirectCall("nx_stm32_pwm_prepare", (state, inactive, Address(config)))
         stop = DirectCall("nx_stm32_pwm_close", (state, inactive))

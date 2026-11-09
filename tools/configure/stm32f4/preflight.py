@@ -9,7 +9,7 @@ def _clock(controller):
     """Name a maintained exclusive gate, not an inferred silicon topology."""
     if controller.startswith(('USART', 'UART', 'SPI', 'I2C')):
         bus = hardware.maintained('stm32f4', controller).apb
-    elif re.fullmatch('TIM[134679]', controller):
+    elif re.fullmatch('TIM[1345679]', controller):
         bus = 2 if controller in {'TIM1', 'TIM9'} else 1
     elif controller == 'DAC':
         bus = 1
@@ -48,7 +48,7 @@ def admission_declarations(result, pins, pin_count):
             exti |= 1 << line
     for item in claims:
         timer = item.key.removeprefix('controller:')
-        if re.fullmatch('TIM[134679]|TIMER[0238]', timer):
+        if re.fullmatch('TIM[1345679]', timer):
             clocks.add(_clock(timer))
     if result.can_domain is not None:
         clocks.add(_clock('CAN1'))
