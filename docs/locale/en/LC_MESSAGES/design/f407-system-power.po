@@ -137,8 +137,8 @@ msgstr "![FIG-31: F4 source ownership and interface boundaries](../assets/diagra
 msgid "FIG-31：F4 源码归属与接口边界"
 msgstr "FIG-31: F4 source ownership and interface boundaries"
 
-msgid "[F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)"
-msgstr "[F4 source ownership and interface boundaries](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/docs/assets/diagrams/driver-source-ownership.svg)"
+msgid "[F4 源码归属与接口边界](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[F4 source ownership and interface boundaries](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 
 msgid "静态配置、资源责任与公共调用边界参见共享图示。"
 msgstr "See the shared diagram for static configuration, resource responsibility and public call boundaries."

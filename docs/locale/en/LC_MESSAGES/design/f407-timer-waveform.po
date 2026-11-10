@@ -149,8 +149,8 @@ msgstr "![FIG-31: F4 source ownership and interface boundaries](../assets/diagra
 msgid "FIG-31：F4 源码归属与接口边界"
 msgstr "FIG-31: F4 source ownership and interface boundaries"
 
-msgid "[F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)"
-msgstr "[F4 source ownership and interface boundaries](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/docs/assets/diagrams/driver-source-ownership.svg)"
+msgid "[F4 源码归属与接口边界](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[F4 source ownership and interface boundaries](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 
 msgid "配置、调用和借用遵循以下合同。每个物理 timer 只选择一个 face：`pwm_group`、 `timer_pulse` 或 `timer_sequence`；不能同时选择另一种 PWM、encoder、capture 或 advanced PWM owner。没有第二套 open、运行时注册表、默认 buffer pool、heap 或 后台 worker。factory 只返回已存在的对象，prepare 不启动 counter、通道或 DMA。 Platform close 必须排空同一个 owner，失败会阻止 System 退出并保留完整借用。"
 msgstr "Configuration, calls and borrowing follow the contracts below. Each physical timer selects exactly one face: `pwm_group`, `timer_pulse` or `timer_sequence`. It cannot simultaneously select another PWM, encoder, capture or advanced PWM owner. There is no second open path, runtime registry, default buffer pool, heap or background worker. Factory lookup returns existing objects only; prepare starts no counter, channel or DMA. Platform close must drain that same owner. Failure prevents System withdrawal and retains all borrows."

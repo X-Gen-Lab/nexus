@@ -146,8 +146,8 @@ msgstr "![FIG-31: F4 source ownership and interface boundaries](../assets/diagra
 msgid "FIG-31：F4 源码归属与接口边界"
 msgstr "FIG-31: F4 source ownership and interface boundaries"
 
-msgid "[F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)"
-msgstr "[F4 source ownership and interface boundaries](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/docs/assets/diagrams/driver-source-ownership.svg)"
+msgid "[F4 源码归属与接口边界](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[F4 source ownership and interface boundaries](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 
 msgid "图示区分构建输入与运行期调用，不表示吞吐保证。factory 只返回已有 `nx_capture_t` 或 `nx_audio_t`。Platform prepare 取得资源并配置格式，不启动 CAPTURE、I2SE 或一次 DMA 传输；应用通过公共 face 提交请求或启动 RAW blocks。 Platform close 调用同一个 C owner 排空，失败会阻止 System 退出，保留全部借用和 精确清理责任。没有 heap、运行时名字注册表、默认 buffer pool 或后台任务。"
 msgstr "The diagram distinguishes build inputs from runtime calls; it provides no throughput guarantee. Factory lookup returns an existing `nx_capture_t` or `nx_audio_t`. Platform prepare acquires resources and configures the format without starting CAPTURE, I2SE or DMA. Applications submit requests or start RAW blocks through public faces. Platform close uses that same C owner to drain. Failure prevents System withdrawal and retains every borrow and exact cleanup responsibility. There is no heap, runtime name registry, default buffer pool or background task."

@@ -6,7 +6,7 @@ physical HIL 为 `not_executed`，不声明晶振精度、功耗或复位后的�
 
 静态配置、资源责任与公共调用边界参见共享图示。
 
-[F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)
+[F4 源码归属与接口边界](README.md)
 
 图表示当前源码和依赖关系；具体模式、关闭证明和时间域规则以下文为准。
 

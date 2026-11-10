@@ -4,7 +4,7 @@
 访问宽度和 ITR 表来自 RM0090 Rev22，复用引脚来自 DS8626 Rev12。静态软件参考
 不代表电机、电源级、外部连线、PCB 修订或物理波形已经验证。
 
-[F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)
+[F4 源码归属与接口边界](README.md)
 
 配置、调用和借用遵循以下合同。每个物理 timer 只选择一个 face：`pwm_group`、
 `timer_pulse` 或 `timer_sequence`；不能同时选择另一种 PWM、encoder、capture 或

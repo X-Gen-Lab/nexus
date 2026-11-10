@@ -109,5 +109,5 @@ msgstr "![FIG-31: F4 source ownership and interface boundaries](../assets/diagra
 msgid "FIG-31：F4 源码归属与接口边界"
 msgstr "FIG-31: F4 source ownership and interface boundaries"
 
-msgid "[驱动源码与资源所有权](../../../docs/assets/diagrams/driver-source-ownership.svg)"
-msgstr "[Driver source and resource ownership](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/docs/assets/diagrams/driver-source-ownership.svg)"
+msgid "[驱动源码与资源所有权](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[Driver source and resource ownership](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
