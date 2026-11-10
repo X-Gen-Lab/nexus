@@ -1,14 +1,8 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 2d9c9af6e124823371794b2104580e89217ac298137c76e312d0c79e3c63c9f2\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 9cdfa72626d8197a0bdc57e1a22b61f921819b2f6e7bffe68d33a63a12bf7fd5\n"
 
 msgid "F407 I2C target 与 SMBus device"
 msgstr "F407 I2C target and SMBus device"
-
-msgid "![驱动源码与资源所有权](../../../docs/assets/diagrams/driver-source-ownership.svg)"
-msgstr "![Driver source and resource ownership](../../../docs/assets/diagrams/driver-source-ownership.svg)"
-
-msgid "驱动源码与资源所有权"
-msgstr "Driver source and resource ownership"
 
 msgid "本页定义 F407VET6/ZGT6 的有限 target 交换和可选 SMBus 机制。 `i2c_target` 与 `i2c` master 共用同一个物理 I2C controller，资源图拒绝同时选择 两个 owner。I2C1/2/3 各有一个静态 C state、冷启动 receipt 和固定 EV/ER 向量； 没有 listener worker、运行期注册、分配或应用寄存器表。"
 msgstr "This page defines finite target exchanges and optional SMBus mechanisms for F407VET6/ZGT6. `i2c_target` and the `i2c` master share the same physical I2C controller; the resource graph rejects selecting both owners together. Each of I2C1/2/3 has one static C state, a cold-start receipt and fixed EV/ER vectors. There is no listener worker, runtime registration, allocation or application register map."
@@ -108,3 +102,12 @@ msgstr "TIMEOUT, PECERR, BERR, ARLO and OVR retain separate diagnostics. When TI
 
 msgid "ES0182 §2.10.2 指出硬件无法按任意无效 byte/command 返回 NACK，因此此接口不 声称实现完整 SMBus v2.0 标准。应用命令验证、寄存器含义、报警条件、host-notify、 ARP、业务重试和错误恢复策略由外部产品提供。NOSTRETCH 始终为零，遵守 §2.10.5 对 target transmitter 的 clock stretching 工作区。"
 msgstr "ES0182 §2.10.2 states that hardware cannot return NACK for arbitrary invalid bytes/commands, so this interface does not claim complete SMBus v2.0 conformance. External products supply application command validation, register semantics, alert conditions, host-notify, ARP, application retries and error recovery policy. NOSTRETCH is always zero, retaining clock stretching for the target transmitter as required by §2.10.5."
+
+msgid "![FIG-31：F4 源码归属与接口边界](../assets/diagrams/driver-source-ownership.svg)"
+msgstr "![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)"
+
+msgid "FIG-31：F4 源码归属与接口边界"
+msgstr "FIG-31: F4 source ownership and interface boundaries"
+
+msgid "[驱动源码与资源所有权](../../../docs/assets/diagrams/driver-source-ownership.svg)"
+msgstr "[Driver source and resource ownership](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/docs/assets/diagrams/driver-source-ownership.svg)"

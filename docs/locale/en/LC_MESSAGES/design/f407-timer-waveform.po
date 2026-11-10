@@ -1,15 +1,12 @@
 # Draft translation from the exact current gettext extraction; review pending.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: f34d63bbcf9b067ac4cbef91a468c43650cda2bd69d62a4d65d60b2714c64196\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: ea67e929e4677d61099784e748f24c4b91e49c2b7788102e3859687222b8d872\n"
 
 msgid "F407 多通道 PWM、单脉冲与 DMA 序列"
 msgstr "F407 multi-channel PWM, one-pulse operation and DMA sequences"
 
 msgid "这里记录 STM32F407VE／ZG 的单一 timer owner 软件合同。寄存器、原生 DMA 访问宽度和 ITR 表来自 RM0090 Rev22，复用引脚来自 DS8626 Rev12。静态软件参考 不代表电机、电源级、外部连线、PCB 修订或物理波形已经验证。"
 msgstr "This page records the single timer owner software contract for STM32F407VE/ZG. Registers, native DMA access widths and ITR tables come from RM0090 Rev22; alternate-function pins come from DS8626 Rev12. Static software references do not establish validation of motors, power stages, external wiring, PCB revisions or physical waveforms."
-
-msgid "箭头区分配置、调用和借用。每个物理 timer 只选择一个 face：`pwm_group`、 `timer_pulse` 或 `timer_sequence`；不能同时选择另一种 PWM、encoder、capture 或 advanced PWM owner。没有第二套 open、运行时注册表、默认 buffer pool、heap 或 后台 worker。factory 只返回已存在的对象，prepare 不启动 counter、通道或 DMA。 Platform close 必须排空同一个 owner，失败会阻止 System 退出并保留完整借用。"
-msgstr "Arrows distinguish configuration, calls and borrowing. Each physical timer selects exactly one face: `pwm_group`, `timer_pulse` or `timer_sequence`. It cannot simultaneously select another PWM, encoder, capture or advanced PWM owner. There is no second open path, runtime registry, default buffer pool, heap or background worker. Factory lookup returns existing objects only; prepare starts no counter, channel or DMA. Platform close must drain that same owner. Failure prevents System withdrawal and retains all borrows."
 
 msgid "实例与硬件边界"
 msgstr "Instances and hardware boundaries"
@@ -145,3 +142,15 @@ msgstr "The same privileged, non-ISR task calls every method serially with IRQs 
 
 msgid "维护程序 `tests/google/f407_timer_waveform_test.cpp` 直接编译生产 C11 后端，硬件 模型只提供 MMIO、IRQ、CPU 和时间边界；既有 `timer_advanced_test.cpp` 覆盖共享 break 核心回归。配置与真实 ARM 软件参考由 `tools/configure/test_f407_timer_waveform_configuration.py` 及对应 contract fixture 验证。软件通过不等于电气波形、DMA 并发吞吐或外部功率电路的 HIL 资格。"
 msgstr "The maintained program `tests/google/f407_timer_waveform_test.cpp` directly compiles the production C11 backend. Hardware models supply only MMIO, IRQ, CPU and time boundaries; existing `timer_advanced_test.cpp` covers shared break-core regressions. `tools/configure/test_f407_timer_waveform_configuration.py` and the corresponding contract fixtures verify configuration and actual ARM software references. Passing software does not establish HIL qualification for electrical waveforms, concurrent DMA throughput or external power circuits."
+
+msgid "![FIG-31：F4 源码归属与接口边界](../assets/diagrams/driver-source-ownership.svg)"
+msgstr "![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)"
+
+msgid "FIG-31：F4 源码归属与接口边界"
+msgstr "FIG-31: F4 source ownership and interface boundaries"
+
+msgid "[F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)"
+msgstr "[F4 source ownership and interface boundaries](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/docs/assets/diagrams/driver-source-ownership.svg)"
+
+msgid "配置、调用和借用遵循以下合同。每个物理 timer 只选择一个 face：`pwm_group`、 `timer_pulse` 或 `timer_sequence`；不能同时选择另一种 PWM、encoder、capture 或 advanced PWM owner。没有第二套 open、运行时注册表、默认 buffer pool、heap 或 后台 worker。factory 只返回已存在的对象，prepare 不启动 counter、通道或 DMA。 Platform close 必须排空同一个 owner，失败会阻止 System 退出并保留完整借用。"
+msgstr "Configuration, calls and borrowing follow the contracts below. Each physical timer selects exactly one face: `pwm_group`, `timer_pulse` or `timer_sequence`. It cannot simultaneously select another PWM, encoder, capture or advanced PWM owner. There is no second open path, runtime registry, default buffer pool, heap or background worker. Factory lookup returns existing objects only; prepare starts no counter, channel or DMA. Platform close must drain that same owner. Failure prevents System withdrawal and retains all borrows."

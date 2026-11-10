@@ -1,6 +1,6 @@
 # Current gettext translation draft; independent review pending.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 4a8a3a527899b4dce7f6f48c6e4dd5c0ee5b95d6ec423e0eb8c21afbc4c3fef1\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 0019665bff7326eb90f664a89adb71a3cd8111da6d74596645bb137c7f5b80a3\n"
 
 msgid "Finite I2S2 slave TX on STM32F407"
 msgstr "STM32F407 上的有限 I2S2 从机发送"
@@ -91,3 +91,18 @@ msgstr "软件证据与限制"
 
 msgid "The maintained host program exercises the real C11 owner at independent MMIO, IRQ, time and memory boundaries, including cancellation, failed stop, late IRQ, geometry, exact loan identity, counter bounds and inaccessible settled controls. ARM fixtures link both exact parts through the public factory and Platform path. These checks establish software behavior and selected linking only. External clock timing, codec operation, electrical limits and concurrent DMA throughput require physical execution."
 msgstr "维护中的主机程序在独立 MMIO、IRQ、time 和 memory 边界直接执行真实 C11 owner，覆盖取消、stop 失败、迟到 IRQ、几何、精确 loan 身份、计数范围和已 SETTLED control 不可访问。ARM 夹具通过公共 factory 和 Platform 路径链接两个精确型号。这些检查只建立软件行为与所选链接证据。外部时钟时序、codec 工作、电气界限和并发 DMA 吞吐仍需物理执行。"
+
+msgid "![FIG-06: request borrowing, drain and final settlement](../assets/diagrams/request-lifecycle.svg)"
+msgstr "![FIG-06：请求借用、排空与最终结清](../assets/diagrams/request-lifecycle.svg)"
+
+msgid "![FIG-31: current F4 source ownership and public call boundaries](../assets/diagrams/driver-source-ownership.svg)"
+msgstr "![FIG-31：当前 F4 源码归属与公共调用边界](../assets/diagrams/driver-source-ownership.svg)"
+
+msgid "FIG-06: request borrowing, drain and final settlement"
+msgstr "FIG-06：请求借用、排空与最终结清"
+
+msgid "FIG-31: current F4 source ownership and public call boundaries"
+msgstr "FIG-31：当前 F4 源码归属与公共调用边界"
+
+msgid "The shared source diagram distinguishes build inputs from runtime calls. The sections below define this finite slave TX mode's external-clock handshake, buffer borrowing and complete withdrawal; the diagram establishes no physical qualification."
+msgstr "共享源码图区分构建输入与运行期调用。下文定义此有限 slave TX 模式的外部时钟握手、缓冲借用和完整退出；图示不建立物理资格。"

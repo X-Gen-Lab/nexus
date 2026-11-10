@@ -1,6 +1,6 @@
 # Current exact gettext entries; independent delta review pending.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 47c8eaeb96d000b8cebfd93b348338a877a08e3b5a27b7ce27bc9c7bc0228c4b\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 4d9c52f7df197ad4f6b9395f5dc3243f2945951520a2845be93fa6782dc4ba45\n"
 
 msgid "F407 DCMI 与 I2S2／3"
 msgstr "F407 DCMI and I2S2/3"
@@ -8,20 +8,8 @@ msgstr "F407 DCMI and I2S2/3"
 msgid "这里记录 `capture.c`、`audio.c` 和同源静态装配的合同。芯片 AF 路线来自 DS8626 Rev12；寄存器、DMA 与关闭时序来自 RM0090 Rev22。软件参考限定 STM32F407VE／ZG，不代表摄像头、codec、PCB 接线、电气时序或物理 HIL 已执行。"
 msgstr "This page records the contracts of `capture.c`, `audio.c` and their shared static assembly. Silicon AF routes come from DS8626 Rev12; register, DMA and stop ordering come from RM0090 Rev22. Software references target STM32F407VE/ZG and do not establish camera, codec, PCB wiring, electrical timing or physical HIL execution."
 
-msgid "静态配置、资源责任与公共调用边界见下图。"
-msgstr "The following diagram shows static configuration, resource responsibility and public call boundaries."
-
-msgid "![F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)"
-msgstr "![F4 source ownership and interface boundaries](../../../docs/assets/diagrams/driver-source-ownership.svg)"
-
-msgid "F4 源码归属与接口边界"
-msgstr "F4 source ownership and interface boundaries"
-
 msgid "图表示当前源码和依赖关系；具体模式、关闭证明和时间域规则以下文为准。"
 msgstr "The diagram shows current source and dependency relationships. The sections below define exact modes, shutdown proof and time-domain rules."
-
-msgid "箭头表示当前配置、调用与所有权关系，不表示吞吐保证。factory 只返回已有 `nx_capture_t` 或 `nx_audio_t`。Platform prepare 取得资源并配置格式，不启动 CAPTURE、I2SE 或一次 DMA 传输；应用通过公共 face 提交请求或启动 RAW blocks。 Platform close 调用同一个 C owner 排空，失败会阻止 System 退出，保留全部借用和 精确清理责任。没有 heap、运行时名字注册表、默认 buffer pool 或后台任务。"
-msgstr "Arrows describe current configuration, call and ownership relationships, not throughput guarantees. Factory lookup returns an existing `nx_capture_t` or `nx_audio_t`. Platform prepare acquires resources and configures the format without starting CAPTURE, I2SE or DMA. Applications submit requests or start RAW blocks through public faces. Platform close uses that same C owner to drain. Failure prevents System withdrawal and retains every borrow and exact cleanup responsibility. There is no heap, runtime name registry, default buffer pool or background task."
 
 msgid "DCMI 输入与模式"
 msgstr "DCMI inputs and modes"
@@ -151,3 +139,18 @@ msgstr "Privilege/ISR/three incoming masks, shared PLL, neighboring DMA and orig
 
 msgid "原手动 face／storage ABI 的布局检查随该 ABI 退出。原 System 特殊 gate 分支的三项 测试只证明手动调用者已自行 join 的前提，随该架构删除；标准 Platform 现在实际调用 audio close，无法完成借用排空就拒绝资源撤回。cold 状态及共享 GPIO／DMA 门由已有 Platform 资源 owner 统一取得，factory 不再允许调用者构造第二个硬件 owner。 linked provider 验证沿用普通 generated face→五方法表→真实私有函数的同一机制， 无需专用角色、公共 opaque storage 或另一个硬件发现入口。"
 msgstr "Layout checks of the manual face/storage ABI retire with that ABI. Three tests of special System gates proved only that manual callers had joined their users and retire with that architecture. Standard Platform now actually calls audio close and refuses resource withdrawal without complete borrow drain. Existing Platform resource owners acquire cold state and shared GPIO/DMA gates. Factory no longer lets callers construct a second hardware owner. Linked-provider verification uses the same generated-face→five-method-table→actual-private-function mechanism without a dedicated role, public opaque storage or another discovery entry point."
+
+msgid "![FIG-31：F4 源码归属与接口边界](../assets/diagrams/driver-source-ownership.svg)"
+msgstr "![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)"
+
+msgid "FIG-31：F4 源码归属与接口边界"
+msgstr "FIG-31: F4 source ownership and interface boundaries"
+
+msgid "[F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)"
+msgstr "[F4 source ownership and interface boundaries](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/docs/assets/diagrams/driver-source-ownership.svg)"
+
+msgid "图示区分构建输入与运行期调用，不表示吞吐保证。factory 只返回已有 `nx_capture_t` 或 `nx_audio_t`。Platform prepare 取得资源并配置格式，不启动 CAPTURE、I2SE 或一次 DMA 传输；应用通过公共 face 提交请求或启动 RAW blocks。 Platform close 调用同一个 C owner 排空，失败会阻止 System 退出，保留全部借用和 精确清理责任。没有 heap、运行时名字注册表、默认 buffer pool 或后台任务。"
+msgstr "The diagram distinguishes build inputs from runtime calls; it provides no throughput guarantee. Factory lookup returns an existing `nx_capture_t` or `nx_audio_t`. Platform prepare acquires resources and configures the format without starting CAPTURE, I2SE or DMA. Applications submit requests or start RAW blocks through public faces. Platform close uses that same C owner to drain. Failure prevents System withdrawal and retains every borrow and exact cleanup responsibility. There is no heap, runtime name registry, default buffer pool or background task."
+
+msgid "静态配置、资源责任与公共调用边界参见共享图示。"
+msgstr "See the shared diagram for static configuration, resource responsibility and public call boundaries."

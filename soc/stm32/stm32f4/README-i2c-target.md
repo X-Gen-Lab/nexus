@@ -1,6 +1,6 @@
 # F407 I2C target 与 SMBus device
 
-![驱动源码与资源所有权](../../../docs/assets/diagrams/driver-source-ownership.svg)
+[驱动源码与资源所有权](../../../docs/assets/diagrams/driver-source-ownership.svg)
 
 本页定义 F407VET6/ZGT6 的有限 target 交换和可选 SMBus 机制。
 `i2c_target` 与 `i2c` master 共用同一个物理 I2C controller，资源图拒绝同时选择

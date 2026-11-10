@@ -4,22 +4,9 @@
 访问宽度和 ITR 表来自 RM0090 Rev22，复用引脚来自 DS8626 Rev12。静态软件参考
 不代表电机、电源级、外部连线、PCB 修订或物理波形已经验证。
 
-```mermaid
-flowchart LR
-    A[schema 2 TOML] --> B[冻结的 TimerWaveformOptions 与资源图]
-    B --> C[固定配置、存储、factory 和薄 IRQ]
-    C --> D[Platform prepare / close]
-    D --> E[同一个手写 C timer owner]
-    F[CPU 完整通道组] -->|一次 commit，不保留指针| E
-    G[有限 pulse request] -->|借用控制与宽度数组| E
-    H[frame DMA consumer loan] -->|借用整个存储块| E
-    E --> I[独占 TIM 与选定 UPDATE DMA stream]
-    I -->|观察真实 MMIO、计数和 IRQ| E
-    E -->|完全排空后 SETTLED| G
-    E -->|完全排空后归还并 SETTLED| H
-```
+[F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)
 
-箭头区分配置、调用和借用。每个物理 timer 只选择一个 face：`pwm_group`、
+配置、调用和借用遵循以下合同。每个物理 timer 只选择一个 face：`pwm_group`、
 `timer_pulse` 或 `timer_sequence`；不能同时选择另一种 PWM、encoder、capture 或
 advanced PWM owner。没有第二套 open、运行时注册表、默认 buffer pool、heap 或
 后台 worker。factory 只返回已存在的对象，prepare 不启动 counter、通道或 DMA。

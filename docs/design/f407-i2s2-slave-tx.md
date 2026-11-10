@@ -50,16 +50,12 @@ or additional initialization authority. The public path is exercised by the
 The broader I2S2/I2S3 format, receive, duplex and master-clock contract is in
 [the F407 capture/audio implementation notes](../../soc/stm32/stm32f4/capture_audio.md).
 
-```mermaid
-flowchart LR
-    TOML[Static audio selection] --> Platform[Platform prepare / close]
-    Platform --> Owner[One audio owner]
-    Factory[Typed factory lookup] --> Face[Existing immutable face]
-    Face --> Owner
-    Loan[Whole frame consumer loan] -->|submit accepts borrow| Owner
-    Owner -->|DMA then wire then IRQ and address drain| Settled[SETTLED returns loan]
-    Master[External CK / WS owner] -->|idle entry and drain clocks| Owner
-```
+![FIG-31: current F4 source ownership and public call boundaries](../assets/diagrams/driver-source-ownership.svg)
+
+The shared source diagram distinguishes build inputs from runtime calls. The
+sections below define this finite slave TX mode's external-clock handshake,
+buffer borrowing and complete withdrawal; the diagram establishes no physical
+qualification.
 
 ## Coordinate the external master
 
@@ -81,6 +77,8 @@ to begin clocking. Start the separately owned master only after observing
 `ACTIVE`. IRQs latch completion and errors; no worker or scheduler is created.
 
 ## Drain before returning storage
+
+![FIG-06: request borrowing, drain and final settlement](../assets/diagrams/request-lifecycle.svg)
 
 DMA TC and NDTR zero prove memory transfer progress. Final access additionally
 requires TX requests off, DMA disabled, a fresh TXE observation followed by a

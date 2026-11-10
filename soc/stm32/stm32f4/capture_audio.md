@@ -4,25 +4,13 @@
 DS8626 Rev12；寄存器、DMA 与关闭时序来自 RM0090 Rev22。软件参考限定
 STM32F407VE／ZG，不代表摄像头、codec、PCB 接线、电气时序或物理 HIL 已执行。
 
-静态配置、资源责任与公共调用边界见下图。
+静态配置、资源责任与公共调用边界参见共享图示。
 
-![F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)
+[F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)
 
 图表示当前源码和依赖关系；具体模式、关闭证明和时间域规则以下文为准。
 
-```mermaid
-flowchart LR
-    A[一份 schema 2 TOML] --> B[冻结的 CaptureOptions / AudioOptions]
-    B --> C[静态配置、存储、typed factory 与 IRQ 连接]
-    C --> D[Platform prepare / close]
-    D --> E[手写 C owner]
-    E --> F[私有官方 HAL / LL 与寄存器观察]
-    G[调用者 frame / stream 存储] -->|显式借用| E
-    E -->|排空后发布或归还| G
-    H[外部 sensor / codec 与电气时序] --- F
-```
-
-箭头表示当前配置、调用与所有权关系，不表示吞吐保证。factory 只返回已有
+图示区分构建输入与运行期调用，不表示吞吐保证。factory 只返回已有
 `nx_capture_t` 或 `nx_audio_t`。Platform prepare 取得资源并配置格式，不启动
 CAPTURE、I2SE 或一次 DMA 传输；应用通过公共 face 提交请求或启动 RAW blocks。
 Platform close 调用同一个 C owner 排空，失败会阻止 System 退出，保留全部借用和

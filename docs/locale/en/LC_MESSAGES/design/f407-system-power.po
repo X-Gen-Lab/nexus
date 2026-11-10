@@ -1,21 +1,12 @@
 # Draft translation from the exact current gettext extraction; review pending.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: a1287c188c826bb6f16eceec27ffb80054be20752585e44722fc76f882314f37\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 6288dad7b577556e5c1acddcac48df118c6234747b0f4bd7d5bea1436eccd987\n"
 
 msgid "F407 System、时钟与监督"
 msgstr "F407 System, clocks and supervision"
 
 msgid "本页描述 F407VE／ZG 的静态 C 机制。产品喂狗、复位、任务重启、低压保护和 VBAT 策略由外部工程提供。主机模型与 ARM 构建分别建立软件和链接证据；本轮 physical HIL 为 `not_executed`，不声明晶振精度、功耗或复位后的物理保留资格。"
 msgstr "This page describes static C mechanisms for F407VE/ZG. Product watchdog feeding, reset, task restart, undervoltage protection and VBAT policy belong in external projects. Host models and ARM builds establish separate software and link evidence. Physical HIL in this batch is `not_executed`; oscillator accuracy, power consumption and physical retention after reset are not qualified."
-
-msgid "静态配置、资源责任与公共调用边界见下图。"
-msgstr "The following diagram shows static configuration, resource responsibility and public call boundaries."
-
-msgid "![F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)"
-msgstr "![F4 source ownership and interface boundaries](../../../docs/assets/diagrams/driver-source-ownership.svg)"
-
-msgid "F4 源码归属与接口边界"
-msgstr "F4 source ownership and interface boundaries"
 
 msgid "图表示当前源码和依赖关系；具体模式、关闭证明和时间域规则以下文为准。"
 msgstr "The diagram shows current source and dependency relationships. The sections below define exact modes, shutdown proof and time-domain rules."
@@ -139,3 +130,15 @@ msgstr "Platform prepares RNG after System successfully starts and withdraws RNG
 
 msgid "每次读保留官方 RNG 的首字丢弃、连续相同值与 seed/clock 错误检查；失去时钟或 epoch 后不再发布数据，不建立熵池或质量认证。应用在 Platform suspend／stop 之前 join 全部同步 RNG／TLS／网络消费者。关闭失败保留原 owner、时钟依赖与可 重试责任；时钟失败后仍可清理，成功才撤回本 owner 取得的位。外部活动 RNGEN／IRQ 仍会令 System.stop 在任何写入之前拒绝撤时钟。"
 msgstr "Each read retains the official RNG's first-word discard, continuous equal-value check and seed/clock error checks. Data is not published after clock or epoch loss; no entropy pool or quality certification is established. Applications join all synchronous RNG/TLS/network consumers before Platform suspend/stop. Failed shutdown retains the original owner, clock dependency and retry responsibility. Cleanup remains available after clock failure and releases only the bits acquired by this owner on success. Foreign active RNGEN/IRQ still causes System.stop to reject clock withdrawal before any write."
+
+msgid "![FIG-31：F4 源码归属与接口边界](../assets/diagrams/driver-source-ownership.svg)"
+msgstr "![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)"
+
+msgid "FIG-31：F4 源码归属与接口边界"
+msgstr "FIG-31: F4 source ownership and interface boundaries"
+
+msgid "[F4 源码归属与接口边界](../../../docs/assets/diagrams/driver-source-ownership.svg)"
+msgstr "[F4 source ownership and interface boundaries](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/docs/assets/diagrams/driver-source-ownership.svg)"
+
+msgid "静态配置、资源责任与公共调用边界参见共享图示。"
+msgstr "See the shared diagram for static configuration, resource responsibility and public call boundaries."

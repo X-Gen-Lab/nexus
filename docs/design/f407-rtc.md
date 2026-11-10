@@ -1,6 +1,6 @@
 ---
 id: design.f407-rtc
-type: design
+type: reference
 audience: maintainer
 source_language: zh_CN
 ---

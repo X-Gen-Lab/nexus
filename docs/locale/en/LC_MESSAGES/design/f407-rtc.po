@@ -1,6 +1,6 @@
 # Current exact gettext entries; independent delta review pending.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: c1ea99b1b9e817435bd9b58ced32cb3fc7a6fa31cf36746bc589cd7a5ffabb10\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 099b752b09b154fb61dcf1a9e6039169769e3388bc3a1078a769c84981b598b7\n"
 
 msgid "F407 RTC 与备份域责任"
 msgstr "F407 RTC and backup-domain responsibilities"
