@@ -200,7 +200,7 @@ def resolve(nodes, edges, *, startup=(), loops=()):
                          tuple(startup_order), tuple(declarations))
 
 
-def resolve_fixed(selected, routes):
+def resolve_fixed(selected, *, adc_triggers=None):
     """Project only existing reviewed timer-triggered ADC modes.
 
 No additional selector is invented. Their providers already validate the exact
@@ -263,18 +263,19 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
         if item["kind"] != "adc" or item["mode"] not in {
                 "trigger-dma", "trigger-dma-continuous"}:
             continue
-        route = routes[item["route"]]
-        resources = route.get("mode_resources", {}).get(item["mode"], [])
-        timers = [value for value in resources
-                  if value.startswith("controller:")]
-        if len(timers) != 1 or len(item.get("dma", ())) != 1:
-            fail("Fixed ADC trigger requires one reviewed timer and DMA route")
+        source = item.get("trigger")
+        if (adc_triggers is None or source not in adc_triggers or
+                len(item.get("dma", ())) != 1):
+            fail("ADC trigger requires one reviewed selected timer and DMA route")
+        timer = "controller:" + adc_triggers[source]
+        signal = source.split("-", 1)[1]
+        event = "update" if signal == "trgo" else "compare" + signal[2:]
         owner = item["id"]
         trigger, adc, dma = (owner + suffix
                              for suffix in (":trigger", ":adc", ":dma"))
         # These conservative clock identities do not assert a common clock
         # source or frequency. The reviewed hardware routes permit crossing.
-        roles = ((trigger, timers[0], ["update"], ["stop"]),
+        roles = ((trigger, timer, [event], ["stop"]),
                  (adc, "controller:" + item["controller"],
                   ["sample-ready"], ["sample", "stop"]),
                  (dma, "engine:" + item["dma"][0].split(":")[0],
@@ -285,9 +286,9 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
                           "events": events, "actions": actions,
                           "stop_actions": ["stop"]})
         edges.extend([
-            {"source": trigger, "event": "update", "target": adc,
+            {"source": trigger, "event": event, "target": adc,
              "action": "sample",
-             "route": timers[0] + ":" + item["controller"],
+             "route": timer + ":" + event + ":" + item["controller"],
              "cross_domain": True},
             {"source": adc, "event": "sample-ready", "target": dma,
              "action": "transfer", "route": item["dma"][0],

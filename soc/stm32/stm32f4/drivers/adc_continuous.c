@@ -6,7 +6,7 @@
  * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "stm32f407_stream.h"
+#include "stm32f4_adc_trigger.h"
 #include "stm32f4xx_ll_adc.h"
 #include "stm32f4xx_ll_tim.h"
 
@@ -117,14 +117,7 @@ static nx_result_t arm(nx_stm32_adc_continuous_state_t* state) {
                          (uint32_t)base->adc.resolution << ADC_CR1_RES_Pos);
     nx_stm32_adc_stream_sequence(base);
     adc->SR = 0U;
-    base->timer->CR1 = 0U;
-    base->timer->CR2 = TIM_CR2_MMS_1;
-    base->timer->DIER = 0U;
-    LL_TIM_SetPrescaler(base->timer, base->prescaler);
-    LL_TIM_SetAutoReload(base->timer, base->period);
-    LL_TIM_SetCounter(base->timer, 0U);
-    base->timer->EGR = TIM_EGR_UG;
-    base->timer->SR = 0U;
+    nx_stm32_adc_trigger_program(base);
     acknowledge(base, 0x3DU);
     base->memory->PAR = (uint32_t)(uintptr_t)&adc->DR;
     base->memory->M0AR = (uint32_t)(uintptr_t)state->targets[0].data;
@@ -138,7 +131,9 @@ static nx_result_t arm(nx_stm32_adc_continuous_state_t* state) {
                        DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
     nx_arch_dsb();
     base->memory->CR |= DMA_SxCR_EN;
-    adc->CR2 = ADC_CR2_ADON | ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTSEL_3;
+    adc->CR2 = ADC_CR2_ADON | ADC_CR2_DMA | ADC_CR2_DDS |
+               ((uint32_t)nx_stm32_adc_trigger_fact(base->trigger)->selection
+                << ADC_CR2_EXTSEL_Pos);
     nx_arch_dsb();
     (void)adc->CR2;
     base->ready_at = nx_deadline_after(

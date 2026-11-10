@@ -80,7 +80,7 @@ def mode_implementation(kind, mode):
 def validate_dma(route, mode, normalize):
     common.validate_dma(route, mode,
                         _FIXED_DMA.get((route["controller"], mode)),
-                        'native', normalize, None)
+                        'native')
 
 
 def dma_irq(dma):

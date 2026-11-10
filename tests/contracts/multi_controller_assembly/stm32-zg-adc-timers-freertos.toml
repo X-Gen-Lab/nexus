@@ -1,0 +1,50 @@
+# Independent timer-triggered DMA; silicon-only routes, no analog qualification.
+schema = 2
+board_package = "stm32-zg-board"
+backend = "freertos"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[adc.internal]
+binding = "adc-internal"
+mode = "trigger-dma"
+channels = [16, 17, 18]
+sample_times = [7, 7, 7]
+reference_mv = 3300
+trigger = "tim3-ch1"
+
+[adc.internal.irq]
+priority = 5
+calls_os = false
+
+[adc.second]
+binding = "adc2"
+mode = "trigger-dma-continuous"
+channels = [8, 8, 8, 8]
+sample_times = [7, 7, 7, 7]
+resolution_bits = 8
+reference_mv = 3300
+trigger = "tim5-ch3"
+
+[adc.second.irq]
+priority = 5
+calls_os = false
+
+[adc.third]
+binding = "adc3"
+mode = "trigger-dma"
+channels = [4, 4]
+sample_times = [7, 7]
+resolution_bits = 10
+reference_mv = 3300
+trigger = "tim8-ch1"
+
+[adc.third.irq]
+priority = 5
+calls_os = false

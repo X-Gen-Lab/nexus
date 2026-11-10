@@ -23,7 +23,22 @@ typedef struct {
     bool loss_latched;
 } nx_stm32_uart_stream_state_t;
 
-/** \brief Discrete independent ADC scan blocks on an exclusive TIM3 TRGO. */
+/** \brief Reviewed regular triggers; zero preserves the TIM3 TRGO profile. */
+typedef enum {
+    NX_STM32_ADC_TIM3_TRGO,
+    NX_STM32_ADC_TIM1_CH1,
+    NX_STM32_ADC_TIM1_CH2,
+    NX_STM32_ADC_TIM1_CH3,
+    NX_STM32_ADC_TIM3_CH1,
+    NX_STM32_ADC_TIM4_CH4,
+    NX_STM32_ADC_TIM5_CH1,
+    NX_STM32_ADC_TIM5_CH2,
+    NX_STM32_ADC_TIM5_CH3,
+    NX_STM32_ADC_TIM8_CH1,
+    NX_STM32_ADC_TIM8_TRGO
+} nx_stm32_adc_trigger_t;
+
+/** \brief Discrete independent ADC scan blocks on an exclusive timer. */
 typedef struct {
     nx_stm32_adc_state_t adc;
     TIM_TypeDef* timer;
@@ -46,6 +61,8 @@ typedef struct {
     bool terminal;
     bool stopping;
     bool fault;
+    uint8_t
+        trigger; /**< Immutable selected source; shared by both DMA modes. */
 } nx_stm32_adc_stream_state_t;
 
 /**

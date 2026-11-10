@@ -132,6 +132,9 @@
           "timeout_ms": {
             "type": "integer",
             "minimum": 0
+          },
+          "trigger": {
+            "type": "string"
           }
         },
         "required": [

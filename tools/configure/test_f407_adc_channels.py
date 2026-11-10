@@ -301,5 +301,85 @@ class F407AdcChannelTests(unittest.TestCase):
                 gate.resolve_ir(assembly)
 
 
+    def test_regular_dma_trigger_choices_have_typed_resources_and_static_links(self):
+        choices = (("tim3-trgo", "TIM3", "TIM3_TRGO"),
+                   ("tim1-ch1", "TIM1", "TIM1_CH1"),
+                   ("tim1-ch2", "TIM1", "TIM1_CH2"),
+                   ("tim1-ch3", "TIM1", "TIM1_CH3"),
+                   ("tim3-ch1", "TIM3", "TIM3_CH1"),
+                   ("tim4-ch4", "TIM4", "TIM4_CH4"),
+                   ("tim5-ch1", "TIM5", "TIM5_CH1"),
+                   ("tim5-ch2", "TIM5", "TIM5_CH2"),
+                   ("tim5-ch3", "TIM5", "TIM5_CH3"),
+                   ("tim8-ch1", "TIM8", "TIM8_CH1"),
+                   ("tim8-trgo", "TIM8", "TIM8_TRGO"))
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            for trigger, timer, symbol in choices:
+                for mode in ('trigger-dma', 'trigger-dma-continuous'):
+                    with self.subTest(trigger=trigger, mode=mode):
+                        assembly = self.dma_assembly(directory, 've', 'ADC2', mode)
+                        assembly.write_text(assembly.read_text().replace(
+                            'reference_mv=3300',
+                            'reference_mv=3300\ntrigger='+json.dumps(trigger)))
+                        result = gate.resolve_ir(assembly)
+                        self.assertEqual(trigger, result.controllers[0].options.trigger)
+                        claims = {claim.key for claim in result.claims}
+                        self.assertIn('controller:'+timer, claims)
+                        if timer != 'TIM3':
+                            self.assertNotIn('controller:TIM3', claims)
+                        self.assertIn('.trigger = NX_STM32_ADC_'+symbol,
+                                      bindings.emit(result)[1])
+
+    def test_independent_adc_dma_can_use_distinct_timer_owners(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            assembly = self.dma_assembly(directory, 've', 'ADC2', 'trigger-dma', peer=True)
+            text = assembly.read_text().replace(
+                '[adc.input.irq]', 'trigger="tim4-ch4"\n[adc.input.irq]').replace(
+                '[adc.peer.irq]', 'trigger="tim8-trgo"\n[adc.peer.irq]')
+            text += ('[adc.third]\nbinding="independent1"\nmode="trigger-dma-continuous"\n'
+                     'channels=[4]\nsample_times=[7]\nreference_mv=3300\ntrigger="tim1-ch2"\n'
+                     '[adc.third.irq]\npriority=5\ncalls_os=false\n')
+            assembly.write_text(text)
+            result = gate.resolve_ir(assembly)
+            claims = {claim.key for claim in result.claims}
+            self.assertTrue({'controller:TIM1', 'controller:TIM4', 'controller:TIM8'} <= claims)
+            self.assertNotIn('controller:TIM3', claims)
+            self.assertEqual(3, len(result.controllers))
+
+    def test_selected_adc_timer_still_excludes_pwm_on_a_different_pin(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            assembly = self.dma_assembly(directory, 've', 'ADC2', 'trigger-dma')
+            board_path = directory/'board.json'
+            board = json.loads(board_path.read_text())
+            board['bindings'].append({'id': 'timer', 'controller': 'TIM5',
+                                       'route': 'tim5-ch4-pa3'})
+            board_path.write_text(json.dumps(board))
+            assembly.write_text(assembly.read_text().replace(
+                '[adc.input.irq]', 'trigger="tim5-ch1"\n[adc.input.irq]')+
+                '[pwm.output]\nbinding="timer"\nmode="fixed-pwm"\n'
+                'tick_hz=1000000\nperiod_ticks=1000\nduty_ticks=0\n')
+            with self.assertRaisesRegex(ValueError, 'controller:TIM5'):
+                gate.resolve_ir(assembly)
+
+    def test_unknown_reserved_or_software_trigger_selections_reject(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            for trigger in ('tim2-trgo', 'exti11', 'tim9-ch1', 'tim8-unknown', 8, True):
+                with self.subTest(trigger=trigger):
+                    assembly = self.dma_assembly(directory, 've', 'ADC2', 'trigger-dma')
+                    assembly.write_text(assembly.read_text().replace(
+                        '[adc.input.irq]', 'trigger='+json.dumps(trigger)+'\n[adc.input.irq]'))
+                    with self.assertRaises(ValueError):
+                        gate.resolve_ir(assembly)
+            assembly = self.dma_assembly(directory, 've', 'ADC2', 'trigger-dma')
+            text = assembly.read_text().split('[adc.input.irq]')[0]
+            assembly.write_text(text.replace('trigger-dma', 'single-shot')+'trigger="tim3-trgo"\n')
+            with self.assertRaises(ValueError):
+                gate.resolve_ir(assembly)
+
+
 if __name__ == "__main__":
     unittest.main()

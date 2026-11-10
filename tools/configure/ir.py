@@ -361,6 +361,7 @@ class AdcOptions:
     irq: IrqOptions | None
     stream_profile: StreamProfileIR | None = None
     resolution_bits: int = 12
+    trigger: str | None = None
 
 
 @dataclass(frozen=True)
@@ -719,7 +720,8 @@ def mode_options(values):
                           StreamProfileIR.from_validated(
                               values["stream_resolution"])
                           if "stream_resolution" in values else None,
-                          resolution_bits=values.get("resolution_bits", 12))
+                          resolution_bits=values.get("resolution_bits", 12),
+                          trigger=values.get("trigger"))
     if kind == "dac":
         return DacOptions(tuple(values["channels"]), values["format"],
                           tuple(values["idle_codes"]), values["output_buffer"],

@@ -390,7 +390,7 @@ model_bytes=128
                     with self.assertRaisesRegex(gate.ConfigurationError, "Resource conflict controller:" + timer):
                         gate.resolve_ir(assembly, test_support=True)
 
-    def test_fixed_adc_trigger_cannot_omit_its_physical_timer_claim(self):
+    def test_adc_route_cannot_override_the_selected_timer_claim(self):
         real_dependency = gate.dependency_identity
         with patch.object(gate, "dependency_identity", side_effect=lambda root, relative, expected=None:
                           real_dependency(gate.ROOT, relative, expected)):
@@ -406,9 +406,9 @@ model_bytes=128
                     selected = next(item for item in ir.controllers if item.kind == "adc")
                     routes = json.loads((package / "routes.json").read_text())
                     route = next(route for route in routes["routes"] if route["id"] == selected.route)
-                    route["mode_resources"] = {}
+                    route["mode_resources"] = {"trigger-dma": ["controller:TIM4"]}
                     (package / "routes.json").write_text(json.dumps(routes))
-                    with self.assertRaisesRegex(gate.ConfigurationError, "Trigger resource differs from fixed provider"):
+                    with self.assertRaisesRegex(gate.ConfigurationError, "ADC trigger resource belongs to the selected assembly"):
                         gate.resolve_ir(assembly, self.root, test_support=native_fixture(assembly))
 
 

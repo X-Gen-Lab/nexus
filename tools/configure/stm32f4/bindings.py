@@ -317,7 +317,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                         f"    .resolution = {(12 - item.options.resolution_bits) // 2}u"]
         if dma:
             definitions += ["    },", f"    .regions = s_nx_dma_regions_{name},",
-                            f"    .region_count = {count}u, .priority = {item.options.irq.priority}u"]
+                            f"    .region_count = {count}u, .priority = {item.options.irq.priority}u,",
+                            f"    .trigger = NX_STM32_ADC_{item.options.trigger.upper().replace('-', '_')}"]
         definitions += ["};"]
         selected = ("adc_continuous" if traits.continuous else "adc_stream" if dma
                     else "adc_injected" if item.mode == "injected-shot" else "adc")

@@ -344,7 +344,7 @@ TEST_F(AdcColdFactory, InternalDmaModesRetainAnalogPowerUntilControllerClose) {
     const nx_dma_memory_region_t region{reinterpret_cast<uintptr_t>(storage),
                                         sizeof(storage), NX_DMA_MEMORY_WRITE};
     const nx_stm32_adc_stream_config_t config{
-        {channels, timing, 3U, 3300U, 0U, ADC1}, &region, 1U, 5U};
+        {channels, timing, 3U, 3300U, 0U, ADC1}, &region, 1U, 5U, 0U};
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
     for (bool continuous : {false, true}) {
         SCOPED_TRACE(continuous);
@@ -678,7 +678,7 @@ TEST_F(AdcColdFactory, SecondaryDmaPreservesForeignPendingAndActivePublishers) {
         const unsigned index = static_cast<unsigned>(irq);
         const uint32_t bit = 1U << (index % 32U);
         const nx_stm32_adc_stream_config_t config{
-            {channels, samples, 1U, 3300U, 0U, converter}, &region, 1U, 5U};
+            {channels, samples, 1U, 3300U, 0U, converter}, &region, 1U, 5U, 0U};
         for (bool active : {false, true}) {
             SCOPED_TRACE(index);
             SCOPED_TRACE(active);
@@ -708,7 +708,7 @@ TEST_F(AdcColdFactory, SecondaryDmaPublishesOnlyItsOwnCompletedDetachedBlock) {
         const unsigned shift = converter == ADC2 ? 16U : 6U;
         const unsigned channel = converter == ADC2 ? 1U : 2U;
         const nx_stm32_adc_stream_config_t config{
-            {channels, timing, 1U, 3300U, 0U, converter}, &region, 1U, 5U};
+            {channels, timing, 1U, 3300U, 0U, converter}, &region, 1U, 5U, 0U};
         nx_stm32_adc_stream_state_t state{};
         nx_stream_slot_t slot{};
         slot.data = reinterpret_cast<uint8_t*>(data);
@@ -833,7 +833,7 @@ TEST_F(AdcColdFactory, DmaInitializationCannotAcquireAnOccupiedIrq) {
     const nx_dma_memory_region_t region{UINT32_C(0x20000000), 1024U,
                                         NX_DMA_MEMORY_WRITE};
     const nx_stm32_adc_stream_config_t config{
-        {channels, samples, 1U, 3300U, 0U, ADC1}, &region, 1U, 5U};
+        {channels, samples, 1U, 3300U, 0U, ADC1}, &region, 1U, 5U, 0U};
     nx_stm32_adc_stream_state_t state{};
     NVIC_EnableIRQ(DMA2_Stream4_IRQn);
     g_f4_model_nvic.ISPR[static_cast<unsigned>(DMA2_Stream4_IRQn) / 32U] |=
@@ -852,7 +852,7 @@ TEST_F(AdcColdFactory, OccupiedTimerIsRejectedBeforeAcquiringAdcEffects) {
     const nx_dma_memory_region_t region{UINT32_C(0x20000000), 1024U,
                                         NX_DMA_MEMORY_WRITE};
     const nx_stm32_adc_stream_config_t config{
-        {channels, samples, 1U, 3300U, 0U, ADC1}, &region, 1U, 5U};
+        {channels, samples, 1U, 3300U, 0U, ADC1}, &region, 1U, 5U, 0U};
     nx_stm32_adc_stream_state_t state{};
     RCC->APB1ENR = RCC_APB1ENR_TIM3EN;
     EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_adc_stream_cold_begin(&state, &config));
@@ -970,3 +970,120 @@ extern "C" int nx_stm32_system_stop(nx_stm32_system_t*, uint32_t) {
     ++stops;
     return 0;
 }
+
+#if defined(NX_ADC_INTERNAL_CONTRACT)
+TEST_F(AdcColdFactory, TimerTriggersOwnTheSelectedApbGateAndIdentity) {
+    const uint8_t channels[]{0U};
+    const uint8_t samples[]{7U};
+    const nx_dma_memory_region_t region{UINT32_C(0x20000000), 1024U,
+                                        NX_DMA_MEMORY_WRITE};
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_DMA2EN;
+    TIM_TypeDef* const timers[]{TIM3, TIM1, TIM1, TIM1, TIM3, TIM4,
+                                TIM5, TIM5, TIM5, TIM8, TIM8};
+    for (uint8_t trigger = 0U; trigger < 11U; ++trigger) {
+        SCOPED_TRACE(trigger);
+        const bool apb2 = timers[trigger] == TIM1 || timers[trigger] == TIM8;
+        const uint32_t gate = timers[trigger] == TIM1   ? RCC_APB2ENR_TIM1EN
+                              : timers[trigger] == TIM8 ? RCC_APB2ENR_TIM8EN
+                              : timers[trigger] == TIM3 ? RCC_APB1ENR_TIM3EN
+                              : timers[trigger] == TIM4 ? RCC_APB1ENR_TIM4EN
+                                                        : RCC_APB1ENR_TIM5EN;
+        const nx_stm32_adc_stream_config_t config{
+            {channels, samples, 1U, 3300U, 0U, ADC1}, &region, 1U, 5U, trigger};
+        nx_stm32_adc_stream_state_t state{};
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_stream_prepare(&state, &config));
+        EXPECT_EQ(timers[trigger], state.timer);
+        EXPECT_EQ(trigger, state.trigger);
+        EXPECT_EQ(apb2 ? 168000000U : 84000000U, state.timer_clock_hz);
+        EXPECT_NE(0U, (apb2 ? RCC->APB2ENR : RCC->APB1ENR) & gate);
+        if (timers[trigger] != TIM3) {
+            EXPECT_EQ(0U, RCC->APB1ENR & RCC_APB1ENR_TIM3EN);
+        }
+        EXPECT_EQ(NX_SUCCESS, nx_stm32_adc_stream_close(&state));
+        EXPECT_EQ(0U, state.adc.cold_effects);
+        EXPECT_EQ(0U, RCC->APB1ENR | RCC->APB2ENR);
+    }
+}
+
+TEST_F(AdcColdFactory, InvalidOrForeignTriggerHasNoNewResourceEffects) {
+    const uint8_t channels[]{0U};
+    const uint8_t samples[]{7U};
+    const nx_dma_memory_region_t region{UINT32_C(0x20000000), 1024U,
+                                        NX_DMA_MEMORY_WRITE};
+    nx_stm32_adc_stream_config_t config{
+        {channels, samples, 1U, 3300U, 0U, ADC1}, &region, 1U, 5U, UINT8_MAX};
+    nx_stm32_adc_stream_state_t state{};
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_stm32_adc_stream_prepare(&state, &config));
+    EXPECT_EQ(0U, state.adc.cold_effects);
+    EXPECT_EQ(0U, RCC->APB1ENR | RCC->APB2ENR);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_adc_stream_close(&state));
+    config.trigger = NX_STM32_ADC_TIM8_TRGO;
+    RCC->APB2ENR = RCC_APB2ENR_TIM8EN;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_adc_stream_prepare(&state, &config));
+    EXPECT_EQ(0U, state.adc.cold_effects);
+    EXPECT_EQ(RCC_APB2ENR_TIM8EN, RCC->APB2ENR);
+    EXPECT_EQ(0U, RCC->APB1ENR);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_adc_stream_close(&state));
+    RCC->APB2ENR = 0U;
+}
+#endif
+
+#if defined(NX_ADC_INTERNAL_CONTRACT)
+TEST_F(AdcColdFactory, SelectedTimerReleaseFailureRetainsItsOriginalIdentity) {
+    const uint8_t channels[]{0U};
+    const uint8_t samples[]{7U};
+    const nx_dma_memory_region_t region{UINT32_C(0x20000000), 1024U,
+                                        NX_DMA_MEMORY_WRITE};
+    nx_stm32_adc_stream_config_t config{
+        {channels, samples, 1U, 3300U, 0U, ADC1},
+        &region,
+        1U,
+        5U,
+        NX_STM32_ADC_TIM8_TRGO};
+    nx_stm32_adc_stream_state_t state{};
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_DMA2EN;
+    RCC->APB1ENR = RCC_APB1ENR_TIM3EN;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_stream_prepare(&state, &config));
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32_adc_close(&state.adc));
+    refuse_probe_release = RCC_APB2ENR_TIM8EN;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_adc_stream_close(&state));
+    EXPECT_EQ(NX_STM32_ADC_TIMER, state.adc.cold_effects);
+    EXPECT_EQ(RCC_APB2ENR_TIM8EN, RCC->APB2ENR);
+    config.trigger = NX_STM32_ADC_TIM4_CH4;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_adc_stream_prepare(&state, &config));
+    EXPECT_EQ(TIM8, state.timer);
+    EXPECT_EQ(NX_STM32_ADC_TIM8_TRGO, state.trigger);
+    refuse_probe_release = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_adc_stream_close(&state));
+    EXPECT_EQ(0U, state.adc.cold_effects);
+    EXPECT_EQ(0U, RCC->APB2ENR);
+    EXPECT_EQ(RCC_APB1ENR_TIM3EN, RCC->APB1ENR);
+    RCC->APB1ENR = 0U;
+}
+
+TEST_F(AdcColdFactory, FailedTimerGateAcquireKeepsItsExactCleanupReceipt) {
+    const uint8_t channels[]{0U};
+    const uint8_t samples[]{7U};
+    const nx_dma_memory_region_t region{UINT32_C(0x20000000), 1024U,
+                                        NX_DMA_MEMORY_WRITE};
+    const nx_stm32_adc_stream_config_t config{
+        {channels, samples, 1U, 3300U, 0U, ADC1},
+        &region,
+        1U,
+        5U,
+        NX_STM32_ADC_TIM8_CH1};
+    nx_stm32_adc_stream_state_t state{};
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_DMA2EN;
+    refuse_probe_enable = RCC_APB2ENR_TIM8EN;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_adc_stream_prepare(&state, &config));
+    EXPECT_NE(0U, state.adc.cold_effects & NX_STM32_ADC_TIMER);
+    EXPECT_EQ(TIM8, state.timer);
+    EXPECT_EQ(NX_STM32_ADC_TIM8_CH1, state.trigger);
+    EXPECT_EQ(0U, RCC->APB2ENR & RCC_APB2ENR_TIM8EN);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_adc_stream_close(&state));
+    EXPECT_EQ(0U, state.adc.cold_effects);
+    EXPECT_EQ(0U, RCC->APB1ENR | RCC->APB2ENR);
+    refuse_probe_enable = 0U;
+}
+#endif

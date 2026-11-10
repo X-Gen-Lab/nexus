@@ -80,7 +80,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
 | PVD | 内部 EXTI16，显式 PLS 0–7；原始 PVDO 轮询或有界边沿事件；不选择电压策略，不替代 BOR |
 | PWM | TIM3／4／5／9／10／11／12／13／14 按各自通道数显式选择一路；固定 PSC/ARR；TIM5 为 32-bit counts，其他为 16-bit；duty0–period、shadow update；stop 建立 GPIO inactive |
-| ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；6／8／10／12-bit 普通软件 shot/scan 最多 16 ranks、软件注入组最多 4 ranks；各转换器均有独占 TIM3 触发有限／连续 DMA block |
+| ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；6／8／10／12-bit 普通软件 shot/scan 最多 16 ranks、软件注入组最多 4 ranks；各转换器均可选择独占内部 timer 触发有限／连续 DMA block |
 | DAC | PA4／PA5 单／双通道，CPU direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA；u8／u12-right／u12-left |
 | CRC | 多项式 0x04C11DB7、初值 0xffffffff、32 位字输入；同步计算、独占 controller、失败输出保持 |
 | CAN | CAN1/CAN2 Classic CAN IRQ、三邮箱、共享 filter domain；无 CAN FD |
@@ -258,9 +258,19 @@ gate、临时观察 gate、TIM3 和 DMA IRQ 分开记录责任，复用现有状
 GPIO bank 的 16-rank 反向序列，以及 VE／ZG 的三转换器独立实例装配；不代表实际
 板卡接线。同步多 ADC 模式继续未实现。ADC1／2／3 分别使用
 DMA2 stream4 channel0／stream2 channel1／stream1 channel2，复用有限和连续 C
-实现与只读 ops，不增加每实例 route 字段。TIM3 仍是独占触发源，不允许独立 stream
-实例暗中共享。VE／ZG 的 DMA 组合参考见
-`tests/contracts/multi_controller_assembly/*tertiary*.toml`。
+实现与只读 ops。静态 `trigger` 可选择 TIM1 CH1–3、TIM3 CH1／TRGO、TIM4 CH4、
+TIM5 CH1–3、TIM8 CH1／TRGO，默认 TIM3 TRGO。只读 C 事实表同时提供精确 timer、
+APB gate、kernel clock、EXTSEL 与 compare channel；两个 DMA 模式共用 C 配置函数。
+trigger 字段使用现有 state／config padding，不引入额外实例分配。默认 ARM 短 enum
+ABI 下，有限 state／连续 state／只读 cold config 分别保持 128／200／36 字节，
+face、stream 与调用方 payload 另计。compare 在 ARR，
+TRGO 为 update；配置 UG 在开启 ADC EXTEN 之前完成，不取得输出 pad 或 timer IRQ。
+TIM1／8 为 168 MHz，其余为 84 MHz；ADC clock 仍为 21 MHz。
+每个 ADC 独占所选 timer，三者使用不同 timer 时可独立运行；相同 timer 的其他
+personality 仍互斥。原配置选择存入 cold owner，在撤回失败后保留精确 timer 身份，
+重试不能误关原 TIM3 或另一个 timer。TIM2 保留 Core，EXTI11 暂未接入。
+软件参考为 `tests/contracts/multi_controller_assembly/*adc-timers*.toml`，不建立
+物理采样资格、PWM 相位关系或硬件同步多 ADC 支持。
 
 F407 的 ADC1 内部通道 16 为温度、17 为 VREFINT、18 为 VBAT／2。pinless
 `adc1-internal` route 共用现有 shot／scan／有限和连续 DMA，不取得 GPIO，也不新增
@@ -285,14 +295,14 @@ close 先证明 ADC 停止，再只撤回所取模拟路径，最后释放 clock
 
 有限 ADC `trigger-dma` 在发布完整块前停 trigger／conversion／DMA，稳定后由显式
 service rearm，块间可有间隙。消费者借用不能被覆盖，未释放时 stop 保持 BUSY；
-TIM3 与 PWM 独占冲突。独立 `trigger-dma-continuous` 维护双缓冲和 replacement，
+所选 timer 与其他 timer owner 独占冲突。独立 `trigger-dma-continuous` 维护双缓冲和 replacement，
 进度不足时停止而非覆盖消费者。
 
 普通 PWM 共用 TIM3／4／5 的四通道、TIM9／12 的双通道，以及 TIM10／11／13／14
 的单通道实现。精确 pad 与 AF2／3／9 路线见[支持表](../../../../docs/delivery/support.md)。
 TIM9／10／11 使用 APB2 的固定 168 MHz timer clock，其他所列 timer 使用 APB1 的
 84 MHz。C 从 controller 身份派生 APB、AF 与 gate，不新增实例字段；配置生成只连接
-精确静态事实。TIM3 与 ADC trigger 互斥；TIM3／4／5 各自的 capture／encoder／PWM
+精确静态事实。所选 ADC trigger 与同一 timer 的 PWM 互斥；TIM3／4／5 各自的 capture／encoder／PWM
 互斥。TIM1／TIM8 advanced PWM
 分别保留 TIM9／TIM12 共享 vector。TIM2 保留给单调时钟，TIM6／7 为 DAC trigger。
 

@@ -116,3 +116,9 @@ TIM3 CH4、TIM4 CH1、TIM5 CH2、TIM1 CH2／CH2N 和 TIM8 CH2／CH2N。
 每个 controller 仍只有一个 owner，TIM5 使用完整 32-bit modulo count。
 Board binding 确定唯一 channel，TOML 不另写通道号；main 保留真实 capture／advanced
 factory face，未 start ring 或输出。软件路线不能代替 PCB 接线或功率级验收。
+
+
+`stm32-ve-adc-timers-baremetal.toml` 与
+`stm32-zg-adc-timers-freertos.toml` 分别选择三个 ADC 的独立 DMA 和 timer。
+前者为 TIM1 CH2／TIM4 CH4／TIM8 TRGO，后者为 TIM3 CH1／TIM5 CH3／TIM8 CH1；
+各自混合有限与连续模式。它们只验证软件装配，不表示同步多 ADC、PWM 相位或实板接线。

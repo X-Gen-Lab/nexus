@@ -1158,7 +1158,8 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                for item in selected if item["kind"] == "external_bus"}
     resources = resource_graph.resolve(claim_list, shared=pwm_sharing,
                                        aliases=aliases)
-    triggers = trigger_graph.resolve_fixed(selected, routes)
+    triggers = trigger_graph.resolve_fixed(
+        selected, adc_triggers=getattr(provider, "ADC_TRIGGERS", None))
     adc.complete_triggers(selected, triggers)
     dma_plan = dma_topology.resolve_selected(selected, provider)
     controllers = tuple(ControllerIR.create(item, family) for item in selected)

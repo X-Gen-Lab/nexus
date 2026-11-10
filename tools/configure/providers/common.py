@@ -495,12 +495,7 @@ def route_dma(route, mode):
     return route.get("mode_dma", {}).get(mode, route.get("dma", []))
 
 
-def validate_dma(route, mode, expected, family, normalize, trigger=None):
+def validate_dma(route, mode, expected, family):
     actual = tuple(sequence(route_dma(route, mode), "DMA route"))
     if expected is None or actual != expected:
         fail(f"DMA route differs from fixed provider: {family}/{route['controller']}/{mode}")
-    if route["kind"] == "adc" and mode_traits("adc", mode).dma:
-        resources = tuple(normalize(resource) for resource in
-                          route.get("mode_resources", {}).get(mode, []))
-        if trigger is None or resources != ("controller:" + trigger,):
-            fail(f"Trigger resource differs from fixed provider: {family}/{route['controller']}")

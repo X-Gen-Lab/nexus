@@ -51,7 +51,7 @@ def admission_declarations(result, pins, pin_count):
             exti |= 1 << line
     for item in claims:
         timer = item.key.removeprefix('controller:')
-        if timer in PWM_TIMERS or timer in {'TIM1', 'TIM6', 'TIM7'}:
+        if timer in PWM_TIMERS or timer in {'TIM1', 'TIM6', 'TIM7', 'TIM8'}:
             clocks.add(_clock(timer))
     if result.can_domain is not None:
         clocks.add(_clock('CAN1'))

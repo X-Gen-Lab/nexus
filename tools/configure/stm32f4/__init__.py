@@ -10,6 +10,7 @@ from .contract import (
     PUBLIC_FORMATS,
     ADC_PIN_CHANNELS,
     ADC_INTERNAL_CHANNELS,
+    ADC_TRIGGERS,
     DAC_PIN_CHANNELS,
     ADC_GROUP,
     CAN_CLOCK_HZ,

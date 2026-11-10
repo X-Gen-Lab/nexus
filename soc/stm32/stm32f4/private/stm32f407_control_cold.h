@@ -6,6 +6,7 @@
 #ifndef NX_STM32F407_CONTROL_COLD_H
 #define NX_STM32F407_CONTROL_COLD_H
 #include "stm32f407_stream.h"
+#include "stm32f4_adc_trigger.h"
 
 #ifndef NX_PLATFORM_REGISTER_WRITE
 #define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
@@ -89,6 +90,7 @@ typedef struct {
     const nx_dma_memory_region_t* regions;
     size_t region_count;
     uint8_t priority;
+    uint8_t trigger;
 } nx_stm32_adc_stream_config_t;
 
 /** \brief All cold helpers require serialized privileged unmasked Thread mode.
@@ -384,14 +386,6 @@ static inline nx_result_t nx_stm32_adc_cold_finish(nx_stm32_adc_state_t* port) {
     nx_result_t probes = nx_stm32_adc_probe_close(port);
     if (probes != NX_SUCCESS)
         return probes;
-    if ((port->cold_effects & NX_STM32_ADC_TIMER) != 0U) {
-        NX_PLATFORM_REGISTER_WRITE(
-            RCC->APB1ENR, RCC->APB1ENR & ~(uint32_t)RCC_APB1ENR_TIM3EN);
-        nx_arch_dsb();
-        if ((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) != 0U)
-            return NX_ERROR_IO;
-        port->cold_effects &= (uint8_t)~NX_STM32_ADC_TIMER;
-    }
     if ((port->cold_effects & NX_STM32_ADC_CLOCK) != 0U) {
         NX_PLATFORM_REGISTER_WRITE(RCC->APB2ENR, RCC->APB2ENR & ~clock);
         nx_arch_dsb();
@@ -413,6 +407,8 @@ nx_stm32_adc_prepare(nx_stm32_adc_state_t* port,
 
 /** \brief Close software shots; submitters have joined before this call. */
 static inline nx_result_t nx_stm32_adc_close(nx_stm32_adc_state_t* port) {
+    if (port != NULL && (port->cold_effects & NX_STM32_ADC_TIMER) != 0U)
+        return NX_ERROR_STATE;
     return nx_stm32_adc_cold_finish(port);
 }
 
@@ -444,22 +440,29 @@ nx_stm32_adc_stream_cold_begin(nx_stm32_adc_stream_state_t* port,
         return NX_ERROR_INVALID;
     if (nx_stm32_adc_clock(config->adc.registers) == 0U)
         return NX_ERROR_UNSUPPORTED;
-    if ((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) != 0U)
+    const nx_stm32_adc_trigger_fact_t* trigger =
+        nx_stm32_adc_trigger_fact(config->trigger);
+    if (trigger == NULL)
+        return NX_ERROR_UNSUPPORTED;
+    volatile uint32_t* timer_clock =
+        trigger->apb2 ? &RCC->APB2ENR : &RCC->APB1ENR;
+    if ((*timer_clock & trigger->gate) != 0U)
         return NX_ERROR_BUSY;
     nx_result_t result = nx_stm32_adc_cold_begin(&port->adc, &config->adc);
     if (result != NX_SUCCESS)
         return result;
+    port->timer = trigger->registers;
+    port->trigger = config->trigger;
     port->adc.cold_effects |= NX_STM32_ADC_TIMER;
-    NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR | RCC_APB1ENR_TIM3EN);
+    NX_PLATFORM_REGISTER_WRITE(*timer_clock, *timer_clock | trigger->gate);
     nx_arch_dsb();
-    if ((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) == 0U)
+    if ((*timer_clock & trigger->gate) == 0U)
         return NX_ERROR_IO;
-    port->timer = TIM3;
     port->dma = DMA2;
     port->memory = nx_stm32_adc_dma_memory(config->adc.registers);
     port->regions = config->regions;
     port->region_count = config->region_count;
-    port->timer_clock_hz = 84000000U;
+    port->timer_clock_hz = nx_stm32_adc_trigger_clock(trigger);
     port->adc_clock_hz = 21000000U;
     return NX_SUCCESS;
 }
@@ -520,7 +523,25 @@ nx_stm32_adc_stream_cold_finish(nx_stm32_adc_stream_state_t* port) {
             return NX_ERROR_BUSY;
         port->adc.cold_effects &= (uint8_t)~NX_STM32_ADC_IRQ;
     }
-    return nx_stm32_adc_cold_finish(&port->adc);
+    nx_result_t result = nx_stm32_adc_cold_finish(&port->adc);
+    if (result != NX_SUCCESS)
+        return result;
+    if ((port->adc.cold_effects & NX_STM32_ADC_TIMER) != 0U) {
+        const nx_stm32_adc_trigger_fact_t* trigger =
+            nx_stm32_adc_trigger_fact(port->trigger);
+        if (trigger == NULL || port->timer != trigger->registers)
+            return NX_ERROR_STATE;
+        if ((port->timer->CR1 & TIM_CR1_CEN) != 0U || port->timer->DIER != 0U)
+            return NX_ERROR_BUSY;
+        volatile uint32_t* clock =
+            trigger->apb2 ? &RCC->APB2ENR : &RCC->APB1ENR;
+        NX_PLATFORM_REGISTER_WRITE(*clock, *clock & ~trigger->gate);
+        nx_arch_dsb();
+        if ((*clock & trigger->gate) != 0U)
+            return NX_ERROR_IO;
+        port->adc.cold_effects &= (uint8_t)~NX_STM32_ADC_TIMER;
+    }
+    return NX_SUCCESS;
 }
 
 /** \brief Drain finite stream ownership before shared clocks and pins. */

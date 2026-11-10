@@ -924,3 +924,60 @@ TEST_F(Stm32AdcContinuous,
     EXPECT_EQ(stream.outstanding, 0U);
     EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
 }
+
+TEST_F(Stm32AdcStream, RegularTriggerSelectorsUseExactTimerEvents) {
+    const uint8_t selectors[]{8U, 0U, 1U, 2U, 7U, 9U, 10U, 11U, 12U, 13U, 14U};
+    const uint8_t channels_for_trigger[]{0U, 1U, 2U, 3U, 1U, 4U,
+                                         1U, 2U, 3U, 1U, 0U};
+    for (uint8_t trigger = 0U; trigger < 11U; ++trigger) {
+        SCOPED_TRACE(trigger);
+        state.trigger = trigger;
+        state.timer_clock_hz = (trigger >= 1U && trigger <= 3U) || trigger >= 9U
+                                   ? 168000000U
+                                   : 84000000U;
+        timer.SMCR = TIM_SMCR_SMS | TIM_SMCR_MSM | TIM_SMCR_ETF;
+        timer.CCMR1 = timer.CCMR2 = UINT32_MAX;
+        timer.CCER = UINT32_MAX;
+        timer.CCR1 = timer.CCR2 = timer.CCR3 = timer.CCR4 = UINT32_MAX;
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_start(&port, &stream, 1000U));
+        ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(4U));
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_service(&port));
+        EXPECT_EQ(selectors[trigger], (adc.CR2 & ADC_CR2_EXTSEL) >> 24U);
+        EXPECT_EQ(0U, timer.SMCR);
+        EXPECT_EQ(0U, timer.CCMR1 | timer.CCMR2 | timer.CCER);
+        EXPECT_EQ(channels_for_trigger[trigger] == 0U ? TIM_CR2_MMS_1 : 0U,
+                  timer.CR2);
+        const uint32_t compares[]{timer.CCR1, timer.CCR2, timer.CCR3,
+                                  timer.CCR4};
+        for (unsigned channel = 1U; channel <= 4U; ++channel)
+            EXPECT_EQ(channel == channels_for_trigger[trigger] ? timer.ARR : 0U,
+                      compares[channel - 1U]);
+        EXPECT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+        ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, &slot, 1U));
+    }
+}
+
+TEST_F(Stm32AdcStream, InvalidTriggerRejectsBeforeConverterInitialization) {
+    state.adc.initialized = false;
+    state.trigger = UINT8_MAX;
+    adc.CR1 = UINT32_C(0x1234);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_adc_stream_initialize(&state));
+    EXPECT_FALSE(state.adc.initialized);
+    EXPECT_EQ(UINT32_C(0x1234), adc.CR1);
+    EXPECT_EQ(nullptr, state.stream);
+}
+
+TEST_F(Stm32AdcContinuous, ContinuousCaptureUsesItsSelectedTrigger) {
+    state.base.trigger = NX_STM32_ADC_TIM8_CH1;
+    state.base.timer_clock_hz = 168000000U;
+    Ready();
+    EXPECT_EQ(13U, (adc.CR2 & ADC_CR2_EXTSEL) >> 24U);
+    EXPECT_EQ(0U, timer.CR2 & TIM_CR2_MMS);
+    EXPECT_EQ(timer.ARR, timer.CCR1);
+    EXPECT_EQ(0U, timer.CCER);
+    Complete(0U);
+    nx_stream_block_t block{};
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &block));
+    EXPECT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
+    EXPECT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+}

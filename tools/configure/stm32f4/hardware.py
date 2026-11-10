@@ -48,6 +48,15 @@ PWM_PIN_CHANNELS = MappingProxyType({
     ("TIM13", "PA6"): 1, ("TIM14", "PA7"): 1,
 })
 # RM0090 Rev22 Tables42/43 and section14.3.7: one request for a packed pair.
+# RM0090 Rev22 Table68: regular conversion events on independently owned
+# timers. TIM2 is the Core timebase; EXTI11 needs a separate physical pin owner.
+ADC_TRIGGERS = MappingProxyType({
+    "tim3-trgo": "TIM3", "tim1-ch1": "TIM1", "tim1-ch2": "TIM1",
+    "tim1-ch3": "TIM1", "tim3-ch1": "TIM3", "tim4-ch4": "TIM4",
+    "tim5-ch1": "TIM5", "tim5-ch2": "TIM5", "tim5-ch3": "TIM5",
+    "tim8-ch1": "TIM8", "tim8-trgo": "TIM8",
+})
+
 DAC_DMA_ROUTES = MappingProxyType({
     1: ("DMA1:stream5:channel7",),
     2: ("DMA1:stream6:channel7",),

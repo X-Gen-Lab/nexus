@@ -59,11 +59,11 @@ CONTROLLER_CONTRACTS = MappingProxyType({
     'adc': ControllerContract(
         frozenset((
             'binding', 'channels', 'irq', 'mode', 'reference_mv', 'resolution_bits',
-            'sample_times', 'stream', 'timeout_ms',
+            'sample_times', 'stream', 'timeout_ms', 'trigger',
         )),
         frozenset((
             'calls_os', 'channels', 'irq_priority', 'reference_mv', 'resolution_bits',
-            'sample_times', 'stream', 'timeout_ms',
+            'sample_times', 'stream', 'timeout_ms', 'trigger',
         )), 'adc'),
     'dac': ControllerContract(
         frozenset(('binding', 'mode', 'channels', 'format', 'idle_codes',

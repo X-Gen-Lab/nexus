@@ -49,6 +49,14 @@ def validate_selection(selection, route, provider):
     if bits not in RESOLUTION_BITS or bits not in supported:
         fail("ADC resolution_bits lacks a maintained provider mode")
     selection["resolution_bits"] = bits
+    triggers = getattr(provider, "ADC_TRIGGERS", None)
+    if mode_traits("adc", selection["mode"]).dma and triggers is not None:
+        trigger = selection.get("trigger", "tim3-trgo")
+        if type(trigger) is not str or trigger not in triggers:
+            fail("ADC trigger lacks a reviewed independently owned timer event")
+        selection["trigger"] = trigger
+    elif "trigger" in selection:
+        fail("ADC trigger requires a maintained timer-DMA mode")
     if (selection["mode"] in {"single-shot", "low-rate-scan"} and
             (selection["mode"] == "single-shot") != (len(channels) == 1)):
         fail("ADC mode contradicts its reviewed channel count")
@@ -71,9 +79,13 @@ def selected_route(selection, route, provider):
     if route["kind"] != "adc" or mapping is None:
         return route
     channels = frozenset(selection["channels"])
-    return {**route, "pins": [pin for pin in route["pins"]
-                             if mapping[(route["controller"], pin["pin"])]
-                             in channels]}
+    resources = list(route.get("resources", ()))
+    if "trigger" in selection:
+        timer = provider.ADC_TRIGGERS[selection["trigger"]]
+        resources += ["controller:" + timer, "timer:" + timer]
+    return {**route, "resources": resources,
+            "pins": [pin for pin in route["pins"]
+                     if mapping[(route["controller"], pin["pin"])] in channels]}
 
 
 def group_trigger_resources(selection, provider):

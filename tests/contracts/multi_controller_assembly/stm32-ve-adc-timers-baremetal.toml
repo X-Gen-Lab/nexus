@@ -1,0 +1,50 @@
+# Independent timer-triggered DMA; silicon-only routes, no analog qualification.
+schema = 2
+board_package = "stm32-ve-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[adc.internal]
+binding = "adc-internal"
+mode = "trigger-dma"
+channels = [16, 17, 18]
+sample_times = [7, 7, 7]
+reference_mv = 3300
+trigger = "tim1-ch2"
+
+[adc.internal.irq]
+priority = 5
+calls_os = false
+
+[adc.second]
+binding = "adc2"
+mode = "trigger-dma-continuous"
+channels = [8, 8, 8, 8]
+sample_times = [7, 7, 7, 7]
+resolution_bits = 8
+reference_mv = 3300
+trigger = "tim4-ch4"
+
+[adc.second.irq]
+priority = 5
+calls_os = false
+
+[adc.third]
+binding = "adc3"
+mode = "trigger-dma"
+channels = [10, 10]
+sample_times = [7, 7]
+resolution_bits = 10
+reference_mv = 3300
+trigger = "tim8-trgo"
+
+[adc.third.irq]
+priority = 5
+calls_os = false

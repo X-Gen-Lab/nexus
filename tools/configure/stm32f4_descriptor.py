@@ -18,6 +18,7 @@ DESCRIPTOR = FamilyDescriptor(
         "soc/stm32/stm32f4/drivers/timer_capture_tim3.c",
         "soc/stm32/stm32f4/drivers/timer_capture_tim5.c",
         "soc/stm32/stm32f4/private/stm32f407_timer_pins.h",
+        "soc/stm32/stm32f4/private/stm32f4_adc_trigger.h",
         "soc/stm32/stm32f4/drivers/advanced_pwm_tim8.c",
         "soc/stm32/stm32f4/drivers/pvd.c",
         "soc/stm32/stm32f4/private/stm32f407_pvd.h",

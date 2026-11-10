@@ -6,7 +6,7 @@ from types import MappingProxyType
 
 from tools.configure.providers import common, descriptor
 from .hardware import (ADC_PIN_CHANNELS, ADC_INTERNAL_CHANNELS,
-                       DAC_PIN_CHANNELS, PWM_PIN_CHANNELS, PWM_TIMERS,
+                       DAC_PIN_CHANNELS, PWM_PIN_CHANNELS, PWM_TIMERS, ADC_TRIGGERS,
                        FIXED_DMA as _FIXED_DMA)
 from tools.configure.adc import RESOLUTION_BITS
 
@@ -156,7 +156,7 @@ def validate_selection(selection, route):
         validate(selection, route)
     elif kind == "adc" and common.mode_traits(kind, selection["mode"]).dma:
         if (route["controller"], selection["mode"]) not in _FIXED_DMA:
-            common.fail("ADC DMA requires a reviewed converter/TIM3 path")
+            common.fail("ADC DMA requires a reviewed converter DMA path")
     elif kind == "uart":
         common.integer(selection["baud"], *LIMITS["uart_baud"], "UART baud")
     elif kind == "pwm":
@@ -202,9 +202,9 @@ def validate_dma(route, mode, normalize):
         expected = DAC_DMA_ROUTES[mask]
     else:
         expected = _FIXED_DMA.get((route["controller"], mode))
-    common.validate_dma(route, mode,
-                        expected,
-                        'stm32f4', normalize, 'TIM3')
+    common.validate_dma(route, mode, expected, 'stm32f4')
+    if route['kind'] == 'adc' and route.get('mode_resources', {}).get(mode):
+        common.fail('ADC trigger resource belongs to the selected assembly, not the analog route')
 
 
 def dma_irq(dma):

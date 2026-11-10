@@ -44,7 +44,7 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 | PWM | TIM3／4／5／9／10／11／12／13／14 的 20 个已审通道，各 controller 显式选择一路；APB1 timer 84 MHz、APB2 timer 168 MHz；TIM5 32-bit，其他 16-bit；无隐式共享时基 |
 | Timer capture | TIM3／4／5 的 CH1–4，共 12 条 AF2 路线；TIM3／4 为 16-bit，TIM5 为 32-bit；每 controller 选择一路，调用方提供 ring |
 | Advanced PWM | TIM1／TIM8 的 CH1–3／CH1N–3N，共六组互补输出，deadtime 与 break；每 controller 选择一组，无自动故障重启或跨 timer 同步 |
-| ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；普通 shot／scan 最多 16 ranks、软件注入组最多 4 ranks；三个转换器均有独占 TIM3 的有限／连续 DMA |
+| ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；普通 shot／scan 最多 16 ranks、软件注入组最多 4 ranks；三个转换器均有可选内部 timer 触发的有限／连续 DMA，所选 timer 独占 |
 | Encoder | TIM3／4／5 独占 TI1／TI2 原始正交计数；x2 TI1、x2 TI2、x4 TI12，独立输入反相与 4-bit filter；无 IRQ／DMA／累计位置策略 |
 | DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码 |
 | Flash／IWDG／WWDG／RTC | 精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置 |
@@ -184,10 +184,15 @@ I2C1／2／3 的 polling／IRQ／DMA 支持显式 7／10-bit master endpoint。
 target、上拉、电容或重复 START 时序，也不提供 I2C target／SMBus／PEC。
 
 ADC1 使用 DMA2 stream4 channel0，ADC2 使用 stream2 channel1，ADC3 使用
-stream1 channel2；有限和连续模式均按所选 lane 解释并清除标志。TIM3 是独占触发源，
-不同 ADC 的 DMA stream 不冲突也不能同时取得同一 TIM3。软件参考装配见
-`tests/contracts/multi_controller_assembly/*tertiary*.toml`，覆盖 VE／ZG 和裸机／
-FreeRTOS；它们不授权实际 Board 接线。
+stream1 channel2；有限和连续模式均按所选 lane 解释并清除标志。两种模式的可选
+`trigger` 为 `tim1-ch1`／`tim1-ch2`／`tim1-ch3`、`tim3-ch1`／`tim3-trgo`、
+`tim4-ch4`、`tim5-ch1`／`tim5-ch2`／`tim5-ch3`、`tim8-ch1`／`tim8-trgo`，
+省略时选择 `tim3-trgo`。每个 ADC 独占所选 timer，不与其 PWM／capture／encoder
+或其他 ADC 共享；三个转换器选用不同 timer 时可独立采集，不建立同步多 ADC 资格。
+不取得 timer GPIO 或 NVIC；compare 位于 ARR，首次相位不同于 update/TRGO，
+不承诺与外部 PWM 同相。TIM2 保留给 Core，EXTI11 尚需独立引脚与事件 owner。
+软件参考 `tests/contracts/multi_controller_assembly/*adc-timers*.toml` 同时选择三个
+ADC 和三个 timer；它们不授权实际 Board 接线或物理采样时序。
 
 WWDG 通过既有 watchdog 接口、静态 factory 和独立 C owner 接入。prepare 不启狗，
 显式 enable 先证明 CFR／debug 配置，再以单次 CR 写入激活；未证实的激活也保留不可逆
@@ -226,7 +231,7 @@ STATE，均不 reload 或等待。未激活时按 CFR→debug→Sleep→gate 逆
 period 表示完整周期，ARR=period−1；TIM5 上限为 UINT32_MAX，其他已审 timer 为
 65535，duty 可达 period，保留 CCR 表达 100% 的空间。set 只暂存 duty，在 update
 event 生效；周期与 PSC 保持固定。每个控制器由一路 owner 独占，不隐式共享时基或
-同步多个 timer。TIM3 与 ADC trigger 互斥；TIM3／4／5 各自的 PWM、capture 和
+同步多个 timer。ADC trigger 与其所选 timer 的 PWM 互斥；TIM3／4／5 各自的 PWM、capture 和
 encoder 互斥；TIM1／TIM8 advanced
 PWM 分别保留共享 vector 的 TIM9／TIM12。冷态 C 校验精确 timer、pad、channel、分频和
 位宽，启钟／撤回失败保留所选 APB gate 的清理责任；已有 GPIO owner 不被覆盖。

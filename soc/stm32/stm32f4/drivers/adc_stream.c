@@ -12,13 +12,68 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "stm32f407_stream.h"
+#include "stm32f4_adc_trigger.h"
 #include "stm32f4xx_ll_adc.h"
 #include "stm32f4xx_ll_tim.h"
 
 #ifndef NX_STM32_DMA_DISABLE
 #define NX_STM32_DMA_DISABLE(stream, mask) ((stream)->CR &= ~(uint32_t)(mask))
 #endif
+
+/** \brief Regular ADC selectors from RM0090 Rev22 Table68, not IRQ indexes. */
+const nx_stm32_adc_trigger_fact_t nx_stm32_adc_triggers[11] = {
+    {TIM3, RCC_APB1ENR_TIM3EN, 8U, 0U, false},
+    {TIM1, RCC_APB2ENR_TIM1EN, 0U, 1U, true},
+    {TIM1, RCC_APB2ENR_TIM1EN, 1U, 2U, true},
+    {TIM1, RCC_APB2ENR_TIM1EN, 2U, 3U, true},
+    {TIM3, RCC_APB1ENR_TIM3EN, 7U, 1U, false},
+    {TIM4, RCC_APB1ENR_TIM4EN, 9U, 4U, false},
+    {TIM5, RCC_APB1ENR_TIM5EN, 10U, 1U, false},
+    {TIM5, RCC_APB1ENR_TIM5EN, 11U, 2U, false},
+    {TIM5, RCC_APB1ENR_TIM5EN, 12U, 3U, false},
+    {TIM8, RCC_APB2ENR_TIM8EN, 13U, 1U, true},
+    {TIM8, RCC_APB2ENR_TIM8EN, 14U, 0U, true},
+};
+
+void nx_stm32_adc_trigger_program(nx_stm32_adc_stream_state_t* state) {
+    const nx_stm32_adc_trigger_fact_t* facts =
+        nx_stm32_adc_trigger_fact(state->trigger);
+    TIM_TypeDef* timer = state->timer;
+    timer->CR1 = 0U;
+    timer->CR2 = facts->channel == 0U ? TIM_CR2_MMS_1 : 0U;
+    timer->SMCR = 0U;
+    timer->DIER = 0U;
+    timer->CCER = 0U;
+    timer->CCMR1 = timer->CCMR2 = 0U;
+    timer->CCR1 = timer->CCR2 = timer->CCR3 = timer->CCR4 = 0U;
+    if (facts->apb2) {
+        timer->BDTR = 0U;
+        timer->RCR = 0U;
+    }
+    LL_TIM_SetPrescaler(timer, state->prescaler);
+    LL_TIM_SetAutoReload(timer, state->period);
+    LL_TIM_SetCounter(timer, 0U);
+    /* Compare at ARR supplies one internal event per complete period. CCxE
+     * stays zero: an ADC trigger never takes or drives a timer output pad. */
+    switch (facts->channel) {
+        case 1U:
+            LL_TIM_OC_SetCompareCH1(timer, state->period);
+            break;
+        case 2U:
+            LL_TIM_OC_SetCompareCH2(timer, state->period);
+            break;
+        case 3U:
+            LL_TIM_OC_SetCompareCH3(timer, state->period);
+            break;
+        case 4U:
+            LL_TIM_OC_SetCompareCH4(timer, state->period);
+            break;
+        default:
+            break;
+    }
+    timer->EGR = TIM_EGR_UG;
+    timer->SR = 0U;
+}
 
 /** \brief Acknowledge only the selected converter's fixed DMA2 lane. */
 static void acknowledge(nx_stm32_adc_stream_state_t* state) {
@@ -66,10 +121,16 @@ nx_result_t nx_stm32_adc_stream_initialize(nx_stm32_adc_stream_state_t* state) {
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
+    const nx_stm32_adc_trigger_fact_t* trigger =
+        nx_stm32_adc_trigger_fact(state->trigger);
+    if (trigger == NULL ||
+        state->timer_clock_hz != nx_stm32_adc_trigger_clock(trigger)) {
+        return NX_ERROR_UNSUPPORTED;
+    }
 #ifndef NEXUS_STM32_MODEL
     if ((state->adc.registers != ADC1 && state->adc.registers != ADC2 &&
          state->adc.registers != ADC3) ||
-        state->timer != TIM3 || state->dma != DMA2 ||
+        state->timer != trigger->registers || state->dma != DMA2 ||
         state->memory != nx_stm32_adc_dma_memory(state->adc.registers)) {
         return NX_ERROR_UNSUPPORTED;
     }
@@ -194,14 +255,7 @@ static void arm(nx_stm32_adc_stream_state_t* state) {
                          (uint32_t)state->adc.resolution << ADC_CR1_RES_Pos);
     nx_stm32_adc_stream_sequence(state);
     adc->SR = 0U;
-    state->timer->CR1 = 0U;
-    state->timer->CR2 = TIM_CR2_MMS_1;
-    state->timer->DIER = 0U;
-    LL_TIM_SetPrescaler(state->timer, state->prescaler);
-    LL_TIM_SetAutoReload(state->timer, state->period);
-    LL_TIM_SetCounter(state->timer, 0U);
-    state->timer->EGR = TIM_EGR_UG;
-    state->timer->SR = 0U;
+    nx_stm32_adc_trigger_program(state);
     acknowledge(state);
     state->memory->PAR = (uint32_t)(uintptr_t)&adc->DR;
     state->memory->M0AR = (uint32_t)(uintptr_t)state->fill.data;
@@ -212,7 +266,9 @@ static void arm(nx_stm32_adc_stream_state_t* state) {
                         DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
     nx_arch_dsb();
     state->memory->CR |= DMA_SxCR_EN;
-    adc->CR2 = ADC_CR2_ADON | ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTSEL_3;
+    adc->CR2 = ADC_CR2_ADON | ADC_CR2_DMA | ADC_CR2_DDS |
+               ((uint32_t)nx_stm32_adc_trigger_fact(state->trigger)->selection
+                << ADC_CR2_EXTSEL_Pos);
     nx_arch_dsb();
     (void)adc->CR2;
     state->ready_at = nx_deadline_after(
