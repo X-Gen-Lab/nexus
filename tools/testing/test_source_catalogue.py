@@ -15,7 +15,8 @@ class SourceCatalogueTests(unittest.TestCase):
     def test_runtime_scope_excludes_google_and_keeps_nested_sources_explicit(self):
         self.assertEqual({item.identifier for item in catalogue.SOURCE_DEPENDENCIES}, {
             "freertos", "cmsis_core", "stm32f4_cmsis", "stm32f4_hal",
-            "threadx", "lwip", "mbedtls", "coremqtt", "mcuboot"})
+            "threadx", "lwip", "mbedtls", "coremqtt", "mcuboot",
+            "stm32_usb_host", "stm32_usb_device"})
         self.assertEqual({item.identifier for item in catalogue.HOST_TEST_DEPENDENCIES},
                          {"googletest"})
         self.assertEqual(catalogue.dependency("googletest").scope, "host-test")

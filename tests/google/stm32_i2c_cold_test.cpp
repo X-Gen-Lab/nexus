@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "stm32f407_clock.h"
 #include "stm32f407_i2c_cold.h"
 nx_stm32_system_t g_nx_stm32_system;
 GPIO_TypeDef g_nx_stm32_gpioa_model;
@@ -27,7 +28,7 @@ class I2CCold : public testing::Test {
     void* peripherals = MAP_FAILED;
     uint16_t snapshots[2]{};
     nx_stm32_i2c_pin_config_t pins[2]{{&snapshots[0], 6U}, {&snapshots[1], 7U}};
-    nx_stm32_i2c_config_t config{I2C1, pins,  nullptr, 42000000U,
+    nx_stm32_i2c_config_t config{I2C1, pins,  nullptr, NEXUS_APB1_HZ,
                                  5U,   false, 100000U};
     nx_stm32_i2c_cold_receipt_t receipt{};
     nx_stm32_i2c_state_t state{};
@@ -105,15 +106,19 @@ TEST_F(I2CCold, FastProfileUsesEveryControllerAndRestoresItsColdResources) {
             ASSERT_EQ(NX_SUCCESS, mode == 0U ? Prepare()
                                              : nx_stm32_i2c_async_prepare(
                                                    &async, &config, &receipt));
-            EXPECT_EQ(0x8024U, config.registers->CCR);
-            EXPECT_EQ(13U, config.registers->TRISE);
+            EXPECT_EQ(NEXUS_APB1_HZ == 21000000U ? 0x8012U : 0x8024U,
+                      config.registers->CCR);
+            EXPECT_EQ(NEXUS_APB1_HZ == 21000000U ? 7U : 13U,
+                      config.registers->TRISE);
             if (mode != 0U) {
                 config.registers->CCR = 0U;
                 config.registers->TRISE = 0U;
                 const nx_i2c_port_t bus{&nx_i2c_v1_async_ops, &async};
                 ASSERT_EQ(NX_SUCCESS, nx_i2c_port_recover(&bus));
-                EXPECT_EQ(0x8024U, config.registers->CCR);
-                EXPECT_EQ(13U, config.registers->TRISE);
+                EXPECT_EQ(NEXUS_APB1_HZ == 21000000U ? 0x8012U : 0x8024U,
+                          config.registers->CCR);
+                EXPECT_EQ(NEXUS_APB1_HZ == 21000000U ? 7U : 13U,
+                          config.registers->TRISE);
             }
             ASSERT_EQ(NX_SUCCESS, mode == 0U ? Close()
                                              : nx_stm32_i2c_async_close(
@@ -470,7 +475,7 @@ TEST_F(I2CCold, SecondControllerKeepsFirstControllerIndependent) {
     uint16_t other_snapshots[2]{};
     nx_stm32_i2c_pin_config_t other_pins[2]{{&other_snapshots[0], 10U},
                                             {&other_snapshots[1], 11U}};
-    nx_stm32_i2c_config_t other_config{I2C2, other_pins, nullptr, 42000000U,
+    nx_stm32_i2c_config_t other_config{I2C2, other_pins, nullptr, NEXUS_APB1_HZ,
                                        5U,   true,       100000U};
     nx_stm32_i2c_cold_receipt_t other_receipt{};
     nx_i2c_v1_state_t second{};
@@ -493,8 +498,8 @@ TEST_F(I2CCold, SecondPollingKeepsLiveFirstOwnerThroughFailedGateRelease) {
     uint16_t saved[2]{};
     const nx_stm32_i2c_pin_config_t other_pins[]{{&saved[0], 10U},
                                                  {&saved[1], 11U}};
-    const nx_stm32_i2c_config_t selected{I2C2, other_pins, nullptr, 42000000U,
-                                         5U,   false,      100000U};
+    const nx_stm32_i2c_config_t selected{
+        I2C2, other_pins, nullptr, NEXUS_APB1_HZ, 5U, false, 100000U};
     nx_stm32_i2c_state_t other{};
     nx_stm32_i2c_cold_receipt_t acquired{};
     GPIOB->IDR |= 0xC00U;

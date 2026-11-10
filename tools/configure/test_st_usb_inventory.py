@@ -3,8 +3,10 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from unittest.mock import patch
 
 from tools.maintenance import source_catalogue
+from tools.maintenance import st_usb_lock
 
 ROOT = Path(source_catalogue.__file__).resolve().parents[2]
 
@@ -22,7 +24,7 @@ class StUsbInventoryTests(unittest.TestCase):
             with self.subTest(identifier=identifier):
                 item = source_catalogue.dependency(identifier)
                 self.assertEqual(item.path, "vendors/st/" + folder)
-                self.assertEqual(item.scope, "inventory")
+                self.assertEqual(item.scope, "runtime")
                 self.assertEqual(item.notice, "LICENSE.md")
                 self.assertEqual(item.upstream_url,
                                  "https://github.com/STMicroelectronics/" +
@@ -41,6 +43,20 @@ class StUsbInventoryTests(unittest.TestCase):
                         "stm32f4", backend=backend, components=components)
                     self.assertFalse(inventory & {item.path for item in selected})
 
+    def test_explicit_host_component_selects_only_the_host_middleware(self):
+        selected = source_catalogue.runtime_selection(
+            "stm32f4", backend="baremetal", components=("st-usb-host",))
+        paths = {item.path for item in selected}
+        self.assertIn("vendors/st/usb_host", paths)
+        self.assertNotIn("vendors/st/usb_device", paths)
+
+    def test_explicit_device_component_selects_only_device_middleware(self):
+        selected = source_catalogue.runtime_selection(
+            "stm32f4", backend="baremetal", components=("st-usb-device",))
+        paths = {item.path for item in selected}
+        self.assertIn("vendors/st/usb_device", paths)
+        self.assertNotIn("vendors/st/usb_host", paths)
+
     def test_gitlinks_and_locks_bind_the_reviewed_official_cube_tuple(self):
         hal = json.loads((ROOT / "dependencies/stm32f4-hal.lock.json").read_text())
         for identifier, _, _, version, commit in self.RELEASES:
@@ -56,6 +72,27 @@ class StUsbInventoryTests(unittest.TestCase):
                     cwd=ROOT, capture_output=True, text=True, check=True).stdout
                 self.assertEqual(output.split()[:2], ["160000", commit])
                 self.assertIn("LICENSE.md", locked["files"])
+
+    def test_explicit_middleware_admission_checks_actual_locked_bytes(self):
+        for role, row in zip(("device", "host"), self.RELEASES):
+            with self.subTest(role=role):
+                identity = st_usb_lock.verify(ROOT, role)
+                self.assertEqual(identity["commit"], row[4])
+                self.assertEqual(identity["version"], row[3])
+                filename = "usbh_core.c" if role == "host" else "usbd_core.c"
+                self.assertIn(str(ROOT / "vendors/st" / ("usb_" + role) /
+                                  "Core/Src" / filename),
+                              identity["configure_inputs"])
+
+    def test_middleware_admission_refuses_wrong_role_and_tampered_file_map(self):
+        with self.assertRaises(ValueError):
+            st_usb_lock.verify(ROOT, "otg")
+        original = (ROOT / "dependencies/stm32-usb-device.lock.json").read_bytes()
+        lock = json.loads(original)
+        lock["files"].pop("Core/Src/usbd_core.c")
+        with patch("tools.maintenance.st_usb_lock.read_lock", return_value=lock):
+            with self.assertRaisesRegex(ValueError, "file map"):
+                st_usb_lock.verify(ROOT, "device")
 
 
 if __name__ == "__main__":

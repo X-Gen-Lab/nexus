@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407zg-spi-frames-software-fixture",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-only-reviewed-controller-pad-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "wire1",
+      "controller": "SPI1",
+      "route": "spi1-frames-two-line-pa5-pa6-pa7-pa4"
+    },
+    {
+      "id": "wire2",
+      "controller": "SPI2",
+      "route": "spi2-frames-one-wire-pb13-pb15-pb12"
+    },
+    {
+      "id": "wire3",
+      "controller": "SPI3",
+      "route": "spi3-frames-receive-only-pc10-pc12-pa15"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only silicon pad and active-low CS contract; no PCB devices or connections are claimed.",
+    "No physical UART/SPI/I2C timing, pulls, voltage or external-device qualification was executed."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "Reviewed F407 silicon AF/analog pads only; exact DMA tuples follow RM0090 Rev22 Tables43/44 and the locked SDK. No PCB or external-device wiring claim."
+    }
+  ]
+}

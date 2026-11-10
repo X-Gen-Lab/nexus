@@ -1,19 +1,64 @@
 /**
  * \file            stm32f407_sdio.h
- * \brief           Exact F407 polling SDIO infrastructure and media ownership
+ * \brief           Exact F407 SD/MMC infrastructure and finite media ownership
  * \author          Nexus Team
  */
 #ifndef NX_STM32F407_SDIO_H
 #define NX_STM32F407_SDIO_H
 
 #include "nexus/io/block.h"
+#include "nexus/io/block_async.h"
+#include "nexus/io/dma.h"
+#include "nexus/io/sdio_io.h"
 #include "stm32f407_platform_cold.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** \brief Static six-pad socket and bounded CPU-polling profile. */
+/** \brief Selected finite engine; polling remains the zero default. */
+typedef enum {
+    NX_STM32_SDIO_POLL,
+    NX_STM32_SDIO_IRQ,
+    NX_STM32_SDIO_DMA
+} nx_stm32_sdio_engine_t;
+
+/** \brief Explicit card protocol; no automatic SD-to-MMC fallback probe. */
+typedef enum {
+    NX_STM32_SDIO_SD_MEMORY,
+    NX_STM32_SDIO_MMC,
+    NX_STM32_SDIO_IO
+} nx_stm32_sdio_protocol_t;
+
+/** \brief Selected I/O-card register facts, not a device or object pool. */
+typedef struct {
+    uint16_t block_bytes[7];
+    uint8_t function_count;
+    uint8_t enabled;
+    uint8_t interrupts;
+    uint8_t inflight;
+    bool interrupt_latched;
+    bool interrupt_armed;
+    bool memory_present;
+} nx_stm32_sdio_io_state_t;
+
+/** \brief Only asynchronous selections allocate this persistent extension. */
+typedef struct {
+    nx_block_request_t* active;
+    nx_result_t terminal;
+    uint32_t words;
+    uint32_t completed_blocks;
+    uint32_t flags;
+    uint32_t function_address;
+    uint16_t unit_bytes;
+    uint8_t function;
+    bool block_mode;
+    bool increment;
+    bool draining;
+    bool dma_complete;
+} nx_stm32_sdio_async_state_t;
+
+/** \brief Exact six/ten-pad socket, selected engine and finite bounds. */
 typedef struct {
     SDIO_TypeDef* registers;
     const nx_stm32_platform_pin_config_t* pins;
@@ -21,17 +66,27 @@ typedef struct {
     uint32_t poll_budget;
     uint32_t stop_timeout_us;
     uint8_t bus_width;
+    nx_stm32_sdio_engine_t engine;
+    nx_stm32_sdio_async_state_t* async;
+    const nx_dma_memory_region_t* dma_regions;
+    size_t dma_region_count;
+    uint8_t irq_priority;
+    nx_stm32_sdio_protocol_t protocol;
+    nx_stm32_sdio_io_state_t* io;
 } nx_stm32_sdio_config_t;
 
 /** \brief Acquired hardware effects stay live until cold close proves return.
  */
 typedef struct {
     uint32_t clock_added;
-    uint8_t pin_mask;
+    uint16_t pin_mask;
     bool owned;
+    uint8_t sdio_priority;
+    uint8_t dma_priority;
+    bool vectors;
 } nx_stm32_sdio_receipt_t;
 
-/** \brief Caller-owned session has no retained payload pointer or DMA state. */
+/** \brief Session owns media; only a selected async extension borrows data. */
 typedef struct {
     const nx_stm32_sdio_config_t* config;
     nx_block_geometry_t geometry;
@@ -44,10 +99,28 @@ typedef struct {
     bool selected;
     bool protocol_started;
     bool programming_pending;
+    bool removed;
 } nx_stm32_sdio_state_t;
 
 /** \brief One readonly table serves each statically assembled block face. */
 extern const nx_block_ops_t nx_stm32_sdio_ops;
+/** \brief Optional shared asynchronous face on the same controller. */
+extern const nx_block_async_ops_t nx_stm32_sdio_async_ops;
+/** \brief Optional SDIO function face shares this exact physical host. */
+extern const nx_sdio_io_ops_t nx_stm32_sdio_io_ops;
+
+/**
+ * \brief Advance at most eight FIFO words and latch terminal data flags.
+ * \param[in,out] state: Exact statically bound owner, stable through close.
+ * \note Fixed IRQ only, no protocol polling, callbacks or request settlement.
+ */
+void nx_stm32_sdio_irq(nx_stm32_sdio_state_t* state);
+/**
+ * \brief Latch only DMA2 stream3 channel4 terminal observations.
+ * \param[in,out] state: Exact statically bound owner, not a request pointer.
+ * \note A DMA TC flag does not prove SDIO CRC, card readiness or settlement.
+ */
+void nx_stm32_sdio_dma_irq(nx_stm32_sdio_state_t* state);
 
 /**
  * \brief Acquire exact pads/gate without discovering or starting a card.
@@ -55,9 +128,11 @@ extern const nx_block_ops_t nx_stm32_sdio_ops;
  * \param[in] config: Immutable reviewed pins, width and finite polling bounds.
  * \param[in,out] receipt: Zero entry owner, retained through failed cleanup.
  * \return Success or refusal with any partial effects in the same receipt.
- * \note Privileged unmasked Thread startup. Platform already owns GPIOC/D
- *       clocks and the HSE8/PLL168 time domain with live 48 MHz PLLQ output.
- *       This owner never enables USB, DMA, an SDIO IRQ or a hidden task.
+ * \note Privileged unmasked Thread startup. Platform already owns GPIOC/D (and
+ * GPIOB for MMC8) clocks and the HSE8/PLL168 time domain with live 48 MHz PLLQ
+ * output. The selected finite engine leases fixed IRQ vectors. Platform owns
+ *       the DMA2 gate before DMA preparation; only submit enables a stream.
+ *       This owner does not enable USB, discover media or create a task.
  */
 nx_result_t nx_stm32_sdio_prepare(nx_stm32_sdio_state_t* state,
                                   const nx_stm32_sdio_config_t* config,
@@ -69,7 +144,8 @@ nx_result_t nx_stm32_sdio_prepare(nx_stm32_sdio_state_t* state,
  * \param[in,out] receipt: Exact retained effects; empty receipt has no
  * authority over an independently active state or controller. \return Success
  * after observation and restoration, or a retained failure. \note Caller data
- * access ends at each synchronous I/O return. Uncertain card programming is
+ * access ends at each synchronous return or acquire-observed asynchronous
+ * SETTLED. Uncertain card programming is
  * separate: a deadline or clock-gate write cannot prove media completion. No
  * implicit card replacement or power cycle occurs.
  */

@@ -136,7 +136,8 @@ class BootFSMC : public testing::Test {
                          static_cast<uint8_t>(p + 3U), pin});
             }
         }
-        config = {pins.data(), pins.size(), banks, 2U, {clock, nullptr}, true};
+        config = {pins.data(),      pins.size(), banks,   2U,
+                  {clock, nullptr}, true,        nullptr, 0U};
     }
     void TearDown() override {
         for (const auto& mapping : mappings) {

@@ -260,7 +260,13 @@ def collect(root=ROOT):
                 declared[(family, binding["controller"], route["kind"], mode)].add(board["id"])
     selected = defaultdict(lambda: {"fixtures": set(), "exports": set()})
     assembly_paths = (root / "tools/configure/assemblies").glob("*.toml")
-    contract_paths = (root / "tests/contracts").glob("*_assembly/*.toml")
+    contract_paths = []
+    for path in (root / "tests/contracts").glob("*/*.toml"):
+        # Authored inputs carry schema even outside the assembly directories.
+        # Existing assembly directories retain strict validation if it is absent.
+        if (path.parent.name.endswith("_assembly") or
+                "schema" in tomllib.loads(path.read_text(encoding="utf-8"))):
+            contract_paths.append(path)
     sdk_paths = (root / "cmake/package/verification/io_evolution").glob("*.toml")
     fixture_paths = sorted(set(assembly_paths) | set(contract_paths)
                            | set(sdk_paths))

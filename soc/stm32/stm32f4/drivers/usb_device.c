@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/io/usb_profile.h"
+#include "stm32f407_clock.h"
 #include "stm32f407_usb_device.h"
 #include "stm32f407xx.h"
 #include <stddef.h>
@@ -67,6 +68,14 @@ _Static_assert(USB_OTG_DIEPCTL_EPTYP_Pos == 18U &&
                    USB_OTG_DOEPCTL_USBAEP == (1U << 15U) &&
                    USB_OTG_DIEPTSIZ_PKTCNT == (0x3FFU << 19U),
                "FS endpoint type, FIFO, DATA0 and packet register facts");
+_Static_assert(USB_OTG_GINTSTS_ISOODRP == (1U << 14U) &&
+                   USB_OTG_GINTSTS_IISOIXFR == (1U << 20U) &&
+                   USB_OTG_GINTSTS_PXFR_INCOMPISOOUT == (1U << 21U) &&
+                   USB_OTG_DIEPCTL_SODDFRM == (1U << 29U) &&
+                   USB_OTG_DOEPCTL_SODDFRM == (1U << 29U) &&
+                   USB_OTG_DIEPTSIZ_MULCNT == (3U << 29U) &&
+                   USB_OTG_DSTS_FNSOF == (0x3FFFU << 8U),
+               "ISO loss, frame parity and single-transaction register facts");
 _Static_assert(USB_OTG_DAINTMSK_IEPM_Pos == 0U &&
                    USB_OTG_DAINTMSK_OEPM_Pos == 16U &&
                    (USB_OTG_DAINTMSK_IEPM & 0xFU) == 0xFU &&
@@ -85,6 +94,53 @@ _Static_assert(USB_OTG_DAINTMSK_IEPM_Pos == 0U &&
 #ifndef NX_USB_SOC_IRQ_GROUP
 #define NX_USB_SOC_IRQ_GROUP() NVIC_GetPriorityGrouping()
 #endif
+#ifndef NX_USB_SOC_HCLK_HZ
+#define NX_USB_SOC_HCLK_HZ NEXUS_CORE_HZ
+#endif
+#ifndef NX_USB_CLOCK_POLL
+#define NX_USB_CLOCK_POLL() ((void)0)
+#endif
+
+/** \brief Allow a conservative 50 ms for the RM0090 force-mode transition.
+ * \note This runs only after cold clock/pad acquisition, before any DCD IRQ
+ *       or packet owner is published. CMOD acknowledgement alone is not a
+ *       substitute for the mode-switch settling interval. A stopped or
+ *       backward clock cannot make the wait succeed.
+ */
+static nx_result_t device_mode(nx_usb_controller_t* c) {
+    nx_result_t result = nx_usb_controller_plan_validate(c);
+    if (result != NX_SUCCESS)
+        return result;
+    result = c->clock.ops->validate(c->clock.context);
+    if (result != NX_SUCCESS)
+        return result;
+    USB_OTG_GlobalTypeDef* core = (USB_OTG_GlobalTypeDef*)c->registers;
+    if ((core->GINTSTS & USB_OTG_GINTSTS_CMOD) == 0U)
+        return NX_SUCCESS;
+    core->GUSBCFG = (core->GUSBCFG & ~(uint32_t)USB_OTG_GUSBCFG_FHMOD) |
+                    (uint32_t)USB_OTG_GUSBCFG_FDMOD;
+    nx_arch_dsb();
+    nx_time_us_t first = nx_time_now_us();
+    nx_time_us_t deadline;
+    result = nx_deadline_finite_after(first, 100000U, &deadline);
+    if (result != NX_SUCCESS)
+        return result;
+    uint32_t remaining = NX_USB_SOC_HCLK_HZ / 100U;
+    do {
+        NX_USB_CLOCK_POLL();
+        nx_time_us_t now = nx_time_now_us();
+        result = c->clock.ops->validate(c->clock.context);
+        if (result != NX_SUCCESS)
+            return result;
+        if (now < first || nx_deadline_expired(deadline, now))
+            return NX_ERROR_TIMEOUT;
+        if (now - first >= 50000U &&
+            (core->GINTSTS & USB_OTG_GINTSTS_CMOD) == 0U)
+            return NX_SUCCESS;
+    } while (remaining-- != 0U);
+    return NX_ERROR_TIMEOUT;
+}
+
 /** \brief Bind actual FS facts to the selected cold, exclusive clock owner. */
 nx_result_t nx_stm32_usb_device_initialize(nx_usb_controller_t* c,
                                            nx_stm32_usb_clock_state_t* clock) {
@@ -94,11 +150,53 @@ nx_result_t nx_stm32_usb_device_initialize(nx_usb_controller_t* c,
         (c->registers != 0U && c->registers != USB_OTG_FS_PERIPH_BASE)) {
         return NX_ERROR_INVALID;
     }
+    uint8_t turnaround = nx_usb_turnaround(NX_USB_CORE_FS, NX_USB_SOC_HCLK_HZ);
+    if (turnaround == 0U) {
+        return NX_ERROR_INVALID;
+    }
     c->registers = USB_OTG_FS_PERIPH_BASE;
+    c->core = NX_USB_CORE_FS;
+    c->turnaround = turnaround;
     c->irq.irq_number = OTG_FS_IRQn;
     c->irq.priority_group = (uint8_t)NX_USB_SOC_IRQ_GROUP();
     c->clock = (nx_usb_clock_domain_t){.ops = &nx_stm32_usb_clock_ops,
                                        .context = clock,
                                        .context_size = sizeof(*clock)};
-    return nx_usb_controller_initialize(c);
+    nx_result_t result = device_mode(c);
+    return result == NX_SUCCESS ? nx_usb_controller_initialize(c) : result;
+}
+
+_Static_assert(USB_OTG_HS_PERIPH_BASE == 0x40040000U &&
+                   USB_OTG_HS_MAX_IN_ENDPOINTS == 6U &&
+                   USB_OTG_HS_MAX_OUT_ENDPOINTS == 6U &&
+                   USB_OTG_HS_TOTAL_FIFO_SIZE == 4096U && OTG_HS_IRQn == 77,
+               "Exact F407 HS core geometry differs from the locked SDK");
+
+/** \brief Bind the HS core to its actual explicitly handed-over PHY domain. */
+nx_result_t nx_stm32_usb_device_hs_initialize(
+    nx_usb_controller_t* c, const nx_usb_clock_domain_t* clock, bool ulpi) {
+    if (c == NULL || clock == NULL ||
+        c->irq_policy.priority_bits != __NVIC_PRIO_BITS ||
+        c->irq_policy.external_irq_count != (uint16_t)FPU_IRQn + 1U ||
+        (c->registers != 0U && c->registers != USB_OTG_HS_PERIPH_BASE)) {
+        return NX_ERROR_INVALID;
+    }
+    uint8_t core = ulpi ? NX_USB_CORE_HS_ULPI : NX_USB_CORE_HS_INTERNAL_FS;
+    uint8_t turnaround = nx_usb_turnaround(core, NX_USB_SOC_HCLK_HZ);
+    if (turnaround == 0U) {
+        return NX_ERROR_INVALID;
+    }
+    uint32_t required =
+        RCC_AHB1ENR_OTGHSEN | (ulpi ? RCC_AHB1ENR_OTGHSULPIEN : 0U);
+    if ((RCC->AHB1ENR & required) != required) {
+        return NX_ERROR_STATE;
+    }
+    c->registers = USB_OTG_HS_PERIPH_BASE;
+    c->core = core;
+    c->turnaround = turnaround;
+    c->irq.irq_number = OTG_HS_IRQn;
+    c->irq.priority_group = (uint8_t)NX_USB_SOC_IRQ_GROUP();
+    c->clock = *clock;
+    nx_result_t result = device_mode(c);
+    return result == NX_SUCCESS ? nx_usb_controller_initialize(c) : result;
 }

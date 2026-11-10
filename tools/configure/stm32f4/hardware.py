@@ -65,6 +65,8 @@ DAC_DMA_ROUTES = MappingProxyType({
 
 
 CONTROLLER_BINDINGS = (
+    ControllerBinding("ADC123", "adc_group", 2, (("ADC", 18),), (
+        ("regular-sequence-dma", ((2, 0, 0),)),)),
     uart_binding("USART1", 2, 37, (2, 7, 4), (2, 2, 4)),
     uart_binding("USART2", 1, 38, (1, 6, 4), (1, 5, 4)),
     uart_binding("USART3", 1, 39, (1, 3, 4), (1, 1, 4)),
@@ -97,47 +99,47 @@ SECONDARY_FACTS = MappingProxyType({
     "USART2": MappingProxyType({
         "kind": "uart", "modes": ("dma-tx", "irq-byte-event", "rx-dma-idle",
                   "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous",
-                  "irq-words", "irq-blocks"),
-        "pins": ("PA2", "PA3"),
+                  "irq-words", "irq-blocks", "irq-wire"),
+        "pins": ("PA2", "PA3", "PA4", "PA0", "PA1"),
         "irq": ("USART2_IRQn",), "clock_hz": 42000000}),
     "USART3": MappingProxyType({
         "kind": "uart", "modes": ("irq-byte-event", "dma-tx", "rx-dma-idle",
                   "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous",
-                  "irq-words", "irq-blocks"),
-        "pins": ("PB10", "PB11"), "irq": ("USART3_IRQn",),
+                  "irq-words", "irq-blocks", "irq-wire"),
+        "pins": ("PB10", "PB11", "PB12", "PB13", "PB14"), "irq": ("USART3_IRQn",),
         "clock_hz": 42000000}),
     "UART4": MappingProxyType({
         "kind": "uart", "modes": ("irq-byte-event", "dma-tx", "rx-dma-idle",
                   "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous",
-                  "irq-words", "irq-blocks"),
+                  "irq-words", "irq-blocks", "irq-wire"),
         "pins": ("PA0", "PA1"), "irq": ("UART4_IRQn",),
         "clock_hz": 42000000}),
     "UART5": MappingProxyType({
         "kind": "uart", "modes": ("irq-byte-event", "dma-tx", "rx-dma-idle",
                   "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous",
-                  "irq-words", "irq-blocks"),
+                  "irq-words", "irq-blocks", "irq-wire"),
         "pins": ("PC12", "PD2"), "irq": ("UART5_IRQn",),
         "clock_hz": 42000000}),
     "USART6": MappingProxyType({
         "kind": "uart", "modes": ("irq-byte-event", "dma-tx", "rx-dma-idle",
                   "rx-dma-continuous", "dma-duplex", "dma-duplex-continuous",
-                  "irq-words", "irq-blocks"),
-        "pins": ("PC6", "PC7"), "irq": ("USART6_IRQn",),
+                  "irq-words", "irq-blocks", "irq-wire"),
+        "pins": ("PC6", "PC7", "PC8", "PG13", "PG8"), "irq": ("USART6_IRQn",),
         "clock_hz": 84000000}),
     "SPI2": MappingProxyType({
-        "kind": "spi", "modes": ("short-poll", "dma"),
-        "pins": ("PB13", "PB14", "PB15"), "irq": (),
+        "kind": "spi", "modes": ("short-poll", "dma", "irq-frames"),
+        "pins": ("PB13", "PB14", "PB15", "PB12"), "irq": (),
         "clock_hz": 42000000}),
     "SPI3": MappingProxyType({
-        "kind": "spi", "modes": ("short-poll", "dma"),
-        "pins": ("PC10", "PC11", "PC12", "PB3", "PB4", "PB5"),
+        "kind": "spi", "modes": ("short-poll", "dma", "irq-frames"),
+        "pins": ("PC10", "PC11", "PC12", "PB3", "PB4", "PB5", "PA15"),
         "irq": (), "clock_hz": 42000000}),
     "I2C3": MappingProxyType({
         "kind": "i2c", "modes": ("poll-messages", "irq-messages", "dma-messages"),
-        "pins": ("PA8", "PC9"), "irq": ("I2C3_EV", "I2C3_ER"),
+        "pins": ("PA8", "PC9", "PA9"), "irq": ("I2C3_EV", "I2C3_ER"),
         "clock_hz": 42000000}),
     "I2C2": MappingProxyType({
         "kind": "i2c", "modes": ("poll-messages", "irq-messages", "dma-messages"),
-        "pins": ("PB10", "PB11"), "irq": ("I2C2_EV", "I2C2_ER"),
+        "pins": ("PB10", "PB11", "PB12"), "irq": ("I2C2_EV", "I2C2_ER"),
         "clock_hz": 42000000}),
 })

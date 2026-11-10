@@ -68,7 +68,13 @@ class F407AdcChannelTests(unittest.TestCase):
                     path.write_text(text)
                     result = gate.resolve_ir(path)
                     self.assertEqual(result.controllers[0].pins, ())
-                    self.assertFalse(any(c.key.startswith('pin:') for c in result.claims))
+                    self.assertFalse(any(c.key.startswith('pin:')
+                                         for c in result.claims
+                                         if c.owner == 'internal'))
+                    pin_claims = {c.key: c.owner for c in result.claims
+                                  if c.key.startswith('pin:')}
+                    self.assertEqual(pin_claims, {'pin:PH0': 'system-clock',
+                                                 'pin:PH1': 'system-clock'})
                     output = directory / mode
                     gate.configure(path, output)
                     self.assertIn('.registers = ADC1', (output / 'bindings.c').read_text())

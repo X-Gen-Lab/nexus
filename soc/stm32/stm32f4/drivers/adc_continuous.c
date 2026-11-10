@@ -117,7 +117,9 @@ static nx_result_t arm(nx_stm32_adc_continuous_state_t* state) {
                          (uint32_t)base->adc.resolution << ADC_CR1_RES_Pos);
     nx_stm32_adc_stream_sequence(base);
     adc->SR = 0U;
-    nx_stm32_adc_trigger_program(base);
+    nx_stm32_adc_trigger_program(base->timer,
+                                 nx_stm32_adc_trigger_fact(base->trigger),
+                                 base->prescaler, base->period);
     acknowledge(base, 0x3DU);
     base->memory->PAR = (uint32_t)(uintptr_t)&adc->DR;
     base->memory->M0AR = (uint32_t)(uintptr_t)state->targets[0].data;

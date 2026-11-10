@@ -157,7 +157,7 @@ static nx_result_t validate_storage(nx_eth_mac_t* mac) {
         mac->rx_count > SIZE_MAX / sizeof(*mac->rx_descriptors) ||
         mac->rx_count > SIZE_MAX / sizeof(*mac->rx_slots) ||
         mac->region_count > SIZE_MAX / sizeof(*mac->regions) ||
-        mac->drain_timeout_us == 0U || mac->hclk_hz < 20000000U ||
+        mac->drain_timeout_us == 0U || mac->hclk_hz < 25000000U ||
         mac->hclk_hz > 240000000U || (mac->address[0] & 1U) != 0U ||
         mac->epoch == UINT64_MAX) {
         return NX_ERROR_INVALID;

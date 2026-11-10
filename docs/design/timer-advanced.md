@@ -8,9 +8,17 @@ is a separate whole-ELF assembly gate, not a conclusion from an object size.
 
 | Mode | STM32F407 silicon route |
 |---|---|
+| Input capture | TIM1 CH1–4: PA8 / PA9 / PA10 / PA11, AF1, 16-bit |
 | Input capture | TIM3 CH1–4: PA6 / PA7 / PB0 / PB1, AF2, 16-bit |
 | Input capture | TIM4 CH1–4: PB6 / PB7 / PB8 / PB9, AF2, 16-bit |
 | Input capture | TIM5 CH1–4: PA0 / PA1 / PA2 / PA3, AF2, 32-bit |
+| Input capture | TIM8 CH1–4: PC6 / PC7 / PC8 / PC9, AF3, 16-bit |
+| Input capture | TIM9 CH1–2: PA2 / PA3, AF3, 16-bit |
+| Input capture | TIM10 CH1: PB8, AF3, 16-bit |
+| Input capture | TIM11 CH1: PB9, AF3, 16-bit |
+| Input capture | TIM12 CH1–2: PB14 / PB15, AF9, 16-bit |
+| Input capture | TIM13 CH1: PA6, AF9, 16-bit |
+| Input capture | TIM14 CH1: PA7, AF9, 16-bit |
 | Complementary PWM | TIM1 CH1 PA8, CH1N PB13, BKIN PB12, AF1 |
 | Complementary PWM | TIM1 CH2 PA9, CH2N PB14, BKIN PB12, AF1 |
 | Complementary PWM | TIM1 CH3 PA10, CH3N PB15, BKIN PB12, AF1 |
@@ -29,20 +37,36 @@ is introduced.
 The reviewed STM32F407 datasheet establishes these alternate
 functions. They do not establish a connector, external load, safe electrical
 level or PCB revision. External Board facts must authorize the actual route.
-The main clock is the established fixed SoC profile; dynamic reclocking is
-unsupported. Constructors verify enabled clock gates, APB timer selection and
-actual AF fields. They do not measure crystal tolerance.
+The timer kernel frequency comes from the selected static ClockPlan, including
+the timer multiplier for its actual APB divider. The default HSE8/PLL168 plan
+gives APB1 timers 84 MHz and APB2 timers 168 MHz; runtime reclocking remains
+unsupported. Constructors verify enabled clock gates, the selected APB divider
+and actual AF fields. These observations do not measure crystal tolerance.
 
 Cold assembly owns the clock, pins and IRQ vector before construction and keeps
 them until stop and publisher quiescence. Its sole immutable configuration
 defines exact timer clock, integer prescaler, channel, filter or complementary
 output policy. `exclusive` is explicit authority over the whole timer, including
 clock-gated peer writers; a disabled register is not proof of absent ownership.
-The TIM1/TIM8 break vectors are shared with TIM9/TIM12 respectively. Both advanced
-timers use APB2; the TIM12 peer gate is on APB1. Assembly must reserve
-the shared resource or supply reviewed static dispatch; a provider never changes
-the NVIC vector on behalf of a peer. A cold configuration failure must be cleaned
-up by its acquisition owner before releasing leases or publishing a factory face.
+Complementary TIM1/TIM8 PWM uses the break vectors shared with TIM9/TIM12
+respectively. TIM1/TIM8 capture instead uses dedicated CC vectors, IRQ 27/46.
+TIM9/10/11 capture shares TIM1 BRK/UP/TRG_COM, while TIM12/13/14 capture shares
+the corresponding TIM8 vectors. The current assembly rejects two timer owners
+of the same vector. An independent CC capture may coexist with a small timer
+when the peer has no source for its shared vector: BIE, UIE or TIE/COMIE respectively.
+Peer gates are observed before reading DIER. A newly active peer source blocks
+close with BUSY; its vector, priority and pending state are never cleared on its
+behalf. TIM1/8/9/10/11 use APB2; the other listed capture timers use APB1.
+A cold configuration failure must be cleaned up by its acquisition owner before
+releasing leases or using the face as a ready device.
+
+TIM1/TIM8 input modes reject foreign channel enables, including complementary
+CCxNE, interrupt sources and nonzero BDTR, including MOE/LOCK. They do not adopt
+PWM state or use or change RCR. Encoder observes its CC vector for foreign
+ownership but does not publish or enable an IRQ. Its raw counter and lifetime
+contract is described in the [SoC package](../../soc/stm32/stm32f4/README.md).
+Small-timer wrappers restrict the actual channel count and compile out absent
+CR2, SMCR, CCMR2 and CCR registers; they do not treat reserved reads as zero.
 
 Capture uses four public controls: start, stop, read and state. Start borrows an
 exact caller-owned ring. An admitted IRQ reads one CCR value, which clears its
@@ -56,8 +80,8 @@ copy. An observable overcapture or full ring increments a saturating incident
 counter; old values are never overwritten. Incidents may coalesce edges, so they
 are not an exact count of physical loss.
 
-The raw capture value is a 16-bit modulo count on TIM3/TIM4 and a full 32-bit
-count on TIM5; state reports that width. `tick_hz` describes its
+The raw capture value is a full 32-bit count on TIM5 and a 16-bit modulo count
+on the other listed capture timers; state reports that width. `tick_hz` describes its
 post-prescaler unit. `observed_at` comes from the common monotonic clock at IRQ
 publication; it is not the edge aperture or a reconstructed absolute hardware
 timestamp. Hardware filter codes specify the selected silicon sampling/filter
@@ -67,6 +91,12 @@ detach keeps the ring borrowed and returns BUSY. Successful stop is the final
 ring access. Failed admission has no retained ring, while the execution owner
 still checks and cleans any refused hardware-control write before releasing
 the outer clock/pin/vector lease.
+
+For a retained live session, stop, release and late IRQ entry first observe that
+the selected RCC gate is enabled. Loss of that gate causes no gated-peripheral
+MMIO and does not release a ring borrow or cold owner. After gate recovery,
+cleanup is not blocked by changed PPRE or pad fields; those checks constrain
+new admission, not withdrawal.
 
 Complementary PWM has five public controls: set duty, start, stop, state and
 clear fault. Period, clock, deadtime, polarity and idle levels are immutable cold
@@ -122,6 +152,11 @@ references select three independent capture timers and both advanced timers on
 F407VE/baremetal and F407ZG/FreeRTOS. They exercise different channels and common
 break inputs without inventing PCB connections. Ring storage is supplied at
 capture start, not allocated by platform startup.
+
+The `tests/contracts/timer_advanced_inputs/` software references add TIM1/TIM8
+capture and encoder as well as small-timer coverage. TIM2 remains the Core
+monotonic timer; TIM6/TIM7 have no capture channels. A software route is not PCB
+wiring or evidence of measured edges.
 
 The maintained GoogleTest/GoogleMock targets compile real production C against
 locked vendor register layouts. Models provide only MMIO/CPU/clock boundaries,

@@ -1,0 +1,136 @@
+# F407 多通道 PWM、单脉冲与 DMA 序列
+
+这里记录 STM32F407VE／ZG 的单一 timer owner 软件合同。寄存器、原生 DMA
+访问宽度和 ITR 表来自 RM0090 Rev22，复用引脚来自 DS8626 Rev12。静态软件参考
+不代表电机、电源级、外部连线、PCB 修订或物理波形已经验证。
+
+```mermaid
+flowchart LR
+    A[schema 2 TOML] --> B[冻结的 TimerWaveformOptions 与资源图]
+    B --> C[固定配置、存储、factory 和薄 IRQ]
+    C --> D[Platform prepare / close]
+    D --> E[同一个手写 C timer owner]
+    F[CPU 完整通道组] -->|一次 commit，不保留指针| E
+    G[有限 pulse request] -->|借用控制与宽度数组| E
+    H[frame DMA consumer loan] -->|借用整个存储块| E
+    E --> I[独占 TIM 与选定 UPDATE DMA stream]
+    I -->|观察真实 MMIO、计数和 IRQ| E
+    E -->|完全排空后 SETTLED| G
+    E -->|完全排空后归还并 SETTLED| H
+```
+
+箭头区分配置、调用和借用。每个物理 timer 只选择一个 face：`pwm_group`、
+`timer_pulse` 或 `timer_sequence`；不能同时选择另一种 PWM、encoder、capture 或
+advanced PWM owner。没有第二套 open、运行时注册表、默认 buffer pool、heap 或
+后台 worker。factory 只返回已存在的对象，prepare 不启动 counter、通道或 DMA。
+Platform close 必须排空同一个 owner，失败会阻止 System 退出并保留完整借用。
+
+## 实例与硬件边界
+
+| 实例 | 计数／输出能力 | 本软件可选模式 |
+| --- | --- | --- |
+| TIM1、TIM8 | 16-bit，四个主通道，前三个互补输出，BKIN／deadtime，TRGO／slave，UPDATE DMA | group、pulse、sequence；group 可选择互补及内部 CH4 trigger |
+| TIM3、TIM4 | 16-bit，四个通道，TRGO／slave，UPDATE DMA | group、pulse、sequence |
+| TIM5 | 32-bit，四个通道，TRGO／slave，UPDATE DMA | CPU group／pulse 保留 32-bit；sequence 的 DMAR native item 为 16-bit |
+| TIM9、TIM12 | 16-bit，两个通道，slave；没有 TRGO master 或 DMA burst | 两通道 group、单／双通道 pulse |
+| TIM10、TIM11、TIM13、TIM14 | 16-bit，一个通道；没有 slave／master 或 DMA burst | 单通道 pulse；普通连续单通道 PWM 沿用原 `pwm` face |
+| TIM6、TIM7 | 没有 PWM 输出通道 | 不作为输出缺口；基础 timer／DAC 触发属于其原有 owner |
+| TIM2 | Core 的单调时间基准 | 保留给 System，所有新波形选择拒绝 |
+
+新 waveform owner 的 TIM1 与 TIM9、TIM8 与 TIM12 可以独立装配。TIM9／12
+不启用 IRQ，也不修改相应的共享 NVIC；停止它们只撤回自身 timer。旧
+`complementary-pwm` cold owner 仍通过 mode resources 保留对应 peer fence，
+它原有的共享 vector 和 peer 门钟准入检查保持生效。
+
+counter 时钟取配置期统一的 APB timer domain，不能从 APB bus 时钟直接猜出。
+`tick_hz` 必须精确整除源时钟，PSC 为 0…65535。CPU 组固定 period，比较值包含
+零及完整 period；普通 16-bit 参考的 period 上限为 65535 ticks，TIM5 CPU 模式可
+用 32-bit period。deadtime 取未经过 PSC 的 tDTS ticks，只接受 DTG 的精确编码，
+不向上或向下舍入保护时间。
+
+## CPU 组提交与 break
+
+应用一次给出按通道升序排列的完整 duty 数组，互补 group 另给内部 CH4 trigger。
+owner 先验证整个输入，再设置并回读 UDIS，然后写全部 CCR shadows。全部成功才
+解除 UDIS，因而中间硬件 update 不能发布部分新组。成功仅表示一组一致的 shadow
+已经就绪，不表示该 update 已发生。方法返回后不保留 frame 或数组指针。
+这些原子更新及带真实回读的最终排空属于现有 HAL／LL 单次寄存器 setter 之外的
+所有权合同，因此由手写 C 直接控制；官方寄存器类型始终留在私有实现。
+
+TIM1／8 与既有 advanced PWM 复用同一个 break、deadtime 和输出撤回核心。
+BKIN 或 BIF 先锁存 fault、撤销 MOE，再确认标志；不启用 AOE 或 lock。部分 CCR
+写入失败会撤回输出并保留 fault，不能把混合 shadow 释放给下一次 update。
+应用必须重新提交完整组，在输出关闭且 BKIN 不活动时显式 clear fault，随后另行
+start；clear 不自动启动。声明的 GPIO idle 电平只描述软件管脚状态，不能证明
+外部功率电路安全。
+
+## 硬件单脉冲
+
+`timer_pulse` 借用 request 和完整只读 width 数组。width 范围为零到 period−1，
+硬件使用 PWM2，领先的 period−width ticks 为不活动电平，所有通道在同一个 OPM
+周期结束。零宽度始终不活动；完整 period 的活动电平没有不活动尾部，因此拒绝。
+OPM 在硬件 update 时清除 CEN，不需要每通道 ISR，也不依赖任务及时停机。
+
+owner 在启动前清除并回读 UIF。很短的脉冲可能在 CEN 写回读前已经结束，这时只有
+来自本次启动的新 UIF 加 CEN=0 才能接受完成。成功还必须撤回通道、定时器源及
+真实 break IRQ，才发布 SETTLED 和一个完成周期。取消／错误报告零保证周期。
+截止包括最后排空；先看到计数结束、随后 IRQ 在截止之后才退出，仍报告超时。
+
+## TRGO 与 ITR 同步
+
+TOML 显式选择 master 的 `enable`、`update` 或内部 `oc4ref`，slave 则给出源实例
+与 `reset`、`gated` 或 `trigger`。配置期按 RM0090 的每实例 ITR 表解析，拒绝假
+连接、非 TRGO 的 OC 别名、未选源和循环依赖。TIM2 不成为新输出 master。
+
+prepare 与 start 的软件 UG 周围暂用 MMS=ENABLE 且 CEN=0，使 TRGO 保持低；
+MMS=RESET 的 UG 本身会输出 TRGO，不能用它当静音模式。全部 shadow、输出和
+break 保护就绪后才设置选定 MMS／SMS。trigger slave 只 arm SMS，不由 CPU 置
+CEN，实际 ITR 上升沿启动计数。reset 和 gated 使用硬件对应语义。stop 先撤回
+slave SMS，再停输出和 counter，最后把 master TRGO 置于关闭 counter 的静音态。
+
+应用先提交／启动全部 slave，再启动选定 master。有限 pulse 从接受到 SETTLED
+期间，master 只提供一次启动事件，不能在 OPM 清 CEN 与任务观察之间重触发。
+同步合同针对 counter／硬件触发，不把普通 PWM1 的静止初始输出电平解释成外部
+电气边沿同步资格。gated 或 reset 会改变实际持续时间；应用应据此选择 deadline。
+
+## 持续 UPDATE DMA 的有限序列
+
+`timer_sequence` 使用普通 normal DMA，UPDATE 请求持续驱动 DMAR，不需要每行
+service。应用提供已有 frame consumer loan：一个 plane、offset=0、连续 rows，
+row_bytes=stride=六个 native items，整份布局恰好等于 block.length。每行顺序固定：
+ARR、RCR／reserved-zero、CCR1、CCR2、CCR3、CCR4。未选择的 CCR 必须为零，RCR
+必须为零，避免 repetition counter 或未实现寄存器语义改变帧边界。DMA 从 DBA=11
+开始，每个 burst 六次传输（DBL 字段为 5），不能覆盖 BDTR、CCER 或 DIER。
+TIM1／8 使用 native 32-bit，TIM3／4／5
+使用 native 16-bit；TIM5 的 CPU counter 宽度不会改变它的 DMAR 访问宽度。
+
+ARR+1 至少为配置的最短 period，所有 selected compare 都必须适合该行 period
+和 native 存储。接收前有界扫描格式，接受后 DMA 直接读原存储，不逐行复制或
+转换。总量不超过 65535 DMA items，所有实际 DMA 源字节须处于声明可达域，排除
+CCM。整个 loan 的未用容量也属于借用，state 输出不能放进容量尾部或任何控制区。
+
+每个六项 burst 必须在下一次 update 前完成。`burst_budget_hclk_cycles` 是应用
+声明并在实际并发负载下验证的上界，且必须严格小于最短 period 对应的 HCLK 周期。
+软件没有测量或证明这个物理上界；超出条件可能在 update 时发布混合 shadows。
+这条 DMA 合同不承诺任意总线阻塞下的跨 update 原子性或无间断波形。
+
+DMA TC／NDTR=0 只表示存储已经送入预装载寄存器。owner 先撤回 UDE、等待 DMA 总线
+及真实 IRQ 退出，再清除并观察 UIF 的新边界，分别等待最后 shadow 生效及其后
+完整尾周期。合并的旧 UIF 不代替这两次新观察。初始空闲周期及服务延迟期间的
+尾行重复是显式合同；成功统计 DMA staged 的存储字节，不统计精确电脉冲次数。
+最后关闭输出、解绑 DMA 两个地址及 PAR、恢复空闲配置，再归还 loan 并 SETTLED。
+
+## 上下文、排空和软件证据
+
+所有方法由同一个 privileged、非 ISR、未屏蔽的 task 串行调用，内部临界区保存
+并恢复进入时的掩码。IRQ 只锁存真实所选源的事实，应用显式调用 service。
+取消、错误或 deadline 不撤销借用；关闭 DMA、SMS、counter、GPIO 或真实 IRQ 的
+任何回读失败都会保留 QUARANTINED 控制和整个源块。重新看起来像 reset 的寄存器
+不能恢复丢失的 clock、DMA reset 或 System time epoch 历史。只允许复位已排空的
+独占 TIM，绝不复位共享 DMA1／2。
+
+维护程序 `tests/google/f407_timer_waveform_test.cpp` 直接编译生产 C11 后端，硬件
+模型只提供 MMIO、IRQ、CPU 和时间边界；既有 `timer_advanced_test.cpp` 覆盖共享
+break 核心回归。配置与真实 ARM 软件参考由
+`tools/configure/test_f407_timer_waveform_configuration.py` 及对应 contract fixture
+验证。软件通过不等于电气波形、DMA 并发吞吐或外部功率电路的 HIL 资格。

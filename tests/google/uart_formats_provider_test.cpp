@@ -113,6 +113,75 @@ TEST_F(UartFormatProvider, WritesAllNineBitsAndWaitsForDistinctWireTc) {
     EXPECT_EQ(state.active, nullptr);
 }
 
+TEST_F(UartFormatProvider, UartFourAndFiveRejectHardwareFlowWithoutEffects) {
+    for (IRQn_Type irq : {UART4_IRQn, UART5_IRQn}) {
+        reset_ports();
+        USART_TypeDef hardware = {};
+        uint8_t storage[4] = {};
+        ByteState bytes = {};
+        bytes.registers = &hardware;
+        bytes.irq = irq;
+        bytes.baud = 115200U;
+        bytes.rx_storage = storage;
+        bytes.rx_capacity = sizeof(storage);
+        bytes.profile = NX_UART_RX_BYTES;
+        const nx_uart_format_t flow = {8U, NX_UART_PARITY_NONE, NX_UART_STOP_1,
+                                       NX_UART_FLOW_RTS_CTS};
+        EXPECT_EQ(nx_stm32_uart_initialize_format(&bytes, 42000000U, flow),
+                  NX_ERROR_UNSUPPORTED);
+        EXPECT_FALSE(bytes.initialized);
+        EXPECT_EQ(hardware.CR1, 0U);
+        EXPECT_EQ(hardware.CR3, 0U);
+        EXPECT_FALSE(model_irq_enabled);
+
+        ASSERT_EQ(nx_stm32_uart_initialize(&bytes, 42000000U), NX_SUCCESS);
+        const uint32_t before1 = hardware.CR1;
+        const uint32_t before3 = hardware.CR3;
+        EXPECT_EQ(nx_stm32_uart_flow_configure(&bytes, true, true),
+                  NX_ERROR_UNSUPPORTED);
+        EXPECT_EQ(nx_stm32_uart_format_configure(&bytes, flow),
+                  NX_ERROR_UNSUPPORTED);
+        EXPECT_EQ(hardware.CR1, before1);
+        EXPECT_EQ(hardware.CR3, before3);
+        EXPECT_FALSE(bytes.closing);
+        ASSERT_EQ(nx_stm32_uart_stop(&bytes), NX_SUCCESS);
+    }
+}
+
+TEST_F(UartFormatProvider, ByteSettlementRetainsBorrowUntilTxSourcesReadQuiet) {
+    ASSERT_EQ(nx_stm32_uart_word_ops.stop(&state), NX_SUCCESS);
+    reset_ports();
+    registers = {};
+    ByteState bytes = {};
+    uint8_t storage[4] = {};
+    const uint8_t data[2] = {0x12U, 0x34U};
+    ASSERT_EQ(initialize_bytes(&bytes, storage), NX_SUCCESS);
+    auto face = bytes_face(&bytes);
+    nx_uart_tx_request_t transfer = {};
+    nx_request_initialize(&transfer.base);
+    ASSERT_EQ(nx_uart_tx_prepare(&transfer, data, 2U, 1000U), NX_SUCCESS);
+    ASSERT_EQ(nx_uart_port_submit(&face, &transfer), NX_SUCCESS);
+    registers.SR = USART_SR_TXE;
+    nx_stm32_uart_format_irq(&bytes);
+    refused_write = &registers.CR1;
+    held_set = USART_CR1_TXEIE;
+    ASSERT_EQ(nx_uart_port_cancel(&face, &transfer), NX_SUCCESS);
+    registers.SR = USART_SR_TXE | USART_SR_TC;
+    nx_stm32_uart_format_irq(&bytes);
+    EXPECT_EQ(bytes.tx_position, 1U);
+    nx_uart_port_service(&face);
+    EXPECT_NE(nx_request_state(&transfer.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(bytes.active, &transfer);
+    refused_write = nullptr;
+    registers.SR = USART_SR_TC;
+    nx_stm32_uart_format_irq(&bytes);
+    nx_uart_port_service(&face);
+    EXPECT_EQ(nx_request_state(&transfer.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(transfer.base.result, NX_ERROR_CANCELLED);
+    EXPECT_EQ(bytes.active, nullptr);
+    ASSERT_EQ(nx_stm32_uart_stop(&bytes), NX_SUCCESS);
+}
+
 TEST_F(UartFormatProvider, CancellationDoesNotReleaseTheInflightWord) {
     ASSERT_EQ(nx_uart_word_tx_prepare(&request, payload, 2U, 1000U),
               NX_SUCCESS);

@@ -20,7 +20,8 @@ class EncoderConfigurationTests(unittest.TestCase):
 
     def assembly(self, timer='TIM3', counting='x4-ti12'):
         pins = {'TIM3': ('pa6', 'pa7'), 'TIM4': ('pb6', 'pb7'),
-                'TIM5': ('pa0', 'pa1')}[timer]
+                'TIM5': ('pa0', 'pa1'), 'TIM1': ('pa8', 'pa9'),
+                'TIM8': ('pc6', 'pc7')}[timer]
         self.board['bindings'] = [{'id': 'position', 'controller': timer,
             'route': f'{timer.lower()}-encoder-{pins[0]}-{pins[1]}'}]
         (self.package / 'board.json').write_text(json.dumps(self.board))
@@ -31,6 +32,15 @@ class EncoderConfigurationTests(unittest.TestCase):
                         'counting=' + json.dumps(counting) + '\nfilter_a=0\n'
                         'filter_b=15\ninvert_a=false\ninvert_b=true\nexclusive=true\n')
         return path
+
+    def test_advanced_timers_have_native_encoder_without_irq_or_dma_claim(self):
+        for timer in ('TIM1', 'TIM8'):
+            with self.subTest(timer=timer):
+                result = gate.resolve_ir(self.assembly(timer))
+                self.assertEqual(timer, result.controllers[0].controller)
+                self.assertFalse(any(claim.owner == 'position' and
+                                     claim.key.startswith(('irq:', 'dma:'))
+                                     for claim in result.claims))
 
     def test_three_timers_and_counting_modes_generate_static_c(self):
         for timer in ('TIM3', 'TIM4', 'TIM5'):

@@ -55,22 +55,38 @@ static nx_result_t configuration(const nx_usb_device_profile_t* p,
             actual = 0U;
         } else if (d[1] == 5U) {
             if (d[0] != 7U || !have_interface || (d[2] & 112U) != 0U ||
-                (d[2] & 15U) == 0U || (d[3] & 252U) != 0U) {
+                (d[2] & 15U) == 0U || (d[3] & 192U) != 0U) {
                 return NX_ERROR_INVALID;
             }
             unsigned transfer = d[3] & 3U;
             unsigned number = d[2] & 15U;
             bool input = (d[2] & 128U) != 0U;
-            if (transfer != 2U && (transfer != 3U || !input)) {
+            if ((transfer != 1U && (d[3] & 252U) != 0U) ||
+                (transfer == 1U && (d[3] & 48U) == 48U))
+                return NX_ERROR_INVALID;
+            if (transfer != 1U && transfer != 2U && transfer != 3U) {
                 return NX_ERROR_UNSUPPORTED;
             }
+            const uint16_t packet = u16(d + 4U);
+            if ((packet & 0xE000U) != 0U)
+                return NX_ERROR_INVALID;
+            if ((packet & 0x1800U) != 0U)
+                return p->speed == NX_USB_PROFILE_HIGH_SPEED &&
+                               (transfer == 1U || transfer == 3U)
+                           ? NX_ERROR_UNSUPPORTED
+                           : NX_ERROR_INVALID;
             nx_usb_profile_transfer_t selected =
-                transfer == 2U ? NX_USB_PROFILE_BULK : NX_USB_PROFILE_INTERRUPT;
+                transfer == 1U   ? NX_USB_PROFILE_ISOCHRONOUS
+                : transfer == 2U ? NX_USB_PROFILE_BULK
+                                 : NX_USB_PROFILE_INTERRUPT;
             const nx_usb_endpoint_profile_t* ep =
                 nx_usb_profile_endpoint(p, (uint8_t)number, input);
             if (ep == NULL || ep->transfer != selected ||
-                u16(d + 4U) != ep->max_packet ||
-                (transfer == 3U && d[6] == 0U)) {
+                packet != ep->max_packet ||
+                (transfer == 1U && (d[6] == 0U || d[6] > 16U)) ||
+                (transfer == 3U &&
+                 (d[6] == 0U ||
+                  (p->speed == NX_USB_PROFILE_HIGH_SPEED && d[6] > 16U)))) {
                 return NX_ERROR_INVALID;
             }
             uint16_t bit = (uint16_t)(1U << (number * 2U + (input ? 1U : 0U)));

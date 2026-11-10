@@ -10,6 +10,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+struct nx_rtc_aux_ops;
 /** \brief Raw YY calendar; no UTC, century, timezone or oscillator policy.
  * \note YY is 00..99 and leap years satisfy YY modulo 4 == 0. Weekday is an
  *       independent 1..7 value, not inferred from the date. Other fields use
@@ -65,6 +66,7 @@ typedef struct {
     nx_result_t (*cancel)(void* context, nx_rtc_request_t* request);
     nx_result_t (*service)(void* context);
     nx_result_t (*stop)(void* context);
+    const struct nx_rtc_aux_ops* auxiliary;
 } nx_rtc_ops_t;
 /** \brief Two-pointer identity; face, ops and context outlive loans/observers.
  */

@@ -7,6 +7,7 @@
 #define NX_STM32F407_TIMER_COLD_H
 #include "stm32f407_platform_cold.h"
 #include "stm32f407_timer_advanced.h"
+#include "stm32f407_timer_hardware.h"
 #include "stm32f407_timer_pins.h"
 
 #ifndef NX_PLATFORM_REGISTER_WRITE
@@ -200,6 +201,71 @@ static const nx_stm32_capture_hardware_t s_nx_capture_tim5 = {
     RCC_APB1ENR_TIM5EN,
     TIM5_IRQn};
 
+static const nx_stm32_capture_hardware_t s_nx_capture_tim1 = {
+    TIM1,
+    &nx_stm32_tim1_timer_capture_ops,
+    nx_stm32_tim1_timer_capture_initialize,
+    nx_stm32_tim1_timer_capture_release,
+    RCC_APB2ENR_TIM1EN,
+    TIM1_CC_IRQn};
+static const nx_stm32_capture_hardware_t s_nx_capture_tim8 = {
+    TIM8,
+    &nx_stm32_tim8_timer_capture_ops,
+    nx_stm32_tim8_timer_capture_initialize,
+    nx_stm32_tim8_timer_capture_release,
+    RCC_APB2ENR_TIM8EN,
+    TIM8_CC_IRQn};
+
+static const nx_stm32_capture_hardware_t s_nx_capture_tim9 = {
+    TIM9,
+    &nx_stm32_tim9_timer_capture_ops,
+    nx_stm32_tim9_timer_capture_initialize,
+    nx_stm32_tim9_timer_capture_release,
+    RCC_APB2ENR_TIM9EN,
+    TIM1_BRK_TIM9_IRQn};
+static const nx_stm32_capture_hardware_t s_nx_capture_tim10 = {
+    TIM10,
+    &nx_stm32_tim10_timer_capture_ops,
+    nx_stm32_tim10_timer_capture_initialize,
+    nx_stm32_tim10_timer_capture_release,
+    RCC_APB2ENR_TIM10EN,
+    TIM1_UP_TIM10_IRQn};
+static const nx_stm32_capture_hardware_t s_nx_capture_tim11 = {
+    TIM11,
+    &nx_stm32_tim11_timer_capture_ops,
+    nx_stm32_tim11_timer_capture_initialize,
+    nx_stm32_tim11_timer_capture_release,
+    RCC_APB2ENR_TIM11EN,
+    TIM1_TRG_COM_TIM11_IRQn};
+static const nx_stm32_capture_hardware_t s_nx_capture_tim12 = {
+    TIM12,
+    &nx_stm32_tim12_timer_capture_ops,
+    nx_stm32_tim12_timer_capture_initialize,
+    nx_stm32_tim12_timer_capture_release,
+    RCC_APB1ENR_TIM12EN,
+    TIM8_BRK_TIM12_IRQn};
+static const nx_stm32_capture_hardware_t s_nx_capture_tim13 = {
+    TIM13,
+    &nx_stm32_tim13_timer_capture_ops,
+    nx_stm32_tim13_timer_capture_initialize,
+    nx_stm32_tim13_timer_capture_release,
+    RCC_APB1ENR_TIM13EN,
+    TIM8_UP_TIM13_IRQn};
+static const nx_stm32_capture_hardware_t s_nx_capture_tim14 = {
+    TIM14,
+    &nx_stm32_tim14_timer_capture_ops,
+    nx_stm32_tim14_timer_capture_initialize,
+    nx_stm32_tim14_timer_capture_release,
+    RCC_APB1ENR_TIM14EN,
+    TIM8_TRG_COM_TIM14_IRQn};
+
+/** \brief Advanced input timers share APB2, not general-purpose APB1 gates. */
+static inline volatile uint32_t*
+nx_stm32_capture_gate_register(const nx_stm32_capture_hardware_t* hardware) {
+    return nx_stm32_timer_apb2(hardware->registers) ? &RCC->APB2ENR
+                                                    : &RCC->APB1ENR;
+}
+
 /** \brief Acquire one exact channel and preserve its full cleanup identity. */
 static inline nx_result_t
 nx_stm32_capture_prepare_for(nx_timer_capture_controller_t* port,
@@ -226,21 +292,28 @@ nx_stm32_capture_prepare_for(nx_timer_capture_controller_t* port,
         nx_stm32_timer_cold_admit(hardware->irq, config->kernel);
     if (status != NX_SUCCESS)
         return status;
-    if ((RCC->APB1ENR & hardware->gate) != 0U)
+    volatile uint32_t* clock = nx_stm32_capture_gate_register(hardware);
+    if ((*clock & hardware->gate) != 0U ||
+        nx_stm32_capture_peer_busy(hardware->registers))
         return NX_ERROR_BUSY;
     cold->configuration = config;
     cold->clock_owned = true;
-    NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR | hardware->gate);
+    NX_PLATFORM_REGISTER_WRITE(*clock, *clock | hardware->gate);
     nx_arch_dsb();
-    if ((RCC->APB1ENR & hardware->gate) == 0U)
+    if ((*clock & hardware->gate) == 0U)
         return NX_ERROR_IO;
+    if (nx_stm32_capture_peer_busy(hardware->registers))
+        return NX_ERROR_BUSY;
     if ((hardware->registers->CR1 & 1U) != 0U ||
-        hardware->registers->CCER != 0U || hardware->registers->DIER != 0U)
+        hardware->registers->CCER != 0U || hardware->registers->DIER != 0U ||
+        ((hardware->registers == TIM1 || hardware->registers == TIM8) &&
+         hardware->registers->BDTR != 0U))
         return NX_ERROR_BUSY;
     cold->priority = NVIC->IPR[hardware->irq];
     cold->irq_leased = true;
-    status = nx_stm32_timer_cold_pin_open(cold, 1U, pad.gpio, pad.bank, pad.pin,
-                                          2U, config->snapshot);
+    status = nx_stm32_timer_cold_pin_open(
+        cold, 1U, pad.gpio, pad.bank, pad.pin,
+        (uint8_t)nx_stm32_timer_af(hardware->registers), config->snapshot);
     if (status != NX_SUCCESS)
         return status;
     status = hardware->initialize(port, &config->timer);
@@ -281,6 +354,8 @@ nx_stm32_capture_close_for(nx_timer_capture_controller_t* port,
         port->config != NULL ? hardware->ops->stop(port) : NX_SUCCESS;
     if (status != NX_SUCCESS)
         return status;
+    if (nx_stm32_capture_peer_busy(hardware->registers))
+        return NX_ERROR_BUSY;
     status = nx_stm32_timer_cold_irq_close(cold, hardware->irq);
     if (status != NX_SUCCESS)
         return status;
@@ -291,9 +366,10 @@ nx_stm32_capture_close_for(nx_timer_capture_controller_t* port,
                                            *config->snapshot);
     if (status != NX_SUCCESS)
         return status;
-    NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR & ~hardware->gate);
+    volatile uint32_t* clock = nx_stm32_capture_gate_register(hardware);
+    NX_PLATFORM_REGISTER_WRITE(*clock, *clock & ~hardware->gate);
     nx_arch_dsb();
-    if ((RCC->APB1ENR & hardware->gate) != 0U)
+    if ((*clock & hardware->gate) != 0U)
         return NX_ERROR_IO;
     cold->clock_owned = false;
     cold->configuration = NULL;
@@ -339,6 +415,112 @@ nx_stm32_tim5_capture_cold_close(nx_timer_capture_controller_t* port,
                                  nx_stm32_timer_cold_t* cold,
                                  const nx_stm32_capture_cold_config_t* config) {
     return nx_stm32_capture_close_for(port, cold, config, &s_nx_capture_tim5);
+}
+
+/** \brief Acquire only TIM1 capture and its dedicated CC vector. */
+static inline nx_result_t nx_stm32_tim1_capture_cold_prepare(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_prepare_for(port, cold, config, &s_nx_capture_tim1);
+}
+/** \brief Return TIM1 only after the ring and CC publisher are detached. */
+static inline nx_result_t
+nx_stm32_tim1_capture_cold_close(nx_timer_capture_controller_t* port,
+                                 nx_stm32_timer_cold_t* cold,
+                                 const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_close_for(port, cold, config, &s_nx_capture_tim1);
+}
+/** \brief Acquire only TIM8 capture and its dedicated CC vector. */
+static inline nx_result_t nx_stm32_tim8_capture_cold_prepare(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_prepare_for(port, cold, config, &s_nx_capture_tim8);
+}
+/** \brief Return TIM8 without changing a peer's shared break/update IRQ. */
+static inline nx_result_t
+nx_stm32_tim8_capture_cold_close(nx_timer_capture_controller_t* port,
+                                 nx_stm32_timer_cold_t* cold,
+                                 const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_close_for(port, cold, config, &s_nx_capture_tim8);
+}
+
+/** \brief Prepare exact TIM9 capture without changing its vector peer. */
+static inline nx_result_t nx_stm32_tim9_capture_cold_prepare(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_prepare_for(port, cold, config, &s_nx_capture_tim9);
+}
+/** \brief Close exact TIM9 capture without changing its vector peer. */
+static inline nx_result_t
+nx_stm32_tim9_capture_cold_close(nx_timer_capture_controller_t* port,
+                                 nx_stm32_timer_cold_t* cold,
+                                 const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_close_for(port, cold, config, &s_nx_capture_tim9);
+}
+/** \brief Prepare exact TIM10 capture without changing its vector peer. */
+static inline nx_result_t nx_stm32_tim10_capture_cold_prepare(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_prepare_for(port, cold, config,
+                                        &s_nx_capture_tim10);
+}
+/** \brief Close exact TIM10 capture without changing its vector peer. */
+static inline nx_result_t nx_stm32_tim10_capture_cold_close(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_close_for(port, cold, config, &s_nx_capture_tim10);
+}
+/** \brief Prepare exact TIM11 capture without changing its vector peer. */
+static inline nx_result_t nx_stm32_tim11_capture_cold_prepare(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_prepare_for(port, cold, config,
+                                        &s_nx_capture_tim11);
+}
+/** \brief Close exact TIM11 capture without changing its vector peer. */
+static inline nx_result_t nx_stm32_tim11_capture_cold_close(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_close_for(port, cold, config, &s_nx_capture_tim11);
+}
+/** \brief Prepare exact TIM12 capture without changing its vector peer. */
+static inline nx_result_t nx_stm32_tim12_capture_cold_prepare(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_prepare_for(port, cold, config,
+                                        &s_nx_capture_tim12);
+}
+/** \brief Close exact TIM12 capture without changing its vector peer. */
+static inline nx_result_t nx_stm32_tim12_capture_cold_close(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_close_for(port, cold, config, &s_nx_capture_tim12);
+}
+/** \brief Prepare exact TIM13 capture without changing its vector peer. */
+static inline nx_result_t nx_stm32_tim13_capture_cold_prepare(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_prepare_for(port, cold, config,
+                                        &s_nx_capture_tim13);
+}
+/** \brief Close exact TIM13 capture without changing its vector peer. */
+static inline nx_result_t nx_stm32_tim13_capture_cold_close(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_close_for(port, cold, config, &s_nx_capture_tim13);
+}
+/** \brief Prepare exact TIM14 capture without changing its vector peer. */
+static inline nx_result_t nx_stm32_tim14_capture_cold_prepare(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_prepare_for(port, cold, config,
+                                        &s_nx_capture_tim14);
+}
+/** \brief Close exact TIM14 capture without changing its vector peer. */
+static inline nx_result_t nx_stm32_tim14_capture_cold_close(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_close_for(port, cold, config, &s_nx_capture_tim14);
 }
 
 /** \brief Read-only physical facts; runtime state/config layouts stay fixed. */

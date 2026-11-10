@@ -320,7 +320,8 @@ class DependencyInventoryGitTests(_InventoryGitFixture):
             if item.path in {official.DIRECTORY, official.CMSIS_DIRECTORY}:
                 review = (official.COMMIT if item.path == official.DIRECTORY
                           else official.CMSIS_COMMIT)
-            if item.identifier in {"googletest", "mcuboot", "tomlc99", "cjson"}:
+            if item.identifier in {"googletest", "mcuboot", "tomlc99", "cjson",
+                                   "stm32_usb_device", "stm32_usb_host"}:
                 review = json.loads((ROOT / item.source_lock).read_text())["commit"]
             if item.identifier == "lwip":
                 review = lwip_lock.COMMIT
@@ -558,6 +559,44 @@ class DependencyInventoryGitTests(_InventoryGitFixture):
         path.write_text(json.dumps(altered))
         with self.assertRaises(ValueError):
             proposals.inventory(self.root)
+
+
+    def test_usb_inventory_records_both_reviewed_role_closures(self):
+        result = proposals.inventory(self.root)
+        for role in ("device", "host"):
+            with self.subTest(role=role):
+                name = "stm32_usb_" + role
+                item = source_catalogue.dependency(name)
+                lock = json.loads((self.root / item.source_lock).read_text())
+                record = next(row for row in result["dependencies"]
+                              if row["id"] == name)
+                self.assertEqual(record["revision"], lock["commit"])
+                self.assertEqual(record["upstream_revision"], lock["commit"])
+                expected = {".gitmodules", item.source_lock}
+                expected.update(item.path + "/" + path for path in lock["files"])
+                self.assertEqual({Path(row["path"]).relative_to(self.root).as_posix()
+                                  for row in record["identities"]}, expected)
+                self.assertFalse(result["software_qualified"])
+
+    def test_usb_inventory_checks_source_bytes_hidden_from_git_status(self):
+        for role in ("device", "host"):
+            item = source_catalogue.dependency("stm32_usb_" + role)
+            lock = json.loads((self.root / item.source_lock).read_text())
+            name = next(path for path in lock["files"] if path.endswith(".c"))
+            checkout = self.root / item.path
+            source = checkout / name
+            original = source.read_bytes()
+            with self.subTest(role=role):
+                self.git(checkout, "update-index", "--assume-unchanged", name)
+                try:
+                    source.write_bytes(original + b"\n/* hidden change */\n")
+                    self.assertEqual(self.git(checkout, "status", "--porcelain"), "")
+                    with self.assertRaisesRegex(ValueError,
+                                                "ST USB source bytes differ"):
+                        proposals.inventory(self.root)
+                finally:
+                    source.write_bytes(original)
+                    self.git(checkout, "update-index", "--no-assume-unchanged", name)
 
 
 class DependencyInventorySelectorsTests(_InventoryGitFixture):

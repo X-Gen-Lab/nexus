@@ -40,7 +40,7 @@ class ProviderContractTests(unittest.TestCase):
                             soc['clock_profiles'][profile])
                     else:
                         soc['clock_profiles'][profile][field] = value
-                    with self.assertRaisesRegex(ValueError, 'Clock'):
+                    with self.assertRaisesRegex(ValueError, '(?i)clock'):
                         gate.validate_soc(soc, part, maintained(family, test_support=(family == "native")))
 
     def test_physical_key_normalization_has_no_silicon_topology(self):

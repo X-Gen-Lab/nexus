@@ -31,15 +31,24 @@ def admission_declarations(result, pins, pin_count):
     claims = tuple(owned_claims(result, owners))
     clocks = set()
     for item in result.controllers:
-        if item.kind in {'uart', 'spi', 'i2c', 'pwm', 'encoder', 'timer_capture', 'advanced_pwm', 'can', 'dac'}:
+        if item.kind in {'uart', 'spi', 'i2c', 'i2c_target', 'pwm', 'encoder', 'timer_capture', 'advanced_pwm', 'can', 'dac'}:
             clocks.add(_clock(item.controller))
-        elif item.kind == 'adc':
+        elif item.kind in {'adc', 'adc_group'}:
             register = 'RCC->APB2ENR'
             names = ('ADC1', 'ADC2', 'ADC3')
             prefix = 'RCC_APB2ENR_'
             clocks.add((register, ' | '.join((prefix + name + 'EN' for name in names))))
-        elif item.kind == 'usb_device':
-            clocks.add(('RCC->AHB2ENR', 'RCC_AHB2ENR_OTGFSEN'))
+        elif item.kind in {'usb_device', 'usb_host'}:
+            if item.controller == 'OTG_FS':
+                clocks.add(('RCC->AHB2ENR', 'RCC_AHB2ENR_OTGFSEN'))
+            else:
+                clocks.add(('RCC->AHB1ENR', 'RCC_AHB1ENR_OTGHSEN'))
+                if item.mode in {'host-hs-ulpi', 'device-hs-ulpi', 'otg-hs-ulpi'}:
+                    clocks.add(('RCC->AHB1ENR', 'RCC_AHB1ENR_OTGHSULPIEN'))
+        elif item.kind == 'capture':
+            clocks.add(('RCC->AHB2ENR', 'RCC_AHB2ENR_DCMIEN'))
+        elif item.kind == 'audio':
+            clocks.add(('RCC->APB1ENR', f'RCC_APB1ENR_SPI{item.controller[-1]}EN'))
         elif item.kind == 'block':
             clocks.add(('RCC->APB2ENR', 'RCC_APB2ENR_SDIOEN'))
         elif item.kind in {'eth', 'eth_frames'}:

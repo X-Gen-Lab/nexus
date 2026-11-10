@@ -17,6 +17,10 @@ nx_platform_start_result_t
 nx_empty_platform_start_diagnosed(nx_platform_diagnostic_t* diagnostic);
 nx_result_t
 nx_empty_platform_stop_diagnosed(nx_platform_diagnostic_t* diagnostic);
+nx_result_t nx_platform_suspend(void) __attribute__((weak));
+nx_platform_start_result_t nx_platform_resume(void) __attribute__((weak));
+nx_result_t nx_empty_platform_suspend(void) __attribute__((weak));
+nx_platform_start_result_t nx_empty_platform_resume(void) __attribute__((weak));
 /** \brief Both SDK fixtures use the same host-only NVIC register storage. */
 NVIC_Type g_f4_model_nvic;
 }
@@ -149,6 +153,36 @@ class PhysicalPlatformFactory : public testing::TestWithParam<bool> {
         mapping = nullptr;
     }
 };
+
+TEST_P(PhysicalPlatformFactory, SuspendAndResumeUseTheActualStaticPinOwners) {
+    auto suspend =
+        GetParam() ? &nx_platform_suspend : &nx_empty_platform_suspend;
+    auto resume = GetParam() ? &nx_platform_resume : &nx_empty_platform_resume;
+    ASSERT_NE(nullptr, suspend);
+    ASSERT_NE(nullptr, resume);
+    ASSERT_EQ(NX_SUCCESS, start().primary);
+    g_nx_stm32_system.started = true;
+    g_nx_stm32_system.core_hz = 168000000U;
+    RCC->CR = RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
+    RCC->PLLCFGR = 8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U);
+    RCC->CFGR = RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL | RCC_CFGR_PPRE1_DIV4 |
+                RCC_CFGR_PPRE2_DIV2;
+    unsigned starts = s_starts;
+    unsigned stops = s_stops;
+    ASSERT_EQ(NX_SUCCESS, suspend());
+    EXPECT_EQ(stops, s_stops);
+    EXPECT_TRUE(g_nx_stm32_system.started);
+    if (GetParam()) {
+        EXPECT_EQ(0U, selected_gpio_gate() & (1U << SELECTED_GPIO));
+    }
+    ASSERT_EQ(NX_SUCCESS, resume().primary);
+    EXPECT_EQ(starts, s_starts);
+    EXPECT_EQ(stops, s_stops);
+    if (GetParam()) {
+        EXPECT_NE(0U, selected_gpio_gate() & (1U << SELECTED_GPIO));
+        EXPECT_EQ(1U, (selected_gpio(0U) >> (SELECTED_PIN * 2U)) & 3U);
+    }
+}
 
 TEST_P(PhysicalPlatformFactory, UnprivilegedColdStartHasNoOuterEffects) {
     const auto before = register_snapshot();

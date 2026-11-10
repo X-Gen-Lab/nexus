@@ -1,15 +1,16 @@
 /**
  * \file            stm32f407_eth_cold.h
- * \brief           Concrete RMII static assembly and retained cold lifecycle
+ * \brief           Concrete MII/RMII assembly and retained cold lifecycle
  * \author          Nexus Team
  */
 #ifndef NX_STM32F407_ETH_COLD_H
 #define NX_STM32F407_ETH_COLD_H
+#include "stm32f407_clock.h"
 #include "stm32f407_eth.h"
 #include "stm32f407_packet_cold.h"
 #include <string.h>
 
-/** \brief Exact descriptor/storage selection and immutable RMII policy. */
+/** \brief Exact storage selection and immutable MII/RMII policy. */
 typedef struct {
     const nx_stm32_platform_pin_config_t* pins;
     const nx_dma_memory_region_t* regions;
@@ -26,6 +27,7 @@ typedef struct {
     nx_irq_policy_t irq_policy;
     uint8_t priority;
     uint8_t address[6];
+    bool mii;
 } nx_stm32_eth_cold_config_t;
 
 /** \brief Connect reviewed RMII resources and initialize the actual MAC.
@@ -47,7 +49,7 @@ nx_stm32_eth_cold_prepare(nx_eth_mac_t* port,
         config->rx_storage_bytes == 0U || config->init_timeout_us == 0U ||
         config->drain_timeout_us == 0U || config->priority > 15U ||
         config->rx_count > SIZE_MAX / config->rx_storage_bytes ||
-        !nx_stm32_packet_pins_valid(config->pins, 9U))
+        !nx_stm32_packet_pins_valid(config->pins, config->mii ? 17U : 9U))
         return NX_ERROR_INVALID;
     if (port->epoch == UINT64_MAX)
         return NX_ERROR_INVALID;
@@ -58,7 +60,8 @@ nx_stm32_eth_cold_prepare(nx_eth_mac_t* port,
     memset(port, 0, sizeof(*port));
     port->epoch = epoch;
     port->registers = UINT32_C(0x40028000);
-    port->hclk_hz = 168000000U;
+    port->hclk_hz = NEXUS_CORE_HZ;
+    port->mii = config->mii;
     port->regions = config->regions;
     port->region_count = 1U;
     port->tx_descriptors = config->tx_descriptors;
@@ -78,8 +81,8 @@ nx_stm32_eth_cold_prepare(nx_eth_mac_t* port,
             config->storage + i * config->rx_storage_bytes;
         config->rx_slots[i].capacity = config->rx_storage_bytes;
     }
-    nx_result_t status =
-        nx_stm32_eth_pins_prepare(config->pins, receipt, false);
+    nx_result_t status = nx_stm32_eth_pins_prepare_mode(config->pins, receipt,
+                                                        false, config->mii);
     if (status != NX_SUCCESS)
         return status;
     return nx_stm32_eth_initialize(
@@ -97,7 +100,7 @@ nx_stm32_eth_cold_close(nx_eth_mac_t* port,
     if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
         return NX_ERROR_CONTEXT;
     if (port == NULL || config == NULL || receipt == NULL ||
-        !nx_stm32_packet_pins_valid(config->pins, 9U))
+        !nx_stm32_packet_pins_valid(config->pins, config->mii ? 17U : 9U))
         return NX_ERROR_INVALID;
     /* Ownership is recorded before any MAC initializer can retain effects. */
     if (receipt->leases == 0U && !receipt->mux_leased &&
@@ -107,6 +110,6 @@ nx_stm32_eth_cold_close(nx_eth_mac_t* port,
     nx_result_t status = nx_eth_mac_ops.stop(port);
     if (status != NX_SUCCESS)
         return status;
-    return nx_stm32_eth_pins_close(config->pins, receipt);
+    return nx_stm32_eth_pins_close_mode(config->pins, receipt, config->mii);
 }
 #endif

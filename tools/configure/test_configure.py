@@ -375,7 +375,7 @@ class AdvancedResolverTests(unittest.TestCase):
     def test_pwm_fractional_divider_rejected(self):
         data = self.fixture("pwm")
         data["controllers"][0]["tick_hz"] = 333333
-        self.reject(data, "exact maintained timer divider")
+        self.reject(data, "timer tick must divide its selected bus clock")
 
     def test_spi_without_child_rejected(self):
         data = self.fixture("spi")

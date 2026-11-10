@@ -81,7 +81,17 @@ typedef struct {
     nx_lifecycle_acquisition_t (*acquire)(size_t index);
     nx_result_t (*release)(size_t index);
     bool permanent_effects;
+    nx_result_t (*suspend)(size_t index);
+    nx_lifecycle_acquisition_t (*resume)(size_t index);
+    nx_result_t (*resources_resume)(void);
 } nx_platform_lifecycle_plan_t;
+
+/** \brief A drain failure remains distinct from a completed suspension. */
+typedef enum {
+    NX_PLATFORM_RUNNING = 0,
+    NX_PLATFORM_SUSPENDING,
+    NX_PLATFORM_SUSPENDED
+} nx_platform_suspend_phase_t;
 
 /**
  * \brief           Zero-initialized storage for one serialized platform.
@@ -99,6 +109,7 @@ typedef struct {
     uint16_t initialized;
     bool started;
     bool operating;
+    nx_platform_suspend_phase_t suspend_phase;
 } nx_platform_lifecycle_state_t;
 
 /**
@@ -137,6 +148,44 @@ nx_platform_lifecycle_start(const nx_platform_lifecycle_plan_t* plan,
 nx_result_t nx_platform_lifecycle_stop(const nx_platform_lifecycle_plan_t* plan,
                                        nx_platform_lifecycle_state_t* state,
                                        nx_platform_diagnostic_t* diagnostic);
+
+/**
+ * \brief Drain controllers and shared resources while retaining System.
+ * \param[in] plan: Same immutable plan that established the live platform.
+ * \param[in,out] state: Exact retained owner, serialized by the caller.
+ * \param[out] diagnostic: Optional call-scoped phase/ordinal, never retained.
+ * \return SUCCESS only after complete drain; BUSY/IO keeps the remaining
+ *         prefix and System. Resume is refused until suspension completes.
+ * \note Joins every application borrower first. Optional suspend hooks keep
+ *       independent autonomous domains; absent hooks use ordinary release.
+ *       This does not enter sleep, alter time, feed watchdogs or cancel loans.
+ *       A suspended plan remains bound and cannot be replaced or fully stopped
+ *       until resume reestablishes the retained owners. Reentry returns BUSY.
+ */
+nx_result_t
+nx_platform_lifecycle_suspend(const nx_platform_lifecycle_plan_t* plan,
+                              nx_platform_lifecycle_state_t* state,
+                              nx_platform_diagnostic_t* diagnostic);
+
+/**
+ * \brief Rebuild the same static cold controllers after System restoration.
+ * \param[in] plan: Same immutable static connections, with System already live.
+ * \param[in,out] state: Successfully suspended owner, not a partially drained
+ *                       or ordinary stopped platform.
+ * \param[out] diagnostic: Optional call-scoped primary/cleanup metadata.
+ * \return Primary/cleanup result; System remains retained even after a clean
+ *         resume rollback. Failed drain leaves SUSPENDING and blocks retry.
+ * \note Does not invoke system_start, start a scheduler or replay requests.
+ *       The SoC power owner establishes the replacement time epoch first.
+ *       Each concrete cold/resume owner performs its real hardware admission;
+ *       resources_resume reacquires shared pins/resources before controllers.
+ *       Missing optional hooks use ordinary acquire/resources_acquire. Product
+ *       code explicitly bridges/replaces deadlines and resubmits work.
+ */
+nx_platform_start_result_t
+nx_platform_lifecycle_resume(const nx_platform_lifecycle_plan_t* plan,
+                             nx_platform_lifecycle_state_t* state,
+                             nx_platform_diagnostic_t* diagnostic);
 
 #ifdef __cplusplus
 }

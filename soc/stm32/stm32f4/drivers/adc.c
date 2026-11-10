@@ -6,8 +6,12 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_provider.h"
 #include "stm32f4xx_ll_adc.h"
+
+#define NX_ADC_COMMON_CLOCK                                                    \
+    ((NEXUS_CLOCK_ADC_DIV / 2U - 1U) << ADC_CCR_ADCPRE_Pos)
 
 #ifndef NX_STM32_IO_POLL
 #define NX_STM32_IO_POLL(kind, port) ((void)(kind), (void)(port))
@@ -100,14 +104,15 @@ nx_result_t nx_stm32_adc_probe_close(nx_stm32_adc_state_t* port) {
 
 /** \brief Prepare the fixed domain before tasks can start any converter.
  * \note ADON cannot be assessed through a gated digital interface. Observe
- *       all three interfaces before retuning; matching DIV4 needs no writes.
- *       Caller serializes all ADC preparation/start during this cold phase.
+ *       all three interfaces before retuning; a matching selected divider needs
+ * no writes. Caller serializes all ADC preparation/start during this cold
+ * phase.
  */
 nx_result_t nx_stm32_adc_common_prepare(nx_stm32_adc_state_t* port) {
     if ((ADC->CCR & (ADC_CCR_MULTI | ADC_CCR_DMA | ADC_CCR_DDS)) != 0U) {
         return NX_ERROR_BUSY;
     }
-    if (LL_ADC_GetCommonClock(ADC) == LL_ADC_CLOCK_SYNC_PCLK_DIV4) {
+    if (LL_ADC_GetCommonClock(ADC) == NX_ADC_COMMON_CLOCK) {
         return NX_SUCCESS;
     }
     const uint32_t all =
@@ -131,9 +136,9 @@ nx_result_t nx_stm32_adc_common_prepare(nx_stm32_adc_state_t* port) {
     }
     nx_result_t result = NX_ERROR_BUSY;
     if (((ADC1->CR2 | ADC2->CR2 | ADC3->CR2) & ADC_CR2_ADON) == 0U) {
-        LL_ADC_SetCommonClock(ADC, LL_ADC_CLOCK_SYNC_PCLK_DIV4);
+        LL_ADC_SetCommonClock(ADC, NX_ADC_COMMON_CLOCK);
         nx_arch_dsb();
-        result = LL_ADC_GetCommonClock(ADC) == LL_ADC_CLOCK_SYNC_PCLK_DIV4
+        result = LL_ADC_GetCommonClock(ADC) == NX_ADC_COMMON_CLOCK
                      ? NX_SUCCESS
                      : NX_ERROR_IO;
     }
@@ -180,7 +185,7 @@ nx_result_t nx_stm32_adc_initialize(nx_stm32_adc_state_t* port) {
         return NX_ERROR_STATE;
     if ((port->common->CCR & (ADC_CCR_MULTI | ADC_CCR_DMA | ADC_CCR_DDS)) !=
             0U ||
-        LL_ADC_GetCommonClock(port->common) != LL_ADC_CLOCK_SYNC_PCLK_DIV4) {
+        LL_ADC_GetCommonClock(port->common) != NX_ADC_COMMON_CLOCK) {
         return NX_ERROR_BUSY;
     }
     port->registers->CR2 = 0U;

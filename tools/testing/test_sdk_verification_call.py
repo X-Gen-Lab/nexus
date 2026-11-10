@@ -70,6 +70,43 @@ class SDKPublicCompileInputTests(unittest.TestCase):
                 with self.subTest(path=path, command=command):
                     self.assertFalse(self.private_input(["-I", path], command=command))
 
+    def test_f407_soc_public_export_accepts_directories_and_headers(self):
+        for root in (self.sdk, ROOT):
+            public = root / "soc/stm32/stm32f4/include"
+            for option, path in (
+                    ("-I", public),
+                    ("-include", public / "nexus/soc/stm32f407_power.h")):
+                with self.subTest(root=root, option=option):
+                    self.assertFalse(self.private_input(
+                        [option, path], command=True))
+
+    def test_f407_soc_public_export_keeps_implementation_boundaries(self):
+        package = self.sdk / "soc/stm32/stm32f4"
+        paths = (self.sdk / "soc", package, package / "private",
+                 package / "drivers", package / "include-other",
+                 package / "include/../private",
+                 package / "include/nexus/private",
+                 package / "include/nexus/vendors",
+                 self.sdk / "soc/stm32/stm32g4/include")
+        for path in paths:
+            with self.subTest(path=path):
+                self.assertTrue(self.private_input(["-I", path]))
+
+    def test_f407_soc_public_export_keeps_alias_and_override_checks(self):
+        public = self.sdk / "soc/stm32/stm32f4/include"
+        public.mkdir(parents=True)
+        relative = os.path.relpath(public, self.build)
+        self.assertFalse(self.private_input(["-I", relative], command=True))
+        alias = public / "alias"
+        alias.symlink_to(self.private, target_is_directory=True)
+        self.assertTrue(self.private_input(["-I", alias]))
+        self.assertTrue(self.private_input(["-I", public, "-DSTM32F407xx"]))
+        entry = {"file": str(self.build / "main.c"),
+                 "directory": str(self.build),
+                 "arguments": ["cc", "-I", str(public)]}
+        self.assertTrue(self.consumer.private_compile_inputs(
+            entry, self.sdk, extra_private=(public,)))
+
     def test_shared_ip_includes_remain_private_after_relocation(self):
         for root in (self.sdk, ROOT):
             directory = root / "soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
@@ -753,7 +790,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assert_complete_matrix()
 
 
-    def test_selected_owner_smokes_link_explicit_public_components(self):
+    def test_selected_audio_smoke_uses_the_standard_platform_factory(self):
         label, stem, smoke = self.SELECTED_INPUTS[-1]
         assembly = "tools/configure/assemblies/" + stem + ".toml"
         directory = self.directory / smoke
@@ -765,8 +802,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                      / (smoke + ".c"))
         self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
         project = (source / "CMakeLists.txt").read_text()
-        self.assertIn("LIBRARIES Nexus::F407I2S2SlaveTx)", project)
-        self.assertIn("stm32f407_i2s2_slave_tx.h",
+        self.assertNotIn("Nexus::F407I2S2SlaveTx", project)
+        self.assertIn("stm32f407_audio.h",
                       (source / "private_headers.c").read_text())
         self.assertIn("set(CMAKE_C_STANDARD 11)", project)
         self.assertIn("set(CMAKE_C_STANDARD_REQUIRED ON)", project)

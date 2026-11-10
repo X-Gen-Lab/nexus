@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407zg-fsmc-software-reference",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "RM0090-Rev22-DS8626-Rev12-software-reference",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "control",
+      "controller": "FSMC",
+      "route": "fsmc-reference-control"
+    },
+    {
+      "id": "psram",
+      "controller": "FSMC",
+      "route": "fsmc-reference-memory_window-zg"
+    },
+    {
+      "id": "nor",
+      "controller": "FSMC",
+      "route": "fsmc-reference-flash_async-zg"
+    },
+    {
+      "id": "nand",
+      "controller": "FSMC",
+      "route": "fsmc-reference-nand3"
+    }
+  ],
+  "provenance": [],
+  "unknowns": [
+    "Software reference only; no fitted memory part, PCB, timing measurement or physical qualification"
+  ],
+  "reserved_resources": []
+}

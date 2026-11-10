@@ -6,6 +6,7 @@
  * \date            2026-10-28
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_i2c_cold.h"
 
 #ifndef NX_PLATFORM_REGISTER_WRITE
@@ -40,8 +41,10 @@ static bool config_valid(const nx_stm32_i2c_config_t* config) {
     if (config == NULL || config->pins == NULL ||
         config->pins[0].snapshot == NULL || config->pins[1].snapshot == NULL ||
         config->pins[0].snapshot == config->pins[1].snapshot ||
-        config->clock_hz != 42000000U || config->priority > 15U ||
-        config->max_hz < 5129U || config->max_hz > 400000U ||
+        config->clock_hz != NEXUS_APB1_HZ || config->clock_hz < 2000000U ||
+        config->clock_hz > 50000000U || config->clock_hz % 1000000U != 0U ||
+        config->priority > 15U || config->max_hz < 5129U ||
+        config->max_hz > 400000U ||
         (config->registers != I2C1 && config->registers != I2C2 &&
          config->registers != I2C3) ||
         (!config->asynchronous && config->dma != NULL))

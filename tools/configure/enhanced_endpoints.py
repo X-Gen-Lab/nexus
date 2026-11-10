@@ -223,6 +223,10 @@ def complete_controller(controller, children, provider):
         controller["interface_kind"] = "spi_dma_transaction"
     if controller["kind"] == "i2c" and not children:
         fail("I2C requires at least one explicit address endpoint")
+    if controller["kind"] == "spi" and controller["mode"] == "irq-frames":
+        if children:
+            fail("SPI frame owners expose no legacy CS endpoint")
+        return
     if (controller["kind"] == "spi" and provider.SPI_REQUIRES_ENDPOINT and
             not children):
         fail("SPI requires at least one reviewed CS endpoint")

@@ -6,11 +6,11 @@
  * \date            2026-10-20
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/core/time.h"
+#include "nexus/io/audio.h"
 #include "nexus_bindings.h"
 #include "nexus_config.h"
-#if NEXUS_F407_I2S2_SLAVE_TX_SELECTED
-#include "nexus/components/f407_i2s2_slave_tx.h"
-#include "nexus/core/time.h"
+#include "nexus_factory.h"
 
 static uint16_t s_samples[4] = {0x1234U, 0x5678U, 0x9abcU, 0xdef0U};
 static nx_stream_slot_t s_slot = {.data = (uint8_t*)s_samples,
@@ -18,11 +18,7 @@ static nx_stream_slot_t s_slot = {.data = (uint8_t*)s_samples,
 static nx_stream_t s_stream;
 static nx_frame_stream_t s_frame;
 static nx_frame_dma_loan_t s_loan;
-static nx_f407_i2s2_tx_request_t s_request;
-static nx_f407_i2s2_slave_tx_storage_t s_owner;
-static const nx_f407_i2s2_slave_tx_t s_tx = {&nx_f407_i2s2_slave_tx_ops,
-                                             &s_owner};
-#endif
+static nx_audio_request_t s_request;
 
 /** \brief Link the maintained public path; this fixture is not a clock source.
  * \note Physical execution requires an independently controlled external
@@ -34,9 +30,8 @@ int main(void) {
     if (started.primary != NX_SUCCESS)
         for (;;) {
         }
-#if NEXUS_F407_I2S2_SLAVE_TX_SELECTED
-    const nx_f407_i2s2_slave_tx_config_t config = {NX_F407_I2S2_SLAVE_TX,
-                                                   4096U};
+    const nx_audio_t* audio = nx_factory_audio(NX_AUDIO_ID_SOUND);
+    nx_audio_rate_t rate;
     const nx_frame_audio_format_t format = {NX_FRAME_AUDIO_I2S,
                                             NX_FRAME_PCM_SIGNED,
                                             NX_FRAME_SAMPLE_LSB,
@@ -56,27 +51,30 @@ int main(void) {
         nx_stream_reserve(&s_stream, &fill) != NX_SUCCESS ||
         nx_frame_stream_publish(&s_frame, &fill, 0U) != NX_SUCCESS ||
         nx_frame_stream_acquire(&s_frame, &s_loan) != NX_SUCCESS ||
-        nx_f407_i2s2_slave_tx_initialize(&s_owner, &s_tx, &config) !=
-            NX_SUCCESS ||
+        audio == NULL ||
+        audio->ops->rate(audio->context, &rate) != NX_SUCCESS ||
+        rate.numerator_hz != 0U || rate.denominator != 0U ||
         nx_request_prepare(&s_request.base,
                            nx_deadline_after(nx_time_now_us(), 100000U)) !=
             NX_SUCCESS)
         for (;;) {
         }
-    s_request.source = &s_loan;
-    if (s_tx.ops->submit(s_tx.context, &s_request) != NX_SUCCESS)
+    s_request.tx = &s_loan;
+    if (audio->ops->submit(audio->context, &s_request) != NX_SUCCESS)
         for (;;) {
         }
     /* ACTIVE alone permits the separately owned master to begin CK. If arm
      * fails after acceptance, service still owns drain and every loan. */
-    while (nx_request_state(&s_request.base) != NX_REQUEST_SETTLED)
-        (void)s_tx.ops->service(s_tx.context);
-    while (s_tx.ops->stop(s_tx.context) != NX_SUCCESS) {
+    while (nx_request_state(&s_request.base) != NX_REQUEST_SETTLED) {
+        if (nx_deadline_expired(s_request.base.deadline, nx_time_now_us()))
+            (void)audio->ops->cancel(audio->context, &s_request);
+        (void)audio->ops->service(audio->context);
+    }
+    while (audio->ops->stop(audio->context) != NX_SUCCESS) {
     }
     if (nx_stream_stop(&s_stream) != NX_SUCCESS)
         for (;;) {
         }
-#endif
     while (nx_platform_stop() != NX_SUCCESS) {
     }
     for (;;) {

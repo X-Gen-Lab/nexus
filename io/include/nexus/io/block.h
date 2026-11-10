@@ -43,6 +43,7 @@ typedef struct {
                                   uint32_t blocks, nx_time_us_t deadline);
     nx_result_t (*sync)(void* context, nx_time_us_t deadline);
     nx_result_t (*stop)(void* context, nx_time_us_t deadline);
+    nx_result_t (*media_removed)(void* context);
 } nx_block_ops_t;
 /** \brief Immutable face; lookup never starts clocks or accesses media. */
 struct nx_block_port {
@@ -128,6 +129,16 @@ nx_result_t nx_block_port_sync(const nx_block_port_t* port,
  */
 nx_result_t nx_block_port_stop(const nx_block_port_t* port,
                                nx_time_us_t deadline);
+/**
+ * \brief Record externally established physical removal of this exact card.
+ * \param[in] port: Same serialized privileged unmasked Thread owner.
+ * \return Success invalidates geometry and begins any required host drain.
+ * \note Board owns detect and debounce. A timeout does not prove removal.
+ *       Call after synchronous I/O has returned, or under the asynchronous
+ *       owner's execution serialization. Outstanding borrows remain live.
+ *       Explicit stop then activation is required before a replacement card.
+ */
+nx_result_t nx_block_port_media_removed(const nx_block_port_t* port);
 #ifdef __cplusplus
 }
 #endif

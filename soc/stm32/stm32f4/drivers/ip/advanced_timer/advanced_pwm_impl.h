@@ -31,6 +31,11 @@
 #define NX_ADV_DEFAULT_BREAK_MASK 1
 #define NX_ADV_BREAK_MASK         4096U
 #endif
+#include "stm32f407_timer_output.h"
+#ifndef NX_ADV_ACCESS_READY
+#define NX_ADV_DEFAULT_ACCESS_READY 1
+#define NX_ADV_ACCESS_READY()       (true)
+#endif
 /** \brief One native CCR per selected pair; CH4 has no complementary output. */
 static volatile uint32_t* advanced_compare(uint8_t channel) {
     return channel == 1U   ? &NX_ADV_CCR1
@@ -65,41 +70,24 @@ static bool advanced_overlap(const void* a, size_t an, const void* b,
 }
 /** \brief Decode exact tDTS ticks; the timer PSC does not participate. */
 static uint32_t deadtime_ticks(uint32_t code) {
-    if (code < 128U) {
-        return code;
-    }
-    if (code < 192U) {
-        return (64U + (code & 63U)) * 2U;
-    }
-    if (code < 224U) {
-        return (32U + (code & 31U)) * 8U;
-    }
-    return (32U + (code & 31U)) * 16U;
+    return nx_stm32_timer_deadtime_ticks(code);
 }
 /** \brief A cold bounded search rejects counts the hardware cannot represent.
  */
 static bool deadtime_code(uint32_t ticks, uint32_t* code) {
-    for (uint32_t candidate = 0U; candidate <= 255U; ++candidate) {
-        if (deadtime_ticks(candidate) == ticks) {
-            *code = candidate;
-            return true;
-        }
-    }
-    return false;
+    return nx_stm32_timer_deadtime_code(ticks, code);
 }
 /** \brief Read the reviewed physical BKIN level, never a software guess. */
 static bool break_active(const nx_advanced_pwm_controller_t* port) {
-    return ((*port->config->break_input & port->config->break_mask) != 0U) ==
-           port->config->break_active_high;
+    return nx_stm32_timer_break_active(port->config->break_input,
+                                       port->config->break_mask,
+                                       port->config->break_active_high);
 }
 /** \brief Snapshot observed break before clearing only that W0C flag. */
 static void observe_break(nx_advanced_pwm_controller_t* port) {
-    if ((NX_ADV_SR & 128U) != 0U || break_active(port)) {
-        port->fault = true;
-        NX_TIMER_WRITE(NX_ADV_BDTR, NX_ADV_BDTR & ~32768U);
-        NX_TIMER_WRITE(NX_ADV_SR, ~128U);
-        nx_arch_dsb();
-    }
+    (void)nx_stm32_timer_break_observe(
+        NX_ADV_REGISTERS, port->config->break_input, port->config->break_mask,
+        port->config->break_active_high, &port->fault);
 }
 /** \brief Reject unknown clocks, unsafe break input and irreversible lock. */
 nx_result_t NX_ADV_INITIALIZE(nx_advanced_pwm_controller_t* port,
@@ -260,22 +248,16 @@ static nx_result_t advanced_stop(void* context) {
     if (!advanced_context()) {
         return NX_ERROR_CONTEXT;
     }
+    if (!NX_ADV_ACCESS_READY())
+        return NX_ERROR_STATE;
     nx_arch_irq_state_t mask = nx_arch_irq_save();
     observe_break(port);
     bool cold = !port->initialized;
-    NX_TIMER_WRITE(NX_ADV_BDTR, NX_ADV_BDTR & ~32768U);
-    NX_TIMER_WRITE(NX_ADV_CCER,
-                   cold ? 0U : NX_ADV_CCER & ~advanced_enable(port));
-    NX_TIMER_WRITE(NX_ADV_DIER, cold ? 0U : NX_ADV_DIER & ~128U);
-    NX_TIMER_WRITE(NX_ADV_CR1, NX_ADV_CR1 & ~1U);
-    nx_arch_dsb();
-    bool retained =
-        (NX_ADV_BDTR & 32768U) != 0U ||
-        (NX_ADV_CCER & (cold ? UINT32_MAX : advanced_enable(port))) != 0U ||
-        (NX_ADV_DIER & (cold ? UINT32_MAX : 128U)) != 0U ||
-        (NX_ADV_CR1 & 1U) != 0U;
+    bool stopped = nx_stm32_timer_output_stop(
+        NX_ADV_REGISTERS, true, cold ? UINT32_MAX : advanced_enable(port),
+        cold ? UINT32_MAX : 128U);
     nx_arch_irq_restore(mask);
-    return retained ? NX_ERROR_BUSY : NX_SUCCESS;
+    return stopped ? NX_SUCCESS : NX_ERROR_BUSY;
 }
 /** \brief End the static session after source and shared publisher detach. */
 nx_result_t NX_ADV_RELEASE(nx_advanced_pwm_controller_t* port) {
@@ -369,7 +351,7 @@ static nx_result_t advanced_state(const void* context,
 }
 /** \brief Shared-vector dispatch supplies exactly this static controller. */
 void NX_ADV_IRQ(nx_advanced_pwm_controller_t* port) {
-    if (port != NULL && port->initialized) {
+    if (port != NULL && port->initialized && NX_ADV_ACCESS_READY()) {
         observe_break(port);
     }
 }
@@ -388,4 +370,8 @@ const nx_advanced_pwm_ops_t NX_ADV_OPS = {.set_duty = advanced_duty,
 #ifdef NX_ADV_DEFAULT_BREAK_MASK
 #undef NX_ADV_BREAK_MASK
 #undef NX_ADV_DEFAULT_BREAK_MASK
+#endif
+#ifdef NX_ADV_DEFAULT_ACCESS_READY
+#undef NX_ADV_ACCESS_READY
+#undef NX_ADV_DEFAULT_ACCESS_READY
 #endif

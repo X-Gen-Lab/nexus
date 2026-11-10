@@ -43,3 +43,18 @@ SETUP 不撤销已取得的 ACK；ACK 前 supersession 会 abort／drain 且不�
 
 完整语义与精确 FS provider 范围见 [USB device 合同](../../docs/design/usb-device.md)。
 主机模型、描述符验证和 ARM 链接不建立 VBUS、PHY、电气、枚举或 class 实板资格。
+## 显式 USB 角色和供电交接
+
+`Nexus::USBRole` 提供 caller-owned 的 OFF／Device／Host 事务。它只调用显式后端，
+不创建任务、不推断 ID pin、不自动运行 SRP／HNP，也不替产品选择角色。后端的 stop
+必须证明 controller、request、DMA、IRQ 和回调全部退出；失败时保留原 transport 和
+Host 电源责任，不能开始另一个角色。
+
+Host 启用前先读回开关关闭，并观察实际 VBUS 不存在，之后才允许打开电源。
+Host 退出后观察实际放电，再允许等待外部 VBUS 并启动 Device。source 回调报告开关
+命令的实际读回；present 回调独立报告 VBUS 和外部故障，不能返回请求的供电状态来
+替代测量。超时中止激活，但不能撤销未排空的 transport 所有权。
+
+调用者在同一特权 task 执行 request／service，继续推进所选 transport 自己的 service，
+并在清理完成前保留 config 和 context。控制器 factory、描述符、class 分派、实际开关
+连接及故障策略仍各有明确 owner；该机制不建立任何 PCB 或物理 OTG 资格。

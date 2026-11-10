@@ -13,6 +13,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "spi_dma_sequence_owner.h"
+#include "stm32f407_clock.h"
 #include "stm32f407_dma.h"
 #include "stm32f4xx_ll_spi.h"
 
@@ -123,7 +124,7 @@ nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state) {
     bool first = state->spi.registers == SPI1;
     if (!route_valid(state->spi.registers, state->dma, state->tx, state->rx) ||
         state->spi.rcc != RCC ||
-        state->spi.clock_hz != (first ? 84000000U : 42000000U)) {
+        state->spi.clock_hz != (first ? NEXUS_APB2_HZ : NEXUS_APB1_HZ)) {
         return NX_ERROR_UNSUPPORTED;
     }
 #endif

@@ -32,7 +32,8 @@ OFFICIAL_F4_VERIFIED_FILES = frozenset({
     "Inc/stm32f4xx_ll_dac.h", "Inc/stm32f4xx_ll_dma.h",
     "Inc/stm32f4xx_ll_system.h", "Inc/stm32f4xx_ll_utils.h",
     "Inc/stm32f4xx_ll_gpio.h", "Inc/stm32f4xx_ll_i2c.h",
-    "Inc/stm32f4xx_ll_iwdg.h", "Inc/stm32f4xx_ll_spi.h",
+    "Inc/stm32f4xx_ll_iwdg.h", "Inc/stm32f4xx_ll_wwdg.h",
+    "Inc/stm32f4xx_ll_spi.h",
     "Inc/stm32f4xx_ll_tim.h", "Inc/stm32f4xx_ll_usart.h", "LICENSE.md",
     "Inc/stm32f4xx_hal.h", "Inc/stm32f4xx_hal_dma.h",
     "Inc/stm32f4xx_hal_dma_ex.h", "Inc/stm32f4xx_hal_uart.h",
@@ -44,6 +45,11 @@ OFFICIAL_F4_VERIFIED_FILES = frozenset({
     "Inc/stm32f4xx_ll_fsmc.h", "Inc/stm32f4xx_ll_pwr.h",
     "Inc/stm32f4xx_ll_rtc.h", "Inc/stm32f4xx_ll_sdmmc.h",
     "Src/stm32f4xx_ll_fsmc.c", "Src/stm32f4xx_ll_sdmmc.c",
+    "Inc/stm32f4xx_hal_dcmi.h", "Inc/stm32f4xx_hal_dcmi_ex.h",
+    "Inc/stm32f4xx_hal_hcd.h", "Inc/stm32f4xx_hal_pcd.h",
+    "Inc/stm32f4xx_hal_pcd_ex.h", "Inc/stm32f4xx_ll_usb.h",
+    "Src/stm32f4xx_hal_dcmi.c", "Src/stm32f4xx_hal_hcd.c",
+    "Src/stm32f4xx_ll_usb.c",
 })
 
 
@@ -261,17 +267,17 @@ class SourceSDKSelectionTests(unittest.TestCase):
 
 
 
-    def test_selected_f407_i2s2_public_closure_is_required(self):
-        role_module = "tools/configure/i2s2.py"
+    def test_selected_f407_audio_public_closure_is_required(self):
         required = {
-            role_module,
-            "components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt",
-            "components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/"
-            "f407_i2s2_slave_tx.h",
-            "soc/stm32/stm32f4/drivers/i2s2_slave_tx.c",
-            "soc/stm32/stm32f4/private/stm32f407_i2s2_slave_tx.h",
+            "tools/configure/stm32f4/capture_audio.py",
+            "soc/stm32/stm32f4/drivers/audio.c",
+            "soc/stm32/stm32f4/drivers/av.c",
+            "soc/stm32/stm32f4/private/stm32f407_audio.h",
+            "soc/stm32/stm32f4/private/stm32f407_av.h",
             "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
             "tools/configure/assemblies/qiming-i2s2-slave-tx.toml",
+            "tools/configure/assemblies/f407-audio-reference/ve/board.json",
+            "tools/configure/assemblies/f407-audio-reference/zg/board.json",
             "cmake/package/verification/io_evolution/consumers/"
             "f407-i2s2-slave-tx.c",
         }
@@ -280,11 +286,18 @@ class SourceSDKSelectionTests(unittest.TestCase):
         for name in sorted(required):
             with self.subTest(path=name):
                 self.assertTrue(source_sdk.selected(name),
-                                "Required I2S2 closure omitted: " + name)
+                                "Required audio closure omitted: " + name)
         payload = source_sdk.provider_descriptors.maintained("stm32f4").owned_payload
-        hardware = required - {role_module}
+        hardware = required - {"tools/configure/stm32f4/capture_audio.py"}
         self.assertTrue(hardware.issubset(set(payload)),
                         sorted(hardware - set(payload)))
+        retired = {
+            "tools/configure/i2s2.py",
+            "tools/configure/stm32f4/i2s2.py",
+            "soc/stm32/stm32f4/drivers/i2s2_slave_tx.c",
+            "soc/stm32/stm32f4/private/stm32f407_i2s2_slave_tx.h",
+        }
+        self.assertFalse(retired.intersection(source_sdk.required_files(ROOT)))
 
     def test_optional_usb_control_and_profile_sources_cannot_be_omitted(self):
         required = {
@@ -1125,7 +1138,8 @@ class SourceSDKTests(unittest.TestCase):
         self.assertEqual(len(product), 2)
         for entry in product:
             command = entry["command"]
-            self.assertFalse(consumer_gate.private_compile_inputs(entry, self.sdk))
+            self.assertFalse(consumer_gate.private_compile_inputs(entry, self.sdk),
+                             json.dumps(entry, sort_keys=True))
             self.assertNotIn(str(ROOT) + "/", command)
 
 

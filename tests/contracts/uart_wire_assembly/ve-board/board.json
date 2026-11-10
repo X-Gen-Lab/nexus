@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407ve-uart-wire-software-fixture",
+  "soc": "STM32F407VET6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-only-reviewed-controller-pad-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "console",
+      "controller": "USART1",
+      "route": "usart1-synchronous-pa9-pa10-pa8"
+    },
+    {
+      "id": "serial2",
+      "controller": "USART2",
+      "route": "usart2-smartcard-pa2-pa4"
+    },
+    {
+      "id": "serial3",
+      "controller": "USART3",
+      "route": "usart3-rts-cts-pb10-pb11-pb13-pb14"
+    },
+    {
+      "id": "serial4",
+      "controller": "UART4",
+      "route": "uart4-half-duplex-pa0"
+    },
+    {
+      "id": "serial5",
+      "controller": "UART5",
+      "route": "uart5-pc12-pd2"
+    },
+    {
+      "id": "serial6",
+      "controller": "USART6",
+      "route": "usart6-pc6-pc7"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only silicon pad and active-low CS contract; no PCB devices or connections are claimed.",
+    "No physical UART/SPI/I2C timing, pulls, voltage or external-device qualification was executed."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "Reviewed F407 silicon AF/analog pads only; exact DMA tuples follow RM0090 Rev22 Tables43/44 and the locked SDK. No PCB or external-device wiring claim."
+    }
+  ]
+}

@@ -1,5 +1,4 @@
 """Selected ADC sequence policy and graph-local reviewed group decisions."""
-import hashlib
 
 from tools.configure.providers.common import fail, integer, mode_traits, sequence
 
@@ -75,6 +74,10 @@ def selected_route(selection, route, provider):
     physical channels acquire pins; repeated ranks never duplicate a lease.
     Other providers keep their existing exact route contract.
     """
+    if route["kind"] == "adc_group":
+        if provider.ADC_GROUP is None:
+            fail("ADC group has no maintained provider")
+        return provider.ADC_GROUP.selected_route(selection, route)
     mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
     if route["kind"] != "adc" or mapping is None:
         return route
@@ -95,28 +98,18 @@ def group_trigger_resources(selection, provider):
     return provider.ADC_GROUP.trigger_resources(selection)
 
 
-def resolve_group(selection, provider, contract, *, review_path, read,
-                  snapshots, part, clock):
-    """Reuse the graph's one retained review before resolving a group.
-
-    Path containment and byte retention are supplied by the common resolver;
-    this category neither rereads the file nor creates another input identity.
-    """
+def resolve_group(selection, provider, *, part, clock, clock_plan):
+    """Resolve maintained silicon facts from the existing assembly input set."""
     if provider.ADC_GROUP is None:
         fail("ADC group has no maintained provider")
-    if contract is None:
-        path = review_path()
-        review = read(path)
-        contract = (review, hashlib.sha256(snapshots[path]).hexdigest(), path)
-    review, digest, _ = contract
-    return (provider.ADC_GROUP.resolve(
-        selection, review, digest, part=part, clock=clock), contract)
+    return provider.ADC_GROUP.resolve(selection, part=part, clock=clock,
+                                      clock_plan=clock_plan)
 
 
 def complete_triggers(selected, triggers):
     """Bind final trigger identities before the enclosing graph is frozen."""
     for item in selected:
-        if item["kind"] == "adc_group" and item["trigger"] == "tim6-trgo":
+        if item["kind"] == "adc_group" and item["trigger"] != "software":
             item["adc_group_resolution"]["trigger_identity"] = next(
                 index + 1 for index, edge in enumerate(triggers.edges)
                 if edge.target == item["id"] + ":adc")

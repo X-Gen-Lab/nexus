@@ -9,6 +9,7 @@ from .hardware import (ADC_PIN_CHANNELS, ADC_INTERNAL_CHANNELS,
                        DAC_PIN_CHANNELS, PWM_PIN_CHANNELS, PWM_TIMERS, ADC_TRIGGERS,
                        FIXED_DMA as _FIXED_DMA)
 from tools.configure.adc import RESOLUTION_BITS
+from . import waveform
 
 PARTS = MappingProxyType({
     "STM32F407VET6": common.PartPolicy("LQFP100", frozenset(('ccm',))),
@@ -50,17 +51,34 @@ OFFSET_IMAGE_ALIGNMENT = 512
 OFFSET_IMAGE_VECTOR_SYMBOL = 'g_pfnVectors'
 FACT_REFERENCES = descriptor.maintained("stm32f4").references
 ETH_CONTROLLER = 'ETH'
-CONTROLLER_INTERFACES = MappingProxyType({
+_BASE_CONTROLLER_INTERFACES = MappingProxyType({
+    **{name: MappingProxyType({'i2c_target': ('target-irq', 'smbus-device')})
+       for name in ('I2C1', 'I2C2', 'I2C3')},
+    'OTG_FS': MappingProxyType({'usb_host': ('host-fs',)}),
+    'OTG_HS': MappingProxyType({'usb_device': ('device-hs-fs', 'device-hs-ulpi',
+                                                  'otg-hs-fs', 'otg-hs-ulpi')}),
+    'TIM1': MappingProxyType({'encoder': ('quadrature',),
+                              'timer_capture': ('edge-capture',)}),
     'TIM3': MappingProxyType({'encoder': ('quadrature',),
                               'timer_capture': ('edge-capture',)}),
     'TIM4': MappingProxyType({'pwm': ('fixed-pwm',), 'encoder': ('quadrature',)}),
     'TIM5': MappingProxyType({'encoder': ('quadrature',),
                               'timer_capture': ('edge-capture',)}),
+    'TIM8': MappingProxyType({'encoder': ('quadrature',),
+                              'timer_capture': ('edge-capture',)}),
+    **{name: MappingProxyType({'timer_capture': ('edge-capture',)})
+       for name in ('TIM9', 'TIM10', 'TIM11', 'TIM12', 'TIM13', 'TIM14')},
     'ETH': MappingProxyType({
-        'eth_frames': ('rmii-vlan-sg-ptp',)}),
+        'eth_frames': ('rmii-vlan-sg-ptp', 'mii-vlan-sg-ptp')}),
     'FSMC': MappingProxyType({
-        'memory_window': ('cpu-window', 'startup-memory'),
+        'memory_window': ('cpu-window', 'startup-memory', 'psram-window'),
+        'flash_async': ('nor-cfi',), 'nand': ('raw-page',),
         'parallel16': ('8080-16',)})})
+CONTROLLER_INTERFACES = MappingProxyType({
+    name: MappingProxyType({**_BASE_CONTROLLER_INTERFACES.get(name, {}),
+                            **waveform.controller_interfaces().get(name, {})})
+    for name in sorted(set(_BASE_CONTROLLER_INTERFACES) |
+                       set(waveform.controller_interfaces()))})
 USB_CONTROLLER = 'OTG_FS'
 CAN_CONTROLLERS = ('CAN1', 'CAN2')
 CAN_CLOCK_HZ = 42000000
@@ -83,8 +101,18 @@ SPI_REQUIRES_ENDPOINT = True
 PIN_ELECTRICAL = True
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
+    ('adc_group', 'regular-sequence-dma'): 'adc_group',
+    ('adc_group', 'injected-sequence'): 'adc_group',
+    **{('capture', mode): 'capture'
+       for mode in ('snapshot-raw', 'snapshot-jpeg', 'raw-blocks')},
+    **{('audio', role + '-' + direction): 'audio'
+       for role in ('master', 'slave') for direction in ('tx', 'rx', 'duplex')},
+    ('pwm_group', 'coherent-pwm'): 'pwm_group',
+    ('timer_pulse', 'one-pulse'): 'timer_pulse',
+    ('timer_sequence', 'dma-burst'): 'timer_sequence',
     ('encoder', 'quadrature'): 'encoder',
     ('crc', 'crc32-words'): 'crc',
+    ('entropy', 'rng-words'): 'entropy',
     ('dac', 'direct'): 'dac',
     ('dac', 'triggered'): 'dac',
     ('dac', 'noise'): 'dac',
@@ -93,22 +121,42 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('dac', 'trigger-dma-circular'): 'dac_dma',
     ('memory_window', 'startup-memory'): 'fsmc',
     ('external_bus', 'async16'): 'fsmc',
+    ('external_bus', 'external-memory'): 'fsmc',
+    ('memory_window', 'psram-window'): 'fsmc',
+    ('flash_async', 'nor-cfi'): 'fsmc',
+    ('nand', 'raw-page'): 'fsmc',
     ('memory_window', 'cpu-window'): 'fsmc',
     ('parallel16', '8080-16'): 'fsmc',
     ('rtc', 'adopt-retained'): 'rtc',
     ('rtc', 'provision-empty'): 'rtc',
     ('block', 'sdio-poll'): 'sdio',
+    ('block', 'sdio-irq'): 'sdio',
+    ('block', 'sdio-dma'): 'sdio',
     ('timer_capture', 'edge-capture'): 'timer_capture',
     ('advanced_pwm', 'complementary-pwm'): 'advanced_pwm',
     ('eth', 'raw-rmii'): 'eth',
+    ('eth', 'raw-mii'): 'eth',
     ('eth_frames', 'rmii-vlan-sg-ptp'): 'eth_frames',
+    ('eth_frames', 'mii-vlan-sg-ptp'): 'eth_frames',
     ('usb_device', 'device-fs'): 'usb_device',
+    ('usb_device', 'otg-fs'): 'usb_device',
+    ('usb_device', 'otg-hs-fs'): 'usb_device',
+    ('usb_device', 'otg-hs-ulpi'): 'usb_device',
+    ('usb_device', 'device-hs-fs'): 'usb_device',
+    ('usb_device', 'device-hs-ulpi'): 'usb_device',
+    ('usb_host', 'host-fs'): 'usb_host',
+    ('usb_host', 'host-hs-fs'): 'usb_host',
+    ('usb_host', 'host-hs-ulpi'): 'usb_host',
     ('can', 'classic-irq'): 'can',
     ('gpio', 'input'): 'gpio',
     ('gpio', 'output'): 'gpio',
     ('uart', 'irq-byte-event'): 'uart',
+    ('uart', 'irq-wire'): 'uart',
     ('uart', 'irq-words'): 'uart_word',
     ('spi', 'short-poll'): 'spi',
+    ('spi', 'irq-frames'): 'spi_frames',
+    ('i2c_target', 'target-irq'): 'i2c_target',
+    ('i2c_target', 'smbus-device'): 'i2c_target',
     ('i2c', 'poll-messages'): 'i2c',
     ('i2c', 'irq-messages'): 'i2c_async',
     ('i2c', 'dma-messages'): 'i2c_async',
@@ -137,20 +185,33 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
 def validate_selection(selection, route):
     """Validate limits of the implemented provider, not theoretical silicon."""
     kind = route["kind"]
+    if kind in {"capture", "audio"}:
+        from .capture_audio import validate
+        validate(selection, route)
     mode_implementation(kind, selection["mode"])
     if kind == 'exti' and selection['mode'] in {'pvd-level', 'pvd-events'}:
         if route['controller'] != 'EXTI16' or route['pins']:
             common.fail('PVD requires its pinless EXTI16 controller')
+    if kind in waveform.KINDS:
+        waveform.validate(selection, route)
     if kind == "watchdog" and selection["mode"] == "window":
         if route["controller"] != "WWDG":
             common.fail("Window watchdog requires its exact WWDG controller")
         common.integer(selection.get("window_ticks", 1), 1, 62, "WWDG window_ticks")
-    if kind == "rtc":
+    if kind == "flash" and type(selection.get("maintenance", False)) is not bool:
+        common.fail("Flash maintenance must be an explicit boolean")
+    if kind == "adc_group":
+        from .adc_group import validate
+        validate(selection, route)
+    elif kind == "rtc":
         from .rtc import validate
+        validate(selection, route)
+    elif kind == "i2c_target":
+        from .i2c_target import validate
         validate(selection, route)
     elif kind == "block":
         from .block import validate
-        validate(selection)
+        validate(selection, route)
     elif kind == "encoder":
         from .encoder import validate
         validate(selection, route)
@@ -171,13 +232,10 @@ def validate_selection(selection, route):
         common.integer(selection["period_ticks"], 1,
                        0xFFFFFFFF if route["controller"] == "TIM5" else 65535,
                        "PWM period")
-        tick = selection["tick_hz"]
-        clock = timer.clock_hz
-        if clock % tick or not 1 <= clock // tick <= 65536:
-            common.fail("PWM tick_hz is not an exact maintained timer divider")
     elif kind == "spi":
-        common.integer(selection.get("max_hz", 1000000), *LIMITS["spi_hz"],
-                       "SPI max_hz")
+        common.integer(selection.get("max_hz", 1000000),
+                       *( (1, 42000000) if selection["mode"] == "irq-frames"
+                          else LIMITS["spi_hz"]), "SPI max_hz")
     if kind == "adc":
         if selection['mode'] == 'injected-shot' and len(selection['channels']) > 4:
             common.fail('Injected ADC requires at most four ranks')
@@ -195,7 +253,19 @@ def mode_implementation(kind, mode):
 
 
 def validate_dma(route, mode, normalize):
-    if route['kind'] == 'dac':
+    if route['kind'] == 'block':
+        expected = ("DMA2:stream3:channel4",) if mode == "sdio-dma" else ()
+    elif route['kind'] == 'timer_sequence':
+        engine, stream, channel = waveform.DMA[int(route['controller'][3:])]
+        expected = (f'DMA{engine}:stream{stream}:channel{channel}',)
+    elif route['kind'] == 'capture':
+        stream = 7 if route['id'].endswith('-s7') else 1
+        expected = (f'DMA2:stream{stream}:channel1',)
+    elif route['kind'] == 'audio':
+        from .capture_audio import dma_paths
+        expected = tuple(f'DMA{engine}:stream{lane}:channel{channel}'
+            for engine, lane, channel in dma_paths(route['controller'], mode))
+    elif route['kind'] == 'dac':
         from .hardware import DAC_DMA_ROUTES
         mask = sum(1 << (DAC_PIN_CHANNELS[("DAC", pin["pin"])] - 1)
                    for pin in route['pins'])
@@ -224,7 +294,7 @@ def builtin_cs(controller):
     return False
 
 # Explicit software capabilities do not authorize an unreviewed route.
-ADC_GROUP = None
+from . import adc_group as ADC_GROUP
 PWM_SHARED = None
 ENDPOINT_POLICY = common.EndpointPolicy(
     spi_transaction=True, spi_dma=(("SPI1", "SPI2", "SPI3"), "dma"),
@@ -243,6 +313,16 @@ def validate_mode_context(selection, route, *, backend, clock_profile):
 
 
 mode_fields = common.mode_fields
-validate_controller_set = common.validate_controller_set
+def validate_controller_set(selected, *, clock_profile):
+    """Both audio cells share exactly one compatible PLLI2S tuple."""
+    del clock_profile
+    waveform.resolve_edges(selected)
+    tuples = {(item["pll_n"], item["pll_r"]) for item in selected
+              if item["kind"] == "audio" and item["mode"].startswith("master-")}
+    if len(tuples) > 1:
+        common.fail("Selected I2S controllers require one compatible PLLI2S tuple")
+
 validate_endpoint_clock = common.validate_endpoint_clock
-configuration_header = common.configuration_header
+def configuration_header(result):
+    from .clocks import header_lines
+    return [*common.configuration_header(result), *header_lines(result)]

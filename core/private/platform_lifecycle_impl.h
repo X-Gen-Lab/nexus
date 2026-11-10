@@ -107,6 +107,7 @@ NX_PLATFORM_ENTRY nx_result_t nx_platform_stop_body_local(
     }
     state->started = false;
     state->bound = NULL;
+    state->suspend_phase = NX_PLATFORM_RUNNING;
     nx_platform_diagnostic_phase_local(diagnostic, cleanup,
                                        NX_PLATFORM_PHASE_NONE, SIZE_MAX);
     return NX_SUCCESS;
@@ -237,13 +238,149 @@ NX_PLATFORM_ENTRY nx_result_t nx_platform_lifecycle_stop_local(
         return NX_ERROR_INVALID;
     }
     if ((state->bound != NULL && state->bound != identity) ||
-        state->initialized > plan->controller_count) {
+        state->initialized > plan->controller_count ||
+        state->suspend_phase != NX_PLATFORM_RUNNING) {
         return NX_ERROR_STATE;
     }
     state->operating = true;
     nx_result_t result =
         nx_platform_stop_body_local(plan, state, diagnostic, false);
     state->operating = false;
+    return result;
+}
+
+/** \brief Withdraw real owners and resources, retaining the System boundary.
+ */
+NX_PLATFORM_ENTRY nx_result_t nx_platform_suspend_body_local(
+    const nx_platform_lifecycle_plan_t* plan,
+    nx_platform_lifecycle_state_t* state, nx_platform_diagnostic_t* diagnostic,
+    bool cleanup) {
+    nx_platform_diagnostic_phase_local(diagnostic, cleanup,
+                                       NX_PLATFORM_PHASE_CONTEXT, SIZE_MAX);
+    nx_result_t result = plan->context_check();
+    if (result != NX_SUCCESS)
+        return result;
+    if (state->suspend_phase == NX_PLATFORM_SUSPENDED)
+        return NX_SUCCESS;
+    state->suspend_phase = NX_PLATFORM_SUSPENDING;
+    while (state->initialized != 0U) {
+        size_t index = state->initialized - 1U;
+        nx_platform_diagnostic_phase_local(diagnostic, cleanup,
+                                           NX_PLATFORM_PHASE_CONTROLLER,
+                                           plan->ordinals[index]);
+        result =
+            plan->suspend != NULL ? plan->suspend(index) : plan->release(index);
+        if (result != NX_SUCCESS)
+            return result;
+        --state->initialized;
+    }
+    nx_platform_diagnostic_phase_local(diagnostic, cleanup,
+                                       NX_PLATFORM_PHASE_RESOURCES, SIZE_MAX);
+    result = plan->resources_release();
+    if (result != NX_SUCCESS)
+        return result;
+    state->suspend_phase = NX_PLATFORM_SUSPENDED;
+    nx_platform_diagnostic_phase_local(diagnostic, cleanup,
+                                       NX_PLATFORM_PHASE_NONE, SIZE_MAX);
+    return NX_SUCCESS;
+}
+
+NX_PLATFORM_ENTRY nx_result_t nx_platform_lifecycle_suspend_local(
+    const nx_platform_lifecycle_plan_t* plan,
+    nx_platform_lifecycle_state_t* state, nx_platform_diagnostic_t* diagnostic,
+    const void* identity) {
+    if (state != NULL && state->operating)
+        return NX_ERROR_BUSY;
+    nx_platform_diagnostic_reset_local(diagnostic);
+    if (state == NULL || identity == NULL ||
+        !nx_platform_plan_valid_local(plan))
+        return NX_ERROR_INVALID;
+    if (!state->started || state->bound != identity ||
+        state->initialized > plan->controller_count ||
+        state->suspend_phase > NX_PLATFORM_SUSPENDED ||
+        (state->suspend_phase == NX_PLATFORM_RUNNING &&
+         state->initialized != plan->controller_count))
+        return NX_ERROR_STATE;
+    state->operating = true;
+    nx_result_t result =
+        nx_platform_suspend_body_local(plan, state, diagnostic, false);
+    state->operating = false;
+    if (result == NX_SUCCESS)
+        nx_platform_diagnostic_reset_local(diagnostic);
+    return result;
+}
+
+/** \brief Reacquire static owners; failures drain without releasing System.
+ */
+NX_PLATFORM_ENTRY nx_platform_start_result_t
+nx_platform_resume_body_local(const nx_platform_lifecycle_plan_t* plan,
+                              nx_platform_lifecycle_state_t* state,
+                              nx_platform_diagnostic_t* diagnostic) {
+    nx_platform_start_result_t result = {NX_SUCCESS, NX_SUCCESS, 0U};
+    nx_platform_diagnostic_phase_local(diagnostic, false,
+                                       NX_PLATFORM_PHASE_CONTEXT, SIZE_MAX);
+    result.primary = plan->context_check();
+    if (result.primary != NX_SUCCESS)
+        return result;
+    state->suspend_phase = NX_PLATFORM_SUSPENDING;
+    nx_platform_diagnostic_phase_local(diagnostic, false,
+                                       NX_PLATFORM_PHASE_RESOURCES, SIZE_MAX);
+    result.primary = plan->resources_resume != NULL ? plan->resources_resume()
+                                                    : plan->resources_acquire();
+    if (result.primary != NX_SUCCESS)
+        goto rollback;
+    for (size_t index = 0U; index < plan->controller_count; ++index) {
+        nx_platform_diagnostic_phase_local(diagnostic, false,
+                                           NX_PLATFORM_PHASE_CONTROLLER,
+                                           plan->ordinals[index]);
+        nx_lifecycle_acquisition_t acquired =
+            plan->resume != NULL ? plan->resume(index) : plan->acquire(index);
+        if (acquired.result != NX_SUCCESS) {
+            result.primary = acquired.result;
+            if (acquired.retained)
+                ++state->initialized;
+            goto rollback;
+        }
+        ++state->initialized;
+    }
+    state->suspend_phase = NX_PLATFORM_RUNNING;
+    return result;
+rollback:
+    result.cleanup =
+        nx_platform_suspend_body_local(plan, state, diagnostic, true);
+    result.remaining_effects = 1U;
+    return result;
+}
+
+NX_PLATFORM_ENTRY nx_platform_start_result_t nx_platform_lifecycle_resume_local(
+    const nx_platform_lifecycle_plan_t* plan,
+    nx_platform_lifecycle_state_t* state, nx_platform_diagnostic_t* diagnostic,
+    const void* identity) {
+    nx_platform_start_result_t result = {NX_ERROR_INVALID, NX_SUCCESS, 0U};
+    if (state != NULL && state->operating) {
+        result.primary = NX_ERROR_BUSY;
+        result.remaining_effects = 1U;
+        return result;
+    }
+    nx_platform_diagnostic_reset_local(diagnostic);
+    if (state == NULL || identity == NULL ||
+        !nx_platform_plan_valid_local(plan))
+        return result;
+    if (!state->started || state->bound != identity ||
+        state->initialized != 0U ||
+        state->suspend_phase != NX_PLATFORM_SUSPENDED) {
+        result.primary = NX_ERROR_STATE;
+        result.remaining_effects =
+            nx_platform_retained_effects_local(plan, state);
+        return result;
+    }
+    state->operating = true;
+    result = nx_platform_resume_body_local(plan, state, diagnostic);
+    state->operating = false;
+    if (result.primary == NX_SUCCESS)
+        nx_platform_diagnostic_reset_local(diagnostic);
+    else
+        result.remaining_effects = 1U;
     return result;
 }
 

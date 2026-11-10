@@ -14,14 +14,22 @@ _Static_assert(LL_GPIO_PULL_NO == 0U && LL_GPIO_PULL_UP == 1U &&
                    LL_GPIO_PULL_DOWN == 2U && LL_GPIO_OUTPUT_PUSHPULL == 0U &&
                    LL_GPIO_OUTPUT_OPENDRAIN == 1U,
                "Reviewed GPIO electrical facts differ from the selected SDK");
+_Static_assert(LL_GPIO_SPEED_FREQ_LOW == 0U &&
+                   LL_GPIO_SPEED_FREQ_MEDIUM == 1U &&
+                   LL_GPIO_SPEED_FREQ_HIGH == 2U &&
+                   LL_GPIO_SPEED_FREQ_VERY_HIGH == 3U,
+               "GPIO slew selection must match the selected LL encodings");
 
 #ifndef NX_STM32_GPIO_CLOCK_READ
 #define NX_STM32_GPIO_CLOCK_READ(reg) (*(reg))
 #endif
+#ifndef NX_PLATFORM_REGISTER_WRITE
+#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
+#endif
 
 static nx_result_t initialize_electrical(nx_stm32_gpio_state_t* port,
                                          uint32_t initial, uint8_t pull,
-                                         uint8_t output_type);
+                                         uint8_t output_type, uint8_t speed);
 
 /** \brief Match a GPIO bank without acquiring its bus clock. */
 static unsigned gpio_bank_index(const GPIO_TypeDef* registers) {
@@ -48,7 +56,13 @@ nx_result_t nx_stm32_gpio_admit(const nx_stm32_gpio_state_t* port,
         (config->mask & ~UINT32_C(0xFFFF)) != 0U ||
         (config->initial & ~config->mask) != 0U || config->pull > 2U ||
         config->output_type > 1U ||
-        (!config->output && config->output_type != 0U))
+        config->speed > NX_STM32_GPIO_SPEED_VERY_HIGH ||
+        (!config->output && (config->output_type != 0U ||
+                             config->speed != NX_STM32_GPIO_SPEED_PRESERVE)) ||
+        (config->output && config->registers == GPIOC &&
+         (config->mask & UINT32_C(0xE000)) != 0U &&
+         config->speed != NX_STM32_GPIO_SPEED_PRESERVE &&
+         config->speed != NX_STM32_GPIO_SPEED_LOW))
         return NX_ERROR_INVALID;
     if (port->initialized)
         return NX_ERROR_BUSY;
@@ -81,13 +95,13 @@ nx_result_t nx_stm32_gpio_prepare(nx_stm32_gpio_state_t* port,
     /* Argument rejection precedes pin writes. Hardware refusal retains the
      * Platform pin receipt/clock for whole-resource rollback. */
     return initialize_electrical(port, config->initial, config->pull,
-                                 config->output_type);
+                                 config->output_type, config->speed);
 }
 
 /** \brief Preload output levels before exposing the configured output mode. */
 static nx_result_t initialize_electrical(nx_stm32_gpio_state_t* port,
                                          uint32_t initial, uint8_t pull,
-                                         uint8_t output_type) {
+                                         uint8_t output_type, uint8_t speed) {
     if (port == NULL || port->registers == NULL || port->mask == 0U ||
         (port->mask & ~0xFFFFU) != 0U || (initial & ~port->mask) != 0U) {
         return NX_ERROR_INVALID;
@@ -102,13 +116,18 @@ static nx_result_t initialize_electrical(nx_stm32_gpio_state_t* port,
             uint32_t selected = 1U << pin;
             LL_GPIO_SetPinOutputType(regs, selected, output_type);
             LL_GPIO_SetPinPull(regs, selected, pull);
-            if (port->output && regs == GPIOC && pin >= 13U) {
-                /* PC13/14/15 use the backup-domain power switch: DS8626
-                 * restricts their output speed to the low 2MHz mode. */
-                LL_GPIO_SetPinSpeed(regs, selected, LL_GPIO_SPEED_FREQ_LOW);
+            bool restricted = regs == GPIOC && pin >= 13U;
+            if (port->output &&
+                (speed != NX_STM32_GPIO_SPEED_PRESERVE || restricted)) {
+                /* DS8626 limits PC13/14/15 to LOW output speed. Explicit
+                 * choices are admitted before effects; zero keeps old intent.
+                 */
+                uint32_t selected_speed =
+                    restricted ? LL_GPIO_SPEED_FREQ_LOW
+                               : (uint32_t)speed - NX_STM32_GPIO_SPEED_LOW;
+                LL_GPIO_SetPinSpeed(regs, selected, selected_speed);
                 nx_arch_dsb();
-                if (LL_GPIO_GetPinSpeed(regs, selected) !=
-                    LL_GPIO_SPEED_FREQ_LOW)
+                if (LL_GPIO_GetPinSpeed(regs, selected) != selected_speed)
                     return NX_ERROR_IO;
             }
             LL_GPIO_SetPinMode(regs, selected,
@@ -123,7 +142,8 @@ static nx_result_t initialize_electrical(nx_stm32_gpio_state_t* port,
 /** \brief Keep existing internal users on explicit push-pull/no-pull facts. */
 nx_result_t nx_stm32_gpio_initialize(nx_stm32_gpio_state_t* port,
                                      uint32_t initial) {
-    return initialize_electrical(port, initial, 0U, 0U);
+    return initialize_electrical(port, initial, 0U, 0U,
+                                 NX_STM32_GPIO_SPEED_PRESERVE);
 }
 
 /** \brief Validate dynamic masks before the one atomic BSRR write. */
@@ -283,7 +303,8 @@ void nx_stm32_pin_restore(GPIO_TypeDef* gpio, uint8_t pin, uint16_t state) {
         return;
     }
     uint32_t bit = 1U << pin;
-    gpio->BSRR = (state & (1U << 11U)) != 0U ? bit : bit << 16U;
+    NX_PLATFORM_REGISTER_WRITE(gpio->BSRR,
+                               (state & (1U << 11U)) != 0U ? bit : bit << 16U);
     uint32_t af = (uint32_t)state >> 7U & 15U;
     if (pin < 8U) {
         LL_GPIO_SetAFPin_0_7(gpio, bit, af);

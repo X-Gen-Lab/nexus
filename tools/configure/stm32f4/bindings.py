@@ -138,7 +138,8 @@ def _i2c_constructor(item, result, devices):
     if (selected is None or selected.hardware is None or
             selected.hardware.kind != "i2c" or
             selected.hardware.controller != item.controller or
-            selected.clock_hz != 42000000 or len(selected.pins) != 2):
+            not 2000000 <= selected.clock_hz <= 50000000 or
+            selected.clock_hz % 1000000 != 0 or len(selected.pins) != 2):
         raise ValueError("I2C requires its reviewed controller integration")
     if item.mode not in {"poll-messages", "irq-messages", "dma-messages"}:
         raise ValueError("I2C requires its maintained execution mode")
@@ -154,7 +155,7 @@ def _i2c_constructor(item, result, devices):
     saved = f"s_nx_i2c_pin_state_{name}"
     config = f"s_nx_i2c_config_{name}"
     receipt = f"s_nx_i2c_cold_{name}"
-    definitions = [f"static uint16_t {saved}[2];",
+    definitions = [f"static uint16_t {saved}[{len(selected.pins)}];",
                    f"static nx_stm32_i2c_cold_receipt_t {receipt};",
                    f"static const nx_stm32_i2c_pin_config_t s_nx_i2c_pins_{name}[] = {{"]
     snapshots = {}
@@ -221,6 +222,9 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     if item.kind == "external_bus":
         from .fsmc import constructor as fsmc_constructor
         return fsmc_constructor(item, result)
+    if item.kind in {"capture", "audio"}:
+        from .capture_audio import constructor as av_constructor
+        return av_constructor(item, result)
     if item.kind == "rtc":
         from .rtc import constructor as rtc_constructor
         return rtc_constructor(item, result)
@@ -267,7 +271,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             raise ValueError("PWM requires explicit period/duty/tick_hz")
         if not 1 <= period <= LIMITS["pwm_period"] or not 0 <= duty <= period or tick <= 0:
             raise ValueError("Invalid fixed PWM counts")
-        timer_hz = PWM_TIMERS[item.controller].clock_hz
+        timer_hz = item.integration.clock_hz
         if timer_hz % tick != 0 or not 1 <= timer_hz // tick <= 65536:
             raise ValueError("PWM tick_hz is not an exact reviewed divider")
         if item.initial not in (0, 1 << pin):
@@ -382,7 +386,9 @@ def _gpio_constructor(item):
                    f"    .registers = GPIO{port}, .mask = {mask}u,",
                    f"    .initial = {initial}u,",
                    f"    .output = {output}, .pull = {pull}u,",
-                   f"    .output_type = {output_type}u", "};"]
+                   f"    .output_type = {output_type}u,",
+                   "    .speed = NX_STM32_GPIO_SPEED_" +
+                   item.options.speed.replace("-", "_").upper(), "};"]
     return Construction(
         state_type="nx_stm32_gpio_state_t", definitions=definitions,
         initialize=DirectCall("nx_stm32_gpio_prepare",
@@ -420,6 +426,11 @@ def _basic_constructor(item, result):
     flash = result.physical_part.flash
     definitions += [f'_Static_assert(FLASH_BASE == 0x{flash["origin"]:08x}u,',
                     '               "Reviewed Flash base differs from the SDK");']
+    if item.options.maintenance:
+        definitions += [
+            "static const nx_flash_maintenance_port_t "
+            f"s_nx_flash_maintenance_{name} = {{",
+            f"    &nx_stm32_flash_maintenance_ops, &s_nx_port_{name}", "};"]
     return Construction(
         state_type="nx_stm32_flash_state_t", definitions=definitions,
         initialize=DirectCall("nx_stm32_flash_prepare",
@@ -435,7 +446,8 @@ def _uart_constructor(item, result):
             selected.hardware.kind != "uart" or
             selected.hardware.controller != item.controller or
             selected.clock_hz is None or selected.irq is None or
-            len(selected.pins) != 2):
+            not selected.pins or len(selected.pins) > 4 or
+            (item.mode != "irq-wire" and len(selected.pins) != 2)):
         raise ValueError("UART requires its reviewed controller integration")
     name = _symbol(item.id)
     traits = mode_traits("uart", item.mode)
@@ -444,7 +456,8 @@ def _uart_constructor(item, result):
     blocks = traits.block_stream
     words = item.mode == "irq-words"
     implementation = mode_implementation(item.kind, item.mode)
-    cold_kind = "byte" if implementation == "uart" else implementation[5:]
+    cold_kind = ("wire" if item.mode == "irq-wire" else
+                 "byte" if implementation == "uart" else implementation[5:])
     saved = f"s_nx_uart_pin_state_{name}"
     config = f"s_nx_uart_config_{name}"
     receipt = f"s_nx_uart_cold_{name}"
@@ -456,7 +469,7 @@ def _uart_constructor(item, result):
                     "nx_uart_rx_event_t" if options.rx_profile == "events"
                     else "uint8_t")
     capacity = options.rx_capacity or 0
-    definitions = [f"static uint16_t {saved}[2];",
+    definitions = [f"static uint16_t {saved}[{len(selected.pins)}];",
                    f"static nx_stm32_uart_cold_receipt_t {receipt};"]
     if not blocks:
         definitions += [f"static {storage_type} s_nx_rx_{name}[{capacity}];"]
@@ -495,6 +508,9 @@ def _uart_constructor(item, result):
         frame = "&s_nx_uart_frame_" + name
         definitions += [f"static const nx_uart_format_t s_nx_uart_frame_{name} =",
                         "    " + uart_formats.expression(options.frame) + ";"]
+    if options.wire is not None:
+        from tools.configure import uart_wires
+        definitions += uart_wires.definitions(name, options.wire)
     config_type = ("nx_stm32_uart_dma_cold_config_t" if dma else
                    "nx_stm32_uart_cold_config_t")
     definitions += [f"static const {config_type} {config} = {{"]
@@ -508,6 +524,9 @@ def _uart_constructor(item, result):
                     indent + f".profile = {profile}, .priority = {selected.irq.priority}u,",
                     indent + f".kernel_bound = {'true' if result.kernel is not None else 'false'},",
                     indent + f".preload_tx = {'true' if secondary_controllers.applies(item, result, 'stm32') else 'false'}, .format = {frame}"]
+    if options.wire is not None:
+        definitions[-1] += ","
+        definitions += [indent + f".wire = &s_nx_uart_wire_{name}, .pin_count = {len(selected.pins)}u"]
     if dma:
         engine = (rx or tx)[0]
         definitions += ["    },",
@@ -553,9 +572,20 @@ def _uart_constructor(item, result):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed STM32 instance, including its rollback and stop."""
     item = controller_ir(item, "stm32f4")
+    if item.kind == "adc_group":
+        from .adc_group import constructor as group_constructor
+        return group_constructor(item, result)
     if item.kind == "encoder":
         from .encoder import constructor as encoder_constructor
         return encoder_constructor(item)
+    if item.kind == "entropy":
+        state = Address("s_nx_port_" + _symbol(item.id))
+        return Construction(state_type="nx_stm32f407_entropy_state_t",
+            definitions=(),
+            admission=(DirectCall("nx_stm32f407_entropy_admit", (state,)),),
+            initialize=DirectCall("nx_stm32f407_entropy_start", (state,)),
+            stop=[DirectCall("nx_stm32f407_entropy_stop", (state,))],
+            retain_on_failed_init=True)
     if item.kind == "crc":
         state = Address("s_nx_port_" + _symbol(item.id))
         return Construction(state_type="nx_stm32_crc_state_t", definitions=(),
@@ -569,21 +599,30 @@ def constructor(item, result, board_bindings, routes, devices):
         from .block import constructor as block_constructor
         return block_constructor(item, result)
     if item.kind == "spi":
+        if item.mode == "irq-frames":
+            from .spi_frames import constructor as frames_constructor
+            return frames_constructor(item)
         construction = _spi_constructor(
             item, result, board_bindings, routes, devices,
             paired=secondary_controllers.applies(item, result, "stm32"))
         return enhanced_endpoints.dma_construction(item, construction, "stm32")
+    if item.kind == "i2c_target":
+        from .i2c_target import constructor as target_constructor
+        return target_constructor(item)
     if item.kind == "i2c":
         return _i2c_constructor(item, result, devices)
     if item.kind == "uart":
         return _uart_constructor(item, result)
+    if item.kind in {"pwm_group", "timer_pulse", "timer_sequence"}:
+        from .waveform import constructor as waveform_constructor
+        return waveform_constructor(item, result)
     if item.kind in timer_advanced.KINDS:
         from .timer import constructor as timer_constructor
         return timer_constructor(item, result)
     if item.kind == "can":
         from .can import constructor as can_constructor
         return can_constructor(item, result)
-    if item.kind in {"eth", "eth_frames", "usb_device"}:
+    if item.kind in {"eth", "eth_frames", "usb_device", "usb_host"}:
         from .packet import constructor as packet_constructor
         return packet_constructor(item, result)
     if item.kind == "gpio":

@@ -11,6 +11,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/arch/arch.h"
+#include "nexus/soc/stm32f407_wwdg_ewi.h"
+#include "stm32f407_clock.h"
 #include "stm32f407_window_watchdog.h"
 #include "stm32f4xx_ll_wwdg.h"
 
@@ -27,6 +29,7 @@
 #define OWN_CONFIG    64U
 #define ACTIVATED     128U
 #define CONFIG_FIELDS (WWDG_CFR_W | WWDG_CFR_WDGTB | WWDG_CFR_EWI)
+#define OWN_EWI       UINT16_C(0x8000)
 
 _Static_assert(WWDG_IRQn == 0, "Exact F407 WWDG publisher identity");
 
@@ -50,18 +53,7 @@ static bool cold_context(void) {
 /** \brief Fixed nominal PCLK1 is derived from the actual maintained RUN tuple.
  */
 static bool clock_valid(void) {
-    const uint32_t pll_mask = RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN |
-                              RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLSRC |
-                              RCC_PLLCFGR_PLLQ;
-    const uint32_t pll =
-        RCC_PLLCFGR_PLLSRC_HSE | 8U | (336U << 6U) | (7U << 24U);
-    const uint32_t running =
-        RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
-    return (RCC->CR & running) == running && (RCC->PLLCFGR & pll_mask) == pll &&
-           (RCC->CFGR & (RCC_CFGR_SW | RCC_CFGR_SWS | RCC_CFGR_HPRE |
-                         RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2)) ==
-               (RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL | RCC_CFGR_PPRE1_DIV4 |
-                RCC_CFGR_PPRE2_DIV2);
+    return nx_stm32_clock_profile_matches(RCC, NULL);
 }
 
 /** \brief No EWI publisher is adopted, enabled or acknowledged by this mode. */
@@ -216,9 +208,9 @@ static bool timing(uint32_t timeout_us, uint8_t window_ticks, uint8_t* reload,
                    uint8_t* divider) {
     if (timeout_us == 0U)
         return false;
-    uint64_t clocks = (uint64_t)timeout_us * 42U;
+    uint64_t clocks = (uint64_t)timeout_us * NEXUS_APB1_HZ;
     for (uint8_t shift = 0U; shift < 4U; ++shift) {
-        uint32_t cycles = 4096U << shift;
+        uint64_t cycles = (UINT64_C(4096) << shift) * 1000000U;
         uint64_t steps = clocks / cycles + (clocks % cycles != 0U ? 1U : 0U);
         if (steps <= 64U && steps >= (uint32_t)window_ticks + 2U) {
             *reload = (uint8_t)(63U + steps);
@@ -299,7 +291,9 @@ static nx_result_t feed(void* context) {
         (RCC->APB1ENR & RCC_APB1ENR_WWDGEN) != 0U && LL_WWDG_IsEnabled(WWDG)) {
         uint32_t config = WWDG->CFR & CONFIG_FIELDS;
         uint32_t window = (uint32_t)port->reload - port->window_ticks + 1U;
-        uint32_t expected = ((uint32_t)port->divider << 7U) | window;
+        uint32_t expected =
+            ((uint32_t)port->divider << 7U) | window |
+            ((port->saved_cfr & OWN_EWI) != 0U ? WWDG_CFR_EWI : 0U);
         if (config == expected) {
             uint32_t counter = LL_WWDG_GetCounter(WWDG);
             if (counter > 0x40U) {
@@ -334,3 +328,129 @@ static nx_result_t query(const void* context, nx_watchdog_state_t* state) {
 
 const nx_watchdog_ops_t nx_stm32_window_watchdog_ops = {
     .enable = enable, .feed = feed, .state = query};
+
+/** \brief A face identifies its real provider without a hardware registry. */
+static nx_stm32_window_watchdog_state_t*
+warning_owner(const nx_watchdog_port_t* face) {
+    if (!storage(face, sizeof(*face), _Alignof(nx_watchdog_port_t)) ||
+        face->ops != &nx_stm32_window_watchdog_ops ||
+        !storage(face->context, sizeof(nx_stm32_window_watchdog_state_t),
+                 _Alignof(nx_stm32_window_watchdog_state_t)))
+        return NULL;
+    return face->context;
+}
+
+/** \brief Check optional state against the complete retained provider/face. */
+static bool warning_storage(const nx_stm32f407_wwdg_ewi_t* warning,
+                            const nx_watchdog_port_t* face,
+                            const nx_stm32_window_watchdog_state_t* port) {
+    if (!storage(warning, sizeof(*warning), _Alignof(nx_stm32f407_wwdg_ewi_t)))
+        return false;
+    uintptr_t begin = (uintptr_t)warning;
+    uintptr_t end = begin + sizeof(*warning);
+    return !(begin < (uintptr_t)face + sizeof(*face) &&
+             (uintptr_t)face < end) &&
+           !(begin < (uintptr_t)port + sizeof(*port) && (uintptr_t)port < end);
+}
+
+nx_result_t nx_stm32f407_wwdg_ewi_arm(nx_stm32f407_wwdg_ewi_t* warning,
+                                      const nx_watchdog_port_t* watchdog,
+                                      uint8_t priority) {
+    if (!cold_context())
+        return NX_ERROR_CONTEXT;
+    nx_stm32_window_watchdog_state_t* port = warning_owner(watchdog);
+    if (port == NULL || !warning_storage(warning, watchdog, port) ||
+        priority > 15U)
+        return NX_ERROR_INVALID;
+    if (warning->retained || warning->watchdog != NULL ||
+        warning->occurrences != 0U || warning->overflow)
+        return NX_ERROR_STATE;
+    if ((port->effects & (PREPARED | ACTIVATED)) != (PREPARED | ACTIVATED) ||
+        !LL_WWDG_IsEnabled(WWDG) || !clock_valid())
+        return NX_ERROR_STATE;
+    if (!vector_idle() || (port->saved_cfr & OWN_EWI) != 0U ||
+        LL_WWDG_IsEnabledIT_EWKUP(WWDG) || (WWDG->SR & WWDG_SR_EWIF) != 0U)
+        return NX_ERROR_BUSY;
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    /* The source is sticky. Publish its static owner before attempting it;
+     * failed readback cannot revoke this lifetime or the watchdog gate. */
+    warning->watchdog = watchdog;
+    warning->retained = true;
+    port->saved_cfr |= OWN_EWI;
+    NX_STM32_WWDG_WRITE(&WWDG->CFR, WWDG->CFR | WWDG_CFR_EWI);
+    nx_arch_dsb();
+    nx_result_t result = NX_ERROR_IO;
+    if (LL_WWDG_IsEnabledIT_EWKUP(WWDG)) {
+        NVIC_SetPriority(WWDG_IRQn, priority);
+        NVIC_EnableIRQ(WWDG_IRQn);
+        nx_arch_dsb();
+        if (NVIC_GetPriority(WWDG_IRQn) == priority &&
+            NVIC_GetEnableIRQ(WWDG_IRQn) != 0U)
+            result = NX_SUCCESS;
+    }
+    nx_arch_irq_restore(saved);
+    return result;
+}
+
+nx_result_t nx_stm32f407_wwdg_ewi_irq(nx_stm32f407_wwdg_ewi_t* warning) {
+    if (!nx_arch_is_privileged() || !nx_arch_in_isr())
+        return NX_ERROR_CONTEXT;
+    if (!storage(warning, sizeof(*warning), _Alignof(nx_stm32f407_wwdg_ewi_t)))
+        return NX_ERROR_INVALID;
+    nx_stm32_window_watchdog_state_t* port = warning_owner(warning->watchdog);
+    if (!warning->retained || port == NULL ||
+        (port->saved_cfr & OWN_EWI) == 0U || !LL_WWDG_IsEnabledIT_EWKUP(WWDG))
+        return NX_ERROR_STATE;
+    if ((WWDG->SR & WWDG_SR_EWIF) == 0U)
+        return NX_ERROR_STATE;
+    NX_STM32_WWDG_WRITE(&WWDG->SR, 0U);
+    nx_arch_dsb();
+    if ((WWDG->SR & WWDG_SR_EWIF) != 0U)
+        return NX_ERROR_IO;
+    if (warning->occurrences == UINT32_MAX)
+        warning->overflow = true;
+    else
+        ++warning->occurrences;
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_stm32f407_wwdg_ewi_read(const nx_stm32f407_wwdg_ewi_t* warning,
+                                       uint32_t* occurrences, bool* overflow) {
+    if (!nx_arch_is_privileged())
+        return NX_ERROR_CONTEXT;
+    if (!storage(warning, sizeof(*warning),
+                 _Alignof(nx_stm32f407_wwdg_ewi_t)) ||
+        !storage(occurrences, sizeof(*occurrences), _Alignof(uint32_t)) ||
+        !storage(overflow, sizeof(*overflow), _Alignof(bool)))
+        return NX_ERROR_INVALID;
+    uintptr_t count = (uintptr_t)occurrences;
+    uintptr_t lost = (uintptr_t)overflow;
+    uintptr_t begin = (uintptr_t)warning;
+    uintptr_t end = begin + sizeof(*warning);
+    if ((count < end && begin < count + sizeof(*occurrences)) ||
+        (lost < end && begin < lost + sizeof(*overflow)) ||
+        (lost < count + sizeof(*occurrences) &&
+         count < lost + sizeof(*overflow)))
+        return NX_ERROR_INVALID;
+    if (!warning->retained)
+        return NX_ERROR_STATE;
+    nx_stm32_window_watchdog_state_t* port = warning_owner(warning->watchdog);
+    if (port == NULL)
+        return NX_ERROR_STATE;
+    uintptr_t provider = (uintptr_t)port;
+    uintptr_t face = (uintptr_t)warning->watchdog;
+    if ((count < provider + sizeof(*port) &&
+         provider < count + sizeof(*occurrences)) ||
+        (lost < provider + sizeof(*port) &&
+         provider < lost + sizeof(*overflow)) ||
+        (count < face + sizeof(*warning->watchdog) &&
+         face < count + sizeof(*occurrences)) ||
+        (lost < face + sizeof(*warning->watchdog) &&
+         face < lost + sizeof(*overflow)))
+        return NX_ERROR_INVALID;
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    *occurrences = warning->occurrences;
+    *overflow = warning->overflow;
+    nx_arch_irq_restore(saved);
+    return NX_SUCCESS;
+}

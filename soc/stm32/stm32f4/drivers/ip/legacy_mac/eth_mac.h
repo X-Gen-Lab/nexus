@@ -78,6 +78,7 @@ typedef struct nx_eth_mac {
     bool tx_closing;
     bool flush_started;
     bool retained;
+    bool mii;
 } nx_eth_mac_t;
 extern const nx_eth_ops_t nx_eth_mac_ops;
 extern const nx_mdio_ops_t nx_eth_mdio_ops;

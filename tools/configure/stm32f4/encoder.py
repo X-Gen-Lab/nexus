@@ -11,6 +11,8 @@ COUNTING = MappingProxyType({
     'x4-ti12': 'NX_ENCODER_MODE_X4_TI12',
 })
 PINS = MappingProxyType({
+    'TIM1': (('PA8', 'ti1', 1), ('PA9', 'ti2', 1)),
+    'TIM8': (('PC6', 'ti1', 3), ('PC7', 'ti2', 3)),
     'TIM3': (('PA6', 'ti1', 2), ('PA7', 'ti2', 2)),
     'TIM4': (('PB6', 'ti1', 2), ('PB7', 'ti2', 2)),
     'TIM5': (('PA0', 'ti1', 2), ('PA1', 'ti2', 2)),

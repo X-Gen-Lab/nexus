@@ -160,14 +160,6 @@ TOML、硬件事实、typed IR 和原子 bundle；失败不发布可用半成品
 
 [可编辑 DOT](i3c-core-lifecycle.dot)。
 
-## FIG-30 F407 I2S2 从机有限发送与整块借用退出
-
-选定 F407 I2S2 slave TX；有限 stereo16 DMA 与外部 CK／WS 前提。
-
-![FIG-30：F407 I2S2 从机有限发送与整块借用退出](f407-i2s2-slave-tx.svg)
-
-[可编辑 DOT](f407-i2s2-slave-tx.dot)。
-
 (fig-31-driver-source-ownership)=
 
 ## FIG-31 F4 源码归属与接口边界

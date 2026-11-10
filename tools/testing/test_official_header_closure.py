@@ -25,11 +25,13 @@ F4_HAL_HEADERS = {
     'Inc/Legacy/stm32_hal_legacy.h', 'Inc/stm32f4xx_hal_def.h',
     *(f'Inc/stm32f4xx_hal_{unit}.h' for unit in (
         'dma', 'dma_ex', 'flash', 'flash_ex', 'flash_ramfunc', 'gpio',
-        'gpio_ex', 'rcc', 'rcc_ex', 'uart')),
-    'Inc/stm32f4xx_hal.h'}
+        'gpio_ex', 'rcc', 'rcc_ex', 'uart', 'dcmi', 'dcmi_ex', 'hcd',
+        'pcd', 'pcd_ex')),
+    'Inc/stm32f4xx_hal.h', 'Inc/stm32f4xx_ll_usb.h'}
 F4_HAL_SOURCES = {f'Src/stm32f4xx_hal_{unit}.c'
-                  for unit in ('uart', 'dma', 'rcc')}
-F4_LL_SOURCES = {'Src/stm32f4xx_ll_fsmc.c', 'Src/stm32f4xx_ll_sdmmc.c'}
+                  for unit in ('uart', 'dma', 'rcc', 'dcmi', 'hcd')}
+F4_LL_SOURCES = {f'Src/stm32f4xx_ll_{unit}.c'
+                 for unit in ('fsmc', 'sdmmc', 'usb')}
 F4_REQUIRED_FILES = {
     'LICENSE.md', 'Inc/stm32f4xx_hal_eth.h', *F4_HAL_HEADERS,
     *F4_HAL_SOURCES, *F4_LL_SOURCES,
@@ -37,7 +39,7 @@ F4_REQUIRED_FILES = {
                       ('gpio', 'usart', 'spi', 'adc', 'dac', 'dma', 'tim',
                        'iwdg', 'wwdg', 'i2c', 'bus', 'rcc', 'rng', 'fsmc', 'sdmmc', 'rtc', 'pwr',
                        'crc', 'utils', 'system'))}
-F4_SELECTED_API = 'stm32f407-reviewed-ll-fsmc-sdio-rtc-uart-dma-hal-tx'
+F4_SELECTED_API = 'stm32f407-reviewed-hal-ll-controllers'
 
 ADDITIONS = {
     'h7': {
@@ -166,7 +168,7 @@ class OfficialHeaderClosureTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             f1.contract(selected)
 
-    def test_f4_closes_exact_headers_and_five_reviewed_sources(self):
+    def test_f4_closes_exact_headers_and_reviewed_controller_sources(self):
         from tools.maintenance import stm32f4_hal_lock as f4
         additions = {
             'Inc/stm32f4xx_hal_eth.h': {
@@ -244,6 +246,9 @@ class OfficialHeaderClosureTests(unittest.TestCase):
 #define HAL_DMA_MODULE_ENABLED
 #define HAL_UART_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
+#define HAL_DCMI_MODULE_ENABLED
+#define HAL_HCD_MODULE_ENABLED
+#define HAL_PCD_MODULE_ENABLED
 #define HSE_VALUE 8000000U
 #define HSI_VALUE 16000000U
 #define LSE_VALUE 32768U
@@ -256,6 +261,10 @@ class OfficialHeaderClosureTests(unittest.TestCase):
 #include "stm32f4xx_hal_dma.h"
 #include "stm32f4xx_hal_rcc.h"
 #include "stm32f4xx_hal_uart.h"
+#include "stm32f4xx_hal_dcmi.h"
+#include "stm32f4xx_hal_hcd.h"
+#include "stm32f4xx_hal_pcd.h"
+#include "stm32f4xx_hal_pcd_ex.h"
 #define assert_param(expr) ((void)0U)
 ''')
             flags = ['-std=c11', '-mcpu=cortex-m4', '-mthumb',
@@ -268,8 +277,9 @@ class OfficialHeaderClosureTests(unittest.TestCase):
             used = set()
             # Compile committed vendor sources against only exported HAL
             # headers, never the complete checkout's incidental include tree.
-            for unit in ('uart', 'dma', 'rcc'):
-                source = ROOT / f4.DIRECTORY / f'Src/stm32f4xx_hal_{unit}.c'
+            for name in sorted(F4_HAL_SOURCES | F4_LL_SOURCES):
+                source = ROOT / f4.DIRECTORY / name
+                unit = source.stem
                 dependencies = root / (unit + '.d')
                 result = run([
                     compiler, *flags,

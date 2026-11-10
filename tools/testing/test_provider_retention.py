@@ -308,6 +308,159 @@ class ComponentPublicContractsTests(unittest.TestCase):
                 inspect_provider_retention(elf, bindings, root=root)
 
 
+class OptionalOperationsTests(unittest.TestCase):
+    """Public const subtables retain every reachable table and method byte."""
+
+    bindings = ("static const nx_probe_t s_nx_face_probe = {"
+                "&nx_probe_ops, &s_nx_port_probe};\n")
+
+    def tree(self, directory):
+        root = Path(directory)
+        header = root / "io/include/nexus/io/probe.h"
+        source = root / "soc/stm32/stm32f4/drivers/probe.c"
+        header.parent.mkdir(parents=True)
+        source.parent.mkdir(parents=True)
+        header.write_text("""
+typedef struct nx_leaf_ops nx_leaf_ops_t;
+struct nx_leaf_ops { int (*ping)(void*); int (*pong)(void*); };
+typedef struct nx_child_ops {
+    const nx_leaf_ops_t* deeper;
+    int (*status)(void*);
+} nx_child_ops_t;
+typedef struct nx_probe_ops {
+    int (*start)(void*);
+    const struct nx_child_ops* auxiliary;
+    int (*stop)(void*);
+} nx_probe_ops_t;
+typedef struct { const nx_probe_ops_t* ops; void* context; } nx_probe_t;
+""")
+        source.write_text("""
+static const nx_leaf_ops_t leaf_operations = {.ping = ping, .pong = pong};
+static const nx_child_ops_t child_operations = {&leaf_operations, status};
+const nx_probe_ops_t nx_probe_ops = {start, &child_operations, stop};
+""")
+        return root, header, source
+
+    def image(self):
+        """Build actual ELF32 bytes, including local FILE ownership records."""
+        data = bytearray(0x800)
+        strings = bytearray(b"\0")
+
+        def name(text):
+            offset = len(strings)
+            strings.extend(text.encode("ascii") + b"\0")
+            return offset
+
+        symbols = [(0, 0, 0, 0, 0),
+                   (name("probe.c"), 0, 0, 4, 0xfff1),
+                   (name("child_operations"), 0x08001014, 8, 1, 1),
+                   (name("leaf_operations"), 0x0800101c, 8, 1, 1),
+                   (name("probe.c"), 0, 0, 4, 0xfff1)]
+        for index, method in enumerate(("start", "stop", "status", "ping", "pong")):
+            symbols.append((name(method), 0x08002001 + index * 16, 8, 2, 2))
+        symbols += [(name("bindings.c"), 0, 0, 4, 0xfff1),
+                    (name("s_nx_face_probe"), 0x08001000, 8, 1, 1),
+                    (name("s_nx_port_probe"), 0x20000000, 16, 1, 3),
+                    (name("nx_probe_ops"), 0x08001008, 12, 17, 1)]
+        for index, (symbol_name, value, size, info, section) in enumerate(symbols):
+            struct.pack_into("<IIIBBH", data, 0x200 + index * 16,
+                             symbol_name, value, size, info, 0, section)
+        data[0x400:0x400 + len(strings)] = strings
+        names = b"\0.rodata\0.text\0.bss\0.symtab\0.strtab\0.shstrtab\0"
+        data[0x500:0x500 + len(names)] = names
+        struct.pack_into("<16sHHIIIIIHHHHHH", data, 0,
+                         b"\x7fELF\x01\x01\x01" + b"\0" * 9,
+                         2, 40, 1, 0x08002001, 52, 0x600, 0x400,
+                         52, 32, 3, 40, 7, 6)
+        for index, load in enumerate((
+                (1, 0x100, 0x08001000, 0x08001000, 0x80, 0x80, 4, 4),
+                (1, 0x180, 0x08002000, 0x08002000, 0x80, 0x80, 5, 4),
+                (1, 0x200, 0x20000000, 0x20000000, 0, 0x80, 6, 4))):
+            struct.pack_into("<8I", data, 52 + index * 32, *load)
+        sections = [(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+                    (1, 1, 2, 0x08001000, 0x100, 0x80, 0, 0, 4, 0),
+                    (9, 1, 6, 0x08002000, 0x180, 0x80, 0, 0, 4, 0),
+                    (15, 8, 3, 0x20000000, 0x200, 0x80, 0, 0, 4, 0),
+                    (20, 2, 0, 0, 0x200, len(symbols) * 16, 5, 13, 4, 16),
+                    (28, 3, 0, 0, 0x400, len(strings), 0, 0, 1, 0),
+                    (36, 3, 0, 0, 0x500, len(names), 0, 0, 1, 0)]
+        for index, section in enumerate(sections):
+            struct.pack_into("<10I", data, 0x600 + index * 40, *section)
+        struct.pack_into("<9I", data, 0x100,
+                         0x08001008, 0x20000000,
+                         0x08002001, 0x08001014, 0x08002011,
+                         0x0800101c, 0x08002021, 0x08002031, 0x08002041)
+        return data
+
+    def test_recursive_const_tables_and_null_optional_pointer(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, source = self.tree(directory)
+            report = inspect_provider_retention(Elf32(self.image()), self.bindings,
+                                                root=root)
+            self.assertEqual(report["operations_table_count"], 3)
+            self.assertEqual(report["method_count"], 5)
+            tables = {table["name"]: table for table in report["tables"]}
+            self.assertEqual([item["slot"] for item in tables["nx_probe_ops"]["methods"]],
+                             [0, 2])
+            self.assertEqual(tables["nx_probe_ops"]["subtables"][0]["slot"], 1)
+            self.assertEqual(tables["child_operations"]["subtables"][0]["slot"], 0)
+            self.assertEqual(tables["leaf_operations"]["slots"], ["ping", "pong"])
+            source.write_text(source.read_text().replace("start, &child_operations, stop",
+                                                        "start, NULL, stop"))
+            data = self.image()
+            struct.pack_into("<I", data, 0x10c, 0)
+            report = inspect_provider_retention(Elf32(data), self.bindings, root=root)
+            self.assertEqual(report["operations_table_count"], 1)
+            self.assertEqual(report["method_count"], 2)
+
+    def test_actual_subtable_pointer_and_deep_method_order_are_exact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, _ = self.tree(directory)
+            for offset, value in ((0x10c, 0), (0x10c, 0x0800101c),
+                                  (0x114, 0x08002031), (0x120, 0x08002031)):
+                with self.subTest(offset=offset, value=value):
+                    data = self.image()
+                    struct.pack_into("<I", data, offset, value)
+                    with self.assertRaises(EvidenceError):
+                        inspect_provider_retention(Elf32(data), self.bindings, root=root)
+
+    def test_actual_local_subtable_provenance_and_readonly_storage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, _ = self.tree(directory)
+            data = self.image()
+            # Point the real STT_FILE record at bindings.c, not probe.c.
+            bindings_file = struct.unpack_from("<I", data, 0x200 + 10 * 16)[0]
+            struct.pack_into("<I", data, 0x210, bindings_file)
+            with self.assertRaisesRegex(EvidenceError, "source"):
+                inspect_provider_retention(Elf32(data), self.bindings, root=root)
+            data = self.image()
+            struct.pack_into("<I", data, 0x10c, 0x20000010)
+            struct.pack_into("<I", data, 0x224, 0x20000010)
+            struct.pack_into("<H", data, 0x22e, 3)
+            with self.assertRaisesRegex(EvidenceError, "read-only"):
+                inspect_provider_retention(Elf32(data), self.bindings, root=root)
+
+    def test_unknown_mutable_and_cyclic_subtable_layouts_are_rejected(self):
+        for before, after in (
+                ("const struct nx_child_ops*", "const struct nx_unknown_ops*"),
+                ("const struct nx_child_ops*", "struct nx_child_ops*"),
+                ("int (*ping)(void*);", "const struct nx_probe_ops* back;")):
+            with self.subTest(after=after), tempfile.TemporaryDirectory() as directory:
+                root, header, _ = self.tree(directory)
+                header.write_text(header.read_text().replace(before, after))
+                with self.assertRaises(EvidenceError):
+                    source_contracts(root)
+
+    def test_subtable_initializer_requires_direct_exact_typed_object(self):
+        for target in ("child_operations", "&leaf_operations", "&missing_operations"):
+            with self.subTest(target=target), tempfile.TemporaryDirectory() as directory:
+                root, _, source = self.tree(directory)
+                source.write_text(source.read_text().replace(
+                    "start, &child_operations, stop", "start, " + target + ", stop"))
+                with self.assertRaises(EvidenceError):
+                    source_contracts(root)
+
+
 class ProviderRetentionTests(unittest.TestCase):
     def test_shared_can_provider_uses_actual_source_and_public_face(self):
         faces, layouts, providers, _ = source_contracts()
@@ -527,280 +680,61 @@ class ProviderRetentionTests(unittest.TestCase):
             inspect_provider_retention(image(), "")
 
 
-def i2s2_image(*, generated=False):
-    """External caller objects and actual four-slot component ABI bytes."""
+def audio_image():
+    """Standard factory audio uses the ordinary five-method pointer audit."""
     elf = image()
-    if not generated:
-        elf.defined_symbols = []
-    objects = [("application_tx", 0x08001090, 8, 0),
-               ("nx_f407_i2s2_slave_tx_ops", 0x08001080, 16, 0),
-               ("application_storage", 0x20000080, 88, 2)]
-    elf.defined_symbols.extend(
+    elf.defined_symbols = [
         {"name": name, "value": value, "size": size, "section": section,
          "type": 1, "binding": int(name.endswith("_ops"))}
-        for name, value, size, section in objects)
+        for name, value, size, section in (
+            ("s_nx_face_sound", 0x08001000, 8, 0),
+            ("nx_stm32_audio_ops", 0x08001010, 20, 0),
+            ("s_nx_port_sound", 0x20000000, 128, 2))]
     elf.defined_symbols.extend(
-        {"name": name, "value": 0x08002081 + index * 16, "size": 16,
-         "section": 1, "type": 2, "binding": 0, "file": "i2s2_slave_tx.c"}
-        for index, name in enumerate(("submit", "service", "cancel", "stop")))
-    struct.pack_into("<6I", elf.data, 0x80, 0x08002081, 0x08002091,
-                     0x080020a1, 0x080020b1, 0x08001080, 0x20000080)
-    resolved = {
-        "soc_family": "stm32f4", "part": "STM32F407VET6",
-        "backend": "baremetal", "clock_profile": "hse8-pll168",
-        "i2s2": {"profile": "slave-tx-stereo16-pb12-pb13-pb15",
-                 "part": "STM32F407VET6", "claims": [
-                     "controller:SPI2", "pin:PB12", "pin:PB13", "pin:PB15",
-                     "dma:DMA1:stream4:channel0", "irq:DMA1_Stream4",
-                     "irq:SPI2"]}}
-    return elf, resolved
+        {"name": name, "value": 0x08002001 + index * 16, "size": 16,
+         "section": 1, "type": 2, "binding": 0, "file": "audio.c"}
+        for index, name in enumerate(("submit", "service", "cancel", "stop",
+                                      "rate")))
+    struct.pack_into("<9I", elf.data, 0, 0x08001010, 0x20000000, 0, 0,
+                     0x08002001, 0x08002011, 0x08002021, 0x08002031,
+                     0x08002041)
+    bindings = "static const nx_audio_port_t s_nx_face_sound = {" + (
+        "&nx_stm32_audio_ops, &s_nx_port_sound};")
+    return elf, bindings
 
 
-class I2s2ComponentRetentionTests(unittest.TestCase):
-    """An explicit role admits real caller faces, never empty success."""
-
-    def setUp(self):
-        self.elf, self.resolved = i2s2_image()
-
-    def symbol(self, name):
-        return next(symbol for symbol in self.elf.defined_symbols
-                    if symbol["name"] == name)
-
-    def inspect(self, bindings=""):
-        return inspect_provider_retention(self.elf, bindings,
-                                          resolved=self.resolved)
-
-    def rejected(self, bindings=""):
-        with self.assertRaises(EvidenceError):
-            self.inspect(bindings)
-
-    def test_exact_role_audits_caller_face_table_and_all_four_methods(self):
-        report = self.inspect()
-        self.assertEqual((report["face_count"],
-                          report["operations_table_count"],
-                          report["method_count"]), (1, 1, 4))
-        face = report["faces"][0]
-        self.assertEqual(face["origin"], "caller_owned_component")
-        self.assertEqual(face["name"], "application_tx")
-        self.assertEqual(face["context"], "application_storage")
-        self.assertEqual(face["context_bytes"], 88)
+class AudioFactoryRetentionTests(unittest.TestCase):
+    def test_audio_uses_generated_context_and_all_five_public_methods(self):
+        elf, bindings = audio_image()
+        report = inspect_provider_retention(elf, bindings)
+        self.assertEqual((report["face_count"], report["method_count"]), (1, 5))
         self.assertEqual(report["tables"][0]["slots"],
-                         ["submit", "service", "cancel", "stop"])
-        self.assertEqual(report["tables"][0]["null_methods"], 0)
-        self.assertEqual(report["physical_status"], "not_executed")
+                         ["submit", "service", "cancel", "stop", "rate"])
+        self.assertNotIn("origin", report["faces"][0])
 
-    def test_role_must_equal_the_exact_validated_typed_ir(self):
-        original = deepcopy(self.resolved)
-        mutations = [lambda r: r.pop("i2s2"),
-                     lambda r: r.update(i2s2=None),
-                     lambda r: r["i2s2"].update(extra=True),
-                     lambda r: r["i2s2"].update(claims=[]),
-                     lambda r: r["i2s2"].update(part="STM32F407ZGT6"),
-                     lambda r: r["i2s2"].update(profile="another-profile"),
-                     lambda r: r.update(soc_family="stm32h743"),
-                     lambda r: r.update(backend="freertos"),
-                     lambda r: r.update(clock_profile="hsi16")]
-        for index, mutate in enumerate(mutations):
-            with self.subTest(index=index):
-                self.resolved = deepcopy(original)
-                mutate(self.resolved)
-                self.rejected()
+    def test_audio_cannot_substitute_another_owner_or_private_method(self):
+        for location, value in ((4, 0x20000004), (16, 0x08002011), (16, 0)):
+            with self.subTest(location=location, value=value):
+                elf, bindings = audio_image()
+                struct.pack_into("<I", elf.data, location, value)
+                with self.assertRaises(EvidenceError):
+                    inspect_provider_retention(elf, bindings)
+        elf, bindings = audio_image()
+        elf.defined_symbols[3]["file"] = "another_provider.c"
+        with self.assertRaises(EvidenceError):
+            inspect_provider_retention(elf, bindings)
 
-    def test_zg_uses_its_matching_role_and_absent_role_keeps_legacy_scope(self):
-        self.resolved["part"] = "STM32F407ZGT6"
-        self.resolved["i2s2"]["part"] = "STM32F407ZGT6"
-        self.assertEqual(self.inspect()["method_count"], 4)
+    def test_retired_manual_role_never_authorizes_an_empty_generated_graph(self):
+        elf, _ = audio_image()
+        resolved = {"soc_family": "stm32f4", "part": "STM32F407VET6",
+                    "backend": "baremetal", "clock_profile": "hse8-pll168",
+                    "i2s2": {"profile": "slave-tx-stereo16-pb12-pb13-pb15",
+                             "part": "STM32F407VET6", "claims": [
+                                 "controller:SPI2", "pin:PB12", "pin:PB13",
+                                 "pin:PB15", "dma:DMA1:stream4:channel0",
+                                 "irq:DMA1_Stream4", "irq:SPI2"]}}
         with self.assertRaisesRegex(EvidenceError, "no selected faces"):
-            inspect_provider_retention(self.elf, "")
-        self.assertNotIn("origin", inspect_provider_retention(
-            image(), BINDINGS)["faces"][0])
-
-    def test_selected_role_cannot_certify_missing_or_corrupt_caller_face(self):
-        self.symbol("application_tx")["size"] = 0
-        self.rejected()
-        self.symbol("application_tx")["size"] = 8
-        struct.pack_into("<I", self.elf.data, 0x90, 0x08001084)
-        self.rejected()
-
-    def test_readonly_ops_reference_does_not_substitute_for_a_caller_face(self):
-        self.elf.defined_symbols.append({
-            "name": "application_ops_reference", "value": 0x080010a0,
-            "size": 4, "section": 0, "type": 1, "binding": 0})
-        struct.pack_into("<I", self.elf.data, 0xa0, 0x08001080)
-        report = self.inspect()
-        self.assertEqual(report["face_count"], 1)
-        self.assertEqual(report["faces"][0]["name"], "application_tx")
-        self.assertEqual(report["method_count"], 4)
-
-    def test_caller_face_requires_complete_readonly_loaded_object_bytes(self):
-        for field, value in (("binding", 2), ("size", 12)):
-            with self.subTest(field=field):
-                self.elf, _ = i2s2_image()
-                self.symbol("application_tx")[field] = value
-                self.rejected()
-        self.elf, _ = i2s2_image()
-        self.elf.sections[0]["flags"] = 3
-        self.elf.loads[0]["flags"] = 6
-        self.rejected()
-        self.elf, _ = i2s2_image()
-        self.elf.loads[0]["files"] = 0x94
-        self.rejected()
-
-    def test_context_needs_one_exact_public_storage_extent_and_alignment(self):
-        for field, value in (("binding", 2), ("size", 80),
-                             ("size", 96), ("value", 0x20000084)):
-            with self.subTest(field=field, value=value):
-                self.elf, _ = i2s2_image()
-                self.symbol("application_storage")[field] = value
-                struct.pack_into("<I", self.elf.data, 0x94,
-                                 self.symbol("application_storage")["value"])
-                self.rejected()
-        self.elf, _ = i2s2_image()
-        self.elf.defined_symbols.append(dict(
-            self.symbol("application_storage"), name="storage_alias"))
-        self.rejected()
-
-    def test_readonly_face_and_operations_need_arm_pointer_alignment(self):
-        self.symbol("application_tx")["value"] += 1
-        struct.pack_into("<2I", self.elf.data, 0x91,
-                         0x08001080, 0x20000080)
-        self.rejected()
-        self.elf, _ = i2s2_image()
-        self.symbol("nx_f407_i2s2_slave_tx_ops")["value"] = 0x08001061
-        struct.pack_into("<4I", self.elf.data, 0x61, 0x08002081,
-                         0x08002091, 0x080020a1, 0x080020b1)
-        struct.pack_into("<I", self.elf.data, 0x90, 0x08001061)
-        self.rejected()
-
-    def test_reordered_public_slots_cannot_expand_the_component_abi(self):
-        relative = ("components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/"
-                    "f407_i2s2_slave_tx.h")
-        source = (Path(__file__).resolve().parents[2] / relative).read_text()
-        source = source.replace("(*submit)", "(*temporary)").replace(
-            "(*service)", "(*submit)").replace("(*temporary)", "(*service)")
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            header = root / relative
-            header.parent.mkdir(parents=True)
-            header.write_text(source)
-            provider = root / "soc/stm32/stm32f4/drivers/i2s2_slave_tx.c"
-            provider.parent.mkdir(parents=True)
-            provider.write_text(
-                "const nx_f407_i2s2_slave_tx_ops_t "
-                "nx_f407_i2s2_slave_tx_ops = { .submit = submit, "
-                ".service = service, .cancel = cancel, .stop = stop };\n")
-            struct.pack_into("<2I", self.elf.data, 0x80,
-                             0x08002091, 0x08002081)
-            with self.assertRaises(EvidenceError):
-                inspect_provider_retention(self.elf, "", root=root,
-                                            resolved=self.resolved)
-
-    def test_context_must_be_writable_nonexecuting_and_fully_loaded(self):
-        for section_flags, load_flags, memory in ((2, 4, 256),
-                                                 (7, 7, 256), (3, 6, 160)):
-            with self.subTest(flags=section_flags, memory=memory):
-                self.elf, _ = i2s2_image()
-                self.elf.sections[2]["flags"] = section_flags
-                self.elf.loads[2].update(flags=load_flags, memory=memory)
-                self.rejected()
-
-    def test_executable_load_cannot_overlap_only_the_storage_interior(self):
-        self.elf.loads.append({
-            "offset": 256, "virtual": 0x20000088, "physical": 0x20000088,
-            "files": 16, "memory": 16, "flags": 5})
-        self.rejected()
-
-    def test_storage_size_follows_the_public_32bit_union_contract(self):
-        from tools.measurement.retention import i2s2_storage_contract
-        relative = ("components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/"
-                    "f407_i2s2_slave_tx.h")
-        source = (Path(__file__).resolve().parents[2] / relative).read_text()
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / relative
-            path.parent.mkdir(parents=True)
-            path.write_text(source.replace("STORAGE_BYTES 88U",
-                                           "STORAGE_BYTES 96U"))
-            self.assertEqual(i2s2_storage_contract(Path(directory))[0], 96)
-
-    def test_redefined_or_changed_public_storage_contract_is_rejected(self):
-        from tools.measurement.retention import i2s2_storage_contract
-        relative = ("components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/"
-                    "f407_i2s2_slave_tx.h")
-        source = (Path(__file__).resolve().parents[2] / relative).read_text()
-        changes = [source.replace("typedef union {",
-                                  "#undef NX_F407_I2S2_SLAVE_TX_STORAGE_BYTES\n"
-                                  "#define NX_F407_I2S2_SLAVE_TX_"
-                                  "STORAGE_BYTES 96U\n"
-                                  "typedef union {"),
-                   source.replace("uint64_t alignment;", "uint32_t alignment;")]
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / relative
-            path.parent.mkdir(parents=True)
-            for index, changed in enumerate(changes):
-                with self.subTest(index=index):
-                    path.write_text(changed)
-                    with self.assertRaises(EvidenceError):
-                        i2s2_storage_contract(Path(directory))
-
-    def test_missing_weak_non_thumb_or_counterfeit_methods_are_rejected(self):
-        for pointer in (0, 0x08002080, 0x08002091):
-            with self.subTest(pointer=pointer):
-                self.elf, _ = i2s2_image()
-                struct.pack_into("<I", self.elf.data, 0x80, pointer)
-                self.rejected()
-        for field, value in (("binding", 2), ("binding", 1),
-                             ("file", "another_provider.c")):
-            with self.subTest(field=field):
-                self.elf, _ = i2s2_image()
-                self.symbol("submit")[field] = value
-                self.rejected()
-
-    def test_two_caller_faces_share_only_the_operations_table(self):
-        self.elf.sections[2]["size"] = 512
-        self.elf.loads[2]["memory"] = 512
-        self.elf.defined_symbols.extend([
-            dict(self.symbol("application_tx"), name="second_tx",
-                 value=0x080010a0),
-            dict(self.symbol("application_storage"), name="second_storage",
-                 value=0x20000100)])
-        struct.pack_into("<2I", self.elf.data, 0xa0, 0x08001080, 0x20000100)
-        report = self.inspect()
-        self.assertEqual((report["face_count"],
-                          report["operations_table_count"],
-                          report["method_count"]), (2, 1, 4))
-        for address in (0x20000080, 0x200000a0):
-            with self.subTest(address=address):
-                self.symbol("second_storage")["value"] = address
-                struct.pack_into("<I", self.elf.data, 0xa4, address)
-                self.rejected()
-
-    def test_mixed_generated_faces_keep_their_existing_pointer_audit(self):
-        self.elf, _ = i2s2_image(generated=True)
-        self.assertEqual(self.inspect(BINDINGS)["face_count"], 3)
-        struct.pack_into("<I", self.elf.data, 4, 0x20000020)
-        with self.assertRaisesRegex(EvidenceError, "context pointer"):
-            self.inspect(BINDINGS)
-
-    def test_resolved_file_entrypoint_runs_the_same_component_audit(self):
-        from unittest.mock import patch
-        from tools.measurement import retention
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            elf_path, bindings_path = root / "image.elf", root / "bindings.c"
-            elf_path.write_bytes(self.elf.data)
-            bindings_path.write_text("/* No generated factory faces. */\n")
-            with patch.object(retention, "Elf32", return_value=self.elf), \
-                    patch.object(retention, "resolved_identity",
-                                 return_value=(self.resolved, {})), \
-                    patch.object(retention, "resolved_float_abi",
-                                 return_value="hard"), \
-                    patch.object(retention, "resolved_input_files",
-                                 return_value=[]), \
-                    patch.object(retention, "validate_elf_configuration"):
-                report = retention.inspect_files(
-                    elf_path, bindings_path,
-                    resolved_path=root / "resolved.json")
-        self.assertEqual(report["method_count"], 4)
+            inspect_provider_retention(elf, "", resolved=resolved)
 
 
 class ArrayContextTests(unittest.TestCase):

@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.31)
+project(st_usb_device_link_fixture LANGUAGES C ASM)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
+    message(FATAL_ERROR "Device Core fixture requires source and assembly")
+endif()
+set(NEXUS_BUILD_TESTS OFF CACHE BOOL "ARM link fixture")
+set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit private integration")
+add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+nexus_add_firmware(usb_device_stack_fixture SOURCES device_stack_main.c)
+target_include_directories(usb_device_stack_fixture PRIVATE
+    "${NEXUS_SOURCE_ROOT}/components/st_usb_device/private")
+target_include_directories(usb_device_stack_fixture SYSTEM PRIVATE
+    "${NEXUS_SOURCE_ROOT}/vendors/st/usb_device/Core/Inc")
+nexus_target_warnings(usb_device_stack_fixture STRICT)

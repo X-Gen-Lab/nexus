@@ -25,6 +25,7 @@ source_language: zh_CN
 | [能力矩阵](capabilities.md) | 事实、路线、装配与实际生产定义关联 |
 | [源码定位](../explanation/source-map.md) | 各层权威入口与源码归属 |
 | [资格边界](../reference/platforms/qualification.md) | 模型、ARM、SDK、候选和物理验收分开 |
+| [本批变更与验证](https://github.com/X-Gen-Lab/nexus/pull/60) | 当前 PR 的源码 HEAD、实际本地 CI、ARM 和 SDK 记录；与历史记录分别读取 |
 | [软件证据导航](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-verification.md) | 按原源码与配置读取执行记录 |
 
 当前源码版本号保持 0.2.1；已发布版本仍以

@@ -6,6 +6,7 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_i2c_cold.h"
 #include "stm32f407_i2c_port.h"
 #include "stm32f407_provider.h"
@@ -89,7 +90,7 @@ nx_result_t nx_stm32_i2c_close(nx_stm32_i2c_state_t* port,
 #define NX_STM32_I2C_ADDRESS_CLEARED(port) ((void)(port))
 #endif
 
-/** \brief Apply reviewed 42 MHz standard/Fast timing without overspeed. */
+/** \brief Apply the selected whole-MHz APB standard/Fast timing. */
 nx_result_t nx_stm32_i2c_initialize(nx_stm32_i2c_state_t* port) {
     if (port == NULL || port->registers == NULL || port->line_gpio == NULL ||
         port->line_mask == 0U || (port->line_mask & ~UINT32_C(0xFFFF)) != 0U) {
@@ -97,12 +98,15 @@ nx_result_t nx_stm32_i2c_initialize(nx_stm32_i2c_state_t* port) {
     }
     uint16_t ccr;
     uint8_t rise;
-    if (port->peripheral_mhz != 42U ||
-        !nx_i2c_v1_timing(42U, port->rate_hz, &ccr, &rise)) {
+    if (NEXUS_APB1_HZ % 1000000U != 0U ||
+        port->peripheral_mhz != NEXUS_APB1_HZ / 1000000U ||
+        port->peripheral_mhz < 2U || port->peripheral_mhz > 50U ||
+        !nx_i2c_v1_timing((uint8_t)port->peripheral_mhz, port->rate_hz, &ccr,
+                          &rise)) {
         return NX_ERROR_UNSUPPORTED;
     }
     port->registers->CR1 = 0U;
-    port->registers->CR2 = 42U;
+    port->registers->CR2 = port->peripheral_mhz;
     port->registers->CCR = ccr;
     port->registers->TRISE = rise;
     port->registers->OAR1 = (1U << 14U);

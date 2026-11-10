@@ -22,7 +22,7 @@ class ProviderSourceSelectionTests(unittest.TestCase):
                 "platform_coordinator.c", "platform_lifecycle.c",
                 "system_lifecycle.c", "platform_cold.c",
                 "lifecycle_pins.c", "chip.c")} | {
-            (directory / "reset.c").as_posix()}
+            (directory / name).as_posix() for name in ("reset.c", "supervision.c")}
 
     def configure_sources(self, family, controllers):
         """Inspect production targets without claiming an ARM link proof."""
@@ -81,7 +81,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             self.assertEqual(len(units), len({unit["file"] for unit in units}))
             return provider, sdk
 
-    # Base units own cold lifecycle and stateless silicon identity queries.
+    # Base units own cold lifecycle, reset/fault records and silicon queries.
     # Exact sets retain the shared resource, context and pin mechanisms.
     # Selected GPIO/UART/SPI classes also own their C lifecycle adapters; ELF
     # retention remains a separate contract from compilation-unit selection.
@@ -130,7 +130,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 expected = {"gpio.c", "uart.c", "uart_stream.c", "uart_cold.c",
                             "uart_hardware.c",
                             "lifecycle_uart.c",
-                            "adc.c", "adc_stream.c", "platform_cold.c"}
+                            "adc.c", "adc_stream.c", "adc_trigger.c", "platform_cold.c"}
                 self.assertEqual(provider, self.private_sources(family, expected))
 
 

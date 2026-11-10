@@ -19,7 +19,12 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
         if kind == 'timer_capture':
             pins = {'TIM3': ('PA6', 'PA7', 'PB0', 'PB1'),
                     'TIM4': ('PB6', 'PB7', 'PB8', 'PB9'),
-                    'TIM5': ('PA0', 'PA1', 'PA2', 'PA3')}[controller]
+                    'TIM5': ('PA0', 'PA1', 'PA2', 'PA3'),
+                    'TIM1': ('PA8', 'PA9', 'PA10', 'PA11'),
+                    'TIM8': ('PC6', 'PC7', 'PC8', 'PC9'),
+                    'TIM9': ('PA2', 'PA3'), 'TIM10': ('PB8',),
+                    'TIM11': ('PB9',), 'TIM12': ('PB14', 'PB15'),
+                    'TIM13': ('PA6',), 'TIM14': ('PA7',)}[controller]
             route = ('capture-pb6' if controller == 'TIM4' and channel == 1
                      else f'capture-{controller.lower()}-ch{channel}-{pins[channel-1].lower()}')
             options = 'edge="both"\nfilter=3\n'
@@ -57,6 +62,87 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
                         'tick_hz=1000000\nexclusive=true\n'+options+
                         f'[{kind}.signal.irq]\npriority=6\ncalls_os=false\n')
         return path
+
+    def test_advanced_capture_selects_cc_vector_without_break_peer_claim(self):
+        from tools.configure import bindings
+        for timer, vector, peer in (('TIM1', 'TIM1_CC', 'TIM9'),
+                                     ('TIM8', 'TIM8_CC', 'TIM12')):
+            for channel in range(1, 5):
+                with self.subTest(timer=timer, channel=channel):
+                    path = self.channel_case('timer_capture', timer, channel)
+                    result = gate.resolve_ir(path)
+                    source = bindings.emit(result)[1]
+                    self.assertIn(f'void {vector}_IRQHandler', source)
+                    self.assertIn(f'&nx_stm32_{timer.lower()}_timer_capture_ops', source)
+                    keys = {claim.key for claim in result.claims}
+                    self.assertIn('irq:' + vector, keys)
+                    self.assertNotIn('controller:' + peer, keys)
+                    self.assertNotIn('irq:' + timer + '_BRK_' + peer, keys)
+
+    def test_advanced_capture_and_encoder_cannot_share_a_timer_on_other_pads(self):
+        for timer, pins in (('TIM1', 'pa8-pa9'), ('TIM8', 'pc6-pc7')):
+            with self.subTest(timer=timer):
+                path = self.channel_case('timer_capture', timer, 3)
+                board_path = self.directory / 'channel-board/board.json'
+                board = json.loads(board_path.read_text())
+                board['bindings'].append({'id': 'position', 'controller': timer,
+                                          'route': timer.lower() + '-encoder-' + pins})
+                board_path.write_text(json.dumps(board))
+                path.write_text(path.read_text() +
+                    '[encoder.position]\nbinding="position"\nmode="quadrature"\n'
+                    'counting="x4-ti12"\nfilter_a=0\nfilter_b=0\n'
+                    'invert_a=false\ninvert_b=false\nexclusive=true\n')
+                with self.assertRaisesRegex(ValueError, 'controller:' + timer):
+                    gate.resolve_ir(path)
+
+    def test_small_capture_selects_exact_channel_and_shared_source_vector(self):
+        from tools.configure import bindings
+        for timer, count, vector in (
+                ('TIM9', 2, 'TIM1_BRK_TIM9'), ('TIM10', 1, 'TIM1_UP_TIM10'),
+                ('TIM11', 1, 'TIM1_TRG_COM_TIM11'), ('TIM12', 2, 'TIM8_BRK_TIM12'),
+                ('TIM13', 1, 'TIM8_UP_TIM13'), ('TIM14', 1, 'TIM8_TRG_COM_TIM14')):
+            for channel in range(1, count + 1):
+                with self.subTest(timer=timer, channel=channel):
+                    result = gate.resolve_ir(self.channel_case('timer_capture', timer, channel))
+                    source = bindings.emit(result)[1]
+                    self.assertIn(f'void {vector}_IRQHandler', source)
+                    self.assertIn(f'.channel = {channel}u', source)
+                    keys = {claim.key for claim in result.claims}
+                    self.assertIn('irq:' + vector, keys)
+                    self.assertNotIn('controller:TIM1', keys)
+                    self.assertNotIn('controller:TIM8', keys)
+
+    def test_small_capture_coexists_with_peer_cc_but_rejects_same_vector_owner(self):
+        for timer, peer, pin, shared, cc, complementary in (
+                ('TIM9', 'TIM1', 'pa8', 'TIM1_BRK_TIM9', 'TIM1_CC',
+                 'complementary-pa8-pb12-pb13'),
+                ('TIM12', 'TIM8', 'pc6', 'TIM8_BRK_TIM12', 'TIM8_CC',
+                 'complementary-pc6-pa7-pa6')):
+            with self.subTest(timer=timer):
+                path = self.channel_case('timer_capture', timer, 1)
+                original = path.read_text()
+                board_path = self.directory / 'channel-board/board.json'
+                board = json.loads(board_path.read_text())
+                board['bindings'].append({'id': 'peer', 'controller': peer,
+                    'route': 'capture-' + peer.lower() + '-ch1-' + pin})
+                board_path.write_text(json.dumps(board))
+                path.write_text(original + '[timer_capture.peer]\nbinding="peer"\n'
+                    'mode="edge-capture"\ntick_hz=1000000\nedge="rising"\n'
+                    'filter=0\nexclusive=true\n[timer_capture.peer.irq]\n'
+                    'priority=6\ncalls_os=false\n')
+                result = gate.resolve_ir(path)
+                keys = {claim.key for claim in result.claims}
+                self.assertIn('irq:' + cc, keys)
+                self.assertIn('irq:' + shared, keys)
+                board['bindings'][-1]['route'] = complementary
+                board_path.write_text(json.dumps(board))
+                path.write_text(original + '[advanced_pwm.peer]\nbinding="peer"\n'
+                    'mode="complementary-pwm"\ntick_hz=1000000\nperiod_ticks=1000\n'
+                    'deadtime_ticks=128\nbreak_active_high=true\nidle_high=false\n'
+                    'idle_complement_high=false\nexclusive=true\n[advanced_pwm.peer.irq]\n'
+                    'priority=6\ncalls_os=false\n')
+                with self.assertRaisesRegex(ValueError, 'controller:' + timer + '|irq:' + shared):
+                    gate.resolve_ir(path)
 
     def test_capture_routes_derive_twelve_channels_and_exact_static_transports(self):
         from tools.configure import bindings

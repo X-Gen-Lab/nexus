@@ -66,7 +66,7 @@ def validate_soc(soc, provider):
             fail(f"CAN resource/clock facts differ from maintained SDK: {name}")
 
 
-def validate_selection(selection, provider, ram_size):
+def validate_selection(selection, provider, ram_size, *, clock_hz=None):
     required = FIELDS - {"calls_os"}
     if not required.issubset(selection):
         fail("CAN requires timing, operation, bounded ring/drain and IRQ priority")
@@ -87,7 +87,8 @@ def validate_selection(selection, provider, ram_size):
     segment2 = integer(timing["segment2"], 1, 8, "CAN segment2")
     integer(timing["sjw"], 1, min(4, segment2), "CAN SJW")
     bitrate = integer(selection["bitrate"], 1, context="CAN bitrate")
-    if bitrate * prescaler * (1 + segment1 + segment2) != provider.CAN_CLOCK_HZ:
+    hz = provider.CAN_CLOCK_HZ if clock_hz is None else clock_hz
+    if bitrate * prescaler * (1 + segment1 + segment2) != hz:
         fail("CAN bitrate must exactly match the maintained APB clock and timing")
 
 

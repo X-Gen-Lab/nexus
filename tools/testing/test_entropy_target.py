@@ -1,4 +1,4 @@
-"""Execute explicit F407 entropy target admission and its source closure."""
+"""Execute typed F407 RNG selection, clock admission and its source closure."""
 
 import importlib.util
 import json
@@ -10,125 +10,131 @@ import sys
 import tempfile
 import unittest
 
+from tools.configure import configure
 
 ROOT = Path(__file__).resolve().parents[2]
-HELPER = ROOT / "soc/stm32/stm32f4/Entropy.cmake"
-PLATFORM_ROOT = ROOT
 
 
 class EntropyTargetTests(unittest.TestCase):
-    def configure(self, body, family="stm32f4"):
-        with tempfile.TemporaryDirectory(prefix="entropy target ") as value:
-            directory = Path(value)
-            source = directory / "source"
-            source.mkdir()
+    def configure(self, *, sysclk_source="input", pll48=False, pll_q=7,
+                  build=False, selected=True):
+        self.assertIsNotNone(shutil.which("arm-none-eabi-gcc"))
+        self.assertIsNotNone(shutil.which("cmake"))
+        with tempfile.TemporaryDirectory(prefix="rng typed ", dir=ROOT / "build") as temp:
+            source = Path(temp)
+            assembly = source / "assembly.toml"
+            board = ROOT / "tests/contracts/entropy_assembly/ve-board"
+            assembly.write_text(
+                f'schema=2\nboard_package="{board}"\nbackend="baremetal"\n'
+                'clock="custom"\n[memory]\nmain_stack_bytes=2048\n'
+                + ('[entropy.random]\nbinding="rng"\nmode="rng-words"\n'
+                   if selected else '')
+                + '[clock_parameters]\nsource="hsi"\ninput_hz=16000000\n'
+                'pll_m=16\npll_n=336\npll_p=4\n'
+                f'pll_q={pll_q}\nahb_div=1\napb1_div=4\napb2_div=2\n'
+                'adc_div=4\nsupply_mv=3300\ncss=false\n'
+                f'sysclk_source="{sysclk_source}"\n'
+                f'pll48={str(pll48).lower()}\n')
+            (source / "main.c").write_text(
+                '#include "nexus_factory.h"\n'
+                '#include "nexus_bindings.h"\n'
+                'int main(void) {\n'
+                '    if (nx_platform_start().primary != NX_SUCCESS) return 1;\n'
+                '    uint32_t word;\n'
+                '    (void)nx_entropy_port_try_read(\n'
+                '        nx_factory_entropy(NX_ENTROPY_ID_RANDOM), &word);\n'
+                '    return (int)nx_platform_stop();\n}\n')
             (source / "CMakeLists.txt").write_text(
-                "cmake_minimum_required(VERSION 3.31)\n"
-                "project(entropy_target C)\n"
-                "add_library(platform INTERFACE)\n"
-                "add_library(Nexus::Platform ALIAS platform)\n"
-                f'set_property(TARGET platform PROPERTY NEXUS_SOC_FAMILY '
-                f'"{family}")\n'
-                'set_property(TARGET platform PROPERTY NEXUS_STM32_DEVICE '
-                '"STM32F407xx")\n'
-                f'set_property(TARGET platform PROPERTY NEXUS_SOURCE_DIR '
-                f'"{PLATFORM_ROOT}")\n'
-                "foreach(name nexus_io nexus_arch nexus_build_options "
-                "nexus_owned_warnings)\n"
-                "  add_library(${name} INTERFACE)\n"
-                "endforeach()\n"
-                "add_library(Nexus::IO ALIAS nexus_io)\n"
-                "add_library(Nexus::Arch ALIAS nexus_arch)\n"
-                "function(nexus_apply_target_policy target)\n"
-                "  set_property(TARGET ${target} PROPERTY "
-                "NEXUS_TEST_POLICY_APPLIED TRUE)\n"
-                "endfunction()\n"
-                "function(nexus_use_cmsis_core target)\n"
-                "endfunction()\n"
-                f'include("{HELPER}")\n' + body,
-                encoding="utf-8")
-            return subprocess.run(
-                [shutil.which("cmake") or "cmake", "-S", str(source),
-                 "-B", str(directory / "build"), "-G", "Ninja"],
-                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                text=True, check=False, timeout=30)
-
-    def test_empty_platform_resolves_all_explicit_target_dependencies(self):
-        compiler = os.environ.get("NEXUS_ARM_GCC") or shutil.which(
-            "arm-none-eabi-gcc")
-        self.assertIsNotNone(compiler, "Prepared ARM compiler required")
-        with tempfile.TemporaryDirectory(
-                prefix="empty entropy platform ") as value:
-            directory = Path(value)
-            source = directory / "source"
-            source.mkdir()
-            assembly = (PLATFORM_ROOT / "tools/configure/assemblies"
-                        / "qiming-baremetal-empty.toml")
-            include_dir = ROOT / "soc/stm32/stm32f4/include"
-            (source / "CMakeLists.txt").write_text(
-                "cmake_minimum_required(VERSION 3.31)\n"
-                "project(empty_entropy_platform C ASM)\n"
-                f'set(NEXUS_ASSEMBLY_FILE "{assembly}" CACHE FILEPATH "")\n'
-                "set(NEXUS_BUILD_TESTS OFF CACHE BOOL \"\")\n"
-                "set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL \"\")\n"
-                f'add_subdirectory("{PLATFORM_ROOT}" nexus EXCLUDE_FROM_ALL)\n'
-                f'include("{HELPER}")\n'
-                "get_target_property(configuration Nexus::Platform NEXUS_CONFIG_DIR)\n"
-                'file(READ "${configuration}/resolved.json" resolved)\n'
-                'string(JSON controller_count LENGTH "${resolved}" controllers)\n'
-                "if(NOT controller_count EQUAL 0)\n"
-                '  message(FATAL_ERROR "Fixture unexpectedly selects I/O")\n'
-                "endif()\n"
-                "nexus_add_stm32f407_entropy(entropy)\n"
-                "get_target_property(excluded entropy EXCLUDE_FROM_ALL)\n"
-                "get_target_property(includes entropy "
-                "INTERFACE_INCLUDE_DIRECTORIES)\n"
-                "if(NOT excluded)\n"
-                '  message(FATAL_ERROR "Entropy is no longer optional")\n'
-                "endif()\n"
-                f'if(NOT includes STREQUAL "{include_dir}")\n'
-                '  message(FATAL_ERROR "Private or vendor headers exported")\n'
-                "endif()\n", encoding="utf-8")
-            environment = dict(os.environ)
-            environment["PATH"] = str(Path(compiler).parent) + os.pathsep + (
-                environment.get("PATH", ""))
+                'cmake_minimum_required(VERSION 3.31)\n'
+                'project(rng_typed_contract LANGUAGES C ASM)\n'
+                'set(NEXUS_BUILD_TESTS OFF CACHE BOOL "")\n'
+                'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "")\n'
+                'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
+                f'set(NEXUS_ASSEMBLY_FILE "{assembly}")\n'
+                f'add_subdirectory("{ROOT}" nexus-sdk)\n'
+                + ('nexus_add_firmware(app SOURCES main.c)\n' if build else ''))
             result = subprocess.run(
-                [shutil.which("cmake") or "cmake", "-S", str(source),
-                 "-B", str(directory / "build"), "-G", "Ninja",
-                 "-DCMAKE_TOOLCHAIN_FILE=" + str(
-                     PLATFORM_ROOT / "cmake/toolchains/arm-gcc.cmake"),
-                 "-DPython3_EXECUTABLE=" + sys.executable],
-                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                env=environment, text=True, check=False, timeout=60)
-            self.assertEqual(result.returncode, 0, result.stdout)
+                ["cmake", "-S", str(source), "-B", str(source / "binary"),
+                 "-G", "Ninja", f"-DPython3_EXECUTABLE={sys.executable}",
+                 f"-DCMAKE_TOOLCHAIN_FILE={ROOT}/cmake/toolchains/arm-gcc.cmake"],
+                capture_output=True, text=True, check=False, timeout=180)
+            if result.returncode != 0:
+                return result
+            commands = json.loads((source / "binary/compile_commands.json").read_text())
+            rng = [item for item in commands
+                   if item["file"].endswith("/drivers/entropy.c")]
+            self.assertEqual(len(rng), 1 if selected else 0)
+            generated = (source / "binary/nexus-sdk/generated/bindings.c").read_text()
+            self.assertEqual("nx_stm32f407_entropy_ops" in generated, selected)
+            self.assertNotIn("entropy_instance", generated)
+            if not build:
+                return result
+            environment = dict(os.environ)
+            # An outer build_slot owns this complete compiler-using module.
+            result = subprocess.run(
+                ["cmake", "--build", str(source / "binary"), "--parallel", "2",
+                 "--target", "app"], capture_output=True, text=True,
+                env=environment, check=False, timeout=180)
+            if result.returncode == 0:
+                symbols = subprocess.run(
+                    ["arm-none-eabi-nm", "--defined-only", "--format=posix",
+                     str(source / "binary/bin/app.elf")],
+                    capture_output=True, text=True, check=True, timeout=30).stdout
+                for name in ("nx_factory_entropy", "nx_stm32f407_entropy_admit",
+                             "nx_stm32f407_entropy_start",
+                             "nx_stm32f407_entropy_stop"):
+                    self.assertRegex(symbols, rf"(?m)^{name} T ")
+                self.assertNotIn("entropy_instance", symbols)
+            return result
 
-    def test_second_target_for_same_hardware_is_rejected(self):
-        result = self.configure(
-            "nexus_add_stm32f407_entropy(first)\n"
-            "nexus_add_stm32f407_entropy(second)\n")
-        self.assertNotEqual(result.returncode, 0, result.stdout)
-        self.assertIn("one explicit F407 entropy target", result.stdout)
+    def test_direct_input_without_reserved_pll48_rejects_the_rng_selection(self):
+        result = self.configure()
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertRegex(result.stdout + result.stderr,
+                         r"RNG\s+requires\s+selected\s+nominal\s+PLL48=48MHz")
 
-    def test_other_family_is_not_silently_selected(self):
-        result = self.configure(
-            "nexus_add_stm32f407_entropy(entropy)\n", family="native")
-        self.assertNotEqual(result.returncode, 0, result.stdout)
-        self.assertIn("requires an STM32F407 Platform", result.stdout)
+    def test_active_main_pll_with_other_q_frequency_cannot_supply_rng(self):
+        result = self.configure(sysclk_source="pll", pll_q=8)
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertRegex(result.stdout + result.stderr,
+                         r"RNG\s+requires\s+selected\s+nominal\s+PLL48=48MHz")
 
-    def test_extra_arguments_are_rejected(self):
-        result = self.configure(
-            "nexus_add_stm32f407_entropy(entropy unexpected)\n")
-        self.assertNotEqual(result.returncode, 0, result.stdout)
-        self.assertIn("requires one unused target name", result.stdout)
+    def test_explicit_direct_hsi_pll48_is_a_valid_rng_clock_owner(self):
+        result = self.configure(pll48=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_unselected_helper_adds_no_target(self):
-        result = self.configure(
-            "get_property(selected GLOBAL PROPERTY "
-            "NEXUS_STM32F407_ENTROPY_TARGET)\n"
-            "if(selected)\n"
-            '  message(FATAL_ERROR "Unselected entropy target exists")\n'
-            "endif()\n")
-        self.assertEqual(result.returncode, 0, result.stdout)
+    def test_selected_factory_links_the_public_entropy_word_api(self):
+        result = self.configure(pll48=True, build=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_unselected_rng_adds_no_driver_or_hardware_owner(self):
+        result = self.configure(selected=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_unknown_entropy_fields_are_rejected(self):
+        path = ROOT / "tests/contracts/entropy_assembly/ve.toml"
+        with tempfile.TemporaryDirectory(dir=ROOT / "build") as temp:
+            assembly = Path(temp) / "assembly.toml"
+            assembly.write_text(path.read_text().replace('board_package="ve-board"',
+                f'board_package="{path.parent / "ve-board"}"') + 'unknown=true\n')
+            with self.assertRaisesRegex(ValueError, "unknown"):
+                configure.resolve_ir(assembly)
+
+    def test_rng_uses_the_typed_platform_source_closure(self):
+        spec = importlib.util.spec_from_file_location(
+            "rng_sdk_payload", ROOT / "cmake/package/package_source_sdk.py")
+        source_sdk = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(source_sdk)
+        required = set(source_sdk.required_files(ROOT))
+        current = {"soc/stm32/stm32f4/drivers/entropy.c",
+                   "soc/stm32/stm32f4/private/stm32f407_entropy.h",
+                   "io/include/nexus/io/entropy.h",
+                   "io/src/api/entropy.c"}
+        retired = {"soc/stm32/stm32f4/Entropy.cmake",
+                   "soc/stm32/stm32f4/entropy_instance.c",
+                   "soc/stm32/stm32f4/include/nexus/soc/stm32f407_entropy.h"}
+        self.assertTrue(current.issubset(required))
+        self.assertFalse(retired & required)
 
     def test_official_rng_inline_headers_close_the_packaged_source_graph(self):
         spec = importlib.util.spec_from_file_location(
@@ -138,8 +144,7 @@ class EntropyTargetTests(unittest.TestCase):
         required = {f"Inc/stm32f4xx_ll_{kind}.h"
                     for kind in ("bus", "rcc", "rng")}
         self.assertLessEqual(required, module.REVIEWED_FILES)
-        lock = json.loads((ROOT / "dependencies/stm32f4-hal.lock.json")
-                          .read_text())
+        lock = json.loads((ROOT / "dependencies/stm32f4-hal.lock.json").read_text())
         self.assertLessEqual(required, module.contract(lock))
 
 

@@ -61,6 +61,7 @@ nx_stm32_platform_selected_preflight(const nx_stm32_platform_config_t* config);
  * \param[in] config: Unchanged static resources and unique snapshot slots.
  * \param[in] powered_only: Ignore banks whose clock has not been acquired.
  * \return Success or invalid/context/busy without writes or snapshot changes.
+ * \note Active HSE/LSE oscillator pads reject before checking GPIO bus power.
  */
 nx_result_t
 nx_stm32_platform_pins_admit(const nx_stm32_platform_config_t* config,

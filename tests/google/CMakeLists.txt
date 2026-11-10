@@ -61,6 +61,7 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/crc.cmake")
 
 include("${CMAKE_CURRENT_LIST_DIR}/native_cold.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/stm32_i2c_cold.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/i2c_target.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/stm32_platform_cold.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/stm32_static_lifecycle.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/stm32_i2c_poll_factory.cmake")
@@ -317,6 +318,7 @@ target_compile_options(nexus_stm32_adc_stream_test PRIVATE
 
 target_sources(nexus_stm32_adc_stream_test PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_stream.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_trigger.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_continuous.c")
 
 nexus_google_test(nexus_stm32_i2c_register_test STM32F4_LL
@@ -395,6 +397,7 @@ include(can_runtime.cmake)
 include(ethernet.cmake)
 include(usb_device.cmake)
 include(timer_advanced.cmake)
+include(timer_clock.cmake)
 
 include(timer_factory.cmake)
 
@@ -439,7 +442,6 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/rtc_lptim.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/mapped_storage.cmake")
 include(amp_ipc.cmake)
 include(stm32f407_handoff.cmake)
-include(f407_i2s2_slave_tx.cmake)
 include(frame_stream.cmake)
 
 include(i3c_controller.cmake)
@@ -481,10 +483,9 @@ if(TARGET Nexus::LwIPTCPLoanedRXStorage AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set_tests_properties(nexus_network_tcp_loaned_stream_test PROPERTIES TIMEOUT 30)
 endif()
 
-# The explicit entropy instance uses the real reviewed LL over a register model.
+# The private entropy health tests use real reviewed LL over a register model.
 nexus_google_test(nexus_entropy_test STM32F4_LL SOURCES entropy_test.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/entropy.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/entropy_instance.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include")
@@ -495,6 +496,23 @@ target_compile_definitions(nexus_entropy_test PRIVATE STM32F407xx
     NEXUS_STM32_MODEL)
 target_compile_options(nexus_entropy_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/entropy_model.h")
+
+foreach(entropy_profile RANGE 0 3)
+    set(entropy_target "nexus_entropy_profile_${entropy_profile}_test")
+    nexus_google_test(${entropy_target} STM32F4_LL
+        SOURCES entropy_profile_test.cpp
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/entropy.c"
+        LIBRARIES Nexus::IO Nexus::Arch
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include")
+    target_include_directories(${entropy_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+    nexus_use_cmsis_core(${entropy_target})
+    target_compile_definitions(${entropy_target} PRIVATE STM32F407xx
+        NEXUS_STM32_MODEL NX_ENTROPY_PROFILE=${entropy_profile})
+    target_compile_options(${entropy_target} PRIVATE
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/entropy_profile_model.h")
+endforeach()
 
 include(tls_client.cmake)
 
@@ -549,3 +567,9 @@ foreach(spi_latch_target IN ITEMS
     target_compile_options(${spi_latch_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_spi_cs_model.h")
 endforeach()
+
+include(f407_capture_audio.cmake)
+include("${CMAKE_CURRENT_SOURCE_DIR}/stm32_spi_frames.cmake")
+
+include(entropy_factory.cmake)
+include(f407_timer_waveform.cmake)

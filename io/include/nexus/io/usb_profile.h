@@ -17,14 +17,24 @@ enum nx_usb_fs_limit {
     NX_USB_FS_MAX_PACKET = 64U
 };
 typedef enum { NX_USB_PROFILE_DEVICE } nx_usb_profile_role_t;
-typedef enum { NX_USB_PROFILE_FULL_SPEED } nx_usb_profile_speed_t;
-typedef enum { NX_USB_PROFILE_INTERNAL_FS } nx_usb_profile_phy_t;
-typedef enum { NX_USB_PROFILE_PIO } nx_usb_profile_engine_t;
+typedef enum {
+    NX_USB_PROFILE_FULL_SPEED,
+    NX_USB_PROFILE_HIGH_SPEED
+} nx_usb_profile_speed_t;
+typedef enum {
+    NX_USB_PROFILE_INTERNAL_FS,
+    NX_USB_PROFILE_EXTERNAL_ULPI
+} nx_usb_profile_phy_t;
+typedef enum {
+    NX_USB_PROFILE_PIO,
+    NX_USB_PROFILE_AHB_DMA
+} nx_usb_profile_engine_t;
 /* Selected kinds, independent of controller EPTYP encodings. */
 typedef enum {
     NX_USB_PROFILE_CONTROL,
     NX_USB_PROFILE_BULK,
-    NX_USB_PROFILE_INTERRUPT
+    NX_USB_PROFILE_INTERRUPT,
+    NX_USB_PROFILE_ISOCHRONOUS
 } nx_usb_profile_transfer_t;
 typedef struct {
     const nx_usb_endpoint_port_t* port;
@@ -56,7 +66,7 @@ typedef struct {
     nx_usb_setup_decision_port_t setup_decision;
 } nx_usb_device_profile_t;
 /**
- * \brief           Validate exact selected FS facts without observing the
+ * \brief           Validate exact selected FS/HS facts without observing the
  *                  controller.
  *
  * \param[in]       profile: Stable readable immutable facts, faces and
@@ -72,9 +82,18 @@ typedef struct {
  *                  natural C alignment and nonwrapping extents. Numeric
  *                  rejection is not a probe of arbitrary addresses or opaque
  *                  private contexts. EP0 selects control/64; nonzero
- *                  bulk selects 8/16/32/64-byte MPS. Interrupt selects
- *                  nonzero IN with 1..64-byte MPS. Host polling interval
- *                  belongs to the external descriptor, not this profile.
+ *                  bulk selects 8/16/32/64-byte MPS at FS or 512 at HS.
+ *                  Interrupt selects
+ *                  nonzero IN/OUT with 1..64-byte MPS at FS or 1..1024 at HS.
+ *                  ISO selects 1..1023 bytes at FS or 1..1024 at HS, with one
+ *                  transaction per opportunity; full FIFO admission remains
+ *                  the controller's duty. ISO never supports STALL or ACK
+ *                  guarantees. Its request selects next-frame parity, keeps
+ *                  a finite remaining deadline of at most one second and
+ *                  never retries a missed opportunity. ULPI ISO submission
+ *                  requires an observed speed; FS fallback caps MPS at 1023.
+ *                  External descriptors own interval and synchronization;
+ *                  this profile does not schedule a periodic stream.
  */
 nx_result_t nx_usb_profile_validate(const nx_usb_device_profile_t* profile);
 /**

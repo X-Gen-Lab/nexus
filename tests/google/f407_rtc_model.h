@@ -16,6 +16,7 @@ typedef struct {
     PWR_TypeDef power;
     EXTI_TypeDef exti;
     GPIO_TypeDef gpio_c;
+    uint32_t sram[1024];
     nx_time_us_t now;
     uint32_t writes;
     uint32_t clock_reads;
@@ -26,6 +27,8 @@ typedef struct {
     uint32_t prer_values[4];
     bool privileged;
     bool masked;
+    uint32_t basepri;
+    uint32_t faultmask;
     bool in_isr;
     bool irq_busy;
     uint32_t irq_enabled[3];
@@ -36,11 +39,21 @@ typedef struct {
     bool hold_lse;
     bool hold_init;
     bool hold_alarm;
+    bool hold_alarm_b;
+    bool hold_wakeup;
+    bool hold_regulator;
+    bool hold_sram_gate;
+    bool hold_regulator_disable;
+    bool hold_sram_gate_disable;
+    bool hold_recalibration;
+    uint8_t recalibration_reads;
     bool hold_clear;
     bool hold_write;
     bool hold_gpio_clock_enable;
     bool hold_gpio_clock_restore;
     bool hold_reload;
+    bool hold_standby_flags;
+    void (*observe_write)(volatile uint32_t*, uint32_t);
     bool reload_pending;
     uint32_t prior_time;
     uint32_t prior_date;
@@ -53,6 +66,7 @@ uint32_t nx_f407_rtc_model_read(volatile uint32_t* reg);
 void nx_f407_rtc_model_write(volatile uint32_t* reg, uint32_t value);
 bool nx_f407_rtc_privileged(void);
 bool nx_f407_rtc_masked(void);
+nx_arch_irq_masks_t nx_f407_rtc_masks(void);
 bool nx_f407_rtc_in_isr(void);
 void nx_f407_rtc_dsb(void);
 uint32_t nx_f407_rtc_model_irq_enabled(IRQn_Type irq);
@@ -66,6 +80,7 @@ uint32_t nx_f407_rtc_model_irq_active(IRQn_Type irq);
 #define NX_F407_RTC_PWR   (&g_f407_rtc_model.power)
 #define NX_F407_RTC_EXTI  (&g_f407_rtc_model.exti)
 #define NX_F407_RTC_GPIOC (&g_f407_rtc_model.gpio_c)
+#define NX_F407_RTC_SRAM  ((void*)g_f407_rtc_model.sram)
 #undef NVIC_GetEnableIRQ
 #undef NVIC_GetPendingIRQ
 #undef NVIC_GetActive

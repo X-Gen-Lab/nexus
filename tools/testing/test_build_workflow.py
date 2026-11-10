@@ -359,27 +359,83 @@ class ProcessExecutionTests(unittest.TestCase):
                             if json.loads(path.read_text())["exit_code"] == 7)
             self.assertIn("original failure", (original / "stdout.txt").read_text())
 
-    def test_timeout_reaps_actual_descendant_process(self):
+    def test_timeout_withdraws_actual_descendant_process(self):
+        import signal
         from tools.dev.process import run
+        linux = os.name == "posix" and Path("/proc/self/stat").is_file()
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            marker = root / "survived.txt"
-            child = ("import pathlib,time; time.sleep(3); "
-                     f"pathlib.Path({str(marker)!r}).write_text('survived')")
-            parent = ("import subprocess,sys,time; "
+            parent_identity = root / "parent.json"
+            child_identity = root / "child.json"
+
+            def announce(path):
+                # The fixture records its own kernel identity before waiting.
+                return ("import json,os,pathlib,time; "
+                        "identity={'pid':os.getpid()}; "
+                        "stat=pathlib.Path('/proc/self/stat'); "
+                        "identity.update(start_time=int(stat.read_text()."
+                        "rsplit(')',1)[1].split()[19])) if stat.is_file() "
+                        "else None; "
+                        f"pathlib.Path({str(path)!r}).write_text("
+                        "json.dumps(identity)); ")
+
+            def observe(pid):
+                # Independent OS observation, not the provider's PID parser.
+                try:
+                    fields = Path("/proc", str(pid), "stat").read_text().rsplit(
+                        ")", 1)[1].split()
+                    return int(fields[19]), fields[0]
+                except (FileNotFoundError, ProcessLookupError):
+                    return None
+
+            child = announce(child_identity) + "time.sleep(10)"
+            parent = ("import subprocess,sys; " + announce(parent_identity) +
                       f"subprocess.Popen([sys.executable,'-c',{child!r}]); "
                       "print('started',flush=True); time.sleep(10)")
             started = time.monotonic()
-            result = run([sys.executable, "-c", parent], cwd=root,
-                         env=os.environ.copy(), log=root / "timeout.txt",
-                         timeout=0.15)
-            self.assertEqual(result.returncode, 124)
-            self.assertLess(time.monotonic() - started, 5)
-            time.sleep(1.1)
-            self.assertFalse(marker.exists())
-            record = json.loads((root / "timeout.command.json").read_text())
-            self.assertEqual(record["outcome"], "timed_out")
-            self.assertIn("started", (root / "timeout.txt").read_text())
+            try:
+                # Two interpreters must actually start under the caller's
+                # finite budget; a timeout before readiness is still a failure.
+                result = run([sys.executable, "-c", parent], cwd=root,
+                             env=os.environ.copy(), log=root / "timeout.txt",
+                             timeout=2)
+                self.assertEqual(result.returncode, 124)
+                self.assertIn("started", (root / "timeout.txt").read_text())
+                identities = []
+                for path in (parent_identity, child_identity):
+                    self.assertTrue(path.is_file(), "Fixture did not start")
+                    identities.append(json.loads(path.read_text()))
+                self.assertNotEqual(identities[0]["pid"], identities[1]["pid"])
+                record = json.loads((root / "timeout.command.json").read_text())
+                self.assertEqual(record["outcome"], "timed_out")
+                self.assertTrue(record["withdrawal_complete"])
+                if linux:
+                    withdrawn = {(item["pid"], item["start_time"]): item
+                                 for item in record["withdrawn_processes"]}
+                    for identity in identities:
+                        key = identity["pid"], identity["start_time"]
+                        self.assertIn(key, withdrawn)
+                        self.assertTrue(withdrawn[key]["withdrawal_complete"])
+                        current = observe(identity["pid"])
+                        self.assertTrue(current is None or
+                                        current[0] != identity["start_time"] or
+                                        current[1] in {"Z", "X"})
+                self.assertLess(time.monotonic() - started, 5)
+            finally:
+                # Assertion failure must not leave an executable Linux fixture.
+                # Match its original identity before signalling a retained PID.
+                if linux:
+                    for path in (child_identity, parent_identity):
+                        if path.is_file():
+                            identity = json.loads(path.read_text())
+                            current = observe(identity["pid"])
+                            if (current is not None and
+                                    current[0] == identity["start_time"] and
+                                    current[1] not in {"Z", "X"}):
+                                try:
+                                    os.kill(identity["pid"], signal.SIGKILL)
+                                except ProcessLookupError:
+                                    pass
 
     def test_missing_executable_is_recorded_as_launch_failure(self):
         from tools.dev.process import run

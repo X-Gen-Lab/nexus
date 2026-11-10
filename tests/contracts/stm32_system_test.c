@@ -56,6 +56,10 @@ bool nx_arch_in_isr(void) {
 bool nx_arch_irq_is_masked(void) {
     return s_mask != 0U;
 }
+/** \brief Preserve the same incoming mask in the extended CPU snapshot. */
+nx_arch_irq_masks_t nx_arch_irq_masks(void) {
+    return (nx_arch_irq_masks_t){s_mask, 0U, 0U};
+}
 /** \brief Register model writes are synchronous, not physical bus timing. */
 void nx_arch_dsb(void) {
 }

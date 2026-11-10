@@ -12,6 +12,7 @@
 #include "nexus/io/adc.h"
 #include "nexus/io/exti.h"
 #include "nexus/io/flash.h"
+#include "nexus/io/flash_maintenance.h"
 #include "nexus/io/gpio.h"
 #include "nexus/io/i2c.h"
 #include "nexus/io/spi.h"
@@ -143,7 +144,11 @@ typedef struct {
     volatile uint8_t* memory;
     uint32_t supply_mv;
     bool active;
+    bool power_on_reset_required;
 } nx_stm32_flash_state_t;
+/** \brief Explicitly assembled optional face shares the physical pulse owner.
+ */
+extern const nx_flash_maintenance_ops_t nx_stm32_flash_maintenance_ops;
 typedef struct {
     IWDG_TypeDef* registers;
     FLASH_TypeDef* flash;

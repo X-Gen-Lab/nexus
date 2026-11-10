@@ -6,6 +6,7 @@
  * \date            2026-11-10
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_timer_advanced.h"
 #include "stm32f407_timer_pins.h"
 #define NX_CAPTURE_CR1          (TIM5->CR1)
@@ -27,10 +28,11 @@
 #define NX_CAPTURE_IRQ          nx_stm32_tim5_timer_capture_irq
 #define NX_CAPTURE_RELEASE      nx_stm32_tim5_timer_capture_release
 #define NX_CAPTURE_OPS          nx_stm32_tim5_timer_capture_ops
-#define NX_CAPTURE_HZ           84000000U
+#define NX_CAPTURE_HZ           NEXUS_APB1_TIMER_HZ
 #define NX_CAPTURE_COUNTER_BITS 32U
 #define NX_CAPTURE_CLOCK_READY(channel)                                        \
     ((RCC->APB1ENR & RCC_APB1ENR_TIM5EN) != 0U &&                              \
-     (RCC->CFGR & RCC_CFGR_PPRE1) == RCC_CFGR_PPRE1_DIV4 &&                    \
+     (RCC->CFGR & RCC_CFGR_PPRE1) == (NEXUS_CLOCK_CFGR & RCC_CFGR_PPRE1) &&    \
      nx_stm32_capture_pins_ready(TIM5, (channel)))
+#define NX_CAPTURE_ACCESS_READY() ((RCC->APB1ENR & RCC_APB1ENR_TIM5EN) != 0U)
 #include "timer_capture_impl.h"

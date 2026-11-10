@@ -90,7 +90,10 @@ class SDKSecurePolicyTests(unittest.TestCase):
                 self.assertEqual(resolved.cpu["arch"],
                                  "cortex-m4" if profile.arm else "native")
                 if profile.arm:
-                    self.assertIn("nexus_add_stm32f407_entropy", cmake)
+                    self.assertNotIn("nexus_add_stm32f407_entropy", cmake)
+                    self.assertEqual([(item.kind, item.controller, item.mode)
+                                      for item in resolved.controllers],
+                                     [("entropy", "RNG", "rng-words")])
                     self.assertEqual(resolved.memory_budget.static_ram_limit_bytes,
                                      114688)
                     self.assertEqual(resolved.memory_budget.flash_load_limit_bytes,
@@ -160,7 +163,7 @@ class SDKSecurePolicyTests(unittest.TestCase):
                 self.assertIn("MQTT_Init", report["symbols"])
                 self.assertIn("nx_entropy_fill", report["symbols"])
                 if arm:
-                    self.assertIn("nx_stm32f407_entropy_instance_start", report["symbols"])
+                    self.assertIn("nx_factory_entropy", report["symbols"])
                     owners = [call for call in calls if "--component-owner" in call]
                     self.assertEqual(len(owners), 1)
                     self.assertIn("f407-secure-services", owners[0])

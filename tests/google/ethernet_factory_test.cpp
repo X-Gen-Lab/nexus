@@ -84,7 +84,13 @@ extern "C" nx_result_t nx_stm32_validate_identity(uint32_t) {
 }
 extern "C" nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t*,
                                                          uint32_t) {
-    return {s_ports->Start(), 0, 0U};
+    int result = s_ports->Start();
+    if (result == 0) {
+        RCC->CR = 0x03030003U;
+        RCC->PLLCFGR = 0x07405408U;
+        RCC->CFGR = 0x0000940aU;
+    }
+    return {result, 0, 0U};
 }
 extern "C" int nx_stm32_system_stop(nx_stm32_system_t*, uint32_t) {
     return s_ports->Stop();
@@ -591,4 +597,35 @@ TEST_F(EthernetFactory, AbsentColdReceiptCannotStopActiveController) {
     EXPECT_EQ(0U, receipt.leases);
     EXPECT_FALSE(receipt.mux_leased);
     EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+}
+TEST_F(EthernetFactory, MiiSeventeenPadsRetainLastLeaseUntilActualRestore) {
+    uint16_t snapshots[17]{};
+    const EthPinConfig pins[] = {
+        {GPIOA, &snapshots[0], 0U, 0U},   {GPIOA, &snapshots[1], 0U, 1U},
+        {GPIOA, &snapshots[2], 0U, 2U},   {GPIOA, &snapshots[3], 0U, 3U},
+        {GPIOA, &snapshots[4], 0U, 7U},   {GPIOB, &snapshots[5], 1U, 0U},
+        {GPIOB, &snapshots[6], 1U, 1U},   {GPIOB, &snapshots[7], 1U, 8U},
+        {GPIOB, &snapshots[8], 1U, 10U},  {GPIOB, &snapshots[9], 1U, 11U},
+        {GPIOB, &snapshots[10], 1U, 12U}, {GPIOB, &snapshots[11], 1U, 13U},
+        {GPIOC, &snapshots[12], 2U, 1U},  {GPIOC, &snapshots[13], 2U, 2U},
+        {GPIOC, &snapshots[14], 2U, 3U},  {GPIOC, &snapshots[15], 2U, 4U},
+        {GPIOC, &snapshots[16], 2U, 5U}};
+    EthPinReceipt receipt{};
+    mux() = 0x00800000U;
+    ASSERT_TRUE(nx_stm32_packet_pins_valid(pins, 17U));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_eth_pins_prepare_mode(pins, &receipt, false, true));
+    EXPECT_EQ(0x1ffffU, receipt.leases);
+    EXPECT_EQ(0U, mux() & 0x00800000U);
+    s_hold_restore = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_eth_pins_close_mode(pins, &receipt, true));
+    EXPECT_NE(0U, receipt.leases & (1U << 16U));
+    EXPECT_TRUE(receipt.mux_leased);
+    s_hold_restore = false;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_eth_pins_close_mode(pins, &receipt, true));
+    EXPECT_EQ(0U, receipt.leases);
+    EXPECT_FALSE(receipt.mux_leased);
+    EXPECT_EQ(0x00800000U, mux() & 0x00800000U);
+    for (const auto& pin : pins)
+        EXPECT_EQ(0x123U, s_pins[pin.port_index][pin.pin]);
 }

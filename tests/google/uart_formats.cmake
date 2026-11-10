@@ -19,3 +19,7 @@ target_compile_options(nexus_stm32_uart_formats_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/uart_format_model.h")
 target_compile_options(nexus_stm32_uart_formats_test PRIVATE
     "$<$<COMPILE_LANGUAGE:C>:-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_official_model.h>")
+
+target_sources(nexus_stm32_uart_formats_test PRIVATE
+    stm32_uart_wire_test.cpp
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_wire.c")

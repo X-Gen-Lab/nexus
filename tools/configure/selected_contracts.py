@@ -108,6 +108,7 @@ def controller_class(item):
     """Physical controller and nominal public face have separate identities."""
     return ("pin_state" if item.kind == "gpio" and item.mode == "named-states" else
             "uart_word" if item.mode == "irq-words" else
+            "spi_frames" if item.kind == "spi" and item.mode == "irq-frames" else
             item.interface_kind or item.kind)
 
 
@@ -153,6 +154,8 @@ def _format(item, provider, shape):
                               if frame else 0),
                       stop_half_bits=frame.stop_bits * 2 if frame else 2,
                       requested_baud=options.baud)
+        if options.wire is not None and options.wire.protocol == "smartcard":
+            fields.update(parity=1, stop_half_bits=3)
         continuity = ("model" if provider.MODEL else "double_buffer"
                       if shape.continuous else "rearm_gap"
                       if shape.rx_dma else "irq_buffered")
@@ -160,7 +163,8 @@ def _format(item, provider, shape):
             source = "irq_observation"
     elif kind == "spi":
         fields = dict(word_bits=0 if controller_class(item) ==
-                      "spi_dma_transaction" else 8,
+                      "spi_dma_transaction" else
+                      options.frames.word_bits if options.frames else 8,
                       configured_max_hz=options.max_hz)
     elif kind == "i2c":
         # Zero identifies endpoint-owned widths on a mixed-width controller.
@@ -222,8 +226,7 @@ def describe(item, endpoint=None, *, public_class=None):
     nominal_kind, nominal_mode = kind, item.mode
     if kind == "external_bus" and endpoint is not None:
         nominal_kind = selected
-        nominal_mode = (endpoint.options.mode if selected == "memory_window"
-                        else "8080-16")
+        nominal_mode = ("8080-16" if selected=="parallel16" else endpoint.options.mode)
         shape = mode_traits(nominal_kind, nominal_mode)
     limits = {}
     if kind == "rtc":
@@ -231,8 +234,14 @@ def describe(item, endpoint=None, *, public_class=None):
     elif kind == "lptim":
         limits.update(unit="ticks", max_transfer_units=65536)
     elif kind == "block":
-        limits.update(unit="blocks", unit_bytes=512, buffer_alignment=4,
-                      max_transfer_units=item.options.max_blocks)
+        if item.options.protocol == "sdio":
+            limits.update(unit="bytes", unit_bytes=1,
+                          buffer_alignment=16 if item.mode == "sdio-dma" else 4,
+                          max_transfer_units=item.options.max_blocks * 2048)
+        else:
+            limits.update(unit="blocks", unit_bytes=512,
+                          buffer_alignment=16 if item.mode == "sdio-dma" else 4,
+                          max_transfer_units=item.options.max_blocks)
     elif kind == "external_bus" and endpoint is not None:
         if selected == "parallel16":
             limits.update(unit="words", unit_bytes=2, buffer_alignment=2,
@@ -240,20 +249,36 @@ def describe(item, endpoint=None, *, public_class=None):
         else:
             limits.update(unit="bytes", unit_bytes=1,
                           max_transfer_units=(endpoint.options.bytes
-                              if endpoint.options.mode == "cpu-window" else None))
-    if kind in {"uart", "spi", "i2c", "can", "can_fd", "eth", "eth_frames",
-                "usb_device"}:
+                              if endpoint.options.mode in {"cpu-window","psram-window"} else None))
+    if kind in {"uart", "spi", "i2c", "i2c_target", "can", "can_fd", "eth", "eth_frames",
+                "usb_device", "usb_host"}:
         limits.update(unit="bytes", unit_bytes=1, word_bits=(8,))
+    if (kind == "uart" and item.options.wire is not None and
+            item.options.wire.protocol == "smartcard"):
+        limits["max_transfer_units"] = 1
+    if kind == "entropy":
+        limits.update(unit="words", unit_bytes=4, buffer_alignment=4,
+                      max_transfer_units=1, word_bits=(32,))
     if kind == "crc":
         limits.update(unit="words", unit_bytes=4, buffer_alignment=4,
                       word_bits=(32,))
     if kind in {"uart", "spi"} and shape.dma:
         limits["max_transfer_units"] = "UINT16_MAX"
-    if kind == "spi" and not shape.dma and not provider.MODEL:
+    if kind == "spi" and item.mode == "irq-frames":
+        width = item.options.frames.word_bits // 8
+        limits.update(unit="words", unit_bytes=width, buffer_alignment=width,
+                      max_transfer_units="UINT16_MAX",
+                      word_bits=(item.options.frames.word_bits,))
+    elif kind == "spi" and not shape.dma and not provider.MODEL:
         limits["max_transfer_units"] = 256
     elif kind == "i2c" and not provider.MODEL:
         limits.update(max_transfer_units="NX_I2C_MAX_MESSAGE_BYTES",
                       max_messages="NX_I2C_MAX_MESSAGES")
+    elif kind == "i2c_target":
+        # One WRITE_READ request has two bounded direction spans; address
+        # phases are not independent messages or caller payload bytes.
+        limits.update(max_transfer_units=512, max_segment_units=256,
+                      max_segments=2, max_total_units=512)
     elif kind in {"adc", "pwm_adc"}:
         count = len(item.options.channels)
         bound = ("UINT16_MAX" if kind == "pwm_adc" else
@@ -261,10 +286,13 @@ def describe(item, endpoint=None, *, public_class=None):
         limits.update(unit="samples", unit_bytes=2, buffer_alignment=2,
                       max_transfer_units=bound)
     elif kind == "adc_group":
+        width = (2 if item.mode == "injected-sequence" or
+                 item.options.operation == "triple-simultaneous" or
+                 item.options.sample_stride == 1 else 4)
         limits.update(unit="frames", unit_bytes=item.options.scan_stride,
-                      buffer_alignment=2,
+                      buffer_alignment=width,
                       max_transfer_units=item.options.max_frames,
-                      word_bits=(12,))
+                      word_bits=(item.options.resolution_bits,))
     elif kind in {"can", "can_fd"}:
         limits.update(max_transfer_units=64 if kind == "can_fd" else 8,
                       max_messages=1)
@@ -277,7 +305,13 @@ def describe(item, endpoint=None, *, public_class=None):
                       max_messages=1)
     elif kind == "usb_device":
         limits.update(max_transfer_units=endpoint.options.max_packet
-                      if endpoint is not None else 64, max_messages=1)
+                      if endpoint is not None else
+                      1024 if item.mode in {"device-hs-ulpi", "otg-hs-ulpi"} else 64,
+                      max_messages=1)
+    elif kind == "usb_host":
+        limits.update(max_transfer_units=1024 if item.mode == "host-hs-ulpi"
+                      else 1023, buffer_alignment=4 if item.options.engine == "dma" else 1,
+                      max_messages=1)
     elif kind == "flash":
         unit = (1 if provider.MODEL else
                 getattr(provider, "FLASH_PROGRAM_UNIT", None))
@@ -368,13 +402,12 @@ def _silicon_policy(result, item=None):
     if item is not None:
         if item not in result.controllers or item.provider != result.soc_family:
             fail("Selected silicon profile belongs to no ADC group owner")
-        if item.kind == "adc_group":
-            return item.options.admission
     provider = for_selection(result)
     selected_policy = getattr(provider, "silicon_policy", None)
     policy = (selected_policy(result, item)
               if selected_policy is not None else None)
-    if item is None and result.clock_plan is not None and policy is None:
+    if (item is None and result.clock_plan is not None and
+            result.clock_plan.reviewed_revision_ids and policy is None):
         fail("Selected silicon clock review has no maintained provider")
     return policy
 

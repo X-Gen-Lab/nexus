@@ -1,0 +1,101 @@
+# Software-only exact wire resource reference; physical HIL is not executed.
+schema = 2
+board_package = "zg-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+
+[uart.console]
+binding="console"
+mode="irq-wire"
+baud=9600
+[uart.console.rx]
+format="events"
+capacity=8
+[uart.console.irq]
+priority=5
+calls_os=false
+[uart.console.wire]
+protocol="synchronous"
+clock_polarity=true
+clock_phase=true
+last_bit_clock=true
+
+[uart.serial2]
+binding="serial2"
+mode="irq-wire"
+baud=9600
+[uart.serial2.rx]
+format="events"
+capacity=8
+[uart.serial2.irq]
+priority=5
+calls_os=false
+[uart.serial2.wire]
+protocol="smartcard"
+prescaler=21
+guard_time=16
+smartcard_nack=true
+
+[uart.serial3]
+binding="serial3"
+mode="irq-wire"
+baud=9600
+[uart.serial3.rx]
+format="events"
+capacity=8
+[uart.serial3.irq]
+priority=5
+calls_os=false
+[uart.serial3.wire]
+protocol="asynchronous"
+flow="rts-cts"
+
+[uart.serial4]
+binding="serial4"
+mode="irq-wire"
+baud=9600
+[uart.serial4.rx]
+format="events"
+capacity=8
+[uart.serial4.irq]
+priority=5
+calls_os=false
+[uart.serial4.wire]
+protocol="half-duplex"
+
+
+[uart.serial5]
+binding="serial5"
+mode="irq-wire"
+baud=9600
+[uart.serial5.rx]
+format="events"
+capacity=8
+[uart.serial5.irq]
+priority=5
+calls_os=false
+[uart.serial5.wire]
+protocol="lin"
+lin_break_bits=11
+
+[uart.serial6]
+binding="serial6"
+mode="irq-wire"
+baud=9600
+[uart.serial6.rx]
+format="events"
+capacity=8
+[uart.serial6.irq]
+priority=5
+calls_os=false
+[uart.serial6.wire]
+protocol="irda"
+prescaler=42
+irda_low_power=true

@@ -29,8 +29,8 @@ Arch 为 I/O、SoC 和 OS 适配提供 CPU 局部机制。公共头在
 | `native/nx_arch_native.c` | 宿主递归排他和 C11 内存屏障 |
 
 同一 Cortex-M 实现覆盖 M0／M0+／M3／M4／M7／M23／M33／M55／M85，包括
-ARMv8.1-M Mainline 编译器配置组合。F407／F470 首发与 G474／H743／U575 参考范围
-由[支持矩阵](../docs/delivery/support.md)限定。CPU 能力不扩大 SoC／Board。
+ARMv8.1-M Mainline 编译器配置组合。当前生产 SoC 为 F407VE／ZG，精确型号与模式
+见[支持矩阵](../docs/delivery/support.md)。CPU 能力不扩大 SoC／Board。
 独立 CPU 运行时选择 Core／Arch 和可选 OS，不创建 SoC、Board、启动或
 factory；见 [Runtime 装配](../docs/delivery/cortex-m.md)。
 

@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/arch/arch.h"
+#include "stm32f407_clock.h"
 #include "stm32f407_i2c_async.h"
 #include "stm32f407_i2c_cold.h"
 #include <stddef.h>
@@ -24,8 +25,10 @@ nx_result_t nx_stm32_i2c_async_prepare(nx_i2c_v1_state_t* port,
         return NX_ERROR_BUSY;
     uint16_t ccr;
     uint8_t rise;
-    if (config->clock_hz != 42000000U ||
-        !nx_i2c_v1_timing(42U, config->max_hz, &ccr, &rise)) {
+    if (config->clock_hz != NEXUS_APB1_HZ || config->clock_hz < 2000000U ||
+        config->clock_hz > 50000000U || config->clock_hz % 1000000U != 0U ||
+        !nx_i2c_v1_timing((uint8_t)(config->clock_hz / 1000000U),
+                          config->max_hz, &ccr, &rise)) {
         return NX_ERROR_UNSUPPORTED;
     }
     nx_result_t result = nx_stm32_i2c_async_cold_acquire(config, receipt);
@@ -259,7 +262,8 @@ nx_result_t nx_stm32_i2c_async_initialize(nx_i2c_v1_state_t* state,
     if ((state->registers != (volatile uint32_t*)I2C1 &&
          state->registers != (volatile uint32_t*)I2C2 &&
          state->registers != (volatile uint32_t*)I2C3) ||
-        state->peripheral_mhz != 42U) {
+        NEXUS_APB1_HZ % 1000000U != 0U ||
+        state->peripheral_mhz != NEXUS_APB1_HZ / 1000000U) {
         return NX_ERROR_UNSUPPORTED;
     }
     bool third = state->registers == (volatile uint32_t*)I2C3;

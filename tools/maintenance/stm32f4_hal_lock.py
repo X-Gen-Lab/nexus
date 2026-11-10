@@ -2,8 +2,10 @@
 """Verify selected STM32F4 LL/HAL sources with their official CMSIS pairing.
 
 STM32CubeF4 v1.28.3 pins both reviewed components. The graph closes inline LL,
-ETH definitions and explicitly selected UART/DMA/RCC C, stateless FSMC/SDIO
-LL C and RTC/PWR/DAC/DMA/CRC/identity inline operations with their closed headers.
+ETH definitions and explicitly selected UART/DMA/RCC/DCMI/HCD C, stateless
+FSMC/SDIO/USB LL C and RTC/PWR/DAC/DMA/CRC/identity inline operations with their
+closed headers. PCD headers close the private USB configuration; PCD C is not
+selected by this source graph.
 GPIO/Flash headers supply RCC declarations only; their C, global HAL
 initialization and SysTick are not selected.
 Source admission does not qualify a transport or create mutable Handles.
@@ -52,6 +54,11 @@ REVIEWED_FILES = frozenset({
     "Inc/stm32f4xx_ll_fsmc.h", "Src/stm32f4xx_ll_fsmc.c",
     "Inc/stm32f4xx_ll_sdmmc.h", "Src/stm32f4xx_ll_sdmmc.c",
     "Inc/stm32f4xx_ll_rtc.h", "Inc/stm32f4xx_ll_pwr.h",
+    "Inc/stm32f4xx_hal_dcmi.h", "Inc/stm32f4xx_hal_dcmi_ex.h",
+    "Src/stm32f4xx_hal_dcmi.c", "Inc/stm32f4xx_hal_hcd.h",
+    "Src/stm32f4xx_hal_hcd.c", "Inc/stm32f4xx_ll_usb.h",
+    "Src/stm32f4xx_ll_usb.c", "Inc/stm32f4xx_hal_pcd.h",
+    "Inc/stm32f4xx_hal_pcd_ex.h",
 })
 PAIRING = {
     "repository": "https://github.com/STMicroelectronics/STM32CubeF4.git",
@@ -72,7 +79,7 @@ def contract(lock):
     if (lock["repository"] != ORIGIN or lock["commit"] != COMMIT or
             lock["release"] != "v1.8.5" or
             lock["selected_api"] != (
-                "stm32f407-reviewed-ll-fsmc-sdio-rtc-uart-dma-hal-tx") or
+                "stm32f407-reviewed-hal-ll-controllers") or
             lock["pairing"] != PAIRING):
         raise ValueError("Exact official STM32F4 release and CMSIS pairing required")
     if not isinstance(lock["files"], dict) or set(lock["files"]) != REVIEWED_FILES:

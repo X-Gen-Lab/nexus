@@ -23,7 +23,7 @@ stop／recover、borrow 与外部 join。ClockDomain 只能证明已登记消费
 
 | 扩展 | 入口与范围 |
 | --- | --- |
-| F407 I2S2 slave TX | [合同](stm32/f407_i2s2_slave_tx/README.md)；有限 stereo16、外部 CK／WS、DMA 排空 |
+| F407 音频 | [标准 audio 合同](../../docs/design/f407-i2s2-slave-tx.md)；静态 factory、Platform 生命周期与有限帧借用 |
 | F407 image handoff | [合同](stm32/stm32f407_handoff/README.md)；已停止裸机平台、掩码 MSP 交接 |
 | H743 W25Q128JV | [合同](stm32/stm32h743_w25q128/README.md)；单线 Flash、CPU read mapping、显式 MPU 防护 |
 | H743 DMA2D frame | [公共头](stm32/stm32h743_frame_dma2d/include/nexus/components/frame_dma2d.h)；精确内存加速，不能当显示控制器 |

@@ -39,9 +39,10 @@ def clean_environment():
 def private_compile_inputs(entry, sdk, extra_private=()):
     """Audit actual compiler options against canonical Nexus source boundaries.
 
-    Kernel PUBLIC headers remain valid. Chip component APIs live below their
-    declared package's include/nexus directory; neither package roots nor
-    implementation directories become public because their path contains soc.
+    Kernel PUBLIC headers remain valid. F407 SoC APIs live only below the
+    maintained soc/stm32/stm32f4/include subtree. Chip component APIs live below
+    their declared package's include/nexus directory; package roots and
+    implementation directories remain private.
     """
     arguments = entry.get("arguments")
     if arguments is None:
@@ -80,8 +81,11 @@ def private_compile_inputs(entry, sdk, extra_private=()):
                 continue
             relative = path.relative_to(root)
             parts = relative.parts
-            if (not parts or parts[0] in {"soc", "drivers", "tests"} or
+            if (not parts or parts[0] in {"drivers", "tests"} or
                     {"vendors", "private"}.intersection(parts)):
+                return True
+            if (parts[0] == "soc" and
+                    parts[:4] != ("soc", "stm32", "stm32f4", "include")):
                 return True
             if parts == ("components",):
                 return True
@@ -375,12 +379,9 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
            'target_link_libraries(installed_public PRIVATE Nexus::TLS Nexus::CoreMQTT)\n'
            'nexus_apply_target_policy(installed_public)\n'
            'nexus_target_warnings(installed_public STRICT)\n'
-           + ('nexus_add_stm32f407_entropy(installed_entropy)\n'
-              if specification.arm else '')
            + 'nexus_add_firmware(installed_services SOURCES composition.c\n'
            '  LIBRARIES installed_public Nexus::TLSStorage Nexus::CoreMQTTStorage\n'
-           '  Nexus::LwIPStorage' + (' installed_entropy' if specification.arm else '')
-           + ')\n' if secure else selected_setup if selected_setup else
+           '  Nexus::LwIPStorage)\n' if secure else selected_setup if selected_setup else
            'nexus_add_firmware(installed_services SOURCES main.c private_headers.c\n'
            + ('  LIBRARIES ' + libraries[specification.scenario]
               if libraries[specification.scenario] else '') + ')\n')
@@ -427,9 +428,6 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
     source.mkdir()
     run_checked(["git", "init", "--quiet", str(source)])
     version = load_policy(sdk)["semantic_version"]
-    library = ("Nexus::F407I2S2SlaveTx"
-               if smoke_name == "f407-i2s2-slave-tx" else None)
-    component = " LIBRARIES " + library if library else ""
     (source / "CMakeLists.txt").write_text(
         'cmake_minimum_required(VERSION 3.31)\n'
         'project(installed_selected_consumer LANGUAGES C ASM)\n'
@@ -438,8 +436,7 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         'set(CMAKE_C_EXTENSIONS OFF)\n'
         'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
         f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
-        'nexus_add_firmware(installed_selected SOURCES main.c private_headers.c'
-        f'{component})\n'
+        'nexus_add_firmware(installed_selected SOURCES main.c private_headers.c)\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
         'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
         'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
@@ -450,7 +447,8 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '#error Vendor SDK leaked into product source\n#endif\n'
         '#if __has_include("stm32f407_provider.h") || '
         '__has_include("stm32f407_eth_frames.h") || '
-        '__has_include("stm32f407_i2s2_slave_tx.h") || '
+        '__has_include("stm32f407_audio.h") || '
+        '__has_include("stm32f407_capture.h") || '
         '__has_include("can_controller.h") || '
         '__has_include("usb_device_controller.h")\n'
         '#error Private provider leaked into product source\n#endif\n'

@@ -59,18 +59,47 @@ def validate_soc(soc, provider):
             policy = getattr(provider, "TIMER_ADVANCED", None)
             facts = policy.binding(kind, name) if policy is not None else None
             mode = "edge-capture" if kind == "timer_capture" else "complementary-pwm"
-            pins = (list(dict.fromkeys(pin for route in facts.routes
+            bindings = tuple(binding for binding in policy.bindings
+                             if binding.controller == name) if policy else ()
+            ordered = tuple(binding for binding in bindings
+                            if binding.kind == item['kind']) + tuple(
+                binding for binding in bindings if binding.kind != item['kind'])
+            pins = list(dict.fromkeys(pin for binding in ordered
+                                      for route in binding.routes
                                       for pin, _, _ in route.pins))
-                    if facts is not None else [])
+            vectors = sorted({(binding.irq, binding.vector) for binding in bindings})
+            if provider.PREFIX == "stm32":
+                from tools.configure.stm32f4.waveform import extra_pins
+                pins = list(dict.fromkeys((*pins, *extra_pins(name))))
             if (facts is None or name != facts.controller or modes != [mode] or
-                    item["irq"] != [facts.vector] or item.get("irq_numbers") != [facts.irq] or
+                    item["irq"] != [vector for _, vector in vectors] or
+                    item.get("irq_numbers") != [irq for irq, _ in vectors] or
                     type(item.get("clock_hz")) is not int or item["clock_hz"] != facts.clock_hz or
                     item["pins"] != pins or
                     item.get("resources") != list(facts.resources)):
                 fail("Timer controller, shared vector, clock or pin facts differ from the SDK")
 
 
-def validate_selection(selection, route, provider):
+def selected_hardware(route, hardware, provider):
+    """Select IRQ ownership from the existing exact personality policy."""
+    policy = getattr(provider, 'TIMER_ADVANCED', None)
+    if policy is None:
+        return hardware
+    if (getattr(provider, 'PREFIX', None) == 'stm32' and
+            route['kind'] in {'pwm_group', 'timer_pulse', 'timer_sequence'}):
+        facts = policy.binding('advanced_pwm', route['controller'])
+        if facts is None:
+            return {**hardware, 'irq': [], 'irq_numbers': []}
+    else:
+        facts = policy.binding(route['kind'], route['controller'])
+    if facts is None:
+        facts = policy.binding(hardware['kind'], route['controller'])
+    if facts is None:
+        return hardware
+    return {**hardware, 'irq': [facts.vector], 'irq_numbers': [facts.irq]}
+
+
+def validate_selection(selection, route, provider, *, clock_plan=None):
     kind = route["kind"]
     fields = CAPTURE_FIELDS if kind == "timer_capture" else ADVANCED_FIELDS
     if not (fields - {"calls_os"}).issubset(selection):
@@ -81,7 +110,11 @@ def validate_selection(selection, route, provider):
     if facts is None or facts.route(actual) is None:
         fail("Timer selection differs from the reviewed exclusive pad route")
     tick = integer(selection["tick_hz"], 1, context="Timer tick_hz")
-    if facts.clock_hz % tick or not 1 <= facts.clock_hz // tick <= 65536:
+    frequency = facts.clock_hz
+    domain = getattr(provider, "timer_clock_domain", None)
+    if clock_plan is not None and domain is not None:
+        frequency = clock_plan["domains"][domain(route["controller"])]["nominal_hz"]
+    if frequency % tick or not 1 <= frequency // tick <= 65536:
         fail("Timer tick_hz must exactly divide the selected clock within 16 bits")
     if type(selection["exclusive"]) is not bool or not selection["exclusive"]:
         fail("Timer requires an explicit exclusive controller owner")

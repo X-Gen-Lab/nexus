@@ -1,0 +1,110 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 2d9c9af6e124823371794b2104580e89217ac298137c76e312d0c79e3c63c9f2\n"
+
+msgid "F407 I2C target 与 SMBus device"
+msgstr "F407 I2C target and SMBus device"
+
+msgid "![驱动源码与资源所有权](../../../docs/assets/diagrams/driver-source-ownership.svg)"
+msgstr "![Driver source and resource ownership](../../../docs/assets/diagrams/driver-source-ownership.svg)"
+
+msgid "驱动源码与资源所有权"
+msgstr "Driver source and resource ownership"
+
+msgid "本页定义 F407VET6/ZGT6 的有限 target 交换和可选 SMBus 机制。 `i2c_target` 与 `i2c` master 共用同一个物理 I2C controller，资源图拒绝同时选择 两个 owner。I2C1/2/3 各有一个静态 C state、冷启动 receipt 和固定 EV/ER 向量； 没有 listener worker、运行期注册、分配或应用寄存器表。"
+msgstr "This page defines finite target exchanges and optional SMBus mechanisms for F407VET6/ZGT6. `i2c_target` and the `i2c` master share the same physical I2C controller; the resource graph rejects selecting both owners together. Each of I2C1/2/3 has one static C state, a cold-start receipt and fixed EV/ER vectors. There is no listener worker, runtime registration, allocation or application register map."
+
+msgid "RX 数据读取和 GPIO 使用官方 LL，NVIC 使用官方 CMSIS。TX DR 单次 store 避免 该 SDK LL transmitter 的 DR read-modify-write 引入额外破坏性读。复合 CR1 命令、 已观察 SR1 的 ADDR/STOPF 序列、完整冷态快照恢复及 bounded reset/withdraw 由 C 显式维护：通用 HAL listener callback 的完成点不包含 Nexus 的借用退出 证明，单独的 LL setter 也不能替代 PEC 命令单次 CR1 写入后、pending 期间 不再写 CR1 的约束。"
+msgstr "RX data reads and GPIO use the official LL; NVIC uses official CMSIS. TX writes DR with a single store to avoid the additional destructive read introduced by this SDK's LL transmitter DR read-modify-write. C explicitly maintains compound CR1 commands, ADDR/STOPF sequences after observing SR1, complete cold snapshot restoration and bounded reset/withdrawal. A generic HAL listener callback's completion point does not include proof that Nexus borrows have ended, nor can an individual LL setter replace the requirement to issue the combined PEC command in one CR1 write, then perform no further CR1 writes until hardware clears PEC."
+
+msgid "依据为 RM0090 Rev22 §27.3.2、§27.3.7、§27.3.9、§27.6，DS8626 Rev12 AF4 表及 ES0182 Rev19 §2.10.2/§2.10.5。GoogleTest/Mock 建立软件行为， ARM ELF 建立构建和资源证据。PCB、电气、外部 controller 和真实 SCL 时序的 物理状态仍为 `not_executed`。"
+msgstr "The references are RM0090 Rev22 §27.3.2, §27.3.7, §27.3.9 and §27.6, the DS8626 Rev12 AF4 table, and ES0182 Rev19 §2.10.2/§2.10.5. GoogleTest/Mock establishes software behavior; ARM ELF establishes build and resource evidence. Physical PCB, electrical, external-controller and actual SCL timing status remains `not_executed`."
+
+msgid "静态选择与生命周期"
+msgstr "Static selection and lifecycle"
+
+msgid "TOML `target-irq` 选择普通 I2C target，`smbus-device` 选择 SMBus device。 `own_address`、`address_bits`、`second_address`、`max_hz`、 `irq_latency_us`、`pec`、`alert` 和 IRQ policy 均显式提供。 `max_hz` 是外部 SCL 的集成上界；本 target 不生成总线频率。 实际 APB1 频率来自唯一 ClockPlan，C 使用相同的 `NEXUS_APB1_HZ` 核对 CR2.FREQ。输入必须为整 MHz，标准模式至少 2 MHz，Fast 模式至少 4 MHz。"
+msgstr "TOML `target-irq` selects an ordinary I2C target; `smbus-device` selects an SMBus device. `own_address`, `address_bits`, `second_address`, `max_hz`, `irq_latency_us`, `pec`, `alert` and IRQ policy are all explicit. `max_hz` is the integration upper bound for external SCL; this target does not generate the bus frequency. The actual APB1 frequency comes from the single ClockPlan, and C uses the same `NEXUS_APB1_HZ` to verify CR2.FREQ. That input must be an integer number of MHz: at least 2 MHz in Standard mode and at least 4 MHz in Fast mode."
+
+msgid "普通 target 接受 7 位或 10 位自身地址。双地址只适用于两个不同的普通 7 位地址，第二地址为零表示不启用比较器。SMBus device 使用 7 位地址和 至多 100 kHz 的外部 SCL。`alert=true` 必须选择 Board 已声明的第三条 SMBA 路线；不得从两条 SCL/SDA 线推断实际 PCB 有 SMBA。"
+msgstr "An ordinary target accepts a 7-bit or 10-bit own address. Dual addressing applies only to two distinct ordinary 7-bit addresses; a zero second address disables that comparator. An SMBus device uses a 7-bit address and external SCL of at most 100 kHz. `alert=true` must select a third SMBA route explicitly declared by the Board. Two SCL/SDA wires do not establish that the actual PCB has SMBA."
+
+msgid "`nx_factory_i2c_target()` 只返回既有不可变 face。Platform 的只读 admission 先于 System clock effects，拒绝已供钟的活动 I2C、NVIC 引用和被占用的 pad。 System RUN 建立后，C cold prepare 才取得 gate、配置 AF4 open-drain、OAR1/2、 SMBus/PEC 和 IRQ priority，并逐项读回。未有请求时 ACK 关闭。 失败取得的资源保留在同一个 exact receipt；close 成功后才可回收静态存储。 关闭后保留 generation 计数，不能通过重启静态 state 重新接受旧 READY。"
+msgstr "`nx_factory_i2c_target()` returns only an existing immutable face. Platform read-only admission precedes System clock effects and rejects an already-clocked active I2C instance, NVIC references and occupied pads. Only after System RUN is established does C cold prepare acquire the gate, configure AF4 open-drain, OAR1/2, SMBus/PEC and IRQ priority, and read back each item. ACK is disabled while no request exists. Resources acquired during a failed initialization remain in the same exact receipt; static storage can be reclaimed only after close succeeds. Closing preserves the generation counter, so restarting static state cannot re-admit an old READY request."
+
+msgid "有限交换与借用"
+msgstr "Finite exchanges and borrowing"
+
+msgid "caller 先初始化 request，再通过对应 port prepare 一个有限 Core deadline："
+msgstr "The caller initializes the request, then prepares it through the corresponding port with a finite Core deadline:"
+
+msgid "direction"
+msgstr "direction"
+
+msgid "caller spans"
+msgstr "caller spans"
+
+msgid "wire 结束证据"
+msgstr "Wire completion evidence"
+
+msgid "`RECEIVE`"
+msgstr "`RECEIVE`"
+
+msgid "1..256 字节可写 RX capacity"
+msgstr "Writable RX capacity of 1..256 bytes"
+
+msgid "自身地址后的 STOPF"
+msgstr "STOPF after an own-address match"
+
+msgid "`TRANSMIT`"
+msgstr "`TRANSMIT`"
+
+msgid "1..256 字节不可变 TX"
+msgstr "Immutable TX of 1..256 bytes"
+
+msgid "最后一个 payload 字节后的 AF/NACK；启用 PEC 时须在 PEC 后"
+msgstr "AF/NACK after the final payload byte, or after PEC when enabled"
+
+msgid "`WRITE_READ`"
+msgstr "`WRITE_READ`"
+
+msgid "两个互不重叠的有界 span，预计算响应"
+msgstr "Two bounded, non-overlapping spans with a precomputed response"
+
+msgid "RX 后一次 Sr，再完成 TX"
+msgstr "One Sr after RX, followed by TX completion"
+
+msgid "`ALERT_RESPONSE`"
+msgstr "`ALERT_RESPONSE`"
+
+msgid "无 caller payload"
+msgstr "No caller payload"
+
+msgid "ARA 自身地址字节，及可选 PEC 后的 AF"
+msgstr "AF after the ARA own-address byte and optional PEC"
+
+msgid "prepare 只绑定 owner、generation、System time epoch 和 span，不写 I2C/pad。 已有 System 时钟的读操作仍可维护其共享计数器，不会取得新的 clock owner。 submit 先建立 ACCEPTED borrow，再开放地址 ACK 或 ARA ALERT。 10 位读支持硬件要求的空 receiver 前导地址及随后的读 header。 DUALF 决定实际报告的自身地址，不用静态首地址冒充匹配结果。 计数使用 `size_t`，256 字节边界不会回绕；计数不含地址或 PEC。"
+msgstr "Prepare binds only the owner, generation, System time epoch and spans; it writes no I2C or pad registers. Reading the existing System clock may still maintain its shared counter; it acquires no new clock owner. Submit establishes the ACCEPTED borrow before enabling address ACK or ARA ALERT. A 10-bit read supports the hardware-required receiver-mode address preamble with no payload, followed by the read header. DUALF determines the actual reported own address; the static first address is not substituted for the match result. Counts use `size_t` and do not wrap at the 256-byte boundary. They exclude addresses and PEC."
+
+msgid "IRQ 在已观察到 ADDR 后才允许 SR1→SR2 的破坏性清除序列。 它先读取旧 receiver 管线，再处理 Sr 的新方向；不在普通轮询中读取 SR2， 避免清除恰好晚到的 ADDR。STOPF 前先排空最多两个实际 RX 管线字节，随后 fresh SR1→CR1 清除。TX 在 ADDR 后先装首字节，后续只在 BTF 时装下一字节。 这个有意的逐字节 clock stretching 不会预取另一个 caller 字节。 IRQ 只搬字节和锁存结果，不能发布 SETTLED。"
+msgstr "IRQ permits the destructive SR1→SR2 clear sequence only after observing ADDR. It first reads the old receiver pipeline, then handles the new direction of Sr. Ordinary polling does not read SR2, avoiding accidental clearing of a newly arriving ADDR. Before clearing STOPF it drains at most two actual RX pipeline bytes, then uses a fresh SR1→CR1 clear sequence. TX loads the first byte after ADDR and subsequent bytes only on BTF. This deliberate per-byte clock stretching does not prefetch another caller byte. IRQ only moves bytes and latches results; it cannot publish SETTLED."
+
+msgid "Thread service 处理 deadline、cancel 和退出。C 关闭 publisher 后，通过本 controller 的实际 reset、PE/ACK/ALERT 读回及两个 NVIC 向量的 disable、pending clear、active=0 证明退出，再断开 active 指针并 release-publish SETTLED。 失败排空保持 QUARANTINED 和同一 borrow；调用者继续保存 request、span、state 和 receipt，待真实退出后重试。reset 只释放自身输出，不证明共享总线已经恢复， 也不会自动 GPIO clock-pulse 或重试应用数据。"
+msgstr "Thread service handles deadlines, cancellation and withdrawal. After C closes the publisher, it proves withdrawal through an actual reset of this controller, PE/ACK/ALERT readback, and disabling both NVIC vectors, clearing pending status and observing active=0. It then detaches the active pointer and release-publishes SETTLED. Failed drain retains QUARANTINED and the same borrow. The caller must keep the request, spans, state and receipt alive until actual withdrawal permits a retry. Reset releases only this controller's outputs; it does not prove that the shared bus has recovered, automatically generate GPIO clock pulses or retry application data."
+
+msgid "每次准备、提交、IRQ payload 访问前后均核对实际 RUN/时钟和同一 epoch。 失域后不再调用旧 Core 时间；cleanup 仍能撤回自身资源。Platform suspend 使用 同一个 C close；恢复只重新建立冷态 owner 和新 epoch，不重放请求。"
+msgstr "Each prepare, submit and IRQ payload access checks actual RUN/clock state and the same epoch both before and after. Once that domain is lost, the old Core time is no longer called; cleanup can still withdraw this owner's resources. Platform suspend uses the same C close. Resume only re-establishes a cold owner and new epoch; it does not replay requests."
+
+msgid "SMBus 的明确边界"
+msgstr "Explicit SMBus boundaries"
+
+msgid "PEC 实际使用 CR1.ENPEC/PEC。RX-only 交换接收恰好 capacity 个 payload 字节， 随后接收独立 PEC。WRITE_READ 的 CRC 连续覆盖 W 地址、RX payload、Sr R 地址 和 TX payload，只在最终 TX 末尾追加 PEC。软件 CRC-8 独立核对接收数据， 不靠读取 SR2 取得 CRC。PEC 命令的拒绝、硬件 PECERR 和过晚的 RX 管线均不能 报告成功。"
+msgstr "PEC actually uses CR1.ENPEC/PEC. An RX-only exchange receives exactly capacity payload bytes followed by a separate PEC. WRITE_READ CRC continuously covers the W address, RX payload, Sr R address and TX payload, appending PEC only at the end of the final TX. Software CRC-8 independently checks received data without reading SR2 to obtain CRC. A rejected PEC command, hardware PECERR or an RX pipeline observed too late cannot result in success."
+
+msgid "`irq_latency_us` 包含 IRQ entry 和 PEC 定位前全部非等待工作。选择 PEC 要求 该声明严格小于六个外部最大 SCL bit 周期。clock stretching 在 ADDR/BTF 点 提供背压，但不能倒退已经经过的 PEC ACK 窗口。模型和软件 CRC 不证明物理 ACK 时序，也不能保证运行期发现每一种被违反的集成预算。"
+msgstr "`irq_latency_us` includes IRQ entry and all non-waiting work before PEC positioning. Selecting PEC requires this declaration to be strictly less than six bit periods at the maximum external SCL frequency. Clock stretching provides backpressure at ADDR/BTF, but cannot undo an already elapsed PEC ACK window. Models and software CRC neither prove physical ACK timing nor guarantee runtime detection of every violated integration budget."
+
+msgid "TIMEOUT、PECERR、BERR、ARLO、OVR 保留独立 diagnostics。仅 TIMEOUT 的硬件失败 报告 TIMEOUT；同时出现其他损坏标志时报告 IO 并保留全部 observed faults。 ALERT_RESPONSE 是一个显式、有限、被借用的请求，才会拉低 SMBA 并响应 ARA。 内部发送自身 7 位地址左移一位，低位为零。ARA 仲裁丢失可在原 deadline 内等待 下一次 ARA；若启用 PEC，按 RM0090 的 ARLO 限制重建本 controller 的硬件 CRC 状态。它不延长 deadline、不重试 caller 数据，也不产生后台告警策略。"
+msgstr "TIMEOUT, PECERR, BERR, ARLO and OVR retain separate diagnostics. When TIMEOUT is the only hardware fault, the result is TIMEOUT; if other corruption flags occur at the same time, the result is IO with all observed faults retained. Only an explicit, finite, borrowed ALERT_RESPONSE request pulls SMBA low and responds to ARA. It internally transmits its own 7-bit address shifted left one bit, with the low bit zero. After losing ARA arbitration, it may wait for the next ARA within the original deadline. If PEC is enabled, this controller's hardware CRC state is rebuilt according to the RM0090 ARLO restriction. This neither extends the deadline, retries caller data nor creates a background alert policy."
+
+msgid "ES0182 §2.10.2 指出硬件无法按任意无效 byte/command 返回 NACK，因此此接口不 声称实现完整 SMBus v2.0 标准。应用命令验证、寄存器含义、报警条件、host-notify、 ARP、业务重试和错误恢复策略由外部产品提供。NOSTRETCH 始终为零，遵守 §2.10.5 对 target transmitter 的 clock stretching 工作区。"
+msgstr "ES0182 §2.10.2 states that hardware cannot return NACK for arbitrary invalid bytes/commands, so this interface does not claim complete SMBus v2.0 conformance. External products supply application command validation, register semantics, alert conditions, host-notify, ARP, application retries and error recovery policy. NOSTRETCH is always zero, retaining clock stretching for the target transmitter as required by §2.10.5."

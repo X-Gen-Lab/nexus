@@ -15,17 +15,24 @@ foreach(required "${stm32_device}/Include/${stm32_device_header}.h"
     endif()
 endforeach()
 include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/platform/ControllerModes.cmake")
-set(stm32_sources reset.c drivers/platform_coordinator.c drivers/platform_lifecycle.c
+set(stm32_sources reset.c supervision.c drivers/platform_coordinator.c drivers/platform_lifecycle.c
     drivers/system_lifecycle.c drivers/chip.c
     drivers/lifecycle_pins.c)
 set(stm32_uart_hal OFF)
-foreach(kind gpio uart spi i2c flash watchdog exti pwm encoder adc dac crc can usb_device eth eth_frames
-        timer_capture advanced_pwm block rtc external_bus)
+set(stm32_usb_host_hal OFF)
+set(stm32_libraries)
+foreach(kind gpio uart spi i2c i2c_target flash watchdog exti pwm encoder adc adc_group dac crc can usb_device usb_host eth eth_frames
+        timer_capture advanced_pwm block rtc external_bus capture audio entropy
+        pwm_group timer_pulse timer_sequence)
     nexus_controller_modes(modes "${kind}")
     if(NOT modes)
         continue()
     endif()
-    if(kind STREQUAL "eth")
+    if(kind MATCHES "^(pwm_group|timer_pulse|timer_sequence)$")
+        list(APPEND stm32_sources drivers/av.c drivers/timer_waveform.c)
+    elseif(kind STREQUAL "capture" OR kind STREQUAL "audio")
+        list(APPEND stm32_sources drivers/av.c "drivers/${kind}.c")
+    elseif(kind STREQUAL "eth")
         list(APPEND stm32_sources drivers/ethernet.c)
     elseif(kind STREQUAL "eth_frames")
         list(APPEND stm32_sources drivers/ethernet_frames.c)
@@ -51,6 +58,14 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm encoder adc dac crc can u
                 list(APPEND stm32_sources drivers/timer_capture_tim3.c)
             elseif(timer STREQUAL "TIM5")
                 list(APPEND stm32_sources drivers/timer_capture_tim5.c)
+            elseif(timer STREQUAL "TIM1")
+                list(APPEND stm32_sources drivers/timer_capture_tim1.c)
+            elseif(timer STREQUAL "TIM8")
+                list(APPEND stm32_sources drivers/timer_capture_tim8.c)
+            elseif(timer MATCHES "^TIM(9|1[0-4])$")
+                string(TOLOWER "${timer}" timer_source_name)
+                list(APPEND stm32_sources
+                    "drivers/timer_capture_${timer_source_name}.c")
             else()
                 message(FATAL_ERROR "Unreviewed capture timer: ${timer}")
             endif()
@@ -73,15 +88,22 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm encoder adc dac crc can u
         list(APPEND stm32_sources drivers/sdio.c)
     elseif(kind STREQUAL "external_bus")
         list(APPEND stm32_sources drivers/fsmc.c)
+    elseif(kind STREQUAL "spi")
+        if("short-poll" IN_LIST modes OR "dma" IN_LIST modes)
+            list(APPEND stm32_sources drivers/spi.c)
+        endif()
     else()
         list(APPEND stm32_sources "drivers/${kind}.c")
     endif()
     # Pin acquisition and rollback share GPIO helpers, including CS/PWM pins.
-    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|encoder|adc|dac|can|usb_device|eth|eth_frames|timer_capture|advanced_pwm|block|external_bus)$"
+    if(kind MATCHES "^(gpio|uart|spi|i2c|i2c_target|exti|pwm|encoder|adc|adc_group|dac|can|usb_device|usb_host|eth|eth_frames|timer_capture|advanced_pwm|block|external_bus|capture|audio|pwm_group|timer_pulse|timer_sequence)$"
         AND (NOT kind STREQUAL "exti" OR "edge-event" IN_LIST modes))
         list(APPEND stm32_sources drivers/gpio.c)
     endif()
     if(kind STREQUAL "uart")
+        if("irq-wire" IN_LIST modes)
+            list(APPEND stm32_sources drivers/uart_wire.c)
+        endif()
         list(APPEND stm32_sources drivers/uart_cold.c drivers/uart_hardware.c drivers/lifecycle_uart.c)
         if("irq-words" IN_LIST modes)
             list(APPEND stm32_sources drivers/uart_word.c)
@@ -108,7 +130,12 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm encoder adc dac crc can u
     elseif(kind STREQUAL "gpio")
         list(APPEND stm32_sources drivers/lifecycle_gpio.c)
     elseif(kind STREQUAL "spi")
-        list(APPEND stm32_sources drivers/lifecycle_spi.c)
+        if("short-poll" IN_LIST modes OR "dma" IN_LIST modes)
+            list(APPEND stm32_sources drivers/lifecycle_spi.c)
+        endif()
+        if("irq-frames" IN_LIST modes)
+            list(APPEND stm32_sources drivers/spi_frames.c drivers/spi_frames_cold.c)
+        endif()
         if("dma" IN_LIST modes)
             list(APPEND stm32_sources drivers/spi_dma.c)
         endif()
@@ -127,6 +154,19 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm encoder adc dac crc can u
     elseif(kind STREQUAL "usb_device")
         list(APPEND stm32_sources usb_clock.c
             drivers/ip/fs_device_pio/usb_device_controller.c)
+        if("device-hs-fs" IN_LIST modes OR "device-hs-ulpi" IN_LIST modes
+                OR "otg-hs-fs" IN_LIST modes OR "otg-hs-ulpi" IN_LIST modes)
+            list(APPEND stm32_sources usb_hs_clock.c)
+        endif()
+        if("otg-fs" IN_LIST modes OR "otg-hs-fs" IN_LIST modes
+                OR "otg-hs-ulpi" IN_LIST modes)
+            set(stm32_usb_host_hal ON)
+            list(APPEND stm32_sources drivers/usb_otg.c drivers/usb_host.c
+                usb_hs_clock.c)
+            list(APPEND stm32_libraries Nexus::IOUSBOTG Nexus::USBRole)
+        endif()
+    elseif(kind STREQUAL "usb_host")
+        set(stm32_usb_host_hal ON)
     elseif(kind STREQUAL "can")
         list(APPEND stm32_sources drivers/ip/classic_can/can_controller.c)
     elseif(kind STREQUAL "dac")
@@ -139,21 +179,31 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm encoder adc dac crc can u
         endif()
         if("trigger-dma" IN_LIST modes
             OR "trigger-dma-continuous" IN_LIST modes)
-            list(APPEND stm32_sources drivers/adc_stream.c)
+            list(APPEND stm32_sources drivers/adc_stream.c drivers/adc_trigger.c)
         endif()
         if("trigger-dma-continuous" IN_LIST modes)
             list(APPEND stm32_sources drivers/adc_continuous.c)
         endif()
+    elseif(kind STREQUAL "adc_group")
+        list(APPEND stm32_sources drivers/adc_trigger.c)
     endif()
 endforeach()
 list(REMOVE_DUPLICATES stm32_sources)
 list(APPEND stm32_sources drivers/platform_cold.c)
+if("flash_async" IN_LIST NEXUS_SELECTED_KINDS)
+    list(APPEND stm32_sources drivers/fsmc_nor.c)
+endif()
+if("nand" IN_LIST NEXUS_SELECTED_KINDS)
+    list(APPEND stm32_sources drivers/fsmc_nand.c)
+endif()
 add_library(nexus_soc_stm32f4 STATIC ${stm32_sources})
-target_link_libraries(nexus_soc_stm32f4 PUBLIC nexus_io
+target_link_libraries(nexus_soc_stm32f4 PUBLIC nexus_io ${stm32_libraries}
     PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
 target_include_directories(nexus_soc_stm32f4 PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/private"
     "${CMAKE_CURRENT_SOURCE_DIR}/../../../io/private")
+target_include_directories(nexus_soc_stm32f4 PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(nexus_soc_stm32f4 PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers/ip/i2c_v1_async"
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers/ip/classic_can"
@@ -164,6 +214,16 @@ target_include_directories(nexus_soc_stm32f4 SYSTEM PRIVATE
     "${stm32_device}/Include")
 nexus_use_cmsis_core(nexus_soc_stm32f4)
 target_compile_definitions(nexus_soc_stm32f4 PRIVATE ${NEXUS_STM32_DEVICE})
+nexus_controller_modes(stm32_timer_pulse_modes timer_pulse)
+if(stm32_timer_pulse_modes)
+    target_compile_definitions(nexus_soc_stm32f4 PRIVATE
+        NEXUS_STM32_TIMER_PULSE=1)
+endif()
+nexus_controller_modes(stm32_timer_sequence_modes timer_sequence)
+if(stm32_timer_sequence_modes)
+    target_compile_definitions(nexus_soc_stm32f4 PRIVATE
+        NEXUS_STM32_TIMER_SEQUENCE=1)
+endif()
 nexus_controller_modes(stm32_i2c_modes i2c)
 if("irq-messages" IN_LIST stm32_i2c_modes OR
         "dma-messages" IN_LIST stm32_i2c_modes)
@@ -175,6 +235,10 @@ nexus_stm32f4_official(nexus_soc_stm32f4)
 if(stm32_uart_hal)
     nexus_stm32f407_uart_hal(nexus_soc_stm32f4)
 endif()
+if(stm32_usb_host_hal)
+    include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32USB.cmake")
+    nexus_stm32f407_usb_hal(nexus_soc_stm32f4 HOST)
+endif()
 nexus_controller_modes(stm32_block_modes block)
 if(stm32_block_modes)
     include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32SDIO.cmake")
@@ -185,6 +249,18 @@ if(stm32_external_bus_modes)
     include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32FSMC.cmake")
     nexus_stm32f407_fsmc_ll(nexus_soc_stm32f4)
 endif()
+nexus_controller_modes(stm32_capture_modes capture)
+if(stm32_capture_modes)
+    include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Capture.cmake")
+    nexus_stm32f407_capture_hal(nexus_soc_stm32f4)
+    if(NEXUS_EXACT_PART STREQUAL "STM32F407VET6")
+        target_compile_definitions(nexus_soc_stm32f4 PRIVATE
+            NX_STM32_CAPTURE_MAX_BITS=12U)
+    else()
+        target_compile_definitions(nexus_soc_stm32f4 PRIVATE
+            NX_STM32_CAPTURE_MAX_BITS=14U)
+    endif()
+endif()
 set(NEXUS_STARTUP_SOURCE
     "${stm32_device}/Source/Templates/gcc/${NEXUS_STM32_STARTUP}" PARENT_SCOPE)
 set(stm32_system_includes
@@ -193,6 +269,10 @@ set(stm32_system_includes
 if(stm32_uart_hal)
     list(APPEND stm32_system_includes
         "${CMAKE_CURRENT_SOURCE_DIR}/private/hal"
+        "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Inc")
+endif()
+if(stm32_usb_host_hal)
+    list(APPEND stm32_system_includes
         "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Inc")
 endif()
 set(NEXUS_SYSTEM_PRIVATE_INCLUDES ${stm32_system_includes} PARENT_SCOPE)
@@ -230,13 +310,17 @@ function(nexus_add_stm32f407_sleep target)
     get_filename_component(sleep_source
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../.." ABSOLUTE)
     add_library(${target} STATIC EXCLUDE_FROM_ALL
-        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/sleep.c")
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/sleep.c"
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/power.c")
     nexus_apply_target_policy(${target})
-    target_link_libraries(${target} PRIVATE Nexus::ClockDomain Nexus::Arch
+    target_link_libraries(${target} PUBLIC Nexus::ClockDomain Nexus::IORTC
+        PRIVATE Nexus::Arch
         nexus_build_options nexus_owned_warnings)
     target_include_directories(${target} PRIVATE
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/private"
         "${sleep_source}/components/clock_domain/private")
+    target_include_directories(${target} PUBLIC
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/include")
     target_include_directories(${target} SYSTEM PRIVATE
         "${sleep_source}/vendors/st/cmsis_device_f4/Include")
     nexus_use_cmsis_core(${target})
@@ -260,5 +344,3 @@ if(NEXUS_OS_TIMEBASE_LOWPOWER)
     set(NEXUS_SYSTEM_COMPILE_DEFINITIONS ${NEXUS_STM32_DEVICE}
         NEXUS_TIMEBASE_LOWPOWER=1 PARENT_SCOPE)
 endif()
-
-include("${CMAKE_CURRENT_LIST_DIR}/Entropy.cmake")

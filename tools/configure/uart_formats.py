@@ -50,6 +50,8 @@ def _fifo(selection, route, provider):
 
 def validate(selection, route, provider):
     """Do not infer flow-control wiring or reinterpret word data as bytes."""
+    from tools.configure import uart_wires
+    uart_wires.validate(selection, route, provider)
     _fifo(selection, route, provider)
     policy = getattr(provider, "UART_FORMATS", _NO_FORMATS)
     if "irq_probe" in selection:
@@ -192,7 +194,7 @@ def normalize_authored(selection, name, obj):
     """Flatten only UART authoring; hardware and mode selection stay later."""
     obj(selection, {"id", "authored_kind", "binding", "mode", "baud",
                     "rx", "irq"},
-        {"frame", "stream", "fifo"}, f"uart.{name}")
+        {"frame", "stream", "fifo", "wire"}, f"uart.{name}")
     rx = obj(selection.pop("rx"), {"format"}, {"capacity"}, f"uart.{name}.rx")
     irq = obj(selection.pop("irq"), {"priority"}, {"calls_os", "probe"},
               f"uart.{name}.irq")

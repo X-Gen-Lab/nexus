@@ -34,7 +34,7 @@ try:
         stm32g4_hal_lock, stm32h5_device_lock, stm32h5_hal_lock,
         stm32h7_hal_lock, stm32u5_hal_lock,
         stm32g4_lock, threadx_lock, freertos_transport, lwip_lock, mbedtls_lock,
-        coremqtt_lock, mcuboot_lock,
+        coremqtt_lock, mcuboot_lock, st_usb_lock,
     )
     from tools.configure.metadata import load_policy, parse_json, snapshot
     from tools.configure import dependencies as configuration_dependencies
@@ -258,6 +258,7 @@ REQUIRED_FILES = (
     'cmake/platform/SDK.cmake',
     'cmake/platform/STM32FSMC.cmake',
     'cmake/platform/STM32Official.cmake',
+    'cmake/platform/STM32USB.cmake',
     'cmake/platform/STM32SDIO.cmake',
     'cmake/platform/TargetPolicy.cmake',
     'cmake/platform/Workload.cmake',
@@ -391,9 +392,20 @@ REQUIRED_FILES = (
     'components/usb_control/include/nexus/components/usb_acm.h',
     'components/usb_control/include/nexus/components/usb_control.h',
     'components/usb_control/include/nexus/components/usb_descriptors.h',
+    'components/usb_control/include/nexus/components/usb_role.h',
     'components/usb_control/src/usb_acm.c',
     'components/usb_control/src/usb_control.c',
     'components/usb_control/src/usb_descriptors.c',
+    'components/usb_control/src/usb_role.c',
+    'components/st_usb/CMakeLists.txt',
+    'components/st_usb/private/usbh_conf.h',
+    'components/st_usb/private/usb_host_stack.h',
+    'components/st_usb/src/usb_host_stack.c',
+    'components/st_usb_device/CMakeLists.txt',
+    'components/st_usb_device/private/usbd_conf.h',
+    'components/st_usb_device/private/usb_device_stack.h',
+    'components/st_usb_device/src/usb_device_stack.c',
+    'tools/maintenance/st_usb_lock.py',
     'components/user_io_broker/CMakeLists.txt',
     'components/user_io_broker/include/nexus/components/user_io_async.h',
     'components/user_io_broker/include/nexus/components/user_io_async_storage.h',
@@ -499,6 +511,7 @@ REQUIRED_FILES = (
     'io/include/nexus/io/uart_word.h',
     'io/include/nexus/io/usb_activation.h',
     'io/include/nexus/io/usb_device.h',
+    'io/include/nexus/io/usb_host.h',
     'io/include/nexus/io/usb_profile.h',
     'io/include/nexus/io/wake.h',
     'io/include/nexus/io/watchdog.h',
@@ -538,6 +551,7 @@ REQUIRED_FILES = (
     'io/src/api/uart.c',
     'io/src/api/uart_word.c',
     'io/src/api/usb_device.c',
+    'io/src/api/usb_host.c',
     'io/src/api/watchdog.c',
     'io/src/mechanisms/adc_format.c',
     'io/src/mechanisms/adc_observer.c',
@@ -630,7 +644,6 @@ REQUIRED_FILES = (
     'scripts/ci/verify_vendor_source.py',
     'scripts/validation/junit.py',
     'soc/stm32/stm32f4/CMakeLists.txt',
-    'soc/stm32/stm32f4/Entropy.cmake',
     'soc/stm32/stm32f4/README.md',
     'soc/stm32/stm32f4/drivers/adc.c',
     'soc/stm32/stm32f4/drivers/adc_continuous.c',
@@ -648,7 +661,6 @@ REQUIRED_FILES = (
     'soc/stm32/stm32f4/drivers/i2c.c',
     'soc/stm32/stm32f4/drivers/i2c_async.c',
     'soc/stm32/stm32f4/drivers/i2c_cold.c',
-    'soc/stm32/stm32f4/drivers/i2s2_slave_tx.c',
     'soc/stm32/stm32f4/drivers/ip/advanced_timer/advanced_pwm_impl.h',
     'soc/stm32/stm32f4/drivers/ip/advanced_timer/timer_advanced_controller.h',
     'soc/stm32/stm32f4/drivers/ip/advanced_timer/timer_capture_impl.h',
@@ -679,10 +691,10 @@ REQUIRED_FILES = (
     'soc/stm32/stm32f4/drivers/uart_stream.c',
     'soc/stm32/stm32f4/drivers/uart_word.c',
     'soc/stm32/stm32f4/drivers/usb_device.c',
+    'soc/stm32/stm32f4/drivers/usb_host.c',
+    'soc/stm32/stm32f4/drivers/usb_hal_time.c',
     'soc/stm32/stm32f4/drivers/watchdog.c',
-    'soc/stm32/stm32f4/entropy_instance.c',
     'soc/stm32/stm32f4/handoff.c',
-    'soc/stm32/stm32f4/include/nexus/soc/stm32f407_entropy.h',
     'soc/stm32/stm32f4/memory_init.c',
     'soc/stm32/stm32f4/private/fsmc_hal/README.md',
     'soc/stm32/stm32f4/private/fsmc_hal/stm32f4xx_hal_conf.h',
@@ -708,7 +720,6 @@ REQUIRED_FILES = (
     'soc/stm32/stm32f4/private/stm32f407_i2c_async.h',
     'soc/stm32/stm32f4/private/stm32f407_i2c_cold.h',
     'soc/stm32/stm32f4/private/stm32f407_i2c_port.h',
-    'soc/stm32/stm32f4/private/stm32f407_i2s2_slave_tx.h',
     'soc/stm32/stm32f4/private/stm32f407_lowpower.h',
     'soc/stm32/stm32f4/private/stm32f407_packet_cold.h',
     'soc/stm32/stm32f4/private/stm32f407_platform_cold.h',
@@ -729,6 +740,9 @@ REQUIRED_FILES = (
     'soc/stm32/stm32f4/private/stm32f407_usb_clock.h',
     'soc/stm32/stm32f4/private/stm32f407_usb_cold.h',
     'soc/stm32/stm32f4/private/stm32f407_usb_device.h',
+    'soc/stm32/stm32f4/private/stm32f407_usb_host.h',
+    'soc/stm32/stm32f4/private/stm32f407_usb_host_cold.h',
+    'soc/stm32/stm32f4/private/usb_hal/stm32f4xx_hal_conf.h',
     'soc/stm32/stm32f4/private/uart_control.h',
     'soc/stm32/stm32f4/references.json',
     'soc/stm32/stm32f4/routes.json',
@@ -772,7 +786,6 @@ REQUIRED_FILES = (
     'tools/configure/gpio_phase.py',
     'tools/configure/i2c_timing.py',
     'tools/configure/i2c_timing_selection.py',
-    'tools/configure/i2s2.py',
     'tools/configure/integration_package.py',
     'tools/configure/io_traits.py',
     'tools/configure/ir.py',
@@ -808,7 +821,6 @@ REQUIRED_FILES = (
     'tools/configure/stm32f4/fsmc.py',
     'tools/configure/stm32f4/gpio.py',
     'tools/configure/stm32f4/hardware.py',
-    'tools/configure/stm32f4/i2s2.py',
     'tools/configure/stm32f4/integration.py',
     'tools/configure/stm32f4/packet.py',
     'tools/configure/stm32f4/preflight.py',
@@ -821,6 +833,7 @@ REQUIRED_FILES = (
     'tools/configure/trigger_graph.py',
     'tools/configure/uart_formats.py',
     'tools/configure/usb_device.py',
+    'tools/configure/usb_host.py',
     'tools/configure/usb_profiles.py',
     'tools/dev/artifacts.py',
     'tools/dev/cache.py',
@@ -861,8 +874,6 @@ REQUIRED_FILES = (
     'tools/measurement/workload.c',
 )
 REQUIRED_FILES += (
-    'components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt',
-    'components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h',
     'io/src/api/rtc.c',
     'io/include/nexus/io/lptim.h',
     'io/include/nexus/io/rtc.h',
@@ -995,6 +1006,9 @@ def dependency_required_files(root, profile):
         elif path == stm32f4_hal_lock.DIRECTORY:
             lock = parse_json(regular(root, stm32f4_hal_lock.LOCK_NAME).read_bytes())
             names.update(path + "/" + name for name in stm32f4_hal_lock.contract(lock))
+        elif path in {"vendors/st/usb_host", "vendors/st/usb_device"}:
+            lock = parse_json(regular(root, item.source_lock).read_bytes())
+            names.update(path + "/" + name for name in lock["files"])
         elif path == "ext/freertos":
             names.update(FREERTOS_REQUIRED_FILES)
         elif path == "ext/threadx":
@@ -1430,6 +1444,14 @@ def verify_selected_dependencies(root, records, *, source_sdk=False):
         mbedtls_lock.verify(root / "ext/mbedtls", root / mbedtls_lock.LOCK_NAME,
                             **({"source_sdk": True, "dependency_records": list(records.values())}
                                 if source_sdk else {}))
+    for role in ("device", "host"):
+        path = "vendors/st/usb_" + role
+        if path not in records:
+            continue
+        identity = st_usb_lock.verify(root, role, source_sdk=source_sdk)
+        if (records[path]["commit"], records[path]["tree"]) != (
+                identity["commit"], identity["tree"]):
+            raise SDKError("ST USB package identity differs from reviewed source")
     for official in OFFICIAL_DRIVERS:
         if official.DIRECTORY not in records:
             continue

@@ -7,15 +7,18 @@ Selection also requires `tickless = true`, SysTick, a single privileged
 security domain and no MPU profile. CPU-only Runtime configurations reject this
 selection because they have no reviewed SoC timer, clock or IRQ facts.
 
-This binding uses shallow Sleep. The fixed clock and 1 MHz monotonic timer keep
+This binding uses shallow Sleep. The selected static clock and 1 MHz monotonic timer keep
 running. It does not enter STOP, suspend clocks, select a different tick source,
 configure a wake pin or make board electrical claims.
 
 | SoC | Clock / timer | Private compare | Existing shared owner |
 | --- | --- | --- | --- |
-| STM32F407 | HSE8 / PLL168, TIM2 PSC83 | CC1, CCR1 | TIM2 update / 64-bit epoch |
+| STM32F407 | Selected ClockPlan; default HSE8 / PLL168, TIM2 PSC83 | CC1, CCR1 | TIM2 update / 64-bit epoch |
 
-The timer is already exclusively reserved by the platform timebase. No output
+The timer is already exclusively reserved by the platform timebase. Selected
+custom profiles derive the timer prescaler and core-cycle conversion from that
+same plan. A profile is usable only when every runtime timer/IRQ condition below
+is observed; a nominal clock calculation alone does not establish it. No output
 channel is connected to a pin. The getter only inspects the established profile:
 the actual PLL tuple, oscillator/source ready bits, mux/bus dividers, Flash
 latency and disabled spread spectrum; the free-running upward timer mode,

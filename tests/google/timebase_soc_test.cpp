@@ -1,7 +1,9 @@
 /**
  * \file            timebase_soc_test.cpp
- * \brief           Actual reviewed SoC sleep binding and timer channel
- * ownership \author          Nexus Team \version         1.0.0 \date 2026-10-11
+ * \brief           Actual SoC sleep binding and timer channel ownership
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
@@ -157,8 +159,9 @@ TEST_F(TimebaseSoC, ReservedCompareKeepsOverflowAndHasExplicitBorrowState) {
     EXPECT_EQ(TIMER_ENABLE, 1U);
     EXPECT_TRUE(LOWPOWER_BUSY());
     face->resume_tick(face->context, now + 1000U);
-    EXPECT_FALSE(LOWPOWER_BUSY());
+    EXPECT_TRUE(LOWPOWER_BUSY());
     SysTick_Handler();
+    EXPECT_FALSE(LOWPOWER_BUSY());
     EXPECT_EQ(ticks, 1U);
 }
 } /* namespace */

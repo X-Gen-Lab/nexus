@@ -33,6 +33,10 @@ typedef struct {
     size_t bank_count;
     nx_clock_t clock;
     bool boot_backed;
+    /** Optional exact bank_count array; NULL retains legacy NE3/NE4 facts. */
+    const nx_stm32_fsmc_parameters_t* parameters;
+    /** Generic profiles require exact LQFP package 100 or 144. */
+    uint16_t package_pins;
 } nx_stm32_fsmc_config_t;
 
 struct nx_stm32_fsmc;
@@ -178,6 +182,44 @@ nx_result_t nx_stm32_fsmc_stop(nx_stm32_fsmc_t* bus);
  */
 nx_result_t nx_stm32_fsmc_sram_acquire(nx_stm32_fsmc_t* bus,
                                        nx_stm32_fsmc_lease_t* lease);
+
+/** \brief Borrow one explicitly selected bank through the same FSMC owner.
+ * \param[in,out] bus: Prepared serialized privileged Thread owner.
+ * \param[in] index: Selected configuration-array index, not a bank number.
+ * \param[in,out] lease: Fresh zero, internal stable distinct storage.
+ * \return SUCCESS or rejection without retained references or new effects.
+ * \note Generic NOR/NAND command owners keep this loan until actual idle.
+ */
+nx_result_t nx_stm32_fsmc_acquire(nx_stm32_fsmc_t* bus, size_t index,
+                                  nx_stm32_fsmc_lease_t* lease);
+
+/** \brief Validate an exact lease and observe its selected decoder/gate.
+ * \param[in] lease: Same stable storage and immutable granted geometry.
+ * \return SUCCESS, STATE for stale lease or IO for missing hardware.
+ * \note Privileged serialized Thread call, no writes or ownership change.
+ */
+nx_result_t nx_stm32_fsmc_check(const nx_stm32_fsmc_lease_t* lease);
+
+/** \brief Validate a command endpoint/payload against all bus control spans.
+ * \param[in] bus: Prepared serialized unique owner.
+ * \param[in] storage: Complete representable internal/Flash span.
+ * \param[in] bytes: Positive extent.
+ * \param[in] writable: Reject physical Flash for mutable spans.
+ * \return True only for disjoint admitted storage; no hardware access.
+ * \note External payload memory requires separate lifetime handling and is
+ *       deliberately excluded by the finite command endpoints.
+ */
+bool nx_stm32_fsmc_storage(const nx_stm32_fsmc_t* bus, const void* storage,
+                           size_t bytes, bool writable);
+
+/** \brief Immutable endpoint context for a selected PSRAM memory window. */
+typedef struct {
+    nx_stm32_fsmc_t* bus;
+    size_t index;
+} nx_stm32_fsmc_window_t;
+
+/** \brief Same bus owner, context is an immutable selected bank binding. */
+extern const nx_memory_window_ops_t nx_stm32_fsmc_window_ops;
 
 /**
  * \brief           Return an exact SRAM or LCD bank lease after caller join

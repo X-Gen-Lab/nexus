@@ -145,6 +145,75 @@ TEST_F(Stm32Encoder, ThreeWidthsAndCountingModesKeepRawPositionAcrossStop) {
     }
 }
 
+TEST_F(Stm32Encoder, AdvancedTimersKeepRawPositionAndUseTheirApb2FilterClock) {
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+    for (TIM_TypeDef* timer : {TIM1, TIM8}) {
+        for (nx_encoder_mode_t mode :
+             {NX_ENCODER_MODE_X2_TI1, NX_ENCODER_MODE_X2_TI2,
+              NX_ENCODER_MODE_X4_TI12}) {
+            SCOPED_TRACE(timer);
+            SCOPED_TRACE(mode);
+            config = {timer, mode, 3U, 7U, false, true};
+            const nx_result_t prepared =
+                nx_stm32_encoder_prepare(&state, &config);
+            EXPECT_EQ(NX_SUCCESS, prepared);
+            if (prepared != NX_SUCCESS)
+                continue;
+            EXPECT_EQ(RCC_APB1ENR_TIM7EN, RCC->APB1ENR);
+            EXPECT_EQ(timer == TIM1 ? RCC_APB2ENR_TIM1EN : RCC_APB2ENR_TIM8EN,
+                      RCC->APB2ENR);
+            ASSERT_EQ(NX_SUCCESS, nx_encoder_start(&face));
+            timer->CNT = 0x1234abcdU;
+            nx_encoder_sample_t sample{};
+            ASSERT_EQ(NX_SUCCESS, nx_encoder_read(&face, &sample));
+            EXPECT_EQ(0xabcdU, sample.count);
+            nx_encoder_state_t info{};
+            ASSERT_EQ(NX_SUCCESS, nx_encoder_state(&face, &info));
+            EXPECT_EQ(168000000U, info.filter_clock_hz);
+            EXPECT_EQ(16U, info.counter_bits);
+            EXPECT_EQ(mode, info.mode);
+            ASSERT_EQ(NX_SUCCESS, nx_encoder_stop(&face));
+            EXPECT_EQ(0x1234abcdU, timer->CNT);
+            EXPECT_EQ(NX_SUCCESS, nx_stm32_encoder_close(&state));
+            EXPECT_EQ(0U, RCC->APB2ENR);
+        }
+    }
+}
+
+TEST_F(Stm32Encoder,
+       AdvancedForeignBreakStateAndFailedGateReleaseRetainOwners) {
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+    for (TIM_TypeDef* timer : {TIM1, TIM8}) {
+        SCOPED_TRACE(timer);
+        config = {timer, NX_ENCODER_MODE_X4_TI12, 0U, 0U, false, false};
+        const uint32_t gate =
+            timer == TIM1 ? RCC_APB2ENR_TIM1EN : RCC_APB2ENR_TIM8EN;
+        const unsigned peer = timer == TIM1 ? 24U : 43U;
+        NVIC->ISER[peer / 32U] |= 1U << (peer % 32U);
+        timer->BDTR = TIM_BDTR_MOE | TIM_BDTR_LOCK_0;
+        EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_encoder_prepare(&state, &config));
+        EXPECT_FALSE(state.initialized);
+        EXPECT_NE(0U, state.cold_effects);
+        EXPECT_EQ(TIM_BDTR_MOE | TIM_BDTR_LOCK_0, timer->BDTR);
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_close(&state));
+        timer->BDTR = 0U;
+        timer->CCER = TIM_CCER_CC1NE;
+        EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_encoder_prepare(&state, &config));
+        EXPECT_EQ(TIM_CCER_CC1NE, timer->CCER);
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_close(&state));
+        timer->CCER = 0U;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_prepare(&state, &config));
+        held = &RCC->APB2ENR;
+        held_mask = held_value = gate;
+        EXPECT_EQ(NX_ERROR_IO, nx_stm32_encoder_close(&state));
+        EXPECT_NE(0U, state.cold_effects);
+        EXPECT_EQ(&config, state.config);
+        held = nullptr;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_close(&state));
+        EXPECT_NE(0U, NVIC->ISER[peer / 32U] & (1U << (peer % 32U)));
+    }
+}
+
 TEST_F(Stm32Encoder, RefusedSourceWithdrawalKeepsSessionAndClockForRetry) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_prepare(&state, &config));
     ASSERT_EQ(NX_SUCCESS, nx_encoder_start(&face));

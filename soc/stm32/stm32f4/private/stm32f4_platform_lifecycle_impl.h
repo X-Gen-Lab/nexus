@@ -9,6 +9,7 @@
 #ifndef NEXUS_STM32F4_PLATFORM_LIFECYCLE_IMPL_H
 #define NEXUS_STM32F4_PLATFORM_LIFECYCLE_IMPL_H
 
+#include "stm32f407_clock.h"
 #include "stm32f4_platform_lifecycle.h"
 
 /** \brief Validate all optional connections before invoking any owner. */
@@ -131,6 +132,27 @@ static inline nx_result_t nx_stm32f4_platform_resources_release_local(
                ? NX_SUCCESS
                : config->clock_owner->release(config->dma_added,
                                               config->syscfg_added);
+}
+
+/** \brief Reacquire real shared pins after System has restored a RUN epoch. */
+static inline nx_result_t nx_stm32f4_platform_resources_resume_local(
+    const nx_stm32f4_platform_config_t* config) {
+    nx_result_t result = nx_stm32f4_platform_admit_local(config);
+    if (result != NX_SUCCESS)
+        return result;
+    if (!config->system->started || config->system->core_hz != NEXUS_CORE_HZ ||
+        config->system->timer_error != NX_SUCCESS ||
+        !nx_stm32_clock_profile_matches(config->system->rcc, NULL))
+        return NX_ERROR_STATE;
+    if (config->pins != NULL) {
+        result = config->pin_owner->preflight(config->selected);
+        if (result != NX_SUCCESS)
+            return result;
+        result = config->pin_owner->acquire(config->selected, config->pins);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+    return nx_stm32f4_platform_resources_acquire_local(config);
 }
 
 static inline nx_result_t nx_stm32f4_platform_system_release_local(

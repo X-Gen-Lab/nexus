@@ -24,6 +24,9 @@ void nx_stm32_window_watchdog_model_write(volatile uint32_t* address,
 #undef NVIC_GetEnableIRQ
 #undef NVIC_GetPendingIRQ
 #undef NVIC_GetActive
+#undef NVIC_SetPriority
+#undef NVIC_GetPriority
+#undef NVIC_EnableIRQ
 #define DBGMCU (&nx_wwdg_model_debug)
 #define NVIC   (&nx_wwdg_model_nvic)
 #define NVIC_GetEnableIRQ(irq)                                                 \
@@ -32,6 +35,12 @@ void nx_stm32_window_watchdog_model_write(volatile uint32_t* address,
     ((NVIC->ISPR[(unsigned)(irq) / 32U] >> ((unsigned)(irq) % 32U)) & 1U)
 #define NVIC_GetActive(irq)                                                    \
     ((NVIC->IABR[(unsigned)(irq) / 32U] >> ((unsigned)(irq) % 32U)) & 1U)
+#define NVIC_SetPriority(irq, value)                                           \
+    (NVIC->IPR[(unsigned)(irq)] = (uint8_t)((value) << 4U))
+#define NVIC_GetPriority(irq) (NVIC->IPR[(unsigned)(irq)] >> 4U)
+#define NVIC_EnableIRQ(irq)                                                    \
+    (NVIC->ISER[(unsigned)(irq) / 32U] |= UINT32_C(1)                          \
+                                          << ((unsigned)(irq) % 32U))
 #define NX_STM32_WWDG_WRITE(address, value)                                    \
     nx_stm32_window_watchdog_model_write((address), (value))
 #endif

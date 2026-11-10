@@ -51,6 +51,32 @@ class SourceLayoutTests(unittest.TestCase):
         self.assertTrue((ROOT /
                          "arch/arm/cortex_m/private/compiler.h").is_file())
         self.assertFalse((ROOT / "arch/cortex_m").exists())
+
+    def test_usb_host_hs_and_optional_middleware_have_complete_sdk_sources(self):
+        path = ROOT / "cmake/package/package_source_sdk.py"
+        spec = importlib.util.spec_from_file_location("usb_layout_sdk", path)
+        package = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(package)
+        required = set(package.REQUIRED_FILES)
+        expected = {
+            "soc/stm32/stm32f4/usb_hs_clock.c",
+            "soc/stm32/stm32f4/drivers/usb_hal_time.c",
+            "soc/stm32/stm32f4/private/stm32f407_usb_hs_clock.h",
+            "soc/stm32/stm32f4/private/stm32f407_usb_hs_cold.h",
+            "soc/stm32/stm32f4/private/stm32f407_usb_pins.h",
+            "soc/stm32/stm32f4/private/stm32f407_usb_phy.h",
+            "soc/stm32/stm32f4/private/usb_hal/stm32f4xx_hal_conf.h",
+            "components/st_usb/CMakeLists.txt",
+            "components/st_usb/private/usbh_conf.h",
+            "components/st_usb/private/usb_host_stack.h",
+            "components/st_usb/src/usb_host_stack.c",
+            "components/st_usb_device/CMakeLists.txt",
+            "components/st_usb_device/private/usbd_conf.h",
+            "components/st_usb_device/private/usb_device_stack.h",
+            "components/st_usb_device/src/usb_device_stack.c",
+            "tools/maintenance/st_usb_lock.py",
+        }
+        self.assertFalse(expected - required, expected - required)
         self.assertTrue(all((ROOT / path).is_file() for path in required))
 
 

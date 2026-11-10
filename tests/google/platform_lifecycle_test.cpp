@@ -7,6 +7,14 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/core/platform_lifecycle.h"
+extern "C" nx_result_t
+nx_platform_lifecycle_suspend(const nx_platform_lifecycle_plan_t*,
+                              nx_platform_lifecycle_state_t*,
+                              nx_platform_diagnostic_t*) __attribute__((weak));
+extern "C" nx_platform_start_result_t
+nx_platform_lifecycle_resume(const nx_platform_lifecycle_plan_t*,
+                             nx_platform_lifecycle_state_t*,
+                             nx_platform_diagnostic_t*) __attribute__((weak));
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <vector>
@@ -86,7 +94,10 @@ class PlatformLifecycle : public testing::Test {
                                       system_release,
                                       acquire,
                                       release,
-                                      false};
+                                      false,
+                                      nullptr,
+                                      nullptr,
+                                      nullptr};
     nx_platform_lifecycle_state_t state{};
     nx_platform_diagnostic_t diagnostic{};
 
@@ -149,6 +160,77 @@ TEST_F(PlatformLifecycle,
     EXPECT_FALSE(state.started);
     EXPECT_EQ(state.bound, nullptr);
     EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_NONE);
+}
+
+TEST_F(PlatformLifecycle, SuspendRetriesDrainAndKeepsSystemUntilColdResume) {
+    ASSERT_NE(nullptr, &nx_platform_lifecycle_suspend);
+    ASSERT_NE(nullptr, &nx_platform_lifecycle_resume);
+    InSequence order;
+    start();
+    EXPECT_CALL(ports, context()).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(ports, release(2U)).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(ports, release(1U)).WillOnce(Return(NX_ERROR_BUSY));
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_platform_lifecycle_suspend(&plan, &state, &diagnostic));
+    EXPECT_EQ(NX_PLATFORM_SUSPENDING, state.suspend_phase);
+    EXPECT_EQ(2U, state.initialized);
+    EXPECT_TRUE(state.started);
+    EXPECT_EQ(&plan, state.bound);
+    EXPECT_EQ(2U, diagnostic.controller_index);
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_platform_lifecycle_resume(&plan, &state, &diagnostic).primary);
+    EXPECT_CALL(ports, context()).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(ports, release(1U)).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(ports, release(0U)).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(ports, resources_release()).WillOnce(Return(NX_SUCCESS));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_platform_lifecycle_suspend(&plan, &state, &diagnostic));
+    EXPECT_EQ(NX_PLATFORM_SUSPENDED, state.suspend_phase);
+    EXPECT_TRUE(state.started);
+    EXPECT_CALL(ports, context()).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(ports, resources_acquire()).WillOnce(Return(NX_SUCCESS));
+    for (size_t index = 0; index < 3; ++index)
+        EXPECT_CALL(ports, acquire(index))
+            .WillOnce(Return(nx_lifecycle_acquisition_t{NX_SUCCESS, true}));
+    const auto result =
+        nx_platform_lifecycle_resume(&plan, &state, &diagnostic);
+    EXPECT_EQ(NX_SUCCESS, result.primary);
+    EXPECT_EQ(NX_PLATFORM_RUNNING, state.suspend_phase);
+    EXPECT_EQ(3U, state.initialized);
+    EXPECT_TRUE(state.started);
+}
+
+TEST_F(PlatformLifecycle, ResumeFailureRollsBackControllersAndKeepsSystem) {
+    ASSERT_NE(nullptr, &nx_platform_lifecycle_suspend);
+    InSequence order;
+    start();
+    EXPECT_CALL(ports, context()).WillOnce(Return(NX_SUCCESS));
+    for (size_t index = 3; index != 0; --index)
+        EXPECT_CALL(ports, release(index - 1)).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(ports, resources_release()).WillOnce(Return(NX_SUCCESS));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_platform_lifecycle_suspend(&plan, &state, &diagnostic));
+    EXPECT_CALL(ports, context()).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(ports, resources_acquire()).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(ports, acquire(0U))
+        .WillOnce(Return(nx_lifecycle_acquisition_t{NX_SUCCESS, true}));
+    EXPECT_CALL(ports, acquire(1U))
+        .WillOnce(Return(nx_lifecycle_acquisition_t{NX_ERROR_IO, true}));
+    EXPECT_CALL(ports, context()).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(ports, release(1U)).WillOnce(Return(NX_ERROR_BUSY));
+    const auto result =
+        nx_platform_lifecycle_resume(&plan, &state, &diagnostic);
+    EXPECT_EQ(NX_ERROR_IO, result.primary);
+    EXPECT_EQ(NX_ERROR_BUSY, result.cleanup);
+    EXPECT_EQ(1U, result.remaining_effects);
+    EXPECT_TRUE(state.started);
+    EXPECT_EQ(2U, state.initialized);
+    EXPECT_EQ(NX_PLATFORM_SUSPENDING, state.suspend_phase);
+    EXPECT_EQ(NX_PLATFORM_PHASE_CONTROLLER, diagnostic.phase);
+    EXPECT_EQ(2U, diagnostic.controller_index);
+    EXPECT_EQ(2U, diagnostic.cleanup_controller_index);
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_platform_lifecycle_resume(&plan, &state, &diagnostic).primary);
 }
 
 TEST_F(PlatformLifecycle, RefusedAdmissionHasNoAcquisitionOrRollback) {

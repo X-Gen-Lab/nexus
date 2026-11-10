@@ -7,7 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "f407_rtc_model.h"
+#include "nexus/io/rtc_aux.h"
 #include <cstring>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 extern "C" nx_stm32_system_t g_nx_stm32_system;
 class F407Rtc : public testing::Test {
@@ -65,6 +67,521 @@ class F407Rtc : public testing::Test {
         return r;
     }
 };
+namespace {
+using RtcWriteObserver =
+    testing::MockFunction<void(volatile uint32_t*, uint32_t)>;
+RtcWriteObserver* standby_observer;
+} /* namespace */
+class F407RtcStandby : public F407Rtc {
+  protected:
+    nx_rtc_standby_t receipt{};
+    uint32_t saved_cr{};
+    uint32_t saved_tafcr{};
+    static constexpr uint32_t events =
+        NX_RTC_EVENT_ALARM_B | NX_RTC_EVENT_WAKEUP | NX_RTC_EVENT_TIMESTAMP |
+        NX_RTC_EVENT_TAMPER1;
+    static constexpr uint32_t lines = (1U << 17U) | (1U << 21U) | (1U << 22U);
+    static constexpr uint32_t cr_mask =
+        RTC_CR_ALRAE | RTC_CR_ALRBE | RTC_CR_WUTE | RTC_CR_TSE | RTC_CR_ALRAIE |
+        RTC_CR_ALRBIE | RTC_CR_WUTIE | RTC_CR_TSIE;
+    void suspended() {
+        open();
+        nx_rtc_alarm_t alarm{2U, 3U, 4U, 5U};
+        ASSERT_EQ(NX_SUCCESS, nx_rtc_port_alarm_b(&port, true, &alarm));
+        nx_rtc_wakeup_t wake{true, NX_RTC_WAKE_SECOND, 1U};
+        ASSERT_EQ(NX_SUCCESS, nx_rtc_port_wakeup(&port, &wake));
+        nx_rtc_capture_config_t capture{};
+        capture.timestamp_enabled = true;
+        capture.timestamp_pin = 1U;
+        capture.tamper1_pin = 1U;
+        capture.tamper_mask = 1U;
+        ASSERT_EQ(NX_SUCCESS, nx_rtc_port_capture_configure(&port, &capture));
+        ASSERT_EQ(NX_SUCCESS, nx_rtc_port_wake_route(&port, events));
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_suspend(&state));
+        saved_cr = g_f407_rtc_model.rtc.CR;
+        saved_tafcr = g_f407_rtc_model.rtc.TAFCR;
+    }
+    void TearDown() override {
+        g_f407_rtc_model.observe_write = nullptr;
+        standby_observer = nullptr;
+    }
+};
+TEST_F(F407RtcStandby,
+       PrepareDisablesSourcesPreservingRoutesBackupAndCalendar) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    m.rtc.BKP0R = 0x12345678U;
+    const auto time = m.rtc.TR;
+    const auto date = m.rtc.DR;
+    const auto prer = m.rtc.PRER;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    EXPECT_EQ(&state, receipt.owner);
+    EXPECT_NE(0U, receipt.epoch);
+    EXPECT_EQ(0U, m.rtc.CR & cr_mask);
+    EXPECT_EQ(0U, m.rtc.TAFCR &
+                      (RTC_TAFCR_TAMP1E | RTC_TAFCR_TAMP2E | RTC_TAFCR_TAMPIE));
+    EXPECT_EQ(lines, m.exti.EMR);
+    EXPECT_EQ(lines, m.exti.RTSR);
+    EXPECT_EQ(0U, m.exti.IMR | m.exti.FTSR);
+    EXPECT_EQ(time, m.rtc.TR);
+    EXPECT_EQ(date, m.rtc.DR);
+    EXPECT_EQ(prer, m.rtc.PRER);
+    EXPECT_EQ(0x12345678U, m.rtc.BKP0R);
+    EXPECT_EQ(0U, m.backup_resets);
+    auto writes = m.writes;
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_standby_validate(&port, &receipt));
+    EXPECT_EQ(writes, m.writes);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_rtc_close(&state));
+}
+TEST_F(F407RtcStandby, UnauthorizedPendingEventsAreNotSilentlyDiscarded) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    m.rtc.ISR |= RTC_ISR_ALRBF;
+    m.exti.PR |= 1U << 17U;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    EXPECT_NE(0U, m.rtc.ISR & RTC_ISR_ALRBF);
+    EXPECT_NE(0U, m.exti.PR & (1U << 17U));
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_standby_restore(&port, &receipt));
+    EXPECT_EQ(saved_cr, m.rtc.CR);
+}
+TEST_F(F407RtcStandby,
+       DisableClearReenableOrderingAndCommitPreservesNewEvents) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    const uint32_t flags =
+        RTC_ISR_ALRBF | RTC_ISR_WUTF | RTC_ISR_TSF | RTC_ISR_TAMP1F;
+    m.rtc.ISR |= flags;
+    m.exti.PR = lines;
+    testing::NiceMock<RtcWriteObserver> observer;
+    standby_observer = &observer;
+    m.observe_write = [](volatile uint32_t* p, uint32_t value) {
+        standby_observer->Call(p, value);
+    };
+    EXPECT_CALL(observer, Call(testing::_, testing::_))
+        .Times(testing::AnyNumber());
+    {
+        testing::InSequence order;
+        EXPECT_CALL(observer, Call(&m.rtc.CR, saved_cr & ~cr_mask));
+        EXPECT_CALL(observer, Call(&m.rtc.TAFCR,
+                                   saved_tafcr & ~uint32_t{RTC_TAFCR_TAMP1E |
+                                                           RTC_TAFCR_TAMP2E |
+                                                           RTC_TAFCR_TAMPIE}));
+        EXPECT_CALL(observer,
+                    Call(&m.rtc.ISR, testing::Truly([flags](uint32_t value) {
+                        return (value & flags) == 0U;
+                    })));
+        EXPECT_CALL(observer, Call(&m.exti.PR, lines));
+        EXPECT_CALL(observer, Call(&m.rtc.TAFCR, saved_tafcr));
+        EXPECT_CALL(observer, Call(&m.rtc.CR, saved_cr)).RetiresOnSaturation();
+    }
+    ASSERT_EQ(NX_SUCCESS,
+              nx_rtc_port_standby_prepare(&port, events, 8U, &receipt));
+    EXPECT_EQ(0U, m.rtc.ISR & flags);
+    EXPECT_EQ(0U, m.exti.PR & lines);
+    m.rtc.ISR |= RTC_ISR_TSF | RTC_ISR_TSOVF;
+    m.exti.PR |= 1U << 21U;
+    m.masked = true;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_standby_commit(&port, &receipt));
+    EXPECT_EQ(saved_cr, m.rtc.CR);
+    EXPECT_EQ(saved_tafcr, m.rtc.TAFCR);
+    EXPECT_EQ(RTC_ISR_TSF | RTC_ISR_TSOVF,
+              m.rtc.ISR & (RTC_ISR_TSF | RTC_ISR_TSOVF));
+    EXPECT_NE(0U, m.exti.PR & (1U << 21U));
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_standby_restore(&port, &receipt));
+    EXPECT_EQ(nullptr, receipt.owner);
+    EXPECT_EQ(0U, receipt.epoch);
+    EXPECT_NE(0U, m.rtc.ISR & RTC_ISR_TSF);
+    EXPECT_NE(0U, m.exti.PR & (1U << 21U));
+}
+TEST_F(F407RtcStandby, PreparedReceiptUsesIndependentClockWithoutOldCoreReads) {
+    suspended();
+    config.clock.read = [](void*) -> nx_time_us_t {
+        ADD_FAILURE() << "old Core clock used";
+        return NX_DEADLINE_NEVER;
+    };
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    g_nx_stm32_system.started = false;
+    g_f407_rtc_model.now = NX_DEADLINE_NEVER;
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_standby_validate(&port, &receipt));
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_standby_restore(&port, &receipt));
+    EXPECT_EQ(saved_cr, g_f407_rtc_model.rtc.CR);
+}
+TEST_F(F407RtcStandby, FailedDisableReadbackRetainsReceiptForExplicitRestore) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    m.hold_write = true;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    EXPECT_EQ(&state, receipt.owner);
+    EXPECT_NE(0U, nx_stm32_rtc_effects(&state));
+    m.hold_write = false;
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_standby_restore(&port, &receipt));
+    EXPECT_EQ(saved_cr, m.rtc.CR);
+    EXPECT_EQ(nullptr, receipt.owner);
+}
+TEST_F(F407RtcStandby,
+       FixedPollExhaustionRetainsDisabledSourcesWithoutDeadline) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    m.hold_standby_flags = true;
+    config.clock.read = [](void*) -> nx_time_us_t {
+        ADD_FAILURE() << "deadline read in poll";
+        return 0U;
+    };
+    EXPECT_EQ(NX_ERROR_TIMEOUT,
+              nx_rtc_port_standby_prepare(&port, 0U, 3U, &receipt));
+    EXPECT_EQ(&state, receipt.owner);
+    EXPECT_EQ(0U, m.rtc.CR & cr_mask);
+    m.hold_standby_flags = false;
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_standby_restore(&port, &receipt));
+}
+TEST_F(F407RtcStandby,
+       CommitFailureCannotReleaseReceiptAndRestoreKeepsWakeFlags) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    m.masked = true;
+    m.hold_write = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_rtc_port_standby_commit(&port, &receipt));
+    EXPECT_EQ(&state, receipt.owner);
+    m.rtc.ISR |= RTC_ISR_WUTF;
+    m.exti.PR |= 1U << 22U;
+    m.hold_write = false;
+    g_nx_stm32_system.started = false;
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_standby_restore(&port, &receipt));
+    EXPECT_EQ(nullptr, receipt.owner);
+    EXPECT_NE(0U, m.rtc.ISR & RTC_ISR_WUTF);
+    EXPECT_NE(0U, m.exti.PR & (1U << 22U));
+    m.masked = false;
+    g_nx_stm32_system.started = true;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_rtc_resume(&state));
+}
+TEST_F(F407RtcStandby, CopiesStaleEpochsAndUnmaskedCommitHaveNoEffects) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    const auto writes = m.writes;
+    auto copy = receipt;
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_standby_validate(&port, &copy));
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_standby_restore(&port, &copy));
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_rtc_port_standby_commit(&port, &receipt));
+    ++receipt.epoch;
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_standby_validate(&port, &receipt));
+    --receipt.epoch;
+    EXPECT_EQ(writes, m.writes);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_rtc_resume(&state));
+}
+TEST_F(F407RtcStandby, AutonomousClockOrRouteDriftRejectsReadonlyValidation) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    const auto backup = m.rcc.BDCR;
+    const auto writes = m.writes;
+    m.rcc.BDCR = (m.rcc.BDCR & ~uint32_t{RCC_BDCR_RTCSEL}) | RCC_BDCR_RTCSEL;
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_standby_validate(&port, &receipt));
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_standby_restore(&port, &receipt));
+    m.rcc.BDCR = backup;
+    m.exti.EMR = 0U;
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_standby_validate(&port, &receipt));
+    EXPECT_EQ(writes, m.writes);
+}
+TEST_F(F407RtcStandby, PendingExtiWithoutRtcFlagStillNeedsExplicitDiscard) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    m.exti.PR = 1U << 22U;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    EXPECT_NE(0U, m.exti.PR & (1U << 22U));
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_standby_restore(&port, &receipt));
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_standby_prepare(
+                              &port, NX_RTC_EVENT_WAKEUP, 8U, &receipt));
+    EXPECT_EQ(0U, m.exti.PR & (1U << 22U));
+}
+TEST_F(F407RtcStandby, LateUnauthorizedEventSurvivesPrepareFailureAndRestore) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    m.rtc.ISR |= RTC_ISR_WUTF;
+    m.exti.PR = 1U << 22U;
+    m.observe_write = [](volatile uint32_t* p, uint32_t) {
+        if (p == &g_f407_rtc_model.exti.PR) {
+            g_f407_rtc_model.rtc.ISR |= RTC_ISR_TSF;
+            g_f407_rtc_model.exti.PR |= 1U << 21U;
+        }
+    };
+    EXPECT_EQ(NX_ERROR_BUSY, nx_rtc_port_standby_prepare(
+                                 &port, NX_RTC_EVENT_WAKEUP, 8U, &receipt));
+    EXPECT_EQ(&state, receipt.owner);
+    EXPECT_NE(0U, m.rtc.ISR & RTC_ISR_TSF);
+    EXPECT_NE(0U, m.exti.PR & (1U << 21U));
+    m.observe_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_standby_restore(&port, &receipt));
+    EXPECT_NE(0U, m.rtc.ISR & RTC_ISR_TSF);
+    EXPECT_NE(0U, m.exti.PR & (1U << 21U));
+}
+TEST_F(F407RtcStandby,
+       ContextBoundsAliasesAndEpochExhaustionRejectBeforeEffects) {
+    open();
+    auto& m = g_f407_rtc_model;
+    auto writes = m.writes;
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_rtc_port_standby_prepare(&port, 128U, 8U, &receipt));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_rtc_port_standby_prepare(&port, 0U, 0U, &receipt));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_rtc_port_standby_prepare(
+                  &port, 0U, 8U, reinterpret_cast<nx_rtc_standby_t*>(&state)));
+    EXPECT_EQ(writes, m.writes);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_suspend(&state));
+    state.standby_epoch = UINT64_MAX;
+    EXPECT_EQ(NX_ERROR_EXHAUSTED,
+              nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    EXPECT_EQ(writes, m.writes);
+    EXPECT_EQ(nullptr, receipt.owner);
+}
+
+TEST_F(F407RtcStandby, CommitRejectsBasepriEvenWhenPrimaskIsSet) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    m.masked = true;
+    m.basepri = 0x50U;
+    const auto writes = m.writes;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_rtc_port_standby_commit(&port, &receipt));
+    EXPECT_EQ(writes, m.writes);
+    EXPECT_EQ(&state, receipt.owner);
+    EXPECT_EQ(0U, m.rtc.CR & cr_mask);
+}
+TEST_F(F407RtcStandby, CommitRejectsFaultmaskEvenWhenPrimaskIsSet) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    m.masked = true;
+    m.faultmask = 1U;
+    const auto writes = m.writes;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_rtc_port_standby_commit(&port, &receipt));
+    EXPECT_EQ(writes, m.writes);
+    EXPECT_EQ(&state, receipt.owner);
+    EXPECT_EQ(0U, m.rtc.CR & cr_mask);
+}
+
+TEST_F(F407Rtc, AuxiliaryAlarmBUsesOwnWriteFlagAndPreservesAlarmA) {
+    open();
+    prepare();
+    arm();
+    const auto alarm_a = g_f407_rtc_model.rtc.ALRMAR;
+    nx_rtc_alarm_t pattern{2U, 3U, 4U, 5U};
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_alarm_b(&port, true, &pattern));
+    EXPECT_EQ(0x02030405U, g_f407_rtc_model.rtc.ALRMBR);
+    EXPECT_NE(0U, g_f407_rtc_model.rtc.CR & RTC_CR_ALRBE);
+    EXPECT_NE(0U, g_f407_rtc_model.rtc.CR & RTC_CR_ALRAE);
+    EXPECT_EQ(alarm_a, g_f407_rtc_model.rtc.ALRMAR);
+    g_f407_rtc_model.rtc.ISR |= RTC_ISR_ALRBF;
+    uint32_t events = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_events(&port, &events));
+    EXPECT_EQ(NX_RTC_EVENT_ALARM_B, events);
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_acknowledge(&port, NX_RTC_EVENT_ALARM_B));
+    EXPECT_EQ(0U, g_f407_rtc_model.rtc.ISR & RTC_ISR_ALRBF);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
+}
+TEST_F(F407Rtc, WakeupRejectsForbiddenFastZeroBeforeWritesAndUsesWutwf) {
+    open();
+    const auto writes = g_f407_rtc_model.writes;
+    nx_rtc_wakeup_t wake{true, NX_RTC_WAKE_DIV2, 0U};
+    EXPECT_EQ(NX_ERROR_INVALID, nx_rtc_port_wakeup(&port, &wake));
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+    wake = {true, NX_RTC_WAKE_SECOND_EXTENDED, 12U};
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_wakeup(&port, &wake));
+    EXPECT_EQ(12U, g_f407_rtc_model.rtc.WUTR);
+    EXPECT_EQ(RTC_CR_WUTE | 6U,
+              g_f407_rtc_model.rtc.CR & (RTC_CR_WUTE | RTC_CR_WUCKSEL));
+    g_f407_rtc_model.rtc.ISR |= RTC_ISR_WUTF | RTC_ISR_TAMP1F;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_acknowledge(&port, NX_RTC_EVENT_WAKEUP));
+    EXPECT_EQ(0U, g_f407_rtc_model.rtc.ISR & RTC_ISR_WUTF);
+    EXPECT_NE(0U, g_f407_rtc_model.rtc.ISR & RTC_ISR_TAMP1F);
+}
+TEST_F(F407Rtc, TimestampRetainsRawSubsecondsAndOverflowWithoutInventingYear) {
+    open();
+    nx_rtc_capture_config_t capture{};
+    capture.timestamp_enabled = true;
+    capture.timestamp_pin = capture.tamper1_pin = 1U;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_capture_configure(&port, &capture));
+    nx_rtc_capture_t output{};
+    EXPECT_EQ(NX_ERROR_BUSY, nx_rtc_port_capture_read(&port, &output));
+    g_f407_rtc_model.rtc.TSTR = 0x00123456U;
+    g_f407_rtc_model.rtc.TSDR = 0x00008229U;
+    g_f407_rtc_model.rtc.TSSSR = 127U;
+    g_f407_rtc_model.rtc.ISR |= RTC_ISR_TSF | RTC_ISR_TSOVF;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_capture_read(&port, &output));
+    EXPECT_EQ(2U, output.month);
+    EXPECT_EQ(29U, output.day);
+    EXPECT_EQ(4U, output.weekday);
+    EXPECT_EQ(12U, output.hour);
+    EXPECT_EQ(34U, output.minute);
+    EXPECT_EQ(56U, output.second);
+    EXPECT_EQ(127U, output.subseconds);
+    EXPECT_EQ(256U, output.subsecond_divisor);
+    EXPECT_TRUE(output.overflow);
+    EXPECT_EQ(&state, output.domain.identity);
+    EXPECT_NE(0U, g_f407_rtc_model.rtc.ISR & RTC_ISR_TSF);
+    const auto saved = output;
+    g_f407_rtc_model.rtc.TSTR = 0x002a0000U;
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_capture_read(&port, &output));
+    EXPECT_EQ(0, std::memcmp(&saved, &output, sizeof(output)));
+}
+TEST_F(F407Rtc, BackupWordBoundsTamperAndSramLoanRetainRealResponsibility) {
+    open();
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_backup_write(&port, 19U, 0x12345678U));
+    uint32_t value = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_backup_read(&port, 19U, &value));
+    EXPECT_EQ(0x12345678U, value);
+    const auto writes = g_f407_rtc_model.writes;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_rtc_port_backup_write(&port, 20U, 1U));
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+    nx_memory_window_lease_t lease{};
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_sram_acquire(&port, &lease));
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_sram_prepare(&port, true));
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_sram_acquire(&port, &lease));
+    EXPECT_EQ(4096U, lease.bytes);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_rtc_port_stop(&port));
+    auto copied = lease;
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_rtc_port_sram_release(&port, &copied, copied.epoch));
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_sram_release(&port, &lease, lease.epoch));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_rtc_close(&state));
+    EXPECT_EQ(0U, g_f407_rtc_model.rcc.AHB1ENR & RCC_AHB1ENR_BKPSRAMEN);
+    EXPECT_EQ(0U, g_f407_rtc_model.power.CSR & PWR_CSR_BRE);
+    EXPECT_EQ(0U, g_f407_rtc_model.backup_resets);
+}
+TEST_F(F407Rtc, CalibrationValidatesWindowBeforeWritesAndKeepsCoreSeparate) {
+    open();
+    const auto generation = state.generation;
+    nx_rtc_calibration_t calibration{NX_RTC_CALIBRATION_SMOOTH, 3U, 8U, true,
+                                     false};
+    const auto writes = g_f407_rtc_model.writes;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_rtc_port_calibrate(&port, &calibration));
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+    calibration.pulses = 4U;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_calibrate(&port, &calibration));
+    EXPECT_EQ(RTC_CALR_CALP | RTC_CALR_CALW8 | 4U, g_f407_rtc_model.rtc.CALR);
+    EXPECT_EQ(generation, state.generation);
+    nx_rtc_snapshot_t snapshot{};
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_read(&port, &snapshot));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_rtc_close(&state));
+    EXPECT_EQ(0U, g_f407_rtc_model.rtc.CALR);
+}
+TEST_F(F407Rtc, AuxiliaryFailureQuarantinesAlarmWithoutInventingCalendarTaint) {
+    open();
+    prepare();
+    arm();
+    nx_rtc_alarm_t pattern{2U, 3U, 4U, 5U};
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_alarm_b(&port, true, &pattern));
+    g_f407_rtc_model.hold_alarm_b = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_rtc_port_alarm_b(&port, false, &pattern));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_rtc_port_service(&port));
+    EXPECT_FALSE(state.tainted);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_rtc_close(&state));
+    EXPECT_EQ(&request, state.active);
+    g_f407_rtc_model.hold_alarm_b = false;
+    for (unsigned i = 0; i != 20U && state.opened; ++i)
+        (void)nx_stm32_rtc_close(&state);
+    ASSERT_FALSE(state.opened);
+    EXPECT_EQ(NX_ERROR_IO, result());
+    EXPECT_EQ(0U, g_f407_rtc_model.illegal_writes);
+}
+TEST_F(F407Rtc, CoarseCalibrationWaitsForSmoothWithdrawalBeforeApplying) {
+    config.allow_set = true;
+    open();
+    g_f407_rtc_model.hold_recalibration = true;
+    nx_rtc_calibration_t coarse{NX_RTC_CALIBRATION_COARSE, 2U, 0U, false, true};
+    EXPECT_EQ(NX_ERROR_TIMEOUT, nx_rtc_port_calibrate(&port, &coarse));
+    EXPECT_EQ(0U, g_f407_rtc_model.rtc.CALIBR);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_rtc_close(&state));
+    g_f407_rtc_model.hold_recalibration = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_rtc_close(&state));
+    EXPECT_EQ(0U, g_f407_rtc_model.backup_resets);
+}
+TEST_F(F407Rtc, ExplicitWakeEventRoutesPreserveForeignExtiAndWithdrawOnClose) {
+    open();
+    g_f407_rtc_model.exti.EMR = 1U << 4U;
+    g_f407_rtc_model.exti.RTSR = 1U << 4U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_rtc_port_wake_route(&port, NX_RTC_EVENT_ALARM_A |
+                                                NX_RTC_EVENT_WAKEUP |
+                                                NX_RTC_EVENT_TIMESTAMP));
+    EXPECT_EQ((1U << 4U) | (1U << 17U) | (1U << 21U) | (1U << 22U),
+              g_f407_rtc_model.exti.EMR);
+    EXPECT_EQ(0U, g_f407_rtc_model.exti.IMR);
+    EXPECT_EQ(0U, g_f407_rtc_model.irq_enabled[0] |
+                      g_f407_rtc_model.irq_enabled[1] |
+                      g_f407_rtc_model.irq_enabled[2]);
+    prepare();
+    arm();
+    g_f407_rtc_model.rtc.ISR |= RTC_ISR_ALRAF;
+    drain();
+    EXPECT_EQ(NX_SUCCESS, result());
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_close(&state));
+    EXPECT_EQ(1U << 4U, g_f407_rtc_model.exti.EMR);
+    EXPECT_EQ(1U << 4U, g_f407_rtc_model.exti.RTSR);
+}
+TEST_F(F407Rtc, UnsupportedPackagePadAndTamperTwoRejectWithoutEffect) {
+    open();
+    nx_rtc_capture_config_t capture_config{};
+    capture_config.timestamp_pin = capture_config.tamper1_pin = 1U;
+    capture_config.tamper_mask = 2U;
+    const auto writes = g_f407_rtc_model.writes;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_rtc_port_capture_configure(&port, &capture_config));
+    capture_config.tamper_mask = 0U;
+    capture_config.timestamp_pin = 2U;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_rtc_port_capture_configure(&port, &capture_config));
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+}
+TEST_F(F407Rtc, SramPowerFailureRetainsEffectsAndPreownedPowerSurvivesClose) {
+    open();
+    g_f407_rtc_model.hold_regulator = true;
+    EXPECT_EQ(NX_ERROR_TIMEOUT, nx_rtc_port_sram_prepare(&port, true));
+    EXPECT_NE(0U, state.sram_effects);
+    nx_memory_window_lease_t lease{};
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_sram_acquire(&port, &lease));
+    g_f407_rtc_model.hold_sram_gate_disable = true;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_rtc_close(&state));
+    EXPECT_NE(0U, state.sram_effects);
+    g_f407_rtc_model.hold_sram_gate_disable = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_rtc_close(&state));
+    EXPECT_EQ(0U, state.sram_effects);
+    g_f407_rtc_model.hold_regulator = false;
+    g_f407_rtc_model.rcc.AHB1ENR |= RCC_AHB1ENR_BKPSRAMEN;
+    g_f407_rtc_model.power.CSR |= PWR_CSR_BRE | PWR_CSR_BRR;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_prepare(&state, &config));
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_sram_prepare(&port, true));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_close(&state));
+    EXPECT_NE(0U, g_f407_rtc_model.rcc.AHB1ENR & RCC_AHB1ENR_BKPSRAMEN);
+    EXPECT_NE(0U, g_f407_rtc_model.power.CSR & PWR_CSR_BRE);
+}
+TEST_F(F407Rtc, ProvisionCanTransferOnlyClosedJoinedAutonomousResponsibility) {
+    provision();
+    open();
+    nx_rtc_backup_handoff_t handoff{};
+    EXPECT_EQ(NX_ERROR_BUSY, nx_rtc_port_backup_handoff(&port, &handoff));
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_stop(&port));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_rtc_close(&state));
+    const auto before = g_f407_rtc_model.writes;
+    const auto backup = g_f407_rtc_model.rcc.BDCR;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_backup_handoff(&port, &handoff));
+    EXPECT_EQ(32768U, handoff.oscillator_hz);
+    EXPECT_EQ(0x3fU, handoff.resources);
+    EXPECT_EQ(0, std::memcmp(&initial, &handoff.calendar, sizeof(initial)));
+    EXPECT_EQ(backup, g_f407_rtc_model.rcc.BDCR);
+    EXPECT_EQ(before, g_f407_rtc_model.writes);
+    EXPECT_EQ(0U, nx_stm32_rtc_effects(&state));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_rtc_close(&state));
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_backup_handoff(&port, &handoff));
+}
 TEST_F(F407Rtc, AdoptIsReadOnlyAndCleanCloseLeavesAutonomousTime) {
     const auto rtc = g_f407_rtc_model.rtc;
     const auto backup = g_f407_rtc_model.rcc.BDCR;
@@ -75,6 +592,82 @@ TEST_F(F407Rtc, AdoptIsReadOnlyAndCleanCloseLeavesAutonomousTime) {
     EXPECT_EQ(backup, g_f407_rtc_model.rcc.BDCR);
     EXPECT_EQ(0U, nx_stm32_rtc_effects(&state));
     EXPECT_EQ(0U, g_f407_rtc_model.writes);
+}
+TEST_F(F407Rtc, SuspendPreservesWakeAndInvalidatesAnOldCoreDeadlineToken) {
+    open();
+    prepare(2000U);
+    nx_rtc_wakeup_t wake{true, NX_RTC_WAKE_SECOND, 1U};
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_wakeup(&port, &wake));
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_wake_route(&port, NX_RTC_EVENT_WAKEUP));
+    g_f407_rtc_model.rtc.ISR |= RTC_ISR_WUTF;
+    const auto rtc = g_f407_rtc_model.rtc;
+    const auto exti = g_f407_rtc_model.exti;
+    const auto generation = state.generation;
+    const auto writes = g_f407_rtc_model.writes;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_suspend(&state));
+    EXPECT_TRUE(state.suspended);
+    nx_rtc_snapshot_t snapshot{};
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_read(&port, &snapshot));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_rtc_port_stop(&port));
+    g_f407_rtc_model.now = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_resume(&state));
+    EXPECT_FALSE(state.suspended);
+    EXPECT_EQ(generation + 1U, state.generation);
+    EXPECT_EQ(0, std::memcmp(&rtc, &g_f407_rtc_model.rtc, sizeof(rtc)));
+    EXPECT_EQ(0, std::memcmp(&exti, &g_f407_rtc_model.exti, sizeof(exti)));
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_submit(&port, &request));
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_read(&port, &snapshot));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_rtc_close(&state));
+}
+TEST_F(F407Rtc, SuspendRejectsLiveLoansAndResumeFailureRetainsWakeOwnership) {
+    open();
+    prepare();
+    arm();
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_rtc_suspend(&state));
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_cancel(&port, &request));
+    drain();
+    nx_memory_window_lease_t lease{};
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_sram_prepare(&port, true));
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_sram_acquire(&port, &lease));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_rtc_suspend(&state));
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_sram_release(&port, &lease, lease.epoch));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_suspend(&state));
+    const auto generation = state.generation;
+    g_f407_rtc_model.rcc.BDCR &= ~uint32_t{RCC_BDCR_RTCEN};
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32_rtc_resume(&state));
+    EXPECT_TRUE(state.suspended);
+    EXPECT_EQ(generation, state.generation);
+    g_f407_rtc_model.rcc.BDCR |= RCC_BDCR_RTCEN;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_resume(&state));
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32_rtc_resume(&state));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_rtc_close(&state));
+}
+TEST_F(F407Rtc,
+       ProvisionSuspendRetainsEffectsAndExhaustionRejectsBeforeWrites) {
+    provision();
+    open();
+    const auto effects = state.effects;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_suspend(&state));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_resume(&state));
+    EXPECT_EQ(effects, state.effects);
+    state.generation = UINT64_MAX;
+    const auto writes = g_f407_rtc_model.writes;
+    EXPECT_EQ(NX_ERROR_EXHAUSTED, nx_stm32_rtc_suspend(&state));
+    EXPECT_FALSE(state.suspended);
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+}
+TEST_F(F407Rtc, LostBackupRegulatorCannotAdmitAClaimedRetainedSramLoan) {
+    open();
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_sram_prepare(&port, true));
+    g_f407_rtc_model.power.CSR &= ~uint32_t{PWR_CSR_BRE | PWR_CSR_BRR};
+    nx_memory_window_lease_t lease{};
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_sram_acquire(&port, &lease));
+    if (lease.owner != nullptr) {
+        EXPECT_EQ(NX_SUCCESS,
+                  nx_rtc_port_sram_release(&port, &lease, lease.epoch));
+    }
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_rtc_close(&state));
 }
 TEST_F(F407Rtc, ForeignClockCalendarOrInterruptRejectBeforeEffects) {
     for (unsigned condition = 0U; condition != 7U; ++condition) {

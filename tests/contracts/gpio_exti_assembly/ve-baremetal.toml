@@ -1,0 +1,144 @@
+schema = 2
+board_package = "ve_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 32768
+flash_load_limit_bytes = 65536
+
+[exti.edge0]
+binding = "edge0"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge1]
+binding = "edge1"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge2]
+binding = "edge2"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge3]
+binding = "edge3"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge4]
+binding = "edge4"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge5]
+binding = "edge5"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge6]
+binding = "edge6"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge7]
+binding = "edge7"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge8]
+binding = "edge8"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge9]
+binding = "edge9"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge10]
+binding = "edge10"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge11]
+binding = "edge11"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge12]
+binding = "edge12"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge13]
+binding = "edge13"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge14]
+binding = "edge14"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[exti.edge15]
+binding = "edge15"
+mode = "edge-event"
+edge = "both"
+event_capacity = 2
+irq.priority = 5
+irq.calls_os = false
+
+[gpio.drive]
+binding = "drive"
+mode = "output"
+speed = "high"

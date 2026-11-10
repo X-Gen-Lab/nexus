@@ -1,4 +1,4 @@
-# Reviewed against the exact current canonical source and gettext messages.
+# Current canonical messages; semantic review admission is tracked separately.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus documentation\n"
@@ -6279,31 +6279,8 @@ msgstr "有界描述符视图；产品描述符字节仍由外部提供。"
 msgid "Validate complete device, configuration or string descriptor bytes."
 msgstr "校验完整的 device、configuration 或 string 描述符字节。"
 
-#: docs/reference/api/components.md:620
-msgid ""
-"Configuration views require alternate zero, endpoint plans matching selected "
-"bulk or interrupt IN ports, consistent totals and unique interface numbers. "
-"Interrupt bInterval is a nonzero linear count of full-speed 1 ms frames in "
-"external descriptor bytes. Bulk bInterval is not interpreted; no polling is "
-"scheduled. Class-specific subordinate bytes are bounds-checked but not "
-"decoded. Class dispatch, VID/PID, strings, policy, CDC/HID and descriptor "
-"lookup remain external. Success is structural validation, not enumeration or "
-"physical qualification. To send bytes, preserve their lifetime through the "
-"control adapter's acquire-observed outer SETTLED. The view struct requires "
-"natural C alignment; rejection is not an arbitrary address probe. Descriptor "
-"bytes need only byte alignment and remain externally readable."
-msgstr ""
-"configuration 视图要求 alternate zero、与选定 bulk 或 interrupt IN 端口匹配的 endpoint "
-"计划、一致的总长度及唯一的 interface 编号。interrupt bInterval 是外部 descriptor 字节中 full-speed "
-"1 ms frame 的非零线性计数。bulk bInterval 不作解析，也不调度轮询。class-specific "
-"从属字节仅检查边界，不作解码。class 分派、VID/PID、字符串、策略、CDC/HID 及 descriptor "
-"查找仍由外部负责。成功仅表示结构校验通过，不表示枚举或物理资格。发送字节时，必须保持其有效，直到以 acquire 语义观察到 control "
-"adapter 的 outer SETTLED。view 结构体须按 C 类型自然对齐；拒绝机制不能用于探测任意地址。descriptor 字节仅需 "
-"byte alignment，且须保持外部可读。"
-
-#: docs/reference/api/components.md:620
-msgid "[in] Immutable exact selected FS endpoint facts."
-msgstr "[in] 选定 FS endpoint 的不可变精确事实。"
+msgid "[in] Immutable exact selected FS/HS endpoint facts."
+msgstr "[in] 选定 FS/HS endpoint 的不可变精确事实。"
 
 #: docs/reference/api/components.md:620
 msgid "[in] Complete external descriptor; never copied/retained."
@@ -6403,3 +6380,6 @@ msgstr ""
 "时，精确的内核调用槽及用户地址空间继续被借用。device_effect_possible 在调用 WRITE "
 "提供者前置位；出错不能授权重放。result 描述准入及器件执行结果；cleanup_result "
 "独立描述最近一次释放尝试。这是软件责任，不是物理引脚证据。"
+
+msgid "Configuration views require alternate zero, endpoint plans matching selected bulk, interrupt or ISO ports, consistent totals and unique interface numbers. ISO bInterval is 1..16, an exponent of FS frames or HS microframes; ISO synchronization/usage encodings remain class policy after reserved-value validation. Only one transaction is selected; HS high-bandwidth multipliers return UNSUPPORTED. Interrupt bInterval in external descriptor bytes is a 1..255 linear count of 1 ms frames at FS, or a 1..16 exponent of 125 us microframes at HS. Bulk bInterval is not interpreted; no polling is scheduled. Class-specific subordinate bytes are bounds-checked but not decoded. Class dispatch, VID/PID, strings, policy, CDC/HID and descriptor lookup remain external. Success is structural validation, not enumeration or physical qualification. To send bytes, preserve their lifetime through the control adapter's acquire-observed outer SETTLED. The view struct requires natural C alignment; rejection is not an arbitrary address probe. Descriptor bytes need only byte alignment and remain externally readable."
+msgstr "configuration 视图要求 alternate zero、与选定 bulk、interrupt 或 ISO 端口匹配的 endpoint 计划、一致的总长度及唯一的 interface 编号。ISO bInterval 为 1..16，表示 FS frame 或 HS microframe 的指数；ISO 同步／用途编码在保留值校验后仍属 class 策略。每次仅选择一个 transaction；HS 高带宽 multiplier 返回 UNSUPPORTED。外部 descriptor 字节中的 interrupt bInterval 在 FS 为 1..255 的线性计数，单位为 1 ms frame；在 HS 为 1..16 的指数编码，单位为 125 µs microframe。bulk bInterval 不作解析，也不调度轮询。class-specific 从属字节仅检查边界，不作解码。class 分派、VID/PID、字符串、策略、CDC/HID 及 descriptor 查找仍由外部负责。成功仅表示结构校验通过，不表示枚举或物理资格。发送字节时，必须保持其有效，直到以 acquire 语义观察到 control adapter 的 outer SETTLED。view 结构体须按 C 类型自然对齐；拒绝机制不能用于探测任意地址。descriptor 字节仅需 byte alignment，且须保持外部可读。"

@@ -139,6 +139,20 @@ TEST_F(TimebaseIntegration, ClockStopRejectsOutstandingPauseBeforeAnyRelease) {
     const auto* state = static_cast<nx_timebase_lowpower_t*>(face->context);
     EXPECT_TRUE(state->paused);
 }
+TEST_F(TimebaseIntegration, ClockStopRetainsTheFirstShortTickUntilItsRealIrq) {
+    face = nx_freertos_lowpower_port();
+    ASSERT_NE(face, nullptr);
+    nx_freertos_tick_snapshot_t snapshot{};
+    ASSERT_EQ(NX_SUCCESS, face->pause_tick(face->context, &snapshot));
+    face->resume_tick(face->context, face->now_us(face->context) + 100U);
+    const auto* state = static_cast<nx_timebase_lowpower_t*>(face->context);
+    ASSERT_TRUE(state->first_short);
+    EXPECT_EQ(-1, nx_stm32_system_stop(&g_nx_stm32_system, 1U));
+    EXPECT_EQ(TIM_CR1_CEN, TIMER_CTRL);
+    SysTick_Handler();
+    EXPECT_FALSE(state->first_short);
+    EXPECT_FALSE(nx_stm32_lowpower_busy());
+}
 } /* namespace */
 
 extern "C" nx_arch_irq_state_t nx_arch_irq_save(void) {
@@ -155,6 +169,10 @@ extern "C" bool nx_arch_is_privileged(void) {
 }
 extern "C" bool nx_arch_irq_is_masked(void) {
     return false;
+}
+/** \brief This continuous-timer fixture models all incoming masks as clear. */
+extern "C" nx_arch_irq_masks_t nx_arch_irq_masks(void) {
+    return {0U, 0U, 0U};
 }
 extern "C" void nx_arch_isb(void) {
 }

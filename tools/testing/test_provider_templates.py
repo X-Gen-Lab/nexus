@@ -247,8 +247,9 @@ class ProviderTemplateCompileTests(unittest.TestCase):
         self.addCleanup(self.storage.cleanup)
         self.area = Path(self.storage.name)
         (self.area / "nexus_config.h").write_text(
-            "/* Exact cache-off compile fixture, no runtime executed. */\n"
-            "#define NEXUS_SOC_CACHE_MASK 0U\n")
+            "/* Reviewed hse8-pll168 symbol-only ARM fixture. */\n"
+            "#define NEXUS_SOC_CACHE_MASK 0U\n"
+            "#define NEXUS_CORE_HZ 168000000U\n")
         command = shlex.split(os.environ.get("NEXUS_ARM_GCC",
                                              "arm-none-eabi-gcc"))
         self.assertTrue(command, "Required ARM compiler command is empty")

@@ -1,2160 +1,753 @@
-# Reviewed against the exact current canonical source and gettext messages.
+# Exact current gettext entries; independent review pending.
 msgid ""
-msgstr ""
-"Project-Id-Version: Nexus source documentation\n"
-"Language: zh_CN\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: d5afb69aea1d7ee14da633dd0303619f247680ef8f53f011c3506fac29a20fe2\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 9f5da1b8c5dc468af98bc967593974a97747bd96076d7413d98d47f9bcb54e8b\n"
 
-#: docs/reference/api/extension-components.md:8
 msgid "Extension and lifecycle APIs"
 msgstr "扩展与生命周期 API"
 
-#: docs/reference/api/extension-components.md:10
-msgid ""
-"These public headers describe framed data, explicit owners, retained clocks "
-"and trusted mediation. Their declarations do not establish a board "
-"connection, execution mode, kernel gateway or physical qualification. "
-"Construction, memory ownership and final-access requirements remain part of "
-"each contract."
-msgstr ""
-"这些公共头文件描述成帧数据、显式所有者、保留时钟和可信代理。其声明并不证明板级连接、执行模式、内核网关或物理资格验证。构造、内存所有权及最后访问要求仍属于各自合同。"
+msgid "These public headers describe framed data, explicit owners, retained clocks and trusted mediation. Their declarations do not establish a board connection, execution mode, kernel gateway or physical qualification. Construction, memory ownership and final-access requirements remain part of each contract."
+msgstr "这些公共头文件描述成帧数据、显式所有者、保留时钟和可信代理。其声明并不证明板级连接、执行模式、内核网关或物理资格验证。构造、内存所有权及最后访问要求仍属于各自合同。"
 
-#: docs/reference/api/extension-components.md:14
-msgid "Explicit F407 entropy construction"
-msgstr "显式 F407 熵源构造"
+msgid "Selected F407 entropy owner"
+msgstr "所选 F407 熵源 owner"
 
-#: docs/reference/api/extension-components.md:16
-msgid ""
-"For an F407 assembly, explicitly call `nexus_add_stm32f407_entropy(target)` "
-"and link that target at the product's composition site. It owns the unique "
-"static RNG source and refuses a second constructor. The getter "
-"`nx_stm32f407_entropy_instance()` returns an existing readonly face; it "
-"performs no startup, register access or factory registration."
-msgstr ""
-"对于 F407 装配，显式调用 `nexus_add_stm32f407_entropy(target)`，并在产品装配处链接该目标。它拥有唯一静态 "
-"RNG 源并拒绝第二个构造器。getter `nx_stm32f407_entropy_instance()` 返回已有只读接口；不执行启动、寄存器访问或"
-" factory 注册。"
+msgid "Select the chip's one internal RNG through the authored assembly:"
+msgstr "通过 authored assembly 选择芯片内唯一的 RNG："
 
-#: docs/reference/api/extension-components.md:22
-msgid ""
-"After successful Platform startup, call "
-"`nx_stm32f407_entropy_instance_start()` with exact validated Board/profile "
-"`hse_hz` and `hclk_hz` facts. The implementation checks the live PLL48/HCLK "
-"relationship and acquires only its RNG clock gate; it neither configures the "
-"shared PLL nor starts Platform. The reviewed source choices are 8 MHz HSE or "
-"16 MHz HSI. The product must preserve those clock dependencies through stop."
-msgstr ""
-"Platform 成功启动后，使用准确验证过的 Board/profile `hse_hz` 和 `hclk_hz` 事实调用 "
-"`nx_stm32f407_entropy_instance_start()`。实现检查实时 PLL48/HCLK 关系，仅取得其 RNG "
-"时钟门；不配置共享 PLL，也不启动 Platform。经过审查的时钟源选择为 8 MHz HSE 或 16 MHz HSI。产品必须将这些时钟依赖保持到"
-" stop 完成。"
+msgid "The Board supplies the pinless `rng` binding. Configuration requires the selected nominal PLL48 domain to be exactly 48 MHz, including an explicit `pll48 = true` reservation when SYSCLK uses a direct input. The generated `nx_factory_entropy(NX_ENTROPY_ID_RANDOM)` returns an existing readonly {ref}`entropy face <entropy_8h>` without starting hardware. No separate CMake constructor, public mutable owner or second clock configuration is used."
+msgstr "Board 提供无引脚的 `rng` binding。配置要求所选标称 PLL48 域恰好为 48 MHz；SYSCLK 使用直接输入时，还须显式预留 `pll48 = true`。生成的 `nx_factory_entropy(NX_ENTROPY_ID_RANDOM)` 返回已有只读{ref}`熵源 face <entropy_8h>`，不启动硬件。不使用独立 CMake 构造器、公开可变 owner 或第二套时钟配置。"
 
-#: docs/reference/api/extension-components.md:29
-msgid ""
-"Run start/stop from one privileged, unmasked, serialized task context. Join "
-"every entropy consumer before `nx_stm32f407_entropy_instance_stop()`, and "
-"require that stop to succeed before withdrawing Platform clocks. Failed "
-"withdrawal retains the same owner and cleanup responsibility; retry stop "
-"without resetting or rebinding its state. A stopped face remains valid and "
-"rejects data calls with STATE. This explicit constructor is separate from "
-"TOML typed-factory selection; neither it nor software RNG health checks "
-"qualify physical min-entropy or HIL."
-msgstr ""
-"在单一特权、未屏蔽中断的串行任务上下文执行 start/stop。在 `nx_stm32f407_entropy_instance_stop()` "
-"前等待全部熵使用方退出，并要求 stop 成功后才撤回 Platform 时钟。撤回失败时保留同一所有者与清理责任；重试 "
-"stop，不重置或重新绑定状态。停止后的接口仍有效，数据调用返回 STATE。此显式构造器与 TOML typed-factory 选择分离；它及软件 "
-"RNG 健康检查均不能证明物理最小熵或 HIL。"
+msgid "Readonly admission rejects foreign enabled RNG or IRQ state before System clock effects. Platform prepares the same private RNG owner after System startup, withdraws it before clock shutdown or suspend, and prepares it again in the new epoch on resume. The existing C implementation checks the actual RCC/Flash plan and retains its acquired gate and enable effects through cleanup. Join every entropy, TLS and network consumer before serialized privileged Platform suspend or stop. Failed withdrawal retains that owner and cleanup responsibility; retry the lifecycle operation without resetting its state. A cold or stopped face remains valid and rejects data calls with STATE. Clock failure or an epoch change stops data publication while cleanup remains available."
+msgstr "只读 admission 在 System 时钟产生影响前拒绝外来已使能的 RNG 或 IRQ 状态。Platform 在 System 启动后准备同一个私有 RNG owner，在时钟关闭或 suspend 前撤回，并在 resume 的新 epoch 中重新准备。已有 C 实现核对实际 RCC/Flash 计划，并在清理期间保留已取得 gate 和 enable 影响的责任。在串行化、特权 Platform suspend 或 stop 前，必须 join 所有熵源、TLS 和网络消费者。撤回失败保留 owner 和清理责任；重试生命周期操作时不可重置其状态。冷态或已停止的 face 仍有效，数据调用返回 STATE。时钟故障或 epoch 改变后停止数据发布，清理仍可执行。"
 
-#: docs/reference/api/extension-components.md:39
-msgid "stm32f407_entropy.h"
-msgstr "stm32f407_entropy.h"
+msgid "The [System contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README-system-power.md) defines clock authority and recovery. RNG health checks and software models establish neither physical min-entropy nor HIL qualification."
+msgstr "[System 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README-system-power.md)定义时钟权威与恢复。RNG 健康检查和软件模型均不能证明物理最小熵或 HIL 资格。"
 
-#: docs/reference/api/extension-components.md:41
-msgid "Explicit optional construction of the unique F407 RNG source."
-msgstr "唯一 F407 RNG 源的显式可选构造。"
+msgid "usb_role.h"
+msgstr "usb_role.h"
 
-#: docs/reference/api/extension-components.md:41
-#: docs/reference/api/extension-components.md:49
-#: docs/reference/api/extension-components.md:57
-#: docs/reference/api/extension-components.md:65
-#: docs/reference/api/extension-components.md:73
-#: docs/reference/api/extension-components.md:81
-#: docs/reference/api/extension-components.md:105
+msgid "Explicit USB role withdrawal and VBUS handover."
+msgstr "显式 USB 角色撤回与 VBUS 交接。"
+
 msgid "Author  Nexus Team"
 msgstr "作者  Nexus Team"
 
-#: docs/reference/api/extension-components.md:41
-#: docs/reference/api/extension-components.md:49
-#: docs/reference/api/extension-components.md:57
-#: docs/reference/api/extension-components.md:65
-#: docs/reference/api/extension-components.md:73
-#: docs/reference/api/extension-components.md:81
-#: docs/reference/api/extension-components.md:89
-#: docs/reference/api/extension-components.md:97
-#: docs/reference/api/extension-components.md:105
-#: docs/reference/api/extension-components.md:113
-#: docs/reference/api/extension-components.md:121
-#: docs/reference/api/extension-components.md:129
-#: docs/reference/api/extension-components.md:137
-#: docs/reference/api/extension-components.md:145
-#: docs/reference/api/extension-components.md:170
 msgid "Nexus Team"
 msgstr "Nexus Team"
 
-#: docs/reference/api/extension-components.md:41
-#: docs/reference/api/extension-components.md:49
-#: docs/reference/api/extension-components.md:57
-#: docs/reference/api/extension-components.md:65
-#: docs/reference/api/extension-components.md:73
-#: docs/reference/api/extension-components.md:81
-#: docs/reference/api/extension-components.md:89
-#: docs/reference/api/extension-components.md:97
-#: docs/reference/api/extension-components.md:105
-#: docs/reference/api/extension-components.md:113
-#: docs/reference/api/extension-components.md:121
-#: docs/reference/api/extension-components.md:129
-#: docs/reference/api/extension-components.md:137
-#: docs/reference/api/extension-components.md:145
-#: docs/reference/api/extension-components.md:170
-msgid "Functions"
-msgstr "函数"
-
-#: docs/reference/api/extension-components.md:41
-msgid "Return the existing static source face without starting it."
-msgstr "返回已有静态源接口，不启动源。"
-
-#: docs/reference/api/extension-components.md:41
-msgid ""
-"No allocation, register access, clock acquisition, locking or registration. "
-"The face's private state belongs to the unique explicit constructor target. "
-"Data calls use its shared provider table directly; a cold face reports STATE."
-msgstr ""
-"不分配、不访问寄存器、不取得时钟、不加锁或注册。接口私有状态属于唯一显式构造器目标。数据调用直接使用共享 provider 表；冷态接口返回 STATE。"
-
-#: docs/reference/api/extension-components.md:0
-msgid "Returns"
-msgstr "返回值"
-
-#: docs/reference/api/extension-components.md:41
-msgid "Stable readonly face, including while the source is stopped"
-msgstr "稳定只读接口，源停止时仍有效"
-
-#: docs/reference/api/extension-components.md:41
-msgid "Start the explicit source after successful Platform startup."
-msgstr "Platform 成功启动后显式启动源。"
-
-#: docs/reference/api/extension-components.md:41
-msgid ""
-"Privileged unmasked serialized task. One unique hardware RNG owner; a "
-"repeated live start returns BUSY. No scheduler, Platform startup or clock-"
-"profile change is implicit. A post-write IO may retain owned effects; stop "
-"must succeed before releasing Platform clock resources or recovery state."
-msgstr ""
-"特权、未屏蔽中断的串行任务。唯一硬件 RNG 所有者；有效状态下重复 start 返回 BUSY。不隐式调度、启动 Platform "
-"或变更时钟配置。写入后的 IO 错误可能保留已拥有的效果；释放 Platform 时钟资源或恢复状态之前必须 stop 成功。"
-
-#: docs/reference/api/extension-components.md:0
-msgid "Parameters"
-msgstr "参数"
-
-#: docs/reference/api/extension-components.md:41
-msgid ""
-"[in] Exact validated Board/profile facts, copied during this call; "
-"source/PLL48 dependency stays live until stop"
-msgstr "[in] 准确验证过的 Board/profile 事实，本次调用中复制；源/PLL48 依赖保持有效到 stop"
-
-#: docs/reference/api/extension-components.md:41
-msgid "SUCCESS, CONTEXT, INVALID, BUSY, STATE, UNSUPPORTED or IO"
-msgstr "SUCCESS、CONTEXT、INVALID、BUSY、STATE、UNSUPPORTED 或 IO"
-
-#: docs/reference/api/extension-components.md:41
-msgid "Stop the source before withdrawing Platform clock resources."
-msgstr "撤回 Platform 时钟资源前停止源。"
-
-#: docs/reference/api/extension-components.md:41
-msgid ""
-"Privileged unmasked serialized task after source consumers have joined. Retry"
-" the same stop on failed withdrawal; do not reset or rebind private state. "
-"The existing static face remains valid and reports STATE while admission is "
-"closed."
-msgstr ""
-"源使用方全部退出后，在特权、未屏蔽中断的串行任务执行。撤回失败时重试同一 stop；不得重置或重新绑定私有状态。现有静态接口保持有效，准入关闭时返回 "
-"STATE。"
-
-#: docs/reference/api/extension-components.md:41
-msgid "SUCCESS when stopped; IO retains failed cleanup ownership"
-msgstr "停止完成时 SUCCESS；IO 保留失败清理的所有权"
-
-#: docs/reference/api/extension-components.md:41
-msgid "Exact Board/profile facts admitted against the live RCC."
-msgstr "针对实时 RCC 准入的准确 Board/profile 事实。"
-
-#: docs/reference/api/extension-components.md:41
-msgid ""
-"First scope uses an 8 MHz reviewed HSE Board or the fixed 16 MHz HSI. These "
-"values come from validated assembly facts, not guessed hardware. Start checks"
-" exact PLL48 and HCLK; caller maintains the source/PLLQ/HCLK dependency until"
-" stop."
-msgstr ""
-"首个范围使用经过审查的 8 MHz HSE Board 或固定 16 MHz HSI。这些值来自经过验证的装配事实，不猜测硬件。start 检查准确的 "
-"PLL48 与 HCLK；调用方将源/PLLQ/HCLK 依赖保持至 stop。"
-
-#: docs/reference/api/extension-components.md:41
-#: docs/reference/api/extension-components.md:49
-#: docs/reference/api/extension-components.md:57
-#: docs/reference/api/extension-components.md:65
-#: docs/reference/api/extension-components.md:73
-#: docs/reference/api/extension-components.md:81
-#: docs/reference/api/extension-components.md:89
-#: docs/reference/api/extension-components.md:97
-#: docs/reference/api/extension-components.md:113
-#: docs/reference/api/extension-components.md:121
-#: docs/reference/api/extension-components.md:129
-#: docs/reference/api/extension-components.md:137
-#: docs/reference/api/extension-components.md:145
-msgid "Public Members"
-msgstr "公共成员"
-
-#: docs/reference/api/extension-components.md:47
-msgid "frame_stream.h"
-msgstr "frame_stream.h"
-
-#: docs/reference/api/extension-components.md:49
-msgid "Complete framed blocks and strided DMA consumer loans."
-msgstr "完整的成帧块与带步长的 DMA 消费者借用。"
-
-#: docs/reference/api/extension-components.md:49
-#: docs/reference/api/extension-components.md:89
-#: docs/reference/api/extension-components.md:145
-msgid "Defines"
-msgstr "宏定义"
-
-#: docs/reference/api/extension-components.md:49
-#: docs/reference/api/extension-components.md:89
-#: docs/reference/api/extension-components.md:113
-#: docs/reference/api/extension-components.md:129
-msgid "Typedefs"
-msgstr "类型定义"
-
-#: docs/reference/api/extension-components.md:49
-msgid "Immutable consumer block retained through final DMA access."
-msgstr "不可变消费者块，保留至 DMA 最后访问结束。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"Zero-initialize before first acquisition. Keep this exact control live and "
-"exclusively owned until release; copied tokens never authorize earlier reuse "
-"or another instance."
-msgstr "首次获取前清零初始化。释放前必须让这个精确控制对象保持存活并由唯一所有者持有；复制的令牌从不授权提前复用或操作另一个实例。"
-
-#: docs/reference/api/extension-components.md:49
-#: docs/reference/api/extension-components.md:65
-#: docs/reference/api/extension-components.md:89
-#: docs/reference/api/extension-components.md:113
-#: docs/reference/api/extension-components.md:121
-#: docs/reference/api/extension-components.md:129
-#: docs/reference/api/extension-components.md:145
-#: docs/reference/api/extension-components.md:170
 msgid "Enums"
 msgstr "枚举"
 
-#: docs/reference/api/extension-components.md:49
-msgid "Memory representations; these values never configure a wire."
-msgstr "内存表示；这些取值从不配置总线上的传输。"
-
-#: docs/reference/api/extension-components.md:49
-#: docs/reference/api/extension-components.md:65
-#: docs/reference/api/extension-components.md:89
-#: docs/reference/api/extension-components.md:113
-#: docs/reference/api/extension-components.md:121
-#: docs/reference/api/extension-components.md:129
-#: docs/reference/api/extension-components.md:145
-#: docs/reference/api/extension-components.md:170
 msgid "Values:"
 msgstr "取值："
 
-#: docs/reference/api/extension-components.md:49
-msgid "Serial framing whose complete units determine block geometry."
-msgstr "串行成帧规则，其完整单位决定块的几何布局。"
+msgid "Functions"
+msgstr "函数"
 
-#: docs/reference/api/extension-components.md:49
-msgid "Position of useful sample bits in each stored slot container."
-msgstr "每个存储时隙容器中有效采样位的位置。"
+msgid "Bind an idle role owner without touching hardware or power."
+msgstr "绑定空闲角色 owner，不操作硬件或电源。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "Compute complete audio storage without touching payload."
-msgstr "计算完整音频存储布局，不访问载荷。"
+msgid "Task-only. Initialization must never replace a live owner."
+msgstr "仅限任务调用。初始化不得替换仍在使用的 owner。"
 
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"Task/IRQ bounded pure calculation. No format conversion, serializer "
-"configuration or codec negotiation is performed."
-msgstr "可在任务或 IRQ 中执行的有界纯计算。不执行格式转换、串行器配置或编解码器协商。"
+msgid "Parameters"
+msgstr "参数"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[in] Explicit framing, sample and stored slot geometry."
-msgstr "[in] 显式成帧规则、采样参数和存储时隙的几何布局。"
+msgid "[out] Fresh unpublished storage, disjoint from config/context."
+msgstr "[out] 尚未发布的新存储，与 config/context 不重叠。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[out] Separate fresh output, unchanged on rejection."
-msgstr "[out] 独立的新输出；拒绝时保持不变。"
+msgid "[in] Immutable complete backend and allowed-role facts."
+msgstr "[in] 不可变的完整 backend 与允许角色事实。"
 
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"SUCCESS, INVALID for incompatible framing or EXHAUSTED on arithmetic "
-"overflow; never retains an input or allocates."
-msgstr "成功返回 SUCCESS；成帧规则不兼容时返回 INVALID，算术溢出时返回 EXHAUSTED；从不保留输入或分配内存。"
+msgid "Returns"
+msgstr "返回值"
 
-#: docs/reference/api/extension-components.md:49
-msgid "Check and copy planar/strided frame geometry."
-msgstr "检查并复制平面式或带步长的帧几何布局。"
+msgid "SUCCESS or INVALID; failure leaves output unchanged."
+msgstr "SUCCESS 或 INVALID；失败时输出不变。"
 
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"Bounded pure calculation. Pixel/color meanings remain with the selected "
-"camera/display/DMA adapter."
-msgstr "有界纯计算。像素和颜色的含义仍由所选相机、显示或 DMA 适配器负责。"
+msgid "Request a role transaction, retaining the old transport until drained."
+msgstr "请求一次角色切换事务，保留旧 transport 直到排空。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[in] 1..NX_FRAME_MAX_PLANES immutable plane descriptions."
-msgstr "[in] 1..NX_FRAME_MAX_PLANES 个不可变平面描述。"
+msgid "REJECTED creates no effects. Call service until phase becomes zero. Source power is never enabled while VBUS is already externally present."
+msgstr "REJECTED 不产生影响。持续调用 service，直到 phase 为零。实际 VBUS 已由外部供电时，绝不启用 source power。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[in] Exact plane count, not a runtime pool maximum."
-msgstr "[in] 精确平面数，并非运行时池的容量上限。"
+msgid "[inout] Initialized single task owner."
+msgstr "[inout] 已初始化、由单一任务串行操作的 owner。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[out] Fresh output, unchanged on every rejection."
-msgstr "[out] 新输出；任何拒绝都保持其不变。"
+msgid "[in] Explicit OFF, DEVICE or HOST; no policy is inferred."
+msgstr "[in] 显式 OFF、DEVICE 或 HOST；不推断策略。"
 
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"SUCCESS, INVALID for empty/overlapping/short-stride planes, or EXHAUSTED on "
-"byte arithmetic overflow."
-msgstr "成功返回 SUCCESS；平面为空、相互重叠或步长不足时返回 INVALID；字节数算术溢出时返回 EXHAUSTED。"
+msgid "[in] Finite absolute Core deadline for the complete handover."
+msgstr "[in] 覆盖完整交接过程的有限、绝对 Core deadline。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "Cold-bind a complete-frame layout to an existing queue."
-msgstr "在冷构造阶段将完整帧布局绑定到既有队列。"
+msgid "SUCCESS accepts the transition; BUSY retains the current transition."
+msgstr "SUCCESS 表示接受切换；BUSY 保留当前切换。"
 
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"Task-only cold assembly, O(n squared) storage checks. No hardware or DMA-"
-"domain admission is inferred. Keep all queue/control/payload storage live "
-"through final stop."
-msgstr ""
-"仅供任务执行的冷构造，存储检查的复杂度为 O(n²)。不据此推断硬件或 DMA 域准入。全部队列、控制对象和载荷存储须保持存活，直至最终停止完成。"
+msgid "Cancel activation and finish OFF through the same drain barriers."
+msgstr "取消激活，通过同一排空屏障完成 OFF。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[out] Fresh control disjoint from queue and payloads."
-msgstr "[out] 新控制对象，与队列及载荷均不重叠。"
+msgid "Service remains required. Its final result is CANCELLED, or an earlier failure. A failed stop still prevents source-off and replacement start."
+msgstr "仍须调用 service。最终结果为 CANCELLED，或更早发生的失败。stop 失败仍会阻止 source-off 和替代 transport 启动。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[inout] Initialized unborrowed queue with all slots free."
-msgstr "[inout] 已初始化且未被借用的队列，全部时隙空闲。"
+msgid "[inout] Same serialized owner, including a pending transition."
+msgstr "[inout] 同一个串行化 owner，包括尚未结束的切换。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[in] Checked complete-frame geometry, copied on success."
-msgstr "[in] 已检查的完整帧几何布局，成功时复制。"
+msgid "[in] Fresh finite absolute deadline for retained cleanup."
+msgstr "[in] 用于保留责任清理的新有限、绝对 deadline。"
 
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"SUCCESS, INVALID for aliases/short buffers/bad layout, BUSY for outstanding "
-"blocks or STATE while stopping."
-msgstr "成功返回 SUCCESS；存在别名、缓冲区不足或布局无效时返回 INVALID；仍有未归还块时返回 BUSY；停止过程中返回 STATE。"
+msgid "SUCCESS accepts cleanup; it never revokes a transport or packet."
+msgstr "SUCCESS 表示接受清理；不会撤销 transport 或 packet 的所有权。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "Publish one complete frame after final producer access."
-msgstr "生产者最后访问结束后，发布一个完整帧。"
+msgid "Advance one bounded handover step, including failed-start cleanup."
+msgstr "推进一个有界交接步骤，包括启动失败后的清理。"
 
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"Bounded task/IRQ metadata. Reserve/prepost/abort still use the existing "
-"stream; publication always has exact frame size."
-msgstr "可在任务或 IRQ 中执行的有界元数据操作。预留、预提交和中止仍使用既有流；发布大小始终等于精确帧大小。"
+msgid "stop failure never permits power withdrawal or a replacement start. Timeout cancels activation but does not revoke transport ownership. HOST withdrawal observes actual VBUS discharge before DEVICE activation. DEVICE activation waits for externally supplied VBUS. No sleeps occur."
+msgstr "stop 失败绝不允许撤回电源或启动替代 transport。超时取消激活，但不撤销 transport 所有权。HOST 撤回后，必须观察实际 VBUS 放电完成，才可激活 DEVICE。DEVICE 激活等待外部供应的 VBUS。不调用 sleep。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[inout] Exclusive serialized producer binding."
-msgstr "[inout] 独占且串行使用的生产者绑定。"
+msgid "[inout] Same owner with backend/config storage still alive."
+msgstr "[inout] 同一个 owner；backend/config 存储仍保持有效。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[in] Existing stream producer loan, detached from all DMA."
-msgstr "[in] 既有流的生产者借用，已从全部 DMA 脱离。"
+msgid "BUSY while work remains; final SUCCESS or original transition error."
+msgstr "工作尚未完成时为 BUSY；最终返回 SUCCESS 或原始切换错误。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[in] Existing observed stream boundary flags."
-msgstr "[in] 已观察到的既有流边界标志。"
+msgid "One controller transport owner and its reviewed power switch."
+msgstr "一个控制器 transport owner 及其已审查的电源开关。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "Existing stream result; rejection retains the fill loan."
-msgstr "返回既有流的结果；拒绝时保留填充借用。"
+msgid "All operations use the same serialized unmasked privileged task. stop succeeds only after every transfer, IRQ and callback has joined. start failure may retain effects: stop must remain callable. source reports success only after the switch command has been read back. present reads actual VBUS, independently of the requested switch state."
+msgstr "所有操作由同一个串行化、未屏蔽 IRQ 的特权任务执行。stop 仅在所有传输、IRQ 和 callback 均已 join 后成功。start 失败可能保留影响，stop 必须仍可调用。source 仅在开关命令读回确认后报告成功。present 读取实际 VBUS，与所请求的开关状态无关。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "Publish one complete frame from the existing posted FIFO."
-msgstr "从既有预提交 FIFO 发布一个完整帧。"
+msgid "Public Members"
+msgstr "公共成员"
 
-#: docs/reference/api/extension-components.md:49
-msgid "Bounded task/IRQ metadata; preserves pending and FIFO counts."
-msgstr "可在任务或 IRQ 中执行的有界元数据操作；保留待处理数和 FIFO 计数。"
+msgid "Caller-owned transaction state; initialize once before publication."
+msgstr "调用方拥有的事务状态；在发布前仅初始化一次。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[inout] Same producer binding and complete-frame layout."
-msgstr "[inout] 同一生产者绑定及完整帧布局。"
+msgid "Config and backend context outlive successful OFF completion. Fields are modified only by these methods. The same serialized owner may read active/target/result and phase (zero means transaction complete). No allocation, ID-pin policy, SRP/HNP, background executor or automatic role selection is supplied."
+msgstr "Config 与 backend context 的生命周期必须覆盖并超过 OFF 成功完成时点。字段仅由这些方法修改。同一个串行化 owner 可读取 active/target/result 及 phase（零表示事务完成）。不提供分配、ID-pin 策略、SRP/HNP、后台执行者或自动角色选择。"
 
-#: docs/reference/api/extension-components.md:49
-msgid "[inout] Existing posted producer bound to this stream."
-msgstr "[inout] 已绑定到此流的既有预提交生产者。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "[in] Oldest pending loan, absent from all hardware targets."
-msgstr "[in] 最早的待处理借用，已不在任何硬件目标中。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "[in] Observed existing stream boundary flags."
-msgstr "[in] 已观察到的既有流边界标志。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "Existing posted-publication result, INVALID for foreign pool."
-msgstr "返回既有预提交发布操作的结果；来自其他池时返回 INVALID。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "Acquire the next complete immutable DMA consumer loan."
-msgstr "获取下一个完整、不可变的 DMA 消费者借用。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"Task/IRQ; output disjointness scans the fixed pool in O(n) before the O(1) "
-"guarded queue operation. Output cannot alias queue controls or any full-"
-"capacity pool payload. EMPTY creates no loan and never repeats a previous "
-"frame. Caller owns silence/blanking/stop policy. Do not use retries as "
-"additional observed boundaries."
-msgstr ""
-"可在任务或 IRQ 中调用。在带保护的 O(1) 队列操作前，以 O(n) "
-"扫描固定池来检查输出不重叠。输出不得与队列控制对象或池内任何载荷的完整容量范围重叠。EMPTY "
-"不创建借用，也从不重复上一帧。静音、消隐或停止策略由调用方负责。不得将重试计为额外观察到的边界。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"[inout] Same serialized consumer, one call per observed output boundary when "
-"using underrun accounting."
-msgstr "[inout] 同一串行消费者；使用欠载计数时，每个观察到的输出边界只调用一次。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "[inout] Zero or previously released control, unchanged on error."
-msgstr "[inout] 已清零或先前已释放的控制对象；出错时保持不变。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"SUCCESS, EMPTY with saturating underrun count, BUSY for a live loan, INVALID "
-"for output alias or STATE for an incomplete queued block."
-msgstr ""
-"成功返回 SUCCESS；EMPTY 时增加饱和欠载计数；仍有活动借用时返回 BUSY；输出存在别名时返回 INVALID；已入队块不完整时返回 "
-"STATE。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "Derive a strided byte rectangle from a live frame loan."
-msgstr "从活动帧借用导出带步长的字节矩形。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"Task/IRQ; an O(n) immutable-pool output check precedes the O(1) guarded view "
-"calculation. Output cannot alias the loan, queue controls or any full-"
-"capacity pool payload. The adapter checks pixel alignment, resource and DMA "
-"domain."
-msgstr ""
-"可在任务或 IRQ 中调用。在带保护的 O(1) 视图计算前，以 O(n) "
-"检查输出与不可变池不重叠。输出不得与借用控制对象、队列控制对象或池内任何载荷的完整容量范围重叠。像素对齐、资源及 DMA 域由适配器检查。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "[in] Exact live immutable DMA consumer loan."
-msgstr "[in] 精确、活动且不可变的 DMA 消费者借用。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "[in] Plane index in the bound layout."
-msgstr "[in] 已绑定布局中的平面索引。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "[in] Byte column within a row, not a pixel count."
-msgstr "[in] 行内字节列偏移，并非像素数。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "[in] First complete row."
-msgstr "[in] 起始完整行。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "[in] Positive bytes per selected row."
-msgstr "[in] 每个选中行的正数字节数。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "[in] Positive selected row count."
-msgstr "[in] 选中的正数行数。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "[out] Fresh output unchanged on failure."
-msgstr "[out] 新输出；失败时保持不变。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"SUCCESS, INVALID for out-of-plane rectangles or STATE for stale/foreign "
-"loans; no DMA access begins here."
-msgstr "成功返回 SUCCESS；矩形超出平面时返回 INVALID；借用身份陈旧或来自其他实例时返回 STATE；此处不启动 DMA 访问。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "Release only after the adapter proves final DMA access."
-msgstr "只有适配器证明 DMA 最后访问结束后才能释放。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"Bounded task/IRQ metadata. Timeout/cancel is not quiescence; failed drain "
-"retains the queue borrow, including during stop. This helper checks proof "
-"facts and does not stop hardware."
-msgstr ""
-"可在任务或 IRQ 中执行的有界元数据操作。超时或取消不代表静止；排空失败会保留队列借用，停止过程中也不例外。此辅助函数检查证明事实，不停止硬件。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "[inout] Original owner; another instance cannot release."
-msgstr "[inout] 原始所有者；另一个实例不能释放。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "[inout] Exact acquired control, cleared only on success."
-msgstr "[inout] 精确获取的控制对象，仅在成功时清除。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"[in] Actual provider observations of engine, IRQ and peripheral quiescence; "
-"counter completion alone is not proof."
-msgstr "[in] 提供方对引擎、IRQ 和外设静止状态的实际观测；单凭计数器完成不构成证明。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"SUCCESS, BUSY while any source remains, STATE for stale or foreign tokens, or"
-" INVALID for impossible drain counters."
-msgstr ""
-"成功返回 SUCCESS；任何访问源尚未退出时返回 BUSY；令牌身份陈旧或来自其他实例时返回 STATE；排空计数不可能成立时返回 INVALID。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "Immutable audio memory format, independent of codec policy."
-msgstr "不可变音频内存格式，独立于编解码器策略。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"PCM frames store every slot, including inactive slots, in ascending slot "
-"order; slot_bits is the container width. I2S has two 16/32-bit slots; SAI has"
-" 1..32 8/16/32-bit slots. PDM has 1..8 byte-interleaved lanes; each byte "
-"holds eight successive bits of one lane, so frames must divide by eight. "
-"active_slots selects valid lanes/slots without compacting storage. Sample "
-"byte order is explicitly declared."
-msgstr ""
-"PCM 帧按时隙升序存储每个时隙，包括非活动时隙；slot_bits 是容器位宽。I2S 有两个 16/32 位时隙；SAI 有 1..32 个 "
-"8/16/32 位时隙。PDM 有 1..8 条按字节交错的通道；每个字节保存同一通道连续的八个位，因此帧数必须能被八整除。active_slots "
-"选择有效通道或时隙，不压缩存储布局。采样字节序须显式声明。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "One plane; the last row needs no trailing stride padding."
-msgstr "一个平面；最后一行无需尾随的步长填充。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"row_bytes/stride are bytes, rows is a complete line count. A plane occupies "
-"(rows - 1) * stride + row_bytes bytes."
-msgstr ""
-"row_bytes 和 stride 的单位为字节，rows 为完整行数。一个平面占用 (rows - 1) * stride + row_bytes "
-"字节。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "Immutable frame geometry copied into a bound stream."
-msgstr "复制到已绑定流中的不可变帧几何布局。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"Plane intervals, including inter-row padding, cannot overlap. bytes is the "
-"exact maximum plane end, not summed row bytes. Audio formats are separate "
-"immutable caller metadata; this layout represents their checked complete-unit"
-" storage."
-msgstr ""
-"各平面的区间（包括行间填充）不得重叠。bytes "
-"是最远平面末端的精确位置，并非各行字节数之和。音频格式是独立、不可变的调用方元数据；此布局表示经检查的完整单位存储。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "Caller-owned binding; the existing stream owns every queue."
-msgstr "调用方拥有的绑定；全部队列均由既有流拥有。"
-
-#: docs/reference/api/extension-components.md:49
-msgid ""
-"Initialize before publication. One serialized producer and consumer use "
-"framed publish/acquire exclusively until stop. Hardware, queue capacity and "
-"synchronization remain explicit."
-msgstr "发布前初始化。一个串行生产者和一个串行消费者始终使用成帧发布与获取接口，直至停止。硬件、队列容量及同步方式仍须显式提供。"
-
-#: docs/reference/api/extension-components.md:49
-msgid "Checked 2D byte rectangle for an explicit DMA adapter."
-msgstr "供显式 DMA 适配器使用的已检查二维字节矩形。"
-
-#: docs/reference/api/extension-components.md:55
 msgid "spi_dma_owner.h"
 msgstr "spi_dma_owner.h"
 
-#: docs/reference/api/extension-components.md:57
 msgid "Optional typed whole-CS SPI executor for bounded BusOwner."
 msgstr "面向有界 BusOwner 的可选类型化完整片选区间 SPI 执行器。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "Bind a fresh executor without opening hardware or admission."
 msgstr "绑定新执行器，不开启硬件或准入。"
 
-#: docs/reference/api/extension-components.md:57
-msgid ""
-"Task-only, all lifecycle users joined before replacement. Uses original "
-"FIFO/slots/epochs; final provider terminal result survives late cancellation."
-" Continue unique executor service during stop and quarantine. Hardware stop, "
-"publisher join and observer join remain explicit external steps."
-msgstr ""
-"仅供任务调用；替换前须让全部生命周期使用者完成会合退出。沿用原始 FIFO、时隙和 "
-"epoch；提供方最终终止结果不受晚到取消影响。停止和隔离期间继续由唯一执行器推进。硬件停止、发布者会合退出和观察者会合退出仍是显式外部步骤。"
+msgid "Task-only, all lifecycle users joined before replacement. Uses original FIFO/slots/epochs; final provider terminal result survives late cancellation. Continue unique executor service during stop and quarantine. Hardware stop, publisher join and observer join remain explicit external steps."
+msgstr "仅供任务调用；替换前须让全部生命周期使用者完成会合退出。沿用原始 FIFO、时隙和 epoch；提供方最终终止结果不受晚到取消影响。停止和隔离期间继续由唯一执行器推进。硬件停止、发布者会合退出和观察者会合退出仍是显式外部步骤。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "[inout] Zero fresh storage, distinct from capability/face."
 msgstr "[inout] 已清零的新存储，与能力对象及接口对象均不重叠。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "[in] Initialized bus exclusively serviced by this owner."
 msgstr "[in] 已初始化且仅由此所有者推进的总线。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "Executor for nx_bus_owner_init, zero port on invalid input."
 msgstr "供 nx_bus_owner_init 使用的执行器；输入无效时返回全零端口。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "Check typed storage, then use bounded owner admission."
 msgstr "检查类型化存储，再使用有界所有者准入。"
 
-#: docs/reference/api/extension-components.md:57
-msgid ""
-"The request has an absolute deadline including queue time. Task multi-"
-"producer checks run outside the metadata guard. There is no capacity scan, "
-"allocation, OS lock or worker. One operation has one CS interval with allowed"
-" SCK gaps. Schedule bounded service even when hints fail. Waiters never "
-"service the shared controller. Queued provider failures settle later without "
-"converting admission into rejection."
-msgstr ""
-"请求使用包含排队时间的绝对期限。任务级多生产者检查在元数据保护区外执行。不扫描容量，不分配内存，也不创建 OS 锁或工作线程。一次操作对应一个 CS "
-"区间，允许其中出现 SCK 间隙。即使提示通知失败，也须调度有界推进。等待者从不推进共享控制器。已排队请求的提供方失败随后结算，不把已接受准入改判为拒绝。"
+msgid "The request has an absolute deadline including queue time. Task multi-producer checks run outside the metadata guard. There is no capacity scan, allocation, OS lock or worker. One operation has one CS interval with allowed SCK gaps. Schedule bounded service even when hints fail. Waiters never service the shared controller. Queued provider failures settle later without converting admission into rejection."
+msgstr "请求使用包含排队时间的绝对期限。任务级多生产者检查在元数据保护区外执行。不扫描容量，不分配内存，也不创建 OS 锁或工作线程。一次操作对应一个 CS 区间，允许其中出现 SCK 间隙。即使提示通知失败，也须调度有界推进。等待者从不推进共享控制器。已排队请求的提供方失败随后结算，不把已接受准入改判为拒绝。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "[inout] Owner with this exact typed executor."
 msgstr "[inout] 装配此精确类型化执行器的所有者。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "[inout] Prepared READY outer request."
 msgstr "[inout] 已准备好的 READY 外层请求。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "[in] Immutable chain through outer SETTLED."
 msgstr "[in] 不可变链，保持至外层请求进入 SETTLED。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "[in] Optional static caller hint, or NULL."
 msgstr "[in] 可选的静态调用方提示端口，或 NULL。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "[out] Stable slot/epoch identity on SUCCESS."
 msgstr "[out] SUCCESS 时返回稳定的时隙/epoch 身份。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "SUCCESS means ACCEPTED; failure retains nothing."
 msgstr "SUCCESS 表示 ACCEPTED；失败不保留任何内容。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "Caller-owned queued and active SPI chain."
 msgstr "调用方拥有的已排队或活动 SPI 链。"
 
-#: docs/reference/api/extension-components.md:57
-msgid ""
-"The outer deadline includes queue residence. The chain, descriptors and all "
-"TX/RX or fixed cells stay borrowed until acquire-observed outer SETTLED. "
-"Counts and results use words."
-msgstr ""
-"外层期限包含排队停留时间。链、描述符以及全部 TX/RX 缓冲区或固定存储单元保持被借用，直至以 acquire 语义观察到外层 "
-"SETTLED。计数和结果以字为单位。"
+msgid "The outer deadline includes queue residence. The chain, descriptors and all TX/RX or fixed cells stay borrowed until acquire-observed outer SETTLED. Counts and results use words."
+msgstr "外层期限包含排队停留时间。链、描述符以及全部 TX/RX 缓冲区或固定存储单元保持被借用，直至以 acquire 语义观察到外层 SETTLED。计数和结果以字为单位。"
 
-#: docs/reference/api/extension-components.md:57
 msgid "Selected-only exact metadata; no queue, payload copy or worker."
 msgstr "仅为所选实例提供的精确元数据；不添加队列、载荷复制或工作线程。"
 
-#: docs/reference/api/extension-components.md:63
 msgid "mapped_storage.h"
 msgstr "mapped_storage.h"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Bounded read mappings and exclusive storage requests."
 msgstr "有界只读映射与独占存储请求。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Read-only consumers; capability does not prove physical routing."
 msgstr "只读消费者；能力声明不证明物理布线。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Physical mutation, separate from read-map ownership."
 msgstr "物理修改操作，与只读映射所有权分离。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Prepare unborrowed caller storage without accessing payload."
 msgstr "准备未被借用的调用方存储，不访问载荷。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "SUCCESS or INVALID/STATE; no retained references on failure."
 msgstr "成功返回 SUCCESS，否则返回 INVALID/STATE；失败不保留引用。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Query immutable geometry without starting hardware."
 msgstr "查询不可变几何参数，不启动硬件。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Acquire one bounded, positive read-only span on a serialized executor."
 msgstr "在串行执行器上获取一个有界、长度为正的只读范围。"
 
-#: docs/reference/api/extension-components.md:65
-msgid ""
-"SUCCESS or INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE. Rejection retains no "
-"loan. Live read maps exclude all command/program/erase/cache/DMA writers. "
-"CPU/XIP/DMA consumers may run concurrently after successful acquisition."
-msgstr ""
-"返回 SUCCESS 或 "
-"INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE。拒绝不保留借用。活动只读映射排斥全部命令、编程、擦除、缓存及 DMA "
-"写入者。成功获取后，CPU/XIP/DMA 消费者可以并发运行。"
+msgid "SUCCESS or INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE. Rejection retains no loan. Live read maps exclude all command/program/erase/cache/DMA writers. CPU/XIP/DMA consumers may run concurrently after successful acquisition."
+msgstr "返回 SUCCESS 或 INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE。拒绝不保留借用。活动只读映射排斥全部命令、编程、擦除、缓存及 DMA 写入者。成功获取后，CPU/XIP/DMA 消费者可以并发运行。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Release an exact live loan after its consumers have joined."
 msgstr "消费者全部会合退出后，释放一个精确的活动借用。"
 
-#: docs/reference/api/extension-components.md:65
-msgid ""
-"SUCCESS, INVALID/STATE, or backend unmap error retaining the loan. Task-only,"
-" same serialized executor; no forced revocation or timeout release."
-msgstr ""
-"返回 SUCCESS、INVALID/STATE，或保留借用的后端解除映射错误。仅供任务调用，使用同一串行执行器；不强制撤销借用，也不因超时释放。"
+msgid "SUCCESS, INVALID/STATE, or backend unmap error retaining the loan. Task-only, same serialized executor; no forced revocation or timeout release."
+msgstr "返回 SUCCESS、INVALID/STATE，或保留借用的后端解除映射错误。仅供任务调用，使用同一串行执行器；不强制撤销借用，也不因超时释放。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Admit one exclusive PROGRAM/ERASE request with an absolute deadline."
 msgstr "以绝对期限接纳一个独占 PROGRAM/ERASE 请求。"
 
-#: docs/reference/api/extension-components.md:65
-msgid ""
-"SUCCESS is ACCEPTED, possibly settled. Rejection retains no request or "
-"payload and produces no hardware effects. No map loan may remain live. Task-"
-"only serialized owner; no workers, allocation, locks or queue exist."
-msgstr ""
-"SUCCESS 表示 "
-"ACCEPTED，请求可能已经完成结算。拒绝不保留请求或载荷，也不产生硬件效果。不得仍有活动映射借用。仅供串行任务所有者使用；不创建工作线程、内存分配、锁或队列。"
+msgid "SUCCESS is ACCEPTED, possibly settled. Rejection retains no request or payload and produces no hardware effects. No map loan may remain live. Task-only serialized owner; no workers, allocation, locks or queue exist."
+msgstr "SUCCESS 表示 ACCEPTED，请求可能已经完成结算。拒绝不保留请求或载荷，也不产生硬件效果。不得仍有活动映射借用。仅供串行任务所有者使用；不创建工作线程、内存分配、锁或队列。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Request cancellation by instance and nonrepeating writer epoch."
 msgstr "通过实例及不重复的写入 epoch 身份请求取消。"
 
-#: docs/reference/api/extension-components.md:65
-msgid ""
-"SUCCESS starts/observes drain; STATE rejects stale/foreign identity. "
-"Cancellation never releases storage. Continue service through drain."
+msgid "SUCCESS starts/observes drain; STATE rejects stale/foreign identity. Cancellation never releases storage. Continue service through drain."
 msgstr "SUCCESS 表示启动或观察排空；STATE 拒绝过期或属于其他实例的身份。取消从不释放存储。须继续推进，直至排空结束。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Advance one bounded backend step or drain attempt without waiting."
 msgstr "不等待地推进一次有界后端步骤或排空尝试。"
 
-#: docs/reference/api/extension-components.md:65
-msgid ""
-"Backend/IRQ/data references detach before release-publication of SETTLED, "
-"which is the final request access. Failed drain is QUARANTINED; storage "
-"remains borrowed and later service may retry source withdrawal."
-msgstr ""
-"在以 release 语义发布 SETTLED 前，后端、IRQ 和数据引用全部脱离；该发布是对请求的最后访问。排空失败进入 "
-"QUARANTINED；存储继续被借用，后续推进可以重试撤回访问源。"
+msgid "Backend/IRQ/data references detach before release-publication of SETTLED, which is the final request access. Failed drain is QUARANTINED; storage remains borrowed and later service may retry source withdrawal."
+msgstr "在以 release 语义发布 SETTLED 前，后端、IRQ 和数据引用全部脱离；该发布是对请求的最后访问。排空失败进入 QUARANTINED；存储继续被借用，后续推进可以重试撤回访问源。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Close admission and request writer cancellation."
 msgstr "关闭准入并请求取消写入操作。"
 
-#: docs/reference/api/extension-components.md:65
-msgid ""
-"SUCCESS only after all map loans and writer sources are gone; BUSY retains "
-"storage and needs release/service. Repeated successful stop performs no "
-"backend operation. The owner cannot restart or revoke loans."
-msgstr ""
-"只有全部映射借用与写入访问源均已退出才返回 SUCCESS；BUSY "
-"保留存储，仍需释放借用或继续推进。成功停止后的重复调用不执行后端操作。此所有者不能重启或撤销借用。"
+msgid "SUCCESS only after all map loans and writer sources are gone; BUSY retains storage and needs release/service. Repeated successful stop performs no backend operation. The owner cannot restart or revoke loans."
+msgstr "只有全部映射借用与写入访问源均已退出才返回 SUCCESS；BUSY 保留存储，仍需释放借用或继续推进。成功停止后的重复调用不执行后端操作。此所有者不能重启或撤销借用。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Exact byte geometry; units divide size and one another."
 msgstr "精确字节几何参数；各单位须整除总大小，且彼此满足整除关系。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Caller-owned request and input, borrowed through SETTLED."
 msgstr "调用方拥有的请求及输入，保持被借用至 SETTLED。"
 
-#: docs/reference/api/extension-components.md:65
-msgid ""
-"Initialize base before prepare. PROGRAM borrows length input bytes; ERASE "
-"requires NULL input. Geometry alignment is checked at admission. Partial "
-"effects survive cancellation, timeout and I/O failure. No replay."
-msgstr ""
-"准备前先初始化 base。PROGRAM 借用 length 个输入字节；ERASE 要求输入为 NULL。几何对齐在准入时检查。取消、超时或 I/O "
-"失败都不会撤销已产生的部分效果。不得重放。"
+msgid "Initialize base before prepare. PROGRAM borrows length input bytes; ERASE requires NULL input. Geometry alignment is checked at admission. Partial effects survive cancellation, timeout and I/O failure. No replay."
+msgstr "准备前先初始化 base。PROGRAM 借用 length 个输入字节；ERASE 要求输入为 NULL。几何对齐在准入时检查。取消、超时或 I/O 失败都不会撤销已产生的部分效果。不得重放。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Stable instance-bound identity of one read mapping."
 msgstr "一个只读映射的稳定实例绑定身份。"
 
-#: docs/reference/api/extension-components.md:65
-msgid ""
-"Fields are immutable until release. Data stays read-only. Join every CPU, XIP"
-" instruction fetch and DMA reader before release; a copied token grants no "
-"additional loan. A failed release retains cleanup responsibility; readers "
-"remain joined and must not resume access through the view. The portable owner"
-" closes admission and permits release/stop cleanup retry."
-msgstr ""
-"字段在 release 前不可变。数据保持只读。Release 前须 join 每个 CPU、XIP 指令取指和 DMA 读取者；复制 token "
-"不授予额外借用。Release 失败会保留清理责任；读取者必须保持已 join，不得通过该 view 恢复访问。可移植 owner 关闭准入，并允许重试 "
-"release/stop 清理。"
+msgid "Fields are immutable until release. Data stays read-only. Join every CPU, XIP instruction fetch and DMA reader before release; a copied token grants no additional loan. A failed release retains cleanup responsibility; readers remain joined and must not resume access through the view. The portable owner closes admission and permits release/stop cleanup retry."
+msgstr "字段在 release 前不可变。数据保持只读。Release 前须 join 每个 CPU、XIP 指令取指和 DMA 读取者；复制 token 不授予额外借用。Release 失败会保留清理责任；读取者必须保持已 join，不得通过该 view 恢复访问。可移植 owner 关闭准入，并允许重试 release/stop 清理。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Stable writer identity; drain controls before reuse or destruction."
 msgstr "稳定的写入身份；复用或销毁前须排空控制请求。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Shared immutable operations; every callback receives instance state."
 msgstr "共享不可变操作表；每个回调都接收实例状态。"
 
-#: docs/reference/api/extension-components.md:65
 msgid "Immutable face; context and all retained storage outlive users."
 msgstr "不可变接口对象；上下文及全部保留存储必须比使用者存活更久。"
 
-#: docs/reference/api/extension-components.md:71
 msgid "mapped_storage_owner.h"
 msgstr "mapped_storage_owner.h"
 
-#: docs/reference/api/extension-components.md:73
 msgid "Explicit portable mapped-storage constructor and storage."
 msgstr "显式、可移植的映射存储构造器及存储。"
 
-#: docs/reference/api/extension-components.md:73
 msgid "Bind unused explicit storage without hardware or payload access."
 msgstr "绑定未使用的显式存储，不访问硬件或载荷。"
 
-#: docs/reference/api/extension-components.md:73
-msgid ""
-"SUCCESS or INVALID; zero capacity, overlapping metadata/aperture, overflowing"
-" spans, inconsistent units and missing callbacks reject. Caller constructs a "
-"const face with owner_ops and this owner context."
-msgstr ""
-"返回 SUCCESS 或 INVALID；容量为零、元数据与映射窗口重叠、跨度溢出、单位不一致或缺少回调时拒绝。调用方使用 owner_ops "
-"和此所有者上下文构造 const 接口对象。"
+msgid "SUCCESS or INVALID; zero capacity, overlapping metadata/aperture, overflowing spans, inconsistent units and missing callbacks reject. Caller constructs a const face with owner_ops and this owner context."
+msgstr "返回 SUCCESS 或 INVALID；容量为零、元数据与映射窗口重叠、跨度溢出、单位不一致或缺少回调时拒绝。调用方使用 owner_ops 和此所有者上下文构造 const 接口对象。"
 
-#: docs/reference/api/extension-components.md:73
-#: docs/reference/api/extension-components.md:145
 msgid "Variables"
 msgstr "变量"
 
-#: docs/reference/api/extension-components.md:73
 msgid "One read-only method table shared by every portable owner instance."
 msgstr "全部可移植所有者实例共享的一张只读方法表。"
 
-#: docs/reference/api/extension-components.md:73
 msgid "Private provider boundary; immutable callbacks and independent context."
 msgstr "私有提供方边界；回调不可变，上下文独立。"
 
-#: docs/reference/api/extension-components.md:73
-msgid ""
-"Context is one explicitly sized private state span. Geometry and mapped "
-"address stay fixed. map SUCCESS establishes the readable aperture; map "
-"failure leaves no effects. unmap SUCCESS proves all aperture/cache references"
-" withdrawn; failure retains the last map loan and closes reader/writer "
-"admission. Readers remain joined after a release attempt; a retained loan "
-"authorizes cleanup retry, not renewed access. start is called only after "
-"request admission and mapping exclusion. start errors may have effects and "
-"always proceed through drain. poll advances bounded work, returns BUSY or a "
-"terminal result, and supplies monotonically increasing completed bytes. "
-"cancel initiates withdrawal but proves no drain. drain SUCCESS detaches every"
-" hardware/IRQ/cache/DMA/descriptor/data source; BUSY retains ownership, other"
-" errors quarantine it. No callback retains the request itself. "
-"Command/cache/DMA writers outside these callbacks are forbidden while the "
-"owner exists. Physical adapters own cache-line domains, XIP execution "
-"exclusion and hardware-specific drain proof."
-msgstr ""
-"Context 是一个具有明确大小的私有状态区间；几何和映射地址保持固定。map SUCCESS 建立可读窗口；map 失败不产生效果。unmap "
-"SUCCESS 证明全部窗口/cache 引用已撤回；失败保留最后一个映射借用，并关闭读者/写入者准入。尝试 release 后，读取者必须保持已 "
-"join；保留的借用只授权重试清理，不授权重新访问。start 仅在请求准入并排除映射后调用；start 错误可能已有副作用，必须继续 "
-"drain。poll 推进有界工作，返回 BUSY 或终态结果，并提供单调增加的完成字节数。cancel 发起撤回，但不证明已排空。drain "
-"SUCCESS 脱离全部硬件/IRQ/cache/DMA/描述符/数据来源；BUSY 保留所有权，其他错误保留隔离。Callback "
-"不保留请求本身。Owner 存在期间禁止这些 callback 之外的命令/cache/DMA 写入者。物理适配器负责 cache-line 域、XIP "
-"执行排除和硬件特定的排空证明。"
+msgid "Context is one explicitly sized private state span. Geometry and mapped address stay fixed. map SUCCESS establishes the readable aperture; map failure leaves no effects. unmap SUCCESS proves all aperture/cache references withdrawn; failure retains the last map loan and closes reader/writer admission. Readers remain joined after a release attempt; a retained loan authorizes cleanup retry, not renewed access. start is called only after request admission and mapping exclusion. start errors may have effects and always proceed through drain. poll advances bounded work, returns BUSY or a terminal result, and supplies monotonically increasing completed bytes. cancel initiates withdrawal but proves no drain. drain SUCCESS detaches every hardware/IRQ/cache/DMA/descriptor/data source; BUSY retains ownership, other errors quarantine it. No callback retains the request itself. Command/cache/DMA writers outside these callbacks are forbidden while the owner exists. Physical adapters own cache-line domains, XIP execution exclusion and hardware-specific drain proof."
+msgstr "Context 是一个具有明确大小的私有状态区间；几何和映射地址保持固定。map SUCCESS 建立可读窗口；map 失败不产生效果。unmap SUCCESS 证明全部窗口/cache 引用已撤回；失败保留最后一个映射借用，并关闭读者/写入者准入。尝试 release 后，读取者必须保持已 join；保留的借用只授权重试清理，不授权重新访问。start 仅在请求准入并排除映射后调用；start 错误可能已有副作用，必须继续 drain。poll 推进有界工作，返回 BUSY 或终态结果，并提供单调增加的完成字节数。cancel 发起撤回，但不证明已排空。drain SUCCESS 脱离全部硬件/IRQ/cache/DMA/描述符/数据来源；BUSY 保留所有权，其他错误保留隔离。Callback 不保留请求本身。Owner 存在期间禁止这些 callback 之外的命令/cache/DMA 写入者。物理适配器负责 cache-line 域、XIP 执行排除和硬件特定的排空证明。"
 
-#: docs/reference/api/extension-components.md:73
 msgid "Exact caller-owned map capacity; fields belong to the owner."
 msgstr "精确的调用方映射容量；各字段归所有者管理。"
 
-#: docs/reference/api/extension-components.md:73
 msgid "Caller-owned state, published only after successful initialization."
 msgstr "调用方拥有的状态，仅在初始化成功后发布。"
 
-#: docs/reference/api/extension-components.md:73
-msgid ""
-"All methods and controls use one serialized task executor. Consumers may use "
-"their maps elsewhere, then join before release. No implicit IRQ guard or "
-"cross-task synchronization is supplied. Keep state, slots, backend context, "
-"clock and face alive through stop and control/consumer join."
-msgstr ""
-"全部方法和控制操作使用同一个串行任务执行器。消费者可以在其他执行上下文使用映射，但释放前须会合退出。不隐式提供 IRQ "
-"保护或跨任务同步。状态、时隙、后端上下文、时钟和接口对象均须保持存活，直至停止及控制使用者与消费者会合退出。"
+msgid "All methods and controls use one serialized task executor. Consumers may use their maps elsewhere, then join before release. No implicit IRQ guard or cross-task synchronization is supplied. Keep state, slots, backend context, clock and face alive through stop and control/consumer join."
+msgstr "全部方法和控制操作使用同一个串行任务执行器。消费者可以在其他执行上下文使用映射，但释放前须会合退出。不隐式提供 IRQ 保护或跨任务同步。状态、时隙、后端上下文、时钟和接口对象均须保持存活，直至停止及控制使用者与消费者会合退出。"
 
-#: docs/reference/api/extension-components.md:79
 msgid "native_mapped_storage.h"
 msgstr "native_mapped_storage.h"
 
-#: docs/reference/api/extension-components.md:81
 msgid "Caller-owned coherent Native NOR model with bounded steps."
 msgstr "调用方拥有的一致性 Native NOR 模型，每步工作量有界。"
 
-#: docs/reference/api/extension-components.md:81
 msgid "Construct an unused Native backend without modifying backing bytes."
 msgstr "构造未使用的 Native 后端，不修改底层存储字节。"
 
-#: docs/reference/api/extension-components.md:81
-msgid ""
-"SUCCESS or INVALID. Only CPU_READ is supported; XIP and DMA tags reject. "
-"Native coherent memory needs no cache maintenance. The portable owner still "
-"excludes mappings from every modeled mutation and drain."
-msgstr ""
-"返回 SUCCESS 或 INVALID。仅支持 CPU_READ；XIP 和 DMA 标记均拒绝。Native "
-"一致性内存无需缓存维护。可移植所有者仍保证映射与每一次建模修改及排空互斥。"
+msgid "SUCCESS or INVALID. Only CPU_READ is supported; XIP and DMA tags reject. Native coherent memory needs no cache maintenance. The portable owner still excludes mappings from every modeled mutation and drain."
+msgstr "返回 SUCCESS 或 INVALID。仅支持 CPU_READ；XIP 和 DMA 标记均拒绝。Native 一致性内存无需缓存维护。可移植所有者仍保证映射与每一次建模修改及排空互斥。"
 
-#: docs/reference/api/extension-components.md:81
 msgid "Independent Native backend state; never a physical Flash substitute."
 msgstr "独立的 Native 后端状态，从不替代物理 Flash。"
 
-#: docs/reference/api/extension-components.md:81
-msgid ""
-"The model preserves supplied bytes, programs only 1-to-0, and erases to 0xff."
-" One service changes at most quantum bytes. No implicit file, heap, thread, "
-"DMA, executable aperture or durability claim exists. fault_after bounds "
-"mutated bytes; SIZE_MAX disables the fault. hold_drain models live retained "
-"sources and drain_error models failure to prove source withdrawal."
-msgstr ""
-"模型保留传入的字节，仅允许从 1 编程为 0，并擦除为 0xff。一次推进最多修改 quantum 个字节。不隐式创建文件、堆、线程、DMA "
-"或可执行映射窗口，也不声称具有持久性。fault_after 限制已修改字节数；SIZE_MAX 禁用该故障。hold_drain "
-"模拟尚存的保留访问源，drain_error 模拟无法证明访问源已撤回的失败。"
+msgid "The model preserves supplied bytes, programs only 1-to-0, and erases to 0xff. One service changes at most quantum bytes. No implicit file, heap, thread, DMA, executable aperture or durability claim exists. fault_after bounds mutated bytes; SIZE_MAX disables the fault. hold_drain models live retained sources and drain_error models failure to prove source withdrawal."
+msgstr "模型保留传入的字节，仅允许从 1 编程为 0，并擦除为 0xff。一次推进最多修改 quantum 个字节。不隐式创建文件、堆、线程、DMA 或可执行映射窗口，也不声称具有持久性。fault_after 限制已修改字节数；SIZE_MAX 禁用该故障。hold_drain 模拟尚存的保留访问源，drain_error 模拟无法证明访问源已撤回的失败。"
 
-#: docs/reference/api/extension-components.md:87
 msgid "amp_ipc.h"
 msgstr "amp_ipc.h"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Bounded epoch-safe unidirectional shared-memory loans."
 msgstr "有界、以 epoch 防止旧身份复用的单向共享内存借用。"
 
-#: docs/reference/api/extension-components.md:89
-#: docs/reference/api/extension-components.md:97
-#: docs/reference/api/extension-components.md:113
-#: docs/reference/api/extension-components.md:121
-#: docs/reference/api/extension-components.md:129
-#: docs/reference/api/extension-components.md:137
-#: docs/reference/api/extension-components.md:145
-msgid ""
-"Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  Copyright"
-" (c) 2026 Nexus Team"
-msgstr ""
-"作者  Nexus Team   版本  1.0.0   日期  2026-10-20   版权  Copyright (c) 2026 Nexus "
-"Team"
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "作者  Nexus Team   版本  1.0.0   日期  2026-10-20   版权  Copyright (c) 2026 Nexus Team"
 
-#: docs/reference/api/extension-components.md:89
-#: docs/reference/api/extension-components.md:97
-#: docs/reference/api/extension-components.md:113
-#: docs/reference/api/extension-components.md:121
-#: docs/reference/api/extension-components.md:129
-#: docs/reference/api/extension-components.md:137
-#: docs/reference/api/extension-components.md:145
 msgid "1.0.0"
 msgstr "1.0.0"
 
-#: docs/reference/api/extension-components.md:89
-#: docs/reference/api/extension-components.md:97
-#: docs/reference/api/extension-components.md:113
-#: docs/reference/api/extension-components.md:121
-#: docs/reference/api/extension-components.md:129
-#: docs/reference/api/extension-components.md:137
-#: docs/reference/api/extension-components.md:145
 msgid "2026-10-20"
 msgstr "2026-10-20"
 
-#: docs/reference/api/extension-components.md:89
-#: docs/reference/api/extension-components.md:97
-#: docs/reference/api/extension-components.md:113
-#: docs/reference/api/extension-components.md:121
-#: docs/reference/api/extension-components.md:129
-#: docs/reference/api/extension-components.md:137
-#: docs/reference/api/extension-components.md:145
 msgid "Copyright (c) 2026 Nexus Team"
 msgstr "Copyright (c) 2026 Nexus Team"
 
-#: docs/reference/api/extension-components.md:89
+msgid "Defines"
+msgstr "宏定义"
+
 msgid "Explicit port-isolation unit; supported cache granules divide 64."
 msgstr "显式端口隔离单元；支持的缓存粒度须能整除 64。"
 
-#: docs/reference/api/extension-components.md:89
+msgid "Typedefs"
+msgstr "类型定义"
+
 msgid "Publish one complete-cache-line payload span without copying."
 msgstr "发布一个覆盖完整缓存行的载荷范围，不进行复制。"
 
-#: docs/reference/api/extension-components.md:89
-msgid ""
-"Serialized owner Thread only, same rule for every API below. No waits, "
-"allocation, scheduler, ISR or implicit worker. Outputs must not overlap any "
-"live instance/lane storage. Producer must finish DMA/other writers before "
-"this call."
-msgstr ""
-"仅供串行所有者 Thread 调用；下方全部 API 均遵守相同规则。不等待，不分配内存，不创建调度器、ISR "
-"或隐式工作线程。输出不得与任何活动实例或通道存储重叠。生产者须在调用前结束 DMA 及其他写入者的访问。"
+msgid "Serialized owner Thread only, same rule for every API below. No waits, allocation, scheduler, ISR or implicit worker. Outputs must not overlap any live instance/lane storage. Producer must finish DMA/other writers before this call."
+msgstr "仅供串行所有者 Thread 调用；下方全部 API 均遵守相同规则。不等待，不分配内存，不创建调度器、ISR 或隐式工作线程。输出不得与任何活动实例或通道存储重叠。生产者须在调用前结束 DMA 及其他写入者的访问。"
 
-#: docs/reference/api/extension-components.md:89
-msgid ""
-"SUCCESS transfers a read-only borrow until exact ACK poll or successful "
-"reset_join. Rejection retains nothing and does not publish. EXHAUSTED means "
-"no reusable slot identity."
-msgstr ""
-"SUCCESS 转移只读借用，直至轮询到精确 ACK 或 reset_join 成功。拒绝不保留内容，也不发布。EXHAUSTED "
-"表示没有可复用的时隙身份。"
+msgid "SUCCESS transfers a read-only borrow until exact ACK poll or successful reset_join. Rejection retains nothing and does not publish. EXHAUSTED means no reusable slot identity."
+msgstr "SUCCESS 转移只读借用，直至轮询到精确 ACK 或 reset_join 成功。拒绝不保留内容，也不发布。EXHAUSTED 表示没有可复用的时隙身份。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Acquire-observe an exact ACK; BUSY/IO/STATE retain the sender borrow."
 msgstr "以 acquire 语义观察精确 ACK；BUSY/IO/STATE 均保留发送方借用。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Acquire one offer after descriptor/payload invalidation succeeds."
 msgstr "描述符及载荷失效操作成功后，获取一个发布项。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Join the caller view, then publish its exact ACK."
 msgstr "让调用方视图的全部使用者会合退出，再发布该视图的精确 ACK。"
 
-#: docs/reference/api/extension-components.md:89
-msgid ""
-"Valid ticket invocation permanently joins local readers. IO or STATE retains "
-"endpoint/slot storage; retry finish or use reset_join after closing. Stale "
-"tickets change nothing."
-msgstr ""
-"使用有效票据调用即不可撤销地确认本地读取者已会合退出。IO 或 STATE 保留端点和时隙存储；可重试 finish，或关闭后使用 "
-"reset_join。陈旧票据不改变任何状态。"
+msgid "Valid ticket invocation permanently joins local readers. IO or STATE retains endpoint/slot storage; retry finish or use reset_join after closing. Stale tickets change nothing."
+msgstr "使用有效票据调用即不可撤销地确认本地读取者已会合退出。IO 或 STATE 保留端点和时隙存储；可重试 finish，或关闭后使用 reset_join。陈旧票据不改变任何状态。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Close admission; outstanding send/receive loans remain retained."
 msgstr "关闭准入；未完成的发送和接收借用仍被保留。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Join a closed endpoint after all exact ACKs/local returns."
 msgstr "全部精确 ACK 及本地归还完成后，让已关闭端点会合退出。"
 
-#: docs/reference/api/extension-components.md:89
-msgid ""
-"BUSY, IO or STATE retain the unique owner. Success performs its final access "
-"and unclaims the role. Storage cannot be reconstructed: boot/sequence "
-"identities never reset here."
+msgid "BUSY, IO or STATE retain the unique owner. Success performs its final access and unclaims the role. Storage cannot be reconstructed: boot/sequence identities never reset here."
 msgstr "BUSY、IO 或 STATE 保留唯一所有者。成功执行最后访问并释放该角色声明。不得重构存储：此处从不重置启动及序列身份。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Join after an explicit old-peer stop proof."
 msgstr "在取得显式旧对端停止证明后会合退出。"
 
-#: docs/reference/api/extension-components.md:89
-msgid ""
-"Closed endpoint required; receiver views must have been consumed by finish "
-"first. Failed proof retains ALL sender loans and ownership. Success retires "
-"this endpoint; any replacement uses a strictly newer nonzero boot epoch from "
-"the external boot owner, never rollover/reuse."
-msgstr ""
-"要求端点已关闭；接收者视图必须先由 finish "
-"消费。证明失败保留发送方的全部借用及所有权。成功后此端点退役；任何替代端点均须使用外部启动所有者提供的、严格更新的非零启动 epoch，绝不回绕或复用。"
+msgid "Closed endpoint required; receiver views must have been consumed by finish first. Failed proof retains ALL sender loans and ownership. Success retires this endpoint; any replacement uses a strictly newer nonzero boot epoch from the external boot owner, never rollover/reuse."
+msgstr "要求端点已关闭；接收者视图必须先由 finish 消费。证明失败保留发送方的全部借用及所有权。成功后此端点退役；任何替代端点均须使用外部启动所有者提供的、严格更新的非零启动 epoch，绝不回绕或复用。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "One writer's isolated publication word; accesses use the port only."
 msgstr "一个写入者的隔离发布字；仅通过端口访问。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Shared descriptor; offsets refer to the configured payload window."
 msgstr "共享描述符；偏移量相对于已配置的载荷窗口。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Caller-owned shared slot with disjoint writer cache lines."
 msgstr "调用方拥有的共享时隙，各写入者的缓存行互不重叠。"
 
-#: docs/reference/api/extension-components.md:89
-msgid ""
-"Sender alone writes offer/published; receiver alone writes "
-"receipt/acknowledged. All four units must be reachable by both CPUs. Cold "
-"initialization precedes either endpoint."
-msgstr ""
-"仅发送方写 offer/published；仅接收方写 receipt/acknowledged。两个 CPU "
-"均须能访问这四个单元。任一端点启动前须完成冷初始化。"
+msgid "Sender alone writes offer/published; receiver alone writes receipt/acknowledged. All four units must be reachable by both CPUs. Cold initialization precedes either endpoint."
+msgstr "仅发送方写 offer/published；仅接收方写 receipt/acknowledged。两个 CPU 均须能访问这四个单元。任一端点启动前须完成冷初始化。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Hardware/ownership boundary supplied by the integration."
 msgstr "集成方提供的硬件与所有权边界。"
 
-#: docs/reference/api/extension-components.md:89
-msgid ""
-"Every callback is synchronous, bounded and non-reentrant. claim grants the "
-"unique role owner of this exact lane and atomically rejects a reused/non-"
-"increasing local boot epoch, even after ordinary join. Its authoritative "
-"hardware boot owner preserves this history across CPU resets; exhaustion "
-"fails closed. Rejection has no effects. unclaim follows final join only and "
-"never erases boot identity history. clean/invalidate cover exact complete "
-"isolated cache lines, finish their architectural barriers, and may fail. A "
-"failed clean MUST NOT publish a control word. acquire/release are infallible "
-"atomic 32-bit coherent control operations: the port owns any control-cache "
-"maintenance. They must order descriptor/payload access across both CPUs and "
-"bus fabric. stopped proves the named old peer CPU, DMA, IRQ and all observers"
-" can never access the lane or payload again. The context binds the exact "
-"physical lane and peer execution epoch covered by stopped. An epoch "
-"observation, cancel, deadline or elapsed timeout never supplies this proof. "
-"No existing single-core SoC supplies it."
-msgstr ""
-"每个回调均同步、有界且不可重入。claim 授予此精确通道的唯一角色所有者，并以原子方式拒绝复用或未递增的本地启动 epoch，即使普通 join "
-"已完成也不例外。其权威硬件启动所有者跨 CPU 复位保留此历史；耗尽时关闭接纳。拒绝不产生效果。unclaim "
-"仅发生于最终会合退出后，且从不清除启动身份历史。clean/invalidate 覆盖精确、完整且隔离的缓存行，完成其架构屏障，并可能失败。clean "
-"失败绝不能发布控制字。acquire/release 是不会失败的原子 32 位一致性控制操作：端口负责全部控制缓存维护。它们须跨两个 CPU "
-"和总线互连，对描述符及载荷访问建立顺序。stopped 证明指定的旧对端 CPU、DMA、IRQ 及全部观察者从此再也不能访问通道或载荷。上下文绑定 "
-"stopped 所覆盖的精确物理通道和对端执行 epoch。epoch 观测、取消、期限或已流逝的超时都不能提供此证明。现有单核 SoC 均不提供该证明。"
+msgid "Every callback is synchronous, bounded and non-reentrant. claim grants the unique role owner of this exact lane and atomically rejects a reused/non-increasing local boot epoch, even after ordinary join. Its authoritative hardware boot owner preserves this history across CPU resets; exhaustion fails closed. Rejection has no effects. unclaim follows final join only and never erases boot identity history. clean/invalidate cover exact complete isolated cache lines, finish their architectural barriers, and may fail. A failed clean MUST NOT publish a control word. acquire/release are infallible atomic 32-bit coherent control operations: the port owns any control-cache maintenance. They must order descriptor/payload access across both CPUs and bus fabric. stopped proves the named old peer CPU, DMA, IRQ and all observers can never access the lane or payload again. The context binds the exact physical lane and peer execution epoch covered by stopped. An epoch observation, cancel, deadline or elapsed timeout never supplies this proof. No existing single-core SoC supplies it."
+msgstr "每个回调均同步、有界且不可重入。claim 授予此精确通道的唯一角色所有者，并以原子方式拒绝复用或未递增的本地启动 epoch，即使普通 join 已完成也不例外。其权威硬件启动所有者跨 CPU 复位保留此历史；耗尽时关闭接纳。拒绝不产生效果。unclaim 仅发生于最终会合退出后，且从不清除启动身份历史。clean/invalidate 覆盖精确、完整且隔离的缓存行，完成其架构屏障，并可能失败。clean 失败绝不能发布控制字。acquire/release 是不会失败的原子 32 位一致性控制操作：端口负责全部控制缓存维护。它们须跨两个 CPU 和总线互连，对描述符及载荷访问建立顺序。stopped 证明指定的旧对端 CPU、DMA、IRQ 及全部观察者从此再也不能访问通道或载荷。上下文绑定 stopped 所覆盖的精确物理通道和对端执行 epoch。epoch 观测、取消、期限或已流逝的超时都不能提供此证明。现有单核 SoC 均不提供该证明。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Instance/boot/slot identity; endpoint outlives every ticket copy."
 msgstr "实例、启动及时隙身份；端点须比每一份票据副本存活更久。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Receiver's borrowed read-only shared span."
 msgstr "接收者借用的只读共享范围。"
 
-#: docs/reference/api/extension-components.md:89
-msgid ""
-"Caller must join every local reader before finish. A valid finish invocation "
-"consumes the caller view even when link acknowledgement fails; endpoint "
-"storage remains retained."
+msgid "Caller must join every local reader before finish. A valid finish invocation consumes the caller view even when link acknowledgement fails; endpoint storage remains retained."
 msgstr "调用方须在 finish 前让每个本地读取者会合退出。有效 finish 调用会消费调用方视图，即使链路确认失败也不例外；端点存储仍被保留。"
 
-#: docs/reference/api/extension-components.md:89
 msgid "Stable close identity; endpoint lives longer than all control copies."
 msgstr "稳定的关闭身份；端点须比全部控制对象副本存活更久。"
 
-#: docs/reference/api/extension-components.md:95
 msgid "amp_ipc_storage.h"
 msgstr "amp_ipc_storage.h"
 
-#: docs/reference/api/extension-components.md:97
 msgid "Caller-owned endpoint configuration and retained loan state."
 msgstr "调用方拥有的端点配置及保留借用状态。"
 
-#: docs/reference/api/extension-components.md:97
 msgid "Claim and bind unused zero-initialized endpoint storage."
 msgstr "声明并绑定未使用、已清零初始化的端点存储。"
 
-#: docs/reference/api/extension-components.md:97
-msgid ""
-"Serialized privileged owner Thread, before publication. Validates disjoint "
-"spans and exact boot epochs before claim. Rejected construction has no "
-"references or shared effects. The port must independently enforce unique "
-"hardware/role ownership; this component contains no global registry."
-msgstr ""
-"由串行特权所有者 Thread 在发布前调用。claim 前校验范围互不重叠及精确启动 "
-"epoch。构造拒绝不保留引用，也不产生共享效果。端口须独立强制唯一硬件及角色所有权；此组件不含全局注册表。"
+msgid "Serialized privileged owner Thread, before publication. Validates disjoint spans and exact boot epochs before claim. Rejected construction has no references or shared effects. The port must independently enforce unique hardware/role ownership; this component contains no global registry."
+msgstr "由串行特权所有者 Thread 在发布前调用。claim 前校验范围互不重叠及精确启动 epoch。构造拒绝不保留引用，也不产生共享效果。端口须独立强制唯一硬件及角色所有权；此组件不含全局注册表。"
 
-#: docs/reference/api/extension-components.md:97
 msgid "Zero-initialized local state; no sharing with another endpoint."
 msgstr "已清零初始化的本地状态；不与其他端点共享。"
 
-#: docs/reference/api/extension-components.md:97
 msgid "One unidirectional lane and exact caller-owned storage."
 msgstr "一条单向通道及精确的调用方存储。"
 
-#: docs/reference/api/extension-components.md:97
-msgid ""
-"Both boot words are externally published, monotonic nonzero epochs. Never "
-"republish an old boot identity, including after a whole-device reset. The "
-"boot owner must fail closed on exhaustion. Initial shared records/words are "
-"zeroed or retained from older epochs, never edited while live. Wire and boot "
-"words occupy separate complete 64-byte units. All shared spans align to "
-"granule (power of two, 1..64). Payload size is a positive multiple of "
-"granule. Configuration, callbacks and all supplied storage outlive final "
-"join."
-msgstr ""
-"两个启动字均为外部发布、单调且非零的 "
-"epoch。绝不重新发布旧启动身份，整机复位后也不例外。启动所有者须在耗尽时关闭接纳。初始共享记录及控制字须已清零，或保留自更早 "
-"epoch；活动期间不得编辑。协议控制字和启动字分别占用独立、完整的 64 字节单元。全部共享范围按 granule 对齐，granule 为 1..64"
-" 之间的二次幂。载荷大小是 granule 的正整数倍。配置、回调及全部传入存储均须保持存活，直至最终会合退出。"
+msgid "Both boot words are externally published, monotonic nonzero epochs. Never republish an old boot identity, including after a whole-device reset. The boot owner must fail closed on exhaustion. Initial shared records/words are zeroed or retained from older epochs, never edited while live. Wire and boot words occupy separate complete 64-byte units. All shared spans align to granule (power of two, 1..64). Payload size is a positive multiple of granule. Configuration, callbacks and all supplied storage outlive final join."
+msgstr "两个启动字均为外部发布、单调且非零的 epoch。绝不重新发布旧启动身份，整机复位后也不例外。启动所有者须在耗尽时关闭接纳。初始共享记录及控制字须已清零，或保留自更早 epoch；活动期间不得编辑。协议控制字和启动字分别占用独立、完整的 64 字节单元。全部共享范围按 granule 对齐，granule 为 1..64 之间的二次幂。载荷大小是 granule 的正整数倍。配置、回调及全部传入存储均须保持存活，直至最终会合退出。"
 
-#: docs/reference/api/extension-components.md:103
 msgid "stm32f407_handoff.h"
 msgstr "stm32f407_handoff.h"
 
-#: docs/reference/api/extension-components.md:105
 msgid "Exact F407 Flash-image transfer after explicit owner drain."
 msgstr "显式所有者排空后的精确 F407 Flash 映像移交。"
 
-#: docs/reference/api/extension-components.md:105
 msgid "Construct the single static F407 handoff admission domain."
 msgstr "构造唯一的静态 F407 移交准入域。"
 
-#: docs/reference/api/extension-components.md:105
-msgid ""
-"Serialized privileged Thread, once before any consumer. No heap, hardware "
-"writes, discovery or implicit startup. The caller enrolls every "
-"platform/product execution, IRQ, DMA, observer and memory owner that can "
-"outlive entry. Release a lease only after its actual join/drain."
-msgstr ""
-"由串行特权 Thread "
-"在任何消费者启动前调用一次。不使用堆，不写硬件，不执行发现或隐式启动。调用方须登记每个可能在入口之后仍存活的平台或产品执行者、IRQ、DMA、观察者及内存所有者。租约仅在其实际会合退出或排空后释放。"
+msgid "Serialized privileged Thread, once before any consumer. No heap, hardware writes, discovery or implicit startup. The caller enrolls every platform/product execution, IRQ, DMA, observer and memory owner that can outlive entry. Release a lease only after its actual join/drain."
+msgstr "由串行特权 Thread 在任何消费者启动前调用一次。不使用堆，不写硬件，不执行发现或隐式启动。调用方须登记每个可能在入口之后仍存活的平台或产品执行者、IRQ、DMA、观察者及内存所有者。租约仅在其实际会合退出或排空后释放。"
 
-#: docs/reference/api/extension-components.md:105
 msgid "[in] Positive bound on enrolled live tokens."
 msgstr "[in] 已登记活动令牌数的正数上限。"
 
-#: docs/reference/api/extension-components.md:105
 msgid "SUCCESS, INVALID, CONTEXT or STATE; never resets an epoch."
 msgstr "返回 SUCCESS、INVALID、CONTEXT 或 STATE；从不重置 epoch。"
 
-#: docs/reference/api/extension-components.md:105
 msgid "Return the existing single static admission domain."
 msgstr "返回既有的唯一静态准入域。"
 
-#: docs/reference/api/extension-components.md:105
 msgid "Pure lookup; does not initialize, acquire or touch hardware."
 msgstr "纯查询；不初始化、不获取租约，也不访问硬件。"
 
-#: docs/reference/api/extension-components.md:105
 msgid "Stable object identity, including before initialization."
 msgstr "稳定对象身份，初始化前亦有效。"
 
-#: docs/reference/api/extension-components.md:105
 msgid "Validate stopped F407 state and tail-transfer to Flash."
 msgstr "校验已停止的 F407 状态，并以尾跳转移交至 Flash。"
 
-#: docs/reference/api/extension-components.md:105
-msgid ""
-"Selected STM32F407VET6/ZGT6 baremetal images only. Caller is privileged "
-"Thread on MSP, PRIMASK=1, other masks clear. No scheduler may have started. "
-"Stop the actual Platform, join all users and keep admission closed. An "
-"unrelated empty domain cannot authorize transfer. Rejects active FP/lazy "
-"preservation, partial CP10/11 permissions, MPU, ART, SysTick, "
-"enabled/pending/active IRQs, non-HSI16/reset buses, peripheral/DMA gates, "
-"busy Flash and retained System effects. Ordinary inactive CP10/11 permissions"
-" from SystemInit are supported. Main SRAM is preserved; MSP is 8-aligned in "
-"(0x20000000,0x20020000]. All 98 vectors fit exact observed and generated "
-"Flash geometry. Reset PC is Thumb with its first halfword in Flash. Success "
-"sets VTOR, disables CP10/11, sets CONTROL=0, PSP=0 and MSP, then branches to "
-"PC with PRIMASK=1. This is a masked handoff entry. No RAM copy/clear, image "
-"authentication/selection, device drain, clock change or physical "
-"qualification occurs. Target owns RAM startup and resets controllers before "
-"enabling gates. No old deadline survives transfer. Exclude NMI/HardFault, "
-"debugger, DMA and other bus masters. Enrollment is caller policy; Platform "
-"and product owners are never enrolled automatically. Rejection preserves "
-"masks and performs no writable MMIO. Reading SysTick CTRL consumes COUNTFLAG "
-"even if rejected."
-msgstr ""
-"仅支持所选 STM32F407VET6/ZGT6 裸机映像。调用方须为使用 MSP 的特权 "
-"Thread，PRIMASK=1，其他屏蔽寄存器为零。不得已启动调度器。停止实际 "
-"Platform，让全部使用者会合退出，并保持准入关闭。无关的空域不能授权移交。活动浮点状态或延迟保存、CP10/11 "
-"权限不完整、MPU、ART、SysTick、已启用或挂起或活动的 IRQ、非 HSI16 时钟或非复位总线配置、外设或 DMA 门控、忙碌 Flash "
-"及残留 System 效果均导致拒绝。支持 SystemInit 设置的普通未激活 CP10/11 权限。保留主 SRAM；MSP 须按 8 "
-"字节对齐，且位于 (0x20000000,0x20020000]。全部 98 个向量须满足实际观察及生成配置确定的精确 Flash 几何范围。复位 PC "
-"须为 Thumb，且首个半字位于 Flash。成功时设置 VTOR、禁用 CP10/11、设置 CONTROL=0、PSP=0 和 MSP，然后在 "
-"PRIMASK=1 下跳转到 PC。这是保持中断屏蔽的移交入口。不复制或清除 "
-"RAM，不认证或选择映像，不排空器件，不改变时钟，也不进行物理资格验证。目标映像负责 RAM "
-"启动，并在启用门控前复位控制器。任何旧期限在移交后均不再有效。外部须排除 NMI/HardFault、调试器、DMA "
-"及其他总线主设备。登记属于调用方策略；Platform 和产品所有者从不自动登记。拒绝时保留中断屏蔽状态，且不执行可写 MMIO 操作。即使拒绝，读取 "
-"SysTick CTRL 也会消耗 COUNTFLAG。"
+msgid "Selected STM32F407VET6/ZGT6 baremetal images only. Caller is privileged Thread on MSP, PRIMASK=1, other masks clear. No scheduler may have started. Stop the actual Platform, join all users and keep admission closed. An unrelated empty domain cannot authorize transfer. Rejects active FP/lazy preservation, partial CP10/11 permissions, MPU, ART, SysTick, enabled/pending/active IRQs, non-HSI16/reset buses, peripheral/DMA gates, busy Flash and retained System effects. Ordinary inactive CP10/11 permissions from SystemInit are supported. Main SRAM is preserved; MSP is 8-aligned in (0x20000000,0x20020000]. All 98 vectors fit exact observed and generated Flash geometry. Reset PC is Thumb with its first halfword in Flash. Success sets VTOR, disables CP10/11, sets CONTROL=0, PSP=0 and MSP, then branches to PC with PRIMASK=1. This is a masked handoff entry. No RAM copy/clear, image authentication/selection, device drain, clock change or physical qualification occurs. Target owns RAM startup and resets controllers before enabling gates. No old deadline survives transfer. Exclude NMI/HardFault, debugger, DMA and other bus masters. Enrollment is caller policy; Platform and product owners are never enrolled automatically. Rejection preserves masks and performs no writable MMIO. Reading SysTick CTRL consumes COUNTFLAG even if rejected."
+msgstr "仅支持所选 STM32F407VET6/ZGT6 裸机映像。调用方须为使用 MSP 的特权 Thread，PRIMASK=1，其他屏蔽寄存器为零。不得已启动调度器。停止实际 Platform，让全部使用者会合退出，并保持准入关闭。无关的空域不能授权移交。活动浮点状态或延迟保存、CP10/11 权限不完整、MPU、ART、SysTick、已启用或挂起或活动的 IRQ、非 HSI16 时钟或非复位总线配置、外设或 DMA 门控、忙碌 Flash 及残留 System 效果均导致拒绝。支持 SystemInit 设置的普通未激活 CP10/11 权限。保留主 SRAM；MSP 须按 8 字节对齐，且位于 (0x20000000,0x20020000]。全部 98 个向量须满足实际观察及生成配置确定的精确 Flash 几何范围。复位 PC 须为 Thumb，且首个半字位于 Flash。成功时设置 VTOR、禁用 CP10/11、设置 CONTROL=0、PSP=0 和 MSP，然后在 PRIMASK=1 下跳转到 PC。这是保持中断屏蔽的移交入口。不复制或清除 RAM，不认证或选择映像，不排空器件，不改变时钟，也不进行物理资格验证。目标映像负责 RAM 启动，并在启用门控前复位控制器。任何旧期限在移交后均不再有效。外部须排除 NMI/HardFault、调试器、DMA 及其他总线主设备。登记属于调用方策略；Platform 和产品所有者从不自动登记。拒绝时保留中断屏蔽状态，且不执行可写 MMIO 操作。即使拒绝，读取 SysTick CTRL 也会消耗 COUNTFLAG。"
 
-#: docs/reference/api/extension-components.md:105
 msgid "[in] Closed, drained barrier from this exact domain."
 msgstr "[in] 来自此精确域、已关闭且已排空的屏障。"
 
-#: docs/reference/api/extension-components.md:105
 msgid "[in] 512-aligned physical Flash vector address."
 msgstr "[in] 按 512 字节对齐的物理 Flash 向量地址。"
 
-#: docs/reference/api/extension-components.md:105
 msgid "Error before transfer; success never returns."
 msgstr "移交前可能返回错误；成功时永不返回。"
 
-#: docs/reference/api/extension-components.md:111
 msgid "user_io_async.h"
 msgstr "user_io_async.h"
 
-#: docs/reference/api/extension-components.md:113
 msgid "Bounded copied UART user mediation."
 msgstr "有界复制式 UART 用户代理。"
 
-#: docs/reference/api/extension-components.md:113
 msgid "Authenticate and copy one bounded user gateway transaction."
 msgstr "认证并复制一次有界用户网关事务。"
 
-#: docs/reference/api/extension-components.md:113
-msgid ""
-"Privileged unmasked Thread, one serialized gateway executor. Authenticate the"
-" current principal on every call. The trusted copy port supplies fault "
-"containment and mapping stability; range checks alone prove neither. The "
-"caller separately drives the existing BusOwner/UARTOwner; this call never "
-"services it. CANCEL only requests its drain. CONSUME requires acquire SETTLED"
-" and the existing owner's idle/join barrier, copies the reply first, then "
-"wipes bytes/releases the exact cell. Failed reply copy, cancellation or "
-"quarantine never releases an accepted cell. No SVC/CMSE entry or NS RTOS is "
-"provided."
-msgstr ""
-"特权、未屏蔽中断的 "
-"Thread，由唯一网关执行者串行调用。每次调用均认证当前主体。可信复制端口提供故障隔离和映射稳定性；仅范围检查不能证明两者。调用方另外推进既有 "
-"BusOwner/UARTOwner；本调用从不执行其 service。CANCEL 仅请求其排空。CONSUME 要求以 acquire 观察 "
-"SETTLED 及既有所有者的空闲／汇合屏障，先复制回复，再擦除字节并释放精确单元。回复复制失败、取消或隔离都不释放已接受单元。不提供 SVC/CMSE "
-"入口或 NS RTOS。"
+msgid "Privileged unmasked Thread, one serialized gateway executor. Authenticate the current principal on every call. The trusted copy port supplies fault containment and mapping stability; range checks alone prove neither. The caller separately drives the existing BusOwner/UARTOwner; this call never services it. CANCEL only requests its drain. CONSUME requires acquire SETTLED and the existing owner's idle/join barrier, copies the reply first, then wipes bytes/releases the exact cell. Failed reply copy, cancellation or quarantine never releases an accepted cell. No SVC/CMSE entry or NS RTOS is provided."
+msgstr "特权、未屏蔽中断的 Thread，由唯一网关执行者串行调用。每次调用均认证当前主体。可信复制端口提供故障隔离和映射稳定性；仅范围检查不能证明两者。调用方另外推进既有 BusOwner/UARTOwner；本调用从不执行其 service。CANCEL 仅请求其排空。CONSUME 要求以 acquire 观察 SETTLED 及既有所有者的空闲／汇合屏障，先复制回复，再擦除字节并释放精确单元。回复复制失败、取消或隔离都不释放已接受单元。不提供 SVC/CMSE 入口或 NS RTOS。"
 
-#: docs/reference/api/extension-components.md:113
 msgid "[inout] Trusted privileged binding and exact copied slots."
 msgstr "[inout] 可信特权绑定及精确复制槽位。"
 
-#: docs/reference/api/extension-components.md:113
 msgid "[in] Transient full readable user header, copied once."
 msgstr "[in] 临时完整可读的用户头部，仅复制一次。"
 
-#: docs/reference/api/extension-components.md:113
 msgid "[in] Transient readable SUBMIT bytes; NULL otherwise."
 msgstr "[in] 临时可读的 SUBMIT 字节；其他情况为 NULL。"
 
-#: docs/reference/api/extension-components.md:113
 msgid "[out] Transient disjoint full writable user reply."
 msgstr "[out] 临时、互不重叠且完整可写的用户回复。"
 
-#: docs/reference/api/extension-components.md:113
-msgid ""
-"SUCCESS after reply copy; identity/span/protocol/copy/control errors "
-"otherwise. No user address survives any return. A reply-copy error can follow"
-" acceptance: POLL the proposed slot/epoch; duplicate SUBMIT cannot replay or "
-"replace it."
-msgstr ""
-"回复复制后返回 SUCCESS；否则返回身份、跨度、协议、复制或控制错误。任何返回后均不保留用户地址。接受后仍可能发生回复复制错误：以 POLL "
-"查询所提出的槽位／纪元；重复 SUBMIT 不得重放或替换它。"
+msgid "SUCCESS after reply copy; identity/span/protocol/copy/control errors otherwise. No user address survives any return. A reply-copy error can follow acceptance: POLL the proposed slot/epoch; duplicate SUBMIT cannot replay or replace it."
+msgstr "回复复制后返回 SUCCESS；否则返回身份、跨度、协议、复制或控制错误。任何返回后均不保留用户地址。接受后仍可能发生回复复制错误：以 POLL 查询所提出的槽位／纪元；重复 SUBMIT 不得重放或替换它。"
 
-#: docs/reference/api/extension-components.md:113
 msgid "Close copied admission and cancel this binding's live work."
 msgstr "关闭复制接纳并取消此绑定的活动工作。"
 
-#: docs/reference/api/extension-components.md:113
-msgid ""
-"Trusted privileged management, not a user gateway action. Same serialized "
-"lifecycle executor as dispatch/join, except synchronous identity/copy "
-"callbacks may request close. This is not a general concurrent cross-task "
-"control API. Close is permanent; it does not close the underlying owner. No "
-"worker or provider service runs here. Keep driving the owner and authenticate"
-" POLL/CONSUME through normal dispatch. Identity/copy callbacks may request "
-"close, never recursively dispatch or reconstruct. All bound storage stays "
-"live."
-msgstr ""
-"可信特权管理操作，不是用户网关动作。与 dispatch/join 使用同一串行生命周期执行者，但同步身份／复制回调可以请求 "
-"close。这不是通用的跨任务并发控制 API。关闭是永久的，但不关闭底层所有者。此处不运行工作线程或提供者 service。须继续推进所有者，并通过常规"
-" dispatch 认证 POLL/CONSUME。身份／复制回调可以请求 close，但不得递归 dispatch 或重新构造。全部绑定存储保持存活。"
+msgid "Trusted privileged management, not a user gateway action. Same serialized lifecycle executor as dispatch/join, except synchronous identity/copy callbacks may request close. This is not a general concurrent cross-task control API. Close is permanent; it does not close the underlying owner. No worker or provider service runs here. Keep driving the owner and authenticate POLL/CONSUME through normal dispatch. Identity/copy callbacks may request close, never recursively dispatch or reconstruct. All bound storage stays live."
+msgstr "可信特权管理操作，不是用户网关动作。与 dispatch/join 使用同一串行生命周期执行者，但同步身份／复制回调可以请求 close。这不是通用的跨任务并发控制 API。关闭是永久的，但不关闭底层所有者。此处不运行工作线程或提供者 service。须继续推进所有者，并通过常规 dispatch 认证 POLL/CONSUME。身份／复制回调可以请求 close，但不得递归 dispatch 或重新构造。全部绑定存储保持存活。"
 
-#: docs/reference/api/extension-components.md:113
 msgid "Privileged retirement after permanently lost user mappings."
 msgstr "用户映射永久丢失后的特权回收。"
 
-#: docs/reference/api/extension-components.md:113
-msgid ""
-"Same trusted serialized management as close/join; never an untrusted wire "
-"action. The kernel decides when cleanup is authorized. First close/cancel and"
-" separately drive the real owner. Every retained exact cell must acquire "
-"SETTLED and the owner must be idle. The trusted drained proof then fences "
-"future gateway entries and joins all outer observers while retaining the "
-"role. Only then are all copied payloads wiped and cells retired without user "
-"copyout. Pending, quarantined or unjoined work retains every cell unchanged. "
-"Success is idempotent and permanently rejects dispatch. It does not release "
-"the role: successful join is still required before reclaiming any bound "
-"storage. No forced borrow revocation, process-liveness policy or provider "
-"service is supplied."
-msgstr ""
-"与 close/join 使用相同的可信串行管理；绝不是不可信的传输动作。由内核决定何时授权清理。先 "
-"close/cancel，再另行推进真实所有者。每个保留的精确单元都必须以 acquire 观察 SETTLED，且所有者必须空闲。随后可信 "
-"drained "
-"证明阻止未来网关入口并汇合全部外部观察者，同时保留角色。只有此后才能擦除全部复制载荷并回收单元，无需向用户复制输出。待处理、隔离或未汇合的工作保留每个单元不变。成功具有幂等性，并永久拒绝"
-" dispatch。它不释放角色：回收任何绑定存储前仍须成功 join。不提供强制撤销借用、进程存活策略或提供者 service。"
+msgid "Same trusted serialized management as close/join; never an untrusted wire action. The kernel decides when cleanup is authorized. First close/cancel and separately drive the real owner. Every retained exact cell must acquire SETTLED and the owner must be idle. The trusted drained proof then fences future gateway entries and joins all outer observers while retaining the role. Only then are all copied payloads wiped and cells retired without user copyout. Pending, quarantined or unjoined work retains every cell unchanged. Success is idempotent and permanently rejects dispatch. It does not release the role: successful join is still required before reclaiming any bound storage. No forced borrow revocation, process-liveness policy or provider service is supplied."
+msgstr "与 close/join 使用相同的可信串行管理；绝不是不可信的传输动作。由内核决定何时授权清理。先 close/cancel，再另行推进真实所有者。每个保留的精确单元都必须以 acquire 观察 SETTLED，且所有者必须空闲。随后可信 drained 证明阻止未来网关入口并汇合全部外部观察者，同时保留角色。只有此后才能擦除全部复制载荷并回收单元，无需向用户复制输出。待处理、隔离或未汇合的工作保留每个单元不变。成功具有幂等性，并永久拒绝 dispatch。它不释放角色：回收任何绑定存储前仍须成功 join。不提供强制撤销借用、进程存活策略或提供者 service。"
 
-#: docs/reference/api/extension-components.md:113
 msgid "Join closed/consumed cells, owner and trusted gateway role."
 msgstr "汇合已关闭／已消费单元、所有者及可信网关角色。"
 
-#: docs/reference/api/extension-components.md:113
-msgid ""
-"Trusted serialized management. No reinitialization/reopen, hidden provider "
-"stop or identity registry is created. A successful join permits a fresh "
-"object with a larger claimed session; never reset or reconstruct this live "
-"object."
-msgstr ""
-"可信串行管理。不创建重新初始化／重新打开、隐式提供者停止或身份注册表。成功 join 后，可由新对象申领更大的会话；不得重置或重新构造此活动对象。"
+msgid "Trusted serialized management. No reinitialization/reopen, hidden provider stop or identity registry is created. A successful join permits a fresh object with a larger claimed session; never reset or reconstruct this live object."
+msgstr "可信串行管理。不创建重新初始化／重新打开、隐式提供者停止或身份注册表。成功 join 后，可由新对象申领更大的会话；不得重置或重新构造此活动对象。"
 
-#: docs/reference/api/extension-components.md:113
-msgid ""
-"SUCCESS only after no gateway/copy, copied cell or owner publisher remains "
-"and the trusted role release proves outer gateway observers joined; "
-"BUSY/error retains role and storage."
-msgstr ""
-"仅在不再存在网关／复制、复制单元或所有者发布者，且可信角色释放证明外部网关观察者已汇合后返回 SUCCESS；BUSY 或错误均保留角色与存储。"
+msgid "SUCCESS only after no gateway/copy, copied cell or owner publisher remains and the trusted role release proves outer gateway observers joined; BUSY/error retains role and storage."
+msgstr "仅在不再存在网关／复制、复制单元或所有者发布者，且可信角色释放证明外部网关观察者已汇合后返回 SUCCESS；BUSY 或错误均保留角色与存储。"
 
-#: docs/reference/api/extension-components.md:113
 msgid "Twelve scalar local C gateway words; no principal, address or callback."
 msgstr "十二个本地 C 网关标量字；不含主体、地址或回调。"
 
-#: docs/reference/api/extension-components.md:113
-msgid ""
-"SUBMIT proposes the exact next nonzero 64-bit epoch for an explicit slot "
-"within the exact claimed nonzero session and supplies positive length plus an"
-" absolute deadline in the existing owner's clock domain. Other actions use "
-"the accepted exact epoch and zero length/deadline words. device must match "
-"the immutable trusted binding; reserved=0. Word pairs encode low then high "
-"halves, independently of the compiler enum, pointer and uint64_t alignment "
-"ABI. These are local C gateway records; an integrating kernel owns byte order"
-" and any transport serialization."
-msgstr ""
-"SUBMIT 在精确已申领的非零会话内，为显式槽位提出精确下一个非零 64 "
-"位纪元，并提供正数长度及既有所有者时钟域中的绝对截止时间。其他动作使用精确已接受纪元，长度／截止时间字均为零。device "
-"必须匹配不可变可信绑定；reserved=0。字对按低半部、高半部编码，不依赖编译器枚举、指针或 uint64_t 的对齐 ABI。这些是本地 C "
-"网关记录；字节序及任何传输序列化均由集成内核负责。"
+msgid "SUBMIT proposes the exact next nonzero 64-bit epoch for an explicit slot within the exact claimed nonzero session and supplies positive length plus an absolute deadline in the existing owner's clock domain. Other actions use the accepted exact epoch and zero length/deadline words. device must match the immutable trusted binding; reserved=0. Word pairs encode low then high halves, independently of the compiler enum, pointer and uint64_t alignment ABI. These are local C gateway records; an integrating kernel owns byte order and any transport serialization."
+msgstr "SUBMIT 在精确已申领的非零会话内，为显式槽位提出精确下一个非零 64 位纪元，并提供正数长度及既有所有者时钟域中的绝对截止时间。其他动作使用精确已接受纪元，长度／截止时间字均为零。device 必须匹配不可变可信绑定；reserved=0。字对按低半部、高半部编码，不依赖编译器枚举、指针或 uint64_t 的对齐 ABI。这些是本地 C 网关记录；字节序及任何传输序列化均由集成内核负责。"
 
-#: docs/reference/api/extension-components.md:113
 msgid "Ten initialized scalar words; no privileged pointer."
 msgstr "十个已初始化标量字；不含特权指针。"
 
-#: docs/reference/api/extension-components.md:113
-msgid ""
-"state is a Core nx_request_state_t value encoded as uint32_t. Only SETTLED "
-"has a final result/count; other results are BUSY with count zero. accepted=1 "
-"denotes the retained copied cell, including a terminal error when the "
-"existing owner rejects admission. No hardware effect follows from acceptance "
-"alone."
-msgstr ""
-"state 为编码成 uint32_t 的 Core nx_request_state_t 值。仅 SETTLED 具有最终结果／计数；其他结果为 "
-"BUSY，计数为零。accepted=1 表示保留的复制单元，包括既有所有者拒绝接纳时的终结错误。仅接受本身不产生硬件效果。"
+msgid "state is a Core nx_request_state_t value encoded as uint32_t. Only SETTLED has a final result/count; other results are BUSY with count zero. accepted=1 denotes the retained copied cell, including a terminal error when the existing owner rejects admission. No hardware effect follows from acceptance alone."
+msgstr "state 为编码成 uint32_t 的 Core nx_request_state_t 值。仅 SETTLED 具有最终结果／计数；其他结果为 BUSY，计数为零。accepted=1 表示保留的复制单元，包括既有所有者拒绝接纳时的终结错误。仅接受本身不产生硬件效果。"
 
-#: docs/reference/api/extension-components.md:119
 msgid "user_io_async_storage.h"
 msgstr "user_io_async_storage.h"
 
-#: docs/reference/api/extension-components.md:121
 msgid "Trusted kernel assembly for exact copied UART user cells."
 msgstr "针对精确复制 UART 用户单元的可信内核装配。"
 
-#: docs/reference/api/extension-components.md:121
 msgid "Nominal copy permissions; actual access still requires trusted copy."
 msgstr "名义复制权限；实际访问仍须经过可信复制。"
 
-#: docs/reference/api/extension-components.md:121
 msgid "Cold construct one exact copied mediation over a real owner."
 msgstr "在真实所有者之上初始构造精确复制代理。"
 
-#: docs/reference/api/extension-components.md:121
-msgid ""
-"Privileged unmasked Thread with owner idle and no concurrent users. Cold O(n "
-"squared) alias checks reject all known mutable cell/payload/control overlaps "
-"and user-RAM aliases. Admission checks fixed region extents and copies at "
-"most the selected exact payload budget; no queue or worker is added. Keep "
-"policy, cells, owner, provider and all contexts stable through permanent "
-"close, consumption and successful join. Pure cold checks precede a "
-"constructing reservation and the trusted role claim; no fallible step follows"
-" successful claim. Fresh objects require a larger externally claimed session;"
-" this object cannot be reconstructed to reset its epochs."
-msgstr ""
-"特权、未屏蔽中断的 Thread，所有者空闲且没有并发使用者。初始 O(n squared) 别名检查拒绝全部已知可变单元／载荷／控制重叠及用户 RAM "
-"别名。接纳检查固定区域范围，复制量不超过所选精确载荷预算；不增加队列或工作线程。策略、单元、所有者、提供者及全部上下文须在永久关闭、消费直至成功汇合期间保持稳定。纯初始检查先于构造保留及可信角色申领；成功申领后不再有可失败步骤。新对象须从外部申领更大的会话；不得重新构造此对象以重置纪元。"
+msgid "Privileged unmasked Thread with owner idle and no concurrent users. Cold O(n squared) alias checks reject all known mutable cell/payload/control overlaps and user-RAM aliases. Admission checks fixed region extents and copies at most the selected exact payload budget; no queue or worker is added. Keep policy, cells, owner, provider and all contexts stable through permanent close, consumption and successful join. Pure cold checks precede a constructing reservation and the trusted role claim; no fallible step follows successful claim. Fresh objects require a larger externally claimed session; this object cannot be reconstructed to reset its epochs."
+msgstr "特权、未屏蔽中断的 Thread，所有者空闲且没有并发使用者。初始 O(n squared) 别名检查拒绝全部已知可变单元／载荷／控制重叠及用户 RAM 别名。接纳检查固定区域范围，复制量不超过所选精确载荷预算；不增加队列或工作线程。策略、单元、所有者、提供者及全部上下文须在永久关闭、消费直至成功汇合期间保持稳定。纯初始检查先于构造保留及可信角色申领；成功申领后不再有可失败步骤。新对象须从外部申领更大的会话；不得重新构造此对象以重置纪元。"
 
-#: docs/reference/api/extension-components.md:121
 msgid "[out] Fresh zero privileged storage, initialized once."
 msgstr "[out] 全新零初始化的特权存储，仅初始化一次。"
 
-#: docs/reference/api/extension-components.md:121
 msgid "[inout] Exact caller-owned cells/payloads, no maximum pool."
 msgstr "[inout] 调用方拥有的精确单元／载荷，不设最大存储池。"
 
-#: docs/reference/api/extension-components.md:121
 msgid "[in] Positive cell count representable in a scalar slot ID."
 msgstr "[in] 能以标量槽位 ID 表示的正数单元数量。"
 
-#: docs/reference/api/extension-components.md:121
 msgid "[in] Immutable trusted principal/grant/copy/owner binding."
 msgstr "[in] 不可变可信主体／授权／复制／所有者绑定。"
 
-#: docs/reference/api/extension-components.md:121
-msgid ""
-"SUCCESS or INVALID/STATE/CONTEXT/BUSY/EXHAUSTED, or trusted claim error "
-"without new retained users or hardware effects; every rejected output remains"
-" unchanged."
-msgstr ""
-"SUCCESS 或 "
-"INVALID/STATE/CONTEXT/BUSY/EXHAUSTED，或可信申领错误；不新增保留的用户引用或硬件效果；拒绝时每个输出均保持不变。"
+msgid "SUCCESS or INVALID/STATE/CONTEXT/BUSY/EXHAUSTED, or trusted claim error without new retained users or hardware effects; every rejected output remains unchanged."
+msgstr "SUCCESS 或 INVALID/STATE/CONTEXT/BUSY/EXHAUSTED，或可信申领错误；不新增保留的用户引用或硬件效果；拒绝时每个输出均保持不变。"
 
-#: docs/reference/api/extension-components.md:121
 msgid "Nominal actual user RAM; trusted copy still enforces real access."
 msgstr "名义上的实际用户 RAM；真实访问仍由可信复制强制检查。"
 
-#: docs/reference/api/extension-components.md:121
 msgid "Bounded trusted kernel identity and fault-contained copies."
 msgstr "有界可信内核身份及具有故障隔离的复制。"
 
-#: docs/reference/api/extension-components.md:121
-msgid ""
-"identity authenticates the current entry, never user input. Copy operations "
-"guarantee complete checked CPU access and mapping/process lifetime for the "
-"callback duration. Neither success nor error retains a user address, kernel "
-"scratch pointer, mapping or observer after return. Errors may have partially "
-"copied bytes; the copied payload cell is wiped on rejection, and reply "
-"failure is recoverable through exact slot/epoch. No callback blocks, "
-"dispatches recursively, or substitutes a permission observation for fault-"
-"safe copying. Identity/copy callbacks may close this mediation. A new "
-"kernel/CMSE wrapper must actually establish these preconditions; this "
-"component does not.              claim is a trusted exclusive role authority "
-"for the actual              owner/controller binding. It rejects a second "
-"live role even              with a larger session, and rejects reused/non-"
-"increasing              nonzero sessions from persistent, nonwrapping history"
-" across              fresh storage, process/device reset and reconstruction."
-"              Failed claim retains no reference/effect. Successful claim"
-"              permanently consumes that session and retains the exact role"
-"              until release. release SUCCESS proves outer gateway/transport "
-"observers joined and detaches all authority references; failure retains the "
-"original role unchanged. drained SUCCESS permanently fences future outer "
-"gateway entry and joins all gateway/transport observers, while the exact role"
-" remains claimed. Failed drained preserves the role and every cell unchanged."
-" It must not modify bound configuration, cell identities or requests. Claim, "
-"release and drained are bounded and cannot recursively construct, dispatch, "
-"close, reap or join. Context/history must remain live; no source code "
-"implements this kernel authority, physical isolation, storage partition or "
-"recovery policy. Alternate wrappers of one controller are not distinct roles."
-msgstr ""
-"identity 认证当前入口，绝不接受用户提供的身份。复制操作保证在回调期间完成全部经检查的 CPU "
-"访问，并保证映射／进程生命周期。无论成功或错误，返回后均不保留用户地址、内核临时指针、映射或观察者。错误可能发生在部分字节已复制之后；拒绝时擦除复制载荷单元，回复失败可通过精确槽位／纪元恢复。任何回调都不得阻塞、递归"
-" dispatch，或以权限观察替代故障安全复制。身份／复制回调可以关闭此代理。新的内核／CMSE "
-"包装层必须真正建立这些前提；本组件不提供它们。claim "
-"是针对实际所有者／控制器绑定的可信独占角色授权者。即使会话更大，也拒绝第二个活动角色；并依据跨新存储、进程／器件复位及重构保留的持久、不回绕历史，拒绝复用或不递增的非零会话。失败申领不保留任何引用或效果。成功申领永久消耗该会话，并保留精确角色直至释放。release"
-" 返回 SUCCESS 证明外部网关／传输观察者已汇合，并分离全部授权引用；失败时原角色保持不变。drained 返回 SUCCESS "
-"永久阻止未来外部网关入口，并汇合全部网关／传输观察者，同时精确角色仍被申领。drained "
-"失败保留角色及每个单元不变。它不得修改绑定配置、单元身份或请求。claim、release 和 drained 有界，且不得递归 "
-"construct、dispatch、close、reap 或 "
-"join。上下文／历史必须保持存活；源码不实现此内核授权、物理隔离、存储分区或恢复策略。同一控制器的不同包装不构成不同角色。"
+msgid "identity authenticates the current entry, never user input. Copy operations guarantee complete checked CPU access and mapping/process lifetime for the callback duration. Neither success nor error retains a user address, kernel scratch pointer, mapping or observer after return. Errors may have partially copied bytes; the copied payload cell is wiped on rejection, and reply failure is recoverable through exact slot/epoch. No callback blocks, dispatches recursively, or substitutes a permission observation for fault-safe copying. Identity/copy callbacks may close this mediation. A new kernel/CMSE wrapper must actually establish these preconditions; this component does not.              claim is a trusted exclusive role authority for the actual              owner/controller binding. It rejects a second live role even              with a larger session, and rejects reused/non-increasing              nonzero sessions from persistent, nonwrapping history across              fresh storage, process/device reset and reconstruction.              Failed claim retains no reference/effect. Successful claim              permanently consumes that session and retains the exact role              until release. release SUCCESS proves outer gateway/transport observers joined and detaches all authority references; failure retains the original role unchanged. drained SUCCESS permanently fences future outer gateway entry and joins all gateway/transport observers, while the exact role remains claimed. Failed drained preserves the role and every cell unchanged. It must not modify bound configuration, cell identities or requests. Claim, release and drained are bounded and cannot recursively construct, dispatch, close, reap or join. Context/history must remain live; no source code implements this kernel authority, physical isolation, storage partition or recovery policy. Alternate wrappers of one controller are not distinct roles."
+msgstr "identity 认证当前入口，绝不接受用户提供的身份。复制操作保证在回调期间完成全部经检查的 CPU 访问，并保证映射／进程生命周期。无论成功或错误，返回后均不保留用户地址、内核临时指针、映射或观察者。错误可能发生在部分字节已复制之后；拒绝时擦除复制载荷单元，回复失败可通过精确槽位／纪元恢复。任何回调都不得阻塞、递归 dispatch，或以权限观察替代故障安全复制。身份／复制回调可以关闭此代理。新的内核／CMSE 包装层必须真正建立这些前提；本组件不提供它们。claim 是针对实际所有者／控制器绑定的可信独占角色授权者。即使会话更大，也拒绝第二个活动角色；并依据跨新存储、进程／器件复位及重构保留的持久、不回绕历史，拒绝复用或不递增的非零会话。失败申领不保留任何引用或效果。成功申领永久消耗该会话，并保留精确角色直至释放。release 返回 SUCCESS 证明外部网关／传输观察者已汇合，并分离全部授权引用；失败时原角色保持不变。drained 返回 SUCCESS 永久阻止未来外部网关入口，并汇合全部网关／传输观察者，同时精确角色仍被申领。drained 失败保留角色及每个单元不变。它不得修改绑定配置、单元身份或请求。claim、release 和 drained 有界，且不得递归 construct、dispatch、close、reap 或 join。上下文／历史必须保持存活；源码不实现此内核授权、物理隔离、存储分区或恢复策略。同一控制器的不同包装不构成不同角色。"
 
-#: docs/reference/api/extension-components.md:121
 msgid "Immutable trusted one-principal/one-device/one-owner grant."
 msgstr "不可变可信的单主体／单设备／单所有者授权。"
 
-#: docs/reference/api/extension-components.md:121
-msgid ""
-"This is kernel configuration, never copied from users. owner/executor/port "
-"must be the already constructed exact BusOwner + UARTOwner bridge, with no "
-"other direct producers or external request/payload observers. Completion "
-"callbacks are not installed. All callback contexts remain privileged; "
-"explicit extents cover their complete live controls. Guard, clock and wake "
-"contexts may be the same trusted object. The caller owns actual UART startup,"
-" hardware attribution, executor scheduling, clock/deadline domain and final "
-"stop."
-msgstr ""
-"这是内核配置，绝不从用户复制。owner/executor/port 必须是已构造的精确 BusOwner + UARTOwner "
-"桥接，不得有其他直接生产者或外部请求／载荷观察者。不安装完成回调。全部回调上下文保持在特权内存中；显式范围覆盖其完整活动控制。保护、时钟及唤醒上下文可以是同一可信对象。调用方负责实际"
-" UART 启动、硬件归属、执行者调度、时钟／截止时间域及最终停止。"
+msgid "This is kernel configuration, never copied from users. owner/executor/port must be the already constructed exact BusOwner + UARTOwner bridge, with no other direct producers or external request/payload observers. Completion callbacks are not installed. All callback contexts remain privileged; explicit extents cover their complete live controls. Guard, clock and wake contexts may be the same trusted object. The caller owns actual UART startup, hardware attribution, executor scheduling, clock/deadline domain and final stop."
+msgstr "这是内核配置，绝不从用户复制。owner/executor/port 必须是已构造的精确 BusOwner + UARTOwner 桥接，不得有其他直接生产者或外部请求／载荷观察者。不安装完成回调。全部回调上下文保持在特权内存中；显式范围覆盖其完整活动控制。保护、时钟及唤醒上下文可以是同一可信对象。调用方负责实际 UART 启动、硬件归属、执行者调度、时钟／截止时间域及最终停止。"
 
-#: docs/reference/api/extension-components.md:121
 msgid "Exact privileged cell; initialize only data and capacity."
 msgstr "精确特权单元；仅初始化 data 和 capacity。"
 
-#: docs/reference/api/extension-components.md:121
-msgid ""
-"All other fields start zero and are mechanism-private after construction. "
-"data is independent writable privileged RAM, capacity is its exact positive "
-"byte budget, at most UINT32_MAX. No user pointer is ever assigned here. Core "
-"identity epochs never wrap and survive consume/close; never copy or reset a "
-"live cell. UARTOwner borrows operation/payload until real provider final "
-"access, then user-result retention lasts until successful reply copy plus "
-"joined CONSUME, or trusted joined reap. Epoch history survives both paths."
-msgstr ""
-"其他字段初始均为零，构造后为机制私有。data 是独立可写特权 RAM；capacity 是精确正数字节预算，最大为 "
-"UINT32_MAX。此处绝不赋入用户指针。Core 身份纪元从不回绕，并在 consume/close "
-"后保留；不得复制或重置活动单元。UARTOwner 借用操作／载荷直至真实提供者的最后访问，此后用户结果保留至回复复制成功且 CONSUME "
-"已汇合，或可信 reap 已汇合。两条路径均保留纪元历史。"
+msgid "All other fields start zero and are mechanism-private after construction. data is independent writable privileged RAM, capacity is its exact positive byte budget, at most UINT32_MAX. No user pointer is ever assigned here. Core identity epochs never wrap and survive consume/close; never copy or reset a live cell. UARTOwner borrows operation/payload until real provider final access, then user-result retention lasts until successful reply copy plus joined CONSUME, or trusted joined reap. Epoch history survives both paths."
+msgstr "其他字段初始均为零，构造后为机制私有。data 是独立可写特权 RAM；capacity 是精确正数字节预算，最大为 UINT32_MAX。此处绝不赋入用户指针。Core 身份纪元从不回绕，并在 consume/close 后保留；不得复制或重置活动单元。UARTOwner 借用操作／载荷直至真实提供者的最后访问，此后用户结果保留至回复复制成功且 CONSUME 已汇合，或可信 reap 已汇合。两条路径均保留纪元历史。"
 
-#: docs/reference/api/extension-components.md:121
 msgid "Caller-owned trusted control; initialize once, never reset epochs."
 msgstr "调用方拥有的可信控制；仅初始化一次，不得重置纪元。"
 
-#: docs/reference/api/extension-components.md:127
 msgid "i3c_controller.h"
 msgstr "i3c_controller.h"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Explicit bounded I3C discovery, transfers and event ownership."
 msgstr "显式有界的 I3C 发现、传输及事件所有权。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Prepare unused metadata without retaining its payload."
 msgstr "准备未使用的元数据，不取得载荷借用。"
 
-#: docs/reference/api/extension-components.md:129
-msgid ""
-"Serialized owner Thread. DISCOVER has no payload or target. PRIVATE permits "
-"1..65535 bytes. CCC permits only ENEC/DISEC broadcast/direct writes and "
-"direct GETMWL/GETMRL/GETPID/ GETBCR/GETDCR/GETSTATUS reads, with exact "
-"defined lengths. GETMRL uses two bytes, or three when confirmed BCR bit2 "
-"advertises an IBI payload. Address-changing, HDR and controller-handoff CCCs "
-"reject. All APIs require one serialized executor. Port and clock callbacks "
-"must not reenter the core, invoke application code or mutate retained state. "
-"No ISR, allocation, OS lock or worker. Absolute deadlines use the injected "
-"clock."
-msgstr ""
-"由所有者 Thread 串行执行。DISCOVER 没有载荷或目标。PRIVATE 允许 1..65535 字节。CCC 仅允许 ENEC/DISEC "
-"广播／定向写入，以及具有精确定义长度的定向 GETMWL/GETMRL/GETPID/GETBCR/GETDCR/GETSTATUS 读取。GETMRL "
-"使用两字节；若已确认 BCR 的 bit2 声明 IBI 载荷，则使用三字节。拒绝改变地址、HDR 及控制器交接 CCC。全部 API "
-"都要求唯一串行执行者。端口与时钟回调不得重入核心、调用应用代码或修改保留状态。不得在 ISR 中调用；不进行分配，不使用 OS "
-"锁或工作线程。绝对截止时间使用注入的时钟。"
+msgid "Serialized owner Thread. DISCOVER has no payload or target. PRIVATE permits 1..65535 bytes. CCC permits only ENEC/DISEC broadcast/direct writes and direct GETMWL/GETMRL/GETPID/ GETBCR/GETDCR/GETSTATUS reads, with exact defined lengths. GETMRL uses two bytes, or three when confirmed BCR bit2 advertises an IBI payload. Address-changing, HDR and controller-handoff CCCs reject. All APIs require one serialized executor. Port and clock callbacks must not reenter the core, invoke application code or mutate retained state. No ISR, allocation, OS lock or worker. Absolute deadlines use the injected clock."
+msgstr "由所有者 Thread 串行执行。DISCOVER 没有载荷或目标。PRIVATE 允许 1..65535 字节。CCC 仅允许 ENEC/DISEC 广播／定向写入，以及具有精确定义长度的定向 GETMWL/GETMRL/GETPID/GETBCR/GETDCR/GETSTATUS 读取。GETMRL 使用两字节；若已确认 BCR 的 bit2 声明 IBI 载荷，则使用三字节。拒绝改变地址、HDR 及控制器交接 CCC。全部 API 都要求唯一串行执行者。端口与时钟回调不得重入核心、调用应用代码或修改保留状态。不得在 ISR 中调用；不进行分配，不使用 OS 锁或工作线程。绝对截止时间使用注入的时钟。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Admit a finite operation after cold validation and readiness."
 msgstr "经初始校验及就绪检查后接纳有限操作。"
 
-#: docs/reference/api/extension-components.md:129
-msgid ""
-"SUCCESS transfers the borrow. Rejection has no effects or retained "
-"references. Outputs cannot alias retained controller, port table, "
-"target/event storage, policy, request or payload. Port and clock context "
-"spans remain the caller's responsibility."
-msgstr ""
-"SUCCESS "
-"转移借用。拒绝不产生效果，也不保留引用。输出不得与保留的控制器、端口表、目标／事件存储、策略、请求或载荷形成别名。端口与时钟上下文范围仍由调用方负责。"
+msgid "SUCCESS transfers the borrow. Rejection has no effects or retained references. Outputs cannot alias retained controller, port table, target/event storage, policy, request or payload. Port and clock context spans remain the caller's responsibility."
+msgstr "SUCCESS 转移借用。拒绝不产生效果，也不保留引用。输出不得与保留的控制器、端口表、目标／事件存储、策略、请求或载荷形成别名。端口与时钟上下文范围仍由调用方负责。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Perform one bounded FIFO/event phase or one drain proof."
 msgstr "执行一个有界 FIFO／事件阶段，或一次排空证明。"
 
-#: docs/reference/api/extension-components.md:129
-msgid ""
-"Partial DAA, malformed observations and errors fault admission while "
-"retaining every known/tentative assigned address. Cancel/timeout/failed drain"
-" never release a loan. Failed quiescence stays QUARANTINED; continued service"
-" may recover. An event overflow returns OVERFLOW and latches its counter, "
-"without discarding an already retained queued event."
-msgstr ""
-"部分 DAA、畸形观察及错误使接纳进入故障状态，同时保留每个已知／暂定分配地址。取消、超时或排空失败绝不释放借用。静默证明失败时保持 "
-"QUARANTINED；继续 service 可以恢复。事件溢出返回 OVERFLOW 并锁存计数，不丢弃已保留的队列事件。"
+msgid "Partial DAA, malformed observations and errors fault admission while retaining every known/tentative assigned address. Cancel/timeout/failed drain never release a loan. Failed quiescence stays QUARANTINED; continued service may recover. An event overflow returns OVERFLOW and latches its counter, without discarding an already retained queued event."
+msgstr "部分 DAA、畸形观察及错误使接纳进入故障状态，同时保留每个已知／暂定分配地址。取消、超时或排空失败绝不释放借用。静默证明失败时保持 QUARANTINED；继续 service 可以恢复。事件溢出返回 OVERFLOW 并锁存计数，不丢弃已保留的队列事件。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Request withdrawal using stable epoch before request dereference."
 msgstr "在解引用请求前，使用稳定纪元请求撤回。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Obtain only a confirmed target; tentative/retired records reject."
 msgstr "仅获取已确认目标；拒绝暂定／已退役记录。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Copy one retained event; EMPTY leaves output unchanged."
 msgstr "复制一个保留事件；EMPTY 时输出不变。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Copy saturating loss counters without clearing them."
 msgstr "复制饱和丢失计数器，不清零。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Close admission without changing loans, target identities or events."
 msgstr "关闭接纳，不更改借用、目标身份或事件。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Prove a whole-bus reset before invalidating dynamic addresses."
 msgstr "使动态地址失效前，证明已完成整条总线复位。"
 
-#: docs/reference/api/extension-components.md:129
-msgid ""
-"Requires closed admission. Hardware proof covers real wire, FIFO and IRQ "
-"quiescence AND every target's dynamic address invalidated. Peripheral reset "
-"or FIFO flush alone is never this proof. Failure preserves all loans and "
-"address records. Success settles outstanding work and invalidates endpoints; "
-"retained events preserve their old epochs for the caller."
-msgstr ""
-"要求接纳已关闭。硬件证明必须同时覆盖真实线路、FIFO、IRQ 静默，以及每个目标的动态地址均已失效。仅外设复位或 FIFO "
-"清空绝不构成此证明。失败保留全部借用与地址记录。成功使未完成工作结算并使端点失效；保留事件仍携带旧纪元供调用方处理。"
+msgid "Requires closed admission. Hardware proof covers real wire, FIFO and IRQ quiescence AND every target's dynamic address invalidated. Peripheral reset or FIFO flush alone is never this proof. Failure preserves all loans and address records. Success settles outstanding work and invalidates endpoints; retained events preserve their old epochs for the caller."
+msgstr "要求接纳已关闭。硬件证明必须同时覆盖真实线路、FIFO、IRQ 静默，以及每个目标的动态地址均已失效。仅外设复位或 FIFO 清空绝不构成此证明。失败保留全部借用与地址记录。成功使未完成工作结算并使端点失效；保留事件仍携带旧纪元供调用方处理。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Reopen an idle unfaulted pause; faults require explicit bus reset."
 msgstr "重新打开空闲且无故障的暂停；故障要求显式总线复位。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Close, withdraw and finally relinquish the unique controller."
 msgstr "关闭、撤回，最后放弃唯一控制器。"
 
-#: docs/reference/api/extension-components.md:129
-msgid ""
-"Active work or queued events return BUSY. Caller continues service, consumes "
-"events and retries. Assigned/tentative addresses or a fault return STATE "
-"until whole-bus reset proof invalidates them. Successful final wire/ FIFO/IRQ"
-" quiescence releases ownership, never reconstructing this object. Storage "
-"outlives copied endpoints and tickets."
-msgstr ""
-"活动工作或队列事件返回 BUSY。调用方须继续 service、消费事件并重试。存在已分配／暂定地址或故障时返回 "
-"STATE，直至整条总线复位证明使其失效。最终真实线路／FIFO／IRQ "
-"静默证明成功后释放所有权，不得重新构造此对象。存储须在所有复制的端点与票据存续期间保持有效。"
+msgid "Active work or queued events return BUSY. Caller continues service, consumes events and retries. Assigned/tentative addresses or a fault return STATE until whole-bus reset proof invalidates them. Successful final wire/ FIFO/IRQ quiescence releases ownership, never reconstructing this object. Storage outlives copied endpoints and tickets."
+msgstr "活动工作或队列事件返回 BUSY。调用方须继续 service、消费事件并重试。存在已分配／暂定地址或故障时返回 STATE，直至整条总线复位证明使其失效。最终真实线路／FIFO／IRQ 静默证明成功后释放所有权，不得重新构造此对象。存储须在所有复制的端点与票据存续期间保持有效。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Controller-bound confirmed target incarnation, never a factory ID."
 msgstr "绑定到控制器的已确认目标代次，绝不是工厂 ID。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Stable operation identity; controller outlives all copied controls."
 msgstr "稳定操作身份；控制器须在全部复制的控制存续期间保持有效。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Caller-owned finite operation; no implicit bus discovery."
 msgstr "调用方拥有的有限操作；不隐式发现总线。"
 
-#: docs/reference/api/extension-components.md:129
-msgid ""
-"Initialize base once with nx_request_initialize. Accepted metadata and "
-"payload stay borrowed until acquire SETTLED. TX stays immutable; transferred "
-"counts bytes handed to the FIFO, not acknowledged target effects. No replay "
-"after errors. Public fields are immutable throughout an accepted borrow."
-msgstr ""
-"仅使用 nx_request_initialize 初始化 base 一次。已接受元数据和载荷保持借用，直至以 acquire 观察 SETTLED。TX"
-" 保持不可变；transferred 统计交给 FIFO 的字节，而不是目标已确认的效果。错误后不重放。在整个已接受借用期间，公共字段均不可变。"
+msgid "Initialize base once with nx_request_initialize. Accepted metadata and payload stay borrowed until acquire SETTLED. TX stays immutable; transferred counts bytes handed to the FIFO, not acknowledged target effects. No replay after errors. Public fields are immutable throughout an accepted borrow."
+msgstr "仅使用 nx_request_initialize 初始化 base 一次。已接受元数据和载荷保持借用，直至以 acquire 观察 SETTLED。TX 保持不可变；transferred 统计交给 FIFO 的字节，而不是目标已确认的效果。错误后不重放。在整个已接受借用期间，公共字段均不可变。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Copied event; no callback, target creation or hidden work."
 msgstr "复制的事件；不调用回调、不创建目标、不隐式执行工作。"
 
-#: docs/reference/api/extension-components.md:129
-msgid ""
-"IBI endpoint retains its exact confirmed target epoch. Confirmed BCR bit1 "
-"must advertise IBI. Bit2 requires 1..4 payload bytes including MDB; otherwise"
-" zero data bytes. HOT_JOIN carries no endpoint and only requests explicit "
-"caller-controlled discovery. Payload is at most four bytes, as in the "
-"selected H563 reference; no timestamp claim."
-msgstr ""
-"IBI 端点保留精确已确认目标纪元。已确认 BCR 的 bit1 必须声明 IBI 能力。bit2 置位时要求 1..4 字节载荷且包含 "
-"MDB；否则为零数据字节。HOT_JOIN 不携带端点，仅请求由调用方显式控制的发现。与所选 H563 参考一致，载荷最多四字节；不提供时间戳保证。"
+msgid "IBI endpoint retains its exact confirmed target epoch. Confirmed BCR bit1 must advertise IBI. Bit2 requires 1..4 payload bytes including MDB; otherwise zero data bytes. HOT_JOIN carries no endpoint and only requests explicit caller-controlled discovery. Payload is at most four bytes, as in the selected H563 reference; no timestamp claim."
+msgstr "IBI 端点保留精确已确认目标纪元。已确认 BCR 的 bit1 必须声明 IBI 能力。bit2 置位时要求 1..4 字节载荷且包含 MDB；否则为零数据字节。HOT_JOIN 不携带端点，仅请求由调用方显式控制的发现。与所选 H563 参考一致，载荷最多四字节；不提供时间戳保证。"
 
-#: docs/reference/api/extension-components.md:129
 msgid "Explicit loss accounting; counters saturate rather than wrap."
 msgstr "显式丢失统计；计数器饱和而不回绕。"
 
-#: docs/reference/api/extension-components.md:135
 msgid "i3c_controller_storage.h"
 msgstr "i3c_controller_storage.h"
 
-#: docs/reference/api/extension-components.md:137
 msgid "Caller storage and aggregate I3C hardware boundary."
 msgstr "调用方存储及聚合 I3C 硬件边界。"
 
-#: docs/reference/api/extension-components.md:137
 msgid "Bind unused zero storage and claim one controller."
 msgstr "绑定尚未使用且已零初始化的存储，并申领一个控制器。"
 
-#: docs/reference/api/extension-components.md:137
-msgid ""
-"Reject overlapping/unaligned/overflowing storage, duplicate PIDs/addresses, "
-"reserved I3C addresses and nonzero targets. The config value is copied and "
-"need not remain alive; its referenced storage and contexts remain live and "
-"separate from every request/payload/output. 48-bit PIDs are caller- authored,"
-" never selected by a factory. Positive event capacity and 1..8-byte service "
-"batches match this bounded SDR/IBI reference. No legacy I2C, DMA, HDR, target"
-" role, implicit discovery or hidden event worker."
-msgstr ""
-"拒绝重叠、未对齐、地址运算溢出的存储、重复 PID／地址、I3C 保留地址及非零目标。config "
-"值被复制，无需继续存活；但其引用的存储与上下文须保持存活，并与每个请求／载荷／输出分离。48 位 PID 由调用方编写，绝不由工厂选择。正数事件容量及 "
-"1..8 字节 service 批次对应此有界 SDR/IBI 参考。不支持传统 I2C、DMA、HDR、目标角色、隐式发现或隐藏事件工作线程。"
+msgid "Reject overlapping/unaligned/overflowing storage, duplicate PIDs/addresses, reserved I3C addresses and nonzero targets. The config value is copied and need not remain alive; its referenced storage and contexts remain live and separate from every request/payload/output. 48-bit PIDs are caller- authored, never selected by a factory. Positive event capacity and 1..8-byte service batches match this bounded SDR/IBI reference. No legacy I2C, DMA, HDR, target role, implicit discovery or hidden event worker."
+msgstr "拒绝重叠、未对齐、地址运算溢出的存储、重复 PID／地址、I3C 保留地址及非零目标。config 值被复制，无需继续存活；但其引用的存储与上下文须保持存活，并与每个请求／载荷／输出分离。48 位 PID 由调用方编写，绝不由工厂选择。正数事件容量及 1..8 字节 service 批次对应此有界 SDR/IBI 参考。不支持传统 I2C、DMA、HDR、目标角色、隐式发现或隐藏事件工作线程。"
 
-#: docs/reference/api/extension-components.md:137
 msgid "Authored immutable target policy, not runtime factory discovery."
 msgstr "预先编写的不可变目标策略，不是运行时工厂发现。"
 
-#: docs/reference/api/extension-components.md:137
 msgid "Caller-owned target record, zero-initialized once."
 msgstr "调用方拥有的目标记录，仅零初始化一次。"
 
-#: docs/reference/api/extension-components.md:137
-msgid ""
-"Core retains tentative and confirmed addresses on DAA error. Epoch never "
-"resets or wraps, including after bus reset."
+msgid "Core retains tentative and confirmed addresses on DAA error. Epoch never resets or wraps, including after bus reset."
 msgstr "DAA 出错时核心保留暂定及已确认地址。纪元从不重置或回绕，包括总线复位后。"
 
-#: docs/reference/api/extension-components.md:137
 msgid "Value command; begin copies it synchronously and retains no pointer."
 msgstr "值命令；begin 同步复制，不保留指针。"
 
-#: docs/reference/api/extension-components.md:137
 msgid "One bounded hardware observation and aggregate FIFO progress."
 msgstr "单次有界硬件观察及聚合 FIFO 进度。"
 
-#: docs/reference/api/extension-components.md:137
-msgid ""
-"No callback retains spans. tx/rx counts may not exceed the supplied "
-"capacities. DAA acknowledged confirms the preceding assignment BEFORE any "
-"next identity in this observation. A complete DAA with a tentative "
-"unacknowledged address is an error, never implicit success. Event data are "
-"fully copied."
-msgstr ""
-"任何回调均不保留跨度。tx/rx 计数不得超过提供的容量。本次观察中，DAA 确认必须先确认此前的地址分配，再处理下一个身份。若 DAA "
-"完成时仍有未确认的暂定地址，则是错误，绝不视为隐式成功。事件数据全部复制。"
+msgid "No callback retains spans. tx/rx counts may not exceed the supplied capacities. DAA acknowledged confirms the preceding assignment BEFORE any next identity in this observation. A complete DAA with a tentative unacknowledged address is an error, never implicit success. Event data are fully copied."
+msgstr "任何回调均不保留跨度。tx/rx 计数不得超过提供的容量。本次观察中，DAA 确认必须先确认此前的地址分配，再处理下一个身份。若 DAA 完成时仍有未确认的暂定地址，则是错误，绝不视为隐式成功。事件数据全部复制。"
 
-#: docs/reference/api/extension-components.md:137
 msgid "Synchronous bounded hardware leaves; no request forwarding."
 msgstr "同步有界硬件叶操作；不转发请求。"
 
-#: docs/reference/api/extension-components.md:137
-msgid ""
-"begin and assign are infallible commands. pump reports later hardware "
-"failures and services at most the supplied payload batch capacities, one "
-"fixed eight-byte DAA identity, one IBI and one hot-join latch. Identity "
-"metadata does not contribute to transmitted/received payload counts. No "
-"command or span is retained. No application code is called. withdraw requests"
-" abort. quiescent SUCCESS proves actual wire/FIFO/IRQ quiescence and all port"
-" observers detached."
-msgstr ""
-"begin 和 assign 是不会失败的命令。pump 报告后续硬件错误，每次最多处理给定载荷批次容量、一条固定八字节 DAA 身份、一条 IBI "
-"和一个 hot-join 锁存。身份元数据不计入 transmitted/received "
-"载荷计数。不保留命令或区间指针，不调用应用代码。withdraw 请求中止。quiescent SUCCESS 证明实际线上/FIFO/IRQ "
-"已静默，且所有端口观察者均已脱离。"
+msgid "begin and assign are infallible commands. pump reports later hardware failures and services at most the supplied payload batch capacities, one fixed eight-byte DAA identity, one IBI and one hot-join latch. Identity metadata does not contribute to transmitted/received payload counts. No command or span is retained. No application code is called. withdraw requests abort. quiescent SUCCESS proves actual wire/FIFO/IRQ quiescence and all port observers detached."
+msgstr "begin 和 assign 是不会失败的命令。pump 报告后续硬件错误，每次最多处理给定载荷批次容量、一条固定八字节 DAA 身份、一条 IBI 和一个 hot-join 锁存。身份元数据不计入 transmitted/received 载荷计数。不保留命令或区间指针，不调用应用代码。withdraw 请求中止。quiescent SUCCESS 证明实际线上/FIFO/IRQ 已静默，且所有端口观察者均已脱离。"
 
-#: docs/reference/api/extension-components.md:137
-msgid ""
-"reset additionally proves EVERY target dynamic address invalidated. FIFO "
-"flush or controller reset alone cannot report SUCCESS. BUSY/IO/UNSUPPORTED "
-"proof retains loans and ownership. release is infallible after successful "
-"final quiescence; it must not silently refuse ownership transfer or repeat a "
-"fallible proof while the core publishes join. The port context and supplied "
-"storage outlive observers."
-msgstr ""
-"reset 还必须证明每个目标的动态地址均已失效。仅刷新 FIFO 或复位控制器不得返回 SUCCESS。BUSY/IO/UNSUPPORTED "
-"证明保留借用和所有权。最终静默成功后的 release 不得失败；核心发布 join 时，它不得静默拒绝所有权转交，也不得重复执行可能失败的证明。端口 "
-"context 和所提供的存储必须存活到观察者全部退出之后。"
+msgid "reset additionally proves EVERY target dynamic address invalidated. FIFO flush or controller reset alone cannot report SUCCESS. BUSY/IO/UNSUPPORTED proof retains loans and ownership. release is infallible after successful final quiescence; it must not silently refuse ownership transfer or repeat a fallible proof while the core publishes join. The port context and supplied storage outlive observers."
+msgstr "reset 还必须证明每个目标的动态地址均已失效。仅刷新 FIFO 或复位控制器不得返回 SUCCESS。BUSY/IO/UNSUPPORTED 证明保留借用和所有权。最终静默成功后的 release 不得失败；核心发布 join 时，它不得静默拒绝所有权转交，也不得重复执行可能失败的证明。端口 context 和所提供的存储必须存活到观察者全部退出之后。"
 
-#: docs/reference/api/extension-components.md:137
-msgid ""
-"All port/clock callbacks are non-reentrant: no core calls, application calls "
-"or mutation of retained core state. claim atomically acquires an exclusive "
-"controller and its IRQ/clock/pins. SUCCESS requires independently established"
-" proof that EVERY target dynamic address is invalidated, including targets "
-"still powered across MCU reset. The caller establishes this baseline before "
-"construction; claim never attempts an unproven reset. Rejection has no "
-"effects. ready is a read-only admission check."
-msgstr ""
-"全部端口／时钟回调均不可重入：不得调用核心、调用应用代码或修改核心保留状态。claim 原子地取得控制器及其 "
-"IRQ／时钟／引脚的独占所有权。SUCCESS 要求独立建立证明：每个目标的动态地址都已失效，包括 MCU "
-"复位期间仍保持供电的目标。调用方须在构造前建立此基线；claim 绝不尝试未经证明的复位。拒绝不产生效果。ready 是只读接纳检查。"
+msgid "All port/clock callbacks are non-reentrant: no core calls, application calls or mutation of retained core state. claim atomically acquires an exclusive controller and its IRQ/clock/pins. SUCCESS requires independently established proof that EVERY target dynamic address is invalidated, including targets still powered across MCU reset. The caller establishes this baseline before construction; claim never attempts an unproven reset. Rejection has no effects. ready is a read-only admission check."
+msgstr "全部端口／时钟回调均不可重入：不得调用核心、调用应用代码或修改核心保留状态。claim 原子地取得控制器及其 IRQ／时钟／引脚的独占所有权。SUCCESS 要求独立建立证明：每个目标的动态地址都已失效，包括 MCU 复位期间仍保持供电的目标。调用方须在构造前建立此基线；claim 绝不尝试未经证明的复位。拒绝不产生效果。ready 是只读接纳检查。"
 
-#: docs/reference/api/extension-components.md:137
 msgid "Exact caller capacities; separate static controller and target data."
 msgstr "调用方的精确容量；静态控制器与目标数据分离。"
 
-#: docs/reference/api/extension-components.md:143
-msgid "f407_i2s2_slave_tx.h"
-msgstr "f407_i2s2_slave_tx.h"
-
-#: docs/reference/api/extension-components.md:145
-msgid "Exact F407 finite stereo16 I2S2 slave transmitter."
-msgstr "精确面向 F407 的有限 stereo16 I2S2 从机发送器。"
-
-#: docs/reference/api/extension-components.md:145
-msgid "Fixed chip resource selected by the same validated hardware IR."
-msgstr "由同一份已验证硬件 IR 选定的固定芯片资源。"
-
-#: docs/reference/api/extension-components.md:145
-msgid "Acquire the selected F407 SPI2 personality and fixed pads."
-msgstr "取得选定 F407 SPI2 工作模式及固定引脚的所有权。"
-
-#: docs/reference/api/extension-components.md:145
-msgid ""
-"The caller owns the external master and holds CK idle LOW and WS HIGH "
-"continuously from before initialization/submission until acquire-observed "
-"ACTIVE. Pin reads sample instants; they cannot prove electrical silence. The "
-"master transmits exactly the declared complete frames and stops before a "
-"missing next word. Restart begins at the left channel. A prefilling "
-"cancellation with CK idle cannot empty DR; preserve QUARANTINED storage until"
-" coordinated drain clocks allow TXE then fresh BSY observations. This error "
-"drain can underrun and does not promise valid stereo audio or a complete "
-"transmitted frame; errors report zero transferred bytes. Timeout, TC or NDTR0"
-" never proves wire completion or final access. The caller also supplies valid"
-" operating voltage, I/O levels, load, CK/WS/SD timing and DMA refill margin "
-"under DS8626. ACTIVE and pin samples do not measure or qualify those "
-"electrical/rate conditions."
-msgstr ""
-"调用方拥有外部主机，并且从初始化或提交之前开始，持续保持 CK 处于空闲 LOW、WS 处于 HIGH，直到以 acquire 语义观察到 "
-"ACTIVE。引脚读取只反映采样瞬间，不能证明电气信号持续静止。主机必须恰好传输所声明的完整帧，并在需要下一个尚未提供的数据字之前停止。再次启动时从左声道开始。已预填充时，若取消请求且"
-" CK 仍保持空闲，DR 便无法排空；必须保留处于 QUARANTINED 的存储，直到协调提供的排空时钟允许先观察 TXE，再重新观察 "
-"BSY。这种错误排空可能产生欠载，并不保证得到有效的立体声音频或发送完整帧；错误一律报告零传输字节。超时、TC 或 NDTR0 "
-"都不能证明线上发送完成或已完成最终访问。调用方还必须按 DS8626 提供有效的工作电压、I/O 电平、负载、CK/WS/SD 时序和 DMA "
-"补充数据裕量。ACTIVE 和引脚采样既不测量这些电气或速率条件，也不构成对它们的验证。"
-
-#: docs/reference/api/extension-components.md:145
-msgid ""
-"One privileged unmasked task serializes every method and external owner "
-"lifecycle. Preserve incoming masks on all rejection paths. NMI/HardFault, "
-"other DMA/IRQ/pin owners, reset/reclock/debugger writers and concurrent "
-"Platform stop are excluded. Observed reset or clock-profile history loss "
-"while borrowed permanently retains the request; restoring reset-looking "
-"registers cannot establish prior final access. Main SRAM is DMA-visible; CCM "
-"is not. Chip pin capability establishes neither a PCB route nor "
-"codec/electrical HIL. The assembly and fixture supply the actual F407/package"
-" identity: shared device-group and density reads alone do not distinguish an "
-"F405 or authenticate the physical package."
-msgstr ""
-"由一个未屏蔽中断的特权任务串行执行所有方法，并串行管理外部所有者的生命周期。所有拒绝路径都必须保留调用前的中断屏蔽状态。不允许从 "
-"NMI/HardFault 调用，也不允许其他 DMA/IRQ/引脚所有者、复位或重配时钟的写入方、调试器写入方以及并发 Platform stop "
-"介入。借用期间一旦观察到复位或时钟配置历史丢失，请求就会被永久保留；将寄存器恢复成复位时的样子不能证明此前已经完成最终访问。主 SRAM 对 DMA "
-"可见；CCM 不可见。芯片引脚能力既不能证明 PCB 布线，也不代表已经完成编解码器或电气 HIL 验证。实际的 F407 "
-"及封装身份由装配配置和测试夹具确定：仅凭共用的器件组标识和容量读数，既不能区分 F405 与 F407，也不能验证物理封装。"
-
-#: docs/reference/api/extension-components.md:145
-msgid ""
-"Exact F407VE/ZG, baremetal, HSE8/PLL168 and live TIM2 only. The normal "
-"hardware role exclusively claims SPI2/I2S2, PB12 WS/PB13 CK/PB15 SD AF5, DMA1"
-" Stream4 channel0 and both vectors. No PLLI2S, continuous DBM or IRQ service "
-"is enabled. Peripheral/pad/SPI2 gate ownership lasts until stop SUCCESS, "
-"independently of each request's shorter frame loan. The selected cold-reset "
-"Platform separately holds the shared GPIOB/DMA1 gates. Initialization "
-"requires both already on; this provider never enables or withdraws them. "
-"Every shared domain user, including external HAL users, must join before "
-"Platform stop. Clock-gating is not proof of a reset engine; unknown running-"
-"state attachment is unsupported."
-msgstr ""
-"仅支持精确的 F407VE/ZG 器件、baremetal、HSE8/PLL168 以及有效运行中的 TIM2。常规硬件角色以独占方式声明 "
-"SPI2/I2S2、PB12 WS/PB13 CK/PB15 SD AF5、DMA1 Stream4 channel0 及两个向量。不启用 "
-"PLLI2S、连续 DBM 或 IRQ 服务。外设、引脚和 SPI2 时钟门控的所有权一直保留到 stop 返回 "
-"SUCCESS，独立于每个请求持续时间较短的帧借用。选定的冷复位 Platform 单独持有共享的 GPIOB/DMA1 "
-"时钟门控。初始化要求这两个门控已经开启；本提供方绝不启用或撤回它们。所有共享域使用者，包括外部 HAL 使用者，都必须在 Platform stop "
-"前完成活动并汇合退出。时钟门控状态不能证明引擎已经复位；不支持接管运行状态未知的硬件。"
-
-#: docs/reference/api/extension-components.md:145
-msgid "[inout] Fresh zero storage, disjoint from all controls."
-msgstr "[inout] 全新的零初始化存储，且与所有控制对象的存储范围互不重叠。"
-
-#: docs/reference/api/extension-components.md:145
-msgid "[in] Stable readonly {&nx_f407_i2s2_slave_tx_ops, storage}."
-msgstr "[in] 地址稳定且只读的 {&nx_f407_i2s2_slave_tx_ops, storage}。"
-
-#: docs/reference/api/extension-components.md:145
-msgid "[in] Fixed resource and observation budget."
-msgstr "[in] 固定资源及观察预算。"
-
-#: docs/reference/api/extension-components.md:145
-msgid ""
-"SUCCESS, INVALID, CONTEXT, BUSY, STATE, UNSUPPORTED or IO. Initialization IO "
-"retains cleanup responsibility; call stop before reuse."
-msgstr ""
-"SUCCESS、INVALID、CONTEXT、BUSY、STATE、UNSUPPORTED 或 IO。初始化返回 IO 时仍保留清理责任；复用前须调用 "
-"stop。"
-
-#: docs/reference/api/extension-components.md:145
-msgid "Shared immutable methods; callbacks receive the storage context."
-msgstr "共享且不可变的方法表；回调接收存储上下文。"
-
-#: docs/reference/api/extension-components.md:145
-msgid "One complete contiguous interleaved stereo16 frame block."
-msgstr "一个完整、连续且交错存储的 stereo16 帧块。"
-
-#: docs/reference/api/extension-components.md:145
-msgid ""
-"Initialize and prepare base with the ordinary helpers. The source has one "
-"plane of contiguous nonempty rows, no offset or padding, and 4..131068 bytes "
-"in a multiple of four. Each frame stores left then right 16-bit little-endian"
-" samples. The fixed Philips I2S wire emits each sample MSB first in 16-bit "
-"slots. Sample values, rate, codec and external clocks are caller policy. "
-"Acceptance transfers the exact immutable source loan and borrows this request"
-" until acquire-observed SETTLED. Never separately release, mutate or reuse "
-"accepted storage. SUCCESS reports the whole block only after memory and wire "
-"completion. Every error or cancellation reports zero; the DMA count does not "
-"establish serialized audio bytes."
-msgstr ""
-"使用常规辅助函数初始化并准备 base。源数据由一个平面内的连续非空行组成，没有偏移或填充，大小为 4..131068 "
-"字节且必须是四的倍数。每帧按先左声道、后右声道的顺序存放 16 位小端采样。固定的 Philips I2S 线上格式使用 16 位时隙，并以 MSB "
-"优先的顺序发送每个采样。采样值、速率、编解码器和外部时钟均由调用方决定。接受请求时会移交该确切且不可变的源帧借用，并借用此请求，直至以 acquire "
-"语义观察到 SETTLED。不得自行释放、修改或复用已接受的存储。只有在内存传输和线上发送均完成后，SUCCESS "
-"才报告整个块的字节数。任何错误或取消均报告零字节；DMA 计数无法证明已经串行发送的音频字节数。"
-
-#: docs/reference/api/extension-components.md:145
-msgid "One privileged serialized task executor; no ISR callback."
-msgstr "由一个特权任务串行执行所有操作；不提供 ISR 回调。"
-
-#: docs/reference/api/extension-components.md:145
-msgid ""
-"submit SUCCESS means ACCEPTED, including subsequent setup failure. QUEUED is "
-"not armed. Acquire-observed ACTIVE alone authorizes the external master to "
-"begin CK, after one DR halfword and a live TIM2 interval have been observed. "
-"Error, cancellation or timeout retains the full loan until actual engine, "
-"serializer, vector and address withdrawal. service returns SUCCESS when idle "
-"or settled, otherwise BUSY or an observed failure with the borrow retained. "
-"stop closes further admission and requests cancellation; repeat it after "
-"service proves the remaining cleanup. The first SR observation occurs only "
-"after acceptance because reading SR clears UDR/FRE. Its fault remains latched"
-" through cleanup; a later clean status read cannot erase the operation's "
-"cause. No method allocates, starts a task or replays a block. Admission "
-"checks controls against every full-capacity pool slot in O(slot count); "
-"service/cancel do not scan the pool."
-msgstr ""
-"submit 返回 SUCCESS 表示 ACCEPTED，即使后续设置失败也不改变这一含义。QUEUED 尚未完成就绪准备。只有在观察到 DR "
-"中已有一个半字且有效运行的 TIM2 已经过所需间隔后，以 acquire 语义观察到 ACTIVE，才允许外部主机开始提供 "
-"CK。发生错误、取消或超时时，仍保留完整借用，直到实际完成 DMA 引擎、串行发送器、向量和地址引用的撤回。service 在空闲或请求已终结时返回 "
-"SUCCESS；否则返回 BUSY 或观察到的失败状态，同时继续保留借用。stop 关闭后续请求接纳并请求取消；待 service "
-"证明剩余清理已经完成后，再次调用 stop。由于读取 SR 会清除 UDR/FRE，请求的首次 SR "
-"观察仅在接受后发生。观察到的故障在整个清理过程中保持锁存；后续无故障的状态读取不能抹去本次操作的失败原因。任何方法都不分配内存、不启动任务，也不重放数据块。接纳请求时，会以"
-" O(slot count) 的复杂度检查控制对象是否与池中每个槽位的完整容量范围重叠；service/cancel 不扫描该池。"
-
-#: docs/reference/api/extension-components.md:145
-msgid "Immutable caller-owned face; private state is separate."
-msgstr "由调用方持有的不可变接口对象；私有状态单独存放。"
-
-#: docs/reference/api/extension-components.md:145
-msgid "Exact resource and positive bounded observation budget."
-msgstr "精确选定的资源，以及为正数的有界观察预算。"
-
-#: docs/reference/api/extension-components.md:145
-msgid ""
-"poll_limit bounds each arm/drain observation loop, not time or external-clock"
-" progress. Arming observes at least three actual 1 MHz TIM2 ticks after I2SE "
-"readback. Deadlines are absolute in the current live Platform TIM2 epoch. The"
-" caller stops and joins this owner before Platform stop/restart; the deadline"
-" includes wire and observer withdrawal. No automatic ClockDomain enrollment "
-"is implied."
-msgstr ""
-"poll_limit 限制每次就绪准备或排空观察循环的次数，并不表示经过的时间，也不保证外部时钟推进。就绪准备必须在 I2SE 读回后观察到至少三个实际的"
-" 1 MHz TIM2 计数推进。截止时间是当前有效 Platform TIM2 "
-"时间纪元内的绝对时间。调用方必须先停止该所有者并等待其活动完全结束，再执行 Platform "
-"stop/restart；截止时间也涵盖线上发送排空和观察者撤回。这里并不意味着会自动加入 ClockDomain。"
-
-#: docs/reference/api/extension-components.md:145
-msgid "Exact storage for one owner, zeroed once before publication."
-msgstr "供一个所有者使用的精确大小存储，在发布前完成一次清零。"
-
-#: docs/reference/api/extension-components.md:145
-msgid ""
-"Do not copy or alter. Keep storage and face live through successful stop. "
-"Accepted request/source loans last until acquire-observed SETTLED; a failed "
-"stop never revokes an unfinished borrow."
-msgstr ""
-"不得复制或修改。存储和接口对象必须始终保持有效，直到 stop 成功。已接受的请求及源帧借用一直保留到以 acquire 语义观察到 "
-"SETTLED；stop 失败绝不撤销尚未结束的借用。"
-
-#: docs/reference/api/extension-components.md:151
 msgid "MCUboot control and explicit Flash composition"
 msgstr "MCUboot 控制与显式 Flash 装配"
 
-#: docs/reference/api/extension-components.md:153
-msgid ""
-"`Nexus::MCUBootControl` exposes the stateless public control API below. It "
-"uses only Nexus types. `Nexus::MCUBootPort` is the separate, concrete Flash "
-"composition boundary; `Nexus::MCUBootBootStorage` belongs to a separately "
-"linked boot image. These targets are outside the default platform assembly."
-msgstr ""
-"`Nexus::MCUBootControl` 暴露下述无状态公共控制 API，仅使用 Nexus 类型。`Nexus::MCUBootPort` "
-"是独立的具体 Flash 装配边界；`Nexus::MCUBootBootStorage` 属于独立链接的 boot 镜像。这些 target "
-"均不属于默认平台装配。"
+msgid "`Nexus::MCUBootControl` exposes the stateless public control API below. It uses only Nexus types. `Nexus::MCUBootPort` is the separate, concrete Flash composition boundary; `Nexus::MCUBootBootStorage` belongs to a separately linked boot image. These targets are outside the default platform assembly."
+msgstr "`Nexus::MCUBootControl` 暴露下述无状态公共控制 API，仅使用 Nexus 类型。`Nexus::MCUBootPort` 是独立的具体 Flash 装配边界；`Nexus::MCUBootBootStorage` 属于独立链接的 boot 镜像。这些 target 均不属于默认平台装配。"
 
-#: docs/reference/api/extension-components.md:158
-msgid ""
-"Use the [canonical MCUboot contract](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) for "
-"helper selection, the boot/application ownership diagram, finite operation "
-"and Flash-region lifetime, partial persistent writes and product recovery "
-"duties. The selected overwrite-only profile supports permanent requests; the "
-"control API does not authenticate a candidate, reset hardware or provide "
-"rollback. Software models and linked-image budgets do not establish physical "
-"Flash, power-cut or HIL qualification."
-msgstr ""
-"helper 选择、boot／应用所有权图、有限 operation 与 Flash region 生命周期、部分持久写入和产品恢复责任，以 "
-"[MCUboot 权威合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/mcuboot/README.md)为准。所选覆盖配置支持永久更新请求；控制 API "
-"不鉴别候选镜像、不复位硬件，也不提供回滚。软件模型与已链接镜像预算不建立物理 Flash、掉电或 HIL 资格。"
+msgid "Use the [canonical MCUboot contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) for helper selection, the boot/application ownership diagram, finite operation and Flash-region lifetime, partial persistent writes and product recovery duties. The selected overwrite-only profile supports permanent requests; the control API does not authenticate a candidate, reset hardware or provide rollback. Software models and linked-image budgets do not establish physical Flash, power-cut or HIL qualification."
+msgstr "helper 选择、boot／应用所有权图、有限 operation 与 Flash region 生命周期、部分持久写入和产品恢复责任，以 [MCUboot 权威合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md)为准。所选覆盖配置支持永久更新请求；控制 API 不鉴别候选镜像、不复位硬件，也不提供回滚。软件模型与已链接镜像预算不建立物理 Flash、掉电或 HIL 资格。"
 
-#: docs/reference/api/extension-components.md:168
 msgid "mcuboot_control.h"
 msgstr "mcuboot_control.h"
 
-#: docs/reference/api/extension-components.md:170
 msgid "Stateless control of a fixed MCUboot overwrite-only image."
 msgstr "固定 MCUboot 覆盖镜像的无状态控制。"
 
-#: docs/reference/api/extension-components.md:170
-msgid ""
-"The selected single-image profile supports permanent requests only. This API "
-"neither downloads nor verifies an image, resets hardware, confirms a trial "
-"image, or provides rollback. Applications own authorization, valid candidate "
-"bytes, maintenance scheduling, platform lifetime and reset policy. Author  "
-"Nexus Team"
-msgstr ""
-"所选单镜像配置仅支持永久更新请求。此 API "
-"不下载或校验镜像、不复位硬件、不确认试运行镜像，也不提供回滚。应用负责授权、有效候选字节、维护调度、平台生命周期和复位策略。作者  Nexus Team"
+msgid "The selected single-image profile supports permanent requests only. This API neither downloads nor verifies an image, resets hardware, confirms a trial image, or provides rollback. Applications own authorization, valid candidate bytes, maintenance scheduling, platform lifetime and reset policy. Author  Nexus Team"
+msgstr "所选单镜像配置仅支持永久更新请求。此 API 不下载或校验镜像、不复位硬件、不确认试运行镜像，也不提供回滚。应用负责授权、有效候选字节、维护调度、平台生命周期和复位策略。作者  Nexus Team"
 
-#: docs/reference/api/extension-components.md:170
 msgid "Requested upgrade behavior; TEST is explicitly unsupported."
 msgstr "请求的更新行为；明确不支持 TEST。"
 
-#: docs/reference/api/extension-components.md:170
 msgid "Upstream observed action, not a physical or image-health verdict."
 msgstr "上游观察到的动作，不是物理或镜像健康结论。"
 
-#: docs/reference/api/extension-components.md:170
-msgid ""
-"TEST and REVERT can be observed in foreign trailer metadata; their presence "
-"does not add support for those modes to overwrite-only firmware."
+msgid "TEST and REVERT can be observed in foreign trailer metadata; their presence does not add support for those modes to overwrite-only firmware."
 msgstr "外部 trailer 元数据中可能观察到 TEST 和 REVERT；出现这些值不会为覆盖模式固件增加相应模式支持。"
 
-#: docs/reference/api/extension-components.md:170
 msgid "Query upstream's planned action for image zero."
 msgstr "查询上游对镜像零的计划动作。"
 
-#: docs/reference/api/extension-components.md:170
-msgid ""
-"Task/boot context only. Caller serializes access and supplies the immutable "
-"Flash operation hook and its finite deadline for the whole call. All "
-"referenced areas, regions, clock and provider remain alive through return. "
-"The pinned upstream API treats an unreadable secondary trailer as empty; NONE"
-" therefore does not establish secondary availability or image validity."
-msgstr ""
-"仅限 task／boot 上下文。调用方串行化访问，为整个调用提供不可变 Flash operation hook 及其有限 "
-"deadline。所有被引用的 area、region、时钟与 provider 持续存活至返回。固定上游 API 将不可读的 secondary "
-"trailer 视为空，因此 NONE 不能证明 secondary 可用或镜像有效。"
+msgid "Task/boot context only. Caller serializes access and supplies the immutable Flash operation hook and its finite deadline for the whole call. All referenced areas, regions, clock and provider remain alive through return. The pinned upstream API treats an unreadable secondary trailer as empty; NONE therefore does not establish secondary availability or image validity."
+msgstr "仅限 task／boot 上下文。调用方串行化访问，为整个调用提供不可变 Flash operation hook 及其有限 deadline。所有被引用的 area、region、时钟与 provider 持续存活至返回。固定上游 API 将不可读的 secondary trailer 视为空，因此 NONE 不能证明 secondary 可用或镜像有效。"
 
-#: docs/reference/api/extension-components.md:170
 msgid "Receives a value on success only; never retained."
 msgstr "仅在成功时接收值；不保留该指针。"
 
-#: docs/reference/api/extension-components.md:170
-msgid ""
-"NX_SUCCESS for a known action, NX_ERROR_INVALID for NULL, or NX_ERROR_IO for "
-"upstream PANIC, an unknown value or a reported read error."
-msgstr ""
-"已知动作返回 NX_SUCCESS，NULL 返回 NX_ERROR_INVALID，上游 PANIC、未知值或报告的读取错误返回 "
-"NX_ERROR_IO。"
+msgid "NX_SUCCESS for a known action, NX_ERROR_INVALID for NULL, or NX_ERROR_IO for upstream PANIC, an unknown value or a reported read error."
+msgstr "已知动作返回 NX_SUCCESS，NULL 返回 NX_ERROR_INVALID，上游 PANIC、未知值或报告的读取错误返回 NX_ERROR_IO。"
 
-#: docs/reference/api/extension-components.md:170
 msgid "Request a permanent upgrade using the upstream public trailer API."
 msgstr "使用上游公共 trailer API 请求永久更新。"
 
-#: docs/reference/api/extension-components.md:170
-msgid ""
-"Same serialized finite operation/lifetime contract as query. Return settles "
-"current Flash access; a timeout is not a physical pulse abort. This does not "
-"prove candidate authenticity, promise old-image recovery, renew the deadline,"
-" stop infrastructure or reset the MCU."
-msgstr ""
-"沿用 query 的串行化、有限 operation 与生命周期合同。返回时当前 Flash "
-"访问已结清；超时不是中止物理脉冲。该调用不证明候选真实性、不承诺恢复旧镜像、不续期 deadline、不停止基础设施，也不复位 MCU。"
+msgid "Same serialized finite operation/lifetime contract as query. Return settles current Flash access; a timeout is not a physical pulse abort. This does not prove candidate authenticity, promise old-image recovery, renew the deadline, stop infrastructure or reset the MCU."
+msgstr "沿用 query 的串行化、有限 operation 与生命周期合同。返回时当前 Flash 访问已结清；超时不是中止物理脉冲。该调用不证明候选真实性、不承诺恢复旧镜像、不续期 deadline、不停止基础设施，也不复位 MCU。"
 
-#: docs/reference/api/extension-components.md:170
 msgid "PERMANENT requests an update; TEST rejects without access."
 msgstr "PERMANENT 请求更新；TEST 无访问即拒绝。"
 
-#: docs/reference/api/extension-components.md:170
-msgid ""
-"NX_SUCCESS after upstream completes and reports PERMANENT on readback, "
-"NX_ERROR_UNSUPPORTED for TEST, NX_ERROR_INVALID for an unknown request, "
-"NX_ERROR_STATE for another known readback action, or NX_ERROR_IO for an "
-"upstream error. An error can follow partial persistent trailer modification, "
-"including a pending TEST that cannot be silently promoted."
-msgstr ""
-"上游完成且读回报告 PERMANENT 后返回 NX_SUCCESS；TEST 返回 NX_ERROR_UNSUPPORTED，未知请求返回 "
-"NX_ERROR_INVALID，读回其他已知动作返回 NX_ERROR_STATE，上游错误返回 NX_ERROR_IO。部分持久 trailer "
-"修改后仍可能返回错误，包括不能悄悄提升为永久更新的 pending TEST。"
+msgid "NX_SUCCESS after upstream completes and reports PERMANENT on readback, NX_ERROR_UNSUPPORTED for TEST, NX_ERROR_INVALID for an unknown request, NX_ERROR_STATE for another known readback action, or NX_ERROR_IO for an upstream error. An error can follow partial persistent trailer modification, including a pending TEST that cannot be silently promoted."
+msgstr "上游完成且读回报告 PERMANENT 后返回 NX_SUCCESS；TEST 返回 NX_ERROR_UNSUPPORTED，未知请求返回 NX_ERROR_INVALID，读回其他已知动作返回 NX_ERROR_STATE，上游错误返回 NX_ERROR_IO。部分持久 trailer 修改后仍可能返回错误，包括不能悄悄提升为永久更新的 pending TEST。"

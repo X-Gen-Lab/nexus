@@ -5,6 +5,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/io/spi_transaction.h"
+#include "stm32f407_clock.h"
 #include "stm32f407_provider.h"
 #include "stm32f407_spi_cold.h"
 #include "stm32f4xx_ll_gpio.h"
@@ -95,7 +96,8 @@ bool nx_stm32_spi_config_valid(const nx_stm32_spi_config_t* config) {
         config->pin_count != 3U + config->endpoint_count ||
         (config->registers != SPI1 && config->registers != SPI2 &&
          config->registers != SPI3) ||
-        config->clock_hz != (config->registers == SPI1 ? 84000000U : 42000000U))
+        config->clock_hz !=
+            (config->registers == SPI1 ? NEXUS_APB2_HZ : NEXUS_APB1_HZ))
         return false;
     for (size_t i = 0U; i < config->pin_count; ++i) {
         const nx_stm32_spi_pin_config_t* pin = &config->pins[i];

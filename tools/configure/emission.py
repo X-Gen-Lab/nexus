@@ -9,7 +9,7 @@ def emit_bundle(result, output):
     layer alone combines the complete compiler, linker and binding projections.
     """
     from tools.configure import cpu as cpu_profiles
-    from tools.configure import kernel, memory as memory_regions, metadata, i2s2
+    from tools.configure import kernel, memory as memory_regions, metadata
     from tools.configure.ir import thaw
     from tools.configure.providers import descriptor, for_selection
     from tools.configure.ir import ConfigurationIR
@@ -31,7 +31,6 @@ def emit_bundle(result, output):
               *cpu_profiles.header_lines(profile), *kernel.header_lines(policy),
               *memory_regions.header_lines(result),
               *metadata.header_lines(thaw(result.platform_metadata))]
-    header.extend(i2s2.header_lines(result.i2s2))
     probes = any(getattr(getattr(item.options, "irq", None), "probe", False)
                  for item in result.controllers)
     if probes:
@@ -80,7 +79,6 @@ def emit_bundle(result, output):
               item.source_directory + '")' for item in sources]
     cmake += ['set(NEXUS_SOC_SOURCE_VARIABLES "' + ';'.join(
         'NEXUS_SOC_SOURCE_' + item.family for item in sources) + '")']
-    cmake.extend(i2s2.selection_lines(result.i2s2))
     cmake.append('set(NEXUS_RUNTIME_POWER "' + ("ON" if result.runtime_power is not None else "OFF") + '")')
     cmake.append("set(NEXUS_IO_CYCLE_PROBES " + ("ON" if probes else "OFF") + ")")
     for selection in result.controllers:

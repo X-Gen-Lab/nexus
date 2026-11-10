@@ -48,6 +48,89 @@ class F407FSMCConfigurationTests(unittest.TestCase):
         assembly.write_text(text + extra)
         return assembly
 
+    def reference(self, directory, kind="memory_window", part="STM32F407ZGT6",
+                  parameters=None, suffix=""):
+        board = gate.load(gate.ROOT / "boards/stm32f407zg_qiming_v41/board.json")
+        board.update(id="f407-fsmc-reference-software-fixture", soc=part,
+                     bindings=[{"id":"control", "controller":"FSMC",
+                                "route":"fsmc-reference-control"},
+                               {"id":"bank", "controller":"FSMC",
+                                "route":("fsmc-reference-nand2" if kind=="nand" else
+                                          "fsmc-reference-"+kind+"-"+
+                                          ("ve" if part=="STM32F407VET6" else "zg"))}],
+                     provenance=[], unknowns=["Software reference only; no fitted device or PCB"])
+        (directory/"board.json").write_text(json.dumps(board))
+        if parameters is None:
+            parameters = ('bank=3,width=16,address_lines=19,bytes=1048576,'
+                'multiplexed=false,extended_mode=true,burst_page_bytes=0,byte_lanes=true,burst_read=false,burst_write=false,'
+                'clock_division=3,data_latency=4,access_mode="B",wait_signal=false,'
+                'asynchronous_wait=false,wait_high=false,wait_before=false,wrap=false')
+        timing = 'address_setup=2,address_hold=1,data_setup=9,bus_turn=1'
+        text = ('schema=2\nboard_package="."\nbackend="baremetal"\n'
+                'clock="hse8-pll168"\noptimization="Os"\n'
+                '[memory]\nmain_stack_bytes=2048\nlibc_heap_bytes=0\n'
+                'flash_load_limit_bytes=65536\nstatic_ram_limit_bytes=32768\n'
+                '[external_bus.ext0]\nbinding="control"\nmode="external-memory"\n'
+                f'[{kind}.chip0]\ncontroller="ext0"\nbinding="bank"\n')
+        if kind != "nand":
+            text += f'read_timing={{{timing}}}\nwrite_timing={{{timing}}}\n'
+        if kind == "memory_window": text += 'mode="psram-window"\n'
+        if kind == "flash_async":
+            text += ('nor={command_set=2,cfi=true,unlock1=2730,unlock2=1364,'
+                     'cfi_address=170,ready_delay_us=1,requires_fresh_erase=true,sectors=[{offset=0,size=524288},{offset=524288,size=524288}]}\n')
+        if kind == "nand":
+            text += ('ready_delay_us=1\ngeometry={page_bytes=512,oob_bytes=16,pages_per_block=32,'
+                     'blocks=4,column_cycles=1,row_cycles=2}\n')
+        text += f'parameters={{{parameters}}}\n' + suffix
+        assembly=directory/"assembly.toml";assembly.write_text(text)
+        return assembly
+
+    def test_reference_psram_uses_immutable_explicit_parameters(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path=self.reference(Path(temporary))
+            result=gate.resolve_ir(path,test_support=native_fixture(path))
+            bank,=result.devices
+            self.assertEqual(bank.options.parameters.width,16)
+            self.assertEqual(bank.options.mode,"psram-window")
+            _,source=bindings.emit(result)
+            self.assertIn("NX_STM32_FSMC_PSRAM",source)
+            self.assertIn("nx_stm32_fsmc_window_ops",source)
+            self.assertIn(".package_pins = 144u",source)
+            with self.assertRaises(FrozenInstanceError): bank.options.parameters.width=8
+
+    def test_reference_nor_async_and_readonly_flash_share_endpoint_owner(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path=self.reference(Path(temporary),"flash_async")
+            result=gate.resolve_ir(path,test_support=native_fixture(path))
+            header,_=factory.emit(result);_,source=bindings.emit(result)
+            self.assertIn("nx_factory_flash_async",header)
+            self.assertIn("nx_factory_fsmc_nor_flash",header)
+            self.assertIn("nx_stm32_fsmc_nor_prepare",source)
+            self.assertIn("nx_stm32_fsmc_nor_close",source)
+            self.assertIn("nx_stm32_fsmc_nor_flash_ops",source)
+            self.assertIn("NX_STM32_FSMC_NOR",source)
+            self.assertEqual(len(result.controllers),1)
+
+    def test_reference_ve_nand2_raw_ecc_and_exact_byte_geometry(self):
+        parameters=('bank=2,width=8,tclr=2,tar=3,ecc_bytes=512,wait_signal=false,'
+                    'common={setup=1,wait=2,hold=3,hiz=4},'
+                    'attribute={setup=4,wait=3,hold=2,hiz=1}')
+        with tempfile.TemporaryDirectory() as temporary:
+            path=self.reference(Path(temporary),"nand","STM32F407VET6",parameters)
+            result=gate.resolve_ir(path,test_support=native_fixture(path))
+            self.assertTrue(all(pin["pin"][1] in "DE" for pin in result.controllers[0].pins))
+            self.assertEqual(result.devices[0].options.geometry.page_bytes,512)
+            header,_=factory.emit(result);_,source=bindings.emit(result)
+            self.assertIn("nx_factory_nand",header)
+            self.assertIn("nx_stm32_fsmc_nand_prepare",source)
+            self.assertIn(".package_pins = 100u",source)
+
+    def test_reference_does_not_guess_missing_electrical_or_geometry_fields(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path=self.reference(Path(temporary),parameters="bank=3,width=16")
+            with self.assertRaises(ValueError):
+                gate.resolve_ir(path,test_support=native_fixture(path))
+
     def test_one_bus_three_public_classes_and_one_exact_pad_union(self):
         with tempfile.TemporaryDirectory() as temporary:
             result = gate.resolve_ir(self.fixture(Path(temporary)), test_support=native_fixture(self.fixture(Path(temporary))))
@@ -208,7 +291,8 @@ class F407FSMCConfigurationTests(unittest.TestCase):
                 keys = {claim.key for claim in result.resource_plan.claims}
                 selected_pins = {claim.key for claim in result.resource_plan.claims
                                  if claim.key.startswith("pin:") and
-                                 claim.owner != "board-reserved"}
+                                 claim.owner not in {"board-reserved",
+                                                     "system-clock"}}
                 touch_pins = {"pin:PF10", "pin:PF11", "pin:PA5", "pin:PB0",
                               "pin:PB1", "pin:PB2"}
                 self.assertEqual(selected_pins,
@@ -218,7 +302,14 @@ class F407FSMCConfigurationTests(unittest.TestCase):
                                  if claim.key.startswith("pin:") and
                                  claim.owner == "board-reserved"}
                 self.assertEqual(reserved_pins, {"pin:PA13", "pin:PA14"})
-                self.assertEqual(sum(key.startswith("pin:") for key in keys), 28)
+                clock_pins = {claim.key for claim in result.resource_plan.claims
+                              if claim.key.startswith("pin:") and
+                              claim.owner == "system-clock"}
+                self.assertEqual(clock_pins, {"pin:PH0", "pin:PH1"})
+                self.assertEqual({key for key in keys
+                                  if key.startswith("pin:")},
+                                 selected_pins | reserved_pins | clock_pins)
+                self.assertEqual(sum(key.startswith("pin:") for key in keys), 30)
                 self.assertIn("ip:FSMC/bank4", keys)
                 self.assertNotIn("ip:FSMC/bank3", keys)
                 self.assertNotIn("pin:PG10", keys)

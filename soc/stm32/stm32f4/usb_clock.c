@@ -6,8 +6,8 @@
  * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_usb_clock.h"
-#include "stm32f407xx.h"
 #ifndef NX_USB_CLOCK_WRITE
 #define NX_USB_CLOCK_WRITE(reg, value) ((reg) = (uint32_t)(value))
 #endif
@@ -22,14 +22,8 @@ static bool cold_context(void) {
 /** \brief Exact established profile avoids truncation-based frequency claims.
  */
 static bool source_ready(void) {
-    const uint32_t mask = RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN |
-                          RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLSRC |
-                          RCC_PLLCFGR_PLLQ;
-    const uint32_t expected =
-        8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U);
-    const uint32_t ready =
-        RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
-    return (RCC->PLLCFGR & mask) == expected && (RCC->CR & ready) == ready;
+    return NEXUS_PLL48_HZ == 48000000U &&
+           nx_stm32_clock_profile_matches(RCC, NULL);
 }
 
 /** \brief A retained failed acquisition cannot expose USB registers as ready.

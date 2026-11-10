@@ -9,3 +9,7 @@ main_stack_bytes = 8192
 flash_load_limit_bytes = 524288
 static_ram_limit_bytes = 114688
 libc_heap_bytes = 0
+
+[entropy.random]
+binding = "rng"
+mode = "rng-words"

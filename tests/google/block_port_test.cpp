@@ -23,6 +23,7 @@ class BlockModel {
                 (uint64_t, const void*, size_t, uint32_t, nx_time_us_t));
     MOCK_METHOD(nx_result_t, Sync, (nx_time_us_t));
     MOCK_METHOD(nx_result_t, Stop, (nx_time_us_t));
+    MOCK_METHOD(nx_result_t, MediaRemoved, ());
 };
 const nx_block_ops_t ops = {
     [](const void* c) { return static_cast<const BlockModel*>(c)->Geometry(); },
@@ -43,6 +44,7 @@ const nx_block_ops_t ops = {
     [](void* c, nx_time_us_t d) {
         return static_cast<BlockModel*>(c)->Stop(d);
     },
+    [](void* c) { return static_cast<BlockModel*>(c)->MediaRemoved(); },
 };
 } /* namespace */
 
@@ -63,6 +65,7 @@ TEST(BlockPort, ExactContextAnd64BitAddressReachTheSharedMethods) {
         .WillOnce(testing::Return(nx_block_io_result_t{NX_ERROR_TIMEOUT, 1U}));
     EXPECT_CALL(first, Sync(9000U)).WillOnce(testing::Return(NX_ERROR_TIMEOUT));
     EXPECT_CALL(second, Stop(10000U)).WillOnce(testing::Return(NX_ERROR_BUSY));
+    EXPECT_CALL(first, MediaRemoved()).WillOnce(testing::Return(NX_SUCCESS));
     EXPECT_EQ(&geometry, nx_block_port_geometry(&a));
     EXPECT_EQ(NX_BLOCK_STOPPED, nx_block_port_state(&b));
     EXPECT_EQ(NX_SUCCESS, nx_block_port_activate(&b, 6000U));
@@ -76,6 +79,7 @@ TEST(BlockPort, ExactContextAnd64BitAddressReachTheSharedMethods) {
     EXPECT_EQ(1U, write.completed_blocks);
     EXPECT_EQ(NX_ERROR_TIMEOUT, nx_block_port_sync(&a, 9000U));
     EXPECT_EQ(NX_ERROR_BUSY, nx_block_port_stop(&b, 10000U));
+    EXPECT_EQ(NX_SUCCESS, nx_block_port_media_removed(&a));
 }
 
 TEST(BlockPort, MissingMethodsRemainUnsupportedWithoutInventingProgress) {
@@ -96,4 +100,5 @@ TEST(BlockPort, MissingMethodsRemainUnsupportedWithoutInventingProgress) {
     EXPECT_EQ(0U, write.completed_blocks);
     EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_block_port_sync(&port, 8000U));
     EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_block_port_stop(&port, 9000U));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_block_port_media_removed(&port));
 }

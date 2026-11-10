@@ -33,7 +33,7 @@ nexus_io_domain(uart ALIAS IOUART
         src/mechanisms/stream_profile.c
     DEPENDS nexus_io_stream_profile_storage nexus_io_gpio)
 nexus_io_domain(spi ALIAS IOSPI
-    SOURCES src/api/spi.c src/mechanisms/spi_dma_owner_binding.c
+    SOURCES src/api/spi.c src/api/spi_frames.c src/mechanisms/spi_dma_owner_binding.c
         src/mechanisms/spi_dma_sequence.c src/mechanisms/spi_dma_transaction.c
         src/mechanisms/spi_transaction.c
     DEPENDS nexus_io_stream)
@@ -41,9 +41,15 @@ nexus_io_domain(i2c ALIAS IOI2C
     SOURCES src/api/i2c.c src/mechanisms/i2c_bus_clear.c
         src/mechanisms/i2c_long.c
     DEPENDS nexus_io_dma nexus_io_wake)
+nexus_io_domain(i2c_target ALIAS IOI2CTarget SOURCES src/api/i2c_target.c)
 nexus_io_domain(flash ALIAS IOFlash
-    SOURCES src/api/flash.c src/mechanisms/flash_region.c)
-nexus_io_domain(block ALIAS IOBlock SOURCES src/api/block.c)
+    SOURCES src/api/flash.c src/api/flash_maintenance.c
+        src/mechanisms/flash_region.c)
+nexus_io_domain(flash_async ALIAS IOFlashAsync SOURCES src/api/flash_async.c
+    DEPENDS nexus_io_flash)
+nexus_io_domain(nand ALIAS IONAND SOURCES src/api/nand.c)
+nexus_io_domain(block ALIAS IOBlock SOURCES src/api/block.c src/api/block_async.c
+    src/api/sdio_io.c DEPENDS nexus_io_dma)
 nexus_io_domain(external_bus ALIAS IOExternalBus SOURCES src/api/external_bus.c)
 nexus_io_domain(parallel16 ALIAS IOParallel16 SOURCES src/api/parallel16.c)
 nexus_io_domain(memory_window ALIAS IOMemoryWindow
@@ -62,7 +68,11 @@ nexus_io_domain(adc ALIAS IOADC
 nexus_io_domain(can ALIAS IOCAN SOURCES src/api/can.c DEPENDS nexus_io_wake)
 nexus_io_domain(usb_device ALIAS IOUSBDevice
     SOURCES src/api/usb_device.c src/mechanisms/usb_profile.c
-    DEPENDS nexus_io_wake)
+    DEPENDS nexus_io_dma nexus_io_wake)
+nexus_io_domain(usb_host ALIAS IOUSBHost SOURCES src/api/usb_host.c
+    DEPENDS nexus_io_dma nexus_io_wake)
+nexus_io_domain(usb_otg ALIAS IOUSBOTG SOURCES src/api/usb_otg.c
+    DEPENDS nexus_io_usb_device nexus_io_usb_host)
 nexus_io_domain(mdio ALIAS IOMDIO SOURCES src/api/mdio.c)
 nexus_io_domain(eth ALIAS IOEthernet SOURCES src/api/ethernet.c
     DEPENDS nexus_io_mdio nexus_io_dma nexus_io_wake)
@@ -84,6 +94,15 @@ nexus_io_domain(adc_group ALIAS IOADCGroup SOURCES src/api/adc_group.c
 nexus_io_domain(rtc ALIAS IORTC SOURCES src/api/rtc.c DEPENDS nexus_io_wake)
 nexus_io_domain(lptim ALIAS IOLPTIM SOURCES src/api/lptim.c DEPENDS nexus_io_wake)
 nexus_io_domain(entropy ALIAS IOEntropy SOURCES src/api/entropy.c)
+foreach(domain capture audio timer_pulse timer_sequence)
+    add_library(nexus_io_${domain} INTERFACE)
+    target_link_libraries(nexus_io_${domain} INTERFACE
+        nexus_io_contract nexus_io_stream)
+endforeach()
+add_library(Nexus::IOCapture ALIAS nexus_io_capture)
+add_library(Nexus::IOTimerPulse ALIAS nexus_io_timer_pulse)
+add_library(Nexus::IOTimerSequence ALIAS nexus_io_timer_sequence)
+add_library(Nexus::IOAudio ALIAS nexus_io_audio)
 
 # Common observation is usable without a physical controller. Every other
 # source is compiled only through a selected domain or explicit consumer target.
@@ -102,10 +121,11 @@ endif()
 # Runtime and Native admit caller-defined providers, independently of Board facts.
 if(_nexus_runtime_scope OR NOT DEFINED NEXUS_SOC_FAMILY OR
         NEXUS_SOC_FAMILY STREQUAL "native")
-    set(_nexus_io_domains gpio uart spi i2c flash watchdog exti pwm adc dac dac_tx crc can
-        usb_device eth eth_frames timer_capture advanced_pwm pwm_group encoder
+    set(_nexus_io_domains gpio uart spi i2c i2c_target flash watchdog exti pwm adc dac dac_tx crc can
+        usb_device usb_host eth eth_frames timer_capture advanced_pwm pwm_group encoder
         pwm_adc can_fd adc_group rtc lptim entropy block external_bus
-        parallel16 memory_window)
+        parallel16 memory_window flash_async nand capture audio
+        timer_pulse timer_sequence)
 endif()
 foreach(domain IN LISTS _nexus_io_domains)
     if(NOT TARGET nexus_io_${domain})

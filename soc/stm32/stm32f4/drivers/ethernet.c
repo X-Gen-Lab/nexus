@@ -6,6 +6,7 @@
  * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_eth.h"
 #include <stddef.h>
 _Static_assert(offsetof(ETH_TypeDef, MACCR) == 0x0U, "ETH MACCR offset");
@@ -129,7 +130,7 @@ nx_result_t nx_stm32_eth_initialize(nx_eth_mac_t* mac, nx_time_us_t deadline) {
         mac->irq_policy.priority_bits != __NVIC_PRIO_BITS ||
         mac->irq_policy.external_irq_count != 82U)
         return NX_ERROR_INVALID;
-    if (mac->registers != ETH_BASE || mac->hclk_hz != 168000000U ||
+    if (mac->registers != ETH_BASE || mac->hclk_hz != NEXUS_CORE_HZ ||
         mac->source.irq_number != ETH_IRQn)
         return NX_ERROR_UNSUPPORTED;
     if (mac->regions == NULL || mac->region_count == 0U ||
@@ -145,9 +146,10 @@ nx_result_t nx_stm32_eth_initialize(nx_eth_mac_t* mac, nx_time_us_t deadline) {
             (region->permissions & ~3U) != 0U)
             return NX_ERROR_PERMISSION;
     }
-    if ((RCC->AHB1ENR & (RCC_AHB1ENR_ETHMACEN | RCC_AHB1ENR_ETHMACTXEN |
+    if (!nx_stm32_clock_profile_matches(RCC, NULL) ||
+        (RCC->AHB1ENR & (RCC_AHB1ENR_ETHMACEN | RCC_AHB1ENR_ETHMACTXEN |
                          RCC_AHB1ENR_ETHMACRXEN)) != UINT32_C(0x0E000000) ||
-        (SYSCFG->PMC & SYSCFG_PMC_MII_RMII_SEL) == 0U)
+        ((SYSCFG->PMC & SYSCFG_PMC_MII_RMII_SEL) != 0U) == mac->mii)
         return NX_ERROR_STATE;
     mac->irq_control = NX_ETH_SOC_IRQ_CONTROL;
     mac->pend_irq = NX_ETH_SOC_PEND_IRQ;

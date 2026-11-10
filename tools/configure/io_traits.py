@@ -88,8 +88,7 @@ def emit_controllers(controllers):
     source = []
     groups = {}
     for item, record in selected:
-        namespace = ("uart_word" if item.mode == "irq-words" else
-                     item.interface_kind or item.kind)
+        namespace = selected_contracts.controller_class(item)
         groups.setdefault((item.kind, namespace), []).append((item, record))
     for (kind, namespace), instances in sorted(groups.items()):
         typename = f"nx_factory_{namespace}_traits_t"

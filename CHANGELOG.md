@@ -8,7 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Future changes are tracked here.
+### Changed
+
+- Consolidate production MCU integration in the shared STM32F4 provider, with
+  exact STM32F407VE/ZG facts and static typed factories. Keep hardware behavior
+  in C11 and generate only configuration and fixed connections.
+- Extend reviewed serial, timer/ADC/DAC, storage, Ethernet, RTC and supervision
+  modes; add I2C target/SMBus, DCMI/I2S and USB Host/managed OTG. Optional ST USB
+  middleware stays behind private bridges and is compiled only when selected.
+- Integrate selected ClockPlan, suspend/resume, STOP and explicit RTC/Standby
+  handover while retaining failed-drain ownership and original request storage.
+- Replace the manual F407 I2S2 component with the static Audio factory. Describe
+  exact modes, ownership and integration limits in the bilingual design pages.
+
+Software models and selected ARM consumers establish software evidence only.
+Physical HIL, electrical behavior and measured performance remain unqualified.
 
 ## [0.2.1] - 2026-11-02 (Asia/Shanghai)
 

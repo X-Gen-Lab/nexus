@@ -55,8 +55,30 @@
 #define NX_CAPTURE_DEFAULT_CAPTURE_ACCESS_READY 1
 #define NX_CAPTURE_ACCESS_READY()               (true)
 #endif
+#ifndef NX_CAPTURE_CHANNELS
+#define NX_CAPTURE_DEFAULT_CHANNELS 1
+#define NX_CAPTURE_CHANNELS         4U
+#endif
+#ifndef NX_CAPTURE_HAS_CR2
+#define NX_CAPTURE_DEFAULT_HAS_CR2 1
+#define NX_CAPTURE_HAS_CR2         1
+#endif
+#ifndef NX_CAPTURE_HAS_SMCR
+#define NX_CAPTURE_DEFAULT_HAS_SMCR 1
+#define NX_CAPTURE_HAS_SMCR         1
+#endif
+#if NX_CAPTURE_CHANNELS != 1U && NX_CAPTURE_CHANNELS != 2U &&                  \
+    NX_CAPTURE_CHANNELS != 4U
+#error "Capture channel count must match a reviewed concrete timer"
+#endif
 /** \brief Select one scalar SDK CCR; no array arithmetic crosses registers. */
 static volatile uint32_t* capture_compare(uint8_t channel) {
+#if NX_CAPTURE_CHANNELS == 1U
+    (void)channel;
+    return &NX_CAPTURE_CCR1;
+#elif NX_CAPTURE_CHANNELS == 2U
+    return channel == 1U ? &NX_CAPTURE_CCR1 : &NX_CAPTURE_CCR2;
+#else
     switch (channel) {
         case 1U:
             return &NX_CAPTURE_CCR1;
@@ -67,6 +89,7 @@ static volatile uint32_t* capture_compare(uint8_t channel) {
         default:
             return &NX_CAPTURE_CCR4;
     }
+#endif
 }
 /** \brief Fixed channel mode byte in its exact CCMR register. */
 static uint32_t capture_mode(const nx_timer_capture_config_t* config) {
@@ -120,8 +143,8 @@ nx_result_t NX_CAPTURE_INITIALIZE(nx_timer_capture_controller_t* port,
         NX_CAPTURE_CONTROL_OVERLAP(port, sizeof(*port)) ||
         NX_CAPTURE_CONTROL_OVERLAP(config, sizeof(*config)) ||
         capture_overlap(port, sizeof(*port), config, sizeof(*config)) ||
-        config->channel < 1U || config->channel > 4U || config->tick_hz == 0U ||
-        config->timer_hz != NX_CAPTURE_HZ ||
+        config->channel < 1U || config->channel > NX_CAPTURE_CHANNELS ||
+        config->tick_hz == 0U || config->timer_hz != NX_CAPTURE_HZ ||
         config->timer_hz % config->tick_hz != 0U ||
         config->timer_hz / config->tick_hz > 65536U || config->filter > 15U ||
         config->edge > NX_TIMER_EDGE_BOTH) {
@@ -149,24 +172,38 @@ nx_result_t NX_CAPTURE_INITIALIZE(nx_timer_capture_controller_t* port,
      * keeps hot controls closed and gives assembly an exact cleanup owner. */
     port->config = config;
     NX_TIMER_WRITE(NX_CAPTURE_CR1, 0U);
+#if NX_CAPTURE_HAS_CR2
     NX_TIMER_WRITE(NX_CAPTURE_CR2, 1U << 4U);
+#endif
+#if NX_CAPTURE_HAS_SMCR
     NX_TIMER_WRITE(NX_CAPTURE_SMCR, 0U);
+#endif
     NX_TIMER_WRITE(NX_CAPTURE_PSC, config->timer_hz / config->tick_hz - 1U);
     NX_TIMER_WRITE(NX_CAPTURE_ARR, NX_CAPTURE_COUNTER_MAX);
     NX_TIMER_WRITE(NX_CAPTURE_CCMR1,
                    config->channel <= 2U ? capture_mode(config) : 0U);
+#if NX_CAPTURE_CHANNELS > 2U
     NX_TIMER_WRITE(NX_CAPTURE_CCMR2,
                    config->channel > 2U ? capture_mode(config) : 0U);
+#endif
     NX_TIMER_WRITE(NX_CAPTURE_CCER, polarity);
     nx_arch_dsb();
-    if (NX_CAPTURE_CR1 != 0U || NX_CAPTURE_CR2 != (1U << 4U) ||
+    if (NX_CAPTURE_CR1 != 0U ||
+#if NX_CAPTURE_HAS_CR2
+        NX_CAPTURE_CR2 != (1U << 4U) ||
+#endif
         NX_CAPTURE_PSC != config->timer_hz / config->tick_hz - 1U ||
         NX_CAPTURE_ARR != NX_CAPTURE_COUNTER_MAX ||
         NX_CAPTURE_CCMR1 !=
             (config->channel <= 2U ? capture_mode(config) : 0U) ||
+#if NX_CAPTURE_CHANNELS > 2U
         NX_CAPTURE_CCMR2 !=
             (config->channel > 2U ? capture_mode(config) : 0U) ||
-        NX_CAPTURE_SMCR != 0U || NX_CAPTURE_CCER != polarity) {
+#endif
+#if NX_CAPTURE_HAS_SMCR
+        NX_CAPTURE_SMCR != 0U ||
+#endif
+        NX_CAPTURE_CCER != polarity) {
         return NX_ERROR_IO;
     }
     /* MMS=enable follows disabled CEN while UG loads the prescaler. Prove a
@@ -182,9 +219,14 @@ nx_result_t NX_CAPTURE_INITIALIZE(nx_timer_capture_controller_t* port,
         return NX_ERROR_IO;
     }
     NX_TIMER_WRITE(NX_CAPTURE_SR, 0U);
+#if NX_CAPTURE_HAS_CR2
     NX_TIMER_WRITE(NX_CAPTURE_CR2, 0U);
+#endif
     nx_arch_dsb();
-    if ((NX_CAPTURE_SR & 1U) != 0U || NX_CAPTURE_CR2 != 0U ||
+    if ((NX_CAPTURE_SR & 1U) != 0U ||
+#if NX_CAPTURE_HAS_CR2
+        NX_CAPTURE_CR2 != 0U ||
+#endif
         NX_CAPTURE_CR1 != 0U) {
         return NX_ERROR_IO;
     }
@@ -216,12 +258,20 @@ static nx_result_t capture_start(void* context,
         NX_CAPTURE_DIER != 0U || NX_CAPTURE_CR1 != 0U ||
         NX_CAPTURE_PSC != port->config->timer_hz / port->config->tick_hz - 1U ||
         NX_CAPTURE_ARR != NX_CAPTURE_COUNTER_MAX ||
-        NX_CAPTURE_CCER != polarity || NX_CAPTURE_CR2 != 0U ||
+        NX_CAPTURE_CCER != polarity ||
+#if NX_CAPTURE_HAS_CR2
+        NX_CAPTURE_CR2 != 0U ||
+#endif
+#if NX_CAPTURE_HAS_SMCR
         NX_CAPTURE_SMCR != 0U ||
+#endif
         NX_CAPTURE_CCMR1 !=
-            (port->config->channel <= 2U ? capture_mode(port->config) : 0U) ||
-        NX_CAPTURE_CCMR2 !=
-            (port->config->channel > 2U ? capture_mode(port->config) : 0U)) {
+            (port->config->channel <= 2U ? capture_mode(port->config) : 0U)
+#if NX_CAPTURE_CHANNELS > 2U
+        || NX_CAPTURE_CCMR2 !=
+               (port->config->channel > 2U ? capture_mode(port->config) : 0U)
+#endif
+    ) {
         return NX_ERROR_STATE;
     }
     nx_arch_irq_state_t mask = nx_arch_irq_save();
@@ -383,7 +433,7 @@ static nx_result_t capture_state(const void* context,
 }
 /** \brief Read-clear captured data before observing and acknowledging loss. */
 void NX_CAPTURE_IRQ(nx_timer_capture_controller_t* port) {
-    if (port == NULL || !port->initialized) {
+    if (port == NULL || !port->initialized || !NX_CAPTURE_ACCESS_READY()) {
         return;
     }
     const uint32_t flag = 1U << port->config->channel;
@@ -463,4 +513,16 @@ const nx_timer_capture_ops_t NX_CAPTURE_OPS = {.start = capture_start,
 #ifdef NX_CAPTURE_DEFAULT_CAPTURE_ACCESS_READY
 #undef NX_CAPTURE_ACCESS_READY
 #undef NX_CAPTURE_DEFAULT_CAPTURE_ACCESS_READY
+#endif
+#ifdef NX_CAPTURE_DEFAULT_CHANNELS
+#undef NX_CAPTURE_CHANNELS
+#undef NX_CAPTURE_DEFAULT_CHANNELS
+#endif
+#ifdef NX_CAPTURE_DEFAULT_HAS_CR2
+#undef NX_CAPTURE_HAS_CR2
+#undef NX_CAPTURE_DEFAULT_HAS_CR2
+#endif
+#ifdef NX_CAPTURE_DEFAULT_HAS_SMCR
+#undef NX_CAPTURE_HAS_SMCR
+#undef NX_CAPTURE_DEFAULT_HAS_SMCR
 #endif

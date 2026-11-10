@@ -556,3 +556,39 @@ extern "C" void nx_stm32_pin_restore(GPIO_TypeDef* gpio, uint8_t pin,
         (gpio->ODR & ~mask) |
         ((static_cast<uint32_t>(saved) & (1U << 11U)) != 0U ? mask : 0U);
 }
+
+TEST_F(PlatformCold, ActiveOscillatorPadsRejectBeforeBankClockOrSnapshot) {
+    struct OscillatorPad {
+        GPIO_TypeDef* gpio;
+        uint8_t bank;
+        uint8_t pin;
+        bool hse;
+    };
+    const OscillatorPad pads[]{{GPIOH, 7U, 0U, true},
+                               {GPIOH, 7U, 1U, true},
+                               {GPIOC, 2U, 14U, false},
+                               {GPIOC, 2U, 15U, false}};
+    config.pin_count = 1U;
+    for (const auto& pad : pads) {
+        SCOPED_TRACE(pad.pin);
+        pins[0] = {pad.gpio, &snapshots[0], pad.bank, pad.pin};
+        for (bool ready_only : {false, true}) {
+            SCOPED_TRACE(ready_only);
+            RCC->AHB1ENR = 0U;
+            RCC->CR =
+                pad.hse ? (ready_only ? RCC_CR_HSERDY : RCC_CR_HSEON) : 0U;
+            RCC->BDCR =
+                pad.hse ? 0U : (ready_only ? RCC_BDCR_LSERDY : RCC_BDCR_LSEON);
+            EXPECT_EQ(NX_ERROR_BUSY,
+                      nx_stm32_platform_pins_admit(&config, true));
+            EXPECT_EQ(NX_ERROR_BUSY,
+                      nx_stm32_platform_pins_admit(&config, false));
+            EXPECT_EQ(0U, RCC->AHB1ENR);
+            EXPECT_EQ(0U, writes);
+            EXPECT_EQ(0U, captures);
+            EXPECT_EQ(0xFFFFU, snapshots[0]);
+            RCC->CR = RCC->BDCR = 0U;
+            EXPECT_EQ(NX_SUCCESS, nx_stm32_platform_pins_admit(&config, false));
+        }
+    }
+}

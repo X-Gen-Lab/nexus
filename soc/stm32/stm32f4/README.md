@@ -5,6 +5,10 @@
 （LQFP144、1 MiB Flash）的固定类型 C 接口。公共接口在 `io/`，厂商类型与可变状态
 留在本包私有目录；Board 只授权已审接线，产品任务、分区和恢复策略由外部工程提供。
 
+本页的 `docs/`、`tests/` 和软件参考链接以完整 checkout 为上下文。Source SDK
+只携带 manifest 声明的所选源码；使用 SDK 时，按根 `.nexus-source-sdk.json` 的
+`source_revision` 在原仓库阅读这些合同，不推定所有相对链接都包含在离线 payload 中。
+
 ## 源码与状态归属
 
 | 入口 | 责任 |
@@ -12,12 +16,12 @@
 | `soc.json`、`routes.json`、`references.json` | 已维护精确型号、路线与资料来源 |
 | `devices.json` | 官方器件宏、启动文件、IRQ 与时基存在性的编译事实 |
 | 根目录 `tools/configure/stm32f4/` | 当前集中配置适配、静态存储与固定连接 |
-| `system.c` | 启动、固定时钟、TIM2 时间域与失败退出 |
+| `system.c` | 启动、所选静态时钟、TIM2 时间域与失败退出 |
 | `private/stm32f4_platform_lifecycle_impl.h`、`drivers/platform_coordinator.c` | System 与共享资源的同源 C 协调实现及通用入口 |
 | `drivers/`、`private/` | 具体模式、实例状态、硬件生命周期与独立回读 |
 | `CMakeLists.txt` | 所选源码、官方库与私有编译依赖 |
 
-![FIG-31：共享 IP 与精确 SoC 的源码责任](../../../../docs/assets/diagrams/driver-source-ownership.svg)
+![FIG-31：共享 IP 与精确 SoC 的源码责任](../../../docs/assets/diagrams/driver-source-ownership.svg)
 
 图表示构建期源码归属，不增加运行时转发层。公共 face 共享只读方法表，各实例保有
 独立 context；factory 只返回已有身份，不初始化硬件。
@@ -39,24 +43,30 @@ linker／startup 计划，`NEXUS_MEMORY_CCM` 表达所选域。默认装配不�
 该路径仅依赖 Flash 常量和冷态本地栈，不使用 libc、global 或 heap。`.noinit` 只表示
 不复制／清零，不保证复位或断电保留。
 
-`system.c` 建立已审 8 MHz HSE／168 MHz PLL、APB1 42 MHz、APB2 84 MHz。保留 TIM2
-以 1 MHz 运行，通过 overflow IRQ 扩展 32-bit counter，IRQ 至少每 2^32 微秒服务
-一次，不占 RTOS SysTick。USB FS 另行显式取得独立 48 MHz clock owner，基本启动
-不会开启它。初始化分别记录 primary、cleanup、remaining effects；HSI 切换失败
-保留责任，不误关活动 PLL。单调时钟尚不存在的 bootstrap 阶段使用明确 poll 界限。
-不支持动态变频。
+`system.c` 按唯一静态 ClockPlan 启动；默认 profile 为 HSE8／PLL168、
+APB1 42 MHz、APB2 84 MHz，也可显式选择经校验的 HSE／HSI、直接 SYSCLK、
+PLL 和总线分频。下文未另说明的 MHz 数字均是默认 profile 示例，实际 C 与生成
+常量使用所选计划。TIM2 始终整数分频为 1 MHz，通过 overflow IRQ 扩展 32-bit
+counter，IRQ 至少每 2^32 微秒服务一次，不占 RTOS SysTick。PLL48 与 USB 功能
+owner 分开取得；没有消费者的直接输入 profile 不开启主 PLL。
+
+初始化分别记录 primary、cleanup、remaining effects；HSI 切换失败保留责任，
+不误关活动 PLL。单调时钟尚不存在的 bootstrap 阶段使用明确 poll 界限。不提供
+运行期 DVFS。静态参数、Flash latency、CSS、STOP 新 epoch 和监督详见
+[System 合同](README-system-power.md)。
 
 ## 官方 HAL／LL 复用与 FPU 约束
 
 官方 ST Device 与 Arm CMSIS 子模块提供寄存器布局、mask、完整 GCC vector／startup。
-STM32F4 HAL Driver 为私有状态机提供所选 LL 操作，并仅在 UART `dma-tx` 模式提供
-HAL 有限 TX。审核版本、精确 Git、CMSIS 配对、文件摘要和许可证由
-[stm32f4-hal.lock.json](../../../../dependencies/stm32f4-hal.lock.json)固定。
+STM32F4 HAL Driver 为私有实现提供所选 HAL／LL；完整模式由唯一硬件 owner 推进。
+审核版本、精确 Git、CMSIS 配对、文件摘要和许可证由
+[stm32f4-hal.lock.json](../../../dependencies/stm32f4-hal.lock.json)固定。
 
-厂商头只进入实现与生成 binding。只有 `dma-tx` 选入私有 UART/DMA Handle 与官方
-UART／DMA／RCC C 单元；其他 UART 保留各自 provider。不调用全局 HAL 初始化，不启动
-HAL SysTick，不宣称全 HAL 支持。[官方驱动合同](../../../../docs/design/official-stm32-provider.md)
-定义完整模式的所有权、时间、取消、成本比较和交付要求。
+厂商头和 Handle 留在私有闭包；CMake 按模式选择实际 C 单元。UART DMA 和 DCMI
+复用经审阅的官方路径，其他模式根据其取消、排空和 erratum 合同选用 LL 或局部 C。
+不调用全局 HAL 初始化，不启动 HAL SysTick，也不由官方函数存在推导 Nexus 支持。
+[官方驱动合同](../../../docs/design/official-stm32-provider.md)规定完整模式的
+所有权、时间、成本和交付边界。
 
 `SystemInit` 开启 CP10/CP11，此 hard-float 平台不关闭 lazy FP context。FreeRTOS
 CM4F port 显式开启 ASPEN/LSPEN。因此 ES0182 Rev19 §2.1.2（Arm776924）对所列全部
@@ -64,31 +74,28 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 返回之外必须执行超过两条指令。须沿生成尾分支进入真实 callee，不能计算不可达填充
 或 literal。外部 handler 同样遵守，修改编译器／优化／handler 后重新检查实际 image。
 平台不会绕过内核 ABI 修改 FPCCR，详见
-[短 ISR 合同](../../../../docs/design/official-stm32-provider.md#cortex-m4f-short-isr-constraint)。
+[短 ISR 合同](../../../docs/design/official-stm32-provider.md#cortex-m4f-short-isr-constraint)。
 
-## 已维护模式
+## 模式和维护入口
 
-| 接口 | 执行与限制 |
+唯一当前模式矩阵见[精确支持](../../../docs/delivery/support.md)，机器生成的
+路线／装配／生产源码关联见[能力矩阵](../../../docs/delivery/capabilities.md)。
+本页保留原有基础驱动的硬件顺序；扩展模式的权威合同就近维护，不复制第二份列表。
+
+| 模块 | 具体合同 |
 | --- | --- |
-| GPIO | 单 port 的 16-bit 授权 mask；原子 BSRR set/reset；串行 toggle；先初值后 mode |
-| UART | 六个实例共用 IRQ bytes/events、独立 9N1 words、IRQ blocks、HAL 有限 TX DMA、有限／连续 RX DMA 和 DMA duplex；真实 TC、显式 loss、drain、quarantine |
-| SPI | SPI1／2／3 共用短 polling／有限全双工 DMA；每端点 MSB／LSB-first master、mode0–3；普通 byte face 为 8 位，增强 polling 事务支持 8／16 位 word，三个控制器均可选择增强 DMA 事务；polling 最多 256 words，DMA 每段最多 65535 words |
-| I2C | I2C1／2／3 polling/IRQ/DMA；42 MHz PCLK、名义 5129 Hz–400 kHz；显式 7／10-bit endpoint、最多 8 条 read/write message，各 1–256 bytes；repeated START、末字节 ACK、NACK／仲裁／STOP 错误；10-bit 受下述勘误时序准入约束 |
-| Flash | VE 8-sector／ZG 12-sector 精确几何；声明 2.7–3.6 V 的 x32 program；范围／对齐、完整 pulse 和 cache invalidation；C deadline 不能抢占 erase |
-| IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
-| WWDG | 固定 42 MHz PCLK1，1／2／4／8 分频，显式 window_ticks；prepare 不启狗，单次 CR 激活、早／迟喂狗拒绝、失败关闭留责；无 EWI／STOP／Standby 覆盖 |
-| EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
-| PVD | 内部 EXTI16，显式 PLS 0–7；原始 PVDO 轮询或有界边沿事件；不选择电压策略，不替代 BOR |
-| PWM | TIM3／4／5／9／10／11／12／13／14 按各自通道数显式选择一路；固定 PSC/ARR；TIM5 为 32-bit counts，其他为 16-bit；duty0–period、shadow update；stop 建立 GPIO inactive |
-| ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；6／8／10／12-bit 普通软件 shot/scan 最多 16 ranks、软件注入组最多 4 ranks；各转换器均可选择独占内部 timer 触发有限／连续 DMA block |
-| DAC | PA4／PA5 单／双通道，CPU direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA；u8／u12-right／u12-left |
-| CRC | 多项式 0x04C11DB7、初值 0xffffffff、32 位字输入；同步计算、独占 controller、失败输出保持 |
-| CAN | CAN1/CAN2 Classic CAN IRQ、三邮箱、共享 filter domain；无 CAN FD |
-| USB | OTG FS device PIO endpoint，独立 USB48 owner；无 Host/HS/DMA/class stack |
-| Ethernet | Raw RMII frame/MDIO、调用者 descriptor／RX loan；IP／协议策略外置 |
-| Timer capture | TIM3／4／5 的 CH1–4 共 12 条路线；TIM3／4 为 16-bit，TIM5 为 32-bit；独占所选 controller，调用方提供 ring |
-| Encoder | TIM3／4／5 的独占 TI1／TI2 原始 modulo position，x2／x4、两路 filter 与反相；停止保留位置，不建立累计计数或 IRQ |
-| Advanced PWM | TIM1／TIM8 的 CH1–3／CH1N–3N，共六组互补输出、deadtime／break；每 controller 选择一组，功率级电气安全外部验收 |
+| System／内存／监督／低功耗 | [System](README-system-power.md) |
+| UART 协议与收发 | [USART 线模式](../../../docs/design/uart-wire-modes.md)、[UART DMA](../../../docs/design/uart-dma-rs485.md) |
+| SPI master／slave、TI、CRC | [帧事务](../../../docs/design/spi-frame-modes.md) |
+| I2C target／SMBus device | [有限 target 交换](README-i2c-target.md) |
+| 多通道 PWM／单脉冲／DMA 序列 | [定时器波形](timer_waveform.md) |
+| USB Device／Host／显式 OTG | [USB](../../../docs/design/usb-device.md) |
+| 同步／交错／注入多 ADC | [ADC group](../../../docs/design/f407-adc-groups.md) |
+| DCMI 与 I2S2／3 | [capture／audio](capture_audio.md) |
+| RTC／备份／自主唤醒 | [RTC](../../../docs/design/f407-rtc.md) |
+| Flash／OTP／Options、SD／MMC／SDIO | [物理存储](../../../docs/design/f407-storage.md) |
+| SRAM／PSRAM／NOR／NAND／8080 | [FSMC](../../../docs/design/f407-fsmc.md) |
+| Ethernet 帧与时间戳 | [原始帧](../../../docs/design/ethernet.md)、[增强帧](../../../docs/design/ethernet-frames.md) |
 
 IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征；当前没有
 声明满足条件的 operating profile，不能直接据此保证时限。名义配置可成功，但启用后
@@ -101,13 +108,13 @@ IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征�
 
 已选 erase-aligned offset image 有明确 startup／vector／linker／ELF/BIN 检查，
 不包含 boot 认证、激活或运行镜像 handoff 资格。精确 mode／Board／生产源码见
-[派生矩阵](../../../../docs/delivery/capabilities.md)。
+[派生矩阵](../../../docs/delivery/capabilities.md)。
 
 ## 窗口看门狗与复位来源
 
 `watchdog` 的 `window` 模式通过同一公共接口与 typed factory 提供 WWDG。
 无写 admit 位于 System 启动前；prepare 在 System 建立真实 ON／RDY／SW／SWS 时钟
-profile 后取得 gate 与 Sleep clock。它拒绝外来 gate、reset、vector、WDGA 或 EWI，
+profile 后取得 gate 与 Sleep clock。它拒绝未取得的 gate、reset、vector、WDGA 或外来 EWI，
 不会在 startup 启狗。复位原因从 IWDG 拆入 SoC `reset.c`，只选择 WWDG 也能调用
 `nx_reset_cause()`，不需要链接 IWDG transport。
 
@@ -127,11 +134,38 @@ enable 先写并核对 CFR 与 CPU debug freeze，最后一次 CR 写同时提�
 未激活的 close 依次恢复 CFR、debug、Sleep clock、运行 gate；回读失败保留对应收条，
 并立即撤销再次激活的准入。已激活或未证实激活的 stop 返回 UNSUPPORTED，真实 Core
 生命周期因此保留 System。只有产品显式选择喂狗／复位策略；没有默认任务、自动喂狗、
-EWI 或 STOP／Standby 保证。软件参考为 `*wwdg*.toml` 与 `*watchdogs*.toml`，不建立
+自动 EWI 恢复或 STOP／Standby 保证。可选 EWI 的独占与不可逆责任见
+[监督合同](README-system-power.md)。软件参考为 `*wwdg*.toml` 与 `*watchdogs*.toml`，不建立
 物理复位、窗口时限或安全认证。
 
 外来 EWI enable 为 sticky 位，只能由硬件 reset 清除；该模式不会把普通写入伪装成
 可撤回 EWI 的恢复。遇到未取得的 EWI／vector 时保持 BUSY 与现有责任。
+
+## GPIO 电气与外部 EXTI
+
+普通 GPIO input／output 和 EXTI0–15 分别复用既有 GPIO／EXTI C 驱动，共用静态
+factory 与唯一 Platform 冷态引脚 owner／快照。路线覆盖所维护封装实际引出的 pad；
+接线和负载仍须由 Board 授权。两个不同 port 的同号 EXTI 线不能同时取得，因为它们
+共享同一 EXTICR 选择。
+EXTI5–9 和 EXTI10–15 分别使用共享 IRQ；只有最后一个 owner 退出才撤回该向量。
+
+普通 `mode="output"` 的 `speed` 可选 `low`、`medium`、`high` 或 `very-high`。
+省略该字段表示保持已有 OSPEEDR，不接受用户填写 `preserve`。`input` 和 EXTI
+不接纳这个字段。PC13／14／15 的普通输出只接纳 `low`，省略也采用该档位。
+速度是硬件驱动档位，不是实际输出频率、上升沿或负载能力的测量保证。
+
+所选 HSE、RTC 的 LSE 与 Board 声明的 SWD 通过同一资源计划保留对应 pad。
+C 无写准入还拒绝实际外来 HSEON／HSERDY 或 LSEON／LSERDY 尚未退出的占用，
+不关闭另一 owner 的振荡器。显式速度由官方 LL 写入，执行屏障并确认回读后才写
+对应 pin 的输出模式。部分失败可能已改变前面的 pin，仍由 Platform 保留 bound
+owner／clock 并负责清理。普通 stop 维持声明的 inactive 电平并撤销 face；所有
+publisher 退出后，最终 OSPEEDR、AF、pull 和 latch 恢复仍由唯一冷态快照完成，
+不增加另一套恢复存储。
+
+软件参考见 `tests/contracts/gpio_exti_assembly/`，分别选择 VE 裸机与 ZG FreeRTOS
+装配。它们验证静态实例、实际 ARM 链接、资源预算与方法保留，不证明调度器已经
+运行、真实边沿已经采集或 PCB 电气已经验收。事件仍按既有合同保留 COALESCED／LOSS，
+不提供自动消抖或精确物理边沿时间。
 
 ## PVD 电压检测与内部 EXTI
 
@@ -166,7 +200,7 @@ pad、TX／RX stream、IRQ 和 selector，HAL admission、接收引擎与资源�
 六个实例没有新增可变字段，不使用 TX-only 模式中未选择的 RX DMA／continuous
 配置。GPIO 快照只属于冷态 lease；已经取得资源的直接 HAL 初始化无需重复持有快照。
 
-| 实例 | TX／RX DMA stream | selector | APB 时钟 |
+| 实例 | TX／RX DMA stream | selector | 默认 profile 的 APB 时钟 |
 | --- | --- | --- | --- |
 | USART1 | DMA2 stream7／2 | 4 | 84 MHz |
 | USART2 | DMA1 stream6／5 | 4 | 42 MHz |
@@ -232,7 +266,8 @@ ADC3 的通道 0--3 使用 PA0--3，10--13 使用 PC0--3；ZG 另有 PF6--10 的
 shot/scan C、只读 ops 和类型化 factory，实例 context 保持独立。
 
 RM0090 §13.3.2／§13.13.16 区分每个转换器的数字接口 gate 和共享模拟 ADCCLK。
-本实现固定 PCLK2／4，即 21 MHz，拒绝继承 MULTI、公共 DMA 或 DDS。匹配的配置不再
+公共分频来自唯一静态 ClockPlan，默认 PCLK2／4，即 21 MHz。普通独立 ADC
+拒绝继承 MULTI、公共 DMA 或 DDS；多 ADC 使用独占公共域的 `adc_group`。匹配的配置不再
 写 CCR；调整前临时打开尚未可读的数字接口，逐项记录责任，确认三个 ADON 都为零后
 才设置分频，再撤回本次临时 gate。启钟或撤回回读失败保留 receipt，由 close 重试。
 整个冷态准备与其他 ADC 启动必须串行；不提供动态调频、并发热接入或共享 ADCRST。
@@ -256,7 +291,9 @@ gate、临时观察 gate、TIM3 和 DMA IRQ 分开记录责任，复用现有状
 
 `tests/contracts/adc_external_assembly/` 提供两种密度的软件参考装配，使用三个
 GPIO bank 的 16-rank 反向序列，以及 VE／ZG 的三转换器独立实例装配；不代表实际
-板卡接线。同步多 ADC 模式继续未实现。ADC1／2／3 分别使用
+板卡接线。本节为独立转换器模式；同步／交错／注入组使用
+[ADC group](../../../docs/design/f407-adc-groups.md) 的唯一组 owner，不能和
+独立 ADC 实例同时取得同一个转换器。ADC1／2／3 分别使用
 DMA2 stream4 channel0／stream2 channel1／stream1 channel2，复用有限和连续 C
 实现与只读 ops。静态 `trigger` 可选择 TIM1 CH1–3、TIM3 CH1／TRGO、TIM4 CH4、
 TIM5 CH1–3、TIM8 CH1／TRGO，默认 TIM3 TRGO。只读 C 事实表同时提供精确 timer、
@@ -299,16 +336,17 @@ service rearm，块间可有间隙。消费者借用不能被覆盖，未释放�
 进度不足时停止而非覆盖消费者。
 
 普通 PWM 共用 TIM3／4／5 的四通道、TIM9／12 的双通道，以及 TIM10／11／13／14
-的单通道实现。精确 pad 与 AF2／3／9 路线见[支持表](../../../../docs/delivery/support.md)。
-TIM9／10／11 使用 APB2 的固定 168 MHz timer clock，其他所列 timer 使用 APB1 的
-84 MHz。C 从 controller 身份派生 APB、AF 与 gate，不新增实例字段；配置生成只连接
-精确静态事实。所选 ADC trigger 与同一 timer 的 PWM 互斥；TIM3／4／5 各自的 capture／encoder／PWM
-互斥。TIM1／TIM8 advanced PWM
+的单通道实现。精确 pad 与 AF2／3／9 路线以 `routes.json` 和所选 Board 绑定为准。
+TIM9／10／11 使用 APB2 timer，其他所列 timer 使用 APB1 timer，
+默认分别为 168／84 MHz。C 从 controller 身份派生 APB、AF 与 gate，不新增实例字段；配置生成只连接
+精确静态事实。所选 ADC trigger、PWM、capture 与 encoder 按同一 timer personality
+独占。TIM1／TIM8 advanced PWM
 分别保留 TIM9／TIM12 共享 vector。TIM2 保留给单调时钟，TIM6／7 为 DAC trigger。
 
 互补输出共用一套 C 算法，以两个编译期 wrapper 直接操作 TIM1／TIM8；CMake 只选中
 所需 controller 实现，不增加运行时设备派发。TIM1／TIM8 均可选择 CH1–3 的一组
-互补输出，使用 168 MHz timer clock；通道路线见[定时器合同](../../../../docs/design/timer-advanced.md)。
+互补输出，使用所选 APB2 timer clock，默认为 168 MHz；通道路线见
+[定时器合同](../../../docs/design/timer-advanced.md)。
 break IRQ 分别为 TIM1_BRK_TIM9／TIM8_BRK_TIM12，后者的 TIM12 peer gate 属于
 APB1，TIM8 gate 属于 APB2。资源冲突在配置期拒绝，冷态也检查实际 peer gate。
 
@@ -319,11 +357,17 @@ APB1，TIM8 gate 属于 APB2。资源冲突在配置期拒绝，冷态也检查�
 启停、set、break 故障锁存和显式 rearm 使用原公共接口，不增加 heap、worker 或自动重启。
 `*advanced-pair*.toml` 是两路并存的软件参考，不授权 PCB 接线或功率级安全。
 
-输入捕获以同一 C 引擎接入 TIM3／4／5 的四个通道，TIM5 不截断为 16 位。
+输入捕获以同一 C 引擎接入 TIM1／3／4／5／8 的四个通道、TIM9／12 的两个通道和
+TIM10／11／13／14 的单通道。只有 TIM5 使用完整 32-bit，其余为 16-bit modulo count。
+小 timer 的 wrapper 在编译期剪除未实现的 CR2／SMCR／CCMR2／CCR 寄存器访问。
 通道来自 Board route：controller 事实维护时钟、IRQ 和共享资源，channel 事实维护
 pad；生成器只写静态配置和连接。`stm32f407_timer_pins.h` 在 C 中统一冷态 pin 设置
 与热态准入，IRQ 不扫描其他通道，只处理所选 CCR、CCIF 和 CCxOF。
 冷配置记录精确 timer 身份，阻止另一 controller 的 wrapper 清理原会话。
+TIM1／8 capture 使用独立 CC IRQ27／46；small timer 的共享 vector 仅按真实 peer
+BIE／UIE／TIE／COMIE 源判别，不因 peer clock 开启就拒绝合法并存。失去 RCC gate 时，
+stop／release／迟到 IRQ 不访问 gated MMIO，也不解除原借用；恢复 gate 后允许继续
+清理，不因 PPRE 或 pin 字段变化挡住撤回。精确规则见上述定时器合同。
 `*timer-channels*.toml` 同时选择三路独立 capture 和两路 advanced PWM；ring 在
 capture start 时由调用方提供，不在 startup 分配。原公共接口与可变实例布局保持不变。
 
@@ -379,15 +423,19 @@ I2C recover 同时检查 BUSY 与已保留 SCL/SDA GPIO 实时输入；即使 BU
 
 ## 原始 Encoder 与资源归属
 
-`drivers/encoder.c` 复用官方 LL，提供 TIM3／4／5 的硬件 x2 TI1／x2 TI2／x4 TI12
-原始计数。引脚固定为 PA6／PA7、PB6／PB7、PA0／PA1，均为 AF2；filter code 为
-0–15，kernel clock 为固定 84 MHz。counter 在 prepare 后保持停止，stop 不清零 CNT；
-read 仅返回 16／16／32-bit modulo count 和软件观察时间，不维护累计位置或速度。
+`drivers/encoder.c` 复用官方 LL，提供 TIM1／3／4／5／8 的硬件 x2 TI1／x2 TI2／x4 TI12
+原始计数。TIM1 使用 PA8／PA9 AF1，TIM8 使用 PC6／PC7 AF3；TIM3／4／5 分别使用
+PA6／PA7、PB6／PB7、PA0／PA1 AF2。filter code 为 0–15，filter clock 来自所选
+APB timer，默认 APB2／APB1 分别为 168／84 MHz。counter 在 prepare 后保持停止，
+stop 不清零 CNT；只有 TIM5 返回 32-bit，其余为 16-bit modulo count，另带软件观察
+时间，不维护累计位置或速度。
 
 每个实例只保留只读 descriptor 指针、cold receipt 和 initialized。当前 ARM ABI 下
 可变 state 为 8 字节，只读 config 为 12 字节；face／共享 ops 与公共 pin lease 另计。
 编码器不创建 IRQ、DMA、ring 或 worker，与相同 timer 的 PWM／capture 互斥。
-取得前拒绝外来 clock／vector／活动 controller；部分失败和关闭失败保留精确责任。
+取得前拒绝外来 clock／对应 vector／活动 controller；TIM1／8 还拒绝任何外来 E／NE
+channel enable、DIER 与非零 BDTR，不接管 MOE／LOCK，也不使用或修改 RCR。
+部分失败和关闭失败保留精确责任。
 完整 close 证明 counter／inputs／DIER 已退出后再撤 clock，最终 GPIO 恢复仍由
 Platform 的两份 pin lease 负责。APB／AF／gate 事实与 PWM 共用同一私有 C 头，
 不增加运行时表、查找层或实例字段。
@@ -405,7 +453,7 @@ DHR 写入暂存两个值。公共 CPU 输入始终是未移位原始码；`u12-
 不测量电压。noise／triangle 的偏移加幅度不得超过 4095，noise 不提供随机熵。
 
 软件触发不产生 DMA 请求。当前 CPU／wave 实现没有 DAC IRQ；TIM6／7 为独占
-trigger owner，从固定 84 MHz timer clock 取得向下限速的整数分频。API 只准入
+trigger owner，从所选 APB1 timer clock（默认 84 MHz）取得向下限速的整数分频。API 只准入
 1 Hz--1 MHz 数字请求，状态返回实际分频；此政策不是实测模拟更新率或负载保证。
 修改 PSC／ARR 时先禁用并观察 DAC TEN，再生成 UG，避免配置过程输出额外样本；
 明确清除继承的 OPM／UDIS／URS／ARPE，并回读 divider／MMS。startup 延时从最后一个

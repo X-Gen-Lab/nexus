@@ -5,6 +5,7 @@
  */
 #ifndef NX_STM32F407_TIMER_PINS_H
 #define NX_STM32F407_TIMER_PINS_H
+#include "stm32f407_timer_hardware.h"
 #include "stm32f407xx.h"
 #include <stdbool.h>
 
@@ -15,13 +16,17 @@ typedef struct {
     uint8_t pin;
 } nx_stm32_timer_pin_t;
 
-/** \brief One TI1--TI4 pad on each maintained full general-purpose timer. */
+/** \brief One TI1--TI4 pad on each maintained four-channel input timer. */
 static inline bool nx_stm32_capture_pin(const TIM_TypeDef* timer,
                                         uint8_t channel,
                                         nx_stm32_timer_pin_t* pad) {
-    if (channel < 1U || channel > 4U)
+    if (channel < 1U || channel > nx_stm32_capture_channels(timer))
         return false;
-    if (timer == TIM3) {
+    if (timer == TIM1) {
+        *pad = (nx_stm32_timer_pin_t){GPIOA, 0U, (uint8_t)(channel + 7U)};
+    } else if (timer == TIM8) {
+        *pad = (nx_stm32_timer_pin_t){GPIOC, 2U, (uint8_t)(channel + 5U)};
+    } else if (timer == TIM3) {
         *pad = channel <= 2U
                    ? (nx_stm32_timer_pin_t){GPIOA, 0U, (uint8_t)(channel + 5U)}
                    : (nx_stm32_timer_pin_t){GPIOB, 1U, (uint8_t)(channel - 3U)};
@@ -29,6 +34,16 @@ static inline bool nx_stm32_capture_pin(const TIM_TypeDef* timer,
         *pad = (nx_stm32_timer_pin_t){GPIOB, 1U, (uint8_t)(channel + 5U)};
     } else if (timer == TIM5) {
         *pad = (nx_stm32_timer_pin_t){GPIOA, 0U, (uint8_t)(channel - 1U)};
+    } else if (timer == TIM9) {
+        *pad = (nx_stm32_timer_pin_t){GPIOA, 0U, (uint8_t)(channel + 1U)};
+    } else if (timer == TIM10 || timer == TIM11) {
+        *pad = (nx_stm32_timer_pin_t){GPIOB, 1U,
+                                      (uint8_t)(timer == TIM10 ? 8U : 9U)};
+    } else if (timer == TIM12) {
+        *pad = (nx_stm32_timer_pin_t){GPIOB, 1U, (uint8_t)(channel + 13U)};
+    } else if (timer == TIM13 || timer == TIM14) {
+        *pad = (nx_stm32_timer_pin_t){GPIOA, 0U,
+                                      (uint8_t)(timer == TIM13 ? 6U : 7U)};
     } else {
         return false;
     }
@@ -75,7 +90,7 @@ static inline bool nx_stm32_capture_pins_ready(const TIM_TypeDef* timer,
                                                uint8_t channel) {
     nx_stm32_timer_pin_t pad;
     return nx_stm32_capture_pin(timer, channel, &pad) &&
-           nx_stm32_timer_pin_ready(&pad, 2U);
+           nx_stm32_timer_pin_ready(&pad, nx_stm32_timer_af(timer));
 }
 
 /** \brief Bounded task-only proof of both outputs and the hardware break pad.

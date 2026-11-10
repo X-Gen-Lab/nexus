@@ -12,7 +12,16 @@
  */
 #include "nexus/arch/arch.h"
 #include "nexus/core/platform_lifecycle.h"
+#include "nexus/soc/stm32f407_wwdg_ewi.h"
 #include "stm32f407_window_watchdog.h"
+extern "C" nx_result_t nx_stm32f407_wwdg_ewi_arm(nx_stm32f407_wwdg_ewi_t*,
+                                                 const nx_watchdog_port_t*,
+                                                 uint8_t) __attribute__((weak));
+extern "C" nx_result_t nx_stm32f407_wwdg_ewi_irq(nx_stm32f407_wwdg_ewi_t*)
+    __attribute__((weak));
+extern "C" nx_result_t
+nx_stm32f407_wwdg_ewi_read(const nx_stm32f407_wwdg_ewi_t*, uint32_t*, bool*)
+    __attribute__((weak));
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -81,6 +90,71 @@ class WindowWatchdog : public testing::Test {
     }
 };
 } /* namespace */
+
+TEST_F(WindowWatchdog, EarlyWarningRetainsSourceAndNeverReloadsWatchdog) {
+    ASSERT_NE(nullptr, &nx_stm32f407_wwdg_ewi_arm);
+    ASSERT_NE(nullptr, &nx_stm32f407_wwdg_ewi_irq);
+    ASSERT_NE(nullptr, &nx_stm32f407_wwdg_ewi_read);
+    nx_stm32f407_wwdg_ewi_t warning{};
+    Prepare();
+    ASSERT_EQ(NX_SUCCESS,
+              face.ops->enable(face.context, 2000U, false, &observed));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f407_wwdg_ewi_arm(&warning, &face, 4U));
+    EXPECT_TRUE(warning.retained);
+    EXPECT_NE(0U, WWDG->CFR & WWDG_CFR_EWI);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_window_watchdog_stop(&owner));
+    WWDG->CR = WWDG_CR_WDGA | 0x40U;
+    WWDG->SR = WWDG_SR_EWIF;
+    writes.clear();
+    isr = true;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f407_wwdg_ewi_irq(&warning));
+    EXPECT_EQ(0U, WWDG->SR & WWDG_SR_EWIF);
+    EXPECT_EQ(WWDG_CR_WDGA | 0x40U, WWDG->CR);
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32f407_wwdg_ewi_irq(&warning));
+    isr = false;
+    uint32_t count = 0U;
+    bool overflow = true;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32f407_wwdg_ewi_read(&warning, &count, &overflow));
+    EXPECT_EQ(1U, count);
+    EXPECT_FALSE(overflow);
+    EXPECT_EQ(1U, writes.size());
+}
+
+TEST_F(WindowWatchdog, RefusedWarningAcknowledgeRetainsBorrowAndCount) {
+    ASSERT_NE(nullptr, &nx_stm32f407_wwdg_ewi_arm);
+    nx_stm32f407_wwdg_ewi_t warning{};
+    Prepare();
+    ASSERT_EQ(NX_SUCCESS,
+              face.ops->enable(face.context, 2000U, false, &observed));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f407_wwdg_ewi_arm(&warning, &face, 4U));
+    WWDG->SR = WWDG_SR_EWIF;
+    refused_write = &WWDG->SR;
+    isr = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32f407_wwdg_ewi_irq(&warning));
+    EXPECT_EQ(0U, warning.occurrences);
+    EXPECT_TRUE(warning.retained);
+    isr = false;
+    refused_write = nullptr;
+    WWDG->CR = WWDG_CR_WDGA | (owner.reload - owner.window_ticks);
+    EXPECT_EQ(NX_SUCCESS, face.ops->feed(face.context));
+    EXPECT_NE(0U, WWDG->CFR & WWDG_CFR_EWI);
+}
+
+TEST_F(WindowWatchdog, WarningSnapshotCannotOverwriteRetainedWatchdogOwner) {
+    nx_stm32f407_wwdg_ewi_t warning{};
+    Prepare();
+    ASSERT_EQ(NX_SUCCESS,
+              face.ops->enable(face.context, 2000U, false, &observed));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f407_wwdg_ewi_arm(&warning, &face, 4U));
+    auto saved = owner;
+    bool overflow = false;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32f407_wwdg_ewi_read(
+                  &warning, reinterpret_cast<uint32_t*>(&owner), &overflow));
+    EXPECT_EQ(saved.effects, owner.effects);
+    owner = saved;
+}
 
 /** \brief Observe actual writes, with a selectable refused register. */
 extern "C" void nx_stm32_window_watchdog_model_write(volatile uint32_t* address,
@@ -190,7 +264,10 @@ TEST_F(WindowWatchdog, RealPlatformStopsBeforeSystemWithdrawalAfterActivation) {
                 nx_stm32_window_watchdog_prepare(platform_owner, 8U), true};
         },
         [](size_t) { return nx_stm32_window_watchdog_stop(platform_owner); },
-        false};
+        false,
+        nullptr,
+        nullptr,
+        nullptr};
     nx_platform_lifecycle_state_t lifecycle = {};
     ASSERT_EQ(NX_SUCCESS,
               nx_platform_lifecycle_start(&plan, &lifecycle, nullptr).primary);

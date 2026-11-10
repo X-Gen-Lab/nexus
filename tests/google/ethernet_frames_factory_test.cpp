@@ -14,6 +14,10 @@ extern "C" {
 #include "stm32f407_system.h"
 nx_stm32_system_t g_nx_stm32_system;
 NVIC_Type g_nx_eth_frames_factory_nvic;
+uint32_t nx_boot_cpacr;
+uint32_t nx_boot_mpu;
+uint32_t nx_boot_vtor;
+uint32_t nx_system_rng_control;
 }
 #include <cstdlib>
 #include <cstring>
@@ -105,6 +109,10 @@ class EthernetFramesFactory : public testing::Test {
                  MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(reinterpret_cast<void*>(packet_base), packets);
         std::memset(NVIC, 0, sizeof(*NVIC));
+        nx_boot_cpacr = 0x00f00000U;
+        nx_boot_mpu = 0U;
+        nx_boot_vtor = 0x08000000U;
+        nx_system_rng_control = 0U;
         Reg(UINT32_C(0x40023800)) = 3U;
         Reg(UINT32_C(0x40023804)) = UINT32_C(0x24003010);
         RCC->CR |= 16U << RCC_CR_HSITRIM_Pos;

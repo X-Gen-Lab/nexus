@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "stm32-zg-ulpi-dma-software-contract",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "DS8626-Rev12-RM0090-Rev22-software-pad-reference",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "host",
+      "controller": "OTG_HS",
+      "route": "usbhs-host-ulpi"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only reference: physical connector, PHY supply/reset, VBUS source switch and fault sensing are external and not qualified.",
+    "No electrical wiring or USB physical station execution. Application owns VBUS/PHY handover before start and after successful stop."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "SoC internal FS PHY only; PA11/PA12 AF10 pad route. GPIO and physical connector are distinct contracts."
+    }
+  ]
+}

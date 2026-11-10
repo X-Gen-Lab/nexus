@@ -59,11 +59,11 @@ ALL_DEPENDENCIES = (
     SourceDependency("stm32_usb_device", "vendors/st/usb_device",
         "https://github.com/STMicroelectronics/stm32-mw-usb-device.git",
         "https://github.com/X-Gen-Lab/stm32-mw-usb-device.git",
-        "inventory", "LICENSE.md", "dependencies/stm32-usb-device.lock.json"),
+        "runtime", "LICENSE.md", "dependencies/stm32-usb-device.lock.json"),
     SourceDependency("stm32_usb_host", "vendors/st/usb_host",
         "https://github.com/STMicroelectronics/stm32-mw-usb-host.git",
         "https://github.com/X-Gen-Lab/stm32-mw-usb-host.git",
-        "inventory", "LICENSE.md", "dependencies/stm32-usb-host.lock.json"),
+        "runtime", "LICENSE.md", "dependencies/stm32-usb-host.lock.json"),
     SourceDependency("threadx", "ext/threadx",
         "https://github.com/eclipse-threadx/threadx.git",
         "https://github.com/X-Gen-Lab/threadx.git",
@@ -302,7 +302,9 @@ def runtime_selection(family, *, backend, components=(), test_support=False):
     if backend != "baremetal":
         identifiers.add(backend)
     suppliers = {"network": "lwip", "network-loaned-rx": "lwip",
-                 "tls": "mbedtls", "mqtt": "coremqtt", "mcuboot": "mcuboot"}
+                 "tls": "mbedtls", "mqtt": "coremqtt", "mcuboot": "mcuboot",
+                 "st-usb-host": "stm32_usb_host",
+                 "st-usb-device": "stm32_usb_device"}
     identifiers.update(suppliers[value] for value in components
                        if value in suppliers)
     if test_support:

@@ -1,0 +1,126 @@
+# Current exact gettext entries; independent delta review pending.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: c1ea99b1b9e817435bd9b58ced32cb3fc7a6fa31cf36746bc589cd7a5ffabb10\n"
+
+msgid "F407 RTC 与备份域责任"
+msgstr "F407 RTC and backup-domain responsibilities"
+
+msgid "当前实现限定 STM32F407VET6／ZGT6、LSE32768、24 小时 BCD、BYPSHAD 与 127／255 预分频。静态 `[rtc.name]` 装配返回已有 `nx_rtc_port_t`；普通冷态、 日历和辅助操作由同一特权、未屏蔽 IRQ 的串行任务责任者调用。显式 Standby commit 在屏蔽 IRQ 后执行，validate／restore 允许屏蔽或未屏蔽的特权 Thread。 没有后台任务、堆、事件队列或第二个备份域写入者。"
+msgstr "The current implementation is limited to STM32F407VET6/ZGT6, LSE32768, 24-hour BCD, BYPSHAD and 127/255 prescalers. A static `[rtc.name]` assembly returns the existing `nx_rtc_port_t`. One privileged task with IRQs unmasked serializes ordinary cold, calendar and auxiliary operations. Explicit Standby commit runs after IRQ masking; validate/restore accept privileged Thread context with or without masks. There is no background task, heap, event queue or second backup-domain writer."
+
+msgid "普通 finite Alarm A 沿用[请求生命周期](../explanation/rtc-lptim.md)和 [借用图](../assets/diagrams/request-lifecycle.svg)。`nexus/io/rtc_aux.h` 的可选 方法表使用同一端口上下文；未实现的提供者返回 `UNSUPPORTED`，不虚构功能。"
+msgstr "Finite Alarm A follows the [request lifecycle](../explanation/rtc-lptim.md) and [borrow diagram](../assets/diagrams/request-lifecycle.svg). The optional method table in `nexus/io/rtc_aux.h` uses that same port context. Providers without an implementation return `UNSUPPORTED` rather than fabricating capability."
+
+msgid "准备、设置和移交"
+msgstr "Preparation, setting and handoff"
+
+msgid "`adopt-retained` 只接纳已经准备的 PWREN、DBP、LSE、RTC 时钟与显式可信日历。 准入与干净关闭不写备份寄存器。YY00 不以 INITS 推断无效；世纪、时区、UTC、 掉电恢复和数据来源证明属于外部产品。"
+msgstr "`adopt-retained` accepts only already-established PWREN, DBP, LSE, RTC clocks and an explicitly trusted calendar. Admission and clean close do not write backup registers. INITS does not make YY00 invalid. Century, timezone, UTC, power-loss recovery and data provenance belong to the external product."
+
+msgid "`provision-empty` 要求显式初始日历与完整的 reset-like 空域。代码不写 BDRST， 不把非空备份域自动清空。部分启动失败保留精确 effects；没有获得 INITF 或没有 观察到新日历时，不发布虚构的旧日期或成功结果。"
+msgstr "`provision-empty` requires an explicit initial calendar and a completely reset-like empty domain. It never writes BDRST or automatically clears a nonempty backup domain. Partial startup failures retain exact effects. Failure to obtain INITF or observe the new calendar never publishes an invented old date or successful result."
+
+msgid "日历设置只在无活动源时受理，并受 `allow_set` 授权。设置成功推进非回绕的 setting generation。粗校准重新启动分频器，因此也要求该授权并推进 generation。 平滑校准改变 RTC 频率，不重置 setting generation。两者都不调整 Core 时间。"
+msgstr "Calendar setting requires no active sources and explicit `allow_set` authorization. Success advances a nonwrapping setting generation. Coarse calibration restarts the prescaler and therefore requires the same authorization and advances generation. Smooth calibration changes RTC frequency without resetting the setting generation. Neither operation adjusts Core time."
+
+msgid "普通 stop 先关闭准入并撤掉 Alarm A／B、wakeup、timestamp、tamper、EXTI event 及 SRAM 引用，再归还借用。provision 留下的自主 LSE／RTC、DBP／PWREN 和日历 责任仍使 private close 返回 `BUSY`。外部责任者在源已退出、没有 loan、所有用户 已 join 后，可显式调用 `nx_rtc_port_backup_handoff`，接受复制的资源／日历收条。 移交不写寄存器，不关闭自主时间，也不授予并发写权限；之后 private close 才能成功。 失败启动、污染日历和未完成排空不能通过移交抹去责任。"
+msgstr "Ordinary stop seals admission, withdraws Alarm A/B, wakeup, timestamp, tamper, EXTI events and SRAM references, then returns borrows. Autonomous LSE/RTC, DBP/PWREN and calendar effects left by provisioning still make private close return `BUSY`. After source withdrawal, loan return and joining all users, an external owner may explicitly call `nx_rtc_port_backup_handoff` to accept a copied resource/calendar receipt. Handoff writes no registers, does not stop autonomous time and grants no concurrent writer permission. Private close can then succeed. Handoff cannot erase responsibility for failed startup, a contaminated calendar or incomplete drain."
+
+msgid "辅助硬件接口"
+msgstr "Auxiliary hardware interfaces"
+
+msgid "接口"
+msgstr "Interface"
+
+msgid "当前行为"
+msgstr "Current behavior"
+
+msgid "Alarm A"
+msgstr "Alarm A"
+
+msgid "一个有限 request；day/time 精确匹配，独立 Core deadline"
+msgstr "One finite request; exact day/time match and an independent Core deadline"
+
+msgid "Alarm B"
+msgstr "Alarm B"
+
+msgid "同步复制精确 day/time 比较器；可与 Alarm A 并存，显式开／关"
+msgstr "Synchronously copies an exact day/time comparator; can coexist with Alarm A; explicit enable/disable"
+
+msgid "Wakeup"
+msgstr "Wakeup"
+
+msgid "16 位 reload，RTCCLK／16、8、4、2 或 1 Hz／扩展 1 Hz；WUTWF 握手"
+msgstr "16-bit reload; RTCCLK/16, 8, 4, 2, or 1 Hz/extended 1 Hz; WUTWF handshake"
+
+msgid "Timestamp"
+msgstr "Timestamp"
+
+msgid "PC13／RTC_AF1，显式边沿；原始月／日／星期／时间／子秒与 overflow"
+msgstr "PC13/RTC_AF1, explicit edge; raw month/day/weekday/time/subsecond and overflow"
+
+msgid "Tamper"
+msgstr "Tamper"
+
+msgid "PC13 tamper1，显式边沿／滤波、采样率、预充电与内部 pullup"
+msgstr "PC13 tamper1; explicit edge/filter, sampling frequency, precharge and internal pullup"
+
+msgid "Calibration"
+msgstr "Calibration"
+
+msgid "smooth 8／16／32 秒窗口或 coarse；等待 RECALPF／INITF，禁止同时使用"
+msgstr "Smooth 8/16/32-second windows or coarse calibration; waits for RECALPF/INITF; mutually exclusive"
+
+msgid "Backup registers"
+msgstr "Backup registers"
+
+msgid "精确 BKP0R..BKP19R，单 word 读写／读回，无数据布局或擦除策略"
+msgstr "Exact BKP0R..BKP19R; single-word read/write/readback without data-layout or erase policy"
+
+msgid "Backup SRAM"
+msgstr "Backup SRAM"
+
+msgid "显式 gate／可选 BRE 准备，4096 字节 CPU lease；不清零或测试内容"
+msgstr "Explicit gate/optional BRE preparation; a 4096-byte CPU lease without clearing or testing contents"
+
+msgid "PI8／RTC_AF2 没有在当前 VE100／ZG144 封装引出，所以 AF2 和 tamper2 返回 `UNSUPPORTED`。SDK 中存在 TAMP2 宏不构成包能力。PC13 的 pad 所有权、电气连接 和外部拉电阻必须由外部装配责任者先接纳；配置捕获不擅自接管 GPIO。tamper 事件 会由硬件清除全部 20 个 backup registers，启用该功能即要求调用者明确接受这一 硬件效果；backup SRAM 不因 tamper 被自动清除。"
+msgstr "PI8/RTC_AF2 is not bonded on the selected VE100/ZG144 packages, so AF2 and tamper2 return `UNSUPPORTED`. A TAMP2 SDK macro does not establish package capability. The external assembly owner must first authorize PC13 ownership, electrical connections and external pulls; capture configuration does not silently take GPIO ownership. A tamper event clears all twenty backup registers in hardware. Enabling tamper explicitly accepts that effect; it does not automatically clear backup SRAM."
+
+msgid "时间戳寄存器没有 year，接口不补出一个年份。子秒保留 downcounter 和 256 的分母， overflow 表示事件丢失，不转换成软件采样时间。读取事件／capture 不清标志；显式 ack 只清已观察的所选 W0C 位，并保留其他源。硬件只有一个锁存器，不提供无损队列。"
+msgstr "Timestamp registers have no year, and the API never invents one. Subseconds preserve the downcounter and denominator256. Overflow means a lost event and is not converted into software observation time. Reading events/capture does not clear flags. Explicit acknowledgement clears only selected observed W0C bits and preserves other sources. One hardware latch does not provide a lossless queue."
+
+msgid "SRAM 准备仅记录新加的 BKPSRAMEN／BRE。预先存在的电源位在 stop 后保留； 新加位的拒写／拒撤保留 receipt，直到真实读回成功。原始 lease 的稳定地址、 owner、完整几何与非回绕 epoch 共同控制归还；复制或修改的 token 不授予归还权限。 调用者先 join 所有派生指针用户。CPU 可访问不代表可用于 DMA、执行、堆或启动对象， BRE ready 也不证明实际 VBAT 接线、保持时间或产品掉电政策。"
+msgstr "SRAM preparation records only newly added BKPSRAMEN/BRE. Existing power bits survive stop. Failed writes/withdrawal retain the receipt until actual readback succeeds. Release requires the original lease address, owner, complete geometry and nonwrapping epoch. Copied or modified tokens cannot release it. All derived pointer users must join first. CPU accessibility grants neither DMA, execution, heap nor startup-object permission. BRE-ready does not prove VBAT wiring, retention duration or product power-loss policy."
+
+msgid "STOP 事件与失败退出"
+msgstr "STOP events and failure withdrawal"
+
+msgid "`nx_rtc_port_wake_route` 显式控制 EXTI17（Alarm A／B）、21（timestamp／tamper） 和 22（wakeup）的 EMR／RTSR，以及对应 RTC interrupt-generation 位。它不启用 NVIC／IMR，不添加 ISR、回调或隐藏 publisher。所有无关 EXTI 位保持原值。 STOP 责任者拥有进入低功耗、外部用户 join 和 Core clock epoch 的恢复；RTC setting domain、Core 单调 deadline 和跨 STOP 时间映射保持独立。"
+msgstr "`nx_rtc_port_wake_route` explicitly controls EMR/RTSR for EXTI17 (Alarm A/B), 21 (timestamp/tamper) and22 (wakeup), plus corresponding RTC interrupt-generation bits. It does not enable NVIC/IMR or add an ISR, callback or hidden publisher. Unrelated EXTI bits remain unchanged. The STOP owner controls power entry, joining external users and restoration of the Core clock epoch. RTC setting, Core monotonic deadlines and cross-STOP time mapping remain separate domains."
+
+msgid "Platform 的专用 `nx_stm32_rtc_suspend`／`resume` 不调用永久 close／prepare。 suspend 要求没有有限 Alarm A request 或 SRAM loan，关闭公共准入但保留自主源、 EXTI pending 和 provision effects；Alarm B／wakeup 不借用 request，可以保持唤醒。 System 恢复后，resume 重新核对实际 RTC、SRAM gate 和所需 BRE／BRR，失败保留 suspended 责任。成功推进 owner admission generation，使旧 Core epoch 中准备的 READY token 失效；不设置日历，不把 setting generation 当成 Core 时间，也不清 捕获标志。这个保守身份边界与 clean reopen 一样，不宣称 RTC 计时发生了跳变。"
+msgstr "Platform-specific `nx_stm32_rtc_suspend`/`resume` do not call permanent close/prepare. Suspend requires no finite Alarm A request or SRAM loan, seals public admission, and retains autonomous sources, EXTI pending and provisioning effects. Alarm B/wakeup can remain armed without borrowing a request. After System restoration, resume rechecks actual RTC, SRAM gates and required BRE/BRR; failure retains suspension responsibility. Success advances owner admission generation and invalidates READY tokens prepared in the old Core epoch. It neither sets the calendar, treats setting generation as Core time nor clears captured flags. This conservative identity boundary matches clean reopen without claiming an RTC time discontinuity."
+
+msgid "常规 RTC clock crossing 同时受有限 Core budget 和 poll-count 上界约束。控制写、 ALRBWF、WUTWF、RECALPF、INITF 或源清除失败时，保留源／资源责任。辅助源失败 使活动 Alarm A 锁住失败原因并保持 `QUARANTINED`，不虚构日历污染。只有实际 撤源和恢复字段后才以 release 发布 `SETTLED`。不存在自动 reset、重放或备份擦除。"
+msgstr "Ordinary RTC clock crossing has both a finite Core budget and a poll-count bound. Failed control writes, ALRBWF, WUTWF, RECALPF, INITF or source clearing retain source/resource responsibility. An auxiliary-source failure latches the active Alarm A failure and keeps it `QUARANTINED` without inventing calendar corruption. Only actual source withdrawal and field restoration permit release-publication of `SETTLED`. There is no automatic reset, replay or backup erasure."
+
+msgid "显式 Standby 握手"
+msgstr "Explicit Standby handshake"
+
+msgid "ES0182 Rev19 §2.2.6 要求使用的唤醒源先禁用、清旗、重新启用，再进入 Standby。 `nx_rtc_standby_t` 是调用者稳定、初始为零的收条，绑定唯一 RTC owner、原始对象 地址和独立非回绕 epoch。完整源快照留在私有 RTC state，不把厂商寄存器类型暴露 为公共接口，也不新建备份域 owner。"
+msgstr "ES0182 Rev19 §2.2.6 requires selected wake sources to be disabled, acknowledged and reenabled before Standby. `nx_rtc_standby_t` is caller-owned stable, initially zero receipt storage, bound to the unique RTC owner, original object address and an independent nonwrapping epoch. The complete source snapshot remains in private RTC state. Vendor register types do not enter the public interface and no new backup-domain owner is created."
+
+msgid "调用者先完成 Platform suspend，再调用 `nx_rtc_port_standby_prepare`，显式给出可 丢弃事件 mask 和正的固定 poll budget。它要求无 Alarm A request／SRAM loan，禁用 Alarm／wakeup／timestamp／tamper 前端与 interrupt generation，等待写 ready，再 清除授权且实际观察到的 RTC flags 与对应 EXTI PR。EXTI IMR／EMR／RTSR／FTSR 路由保持原样，所有日历、校准、backup data 和备份电源位保持原值。"
+msgstr "The caller completes Platform suspend before invoking `nx_rtc_port_standby_prepare`, explicitly supplying the discardable event mask and a positive fixed poll budget. It requires no Alarm A request or SRAM loan, disables Alarm/wakeup/timestamp/tamper frontends and interrupt generation, waits for write-ready, then acknowledges only authorized and actually observed RTC flags and matching EXTI PR. EXTI IMR/EMR/RTSR/FTSR routing remains unchanged, as do calendar, calibration, backup data and backup power bits."
+
+msgid "未授权的 pending flag／PR 返回 BUSY；共享 EXTI 线需要对其路由源提供明确授权。 准备过程中到达的新事件不会被循环清空。首次硬件写之前的拒绝不持有收条；开始写 之后的失败保留收条和部分禁源责任，只能显式 restore 后重试。零收条的 restore 在没有实际持有者时是无副作用成功。有限 Alarm A 必须先 join；自主 Standby alarm 可使用不借用 request 的 Alarm B。"
+msgstr "Unauthorized pending flags/PR return BUSY. Shared EXTI lines require explicit authorization for their routed sources. Newly arriving events during prepare are not repeatedly cleared. Rejection before the first hardware write retains no receipt. Failure after writing begins retains the receipt and partial source-disable responsibility; explicit restore is required before retry. Restoring a zero receipt succeeds without effects when no real holder exists. Finite Alarm A must be joined first; an autonomous Standby alarm may use Alarm B without borrowing a request."
+
+msgid "`nx_rtc_port_standby_validate` 只读验证原始收条、disabled 控制、原 EXTI 路由和 当前提供者已维护的独立 LSE32768 时钟。它不读取旧 Core 时钟。Power owner 验证 该证明后负责 EWUP、PDDS、SCR 和 CWUF 顺序；在 PRIMASK 已屏蔽、WUF 已清后， `nx_rtc_port_standby_commit` 只恢复原 RTC 源并回读，不再清除 RTC、EXTI 或 PWR pending。启用源之后到达的业务事件保留。"
+msgstr "`nx_rtc_port_standby_validate` checks the original receipt, disabled controls, original EXTI routing and the current provider's independently maintained LSE32768 clock without writes. It does not read the old Core clock. After validating this proof, the Power owner controls EWUP, PDDS, SCR and CWUF sequencing. With PRIMASK masked and WUF cleared, `nx_rtc_port_standby_commit` only restores and reads back the original RTC sources. It never clears RTC, EXTI or PWR pending state again. Business events arriving after source enable remain preserved."
+
+msgid "实际 Standby 以复位退出；新镜像仍须满足 `adopt-retained` 的外部准备／可信日历 合同，不会隐式清除复位唤醒原因或接管前镜像留下的自主源。若进入过程返回或 中途失败，调用者恢复 System 并调用 `nx_rtc_port_standby_restore`，只恢复源控制并在完整回读后解除收条。该 cleanup 允许新的 System epoch，完全不依赖旧 Core deadline／callback；失败保留责任， 绝不以 timeout 抹去收条。RTC resume 在收条未归还时返回 BUSY，private close 也 不能撤掉仍持有的资源。RTC 不擅自写 PWR CWUF／EWUP 或选择事件丢弃政策。"
+msgstr "Real Standby exits through reset. The new image must still satisfy `adopt-retained`'s external preparation and trusted-calendar contract. It does not implicitly clear reset wake causes or adopt autonomous sources left by the previous image. If entry returns or fails partway through, the caller restores System and invokes `nx_rtc_port_standby_restore`, which restores source controls and releases the receipt only after complete readback. This cleanup accepts a new System epoch and never depends on an old Core deadline/callback. Failure retains responsibility; a timeout never erases the receipt. RTC resume returns BUSY while the receipt is outstanding, and private close cannot withdraw its retained resources. RTC neither writes PWR CWUF/EWUP on its own nor chooses event-discard policy."
+
+msgid "GoogleTest 执行真实 C11 提供者，外部模型提供写保护、W0C、时钟跨越、拒写、 拒撤及 NVIC／EXTI 事实。模型结果、选定 ARM 编译／链接与实物测量分开；LSE 精度、PC13／VBAT 电气、实际 STOP／Standby 唤醒、校准精度和保持性 HIL 仍为 `not_executed`。依据为只读 ST RM0090 Rev22 第26章和 DS8626 封装／AF 表。"
+msgstr "GoogleTest executes the actual C11 provider; external models supply write protection, W0C behavior, clock crossing, refused writes/withdrawal and NVIC/EXTI facts. Model results, selected ARM compilation/linking and physical measurements remain separate. HIL for LSE accuracy, PC13/VBAT electrical behavior, actual STOP/Standby wake, calibration accuracy and retention is still `not_executed`. Sources are the read-only ST RM0090 Rev22 chapter26 and DS8626 package/AF tables."

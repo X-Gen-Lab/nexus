@@ -5,11 +5,13 @@ negotiation policy, PHY power/reset circuitry and product recovery outside Nexus
 Lookup returns immutable Ethernet and MDIO faces; it never starts hardware.
 The default platform does not instantiate descriptors, buffers, a PHY or a worker.
 The production owner is `soc/stm32/stm32f4/`; this mode currently targets the exact
-STM32F407ZGT6 package and reviewed RMII software routes. Family organization does
+STM32F407VET6/ZGT6 packages for the reviewed seventeen-pad MII A/B/C route and
+STM32F407ZGT6 for the existing nine-pad RMII A/C/G route. Family organization does
 not establish support for every STM32F4 device. Native is an explicitly enabled
 host model under `tests/support/native/`, not a production SoC.
 
-The first mode is RMII, normal four-word chained descriptors, contiguous untagged
+The selected `raw-mii` or `raw-rmii` mode uses normal four-word chained
+descriptors, contiguous untagged
 Ethernet II frames, 14–1514 bytes excluding FCS. Length-coded IEEE 802.3,
 802.1Q/802.1ad tags, jumbo frames, checksum offload, PTP and scatter/gather are
 rejected or remain separate unsupported modes. TX padding and FCS insertion stay
@@ -17,6 +19,15 @@ in hardware. RX storage has at least 1518 bytes; automatic CRC/pad/type strippin
 is disabled, so the reported RX descriptor length includes its four-byte FCS.
 The public loan subtracts exactly four bytes after complete-frame bounds checks.
 No software claim establishes cable, waveform or throughput qualification.
+
+MII selects all seventeen AF11 pads, including CRS, COL, RX_ER, RX_CLK and
+TX_CLK; the explicit pad receipt retains all seventeen bits through refused
+withdrawal. The external PHY supplies 2.5/25 MHz receive/transmit clocks for
+10/100 Mbit/s. RMII instead requires its external 50 MHz reference. Selecting
+either software route proves no fitted PHY, strap, reset, connector or magnetics.
+The same physical MAC, selector, DMA, MDIO and drain owner serves both modes.
+Fresh RCC source/PLL/divider observations must match the selected clock profile
+before MAC reset; a configured HCLK value alone cannot authorize a changed tree.
 
 ## Static storage and data ownership
 

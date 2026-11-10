@@ -277,6 +277,69 @@ class EthernetFramesMac : public testing::Test {
         Regs()[status / 4U] |= 0x40U;
     }
 };
+TEST_F(EthernetFramesMac, OffloadSelectionProgramsFirstDescriptorOnly) {
+    mac.checksum_offload = true;
+    Start();
+    EXPECT_NE(0U, Regs()[0U] & 0x400U);
+    EXPECT_NE(0U, Regs()[control / 4U] & 0x04000000U);
+    request.checksum = NX_ETH_FRAMES_CHECKSUM_FULL;
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_submit(&port, &request));
+    EXPECT_EQ(0x00c00000U, tx[0].status & 0x00c00000U);
+    EXPECT_EQ(0U, tx[1].status & 0x00c00000U);
+    EXPECT_NE(0U, tx[0].status & ttse);
+    tx[0].status = 0U;
+    tx[1].status = 0x18000U;
+    Progress();
+    nx_result_t result{};
+    size_t transferred = 99U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_request_result(&request.base, &result, &transferred));
+    EXPECT_EQ(NX_ERROR_IO, result);
+    EXPECT_EQ(0U, transferred);
+}
+TEST_F(EthernetFramesMac, UnselectedOrInvalidChecksumRejectsWithoutOwnEffect) {
+    Start();
+    request.checksum = NX_ETH_FRAMES_CHECKSUM_FULL;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_eth_frames_port_submit(&port, &request));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+    EXPECT_EQ(0U, tx[0].status & own);
+    request.checksum = NX_ETH_FRAMES_CHECKSUM_RESERVED;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_eth_frames_port_submit(&port, &request));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+}
+TEST_F(EthernetFramesMac, RxChecksumUsesActualEsaAndRetainsMetadataWithLoan) {
+    mac.checksum_offload = true;
+    Start();
+    RxFrame(0U, 64U, false, 1U);
+    rx[0].extended = 0x40U | 0x10U | 2U;
+    Progress();
+    nx_eth_frames_rx_loan_t loan{};
+    nx_eth_fragment_t view{};
+    ASSERT_EQ(NX_SUCCESS, Acquire(&loan, &view, 1U));
+    EXPECT_EQ(NX_ETH_FRAMES_RX_CHECKSUM_AVAILABLE |
+                  NX_ETH_FRAMES_RX_CHECKSUM_IPV4 |
+                  NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_ERROR | 2U,
+              loan.checksum_flags);
+    auto altered = loan;
+    altered.checksum_flags = 0U;
+    EXPECT_EQ(NX_ERROR_STATE, Release(&altered));
+    EXPECT_EQ(NX_SUCCESS, Release(&loan));
+    RxFrame(1U, 64U);
+    rx[1].extended = 0x42U;
+    Progress();
+    ASSERT_EQ(NX_SUCCESS, Acquire(&loan, &view, 1U));
+    EXPECT_EQ(0U, loan.checksum_flags);
+}
+#if defined(NX_ETH_FRAMES_TEST_STM32)
+TEST_F(EthernetFramesMac, MiiSelectionAcceptsOnlyTheMatchingSyscfgMode) {
+    mac.mii = true;
+    *reinterpret_cast<uint32_t*>(UINT32_C(0x40013804)) = 0U;
+    EXPECT_EQ(NX_SUCCESS, Initialize());
+    EXPECT_EQ(NX_SUCCESS, nx_eth_frames_port_stop(&port));
+    *reinterpret_cast<uint32_t*>(UINT32_C(0x40013804)) = 0x00800000U;
+    EXPECT_EQ(NX_ERROR_STATE, Initialize());
+}
+#endif
 } /* namespace */
 extern "C" nx_time_us_t nx_time_now_us(void) {
     return now;

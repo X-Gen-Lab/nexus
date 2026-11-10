@@ -6,6 +6,7 @@
  * \date            2026-11-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f4_encoder.h"
 #include "stm32f4xx_ll_bus.h"
 #include "stm32f4xx_ll_tim.h"
@@ -19,30 +20,60 @@ static bool context_ok(void) {
 }
 /** \brief Exact reviewed TI1/TI2 bank; Platform owns both pad leases. */
 static GPIO_TypeDef* gpio(const nx_stm32_encoder_config_t* config) {
-    return config->registers == TIM4 ? GPIOB : GPIOA;
+    return config->registers == TIM4   ? GPIOB
+           : config->registers == TIM8 ? GPIOC
+                                       : GPIOA;
 }
 /** \brief Physical phase order is fixed before optional inversion. */
 static uint8_t first_pin(const nx_stm32_encoder_config_t* config) {
-    return config->registers == TIM5 ? 0U : 6U;
+    return config->registers == TIM5 ? 0U : config->registers == TIM1 ? 8U : 6U;
+}
+/** \brief Bus helpers share the same selected timer identity as pin routing. */
+static bool clock_enabled(const nx_stm32_encoder_config_t* config) {
+    uint32_t gate = nx_stm32_timer_gate(config->registers);
+    return nx_stm32_timer_apb2(config->registers)
+               ? LL_APB2_GRP1_IsEnabledClock(gate) != 0U
+               : LL_APB1_GRP1_IsEnabledClock(gate) != 0U;
+}
+/** \brief Only this receipt's APB gate may be changed, preserving its peers. */
+static void clock_change(const nx_stm32_encoder_config_t* config, bool on) {
+    uint32_t gate = nx_stm32_timer_gate(config->registers);
+    if (nx_stm32_timer_apb2(config->registers)) {
+        if (on)
+            LL_APB2_GRP1_EnableClock(gate);
+        else
+            LL_APB2_GRP1_DisableClock(gate);
+    } else if (on) {
+        LL_APB1_GRP1_EnableClock(gate);
+    } else {
+        LL_APB1_GRP1_DisableClock(gate);
+    }
 }
 /** \brief This mode publishes no IRQ and cannot adopt a foreign vector. */
 static bool vector_idle(const nx_stm32_encoder_config_t* config) {
-    const IRQn_Type irq = config->registers == TIM3   ? TIM3_IRQn
+    const IRQn_Type irq = config->registers == TIM1   ? TIM1_CC_IRQn
+                          : config->registers == TIM8 ? TIM8_CC_IRQn
+                          : config->registers == TIM3 ? TIM3_IRQn
                           : config->registers == TIM4 ? TIM4_IRQn
                                                       : TIM5_IRQn;
     return NVIC_GetEnableIRQ(irq) == 0U && NVIC_GetPendingIRQ(irq) == 0U &&
            NVIC_GetActive(irq) == 0U;
 }
+/** \brief Advanced timers also expose complementary channel enable sources. */
+static uint32_t channel_enables(const nx_stm32_encoder_config_t* config) {
+    return nx_stm32_timer_apb2(config->registers) ? UINT32_C(0x1555)
+                                                  : UINT32_C(0x1111);
+}
 /** \brief Stop every owned source without resetting the modulo position. */
 static nx_result_t withdraw(nx_stm32_encoder_state_t* state) {
     TIM_TypeDef* regs = state->config->registers;
     LL_TIM_DisableCounter(regs);
-    LL_TIM_CC_DisableChannel(regs, LL_TIM_CHANNEL_CH1 | LL_TIM_CHANNEL_CH2 |
-                                       LL_TIM_CHANNEL_CH3 | LL_TIM_CHANNEL_CH4);
+    LL_TIM_CC_DisableChannel(regs, channel_enables(state->config));
     LL_TIM_WriteReg(regs, DIER, 0U);
     nx_arch_dsb();
     return (regs->CR1 & TIM_CR1_CEN) == 0U &&
-                   (regs->CCER & UINT32_C(0x1111)) == 0U && regs->DIER == 0U
+                   (regs->CCER & channel_enables(state->config)) == 0U &&
+                   regs->DIER == 0U
                ? NX_SUCCESS
                : NX_ERROR_IO;
 }
@@ -50,7 +81,8 @@ static nx_result_t withdraw(nx_stm32_encoder_state_t* state) {
 nx_result_t nx_stm32_encoder_prepare(nx_stm32_encoder_state_t* state,
                                      const nx_stm32_encoder_config_t* config) {
     if (state == NULL || config == NULL ||
-        (config->registers != TIM3 && config->registers != TIM4 &&
+        (config->registers != TIM1 && config->registers != TIM8 &&
+         config->registers != TIM3 && config->registers != TIM4 &&
          config->registers != TIM5) ||
         config->mode < NX_ENCODER_MODE_X2_TI1 ||
         config->mode > NX_ENCODER_MODE_X4_TI12 || config->filter_a > 15U ||
@@ -58,13 +90,13 @@ nx_result_t nx_stm32_encoder_prepare(nx_stm32_encoder_state_t* state,
         return NX_ERROR_INVALID;
     if (!context_ok())
         return NX_ERROR_CONTEXT;
-    const uint32_t gate = nx_stm32_timer_gate(config->registers);
     if (state->initialized || state->cold_effects != 0U ||
-        LL_APB1_GRP1_IsEnabledClock(gate) != 0U || !vector_idle(config))
+        clock_enabled(config) || !vector_idle(config))
         return NX_ERROR_BUSY;
     GPIO_TypeDef* bank = gpio(config);
-    const uint32_t gpio_gate =
-        bank == GPIOA ? RCC_AHB1ENR_GPIOAEN : RCC_AHB1ENR_GPIOBEN;
+    const uint32_t gpio_gate = bank == GPIOA   ? RCC_AHB1ENR_GPIOAEN
+                               : bank == GPIOB ? RCC_AHB1ENR_GPIOBEN
+                                               : RCC_AHB1ENR_GPIOCEN;
     if ((RCC->AHB1ENR & gpio_gate) == 0U)
         return NX_ERROR_STATE;
     const uint8_t pin = first_pin(config);
@@ -74,17 +106,19 @@ nx_result_t nx_stm32_encoder_prepare(nx_stm32_encoder_state_t* state,
      * immutable descriptor remains borrowed until close proves release. */
     state->config = config;
     state->cold_effects = NX_ENCODER_CLOCK;
-    LL_APB1_GRP1_EnableClock(gate);
+    clock_change(config, true);
     nx_arch_dsb();
-    if (LL_APB1_GRP1_IsEnabledClock(gate) == 0U)
+    if (!clock_enabled(config))
         return NX_ERROR_IO;
     TIM_TypeDef* regs = config->registers;
     if ((regs->CR1 & TIM_CR1_CEN) != 0U || regs->DIER != 0U ||
-        (regs->CCER & UINT32_C(0x1111)) != 0U)
+        (regs->CCER & channel_enables(config)) != 0U ||
+        ((regs == TIM1 || regs == TIM8) && regs->BDTR != 0U))
         return NX_ERROR_BUSY;
     state->cold_effects |= NX_ENCODER_CONTROLLER;
     for (uint8_t i = pin; i < pin + 2U; ++i) {
-        nx_result_t result = nx_stm32_pin_configure(bank, i, 2U, 2U, 0U, false);
+        nx_result_t result = nx_stm32_pin_configure(
+            bank, i, 2U, (uint8_t)nx_stm32_timer_af(regs), 0U, false);
         if (result != NX_SUCCESS)
             return result;
     }
@@ -131,7 +165,8 @@ nx_result_t nx_stm32_encoder_prepare(nx_stm32_encoder_state_t* state,
         return NX_ERROR_IO;
     for (uint8_t i = pin; i < pin + 2U; ++i) {
         if (((bank->MODER >> ((uint32_t)i * 2U)) & 3U) != 2U ||
-            ((bank->AFR[i / 8U] >> ((uint32_t)(i % 8U) * 4U)) & 15U) != 2U ||
+            ((bank->AFR[i / 8U] >> ((uint32_t)(i % 8U) * 4U)) & 15U) !=
+                nx_stm32_timer_af(regs) ||
             ((bank->PUPDR >> ((uint32_t)i * 2U)) & 3U) != 0U ||
             (bank->OTYPER & (1U << i)) != 0U)
             return NX_ERROR_IO;
@@ -149,9 +184,8 @@ nx_result_t nx_stm32_encoder_close(nx_stm32_encoder_state_t* state) {
         return state->initialized ? NX_ERROR_BUSY : NX_SUCCESS;
     if (state->config == NULL)
         return NX_ERROR_STATE;
-    const uint32_t gate = nx_stm32_timer_gate(state->config->registers);
     if ((state->cold_effects & NX_ENCODER_CONTROLLER) != 0U) {
-        if (LL_APB1_GRP1_IsEnabledClock(gate) == 0U)
+        if (!clock_enabled(state->config))
             return NX_ERROR_IO;
         nx_result_t result = withdraw(state);
         if (result != NX_SUCCESS)
@@ -159,9 +193,9 @@ nx_result_t nx_stm32_encoder_close(nx_stm32_encoder_state_t* state) {
         state->initialized = false;
         state->cold_effects &= (uint8_t)~NX_ENCODER_CONTROLLER;
     }
-    LL_APB1_GRP1_DisableClock(gate);
+    clock_change(state->config, false);
     nx_arch_dsb();
-    if (LL_APB1_GRP1_IsEnabledClock(gate) != 0U)
+    if (clock_enabled(state->config))
         return NX_ERROR_IO;
     state->cold_effects = 0U;
     state->config = NULL;
@@ -176,10 +210,7 @@ static nx_result_t ready(const nx_stm32_encoder_state_t* state) {
         return NX_ERROR_CONTEXT;
     if (!state->initialized || state->config == NULL)
         return NX_ERROR_STATE;
-    return LL_APB1_GRP1_IsEnabledClock(
-               nx_stm32_timer_gate(state->config->registers))
-               ? NX_SUCCESS
-               : NX_ERROR_IO;
+    return clock_enabled(state->config) ? NX_SUCCESS : NX_ERROR_IO;
 }
 /** \brief Enable both phases without restarting the raw position. */
 static nx_result_t start(void* context) {
@@ -246,13 +277,19 @@ static nx_result_t describe(const void* context, nx_encoder_state_t* result) {
                      _Alignof(nx_encoder_state_t)))
         return NX_ERROR_INVALID;
     const nx_stm32_encoder_config_t* config = state->config;
-    *result = (nx_encoder_state_t){
-        .filter_clock_hz = UINT32_C(84000000),
+    *result = (nx_encoder_state_t) {
+#if NEXUS_APB1_TIMER_HZ == NEXUS_APB2_TIMER_HZ
+        .filter_clock_hz = NEXUS_APB1_TIMER_HZ,
+#else
+        .filter_clock_hz = nx_stm32_timer_apb2(config->registers)
+                               ? NEXUS_APB2_TIMER_HZ
+                               : NEXUS_APB1_TIMER_HZ,
+#endif
         .mode = config->mode,
         .counter_bits = config->registers == TIM5 ? 32U : 16U,
-        .filter_a = config->filter_a,
-        .filter_b = config->filter_b,
-        .running = LL_TIM_IsEnabledCounter(config->registers) != 0U};
+        .filter_a = config->filter_a, .filter_b = config->filter_b,
+        .running = LL_TIM_IsEnabledCounter(config->registers) != 0U
+    };
     return NX_SUCCESS;
 }
 /** \brief One immutable method table, with no ring, request or worker. */

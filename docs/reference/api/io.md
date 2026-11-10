@@ -7,69 +7,86 @@ source_language: en
 
 # Typed I/O: devices and execution contracts
 
-These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records.
+Use this index to open declarations from public headers. Select a supported
+part, Board and mode through the [support matrix](../../delivery/support.md),
+then follow that mode's design contract and the header's call requirements.
+A public header or optional method does not authorize every provider or device.
 
-The Native model controls in `model.h`, `spi_dma_model.h` and `rtc_lptim_model.h` support host tests. They do not establish MCU hardware support or device discovery. Optional interfaces describe selected contracts; their presence does not imply support on every provider.
+Factory lookup returns an existing immutable face without starting hardware.
+Controllers, child endpoints and optional faces retain their declared identities;
+querying a face does not activate media or acquire a memory bank. Vendor Handles
+and mutable provider state remain private.
 
-SPI byte-span lengths count bytes. The optional polling and segmented DMA
-transaction faces count 8- or 16-bit words; a 16-bit element is a numeric
-`uint16_t` in native storage. They do not swap bytes, concatenate segments or
-allocate hidden scratch storage. Selected bit order determines serialization.
+## Find the selected interface
 
-F407 SPI checks the GPIO CS output latch after each command. A polling return
-releases all caller buffers, but failed CS withdrawal retains the static endpoint
-identity and owner fault until explicit recover or close proves withdrawal.
-Finite DMA retains its request and buffers through failed CS withdrawal and
-quarantine; service retries cleanup without replaying payload or extending the
-first drain deadline. Latch readback does not establish the external pin voltage.
-
-## Explicit media and external-controller faces
-
-| Public header | Selected identity and boundary |
+| Task | Public headers |
 | --- | --- |
-| `block.h` | One media session with geometry, explicit activation and whole-block progress |
-| `external_bus.h` | One shared external controller; distinct from its child bank endpoints |
-| `parallel16.h` | One settled 16-bit command/data endpoint; no payload survives return |
-| `memory_window.h` | Exact bank geometry; explicit CPU-window lease only in the runtime profile |
+| Samples, camera storage and finite audio | `adc.h`, `adc_group.h`, `capture.h`, `audio.h`, `frame_stream.h` |
+| Serial data and wire formats | `uart.h`, `uart_word.h`, `uart_wire.h`, `uart_rs485.h`, `spi.h`, `spi_transaction.h`, `spi_dma_transaction.h`, `spi_frames.h`, `i2c.h`, `i2c_target.h` |
+| Media and physical storage | `block.h`, `block_async.h`, `sdio_io.h`, `flash.h`, `flash_async.h`, `flash_maintenance.h`, `nand.h`, `external_bus.h`, `memory_window.h`, `parallel16.h` |
+| Calendar and backup resources | `rtc.h`, `rtc_aux.h` |
+| Timed outputs and finite waveforms | `advanced_pwm.h`, `pwm_group.h`, `timer_pulse.h`, `timer_sequence.h`, `timer_capture.h` |
+| USB packets, activation and explicit roles | `usb_device.h`, `usb_host.h`, `usb_otg.h`, `usb_activation.h`, `usb_profile.h` |
+| Borrowing, progress and observation | `stream.h`, `frame_stream.h`, `dma.h`, `wake.h`, `observation.h`, `diagnostic.h` |
 
-Factory lookup returns an existing face without starting hardware or acquiring
-a bank. A controller face cannot substitute for an endpoint. A CPU-window lease
-permits direct loads/stores after acquisition and requires all derived pointer
-users to join before exact release. Startup backing is a separately selected,
-reset-time memory plan: its backing ownership already exists before Platform start
-and lasts while static objects exist. It rejects a whole-bank runtime loan and ordinary Platform
-stop. Neither profile grants DMA, executable memory, an allocator or physical
-retention evidence. See the [I/O ownership design](../../design/io-evolution.md)
-and the selected Board's explicit memory profile.
+Lengths, numeric word order, frame geometry and result counts belong to each
+face. Accepted requests and buffers remain borrowed until acquire-observed
+SETTLED; cancellation, timeout and DMA completion do not revoke a borrow.
+Caller-owned streams and derived memory pointers also need their own joined
+release. The [I/O ownership design](../../design/io-evolution.md) explains these
+relationships; declarations below remain the signature authority.
 
-The F407 `sdio-poll` reference requires explicit media activation, uses 512-byte
-sectors, one- or four-bit width and a maximum 12 MHz card clock. CPU polling
-releases caller buffers on every synchronous return; unresolved card/controller
-completion still retains the session, pins and gate. Stop succeeds only after
-complete withdrawal. DMA, IRQ completion, asynchronous cancellation, connected
-card-detect and hot-swap are not provided by this selected mode.
+Use the header's required executor, preparation method and live time domain.
+Explicit service advances finite transfers and failed drain; the library does
+not create a product worker. Restart and epoch rules belong to the selected
+provider. [RTC](../../design/f407-rtc.md),
+[serial wire modes](../../design/uart-wire-modes.md),
+[SPI frames](../../design/spi-frame-modes.md) and
+[capture/audio](../../design/f407-capture-audio.md) describe their exact
+arming, final-access and recovery boundaries.
 
-IRQ timestamps and sampled GPIO levels are observations. The F407 EXTI provider
-marks them COALESCED; that source cannot satisfy the strict NEC source policy.
-The explicit NEC IRQ-observation reference preserves source flags and publishes
-sampled/uncertain quality. Protocol inverse checks never establish edge capture
-completeness or physical timing. See the
-[infrared source-quality contract](../../../components/infrared/README.md).
+I2C target exchanges use `i2c_target.h` and borrow complete bounded requests.
+WRITE_READ supplies a precomputed response across one repeated START. The
+[F407 target contract](../../design/f407-i2c-target.md) defines own addresses,
+optional PEC/ARA, IRQ latency and full drain. Product command tables, ARP and
+Host Notify remain external.
 
-For public RS485 composition, use the same exact typed UART reference for
-`nx_factory_uart_ref()` and `nx_factory_uart_tx_validator_ref()`. The validator
-getter only returns the existing selected callback; it adds no mutable state or
-method table and returns NULL for unreviewed modes or IDs. Callback symbols may be shared; pairing with that transport's context and
-exclusive executor remains a caller precondition. The caller still owns DE,
-setup/hold timing and joined shutdown. The
-{ref}`RS485 I/O contract <uart__rs485_8h>` defines that ownership; lookup does not
-verify transceiver supply, RS485 bus wiring or physical turnaround.
+Media activation, function selection, memory-window leases and permanent startup
+backing are distinct operations. A block session does not turn an SDIO function
+into sector media. A CPU-window lease grants only its declared bank access;
+startup backing remains held while its static objects exist. See
+[physical storage](../../design/f407-storage.md) and
+[FSMC](../../design/f407-fsmc.md) before selecting those interfaces.
+
+For RS485, pair `nx_factory_uart_ref()` and
+`nx_factory_uart_tx_validator_ref()` with the same exact UART identity and
+transport context. The caller owns DE, setup/hold timing and joined shutdown;
+the {ref}`RS485 contract <uart__rs485_8h>` defines the composition.
+IRQ timestamps and sampled GPIO levels remain observations, with the source
+quality defined by the selected provider and the
+[infrared contract](../../../components/infrared/README.md).
+
+USB Device and Host use distinct packet faces. An explicitly managed OTG role
+owns the selected core/PHY and exposes the ready face for its current generation.
+The [USB ownership contract](../../design/usb-device.md) defines PHY speeds,
+PIO or HS AHB DMA, power handover and optional ST Core bridges.
+
+Native controls in `model.h`, `spi_dma_model.h` and `rtc_lptim_model.h` are host
+test interfaces. They establish no MCU discovery or physical support.
 
 (block_8h)=
 
 ## block.h
 
 ```{doxygenfile} io/include/nexus/io/block.h
+:project: nexus
+```
+
+(block__async_8h)=
+
+## block_async.h
+
+```{doxygenfile} io/include/nexus/io/block_async.h
 :project: nexus
 ```
 
@@ -133,7 +150,7 @@ verify transceiver supply, RS485 bus wiring or physical turnaround.
 
 ## adc.h
 
-```{doxygenfile} adc.h
+```{doxygenfile} io/include/nexus/io/adc.h
 :project: nexus
 ```
 
@@ -141,7 +158,7 @@ verify transceiver supply, RS485 bus wiring or physical turnaround.
 
 ## adc_format.h
 
-```{doxygenfile} adc_format.h
+```{doxygenfile} io/include/nexus/io/adc_format.h
 :project: nexus
 ```
 
@@ -149,7 +166,7 @@ verify transceiver supply, RS485 bus wiring or physical turnaround.
 
 ## adc_group.h
 
-```{doxygenfile} adc_group.h
+```{doxygenfile} io/include/nexus/io/adc_group.h
 :project: nexus
 ```
 
@@ -157,7 +174,7 @@ verify transceiver supply, RS485 bus wiring or physical turnaround.
 
 ## adc_observer.h
 
-```{doxygenfile} adc_observer.h
+```{doxygenfile} io/include/nexus/io/adc_observer.h
 :project: nexus
 ```
 
@@ -165,7 +182,15 @@ verify transceiver supply, RS485 bus wiring or physical turnaround.
 
 ## advanced_pwm.h
 
-```{doxygenfile} advanced_pwm.h
+```{doxygenfile} io/include/nexus/io/advanced_pwm.h
+:project: nexus
+```
+
+(audio_8h)=
+
+## audio.h
+
+```{doxygenfile} io/include/nexus/io/audio.h
 :project: nexus
 ```
 
@@ -173,7 +198,7 @@ verify transceiver supply, RS485 bus wiring or physical turnaround.
 
 ## can.h
 
-```{doxygenfile} can.h
+```{doxygenfile} io/include/nexus/io/can.h
 :project: nexus
 ```
 
@@ -181,7 +206,15 @@ verify transceiver supply, RS485 bus wiring or physical turnaround.
 
 ## can_fd.h
 
-```{doxygenfile} can_fd.h
+```{doxygenfile} io/include/nexus/io/can_fd.h
+:project: nexus
+```
+
+(capture_8h)=
+
+## capture.h
+
+```{doxygenfile} io/include/nexus/io/capture.h
 :project: nexus
 ```
 
@@ -189,7 +222,7 @@ verify transceiver supply, RS485 bus wiring or physical turnaround.
 
 ## cycle_probe.h
 
-```{doxygenfile} cycle_probe.h
+```{doxygenfile} io/include/nexus/io/cycle_probe.h
 :project: nexus
 ```
 
@@ -212,7 +245,7 @@ finite positive `maximum_service_gap_us`. Unknown groups stay unknown.
 
 ## dma.h
 
-```{doxygenfile} dma.h
+```{doxygenfile} io/include/nexus/io/dma.h
 :project: nexus
 ```
 
@@ -220,7 +253,7 @@ finite positive `maximum_service_gap_us`. Unknown groups stay unknown.
 
 ## encoder.h
 
-```{doxygenfile} encoder.h
+```{doxygenfile} io/include/nexus/io/encoder.h
 :project: nexus
 ```
 
@@ -232,9 +265,9 @@ The entropy face supplies bounded, health-admitted source words. `nx_entropy_fil
 uses a finite absolute deadline and erases the complete admitted output on a
 read failure. It does not allocate, create a worker or establish entropy quality;
 it is not a DRBG. A source's existence does not authorize full entropy credit
-for a cryptographic library. See the explicit
-{ref}`F407 constructor <stm32f407-entropy-construction>` for its
-clock and shutdown prerequisites. Other retained SDKs do not grant an entropy provider.
+for a cryptographic library. See the selected
+{ref}`F407 owner <stm32f407-entropy-construction>` for its typed factory,
+Platform lifecycle and clock prerequisites. Other retained SDKs do not grant an entropy provider.
 
 ```{doxygenfile} io/include/nexus/io/entropy.h
 :project: nexus
@@ -244,7 +277,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## ethernet.h
 
-```{doxygenfile} ethernet.h
+```{doxygenfile} io/include/nexus/io/ethernet.h
 :project: nexus
 ```
 
@@ -252,7 +285,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## ethernet_frames.h
 
-```{doxygenfile} ethernet_frames.h
+```{doxygenfile} io/include/nexus/io/ethernet_frames.h
 :project: nexus
 ```
 
@@ -260,7 +293,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## exti.h
 
-```{doxygenfile} exti.h
+```{doxygenfile} io/include/nexus/io/exti.h
 :project: nexus
 ```
 
@@ -268,7 +301,31 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## flash.h
 
-```{doxygenfile} flash.h
+```{doxygenfile} io/include/nexus/io/flash.h
+:project: nexus
+```
+
+(flash__async_8h)=
+
+## flash_async.h
+
+```{doxygenfile} io/include/nexus/io/flash_async.h
+:project: nexus
+```
+
+(flash__maintenance_8h)=
+
+## flash_maintenance.h
+
+```{doxygenfile} io/include/nexus/io/flash_maintenance.h
+:project: nexus
+```
+
+(frame__stream_8h)=
+
+## frame_stream.h
+
+```{doxygenfile} io/include/nexus/io/frame_stream.h
 :project: nexus
 ```
 
@@ -276,7 +333,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## fwd.h
 
-```{doxygenfile} fwd.h
+```{doxygenfile} io/include/nexus/io/fwd.h
 :project: nexus
 ```
 
@@ -284,7 +341,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## gpio.h
 
-```{doxygenfile} gpio.h
+```{doxygenfile} io/include/nexus/io/gpio.h
 :project: nexus
 ```
 
@@ -292,7 +349,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## i2c.h
 
-```{doxygenfile} i2c.h
+```{doxygenfile} io/include/nexus/io/i2c.h
 :project: nexus
 ```
 
@@ -300,7 +357,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## i2c_bus_clear.h
 
-```{doxygenfile} i2c_bus_clear.h
+```{doxygenfile} io/include/nexus/io/i2c_bus_clear.h
 :project: nexus
 ```
 
@@ -308,7 +365,15 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## i2c_long.h
 
-```{doxygenfile} i2c_long.h
+```{doxygenfile} io/include/nexus/io/i2c_long.h
+:project: nexus
+```
+
+(i2c__target_8h)=
+
+## i2c_target.h
+
+```{doxygenfile} io/include/nexus/io/i2c_target.h
 :project: nexus
 ```
 
@@ -316,7 +381,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## lptim.h
 
-```{doxygenfile} lptim.h
+```{doxygenfile} io/include/nexus/io/lptim.h
 :project: nexus
 ```
 
@@ -324,7 +389,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## mdio.h
 
-```{doxygenfile} mdio.h
+```{doxygenfile} io/include/nexus/io/mdio.h
 :project: nexus
 ```
 
@@ -332,7 +397,15 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## model.h
 
-```{doxygenfile} model.h
+```{doxygenfile} io/include/nexus/io/native/model.h
+:project: nexus
+```
+
+(nand_8h)=
+
+## nand.h
+
+```{doxygenfile} io/include/nexus/io/nand.h
 :project: nexus
 ```
 
@@ -340,7 +413,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## observation.h
 
-```{doxygenfile} observation.h
+```{doxygenfile} io/include/nexus/io/observation.h
 :project: nexus
 ```
 
@@ -348,7 +421,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## pin_state.h
 
-```{doxygenfile} pin_state.h
+```{doxygenfile} io/include/nexus/io/pin_state.h
 :project: nexus
 ```
 
@@ -356,7 +429,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## pwm_adc.h
 
-```{doxygenfile} pwm_adc.h
+```{doxygenfile} io/include/nexus/io/pwm_adc.h
 :project: nexus
 ```
 
@@ -364,7 +437,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## pwm_group.h
 
-```{doxygenfile} pwm_group.h
+```{doxygenfile} io/include/nexus/io/pwm_group.h
 :project: nexus
 ```
 
@@ -372,7 +445,15 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## rtc.h
 
-```{doxygenfile} rtc.h
+```{doxygenfile} io/include/nexus/io/rtc.h
+:project: nexus
+```
+
+(rtc__aux_8h)=
+
+## rtc_aux.h
+
+```{doxygenfile} io/include/nexus/io/rtc_aux.h
 :project: nexus
 ```
 
@@ -380,7 +461,15 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## rtc_lptim_model.h
 
-```{doxygenfile} rtc_lptim_model.h
+```{doxygenfile} io/include/nexus/io/native/rtc_lptim_model.h
+:project: nexus
+```
+
+(sdio__io_8h)=
+
+## sdio_io.h
+
+```{doxygenfile} io/include/nexus/io/sdio_io.h
 :project: nexus
 ```
 
@@ -388,7 +477,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## spi.h
 
-```{doxygenfile} spi.h
+```{doxygenfile} io/include/nexus/io/spi.h
 :project: nexus
 ```
 
@@ -396,7 +485,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## spi_dma_model.h
 
-```{doxygenfile} spi_dma_model.h
+```{doxygenfile} io/include/nexus/io/native/spi_dma_model.h
 :project: nexus
 ```
 
@@ -404,7 +493,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## spi_dma_owner_binding.h
 
-```{doxygenfile} spi_dma_owner_binding.h
+```{doxygenfile} io/include/nexus/io/spi_dma_owner_binding.h
 :project: nexus
 ```
 
@@ -412,7 +501,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## spi_dma_transaction.h
 
-```{doxygenfile} spi_dma_transaction.h
+```{doxygenfile} io/include/nexus/io/spi_dma_transaction.h
 :project: nexus
 ```
 
@@ -420,7 +509,15 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## spi_transaction.h
 
-```{doxygenfile} spi_transaction.h
+```{doxygenfile} io/include/nexus/io/spi_transaction.h
+:project: nexus
+```
+
+(spi__frames_8h)=
+
+## spi_frames.h
+
+```{doxygenfile} io/include/nexus/io/spi_frames.h
 :project: nexus
 ```
 
@@ -428,7 +525,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## stream.h
 
-```{doxygenfile} stream.h
+```{doxygenfile} io/include/nexus/io/stream.h
 :project: nexus
 ```
 
@@ -436,7 +533,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## stream_budget.h
 
-```{doxygenfile} stream_budget.h
+```{doxygenfile} io/include/nexus/io/stream_budget.h
 :project: nexus
 ```
 
@@ -444,7 +541,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## stream_profile.h
 
-```{doxygenfile} stream_profile.h
+```{doxygenfile} io/include/nexus/io/stream_profile.h
 :project: nexus
 ```
 
@@ -452,7 +549,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## timer.h
 
-```{doxygenfile} timer.h
+```{doxygenfile} io/include/nexus/io/timer.h
 :project: nexus
 ```
 
@@ -460,7 +557,23 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## timer_capture.h
 
-```{doxygenfile} timer_capture.h
+```{doxygenfile} io/include/nexus/io/timer_capture.h
+:project: nexus
+```
+
+(timer__pulse_8h)=
+
+## timer_pulse.h
+
+```{doxygenfile} io/include/nexus/io/timer_pulse.h
+:project: nexus
+```
+
+(timer__sequence_8h)=
+
+## timer_sequence.h
+
+```{doxygenfile} io/include/nexus/io/timer_sequence.h
 :project: nexus
 ```
 
@@ -468,7 +581,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## uart.h
 
-```{doxygenfile} uart.h
+```{doxygenfile} io/include/nexus/io/uart.h
 :project: nexus
 ```
 
@@ -476,7 +589,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## uart_format.h
 
-```{doxygenfile} uart_format.h
+```{doxygenfile} io/include/nexus/io/uart_format.h
 :project: nexus
 ```
 
@@ -484,7 +597,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## uart_rs485.h
 
-```{doxygenfile} uart_rs485.h
+```{doxygenfile} io/include/nexus/io/uart_rs485.h
 :project: nexus
 ```
 
@@ -492,7 +605,15 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## uart_word.h
 
-```{doxygenfile} uart_word.h
+```{doxygenfile} io/include/nexus/io/uart_word.h
+:project: nexus
+```
+
+(uart__wire_8h)=
+
+## uart_wire.h
+
+```{doxygenfile} io/include/nexus/io/uart_wire.h
 :project: nexus
 ```
 
@@ -500,7 +621,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## usb_activation.h
 
-```{doxygenfile} usb_activation.h
+```{doxygenfile} io/include/nexus/io/usb_activation.h
 :project: nexus
 ```
 
@@ -508,7 +629,23 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## usb_device.h
 
-```{doxygenfile} usb_device.h
+```{doxygenfile} io/include/nexus/io/usb_device.h
+:project: nexus
+```
+
+(usb__host_8h)=
+
+## usb_host.h
+
+```{doxygenfile} io/include/nexus/io/usb_host.h
+:project: nexus
+```
+
+(usb__otg_8h)=
+
+## usb_otg.h
+
+```{doxygenfile} io/include/nexus/io/usb_otg.h
 :project: nexus
 ```
 
@@ -516,7 +653,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## usb_profile.h
 
-```{doxygenfile} usb_profile.h
+```{doxygenfile} io/include/nexus/io/usb_profile.h
 :project: nexus
 ```
 
@@ -524,7 +661,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## wake.h
 
-```{doxygenfile} wake.h
+```{doxygenfile} io/include/nexus/io/wake.h
 :project: nexus
 ```
 
@@ -532,7 +669,7 @@ clock and shutdown prerequisites. Other retained SDKs do not grant an entropy pr
 
 ## watchdog.h
 
-```{doxygenfile} watchdog.h
+```{doxygenfile} io/include/nexus/io/watchdog.h
 :project: nexus
 ```
 

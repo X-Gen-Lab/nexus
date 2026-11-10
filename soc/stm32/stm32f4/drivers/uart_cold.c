@@ -15,8 +15,8 @@
 #define NX_PLATFORM_PRIORITY_WRITE(reg, value) ((reg) = (uint8_t)(value))
 #endif
 
-#define NX_UART_COLD_VECTORS 4U
-#define NX_UART_COLD_OWNED   8U
+#define NX_UART_COLD_VECTORS 64U
+#define NX_UART_COLD_OWNED   128U
 
 /** \brief Match one reviewed controller without authorizing an inferred bank.
  */
@@ -38,6 +38,91 @@ bool nx_stm32_uart_cold_context(void) {
            !nx_arch_irq_is_masked();
 }
 
+/** \brief Default UARTs keep their original two-pad resource contract. */
+static size_t pin_count(const nx_stm32_uart_cold_config_t* config) {
+    return config->wire == NULL ? 2U : config->pin_count;
+}
+
+/** \brief RTS is the final optional modem pad in the reviewed ordered tuple.
+ */
+static bool rts_pin(const nx_stm32_uart_cold_config_t* config, size_t index) {
+    return config->wire != NULL &&
+           config->wire->mode == NX_UART_WIRE_ASYNCHRONOUS &&
+           (config->wire->flow == NX_UART_FLOW_RTS ||
+            config->wire->flow == NX_UART_FLOW_RTS_CTS) &&
+           index + 1U == pin_count(config);
+}
+
+/** \brief Independent DS8626 Table 9 clock and modem AF pad facts. */
+static bool wire_pad(const nx_stm32_uart_cold_config_t* config, size_t index,
+                     GPIO_TypeDef** gpio, uint8_t* pad) {
+    const nx_stm32_uart_hardware_t* selected = hardware(config);
+    bool smartcard =
+        config->wire != NULL && config->wire->mode == NX_UART_WIRE_SMARTCARD;
+    bool synchronous =
+        config->wire != NULL && config->wire->mode == NX_UART_WIRE_SYNCHRONOUS;
+    if (index == 0U) {
+        *gpio = selected->tx_gpio;
+        *pad = selected->tx_pin;
+        return true;
+    }
+    if (index == 1U && !smartcard) {
+        *gpio = selected->rx_gpio;
+        *pad = selected->rx_pin;
+        return true;
+    }
+    if (index == 1U + (smartcard ? 0U : 1U) && (smartcard || synchronous)) {
+        switch (selected->irq) {
+            case USART1_IRQn:
+                *gpio = GPIOA;
+                *pad = 8U;
+                return true;
+            case USART2_IRQn:
+                *gpio = GPIOA;
+                *pad = 4U;
+                return true;
+            case USART3_IRQn:
+                *gpio = GPIOB;
+                *pad = 12U;
+                return true;
+            case USART6_IRQn:
+                *gpio = GPIOC;
+                *pad = 8U;
+                return true;
+            default:
+                return false;
+        }
+    }
+    if (config->wire == NULL || config->wire->mode != NX_UART_WIRE_ASYNCHRONOUS)
+        return false;
+    bool cts = index == 2U && (config->wire->flow == NX_UART_FLOW_CTS ||
+                               config->wire->flow == NX_UART_FLOW_RTS_CTS);
+    bool rts = (index == 2U && config->wire->flow == NX_UART_FLOW_RTS) ||
+               (index == 3U && config->wire->flow == NX_UART_FLOW_RTS_CTS);
+    if (!cts && !rts)
+        return false;
+    switch (selected->irq) {
+        case USART1_IRQn:
+            *gpio = GPIOA;
+            *pad = (uint8_t)(cts ? 11U : 12U);
+            return true;
+        case USART2_IRQn:
+            *gpio = GPIOA;
+            *pad = (uint8_t)(cts ? 0U : 1U);
+            return true;
+        case USART3_IRQn:
+            *gpio = GPIOB;
+            *pad = (uint8_t)(cts ? 13U : 14U);
+            return true;
+        case USART6_IRQn:
+            *gpio = GPIOG;
+            *pad = (uint8_t)(cts ? 13U : 8U);
+            return true;
+        default:
+            return false;
+    }
+}
+
 static bool config_valid(const nx_stm32_uart_cold_config_t* config) {
     const nx_stm32_uart_hardware_t* selected = hardware(config);
     if (config == NULL || config->pins == NULL || config->vectors == NULL ||
@@ -47,18 +132,44 @@ static bool config_valid(const nx_stm32_uart_cold_config_t* config) {
     if (config->clock_hz != selected->clock_hz ||
         config->vectors[0] != selected->irq)
         return false;
-    for (size_t i = 0U; i < 2U; ++i) {
-        const nx_stm32_platform_pin_config_t* pin = &config->pins[i];
-        if (pin->registers !=
-                (i == 0U ? selected->tx_gpio : selected->rx_gpio) ||
-            pin->port_index !=
-                (i == 0U ? selected->tx_port : selected->rx_port) ||
-            pin->snapshot == NULL ||
-            pin->pin != (i == 0U ? selected->tx_pin : selected->rx_pin))
-            return false;
+    size_t count = pin_count(config);
+    size_t expected = 2U;
+    if (config->wire != NULL) {
+        nx_uart_wire_mode_t mode = config->wire->mode;
+        expected = mode == NX_UART_WIRE_HALF_DUPLEX   ? 1U
+                   : mode == NX_UART_WIRE_SYNCHRONOUS ? 3U
+                                                      : 2U;
+        if (mode == NX_UART_WIRE_ASYNCHRONOUS) {
+            if (config->wire->flow == NX_UART_FLOW_RTS_CTS)
+                expected += 2U;
+            else if (config->wire->flow != NX_UART_FLOW_NONE)
+                ++expected;
+        }
     }
-    if (config->pins[0].snapshot == config->pins[1].snapshot)
+    if (count != expected || count > 4U)
         return false;
+    for (size_t i = 0U; i < count; ++i) {
+        const nx_stm32_platform_pin_config_t* pin = &config->pins[i];
+        GPIO_TypeDef* expected_gpio = NULL;
+        uint8_t expected_pad = 0U;
+        if (!wire_pad(config, i, &expected_gpio, &expected_pad))
+            return false;
+        /* GPIO identity may be explicitly redirected by a CPU/MMIO model.
+         * Bank ownership is a silicon fact, never pointer subtraction. */
+        uint8_t expected_port = expected_gpio == GPIOA   ? 0U
+                                : expected_gpio == GPIOB ? 1U
+                                : expected_gpio == GPIOC ? 2U
+                                : expected_gpio == GPIOD ? 3U
+                                : expected_gpio == GPIOG ? 6U
+                                                         : UINT8_MAX;
+        if (pin->registers != expected_gpio || pin->snapshot == NULL ||
+            pin->port_index != expected_port || pin->pin != expected_pad)
+            return false;
+        for (size_t prior = 0U; prior < i; ++prior) {
+            if (pin->snapshot == config->pins[prior].snapshot)
+                return false;
+        }
+    }
     for (size_t i = 0U; i < config->vector_count; ++i) {
         IRQn_Type irq = config->vectors[i];
         if (irq != config->vectors[0] && irq != selected->transmit.irq &&
@@ -129,8 +240,9 @@ nx_stm32_uart_cold_acquire(const nx_stm32_uart_cold_config_t* config,
         return NX_ERROR_BUSY;
     /* Both pads may occupy different banks. The enclosing Platform owns their
      * gates; no UART may silently acquire an unrelated GPIO or release one. */
-    uint32_t gpio_gates =
-        (1U << config->pins[0].port_index) | (1U << config->pins[1].port_index);
+    uint32_t gpio_gates = 0U;
+    for (size_t i = 0U; i < pin_count(config); ++i)
+        gpio_gates |= 1U << config->pins[i].port_index;
     if ((RCC->AHB1ENR & gpio_gates) != gpio_gates)
         return NX_ERROR_STATE;
     for (size_t i = 0U; i < config->vector_count; ++i) {
@@ -156,24 +268,40 @@ nx_stm32_uart_cold_acquire(const nx_stm32_uart_cold_config_t* config,
     for (size_t i = 0U; i < config->vector_count; ++i)
         receipt->priorities[i] = NVIC->IPR[(uint32_t)config->vectors[i]];
     receipt->effects |= NX_UART_COLD_VECTORS;
-    for (size_t i = 0U; i < 2U; ++i) {
+    for (size_t i = 0U; i < pin_count(config); ++i) {
         const nx_stm32_platform_pin_config_t* pin = &config->pins[i];
         nx_result_t result = nx_stm32_gpio_clock_enable(pin->port_index);
         if (result != NX_SUCCESS)
             return result;
         *pin->snapshot = nx_stm32_pin_capture(pin->registers, pin->pin);
         receipt->effects |= (uint8_t)(1U << i);
-        if (i == 0U && config->preload_tx) {
+        bool open_drain = i == 0U && config->wire != NULL &&
+                          (config->wire->mode == NX_UART_WIRE_HALF_DUPLEX ||
+                           config->wire->mode == NX_UART_WIRE_SMARTCARD);
+        bool rts = rts_pin(config, i);
+        if ((i == 0U && (config->preload_tx || open_drain)) || rts) {
             NX_PLATFORM_REGISTER_WRITE(pin->registers->BSRR, 1U << pin->pin);
             nx_arch_dsb();
             if ((pin->registers->ODR & (1U << pin->pin)) == 0U)
                 return NX_ERROR_IO;
         }
-        result = nx_stm32_pin_configure(pin->registers, pin->pin, 2U,
-                                        hardware(config)->alternate,
-                                        (uint8_t)(i == 0U ? 0U : 1U), false);
+        /* ES0182 2.11.9: keep RTS inactive until both UE and RE exist. */
+        uint8_t mode = rts ? 1U : 2U;
+        uint8_t pull = (uint8_t)(i == 0U || rts ? 0U : 1U);
+        result = nx_stm32_pin_configure(pin->registers, pin->pin, mode,
+                                        hardware(config)->alternate, pull,
+                                        open_drain);
         if (result != NX_SUCCESS)
             return result;
+        nx_arch_dsb();
+        uint32_t shift = (uint32_t)pin->pin * 2U;
+        if (((pin->registers->MODER >> shift) & 3U) != mode ||
+            ((pin->registers->OTYPER >> pin->pin) & 1U) !=
+                (open_drain ? 1U : 0U) ||
+            ((pin->registers->PUPDR >> shift) & 3U) != pull ||
+            ((pin->registers->AFR[pin->pin / 8U] >> ((pin->pin % 8U) * 4U)) &
+             15U) != hardware(config)->alternate)
+            return NX_ERROR_IO;
     }
     return NX_SUCCESS;
 }
@@ -242,6 +370,21 @@ nx_stm32_uart_cold_verify(const nx_stm32_uart_cold_config_t* config,
     if ((*gate_register(config) & gate(config)) == 0U ||
         (config->registers->CR1 & USART_CR1_UE) == 0U)
         return NX_ERROR_IO;
+    size_t last = pin_count(config) - 1U;
+    if (rts_pin(config, last)) {
+        if ((config->registers->CR1 & (USART_CR1_UE | USART_CR1_RE)) !=
+            (USART_CR1_UE | USART_CR1_RE))
+            return NX_ERROR_IO;
+        const nx_stm32_platform_pin_config_t* pin = &config->pins[last];
+        nx_result_t result =
+            nx_stm32_pin_configure(pin->registers, pin->pin, 2U,
+                                   hardware(config)->alternate, 0U, false);
+        if (result != NX_SUCCESS)
+            return result;
+        nx_arch_dsb();
+        if (((pin->registers->MODER >> ((uint32_t)pin->pin * 2U)) & 3U) != 2U)
+            return NX_ERROR_IO;
+    }
     for (size_t i = 0U; i < config->vector_count; ++i) {
         IRQn_Type irq = config->vectors[i];
         uint32_t index = (uint32_t)irq;
@@ -282,7 +425,7 @@ nx_stm32_uart_cold_release(const nx_stm32_uart_cold_config_t* config,
         }
         receipt->effects &= (uint8_t)~NX_UART_COLD_VECTORS;
     }
-    for (size_t i = 0U; i < 2U; ++i) {
+    for (size_t i = 0U; i < pin_count(config); ++i) {
         if ((receipt->effects & (1U << i)) == 0U)
             continue;
         const nx_stm32_platform_pin_config_t* pin = &config->pins[i];
@@ -296,7 +439,7 @@ nx_stm32_uart_cold_release(const nx_stm32_uart_cold_config_t* config,
                 return NX_ERROR_IO;
         }
     }
-    for (size_t i = 2U; i != 0U; --i) {
+    for (size_t i = pin_count(config); i != 0U; --i) {
         uint8_t bit = (uint8_t)(1U << (i - 1U));
         if ((receipt->effects & bit) == 0U)
             continue;

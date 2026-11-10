@@ -1,9 +1,18 @@
-# 显式时钟借用与浅睡眠
+---
+id: design.clock_domain_sleep
+type: explanation
+audience: maintainer
+source_language: zh_CN
+---
 
-IO58 当前交付是静态 caller-owned 时钟接纳、排空屏障，以及 STM32F407
-固定 RUN 配置下的一次浅睡眠。组件不创建全局 PM 注册表、任务、定时器、最大对象池或
-默认状态。未显式选用的 `Nexus::ClockDomain` 是 `EXCLUDE_FROM_ALL` 静态目标；F4 的 sleep
-源也须由显式可选目标引用。板卡不自动选 GPIO 唤醒或改变电气连接。
+# 显式时钟借用与睡眠边界
+
+ClockDomain 提供 caller-owned 时钟借用与排空屏障；F407 的浅 Sleep 与深 STOP
+通过不同的显式硬件入口使用屏障。组件不建立全局 PM 注册表、任务、定时器、最大
+对象池或默认状态。未选的 `Nexus::ClockDomain` 和 SoC 电源目标保持按需选编。
+Board 不自动选择唤醒接线。借用结束条件见
+[请求生命周期图](../assets/diagrams/request-lifecycle.svg)，整平台协调见
+[系统架构](../delivery/architecture.md)。图中的借用终止不是时钟域转换凭证。
 
 公共 API 使用 opaque `nx_clock_domain_t`，mutable storage / constructor 只供私有
 装配。消费者提供自然对齐、零初始化的 `nx_clock_lease_t`。接纳成功后，token 的对象
@@ -24,31 +33,33 @@ SMP、signal 或其他安全域调用不在合同内。输出和 wake word 不�
 retained token 或彼此；拒绝不能破坏已借用控制。没有回调或 token release 后的访问。
 
 SoC sleep 在 incoming PRIMASK/BASEPRI/FAULTMASK 全清的 privileged Thread 调用。
-同一个保存掩码下最终验证 closed barrier、真实寄存器固定配置和 wake sequence，再
+同一个保存掩码下最终验证 closed barrier、所选静态 ClockPlan 的真实寄存器配置和 wake sequence，再
 进入既有生产 `nx_arch_wait_for_interrupt`。WFI 保持 PRIMASK，已使能 IRQ 变为 pending
 可以唤醒，恢复掩码后运行；返回后 owner 必须重检真实业务谓词。序列变化则成功返回
-`slept=false`。SCR.SLEEPDEEP 已设置、STOP、动态 RUN 均明确拒绝；从不改写 SCR、
+`slept=false`。浅 Sleep 入口拒绝已设置的 SCR.SLEEPDEEP、深 STOP 和动态 RUN；它不改写 SCR、
 RCC、Flash、Tick、pending IRQ 或 deadline。32-bit wake sequence 需要调用者证明
 观察窗口内不会完整绕回；不声称用一个快照解决 DMA/NMI/SMP 发布或无界 ABA。
 
-当前 F407 profile 为 nominal HSE8 MHz / M8 / N336 / P2 / Q7，SYSCLK/AHB168、
-APB1 42、APB2 84 MHz，Flash5WS，SSCG disabled。来源是锁定 F4 SDK 的 RCC 定义与
-当前 system.c 固定启动值。晶振实际频率、供电、热漂移和板卡布局不能由 ready/divisor
-读回测得，仍需物理验证。
+F407 的默认 profile 为 HSE8／PLL168、APB1 42 MHz、APB2 84 MHz 与 Flash5WS。
+静态 custom／直接输入使用同一 ClockPlan 的实际常量和只读 RCC 检查，不从默认
+数字推导可用性；晶振频率、供电和温漂也不能由 ready/divisor 读回测得。
 
-owner 必须独占 RCC 决策，登记全部相关消费者，并提供实际 enabled wake IRQ；模块不
-发现遗漏消费者或隐式暂停内核。实际 deep STOP / PLL 改频扩展必须先排空，停止全部
-Tick/time providers、scheduler deadline borrowers 与 IRQ，再由独占硬件端口实施有限
-clock restore / rollback；clock/time 的新域需 cold 重建，旧绝对 deadline 不可继承。
-本切片没有实现这些扩展，不把 admission epoch 伪装成时间域转换。
+深 STOP 使用 `nx_stm32f407_power_enter`，调用者先完整暂停 Platform、排空自己的
+ClockDomain 和 OS 时间借用，再显式提供已接纳的唤醒集合。恢复建立新的 Core epoch，
+不能复用旧绝对 deadline；可选独立 RTC elapsed envelope 与 OS 时间恢复分别证明。
+Standby 的复位、存储丢失及 RTC wake 握手由同一 RTC／电源 owner 协作承担。
+完整前提、失败保留与已维护范围以 [F407 System 合同](f407-system-power.md)为准。
+ClockDomain 自身不发现遗漏消费者，不暂停调度器、不计算跨 STOP 时间，也不替代
+实际硬件关停与唤醒序列。当前不提供运行期 DVFS。
 
 当前测试直接执行生产 domain、Native 排他和 F4 sleep C 实现，只替换 CPU context／
 WFI 外部叶子。历史跨系列 RED／GREEN 与测量记录保留原始身份，见
 [固定旧源码](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design/clock-domain-sleep.md)。
 本次软件结果须由当前门禁重新建立；主机模型不建立 physical HIL、WCET 或功耗资格。
 
-## 当前范围
+## 资格边界
 
-F4 只接纳当前明确维护的固定时钟和浅睡眠选择。原 H743 pause/resume 不属于
-本轮生产 provider；ClockDomain 公共屏障不自动赋予 F4 DVFS、深 STOP 或运行期
-外设恢复。历史实现按固定旧源码读取，当前模式以支持目录为准。
+公共屏障、浅 Sleep、深 STOP 和所选自主唤醒分别取得证据；通用组件存在不能替代
+精确 SoC 集成。旧 H743 pause/resume 不属于当前 F4 provider。主机模型只证明实际
+执行的软件合同，ARM 链接只证明 ABI、所选闭包和静态预算。功耗、唤醒边沿、IRQ
+延迟和物理保留仍需独立 HIL，当前为 `not_executed`。

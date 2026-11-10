@@ -5,6 +5,7 @@
  */
 #ifndef NX_STM32F407_USB_COLD_H
 #define NX_STM32F407_USB_COLD_H
+#include "stm32f407_clock.h"
 #include "stm32f407_packet_cold.h"
 #include "stm32f407_usb_device.h"
 #include <string.h>
@@ -54,6 +55,8 @@ nx_stm32_usb_cold_prepare(nx_usb_controller_t* port,
         config->capacity == 0U || config->poll_limit == 0U ||
         config->clock_timeout_us == 0U || config->drain_timeout_us == 0U ||
         config->priority > 15U || !nx_stm32_packet_pins_valid(config->pins, 2U))
+        return NX_ERROR_INVALID;
+    if (nx_usb_turnaround(NX_USB_CORE_FS, NEXUS_CORE_HZ) == 0U)
         return NX_ERROR_INVALID;
     if (port->snapshot.epoch == UINT64_MAX)
         return NX_ERROR_INVALID;

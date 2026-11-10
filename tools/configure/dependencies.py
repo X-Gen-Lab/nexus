@@ -6,12 +6,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 COMMON = (
-    "__init__", "bundle", "dependencies", "contracts", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "records", "i2s2",
+    "__init__", "bundle", "dependencies", "contracts", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "records",
     "threadx", "lowpower", "providers/__init__", "providers/common",
     "providers/descriptor", "calls",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",
     "selected_contracts", "integration_package",
     "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles",
+    "usb_host", "usb_otg",
 )
 PLATFORM = (
     "configure", "selection", "onboarding", "authored", "bindings", "emission", "experience", "can", "memory",
@@ -20,6 +21,7 @@ PLATFORM = (
     "i2c_timing", "i2c_timing_selection", "pin_states", "runtime_power",
     "adc", "dac", "exti", "board_hardware", "gpio_electrical", "rtc",
     "providers/hardware",
+    "i2c_target", "spi_frames", "uart_wires",
 )
 
 
@@ -29,6 +31,7 @@ SDK = (
     "tools/maintenance/freertos_transport.py",
     "tools/maintenance/stm32f1_hal_lock.py",
     "tools/maintenance/stm32f4_hal_lock.py",
+    "tools/maintenance/st_usb_lock.py",
     "tools/maintenance/stm32g4_lock.py", "tools/maintenance/threadx_lock.py",
     "scripts/ci/vendor_import_identity.py", "scripts/ci/verify_vendor_source.py",
 )

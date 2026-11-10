@@ -200,7 +200,7 @@ def resolve(nodes, edges, *, startup=(), loops=()):
                          tuple(startup_order), tuple(declarations))
 
 
-def resolve_fixed(selected, *, adc_triggers=None):
+def resolve_fixed(selected, *, adc_triggers=None, adc_injected_triggers=None):
     """Project only existing reviewed timer-triggered ADC modes.
 
 No additional selector is invented. Their providers already validate the exact
@@ -217,20 +217,27 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
                           "events": ["sample-ready"],
                           "actions": ["sample", "stop"],
                           "stop_actions": ["stop"]})
-            if item["trigger"] == "tim6-trgo":
+            if item["trigger"] != "software":
+                routes = (adc_injected_triggers if item["mode"] == "injected-sequence"
+                          else adc_triggers)
+                if routes is None or item["trigger"] not in routes:
+                    fail("ADC group trigger lacks an exact selected event")
+                timer = routes[item["trigger"]]
+                signal = item["trigger"].split("-", 1)[1]
+                event = "update" if signal == "trgo" else "compare" + signal[2:]
                 nodes.append({"id": trigger, "owner": owner,
-                              "clock_domain": "controller:TIM6",
-                              "events": ["update"], "actions": ["stop"],
+                              "clock_domain": "controller:" + timer,
+                              "events": [event], "actions": ["stop"],
                               "stop_actions": ["stop"]})
-                edges.append({"source": trigger, "event": "update",
+                edges.append({"source": trigger, "event": event,
                               "target": adc, "action": "sample",
-                              "route": "TIM6:TRGO:ADC1:" + item["mode"],
+                              "route": timer + ":" + event + ":ADC1:" + item["mode"],
                               "cross_domain": True})
                 startup.append((adc, trigger))
             if item["mode"] == "regular-sequence-dma":
                 dma = owner + ":dma"
                 nodes.append({"id": dma, "owner": owner,
-                              "clock_domain": "engine:DMA1",
+                              "clock_domain": "engine:" + item["dma"][0].split(":")[0],
                               "events": ["block-ready"],
                               "actions": ["transfer", "stop"],
                               "stop_actions": ["stop"]})

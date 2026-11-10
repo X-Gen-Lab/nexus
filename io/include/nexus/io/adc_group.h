@@ -35,13 +35,17 @@ typedef struct {
     const uint16_t* sample_halfcycles; /**< Sampling-code lookup, immutable. */
     size_t sample_code_count;
     uint32_t adc_clock_hz;
-    uint32_t physical_scan_halfcycles; /**< Includes all discarded ranks. */
+    /** \brief Complete scan cost; zero for an unknown interleaved span. */
+    uint32_t physical_scan_halfcycles;
     uint32_t timer_period_us; /**< Zero for software; not an aperture. */
     size_t max_frames;
     uint16_t physical_ranks;
     bool active;
     bool fault;
     bool quarantined;
+    const uint8_t* converters; /**< Converter ID per logical result, or NULL. */
+    uint8_t interleave_delay_cycles; /**< Selected minimum spacing. */
+    uint8_t buffer_alignment;        /**< DMA access can exceed one sample. */
 } nx_adc_group_info_t;
 /** \brief Shared read-only selected methods; ordinary ADC tables do not grow.
  * \note A privileged task serializes every call. IRQs only record bounded
@@ -108,11 +112,13 @@ nx_result_t nx_adc_group_cancel(const nx_adc_group_port_t* port,
  *       still reference it. QUARANTINED requests remain owned and retryable.
  */
 nx_result_t nx_adc_group_service(const nx_adc_group_port_t* port);
-/** \brief Close admission and prove request source drain before reporting idle.
+/** \brief Stop the current request, prove drain and clear a recoverable fault.
  * \param[in] port: Same stable selected face and serialized privileged task.
  * \return SUCCESS only after final request detach; BUSY/IO keeps all leases.
  * \note Stop is not cold close: pads, common clock, internal-source enables
  *       and provider storage remain retained until platform joined close.
+ *       A fully stopped face can accept another request with the same static
+ *       selection. A pending platform close keeps admission sealed.
  */
 nx_result_t nx_adc_group_stop(const nx_adc_group_port_t* port);
 /** \brief Copy actual selected facts and current retained owner state.

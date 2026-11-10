@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "stm32-ve-hs-fs-dma-otg-software-contract",
+  "soc": "STM32F407VET6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-only-managed-HS-internal-FS-PB14-PB15-with-explicit-power-GPIO-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "usbfs",
+      "controller": "OTG_HS",
+      "route": "usbhs-device-pb14-pb15"
+    },
+    {
+      "id": "source",
+      "controller": "GPIOE",
+      "route": "gpio-pe3",
+      "mask": 8,
+      "initial": 0
+    },
+    {
+      "id": "present",
+      "controller": "GPIOE",
+      "route": "gpio-pe4",
+      "mask": 16,
+      "initial": 0
+    },
+    {
+      "id": "oc",
+      "controller": "GPIOA",
+      "route": "gpio-pa0",
+      "mask": 1,
+      "initial": 0
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only pad contract; connector, electrical device role, VBUS/power wiring and crystal tolerance are not measured.",
+    "VBUS sensing false is explicit software policy, not a claim of a reviewed self-powered board.",
+    "No physical USB waveform, enumeration or attach/detach qualification was executed.",
+    "Power GPIO links are software signals, not reviewed PCB wiring."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "RM0090 OTG FS/HS role and PHY pad software contract; power GPIO links have no measured PCB identity."
+    }
+  ]
+}

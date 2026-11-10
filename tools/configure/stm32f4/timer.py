@@ -33,7 +33,7 @@ def constructor(item, result):
              f"    .priority = {options.irq.priority}u,",
              f"    .kernel = {str(result.kernel is not None).lower()},",
              "    .timer = {",
-             f"        .timer_hz = {facts.clock_hz}u,",
+             f"        .timer_hz = {item.integration.clock_hz}u,",
              f"        .channel = {route.channel}u,",
              f"        .tick_hz = {options.tick_hz}u, .exclusive = true,"]
     if capture:

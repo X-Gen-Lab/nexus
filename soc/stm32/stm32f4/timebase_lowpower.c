@@ -9,6 +9,7 @@
 #include "timebase_lowpower.h"
 #include "FreeRTOS.h"
 #include "nexus/core/time.h"
+#include "stm32f407_clock.h"
 #include "stm32f407_lowpower.h"
 #include "stm32f407_system.h"
 
@@ -52,33 +53,20 @@ static const nx_freertos_lowpower_port_t s_port = {
 /** \brief Actual source, PLL, bus mux/divisors and established Flash latency.
  */
 static bool fixed_run(void) {
-    const uint32_t pll_mask =
-        (uint32_t)(RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP |
-                   RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLQ);
-    const uint32_t pll =
-        8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U);
-    const uint32_t ready =
-        RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
-    const uint32_t bus_mask =
-        (uint32_t)(RCC_CFGR_SW | RCC_CFGR_SWS | RCC_CFGR_HPRE | RCC_CFGR_PPRE1 |
-                   RCC_CFGR_PPRE2);
-    const uint32_t bus = RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL |
-                         RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
-    return (RCC->CR & ready) == ready && (RCC->PLLCFGR & pll_mask) == pll &&
-           (RCC->CFGR & bus_mask) == bus &&
-           (FLASH->ACR & FLASH_ACR_LATENCY) == FLASH_ACR_LATENCY_5WS &&
-           (RCC->SSCGR & RCC_SSCGR_SSCGEN) == 0U;
+    return nx_stm32_clock_profile_matches(RCC, FLASH);
 }
 
 /** \brief Inspect the established exclusive profile without repairing it. */
 const nx_freertos_lowpower_port_t* nx_freertos_lowpower_port(void) {
     uint32_t irq = (uint32_t)TIM2_IRQn;
-    if (!fixed_run() || configCPU_CLOCK_HZ != 168000000u ||
-        !g_nx_stm32_system.started || g_nx_stm32_system.core_hz != 168000000u ||
+    if (!fixed_run() || configCPU_CLOCK_HZ != NEXUS_CORE_HZ ||
+        !g_nx_stm32_system.started ||
+        g_nx_stm32_system.core_hz != NEXUS_CORE_HZ ||
         g_nx_stm32_system.timer != TIM2 ||
         (RCC->APB1ENR & RCC_APB1ENR_TIM2EN) == 0u ||
         (RCC->APB1LPENR & RCC_APB1LPENR_TIM2LPEN) == 0u ||
-        TIM2->CR1 != TIM_CR1_CEN || TIM2->SMCR != 0u || TIM2->PSC != 83u ||
+        TIM2->CR1 != TIM_CR1_CEN || TIM2->SMCR != 0u ||
+        TIM2->PSC != NEXUS_APB1_TIMER_HZ / 1000000U - 1U ||
         TIM2->ARR != UINT32_MAX || (TIM2->DIER & TIM_DIER_UIE) == 0u ||
         TIM2->CCMR1 != 0u || TIM2->CCER != 0u ||
         (NVIC->ISER[irq / 32u] & (UINT32_C(1) << (irq % 32u))) == 0u) {
@@ -89,7 +77,7 @@ const nx_freertos_lowpower_port_t* nx_freertos_lowpower_port(void) {
 
 /** \brief Retain the continuous clock for every outstanding tick/alarm loan. */
 bool nx_stm32_lowpower_busy(void) {
-    return s_context.paused || s_context.armed;
+    return s_context.paused || s_context.armed || s_context.first_short;
 }
 
 /** \brief Own only compare acknowledgement; the overflow owner runs first. */

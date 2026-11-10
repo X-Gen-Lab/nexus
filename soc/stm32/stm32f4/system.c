@@ -9,6 +9,7 @@
 #include "nexus/core/fault.h"
 #include "nexus/core/time.h"
 #include "nexus_config.h"
+#include "stm32f407_clock.h"
 #include "stm32f407_system.h"
 #if defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM
 #include "memory_init.h"
@@ -27,6 +28,21 @@ nx_stm32_system_t g_nx_stm32_system = {
 #endif
 
 extern nx_stm32_system_t g_nx_stm32_system;
+
+#ifndef NX_STM32_BOOT_CPACR
+#ifdef NEXUS_STM32_MODEL
+#define NX_STM32_BOOT_CPACR  UINT32_C(0x00f00000)
+#define NX_STM32_BOOT_MPU    0U
+#define NX_STM32_BOOT_VTOR   UINT32_C(0x08000000)
+#define NX_STM32_BOOT_VECTOR UINT32_C(0x08000000)
+#else
+extern const uint32_t g_pfnVectors[];
+#define NX_STM32_BOOT_CPACR  SCB->CPACR
+#define NX_STM32_BOOT_MPU    MPU->CTRL
+#define NX_STM32_BOOT_VTOR   SCB->VTOR
+#define NX_STM32_BOOT_VECTOR ((uintptr_t)g_pfnVectors)
+#endif
+#endif
 
 /* CMSIS/HAL readers share the last confirmed fixed HCLK observation. Startup
  * initializes DATA after SystemInit, so this reset value needs no early RAM. */
@@ -73,13 +89,11 @@ void TIM2_IRQHandler(void) {
 #define NX_STM32_EFFECT_TIMER       2U
 #define NX_STM32_EFFECT_TIMER_GATE  4U
 #define NX_STM32_EFFECT_TIMER_QUIET 8U
-#if defined(NEXUS_F407_I2S2_SLAVE_TX_SELECTED) &&                              \
-    NEXUS_F407_I2S2_SLAVE_TX_SELECTED
-#define NX_STM32_EFFECT_GPIOB_GATE 16U
-#define NX_STM32_EFFECT_DMA1_GATE  32U
-#endif
 #ifndef NX_STM32_WRITE
 #define NX_STM32_WRITE(reg, value) (*(reg) = (uint32_t)(value))
+#endif
+#ifndef NX_STM32_RNG_CONTROL
+#define NX_STM32_RNG_CONTROL RNG->CR
 #endif
 #ifndef NX_STM32_IRQ_AVAILABLE
 #ifdef NEXUS_STM32_MODEL
@@ -164,26 +178,30 @@ static bool timer_mode_idle(const TIM_TypeDef* timer) {
 }
 
 /** \brief Check cold ownership before any global clock or Flash change. */
-nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system) {
-    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
-        nx_arch_irq_is_masked()) {
-        return NX_ERROR_CONTEXT;
-    }
+static nx_result_t preflight_hardware(const nx_stm32_system_t* system) {
     if (system == NULL || system->rcc == NULL || system->flash == NULL ||
         system->power == NULL || system->timer == NULL) {
         return NX_ERROR_INVALID;
     }
+    if ((NX_STM32_BOOT_CPACR & UINT32_C(0x00f00000)) != UINT32_C(0x00f00000) ||
+        (NX_STM32_BOOT_MPU & MPU_CTRL_ENABLE_Msk) != 0U ||
+        NX_STM32_BOOT_VTOR != NX_STM32_BOOT_VECTOR ||
+        (NX_STM32_BOOT_VECTOR & 511U) != 0U)
+        return NX_ERROR_STATE;
     uint32_t clock = system->rcc->CR;
     uint32_t bus_mask = (uint32_t)(RCC_CFGR_SW | RCC_CFGR_SWS | RCC_CFGR_HPRE |
                                    RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2);
-    if (system->started || system->remaining_effects != 0U ||
+    if (system->started || system->time_epoch == UINT64_MAX ||
+        system->remaining_effects != 0U ||
         (clock & (RCC_CR_HSION | RCC_CR_HSIRDY)) !=
             (RCC_CR_HSION | RCC_CR_HSIRDY) ||
         /* The nominal HSI fallback requires the reset trim, not foreign tuning.
          */
         (clock & RCC_CR_HSITRIM) != (16U << RCC_CR_HSITRIM_Pos) ||
-        (clock & (RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON |
-                  RCC_CR_PLLRDY | RCC_CR_PLLI2SON | RCC_CR_PLLI2SRDY)) != 0U ||
+        (clock & (RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_HSEBYP | RCC_CR_CSSON |
+                  RCC_CR_PLLON | RCC_CR_PLLRDY | RCC_CR_PLLI2SON |
+                  RCC_CR_PLLI2SRDY)) != 0U ||
+        (system->rcc->CIR & (UINT32_C(0x7f00) | RCC_CIR_CSSF)) != 0U ||
         (system->rcc->CFGR & bus_mask) != 0U ||
         (system->rcc->SSCGR & RCC_SSCGR_SSCGEN) != 0U ||
         (system->rcc->APB1ENR & RCC_APB1ENR_TIM2EN) != 0U ||
@@ -196,7 +214,15 @@ nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system) {
     return NX_SUCCESS;
 }
 
-#if (defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM) ||                         \
+/** \brief Public cold admission also excludes every incoming IRQ mask. */
+nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    return preflight_hardware(system);
+}
+
+#if !defined(NEXUS_STM32_MODEL) ||                                             \
+    (defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM) ||                         \
     (defined(NEXUS_MEMORY_ADDSRAM) && NEXUS_MEMORY_ADDSRAM)
 #ifndef NX_STM32_BOOT_FAILURE
 /** \brief Fail before constructors without observing initialized global RAM. */
@@ -239,10 +265,11 @@ static int restore_hsi(nx_stm32_system_t* system, uint32_t limit) {
     }
     /* HPRE is one throughout the reviewed profile. Publish the confirmed HSI
      * switch even if a later PLL, prescaler or resource cleanup is refused. */
-    system->core_hz = 16000000U;
+    system->core_hz = 16000000U / NEXUS_CLOCK_AHB_DIV;
     SystemCoreClock = system->core_hz;
     NX_STM32_WRITE(&system->rcc->CR,
-                   system->rcc->CR & ~(uint32_t)(RCC_CR_PLLON | RCC_CR_HSEON));
+                   system->rcc->CR &
+                       ~(uint32_t)(RCC_CR_PLLON | RCC_CR_HSEON | RCC_CR_CSSON));
     if (!wait_bits(system, &system->rcc->CR, RCC_CR_PLLRDY | RCC_CR_HSERDY, 0U,
                    limit)) {
         return -1;
@@ -254,6 +281,8 @@ static int restore_hsi(nx_stm32_system_t* system, uint32_t limit) {
             RCC_CFGR_HPRE | RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2)) {
         return -1;
     }
+    system->core_hz = 16000000U;
+    SystemCoreClock = system->core_hz;
     if (!write_checked(&system->rcc->PLLCFGR, system->saved_pll, UINT32_MAX) ||
         !write_checked(&system->flash->ACR, system->saved_flash, UINT32_MAX)) {
         return -1;
@@ -276,6 +305,25 @@ static int restore_hsi(nx_stm32_system_t* system, uint32_t limit) {
 }
 
 /** \brief Initialize CPU registers without touching not-yet-initialized RAM. */
+bool nx_stm32_system_cpu_boot(SCB_Type* scb,
+                              volatile const uint32_t* mpu_control,
+                              uintptr_t vectors) {
+    if (scb == NULL || mpu_control == NULL ||
+        (*mpu_control & MPU_CTRL_ENABLE_Msk) != 0U ||
+        vectors < UINT32_C(0x08000000) || vectors >= UINT32_C(0x08100000) ||
+        (vectors & 511U) != 0U)
+        return false;
+    if (!write_checked(&scb->CPACR, scb->CPACR | UINT32_C(0x00f00000),
+                       UINT32_C(0x00f00000)))
+        return false;
+    nx_arch_isb();
+    if (!write_checked(&scb->VTOR, (uint32_t)vectors, UINT32_MAX))
+        return false;
+    nx_arch_isb();
+    return true;
+}
+
+/** \brief Initialize CPU registers without erasing inherited clock evidence. */
 void SystemInit(void) {
 #if defined(NEXUS_MEMORY_ADDSRAM) && NEXUS_MEMORY_ADDSRAM
     /* The complete Flash plan and incoming reset profile must be proved
@@ -285,18 +333,8 @@ void SystemInit(void) {
     }
 #endif
 #ifndef NEXUS_STM32_MODEL
-    SCB->CPACR |= (0xFU << 20U);
-    __DSB();
-    __ISB();
-    RCC->CR |= RCC_CR_HSION;
-    RCC->CFGR = 0U;
-    RCC->CR &= ~(uint32_t)(RCC_CR_HSEON | RCC_CR_CSSON | RCC_CR_PLLON);
-    RCC->PLLCFGR = 0x24003010U;
-    RCC->CIR = 0U;
-    extern const uint32_t g_pfnVectors[];
-    SCB->VTOR = (uint32_t)(uintptr_t)g_pfnVectors;
-    __DSB();
-    __ISB();
+    if (!nx_stm32_system_cpu_boot(SCB, &MPU->CTRL, (uintptr_t)g_pfnVectors))
+        NX_STM32_BOOT_FAILURE(4U);
     NVIC_SetPriorityGrouping(3U);
 #endif
 #if defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM
@@ -314,18 +352,55 @@ void SystemInit(void) {
 #endif
 }
 
+/** \brief A failed HSE has already invalidated every timer-derived deadline.
+ */
+void nx_stm32_system_css_irq(nx_stm32_system_t* system) {
+    (void)nx_arch_irq_save();
+    if (system != NULL) {
+        system->timer_error = NX_ERROR_IO;
+        system->started = false;
+        if (system->rcc != NULL) {
+            uint32_t enabled = system->rcc->CIR & UINT32_C(0x7f00);
+            NX_STM32_WRITE(&system->rcc->CIR, enabled | RCC_CIR_CSSC);
+            if ((system->rcc->CFGR & RCC_CFGR_SWS) == 0U) {
+                uint32_t hpre =
+                    (uint32_t)((system->rcc->CFGR & RCC_CFGR_HPRE) >> 4U);
+                system->core_hz = 16000000U >> AHBPrescTable[hpre];
+                SystemCoreClock = system->core_hz;
+            }
+        }
+        if (system->timer != NULL) {
+            NX_STM32_WRITE(&system->timer->DIER, 0U);
+            NX_STM32_WRITE(&system->timer->CR1, 0U);
+        }
+        nx_arch_dsb();
+    }
+    timer_park();
+}
+
+#if NEXUS_CLOCK_CSS
+void NMI_Handler(void);
+/** \brief Selected CSS owns NMI; unrelated unexpected NMI also fails stop. */
+void NMI_Handler(void) {
+    nx_stm32_system_css_irq(&g_nx_stm32_system);
+}
+#endif
+
 /** \brief Establish the one supported fixed clock profile and TIM2 source. */
-nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
-                                              uint32_t poll_limit) {
+static nx_stm32_start_result_t start_owned(nx_stm32_system_t* system,
+                                           uint32_t poll_limit) {
     nx_stm32_start_result_t result = {0, 0, 0U};
-    if (poll_limit == 0U || nx_stm32_system_preflight(system) != NX_SUCCESS) {
+    if (poll_limit == 0U || preflight_hardware(system) != NX_SUCCESS) {
         result.primary = -2;
         return result;
     }
     system->timer_error = NX_SUCCESS;
     system->core_hz = 16000000U;
     SystemCoreClock = system->core_hz;
-    system->reset_cause = system->rcc->CSR;
+    if (!system->reset_captured) {
+        system->reset_cause = system->rcc->CSR;
+        system->reset_captured = true;
+    }
     system->saved_pll = system->rcc->PLLCFGR;
     system->saved_flash = system->flash->ACR;
     system->owned_power_clock =
@@ -343,44 +418,54 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
     if (!write_checked(&system->power->CR, system->power->CR | PWR_CR_VOS,
                        PWR_CR_VOS) ||
         !write_checked(&system->flash->ACR,
-                       FLASH_ACR_LATENCY_5WS | FLASH_ACR_ICEN | FLASH_ACR_DCEN |
-                           FLASH_ACR_PRFTEN,
+                       NEXUS_FLASH_WAIT_STATES | FLASH_ACR_ICEN |
+                           FLASH_ACR_DCEN | FLASH_ACR_PRFTEN,
                        FLASH_ACR_LATENCY | FLASH_ACR_ICEN | FLASH_ACR_DCEN |
                            FLASH_ACR_PRFTEN)) {
         result.primary = -6;
         goto rollback;
     }
+#if NEXUS_CLOCK_SOURCE_HSE
     NX_STM32_WRITE(&system->rcc->CR, system->rcc->CR | RCC_CR_HSEON);
     if (!wait_bits(system, &system->rcc->CR, RCC_CR_HSERDY, RCC_CR_HSERDY,
                    poll_limit)) {
         result.primary = -3;
         goto rollback;
     }
-    if (!write_checked(&system->rcc->PLLCFGR,
-                       8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U),
+#endif
+    if (!write_checked(&system->rcc->PLLCFGR, NEXUS_CLOCK_PLLCFGR,
                        UINT32_MAX) ||
-        !write_checked(&system->rcc->CFGR,
-                       RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2,
+        !write_checked(&system->rcc->CFGR, NEXUS_CLOCK_CFGR,
                        RCC_CFGR_HPRE | RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2)) {
         result.primary = -6;
         goto rollback;
     }
+#if NEXUS_CLOCK_PLL_ENABLED
     NX_STM32_WRITE(&system->rcc->CR, system->rcc->CR | RCC_CR_PLLON);
     if (!wait_bits(system, &system->rcc->CR, RCC_CR_PLLRDY, RCC_CR_PLLRDY,
                    poll_limit)) {
         result.primary = -4;
         goto rollback;
     }
-    NX_STM32_WRITE(&system->rcc->CFGR, system->rcc->CFGR | RCC_CFGR_SW_PLL);
-    if (!wait_bits(system, &system->rcc->CFGR, RCC_CFGR_SWS, RCC_CFGR_SWS_PLL,
-                   poll_limit)) {
+#endif
+    NX_STM32_WRITE(&system->rcc->CFGR,
+                   (system->rcc->CFGR & ~(uint32_t)RCC_CFGR_SW) |
+                       NEXUS_CLOCK_SW);
+    if (!wait_bits(system, &system->rcc->CFGR, RCC_CFGR_SWS,
+                   NEXUS_CLOCK_SW << 2U, poll_limit)) {
         result.primary = -5;
         goto rollback;
     }
     /* Consumers start only after the timebase, but failed timer preparation
      * can leave the PLL live. Metadata follows hardware, not API success. */
-    system->core_hz = 168000000U;
+    system->core_hz = NEXUS_CORE_HZ;
     SystemCoreClock = system->core_hz;
+    if (NEXUS_CLOCK_CSS &&
+        !write_checked(&system->rcc->CR, system->rcc->CR | RCC_CR_CSSON,
+                       RCC_CR_CSSON)) {
+        result.primary = -6;
+        goto rollback;
+    }
     system->remaining_effects |= NX_STM32_EFFECT_TIMER_GATE;
     if (!write_checked(&system->rcc->APB1ENR,
                        system->rcc->APB1ENR | RCC_APB1ENR_TIM2EN,
@@ -406,10 +491,12 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
         result.primary = -6;
         goto rollback;
     }
-    bool valid = write_checked(&system->timer->CR1, 0U, UINT32_MAX) &&
-                 write_checked(&system->timer->PSC, 83U, UINT32_MAX) &&
-                 write_checked(&system->timer->ARR, UINT32_MAX, UINT32_MAX) &&
-                 write_checked(&system->timer->SR, 0U, UINT32_MAX);
+    bool valid =
+        write_checked(&system->timer->CR1, 0U, UINT32_MAX) &&
+        write_checked(&system->timer->PSC, NEXUS_APB1_TIMER_HZ / 1000000U - 1U,
+                      UINT32_MAX) &&
+        write_checked(&system->timer->ARR, UINT32_MAX, UINT32_MAX) &&
+        write_checked(&system->timer->SR, 0U, UINT32_MAX);
     if (!valid) {
         result.primary = -6;
         goto rollback;
@@ -442,23 +529,7 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
         result.primary = -6;
         goto rollback;
     }
-#if defined(NEXUS_F407_I2S2_SLAVE_TX_SELECTED) &&                              \
-    NEXUS_F407_I2S2_SLAVE_TX_SELECTED
-    /* Normal cold-reset assembly excludes every running peripheral/master.
-     * Enabling a gated domain is not proof that a foreign old EN was idle.
-     * Shared gates live with Platform, beyond every pin/stream-local owner. */
-    uint32_t shared = RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_DMA1EN;
-    uint32_t missing = shared & ~system->rcc->AHB1ENR;
-    if ((missing & RCC_AHB1ENR_GPIOBEN) != 0U)
-        system->remaining_effects |= NX_STM32_EFFECT_GPIOB_GATE;
-    if ((missing & RCC_AHB1ENR_DMA1EN) != 0U)
-        system->remaining_effects |= NX_STM32_EFFECT_DMA1_GATE;
-    if (!write_checked(&system->rcc->AHB1ENR, system->rcc->AHB1ENR | shared,
-                       shared)) {
-        result.primary = -6;
-        goto rollback;
-    }
-#endif
+    ++system->time_epoch;
     system->started = true;
     return result;
 rollback:
@@ -467,32 +538,38 @@ rollback:
     return result;
 }
 
+/** \brief Ordinary startup never changes an incoming caller mask. */
+nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
+                                              uint32_t poll_limit) {
+    if (nx_stm32_system_preflight(system) != NX_SUCCESS)
+        return (nx_stm32_start_result_t){-2, 0, 0U};
+    return start_owned(system, poll_limit);
+}
+
+/** \brief The deep-power owner restores while wake IRQs remain excluded. */
+nx_stm32_start_result_t nx_stm32_system_restore(nx_stm32_system_t* system,
+                                                uint32_t poll_limit) {
+    nx_arch_irq_masks_t masks = nx_arch_irq_masks();
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || masks.primask != 1U ||
+        masks.basepri != 0U || masks.faultmask != 0U)
+        return (nx_stm32_start_result_t){-2, 0, 0U};
+    return start_owned(system, poll_limit);
+}
+
 /** \brief Stop timer access before attempting clock cleanup. */
 int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit) {
     if (system == NULL || system->rcc == NULL || system->timer == NULL ||
         system->flash == NULL || system->power == NULL || poll_limit == 0U) {
         return -2;
     }
+    /* An explicitly enabled RNG still leases PLL48 after synchronous calls
+     * have returned. Its owner withdraws RNGEN before this clock teardown. */
+    if ((system->rcc->AHB2ENR & RCC_AHB2ENR_RNGEN) != 0U &&
+        (NX_STM32_RNG_CONTROL & (RNG_CR_RNGEN | RNG_CR_IE)) != 0U)
+        return -1;
 #if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
     if (nx_stm32_lowpower_busy()) {
         return -1;
-    }
-#endif
-#if defined(NEXUS_F407_I2S2_SLAVE_TX_SELECTED) &&                              \
-    NEXUS_F407_I2S2_SLAVE_TX_SELECTED
-    /* All Platform consumers, including external HAL users, have joined.
-     * Retain attempted additions until their actual withdrawal reads back. */
-    uint32_t shared = 0U;
-    if ((system->remaining_effects & NX_STM32_EFFECT_GPIOB_GATE) != 0U)
-        shared |= RCC_AHB1ENR_GPIOBEN;
-    if ((system->remaining_effects & NX_STM32_EFFECT_DMA1_GATE) != 0U)
-        shared |= RCC_AHB1ENR_DMA1EN;
-    if (shared != 0U) {
-        if (!write_checked(&system->rcc->AHB1ENR,
-                           system->rcc->AHB1ENR & ~shared, shared))
-            return -1;
-        system->remaining_effects &=
-            ~(NX_STM32_EFFECT_GPIOB_GATE | NX_STM32_EFFECT_DMA1_GATE);
     }
 #endif
     if ((system->remaining_effects & NX_STM32_EFFECT_TIMER) != 0U) {

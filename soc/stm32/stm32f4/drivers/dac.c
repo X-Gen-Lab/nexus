@@ -6,13 +6,14 @@
  * \date            2026-11-08
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_dac.h"
 #include "stm32f4xx_ll_bus.h"
 #include "stm32f4xx_ll_dac.h"
 #include "stm32f4xx_ll_gpio.h"
 #include "stm32f4xx_ll_tim.h"
 
-#define NX_DAC_TIMER_HZ 84000000U
+#define NX_DAC_TIMER_HZ NEXUS_APB1_TIMER_HZ
 
 /** \brief Controls require a privileged, unmasked serialized task owner. */
 static bool context_ok(void) {

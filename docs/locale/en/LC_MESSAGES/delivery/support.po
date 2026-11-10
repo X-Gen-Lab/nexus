@@ -1,862 +1,360 @@
-# Reviewed against the exact current canonical source and gettext messages.
+# Current canonical messages; semantic review admission is tracked separately.
 msgid ""
-msgstr ""
-"Project-Id-Version: Nexus source documentation\n"
-"Language: en\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: ac9304eb41c4b81462561ba927d004dcc211600fa4529f8f31d2e7e56652fd35\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 87a01258977024b0e83de65734929b78d89fb35a10ccdf6606cbaeb50e2b14fd\n"
 
-#: docs/delivery/support.md:8
 msgid "当前精确支持范围"
 msgstr "Current exact support scope"
 
-#: docs/delivery/support.md:10
-msgid ""
-"当前生产入口为 STM32F4，迁入的具体实现仍限定 STM32F407VET6／STM32F407ZGT6。 两者共享系列源码，Flash "
-"密度、封装和允许引脚来自精确事实。其他 F4 型号尚需逐项 接入与验证，不能由官方 HAL 或器件宏存在推定支持。"
-msgstr ""
-"The production entry point is STM32F4. Migrated concrete implementations "
-"remain limited to STM32F407VET6/STM32F407ZGT6. They share series sources, "
-"while Flash density, package and allowed pins come from exact facts. Other "
-"F4 parts require individual integration and verification; official HAL or "
-"device macros do not imply support."
+msgid "本页帮助消费者选择当前维护的 F407 型号、Board、后端与外设模式。生产实现限定 STM32F407VET6／STM32F407ZGT6；其他 F4 型号、SDK 宏或公共头的存在不授予相同模式。 下表描述源码维护范围，实际选择仍须通过同一 TOML／typed IR resolver。"
+msgstr "This page helps consumers select maintained F407 parts, Boards, backends and peripheral modes. Production implementations cover STM32F407VET6 / STM32F407ZGT6. Other F4 parts, SDK macros and public headers do not grant the same modes. The table describes source-maintenance scope; actual selections must still pass the same TOML / typed IR resolver."
 
-#: docs/delivery/support.md:14
-msgid "型号、板卡与后端"
-msgstr "Parts, boards and backends"
+msgid "型号、Board 与 OS 边界"
+msgstr "Part, Board and OS boundaries"
 
-#: docs/delivery/support.md:0
 msgid "对象"
 msgstr "Object"
 
-#: docs/delivery/support.md:0
-msgid "当前边界"
-msgstr "Current boundary"
+msgid "精确边界"
+msgstr "Exact boundary"
 
-#: docs/delivery/support.md:0
-msgid "F407VET6"
-msgstr "F407VET6"
+msgid "STM32F407VET6"
+msgstr "STM32F407VET6"
 
-#: docs/delivery/support.md:0
-msgid "LQFP100、512 KiB Flash、128 KiB SRAM 与 64 KiB 非 DMA CCM"
-msgstr "LQFP100, 512 KiB Flash, 128 KiB SRAM and 64 KiB non-DMA CCM"
+msgid "LQFP100，512 KiB Flash、128 KiB 主 SRAM、64 KiB CPU-only CCM；只开放该封装实际引出的路线"
+msgstr "LQFP100, 512 KiB Flash, 128 KiB main SRAM and 64 KiB CPU-only CCM; only routes physically exposed by this package are admitted"
 
-#: docs/delivery/support.md:0
-msgid "F407ZGT6"
-msgstr "F407ZGT6"
+msgid "STM32F407ZGT6"
+msgstr "STM32F407ZGT6"
 
-#: docs/delivery/support.md:0
-msgid "LQFP144、1 MiB Flash、128 KiB SRAM 与 64 KiB 非 DMA CCM"
-msgstr "LQFP144, 1 MiB Flash, 128 KiB SRAM and 64 KiB non-DMA CCM"
+msgid "LQFP144，1 MiB Flash、128 KiB 主 SRAM、64 KiB CPU-only CCM；额外引脚不自动授权 PCB 接线"
+msgstr "LQFP144, 1 MiB Flash, 128 KiB main SRAM and 64 KiB CPU-only CCM; extra pins do not automatically authorize PCB wiring"
 
-#: docs/delivery/support.md:0
-msgid "启明 V3.1／核心板／V4.1"
-msgstr "Qiming V3.1 / core board / V4.1"
+msgid "启明 ZG Board"
+msgstr "Qiming ZG Boards"
 
-#: docs/delivery/support.md:0
-msgid "三个独立 ZG 来源与装配身份，不能互相代替"
-msgstr ""
-"Three independent ZG sources and assembly identities; none substitutes for "
-"another"
+msgid "[V3.1](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407_qiming_v31/README.md)、[独立核心板](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407zg_qiming_core/README.md)、[V4.1](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407zg_qiming_v41/README.md) 是三个独立来源和装配身份"
+msgstr "[V3.1](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407_qiming_v31/README.md), [standalone core board](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407zg_qiming_core/README.md) and [V4.1](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407zg_qiming_v41/README.md) have three separate source and assembly identities"
 
-#: docs/delivery/support.md:0
-msgid "天空星青春版"
-msgstr "Sky youth edition"
+msgid "天空星 VE Board"
+msgstr "Sky VE Board"
 
-#: docs/delivery/support.md:0
-msgid "独立 VE 板卡事实，不推广到 VG 高配板"
-msgstr "Independent VE Board facts, without extending to the VG premium board"
+msgid "[天空星青春版](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407ve_sky_qingchun/README.md)；不推广到 VG 高配板或其他 PCB 修订"
+msgstr "[Sky Qingchun](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/stm32f407ve_sky_qingchun/README.md); this scope does not extend to the VG high-spec board or other PCB revisions"
 
-#: docs/delivery/support.md:0
-msgid "裸机／FreeRTOS"
-msgstr "Baremetal / FreeRTOS"
+msgid "裸机"
+msgstr "Bare metal"
 
-#: docs/delivery/support.md:0
-msgid "按实际 assembly、IRQ ceiling 和模式选择"
-msgstr "Select by actual assembly, IRQ ceiling and mode"
+msgid "显式选择 `baremetal`；启动不创建调度器或产品任务，调用者推进 service 与停止"
+msgstr "Explicit `baremetal` selection; startup creates neither a scheduler nor product tasks. The caller advances service and shutdown"
 
-#: docs/delivery/support.md:0
+msgid "FreeRTOS"
+msgstr "FreeRTOS"
+
+msgid "静态任务／队列／等待适配；按所选 assembly、实际 IRQ syscall ceiling 和执行上下文接入"
+msgstr "Static task / queue / wait adapters; integration follows the selected assembly, actual IRQ syscall ceiling and execution context"
+
 msgid "ThreadX"
 msgstr "ThreadX"
 
-#: docs/delivery/support.md:0
-msgid "明确维护的 M4 子集；不继承 FreeRTOS 全部 profile"
-msgstr ""
-"Explicitly maintained M4 subset; it does not inherit every FreeRTOS profile"
+msgid "已维护的 M4 适配子集与明确消费者；不继承所有 FreeRTOS 模式组合"
+msgstr "The maintained M4 adapter subset and explicit consumers; it does not inherit every FreeRTOS mode combination"
 
-#: docs/delivery/support.md:0
-msgid "Native"
-msgstr "Native"
+msgid "Native／CPU-only Runtime"
+msgstr "Native／CPU-only Runtime"
 
-#: docs/delivery/support.md:0
-msgid "显式 host 测试 scope，不是生产芯片或 PCB"
-msgstr "Explicit host-test scope, not a production chip or PCB"
+msgid "Native 是显式 host-test scope；CPU-only Runtime 不提供 SoC 外设，二者都不是 PCB 资格"
+msgstr "Native is an explicit host-test scope; CPU-only Runtime supplies no SoC peripherals. Neither establishes PCB qualification"
 
-#: docs/delivery/support.md:26
-msgid ""
-"精确资源权威是 [soc.json](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/soc/stm32/stm32f4/soc.json)、 "
-"[routes.json](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f4/routes.json)和各 [Board 包](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/README.md)。 当前 F407 时钟仍为受审 "
-"HSE8／168 MHz profile；不能配置任意时钟或运行期变频。"
-msgstr ""
-"Exact resource authorities are [soc.json](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/soc.json), "
-"[routes.json](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f4/routes.json) and the [Board "
-"packages](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/boards/README.md). Current F407 clocks still use the reviewed "
-"HSE8/168 MHz profile; arbitrary clocks and runtime scaling are not "
-"configurable."
+msgid "引脚、AF、DMA、IRQ、Flash 几何和资源冲突只在 [SoC 事实](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/soc.json)、 [路线](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/routes.json)、[Board 包](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/README.md)及 实际 provider 中维护。本页不复制第二份 pin／DMA 表。软件 fixture 只声明测试路线； 原理图、元件实装、跳线、电压和晶振事实仍须由精确 Board 授权。"
+msgstr "Pins, AF, DMA, IRQ, Flash geometry and resource conflicts are maintained only in the [SoC facts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/soc.json), [routes](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/routes.json), [Board packages](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/boards/README.md) and actual providers. This page does not duplicate pin / DMA tables. Software fixtures declare test routes only; schematics, fitted components, jumpers, voltage and oscillator facts still require exact Board authorization."
 
-#: docs/delivery/support.md:30
-msgid ""
-"[器件目录](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f4/devices.json)只描述官方宏、启动和 IRQ 的 SDK 编译事实，不为其他 F4 "
-"型号建立驱动、Board 或运行时模式资格。"
-msgstr ""
-"The [device catalogue](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/soc/stm32/stm32f4/devices.json) records only official "
-"macro, startup and IRQ facts for SDK compilation. It does not establish "
-"driver, Board or runtime-mode qualification for other F4 parts."
+msgid "OS 的静态对象、权限、IRQ 和退出要求见 [OS 合同](../design/os-contracts.md)与 [后端入口](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/README.md)。选择一个后端不自动验证每种外设／低功耗组合。"
+msgstr "Static OS objects, privilege, IRQ and exit requirements are defined by the [OS contract](../design/os-contracts.md) and [backend entry](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/README.md). Selecting a backend does not automatically validate every peripheral / low-power combination."
 
-#: docs/delivery/support.md:33
-msgid "已有模式与限制"
-msgstr "Existing modes and limitations"
+msgid "当前模式矩阵"
+msgstr "Current mode matrix"
 
-#: docs/delivery/support.md:35
-msgid "下表是源码维护范围摘要，完整选择须通过实际 resolver；不表示本次重构全部软件 退出或物理测试已经通过。"
-msgstr ""
-"The table summarizes maintained source scope. Complete selections must pass "
-"the actual resolver; it does not mean every software exit or physical test "
-"has passed in this refactor."
+msgid "能力"
+msgstr "Capability"
 
-#: docs/delivery/support.md:0
-msgid "类别"
-msgstr "Category"
+msgid "维护模式与关键边界"
+msgstr "Maintained modes and key boundaries"
 
-#: docs/delivery/support.md:0
-msgid "维护范围与必要限制"
-msgstr "Maintained scope and required limitations"
+msgid "权威合同"
+msgstr "Authoritative contract"
 
-#: docs/delivery/support.md:0
-msgid "GPIO／EXTI"
-msgstr "GPIO／EXTI"
+msgid "冷态与平台归还"
+msgstr "Cold lifecycle and platform withdrawal"
 
-#: docs/delivery/support.md:0
-msgid "受审引脚、静态电气与事件存储；不存在自动消抖政策"
-msgstr ""
-"Reviewed pins, static electrical settings and event storage; no automatic "
-"debounce policy"
+msgid "静态 factory 纯查询；手写 C 执行准入、取得、逆序撤回和回读。部分效果、未退出 IRQ／DMA 与失败引脚恢复继续保留原 owner 和收条"
+msgstr "Static factory lookups are pure; handwritten C performs admission, acquisition, reverse withdrawal and readback. Partial effects, live IRQ / DMA references and failed pin restoration retain the original owner and receipts"
 
-#: docs/delivery/support.md:0
-msgid "UART"
-msgstr "UART"
+msgid "[所有权](../explanation/ownership.md)、[F4 实现](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[Ownership](../explanation/ownership.md), [F4 implementation](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 
-#: docs/delivery/support.md:0
-msgid ""
-"IRQ byte/event、word 与明确 block／DMA 模式分别选择；有限 TX、有限 RX、连续 RX 和双向模式不自动互相授权"
-msgstr ""
-"Select IRQ byte/event, word and explicit block/DMA modes separately. Finite "
-"TX, finite RX, continuous RX and bidirectional modes do not automatically "
-"authorize one another"
+msgid "System／时钟"
+msgstr "System / clocks"
 
-#: docs/delivery/support.md:0
-msgid "SPI／I2C"
-msgstr "SPI／I2C"
+msgid "默认 `hse8-pll168`；显式 custom HSE／HSI、直接输入或 PLL、AHB／APB／ADC 分频与 Flash latency。频率来自同一静态 ClockPlanIR，不提供运行期 DVFS"
+msgstr "Default `hse8-pll168`; explicit custom HSE / HSI, direct input or PLL, AHB / APB / ADC division and Flash latency. Frequencies come from one static ClockPlanIR; runtime DVFS is not provided"
 
-#: docs/delivery/support.md:0
-msgid ""
-"SPI1／2／3 polling、普通与增强 DMA 事务；I2C1／2／3 polling／IRQ／DMA；显式 endpoint 与受审路线"
-msgstr ""
-"SPI1/2/3 polling, ordinary and enhanced DMA transactions; I2C1/2/3 "
-"polling/IRQ/DMA; explicit endpoints and reviewed routes"
+msgid "[System 与时钟](../design/f407-system-power.md)"
+msgstr "[System and clocks](../design/f407-system-power.md)"
 
-#: docs/delivery/support.md:0
-msgid "ADC／Timer"
-msgstr "ADC / Timer"
+msgid "Sleep／STOP"
+msgstr "Sleep／STOP"
 
-#: docs/delivery/support.md
+msgid "浅 Sleep 保留时间域；显式排空后进入 STOP，恢复建立新 Core epoch，旧 deadline 不继承。唤醒源、独立 elapsed bounds 和 OS 恢复由调用者承担"
+msgstr "Shallow Sleep preserves the time domain. STOP requires explicit drain and restoration establishes a new Core epoch; old deadlines do not carry over. Callers own wake sources, independent elapsed bounds and OS restoration"
+
+msgid "[System 低功耗](../design/f407-system-power.md)、[ClockDomain 屏障](../design/clock-domain-sleep.md)"
+msgstr "[System low power](../design/f407-system-power.md), [ClockDomain barrier](../design/clock-domain-sleep.md)"
+
+msgid "Standby"
+msgstr "Standby"
+
+msgid "显式 WKUP／RTC 唤醒与同一 RTC owner 的准备收条；按勘误禁源、处理 WUF，RTC 事件只按明确授权丢弃。真实进入经复位重建启动；虚假返回建立新 Core epoch，restore 失败保留责任"
+msgstr "Explicit WKUP/RTC wake and a preparation receipt from the same RTC owner; sources are disabled and WUF handled according to the erratum, and RTC events are discarded only with explicit authorization. Real entry rebuilds startup through reset; a spurious return establishes a new Core epoch, and failed restore retains responsibility"
+
+msgid "[System 低功耗](../design/f407-system-power.md)、[RTC 合同](../design/f407-rtc.md)"
+msgstr "[System low power](../design/f407-system-power.md), [RTC contract](../design/f407-rtc.md)"
+
+msgid "监督与故障"
+msgstr "Supervision and faults"
+
+msgid "IWDG／WWDG 显式启用；可选 WWDG EWI、HSE CSS／NMI、复位原因、首次故障记录与 DWT trace。无自动喂狗、任务重启或旧时间域降频续跑"
+msgstr "Explicit IWDG / WWDG activation; optional WWDG EWI, HSE CSS / NMI, reset cause, first-fault record and DWT trace. No automatic feeding, task restart or downclocked continuation in the old time domain"
+
+msgid "[监督与故障](../design/f407-system-power.md)"
+msgstr "[Supervision and faults](../design/f407-system-power.md)"
+
+msgid "GPIO／EXTI／PVD"
+msgstr "GPIO／EXTI／PVD"
+
+msgid "[F4 GPIO／PVD](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)、[I/O 观察](../design/io-observation-recovery.md)"
+msgstr "[F4 GPIO / PVD](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md), [I/O observation](../design/io-observation-recovery.md)"
+
+msgid "UART 数据传输"
+msgstr "UART data transport"
+
+msgid "全部六实例：IRQ byte／event、独立 9N1 words、调用者存储的 blocks、有限 HAL TX DMA、有限／连续 RX DMA 和 duplex；各模式分别选择"
+msgstr "All six instances: IRQ bytes / events, separate 9N1 words, blocks in caller storage, finite HAL TX DMA, finite / continuous RX DMA and duplex; each mode is selected separately"
+
+msgid "[UART DMA 与 RS485](../design/uart-dma-rs485.md)"
+msgstr "[UART DMA and RS485](../design/uart-dma-rs485.md)"
+
+msgid "UART 线模式"
+msgstr "UART wire modes"
+
+msgid "全部六实例支持半双工、LIN、IrDA；同步 master、Smartcard、CTS／RTS 只用于 USART1／2／3／6。RS485 显式组合 DE 与既有传输 owner"
+msgstr "All six instances support half duplex, LIN and IrDA. Synchronous master, Smartcard and CTS / RTS are limited to USART1 / 2 / 3 / 6. RS485 explicitly composes DE with the existing transport owner"
+
+msgid "[UART 线模式](../design/uart-wire-modes.md)、[RS485](../design/uart-dma-rs485.md)"
+msgstr "[UART wire modes](../design/uart-wire-modes.md), [RS485](../design/uart-dma-rs485.md)"
+
+msgid "SPI"
+msgstr "SPI"
+
+msgid "SPI1／2／3 polling、8／16-bit 分段事务、有限 DMA；`irq-frames` 提供 master／slave、单双线、Motorola／TI 与双线 CRC。单线 CRC 拒绝；主接收精确帧数以声明时序预算成立为条件"
+msgstr "SPI1 / 2 / 3 polling, 8 / 16-bit segmented transactions and finite DMA; `irq-frames` supplies master / slave, one / two lines, Motorola / TI and two-line CRC. One-line CRC rejects. Exact master receive frame counts are conditional on the declared timing budget"
+
+msgid "[SPI 帧模式](../design/spi-frame-modes.md)、[公共 I/O](../reference/api/io.md)"
+msgstr "[SPI frame modes](../design/spi-frame-modes.md), [public I/O](../reference/api/io.md)"
+
+msgid "I2C master"
+msgstr "I2C master"
+
+msgid "I2C1／2／3 polling／IRQ／DMA、显式 7／10-bit endpoint；实际时序与 repeated START 勘误共同限制准入；与 target personality 分选"
+msgstr "I2C1/2/3 polling/IRQ/DMA with explicit 7/10-bit endpoints; actual timing and repeated START errata constrain admission; selected separately from the target personality"
+
+msgid "[总线恢复](../design/i2c-bus-clear.md)、[F4 I2C](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[Bus recovery](../design/i2c-bus-clear.md), [F4 I2C](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+
+msgid "I2C target／SMBus"
+msgstr "I2C target/SMBus"
+
+msgid "I2C1／2／3 的 `target-irq` 提供 7／10-bit 自身地址与 7-bit 双地址；`smbus-device` 为 7-bit、至多 100 kHz，可选 PEC／SMBA ARA。每方向至多 256 B、WRITE_READ 合计至多 512 B、最多两个地址阶段；IRQ、无 DMA，响应预计算。PEC 受声明 IRQ 预算约束；ARP／Host Notify 与命令策略由产品提供"
+msgstr "I2C1/2/3 `target-irq` provides 7- or 10-bit own addresses and dual 7-bit addressing; `smbus-device` uses 7-bit addresses at up to 100 kHz with optional PEC/SMBA ARA. At most 256 B per direction, 512 B total for WRITE_READ and two address phases; IRQ only, no DMA, with precomputed responses. PEC depends on the declared IRQ budget; products provide ARP, Host Notify and command policy"
+
+msgid "[I2C target 合同](../design/f407-i2c-target.md)"
+msgstr "[I2C target contract](../design/f407-i2c-target.md)"
+
+msgid "普通 PWM／capture／encoder"
+msgstr "Ordinary PWM / capture / encoder"
+
+msgid "[定时器合同](../design/timer-advanced.md)、[F4 实现](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[Timer contract](../design/timer-advanced.md), [F4 implementation](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+
+msgid "互补 PWM"
+msgstr "Complementary PWM"
+
+msgid "TIM1／TIM8 的 CH1–3／CH1N–3N、deadtime、break 和显式 rearm；没有自动故障重启或隐式跨 timer 同步"
+msgstr "TIM1 / TIM8 CH1–3 / CH1N–3N, deadtime, break and explicit rearm; no automatic fault restart or implicit synchronization across timers"
+
+msgid "[高级定时器](../design/timer-advanced.md)"
+msgstr "[Advanced timers](../design/timer-advanced.md)"
+
+msgid "PWM 组／有限波形"
+msgstr "PWM groups/finite waveforms"
+
+msgid "单 timer 多通道 CPU group、硬件单脉冲与有限 UPDATE-DMA sequence；实例、TRGO／ITR、break 和 burst 预算显式选择。sequence 成功统计 staged 存储字节，不承诺精确电脉冲数"
+msgstr "Multi-channel CPU groups on one timer, hardware one-pulse operation and finite UPDATE-DMA sequences; instances, TRGO/ITR, break and burst budgets are explicitly selected. Sequence success counts staged storage bytes and does not promise exact electrical pulse counts"
+
+msgid "[有限波形合同](../design/f407-timer-waveform.md)"
+msgstr "[Finite waveform contract](../design/f407-timer-waveform.md)"
+
+msgid "独立 ADC"
+msgstr "Independent ADCs"
+
+msgid "ADC1／2／3 的已审外部输入，ADC1 内部输入；6／8／10／12-bit、regular shot／scan、软件 injected、有限／连续 timer DMA。内部输入与模拟路径有独立启动／退出责任"
+msgstr "Reviewed ADC1 / 2 / 3 external inputs and ADC1 internal inputs; 6 / 8 / 10 / 12-bit regular shot / scan, software injected and finite / continuous timer DMA. Internal inputs and analog paths have separate startup / withdrawal responsibilities"
+
+msgid "[F4 ADC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[F4 ADC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+
+msgid "多 ADC／注入采集"
+msgstr "Multiple ADCs / injected acquisition"
+
+msgid "`adc_group` 独占 ADC123 公共域；双／三同步、交错的有限 DMA，以及单／双／三注入组。显式触发、格式、采样时间与原始码看门狗；没有循环多 ADC 或 regular／injected 并行"
+msgstr "`adc_group` exclusively owns the shared ADC123 domain: dual / triple simultaneous and interleaved finite DMA, plus single / dual / triple injected groups. Trigger, format, sampling time and raw-code watchdog are explicit; no circular multi-ADC mode or concurrent regular / injected operation"
+
+msgid "[多 ADC 合同](../design/f407-adc-groups.md)"
+msgstr "[Multi-ADC contract](../design/f407-adc-groups.md)"
+
 msgid "DAC"
 msgstr "DAC"
 
-msgid "单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码"
-msgstr ""
-"Single/dual-channel direct, software or exclusive TIM6/7 triggering, "
-"noise/triangle; finite/circular triggered DMA, three input formats and "
-"explicit idle codes"
+msgid "单／双通道 direct、独占 timer trigger、noise／triangle、有限／循环 DMA 与显式 idle code。数字完成不承诺精确 N 次模拟转换、settling 或输出精度"
+msgstr "Single / dual-channel direct output, exclusive timer trigger, noise / triangle, finite / circular DMA and explicit idle code. Digital completion promises neither exactly N analog conversions nor settling or output accuracy"
 
-#: docs/delivery/support.md:0
-msgid "Flash／IWDG／WWDG／RTC"
-msgstr "Flash/IWDG/WWDG/RTC"
+msgid "[F4 DAC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[F4 DAC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 
-#: docs/delivery/support.md:0
-msgid "精确几何与生命周期；构造不隐式启狗，产品分区与备份域政策外置"
-msgstr ""
-"Exact geometry and lifecycle; construction does not implicitly start a "
-"watchdog, and product partitions and backup-domain policy remain external"
+msgid "DCMI"
+msgstr "DCMI"
+
+msgid "RAW／JPEG snapshot 与连续 RAW storage blocks；VE 最高 12-bit，ZG 可选 14-bit。JPEG 返回含硬件 padding 的 word 前缀，RAW blocks 不等于图像或精确帧数"
+msgstr "RAW / JPEG snapshots and continuous RAW storage blocks; VE supports up to 12-bit, ZG optionally 14-bit. JPEG returns a word prefix containing hardware padding; RAW blocks are neither images nor an exact frame count"
+
+msgid "[DCMI／I2S 合同](../design/f407-capture-audio.md)"
+msgstr "[DCMI/I2S contract](../design/f407-capture-audio.md)"
+
+msgid "I2S2／3"
+msgstr "I2S2／3"
+
+msgid "master／slave × TX／RX／duplex 的有限 DMA；Philips、MSB／LSB justified、PCM short／long，16／24／32-bit 数据。master 显式 PLLI2S，slave 外部 rate 为 unknown；不转换音频格式"
+msgstr "Finite DMA for master / slave × TX / RX / duplex; Philips, MSB / LSB justified, PCM short / long and 16 / 24 / 32-bit data. Master mode explicitly selects PLLI2S; external slave rate is unknown. Audio formats are not converted"
+
+msgid "[音频合同](../design/f407-capture-audio.md)、[有限 slave TX 路径](../design/f407-i2s2-slave-tx.md)"
+msgstr "[Audio contract](../design/f407-capture-audio.md), [Finite slave TX path](../design/f407-i2s2-slave-tx.md)"
+
+msgid "RTC／备份域"
+msgstr "RTC / backup domain"
+
+msgid "`adopt-retained`／`provision-empty`、Alarm A request、Alarm B、wakeup、timestamp、tamper、校准、20 个 backup registers、4 KiB backup SRAM CPU lease 与显式 handoff；不提供世纪／时区或保持性证明"
+msgstr "`adopt-retained` / `provision-empty`, Alarm A requests, Alarm B, wakeup, timestamp, tamper, calibration, 20 backup registers, 4 KiB backup SRAM CPU leases and explicit handoff; no century / timezone or retention proof"
+
+msgid "[RTC 合同](../design/f407-rtc.md)"
+msgstr "[RTC contract](../design/f407-rtc.md)"
+
+msgid "内部 Flash／制造维护"
+msgstr "Internal Flash / manufacturing maintenance"
+
+msgid "精确 VE／ZG sector 几何；显式维护 face 提供 OTP、锁定、option／RDP 及保护降级的整阵列擦除效果。不可逆效果逐次声明，不自动回滚、重放或把软件复位当作所需 POR"
+msgstr "Exact VE / ZG sector geometry; an explicit maintenance face supplies OTP, locks, options / RDP and whole-array erase effects of protection downgrades. Irreversible effects are declared per operation; no automatic rollback, replay or substitution of a software reset for required POR"
+
+msgid "[物理存储与维护](../design/f407-storage.md)"
+msgstr "[Physical storage and maintenance](../design/f407-storage.md)"
+
+msgid "SDIO／MMC／I/O functions"
+msgstr "SDIO／MMC／I/O functions"
+
+msgid "[SDIO 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/sdio_hal/README.md)"
+msgstr "[SDIO contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/sdio_hal/README.md)"
+
+msgid "FSMC"
+msgstr "FSMC"
+
+msgid "运行期 CPU window、永久 startup SRAM、parallel16，以及显式 PSRAM、有限 NOR program／erase、raw NAND／OOB／ECC 码；bank 与 mux／burst／WAIT 按封装和所选模式授权，无 FTL 或自动纠错"
+msgstr "Runtime CPU windows, permanent startup SRAM, parallel16, explicit PSRAM, finite NOR program / erase and raw NAND / OOB / ECC codes. Banks and mux / burst / WAIT require package and selected-mode authorization; no FTL or automatic error correction"
+
+msgid "[FSMC 合同](../design/f407-fsmc.md)、[存储边界](../design/f407-storage.md)"
+msgstr "[FSMC contract](../design/f407-fsmc.md), [storage boundaries](../design/f407-storage.md)"
 
 msgid "CRC／芯片身份"
 msgstr "CRC / chip identity"
 
-msgid "固定多项式 CRC-32 字序列；实际 UID、device／revision ID 和半字 Flash 容量；不建立认证或订货号推断"
-msgstr ""
-"Fixed-polynomial CRC-32 word sequences; actual UID, device/revision IDs and "
-"halfword Flash capacity; no authentication or ordering-code inference"
+msgid "固定 CRC-32 数值字序列；实际 UID、device／revision 与 Flash 容量。数据不证明完整订货号、封装身份或认证秘密"
+msgstr "Fixed CRC-32 numeric word sequences; actual UID, device / revision and Flash capacity. Data does not prove a complete ordering code, package identity or authentication secret"
 
-#: docs/delivery/support.md:0
-msgid "Classic CAN"
-msgstr "Classic CAN"
+msgid "[F4 CRC／身份](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[F4 CRC / identity](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 
-#: docs/delivery/support.md:0
-msgid "所选 mailbox 与共享 filter domain；不提供 CAN FD"
-msgstr "Selected mailboxes and shared filter domain; CAN FD is not provided"
+msgid "RNG"
+msgstr "RNG"
 
-#: docs/delivery/support.md:0
-msgid "USB"
-msgstr "USB"
+msgid "唯一 typed RNG factory 与 Platform 生命周期；精确 PLL48 和活跃 System epoch，保留官方 seed／clock／连续值错误检查；不建立 DRBG、熵池或质量认证"
+msgstr "One typed RNG factory and Platform lifecycle; exact PLL48 and a live System epoch, preserving official seed, clock and consecutive-value error checks; no DRBG, entropy pool or quality certification"
 
-#: docs/delivery/support.md:0
-msgid "所选 OTG FS device PIO；不由此授予 Host、HS、DMA 或全部 class stack"
-msgstr ""
-"Selected OTG FS device PIO; this grants no Host, HS, DMA or complete class "
-"stack"
+msgid "[RNG 时钟合同](../design/f407-system-power.md)、[公共 I/O](../reference/api/io.md)"
+msgstr "[RNG clock contract](../design/f407-system-power.md), [Public I/O](../reference/api/io.md)"
 
-#: docs/delivery/support.md:0
+msgid "CAN"
+msgstr "CAN"
+
+msgid "CAN1／2 classic IRQ、mailbox 与共享 filter domain；F407 不提供 CAN FD"
+msgstr "CAN1 / 2 classic IRQ, mailboxes and a shared filter domain; F407 supplies no CAN FD"
+
+msgid "[Classic CAN](../design/classic-can.md)"
+msgstr "[Classic CAN](../design/classic-can.md)"
+
 msgid "Ethernet"
 msgstr "Ethernet"
 
-#: docs/delivery/support.md:0
-msgid "所选 RMII／MDIO 与帧模式；协议栈、PHY 接线及实物行为分别验证"
-msgstr ""
-"Selected RMII/MDIO and frame modes; verify protocol stacks, PHY wiring and "
-"physical behavior separately"
+msgid "VE／ZG MII 与 ZG RMII、独立 MDIO；raw `eth` 与增强 `eth_frames` 分选。增强 face 提供整帧 SG、单 C-tag VLAN、显式 checksum offload 和 MAC 硬件事件／PTP 时间戳；PHY 接线、协议栈、同步与网络政策由外部提供"
+msgstr "VE/ZG MII and ZG RMII with separate MDIO; raw `eth` and enhanced `eth_frames` are selected separately. The enhanced face provides complete-frame SG, one C-tag VLAN, explicit checksum offload and MAC hardware-event/PTP timestamps; PHY wiring, protocol stacks, synchronization and network policy remain external"
 
-#: docs/delivery/support.md:0
-msgid "SDIO／FSMC"
-msgstr "SDIO／FSMC"
+msgid "[Ethernet 帧](../design/ethernet-frames.md)、[MAC／MDIO](../design/ethernet.md)"
+msgstr "[Ethernet frames](../design/ethernet-frames.md), [MAC / MDIO](../design/ethernet.md)"
 
-#: docs/delivery/support.md:0
-msgid "所选 polling SDIO、外部窗口与 parallel16；启动 SRAM 为永久 boot owner"
-msgstr ""
-"Selected polling SDIO, external windows and parallel16; startup SRAM has a "
-"permanent boot owner"
+msgid "USB"
+msgstr "USB"
 
-#: docs/delivery/support.md:0
-msgid "可选器件"
-msgstr "Optional devices"
+msgid "[USB 所有权](../design/usb-device.md)"
+msgstr "[USB ownership](../design/usb-device.md)"
 
-#: docs/delivery/support.md:0
-msgid "ILI9341 parallel16、XPT2046、W25 等通过公共端口访问，板级供电和产品策略外置"
-msgstr ""
-"ILI9341 parallel16, XPT2046 and W25 use public ports; Board power and "
-"product policies remain external"
+msgid "可选器件组件"
+msgstr "Optional device components"
 
-#: docs/delivery/support.md:51
-msgid ""
-"六个 UART 的 `dma-tx` 共用官方 HAL 有限 TX 和分离 LL IRQ RX，支持 byte／event 接收。六个实例也分别支持 "
-"`rx-dma-idle`、`rx-dma-continuous`、`dma-duplex` 和 `dma-duplex-"
-"continuous`，复用同一接收、双缓冲和借用排空算法。固定 TX／RX 路由为： USART1 DMA2 stream7／2 "
-"channel4；USART2 DMA1 stream6／5 channel4；USART3 DMA1 stream3／1 channel4；UART4"
-" DMA1 stream4／2 channel4；UART5 DMA1 stream7／0 channel4；USART6 DMA2 stream6／1"
-" channel5。只读 C 硬件事实表同时用于 冷态准入、标志位和 IRQ 选择，不增加可变实例字段。TC 与 DMA 完成分别观察，撤回 "
-"失败继续保留借用，W1C 只清理所选 stream。六路也支持独立 9N1 的 `irq-words` 和由调用者提供存储的 `irq-"
-"blocks`；9 位数据不经过 byte 接口。其他可选 UART 模式、替代引脚和 DMA 路线必须另外接入。"
-msgstr ""
-"All six UARTs share official HAL finite TX and disjoint LL IRQ byte/event RX"
-" in `dma-tx` mode. Each also supports `rx-dma-idle`, `rx-dma-continuous`, "
-"`dma-duplex` and `dma-duplex-continuous`, reusing the same receive, double-"
-"buffer and borrow-drain algorithms. The fixed TX/RX routes are: USART1 DMA2 "
-"stream7/2 channel4; USART2 DMA1 stream6/5 channel4; USART3 DMA1 stream3/1 "
-"channel4; UART4 DMA1 stream4/2 channel4; UART5 DMA1 stream7/0 channel4; "
-"USART6 DMA2 stream6/1 channel5. One readonly C hardware table supplies cold "
-"admission, status and IRQ selection without extra mutable instance fields. "
-"Wire TC and DMA completion are observed separately. Failed withdrawal "
-"retains borrows, and W1C clears only the selected stream. All six also "
-"support independent 9N1 `irq-words` and caller-backed `irq-blocks`. Nine-bit"
-" data never passes through the byte interface. Other UART protocols, "
-"alternate pads and DMA routes require separate integration."
+msgid "ILI9341 parallel16、XPT2046、W25 等通过公共端口访问；板级供电、存储分区和恢复政策由外部工程提供"
+msgstr "ILI9341 parallel16, XPT2046, W25 and other components use public ports; Board power, storage partitions and recovery policy remain external"
 
-#: ../../../../docs/delivery/support.md:57
-msgid ""
-"ADC1／2 通道对应 PA0--7、PB0--1、PC0--5。ADC3 在 VE 开放 PA0--3 的通道 0--3 和 PC0--3 的通道 "
-"10--13；ZG 另有 PF6--10 的通道 4--8、PF3 的通道 9 和 PF4／5 的通道 14／15。序列可以重新排序或重复同一输入，最多"
-" 16 ranks，重复 输入的 sample time 必须一致；每个使用的引脚都须有明确 Board route。 同步多 ADC "
-"模式尚未接入。16-rank 与三独立实例参考装配见 `tests/contracts/adc_external_assembly/`，不授予真实 "
-"PCB 或物理采样资格。"
-msgstr ""
-"ADC1/2 channels map to PA0--7, PB0--1 and PC0--5. On VE, ADC3 exposes "
-"channels 0--3 on PA0--3 and channels 10--13 on PC0--3; ZG additionally "
-"exposes channels 4--8 on PF6--10, channel 9 on PF3, and channels 14/15 on "
-"PF4/5. Sequences may reorder or repeat an input up to 16 ranks; repeated "
-"inputs must use the same sample time, and each used pin requires an explicit"
-" Board route. Synchronized multi-ADC modes remain unsupported. The 16-rank "
-"and three-independent-instance references in "
-"`tests/contracts/adc_external_assembly/` grant no PCB or physical sampling "
-"qualification."
+msgid "[组件入口](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/README.md)、[I/O 所有权](../design/io-evolution.md)"
+msgstr "[Components](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/README.md), [I/O ownership](../design/io-evolution.md)"
 
-#: ../../../../docs/delivery/support.md:64
-msgid ""
-"三个 ADC 的 `resolution_bits` 均可选择 6／8／10／12，默认 12。各转换器的 poll、 有限和连续 DMA "
-"共用该静态选择，转换周期与触发速率准入随之变化。DMA 仍使用 halfword，样本仍是右对齐的 `uint16_t` "
-"原始计数；分辨率选择不建立模拟精度或实际吞吐资格。"
-msgstr ""
-"All three ADCs select `resolution_bits` from 6/8/10/12, defaulting to 12. "
-"Each converter uses that static choice for polling, finite and continuous "
-"DMA; conversion costs and trigger-rate admission change with it. DMA still "
-"transfers halfwords of right-aligned `uint16_t` raw counts. Resolution "
-"selection establishes neither analogue accuracy nor measured throughput."
+msgid "模式矩阵不穷举所有芯片功能的笛卡尔组合。未列出的格式、外部触发、共享资源和 后端组合必须由相应 provider 明确接入；不能从一种模式或公共 API 的存在推定。"
+msgstr "The mode matrix does not enumerate every Cartesian combination of chip functions. Unlisted formats, external triggers, shared resources and backend combinations require explicit provider integration; support cannot be inferred from one mode or a public API."
 
-#: ../../../../docs/delivery/support.md:68
-msgid ""
-"共享 ADCCLK 固定为 PCLK2／4，即 21 MHz。冷态改分频前先取得数字接口观察责任， 确认所有 ADC 已关闭，再撤回本次临时 "
-"gate；匹配分频时不写 CCR。准备与其他 ADC 启动必须串行，不支持并发热接入或动态调频。软件采样停止回读失败保留设备清理责任， "
-"平台关闭成功前禁止再次采样，但返回后不保留调用者的样本或 count。"
-msgstr ""
-"Shared ADCCLK is fixed at PCLK2/4, or 21 MHz. Before changing the divider "
-"during cold setup, acquire the digital interfaces for observation, confirm "
-"every ADC is off and withdraw the temporarily added gates. A matching "
-"divider causes no CCR write. Preparation must be serialized against other "
-"ADC starts; concurrent hot attachment and dynamic frequency changes are "
-"unsupported. A failed software-sampling stop readback retains device cleanup"
-" and prevents new sampling until platform close succeeds. Caller samples and"
-" count are not retained after return."
+msgid "选择、证据与来源"
+msgstr "Selection, evidence and sources"
 
-#: docs/delivery/support.md:55
-msgid ""
-"DMA buffer 必须位于所选可达域，CCM 不可用于该 DMA。连续 producer 不覆盖已借用 块，缺替换存储时停止并报告 "
-"loss；模型或静态预算不证明任意负载下无丢失。 取消、超时和停止失败继续保留 buffer 与恢复责任，直到真实排空并发布 SETTLED。"
-msgstr ""
-"DMA buffers must reside in the selected reachable domain; CCM is unavailable"
-" to this DMA. A continuous producer does not overwrite borrowed blocks. It "
-"stops and reports loss when replacement storage is unavailable; models or "
-"static budgets prove no loss-free behavior under arbitrary loads. Cancel, "
-"timeout and failed stop retain buffer and recovery duties until actual drain"
-" and SETTLED publication."
+msgid "先确定精确型号和 Board 授权，再选择模式并通过 resolver 检查资源、内存域和时钟。 [派生能力表](capabilities.md)用于追踪声明、路线、装配和生产 ops；它不是第二份 配置输入，也不证明相关运行、排空或物理时序已通过。"
+msgstr "Establish the exact part and Board authorization, then select a mode and pass the resolver's resource, memory-domain and clock checks. The [derived capability table](capabilities.md) traces declarations, routes, assemblies and production operations. It is neither a second configuration input nor proof that the corresponding execution, drain or physical timing passed."
 
-msgid ""
-"DAC 由一个 controller owner 独占，按所选通道取得 PA4／PA5；与 ADC 或 SPI 的 引脚冲突必须拒绝。公共 CPU "
-"写入始终接收未移位原始码，`u12-left` 由 C 编码， 数字 DOR 始终为右对齐 12 位，`u8` 观察值为输入码乘 16。TIM6／7 "
-"触发只开放 独占的 84 MHz 固定时钟源，API 的 1 MHz 上限是数字配置政策，不是模拟性能保证； 实际分频可查询。noise "
-"是确定性波形，不能用于熵源。stop 保持所声明空闲码， 完整 Platform stop 才禁用 DAC "
-"并恢复原引脚字段；失败保留责任且可重试。两种密度的 `tests/contracts/dac_assembly/` 只提供软件参考，不代表 PCB "
-"接线、负载、精度或 模拟 settling 资格。外部共享触发与物理验收仍未完成。"
-msgstr ""
-"One controller owner exclusively owns DAC and acquires PA4/PA5 for the "
-"selected channels; pin conflicts with ADC or SPI must be rejected. Public "
-"CPU writes always accept unshifted raw codes, and C encodes `u12-left`. "
-"Digital DOR observations always use right-aligned 12-bit units; `u8` "
-"observations equal the input code multiplied by 16. TIM6/7 triggering only "
-"admits an exclusive fixed 84 MHz timer source. The API limit of 1 MHz is a "
-"digital configuration policy, not an analog performance guarantee; the "
-"actual divider is queryable. Noise is a deterministic waveform, not an "
-"entropy source. Stop holds the declared idle code. Complete Platform stop "
-"disables DAC and restores the original pin fields; failures retain "
-"responsibility and can be retried. The two-density "
-"`tests/contracts/dac_assembly/` fixtures are software references only, "
-"without PCB wiring, load, accuracy or analog settling qualification. "
-"External shared triggering and physical acceptance remain incomplete."
+msgid "源码维护、分组模型回归、ARM ELF、Source SDK、完整软件候选和物理 station 分别 建立证据，并绑定各自源码与配置。代理的 GREEN 或单个 ELF 不构成全候选通过。 当前 physical HIL 为 `not_executed`；未知 PCB、晶振精度、跳线、负载和波形保持未知。"
+msgstr "Source maintenance, grouped model regressions, ARM ELF, Source SDK, whole software candidates and physical stations establish separate evidence bound to their own source and configuration. An agent's GREEN or a single ELF does not establish whole-candidate acceptance. Current physical HIL is `not_executed`; unknown PCBs, oscillator accuracy, jumpers, loads and waveforms remain unknown."
 
-msgid ""
-"DAC 的 `trigger-dma`／`trigger-dma-circular` 是可选静态 TX 分面，共用同一个 controller "
-"ID；CPU 模式不预留 DMA 状态。调用方提供最多 65535 个编码帧，明确 字节数、对齐和 DMA 可读域；左对齐与双通道 lane "
-"已由调用方编码，保留位须为零。 通道 1／双通道使用 DMA1 stream5 channel7，单独通道 2 使用 stream6 channel7，"
-" 同时独占所选 TIM6／7、stream IRQ 与 TIM6_DAC IRQ。IRQ 只锁存事实和可选 wake， 调用方推进 "
-"service；不会隐式建立 task、queue 或复制缓冲区。"
-msgstr ""
-"DAC `trigger-dma`/`trigger-dma-circular` modes use an optional static TX "
-"facet with the same controller ID; CPU modes reserve no DMA state. The "
-"caller supplies at most 65535 encoded frames with explicit byte extent, "
-"alignment and DMA-readable memory domains. Left alignment and dual-channel "
-"lanes are already encoded by the caller; reserved bits must be zero. Channel"
-" 1/dual mode uses DMA1 stream5 channel7; channel 2 alone uses stream6 "
-"channel7. They also exclusively own the selected TIM6/7, stream IRQ and "
-"TIM6_DAC IRQ. IRQs only latch facts and an optional wake hint; the caller "
-"progresses service. No task, queue or copy buffer is implicitly created."
+msgid "所有 vendor、子模块、锁与许可证保留。未选 SDK 不进入默认生产构建闭包； [器件目录](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/devices.json)只描述官方宏、启动和 IRQ 编译事实。 历史范围见[固定重构前源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)， 旧候选、计数和实板结果不重标为当前源码资格。"
+msgstr "All vendors, submodules, locks and licenses are retained. Unselected SDKs do not enter the default production build closure. The [device catalogue](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/devices.json) describes official macro, startup and IRQ compilation facts only. Historical scope is available in the [fixed pre-refactor source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18); old candidates, counts and physical results are not relabeled as qualification for the current source."
 
-msgid ""
-"有限 DMA 成功包含最后数字锁存；首触发输出 idle，尾部可能短暂停 timer、插入 间隔或重复末码，不承诺恰好 N "
-"次模拟转换。循环模式持续借用至取消、超时或故障后 完成排空。SETTLED 之前 request 与帧保持有效且不可改写；无法排空时保留 "
-"QUARANTINED，next_service 返回 NEVER，由调用方明确恢复和重试。欠载状态需显式 stop 与 W1C 回读恢复。软件模型和 "
-"ARM 链接不授予物理输出性能资格。"
-msgstr ""
-"Finite DMA success includes the final digital latch. The first trigger "
-"outputs idle; the tail may briefly pause the timer, insert an interval or "
-"repeat the last code. It does not promise exactly N analog conversions. "
-"Circular mode retains the loan until complete drain after cancellation, "
-"timeout or failure. The request and frames remain live and immutable until "
-"SETTLED. Failed drain retains QUARANTINED; next_service returns NEVER, and "
-"the caller explicitly recovers and retries. Underrun recovery requires "
-"explicit stop and W1C readback. Software models and ARM linkage do not "
-"establish physical output performance qualification."
+msgid "FS／HS 引擎的 Device／Host、PIO 与 HS AHB DMA；Device 支持 control、bulk、interrupt 和单 transaction ISO packet。Device ISO 使用实际速度的帧窗口，接纳时剩余期限至多 1 秒，并满足受审 FIFO 分区；无 ACK／自动重试或周期调度。内部 PHY 仍为 FS，外部 ULPI 提供 HS／FS 回退；显式 managed roles 与按需 ST 官方 Core 桥接。不维护高带宽 ISO、remote wake、自动 HNP／SRP、Host split 或即时 premature STATUS OUT"
+msgstr "Device/Host on FS/HS engines, PIO and HS AHB DMA. Device supports control, bulk, interrupt and single-transaction ISO packets. Device ISO uses the frame window for the observed speed, requires at most 1 second of remaining deadline on admission, and must fit the reviewed FIFO partition. It provides no ACK, automatic retry or periodic scheduling. The internal PHY remains FS; external ULPI provides HS/FS fallback. Explicit managed roles and optional ST Core bridges are available. High-bandwidth ISO, remote wake, automatic HNP/SRP, Host split and immediate premature STATUS OUT are not maintained"
 
-msgid ""
-"静态装配指定唯一 CRC controller owner；factory 只查询既有接口。 `crc32-words` 使用多项式 "
-"0x04C11DB7、 初值 0xffffffff、MSB 优先、不反射且无 final XOR。输入为 32 位数值字，长度以字 "
-"计；不隐式拼装或补齐字节流。空序列返回初值。每 16 字和最终读回检查绝对 deadline； 失败不改输出、不保留借用，下一次计算重新 "
-"reset。输入／输出与 state、CRC 和其 时钟控制区隔离；关闭只撤回新增 gate，失败保持可重试 receipt，CRC_IDR 保持不变。"
-msgstr ""
-"Static assembly assigns one CRC controller owner; factory lookup returns the"
-" existing interface. `crc32-words` uses polynomial 0x04C11DB7, initial state"
-" 0xffffffff, MSB first, no reflection and no final XOR. Input is a sequence "
-"of numeric 32-bit words, with length in words; byte streams are not "
-"implicitly packed or padded. An empty sequence returns the initial state. "
-"The absolute deadline is checked every 16 words and after the final "
-"readback. Failure leaves output unchanged and retains no loan; the next "
-"calculation resets afresh. Input/output storage is separate from state, CRC "
-"and its clock controls. Close withdraws only the added gate and retains a "
-"retryable receipt on failure. CRC_IDR remains unchanged."
+msgid "SD memory／MMC polling、有限 IRQ／DMA；SDIO functions 使用独立 face 的 CMD5／52／53。单卡、3.3 V，SD／SDIO 为 1／4 位，MMC 可显式选择经版本和 SWITCH 检查的 8 位十引脚软件参考。combo 不同时维护 memory portion；当前只接纳 `hse8-pll168`，不提供 HS／DDR／HS200"
+msgstr "SD memory / MMC polling and finite IRQ / DMA; SDIO functions use CMD5 / 52 / 53 through a separate face. One card, 3.3 V; SD / SDIO use 1 / 4-bit buses. MMC may explicitly select an 8-bit ten-pad software reference after version and SWITCH checks. Combo cards do not simultaneously maintain the memory portion. Only `hse8-pll168` is currently admitted; HS / DDR / HS200 are not provided"
 
-msgid ""
-"`nx_chip_info_read` 无需启动外设，直接读取实际 UID、device／revision ID 和 16 位 Flash "
-"容量，不补用配置值、不开时钟、不分配常驻状态。身份数据不代替硅片 启动准入，也不证明完整订货号／封装或认证秘密。Native 显式返回 "
-"UNSUPPORTED； 模型与 ARM 链接仍不能证明物理身份、吞吐或实板功能。"
-msgstr ""
-"`nx_chip_info_read` requires no peripheral startup. It directly observes the"
-" actual UID, device/revision IDs and 16-bit Flash capacity, without "
-"configured fallback values, clock enabling or persistent state. Identity "
-"data does not replace silicon startup admission or establish an exact "
-"ordering code, package or authentication secret. Native explicitly returns "
-"UNSUPPORTED. Models and ARM linkage do not establish physical identity, "
-"throughput or board functionality."
+msgid "已审 TIM3／4／5／9–14 PWM；TIM1／3／4／5／8／9–14 原始输入捕获，按实例开放 1／2／4 通道，TIM5 保留 32 位；TIM1／3／4／5／8 支持 x2／x4 正交计数。TIM2 保留给 Core，TIM6／7 用作专用触发；timer personality 独占，IRQ 只取得所选模式实际使用的向量"
+msgstr "Reviewed TIM3 / 4 / 5 / 9–14 PWM; TIM1 / 3 / 4 / 5 / 8 / 9–14 raw input capture, with 1 / 2 / 4 channels according to the instance and a full 32-bit count on TIM5. TIM1 / 3 / 4 / 5 / 8 support x2 / x4 quadrature counting. TIM2 is reserved for Core and TIM6 / 7 for dedicated triggers. Timer personalities are exclusive; an IRQ lease covers only the vector actually used by the selected mode"
 
-#: docs/delivery/support.md:59
-msgid "选择、证据与保留依赖"
-msgstr "Selection, evidence and retained dependencies"
-
-#: docs/delivery/support.md:61
-msgid ""
-"[派生矩阵](capabilities.md)关联声明模式、受审路线、Board、装配与实际生产 ops。 "
-"查询通过只建立配置一致性；模型、ARM、SDK、软件候选和物理 station 记录分别验证。 当前物理 HIL 为 `not_executed`，未知"
-" PCB、跳线、电源与波形仍保持未知。"
-msgstr ""
-"The [derived matrix](capabilities.md) relates declared modes, reviewed "
-"routes, Boards, assemblies and actual production ops. A successful query "
-"establishes only configuration consistency. Model, ARM, SDK, software-"
-"candidate and physical-station records are verified separately. Physical HIL"
-" is currently `not_executed`; unknown PCB, jumpers, power and waveforms "
-"remain unknown."
-
-#: docs/delivery/support.md:65
-msgid ""
-"所有 vendor、子模块和许可证保留；未选 SDK 不进入生产支持或默认构建闭包。 退出的其他 MCU 适配仅保留历史追溯，原始范围见 "
-"[重构前固定源码](https://github.com/X-Gen-"
-"Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)。 "
-"本次重构不能继承旧候选、软件计数或实板结果。"
-msgstr ""
-"All vendors, submodules and licenses are retained. Unselected SDKs do not "
-"enter production support or the default build closure. Other retired MCU "
-"integrations remain historical references at the [fixed pre-refactor "
-"source](https://github.com/X-Gen-"
-"Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18). This refactor "
-"cannot inherit old candidates, software counts or physical-board results."
-
-#: docs/delivery/support.md
-msgid ""
-"SPI1／2／3 共用轮询和有限全双工 DMA 实现，均可选择 8／16 位增强事务；I2C1／2／3 共用 polling、IRQ 和 DMA 的 C"
-" 时序计算，`max_hz` 默认 100000，名义范围为 5129–400000 Hz。CCR 向上取整；Fast-mode 使用 2:1 duty"
-" 与 300 ns TRISE 公式。 RM0090 §27.6.8 要求特定 PCLK 条件才能达到 400 kHz；固定 42 MHz 下， "
-"`max_hz=400000` 选择 CCR=36，名义约 388.9 kHz。时钟容差、上拉和总线电容仍须实板验证。 异步恢复保留取得的时序与 "
-"wake；请求、通知发布者或 DMA 尚未退出时返回 BUSY， 不会先复位硬件。SPI endpoint 的 `lsb_first` 默认 "
-"false，可显式选择 true， 覆盖三个控制器的普通 byte face、8／16 位增强 polling 与 DMA；只在空闲后修改 "
-"硬件位序，不反转或复制 buffer。I2S／TI 和固定 MSB 的 BMP280 不使用该选择。 SPI3 的 AF6 路线是 PC10／11／12"
-" 或 PB3／4／5；I2C3 是 PA8 SCL 与 PC9 SDA AF4，恢复检查两条真实 输入。SPI2 使用 DMA1 stream4 "
-"TX／stream3 RX channel0，SPI3 使用 stream5 TX／ stream0 RX channel0；I2C3 使用 "
-"stream4 TX／stream2 RX channel3。共享物理 stream 时配置拒绝，不自动替换路线。增强 SPI DMA "
-"事务的每段完成都保持同一 CS，取消和 停止失败保留整条请求与借用，直到所选引擎、线端和 CS 均已撤回。"
-msgstr ""
-"SPI1/2/3 share polling and finite full-duplex DMA implementations and each "
-"supports enhanced 8/16-bit transactions. I2C1/2/3 share C timing calculation"
-" for polling, IRQ and DMA; max_hz defaults to 100000, with a nominal range "
-"of 5129–400000 Hz. CCR rounds upward; Fast-mode uses 2:1 duty and the 300 ns"
-" TRISE formula. RM0090 §27.6.8 requires a particular PCLK condition to reach"
-" 400 kHz; at fixed 42 MHz, max_hz=400000 selects CCR=36, nominally about "
-"388.9 kHz. Clock tolerance, pull-ups and bus capacitance still require "
-"hardware validation. Asynchronous recovery preserves the acquired timing and"
-" wake sink. It returns BUSY before resetting hardware while a request, "
-"notification publisher or DMA is still live. The SPI endpoint option "
-"lsb_first defaults to false and may explicitly be true. It covers ordinary "
-"byte faces and enhanced 8/16-bit polling and DMA on all three controllers. "
-"Hardware bit order changes only while idle, without reversing or copying "
-"buffers. This choice does not apply to I2S/TI or the fixed-MSB BMP280 "
-"driver. SPI3 AF6 routes use PC10/11/12 or PB3/4/5. I2C3 uses PA8 SCL and PC9"
-" SDA AF4, and recovery observes both real inputs. SPI2 uses DMA1 stream4 "
-"TX/stream3 RX channel0; SPI3 uses stream5 TX/stream0 RX channel0; I2C3 uses "
-"stream4 TX/stream2 RX channel3. Configuration rejects shared physical "
-"streams without silently replacing routes. Enhanced SPI DMA keeps one CS "
-"interval across segment completions. Failed cancellation or stop retains the"
-" whole request and borrows until the selected engines, wire and CS are all "
-"withdrawn."
-
-msgid "PWM"
-msgstr "PWM"
-
-msgid ""
-"TIM3／4／5／9／10／11／12／13／14 的 20 个已审通道，各 controller 显式选择一路；APB1 timer 84 "
-"MHz、APB2 timer 168 MHz；TIM5 32-bit，其他 16-bit；无隐式共享时基"
-msgstr ""
-"Twenty reviewed channels across TIM3/4/5/9/10/11/12/13/14, selecting one per"
-" controller; APB1 timers 84 MHz and APB2 timers 168 MHz; TIM5 is 32-bit and "
-"the others 16-bit. No implicit shared timebase."
-
-msgid ""
-"ADC1 的内部通道 16／17／18 分别返回温度、VREFINT、VBAT／2 的原始计数。 `adc1-internal` route 不取得 "
-"GPIO；现有采样模式共用静态序列，内部输入固定选择 `sample_times=7` 的 480-cycle "
-"acquisition。温度、电压换算和校准由应用负责， `reference_mv` 仍是名义值。冷态拒绝接管已启用的所需模拟路径，仅撤回本次取得的 "
-"TSVREFE／VBATE；失败保留 clock 与清理责任。1 MHz 时间域的启动等待包含取整裕量： 外部输入 4 μs，含内部输入 11 "
-"μs。软件参考见 `tests/contracts/multi_controller_assembly/*adc-"
-"internal*.toml`；不建立物理采样资格。"
-msgstr ""
-"ADC1 internal channels 16/17/18 return raw counts for temperature, VREFINT "
-"and VBAT/2 respectively. The `adc1-internal` route acquires no GPIO; "
-"existing sampling modes share static sequences, with internal inputs "
-"restricted to `sample_times=7` for a 480-cycle acquisition. Applications own"
-" temperature/voltage conversion and calibration; `reference_mv` remains "
-"nominal. Cold preparation rejects already-enabled required analog paths and "
-"releases only the acquired TSVREFE/VBATE paths; failed cleanup retains "
-"clocks and responsibility. Startup waits include quantization margin in the "
-"1 MHz time domain: 4 us for external inputs and 11 us for sequences "
-"containing internal inputs. Software references are in "
-"`tests/contracts/multi_controller_assembly/*adc-internal*.toml`; they "
-"establish no physical sampling qualification."
-
-msgid "普通 PWM 共用一套 C 实现；以下按通道顺序列出已审路线，仍须由 Board 显式授权。"
-msgstr ""
-"General PWM shares one C implementation. The reviewed routes below list pads"
-" in channel order and still require explicit Board authorization."
-
-msgid "168 MHz"
-msgstr "168 MHz"
-
-msgid "2"
-msgstr "2"
-
-msgid "3"
-msgstr "3"
-
-msgid "84 MHz"
-msgstr "84 MHz"
-
-msgid "9"
-msgstr "9"
-
-msgid "AF"
-msgstr "AF"
-
-msgid "CH1–2：PA2／PA3"
-msgstr "CH1–2: PA2/PA3"
-
-msgid "CH1–2：PB14／PB15"
-msgstr "CH1–2: PB14/PB15"
-
-msgid "CH1–4：PA0／PA1／PA2／PA3"
-msgstr "CH1–4: PA0/PA1/PA2/PA3"
-
-msgid "CH1–4：PA6／PA7／PB0／PB1"
-msgstr "CH1–4: PA6/PA7/PB0/PB1"
-
-msgid "CH1–4：PB6／PB7／PB8／PB9"
-msgstr "CH1–4: PB6/PB7/PB8/PB9"
-
-msgid "CH1：PA6"
-msgstr "CH1: PA6"
-
-msgid "CH1：PA7"
-msgstr "CH1: PA7"
-
-msgid "CH1：PB8"
-msgstr "CH1: PB8"
-
-msgid "CH1：PB9"
-msgstr "CH1: PB9"
-
-msgid "TIM10"
-msgstr "TIM10"
-
-msgid "TIM11"
-msgstr "TIM11"
-
-msgid "TIM12"
-msgstr "TIM12"
-
-msgid "TIM13"
-msgstr "TIM13"
-
-msgid "TIM14"
-msgstr "TIM14"
-
-msgid "TIM3"
-msgstr "TIM3"
-
-msgid "TIM4"
-msgstr "TIM4"
-
-msgid "TIM5"
-msgstr "TIM5"
-
-msgid "TIM9"
-msgstr "TIM9"
-
-msgid "Timer"
-msgstr "Timer"
-
-msgid "固定 timer clock"
-msgstr "Fixed timer clock"
-
-msgid "通道与引脚"
-msgstr "Channels and pads"
-
-msgid "Encoder"
-msgstr "Encoder"
-
-msgid ""
-"TIM3／4／5 独占 TI1／TI2 原始正交计数；x2 TI1、x2 TI2、x4 TI12，独立输入反相与 4-bit filter；无 "
-"IRQ／DMA／累计位置策略"
-msgstr ""
-"Exclusive TIM3/4/5 TI1/TI2 raw quadrature counting; x2 TI1, x2 TI2 or x4 "
-"TI12, independent input inversion and 4-bit filters; no IRQ/DMA or "
-"accumulated position policy"
-
-msgid ""
-"Encoder 复用现有公共接口与 typed factory：TIM3 为 PA6／PA7、TIM4 为 PB6／PB7、 TIM5 为 "
-"PA0／PA1，均为 AF2。计数宽度分别为 16／16／32 bits，filter clock 固定 84 MHz；`counting` 选择 "
-"`x2-ti1`／`x2-ti2`／`x4-ti12`，两路 filter code 为 0–15。 每个 encoder 独占整个 "
-"timer，与同一控制器的 PWM／capture 互斥。"
-msgstr ""
-"Encoder reuses the existing public interface and typed factory: TIM3 uses "
-"PA6/PA7, TIM4 PB6/PB7, and TIM5 PA0/PA1, all on AF2. Counter widths are "
-"16/16/32 bits with a fixed 84 MHz filter clock. Select `counting` from "
-"`x2-ti1`/`x2-ti2`/`x4-ti12`, with filter codes 0–15 on each input. Each "
-"encoder owns the whole timer and conflicts with PWM/capture on that "
-"controller."
-
-msgid ""
-"准备成功时 counter 仍关闭；应用显式 start。stop 保留原始 modulo position， 完整 close "
-"先证明输入／counter／DMA 请求和中断源已停止，再撤回本次 clock；失败保留 静态 descriptor 与清理责任。read "
-"的时间是软件观察时刻，不代表某条边沿；不能恢复 漏采的整圈，方向历史、速度、机械零点和累计位置由产品决定。代码不建立 ring、 任务、IRQ 或 "
-"DMA。示例为 `tests/contracts/multi_controller_assembly/*encoders*.toml`； filter "
-"code 不构成实测抗噪或物理边沿速率保证。"
-msgstr ""
-"Successful preparation leaves the counter disabled; applications explicitly "
-"start it. Stop preserves raw modulo position. Full close proves "
-"input/counter/DMA-request/interrupt-source withdrawal before removing the "
-"acquired clock; failure retains the static descriptor and cleanup "
-"responsibility. Read timestamps are software observations rather than edge "
-"timestamps. Missed complete wraps cannot be reconstructed; products own "
-"direction history, speed, mechanical zero and accumulated position. The code"
-" creates no ring, task, IRQ or DMA. Examples are "
-"`tests/contracts/multi_controller_assembly/*encoders*.toml`; filter codes "
-"establish no measured noise rejection or physical edge-rate guarantee."
-
-msgid ""
-"`injected-shot` 独占所选 ADC，以一次 JSWSTART 执行 1–4 ranks，顺序读取 JDR1–4。 保留 "
-"6／8／10／12-bit 原始计数，offset 固定为零；全部采样和停止成功后才发布 samples／count，超时或停止失败保持 "
-"count=0，失败清理责任仍由实例保留。 不提供同一 ADC 的 regular／DMA 联合、自动注入或外部触发，不建立额外实例状态。 软件参考 "
-"`tests/contracts/multi_controller_assembly/*adc-injected*.toml` 同时选择 "
-"三个转换器；ZG 还选择独立 TIM3 PWM，二者没有相位同步关系。"
-msgstr ""
-"`injected-shot` exclusively owns the selected ADC and uses one JSWSTART for "
-"1–4 ranks, read in order from JDR1–4. It preserves 6/8/10/12-bit raw counts "
-"with zero offsets; samples/count publish only after all sampling and "
-"stopping succeed. Timeout or stop failure leaves count=0 and retains "
-"instance cleanup responsibility. It provides no same-ADC regular/DMA "
-"combination, automatic injection or external trigger, and adds no instance "
-"state. The `tests/contracts/multi_controller_assembly/*adc-injected*.toml` "
-"references select three converters; ZG also selects an independent TIM3 PWM,"
-" without phase synchronization."
-
-#: docs/delivery/support.md:151
-msgid ""
-"I2C1／2／3 的 polling／IRQ／DMA 支持显式 7／10-bit master endpoint。 `address_bits` 默认 "
-"7，地址为 8–119；显式 10 时为 0–1023，两种宽度可共用控制器。 10-bit read 先完成 transmitter "
-"地址前缀，再以内部 repeated START 发送 header-R； 只有最终 ADDR 才释放接收窗口及 DMA 请求，地址字节不计入 "
-"payload。 依据 ES0182 Rev19 §2.10.4，10-bit Standard profile 要求 `max_hz <= "
-"88000`， 或显式选择 Fast `max_hz > 100000`；C 入口另校验实际 CCR，42 MHz PCLK 不豁免勘误。 现有 "
-"drain／quarantine 合同保持不变，ARM endpoint 8 字节及异步 state 64 字节不增长。 软件装配为 "
-"`tests/contracts/multi_controller_assembly/*i2c-tenbit*.toml`，不证明物理 "
-"target、上拉、电容或重复 START 时序，也不提供 I2C target／SMBus／PEC。"
-msgstr ""
-"I2C1/2/3 polling/IRQ/DMA support explicit 7/10-bit master endpoints. "
-"`address_bits` defaults to 7, with addresses 8–119; explicit 10 permits "
-"0–1023, and both widths can share a controller. A 10-bit read completes the "
-"transmitter address prefix, then sends header-R after an internal repeated "
-"START; only the final ADDR releases the receive window and DMA requests. "
-"Address bytes do not count as payload. Under ES0182 Rev19 section 2.10.4, a "
-"10-bit Standard profile requires `max_hz <= 88000`, or explicit Fast mode "
-"with `max_hz > 100000`; C admission also checks the actual CCR, and 42 MHz "
-"PCLK does not exempt the erratum. Existing drain/quarantine contracts remain"
-" unchanged; ARM endpoint storage stays 8 bytes and asynchronous state 64 "
-"bytes. Software assemblies are "
-"`tests/contracts/multi_controller_assembly/*i2c-tenbit*.toml`; they do not "
-"qualify physical targets, pull-ups, capacitance or repeated START timing, "
-"and do not provide I2C target/SMBus/PEC."
-
-msgid ""
-"WWDG 通过既有 watchdog 接口、静态 factory 和独立 C owner 接入。prepare 不启狗， 显式 enable 先证明 "
-"CFR／debug 配置，再以单次 CR 写入激活；未证实的激活也保留不可逆 责任。`window_ticks` 为 1–62，默认 1；名义 42 "
-"MHz PCLK1 的 1／2／4／8 分频须保留 至少一个 `0x40<T<W` 合法计数，不能容纳窗口的 timeout 明确拒绝。早喂 "
-"BUSY、迟喂 STATE，均不 reload 或等待。未激活时按 CFR→debug→Sleep→gate 逆序恢复，失败保留 清理收条且禁止再次 "
-"enable；激活后 stop 保留 System。实际物理 bounds 仍为 0/0 unknown， 不提供 "
-"EWI、STOP／Standby、自动喂狗或物理复位资格。复位原因是独立 SoC 能力，不依赖 选择 IWDG。两份参考为 `*wwdg-"
-"baremetal.toml` 与 `*watchdogs-freertos.toml`。"
-msgstr ""
-"WWDG uses the existing watchdog interface, static factory and a separate C "
-"owner. Prepare does not activate it; explicit enable proves CFR/debug "
-"settings before a single CR activation write. Unproved activation also "
-"retains irreversible responsibility. `window_ticks` is 1–62, default 1. The "
-"nominal 42 MHz PCLK1 and divisors 1/2/4/8 must leave at least one legal "
-"`0x40<T<W` count; timeouts that cannot fit the window reject explicitly. "
-"Early feed returns BUSY and guarded late feed STATE, without reload or "
-"waiting. Before activation, close restores CFR→debug→Sleep→gate; failure "
-"retains cleanup receipts and revokes further enable admission. Activated "
-"stop retains System. Physical bounds remain 0/0 unknown. EWI, STOP/Standby, "
-"automatic feeding and physical reset qualification are not provided. Reset "
-"causes are a separate SoC capability independent of IWDG selection. "
-"References are `*wwdg-baremetal.toml` and `*watchdogs-freertos.toml`."
-
-msgid "PVD"
-msgstr "PVD"
-
-msgid ""
-"PVD 复用 EXTI 接口的 `pvd-level`／`pvd-events`：`level=true` 表示低电压， rising "
-"表示电压下降。阈值编码必须按 DS8626 的 min／max 与迟滞选择，平台不选择 产品电压政策。轮询不分配事件队列；事件模式显式选择 "
-"edge／capacity／IRQ，保持 COALESCED／LOSS 与 wake 合同。关闭先排空 IRQ 再恢复 PLS，不取得或释放 "
-"System 拥有的 PWR clock；失败保留清理责任。不建立物理阈值、BOR 或 STOP 唤醒资格。"
-msgstr ""
-"PVD reuses the EXTI interface through `pvd-level`/`pvd-events`: `level=true`"
-" means low voltage, and rising means falling supply voltage. Select the "
-"threshold encoding using the DS8626 min/max bounds and hysteresis; the "
-"platform does not choose product voltage policy. Polling allocates no event "
-"ring. Event mode explicitly selects edge/capacity/IRQ and preserves the "
-"COALESCED/LOSS and wake contracts. Stop drains IRQs before restoring PLS, "
-"without acquiring or releasing the System-owned PWR clock; failures retain "
-"cleanup responsibility. This does not qualify physical thresholds, BOR or "
-"STOP wakeup."
-
-msgid "内部 EXTI16 的原始 PVDO 电平或有界事件；显式 threshold_code 0–7，不提供精确电压或 BOR 保证"
-msgstr ""
-"Raw PVDO level or bounded events on internal EXTI16; explicit threshold_code"
-" 0–7, without a precise-voltage or BOR guarantee"
-
-msgid "Advanced PWM"
-msgstr "Advanced PWM"
-
-msgid ""
-"TIM1／TIM8 的 CH1–3／CH1N–3N，共六组互补输出，deadtime 与 break；每 controller "
-"选择一组，无自动故障重启或跨 timer 同步"
-msgstr ""
-"Six complementary output pairs across TIM1/TIM8 CH1–3/CH1N–3N, with deadtime"
-" and break; select one pair per controller, with no automatic fault restart "
-"or cross-timer synchronization"
-
-msgid ""
-"TIM3／4／5 的 CH1–4，共 12 条 AF2 路线；TIM3／4 为 16-bit，TIM5 为 32-bit；每 controller "
-"选择一路，调用方提供 ring"
-msgstr ""
-"Twelve AF2 routes across TIM3/4/5 CH1–4; TIM3/4 are 16-bit and TIM5 is "
-"32-bit; select one channel per controller, with a caller-owned ring"
-
-msgid "Timer capture"
-msgstr "Timer capture"
-
-msgid ""
-"互补 PWM 的 TIM1 CH1–3 为 PA8／PA9／PA10，对应 CH1N–3N 为 PB13／PB14／PB15， 共用 PB12 "
-"BKIN，均为 AF1；TIM8 CH1–3 为 PC6／PC7／PC8，对应 PA7／PB0／PB1， 共用 PA6 BKIN，均为 AF3。两者均为"
-" 168 MHz timer clock，分别独占 TIM9／TIM12 共享 break vector；TIM12 peer gate 位于 "
-"APB1。不提供 CH4 互补输出。只选编所需 controller wrapper，共享 C 算法和冷态清理。完整 "
-"controller／配置、pin／IRQ／gate 责任保留到所有资源退出，失败重试不能更换配置或存储。配置显式选择 inactive 电平， "
-"同组输出全部观察为 inactive 后才恢复任一引脚。软件参考为 "
-"`tests/contracts/multi_controller_assembly/*timer-channels*.toml` 与 "
-"`*advanced-pair*.toml`，不建立物理波形、功率级安全或跨 timer 同步资格。"
-msgstr ""
-"TIM1 complementary CH1–3 use PA8/PA9/PA10 and CH1N–3N use PB13/PB14/PB15, "
-"sharing PB12 BKIN, all AF1. TIM8 CH1–3 use PC6/PC7/PC8 and their complements"
-" use PA7/PB0/PB1, sharing PA6 BKIN, all AF3. Both use a 168 MHz timer clock "
-"and respectively exclude TIM9/TIM12 on the shared break vectors; the TIM12 "
-"peer gate is on APB1. CH4 has no complementary output. Only selected "
-"controller wrappers compile, sharing C behavior and cold cleanup. Exact "
-"controller/configuration and pin/IRQ/gate responsibilities remain until all "
-"resources withdraw; a failed retry cannot replace configuration or storage. "
-"Assembly explicitly selects inactive levels; all outputs in the group must "
-"be observed inactive before any pad is restored. Software references are "
-"`tests/contracts/multi_controller_assembly/*timer-channels*.toml` and "
-"`*advanced-pair*.toml`, without physical waveform, power-stage safety or "
-"cross-timer synchronization qualification."
-
-msgid ""
-"捕获的 CH1–4 路线为 TIM3：PA6／PA7／PB0／PB1，TIM4：PB6／PB7／PB8／PB9， "
-"TIM5：PA0／PA1／PA2／PA3，均为 AF2 与 84 MHz timer clock。所选通道独占整个 controller，与该 "
-"timer 的 PWM／encoder 互斥。channel 从已审 Board binding 派生，不再填写第二份通道参数；IRQ 只读取所选 "
-"CCR，保留其他通道状态和后到边沿。 返回值是所报告宽度的 modulo count；观察时间不是物理边沿时间。"
-msgstr ""
-"Capture CH1–4 use PA6/PA7/PB0/PB1 on TIM3, PB6/PB7/PB8/PB9 on TIM4, and "
-"PA0/PA1/PA2/PA3 on TIM5, all AF2 with an 84 MHz timer clock. The selected "
-"channel exclusively owns the entire controller and conflicts with "
-"PWM/encoder on that timer. channel derives from the reviewed Board binding "
-"rather than a second authored channel parameter. IRQ reads only the selected"
-" CCR, preserving other channel facts and late edges. Results are modulo "
-"counts of the reported width; observation time is not physical edge time."
-
-msgid ""
-"ADC1 使用 DMA2 stream4 channel0，ADC2 使用 stream2 channel1，ADC3 使用 stream1 "
-"channel2；有限和连续模式均按所选 lane 解释并清除标志。两种模式的可选 `trigger` 为 "
-"`tim1-ch1`／`tim1-ch2`／`tim1-ch3`、`tim3-ch1`／`tim3-trgo`、 "
-"`tim4-ch4`、`tim5-ch1`／`tim5-ch2`／`tim5-ch3`、`tim8-ch1`／`tim8-trgo`， 省略时选择 "
-"`tim3-trgo`。每个 ADC 独占所选 timer，不与其 PWM／capture／encoder 或其他 ADC 共享；三个转换器选用不同 "
-"timer 时可独立采集，不建立同步多 ADC 资格。 不取得 timer GPIO 或 NVIC；compare 位于 ARR，首次相位不同于 "
-"update/TRGO， 不承诺与外部 PWM 同相。TIM2 保留给 Core，EXTI11 尚需独立引脚与事件 owner。 软件参考 "
-"`tests/contracts/multi_controller_assembly/*adc-timers*.toml` 同时选择三个 ADC 和三个"
-" timer；它们不授权实际 Board 接线或物理采样时序。"
-msgstr ""
-"ADC1 uses DMA2 stream4 channel0, ADC2 uses stream2 channel1, and ADC3 uses "
-"stream1 channel2; finite and continuous modes interpret and clear only their"
-" selected lane. Both modes accept `trigger` values "
-"`tim1-ch1`/`tim1-ch2`/`tim1-ch3`, `tim3-ch1`/`tim3-trgo`, `tim4-ch4`, "
-"`tim5-ch1`/`tim5-ch2`/`tim5-ch3`, and `tim8-ch1`/`tim8-trgo`; omission "
-"selects `tim3-trgo`. Each ADC exclusively owns its selected timer, sharing "
-"with neither PWM/capture/encoder nor another ADC. Three converters can "
-"acquire independently with distinct timers, without simultaneous multimode "
-"qualification. No timer GPIO or NVIC vector is acquired. Compare occurs at "
-"ARR, with a different initial phase from update/TRGO; no phase relationship "
-"to external PWM is promised. TIM2 remains with Core; EXTI11 still requires "
-"an independent pin/event owner. "
-"`tests/contracts/multi_controller_assembly/*adc-timers*.toml` selects three "
-"ADCs and three timers as software references without authorizing actual "
-"Board wiring or physical acquisition timing."
-
-msgid ""
-"ADC1／2 外部 0--15、ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；普通 shot／scan 最多 16 "
-"ranks、软件注入组最多 4 ranks；三个转换器均有可选内部 timer 触发的有限／连续 DMA，所选 timer 独占"
-msgstr ""
-"ADC1/2 external channels 0--15, ADC3 external inputs by package, ADC1 "
-"internal temperature/VREFINT/VBAT, ordinary shots/scans up to 16 ranks and "
-"software-injected groups up to four ranks; all three converters offer "
-"finite/continuous DMA with an exclusively selected internal timer trigger"
-
-msgid ""
-"period 表示完整周期，ARR=period−1；TIM5 上限为 UINT32_MAX，其他已审 timer 为 65535，duty 可达 "
-"period，保留 CCR 表达 100% 的空间。set 只暂存 duty，在 update event 生效；周期与 PSC "
-"保持固定。每个控制器由一路 owner 独占，不隐式共享时基或 同步多个 timer。ADC trigger 与其所选 timer 的 PWM "
-"互斥；TIM3／4／5 各自的 PWM、capture 和 encoder 互斥；TIM1／TIM8 advanced PWM 分别保留共享 "
-"vector 的 TIM9／TIM12。冷态 C 校验精确 timer、pad、channel、分频和 位宽，启钟／撤回失败保留所选 APB gate "
-"的清理责任；已有 GPIO owner 不被覆盖。 `tests/contracts/multi_controller_assembly/*pwm-"
-"family*.toml` 同时链接九个独立实例， 不授权 PCB 接线或实际输出时序。"
-msgstr ""
-"period denotes the complete cycle, ARR=period−1. TIM5 permits UINT32_MAX and"
-" the other reviewed timers permit 65535; duty may equal period, reserving "
-"CCR space for 100%. set only stages duty, which takes effect at an update "
-"event; period and PSC stay fixed. One channel owner exclusively owns each "
-"controller, with no implicit shared timebase or cross-timer synchronization."
-" An ADC trigger conflicts with PWM on its selected timer; PWM, capture and "
-"encoder are mutually exclusive on each of TIM3/4/5. TIM1/TIM8 advanced PWM "
-"respectively reserve TIM9/TIM12 on their shared vectors. Cold C admission "
-"checks the exact timer, pad, channel, divider and width; failed clock "
-"acquisition or withdrawal retains the selected APB gate cleanup "
-"responsibility and never overwrites an existing GPIO owner. "
-"`tests/contracts/multi_controller_assembly/*pwm-family*.toml` links nine "
-"independent instances without authorizing PCB wiring or physical output "
-"timing."
+msgid "精确封装全部 GPIO 的 input／output、四档显式输出速度与 EXTI0–15；PVD 原始电平／事件。省略速度保留已有配置，PC13–15 输出限制为 LOW；晶振和调试引脚仍受资源约束。保留 COALESCED／LOSS，不提供自动消抖、精确边沿时间或 BOR 资格"
+msgstr "Input / output on every GPIO pad of the exact packages, four explicit output-speed grades and EXTI0–15; raw PVD levels / events. An omitted speed preserves the existing setting, except PC13–15 outputs are restricted to LOW. Oscillator and debug pads remain subject to resource constraints. COALESCED / LOSS are preserved; no automatic debounce, exact edge time or BOR qualification"

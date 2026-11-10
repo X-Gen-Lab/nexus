@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "f407ve-audio-software-reference",
+  "soc": "STM32F407VET6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "audio-reference",
+      "controller": "I2S2",
+      "route": "i2s2-simplex"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software-only silicon route; no PCB wiring, codec or external master qualified"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "DS8626 Rev12 AF table and package pinout; no physical wiring assertion"
+    }
+  ]
+}

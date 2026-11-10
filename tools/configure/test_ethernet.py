@@ -6,10 +6,36 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import configure as gate
+from tools.configure import bindings, configure as gate
 
 
 class EthernetConfigurationTests(unittest.TestCase):
+    def test_mii_exact_ve_zg_route_is_complete_without_fitted_phy_claim(self):
+        for part in ('STM32F407VET6', 'STM32F407ZGT6'):
+            with self.subTest(part=part):
+                board = gate.load(gate.ROOT /
+                    'tests/contracts/ethernet_assembly/stm32-zg-board/board.json')
+                board['soc'] = part
+                board['bindings'][0]['route'] = 'mii-a-b-c'
+                (self.root / 'board.json').write_text(json.dumps(board))
+                path = self.assembly(change=lambda text: text.replace(
+                    'mode="raw-rmii"', 'mode="raw-mii"'))
+                lines = path.read_text().splitlines()
+                lines = ['board_package="."' if line.startswith('board_package=')
+                         else line for line in lines]
+                path.write_text('\n'.join(lines) + '\n')
+                result = gate.resolve_ir(path)
+                item, = result.controllers
+                self.assertEqual(item.mode, 'raw-mii')
+                self.assertEqual(len(item.pins), 17)
+                wires = {pin['pin'] for pin in item.pins}
+                self.assertIn('PB8', wires)
+                self.assertIn('PC3', wires)
+                self.assertFalse(any(pin.startswith('PG') for pin in wires))
+                source = bindings.emit(result)[1]
+                self.assertIn('.mii = true', source)
+                self.assertFalse(result.physical_qualified)
+
     def setUp(self):
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)

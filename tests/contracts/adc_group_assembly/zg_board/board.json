@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "f407-zg-adc-group-software-contract",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "RM0090-Rev22-DS8626-Rev12-software-reference",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "group",
+      "controller": "ADC123",
+      "route": "adc123-external-zg"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Silicon-only software fixture; no physical PCB route or HIL qualification."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "RM0090 Rev22 sections13.9/13.13 and DS8626 Rev12 Table7."
+    }
+  ]
+}

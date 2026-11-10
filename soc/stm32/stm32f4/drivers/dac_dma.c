@@ -6,6 +6,7 @@
  * \date            2026-11-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_dac_dma.h"
 #include "stm32f407_provider.h"
 #include "stm32f4xx_ll_bus.h"
@@ -17,7 +18,7 @@
 enum { IDLE, ACTIVE, TAIL, DRAIN };
 enum { COUNTED = 1U, FAILED = 2U };
 #define DRAIN_US 200U
-#define TIMER_HZ 84000000U
+#define TIMER_HZ NEXUS_APB1_TIMER_HZ
 
 /** \brief These controls belong to one privileged, unmasked task executor. */
 static bool context_ok(void) {

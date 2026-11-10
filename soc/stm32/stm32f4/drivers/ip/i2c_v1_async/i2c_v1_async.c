@@ -323,8 +323,7 @@ nx_result_t nx_i2c_v1_initialize(nx_i2c_v1_state_t* state) {
     if (state == NULL || state->registers == NULL ||
         state->line_inputs == NULL || state->line_mask == 0U ||
         (state->line_mask & ~UINT32_C(0xFFFF)) != 0U ||
-        (state->peripheral_mhz != 8U && state->peripheral_mhz != 42U &&
-         state->peripheral_mhz != 50U)) {
+        state->peripheral_mhz < 2U || state->peripheral_mhz > 50U) {
         return NX_ERROR_INVALID;
     }
     if (!nx_arch_is_privileged() || nx_arch_in_isr() ||

@@ -14,6 +14,7 @@ target_compile_definitions(nexus_f407_rtc_test PRIVATE STM32F407xx
     nx_arch_is_privileged=nx_f407_rtc_privileged
     nx_arch_in_isr=nx_f407_rtc_in_isr
     nx_arch_irq_is_masked=nx_f407_rtc_masked
+    nx_arch_irq_masks=nx_f407_rtc_masks
     nx_arch_dsb=nx_f407_rtc_dsb)
 set_source_files_properties(
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/rtc.c" PROPERTIES

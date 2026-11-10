@@ -10,9 +10,9 @@
 #include "lwip/init.h"
 #include "nexus/mqtt/core_mqtt_storage.h"
 #include "nexus/network/lwip_storage.h"
-#include "nexus/soc/stm32f407_entropy.h"
 #include "nexus/tls/storage.h"
 #include "nexus_bindings.h"
+#include "nexus_factory.h"
 #include "public_ca.h"
 #include <stdalign.h>
 
@@ -48,9 +48,9 @@ void nx_lwip_port_assert(const char* message) {
 uint32_t nx_lwip_port_random_u32(void) {
     uint8_t bytes[4U];
     const nx_clock_t clock = {now, NULL};
-    nx_result_t result =
-        nx_entropy_fill(nx_stm32f407_entropy_instance(), bytes, sizeof(bytes),
-                        &clock, nx_deadline_after(nx_time_now_us(), 100000U));
+    nx_result_t result = nx_entropy_fill(
+        nx_factory_entropy(NX_ENTROPY_ID_RANDOM), bytes, sizeof(bytes), &clock,
+        nx_deadline_after(nx_time_now_us(), 100000U));
     if (result != NX_SUCCESS) {
         nx_lwip_port_assert("Unqualified link fixture RNG source failed");
         for (;;) {
@@ -167,8 +167,9 @@ int main(void) {
         return 1;
     }
     /* Exact facts of the selected reviewed hse8-pll168 Qiming assembly. */
-    const nx_stm32f407_entropy_config_t entropy_config = {8000000U, 168000000U};
-    nx_result_t result = nx_stm32f407_entropy_instance_start(&entropy_config);
+    nx_result_t result = nx_factory_entropy(NX_ENTROPY_ID_RANDOM) != NULL
+                             ? NX_SUCCESS
+                             : NX_ERROR_STATE;
     bool joined = true;
     bool network_started = false;
     if (result == NX_SUCCESS) {
@@ -182,7 +183,7 @@ int main(void) {
         const nx_tls_runtime_config_t runtime_config = {
             tls_arena,
             sizeof(tls_arena),
-            nx_stm32f407_entropy_instance(),
+            nx_factory_entropy(NX_ENTROPY_ID_RANDOM),
             {now, NULL},
             {untrusted_utc, NULL},
             100000U,
@@ -213,10 +214,6 @@ int main(void) {
             }
         }
     }
-    nx_result_t stopped = nx_stm32f407_entropy_instance_stop();
-    if (stopped != NX_SUCCESS) {
-        return 2;
-    }
-    stopped = nx_platform_stop();
+    nx_result_t stopped = nx_platform_stop();
     return result == NX_SUCCESS && stopped == NX_SUCCESS ? 0 : 3;
 }

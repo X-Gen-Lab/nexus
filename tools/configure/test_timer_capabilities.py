@@ -79,9 +79,9 @@ class TimerCapabilityObserverTests(unittest.TestCase):
         rows = capabilities.collect(configure.ROOT)
         selected = [row for row in rows if row["kind"] in {"timer_capture", "advanced_pwm"}]
         expected = {
-            ('stm32f4', "TIM3", "timer_capture", "edge-capture"),
-            ('stm32f4', "TIM4", "timer_capture", "edge-capture"),
-            ('stm32f4', "TIM5", "timer_capture", "edge-capture"),
+            ('stm32f4', f"TIM{number}", "timer_capture", "edge-capture")
+            for number in (1, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14)
+        } | {
             ('stm32f4', "TIM1", "advanced_pwm", "complementary-pwm"),
             ('stm32f4', "TIM8", "advanced_pwm", "complementary-pwm"),
         }
@@ -89,9 +89,10 @@ class TimerCapabilityObserverTests(unittest.TestCase):
                            row["mode"]) for row in selected}, expected)
         for row in selected:
             self.assertTrue(row["fixtures"])
-            name = ('advanced_pwm_tim8' if row['controller'] == 'TIM8'
-                    else 'timer_capture_'+row['controller'].lower()
+            name = ('timer_capture_'+row['controller'].lower()
                     if row['kind'] == 'timer_capture' and row['controller'] != 'TIM4'
+                    else 'advanced_pwm_tim8'
+                    if row['kind'] == 'advanced_pwm' and row['controller'] == 'TIM8'
                     else row['kind'])
             self.assertEqual(row["exports"],
                              [f"{source_directory(row['family'])}/drivers/{name}.c"])

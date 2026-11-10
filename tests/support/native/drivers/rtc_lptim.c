@@ -443,8 +443,8 @@ static nx_result_t lptim_stop(void* context) {
     return state->armed || state->pending || state->terminal ? NX_ERROR_BUSY
                                                              : NX_SUCCESS;
 }
-const nx_rtc_ops_t nx_native_rtc_ops = {rtc_read,   rtc_set,     rtc_submit,
-                                        rtc_cancel, rtc_service, rtc_stop};
+const nx_rtc_ops_t nx_native_rtc_ops = {
+    rtc_read, rtc_set, rtc_submit, rtc_cancel, rtc_service, rtc_stop, NULL};
 const nx_lptim_ops_t nx_native_lptim_ops = {
     lptim_sample, lptim_submit, lptim_cancel, lptim_service, lptim_stop};
 

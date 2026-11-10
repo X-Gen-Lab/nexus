@@ -27,6 +27,10 @@ class PlatformLifecycleEmissionTests(unittest.TestCase):
                 self.assertIn('"platform_lifecycle_impl.h"', source)
                 self.assertIn("nx_platform_lifecycle_start_local(", source)
                 self.assertIn("nx_platform_lifecycle_stop_local(", source)
+                self.assertIn("nx_platform_lifecycle_suspend_local(", source)
+                self.assertIn("nx_platform_lifecycle_resume_local(", source)
+                self.assertIn("nx_platform_suspend(void)", header)
+                self.assertIn("nx_platform_resume(void)", header)
                 self.assertIn("static nx_platform_lifecycle_state_t "
                               "s_nx_platform_lifecycle;", source)
                 self.assertNotIn("nx_platform_start_impl", source)
@@ -87,6 +91,15 @@ class PlatformLifecycleEmissionTests(unittest.TestCase):
         self.assertIn(".controller_count = 0u", source)
         self.assertIn(".ordinals = NULL", source)
         self.assertNotIn("s_nx_platform_ordinals[]", source)
+
+    def test_rtc_suspend_preserves_autonomous_owner_in_fixed_dispatch(self):
+        result = self.resolve(
+            "boards/stm32f407zg_qiming_core/assemblies/rtc-adopt.toml")
+        source = bindings.emit(result)[1]
+        self.assertIn("nx_stm32_rtc_suspend(&s_nx_port_calendar)", source)
+        self.assertIn("nx_stm32_rtc_resume(&s_nx_port_calendar)", source)
+        self.assertIn(".suspend = nx_platform_suspend_controller", source)
+        self.assertIn(".resume = nx_platform_resume_controller", source)
 
     def test_runtime_power_still_rejects_unmaintained_provider(self):
         result = self.resolve(

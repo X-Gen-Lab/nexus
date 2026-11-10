@@ -18,12 +18,13 @@ static bool privileged;
 static bool in_isr;
 static bool masked;
 static bool refuse_restricted_speed;
+static bool refuse_gpio_speed;
 static nx_time_us_t model_time;
 class BasicCold : public testing::Test {
   protected:
     void* mapping = MAP_FAILED;
     nx_stm32_gpio_state_t gpio{};
-    nx_stm32_gpio_config_t config{GPIOD, 0x1000U, 0x1000U, true, 0U, 0U};
+    nx_stm32_gpio_config_t config{GPIOD, 0x1000U, 0x1000U, true, 0U, 0U, 0U};
     nx_stm32_flash_state_t flash{};
     nx_stm32_watchdog_state_t watchdog{};
     const nx_flash_sector_t sectors[8]{
@@ -42,6 +43,7 @@ class BasicCold : public testing::Test {
         in_isr = false;
         masked = false;
         refuse_restricted_speed = false;
+        refuse_gpio_speed = false;
         model_time = 100U;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
@@ -130,6 +132,89 @@ TEST_F(BasicCold, GPIORejectsInvalidElectricalChoicesBeforeClockOrPinWrites) {
     reject();
 }
 
+TEST_F(BasicCold, GPIOSelectsAllFourOutputSpeedsWithoutTouchingPeerPads) {
+    const uint32_t peers = UINT32_C(0xA55AA55A) & ~(3U << 24U);
+    for (uint8_t speed : {uint8_t{1U}, uint8_t{2U}, uint8_t{3U}, uint8_t{4U}}) {
+        gpio = {};
+        config.speed = speed;
+        GPIOD->OSPEEDR = peers;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_prepare(&gpio, &config));
+        EXPECT_EQ(peers | (static_cast<uint32_t>(speed - 1U) << 24U),
+                  GPIOD->OSPEEDR);
+        EXPECT_EQ(config.mask, GPIOD->BSRR);
+    }
+}
+
+TEST_F(BasicCold, GPIORejectsInvalidOrInputSpeedBeforeAnyEffects) {
+    for (const auto selected : {uint8_t{5U}, uint8_t{255U}}) {
+        config.speed = selected;
+        EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_gpio_prepare(&gpio, &config));
+        EXPECT_EQ(0U, RCC->AHB1ENR);
+        EXPECT_EQ(0U, GPIOD->BSRR);
+        EXPECT_EQ(nullptr, gpio.registers);
+    }
+    config.speed = 1U;
+    config.output = false;
+    config.initial = 0U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_gpio_prepare(&gpio, &config));
+    EXPECT_EQ(0U, RCC->AHB1ENR);
+}
+
+TEST_F(BasicCold, GPIORejectsRestrictedOutputSpeedBeforeClockOrLevelWrites) {
+    config.registers = GPIOC;
+    config.mask = config.initial = 1U << 13U;
+    for (uint8_t speed : {uint8_t{2U}, uint8_t{3U}, uint8_t{4U}}) {
+        config.speed = speed;
+        EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_gpio_prepare(&gpio, &config));
+        EXPECT_EQ(0U, RCC->AHB1ENR);
+        EXPECT_EQ(0U, GPIOC->BSRR);
+        EXPECT_EQ(0U, GPIOC->MODER);
+        EXPECT_EQ(nullptr, gpio.registers);
+    }
+}
+
+TEST_F(BasicCold, GPIORefusedSpeedNeverExposesOutputAndRetainsBoundOwner) {
+    config.speed = 4U;
+    refuse_gpio_speed = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_gpio_prepare(&gpio, &config));
+    EXPECT_FALSE(gpio.initialized);
+    EXPECT_EQ(0U, GPIOD->MODER & (3U << 24U));
+    EXPECT_EQ(GPIOD, gpio.registers);
+    EXPECT_NE(0U, RCC->AHB1ENR & RCC_AHB1ENR_GPIODEN);
+}
+
+TEST_F(BasicCold, GPIOAllBondedBanksUseTheSameInputAndOutputOwner) {
+    GPIO_TypeDef* banks[]{GPIOA, GPIOB, GPIOC, GPIOD,
+                          GPIOE, GPIOF, GPIOG, GPIOH};
+    for (unsigned index = 0U; index < 8U; ++index) {
+        SCOPED_TRACE(index);
+        config.registers = banks[index];
+        config.mask = index == 7U ? 3U : 0xFFFFU;
+        config.initial = 0U;
+        config.speed = NX_STM32_GPIO_SPEED_PRESERVE;
+        for (bool output : {false, true}) {
+            gpio = {};
+            config.output = output;
+            ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_prepare(&gpio, &config));
+            const nx_gpio_port_t face{&nx_stm32_gpio_ops, &gpio};
+            banks[index]->IDR = config.mask;
+            uint32_t value = 0U;
+            ASSERT_EQ(NX_SUCCESS, nx_gpio_port_read(&face, &value));
+            EXPECT_EQ(config.mask, value);
+            EXPECT_EQ(1U << index, RCC->AHB1ENR & (1U << index));
+            if (output) {
+                EXPECT_EQ(NX_SUCCESS,
+                          nx_gpio_port_write(&face, config.mask, 0U));
+                EXPECT_EQ(config.mask, banks[index]->BSRR);
+            } else {
+                EXPECT_EQ(NX_ERROR_INVALID,
+                          nx_gpio_port_write(&face, config.mask, 0U));
+            }
+            ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_stop(&gpio, 0U));
+        }
+    }
+}
+
 TEST_F(BasicCold, FlashBindsPhysicalGeometryWithoutMMIOWrites) {
     FLASH->SR = FLASH_SR_EOP;
     FLASH->CR = FLASH_CR_LOCK;
@@ -211,6 +296,9 @@ extern "C" bool nx_arch_irq_is_masked(void) {
     return masked;
 }
 extern "C" void nx_arch_dsb(void) {
+    if (refuse_gpio_speed) {
+        GPIOD->OSPEEDR &= ~(3U << 24U);
+    }
     if (refuse_restricted_speed) {
         GPIOC->OSPEEDR |= 3U << 26U;
     }

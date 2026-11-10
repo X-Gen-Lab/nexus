@@ -59,13 +59,19 @@ from .bindings import constructor
 from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, platform_declarations,
                        platform_system_start, platform_resources_acquire,
-                       platform_resources_release, platform_system_release)
-from tools.configure.clocks import normalize as normalize_clock, plan as clock_plan
+                       platform_resources_release, platform_system_release,
+                       platform_resources_resume)
+from .emission import platform_power_controllers
+from .clocks import normalize as normalize_clock, plan as clock_plan
+from .clocks import controller_hz as controller_clock_hz
+from .clocks import validate_consumers as validate_clock_consumers
+from .clocks import timer_domain as timer_clock_domain
 from . import gpio as GPIO_PHASE
 from . import sram as EXTERNAL_MEMORY
 from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS, CONTROLLER_PAIRS,
                        SECONDARY_FACTS, DAC_DMA_ROUTES)
-from .i2s2 import resolve_i2s2
 from .integration import USB_DEVICE, ETHERNET, TIMER_ADVANCED
 from .integration import CAN_INTEGRATION
 from . import fsmc as EXTERNAL_BUS
+
+from .capture_audio import resolve_fields as capture_audio_fields

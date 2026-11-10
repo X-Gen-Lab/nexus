@@ -5,7 +5,9 @@
  */
 #ifndef NX_STM32F407_CONTROL_COLD_H
 #define NX_STM32F407_CONTROL_COLD_H
+#include "stm32f407_clock.h"
 #include "stm32f407_stream.h"
+#include "stm32f4_adc_pins.h"
 #include "stm32f4_adc_trigger.h"
 
 #ifndef NX_PLATFORM_REGISTER_WRITE
@@ -194,7 +196,7 @@ nx_stm32_pwm_prepare(nx_stm32_pwm_state_t* port,
         config->duty_ticks > config->period_ticks || config->tick_hz == 0U)
         return NX_ERROR_INVALID;
     const bool apb2 = nx_stm32_timer_apb2(config->registers);
-    const uint32_t source_hz = apb2 ? UINT32_C(168000000) : UINT32_C(84000000);
+    const uint32_t source_hz = apb2 ? NEXUS_APB2_TIMER_HZ : NEXUS_APB1_TIMER_HZ;
     if (source_hz / config->tick_hz != (uint32_t)config->prescaler + 1U ||
         source_hz % config->tick_hz != 0U)
         return NX_ERROR_INVALID;
@@ -279,30 +281,6 @@ static inline uint32_t nx_stm32_adc_clock(const ADC_TypeDef* registers) {
            : registers == ADC2 ? RCC_APB2ENR_ADC2EN
            : registers == ADC3 ? RCC_APB2ENR_ADC3EN
                                : 0U;
-}
-
-/** \brief Configure one reviewed external channel; sequence order is separate.
- */
-static inline nx_result_t nx_stm32_adc_pin(ADC_TypeDef* registers,
-                                           uint8_t channel) {
-    if (registers == ADC1 && channel >= 16U && channel <= 18U)
-        return NX_SUCCESS;
-    GPIO_TypeDef* gpio;
-    uint8_t pin;
-    if (registers == ADC3) {
-        static const uint8_t pads[16] = {
-            0x00U, 0x01U, 0x02U, 0x03U, 0x56U, 0x57U, 0x58U, 0x59U,
-            0x5AU, 0x53U, 0x20U, 0x21U, 0x22U, 0x23U, 0x54U, 0x55U};
-        uint8_t pad = pads[channel];
-        gpio = pad < 0x20U ? GPIOA : pad < 0x50U ? GPIOC : GPIOF;
-        pin = pad & 15U;
-    } else {
-        gpio = channel < 8U ? GPIOA : channel < 10U ? GPIOB : GPIOC;
-        pin = channel < 8U    ? channel
-              : channel < 10U ? (uint8_t)(channel - 8U)
-                              : (uint8_t)(channel - 10U);
-    }
-    return nx_stm32_pin_configure(gpio, pin, 3U, 0U, 0U, false);
 }
 
 /** \brief Acquire one converter; clock and controller receipts are distinct. */
@@ -463,7 +441,7 @@ nx_stm32_adc_stream_cold_begin(nx_stm32_adc_stream_state_t* port,
     port->regions = config->regions;
     port->region_count = config->region_count;
     port->timer_clock_hz = nx_stm32_adc_trigger_clock(trigger);
-    port->adc_clock_hz = 21000000U;
+    port->adc_clock_hz = NEXUS_ADC_HZ;
     return NX_SUCCESS;
 }
 

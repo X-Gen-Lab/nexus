@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "stm32-zg-i2c-target-software-fixture",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-fixture-v1",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "target0",
+      "controller": "I2C1",
+      "route": "target-i2c1-pb6-pb7"
+    },
+    {
+      "id": "smbus0",
+      "controller": "I2C1",
+      "route": "target-i2c1-pb6-pb7-pb5"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Development compile/link fixture, not a physical PCB package",
+    "External devices, I2C pull-ups, electrical wiring and 3.3 V supply are not measured",
+    "Ineligible for physical HIL or product promotion"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "Reviewed STM32F407 silicon controller and AF resources; no physical wiring qualification"
+    }
+  ]
+}

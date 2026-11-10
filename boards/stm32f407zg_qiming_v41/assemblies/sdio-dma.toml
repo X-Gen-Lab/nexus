@@ -1,0 +1,36 @@
+# Software reference only; no physical card, DMA or manufacturing qualification.
+schema = 2
+board_package = ".."
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[hardware]
+sd_card = "inserted"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 4096
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0
+
+[block.sd0]
+binding = "sdio"
+mode = "sdio-dma"
+protocol = "sd-memory"
+bus_width = 4
+max_blocks = 8
+poll_budget = 100000
+stop_timeout_us = 1000000
+
+[block.sd0.irq]
+priority = 6
+
+# Selecting this face never invokes or authorizes a manufacturing action.
+[flash.physical]
+binding = "flash0"
+mode = "poll-word"
+maintenance = true

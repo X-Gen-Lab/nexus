@@ -6,6 +6,7 @@
  * \date            2026-11-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_uart_hardware.h"
 
 /* Only reviewed pads and DMA lanes are admitted. Extra silicon alternatives
@@ -14,7 +15,7 @@ const nx_stm32_uart_hardware_t nx_stm32_uart_hardware[6] = {
     {USART1,
      GPIOA,
      GPIOA,
-     84000000U,
+     NEXUS_APB2_HZ,
      RCC_APB2ENR_USART1EN,
      USART1_IRQn,
      0U,
@@ -32,7 +33,7 @@ const nx_stm32_uart_hardware_t nx_stm32_uart_hardware[6] = {
     {USART2,
      GPIOA,
      GPIOA,
-     42000000U,
+     NEXUS_APB1_HZ,
      RCC_APB1ENR_USART2EN,
      USART2_IRQn,
      0U,
@@ -50,7 +51,7 @@ const nx_stm32_uart_hardware_t nx_stm32_uart_hardware[6] = {
     {USART3,
      GPIOB,
      GPIOB,
-     42000000U,
+     NEXUS_APB1_HZ,
      RCC_APB1ENR_USART3EN,
      USART3_IRQn,
      1U,
@@ -68,7 +69,7 @@ const nx_stm32_uart_hardware_t nx_stm32_uart_hardware[6] = {
     {UART4,
      GPIOA,
      GPIOA,
-     42000000U,
+     NEXUS_APB1_HZ,
      RCC_APB1ENR_UART4EN,
      UART4_IRQn,
      0U,
@@ -86,7 +87,7 @@ const nx_stm32_uart_hardware_t nx_stm32_uart_hardware[6] = {
     {UART5,
      GPIOC,
      GPIOD,
-     42000000U,
+     NEXUS_APB1_HZ,
      RCC_APB1ENR_UART5EN,
      UART5_IRQn,
      2U,
@@ -104,7 +105,7 @@ const nx_stm32_uart_hardware_t nx_stm32_uart_hardware[6] = {
     {USART6,
      GPIOC,
      GPIOC,
-     84000000U,
+     NEXUS_APB2_HZ,
      RCC_APB2ENR_USART6EN,
      USART6_IRQn,
      2U,

@@ -1,0 +1,114 @@
+# Reviewed against the exact current canonical source and gettext messages.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 7ab3ff1c3ae35327909c8f4536135642e93b3ac8ea8e584ed42b97aa9e4bf20e\n"
+
+msgid "F407 USART 线模式与冷态资源"
+msgstr "F407 USART wire modes and cold resources"
+
+msgid "`irq-wire` 为 STM32F407VET6／ZGT6 提供显式 USART 线模式，公共面继续使用 `nx_uart_port_t`、字节请求和事件 ring。配置选择完整收发机制、精确引脚、 IRQ 与错误退出；不会从 HAL 函数存在推导其他器件、板卡或物理资格。"
+msgstr "`irq-wire` provides explicit USART wire modes for STM32F407VET6/ZGT6. The public face continues to use `nx_uart_port_t`, byte requests and an event ring. Configuration selects complete transmit/receive mechanisms, exact pads, IRQs and failure withdrawal. The presence of a HAL function does not establish another device, Board route or physical qualification."
+
+msgid "`wire.protocol`"
+msgstr "`wire.protocol`"
+
+msgid "精确实例"
+msgstr "Exact instances"
+
+msgid "固定帧与执行合同"
+msgstr "Fixed frame and execution contract"
+
+msgid "`asynchronous`"
+msgstr "`asynchronous`"
+
+msgid "USART1／2／3／6"
+msgstr "USART1/2/3/6"
+
+msgid "8N1；`flow` 可为 `none`、`rts`、`cts`、`rts-cts`，路线必须包含实际选定握手脚"
+msgstr "8N1; `flow` is `none`, `rts`, `cts` or `rts-cts`; the route must include the selected handshake pads"
+
+msgid "`synchronous`"
+msgstr "`synchronous`"
+
+msgid "8N1 master；显式 CPOL、CPHA、末位时钟；接收时必须提交实际或 dummy TX 来产生 CK"
+msgstr "8N1 master; explicit CPOL, CPHA and last-bit clock; reception requires submitting actual or dummy TX data to generate CK"
+
+msgid "`half-duplex`"
+msgstr "`half-duplex`"
+
+msgid "全部六实例"
+msgstr "All six instances"
+
+msgid "8N1；只取得 TX，内部接收使用同一脚；先建立释放电平，再选择 open-drain AF"
+msgstr "8N1; acquires TX only and receives internally on that same pad; establish the released latch level before selecting open-drain AF"
+
+msgid "`lin`"
+msgstr "`lin`"
+
+msgid "8N1；显式 10／11-bit break 检测，13-bit break 发送与原始字节／错误事件"
+msgstr "8N1; explicit 10/11-bit break detection, 13-bit break transmission and raw byte/error events"
+
+msgid "`irda`"
+msgstr "`irda`"
+
+msgid "8N1 SIR、最高 115200 baud；显式非零 PSC，low-power 需要所选 APB／PSC 为 1.42–2.12 MHz"
+msgstr "8N1 SIR up to 115200 baud; explicit nonzero PSC; low-power mode requires the selected APB/PSC to be 1.42–2.12 MHz"
+
+msgid "`smartcard`"
+msgstr "`smartcard`"
+
+msgid "8E1.5；open-drain TX、独立 CK、PSC 1–31、guard 0–255、可选硬件 NACK；每请求只发送一个字符"
+msgstr "8E1.5; open-drain TX, independent CK, PSC 1–31, guard 0–255 and optional hardware NACK; one character per TX request"
+
+msgid "UART4／5 缺少 CK、Smartcard 与 RTS／CTS。C 冷态准入和 TOML 验证都拒绝这些 组合，既有私有 format／flow 入口也不能给 UART4／5 开启硬件握手。 模式不实现 LIN schedule、ISO 7816 会话、ATR、卡供电／复位或 IrDA 协议栈。"
+msgstr "UART4/5 have no CK, Smartcard or RTS/CTS. C cold admission and TOML validation reject these combinations. Existing private format/flow entry points also cannot enable hardware handshaking on UART4/5. These modes do not implement LIN schedules, ISO 7816 sessions, ATR, card power/reset or an IrDA protocol stack."
+
+msgid "配置、状态与引脚"
+msgstr "Configuration, state and pads"
+
+msgid "公共配置类型在 `nexus/io/uart_wire.h`；厂商寄存器、Handle 与可变实现仍留在 SoC 私有目录。`[uart.<id>.wire]` 经不可变 `UartWireOptions` 生成只读配置， factory 返回原有 UART face。`uart_wire.c` 只在选择 `irq-wire` 时选编，普通 byte/event 状态和 `nx_uart_ops_t` 没有增加字段或方法槽。"
+msgstr "Public configuration types live in `nexus/io/uart_wire.h`; vendor registers, Handles and mutable implementation remain private to the SoC. `[uart.<id>.wire]` resolves through immutable `UartWireOptions` into readonly configuration, and the factory returns the existing UART face. `uart_wire.c` is selected only for `irq-wire`; ordinary byte/event state and `nx_uart_ops_t` gain no fields or method slots."
+
+msgid "![FIG-04：静态 factory 与独立状态](../assets/diagrams/factory-instances.svg)"
+msgstr "![FIG-04: static factory and independent state](../assets/diagrams/factory-instances.svg)"
+
+msgid "FIG-04：静态 factory 与独立状态"
+msgstr "FIG-04: static factory and independent state"
+
+msgid "此图沿用现有 factory／face／state 关系，不表示某块 PCB 已接入新线模式。 完整软件资源参考为 `tests/contracts/uart_wire_assembly/six-wire-ve.toml` 和 `six-wire-zg.toml`：USART1 同步、USART2 Smartcard、USART3 RTS／CTS、UART4 单线、UART5 LIN、USART6 IrDA；两个 Board package 明确为软件 fixture。"
+msgstr "The figure retains the existing factory/face/state relationships and does not assert that a PCB implements these wire modes. Complete software resource references are `tests/contracts/uart_wire_assembly/six-wire-ve.toml` and `six-wire-zg.toml`: USART1 synchronous, USART2 Smartcard, USART3 RTS/CTS, UART4 single wire, UART5 LIN and USART6 IrDA. Both Board packages are explicitly software fixtures."
+
+msgid "冷态记录保存实际取得的全部 pad 与 IRQ 优先级；单线不占用未使用的 RX， Smartcard 占用 TX 与 CK，同步占用 TX／RX／CK，握手只取得所选 CTS／RTS。 原 pad latch、mode、type、pull、speed 与 AF 在完整停止后恢复。失败的回读 保留收条、时钟和同一 owner，后续 close 重试；不得清零 owner 来掩盖残留。"
+msgstr "Cold receipts retain every acquired pad and IRQ priority. Single-wire mode does not acquire unused RX; Smartcard acquires TX and CK, synchronous mode acquires TX/RX/CK, and flow control acquires only selected CTS/RTS pads. Original pad latch, mode, type, pull, speed and AF are restored after complete stop. Failed readback retains the receipt, clock and same owner for a later close retry. Clearing the owner cannot hide remaining effects."
+
+msgid "ES0182 Rev19 §2.11.9 要求 UE／RE 有效后才把 RTS 切到 AF。冷启动先把已授权 RTS 建立为 GPIO high，完整 USART 配置与 UE／RE 回读成立后才交给外设。 停止先撤销 RTSE 并回读，再关闭 UE／RE；RTSE 撤销失败时保留活动接收器和资源。 CTS／RTS 的电平、电压、外部上拉、peer 行为和 PCB 接线仍由 Board／产品审核。"
+msgstr "ES0182 Rev19 §2.11.9 requires UE/RE to be valid before switching RTS to AF. Cold startup first drives the authorized RTS pad high as GPIO, then hands it to the peripheral after the complete USART tuple and UE/RE readback succeed. Stop withdraws and reads back RTSE before disabling UE/RE; failed RTSE withdrawal retains the enabled receiver and resources. Board/product review still owns CTS/RTS levels, voltage, external pulls, peer behavior and PCB wiring."
+
+msgid "收发、取消与恢复"
+msgstr "Transfers, cancellation and recovery"
+
+msgid "一个未屏蔽的 Thread executor 独占 submit、cancel、service、read 与 stop； 生成 IRQ 直接绑定实例。IRQ 先记录 RX／错误，再处理 TX，保持 ES0182 §2.11.2 所需的 parity 观察顺序。ring 溢出沿用显式 loss，不能静默覆盖旧事件。"
+msgstr "One unmasked Thread executor exclusively owns submit, cancel, service, read and stop; generated IRQs bind directly to instances. IRQs record RX/errors before processing TX, preserving the parity-observation ordering required by ES0182 §2.11.2. Ring overflow retains explicit loss and never silently overwrites earlier events."
+
+msgid "接受 TX 后，请求和 payload 借用到 acquire 观察 SETTLED。取消和 deadline 只停止加载，不撤销借用。TXEIE／TCIE 撤销失败时不能继续读 payload，也不能 结清请求；保留 QUARANTINED，service 在真实 TC 与源静止后才能释放。 完整停止排空 TX、撤销所有接收／LIN publisher，再归还引脚与时钟。 成功 close 后可以用原静态配置重新启动；失败 close 继续持有原状态。"
+msgstr "Accepted TX borrows the request and payload until an acquire observation of SETTLED. Cancellation and deadlines stop loading without revoking the borrow. Failed TXEIE/TCIE withdrawal permits neither another payload read nor settlement. QUARANTINED storage remains retained; service can release it only after actual TC and source withdrawal. Complete stop drains TX, withdraws every receive/LIN publisher, then returns pads and clocks. Successful close permits restart with the original static configuration; failed close retains the same state."
+
+msgid "`nx_uart_lin_break_prepare` 生成无 payload、长度为零的控制请求，只能提交给 LIN provider。SBK 尚未撤销或实际 TC 未出现时，取消／超时仍保留请求；排空 超过预算时进入 QUARANTINED。接收 break 使用 `NX_UART_EVENT_BREAK` 与 `NX_UART_EVENT_NO_BYTE`，同时保留实际 framing／overrun 等错误事实。 byte profile 不能表示 break 事件，使用 LIN 边界的调用者必须选择 events。"
+msgstr "`nx_uart_lin_break_prepare` creates a control request without payload and with zero length, accepted only by a LIN provider. Cancellation/timeout retains the request while SBK remains set or actual TC has not occurred; an exhausted drain budget enters QUARANTINED. Received breaks use `NX_UART_EVENT_BREAK` and `NX_UART_EVENT_NO_BYTE`, preserving actual framing/overrun and other errors. The byte profile cannot represent break events; callers using LIN boundaries must select events."
+
+msgid "Smartcard 每请求只准入一个字符，TC 包含硬件 guard time；后续请求要等前一个 SETTLED。这实现 ES0182 §2.11.8 的 TC 间隔要求。发送期间观察到 PE／FE／ORE／NE 会停止后续加载、保留 RX 错误事实，并在真实 TC 后以 IO 结清。重传属于调用者， 不在 IRQ 中自动执行。"
+msgstr "Smartcard admits one character per request. TC includes hardware guard time, and the next request waits for the previous SETTLED. This implements the TC spacing required by ES0182 §2.11.8. PE/FE/ORE/NE observed during transmission stops further loading, preserves RX errors and settles with IO after actual TC. Retransmission belongs to the caller and is never automatic in IRQs."
+
+msgid "单线 TX／RX 可能观察到自身回送，线路仲裁与对端冲突处理属于产品。IrDA 在接收 期间不能抢发；产品必须提供光学收发器 settling、至少手册所述 TX／RX turnaround 以及显式 service／IRQ 延迟预算。同步接收的数据保存在原 ring，TX settlement 不代表调用者已读取全部 RX；overflow 仍是独立事实。"
+msgstr "Single-wire TX/RX can observe its own echo; the product owns line arbitration and peer collision handling. IrDA must not transmit over an active reception. The product supplies optical-transceiver settling, at least the manual’s TX/RX turnaround, and explicit service/IRQ latency budgets. Synchronous RX remains in the ordinary ring; TX settlement does not mean the caller has consumed all RX, and overflow remains independent."
+
+msgid "精确勘误与验证边界"
+msgstr "Exact errata and validation boundaries"
+
+msgid "依据 DS8626 Rev12 Table5／Table9、RM0090 Rev22 §30.3.8–30.3.13 与 ES0182 Rev19 §2.11。Smartcard NACK 采样窗口问题（§2.11.6）没有软件 workaround， 不能由此实现宣称 ISO 7816 认证。RTS 在 peer 违反握手时的异常（§2.11.5）仍要求 真实 IRQ 延迟与 peer 合同；有限 ring 不是自动无损背压。"
+msgstr "The sources are DS8626 Rev12 Table5/Table9, RM0090 Rev22 §30.3.8–30.3.13 and ES0182 Rev19 §2.11. The Smartcard NACK sampling-window limitation (§2.11.6) has no software workaround; this implementation does not establish ISO 7816 certification. RTS behavior when a peer violates handshaking (§2.11.5) still requires actual IRQ latency and a peer contract; a finite ring is not automatically lossless backpressure."
+
+msgid "LIN 不与 CTS 组合，也不会把 break 排到活动数据之后；新 break 只能在唯一 TX 槽空闲时准入，避免 §2.11.7 的活动数据／CTS／break 组合。无 workaround 的 IDLE 偏差（§2.11.1）不成为本 IRQ ring 的帧边界保证。芯片 revision 尚未实测。"
+msgstr "LIN is not combined with CTS, and breaks are never queued behind active data. A new break is admitted only when the unique TX slot is idle, avoiding the active-data/CTS/break combination in §2.11.7. The IDLE deviation without a workaround (§2.11.1) provides no frame-boundary guarantee for this IRQ ring. The physical silicon revision has not been observed."
+
+msgid "GoogleTest 执行真实 C provider 与外部 MMIO／NVIC 边界，覆盖实例拒绝、完整 tuple、 RX、TX、Smartcard 错误、LIN break、取消、quarantine、RTS 启停与冷态恢复。 精确 TOML／typed IR／factory 和 VE／ZG ARM ELF 分别验证其软件与链接范围。 这些结果不建立电气波形、卡认证、光学时序或物理 HIL；当前 physical status 为 `not_executed`。既有 DMA 与 RS485 贷款合同仍见 [UART DMA 与电气适配](uart-dma-rs485.md)。"
+msgstr "GoogleTest executes the real C provider against external MMIO/NVIC boundaries, covering instance rejection, complete tuples, RX, TX, Smartcard errors, LIN breaks, cancellation, quarantine, RTS startup/stop and cold restoration. Exact TOML/typed IR/factory checks and VE/ZG ARM ELFs establish their respective software and link scopes. They do not establish electrical waveforms, card certification, optical timing or physical HIL; physical status remains `not_executed`. Existing DMA and RS485 borrowing contracts remain in [UART DMA and electrical adaptation](uart-dma-rs485.md)."

@@ -37,8 +37,8 @@ class STM32StaticLifecycle : public testing::Test {
     nx_stm32_platform_config_t platform{};
     nx_stm32_platform_pin_receipt_t pin_receipt{};
     nx_stm32_gpio_state_t gpio{};
-    nx_stm32_gpio_config_t gpio_config{GPIOD, 1U << 12U, 1U << 12U,
-                                       true,  0U,        0U};
+    nx_stm32_gpio_config_t gpio_config{GPIOD, 1U << 12U, 1U << 12U, true,
+                                       0U,    0U,        0U};
     nx_stm32_uart_state_t uart{};
     nx_stm32_uart_cold_receipt_t uart_receipt{};
     uint8_t rx_storage[16]{};

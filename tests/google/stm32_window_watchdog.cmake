@@ -4,6 +4,7 @@ nexus_google_test(nexus_stm32_window_watchdog_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/window_watchdog.c"
     LIBRARIES Nexus::IO
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_window_watchdog_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"

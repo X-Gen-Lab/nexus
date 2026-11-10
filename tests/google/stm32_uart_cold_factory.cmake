@@ -1,5 +1,5 @@
 # Each exact cold wrapper executes through its actual generated public factory.
-foreach(cold_uart_mode irq irq-words irq-blocks dma-tx rx-dma-idle
+foreach(cold_uart_mode irq irq-wire irq-words irq-blocks dma-tx rx-dma-idle
         rx-dma-continuous dma-duplex dma-duplex-continuous)
     if(cold_uart_mode STREQUAL "irq-words")
         set(cold_uart_input "${NEXUS_SOURCE_DIR}/tests/contracts/io_evolution_assembly/f407-uart9n1.toml")
@@ -25,6 +25,9 @@ foreach(cold_uart_mode irq irq-words irq-blocks dma-tx rx-dma-idle
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c")
+    if(cold_uart_mode STREQUAL "irq-wire")
+        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_wire.c")
+    endif()
     set(cold_uart_rx 0)
     set(cold_uart_tx 0)
     set(cold_uart_hal FALSE)
@@ -70,6 +73,9 @@ foreach(cold_uart_mode irq irq-words irq-blocks dma-tx rx-dma-idle
         target_compile_definitions(${cold_uart_target} PRIVATE NX_COLD_WORDS)
     elseif(cold_uart_mode STREQUAL "irq-blocks")
         target_compile_definitions(${cold_uart_target} PRIVATE NX_COLD_BLOCKS)
+    endif()
+    if(cold_uart_mode STREQUAL "irq-wire")
+        target_compile_definitions(${cold_uart_target} PRIVATE NX_COLD_WIRE_CASES)
     endif()
     set(cold_uart_model
         "${CMAKE_CURRENT_SOURCE_DIR}/stm32_uart_cold_factory_model.h")

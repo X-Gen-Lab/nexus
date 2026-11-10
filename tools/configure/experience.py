@@ -211,7 +211,7 @@ def differences(before, after):
               "kernel_profile", "clock_profile", "clock", "clock_plan",
               "optimization", "controllers", "devices", "components",
               "claims", "memory", "flash", "layout", "memory_budgets",
-              "factory", "runtime_power", "i2s2", "trigger_plan",
+              "factory", "runtime_power", "trigger_plan",
               "resource_plan", "pwm_shared_owners", "dma_topology", "hardware")
     changes = []
     missing = object()
