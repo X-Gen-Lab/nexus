@@ -17,6 +17,8 @@ foreach(timer_family stm32)
     nexus_google_test(${timer_target} SOURCES timer_factory_test.cpp
         "${timer_bundle}/bindings.c"
         "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture_tim3.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture_tim5.c"
         "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/advanced_pwm.c"
         "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/advanced_pwm_tim8.c"
         LIBRARIES Nexus::IO Nexus::Arch

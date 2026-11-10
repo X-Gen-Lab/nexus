@@ -4845,6 +4845,346 @@
         }
       ],
       "source": "DS8626 Rev 12 alternate function table; RM0090 Rev 22 TIM8 advanced timer, APB2 gate and shared TIM12 break vector"
+    },
+    {
+      "id": "capture-tim3-ch1-pa6",
+      "controller": "TIM3",
+      "kind": "timer_capture",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "capture-tim3-ch2-pa7",
+      "controller": "TIM3",
+      "kind": "timer_capture",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PA7",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "capture-tim3-ch3-pb0",
+      "controller": "TIM3",
+      "kind": "timer_capture",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PB0",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "capture-tim3-ch4-pb1",
+      "controller": "TIM3",
+      "kind": "timer_capture",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PB1",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "capture-tim4-ch2-pb7",
+      "controller": "TIM4",
+      "kind": "timer_capture",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PB7",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "capture-tim4-ch3-pb8",
+      "controller": "TIM4",
+      "kind": "timer_capture",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PB8",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "capture-tim4-ch4-pb9",
+      "controller": "TIM4",
+      "kind": "timer_capture",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PB9",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "capture-tim5-ch1-pa0",
+      "controller": "TIM5",
+      "kind": "timer_capture",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "capture-tim5-ch2-pa1",
+      "controller": "TIM5",
+      "kind": "timer_capture",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "capture-tim5-ch3-pa2",
+      "controller": "TIM5",
+      "kind": "timer_capture",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "capture-tim5-ch4-pa3",
+      "controller": "TIM5",
+      "kind": "timer_capture",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PA3",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "complementary-tim1-ch2-pa9-pb14-pb12",
+      "controller": "TIM1",
+      "kind": "advanced_pwm",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "complementary-pwm"
+      ],
+      "pins": [
+        {
+          "pin": "PA9",
+          "function": "output",
+          "af": 1
+        },
+        {
+          "pin": "PB14",
+          "function": "complement",
+          "af": 1
+        },
+        {
+          "pin": "PB12",
+          "function": "break",
+          "af": 1
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "complementary-tim1-ch3-pa10-pb15-pb12",
+      "controller": "TIM1",
+      "kind": "advanced_pwm",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "complementary-pwm"
+      ],
+      "pins": [
+        {
+          "pin": "PA10",
+          "function": "output",
+          "af": 1
+        },
+        {
+          "pin": "PB15",
+          "function": "complement",
+          "af": 1
+        },
+        {
+          "pin": "PB12",
+          "function": "break",
+          "af": 1
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "complementary-tim8-ch2-pc7-pb0-pa6",
+      "controller": "TIM8",
+      "kind": "advanced_pwm",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "complementary-pwm"
+      ],
+      "pins": [
+        {
+          "pin": "PC7",
+          "function": "output",
+          "af": 3
+        },
+        {
+          "pin": "PB0",
+          "function": "complement",
+          "af": 3
+        },
+        {
+          "pin": "PA6",
+          "function": "break",
+          "af": 3
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
+    },
+    {
+      "id": "complementary-tim8-ch3-pc8-pb1-pa6",
+      "controller": "TIM8",
+      "kind": "advanced_pwm",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "complementary-pwm"
+      ],
+      "pins": [
+        {
+          "pin": "PC8",
+          "function": "output",
+          "af": 3
+        },
+        {
+          "pin": "PB1",
+          "function": "complement",
+          "af": 3
+        },
+        {
+          "pin": "PA6",
+          "function": "break",
+          "af": 3
+        }
+      ],
+      "source": "DS8626 Rev12 Table9 alternate functions; RM0090 Rev22 timer input channels, counter widths, OISx/OISxN and complementary pairs. Silicon route only; no PCB wiring claim."
     }
   ]
 }

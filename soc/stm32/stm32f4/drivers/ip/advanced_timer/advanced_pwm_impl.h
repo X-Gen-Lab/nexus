@@ -13,11 +13,12 @@
  * removes only its own helper/default macros; caller-supplied ports survive. */
 #if !defined(NX_ADV_CR1) || !defined(NX_ADV_CR2) || !defined(NX_ADV_SMCR) ||   \
     !defined(NX_ADV_RCR) || !defined(NX_ADV_PSC) || !defined(NX_ADV_ARR) ||    \
-    !defined(NX_ADV_CCR) || !defined(NX_ADV_CCMR) || !defined(NX_ADV_CCER) ||  \
-    !defined(NX_ADV_DIER) || !defined(NX_ADV_EGR) || !defined(NX_ADV_SR) ||    \
-    !defined(NX_ADV_BDTR) || !defined(NX_ADV_INITIALIZE) ||                    \
-    !defined(NX_ADV_IRQ) || !defined(NX_ADV_RELEASE) ||                        \
-    !defined(NX_ADV_OPS) || !defined(NX_ADV_HZ) ||                             \
+    !defined(NX_ADV_CCR1) || !defined(NX_ADV_CCR2) || !defined(NX_ADV_CCR3) || \
+    !defined(NX_ADV_CCMR1) || !defined(NX_ADV_CCMR2) ||                        \
+    !defined(NX_ADV_CCER) || !defined(NX_ADV_DIER) || !defined(NX_ADV_EGR) ||  \
+    !defined(NX_ADV_SR) || !defined(NX_ADV_BDTR) ||                            \
+    !defined(NX_ADV_INITIALIZE) || !defined(NX_ADV_IRQ) ||                     \
+    !defined(NX_ADV_RELEASE) || !defined(NX_ADV_OPS) || !defined(NX_ADV_HZ) || \
     !defined(NX_ADV_CLOCK_READY) || !defined(NX_ADV_INPUT_VALID)
 #error                                                                         \
     "Advanced PWM implementation requires one complete concrete specialization"
@@ -30,6 +31,26 @@
 #define NX_ADV_DEFAULT_BREAK_MASK 1
 #define NX_ADV_BREAK_MASK         4096U
 #endif
+/** \brief One native CCR per selected pair; CH4 has no complementary output. */
+static volatile uint32_t* advanced_compare(uint8_t channel) {
+    return channel == 1U   ? &NX_ADV_CCR1
+           : channel == 2U ? &NX_ADV_CCR2
+                           : &NX_ADV_CCR3;
+}
+/** \brief OISx and OISxN are adjacent bits starting at CR2 bit eight. */
+static uint32_t advanced_idle(const nx_advanced_pwm_config_t* config) {
+    return ((config->idle_high ? 256U : 0U) |
+            (config->idle_complement_high ? 512U : 0U))
+           << (((uint32_t)config->channel - 1U) * 2U);
+}
+/** \brief PWM1 with preload occupies the selected CCMR byte. */
+static uint32_t advanced_mode(const nx_advanced_pwm_config_t* config) {
+    return 104U << (((uint32_t)config->channel - 1U) % 2U * 8U);
+}
+/** \brief CCxE and CCxNE share one four-bit CCER group. */
+static uint32_t advanced_enable(const nx_advanced_pwm_controller_t* port) {
+    return 5U << (((uint32_t)port->config->channel - 1U) * 4U);
+}
 /** \brief Task controls never borrow CPU privilege from an interface lookup. */
 static bool advanced_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr();
@@ -86,6 +107,7 @@ nx_result_t NX_ADV_INITIALIZE(nx_advanced_pwm_controller_t* port,
     uint32_t code = 0U;
     if (port == NULL || config == NULL ||
         advanced_overlap(port, sizeof(*port), config, sizeof(*config)) ||
+        config->channel < 1U || config->channel > 3U ||
         config->break_input == NULL ||
         config->break_mask != NX_ADV_BREAK_MASK ||
         !NX_ADV_INPUT_VALID(config->break_input) ||
@@ -107,13 +129,12 @@ nx_result_t NX_ADV_INITIALIZE(nx_advanced_pwm_controller_t* port,
         (NX_ADV_BDTR & (32768U | 768U)) != 0U) {
         return NX_ERROR_BUSY;
     }
-    if (!NX_ADV_CLOCK_READY()) {
+    if (!NX_ADV_CLOCK_READY(config->channel)) {
         return NX_ERROR_STATE;
     }
     uint32_t protection =
         code | 1024U | 2048U | 4096U | (config->break_active_high ? 8192U : 0U);
-    uint32_t idle = (config->idle_high ? 256U : 0U) |
-                    (config->idle_complement_high ? 512U : 0U);
+    uint32_t idle = advanced_idle(config);
     /* The pointer is an acquired-session marker, not a ready interface.
      * Failed cold readback must preserve exact owner cleanup responsibility. */
     port->config = config;
@@ -123,8 +144,11 @@ nx_result_t NX_ADV_INITIALIZE(nx_advanced_pwm_controller_t* port,
     NX_TIMER_WRITE(NX_ADV_CR2, idle);
     NX_TIMER_WRITE(NX_ADV_PSC, config->timer_hz / config->tick_hz - 1U);
     NX_TIMER_WRITE(NX_ADV_ARR, config->period_ticks - 1U);
-    NX_TIMER_WRITE(NX_ADV_CCR, 0U);
-    NX_TIMER_WRITE(NX_ADV_CCMR, 104U);
+    NX_TIMER_WRITE(*advanced_compare(config->channel), 0U);
+    NX_TIMER_WRITE(NX_ADV_CCMR1,
+                   config->channel <= 2U ? advanced_mode(config) : 0U);
+    NX_TIMER_WRITE(NX_ADV_CCMR2,
+                   config->channel == 3U ? advanced_mode(config) : 0U);
     NX_TIMER_WRITE(NX_ADV_BDTR, protection);
     NX_TIMER_WRITE(NX_ADV_EGR, 1U);
     NX_TIMER_WRITE(NX_ADV_SR, ~128U);
@@ -132,8 +156,10 @@ nx_result_t NX_ADV_INITIALIZE(nx_advanced_pwm_controller_t* port,
     if (NX_ADV_CR1 != 128U || NX_ADV_CR2 != idle || NX_ADV_SMCR != 0U ||
         NX_ADV_RCR != 0U ||
         NX_ADV_PSC != config->timer_hz / config->tick_hz - 1U ||
-        NX_ADV_ARR != config->period_ticks - 1U || NX_ADV_CCMR != 104U ||
-        NX_ADV_CCR != 0U || NX_ADV_BDTR != protection) {
+        NX_ADV_ARR != config->period_ticks - 1U ||
+        NX_ADV_CCMR1 != (config->channel <= 2U ? advanced_mode(config) : 0U) ||
+        NX_ADV_CCMR2 != (config->channel == 3U ? advanced_mode(config) : 0U) ||
+        *advanced_compare(config->channel) != 0U || NX_ADV_BDTR != protection) {
         return NX_ERROR_IO;
     }
     *port =
@@ -156,9 +182,9 @@ static nx_result_t advanced_duty(void* context, uint32_t ticks) {
         return NX_ERROR_STATE;
     }
     nx_arch_irq_state_t mask = nx_arch_irq_save();
-    NX_TIMER_WRITE(NX_ADV_CCR, ticks);
+    NX_TIMER_WRITE(*advanced_compare(port->config->channel), ticks);
     nx_arch_dsb();
-    if (NX_ADV_CCR != ticks) {
+    if (*advanced_compare(port->config->channel) != ticks) {
         nx_arch_irq_restore(mask);
         return NX_ERROR_IO;
     }
@@ -177,16 +203,19 @@ static nx_result_t advanced_start(void* context) {
     }
     nx_arch_irq_state_t mask = nx_arch_irq_save();
     observe_break(port);
-    uint32_t idle = (port->config->idle_high ? 256U : 0U) |
-                    (port->config->idle_complement_high ? 512U : 0U);
+    uint32_t idle = advanced_idle(port->config);
     uint32_t protection =
         1024U | 2048U | 4096U | (port->config->break_active_high ? 8192U : 0U);
-    if (port->fault || !NX_ADV_CLOCK_READY() ||
+    if (port->fault || !NX_ADV_CLOCK_READY(port->config->channel) ||
         NX_ADV_ARR != port->config->period_ticks - 1U ||
         NX_ADV_PSC != port->config->timer_hz / port->config->tick_hz - 1U ||
         (NX_ADV_CR1 & ~1U) != 128U || NX_ADV_CR2 != idle || NX_ADV_SMCR != 0U ||
-        NX_ADV_RCR != 0U || NX_ADV_CCMR != 104U ||
-        NX_ADV_CCR != port->duty_ticks ||
+        NX_ADV_RCR != 0U ||
+        NX_ADV_CCMR1 !=
+            (port->config->channel <= 2U ? advanced_mode(port->config) : 0U) ||
+        NX_ADV_CCMR2 !=
+            (port->config->channel == 3U ? advanced_mode(port->config) : 0U) ||
+        *advanced_compare(port->config->channel) != port->duty_ticks ||
         (NX_ADV_BDTR & ~(32768U | 255U)) != protection ||
         deadtime_ticks(NX_ADV_BDTR & 255U) != port->config->deadtime_ticks) {
         nx_arch_irq_restore(mask);
@@ -198,7 +227,7 @@ static nx_result_t advanced_start(void* context) {
         return NX_ERROR_BUSY;
     }
     NX_TIMER_WRITE(NX_ADV_EGR, 1U);
-    NX_TIMER_WRITE(NX_ADV_CCER, 5U);
+    NX_TIMER_WRITE(NX_ADV_CCER, advanced_enable(port));
     NX_TIMER_WRITE(NX_ADV_DIER, NX_ADV_DIER | 128U);
     NX_TIMER_WRITE(NX_ADV_CR1, NX_ADV_CR1 | 1U);
     nx_arch_dsb();
@@ -213,8 +242,8 @@ static nx_result_t advanced_start(void* context) {
     nx_arch_dsb();
     observe_break(port);
     if (port->fault || (NX_ADV_BDTR & 32768U) == 0U ||
-        (NX_ADV_CCER & 5U) != 5U || (NX_ADV_CR1 & 1U) == 0U ||
-        (NX_ADV_DIER & 128U) == 0U) {
+        (NX_ADV_CCER & advanced_enable(port)) != advanced_enable(port) ||
+        (NX_ADV_CR1 & 1U) == 0U || (NX_ADV_DIER & 128U) == 0U) {
         NX_TIMER_WRITE(NX_ADV_BDTR, NX_ADV_BDTR & ~32768U);
         nx_arch_irq_restore(mask);
         return NX_ERROR_IO;
@@ -235,14 +264,16 @@ static nx_result_t advanced_stop(void* context) {
     observe_break(port);
     bool cold = !port->initialized;
     NX_TIMER_WRITE(NX_ADV_BDTR, NX_ADV_BDTR & ~32768U);
-    NX_TIMER_WRITE(NX_ADV_CCER, cold ? 0U : NX_ADV_CCER & ~5U);
+    NX_TIMER_WRITE(NX_ADV_CCER,
+                   cold ? 0U : NX_ADV_CCER & ~advanced_enable(port));
     NX_TIMER_WRITE(NX_ADV_DIER, cold ? 0U : NX_ADV_DIER & ~128U);
     NX_TIMER_WRITE(NX_ADV_CR1, NX_ADV_CR1 & ~1U);
     nx_arch_dsb();
-    bool retained = (NX_ADV_BDTR & 32768U) != 0U ||
-                    (NX_ADV_CCER & (cold ? UINT32_MAX : 5U)) != 0U ||
-                    (NX_ADV_DIER & (cold ? UINT32_MAX : 128U)) != 0U ||
-                    (NX_ADV_CR1 & 1U) != 0U;
+    bool retained =
+        (NX_ADV_BDTR & 32768U) != 0U ||
+        (NX_ADV_CCER & (cold ? UINT32_MAX : advanced_enable(port))) != 0U ||
+        (NX_ADV_DIER & (cold ? UINT32_MAX : 128U)) != 0U ||
+        (NX_ADV_CR1 & 1U) != 0U;
     nx_arch_irq_restore(mask);
     return retained ? NX_ERROR_BUSY : NX_SUCCESS;
 }
@@ -287,7 +318,8 @@ static nx_result_t advanced_clear(void* context) {
         return NX_ERROR_CONTEXT;
     }
     nx_arch_irq_state_t mask = nx_arch_irq_save();
-    if ((NX_ADV_BDTR & 32768U) != 0U || (NX_ADV_CCER & 5U) != 0U ||
+    if ((NX_ADV_BDTR & 32768U) != 0U ||
+        (NX_ADV_CCER & advanced_enable(port)) != 0U ||
         (NX_ADV_CR1 & 1U) != 0U || break_active(port)) {
         nx_arch_irq_restore(mask);
         return NX_ERROR_BUSY;

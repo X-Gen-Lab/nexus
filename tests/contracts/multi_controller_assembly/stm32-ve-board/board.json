@@ -195,6 +195,96 @@
       "id": "advanced8",
       "controller": "TIM8",
       "route": "complementary-pc6-pa7-pa6"
+    },
+    {
+      "id": "timer-capture-pb6",
+      "controller": "TIM4",
+      "route": "capture-pb6"
+    },
+    {
+      "id": "timer-complementary-pa8-pb12-pb13",
+      "controller": "TIM1",
+      "route": "complementary-pa8-pb12-pb13"
+    },
+    {
+      "id": "timer-complementary-pc6-pa7-pa6",
+      "controller": "TIM8",
+      "route": "complementary-pc6-pa7-pa6"
+    },
+    {
+      "id": "timer-capture-tim3-ch1-pa6",
+      "controller": "TIM3",
+      "route": "capture-tim3-ch1-pa6"
+    },
+    {
+      "id": "timer-capture-tim3-ch2-pa7",
+      "controller": "TIM3",
+      "route": "capture-tim3-ch2-pa7"
+    },
+    {
+      "id": "timer-capture-tim3-ch3-pb0",
+      "controller": "TIM3",
+      "route": "capture-tim3-ch3-pb0"
+    },
+    {
+      "id": "timer-capture-tim3-ch4-pb1",
+      "controller": "TIM3",
+      "route": "capture-tim3-ch4-pb1"
+    },
+    {
+      "id": "timer-capture-tim4-ch2-pb7",
+      "controller": "TIM4",
+      "route": "capture-tim4-ch2-pb7"
+    },
+    {
+      "id": "timer-capture-tim4-ch3-pb8",
+      "controller": "TIM4",
+      "route": "capture-tim4-ch3-pb8"
+    },
+    {
+      "id": "timer-capture-tim4-ch4-pb9",
+      "controller": "TIM4",
+      "route": "capture-tim4-ch4-pb9"
+    },
+    {
+      "id": "timer-capture-tim5-ch1-pa0",
+      "controller": "TIM5",
+      "route": "capture-tim5-ch1-pa0"
+    },
+    {
+      "id": "timer-capture-tim5-ch2-pa1",
+      "controller": "TIM5",
+      "route": "capture-tim5-ch2-pa1"
+    },
+    {
+      "id": "timer-capture-tim5-ch3-pa2",
+      "controller": "TIM5",
+      "route": "capture-tim5-ch3-pa2"
+    },
+    {
+      "id": "timer-capture-tim5-ch4-pa3",
+      "controller": "TIM5",
+      "route": "capture-tim5-ch4-pa3"
+    },
+    {
+      "id": "timer-complementary-tim1-ch2-pa9-pb14-pb12",
+      "controller": "TIM1",
+      "route": "complementary-tim1-ch2-pa9-pb14-pb12"
+    },
+    {
+      "id": "timer-complementary-tim1-ch3-pa10-pb15-pb12",
+      "controller": "TIM1",
+      "route": "complementary-tim1-ch3-pa10-pb15-pb12"
+    },
+    {
+      "id": "timer-complementary-tim8-ch2-pc7-pb0-pa6",
+      "controller": "TIM8",
+      "route": "complementary-tim8-ch2-pc7-pb0-pa6"
+    },
+    {
+      "id": "timer-complementary-tim8-ch3-pc8-pb1-pa6",
+      "controller": "TIM8",
+      "route": "complementary-tim8-ch3-pc8-pb1-pa6"
     }
   ],
   "reserved_resources": [],

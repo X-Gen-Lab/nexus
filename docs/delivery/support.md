@@ -42,7 +42,8 @@ SDK 编译事实，不为其他 F4 型号建立驱动、Board 或运行时模式
 | UART | IRQ byte/event、word 与明确 block／DMA 模式分别选择；有限 TX、有限 RX、连续 RX 和双向模式不自动互相授权 |
 | SPI／I2C | SPI1／2／3 polling、普通与增强 DMA 事务；I2C1／2／3 polling／IRQ／DMA；显式 endpoint 与受审路线 |
 | PWM | TIM3／4／5／9／10／11／12／13／14 的 20 个已审通道，各 controller 显式选择一路；APB1 timer 84 MHz、APB2 timer 168 MHz；TIM5 32-bit，其他 16-bit；无隐式共享时基 |
-| Advanced PWM | TIM1／TIM8 的 CH1／CH1N、deadtime 与 break；独立实例、静态路线，无自动故障重启或跨 timer 同步 |
+| Timer capture | TIM3／4／5 的 CH1–4，共 12 条 AF2 路线；TIM3／4 为 16-bit，TIM5 为 32-bit；每 controller 选择一路，调用方提供 ring |
+| Advanced PWM | TIM1／TIM8 的 CH1–3／CH1N–3N，共六组互补输出，deadtime 与 break；每 controller 选择一组，无自动故障重启或跨 timer 同步 |
 | ADC／Timer | ADC1／2 外部 0--15、ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；普通 shot／scan 最多 16 ranks、软件注入组最多 4 ranks；三个转换器均有独占 TIM3 的有限／连续 DMA |
 | Encoder | TIM3／4／5 独占 TI1／TI2 原始正交计数；x2 TI1、x2 TI2、x4 TI12，独立输入反相与 4-bit filter；无 IRQ／DMA／累计位置策略 |
 | DAC | 单／双通道 direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA、三种输入格式与显式空闲码 |
@@ -60,14 +61,21 @@ rising 表示电压下降。阈值编码必须按 DS8626 的 min／max 与迟滞
 COALESCED／LOSS 与 wake 合同。关闭先排空 IRQ 再恢复 PLS，不取得或释放 System
 拥有的 PWR clock；失败保留清理责任。不建立物理阈值、BOR 或 STOP 唤醒资格。
 
-互补 PWM 的 TIM1 使用 PA8／PB13／PB12 AF1，TIM8 使用 PC6／PA7／PA6 AF3，
-依次为 CH1／CH1N／BKIN；两者均为 168 MHz timer clock。分别独占 TIM9／TIM12
-共享 break vector，TIM8 的 TIM12 peer gate 位于 APB1。只选编所需 wrapper，
-运行时直接操作所选 timer，共享 C 算法和冷态清理；完整配置、pin／IRQ／gate 责任
-保留到所有资源退出，不能在失败重试时更换配置或存储。配置显式选择 inactive 电平，
+捕获的 CH1–4 路线为 TIM3：PA6／PA7／PB0／PB1，TIM4：PB6／PB7／PB8／PB9，
+TIM5：PA0／PA1／PA2／PA3，均为 AF2 与 84 MHz timer clock。所选通道独占整个
+controller，与该 timer 的 PWM／encoder 互斥。channel 从已审 Board binding
+派生，不再填写第二份通道参数；IRQ 只读取所选 CCR，保留其他通道状态和后到边沿。
+返回值是所报告宽度的 modulo count；观察时间不是物理边沿时间。
+
+互补 PWM 的 TIM1 CH1–3 为 PA8／PA9／PA10，对应 CH1N–3N 为 PB13／PB14／PB15，
+共用 PB12 BKIN，均为 AF1；TIM8 CH1–3 为 PC6／PC7／PC8，对应 PA7／PB0／PB1，
+共用 PA6 BKIN，均为 AF3。两者均为 168 MHz timer clock，分别独占 TIM9／TIM12
+共享 break vector；TIM12 peer gate 位于 APB1。不提供 CH4 互补输出。只选编所需
+controller wrapper，共享 C 算法和冷态清理。完整 controller／配置、pin／IRQ／gate
+责任保留到所有资源退出，失败重试不能更换配置或存储。配置显式选择 inactive 电平，
 同组输出全部观察为 inactive 后才恢复任一引脚。软件参考为
-`tests/contracts/multi_controller_assembly/*advanced-pair*.toml`，不建立物理波形、
-功率级安全或跨 timer 同步资格。
+`tests/contracts/multi_controller_assembly/*timer-channels*.toml` 与
+`*advanced-pair*.toml`，不建立物理波形、功率级安全或跨 timer 同步资格。
 
 六个 UART 的 `dma-tx` 共用官方 HAL 有限 TX 和分离 LL IRQ RX，支持 byte／event
 接收。六个实例也分别支持 `rx-dma-idle`、`rx-dma-continuous`、`dma-duplex` 和
@@ -218,7 +226,8 @@ STATE，均不 reload 或等待。未激活时按 CFR→debug→Sleep→gate 逆
 period 表示完整周期，ARR=period−1；TIM5 上限为 UINT32_MAX，其他已审 timer 为
 65535，duty 可达 period，保留 CCR 表达 100% 的空间。set 只暂存 duty，在 update
 event 生效；周期与 PSC 保持固定。每个控制器由一路 owner 独占，不隐式共享时基或
-同步多个 timer。TIM3 与 ADC trigger、TIM4 与 capture 互斥；TIM1／TIM8 advanced
+同步多个 timer。TIM3 与 ADC trigger 互斥；TIM3／4／5 各自的 PWM、capture 和
+encoder 互斥；TIM1／TIM8 advanced
 PWM 分别保留共享 vector 的 TIM9／TIM12。冷态 C 校验精确 timer、pad、channel、分频和
 位宽，启钟／撤回失败保留所选 APB gate 的清理责任；已有 GPIO owner 不被覆盖。
 `tests/contracts/multi_controller_assembly/*pwm-family*.toml` 同时链接九个独立实例，

@@ -7,6 +7,7 @@
 #define NX_STM32F407_TIMER_COLD_H
 #include "stm32f407_platform_cold.h"
 #include "stm32f407_timer_advanced.h"
+#include "stm32f407_timer_pins.h"
 
 #ifndef NX_PLATFORM_REGISTER_WRITE
 #define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
@@ -26,12 +27,13 @@ typedef struct {
     bool clock_owned;
 } nx_stm32_timer_cold_t;
 
-/** \brief Static capture policy with the unique PB6 snapshot slot. */
+/** \brief Static controller/channel policy with one unique pad snapshot. */
 typedef struct {
     nx_timer_capture_config_t timer;
     uint16_t* snapshot;
     uint8_t priority;
     bool kernel;
+    TIM_TypeDef* registers;
 } nx_stm32_capture_cold_config_t;
 
 /** \brief Static selected complementary policy and three unique pin snapshots.
@@ -165,17 +167,50 @@ static inline nx_result_t nx_stm32_timer_cold_admit(unsigned irq, bool kernel) {
                                                     : NX_SUCCESS;
 }
 
-/** \brief Prepare TIM4 while preserving full cold identity before any write. */
+/** \brief Exact cold-only controller facts; hot registers stay specialized. */
+typedef struct {
+    TIM_TypeDef* registers;
+    const nx_timer_capture_ops_t* ops;
+    nx_result_t (*initialize)(nx_timer_capture_controller_t* port,
+                              const nx_timer_capture_config_t* config);
+    nx_result_t (*release)(nx_timer_capture_controller_t* port);
+    uint32_t gate;
+    uint8_t irq;
+} nx_stm32_capture_hardware_t;
+
+static const nx_stm32_capture_hardware_t s_nx_capture_tim3 = {
+    TIM3,
+    &nx_stm32_tim3_timer_capture_ops,
+    nx_stm32_tim3_timer_capture_initialize,
+    nx_stm32_tim3_timer_capture_release,
+    RCC_APB1ENR_TIM3EN,
+    TIM3_IRQn};
+static const nx_stm32_capture_hardware_t s_nx_capture_tim4 = {
+    TIM4,
+    &nx_stm32_timer_capture_ops,
+    nx_stm32_timer_capture_initialize,
+    nx_stm32_timer_capture_release,
+    RCC_APB1ENR_TIM4EN,
+    TIM4_IRQn};
+static const nx_stm32_capture_hardware_t s_nx_capture_tim5 = {
+    TIM5,
+    &nx_stm32_tim5_timer_capture_ops,
+    nx_stm32_tim5_timer_capture_initialize,
+    nx_stm32_tim5_timer_capture_release,
+    RCC_APB1ENR_TIM5EN,
+    TIM5_IRQn};
+
+/** \brief Acquire one exact channel and preserve its full cleanup identity. */
 static inline nx_result_t
-nx_stm32_capture_cold_prepare(nx_timer_capture_controller_t* port,
-                              nx_stm32_timer_cold_t* cold,
-                              const nx_stm32_capture_cold_config_t* config) {
+nx_stm32_capture_prepare_for(nx_timer_capture_controller_t* port,
+                             nx_stm32_timer_cold_t* cold,
+                             const nx_stm32_capture_cold_config_t* config,
+                             const nx_stm32_capture_hardware_t* hardware) {
     if (!nx_stm32_timer_cold_context())
         return NX_ERROR_CONTEXT;
     if (!nx_stm32_timer_cold_objects(port, sizeof(*port), cold, config,
-                                     sizeof(*config)))
-        return NX_ERROR_INVALID;
-    if (!nx_stm32_timer_cold_snapshots(config->snapshot, sizeof(uint16_t), port,
+                                     sizeof(*config)) ||
+        !nx_stm32_timer_cold_snapshots(config->snapshot, sizeof(uint16_t), port,
                                        sizeof(*port), cold, config,
                                        sizeof(*config)) ||
         config->priority > 15U)
@@ -183,87 +218,130 @@ nx_stm32_capture_cold_prepare(nx_timer_capture_controller_t* port,
     if (port->config != NULL || cold->configuration != NULL ||
         cold->clock_owned || cold->pin_leases != 0U || cold->irq_leased)
         return NX_ERROR_BUSY;
-    nx_result_t status = nx_stm32_timer_cold_admit(TIM4_IRQn, config->kernel);
+    nx_stm32_timer_pin_t pad;
+    if (config->registers != hardware->registers ||
+        !nx_stm32_capture_pin(hardware->registers, config->timer.channel, &pad))
+        return NX_ERROR_INVALID;
+    nx_result_t status =
+        nx_stm32_timer_cold_admit(hardware->irq, config->kernel);
     if (status != NX_SUCCESS)
         return status;
-    if ((RCC->APB1ENR & RCC_APB1ENR_TIM4EN) != 0U)
+    if ((RCC->APB1ENR & hardware->gate) != 0U)
         return NX_ERROR_BUSY;
     cold->configuration = config;
     cold->clock_owned = true;
-    NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR | RCC_APB1ENR_TIM4EN);
+    NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR | hardware->gate);
     nx_arch_dsb();
-    if ((RCC->APB1ENR & RCC_APB1ENR_TIM4EN) == 0U)
+    if ((RCC->APB1ENR & hardware->gate) == 0U)
         return NX_ERROR_IO;
-    if ((TIM4->CR1 & 1U) != 0U || TIM4->CCER != 0U || TIM4->DIER != 0U)
+    if ((hardware->registers->CR1 & 1U) != 0U ||
+        hardware->registers->CCER != 0U || hardware->registers->DIER != 0U)
         return NX_ERROR_BUSY;
-    cold->priority = NVIC->IPR[TIM4_IRQn];
+    cold->priority = NVIC->IPR[hardware->irq];
     cold->irq_leased = true;
-    status = nx_stm32_timer_cold_pin_open(cold, 1U, GPIOB, 1U, 6U, 2U,
-                                          config->snapshot);
+    status = nx_stm32_timer_cold_pin_open(cold, 1U, pad.gpio, pad.bank, pad.pin,
+                                          2U, config->snapshot);
     if (status != NX_SUCCESS)
         return status;
-    status = nx_stm32_timer_capture_initialize(port, &config->timer);
+    status = hardware->initialize(port, &config->timer);
     return status == NX_SUCCESS
-               ? nx_stm32_timer_cold_irq_open(TIM4_IRQn, config->priority)
+               ? nx_stm32_timer_cold_irq_open(hardware->irq, config->priority)
                : status;
 }
 
-/** \brief Detach the full capture configuration only after the last lease. */
+/** \brief Reclaim only the exact controller/config after the last lease. */
 static inline nx_result_t
-nx_stm32_capture_cold_close(nx_timer_capture_controller_t* port,
-                            nx_stm32_timer_cold_t* cold,
-                            const nx_stm32_capture_cold_config_t* config) {
+nx_stm32_capture_close_for(nx_timer_capture_controller_t* port,
+                           nx_stm32_timer_cold_t* cold,
+                           const nx_stm32_capture_cold_config_t* config,
+                           const nx_stm32_capture_hardware_t* hardware) {
     if (!nx_stm32_timer_cold_context())
         return NX_ERROR_CONTEXT;
     if (!nx_stm32_timer_cold_objects(port, sizeof(*port), cold, config,
-                                     sizeof(*config)))
-        return NX_ERROR_INVALID;
-    if (!nx_stm32_timer_cold_snapshots(config->snapshot, sizeof(uint16_t), port,
+                                     sizeof(*config)) ||
+        !nx_stm32_timer_cold_snapshots(config->snapshot, sizeof(uint16_t), port,
                                        sizeof(*port), cold, config,
                                        sizeof(*config)))
         return NX_ERROR_INVALID;
     if (cold->configuration == NULL) {
         return port->config == NULL && !cold->clock_owned &&
                        cold->pin_leases == 0U && !cold->irq_leased
-                   ? nx_stm32_timer_capture_release(port)
+                   ? hardware->release(port)
                    : NX_ERROR_BUSY;
     }
+    nx_stm32_timer_pin_t pad;
     if (cold->configuration != config ||
-        (port->config != NULL && port->config != &config->timer))
+        config->registers != hardware->registers ||
+        (port->config != NULL && port->config != &config->timer) ||
+        !nx_stm32_capture_pin(hardware->registers, config->timer.channel, &pad))
         return NX_ERROR_INVALID;
     if (!cold->clock_owned)
         return NX_ERROR_STATE;
-    nx_result_t status = port->config != NULL
-                             ? nx_stm32_timer_capture_ops.stop(port)
-                             : NX_SUCCESS;
+    nx_result_t status =
+        port->config != NULL ? hardware->ops->stop(port) : NX_SUCCESS;
     if (status != NX_SUCCESS)
         return status;
-    status = nx_stm32_timer_cold_irq_close(cold, TIM4_IRQn);
+    status = nx_stm32_timer_cold_irq_close(cold, hardware->irq);
     if (status != NX_SUCCESS)
         return status;
-    status = nx_stm32_timer_capture_release(port);
+    status = hardware->release(port);
     if (status != NX_SUCCESS)
         return status;
-    status =
-        nx_stm32_timer_cold_pin_close(cold, 1U, GPIOB, 6U, *config->snapshot);
+    status = nx_stm32_timer_cold_pin_close(cold, 1U, pad.gpio, pad.pin,
+                                           *config->snapshot);
     if (status != NX_SUCCESS)
         return status;
-    NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR,
-                               RCC->APB1ENR & ~(uint32_t)RCC_APB1ENR_TIM4EN);
+    NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR & ~hardware->gate);
     nx_arch_dsb();
-    if ((RCC->APB1ENR & RCC_APB1ENR_TIM4EN) != 0U)
+    if ((RCC->APB1ENR & hardware->gate) != 0U)
         return NX_ERROR_IO;
     cold->clock_owned = false;
     cold->configuration = NULL;
     return NX_SUCCESS;
 }
 
+/** \brief Select only the immutable TIM4 acquisition facts. */
+static inline nx_result_t
+nx_stm32_capture_cold_prepare(nx_timer_capture_controller_t* port,
+                              nx_stm32_timer_cold_t* cold,
+                              const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_prepare_for(port, cold, config, &s_nx_capture_tim4);
+}
+/** \brief End only the TIM4 session, including partially acquired resources. */
+static inline nx_result_t
+nx_stm32_capture_cold_close(nx_timer_capture_controller_t* port,
+                            nx_stm32_timer_cold_t* cold,
+                            const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_close_for(port, cold, config, &s_nx_capture_tim4);
+}
+/** \brief Select only the immutable TIM3 acquisition facts. */
+static inline nx_result_t nx_stm32_tim3_capture_cold_prepare(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_prepare_for(port, cold, config, &s_nx_capture_tim3);
+}
+/** \brief End only the TIM3 session; failed proof preserves its owner. */
+static inline nx_result_t
+nx_stm32_tim3_capture_cold_close(nx_timer_capture_controller_t* port,
+                                 nx_stm32_timer_cold_t* cold,
+                                 const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_close_for(port, cold, config, &s_nx_capture_tim3);
+}
+/** \brief Select only the immutable TIM5 acquisition facts. */
+static inline nx_result_t nx_stm32_tim5_capture_cold_prepare(
+    nx_timer_capture_controller_t* port, nx_stm32_timer_cold_t* cold,
+    const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_prepare_for(port, cold, config, &s_nx_capture_tim5);
+}
+/** \brief End only the TIM5 session; failed proof preserves its owner. */
+static inline nx_result_t
+nx_stm32_tim5_capture_cold_close(nx_timer_capture_controller_t* port,
+                                 nx_stm32_timer_cold_t* cold,
+                                 const nx_stm32_capture_cold_config_t* config) {
+    return nx_stm32_capture_close_for(port, cold, config, &s_nx_capture_tim5);
+}
+
 /** \brief Read-only physical facts; runtime state/config layouts stay fixed. */
-typedef struct {
-    GPIO_TypeDef* gpio;
-    uint8_t bank;
-    uint8_t pin;
-} nx_stm32_advanced_pin_t;
 typedef struct {
     TIM_TypeDef* registers;
     const nx_advanced_pwm_ops_t* ops;
@@ -273,7 +351,6 @@ typedef struct {
     volatile uint32_t* peer_clock;
     uint32_t gate;
     uint32_t peer_gate;
-    nx_stm32_advanced_pin_t pins[3];
     uint8_t irq;
     uint8_t alternate;
 } nx_stm32_advanced_hardware_t;
@@ -286,7 +363,6 @@ static const nx_stm32_advanced_hardware_t s_nx_advanced_tim1 = {
     &RCC->APB2ENR,
     RCC_APB2ENR_TIM1EN,
     RCC_APB2ENR_TIM9EN,
-    {{GPIOA, 0U, 8U}, {GPIOB, 1U, 13U}, {GPIOB, 1U, 12U}},
     TIM1_BRK_TIM9_IRQn,
     1U};
 static const nx_stm32_advanced_hardware_t s_nx_advanced_tim8 = {
@@ -297,7 +373,6 @@ static const nx_stm32_advanced_hardware_t s_nx_advanced_tim8 = {
     &RCC->APB1ENR,
     RCC_APB2ENR_TIM8EN,
     RCC_APB1ENR_TIM12EN,
-    {{GPIOC, 2U, 6U}, {GPIOA, 0U, 7U}, {GPIOA, 0U, 6U}},
     TIM8_BRK_TIM12_IRQn,
     3U};
 
@@ -312,7 +387,6 @@ nx_stm32_advanced_prepare_for(nx_advanced_pwm_controller_t* port,
     if (!nx_stm32_timer_cold_objects(port, sizeof(*port), cold, config,
                                      sizeof(*config)))
         return NX_ERROR_INVALID;
-    const nx_stm32_advanced_pin_t* input = &hardware->pins[2];
     if (!nx_stm32_timer_cold_snapshots(config->snapshots, 3U * sizeof(uint16_t),
                                        port, sizeof(*port), cold, config,
                                        sizeof(*config)))
@@ -320,9 +394,12 @@ nx_stm32_advanced_prepare_for(nx_advanced_pwm_controller_t* port,
     if (port->config != NULL || cold->configuration != NULL ||
         cold->clock_owned || cold->pin_leases != 0U || cold->irq_leased)
         return NX_ERROR_BUSY;
+    nx_stm32_timer_pin_t input;
     if (config->priority > 15U ||
-        config->timer.break_input != &input->gpio->IDR ||
-        config->timer.break_mask != (UINT32_C(1) << input->pin))
+        !nx_stm32_advanced_pin(hardware->registers, config->timer.channel, 2U,
+                               &input) ||
+        config->timer.break_input != &input.gpio->IDR ||
+        config->timer.break_mask != (UINT32_C(1) << input.pin))
         return NX_ERROR_INVALID;
     nx_result_t status =
         nx_stm32_timer_cold_admit(hardware->irq, config->kernel);
@@ -344,9 +421,12 @@ nx_stm32_advanced_prepare_for(nx_advanced_pwm_controller_t* port,
     cold->priority = NVIC->IPR[hardware->irq];
     cold->irq_leased = true;
     for (unsigned index = 0U; index < 3U && status == NX_SUCCESS; ++index) {
-        const nx_stm32_advanced_pin_t* pin = &hardware->pins[index];
+        nx_stm32_timer_pin_t pin;
+        if (!nx_stm32_advanced_pin(hardware->registers, config->timer.channel,
+                                   index, &pin))
+            return NX_ERROR_INVALID;
         status = nx_stm32_timer_cold_pin_open(
-            cold, (uint8_t)(1U << index), pin->gpio, pin->bank, pin->pin,
+            cold, (uint8_t)(1U << index), pin.gpio, pin.bank, pin.pin,
             hardware->alternate, &config->snapshots[index]);
     }
     if (status != NX_SUCCESS)
@@ -403,7 +483,6 @@ nx_stm32_advanced_close_for(nx_advanced_pwm_controller_t* port,
     if (!nx_stm32_timer_cold_objects(port, sizeof(*port), cold, config,
                                      sizeof(*config)))
         return NX_ERROR_INVALID;
-    const nx_stm32_advanced_pin_t* input = &hardware->pins[2];
     if (!nx_stm32_timer_cold_snapshots(config->snapshots, 3U * sizeof(uint16_t),
                                        port, sizeof(*port), cold, config,
                                        sizeof(*config)))
@@ -414,8 +493,11 @@ nx_stm32_advanced_close_for(nx_advanced_pwm_controller_t* port,
                    ? hardware->release(port)
                    : NX_ERROR_BUSY;
     }
-    if (config->timer.break_input != &input->gpio->IDR ||
-        config->timer.break_mask != (UINT32_C(1) << input->pin) ||
+    nx_stm32_timer_pin_t input;
+    if (!nx_stm32_advanced_pin(hardware->registers, config->timer.channel, 2U,
+                               &input) ||
+        config->timer.break_input != &input.gpio->IDR ||
+        config->timer.break_mask != (UINT32_C(1) << input.pin) ||
         cold->configuration != config ||
         (port->config != NULL && port->config != &config->timer))
         return NX_ERROR_INVALID;
@@ -435,18 +517,24 @@ nx_stm32_advanced_close_for(nx_advanced_pwm_controller_t* port,
     for (unsigned index = 0U; index < 2U; ++index) {
         if ((cold->pin_leases & (1U << index)) == 0U)
             continue;
-        const nx_stm32_advanced_pin_t* pin = &hardware->pins[index];
+        nx_stm32_timer_pin_t pin;
+        if (!nx_stm32_advanced_pin(hardware->registers, config->timer.channel,
+                                   index, &pin))
+            return NX_ERROR_INVALID;
         bool high = index == 0U ? config->timer.idle_high
                                 : config->timer.idle_complement_high;
-        status = nx_stm32_timer_cold_inactive(pin->gpio, pin->pin, high);
+        status = nx_stm32_timer_cold_inactive(pin.gpio, pin.pin, high);
         if (status != NX_SUCCESS)
             return status;
     }
     for (unsigned remaining = 3U; remaining != 0U; --remaining) {
         unsigned index = remaining - 1U;
-        const nx_stm32_advanced_pin_t* pin = &hardware->pins[index];
+        nx_stm32_timer_pin_t pin;
+        if (!nx_stm32_advanced_pin(hardware->registers, config->timer.channel,
+                                   index, &pin))
+            return NX_ERROR_INVALID;
         status = nx_stm32_timer_cold_pin_close(cold, (uint8_t)(1U << index),
-                                               pin->gpio, pin->pin,
+                                               pin.gpio, pin.pin,
                                                config->snapshots[index]);
         if (status != NX_SUCCESS)
             return status;

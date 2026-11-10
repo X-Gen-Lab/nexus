@@ -524,7 +524,9 @@
       "modes": [
         "fixed-pwm"
       ],
-      "irq": [],
+      "irq": [
+        "TIM3"
+      ],
       "pins": [
         "PA6",
         "PA7",
@@ -537,8 +539,15 @@
       "interfaces": {
         "encoder": [
           "quadrature"
+        ],
+        "timer_capture": [
+          "edge-capture"
         ]
-      }
+      },
+      "irq_numbers": [
+        29
+      ],
+      "clock_hz": 84000000
     },
     "ADC1": {
       "kind": "adc",
@@ -750,7 +759,11 @@
       "pins": [
         "PA8",
         "PB13",
-        "PB12"
+        "PB12",
+        "PA9",
+        "PB14",
+        "PA10",
+        "PB15"
       ],
       "resources": [
         "clock:TIM1",
@@ -1293,7 +1306,9 @@
       "modes": [
         "fixed-pwm"
       ],
-      "irq": [],
+      "irq": [
+        "TIM5"
+      ],
       "pins": [
         "PA0",
         "PA1",
@@ -1306,8 +1321,15 @@
       "interfaces": {
         "encoder": [
           "quadrature"
+        ],
+        "timer_capture": [
+          "edge-capture"
         ]
-      }
+      },
+      "irq_numbers": [
+        50
+      ],
+      "clock_hz": 84000000
     },
     "TIM9": {
       "kind": "pwm",
@@ -1419,7 +1441,11 @@
       "pins": [
         "PC6",
         "PA7",
-        "PA6"
+        "PA6",
+        "PC7",
+        "PB0",
+        "PC8",
+        "PB1"
       ],
       "resources": [
         "clock:TIM8",

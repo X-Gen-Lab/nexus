@@ -15,6 +15,8 @@ def operations(item):
     selected = implementation(item)
     if item.kind == 'advanced_pwm' and item.controller == 'TIM8':
         return 'nx_stm32_tim8_advanced_pwm_ops'
+    if item.kind == 'timer_capture' and item.controller in {'TIM3', 'TIM5'}:
+        return f'nx_stm32_{item.controller.lower()}_timer_capture_ops'
     if item.interface_kind == "spi_dma_transaction":
         return "nx_spi_dma_sequence_port_ops"
     if item.kind in {"eth", "eth_frames"}:

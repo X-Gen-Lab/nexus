@@ -51,9 +51,11 @@ OFFSET_IMAGE_VECTOR_SYMBOL = 'g_pfnVectors'
 FACT_REFERENCES = descriptor.maintained("stm32f4").references
 ETH_CONTROLLER = 'ETH'
 CONTROLLER_INTERFACES = MappingProxyType({
-    'TIM3': MappingProxyType({'encoder': ('quadrature',)}),
+    'TIM3': MappingProxyType({'encoder': ('quadrature',),
+                              'timer_capture': ('edge-capture',)}),
     'TIM4': MappingProxyType({'pwm': ('fixed-pwm',), 'encoder': ('quadrature',)}),
-    'TIM5': MappingProxyType({'encoder': ('quadrature',)}),
+    'TIM5': MappingProxyType({'encoder': ('quadrature',),
+                              'timer_capture': ('edge-capture',)}),
     'ETH': MappingProxyType({
         'eth_frames': ('rmii-vlan-sg-ptp',)}),
     'FSMC': MappingProxyType({

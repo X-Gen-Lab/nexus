@@ -4,6 +4,8 @@ foreach(timer_family stm32f4)
     set(timer_target "nexus_${timer_family}_timer_advanced_test")
     nexus_google_test(${timer_target} SOURCES timer_advanced_test.cpp
         "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/timer_capture.c"
+        "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/timer_capture_tim3.c"
+        "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/timer_capture_tim5.c"
         "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/advanced_pwm.c"
         "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/advanced_pwm_tim8.c"
         "${NEXUS_SOURCE_DIR}/io/src/api/timer_capture.c"

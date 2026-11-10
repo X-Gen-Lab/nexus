@@ -8,9 +8,23 @@ is a separate whole-ELF assembly gate, not a conclusion from an object size.
 
 | Mode | STM32F407 silicon route |
 |---|---|
-| Input capture | TIM4 CH1, PB6 AF2 |
+| Input capture | TIM3 CH1–4: PA6 / PA7 / PB0 / PB1, AF2, 16-bit |
+| Input capture | TIM4 CH1–4: PB6 / PB7 / PB8 / PB9, AF2, 16-bit |
+| Input capture | TIM5 CH1–4: PA0 / PA1 / PA2 / PA3, AF2, 32-bit |
 | Complementary PWM | TIM1 CH1 PA8, CH1N PB13, BKIN PB12, AF1 |
+| Complementary PWM | TIM1 CH2 PA9, CH2N PB14, BKIN PB12, AF1 |
+| Complementary PWM | TIM1 CH3 PA10, CH3N PB15, BKIN PB12, AF1 |
 | Complementary PWM | TIM8 CH1 PC6, CH1N PA7, BKIN PA6, AF3 |
+| Complementary PWM | TIM8 CH2 PC7, CH2N PB0, BKIN PA6, AF3 |
+| Complementary PWM | TIM8 CH3 PC8, CH3N PB1, BKIN PA6, AF3 |
+
+One selected channel owns the entire controller. Capture, ordinary PWM and
+encoder personalities cannot share the same timer; complementary CH4 does not
+exist. The channel is derived from the reviewed Board route, rather than authored
+again beside the binding. Controller facts own clocks, vectors and peer claims;
+channel facts own pads. Static generation writes the channel and fixed connections
+while C owns every hardware transition. No per-channel worker or controller pool
+is introduced.
 
 The reviewed STM32F407 datasheet establishes these alternate
 functions. They do not establish a connector, external load, safe electrical
@@ -42,7 +56,8 @@ copy. An observable overcapture or full ring increments a saturating incident
 counter; old values are never overwritten. Incidents may coalesce edges, so they
 are not an exact count of physical loss.
 
-The raw capture value is a 16-bit modulo timer count. `tick_hz` describes its
+The raw capture value is a 16-bit modulo count on TIM3/TIM4 and a full 32-bit
+count on TIM5; state reports that width. `tick_hz` describes its
 post-prescaler unit. `observed_at` comes from the common monotonic clock at IRQ
 publication; it is not the edge aperture or a reconstructed absolute hardware
 timestamp. Hardware filter codes specify the selected silicon sampling/filter
@@ -55,7 +70,9 @@ the outer clock/pin/vector lease.
 
 Complementary PWM has five public controls: set duty, start, stop, state and
 clear fault. Period, clock, deadtime, polarity and idle levels are immutable cold
-facts. Duty stages CCR shadow against that fixed base. Zero and full-period duty
+facts. The selected CH1/CH2/CH3 pair controls its matching CCR, CCMR byte,
+CCxE/CCxNE and OISx/OISxN; BKIN and MOE remain controller-wide. Duty stages
+CCR shadow against that fixed base. Zero and full-period duty
 remain explicit count boundaries; electrical behavior still requires the
 reviewed complementary output circuit and physical validation.
 
@@ -92,9 +109,19 @@ pin, IRQ and clock receipt, including a failed pad restore after hot release.
 Retry cannot substitute another configuration, snapshot storage or timer wrapper.
 Controller, cold owner, immutable configuration and snapshot ranges must be
 disjoint before any hardware write. All group outputs must be observed inactive
-before restoring any pad. TIM1/TIM8 share this C cleanup algorithm through static
-hardware facts; hot register paths remain compile-time specializations and CMake
-compiles only the selected wrappers. No per-instance dispatch table is added.
+before restoring any pad. Capture additionally retains exact controller identity
+in its read-only cold configuration, so another timer wrapper cannot restore its
+pad or disable its gate. C pad facts are shared by cold setup and hot admission.
+Each mode shares one C cleanup algorithm through static hardware facts; hot
+controller registers remain compile-time specializations, with bounded channel
+selection and no scan of other channels. CMake compiles only selected wrappers.
+No per-instance dispatch table is added.
+
+The two `tests/contracts/multi_controller_assembly/*timer-channels*.toml`
+references select three independent capture timers and both advanced timers on
+F407VE/baremetal and F407ZG/FreeRTOS. They exercise different channels and common
+break inputs without inventing PCB connections. Ring storage is supplied at
+capture start, not allocated by platform startup.
 
 The maintained GoogleTest/GoogleMock targets compile real production C against
 locked vendor register layouts. Models provide only MMIO/CPU/clock boundaries,

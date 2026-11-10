@@ -13,8 +13,10 @@
  * removes only its own helper/default macros; caller-supplied ports survive. */
 #if !defined(NX_CAPTURE_CR1) || !defined(NX_CAPTURE_CR2) ||                    \
     !defined(NX_CAPTURE_SMCR) || !defined(NX_CAPTURE_PSC) ||                   \
-    !defined(NX_CAPTURE_ARR) || !defined(NX_CAPTURE_CCR) ||                    \
-    !defined(NX_CAPTURE_CCMR) || !defined(NX_CAPTURE_CCER) ||                  \
+    !defined(NX_CAPTURE_ARR) || !defined(NX_CAPTURE_CCR1) ||                   \
+    !defined(NX_CAPTURE_CCR2) || !defined(NX_CAPTURE_CCR3) ||                  \
+    !defined(NX_CAPTURE_CCR4) || !defined(NX_CAPTURE_CCMR1) ||                 \
+    !defined(NX_CAPTURE_CCMR2) || !defined(NX_CAPTURE_CCER) ||                 \
     !defined(NX_CAPTURE_DIER) || !defined(NX_CAPTURE_EGR) ||                   \
     !defined(NX_CAPTURE_SR) || !defined(NX_CAPTURE_INITIALIZE) ||              \
     !defined(NX_CAPTURE_IRQ) || !defined(NX_CAPTURE_RELEASE) ||                \
@@ -53,6 +55,31 @@
 #define NX_CAPTURE_DEFAULT_CAPTURE_ACCESS_READY 1
 #define NX_CAPTURE_ACCESS_READY()               (true)
 #endif
+/** \brief Select one scalar SDK CCR; no array arithmetic crosses registers. */
+static volatile uint32_t* capture_compare(uint8_t channel) {
+    switch (channel) {
+        case 1U:
+            return &NX_CAPTURE_CCR1;
+        case 2U:
+            return &NX_CAPTURE_CCR2;
+        case 3U:
+            return &NX_CAPTURE_CCR3;
+        default:
+            return &NX_CAPTURE_CCR4;
+    }
+}
+/** \brief Fixed channel mode byte in its exact CCMR register. */
+static uint32_t capture_mode(const nx_timer_capture_config_t* config) {
+    return (1U | ((uint32_t)config->filter << 4U))
+           << (((uint32_t)config->channel - 1U) % 2U * 8U);
+}
+/** \brief Input polarity bits follow the selected four-bit CCER group. */
+static uint32_t capture_polarity(const nx_timer_capture_config_t* config) {
+    uint32_t bits = config->edge == NX_TIMER_EDGE_RISING ? 0U : 2U;
+    if (config->edge == NX_TIMER_EDGE_BOTH)
+        bits |= 8U;
+    return bits << (((uint32_t)config->channel - 1U) * 4U);
+}
 /** \brief Serialized task controls require the actual privileged CPU context.
  */
 static bool capture_context(void) {
@@ -93,7 +120,8 @@ nx_result_t NX_CAPTURE_INITIALIZE(nx_timer_capture_controller_t* port,
         NX_CAPTURE_CONTROL_OVERLAP(port, sizeof(*port)) ||
         NX_CAPTURE_CONTROL_OVERLAP(config, sizeof(*config)) ||
         capture_overlap(port, sizeof(*port), config, sizeof(*config)) ||
-        config->tick_hz == 0U || config->timer_hz != NX_CAPTURE_HZ ||
+        config->channel < 1U || config->channel > 4U || config->tick_hz == 0U ||
+        config->timer_hz != NX_CAPTURE_HZ ||
         config->timer_hz % config->tick_hz != 0U ||
         config->timer_hz / config->tick_hz > 65536U || config->filter > 15U ||
         config->edge > NX_TIMER_EDGE_BOTH) {
@@ -109,17 +137,14 @@ nx_result_t NX_CAPTURE_INITIALIZE(nx_timer_capture_controller_t* port,
         !NX_CAPTURE_VECTOR_QUIET()) {
         return NX_ERROR_BUSY;
     }
-    if (!NX_CAPTURE_CLOCK_READY()) {
+    if (!NX_CAPTURE_CLOCK_READY(config->channel)) {
         return NX_ERROR_STATE;
     }
     if ((NX_CAPTURE_CR1 & 1U) != 0U || NX_CAPTURE_CCER != 0U ||
         NX_CAPTURE_DIER != 0U) {
         return NX_ERROR_BUSY;
     }
-    uint32_t polarity = config->edge == NX_TIMER_EDGE_RISING ? 0U : 2U;
-    if (config->edge == NX_TIMER_EDGE_BOTH) {
-        polarity |= 8U;
-    }
+    const uint32_t polarity = capture_polarity(config);
     /* Retain the immutable session before the first effect. Failed readback
      * keeps hot controls closed and gives assembly an exact cleanup owner. */
     port->config = config;
@@ -128,13 +153,19 @@ nx_result_t NX_CAPTURE_INITIALIZE(nx_timer_capture_controller_t* port,
     NX_TIMER_WRITE(NX_CAPTURE_SMCR, 0U);
     NX_TIMER_WRITE(NX_CAPTURE_PSC, config->timer_hz / config->tick_hz - 1U);
     NX_TIMER_WRITE(NX_CAPTURE_ARR, NX_CAPTURE_COUNTER_MAX);
-    NX_TIMER_WRITE(NX_CAPTURE_CCMR, 1U | ((uint32_t)config->filter << 4U));
+    NX_TIMER_WRITE(NX_CAPTURE_CCMR1,
+                   config->channel <= 2U ? capture_mode(config) : 0U);
+    NX_TIMER_WRITE(NX_CAPTURE_CCMR2,
+                   config->channel > 2U ? capture_mode(config) : 0U);
     NX_TIMER_WRITE(NX_CAPTURE_CCER, polarity);
     nx_arch_dsb();
     if (NX_CAPTURE_CR1 != 0U || NX_CAPTURE_CR2 != (1U << 4U) ||
         NX_CAPTURE_PSC != config->timer_hz / config->tick_hz - 1U ||
         NX_CAPTURE_ARR != NX_CAPTURE_COUNTER_MAX ||
-        NX_CAPTURE_CCMR != (1U | ((uint32_t)config->filter << 4U)) ||
+        NX_CAPTURE_CCMR1 !=
+            (config->channel <= 2U ? capture_mode(config) : 0U) ||
+        NX_CAPTURE_CCMR2 !=
+            (config->channel > 2U ? capture_mode(config) : 0U) ||
         NX_CAPTURE_SMCR != 0U || NX_CAPTURE_CCER != polarity) {
         return NX_ERROR_IO;
     }
@@ -178,17 +209,19 @@ static nx_result_t capture_start(void* context,
     if (port->events != NULL || port->running || port->draining) {
         return NX_ERROR_BUSY;
     }
-    uint32_t polarity = port->config->edge == NX_TIMER_EDGE_RISING ? 0U : 2U;
-    if (port->config->edge == NX_TIMER_EDGE_BOTH) {
-        polarity |= 8U;
-    }
-    if (!NX_CAPTURE_CLOCK_READY() || NX_CAPTURE_DIER != 0U ||
-        NX_CAPTURE_CR1 != 0U ||
+    const uint32_t polarity = capture_polarity(port->config);
+    const uint32_t enable = 1U << (((uint32_t)port->config->channel - 1U) * 4U);
+    const uint32_t flag = 1U << port->config->channel;
+    if (!NX_CAPTURE_CLOCK_READY(port->config->channel) ||
+        NX_CAPTURE_DIER != 0U || NX_CAPTURE_CR1 != 0U ||
         NX_CAPTURE_PSC != port->config->timer_hz / port->config->tick_hz - 1U ||
         NX_CAPTURE_ARR != NX_CAPTURE_COUNTER_MAX ||
         NX_CAPTURE_CCER != polarity || NX_CAPTURE_CR2 != 0U ||
         NX_CAPTURE_SMCR != 0U ||
-        NX_CAPTURE_CCMR != (1U | ((uint32_t)port->config->filter << 4U))) {
+        NX_CAPTURE_CCMR1 !=
+            (port->config->channel <= 2U ? capture_mode(port->config) : 0U) ||
+        NX_CAPTURE_CCMR2 !=
+            (port->config->channel > 2U ? capture_mode(port->config) : 0U)) {
         return NX_ERROR_STATE;
     }
     nx_arch_irq_state_t mask = nx_arch_irq_save();
@@ -196,12 +229,12 @@ static nx_result_t capture_start(void* context,
     port->capacity = capacity;
     port->head = port->tail = port->count = 0U;
     port->loss_incidents = port->pending_flags = 0U;
-    NX_TIMER_WRITE(NX_CAPTURE_SR, ~(uint32_t)(2U | 512U));
-    NX_TIMER_WRITE(NX_CAPTURE_CCER, NX_CAPTURE_CCER | 1U);
+    NX_TIMER_WRITE(NX_CAPTURE_SR, ~(flag | (flag << 8U)));
+    NX_TIMER_WRITE(NX_CAPTURE_CCER, NX_CAPTURE_CCER | enable);
     NX_TIMER_WRITE(NX_CAPTURE_CR1, NX_CAPTURE_CR1 | 1U);
     nx_arch_dsb();
-    if ((NX_CAPTURE_CCER & 1U) == 0U || (NX_CAPTURE_CR1 & 1U) == 0U) {
-        NX_TIMER_WRITE(NX_CAPTURE_CCER, NX_CAPTURE_CCER & ~1U);
+    if ((NX_CAPTURE_CCER & enable) == 0U || (NX_CAPTURE_CR1 & 1U) == 0U) {
+        NX_TIMER_WRITE(NX_CAPTURE_CCER, NX_CAPTURE_CCER & ~enable);
         NX_TIMER_WRITE(NX_CAPTURE_CR1, NX_CAPTURE_CR1 & ~1U);
         port->events = NULL;
         port->capacity = 0U;
@@ -209,10 +242,10 @@ static nx_result_t capture_start(void* context,
         return NX_ERROR_IO;
     }
     port->running = true;
-    NX_TIMER_WRITE(NX_CAPTURE_DIER, NX_CAPTURE_DIER | 2U);
+    NX_TIMER_WRITE(NX_CAPTURE_DIER, NX_CAPTURE_DIER | flag);
     nx_arch_dsb();
-    if ((NX_CAPTURE_DIER & 2U) == 0U) {
-        NX_TIMER_WRITE(NX_CAPTURE_CCER, NX_CAPTURE_CCER & ~1U);
+    if ((NX_CAPTURE_DIER & flag) == 0U) {
+        NX_TIMER_WRITE(NX_CAPTURE_CCER, NX_CAPTURE_CCER & ~enable);
         NX_TIMER_WRITE(NX_CAPTURE_CR1, NX_CAPTURE_CR1 & ~1U);
         port->running = false;
         port->events = NULL;
@@ -239,12 +272,14 @@ static nx_result_t capture_stop(void* context) {
     nx_arch_irq_state_t mask = nx_arch_irq_save();
     port->draining = port->events != NULL;
     bool cold = !port->initialized;
-    NX_TIMER_WRITE(NX_CAPTURE_DIER, cold ? 0U : NX_CAPTURE_DIER & ~2U);
-    NX_TIMER_WRITE(NX_CAPTURE_CCER, cold ? 0U : NX_CAPTURE_CCER & ~1U);
+    const uint32_t enable = 1U << (((uint32_t)port->config->channel - 1U) * 4U);
+    const uint32_t flag = 1U << port->config->channel;
+    NX_TIMER_WRITE(NX_CAPTURE_DIER, cold ? 0U : NX_CAPTURE_DIER & ~flag);
+    NX_TIMER_WRITE(NX_CAPTURE_CCER, cold ? 0U : NX_CAPTURE_CCER & ~enable);
     NX_TIMER_WRITE(NX_CAPTURE_CR1, NX_CAPTURE_CR1 & ~1U);
     nx_arch_dsb();
-    if ((NX_CAPTURE_DIER & (cold ? UINT32_MAX : 2U)) != 0U ||
-        (NX_CAPTURE_CCER & (cold ? UINT32_MAX : 1U)) != 0U ||
+    if ((NX_CAPTURE_DIER & (cold ? UINT32_MAX : flag)) != 0U ||
+        (NX_CAPTURE_CCER & (cold ? UINT32_MAX : enable)) != 0U ||
         (NX_CAPTURE_CR1 & 1U) != 0U) {
         nx_arch_irq_restore(mask);
         return NX_ERROR_BUSY;
@@ -351,10 +386,12 @@ void NX_CAPTURE_IRQ(nx_timer_capture_controller_t* port) {
     if (port == NULL || !port->initialized) {
         return;
     }
+    const uint32_t flag = 1U << port->config->channel;
+    const uint32_t overcapture = flag << 8U;
     if (port->draining) {
         /* A refused DIER clear can still deliver a late level IRQ. Acknowledge
          * observed facts without writing the retained consumer ring. */
-        uint32_t discarded = NX_CAPTURE_SR & (2U | 512U);
+        uint32_t discarded = NX_CAPTURE_SR & (flag | overcapture);
         NX_TIMER_WRITE(NX_CAPTURE_SR, ~discarded);
         if (discarded != 0U) {
             capture_loss(port, NX_TIMER_CAPTURE_RING_LOSS);
@@ -364,19 +401,20 @@ void NX_CAPTURE_IRQ(nx_timer_capture_controller_t* port) {
     if (port->events == NULL || !port->running) {
         return;
     }
-    uint32_t flags = NX_CAPTURE_SR & (2U | 512U);
+    uint32_t flags = NX_CAPTURE_SR & (flag | overcapture);
     uint32_t ticks = 0U;
-    if ((flags & 2U) != 0U) {
+    if ((flags & flag) != 0U) {
         /* Input-mode CCR reads clear CCIF. Preserve any later unread edge;
          * an edge replacing the sampled count must expose its overcapture. */
-        ticks = NX_TIMER_READ(NX_CAPTURE_CCR) & NX_CAPTURE_COUNTER_MAX;
-        flags |= NX_CAPTURE_SR & 512U;
+        ticks = NX_TIMER_READ(*capture_compare(port->config->channel)) &
+                NX_CAPTURE_COUNTER_MAX;
+        flags |= NX_CAPTURE_SR & overcapture;
     }
-    NX_TIMER_WRITE(NX_CAPTURE_SR, ~(flags & 512U));
-    if ((flags & 512U) != 0U) {
+    NX_TIMER_WRITE(NX_CAPTURE_SR, ~(flags & overcapture));
+    if ((flags & overcapture) != 0U) {
         capture_loss(port, NX_TIMER_CAPTURE_OVERCAPTURE);
     }
-    if ((flags & 2U) == 0U) {
+    if ((flags & flag) == 0U) {
         return;
     }
     if (port->count == port->capacity) {

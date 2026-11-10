@@ -26,6 +26,11 @@ class TimerCapabilityObserverTests(unittest.TestCase):
         source = configure.ROOT / 'soc/stm32/stm32f4/drivers/advanced_pwm_tim8.c'
         self.assertEqual(capabilities.source_ops(source, configure.ROOT),
                          {'nx_stm32_tim8_advanced_pwm_ops'})
+        for timer in ('TIM3', 'TIM5'):
+            source = configure.ROOT / (
+                'soc/stm32/stm32f4/drivers/timer_capture_'+timer.lower()+'.c')
+            self.assertEqual(capabilities.source_ops(source, configure.ROOT),
+                             {f'nx_stm32_{timer.lower()}_timer_capture_ops'})
 
     def test_macro_mentions_without_actual_table_definition_are_rejected(self):
         self.source.write_text('#define NX_TABLE_OPS nx_unused_ops\n#include "template.h"\n')
@@ -74,7 +79,9 @@ class TimerCapabilityObserverTests(unittest.TestCase):
         rows = capabilities.collect(configure.ROOT)
         selected = [row for row in rows if row["kind"] in {"timer_capture", "advanced_pwm"}]
         expected = {
+            ('stm32f4', "TIM3", "timer_capture", "edge-capture"),
             ('stm32f4', "TIM4", "timer_capture", "edge-capture"),
+            ('stm32f4', "TIM5", "timer_capture", "edge-capture"),
             ('stm32f4', "TIM1", "advanced_pwm", "complementary-pwm"),
             ('stm32f4', "TIM8", "advanced_pwm", "complementary-pwm"),
         }
@@ -83,6 +90,8 @@ class TimerCapabilityObserverTests(unittest.TestCase):
         for row in selected:
             self.assertTrue(row["fixtures"])
             name = ('advanced_pwm_tim8' if row['controller'] == 'TIM8'
+                    else 'timer_capture_'+row['controller'].lower()
+                    if row['kind'] == 'timer_capture' and row['controller'] != 'TIM4'
                     else row['kind'])
             self.assertEqual(row["exports"],
                              [f"{source_directory(row['family'])}/drivers/{name}.c"])

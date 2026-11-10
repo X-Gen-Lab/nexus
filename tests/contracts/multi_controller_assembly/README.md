@@ -109,3 +109,10 @@ TIM1 使用 PA8／PB13／PB12 AF1，TIM8 使用 PC6／PA7／PA6 AF3；168 MHz ti
 下显式选择 1 MHz tick、1000-tick period 与 128 个 timer-clock deadtime ticks。
 两路分别占用 TIM9／TIM12 共享 break vector，不能同时选择其 peer。main 保留两个
 真实 factory face，但不 start 输出；软件 Board 不授权具体 PCB 或功率级接线。
+
+`stm32-ve-timer-channels-baremetal.toml` 同时选择 TIM3 CH3、TIM4 CH2、TIM5 CH4、
+TIM1 CH3／CH3N 和 TIM8 CH1／CH1N；`stm32-zg-timer-channels-freertos.toml` 选择
+TIM3 CH4、TIM4 CH1、TIM5 CH2、TIM1 CH2／CH2N 和 TIM8 CH2／CH2N。
+每个 controller 仍只有一个 owner，TIM5 使用完整 32-bit modulo count。
+Board binding 确定唯一 channel，TOML 不另写通道号；main 保留真实 capture／advanced
+factory face，未 start ring 或输出。软件路线不能代替 PCB 接线或功率级验收。

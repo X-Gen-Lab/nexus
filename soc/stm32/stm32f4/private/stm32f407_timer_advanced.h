@@ -46,6 +46,23 @@ nx_stm32_tim8_advanced_pwm_release(nx_advanced_pwm_controller_t* port);
 /** \brief Dispatch only TIM8's observed break from its static vector. */
 void nx_stm32_tim8_advanced_pwm_irq(nx_advanced_pwm_controller_t* port);
 extern const nx_advanced_pwm_ops_t nx_stm32_tim8_advanced_pwm_ops;
+/** \brief Independent general timers retain their native counter width. */
+nx_result_t
+nx_stm32_tim3_timer_capture_initialize(nx_timer_capture_controller_t* port,
+                                       const nx_timer_capture_config_t* config);
+nx_result_t
+nx_stm32_tim5_timer_capture_initialize(nx_timer_capture_controller_t* port,
+                                       const nx_timer_capture_config_t* config);
+/** \brief Release only the corresponding drained and quiescent session. */
+nx_result_t
+nx_stm32_tim3_timer_capture_release(nx_timer_capture_controller_t* port);
+nx_result_t
+nx_stm32_tim5_timer_capture_release(nx_timer_capture_controller_t* port);
+/** \brief Static generated vectors deliver only their own controller. */
+void nx_stm32_tim3_timer_capture_irq(nx_timer_capture_controller_t* port);
+void nx_stm32_tim5_timer_capture_irq(nx_timer_capture_controller_t* port);
+extern const nx_timer_capture_ops_t nx_stm32_tim3_timer_capture_ops;
+extern const nx_timer_capture_ops_t nx_stm32_tim5_timer_capture_ops;
 #ifdef __cplusplus
 }
 #endif

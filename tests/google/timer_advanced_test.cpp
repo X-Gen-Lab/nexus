@@ -63,6 +63,8 @@ static unsigned s_writes;
 static bool s_edge_before_capture_read;
 static bool s_edge_after_capture_read;
 static ::testing::MockFunction<nx_time_us_t()>* s_observation;
+static volatile uint32_t* s_capture_read = &CAP_CCR;
+static uint32_t s_capture_flag = 2U;
 
 /** \brief External CPU context, not a replacement timer implementation. */
 extern "C" bool nx_arch_in_isr(void) {
@@ -99,13 +101,17 @@ extern "C" void nx_timer_model_write(volatile uint32_t* address,
     if (address == s_refused) {
         value = (value & ~s_hold) | (*address & s_hold);
     }
-    if (address == &CAP_SR || address == &ADV_SR || address == &TIM8->SR) {
+    if (address == &CAP_SR || address == &TIM3->SR || address == &TIM5->SR ||
+        address == &ADV_SR || address == &TIM8->SR) {
         *address &= value;
     } else {
         *address = value;
     }
-    if (address == &CAP_EGR && (value & 1U) != 0U && (CAP_CR1 & 2U) == 0U) {
-        CAP_SR |= 1U;
+    for (TIM_TypeDef* timer : {TIM3, TIM4, TIM5}) {
+        if (address == &timer->EGR && (value & 1U) != 0U &&
+            (timer->CR1 & 2U) == 0U) {
+            timer->SR |= 1U;
+        }
     }
     if (address == &ADV_BDTR && (value & 32768U) != 0U && s_break_on_enable) {
         BREAK_INPUT |= 4096U;
@@ -125,17 +131,25 @@ extern "C" void nx_timer_model_write(volatile uint32_t* address,
 
 /** \brief Actual input capture read-clear with asynchronous edge injection. */
 extern "C" uint32_t nx_timer_model_read(volatile uint32_t* address) {
-    if (address == &CAP_CCR && s_edge_before_capture_read) {
-        CAP_CCR = 211U;
-        CAP_SR |= 2U | 512U;
+    if (address == s_capture_read && s_edge_before_capture_read) {
+        *address = 211U;
+        CAP_SR |= s_capture_flag | (s_capture_flag << 8U);
         s_edge_before_capture_read = false;
     }
     uint32_t value = *address;
-    if (address == &CAP_CCR) {
-        CAP_SR &= ~2U;
+    for (TIM_TypeDef* timer : {TIM3, TIM4, TIM5}) {
+        volatile uint32_t* ccr[4] = {&timer->CCR1, &timer->CCR2, &timer->CCR3,
+                                     &timer->CCR4};
+        for (unsigned channel = 0U; channel < 4U; ++channel) {
+            if (address == ccr[channel]) {
+                timer->SR &= ~(2U << channel);
+            }
+        }
+    }
+    if (address == s_capture_read) {
         if (s_edge_after_capture_read) {
-            CAP_CCR = 211U;
-            CAP_SR |= 2U;
+            *address = 211U;
+            CAP_SR |= s_capture_flag;
             s_edge_after_capture_read = false;
         }
     }
@@ -147,10 +161,10 @@ class TimerHardware : public ::testing::Test {
     nx_timer_capture_controller_t capture{};
     nx_advanced_pwm_controller_t advanced{};
     nx_timer_capture_config_t cap_config{CAP_HZ, 1000000U, NX_TIMER_EDGE_RISING,
-                                         0U, true};
+                                         0U,     true,     1U};
     nx_advanced_pwm_config_t adv_config{&BREAK_INPUT, 4096U, ADV_HZ, 1000000U,
                                         1000U,        128U,  true,   false,
-                                        false,        true};
+                                        false,        true,  1U};
     nx_timer_capture_t cap{&CAP_OPS, &capture};
     nx_advanced_pwm_t pwm{&ADV_OPS, &advanced};
     nx_timer_capture_event_t ring[2]{};
@@ -173,6 +187,8 @@ class TimerHardware : public ::testing::Test {
         s_edge_before_capture_read = false;
         s_edge_after_capture_read = false;
         s_observation = nullptr;
+        s_capture_read = &CAP_CCR;
+        s_capture_flag = 2U;
         RCC->APB1ENR = RCC_APB1ENR_TIM4EN;
         RCC->APB2ENR = RCC_APB2ENR_TIM1EN;
         RCC->CFGR = RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
@@ -199,6 +215,267 @@ class TimerHardware : public ::testing::Test {
         GPIOA->AFR[0] |= 51U << 24U;
     }
 };
+
+/** \brief SDK channel registers remain separate scalar MMIO objects. */
+static volatile uint32_t* CaptureRegister(TIM_TypeDef* timer,
+                                          unsigned channel) {
+    switch (channel) {
+        case 1U:
+            return &timer->CCR1;
+        case 2U:
+            return &timer->CCR2;
+        case 3U:
+            return &timer->CCR3;
+        default:
+            return &timer->CCR4;
+    }
+}
+
+TEST_F(TimerHardware, CaptureAllFourChannelsUseExactModesFlagsAndRegisters) {
+    GPIOB->MODER |= 0xAAU << 12U;
+    GPIOB->AFR[0] |= 0x22U << 24U;
+    GPIOB->AFR[1] |= 0x22U;
+    for (uint8_t channel = 1U; channel <= 4U; ++channel) {
+        SCOPED_TRACE(channel);
+        std::memset(TIM4, 0, sizeof(*TIM4));
+        capture = {};
+        auto config = cap_config;
+        config.channel = channel;
+        config.edge = NX_TIMER_EDGE_BOTH;
+        config.filter = 7U;
+        ASSERT_EQ(NX_SUCCESS, CAP_INIT(&capture, &config));
+        const uint32_t mode = 0x71U << (((channel - 1U) % 2U) * 8U);
+        EXPECT_EQ(channel <= 2U ? mode : 0U, TIM4->CCMR1);
+        EXPECT_EQ(channel > 2U ? mode : 0U, TIM4->CCMR2);
+        ASSERT_EQ(NX_SUCCESS, nx_timer_capture_start(&cap, ring, 2U));
+        const uint32_t flag = 1U << channel;
+        EXPECT_EQ(flag, CAP_DIER);
+        EXPECT_EQ(11U << ((channel - 1U) * 4U), CAP_CCER);
+        *CaptureRegister(TIM4, channel) = 100U + channel;
+        CAP_SR |= flag | 1U;
+        CAP_IRQ(&capture);
+        nx_timer_capture_event_t event{};
+        ASSERT_EQ(NX_SUCCESS, nx_timer_capture_read(&cap, &event));
+        EXPECT_EQ(100U + channel, event.captured_ticks);
+        EXPECT_EQ(0U, CAP_SR & flag);
+        EXPECT_NE(0U, CAP_SR & 1U);
+        ASSERT_EQ(NX_SUCCESS, nx_timer_capture_stop(&cap));
+        ASSERT_EQ(NX_SUCCESS, CAP_RELEASE(&capture));
+    }
+}
+
+TEST_F(TimerHardware, SelectedCaptureOverrunPreservesOtherChannelFacts) {
+    GPIOB->MODER |= 2U << 16U;
+    GPIOB->AFR[1] |= 2U;
+    cap_config.channel = 3U;
+    ASSERT_EQ(NX_SUCCESS, CAP_INIT(&capture, &cap_config));
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_start(&cap, ring, 2U));
+    TIM4->CCR3 = 321U;
+    CAP_SR |= (1U << 3U) | (1U << 11U) | 2U | 512U;
+    CAP_IRQ(&capture);
+    nx_timer_capture_event_t event{};
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_read(&cap, &event));
+    EXPECT_EQ(321U, event.captured_ticks);
+    EXPECT_NE(0U, event.flags & NX_TIMER_CAPTURE_OVERCAPTURE);
+    EXPECT_EQ(2U | 512U, CAP_SR & (2U | 512U));
+    EXPECT_EQ(0U, CAP_SR & ((1U << 3U) | (1U << 11U)));
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_stop(&cap));
+}
+
+TEST_F(TimerHardware, ChannelFourReadPreservesAnEdgeArrivingAfterCcrRead) {
+    GPIOB->MODER |= 2U << 18U;
+    GPIOB->AFR[1] |= 2U << 4U;
+    cap_config.channel = 4U;
+    ASSERT_EQ(NX_SUCCESS, CAP_INIT(&capture, &cap_config));
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_start(&cap, ring, 2U));
+    s_capture_read = &TIM4->CCR4;
+    s_capture_flag = 16U;
+    s_edge_after_capture_read = true;
+    TIM4->CCR4 = 111U;
+    CAP_SR |= 16U;
+    CAP_IRQ(&capture);
+    nx_timer_capture_event_t event{};
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_read(&cap, &event));
+    EXPECT_EQ(111U, event.captured_ticks);
+    EXPECT_NE(0U, CAP_SR & 16U);
+    CAP_IRQ(&capture);
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_read(&cap, &event));
+    EXPECT_EQ(211U, event.captured_ticks);
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_stop(&cap));
+}
+
+TEST_F(TimerHardware, CaptureChannelAdmissionRejectsZeroAndFiveWithoutEffects) {
+    for (uint8_t channel : {uint8_t{0U}, uint8_t{5U}}) {
+        SCOPED_TRACE(channel);
+        std::memset(TIM4, 0, sizeof(*TIM4));
+        capture = {};
+        cap_config.channel = channel;
+        s_writes = 0U;
+        EXPECT_EQ(NX_ERROR_INVALID, CAP_INIT(&capture, &cap_config));
+        EXPECT_EQ(0U, s_writes);
+        EXPECT_EQ(nullptr, capture.config);
+    }
+}
+
+TEST_F(TimerHardware, FourthChannelStopRefusalKeepsRingAndDrainsLateFacts) {
+    GPIOB->MODER |= 2U << 18U;
+    GPIOB->AFR[1] |= 2U << 4U;
+    cap_config.channel = 4U;
+    ASSERT_EQ(NX_SUCCESS, CAP_INIT(&capture, &cap_config));
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_start(&cap, ring, 2U));
+    s_refused = &CAP_DIER;
+    s_hold = 16U;
+    ASSERT_EQ(NX_ERROR_BUSY, nx_timer_capture_stop(&cap));
+    EXPECT_EQ(ring, capture.events);
+    EXPECT_TRUE(capture.draining);
+    TIM4->CCR4 = 777U;
+    CAP_SR |= 16U | (16U << 8U) | 2U;
+    CAP_IRQ(&capture);
+    EXPECT_EQ(0U, capture.count);
+    EXPECT_EQ(0U, CAP_SR & (16U | (16U << 8U)));
+    EXPECT_NE(0U, CAP_SR & 2U);
+    s_refused = nullptr;
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_stop(&cap));
+    EXPECT_EQ(nullptr, capture.events);
+}
+
+TEST_F(TimerHardware, Tim3AndTim5KeepIndependentChannelsAndNativeWidths) {
+    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN | RCC_APB1ENR_TIM5EN;
+    GPIOB->MODER |= 2U;
+    GPIOB->AFR[0] |= 2U;
+    GPIOA->MODER |= 2U << 6U;
+    GPIOA->AFR[0] |= 2U << 12U;
+    nx_timer_capture_controller_t third{}, fifth{};
+    auto three = cap_config;
+    auto five = cap_config;
+    three.channel = 3U;
+    five.channel = 4U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim3_timer_capture_initialize(&third, &three));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim5_timer_capture_initialize(&fifth, &five));
+    const nx_timer_capture_t a{&nx_stm32_tim3_timer_capture_ops, &third};
+    const nx_timer_capture_t b{&nx_stm32_tim5_timer_capture_ops, &fifth};
+    nx_timer_capture_event_t left[1]{}, right[1]{};
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_start(&a, left, 1U));
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_start(&b, right, 1U));
+    TIM3->CCR3 = 0xABCDU;
+    TIM5->CCR4 = 0xFEDCBA98U;
+    TIM3->SR |= 8U;
+    TIM5->SR |= 16U;
+    nx_stm32_tim3_timer_capture_irq(&third);
+    nx_stm32_tim5_timer_capture_irq(&fifth);
+    nx_timer_capture_event_t event{};
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_read(&a, &event));
+    EXPECT_EQ(0xABCDU, event.captured_ticks);
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_read(&b, &event));
+    EXPECT_EQ(0xFEDCBA98U, event.captured_ticks);
+    nx_timer_capture_state_t state{};
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_state(&b, &state));
+    EXPECT_EQ(32U, state.counter_bits);
+    EXPECT_EQ(UINT32_MAX, TIM5->ARR);
+    EXPECT_EQ(UINT16_MAX, TIM3->ARR);
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_stop(&a));
+    EXPECT_NE(0U, TIM5->CR1 & 1U);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_tim3_timer_capture_release(&third));
+    ASSERT_EQ(NX_SUCCESS, nx_timer_capture_stop(&b));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_tim5_timer_capture_release(&fifth));
+}
+
+TEST_F(TimerHardware, AdvancedPairsTwoAndThreeSelectExactIdleDutyAndSources) {
+    Tim8Pads();
+    GPIOA->MODER |= (2U << 18U) | (2U << 20U);
+    GPIOA->AFR[1] |= 0x11U << 4U;
+    GPIOB->MODER |= 0xAU << 28U;
+    GPIOB->AFR[1] |= 0x11U << 24U;
+    GPIOB->MODER |= 0xAU;
+    GPIOB->AFR[0] |= 0x33U;
+    GPIOC->MODER |= (2U << 14U) | (2U << 16U);
+    GPIOC->AFR[0] |= 3U << 28U;
+    GPIOC->AFR[1] |= 3U;
+    for (TIM_TypeDef* timer : {TIM1, TIM8}) {
+        for (uint8_t channel : {uint8_t{2U}, uint8_t{3U}}) {
+            SCOPED_TRACE(channel);
+            std::memset(timer, 0, sizeof(*timer));
+            nx_advanced_pwm_controller_t local{};
+            auto config = adv_config;
+            config.channel = channel;
+            config.idle_high = true;
+            config.idle_complement_high = true;
+            if (timer == TIM8) {
+                config.break_input = &GPIOA->IDR;
+                config.break_mask = 64U;
+            }
+            const nx_advanced_pwm_ops_t* ops =
+                timer == TIM1 ? &ADV_OPS : &nx_stm32_tim8_advanced_pwm_ops;
+            const auto initialize = timer == TIM1
+                                        ? ADV_INIT
+                                        : nx_stm32_tim8_advanced_pwm_initialize;
+            const auto release = timer == TIM1
+                                     ? ADV_RELEASE
+                                     : nx_stm32_tim8_advanced_pwm_release;
+            const nx_advanced_pwm_t face{ops, &local};
+            ASSERT_EQ(NX_SUCCESS, initialize(&local, &config));
+            const uint32_t mode = 104U << (((channel - 1U) % 2U) * 8U);
+            EXPECT_EQ(channel == 2U ? mode : 0U, timer->CCMR1);
+            EXPECT_EQ(channel == 3U ? mode : 0U, timer->CCMR2);
+            EXPECT_EQ(768U << ((channel - 1U) * 2U), timer->CR2);
+            ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_set_duty(&face, 345U));
+            EXPECT_EQ(345U, *CaptureRegister(timer, channel));
+            EXPECT_EQ(0U, timer->CCR1);
+            ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_start(&face));
+            EXPECT_EQ(5U << ((channel - 1U) * 4U), timer->CCER);
+            ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_stop(&face));
+            EXPECT_EQ(0U, timer->CCER);
+            EXPECT_EQ(0U, timer->BDTR & 32768U);
+            ASSERT_EQ(NX_SUCCESS, release(&local));
+        }
+    }
+}
+
+TEST_F(TimerHardware, AdvancedPairAdmissionRejectsZeroAndFourWithoutEffects) {
+    for (uint8_t channel : {uint8_t{0U}, uint8_t{4U}}) {
+        std::memset(TIM1, 0, sizeof(*TIM1));
+        advanced = {};
+        adv_config.channel = channel;
+        s_writes = 0U;
+        EXPECT_EQ(NX_ERROR_INVALID, ADV_INIT(&advanced, &adv_config));
+        EXPECT_EQ(0U, s_writes);
+        EXPECT_EQ(nullptr, advanced.config);
+    }
+}
+
+TEST_F(TimerHardware, ThirdPairBreakCannotReenableBeforeFullSourceWithdrawal) {
+    Tim8Pads();
+    GPIOC->MODER |= 2U << 16U;
+    GPIOC->AFR[1] |= 3U;
+    GPIOB->MODER |= 2U << 2U;
+    GPIOB->AFR[0] |= 3U << 4U;
+    auto config = adv_config;
+    config.channel = 3U;
+    config.break_input = &GPIOA->IDR;
+    config.break_mask = 64U;
+    nx_advanced_pwm_controller_t local{};
+    const nx_advanced_pwm_t face{&nx_stm32_tim8_advanced_pwm_ops, &local};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_pwm_initialize(&local, &config));
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_start(&face));
+    TIM8->SR |= 128U;
+    nx_stm32_tim8_advanced_pwm_irq(&local);
+    EXPECT_TRUE(local.fault);
+    EXPECT_EQ(0U, TIM8->BDTR & 32768U);
+    EXPECT_EQ(NX_ERROR_STATE, nx_advanced_pwm_start(&face));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_advanced_pwm_clear_fault(&face));
+    s_refused = &TIM8->CCER;
+    s_hold = 5U << 8U;
+    ASSERT_EQ(NX_ERROR_BUSY, nx_advanced_pwm_stop(&face));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_advanced_pwm_clear_fault(&face));
+    s_refused = nullptr;
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_stop(&face));
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_clear_fault(&face));
+    EXPECT_EQ(0U, TIM8->BDTR & 32768U);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_tim8_advanced_pwm_release(&local));
+}
 
 TEST_F(TimerHardware, Tim8UsesItsOwnPadsClockAndBreakEncoding) {
     Tim8Pads();

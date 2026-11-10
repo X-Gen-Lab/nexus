@@ -1,0 +1,81 @@
+# Silicon-only channel contracts; no PCB connections or waveforms qualified.
+schema = 2
+board_package = "stm32-zg-board"
+backend = "freertos"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[timer_capture.tim3]
+binding = "timer-capture-tim3-ch4-pb1"
+mode = "edge-capture"
+tick_hz = 1000000
+exclusive = true
+edge = "both"
+filter = 3
+
+[timer_capture.tim3.irq]
+priority = 6
+calls_os = false
+
+[timer_capture.tim4]
+binding = "timer-capture-pb6"
+mode = "edge-capture"
+tick_hz = 1000000
+exclusive = true
+edge = "both"
+filter = 3
+
+[timer_capture.tim4.irq]
+priority = 6
+calls_os = false
+
+[timer_capture.tim5]
+binding = "timer-capture-tim5-ch2-pa1"
+mode = "edge-capture"
+tick_hz = 1000000
+exclusive = true
+edge = "both"
+filter = 3
+
+[timer_capture.tim5.irq]
+priority = 6
+calls_os = false
+
+[advanced_pwm.tim1]
+binding = "timer-complementary-tim1-ch2-pa9-pb14-pb12"
+mode = "complementary-pwm"
+tick_hz = 1000000
+exclusive = true
+period_ticks = 1000
+deadtime_ticks = 128
+break_active_high = true
+idle_high = false
+idle_complement_high = false
+
+[advanced_pwm.tim1.irq]
+priority = 6
+calls_os = false
+
+[advanced_pwm.tim8]
+binding = "timer-complementary-tim8-ch2-pc7-pb0-pa6"
+mode = "complementary-pwm"
+tick_hz = 1000000
+exclusive = true
+period_ticks = 1000
+deadtime_ticks = 128
+break_active_high = true
+idle_high = false
+idle_complement_high = false
+
+[advanced_pwm.tim8.irq]
+priority = 6
+calls_os = false

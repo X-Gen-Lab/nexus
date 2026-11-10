@@ -177,17 +177,22 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 self.assertEqual(provider, self.private_sources('stm32f4', expected))
                 self.assertEqual(sdk, set())
 
-    def test_advanced_timers_compile_only_the_selected_specializations(self):
-        for controllers in (('TIM1',), ('TIM8',), ('TIM1', 'TIM8')):
-            with self.subTest(controllers=controllers):
-                provider, sdk = self.configure_sources('stm32f4', [
-                    ('advanced_pwm', 'complementary-pwm', name)
-                    for name in controllers])
-                expected = {'gpio.c', 'platform_cold.c'}
-                expected.update('advanced_pwm.c' if name == 'TIM1' else
-                                'advanced_pwm_tim8.c' for name in controllers)
-                self.assertEqual(provider, self.private_sources('stm32f4', expected))
-                self.assertEqual(sdk, set())
+    def test_timers_compile_only_the_selected_controller_specializations(self):
+        for kind, mode, names, files in (
+                ('advanced_pwm', 'complementary-pwm', ('TIM1', 'TIM8'),
+                 ('advanced_pwm.c', 'advanced_pwm_tim8.c')),
+                ('timer_capture', 'edge-capture', ('TIM3', 'TIM4', 'TIM5'),
+                 ('timer_capture_tim3.c', 'timer_capture.c', 'timer_capture_tim5.c'))):
+            sources = dict(zip(names, files))
+            for controllers in (*((name,) for name in names), names):
+                with self.subTest(kind=kind, controllers=controllers):
+                    provider, sdk = self.configure_sources('stm32f4', [
+                        (kind, mode, name) for name in controllers])
+                    expected = {'gpio.c', 'platform_cold.c'} | {
+                        sources[name] for name in controllers}
+                    self.assertEqual(provider,
+                                     self.private_sources('stm32f4', expected))
+                    self.assertEqual(sdk, set())
 
     def test_multiple_instances_share_one_compilation_unit(self):
         for family in ("stm32f4",):

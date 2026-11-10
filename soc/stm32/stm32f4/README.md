@@ -86,9 +86,9 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | CAN | CAN1/CAN2 Classic CAN IRQ、三邮箱、共享 filter domain；无 CAN FD |
 | USB | OTG FS device PIO endpoint，独立 USB48 owner；无 Host/HS/DMA/class stack |
 | Ethernet | Raw RMII frame/MDIO、调用者 descriptor／RX loan；IP／协议策略外置 |
-| Timer capture | 已审 TIM4 edge-capture 路线和有界事件 |
+| Timer capture | TIM3／4／5 的 CH1–4 共 12 条路线；TIM3／4 为 16-bit，TIM5 为 32-bit；独占所选 controller，调用方提供 ring |
 | Encoder | TIM3／4／5 的独占 TI1／TI2 原始 modulo position，x2／x4、两路 filter 与反相；停止保留位置，不建立累计计数或 IRQ |
-| Advanced PWM | TIM1／TIM8 的 CH1／CH1N、deadtime／break；独立状态与固定路线，功率级电气安全外部验收 |
+| Advanced PWM | TIM1／TIM8 的 CH1–3／CH1N–3N，共六组互补输出、deadtime／break；每 controller 选择一组，功率级电气安全外部验收 |
 
 IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征；当前没有
 声明满足条件的 operating profile，不能直接据此保证时限。名义配置可成功，但启用后
@@ -292,12 +292,13 @@ TIM3 与 PWM 独占冲突。独立 `trigger-dma-continuous` 维护双缓冲和 r
 的单通道实现。精确 pad 与 AF2／3／9 路线见[支持表](../../../../docs/delivery/support.md)。
 TIM9／10／11 使用 APB2 的固定 168 MHz timer clock，其他所列 timer 使用 APB1 的
 84 MHz。C 从 controller 身份派生 APB、AF 与 gate，不新增实例字段；配置生成只连接
-精确静态事实。TIM3 与 ADC trigger、TIM4 与 capture 互斥；TIM1／TIM8 advanced PWM
+精确静态事实。TIM3 与 ADC trigger 互斥；TIM3／4／5 各自的 capture／encoder／PWM
+互斥。TIM1／TIM8 advanced PWM
 分别保留 TIM9／TIM12 共享 vector。TIM2 保留给单调时钟，TIM6／7 为 DAC trigger。
 
 互补输出共用一套 C 算法，以两个编译期 wrapper 直接操作 TIM1／TIM8；CMake 只选中
-所需实现，不增加运行时寄存器派发。TIM1 使用 PA8／PB13／PB12 AF1；TIM8 使用
-PC6／PA7／PA6 AF3，依次为 CH1／CH1N／BKIN，均使用 168 MHz timer clock。
+所需 controller 实现，不增加运行时设备派发。TIM1／TIM8 均可选择 CH1–3 的一组
+互补输出，使用 168 MHz timer clock；通道路线见[定时器合同](../../../../docs/design/timer-advanced.md)。
 break IRQ 分别为 TIM1_BRK_TIM9／TIM8_BRK_TIM12，后者的 TIM12 peer gate 属于
 APB1，TIM8 gate 属于 APB2。资源冲突在配置期拒绝，冷态也检查实际 peer gate。
 
@@ -307,6 +308,14 @@ APB1，TIM8 gate 属于 APB2。资源冲突在配置期拒绝，冷态也检查�
 关闭先观察同组所有输出 inactive，再逆序恢复引脚；拒绝撤源或回读失败保留原责任。
 启停、set、break 故障锁存和显式 rearm 使用原公共接口，不增加 heap、worker 或自动重启。
 `*advanced-pair*.toml` 是两路并存的软件参考，不授权 PCB 接线或功率级安全。
+
+输入捕获以同一 C 引擎接入 TIM3／4／5 的四个通道，TIM5 不截断为 16 位。
+通道来自 Board route：controller 事实维护时钟、IRQ 和共享资源，channel 事实维护
+pad；生成器只写静态配置和连接。`stm32f407_timer_pins.h` 在 C 中统一冷态 pin 设置
+与热态准入，IRQ 不扫描其他通道，只处理所选 CCR、CCIF 和 CCxOF。
+冷配置记录精确 timer 身份，阻止另一 controller 的 wrapper 清理原会话。
+`*timer-channels*.toml` 同时选择三路独立 capture 和两路 advanced PWM；ring 在
+capture start 时由调用方提供，不在 startup 分配。原公共接口与可变实例布局保持不变。
 
 `period_ticks` 表示完整周期，ARR 为 period−1。上限保留了 CCR 表达 100% duty 的
 空间：TIM5 为 UINT32_MAX，其他已审 timer 为 65535。set 只更新 duty 的预装载，不改变周期

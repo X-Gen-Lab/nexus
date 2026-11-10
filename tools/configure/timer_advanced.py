@@ -9,6 +9,14 @@ from tools.configure.providers.common import UINT32_MAX, fail, integer
 
 
 @dataclass(frozen=True)
+class TimerRoute:
+    """One channel's complete physical route, distinct from controller facts."""
+
+    channel: int
+    pins: tuple
+
+
+@dataclass(frozen=True)
 class TimerBinding:
     """One maintained timer personality and its physical ownership facts."""
 
@@ -17,8 +25,11 @@ class TimerBinding:
     vector: str
     irq: int
     clock_hz: int
-    pins: tuple
+    routes: tuple
     resources: tuple
+
+    def route(self, pins):
+        return next((route for route in self.routes if route.pins == pins), None)
 
 
 @dataclass(frozen=True)
@@ -40,23 +51,23 @@ ADVANCED_FIELDS = {"tick_hz", "period_ticks", "deadtime_ticks", "break_active_hi
 
 def validate_soc(soc, provider):
     for name, item in soc["controllers"].items():
-        kind = item["kind"]
-        if kind not in KINDS:
-            continue
-        policy = getattr(provider, "TIMER_ADVANCED", None)
-        facts = policy.binding(kind, name) if policy is not None else None
-        mode = "edge-capture" if kind == "timer_capture" else "complementary-pwm"
-        pins = [pin for pin, _, _ in facts.pins] if facts is not None else []
-        if 'pwm' in getattr(provider, 'CONTROLLER_INTERFACES', {}).get(name, {}):
-            pins = list(dict.fromkeys(pins + [
-                pin for controller, pin in provider.PWM_PIN_CHANNELS
-                if controller == name]))
-        if (facts is None or name != facts.controller or item["modes"] != [mode] or
-                item["irq"] != [facts.vector] or item.get("irq_numbers") != [facts.irq] or
-                type(item.get("clock_hz")) is not int or item["clock_hz"] != facts.clock_hz or
-                item["pins"] != pins or
-                item.get("resources") != list(facts.resources)):
-            fail("Timer controller, shared vector, clock or pin facts differ from the SDK")
+        for kind in sorted(KINDS):
+            modes = (item['modes'] if item['kind'] == kind else
+                     item.get('interfaces', {}).get(kind))
+            if modes is None:
+                continue
+            policy = getattr(provider, "TIMER_ADVANCED", None)
+            facts = policy.binding(kind, name) if policy is not None else None
+            mode = "edge-capture" if kind == "timer_capture" else "complementary-pwm"
+            pins = (list(dict.fromkeys(pin for route in facts.routes
+                                      for pin, _, _ in route.pins))
+                    if facts is not None else [])
+            if (facts is None or name != facts.controller or modes != [mode] or
+                    item["irq"] != [facts.vector] or item.get("irq_numbers") != [facts.irq] or
+                    type(item.get("clock_hz")) is not int or item["clock_hz"] != facts.clock_hz or
+                    item["pins"] != pins or
+                    item.get("resources") != list(facts.resources)):
+                fail("Timer controller, shared vector, clock or pin facts differ from the SDK")
 
 
 def validate_selection(selection, route, provider):
@@ -67,7 +78,7 @@ def validate_selection(selection, route, provider):
     policy = getattr(provider, "TIMER_ADVANCED", None)
     facts = policy.binding(kind, route['controller']) if policy is not None else None
     actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
-    if facts is None or route["controller"] != facts.controller or actual != facts.pins:
+    if facts is None or facts.route(actual) is None:
         fail("Timer selection differs from the reviewed exclusive pad route")
     tick = integer(selection["tick_hz"], 1, context="Timer tick_hz")
     if facts.clock_hz % tick or not 1 <= facts.clock_hz // tick <= 65536:

@@ -15,6 +15,102 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name)
 
+    def channel_case(self, kind, controller, channel):
+        if kind == 'timer_capture':
+            pins = {'TIM3': ('PA6', 'PA7', 'PB0', 'PB1'),
+                    'TIM4': ('PB6', 'PB7', 'PB8', 'PB9'),
+                    'TIM5': ('PA0', 'PA1', 'PA2', 'PA3')}[controller]
+            route = ('capture-pb6' if controller == 'TIM4' and channel == 1
+                     else f'capture-{controller.lower()}-ch{channel}-{pins[channel-1].lower()}')
+            options = 'edge="both"\nfilter=3\n'
+            mode = 'edge-capture'
+        else:
+            pads = {'TIM1': (('PA8', 'PB13', 'PB12'),
+                             ('PA9', 'PB14', 'PB12'),
+                             ('PA10', 'PB15', 'PB12')),
+                    'TIM8': (('PC6', 'PA7', 'PA6'),
+                             ('PC7', 'PB0', 'PA6'),
+                             ('PC8', 'PB1', 'PA6'))}[controller][channel-1]
+            route = ({'TIM1': 'complementary-pa8-pb12-pb13',
+                      'TIM8': 'complementary-pc6-pa7-pa6'}[controller]
+                     if channel == 1 else
+                     f'complementary-{controller.lower()}-ch{channel}-'+
+                     '-'.join(p.lower() for p in pads))
+            options = ('period_ticks=1000\ndeadtime_ticks=128\n'
+                       'break_active_high=true\nidle_high=false\n'
+                       'idle_complement_high=false\n')
+            mode = 'complementary-pwm'
+        base = gate.ROOT/'tests/contracts/multi_controller_assembly'
+        board = json.loads((base/'stm32-ve-board/board.json').read_text())
+        board['bindings'] = [{'id': 'selected', 'controller': controller,
+                              'route': route}]
+        package = self.directory/'channel-board'
+        package.mkdir(exist_ok=True)
+        (package/'board.json').write_text(json.dumps(board))
+        path = self.directory/'channel.toml'
+        path.write_text('schema=2\nboard_package="channel-board"\n'
+                        'backend="baremetal"\nclock="hse8-pll168"\n'
+                        'optimization="Os"\n[factory]\ncapabilities=true\n'
+                        '[memory]\nmain_stack_bytes=2048\nlibc_heap_bytes=0\n'
+                        'static_ram_limit_bytes=16384\nflash_load_limit_bytes=65536\n'
+                        f'[{kind}.signal]\nbinding="selected"\nmode="{mode}"\n'
+                        'tick_hz=1000000\nexclusive=true\n'+options+
+                        f'[{kind}.signal.irq]\npriority=6\ncalls_os=false\n')
+        return path
+
+    def test_capture_routes_derive_twelve_channels_and_exact_static_transports(self):
+        from tools.configure import bindings
+        for controller in ('TIM3', 'TIM4', 'TIM5'):
+            for channel in range(1, 5):
+                with self.subTest(controller=controller, channel=channel):
+                    path = self.channel_case('timer_capture', controller, channel)
+                    try:
+                        result = gate.resolve_ir(path)
+                    except ValueError as error:
+                        self.fail(str(error))
+                    source = bindings.emit(result)[1]
+                    self.assertIn(f'.channel = {channel}u', source)
+                    self.assertIn(f'.registers = {controller}', source)
+                    stem = ('nx_stm32_timer_capture' if controller == 'TIM4'
+                            else f'nx_stm32_{controller.lower()}_timer_capture')
+                    self.assertIn('&'+stem+'_ops', source)
+                    self.assertIn(f'{controller}_IRQHandler', source)
+                    self.assertFalse(result.physical_qualified)
+                    self.assertEqual(len(result.controllers), 1)
+
+    def test_advanced_routes_derive_all_six_pairs_and_preserve_break_peer(self):
+        from tools.configure import bindings
+        for controller, peer in (('TIM1', 'TIM9'), ('TIM8', 'TIM12')):
+            for channel in range(1, 4):
+                with self.subTest(controller=controller, channel=channel):
+                    path = self.channel_case('advanced_pwm', controller, channel)
+                    try:
+                        result = gate.resolve_ir(path)
+                    except ValueError as error:
+                        self.fail(str(error))
+                    source = bindings.emit(result)[1]
+                    self.assertIn(f'.channel = {channel}u', source)
+                    self.assertIn('controller:'+peer,
+                                  {item.key for item in result.claims})
+                    self.assertFalse(result.physical_qualified)
+
+    def test_new_capture_personalities_exclude_their_own_pwm_controller(self):
+        for controller, pin in (('TIM3', 'pa7'), ('TIM5', 'pa1')):
+            with self.subTest(controller=controller):
+                path = self.channel_case('timer_capture', controller, 1)
+                gate.resolve_ir(path)
+                board_path = self.directory/'channel-board/board.json'
+                board = json.loads(board_path.read_text())
+                board['bindings'].append({'id': 'alias', 'controller': controller,
+                                          'route': controller.lower()+'-ch2-'+pin,
+                                          'initial': 0})
+                board_path.write_text(json.dumps(board))
+                path.write_text(path.read_text()+'\n[pwm.alias]\nbinding="alias"\n'
+                                'mode="fixed-pwm"\ntick_hz=1000000\n'
+                                'period_ticks=1000\nduty_ticks=0\n')
+                with self.assertRaisesRegex(ValueError, 'controller:'+controller):
+                    gate.resolve_ir(path)
+
     def dual_advanced(self):
         base = gate.ROOT / 'tests/contracts/timer_assembly'
         board = json.loads((base / 'stm32-zg-board/board.json').read_text())

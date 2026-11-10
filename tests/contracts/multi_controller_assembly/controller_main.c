@@ -55,6 +55,12 @@ int main(void) {
             s_observed_identity = nx_factory_advanced_pwm(id);
         }
     }
+    if (NX_TIMER_CAPTURE_ID_COUNT != 0U) {
+        s_identity_count = NX_TIMER_CAPTURE_ID_COUNT;
+        for (uint16_t id = 0U; id < s_identity_count; ++id) {
+            s_observed_identity = nx_factory_timer_capture(id);
+        }
+    }
 #ifdef NX_FIXTURE_ENCODER
     s_identity_count = NX_ENCODER_ID_COUNT;
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
