@@ -36,6 +36,16 @@ void nx_stm32_advanced_pwm_irq(nx_advanced_pwm_controller_t* port);
 extern const nx_timer_capture_ops_t nx_stm32_timer_capture_ops;
 /** \brief Static five-control table; independent of the default PWM mode. */
 extern const nx_advanced_pwm_ops_t nx_stm32_advanced_pwm_ops;
+/** \brief The second advanced controller keeps the same state/config ABI. */
+nx_result_t
+nx_stm32_tim8_advanced_pwm_initialize(nx_advanced_pwm_controller_t* port,
+                                      const nx_advanced_pwm_config_t* config);
+/** \brief Release only the drained TIM8 session. */
+nx_result_t
+nx_stm32_tim8_advanced_pwm_release(nx_advanced_pwm_controller_t* port);
+/** \brief Dispatch only TIM8's observed break from its static vector. */
+void nx_stm32_tim8_advanced_pwm_irq(nx_advanced_pwm_controller_t* port);
+extern const nx_advanced_pwm_ops_t nx_stm32_tim8_advanced_pwm_ops;
 #ifdef __cplusplus
 }
 #endif

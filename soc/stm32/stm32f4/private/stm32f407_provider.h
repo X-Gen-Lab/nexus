@@ -383,6 +383,8 @@ extern const nx_exti_ops_t nx_stm32_exti_ops;
 nx_result_t nx_stm32_exti_read(void* context, nx_exti_event_t* events,
                                size_t capacity, size_t* count);
 nx_result_t nx_stm32_exti_stop(void* context);
+nx_result_t nx_stm32_exti_attach_wake(void* context, const nx_irq_wake_t* wake,
+                                      uint8_t syscall_ceiling);
 extern const nx_pwm_ops_t nx_stm32_pwm_ops;
 nx_result_t nx_stm32_pwm_set(void* context, uint32_t period_ticks,
                              uint32_t duty_ticks);

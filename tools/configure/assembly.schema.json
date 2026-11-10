@@ -1017,6 +1017,12 @@
               "up",
               "down"
             ]
+          },
+          "threshold_code": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 7,
+            "description": "PVD PLS encoding; consult the exact datasheet threshold bounds and hysteresis. No voltage policy is selected by default."
           }
         },
         "required": [

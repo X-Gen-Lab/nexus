@@ -99,7 +99,7 @@ extern "C" void nx_timer_model_write(volatile uint32_t* address,
     if (address == s_refused) {
         value = (value & ~s_hold) | (*address & s_hold);
     }
-    if (address == &CAP_SR || address == &ADV_SR) {
+    if (address == &CAP_SR || address == &ADV_SR || address == &TIM8->SR) {
         *address &= value;
     } else {
         *address = value;
@@ -115,6 +115,11 @@ extern "C" void nx_timer_model_write(volatile uint32_t* address,
     if (address == &ADV_CR1 && (value & 1U) != 0U && s_break_before_enable) {
         ADV_SR |= 128U;
         ADV_BDTR &= ~32768U;
+    }
+    if (address == &TIM8->BDTR && (value & 32768U) != 0U && s_break_on_enable) {
+        GPIOA->IDR |= 64U;
+        TIM8->SR |= 128U;
+        TIM8->BDTR &= ~32768U;
     }
 }
 
@@ -185,7 +190,95 @@ class TimerHardware : public ::testing::Test {
         CAP_IRQ(&capture);
         s_isr = false;
     }
+    void Tim8Pads(void) {
+        RCC->APB2ENR |= RCC_APB2ENR_TIM8EN;
+        RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+        GPIOC->MODER |= 2U << 12U;
+        GPIOC->AFR[0] |= 3U << 24U;
+        GPIOA->MODER |= 10U << 12U;
+        GPIOA->AFR[0] |= 51U << 24U;
+    }
 };
+
+TEST_F(TimerHardware, Tim8UsesItsOwnPadsClockAndBreakEncoding) {
+    Tim8Pads();
+    nx_advanced_pwm_controller_t second{};
+    auto config = adv_config;
+    config.break_input = &GPIOA->IDR;
+    config.break_mask = 64U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_pwm_initialize(&second, &config));
+    EXPECT_EQ(999U, TIM8->ARR);
+    EXPECT_EQ(167U, TIM8->PSC);
+    EXPECT_EQ(128U | 1024U | 2048U | 4096U | 8192U, TIM8->BDTR);
+    EXPECT_EQ(0U, TIM1->CR1);
+    const nx_advanced_pwm_t face{&nx_stm32_tim8_advanced_pwm_ops, &second};
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_set_duty(&face, 300U));
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_start(&face));
+    EXPECT_NE(0U, TIM8->BDTR & 32768U);
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_stop(&face));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_tim8_advanced_pwm_release(&second));
+    EXPECT_EQ(nullptr, second.config);
+}
+
+TEST_F(TimerHardware, TwoAdvancedControllersKeepDutyAndBreakIndependent) {
+    Tim8Pads();
+    ASSERT_EQ(NX_SUCCESS, ADV_INIT(&advanced, &adv_config));
+    nx_advanced_pwm_controller_t second{};
+    auto config = adv_config;
+    config.break_input = &GPIOA->IDR;
+    config.break_mask = 64U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_pwm_initialize(&second, &config));
+    const nx_advanced_pwm_t face{&nx_stm32_tim8_advanced_pwm_ops, &second};
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_set_duty(&pwm, 100U));
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_set_duty(&face, 200U));
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_start(&pwm));
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_start(&face));
+    GPIOA->IDR |= 64U;
+    TIM8->SR |= 128U;
+    nx_stm32_tim8_advanced_pwm_irq(&second);
+    EXPECT_TRUE(second.fault);
+    EXPECT_FALSE(advanced.fault);
+    EXPECT_EQ(0U, TIM8->BDTR & 32768U);
+    EXPECT_NE(0U, TIM1->BDTR & 32768U);
+    EXPECT_EQ(100U, TIM1->CCR1);
+    EXPECT_EQ(200U, TIM8->CCR1);
+}
+
+TEST_F(TimerHardware, Tim8RejectsTim1BreakAndMissingTim8GateBeforeWrites) {
+    Tim8Pads();
+    nx_advanced_pwm_controller_t second{};
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_tim8_advanced_pwm_initialize(&second, &adv_config));
+    auto config = adv_config;
+    config.break_input = &GPIOA->IDR;
+    config.break_mask = 64U;
+    RCC->APB2ENR &= ~(uint32_t)RCC_APB2ENR_TIM8EN;
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_stm32_tim8_advanced_pwm_initialize(&second, &config));
+    EXPECT_EQ(0U, s_writes);
+    EXPECT_EQ(nullptr, second.config);
+}
+
+TEST_F(TimerHardware, Tim8BreakDuringMoeAdmissionNeverAutomaticallyRestarts) {
+    Tim8Pads();
+    nx_advanced_pwm_controller_t second{};
+    auto config = adv_config;
+    config.break_input = &GPIOA->IDR;
+    config.break_mask = 64U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_pwm_initialize(&second, &config));
+    const nx_advanced_pwm_t face{&nx_stm32_tim8_advanced_pwm_ops, &second};
+    s_break_on_enable = true;
+    ASSERT_EQ(NX_ERROR_IO, nx_advanced_pwm_start(&face));
+    EXPECT_TRUE(second.fault);
+    EXPECT_EQ(0U, TIM8->BDTR & 32768U);
+    s_break_on_enable = false;
+    GPIOA->IDR = 0U;
+    EXPECT_EQ(NX_ERROR_STATE, nx_advanced_pwm_start(&face));
+    EXPECT_EQ(0U, TIM8->BDTR & 32768U);
+}
 
 TEST(TimerContracts, InterfacesKeepOptionalModesSeparate) {
     EXPECT_EQ(nx_timer_capture_start(nullptr, nullptr, 0U), NX_ERROR_INVALID);

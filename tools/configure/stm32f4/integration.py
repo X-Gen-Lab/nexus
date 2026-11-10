@@ -30,4 +30,9 @@ TIMER_ADVANCED = TimerPolicy(bindings=(
         (("PA8", "output", 1), ("PB13", "complement", 1),
          ("PB12", "break", 1)),
         ("clock:TIM1", "controller:TIM9")),
+    TimerBinding(
+        "advanced_pwm", 'TIM8', 'TIM8_BRK_TIM12', 43, 168000000,
+        (("PC6", "output", 3), ("PA7", "complement", 3),
+         ("PA6", "break", 3)),
+        ("clock:TIM8", "controller:TIM12")),
 ))

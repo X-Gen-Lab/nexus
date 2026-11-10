@@ -288,6 +288,19 @@ class ExtiOptions:
 
 
 @dataclass(frozen=True)
+class PvdOptions:
+    threshold_code: int
+
+
+@dataclass(frozen=True)
+class PvdEventsOptions:
+    threshold_code: int
+    edge: str
+    event_capacity: int
+    irq: IrqOptions
+
+
+@dataclass(frozen=True)
 class EncoderOptions:
     counting: str
     filter_a: int
@@ -590,7 +603,7 @@ class WindowWatchdogOptions:
 
 
 ControllerOptions = (GpioOptions | BlockOptions | PinStateOptions | UartOptions | SpiOptions | I2cOptions |
-                     ExtiOptions | PwmOptions | PwmGroupOptions | EncoderOptions | AdcOptions | DacOptions | CanOptions |
+                     ExtiOptions | PvdOptions | PvdEventsOptions | PwmOptions | PwmGroupOptions | EncoderOptions | AdcOptions | DacOptions | CanOptions |
                      UsbDeviceOptions | EthernetOptions | EthernetFramesOptions |
                      TimerCaptureOptions |
                      AdvancedPwmOptions | PwmAdcOptions | CanFdOptions |
@@ -689,6 +702,11 @@ def mode_options(values):
         return I2cOptions(values.get("max_hz", 100000), irq,
                          values.get("timing_resolution"))
     if kind == "exti":
+        if values['mode'] == 'pvd-level':
+            return PvdOptions(values['threshold_code'])
+        if values['mode'] == 'pvd-events':
+            return PvdEventsOptions(values['threshold_code'], values['edge'],
+                                    values['event_capacity'], irq)
         return ExtiOptions(values["edge"], values["event_capacity"], irq,
                            values.get("pull", "none"))
     if kind == "pwm":

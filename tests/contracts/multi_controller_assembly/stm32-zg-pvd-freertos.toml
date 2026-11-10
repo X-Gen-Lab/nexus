@@ -1,0 +1,23 @@
+# Software reference only: PLS code is explicit, not a precise voltage promise.
+schema = 2
+board_package = "stm32-zg-board"
+backend = "freertos"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[exti.supply]
+binding = "pvd"
+mode = "pvd-events"
+threshold_code = 5
+edge = "both"
+event_capacity = 4
+irq.priority = 6

@@ -10,6 +10,7 @@ is a separate whole-ELF assembly gate, not a conclusion from an object size.
 |---|---|
 | Input capture | TIM4 CH1, PB6 AF2 |
 | Complementary PWM | TIM1 CH1 PA8, CH1N PB13, BKIN PB12, AF1 |
+| Complementary PWM | TIM8 CH1 PC6, CH1N PA7, BKIN PA6, AF3 |
 
 The reviewed STM32F407 datasheet establishes these alternate
 functions. They do not establish a connector, external load, safe electrical
@@ -23,8 +24,9 @@ them until stop and publisher quiescence. Its sole immutable configuration
 defines exact timer clock, integer prescaler, channel, filter or complementary
 output policy. `exclusive` is explicit authority over the whole timer, including
 clock-gated peer writers; a disabled register is not proof of absent ownership.
-The TIM1 break vector is shared with TIM9. Assembly must reserve
-that shared resource or supply reviewed static dispatch; a provider never changes
+The TIM1/TIM8 break vectors are shared with TIM9/TIM12 respectively. Both advanced
+timers use APB2; the TIM12 peer gate is on APB1. Assembly must reserve
+the shared resource or supply reviewed static dispatch; a provider never changes
 the NVIC vector on behalf of a peer. A cold configuration failure must be cleaned
 up by its acquisition owner before releasing leases or publishing a factory face.
 
@@ -84,6 +86,15 @@ the ended static session under a saved mask. Pins, clocks and vector leases
 remain with assembly until it explicitly drives and reads back the Board's
 declared inactive levels, then releases resources. Public stop makes a timer
 source-withdrawal promise; it does not certify an electrical safety state.
+
+Cold cleanup retains the exact full configuration identity through the last
+pin, IRQ and clock receipt, including a failed pad restore after hot release.
+Retry cannot substitute another configuration, snapshot storage or timer wrapper.
+Controller, cold owner, immutable configuration and snapshot ranges must be
+disjoint before any hardware write. All group outputs must be observed inactive
+before restoring any pad. TIM1/TIM8 share this C cleanup algorithm through static
+hardware facts; hot register paths remain compile-time specializations and CMake
+compiles only the selected wrappers. No per-instance dispatch table is added.
 
 The maintained GoogleTest/GoogleMock targets compile real production C against
 locked vendor register layouts. Models provide only MMIO/CPU/clock boundaries,

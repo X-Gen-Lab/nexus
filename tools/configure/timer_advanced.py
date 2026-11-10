@@ -27,8 +27,9 @@ class TimerPolicy:
 
     bindings: tuple
 
-    def binding(self, kind):
-        return next((item for item in self.bindings if item.kind == kind), None)
+    def binding(self, kind, controller):
+        return next((item for item in self.bindings
+                     if item.kind == kind and item.controller == controller), None)
 
 
 KINDS = {"timer_capture", "advanced_pwm"}
@@ -43,7 +44,7 @@ def validate_soc(soc, provider):
         if kind not in KINDS:
             continue
         policy = getattr(provider, "TIMER_ADVANCED", None)
-        facts = policy.binding(kind) if policy is not None else None
+        facts = policy.binding(kind, name) if policy is not None else None
         mode = "edge-capture" if kind == "timer_capture" else "complementary-pwm"
         pins = [pin for pin, _, _ in facts.pins] if facts is not None else []
         if 'pwm' in getattr(provider, 'CONTROLLER_INTERFACES', {}).get(name, {}):
@@ -64,7 +65,7 @@ def validate_selection(selection, route, provider):
     if not (fields - {"calls_os"}).issubset(selection):
         fail("Timer requires explicit clock, mode, safe policy, exclusive owner and IRQ")
     policy = getattr(provider, "TIMER_ADVANCED", None)
-    facts = policy.binding(kind) if policy is not None else None
+    facts = policy.binding(kind, route['controller']) if policy is not None else None
     actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
     if facts is None or route["controller"] != facts.controller or actual != facts.pins:
         fail("Timer selection differs from the reviewed exclusive pad route")

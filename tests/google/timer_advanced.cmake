@@ -5,6 +5,7 @@ foreach(timer_family stm32f4)
     nexus_google_test(${timer_target} SOURCES timer_advanced_test.cpp
         "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/timer_capture.c"
         "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/advanced_pwm.c"
+        "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/advanced_pwm_tim8.c"
         "${NEXUS_SOURCE_DIR}/io/src/api/timer_capture.c"
         "${NEXUS_SOURCE_DIR}/io/src/api/advanced_pwm.c"
         LIBRARIES Nexus::Core

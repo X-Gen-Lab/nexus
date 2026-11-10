@@ -31,8 +31,9 @@ class ProviderSourceSelectionTests(unittest.TestCase):
             generated = source / "generated"
             generated.mkdir()
             (generated / "resolved.json").write_text(json.dumps({
-                "controllers": [{"kind": kind, "mode": mode}
-                                for kind, mode in controllers],
+                "controllers": [{"kind": item[0], "mode": item[1],
+                                 **({'controller': item[2]} if len(item) == 3 else {})}
+                                for item in controllers],
             }))
             # Every family consumes its actual locked SDK and real CMake
             # integration. Configuration inspects selection, not ARM behavior.
@@ -164,6 +165,28 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 if "independent" in modes:
                     expected.add("watchdog.c")
                 self.assertEqual(provider, self.private_sources("stm32f4", expected))
+                self.assertEqual(sdk, set())
+
+    def test_pvd_selects_no_gpio_and_only_event_mode_retains_exti(self):
+        for mode in ('pvd-level', 'pvd-events'):
+            with self.subTest(mode=mode):
+                provider, sdk = self.configure_sources('stm32f4', [('exti', mode)])
+                expected = {'pvd.c', 'platform_cold.c'}
+                if mode == 'pvd-events':
+                    expected.add('exti.c')
+                self.assertEqual(provider, self.private_sources('stm32f4', expected))
+                self.assertEqual(sdk, set())
+
+    def test_advanced_timers_compile_only_the_selected_specializations(self):
+        for controllers in (('TIM1',), ('TIM8',), ('TIM1', 'TIM8')):
+            with self.subTest(controllers=controllers):
+                provider, sdk = self.configure_sources('stm32f4', [
+                    ('advanced_pwm', 'complementary-pwm', name)
+                    for name in controllers])
+                expected = {'gpio.c', 'platform_cold.c'}
+                expected.update('advanced_pwm.c' if name == 'TIM1' else
+                                'advanced_pwm_tim8.c' for name in controllers)
+                self.assertEqual(provider, self.private_sources('stm32f4', expected))
                 self.assertEqual(sdk, set())
 
     def test_multiple_instances_share_one_compilation_unit(self):

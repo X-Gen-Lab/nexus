@@ -3569,24 +3569,6 @@ msgid "Success, EMPTY or INVALID. No debounce policy or callbacks."
 msgstr "成功、EMPTY 或 INVALID。不提供消抖策略或回调。"
 
 #: docs/reference/api/io.md:219
-msgid "Observe this line's raw electrical level without events."
-msgstr "不消费事件，观察此线路的原始电气电平。"
-
-#: docs/reference/api/io.md:219
-msgid ""
-"Bounded task/IRQ observation, no waiting or callback. High is the physical "
-"input value, independent of edge or active polarity. No event is consumed and"
-" no pending bit cleared. Output must be disjoint from faces, operations, "
-"provider storage and MMIO. Direct hardware providers may require privilege. "
-"Failed stop retains the pad until proven cleanup; successful stop ends level "
-"access. A missing optional method does not synthesize a level from the event "
-"queue."
-msgstr ""
-"有界任务/IRQ 观察，不等待或回调。High 表示物理输入值，与边沿或有效极性无关。不消费事件或清除 pending "
-"位。输出必须与接口、方法表、provider 存储和 MMIO 分离。直接硬件 provider "
-"可能要求特权。停机失败时保留引脚，直至确认清理完成；停机成功后结束电平访问。缺少可选方法时，不从事件队列合成电平。"
-
-#: docs/reference/api/io.md:219
 msgid "[in] Initialized exact line; serialized against stop/rebind."
 msgstr "[in] 已初始化的精确线路；与 stop/rebind 串行执行。"
 
@@ -3642,16 +3624,6 @@ msgstr "[in] 不可变且存活的目标；NULL 表示分离。"
 #: docs/reference/api/io.md:219
 msgid "Edge facts; timestamp precision and coalescing are provider-specific."
 msgstr "边沿事实；时间戳精度与合并行为由提供者决定。"
-
-#: docs/reference/api/io.md:219
-msgid ""
-"LOSS is an independent boundary after older buffered facts and before later "
-"facts. Its edge is invalid; its timestamp is detection/report time, never a "
-"reconstructed missing edge. For COALESCED facts, edge may derive from sampled"
-" pin level after an IRQ and does not represent complete edge history."
-msgstr ""
-"LOSS 是独立边界，排在较旧缓冲事实之后、后续事实之前。其 edge 无效；时间戳为检测或报告时间，绝不重建丢失边沿。对于 COALESCED "
-"事实，edge 可能由 IRQ 后采样的引脚电平推导，不代表完整边沿历史。"
 
 #: docs/reference/api/io.md:225
 msgid "flash.h"
@@ -8857,3 +8829,30 @@ msgid ""
 msgstr ""
 "成功；INVALID/CONTEXT，或未准入喂狗时的 STATE。窗口 provider 对过早喂狗返回 BUSY，对受保护的迟喂边界返回 "
 "STATE；两者都不会 reload 或等待。任务／IRQ 执行有界且不分配内存。"
+
+msgid ""
+"Bounded task/IRQ observation, no waiting or callback. GPIO sources report "
+"the physical pad; internal sources report their documented raw output, "
+"independent of edge or active polarity. No event is consumed and no pending "
+"bit cleared. Output must be disjoint from faces, operations, provider "
+"storage and MMIO. Direct hardware providers may require privilege. Failed "
+"stop retains the source until proven cleanup; successful stop ends level "
+"access. A missing optional method does not synthesize a level from the event"
+" queue."
+msgstr ""
+"在任务或 IRQ 中执行有界观察，不等待或回调。GPIO 源报告物理引脚，内部源报告其文档规定的原始输出，不受边沿或有效极性影响。不消耗事件或清除 "
+"pending。输出必须与接口、操作表、provider 存储和 MMIO 分离。直接硬件 provider "
+"可要求特权。停止失败保留信号源直至证明清理完成；停止成功后不能再查询电平。缺少可选方法时不从事件队列合成电平。"
+
+msgid ""
+"LOSS is an independent boundary after older buffered facts and before later "
+"facts. Its edge is invalid; its timestamp is detection/report time, never a "
+"reconstructed missing edge. For COALESCED facts, edge may derive from the "
+"sampled raw source after an IRQ and does not represent complete edge "
+"history."
+msgstr ""
+"LOSS 是较早缓存事实与后续事实之间的独立边界。其 edge 无效，timestamp 是检测或报告时刻，不能重建丢失的边沿。COALESCED "
+"事实的 edge 可以来自 IRQ 后采样的原始信号，不代表完整边沿历史。"
+
+msgid "Observe this line's raw logical signal without events."
+msgstr "观察此线路的原始逻辑信号，不消耗事件。"

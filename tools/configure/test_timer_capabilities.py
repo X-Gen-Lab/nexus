@@ -16,13 +16,16 @@ class TimerCapabilityObserverTests(unittest.TestCase):
         (self.root / "io/private").mkdir(parents=True)
         self.source = self.root / "wrapper.c"
 
-    def test_real_four_timer_tables_are_derived_from_the_selected_source(self):
+    def test_real_timer_tables_are_derived_from_the_selected_source(self):
         for family, prefix in (('stm32f4', 'stm32'),):
             for kind in ("timer_capture", "advanced_pwm"):
                 with self.subTest(family=family, kind=kind):
                     source = configure.ROOT / f"{source_directory(family)}/drivers/{kind}.c"
                     self.assertEqual(capabilities.source_ops(source, configure.ROOT),
                                      {f"nx_{prefix}_{kind}_ops"})
+        source = configure.ROOT / 'soc/stm32/stm32f4/drivers/advanced_pwm_tim8.c'
+        self.assertEqual(capabilities.source_ops(source, configure.ROOT),
+                         {'nx_stm32_tim8_advanced_pwm_ops'})
 
     def test_macro_mentions_without_actual_table_definition_are_rejected(self):
         self.source.write_text('#define NX_TABLE_OPS nx_unused_ops\n#include "template.h"\n')
@@ -73,12 +76,16 @@ class TimerCapabilityObserverTests(unittest.TestCase):
         expected = {
             ('stm32f4', "TIM4", "timer_capture", "edge-capture"),
             ('stm32f4', "TIM1", "advanced_pwm", "complementary-pwm"),
+            ('stm32f4', "TIM8", "advanced_pwm", "complementary-pwm"),
         }
         self.assertEqual({(row["family"], row["controller"], row["kind"],
                            row["mode"]) for row in selected}, expected)
         for row in selected:
             self.assertTrue(row["fixtures"])
-            self.assertEqual(row["exports"], [f"{source_directory(row['family'])}/drivers/{row['kind']}.c"])
+            name = ('advanced_pwm_tim8' if row['controller'] == 'TIM8'
+                    else row['kind'])
+            self.assertEqual(row["exports"],
+                             [f"{source_directory(row['family'])}/drivers/{name}.c"])
             self.assertFalse(row["boards"])
 
 

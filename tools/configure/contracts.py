@@ -45,9 +45,11 @@ CONTROLLER_CONTRACTS = MappingProxyType({
         frozenset(('binding', 'mode', 'window_ticks')),
         frozenset(('window_ticks',)), 'watchdog'),
     'exti': ControllerContract(
-        frozenset(('binding', 'edge', 'event_capacity', 'irq', 'mode', 'pull')),
+        frozenset(('binding', 'edge', 'event_capacity', 'irq', 'mode', 'pull',
+                   'threshold_code')),
         frozenset((
             'calls_os', 'edge', 'event_capacity', 'irq_priority', 'pull',
+            'threshold_code',
         )), 'exti'),
     'pwm': ControllerContract(
         frozenset((

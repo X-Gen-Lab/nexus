@@ -215,6 +215,9 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     """Select immutable resources; concrete C owns every cold transition."""
     del board_bindings, routes, devices
     item = controller_ir(item, "stm32f4")
+    if item.kind == 'exti' and item.mode in {'pvd-level', 'pvd-events'}:
+        from .pvd import constructor as pvd_constructor
+        return pvd_constructor(item)
     if item.kind == "external_bus":
         from .fsmc import constructor as fsmc_constructor
         return fsmc_constructor(item, result)
@@ -341,7 +344,7 @@ def shared_irq_definitions(selections):
     selections = [controller_ir(item, "stm32f4") for item in selections]
     groups = {}
     for item in selections:
-        if item.kind != "exti":
+        if item.kind != "exti" or item.mode != 'edge-event':
             continue
         line = int(item.controller[4:])
         vector = (f"EXTI{line}" if line < 5 else

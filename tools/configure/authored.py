@@ -217,6 +217,12 @@ def editor_schema():
         if "window_ticks" in fields:
             properties["window_ticks"] = {
                 "type": "integer", "minimum": 1, "maximum": 62, "default": 1}
+        if "threshold_code" in fields:
+            properties["threshold_code"] = {
+                "type": "integer", "minimum": 0, "maximum": 7,
+                "description": "PVD PLS encoding; consult the exact datasheet "
+                               "threshold bounds and hysteresis. No voltage "
+                               "policy is selected by default."}
         for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing",
                              "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b", "lsb_first"}:
             properties[name] = {"type": "boolean"}

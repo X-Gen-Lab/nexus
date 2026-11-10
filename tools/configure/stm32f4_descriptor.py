@@ -15,6 +15,9 @@ DESCRIPTOR = FamilyDescriptor(
     ),
     references="references.json",
     owned_payload=(
+        "soc/stm32/stm32f4/drivers/advanced_pwm_tim8.c",
+        "soc/stm32/stm32f4/drivers/pvd.c",
+        "soc/stm32/stm32f4/private/stm32f407_pvd.h",
         "soc/stm32/stm32f4/drivers/window_watchdog.c",
         "soc/stm32/stm32f4/private/stm32f407_window_watchdog.h",
         "soc/stm32/stm32f4/reset.c",
@@ -74,6 +77,7 @@ DESCRIPTOR = FamilyDescriptor(
         "soc/stm32/stm32f4/private/stm32f407_eth_frames.h",
     ),
     configuration_helpers=(
+        "tools/configure/stm32f4/pvd.py",
         "tools/configure/stm32f4/encoder.py",
         "tools/configure/stm32f4/dac.py",
         "tools/configure/stm32f4/sram.py",

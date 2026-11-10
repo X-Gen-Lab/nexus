@@ -26,6 +26,10 @@
 #define NX_ADV_DEFAULT_TIMER_WRITE 1
 #define NX_TIMER_WRITE(reg, value) ((reg) = (uint32_t)(value))
 #endif
+#ifndef NX_ADV_BREAK_MASK
+#define NX_ADV_DEFAULT_BREAK_MASK 1
+#define NX_ADV_BREAK_MASK         4096U
+#endif
 /** \brief Task controls never borrow CPU privilege from an interface lookup. */
 static bool advanced_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr();
@@ -82,7 +86,8 @@ nx_result_t NX_ADV_INITIALIZE(nx_advanced_pwm_controller_t* port,
     uint32_t code = 0U;
     if (port == NULL || config == NULL ||
         advanced_overlap(port, sizeof(*port), config, sizeof(*config)) ||
-        config->break_input == NULL || config->break_mask != 4096U ||
+        config->break_input == NULL ||
+        config->break_mask != NX_ADV_BREAK_MASK ||
         !NX_ADV_INPUT_VALID(config->break_input) ||
         config->timer_hz != NX_ADV_HZ || config->tick_hz == 0U ||
         config->timer_hz % config->tick_hz != 0U ||
@@ -347,4 +352,8 @@ const nx_advanced_pwm_ops_t NX_ADV_OPS = {.set_duty = advanced_duty,
 #ifdef NX_ADV_DEFAULT_TIMER_WRITE
 #undef NX_TIMER_WRITE
 #undef NX_ADV_DEFAULT_TIMER_WRITE
+#endif
+#ifdef NX_ADV_DEFAULT_BREAK_MASK
+#undef NX_ADV_BREAK_MASK
+#undef NX_ADV_DEFAULT_BREAK_MASK
 #endif

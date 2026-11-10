@@ -1388,6 +1388,43 @@
       "resources": [
         "timer:TIM14"
       ]
+    },
+    "EXTI16": {
+      "kind": "exti",
+      "modes": [
+        "pvd-level",
+        "pvd-events"
+      ],
+      "irq": [
+        "PVD_IRQn"
+      ],
+      "pins": [],
+      "resources": [
+        "exti:line:16",
+        "pwr:pvd"
+      ]
+    },
+    "TIM8": {
+      "kind": "advanced_pwm",
+      "modes": [
+        "complementary-pwm"
+      ],
+      "irq": [
+        "TIM8_BRK_TIM12"
+      ],
+      "irq_numbers": [
+        43
+      ],
+      "clock_hz": 168000000,
+      "pins": [
+        "PC6",
+        "PA7",
+        "PA6"
+      ],
+      "resources": [
+        "clock:TIM8",
+        "controller:TIM12"
+      ]
     }
   },
   "reserved_resources": [

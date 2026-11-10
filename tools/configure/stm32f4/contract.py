@@ -114,6 +114,8 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('watchdog', 'independent'): 'watchdog',
     ('watchdog', 'window'): 'window_watchdog',
     ('exti', 'edge-event'): 'exti',
+    ('exti', 'pvd-level'): 'pvd',
+    ('exti', 'pvd-events'): 'pvd_events',
     ('pwm', 'fixed-pwm'): 'pwm',
     ('adc', 'low-rate-scan'): 'adc',
     ('uart', 'dma-tx'): 'uart_hal',
@@ -134,6 +136,9 @@ def validate_selection(selection, route):
     """Validate limits of the implemented provider, not theoretical silicon."""
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
+    if kind == 'exti' and selection['mode'] in {'pvd-level', 'pvd-events'}:
+        if route['controller'] != 'EXTI16' or route['pins']:
+            common.fail('PVD requires its pinless EXTI16 controller')
     if kind == "watchdog" and selection["mode"] == "window":
         if route["controller"] != "WWDG":
             common.fail("Window watchdog requires its exact WWDG controller")

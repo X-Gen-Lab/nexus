@@ -97,3 +97,15 @@ Standard 10-bit profile 限制在名义 88 kHz 以内；Fast profile 显式选�
 调用 enable。`window_ticks` 为必须经过的 WWDG decrement 数，不是微秒；62 的极限
 只适用于仍保留合法喂狗计数的 timeout。两种看门狗使用同一公共接口与独立静态身份，
 不自动喂狗、启动任务或授予物理复位／时间窗资格。
+
+`stm32-ve-pvd-baremetal.toml` 选择无事件队列的 PVD level，
+`stm32-zg-pvd-freertos.toml` 选择显式四项存储、双边沿与 priority6 的 PVD events。
+两者均选择 PLS code5，仅作为软件参考；PVDO high 表示低电压，不能解释为 power-good。
+不取得 GPIO／SYSCFG，不选择产品阈值政策、不证明实际电压、BOR 或低功耗唤醒。
+
+`stm32-ve-advanced-pair-baremetal.toml` 和
+`stm32-zg-advanced-pair-freertos.toml` 同时选择 TIM1／TIM8 的 CH1／CH1N／BKIN。
+TIM1 使用 PA8／PB13／PB12 AF1，TIM8 使用 PC6／PA7／PA6 AF3；168 MHz timer clock
+下显式选择 1 MHz tick、1000-tick period 与 128 个 timer-clock deadtime ticks。
+两路分别占用 TIM9／TIM12 共享 break vector，不能同时选择其 peer。main 保留两个
+真实 factory face，但不 start 输出；软件 Board 不授权具体 PCB 或功率级接线。

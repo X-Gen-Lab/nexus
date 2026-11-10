@@ -180,6 +180,21 @@
       "id": "iwdg",
       "controller": "IWDG",
       "route": "iwdg"
+    },
+    {
+      "id": "pvd",
+      "controller": "EXTI16",
+      "route": "pvd-exti16"
+    },
+    {
+      "id": "advanced1",
+      "controller": "TIM1",
+      "route": "complementary-pa8-pb12-pb13"
+    },
+    {
+      "id": "advanced8",
+      "controller": "TIM8",
+      "route": "complementary-pc6-pa7-pa6"
     }
   ],
   "reserved_resources": [],

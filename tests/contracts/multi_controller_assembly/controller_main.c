@@ -43,6 +43,18 @@ int main(void) {
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_watchdog(id);
     }
+    if (NX_EXTI_ID_COUNT != 0U) {
+        s_identity_count = NX_EXTI_ID_COUNT;
+        for (uint16_t id = 0U; id < s_identity_count; ++id) {
+            s_observed_identity = nx_factory_exti(id);
+        }
+    }
+    if (NX_ADVANCED_PWM_ID_COUNT != 0U) {
+        s_identity_count = NX_ADVANCED_PWM_ID_COUNT;
+        for (uint16_t id = 0U; id < s_identity_count; ++id) {
+            s_observed_identity = nx_factory_advanced_pwm(id);
+        }
+    }
 #ifdef NX_FIXTURE_ENCODER
     s_identity_count = NX_ENCODER_ID_COUNT;
     for (uint16_t id = 0U; id < s_identity_count; ++id) {

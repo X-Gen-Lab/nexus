@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 24c4293c9a633e11433ad239ae50b24052ace3bc3809b9a02f943c7eefaca686\n"
+"X-Nexus-Source-SHA256: 3b1343e5f47264b17aa978586b0305fd15b13f4ff8f8105d557ad5eb45d25fdf\n"
 
 #: docs/delivery/capabilities.md:8
 msgid "当前派生能力矩阵"
@@ -1778,3 +1778,60 @@ msgstr "`wwdg`"
 
 msgid "window"
 msgstr "window"
+
+msgid "EXTI16"
+msgstr "EXTI16"
+
+msgid "`pvd-exti16`"
+msgstr "`pvd-exti16`"
+
+msgid "`soc/stm32/stm32f4/drivers/pvd.c`"
+msgstr "`soc/stm32/stm32f4/drivers/pvd.c`"
+
+msgid ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-pvd-baremetal.toml`"
+msgstr ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-pvd-baremetal.toml`"
+
+msgid "`tests/contracts/multi_controller_assembly/stm32-zg-pvd-freertos.toml`"
+msgstr ""
+"`tests/contracts/multi_controller_assembly/stm32-zg-pvd-freertos.toml`"
+
+msgid "pvd-events"
+msgstr "pvd-events"
+
+msgid "pvd-level"
+msgstr "pvd-level"
+
+msgid "TIM8"
+msgstr "TIM8"
+
+msgid "`complementary-pc6-pa7-pa6`"
+msgstr "`complementary-pc6-pa7-pa6`"
+
+msgid "`soc/stm32/stm32f4/drivers/advanced_pwm_tim8.c`"
+msgstr "`soc/stm32/stm32f4/drivers/advanced_pwm_tim8.c`"
+
+msgid ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-advanced-pair-"
+"baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-"
+"advanced-pair-freertos.toml`"
+msgstr ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-advanced-pair-"
+"baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-"
+"advanced-pair-freertos.toml`"
+
+msgid ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-advanced-pair-"
+"baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-"
+"advanced-pair-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve-"
+"freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, "
+"`tests/contracts/timer_assembly/stm32-zg-freertos.toml`, "
+"`tests/contracts/timer_assembly/stm32-zg.toml`"
+msgstr ""
+"`tests/contracts/multi_controller_assembly/stm32-ve-advanced-pair-"
+"baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-"
+"advanced-pair-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve-"
+"freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, "
+"`tests/contracts/timer_assembly/stm32-zg-freertos.toml`, "
+"`tests/contracts/timer_assembly/stm32-zg.toml`"

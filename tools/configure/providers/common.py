@@ -418,6 +418,8 @@ _MODE_TRAITS = MappingProxyType({
     ("watchdog", "independent"): ModeTraits(),
     ("watchdog", "window"): ModeTraits(),
     ("exti", "edge-event"): ModeTraits(irq=True),
+    ("exti", "pvd-level"): ModeTraits(polling=True),
+    ("exti", "pvd-events"): ModeTraits(irq=True),
     ("pwm", "fixed-pwm"): ModeTraits(),
     ("pwm", "shared-fixed-pwm"): ModeTraits(),
     ("adc", "single-shot"): ModeTraits(polling=True),

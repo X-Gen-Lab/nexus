@@ -13,6 +13,8 @@ def implementation(item):
 def operations(item):
     """Name the actual readonly table; shared algorithms keep one identity."""
     selected = implementation(item)
+    if item.kind == 'advanced_pwm' and item.controller == 'TIM8':
+        return 'nx_stm32_tim8_advanced_pwm_ops'
     if item.interface_kind == "spi_dma_transaction":
         return "nx_spi_dma_sequence_port_ops"
     if item.kind in {"eth", "eth_frames"}:
@@ -33,6 +35,9 @@ def includes(result):
     source = []
     source.append('#include "stm32f407_provider.h"')
     source.append('#include "stm32f407_platform_cold.h"')
+    if any(item.kind == 'exti' and item.mode in {'pvd-level', 'pvd-events'}
+           for item in selections):
+        source.append('#include "stm32f407_pvd.h"')
     if any(item.kind == "watchdog" and item.mode == "window" for item in selections):
         source.append('#include "stm32f407_window_watchdog.h"')
     if any(item.kind == "crc" for item in selections):
@@ -129,7 +134,7 @@ def state_declarations(result):
     source = []
     if has_dma(result):
         source.append("static uint32_t s_nx_platform_dma_clocks_added;")
-    if any(item.kind == "exti" for item in selections):
+    if any(item.kind == "exti" and item.mode == 'edge-event' for item in selections):
         source.append('static uint32_t s_nx_platform_syscfg_clock_added;')
     source.extend(can.state_declarations(result, "stm32"))
     source.extend(packet.state_declarations(result))
@@ -235,5 +240,6 @@ def _resource_slots(result):
     """Name only selected receipt storage; absent resources allocate nothing."""
     dma = '&s_nx_platform_dma_clocks_added' if has_dma(result) else 'NULL'
     syscfg = ('&s_nx_platform_syscfg_clock_added' if
-              any(item.kind == 'exti' for item in result.controllers) else 'NULL')
+              any(item.kind == 'exti' and item.mode == 'edge-event'
+                  for item in result.controllers) else 'NULL')
     return dma, syscfg

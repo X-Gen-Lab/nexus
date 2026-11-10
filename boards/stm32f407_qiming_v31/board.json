@@ -64,6 +64,11 @@
       "id": "wwdg",
       "controller": "WWDG",
       "route": "wwdg"
+    },
+    {
+      "id": "pvd",
+      "controller": "EXTI16",
+      "route": "pvd-exti16"
     }
   ],
   "reserved_resources": [

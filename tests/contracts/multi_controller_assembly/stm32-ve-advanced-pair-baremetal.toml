@@ -1,0 +1,45 @@
+# Software-only dual advanced timers; power-stage safety needs physical tests.
+schema = 2
+board_package = "stm32-ve-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[advanced_pwm.advanced1]
+binding = "advanced1"
+mode = "complementary-pwm"
+tick_hz = 1000000
+period_ticks = 1000
+deadtime_ticks = 128
+break_active_high = true
+idle_high = false
+idle_complement_high = false
+exclusive = true
+
+[advanced_pwm.advanced1.irq]
+priority = 6
+calls_os = false
+
+[advanced_pwm.advanced8]
+binding = "advanced8"
+mode = "complementary-pwm"
+tick_hz = 1000000
+period_ticks = 1000
+deadtime_ticks = 128
+break_active_high = true
+idle_high = false
+idle_complement_high = false
+exclusive = true
+
+[advanced_pwm.advanced8.irq]
+priority = 6
+calls_os = false

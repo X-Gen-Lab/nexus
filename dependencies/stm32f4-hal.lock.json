@@ -133,6 +133,10 @@
       "bytes": 10642,
       "sha256": "535cb625cfcd461d6054549bf04d25ef939ec5754f77731a5f9fd92728280ded"
     },
+    "Inc/stm32f4xx_ll_wwdg.h": {
+      "bytes": 10172,
+      "sha256": "f554a0fcd1339ef7a8a93f6082bb93ac68f405f53071a8aac12299d609973ad1"
+    },
     "LICENSE.md": {
       "bytes": 1485,
       "sha256": "376c82bcef0be563bf59b93d05cfdd4b6295e4660b55b31dd8a883bf1d6637f7"

@@ -78,6 +78,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | IWDG | 4–256 预分频、12-bit reload、名义 32 kHz；观察 option 已启用和不可逆软件 enable，debug freeze 显式；当前物理 timeout bounds 为 0/0 unknown |
 | WWDG | 固定 42 MHz PCLK1，1／2／4／8 分频，显式 window_ticks；prepare 不启狗，单次 CR 激活、早／迟喂狗拒绝、失败关闭留责；无 EWI／STOP／Standby 覆盖 |
 | EXTI | 静态 line、有界共享 vector 分派、独立事件存储和 overflow；pending 可合并边沿，无 debounce 策略 |
+| PVD | 内部 EXTI16，显式 PLS 0–7；原始 PVDO 轮询或有界边沿事件；不选择电压策略，不替代 BOR |
 | PWM | TIM3／4／5／9／10／11／12／13／14 按各自通道数显式选择一路；固定 PSC/ARR；TIM5 为 32-bit counts，其他为 16-bit；duty0–period、shadow update；stop 建立 GPIO inactive |
 | ADC | ADC1／2 外部通道 0--15，ADC3 按封装选择外部输入；ADC1 内部温度／VREFINT／VBAT；6／8／10／12-bit 普通软件 shot/scan 最多 16 ranks、软件注入组最多 4 ranks；各转换器均有独占 TIM3 触发有限／连续 DMA block |
 | DAC | PA4／PA5 单／双通道，CPU direct、软件或独占 TIM6／7 触发、noise／triangle；有限／循环触发 DMA；u8／u12-right／u12-left |
@@ -87,7 +88,7 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | Ethernet | Raw RMII frame/MDIO、调用者 descriptor／RX loan；IP／协议策略外置 |
 | Timer capture | 已审 TIM4 edge-capture 路线和有界事件 |
 | Encoder | TIM3／4／5 的独占 TI1／TI2 原始 modulo position，x2／x4、两路 filter 与反相；停止保留位置，不建立累计计数或 IRQ |
-| Advanced PWM | 已审 TIM1 互补输出／deadtime／break，功率级电气安全外部验收 |
+| Advanced PWM | TIM1／TIM8 的 CH1／CH1N、deadtime／break；独立状态与固定路线，功率级电气安全外部验收 |
 
 IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征；当前没有
 声明满足条件的 operating profile，不能直接据此保证时限。名义配置可成功，但启用后
@@ -131,6 +132,31 @@ EWI 或 STOP／Standby 保证。软件参考为 `*wwdg*.toml` 与 `*watchdogs*.t
 
 外来 EWI enable 为 sticky 位，只能由硬件 reset 清除；该模式不会把普通写入伪装成
 可撤回 EWI 的恢复。遇到未取得的 EWI／vector 时保持 BUSY 与现有责任。
+
+## PVD 电压检测与内部 EXTI
+
+`exti` 的 `pvd-level` 与 `pvd-events` 共用内部 `pvd` Board binding，
+`threshold_code` 必须显式选择 0–7，不提供默认电压政策。编码与迟滞边界依据
+RM0090 §5.2.3、DS8626 Rev12 Table19；官方 LL 注释中的简写电压不作为精确阈值。
+例如 code5 的典型上升／下降阈值为 2.93／2.84 V，仍有器件、温度和电源条件下的
+min／max，不是可编程 ADC 或电压计。`.level=true` 始终表示 PVDO=1，即低于阈值；
+PVDO rising 表示电压下降，falling 表示电压恢复，不翻转为 power-good。
+
+轮询只保留 3 字节比较器收条，不分配队列，也不选编 GPIO 或 EXTI 事件驱动。
+事件模式增加现有 EXTI state 与显式 `event_capacity`，由 `PVD_IRQHandler` 直接
+分派；复用同一 read／stop／wake 合同，不增加 worker、运行时 registry 或接口转发层。
+IRQ 先精确 W1C 清除 PR16，再发布 COALESCED 事件与 wake；溢出通过 LOSS 暴露。
+启动前的低电压可由 level 读到，不伪造历史边沿；不启用 EXTI EMR。
+
+无写 admit 在 System 启动前检查 EXTI16／PVD vector 的外来占用；PWR clock 尚未
+开启时不读取 gated 比较器状态。prepare 在 System 取得 PWREN 后重查 PVDE、保存
+PLS，复用 LL 配置并观察回读，再清 pending、开放实际 IRQ。PVD 不取得或关闭 PWREN，
+不复位整个 PWR，不修改 VOS／DBP。只提供当前原始信号，不承诺资料未定义的启动稳定时间。
+
+关闭先撤销 level 的 READY 资格，再撤回 EXTI source／NVIC 并观察 handler 排空，
+最后关闭 PVDE、恢复原 PLS 与 IRQ priority。任一步失败保留收条、存储与 System
+清理责任，允许显式重试。ring、完整 owner 与冷配置必须分离，不能覆盖清理状态。
+本模式不提供低压保存任务、BOR／安全保护、STOP 唤醒或物理阈值资格。
 
 ## UART、DMA 与执行进度
 
@@ -266,8 +292,21 @@ TIM3 与 PWM 独占冲突。独立 `trigger-dma-continuous` 维护双缓冲和 r
 的单通道实现。精确 pad 与 AF2／3／9 路线见[支持表](../../../../docs/delivery/support.md)。
 TIM9／10／11 使用 APB2 的固定 168 MHz timer clock，其他所列 timer 使用 APB1 的
 84 MHz。C 从 controller 身份派生 APB、AF 与 gate，不新增实例字段；配置生成只连接
-精确静态事实。TIM3 与 ADC trigger、TIM4 与 capture 互斥；现有 TIM1 advanced PWM
-仍保守保留 TIM9 共享 vector。TIM2 保留给单调时钟，TIM6／7 为 DAC trigger。
+精确静态事实。TIM3 与 ADC trigger、TIM4 与 capture 互斥；TIM1／TIM8 advanced PWM
+分别保留 TIM9／TIM12 共享 vector。TIM2 保留给单调时钟，TIM6／7 为 DAC trigger。
+
+互补输出共用一套 C 算法，以两个编译期 wrapper 直接操作 TIM1／TIM8；CMake 只选中
+所需实现，不增加运行时寄存器派发。TIM1 使用 PA8／PB13／PB12 AF1；TIM8 使用
+PC6／PA7／PA6 AF3，依次为 CH1／CH1N／BKIN，均使用 168 MHz timer clock。
+break IRQ 分别为 TIM1_BRK_TIM9／TIM8_BRK_TIM12，后者的 TIM12 peer gate 属于
+APB1，TIM8 gate 属于 APB2。资源冲突在配置期拒绝，冷态也检查实际 peer gate。
+
+共享冷态流程只引用静态硬件事实，不改变热路径。完整配置身份与 pin／IRQ／gate 收条
+保留到最后一次清理成功，包含热态 release 后的引脚回滚失败；不能换配置、snapshot
+存储或 timer wrapper 重试。snapshot、控制器、冷态与只读配置区域必须互不重叠。
+关闭先观察同组所有输出 inactive，再逆序恢复引脚；拒绝撤源或回读失败保留原责任。
+启停、set、break 故障锁存和显式 rearm 使用原公共接口，不增加 heap、worker 或自动重启。
+`*advanced-pair*.toml` 是两路并存的软件参考，不授权 PCB 接线或功率级安全。
 
 `period_ticks` 表示完整周期，ARR 为 period−1。上限保留了 CCR 表达 100% duty 的
 空间：TIM5 为 UINT32_MAX，其他已审 timer 为 65535。set 只更新 duty 的预装载，不改变周期

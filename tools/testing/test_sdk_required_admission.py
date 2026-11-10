@@ -104,6 +104,10 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
             "soc/stm32/stm32f4/drivers/window_watchdog.c",
             "soc/stm32/stm32f4/private/stm32f407_window_watchdog.h",
             "soc/stm32/stm32f4/reset.c",
+            "soc/stm32/stm32f4/drivers/pvd.c",
+            "soc/stm32/stm32f4/private/stm32f407_pvd.h",
+            "tools/configure/stm32f4/pvd.py",
+            "soc/stm32/stm32f4/drivers/advanced_pwm_tim8.c",
             "soc/stm32/stm32f4/private/stm32f4_encoder.h",
             "soc/stm32/stm32f4/private/stm32f407_timer_hardware.h",
             "tools/configure/stm32f4/encoder.py",
@@ -150,6 +154,17 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
         self.write_manifest()
         with self.assertRaisesRegex(self.sdk.SDKError,
                                     "Unsafe source SDK path"):
+            self.sdk.verify(self.root)
+
+    def test_window_watchdog_sdk_requires_its_actual_vendor_ll_header(self):
+        name = 'vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_wwdg.h'
+        required = self.sdk.required_files(ROOT, self.identity['profile'])
+        self.assertTrue(name in required, 'Source SDK lacks the WWDG LL header')
+        self.complete_required_map()
+        self.files.pop(name)
+        self.write_manifest()
+        with self.assertRaisesRegex(self.sdk.SDKError,
+                                    'missing required sources/licenses'):
             self.sdk.verify(self.root)
 
     def test_schema_and_provenance_precede_required_name_admission(self):

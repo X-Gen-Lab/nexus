@@ -15,6 +15,50 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name)
 
+    def dual_advanced(self):
+        base = gate.ROOT / 'tests/contracts/timer_assembly'
+        board = json.loads((base / 'stm32-zg-board/board.json').read_text())
+        board['bindings'].append({'id': 'complementary8', 'controller': 'TIM8',
+                                 'route': 'complementary-pc6-pa7-pa6'})
+        package = self.directory / 'dual-board'
+        package.mkdir(exist_ok=True)
+        (package / 'board.json').write_text(json.dumps(board))
+        text = (base / 'stm32-zg.toml').read_text().replace(
+            'board_package="stm32-zg-board"', 'board_package="dual-board"')
+        second = text[text.index('[advanced_pwm.power]'):].replace(
+            'advanced_pwm.power', 'advanced_pwm.power8').replace(
+            'binding="complementary"', 'binding="complementary8"')
+        path = self.directory / 'dual.toml'
+        path.write_text(text + '\n' + second)
+        return path
+
+    def test_two_advanced_timers_have_exact_distinct_pads_vectors_and_factories(self):
+        ir = gate.resolve_ir(self.dual_advanced())
+        self.assertEqual({'TIM1', 'TIM8'}, {item.controller for item in ir.controllers
+                                          if item.kind == 'advanced_pwm'})
+        claims = {item.key for item in ir.claims}
+        self.assertTrue({'irq:TIM1_BRK_TIM9', 'irq:TIM8_BRK_TIM12',
+                         'controller:TIM9', 'controller:TIM12'} <= claims)
+        from tools.configure import bindings
+        source = bindings.emit(ir)[1]
+        self.assertIn('&nx_stm32_tim8_advanced_pwm_ops', source)
+        self.assertIn('nx_stm32_tim8_advanced_cold_prepare', source)
+        self.assertIn('TIM8_BRK_TIM12_IRQHandler', source)
+        self.assertIn('.break_input = &GPIOA->IDR, .break_mask = 64u', source)
+
+    def test_tim8_reserves_its_actual_tim12_shared_break_vector_peer(self):
+        path = self.dual_advanced()
+        package = path.parent / 'dual-board/board.json'
+        board = json.loads(package.read_text())
+        board['bindings'].append({'id': 'pwm12', 'controller': 'TIM12',
+                                  'route': 'tim12-ch1-pb14', 'initial': 0})
+        package.write_text(json.dumps(board))
+        path.write_text(path.read_text() + '\n[pwm.peer]\nbinding="pwm12"\n'
+                        'mode="fixed-pwm"\nperiod_ticks=1000\nduty_ticks=0\n'
+                        'tick_hz=1000000\n')
+        with self.assertRaisesRegex(ValueError, 'TIM12'):
+            gate.resolve_ir(path)
+
     def assembly(self, label="stm32-zg", change=None):
         base = gate.ROOT / "tests/contracts/timer_assembly"
         text = (base / (label + ".toml")).read_text().replace(

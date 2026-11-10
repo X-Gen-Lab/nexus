@@ -4800,6 +4800,51 @@
         "quadrature"
       ],
       "source": "DS8626 Rev12 Table9; RM0090 Rev22 section18.3 encoder interface; F407VE/ZG only"
+    },
+    {
+      "id": "pvd-exti16",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "EXTI16",
+      "kind": "exti",
+      "pins": [],
+      "modes": [
+        "pvd-level",
+        "pvd-events"
+      ],
+      "source": "RM0090 Rev 22 section 5.2.3 and EXTI16; DS8626 Rev 12 Table 19, PLS encoding and threshold bounds"
+    },
+    {
+      "id": "complementary-pc6-pa7-pa6",
+      "controller": "TIM8",
+      "kind": "advanced_pwm",
+      "variants": [
+        "STM32F407ZGT6",
+        "STM32F407VET6"
+      ],
+      "modes": [
+        "complementary-pwm"
+      ],
+      "pins": [
+        {
+          "pin": "PC6",
+          "function": "output",
+          "af": 3
+        },
+        {
+          "pin": "PA7",
+          "function": "complement",
+          "af": 3
+        },
+        {
+          "pin": "PA6",
+          "function": "break",
+          "af": 3
+        }
+      ],
+      "source": "DS8626 Rev 12 alternate function table; RM0090 Rev 22 TIM8 advanced timer, APB2 gate and shared TIM12 break vector"
     }
   ]
 }

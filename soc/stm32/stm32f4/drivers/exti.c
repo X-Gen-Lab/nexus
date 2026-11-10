@@ -120,8 +120,10 @@ void nx_stm32_exti_dispatch(nx_stm32_exti_state_t* const* ports, size_t count,
         }
         nx_exti_edge_t edge = port->edge;
         if (edge == NX_EXTI_BOTH) {
-            edge = (port->gpio->IDR & bit) != 0U ? NX_EXTI_RISING
-                                                 : NX_EXTI_FALLING;
+            const bool high = port->line == 16U
+                                  ? (PWR->CSR & PWR_CSR_PVDO) != 0U
+                                  : (port->gpio->IDR & bit) != 0U;
+            edge = high ? NX_EXTI_RISING : NX_EXTI_FALLING;
         }
         port->storage[port->head] =
             (nx_exti_event_t){.timestamp_us = nx_time_now_us(),
@@ -179,7 +181,7 @@ nx_result_t nx_stm32_exti_read(void* context, nx_exti_event_t* events,
  */
 nx_result_t nx_stm32_exti_stop(void* context) {
     nx_stm32_exti_state_t* port = context;
-    if (port == NULL || port->registers == NULL || port->line > 15U) {
+    if (port == NULL || port->registers == NULL || port->line > 16U) {
         return NX_ERROR_INVALID;
     }
     if (nx_arch_in_isr()) {
@@ -188,7 +190,8 @@ nx_result_t nx_stm32_exti_stop(void* context) {
     if (!port->initialized)
         return NX_SUCCESS;
     nx_arch_irq_state_t saved = nx_arch_irq_save();
-    IRQn_Type irq = port->line <= 4U
+    IRQn_Type irq = port->line == 16U ? PVD_IRQn
+                    : port->line <= 4U
                         ? (IRQn_Type)((int)EXTI0_IRQn + (int)port->line)
                         : (port->line <= 9U ? EXTI9_5_IRQn : EXTI15_10_IRQn);
     unsigned word = (unsigned)irq / 32U;
@@ -214,8 +217,9 @@ nx_result_t nx_stm32_exti_stop(void* context) {
         nx_arch_irq_restore(saved);
         return NX_ERROR_IO;
     }
-    uint32_t vector_mask =
-        port->line <= 4U ? bit : (port->line <= 9U ? 0x3E0U : 0xFC00U);
+    uint32_t vector_mask = port->line <= 4U || port->line == 16U
+                               ? bit
+                               : (port->line <= 9U ? 0x3E0U : 0xFC00U);
     bool shared =
         (NX_STM32_EXTI_READ(&port->registers->IMR) & vector_mask) != 0U;
     if (!shared) {
@@ -238,11 +242,10 @@ nx_result_t nx_stm32_exti_stop(void* context) {
 }
 
 /** \brief Validate shared-vector priority before attaching a borrowed sink. */
-static nx_result_t stm32_exti_attach_wake(void* context,
-                                          const nx_irq_wake_t* wake,
-                                          uint8_t syscall_ceiling) {
+nx_result_t nx_stm32_exti_attach_wake(void* context, const nx_irq_wake_t* wake,
+                                      uint8_t syscall_ceiling) {
     nx_stm32_exti_state_t* port = context;
-    if (port == NULL) {
+    if (port == NULL || port->line > 16U) {
         return NX_ERROR_INVALID;
     }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
@@ -253,7 +256,8 @@ static nx_result_t stm32_exti_attach_wake(void* context,
         nx_arch_irq_restore(saved);
         return NX_ERROR_STATE;
     }
-    IRQn_Type irq = port->line <= 4U
+    IRQn_Type irq = port->line == 16U ? PVD_IRQn
+                    : port->line <= 4U
                         ? (IRQn_Type)((int)EXTI0_IRQn + (int)port->line)
                         : (port->line <= 9U ? EXTI9_5_IRQn : EXTI15_10_IRQn);
     nx_result_t result = nx_stm32_irq_wake_validate(wake, irq, syscall_ceiling);
@@ -302,6 +306,6 @@ static nx_result_t stm32_exti_level(const void* context, bool* high) {
 const nx_exti_ops_t nx_stm32_exti_ops = {
     .read = nx_stm32_exti_read,
     .stop = nx_stm32_exti_stop,
-    .attach_wake = stm32_exti_attach_wake,
+    .attach_wake = nx_stm32_exti_attach_wake,
     .level = stm32_exti_level,
 };
