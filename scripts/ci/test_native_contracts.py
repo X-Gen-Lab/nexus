@@ -105,10 +105,7 @@ class NativeExecutionTests(unittest.TestCase):
 
     def execute(self, preset="native-debug"):
         output = io.StringIO()
-        from scripts.ci import io_lifecycle_matrix as matrix
         with patch.object(native_contracts, "ROOT", self.root), \
-                patch.object(matrix, "capture_complete"), \
-                patch.object(matrix, "verify_snapshot"), \
                 redirect_stdout(output), redirect_stderr(output):
             result = native_contracts.main(["--preset", preset])
         return result, output.getvalue()

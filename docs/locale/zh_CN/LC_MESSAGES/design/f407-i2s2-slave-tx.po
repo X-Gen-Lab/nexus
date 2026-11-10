@@ -1,581 +1,108 @@
-# Reviewed against the exact current canonical source and gettext messages.
+# Current gettext translation draft; independent review pending.
 msgid ""
-msgstr ""
-"Project-Id-Version: Nexus source documentation\n"
-"Language: zh_CN\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 53d803110abc6880557ffc0893a520591057a6e3ca2075dfd3e974592338cd80\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 0019665bff7326eb90f664a89adb71a3cd8111da6d74596645bb137c7f5b80a3\n"
 
-#: docs/design/f407-i2s2-slave-tx.md:10
 msgid "Finite I2S2 slave TX on STM32F407"
 msgstr "STM32F407 上的有限 I2S2 从机发送"
 
-#: docs/design/f407-i2s2-slave-tx.md:12
-msgid ""
-"Use this exact baremetal role to transmit one caller-owned stereo16 frame "
-"block from an STM32F407VET6 or STM32F407ZGT6 under an independently "
-"controlled external I2S master. One task owns the transmitter, the external-"
-"clock handshake and failure drain. The implementation supplies finite normal "
-"DMA and explicit final access; the product supplies samples, rate, codec, "
-"master and recovery policy. Physical HIL is `not_executed`. IO-41 remains "
-"`in_progress`; continuous audio, SAI and PDM remain open."
-msgstr ""
-"在独立控制的外部 I2S 主机提供时钟时，这个精确裸机角色可让 STM32F407VET6 或 STM32F407ZGT6 发送一个由调用方拥有的 "
-"stereo16 帧块。单一任务拥有发送器、外部时钟握手及失败排空。实现提供有限普通模式 DMA "
-"和显式最终访问边界；产品负责采样值、速率、编解码器、主机及恢复政策。物理 HIL 为 `not_executed`。IO-41 仍为 "
-"`in_progress`；连续音频、SAI 和 PDM 仍开放。"
+msgid "Select `[audio.sound]` to transmit one whole stereo16 frame loan through the standard audio factory and Platform lifecycle. The maintained VE and ZG assemblies use software reference Board packages with explicit chip routes. They establish no fitted codec, PCB wiring or qualified external master. Physical HIL remains `not_executed`."
+msgstr "选择 `[audio.sound]`，通过标准 audio factory 和 Platform 生命周期发送一个完整 stereo16 帧 loan。维护中的 VE 和 ZG 装配使用明确芯片路线的软件参考 Board 包，不证明已安装 codec、PCB 接线或外部 master 资格。物理 HIL 仍为 `not_executed`。"
 
-#: docs/design/f407-i2s2-slave-tx.md:20
-msgid "Select one physical role"
-msgstr "选择一个物理角色"
+msgid "Select the static audio owner"
+msgstr "选择静态 audio owner"
 
-#: docs/design/f407-i2s2-slave-tx.md:22
-msgid ""
-"The authored role is `[i2s2]` with `profile = \"slave-tx-"
-"stereo16-pb12-pb13-pb15\"`. It resolves through the same validated hardware "
-"IR and resource plan as other controllers. A selected SPI2 personality, pin, "
-"DMA stream or vector conflict is rejected before generation. Omitting the "
-"role leaves it unselected; it creates no audio owner or target."
-msgstr ""
-"在 `[i2s2]` 中以 `profile = \"slave-tx-stereo16-pb12-pb13-pb15\"` "
-"声明这个角色。它与其他控制器通过同一套已验证硬件 IR 和资源计划解析。所选 SPI2 模式、引脚、DMA stream "
-"或向量发生冲突时，在生成前拒绝。省略角色就保持未选中，不创建音频所有者或目标。"
+msgid "The [VE input](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/assemblies/sky-i2s2-slave-tx.toml) and [ZG input](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/assemblies/qiming-i2s2-slave-tx.toml) select `I2S2`, `slave-tx`, Philips format, 16-bit samples and 16-bit slots. The standard typed IR claims SPI2's personality, PB12/PB13/PB15, DMA1 Stream4 channel0, DMA1 Stream4 IRQ and SPI2 IRQ. Conflicting SPI, pad, stream or vector owners are rejected before generation."
+msgstr "[VE 输入](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/assemblies/sky-i2s2-slave-tx.toml)和 [ZG 输入](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/assemblies/qiming-i2s2-slave-tx.toml)选择 `I2S2`、`slave-tx`、Philips 格式、16-bit samples 与 16-bit slots。标准 typed IR 声明 SPI2 personality、PB12／PB13／PB15、DMA1 Stream4 channel0、DMA1 Stream4 IRQ 和 SPI2 IRQ。冲突的 SPI、引脚、stream 或 vector owner 在生成前被拒绝。"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid "Resource or format"
-msgstr "资源或格式"
+msgid "Resource"
+msgstr "资源"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid "Exact selection"
-msgstr "精确选定项"
+msgid "Selected behavior"
+msgstr "所选行为"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid "Chip and clock"
-msgstr "芯片与时钟"
-
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid ""
-"STM32F407VET6 or STM32F407ZGT6; baremetal; `hse8-pll168`; live 1 MHz TIM2"
-msgstr "STM32F407VET6 或 STM32F407ZGT6；baremetal；`hse8-pll168`；有效运行的 1 MHz TIM2"
-
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid "Wire"
-msgstr "线上协议"
-
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid ""
-"Philips I2S; two 16-bit channels and 16-bit slots; samples leave MSB first"
-msgstr "Philips I2S；两个 16 位声道、16 位时隙；采样以 MSB 优先的顺序输出"
-
-#: docs/design/f407-i2s2-slave-tx.md:0
 msgid "Pads"
 msgstr "引脚"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
 msgid "PB12 WS input, PB13 CK input, PB15 SD output; AF5"
 msgstr "PB12 WS 输入、PB13 CK 输入、PB15 SD 输出；AF5"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid "Engine"
-msgstr "DMA 引擎"
+msgid "DMA"
+msgstr "DMA"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid ""
-"DMA1 Stream4 channel0; normal, direct, memory-incrementing 16-bit transfers"
-msgstr "DMA1 Stream4 channel0；普通模式、直接模式、内存地址递增的 16 位传输"
+msgid "DMA1 Stream4 channel0, normal direct halfword transfers"
+msgstr "DMA1 Stream4 channel0，普通 direct halfword 传输"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid "Exclusive vectors"
-msgstr "独占中断向量"
+msgid "Memory"
+msgstr "内存"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid ""
-"DMA1 Stream4 and SPI2; sources remain disabled and no IRQ service is "
-"installed"
-msgstr "DMA1 Stream4 和 SPI2；中断源始终保持禁用，不安装 IRQ 服务"
+msgid "Complete aligned read-permitted SRAM span; CCM is excluded"
+msgstr "完整对齐且具备读权限的 SRAM span；排除 CCM"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid "Payload"
-msgstr "数据负载"
+msgid "Storage"
+msgstr "存储"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid ""
-"One plane, zero offset, contiguous nonempty rows with `stride == row_bytes` "
-"and no padding; left then right 16-bit little-endian samples"
-msgstr "一个平面，偏移为零，各非空行连续排列，满足 `stride == row_bytes` 且无填充；按先左后右顺序存放 16 位小端采样"
+msgid "One plane, offset zero, nonempty contiguous rows without padding"
+msgstr "单 plane，offset 为零，非空连续 rows，无 padding"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid "Block size"
-msgstr "块大小"
+msgid "Block"
+msgstr "块"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid "4..131068 B, divisible by four; 2..65534 DMA halfwords"
-msgstr "4..131068 B，且为四的倍数；2..65534 个 DMA 半字"
+msgid "4..131068 bytes, divisible by four, left then right halfwords"
+msgstr "4..131068 字节，长度可被四整除，先左后右 halfword"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid "DMA memory"
-msgstr "DMA 可访问内存"
+msgid "Clocks"
+msgstr "时钟"
 
-#: docs/design/f407-i2s2-slave-tx.md:0
-msgid ""
-"Entire aligned source span in main SRAM `[0x20000000, 0x20020000)`; CCM is "
-"excluded"
-msgstr "整个对齐的源数据范围必须位于主 SRAM `[0x20000000, 0x20020000)` 内；不允许使用 CCM"
+msgid "External CK/WS; no PLLI2S or MCLK acquired in this slave mode"
+msgstr "外部 CK／WS；此 slave 模式不取得 PLLI2S 或 MCLK"
 
-#: docs/design/f407-i2s2-slave-tx.md:39
-msgid ""
-"For this stereo16 I2S format, `nx_frame_layout_audio` describes successive "
-"audio frames as rows. Keep that canonical layout: a multi-frame block may "
-"have multiple contiguous rows. The provider checks nonempty rows, `stride == "
-"row_bytes` and a bounded `rows * row_bytes == layout.bytes`, then takes a "
-"view covering the actual row geometry. The DMA count and settlement cover the"
-" complete block; there is no per-row loan or completion."
-msgstr ""
-"对于这种 stereo16 I2S 格式，`nx_frame_layout_audio` "
-"将连续音频帧描述为行。保留这种规范布局：多帧块可以由多个连续行组成。provider 检查行非空、`stride == "
-"row_bytes`，并以有界计算核验 `rows * row_bytes == layout.bytes`，再以实际行布局取得视图。DMA "
-"计数和结清均覆盖完整块，不存在逐行借用或逐行完成。"
+msgid "`nx_frame_layout_audio` can describe successive stereo frames as contiguous rows. The provider verifies that the row extent equals both `layout.bytes` and the complete consumer loan length. Layout describes storage; the static assembly selects wire format. No sample conversion is performed."
+msgstr "`nx_frame_layout_audio` 可将连续 stereo frames 描述为连续 rows。provider 校验 row extent 同时等于 `layout.bytes` 和完整消费者 loan 长度。layout 描述存储；静态装配选择线上格式。不执行采样格式转换。"
 
-#: docs/design/f407-i2s2-slave-tx.md:46
-msgid ""
-"`nx_frame_layout_t` records storage geometry; it does not configure the wire "
-"or validate audio format metadata. The caller still supplies the declared "
-"little-endian stereo16 samples. Other audio-layout helper formats do not "
-"become supported transmitter formats."
-msgstr ""
-"`nx_frame_layout_t` 记录存储几何布局，不配置线上格式，也不验证音频格式元数据。调用方仍须提供所声明的小端 stereo16 "
-"采样。音频布局 helper 的其他格式不会因此成为发送器支持的格式。"
+msgid "Platform startup prepares the selected owner and installs its thin IRQ connections without starting DMA or I2SE. `nx_factory_audio(NX_AUDIO_ID_SOUND)` returns that existing immutable face. There is no caller-created hardware owner or additional initialization authority. The public path is exercised by the [SDK consumer](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c). The broader I2S2/I2S3 format, receive, duplex and master-clock contract is in [the F407 capture/audio implementation notes](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/capture_audio.md)."
+msgstr "Platform 启动准备所选 owner 并安装薄 IRQ 连接，不启动 DMA 或 I2SE。`nx_factory_audio(NX_AUDIO_ID_SOUND)` 返回已有不可变接口。没有由调用者另建的硬件 owner 或额外初始化权限。公共路径由 [SDK 消费者](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c)验证。更广的 I2S2／I2S3 格式、接收、duplex 和 master-clock 合同见 [F407 capture/audio 实现说明](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/capture_audio.md)。"
 
-#: docs/design/f407-i2s2-slave-tx.md:51
-msgid ""
-"The maintained VE input is below. The [ZG input](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/configure/assemblies/qiming-i2s2-slave-tx.toml) selects the "
-"corresponding exact Board package with the same role."
-msgstr ""
-"下面是维护的 VE 输入。[ZG 输入](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/tools/configure/assemblies/qiming-i2s2-slave-tx.toml) "
-"以相同角色选择对应的精确 Board 包。"
+msgid "Coordinate the external master"
+msgstr "协调外部 master"
 
-#: docs/design/f407-i2s2-slave-tx.md:59
-msgid ""
-"The component target is `Nexus::F407I2S2SlaveTx`, defined by [its CMake "
-"file](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt) only for the "
-"validated selection. A consumer explicitly links it and constructs one stable"
-" readonly face with shared operations and separate zero-initialized owner "
-"storage. Factory lookup does not create or start an audio owner. The firmware"
-" owner storage is 88 B, excluding caller-owned request, stream, frame and "
-"payload storage. No task, allocation, queue or replay worker is created."
-msgstr ""
-"组件目标为 `Nexus::F407I2S2SlaveTx`，仅在选中已验证角色时由[其 CMake "
-"文件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt) "
-"定义。消费者显式链接目标，并以共享操作表和独立清零的所有者存储构造一个稳定的只读 face。Factory 查找不创建或启动音频所有者。固件所有者存储为 "
-"88 B，不包括调用方拥有的请求、流、帧和载荷存储。不创建任务、分配、队列或重放 worker。"
+msgid "One privileged unmasked task serializes audio methods and the external-clock handshake. Before submission, Philips WS must be high and CK at the selected idle polarity. The product supplies the codec, sample rate, external master and electrical timing required by DS8626."
+msgstr "由一个 privileged 且未屏蔽中断的 task 串行执行 audio 方法和外部时钟握手。提交前，Philips WS 必须为高，CK 必须处于所选空闲极性。产品提供 codec、采样率、外部 master 和 DS8626 要求的电气时序。"
 
-#: docs/design/f407-i2s2-slave-tx.md:67
-msgid ""
-"The role uses external CK/WS; it does not enable PLLI2S or generate an audio "
-"clock. Chip AF capability does not establish a PCB route. The assembly "
-"supplies the exact part/package identity: device-group and Flash-density "
-"reads cannot authenticate an F407 or distinguish its physical package. The "
-"caller must meet DS8626 voltage, I/O, load and CK/WS/SD timing requirements "
-"and provide adequate DMA refill margin. This software defines no measured "
-"external-clock rate or additional characterized PCLK-to-CK ratio."
-msgstr ""
-"该角色使用外部 CK/WS，不启用 PLLI2S，也不生成音频时钟。芯片 AF 能力不证明 PCB 布线。装配提供精确料号／封装身份：器件组和 Flash"
-" 容量读取不能认证 F407 或区分其物理封装。调用方必须满足 DS8626 的电压、I/O、负载及 CK/WS/SD 时序要求，并提供足够的 DMA "
-"补充裕量。本软件不定义实测外部时钟速率，也不额外给出经过特性测定的 PCLK 与 CK 比率。"
+msgid "`submit` accepts a prepared `nx_audio_request_t` with `tx` pointing to one exact `nx_frame_dma_loan_t`; `rx` is null. Rejection retains no request or payload references and makes no hardware changes. Acceptance borrows the complete request, control and payload until acquire-observed `SETTLED`."
+msgstr "`submit` 接受已 prepare 的 `nx_audio_request_t`，其 `tx` 指向一个精确 `nx_frame_dma_loan_t`，`rx` 为空。拒绝不保留请求或 payload 引用，也不改变硬件。接受会借用完整 request、control 和 payload，直到 acquire 观测到 `SETTLED`。"
 
-#: docs/design/f407-i2s2-slave-tx.md:75
-msgid "Keep Platform and transmitter ownership separate"
-msgstr "分别维护 Platform 与发送器所有权"
+msgid "Keep CK/WS idle while explicitly calling `service`. Slave TX reaches `ACTIVE` only after DMA has prefetched one DR halfword, TXE is low, at least three actual microsecond ticks and three peripheral clocks have passed, and idle CK/WS still holds. Frozen time or a lost channel boundary cannot authorize the master to begin clocking. Start the separately owned master only after observing `ACTIVE`. IRQs latch completion and errors; no worker or scheduler is created."
+msgstr "显式调用 `service` 时保持 CK／WS 空闲。仅当 DMA 已预取一个 DR halfword、TXE 为低、经过至少三个真实微秒 tick 和三个外设时钟，且 CK／WS 仍空闲时，slave TX 才进入 `ACTIVE`。冻结时间或丢失通道边界不能授权 master 开始输出时钟。仅在观测到 `ACTIVE` 后启动独立 owner 的 master。IRQ 锁存完成和错误，不创建 worker 或 scheduler。"
 
-#: docs/design/f407-i2s2-slave-tx.md:77
-msgid ""
-"The selected normal Platform startup assumes cold reset with no foreign "
-"running peripheral or bus master. It establishes the fixed clock and TIM2 "
-"epoch and holds GPIOB/DMA1 gates for the Platform lifetime. Clock-gating does"
-" not prove that a retained DMA engine is reset; attachment to unknown gated "
-"or running HAL state is unsupported."
-msgstr ""
-"所选正常 Platform 启动以冷复位为前提，没有其他已在运行的外设或总线主设备。它建立固定时钟和 TIM2 时间域，并在 Platform "
-"生命周期内持有 GPIOB/DMA1 门控。时钟门控状态不能证明保留的 DMA 引擎已经复位；不支持附着到未知门控状态或正在运行的 HAL 状态。"
+msgid "Drain before returning storage"
+msgstr "归还存储前排空"
 
-#: docs/design/f407-i2s2-slave-tx.md:83
-msgid ""
-"Transmitter initialization requires both shared gates already on. It owns the"
-" SPI2 gate, the SPI2/I2S2 personality, its selected pad fields and both "
-"vectors until successful transmitter stop. It never opens or withdraws "
-"GPIOB/DMA1 gates, resets the whole DMA controller or changes neighboring "
-"stream/pin state. Platform tracks its attempted gate additions before writes,"
-" preserves preexisting gates and retains cleanup responsibility if rollback "
-"fails."
-msgstr ""
-"发送器初始化要求两个共享门控已经开启。它拥有 SPI2 门控、SPI2/I2S2 模式、所选引脚字段及两个向量，直至发送器成功停止。它从不打开或撤回 "
-"GPIOB/DMA1 门控，不复位整个 DMA 控制器，也不改变相邻 stream／引脚状态。Platform "
-"在写入前记录所尝试添加的门控，保留预先存在的门控，并在回滚失败时继续承担清理责任。"
+msgid "DMA TC and NDTR zero prove memory transfer progress. Final access additionally requires TX requests off, DMA disabled, a fresh TXE observation followed by a fresh BSY-clear observation, I2SE disabled with readback, both actual IRQ observers withdrawn, and DMA addresses cleared. A later refused address or IRQ withdrawal retains the already established wire proof while preserving the borrow."
+msgstr "DMA TC 和 NDTR 为零仅证明内存传输进度。最终访问还要求撤销 TX requests、禁用 DMA、依次取得新的 TXE 和 BSY-clear 观测、禁用 I2SE 并回读、撤回两个真实 IRQ observer，并清空 DMA 地址。随后地址或 IRQ 撤回被拒绝时，保留已成立的 wire proof，同时继续保留借用。"
 
-#: docs/design/f407-i2s2-slave-tx.md:90
-msgid ""
-"One privileged unmasked task serializes initialization and every method. "
-"Concurrent Platform stop, reset/reclock/debugger writers and competing DMA, "
-"vector or pin owners are excluded. Failed calls do not authorize storage "
-"reuse. Stop and join the transmitter and every other shared-domain user, "
-"including external HAL users, before Platform stop withdraws its added gates "
-"or ends the TIM2 epoch. Old deadlines cannot cross Platform stop/restart."
-msgstr ""
-"一个未设置中断屏蔽的特权任务串行执行初始化和每个方法。排除并发 Platform stop、复位／重新配置时钟／调试器写入者，以及竞争 "
-"DMA、向量或引脚的所有者。调用失败不授权复用存储。在 Platform stop 撤回其添加的门控或结束 TIM2 时间域前，先停止并 join "
-"发送器及所有其他共享域用户，包括外部 HAL 用户。旧的绝对截止时间不能跨越 Platform stop/restart。"
+msgid "Cancellation and an absolute deadline initiate drain. If the external master stops while DR or the shift register contains a word, drain can remain blocked. The request becomes `QUARANTINED`; failed stop never authorizes reuse. A failed DMA-request setup before any I2SE attempt can clean up without inventing a TXE proof. An unconfirmed I2SE enable attempt retains the possible wire duty."
+msgstr "取消和绝对 deadline 发起排空。若外部 master 在 DR 或移位寄存器仍有字时停止，排空可持续阻塞。请求进入 `QUARANTINED`；stop 失败不授权复用。在尚未尝试 I2SE 前，DMA-request 设置失败可清理，无须编造 TXE 证明。不能确认 I2SE enable 的尝试仍保留可能的线上责任。"
 
-#: docs/design/f407-i2s2-slave-tx.md:97
-msgid "Accept the frame before arming the master"
-msgstr "先接受帧，再允许主机开始"
+msgid "Platform close first revokes new admission, then cancels and joins the current request. Refused wire, DMA, IRQ, address or resource withdrawal prevents Platform from ending the System/time domain. The owner preserves shared DMA1 gates, neighboring streams and pads; it never resets the shared DMA controller. A clock/reset/timebase history loss permanently quarantines the old borrow. Restarting the clock does not recreate its completion history."
+msgstr "Platform close 先撤销新准入，再取消当前请求并等待其彻底排空（join）。wire、DMA、IRQ、地址或资源撤回被拒绝时，Platform 不得结束 System／时间域。owner 保留共享 DMA1 gate、相邻 streams 和引脚，不复位共享 DMA controller。丢失 clock／reset／timebase 历史会永久隔离旧借用。重新启动时钟不能重建其完成历史。"
 
-#: docs/design/f407-i2s2-slave-tx.md:99
-msgid ""
-"![FIG-30: exact finite I2S2 ownership, arm handshake and final-access "
-"proof](../assets/diagrams/f407-i2s2-slave-tx.svg)"
-msgstr ""
-"![FIG-30：精确有限 I2S2 的所有权、使能握手及最终访问证明](../assets/diagrams/f407-i2s2-slave-"
-"tx.svg)"
+msgid "Software evidence and limits"
+msgstr "软件证据与限制"
 
-#: docs/design/f407-i2s2-slave-tx.md:99
-msgid ""
-"FIG-30: exact finite I2S2 ownership, arm handshake and final-access proof"
-msgstr "FIG-30：精确有限 I2S2 的所有权、使能握手及最终访问证明"
+msgid "The maintained host program exercises the real C11 owner at independent MMIO, IRQ, time and memory boundaries, including cancellation, failed stop, late IRQ, geometry, exact loan identity, counter bounds and inaccessible settled controls. ARM fixtures link both exact parts through the public factory and Platform path. These checks establish software behavior and selected linking only. External clock timing, codec operation, electrical limits and concurrent DMA throughput require physical execution."
+msgstr "维护中的主机程序在独立 MMIO、IRQ、time 和 memory 边界直接执行真实 C11 owner，覆盖取消、stop 失败、迟到 IRQ、几何、精确 loan 身份、计数范围和已 SETTLED control 不可访问。ARM 夹具通过公共 factory 和 Platform 路径链接两个精确型号。这些检查只建立软件行为与所选链接证据。外部时钟时序、codec 工作、电气界限和并发 DMA 吞吐仍需物理执行。"
 
-#: docs/design/f407-i2s2-slave-tx.md:101
-msgid ""
-"**FIG-30 is a reference lifecycle for this exact role.** Solid arrows show "
-"required order or a named branch; dashed arrows show retained responsibility "
-"and bounded retry. It is based on the public header, provider and selected "
-"System implementation linked below. It establishes neither physical clock "
-"silence nor hardware qualification."
-msgstr ""
-"**FIG-30 是这个精确角色的参考生命周期。** "
-"实线表示必需顺序或已标明的分支；虚线表示保留责任及有界重试。其依据是下方链接的公共头文件、provider 和所选 System "
-"实现。它不证明物理时钟持续静止或硬件资格。"
+msgid "![FIG-06: request borrowing, drain and final settlement](../assets/diagrams/request-lifecycle.svg)"
+msgstr "![FIG-06：请求借用、排空与最终结清](../assets/diagrams/request-lifecycle.svg)"
 
-#: docs/design/f407-i2s2-slave-tx.md:107
-msgid ""
-"Hold CK continuously LOW and WS HIGH before initialization and submission, "
-"and keep them there until acquire-observed ACTIVE. Register pin reads sample "
-"instants; the caller's master coordination establishes the continuous quiet "
-"interval. Each normal restart begins with the left channel."
-msgstr ""
-"在初始化和提交之前开始，持续保持 CK 为 LOW、WS 为 HIGH，直到以 acquire 语义观察到 "
-"ACTIVE。寄存器中的引脚读数只反映采样瞬间；连续的静止间隔必须由调用方协调外部主机来保证。每次正常重新启动都从左声道开始。"
+msgid "![FIG-31: current F4 source ownership and public call boundaries](../assets/diagrams/driver-source-ownership.svg)"
+msgstr "![FIG-31：当前 F4 源码归属与公共调用边界](../assets/diagrams/driver-source-ownership.svg)"
 
-#: docs/design/f407-i2s2-slave-tx.md:111
-msgid ""
-"Start Platform successfully, then initialize fresh transmitter storage with "
-"the stable face and a positive `poll_limit`. Initialization can retain "
-"cleanup responsibility on IO; keep its storage live and call stop."
-msgstr ""
-"先成功启动 Platform，再使用地址稳定的接口对象和正值 `poll_limit` 初始化全新的发送器存储。初始化返回 IO "
-"时可能仍保留清理责任；必须保持其存储有效，并调用 stop。"
+msgid "FIG-06: request borrowing, drain and final settlement"
+msgstr "FIG-06：请求借用、排空与最终结清"
 
-#: docs/design/f407-i2s2-slave-tx.md:114
-msgid ""
-"Build the complete contiguous frame with the ordinary stream/frame helpers "
-"and acquire its original `nx_frame_dma_loan_t`. Initialize and prepare the "
-"request with an absolute deadline in the current live TIM2 epoch, and assign "
-"that loan to its `source`. Controls must be correctly aligned, live and "
-"disjoint from every full-capacity pool slot, including unused payload tails."
-msgstr ""
-"使用常规 stream/frame 辅助函数构建完整、连续的帧，并取得其原始 `nx_frame_dma_loan_t`。在当前有效 TIM2 "
-"时间纪元内，使用绝对截止时间初始化并准备请求，再将该借用赋给请求的 "
-"`source`。控制对象必须正确对齐、始终有效，且与池中每个槽位的完整容量范围互不重叠，包括未使用的负载尾部。"
+msgid "FIG-31: current F4 source ownership and public call boundaries"
+msgstr "FIG-31：当前 F4 源码归属与公共调用边界"
 
-#: docs/design/f407-i2s2-slave-tx.md:119
-msgid ""
-"Submit through the face. Rejection retains no request or frame reference and "
-"introduces no submission hardware effect. `NX_SUCCESS` means ACCEPTED: the "
-"exact whole-frame loan and request are borrowed. The provider publishes "
-"QUEUED before the first read-clear SR observation or possible DMA prefetch. "
-"Initialization separately owns cleanup before its SR reads."
-msgstr ""
-"通过接口对象提交请求。拒绝接纳时，不保留任何请求或帧引用，也不会产生提交所导致的硬件效果。`NX_SUCCESS` 表示 "
-"ACCEPTED：该确切的完整帧借用及请求均已被借用。提供方会先发布 QUEUED，再进行请求路径中的首次读清除型 SR 观察或允许任何可能的 DMA "
-"预取。初始化则在读取 SR 之前，单独取得相应的清理责任。"
-
-#: docs/design/f407-i2s2-slave-tx.md:124
-msgid ""
-"Submission runs bounded arming synchronously. It programs the full halfword "
-"count, enables DMA, then TXDMAEN, then I2SE. ACTIVE requires observed I2SE "
-"enable, one prefetched DR halfword (`NDTR = N - 1`, `TXE = 0`) and at least "
-"three actual 1 MHz TIM2 ticks after enable readback. `BSY = 0` is not an arm "
-"prerequisite. A CPU polling count is not elapsed time. The return state may "
-"already be ACTIVE or DRAINING; QUEUED and ACCEPTED alone never authorize CK."
-msgstr ""
-"提交过程同步执行有界的就绪准备。它先写入完整的半字计数，再依次启用 DMA、TXDMAEN 和 I2SE。发布 ACTIVE 前，必须观察到 I2SE "
-"已启用、DR 已预填充一个半字（`NDTR = N - 1`、`TXE = 0`），并在启用读回后观察到至少三个实际的 1 MHz TIM2 "
-"计数推进。`BSY = 0` 不是就绪准备的前提条件。CPU 轮询次数不表示经过的时间。返回时请求可能已经处于 ACTIVE 或 DRAINING；仅有 "
-"QUEUED 或 ACCEPTED 绝不允许开始提供 CK。"
-
-#: docs/design/f407-i2s2-slave-tx.md:130
-msgid ""
-"Only acquire-observed ACTIVE authorizes the master to clock the declared "
-"complete stereo frames. The master must stop before requesting a missing next"
-" word. The same task calls `service` to observe completion, errors and "
-"deadline expiry and to progress drain. No provider IRQ advances the request."
-msgstr ""
-"只有以 acquire 语义观察到 ACTIVE，才允许主机为所声明的完整立体声帧提供时钟。主机必须在需要下一个尚未提供的数据字之前停止。由同一个任务调用"
-" `service`，观察完成状态、错误和截止时间到期，并推进排空。提供方不通过 IRQ 推进请求。"
-
-#: docs/design/f407-i2s2-slave-tx.md:135
-msgid ""
-"An SR read clears UDR/FRE, so each request-path observation occurs after "
-"acceptance and preserves any fault as the first operation error. A later "
-"clean read or late DMA completion cannot turn that error into success. The "
-"absolute deadline covers the whole operation, including wire and final "
-"address/vector withdrawal. Arming observation-budget exhaustion can also "
-"produce TIMEOUT; it does not prove that a particular duration elapsed. "
-"`poll_limit` bounds each observation loop and never guarantees progress by an"
-" external master."
-msgstr ""
-"SR 读取会清除 UDR/FRE，因此每次请求路径中的观察都发生在接受之后，并将任何故障保留为本操作的首个错误。后续干净的读取或迟到的 DMA "
-"完成都不能将错误变成成功。绝对截止时间覆盖整个操作，包括线上排空及最终地址／向量撤回。使能观察预算耗尽也可能产生 "
-"TIMEOUT；这不证明已经经过某个特定时长。`poll_limit` 限定每个观察循环，从不保证外部主机取得进展。"
-
-#: docs/design/f407-i2s2-slave-tx.md:143
-msgid "Prove final access before releasing storage"
-msgstr "归还存储前证明最终访问"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid "Observation or stage"
-msgstr "观察结果或阶段"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid "Required action and remaining responsibility"
-msgstr "所需操作与仍须承担的责任"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid "Normal `TCIF` and `NDTR = 0`"
-msgstr "正常的 `TCIF` 与 `NDTR = 0`"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid ""
-"Memory-count completion only. Keep the request and frame borrowed. Software "
-"DMA disable can also set TCIF with a nonzero count."
-msgstr "这只能证明内存计数完成。继续保留对请求和帧的借用。软件禁用 DMA 也可能在计数非零时置位 TCIF。"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid "Cancel, timeout or failure"
-msgstr "取消、超时或失败"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid ""
-"Preserve the first error and enter DRAINING; every error/cancellation reports"
-" zero transferred bytes."
-msgstr "保留首个错误并进入 DRAINING；任何错误或取消均报告零传输字节。"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid "Engine withdrawal"
-msgstr "DMA 引擎撤回"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid ""
-"Clear TXDMAEN and DMA EN with readback before relying on serializer drain. A "
-"failed clear retains the borrow."
-msgstr "清除 TXDMAEN 和 DMA EN 并完成读回确认，然后才能依据串行发送器的排空状态继续。清除失败时仍保留借用。"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid "Any I2SE enable attempt"
-msgstr "任何 I2SE 启用尝试"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid ""
-"Observe `TXE = 1`, then a separate fresh `BSY = 0`, before clearing I2SE with"
-" readback. An ignored enable write is still an attempted enable."
-msgstr ""
-"先观察到 `TXE = 1`，再通过另一次新的读取观察到 `BSY = 0`，之后才能清除 I2SE "
-"并读回确认。即使启用写入被忽略，也仍属于一次启用尝试。"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid "No I2SE attempt"
-msgstr "未尝试启用 I2SE"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid ""
-"An accepted early setup failure may prove engine and reference withdrawal "
-"without waiting for serializer flags."
-msgstr "对于已被接受、但在早期设置阶段失败的请求，可以在不等待串行发送器标志的情况下证明 DMA 引擎和引用已撤回。"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid "Serializer already proved quiet"
-msgstr "已证明串行发送器空闲"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid ""
-"Preserve that proof across later cleanup retries; do not demand TXE again "
-"from disabled I2S."
-msgstr "在之后的清理重试中保留该证明；不要再次要求已禁用的 I2S 给出 TXE。"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid "Reference withdrawal"
-msgstr "引用撤回"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid ""
-"Clear stream configuration, addresses/count and flags; withdraw and prove "
-"disabled, not pending and inactive vectors."
-msgstr "清除 DMA 流配置、地址、计数和标志；撤回中断向量，并证明它们已禁用、无挂起且不处于活动状态。"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid "Every proof joined"
-msgstr "所有证明均已汇合"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid ""
-"Detach provider references, release the original whole-frame loan, then "
-"release-publish SETTLED as the final request access."
-msgstr "解除提供方持有的引用，归还原始完整帧借用，然后以 release 语义发布 SETTLED，作为对请求的最终访问。"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid "Missing proof"
-msgstr "证明不足"
-
-#: docs/design/f407-i2s2-slave-tx.md:55
-msgid ""
-"Retain QUARANTINED storage. A drain-loop bound can return BUSY; timeout, TC "
-"or a zero DMA count never substitutes for final access."
-msgstr "保留处于 QUARANTINED 的存储。排空循环达到次数上限时可以返回 BUSY；超时、TC 或 DMA 计数为零都不能替代最终访问证明。"
-
-#: docs/design/f407-i2s2-slave-tx.md:157
-msgid ""
-"Acquire-observe SETTLED before reading the terminal result or reusing the "
-"request and frame storage. Successful completion reports the full submitted "
-"byte count. Error and cancellation report zero; a DMA count cannot establish "
-"serialized audio bytes. Join external observers before their own storage is "
-"reused. While stop has not closed admission, successful request settlement "
-"keeps the initialized transmitter ready for another separately prepared "
-"block; it does not release its physical role."
-msgstr ""
-"先以 acquire 观察 SETTLED，再读取终结结果或复用请求及帧存储。成功完成报告全部提交字节数。错误和取消报告零；DMA "
-"计数不能证明串行音频字节数。复用外部观察者自身存储前，先 join 这些观察者。只要 stop "
-"尚未关闭准入，请求成功结清后，已初始化的发送器就可接受另行准备的下一块；结清不归还其物理角色。"
-
-#: docs/design/f407-i2s2-slave-tx.md:165
-msgid ""
-"With CK idle after prefill, DR cannot empty. Cancellation therefore retains "
-"the loan until the product coordinates enough drain clocks for the actual TXE"
-" and fresh BSY proof. This error drain may underrun or produce "
-"partial/invalid audio; it does not promise a complete stereo frame. Keep the "
-"first failure and restart later only at the left channel. Continuing "
-"`service` or `stop` through the same owner can retry a stalled-clock cleanup "
-"while its hardware/time history remains known."
-msgstr ""
-"预填充后 CK 保持静止时，DR 无法清空。因此，取消仍保留借用，直至产品协调足够的排空时钟，实际证明 TXE 及新鲜 BSY "
-"条件。这种错误排空可能欠载或产生部分／无效音频，不保证完整 stereo "
-"帧。保留首个失败，之后重启只能从左声道开始。只要硬件／时间历史仍已知，就可通过同一所有者继续调用 `service` 或 "
-"`stop`，重试时钟停滞后的清理。"
-
-#: docs/design/f407-i2s2-slave-tx.md:173
-msgid ""
-"Observed reset, shared-gate/clock-profile loss or invalid time history while "
-"borrowed permanently quarantines this instance and its loan. Restoring reset-"
-"looking registers cannot establish prior final access. There is no reset or "
-"recovery API that revokes that borrow. A product owns the response to an "
-"unrecoverable controller/master failure."
-msgstr ""
-"借用期间观察到复位、共享门控／时钟配置丢失或无效时间历史，会使本实例及其借用永久隔离。将寄存器恢复为看似复位的状态，不能证明此前的最终访问。不存在撤销该借用的复位或恢复"
-" API。产品负责应对无法恢复的控制器／主机故障。"
-
-#: docs/design/f407-i2s2-slave-tx.md:179
-msgid ""
-"`stop` closes admission and requests cancellation. Repeat it after service "
-"has proved any outstanding cleanup. Only successful transmitter stop returns "
-"the selected pads/SPI2 personality and SPI2 gate; shared GPIOB/DMA1 gates "
-"remain for Platform users. Failed stop retains every unfinished borrow and "
-"owned effect."
-msgstr ""
-"`stop` 关闭准入并请求取消。在 service 确认剩余清理已完成后，再次调用 stop。只有发送器成功停止才归还所选引脚／SPI2 模式及 "
-"SPI2 门控；共享 GPIOB/DMA1 门控仍留给 Platform 用户。失败的 stop 保留每个未结束的借用及已拥有的效果。"
-
-#: docs/design/f407-i2s2-slave-tx.md:184
-msgid "Assess the current evidence"
-msgstr "判断当前证据"
-
-#: docs/design/f407-i2s2-slave-tx.md:186
-msgid ""
-"Normal ARM builds passed for the selected VE and ZG I2S2 configurations and "
-"the omitted default. Scoped Native and selection tests, SDK/release checks, "
-"retention checks and both corrected caller-face audits also passed. One "
-"relocated, nonpublishable development Source SDK passed export, rename, "
-"verification, a public C11 consumer link, the selected-image audit and "
-"reverification; this covered one VE image. The [source-bound "
-"evidence](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/testing/evidence/f407-i2s2-20261020/README.md) records full-"
-"image resources rather than isolated driver cost. This is partial development"
-" evidence: it does not qualify the full v10 matrix, clean main, formal/OCI "
-"delivery or physical HIL. The API and full-site build receipts and the final "
-"commit gate must be assessed separately. Original strict Wshadow and harness-"
-"setup failures are retained separately from functional TDD."
-msgstr ""
-"选入 I2S2 的 VE、ZG 配置以及未选入 I2S2 的默认配置均已通过普通 ARM 构建。限定范围内的 Native "
-"与选择测试、SDK／交付工具检查、retention 检查，以及修正后的两项调用者接口审计也均已通过。一个经移动路径的不可发布开发版 Source SDK"
-" 已通过导出、更名、验证、公共 C11 consumer 链接、所选镜像审计及再次验证；该 SDK 检查仅覆盖一个 VE "
-"镜像。[源码绑定证据](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/testing/evidence/f407-i2s2-20261020/README.md)记录完整镜像资源，不代表独立驱动成本。这些是部分开发证据，不能据此认定完整"
-" v10 矩阵、clean main、正式／OCI 交付或物理 HIL 已取得资格。API 与全站构建收据，以及最终提交门禁，必须分别评估。原有严格 "
-"Wshadow 与测试夹具准备失败记录继续保留，并与功能 TDD 分列。"
-
-#: docs/design/f407-i2s2-slave-tx.md:199
-msgid ""
-"The normal public-consumer source is [f407-i2s2-slave-"
-"tx.c](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-"
-"tx.c). It links public construction and whole-frame ownership paths; linking "
-"does not execute those calls. It is not an external clock source or a "
-"completed hardware tutorial. No physical execution or valid audio result is "
-"claimed. Continuous DBM, gapless replay, SAI/PDM, other "
-"formats/pads/parts/backends and physical HIL remain open under IO-41."
-msgstr ""
-"正常公共消费者源码为 [f407-i2s2-slave-tx.c](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-"
-"tx.c)。它链接公共构造和完整帧所有权路径；链接不会执行这些调用。它不是外部时钟源，也不是已完成的硬件教程。不宣称已执行物理运行或获得有效音频结果。连续"
-" DBM、无间隙重放、SAI/PDM、其他格式／引脚／料号／后端及物理 HIL 在 IO-41 下仍开放。"
-
-#: docs/design/f407-i2s2-slave-tx.md:207
-msgid ""
-"The hardware sequence follows RM0090 Rev22 sections 28.4.6–28.4.8 and "
-"10.3.13–10.3.14, with DS8626 electrical requirements and the pinned ES0182 "
-"scope. The SPI-only BSY erratum workaround is not substituted for the I2S "
-"shutdown sequence. Source identities are maintained in [the F407 reference "
-"manifest](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f4/references.json)."
-msgstr ""
-"硬件顺序遵循 RM0090 Rev22 第 28.4.6–28.4.8 节及第 10.3.13–10.3.14 节，同时以 DS8626 "
-"的电气要求及锁定的 ES0182 适用范围为约束。不以仅适用于 SPI 的 BSY 勘误规避方法替代 I2S 停止顺序。来源身份维护于 [F407 "
-"参考清单](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f4/references.json)。"
-
-#: docs/design/f407-i2s2-slave-tx.md:213
-msgid ""
-"See the [public contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-"
-"SOURCE/components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h),"
-" [real provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f4/drivers/i2s2_slave_tx.c), [selected System "
-"lifecycle](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f4/private/stm32f407_system.h), [frame ownership "
-"contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/io/include/nexus/io/frame_stream.h) and [qualification "
-"boundaries](../delivery/qualification.md)."
-msgstr ""
-"参见[公共合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h)、[真实"
-" provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f4/drivers/i2s2_slave_tx.c)、[所选 System "
-"生命周期](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f4/private/stm32f407_system.h)、[帧所有权合同](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/io/include/nexus/io/frame_stream.h)及[资格边界](../delivery/qualification.md)。"
+msgid "The shared source diagram distinguishes build inputs from runtime calls. The sections below define this finite slave TX mode's external-clock handshake, buffer borrowing and complete withdrawal; the diagram establishes no physical qualification."
+msgstr "共享源码图区分构建输入与运行期调用。下文定义此有限 slave TX 模式的外部时钟握手、缓冲借用和完整退出；图示不建立物理资格。"

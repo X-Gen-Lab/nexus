@@ -26,6 +26,7 @@ typedef struct {
     nx_timer_edge_t edge;
     uint8_t filter;
     bool exclusive;
+    uint8_t channel; /**< Exact TI1--TI4 input selected by the Board route. */
 } nx_timer_capture_config_t;
 /**
  * \brief Exact caller storage; zero initialize and never mutate internals.
@@ -68,6 +69,7 @@ typedef struct {
     bool idle_high;
     bool idle_complement_high;
     bool exclusive;
+    uint8_t channel; /**< Exact CH1--CH3 complementary pair, never CH4. */
 } nx_advanced_pwm_config_t;
 /**
  * \brief Static selected-mode control; default PWM storage is unchanged.

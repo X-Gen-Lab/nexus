@@ -45,7 +45,8 @@ def validate_interrupt_profile(profile, provider):
 
 
 
-def validate_selection(selection, route, provider, ram_size):
+def validate_selection(selection, route, provider, ram_size, *, clock=None,
+                       clock_plan=None):
     """One maintained mode has one bounded, explicit configuration contract."""
     kind = route["kind"]
     contract = CONTROLLER_CONTRACTS.get(kind)
@@ -56,7 +57,7 @@ def validate_selection(selection, route, provider, ram_size):
     unknown = selection.keys() - {"id", "binding", "mode"} - fields
     if contract is None or unknown:
         fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")
-    electrical = {"pull", "output_type"} & selection.keys()
+    electrical = {"pull", "output_type", "speed"} & selection.keys()
     if electrical:
         if (kind not in {"gpio", "exti"} or
                 not getattr(provider, "PIN_ELECTRICAL", False) or
@@ -70,26 +71,40 @@ def validate_selection(selection, route, provider, ram_size):
                 fail(f"Unsupported {kind} {field}")
         if "output_type" in selection and selection["mode"] != "output":
             fail("GPIO output_type requires output mode")
+    if kind == "gpio":
+        from tools.configure import gpio_electrical
+        gpio_electrical.validate_speed(selection, route)
     if kind == "lptim":
         timer_advanced.validate_lptim_selection(selection)
+    if kind == "i2c_target":
+        from tools.configure import i2c_target
+        i2c_target.validate(selection, route)
     if kind == "rtc":
         from tools.configure import rtc
         rtc.validate_selection(selection)
     if kind in {"timer_capture", "advanced_pwm"}:
         from tools.configure import timer_advanced
-        timer_advanced.validate_selection(selection, route, provider)
+        timer_advanced.validate_selection(selection, route, provider,
+                                           clock_plan=clock_plan)
     elif kind in {"eth", "eth_frames"}:
         from tools.configure import ethernet
         ethernet.validate_selection(selection, route, provider, ram_size)
     elif kind == "usb_device":
         from tools.configure import usb_device
         usb_device.validate_selection(selection, route, provider, ram_size)
+    elif kind == "usb_host":
+        from tools.configure import usb_host
+        usb_host.validate_selection(selection, route, provider)
     elif kind == "can":
         from tools.configure import can
-        can.validate_selection(selection, provider, ram_size)
+        can.validate_selection(selection, provider, ram_size,
+                               clock_hz=clock["apb1_hz"] if clock else None)
     elif kind == "uart":
         from tools.configure import uart_formats
         uart_formats.validate_selection(selection, route, provider, ram_size)
+    elif kind == "spi":
+        from tools.configure import spi_frames
+        spi_frames.validate(selection, route, provider)
     elif kind == "exti":
         from tools.configure import exti
         exti.validate_selection(selection, ram_size)
@@ -99,6 +114,12 @@ def validate_selection(selection, route, provider, ram_size):
     elif kind == "adc":
         from tools.configure import adc
         adc.validate_selection(selection, route, provider)
+    elif kind == "dac":
+        from tools.configure import dac
+        dac.validate_selection(selection, route, provider)
+    elif kind == "watchdog":
+        if selection["mode"] != "window" and "window_ticks" in selection:
+            fail("window_ticks requires the window watchdog mode")
     elif kind == "i2c":
         from tools.configure import i2c_timing_selection
         i2c_timing_selection.validate_selection(selection, provider)
@@ -145,7 +166,16 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
     the enclosing graph and never published as a second configuration result.
     """
     mode = selection["mode"]
+    if route["kind"] in {"usb_device", "usb_host"}:
+        from tools.configure import usb_host
+        usb_host.validate_clock(route["controller"], clock["core_hz"])
     resolved_timing = None
+    if route["kind"] == "uart" and selection["mode"] == "irq-wire":
+        from tools.configure import uart_wires
+        uart_wires.validate_clock(selection, route, clock)
+    if route["kind"] == "spi":
+        from tools.configure import spi_frames
+        spi_frames.validate_clock(selection, route, clock)
     if route["kind"] == "i2c":
         from tools.configure import i2c_timing_selection
         resolved_timing = i2c_timing_selection.resolve(
@@ -169,6 +199,14 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
         **({"stream_resolution": resolved_stream}
            if resolved_stream is not None else {}),
         **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})}
+    if route["kind"] in {"capture", "audio"}:
+        resolver = getattr(provider, "capture_audio_fields", None)
+        if resolver is None:
+            fail("Selected provider has no camera/audio owner")
+        result.update(resolver(selection, route, clock, clock_plan))
+    if route["kind"] in {"pwm_group", "timer_pulse", "timer_sequence"} and provider.PREFIX == "stm32":
+        from tools.configure.stm32f4 import waveform
+        result["waveform_resolution"] = waveform.resolve_fields(selection, route, clock)
     result.update(provider.mode_fields(
         selection, route, clock_profile=clock_profile))
     if route["kind"] == "can_fd":

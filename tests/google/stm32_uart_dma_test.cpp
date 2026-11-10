@@ -18,6 +18,8 @@ extern "C" {
 #include "nexus/io/native/model.h"
 #include <gtest/gtest.h>
 
+GPIO_TypeDef g_nx_stm32_gpioa_model;
+
 static bool s_hold_dma_enable;
 static bool s_error_at_disable;
 static bool s_error_at_ack;

@@ -1,4 +1,4 @@
-"""Exact extra UARTs keep APB, vector and no-DMA admission independent."""
+"""Exact UARTs keep APB, vector and DMA resource admission independent."""
 from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError
 import json
@@ -27,13 +27,152 @@ class F407UartInstanceTests(unittest.TestCase):
                 with self.assertRaises(FrozenInstanceError):
                     selected.apb = 3 - apb
 
-    def test_new_irq_routes_do_not_authorize_an_unreviewed_dma_path(self):
-        for controller in ("USART3", "UART4", "UART5", "USART6"):
-            for mode in ("dma-tx", "rx-dma-idle", "rx-dma-continuous",
+    def test_all_receive_routes_use_the_reviewed_stream_and_selector(self):
+        for name, engine, tx, rx, channel in (
+                ("USART1", 2, 7, 2, 4), ("USART2", 1, 6, 5, 4),
+                ("USART3", 1, 3, 1, 4), ("UART4", 1, 4, 2, 4),
+                ("UART5", 1, 7, 0, 4), ("USART6", 2, 6, 1, 5)):
+            for mode in ("rx-dma-idle", "rx-dma-continuous",
                          "dma-duplex", "dma-duplex-continuous"):
-                with self.subTest(controller=controller, mode=mode):
-                    selected = hardware.maintained('stm32f4', controller)
-                    self.assertIsNone(selected.dma(mode))
+                with self.subTest(controller=name, mode=mode):
+                    routes = ((engine, rx, channel),)
+                    if mode.startswith("dma-duplex"):
+                        routes = ((engine, tx, channel),) + routes
+                    self.assertEqual(hardware.maintained('stm32f4', name).dma(mode),
+                                     routes)
+
+    def test_all_six_finite_dma_transmitters_generate_their_exact_static_route(self):
+        routes = (("USART1", "usart1-pa9-pa10", 2, 7, 4),
+                  ("USART2", "usart2-pa2-pa3", 1, 6, 4),
+                  ("USART3", "usart3-pb10-pb11", 1, 3, 4),
+                  ("UART4", "uart4-pa0-pa1", 1, 4, 4),
+                  ("UART5", "uart5-pc12-pd2", 1, 7, 4),
+                  ("USART6", "usart6-pc6-pc7", 2, 6, 5))
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            board = gate.load(gate.ROOT /
+                              "boards/stm32f407_qiming_v31/board.json")
+            board["id"] = "six-uart-dma-software-fixture"
+            board["provenance"] = []
+            board["unknowns"] = ["Software pad fixture; no PCB or HIL claim"]
+            for part in ("STM32F407VET6", "STM32F407ZGT6"):
+                for backend in ("baremetal", "freertos"):
+                    for controller, route, engine, stream, channel in routes:
+                        with self.subTest(part=part, backend=backend,
+                                          controller=controller):
+                            board["soc"] = part
+                            board["bindings"] = [{"id": "serial", "controller": controller,
+                                                  "route": route}]
+                            (directory / "board.json").write_text(json.dumps(board))
+                            assembly = directory / "assembly.toml"
+                            assembly.write_text(
+                                'schema=2\nboard_package="."\nbackend=' + json.dumps(backend) +
+                                '\nclock="hse8-pll168"\noptimization="Os"\n'
+                                '[memory]\nmain_stack_bytes=2048\nlibc_heap_bytes=0\n'
+                                'flash_load_limit_bytes=65536\nstatic_ram_limit_bytes=32768\n'
+                                '[uart.serial]\nbinding="serial"\nmode="dma-tx"\n'
+                                'baud=115200\n[uart.serial.rx]\nformat="events"\ncapacity=2\n'
+                                '[uart.serial.irq]\npriority=5\ncalls_os=false\n')
+                            result = gate.resolve_ir(assembly)
+                            selected, = result.controllers
+                            self.assertEqual([(lane.engine, lane.lane, lane.request)
+                                              for lane in selected.integration.dma],
+                                             [(f"DMA{engine}", stream, channel)])
+                            source = bindings.emit(result)[1]
+                            self.assertIn("nx_stm32_uart_hal_cold_prepare", source)
+                            self.assertIn(f"DMA{engine}_Stream{stream}_IRQHandler", source)
+                            self.assertIn(f"{stream}u, {channel}u", source)
+
+    def test_six_dma_receivers_generate_each_public_mode(self):
+        source = gate.ROOT / "tests/contracts/multi_controller_assembly"
+        cases = (("USART1", "primary-uart", 2, 7, 2, 4),
+                 ("USART2", "secondary-uart", 1, 6, 5, 4),
+                 ("USART3", "usart3", 1, 3, 1, 4),
+                 ("UART4", "uart4", 1, 4, 2, 4),
+                 ("UART5", "uart5", 1, 7, 0, 4),
+                 ("USART6", "usart6", 2, 6, 1, 5))
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            for board_name in ("stm32-ve-board", "stm32-zg-board"):
+                board = gate.load(source / board_name / "board.json")
+                (directory / "board.json").write_text(json.dumps(board))
+                for backend in ("baremetal", "freertos"):
+                    for mode in ("rx-dma-idle", "rx-dma-continuous",
+                                 "dma-duplex", "dma-duplex-continuous"):
+                        with self.subTest(board=board_name, backend=backend,
+                                          mode=mode):
+                            text = ('schema=2\nboard_package="."\nbackend=' +
+                                    json.dumps(backend) +
+                                    '\nclock="hse8-pll168"\noptimization="Os"\n'
+                                    '[memory]\nmain_stack_bytes=2048\n'
+                                    'libc_heap_bytes=0\n'
+                                    'flash_load_limit_bytes=65536\n'
+                                    'static_ram_limit_bytes=32768\n')
+                            for _, binding, *_ in cases:
+                                text += (f'[uart.{binding}]\nbinding="{binding}"\n'
+                                         f'mode="{mode}"\nbaud=115200\n'
+                                         f'[uart.{binding}.rx]\nformat="blocks"\n'
+                                         f'[uart.{binding}.irq]\npriority=5\n')
+                            assembly = directory / "assembly.toml"
+                            assembly.write_text(text)
+                            result = gate.resolve_ir(assembly)
+                            self.assertEqual(len(result.controllers), 6)
+                            generated = bindings.emit(result)[1]
+                            for name, _, engine, tx, rx, channel in cases:
+                                item = next(x for x in result.controllers
+                                            if x.controller == name)
+                                expected = [(f"DMA{engine}", rx, channel)]
+                                if mode.startswith("dma-duplex"):
+                                    expected.insert(0, (f"DMA{engine}", tx, channel))
+                                self.assertEqual(
+                                    [(x.engine, x.lane, x.request)
+                                     for x in item.integration.dma], expected)
+                                self.assertIn(f"DMA{engine}_Stream{rx}_IRQHandler",
+                                              generated)
+                            self.assertNotIn("HAL_UART", generated)
+
+    def test_all_six_irq_words_and_blocks_are_static_non_dma_profiles(self):
+        fixtures = gate.ROOT / "tests/contracts/multi_controller_assembly"
+        binding_names = ("primary-uart", "secondary-uart", "usart3",
+                    "uart4", "uart5", "usart6")
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            for part in ("ve", "zg"):
+                board = gate.load(fixtures / f"stm32-{part}-board/board.json")
+                (directory / "board.json").write_text(json.dumps(board))
+                for backend in ("baremetal", "freertos"):
+                    for mode in ("irq-words", "irq-blocks"):
+                        with self.subTest(part=part, backend=backend, mode=mode):
+                            text = ('schema=2\nboard_package="."\nbackend=' +
+                                    json.dumps(backend) +
+                                    '\nclock="hse8-pll168"\noptimization="Os"\n'
+                                    '[memory]\nmain_stack_bytes=2048\n'
+                                    'libc_heap_bytes=0\n'
+                                    'flash_load_limit_bytes=65536\n'
+                                    'static_ram_limit_bytes=32768\n')
+                            for i, binding in enumerate(binding_names, 1):
+                                text += (f'[uart.serial{i}]\nbinding="{binding}"\n'
+                                         f'mode="{mode}"\nbaud=115200\n'
+                                         f'[uart.serial{i}.rx]\n')
+                                if mode == "irq-words":
+                                    text += ('format="words"\ncapacity=4\n'
+                                             f'[uart.serial{i}.frame]\n'
+                                             'data_bits=9\nparity="none"\n'
+                                             'stop_bits=1\nflow="none"\n')
+                                else:
+                                    text += 'format="blocks"\n'
+                                text += f'[uart.serial{i}.irq]\npriority=5\n'
+                            assembly = directory / "assembly.toml"
+                            assembly.write_text(text)
+                            result = gate.resolve_ir(assembly)
+                            self.assertEqual(len(result.controllers), 6)
+                            for item in result.controllers:
+                                self.assertEqual(item.integration.dma, ())
+                            generated = bindings.emit(result)[1]
+                            self.assertNotIn("void DMA", generated)
+                            suffix = "word" if mode == "irq-words" else "stream"
+                            self.assertIn(f"nx_stm32_uart_{suffix}_cold_prepare",
+                                          generated)
 
     def test_unreviewed_uart_name_does_not_infer_a_clock_gate(self):
         with self.assertRaisesRegex(ValueError, "Unmaintained controller"):

@@ -1,0 +1,71 @@
+schema = 2
+board_package = "stm32-zg-board"
+backend = "freertos"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[uart.serial1]
+binding = "primary-uart"
+mode = "irq-blocks"
+baud = 115200
+[uart.serial1.rx]
+format = "blocks"
+[uart.serial1.irq]
+priority = 5
+calls_os = false
+
+[uart.serial2]
+binding = "secondary-uart"
+mode = "irq-blocks"
+baud = 115200
+[uart.serial2.rx]
+format = "blocks"
+[uart.serial2.irq]
+priority = 5
+calls_os = false
+
+[uart.serial3]
+binding = "usart3"
+mode = "irq-blocks"
+baud = 115200
+[uart.serial3.rx]
+format = "blocks"
+[uart.serial3.irq]
+priority = 5
+calls_os = false
+
+[uart.serial4]
+binding = "uart4"
+mode = "irq-blocks"
+baud = 115200
+[uart.serial4.rx]
+format = "blocks"
+[uart.serial4.irq]
+priority = 5
+calls_os = false
+
+[uart.serial5]
+binding = "uart5"
+mode = "irq-blocks"
+baud = 115200
+[uart.serial5.rx]
+format = "blocks"
+[uart.serial5.irq]
+priority = 5
+calls_os = false
+
+[uart.serial6]
+binding = "usart6"
+mode = "irq-blocks"
+baud = 115200
+[uart.serial6.rx]
+format = "blocks"
+[uart.serial6.irq]
+priority = 5
+calls_os = false

@@ -223,6 +223,10 @@ def complete_controller(controller, children, provider):
         controller["interface_kind"] = "spi_dma_transaction"
     if controller["kind"] == "i2c" and not children:
         fail("I2C requires at least one explicit address endpoint")
+    if controller["kind"] == "spi" and controller["mode"] == "irq-frames":
+        if children:
+            fail("SPI frame owners expose no legacy CS endpoint")
+        return
     if (controller["kind"] == "spi" and provider.SPI_REQUIRES_ENDPOINT and
             not children):
         fail("SPI requires at least one reviewed CS endpoint")
@@ -246,7 +250,8 @@ def resolve_device(device, controller, provider, *, soc, clock_plan,
             (ENDPOINT_FIELDS["spi"] - {"controller", "driver", "model_bytes"})
             | model_fields, "SPI device")
     else:
-        obj(device, {"id", "controller", "driver", "address"}, model_fields,
+        obj(device, {"id", "controller", "driver", "address"},
+            model_fields | {"address_bits"},
             "I2C device")
         if provider.MODEL and "model_bytes" not in device:
             fail("Native I2C device requires explicit model_bytes")
@@ -275,8 +280,13 @@ def resolve_device(device, controller, provider, *, soc, clock_plan,
                         fail("Duplicate SPI chip select")
                     chip_selects.add(pin["pin"])
     else:
-        integer(device["address"], 8, 119, "7-bit I2C address")
-        key = (controller["id"], device["address"])
+        width = device.get("address_bits", 7)
+        integer(device["address"], 8 if width == 7 else 0,
+                119 if width == 7 else 1023, f"{width}-bit I2C address")
+        if width == 10 and 88000 < controller["max_hz"] <= 100000:
+            fail("10-bit I2C repeated START requires Standard <=88000 Hz "
+                 "or explicit Fast mode >100000 Hz (ES0182 2.10.4)")
+        key = (controller["id"], width, device["address"])
         if key in addresses:
             fail("Duplicate I2C address on one bus")
         addresses.add(key)

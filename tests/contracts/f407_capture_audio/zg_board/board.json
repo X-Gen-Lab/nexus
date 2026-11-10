@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "f407zg-capture-audio-software-fixture",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-fixture-v1",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "camera",
+      "controller": "DCMI",
+      "route": "dcmi12-hardware-s1"
+    },
+    {
+      "id": "camera8",
+      "controller": "DCMI",
+      "route": "dcmi8-embedded-s1"
+    },
+    {
+      "id": "camera14",
+      "controller": "DCMI",
+      "route": "dcmi14-hardware-s7"
+    },
+    {
+      "id": "sound",
+      "controller": "I2S2",
+      "route": "i2s2-duplex"
+    },
+    {
+      "id": "sound3",
+      "controller": "I2S3",
+      "route": "i2s3-simplex"
+    },
+    {
+      "id": "sound3duplex",
+      "controller": "I2S3",
+      "route": "i2s3-duplex-mclk"
+    },
+    {
+      "id": "camera-jpeg",
+      "controller": "DCMI",
+      "route": "dcmi8-hardware-s7"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software-only silicon route; no PCB wiring, codec or physical qualification"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "DS8626 Rev12 AF table and package pinout; no physical wiring assertion"
+    }
+  ]
+}

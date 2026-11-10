@@ -11,7 +11,7 @@ import unittest
 
 from tools.configure import configure
 from tools.evidence.common import file_identity
-from tools.release import transport
+from tools.maintenance import consumer_profiles
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -50,7 +50,7 @@ class SDKServicesPolicyTests(unittest.TestCase):
         return execution
 
     def test_service_profiles_are_exact_frozen_plan_entries(self):
-        profiles = tuple(item for item in transport.SERVICE_CONSUMERS
+        profiles = tuple(item for item in consumer_profiles.SERVICE_CONSUMERS
                          if item.scenario == "common_services")
         self.assertEqual([item.name for item in profiles], [
             "native services", "f407 services"])
@@ -60,7 +60,7 @@ class SDKServicesPolicyTests(unittest.TestCase):
                          [False, True])
         with self.assertRaises(FrozenInstanceError):
             profiles[0].name = "changed"
-        plan = transport.consumer_plan()
+        plan = consumer_profiles.consumer_plan()
         self.assertEqual(tuple(entry for entry in plan if entry[0] == "services" and
                                entry[1].scenario == "common_services"), tuple(("services", item)
                                           for item in profiles))
@@ -68,21 +68,10 @@ class SDKServicesPolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "canonical|reviewed"):
             self.consumers.service_profile(changed)
 
-    def test_transport_requires_new_images_without_guessing_name_prefixes(self):
-        rows = transport.consumer_layout()
-        files = {image: {"size": 1} for _, _, images in rows for image in images}
-        directories = [name for source, build, _ in rows
-                       for name in (source, build, build + "/bin")]
-        transport.consumer_images(files, directories)
-        self.assertIn("f407 services build/bin/installed_services.elf", files)
-        self.assertIn("f407 services build/bin/installed_services.elf", files)
-        del files["f407 services build/bin/installed_services.elf"]
-        with self.assertRaisesRegex(ValueError, "roots and images"):
-            transport.consumer_images(files, directories)
 
     def test_native_services_prepare_real_success_smoke_and_explicit_libraries(self):
         prefix = self.prefix()
-        profile = transport.SERVICE_CONSUMERS[0]
+        profile = consumer_profiles.SERVICE_CONSUMERS[0]
         output = self.directory / "prepared"
         output.mkdir()
         source, build, command = self.consumers.prepare_service_consumer(
@@ -108,7 +97,7 @@ class SDKServicesPolicyTests(unittest.TestCase):
         prefix = self.prefix()
         output = self.directory / "prepared"
         output.mkdir()
-        changed = replace(transport.SERVICE_CONSUMERS[0], name="unreviewed")
+        changed = replace(consumer_profiles.SERVICE_CONSUMERS[0], name="unreviewed")
         with self.assertRaisesRegex(ValueError, "canonical|reviewed"):
             self.consumers.prepare_service_consumer(
                 prefix, output, changed, self.command,
@@ -120,7 +109,7 @@ class SDKServicesPolicyTests(unittest.TestCase):
         prefix = self.prefix()
         output = self.directory / "images"
         output.mkdir()
-        profile = transport.SERVICE_CONSUMERS[profile_index]
+        profile = consumer_profiles.SERVICE_CONSUMERS[profile_index]
         source, build, _ = self.consumers.prepare_service_consumer(
             prefix, output, profile, self.command,
             expected_revision="a" * 40, fixture=True)

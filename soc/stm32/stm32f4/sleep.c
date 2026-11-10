@@ -9,28 +9,13 @@
 #include "nexus/arch/sleep.h"
 #include "clock_domain_impl.h"
 #include "nexus/arch/arch.h"
+#include "stm32f407_clock.h"
 #include "stm32f407_sleep.h"
-#include "stm32f407xx.h"
 
 /** \brief Actual source, PLL, bus mux/divisors and established Flash latency.
  */
 static bool fixed_run(void) {
-    const uint32_t pll_mask =
-        (uint32_t)(RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP |
-                   RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLQ);
-    const uint32_t pll =
-        8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U);
-    const uint32_t ready =
-        RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
-    const uint32_t bus_mask =
-        (uint32_t)(RCC_CFGR_SW | RCC_CFGR_SWS | RCC_CFGR_HPRE | RCC_CFGR_PPRE1 |
-                   RCC_CFGR_PPRE2);
-    const uint32_t bus = RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL |
-                         RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
-    return (RCC->CR & ready) == ready && (RCC->PLLCFGR & pll_mask) == pll &&
-           (RCC->CFGR & bus_mask) == bus &&
-           (FLASH->ACR & FLASH_ACR_LATENCY) == FLASH_ACR_LATENCY_5WS &&
-           (RCC->SSCGR & RCC_SSCGR_SSCGEN) == 0U &&
+    return nx_stm32_clock_profile_matches(RCC, FLASH) &&
            (RCC->APB1LPENR & RCC_APB1LPENR_TIM2LPEN) != 0U;
 }
 

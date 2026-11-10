@@ -1,0 +1,19 @@
+# Internal raw counts; software assembly, no analog qualification.
+schema = 2
+board_package = "stm32-ve-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[adc.internal]
+binding = "adc-internal"
+mode = "low-rate-scan"
+channels = [16, 17, 18]
+sample_times = [7, 7, 7]
+reference_mv = 3300

@@ -14,6 +14,8 @@ void nx_flash_program_model_poll(unsigned kind, void* context);
 uint32_t nx_flash_program_model_read(const volatile uint32_t* reg);
 void nx_flash_program_model_write(volatile uint32_t* reg, uint32_t value);
 void nx_flash_program_model_store(volatile uint32_t* address, uint32_t value);
+void nx_flash_program_model_store_byte(volatile uint8_t* address,
+                                       uint8_t value);
 bool nx_flash_program_model_irq_idle(void);
 bool nx_flash_program_model_irq_clear(void);
 bool nx_flash_program_model_irq_active(void);
@@ -31,6 +33,8 @@ bool nx_flash_program_model_privileged(void);
     nx_flash_program_model_write((reg), (value))
 #define NX_STM32_FLASH_STORE(address, value)                                   \
     nx_flash_program_model_store((address), (value))
+#define NX_STM32_FLASH_STORE_BYTE(address, value)                              \
+    nx_flash_program_model_store_byte((address), (value))
 #define NX_STM32_FLASH_IRQ_IDLE()   nx_flash_program_model_irq_idle()
 #define NX_STM32_FLASH_IRQ_CLEAR()  nx_flash_program_model_irq_clear()
 #define NX_STM32_FLASH_IRQ_ACTIVE() nx_flash_program_model_irq_active()

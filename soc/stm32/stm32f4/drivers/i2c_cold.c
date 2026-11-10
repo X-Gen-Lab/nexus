@@ -6,6 +6,7 @@
  * \date            2026-10-28
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_i2c_cold.h"
 
 #ifndef NX_PLATFORM_REGISTER_WRITE
@@ -21,23 +22,39 @@ static bool cold_context(void) {
 }
 
 static uint32_t gate_mask(const nx_stm32_i2c_config_t* config) {
-    return config->registers == I2C1 ? RCC_APB1ENR_I2C1EN : RCC_APB1ENR_I2C2EN;
+    return config->registers == I2C1   ? RCC_APB1ENR_I2C1EN
+           : config->registers == I2C2 ? RCC_APB1ENR_I2C2EN
+                                       : RCC_APB1ENR_I2C3EN;
+}
+
+static uint32_t gpio_mask(const nx_stm32_i2c_config_t* config) {
+    return config->registers == I2C3 ? RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN
+                                     : RCC_AHB1ENR_GPIOBEN;
+}
+
+static GPIO_TypeDef* pin_bank(const nx_stm32_i2c_config_t* config,
+                              size_t index) {
+    return config->registers == I2C3 ? (index == 0U ? GPIOA : GPIOC) : GPIOB;
 }
 
 static bool config_valid(const nx_stm32_i2c_config_t* config) {
     if (config == NULL || config->pins == NULL ||
         config->pins[0].snapshot == NULL || config->pins[1].snapshot == NULL ||
         config->pins[0].snapshot == config->pins[1].snapshot ||
-        config->clock_hz != 42000000U || config->priority > 15U ||
-        (config->registers != I2C1 && config->registers != I2C2) ||
-        (!config->asynchronous &&
-         (config->registers != I2C1 || config->dma != NULL)))
+        config->clock_hz != NEXUS_APB1_HZ || config->clock_hz < 2000000U ||
+        config->clock_hz > 50000000U || config->clock_hz % 1000000U != 0U ||
+        config->priority > 15U || config->max_hz < 5129U ||
+        config->max_hz > 400000U ||
+        (config->registers != I2C1 && config->registers != I2C2 &&
+         config->registers != I2C3) ||
+        (!config->asynchronous && config->dma != NULL))
         return false;
     uint8_t first = config->pins[0].pin;
     uint8_t second = config->pins[1].pin;
-    return config->registers == I2C1 ? ((first == 6U && second == 7U) ||
+    return config->registers == I2C1   ? ((first == 6U && second == 7U) ||
                                         (first == 8U && second == 9U))
-                                     : (first == 10U && second == 11U);
+           : config->registers == I2C2 ? (first == 10U && second == 11U)
+                                       : (first == 8U && second == 9U);
 }
 
 static size_t vector_count(const nx_stm32_i2c_config_t* config) {
@@ -50,8 +67,13 @@ static IRQn_Type vector(const nx_stm32_i2c_config_t* config, size_t index) {
                                     DMA1_Stream0_IRQn, DMA1_Stream6_IRQn};
         return values[index];
     }
-    const IRQn_Type values[] = {I2C2_EV_IRQn, I2C2_ER_IRQn, DMA1_Stream2_IRQn,
-                                DMA1_Stream7_IRQn};
+    if (config->registers == I2C2) {
+        const IRQn_Type values[] = {I2C2_EV_IRQn, I2C2_ER_IRQn,
+                                    DMA1_Stream2_IRQn, DMA1_Stream7_IRQn};
+        return values[index];
+    }
+    const IRQn_Type values[] = {I2C3_EV_IRQn, I2C3_ER_IRQn, DMA1_Stream2_IRQn,
+                                DMA1_Stream4_IRQn};
     return values[index];
 }
 
@@ -60,27 +82,26 @@ static bool vector_idle(IRQn_Type irq) {
            NVIC_GetActive(irq) == 0U;
 }
 
-static bool withdraw(uint8_t pin) {
+static bool withdraw(GPIO_TypeDef* bank, uint8_t pin) {
     uint32_t mask = 3U << (pin * 2U);
-    uint32_t mode = GPIOB->MODER & mask;
+    uint32_t mode = bank->MODER & mask;
     if (mode != 0U && mode != mask) {
-        NX_PLATFORM_REGISTER_WRITE(GPIOB->MODER, GPIOB->MODER | mask);
+        NX_PLATFORM_REGISTER_WRITE(bank->MODER, bank->MODER | mask);
         nx_arch_dsb();
-        if ((GPIOB->MODER & mask) != mask)
+        if ((bank->MODER & mask) != mask)
             return false;
     }
     return true;
 }
 
-_Static_assert(sizeof(nx_stm32_i2c_cold_receipt_t) <= 8U,
-               "I2C cold ownership must not exceed eight bytes");
-/* Encode the two reviewed APB1 bits directly. Full-width register accesses
- * remain masked to their selected gate; the compact receipt is not MMIO. */
-_Static_assert(((RCC_APB1ENR_I2C1EN | RCC_APB1ENR_I2C2EN) >> 20U) ==
-                   NX_STM32_I2C_COLD_PERIPHERAL_CLOCK,
-               "I2C gate receipt encoding");
-_Static_assert((RCC_AHB1ENR_GPIOBEN << 2U) == NX_STM32_I2C_COLD_GPIO_CLOCK,
-               "GPIO gate receipt encoding");
+_Static_assert(sizeof(nx_stm32_i2c_cold_receipt_t) == 6U,
+               "I2C cold ownership remains six bytes");
+/* One selected peripheral gate is a Boolean; A/B/C retain independent facts.
+ * Neither controller count nor a two-bank route increases mutable storage. */
+_Static_assert(
+    ((RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN) << 4U) ==
+        NX_STM32_I2C_COLD_GPIO_CLOCK,
+    "GPIO gate receipt encoding");
 
 static nx_result_t
 verify_resources(const nx_stm32_i2c_config_t* config,
@@ -89,7 +110,7 @@ verify_resources(const nx_stm32_i2c_config_t* config,
         (receipt->effects & NX_STM32_I2C_COLD_PREPARED) == 0U)
         return NX_ERROR_INVALID;
     if ((RCC->APB1ENR & gate_mask(config)) == 0U ||
-        (RCC->AHB1ENR & RCC_AHB1ENR_GPIOBEN) == 0U ||
+        (RCC->AHB1ENR & gpio_mask(config)) != gpio_mask(config) ||
         (config->registers->CR1 & I2C_CR1_PE) == 0U)
         return NX_ERROR_IO;
     return NX_SUCCESS;
@@ -102,28 +123,29 @@ static nx_result_t release_resources(const nx_stm32_i2c_config_t* config,
     while (receipt->captured != 0U) {
         const nx_stm32_i2c_pin_config_t* pin =
             &config->pins[receipt->captured - 1U];
-        if (!withdraw(pin->pin))
+        GPIO_TypeDef* bank = pin_bank(config, receipt->captured - 1U);
+        if (!withdraw(bank, pin->pin))
             return NX_ERROR_IO;
-        nx_stm32_pin_restore(GPIOB, pin->pin, *pin->snapshot);
+        nx_stm32_pin_restore(bank, pin->pin, *pin->snapshot);
         nx_arch_dsb();
-        if (nx_stm32_pin_capture(GPIOB, pin->pin) != *pin->snapshot)
+        if (nx_stm32_pin_capture(bank, pin->pin) != *pin->snapshot)
             return NX_ERROR_IO;
         --receipt->captured;
     }
     uint32_t gate = gate_mask(config);
     uint32_t original =
-        ((uint32_t)receipt->effects & NX_STM32_I2C_COLD_PERIPHERAL_CLOCK)
-        << 20U;
+        (receipt->effects & NX_STM32_I2C_COLD_PERIPHERAL_CLOCK) != 0U ? gate
+                                                                      : 0U;
     NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, (RCC->APB1ENR & ~gate) | original);
     nx_arch_dsb();
     if ((RCC->APB1ENR & gate) != original)
         return NX_ERROR_IO;
     original =
-        ((uint32_t)receipt->effects & NX_STM32_I2C_COLD_GPIO_CLOCK) >> 2U;
-    NX_PLATFORM_REGISTER_WRITE(
-        RCC->AHB1ENR, (RCC->AHB1ENR & ~RCC_AHB1ENR_GPIOBEN) | original);
+        ((uint32_t)receipt->effects & NX_STM32_I2C_COLD_GPIO_CLOCK) >> 4U;
+    NX_PLATFORM_REGISTER_WRITE(RCC->AHB1ENR,
+                               (RCC->AHB1ENR & ~gpio_mask(config)) | original);
     nx_arch_dsb();
-    if ((RCC->AHB1ENR & RCC_AHB1ENR_GPIOBEN) != original)
+    if ((RCC->AHB1ENR & gpio_mask(config)) != original)
         return NX_ERROR_IO;
     *receipt = (nx_stm32_i2c_cold_receipt_t){0};
     return NX_SUCCESS;
@@ -132,8 +154,9 @@ static nx_result_t release_resources(const nx_stm32_i2c_config_t* config,
 static nx_result_t acquire_clocks(const nx_stm32_i2c_config_t* config,
                                   nx_stm32_i2c_cold_receipt_t* receipt) {
     uint32_t gate = gate_mask(config);
-    uint32_t gpio = (RCC->AHB1ENR & (uint32_t)RCC_AHB1ENR_GPIOBEN) << 2U;
-    uint32_t peripheral = (RCC->APB1ENR & gate) >> 20U;
+    uint32_t gpio = (RCC->AHB1ENR & gpio_mask(config)) << 4U;
+    uint32_t peripheral =
+        (RCC->APB1ENR & gate) != 0U ? NX_STM32_I2C_COLD_PERIPHERAL_CLOCK : 0U;
     receipt->effects = (uint8_t)(NX_STM32_I2C_COLD_OWNED | gpio | peripheral);
     NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR | gate);
     nx_arch_dsb();
@@ -145,14 +168,16 @@ static nx_result_t acquire_clocks(const nx_stm32_i2c_config_t* config,
 
 static nx_result_t acquire_pads(const nx_stm32_i2c_config_t* config,
                                 nx_stm32_i2c_cold_receipt_t* receipt) {
-    nx_result_t result = nx_stm32_gpio_clock_enable(1U);
-    if (result != NX_SUCCESS)
-        return result;
     for (size_t i = 0U; i < 2U; ++i) {
+        GPIO_TypeDef* bank = pin_bank(config, i);
+        uint8_t number = config->registers == I2C3 ? (i == 0U ? 0U : 2U) : 1U;
+        nx_result_t result = nx_stm32_gpio_clock_enable(number);
+        if (result != NX_SUCCESS)
+            return result;
         const nx_stm32_i2c_pin_config_t* pin = &config->pins[i];
-        *pin->snapshot = nx_stm32_pin_capture(GPIOB, pin->pin);
+        *pin->snapshot = nx_stm32_pin_capture(bank, pin->pin);
         receipt->captured = (uint8_t)(i + 1U);
-        result = nx_stm32_pin_configure(GPIOB, pin->pin, 2U, 4U, 0U, true);
+        result = nx_stm32_pin_configure(bank, pin->pin, 2U, 4U, 0U, true);
         if (result != NX_SUCCESS)
             return result;
     }

@@ -11,6 +11,32 @@ from tools.configure import bindings, configure, factory, selected_contracts
 
 
 class EthernetFramesConfiguration(unittest.TestCase):
+    def test_checksum_offload_is_explicit_typed_and_frozen_in_cold_config(self):
+        result = self.resolve('f407zg', changes=((
+            'mode = "rmii-vlan-sg-ptp"',
+            'mode = "rmii-vlan-sg-ptp"\nchecksum_offload = true'),))
+        item, = result.controllers
+        self.assertTrue(item.options.checksum_offload)
+        self.assertIn('.checksum_offload = true', bindings.emit(result)[1])
+        default, = self.resolve('f407zg').controllers
+        self.assertFalse(default.options.checksum_offload)
+        with self.assertRaises(ValueError):
+            self.resolve('f407zg', changes=((
+                'mode = "rmii-vlan-sg-ptp"',
+                'mode = "rmii-vlan-sg-ptp"\nchecksum_offload = 1'),))
+
+    def test_enhanced_mii_route_selects_existing_frames_and_mdio_owner(self):
+        def mii(board):
+            board['bindings'][0]['route'] = 'mii-frames-a-b-c'
+        result = self.resolve('f407zg', changes=((
+            'mode = "rmii-vlan-sg-ptp"', 'mode = "mii-vlan-sg-ptp"'),),
+            board_change=mii)
+        item, = result.controllers
+        self.assertEqual(len(item.pins), 17)
+        self.assertIn('.mii = true', bindings.emit(result)[1])
+        self.assertIn('nx_factory_eth_frames(', factory.emit(result)[0])
+        self.assertIn('nx_factory_mdio(', factory.emit(result)[0])
+
     def fixture(self, family):
         return configure.ROOT / ('cmake/package/verification/io_evolution/'
                                  + family + '-eth-frames.toml')

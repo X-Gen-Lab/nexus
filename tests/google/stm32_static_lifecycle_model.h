@@ -12,6 +12,8 @@ extern "C" {
 #endif
 /** \brief Hardware write acceptance; the production policy remains real C. */
 void nx_static_lifecycle_write(volatile uint32_t* address, uint32_t value);
+/** \brief Complete modeled write-only GPIO commands at the CPU barrier. */
+void nx_static_lifecycle_observe(void);
 #ifdef __cplusplus
 }
 #endif
@@ -19,4 +21,5 @@ void nx_static_lifecycle_write(volatile uint32_t* address, uint32_t value);
     nx_static_lifecycle_write(&(reg), (uint32_t)(value))
 #define NX_UART_REG_WRITE(address, value)                                      \
     nx_static_lifecycle_write((address), (uint32_t)(value))
+#define NX_F4_CPU_MMIO_SYNC() nx_static_lifecycle_observe()
 #endif

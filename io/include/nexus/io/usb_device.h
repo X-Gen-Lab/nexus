@@ -12,6 +12,11 @@
 extern "C" {
 #endif
 typedef enum { NX_USB_DATA, NX_USB_STATUS } nx_usb_stage_t;
+typedef enum {
+    NX_USB_DEVICE_SPEED_UNKNOWN,
+    NX_USB_DEVICE_FULL_SPEED,
+    NX_USB_DEVICE_HIGH_SPEED
+} nx_usb_device_speed_t;
 typedef struct {
     nx_request_t base;
     const uint8_t* in;
@@ -33,7 +38,8 @@ typedef enum {
     NX_USB_EVENT_RESET,
     NX_USB_EVENT_SUSPEND,
     NX_USB_EVENT_RESUME,
-    NX_USB_EVENT_LOSS
+    NX_USB_EVENT_LOSS,
+    NX_USB_EVENT_ENUMERATED
 } nx_usb_event_kind_t;
 typedef struct {
     nx_usb_setup_t setup;
@@ -50,6 +56,8 @@ typedef struct {
     bool suspended;
     bool control_pending;
     uint8_t address;
+    /** \brief UNKNOWN after reset; ENUMERATED publishes the observed speed. */
+    nx_usb_device_speed_t speed;
 } nx_usb_device_state_t;
 /** \brief Shared readonly packet methods; context is a selected endpoint. */
 typedef struct {
@@ -107,6 +115,12 @@ nx_result_t nx_usb_out_prepare(nx_usb_request_t* request, uint8_t* bytes,
  * \return Success means ACCEPTED; fourth-party buffers are not copied early.
  * \note One privileged task executor, IRQ masks clear. IN FIFO writes do not
  *       prove host ACK. OUT overrun drains all packet words without overflow.
+ *       Selected F407 ISO packets require a remaining Core deadline at most
+ *       one second, observed ULPI speed and exactly one transaction. Hardware
+ *       selects next frame/microframe parity; it does not implement interval
+ *       scheduling, retries or receive acknowledgment. An incomplete ISO
+ *       opportunity settles IO only after source/FIFO/AHB withdrawal. Long
+ *       execution stalls expire by Core time before modular frame comparison.
  */
 nx_result_t nx_usb_endpoint_submit(const nx_usb_endpoint_port_t* port,
                                    nx_usb_request_t* request);
@@ -125,7 +139,8 @@ nx_result_t nx_usb_endpoint_cancel(const nx_usb_endpoint_port_t* port,
  * \brief Set/clear STALL only after the endpoint has no live transfer.
  * \param[in] port: Serialized owner, started and IRQ masks clear.
  * \param[in] stalled: Desired STALL; clearing bulk/interrupt resets DATA0.
- * \return Success after readback, BUSY retains a pending request.
+ * \return Success after readback, BUSY retains a pending request; a selected
+ *         ISO direction returns UNSUPPORTED without an endpoint write.
  */
 nx_result_t nx_usb_endpoint_stall(const nx_usb_endpoint_port_t* port,
                                   bool stalled);

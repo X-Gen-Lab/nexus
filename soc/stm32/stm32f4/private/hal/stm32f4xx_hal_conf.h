@@ -5,11 +5,17 @@
  */
 #ifndef NX_STM32F407_HAL_CONF_H
 #define NX_STM32F407_HAL_CONF_H
+#include "nexus_config.h"
 #define HAL_MODULE_ENABLED
 #define HAL_DMA_MODULE_ENABLED
 #define HAL_UART_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
-#define HSE_VALUE                       8000000U
+#if defined(NEXUS_CLOCK_SOURCE_HSE) && NEXUS_CLOCK_SOURCE_HSE &&               \
+    defined(NEXUS_CLOCK_INPUT_HZ)
+#define HSE_VALUE NEXUS_CLOCK_INPUT_HZ
+#else
+#define HSE_VALUE 8000000U
+#endif
 #define HSI_VALUE                       16000000U
 #define LSE_VALUE                       32768U
 #define EXTERNAL_CLOCK_VALUE            12288000U

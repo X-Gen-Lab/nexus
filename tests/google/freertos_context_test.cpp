@@ -191,6 +191,7 @@ class FreeRTOSRejectedContextTest
     : public FreeRTOSContextTest,
       public ::testing::WithParamInterface<std::tuple<Context, Operation>> {};
 
+#if NEXUS_FREERTOS_COMMON_CONTRACTS
 TEST_P(FreeRTOSRejectedContextTest, RejectsBeforeKernelOrStorageEffects) {
     const auto [condition, operation] = GetParam();
     set_context(condition == Context::Isr, condition == Context::Masked,
@@ -524,6 +525,8 @@ TEST_F(FreeRTOSContextTest, SuccessfulJoinDeletesBeforeReclaimPermission) {
     EXPECT_EQ(task.finished, nullptr);
 }
 
+#endif
+
 TEST_F(FreeRTOSContextTest, KernelBootstrapMaskAllowsFollowingStaticObjects) {
     EXPECT_CALL(calls, create_queue(1, 0, nullptr, &notification.storage,
                                     queueQUEUE_TYPE_BINARY_SEMAPHORE))
@@ -696,6 +699,7 @@ TEST_F(FreeRTOSContextTest, FaultmaskAlwaysRejectsBeforeKernelQueries) {
     EXPECT_EQ(nx_freertos_queue_send(&queue, &item, 0), NX_ERROR_CONTEXT);
     EXPECT_EQ(queue.users, 0U);
 }
+#if NEXUS_FREERTOS_COMMON_CONTRACTS
 TEST_F(FreeRTOSContextTest, DeadlineQueueKeepsOneBudgetAfterSpuriousReturn) {
     queue.handle = queue_handle;
     EXPECT_CALL(calls, scheduler()).WillOnce(Return(taskSCHEDULER_RUNNING));
@@ -731,6 +735,8 @@ TEST_F(FreeRTOSContextTest, PermanentTaskCreatesNoJoinSemaphore) {
               NX_SUCCESS);
     EXPECT_EQ(permanent.handle, task_handle);
 }
+
+#endif
 
 #if configUSE_TASK_NOTIFICATIONS == 1
 TEST_F(FreeRTOSContextTest, DirectNotificationUsesExclusiveSlotAndNoLatch) {
@@ -816,6 +822,7 @@ TEST_F(FreeRTOSContextTest, DisabledNotificationsRejectBeforeObjectChanges) {
 }
 #endif
 
+#if NEXUS_FREERTOS_COMMON_CONTRACTS
 TEST_F(FreeRTOSContextTest, ClosableQueueCloseLatchesBeforeWaiterSleeps) {
     nx_freertos_closable_queue_t closable{};
     closable.queue.handle = queue_handle;
@@ -1033,6 +1040,8 @@ TEST_F(FreeRTOSContextTest, JoinTimeoutRetainsEveryBorrowedResource) {
     EXPECT_EQ(task.finished, latch);
     EXPECT_EQ(task.context, &item);
 }
+
+#endif
 
 } /* namespace */
 

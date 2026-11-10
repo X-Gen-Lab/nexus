@@ -173,5 +173,32 @@ class ToolRunnerTests(unittest.TestCase):
 
 
 
+class ChangedDomainTests(unittest.TestCase):
+    def test_documentation_does_not_select_behavioral_tool_domains(self):
+        self.assertEqual(run_tool_tests.changed_suites([
+            ".github/workflows/README.md", "tools/configure/README.md",
+            "cmake/package/README.md"]), ())
+
+    def test_workflow_readme_does_not_expand_a_production_change(self):
+        self.assertEqual(run_tool_tests.changed_suites([
+            ".github/workflows/README.md", "core/src/time.c"]),
+            ("testing",))
+
+    def test_complete_domains_follow_actual_changes_and_deletions(self):
+        self.assertEqual(run_tool_tests.changed_suites(["soc/stm32/driver.c"]),
+                         ("testing",))
+        self.assertEqual(run_tool_tests.changed_suites([
+            "tools/configure/removed.py", "README.md"]),
+            ("testing", "configure"))
+        self.assertEqual(run_tool_tests.changed_suites(["scripts/validation/junit.py"]),
+                         tuple(run_tool_tests.SUITES))
+        self.assertEqual(run_tool_tests.changed_suites(["new-build-entry.py"]),
+                         tuple(run_tool_tests.SUITES))
+
+    def test_maintenance_policy_is_a_behavioral_input(self):
+        from tools.dev.change_paths import behavioral
+        self.assertTrue(behavioral("AGENTS.md"))
+
+
 if __name__ == "__main__":
     unittest.main()

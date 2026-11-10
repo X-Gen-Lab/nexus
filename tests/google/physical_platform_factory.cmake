@@ -31,6 +31,10 @@ foreach(physical_family stm32)
             target_compile_definitions(${physical_object} PRIVATE
                 nx_platform_start=nx_empty_platform_start
                 nx_platform_stop=nx_empty_platform_stop
+                nx_platform_suspend=nx_empty_platform_suspend
+                nx_platform_resume=nx_empty_platform_resume
+                nx_platform_suspend_diagnosed=nx_empty_platform_suspend_diagnosed
+                nx_platform_resume_diagnosed=nx_empty_platform_resume_diagnosed
                 nx_platform_start_diagnosed=nx_empty_platform_start_diagnosed
                 nx_platform_stop_diagnosed=nx_empty_platform_stop_diagnosed)
             # Generated exports return a const Nexus pointer or immutable label

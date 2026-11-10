@@ -1,0 +1,77 @@
+schema = 2
+board_package = "stm32-zg-board"
+backend = "freertos"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[uart.serial1]
+binding = "primary-uart"
+mode = "dma-tx"
+baud = 115200
+[uart.serial1.rx]
+format = "events"
+capacity = 4
+[uart.serial1.irq]
+priority = 5
+calls_os = false
+
+[uart.serial2]
+binding = "secondary-uart"
+mode = "dma-tx"
+baud = 115200
+[uart.serial2.rx]
+format = "events"
+capacity = 4
+[uart.serial2.irq]
+priority = 5
+calls_os = false
+
+[uart.serial3]
+binding = "usart3"
+mode = "dma-tx"
+baud = 115200
+[uart.serial3.rx]
+format = "events"
+capacity = 4
+[uart.serial3.irq]
+priority = 5
+calls_os = false
+
+[uart.serial4]
+binding = "uart4"
+mode = "dma-tx"
+baud = 115200
+[uart.serial4.rx]
+format = "events"
+capacity = 4
+[uart.serial4.irq]
+priority = 5
+calls_os = false
+
+[uart.serial5]
+binding = "uart5"
+mode = "dma-tx"
+baud = 115200
+[uart.serial5.rx]
+format = "events"
+capacity = 4
+[uart.serial5.irq]
+priority = 5
+calls_os = false
+
+[uart.serial6]
+binding = "usart6"
+mode = "dma-tx"
+baud = 115200
+[uart.serial6.rx]
+format = "events"
+capacity = 4
+[uart.serial6.irq]
+priority = 5
+calls_os = false

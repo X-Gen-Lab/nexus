@@ -17,14 +17,20 @@ extern "C" {
 }
 #include "nexus/io/native/model.h"
 #include <gtest/gtest.h>
+#include <sys/mman.h>
 
 #undef nx_arch_dsb
 static ADC_TypeDef* s_power_adc;
 static bool s_delay_power_store;
+static bool s_refuse_power_enable;
+static nx_time_us_t s_first_start;
 
 /** \brief Complete the modeled APB power store before the warmup timestamp. */
 extern "C" void nx_stm32_adc_model_barrier(void) {
     nx_arch_dsb();
+    if (s_refuse_power_enable && s_power_adc != nullptr) {
+        s_power_adc->CR2 &= ~static_cast<uint32_t>(ADC_CR2_ADON);
+    }
     if (s_delay_power_store && s_power_adc != nullptr &&
         (s_power_adc->CR2 & ADC_CR2_ADON) != 0U) {
         (void)nx_native_clock_advance(5U);
@@ -40,6 +46,9 @@ extern "C" void nx_stm32_adc_model_poll(unsigned kind, void* raw) {
     EXPECT_EQ(kind, 5U);
     auto* state = static_cast<nx_stm32_adc_state_t*>(raw);
     ADC_TypeDef* adc = state->registers;
+    if ((adc->CR2 & ADC_CR2_SWSTART) != 0U && s_first_start == 0U) {
+        s_first_start = nx_time_now_us();
+    }
     (void)nx_native_clock_advance(1U);
     if ((adc->CR2 & ADC_CR2_SWSTART) != 0U) {
         unsigned rank =
@@ -50,7 +59,11 @@ extern "C" void nx_stm32_adc_model_poll(unsigned kind, void* raw) {
         unsigned shift = rank < 6U    ? rank * 5U
                          : rank < 12U ? (rank - 6U) * 5U
                                       : (rank - 12U) * 5U;
-        adc->DR = 100U + ((sequence >> shift) & 31U) * 100U;
+        const uint32_t bits =
+            12U - 2U * static_cast<uint32_t>((adc->CR1 & ADC_CR1_RES) >>
+                                             ADC_CR1_RES_Pos);
+        adc->DR =
+            (100U + ((sequence >> shift) & 31U) * 100U) & ((1U << bits) - 1U);
         adc->CR2 &= ~static_cast<uint32_t>(ADC_CR2_SWSTART);
         adc->SR |= ADC_SR_EOC;
     }
@@ -75,13 +88,21 @@ static DMA_TypeDef* s_target_dma;
 /** \brief Model only W1C status, including facts arriving after
  * acknowledgement.
  */
-extern "C" void nx_stm32_adc_model_ack(void* raw, uint32_t flags) {
+extern "C" void nx_stm32_adc_model_ack(void* raw, void* converter,
+                                       uint32_t flags) {
     auto* dma = static_cast<DMA_TypeDef*>(raw);
+    const unsigned shift = converter == ADC2   ? 16U
+                           : converter == ADC3 ? 6U
+                                               : 0U;
+    volatile uint32_t* status =
+        converter == ADC2 || converter == ADC3 ? &dma->LISR : &dma->HISR;
+    volatile uint32_t* clear =
+        converter == ADC2 || converter == ADC3 ? &dma->LIFCR : &dma->HIFCR;
     if (s_error_ack) {
-        dma->HISR |= 1U << 3U;
+        *status |= 1U << (shift + 3U);
     }
-    dma->HIFCR = flags;
-    dma->HISR &= ~flags;
+    *clear = flags << shift;
+    *status &= ~(flags << shift);
 }
 /** \brief Refuse a write or advance CT at the real hardware store boundary. */
 extern "C" void nx_stm32_adc_model_target(void* raw, unsigned bank,
@@ -130,9 +151,12 @@ class Stm32AdcStream : public testing::Test {
         s_error_ack = false;
         s_target_dma = &dma;
         s_delay_power_store = false;
+        s_refuse_power_enable = false;
+        s_first_start = 0U;
         s_power_adc = &adc;
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         state.adc.registers = &adc;
+        common.CCR = ADC_CCR_ADCPRE_0;
         state.adc.common = &common;
         state.adc.channels = channels;
         state.adc.sample_times = sample_times;
@@ -154,6 +178,90 @@ class Stm32AdcStream : public testing::Test {
     }
 };
 
+TEST_F(Stm32AdcStream, SoftwareShotWarmupStartsAfterThePowerStoreBarrier) {
+    s_delay_power_store = true;
+    uint16_t output[2]{};
+    size_t count{};
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_sample(&port, output, 2U, 1000U, &count));
+    EXPECT_GE(s_first_start, 108U);
+    EXPECT_FALSE(s_delay_power_store);
+    EXPECT_EQ(2U, count);
+}
+
+TEST_F(Stm32AdcStream, SoftwareShotRequiresAnObservedEnableBeforeConversion) {
+    s_refuse_power_enable = true;
+    uint16_t output[2]{0xBEEFU, 0xCAFEU};
+    size_t count{};
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_adc_port_sample(&port, output, 2U, 1000U, &count));
+    EXPECT_EQ(0U, count);
+    EXPECT_EQ(0xBEEFU, output[0]);
+    EXPECT_EQ(0xCAFEU, output[1]);
+    EXPECT_EQ(0U, s_first_start);
+    EXPECT_FALSE(state.adc.active);
+    s_refuse_power_enable = false;
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_sample(&port, output, 2U, 1000U, &count));
+    EXPECT_EQ(2U, count);
+}
+
+TEST_F(Stm32AdcStream, ExternalScanSamplesAllSixteenRanksInAuthoredOrder) {
+    const uint8_t ranks[]{15U, 14U, 13U, 12U, 11U, 10U, 9U, 8U,
+                          7U,  6U,  5U,  4U,  3U,  2U,  1U, 0U};
+    const uint8_t timing[16]{};
+    uint16_t output[16]{};
+    state.adc.channels = ranks;
+    state.adc.sample_times = timing;
+    state.adc.channel_count = 16U;
+    size_t count = 0U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_adc_port_sample(&port, output, 16U, 1000U, &count));
+    ASSERT_EQ(16U, count);
+    for (size_t i = 0U; i < count; ++i) {
+        EXPECT_EQ(100U + 100U * ranks[i], output[i]);
+    }
+    EXPECT_EQ(0U, adc.CR2);
+    EXPECT_FALSE(state.adc.active);
+}
+
+TEST_F(Stm32AdcStream, RepeatedChannelCannotHaveConflictingSampleTimes) {
+    const uint8_t ranks[]{15U, 15U};
+    const uint8_t timing[]{0U, 7U};
+    state.adc.channels = ranks;
+    state.adc.sample_times = timing;
+    common.CCR = UINT32_C(0xA5000000);
+    adc.CR1 = UINT32_C(0x5A000000);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_adc_initialize(&state.adc));
+    EXPECT_EQ(UINT32_C(0xA5000000), common.CCR);
+    EXPECT_EQ(UINT32_C(0x5A000000), adc.CR1);
+}
+
+TEST_F(Stm32AdcStream, SixteenRankDmaSequenceCrossesBothRegisterBoundaries) {
+    const uint8_t ranks[]{0U, 1U, 2U,  3U,  4U,  5U,  6U,  7U,
+                          8U, 9U, 10U, 11U, 12U, 13U, 14U, 15U};
+    const uint8_t timing[16]{};
+    uint16_t output[16]{};
+    nx_stream_slot_t full_slot{};
+    nx_stream_t full_stream{};
+    full_slot.data = reinterpret_cast<uint8_t*>(output);
+    full_slot.capacity = sizeof(output);
+    ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&full_stream, &full_slot, 1U));
+    region = {reinterpret_cast<uintptr_t>(output), sizeof(output),
+              NX_DMA_MEMORY_WRITE};
+    state.adc.channels = ranks;
+    state.adc.sample_times = timing;
+    state.adc.channel_count = 16U;
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_start(&port, &full_stream, 1000U));
+    EXPECT_EQ(UINT32_C(0x0A418820), adc.SQR3);
+    EXPECT_EQ(UINT32_C(0x16A4A0E6), adc.SQR2);
+    EXPECT_EQ(UINT32_C(0x00F7B9AC), adc.SQR1);
+    EXPECT_EQ(16U, memory.NDTR);
+    EXPECT_EQ(NX_STREAM_SLOT_FILLING, full_slot.state);
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+    EXPECT_EQ(NX_STREAM_SLOT_FREE, full_slot.state);
+    EXPECT_EQ(0U, memory.CR & DMA_SxCR_EN);
+    EXPECT_EQ(0U, adc.CR2 & (ADC_CR2_EXTEN | ADC_CR2_DMA | ADC_CR2_ADON));
+}
+
 TEST_F(Stm32AdcStream, StabilizationRequiresExplicitServiceBeforeFirstTrigger) {
     ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
     EXPECT_EQ(timer.CR1 & TIM_CR1_CEN, 0U);
@@ -163,6 +271,8 @@ TEST_F(Stm32AdcStream, StabilizationRequiresExplicitServiceBeforeFirstTrigger) {
     ASSERT_EQ(nx_native_clock_advance(2U), NX_SUCCESS);
     EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
     EXPECT_EQ(timer.CR1 & TIM_CR1_CEN, 0U);
+    ASSERT_EQ(nx_native_clock_advance(1U), NX_SUCCESS);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
     ASSERT_EQ(nx_native_clock_advance(1U), NX_SUCCESS);
     EXPECT_EQ(nx_adc_port_stream_service(&port), NX_SUCCESS);
     EXPECT_NE(timer.CR1 & TIM_CR1_CEN, 0U);
@@ -181,7 +291,7 @@ TEST_F(Stm32AdcStream, ValidatesCompleteScanConversionBudgetBeforeAdmission) {
 TEST_F(Stm32AdcStream,
        PublishesOnlyAfterDrainAndRequiresExplicitFreeBlockResume) {
     ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
-    ASSERT_EQ(nx_native_clock_advance(3U), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(4U), NX_SUCCESS);
     ASSERT_EQ(nx_adc_port_stream_service(&port), NX_SUCCESS);
     EXPECT_EQ(memory.NDTR, 4U);
     EXPECT_NE(timer.CR1 & TIM_CR1_CEN, 0U);
@@ -205,7 +315,7 @@ TEST_F(Stm32AdcStream,
     EXPECT_EQ(memory.CR & DMA_SxCR_EN, 0U);
     EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
     EXPECT_EQ(timer.CR1 & TIM_CR1_CEN, 0U);
-    ASSERT_EQ(nx_native_clock_advance(3U), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(4U), NX_SUCCESS);
     EXPECT_EQ(nx_adc_port_stream_service(&port), NX_SUCCESS);
     EXPECT_NE(memory.CR & DMA_SxCR_EN, 0U);
     EXPECT_NE(timer.CR1 & TIM_CR1_CEN, 0U);
@@ -214,7 +324,7 @@ TEST_F(Stm32AdcStream,
 
 TEST_F(Stm32AdcStream, RefusedDisableNeverPublishesMutableDmaMemory) {
     ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
-    ASSERT_EQ(nx_native_clock_advance(3U), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(4U), NX_SUCCESS);
     ASSERT_EQ(nx_adc_port_stream_service(&port), NX_SUCCESS);
     s_hold_dma_enable = true;
     memory.NDTR = 0U;
@@ -245,10 +355,12 @@ TEST_F(Stm32AdcStream, WarmupStartsAfterPowerStoreBarrierCompletes) {
     ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
     EXPECT_FALSE(s_delay_power_store);
     EXPECT_EQ(nx_time_now_us(), 105U);
-    EXPECT_EQ(state.ready_at, 108U);
+    EXPECT_EQ(state.ready_at, 109U);
     EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
     EXPECT_EQ(timer.CR1 & TIM_CR1_CEN, 0U);
     ASSERT_EQ(nx_native_clock_advance(2U), NX_SUCCESS);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
+    ASSERT_EQ(nx_native_clock_advance(1U), NX_SUCCESS);
     EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
     ASSERT_EQ(nx_native_clock_advance(1U), NX_SUCCESS);
     EXPECT_EQ(nx_adc_port_stream_service(&port), NX_SUCCESS);
@@ -257,7 +369,7 @@ TEST_F(Stm32AdcStream, WarmupStartsAfterPowerStoreBarrierCompletes) {
 
 TEST_F(Stm32AdcStream, ObservedDmaFaultCannotBeReplacedByLateTransferComplete) {
     ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
-    ASSERT_EQ(nx_native_clock_advance(3U), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(4U), NX_SUCCESS);
     ASSERT_EQ(nx_adc_port_stream_service(&port), NX_SUCCESS);
     s_hold_dma_enable = true;
     memory.NDTR = 1U;
@@ -331,6 +443,85 @@ TEST_F(Stm32AdcStream, StoppedMultiChannelStreamRestoresIndependentPollShots) {
     EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
 }
 
+class Stm32AdcResolution : public Stm32AdcStream,
+                           public testing::WithParamInterface<unsigned> {};
+
+TEST_P(Stm32AdcResolution, HardwareAndPollingReportTheSelectedRawFormat) {
+    state.adc.resolution = static_cast<uint8_t>((12U - GetParam()) / 2U);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_initialize(&state.adc));
+    EXPECT_EQ(state.adc.resolution, (adc.CR1 & ADC_CR1_RES) >> ADC_CR1_RES_Pos);
+    nx_adc_info_t info{};
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_info(&port, &info));
+    EXPECT_EQ(GetParam(), info.resolution_bits);
+    size_t count{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_adc_port_sample(&port, samples, 4U,
+                                 nx_deadline_after(100U, 50U), &count));
+    EXPECT_EQ(2U, count);
+    const unsigned mask = (1U << GetParam()) - 1U;
+    EXPECT_EQ(100U & mask, samples[0]);
+    EXPECT_EQ(200U & mask, samples[1]);
+    EXPECT_EQ(state.adc.resolution, (adc.CR1 & ADC_CR1_RES) >> ADC_CR1_RES_Pos);
+}
+
+TEST_P(Stm32AdcResolution,
+       RateBudgetIncludesSampleAndSelectedConversionCycles) {
+    state.adc.resolution = static_cast<uint8_t>((12U - GetParam()) / 2U);
+    sample_times[0] = sample_times[1] = 0U;
+    constexpr uint32_t admissible[]{700000U, 800000U, 875000U, 1000000U};
+    constexpr uint32_t excessive[]{1400000U, 1000000U, 1000000U, 1400000U};
+    uint16_t prescaler = UINT16_C(0x1234);
+    uint16_t period = UINT16_C(0x5678);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_adc_stream_rate(&state, admissible[state.adc.resolution],
+                                       &prescaler, &period));
+    EXPECT_EQ(admissible[state.adc.resolution],
+              UINT32_C(84000000) / ((static_cast<uint32_t>(prescaler) + 1U) *
+                                    (static_cast<uint32_t>(period) + 1U)));
+    prescaler = UINT16_C(0x1234);
+    period = UINT16_C(0x5678);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_stm32_adc_stream_rate(&state, excessive[state.adc.resolution],
+                                       &prescaler, &period));
+    EXPECT_EQ(UINT16_C(0x1234), prescaler);
+    EXPECT_EQ(UINT16_C(0x5678), period);
+}
+
+TEST_P(Stm32AdcResolution, DmaAndPollingKeepResolutionAndHalfwordStorage) {
+    state.adc.resolution = static_cast<uint8_t>((12U - GetParam()) / 2U);
+    for (unsigned cycle = 0U; cycle < 2U; ++cycle) {
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_start(&port, &stream, 1000U));
+        EXPECT_EQ(state.adc.resolution,
+                  (adc.CR1 & ADC_CR1_RES) >> ADC_CR1_RES_Pos);
+        EXPECT_EQ(DMA_SxCR_PSIZE_0 | DMA_SxCR_MSIZE_0,
+                  memory.CR & (DMA_SxCR_PSIZE | DMA_SxCR_MSIZE));
+        EXPECT_EQ(4U, memory.NDTR);
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+        size_t count{};
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_adc_port_sample(&port, samples, 4U,
+                                     nx_deadline_after(nx_time_now_us(), 50U),
+                                     &count));
+        EXPECT_EQ(2U, count);
+        EXPECT_EQ(0U, adc.CR1 & ADC_CR1_SCAN);
+        EXPECT_EQ(state.adc.resolution,
+                  (adc.CR1 & ADC_CR1_RES) >> ADC_CR1_RES_Pos);
+        ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, &slot, 1U));
+    }
+}
+
+INSTANTIATE_TEST_SUITE_P(AllF407Resolutions, Stm32AdcResolution,
+                         testing::Values(12U, 10U, 8U, 6U));
+
+TEST_F(Stm32AdcStream, InvalidResolutionIsRejectedBeforeAnyRegisterWrite) {
+    state.adc.resolution = 4U;
+    adc.CR1 = UINT32_C(0x5A000000);
+    common.CCR = UINT32_C(0x12345678);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_adc_initialize(&state.adc));
+    EXPECT_EQ(UINT32_C(0x5A000000), adc.CR1);
+    EXPECT_EQ(UINT32_C(0x12345678), common.CCR);
+}
+
 class Stm32AdcContinuous : public testing::Test {
   protected:
     ADC_TypeDef adc = {};
@@ -356,9 +547,12 @@ class Stm32AdcContinuous : public testing::Test {
         s_error_ack = false;
         s_target_dma = &dma;
         s_delay_power_store = false;
+        s_refuse_power_enable = false;
+        s_first_start = 0U;
         s_power_adc = &adc;
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         state.base.adc.registers = &adc;
+        common.CCR = ADC_CCR_ADCPRE_0;
         state.base.adc.common = &common;
         state.base.adc.channels = channels;
         state.base.adc.sample_times = sample_times;
@@ -382,7 +576,7 @@ class Stm32AdcContinuous : public testing::Test {
     }
     void Ready() {
         ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
-        ASSERT_EQ(nx_native_clock_advance(3U), NX_SUCCESS);
+        ASSERT_EQ(nx_native_clock_advance(4U), NX_SUCCESS);
         ASSERT_EQ(nx_adc_port_stream_service(&port), NX_SUCCESS);
     }
     void Complete(unsigned bank) {
@@ -422,6 +616,72 @@ TEST_F(Stm32AdcContinuous, TwoPrepostedTargetsStayInvisibleUntilSwapped) {
     EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
 }
 
+class SecondaryAdcContinuous : public Stm32AdcContinuous,
+                               public testing::WithParamInterface<unsigned> {
+  protected:
+    void* mmio = MAP_FAILED;
+    unsigned Shift() const {
+        return GetParam() == 2U ? 16U : 6U;
+    }
+    void SetUp() override {
+        Stm32AdcContinuous::SetUp();
+        mmio = mmap(reinterpret_cast<void*>(0x40012000U), 0x1000U,
+                    PROT_READ | PROT_WRITE,
+                    MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
+        ASSERT_EQ(mmio, reinterpret_cast<void*>(0x40012000U));
+        state.base.adc.registers = GetParam() == 2U ? ADC2 : ADC3;
+        state.base.adc.initialized = false;
+        s_power_adc = state.base.adc.registers;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_continuous_initialize(&state));
+    }
+    void TearDown() override {
+        if (mmio != MAP_FAILED) {
+            EXPECT_EQ(0, munmap(mmio, 0x1000U));
+        }
+    }
+};
+
+TEST_P(SecondaryAdcContinuous, OnlyItsOwnLaneCanPublishAReplacedTarget) {
+    Ready();
+    EXPECT_EQ(GetParam() - 1U, (memory.CR & DMA_SxCR_CHSEL) >> 25U);
+    memory.CR |= DMA_SxCR_CT;
+    dma.HISR = 0x20U;
+    dma.LISR = 0x20U;
+    nx_stm32_adc_continuous_irq(&state);
+    nx_stream_block_t block{};
+    EXPECT_EQ(NX_ERROR_EMPTY, nx_stream_acquire(&stream, &block));
+    dma.LISR |= 0x20U << Shift();
+    nx_stm32_adc_continuous_irq(&state);
+    EXPECT_EQ(0x20U << Shift(), dma.LIFCR);
+    EXPECT_EQ(0x20U, dma.LISR);
+    EXPECT_EQ(0x20U, dma.HISR);
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &block));
+    EXPECT_EQ(reinterpret_cast<uint8_t*>(samples[0]), block.data);
+    EXPECT_NE(memory.M0AR,
+              static_cast<uint32_t>(reinterpret_cast<uintptr_t>(block.data)));
+    ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
+    EXPECT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+}
+
+TEST_P(SecondaryAdcContinuous, DmaErrorAndFailedDrainKeepAllOutstandingLoans) {
+    Ready();
+    s_hold_dma_enable = true;
+    dma.LISR = 0x08U << Shift();
+    nx_stm32_adc_continuous_irq(&state);
+    EXPECT_TRUE(state.halted);
+    EXPECT_EQ(2U, stream.outstanding);
+    nx_stream_block_t block{};
+    EXPECT_EQ(NX_ERROR_EMPTY, nx_stream_acquire(&stream, &block));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_adc_port_stream_stop(&port));
+    EXPECT_EQ(2U, stream.outstanding);
+    s_hold_dma_enable = false;
+    EXPECT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+    EXPECT_EQ(0U, stream.outstanding);
+}
+
+INSTANTIATE_TEST_SUITE_P(IndependentConverters, SecondaryAdcContinuous,
+                         testing::Values(2U, 3U));
+
 TEST_F(Stm32AdcContinuous, HeldConsumerForcesStopAndExplicitWarmResume) {
     Ready();
     Complete(0U);
@@ -435,7 +695,7 @@ TEST_F(Stm32AdcContinuous, HeldConsumerForcesStopAndExplicitWarmResume) {
     EXPECT_EQ(stream.losses, 1U);
     ASSERT_EQ(nx_stream_release(&stream, &held), NX_SUCCESS);
     EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
-    ASSERT_EQ(nx_native_clock_advance(3U), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(4U), NX_SUCCESS);
     EXPECT_EQ(nx_adc_port_stream_service(&port), NX_SUCCESS);
     EXPECT_NE(timer.CR1 & TIM_CR1_CEN, 0U);
     nx_stream_block_t completed = {};
@@ -507,6 +767,35 @@ TEST_F(Stm32AdcContinuous, BankFlipDuringAddressWriteNeverPublishesOldTarget) {
     EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
 }
 
+class Stm32AdcContinuousResolution
+    : public Stm32AdcContinuous,
+      public testing::WithParamInterface<unsigned> {};
+
+TEST_P(Stm32AdcContinuousResolution, FactsAndEngineUseTheSameResolution) {
+    state.base.adc.resolution = static_cast<uint8_t>((12U - GetParam()) / 2U);
+    nx_adc_info_t raw{};
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_info(&port, &raw));
+    EXPECT_EQ(GetParam(), raw.resolution_bits);
+    nx_adc_sequence_info_t facts{};
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_sequence_info(&port, &facts));
+    EXPECT_EQ(GetParam(), facts.conversion_cycles);
+    EXPECT_EQ(2U * (15U + GetParam()), facts.scan_cycles);
+    EXPECT_EQ(0U, memory.CR & DMA_SxCR_EN);
+    for (unsigned cycle = 0U; cycle < 2U; ++cycle) {
+        Ready();
+        EXPECT_EQ(state.base.adc.resolution,
+                  (adc.CR1 & ADC_CR1_RES) >> ADC_CR1_RES_Pos);
+        EXPECT_EQ(DMA_SxCR_PSIZE_0 | DMA_SxCR_MSIZE_0,
+                  memory.CR & (DMA_SxCR_PSIZE | DMA_SxCR_MSIZE));
+        EXPECT_EQ(4U, memory.NDTR);
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+        ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, slots, 3U));
+    }
+}
+
+INSTANTIATE_TEST_SUITE_P(AllF407Resolutions, Stm32AdcContinuousResolution,
+                         testing::Values(12U, 10U, 8U, 6U));
+
 TEST_F(Stm32AdcContinuous, SequenceFactsAreColdAndDescribeCompleteScanCost) {
     nx_adc_sequence_info_t facts = {};
     ASSERT_EQ(nx_adc_port_sequence_info(&port, &facts), NX_SUCCESS);
@@ -529,6 +818,7 @@ TEST_F(Stm32AdcContinuous, ObserverUsesLoanEpochAndSoftwareObservationClock) {
     ASSERT_EQ(nx_adc_port_attach_observer(&port, &observer), NX_SUCCESS);
     Ready();
     ASSERT_EQ(nx_native_clock_advance(7U), NX_SUCCESS);
+    const nx_time_us_t completed_at = nx_time_now_us();
     Complete(0U);
     nx_stream_block_t first = {};
     ASSERT_EQ(nx_stream_acquire(&stream, &first), NX_SUCCESS);
@@ -537,7 +827,7 @@ TEST_F(Stm32AdcContinuous, ObserverUsesLoanEpochAndSoftwareObservationClock) {
               NX_SUCCESS);
     EXPECT_EQ(observed.epoch, first.epoch);
     EXPECT_EQ(observed.sequence, 1U);
-    EXPECT_EQ(observed.observed_at, 110U);
+    EXPECT_EQ(observed.observed_at, completed_at);
     EXPECT_NE(observed.flags & NX_ADC_OBSERVATION_DISCONTINUITY, 0U);
     EXPECT_EQ(nx_adc_port_attach_observer(&port, nullptr), NX_ERROR_BUSY);
     ASSERT_EQ(nx_stream_release(&stream, &first), NX_SUCCESS);
@@ -633,4 +923,61 @@ TEST_F(Stm32AdcContinuous,
     EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_EXHAUSTED);
     EXPECT_EQ(stream.outstanding, 0U);
     EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
+}
+
+TEST_F(Stm32AdcStream, RegularTriggerSelectorsUseExactTimerEvents) {
+    const uint8_t selectors[]{8U, 0U, 1U, 2U, 7U, 9U, 10U, 11U, 12U, 13U, 14U};
+    const uint8_t channels_for_trigger[]{0U, 1U, 2U, 3U, 1U, 4U,
+                                         1U, 2U, 3U, 1U, 0U};
+    for (uint8_t trigger = 0U; trigger < 11U; ++trigger) {
+        SCOPED_TRACE(trigger);
+        state.trigger = trigger;
+        state.timer_clock_hz = (trigger >= 1U && trigger <= 3U) || trigger >= 9U
+                                   ? 168000000U
+                                   : 84000000U;
+        timer.SMCR = TIM_SMCR_SMS | TIM_SMCR_MSM | TIM_SMCR_ETF;
+        timer.CCMR1 = timer.CCMR2 = UINT32_MAX;
+        timer.CCER = UINT32_MAX;
+        timer.CCR1 = timer.CCR2 = timer.CCR3 = timer.CCR4 = UINT32_MAX;
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_start(&port, &stream, 1000U));
+        ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(4U));
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_stream_service(&port));
+        EXPECT_EQ(selectors[trigger], (adc.CR2 & ADC_CR2_EXTSEL) >> 24U);
+        EXPECT_EQ(0U, timer.SMCR);
+        EXPECT_EQ(0U, timer.CCMR1 | timer.CCMR2 | timer.CCER);
+        EXPECT_EQ(channels_for_trigger[trigger] == 0U ? TIM_CR2_MMS_1 : 0U,
+                  timer.CR2);
+        const uint32_t compares[]{timer.CCR1, timer.CCR2, timer.CCR3,
+                                  timer.CCR4};
+        for (unsigned channel = 1U; channel <= 4U; ++channel)
+            EXPECT_EQ(channel == channels_for_trigger[trigger] ? timer.ARR : 0U,
+                      compares[channel - 1U]);
+        EXPECT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
+        ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, &slot, 1U));
+    }
+}
+
+TEST_F(Stm32AdcStream, InvalidTriggerRejectsBeforeConverterInitialization) {
+    state.adc.initialized = false;
+    state.trigger = UINT8_MAX;
+    adc.CR1 = UINT32_C(0x1234);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_adc_stream_initialize(&state));
+    EXPECT_FALSE(state.adc.initialized);
+    EXPECT_EQ(UINT32_C(0x1234), adc.CR1);
+    EXPECT_EQ(nullptr, state.stream);
+}
+
+TEST_F(Stm32AdcContinuous, ContinuousCaptureUsesItsSelectedTrigger) {
+    state.base.trigger = NX_STM32_ADC_TIM8_CH1;
+    state.base.timer_clock_hz = 168000000U;
+    Ready();
+    EXPECT_EQ(13U, (adc.CR2 & ADC_CR2_EXTSEL) >> 24U);
+    EXPECT_EQ(0U, timer.CR2 & TIM_CR2_MMS);
+    EXPECT_EQ(timer.ARR, timer.CCR1);
+    EXPECT_EQ(0U, timer.CCER);
+    Complete(0U);
+    nx_stream_block_t block{};
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &block));
+    EXPECT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
+    EXPECT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
 }

@@ -3,7 +3,6 @@ name: Documentation Build
 on:
   workflow_call:
 
-# A PR or preview build cannot deploy Pages or mint an OIDC token.
 permissions:
   contents: read
 
@@ -17,119 +16,39 @@ jobs:
         with:
           fetch-depth: 0
           submodules: false
-
       - name: Setup the qualified Python tuple
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.12.14'
-
       - name: Prepare the reviewed selected source closure
-        run: |
-          python3 -B tools/dev/dependencies.py prepare --scope native \
-            --allow-network --report build/dependencies/docs-build-preparation.json
-
+        run: >-
+          python3 -B tools/dev/dependencies.py prepare --scope native
+          --allow-network --report build/dependencies/docs-build-preparation.json
       - name: Prepare the complete hash-locked documentation closure
-        run: |
-          python3 tools/documentation/install.py \
-            --prefix "$RUNNER_TEMP/nexus-docs-tools" \
-            --cache "$RUNNER_TEMP/nexus-docs-cache"
-
+        run: >-
+          python3 tools/documentation/install.py
+          --prefix "$RUNNER_TEMP/nexus-docs-tools"
+          --cache "$RUNNER_TEMP/nexus-docs-cache"
       - name: Check documentation source and contracts
-        run: |
-          "$RUNNER_TEMP/nexus-docs-tools/venv/bin/python" \
-            tools/dev/dev.py docs check \
-            --report build/documentation-check.json
-
-      - name: Execute the complete documentation regression domain
-        run: |
-          "$RUNNER_TEMP/nexus-docs-tools/venv/bin/python" \
-            tools/dev/dev.py docs test \
-            --tool-prefix "$RUNNER_TEMP/nexus-docs-tools" \
-            --report build/documentation-tests.json
-
-      - name: Build fresh API and bilingual documentation
-        run: |
-          "$RUNNER_TEMP/nexus-docs-tools/venv/bin/python" \
-            tools/dev/dev.py docs build \
-            --tool-prefix "$RUNNER_TEMP/nexus-docs-tools" \
-            --output build/documentation --language all --timeout 900
-
-      - name: Package verified offline documentation
-        run: |
-          "$RUNNER_TEMP/nexus-docs-tools/venv/bin/python" \
-            tools/dev/dev.py docs package \
-            --build build/documentation \
-            --output "$RUNNER_TEMP/nexus-documentation-package"
-
-      - name: Stage and compare the verified package for bounded job identity
-        run: |
-          "$RUNNER_TEMP/nexus-docs-tools/venv/bin/python" - <<'PY'
-          import hashlib
-          import json
-          import os
-          from pathlib import Path
-          import shutil
-          from tools.documentation import delivery
-
-          source = Path(os.environ['RUNNER_TEMP']) / 'nexus-documentation-package'
-          staging = Path('build/documentation-package')
-          if staging.exists() or staging.is_symlink():
-              raise SystemExit('Documentation upload staging must be fresh')
-          archives = list(source.glob('*.tar.gz'))
-          if len(archives) != 1:
-              raise SystemExit('One verified documentation archive is required')
-          manifest = delivery.verify(archives[0])
-          payload = source / manifest['release_id']
-          manifest_digest = hashlib.sha256(
-              (payload / delivery.MANIFEST).read_bytes()).hexdigest()
-          archive_digest = hashlib.sha256(archives[0].read_bytes()).hexdigest()
-          delivery.verify(payload, expected_manifest_sha256=manifest_digest)
-          shutil.copytree(source, staging)
-          copied_archive = staging / archives[0].name
-          if hashlib.sha256(copied_archive.read_bytes()).hexdigest() != archive_digest:
-              raise SystemExit('Staged archive differs from verified publication')
-          delivery.verify(copied_archive, expected_manifest_sha256=manifest_digest)
-          delivery.verify(staging / manifest['release_id'],
-                          expected_manifest_sha256=manifest_digest)
-          (staging / 'staging-copy.json').write_text(json.dumps({
-              'archive_sha256': archive_digest,
-              'manifest_sha256': manifest_digest,
-              'documentation_commit': manifest['documentation_source']['commit'],
-              'status': 'verified_copy'}, indent=2) + '\n')
-          PY
-
-      - name: Bind successful documentation bytes to observed execution
-        if: success()
-        uses: ./.github/actions/record-identity
-        with:
-          job: documentation
-          result: ${{ job.status }}
-          expected-commit: ${{ github.sha }}
-          output: build/docs-job-identity
-          require-dependencies: 'false'
-          artifacts: |
-            build/dependencies/docs-build-preparation.json
-            build/documentation/
-            build/documentation-package/
-            build/documentation-check.json
-            build/documentation-tests.json
-          tools: |
-            python=${{ runner.temp }}/nexus-docs-tools/venv/bin/python
-            doxygen=${{ runner.temp }}/nexus-docs-tools/bin/doxygen
-            sphinx=${{ runner.temp }}/nexus-docs-tools/venv/bin/sphinx-build
-
-      - name: Upload successful preview and offline package
-        if: success()
+        run: python3 tools/documentation/cli.py check --full
+      - name: Execute documentation tool tests
+        run: >-
+          python3 tools/documentation/cli.py test
+          --tool-prefix "$RUNNER_TEMP/nexus-docs-tools"
+          --report build/quality/docs-tests.json
+      - name: Build complete English and Chinese documentation
+        run: >-
+          python3 tools/documentation/cli.py build
+          --tool-prefix "$RUNNER_TEMP/nexus-docs-tools"
+          --output build/documentation --language all
+      - name: Preserve successful documentation output
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: nexus-documentation-${{ github.sha }}
-          include-hidden-files: true
-          if-no-files-found: error
-          retention-days: 30
+          name: documentation
           path: |
-            build/dependencies/docs-build-preparation.json
             build/documentation/
-            build/documentation-package/
-            build/documentation-check.json
-            build/documentation-tests.json
-            build/docs-job-identity/
+            build/dependencies/docs-build-preparation.json
+            build/quality/docs-tests.json
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 14

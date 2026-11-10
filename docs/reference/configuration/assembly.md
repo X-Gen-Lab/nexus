@@ -63,6 +63,59 @@ include it and use nominal references such as `NX_UART_REF_UART0` with
 the interface faces. Factory getters return existing static objects and do not
 start hardware.
 
+## I2C endpoint address width
+
+An `i2c_device` has `address_bits = 7` by default, with an address from 8 to
+119. Reviewed STM32F407 polling, IRQ and DMA message providers also accept
+`address_bits = 10`, with an address from 0 to 1023. Width is an exact integer;
+unknown widths and booleans reject. A controller may have both widths, and
+duplicate endpoint checks include the width. Native does not acquire 10-bit
+support from the schema. Controller metadata uses `address_bits = 0` when the
+width belongs to each endpoint; the endpoint selected contract reports 7 or 10.
+
+A 10-bit read includes its own repeated START before the read header. ES0182
+Rev19 section 2.10.4 therefore restricts the maintained F407 10-bit profile to
+`max_hz <= 88000` in Standard mode or explicit Fast mode with
+`max_hz > 100000`. The default 100 kHz profile must be changed explicitly;
+42 MHz PCLK is not an erratum exemption. Firmware also checks the actual CCR
+before borrowing storage or starting hardware. The authored ceiling and ARM
+link checks do not qualify physical rise times, target devices or bus timing.
+
+## ADC raw resolution and scan timing
+
+For the maintained F407 ADC1 modes, `resolution_bits` selects 6, 8, 10 or 12
+bits. Omitting it produces an explicit 12-bit decision in the immutable IR and
+resolved audit output. Booleans, strings and other integer values reject. A
+provider must declare support for the chosen resolution; the configuration
+field alone does not grant another device that capability.
+
+The following fragment belongs in an assembly whose Board explicitly authorizes
+the `analog` ADC binding. It is not a complete assembly or a PCB wiring claim.
+
+<!-- nexus-toml-fragment: ADC selection within an independently complete Board-authorized assembly -->
+```toml
+[adc.analog]
+binding = "analog"
+mode = "low-rate-scan"
+channels = [0, 1]
+sample_times = [0, 0]
+reference_mv = 3300
+resolution_bits = 8
+```
+
+Polling, finite trigger DMA and continuous trigger DMA share the selected raw
+format. According to RM0090 Rev22 §13.7, one rank costs its selected acquisition
+cycles plus 12, 10, 8 or 6 conversion cycles. Rate admission and continuous
+sequence metadata use the complete scan cost. A timer divider must also be exact;
+lowering the resolution never silently changes the requested trigger rate.
+
+DMA still transfers halfwords, and each sample remains a right-aligned native
+`uint16_t` raw count. Block capacities and lengths remain byte counts and must
+contain whole scans.
+No packed byte format or extra buffer is introduced for 6- or 8-bit conversions.
+These software facts do not establish analog accuracy, effective resolution,
+sample aperture timestamps or physical throughput.
+
 ## Physical Flash and the selected image
 
 `flash` in the resolved output describes the complete physical device, including

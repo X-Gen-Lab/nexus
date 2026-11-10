@@ -283,6 +283,26 @@
       "requires": {
         "display_module": "ili9341-16bit"
       }
+    },
+    {
+      "id": "crc",
+      "controller": "CRC",
+      "route": "crc-internal"
+    },
+    {
+      "id": "wwdg",
+      "controller": "WWDG",
+      "route": "wwdg"
+    },
+    {
+      "id": "pvd",
+      "controller": "EXTI16",
+      "route": "pvd-exti16"
+    },
+    {
+      "id": "rng",
+      "controller": "RNG",
+      "route": "rng-internal"
     }
   ],
   "reserved_resources": [

@@ -8,7 +8,12 @@
 
 #define HAL_MODULE_ENABLED
 #define HAL_SD_MODULE_ENABLED
-#define HSE_VALUE           8000000U
+#include "nexus_config.h"
+#if defined(NEXUS_CLOCK_SOURCE_HSE) && NEXUS_CLOCK_SOURCE_HSE
+#define HSE_VALUE NEXUS_CLOCK_INPUT_HZ
+#else
+#define HSE_VALUE 8000000U
+#endif
 #define HSI_VALUE           16000000U
 #define LSE_VALUE           32768U
 #define HSE_STARTUP_TIMEOUT 100U

@@ -3,14 +3,19 @@ import re
 
 from tools.configure.providers import hardware
 from tools.configure.providers.common import fail, owned_claims
+from .hardware import PWM_TIMERS
 
 
 def _clock(controller):
     """Name a maintained exclusive gate, not an inferred silicon topology."""
     if controller.startswith(('USART', 'UART', 'SPI', 'I2C')):
         bus = hardware.maintained('stm32f4', controller).apb
-    elif re.fullmatch('TIM[1349]', controller):
-        bus = 2 if controller in {'TIM1', 'TIM9'} else 1
+    elif controller in PWM_TIMERS:
+        bus = PWM_TIMERS[controller].apb
+    elif controller in {'TIM1', 'TIM8', 'TIM6', 'TIM7'}:
+        bus = 2 if controller in {'TIM1', 'TIM8'} else 1
+    elif controller == 'DAC':
+        bus = 1
     elif controller in {'CAN1', 'CAN2'}:
         bus = 1
     else:
@@ -26,15 +31,24 @@ def admission_declarations(result, pins, pin_count):
     claims = tuple(owned_claims(result, owners))
     clocks = set()
     for item in result.controllers:
-        if item.kind in {'uart', 'spi', 'i2c', 'pwm', 'timer_capture', 'advanced_pwm', 'can'}:
+        if item.kind in {'uart', 'spi', 'i2c', 'i2c_target', 'pwm', 'encoder', 'timer_capture', 'advanced_pwm', 'can', 'dac'}:
             clocks.add(_clock(item.controller))
-        elif item.kind == 'adc':
+        elif item.kind in {'adc', 'adc_group'}:
             register = 'RCC->APB2ENR'
             names = ('ADC1', 'ADC2', 'ADC3')
             prefix = 'RCC_APB2ENR_'
             clocks.add((register, ' | '.join((prefix + name + 'EN' for name in names))))
-        elif item.kind == 'usb_device':
-            clocks.add(('RCC->AHB2ENR', 'RCC_AHB2ENR_OTGFSEN'))
+        elif item.kind in {'usb_device', 'usb_host'}:
+            if item.controller == 'OTG_FS':
+                clocks.add(('RCC->AHB2ENR', 'RCC_AHB2ENR_OTGFSEN'))
+            else:
+                clocks.add(('RCC->AHB1ENR', 'RCC_AHB1ENR_OTGHSEN'))
+                if item.mode in {'host-hs-ulpi', 'device-hs-ulpi', 'otg-hs-ulpi'}:
+                    clocks.add(('RCC->AHB1ENR', 'RCC_AHB1ENR_OTGHSULPIEN'))
+        elif item.kind == 'capture':
+            clocks.add(('RCC->AHB2ENR', 'RCC_AHB2ENR_DCMIEN'))
+        elif item.kind == 'audio':
+            clocks.add(('RCC->APB1ENR', f'RCC_APB1ENR_SPI{item.controller[-1]}EN'))
         elif item.kind == 'block':
             clocks.add(('RCC->APB2ENR', 'RCC_APB2ENR_SDIOEN'))
         elif item.kind in {'eth', 'eth_frames'}:
@@ -42,11 +56,11 @@ def admission_declarations(result, pins, pin_count):
             if item.kind == 'eth_frames':
                 clocks.add(('RCC->AHB1ENR', 'RCC_AHB1ENR_ETHMACPTPEN'))
         elif item.kind == 'exti':
-            line = int(item.pins[0]['pin'][2:])
+            line = int(item.controller.removeprefix('EXTI'))
             exti |= 1 << line
     for item in claims:
         timer = item.key.removeprefix('controller:')
-        if re.fullmatch('TIM[1349]|TIMER[0238]', timer):
+        if timer in PWM_TIMERS or timer in {'TIM1', 'TIM6', 'TIM7', 'TIM8'}:
             clocks.add(_clock(timer))
     if result.can_domain is not None:
         clocks.add(_clock('CAN1'))

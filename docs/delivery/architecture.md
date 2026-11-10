@@ -20,7 +20,7 @@ Nexus 提供静态 C11 通用机制。当前生产 SoC 入口只有 `soc/stm32/s
 
 | 位置 | 责任与所有者 |
 |---|---|
-| `core/` | 结果、单调 deadline、请求与借用规则、整平台冷态协调 |
+| `core/` | 结果、单调 deadline、请求与借用规则、整平台启动、停止、暂停与恢复协调 |
 | `arch/` | 编译期 CPU 原语、中断状态保存恢复和明确能力 |
 | `io/` | 公共类型、检查分派与硬件无关机制 |
 | `soc/stm32/stm32f4/` | 精确芯片事实、启动、时钟、IRQ／DMA、私有控制器状态与 HAL／LL 适配 |
@@ -53,13 +53,21 @@ F4 C 实现维护资源准入、取得、收条、硬件撤回和 readback。部
 当前步骤已经产生的效果，再逆序撤回前序步骤；失败释放保留实际责任。
 
 默认静态装配通过 Core 私有 `platform_lifecycle_impl.h` 使用手写 C 协调器。
-公共 `nx_platform_lifecycle_start/stop` 以运行期参数调用同一实现。固定装配的配置、
+公共 `nx_platform_lifecycle_start/stop/suspend/resume` 以运行期参数调用同一实现。固定装配的配置、
 可选 owner 和诊断在同一编译单元可见，编译器可以裁剪恒定分支和不再需要的回调表；
 产品仅包含公共接口，不增加运行时转发层或第二份算法。
 全部 controller 准入先于硬件效果；随后依次建立 System、共享资源与 controller。
 失败按逆序撤回，在首个释放拒绝处保留剩余责任，后续 stop 只重试未完成部分。
 primary、cleanup、remaining effects 和调用期诊断独立保留，不以清理成功覆盖原始失败。
 F4 的 System／DMA／SYSCFG／pins／CAN／Ethernet 共享责任由其私有 C 协调器处理。
+
+暂停先由调用者 join 借用者，再逆序排空 controller 和共享资源；失败停在
+SUSPENDING 并保留前缀，不能直接 resume。只有完整 SUSPENDED 才按原 plan 重取
+资源和 controller；恢复失败逆序回滚，System 与原配置责任仍保留。自主 RTC 等
+域通过同一 owner 的显式 suspend/resume hook 保留，不由通用协调器直接写硬件。
+暂停本身不进入低功耗；STOP 的独立电源机制恢复后建立新 Core epoch，应用与 OS
+重新建立 deadline，不能把暂停代次当作时间转换。详见
+[System 合同](../design/f407-system-power.md)。
 
 ACCEPTED 后借用请求与 buffer，直到 acquire 观察 SETTLED。DMA 完成、线上完成、
 IRQ／callback 撤回和最终发布分别证明；timeout／cancel 不提前释放借用。
@@ -75,8 +83,7 @@ Board／SoC 不再保留 Python 插件。默认主机工具仍使用 Python 校�
 由手写 C 维护。既有 `nx_lifecycle_*` 可撤销资源事务与整平台协调器职责不同，不要求
 为统一外观把全部驱动改接同一组 ops。
 
-Host C11 `nxconfig` 是可选主机试点，其全面替换不作为固件 C 化或软件交付前置。
-协调状态保留身份、16-bit 前缀和重入保护，M4 ABI 为 8 字节；超过 65535 个物理
+协调状态保留身份、16-bit 前缀、重入保护和暂停阶段，当前 M4 ELF 为 12 字节；超过 65535 个物理
 controller 的 plan 在任何 owner 回调前拒绝。它不改变日常 I/O 热路径；实际资源、
 模型行为、ARM 链接和
 物理测量各自验收，不能从源码迁移推导整平台通过。

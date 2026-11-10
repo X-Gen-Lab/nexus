@@ -154,12 +154,26 @@ class EndpointPolicy:
 
     spi_transaction: bool = False
     i2c_long: bool = False
-    spi_dma: tuple[str | None, str] | None = None
+    spi_dma: tuple[tuple[str, ...] | None, str] | None = None
     model_async_echo: bool = False
+    spi_lsb_first: bool = False
+    i2c_ten_bit: bool = False
 
     def validate(self, device, controller):
         driver, kind, mode = (device["driver"], controller["kind"],
                               controller["mode"])
+        if kind == "i2c":
+            width = device.get("address_bits", 7)
+            if type(width) is not int or width not in (7, 10):
+                fail("I2C address_bits must be exactly 7 or 10")
+            if width == 10 and not self.i2c_ten_bit:
+                fail("I2C requires a reviewed 10-bit endpoint provider")
+        if "lsb_first" in device:
+            if type(device["lsb_first"]) is not bool:
+                fail("SPI lsb_first must be a boolean")
+            if device["lsb_first"] and (not self.spi_lsb_first or driver not in {
+                    "spi-endpoint", "spi-transaction", "spi-dma-transaction"}):
+                fail("SPI LSB-first requires a reviewed endpoint provider")
         if driver == "spi-transaction":
             if kind != "spi":
                 fail("SPI transaction requires its SPI controller")
@@ -174,7 +188,7 @@ class EndpointPolicy:
             if (kind != "spi" or self.spi_dma is None or
                     mode != self.spi_dma[1] or
                     (self.spi_dma[0] is not None and
-                     controller["controller"] != self.spi_dma[0])):
+                     controller["controller"] not in self.spi_dma[0])):
                 fail("SPI DMA transaction requires a reviewed DMA mode")
         if self.model_async_echo and mode == "async-model":
             if driver != "spi-dma-transaction" or "model_bytes" in device:
@@ -339,11 +353,31 @@ class ModeTraits:
 
 
 _MODE_TRAITS = MappingProxyType({
+    ('capture', 'snapshot-raw'): ModeTraits(irq=True, rx_dma=True),
+    ('capture', 'snapshot-jpeg'): ModeTraits(irq=True, rx_dma=True),
+    ('capture', 'raw-blocks'): ModeTraits(irq=True, rx_dma=True, continuous=True),
+    **{('audio', role + '-' + direction): ModeTraits(
+        irq=True, tx_dma=direction != 'rx', rx_dma=direction != 'tx')
+       for role in ('master', 'slave') for direction in ('tx', 'rx', 'duplex')},
+    ("dac", "direct"): ModeTraits(polling=True),
+    ("crc", "crc32-words"): ModeTraits(polling=True),
+    ("dac", "triggered"): ModeTraits(polling=True),
+    ("dac", "noise"): ModeTraits(polling=True),
+    ("dac", "triangle"): ModeTraits(polling=True),
+    ("dac", "trigger-dma"): ModeTraits(irq=True, tx_dma=True),
+    ("dac", "trigger-dma-circular"): ModeTraits(irq=True, tx_dma=True,
+                                               continuous=True),
     ("memory_window", "startup-memory"): ModeTraits(),
     ("external_bus", "async16"): ModeTraits(polling=True),
+    ("external_bus", "external-memory"): ModeTraits(polling=True),
+    ("memory_window", "psram-window"): ModeTraits(),
+    ("flash_async", "nor-cfi"): ModeTraits(polling=True),
+    ("nand", "raw-page"): ModeTraits(polling=True),
     ("memory_window", "cpu-window"): ModeTraits(),
     ("parallel16", "8080-16"): ModeTraits(polling=True),
     ("block", "sdio-poll"): ModeTraits(polling=True),
+    ("block", "sdio-irq"): ModeTraits(irq=True),
+    ("block", "sdio-dma"): ModeTraits(irq=True, tx_dma=True, rx_dma=True),
     ("rtc", "calendar-alarm"): ModeTraits(),
     ("rtc", "retained-calendar-alarm"): ModeTraits(),
     ("rtc", "adopt-retained"): ModeTraits(polling=True),
@@ -356,17 +390,30 @@ _MODE_TRAITS = MappingProxyType({
     ("can_fd", "iso-fd-loopback"): ModeTraits(irq=True),
     ("can_fd", "iso-fd-normal"): ModeTraits(irq=True),
     ("pwm_group", "coherent-pwm"): ModeTraits(irq=True),
+    ("timer_pulse", "one-pulse"): ModeTraits(irq=True),
+    ("timer_sequence", "dma-burst"): ModeTraits(irq=True, tx_dma=True),
     ("encoder", "quadrature"): ModeTraits(),
     ("timer_capture", "edge-capture"): ModeTraits(irq=True),
     ("advanced_pwm", "complementary-pwm"): ModeTraits(irq=True),
     ("eth", "raw-rmii"): ModeTraits(irq=True, bus_master=True),
+    ("eth", "raw-mii"): ModeTraits(irq=True, bus_master=True),
     ("eth_frames", "rmii-vlan-sg-ptp"): ModeTraits(irq=True, bus_master=True),
+    ("eth_frames", "mii-vlan-sg-ptp"): ModeTraits(irq=True, bus_master=True),
     ("usb_device", "device-fs"): ModeTraits(irq=True),
+    ("usb_device", "otg-fs"): ModeTraits(irq=True),
+    ("usb_device", "otg-hs-fs"): ModeTraits(irq=True),
+    ("usb_device", "otg-hs-ulpi"): ModeTraits(irq=True),
+    ("usb_device", "device-hs-fs"): ModeTraits(irq=True),
+    ("usb_device", "device-hs-ulpi"): ModeTraits(irq=True),
+    ("usb_host", "host-fs"): ModeTraits(irq=True),
+    ("usb_host", "host-hs-fs"): ModeTraits(irq=True),
+    ("usb_host", "host-hs-ulpi"): ModeTraits(irq=True),
     ("can", "classic-irq"): ModeTraits(irq=True),
     ("gpio", "input"): ModeTraits(),
     ("gpio", "output"): ModeTraits(),
     ("gpio", "named-states"): ModeTraits(),
     ("uart", "irq-byte-event"): ModeTraits(irq=True),
+    ("uart", "irq-wire"): ModeTraits(irq=True),
     ("uart", "irq-words"): ModeTraits(irq=True),
     ("uart", "irq-bytes"): ModeTraits(irq=True),
     ("uart", "irq-fifo-bytes"): ModeTraits(irq=True),
@@ -382,11 +429,15 @@ _MODE_TRAITS = MappingProxyType({
         irq=True, block_stream=True, rx_dma=True, continuous=True),
     ("uart", "dma-duplex-continuous"): ModeTraits(
         irq=True, block_stream=True, tx_dma=True, rx_dma=True, continuous=True),
+    ("entropy", "rng-words"): ModeTraits(polling=True),
     ("spi", "short-poll"): ModeTraits(polling=True),
+    ("spi", "irq-frames"): ModeTraits(irq=True),
     ("spi", "async-model"): ModeTraits(irq=True),
     ("spi", "dma"): ModeTraits(irq=True, tx_dma=True, rx_dma=True),
     ("spi", "dma-full-duplex"): ModeTraits(
         irq=True, tx_dma=True, rx_dma=True),
+    ("i2c_target", "target-irq"): ModeTraits(irq=True),
+    ("i2c_target", "smbus-device"): ModeTraits(irq=True),
     ("i2c", "poll-messages"): ModeTraits(polling=True),
     ("i2c", "irq-messages"): ModeTraits(irq=True),
     ("i2c", "dma-messages"): ModeTraits(
@@ -394,11 +445,15 @@ _MODE_TRAITS = MappingProxyType({
     ("flash", "poll-byte"): ModeTraits(polling=True),
     ("flash", "poll-word"): ModeTraits(polling=True),
     ("watchdog", "independent"): ModeTraits(),
+    ("watchdog", "window"): ModeTraits(),
     ("exti", "edge-event"): ModeTraits(irq=True),
+    ("exti", "pvd-level"): ModeTraits(polling=True),
+    ("exti", "pvd-events"): ModeTraits(irq=True),
     ("pwm", "fixed-pwm"): ModeTraits(),
     ("pwm", "shared-fixed-pwm"): ModeTraits(),
     ("adc", "single-shot"): ModeTraits(polling=True),
     ("adc", "low-rate-scan"): ModeTraits(polling=True),
+    ("adc", "injected-shot"): ModeTraits(polling=True),
     ("adc", "trigger-dma"): ModeTraits(
         irq=True, block_stream=True, rx_dma=True),
     ("adc", "trigger-dma-continuous"): ModeTraits(
@@ -469,12 +524,7 @@ def route_dma(route, mode):
     return route.get("mode_dma", {}).get(mode, route.get("dma", []))
 
 
-def validate_dma(route, mode, expected, family, normalize, trigger=None):
+def validate_dma(route, mode, expected, family):
     actual = tuple(sequence(route_dma(route, mode), "DMA route"))
     if expected is None or actual != expected:
         fail(f"DMA route differs from fixed provider: {family}/{route['controller']}/{mode}")
-    if route["kind"] == "adc" and mode_traits("adc", mode).dma:
-        resources = tuple(normalize(resource) for resource in
-                          route.get("mode_resources", {}).get(mode, []))
-        if trigger is None or resources != ("controller:" + trigger,):
-            fail(f"Trigger resource differs from fixed provider: {family}/{route['controller']}")

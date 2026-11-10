@@ -13,6 +13,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "spi_dma_sequence_owner.h"
+#include "stm32f407_clock.h"
 #include "stm32f407_dma.h"
 #include "stm32f4xx_ll_spi.h"
 
@@ -37,13 +38,15 @@
 /** \brief Selected register identity determines the immutable reviewed route.
  */
 static bool primary(const nx_stm32_spi_dma_state_t* state) {
-    return state->spi.registers != SPI2;
+    return state->spi.registers != SPI2 && state->spi.registers != SPI3;
 }
 /** \brief Each selected engine's vector is independent of DMA request
  * selectors. */
 static IRQn_Type dma_irq(const nx_stm32_spi_dma_state_t* state, bool receive) {
     if (primary(state))
         return receive ? DMA2_Stream0_IRQn : DMA2_Stream3_IRQn;
+    if (state->spi.registers == SPI3)
+        return receive ? DMA1_Stream0_IRQn : DMA1_Stream5_IRQn;
     return receive ? DMA1_Stream3_IRQn : DMA1_Stream4_IRQn;
 }
 /** \brief The second pair straddles low and high status banks. */
@@ -51,6 +54,8 @@ static uint32_t flag_shift(const nx_stm32_spi_dma_state_t* state,
                            bool receive) {
     if (primary(state))
         return receive ? 0U : 22U;
+    if (state->spi.registers == SPI3)
+        return receive ? 0U : 6U;
     return receive ? 22U : 0U;
 }
 /** \brief Observe only the exact engine's retained terminal group. */
@@ -92,6 +97,17 @@ static void detach(nx_stm32_spi_dma_state_t* state, bool receive) {
     acknowledge_bits(state, receive, flags(state, receive) & 0x30U);
 }
 
+/** \brief RM0090 fixed full-duplex routes, without per-instance metadata. */
+static bool route_valid(SPI_TypeDef* registers, DMA_TypeDef* dma,
+                        DMA_Stream_TypeDef* tx, DMA_Stream_TypeDef* rx) {
+    if (registers == SPI1)
+        return dma == DMA2 && tx == DMA2_Stream3 && rx == DMA2_Stream0;
+    if (registers == SPI2)
+        return dma == DMA1 && tx == DMA1_Stream4 && rx == DMA1_Stream3;
+    return registers == SPI3 && dma == DMA1 && tx == DMA1_Stream5 &&
+           rx == DMA1_Stream0;
+}
+
 /** \brief Refuse alternate controller routes before acquiring any request. */
 nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state) {
     if (state == NULL || state->spi.registers == NULL ||
@@ -106,11 +122,9 @@ nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state) {
     }
 #ifndef NEXUS_STM32_MODEL
     bool first = state->spi.registers == SPI1;
-    if ((!first && state->spi.registers != SPI2) || state->spi.rcc != RCC ||
-        state->spi.clock_hz != (first ? 84000000U : 42000000U) ||
-        state->dma != (first ? DMA2 : DMA1) ||
-        state->tx != (first ? DMA2_Stream3 : DMA1_Stream4) ||
-        state->rx != (first ? DMA2_Stream0 : DMA1_Stream3)) {
+    if (!route_valid(state->spi.registers, state->dma, state->tx, state->rx) ||
+        state->spi.rcc != RCC ||
+        state->spi.clock_hz != (first ? NEXUS_APB2_HZ : NEXUS_APB1_HZ)) {
         return NX_ERROR_UNSUPPORTED;
     }
 #endif
@@ -123,8 +137,12 @@ nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state) {
     /* An idle peripheral still has an owner while its vectors are retained. */
     unsigned rx_vector = (unsigned)dma_irq(state, true);
     unsigned tx_vector = (unsigned)dma_irq(state, false);
-    if ((NVIC->ISER[rx_vector / 32U] & (1UL << (rx_vector % 32U))) != 0U ||
-        (NVIC->ISER[tx_vector / 32U] & (1UL << (tx_vector % 32U))) != 0U) {
+    if (((NVIC->ISER[rx_vector / 32U] | NVIC->ISPR[rx_vector / 32U] |
+          NVIC->IABR[rx_vector / 32U]) &
+         (1UL << (rx_vector % 32U))) != 0U ||
+        ((NVIC->ISER[tx_vector / 32U] | NVIC->ISPR[tx_vector / 32U] |
+          NVIC->IABR[tx_vector / 32U]) &
+         (1UL << (tx_vector % 32U))) != 0U) {
         return NX_ERROR_BUSY;
     }
 #endif
@@ -171,7 +189,8 @@ static nx_result_t configuration(nx_stm32_spi_dma_endpoint_state_t* device,
     }
     *control = SPI_CR1_MSTR | SPI_CR1_SSM | SPI_CR1_SSI | (baud_bits << 3U) |
                ((endpoint->mode & 1U) != 0U ? SPI_CR1_CPHA : 0U) |
-               ((endpoint->mode & 2U) != 0U ? SPI_CR1_CPOL : 0U);
+               ((endpoint->mode & 2U) != 0U ? SPI_CR1_CPOL : 0U) |
+               (endpoint->lsb_first ? SPI_CR1_LSBFIRST : 0U);
     return NX_SUCCESS;
 }
 
@@ -234,6 +253,30 @@ static void program(nx_stm32_spi_dma_state_t* state, bool receive,
                  DMA_SxCR_DMEIE | (receive ? 0U : DMA_SxCR_DIR_0);
 }
 
+/** \brief Keep the first terminal error and deadline through every retry. */
+static void begin_drain(nx_stm32_spi_dma_state_t* state, nx_result_t terminal) {
+    detach(state, false);
+    detach(state, true);
+    if (state->terminal == NX_SUCCESS)
+        state->terminal = terminal;
+    if (!state->draining) {
+        state->draining = true;
+        if (state->drain_deadline == NX_DEADLINE_NEVER)
+            state->drain_deadline = nx_deadline_after(nx_time_now_us(), 200U);
+        (void)nx_request_transition(&state->active->base, NX_REQUEST_DRAINING);
+    }
+}
+
+/** \brief A missed drain budget isolates storage without revoking its loan. */
+static void observe_drain_deadline(nx_stm32_spi_dma_state_t* state,
+                                   nx_time_us_t now) {
+    if (state->draining && nx_deadline_expired(state->drain_deadline, now) &&
+        nx_request_state(&state->active->base) != NX_REQUEST_QUARANTINED) {
+        (void)nx_request_transition(&state->active->base,
+                                    NX_REQUEST_QUARANTINED);
+    }
+}
+
 /** \brief One admission gates both DMA engines and the entire selected CS
  * interval. */
 static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
@@ -261,7 +304,8 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
             (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
             result = NX_ERROR_BUSY;
         } else if (!retained_cs ||
-                   (state->spi.active && state->endpoint == device)) {
+                   (state->spi.active &&
+                    state->spi.held_endpoint == &device->endpoint)) {
             if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
                 result = NX_ERROR_TIMEOUT;
             } else {
@@ -278,7 +322,6 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
     }
     state->memory_flags = memory_flags;
     state->active = request;
-    state->endpoint = device;
     state->spi.active = true;
     state->terminal = NX_SUCCESS;
     state->draining = false;
@@ -289,9 +332,13 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
     state->spi.registers->CR2 = 0U;
     program(state, true, request, bits);
     program(state, false, request, bits);
-    if (!retained_cs) {
-        (void)nx_stm32_gpio_write(device->endpoint.cs, 0U,
-                                  device->endpoint.cs_mask);
+    if (!retained_cs &&
+        nx_stm32_spi_select(&device->endpoint, true) != NX_SUCCESS) {
+        /* Admission already borrowed memory. Do not start either engine or
+         * turn a partially applied CS command into an unborrowed rejection. */
+        begin_drain(state, NX_ERROR_IO);
+        nx_arch_irq_restore(saved);
+        return NX_SUCCESS;
     }
     nx_arch_dsb();
     state->rx->CR |= DMA_SxCR_EN;
@@ -321,17 +368,6 @@ static nx_result_t start_admitted(void* context, nx_spi_request_t* request) {
         return NX_ERROR_STATE;
     }
     return start(context, request, true, 0U, 8U, false);
-}
-
-/** \brief Stopping DMA does not withdraw CS before an actual SPI idle
- * observation. */
-static void begin_drain(nx_stm32_spi_dma_state_t* state, nx_result_t terminal) {
-    detach(state, false);
-    detach(state, true);
-    state->draining = true;
-    state->terminal = terminal;
-    state->drain_deadline = nx_deadline_after(nx_time_now_us(), 200U);
-    (void)nx_request_transition(&state->active->base, NX_REQUEST_DRAINING);
 }
 
 /** \brief Cancellation never reclaims memory or derives wire count from NDTR.
@@ -457,9 +493,14 @@ static void service_phase(void* context, bool retained_cs) {
         (void)state->spi.registers->DR;
         (void)state->spi.registers->SR;
         nx_arch_dsb();
-        nx_stm32_spi_endpoint_state_t* endpoint = &state->endpoint->endpoint;
-        if (!retained_cs) {
-            (void)nx_stm32_gpio_write(endpoint->cs, endpoint->cs_mask, 0U);
+        const nx_stm32_spi_endpoint_state_t* endpoint =
+            state->spi.held_endpoint;
+        if (!retained_cs &&
+            nx_stm32_spi_select(endpoint, false) != NX_SUCCESS) {
+            begin_drain(state, NX_ERROR_IO);
+            observe_drain_deadline(state, now);
+            nx_arch_irq_restore(saved);
+            return;
         }
         /* Both engines are actually disabled; do not erase a late error. */
         if (state->terminal == NX_SUCCESS &&
@@ -468,25 +509,16 @@ static void service_phase(void* context, bool retained_cs) {
         }
         nx_result_t result = state->terminal;
         size_t count = result == NX_SUCCESS ? request->length : 0U;
-        state->spi.fault = result == NX_ERROR_IO;
+        state->spi.fault = state->spi.fault || result == NX_ERROR_IO;
         state->active = NULL;
-        if (!retained_cs) {
-            state->endpoint = NULL;
-        }
         state->spi.active = retained_cs;
         nx_request_settle(&request->base, result, count);
     } else {
         if (!state->draining && state->tx_complete && state->rx_complete &&
             nx_deadline_expired(state->drain_deadline, now)) {
-            nx_time_us_t deadline = state->drain_deadline;
             begin_drain(state, NX_ERROR_IO);
-            state->drain_deadline = deadline;
         }
-        if (state->draining &&
-            nx_deadline_expired(state->drain_deadline, now) &&
-            nx_request_state(&request->base) != NX_REQUEST_QUARANTINED) {
-            (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
-        }
+        observe_drain_deadline(state, now);
     }
     nx_arch_irq_restore(saved);
 }
@@ -523,6 +555,12 @@ static nx_result_t stop(void* context) {
         (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
         return NX_ERROR_BUSY;
     }
+    if (state->spi.held_endpoint != NULL) {
+        nx_result_t result =
+            nx_stm32_spi_select(state->spi.held_endpoint, false);
+        if (result != NX_SUCCESS)
+            return result;
+    }
 #ifndef NEXUS_STM32_MODEL
     NVIC_DisableIRQ(dma_irq(state, true));
     NVIC_DisableIRQ(dma_irq(state, false));
@@ -549,11 +587,8 @@ nx_result_t nx_stm32_spi_dma_prepare(nx_stm32_spi_dma_state_t* state,
     if (config == NULL || config->regions == NULL ||
         config->region_count == 0U || config->priority > 15U)
         return NX_ERROR_INVALID;
-    bool first = config->spi.registers == SPI1;
-    if ((!first && config->spi.registers != SPI2) ||
-        config->dma != (first ? DMA2 : DMA1) ||
-        config->tx != (first ? DMA2_Stream3 : DMA1_Stream4) ||
-        config->rx != (first ? DMA2_Stream0 : DMA1_Stream3))
+    if (!route_valid(config->spi.registers, config->dma, config->tx,
+                     config->rx))
         return NX_ERROR_UNSUPPORTED;
     nx_result_t result =
         nx_stm32_spi_cold_acquire(&state->spi, &config->spi, receipt);
@@ -599,10 +634,8 @@ static bool pair_config(const nx_stm32_spi_dma_config_t* config) {
         config->spi.pin_count > 16U || config->regions == NULL ||
         config->region_count == 0U || config->priority > 15U)
         return false;
-    bool first = config->spi.registers == SPI1;
-    return config->dma == (first ? DMA2 : DMA1) &&
-           config->tx == (first ? DMA2_Stream3 : DMA1_Stream4) &&
-           config->rx == (first ? DMA2_Stream0 : DMA1_Stream3);
+    return route_valid(config->spi.registers, config->dma, config->tx,
+                       config->rx);
 }
 
 nx_result_t
@@ -618,8 +651,13 @@ nx_stm32_spi_dma_pair_prepare(nx_stm32_spi_dma_state_t* state,
         state->active != NULL || state->spi.active || state->wake != NULL)
         return NX_ERROR_BUSY;
     const bool first = config->spi.registers == SPI1;
-    const unsigned vectors[2] = {first ? DMA2_Stream3_IRQn : DMA1_Stream4_IRQn,
-                                 first ? DMA2_Stream0_IRQn : DMA1_Stream3_IRQn};
+    const bool third = config->spi.registers == SPI3;
+    const unsigned vectors[2] = {first   ? DMA2_Stream3_IRQn
+                                 : third ? DMA1_Stream5_IRQn
+                                         : DMA1_Stream4_IRQn,
+                                 first   ? DMA2_Stream0_IRQn
+                                 : third ? DMA1_Stream0_IRQn
+                                         : DMA1_Stream3_IRQn};
     for (unsigned i = 0U; i < 2U; ++i) {
         const unsigned irq = vectors[i];
         const uint32_t mask = 1UL << (irq % 32U);
@@ -633,7 +671,9 @@ nx_stm32_spi_dma_pair_prepare(nx_stm32_spi_dma_state_t* state,
     if (config->kernel_bound && NVIC_GetPriorityGrouping() > 3U)
         return NX_ERROR_PERMISSION;
     volatile uint32_t* gate = first ? &RCC->APB2ENR : &RCC->APB1ENR;
-    const uint32_t mask = first ? RCC_APB2ENR_SPI1EN : RCC_APB1ENR_SPI2EN;
+    const uint32_t mask = first   ? RCC_APB2ENR_SPI1EN
+                          : third ? RCC_APB1ENR_SPI3EN
+                                  : RCC_APB1ENR_SPI2EN;
     cold->clock_added = ~*gate & mask;
     NX_PLATFORM_REGISTER_WRITE(*gate, *gate | mask);
     nx_arch_dsb();
@@ -679,8 +719,8 @@ nx_stm32_spi_dma_pair_prepare(nx_stm32_spi_dma_state_t* state,
         *entry->chip_select =
             (nx_stm32_gpio_state_t){pin->registers, 1U << pin->pin, true, true};
         *entry->endpoint = (nx_stm32_spi_endpoint_state_t){
-            &state->spi, entry->chip_select, 1U << pin->pin,
-            entry->frequency_hz, entry->mode};
+            &state->spi,         entry->chip_select, 1U << pin->pin,
+            entry->frequency_hz, entry->mode,        entry->lsb_first};
         ((nx_stm32_spi_dma_endpoint_state_t*)entry->endpoint)->dma = state;
     }
     nx_result_t status = nx_stm32_spi_dma_initialize(state);
@@ -715,8 +755,13 @@ nx_result_t nx_stm32_spi_dma_pair_close(nx_stm32_spi_dma_state_t* state,
         cold->constructed = false;
     }
     const bool first = config->spi.registers == SPI1;
-    const unsigned vectors[2] = {first ? DMA2_Stream3_IRQn : DMA1_Stream4_IRQn,
-                                 first ? DMA2_Stream0_IRQn : DMA1_Stream3_IRQn};
+    const bool third = config->spi.registers == SPI3;
+    const unsigned vectors[2] = {first   ? DMA2_Stream3_IRQn
+                                 : third ? DMA1_Stream5_IRQn
+                                         : DMA1_Stream4_IRQn,
+                                 first   ? DMA2_Stream0_IRQn
+                                 : third ? DMA1_Stream0_IRQn
+                                         : DMA1_Stream3_IRQn};
     if (cold->vectors) {
         for (unsigned i = 0U; i < 2U; ++i) {
             const unsigned irq = vectors[i];
@@ -777,6 +822,8 @@ nx_result_t nx_stm32_spi_dma_pair_close(nx_stm32_spi_dma_state_t* state,
         cold->clock_added = 0U;
     }
     state->spi.registers = NULL;
+    state->spi.held_endpoint = NULL;
+    state->spi.fault = false;
     return NX_SUCCESS;
 }
 
@@ -928,7 +975,7 @@ static nx_result_t sequence_release(void* context, void* child) {
     nx_stm32_spi_dma_state_t* state = context;
     nx_stm32_spi_dma_endpoint_state_t* endpoint = child;
     if (state == NULL || endpoint == NULL || endpoint->dma != state ||
-        state->endpoint != endpoint) {
+        state->spi.held_endpoint != &endpoint->endpoint) {
         return NX_ERROR_INVALID;
     }
     if (state->active != NULL ||
@@ -937,10 +984,8 @@ static nx_result_t sequence_release(void* context, void* child) {
         return NX_ERROR_BUSY;
     }
     nx_arch_dsb();
-    nx_result_t result = nx_stm32_gpio_write(endpoint->endpoint.cs,
-                                             endpoint->endpoint.cs_mask, 0U);
+    nx_result_t result = nx_stm32_spi_select(&endpoint->endpoint, false);
     if (result == NX_SUCCESS) {
-        state->endpoint = NULL;
         state->spi.active = false;
     }
     return result;

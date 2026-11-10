@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#define NX_STM32_SYSTEM_HAS_TIME_EPOCH 1
 
 typedef struct {
     RCC_TypeDef* rcc;
@@ -22,6 +23,7 @@ typedef struct {
     PWR_TypeDef* power;
     TIM_TypeDef* timer;
     uint64_t overflow_us;
+    uint64_t time_epoch;
     uint32_t reset_cause;
     uint32_t core_hz;
     volatile uint32_t remaining_effects;
@@ -34,6 +36,7 @@ typedef struct {
     bool owned_power_clock;
     bool power_snapshotted;
     volatile bool started;
+    bool reset_captured;
 } nx_stm32_system_t;
 
 typedef struct {
@@ -54,7 +57,7 @@ typedef struct {
 nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system);
 
 /**
- * \brief           Establish HSE8/PLL168 and TIM2 at 1 MHz.
+ * \brief           Establish the selected static clock and TIM2 at 1 MHz.
  *
  * \param[in,out]   system: Exclusive context with bound registers.
  *
@@ -65,12 +68,20 @@ nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system);
  * \details         Task startup only; no running peripheral consumers.
  *                  Bootstrap has poll bounds, not invented elapsed time.
  *                  Failed source switching retains the live clock effects.
- *                  The selected finite I2S2 cold-reset reference also holds
- *                  shared GPIOB/DMA1 gates through Platform lifetime. This is
- *                  not attachment to unknown gated DMA or running HAL owners.
  */
 nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
                                               uint32_t poll_limit);
+
+/** \brief Restore a stopped system under the exclusive deep-power guard.
+ * \param[in,out] system: Stopped owner, all old time/clock borrowers joined.
+ * \param[in] poll_limit: Nonzero bootstrap bound per restoration phase.
+ * \return Complete primary/cleanup/effects receipt, as for ordinary startup.
+ * \note Private power owner only, privileged Thread with PRIMASK=1 and other
+ *       masks clear. The closed domain excludes wake publishers through the
+ *       new epoch establishment; this never resumes old deadlines or OS time.
+ */
+nx_stm32_start_result_t nx_stm32_system_restore(nx_stm32_system_t* system,
+                                                uint32_t poll_limit);
 
 /**
  * \brief           Release the timebase and switch back to HSI.
@@ -84,9 +95,9 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
  * \note            Unrelated power fields and pre-existing PWR gates survive.
  *                  Consumers join before withdrawal; the live time epoch ends
  *                  before any timer/IRQ reference is removed.
- *                  In the selected I2S2 reference, every shared-domain user,
- *                  including external HAL users, has joined before added
- *                  GPIOB/DMA1 gates are withdrawn. Pre-existing gates survive.
+ *                  An active RNG/IRQ source retains its explicit PLL48 lease;
+ *                  stop refuses it before any write or epoch invalidation.
+ *                  The RNG owner must withdraw RNGEN before retrying.
  */
 int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit);
 
@@ -142,6 +153,26 @@ void SystemInit(void);
 
 /** \brief Reserved TIM2 vector; no other owner may use this timer. */
 void TIM2_IRQHandler(void);
+
+/** \brief Terminal CSS/NMI dispatch; no old time borrower may resume.
+ * \param[in,out] system: Exact stable owner, accessible in privileged NMI.
+ * \note Marks time failed before acknowledgement, retains all effects, masks
+ *       configurable IRQs, observes and parks. Never reads the stopped timer
+ *       as elapsed time. Selected CSS owns the generated NMI vector.
+ */
+void nx_stm32_system_css_irq(nx_stm32_system_t* system);
+
+/** \brief Establish hard-float access and the exact Flash vector before RAM.
+ * \param[in,out] scb: Accessible privileged SCB register block.
+ * \param[in] mpu_control: Accessible MPU block, required disabled at cold
+ * startup. \param[in] vectors: Exact linker vector, in internal Flash, aligned
+ * to512. \return True after barriers/readback, false before unsupported
+ * mutation. \note Reset-stack/Flash-only algorithm; no globals, libc or OS.
+ * Does not disable an inherited MPU or erase evidence of foreign RCC ownership.
+ */
+bool nx_stm32_system_cpu_boot(SCB_Type* scb,
+                              volatile const uint32_t* mpu_control,
+                              uintptr_t vectors);
 
 /** \brief Read modulo-32-bit milliseconds from the existing Nexus epoch.
  * \return Zero outside a live epoch; no HAL or SysTick timebase is started.

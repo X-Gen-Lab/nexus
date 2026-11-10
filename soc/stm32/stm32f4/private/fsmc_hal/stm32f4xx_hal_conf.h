@@ -11,7 +11,9 @@
 /* This translation unit selects the NOR/SRAM engine only. These are the
  * separate NAND and PCCARD controller compile guards, not NE3/NE4 logical
  * NOR/SRAM chip selects. No unsupported ECC tick path is linked implicitly. */
+#if !defined(NEXUS_STM32_FSMC_NAND)
 #undef FSMC_Bank2_3
+#endif
 #undef FSMC_Bank4
 #define assert_param(expression) ((void)0U)
 #endif

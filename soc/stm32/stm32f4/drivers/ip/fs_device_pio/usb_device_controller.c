@@ -7,6 +7,27 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "usb_device_controller.h"
+#include <string.h>
+
+/** \brief RM0090 Rev22 tables203/213, with the actual core clock floor. */
+uint8_t nx_usb_turnaround(uint8_t core, uint32_t ahb_hz) {
+    if (core > NX_USB_CORE_HS_ULPI ||
+        ahb_hz <= (core == NX_USB_CORE_FS ? 14200000U : 30000000U)) {
+        return 0U;
+    }
+    if (core == NX_USB_CORE_HS_ULPI) {
+        return 9U;
+    }
+    static const uint32_t upper[] = {15000000U, 16000000U, 17200000U,
+                                     18500000U, 20000000U, 21800000U,
+                                     24000000U, 27500000U, 32000000U};
+    for (size_t i = 0U; i < sizeof(upper) / sizeof(upper[0]); ++i) {
+        if (ahb_hz < upper[i]) {
+            return (uint8_t)(15U - i);
+        }
+    }
+    return 6U;
+}
 
 enum {
     AHB = 0x008U,
@@ -29,19 +50,32 @@ enum {
     OUT_EP = 0xB00U,
     FIFO = 0x1000U
 };
-#define ENABLE        (UINT32_C(1) << 31U)
-#define DISABLE       (UINT32_C(1) << 30U)
-#define SNAK          (UINT32_C(1) << 27U)
-#define CNAK          (UINT32_C(1) << 26U)
-#define STALL         (UINT32_C(1) << 21U)
-#define ACTIVE        (UINT32_C(1) << 15U)
-#define DATA_PID      (UINT32_C(1) << 16U)
-#define NAK_STATUS    (UINT32_C(1) << 17U)
-#define DATA0         (UINT32_C(1) << 28U)
-#define GEOMETRY_MASK (0x7FFU | (3U << 18U) | (15U << 22U))
+#define ENABLE         (UINT32_C(1) << 31U)
+#define DISABLE        (UINT32_C(1) << 30U)
+#define SNAK           (UINT32_C(1) << 27U)
+#define CNAK           (UINT32_C(1) << 26U)
+#define STALL          (UINT32_C(1) << 21U)
+#define ACTIVE         (UINT32_C(1) << 15U)
+#define DATA_PID       (UINT32_C(1) << 16U)
+#define NAK_STATUS     (UINT32_C(1) << 17U)
+#define DATA0          (UINT32_C(1) << 28U)
+#define ISO_OUT_DROP   (UINT32_C(1) << 14U)
+#define ISO_INCOMP_IN  (UINT32_C(1) << 20U)
+#define ISO_INCOMP_OUT (UINT32_C(1) << 21U)
+#define GEOMETRY_MASK  (0x7FFU | (3U << 18U) | (15U << 22U))
 #define GLOBAL_MASK                                                            \
     ((1U << 4U) | (1U << 11U) | (1U << 12U) | (1U << 13U) | (1U << 18U) |      \
      (1U << 19U) | (1U << 31U))
+/** \brief DMA drains RX internally, without software FIFO status pops. */
+static uint32_t global_mask(const nx_usb_controller_t* c) {
+    uint32_t mask = c->dma ? GLOBAL_MASK & ~(1U << 4U) : GLOBAL_MASK;
+    for (size_t i = 0U; i < c->endpoint_count; ++i) {
+        if (c->endpoints[i].transfer == NX_USB_PROFILE_ISOCHRONOUS)
+            mask |= c->endpoints[i].in ? ISO_INCOMP_IN
+                                       : ISO_INCOMP_OUT | ISO_OUT_DROP;
+    }
+    return mask;
+}
 #ifndef NX_USB_IRQ_ENABLE
 /** \brief Direct NVIC configuration, without a hot access table. */
 static void irq_enable(uintptr_t base, int irq, uint8_t priority,
@@ -102,6 +136,29 @@ static bool overlap(const void* a, size_t an, const void* b, size_t bn) {
     }
     return an != 0U && bn != 0U && av < bv + bn && bv < av + an;
 }
+/** \brief Core geometry never infers the negotiated PHY from the name HS. */
+static uint8_t endpoint_numbers(const nx_usb_controller_t* c) {
+    return c->core == NX_USB_CORE_FS ? 4U : 6U;
+}
+/** \brief The HS instance has its own 4096-byte physical FIFO domain. */
+static uint16_t fifo_words(const nx_usb_controller_t* c) {
+    return c->core == NX_USB_CORE_FS ? 320U : 1024U;
+}
+/** \brief Only external ULPI selects high-speed packet geometry. */
+static uint16_t packet_limit(const nx_usb_controller_t* c) {
+    return c->core == NX_USB_CORE_HS_ULPI ? 1024U : 64U;
+}
+/** \brief ULPI full-speed fallback changes active MPS, not selected maxima. */
+static uint16_t effective_mps(const nx_usb_endpoint_t* ep) {
+    const uint16_t fs_limit =
+        ep->transfer == NX_USB_PROFILE_ISOCHRONOUS ? 1023U : 64U;
+    if (ep->controller->core == NX_USB_CORE_HS_ULPI && ep->number != 0U &&
+        ep->controller->snapshot.speed == NX_USB_DEVICE_FULL_SPEED &&
+        ep->max_packet > fs_limit) {
+        return fs_limit;
+    }
+    return ep->max_packet;
+}
 /** \brief Exact selected direction, bounded by the actual eight directions. */
 static nx_usb_endpoint_t* endpoint(nx_usb_controller_t* c, uint8_t number,
                                    bool in) {
@@ -119,7 +176,8 @@ static uint32_t ep_offset(const nx_usb_endpoint_t* ep) {
 }
 /** \brief Defined FS W1C events exclude the read-only IN TXFE status bit. */
 static uint32_t ep_flags(const nx_usb_endpoint_t* ep) {
-    return NX_USB_READ(ep->controller->registers, ep_offset(ep) + 8U) & 0x5BU;
+    return NX_USB_READ(ep->controller->registers, ep_offset(ep) + 8U) &
+           (ep->controller->dma ? 0x5FU : 0x5BU);
 }
 /** \brief Selected bulk/interrupt DATA PID commands never apply to EP0. */
 static bool uses_data_toggle(const nx_usb_endpoint_t* ep) {
@@ -151,6 +209,17 @@ static bool cold_flush(nx_usb_controller_t* c, uint32_t command) {
     nx_arch_dsb();
     return true;
 }
+/** \brief ES0182 Rev19 section2.14.6 excludes immediate DAD/PFIVL reads. */
+static uint32_t configuration_write(nx_usb_controller_t* c, uint32_t value) {
+    NX_USB_WRITE(c->registers, CONFIG, value);
+    /* Sixteen ordered AHB reads exceed three 48 MHz PHY cycles at <=200 MHz.
+     * Read the global reset register, outside endpoint/FIFO write sequences. */
+    for (unsigned i = 0U; i < 16U; ++i) {
+        (void)NX_USB_READ(c->registers, RESET);
+    }
+    nx_arch_dsb();
+    return NX_USB_READ(c->registers, CONFIG);
+}
 /** \brief Hot flush is one command/readback, never the cold poll budget. */
 static bool hot_flush(nx_usb_controller_t* c, uint32_t command) {
     if ((NX_USB_READ(c->registers, RESET) & 0x31U) != 0U) {
@@ -170,13 +239,16 @@ static bool hot_flush(nx_usb_controller_t* c, uint32_t command) {
  * MMIO. */
 static bool plan_valid(nx_usb_controller_t* c) {
     if (c == NULL || c->registers == 0U || c->endpoints == NULL ||
-        c->endpoint_count < 2U || c->endpoint_count > 8U || c->events == NULL ||
-        c->capacity == 0U || c->capacity > SIZE_MAX / sizeof(*c->events) ||
-        c->poll_limit == 0U || c->drain_timeout_us == 0U ||
-        c->snapshot.started || c->clock_retained || c->clock.ops == NULL ||
-        c->clock.ops->retain == NULL || c->clock.ops->release == NULL ||
-        c->clock.ops->validate == NULL || c->clock.context == NULL ||
-        c->clock.context_size == 0U || c->snapshot.epoch == UINT64_MAX ||
+        c->core > NX_USB_CORE_HS_ULPI || c->turnaround < 6U ||
+        c->turnaround > 15U || c->endpoint_count < 2U ||
+        c->endpoint_count > (size_t)endpoint_numbers(c) * 2U ||
+        c->events == NULL || c->capacity == 0U ||
+        c->capacity > SIZE_MAX / sizeof(*c->events) || c->poll_limit == 0U ||
+        c->drain_timeout_us == 0U || c->snapshot.started || c->clock_retained ||
+        c->clock.ops == NULL || c->clock.ops->retain == NULL ||
+        c->clock.ops->release == NULL || c->clock.ops->validate == NULL ||
+        c->clock.context == NULL || c->clock.context_size == 0U ||
+        c->snapshot.epoch == UINT64_MAX ||
         overlap(c, sizeof(*c), c->clock.ops, sizeof(*c->clock.ops)) ||
         overlap(c->endpoints, c->endpoint_count * sizeof(*c->endpoints),
                 c->clock.ops, sizeof(*c->clock.ops)) ||
@@ -189,7 +261,8 @@ static bool plan_valid(nx_usb_controller_t* c) {
                 c->clock.context, c->clock.context_size) ||
         overlap(c->events, c->capacity * sizeof(*c->events), c->clock.context,
                 c->clock.context_size) ||
-        c->rx_fifo_words < 64U || c->rx_fifo_words > 320U ||
+        c->rx_fifo_words < 48U ||
+        c->rx_fifo_words > (c->core == NX_USB_CORE_FS ? 256U : fifo_words(c)) ||
         nx_irq_wake_validate(NULL, &c->irq_policy, &c->irq) != NX_SUCCESS ||
         overlap(c, sizeof(*c), c->endpoints,
                 c->endpoint_count * sizeof(*c->endpoints)) ||
@@ -199,9 +272,58 @@ static bool plan_valid(nx_usb_controller_t* c) {
         return false;
     }
     bool in0 = false, out0 = false;
+    uint8_t in_used = 0U, highest_in = 0U;
+    uint16_t largest_out = 64U;
+    uint32_t fifo_end = c->rx_fifo_words;
+    size_t out_count = 0U;
+    size_t iso_out_count = 0U;
+    if (c->dma) {
+        if (c->core == NX_USB_CORE_FS || c->dma_storage == NULL ||
+            c->dma_regions == NULL || c->dma_region_count == 0U ||
+            c->dma_region_count > SIZE_MAX / sizeof(*c->dma_regions) ||
+            overlap(c, sizeof(*c), c->dma_storage,
+                    c->endpoint_count * sizeof(*c->dma_storage)))
+            return false;
+        for (size_t i = 0U; i < c->endpoint_count; ++i) {
+            const nx_usb_dma_storage_t* storage = &c->dma_storage[i];
+            size_t minimum =
+                ((size_t)c->endpoints[i].max_packet + 3U) & ~(size_t)3U;
+            if (minimum < 24U)
+                minimum = 24U;
+            if (storage->capacity < minimum || storage->capacity > UINT32_MAX ||
+                (uintptr_t)storage->bytes >
+                    UINT32_MAX - (storage->capacity - 1U) ||
+                nx_dma_buffer_validate(
+                    c->dma_regions, c->dma_region_count, storage->bytes,
+                    storage->capacity, 4U,
+                    c->endpoints[i].in ? NX_DMA_TO_DEVICE
+                                       : NX_DMA_FROM_DEVICE) != NX_SUCCESS ||
+                overlap(storage->bytes, storage->capacity, c, sizeof(*c)) ||
+                overlap(storage->bytes, storage->capacity, c->endpoints,
+                        c->endpoint_count * sizeof(*c->endpoints)) ||
+                overlap(storage->bytes, storage->capacity, c->events,
+                        c->capacity * sizeof(*c->events)) ||
+                overlap(storage->bytes, storage->capacity, c->clock.context,
+                        c->clock.context_size) ||
+                overlap(storage->bytes, storage->capacity, c->dma_storage,
+                        c->endpoint_count * sizeof(*c->dma_storage)) ||
+                overlap(storage->bytes, storage->capacity, c->dma_regions,
+                        c->dma_region_count * sizeof(*c->dma_regions)))
+                return false;
+            for (size_t j = 0U; j < i; ++j) {
+                if (overlap(storage->bytes, storage->capacity,
+                            c->dma_storage[j].bytes,
+                            c->dma_storage[j].capacity))
+                    return false;
+            }
+        }
+    } else if (c->dma_storage != NULL || c->dma_regions != NULL ||
+               c->dma_region_count != 0U) {
+        return false;
+    }
     for (size_t i = 0U; i < c->endpoint_count; ++i) {
         nx_usb_endpoint_t* ep = &c->endpoints[i];
-        if (ep->number > 3U || ep->request != NULL) {
+        if (ep->number >= endpoint_numbers(c) || ep->request != NULL) {
             return false;
         }
         if (ep->number == 0U) {
@@ -215,21 +337,47 @@ static bool plan_valid(nx_usb_controller_t* c) {
                 out0 = true;
             }
         } else if (ep->transfer == NX_USB_PROFILE_BULK) {
-            if (ep->max_packet != 8U && ep->max_packet != 16U &&
-                ep->max_packet != 32U && ep->max_packet != 64U) {
+            bool valid = c->core == NX_USB_CORE_HS_ULPI
+                             ? ep->max_packet == 512U
+                             : ep->max_packet == 8U || ep->max_packet == 16U ||
+                                   ep->max_packet == 32U ||
+                                   ep->max_packet == 64U;
+            if (!valid) {
                 return false;
             }
-        } else if (ep->transfer != NX_USB_PROFILE_INTERRUPT || !ep->in ||
-                   ep->max_packet == 0U || ep->max_packet > 64U) {
+        } else if (ep->transfer == NX_USB_PROFILE_ISOCHRONOUS) {
+            if (ep->max_packet == 0U ||
+                ep->max_packet >
+                    (c->core == NX_USB_CORE_HS_ULPI ? 1024U : 1023U))
+                return false;
+        } else if (ep->transfer != NX_USB_PROFILE_INTERRUPT ||
+                   ep->max_packet == 0U || ep->max_packet > packet_limit(c)) {
             return false;
         }
         if (ep->in &&
-            (ep->fifo_words < 16U || ep->fifo_start < c->rx_fifo_words ||
-             (uint32_t)ep->fifo_start + ep->fifo_words > 320U)) {
+            (ep->fifo_words < 16U ||
+             (ep->number == 0U && ep->fifo_words > 256U) ||
+             ep->fifo_words < (uint16_t)((ep->max_packet + 3U) / 4U) ||
+             ep->fifo_start < c->rx_fifo_words ||
+             (uint32_t)ep->fifo_start + ep->fifo_words > fifo_words(c))) {
             return false;
         }
         if (!ep->in && (ep->fifo_start != 0U || ep->fifo_words != 0U)) {
             return false;
+        }
+        if (ep->in) {
+            in_used |= (uint8_t)(1U << ep->number);
+            if (ep->number > highest_in)
+                highest_in = ep->number;
+            uint32_t end = (uint32_t)ep->fifo_start + ep->fifo_words;
+            if (end > fifo_end)
+                fifo_end = end;
+        } else {
+            ++out_count;
+            if (ep->transfer == NX_USB_PROFILE_ISOCHRONOUS)
+                ++iso_out_count;
+            if (ep->max_packet > largest_out)
+                largest_out = ep->max_packet;
         }
         for (size_t j = 0U; j < i; ++j) {
             const nx_usb_endpoint_t* other = &c->endpoints[j];
@@ -243,7 +391,42 @@ static bool plan_valid(nx_usb_controller_t* c) {
             }
         }
     }
-    return in0 && out0;
+    /* RM35.10.1: SETUP10 + global NAK1 + packet/status + OUT completion.
+     * The pinned PCDEx requires 16 words for every lower unused IN FIFO.
+     * Reserve 32 words in DMA mode, covering the six numbered DMA banks. */
+    for (uint8_t number = 1U; number < highest_in; ++number) {
+        if ((in_used & (1U << number)) == 0U)
+            fifo_end += 16U;
+    }
+    if (c->dma)
+        fifo_end += 32U;
+    size_t packet_words = ((size_t)largest_out + 3U) / 4U + 1U;
+    size_t minimum_rx =
+        11U + packet_words * (iso_out_count > 1U ? 2U : 1U) + out_count;
+    return in0 && out0 && c->rx_fifo_words >= minimum_rx &&
+           fifo_end <= fifo_words(c);
+}
+/** \brief Pure validation also admits cold plans before their pin effects. */
+nx_result_t nx_usb_controller_plan_validate(nx_usb_controller_t* c) {
+    return plan_valid(c) ? NX_SUCCESS : NX_ERROR_INVALID;
+}
+/** \brief Exact selected direction storage, separate from application loans. */
+static const nx_usb_dma_storage_t* dma_storage(const nx_usb_endpoint_t* ep) {
+    return &ep->controller
+                ->dma_storage[(size_t)(ep - ep->controller->endpoints)];
+}
+/** \brief Endpoint disable and AHB idle precede DMA address readback. */
+static bool dma_detached(nx_usb_endpoint_t* ep) {
+    nx_usb_controller_t* c = ep->controller;
+    if (!c->dma)
+        return true;
+    if ((NX_USB_READ(c->registers, ep_offset(ep)) & ENABLE) != 0U ||
+        (NX_USB_READ(c->registers, RESET) & ENABLE) == 0U)
+        return false;
+    NX_USB_WRITE(c->registers, ep_offset(ep) + 20U, 0U);
+    nx_arch_dsb();
+    return NX_USB_READ(c->registers, ep_offset(ep) + 20U) == 0U &&
+           (NX_USB_READ(c->registers, RESET) & ENABLE) != 0U;
 }
 /** \brief Exact selected direction bit; EP0 has separate lifecycle ownership.
  */
@@ -251,9 +434,14 @@ static uint32_t endpoint_interrupt_bit(const nx_usb_endpoint_t* ep) {
     return 1U << (ep->number + (ep->in ? 0U : 16U));
 }
 /** \brief Immutable nonzero geometry excludes OUT-only reserved FIFO fields. */
+static uint32_t endpoint_type(const nx_usb_endpoint_t* ep) {
+    return ep->transfer == NX_USB_PROFILE_ISOCHRONOUS ? 1U
+           : ep->transfer == NX_USB_PROFILE_INTERRUPT ? 3U
+                                                      : 2U;
+}
+/** \brief Live fallback changes MPS without changing the selected transport. */
 static uint32_t endpoint_geometry(const nx_usb_endpoint_t* ep) {
-    uint32_t type = ep->transfer == NX_USB_PROFILE_INTERRUPT ? 3U : 2U;
-    return (uint32_t)ep->max_packet | (type << 18U) |
+    return (uint32_t)effective_mps(ep) | (endpoint_type(ep) << 18U) |
            (ep->in ? (uint32_t)ep->number << 22U : 0U);
 }
 /** \brief Preserve every other selected route and prove the complete RMW. */
@@ -287,11 +475,11 @@ static bool activate_endpoint(nx_usb_endpoint_t* ep, uint32_t control) {
     uint32_t geometry = endpoint_geometry(ep);
     uint32_t commands = ENABLE | DISABLE | SNAK | CNAK | DATA0 | (1U << 29U);
     control = (control & ~(GEOMETRY_MASK | ACTIVE | STALL | commands)) |
-              geometry | ACTIVE | SNAK | DATA0;
+              geometry | ACTIVE | SNAK | (uses_data_toggle(ep) ? DATA0 : 0U);
     NX_USB_WRITE(base, ep_offset(ep), control);
     nx_arch_dsb();
     uint32_t mask = GEOMETRY_MASK | ACTIVE | ENABLE | DISABLE | STALL |
-                    DATA_PID | NAK_STATUS;
+                    (uses_data_toggle(ep) ? DATA_PID : 0U) | NAK_STATUS;
     uint32_t expected = geometry | ACTIVE | NAK_STATUS;
     return wait_bits(ep->controller, ep_offset(ep), mask, expected) &&
            activation_hints(ep, true);
@@ -343,6 +531,11 @@ static void arm_setup(nx_usb_controller_t* c) {
         return;
     }
     uint32_t offset = ep_offset(ep);
+    if (c->dma) {
+        NX_USB_WRITE(c->registers, offset + 20U,
+                     (uint32_t)(uintptr_t)dma_storage(ep)->bytes);
+        nx_arch_dsb();
+    }
     NX_USB_WRITE(c->registers, offset + 16U, (3U << 29U) | (1U << 19U) | 24U);
     NX_USB_WRITE(c->registers, offset,
                  (NX_USB_READ(c->registers, offset) & ~STALL) | ENABLE | CNAK);
@@ -366,6 +559,7 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
     c->clock_retained = true;
     c->snapshot.started = true;
     c->snapshot.closing = true;
+    c->snapshot.speed = NX_USB_DEVICE_SPEED_UNKNOWN;
     /* Failed cold start is still an owner: every validated direction must be
      * bound before the first MMIO operation can fail and require stop. */
     for (size_t i = 0U; i < c->endpoint_count; ++i) {
@@ -375,7 +569,10 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
     NX_USB_WRITE(base, AHB, 0U);
     NX_USB_WRITE(base, MASK, 0U);
     NX_USB_IRQ_DISABLE(base, c->irq.irq_number);
-    NX_USB_WRITE(base, USB, (1U << 30U) | (1U << 6U) | (6U << 10U));
+    const bool ulpi = c->core == NX_USB_CORE_HS_ULPI;
+    NX_USB_WRITE(base, USB,
+                 (1U << 30U) | (ulpi ? 0U : 1U << 6U) |
+                     ((uint32_t)c->turnaround << 10U));
     if (!wait_bits(c, RESET, ENABLE, ENABLE) || !cold_flush(c, 1U) ||
         !wait_bits(c, INTERRUPT, 1U, 0U) ||
         !cold_flush(c, (0x10U << 6U) | 32U) || !cold_flush(c, 16U)) {
@@ -383,9 +580,32 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
     }
     NX_USB_WRITE(base, CONTROL, 2U);
     NX_USB_WRITE(base, PHY,
-                 (1U << 16U) | (c->vbus_sensing ? (1U << 19U) : (1U << 21U)));
-    NX_USB_WRITE(base, CONFIG, 3U);
+                 (ulpi ? 0U : 1U << 16U) |
+                     (c->vbus_sensing ? 1U << 19U : 1U << 21U));
+    NX_USB_WRITE(base, CONFIG, ulpi ? 0U : 3U);
     NX_USB_WRITE(base, RX_SIZE, c->rx_fifo_words);
+    uint32_t reserved_start = c->rx_fifo_words;
+    uint8_t highest_in = 0U;
+    for (size_t i = 0U; i < c->endpoint_count; ++i) {
+        const nx_usb_endpoint_t* ep = &c->endpoints[i];
+        if (ep->in) {
+            uint32_t end = (uint32_t)ep->fifo_start + ep->fifo_words;
+            if (end > reserved_start)
+                reserved_start = end;
+            if (ep->number > highest_in)
+                highest_in = ep->number;
+        }
+    }
+    for (uint8_t number = 1U; number < highest_in; ++number) {
+        if (endpoint(c, number, true) == NULL) {
+            uint32_t offset = TX_SIZE + (uint32_t)number * 4U;
+            uint32_t value = (16U << 16U) | reserved_start;
+            NX_USB_WRITE(base, offset, value);
+            if (NX_USB_READ(base, offset) != value)
+                return NX_ERROR_IO;
+            reserved_start += 16U;
+        }
+    }
     uint32_t ep_mask = 0U;
     for (size_t i = 0U; i < c->endpoint_count; ++i) {
         nx_usb_endpoint_t* ep = &c->endpoints[i];
@@ -397,9 +617,8 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
         uint32_t offset = ep_offset(ep);
         uint32_t control = SNAK | (ep->number == 0U ? ACTIVE : 0U);
         if (ep->number != 0U) {
-            /* Validation limits nonzero directions to bulk or interrupt. */
-            uint32_t type = ep->transfer == NX_USB_PROFILE_INTERRUPT ? 3U : 2U;
-            control |= (uint32_t)ep->max_packet | (type << 18U) | (1U << 28U);
+            control |= (uint32_t)ep->max_packet | (endpoint_type(ep) << 18U) |
+                       (uses_data_toggle(ep) ? DATA0 : 0U);
         }
         if (ep->in) {
             control |= (uint32_t)ep->number << 22U;
@@ -413,10 +632,10 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
             }
         }
         NX_USB_WRITE(base, offset, control);
-        NX_USB_WRITE(base, offset + 8U, 0x5BU);
+        NX_USB_WRITE(base, offset + 8U, c->dma ? 0x5FU : 0x5BU);
         uint32_t selected = ACTIVE | ENABLE | DISABLE;
         if (ep->number != 0U) {
-            selected |= GEOMETRY_MASK | DATA_PID;
+            selected |= GEOMETRY_MASK | (uses_data_toggle(ep) ? DATA_PID : 0U);
         }
         if ((NX_USB_READ(base, offset) & selected) != (control & selected) ||
             ep_flags(ep) != 0U) {
@@ -426,12 +645,12 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
             ep_mask |= endpoint_interrupt_bit(ep);
         }
     }
-    NX_USB_WRITE(base, IN_MASK, 0x0BU);
-    NX_USB_WRITE(base, OUT_MASK, 0x5BU);
+    NX_USB_WRITE(base, IN_MASK, c->dma ? 0x0FU : 0x0BU);
+    NX_USB_WRITE(base, OUT_MASK, c->dma ? 0x5FU : 0x5BU);
     NX_USB_WRITE(base, EP_MASK, ep_mask);
     NX_USB_WRITE(base, TX_EMPTY_MASK, 0U);
     NX_USB_WRITE(base, INTERRUPT,
-                 GLOBAL_MASK & ~((1U << 4U) | (1U << 18U) | (1U << 19U)));
+                 global_mask(c) & ~((1U << 4U) | (1U << 18U) | (1U << 19U)));
     /* Metadata is complete before any global source can publish facts. */
     c->head = c->count = 0U;
     c->lost = 0U;
@@ -441,13 +660,14 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
     c->address_pending = false;
     c->reset_pending = c->setup_pending = false;
     arm_setup(c);
-    NX_USB_WRITE(base, MASK, GLOBAL_MASK);
+    uint32_t mask = global_mask(c);
+    NX_USB_WRITE(base, MASK, mask);
     NX_USB_IRQ_ENABLE(base, c->irq.irq_number, c->irq.priority,
                       c->irq_policy.priority_bits);
-    NX_USB_WRITE(base, AHB, 1U);
+    uint32_t ahb = 1U | (c->dma ? (1U << 5U) | (3U << 1U) : 0U);
+    NX_USB_WRITE(base, AHB, ahb);
     nx_arch_dsb();
-    if (NX_USB_READ(base, MASK) != GLOBAL_MASK ||
-        NX_USB_READ(base, AHB) != 1U ||
+    if (NX_USB_READ(base, MASK) != mask || NX_USB_READ(base, AHB) != ahb ||
         !NX_USB_IRQ_ENABLED(base, c->irq.irq_number) ||
         NX_USB_IRQ_PRIORITY(base, c->irq.irq_number,
                             c->irq_policy.priority_bits) != c->irq.priority ||
@@ -496,6 +716,43 @@ static void begin_drain(nx_usb_endpoint_t* ep, nx_result_t reason) {
         ep->terminal = reason;
     }
 }
+/** \brief USB FS has 11 frame bits; HS includes three microframe bits. */
+static uint16_t iso_frame_mask(const nx_usb_controller_t* c) {
+    return c->snapshot.speed == NX_USB_DEVICE_HIGH_SPEED ? 0x3FFFU : 0x7FFU;
+}
+/** \brief A global incomplete fact cannot revoke a future request's borrow.
+ * The admitted one-second Core deadline is shorter than either speed's
+ * 1.024-second frame half-ring. After a long service stall, deadline expiry
+ * wins before modular arithmetic, so an old target cannot appear future.
+ */
+static void incomplete_iso(nx_usb_controller_t* c, uint32_t flags) {
+    uint32_t observed = flags & (ISO_INCOMP_IN | ISO_INCOMP_OUT | ISO_OUT_DROP);
+    if (observed == 0U)
+        return;
+    const uint16_t mask = iso_frame_mask(c);
+    const uint16_t frame =
+        (uint16_t)((NX_USB_READ(c->registers, 0x808U) >> 8U) & mask);
+    const nx_time_us_t now = nx_time_now_us();
+    for (size_t i = 0U; i < c->endpoint_count; ++i) {
+        nx_usb_endpoint_t* ep = &c->endpoints[i];
+        if (ep->transfer != NX_USB_PROFILE_ISOCHRONOUS || ep->request == NULL ||
+            nx_request_state(&ep->request->base) != NX_REQUEST_ACTIVE ||
+            (observed &
+             (ep->in ? ISO_INCOMP_IN : ISO_INCOMP_OUT | ISO_OUT_DROP)) == 0U)
+            continue;
+        /* A completed controller packet wins an unrelated old indication. */
+        if ((ep_flags(ep) & 1U) != 0U &&
+            (NX_USB_READ(c->registers, ep_offset(ep)) & ENABLE) == 0U)
+            continue;
+        if (now >= ep->request->base.deadline) {
+            begin_drain(ep, NX_ERROR_TIMEOUT);
+        } else if (((uint32_t)(frame - ep->target_frame) & mask) <
+                   ((uint32_t)mask + 1U) / 2U) {
+            begin_drain(ep, NX_ERROR_IO);
+        }
+    }
+    NX_USB_WRITE(c->registers, INTERRUPT, observed);
+}
 /** \brief New control/reset epochs never silently revoke earlier endpoint
  * loans. */
 static void invalidate(nx_usb_controller_t* c, bool reset) {
@@ -514,6 +771,7 @@ static void invalidate(nx_usb_controller_t* c, bool reset) {
     }
     if (reset) {
         c->reset_pending = true;
+        c->snapshot.speed = NX_USB_DEVICE_SPEED_UNKNOWN;
     } else {
         c->setup_pending = true;
     }
@@ -538,7 +796,18 @@ static void setup_packet(nx_usb_controller_t* c, const uint8_t* b) {
  * words. */
 static void receive(nx_usb_controller_t* c) {
     uintptr_t base = c->registers;
-    size_t words_left = 128U;
+    if (c->dma) {
+        nx_usb_endpoint_t* out0 = endpoint(c, 0U, false);
+        uint32_t flags = ep_flags(out0);
+        if ((flags & 8U) != 0U) {
+            nx_arch_dsb();
+            if (!c->snapshot.closing && !c->reset_pending)
+                setup_packet(c, dma_storage(out0)->bytes);
+            NX_USB_WRITE(base, ep_offset(out0) + 8U, 8U);
+        }
+        return;
+    }
+    size_t words_left = fifo_words(c);
     for (unsigned header = 0U; header < 8U; ++header) {
         if ((NX_USB_READ(base, INTERRUPT) & 16U) == 0U) {
             break;
@@ -547,14 +816,15 @@ static void receive(nx_usb_controller_t* c) {
         uint8_t number = (uint8_t)(status & 15U);
         size_t bytes = (status >> 4U) & 0x7FFU;
         unsigned type = (status >> 17U) & 15U;
-        if (bytes > 64U || (bytes + 3U) / 4U > words_left) {
+        nx_usb_endpoint_t* ep = endpoint(c, number, false);
+        uint16_t maximum = ep != NULL ? effective_mps(ep) : 64U;
+        if (bytes > maximum || (bytes + 3U) / 4U > words_left) {
             c->snapshot.closing = true;
             for (size_t i = 0U; i < c->endpoint_count; ++i) {
                 begin_drain(&c->endpoints[i], NX_ERROR_IO);
             }
             return;
         }
-        nx_usb_endpoint_t* ep = endpoint(c, number, false);
         bool copy = !c->snapshot.closing && !c->reset_pending && type == 2U &&
                     ep != NULL && ep->request != NULL &&
                     nx_request_state(&ep->request->base) == NX_REQUEST_ACTIVE;
@@ -616,7 +886,7 @@ static bool drain(nx_usb_endpoint_t* ep) {
         if (!ep->in && ep->number == 0U) {
             return false;
         }
-        if (ep->in) {
+        if (ep->in && ep->transfer != NX_USB_PROFILE_ISOCHRONOUS) {
             NX_USB_WRITE(base, offset, control | SNAK);
             nx_arch_dsb();
             control = NX_USB_READ(base, offset);
@@ -633,6 +903,8 @@ static bool drain(nx_usb_endpoint_t* ep) {
         (ep->disable_requested && (flags & 2U) == 0U)) {
         return false;
     }
+    if (!dma_detached(ep))
+        return false;
     if (ep->in) {
         uint32_t reset = NX_USB_READ(base, RESET);
         if ((reset & 32U) != 0U) {
@@ -705,8 +977,7 @@ static void control_complete(nx_usb_endpoint_t* ep, nx_result_t result,
         if (ep->in && c->address_pending) {
             uint32_t value = (NX_USB_READ(c->registers, CONFIG) & ~0x7F0U) |
                              ((uint32_t)c->pending_address << 4U);
-            NX_USB_WRITE(c->registers, CONFIG, value);
-            if (NX_USB_READ(c->registers, CONFIG) != value) {
+            if (configuration_write(c, value) != value) {
                 c->snapshot.closing = true;
             } else {
                 c->snapshot.address = c->pending_address;
@@ -748,6 +1019,31 @@ static void progress(nx_usb_controller_t* c) {
         uint32_t offset = ep_offset(ep);
         uint32_t flags = ep_flags(ep);
         nx_request_state_t state = nx_request_state(&ep->request->base);
+        if (c->dma && state == NX_REQUEST_ACTIVE && (flags & 4U) != 0U) {
+            begin_drain(ep, NX_ERROR_IO);
+            state = NX_REQUEST_DRAINING;
+        }
+        if (c->dma && !ep->in && state == NX_REQUEST_ACTIVE &&
+            (flags & 1U) != 0U && !ep->rx_seen && dma_detached(ep)) {
+            size_t residual = NX_USB_READ(base, offset + 16U) & 0x7FFFFU;
+            size_t maximum = effective_mps(ep);
+            if (residual > maximum) {
+                begin_drain(ep, NX_ERROR_IO);
+                state = NX_REQUEST_DRAINING;
+            } else {
+                ep->received = maximum - residual;
+                ep->rx_seen = true;
+                size_t copied = ep->received > ep->request->length
+                                    ? ep->request->length
+                                    : ep->received;
+                if (copied != 0U)
+                    memcpy(ep->request->out, dma_storage(ep)->bytes, copied);
+                if (ep->received > ep->request->length) {
+                    begin_drain(ep, NX_ERROR_OVERFLOW);
+                    state = NX_REQUEST_DRAINING;
+                }
+            }
+        }
         uint32_t hints = flags & (ep->in ? 0x50U : 0x48U);
         if (hints != 0U) {
             NX_USB_WRITE(base, offset + 8U, hints);
@@ -759,7 +1055,8 @@ static void progress(nx_usb_controller_t* c) {
         bool complete =
             (flags & 1U) != 0U && (NX_USB_READ(base, offset) & ENABLE) == 0U &&
             (ep->in ? NX_USB_READ(base, offset + 24U) == ep->fifo_words
-                    : ep->rx_seen);
+                    : ep->rx_seen) &&
+            dma_detached(ep);
         if (state == NX_REQUEST_ACTIVE && complete) {
             NX_USB_WRITE(base, offset + 8U, flags);
             nx_arch_dsb();
@@ -815,7 +1112,7 @@ static void progress(nx_usb_controller_t* c) {
         if (hot_flush(c, (0x10U << 6U) | 32U) && hot_flush(c, 16U) &&
             clear_halts(c, true) && reset_nonzero_endpoints(c)) {
             uint32_t config = NX_USB_READ(base, CONFIG) & ~0x7F0U;
-            NX_USB_WRITE(base, CONFIG, config);
+            (void)configuration_write(c, config);
             nx_arch_dsb();
             if (NX_USB_READ(base, CONFIG) == config) {
                 /* No reset fact alone revokes a loan or reopens admission. */
@@ -870,12 +1167,20 @@ void nx_usb_controller_irq(nx_usb_controller_t* c) {
         NX_USB_WRITE(c->registers, INTERRUPT, ENABLE);
     }
     if ((flags & (1U << 13U)) != 0U) {
-        if ((NX_USB_READ(c->registers, 0x808U) & 6U) != 6U) {
+        const uint32_t observed = NX_USB_READ(c->registers, 0x808U) & 6U;
+        const uint32_t expected = c->core == NX_USB_CORE_HS_ULPI ? 0U : 6U;
+        if (observed != expected &&
+            !(c->core == NX_USB_CORE_HS_ULPI && observed == 2U)) {
             c->snapshot.closing = true;
+        } else {
+            c->snapshot.speed = observed == 0U ? NX_USB_DEVICE_HIGH_SPEED
+                                               : NX_USB_DEVICE_FULL_SPEED;
+            event(c, NX_USB_EVENT_ENUMERATED);
         }
         NX_USB_WRITE(c->registers, INTERRUPT, 1U << 13U);
     }
     receive(c);
+    incomplete_iso(c, flags);
     progress(c);
     const nx_irq_wake_t* wake = c->wake;
     nx_arch_irq_restore(saved);
@@ -900,6 +1205,13 @@ static bool storage_valid(const nx_usb_controller_t* c, const void* bytes,
         return false;
     }
     for (size_t i = 0U; i < c->endpoint_count; ++i) {
+        if (c->dma && (overlap(bytes, length, c->dma_storage[i].bytes,
+                               c->dma_storage[i].capacity) ||
+                       overlap(bytes, length, c->dma_storage,
+                               c->endpoint_count * sizeof(*c->dma_storage)) ||
+                       overlap(bytes, length, c->dma_regions,
+                               c->dma_region_count * sizeof(*c->dma_regions))))
+            return false;
         const nx_usb_endpoint_t* ep = &c->endpoints[i];
         if (ep->request != NULL) {
             const nx_usb_request_t* request = ep->request;
@@ -917,7 +1229,7 @@ static bool storage_valid(const nx_usb_controller_t* c, const void* bytes,
  * storage. */
 static bool request_valid(nx_usb_endpoint_t* ep, nx_usb_request_t* r) {
     nx_usb_controller_t* c = ep->controller;
-    if (r == NULL || r->length > ep->max_packet ||
+    if (r == NULL || r->length > effective_mps(ep) ||
         (r->stage != NX_USB_DATA && r->stage != NX_USB_STATUS) ||
         (r->length != 0U && (ep->in ? r->in == NULL || r->out != NULL
                                     : r->out == NULL || r->in != NULL)) ||
@@ -961,30 +1273,42 @@ static nx_result_t submit(void* context, nx_usb_request_t* r) {
     nx_result_t result = NX_SUCCESS;
     uintptr_t base = c->registers;
     uint32_t offset = ep_offset(ep);
+    const bool iso = ep->transfer == NX_USB_PROFILE_ISOCHRONOUS;
+    const nx_time_us_t now = nx_time_now_us();
     /* Refuse an observed reset before IRQ collection advances the epoch. A
      * later physical reset still owns the ordinary borrow/drain sequence.
      * Only external policy activates nonzero endpoints after configuration. */
     if (!c->snapshot.started || c->snapshot.closing || ep->halted ||
         c->reset_pending ||
+        (iso && c->core == NX_USB_CORE_HS_ULPI &&
+         c->snapshot.speed == NX_USB_DEVICE_SPEED_UNKNOWN) ||
         (NX_USB_READ(base, INTERRUPT) & (1U << 12U)) != 0U ||
         (ep->number != 0U && (NX_USB_READ(base, offset) & (1U << 15U)) == 0U)) {
         result = NX_ERROR_STATE;
     } else if (!request_valid(ep, r)) {
         result = NX_ERROR_INVALID;
     } else if (ep->request != NULL ||
-               (NX_USB_READ(base, offset + 8U) & 0x1BU) != 0U ||
+               (iso && (NX_USB_READ(base, INTERRUPT) &
+                        (ep->in ? ISO_INCOMP_IN
+                                : ISO_INCOMP_OUT | ISO_OUT_DROP)) != 0U) ||
+               (NX_USB_READ(base, offset + 8U) & (c->dma ? 0x1FU : 0x1BU)) !=
+                   0U ||
                ((ep->in || ep->number != 0U) &&
                 (NX_USB_READ(base, offset) & ENABLE) != 0U) ||
                (!ep->in && (NX_USB_READ(base, CONTROL) & 8U) != 0U)) {
         nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
-    } else if (nx_time_now_us() >= r->base.deadline) {
-        result = NX_ERROR_TIMEOUT;
-    } else if (ep->in &&
-               NX_USB_READ(base, offset + 24U) < (r->length + 3U) / 4U) {
-        result = NX_ERROR_BUSY;
     } else {
-        result = nx_request_admit(&r->base, NX_REQUEST_ACTIVE);
+        if (now >= r->base.deadline) {
+            result = NX_ERROR_TIMEOUT;
+        } else if (iso && r->base.deadline - now > 1000000U) {
+            result = NX_ERROR_INVALID;
+        } else if (ep->in &&
+                   NX_USB_READ(base, offset + 24U) < (r->length + 3U) / 4U) {
+            result = NX_ERROR_BUSY;
+        } else {
+            result = nx_request_admit(&r->base, NX_REQUEST_ACTIVE);
+        }
     }
     if (result != NX_SUCCESS) {
         nx_arch_irq_restore(saved);
@@ -995,17 +1319,35 @@ static nx_result_t submit(void* context, nx_usb_request_t* r) {
     ep->rx_seen = false;
     ep->disable_requested = false;
     ep->terminal = NX_SUCCESS;
+    if (c->dma) {
+        const nx_usb_dma_storage_t* storage = dma_storage(ep);
+        if (ep->in && r->length != 0U)
+            memcpy(storage->bytes, r->in, r->length);
+        size_t padded = (r->length + 3U) & ~(size_t)3U;
+        if (ep->in && padded > r->length)
+            memset(storage->bytes + r->length, 0, padded - r->length);
+        NX_USB_WRITE(base, offset + 20U, (uint32_t)(uintptr_t)storage->bytes);
+        nx_arch_dsb();
+    }
     uint32_t size =
-        (1U << 19U) | (uint32_t)(ep->in ? r->length : ep->max_packet);
+        (1U << 19U) | (uint32_t)(ep->in ? r->length : effective_mps(ep));
+    if (iso && ep->in)
+        size |= 1U << 29U;
     if (!ep->in && ep->number == 0U) {
         size |= 3U << 29U;
     }
     NX_USB_WRITE(base, offset + 16U, size);
     uint32_t control = NX_USB_READ(base, offset) &
                        ~(DISABLE | SNAK | (1U << 29U) | (1U << 28U));
+    if (iso) {
+        const uint16_t mask = iso_frame_mask(c);
+        const uint32_t frame = NX_USB_READ(base, 0x808U) >> 8U;
+        ep->target_frame = (uint16_t)((frame + 1U) & mask);
+        control |= (ep->target_frame & 1U) != 0U ? 1U << 29U : DATA0;
+    }
     /* EP0 DATA PID is managed by SETUP/core. SD0/SD1 are reserved for EP0. */
     NX_USB_WRITE(base, offset, control | ENABLE | CNAK);
-    if (ep->in) {
+    if (ep->in && !c->dma) {
         for (size_t index = 0U; index < r->length; index += 4U) {
             uint32_t word = 0U;
             for (unsigned lane = 0U; lane < 4U && index + lane < r->length;
@@ -1041,6 +1383,8 @@ static nx_result_t cancel(void* context, nx_usb_request_t* r) {
 /** \brief Caller holds the existing local IRQ guard; no hidden cancellation. */
 static nx_result_t stall_locked(nx_usb_endpoint_t* ep, bool value) {
     nx_usb_controller_t* c = ep->controller;
+    if (ep->transfer == NX_USB_PROFILE_ISOCHRONOUS)
+        return NX_ERROR_UNSUPPORTED;
     if (ep->request != NULL) {
         return NX_ERROR_BUSY;
     }
@@ -1085,7 +1429,7 @@ static nx_result_t activation_set(void* context, uint64_t epoch,
                                   uint8_t address, bool active) {
     nx_usb_controller_t* c = context;
     if (c == NULL || (address & 0x70U) != 0U || (address & 15U) == 0U ||
-        (address & 15U) > 3U) {
+        (address & 15U) >= endpoint_numbers(c)) {
         return NX_ERROR_INVALID;
     }
     if (!task_context()) {
@@ -1342,12 +1686,20 @@ static nx_result_t stop(void* context) {
     NX_USB_WRITE(c->registers, CONTROL,
                  NX_USB_READ(c->registers, CONTROL) | 2U | (1U << 9U));
     nx_arch_dsb();
+    if (c->dma) {
+        NX_USB_WRITE(c->registers, AHB,
+                     NX_USB_READ(c->registers, AHB) & ~(1U << 5U));
+        nx_arch_dsb();
+    }
     if ((NX_USB_READ(c->registers, CONTROL) & 10U) != 10U ||
-        (NX_USB_READ(c->registers, AHB) & (1U << 5U)) != 0U) {
+        (NX_USB_READ(c->registers, AHB) & (1U << 5U)) != 0U ||
+        (c->dma && (NX_USB_READ(c->registers, RESET) & ENABLE) == 0U)) {
         nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
     }
     nx_arch_irq_restore(saved);
+    if (c->dma && !cold_flush(c, 16U))
+        return NX_ERROR_BUSY;
     nx_usb_controller_irq(c);
     saved = nx_arch_irq_save();
     for (size_t i = 0U; i < c->endpoint_count; ++i) {
@@ -1392,6 +1744,21 @@ static nx_result_t stop(void* context) {
         c->publishers != 0U) {
         nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
+    }
+    if (c->dma) {
+        if ((NX_USB_READ(c->registers, RESET) & ENABLE) == 0U) {
+            nx_arch_irq_restore(saved);
+            return NX_ERROR_BUSY;
+        }
+        for (size_t i = 0U; i < c->endpoint_count; ++i) {
+            uint32_t offset = ep_offset(&c->endpoints[i]) + 20U;
+            NX_USB_WRITE(c->registers, offset, 0U);
+            nx_arch_dsb();
+            if (NX_USB_READ(c->registers, offset) != 0U) {
+                nx_arch_irq_restore(saved);
+                return NX_ERROR_BUSY;
+            }
+        }
     }
     if (out0->request != NULL) {
         nx_result_t terminal = out0->terminal == NX_ERROR_STATE

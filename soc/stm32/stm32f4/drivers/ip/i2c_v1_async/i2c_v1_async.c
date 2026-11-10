@@ -15,7 +15,7 @@
 #define NX_I2C_V1_DMA_ACK(clear, mask) (*(clear) = (uint32_t)(mask))
 #endif
 
-/* The two SDK wrappers assert every layout and mask before using this
+/* The SDK wrapper asserts every layout and mask before using this
  * algorithm. There is no per-byte virtual register access in firmware. */
 _Static_assert(NX_I2C_MAX_MESSAGES <= UINT8_MAX &&
                    NX_I2C_MAX_MESSAGE_BYTES <= UINT16_MAX &&
@@ -43,6 +43,7 @@ _Static_assert(NX_I2C_MAX_MESSAGES <= UINT8_MAX &&
 #define SB           (UINT32_C(1) << 0U)
 #define ADDRESS      (UINT32_C(1) << 1U)
 #define BTF          (UINT32_C(1) << 2U)
+#define ADD10        (UINT32_C(1) << 3U)
 #define RXNE         (UINT32_C(1) << 6U)
 #define TXE          (UINT32_C(1) << 7U)
 #define BUS_ERROR    (UINT32_C(1) << 8U)
@@ -62,6 +63,10 @@ _Static_assert(NX_I2C_MAX_MESSAGES <= UINT8_MAX &&
 #endif
 #ifndef NX_I2C_V1_WRITE_DATA
 #define NX_I2C_V1_WRITE_DATA(state, value) ((state)->registers[DATA] = (value))
+#endif
+#ifndef NX_I2C_V1_LINES_HIGH
+#define NX_I2C_V1_LINES_HIGH(state)                                            \
+    ((*(state)->line_inputs & (state)->line_mask) == (state)->line_mask)
 #endif
 #ifndef NX_I2C_V1_ADDRESS_CLEARED
 #define NX_I2C_V1_ADDRESS_CLEARED(state) ((void)(state))
@@ -185,8 +190,8 @@ static void next_message(nx_i2c_v1_state_t* state) {
 static nx_result_t start(void* context, nx_i2c_request_t* request,
                          bool admitted) {
     nx_i2c_v1_endpoint_t* endpoint = context;
-    if (endpoint == NULL || endpoint->port == NULL || endpoint->address < 8U ||
-        endpoint->address > 119U) {
+    if (endpoint == NULL || endpoint->port == NULL ||
+        !nx_i2c_v1_address_valid(endpoint->address, endpoint->address_bits)) {
         return NX_ERROR_INVALID;
     }
     if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
@@ -200,6 +205,11 @@ static nx_result_t start(void* context, nx_i2c_request_t* request,
     nx_i2c_v1_state_t* state = endpoint->port;
     if (!state->initialized || state->stopping || state->faulted) {
         return NX_ERROR_STATE;
+    }
+    if (endpoint->address_bits == 10U &&
+        !nx_i2c_v1_ten_timing((uint16_t)state->registers[CKCFG],
+                              state->peripheral_mhz)) {
+        return NX_ERROR_UNSUPPORTED;
     }
     if (nx_request_state(&request->base) !=
         (admitted ? NX_REQUEST_QUEUED : NX_REQUEST_READY)) {
@@ -237,6 +247,7 @@ static nx_result_t start(void* context, nx_i2c_request_t* request,
     if (result == NX_SUCCESS) {
         state->active = request;
         state->address = endpoint->address;
+        state->address_bits = endpoint->address_bits;
         state->message = 0U;
         state->transferred = 0U;
         state->terminal = NX_SUCCESS;
@@ -261,7 +272,50 @@ static nx_result_t start_admitted(void* context, nx_i2c_request_t* request) {
 static bool on_port(const void* context, const nx_i2c_port_t* port) {
     const nx_i2c_v1_endpoint_t* endpoint = context;
     return endpoint != NULL && port != NULL &&
-           port->ops == &nx_i2c_v1_async_ops && port->context == endpoint->port;
+           port->ops == &nx_i2c_v1_async_ops &&
+           port->context == endpoint->port &&
+           nx_i2c_v1_address_valid(endpoint->address, endpoint->address_bits);
+}
+
+/** \brief Reuse owned timing across reset, with no hardware adoption. */
+static bool clock_profile(const nx_i2c_v1_state_t* state, uint16_t* ccr,
+                          uint8_t* rise) {
+    if (state->timing_ccr == 0U) {
+        /* Preserve the admitted 8 MHz low-clock erratum-safe 80 kHz profile. */
+        return nx_i2c_v1_timing(state->peripheral_mhz,
+                                state->peripheral_mhz == 8U ? 80000U : 100000U,
+                                ccr, rise);
+    }
+    uint16_t selected = state->timing_ccr;
+    uint32_t count = selected & 0xFFFU;
+    bool fast = (selected & 0x8000U) != 0U;
+    uint32_t maximum = fast                          ? 400000U
+                       : state->peripheral_mhz == 8U ? 80000U
+                                                     : 100000U;
+    uint16_t fastest;
+    if (!nx_i2c_v1_timing(state->peripheral_mhz, maximum, &fastest, rise) ||
+        (selected & 0x7000U) != 0U || count < (fastest & 0xFFFU) ||
+        (fast && state->peripheral_mhz == 8U)) {
+        return false;
+    }
+    *ccr = selected;
+    return true;
+}
+
+/** \brief Program an admitted profile without changing publisher ownership. */
+static void program_profile(nx_i2c_v1_state_t* state, uint16_t ccr,
+                            uint8_t rise) {
+    state->timing_ccr = ccr;
+    state->registers[CTL0] = 0U;
+    state->registers[CTL1] = state->peripheral_mhz;
+    state->registers[CKCFG] = ccr;
+    state->registers[RT] = rise;
+    state->registers[ADDR0] = 1U << 14U;
+    state->registers[CTL0] = ENABLE;
+    state->phase = NX_I2C_V1_IDLE;
+    state->stopping = false;
+    state->faulted = false;
+    state->initialized = true;
 }
 
 /** \brief Initialize a selected mode; polling storage is wholly independent. */
@@ -269,8 +323,7 @@ nx_result_t nx_i2c_v1_initialize(nx_i2c_v1_state_t* state) {
     if (state == NULL || state->registers == NULL ||
         state->line_inputs == NULL || state->line_mask == 0U ||
         (state->line_mask & ~UINT32_C(0xFFFF)) != 0U ||
-        (state->peripheral_mhz != 8U && state->peripheral_mhz != 42U &&
-         state->peripheral_mhz != 50U)) {
+        state->peripheral_mhz < 2U || state->peripheral_mhz > 50U) {
         return NX_ERROR_INVALID;
     }
     if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
@@ -291,21 +344,12 @@ nx_result_t nx_i2c_v1_initialize(nx_i2c_v1_state_t* state) {
              0U)) {
         return NX_ERROR_BUSY;
     }
-    state->registers[CTL0] = 0U;
-    state->registers[CTL1] = state->peripheral_mhz;
-    /* ES096 2.8.5 excludes 88..100 kHz repeated START on the admitted
-     * low-clock F103 profile. CCR50 at APB8 MHz yields nominal 80 kHz. */
-    state->registers[CKCFG] = state->peripheral_mhz == 8U
-                                  ? 50U
-                                  : (uint32_t)state->peripheral_mhz * 5U;
-    state->registers[RT] = (uint32_t)state->peripheral_mhz + 1U;
-    state->registers[ADDR0] = 1U << 14U;
-    state->registers[CTL0] = ENABLE;
-    state->phase = NX_I2C_V1_IDLE;
-    state->stopping = false;
-    state->faulted = false;
-    state->wake_publishers = 0U;
-    state->initialized = true;
+    uint16_t ccr;
+    uint8_t rise;
+    if (!clock_profile(state, &ccr, &rise)) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    program_profile(state, ccr, rise);
     return NX_SUCCESS;
 }
 
@@ -350,20 +394,41 @@ void nx_i2c_v1_irq(nx_i2c_v1_state_t* state) {
             nx_i2c_message_t* message =
                 &state->active->messages[state->message];
             size_t remaining = message->length - state->index;
-            if (state->phase == NX_I2C_V1_START && (flags & SB) != 0U) {
-                NX_I2C_V1_WRITE_DATA(state, (uint32_t)state->address * 2U |
-                                                (message->read ? 1U : 0U));
+            if ((state->phase == NX_I2C_V1_START ||
+                 state->phase == NX_I2C_V1_TEN_READ_START) &&
+                (flags & SB) != 0U) {
+                bool ten_prefix = state->phase == NX_I2C_V1_START &&
+                                  state->address_bits == 10U;
                 state->registers[CTL0] &= ~(START | ACK | POS);
-                if (message->read && message->length > 1U) {
+                if (!ten_prefix && message->read && message->length > 1U) {
                     state->registers[CTL0] |= ACK;
                 }
-                if (state->dma == NULL && message->read &&
+                if (!ten_prefix && state->dma == NULL && message->read &&
                     message->length == 2U) {
                     state->registers[CTL0] =
                         (state->registers[CTL0] | POS) & ~ACK;
                 }
-                state->phase = NX_I2C_V1_ADDRESS;
-            } else if (state->phase == NX_I2C_V1_ADDRESS &&
+                uint32_t address =
+                    state->address_bits == 10U
+                        ? 0xF0U | (((uint32_t)state->address >> 7U) & 6U)
+                        : (uint32_t)state->address << 1U;
+                NX_I2C_V1_WRITE_DATA(
+                    state, address | (!ten_prefix && message->read ? 1U : 0U));
+                state->phase =
+                    ten_prefix ? NX_I2C_V1_TEN_LOW : NX_I2C_V1_ADDRESS;
+            } else if (state->phase == NX_I2C_V1_TEN_LOW &&
+                       (flags & ADD10) != 0U) {
+                NX_I2C_V1_WRITE_DATA(state, state->address & 0xFFU);
+                state->phase = NX_I2C_V1_TEN_ADDRESS;
+            } else if (state->phase == NX_I2C_V1_TEN_ADDRESS && message->read &&
+                       (flags & ADDRESS) != 0U) {
+                /* No DMA request or message completion at the transmitter
+                 * prefix. Reuse the already prepared stream after header-R. */
+                clear_address(state);
+                state->registers[CTL0] |= START;
+                state->phase = NX_I2C_V1_TEN_READ_START;
+            } else if ((state->phase == NX_I2C_V1_ADDRESS ||
+                        state->phase == NX_I2C_V1_TEN_ADDRESS) &&
                        (flags & ADDRESS) != 0U) {
                 if (state->dma != NULL && message->read &&
                     message->length > 1U) {
@@ -634,6 +699,7 @@ static nx_result_t stop(void* context) {
     state->registers[CTL0] = 0U;
     state->wake = NULL;
     state->initialized = false;
+    state->timing_ccr = 0U;
     nx_arch_irq_restore(mask);
     return NX_SUCCESS;
 }
@@ -649,21 +715,34 @@ static nx_result_t recover(void* context) {
         nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
+    nx_arch_irq_state_t mask = nx_arch_irq_save();
     if (!state->initialized || state->stopping) {
+        nx_arch_irq_restore(mask);
         return NX_ERROR_STATE;
     }
-    if (state->active != NULL) {
+    if (state->active != NULL || state->wake_publishers != 0U ||
+        (state->dma != NULL &&
+         ((*state->dma->rx.control | *state->dma->tx.control) & DMA_ENABLE) !=
+             0U)) {
+        nx_arch_irq_restore(mask);
         return NX_ERROR_BUSY;
     }
     if (!wire_idle(state) || (state->registers[STAT1] & BUS_BUSY) != 0U ||
-        (*state->line_inputs & state->line_mask) != state->line_mask) {
+        !NX_I2C_V1_LINES_HIGH(state)) {
+        nx_arch_irq_restore(mask);
         return NX_ERROR_IO;
+    }
+    uint16_t ccr;
+    uint8_t rise;
+    if (!clock_profile(state, &ccr, &rise)) {
+        nx_arch_irq_restore(mask);
+        return NX_ERROR_UNSUPPORTED;
     }
     state->registers[CTL0] = 1U << 15U;
     nx_arch_dsb();
-    state->registers[CTL0] = 0U;
-    state->initialized = false;
-    return nx_i2c_v1_initialize(state);
+    program_profile(state, ccr, rise);
+    nx_arch_irq_restore(mask);
+    return NX_SUCCESS;
 }
 
 /** \brief Attach only while all publishers are unborrowed and policy checked.

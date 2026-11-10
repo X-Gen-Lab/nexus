@@ -40,6 +40,7 @@ int refused_priority;
 unsigned starts;
 unsigned writes;
 nx_time_us_t now;
+bool early_rts;
 constexpr std::array<IRQn_Type, 1U + NX_COLD_RX + NX_COLD_TX> vectors {
     USART1_IRQn,
 #if NX_COLD_RX
@@ -126,6 +127,7 @@ class UartColdFactory : public testing::Test {
         refused_priority = -1;
         held_bits = starts = writes = 0U;
         now = 100U;
+        early_rts = false;
         RCC->AHB1ENR = original_ahb1;
         RCC->APB1ENR = original_apb1;
         USART1->SR = USART_SR_TC | USART_SR_TXE;
@@ -283,6 +285,163 @@ TEST_F(UartColdFactory, EmptyReceiptDoesNotEraseUnownedColdStorage) {
     EXPECT_EQ(0, std::memcmp(&state, &before, sizeof(before)));
     EXPECT_EQ(0U, writes);
 }
+
+#if NX_COLD_RX
+TEST_F(UartColdFactory, AdditionalDmaOwnersWithdrawTheirActualNvicAndPads) {
+    const uint32_t original_gates = RCC->AHB1ENR;
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN |
+                    RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIODEN |
+                    RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
+    for (size_t i = 1U; i < 6U; ++i) {
+        SCOPED_TRACE(i);
+        const auto& selected = nx_stm32_uart_hardware[i];
+        selected.registers->SR = USART_SR_TC | USART_SR_TXE;
+        uint16_t snapshots[2]{};
+        const nx_stm32_platform_pin_config_t pins[] = {
+            {selected.tx_gpio, &snapshots[0], selected.tx_port,
+             selected.tx_pin},
+            {selected.rx_gpio, &snapshots[1], selected.rx_port,
+             selected.rx_pin}};
+        std::array<IRQn_Type, 2U + NX_COLD_TX> publishers {
+            selected.irq, selected.receive_irq,
+#if NX_COLD_TX
+                selected.transmit.irq,
+#endif
+        };
+        const nx_dma_memory_region_t memory{
+            UINT32_C(0x20000000), UINT32_C(0x20000),
+            NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
+        ColdConfig config{};
+        config.uart = {selected.registers,
+                       pins,
+                       publishers.data(),
+                       nullptr,
+                       nullptr,
+                       0U,
+                       selected.clock_hz,
+                       115200U,
+                       NX_UART_RX_BLOCKS,
+                       (uint8_t)publishers.size(),
+                       5U,
+                       false,
+                       false,
+                       nullptr,
+                       0U};
+        config.resources = {selected.dma, &memory, 1U};
+        config.receive = selected.receive;
+#if NX_COLD_TX
+        config.transmit = selected.transmit;
+#endif
+        for (IRQn_Type irq : publishers)
+            NVIC->IPR[(unsigned)irq] = 0xB0U;
+        ColdState state{};
+        nx_stm32_uart_cold_receipt_t receipt{};
+        config.receive = DMA2_Stream4;
+        const unsigned before = writes;
+        EXPECT_EQ(NX_ERROR_INVALID, COLD_PREPARE(&state, &config, &receipt));
+        EXPECT_EQ(before, writes);
+        config.receive = selected.receive;
+        ASSERT_EQ(NX_SUCCESS, COLD_PREPARE(&state, &config, &receipt));
+        for (IRQn_Type irq : publishers) {
+            EXPECT_TRUE(Enabled(irq));
+            EXPECT_EQ(0x50U, NVIC->IPR[(unsigned)irq]);
+        }
+        const unsigned rx_irq = (unsigned)selected.receive_irq;
+        refused = &NVIC->ICER[rx_irq / 32U];
+        held_bits = 1U << (rx_irq % 32U);
+        EXPECT_NE(NX_SUCCESS, COLD_CLOSE(&state, &config, &receipt));
+        EXPECT_TRUE(Enabled(selected.receive_irq));
+        EXPECT_NE(0U, receipt.effects);
+        EXPECT_EQ(NX_ERROR_BUSY, COLD_PREPARE(&state, &config, &receipt));
+        refused = nullptr;
+        ASSERT_EQ(NX_SUCCESS, COLD_CLOSE(&state, &config, &receipt));
+        for (IRQn_Type irq : publishers) {
+            EXPECT_FALSE(Enabled(irq));
+            EXPECT_EQ(0xB0U, NVIC->IPR[(unsigned)irq]);
+        }
+        EXPECT_EQ(0U, receipt.effects);
+        EXPECT_EQ(0U, receipt.clock_added);
+    }
+    RCC->AHB1ENR = original_gates;
+}
+#endif
+
+#if defined(NX_COLD_WORDS) || defined(NX_COLD_BLOCKS)
+TEST_F(UartColdFactory, AdditionalIrqProfilesReceiveThroughTheirOwnPublisher) {
+    const uint32_t original_gates = RCC->AHB1ENR;
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN |
+                    RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIODEN;
+    for (size_t i = 1U; i < 6U; ++i) {
+        SCOPED_TRACE(i);
+        const auto& selected = nx_stm32_uart_hardware[i];
+        uint16_t snapshots[2]{};
+        const nx_stm32_platform_pin_config_t pins[] = {
+            {selected.tx_gpio, &snapshots[0], selected.tx_port,
+             selected.tx_pin},
+            {selected.rx_gpio, &snapshots[1], selected.rx_port,
+             selected.rx_pin}};
+        ColdConfig config{};
+        config.registers = selected.registers;
+        config.pins = pins;
+        config.vectors = &selected.irq;
+        config.vector_count = 1U;
+        config.clock_hz = selected.clock_hz;
+        config.baud = 115200U;
+        config.priority = 5U;
+#ifdef NX_COLD_WORDS
+        uint16_t received[4]{};
+        config.rx_storage = received;
+        config.rx_capacity = 4U;
+#else
+        config.profile = NX_UART_RX_BLOCKS;
+#endif
+        selected.registers->SR = USART_SR_TC | USART_SR_TXE;
+        ColdState state{};
+        nx_stm32_uart_cold_receipt_t receipt{};
+        NVIC->IPR[(unsigned)selected.irq] = 0xB0U;
+        ASSERT_EQ(NX_SUCCESS, COLD_PREPARE(&state, &config, &receipt));
+        EXPECT_TRUE(Enabled(selected.irq));
+        EXPECT_EQ(0x50U, NVIC->IPR[(unsigned)selected.irq]);
+#ifdef NX_COLD_WORDS
+        const nx_uart_word_port_t face{&nx_stm32_uart_word_ops, &state};
+        EXPECT_NE(0U, selected.registers->CR1 & USART_CR1_M);
+        selected.registers->DR = 0x1ABU;
+        selected.registers->SR = USART_SR_RXNE;
+        nx_stm32_uart_word_irq(&state);
+        uint16_t word{};
+        size_t count{};
+        ASSERT_EQ(NX_SUCCESS, nx_uart_word_port_read(&face, &word, 1U, &count));
+        EXPECT_EQ(1U, count);
+        EXPECT_EQ(0x1ABU, word);
+#else
+        const nx_uart_port_t face{&nx_stm32_uart_stream_ops, &state};
+        uint8_t data[2]{};
+        nx_stream_slot_t slot{};
+        slot.data = data;
+        slot.capacity = sizeof(data);
+        nx_stream_t stream{};
+        ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, &slot, 1U));
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&face, &stream));
+        selected.registers->DR = 0xABU;
+        selected.registers->SR = USART_SR_RXNE | USART_SR_IDLE;
+        nx_stm32_uart_stream_irq(&state);
+        nx_stream_block_t block{};
+        ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &block));
+        EXPECT_EQ(1U, block.length);
+        EXPECT_EQ(0xABU, block.data[0]);
+        EXPECT_EQ(NX_ERROR_BUSY, COLD_CLOSE(&state, &config, &receipt));
+        EXPECT_NE(0U, receipt.effects);
+        ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
+#endif
+        selected.registers->SR = USART_SR_TC | USART_SR_TXE;
+        ASSERT_EQ(NX_SUCCESS, COLD_CLOSE(&state, &config, &receipt));
+        EXPECT_FALSE(Enabled(selected.irq));
+        EXPECT_EQ(0xB0U, NVIC->IPR[(unsigned)selected.irq]);
+        EXPECT_EQ(0U, receipt.effects);
+    }
+    RCC->AHB1ENR = original_gates;
+}
+#endif
 
 #if !NX_COLD_RX && !NX_COLD_TX && !defined(NX_COLD_WORDS) &&                   \
     !defined(NX_COLD_BLOCKS)
@@ -526,11 +685,103 @@ TEST_F(UartColdFactory,
     EXPECT_EQ(original_ahb1, RCC->AHB1ENR);
 }
 #endif
+#ifdef NX_COLD_WIRE_CASES
+TEST_F(UartColdFactory, WirePinsAcquireExactClockFlowAndOpenDrainAndRestore) {
+    for (auto mode : {NX_UART_WIRE_HALF_DUPLEX, NX_UART_WIRE_SMARTCARD,
+                      NX_UART_WIRE_SYNCHRONOUS, NX_UART_WIRE_ASYNCHRONOUS}) {
+        SCOPED_TRACE(static_cast<int>(mode));
+        RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+        USART1->SR = USART_SR_TC | USART_SR_TXE;
+        uint16_t saved[4] = {};
+        nx_stm32_platform_pin_config_t pins[4] = {{GPIOA, &saved[0], 0U, 9U},
+                                                  {GPIOA, &saved[1], 0U, 10U},
+                                                  {GPIOA, &saved[2], 0U, 8U},
+                                                  {GPIOA, &saved[3], 0U, 12U}};
+        nx_uart_wire_config_t wire = {};
+        wire.mode = mode;
+        uint8_t count = 3U;
+        if (mode == NX_UART_WIRE_HALF_DUPLEX)
+            count = 1U;
+        if (mode == NX_UART_WIRE_SMARTCARD) {
+            count = 2U;
+            pins[1].pin = 8U;
+            wire.prescaler = 21U;
+            wire.guard_time = 16U;
+            wire.smartcard_nack = true;
+        }
+        if (mode == NX_UART_WIRE_ASYNCHRONOUS) {
+            count = 4U;
+            pins[2].pin = 11U;
+            wire.flow = NX_UART_FLOW_RTS_CTS;
+        }
+        const uint32_t prior_mode = GPIOA->MODER;
+        const uint32_t prior_type = GPIOA->OTYPER;
+        const uint32_t prior_latch = GPIOA->ODR;
+        const uint32_t prior_af = GPIOA->AFR[1];
+        nx_stm32_uart_state_t owner = {};
+        nx_stm32_uart_cold_receipt_t receipt = {};
+        uint8_t bytes[8] = {};
+        nx_stm32_uart_cold_config_t config = {};
+        config.registers = USART1;
+        config.pins = pins;
+        config.vectors = vectors.data();
+        config.vector_count = 1U;
+        config.rx_storage = bytes;
+        config.rx_capacity = sizeof(bytes);
+        config.clock_hz = 84000000U;
+        config.baud = 9600U;
+        config.profile = NX_UART_RX_BYTES;
+        config.priority = 5U;
+        config.wire = &wire;
+        config.pin_count = count;
+        ASSERT_EQ(nx_stm32_uart_wire_cold_prepare(&owner, &config, &receipt),
+                  NX_SUCCESS);
+        const bool open =
+            mode == NX_UART_WIRE_HALF_DUPLEX || mode == NX_UART_WIRE_SMARTCARD;
+        EXPECT_EQ((GPIOA->OTYPER & (1U << 9U)) != 0U, open);
+        if (open) {
+            EXPECT_NE(GPIOA->ODR & (1U << 9U), 0U);
+        }
+        if (mode == NX_UART_WIRE_ASYNCHRONOUS) {
+            EXPECT_FALSE(early_rts);
+            refused = &USART1->CR3;
+            held_bits = USART_CR3_RTSE;
+            EXPECT_EQ(nx_stm32_uart_stop(&owner), NX_ERROR_BUSY);
+            EXPECT_EQ(USART1->CR1 & (USART_CR1_UE | USART_CR1_RE),
+                      USART_CR1_UE | USART_CR1_RE);
+            refused = nullptr;
+        }
+        for (size_t index = 0U; index < count; ++index) {
+            EXPECT_EQ((GPIOA->MODER >> (pins[index].pin * 2U)) & 3U, 2U);
+            EXPECT_EQ((GPIOA->AFR[1] >> ((pins[index].pin - 8U) * 4U)) & 15U,
+                      7U);
+        }
+        ASSERT_EQ(nx_stm32_uart_wire_cold_close(&owner, &config, &receipt),
+                  NX_SUCCESS);
+        EXPECT_EQ(GPIOA->MODER, prior_mode);
+        EXPECT_EQ(GPIOA->OTYPER, prior_type);
+        EXPECT_EQ(GPIOA->ODR, prior_latch);
+        EXPECT_EQ(GPIOA->AFR[1], prior_af);
+        EXPECT_EQ(receipt.effects, 0U);
+        EXPECT_FALSE(Enabled(USART1_IRQn));
+    }
+}
+#endif
 #endif
 
 extern "C" bool nx_arch_is_privileged(void) {
     return privileged;
 }
+#ifdef NX_COLD_WIRE_CASES
+extern "C" void nx_uart_cold_wire_enable(USART_TypeDef* registers) {
+    if (registers == USART1 && (registers->CR3 & USART_CR3_RTSE) != 0U &&
+        ((GPIOA->MODER >> 24U) & 3U) == 2U) {
+        early_rts = true;
+    }
+    nx_platform_cold_model_write(&registers->CR1,
+                                 registers->CR1 | USART_CR1_UE);
+}
+#endif
 extern "C" bool nx_arch_in_isr(void) {
     return g_f4_model_isr;
 }
@@ -587,6 +838,15 @@ extern "C" void nx_platform_cold_model_write(volatile uint32_t* reg,
         }
         if (reg == &NVIC->ICPR[bank]) {
             NVIC->ISPR[bank] &= ~value;
+            return;
+        }
+    }
+    for (unsigned bank = 0U; bank < 9U; ++bank) {
+        auto* gpio =
+            reinterpret_cast<GPIO_TypeDef*>(GPIOA_BASE + bank * 0x400U);
+        if (reg == &gpio->BSRR) {
+            gpio->ODR = (gpio->ODR | (value & 0xFFFFU)) & ~(value >> 16U);
+            *reg = value;
             return;
         }
     }

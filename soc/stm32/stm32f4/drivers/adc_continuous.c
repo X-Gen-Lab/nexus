@@ -1,19 +1,21 @@
 /**
  * \file            adc_continuous.c
- * \brief           ADC1 continuous double-buffer DMA with proved target loans
+ * \brief           Continuous ADC double-buffer DMA with proved target loans
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "stm32f407_stream.h"
+#include "stm32f4_adc_trigger.h"
+#include "stm32f4xx_ll_adc.h"
 #include "stm32f4xx_ll_tim.h"
 
 #ifndef NX_STM32_DMA_DISABLE
 #define NX_STM32_DMA_DISABLE(stream, mask) ((stream)->CR &= ~(uint32_t)(mask))
 #endif
 #ifndef NX_STM32_ADC_CONTINUOUS_ACK
-#define NX_STM32_ADC_CONTINUOUS_ACK(dma, flags) ((dma)->HIFCR = (flags))
+#define NX_STM32_ADC_CONTINUOUS_ACK(base, flags)                               \
+    nx_stm32_adc_dma_ack((base), (flags))
 #endif
 #ifndef NX_STM32_ADC_CONTINUOUS_TARGET
 #define NX_STM32_ADC_CONTINUOUS_TARGET(memory, bank, address)                  \
@@ -26,11 +28,11 @@
     } while (0)
 #endif
 
-/** \brief Clear exactly stream4 facts, never another DMA owner. */
+/** \brief Clear exactly the selected lane, never another DMA owner. */
 static void acknowledge(nx_stm32_adc_stream_state_t* base, uint32_t flags) {
-    NX_STM32_ADC_CONTINUOUS_ACK(base->dma, flags);
+    NX_STM32_ADC_CONTINUOUS_ACK(base, flags);
 #ifndef NEXUS_STM32_MODEL
-    NVIC_ClearPendingIRQ(DMA2_Stream4_IRQn);
+    NVIC_ClearPendingIRQ(nx_stm32_adc_dma_irq(base->adc.registers));
 #endif
 }
 
@@ -111,16 +113,13 @@ static nx_result_t arm(nx_stm32_adc_continuous_state_t* state) {
     ADC_TypeDef* adc = base->adc.registers;
     adc->CR2 = 0U;
     adc->CR1 = base->adc.channel_count > 1U ? (uint32_t)ADC_CR1_SCAN : 0U;
+    LL_ADC_SetResolution(adc,
+                         (uint32_t)base->adc.resolution << ADC_CR1_RES_Pos);
     nx_stm32_adc_stream_sequence(base);
     adc->SR = 0U;
-    base->timer->CR1 = 0U;
-    base->timer->CR2 = TIM_CR2_MMS_1;
-    base->timer->DIER = 0U;
-    LL_TIM_SetPrescaler(base->timer, base->prescaler);
-    LL_TIM_SetAutoReload(base->timer, base->period);
-    LL_TIM_SetCounter(base->timer, 0U);
-    base->timer->EGR = TIM_EGR_UG;
-    base->timer->SR = 0U;
+    nx_stm32_adc_trigger_program(base->timer,
+                                 nx_stm32_adc_trigger_fact(base->trigger),
+                                 base->prescaler, base->period);
     acknowledge(base, 0x3DU);
     base->memory->PAR = (uint32_t)(uintptr_t)&adc->DR;
     base->memory->M0AR = (uint32_t)(uintptr_t)state->targets[0].data;
@@ -128,15 +127,19 @@ static nx_result_t arm(nx_stm32_adc_continuous_state_t* state) {
     base->memory->NDTR =
         (uint32_t)(state->targets[0].capacity / sizeof(uint16_t));
     base->memory->FCR = DMA_SxFCR_FEIE;
-    base->memory->CR = DMA_SxCR_DBM | DMA_SxCR_CIRC | DMA_SxCR_MINC |
-                       DMA_SxCR_PSIZE_0 | DMA_SxCR_MSIZE_0 | DMA_SxCR_PL_1 |
-                       DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
+    base->memory->CR = nx_stm32_adc_dma_channel(adc) | DMA_SxCR_DBM |
+                       DMA_SxCR_CIRC | DMA_SxCR_MINC | DMA_SxCR_PSIZE_0 |
+                       DMA_SxCR_MSIZE_0 | DMA_SxCR_PL_1 | DMA_SxCR_TCIE |
+                       DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
     nx_arch_dsb();
     base->memory->CR |= DMA_SxCR_EN;
-    adc->CR2 = ADC_CR2_ADON | ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTSEL_3;
+    adc->CR2 = ADC_CR2_ADON | ADC_CR2_DMA | ADC_CR2_DDS |
+               ((uint32_t)nx_stm32_adc_trigger_fact(base->trigger)->selection
+                << ADC_CR2_EXTSEL_Pos);
     nx_arch_dsb();
     (void)adc->CR2;
-    base->ready_at = nx_deadline_after(nx_time_now_us(), 3U);
+    base->ready_at = nx_deadline_after(
+        nx_time_now_us(), nx_stm32_adc_startup_delay_us(&base->adc));
     base->warming = true;
     state->halted = false;
     return NX_SUCCESS;
@@ -234,7 +237,7 @@ void nx_stm32_adc_continuous_irq(nx_stm32_adc_continuous_state_t* state) {
         return;
     }
     nx_stm32_adc_stream_state_t* base = &state->base;
-    uint32_t flags = base->dma->HISR & 0x3DU;
+    uint32_t flags = nx_stm32_adc_dma_flags(base);
     if ((flags & 0x2DU) == 0U) {
         return;
     }
@@ -269,7 +272,7 @@ void nx_stm32_adc_continuous_irq(nx_stm32_adc_continuous_state_t* state) {
                 base->memory->M1AR != old &&
                 ((base->memory->CR & DMA_SxCR_CT) != 0U ? 1U : 0U) == active &&
                 (base->memory->CR & DMA_SxCR_EN) != 0U &&
-                (base->dma->HISR & 0x2DU) == 0U &&
+                (nx_stm32_adc_dma_flags(base) & 0x2DU) == 0U &&
                 (base->adc.registers->SR & ADC_SR_OVR) == 0U;
             if (detached) {
                 result = state->observer == NULL
@@ -392,17 +395,19 @@ static nx_result_t sequence_info(const void* context,
     static const uint16_t cycles[] = {3U, 15U, 28U, 56U, 84U, 112U, 144U, 480U};
     uint32_t scan = 0U;
     for (size_t i = 0U; i < base->adc.channel_count; ++i) {
-        scan += cycles[base->adc.sample_times[i]] + 12U;
+        scan += cycles[base->adc.sample_times[i]] +
+                (12U - 2U * base->adc.resolution);
     }
-    *info = (nx_adc_sequence_info_t){.channels = base->adc.channels,
-                                     .sample_times = base->adc.sample_times,
-                                     .sample_cycles = cycles,
-                                     .channel_count = base->adc.channel_count,
-                                     .sample_code_count = 8U,
-                                     .adc_clock_hz = base->adc_clock_hz,
-                                     .timer_clock_hz = base->timer_clock_hz,
-                                     .scan_cycles = scan,
-                                     .conversion_cycles = 12U};
+    *info = (nx_adc_sequence_info_t){
+        .channels = base->adc.channels,
+        .sample_times = base->adc.sample_times,
+        .sample_cycles = cycles,
+        .channel_count = base->adc.channel_count,
+        .sample_code_count = 8U,
+        .adc_clock_hz = base->adc_clock_hz,
+        .timer_clock_hz = base->timer_clock_hz,
+        .scan_cycles = scan,
+        .conversion_cycles = (uint16_t)(12U - 2U * base->adc.resolution)};
     return NX_SUCCESS;
 }
 

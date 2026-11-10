@@ -12,7 +12,6 @@
 #include "nexus/mqtt/core_mqtt_storage.h"
 #include "nexus/network/lwip_storage.h"
 #include "nexus/network/lwip_tcp_storage.h"
-#include "nexus/soc/stm32f407_entropy.h"
 #include "nexus/tls/storage.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
@@ -59,9 +58,9 @@ void nx_lwip_port_assert(const char* message) {
 uint32_t nx_lwip_port_random_u32(void) {
     uint8_t bytes[4U];
     const nx_clock_t clock = {now, NULL};
-    nx_result_t result =
-        nx_entropy_fill(nx_stm32f407_entropy_instance(), bytes, sizeof(bytes),
-                        &clock, nx_deadline_after(nx_time_now_us(), 100000U));
+    nx_result_t result = nx_entropy_fill(
+        nx_factory_entropy(NX_ENTROPY_ID_RANDOM), bytes, sizeof(bytes), &clock,
+        nx_deadline_after(nx_time_now_us(), 100000U));
     if (result != NX_SUCCESS) {
         quarantine();
     }
@@ -149,7 +148,7 @@ static nx_result_t run_services(bool* joined) {
     const nx_tls_runtime_config_t runtime_config = {
         tls_arena,
         sizeof(tls_arena),
-        nx_stm32f407_entropy_instance(),
+        nx_factory_entropy(NX_ENTROPY_ID_RANDOM),
         {now, NULL},
         {untrusted_utc, NULL},
         100000U,
@@ -179,8 +178,9 @@ int main(void) {
         }
         return 1;
     }
-    const nx_stm32f407_entropy_config_t entropy_config = {8000000U, 168000000U};
-    nx_result_t result = nx_stm32f407_entropy_instance_start(&entropy_config);
+    nx_result_t result = nx_factory_entropy(NX_ENTROPY_ID_RANDOM) != NULL
+                             ? NX_SUCCESS
+                             : NX_ERROR_STATE;
     const nx_eth_frames_port_t* mac =
         nx_factory_eth_frames(NX_ETH_FRAMES_ID_MAC);
     const nx_mdio_port_t* mdio = nx_factory_mdio(NX_MDIO_ID_MAC);
@@ -190,8 +190,7 @@ int main(void) {
         result = NX_ERROR_STATE;
     }
     if (result != NX_SUCCESS) {
-        if (nx_stm32f407_entropy_instance_stop() != NX_SUCCESS ||
-            nx_platform_stop() != NX_SUCCESS) {
+        if (nx_platform_stop() != NX_SUCCESS) {
             quarantine();
         }
         return 2;

@@ -53,32 +53,16 @@ class DeclaredModeIngress(unittest.TestCase):
         expected.add(("STM32F407ZGT6", "GPIOB", "output"))
         self.assertEqual(actual, expected)
 
-    def test_every_group_is_an_explicit_actual_provider_stage_input_once(self):
-        plan = json.loads((ROOT / "tools/dev/plans/software.json").read_text())
-        selected = {"{root}/" + path.relative_to(ROOT).as_posix()
-                    for path in self.fixtures()}
-        observed = []
-        for stage in plan["stages"]:
-            arguments = stage["args"]
-            for index, value in enumerate(arguments):
-                if value == "--fixture" and arguments[index + 1] in selected:
-                    self.assertEqual(stage["checker"], "provider_assemblies")
-                    self.assertEqual(stage["name"],
-                                     "providers-multi_controller_assembly")
-                    observed.append(arguments[index + 1])
-        self.assertEqual(set(observed), selected)
-        self.assertEqual(len(observed), len(selected))
-        stage, = [stage for stage in plan["stages"] if
-                  stage["name"] == "providers-multi_controller_assembly"]
-        arguments = stage["args"]
-        self.assertNotIn("--project", arguments)
-        actual = [arguments[index + 1] for index, value in enumerate(arguments)
-                  if value == "--fixture"]
-        original = {"{root}/" + path.relative_to(ROOT).as_posix()
-                    for path in (ROOT / "tests/contracts" /
-                                 "multi_controller_assembly").glob("*.toml")}
-        self.assertEqual(set(actual), selected | original)
-        self.assertEqual(len(actual), len(selected | original))
+    def test_ci_keeps_every_declared_fixture_in_the_actual_arm_graph(self):
+        import yaml
+        workflow = yaml.load((ROOT / ".github/workflows/build-matrix.yml")
+                             .read_text(), Loader=yaml.BaseLoader)
+        job = workflow["jobs"]["controller-routes"]
+        self.assertIn("declared_io_assembly", job["strategy"]["matrix"]["fixture"])
+        commands = "\n".join(step.get("run", "") for step in job["steps"])
+        self.assertIn('"$fixture"/*.toml', commands)
+        self.assertIn("scripts/ci/provider_assemblies.py", commands)
+        self.fixtures()
 
     def test_capability_discovery_uses_the_same_authored_selections(self):
         indexed = {(row["family"], row["controller"], row["mode"]): row

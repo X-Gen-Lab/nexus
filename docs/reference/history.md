@@ -19,7 +19,7 @@ source_language: zh_CN
 | HAL factory／设备接口 | [当前 API](api/index.md)、[配置与 factory](../explanation/factory.md) | 生成 ID、只读 face、cold lookup 与平台生命周期 |
 | OSAL | [OS 等待与停机](../guides/os-shutdown.md)、[当前 OS API](api/os.md) | 后端差异、静态存储、deadline、publisher 与 join |
 | Kconfig 平台／外设／OS 宏 | [配置参考](configuration/index.md)、[迁移指南](../guides/migration.md) | 单 authored TOML、不可变 IR、拒绝规则与精确 mode |
-| 旧 build／flash 教程 | [首次构建](../tutorials/index.md)、[支持范围](../status/support.md) | 实际工具版本、Board、SDK 和产物身份 |
+| 旧 build／flash 教程 | [首次构建](../tutorials/index.md)、[支持范围](platforms/support.md) | 实际工具版本、Board、SDK 和产物身份 |
 | 历史软件数量或通过记录 | [精确证据入口](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-verification.md) | 原 source、scope、receipt；文档更新不继承资格 |
 
 迁移应同时改变配置、接口访问、存储所有权与停止流程，然后对迁移后的源码与
@@ -27,29 +27,13 @@ source_language: zh_CN
 
 ## 获取冻结的旧资料
 
-`docs/archive/sphinx-before-next-generation/` 和 `docs/archive/implementation/`
-保留历史源码及原编号。它们不参与当前站点默认搜索，不作为当前能力或资格。
-可在 Git 中选择具体 commit 浏览或下载旧源：
+历史设计、执行台账、归档和原始状态页保存在
+[固定 Git 提交](https://github.com/X-Gen-Lab/nexus/tree/83a27dfbee4e8fbf4d35875b1e9db85af7516eec)。
+当前源码目录只保留维护中的平台实现、合同和使用指南。阅读历史结果时确认完整提交、
+配置和产物身份；旧结果不赋予当前源码任何验证资格。
 
-- [旧 Sphinx 文档源：冻结文档规划基线 0111c8d3](https://github.com/X-Gen-Lab/nexus/tree/0111c8d3b9c7b37d258b9c401070305b13b6f3a1/docs/archive/sphinx-before-next-generation)
-- [历史 RF 实施源：同一冻结基线](https://github.com/X-Gen-Lab/nexus/tree/0111c8d3b9c7b37d258b9c401070305b13b6f3a1/docs/archive/implementation)
+## 文档路径与版本
 
-这个固定 revision 只确定旧资料字节，不表示该 revision 的固件得到历史资格。
-旧 locale PO 也是历史翻译，不能因当前 language selector 自动成为已审查新译文。
-需要离线阅读旧资料时取得上述固定 Git snapshot；当前文档包提供迁移解释和旧 URL
-alias，不把全部历史教程塞进当前搜索或重新解释其合同。
-
-## 旧地址如何处理
-
-[URL 迁移表](redirects.csv)列出旧 RST 对应路径、语言和目标页。
-`en/`、`zh_CN/` 旧地址分别保留。公开站点根 `api/index.html` 是历史 API 边界
-入口，引导读者确认版本后选择迁移说明；它不能静默解释为当前 API。
-当前公共 API 位于不可变版本根的 `versions/<release_id>/api/index.html`，
-或解压后离线包根的 `api/index.html`。判断地址时必须同时确认所属版本根。
-旧 HAL／OSAL／Kconfig 等不同语义的路径进入本页，明确版本边界后再选迁移指南。
-当前上一轮简版 Sphinx 同义入口可进入对应新页。alias 是本地 HTML 和相对链接，
-不依赖 JavaScript、CDN 或外部跳转服务。
-
-[页面迁移与权威映射](../design/documentation-migration.csv)记录源页面、权威、读者任务、
-实际站点去向与保留规则。原合同和结果路径保留，链接原文或派生视图，避免建立第二份
-状态和规范。后续路径变化应同步映射、导航、alias 和离线检查。
+当前站点使用 `en/`、`zh_CN/` 和 `api/` 入口。已退役文档的原始路径通过固定 Git
+版本读取；当前工具不再生成旧 URL alias、归档恢复包和候选晋升记录。
+迁移后的产品应依照当前公共头、配置 schema 和生命周期合同重新验证。

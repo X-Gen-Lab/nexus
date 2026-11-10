@@ -1,0 +1,47 @@
+schema = 2
+board_package = "ve_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 32768
+flash_load_limit_bytes = 65536
+
+[capture.camera]
+binding = "camera"
+mode = "snapshot-raw"
+pixel_clock_hz = 24000000
+poll_limit = 128
+frame_divisor = 1
+pclk_falling = false
+hsync_high = false
+vsync_high = false
+irq = { priority = 5 }
+
+[audio.sound]
+binding = "sound"
+mode = "master-duplex"
+standard = "philips"
+sample_bits = 24
+slot_bits = 32
+mclk = false
+cpol_high = false
+poll_limit = 4096
+irq = { priority = 5 }
+sample_rate_hz = 48000
+pll_n = 192
+pll_r = 2
+max_error_ppm = 10000
+
+[uart.console]
+binding = "console"
+mode = "dma-tx"
+baud = 115200
+irq = { priority = 5, calls_os = false }
+
+[uart.console.rx]
+format = "events"
+capacity = 8

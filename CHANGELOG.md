@@ -8,7 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Future changes are tracked here.
+### Changed
+
+- Consolidate production MCU integration in the shared STM32F4 provider, with
+  exact STM32F407VE/ZG facts and static typed factories. Keep hardware behavior
+  in C11 and generate only configuration and fixed connections.
+- Extend reviewed serial, timer/ADC/DAC, storage, Ethernet, RTC and supervision
+  modes; add I2C target/SMBus, DCMI/I2S and USB Host/managed OTG. Optional ST USB
+  middleware stays behind private bridges and is compiled only when selected.
+- Integrate selected ClockPlan, suspend/resume, STOP and explicit RTC/Standby
+  handover while retaining failed-drain ownership and original request storage.
+- Replace the manual F407 I2S2 component with the static Audio factory. Describe
+  exact modes, ownership and integration limits in the bilingual design pages.
+
+Software models and selected ARM consumers establish software evidence only.
+Physical HIL, electrical behavior and measured performance remain unqualified.
 
 ## [0.2.1] - 2026-11-02 (Asia/Shanghai)
 
@@ -178,7 +192,7 @@ receipts are preserved and do not make those archives downloadable.
 Physical MCU HIL remains `not_executed`. Source distribution, host models, ARM
 linking and documentation publication do not establish physical timing,
 electrical safety, signed product qualification, certification or LTS. See the
-[release guide](docs/status/release-0.1.0.md) for exact support, verification and
+[release guide](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/status/release-0.1.0.md) for exact support, verification and
 remaining acceptance, and [delivery](docs/delivery/README.md) for original records.
 
 ## Pre-refactor working history (superseded)

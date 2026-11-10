@@ -5,7 +5,7 @@
  */
 #ifndef NX_STM32F407_RTC_H
 #define NX_STM32F407_RTC_H
-#include "nexus/io/rtc.h"
+#include "nexus/io/rtc_aux.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,7 +39,8 @@ typedef struct {
 /** \brief Stable single privileged unmasked task owner, initially zeroed.
  * \note Stop closes alarm admission and restores borrowed Alarm A fields.
  *       Provision leaves autonomous backup clocks on; private close remains
- *       BUSY with persistent effects until reset or a future explicit handoff.
+ *       BUSY until explicit backup_handoff transfers persistent effects to an
+ *       external owner. Neither operation disables autonomous backup time.
  *       Adopt creates no backup clock effects and can close cleanly. Neither
  *       mode guarantees physical VBAT retention or erases backup data
  * registers.
@@ -47,16 +48,37 @@ typedef struct {
 typedef struct {
     const nx_stm32_rtc_config_t* config;
     nx_rtc_request_t* active;
+    nx_rtc_standby_t* standby_receipt;
+    uint64_t standby_epoch;
+    uint32_t standby_cr;
+    uint32_t standby_tafcr;
+    uint8_t standby_phase;
     uint64_t generation;
     uint32_t effects;
     uint32_t saved_alarm;
     uint32_t saved_subsecond;
+    uint32_t saved_alarm_b;
+    uint32_t saved_subsecond_b;
+    uint32_t saved_wakeup;
+    uint32_t auxiliary_cr;
+    uint32_t auxiliary_tafcr;
+    uint32_t auxiliary_calr;
+    uint32_t auxiliary_calibr;
+    uint32_t wake_lines;
+    nx_memory_window_lease_t* sram_lease;
+    uint64_t sram_epoch;
+    uint8_t sram_effects;
     nx_result_t terminal;
     uint8_t stage;
     bool opened;
     bool closing;
     bool terminal_set;
     bool tainted;
+    bool auxiliary_dirty;
+    bool auxiliary_faulted;
+    bool sram_ready;
+    bool sram_retention;
+    bool suspended;
 } nx_stm32_rtc_state_t;
 extern const nx_rtc_ops_t nx_stm32_rtc_ops;
 /** \brief Adapt the exact selected Core TIM2 system owner to nx_clock_t.
@@ -86,9 +108,28 @@ nx_result_t nx_stm32_rtc_prepare(nx_stm32_rtc_state_t* state,
  * \return SUCCESS only with no remaining owned effects; BUSY retains them.
  */
 nx_result_t nx_stm32_rtc_close(nx_stm32_rtc_state_t* state);
+/** \brief Quiesce software users while keeping autonomous STOP wake sources.
+ * \param[in,out] state: Stable open owner; all external users joined.
+ * \return SUCCESS, BUSY for an Alarm A request/SRAM lease, STATE for invalid
+ * lifecycle/hardware, EXHAUSTED before the last admission generation.
+ * \note No register or pending flag is changed. Caller owns STOP entry and
+ * System clock epoch restoration; public operations reject suspended use.
+ */
+nx_result_t nx_stm32_rtc_suspend(nx_stm32_rtc_state_t* state);
+/** \brief Revalidate the same sources after the System has resumed.
+ * \param[in,out] state: Exact suspended owner with live restored System.
+ * \return SUCCESS, STATE or EXHAUSTED, retaining suspension on failure.
+ * \note Success advances admission generation and rejects READY domains from
+ * the previous Core deadline epoch. It neither sets the calendar nor clears
+ * capture/wakeup flags, and establishes no cross-clock time mapping.
+ */
+nx_result_t nx_stm32_rtc_resume(nx_stm32_rtc_state_t* state);
 /** \brief Read exact persistent ownership receipt; no hardware mutation.
  * \param[in] state: Stable aligned owner, or NULL.
- * \return Nonzero effects require reset or an explicit future handoff.
+ * \return Nonzero effects retain responsibility. Bits0..5 are transferable
+ * autonomous resources; bit6 is the temporary GPIO inspection gate. Bits8/9
+ * are added SRAM gate/regulator, bit10 auxiliary sources, bit11 an SRAM loan,
+ * bit12 suspended ownership, bit13 a Standby preparation receipt.
  */
 uint32_t nx_stm32_rtc_effects(const nx_stm32_rtc_state_t* state);
 #ifdef __cplusplus

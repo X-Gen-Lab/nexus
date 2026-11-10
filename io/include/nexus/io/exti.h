@@ -28,8 +28,8 @@ typedef enum {
  * \note            LOSS is an independent boundary after older buffered facts
  *                  and before later facts. Its edge is invalid; its timestamp
  *                  is detection/report time, never a reconstructed missing
- *                  edge. For COALESCED facts, edge may derive from sampled pin
- *                  level after an IRQ and does not represent complete edge
+ *                  edge. For COALESCED facts, edge may derive from the sampled
+ *                  raw source after an IRQ and does not represent complete edge
  *                  history.
  */
 typedef struct {
@@ -81,18 +81,19 @@ nx_result_t nx_exti_port_read(const nx_exti_port_t* port,
                               nx_exti_event_t* events, size_t capacity,
                               size_t* count);
 /**
- * \brief           Observe this line's raw electrical level without events.
+ * \brief           Observe this line's raw logical signal without events.
  * \param[in]       port: Initialized exact line; serialized against
  * stop/rebind. \param[out]      high: Caller-owned sample, unchanged on error,
  * never retained. \return          Success or INVALID, STATE, CONTEXT or
  * UNSUPPORTED. \note            Bounded task/IRQ observation, no waiting or
- * callback. High is the physical input value, independent of edge or active
+ * callback. GPIO sources report the physical pad; internal sources report
+ *                  their documented raw output, independent of edge or active
  *                  polarity. No event is consumed and no pending bit cleared.
  *                  Output must be disjoint from faces, operations, provider
  *                  storage and MMIO. Direct hardware providers may require
- *                  privilege. Failed stop retains the pad until proven cleanup;
- *                  successful stop ends level access. A missing optional
- *                  method does not synthesize a level from the event queue.
+ *                  privilege. Failed stop retains the source until proven
+ * cleanup; successful stop ends level access. A missing optional method does
+ * not synthesize a level from the event queue.
  */
 nx_result_t nx_exti_port_level(const nx_exti_port_t* port, bool* high);
 /**

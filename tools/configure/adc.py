@@ -1,7 +1,8 @@
 """Selected ADC sequence policy and graph-local reviewed group decisions."""
-import hashlib
 
 from tools.configure.providers.common import fail, integer, mode_traits, sequence
+
+RESOLUTION_BITS = (6, 8, 10, 12)
 
 
 def validate_selection(selection, route, provider):
@@ -9,6 +10,10 @@ def validate_selection(selection, route, provider):
     if not {"channels", "sample_times", "reference_mv"}.issubset(selection):
         fail("ADC requires channels, sample_times and reference_mv")
     channels = sequence(selection["channels"], "ADC channels")
+    internal = getattr(provider, "ADC_INTERNAL_CHANNELS", {}).get(
+        route["controller"], ())
+    for channel in channels:
+        integer(channel, 0, max((15, *internal)), "ADC channel")
     mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
     if mapping is None:
         expected = [int(pin["pin"][2:]) for pin in route["pins"]]
@@ -19,16 +24,38 @@ def validate_selection(selection, route, provider):
             if key not in mapping:
                 fail("ADC controller/pin lacks a reviewed channel mapping")
             expected.append(mapping[key])
-    if channels != expected or not channels or len(channels) > 16:
+        expected.extend(internal)
+    matches = (channels == expected if mapping is None
+               else set(channels).issubset(expected))
+    if not matches or not channels or len(channels) > 16:
         fail("ADC channel sequence differs from reviewed analog pins")
-    for channel in channels:
-        integer(channel, 0, 15, "ADC channel")
     samples = sequence(selection["sample_times"], "ADC sample_times")
     if len(samples) != len(channels):
         fail("ADC sample_times must match the channel sequence")
     for sample in samples:
         integer(sample, 0, 7, "ADC sample encoding")
+    # SMPR stores one setting per physical channel, not one per sequence rank.
+    # Repeating a channel is valid only with the same acquisition time.
+    timings = {}
+    for channel, sample in zip(channels, samples):
+        if channel in timings and timings[channel] != sample:
+            fail("ADC repeated channel requires one consistent sample time")
+        timings[channel] = sample
     integer(selection["reference_mv"], 1, 3600, "ADC reference_mv")
+    bits = selection.get("resolution_bits", 12)
+    integer(bits, 6, 12, "ADC resolution_bits")
+    supported = provider.LIMITS.get("adc_resolution_bits", (12,))
+    if bits not in RESOLUTION_BITS or bits not in supported:
+        fail("ADC resolution_bits lacks a maintained provider mode")
+    selection["resolution_bits"] = bits
+    triggers = getattr(provider, "ADC_TRIGGERS", None)
+    if mode_traits("adc", selection["mode"]).dma and triggers is not None:
+        trigger = selection.get("trigger", "tim3-trgo")
+        if type(trigger) is not str or trigger not in triggers:
+            fail("ADC trigger lacks a reviewed independently owned timer event")
+        selection["trigger"] = trigger
+    elif "trigger" in selection:
+        fail("ADC trigger requires a maintained timer-DMA mode")
     if (selection["mode"] in {"single-shot", "low-rate-scan"} and
             (selection["mode"] == "single-shot") != (len(channels) == 1)):
         fail("ADC mode contradicts its reviewed channel count")
@@ -40,6 +67,30 @@ def validate_selection(selection, route, provider):
         fail("Polling ADC has no IRQ options")
 
 
+def selected_route(selection, route, provider):
+    """Project admitted analog ranks to unique pads before resource claiming.
+
+    The authored Board route remains the authorization boundary. Only selected
+    physical channels acquire pins; repeated ranks never duplicate a lease.
+    Other providers keep their existing exact route contract.
+    """
+    if route["kind"] == "adc_group":
+        if provider.ADC_GROUP is None:
+            fail("ADC group has no maintained provider")
+        return provider.ADC_GROUP.selected_route(selection, route)
+    mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
+    if route["kind"] != "adc" or mapping is None:
+        return route
+    channels = frozenset(selection["channels"])
+    resources = list(route.get("resources", ()))
+    if "trigger" in selection:
+        timer = provider.ADC_TRIGGERS[selection["trigger"]]
+        resources += ["controller:" + timer, "timer:" + timer]
+    return {**route, "resources": resources,
+            "pins": [pin for pin in route["pins"]
+                     if mapping[(route["controller"], pin["pin"])] in channels]}
+
+
 def group_trigger_resources(selection, provider):
     """Return category claims for the existing central resource ledger."""
     if provider.ADC_GROUP is None:
@@ -47,28 +98,18 @@ def group_trigger_resources(selection, provider):
     return provider.ADC_GROUP.trigger_resources(selection)
 
 
-def resolve_group(selection, provider, contract, *, review_path, read,
-                  snapshots, part, clock):
-    """Reuse the graph's one retained review before resolving a group.
-
-    Path containment and byte retention are supplied by the common resolver;
-    this category neither rereads the file nor creates another input identity.
-    """
+def resolve_group(selection, provider, *, part, clock, clock_plan):
+    """Resolve maintained silicon facts from the existing assembly input set."""
     if provider.ADC_GROUP is None:
         fail("ADC group has no maintained provider")
-    if contract is None:
-        path = review_path()
-        review = read(path)
-        contract = (review, hashlib.sha256(snapshots[path]).hexdigest(), path)
-    review, digest, _ = contract
-    return (provider.ADC_GROUP.resolve(
-        selection, review, digest, part=part, clock=clock), contract)
+    return provider.ADC_GROUP.resolve(selection, part=part, clock=clock,
+                                      clock_plan=clock_plan)
 
 
 def complete_triggers(selected, triggers):
     """Bind final trigger identities before the enclosing graph is frozen."""
     for item in selected:
-        if item["kind"] == "adc_group" and item["trigger"] == "tim6-trgo":
+        if item["kind"] == "adc_group" and item["trigger"] != "software":
             item["adc_group_resolution"]["trigger_identity"] = next(
                 index + 1 for index, edge in enumerate(triggers.edges)
                 if edge.target == item["id"] + ":adc")

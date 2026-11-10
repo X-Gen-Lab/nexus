@@ -77,6 +77,6 @@ before copying request storage into an application.
 ![Request admission, drain, quarantine and final settlement](../assets/diagrams/request-lifecycle.svg)
 
 FIG-06 expresses current Core helper transitions with provider proof obligations.
-The [I/O lifecycle matrix](../design/io-lifecycle-matrix.md) limits
+The [I/O lifecycle matrix](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/io-lifecycle-matrix.md) limits
 what these models establish. IRQ hints, stable slot epochs, observer detach and
 join require the [OS shutdown guide](../guides/os-shutdown.md).

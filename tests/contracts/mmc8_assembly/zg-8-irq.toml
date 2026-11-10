@@ -1,0 +1,34 @@
+# Software reference only: no physical eight-wire socket is asserted.
+schema = 2
+board_package = "zg-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 32768
+flash_load_limit_bytes = 65536
+
+[uart.console]
+binding = "console"
+mode = "irq-byte-event"
+baud = 115200
+[uart.console.rx]
+format = "bytes"
+capacity = 16
+[uart.console.irq]
+priority = 5
+
+[block.sd0]
+binding = "mmc8"
+mode = "sdio-irq"
+protocol = "mmc"
+bus_width = 8
+max_blocks = 32
+poll_budget = 50000
+stop_timeout_us = 10000
+[block.sd0.irq]
+priority = 6
+calls_os = false

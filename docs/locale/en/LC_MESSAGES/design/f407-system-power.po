@@ -1,0 +1,144 @@
+# Draft translation from the exact current gettext extraction; review pending.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 6288dad7b577556e5c1acddcac48df118c6234747b0f4bd7d5bea1436eccd987\n"
+
+msgid "F407 System、时钟与监督"
+msgstr "F407 System, clocks and supervision"
+
+msgid "本页描述 F407VE／ZG 的静态 C 机制。产品喂狗、复位、任务重启、低压保护和 VBAT 策略由外部工程提供。主机模型与 ARM 构建分别建立软件和链接证据；本轮 physical HIL 为 `not_executed`，不声明晶振精度、功耗或复位后的物理保留资格。"
+msgstr "This page describes static C mechanisms for F407VE/ZG. Product watchdog feeding, reset, task restart, undervoltage protection and VBAT policy belong in external projects. Host models and ARM builds establish separate software and link evidence. Physical HIL in this batch is `not_executed`; oscillator accuracy, power consumption and physical retention after reset are not qualified."
+
+msgid "图表示当前源码和依赖关系；具体模式、关闭证明和时间域规则以下文为准。"
+msgstr "The diagram shows current source and dependency relationships. The sections below define exact modes, shutdown proof and time-domain rules."
+
+msgid "配置与真实频率"
+msgstr "Configuration and actual frequencies"
+
+msgid "既有 `clock = \"hse8-pll168\"` 保持 8 MHz HSE、M8/N336/P2/Q7、AHB168、 APB1 42、APB2 84 MHz。新增 `clock = \"custom\"` 必须完整提供唯一参数表："
+msgstr "The existing `clock = \"hse8-pll168\"` retains an 8 MHz HSE, M8/N336/P2/Q7, AHB168, APB1 42 and APB2 84 MHz. New `clock = \"custom\"` selections must supply one complete parameter table:"
+
+msgid "`sysclk_source` 可显式选 `\"input\"`，令 SYSCLK 直接采用已声明的 HSE/HSI， 默认 `\"pll\"` 保持兼容。直接输入且没有 PLL 消费者时，C 从未置 PLLON，计划的 `pll48`/`pll_sysclk` 域为 0（不可用）。共享 PLLM/source 仍静态写入以供独立 PLLI2S owner 使用。需要 USB 内置 FS PHY 或显式 RNG/SDIO 48 MHz 预留时，直接 输入配置另外声明 `pll48 = true`；它要求精确 48 MHz 并建立实际独立 PLL。 USB FS 的 HCLK 必须大于 14.2 MHz，HS engine 必须大于 30 MHz；HS ULPI 使用 显式外部 60 MHz PHY clock，不以主 PLLQ 作为时钟消费条件。 内置 PHY 的 USB48 仅接纳外部 HSE 晶振源；RM0090 §34.3.2 的 ±0.25% 要求不能由 DS8626 Table34 中 HSI 的名义值与 25°C 下 ±1% 误差界替代。"
+msgstr "Explicit `sysclk_source = \"input\"` drives SYSCLK directly from the declared HSE/HSI; the default `\"pll\"` preserves existing behavior. With direct input and no PLL consumer, C never sets PLLON and the planned `pll48`/`pll_sysclk` domains are zero, meaning unavailable. Shared PLLM/source fields are still statically programmed for the independent PLLI2S owner. Direct-input configurations needing the USB internal FS PHY or an explicit RNG/SDIO 48 MHz reservation additionally declare `pll48 = true`; this requires exact 48 MHz and establishes a real independent PLL. USB FS requires HCLK above 14.2 MHz; the HS engine requires above 30 MHz. HS ULPI uses an explicit external 60 MHz PHY clock and does not require main PLLQ consumption. USB48 for the internal PHY accepts only an external HSE crystal source: the ±0.25% requirement in RM0090 §34.3.2 cannot be established from the nominal HSI value and its ±1% bound at 25°C in DS8626 Table34."
+
+msgid "主机工具只计算并验证静态连接和常量，启动、回读、等待及回滚全部留在 C。 输入为 HSI16 或已审 Board 的 HSE4–26 MHz；HSE 必须精确匹配 Board 晶振事实。 不提供外部 bypass 或运行期改频。PLL 输入限 1–2 MHz、VCO 限 192–432 MHz， SYSCLK/AHB 不超过 168 MHz，APB1/2 不超过 42/84 MHz，ADC 不超过 36 MHz。 所有已使用域必须产生精确整数 Hz，TIM2 必须能整数分频到 1 MHz。AHB 与 APB 分频器按 RM0090 编码；APB 除 1 时 timer 不倍频，其他分频时 timer 为两倍 PCLK。"
+msgstr "Host tools calculate and validate static connections and constants only. Startup, readback, waiting and rollback remain in C. Input is HSI16 or a reviewed Board HSE of 4–26 MHz; HSE must exactly match the Board oscillator facts. External bypass and runtime frequency changes are unavailable. PLL input is limited to 1–2 MHz and VCO to 192–432 MHz; SYSCLK/AHB cannot exceed 168 MHz, APB1/2 cannot exceed 42/84 MHz, and ADC cannot exceed 36 MHz. Every consumed domain must produce exact integer Hz, and TIM2 must divide exactly to 1 MHz. AHB and APB dividers follow RM0090 encodings. Timers use PCLK when the APB divider is one, and twice PCLK otherwise."
+
+msgid "`ClockPlanIR` 是唯一已选时钟计划。`nexus_config.h` 与 `private/stm32f407_clock.h` 的 `NEXUS_*_HZ`、PLL/CFGR、ADC divider 和 Flash wait-state 常量由该计划产生；UART/SPI/I2C/CAN、timer、ADC/DAC 与监督机制使用 同一实际频率合同。PLLI2S 与主 PLL 共享 source/M，音频 owner 独占自己的 N/R。 USB/SDIO 的已选 48 MHz 使用者必须具有精确名义 PLL48；具体尚未审核 custom profile 的 provider 继续显式拒绝。HSI 的名义值不建立 USB 精度或外部同步资格。"
+msgstr "`ClockPlanIR` is the sole selected clock plan. It generates `NEXUS_*_HZ`, PLL/CFGR, ADC-divider and Flash wait-state constants in `nexus_config.h` and `private/stm32f407_clock.h`. UART/SPI/I2C/CAN, timers, ADC/DAC and supervision use the same actual-frequency contract. PLLI2S shares source/M with the main PLL; the audio owner exclusively owns its N/R. Selected USB/SDIO 48 MHz consumers require exact nominal PLL48. Providers whose custom profiles remain unreviewed continue to reject them explicitly. Nominal HSI does not establish USB accuracy or external synchronization qualification."
+
+msgid "Flash 暂只接纳声明 2.7–3.6 V 的供电范围，按每 30 MHz 一档计算 0–5 WS，并先 建立 VOS/Flash 再切换 PLL。`nx_stm32_clock_profile_matches` 只读核对实际 source ready、PLL、总线、CSS、SSCG、所需 Flash latency 和 HSI reset trim。 这些读回不能测量实际电压、晶振误差或温漂。"
+msgstr "Flash currently accepts a declared 2.7–3.6 V supply range only. It calculates 0–5 WS in 30 MHz steps and establishes VOS/Flash before switching to PLL. `nx_stm32_clock_profile_matches` checks actual source-ready, PLL, bus, CSS, SSCG, required Flash latency and HSI reset trim without writes. These readbacks cannot measure actual voltage, oscillator error or temperature drift."
+
+msgid "已选 ADC 另外要求至少 0.6 MHz；DS8626 Table67 的模拟供电条件与最高频率仍须 由具体模拟供电/Board 验收，不把名义时钟算术当作 VDDA 测量。"
+msgstr "Selected ADC additionally requires at least 0.6 MHz. The exact analog supply and Board acceptance must establish the analog supply conditions and maximum frequency in DS8626 Table67; nominal clock arithmetic is not a VDDA measurement."
+
+msgid "冷启动与内存域"
+msgstr "Cold startup and memory domains"
+
+msgid "`SystemInit` 在普通 DATA/BSS 之前启用并读回 CP10/CP11，拒绝继承的有效 MPU， 安装 512-byte 对齐的真实 Flash vector，并保持既有 lazy-FP ABI。它不清除外来 RCC 状态来掩盖 warm handoff；普通启动的只读 preflight 仍要求可证明的冷时钟、 独占 TIM2、正确 FPU/MPU/vector。RAM 尚不可用的失败路径仅使用 reset stack 与 Flash 常量并 park，不依赖日志、scheduler 或 libc。"
+msgstr "Before ordinary DATA/BSS initialization, `SystemInit` enables and reads back CP10/CP11, rejects an inherited active MPU, installs the actual 512-byte-aligned Flash vector and preserves the existing lazy-FP ABI. It does not clear foreign RCC state to conceal a warm handoff. The ordinary read-only startup preflight still requires provable cold clocks, exclusive TIM2 and correct FPU/MPU/vector state. Failure before RAM is usable relies only on the reset stack and Flash constants, then parks; it does not depend on logging, a scheduler or libc."
+
+msgid "域"
+msgstr "Domain"
+
+msgid "F407VE／ZG 事实与使用边界"
+msgstr "F407VE/ZG facts and usage boundaries"
+
+msgid "主 SRAM"
+msgstr "Main SRAM"
+
+msgid "128 KiB；普通栈、DATA/BSS，已审 DMA 可以访问"
+msgstr "128 KiB; ordinary stacks and DATA/BSS, accessible to reviewed DMA"
+
+msgid "CCM"
+msgstr "CCM"
+
+msgid "64 KiB CPU-only；显式 linker/startup 计划，DMA 始终排除"
+msgstr "64 KiB, CPU-only; explicit linker/startup plan, always excluded from DMA"
+
+msgid "Backup SRAM"
+msgstr "Backup SRAM"
+
+msgid "4 KiB；RTC/backup owner 显式获得 gate、DBP/BRE 和借用"
+msgstr "4 KiB; the RTC/backup owner explicitly acquires its gate, DBP/BRE and loans"
+
+msgid "外部 SRAM"
+msgstr "External SRAM"
+
+msgid "独立精确 FSMC startup plan；不自动获得 STOP 改时钟资格"
+msgstr "An independent exact FSMC startup plan; no automatic qualification for STOP clock changes"
+
+msgid "Flash"
+msgstr "Flash"
+
+msgid "VE 512 KiB／ZG 1 MiB；不隐含产品分区"
+msgstr "VE 512 KiB / ZG 1 MiB; no implied product partitions"
+
+msgid "所选 CCM 在第一次写入前先确认 gate 和完整 copy/clear 计划；默认不增加 CCM 初始化。`.noinit` 仅表示不复制和清零。STOP 保持主 SRAM/CCM 内容，Standby 复位并丢失这两域；backup 的有效性、供电和物理保留由显式 RTC/产品策略证明。"
+msgstr "Selected CCM checks its gate and complete copy/clear plan before the first write; the default adds no CCM initialization. `.noinit` means only that copying and zeroing are omitted. STOP preserves main SRAM/CCM contents. Standby resets and loses both domains. Explicit RTC/product policy must establish backup validity, supply and physical retention."
+
+msgid "STOP、Standby 与时间域"
+msgstr "STOP, Standby and time domains"
+
+msgid "浅 Sleep 保留运行时钟、TIM2 和现有 tickless 合同。深 STOP 通过可选 `nexus_add_stm32f407_sleep()` 的 `nx_stm32f407_power_enter` 显式执行。 调用者先关闭自己的 ClockDomain，加入所有设备、DMA、deadline 和 OS borrowers， 实际停止周期 SysTick 并处理其旧 pending。接口验证 closed/empty barrier、全 DMA stream、外设 gate、无 active handler 和精确已使能 wake IRQ 集合后才发生效果。"
+msgstr "Shallow Sleep preserves running clocks, TIM2 and the existing tickless contract. Deep STOP explicitly uses `nx_stm32f407_power_enter` through optional `nexus_add_stm32f407_sleep()`. The caller first closes its ClockDomain, joins all device, DMA, deadline and OS borrowers, actually stops periodic SysTick and handles its previous pending state. Before effects, the interface checks the closed/empty barrier, every DMA stream, peripheral gates, absence of active handlers and the exact enabled wake IRQ set."
+
+msgid "实际装配先调用 `nx_platform_suspend()` 排空 controller 并释放共享 pins/gates， 保留 System；失败停在原有 prefix，必须继续 service/drain 后重试。成功后再关闭 调用者的 ClockDomain barrier、执行 power enter，并在 RUN 恢复后调用 `nx_platform_resume()` 重建同一静态装配。resume 不调用 system_start、不启动 任务、不重放旧请求；失败反向排空，保留 System 和未关闭 owner。尚在挂起状态时 普通 platform stop 拒绝，须先显式恢复。RTC 使用专用 suspend/resume 保存自主 calendar、aux wake route 与持久 backup effects；活动 AlarmA/内存 loan 会阻止挂起。 不可撤回的 watchdog 或 startup SRAM owner 仍可以明确阻止 STOP。"
+msgstr "An actual assembly first calls `nx_platform_suspend()` to drain controllers and release shared pins/gates while retaining System. Failure keeps the original prefix; service/drain must progress before retry. After successful suspend, the caller closes its ClockDomain barrier, enters power and calls `nx_platform_resume()` after RUN restoration to rebuild the same static assembly. Resume does not call system_start, start tasks or replay requests. Failure unwinds in reverse order while retaining System and unclosed owners. Ordinary platform stop rejects a still-suspended assembly; explicit resume must happen first. RTC uses dedicated suspend/resume to preserve its autonomous calendar, auxiliary wake route and persistent backup effects. Active AlarmA or memory loans block suspend. An irreversible watchdog or startup SRAM owner can still explicitly block STOP."
+
+msgid "必须先让完整 Platform suspend 成功，再进入原始 Power 入口；只读到外设 gate 为零 不能证明逻辑借用已经退出。例如 OTG 正在 OFF 状态等待 VBUS 或角色转换时，可能尚未 取得 USB gate，却仍保留旧域 deadline，必须先 close/cancel 并完成排空。ClockDomain 只证明调用者实际登记并排空的借用，不发现遗漏 owner，也不替调用者暂停任务或 OS。"
+msgstr "The complete Platform must successfully suspend before entering the raw Power API. Reading a peripheral gate as zero does not prove that logical borrowers drained. For example, OTG waiting for VBUS or a role transition while OFF may not yet own a USB gate but still retain an old-domain deadline; it must first close/cancel and complete drain. ClockDomain proves only the loans actually enrolled and drained by its caller. It neither discovers omitted owners nor suspends tasks or the OS on their behalf."
+
+msgid "Standby 的 WKUP／RTC 序列遵循 ES0182 Rev19 §2.2.6。`wake_pin = true` 显式选入 PA0 WKUP，入口在所有源禁用时清 WUF，再重开所选 EWUP；返回时恢复原 EWUP。已有 WUF 默认 BUSY，只有 `discard_wakeup = true` 才授权确认它。WKUP 不要求额外 NVIC IRQ；引脚、电气与 VBAT 条件由产品证明。"
+msgstr "The Standby WKUP/RTC sequence follows ES0182 Rev19 §2.2.6. `wake_pin = true` explicitly selects PA0 WKUP. Entry clears WUF while every source is disabled, then reenables the selected EWUP; return restores the original EWUP. Existing WUF defaults to BUSY and requires `discard_wakeup = true` for acknowledgement. WKUP needs no additional NVIC IRQ. The product must establish pin, electrical and VBAT conditions."
+
+msgid "RTCEN 已开启的 Standby 使用 `nx_stm32f407_standby_enter()`。应用在 Platform.suspend 后先调用同一 RTC owner 的 `standby_prepare`，显式提供允许 丢弃的 RTC 事件 mask。RTC 独占前端禁源、必要的 flags/EXTI PR 确认及 receipt； Power 只读 validate，在 CWUF 后调用 commit，再执行 WFI，不直接写 RTC/EXTI。 真正 Standby 复位不返回。虚假返回先重建 System epoch，再 restore RTC；新到的 WUTF／EXTI PR 保持可消费。RTC restore 失败保留原 receipt，调用者重试后才能 Platform.resume。PROVISION 的自主备份责任仍须显式 handoff，不能靠普通 close 或一次睡眠删除。"
+msgstr "Standby with RTCEN already enabled uses `nx_stm32f407_standby_enter()`. After Platform.suspend, the application first calls the same RTC owner's `standby_prepare`, explicitly supplying the RTC event mask it permits discarding. RTC exclusively disables its source frontends, acknowledges necessary flags/EXTI PR and owns the receipt. Power validates read-only, calls commit after CWUF, then executes WFI without directly writing RTC/EXTI. Real Standby resets and does not return. A spurious return first rebuilds the System epoch, then restores RTC; newly arrived WUTF/EXTI PR remain consumable. Failed RTC restore retains the original receipt, which the caller must successfully retry before Platform.resume. PROVISION's autonomous backup responsibility still requires explicit handoff; ordinary close or a sleep operation cannot delete it."
+
+msgid "本 drained profile 只允许 EXTI0–15 与独立 RTC 的 IRQ 唤醒。RTC 的 EXTI17/21/22 EMR+RTSR 可通过 `wake_events` 选择一次 WFE；不使用会合并并丢弃 真实边沿的 SEV/WFE/WFE 清空序列。已有 event latch 可以造成立即返回，调用者仍 须重检业务谓词。RTC 必须有仍运行的 LSE/LSI，HSE 派生 RTC 不能充当此 STOP 唤醒。 不清 RTC/EXTI pending，不自动配置 Board wake pin。"
+msgstr "This drained profile allows wake IRQs from EXTI0–15 and the independent RTC only. RTC EXTI17/21/22 EMR+RTSR can select one WFE through `wake_events`. It does not use a SEV/WFE/WFE clearing sequence that would coalesce and discard real edges. An existing event latch may return immediately; the caller must still recheck its business predicate. RTC requires LSE/LSI to remain running. HSE-derived RTC cannot supply this STOP wake. RTC/EXTI pending flags are not cleared and Board wake pins are not configured automatically."
+
+msgid "进入前记录旧 TIM2 时间，停止 timer/vector 并结束旧 epoch；WFI/WFE 返回后在 PRIMASK 保护下恢复已选 PLL/总线/Flash，重新建立 1 MHz TIM2 并递增 `time_epoch`。收据分开提供 `old_epoch/before_us` 与 `new_epoch/after_us`。 Core 暂停的时间始终未知，不把 timer 归零包装成连续单调时间。恢复失败不返回到 旧 IRQ/deadline 消费者：保留 mask、资源与 storage，观测平台故障并 park。"
+msgstr "Before entry, the mechanism records old TIM2 time, stops the timer/vector and ends the old epoch. After WFI/WFE returns, it restores the selected PLL, buses and Flash under PRIMASK, reestablishes 1 MHz TIM2 and increments `time_epoch`. The receipt separately reports `old_epoch/before_us` and `new_epoch/after_us`. Elapsed time while Core is paused remains unknown; resetting the timer does not create continuous monotonic time. Failed restoration never returns to old IRQ/deadline consumers: masks, resources and storage remain retained while the platform observes the fault and parks."
+
+msgid "`nx_stm32f407_deadline_bridge` 只接受匹配的旧 epoch，以及由独立 RTC 提供的 elapsed min/max，输出新域中最早／最晚 deadline 包络。采样窗口、晶振误差、RTC 失效和量化误差必须计入外部界限。它不自动补 kernel tick、恢复请求或重新启动任务。 Standby 必须已有明确 wake source；真实进入后通过复位重建整个 boot。若 WFI 立即返回，机制恢复新 RUN epoch 并报告 IO，不假称已经发生复位。"
+msgstr "`nx_stm32f407_deadline_bridge` accepts only a matching old epoch and elapsed min/max supplied by an independent RTC, producing earliest/latest deadline envelopes in the new domain. External bounds must include sampling windows, oscillator error, RTC failure and quantization error. It does not automatically compensate kernel ticks, restore requests or restart tasks. Standby requires an explicit wake source and rebuilds the whole boot through reset after real entry. If WFI returns immediately, the mechanism restores a new RUN epoch and reports IO rather than claiming that reset occurred."
+
+msgid "EWI、CSS、故障与 trace"
+msgstr "EWI, CSS, faults and trace"
+
+msgid "WWDG 的基本 owner 仍为原有 6-byte 状态。可选 caller-owned `nx_stm32f407_wwdg_ewi_t` 在显式激活看门狗之后 arm，产品提供唯一 WWDG vector。 EWI 是 sticky 效果，失败读回或 NVIC enable 不能撤回 storage；IRQ 精确清 EWIF， 累计饱和次数并报告 overflow，不喂狗、不复位、不调用 worker。早／迟喂狗窗口继续 由原 owner 核对真实 counter；EWI 开启后 feed 保留 EWI 配置。"
+msgstr "The existing base WWDG owner remains a 6-byte state. Optional caller-owned `nx_stm32f407_wwdg_ewi_t` arms after explicit watchdog activation; the product supplies the unique WWDG vector. EWI is a sticky effect: failed readback or NVIC enable cannot release its storage. IRQ acknowledges exactly EWIF, increments a saturating count and reports overflow; it never feeds, resets or calls a worker. The original owner still checks the actual counter for early/late feed windows. Feeding preserves EWI configuration after EWI is enabled."
+
+msgid "`css = true` 只用于 HSE，显式选择 NMI ownership。CSS/NMI 在确认任何 elapsed 时间之前标记 TIM2 域失败，确认 CSSC 时保留其他 RCC interrupt enable，再保留 全部效果、观测并 park。它不采用降频后继续使用旧 deadline 的恢复策略。"
+msgstr "`css = true` applies only to HSE and explicitly selects NMI ownership. CSS/NMI marks the TIM2 domain failed before acknowledging any elapsed time, preserves other RCC interrupt enables while acknowledging CSSC, then retains all effects, observes the fault and parks. It does not reduce frequency and continue using old deadlines."
+
+msgid "`nx_stm32f407_fault_capture` 使用调用者静态记录及 lock-free 首次发布；嵌套报告 不能覆盖首故障，完整 acquire/read 与 checksum 拒绝未完成或损坏记录。接口不沿 不可信 SP 走栈；fault entry 先根据 EXC_RETURN、FPU extended frame 与 stacking 错误证明 basic frame 可读。默认不预留 RAM、不装载产品 Fault vector、不写 Flash。"
+msgstr "`nx_stm32f407_fault_capture` uses caller-owned static records and lock-free first publication. Nested reports cannot overwrite the first fault; complete acquire/read and checksum reject incomplete or corrupted records. The API does not walk an untrusted SP. Fault entry first proves the basic frame readable from EXC_RETURN, the FPU extended frame and stacking errors. The default reserves no RAM, installs no product Fault vector and writes no Flash."
+
+msgid "复位原因仍是启动捕获的原始 flags 映射。显式 clear 只执行硬件支持的完整 RMVF 确认，不篡改已捕获 cause；显式 reset request 保留 PRIGROUP、提供 AIRCR key， 保存 mask 并等待真实复位。DWT trace 由显式调用开启／关闭，关闭不清共享 TRCENA； 周期计数在 STOP 停止，速率随 HCLK，既不是时间域，也不是一个永久 deadline。"
+msgstr "Reset causes remain a mapping of raw flags captured at startup. Explicit clear performs only the hardware-supported whole RMVF acknowledgement without changing the captured cause. Explicit reset request preserves PRIGROUP, supplies the AIRCR key, saves masks and waits for real reset. DWT trace is explicitly enabled/disabled; disable does not clear shared TRCENA. Cycle counting stops during STOP and changes rate with HCLK. It is neither a time domain nor a permanent deadline."
+
+msgid "RNG 的 typed 配置与时钟依赖"
+msgstr "Typed RNG configuration and clock dependencies"
+
+msgid "通过 `[entropy.random]`、`binding = \"rng\"`、`mode = \"rng-words\"` 选择唯一 RNG 内部路线。四个生产 Board 包都声明该无引脚 binding；它不建立外部电路或 熵质量资格。配置期只消费已解析计划的 `pll48.nominal_hz`，缺少精确 48 MHz 时 拒绝生成。`nx_factory_entropy(NX_ENTROPY_ID_RANDOM)` 只返回既有 readonly face，不启动硬件。生成的 Platform 生命周期直接使用原有私有 C owner 与 ops， 没有第二份实例或时钟 authority；未选择时不编译 RNG driver。"
+msgstr "Select the unique internal RNG route with `[entropy.random]`, `binding = \"rng\"` and `mode = \"rng-words\"`. All four production Board packages declare that pinless binding. It establishes no external circuit or entropy-quality qualification. Configuration consumes only the resolved plan's `pll48.nominal_hz` and rejects generation without exact 48 MHz. `nx_factory_entropy(NX_ENTROPY_ID_RANDOM)` returns the existing read-only face without starting hardware. Generated Platform lifecycle uses the existing private C owner and operations table directly, with no second instance or clock authority. Unselected assemblies do not compile the RNG driver."
+
+msgid "Platform 在 System 成功启动后 prepare RNG，并在关闭或挂起时撤回 RNG enable 与本 owner 取得的 gate；恢复仍使用同一静态 owner，并重新绑定当前 time epoch。 在任何 System 时钟效果前先只读拒绝已有 gate 下的外部 RNGEN／IE；prepare 再次检查 System 运行状态、RCC/Flash 完整计划与实际 PLL48，不修改共享 PLL。 HSE26、HSI 与直接 SYSCLK 共用同一事实；直接输入必须显式预留 `pll48 = true`。"
+msgstr "Platform prepares RNG after System successfully starts and withdraws RNG enable and this owner's acquired gate on stop or suspend. Resume reuses the same static owner and binds the current time epoch again. Read-only admission rejects foreign RNGEN/IE under an already enabled gate before any System clock effect. Prepare then checks System running state, the full RCC/Flash plan and actual PLL48 without changing the shared PLL. HSE26, HSI and direct SYSCLK use the same facts; direct input requires an explicit `pll48 = true` reservation."
+
+msgid "每次读保留官方 RNG 的首字丢弃、连续相同值与 seed/clock 错误检查；失去时钟或 epoch 后不再发布数据，不建立熵池或质量认证。应用在 Platform suspend／stop 之前 join 全部同步 RNG／TLS／网络消费者。关闭失败保留原 owner、时钟依赖与可 重试责任；时钟失败后仍可清理，成功才撤回本 owner 取得的位。外部活动 RNGEN／IRQ 仍会令 System.stop 在任何写入之前拒绝撤时钟。"
+msgstr "Each read retains the official RNG's first-word discard, continuous equal-value check and seed/clock error checks. Data is not published after clock or epoch loss; no entropy pool or quality certification is established. Applications join all synchronous RNG/TLS/network consumers before Platform suspend/stop. Failed shutdown retains the original owner, clock dependency and retry responsibility. Cleanup remains available after clock failure and releases only the bits acquired by this owner on success. Foreign active RNGEN/IRQ still causes System.stop to reject clock withdrawal before any write."
+
+msgid "![FIG-31：F4 源码归属与接口边界](../assets/diagrams/driver-source-ownership.svg)"
+msgstr "![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)"
+
+msgid "FIG-31：F4 源码归属与接口边界"
+msgstr "FIG-31: F4 source ownership and interface boundaries"
+
+msgid "[F4 源码归属与接口边界](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[F4 source ownership and interface boundaries](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+
+msgid "静态配置、资源责任与公共调用边界参见共享图示。"
+msgstr "See the shared diagram for static configuration, resource responsibility and public call boundaries."

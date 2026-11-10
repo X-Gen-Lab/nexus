@@ -1,6 +1,6 @@
 /**
  * \file            timer.c
- * \brief           General-purpose fixed-base TIM3 PWM without capture or DMA
+ * \brief           Shared fixed-base general timer PWM without capture or DMA
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-09
@@ -32,8 +32,9 @@ nx_result_t nx_stm32_pwm_initialize(nx_stm32_pwm_state_t* port) {
     if (port == NULL || port->registers == NULL ||
         port->inactive_gpio == NULL || port->channel == 0U ||
         port->channel > 4U || port->period_ticks == 0U ||
-        port->period_ticks > 65535U || port->duty_ticks > port->period_ticks ||
-        port->tick_hz == 0U || port->inactive_mask == 0U) {
+        (port->registers != TIM5 && port->period_ticks > 65535U) ||
+        port->duty_ticks > port->period_ticks || port->tick_hz == 0U ||
+        port->inactive_mask == 0U) {
         return NX_ERROR_INVALID;
     }
     TIM_TypeDef* regs = port->registers;
@@ -69,7 +70,8 @@ nx_result_t nx_stm32_pwm_set(void* context, uint32_t period_ticks,
                              uint32_t duty_ticks) {
     nx_stm32_pwm_state_t* port = context;
     if (port == NULL || !port->initialized || period_ticks == 0U ||
-        period_ticks > 65535U || duty_ticks > period_ticks) {
+        (port->registers != TIM5 && period_ticks > 65535U) ||
+        duty_ticks > period_ticks) {
         return NX_ERROR_INVALID;
     }
     if (period_ticks != port->period_ticks ||
@@ -82,7 +84,7 @@ nx_result_t nx_stm32_pwm_set(void* context, uint32_t period_ticks,
     return NX_SUCCESS;
 }
 
-/** \brief Connect the initialized pin to AF2 before enabling its channel. */
+/** \brief Connect the reviewed alternate function before enabling output. */
 nx_result_t nx_stm32_pwm_start(void* context) {
     nx_stm32_pwm_state_t* port = context;
     if (port == NULL || !port->initialized ||
@@ -90,13 +92,14 @@ nx_result_t nx_stm32_pwm_start(void* context) {
         return NX_ERROR_STATE;
     }
     GPIO_TypeDef* gpio = port->inactive_gpio->registers;
+    const uint32_t alternate = nx_stm32_timer_af(port->registers);
     for (unsigned pin = 0U; pin < 16U; ++pin) {
         if ((port->inactive_mask & (1U << pin)) != 0U) {
             uint32_t selected = 1U << pin;
             if (pin < 8U) {
-                LL_GPIO_SetAFPin_0_7(gpio, selected, LL_GPIO_AF_2);
+                LL_GPIO_SetAFPin_0_7(gpio, selected, alternate);
             } else {
-                LL_GPIO_SetAFPin_8_15(gpio, selected, LL_GPIO_AF_2);
+                LL_GPIO_SetAFPin_8_15(gpio, selected, alternate);
             }
             LL_GPIO_SetPinMode(gpio, selected, LL_GPIO_MODE_ALTERNATE);
         }

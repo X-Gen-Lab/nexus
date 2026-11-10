@@ -3,13 +3,12 @@
 import json
 import unittest
 
-from tools.testing import test_tdd_matrix_integration as integration
+from tools.testing import gate_fixture as integration
 
 
 class TDDBinaryPlanBoundaryTests(unittest.TestCase):
     def setUp(self):
-        self.fixture = integration.TDDMatrixIntegrationTests(
-            "test_build_capture_execution_summary_strict_audit_order")
+        self.fixture = integration.GateFixture()
         self.fixture.setUp()
         self.addCleanup(self.fixture.doCleanups)
 
@@ -24,9 +23,8 @@ class TDDBinaryPlanBoundaryTests(unittest.TestCase):
             commands.append(command)
             return self.fixture.execute(command, environment, log)
 
-        status, output, _, after = self.fixture.run_gate(execute=execute)
+        status, output = self.fixture.run_gate(execute=execute)
         self.assertEqual(status, 1, output)
-        after.assert_not_called()
         self.assertFalse(any(command[0] == str(path) for command in commands))
         self.assertFalse((self.fixture.build / "tdd/execution.json").exists())
 

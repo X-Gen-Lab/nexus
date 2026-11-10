@@ -28,6 +28,29 @@ typedef struct {
     uint16_t tci;
     bool present;
 } nx_eth_vlan_t;
+/** \brief Explicit hardware TX checksum insertion; not an arbitrary CRC. */
+typedef enum {
+    NX_ETH_FRAMES_CHECKSUM_NONE,
+    NX_ETH_FRAMES_CHECKSUM_IP_HEADER,
+    NX_ETH_FRAMES_CHECKSUM_PAYLOAD,
+    NX_ETH_FRAMES_CHECKSUM_FULL,
+    NX_ETH_FRAMES_CHECKSUM_RESERVED
+} nx_eth_frames_tx_checksum_t;
+/** \brief Actual enhanced RX descriptor observations, never inferred validity.
+ * \note AVAILABLE requires actual ESA writeback with selected IPC offload.
+ *       PAYLOAD bits encode 0=unprocessed, 1=UDP, 2=TCP, 3=ICMP. IPv6 has no
+ *       header checksum. Bypassed, missing or malformed status grants no
+ *       checksum assurance; consumers own protocol admission.
+ */
+enum nx_eth_frames_rx_checksum_flags {
+    NX_ETH_FRAMES_RX_CHECKSUM_AVAILABLE = 1U << 8U,
+    NX_ETH_FRAMES_RX_CHECKSUM_IPV4 = 1U << 6U,
+    NX_ETH_FRAMES_RX_CHECKSUM_IPV6 = 1U << 7U,
+    NX_ETH_FRAMES_RX_CHECKSUM_BYPASSED = 1U << 5U,
+    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_ERROR = 1U << 4U,
+    NX_ETH_FRAMES_RX_CHECKSUM_HEADER_ERROR = 1U << 3U,
+    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_MASK = 7U
+};
 /**
  * \brief One whole L2 frame, excluding preamble, hardware pad and hardware FCS.
  * \note The fragment array and every fragment remain borrowed after ACCEPTED.
@@ -39,6 +62,7 @@ typedef struct {
     const nx_eth_fragment_t* fragments;
     size_t fragment_count;
     bool timestamp_requested;
+    nx_eth_frames_tx_checksum_t checksum;
     nx_io_timestamp_t stamp;
     uint32_t capture_flags;
 } nx_eth_frames_tx_request_t;
@@ -60,6 +84,7 @@ typedef struct {
     nx_eth_vlan_t vlan;
     nx_io_timestamp_t stamp;
     uint32_t capture_flags;
+    uint32_t checksum_flags;
 } nx_eth_frames_rx_loan_t;
 /** \brief Latched engine facts and selected clock epoch, not protocol state. */
 typedef struct {
@@ -95,6 +120,13 @@ struct nx_eth_frames_port {
  *       inserts padding/FCS. Length-coded 802.3, QinQ and 0x88A8 reject.
  *       Failure preserves request and retains no references. Deadline is an
  *       absolute monotonic provider time, distinct from the PTP clock domain.
+ *       Preparation selects CHECKSUM_NONE. Before submission the READY owner
+ *       may explicitly choose checksum insertion on a provider that selects
+ *       offload. IP_HEADER computes only the IP header. PAYLOAD requires the
+ *       caller's pseudo-header checksum seed; FULL includes hardware pseudo
+ *       header calculation. Hardware recognizes only its documented IPv4/IPv6
+ *       and TCP/UDP/ICMP formats; the caller owns packet contents and protocol
+ *       policy. No software checksum fallback or packet repair is provided.
  */
 nx_result_t nx_eth_frames_tx_prepare(nx_eth_frames_tx_request_t* request,
                                      const nx_eth_fragment_t* fragments,

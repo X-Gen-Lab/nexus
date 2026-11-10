@@ -1,6 +1,6 @@
 /**
  * \file            stm32f407_packet_cold.h
- * \brief           Exact packet pad and shared RMII clock transactions
+ * \brief           Exact packet pads and shared MII/RMII clock transactions
  * \author          Nexus Team
  */
 #ifndef NX_STM32F407_PACKET_COLD_H
@@ -11,10 +11,10 @@
 #define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
 #endif
 
-/** \brief Retained RMII pads and selector; each snapshot remains unique. */
+/** \brief Retained Ethernet pads/selector; each snapshot remains unique. */
 typedef struct {
     uint32_t mux_saved;
-    uint16_t leases;
+    uint32_t leases;
     bool mux_leased;
 } nx_stm32_eth_pin_receipt_t;
 
@@ -28,7 +28,7 @@ typedef struct {
 static inline bool
 nx_stm32_packet_pins_valid(const nx_stm32_platform_pin_config_t* pins,
                            size_t count) {
-    if (pins == NULL || count == 0U || count > 9U)
+    if (pins == NULL || count == 0U || count > 17U)
         return false;
     for (size_t i = 0U; i < count; ++i) {
         if (pins[i].registers == NULL || pins[i].snapshot == NULL ||
@@ -108,19 +108,21 @@ nx_stm32_eth_resources_close(nx_stm32_eth_resource_receipt_t* receipt) {
     return NX_SUCCESS;
 }
 
-/** \brief Connect RMII pads and selector after the Platform admits ownership.
- * \note Exact nine-pad state remains retained across every partial failure.
+/** \brief Connect selected pads and selector under Platform ownership.
+ * \note Exact nine/seventeen-pad state survives every partial failure.
  */
 static inline nx_result_t
-nx_stm32_eth_pins_prepare(const nx_stm32_platform_pin_config_t* pins,
-                          nx_stm32_eth_pin_receipt_t* receipt, bool frames) {
-    for (size_t i = 0U; i < 9U; ++i) {
+nx_stm32_eth_pins_prepare_mode(const nx_stm32_platform_pin_config_t* pins,
+                               nx_stm32_eth_pin_receipt_t* receipt, bool frames,
+                               bool mii) {
+    size_t count = mii ? 17U : 9U;
+    for (size_t i = 0U; i < count; ++i) {
         const nx_stm32_platform_pin_config_t* pin = &pins[i];
         nx_result_t status = nx_stm32_gpio_clock_enable(pin->port_index);
         if (status != NX_SUCCESS)
             return status;
         *pin->snapshot = nx_stm32_pin_capture(pin->registers, pin->pin);
-        receipt->leases |= (uint16_t)(1U << i);
+        receipt->leases |= 1U << i;
         status = nx_stm32_pin_configure(pin->registers, pin->pin, 2U, 11U, 0U,
                                         false);
         if (status != NX_SUCCESS)
@@ -139,25 +141,26 @@ nx_stm32_eth_pins_prepare(const nx_stm32_platform_pin_config_t* pins,
         return NX_ERROR_IO;
     receipt->mux_saved = SYSCFG->PMC & SYSCFG_PMC_MII_RMII_SEL;
     receipt->mux_leased = true;
-    NX_PLATFORM_REGISTER_WRITE(SYSCFG->PMC,
-                               SYSCFG->PMC | SYSCFG_PMC_MII_RMII_SEL);
+    NX_PLATFORM_REGISTER_WRITE(
+        SYSCFG->PMC, (SYSCFG->PMC & ~(uint32_t)SYSCFG_PMC_MII_RMII_SEL) |
+                         (mii ? 0U : SYSCFG_PMC_MII_RMII_SEL));
     nx_arch_dsb();
-    return (SYSCFG->PMC & SYSCFG_PMC_MII_RMII_SEL) != 0U ? NX_SUCCESS
-                                                         : NX_ERROR_IO;
+    return ((SYSCFG->PMC & SYSCFG_PMC_MII_RMII_SEL) != 0U) != mii ? NX_SUCCESS
+                                                                  : NX_ERROR_IO;
 }
 
-/** \brief Restore retained RMII pads before releasing the RMII selector. */
+/** \brief Restore every selected pad before releasing the media selector. */
 static inline nx_result_t
-nx_stm32_eth_pins_close(const nx_stm32_platform_pin_config_t* pins,
-                        nx_stm32_eth_pin_receipt_t* receipt) {
-    for (size_t i = 9U; i != 0U; --i) {
-        uint16_t bit = (uint16_t)(1U << (i - 1U));
+nx_stm32_eth_pins_close_mode(const nx_stm32_platform_pin_config_t* pins,
+                             nx_stm32_eth_pin_receipt_t* receipt, bool mii) {
+    for (size_t i = mii ? 17U : 9U; i != 0U; --i) {
+        uint32_t bit = 1U << (i - 1U);
         if ((receipt->leases & bit) == 0U)
             continue;
         nx_result_t status = nx_stm32_packet_pin_close(&pins[i - 1U]);
         if (status != NX_SUCCESS)
             return status;
-        receipt->leases &= (uint16_t)~bit;
+        receipt->leases &= ~bit;
     }
     if (receipt->mux_leased) {
         NX_PLATFORM_REGISTER_WRITE(
@@ -169,5 +172,17 @@ nx_stm32_eth_pins_close(const nx_stm32_platform_pin_config_t* pins,
         receipt->mux_leased = false;
     }
     return NX_SUCCESS;
+}
+/** \brief Preserve the existing nine-pad RMII cold entry point. */
+static inline nx_result_t
+nx_stm32_eth_pins_prepare(const nx_stm32_platform_pin_config_t* pins,
+                          nx_stm32_eth_pin_receipt_t* receipt, bool frames) {
+    return nx_stm32_eth_pins_prepare_mode(pins, receipt, frames, false);
+}
+/** \brief Preserve the existing nine-pad RMII withdrawal entry point. */
+static inline nx_result_t
+nx_stm32_eth_pins_close(const nx_stm32_platform_pin_config_t* pins,
+                        nx_stm32_eth_pin_receipt_t* receipt) {
+    return nx_stm32_eth_pins_close_mode(pins, receipt, false);
 }
 #endif

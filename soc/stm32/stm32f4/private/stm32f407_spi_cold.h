@@ -27,6 +27,7 @@ typedef struct {
     nx_stm32_gpio_state_t* chip_select;
     uint32_t frequency_hz;
     uint8_t mode;
+    bool lsb_first;
 } nx_stm32_spi_endpoint_config_t;
 
 /** \brief Exact static resources; three signal pads precede one pad per CS.

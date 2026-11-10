@@ -18,6 +18,19 @@ extern "C" {
  */
 nx_result_t nx_stm32_usb_device_initialize(nx_usb_controller_t* controller,
                                            nx_stm32_usb_clock_state_t* clock);
+/**
+ * \brief Bind OTG_HS to an explicitly owned internal-FS or external-ULPI PHY.
+ * \param[in,out] controller: Unborrowed exact endpoint/event storage.
+ * \param[in] clock: Explicit gate/PHY clock owner, retained until full stop.
+ * \param[in] ulpi: External 60 MHz ULPI when true; internal FS otherwise.
+ * \return SUCCESS or failure retaining any partial transport responsibility.
+ * \note Privileged cold task after pin/VBUS/PHY power handover. Internal HS
+ *       PHY still runs at full speed; ULPI wiring is never inferred.
+ */
+nx_result_t
+nx_stm32_usb_device_hs_initialize(nx_usb_controller_t* controller,
+                                  const nx_usb_clock_domain_t* clock,
+                                  bool ulpi);
 #ifdef __cplusplus
 }
 #endif

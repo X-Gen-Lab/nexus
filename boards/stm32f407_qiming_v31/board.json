@@ -54,6 +54,26 @@
       "id": "can2",
       "controller": "CAN2",
       "route": "can2-pb12-pb13"
+    },
+    {
+      "id": "crc",
+      "controller": "CRC",
+      "route": "crc-internal"
+    },
+    {
+      "id": "wwdg",
+      "controller": "WWDG",
+      "route": "wwdg"
+    },
+    {
+      "id": "pvd",
+      "controller": "EXTI16",
+      "route": "pvd-exti16"
+    },
+    {
+      "id": "rng",
+      "controller": "RNG",
+      "route": "rng-internal"
     }
   ],
   "reserved_resources": [
@@ -67,7 +87,7 @@
   ],
   "provenance": [
     {
-      "url": "https://github.com/petercwq/STM32407/blob/master/启明欣欣407开发板(高配版)V3.1例程使用手册.pdf",
+      "url": "https://github.com/petercwq/STM32407/blob/master/\u542f\u660e\u6b23\u6b23407\u5f00\u53d1\u677f(\u9ad8\u914d\u7248)V3.1\u4f8b\u7a0b\u4f7f\u7528\u624b\u518c.pdf",
       "scope": "V3.1 LED identities and low-active behavior"
     },
     {

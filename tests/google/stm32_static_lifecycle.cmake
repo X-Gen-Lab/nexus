@@ -8,6 +8,7 @@ nexus_google_test(nexus_stm32_static_lifecycle_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi.c"
         "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu/model.c"

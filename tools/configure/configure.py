@@ -27,8 +27,8 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.configure import cpu as cpu_profiles
-from tools.configure import bundle, dependencies, sdk, i2s2, enhanced_endpoints
-from tools.configure import integration_package, adc
+from tools.configure import bundle, dependencies, sdk, enhanced_endpoints
+from tools.configure import integration_package, adc, dac
 from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
 from tools.configure.ir import (
     CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
@@ -954,7 +954,7 @@ class _DeviceGraphResolution:
 
 def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                           provider, clock, clock_plan, kernel_profile,
-                          irq_profile, memory, i2s2_role, read,
+                          irq_profile, memory, read,
                           snapshots, board_conditions=None) -> _DeviceGraphResolution:
     """Validate coupled device choices, then publish one immutable graph.
 
@@ -971,9 +971,14 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
     claims, claim_list, claim = resource_claims(provider)
     for record in reserved_claims(soc, board, provider):
         claim(**record)
-    if i2s2_role is not None:
-        for resource in i2s2_role.claims:
-            claim(resource, "i2s2", i2s2_role.profile, "RM0090/DS8626 chip reference")
+    if (family == "stm32f4" and clock_plan.get("parameters") is not None and
+            clock_plan["parameters"]["source"] == "hse"):
+        # The selected external oscillator owns its pads before System starts.
+        # A Board reservation may restate this ownership, never release it.
+        for pin in ("PH0", "PH1"):
+            key = "pin:" + pin
+            if key not in claims:
+                claim(key, "system-clock", "hse", clock_plan["profile"])
     if backend == "freertos":
         for irq in ("SysTick", "PendSV", "SVC"):
             claim("irq:" + irq, "freertos", "kernel",
@@ -984,7 +989,6 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             claim("irq:" + irq, "threadx", "kernel",
                   "ThreadX " + irq_profile.kernel_port)
     selected = []
-    adc_group_contract = None
     instance_ids = []
     irq_owners = {}
     for selection in sequence(controller_selections, "selected controllers"):
@@ -1006,6 +1010,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             board_hardware.require_binding(binding, board_conditions)
             route = routes[binding["route"]]
             hardware = soc["controllers"][route["controller"]]
+            hardware = timer_advanced.selected_hardware(route, hardware, provider)
             authored_kind = selection.pop("authored_kind", route["kind"])
             if authored_kind != route["kind"]:
                 fail("Authored kind differs from Board binding kind")
@@ -1016,7 +1021,10 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             if route["kind"] == "rtc":
                 from tools.configure import rtc
                 rtc.validate_board(selection, board)
-            validate_selection(selection, route, provider, ram["size"])
+            validate_selection(selection, route, provider, ram["size"],
+                               clock=clock, clock_plan=clock_plan)
+            route = adc.selected_route(selection, route, provider)
+            route = dac.selected_route(selection, route, provider)
             resolved_pin_states = None
             if mode == "named-states":
                 from tools.configure import pin_states
@@ -1068,6 +1076,8 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             if route["kind"] == "adc_group":
                 for resource in adc.group_trigger_resources(selection, provider):
                     claim(resource, name, mode, route["id"])
+            if route["kind"] == "usb_host" and selection["engine"] == "dma":
+                claim("usb-dma:" + route["controller"], name, mode, route["id"])
             if traits.dma:
                 for dma in route_dma(route, mode):
                     claim("dma:" + dma, name, mode, route["id"])
@@ -1077,11 +1087,9 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                 clock_plan=clock_plan, clock_profile=assembly.clock_profile,
                 pin_states=resolved_pin_states, traits=traits))
             if route["kind"] == "adc_group":
-                resolution, adc_group_contract = adc.resolve_group(
-                    selection, provider, adc_group_contract,
-                    review_path=lambda: contained_file(
-                        root, soc.get("adc_group_review", "")),
-                    read=read, snapshots=snapshots, part=part, clock=clock)
+                resolution = adc.resolve_group(
+                    selection, provider, part=part, clock=clock,
+                    clock_plan=clock_plan)
                 selected[-1]["adc_group_resolution"] = resolution
     provider.validate_controller_set(
         selected, clock_profile=assembly.clock_profile)
@@ -1134,7 +1142,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                 board_hardware.require_binding(
                     bindings[device["cs_binding"]], board_conditions)
             if controller["kind"] == "usb_device":
-                validated = usb_device.endpoint(device)
+                validated = usb_device.endpoint(device, controller)
                 device.clear()
                 device.update(validated)
                 continue
@@ -1156,7 +1164,10 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                for item in selected if item["kind"] == "external_bus"}
     resources = resource_graph.resolve(claim_list, shared=pwm_sharing,
                                        aliases=aliases)
-    triggers = trigger_graph.resolve_fixed(selected, routes)
+    triggers = trigger_graph.resolve_fixed(
+        selected, adc_triggers=getattr(provider, "ADC_TRIGGERS", None),
+        adc_injected_triggers=getattr(provider.ADC_GROUP,
+                                     "INJECTED_TRIGGERS", None))
     adc.complete_triggers(selected, triggers)
     dma_plan = dma_topology.resolve_selected(selected, provider)
     controllers = tuple(ControllerIR.create(item, family) for item in selected)
@@ -1170,8 +1181,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             if can_domain is not None else None),
         pwm_shared_owners=tuple(PwmSharedOwnerIR.from_validated(item)
                                for item in pwm_shared_owners),
-        inputs=((adc_group_contract[2],)
-                if adc_group_contract is not None else ()))
+        inputs=())
 
 
 def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
@@ -1216,16 +1226,17 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
     cpu_profile = cpu_profiles.resolve(soc["cpu"], soc["irq"], backend,
                                        enum_abi=provider.ENUM_ABI)
     validate_interrupt_profile(cpu_profile, provider)
-    clock = soc["clock_profiles"].get(assembly.clock_profile)
+    if assembly.clock_parameters is not None:
+        if family != "stm32f4" or assembly.clock_profile != "custom":
+            fail("Clock parameters require the explicit F407 custom profile")
+        clock = thaw(assembly.clock_parameters)
+    else:
+        clock = soc["clock_profiles"].get(assembly.clock_profile)
     if clock is None:
         fail(f"Unknown clock profile: {assembly.clock_profile}")
     clock_plan = provider.clock_plan(assembly.clock_profile, clock)
     clock = provider.normalize_clock(clock)
     clocks.match_board(clock, board["clocks"])
-    i2s2_role = i2s2.resolve(thaw(assembly.i2s2), family=family,
-                            part=part, backend=backend,
-                            clock_profile=assembly.clock_profile,
-                            provider=provider)
     if assembly.os is not None and not isinstance(assembly.os, Mapping):
         fail("OS policy: expected object")
     kernel_profile = kernel.resolve(thaw(assembly.os), cpu_profile,
@@ -1246,8 +1257,11 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
         assembly, root=root, soc=soc, board=board, routes=routes,
         bindings=bindings, provider=provider, clock=clock, clock_plan=clock_plan,
         kernel_profile=kernel_profile, irq_profile=irq_profile,
-        memory=selected_memory, i2s2_role=i2s2_role, read=read,
+        memory=selected_memory, read=read,
         snapshots=snapshots, board_conditions=facts.hardware)
+    consumer_clocks = getattr(provider, "validate_clock_consumers", None)
+    if consumer_clocks is not None:
+        consumer_clocks(clock_plan, device_graph.controllers)
     external_memory_policy = getattr(provider, "EXTERNAL_MEMORY", None)
     external_memory = (external_memory_policy.resolve(
         selected_memory.budget, device_graph.devices,
@@ -1296,7 +1310,7 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
         physical_qualified=False,
         fact_references=freeze(references),
         pwm_shared_owners=device_graph.pwm_shared_owners,
-        i2s2=i2s2_role, provider_context=facts.provider_context,
+        provider_context=facts.provider_context,
         hardware=facts.hardware, external_memory=external_memory)
     resolved = resolved.with_integrations()
     if assembly.power is not None:

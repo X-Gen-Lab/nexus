@@ -53,7 +53,10 @@ nx_result_t nx_adc_group_submit(const nx_adc_group_port_t* p,
                                 nx_adc_group_request_t* request) {
     if (!valid(p) ||
         !span(request, sizeof(*request), _Alignof(nx_adc_group_request_t)) ||
-        control(p, request, sizeof(*request))) {
+        control(p, request, sizeof(*request)) ||
+        !span(request->frames, request->bytes, 1U) ||
+        control(p, request->frames, request->bytes) ||
+        overlap(request, sizeof(*request), request->frames, request->bytes)) {
         return NX_ERROR_INVALID;
     }
     return p->ops->submit == NULL ? NX_ERROR_UNSUPPORTED

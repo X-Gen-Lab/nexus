@@ -1,11 +1,13 @@
-# USB FS device 包所有权与接入边界
+# USB Device、Host 与显式角色所有权
 
 公共接口是 `nexus/io/usb_device.h`。生产实现归属 `soc/stm32/stm32f4/`，
-当前精确适配 STM32F407VET6／ZGT6 的 internal-PHY full-speed device PIO。
+当前精确适配 STM32F407VET6／ZGT6 的 OTG FS 与 HS core：内置 PHY 的全速、
+外部 ULPI 的高速／全速回退，以及 PIO 和 HS AHB DMA。Host 使用锁定官方 HCD／LL，
+Device 复用已有控制阶段与 errata IP owner。
 目录按 STM32F4 家族组织，不表示该系列全部器件已完成接入。Native 位于
 `tests/support/native/`，仅作为显式启用的主机测试模型。维护范围是
-EP0 control、显式选择的 EP1–EP3 bulk IN/OUT 与 interrupt IN、
-SETUP/reset/suspend/resume 事实、STALL、SET_ADDRESS、取消与退出。
+EP0 control、显式选择的非零 bulk／interrupt／ISO IN/OUT、
+SETUP/reset/suspend/resume 事实、合法类型的 STALL、SET_ADDRESS、取消与退出。
 DCD 的一次 request 仍是一个不超过 MPS 的包；非零 endpoint 的 active／mask 由
 独立可选 activation face 显式控制。SET_CONFIGURATION、配置就绪及其回滚由外部
 Chapter 9 owner 负责，packet 机制不能单独证明完整枚举／物理 reset 恢复。
@@ -13,63 +15,86 @@ Chapter 9 owner 负责，packet 机制不能单独证明完整枚举／物理 re
 `Nexus::USBDescriptors` 校验外部描述符结构。两者不创建任务或分配内存。
 具体 class 分派、描述符字节与查找、VID/PID、字符串、配置及恢复策略由外部工程提供。
 可选 `Nexus::USBACM` 只组合下述 CDC ACM 控制子集；没有数据泵或完整 CDC/HID 类栈，
-也不增加 Host、HS、DMA、ISO 或 remote wake 支持。
+其合同不建立完整 class 栈；Device ISO 由下述有限 packet 合同提供，remote wake 未接入。
+独立的 `nexus/io/usb_host.h` 提供 Host packet transport，
+`nexus/io/usb_otg.h` 提供按需显式 managed role；自动 ID、SRP、HNP 策略不在范围内。
 
 ## 对象、资源与时钟
 
 controller 和 endpoint 保持独立 identity；公共 face 只有 readonly ops 与 context。
-装配拥有一个 controller、精确 endpoint 数组、精确事件环和一个显式 48 MHz clock
-owner。实例共享只读方法表，没有全局可变 registry、endpoint 最大池、隐藏 worker
+装配拥有一个 controller、精确 endpoint 数组、精确事件环和所选 PHY／controller
+clock owner。实例共享只读方法表，没有全局可变 registry、endpoint 最大池、隐藏 worker
 或必选 OS。未选实例不产生状态，MCU 热路径用 direct volatile MMIO。模型编译只
 替换外部 MMIO/NVIC 叶端口，MCU 不携带模型函数表或运行时模拟分支。
 
 STM32F407 的 OTG_FS 基址是 `0x50000000`，四个 IN / 四个 OUT 方向、320-word FIFO，
 单一 IRQ 67；绑定用锁定 SDK 验证实际 offset、stride、容量和 W1C/只读位。
-EP0 固定 64-byte MPS；bulk MPS 只能是 8/16/32/64。interrupt 仅选入 EP1–EP3
-IN，MPS 为 1–64 B，允许 10 B 等非二次幂长度；interrupt OUT 和 ISO 未接入。
-RX FIFO 至少 64 words；每个被选 IN FIFO 至少 16 words，分区先验证无重叠且总计
-不超过 320 words。方向、类型、MPS、FIFO 与重复 identity 的非法计划在 clock
-validate／retain 和 MMIO 之前拒绝。
+OTG_HS 基址是 `0x40040000`，六个 IN／六个 OUT、1024-word FIFO、IRQ 77。
+内置 FS PHY 使用 PB14／PB15 AF12；ULPI 使用十二根 AF10 pad 和外部 60 MHz。
+EP0 固定 64-byte MPS；全速 bulk 为 8/16/32/64，高速 bulk 为 512。
+全速 interrupt IN/OUT 为 1–64 B，高速为 1–1024 B。ISO 的协议 MPS 上界为
+全速 1023 B、高速 1024 B，每次机会只支持一个 transaction，实际选择还须通过 FIFO 准入。
+RX FIFO 采用审核下限 48 words，不自动改变既有默认；FS core 的 RXFD 上限为 256 words，
+HS core 为 1024 words；
+总 FIFO 容量不能当作 RX 上限。每个选中及低编号未选 IN FIFO 至少留 16 words，
+HS AHB DMA 另留 32 words。完整 TX 分区由 controller 验证无重叠且不超总容量，
+非法方向、类型、MPS、FIFO 和重复 identity 在 clock validate／retain 与 MMIO 之前拒绝。
 
-| SoC | 实际 48 MHz 来源 | 接入行为 |
+RX 还须覆盖 SETUP/status 与最大 OUT packet；多个 ISO OUT 至少保留两份最大 OUT
+packet 及其状态字空间。配置器、公开 profile 的 RX 检查和 C 准入使用同一需求。
+FS core 的最大 ISO IN 参考为 48 RX＋16 EP0 TX＋256 ISO TX＝320 words。
+whole-packet FS core OUT 1023 B 需要 270 RX words，超过 RXFD 上限而拒绝；
+HS core 的内置 PHY 全速模式可用足够 RX 接纳该 MPS。这是精确资源组合，不是所有
+MPS／endpoint 组合均可装配的承诺。
+
+| PHY 选择 | 所选 PHY 时钟条件 | 接入行为 |
 |---|---|---|
-| STM32F407 | HSE 8 MHz / M8 × N336 / Q7 | 验证现有 PLL/ready，只管理 USBFS gate |
+| 内置 FS PHY | 选中 ClockPlan 的 HSE／PLL48，精确 48 MHz | 验证实际 PLL/ready 与 SYSCLK/APB 计划；管理对应 FS／HS gate |
+| 外部 ULPI PHY | 外部交接的 60 MHz | 管理 HS 与 ULPI gate；不隐式要求 PLL48 |
 
 clock owner 管理精确 consumer count；失败回滚缺少读回证明时仍保留清理责任。
 DCD 先 validate/retain，退出完成后 release consumer，最后由外部 owner stop
 时钟。pin/electrical/VBUS 和所有共享时钟消费者必须由外部资源 owner 先授权并
-静止，不能仅凭 gate 为零推断系统独占。其他晶振或 PLL 配置需要独立时钟合同，
-不能凭声明 `48 MHz` 直接复用当前配置。
+静止，不能仅凭 gate 为零推断系统独占。FS core AHB 必须大于 14.2 MHz，
+HS core 必须大于 30 MHz，TRDT 按实际 AHB 选择。内置 PHY 不接受仅有 nominal
+48 MHz 的 HSI 精度假设；实际晶振精度和 PCB 仍需外部电气证据。
 
 controller、endpoint、事件环与 request 按所选实例静态分配；可选 ROM profile、
-EP0 adapter 和 outer request 分别计入其 owner 的资源预算。私有 endpoint 的
-`uint8_t transfer` 只保存类型，不增加 interval、调度或队列字段。结构尺寸、
+EP0 adapter 和 outer request 分别计入其 owner 的资源预算。私有 endpoint 保存类型
+与本次 ISO 的目标帧；目标帧复用已验证 ARM ABI 的原 padding。
+`bInterval` 仍属外部 descriptor，不新增调度队列或 worker。结构尺寸、
 未选 section GC 与完整 Flash／RAM 成本须由同源配置的 ARM ELF／map 建立，
 不以 host sizeof 或旧版本 probe 代替当前镜像测量。
 
 ## 选定 ROM profile 与描述符
 
 `nexus/io/usb_profile.h` 的只读 profile 绑定既有 controller／endpoint face，以及
-选定的方向、类型、MPS、FIFO、48 MHz、internal PHY、FS device 与 PIO 事实。
+选定的方向、类型、MPS、FIFO、PHY 时钟、速度和 PIO／AHB DMA 事实。
 只有 USB 被选入且 `factory.capabilities = true` 时，生成器才产生 profile、精确
 endpoint 数组与 `nx_factory_usb_profile` getter。设为 `false` 时不生成这些对象
 或 getter；普通 USB face、方法表、provider context 与既有 generic capability
 类型不因此扩大。getter 不初始化硬件，也不发现新 endpoint。
-装配在既有 `transfer` 字段增加 `"interrupt"` 取值；不可变 IR 与公共 profile 字段不变。
+ULPI 使用独立的高速与全速回退 profile；`nx_factory_usb_profile_for_speed`
+只返回选定速度对应的 ROM 记录，不把高速 512 B MPS 用于全速。
 公共 `NX_USB_PROFILE_INTERRUPT` 的枚举值是 2，USB wire／寄存器 EPTYP 值是 3；
-provider 显式映射类型，不把两者直接强转混用。
+`NX_USB_PROFILE_ISOCHRONOUS` 的枚举值是 3，wire EPTYP 为 1。provider 显式映射类型，
+不把两者直接强转混用。
 
 `nx_usb_profile_validate` 只读检查选定事实，不能证明实际时钟、PCB、VBUS 或枚举。
 外部 descriptor 通过 `nx_usb_descriptor_view_t` 传给
 `nx_usb_descriptor_validate`：device、configuration、string 必须完整；校验
-length／total、EP0 MPS、唯一 interface、alternate 0，以及 bulk／interrupt IN
+length／total、EP0 MPS、唯一 interface、alternate 0，以及 bulk／interrupt／ISO IN/OUT
 endpoint 的方向／编号／类型／MPS 与选定 profile 的对应关系。interrupt 描述符的
-`bInterval` 必须是 1–255 个 full-speed 1 ms frame 的线性计数，零无效；它由外部
-描述符独占，不复制到 TOML、IR、profile 或 provider state。DCD 不调度 host poll，
-也不承诺实际间隔；bulk 的既有 interval 处理保持不变。选定类型不符、描述的 endpoint
-未选入 profile 或 MPS 不符返回 INVALID；interrupt OUT、ISO、非零 control 与 alternate setting
-仍为 UNSUPPORTED，保留字段非法仍为 INVALID。class-specific 子结构只检查边界，
-不解码其类语义。
+`bInterval` 全速为 1–255 个 1 ms frame，高速为 1–16 的指数编码；ISO 在两种速度下
+均为 1–16 指数编码，单位分别是 1 ms frame 和 125 µs microframe。interval 由外部
+descriptor 独占，不复制到 TOML、IR、profile 或 provider state。DCD 不调度 host poll，
+也不承诺实际间隔；bulk 的既有 interval 处理保持不变。ISO 同步／用途字段校验标准
+编码，不推导音频反馈或 class 拓扑；保留 usage／位非法时拒绝。HS 高带宽 multiplier
+仍不支持，不静默裁剪成单 transaction。
+
+选定类型不符、描述的 endpoint 未选入 profile 或 MPS 不符返回 INVALID；非零
+control 与 alternate setting 仍为 UNSUPPORTED，保留字段非法仍为 INVALID。
+class-specific 子结构只检查边界，不解码其类语义。
 
 描述符校验按给定完整长度扫描，不读取硬件、不复制或保留 descriptor；通过只表示
 结构合法。选择哪段描述符、处理何种请求及 class 内容仍属外部策略。发送后，
@@ -87,10 +112,11 @@ payload，直到 acquire-observed SETTLED。所有 request、payload、输出、
 immutable clock ops 和 wake target 均检查与 controller/endpoint/ring/clock state
 及已有 loan 的重叠。拒绝 state/read_events 输出别名时输出保持原值。
 
-IN 的每次有限 data／ZLP 的长度寄存器写入 `(1U << 19) | length`（PKTCNT=1），
-MCNT／保留高位保持零，interrupt 不增加 odd/even-frame 命令。
+非 ISO IN 的每次有限 data／ZLP 长度寄存器写入 `(1U << 19) | length`（PKTCNT=1），
+MCNT／保留高位保持零；ISO IN 同样 PKTCNT=1，但 MCNT=1，按下一节选择帧奇偶。
+interrupt 不增加 odd/even-frame 命令。
 每个选定 IN direction 使用独立 Tx FIFO，
-一次同步装入整个不超过 64 B 的包，没有剩余软件 refill 工作；TX-empty mask 保持零，
+PIO 一次同步装入整个不超过所选 MPS 的包，没有剩余软件 refill 工作；TX-empty mask 保持零，
 不创建 TXFE refill worker。IN FIFO 写入不是完成，只有 XFRC、EP enable 已清、
 FIFO 空闲容量恢复并且观察到的 W1C completion 清除读回成功才发布 SUCCESS。
 OUT 必须同时读到包数据和 XFRC，
@@ -101,7 +127,7 @@ IN TXFE 是只读状态，不参与 W1C 清除/完成的零值证明。ITTXFE �
 FIFO 尚空时到达的可重试信息，OUT STUP 是正常 SETUP phase 事实；两者不错误地终止
 包。IN control timeout 和 OUT FIFO overrun 使用对应方向的真实事件位。EP0 的
 DATA PID 由 SETUP/core 管理：bits 29:28/16 对 EP0 是 reserved，软件只对非零
-bulk／interrupt endpoint 使用 DATA0 命令。reset／clear-halt 必须核对 DATA0
+bulk／interrupt endpoint 使用 DATA0 命令。对这些 endpoint，reset／clear-halt 须核对 DATA0
 读回；失败保留 reset admission 屏障或 halt，不提前允许新包借用。
 
 SETUP 严格解码八个 little-endian bytes，并产生单调递增 epoch。新 SETUP/reset
@@ -125,6 +151,32 @@ closing 均不能证明外部 configuration 已提交。
 最新 SETUP/epoch/closing 状态不依赖事件环空间。时间戳是 IRQ acquisition time，
 不是 USB 总线采样时刻；reset 批次中的无序旧 SETUP 不计作新的已接收 control。
 
+## ISO 有限单包与帧边界
+
+`transfer="isochronous"` 沿用现有 packet request、调用者 payload 与唯一 controller
+owner。每次 submit 从实际 DSTS 选择下一 frame／microframe 的奇偶；FS 使用 11-bit
+帧计数，HS 使用 14-bit 计数。ULPI 必须先观察到 ENUMERATED speed，才能提交 ISO。
+每次提交的剩余 Core deadline 至多一秒，小于两种速度帧半环的 1.024 秒。收集
+incomplete 事实时先检查 Core 超时，避免长停顿把旧目标误判成未来；Core 与 SOF
+之间不建立时间换算。
+
+IN 以单个 transaction 提交，OUT 的硬件接收计划为一个 MPS packet。ISO 的控制位 28／29
+表示 even／odd frame，不表示 DATA toggle，不执行 bulk 的 DATA0 重置证明。
+ISO endpoint 的 STALL 操作返回 UNSUPPORTED，不写端点寄存器。ISO 没有 ACK／NAK
+握手；SUCCESS 只证明控制器完成且必要源、FIFO、AHB 和 IRQ 引用已撤回，不能证明
+host 或其应用已收到数据。周期调度、同步、用途和 class 策略由外部 owner 明确提供，
+不自动重试错过的机会，也不按 `bInterval` 创建数据泵。
+
+已有未清的 global incomplete／drop 事实会在新 admission 前拒绝。ISOODRP（bit14）、
+incomplete IN／OUT（bit20／21）只使已到机会的 active ISO borrow 进入 IO 排空，
+不取消仍属未来帧的请求，也不影响其它 bulk borrow；已观察到的真实完成优先于并发旧
+incomplete。取消、超时、reset 和 stop 都继续实际 drain，失败仍保留 request／payload
+并可进入 QUARANTINED，不能强制释放借用。
+
+软件参考位于 `tests/contracts/usb_iso_assembly/`，分别覆盖 FS 最大 IN、HS core
+内置 PHY 的全速 OUT 和 ULPI HS DMA。它们不提供完整 USB 音视频 class、remote wake
+或物理吞吐／时序资格。
+
 ## 非零 endpoint 显式 activation
 
 独立的 `nexus/io/usb_activation.h` 提供 `nx_usb_activation_port_t`：face 是共享
@@ -137,8 +189,10 @@ profile、face 布局或 factory ABI epoch 1。该机制不新增可变 controll
 状态、队列、worker、实例池、动态分配、TOML 字段或 IR 类型。两指针布局说明 face
 形状；实际只读保留成本、未引用 GC 与完整镜像成本须分别以对应 ARM ELF 确认。
 
-操作只面向已经选定的 EP1–EP3 某一个方向，拒绝两个 EP0 地址及保留／未选地址；
-OUT 仍只允许既有 bulk。调用者须是同一个序列化特权 Task，进入时 incoming IRQ
+操作只面向已经选定的非零 endpoint 某一个方向：FS engine 为 EP1–EP3，HS engine
+为 EP1–EP5；拒绝两个 EP0 地址及保留／未选地址。OUT 可为 bulk、interrupt 或通过
+FIFO 准入的 ISO，各速度 MPS 按选中 profile 限定。调用者须是同一个
+序列化特权 Task，进入时 incoming IRQ
 masks clear。controller 须 started、持有 clock、没有 closing／reset 屏障，参数
 `epoch` 等于最新权威软件 control/reset epoch；冷态 epoch 0 合法。无效 identity
 或已知旧软件 epoch 在 MMIO 前拒绝。软件检查通过后，已观察到的 raw USBRST
@@ -153,8 +207,9 @@ request 或 payload，不能代替已有 packet 的 cancel／drain／acquire SET
 
 冷启动仅使两个 EP0 方向 active 并解除其 endpoint mask；其余选定方向保留
 immutable 几何但 inactive／SNAK。使能一个 inactive 方向时，先按选定 MPS、wire
-类型和仅 IN 的 FIFO selector 配置目标，建立 DATA0、清 STALL、置 active 与 SNAK，
-保持 EPENA clear，不写 TSIZ 或 payload FIFO。核对稳定控制字段、DATA0 与 NAK，
+类型和仅 IN 的 FIFO selector 配置目标，清 STALL、置 active 与 SNAK；bulk／interrupt
+同时建立 DATA0，ISO 不使用 DATA toggle。保持 EPENA clear，不写 TSIZ 或 payload FIFO。
+核对稳定控制字段、适用的 DATA0 与 NAK 状态，
 仅处理命令后新出现的目标 IN NAK-effective／token-empty 提示（0x50），并证明其
 W1C 清除；其他新事件使本次操作失败，进入 partial IO／closing。调用前已有的
 定义事件仍返回 BUSY，不在前置拒绝中清除。随后解除目标 EP_MASK 位并读回完整
@@ -171,9 +226,10 @@ reset progress 新增的反激活步骤只单次观察，由后续 service 继�
 
 幂等调用必须先满足同样的无 loan／无 pending 前置条件。已经 active 的 enable
 先核对 immutable 几何，不重放控制寄存器配置，只按需修正目标 mask；重复 enable
-不得把 DATA1 重置为 DATA0、清除真实 HALT 或发送包。已经 inactive 的 disable
+不得重置 bulk／interrupt 的 DATA1、清除真实 HALT 或发送包。已经 inactive 的 disable
 不重新编程几何，只证明目标 mask 关闭及事件清除。只有显式 disable 后重新 enable
-才建立新 DATA0 并在读回成功后清 halt；disable 保留 PID。已 active 但 immutable
+才为 bulk／interrupt 建立新 DATA0 并在读回成功后清 halt；disable 保留其 PID。
+已 active 但 immutable
 几何损坏时返回 IO／closing，不通过重写控制寄存器掩盖错误。
 
 控制或 mask 写入后的读回失败返回 IO，并保留既有 `closing` 屏障；IO 可以已有
@@ -193,7 +249,8 @@ drain／disable 旧方向，再 stage 新方向，随后提交该请求的 STATU
 
 activation 补充既有 FIG-16 的显式控制调用，不新增生命周期 owner 或执行线程。
 它不提供 Chapter 9／class stack、CDC notification、多配置／alternate 策略、
-连续传输、DMA、ISO、interrupt OUT、HS／Host／OTG 或电气接入；软件机制不证明
+连续传输或电气接入；ISO packet、HS、DMA、Host 和角色由各自独立选入路径提供。
+activation 机制不证明
 物理枚举／reset 时序、完整 IO-35 退出、clean candidate 或 HIL。
 
 ## 可选 EP0 packetizer 与外层借用
@@ -304,9 +361,10 @@ OUT0 quarantine 仍须外部 controller owner 授权真实完整停止，组件�
 从不在 IRQ 使用 cold poll loop。超时使用独立 monotonic deadline，USB suspend 或
 拔线后仍须由外部执行者调用 service，不依赖 SOF 或隐藏 timer。
 
-IN drain 先请求 SNAK、读到实际 NAK 状态，再请求 disable；EN clear、EPDISD、FIFO
-flush 和 W1C clear 必须全部成立。OUT 非零方向先确认 global OUT NAK，再 disable
-及排空 RX。drain 超时保留 QUARANTINED，不能撤销 buffer loan。
+非 ISO IN drain 先请求 SNAK、读到实际 NAK 状态，再请求 disable。ISO IN 不等待
+不适用的 NAK-effective 证明，仍执行 SNAK／EPDIS；EN clear、EPDISD、FIFO flush、
+AHB 与 W1C clear 仍须成立。OUT 非零方向（包括 ISO）先确认 global OUT NAK，
+再 disable 及排空 RX。drain 超时保留 QUARANTINED，不能撤销 buffer loan。
 
 Control OUT0 的 EPD 位固定为零，SETUP 也可绕过 NAK。不能模拟一个不存在的 disable
 ack 来完成取消。OUT0 individual cancel 在缺少真实完成证明时保持 DRAINING，随后
@@ -320,6 +378,49 @@ FIFO，已撤回的 PIO 执行者不再拥有 caller buffer；下一次 cold cor
 捕获 wake target 后 publisher count 仍保留该借用；stop/detach 在 notify 未返回时
 拒绝 BUSY。wake 必须同时支持 service/cancel 的 task 上下文和真正 IRQ 上下文，
 绑定读取实际 priority/group 验证 syscall ceiling，不修改全局 grouping。
+
+## HS AHB DMA、Host 与 managed role
+
+HS Device DMA 使用每方向静态 SRAM staging 和独立 24 B SETUP staging；CPU 复制
+公共 payload，不要求它额外声明 DMA word padding。AHB master 不占 DMA2 stream，
+CCM 不可选。完成还必须证明 endpoint disabled、AHB idle、DMA 地址撤回读回和 IRQ
+会合；失败保持 QUARANTINED，不能只看 XFRC 或 timeout 释放调用者存储。
+
+Host 每个所选 channel 同时借用一个 packet；buffer capacity 覆盖 HAL 的完整 word
+访问，IN 还覆盖 MPS。NAK／NYET 返回 NACK，由协议 owner 明确重试。锁定 HCD 的
+回调只锁存事实；取消／超时保守排空整个共享 FIFO controller。旧 channel、DMA
+地址、FIFO 和 IRQ 全部退出才 SETTLED。Host 没有自动 hub split 策略。
+
+`Nexus::USBRole` 是通用供电和排空屏障，F407 managed OTG 将它接入真实 cold
+Device／Host。一个 composite 独占 core、PHY、pins、clock 和 IRQ；OFF prepare
+不启动 USB。显式 generation-bound 请求先真实 drain，再 source-off 读回和独立
+VBUS 放电确认，才进行新角色的供电／cold prepare。切回 Device 等待至少 50 ms
+并确认实际 CMOD；inactive face 纯拒绝，旧 SETUP epoch 不跨角色复用。过流通过
+显式 service 进入同一撤回屏障；硬件限流与实际放电路径由外部电源 owner 提供。
+详见 `tests/contracts/usb_otg_assembly/README.md` 的软件信号合同。
+
+## 按需官方 Core middleware
+
+`st-usb-device` 与 `st-usb-host` 只准备精确锁定的相应 middleware Core。
+`components/st_usb_device` 和 `components/st_usb` 使用调用者静态 state、slots、
+staging、有限 deadline 和显式 Thread step。官方 Handle／class／descriptor 回调表
+留在私有接线边界，公共 I/O 不泄漏厂商类型；不选时不编译、不建立堆或后台任务。
+
+Device Core 复用现有 epoch、activation 和真实 packet settlement；多包控制 IN
+的提前零长 OUT 意图延后至真实 STATUS_OUT。即时 premature STATUS OUT 回调不由
+严格 DCD 提供，下一 SETUP／deadline 与完整 drain 恢复有软件回归，不能据此声称
+立即中止路径已经完整维护。Host Core 在断开后先排空，再允许 Core reset/class
+退出及应用明确的 cold restart。两者均锁存官方 Core 忽略的 LL 错误。
+
+私有 Device Core bridge 把 profile ISO 显式映射到 `USBD_EP_TYPE_ISOC`，不把
+Nexus 枚举值当作官方 wire 类型。Core／class 仍由特权 Thread 显式 step，packet
+失败沿既有收条传播，不增加自动 class 恢复或完整音视频协议栈。
+
+选入 HCD 的 `HAL_Delay` 与官方 Host Core 的 `USBH_Delay` 使用既有 Core timer，
+不安装 SysTick。除了实际 deadline，
+它对计数冻结保留有限无进展预算；invalid、后退或持续冻结时进入不返回的 park，
+不把 void delay 早退当作成功。原 cold receipt 和所有借用仍保留，故障／reset 策略
+由外部 owner 负责。System STOP 前必须完成所有 delay、request 和角色事务的撤回。
 
 ## 实现位置与验收边界
 
@@ -340,6 +441,6 @@ F4 寄存器模型、ARM 链接、资源预算、SDK consumer 与完整本地门
 USB role、VBUS sensing/power/backfeed、pull-up/ESD、跳帽及共享引脚约束。
 软件装配可以选择 PA11／PA12，pin claim 不证明实际接线或角色正确。
 
-有限 interrupt IN、显式 activation 和 EP0 组件仍不提供完整 Chapter 9／class
-stack 或外部配置事务。完整 IO-35 退出资格、物理枚举、主机重试、reset／拔线、
+可选官方 Device／Host Core 通过私有桥接接入，见上述独立 owner。产品 class、
+描述符身份和外部配置事务仍由应用提供。物理枚举、主机重试、reset／拔线、
 PHY flush 时序、IRQ／WCET 与 HIL 必须另行验收；本环境没有连接实板，均未执行。

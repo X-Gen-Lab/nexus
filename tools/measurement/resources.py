@@ -261,7 +261,6 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("elf", "resolved", "budget", "report"):
         parser.add_argument("--" + name, type=Path, required=True)
-    parser.add_argument("--qualification", type=Path)
     parser.add_argument("--require-cpu", action="store_true",
                         help="require current resolved CPU metadata; no legacy hard-only scope")
     parser.add_argument("--float-abi", choices=("hard", "soft"),
@@ -273,8 +272,7 @@ def main() -> int:
         protected.update(input_protection_paths(args.resolved))
     except (EvidenceError, OSError, TypeError) as error:
         parser.exit(1, f"input protection rejected: {error}\n")
-    if args.report.resolve() in protected or (args.qualification is not None and
-            args.qualification.resolve() in protected | {args.report.resolve()}):
+    if args.report.resolve() in protected:
         parser.exit(1, "report cannot overwrite a measured input\n")
     try:
         report = measure(args.elf, args.resolved, args.budget,
@@ -283,15 +281,6 @@ def main() -> int:
         report = {"schema_version": 1, "kind": "elf_resource_budget",
                   "status": "failed", "failure": str(error)}
     atomic_json(args.report, report)
-    if args.qualification:
-        args.qualification.unlink(missing_ok=True)
-        if report["status"] == "passed":
-            from tools.evidence.identity import git_source
-            from tools.evidence.qualification import create_qualification
-            qualified = create_qualification("resource_budget", git_source(args.source),
-                args.resolved, args.elf, [{"name": "elf_resource_budget", "exit_code": 0,
-                "raw": file_identity(args.report)}], evidence=[file_identity(args.report)])
-            atomic_json(args.qualification, qualified)
     print("ELF budget: " + report["status"])
     return 0 if report["status"] == "passed" else 1
 

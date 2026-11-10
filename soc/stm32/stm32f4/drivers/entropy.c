@@ -7,7 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/arch/arch.h"
+#include "stm32f407_clock.h"
 #include "stm32f407_entropy.h"
+#include "stm32f407_system.h"
 #include "stm32f4xx_ll_bus.h"
 #include "stm32f4xx_ll_rcc.h"
 #include "stm32f4xx_ll_rng.h"
@@ -42,53 +44,32 @@ static bool task_context(void) {
            !nx_arch_irq_is_masked();
 }
 
-/** \brief Validate the existing oscillator, exact PLL48 and authored HCLK. */
-static nx_result_t clock_profile(const nx_stm32f407_entropy_config_t* config) {
-    if (!LL_RCC_PLL_IsReady())
-        return NX_ERROR_STATE;
-    bool hse = LL_RCC_PLL_GetMainSource() == LL_RCC_PLLSOURCE_HSE;
-    if ((hse && !LL_RCC_HSE_IsReady()) || (!hse && !LL_RCC_HSI_IsReady()))
-        return NX_ERROR_STATE;
-    if (config->hse_hz != 8000000U || config->hclk_hz > 168000000U)
+extern nx_stm32_system_t g_nx_stm32_system;
+
+/** \brief Only the selected live System can lend its actual nominal PLL48. */
+static nx_result_t clock_profile(void) {
+    const nx_stm32_system_t* system = &g_nx_stm32_system;
+    if (NEXUS_PLL48_HZ != 48000000U)
         return NX_ERROR_UNSUPPORTED;
-    uint32_t input = hse ? config->hse_hz : 16000000U;
-    uint32_t m = LL_RCC_PLL_GetDivider();
-    uint32_t n = LL_RCC_PLL_GetN();
-    uint32_t q = LL_RCC_PLL_GetQ() >> RCC_PLLCFGR_PLLQ_Pos;
-    uint32_t p = ((LL_RCC_PLL_GetP() >> RCC_PLLCFGR_PLLP_Pos) + 1U) * 2U;
-    if (m < 2U || m > 63U || n < 50U || n > 432U || q < 4U || q > 9U ||
-        (uint64_t)input < (uint64_t)m * 1000000U ||
-        (uint64_t)input > (uint64_t)m * 2000000U ||
-        (uint64_t)input * n != (uint64_t)48000000U * m * q)
-        return NX_ERROR_UNSUPPORTED;
-    uint32_t hpre = LL_RCC_GetAHBPrescaler() >> RCC_CFGR_HPRE_Pos;
-    uint32_t shift = hpre < 8U ? 0U : hpre < 12U ? hpre - 7U : hpre - 6U;
-    uint64_t expected_sysclk = (uint64_t)config->hclk_hz << shift;
-    uint32_t source = LL_RCC_GetSysClkSource();
-    if (source == LL_RCC_SYS_CLKSOURCE_STATUS_PLL)
-        return expected_sysclk * m * p == (uint64_t)input * n
-                   ? NX_SUCCESS
-                   : NX_ERROR_UNSUPPORTED;
-    if (source == LL_RCC_SYS_CLKSOURCE_STATUS_HSI)
-        return LL_RCC_HSI_IsReady() && expected_sysclk == 16000000U
-                   ? NX_SUCCESS
-                   : NX_ERROR_UNSUPPORTED;
-    if (source == LL_RCC_SYS_CLKSOURCE_STATUS_HSE)
-        return LL_RCC_HSE_IsReady() && expected_sysclk == config->hse_hz
-                   ? NX_SUCCESS
-                   : NX_ERROR_UNSUPPORTED;
-    return NX_ERROR_UNSUPPORTED;
+    if (!system->started || system->time_epoch == 0U || system->rcc != RCC ||
+        system->flash == NULL || system->core_hz != NEXUS_CORE_HZ ||
+        system->timer_error != NX_SUCCESS)
+        return NX_ERROR_STATE;
+    const uint32_t source = NEXUS_CLOCK_SOURCE_HSE
+                                ? RCC_CR_HSEON | RCC_CR_HSERDY
+                                : RCC_CR_HSION | RCC_CR_HSIRDY;
+    const uint32_t ready = source | RCC_CR_PLLON | RCC_CR_PLLRDY;
+    if ((RCC->CR & ready) != ready)
+        return NX_ERROR_STATE;
+    return nx_stm32_clock_profile_matches(RCC, system->flash)
+               ? NX_SUCCESS
+               : NX_ERROR_UNSUPPORTED;
 }
 
-/** \brief Detect loss/change without modifying the shared clock profile. */
+/** \brief A retained RNG lease never crosses a System time-domain change. */
 static bool clock_stable(const nx_stm32f407_entropy_state_t* state) {
-    return LL_RCC_PLL_IsReady() &&
-           LL_RCC_ReadReg(PLLCFGR) == state->pll_snapshot &&
-           (LL_RCC_ReadReg(CFGR) & (uint32_t)(RCC_CFGR_SWS | RCC_CFGR_HPRE)) ==
-               state->clock_snapshot &&
-           ((state->pll_snapshot & RCC_PLLCFGR_PLLSRC) != 0U
-                ? LL_RCC_HSE_IsReady()
-                : LL_RCC_HSI_IsReady());
+    return clock_profile() == NX_SUCCESS &&
+           state->time_epoch == g_nx_stm32_system.time_epoch;
 }
 
 /** \brief Guard the RCC shared-register update and retain ownership on error.
@@ -108,30 +89,37 @@ static void gate_disable(void) {
     nx_arch_irq_restore(saved);
 }
 
-/** \brief Admit the exact profile before acquiring the RNG controller. */
+/** \brief Reject foreign live RNG before System can restart its clock. */
 nx_result_t
-nx_stm32f407_entropy_start(nx_stm32f407_entropy_state_t* state,
-                           const nx_stm32f407_entropy_config_t* config) {
+nx_stm32f407_entropy_admit(const nx_stm32f407_entropy_state_t* state) {
     if (!task_context())
         return NX_ERROR_CONTEXT;
-    if (!span(state, sizeof(*state), _Alignof(nx_stm32f407_entropy_state_t)) ||
-        !span(config, sizeof(*config),
-              _Alignof(nx_stm32f407_entropy_config_t)) ||
-        overlaps(state, sizeof(*state), config, sizeof(*config)) ||
-        config->hclk_hz == 0U)
+    if (!span(state, sizeof(*state), _Alignof(nx_stm32f407_entropy_state_t)))
         return NX_ERROR_INVALID;
     if (state->running || state->gate_owned || state->rng_owned)
         return NX_ERROR_BUSY;
-    nx_result_t result = clock_profile(config);
+    if (LL_AHB2_GRP1_IsEnabledClock(LL_AHB2_GRP1_PERIPH_RNG) &&
+        (LL_RNG_IsEnabled(RNG) || LL_RNG_IsEnabledIT(RNG)))
+        return NX_ERROR_BUSY;
+    return NX_SUCCESS;
+}
+
+/** \brief Admit the exact profile before acquiring the RNG controller. */
+nx_result_t nx_stm32f407_entropy_start(nx_stm32f407_entropy_state_t* state) {
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (!span(state, sizeof(*state), _Alignof(nx_stm32f407_entropy_state_t)))
+        return NX_ERROR_INVALID;
+    if (state->running || state->gate_owned || state->rng_owned)
+        return NX_ERROR_BUSY;
+    nx_result_t result = clock_profile();
     if (result != NX_SUCCESS)
         return result;
     bool enabled = LL_AHB2_GRP1_IsEnabledClock(LL_AHB2_GRP1_PERIPH_RNG) != 0U;
     if (enabled && (LL_RNG_IsEnabled(RNG) || LL_RNG_IsEnabledIT(RNG)))
         return NX_ERROR_BUSY;
     memset(state, 0, sizeof(*state));
-    state->pll_snapshot = LL_RCC_ReadReg(PLLCFGR);
-    state->clock_snapshot =
-        LL_RCC_ReadReg(CFGR) & (uint32_t)(RCC_CFGR_SWS | RCC_CFGR_HPRE);
+    state->time_epoch = g_nx_stm32_system.time_epoch;
     if (!enabled) {
         state->gate_owned = true;
         gate_enable();

@@ -107,9 +107,8 @@ CLI 传 `--test-support`，CMake 测试工程声明 `NEXUS_TEST_SUPPORT=ON`。�
 事实、活动生成器或其输入。输入摘要与声明配置模块在执行前记录；外部 Python／CMake
 是受信构建代码，哈希保证身份，不是执行沙箱。
 
-Board／SoC 不再含 Python 插件。当前完整生成仍由集中 Python 工具承担；
-`tools/nxconfig/` 的 Host C11 切片及手写 C 生命周期须按各自实际接入范围说明，
-不能从目录存在宣称全模式切换完成。详细合同见
+Board／SoC 不含 Python 插件。完整配置生成由集中 Python 工具承担，
+固件硬件算法和生命周期直接使用 C。配置工具不进入 MCU 镜像。详细合同见
 [当前架构](../../docs/delivery/architecture.md)、
 [接入指南](../../docs/guides/provider-porting.md)与
 [配置参考](../../docs/reference/configuration/assembly.md)。

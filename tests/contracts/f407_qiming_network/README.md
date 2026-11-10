@@ -31,7 +31,9 @@ connect 与既有有界 TLS／MQTT，不提供重连／重放／持续 renegotia
 clock／MAC／MDIO／adapter／TCP／TLS／MQTT／entropy 共用不变的 Core 单调微秒域，
 lwIP wrapping 毫秒从它派生。
 
-RNG 显式以8／168 MHz启动，供 lwIP／TLS，无固定值、timestamp 或 libc fallback。
+`[entropy.random]` 选择唯一内部 RNG，factory 返回静态 face；Platform 在已选
+System／PLL48 域中直接 prepare 与关闭私有 owner，供 lwIP／TLS，无固定值、
+timestamp 或 libc fallback。
 `FULL_SOURCE` 是软件假设，不是物理 min-entropy。UTC 故意返回 PERMISSION，
 certificate fail-closed，因此本 ARM 参考不能认证 server／firmware。产品提供可信
 UTC／identity；公开 CA 仅为测试根，无 client 私钥。
@@ -44,7 +46,8 @@ PTP、checksum offload、jumbo、生产 trust／recovery policy。
 静态资源先 join TLS／MQTT，再 abort TCP、stop adapter。任何未完成撤回都 park
 并保留内外层存储。`lwip_init` 后，adapter 撤回后不再调用 stack；Core clock／RNG／
 Platform／全局 stack 持续到 reset，因为移除 netif 不等于全局 timer 退休。
-pre-stack 失败先 stop RNG 再释放平台。链接不会执行这些硬件流程。
+pre-stack 失败通过 Platform.stop 先撤回 RNG，再释放 System；关闭失败保留
+owner 与时钟依赖。链接不会执行这些硬件流程。
 
 用已准备锁定 ARM 工具独立构建，每 build 一个 job：
 

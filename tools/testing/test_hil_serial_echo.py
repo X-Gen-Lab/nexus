@@ -117,7 +117,7 @@ class HilSerialEchoTests(unittest.TestCase):
                           create=True)
         self.mock_admit = admission.start()
         self.addCleanup(admission.stop)
-        alias = patch("tools.hil.serial_echo._alias_target",
+        alias = patch("tools.dev.serial._alias_target",
                       return_value=self.device)
         self.mock_alias = alias.start()
         self.addCleanup(alias.stop)
@@ -433,7 +433,7 @@ class HilSerialEchoTests(unittest.TestCase):
         self.assertFalse(self.record.exists())
 
     def test_nonstable_and_traversal_device_names_are_rejected(self):
-        with patch("tools.hil.serial_echo._alias_target",
+        with patch("tools.dev.serial._alias_target",
                    wraps=self.mock_alias):
             for name in ("/dev/ttyUSB0", "/dev/serial/by-id/a/b",
                          "/dev/serial/by-id/../by-id/a", "relative"):

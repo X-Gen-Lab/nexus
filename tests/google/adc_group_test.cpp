@@ -73,6 +73,10 @@ TEST(ADCGroupAPI, MissingSelectedMethodsHaveExplicitUnsupportedResult) {
     nx_adc_group_info_t info{};
     nx_adc_group_request_t request{};
     nx_request_initialize(&request.base);
+    uint16_t samples[2]{};
+    ASSERT_EQ(
+        nx_adc_group_prepare(&request, samples, sizeof(samples), 1U, 1000U),
+        NX_SUCCESS);
     EXPECT_EQ(nx_adc_group_submit(&port, &request), NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(nx_adc_group_cancel(&port, &request), NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(nx_adc_group_service(&port), NX_ERROR_UNSUPPORTED);
@@ -110,5 +114,17 @@ TEST(ADCGroupAPI, SameReadOnlyOperationsPassEachInstancesExactContext) {
     EXPECT_CALL(second, Call()).WillOnce(testing::Return(NX_SUCCESS));
     EXPECT_EQ(nx_adc_group_service(&a), NX_ERROR_BUSY);
     EXPECT_EQ(nx_adc_group_service(&b), NX_SUCCESS);
+}
+TEST(ADCGroupAPI, PayloadCannotOverwriteTheImmutableFaceBeforeDispatch) {
+    unsigned context = 0U;
+    const nx_adc_group_ops_t methods{};
+    const nx_adc_group_port_t port{&methods, &context};
+    nx_adc_group_request_t request{};
+    nx_request_initialize(&request.base);
+    request.frames = const_cast<nx_adc_group_port_t*>(&port);
+    request.bytes = sizeof(port);
+    request.frame_count = 1U;
+    request.base.deadline = 1000U;
+    EXPECT_EQ(nx_adc_group_submit(&port, &request), NX_ERROR_INVALID);
 }
 } /* namespace */

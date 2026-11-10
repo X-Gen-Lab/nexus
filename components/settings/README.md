@@ -23,4 +23,4 @@ component 列表可选择 `settings`，CMake 管理 Storage 依赖；
 
 默认值、迁移、授权、提交频率、Flash 保留区和恢复由产品负责。格式没有认证；CRC
 和主机 NOR 掉电模型不能建立签名更新或物理 Flash 掉电资格。实际执行与剩余退出见
-[原交付台账](../../docs/status/ledgers/platform-delivery-completion.md)。
+[原交付台账](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/status/ledgers/platform-delivery-completion.md)。

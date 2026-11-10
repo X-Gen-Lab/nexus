@@ -19,3 +19,10 @@ target_include_directories(nexus_usb_acm PUBLIC
 target_link_libraries(nexus_usb_acm PUBLIC Nexus::USBControl
     PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
 add_library(Nexus::USBACM ALIAS nexus_usb_acm)
+
+add_library(nexus_usb_role STATIC src/usb_role.c)
+target_include_directories(nexus_usb_role PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_link_libraries(nexus_usb_role PUBLIC Nexus::Core
+    PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
+add_library(Nexus::USBRole ALIAS nexus_usb_role)

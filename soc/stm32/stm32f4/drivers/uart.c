@@ -6,7 +6,7 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "stm32f407_provider.h"
+#include "stm32f407_uart_wire.h"
 #include "stm32f4xx_ll_usart.h"
 #include "uart_control.h"
 
@@ -14,10 +14,16 @@
 #define NX_STM32_UART_ENABLE(registers) LL_USART_Enable(registers)
 #endif
 
+/** \brief DS8626 Table 5 excludes modem control from UART4 and UART5. */
+static bool flow_supported(const nx_stm32_uart_state_t* port) {
+    return port != NULL && port->irq != UART4_IRQn && port->irq != UART5_IRQn;
+}
+
 /** \brief Select the complete frame before the first UE and IRQ enable. */
-static inline nx_result_t initialize_frame(nx_stm32_uart_state_t* port,
-                                           uint32_t clock_hz, uint32_t frame,
-                                           uint32_t stop, uint32_t flow) {
+nx_result_t nx_stm32_uart_initialize_controls(nx_stm32_uart_state_t* port,
+                                              uint32_t clock_hz, uint32_t frame,
+                                              uint32_t stop, uint32_t flow,
+                                              uint32_t guard_prescaler) {
     if (port == NULL || port->registers == NULL || port->baud == 0U ||
         port->baud > clock_hz / 16U || port->initialized || port->irq < 0 ||
         port->irq >= 82 ||
@@ -67,12 +73,14 @@ static inline nx_result_t initialize_frame(nx_stm32_uart_state_t* port,
     NX_UART_REG_WRITE(&port->registers->CR2, stop);
     NX_UART_REG_WRITE(&port->registers->CR3, selected3);
     NX_UART_REG_WRITE(&port->registers->BRR, divisor);
+    NX_UART_REG_WRITE(&port->registers->GTPR, guard_prescaler);
     (void)port->registers->SR;
     (void)port->registers->DR;
     NX_UART_REG_WRITE(&port->registers->CR1, selected1);
     nx_arch_dsb();
     if (port->registers->CR1 != selected1 || port->registers->CR2 != stop ||
-        port->registers->CR3 != selected3 || port->registers->BRR != divisor) {
+        port->registers->CR3 != selected3 || port->registers->BRR != divisor ||
+        port->registers->GTPR != guard_prescaler) {
         goto failed;
     }
     NX_STM32_UART_ENABLE(port->registers);
@@ -98,7 +106,7 @@ failed:
 /** \brief The legacy constructor keeps its exact eight-bit default frame. */
 nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
                                      uint32_t clock_hz) {
-    return initialize_frame(port, clock_hz, 0U, 0U, 0U);
+    return nx_stm32_uart_initialize_controls(port, clock_hz, 0U, 0U, 0U, 0U);
 }
 
 /** \brief No UE/NVIC window exposes a temporary default wire format. */
@@ -110,6 +118,7 @@ nx_result_t nx_stm32_uart_initialize_format(nx_stm32_uart_state_t* port,
         return result;
     }
     if (format.data_bits == 9U ||
+        (format.flow != NX_UART_FLOW_NONE && !flow_supported(port)) ||
         (port != NULL && port->profile == NX_UART_RX_BLOCKS)) {
         return NX_ERROR_UNSUPPORTED;
     }
@@ -128,15 +137,24 @@ nx_result_t nx_stm32_uart_initialize_format(nx_stm32_uart_state_t* port,
                       format.flow == NX_UART_FLOW_RTS_CTS)
                          ? USART_CR3_CTSE
                          : 0U);
-    return initialize_frame(port, clock_hz, frame, stop, flow);
+    return nx_stm32_uart_initialize_controls(port, clock_hz, frame, stop, flow,
+                                             0U);
 }
 
 /** \brief Same side-effect-free rejection checks serve TX and RS485. */
 static inline nx_result_t validate_tx(const nx_stm32_uart_state_t* port,
                                       const nx_uart_tx_request_t* request) {
-    if (port == NULL || port->registers == NULL || request == NULL ||
-        request->data == NULL || request->length == 0U) {
+    if (port == NULL || port->registers == NULL || request == NULL) {
         return NX_ERROR_INVALID;
+    }
+    bool lin_break = request->data == NULL && request->length == 0U &&
+                     (port->registers->CR2 & USART_CR2_LINEN) != 0U;
+    if (!lin_break && (request->data == NULL || request->length == 0U)) {
+        return NX_ERROR_INVALID;
+    }
+    if ((port->registers->CR3 & USART_CR3_SCEN) != 0U &&
+        request->length != 1U) {
+        return NX_ERROR_UNSUPPORTED;
     }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
@@ -174,7 +192,10 @@ static nx_result_t start(nx_stm32_uart_state_t* port,
     port->drain_deadline = NX_DEADLINE_NEVER;
     port->registers->SR &= ~(uint32_t)USART_SR_TC;
     NX_UART_REG_WRITE(&port->registers->CR1,
-                      port->registers->CR1 | (USART_CR1_TXEIE));
+                      port->registers->CR1 |
+                          (request->length == 0U
+                               ? (USART_CR1_SBK | USART_CR1_TCIE)
+                               : USART_CR1_TXEIE));
     nx_arch_irq_restore(mask);
     return NX_SUCCESS;
 }
@@ -202,9 +223,14 @@ static void begin_drain(nx_stm32_uart_state_t* port, nx_result_t terminal) {
                       port->registers->CR1 & (~(uint32_t)USART_CR1_TXEIE));
     port->terminal = terminal;
     (void)nx_request_transition(&port->active->base, NX_REQUEST_DRAINING);
-    port->drain_deadline =
-        nx_deadline_after(nx_time_now_us(), 20000000U / port->baud + 100U);
-    if (port->tx_position == 0U || (port->registers->SR & USART_SR_TC) != 0U) {
+    uint32_t drain_bits = (port->registers->CR3 & USART_CR3_SCEN) != 0U
+                              ? 24U + ((port->registers->GTPR >> 8U) & 255U)
+                              : 28U;
+    port->drain_deadline = nx_deadline_after(
+        nx_time_now_us(), drain_bits * 1000000U / port->baud + 100U);
+    bool started = port->tx_position != 0U || port->active->length == 0U;
+    if (!started || ((port->registers->SR & USART_SR_TC) != 0U &&
+                     (port->registers->CR1 & USART_CR1_SBK) == 0U)) {
         port->tx_complete = true;
     } else {
         NX_UART_REG_WRITE(&port->registers->CR1,
@@ -253,6 +279,9 @@ static uint32_t rx_flags(uint32_t status) {
     if ((status & USART_SR_NE) != 0U) {
         result |= NX_UART_EVENT_NOISE;
     }
+    if ((status & USART_SR_LBD) != 0U) {
+        result |= NX_UART_EVENT_BREAK;
+    }
     return result;
 }
 
@@ -263,8 +292,16 @@ bool nx_stm32_uart_tx_irq(nx_stm32_uart_state_t* port, uint32_t status) {
     }
     bool notify = false;
     nx_uart_tx_request_t* request = port->active;
+    if (request != NULL && !port->tx_complete &&
+        (port->registers->CR3 & USART_CR3_SCEN) != 0U &&
+        (status & (USART_SR_PE | USART_SR_FE | USART_SR_ORE | USART_SR_NE)) !=
+            0U &&
+        nx_request_state(&request->base) == NX_REQUEST_ACTIVE) {
+        begin_drain(port, NX_ERROR_IO);
+    }
     bool wrote_byte = false;
     if (request != NULL && port->tx_position < request->length &&
+        nx_request_state(&request->base) == NX_REQUEST_ACTIVE &&
         (status & USART_SR_TXE) != 0U &&
         (port->registers->CR1 & USART_CR1_TXEIE) != 0U) {
         LL_USART_TransmitData8(port->registers,
@@ -280,7 +317,9 @@ bool nx_stm32_uart_tx_irq(nx_stm32_uart_state_t* port, uint32_t status) {
     }
     if (request != NULL && !wrote_byte && (status & USART_SR_TC) != 0U &&
         (port->registers->CR1 & USART_CR1_TCIE) != 0U &&
-        (port->registers->CR1 & USART_CR1_TXEIE) == 0U) {
+        (port->registers->CR1 & USART_CR1_SBK) == 0U &&
+        ((port->registers->CR1 & USART_CR1_TXEIE) == 0U ||
+         nx_request_state(&request->base) != NX_REQUEST_ACTIVE)) {
         NX_UART_REG_WRITE(&port->registers->CR1,
                           port->registers->CR1 & (~(uint32_t)USART_CR1_TCIE));
         if (port->terminal == NX_SUCCESS &&
@@ -300,12 +339,18 @@ bool nx_stm32_uart_rx_irq(nx_stm32_uart_state_t* port, uint32_t status,
         return false;
     }
     bool notify = false;
+    uint32_t lin =
+        (port->registers->CR2 & USART_CR2_LINEN) != 0U ? USART_SR_LBD : 0U;
+    status &= ~(uint32_t)(USART_SR_LBD & ~lin);
     if ((status & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_ORE |
-                   USART_SR_NE)) != 0U) {
+                   USART_SR_NE | lin)) != 0U) {
         notify = true;
         uint8_t byte = LL_USART_ReceiveData8(port->registers) & payload_mask;
         uint32_t flags = rx_flags(status);
-        bool has_byte = (status & USART_SR_RXNE) != 0U;
+        bool has_byte = (status & USART_SR_RXNE) != 0U && (status & lin) == 0U;
+        if ((status & lin) != 0U) {
+            LL_USART_ClearFlag_LBD(port->registers);
+        }
         if (!has_byte) {
             flags |= NX_UART_EVENT_NO_BYTE;
             byte = 0U;
@@ -396,6 +441,13 @@ void nx_stm32_uart_service(void* context) {
         NX_UART_REG_WRITE(&port->registers->CR1,
                           port->registers->CR1 &
                               (~(uint32_t)(USART_CR1_TXEIE | USART_CR1_TCIE)));
+        nx_arch_dsb();
+        if ((port->registers->CR1 &
+             (USART_CR1_TXEIE | USART_CR1_TCIE | USART_CR1_SBK)) != 0U) {
+            (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
+            nx_arch_irq_restore(mask);
+            return;
+        }
         size_t transferred = port->tx_position;
         nx_result_t terminal = port->terminal;
         port->active = NULL;
@@ -503,10 +555,18 @@ nx_result_t nx_stm32_uart_stop(void* context) {
         nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
     }
-    NX_UART_REG_WRITE(&port->registers->CR1, 0U);
+    /* ES0182 2.11.9: RTSE must not advertise readiness after UE/RE stop. */
     NX_UART_REG_WRITE(&port->registers->CR3, 0U);
     nx_arch_dsb();
-    if (port->registers->CR1 != 0U || port->registers->CR3 != 0U) {
+    if (port->registers->CR3 != 0U) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_BUSY;
+    }
+    NX_UART_REG_WRITE(&port->registers->CR1, 0U);
+    NX_UART_REG_WRITE(&port->registers->CR2, 0U);
+    nx_arch_dsb();
+    if (port->registers->CR1 != 0U || port->registers->CR2 != 0U ||
+        port->registers->CR3 != 0U) {
         nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
     }
@@ -566,6 +626,9 @@ nx_result_t nx_stm32_uart_flow_configure(nx_stm32_uart_state_t* state, bool rts,
     if (state == NULL || state->registers == NULL) {
         return NX_ERROR_INVALID;
     }
+    if ((rts || cts) && !flow_supported(state)) {
+        return NX_ERROR_UNSUPPORTED;
+    }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
@@ -612,6 +675,9 @@ nx_result_t nx_stm32_uart_format_configure(nx_stm32_uart_state_t* state,
         return result;
     }
     if (format.data_bits == 9U) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    if (format.flow != NX_UART_FLOW_NONE && !flow_supported(state)) {
         return NX_ERROR_UNSUPPORTED;
     }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {

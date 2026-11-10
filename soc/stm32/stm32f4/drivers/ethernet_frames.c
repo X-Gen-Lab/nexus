@@ -6,6 +6,7 @@
  * \date            2026-10-17
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_eth_frames.h"
 #include "stm32f4xx_hal_eth.h"
 #include <stddef.h>
@@ -69,7 +70,8 @@ nx_result_t nx_stm32_eth_frames_initialize(nx_eth_frames_mac_t* mac,
         mac->irq_policy.priority_bits != __NVIC_PRIO_BITS ||
         mac->irq_policy.external_irq_count != 82U)
         return NX_ERROR_INVALID;
-    if (mac->registers != UINT32_C(0x40028000) || mac->hclk_hz != 168000000U ||
+    if (mac->registers != UINT32_C(0x40028000) ||
+        mac->hclk_hz != NEXUS_CORE_HZ || mac->hclk_hz != 168000000U ||
         mac->source.irq_number != ETH_IRQn)
         return NX_ERROR_UNSUPPORTED;
     if (mac->regions == NULL || mac->region_count == 0U ||
@@ -90,13 +92,10 @@ nx_result_t nx_stm32_eth_frames_initialize(nx_eth_frames_mac_t* mac,
      * These cold reads precede every MAC/descriptor access and reset. */
     volatile const uint32_t* rcc =
         (volatile const uint32_t*)UINT32_C(0x40023800);
-    uint32_t cr = rcc[0U], pll = rcc[1U], cfgr = rcc[2U];
     if ((rcc[0x30U / 4U] & 0x1e000000U) != 0x1e000000U ||
-        (*(volatile const uint32_t*)UINT32_C(0x40013804) & 0x00800000U) == 0U ||
-        (cr & 0x03030000U) != 0x03030000U ||
-        (pll & 0x0f437fffU) !=
-            (8U | (336U << 6U) | 0x00400000U | (7U << 24U)) ||
-        (cfgr & 0xfcffU) != 0x940aU)
+        (((*(volatile const uint32_t*)UINT32_C(0x40013804) & 0x00800000U) !=
+          0U) == mac->mii) ||
+        !nx_stm32_clock_profile_matches((const RCC_TypeDef*)rcc, NULL))
         return NX_ERROR_STATE;
     mac->irq_control = NX_ETH_FRAMES_SOC_IRQ_CONTROL;
     mac->pend_irq = NX_ETH_FRAMES_SOC_PEND_IRQ;

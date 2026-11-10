@@ -8,6 +8,7 @@ import subprocess
 import sys
 
 BEHAVIOR_DOCUMENTS = {
+    "AGENTS.md",
     "CONTRIBUTING.md", "CONTRIBUTING_CN.md",
     ".kiro/steering/comment-standards.md",
     "docs/sphinx/development/coding_standards.rst",
@@ -31,7 +32,7 @@ def classify(names):
                     or path.name == "Doxyfile"
                     or path.name.startswith("Doxyfile."))
         result["docs"] |= document
-        result["workflows"] |= workflow
+        result["workflows"] |= workflow and not document
         result["code"] |= name in BEHAVIOR_DOCUMENTS or not document
     return result
 

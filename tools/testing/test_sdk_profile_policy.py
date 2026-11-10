@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.release import transport
+from tools.maintenance import consumer_profiles
 from tools.configure import configure
 from tools.evidence.common import file_identity
 
@@ -29,7 +29,7 @@ class SDKProfilePolicyTests(unittest.TestCase):
             setattr(cls, name, module)
 
     def profile(self, name):
-        return next(item for item in transport.SERVICE_CONSUMERS
+        return next(item for item in consumer_profiles.SERVICE_CONSUMERS
                     if item.name == name)
 
     def prepared(self, directory, name):
@@ -144,6 +144,15 @@ class SDKProfilePolicyTests(unittest.TestCase):
                 self.consumers.check_service_image(
                     sdk, source, build, profile, execute)
             self.assertEqual(calls, [])
+
+    def test_uart_hardware_facts_are_required_for_both_sdk_backends(self):
+        expected = {'soc/stm32/stm32f4/drivers/uart_hardware.c',
+                    'soc/stm32/stm32f4/private/stm32f407_uart_hardware.h'}
+        for backend in ('baremetal', 'freertos'):
+            with self.subTest(backend=backend):
+                profile = self.packager.source_profile(backend=backend)
+                self.assertLessEqual(expected, set(
+                    self.packager.required_files(ROOT, profile)))
 
     def test_mcuboot_all_eighty_locked_sources_are_required(self):
         lock = json.loads((ROOT / 'dependencies/mcuboot.lock.json').read_text())

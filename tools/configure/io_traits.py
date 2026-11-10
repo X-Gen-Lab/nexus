@@ -88,8 +88,7 @@ def emit_controllers(controllers):
     source = []
     groups = {}
     for item, record in selected:
-        namespace = ("uart_word" if item.mode == "irq-words" else
-                     item.interface_kind or item.kind)
+        namespace = selected_contracts.controller_class(item)
         groups.setdefault((item.kind, namespace), []).append((item, record))
     for (kind, namespace), instances in sorted(groups.items()):
         typename = f"nx_factory_{namespace}_traits_t"
@@ -100,6 +99,7 @@ def emit_controllers(controllers):
             ' * Parity zero means none. Cache line applies to provider policy;',
             ' * it does not assert that cache is enabled. Unknown timestamp',
             ' * means no usable source described, never event time zero.',
+            ' * I2C address_bits zero means width belongs to each endpoint.',
             ' */',
             'typedef struct {',
             *[f"    uint32_t {name};" for name in _FIELDS[kind]],

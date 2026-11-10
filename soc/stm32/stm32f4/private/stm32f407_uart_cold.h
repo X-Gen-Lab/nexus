@@ -8,7 +8,9 @@
 
 #include "stm32f407_platform_cold.h"
 #include "stm32f407_stream.h"
+#include "stm32f407_uart_hardware.h"
 #include "stm32f407_uart_receive.h"
+#include "stm32f407_uart_wire.h"
 #include "stm32f407_uart_word.h"
 #include <string.h>
 
@@ -31,15 +33,9 @@ typedef struct {
     uint8_t priority;
     bool kernel_bound;
     bool preload_tx;
+    const nx_uart_wire_config_t* wire;
+    uint8_t pin_count;
 } nx_stm32_uart_cold_config_t;
-
-/** \brief Static DMA transmit route; completion facts remain in the owner. */
-typedef struct {
-    DMA_Stream_TypeDef* registers;
-    IRQn_Type irq;
-    uint8_t stream;
-    uint8_t channel;
-} nx_stm32_uart_tx_cold_config_t;
 
 /** \brief Selected DMA data, independent of request and producer storage. */
 typedef struct {
@@ -82,6 +78,11 @@ void nx_stm32_uart_cold_bind(nx_stm32_uart_state_t* state,
 /** \brief Validate only exact selected DMA routes without hardware effects. */
 bool nx_stm32_uart_cold_dma_valid(const nx_stm32_uart_dma_cold_config_t* config,
                                   bool receive, bool transmit);
+/** \brief Match immutable DMA facts independently of cold pad acquisition. */
+bool nx_stm32_uart_dma_route_valid(
+    const nx_stm32_uart_dma_cold_config_t* config, bool receive, bool transmit);
+/** \brief Observe gates for an admitted route without acquiring ownership. */
+bool nx_stm32_uart_dma_powered(const nx_stm32_uart_dma_cold_config_t* config);
 /** \brief Apply and read back selected priority and enabled publisher facts.
  * \param[in] config: The unchanged resources supplied to acquisition.
  * \param[in] receipt: Same retained resource observations.
@@ -146,6 +147,50 @@ nx_stm32_uart_byte_cold_prepare(nx_stm32_uart_state_t* state,
     if (result != NX_SUCCESS)
         (void)nx_stm32_uart_byte_cold_close(state, config, receipt);
     return result;
+}
+
+/** \brief Prepare exact wire pins and complete USART tuple before publishers.
+ * \note Privileged unmasked Thread startup; failures retain the same close.
+ */
+static inline nx_result_t
+nx_stm32_uart_wire_cold_prepare(nx_stm32_uart_state_t* state,
+                                const nx_stm32_uart_cold_config_t* config,
+                                nx_stm32_uart_cold_receipt_t* receipt) {
+    if (!nx_stm32_uart_cold_context())
+        return NX_ERROR_CONTEXT;
+    if (state == NULL || config == NULL || receipt == NULL ||
+        config->wire == NULL || config->format != NULL)
+        return NX_ERROR_INVALID;
+    if (state->initialized || state->active != NULL)
+        return NX_ERROR_BUSY;
+    nx_stm32_uart_state_t facts;
+    memset(&facts, 0, sizeof(facts));
+    facts.registers = config->registers;
+    facts.irq = config->vectors == NULL ? (IRQn_Type)-1 : config->vectors[0];
+    facts.baud = config->baud;
+    facts.profile = config->profile;
+    nx_result_t result = nx_stm32_uart_wire_validate(&facts, config->wire);
+    if (result != NX_SUCCESS)
+        return result;
+    result = nx_stm32_uart_cold_acquire(config, receipt);
+    if (result != NX_SUCCESS)
+        return result;
+    nx_stm32_uart_cold_bind(state, config);
+    result =
+        nx_stm32_uart_wire_initialize(state, config->clock_hz, config->wire);
+    if (result == NX_SUCCESS)
+        result = nx_stm32_uart_cold_verify(config, receipt);
+    if (result != NX_SUCCESS)
+        (void)nx_stm32_uart_byte_cold_close(state, config, receipt);
+    return result;
+}
+
+/** \brief Join all byte/event/wire publishers before restoring owned pins. */
+static inline nx_result_t
+nx_stm32_uart_wire_cold_close(nx_stm32_uart_state_t* state,
+                              const nx_stm32_uart_cold_config_t* config,
+                              nx_stm32_uart_cold_receipt_t* receipt) {
+    return nx_stm32_uart_byte_cold_close(state, config, receipt);
 }
 
 /** \brief Close word ownership before releasing the same static resources. */

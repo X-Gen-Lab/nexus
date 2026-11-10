@@ -30,6 +30,13 @@ size_t model_remaining;
 size_t model_received;
 size_t model_starts;
 bool model_address;
+uint16_t model_endpoint_address;
+uint8_t model_address_bits;
+bool model_low_address;
+bool model_transmitter_address;
+bool model_read_header;
+bool model_internal_restart;
+std::vector<uint8_t> model_address_bytes;
 bool model_sb_pending;
 bool model_restart_on_last_read;
 size_t model_duplicate_starts;
@@ -82,6 +89,13 @@ class I2CRegisters : public testing::Test {
         model_received = 0;
         model_starts = 0;
         model_address = false;
+        model_endpoint_address = 0x50U;
+        model_address_bits = 7U;
+        model_low_address = false;
+        model_transmitter_address = false;
+        model_read_header = false;
+        model_internal_restart = false;
+        model_address_bytes.clear();
         model_sb_pending = false;
         model_restart_on_last_read = false;
         model_duplicate_starts = 0;
@@ -102,7 +116,7 @@ class I2CRegisters : public testing::Test {
         state.peripheral_mhz = 42;
         state.rate_hz = 100000;
         ASSERT_EQ(nx_stm32_i2c_initialize(&state), NX_SUCCESS);
-        endpoint_state = {&state, 0x50};
+        endpoint_state = {&state, 0x50, 7U};
         endpoint = {&nx_stm32_i2c_endpoint_ops, &endpoint_state};
         port = {&nx_stm32_i2c_ops, &state};
     }
@@ -215,9 +229,10 @@ extern "C" void nx_i2c_model_poll(void* raw) {
         return;
     }
     if ((control(state) & start) != 0 && model_remaining == 0) {
-        if (model_starts != 0) {
+        if (model_starts != 0 && !model_internal_restart) {
             ++model_message;
         }
+        model_internal_restart = false;
         ++model_starts;
         control(state) &= ~start;
         model_sb_pending = true;
@@ -229,6 +244,10 @@ extern "C" void nx_i2c_model_poll(void* raw) {
         state->registers->SR2 = I2C_SR2_MSL | I2C_SR2_BUSY;
         return;
     }
+    if (model_low_address) {
+        status(state) = I2C_SR1_ADD10;
+        return;
+    }
     status(state) = rbne | btc;
     status(state) |= I2C_SR1_TXE;
 }
@@ -238,12 +257,25 @@ extern "C" void nx_i2c_model_write(void* raw, uint32_t value) {
     auto* state = static_cast<State*>(raw);
     if (model_sb_pending) {
         ASSERT_LT(model_message, model_messages.size());
-        EXPECT_EQ(value, (UINT32_C(0x50) << 1U) |
-                             (model_messages[model_message].read ? 1U : 0U));
+        const bool ten = model_address_bits == 10U;
+        EXPECT_EQ(value,
+                  ten ? (0xF0U | ((model_endpoint_address >> 7U) & 6U) |
+                         (model_read_header ? 1U : 0U))
+                      : (static_cast<uint32_t>(model_endpoint_address) << 1U) |
+                            (model_messages[model_message].read ? 1U : 0U));
         EXPECT_EQ(control(state) & pos, 0U);
         EXPECT_NE(control(state) & ack, 0U);
+        model_address_bytes.push_back(static_cast<uint8_t>(value));
         model_sb_pending = false;
+        model_low_address = ten && !model_read_header;
+        model_address = !model_low_address;
+        model_read_header = false;
+    } else if (model_low_address) {
+        EXPECT_EQ(value, model_endpoint_address & 0xFFU);
+        model_address_bytes.push_back(static_cast<uint8_t>(value));
+        model_low_address = false;
         model_address = true;
+        model_transmitter_address = model_messages[model_message].read;
     }
     state->registers->DR = value;
 }
@@ -254,6 +286,13 @@ extern "C" void nx_i2c_model_address_cleared(void* raw) {
     ASSERT_LT(model_message, model_messages.size());
     const auto& message = model_messages[model_message];
     model_address = false;
+    if (model_transmitter_address) {
+        EXPECT_EQ(control(state) & stop, 0U);
+        model_transmitter_address = false;
+        model_read_header = true;
+        model_internal_restart = true;
+        return;
+    }
     model_remaining = message.read ? message.length : 0;
     if (message.read) {
         if (message.length == 1) {
@@ -268,6 +307,53 @@ extern "C" void nx_i2c_model_address_cleared(void* raw) {
         }
     }
     model_boundary->Call(model_message, message.read);
+}
+
+TEST_F(I2CRegisters, TenBitReadAddressesTwiceBeforeExistingReceiveWindows) {
+    endpoint_state.address = model_endpoint_address = 0x2ABU;
+    endpoint_state.address_bits = model_address_bits = 10U;
+    state.rate_hz = 80000U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_initialize(&state));
+    for (size_t length : {1U, 2U, 4U}) {
+        SCOPED_TRACE(length);
+        model_starts = model_message = model_received = 0U;
+        model_address_bytes.clear();
+        EXPECT_CALL(boundary, Call(0U, true));
+        EXPECT_EQ(NX_SUCCESS, transact({{data, length, true}}));
+        EXPECT_EQ(length, transferred);
+        EXPECT_EQ(model_address_bytes,
+                  std::vector<uint8_t>({0xF4U, 0xABU, 0xF5U}));
+        EXPECT_EQ(2U, model_starts);
+        EXPECT_EQ(0U, model_duplicate_starts);
+        EXPECT_FALSE(state.active);
+    }
+}
+
+TEST_F(I2CRegisters, TenBitWriteReadPreservesMessageAndWireBoundaries) {
+    endpoint_state.address = model_endpoint_address = 0x2ABU;
+    endpoint_state.address_bits = model_address_bits = 10U;
+    state.rate_hz = 400000U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_initialize(&state));
+    EXPECT_CALL(boundary, Call(0U, false));
+    EXPECT_CALL(boundary, Call(1U, true));
+    EXPECT_EQ(NX_SUCCESS, transact({{data, 1U, false}, {data + 1U, 2U, true}}));
+    EXPECT_EQ(3U, transferred);
+    EXPECT_EQ(model_address_bytes,
+              std::vector<uint8_t>({0xF4U, 0xABU, 0xF4U, 0xABU, 0xF5U}));
+    EXPECT_EQ(3U, model_starts);
+}
+
+TEST_F(I2CRegisters, TenBitStandardTimingErratumRejectsBeforeStart) {
+    endpoint_state.address = 0x2ABU;
+    endpoint_state.address_bits = 10U;
+    nx_i2c_message_t message = {data, 1U, true};
+    const auto before = registers;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_i2c_endpoint_transaction(&endpoint, &message, 1U, 1000U,
+                                          &transferred));
+    EXPECT_EQ(0U, transferred);
+    EXPECT_EQ(0, std::memcmp(&before, &registers, sizeof(registers)));
+    EXPECT_FALSE(state.active);
 }
 
 /** \brief Consume one byte and assert the protected final-three-byte sequence.
@@ -307,6 +393,43 @@ extern "C" uint8_t nx_i2c_model_read(void* raw) {
         status(state) = I2C_SR1_SB;
     }
     return static_cast<uint8_t>(++model_received);
+}
+
+TEST_F(I2CRegisters, FastModeUsesWholeClockCountsWithoutExceedingTheCeiling) {
+    for (uint32_t rate : {400000U, 350000U, 100001U, 5129U}) {
+        SCOPED_TRACE(rate);
+        State cold{};
+        cold.registers = &registers;
+        cold.line_gpio = &lines;
+        cold.line_mask = state.line_mask;
+        cold.peripheral_mhz = 42U;
+        cold.rate_hz = rate;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_initialize(&cold));
+        const uint32_t divider = registers.CCR & 0xFFFU;
+        const bool fast = (registers.CCR & I2C_CCR_FS) != 0U;
+        ASSERT_NE(0U, divider);
+        EXPECT_LE(42000000U, rate * (fast ? 3U : 2U) * divider);
+        EXPECT_EQ(rate > 100000U, fast);
+        EXPECT_EQ(fast ? 13U : 43U, registers.TRISE);
+        if (rate == 400000U) {
+            EXPECT_EQ(I2C_CCR_FS | 36U, registers.CCR);
+            EXPECT_LT(42000000U, 400000U * 3U * divider);
+        }
+    }
+}
+
+TEST_F(I2CRegisters, UnrepresentableClockCeilingRejectsBeforeRegisterStores) {
+    const I2C_TypeDef before = registers;
+    for (uint32_t rate : {0U, 5128U, 400001U, UINT32_MAX}) {
+        State cold{};
+        cold.registers = &registers;
+        cold.line_gpio = &lines;
+        cold.line_mask = state.line_mask;
+        cold.peripheral_mhz = 42U;
+        cold.rate_hz = rate;
+        EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_i2c_initialize(&cold));
+        EXPECT_EQ(0, std::memcmp(&before, &registers, sizeof(before)));
+    }
 }
 
 TEST_F(I2CRegisters, ReceivesThreeFourAndMaximumLengthWithExactPrefix) {
@@ -533,8 +656,8 @@ TEST_F(I2CRegisters, MissingLineFactsRejectInitializationAndRecovery) {
 TEST(I2CPollingIdentity, ColdChildrenMatchExactControllerWithoutPortAccess) {
     State first = {};
     State second = {};
-    EndpointState child = {&first, 0x50};
-    EndpointState other_address = {&first, 0x51};
+    EndpointState child = {&first, 0x50, 7U};
+    EndpointState other_address = {&first, 0x51, 7U};
     const nx_i2c_ops_t* operations = &nx_stm32_i2c_ops;
     const nx_i2c_endpoint_ops_t* endpoint_operations =
         &nx_stm32_i2c_endpoint_ops;
@@ -566,7 +689,7 @@ TEST(I2CPollingIdentity, ColdChildrenMatchExactControllerWithoutPortAccess) {
 
 TEST(I2CPollingIdentity, ForeignControllerMethodsAndMissingBindingsReject) {
     State state = {};
-    EndpointState child = {&state, 0x50};
+    EndpointState child = {&state, 0x50, 7U};
     const nx_i2c_ops_t* operations = &nx_stm32_i2c_ops;
     const nx_i2c_endpoint_ops_t* endpoint_operations =
         &nx_stm32_i2c_endpoint_ops;
@@ -591,7 +714,7 @@ TEST(I2CPollingIdentity, ForeignControllerMethodsAndMissingBindingsReject) {
 
 TEST(I2CPollingIdentity, FixedNonreservedAddressIsValidatedWithoutStartup) {
     State state = {};
-    EndpointState child = {&state, 8U};
+    EndpointState child = {&state, 8U, 7U};
     const nx_i2c_port_t port = {&nx_stm32_i2c_ops, &state};
     const nx_i2c_endpoint_t face = {&nx_stm32_i2c_endpoint_ops, &child};
     EXPECT_TRUE(nx_i2c_endpoint_on_port(&face, &port));

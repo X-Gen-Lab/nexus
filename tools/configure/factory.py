@@ -10,6 +10,7 @@ from tools.configure.providers import for_selection
 from tools.configure import enhanced_endpoints
 from tools.configure import stream_profiles, uart_formats, usb_profiles
 from tools.configure.calls import Symbol
+from tools.configure import usb_otg
 
 FACTORY_ABI_EPOCH = 1
 
@@ -37,10 +38,10 @@ def interface_type(class_name, shape):
     """Use actual public types where controller/direction names differ."""
     if class_name in {"timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc"}:
         return f"nx_{class_name}_t"
-    if class_name in {"eth", "mdio", "memory_window"}:
+    if class_name in {"eth", "mdio", "memory_window", "flash_async", "nand"}:
         return f"nx_{class_name}_port_t"
-    if class_name == "usb_device":
-        return "nx_usb_device_port_t"
+    if class_name in {"usb_device", "usb_host"}:
+        return f"nx_{class_name}_port_t"
     if class_name == "usb_endpoint":
         return "nx_usb_endpoint_port_t"
     return f"nx_{class_name.removesuffix('_device')}_{shape}_t"
@@ -68,7 +69,7 @@ def classes(result):
     records = [(kind, "port", [item for item in result.controllers
                               if controller_class(item) == kind])
                for kind in KINDS]
-    for kind in ("uart_word", "spi_dma_transaction", "pin_state"):
+    for kind in ("uart_word", "spi_dma_transaction", "spi_frames", "pin_state"):
         instances = [item for item in result.controllers
                      if controller_class(item) == kind]
         if instances:
@@ -84,7 +85,7 @@ def classes(result):
             records.append((name, "endpoint", instances))
     records.append(("usb_endpoint", "endpoint", [item for item in result.devices
                     if item.kind == "usb_device"]))
-    for name in ("memory_window", "parallel16"):
+    for name in ("memory_window", "parallel16", "flash_async", "nand"):
         instances = [item for item in result.devices
                      if selected_contracts.endpoint_class(item) == name]
         if instances:
@@ -103,6 +104,89 @@ def _uart_instances(result):
     """Nominal byte UART IDs never substitute for word or endpoint IDs."""
     return tuple(item for item in result.controllers
                  if controller_class(item) == "uart")
+
+
+def _dac_tx_factory(result):
+    """An optional face reuses the controller's ID, state and shared methods."""
+    instances = [item for item in result.controllers if item.kind == "dac"]
+    if not instances:
+        return [], []
+    header = ['#include "nexus/io/dac_tx.h"',
+        r'/** \brief Pure same-controller lookup; NULL for CPU modes or bad IDs. */',
+        'const nx_dac_tx_port_t* nx_factory_dac_tx(nx_dac_id_t id);']
+    source = [r'/** \brief Return an existing transfer face without side effects. */',
+        'const nx_dac_tx_port_t* nx_factory_dac_tx(nx_dac_id_t id) {',
+        '    switch (id) {']
+    for item in instances:
+        if for_selection(item).mode_implementation(item.kind, item.mode) == "dac_dma":
+            name = symbol(item.id)
+            source += [f'        case NX_DAC_ID_{name.upper()}:',
+                       f'            return &s_nx_dac_tx_{name};']
+    source += ['        default:', '            return NULL;', '    }', '}']
+    return header, source
+
+
+def _flash_maintenance_factory(result):
+    """An explicit optional face shares the ordinary physical controller ID."""
+    instances = [item for item in result.controllers if item.kind == "flash"]
+    if not instances:
+        return [], []
+    header = ['#include "nexus/io/flash_maintenance.h"',
+        r'/** \brief Pure optional maintenance lookup; never authorizes pulses. */',
+        'const nx_flash_maintenance_port_t*',
+        'nx_factory_flash_maintenance(nx_flash_id_t id);']
+    source = [r'/** \brief Return an existing selected face without effects. */',
+        'const nx_flash_maintenance_port_t*',
+        'nx_factory_flash_maintenance(nx_flash_id_t id) {',
+        '    switch (id) {']
+    for item in instances:
+        if getattr(item.options, "maintenance", False):
+            name = symbol(item.id)
+            source += [f'        case NX_FLASH_ID_{name.upper()}:',
+                       f'            return &s_nx_flash_maintenance_{name};']
+    source += ['        default:', '            return NULL;', '    }', '}']
+    return header, source
+
+
+def _block_async_factory(result):
+    """One optional finite face uses the same exact card session and ID."""
+    instances = [item for item in result.controllers if item.kind == "block"]
+    if not instances:
+        return [], []
+    header = ['#include "nexus/io/block_async.h"',
+        r'/** \brief Pure finite transport lookup on the same block owner. */',
+        'const nx_block_async_port_t* nx_factory_block_async(nx_block_id_t id);']
+    source = [r'/** \brief Return the selected finite face without effects. */',
+        'const nx_block_async_port_t* nx_factory_block_async(nx_block_id_t id) {',
+        '    switch (id) {']
+    for item in instances:
+        if (item.mode in {"sdio-irq", "sdio-dma"} and
+                item.options.protocol != "sdio"):
+            name = symbol(item.id)
+            source += [f'        case NX_BLOCK_ID_{name.upper()}:',
+                       f'            return &s_nx_block_async_{name};']
+    source += ['        default:', '            return NULL;', '    }', '}']
+    return header, source
+
+
+def _sdio_io_factory(result):
+    """I/O functions share a physical host ID, never a runtime registry."""
+    instances = [item for item in result.controllers if item.kind == "block"]
+    if not instances:
+        return [], []
+    header = ['#include "nexus/io/sdio_io.h"',
+        r'/** \brief Pure optional I/O-function lookup on the same host. */',
+        'const nx_sdio_io_port_t* nx_factory_sdio_io(nx_block_id_t id);']
+    source = [r'/** \brief Return an existing I/O face without discovering a card. */',
+        'const nx_sdio_io_port_t* nx_factory_sdio_io(nx_block_id_t id) {',
+        '    switch (id) {']
+    for item in instances:
+        if item.options.protocol == "sdio":
+            name = symbol(item.id)
+            source += [f'        case NX_BLOCK_ID_{name.upper()}:',
+                       f'            return &s_nx_sdio_io_{name};']
+    source += ['        default:', '            return NULL;', '    }', '}']
+    return header, source
 
 
 def _uart_validator_factory(result):
@@ -238,9 +322,24 @@ def emit(result):
         usb_header, usb_source = usb_profiles.emit(result)
         header.extend(usb_header)
         source.extend(usb_source)
+    otg_header, otg_source = usb_otg.emit_factory(result)
+    header.extend(otg_header)
+    source.extend(otg_source)
     activation_header, activation_source = usb_profiles.emit_activation(result)
     header.extend(activation_header)
     source.extend(activation_source)
+    nor=[item for item in result.devices if item.driver=="flash_async-endpoint"]
+    if nor:
+        header += [r'/** \brief Same NOR endpoint ID; readonly synchronous Flash face. */',
+                   'const nx_flash_port_t* nx_factory_fsmc_nor_flash(nx_flash_async_id_t id);']
+        source += [r'/** \brief Return the same NOR owner without effects. */',
+                   'const nx_flash_port_t* nx_factory_fsmc_nor_flash(nx_flash_async_id_t id) {',
+                   '    switch (id) {']
+        for item in nor:
+            name=symbol(item.id)
+            source += [f'        case NX_FLASH_ASYNC_ID_{name.upper()}:',
+                       f'            return &s_nx_fsmc_flash_{name};']
+        source += ['        default:', '            return NULL;', '    }', '}']
     owner_header, owner_source = enhanced_endpoints.emit_owner_factory(result)
     header.extend(owner_header)
     source.extend(owner_source)
@@ -250,6 +349,18 @@ def emit(result):
     profile_header, profile_source = stream_profiles.emit_factory(result)
     header.extend(profile_header)
     source.extend(profile_source)
+    dac_header, dac_source = _dac_tx_factory(result)
+    header.extend(dac_header)
+    source.extend(dac_source)
+    flash_header, flash_source = _flash_maintenance_factory(result)
+    header.extend(flash_header)
+    source.extend(flash_source)
+    block_header, block_source = _block_async_factory(result)
+    header.extend(block_header)
+    source.extend(block_source)
+    io_header, io_source = _sdio_io_factory(result)
+    header.extend(io_header)
+    source.extend(io_source)
     header += ['#ifdef __cplusplus', '}', '#endif', '#endif', '']
     return "\n".join(header), "\n".join(source) + "\n"
 
@@ -293,6 +404,35 @@ def emit_strong(result):
         header += ["/** \\brief Pure getter; lifecycle remains explicit. */",
                    *signature,
                    f"    return nx_factory_{class_name}(id.value);", "}"]
+    if any(item.kind == "usb_device" and usb_otg.is_managed(item.mode)
+           for item in result.controllers):
+        header += [r'/** \brief Pure managed owner lookup using the same USB Device ref. */',
+                   'static inline const nx_usb_otg_port_t*',
+                   'nx_factory_usb_otg_ref(nx_usb_device_ref_t id) {',
+                   '    return nx_factory_usb_otg(id.value);', '}']
+    if any(item.kind == "dac" for item in result.controllers):
+        header += [
+            r'/** \brief Pure optional transfer lookup using the same DAC ref. */',
+            'static inline const nx_dac_tx_port_t*',
+            'nx_factory_dac_tx_ref(nx_dac_ref_t id) {',
+            '    return nx_factory_dac_tx(id.value);', '}']
+    if any(item.kind == "flash" for item in result.controllers):
+        header += [
+            r'/** \brief Pure optional physical maintenance lookup. */',
+            'static inline const nx_flash_maintenance_port_t*',
+            'nx_factory_flash_maintenance_ref(nx_flash_ref_t id) {',
+            '    return nx_factory_flash_maintenance(id.value);', '}']
+    if any(item.kind == "block" for item in result.controllers):
+        header += [
+            r'/** \brief Pure optional finite transport lookup. */',
+            'static inline const nx_block_async_port_t*',
+            'nx_factory_block_async_ref(nx_block_ref_t id) {',
+            '    return nx_factory_block_async(id.value);', '}']
+        header += [
+            r'/** \brief Pure optional I/O-function lookup on the same host. */',
+            'static inline const nx_sdio_io_port_t*',
+            'nx_factory_sdio_io_ref(nx_block_ref_t id) {',
+            '    return nx_factory_sdio_io(id.value);', '}']
     if _uart_instances(result):
         header += [
             '/** \\brief Pure callback lookup; pair with the same UART ref. */',

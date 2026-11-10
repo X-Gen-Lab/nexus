@@ -85,6 +85,46 @@ class F407GpioElectricalTests(unittest.TestCase):
         self.assertIn(".pull = 0u", source)
         self.assertIn(".output_type = 0u", source)
 
+    def test_explicit_output_speed_is_static_and_default_preserves(self):
+        for speed in ("low", "medium", "high", "very-high"):
+            with self.subTest(speed=speed):
+                path = self.assembly(mode="output", options=f'speed="{speed}"\n')
+                result = gate.resolve_ir(path, test_support=native_fixture(path))
+                self.assertEqual(result.controllers[0].options.speed, speed)
+                self.assertIn(".speed = NX_STM32_GPIO_SPEED_" +
+                              speed.replace("-", "_").upper(),
+                              bindings.emit(result)[1])
+        path = self.assembly(mode="output")
+        result = gate.resolve_ir(path, test_support=native_fixture(path))
+        self.assertEqual(result.controllers[0].options.speed, "preserve")
+        self.assertIn(".speed = NX_STM32_GPIO_SPEED_PRESERVE",
+                      bindings.emit(result)[1])
+
+    def test_board_required_speed_reaches_output_and_rejects_override(self):
+        required = {"mode": "output", "speed": "medium"}
+        path = self.constrained(required, mode="output", options='speed="medium"\n')
+        result = gate.resolve_ir(path, test_support=native_fixture(path))
+        self.assertEqual(result.board_bindings["selected"]["electrical"].speed,
+                         "medium")
+        for options in ("", 'speed="low"\n', 'speed="very-high"\n'):
+            with self.subTest(options=options):
+                path = self.constrained(required, mode="output", options=options)
+                with self.assertRaisesRegex(gate.ConfigurationError,
+                                            "Board electrical.*speed"):
+                    gate.resolve_ir(path, test_support=native_fixture(path))
+
+    def test_speed_rejects_input_invalid_values_and_native_ignoring(self):
+        for native, mode, options in (
+                (False, "input", 'speed="low"\n'),
+                (False, "output", 'speed="preserve"\n'),
+                (False, "output", 'speed="invalid"\n'),
+                (False, "output", 'speed=3\n'),
+                (True, "output", 'speed="low"\n')):
+            with self.subTest(native=native, mode=mode, options=options):
+                path = self.assembly(native=native, mode=mode, options=options)
+                with self.assertRaises(gate.ConfigurationError):
+                    gate.resolve_ir(path, test_support=native_fixture(path))
+
     def test_invalid_electrical_intent_is_rejected(self):
         for options in ('pull="floating"\n', 'pull=true\n', 'pull=[]\n',
                         'output_type="invalid"\n',

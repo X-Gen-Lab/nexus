@@ -328,3 +328,58 @@ TEST_F(Stm32Exti, EventRingAndLossStayInLineOrderWithSharedDispatch) {
     EXPECT_EQ(0U, second.count);
     EXPECT_EQ(NX_SUCCESS, nx_exti_port_stop(&face));
 }
+
+TEST_F(Stm32Exti, EveryPadLinePreservesMuxPeersAndDispatchesItsOwnEvent) {
+    for (uint8_t line = 0U; line < 16U; ++line) {
+        SCOPED_TRACE(line);
+        first.initialized = false;
+        first.line = line;
+        registers = {};
+        const uint32_t original = UINT32_C(0x76543210);
+        for (auto& value : mux.EXTICR)
+            value = original;
+        const uint8_t bank = static_cast<uint8_t>(line % 5U);
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_exti_initialize(&first, &mux, bank));
+        const unsigned index = line / 4U;
+        const unsigned shift = (line % 4U) * 4U;
+        for (unsigned entry = 0U; entry < 4U; ++entry) {
+            EXPECT_EQ(entry == index ? (original & ~(15U << shift)) |
+                                           (uint32_t{bank} << shift)
+                                     : original,
+                      mux.EXTICR[entry]);
+        }
+        registers.PR = gpio.IDR = 1U << line;
+        nx_stm32_exti_state_t* selected[]{&first};
+        nx_stm32_exti_dispatch(selected, 1U, 1U << line);
+        nx_exti_event_t event{};
+        size_t count = 0U;
+        ASSERT_EQ(NX_SUCCESS, nx_exti_port_read(&face, &event, 1U, &count));
+        EXPECT_EQ(1U, count);
+        EXPECT_EQ(line, event.line);
+        EXPECT_EQ(NX_EXTI_RISING, event.edge);
+        EXPECT_EQ(0U, registers.PR);
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_exti_stop(&first));
+        EXPECT_FALSE(first.initialized);
+        EXPECT_EQ(0U, registers.IMR | registers.RTSR | registers.FTSR);
+    }
+}
+
+TEST_F(Stm32Exti, DifferentPortsCannotReassignAnAlreadyOwnedMuxLine) {
+    GPIO_TypeDef other_gpio{};
+    for (uint8_t line :
+         {uint8_t{1U}, uint8_t{4U}, uint8_t{10U}, uint8_t{15U}}) {
+        SCOPED_TRACE(line);
+        registers = {};
+        first.initialized = second.initialized = false;
+        first.line = second.line = line;
+        second.gpio = &other_gpio;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_exti_initialize(&first, &mux, 0U));
+        const auto before = mux;
+        EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_exti_initialize(&second, &mux, 1U));
+        EXPECT_EQ(0, std::memcmp(&before, &mux, sizeof(mux)));
+        EXPECT_FALSE(second.initialized);
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_exti_stop(&first));
+        EXPECT_EQ(NX_SUCCESS, nx_stm32_exti_initialize(&second, &mux, 1U));
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_exti_stop(&second));
+    }
+}

@@ -1,12 +1,12 @@
 # Nexus 下一代平台：从第一性原理设计
 
-状态：**当前 factory + 多态平台架构合同；实现与验收映射见[当前交付](../delivery/README.md)。** 代码采用 TOML 静态装配、纯 typed factory、共享只读方法表、独立私有实例和显式所有权边界。本文的伪代码解释合同；精确可编译接口以当前公共头文件及测试为准。软件执行、离线可复现构建和实板资格分别记录，历史[架构](../archive/strategy/target-architecture.md)仅用于迁移对照。
+状态：**当前 factory + 多态平台架构合同；实现与验收映射见[当前交付](../delivery/README.md)。** 代码采用 TOML 静态装配、纯 typed factory、共享只读方法表、独立私有实例和显式所有权边界。本文的伪代码解释合同；精确可编译接口以当前公共头文件及测试为准。软件执行、离线可复现构建和实板资格分别记录，历史[架构](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/archive/strategy/target-architecture.md)仅用于迁移对照。
 
 本次迭代将设计、工程规范、接入契约与33项实施清单落实为新的生产代码和构建链。新源码与产物建立独立资格；历史通过结果不能继承。
 
 用户明确要求代码格式和注释风格保持当前仓库规范。架构可以重构，排版、命名和Doxygen形式沿用现有配置及贡献/注释指南；通过完善合同内容提高可维护性。
 
-配套资料：[工程手册](engineering-handbook.md)、[接入契约](integration-contracts.md)、[基础执行清单](next-generation-execution.csv)、[factory/TOML/TDD P0–P5 清单](factory-platform-execution.csv)。实施阶段的决策可据实验结果修订，不能用架构提案代替实验。
+配套资料：[工程手册](engineering-handbook.md)、[接入契约](integration-contracts.md)、[基础执行清单](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/next-generation-execution.csv)、[factory/TOML/TDD P0–P5 清单](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/factory-platform-execution.csv)。实施阶段的决策可据实验结果修订，不能用架构提案代替实验。
 
 ## 1. 平台要解决的问题
 
@@ -313,7 +313,7 @@ RTOS tick、HAL时间、UART时序、ADC/PWM触发分别占用实际timebase资�
 
 风格沿用根目录.clang-format/.editorconfig：80列、4空格、K&R attached braces和类型侧pointer alignment。公共symbol延续模块前缀、type的_t后缀和既有命名；private实现static，header自足，整数/长度/序列化规则明确。vendor代码独立target，不通过全局关闭warnings掩盖own代码。
 
-注释沿用反斜杠Doxygen、现有文件头与section/inline形式。public header写完整参数和返回合同，source避免重复；调用context、阻塞和deadline起点、所有权、输出有效性、取消/结清及失败剩余状态用现有标签说明。共享规则放类型/模块contract，函数仅写差异。内部注释解释竞态、屏障、勘误和取舍。文件头保留作者/版本/日期等现有约定，Git补充历史追踪。具体规则和现有落实缺口见[工程手册第12节](engineering-handbook.md#12-代码风格注释与静态检查)。
+注释沿用反斜杠Doxygen、现有文件头与section/inline形式。public header写完整参数和返回合同，source避免重复；调用context、阻塞和deadline起点、所有权、输出有效性、取消/结清及失败剩余状态用现有标签说明。共享规则放类型/模块contract，函数仅写差异。内部注释解释竞态、屏障、勘误和取舍。文件头保留作者/版本/日期等现有约定，Git补充历史追踪。具体规则和现有落实缺口见[工程手册的代码与审查规则](engineering-handbook.md#代码与审查)。
 
 状态码服务于caller可以执行的恢复动作；raw vendor诊断为可选detail。API不隐式格式化日志、不写全局last error、不在IRQ调用全局用户handler。普通错误与invariant违约分别处理。
 
@@ -349,7 +349,7 @@ provenance证明输入/命令/输出绑定，hermetic证明只读声明输入，
 | B5 | 静态分析、资源/性能工具、hermetic/reproducible、HIL准备 | 软件门禁、独立重建、真实工件准入；物理结果仍未执行 |
 | B6 | 新候选与迁移收束 | 新源码资格与交付证据完整；旧入口删除；支持范围真实 |
 
-具体依赖与主责见 [执行清单](next-generation-execution.csv)。十人3–6个月用于范围受控的迭代，不能在此窗口默认完成所有外设、自动拓扑、动态设备系统、低功耗、MPU、安全更新和企业LTS。
+具体依赖与主责见 [执行清单](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/next-generation-execution.csv)。十人3–6个月用于范围受控的迭代，不能在此窗口默认完成所有外设、自动拓扑、动态设备系统、低功耗、MPU、安全更新和企业LTS。
 
 以下是十人投入下的排期假设，任务依赖和退出证据优先于日历。各provider首个切片即带故障验证、格式/warning和最小资源预算，B5负责扩大与收束，不能把检查推迟到最后。
 

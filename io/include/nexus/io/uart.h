@@ -27,6 +27,7 @@ typedef enum {
 #define NX_UART_EVENT_NOISE   8u
 #define NX_UART_EVENT_LOSS    16u
 #define NX_UART_EVENT_NO_BYTE 32u
+#define NX_UART_EVENT_BREAK   64u
 /**
  * \brief           Timestamp belongs to provider clock; precision is
  *                  hardware-specific.

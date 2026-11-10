@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "usb_device.h"
+uint32_t g_nx_usb_soc_hclk_hz = 168000000U;
 #include <string.h>
 
 /** \brief Model clock acquisition still requires actual injected ready facts.
@@ -41,7 +42,7 @@ static const nx_usb_clock_ops_t clock_ops = {.retain = clock_retain,
  */
 static void summaries(nx_native_usb_hardware_t* hw) {
     uint32_t summary = 0U;
-    for (unsigned ep = 0U; ep < 4U; ++ep) {
+    for (unsigned ep = 0U; ep < 6U; ++ep) {
         if (hw->registers[(0x900U + ep * 32U + 8U) / 4U] != 0U) {
             summary |= 1U << ep;
         }
@@ -51,10 +52,10 @@ static void summaries(nx_native_usb_hardware_t* hw) {
     }
     hw->registers[0x818U / 4U] = summary;
     hw->registers[0x14U / 4U] &= ~((1U << 18U) | (1U << 19U) | 16U);
-    if ((summary & 15U) != 0U) {
+    if ((summary & 63U) != 0U) {
         hw->registers[0x14U / 4U] |= 1U << 18U;
     }
-    if ((summary & 0xF0000U) != 0U) {
+    if ((summary & 0x3F0000U) != 0U) {
         hw->registers[0x14U / 4U] |= 1U << 19U;
     }
     if (hw->rx_count != 0U) {
@@ -67,6 +68,10 @@ nx_result_t nx_native_usb_initialize(nx_native_usb_device_t* model) {
         return NX_ERROR_INVALID;
     }
     nx_usb_controller_t* c = &model->controller;
+    c->turnaround = nx_usb_turnaround(c->core, g_nx_usb_soc_hclk_hz);
+    if (c->turnaround == 0U) {
+        return NX_ERROR_INVALID;
+    }
     if (!c->snapshot.started) {
         model->hardware.registers[0x10U / 4U] = 1U << 31U;
     }
@@ -79,6 +84,14 @@ nx_result_t nx_native_usb_initialize(nx_native_usb_device_t* model) {
 /** \brief Pop external RX status and then expose its FIFO words. */
 uint32_t nx_native_usb_read(uintptr_t base, uint32_t offset) {
     nx_native_usb_hardware_t* hw = (nx_native_usb_hardware_t*)base;
+    if (offset == 0x800U && hw->delay_config_read &&
+        hw->config_read_gap == 0U) {
+        hw->early_config_read = true;
+        return hw->registers[offset / 4U] ^ 0x10U;
+    }
+    if (offset != 0x800U && hw->config_read_gap != UINT8_MAX) {
+        ++hw->config_read_gap;
+    }
     ++hw->mmio_reads;
     if (offset == 0x10U) {
         ++hw->reset_reads;
@@ -98,9 +111,9 @@ uint32_t nx_native_usb_read(uintptr_t base, uint32_t offset) {
         return hw->current.status;
     }
     if (offset == 0x1000U) {
-        return hw->rx_word < 16U ? hw->current.words[hw->rx_word++] : 0U;
+        return hw->rx_word < 256U ? hw->current.words[hw->rx_word++] : 0U;
     }
-    if (offset >= 0x908U && offset < 0x980U && offset % 32U == 8U) {
+    if (offset >= 0x908U && offset < 0x9C0U && offset % 32U == 8U) {
         unsigned ep = (offset - 0x908U) / 32U;
         return (hw->registers[offset / 4U] & ~128U) |
                (hw->tx_count[ep] == 0U ? 128U : 0U);
@@ -111,18 +124,21 @@ uint32_t nx_native_usb_read(uintptr_t base, uint32_t offset) {
  * acknowledgements. */
 void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
     nx_native_usb_hardware_t* hw = (nx_native_usb_hardware_t*)base;
+    if (offset == 0x800U) {
+        hw->config_read_gap = 0U;
+    }
     ++hw->mmio_writes;
     /* FIFO writes consume model space; no physical USB transfer occurs here. */
     if (offset >= 0x1000U) {
         unsigned ep = offset / 0x1000U - 1U;
-        if (ep < 4U && hw->tx_count[ep] < 16U) {
+        if (ep < 6U && hw->tx_count[ep] < 256U) {
             hw->tx[ep][hw->tx_count[ep]++] = value;
             --hw->registers[(0x900U + ep * 32U + 24U) / 4U];
         }
         return;
     }
-    if (offset == 0x14U || (((offset >= 0x900U && offset < 0x980U) ||
-                             (offset >= 0xB00U && offset < 0xB80U)) &&
+    if (offset == 0x14U || (((offset >= 0x900U && offset < 0x9C0U) ||
+                             (offset >= 0xB00U && offset < 0xBC0U)) &&
                             (offset % 32U) == 8U)) {
         if (!hw->hold_clear) {
             hw->registers[offset / 4U] &= ~value;
@@ -150,7 +166,7 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
             }
             if ((value & 32U) != 0U) {
                 unsigned fifo = (value >> 6U) & 31U;
-                for (unsigned i = 0U; i < 4U; ++i) {
+                for (unsigned i = 0U; i < 6U; ++i) {
                     if (fifo == i || fifo == 16U) {
                         hw->tx_count[i] = 0U;
                         uint32_t size =
@@ -184,8 +200,8 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
         return;
     }
     /* Endpoint commands self-clear and acknowledge NAK/disable separately. */
-    bool in = offset >= 0x900U && offset < 0x980U;
-    bool out = offset >= 0xB00U && offset < 0xB80U;
+    bool in = offset >= 0x900U && offset < 0x9C0U;
+    bool out = offset >= 0xB00U && offset < 0xBC0U;
     if ((in || out) && offset % 32U == 0U) {
         if ((offset == 0x900U || offset == 0xB00U) &&
             (value & (3U << 28U)) != 0U) {
@@ -193,11 +209,14 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
         }
         uint32_t previous = hw->registers[offset / 4U];
         unsigned number = (offset - (in ? 0x900U : 0xB00U)) / 32U;
-        unsigned direction = number + (in ? 0U : 4U);
+        unsigned direction = number + (in                           ? 0U
+                                       : hw->endpoint_numbers == 6U ? 6U
+                                                                    : 4U);
         if ((hw->hold_stall_clear_mask & (1U << direction)) != 0U) {
             value |= previous & (1U << 21U);
         }
-        if (in && (value & (1U << 30U)) != 0U &&
+        const bool iso = ((value >> 18U) & 3U) == 1U;
+        if (in && !iso && (value & (1U << 30U)) != 0U &&
             (previous & (1U << 17U)) == 0U) {
             hw->early_in_disable = true;
         }
@@ -227,7 +246,7 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
         }
         if ((value & (1U << 30U)) != 0U && !hw->hold_disable &&
             !(out && offset == 0xB00U) &&
-            !(in && (previous & (1U << 17U)) == 0U)) {
+            !(in && !iso && (previous & (1U << 17U)) == 0U)) {
             result &= ~((1U << 31U) | (1U << 30U));
             hw->registers[(offset + 8U) / 4U] |= 2U;
         }
@@ -246,7 +265,7 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
     if (offset == 8U && value == 1U && hw->on_interrupt_enable != NULL) {
         hw->on_interrupt_enable(hw->interrupt_context);
     }
-    if (offset == 0x28U || (offset >= 0x104U && offset <= 0x10CU)) {
+    if (offset == 0x28U || (offset >= 0x104U && offset <= 0x114U)) {
         unsigned ep = offset == 0x28U ? 0U : (offset - 0x100U) / 4U;
         hw->registers[(0x900U + ep * 32U + 24U) / 4U] = value >> 16U;
     }
@@ -254,8 +273,9 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
 nx_result_t nx_native_usb_receive(nx_native_usb_device_t* model, uint8_t ep,
                                   const uint8_t* bytes, size_t length,
                                   bool setup) {
-    if (model == NULL || ep > 3U || length > 64U ||
-        (length != 0U && bytes == NULL)) {
+    if (model == NULL ||
+        ep >= (model->controller.core == NX_USB_CORE_FS ? 4U : 6U) ||
+        length > 1024U || (length != 0U && bytes == NULL)) {
         return NX_ERROR_INVALID;
     }
     nx_native_usb_hardware_t* hw = &model->hardware;
@@ -282,7 +302,8 @@ nx_result_t nx_native_usb_complete(nx_native_usb_device_t* model, uint8_t ep,
     model->hardware.registers[offset / 4U] &= ~(1U << 31U);
     model->hardware.registers[(offset + 8U) / 4U] |= 1U;
     if (in) {
-        if (ep != 0U) {
+        if (ep != 0U &&
+            ((model->hardware.registers[offset / 4U] >> 18U) & 3U) != 1U) {
             model->hardware.registers[offset / 4U] ^= 1U << 16U;
         }
         uint32_t size =

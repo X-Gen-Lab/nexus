@@ -16,9 +16,7 @@ source_language: zh_CN
 静态连接。后续主线是精确 F4 型号扩展、所需运行期能力和真实测量，按实际回归与源码
 身份验收。当前物理 HIL 为 `not_executed`，本次重构没有自动建立软件候选。
 
-[Host C11 配置器](../../tools/nxconfig/README.md)是在 PC 上运行的可选试点，默认平台
-配置仍使用 Python。试点不进入固件，其全面替换不作为平台使用、固件 C 化或软件
-交付的前置条件。它改变的是主机工具实现，不直接改变 MCU 热路径或资源占用。
+主机配置统一由 `tools/configure/` 维护；配置代码不进入 MCU 镜像。
 
 | 入口 | 用途 |
 |---|---|
@@ -27,6 +25,7 @@ source_language: zh_CN
 | [能力矩阵](capabilities.md) | 事实、路线、装配与实际生产定义关联 |
 | [源码定位](../explanation/source-map.md) | 各层权威入口与源码归属 |
 | [资格边界](../reference/platforms/qualification.md) | 模型、ARM、SDK、候选和物理验收分开 |
+| [本批变更与验证](https://github.com/X-Gen-Lab/nexus/pull/60) | 当前 PR 的源码 HEAD、实际本地 CI、ARM 和 SDK 记录；与历史记录分别读取 |
 | [软件证据导航](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-verification.md) | 按原源码与配置读取执行记录 |
 
 当前源码版本号保持 0.2.1；已发布版本仍以

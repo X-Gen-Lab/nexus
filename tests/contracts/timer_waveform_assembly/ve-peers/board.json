@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "f407-waveform-ve-peers",
+  "soc": "STM32F407VET6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-v1",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "drive",
+      "controller": "TIM8",
+      "route": "tim8-group4"
+    },
+    {
+      "id": "peer",
+      "controller": "TIM12",
+      "route": "tim12-group2"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Silicon routes only; no PCB or physical timing"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/rm0090-stm32f405415-stm32f407417-stm32f427437-and-stm32f429439-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "scope": "RM0090 timer register and ITR facts"
+    }
+  ]
+}

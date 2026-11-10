@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.31)
+project(f407_i2c_target_contract LANGUAGES C ASM)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host tests")
+set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit target contract")
+add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+nexus_add_firmware(f407_i2c_target SOURCES main.c)
+nexus_target_warnings(f407_i2c_target STRICT)

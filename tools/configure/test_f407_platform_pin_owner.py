@@ -1,7 +1,7 @@
 """Optional F4 pad and clock owners retain only selected hardware algorithms."""
 import unittest
 
-from tools.configure import bindings, configure
+from tools.configure import bindings, configure, gpio_phase
 
 
 class F407PlatformPinOwnerTests(unittest.TestCase):
@@ -13,6 +13,23 @@ class F407PlatformPinOwnerTests(unittest.TestCase):
                       "Pinless config must omit the pin-owner connection")
         self.assertNotIn("nx_stm32_platform_pins_acquire", source,
                          "Unselected pins must not retain GPIO algorithms")
+
+    def test_internal_adc_admits_resources_with_no_gpio_record(self):
+        for density, backend in (("ve", "baremetal"), ("zg", "freertos")):
+            with self.subTest(density=density):
+                result = configure.resolve_ir(configure.ROOT / (
+                    "tests/contracts/multi_controller_assembly/"
+                    f"stm32-{density}-adc-internal-{backend}.toml"))
+                self.assertEqual(gpio_phase.selected_pins(result), ())
+                self.assertTrue(gpio_phase.applies(result))
+                _, source = bindings.emit(result)
+                self.assertIn(".pins = NULL, .pin_count = 0u", source)
+                self.assertIn(".pin_owner = &s_nx_platform_pin_owner", source)
+                self.assertIn("nx_stm32_platform_selected_preflight", source)
+                self.assertNotIn("s_nx_platform_pins_config[]", source)
+                self.assertNotIn("s_nx_platform_pin_state[", source)
+                for converter in ("ADC1", "ADC2", "ADC3"):
+                    self.assertIn(f"RCC_APB2ENR_{converter}EN", source)
 
     def test_selected_pins_use_one_readonly_fixed_owner_table(self):
         result = configure.resolve_ir(configure.ROOT / (

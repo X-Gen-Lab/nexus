@@ -54,6 +54,22 @@ class UsbConfigurationTests(unittest.TestCase):
                 "\n".join(key + "=" + value for key, value in fields.items()
                           if value is not None) + "\n")
 
+    def test_isochronous_endpoints_preserve_type_and_real_fifo_limits(self):
+        path = self.assembly(mutate=lambda text: text.replace(
+            'transfer="bulk"', 'transfer="isochronous"'))
+        output = self.root / "iso"
+        gate.configure(path, output, test_support=native_fixture(path))
+        self.assertIn("NX_USB_PROFILE_ISOCHRONOUS",
+                      (output / "bindings.c").read_text())
+        ir = gate.resolve_ir(path, test_support=native_fixture(path))
+        self.assertEqual(ir.devices[2].options.transfer, "isochronous")
+        path.write_text(path.read_text().replace(
+            'transfer="isochronous"\nmax_packet=64\nfifo_words=32',
+            'transfer="isochronous"\nmax_packet=1023\nfifo_words=256', 1))
+        # An endpoint maximum is not permission to exceed the 320-word core.
+        with self.assertRaisesRegex(ValueError, "FIFO"):
+            gate.resolve_ir(path, test_support=native_fixture(path))
+
     def test_interrupt_in_preserves_exact_typed_plan_and_existing_bulk_ports(self):
         for family in ('stm32-zg', 'stm32-ve'):
             with self.subTest(family=family):
@@ -84,6 +100,15 @@ class UsbConfigurationTests(unittest.TestCase):
                 self.assertIn("NX_USB_PROFILE_BULK", source)
                 self.assertNotIn("malloc", source)
 
+    def test_full_speed_interrupt_out_uses_shared_rx_fifo_without_tx_storage(self):
+        path = self.assembly(mutate=lambda text: text +
+            self.interrupt_endpoint(direction='"out"', fifo_words=None))
+        ir = gate.resolve_ir(path, test_support=native_fixture(path))
+        options = next(item.options for item in ir.devices
+                       if item.id == "notification")
+        self.assertEqual(options.direction, "out")
+        self.assertEqual(options.fifo_words, 0)
+
     def test_interrupt_in_accepts_full_speed_non_power_of_two_packet_bounds(self):
         for maximum in (1, 10, 64):
             with self.subTest(maximum=maximum):
@@ -97,8 +122,8 @@ class UsbConfigurationTests(unittest.TestCase):
     def test_interrupt_in_rejects_unsupported_and_ambiguous_authored_fields(self):
         changes = ({"max_packet": "0"}, {"max_packet": "65"},
                    {"max_packet": "true"}, {"direction": '"out"',
-                    "fifo_words": None}, {"number": "0"}, {"number": "4"},
-                   {"transfer": '"isochronous"'}, {"interval_frames": "16"},
+                    "fifo_words": "16"}, {"number": "0"}, {"number": "4"},
+                   {"transfer": '"unsupported"'}, {"interval_frames": "16"},
                    {"fifo_words": "15"}, {"fifo_words": "161"},
                    {"polling_worker": "true"})
         for change in changes:
@@ -162,11 +187,11 @@ class UsbConfigurationTests(unittest.TestCase):
         self.assertNotIn("nx_stm32_pin_restore(", source)
 
     def test_packet_type_direction_number_and_fifo_bounds_fail_closed(self):
-        changes = (("rx_fifo_words=96", "rx_fifo_words=63"),
+        changes = (("rx_fifo_words=96", "rx_fifo_words=47"),
                    ("fifo_words=32", "fifo_words=15"),
                    ("fifo_words=32", "fifo_words=240"),
                    ("max_packet=64", "max_packet=65"),
-                   ('transfer="bulk"', 'transfer="isochronous"'),
+                   ('transfer="bulk"', 'transfer="unsupported"'),
                    ('direction="in"', 'direction="sideways"'),
                    ("number=1", "number=4"),
                    ("poll_limit=128", "poll_limit=0"),

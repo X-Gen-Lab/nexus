@@ -355,8 +355,17 @@ class AdvancedResolverTests(unittest.TestCase):
 
     def test_adc_unreviewed_sequence_rejected(self):
         data = self.fixture("adc-scan")
-        data["controllers"][0]["channels"] = [1, 0]
+        data["controllers"][0]["channels"] = [0, 2]
         self.reject(data, "differs from reviewed")
+
+    def test_adc_reordered_sequence_keeps_configured_rank_order(self):
+        data = self.fixture("adc-scan")
+        data["controllers"][0]["channels"] = [1, 0]
+        self.assembly.write_text(render_toml(data))
+        result = gate.resolve_ir(self.assembly)
+        selected, = result.controllers
+        self.assertEqual(selected.options.channels, (1, 0))
+        self.assertEqual({pin["pin"] for pin in selected.pins}, {"PA0", "PA1"})
 
     def test_adc_boolean_sampling_rejected(self):
         data = self.fixture("adc")
@@ -366,7 +375,7 @@ class AdvancedResolverTests(unittest.TestCase):
     def test_pwm_fractional_divider_rejected(self):
         data = self.fixture("pwm")
         data["controllers"][0]["tick_hz"] = 333333
-        self.reject(data, "exact maintained timer divider")
+        self.reject(data, "timer tick must divide its selected bus clock")
 
     def test_spi_without_child_rejected(self):
         data = self.fixture("spi")

@@ -96,9 +96,22 @@ extern "C" void nx_flash_program_model_write(volatile uint32_t* reg,
     *reg = value;
     if (reg == &model->registers->KEYR && value == 0xcdef89abU)
         model->registers->CR &= ~static_cast<uint32_t>(FLASH_CR_LOCK);
+    if (reg == &model->registers->OPTKEYR && value == 0x4c5d6e7fU)
+        model->registers->OPTCR &= ~static_cast<uint32_t>(FLASH_OPTCR_OPTLOCK);
+    if (reg == &model->registers->OPTCR &&
+        (value & FLASH_OPTCR_OPTSTRT) != 0U) {
+        model->registers->OPTCR &= ~static_cast<uint32_t>(FLASH_OPTCR_OPTSTRT);
+        complete(false);
+    }
 }
 extern "C" void nx_flash_program_model_store(volatile uint32_t* address,
                                              uint32_t value) {
+    *address &= value;
+    ++program_pulses;
+    complete(false);
+}
+extern "C" void nx_flash_program_model_store_byte(volatile uint8_t* address,
+                                                  uint8_t value) {
     *address &= value;
     ++program_pulses;
     complete(false);
@@ -293,4 +306,258 @@ TEST_F(PhysicalFlashProgram, UnprivilegedControlsCannotTouchTheController) {
     EXPECT_EQ(0U, program_pulses);
     EXPECT_EQ(before, Control());
     privileged = true;
+}
+
+/** \brief Independent fixed OTP address oracle from RM0090 table 19. */
+class PhysicalFlashMaintenance : public PhysicalFlashProgram {
+  protected:
+    const nx_flash_maintenance_port_t maintenance{
+        &nx_stm32_flash_maintenance_ops, &state};
+    uint8_t* otp = reinterpret_cast<uint8_t*>(0x1fff7800U);
+    void* mapping = MAP_FAILED;
+    void SetUp() override {
+        PhysicalFlashProgram::SetUp();
+        mapping = mmap(
+            reinterpret_cast<void*>(0x1fff7000U), 4096U, PROT_READ | PROT_WRITE,
+            MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
+        ASSERT_NE(MAP_FAILED, mapping);
+        std::memset(otp, 0xff, 528U);
+        registers.OPTCR = 0x0fffaaedU;
+    }
+    void TearDown() override {
+        if (mapping != MAP_FAILED) {
+            EXPECT_EQ(0, munmap(mapping, 4096U));
+        }
+        PhysicalFlashProgram::TearDown();
+    }
+    nx_flash_options_t OpenOptions() const {
+        return {NX_FLASH_READ_OPEN, 0U, 3U, false, false, false};
+    }
+};
+
+TEST_F(PhysicalFlashMaintenance, ExactOtpAndVeGeometryAreCopied) {
+    nx_flash_maintenance_snapshot_t snapshot{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_flash_maintenance_snapshot(&maintenance, &snapshot));
+    EXPECT_EQ(512U, snapshot.otp_bytes);
+    EXPECT_EQ(32U, snapshot.otp_block_bytes);
+    EXPECT_EQ(8U, snapshot.sector_count);
+    EXPECT_EQ(0U, snapshot.otp_locked_blocks);
+    EXPECT_EQ(NX_FLASH_READ_OPEN, snapshot.options.read_protection);
+    EXPECT_FALSE(snapshot.power_on_reset_required);
+}
+
+TEST_F(PhysicalFlashMaintenance, OtpReadCannotReachLockOrSystemMemory) {
+    uint8_t output = 0U;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_flash_maintenance_otp_read(&maintenance, 511U, &output, 1U));
+    EXPECT_EQ(0xffU, output);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_maintenance_otp_read(&maintenance, 512U, &output, 1U));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_flash_maintenance_otp_read(
+                                    &maintenance, UINT32_MAX, &output, 1U));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_flash_maintenance_otp_read(
+                                    &maintenance, 1U, &output, SIZE_MAX));
+    EXPECT_EQ(0U, program_pulses);
+}
+
+TEST_F(PhysicalFlashMaintenance, EffectsAreRequiredBeforeUnlockOrPulse) {
+    uint32_t word = 0x12345678U;
+    auto desired = OpenOptions();
+    EXPECT_EQ(NX_ERROR_INVALID, nx_flash_maintenance_otp_program(
+                                    &maintenance, 0U, &word, 4U, 0U, 1000U));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_maintenance_otp_lock(&maintenance, 0U, 0U, 1000U));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_flash_maintenance_set_options(
+                                    &maintenance, &desired, 0U, 1000U));
+    EXPECT_EQ(FLASH_CR_LOCK, registers.CR);
+    EXPECT_EQ(0U, program_pulses);
+}
+
+TEST_F(PhysicalFlashMaintenance, OtpProgramsOnlySelectedWordsWithoutMainErase) {
+    uint32_t words[2]{0x12345678U, 0xfeed0123U};
+    ASSERT_EQ(NX_SUCCESS, nx_flash_maintenance_otp_program(
+                              &maintenance, 24U, words, sizeof(words),
+                              NX_FLASH_MAINTAIN_OTP_PROGRAM, 1000U));
+    EXPECT_EQ(0, std::memcmp(otp + 24U, words, sizeof(words)));
+    EXPECT_EQ(2U, program_pulses);
+    EXPECT_EQ(0U, erase_pulses);
+    EXPECT_EQ(0xffU, memory[0]);
+    EXPECT_FALSE(state.active);
+}
+
+TEST_F(PhysicalFlashMaintenance,
+       OtpPreflightRejectsLockedTailBeforeFirstPulse) {
+    uint32_t words[2]{};
+    otp[512U + 1U] = 0U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_flash_maintenance_otp_program(
+                                 &maintenance, 28U, words, sizeof(words),
+                                 NX_FLASH_MAINTAIN_OTP_PROGRAM, 1000U));
+    EXPECT_EQ(0U, program_pulses);
+    EXPECT_EQ(0xffU, otp[28U]);
+}
+
+TEST_F(PhysicalFlashMaintenance, OtpRejectsZeroToOneBeforeAnyPulse) {
+    uint32_t words[2]{0U, UINT32_MAX};
+    otp[4U] = 0U;
+    EXPECT_EQ(NX_ERROR_IO, nx_flash_maintenance_otp_program(
+                               &maintenance, 0U, words, sizeof(words),
+                               NX_FLASH_MAINTAIN_OTP_PROGRAM, 1000U));
+    EXPECT_EQ(0U, program_pulses);
+}
+
+TEST_F(PhysicalFlashMaintenance, LockWritesExactlyZeroToOneLockByte) {
+    ASSERT_EQ(NX_SUCCESS,
+              nx_flash_maintenance_otp_lock(&maintenance, 15U,
+                                            NX_FLASH_MAINTAIN_OTP_LOCK, 1000U));
+    EXPECT_EQ(0U, otp[527U]);
+    EXPECT_EQ(0xffU, otp[526U]);
+    EXPECT_EQ(0xffU, otp[511U]);
+    EXPECT_EQ(1U, program_pulses);
+    EXPECT_EQ(NX_SUCCESS,
+              nx_flash_maintenance_otp_lock(&maintenance, 15U,
+                                            NX_FLASH_MAINTAIN_OTP_LOCK, 1000U));
+    EXPECT_EQ(1U, program_pulses);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_maintenance_otp_lock(&maintenance, 16U,
+                                            NX_FLASH_MAINTAIN_OTP_LOCK, 1000U));
+}
+
+TEST_F(PhysicalFlashMaintenance, CorruptLockByteIsNotAnUnlockedBlock) {
+    otp[512U] = 0x7fU;
+    uint32_t word = 0U;
+    EXPECT_EQ(NX_ERROR_IO, nx_flash_maintenance_otp_program(
+                               &maintenance, 0U, &word, sizeof(word),
+                               NX_FLASH_MAINTAIN_OTP_PROGRAM, 1000U));
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_flash_maintenance_otp_lock(&maintenance, 0U,
+                                            NX_FLASH_MAINTAIN_OTP_LOCK, 1000U));
+    EXPECT_EQ(0U, program_pulses);
+}
+
+TEST_F(PhysicalFlashMaintenance,
+       DensitySpecificProtectionRejectsVeSectorEight) {
+    auto desired = OpenOptions();
+    desired.write_protected_sectors = 1U << 8U;
+    uint32_t before = registers.OPTCR;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_maintenance_set_options(
+                  &maintenance, &desired, NX_FLASH_MAINTAIN_OPTIONS, 1000U));
+    EXPECT_EQ(before, registers.OPTCR);
+}
+
+TEST_F(PhysicalFlashMaintenance, PermanentProtectionNeedsSeparateDeclaration) {
+    auto desired = OpenOptions();
+    desired.read_protection = NX_FLASH_READ_PERMANENT;
+    uint32_t before = registers.OPTCR;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_maintenance_set_options(
+                  &maintenance, &desired, NX_FLASH_MAINTAIN_OPTIONS, 1000U));
+    EXPECT_EQ(before, registers.OPTCR);
+}
+
+TEST_F(PhysicalFlashMaintenance, ReadProtectionRegressionNeedsMassEraseEffect) {
+    registers.OPTCR = 0x0fff55edU;
+    auto desired = OpenOptions();
+    uint32_t before = registers.OPTCR;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_maintenance_set_options(
+                  &maintenance, &desired, NX_FLASH_MAINTAIN_OPTIONS, 1000U));
+    EXPECT_EQ(before, registers.OPTCR);
+    EXPECT_EQ(0U, erase_pulses);
+}
+
+TEST_F(PhysicalFlashMaintenance, ExistingPermanentProtectionCannotBeChanged) {
+    registers.OPTCR = 0x0fffccedU;
+    auto desired = OpenOptions();
+    uint32_t before = registers.OPTCR;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_flash_maintenance_set_options(&maintenance, &desired,
+                                               NX_FLASH_MAINTAIN_OPTIONS |
+                                                   NX_FLASH_MAINTAIN_MASS_ERASE,
+                                               1000U));
+    EXPECT_EQ(before, registers.OPTCR);
+}
+
+TEST_F(PhysicalFlashMaintenance, OptionsRequirePorAndNeverResetTheMachine) {
+    auto desired = OpenOptions();
+    desired.write_protected_sectors = 0x81U;
+    desired.hardware_watchdog = true;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_flash_maintenance_set_options(
+                  &maintenance, &desired, NX_FLASH_MAINTAIN_OPTIONS, 1000U));
+    nx_flash_maintenance_snapshot_t snapshot{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_flash_maintenance_snapshot(&maintenance, &snapshot));
+    EXPECT_EQ(0x81U, snapshot.options.write_protected_sectors);
+    EXPECT_TRUE(snapshot.options.hardware_watchdog);
+    EXPECT_TRUE(snapshot.power_on_reset_required);
+    EXPECT_NE(0U, registers.OPTCR & FLASH_OPTCR_OPTLOCK);
+    EXPECT_FALSE(state.active);
+}
+
+TEST_F(PhysicalFlashMaintenance, MissingPulseCompletionRetainsError) {
+    uint32_t word = 0U;
+    missing_end = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_flash_maintenance_otp_program(
+                               &maintenance, 0U, &word, sizeof(word),
+                               NX_FLASH_MAINTAIN_OTP_PROGRAM, 1000U));
+    EXPECT_EQ(1U, program_pulses);
+}
+
+TEST_F(PhysicalFlashMaintenance, FailedRelockRetainsTheSharedPhysicalOwner) {
+    uint32_t word = 0U;
+    refuse_relock = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_flash_maintenance_otp_program(
+                               &maintenance, 0U, &word, sizeof(word),
+                               NX_FLASH_MAINTAIN_OTP_PROGRAM, 1000U));
+    EXPECT_TRUE(state.active);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_flash_port_erase(&face, 0U, 16384U, 1000U));
+    refuse_relock = false;
+}
+
+TEST_F(PhysicalFlashMaintenance, ForeignUnlockedOptionsCannotBeOverwritten) {
+    auto desired = OpenOptions();
+    desired.reset_on_stop = true;
+    registers.OPTCR &= ~static_cast<uint32_t>(FLASH_OPTCR_OPTLOCK);
+    uint32_t before = registers.OPTCR;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_flash_maintenance_set_options(
+                  &maintenance, &desired, NX_FLASH_MAINTAIN_OPTIONS, 1000U));
+    EXPECT_EQ(before, registers.OPTCR);
+    EXPECT_EQ(FLASH_CR_LOCK, registers.CR);
+}
+
+TEST_F(PhysicalFlashMaintenance, InfiniteAndExpiredDeadlinesNeverUnlockOtp) {
+    uint32_t word = 0U;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_maintenance_otp_program(
+                  &maintenance, 0U, &word, sizeof(word),
+                  NX_FLASH_MAINTAIN_OTP_PROGRAM, NX_DEADLINE_NEVER));
+    EXPECT_EQ(NX_ERROR_TIMEOUT,
+              nx_flash_maintenance_otp_lock(&maintenance, 0U,
+                                            NX_FLASH_MAINTAIN_OTP_LOCK, 0U));
+    EXPECT_EQ(0U, program_pulses);
+    EXPECT_EQ(FLASH_CR_LOCK, registers.CR);
+}
+
+TEST_F(PhysicalFlashMaintenance, MaintenanceOutputCannotOverwriteItsOwner) {
+    EXPECT_EQ(NX_ERROR_INVALID, nx_flash_maintenance_otp_read(
+                                    &maintenance, 0U, &state, sizeof(state)));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_maintenance_snapshot(
+                  &maintenance,
+                  reinterpret_cast<nx_flash_maintenance_snapshot_t*>(&state)));
+    EXPECT_EQ(FLASH_CR_LOCK, registers.CR);
+}
+
+TEST_F(PhysicalFlashMaintenance, ForeignPendingVectorRemainsOwnedOnOtpReject) {
+    uint32_t word = 0U;
+    irq_pending = true;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_flash_maintenance_otp_program(
+                                 &maintenance, 0U, &word, sizeof(word),
+                                 NX_FLASH_MAINTAIN_OTP_PROGRAM, 1000U));
+    EXPECT_TRUE(irq_pending);
+    EXPECT_EQ(0U, program_pulses);
+    irq_pending = false;
 }

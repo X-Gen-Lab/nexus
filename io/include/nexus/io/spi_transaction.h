@@ -25,6 +25,9 @@ extern "C" {
  *                  16-bit spans are uint16_t-aligned. Descriptor and TX storage
  *                  stay immutable until return. RX never overlaps descriptors,
  *                  TX storage, other RX spans or the completion output.
+ *                  A 16-bit element is a numeric uint16_t in native storage;
+ *                  the selected bit order controls wire serialization. No
+ *                  byte-order conversion or implicit scratch buffer exists.
  * Ordinary byte-span SPI remains a separate unchanged interface.
  */
 typedef struct {

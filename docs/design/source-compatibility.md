@@ -27,11 +27,8 @@ provider、生成 bindings 和调用者；当前不交付稳定二进制 ABI。�
 使尚未实现的 schema 获得支持。SDK manifest 增加一个被 file-map 覆盖的源码文件，
 不等于修改 manifest 格式。
 
-软件候选另有封存格式版本。新封存使用第 2 版，保留各 scope 的实际原件并重新
-核验范围语义；这不改变 factory epoch 或 TOML schema。第 1 版冻结候选只能通过
-显式 `--legacy-replay` 做历史声明与字节闭包的只读重放，不能重新建立当前范围
-资格，也不执行归档中的 Python。核验时观察的工具身份不补造执行时工具身份；
-原始记录没有建立的执行输入认证仍需明确保留。
+历史候选封存格式保留在其固定源码中；当前平台不提供候选封存或 legacy replay
+入口。阅读原始报告不改变本次源码或产物的验收状态。
 
 类型化源码接口第 2 代只接受严格 TOML 解析后的不可变装配对象；生产 resolver、
 factory 和 emitter 使用具名字段，不提供字典接口或 schema-1 JSON 装配兼容。
@@ -137,7 +134,7 @@ FreeRTOS 使用仅修改根 `.gitmodules` 中两个已知 URL 的组织提交，
 
 ```sh
 python tools/dev/dev.py prepare --scope native --allow-network
-python tools/dev/dev.py prepare --preset stm32-nucleo-h743-baremetal-uart --allow-network
+python tools/dev/dev.py prepare --preset stm32-qiming-baremetal --allow-network
 ```
 
 准备工具先审查源码拥有的完整声明和 Gitlink，再同步、初始化明确选中的顶层路径。

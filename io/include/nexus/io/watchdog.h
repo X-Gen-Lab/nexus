@@ -1,7 +1,7 @@
 /**
  * \file            watchdog.h
  *
- * \brief           Irreversible IWDG effects and neutral hardware reset
+ * \brief           Irreversible watchdog effects and neutral hardware reset
  *                  causes.
  *
  * \author          Nexus Team
@@ -22,7 +22,7 @@ extern "C" {
 #define NX_RESET_LOW_POWER 32u
 #define NX_RESET_BROWNOUT  64u
 /**
- * \brief           Hardware-selected timeout bounds, including declared LSI
+ * \brief           Hardware-selected timeout bounds, including declared clock
  *                  uncertainty.
  *
  * \note            A zero minimum and maximum mean the timeout bounds are
@@ -34,6 +34,9 @@ extern "C" {
  *                  setting. A provider without CPU debug-control access
  *                  supports false only; that value does not observe or
  *                  describe an external debugger's setting.
+ *                  An unproved activation write may retain enabled and
+ *                  irreversible effects; the provider never retries it
+ *                  implicitly or infers safe shutdown from failed readback.
  */
 typedef struct {
     uint32_t minimum_timeout_us;
@@ -67,7 +70,8 @@ struct nx_watchdog_port {
 };
 
 /**
- * \brief           Enable IWDG and report its effect and known timing bounds;
+ * \brief           Enable the selected watchdog and report its effect and
+ *                  known timing bounds;
  *                  activation is irreversible.
  *
  * \param[in,out]   port: Fixed provider; product owns feed/recovery policy.
@@ -95,18 +99,24 @@ struct nx_watchdog_port {
  *                  feed, state and platform stop. Install IRQ feeding only
  *                  after this call returns; activation does not support a
  *                  concurrent reload during shadow-register programming.
+ *                  A window provider rejects timeouts that leave no admitted
+ *                  feed window. Counter ticks and unknown prescaler phase do
+ *                  not establish an exact wall-clock interval.
  */
 nx_result_t nx_watchdog_port_enable(const nx_watchdog_port_t* port,
                                     uint32_t timeout_us, bool debug_freeze,
                                     nx_watchdog_state_t* state);
 /**
- * \brief           Feed an enabled IWDG without changing product health
+ * \brief           Feed an enabled watchdog without changing product health
  *                  policy.
  *
  * \param[in,out]   port: Fixed enabled provider with one serialized feed
  *                  owner.
  *
- * \return          Success or INVALID/STATE; bounded task/IRQ, no allocation.
+ * \return          Success, INVALID/CONTEXT, or STATE when no feed is admitted.
+ *                  A window provider returns BUSY for an early feed and STATE
+ *                  for its guarded late boundary; neither reloads or waits.
+ *                  Task/IRQ execution is bounded and allocation-free.
  */
 nx_result_t nx_watchdog_port_feed(const nx_watchdog_port_t* port);
 /**
@@ -116,8 +126,8 @@ nx_result_t nx_watchdog_port_feed(const nx_watchdog_port_t* port);
  *
  * \param[out]      state: Current hardware/remembered initialization state.
  *
- * \return          Success or INVALID; UNSUPPORTED retains observed hardware
- *                  effects with both timeout bounds zero when those bounds
+ * \return          Success or INVALID/CONTEXT/STATE; UNSUPPORTED retains
+ * observed hardware effects with both timeout bounds zero when those bounds
  *                  cannot be established. Never infer a disabled watchdog
  *                  from a failed query or unknown timeout.
  */

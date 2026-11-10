@@ -1,21 +1,26 @@
 /**
  * \file            advanced_pwm.c
- * \brief           Direct SDK register specialization; no runtime MMIO table
+ * \brief           TIM1 complementary groups share the reviewed C engine
  * \author          Nexus Team
  * \version         1.0.0
- * \date            2026-10-11
+ * \date            2026-11-10
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_timer_advanced.h"
-#include "stm32f407xx.h"
+#include "stm32f407_timer_pins.h"
 #define NX_ADV_CR1        (TIM1->CR1)
+#define NX_ADV_REGISTERS  TIM1
 #define NX_ADV_SMCR       (TIM1->SMCR)
 #define NX_ADV_RCR        (TIM1->RCR)
 #define NX_ADV_CR2        (TIM1->CR2)
 #define NX_ADV_PSC        (TIM1->PSC)
 #define NX_ADV_ARR        (TIM1->ARR)
-#define NX_ADV_CCR        (TIM1->CCR1)
-#define NX_ADV_CCMR       (TIM1->CCMR1)
+#define NX_ADV_CCR1       (TIM1->CCR1)
+#define NX_ADV_CCR2       (TIM1->CCR2)
+#define NX_ADV_CCR3       (TIM1->CCR3)
+#define NX_ADV_CCMR1      (TIM1->CCMR1)
+#define NX_ADV_CCMR2      (TIM1->CCMR2)
 #define NX_ADV_CCER       (TIM1->CCER)
 #define NX_ADV_DIER       (TIM1->DIER)
 #define NX_ADV_EGR        (TIM1->EGR)
@@ -23,16 +28,14 @@
 #define NX_ADV_BDTR       (TIM1->BDTR)
 #define NX_ADV_INITIALIZE nx_stm32_advanced_pwm_initialize
 #define NX_ADV_IRQ        nx_stm32_advanced_pwm_irq
+#define NX_ADV_RELEASE    nx_stm32_advanced_pwm_release
 #define NX_ADV_OPS        nx_stm32_advanced_pwm_ops
-#define NX_ADV_HZ         168000000U
-#define NX_ADV_CLOCK_READY()                                                   \
+#define NX_ADV_HZ         NEXUS_APB2_TIMER_HZ
+#define NX_ADV_BREAK_MASK 4096U
+#define NX_ADV_CLOCK_READY(channel)                                            \
     ((RCC->APB2ENR & RCC_APB2ENR_TIM1EN) != 0U &&                              \
-     (RCC->CFGR & RCC_CFGR_PPRE2) == RCC_CFGR_PPRE2_DIV2 &&                    \
-     (RCC->AHB1ENR & (RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN)) ==           \
-         (RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN) &&                        \
-     ((GPIOA->MODER >> 16U) & 3U) == 2U && (GPIOA->AFR[1] & 15U) == 1U &&      \
-     ((GPIOB->MODER >> 24U) & 15U) == 10U &&                                   \
-     ((GPIOB->AFR[1] >> 16U) & 255U) == 17U)
+     (RCC->CFGR & RCC_CFGR_PPRE2) == (NEXUS_CLOCK_CFGR & RCC_CFGR_PPRE2) &&    \
+     nx_stm32_advanced_pins_ready(TIM1, (channel)))
 #define NX_ADV_INPUT_VALID(p) ((p) == &GPIOB->IDR)
-#define NX_ADV_RELEASE        nx_stm32_advanced_pwm_release
+#define NX_ADV_ACCESS_READY() ((RCC->APB2ENR & RCC_APB2ENR_TIM1EN) != 0U)
 #include "advanced_pwm_impl.h"

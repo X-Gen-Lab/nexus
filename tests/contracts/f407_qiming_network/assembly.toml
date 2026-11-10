@@ -27,3 +27,7 @@ drain_timeout_us = 1000
 [eth_frames.mac.irq]
 priority = 5
 calls_os = false
+
+[entropy.random]
+binding = "rng"
+mode = "rng-words"

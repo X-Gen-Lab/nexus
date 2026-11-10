@@ -6,6 +6,8 @@
 #ifndef NEXUS_STM32_UART_COLD_FACTORY_MODEL_H
 #define NEXUS_STM32_UART_COLD_FACTORY_MODEL_H
 #include "stm32_control_cold_model.h"
+#define NX_UART_REG_WRITE(address, value)                                      \
+    nx_platform_cold_model_write((address), (uint32_t)(value))
 #ifdef NX_COLD_HAL
 #include "../cmake/stm32_scs_model.h"
 #include "stm32f4xx_hal.h"
@@ -41,4 +43,14 @@ uint32_t nx_uart_cold_model_priority_read(IRQn_Type irq);
 #define NVIC_ClearPendingIRQ(irq) nx_uart_cold_model_pending_clear(irq)
 #undef NVIC_GetPriority
 #define NVIC_GetPriority(irq) nx_uart_cold_model_priority_read(irq)
+#ifdef NX_COLD_WIRE_CASES
+#ifdef __cplusplus
+extern "C" {
+#endif
+void nx_uart_cold_wire_enable(USART_TypeDef* registers);
+#ifdef __cplusplus
+}
+#endif
+#define NX_STM32_UART_ENABLE(registers) nx_uart_cold_wire_enable(registers)
+#endif
 #endif

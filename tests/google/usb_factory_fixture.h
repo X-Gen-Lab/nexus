@@ -140,6 +140,8 @@ class UsbFactory : public testing::Test {
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         RCC->PLLCFGR = 8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U);
         RCC->CR = RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
+        RCC->CFGR = RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL | RCC_CFGR_PPRE1_DIV4 |
+                    RCC_CFGR_PPRE2_DIV2;
         face = nx_factory_usb_device(NX_USB_DEVICE_ID_FS);
         bulk = nx_factory_usb_endpoint(NX_USB_ENDPOINT_ID_BULK_IN);
         ASSERT_NE(face, nullptr);

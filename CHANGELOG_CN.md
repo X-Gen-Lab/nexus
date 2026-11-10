@@ -8,7 +8,19 @@
 
 ## [Unreleased]
 
-后续变更在此记录。
+### 变更
+
+- 将生产 MCU 接入统一到共享 STM32F4 provider，以精确 STM32F407VE/ZG 事实和
+  静态强类型 factory 选型。硬件行为全部由 C11 实现，生成器仅装配配置和固定连接。
+- 扩展已审查的串行、定时器/ADC/DAC、存储、Ethernet、RTC 和监督模式；新增
+  I2C target/SMBus、DCMI/I2S、USB Host 与显式 OTG。可选 ST USB 中间件封装在
+  私有桥接内，按选择编译。
+- 整合所选 ClockPlan、suspend/resume、STOP 与显式 RTC/Standby 交接；排空失败
+  继续保留 owner 和原始 request 存储。
+- 用静态 Audio factory 替代手工 F407 I2S2 组件。中英文设计文档明确精确模式、
+  所有权和集成限制。
+
+软件模型与所选 ARM 消费者仅建立软件证据；物理 HIL、电气行为和实测性能尚未验收。
 
 ## [0.2.1] - 2026-11-02 (Asia/Shanghai)
 
@@ -148,7 +160,7 @@ MCU 实板 HIL 继续为 `not_executed`。通用 bootloader 交接、动态变�
 
 MCU 实板 HIL 保持 `not_executed`。源码分发、host 模型、ARM 链接和文档发布
 不建立物理时序、电气安全、签名产品资格、认证或 LTS。精确支持、核验和剩余
-验收见[发行指南](docs/status/release-0.1.0.md)，原始记录见
+验收见[发行指南](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/status/release-0.1.0.md)，原始记录见
 [当前交付](docs/delivery/README.md)。
 
 ## 重构前历史（已被替代）

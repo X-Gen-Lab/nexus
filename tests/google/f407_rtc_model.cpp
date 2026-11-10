@@ -50,9 +50,21 @@ uint32_t nx_f407_rtc_model_read(volatile uint32_t* p) {
     if (p == &m.rtc.ISR) {
         if ((m.rtc.ISR & RTC_ISR_INIT) && !m.hold_init)
             m.rtc.ISR |= RTC_ISR_INITF;
-        if (!(m.rtc.CR & RTC_CR_ALRAE) && !m.hold_alarm)
+        if (!(m.rtc.CR & RTC_CR_ALRAE) && !m.hold_alarm &&
+            !m.hold_standby_flags)
             m.rtc.ISR |= RTC_ISR_ALRAWF;
+        if (!(m.rtc.CR & RTC_CR_ALRBE) && !m.hold_alarm_b &&
+            !m.hold_standby_flags)
+            m.rtc.ISR |= RTC_ISR_ALRBWF;
+        if (!(m.rtc.CR & RTC_CR_WUTE) && !m.hold_wakeup &&
+            !m.hold_standby_flags)
+            m.rtc.ISR |= RTC_ISR_WUTWF;
+        if ((m.rtc.ISR & RTC_ISR_RECALPF) && !m.hold_recalibration &&
+            ++m.recalibration_reads >= 3U)
+            m.rtc.ISR &= ~uint32_t{RTC_ISR_RECALPF};
     }
+    if (p == &m.power.CSR && (m.power.CSR & PWR_CSR_BRE) && !m.hold_regulator)
+        m.power.CSR |= PWR_CSR_BRR;
     if (p == &m.rtc.SSR || p == &m.rtc.TR || p == &m.rtc.DR) {
         ++m.calendar_reads;
         if (m.reload_pending && m.hold_reload) {
@@ -69,11 +81,24 @@ uint32_t nx_f407_rtc_model_read(volatile uint32_t* p) {
 void nx_f407_rtc_model_write(volatile uint32_t* p, uint32_t v) {
     auto& m = g_f407_rtc_model;
     ++m.writes;
+    if (m.observe_write != nullptr)
+        m.observe_write(p, v);
     if (p == &m.rcc.AHB1ENR) {
+        if ((v & RCC_AHB1ENR_BKPSRAMEN) && m.hold_sram_gate)
+            return;
+        if (!(v & RCC_AHB1ENR_BKPSRAMEN) && m.hold_sram_gate_disable)
+            return;
         if ((v & RCC_AHB1ENR_GPIOCEN) && m.hold_gpio_clock_enable)
             return;
         if (!(v & RCC_AHB1ENR_GPIOCEN) && m.hold_gpio_clock_restore)
             return;
+    }
+    if (p == &m.power.CSR && !(v & PWR_CSR_BRE) && m.hold_regulator_disable)
+        return;
+    if (p == &m.exti.PR) {
+        if (!m.hold_clear)
+            m.exti.PR &= ~v;
+        return;
     }
     if (p == &m.rcc.BDCR && (v & RCC_BDCR_BDRST))
         ++m.backup_resets;
@@ -121,7 +146,8 @@ void nx_f407_rtc_model_write(volatile uint32_t* p, uint32_t v) {
             }
             return;
         }
-        if ((p == &m.rtc.TR || p == &m.rtc.DR || p == &m.rtc.PRER) &&
+        if ((p == &m.rtc.TR || p == &m.rtc.DR || p == &m.rtc.PRER ||
+             p == &m.rtc.CALIBR) &&
             !(m.rtc.ISR & RTC_ISR_INITF)) {
             ++m.illegal_writes;
             return;
@@ -136,12 +162,38 @@ void nx_f407_rtc_model_write(volatile uint32_t* p, uint32_t v) {
             ++m.illegal_writes;
             return;
         }
+        if ((p == &m.rtc.ALRMBR || p == &m.rtc.ALRMBSSR) &&
+            !(m.rtc.ISR & RTC_ISR_ALRBWF)) {
+            ++m.illegal_writes;
+            return;
+        }
+        if (p == &m.rtc.WUTR && !(m.rtc.ISR & RTC_ISR_WUTWF)) {
+            ++m.illegal_writes;
+            return;
+        }
+        if (p == &m.rtc.CALR) {
+            if (m.rtc.ISR & RTC_ISR_RECALPF) {
+                ++m.illegal_writes;
+                return;
+            }
+            m.rtc.ISR |= RTC_ISR_RECALPF;
+            m.recalibration_reads = 0U;
+        }
         if (p == &m.rtc.CR) {
             if (m.hold_alarm && !(v & RTC_CR_ALRAE) &&
                 (m.rtc.CR & RTC_CR_ALRAE))
                 return;
             if (v & RTC_CR_ALRAE)
                 m.rtc.ISR &= ~uint32_t{RTC_ISR_ALRAWF};
+            if (m.hold_alarm_b && !(v & RTC_CR_ALRBE) &&
+                (m.rtc.CR & RTC_CR_ALRBE))
+                return;
+            if (m.hold_wakeup && !(v & RTC_CR_WUTE) && (m.rtc.CR & RTC_CR_WUTE))
+                return;
+            if (v & RTC_CR_ALRBE)
+                m.rtc.ISR &= ~uint32_t{RTC_ISR_ALRBWF};
+            if (v & RTC_CR_WUTE)
+                m.rtc.ISR &= ~uint32_t{RTC_ISR_WUTWF};
         }
     }
     *p = v;
@@ -150,7 +202,12 @@ bool nx_f407_rtc_privileged(void) {
     return g_f407_rtc_model.privileged;
 }
 bool nx_f407_rtc_masked(void) {
-    return g_f407_rtc_model.masked;
+    return g_f407_rtc_model.masked || g_f407_rtc_model.basepri != 0U ||
+           g_f407_rtc_model.faultmask != 0U;
+}
+nx_arch_irq_masks_t nx_f407_rtc_masks(void) {
+    return {g_f407_rtc_model.masked ? 1U : 0U, g_f407_rtc_model.basepri,
+            g_f407_rtc_model.faultmask};
 }
 bool nx_f407_rtc_in_isr(void) {
     return g_f407_rtc_model.in_isr;
@@ -172,9 +229,11 @@ uint32_t nx_f407_rtc_model_irq_active(IRQn_Type irq) {
     return g_f407_rtc_model.irq_active[irq_index(irq)];
 }
 
+#if !defined(NX_F407_RTC_REAL_SYSTEM)
 extern "C" nx_time_us_t nx_stm32_system_now(nx_stm32_system_t* system) {
     if (system != &g_nx_stm32_system)
         return 0U;
     ++g_f407_rtc_model.clock_reads;
     return g_f407_rtc_model.now;
 }
+#endif

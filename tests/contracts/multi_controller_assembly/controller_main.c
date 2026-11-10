@@ -17,6 +17,12 @@ int main(void) {
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_uart(id);
     }
+#ifdef NX_FIXTURE_UART_WORD
+    s_identity_count = NX_UART_WORD_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_uart_word(id);
+    }
+#endif
     s_identity_count = NX_SPI_ID_COUNT;
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_spi(id);
@@ -25,10 +31,62 @@ int main(void) {
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_i2c(id);
     }
+    s_identity_count = NX_PWM_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_pwm(id);
+    }
+    s_identity_count = NX_ADC_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_adc(id);
+    }
+    s_identity_count = NX_WATCHDOG_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_watchdog(id);
+    }
+    if (NX_EXTI_ID_COUNT != 0U) {
+        s_identity_count = NX_EXTI_ID_COUNT;
+        for (uint16_t id = 0U; id < s_identity_count; ++id) {
+            s_observed_identity = nx_factory_exti(id);
+        }
+    }
+    if (NX_ADVANCED_PWM_ID_COUNT != 0U) {
+        s_identity_count = NX_ADVANCED_PWM_ID_COUNT;
+        for (uint16_t id = 0U; id < s_identity_count; ++id) {
+            s_observed_identity = nx_factory_advanced_pwm(id);
+        }
+    }
+    if (NX_TIMER_CAPTURE_ID_COUNT != 0U) {
+        s_identity_count = NX_TIMER_CAPTURE_ID_COUNT;
+        for (uint16_t id = 0U; id < s_identity_count; ++id) {
+            s_observed_identity = nx_factory_timer_capture(id);
+        }
+    }
+#ifdef NX_FIXTURE_ENCODER
+    s_identity_count = NX_ENCODER_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_encoder(id);
+    }
+#endif
     s_identity_count = NX_SPI_DEVICE_ID_COUNT;
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_spi_device(id);
     }
+#ifdef NX_FIXTURE_SPI_TRANSACTION
+    s_identity_count = NX_SPI_TRANSACTION_DEVICE_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_spi_transaction_device(id);
+    }
+#endif
+#ifdef NX_FIXTURE_SPI_DMA_TRANSACTION
+    s_identity_count = NX_SPI_DMA_TRANSACTION_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_spi_dma_transaction(id);
+    }
+    s_identity_count = NX_SPI_DMA_TRANSACTION_DEVICE_ID_COUNT;
+    for (uint16_t id = 0U; id < s_identity_count; ++id) {
+        s_observed_identity = nx_factory_spi_dma_transaction_device(id);
+    }
+#endif
     s_identity_count = NX_I2C_DEVICE_ID_COUNT;
     for (uint16_t id = 0U; id < s_identity_count; ++id) {
         s_observed_identity = nx_factory_i2c_device(id);

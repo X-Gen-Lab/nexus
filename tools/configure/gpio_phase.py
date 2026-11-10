@@ -30,8 +30,12 @@ def selected_pins(result):
 
 
 def applies(result):
-    return (getattr(for_selection(result), "GPIO_PHASE", None) is not None
-            and bool(selected_pins(result)))
+    policy = getattr(for_selection(result), "GPIO_PHASE", None)
+    if policy is None:
+        return False
+    requires_admission = getattr(policy, "requires_admission", None)
+    return bool(selected_pins(result)) or (
+        requires_admission is not None and requires_admission(result))
 
 
 def _banks(result):

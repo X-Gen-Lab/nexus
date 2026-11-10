@@ -17,7 +17,7 @@ typedef struct {
  * \brief           Validate complete device, configuration or string
  *                  descriptor bytes.
  *
- * \param[in]       profile: Immutable exact selected FS endpoint facts.
+ * \param[in]       profile: Immutable exact selected FS/HS endpoint facts.
  *
  * \param[in]       descriptor: Complete external descriptor; never
  *                  copied/retained.
@@ -26,10 +26,16 @@ typedef struct {
  *                  output effects.
  *
  * \note            Configuration views require alternate zero, endpoint plans
- *                  matching selected bulk or interrupt IN ports, consistent
- *                  totals and unique interface numbers. Interrupt bInterval is
- *                  a nonzero linear count of full-speed 1 ms frames in external
- *                  descriptor bytes. Bulk bInterval is not interpreted; no
+ *                  matching selected bulk, interrupt or ISO ports, consistent
+ *                  totals and unique interface numbers. ISO bInterval is
+ *                  1..16, an exponent of FS frames or HS microframes; ISO
+ *                  synchronization/usage encodings remain class policy after
+ *                  reserved-value validation. Only one transaction is selected;
+ *                  HS high-bandwidth multipliers return UNSUPPORTED.
+ *                  Interrupt bInterval in external descriptor bytes is a
+ *                  1..255 linear count of 1 ms frames at FS, or a 1..16
+ *                  exponent of 125 us microframes at HS. Bulk bInterval is not
+ *                  interpreted; no
  *                  polling is scheduled. Class-specific subordinate bytes are
  *                  bounds-checked but not decoded. Class dispatch, VID/PID,
  *                  strings, policy, CDC/HID and descriptor lookup remain

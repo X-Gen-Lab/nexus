@@ -93,69 +93,7 @@ resource and competing claims, including owner, mode and source. These records
 locate authored inputs without silently correcting them.
 CLI argument syntax errors retain argparse diagnostics and exit code 2.
 
-## Preview the maintained software plan
-
-The plan/artifact commands, Settings, wait selection and serial extensions in
-this iteration require a development checkout containing those changes. They do
-not modify the published `v0.2.1` archive; installed-SDK support follows actual
-verification of the corresponding new SDK.
-
-From the fixed development checkout, inspect the existing complete software plan
-before starting expensive validation:
-
-```sh
-python tools/dev/dev.py plan \
-    --output-root /tmp/nexus-planned-run-001 \
-    --json /tmp/nexus-plan-001.json
-```
-
-Choose a new JSON path in an existing parent directory; the future run directory
-is not created. The preview derives ordered commands, deadlines, selection
-reasons, checker and preset metadata, and input identities from the maintained
-plan. It does not execute a process, install tools, use equipment or access the
-network. With no observation, case counts remain unknown and the operation
-needs no prior test run. `--preset` filtering is rejected; the complete authored
-plan remains the selection authority.
-
-To include previously observed cases, first build the selected Native preset,
-then explicitly collect case-list evidence with the existing Native producer:
-
-```sh
-python scripts/ci/native_contracts.py --preset native-debug --observe-only
-python tools/dev/dev.py plan \
-    --output-root /tmp/nexus-planned-run-002 \
-    --observation native-debug=build/native-debug/tdd/io-property-inputs.json \
-    --json /tmp/nexus-observed-plan-002.json
-```
-
-`--observe-only` executes each manifest binary's unfiltered case-list process;
-it does not execute test cases or CTest, and writes no execution-success summary.
-Prior summaries and snapshots retain unique `before-observe` paths. The normal
-producer still executes the complete CTest and Google plan, including disabled
-cases. The same snapshot binds all manifest binaries, their object contexts and
-a deduplicated conservative superset of current materialized compiler inputs,
-shared dependencies and linked files. Ninja supplies the metadata through
-original command receipts; preview itself never launches Ninja. These facts
-bind current bytes, without proving a fresh compilation or inventing another
-build graph. See the [development tool contract](../../tools/dev/README.md) for
-bounds and exact receipt requirements.
-
-Preview accepts an explicit observation only while its source, objects, headers,
-archives, binaries, metadata and successful original discovery receipts still
-match. Receipts must belong to this build and follow its snapshot. Stale,
-failed, changed or incomplete observations reject; a relocated checkout or SDK
-needs a new observation. Parameterized and disabled identities are preserved.
-Cases present in the reviewed lifecycle catalogue show its invariant and
-limitations; unreviewed cases remain `unknown`, without a coverage percentage.
-The displayed result means “previously observed and current inputs match”; it
-never means these cases executed during preview or passed.
-
-Known host stages need no equipment. A HIL preparation stage can show declared
-fixture tests and pending measurements, but missing resolved configuration stays
-`configuration_pending`; routes and station facts are not guessed. Unknown
-hardware needs stay `unknown`, and physical status stays `not_executed`.
-Every preview stage remains `not_executed` and qualification remains false.
-Remove only your own preview JSON when no longer needed.
+## Inspect actual build outputs
 
 After a successful build, inspect its captured outputs without guessing which
 ELF belongs to the selected configuration. Replace the path below with that

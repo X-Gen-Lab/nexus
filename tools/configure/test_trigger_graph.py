@@ -106,15 +106,13 @@ class TriggerGraphTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             graph.resolve([node("a")], [], startup=[([], "a")])
 
-    def test_fixed_g474_adc_chain_uses_existing_reviewed_facts(self):
+    def test_selected_f407_adc_events_keep_owned_start_and_stop_order(self):
         selected = [{"id": "samples", "kind": "adc", "mode": "trigger-dma",
-                     "controller": "ADC1", "route": "adc1-pa0",
-                     "dma": ["DMA1:stream1:channel5"]}]
-        routes = {"adc1-pa0": {"mode_resources": {
-            "trigger-dma": ["controller:TIM6"]}}}
-        plan = graph.resolve_fixed(selected, routes)
+                     "controller": "ADC2", "trigger": "tim5-ch2",
+                     "dma": ["DMA2:stream2:channel1"]}]
+        plan = graph.resolve_fixed(selected, adc_triggers={"tim5-ch2": "TIM5"})
         self.assertEqual(len(plan.edges), 2)
-        self.assertEqual(plan.edges[0].event, "update")
+        self.assertEqual(plan.edges[0].event, "compare2")
         self.assertEqual(plan.edges[0].action, "sample")
         self.assertEqual(plan.startup_order[-1], "samples:trigger")
         self.assertEqual(len({item.clock_domain for item in plan.nodes}), 3)
@@ -122,7 +120,7 @@ class TriggerGraphTests(unittest.TestCase):
 
     def test_fixed_non_trigger_modes_have_no_invented_event_graph(self):
         selected = [{"id": "uart", "kind": "uart", "mode": "dma-tx"}]
-        self.assertEqual(graph.resolve_fixed(selected, {}).edges, ())
+        self.assertEqual(graph.resolve_fixed(selected).edges, ())
 
     def test_validated_json_projection_freezes_sequences(self):
         plan = graph.resolve([node("a")], [edge("a", "a")], loops=[{

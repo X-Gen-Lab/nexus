@@ -66,6 +66,8 @@ add_library(nexus_arch INTERFACE)
 add_library(Nexus::Arch ALIAS nexus_arch)
 add_library(nexus_clock_domain INTERFACE)
 add_library(Nexus::ClockDomain ALIAS nexus_clock_domain)
+add_library(nexus_rtc INTERFACE)
+add_library(Nexus::IORTC ALIAS nexus_rtc)
 add_library(nexus_build_options INTERFACE)
 add_library(nexus_owned_warnings INTERFACE)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION {"OFF" if lto else "ON"})
@@ -86,7 +88,7 @@ function(collect_sleep_sources directory result)
     foreach(target IN LISTS targets)
         get_target_property(units "${{target}}" SOURCES)
         foreach(unit IN LISTS units)
-            if(unit MATCHES "(^|/)sleep[.]c$")
+            if(unit MATCHES "(^|/)(sleep|power)[.]c$")
                 list(APPEND sources "${{unit}}")
             endif()
         endforeach()
@@ -146,25 +148,29 @@ endif()
         self.assertEqual(properties["selected"], "TRUE")
         provider = ROOT / source_directory(family)
         self.assertEqual(properties["SOURCES"],
-                         (provider / "sleep.c").as_posix())
+                         ";".join((provider / unit).as_posix()
+                                  for unit in ("sleep.c", "power.c")))
         self.assertEqual(properties["sleep_sources"],
                          properties["SOURCES"])
         private_imports = {
             (provider / "private").as_posix(),
             (ROOT / "components/clock_domain/private").as_posix(),
         }
+        public_imports = {(provider / "include").as_posix()}
         sdk_imports = {
             (ROOT / "vendors/st/cmsis_device_f4/Include").as_posix(),
         }
         definitions = {"STM32F407xx"}
         self.assertEqual(set(properties["INCLUDE_DIRECTORIES"].split(";")),
-                         private_imports | sdk_imports)
-        self.assertEqual(properties["INTERFACE_INCLUDE_DIRECTORIES"],
-                         "value-NOTFOUND")
+                         private_imports | public_imports | sdk_imports)
+        self.assertEqual(
+            set(properties["INTERFACE_INCLUDE_DIRECTORIES"].split(";")),
+            public_imports)
         self.assertEqual(set(properties["COMPILE_DEFINITIONS"].split(";")),
                          definitions)
         self.assertEqual(set(properties["LINK_LIBRARIES"].split(";")), {
-            "Nexus::ClockDomain", "Nexus::Arch", "nexus_build_options",
+            "Nexus::ClockDomain", "Nexus::IORTC", "Nexus::Arch",
+            "nexus_build_options",
             "nexus_owned_warnings", "nexus_cmsis_core",
         })
         arguments = properties["compile_arguments"]
@@ -176,7 +182,8 @@ endif()
             elif argument.startswith("-I"):
                 includes.add(argument[2:])
         core = (ROOT / "vendors/arm/CMSIS_6/CMSIS/Core/Include").as_posix()
-        self.assertEqual(includes, private_imports | sdk_imports | {core})
+        self.assertEqual(
+            includes, private_imports | public_imports | sdk_imports | {core})
         self.assertEqual(properties["EXCLUDE_FROM_ALL"], "TRUE")
         self.assertEqual(properties["INTERPROCEDURAL_OPTIMIZATION"], "ON")
         self.assertEqual(properties["C_COMPILER_LAUNCHER"],

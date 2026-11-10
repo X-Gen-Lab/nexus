@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_can.h"
+#include "stm32f407_clock.h"
 #include "stm32f407xx.h"
 #include <stddef.h>
 
@@ -83,7 +84,7 @@ nx_result_t nx_stm32_can_initialize(nx_can_controller_t* controller) {
         return NX_ERROR_INVALID;
     }
     controller->registers = address;
-    controller->clock_hz = 42000000U;
+    controller->clock_hz = NEXUS_APB1_HZ;
     controller->max_extended_id_mailbox0 = false;
     const int16_t vectors[2][4] = {
         {CAN1_TX_IRQn, CAN1_RX0_IRQn, CAN1_RX1_IRQn, CAN1_SCE_IRQn},

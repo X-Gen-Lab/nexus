@@ -20,3 +20,17 @@ nx_result_t nx_platform_lifecycle_stop(const nx_platform_lifecycle_plan_t* plan,
                                        nx_platform_diagnostic_t* diagnostic) {
     return nx_platform_lifecycle_stop_local(plan, state, diagnostic, plan);
 }
+
+nx_result_t
+nx_platform_lifecycle_suspend(const nx_platform_lifecycle_plan_t* plan,
+                              nx_platform_lifecycle_state_t* state,
+                              nx_platform_diagnostic_t* diagnostic) {
+    return nx_platform_lifecycle_suspend_local(plan, state, diagnostic, plan);
+}
+
+nx_platform_start_result_t
+nx_platform_lifecycle_resume(const nx_platform_lifecycle_plan_t* plan,
+                             nx_platform_lifecycle_state_t* state,
+                             nx_platform_diagnostic_t* diagnostic) {
+    return nx_platform_lifecycle_resume_local(plan, state, diagnostic, plan);
+}

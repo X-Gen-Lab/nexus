@@ -66,30 +66,20 @@ Automation proves execution, while retained development logs document historical
 RED/GREEN order. Pure prose or diagram edits need corresponding document checks
 and semantic review rather than mirrored implementation tests.
 
-## Associate a complete local software plan with a pull request
+## Run local validation when Actions is unavailable
 
-When GitHub Actions is unavailable, `tools/maintenance/local_ci.py` checks an
-existing execution of the maintained `tools/dev/plans/software.json`. The default
-mode is read-only: it verifies actual complete stages, command receipts, clean
-source, inputs and the same plan before reporting the exact source and scope.
-It does not run the plan or convert interrupted or partial reports into success.
+Use the same maintained entry points as CI. The complete TDD gate above runs
+Native GoogleTest and all four tool domains; independent runtime validation uses
+`native_contracts.py` after configuring and building each of `native-debug`,
+`native-release`, `native-asan` and `native-tsan`. The retained contract suite,
+strict bilingual documentation build and independent Source SDK consumers verify
+their separate boundaries. See the [engineering handbook](../design/engineering-handbook.md)
+for scope and concurrency rules.
 
-```sh
-python tools/maintenance/local_ci.py --report /path/to/software/report.json
-```
-
-Explicit `--publish` uses an already configured authorized GitHub credential and
-an existing open PR. It checks the PR head/base twice and publishes only to the
-verified head SHA under `nexus/local-software-plan`; a later head cannot inherit
-that status. Its retained receipt distinguishes pending, confirmed and unconfirmed
-publication. Observations do not form an atomic GitHub merge transaction.
-
-This status establishes only the maintained local plan scope. It is not a GitHub
-Actions job, a sealed software candidate, a configured branch rule or a product
-release. Server rules need their own real readback; independent agent review does
-not invent a CODEOWNERS account or a human approval. The existing release workflow
-still requires its declared final-main CI jobs and trusted publication checks;
-a local status cannot silently replace those requirements.
+Record actual source commit, configuration, tool identities, commands, exit codes
+and fresh reports in the pull request. A failed, partial or interrupted run keeps
+its real result. Local execution does not establish a GitHub Actions status,
+server branch rule, software release or physical HIL result.
 
 ## Keep feedback fast and evidence complete
 
@@ -128,21 +118,10 @@ Do not cache acceptance reports, restore incompatible objects or parallelize two
 mutations of the same build tree. Full gate discovery, actual exits, output
 identities and failure/cancellation retention remain mandatory.
 
-Before running a long qualification plan, select an explicit finite outer
-command budget and a fresh canonical absolute output path outside the platform
-input checkout, without symlink or parent-path aliases. `NEXUS_COMMAND_TIMEOUT`
-supplies the default where a process call has no explicit timeout; it does not
-replace the plan's stage deadlines. The maintained software plan packages an SDK
-under its output, so the existing SDK boundary rejects an output inside the
-platform checkout or with path aliases.
-
-Check the invocation environment first: maintained provider and TrustZone
-qualification reject every `GIT_` variable, including the display-only
-`GIT_PAGER`. Omit an injected `GIT_PAGER` only from this launched process, and
-stop if other `GIT_` names remain. Follow the
-[development command reference](../../tools/dev/README.md) for the maintained
-invocation. Preserve failed and interrupted attempts; a larger retry budget and
-successful early stages do not establish a completed plan or a sealed candidate.
+The commit gate configures and builds once for unchanged staged inputs, then runs
+all Native GoogleTest cases and affected complete tool domains. Build/configuration
+policy changes run every tool domain. Complete CI runs the four Native modes and
+all maintained tool domains separately, without repeating tool tests per mode.
 
 Before deleting a test, identify its behavioral obligation and independent
 remaining coverage. Remove only an obsolete behavior or a demonstrated duplicate

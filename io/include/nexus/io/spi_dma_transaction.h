@@ -18,6 +18,9 @@ extern "C" {
  *                  word; an incrementing direction borrows words elements.
  *                  Width is common to all segments. DMA never uses the polling
  *                  segment's implicit NULL/dummy representation or scratch.
+ *                  A 16-bit element is a native uint16_t numeric word, without
+ *                  byte-order conversion. NDTR and completion counts remain
+ *                  words.
  */
 typedef struct {
     const void* tx;

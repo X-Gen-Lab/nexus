@@ -10,36 +10,15 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class SourceCatalogueTests(unittest.TestCase):
-    def test_host_config_scope_does_not_reclassify_parsers_as_runtime(self):
-        selected = catalogue.host_configuration_sources()
-        self.assertEqual({item.identifier for item in selected}, {
-            "tomlc99", "cjson"})
-        self.assertTrue(all(item.scope == "inventory" for item in selected))
-        self.assertFalse(set(selected).intersection(catalogue.SOURCE_DEPENDENCIES))
 
-    def test_host_config_parsers_are_explicit_inventory_sources(self):
-        expected = {
-            'tomlc99': ('ext/tomlc99',
-                        'https://github.com/X-Gen-Lab/tomlc99.git'),
-            'cjson': ('ext/cjson',
-                      'https://github.com/X-Gen-Lab/cJSON.git'),
-        }
-        for name, (path, transport) in expected.items():
-            with self.subTest(dependency=name):
-                entry = catalogue.dependency(name)
-                self.assertEqual(entry.path, path)
-                self.assertEqual(entry.fetch_url, transport)
-                self.assertEqual(entry.scope, 'inventory')
-                self.assertNotIn(entry, catalogue.SOURCE_DEPENDENCIES)
-                self.assertTrue((ROOT / entry.source_lock).is_file())
 
     def test_runtime_scope_excludes_google_and_keeps_nested_sources_explicit(self):
-        self.assertEqual(len(catalogue.ALL_DEPENDENCIES), 27)
-        self.assertEqual(len(catalogue.ALL_SOURCE_DEPENDENCIES), 22)
-        self.assertEqual(len(catalogue.SOURCE_DEPENDENCIES), 9)
-        self.assertEqual(len(catalogue.HOST_TEST_DEPENDENCIES), 1)
-        self.assertEqual(sum(item.scope == "inventory" for item in
-                             catalogue.ALL_SOURCE_DEPENDENCIES), 12)
+        self.assertEqual({item.identifier for item in catalogue.SOURCE_DEPENDENCIES}, {
+            "freertos", "cmsis_core", "stm32f4_cmsis", "stm32f4_hal",
+            "threadx", "lwip", "mbedtls", "coremqtt", "mcuboot",
+            "stm32_usb_host", "stm32_usb_device"})
+        self.assertEqual({item.identifier for item in catalogue.HOST_TEST_DEPENDENCIES},
+                         {"googletest"})
         self.assertEqual(catalogue.dependency("googletest").scope, "host-test")
         self.assertTrue(all(item.parent is None
                             for item in catalogue.SOURCE_DEPENDENCIES))

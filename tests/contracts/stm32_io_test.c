@@ -478,7 +478,8 @@ static void i2c_test(void) {
                                  .rate_hz = 100000U};
     const nx_i2c_port_t port_api = {&nx_stm32_i2c_ops, &port};
     (void)port_api;
-    nx_stm32_i2c_endpoint_state_t endpoint = {.port = &port, .address = 0x50U};
+    nx_stm32_i2c_endpoint_state_t endpoint = {
+        .port = &port, .address = 0x50U, .address_bits = 7U};
     const nx_i2c_endpoint_t endpoint_api = {&nx_stm32_i2c_endpoint_ops,
                                             &endpoint};
     (void)endpoint_api;
@@ -711,7 +712,7 @@ static void timer_adc_test(void) {
     assert(nx_pwm_port_stop(&pwm_api) == NX_SUCCESS && !pwm.running);
     assert((timer.CR1 & TIM_CR1_CEN) == 0U && gpio.BSRR == (64U << 16U));
     ADC_TypeDef adc = {0};
-    ADC_Common_TypeDef common = {0};
+    ADC_Common_TypeDef common = {.CCR = ADC_CCR_ADCPRE_0};
     uint8_t channels[] = {0U, 1U};
     uint8_t sampling[] = {7U, 7U};
     nx_stm32_adc_state_t port = {.registers = &adc,
@@ -729,7 +730,8 @@ static void timer_adc_test(void) {
     assert(nx_adc_port_sample(&port_api, samples, 2U, s_time + 100U, &count) ==
            NX_SUCCESS);
     assert(count == 2U && samples[0] == 2048U && samples[1] == 2049U);
-    s_delayed_barrier = 1U;
+    /* Power admission is the first barrier; delay final ADC quiescence. */
+    s_delayed_barrier = 2U;
     assert(nx_adc_port_sample(&port_api, samples, 2U, s_time + 100U, &count) ==
            NX_ERROR_TIMEOUT);
     assert(count == 2U && !port.active && adc.CR2 == 0U);

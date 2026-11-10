@@ -60,7 +60,7 @@ runtime 策略，已测路径例如 `-fno-exceptions -fno-rtti`。
 
 实际资产清单和执行收条标识 SDK、工具、依赖许可与结果；最低 Python／CMake
 声明不表示所有 host 已验证。维护的已执行 host 为 Linux，HIL 为 `not_executed`。
-历史候选保留原身份，[0.1.0 范围](../../docs/status/release-0.1.0.md)不资格化新版本。
+历史候选保留原身份，[0.1.0 范围](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/status/release-0.1.0.md)不资格化新版本。
 
 ## 完整安装消费者验证
 
@@ -89,7 +89,7 @@ typed resolver／factory、维护 assembly 和来源 lock 属于 SDK；host goog
 
 ## 器件与执行窗口消费者
 
-当前版本化消费计划由 `tools/release/transport.py` 唯一维护，在下述设备与镜像
+当前版本化消费计划由 `tools/maintenance/consumer_profiles.py` 唯一维护，在下述设备与镜像
 场景之外包括标准 Native 外置 provider 生命周期工程。每个精确的源码／构建
 根目录和链接镜像都必须执行；计划结构本身不代表验收通过。此前的设备扩展
 引入五个独立 C11 工程：F407／GD470 借用 RX、Native／F407 MCUboot Control，

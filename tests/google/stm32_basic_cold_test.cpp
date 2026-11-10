@@ -8,6 +8,7 @@
  */
 extern "C" {
 #include "stm32f407_basic_cold.h"
+#include "stm32f407_control_cold.h"
 nx_stm32_system_t g_nx_stm32_system;
 }
 #include <gtest/gtest.h>
@@ -17,12 +18,13 @@ static bool privileged;
 static bool in_isr;
 static bool masked;
 static bool refuse_restricted_speed;
+static bool refuse_gpio_speed;
 static nx_time_us_t model_time;
 class BasicCold : public testing::Test {
   protected:
     void* mapping = MAP_FAILED;
     nx_stm32_gpio_state_t gpio{};
-    nx_stm32_gpio_config_t config{GPIOD, 0x1000U, 0x1000U, true, 0U, 0U};
+    nx_stm32_gpio_config_t config{GPIOD, 0x1000U, 0x1000U, true, 0U, 0U, 0U};
     nx_stm32_flash_state_t flash{};
     nx_stm32_watchdog_state_t watchdog{};
     const nx_flash_sector_t sectors[8]{
@@ -41,6 +43,7 @@ class BasicCold : public testing::Test {
         in_isr = false;
         masked = false;
         refuse_restricted_speed = false;
+        refuse_gpio_speed = false;
         model_time = 100U;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
@@ -129,6 +132,89 @@ TEST_F(BasicCold, GPIORejectsInvalidElectricalChoicesBeforeClockOrPinWrites) {
     reject();
 }
 
+TEST_F(BasicCold, GPIOSelectsAllFourOutputSpeedsWithoutTouchingPeerPads) {
+    const uint32_t peers = UINT32_C(0xA55AA55A) & ~(3U << 24U);
+    for (uint8_t speed : {uint8_t{1U}, uint8_t{2U}, uint8_t{3U}, uint8_t{4U}}) {
+        gpio = {};
+        config.speed = speed;
+        GPIOD->OSPEEDR = peers;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_prepare(&gpio, &config));
+        EXPECT_EQ(peers | (static_cast<uint32_t>(speed - 1U) << 24U),
+                  GPIOD->OSPEEDR);
+        EXPECT_EQ(config.mask, GPIOD->BSRR);
+    }
+}
+
+TEST_F(BasicCold, GPIORejectsInvalidOrInputSpeedBeforeAnyEffects) {
+    for (const auto selected : {uint8_t{5U}, uint8_t{255U}}) {
+        config.speed = selected;
+        EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_gpio_prepare(&gpio, &config));
+        EXPECT_EQ(0U, RCC->AHB1ENR);
+        EXPECT_EQ(0U, GPIOD->BSRR);
+        EXPECT_EQ(nullptr, gpio.registers);
+    }
+    config.speed = 1U;
+    config.output = false;
+    config.initial = 0U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_gpio_prepare(&gpio, &config));
+    EXPECT_EQ(0U, RCC->AHB1ENR);
+}
+
+TEST_F(BasicCold, GPIORejectsRestrictedOutputSpeedBeforeClockOrLevelWrites) {
+    config.registers = GPIOC;
+    config.mask = config.initial = 1U << 13U;
+    for (uint8_t speed : {uint8_t{2U}, uint8_t{3U}, uint8_t{4U}}) {
+        config.speed = speed;
+        EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_gpio_prepare(&gpio, &config));
+        EXPECT_EQ(0U, RCC->AHB1ENR);
+        EXPECT_EQ(0U, GPIOC->BSRR);
+        EXPECT_EQ(0U, GPIOC->MODER);
+        EXPECT_EQ(nullptr, gpio.registers);
+    }
+}
+
+TEST_F(BasicCold, GPIORefusedSpeedNeverExposesOutputAndRetainsBoundOwner) {
+    config.speed = 4U;
+    refuse_gpio_speed = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_gpio_prepare(&gpio, &config));
+    EXPECT_FALSE(gpio.initialized);
+    EXPECT_EQ(0U, GPIOD->MODER & (3U << 24U));
+    EXPECT_EQ(GPIOD, gpio.registers);
+    EXPECT_NE(0U, RCC->AHB1ENR & RCC_AHB1ENR_GPIODEN);
+}
+
+TEST_F(BasicCold, GPIOAllBondedBanksUseTheSameInputAndOutputOwner) {
+    GPIO_TypeDef* banks[]{GPIOA, GPIOB, GPIOC, GPIOD,
+                          GPIOE, GPIOF, GPIOG, GPIOH};
+    for (unsigned index = 0U; index < 8U; ++index) {
+        SCOPED_TRACE(index);
+        config.registers = banks[index];
+        config.mask = index == 7U ? 3U : 0xFFFFU;
+        config.initial = 0U;
+        config.speed = NX_STM32_GPIO_SPEED_PRESERVE;
+        for (bool output : {false, true}) {
+            gpio = {};
+            config.output = output;
+            ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_prepare(&gpio, &config));
+            const nx_gpio_port_t face{&nx_stm32_gpio_ops, &gpio};
+            banks[index]->IDR = config.mask;
+            uint32_t value = 0U;
+            ASSERT_EQ(NX_SUCCESS, nx_gpio_port_read(&face, &value));
+            EXPECT_EQ(config.mask, value);
+            EXPECT_EQ(1U << index, RCC->AHB1ENR & (1U << index));
+            if (output) {
+                EXPECT_EQ(NX_SUCCESS,
+                          nx_gpio_port_write(&face, config.mask, 0U));
+                EXPECT_EQ(config.mask, banks[index]->BSRR);
+            } else {
+                EXPECT_EQ(NX_ERROR_INVALID,
+                          nx_gpio_port_write(&face, config.mask, 0U));
+            }
+            ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_stop(&gpio, 0U));
+        }
+    }
+}
+
 TEST_F(BasicCold, FlashBindsPhysicalGeometryWithoutMMIOWrites) {
     FLASH->SR = FLASH_SR_EOP;
     FLASH->CR = FLASH_CR_LOCK;
@@ -210,6 +296,9 @@ extern "C" bool nx_arch_irq_is_masked(void) {
     return masked;
 }
 extern "C" void nx_arch_dsb(void) {
+    if (refuse_gpio_speed) {
+        GPIOD->OSPEEDR &= ~(3U << 24U);
+    }
     if (refuse_restricted_speed) {
         GPIOC->OSPEEDR |= 3U << 26U;
     }
@@ -218,6 +307,84 @@ extern "C" void nx_arch_dsb(void) {
 /** \brief External clock input; cold tests never claim physical timing. */
 extern "C" nx_time_us_t nx_time_now_us(void) {
     return model_time;
+}
+
+TEST_F(BasicCold, AdcExternalRanksConfigureTheReviewedBanksOnly) {
+    const uint8_t channels[]{15U, 9U, 3U, 10U, 8U, 0U};
+    const uint8_t samples[]{7U, 6U, 5U, 4U, 3U, 2U};
+    const nx_stm32_adc_config_t selected{channels, samples, 6U,
+                                         3300U,    0U,      ADC1};
+    nx_stm32_adc_state_t adc{};
+    RCC->AHB1ENR =
+        RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN;
+    GPIOA->MODER = GPIOB->MODER = GPIOC->MODER = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_begin(&adc, &selected));
+    EXPECT_EQ(3U | (3U << 6U), GPIOA->MODER);
+    EXPECT_EQ(3U | (3U << 2U), GPIOB->MODER);
+    EXPECT_EQ(3U | (3U << 10U), GPIOC->MODER);
+    EXPECT_EQ(ADC1, adc.registers);
+    EXPECT_EQ(6U, adc.channel_count);
+    EXPECT_EQ(channels, adc.channels);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_finish(&adc));
+    EXPECT_EQ(0U, RCC->APB2ENR & RCC_APB2ENR_ADC1EN);
+}
+
+TEST_F(BasicCold, AdcAllowsSixteenRanksAndConsistentRepeatedChannels) {
+    const uint8_t channels[]{0U, 1U, 2U,  3U,  4U,  5U,  6U,  7U,
+                             8U, 9U, 10U, 11U, 12U, 13U, 14U, 15U};
+    const uint8_t samples[16]{};
+    const nx_stm32_adc_config_t selected{channels, samples, 16U,
+                                         3300U,    0U,      ADC1};
+    nx_stm32_adc_state_t adc{};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_begin(&adc, &selected));
+    EXPECT_EQ(0xffffU, GPIOA->MODER);
+    EXPECT_EQ(0xfU, GPIOB->MODER);
+    EXPECT_EQ(0xfffU, GPIOC->MODER);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_finish(&adc));
+    adc = {};
+    const uint8_t repeated[]{15U, 15U, 15U};
+    const uint8_t repeated_samples[]{7U, 7U, 7U};
+    const nx_stm32_adc_config_t repeat{
+        repeated, repeated_samples, 3U, 3300U, 0U, ADC1};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_begin(&adc, &repeat));
+    EXPECT_EQ(3U, adc.channel_count);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_finish(&adc));
+}
+
+TEST_F(BasicCold, AdcRejectsConflictingSampleTimesBeforeAcquiringClocks) {
+    const uint8_t channels[]{0U, 0U};
+    const uint8_t samples[]{1U, 7U};
+    const nx_stm32_adc_config_t selected{channels, samples, 2U,
+                                         3300U,    0U,      ADC1};
+    nx_stm32_adc_state_t adc{};
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_adc_cold_begin(&adc, &selected));
+    EXPECT_EQ(0U, RCC->APB2ENR);
+    EXPECT_EQ(0U, adc.cold_effects);
+    EXPECT_EQ(nullptr, adc.registers);
+}
+
+TEST_F(BasicCold, AdcRejectsInvalidResolutionBeforeAnyPadOrGateEffect) {
+    const uint8_t channels[]{0U};
+    const uint8_t samples[]{7U};
+    nx_stm32_adc_config_t selected{channels, samples, 1U, 3300U, 0U, ADC1};
+    selected.resolution = 4U;
+    nx_stm32_adc_state_t adc{};
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_adc_cold_begin(&adc, &selected));
+    EXPECT_EQ(0U, RCC->APB2ENR);
+    EXPECT_EQ(0U, GPIOA->MODER);
+    EXPECT_EQ(0U, adc.cold_effects);
+    EXPECT_EQ(nullptr, adc.registers);
+}
+
+TEST_F(BasicCold, AdcColdConfigurationTransfersResolutionIntoTheEngine) {
+    const uint8_t channels[]{0U};
+    const uint8_t samples[]{7U};
+    nx_stm32_adc_config_t selected{channels, samples, 1U, 3300U, 0U, ADC1};
+    selected.resolution = 3U;
+    nx_stm32_adc_state_t adc{};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_begin(&adc, &selected));
+    EXPECT_EQ(3U, adc.resolution);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_adc_cold_finish(&adc));
 }
 
 TEST_F(BasicCold, RestrictedGpioCOutputsUseLowSpeedAndPreserveOtherFields) {

@@ -7,6 +7,32 @@
 #define NEXUS_STM32_I2C_COLD_MODEL_H
 #include "stm32f407xx.h"
 #include <stdint.h>
+#ifdef NX_I2C_CLOCK_21
+#include "nexus_config.h"
+#undef NEXUS_CORE_HZ
+#define NEXUS_CORE_HZ 84000000U
+#undef NEXUS_CLOCK_SOURCE_HSE
+#define NEXUS_CLOCK_SOURCE_HSE 1U
+#undef NEXUS_CLOCK_INPUT_HZ
+#define NEXUS_CLOCK_INPUT_HZ    8000000U
+#define NEXUS_APB1_HZ           21000000U
+#define NEXUS_APB2_HZ           42000000U
+#define NEXUS_APB1_TIMER_HZ     42000000U
+#define NEXUS_APB2_TIMER_HZ     84000000U
+#define NEXUS_ADC_HZ            10500000U
+#define NEXUS_PLL48_HZ          48000000U
+#define NEXUS_CLOCK_PLLM        8U
+#define NEXUS_CLOCK_PLLN        336U
+#define NEXUS_CLOCK_PLLP        4U
+#define NEXUS_CLOCK_PLLQ        7U
+#define NEXUS_CLOCK_PLLCFGR     0x07415408U
+#define NEXUS_CLOCK_CFGR        0x00009400U
+#define NEXUS_FLASH_WAIT_STATES 2U
+#define NEXUS_CLOCK_CSS         0U
+#define NEXUS_CLOCK_AHB_DIV     1U
+#define NEXUS_CLOCK_ADC_DIV     4U
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

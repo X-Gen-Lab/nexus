@@ -1,0 +1,55 @@
+# Mixed address widths and execution modes; no target or electrical qualification.
+schema = 2
+board_package = "stm32-ve-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[i2c.first]
+binding = "primary-i2c"
+mode = "poll-messages"
+max_hz = 80000
+
+[i2c_device.narrow]
+controller = "first"
+address = 80
+
+[i2c_device.wide]
+controller = "first"
+address = 80
+address_bits = 10
+
+[i2c.second]
+binding = "secondary-i2c"
+mode = "irq-messages"
+max_hz = 400000
+[i2c.second.irq]
+priority = 5
+calls_os = false
+
+[i2c_device.second_target]
+controller = "second"
+address = 683
+address_bits = 10
+
+[i2c.third]
+binding = "i2c3"
+mode = "dma-messages"
+max_hz = 88000
+[i2c.third.irq]
+priority = 5
+calls_os = false
+
+[i2c_device.third_target]
+controller = "third"
+address = 1023
+address_bits = 10

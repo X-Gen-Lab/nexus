@@ -93,7 +93,7 @@ struct nx_i2c_endpoint {
 };
 
 /**
- * \brief           Execute a polling 7-bit-address message transaction.
+ * \brief           Execute a polling transaction at the endpoint's address.
  *
  * \param[in]       endpoint: Fixed address/controller binding.
  *

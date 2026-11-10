@@ -67,6 +67,9 @@ nx_result_t nx_stm32_flash_close(nx_stm32_flash_state_t* port) {
 #ifndef NX_STM32_FLASH_STORE
 #define NX_STM32_FLASH_STORE(address, value) (*(address) = (value))
 #endif
+#ifndef NX_STM32_FLASH_STORE_BYTE
+#define NX_STM32_FLASH_STORE_BYTE(address, value) (*(address) = (value))
+#endif
 #ifndef NX_STM32_FLASH_IRQ_IDLE
 #define NX_STM32_FLASH_IRQ_IDLE()                                              \
     (NVIC_GetEnableIRQ(FLASH_IRQn) == 0U &&                                    \
@@ -331,4 +334,328 @@ const nx_flash_ops_t nx_stm32_flash_ops = {
     .read = nx_stm32_flash_read,
     .program = nx_stm32_flash_program,
     .erase = nx_stm32_flash_erase,
+};
+
+#define NX_FLASH_OTP_ADDRESS  UINT32_C(0x1fff7800)
+#define NX_FLASH_OTP_BYTES    UINT32_C(512)
+#define NX_FLASH_OTP_BLOCK    UINT32_C(32)
+#define NX_FLASH_OTP_BLOCKS   UINT32_C(16)
+#define NX_FLASH_MAINTAIN_ALL UINT32_C(31)
+
+/* The existing exact pulse owner deliberately also owns OTP and OPTCR. HAL's
+ * global pFlash and hidden 50-second tick wait cannot establish this owner's
+ * fresh EOP, disabled-vector join or retained failed-relock contract. RM0090
+ * 3.7/3.8 require the same physical pulse ordering used above; no second HAL
+ * transport, reset engine or register-script interpreter is introduced. */
+static volatile uint8_t* otp_memory(void) {
+    return (volatile uint8_t*)(uintptr_t)NX_FLASH_OTP_ADDRESS;
+}
+
+static nx_result_t maintenance_idle(nx_stm32_flash_state_t* port) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (!range(port, 0U, 0U) || (port->geometry->sector_count != 8U &&
+                                 port->geometry->sector_count != 12U))
+        return NX_ERROR_STATE;
+    return port->active || (NX_STM32_FLASH_READ(&port->registers->SR) &
+                            FLASH_SR_BSY) != 0U
+               ? NX_ERROR_BUSY
+               : NX_SUCCESS;
+}
+
+static nx_flash_read_protection_t protection(uint32_t options) {
+    uint32_t encoded = (uint32_t)((options & FLASH_OPTCR_RDP) >> 8U);
+    return encoded == 0xaaU   ? NX_FLASH_READ_OPEN
+           : encoded == 0xccU ? NX_FLASH_READ_PERMANENT
+                              : NX_FLASH_READ_PROTECTED;
+}
+
+static uint32_t sector_mask(const nx_stm32_flash_state_t* port) {
+    return (UINT32_C(1) << port->geometry->sector_count) - 1U;
+}
+
+static bool acknowledged(uint32_t effects, uint32_t required) {
+    return (effects & ~NX_FLASH_MAINTAIN_ALL) == 0U &&
+           (effects & required) == required;
+}
+
+/* Reject wrap and all provider/control/ROM destinations before any copy. The
+ * host model keeps ordinary pointers outside the MCU's 32-bit apertures. */
+static bool maintenance_buffer(const nx_stm32_flash_state_t* port,
+                               const void* pointer, size_t size,
+                               bool destination) {
+    uintptr_t address = (uintptr_t)pointer;
+    if (pointer == NULL || size > UINTPTR_MAX - address)
+        return false;
+    uintptr_t last = address + size;
+    uintptr_t owner = (uintptr_t)port;
+    uintptr_t registers = (uintptr_t)port->registers;
+    uintptr_t geometry = (uintptr_t)port->geometry;
+    uintptr_t sectors = (uintptr_t)port->geometry->sectors;
+    bool system_overlap = UINT32_C(0xe0000000) < last;
+#if UINTPTR_MAX > UINT32_MAX
+    system_overlap = system_overlap && address < UINT64_C(0x100000000);
+#endif
+    return !(address < owner + sizeof(*port) && owner < last) &&
+           !(address < registers + sizeof(*port->registers) &&
+             registers < last) &&
+           !(address < geometry + sizeof(*port->geometry) && geometry < last) &&
+           !(address < sectors + port->geometry->sector_count *
+                                     sizeof(*port->geometry->sectors) &&
+             sectors < last) &&
+           !(address < UINT32_C(0x1fff7a10) && NX_FLASH_OTP_ADDRESS < last) &&
+           !(address < UINT32_C(0x60000000) && UINT32_C(0x40000000) < last) &&
+           !system_overlap &&
+           !(destination && address < UINT32_C(0x20000000) &&
+             UINT32_C(0x08000000) < last);
+}
+
+static nx_result_t
+maintenance_snapshot(void* context, nx_flash_maintenance_snapshot_t* snapshot) {
+    nx_stm32_flash_state_t* port = context;
+    nx_result_t result = maintenance_idle(port);
+    if (result != NX_SUCCESS)
+        return result;
+    if (!maintenance_buffer(port, snapshot, sizeof(*snapshot), true))
+        return NX_ERROR_INVALID;
+    uint32_t locked = 0U;
+    for (uint32_t block = 0U; block < NX_FLASH_OTP_BLOCKS; ++block) {
+        uint8_t value = otp_memory()[NX_FLASH_OTP_BYTES + block];
+        if (value != 0xffU && value != 0U)
+            return NX_ERROR_IO;
+        if (value == 0U)
+            locked |= UINT32_C(1) << block;
+    }
+    uint32_t options = NX_STM32_FLASH_READ(&port->registers->OPTCR);
+    *snapshot = (nx_flash_maintenance_snapshot_t){
+        .options =
+            {
+                .read_protection = protection(options),
+                .write_protected_sectors =
+                    (~(options >> 16U)) & sector_mask(port),
+                .brownout_level =
+                    (uint8_t)((options & FLASH_OPTCR_BOR_LEV) >> 2U),
+                .hardware_watchdog = (options & FLASH_OPTCR_WDG_SW) == 0U,
+                .reset_on_stop = (options & FLASH_OPTCR_nRST_STOP) == 0U,
+                .reset_on_standby = (options & FLASH_OPTCR_nRST_STDBY) == 0U,
+            },
+        .otp_bytes = NX_FLASH_OTP_BYTES,
+        .otp_block_bytes = NX_FLASH_OTP_BLOCK,
+        .otp_locked_blocks = locked,
+        .sector_count = (uint32_t)port->geometry->sector_count,
+        .power_on_reset_required = port->power_on_reset_required,
+    };
+    return NX_SUCCESS;
+}
+
+static nx_result_t otp_read(void* context, uint32_t offset, void* data,
+                            size_t length) {
+    nx_stm32_flash_state_t* port = context;
+    nx_result_t result = maintenance_idle(port);
+    if (result != NX_SUCCESS)
+        return result;
+    if (offset > NX_FLASH_OTP_BYTES || length > NX_FLASH_OTP_BYTES - offset ||
+        (length != 0U && !maintenance_buffer(port, data, length, true)))
+        return NX_ERROR_INVALID;
+    uint8_t* output = data;
+    for (size_t i = 0U; i < length; ++i)
+        output[i] = otp_memory()[offset + i];
+    return NX_SUCCESS;
+}
+
+static nx_result_t otp_program(void* context, uint32_t offset, const void* data,
+                               size_t length, uint32_t effects,
+                               nx_time_us_t deadline) {
+    nx_stm32_flash_state_t* port = context;
+    nx_result_t result = maintenance_idle(port);
+    if (result != NX_SUCCESS)
+        return result;
+    if (!acknowledged(effects, NX_FLASH_MAINTAIN_OTP_PROGRAM) ||
+        deadline == NX_DEADLINE_NEVER || offset >= NX_FLASH_OTP_BYTES ||
+        length == 0U || length > NX_FLASH_OTP_BYTES - offset ||
+        (offset & 3U) != 0U || (length & 3U) != 0U ||
+        !maintenance_buffer(port, data, length, false))
+        return NX_ERROR_INVALID;
+    const uint8_t* input = data;
+    uint32_t last_block = (offset + (uint32_t)length - 1U) / NX_FLASH_OTP_BLOCK;
+    for (uint32_t block = offset / NX_FLASH_OTP_BLOCK; block <= last_block;
+         ++block) {
+        uint8_t lock = otp_memory()[NX_FLASH_OTP_BYTES + block];
+        if (lock != 0xffU)
+            return lock == 0U ? NX_ERROR_BUSY : NX_ERROR_IO;
+    }
+    for (size_t i = 0U; i < length; ++i)
+        if ((input[i] & (uint8_t)~otp_memory()[offset + i]) != 0U)
+            return NX_ERROR_IO;
+    if (nx_deadline_expired(deadline, nx_time_now_us()))
+        return NX_ERROR_TIMEOUT;
+    result = begin(port);
+    if (result != NX_SUCCESS)
+        return result;
+    for (size_t i = 0U; i < length; i += sizeof(uint32_t)) {
+        if (nx_deadline_expired(deadline, nx_time_now_us())) {
+            result = NX_ERROR_TIMEOUT;
+            break;
+        }
+        uint32_t word;
+        memcpy(&word, input + i, sizeof(word));
+        volatile uint32_t* target =
+            (volatile uint32_t*)(otp_memory() + offset + i);
+        if (word == *target)
+            continue;
+        if (!clear_status(port) || !NX_STM32_FLASH_IRQ_CLEAR() ||
+            !control(port, (NX_STM32_FLASH_READ(&port->registers->CR) &
+                            ~(uint32_t)FLASH_CR_PSIZE) |
+                               FLASH_CR_PSIZE_1 | FLASH_CR_PG |
+                               FLASH_CR_EOPIE)) {
+            result = NX_ERROR_IO;
+            break;
+        }
+        NX_STM32_FLASH_STORE(target, word);
+        nx_arch_dsb();
+        result = pulse_result(port, deadline);
+        if (!control(port, NX_STM32_FLASH_READ(&port->registers->CR) &
+                               ~(uint32_t)FLASH_CR_PG) ||
+            *target != word)
+            result = NX_ERROR_IO;
+        if (result != NX_SUCCESS)
+            break;
+    }
+    return end(port, result);
+}
+
+static nx_result_t otp_lock(void* context, uint32_t block, uint32_t effects,
+                            nx_time_us_t deadline) {
+    nx_stm32_flash_state_t* port = context;
+    nx_result_t result = maintenance_idle(port);
+    if (result != NX_SUCCESS)
+        return result;
+    if (block >= NX_FLASH_OTP_BLOCKS || deadline == NX_DEADLINE_NEVER ||
+        !acknowledged(effects, NX_FLASH_MAINTAIN_OTP_LOCK))
+        return NX_ERROR_INVALID;
+    volatile uint8_t* target = otp_memory() + NX_FLASH_OTP_BYTES + block;
+    if (*target != 0xffU && *target != 0U)
+        return NX_ERROR_IO;
+    if (nx_deadline_expired(deadline, nx_time_now_us()))
+        return NX_ERROR_TIMEOUT;
+    if (*target == 0U)
+        return NX_SUCCESS;
+    result = begin(port);
+    if (result != NX_SUCCESS)
+        return result;
+    if (!clear_status(port) || !NX_STM32_FLASH_IRQ_CLEAR() ||
+        !control(port, (NX_STM32_FLASH_READ(&port->registers->CR) &
+                        ~(uint32_t)FLASH_CR_PSIZE) |
+                           FLASH_CR_PG | FLASH_CR_EOPIE))
+        return end(port, NX_ERROR_IO);
+    /* RM0090 table 19: the lock block is sixteen independent bytes. A word
+     * store would permanently lock three neighbours, so this pulse is x8. */
+    NX_STM32_FLASH_STORE_BYTE(target, 0U);
+    nx_arch_dsb();
+    result = pulse_result(port, deadline);
+    if (*target != 0U)
+        result = NX_ERROR_IO;
+    return end(port, result);
+}
+
+static nx_result_t set_options(void* context, const nx_flash_options_t* desired,
+                               uint32_t effects, nx_time_us_t deadline) {
+    nx_stm32_flash_state_t* port = context;
+    nx_result_t result = maintenance_idle(port);
+    if (result != NX_SUCCESS)
+        return result;
+    if (!maintenance_buffer(port, desired, sizeof(*desired), false) ||
+        deadline == NX_DEADLINE_NEVER || desired->brownout_level > 3U ||
+        (desired->write_protected_sectors & ~sector_mask(port)) != 0U ||
+        (desired->read_protection != NX_FLASH_READ_OPEN &&
+         desired->read_protection != NX_FLASH_READ_PROTECTED &&
+         desired->read_protection != NX_FLASH_READ_PERMANENT))
+        return NX_ERROR_INVALID;
+    uint32_t before = NX_STM32_FLASH_READ(&port->registers->OPTCR);
+    if ((before & (FLASH_OPTCR_OPTLOCK | FLASH_OPTCR_OPTSTRT)) !=
+        FLASH_OPTCR_OPTLOCK)
+        return NX_ERROR_BUSY;
+    nx_flash_read_protection_t previous = protection(before);
+    if (previous == NX_FLASH_READ_PERMANENT)
+        return NX_ERROR_UNSUPPORTED;
+    uint32_t required = NX_FLASH_MAINTAIN_OPTIONS;
+    if (previous == NX_FLASH_READ_PROTECTED &&
+        desired->read_protection == NX_FLASH_READ_OPEN)
+        required |= NX_FLASH_MAINTAIN_MASS_ERASE;
+    if (desired->read_protection == NX_FLASH_READ_PERMANENT)
+        required |= NX_FLASH_MAINTAIN_PERMANENT;
+    if (!acknowledged(effects, required))
+        return NX_ERROR_INVALID;
+    if (nx_deadline_expired(deadline, nx_time_now_us()))
+        return NX_ERROR_TIMEOUT;
+    uint32_t rdp = desired->read_protection == NX_FLASH_READ_OPEN ? 0xaaU
+                   : desired->read_protection == NX_FLASH_READ_PERMANENT
+                       ? 0xccU
+                       : 0x55U;
+    uint32_t mask = (sector_mask(port) << 16U) | FLASH_OPTCR_RDP |
+                    FLASH_OPTCR_BOR_LEV | FLASH_OPTCR_WDG_SW |
+                    FLASH_OPTCR_nRST_STOP | FLASH_OPTCR_nRST_STDBY |
+                    FLASH_OPTCR_OPTLOCK | FLASH_OPTCR_OPTSTRT;
+    uint32_t value =
+        (before & ~mask) | (rdp << 8U) |
+        ((~desired->write_protected_sectors & sector_mask(port)) << 16U) |
+        ((uint32_t)desired->brownout_level << 2U) |
+        (desired->hardware_watchdog ? 0U : FLASH_OPTCR_WDG_SW) |
+        (desired->reset_on_stop ? 0U : FLASH_OPTCR_nRST_STOP) |
+        (desired->reset_on_standby ? 0U : FLASH_OPTCR_nRST_STDBY);
+    if ((before & ~(uint32_t)FLASH_OPTCR_OPTLOCK) == value)
+        return NX_SUCCESS;
+    result = begin(port);
+    if (result != NX_SUCCESS)
+        return result;
+    NX_STM32_FLASH_WRITE(&port->registers->OPTKEYR, UINT32_C(0x08192a3b));
+    NX_STM32_FLASH_WRITE(&port->registers->OPTKEYR, UINT32_C(0x4c5d6e7f));
+    nx_arch_dsb();
+    if ((NX_STM32_FLASH_READ(&port->registers->OPTCR) & FLASH_OPTCR_OPTLOCK) !=
+            0U ||
+        !clear_status(port) || !NX_STM32_FLASH_IRQ_CLEAR() ||
+        !control(port,
+                 NX_STM32_FLASH_READ(&port->registers->CR) | FLASH_CR_EOPIE)) {
+        result = NX_ERROR_IO;
+    } else {
+        NX_STM32_FLASH_WRITE(&port->registers->OPTCR, value);
+        nx_arch_dsb();
+        if (NX_STM32_FLASH_READ(&port->registers->OPTCR) != value) {
+            result = NX_ERROR_IO;
+        } else {
+            /* Once this start is issued the entire option image may have
+             * changed, including an irreversible protection transition. Never
+             * replay it or claim a timeout restored the prior image. */
+            port->power_on_reset_required = true;
+            NX_STM32_FLASH_WRITE(&port->registers->OPTCR,
+                                 value | FLASH_OPTCR_OPTSTRT);
+            nx_arch_dsb();
+            result = pulse_result(port, deadline);
+            if ((NX_STM32_FLASH_READ(&port->registers->OPTCR) &
+                 ~(uint32_t)(FLASH_OPTCR_OPTSTRT | FLASH_OPTCR_OPTLOCK)) !=
+                value)
+                result = NX_ERROR_IO;
+        }
+    }
+    NX_STM32_FLASH_WRITE(&port->registers->OPTCR,
+                         (NX_STM32_FLASH_READ(&port->registers->OPTCR) &
+                          ~(uint32_t)FLASH_OPTCR_OPTSTRT) |
+                             FLASH_OPTCR_OPTLOCK);
+    nx_arch_dsb();
+    bool locked = (NX_STM32_FLASH_READ(&port->registers->OPTCR) &
+                   FLASH_OPTCR_OPTLOCK) != 0U;
+    result = end(port, result);
+    if (!locked) {
+        port->active = true;
+        return NX_ERROR_IO;
+    }
+    return result;
+}
+
+const nx_flash_maintenance_ops_t nx_stm32_flash_maintenance_ops = {
+    .snapshot = maintenance_snapshot,
+    .otp_read = otp_read,
+    .otp_program = otp_program,
+    .otp_lock = otp_lock,
+    .set_options = set_options,
 };

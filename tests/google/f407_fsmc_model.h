@@ -11,8 +11,12 @@
  * register structs into low memory; production keeps the official addresses. */
 #undef FSMC_Bank1
 #undef FSMC_Bank1E
-#define FSMC_Bank1  ((FSMC_Bank1_TypeDef*)(uintptr_t)UINT32_C(0x60000000))
-#define FSMC_Bank1E ((FSMC_Bank1E_TypeDef*)(uintptr_t)UINT32_C(0x60000104))
+#undef FSMC_Bank2_3
+#undef FSMC_Bank4
+#define FSMC_Bank1   ((FSMC_Bank1_TypeDef*)(uintptr_t)UINT32_C(0x60000000))
+#define FSMC_Bank1E  ((FSMC_Bank1E_TypeDef*)(uintptr_t)UINT32_C(0x60000104))
+#define FSMC_Bank2_3 ((FSMC_Bank2_3_TypeDef*)(uintptr_t)UINT32_C(0x60000200))
+#define FSMC_Bank4   ((FSMC_Bank4_TypeDef*)(uintptr_t)UINT32_C(0x60000300))
 /* Device masks are unsigned long on the SDK's 32-bit target. Model the same
  * 32-bit complement on this 64-bit host without relaxing owned warnings. */
 #undef CLEAR_BIT
@@ -30,11 +34,16 @@
 extern "C" {
 #endif
 uint32_t nx_fsmc_model_read(const volatile uint32_t* reg);
+uint8_t nx_fsmc_model_read8(const volatile uint8_t* address);
+void nx_fsmc_model_write8(volatile uint8_t* address, uint8_t value);
 uint16_t nx_fsmc_model_read16(const volatile uint16_t* address);
 void nx_fsmc_model_write16(volatile uint16_t* address, uint16_t value);
 #ifdef __cplusplus
 }
 #endif
+#define NX_STM32_FSMC_READ8(address) nx_fsmc_model_read8(address)
+#define NX_STM32_FSMC_WRITE8(address, value)                                   \
+    nx_fsmc_model_write8(address, value)
 #define NX_STM32_FSMC_READ(reg)       nx_fsmc_model_read(&(reg))
 #define NX_STM32_FSMC_READ16(address) nx_fsmc_model_read16(address)
 #define NX_STM32_FSMC_WRITE16(address, value)                                  \

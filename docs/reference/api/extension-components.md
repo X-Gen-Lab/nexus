@@ -10,43 +10,48 @@ source_language: en
 These public headers describe framed data, explicit owners, retained clocks and trusted mediation. Their declarations do not establish a board connection, execution mode, kernel gateway or physical qualification. Construction, memory ownership and final-access requirements remain part of each contract.
 
 (stm32f407-entropy-construction)=
-
-## Explicit F407 entropy construction
-
-For an F407 assembly, explicitly call `nexus_add_stm32f407_entropy(target)` and
-link that target at the product's composition site. It owns the unique static
-RNG source and refuses a second constructor. The getter
-`nx_stm32f407_entropy_instance()` returns an existing readonly face; it performs
-no startup, register access or factory registration.
-
-After successful Platform startup, call
-`nx_stm32f407_entropy_instance_start()` with exact validated Board/profile
-`hse_hz` and `hclk_hz` facts. The implementation checks the live PLL48/HCLK
-relationship and acquires only its RNG clock gate; it neither configures the
-shared PLL nor starts Platform. The reviewed source choices are 8 MHz HSE or
-16 MHz HSI. The product must preserve those clock dependencies through stop.
-
-Run start/stop from one privileged, unmasked, serialized task context. Join every
-entropy consumer before `nx_stm32f407_entropy_instance_stop()`, and require that
-stop to succeed before withdrawing Platform clocks. Failed withdrawal retains
-the same owner and cleanup responsibility; retry stop without resetting or
-rebinding its state. A stopped face remains valid and rejects data calls with
-STATE. This explicit constructor is separate from TOML typed-factory selection;
-neither it nor software RNG health checks qualify physical min-entropy or HIL.
-
 (stm32f407__entropy_8h)=
 
-### stm32f407_entropy.h
+## Selected F407 entropy owner
 
-```{doxygenfile} soc/stm32/stm32f4/include/nexus/soc/stm32f407_entropy.h
-:project: nexus
+Select the chip's one internal RNG through the authored assembly:
+
+<!-- nexus-toml-fragment: Entropy selection only; the enclosing assembly supplies Board, backend, clock and memory. -->
+```toml
+[entropy.random]
+binding = "rng"
+mode = "rng-words"
 ```
 
-(frame__stream_8h)=
 
-## frame_stream.h
+The Board supplies the pinless `rng` binding. Configuration requires the selected
+nominal PLL48 domain to be exactly 48 MHz, including an explicit `pll48 = true`
+reservation when SYSCLK uses a direct input. The generated
+`nx_factory_entropy(NX_ENTROPY_ID_RANDOM)` returns an existing readonly
+{ref}`entropy face <entropy_8h>` without starting hardware. No separate CMake
+constructor, public mutable owner or second clock configuration is used.
 
-```{doxygenfile} frame_stream.h
+Readonly admission rejects foreign enabled RNG or IRQ state before System clock
+effects. Platform prepares the same private RNG owner after System startup, withdraws it
+before clock shutdown or suspend, and prepares it again in the new epoch on
+resume. The existing C implementation checks the actual RCC/Flash plan and
+retains its acquired gate and enable effects through cleanup. Join every entropy,
+TLS and network consumer before serialized privileged Platform suspend or stop.
+Failed withdrawal retains that owner and cleanup responsibility; retry the
+lifecycle operation without resetting its state. A cold or stopped face remains
+valid and rejects data calls with STATE. Clock failure or an epoch change stops
+data publication while cleanup remains available.
+
+The [System contract](../../../soc/stm32/stm32f4/README-system-power.md) defines
+clock authority and recovery. RNG health checks and software models establish
+neither physical min-entropy nor HIL qualification.
+
+
+(usb__role_8h)=
+
+## usb_role.h
+
+```{doxygenfile} usb_role.h
 :project: nexus
 ```
 
@@ -135,14 +140,6 @@ neither it nor software RNG health checks qualify physical min-entropy or HIL.
 ## i3c_controller_storage.h
 
 ```{doxygenfile} i3c_controller_storage.h
-:project: nexus
-```
-
-(f407__i2s2__slave__tx_8h)=
-
-## f407_i2s2_slave_tx.h
-
-```{doxygenfile} f407_i2s2_slave_tx.h
 :project: nexus
 ```
 

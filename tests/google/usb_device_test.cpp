@@ -108,6 +108,269 @@ class UsbDevice : public testing::Test {
         nx_usb_controller_irq(&model.controller);
     }
 };
+TEST_F(UsbDevice, IsochronousPacketsSelectNextFrameWithoutPidOrStall) {
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    endpoints[2].transfer = endpoints[3].transfer = NX_USB_PROFILE_ISOCHRONOUS;
+    endpoints[2].max_packet = endpoints[3].max_packet = 32U;
+    ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
+    const auto in = Port(2U);
+    const auto out = Port(3U);
+    for (uint32_t frame : {0U, 0x7FFU}) {
+        model.hardware.registers[0x808U / 4U] = frame << 8U;
+        ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 3U, NX_USB_DATA, 0U, 200U),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+        EXPECT_EQ(model.hardware.registers[0x930U / 4U],
+                  (1U << 29U) | (1U << 19U) | 3U);
+        EXPECT_EQ((model.hardware.registers[0x920U / 4U] >> 16U) & 1U,
+                  (frame + 1U) & 1U);
+        const size_t writes = model.hardware.mmio_writes;
+        EXPECT_EQ(nx_usb_endpoint_stall(&in, true), NX_ERROR_UNSUPPORTED);
+        EXPECT_EQ(nx_usb_endpoint_stall(&out, false), NX_ERROR_UNSUPPORTED);
+        EXPECT_EQ(model.hardware.mmio_writes, writes);
+        ASSERT_EQ(nx_native_usb_complete(&model, 1U, true), NX_SUCCESS);
+        nx_usb_controller_irq(&model.controller);
+        ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        EXPECT_EQ(request.base.result, NX_SUCCESS);
+        ASSERT_EQ(
+            nx_usb_out_prepare(&request, bytes, 3U, NX_USB_DATA, 0U, 200U),
+            NX_SUCCESS);
+        ASSERT_EQ(nx_usb_endpoint_submit(&out, &request), NX_SUCCESS);
+        EXPECT_EQ(model.hardware.registers[0xB30U / 4U], (1U << 19U) | 32U);
+        const uint8_t payload[] = {1U, 2U, 3U};
+        ASSERT_EQ(nx_native_usb_receive(&model, 1U, payload, 3U, false),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_native_usb_complete(&model, 1U, false), NX_SUCCESS);
+        nx_usb_controller_irq(&model.controller);
+        ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        EXPECT_EQ(request.base.result, NX_SUCCESS);
+        EXPECT_EQ(bytes[2], 3U);
+    }
+}
+TEST_F(UsbDevice, InternalPhyInterruptOutUsesTheActualOutPacketOwner) {
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    endpoints[3].transfer = NX_USB_PROFILE_INTERRUPT;
+    endpoints[3].max_packet = 10U;
+    ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
+    const auto out = Port(3U);
+    ASSERT_EQ(nx_usb_out_prepare(&request, bytes, 10U, NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&out, &request), NX_SUCCESS);
+    const uint8_t payload[] = {4U, 5U};
+    ASSERT_EQ(
+        nx_native_usb_receive(&model, 1U, payload, sizeof(payload), false),
+        NX_SUCCESS);
+    ASSERT_EQ(nx_native_usb_complete(&model, 1U, false), NX_SUCCESS);
+    nx_usb_controller_irq(&model.controller);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+    EXPECT_EQ(bytes[1], 5U);
+}
+
+TEST_F(UsbDevice, IsochronousWindowRejectsLongDeadlinesAndExpiresAfterStall) {
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    endpoints[2].transfer = NX_USB_PROFILE_ISOCHRONOUS;
+    ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
+    const auto in = Port(2U);
+    ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 1U, NX_USB_DATA, 0U,
+                                nx_deadline_after(nx_time_now_us(), 1000001U)),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_usb_endpoint_submit(&in, &request), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 1U, NX_USB_DATA, 0U,
+                                nx_deadline_after(nx_time_now_us(), 1000000U)),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(1100000U), NX_SUCCESS);
+    model.hardware.registers[0x14U / 4U] |= 1U << 20U;
+    nx_usb_controller_irq(&model.controller);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_TIMEOUT);
+}
+
+TEST_F(UsbDevice, IncompleteIsochronousTransferDrainsWithoutRetryingNextFrame) {
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    endpoints[2].transfer = endpoints[3].transfer = NX_USB_PROFILE_ISOCHRONOUS;
+    ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
+    for (bool input : {true, false}) {
+        SCOPED_TRACE(input);
+        const auto port = Port(input ? 2U : 3U);
+        const uint32_t incomplete = 1U << (input ? 20U : 21U);
+        model.hardware.registers[0x808U / 4U] = 4U << 8U;
+        ASSERT_EQ(input ? nx_usb_in_prepare(&request, bytes, 3U, NX_USB_DATA,
+                                            0U, 200U)
+                        : nx_usb_out_prepare(&request, bytes, 3U, NX_USB_DATA,
+                                             0U, 200U),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_usb_endpoint_submit(&port, &request), NX_SUCCESS);
+        /* An old frame-four indication cannot abort the new frame five. */
+        model.hardware.registers[0x14U / 4U] |= incomplete;
+        nx_usb_controller_irq(&model.controller);
+        EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+        model.hardware.registers[0x808U / 4U] = 5U << 8U;
+        model.hardware.hold_disable = true;
+        model.hardware.registers[0x14U / 4U] |= incomplete;
+        nx_usb_controller_irq(&model.controller);
+        EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_DRAINING);
+        EXPECT_EQ(model.controller.endpoints[input ? 2U : 3U].request,
+                  &request);
+        ASSERT_EQ(nx_native_clock_advance(20U), NX_SUCCESS);
+        ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+        EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+        model.hardware.hold_disable = false;
+        ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+        ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        EXPECT_EQ(request.base.result, NX_ERROR_IO);
+        EXPECT_EQ(model.controller.endpoints[input ? 2U : 3U].request, nullptr);
+        EXPECT_EQ(model.hardware.registers[0x14U / 4U] & incomplete, 0U);
+    }
+}
+
+TEST_F(UsbDevice, FullSpeedIsochronousOutUsesActualPacketAndFifoCapacity) {
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    model.controller.core = NX_USB_CORE_HS_INTERNAL_FS;
+    model.controller.irq.irq_number = 77U;
+    model.hardware.endpoint_numbers = 6U;
+    endpoints[3].transfer = NX_USB_PROFILE_ISOCHRONOUS;
+    endpoints[3].max_packet = 1023U;
+    model.controller.rx_fifo_words = 270U;
+    endpoints[0].fifo_start = 270U;
+    endpoints[0].fifo_words = 16U;
+    endpoints[2].fifo_start = 286U;
+    endpoints[2].fifo_words = 16U;
+    endpoints[2].max_packet = 32U;
+    ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
+    uint8_t payload[1023] = {};
+    payload[1022] = 0xA5U;
+    uint8_t output[1023] = {};
+    const auto out = Port(3U);
+    ASSERT_EQ(nx_usb_out_prepare(&request, output, sizeof(output), NX_USB_DATA,
+                                 0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&out, &request), NX_SUCCESS);
+    ASSERT_EQ(
+        nx_native_usb_receive(&model, 1U, payload, sizeof(payload), false),
+        NX_SUCCESS);
+    ASSERT_EQ(nx_native_usb_complete(&model, 1U, false), NX_SUCCESS);
+    nx_usb_controller_irq(&model.controller);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+    EXPECT_EQ(request.base.transferred, sizeof(output));
+    EXPECT_EQ(output[1022], 0xA5U);
+    EXPECT_FALSE(model.controller.snapshot.closing);
+}
+
+TEST_F(UsbDevice, MaximumFsIsochronousInFitsTheReviewedFortyEightWordRxPlan) {
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    endpoints[2].transfer = NX_USB_PROFILE_ISOCHRONOUS;
+    endpoints[2].max_packet = 1023U;
+    model.controller.rx_fifo_words = 48U;
+    endpoints[0].fifo_start = 48U;
+    endpoints[0].fifo_words = 16U;
+    endpoints[2].fifo_start = 64U;
+    endpoints[2].fifo_words = 256U;
+    ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
+    uint8_t payload[1023] = {};
+    payload[1022] = 0xA6U;
+    const auto in = Port(2U);
+    ASSERT_EQ(nx_usb_in_prepare(&request, payload, sizeof(payload), NX_USB_DATA,
+                                0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+    EXPECT_EQ(model.hardware.tx_count[1], 256U);
+    EXPECT_EQ(model.hardware.tx[1][255] & 0xFFFFFFU, 0xA60000U);
+    ASSERT_EQ(nx_native_usb_complete(&model, 1U, true), NX_SUCCESS);
+    nx_usb_controller_irq(&model.controller);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    endpoints[3].transfer = NX_USB_PROFILE_ISOCHRONOUS;
+    endpoints[3].max_packet = 1023U;
+    model.controller.rx_fifo_words = 270U;
+    EXPECT_EQ(nx_native_usb_initialize(&model), NX_ERROR_INVALID);
+}
+
+TEST_F(UsbDevice, IsochronousOutDropDoesNotAbortAnUnrelatedBulkPacket) {
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    endpoints[3].transfer = NX_USB_PROFILE_ISOCHRONOUS;
+    ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
+    nx_usb_request_t bulk{};
+    nx_request_initialize(&bulk.base);
+    const uint8_t tx[] = {1U};
+    const auto in = Port(2U);
+    const auto out = Port(3U);
+    ASSERT_EQ(nx_usb_in_prepare(&bulk, tx, sizeof(tx), NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in, &bulk), NX_SUCCESS);
+    ASSERT_EQ(nx_usb_out_prepare(&request, bytes, 3U, NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&out, &request), NX_SUCCESS);
+    model.hardware.registers[0x808U / 4U] = 1U << 8U;
+    model.hardware.registers[0x14U / 4U] |= 1U << 14U;
+    nx_usb_controller_irq(&model.controller);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(nx_request_state(&bulk.base), NX_REQUEST_ACTIVE);
+    ASSERT_EQ(nx_native_usb_complete(&model, 1U, true), NX_SUCCESS);
+    nx_usb_controller_irq(&model.controller);
+    EXPECT_EQ(nx_request_state(&bulk.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(bulk.base.result, NX_SUCCESS);
+}
+TEST_F(UsbDevice, MultipleIsochronousOutEndpointsReserveBackToBackPackets) {
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    endpoints[2].transfer = endpoints[3].transfer = NX_USB_PROFILE_ISOCHRONOUS;
+    endpoints[2].number = 2U;
+    endpoints[2].in = false;
+    endpoints[2].fifo_start = endpoints[2].fifo_words = 0U;
+    endpoints[2].max_packet = endpoints[3].max_packet = 128U;
+    model.controller.rx_fifo_words = 64U;
+    endpoints[0].fifo_start = 64U;
+    endpoints[0].fifo_words = 16U;
+    EXPECT_EQ(nx_native_usb_initialize(&model), NX_ERROR_INVALID);
+    if (model.controller.snapshot.started) {
+        ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    }
+    model.controller.rx_fifo_words = 80U;
+    endpoints[0].fifo_start = 80U;
+    EXPECT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+}
+
+TEST_F(UsbDevice, IsochronousCancelAndResetKeepBorrowUntilRealWithdrawal) {
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    endpoints[2].transfer = NX_USB_PROFILE_ISOCHRONOUS;
+    ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
+    const auto in = Port(2U);
+    for (bool reset : {false, true}) {
+        SCOPED_TRACE(reset);
+        ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 0U, NX_USB_DATA, 0U,
+                                    nx_deadline_after(nx_time_now_us(), 100U)),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+        model.hardware.hold_flush = true;
+        if (reset) {
+            nx_native_usb_reset(&model);
+            nx_usb_controller_irq(&model.controller);
+        } else {
+            ASSERT_EQ(nx_usb_endpoint_cancel(&in, &request), NX_SUCCESS);
+        }
+        EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        EXPECT_EQ(endpoints[2].request, &request);
+        model.hardware.hold_flush = false;
+        ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+        ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+        EXPECT_EQ(endpoints[2].request, nullptr);
+    }
+}
+
 TEST_F(UsbDevice, InterruptCancelKeepsDataAndZlpBorrowedUntilActualDrain) {
     for (bool refuse_flush : {false, true}) {
         for (size_t length : {size_t{3}, size_t{0}}) {
@@ -230,7 +493,7 @@ TEST_F(UsbDevice, InvalidTransferPlansRejectBeforeClockCallsOrMmio) {
         uint16_t maximum;
     };
     const Plan invalid[] = {{2U, 255U, 1U, true, 64U},
-                            {2U, NX_USB_PROFILE_INTERRUPT, 2U, false, 64U},
+                            {2U, NX_USB_PROFILE_INTERRUPT, 2U, false, 65U},
                             {0U, NX_USB_PROFILE_INTERRUPT, 0U, true, 64U},
                             {2U, NX_USB_PROFILE_INTERRUPT, 1U, true, 0U},
                             {2U, NX_USB_PROFILE_INTERRUPT, 1U, true, 65U},
@@ -524,6 +787,31 @@ TEST_F(UsbDevice, AddressChangesOnlyAfterMatchingStatusInAcknowledgement) {
     nx_usb_controller_irq(&model.controller);
     EXPECT_EQ(model.hardware.registers[0x800 / 4] & 0x7F0U, 7U << 4U);
     EXPECT_EQ(request.base.result, NX_SUCCESS);
+}
+TEST_F(UsbDevice, AddressAndResetAvoidImmediateDcfgReadAfterWrite) {
+    model.hardware.delay_config_read = true;
+    const uint8_t setup[8] = {0, 5, 7, 0, 0, 0, 0, 0};
+    ReceiveSetup(setup);
+    uint64_t epoch = model.controller.snapshot.epoch;
+    ASSERT_EQ(nx_usb_device_address(&device, epoch, 7U), NX_SUCCESS);
+    auto in = Port(0);
+    ASSERT_EQ(
+        nx_usb_in_prepare(&request, nullptr, 0U, NX_USB_STATUS, epoch, 200U),
+        NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_usb_complete(&model, 0U, true), NX_SUCCESS);
+    nx_usb_controller_irq(&model.controller);
+    nx_usb_device_state_t snapshot = {};
+    ASSERT_EQ(nx_usb_device_state(&device, &snapshot), NX_SUCCESS);
+    EXPECT_EQ(snapshot.address, 7U);
+    EXPECT_FALSE(snapshot.closing);
+    EXPECT_FALSE(model.hardware.early_config_read);
+    nx_native_usb_reset(&model);
+    nx_usb_controller_irq(&model.controller);
+    ASSERT_EQ(nx_usb_device_state(&device, &snapshot), NX_SUCCESS);
+    EXPECT_EQ(snapshot.address, 0U);
+    EXPECT_FALSE(model.controller.reset_pending);
+    EXPECT_FALSE(model.hardware.early_config_read);
 }
 TEST_F(UsbDevice, ResetDoesNotRevokeAnUnprovedEndpointLoan) {
     auto port = Port(2);

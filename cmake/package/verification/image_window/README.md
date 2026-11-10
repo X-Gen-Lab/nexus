@@ -19,8 +19,8 @@ cmake -S . -B build -G Ninja \
 cmake --build build --target image_window --parallel 1
 ```
 
-字节复现另使用 `tools/evidence/reproduce.py` 的源码／构建／消费 prefix map。
-普通构建可能保留绝对 `__FILE__`，移动 SDK 可改变 BIN 字节和大小。开发 fixture
+普通构建可能保留绝对 `__FILE__`，移动 SDK 可改变 BIN 字节和大小；当前工程只验证
+链接布局，不建立跨路径字节复现结论。开发 fixture
 还需 `-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON`，没有检出回退。
 
 实际 ELF gate 检查 LOAD、向量词、reset entry、stack reservation 和窗口容量。

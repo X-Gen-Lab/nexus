@@ -85,6 +85,9 @@ class EthernetMac : public testing::Test {
         regions[0] = {UINT32_C(0x20000000), 0x20000, 3};
 #if defined(NX_ETH_TEST_STM32)
         RCC->AHB1ENR |= UINT32_C(0x0e000000);
+        RCC->CR = 0x03030003U;
+        RCC->PLLCFGR = 0x07405408U;
+        RCC->CFGR = 0x0000940aU;
         SYSCFG->PMC |= UINT32_C(0x00800000);
 #else
         RCU_AHB1EN |= UINT32_C(0x0e000000);

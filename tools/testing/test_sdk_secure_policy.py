@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 import unittest
 
-from tools.release import transport
+from tools.maintenance import consumer_profiles
 from tools.configure import configure
 from tools.evidence.common import file_identity
 
@@ -25,7 +25,7 @@ class SDKSecurePolicyTests(unittest.TestCase):
         specification.loader.exec_module(cls.consumers)
 
     def test_secure_profiles_have_explicit_reviewed_execution_domains(self):
-        profiles = tuple(item for item in transport.SERVICE_CONSUMERS
+        profiles = tuple(item for item in consumer_profiles.SERVICE_CONSUMERS
                          if item.scenario == "secure_services")
         self.assertEqual([item.name for item in profiles],
                          ["native secure services", "f407 secure services"])
@@ -34,7 +34,7 @@ class SDKSecurePolicyTests(unittest.TestCase):
         self.assertEqual([item.arm for item in profiles], [False, True])
         self.assertEqual([item.scenario for item in profiles],
                          ["secure_services", "secure_services"])
-        self.assertEqual(tuple(entry for entry in transport.consumer_plan()
+        self.assertEqual(tuple(entry for entry in consumer_profiles.consumer_plan()
                                if entry[0] == "services" and
                                entry[1].scenario == "secure_services"),
                          tuple(("services", item) for item in profiles))
@@ -43,17 +43,6 @@ class SDKSecurePolicyTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "canonical|reviewed"):
                 self.consumers.service_profile(changed)
 
-    def test_missing_secure_image_is_not_a_complete_current_transport(self):
-        rows = transport.consumer_layout()
-        files = {image: {"size": 1} for _, _, images in rows for image in images}
-        directories = [name for source, build, _ in rows
-                       for name in (source, build, build + "/bin")]
-        expected = "native secure services build/bin/installed_services"
-        self.assertIn(expected, files)
-        transport.consumer_images(files, directories)
-        del files[expected]
-        with self.assertRaisesRegex(ValueError, "roots and images"):
-            transport.consumer_images(files, directories)
 
     def prefix(self, base):
         prefix = base / "prefix"
@@ -75,7 +64,7 @@ class SDKSecurePolicyTests(unittest.TestCase):
         return result
 
     def test_preparation_preserves_public_and_composition_boundaries(self):
-        for profile in tuple(item for item in transport.SERVICE_CONSUMERS
+        for profile in tuple(item for item in consumer_profiles.SERVICE_CONSUMERS
                          if item.scenario == "secure_services"):
             with self.subTest(profile=profile.name), tempfile.TemporaryDirectory() as tmp:
                 base = Path(tmp)
@@ -101,14 +90,17 @@ class SDKSecurePolicyTests(unittest.TestCase):
                 self.assertEqual(resolved.cpu["arch"],
                                  "cortex-m4" if profile.arm else "native")
                 if profile.arm:
-                    self.assertIn("nexus_add_stm32f407_entropy", cmake)
+                    self.assertNotIn("nexus_add_stm32f407_entropy", cmake)
+                    self.assertEqual([(item.kind, item.controller, item.mode)
+                                      for item in resolved.controllers],
+                                     [("entropy", "RNG", "rng-words")])
                     self.assertEqual(resolved.memory_budget.static_ram_limit_bytes,
                                      114688)
                     self.assertEqual(resolved.memory_budget.flash_load_limit_bytes,
                                      524288)
 
     def image_fixture(self, base, arm=False):
-        profile = next(item for item in transport.SERVICE_CONSUMERS
+        profile = next(item for item in consumer_profiles.SERVICE_CONSUMERS
                        if item.scenario == "secure_services" and item.arm == arm)
         prefix, sdk = self.prefix(base)
         source, build, _ = self.consumers.prepare_service_consumer(
@@ -171,7 +163,7 @@ class SDKSecurePolicyTests(unittest.TestCase):
                 self.assertIn("MQTT_Init", report["symbols"])
                 self.assertIn("nx_entropy_fill", report["symbols"])
                 if arm:
-                    self.assertIn("nx_stm32f407_entropy_instance_start", report["symbols"])
+                    self.assertIn("nx_factory_entropy", report["symbols"])
                     owners = [call for call in calls if "--component-owner" in call]
                     self.assertEqual(len(owners), 1)
                     self.assertIn("f407-secure-services", owners[0])

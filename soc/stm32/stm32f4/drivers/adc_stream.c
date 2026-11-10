@@ -12,19 +12,19 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "stm32f407_stream.h"
+#include "stm32f4_adc_trigger.h"
+#include "stm32f4xx_ll_adc.h"
 #include "stm32f4xx_ll_tim.h"
 
 #ifndef NX_STM32_DMA_DISABLE
 #define NX_STM32_DMA_DISABLE(stream, mask) ((stream)->CR &= ~(uint32_t)(mask))
 #endif
 
-/** \brief The fixed ADC1 request uses DMA2 stream4 channel0, status high
- * bits0..5. */
+/** \brief Acknowledge only the selected converter's fixed DMA2 lane. */
 static void acknowledge(nx_stm32_adc_stream_state_t* state) {
-    state->dma->HIFCR = 0x3DU;
+    nx_stm32_adc_dma_ack(state, 0x3DU);
 #ifndef NEXUS_STM32_MODEL
-    NVIC_ClearPendingIRQ(DMA2_Stream4_IRQn);
+    NVIC_ClearPendingIRQ(nx_stm32_adc_dma_irq(state->adc.registers));
 #endif
 }
 
@@ -66,10 +66,23 @@ nx_result_t nx_stm32_adc_stream_initialize(nx_stm32_adc_stream_state_t* state) {
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
-#ifndef NEXUS_STM32_MODEL
-    if (state->adc.registers != ADC1 || state->timer != TIM3 ||
-        state->dma != DMA2 || state->memory != DMA2_Stream4) {
+    const nx_stm32_adc_trigger_fact_t* trigger =
+        nx_stm32_adc_trigger_fact(state->trigger);
+    if (trigger == NULL ||
+        state->timer_clock_hz != nx_stm32_adc_trigger_clock(trigger)) {
         return NX_ERROR_UNSUPPORTED;
+    }
+#ifndef NEXUS_STM32_MODEL
+    if ((state->adc.registers != ADC1 && state->adc.registers != ADC2 &&
+         state->adc.registers != ADC3) ||
+        state->timer != trigger->registers || state->dma != DMA2 ||
+        state->memory != nx_stm32_adc_dma_memory(state->adc.registers)) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    IRQn_Type irq = nx_stm32_adc_dma_irq(state->adc.registers);
+    if (NVIC_GetEnableIRQ(irq) != 0U || NVIC_GetPendingIRQ(irq) != 0U ||
+        NVIC_GetActive(irq) != 0U) {
+        return NX_ERROR_BUSY;
     }
 #endif
     if (state->stream != NULL || state->adc.initialized ||
@@ -85,8 +98,9 @@ nx_result_t nx_stm32_adc_stream_initialize(nx_stm32_adc_stream_state_t* state) {
     state->stopping = true;
     acknowledge(state);
 #ifndef NEXUS_STM32_MODEL
-    NVIC_SetPriority(DMA2_Stream4_IRQn, 5U);
-    NVIC_EnableIRQ(DMA2_Stream4_IRQn);
+    state->adc.cold_effects |= NX_STM32_ADC_IRQ;
+    NVIC_SetPriority(irq, 5U);
+    NVIC_EnableIRQ(irq);
 #endif
     return NX_SUCCESS;
 }
@@ -99,12 +113,13 @@ nx_result_t nx_stm32_adc_stream_rate(nx_stm32_adc_stream_state_t* state,
                                              84U, 112U, 144U, 480U};
     if (trigger_hz == 0U || state->timer_clock_hz == 0U ||
         state->timer_clock_hz > 168000000U || state->adc_clock_hz == 0U ||
-        state->adc_clock_hz > 36000000U) {
+        state->adc_clock_hz > 36000000U || state->adc.resolution > 3U) {
         return NX_ERROR_INVALID;
     }
     uint32_t cycles = 0U;
     for (size_t i = 0U; i < state->adc.channel_count; ++i) {
-        cycles += sample_cycles[state->adc.sample_times[i]] + 12U;
+        cycles += sample_cycles[state->adc.sample_times[i]] +
+                  (12U - 2U * state->adc.resolution);
     }
     if (cycles == 0U || trigger_hz > state->adc_clock_hz / cycles ||
         state->timer_clock_hz % trigger_hz != 0U) {
@@ -181,30 +196,30 @@ static void arm(nx_stm32_adc_stream_state_t* state) {
     state->block_flags = NX_STREAM_BOUNDARY_TRIGGER;
     adc->CR2 = 0U;
     adc->CR1 = state->adc.channel_count > 1U ? (uint32_t)ADC_CR1_SCAN : 0U;
+    LL_ADC_SetResolution(adc,
+                         (uint32_t)state->adc.resolution << ADC_CR1_RES_Pos);
     nx_stm32_adc_stream_sequence(state);
     adc->SR = 0U;
-    state->timer->CR1 = 0U;
-    state->timer->CR2 = TIM_CR2_MMS_1;
-    state->timer->DIER = 0U;
-    LL_TIM_SetPrescaler(state->timer, state->prescaler);
-    LL_TIM_SetAutoReload(state->timer, state->period);
-    LL_TIM_SetCounter(state->timer, 0U);
-    state->timer->EGR = TIM_EGR_UG;
-    state->timer->SR = 0U;
+    nx_stm32_adc_trigger_program(state->timer,
+                                 nx_stm32_adc_trigger_fact(state->trigger),
+                                 state->prescaler, state->period);
     acknowledge(state);
     state->memory->PAR = (uint32_t)(uintptr_t)&adc->DR;
     state->memory->M0AR = (uint32_t)(uintptr_t)state->fill.data;
     state->memory->NDTR = (uint32_t)(state->fill.capacity / sizeof(uint16_t));
     state->memory->FCR = 0U;
-    state->memory->CR = DMA_SxCR_MINC | DMA_SxCR_PSIZE_0 | DMA_SxCR_MSIZE_0 |
-                        DMA_SxCR_PL_1 | DMA_SxCR_TCIE | DMA_SxCR_TEIE |
-                        DMA_SxCR_DMEIE;
+    state->memory->CR = nx_stm32_adc_dma_channel(adc) | DMA_SxCR_MINC |
+                        DMA_SxCR_PSIZE_0 | DMA_SxCR_MSIZE_0 | DMA_SxCR_PL_1 |
+                        DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
     nx_arch_dsb();
     state->memory->CR |= DMA_SxCR_EN;
-    adc->CR2 = ADC_CR2_ADON | ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_EXTSEL_3;
+    adc->CR2 = ADC_CR2_ADON | ADC_CR2_DMA | ADC_CR2_DDS |
+               ((uint32_t)nx_stm32_adc_trigger_fact(state->trigger)->selection
+                << ADC_CR2_EXTSEL_Pos);
     nx_arch_dsb();
     (void)adc->CR2;
-    state->ready_at = nx_deadline_after(nx_time_now_us(), 3U);
+    state->ready_at = nx_deadline_after(
+        nx_time_now_us(), nx_stm32_adc_startup_delay_us(&state->adc));
     state->warming = true;
 }
 
@@ -291,7 +306,7 @@ void nx_stm32_adc_stream_irq(nx_stm32_adc_stream_state_t* state) {
         state->stopping) {
         return;
     }
-    uint32_t status = state->dma->HISR & 0x3DU;
+    uint32_t status = nx_stm32_adc_dma_flags(state);
     if ((status & 0x2DU) == 0U) {
         return;
     }
@@ -403,8 +418,8 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     if (!state->adc.initialized) {
         return NX_ERROR_STATE;
     }
-    nx_result_t result =
-        nx_stm32_irq_wake_validate(wake, DMA2_Stream4_IRQn, syscall_ceiling);
+    nx_result_t result = nx_stm32_irq_wake_validate(
+        wake, nx_stm32_adc_dma_irq(state->adc.registers), syscall_ceiling);
     if (result == NX_SUCCESS) {
         nx_arch_irq_state_t saved = nx_arch_irq_save();
         state->wake = wake;

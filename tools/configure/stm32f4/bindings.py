@@ -8,8 +8,9 @@ from tools.configure import enhanced_endpoints, uart_formats
 from tools.configure.providers.common import Construction, exact_part, mode_traits
 from tools.configure.providers import hardware
 from tools.configure import timer_advanced, secondary_controllers
-from .contract import (ADC_CHANNEL_SEQUENCES, FLASH_PROGRAM_UNIT, LIMITS,
+from .contract import (ADC_PIN_CHANNELS, FLASH_PROGRAM_UNIT, LIMITS,
                        PARTS, mode_implementation)
+from .hardware import PWM_PIN_CHANNELS, PWM_TIMERS, ADC_INTERNAL_CHANNELS
 
 _PULL_VALUES = MappingProxyType({"none": 0, "up": 1, "down": 2})
 _OUTPUT_TYPES = MappingProxyType({"push-pull": 0, "open-drain": 1})
@@ -34,12 +35,12 @@ def _spi_constructor(item, result, board_bindings, routes, devices, *, paired=Fa
     selected = item.integration
     if selected is None or selected.clock_hz is None:
         raise ValueError("SPI requires its resolved controller integration")
-    if item.controller not in {"SPI1", "SPI2"} or len(item.pins) != 3:
+    if item.controller not in {"SPI1", "SPI2", "SPI3"} or len(item.pins) != 3:
         raise ValueError("SPI requires its reviewed three-pad controller route")
     name = _symbol(item.id)
     dma = item.mode == "dma"
-    if item.mode not in {"short-poll", "dma"} or (item.controller == "SPI2" and not paired):
-        raise ValueError("SPI requires its maintained polling or paired DMA mode")
+    if item.mode not in {"short-poll", "dma"}:
+        raise ValueError("SPI requires its maintained polling or DMA mode")
     implementation = "spi_dma" if dma else "spi"
     children = [child for child in devices if child.controller == item.id]
     if not children:
@@ -75,7 +76,7 @@ def _spi_constructor(item, result, board_bindings, routes, devices, *, paired=Fa
         base = endpoint + (".endpoint" if dma else "")
         endpoint_records.append(
             f"    {{ &{base}, &{chip_select}, {child.options.max_hz}u, "
-            f"{child.options.mode}u }}")
+            f"{child.options.mode}u, {str(child.options.lsb_first).lower()} }}")
     definitions += [f"static uint16_t {saved}[{len(pin_records)}];",
                     f"static const nx_stm32_spi_pin_config_t s_nx_spi_pins_{name}[] = {{"]
     snapshots = {}
@@ -137,7 +138,8 @@ def _i2c_constructor(item, result, devices):
     if (selected is None or selected.hardware is None or
             selected.hardware.kind != "i2c" or
             selected.hardware.controller != item.controller or
-            selected.clock_hz != 42000000 or len(selected.pins) != 2):
+            not 2000000 <= selected.clock_hz <= 50000000 or
+            selected.clock_hz % 1000000 != 0 or len(selected.pins) != 2):
         raise ValueError("I2C requires its reviewed controller integration")
     if item.mode not in {"poll-messages", "irq-messages", "dma-messages"}:
         raise ValueError("I2C requires its maintained execution mode")
@@ -153,7 +155,7 @@ def _i2c_constructor(item, result, devices):
     saved = f"s_nx_i2c_pin_state_{name}"
     config = f"s_nx_i2c_config_{name}"
     receipt = f"s_nx_i2c_cold_{name}"
-    definitions = [f"static uint16_t {saved}[2];",
+    definitions = [f"static uint16_t {saved}[{len(selected.pins)}];",
                    f"static nx_stm32_i2c_cold_receipt_t {receipt};",
                    f"static const nx_stm32_i2c_pin_config_t s_nx_i2c_pins_{name}[] = {{"]
     snapshots = {}
@@ -172,6 +174,7 @@ def _i2c_constructor(item, result, devices):
                     f"    .registers = {item.controller}, .pins = s_nx_i2c_pins_{name},",
                     f"    .dma = {'&s_nx_i2c_dma_' + name if dma else 'NULL'},",
                     f"    .clock_hz = {selected.clock_hz}u,",
+                    f"    .max_hz = {item.options.max_hz}u,",
                     f"    .priority = {selected.irq.priority if asynchronous else 0}u,",
                     f"    .asynchronous = {'true' if asynchronous else 'false'}", "};"]
     implementation = "i2c_async" if asynchronous else "i2c"
@@ -184,7 +187,8 @@ def _i2c_constructor(item, result, devices):
                     f"s_nx_endpoint_{child_name}")
         if index:
             definitions += [f"static nx_stm32_{implementation}_endpoint_state_t {endpoint} = {{",
-                            f"    .port = &s_nx_port_{name}, .address = {child.options.address}u", "};"]
+                            f"    .port = &s_nx_port_{name}, .address = {child.options.address}u,",
+                            f"    .address_bits = {child.options.address_bits}u", "};"]
         definitions += _endpoint_face("i2c", child_name, endpoint,
                                       implementation)
     if asynchronous:
@@ -212,9 +216,15 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     """Select immutable resources; concrete C owns every cold transition."""
     del board_bindings, routes, devices
     item = controller_ir(item, "stm32f4")
+    if item.kind == 'exti' and item.mode in {'pvd-level', 'pvd-events'}:
+        from .pvd import constructor as pvd_constructor
+        return pvd_constructor(item)
     if item.kind == "external_bus":
         from .fsmc import constructor as fsmc_constructor
         return fsmc_constructor(item, result)
+    if item.kind in {"capture", "audio"}:
+        from .capture_audio import constructor as av_constructor
+        return av_constructor(item, result)
     if item.kind == "rtc":
         from .rtc import constructor as rtc_constructor
         return rtc_constructor(item, result)
@@ -248,24 +258,31 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         initialize = DirectCall("nx_stm32_exti_prepare", (state, Address(config)))
         stop = DirectCall("nx_stm32_exti_close", (state,))
     elif kind == "pwm":
-        if item.controller != "TIM3" or [pin["pin"] for pin in item.pins] != ["PA6"]:
-            raise ValueError("Only reviewed TIM3 CH1 PA6 PWM route is maintained")
+        if len(item.pins) != 1:
+            raise ValueError("Fixed PWM requires one reviewed channel pad")
+        wire = item.pins[0]["pin"]
+        channel = PWM_PIN_CHANNELS.get((item.controller, wire))
+        if channel is None:
+            raise ValueError("Fixed PWM requires a reviewed general timer route")
+        pin = int(wire[2:])
         period, duty, tick = (item.options.period_ticks, item.options.duty_ticks,
                               item.options.tick_hz)
         if not all(isinstance(value, int) for value in (period, duty, tick)):
             raise ValueError("PWM requires explicit period/duty/tick_hz")
         if not 1 <= period <= LIMITS["pwm_period"] or not 0 <= duty <= period or tick <= 0:
-            raise ValueError("Invalid fixed TIM3 PWM counts")
-        timer_hz = LIMITS["timer_hz"]
+            raise ValueError("Invalid fixed PWM counts")
+        timer_hz = item.integration.clock_hz
         if timer_hz % tick != 0 or not 1 <= timer_hz // tick <= 65536:
-            raise ValueError("PWM tick_hz is not an exact reviewed TIM3 divider")
-        if item.initial not in (0, 64):
-            raise ValueError("PWM idle must be explicit PA6 masked output level")
+            raise ValueError("PWM tick_hz is not an exact reviewed divider")
+        if item.initial not in (0, 1 << pin):
+            raise ValueError("PWM idle must be the exact masked output level")
         definitions += [f"static nx_stm32_gpio_state_t s_nx_idle_{name};",
                         f"static const nx_stm32_pwm_config_t {config} = {{",
                         f"    .period_ticks = {period}u, .duty_ticks = {duty}u,",
                         f"    .tick_hz = {tick}u, .prescaler = {timer_hz // tick - 1}u,",
-                        f"    .inactive_high = {str(bool(item.initial)).lower()}", "};"]
+                        f"    .inactive_high = {str(bool(item.initial)).lower()},",
+                        f"    .registers = {item.controller}, .gpio = GPIO{wire[1]},",
+                        f"    .channel = {channel}u, .pin = {pin}u", "};"]
         inactive = Address(f"s_nx_idle_{name}")
         initialize = DirectCall("nx_stm32_pwm_prepare", (state, inactive, Address(config)))
         stop = DirectCall("nx_stm32_pwm_close", (state, inactive))
@@ -274,9 +291,12 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         dma = traits.dma
         channels, sampling = item.options.channels, item.options.sample_times
         reference = item.options.reference_mv
-        reviewed = tuple(int(pin["pin"][2:]) for pin in item.pins)
-        if item.controller != "ADC1" or channels != reviewed or channels not in ADC_CHANNEL_SEQUENCES:
-            raise ValueError("ADC channel sequence must match the reviewed PA0/PA1 route")
+        reviewed = {ADC_PIN_CHANNELS.get((item.controller, pin["pin"]))
+                    for pin in item.pins}
+        internal = frozenset(ADC_INTERNAL_CHANNELS.get(item.controller, ()))
+        if (None in reviewed or not channels or len(channels) > 16 or
+                set(channels) - internal != reviewed):
+            raise ValueError("ADC channel sequence must match its reviewed analog pins")
         if len(sampling) != len(channels) or not all(
                 isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 7
                 for value in sampling):
@@ -294,14 +314,18 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         definitions += [f"static const {config_type} {config} = {{"]
         if dma:
             definitions += ["    .adc = {"]
-        definitions += [f"    .channels = s_nx_adc_channels_{name},",
+        definitions += [f"    .registers = {item.controller},",
+                        f"    .channels = s_nx_adc_channels_{name},",
                         f"    .sample_times = s_nx_adc_samples_{name},",
-                        f"    .channel_count = {len(channels)}u, .reference_mv = {reference}u"]
+                        f"    .channel_count = {len(channels)}u, .reference_mv = {reference}u,",
+                        f"    .resolution = {(12 - item.options.resolution_bits) // 2}u"]
         if dma:
             definitions += ["    },", f"    .regions = s_nx_dma_regions_{name},",
-                            f"    .region_count = {count}u, .priority = {item.options.irq.priority}u"]
+                            f"    .region_count = {count}u, .priority = {item.options.irq.priority}u,",
+                            f"    .trigger = NX_STM32_ADC_{item.options.trigger.upper().replace('-', '_')}"]
         definitions += ["};"]
-        selected = "adc_continuous" if traits.continuous else "adc_stream" if dma else "adc"
+        selected = ("adc_continuous" if traits.continuous else "adc_stream" if dma
+                    else "adc_injected" if item.mode == "injected-shot" else "adc")
         initialize = DirectCall(f"nx_stm32_{selected}_prepare", (state, Address(config)))
         stop = DirectCall(f"nx_stm32_{selected}_close", (state,))
         if dma:
@@ -314,7 +338,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         raise ValueError(f"No maintained STM32 constructor for {kind}")
     from .contract import mode_implementation
     return Construction(
-        state_type=f"nx_stm32_{mode_implementation(item.kind, item.mode)}_state_t",
+        state_type=("nx_stm32_adc_state_t" if kind == "adc" and not traits.dma else
+                    f"nx_stm32_{mode_implementation(item.kind, item.mode)}_state_t"),
         definitions=definitions, initialize=initialize,
         stop=[stop], retain_on_failed_init=True)
 
@@ -324,7 +349,7 @@ def shared_irq_definitions(selections):
     selections = [controller_ir(item, "stm32f4") for item in selections]
     groups = {}
     for item in selections:
-        if item.kind != "exti":
+        if item.kind != "exti" or item.mode != 'edge-event':
             continue
         line = int(item.controller[4:])
         vector = (f"EXTI{line}" if line < 5 else
@@ -361,7 +386,9 @@ def _gpio_constructor(item):
                    f"    .registers = GPIO{port}, .mask = {mask}u,",
                    f"    .initial = {initial}u,",
                    f"    .output = {output}, .pull = {pull}u,",
-                   f"    .output_type = {output_type}u", "};"]
+                   f"    .output_type = {output_type}u,",
+                   "    .speed = NX_STM32_GPIO_SPEED_" +
+                   item.options.speed.replace("-", "_").upper(), "};"]
     return Construction(
         state_type="nx_stm32_gpio_state_t", definitions=definitions,
         initialize=DirectCall("nx_stm32_gpio_prepare",
@@ -372,9 +399,17 @@ def _gpio_constructor(item):
 
 
 def _basic_constructor(item, result):
-    """Keep immutable Flash geometry and fixed IWDG binding declarative."""
+    """Keep Flash geometry and both watchdog lifecycle connections declarative."""
     name = _symbol(item.id)
     state = Address(f"s_nx_port_{name}")
+    if item.kind == "watchdog" and item.mode == "window":
+        arguments = (state, item.options.window_ticks)
+        return Construction(
+            state_type="nx_stm32_window_watchdog_state_t", definitions=(),
+            admission=(DirectCall("nx_stm32_window_watchdog_admit", arguments),),
+            initialize=DirectCall("nx_stm32_window_watchdog_prepare", arguments),
+            stop=(DirectCall("nx_stm32_window_watchdog_stop", (state,)),),
+            retain_on_failed_init=True)
     if item.kind == "watchdog":
         return Construction(
             state_type="nx_stm32_watchdog_state_t", definitions=(),
@@ -391,6 +426,11 @@ def _basic_constructor(item, result):
     flash = result.physical_part.flash
     definitions += [f'_Static_assert(FLASH_BASE == 0x{flash["origin"]:08x}u,',
                     '               "Reviewed Flash base differs from the SDK");']
+    if item.options.maintenance:
+        definitions += [
+            "static const nx_flash_maintenance_port_t "
+            f"s_nx_flash_maintenance_{name} = {{",
+            f"    &nx_stm32_flash_maintenance_ops, &s_nx_port_{name}", "};"]
     return Construction(
         state_type="nx_stm32_flash_state_t", definitions=definitions,
         initialize=DirectCall("nx_stm32_flash_prepare",
@@ -406,7 +446,8 @@ def _uart_constructor(item, result):
             selected.hardware.kind != "uart" or
             selected.hardware.controller != item.controller or
             selected.clock_hz is None or selected.irq is None or
-            len(selected.pins) != 2):
+            not selected.pins or len(selected.pins) > 4 or
+            (item.mode != "irq-wire" and len(selected.pins) != 2)):
         raise ValueError("UART requires its reviewed controller integration")
     name = _symbol(item.id)
     traits = mode_traits("uart", item.mode)
@@ -415,7 +456,8 @@ def _uart_constructor(item, result):
     blocks = traits.block_stream
     words = item.mode == "irq-words"
     implementation = mode_implementation(item.kind, item.mode)
-    cold_kind = "byte" if implementation == "uart" else implementation[5:]
+    cold_kind = ("wire" if item.mode == "irq-wire" else
+                 "byte" if implementation == "uart" else implementation[5:])
     saved = f"s_nx_uart_pin_state_{name}"
     config = f"s_nx_uart_config_{name}"
     receipt = f"s_nx_uart_cold_{name}"
@@ -427,7 +469,7 @@ def _uart_constructor(item, result):
                     "nx_uart_rx_event_t" if options.rx_profile == "events"
                     else "uint8_t")
     capacity = options.rx_capacity or 0
-    definitions = [f"static uint16_t {saved}[2];",
+    definitions = [f"static uint16_t {saved}[{len(selected.pins)}];",
                    f"static nx_stm32_uart_cold_receipt_t {receipt};"]
     if not blocks:
         definitions += [f"static {storage_type} s_nx_rx_{name}[{capacity}];"]
@@ -466,6 +508,9 @@ def _uart_constructor(item, result):
         frame = "&s_nx_uart_frame_" + name
         definitions += [f"static const nx_uart_format_t s_nx_uart_frame_{name} =",
                         "    " + uart_formats.expression(options.frame) + ";"]
+    if options.wire is not None:
+        from tools.configure import uart_wires
+        definitions += uart_wires.definitions(name, options.wire)
     config_type = ("nx_stm32_uart_dma_cold_config_t" if dma else
                    "nx_stm32_uart_cold_config_t")
     definitions += [f"static const {config_type} {config} = {{"]
@@ -479,6 +524,9 @@ def _uart_constructor(item, result):
                     indent + f".profile = {profile}, .priority = {selected.irq.priority}u,",
                     indent + f".kernel_bound = {'true' if result.kernel is not None else 'false'},",
                     indent + f".preload_tx = {'true' if secondary_controllers.applies(item, result, 'stm32') else 'false'}, .format = {frame}"]
+    if options.wire is not None:
+        definitions[-1] += ","
+        definitions += [indent + f".wire = &s_nx_uart_wire_{name}, .pin_count = {len(selected.pins)}u"]
     if dma:
         engine = (rx or tx)[0]
         definitions += ["    },",
@@ -524,25 +572,57 @@ def _uart_constructor(item, result):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed STM32 instance, including its rollback and stop."""
     item = controller_ir(item, "stm32f4")
+    if item.kind == "adc_group":
+        from .adc_group import constructor as group_constructor
+        return group_constructor(item, result)
+    if item.kind == "encoder":
+        from .encoder import constructor as encoder_constructor
+        return encoder_constructor(item)
+    if item.kind == "entropy":
+        state = Address("s_nx_port_" + _symbol(item.id))
+        return Construction(state_type="nx_stm32f407_entropy_state_t",
+            definitions=(),
+            admission=(DirectCall("nx_stm32f407_entropy_admit", (state,)),),
+            initialize=DirectCall("nx_stm32f407_entropy_start", (state,)),
+            stop=[DirectCall("nx_stm32f407_entropy_stop", (state,))],
+            retain_on_failed_init=True)
+    if item.kind == "crc":
+        state = Address("s_nx_port_" + _symbol(item.id))
+        return Construction(state_type="nx_stm32_crc_state_t", definitions=(),
+            initialize=DirectCall("nx_stm32_crc_prepare", (state,)),
+            stop=[DirectCall("nx_stm32_crc_close", (state,))],
+            retain_on_failed_init=True)
+    if item.kind == "dac":
+        from .dac import constructor as dac_constructor
+        return dac_constructor(item, result)
     if item.kind == "block":
         from .block import constructor as block_constructor
         return block_constructor(item, result)
     if item.kind == "spi":
+        if item.mode == "irq-frames":
+            from .spi_frames import constructor as frames_constructor
+            return frames_constructor(item)
         construction = _spi_constructor(
             item, result, board_bindings, routes, devices,
             paired=secondary_controllers.applies(item, result, "stm32"))
         return enhanced_endpoints.dma_construction(item, construction, "stm32")
+    if item.kind == "i2c_target":
+        from .i2c_target import constructor as target_constructor
+        return target_constructor(item)
     if item.kind == "i2c":
         return _i2c_constructor(item, result, devices)
     if item.kind == "uart":
         return _uart_constructor(item, result)
+    if item.kind in {"pwm_group", "timer_pulse", "timer_sequence"}:
+        from .waveform import constructor as waveform_constructor
+        return waveform_constructor(item, result)
     if item.kind in timer_advanced.KINDS:
         from .timer import constructor as timer_constructor
         return timer_constructor(item, result)
     if item.kind == "can":
         from .can import constructor as can_constructor
         return can_constructor(item, result)
-    if item.kind in {"eth", "eth_frames", "usb_device"}:
+    if item.kind in {"eth", "eth_frames", "usb_device", "usb_host"}:
         from .packet import constructor as packet_constructor
         return packet_constructor(item, result)
     if item.kind == "gpio":

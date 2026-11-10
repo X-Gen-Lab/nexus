@@ -410,7 +410,7 @@ clock、Flash power-loss、OS context 需要真实 station instrument 与 review
 
 ## SoC 专项验收
 
-`soc_acceptance.py` 覆盖 [SoC 台账](../../docs/design/soc-refinement-execution.csv)
+`soc_acceptance.py` 覆盖 [SoC 台账](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/soc-refinement-execution.csv)
 SOC-37–55：十九项 ledger cases 和五项另选 modes 定义 hardware、stimuli、raw
 observations、invariants、metric units、safety 与 physical exits。plan 不操作
 instrument、不补 numeric limits、不建立 station ready。

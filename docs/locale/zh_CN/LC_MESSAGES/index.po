@@ -1,14 +1,14 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus source docs\n"
+"Project-Id-Version: Nexus source documentation\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 586e74d6fb9281e899abaee9ca3cd55d074dcc3cd380107c912cc87ad9ad8353\n"
+"X-Nexus-Source-SHA256: 3aa91fa2ef457843c62a88ecd706368bf28713f8ec90debaab87cdd4b54955ba\n"
 
 msgid "Nexus platform documentation"
 msgstr "Nexus 平台文档"

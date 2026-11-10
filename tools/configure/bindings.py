@@ -30,12 +30,14 @@ def _platform_connections(result, provider):
     specifications = (
         ("nx_platform_start_result_t", "system_start", "void"),
         ("nx_result_t", "resources_acquire", "void"),
+        ("nx_result_t", "resources_resume", "void"),
         ("nx_result_t", "resources_release", "void"),
         ("nx_result_t", "system_release", "bool started"))
     source = []
     if not provider.MODEL:
         required = ("platform_declarations", *("platform_" + name
-                    for _, name, _ in specifications))
+                    for _, name, _ in specifications
+                    if name != "resources_resume"))
         if any(not callable(getattr(provider, name, None)) for name in required):
             fail("Physical provider requires typed platform lifecycle hooks")
         source.extend(provider.platform_declarations(result))
@@ -48,7 +50,9 @@ def _platform_connections(result, provider):
             value = ("(nx_platform_start_result_t){ NX_SUCCESS, NX_SUCCESS, 0u }"
                      if name == "system_start" else "NX_SUCCESS")
         else:
-            hook = getattr(provider, "platform_" + name)
+            hook = getattr(provider, "platform_" + name, None)
+            if hook is None and name == "resources_resume":
+                hook = provider.platform_resources_acquire
             call = (hook(result, Symbol("started"))
                     if name == "system_release" else hook(result))
             if not isinstance(call, DirectCall):
@@ -111,7 +115,7 @@ def emit(result):
                         for item in result.devices} &
                        {"spi_transaction_device", "i2c_long_device",
                         "spi_dma_transaction_device", "memory_window",
-                        "parallel16"}):
+                        "parallel16", "flash_async", "nand"}):
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')
     if any(item.kind in {"eth", "eth_frames"} for item in selections):
         header.append('#include "nexus/io/mdio.h"')
@@ -129,6 +133,14 @@ def emit(result):
                ' * Complete release restores the selected original pin states;',
                ' * retain ownership if the product requires continued idle drive.',
                ' */', 'nx_result_t nx_platform_stop(void);',
+               r'/** \brief Drain all controllers/resources while retaining System.',
+               ' * Join application borrowers first. Failure keeps the remaining',
+               ' * prefix and blocks deep power. No scheduler or clock is changed.',
+               ' */', 'nx_result_t nx_platform_suspend(void);',
+               r'/** \brief Rebuild the same cold owners after System restoration.',
+               ' * Reentry is BUSY; failure retains System and incomplete drain.',
+               ' * Old requests, deadlines and application tasks are not replayed.',
+               ' */', 'nx_platform_start_result_t nx_platform_resume(void);',
                '/** \\brief Caller-owned output, accessed only during this call.',
                ' * Controller indices are zero-based resolved.json controllers',
                ' * positions, not typed factory IDs. SIZE_MAX means no controller.',
@@ -149,6 +161,10 @@ def emit(result):
                ' * Context and ownership rules match nx_platform_stop.',
                ' */',
                'nx_result_t nx_platform_stop_diagnosed(nx_platform_diagnostic_t* diagnostic);']
+    header += [r'/** \brief Add call-scoped metadata to the same suspend path. */',
+               'nx_result_t nx_platform_suspend_diagnosed(nx_platform_diagnostic_t* diagnostic);',
+               r'/** \brief Add call-scoped metadata to the same resume path. */',
+               'nx_platform_start_result_t nx_platform_resume_diagnosed(nx_platform_diagnostic_t* diagnostic);']
     header += [
         '/** \\brief Resolved controller ordinals; not factory IDs or a wire ABI. */',
         'enum {']
@@ -267,6 +283,11 @@ def emit(result):
         source += ['static const size_t s_nx_platform_ordinals[] = {',
                    '    ' + ', '.join(f'{index}u'
                                      for index in initialization_indices), '};']
+    power_controllers = getattr(provider, "platform_power_controllers", None)
+    power_source, suspend_hook, resume_hook = (
+        power_controllers(result, initialization_indices)
+        if power_controllers is not None else ([], "NULL", "NULL"))
+    source.extend(power_source)
     source += ['static const nx_platform_lifecycle_plan_t s_nx_platform_plan = {',
                f'    .controller_count = {len(initialize)}u,',
                '    .ordinals = ' + ('s_nx_platform_ordinals'
@@ -279,7 +300,9 @@ def emit(result):
                '    .system_release = nx_platform_system_release,',
                '    .acquire = nx_platform_acquire,',
                '    .release = nx_platform_release,',
-               f'    .permanent_effects = {str(pre_c_effects).lower()}', '};',
+               f'    .permanent_effects = {str(pre_c_effects).lower()},',
+               f'    .suspend = {suspend_hook}, .resume = {resume_hook},',
+               '    .resources_resume = nx_platform_resources_resume', '};',
                r'/** \brief Start the static platform through its C coordinator. */',
                'nx_platform_start_result_t nx_platform_start(void) {',
                '    return nx_platform_lifecycle_start_local(',
@@ -298,5 +321,17 @@ def emit(result):
                '    return nx_platform_lifecycle_stop_local(',
                '        &s_nx_platform_plan, &s_nx_platform_lifecycle, diagnostic, &s_nx_platform_identity);',
                '}']
+    for name, result_type in (("suspend", "nx_result_t"),
+                              ("resume", "nx_platform_start_result_t")):
+        for diagnosed in (False, True):
+            suffix = "_diagnosed" if diagnosed else ""
+            arguments = ("nx_platform_diagnostic_t* diagnostic"
+                         if diagnosed else "void")
+            diagnostic = "diagnostic" if diagnosed else "NULL"
+            source += [r'/** \brief Fixed connection to the phased C owner. */',
+                       f'{result_type} nx_platform_{name}{suffix}({arguments}) {{',
+                       f'    return nx_platform_lifecycle_{name}_local(',
+                       '        &s_nx_platform_plan, &s_nx_platform_lifecycle, ' +
+                       diagnostic + ', &s_nx_platform_identity);', '}']
     header += ['#ifdef __cplusplus', '}', '#endif', '#endif', '']
     return '\n'.join(header), '\n'.join(source) + '\n'

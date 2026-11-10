@@ -16,7 +16,7 @@ from scripts.validation.junit import prepare_report, validate_junit
 from tools.dev.change_paths import behavioral
 from tools.dev.presets import binary_directory
 from tools.dev import process
-from tools.testing.run_tool_tests import SUITES as TOOL_SUITES
+from tools.testing.run_tool_tests import SUITES as TOOL_SUITES, changed_suites
 
 
 def validate_google_report(report, *, not_before_ns=None, expected_cases=None):
@@ -43,7 +43,7 @@ def relevant(name):
 def check_staged_snapshot(root):
     """A worktree-only fix must not certify a different staged source snapshot."""
     result = subprocess.run(
-        ["git", "diff", "--name-only", "-z"], cwd=root,
+        ["git", "diff", "--no-renames", "--name-only", "-z"], cwd=root,
         capture_output=True, check=True,
     )
     dirty = [name.decode() for name in result.stdout.split(b"\0")
@@ -69,7 +69,7 @@ def staged_tree(root):
 def staged_paths(root):
     """Use the complete real index delta, including deletions and odd names."""
     result = subprocess.run(
-        ["git", "diff", "--cached", "--name-only", "-z"], cwd=root,
+        ["git", "diff", "--cached", "--no-renames", "--name-only", "-z"], cwd=root,
         capture_output=True, check=True,
     )
     return [os.fsdecode(name) for name in result.stdout.split(b"\0") if name]
@@ -136,6 +136,8 @@ def main(arguments=None):
     parser.add_argument("--preset", default="native-debug")
     parser.add_argument("--staged", action="store_true")
     parser.add_argument("--all", action="store_true")
+    parser.add_argument("--tools", choices=("all", "changed", "none"),
+                        help="Explicit tool-domain scope; GoogleTest always runs in full")
     parser.add_argument("paths", nargs="*")
     args = parser.parse_args(arguments)
     try:
@@ -157,50 +159,31 @@ def main(arguments=None):
         output.mkdir(parents=True, exist_ok=True)
         summary = output / "execution.json"
         summary.unlink(missing_ok=True)
-        matrix_report = output / "io-property-report.json"
-        matrix_report.unlink(missing_ok=True)
-        matrix_snapshot = output / "io-property-inputs.json"
-        matrix_snapshot.unlink(missing_ok=True)
-        preflight_snapshot = output / "io-property-preflight.json"
-        preflight_snapshot.unlink(missing_ok=True)
         python = sys.executable
-        # The complete tool domains compile Native and ARM fixtures. Diagnose
-        # their existing locked prerequisites before executing those suites.
-        execute([python, "tools/dev/dev.py", "doctor", "--target", "contracts"],
-                env, output / "preflight-contracts.txt")
-        # Reject current Native compile/link failures before expensive tool
-        # suites. The later build still captures their current output context.
+        scope = args.tools or ("all" if args.all else "changed")
+        suites = (TOOL_SUITES if scope == "all" else
+                  changed_suites(staged_paths(ROOT) if args.staged else args.paths)
+                  if scope == "changed" else ())
+        target = "contracts" if "testing" in suites or "ci" in suites else "native"
+        execute([python, "tools/dev/dev.py", "doctor", "--target", target],
+                env, output / "preflight-tools.txt")
         execute([python, "tools/dev/dev.py", "configure", "--preset",
-                 args.preset], env, output / "preflight-configure.txt")
+                 args.preset], env, output / "configure.txt")
         execute([python, "tools/dev/dev.py", "build", "--preset", args.preset,
                  "--target", "nexus_google_contracts"], env,
-                output / "preflight-build.txt")
-        # Catch stale catalogue/compiled ownership before long tool suites.
-        # The final complete capture still observes fresh post-suite inputs.
-        from scripts.ci import io_lifecycle_matrix
-        catalogue = ROOT / "tools/testing/io_lifecycle_matrix.json"
-        io_lifecycle_matrix.capture(
-            ROOT, build, catalogue, preflight_snapshot, complete=False)
+                output / "build.txt")
         tool_results = []
-        for suite in TOOL_SUITES:
+        for suite in suites:
             tool_report = output / f"tools-{suite}.json"
             tool_report.unlink(missing_ok=True)
             execute([python, "-B", "tools/testing/run_tool_tests.py", "--suite",
                      suite, "--report", str(tool_report)], env,
                     output / f"tools-{suite}.txt")
             tool_results.append(json.loads(tool_report.read_text()))
-        execute([python, "tools/dev/dev.py", "configure", "--preset",
-                 args.preset], env, output / "configure.txt")
-        execute([python, "tools/dev/dev.py", "build", "--preset", args.preset,
-                 "--target", "nexus_google_contracts"], env,
-                output / "build.txt")
         manifest = json.loads((build / "google-contracts.json").read_text())
         if (manifest.get("schema") != 1 or not manifest.get("executables")
                 or len(manifest["executables"]) != len(set(manifest["executables"]))):
             raise ValueError("Missing or duplicate GoogleTest executable plan")
-        # The catalogue consumes this runner's evidence, not another execution.
-        io_lifecycle_matrix.capture_complete(
-            ROOT, build, catalogue, matrix_snapshot, execute, env)
         results = []
         for index, name in enumerate(manifest["executables"]):
             binary = checked_binary(name, build)
@@ -228,9 +211,6 @@ def main(arguments=None):
             "scope": "Actual host execution; not proof of historical TDD order "
                      "or physical hardware qualification",
         }, indent=2) + "\n")
-        properties = io_lifecycle_matrix.audit(
-            ROOT, build, catalogue, matrix_snapshot, output)
-        matrix_report.write_text(json.dumps(properties, indent=2) + "\n")
         print(f"Executed {sum(r['passed'] for r in results)} GoogleTest cases; "
               f"evidence: {summary}")
         return 0

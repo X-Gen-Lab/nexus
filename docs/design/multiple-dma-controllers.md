@@ -1,4 +1,4 @@
-# Independent finite UART and SPI DMA controllers
+# Independent DMA controllers
 
 The existing typed faces, shared immutable operations tables and caller-owned
 request/state storage remain authoritative. A cold instance selects one exact
@@ -39,9 +39,61 @@ storage, exact one-byte DMA domains and MINC identity. There is no implicit
 scratch fallback. STM SPI2 polling abort/recovery pulses APB1 SPI2 reset;
 it does not reset the neighboring APB2 SPI1 controller.
 
-Only finite second-controller UART TX/SPI DMA is implemented here. Existing
-primary receive modes remain covered by their own suites; secondary continuous
-RX is not admitted through these new facts. Actual GoogleTest/GoogleMock MMIO
+The table describes finite UART TX/SPI DMA paths. Receive modes and additional
+controllers have their own selected contracts in the support matrix; a TX route
+does not itself authorize RX. Actual GoogleTest/GoogleMock MMIO
 regressions and strict ARM SDK object/layout reports are development evidence.
 Factory/selected whole-image validation is recorded separately. Physical DMA,
 IRQ latency, CS/wire timing and Board HIL remain **not executed**.
+
+
+## Independent ADC timer triggers
+
+ADC1/2/3 retain their reviewed DMA2 stream4/channel0, stream2/channel1 and
+stream1/channel2 respectively. Both finite and continuous modes select one of
+these regular trigger events from RM0090 Rev22 Table68:
+
+| Timer | Selected events | Kernel clock |
+|---|---|---|
+| TIM1 | CH1, CH2, CH3 | 168 MHz |
+| TIM3 | CH1, TRGO | 84 MHz |
+| TIM4 | CH4 | 84 MHz |
+| TIM5 | CH1, CH2, CH3 | 84 MHz |
+| TIM8 | CH1, TRGO | 168 MHz |
+
+The optional TOML `trigger` defaults to `tim3-trgo`. Three ADCs may run
+independently with distinct timer owners; this is not simultaneous or
+interleaved multimode conversion. Each selection exclusively claims the entire
+timer, conflicting with its PWM, capture, encoder or another ADC owner. TIM2
+remains the Core monotonic clock. EXTI11 needs a separate physical pin/event
+owner and is not admitted through these internal routes.
+
+The immutable typed option drives the resource claims, preflight clock mask,
+trigger graph and generated C selector. Analog Board routes authorize only the
+selected ADC pins; they no longer contain a fixed TIM3 policy. One shared
+read-only C fact table owns EXTSEL, controller, APB gate and channel identities.
+The mutable selector uses existing padding. Public ADC faces and stream buffer
+contracts remain unchanged. See the [I/O ownership diagrams](io-evolution.md)
+for the producer loan and withdrawal boundary.
+
+The shared C timer program clears inherited slave, output, interrupt, repeat
+and compare policy before arming. No timer pad or vector is acquired. TRGO uses
+update; compare events occur at ARR with CCxE disabled. Initial compare phase
+differs from the first update, so neither choice promises PWM phase or an
+aperture timestamp. UG occurs while ADC external detection is disabled; after
+ADC warmup, external detection and the selected counter are enabled. The full
+scan budget still uses 21 MHz ADCCLK and the actual selected resolution/sample
+codes.
+
+After memory and publisher drain, close withdraws ADC resources and then the
+selected timer gate. A refused gate release retains the TIMER receipt and its
+original identity even after the ADC clock is gone. Rebind stays BUSY; retry
+releases only the retained timer. A failed gate enable records that identity
+before the write. Startup and cleanup remain serialized privileged task work,
+with no scheduler, allocation or hidden sampling task.
+
+The VE/baremetal and ZG/FreeRTOS `*adc-timers*.toml` references select all three
+converters with three independent timers. Model tests execute real finite and
+continuous C paths, including invalid sources and refused acquisition/release.
+ARM linking, source SDK consumption and physical acquisition are separate
+checks; physical edge rate, jitter and analog behavior require an actual board.

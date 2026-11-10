@@ -77,3 +77,9 @@
 [submodule "ext/cjson"]
 	path = ext/cjson
 	url = https://github.com/X-Gen-Lab/cJSON.git
+[submodule "vendors/st/usb_device"]
+	path = vendors/st/usb_device
+	url = https://github.com/X-Gen-Lab/stm32-mw-usb-device.git
+[submodule "vendors/st/usb_host"]
+	path = vendors/st/usb_host
+	url = https://github.com/X-Gen-Lab/stm32-mw-usb-host.git

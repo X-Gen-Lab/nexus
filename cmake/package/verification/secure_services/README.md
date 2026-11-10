@@ -15,7 +15,7 @@ WANT，初始化并析构 MQTT、abort TLS、stop runtime。软件 MAC 保留正
 ## F407 场景
 
 该场景来自独立仓库 ARM service fixture，使用已审启明 F407ZG `hse8-pll168`
-和显式 RNG 组件。普通应用调用公共 TLS／MQTT，组合层提供精确静态存储及默认
+和唯一 typed RNG 选择；同一 Platform 生命周期持有 RNG 与时钟依赖。普通应用调用公共 TLS／MQTT，组合层提供精确静态存储及默认
 有界 lwIP 池。transport 未连接，UTC 不可信。SDK 检查只编译、链接，核对实际
 CPU／ABI／C11、资源、配置身份和存活符号，不在设备上执行 RNG／TLS／网络。
 预算为 Flash 512 KiB、static RAM 112 KiB、main stack 8 KiB、libc heap 0，超限失败。

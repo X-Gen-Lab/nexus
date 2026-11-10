@@ -1,0 +1,39 @@
+schema = 2
+board_package = "zg_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 32768
+flash_load_limit_bytes = 65536
+
+[capture.camera]
+binding = "camera8"
+mode = "raw-blocks"
+pixel_clock_hz = 24000000
+poll_limit = 128
+frame_divisor = 1
+pclk_falling = false
+hsync_high = false
+vsync_high = false
+irq = { priority = 5 }
+codes = [171, 128, 157, 182]
+max_service_gap_us = 10
+
+[audio.sound]
+binding = "sound3"
+mode = "master-tx"
+standard = "philips"
+sample_bits = 24
+slot_bits = 32
+mclk = false
+cpol_high = false
+poll_limit = 4096
+irq = { priority = 5 }
+sample_rate_hz = 48000
+pll_n = 192
+pll_r = 2
+max_error_ppm = 10000

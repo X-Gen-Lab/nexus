@@ -73,6 +73,122 @@ TEST_F(UsbDescriptors, ProfileBindsDirectionAndSelectedMpsToTheActualFace) {
     endpoints[3].number = 0U;
     EXPECT_EQ(nx_usb_profile_validate(&profile), NX_ERROR_INVALID);
 }
+
+TEST_F(UsbDescriptors,
+       IsochronousProfileAndDescriptorHaveDistinctWireEncoding) {
+    endpoints[2].transfer = endpoints[3].transfer =
+        static_cast<nx_usb_profile_transfer_t>(3);
+    configuration[21] = configuration[28] = 1U;
+    configuration[24] = configuration[31] = 1U;
+    ASSERT_EQ(nx_usb_profile_validate(&profile), NX_SUCCESS);
+    ASSERT_EQ(Validate(), NX_SUCCESS);
+    /* Standard reserved bits reject before class-specific policy is read. */
+    for (uint8_t attributes : {uint8_t{0x41}, uint8_t{0x81}, uint8_t{0xC1}}) {
+        configuration[21] = attributes;
+        EXPECT_EQ(Validate(), NX_ERROR_INVALID);
+    }
+    /* Synchronization is class policy; data/feedback usage stays USB encoded.
+     */
+    configuration[21] = 0x15U;
+    EXPECT_EQ(Validate(), NX_SUCCESS);
+    configuration[21] = 0x31U;
+    EXPECT_EQ(Validate(), NX_ERROR_INVALID);
+    configuration[21] = 1U;
+    for (uint8_t interval : {uint8_t{0}, uint8_t{17}}) {
+        configuration[24] = interval;
+        EXPECT_EQ(Validate(), NX_ERROR_INVALID);
+    }
+    configuration[24] = 1U;
+    profile.speed = NX_USB_PROFILE_HIGH_SPEED;
+    profile.phy = NX_USB_PROFILE_EXTERNAL_ULPI;
+    profile.phy_clock_hz = 60000000U;
+    profile.fifo_words = 1024U;
+    profile.endpoint_numbers = 6U;
+    /* High-bandwidth two/three transactions are not selected. */
+    configuration[23] = 8U;
+    EXPECT_EQ(Validate(), NX_ERROR_UNSUPPORTED);
+}
+TEST_F(UsbDescriptors, FullSpeedInterruptOutHasTheSelectedDescriptorAndMps) {
+    endpoints[3].transfer = NX_USB_PROFILE_INTERRUPT;
+    configuration[28] = 3U;
+    configuration[31] = 255U;
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_SUCCESS);
+    EXPECT_EQ(Validate(), NX_SUCCESS);
+}
+TEST_F(UsbDescriptors, IsochronousReceiveLayoutChecksBackToBackCapacity) {
+    endpoints[2].transfer = endpoints[3].transfer = NX_USB_PROFILE_ISOCHRONOUS;
+    endpoints[2].number = 2U;
+    endpoints[2].in = false;
+    endpoints[2].max_packet = endpoints[3].max_packet = 128U;
+    profile.rx_fifo_words = 64U;
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_ERROR_INVALID);
+    profile.rx_fifo_words = 80U;
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_SUCCESS);
+}
+
+TEST_F(UsbDescriptors, HsInternalPhyProfileKeepsFsPacketsAndSixNumbers) {
+    profile.fifo_words = 1024U;
+    profile.endpoint_numbers = 6U;
+    endpoints[2].number = endpoints[3].number = 5U;
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_SUCCESS);
+    EXPECT_EQ(nx_usb_profile_endpoint(&profile, 5U, true), &endpoints[2]);
+    profile.speed = NX_USB_PROFILE_HIGH_SPEED;
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_ERROR_INVALID);
+}
+
+TEST_F(UsbDescriptors, AhbDmaProfileBelongsToHsCoreEvenWithEmbeddedFsPhy) {
+    profile.engine = NX_USB_PROFILE_AHB_DMA;
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_ERROR_INVALID);
+    profile.fifo_words = 1024U;
+    profile.endpoint_numbers = 6U;
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_SUCCESS);
+    profile.phy = NX_USB_PROFILE_EXTERNAL_ULPI;
+    profile.phy_clock_hz = 60000000U;
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_SUCCESS);
+}
+
+TEST_F(UsbDescriptors, UlpiProfileAndDescriptorsSelect512ByteBulkPackets) {
+    profile.fifo_words = 1024U;
+    profile.endpoint_numbers = 6U;
+    profile.phy = NX_USB_PROFILE_EXTERNAL_ULPI;
+    profile.phy_clock_hz = 60000000U;
+    profile.speed = NX_USB_PROFILE_HIGH_SPEED;
+    profile.rx_fifo_words = 288U;
+    endpoints[2].max_packet = endpoints[3].max_packet = 512U;
+    configuration[22] = configuration[29] = 0U;
+    configuration[23] = configuration[30] = 2U;
+    ASSERT_EQ(nx_usb_profile_validate(&profile), NX_SUCCESS);
+    EXPECT_EQ(Validate(), NX_SUCCESS);
+    endpoints[2].max_packet = 64U;
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_ERROR_INVALID);
+    endpoints[3].max_packet = 64U;
+    profile.speed = NX_USB_PROFILE_FULL_SPEED;
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_SUCCESS);
+}
+
+TEST_F(UsbDescriptors, HighSpeedInterruptOutUsesExponentIntervalOneToSixteen) {
+    profile.fifo_words = 1024U;
+    profile.endpoint_numbers = 6U;
+    profile.phy = NX_USB_PROFILE_EXTERNAL_ULPI;
+    profile.phy_clock_hz = 60000000U;
+    profile.speed = NX_USB_PROFILE_HIGH_SPEED;
+    profile.rx_fifo_words = 288U;
+    endpoints[2].max_packet = 512U;
+    endpoints[3].transfer = NX_USB_PROFILE_INTERRUPT;
+    endpoints[3].max_packet = 1024U;
+    configuration[22] = 0U;
+    configuration[23] = 2U;
+    configuration[28] = 3U;
+    configuration[29] = 0U;
+    configuration[30] = 4U;
+    configuration[31] = 16U;
+    ASSERT_EQ(nx_usb_profile_validate(&profile), NX_SUCCESS);
+    EXPECT_EQ(Validate(), NX_SUCCESS);
+    configuration[31] = 17U;
+    EXPECT_EQ(Validate(), NX_ERROR_INVALID);
+    configuration[31] = 0U;
+    EXPECT_EQ(Validate(), NX_ERROR_INVALID);
+}
 TEST_F(UsbDescriptors,
        CompleteConfigurationUsesSelectedEndpointsAndPacketSizes) {
     EXPECT_EQ(Validate(), NX_SUCCESS);
@@ -121,7 +237,7 @@ TEST_F(UsbDescriptors, DeviceMpsAndStringBoundsDoNotInventProductPolicy) {
     EXPECT_EQ(nx_usb_descriptor_validate(&profile, &view), NX_ERROR_INVALID);
 }
 
-TEST_F(UsbDescriptors, InterruptInProfileAcceptsAllFullSpeedPacketBounds) {
+TEST_F(UsbDescriptors, InterruptProfilesAcceptAllFullSpeedPacketBounds) {
     endpoints[2].transfer = NX_USB_PROFILE_INTERRUPT;
     for (uint16_t maximum : {uint16_t{1}, uint16_t{10}, uint16_t{64}}) {
         endpoints[2].max_packet = maximum;
@@ -134,7 +250,7 @@ TEST_F(UsbDescriptors, InterruptInProfileAcceptsAllFullSpeedPacketBounds) {
     endpoints[2].max_packet = 10U;
     endpoints[2].in = false;
     endpoints[3].number = 2U;
-    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_SUCCESS);
     endpoints[2].in = true;
     endpoints[3].number = 1U;
     endpoints[0].transfer = NX_USB_PROFILE_INTERRUPT;
@@ -162,7 +278,8 @@ TEST_F(UsbDescriptors, InterruptDescriptorOwnsItsLinearFullSpeedPollInterval) {
     configuration[21] = 3U;
     configuration[28] = 3U;
     configuration[31] = 16U;
-    EXPECT_EQ(Validate(), NX_ERROR_UNSUPPORTED);
+    /* The wire OUT type must still match the selected bulk OUT profile. */
+    EXPECT_EQ(Validate(), NX_ERROR_INVALID);
 }
 
 TEST_F(UsbDescriptors, UnalignedProfileGraphIsRejectedBeforeTypedReads) {

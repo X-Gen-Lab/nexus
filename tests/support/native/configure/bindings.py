@@ -137,7 +137,7 @@ def constructor(item, result, board_bindings, routes, devices):
         definitions = [f"static const uint16_t s_nx_adc_model_{name}[{len(channels)}] = {{0}};"]
         initialize = DirectCall("nx_native_adc_configure_instance",
             (state_address, Symbol(f"s_nx_adc_model_{name}"), len(channels),
-             12, item.options.reference_mv))
+             item.options.resolution_bits, item.options.reference_mv))
         stop = [DirectCall("nx_native_adc_stop_instance", (state_address,))]
     else:
         raise ValueError(f"Native construction is not maintained for {kind}")

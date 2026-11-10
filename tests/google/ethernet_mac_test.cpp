@@ -74,6 +74,9 @@ class EthernetMac : public testing::Test {
         regions[0] = {UINT32_C(0x20000000), 0x20000, 3};
 #if defined(NX_ETH_TEST_STM32)
         RCC->AHB1ENR |= UINT32_C(0x0e000000);
+        RCC->CR = 0x03030003U;
+        RCC->PLLCFGR = 0x07405408U;
+        RCC->CFGR = 0x0000940aU;
         SYSCFG->PMC |= UINT32_C(0x00800000);
 #else
         RCU_AHB1EN |= UINT32_C(0x0e000000);
@@ -328,6 +331,26 @@ TEST_F(EthernetMac, CapturedWakeRemainsBorrowedDuringItsCallback) {
 extern "C" nx_result_t nx_eth_model_irq_control(nx_eth_mac_t*, bool) {
     return NX_SUCCESS;
 }
+TEST_F(EthernetMac, MiiSelectionRequiresAnExplicitMatchingSyscfgHandoff) {
+    mac.mii = true;
+    *reinterpret_cast<uint32_t*>(UINT32_C(0x40013804)) = 0U;
+    EXPECT_EQ(NX_SUCCESS, Initialize());
+    nx_result_t stopped = nx_eth_port_stop(&port);
+    for (unsigned attempt = 0U; attempt < 4U && stopped == NX_ERROR_BUSY;
+         ++attempt) {
+        nx_eth_model_poll(&mac);
+        stopped = nx_eth_port_stop(&port);
+    }
+    EXPECT_EQ(NX_SUCCESS, stopped);
+    *reinterpret_cast<uint32_t*>(UINT32_C(0x40013804)) = 0x00800000U;
+    EXPECT_EQ(NX_ERROR_STATE, Initialize());
+}
+TEST_F(EthernetMac, ActualClockChangeRejectsBeforeMacReset) {
+    RCC->CFGR = 0U;
+    EXPECT_EQ(NX_ERROR_STATE, Initialize());
+    EXPECT_EQ(0U, regs[0x1000U / 4U]);
+    EXPECT_FALSE(mac.retained);
+}
 TEST_F(EthernetMac, SocRejectsUnreviewedCcmAndWrongClockBeforeReset) {
     regions[0].begin = UINT32_C(0x10000000);
     EXPECT_EQ(NX_ERROR_PERMISSION, Initialize());
@@ -336,6 +359,23 @@ TEST_F(EthernetMac, SocRejectsUnreviewedCcmAndWrongClockBeforeReset) {
     mac.hclk_hz++;
     EXPECT_EQ(NX_ERROR_UNSUPPORTED, Initialize());
     EXPECT_EQ(0U, regs[0x1000 / 4]);
+}
+#endif
+#if !defined(NX_ETH_TEST_STM32)
+TEST_F(EthernetMac, AhbBelowTwentyFiveMegahertzRejectsBeforeReset) {
+    mac.hclk_hz = 24000000U;
+    EXPECT_EQ(NX_ERROR_INVALID, Initialize());
+    EXPECT_EQ(0U, regs[0x1000U / 4U]);
+    EXPECT_FALSE(mac.retained);
+    if (mac.retained) {
+        nx_result_t result = nx_eth_port_stop(&port);
+        for (unsigned attempt = 0U; attempt < 4U && result == NX_ERROR_BUSY;
+             ++attempt) {
+            nx_eth_model_poll(&mac);
+            result = nx_eth_port_stop(&port);
+        }
+        EXPECT_EQ(NX_SUCCESS, result);
+    }
 }
 #endif
 TEST_F(EthernetMac, CrcLengthFragmentAndVlanAreDiscardedWithoutBorrow) {

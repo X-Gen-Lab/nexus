@@ -4,7 +4,7 @@ Nexus uses one authored TOML assembly, a validated immutable configuration IR,
 static instances and typed factory, and one CMake software target graph. Ninja
 executes the declared graph. Products own application sources and composition.
 
-The [48-item execution ledger](build-system-execution.csv) preserves the requested
+The [48-item execution ledger](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/build-system-execution.csv) preserves the requested
 exit conditions. Implementation, executed software verification, environment
 distribution and physical acceptance have distinct evidence. Historical source
 qualification does not qualify changed build tools.
@@ -114,12 +114,13 @@ The execution ledger keeps all 48 requested requirements and exit conditions
 unchanged. Its updated paths bind the implementation, original RED/GREEN
 records and the final-source software gates in the
 [execution record](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/delivery/build-system-verification.md) and
-[result index](../delivery/build-system-results.json). Historical measurements
+[result index](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/delivery/build-system-results.json). Historical measurements
 retain their source and exact selections instead of inheriting a later HEAD.
 
 Automatic developer provenance binds a unique immutable command-attempt receipt
-and checks its command and working directory. Complete current contracts and
-actual candidate plan execution establish this association; a shared latest
+and checks its command and working directory. Current contract tests verify
+that association. Candidate-plan executions below are historical records; their
+retired orchestration is not a current acceptance mechanism. A shared latest
 report name cannot substitute for an exact attempt.
 
 BLD-18 retains full SDK byte checks at each consumption boundary after

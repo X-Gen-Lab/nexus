@@ -45,11 +45,35 @@ def validate_source(contents):
         raise ValueError("DOT graph declaration missing")
 
 
+def _css(contents):
+    # Comments do not create dependencies. Decode escapes before identifying
+    # url()/@import so escaped syntax cannot evade offline verification.
+    contents = re.sub(r"/\*.*?\*/", "", contents, flags=re.DOTALL)
+    contents = re.sub(r"\\(?:\r\n|[\r\n\f])", "", contents)
+    def unescape(match):
+        if match[1]:
+            value = int(match[1], 16)
+            if not 0 < value <= 0x10ffff or 0xd800 <= value <= 0xdfff:
+                raise ValueError("Offline CSS escape contains an invalid codepoint")
+            return chr(value)
+        return match[2]
+    contents = re.sub(r"\\([0-9a-fA-F]{1,6})(?:\r\n|[ \t\r\n\f])?"
+                      r"|\\([^\r\n\f])", unescape, contents)
+    expressions = (r"url\(\s*([^)]*?)\s*\)",
+                   r"@import\s+([\"'][^\"']+[\"'])")
+    links = []
+    for expression in expressions:
+        for match in re.finditer(expression, contents, re.IGNORECASE):
+            link = match[1].strip().strip("\"'")
+            if "\\" in link:
+                raise ValueError("Offline CSS resource link contains an escape")
+            if link:
+                links.append(link)
+    return links
+
+
 def _local_css(contents, identifiers):
-    # Share the delivery CSS decoder instead of maintaining a weaker SVG
-    # regex. It removes comments, decodes escapes and recognizes url/import
-    # case-insensitively before this stricter local-ID policy is applied.
-    from tools.documentation.delivery import _css
+    # Decode escapes before enforcing the local SVG resource policy.
     try:
         resources = _css(contents)
     except ValueError as error:

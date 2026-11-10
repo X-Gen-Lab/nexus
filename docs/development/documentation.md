@@ -42,13 +42,12 @@ terms; its authority links preserve the single contract.
 
 ## Apply the correct acceptance boundary
 
-Follow the unified document commands documented by the current CLI. A source check,
-strict bilingual build, real configuration/consumer execution, diagram audit, offline
-package and actual published-site check are separate results. Record command exits
-and exact inputs; never claim deployment from local HTML or hardware from a plan.
+Follow the current CLI commands for source checks, strict bilingual builds and
+complete documentation tests. Record actual exit codes and inputs. A local HTML
+build does not establish deployment, firmware acceptance or physical HIL.
 
-The [documentation ledger](../design/documentation-system-execution.csv) owns
-implementation and validation exits. The migration map preserves historical paths;
-old API redirects point to a version-aware migration or history page, not silently
-to a different new function contract. Retain qualification records at their original
-paths and identities.
+Current source contains maintained contracts and reader guides. Historical plans,
+ledgers and reports remain in fixed Git revisions with their original identities.
+Update current navigation, source links and translations together; removed tools
+must not remain as runnable commands. The platform has no separate documentation
+archive recovery or candidate promotion engine.

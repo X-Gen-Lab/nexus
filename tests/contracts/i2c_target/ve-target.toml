@@ -1,0 +1,23 @@
+schema = 2
+board_package = "ve-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 16384
+[i2c_target.target]
+binding = "target0"
+mode = "target-irq"
+own_address = 82
+address_bits = 7
+second_address = 0
+max_hz = 100000
+irq_latency_us = 4
+pec = false
+alert = false
+[i2c_target.target.irq]
+priority = 5
+calls_os = false

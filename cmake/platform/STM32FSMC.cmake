@@ -20,6 +20,10 @@ function(nexus_stm32f407_fsmc_ll target)
     target_compile_features("${vendor}" PRIVATE c_std_11)
     set_target_properties("${vendor}" PROPERTIES C_EXTENSIONS OFF)
     target_compile_definitions("${vendor}" PRIVATE "${device}")
+    if("nand" IN_LIST NEXUS_SELECTED_KINDS)
+        target_compile_definitions("${vendor}" PRIVATE NEXUS_STM32_FSMC_NAND=1)
+        target_compile_definitions("${target}" PRIVATE NEXUS_STM32_FSMC_NAND=1)
+    endif()
     # Do not propagate this minimal HAL config to a UART HAL owner on target.
     target_include_directories("${vendor}" PRIVATE
         "${source}/soc/stm32/stm32f4/private/fsmc_hal")

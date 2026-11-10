@@ -16,7 +16,6 @@ sys.path.insert(0, str(ROOT))
 
 from tests.contracts.test_evidence_support import link_fixture
 from tools.dev.process import run
-from tools.evidence import candidate, reproduce
 from tools.evidence.common import EvidenceError, atomic_json, digest, file_identity
 from tools.evidence.identity import canonical_digest
 from tools.measurement import elf as elf_tools
@@ -109,36 +108,7 @@ class ImageArtifactTests(unittest.TestCase):
         self.assertEqual(json.loads(config.read_text())["flash"]["size"], 0x100000)
         self.assertEqual(config.read_bytes(), before)
 
-    def test_offset_reproduction_validates_actual_objcopy_bytes(self):
-        elf, config, _, binary = self.fixture()
-        artifacts = {"elf": file_identity(elf), "bin": file_identity(binary),
-                     "map": file_identity(elf.with_suffix(".map"))}
-        try:
-            reproduce.validate_build_artifacts(config.parent, artifacts, "resolved.json")
-        except EvidenceError as error:
-            self.fail("Actual offset objcopy bytes must validate: " + str(error))
 
-    def test_offset_candidate_reaches_required_qualification_rejection(self):
-        elf, config, _, binary = self.fixture()
-        lock = self.root / "fixture-lock.json"
-        environment = self.root / "fixture-environment.json"
-        atomic_json(lock, {"kind": "unit-test-input-only"})
-        atomic_json(environment, {"kind": "mocked-environment-not-qualification"})
-        manifest = {
-            "schema_version": 1, "candidate_id": "offset-artifact-rejection",
-            "source": {}, "dependencies": [file_identity(lock)],
-            "environment": file_identity(environment),
-            "configuration": file_identity(config),
-            "artifacts": {"elf": file_identity(elf), "bin": file_identity(binary),
-                          "map": file_identity(elf.with_suffix(".map"))},
-            "qualifications": []}
-        # Only unrelated source/environment boundaries are mocked. The actual
-        # ELF/configuration/BIN must pass, and this never admits qualification.
-        with patch.object(candidate, "verify_source"), \
-                patch.object(candidate, "verify_environment"):
-            with self.assertRaisesRegex(EvidenceError,
-                                        "incomplete required software qualification"):
-                candidate.validate_manifest(manifest)
 
     def test_offset_file_load_before_image_is_rejected(self):
         elf, config, budget, _ = self.fixture(outside=0x08010000)

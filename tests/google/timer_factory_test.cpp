@@ -102,7 +102,7 @@ static uint16_t capture_pin(unsigned port, unsigned pin) {
 /** \brief External pin resource; timer implementation is not replaced. */
 static nx_result_t configure_pin(unsigned port, unsigned pin, uint8_t mode,
                                  uint8_t af, uint8_t pull, bool drain) {
-    if (port > 1U || pin > 15U || af > 15U || pull != 0U || drain)
+    if (port > 2U || pin > 15U || af > 15U || pull != 0U || drain)
         return NX_ERROR_INVALID;
     nx_result_t status = s_ports->Configure(port, pin, mode);
     if (status != NX_SUCCESS)
@@ -144,7 +144,11 @@ extern "C" void nx_timer_factory_write(volatile uint32_t* address,
                                        uint32_t value) {
     ++s_writes;
     if (address == s_refused) {
-        if (address == &NVIC->ICER[0] || address == &NVIC->ICPR[0])
+        bool clear = false;
+        for (unsigned bank = 0U; bank < 3U; ++bank)
+            clear |=
+                address == &NVIC->ICER[bank] || address == &NVIC->ICPR[bank];
+        if (clear)
             value &= ~s_hold;
         else
             value = (value & ~s_hold) | (*address & s_hold);
@@ -154,25 +158,37 @@ extern "C" void nx_timer_factory_write(volatile uint32_t* address,
     if (s_output_withdraw_refused && address == &gpio(1U, 0U) &&
         ((value >> 26U) & 3U) == 3U)
         value = (value & ~(3U << 26U)) | (*address & (3U << 26U));
-    if (address == &NVIC->ISER[0])
-        *address |= value;
-    else if (address == &NVIC->ICER[0]) {
-        NVIC->ISER[0] &= ~value;
-        *address = value;
-    } else if (address == &NVIC->ICPR[0]) {
-        NVIC->ISPR[0] &= ~value;
-        *address = value;
-    } else if (address == &CAP_SR || address == &ADV_SR)
+    for (unsigned bank = 0U; bank < 3U; ++bank) {
+        if (address == &NVIC->ISER[bank]) {
+            *address |= value;
+            return;
+        }
+        if (address == &NVIC->ICER[bank] || address == &NVIC->ICPR[bank]) {
+            if (address == &NVIC->ICER[bank])
+                NVIC->ISER[bank] &= ~value;
+            else
+                NVIC->ISPR[bank] &= ~value;
+            *address = value;
+            return;
+        }
+    }
+    if (address == &CAP_SR || address == &TIM3->SR || address == &TIM5->SR ||
+        address == &ADV_SR || address == &TIM8->SR)
         *address &= value;
-    else if (address == &gpio(0U, 24U) || address == &gpio(1U, 24U)) {
-        unsigned port = address == &gpio(0U, 24U) ? 0U : 1U;
+    else if (address == &gpio(0U, 24U) || address == &gpio(1U, 24U) ||
+             address == &gpio(2U, 24U)) {
+        unsigned port = address == &gpio(0U, 24U)   ? 0U
+                        : address == &gpio(1U, 24U) ? 1U
+                                                    : 2U;
         gpio(port, 20U) =
             (gpio(port, 20U) | (value & 0xffffU)) & ~(value >> 16U);
         *address = value;
     } else
         *address = value;
-    if (address == &CAP_EGR && (value & 1U) != 0U && (CAP_CR1 & 2U) == 0U) {
-        CAP_SR |= 1U;
+    for (TIM_TypeDef* timer : {TIM3, TIM4, TIM5}) {
+        if (address == &timer->EGR && (value & 1U) != 0U &&
+            (timer->CR1 & 2U) == 0U)
+            timer->SR |= 1U;
     }
 }
 /** \brief Priority byte storage remains independent from NVIC live facts. */
@@ -184,8 +200,13 @@ extern "C" void nx_timer_factory_priority_write(volatile uint8_t* address,
 /** \brief Match input capture read-clear without consuming a second edge. */
 extern "C" uint32_t nx_timer_factory_read(volatile uint32_t* address) {
     uint32_t value = *address;
-    if (address == &CAP_CCR)
-        CAP_SR &= ~2U;
+    for (TIM_TypeDef* timer : {TIM3, TIM4, TIM5}) {
+        volatile uint32_t* registers[4] = {&timer->CCR1, &timer->CCR2,
+                                           &timer->CCR3, &timer->CCR4};
+        for (unsigned channel = 0U; channel < 4U; ++channel)
+            if (address == registers[channel])
+                timer->SR &= ~(2U << channel);
+    }
     return value;
 }
 extern "C" nx_time_us_t nx_time_now_us(void) {
@@ -299,6 +320,13 @@ class TimerFactory : public testing::Test {
         CAP_SR |= 2U;
         CAP_IRQ();
     }
+    AdvancedColdConfig Tim8Config(uint16_t* snapshots) {
+        return {{&GPIOA->IDR, 64U, 168000000U, 1000000U, 1000U, 128U, true,
+                 false, false, true, 1U},
+                snapshots,
+                6U,
+                false};
+    }
 };
 
 TEST_F(TimerFactory, BasePreflightRejectsBeforeClockPinAndControllerEffects) {
@@ -324,6 +352,352 @@ TEST_F(TimerFactory, LookupIsPureBeforeAnyClockOrPinEffects) {
     EXPECT_EQ(advanced->config, nullptr);
     EXPECT_EQ(nx_factory_timer_capture(NX_TIMER_CAPTURE_ID_COUNT), nullptr);
     EXPECT_EQ(nx_factory_advanced_pwm(NX_ADVANCED_PWM_ID_COUNT), nullptr);
+}
+
+TEST_F(TimerFactory, CaptureColdFourthChannelOwnsPb9AndRestoresOnlyThatPad) {
+    nx_timer_capture_controller_t local{};
+    TimerCold cold{};
+    uint16_t snapshot{};
+    const CaptureColdConfig config{
+        {84000000U, 1000000U, NX_TIMER_EDGE_BOTH, 3U, true, 4U},
+        &snapshot,
+        6U,
+        false,
+        TIM4};
+    ASSERT_EQ(NX_SUCCESS, CaptureColdPrepare(&local, &cold, &config));
+    EXPECT_EQ(2U, (GPIOB->MODER >> 18U) & 3U);
+    EXPECT_EQ(2U, (GPIOB->AFR[1] >> 4U) & 15U);
+    EXPECT_EQ(0U, (GPIOB->MODER >> 12U) & 3U);
+    ASSERT_EQ(NX_SUCCESS, CaptureColdClose(&local, &cold, &config));
+    EXPECT_EQ(0U, GPIOB->MODER);
+    EXPECT_EQ(nullptr, cold.configuration);
+}
+
+TEST_F(TimerFactory, CaptureColdRejectsAnotherControllerBeforeAnyEffects) {
+    nx_timer_capture_controller_t local{};
+    TimerCold cold{};
+    uint16_t snapshot{};
+    const CaptureColdConfig config{
+        {84000000U, 1000000U, NX_TIMER_EDGE_RISING, 0U, true, 1U},
+        &snapshot,
+        6U,
+        false,
+        TIM5};
+    EXPECT_EQ(NX_ERROR_INVALID, CaptureColdPrepare(&local, &cold, &config));
+    EXPECT_EQ(0U, s_writes);
+    EXPECT_EQ(nullptr, cold.configuration);
+}
+
+TEST_F(TimerFactory, CaptureColdCloseCannotUseAnotherControllersWrapper) {
+    nx_timer_capture_controller_t local{};
+    TimerCold cold{};
+    uint16_t snapshot{};
+    const CaptureColdConfig config{
+        {84000000U, 1000000U, NX_TIMER_EDGE_RISING, 0U, true, 1U},
+        &snapshot,
+        6U,
+        false,
+        TIM4};
+    ASSERT_EQ(NX_SUCCESS, CaptureColdPrepare(&local, &cold, &config));
+    const unsigned before = s_writes;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_tim3_capture_cold_close(&local, &cold, &config));
+    EXPECT_EQ(before, s_writes);
+    EXPECT_EQ(&config, cold.configuration);
+    ASSERT_EQ(NX_SUCCESS, CaptureColdClose(&local, &cold, &config));
+}
+
+TEST_F(TimerFactory,
+       CaptureColdIdentitySurvivesHotReleaseAndRefusedPadRestore) {
+    nx_timer_capture_controller_t local{};
+    TimerCold cold{};
+    uint16_t snapshot{};
+    const CaptureColdConfig config{
+        {84000000U, 1000000U, NX_TIMER_EDGE_RISING, 0U, true, 4U},
+        &snapshot,
+        6U,
+        false,
+        TIM5};
+    const auto different = config;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim5_capture_cold_prepare(&local, &cold, &config));
+    s_restore_refused = true;
+    ASSERT_EQ(NX_ERROR_IO,
+              nx_stm32_tim5_capture_cold_close(&local, &cold, &config));
+    EXPECT_EQ(nullptr, local.config);
+    EXPECT_EQ(&config, cold.configuration);
+    EXPECT_TRUE(cold.clock_owned);
+    s_restore_refused = false;
+    const unsigned writes = s_writes;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_tim5_capture_cold_close(&local, &cold, &different));
+    EXPECT_EQ(writes, s_writes);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim5_capture_cold_close(&local, &cold, &config));
+    EXPECT_EQ(nullptr, cold.configuration);
+}
+
+TEST_F(TimerFactory, CaptureColdControllersOwnActualPadsAndBankedVectors) {
+    for (TIM_TypeDef* timer : {TIM3, TIM5}) {
+        nx_timer_capture_controller_t local{};
+        TimerCold cold{};
+        uint16_t snapshot{};
+        const uint8_t channel = timer == TIM3 ? 3U : 4U;
+        const CaptureColdConfig config{
+            {84000000U, 1000000U, NX_TIMER_EDGE_RISING, 0U, true, channel},
+            &snapshot,
+            6U,
+            false,
+            timer};
+        auto prepare = timer == TIM3 ? nx_stm32_tim3_capture_cold_prepare
+                                     : nx_stm32_tim5_capture_cold_prepare;
+        auto close = timer == TIM3 ? nx_stm32_tim3_capture_cold_close
+                                   : nx_stm32_tim5_capture_cold_close;
+        const unsigned irq = timer == TIM3 ? TIM3_IRQn : TIM5_IRQn;
+        const nx_result_t result = prepare(&local, &cold, &config);
+        EXPECT_EQ(NX_SUCCESS, result);
+        if (result != NX_SUCCESS)
+            continue;
+        EXPECT_NE(0U, NVIC->ISER[irq / 32U] & (1U << (irq % 32U)));
+        EXPECT_EQ(timer == TIM3 ? UINT16_MAX : UINT32_MAX, timer->ARR);
+        GPIO_TypeDef* pad = timer == TIM3 ? GPIOB : GPIOA;
+        const unsigned pin = timer == TIM3 ? 0U : 3U;
+        EXPECT_EQ(2U, (pad->MODER >> (pin * 2U)) & 3U);
+        ASSERT_EQ(NX_SUCCESS, close(&local, &cold, &config));
+        EXPECT_EQ(nullptr, cold.configuration);
+        EXPECT_EQ(0U, NVIC->ISER[irq / 32U] & (1U << (irq % 32U)));
+    }
+}
+
+TEST_F(TimerFactory, AdvancedColdThirdPairsOwnSelectedOutputsAndCommonBreak) {
+    for (TIM_TypeDef* timer : {TIM1, TIM8}) {
+        nx_advanced_pwm_controller_t local{};
+        TimerCold cold{};
+        uint16_t snapshots[3]{};
+        auto config = Tim8Config(snapshots);
+        config.timer.channel = 3U;
+        if (timer == TIM1) {
+            config.timer.break_input = &GPIOB->IDR;
+            config.timer.break_mask = 4096U;
+        }
+        auto prepare = timer == TIM1 ? nx_stm32_advanced_cold_prepare
+                                     : nx_stm32_tim8_advanced_cold_prepare;
+        auto close = timer == TIM1 ? nx_stm32_advanced_cold_close
+                                   : nx_stm32_tim8_advanced_cold_close;
+        const nx_result_t result = prepare(&local, &cold, &config);
+        EXPECT_EQ(NX_SUCCESS, result);
+        if (result != NX_SUCCESS)
+            continue;
+        if (timer == TIM1) {
+            EXPECT_EQ(2U, (GPIOA->MODER >> 20U) & 3U);
+            EXPECT_EQ(2U, (GPIOB->MODER >> 30U) & 3U);
+            EXPECT_EQ(2U, (GPIOB->MODER >> 24U) & 3U);
+        } else {
+            EXPECT_EQ(2U, (GPIOC->MODER >> 16U) & 3U);
+            EXPECT_EQ(2U, (GPIOB->MODER >> 2U) & 3U);
+            EXPECT_EQ(2U, (GPIOA->MODER >> 12U) & 3U);
+        }
+        ASSERT_EQ(NX_SUCCESS, close(&local, &cold, &config));
+        EXPECT_EQ(nullptr, cold.configuration);
+        EXPECT_EQ(0U, GPIOA->MODER | GPIOB->MODER | GPIOC->MODER);
+    }
+}
+
+TEST_F(TimerFactory, Tim8ColdRouteOwnsPc6Pa7Pa6AndItsActualSharedVector) {
+    nx_advanced_pwm_controller_t second{};
+    TimerCold cold{};
+    uint16_t snapshots[3]{};
+    const AdvancedColdConfig config{{&GPIOA->IDR, 64U, 168000000U, 1000000U,
+                                     1000U, 128U, true, false, false, true, 1U},
+                                    snapshots,
+                                    6U,
+                                    false};
+    NVIC->IPR[TIM8_BRK_TIM12_IRQn] = 0x20U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_cold_prepare(&second, &cold, &config));
+    EXPECT_NE(0U, RCC->APB2ENR & RCC_APB2ENR_TIM8EN);
+    EXPECT_EQ(2U, (GPIOC->MODER >> 12U) & 3U);
+    EXPECT_EQ(3U, (GPIOC->AFR[0] >> 24U) & 15U);
+    EXPECT_EQ(10U, (GPIOA->MODER >> 12U) & 15U);
+    EXPECT_EQ(51U, (GPIOA->AFR[0] >> 24U) & 255U);
+    EXPECT_EQ(0x60U, NVIC->IPR[TIM8_BRK_TIM12_IRQn]);
+    constexpr uint32_t vector = 1U << (TIM8_BRK_TIM12_IRQn % 32U);
+    NVIC->IABR[1] = vector;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_stm32_tim8_advanced_cold_close(&second, &cold, &config));
+    EXPECT_NE(0U, cold.pin_leases);
+    EXPECT_TRUE(cold.clock_owned);
+    NVIC->IABR[1] = 0U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_cold_close(&second, &cold, &config));
+    EXPECT_EQ(0U, cold.pin_leases);
+    EXPECT_FALSE(cold.clock_owned);
+    EXPECT_EQ(nullptr, second.config);
+    EXPECT_EQ(0x20U, NVIC->IPR[TIM8_BRK_TIM12_IRQn]);
+    EXPECT_EQ(0U, GPIOC->MODER | GPIOA->MODER);
+}
+
+TEST_F(TimerFactory, Tim8ColdAdmissionRejectsPoweredTim12BeforeAnyEffect) {
+    nx_advanced_pwm_controller_t second{};
+    TimerCold cold{};
+    uint16_t snapshots[3]{};
+    const AdvancedColdConfig config{{&GPIOA->IDR, 64U, 168000000U, 1000000U,
+                                     1000U, 128U, true, false, false, true, 1U},
+                                    snapshots,
+                                    6U,
+                                    false};
+    RCC->APB1ENR = RCC_APB1ENR_TIM12EN;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_stm32_tim8_advanced_cold_prepare(&second, &cold, &config));
+    EXPECT_EQ(0U, s_writes);
+    EXPECT_FALSE(cold.clock_owned);
+    EXPECT_EQ(0U, cold.pin_leases);
+}
+
+TEST_F(TimerFactory, ColdCloseCannotCrossTimerIdentity) {
+    nx_advanced_pwm_controller_t second{};
+    TimerCold cold{};
+    uint16_t snapshots[3]{};
+    const auto config = Tim8Config(snapshots);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_cold_prepare(&second, &cold, &config));
+    const auto before = cold;
+    const unsigned writes = s_writes;
+    ASSERT_EQ(NX_ERROR_INVALID,
+              nx_stm32_advanced_cold_close(&second, &cold, &config));
+    EXPECT_EQ(writes, s_writes);
+    EXPECT_EQ(0, std::memcmp(&before, &cold, sizeof(cold)));
+    EXPECT_EQ(&config.timer, second.config);
+    EXPECT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_cold_close(&second, &cold, &config));
+}
+
+TEST_F(TimerFactory, ColdCloseRequiresTheExactRetainedConfiguration) {
+    nx_advanced_pwm_controller_t second{};
+    TimerCold cold{};
+    uint16_t snapshots[3]{};
+    const auto config = Tim8Config(snapshots);
+    const auto different = config;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_cold_prepare(&second, &cold, &config));
+    const unsigned writes = s_writes;
+    ASSERT_EQ(NX_ERROR_INVALID,
+              nx_stm32_tim8_advanced_cold_close(&second, &cold, &different));
+    EXPECT_EQ(writes, s_writes);
+    EXPECT_EQ(&config.timer, second.config);
+    EXPECT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_cold_close(&second, &cold, &config));
+}
+
+TEST_F(TimerFactory, ColdConfigurationIdentitySurvivesFailedPadRollback) {
+    nx_advanced_pwm_controller_t second{};
+    TimerCold cold{};
+    uint16_t snapshots[3]{};
+    const auto config = Tim8Config(snapshots);
+    const auto different = config;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_cold_prepare(&second, &cold, &config));
+    s_restore_refused = true;
+    ASSERT_EQ(NX_ERROR_IO,
+              nx_stm32_tim8_advanced_cold_close(&second, &cold, &config));
+    EXPECT_EQ(nullptr, second.config);
+    EXPECT_NE(0U, RCC->APB2ENR & RCC_APB2ENR_TIM8EN);
+    s_restore_refused = false;
+    const unsigned writes = s_writes;
+    ASSERT_EQ(NX_ERROR_INVALID,
+              nx_stm32_tim8_advanced_cold_close(&second, &cold, &different));
+    EXPECT_EQ(writes, s_writes);
+    EXPECT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_cold_close(&second, &cold, &config));
+}
+
+TEST_F(TimerFactory, PreownedTimerGateIsNeverAdoptedByColdPreparation) {
+    nx_advanced_pwm_controller_t second{};
+    TimerCold cold{};
+    uint16_t snapshots[3]{};
+    const auto config = Tim8Config(snapshots);
+    RCC->APB2ENR = RCC_APB2ENR_TIM8EN;
+    ASSERT_EQ(NX_ERROR_BUSY,
+              nx_stm32_tim8_advanced_cold_prepare(&second, &cold, &config));
+    EXPECT_EQ(0U, s_writes);
+    EXPECT_FALSE(cold.clock_owned);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_cold_close(&second, &cold, &config));
+    EXPECT_EQ(0U, s_writes);
+    EXPECT_EQ(RCC_APB2ENR_TIM8EN, RCC->APB2ENR);
+}
+
+TEST_F(TimerFactory, PartialPreparationStillRejectsAnotherTimersClose) {
+    nx_advanced_pwm_controller_t second{};
+    TimerCold cold{};
+    uint16_t snapshots[3]{};
+    const auto config = Tim8Config(snapshots);
+    EXPECT_CALL(ports, Configure(2U, 6U, 2U)).WillOnce(Return(NX_ERROR_IO));
+    ASSERT_EQ(NX_ERROR_IO,
+              nx_stm32_tim8_advanced_cold_prepare(&second, &cold, &config));
+    ASSERT_EQ(nullptr, second.config);
+    ASSERT_TRUE(cold.clock_owned);
+    auto wrong = config;
+    wrong.timer.break_input = &GPIOB->IDR;
+    wrong.timer.break_mask = 4096U;
+    const unsigned writes = s_writes;
+    ASSERT_EQ(NX_ERROR_INVALID,
+              nx_stm32_advanced_cold_close(&second, &cold, &wrong));
+    EXPECT_EQ(writes, s_writes);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_tim8_advanced_cold_close(&second, &cold, &config));
+    EXPECT_FALSE(cold.clock_owned);
+    EXPECT_EQ(0U, cold.pin_leases);
+}
+
+TEST_F(TimerFactory, SnapshotsAndAllColdObjectsMustBeDisjointBeforeAnyWrite) {
+    for (unsigned overlap = 0U; overlap < 4U; ++overlap) {
+        SCOPED_TRACE(overlap);
+        /* Each malformed-input probe begins at a fresh model reset. This
+         * does not claim recovery after already-corrupted cleanup storage. */
+        std::memset(mapping, 0, 0x30000U);
+        std::memset(&g_nx_timer_factory_nvic, 0,
+                    sizeof(g_nx_timer_factory_nvic));
+        RCC->CFGR = RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
+        nx_advanced_pwm_controller_t second{};
+        TimerCold cold{};
+        uint16_t snapshots[3]{};
+        auto config = Tim8Config(snapshots);
+        TimerCold* receipt = &cold;
+        if (overlap == 0U)
+            config.snapshots = reinterpret_cast<uint16_t*>(&cold);
+        else if (overlap == 1U)
+            config.snapshots = reinterpret_cast<uint16_t*>(&second);
+        else if (overlap == 2U)
+            config.snapshots = reinterpret_cast<uint16_t*>(&config);
+        else
+            receipt = reinterpret_cast<TimerCold*>(&second);
+        const auto owner_before = second;
+        const auto receipt_before = cold;
+        const auto config_before = config;
+        const unsigned writes = s_writes;
+        EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_tim8_advanced_cold_prepare(
+                                        &second, receipt, &config));
+        EXPECT_EQ(writes, s_writes);
+        EXPECT_EQ(0, std::memcmp(&second, &owner_before, sizeof(second)));
+        EXPECT_EQ(0, std::memcmp(&cold, &receipt_before, sizeof(cold)));
+        EXPECT_EQ(0, std::memcmp(&config, &config_before, sizeof(config)));
+    }
+}
+
+TEST_F(TimerFactory, CaptureSnapshotCannotOverwriteItsColdReceipt) {
+    nx_timer_capture_controller_t local{};
+    TimerCold cold{};
+    const CaptureColdConfig config{
+        {84000000U, 1000000U, NX_TIMER_EDGE_BOTH, 3U, true, 1U},
+        reinterpret_cast<uint16_t*>(&cold),
+        6U,
+        false,
+        TIM4};
+    ASSERT_EQ(NX_ERROR_INVALID, CaptureColdPrepare(&local, &cold, &config));
+    EXPECT_EQ(0U, s_writes);
+    const TimerCold untouched{};
+    EXPECT_EQ(0, std::memcmp(&cold, &untouched, sizeof(cold)));
 }
 TEST_F(TimerFactory, UnprivilegedOwnerRejectsBeforeAnyColdSystemEffects) {
     s_privileged = false;

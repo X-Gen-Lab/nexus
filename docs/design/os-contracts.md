@@ -247,7 +247,7 @@ task return/F9 MSP bootstrap encoding；只有显式 `nonsecure` 使用 BC/B8 en
 nonsecure 是 state 2，其内存 attribution 由实际 Secure startup 实现。v6/v7 保持原有
 非跨世界 tuple，不继承 v8 的 security 参数意义。
 详细 Secure lifecycle 见 [Secure companion](../../os/freertos/secure/README.md)，
-实际实现、受维护矩阵与物理条件见 [OS 台账](os-execution.csv)。
+实际实现、受维护矩阵与物理条件见 [OS 台账](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/os-execution.csv)。
 其他 RTOS 的实际接入流程和可执行 admission probe 见
 [后端接入合同](os-backend-integration.md)，探针通过不会自动注册或宣称新内核支持。
 

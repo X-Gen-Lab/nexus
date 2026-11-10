@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "f407zg-rng-software-fixture",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "rm0090-rev22-internal-rng-software-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "rng",
+      "controller": "RNG",
+      "route": "rng-internal"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Pinless on-chip RNG only; physical entropy, clock tolerances and HIL have not been qualified."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "RM0090 Rev22 RNG chapter and PLL48 clock domain; no external pins or PCB route."
+    }
+  ]
+}

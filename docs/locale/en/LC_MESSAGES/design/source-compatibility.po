@@ -7,28 +7,29 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: c06a972304ac6636558f6be56b6268d2ff4479c232c7e4bd1bb9f3ebacbb4e19\n"
+"X-Nexus-Source-SHA256: f0a7a2f853e3c62f02a89370f7d81bf2a3c9b78da9472a37c191e887b20314bf\n"
 
-#: docs/design/source-compatibility.md:1
+#: ../../../docs/design/source-compatibility.md:1
 msgid "源码版本、factory 代际与依赖维护"
 msgstr "Source versions, factory generations and dependency maintenance"
 
-#: docs/design/source-compatibility.md:3
+#: ../../../docs/design/source-compatibility.md:3
 msgid ""
 "Nexus 交付源码 SDK。消费方在同一配置、编译器和 ABI 选择下重新编译 Core、 provider、生成 bindings "
-"和调用者；当前不交付稳定二进制 ABI。预编译库、不同 enum 选项、不同 FP ABI 或不同生成 bundle 的对象不能因为版本号相同而混合链接。"
+"和调用者；当前不交付稳定二进制 ABI。预编译库、不同 enum 选项、不同 FP ABI 或不同生成 bundle "
+"的对象不能因为版本号相同而混合链接。"
 msgstr ""
 "Nexus delivers a source SDK. Consumers rebuild Core, providers, generated "
-"bindings and callers under the same configuration, compiler and ABI choices; "
-"no stable binary ABI is currently delivered. Precompiled libraries, different"
-" enum options, FP ABIs or generated-bundle objects cannot be mixed merely "
-"because versions match."
+"bindings and callers under the same configuration, compiler and ABI choices;"
+" no stable binary ABI is currently delivered. Precompiled libraries, "
+"different enum options, FP ABIs or generated-bundle objects cannot be mixed "
+"merely because versions match."
 
-#: docs/design/source-compatibility.md:7
+#: ../../../docs/design/source-compatibility.md:7
 msgid "版本各自负责什么"
 msgstr "What each version owns"
 
-#: docs/design/source-compatibility.md:9
+#: ../../../docs/design/source-compatibility.md:9
 msgid ""
 "`dependencies/platform-compatibility.json` 是源码接口代际的唯一策略数据。 "
 "`tools/configure/metadata.py` 是生产装配器和维护工具共用的严格纯 stdlib loader。 "
@@ -36,118 +37,119 @@ msgid ""
 msgstr ""
 "`dependencies/platform-compatibility.json` is the sole source-interface-"
 "generation policy data. `tools/configure/metadata.py` is the strict pure-"
-"stdlib loader shared by production assembly and maintenance tools. It rejects"
-" duplicate keys, unknown fields, missing policy, boolean pseudo-integers, "
-"noncanonical versions and symlink inputs. It neither migrates TOML, selects "
-"hardware, runs builds nor replaces unknown values."
+"stdlib loader shared by production assembly and maintenance tools. It "
+"rejects duplicate keys, unknown fields, missing policy, boolean pseudo-"
+"integers, noncanonical versions and symlink inputs. It neither migrates "
+"TOML, selects hardware, runs builds nor replaces unknown values."
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "项目"
 msgstr "Item"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "当前值"
 msgstr "Current value"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "合同"
 msgstr "Contract"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "平台 semantic version"
 msgstr "Platform semantic version"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "`0.2.1`"
 msgstr "`0.2.1`"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "唯一人工维护值来自兼容性 JSON；CMake、生成头文件和包元数据派生并保持一致"
 msgstr ""
 "The sole authored value comes from the compatibility JSON; CMake, generated "
 "headers and package metadata derive it and remain consistent."
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "`factory_abi_epoch`"
 msgstr "`factory_abi_epoch`"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "`1`"
 msgstr "`1`"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "当前唯一认可的生成源码接口代际；不是 binary ABI 保证"
 msgstr ""
 "The only currently recognized generated-source interface generation; not a "
 "binary ABI guarantee"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "source SDK"
 msgstr "source SDK"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "`source_only` / `exact`"
 msgstr "`source_only` / `exact`"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "CMake package 只接受相同完整版本，拒绝 ranges"
 msgstr "CMake packages accept only the exact full version and reject ranges"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "authored assembly"
 msgstr "authored assembly"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "`2`"
 msgstr "`2`"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "简化的 TOML 选择面；不改变 Board/SoC 事实"
 msgstr "Simplified TOML selection surface; no change to Board/SoC facts"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "resolved JSON projection / typed IR"
 msgstr "resolved JSON projection / typed IR"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "`1` / `2`"
 msgstr "`1` / `2`"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "单向 JSON 输出格式与私有 Python 类型化源码接口分别计代"
 msgstr ""
-"The one-way JSON output format and private typed Python source interface have"
-" separate generations"
+"The one-way JSON output format and private typed Python source interface "
+"have separate generations"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "Board / SoC / routes"
 msgstr "Board / SoC / routes"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "`1` / `1` / `1`"
 msgstr "`1` / `1` / `1`"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "物理事实文件及生产 validator 必须一致"
 msgstr "Physical-fact files and production validators must agree"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "CPU runtime assembly / facts / resolved"
 msgstr "CPU runtime assembly / facts / resolved"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "CPU 软件配置，不能升格 SoC/Board 资格"
 msgstr "CPU software configuration cannot promote SoC/Board qualification"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "installed source SDK manifest"
 msgstr "installed source SDK manifest"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "既有完整 file-map/源依赖/package-export 校验"
-msgstr "Existing complete file-map/source-dependency/package-export validation"
+msgstr ""
+"Existing complete file-map/source-dependency/package-export validation"
 
-#: docs/design/source-compatibility.md:25
+#: ../../../docs/design/source-compatibility.md:25
 msgid ""
 "这些数字不能互相替代。修改文档或新增可选机制通常不改变配置 schema；改变 schema 意味着生产 validator/emitter "
 "明确维护了新的格式，并更新策略断言与负测。策略不能 使尚未实现的 schema 获得支持。SDK manifest 增加一个被 file-map "
@@ -155,29 +157,20 @@ msgid ""
 msgstr ""
 "These numbers are not interchangeable. Documentation edits or optional "
 "mechanisms usually do not change configuration schemas. Schema changes mean "
-"production validators/emitters explicitly maintain a new format, with updated"
-" policy assertions and negative tests. Policy cannot grant support to an "
-"unimplemented schema. Adding a file covered by the SDK manifest file-map does"
-" not change the manifest format."
+"production validators/emitters explicitly maintain a new format, with "
+"updated policy assertions and negative tests. Policy cannot grant support to"
+" an unimplemented schema. Adding a file covered by the SDK manifest file-map"
+" does not change the manifest format."
 
-#: docs/design/source-compatibility.md:30
-msgid ""
-"软件候选另有封存格式版本。新封存使用第 2 版，保留各 scope 的实际原件并重新 核验范围语义；这不改变 factory epoch 或 TOML "
-"schema。第 1 版冻结候选只能通过 显式 `--legacy-replay` 做历史声明与字节闭包的只读重放，不能重新建立当前范围 "
-"资格，也不执行归档中的 Python。核验时观察的工具身份不补造执行时工具身份； 原始记录没有建立的执行输入认证仍需明确保留。"
+#: ../../../docs/design/source-compatibility.md:30
+msgid "历史候选封存格式保留在其固定源码中；当前平台不提供候选封存或 legacy replay 入口。阅读原始报告不改变本次源码或产物的验收状态。"
 msgstr ""
-"Software candidates have a separate sealing format version. Newly sealed "
-"candidates use version 2, retaining the original artifacts for each scope and"
-" revalidating scope semantics; this does not change the factory epoch or TOML"
-" schema. Version 1 frozen candidates support only read-only replay of "
-"historical claims and their byte closure through explicit `--legacy-replay`. "
-"This cannot re-establish qualification for current scopes and does not "
-"execute archived Python. Tool identities observed during verification do not "
-"supply missing tool identities for the original execution; authentication of "
-"execution inputs that the original record did not establish must remain "
-"explicitly unestablished."
+"Historical candidate sealing formats remain in their fixed source revisions;"
+" the current platform exposes no candidate sealing or legacy replay entry "
+"point. Reading original reports does not change acceptance of the current "
+"source or artifacts."
 
-#: docs/design/source-compatibility.md:36
+#: ../../../docs/design/source-compatibility.md:33
 msgid ""
 "类型化源码接口第 2 代只接受严格 TOML 解析后的不可变装配对象；生产 resolver、 factory 和 emitter "
 "使用具名字段，不提供字典接口或 schema-1 JSON 装配兼容。 `resolved.json` 仍是第 1 "
@@ -187,14 +180,14 @@ msgstr ""
 "Typed source interface generation 2 accepts only immutable assembly objects "
 "produced by strict TOML parsing. Production resolver, factory and emitters "
 "use named fields, without a dictionary interface or schema-1 JSON assembly "
-"compatibility. `resolved.json` remains a version-1 one-way output for audits "
-"and independent artifact checks, not a trusted configuration input. "
+"compatibility. `resolved.json` remains a version-1 one-way output for audits"
+" and independent artifact checks, not a trusted configuration input. "
 "`source_epoch` is a Python class contract; it is not serialized to JSON and "
-"adds no MCU state or change to public C factory interfaces. Maintenance tools"
-" observe both declarations on the actual IR class and check them against the "
-"sole version policy."
+"adds no MCU state or change to public C factory interfaces. Maintenance "
+"tools observe both declarations on the actual IR class and check them "
+"against the sole version policy."
 
-#: docs/design/source-compatibility.md:42
+#: ../../../docs/design/source-compatibility.md:39
 msgid ""
 "当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。 既有 `v0.2.0` 标签保留原始预览源码身份。本次 "
 "semantic version 变化保留 epoch `1`、 exact 匹配和 authored schema `2`；版本值不把旧 "
@@ -202,14 +195,14 @@ msgid ""
 msgstr ""
 "The current `0.2.1` version is for development and software-candidate "
 "preparation. A version value alone does not establish publication or "
-"candidate acceptance. The existing `v0.2.0` tag retains its original preview "
-"source identity. This semantic-version change preserves epoch `1`, exact "
+"candidate acceptance. The existing `v0.2.0` tag retains its original preview"
+" source identity. This semantic-version change preserves epoch `1`, exact "
 "matching and authored schema `2`. A version value does not transfer old "
-"SDK/candidate qualification to new source. A new candidate must independently"
-" bind actual clean source, configuration, dependencies, tools and executed "
-"evidence."
+"SDK/candidate qualification to new source. A new candidate must "
+"independently bind actual clean source, configuration, dependencies, tools "
+"and executed evidence."
 
-#: docs/design/source-compatibility.md:47
+#: ../../../docs/design/source-compatibility.md:44
 msgid ""
 "`0.1.0` 是 2026-10-15（Asia/Shanghai）首个公开源码 SDK 开发者预览版。 之前源码快照中的 `1.0.0` "
 "是公开发行前的版本值；2026-01-12 第一阶段的旧 `0.1.0` 文字保留为历史里程碑。该已发布版本的范围和原始证据见 [0.1.0 "
@@ -219,21 +212,21 @@ msgid ""
 msgstr ""
 "`0.1.0` is the first public Source SDK developer preview, released on "
 "2026-10-15 (Asia/Shanghai). The `1.0.0` in earlier source snapshots was a "
-"pre-public-release version value; the earlier `0.1.0` wording from the first "
-"phase on 2026-01-12 remains a historical milestone. See the [historical 0.1.0"
-" release status](https://github.com/X-Gen-"
+"pre-public-release version value; the earlier `0.1.0` wording from the first"
+" phase on 2026-01-12 remains a historical milestone. See the [historical "
+"0.1.0 release status](https://github.com/X-Gen-"
 "Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/release-0.1.0.md)"
-" for that release's scope and original evidence; its release manifest defines"
-" the exact source/tree. Existing tags, release assets and evidence retain "
-"their original identities and are not rewritten to match the current "
+" for that release's scope and original evidence; its release manifest "
+"defines the exact source/tree. Existing tags, release assets and evidence "
+"retain their original identities and are not rewritten to match the current "
 "development version."
 
-#: docs/design/source-compatibility.md:53
+#: ../../../docs/design/source-compatibility.md:50
 msgid ""
 "factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face， "
-"不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后 拿到另一 bundle 使用。`factory_abi_epoch` "
-"命名保留 ABI 字样，但目前只标记生成 源码接口代际：消费者、factory header、公共 face 和实现必须重新编译。当前 epoch 为 "
-"1；指定 0、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。"
+"不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后 拿到另一 bundle 使用。`factory_abi_epoch`"
+" 命名保留 ABI 字样，但目前只标记生成 源码接口代际：消费者、factory header、公共 face 和实现必须重新编译。当前 epoch 为"
+" 1；指定 0、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。"
 msgstr ""
 "Factory compact IDs mean something only within their generated bundle. The "
 "factory returns existing static read-only faces without allocation or "
@@ -245,7 +238,7 @@ msgstr ""
 "future values, nonintegers or missing policy must reject rather than become "
 "compatibility fallbacks."
 
-#: docs/design/source-compatibility.md:59
+#: ../../../docs/design/source-compatibility.md:56
 msgid ""
 "生成配置须把策略原字节加入既有 inputs/snapshots/hash 闭包，并从唯一 loader 生成 "
 "`NEXUS_PLATFORM_VERSION` 和 `NEXUS_FACTORY_ABI_EPOCH`。这些是编译期常量， 不会增加运行时 "
@@ -261,16 +254,16 @@ msgstr ""
 "replace them. Historical SDKs missing this policy are not automatically "
 "recognized by new tools as maintained generations."
 
-#: docs/design/source-compatibility.md:65
+#: ../../../docs/design/source-compatibility.md:62
 msgid "自动检查"
 msgstr "Automatic checks"
 
-#: docs/design/source-compatibility.md:77
+#: ../../../docs/design/source-compatibility.md:74
 msgid ""
-"`--generated` 使用实际生成 header 的路径；不同构建根的路径可能不同。工具从真实 Python validators/emission"
-" 的 AST 读取 schema，读取实际事实文件，并运行现有 `NexusConfigVersion.cmake.in` 的相等版本、不同版本与 "
-"range 拒绝用例。它不复制 resolver 选择规则；如果 authority 的表达形式改变，检查会明确失败，维护者需 更新观察器。所有参与字节有"
-" SHA/size，结束前复验，观察过程中变化不能报告一致。"
+"`--generated` 使用实际生成 header 的路径；不同构建根的路径可能不同。工具从真实 Python "
+"validators/emission 的 AST 读取 schema，读取实际事实文件，并运行现有 "
+"`NexusConfigVersion.cmake.in` 的相等版本、不同版本与 range 拒绝用例。它不复制 resolver 选择规则；如果 "
+"authority 的表达形式改变，检查会明确失败，维护者需 更新观察器。所有参与字节有 SHA/size，结束前复验，观察过程中变化不能报告一致。"
 msgstr ""
 "`--generated` takes the actual generated-header path, which may differ "
 "between build roots. The tool reads schemas from real Python "
@@ -278,10 +271,10 @@ msgstr ""
 "`NexusConfigVersion.cmake.in` equal-version, different-version and range-"
 "rejection cases. It does not copy resolver selection rules; authority-"
 "expression changes fail explicitly and require observer maintenance. All "
-"participating bytes have SHA/size and are rechecked before return; concurrent"
-" changes cannot report consistency."
+"participating bytes have SHA/size and are rechecked before return; "
+"concurrent changes cannot report consistency."
 
-#: docs/design/source-compatibility.md:83
+#: ../../../docs/design/source-compatibility.md:80
 msgid ""
 "`--sdk` 复用既有 `package_source_sdk.verify` 校验整个源文件映射、依赖、厂商 import 和 package "
 "exports，再检查策略及 schema/version 一致。`consistent` 只表示这些 元数据一致，不表示 fresh "
@@ -293,23 +286,23 @@ msgstr ""
 "not that fresh full tests, software candidates, signatures, physical HIL or "
 "product releases pass."
 
-#: docs/design/source-compatibility.md:87
+#: ../../../docs/design/source-compatibility.md:84
 msgid ""
 "版本变更需先写拒绝/兼容契约测试，再修改唯一策略及实际 authority。source breaking 变更需明确 major/epoch "
 "的变化和外部迁移；可选源码能力用 minor，保持公开合同的 缺陷修复用 patch。没有实际迁移实现时，禁止接受旧格式后静默选择新行为。"
 msgstr ""
-"Version changes first add rejection/compatibility contract tests, then modify"
-" the single policy and actual authorities. Source-breaking changes require "
-"explicit major/epoch changes and external migration; optional source "
-"capabilities use minor and public-contract-preserving fixes use patch. "
+"Version changes first add rejection/compatibility contract tests, then "
+"modify the single policy and actual authorities. Source-breaking changes "
+"require explicit major/epoch changes and external migration; optional source"
+" capabilities use minor and public-contract-preserving fixes use patch. "
 "Without real migration, accepting old formats then silently selecting new "
 "behavior is prohibited."
 
-#: docs/design/source-compatibility.md:91
+#: ../../../docs/design/source-compatibility.md:88
 msgid "依赖来源、获取与选版"
 msgstr "Dependency provenance, retrieval and version selection"
 
-#: docs/design/source-compatibility.md:93
+#: ../../../docs/design/source-compatibility.md:90
 msgid ""
 "`tools/maintenance/source_catalogue.py` 是已审 Git 依赖目录：`upstream_url` "
 "标识官方来源与版本观察地址，`fetch_url` 标识本提交允许的获取地址，Gitlink 选择 实际 "
@@ -318,27 +311,27 @@ msgid ""
 msgstr ""
 "`tools/maintenance/source_catalogue.py` is the reviewed Git dependency "
 "catalogue: `upstream_url` identifies the official source and version-"
-"observation endpoint, `fetch_url` identifies the retrieval location approved "
-"by this commit, and the Gitlink selects the actual commit. Source locks "
+"observation endpoint, `fetch_url` identifies the retrieval location approved"
+" by this commit, and the Gitlink selects the actual commit. Source locks "
 "continue to constrain official provenance, licenses and content; a locked "
-"commit must equal the Gitlink rather than override it. Changing hosting does "
-"not upgrade a library or change the CMake dependency graph."
+"commit must equal the Gitlink rather than override it. Changing hosting does"
+" not upgrade a library or change the CMake dependency graph."
 
-#: docs/design/source-compatibility.md:98
+#: ../../../docs/design/source-compatibility.md:95
 msgid ""
 "目录明确枚举顶层 Git 子模块及其嵌套子模块。所选提交的运行时依赖 及其递归闭包参与源码 SDK；GoogleTest/GoogleMock "
 "只供主机测试使用。嵌套模块的 section name 和相对路径分别核对，不能假设两者相同。GD32 官方归档继续按已审 "
 "子树、逐文件锁和原许可管理，不伪装成官方 Git 仓库的 fork。"
 msgstr ""
-"The catalogue explicitly enumerates top-level Git submodules and their nested"
-" submodules. The source SDK includes the selected commit's runtime "
-"dependencies and their recursive closure; GoogleTest/GoogleMock are used only"
-" for host tests. A nested module's section name and relative path are checked"
-" separately and cannot be assumed identical. Official GD32 archives remain "
-"governed by reviewed subtrees, per-file locks and original licenses; they are"
-" not represented as forks of official Git repositories."
+"The catalogue explicitly enumerates top-level Git submodules and their "
+"nested submodules. The source SDK includes the selected commit's runtime "
+"dependencies and their recursive closure; GoogleTest/GoogleMock are used "
+"only for host tests. A nested module's section name and relative path are "
+"checked separately and cannot be assumed identical. Official GD32 archives "
+"remain governed by reviewed subtrees, per-file locks and original licenses; "
+"they are not represented as forks of official Git repositories."
 
-#: docs/design/source-compatibility.md:103
+#: ../../../docs/design/source-compatibility.md:100
 msgid ""
 "`X-Gen-Lab` 托管目录中声明的官方 Git 依赖 fork；`fetch_url` 与 `.gitmodules` "
 "指向已验证的组织仓库。获取地址使用目录中的实际仓库名，不从磁盘 路径或上游 URL 推导名称。官方 `upstream_url` "
@@ -349,12 +342,12 @@ msgstr ""
 "catalogue; `fetch_url` and `.gitmodules` point to verified organization "
 "repositories. Fetch URLs use the actual repository names in the catalogue, "
 "not names inferred from disk paths or upstream URLs. The official "
-"`upstream_url` retains its role for provenance and version observation, while"
-" the Gitlink continues to select the exact commit. Each Nexus commit permits "
-"one explicit fetch URL, without global `url.insteadOf`, floating branches or "
-"automatic fallback to another repository."
+"`upstream_url` retains its role for provenance and version observation, "
+"while the Gitlink continues to select the exact commit. Each Nexus commit "
+"permits one explicit fetch URL, without global `url.insteadOf`, floating "
+"branches or automatic fallback to another repository."
 
-#: docs/design/source-compatibility.md:109
+#: ../../../docs/design/source-compatibility.md:106
 msgid ""
 "FreeRTOS 使用仅修改根 `.gitmodules` 中两个已知 URL 的组织提交，集成引用为 "
 "`nexus/transport-v11.1.0-r1`。它的唯一父提交是已锁定官方基线，嵌套 Gitlink、源码、 "
@@ -362,8 +355,8 @@ msgid ""
 "`dependencies/reviews/freertos/` 中的基线文件和补丁记录该审查；补丁不在配置或构建 期间动态应用。官方发行 tag "
 "仍指向官方基线，组织提交不代表新的官方发行版。"
 msgstr ""
-"FreeRTOS uses an organization commit that changes only two known URLs in its "
-"root `.gitmodules`, with integration ref `nexus/transport-v11.1.0-r1`. Its "
+"FreeRTOS uses an organization commit that changes only two known URLs in its"
+" root `.gitmodules`, with integration ref `nexus/transport-v11.1.0-r1`. Its "
 "sole parent is the locked official baseline; nested Gitlinks, source code, "
 "licenses and file modes remain unchanged. `dependencies/freertos-"
 "transport.lock.json` and the baseline file and patch under "
@@ -372,7 +365,7 @@ msgstr ""
 "still identify the official baseline. The organization commit does not "
 "represent a new official release."
 
-#: docs/design/source-compatibility.md:115
+#: ../../../docs/design/source-compatibility.md:112
 msgid ""
 "开发 checkout 与 SDK 打包执行实际 Git 父链、完整树差异和两处 URL 替换检查， 不能只信锁文件声明的 "
 "`changed_paths`。SDK 内的审查材料和文件映射验证导出字节， 无 Git "
@@ -382,18 +375,18 @@ msgstr ""
 "Development checkouts and SDK packaging verify the actual Git parent chain, "
 "complete tree difference and two URL replacements, rather than trusting the "
 "lock's declared `changed_paths`. Review material and file maps in the SDK "
-"verify exported bytes; consumers without Git cannot claim to have reverified "
-"the complete parent chain or source tree. Consumers must first establish SDK "
-"identity through an independently trusted release identity, candidate record "
-"or previously approved archive digest, before executing packaged "
+"verify exported bytes; consumers without Git cannot claim to have reverified"
+" the complete parent chain or source tree. Consumers must first establish "
+"SDK identity through an independently trusted release identity, candidate "
+"record or previously approved archive digest, before executing packaged "
 "Python/CMake. Agreement between a self-contained manifest and its payload "
 "does not itself establish trusted provenance or signature verification."
 
-#: docs/design/source-compatibility.md:121
+#: ../../../docs/design/source-compatibility.md:118
 msgid "托管迁移、同步与恢复"
 msgstr "Hosting migration, synchronization and recovery"
 
-#: docs/design/source-compatibility.md:123
+#: ../../../docs/design/source-compatibility.md:120
 msgid ""
 "迁移先验证 fork 的官方父仓库关系、匿名读取、固定 commit 与所需引用可达，再 更新 Nexus 获取策略。组织仓库为受维护提交保留 "
 "`refs/tags/nexus/pins/<完整SHA>`； 联网准备在改动 checkout 前核对引用返回的对象与所选 SHA。FreeRTOS "
@@ -407,25 +400,26 @@ msgstr ""
 "preparation checks that the ref advertises the selected SHA before changing "
 "the checkout. FreeRTOS retains both the official baseline and the "
 "organization integration commit. Repository or ref existence does not "
-"establish that the current connection can write to it, or that branch or tag "
-"protection is enabled; those states require actual readback. Synchronizing "
+"establish that the current connection can write to it, or that branch or tag"
+" protection is enabled; those states require actual readback. Synchronizing "
 "upstream must not rewrite production source or published refs."
 
-#: docs/design/source-compatibility.md:129
+#: ../../../docs/design/source-compatibility.md:126
 msgid ""
 "已有 checkout 从已审官方地址迁往已审组织地址时，准备工具先检查工作区、实际 仓库根、origin 和允许的旧/新 "
-"commit。普通源码修改、未跟踪依赖文件、未知 origin 或未知 HEAD 都应停止处理。已登记的旧 Gitlink 可以作为迁移起点；不能将一次 "
-"正常的子模块版本切换误判为用户源码修改。工具不 stash、reset、clean 或强制更新。"
+"commit。普通源码修改、未跟踪依赖文件、未知 origin 或未知 HEAD 都应停止处理。已登记的旧 Gitlink 可以作为迁移起点；不能将一次"
+" 正常的子模块版本切换误判为用户源码修改。工具不 stash、reset、clean 或强制更新。"
 msgstr ""
 "When an existing checkout migrates from a reviewed official location to a "
-"reviewed organization location, preparation first checks the worktree, actual"
-" repository root, origin, and allowed old/new commits. Ordinary source edits,"
-" untracked dependency files, an unknown origin or an unknown HEAD must stop "
-"preparation. A registered old Gitlink is an admissible migration starting "
-"point; a normal submodule revision transition must not be misclassified as a "
-"user source edit. The tool does not stash, reset, clean or force updates."
+"reviewed organization location, preparation first checks the worktree, "
+"actual repository root, origin, and allowed old/new commits. Ordinary source"
+" edits, untracked dependency files, an unknown origin or an unknown HEAD "
+"must stop preparation. A registered old Gitlink is an admissible migration "
+"starting point; a normal submodule revision transition must not be "
+"misclassified as a user source edit. The tool does not stash, reset, clean "
+"or force updates."
 
-#: docs/design/source-compatibility.md:134
+#: ../../../docs/design/source-compatibility.md:131
 msgid ""
 "已有 checkout 先切换到要消费的准确 Nexus 提交，再从仓库根运行显式准备入口。 "
 "工具按所选提交识别已登记的旧依赖状态；以下命令允许下载，离线检查省略 `--allow-network`："
@@ -435,7 +429,7 @@ msgstr ""
 "registered old dependency state according to that selected commit. These "
 "commands permit downloads; omit `--allow-network` for offline verification:"
 
-#: docs/design/source-compatibility.md:143
+#: ../../../docs/design/source-compatibility.md:140
 msgid ""
 "准备工具先审查源码拥有的完整声明和 Gitlink，再同步、初始化明确选中的顶层路径。 每个父模块更新后，重新审查其实际声明和所属 Git "
 "树，再逐层处理明确选中的子路径。 这些步骤不使用无范围的递归下载；组织维护分支只声明已选择并审查的依赖。 先更新顶层 "
@@ -443,39 +437,41 @@ msgid ""
 "HEAD、origin 和干净状态。缺失对象、下载 失败或来源不符必须失败，保留实际执行记录，不改用 `--remote` 或隐式备用地址。 "
 "配置、构建和提交门禁均不自动联网准备依赖。"
 msgstr ""
-"The preparation tool first audits the complete source-owned declarations and "
-"Gitlinks, then synchronizes and initializes the explicitly selected top-level"
-" paths. After each parent module is updated, it audits that parent's actual "
-"declarations and owning Git tree again, then processes the explicitly "
-"selected child paths one level at a time. These steps do not perform unscoped"
-" recursive downloads; organization-maintained branches declare only "
-"dependencies that are selected and reviewed. Update top-level FreeRTOS before"
-" synchronizing its nested declarations, so its old `.gitmodules` cannot write"
-" official URLs back. On completion, check each path, Gitlink, actual HEAD, "
-"origin and clean state. Missing objects, failed downloads or a provenance "
-"mismatch must fail and retain actual execution records; do not substitute "
-"`--remote` or an implicit alternate location. Configuration, builds and "
-"commit gates never prepare dependencies through implicit network access."
+"The preparation tool first audits the complete source-owned declarations and"
+" Gitlinks, then synchronizes and initializes the explicitly selected top-"
+"level paths. After each parent module is updated, it audits that parent's "
+"actual declarations and owning Git tree again, then processes the explicitly"
+" selected child paths one level at a time. These steps do not perform "
+"unscoped recursive downloads; organization-maintained branches declare only "
+"dependencies that are selected and reviewed. Update top-level FreeRTOS "
+"before synchronizing its nested declarations, so its old `.gitmodules` "
+"cannot write official URLs back. On completion, check each path, Gitlink, "
+"actual HEAD, origin and clean state. Missing objects, failed downloads or a "
+"provenance mismatch must fail and retain actual execution records; do not "
+"substitute `--remote` or an implicit alternate location. Configuration, "
+"builds and commit gates never prepare dependencies through implicit network "
+"access."
 
-#: docs/design/source-compatibility.md:151
+#: ../../../docs/design/source-compatibility.md:148
 msgid ""
-"回滚使用正常的新提交，一起恢复获取策略、Gitlink、审查锁和相应示例 pin；不改写 旧提交、tag 或证据。fork 不等于备份：Nexus 自身的"
-" Git bundle 不包含子模块对象， 需要另存依赖 Git 对象，或保留可验证的完整源码 SDK，并实际验证异地恢复。服务 "
+"回滚使用正常的新提交，一起恢复获取策略、Gitlink、审查锁和相应示例 pin；不改写 旧提交、tag 或证据。fork 不等于备份：Nexus "
+"自身的 Git bundle 不包含子模块对象， 需要另存依赖 Git 对象，或保留可验证的完整源码 SDK，并实际验证异地恢复。服务 "
 "不可用时消费已批准的离线包，不把临时换源隐藏在普通构建中。"
 msgstr ""
 "Rollback uses a normal new commit to restore retrieval policy, Gitlinks, "
-"review locks and corresponding example pins together; it does not rewrite old"
-" commits, tags or evidence. A fork is not a backup: a Nexus Git bundle does "
-"not contain submodule objects. Retain dependency Git objects separately, or "
-"keep a verifiable complete source SDK, and actually verify recovery on "
-"another host. During a service outage, consume an approved offline package "
-"rather than hiding a temporary source change inside a normal build."
+"review locks and corresponding example pins together; it does not rewrite "
+"old commits, tags or evidence. A fork is not a backup: a Nexus Git bundle "
+"does not contain submodule objects. Retain dependency Git objects "
+"separately, or keep a verifiable complete source SDK, and actually verify "
+"recovery on another host. During a service outage, consume an approved "
+"offline package rather than hiding a temporary source change inside a normal"
+" build."
 
-#: docs/design/source-compatibility.md:156
+#: ../../../docs/design/source-compatibility.md:153
 msgid "Codex 的每周依赖流程"
 msgstr "Codex weekly dependency process"
 
-#: docs/design/source-compatibility.md:158
+#: ../../../docs/design/source-compatibility.md:155
 msgid ""
 "`tools/maintenance/dependency_proposals.py` 默认只观察当前实际 Gitlink、锁、归档和 "
 "许可证字节，网络读取为零。它覆盖 FreeRTOS、CMSIS、STM32 CMSIS、GD32 import、 GoogleTest、ARM "
@@ -485,45 +481,45 @@ msgstr ""
 "`tools/maintenance/dependency_proposals.py` defaults to observing actual "
 "Gitlinks, locks, archives and license bytes with zero network reads. It "
 "covers exact FreeRTOS, CMSIS, STM32 CMSIS, GD32 import, GoogleTest, ARM-"
-"toolchain, development/Python-tool and GitHub Actions pins. Releases needing "
-"license review explicitly record required rather than inferring licenses from"
-" version names."
+"toolchain, development/Python-tool and GitHub Actions pins. Releases needing"
+" license review explicitly record required rather than inferring licenses "
+"from version names."
 
-#: docs/design/source-compatibility.md:171
+#: ../../../docs/design/source-compatibility.md:168
 msgid ""
 "显式 upstream 模式只查询目录中官方 `upstream_url` 的 heads/tags，组织 fork 的 `fetch_url` "
 "不替代版本来源。普通依赖的 `upstream_revision` 等于所选 Gitlink； FreeRTOS 地址迁移提交分别记录 "
 "`selected_revision` 与官方 `upstream_base`， "
 "避免把组织提交误判为官方缺失版本。真正升级官方基线后，新的组织集成提交也必须 重新准备并审查。使用无 shell、禁止 credential "
-"helper/交互/global config 的 `git ls-remote`；每个请求最长 10 秒， stdout/stderr 总捕获上限 1 "
-"MiB，refs 最多 8192 条。复用已有有界 subprocess capture/kill/reap 机制，不执行 HIL admission "
-"或设备动作。输出目录必须新建且无 symlink；源码内只允许 build 目录。原始 stream、argv、实际退出码、时间和工具/ 响应 SHA "
-"均保留。网络、超时、输出或格式失败为 `not_observed`；没有 Git publication 的 "
+"helper/交互/global config 的 `git ls-remote`；每个请求最长 10 秒， stdout/stderr 总捕获上限 1"
+" MiB，refs 最多 8192 条。复用已有有界 subprocess capture/kill/reap 机制，不执行 HIL admission"
+" 或设备动作。输出目录必须新建且无 symlink；源码内只允许 build 目录。原始 stream、argv、实际退出码、时间和工具/ 响应 SHA"
+" 均保留。网络、超时、输出或格式失败为 `not_observed`；没有 Git publication 的 "
 "GD32/工具链/环境项需单独审查发行来源，不能伪造版本观察成功。观察 refs 不是 选择最新可靠版本或批准升级。周度 workflow "
 "的实际运行状态需另看 GitHub 证据。"
 msgstr ""
-"Explicit upstream mode queries heads/tags only from the catalogue's official "
-"`upstream_url`; an organization fork's `fetch_url` does not replace the "
+"Explicit upstream mode queries heads/tags only from the catalogue's official"
+" `upstream_url`; an organization fork's `fetch_url` does not replace the "
 "version source. For ordinary dependencies, `upstream_revision` equals the "
-"selected Gitlink. A FreeRTOS URL-migration commit records `selected_revision`"
-" separately from its official `upstream_base`, avoiding a false report that "
-"the organization commit is missing upstream. After an actual official-"
-"baseline upgrade, a new organization integration commit must also be prepared"
-" and reviewed. The tool invokes `git ls-remote` without a shell, credential "
-"helpers, interaction or global configuration. Each request is limited to 10 "
-"seconds, 1 MiB of combined stdout/stderr capture and 8192 refs. It reuses the"
-" existing bounded subprocess capture/kill/reap mechanism and performs no HIL "
-"admission or device actions. The output directory must be new and free of "
-"symlinks; within the source tree, only build directories are allowed. "
-"Original streams, argv, actual exit codes, timings and tool/response hashes "
-"are retained. Network, timeout, output or format failures remain "
-"`not_observed`. GD32/toolchain/environment entries without Git publication "
-"need separate release-source review; successful version observation must not "
-"be fabricated. Observing refs neither selects the newest reliable version nor"
-" approves an upgrade. Actual weekly workflow execution requires separate "
-"GitHub evidence."
+"selected Gitlink. A FreeRTOS URL-migration commit records "
+"`selected_revision` separately from its official `upstream_base`, avoiding a"
+" false report that the organization commit is missing upstream. After an "
+"actual official-baseline upgrade, a new organization integration commit must"
+" also be prepared and reviewed. The tool invokes `git ls-remote` without a "
+"shell, credential helpers, interaction or global configuration. Each request"
+" is limited to 10 seconds, 1 MiB of combined stdout/stderr capture and 8192 "
+"refs. It reuses the existing bounded subprocess capture/kill/reap mechanism "
+"and performs no HIL admission or device actions. The output directory must "
+"be new and free of symlinks; within the source tree, only build directories "
+"are allowed. Original streams, argv, actual exit codes, timings and "
+"tool/response hashes are retained. Network, timeout, output or format "
+"failures remain `not_observed`. GD32/toolchain/environment entries without "
+"Git publication need separate release-source review; successful version "
+"observation must not be fabricated. Observing refs neither selects the "
+"newest reliable version nor approves an upgrade. Actual weekly workflow "
+"execution requires separate GitHub evidence."
 
-#: docs/design/source-compatibility.md:184
+#: ../../../docs/design/source-compatibility.md:181
 msgid ""
 "candidate plan 使用严格 JSON：`schema_version=1`、已观察的 `dependency`、明确 "
 "`proposed_revision`、不带凭据/query 的公共 HTTPS `source_url`、实际非空 archive "
@@ -538,109 +534,110 @@ msgstr ""
 "expression and notices identities, and optional `evidence` mapping. Each "
 "identity includes absolute `path`, full `sha256` and actual `size`. Git "
 "provenance needs a full 40-character commit, never main/latest. License "
-"content needs independent review; declarations are not approval. Independent "
-"provenance/license review also checks whether archives match commits and "
-"completely contain notices and changes; tools infer none of these facts from "
-"arbitrary user-provided notices."
+"content needs independent review; declarations are not approval. Independent"
+" provenance/license review also checks whether archives match commits and "
+"completely contain notices and changes; tools infer none of these facts from"
+" arbitrary user-provided notices."
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "必需 gate"
 msgstr "Required gate"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "验收范围"
 msgstr "Acceptance scope"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "license_review"
 msgstr "license_review"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "来源/archive/commit、全部再分发文件、许可/notice 变更，由独立 Codex review 复核"
 msgstr ""
 "Independent Codex review of provenance/archive/commit, all redistributed "
 "files and license/notice changes"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "configuration"
 msgstr "configuration"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "全配置/内核边界、单一输入闭包、schema/epoch 与生成一致性"
 msgstr ""
 "All configuration/kernel boundaries, single input closure, schema/epoch and "
 "generation consistency"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "host_models"
 msgstr "host_models"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid ""
 "pinned GoogleTest/GoogleMock 全发现执行、工具/CTest、维护的 Native sanitizer profiles"
 msgstr ""
 "Complete discovered pinned GoogleTest/GoogleMock execution, tools/CTest and "
 "maintained Native sanitizer profiles"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "cortex_runtime"
 msgstr "cortex_runtime"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "当前 CPU/ISA/FP/MVE/ABI runtime、受维护 MPU 与 Secure/NS 软件矩阵"
 msgstr ""
 "Current CPU/ISA/FP/MVE/ABI runtimes and maintained MPU/Secure/NS software "
 "matrix"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "board_arm"
 msgstr "board_arm"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "三块精确 Board × baremetal/FreeRTOS，受影响的外部 examples"
-msgstr "Three exact Boards × baremetal/FreeRTOS and affected external examples"
+msgstr ""
+"Three exact Boards × baremetal/FreeRTOS and affected external examples"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "resource_budgets"
 msgstr "resource_budgets"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "每个新 ELF 独立预算、同 fixture 前后成本、各 RAM 域和 reservation"
 msgstr ""
 "Each new ELF's independent budget, same-fixture before/after costs, RAM "
 "domains and reservations"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "installed_sdk"
 msgstr "installed_sdk"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "clean exact source SDK、版本/epoch 拒绝、实际独立消费者"
 msgstr ""
 "Clean exact source SDK, version/epoch rejection and real independent "
 "consumers"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "offline_reproduction"
 msgstr "offline_reproduction"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "绑定环境内两次 fresh network-disabled 构建及同一 ELF/BIN/map bytes"
 msgstr ""
 "Two fresh network-disabled builds in the bound environment with identical "
 "ELF/BIN/map bytes"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "static_analysis"
 msgstr "static_analysis"
 
-#: docs/design/source-compatibility.md:0
+#: ../../../docs/design/source-compatibility.md:0
 msgid "owned ClangTidy/Cppcheck、格式/注释、原始失败与明确 vendor 审查边界"
 msgstr ""
 "Owned ClangTidy/Cppcheck, formatting/comments, raw failures and explicit "
 "vendor-review boundaries"
 
-#: docs/design/source-compatibility.md:204
+#: ../../../docs/design/source-compatibility.md:201
 msgid ""
 "工具只形成 proposal。缺证据为 `not_executed`；提供真实 file identities 也只变成 "
 "`referenced_unreviewed`。即使引用 JSON 自称 passed，工具也不升级资格，不执行其 命令、不修改 "
@@ -657,12 +654,12 @@ msgstr ""
 "update source Gitlinks/vendor imports, locks, licensing and external SDK "
 "pins."
 
-#: docs/design/source-compatibility.md:210
+#: ../../../docs/design/source-compatibility.md:207
 msgid ""
-"没有实板时，受升级影响的电气、IRQ/DMA timing、低功耗和长期负载仍是物理 pending。 一次 upstream request、一个模型 "
-"pass 或之前版本的软件候选都不能代替本次验收。"
+"没有实板时，受升级影响的电气、IRQ/DMA timing、低功耗和长期负载仍是物理 pending。 一次 upstream request、一个模型"
+" pass 或之前版本的软件候选都不能代替本次验收。"
 msgstr ""
 "Without boards, affected electrical behavior, IRQ/DMA timing, low power and "
 "long-running load remain physically pending. An upstream request, one model "
-"pass or a previous version's software candidate cannot replace acceptance for"
-" this upgrade."
+"pass or a previous version's software candidate cannot replace acceptance "
+"for this upgrade."

@@ -8,6 +8,14 @@
  */
 #include "nexus/io/block.h"
 
+nx_result_t nx_block_port_media_removed(const nx_block_port_t* port) {
+    if (port == NULL || port->ops == NULL || port->context == NULL)
+        return NX_ERROR_INVALID;
+    return port->ops->media_removed != NULL
+               ? port->ops->media_removed(port->context)
+               : NX_ERROR_UNSUPPORTED;
+}
+
 /** \brief Dispatch queries through the exact immutable instance face. */
 const nx_block_geometry_t* nx_block_port_geometry(const nx_block_port_t* port) {
     if (port == NULL || port->ops == NULL || port->context == NULL ||

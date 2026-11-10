@@ -42,17 +42,11 @@ def required_submodules(scope: str, family: str | None = None,
     if type(host_support) is not bool or (
             host_support and scope not in {"sdk", "candidate"}):
         raise EvidenceError("host support is an explicit SDK source profile")
-    if scope == "host-config":
-        if family is not None or backend != "baremetal" or components:
-            raise EvidenceError("host configuration has no MCU source profile")
-        return tuple(item.path for item in
-                     source_catalogue.host_configuration_sources())
     if scope == "native":
         if family not in (None, "native"):
             raise EvidenceError("Native tests cannot select a hardware family")
         return tuple(item.path for item in ALL_SOURCE_DEPENDENCIES
-                     if item.scope in {"runtime", "host-test"}) + tuple(
-            item.path for item in source_catalogue.host_configuration_sources())
+                     if item.scope in {"runtime", "host-test"})
     if scope not in {"arm", "sdk", "candidate"}:
         raise EvidenceError("unsupported dependency scope")
     family = "stm32f4" if family is None and scope != "arm" else family
@@ -852,8 +846,7 @@ def install_actionlint(directory: Path, cache_directory: Path, *,
 
 def verify_upgrade(gates: dict) -> dict:
     """Reuse the reviewed dependency gate list; references never approve a merge."""
-    from tools.maintenance.dependency_proposals import GATES
-    if set(gates) != set(GATES):
+    if set(gates) != set(source_catalogue.DEPENDENCY_UPGRADE_GATES):
         raise EvidenceError("dependency upgrade requires every maintained gate")
     references = {}
     from tools.evidence.common import verify_file_identity
@@ -877,7 +870,7 @@ def main(argv=None) -> int:
     child = actions.add_parser("prepare")
     child.add_argument("--root", type=Path, default=ROOT)
     child.add_argument("--scope", choices=("native", "arm", "sdk", "candidate",
-                                           "preset", "host-config"), required=True)
+                                           "preset"), required=True)
     child.add_argument("--preset")
     child.add_argument("--family", choices=tuple(FAMILY_MODULE))
     child.add_argument("--backend", choices=("baremetal", "freertos", "threadx"))

@@ -12,6 +12,11 @@ import re
 from typing import Literal
 
 
+DEPENDENCY_UPGRADE_GATES = ("license_review", "configuration", "host_models", "cortex_runtime",
+         "board_arm", "resource_budgets", "installed_sdk",
+         "offline_reproduction", "static_analysis")
+
+
 @dataclass(frozen=True)
 class SourceDependency:
     identifier: str
@@ -51,6 +56,14 @@ ALL_DEPENDENCIES = (
         "https://github.com/STMicroelectronics/stm32f4xx-hal-driver.git",
         "https://github.com/X-Gen-Lab/stm32f4xx-hal-driver.git",
         "runtime", "LICENSE.md", "dependencies/stm32f4-hal.lock.json"),
+    SourceDependency("stm32_usb_device", "vendors/st/usb_device",
+        "https://github.com/STMicroelectronics/stm32-mw-usb-device.git",
+        "https://github.com/X-Gen-Lab/stm32-mw-usb-device.git",
+        "runtime", "LICENSE.md", "dependencies/stm32-usb-device.lock.json"),
+    SourceDependency("stm32_usb_host", "vendors/st/usb_host",
+        "https://github.com/STMicroelectronics/stm32-mw-usb-host.git",
+        "https://github.com/X-Gen-Lab/stm32-mw-usb-host.git",
+        "runtime", "LICENSE.md", "dependencies/stm32-usb-host.lock.json"),
     SourceDependency("threadx", "ext/threadx",
         "https://github.com/eclipse-threadx/threadx.git",
         "https://github.com/X-Gen-Lab/threadx.git",
@@ -269,11 +282,6 @@ HOST_TEST_DEPENDENCIES = tuple(item for item in ALL_SOURCE_DEPENDENCIES
                                if item.scope == "host-test")
 
 
-def host_configuration_sources():
-    """Select build-host parser sources without making them MCU dependencies."""
-    return tuple(dependency(name) for name in ("tomlc99", "cjson"))
-
-
 def runtime_selection(family, *, backend, components=(), test_support=False):
     """Select reviewed sources without preparing dormant catalogue inventory.
 
@@ -294,7 +302,9 @@ def runtime_selection(family, *, backend, components=(), test_support=False):
     if backend != "baremetal":
         identifiers.add(backend)
     suppliers = {"network": "lwip", "network-loaned-rx": "lwip",
-                 "tls": "mbedtls", "mqtt": "coremqtt", "mcuboot": "mcuboot"}
+                 "tls": "mbedtls", "mqtt": "coremqtt", "mcuboot": "mcuboot",
+                 "st-usb-host": "stm32_usb_host",
+                 "st-usb-device": "stm32_usb_device"}
     identifiers.update(suppliers[value] for value in components
                        if value in suppliers)
     if test_support:

@@ -200,7 +200,7 @@ def resolve(nodes, edges, *, startup=(), loops=()):
                          tuple(startup_order), tuple(declarations))
 
 
-def resolve_fixed(selected, routes):
+def resolve_fixed(selected, *, adc_triggers=None, adc_injected_triggers=None):
     """Project only existing reviewed timer-triggered ADC modes.
 
 No additional selector is invented. Their providers already validate the exact
@@ -217,20 +217,27 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
                           "events": ["sample-ready"],
                           "actions": ["sample", "stop"],
                           "stop_actions": ["stop"]})
-            if item["trigger"] == "tim6-trgo":
+            if item["trigger"] != "software":
+                routes = (adc_injected_triggers if item["mode"] == "injected-sequence"
+                          else adc_triggers)
+                if routes is None or item["trigger"] not in routes:
+                    fail("ADC group trigger lacks an exact selected event")
+                timer = routes[item["trigger"]]
+                signal = item["trigger"].split("-", 1)[1]
+                event = "update" if signal == "trgo" else "compare" + signal[2:]
                 nodes.append({"id": trigger, "owner": owner,
-                              "clock_domain": "controller:TIM6",
-                              "events": ["update"], "actions": ["stop"],
+                              "clock_domain": "controller:" + timer,
+                              "events": [event], "actions": ["stop"],
                               "stop_actions": ["stop"]})
-                edges.append({"source": trigger, "event": "update",
+                edges.append({"source": trigger, "event": event,
                               "target": adc, "action": "sample",
-                              "route": "TIM6:TRGO:ADC1:" + item["mode"],
+                              "route": timer + ":" + event + ":ADC1:" + item["mode"],
                               "cross_domain": True})
                 startup.append((adc, trigger))
             if item["mode"] == "regular-sequence-dma":
                 dma = owner + ":dma"
                 nodes.append({"id": dma, "owner": owner,
-                              "clock_domain": "engine:DMA1",
+                              "clock_domain": "engine:" + item["dma"][0].split(":")[0],
                               "events": ["block-ready"],
                               "actions": ["transfer", "stop"],
                               "stop_actions": ["stop"]})
@@ -263,18 +270,19 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
         if item["kind"] != "adc" or item["mode"] not in {
                 "trigger-dma", "trigger-dma-continuous"}:
             continue
-        route = routes[item["route"]]
-        resources = route.get("mode_resources", {}).get(item["mode"], [])
-        timers = [value for value in resources
-                  if value.startswith("controller:")]
-        if len(timers) != 1 or len(item.get("dma", ())) != 1:
-            fail("Fixed ADC trigger requires one reviewed timer and DMA route")
+        source = item.get("trigger")
+        if (adc_triggers is None or source not in adc_triggers or
+                len(item.get("dma", ())) != 1):
+            fail("ADC trigger requires one reviewed selected timer and DMA route")
+        timer = "controller:" + adc_triggers[source]
+        signal = source.split("-", 1)[1]
+        event = "update" if signal == "trgo" else "compare" + signal[2:]
         owner = item["id"]
         trigger, adc, dma = (owner + suffix
                              for suffix in (":trigger", ":adc", ":dma"))
         # These conservative clock identities do not assert a common clock
         # source or frequency. The reviewed hardware routes permit crossing.
-        roles = ((trigger, timers[0], ["update"], ["stop"]),
+        roles = ((trigger, timer, [event], ["stop"]),
                  (adc, "controller:" + item["controller"],
                   ["sample-ready"], ["sample", "stop"]),
                  (dma, "engine:" + item["dma"][0].split(":")[0],
@@ -285,9 +293,9 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
                           "events": events, "actions": actions,
                           "stop_actions": ["stop"]})
         edges.extend([
-            {"source": trigger, "event": "update", "target": adc,
+            {"source": trigger, "event": event, "target": adc,
              "action": "sample",
-             "route": timers[0] + ":" + item["controller"],
+             "route": timer + ":" + event + ":" + item["controller"],
              "cross_domain": True},
             {"source": adc, "event": "sample-ready", "target": dma,
              "action": "transfer", "route": item["dma"][0],

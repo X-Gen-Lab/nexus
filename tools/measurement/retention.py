@@ -12,7 +12,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.evidence.common import EvidenceError, atomic_json, file_identity
 from tools.measurement.elf import Elf32
 from tools.evidence.identity import resolved_identity, resolved_input_files
-from tools.configure import i2s2
 from tools.measurement.resources import (resolved_float_abi,
                                          validate_elf_configuration,
                                          input_protection_paths)
@@ -129,35 +128,92 @@ def provider_initializers(path, source, root):
         yield candidates[0]
 
 
+def operations_layout(body):
+    """Accept only function pointers and direct pointers to const ops types."""
+    fields, children = [], {}
+    declarations = body.split(";")
+    if declarations.pop().strip():
+        raise EvidenceError("unsupported public operations layout")
+    for declaration in declarations:
+        method = re.fullmatch(
+            r"\s*[^;{}]+?\(\*\s*(\w+)\)\s*\([^;{}]*\)\s*", declaration)
+        child = re.fullmatch(
+            r"\s*const\s+(struct\s+nx_\w+|nx_\w+_ops_t)\s*\*\s*(\w+)\s*",
+            declaration)
+        if method is not None:
+            name = method[1]
+        elif child is not None:
+            kind, name = child.groups()
+            children[name] = kind
+        else:
+            raise EvidenceError("unsupported public operations layout")
+        if name in fields:
+            raise EvidenceError("duplicate public operations layout field")
+        fields.append(name)
+    if not fields:
+        raise EvidenceError("unsupported public operations layout")
+    return fields, children
+
+
+def operations_fields(body, slot_names, children):
+    """Keep source slot order and permit no opaque pointer expressions."""
+    tokens = [token.strip() for token in body.strip().rstrip(",").split(",")]
+    if all(re.fullmatch(r"&\s*[A-Za-z_]\w*|[A-Za-z_]\w*|0", token)
+           for token in tokens):
+        if len(tokens) > len(slot_names):
+            raise EvidenceError("too many positional operations fields")
+        fields = list(zip(slot_names, tokens))
+    else:
+        matches = [re.fullmatch(
+            r"\.\s*(\w+)\s*=\s*(&\s*[A-Za-z_]\w*|[A-Za-z_]\w*|0)", token)
+                   for token in tokens]
+        if not all(matches):
+            raise EvidenceError("unsupported concrete operations initializer")
+        fields = [match.groups() for match in matches]
+    if (len(fields) != len(dict(fields))
+            or not set(dict(fields)).issubset(slot_names)):
+        raise EvidenceError("unsupported concrete operations initializer")
+    for name, value in fields:
+        pattern = (r"&\s*[A-Za-z_]\w*|NULL|0" if name in children else
+                   r"[A-Za-z_]\w*|0")
+        if re.fullmatch(pattern, value) is None:
+            raise EvidenceError("unsupported concrete operations initializer")
+    return dict(fields)
+
+
 def source_contracts(root=ROOT):
     """Read public ABI and provider initializers without a mode registry."""
     faces, layouts, providers, inputs = {}, {}, {}, []
     public_headers = set((root / "io/include/nexus/io").glob("*.h"))
     public_headers.update((root / "components").rglob(
         "include/nexus/components/*.h"))
-    forward_aliases = {}
+    forward_aliases, sources, child_types = {}, {}, {}
     for path in sorted(public_headers):
         source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
                         flags=re.DOTALL)
-        for tag, alias in re.findall(
-                r"typedef\s+struct\s+(nx_\w+)\s+(nx_\w+_t)\s*;", source):
+        sources[path] = source
+        aliases = re.findall(
+            r"typedef\s+struct\s+(nx_\w+)\s+(nx_\w+_t)\s*;", source)
+        aliases += re.findall(
+            r"typedef\s+struct\s+(nx_\w+)\s*\{[^{}]*\}\s*(nx_\w+_t)\s*;",
+            source)
+        for tag, alias in aliases:
             if tag in forward_aliases and forward_aliases[tag] != alias:
                 raise EvidenceError("ambiguous public face alias")
             forward_aliases[tag] = alias
-    for path in sorted(public_headers):
-        source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
-                        flags=re.DOTALL)
+    for path, source in sources.items():
         inputs.append(file_identity(path))
-        for body, name in re.findall(
-                r"typedef\s+struct\s*\{([^{}]*)\}\s*(nx_\w+_ops_t)\s*;",
-                source):
-            fields = re.findall(r"[^;{}]+?\(\*\s*(\w+)\)\s*\([^;{}]*\)\s*;",
-                                body)
-            remainder = re.sub(r"[^;{}]+?\(\*\s*\w+\)\s*\([^;{}]*\)\s*;",
-                               "", body).strip()
-            if not fields or remainder or name in layouts:
+        declarations = re.findall(
+            r"typedef\s+struct(?:\s+nx_\w+)?\s*\{([^{}]*)\}\s*"
+            r"(nx_\w+_ops_t)\s*;", source)
+        declarations += [
+            (body, forward_aliases[tag]) for tag, body in re.findall(
+                r"\bstruct\s+(nx_\w+)\s*\{([^{}]*)\}\s*;", source)
+            if forward_aliases.get(tag, "").endswith("_ops_t")]
+        for body, name in declarations:
+            if name in layouts:
                 raise EvidenceError("unsupported public operations layout")
-            layouts[name] = fields
+            layouts[name], child_types[name] = operations_layout(body)
         for name, operations in re.findall(
                 r"struct\s+(nx_\w+)\s*\{\s*const\s+(nx_\w+_ops_t)\s*"
                 r"\*\s*ops\s*;\s*void\s*\*\s*context\s*;\s*\}\s*;", source):
@@ -172,44 +228,93 @@ def source_contracts(root=ROOT):
             if name in faces:
                 raise EvidenceError("duplicate public face type")
             faces[name] = operations
+    for children in child_types.values():
+        for name, kind in children.items():
+            if kind.startswith("struct "):
+                kind = forward_aliases.get(kind.split()[1])
+            if kind not in layouts:
+                raise EvidenceError("unknown public operations subtable layout")
+            children[name] = kind
+    visited = set()
+
+    def check_layout(kind, ancestors):
+        if kind in ancestors:
+            raise EvidenceError("cyclic public operations subtable layout")
+        if kind not in visited:
+            for child in child_types[kind].values():
+                check_layout(child, ancestors | {kind})
+            visited.add(kind)
+
+    for kind in layouts:
+        check_layout(kind, set())
     provider_sources = set((root / "soc/stm32/stm32f4/drivers").rglob("*.c"))
     provider_sources.update((root / "tests/support/native/drivers").rglob("*.c"))
     provider_sources.update((root / "io/src").rglob("*.c"))
+    definitions = {}
     for path in sorted(provider_sources):
         source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
                         flags=re.DOTALL)
-        initializers = [(kind, name, body, template_source)
-            for initializer, template_source in provider_initializers(path, source, root)
-            for kind, name, body in re.findall(
-                r"\bconst\s+(nx_\w+_ops_t)\s+(nx_\w+_ops)\s*=\s*"
-                r"\{([^{}]*)\}\s*;", initializer)]
-        for kind, name, body, template_source in initializers:
+        initializers = [(local, kind, name, body, template_source)
+            for initializer, template_source in provider_initializers(
+                path, source, root)
+            for local, kind, name, body in re.findall(
+                r"\b(?:(static)\s+)?const\s+(nx_\w+_ops_t)\s+"
+                r"([A-Za-z_]\w*)\s*=\s*\{([^{}]*)\}\s*;", initializer)]
+        for local, kind, name, body, template_source in initializers:
             # Core cold transactions are not public I/O faces. Their callbacks
             # never participate in the device face-to-method retention audit.
             if kind == "nx_lifecycle_ops_t":
                 continue
-            if name in providers or kind not in layouts:
+            public_name = re.fullmatch(r"nx_\w+_ops", name) is not None
+            if kind not in layouts and not public_name:
+                continue
+            if (path, name) in definitions or kind not in layouts:
                 raise EvidenceError(
                     f"unsupported concrete operations initializer: {path}:{name}")
-            tokens = [token.strip() for token in body.strip().rstrip(",").split(",")]
-            if all(re.fullmatch(r"[A-Za-z_]\w*|0", token) for token in tokens):
-                if len(tokens) > len(layouts[kind]):
-                    raise EvidenceError("too many positional operations fields")
-                fields = list(zip(layouts[kind], tokens))
-            else:
-                matches = [re.fullmatch(
-                    r"\.\s*(\w+)\s*=\s*([A-Za-z_]\w*|0)", token)
-                           for token in tokens]
-                if not all(matches):
-                    raise EvidenceError("unsupported concrete operations initializer")
-                fields = [match.groups() for match in matches]
-            if (len(fields) != len(dict(fields))
-                    or not set(dict(fields)).issubset(layouts[kind])):
-                raise EvidenceError("unsupported concrete operations initializer")
-            providers[name] = {"type": kind, "fields": dict(fields),
-                               "source": file_identity(path)}
+            provider = {"type": kind,
+                        "fields": operations_fields(
+                            body, layouts[kind], child_types[kind]),
+                        "source": file_identity(path)}
             if template_source is not None:
-                providers[name]["template_source"] = template_source
+                provider["template_source"] = template_source
+            definitions[path, name] = (provider, bool(local))
+            if public_name:
+                if name in providers:
+                    raise EvidenceError("duplicate concrete operations initializer")
+                providers[name] = provider
+
+    def resolve_subtables(key, ancestors):
+        if key in ancestors:
+            raise EvidenceError("cyclic concrete operations subtables")
+        provider, _ = definitions[key]
+        kind = provider["type"]
+        if not child_types[kind] or "subtables" in provider:
+            return
+        subtables = {}
+        for slot, child_type in child_types[kind].items():
+            value = provider["fields"].get(slot, "NULL")
+            child = {"type": child_type, "slots": layouts[child_type],
+                     "name": None}
+            if value not in ("NULL", "0"):
+                name = value[1:].strip()
+                candidate = (key[0], name)
+                if candidate not in definitions:
+                    candidates = [item for item, (_, local) in definitions.items()
+                                  if item[1] == name and not local]
+                    if len(candidates) != 1:
+                        raise EvidenceError(
+                            "missing or ambiguous operations subtable source")
+                    candidate = candidates[0]
+                target, local = definitions[candidate]
+                if target["type"] != child_type:
+                    raise EvidenceError("operations subtable initializer type differs")
+                resolve_subtables(candidate, ancestors | {key})
+                child.update(name=name, provider=target, local=local)
+            subtables[slot] = child
+        provider["subtables"] = subtables
+
+    for key in definitions:
+        resolve_subtables(key, set())
     if not faces or not layouts or not providers:
         raise EvidenceError("missing public/provider operations contracts")
     return faces, layouts, providers, inputs
@@ -235,10 +340,19 @@ def loaded_range(elf, address, size, role, *, writable=False,
         raise EvidenceError(f"{role} has ambiguous or missing LOAD coverage")
 
 
-def linked_object(elf, name, role, *, writable=False):
+def linked_object(elf, name, role, *, writable=False, source=None, local=None):
     """Require the named concrete object and its allocated section bounds."""
     matching = [symbol for symbol in elf.defined_symbols
                 if symbol["name"] == name]
+    if local is not None:
+        matching = [symbol for symbol in matching
+                    if symbol["binding"] == (0 if local else 1)
+                    and (not local or symbol.get("file") is not None
+                         and Path(symbol["file"]).name ==
+                         Path(source["path"]).name)]
+        if not matching:
+            raise EvidenceError(
+                f"{role} differs from initializer source/linkage: {name}")
     if len(matching) != 1:
         raise EvidenceError(f"missing or duplicate {role}: {name}")
     symbol = matching[0]
@@ -442,21 +556,61 @@ def concrete_method(elf, pointer):
             "definitions": matching}
 
 
-def operations_table(elf, operations, expected_type, slot_names, provider):
+def operations_table(elf, operations, expected_type, slot_names, provider, *,
+                     tables=None, ancestors=frozenset(), local=None):
     """Audit shared table words against public ABI and private methods."""
-    table, section = linked_object(elf, operations, "operations")
+    if tables is None:
+        tables = {}
+    table, section = linked_object(elf, operations, "operations",
+                                   source=provider["source"], local=local)
+    if table["value"] in ancestors:
+        raise EvidenceError("cyclic linked operations subtables")
+    key = operations, provider["source"]["path"]
+    if key in tables:
+        return tables[key]
     if table["size"] != 4 * len(slot_names):
         raise EvidenceError(
             "concrete operations layout differs from public ABI")
     slots = object_words(elf, table, section)
     if not any(slots):
         raise EvidenceError("concrete operations table has no methods")
-    methods = []
+    methods, subtables = [], []
+    result = {"name": operations, "type": expected_type,
+              "source": provider["source"], "address": table["value"],
+              "bytes": table["size"], "slots": slot_names, "methods": methods,
+              "null_methods": 0}
+    if "template_source" in provider:
+        result["template_source"] = provider["template_source"]
+    tables[key] = result
     for index, (slot_name, pointer) in enumerate(zip(slot_names, slots)):
+        if slot_name in provider.get("subtables", {}):
+            child = provider["subtables"][slot_name]
+            entry = {"slot": index, "name": slot_name, "type": child["type"],
+                     "operations": child["name"], "address": pointer}
+            if child["name"] is None:
+                if pointer:
+                    raise EvidenceError(
+                        "uninitialized operations subtable unexpectedly linked")
+            else:
+                target, _ = linked_object(
+                    elf, child["name"], "operations subtable",
+                    source=child["provider"]["source"], local=child["local"])
+                if pointer != target["value"]:
+                    raise EvidenceError(
+                        "operations subtable pointer differs from initializer")
+                operations_table(
+                    elf, child["name"], child["type"], child["slots"],
+                    child["provider"],
+                    tables=tables, ancestors=ancestors | {table["value"]},
+                    local=child["local"])
+                entry["source"] = child["provider"]["source"]
+            subtables.append(entry)
+            continue
         expected = provider["fields"].get(slot_name, "NULL")
         if expected in ("NULL", "0"):
             if pointer:
                 raise EvidenceError("uninitialized method unexpectedly linked")
+            result["null_methods"] += 1
             continue
         if not pointer:
             raise EvidenceError("initialized method was omitted from table")
@@ -471,159 +625,9 @@ def operations_table(elf, operations, expected_type, slot_names, provider):
                    for definition in method["definitions"]):
             raise EvidenceError("local method differs from initializer source")
         methods.append({"slot": index, "name": slot_name, **method})
-    result = {"name": operations, "type": expected_type,
-              "source": provider["source"], "address": table["value"],
-              "bytes": table["size"], "slots": slot_names, "methods": methods,
-              "null_methods": sum(pointer == 0 for pointer in slots)}
-    if "template_source" in provider:
-        result["template_source"] = provider["template_source"]
+    if subtables:
+        result["subtables"] = subtables
     return result
-
-
-def selected_i2s2_role(resolved):
-    """Only the exact validated hardware IR authorizes the component audit."""
-    if resolved is None or "i2s2" not in resolved:
-        return None
-    selected = resolved["i2s2"]
-    if (not isinstance(selected, dict)
-            or set(selected) != {"profile", "part", "claims"}):
-        raise EvidenceError("invalid resolved I2S2 role")
-    try:
-        role = i2s2.resolve({"profile": selected["profile"]},
-                            family=resolved.get("soc_family"),
-                            part=resolved.get("part"),
-                            backend=resolved.get("backend"),
-                            clock_profile=resolved.get("clock_profile"))
-    except ValueError as error:
-        raise EvidenceError(
-            "invalid resolved I2S2 role: " + str(error)) from error
-    if selected != {"profile": role.profile, "part": role.part,
-                    "claims": list(role.claims)}:
-        raise EvidenceError(
-            "resolved I2S2 role differs from validated typed IR")
-    return role
-
-
-def i2s2_storage_contract(root):
-    """Read the maintained 32-bit union ABI, including its uint64 alignment."""
-    path = root / ("components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/"
-                   "f407_i2s2_slave_tx.h")
-    source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
-                    flags=re.DOTALL)
-    source = re.sub(r"\A\s*#\s*ifndef\s+(\w+)\s*\n"
-                    r"\s*#\s*define\s+\1\b[^\n]*", "", source, count=1)
-    macro = "NX_F407_I2S2_SLAVE_TX_STORAGE_BYTES"
-    sizes = list(re.finditer(
-        r"#\s*if\s+UINTPTR_MAX\s*==\s*UINT32_MAX\s*\n"
-        r"\s*#\s*define\s+" + macro + r"\s+([1-9][0-9]*)U\s*\n"
-        r"\s*#\s*elif\s+UINTPTR_MAX\s*==\s*UINT64_MAX\s*\n"
-        r"\s*#\s*define\s+" + macro + r"\s+([1-9][0-9]*)U\s*\n"
-        r"\s*#\s*else\s*\n\s*#\s*error[^\n]+\n"
-        r"\s*#\s*endif\b", source))
-    unions = list(re.finditer(
-        r"typedef\s+union\s*\{\s*uint64_t\s+alignment\s*;\s*"
-        r"uintptr_t\s+pointer_alignment\s*;\s*unsigned\s+char\s+"
-        r"private_bytes\s*\[\s*NX_F407_I2S2_SLAVE_TX_STORAGE_BYTES\s*\]\s*;"
-        r"\s*\}\s*nx_f407_i2s2_slave_tx_storage_t\s*;", source))
-    # The uint64 member has 8-byte alignment in the maintained ARM AAPCS ABI.
-    if (len(sizes) != 1 or len(unions) != 1
-            or len(re.findall(r"#\s*define\s+" + macro + r"\b", source)) != 2
-            or re.search(r"#\s*undef\s+" + macro + r"\b", source)
-            or sizes[0].end() > unions[0].start()
-            or conditional_at(source, sizes[0].start())
-            or conditional_at(source, unions[0].start())
-            or int(sizes[0][1]) % 8):
-        raise EvidenceError("unsupported public I2S2 ARM storage layout")
-    return int(sizes[0][1]), file_identity(path)
-
-
-def inspect_i2s2_component(elf, role, face_types, layouts, providers, root):
-    """Audit caller pointer pairs without inventing factory bindings."""
-    face_type = "nx_f407_i2s2_slave_tx_t"
-    operations = "nx_f407_i2s2_slave_tx_ops"
-    expected_type = face_types.get(face_type)
-    provider = providers.get(operations)
-    if (provider is None or expected_type is None
-            or provider["type"] != expected_type
-            or provider["source"] != file_identity(
-                root / "soc/stm32/stm32f4/drivers/i2s2_slave_tx.c")):
-        raise EvidenceError(
-            "missing exact I2S2 public/private operations contract")
-    slot_names = layouts[expected_type]
-    if (slot_names != ["submit", "service", "cancel", "stop"]
-            or any(provider["fields"].get(name, "NULL") in ("NULL", "0")
-                   for name in slot_names)):
-        raise EvidenceError("I2S2 requires all four public operations methods")
-    table = operations_table(elf, operations, expected_type, slot_names,
-                             provider)
-    for method in table["methods"]:
-        expected = provider["fields"][method["name"]]
-        if not any(definition["name"] == expected
-                   and definition["binding"] == 0
-                   and definition["file"] is not None
-                   and Path(definition["file"]).name ==
-                   Path(provider["source"]["path"]).name
-                   for definition in method["definitions"]):
-            raise EvidenceError("I2S2 method lacks private provider provenance")
-    storage_bytes, contract = i2s2_storage_contract(root)
-    candidates = []
-    for symbol in elf.defined_symbols:
-        if (symbol["type"] != 1 or symbol["size"] != 8
-                or not 0 <= symbol["section"] < len(elf.sections)):
-            continue
-        section = elf.sections[symbol["section"]]
-        offset = section["offset"] + symbol["value"] - section["address"]
-        if (section["kind"] != 8 and section["address"] <= symbol["value"]
-                and 0 <= offset <= len(elf.data) - 4
-                and struct.unpack_from("<I", elf.data, offset)[0]
-                == table["address"]):
-            candidates.append(symbol["name"])
-    if not candidates:
-        raise EvidenceError("no retained I2S2 caller-owned face")
-    faces = []
-    spans = [(table["address"], table["address"] + table["bytes"])]
-    for name in candidates:
-        face, section = linked_object(elf, name, "component face")
-        if face["size"] != 8:
-            raise EvidenceError("component face must contain two ARM pointers")
-        words = object_words(elf, face, section)
-        owners = [symbol for symbol in elf.defined_symbols
-                  if symbol["type"] == 1 and symbol["value"] == words[1]]
-        if len(owners) != 1:
-            raise EvidenceError("missing or aliased I2S2 component storage")
-        owner, owner_section = linked_object(
-            elf, owners[0]["name"], "component storage", writable=True)
-        if (owner["size"] != storage_bytes or owner["value"] % 8
-                or owner_section["flags"] & 4
-                or any(load["flags"] & 1
-                       and load["virtual"] < owner["value"] + owner["size"]
-                       and owner["value"] < load["virtual"] + load["memory"]
-                       for load in elf.loads)):
-            raise EvidenceError(
-                "component storage differs from public ARM layout")
-        for obj in (face, owner):
-            start, end = obj["value"], obj["value"] + obj["size"]
-            if (not 0 < start < end <= 1 << 32
-                    or any(start < stop and begin < end
-                           for begin, stop in spans)):
-                raise EvidenceError("overlapping or invalid I2S2 object extent")
-            spans.append((start, end))
-        for other in elf.defined_symbols:
-            if (other is owners[0] or other["type"] != 1 or other["size"] <= 0
-                    or not 0 <= other["section"] < len(elf.sections)
-                    or not elf.sections[other["section"]]["flags"] & 2):
-                continue
-            if (owner["value"] < other["value"] + other["size"]
-                    and other["value"] < owner["value"] + owner["size"]):
-                raise EvidenceError("component storage overlaps another object")
-        faces.append({"name": name, "type": face_type, "operations": operations,
-                      "context": owner["name"], "address": face["value"],
-                      "origin": "caller_owned_component",
-                      "profile": role.profile,
-                      "context_address": owner["value"],
-                      "context_bytes": storage_bytes,
-                      "storage_contract": contract})
-    return faces, table
 
 
 SECURE_COMPONENT_OWNER = "f407-secure-services"
@@ -651,15 +655,16 @@ def secure_service_symbols(arm):
         "nx_lwip_adapter_stop",
     })
     return common | (frozenset({
-        "nx_stm32f407_entropy_instance", "nx_stm32f407_entropy_instance_start",
-        "nx_stm32f407_entropy_instance_stop", "nx_mqtt_connect",
+        "nx_factory_entropy", "nx_stm32f407_entropy_admit",
+        "nx_stm32f407_entropy_start",
+        "nx_stm32f407_entropy_stop", "nx_mqtt_connect",
         "nx_mqtt_publish", "nx_mqtt_process", "nx_mqtt_disconnect",
     }) if arm else frozenset())
 
 
 def secure_owner_inputs(root, consumer):
     """Protect and compare exact canonical C/header/assembly inputs."""
-    from tools.release.transport import SERVICE_CONSUMERS
+    from tools.maintenance.consumer_profiles import SERVICE_CONSUMERS
     choices = [item for item in SERVICE_CONSUMERS
                if item.scenario == "secure_services" and item.domain == "arm-secure"]
     if len(choices) != 1 or consumer is None or Path(consumer).name != "application.c":
@@ -673,14 +678,21 @@ def secure_owner_inputs(root, consumer):
 
 
 def inspect_secure_owner(elf, bindings, resolved, consumer, root):
-    """The explicit empty-F407 contract proves components, never factory faces."""
+    """The exact F407 RNG contract proves its face and component owners."""
     if (resolved is None or resolved.get("soc_family") != "stm32f4" or
             resolved.get("part") != "STM32F407ZGT6" or
             resolved.get("backend") != "baremetal" or
             resolved.get("clock_profile") != "hse8-pll168" or
-            resolved.get("controllers") != [] or resolved.get("devices") != [] or
-            FACE_DECLARATION.search(bindings)):
-        raise EvidenceError("secure component differs from canonical empty F407 domain")
+            resolved.get("controllers") != [dict(
+                kind="entropy", id="random", controller="RNG", binding="rng",
+                route="rng-internal", pins=[], mode="rng-words", initial=0, mask=0)] or
+            resolved.get("devices") != []):
+        raise EvidenceError("secure component differs from canonical RNG F407 domain")
+    provider = inspect_provider_retention(elf, bindings, root=root, resolved=resolved)
+    if (provider["face_count"] != 1 or provider["operations_table_count"] != 1 or
+            provider["faces"][0]["type"] != "nx_entropy_port_t" or
+            provider["faces"][0]["operations"] != "nx_stm32f407_entropy_ops"):
+        raise EvidenceError("secure component differs from its selected RNG face")
     inputs = []
     for canonical, copied in secure_owner_inputs(root, consumer):
         expected, actual = file_identity(canonical), file_identity(copied)
@@ -710,13 +722,16 @@ def inspect_secure_owner(elf, bindings, resolved, consumer, root):
         storage[name] = {"address": obj["value"], "size": obj["size"]}
     return {"schema_version": 1, "kind": "linked_component_owner_retention",
             "status": "passed", "owner_profile": SECURE_COMPONENT_OWNER,
-            "face_count": 0, "operations_table_count": 0,
-            "method_count": len(entrypoints), "faces": [], "tables": [],
+            "face_count": provider["face_count"],
+            "operations_table_count": provider["operations_table_count"],
+            "method_count": len(entrypoints) + provider["method_count"],
+            "faces": provider["faces"], "tables": provider["tables"],
+            "public_contracts": provider["public_contracts"],
             "entrypoints": entrypoints, "storage": storage,
             "consumer": file_identity(Path(consumer)), "consumer_inputs": inputs,
             "forbidden_symbols": forbidden, "physical_status": "not_executed",
-            "limitations": ["Linked component code and static storage only; no "
-                            "factory faces, execution, TLS authentication or HIL."]}
+            "limitations": ["Linked RNG face, component code and static storage "
+                            "only; no execution, TLS authentication or HIL."]}
 
 
 def component_owner_object(elf, name):
@@ -737,7 +752,7 @@ def component_owner_object(elf, name):
 def component_owner_input_paths(root):
     """Protect all optional source contracts before mutating the output."""
     paths = {root / "core/include/nexus/core/time.h",
-             root / "tools/release/transport.py"}
+             root / "tools/maintenance/consumer_profiles.py"}
     paths.update((root / "io/include/nexus/io").glob("*.h"))
     paths.update((root / "components").rglob("include/nexus/components/*.h"))
     paths.update((root / "components").rglob("src/*.c"))
@@ -756,9 +771,7 @@ def inspect_provider_retention(elf, bindings, *, root=ROOT, resolved=None,
         return inspect_secure_owner(elf, bindings, resolved, consumer_path, root)
     if component_owner is not None:
         raise EvidenceError("unsupported component owner")
-    role = selected_i2s2_role(resolved)
-    connections = (selected_faces(bindings) if role is None
-                   or FACE_DECLARATION.search(bindings) else [])
+    connections = selected_faces(bindings)
     face_types, layouts, providers, public_inputs = source_contracts(root)
     faces, tables = [], {}
     for face_type, name, operations, context in connections:
@@ -785,15 +798,8 @@ def inspect_provider_retention(elf, bindings, *, root=ROOT, resolved=None,
         faces.append({"name": name, "type": face_type, "operations": operations,
                       "context": context, "address": face["value"],
                       **context_facts})
-        if operations in tables:
-            continue
-        tables[operations] = operations_table(
-            elf, operations, expected_type, slot_names, provider)
-    if role is not None:
-        component_faces, component_table = inspect_i2s2_component(
-            elf, role, face_types, layouts, providers, root)
-        faces.extend(component_faces)
-        tables[component_table["name"]] = component_table
+        operations_table(elf, operations, expected_type, slot_names, provider,
+                         tables=tables)
     return {"schema_version": 1, "kind": "linked_provider_retention",
             "status": "passed", "face_count": len(faces),
             "operations_table_count": len(tables),

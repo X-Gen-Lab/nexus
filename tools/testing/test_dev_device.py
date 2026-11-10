@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.dev import process, qualification
+from tools.dev import process, provenance as build_provenance
 from tools.evidence.common import file_identity
 from tools.evidence.identity import canonical_digest
 
@@ -50,7 +50,7 @@ class DeveloperDeviceTests(unittest.TestCase):
         result = process.run(command, cwd=self.root, env=os.environ,
                              log=self.root / "build.log", stage="build")
         receipt = json.loads(result.receipt_path.read_text())
-        provenance = qualification.provenance(
+        provenance = build_provenance.provenance(
             {"kind": "synthetic"}, [self.resolved], [self.elf], [command],
             configuration=self.resolved)
         provenance["action"] = "build"
@@ -220,7 +220,7 @@ class DeveloperDeviceTests(unittest.TestCase):
             self.assertIsNone(phase_control)
             yield descriptor, {}
 
-        with patch("tools.hil.serial_echo._device", disconnected_device):
+        with patch("tools.dev.serial._device", disconnected_device):
             with self.assertRaisesRegex(ValueError, "disconnect|EOF"):
                 self.module()._monitor("/dev/serial/by-id/synthetic", 1)
 

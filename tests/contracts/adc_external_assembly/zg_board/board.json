@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407zg-adc-external-software-fixture",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-fixture-v1",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "analog",
+      "controller": "ADC1",
+      "route": "adc1-scan-external16"
+    },
+    {
+      "id": "independent1",
+      "controller": "ADC1",
+      "route": "adc1-ch4-pa4"
+    },
+    {
+      "id": "independent2",
+      "controller": "ADC2",
+      "route": "adc2-ch8-pb0"
+    },
+    {
+      "id": "independent3",
+      "controller": "ADC3",
+      "route": "adc3-ch4-pf6"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only; no PCB route or physical qualification"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "DS8626 Rev12 Table7, external ADC1 inputs; no physical wiring assertion"
+    }
+  ]
+}

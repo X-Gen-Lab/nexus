@@ -642,7 +642,7 @@ nx_result_t AlternateRead(const void* context, nx_rtc_snapshot_t* output) {
 
 TEST(NativeTimeDispatch, SharedReadonlyTableSupportsAnUnrelatedProvider) {
     testing::StrictMock<Alternate> alternate;
-    const nx_rtc_ops_t operations{AlternateRead, nullptr, nullptr,
+    const nx_rtc_ops_t operations{AlternateRead, nullptr, nullptr, nullptr,
                                   nullptr,       nullptr, nullptr};
     const nx_rtc_port_t face{&operations, &alternate};
     nx_rtc_snapshot_t snapshot{};

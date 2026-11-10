@@ -12,15 +12,25 @@ extern "C" {
 #include "nexus/io/memory_window.h"
 #include "nexus/io/parallel16.h"
 #include "stm32f407_fsmc.h"
+#include "stm32f407_fsmc_nand.h"
+#include "stm32f407_fsmc_nor.h"
 }
 #include <algorithm>
 #include <array>
 #include <cstring>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
 #include <vector>
 
 namespace {
+class MemoryPort {
+  public:
+    MOCK_METHOD(uint16_t, Read, (uintptr_t address, unsigned width));
+    MOCK_METHOD(void, Write,
+                (uintptr_t address, uint16_t value, unsigned width));
+};
+MemoryPort* memory_port;
 bool privileged;
 bool in_isr;
 bool masked;
@@ -82,6 +92,7 @@ class FSMC : public testing::Test {
                      MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
             ASSERT_EQ(mapping[i], reinterpret_cast<void*>(bases[i]));
         }
+        memory_port = nullptr;
         privileged = true;
         in_isr = false;
         masked = false;
@@ -114,8 +125,8 @@ class FSMC : public testing::Test {
                 }
             }
         }
-        config = {pins.data(),  pins.size(),      banks.data(),
-                  banks.size(), {clock, nullptr}, false};
+        config = {pins.data(),      pins.size(), banks.data(), banks.size(),
+                  {clock, nullptr}, false,       nullptr,      0U};
     }
     void TearDown() override {
         const std::array<size_t, 3> sizes{0x80000U, 0x1000U, 0x4000U};
@@ -130,6 +141,742 @@ class FSMC : public testing::Test {
                                      states.size());
     }
 };
+
+/** \brief Generic 16-bit NE3 PSRAM uses the legacy electrical pad union. */
+class FSMCExtended : public FSMC {
+  protected:
+    nx_stm32_fsmc_parameters_t profile{};
+    void SetUp() override {
+        FSMC::SetUp();
+        pins.erase(std::remove_if(pins.begin(), pins.end(),
+                                  [](const auto& p) {
+                                      return p.port_index == 6U && p.pin == 12U;
+                                  }),
+                   pins.end());
+        banks[0].kind = NX_STM32_FSMC_PSRAM;
+        profile.bytes = 0x100000U;
+        profile.bank = 3U;
+        profile.width = 16U;
+        profile.address_lines = 19U;
+        profile.byte_lanes = true;
+        profile.extended_mode = true;
+        profile.clock_division = 3U;
+        profile.data_latency = 4U;
+        profile.access_mode = 1U;
+        config.parameters = &profile;
+        config.package_pins = 144U;
+        config.pin_count = pins.size();
+        config.bank_count = 1U;
+    }
+    nx_result_t extended_prepare() {
+        return nx_stm32_fsmc_prepare(&bus, &config, states.data(), 1U);
+    }
+};
+TEST_F(FSMCExtended, PSRAMUsesExplicitCRAMWidthModeLatencyAndWindow) {
+    ASSERT_EQ(extended_prepare(), NX_SUCCESS);
+    EXPECT_EQ(FSMC_Bank1->BTCR[4] & FSMC_BCR1_MTYP,
+              uint32_t{FSMC_MEMORY_TYPE_PSRAM});
+    EXPECT_EQ((FSMC_Bank1->BTCR[5] >> 28U) & 3U, 1U);
+    EXPECT_EQ((FSMC_Bank1->BTCR[5] >> 20U) & 15U, 2U);
+    EXPECT_EQ((FSMC_Bank1->BTCR[5] >> 24U) & 15U, 2U);
+    nx_stm32_fsmc_lease_t lease{};
+    ASSERT_EQ(nx_stm32_fsmc_acquire(&bus, 0U, &lease), NX_SUCCESS);
+    EXPECT_EQ(lease.address, 0x68000000U);
+    EXPECT_EQ(lease.bytes, 0x100000U);
+    EXPECT_EQ(nx_stm32_fsmc_check(&lease), NX_SUCCESS);
+    EXPECT_EQ(nx_stm32_fsmc_stop(&bus), NX_ERROR_BUSY);
+    ASSERT_EQ(nx_stm32_fsmc_release(&lease, lease.epoch), NX_SUCCESS);
+    EXPECT_EQ(nx_stm32_fsmc_stop(&bus), NX_SUCCESS);
+}
+TEST_F(FSMCExtended, ExactPackageRejectsUnavailablePadsBeforeGate) {
+    config.package_pins = 100U;
+    EXPECT_EQ(extended_prepare(), NX_ERROR_INVALID);
+    EXPECT_EQ(RCC->AHB3ENR, 0U);
+}
+TEST_F(FSMCExtended, BadGeometryAndBurstClockRejectBeforeEffects) {
+    profile.bytes = 0x100001U;
+    EXPECT_EQ(extended_prepare(), NX_ERROR_INVALID);
+    profile.bytes = 0x100000U;
+    profile.burst_read = true;
+    profile.clock_division = 2U;
+    EXPECT_EQ(extended_prepare(), NX_ERROR_INVALID);
+    EXPECT_EQ(RCC->AHB3ENR, 0U);
+}
+TEST_F(FSMCExtended, LeaseChecksDecoderAndRejectsModifiedGeometry) {
+    ASSERT_EQ(extended_prepare(), NX_SUCCESS);
+    nx_stm32_fsmc_lease_t lease{};
+    ASSERT_EQ(nx_stm32_fsmc_acquire(&bus, 0U, &lease), NX_SUCCESS);
+    lease.bytes = 4U;
+    EXPECT_EQ(nx_stm32_fsmc_check(&lease), NX_ERROR_STATE);
+    lease.bytes = profile.bytes;
+    FSMC_Bank1->BTCR[4] &= ~uint32_t{FSMC_BCR1_MBKEN};
+    EXPECT_EQ(nx_stm32_fsmc_check(&lease), NX_ERROR_IO);
+    EXPECT_EQ(nx_stm32_fsmc_stop(&bus), NX_ERROR_BUSY);
+}
+
+/** \brief Package100 supports NAND2 over PD7/CLE/ALE and eight data pads. */
+class FSMCNand : public FSMCExtended {
+  protected:
+    void SetUp() override {
+        FSMCExtended::SetUp();
+        banks[0].kind = NX_STM32_FSMC_NAND;
+        profile = {};
+        profile.bank = 2U;
+        profile.width = 8U;
+        profile.tclr = 2U;
+        profile.tar = 3U;
+        profile.ecc_bytes = 512U;
+        profile.common = {1U, 2U, 3U, 4U};
+        profile.attribute = {4U, 3U, 2U, 1U};
+        config.package_pins = 100U;
+        pins.clear();
+        for (uint8_t p = 3U; p <= 4U; ++p) {
+            const uint16_t bits = p == 3U ? 0xd8b3U : 0x0780U;
+            for (uint8_t bit = 0U; bit < 16U; ++bit) {
+                if ((bits & (1U << bit)) != 0U) {
+                    pins.push_back({p == 3U ? GPIOD : GPIOE,
+                                    &snapshots[pins.size()], p, bit});
+                }
+            }
+        }
+        config.pins = pins.data();
+        config.pin_count = pins.size();
+        FSMC_Bank2_3->PCR2 = 0x18U;
+        FSMC_Bank2_3->PMEM2 = 0x12345678U;
+        FSMC_Bank2_3->PATT2 = 0x87654321U;
+    }
+};
+TEST_F(FSMCNand, OfficialNANDConfigurationAndExactPriorRegistersAreRestored) {
+    ASSERT_EQ(extended_prepare(), NX_SUCCESS);
+    EXPECT_EQ(FSMC_Bank2_3->PCR2 & (FSMC_PCR2_PTYP | FSMC_PCR2_PBKEN), 12U);
+    EXPECT_EQ(FSMC_Bank2_3->PMEM2, 0x04030201U);
+    EXPECT_EQ(FSMC_Bank2_3->PATT2, 0x01020304U);
+    EXPECT_EQ(FSMC_Bank2_3->PCR2 & FSMC_PCR2_ECCEN, 0U);
+    nx_stm32_fsmc_lease_t lease{};
+    ASSERT_EQ(nx_stm32_fsmc_acquire(&bus, 0U, &lease), NX_SUCCESS);
+    EXPECT_EQ(lease.address, 0x70000000U);
+    EXPECT_EQ(nx_stm32_fsmc_stop(&bus), NX_ERROR_BUSY);
+    ASSERT_EQ(nx_stm32_fsmc_release(&lease, lease.epoch), NX_SUCCESS);
+    ASSERT_EQ(nx_stm32_fsmc_stop(&bus), NX_SUCCESS);
+    EXPECT_EQ(FSMC_Bank2_3->PCR2, 0x18U);
+    EXPECT_EQ(FSMC_Bank2_3->PMEM2, 0x12345678U);
+    EXPECT_EQ(FSMC_Bank2_3->PATT2, 0x87654321U);
+}
+TEST_F(FSMCNand, FailedDisableRetainsNANDReceiptGateAndRetryResponsibility) {
+    ASSERT_EQ(extended_prepare(), NX_SUCCESS);
+    bad_register = &FSMC_Bank2_3->PCR2;
+    bad_when_value = FSMC_Bank2_3->PCR2 & ~uint32_t{FSMC_PCR2_PBKEN};
+    bad_xor = FSMC_PCR2_PBKEN;
+    EXPECT_EQ(nx_stm32_fsmc_stop(&bus), NX_ERROR_IO);
+    EXPECT_TRUE(states[0].captured);
+    EXPECT_NE(bus.config, nullptr);
+    EXPECT_NE(RCC->AHB3ENR & RCC_AHB3ENR_FSMCEN, 0U);
+    bad_register = nullptr;
+    EXPECT_EQ(nx_stm32_fsmc_stop(&bus), NX_SUCCESS);
+}
+TEST_F(FSMCNand, RunningForeignNANDBankRejectsWithoutChangingIt) {
+    FSMC_Bank2_3->PCR3 = FSMC_PCR3_PBKEN | FSMC_PCR3_PTYP;
+    EXPECT_EQ(extended_prepare(), NX_ERROR_BUSY);
+    EXPECT_EQ(FSMC_Bank2_3->PCR3, 12U);
+    EXPECT_EQ(RCC->AHB3ENR, 0U);
+}
+
+/** \brief Real command state over a mocked external memory bus boundary. */
+class FSMCNor : public FSMCExtended {
+  protected:
+    testing::NiceMock<MemoryPort> memory;
+    nx_stm32_fsmc_nor_t nor{};
+    std::array<nx_flash_sector_t, 2> sectors{
+        {{0U, 0x80000U}, {0x80000U, 0x80000U}}};
+    nx_flash_geometry_t geometry{0x68000000U,    0x100000U,      2U,
+                                 sectors.data(), sectors.size(), 0U};
+    nx_stm32_fsmc_nor_config_t nor_config{&geometry, 0xaaaU, 0x554U, 0xaaU,
+                                          2U,        false,  0U};
+    nx_flash_port_t flash{&nx_stm32_fsmc_nor_flash_ops, &nor};
+    nx_flash_async_port_t async{&nx_stm32_fsmc_nor_async_ops, &nor};
+    uint16_t input[2]{0x1234U, 0x5678U};
+    nx_flash_async_request_t request{};
+    void SetUp() override {
+        FSMCExtended::SetUp();
+        banks[0].kind = NX_STM32_FSMC_NOR;
+        memory_port = &memory;
+        ON_CALL(memory, Read(testing::_, testing::_))
+            .WillByDefault(testing::Return(0xffffU));
+        nx_request_initialize(&request.base);
+    }
+    nx_result_t open() {
+        nx_result_t r = extended_prepare();
+        return r == NX_SUCCESS
+                   ? nx_stm32_fsmc_nor_prepare(&nor, &bus, 0U, &nor_config)
+                   : r;
+    }
+    nx_result_t program(size_t bytes = 2U) {
+        nx_result_t r = nx_flash_async_prepare(&request, NX_FLASH_ASYNC_PROGRAM,
+                                               0U, input, bytes, 100U);
+        return r == NX_SUCCESS ? nx_flash_async_submit(&async, &request) : r;
+    }
+    void ready(uint16_t value) {
+        EXPECT_CALL(memory, Read(0x68000000U, 16U))
+            .Times(2)
+            .WillRepeatedly(testing::Return(value));
+    }
+};
+TEST_F(FSMCNor, SyncFlashCannotSubmitAnUnsettledPulse) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    EXPECT_EQ(nx_flash_port_geometry(&flash), &geometry);
+    EXPECT_CALL(memory, Write(testing::_, testing::_, testing::_)).Times(0);
+    EXPECT_EQ(nx_flash_port_program(&flash, 0U, input, 2U, 100U),
+              NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(nx_flash_port_erase(&flash, 0U, 0x80000U, 100U),
+              NX_ERROR_UNSUPPORTED);
+    testing::Mock::VerifyAndClearExpectations(&memory);
+    EXPECT_EQ(nx_stm32_fsmc_nor_close(&nor), NX_SUCCESS);
+    EXPECT_EQ(nx_stm32_fsmc_stop(&bus), NX_SUCCESS);
+}
+TEST_F(FSMCNor, AMDProgramUsesExplicitUnlockAddressesAndSettlesOnlyAfterReady) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    {
+        testing::InSequence order;
+        EXPECT_CALL(memory, Write(0x68000aaaU, 0xaaU, 16U));
+        EXPECT_CALL(memory, Write(0x68000554U, 0x55U, 16U));
+        EXPECT_CALL(memory, Write(0x68000aaaU, 0xa0U, 16U));
+        EXPECT_CALL(memory, Write(0x68000000U, input[0], 16U));
+    }
+    ASSERT_EQ(program(), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+    EXPECT_EQ(nx_stm32_fsmc_nor_close(&nor), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_stm32_fsmc_stop(&bus), NX_ERROR_BUSY);
+    ready(input[0]);
+    EXPECT_EQ(nx_flash_async_service(&async), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+    EXPECT_EQ(request.base.transferred, 2U);
+}
+TEST_F(FSMCNor, CancelCannotRevokeThePulseOrLaunchTheNextWord) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(program(4U), NX_SUCCESS);
+    EXPECT_EQ(nx_flash_async_cancel(&async, &request), NX_SUCCESS);
+    EXPECT_CALL(memory, Read(0x68000000U, 16U))
+        .WillOnce(testing::Return(0x40U))
+        .WillOnce(testing::Return(0U));
+    EXPECT_EQ(nx_flash_async_service(&async), NX_ERROR_BUSY);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(nx_stm32_fsmc_nor_close(&nor), NX_ERROR_BUSY);
+    testing::Mock::VerifyAndClearExpectations(&memory);
+    EXPECT_CALL(memory, Write(testing::_, 0xa0U, testing::_)).Times(0);
+    ready(input[0]);
+    EXPECT_EQ(nx_flash_async_service(&async), NX_SUCCESS);
+    EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+    EXPECT_EQ(request.base.transferred, 2U);
+    testing::Mock::VerifyAndClearExpectations(&memory);
+    EXPECT_EQ(nx_stm32_fsmc_nor_close(&nor), NX_SUCCESS);
+}
+TEST_F(FSMCNor, DeadlineQuarantinesBusyPulseAndRetainsFirstCauseUntilIdle) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(program(), NX_SUCCESS);
+    model_time = 100U;
+    EXPECT_CALL(memory, Read(0x68000000U, 16U))
+        .WillOnce(testing::Return(0x40U))
+        .WillOnce(testing::Return(0U));
+    EXPECT_EQ(nx_flash_async_service(&async), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(nx_flash_async_cancel(&async, &request), NX_SUCCESS);
+    EXPECT_NE(nor.request, nullptr);
+    testing::Mock::VerifyAndClearExpectations(&memory);
+    ready(input[0]);
+    EXPECT_EQ(nx_flash_async_service(&async), NX_SUCCESS);
+    EXPECT_EQ(request.base.result, NX_ERROR_TIMEOUT);
+}
+TEST_F(FSMCNor, MissingHardwareRetainsBorrowAndLaterIdleSettlesIO) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(program(), NX_SUCCESS);
+    RCC->AHB3ENR = 0U;
+    EXPECT_CALL(memory, Read(testing::_, testing::_)).Times(0);
+    EXPECT_EQ(nx_flash_async_service(&async), NX_ERROR_IO);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(nx_stm32_fsmc_nor_close(&nor), NX_ERROR_BUSY);
+    RCC->AHB3ENR = RCC_AHB3ENR_FSMCEN;
+    testing::Mock::VerifyAndClearExpectations(&memory);
+    ready(input[0]);
+    EXPECT_EQ(nx_flash_async_service(&async), NX_SUCCESS);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+}
+TEST_F(FSMCNor, IntelStatusFailureReturnsToReadArrayOnlyAfterReady) {
+    nor_config.command_set = 1U;
+    ASSERT_EQ(open(), NX_SUCCESS);
+    EXPECT_CALL(memory, Write(testing::_, testing::_, testing::_))
+        .Times(testing::AnyNumber());
+    EXPECT_CALL(memory, Write(0x68000000U, 0x40U, 16U));
+    ASSERT_EQ(program(), NX_SUCCESS);
+    EXPECT_CALL(memory, Read(0x68000000U, 16U)).WillOnce(testing::Return(0U));
+    EXPECT_EQ(nx_flash_async_service(&async), NX_ERROR_BUSY);
+    EXPECT_CALL(memory, Read(0x68000000U, 16U))
+        .WillOnce(testing::Return(0x90U));
+    EXPECT_CALL(memory, Write(0x68000000U, 0xffU, 16U));
+    EXPECT_EQ(nx_flash_async_service(&async), NX_SUCCESS);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+}
+TEST_F(FSMCNor, RejectedRequestHasNoCommandNoBorrowAndNoPayloadMutation) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(nx_flash_async_prepare(&request, NX_FLASH_ASYNC_PROGRAM, 1U,
+                                     input, 2U, 100U),
+              NX_SUCCESS);
+    EXPECT_CALL(memory, Write(testing::_, testing::_, testing::_)).Times(0);
+    EXPECT_EQ(nx_flash_async_submit(&async, &request), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    EXPECT_EQ(nor.request, nullptr);
+}
+TEST_F(FSMCNor, AllFFDoesNotPulseAndStopSealsFurtherAdmission) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    input[0] = 0xffffU;
+    EXPECT_CALL(memory, Write(testing::_, 0xa0U, testing::_)).Times(0);
+    ASSERT_EQ(program(), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(nx_flash_async_stop(&async), NX_SUCCESS);
+    ASSERT_EQ(nx_flash_async_prepare(&request, NX_FLASH_ASYNC_PROGRAM, 0U,
+                                     input, 2U, 100U),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_flash_async_submit(&async, &request), NX_ERROR_STATE);
+}
+TEST_F(FSMCNor, AllFFCannotReportSuccessOverAnAlreadyProgrammedWord) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    input[0] = 0xffffU;
+    EXPECT_CALL(memory, Read(0x68000000U, 16U))
+        .WillOnce(testing::Return(0x0000U));
+    EXPECT_CALL(memory, Write(testing::_, testing::_, testing::_)).Times(0);
+    ASSERT_EQ(program(), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(request.base.transferred, 0U);
+}
+TEST_F(FSMCNor, DeadlineCrossedWhileCheckingOldDataCannotStartAPulse) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    EXPECT_CALL(memory, Read(0x68000000U, 16U))
+        .WillOnce([](uintptr_t, unsigned) {
+            model_time = 100U;
+            return uint16_t{0xffffU};
+        });
+    EXPECT_CALL(memory, Write(testing::_, testing::_, testing::_)).Times(0);
+    ASSERT_EQ(program(), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_TIMEOUT);
+    EXPECT_EQ(request.base.transferred, 0U);
+}
+TEST_F(FSMCNor, CFIMismatchRetainsLeaseUntilExplicitClose) {
+    nor_config.cfi = true;
+    ON_CALL(memory, Read(testing::_, testing::_))
+        .WillByDefault(testing::Return(0U));
+    ASSERT_EQ(extended_prepare(), NX_SUCCESS);
+    EXPECT_EQ(nx_stm32_fsmc_nor_prepare(&nor, &bus, 0U, &nor_config),
+              NX_ERROR_IO);
+    EXPECT_NE(nor.lease.owner, nullptr);
+    EXPECT_EQ(nx_stm32_fsmc_stop(&bus), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_stm32_fsmc_nor_close(&nor), NX_SUCCESS);
+    EXPECT_EQ(nx_stm32_fsmc_stop(&bus), NX_SUCCESS);
+}
+
+TEST_F(FSMCNor, ReadyToggleWithoutProgrammedDataMustFail) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(program(), NX_SUCCESS);
+    ready(0xffffU);
+    EXPECT_EQ(nx_flash_async_service(&async), NX_SUCCESS);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(request.base.transferred, 0U);
+}
+
+/** \brief Byte-wide raw NAND uses the same real controller/LL fixture. */
+class FSMCRawNand : public FSMCNand {
+  protected:
+    testing::NiceMock<MemoryPort> memory;
+    nx_stm32_fsmc_nand_t nand{};
+    nx_nand_geometry_t geometry{512U, 16U, 32U, 4U, 512U, 8U, 1U, 2U};
+    nx_stm32_fsmc_nand_config_t nand_config{&geometry, 0U};
+    nx_nand_port_t port{&nx_stm32_fsmc_nand_ops, &nand};
+    nx_nand_request_t request{};
+    std::array<uint8_t, 512> page{};
+    std::array<uint8_t, 16> oob{};
+    uint8_t status{0xc0U};
+    bool status_mode{};
+    void SetUp() override {
+        FSMCNand::SetUp();
+        memory_port = &memory;
+        ON_CALL(memory, Write(testing::_, testing::_, testing::_))
+            .WillByDefault([this](uintptr_t address, uint16_t value, unsigned) {
+                if (address == 0x70010000U)
+                    status_mode = value == 0x70U;
+            });
+        ON_CALL(memory, Read(testing::_, testing::_))
+            .WillByDefault([this](uintptr_t, unsigned) {
+                return static_cast<uint16_t>(status_mode ? status : 0x5aU);
+            });
+        nx_request_initialize(&request.base);
+        FSMC_Bank2_3->SR2 = FSMC_SR2_FEMPT;
+    }
+    nx_result_t open() {
+        nx_result_t r = extended_prepare();
+        return r == NX_SUCCESS
+                   ? nx_stm32_fsmc_nand_prepare(&nand, &bus, 0U, &nand_config)
+                   : r;
+    }
+    nx_result_t start(nx_nand_operation_t op) {
+        nx_result_t r = nx_nand_prepare(&request, 100U);
+        if (r != NX_SUCCESS)
+            return r;
+        request.operation = op;
+        if (op == NX_NAND_READ_PAGE || op == NX_NAND_PROGRAM_PAGE) {
+            request.data = page.data();
+            request.bytes = page.size();
+            request.oob = oob.data();
+            request.oob_bytes = oob.size();
+        }
+        return nx_nand_submit(&port, &request);
+    }
+    void drain() {
+        for (unsigned i = 0U;
+             i < 100U && nx_request_state(&request.base) != NX_REQUEST_SETTLED;
+             ++i)
+            (void)nx_nand_service(&port);
+        ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    }
+};
+TEST_F(FSMCRawNand, RawReadPageAndOOBUsePhysicalGeometryWithoutBadBlockPolicy) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    EXPECT_EQ(nx_nand_geometry(&port), &geometry);
+    ASSERT_EQ(start(NX_NAND_READ_PAGE), NX_SUCCESS);
+    EXPECT_EQ(nx_stm32_fsmc_nand_close(&nand), NX_ERROR_BUSY);
+    drain();
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+    EXPECT_EQ(request.base.transferred, page.size() + oob.size());
+    EXPECT_TRUE(std::all_of(page.begin(), page.end(),
+                            [](uint8_t b) { return b == 0x5aU; }));
+    EXPECT_EQ(oob[0], 0x5aU);
+    EXPECT_EQ(nx_stm32_fsmc_nand_close(&nand), NX_SUCCESS);
+    EXPECT_EQ(nx_stm32_fsmc_stop(&bus), NX_SUCCESS);
+}
+TEST_F(FSMCRawNand, ProgramConfirmOccursOnceAfterAllDataAndRetainsBusyPulse) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    EXPECT_CALL(memory, Write(testing::_, testing::_, testing::_))
+        .Times(testing::AnyNumber());
+    EXPECT_CALL(memory, Write(0x70010000U, 0x10U, 8U)).Times(1);
+    ASSERT_EQ(start(NX_NAND_PROGRAM_PAGE), NX_SUCCESS);
+    status = 0U;
+    for (unsigned i = 0U; i < 30U; ++i)
+        (void)nx_nand_service(&port);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(nx_nand_cancel(&port, &request), NX_SUCCESS);
+    EXPECT_EQ(nx_stm32_fsmc_nand_close(&nand), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_stm32_fsmc_stop(&bus), NX_ERROR_BUSY);
+    status = 0xc0U;
+    drain();
+    EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+}
+TEST_F(FSMCRawNand, CancelBeforeProgramConfirmResetsLatchAndDrainsReset) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(start(NX_NAND_PROGRAM_PAGE), NX_SUCCESS);
+    EXPECT_CALL(memory, Write(testing::_, testing::_, testing::_))
+        .Times(testing::AnyNumber());
+    EXPECT_CALL(memory, Write(0x70010000U, 0x10U, 8U)).Times(0);
+    EXPECT_CALL(memory, Write(0x70010000U, 0xffU, 8U)).Times(1);
+    status = 0U;
+    EXPECT_EQ(nx_nand_cancel(&port, &request), NX_SUCCESS);
+    EXPECT_EQ(nx_nand_service(&port), NX_ERROR_BUSY);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    status = 0xc0U;
+    drain();
+    EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+}
+TEST_F(FSMCRawNand, EraseNamesWholePhysicalBlockAndFaultBitSettlesIO) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(nx_nand_prepare(&request, 100U), NX_SUCCESS);
+    request.operation = NX_NAND_ERASE_BLOCK;
+    request.page = 1U;
+    EXPECT_EQ(nx_nand_submit(&port, &request), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    request.page = 32U;
+    EXPECT_CALL(memory, Write(testing::_, testing::_, testing::_))
+        .Times(testing::AnyNumber());
+    EXPECT_CALL(memory, Write(0x70010000U, 0x60U, 8U));
+    EXPECT_CALL(memory, Write(0x70010000U, 0xd0U, 8U));
+    ASSERT_EQ(nx_nand_submit(&port, &request), NX_SUCCESS);
+    status = 0xc1U;
+    drain();
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(request.base.transferred, 0U);
+}
+TEST_F(FSMCRawNand, DeadlineAndLostGateRetainPageUntilActualReady) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(start(NX_NAND_READ_PAGE), NX_SUCCESS);
+    status = 0U;
+    model_time = 100U;
+    EXPECT_EQ(nx_nand_service(&port), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    RCC->AHB3ENR = 0U;
+    EXPECT_EQ(nx_nand_service(&port), NX_ERROR_IO);
+    EXPECT_EQ(nx_stm32_fsmc_nand_close(&nand), NX_ERROR_BUSY);
+    RCC->AHB3ENR = RCC_AHB3ENR_FSMCEN;
+    status = 0xc0U;
+    drain();
+    EXPECT_EQ(request.base.result, NX_ERROR_TIMEOUT);
+}
+TEST_F(FSMCRawNand, RawIDStatusAndOOBHaveNoImplicitGeometryInference) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    std::array<uint8_t, 5> id{};
+    ASSERT_EQ(nx_nand_id(&port, id.data(), id.size()), NX_SUCCESS);
+    EXPECT_EQ(id[0], 0x5aU);
+    uint8_t value = 0U;
+    EXPECT_EQ(nx_nand_status(&port, &value), NX_SUCCESS);
+    EXPECT_EQ(value, 0xc0U);
+    ASSERT_EQ(nx_nand_prepare(&request, 100U), NX_SUCCESS);
+    request.operation = NX_NAND_READ_OOB;
+    request.oob = oob.data();
+    request.oob_bytes = oob.size();
+    EXPECT_CALL(memory, Write(testing::_, testing::_, testing::_))
+        .Times(testing::AnyNumber());
+    EXPECT_CALL(memory, Write(0x70010000U, 0x50U, 8U));
+    ASSERT_EQ(nx_nand_submit(&port, &request), NX_SUCCESS);
+    EXPECT_EQ(nx_nand_status(&port, &value), NX_ERROR_BUSY);
+    drain();
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+    EXPECT_EQ(request.base.transferred, 16U);
+}
+TEST_F(FSMCRawNand, ECCCodesWaitForActualFIFOEmptyAndDisableReadback) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    uint32_t code = 0U;
+    ASSERT_EQ(nx_nand_prepare(&request, 100U), NX_SUCCESS);
+    request.operation = NX_NAND_READ_PAGE;
+    request.data = page.data();
+    request.bytes = page.size();
+    request.ecc = &code;
+    request.ecc_count = 1U;
+    ASSERT_EQ(nx_nand_submit(&port, &request), NX_SUCCESS);
+    FSMC_Bank2_3->SR2 = 0U;
+    for (unsigned i = 0U; i < 30U; ++i)
+        (void)nx_nand_service(&port);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_NE(FSMC_Bank2_3->PCR2 & FSMC_PCR2_ECCEN, 0U);
+    model_time = 100U;
+    EXPECT_EQ(nx_nand_service(&port), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    FSMC_Bank2_3->ECCR2 = 0x123456U;
+    FSMC_Bank2_3->SR2 = FSMC_SR2_FEMPT;
+    drain();
+    EXPECT_EQ(code, 0x123456U);
+    EXPECT_EQ(FSMC_Bank2_3->PCR2 & FSMC_PCR2_ECCEN, 0U);
+    EXPECT_EQ(request.base.result, NX_ERROR_TIMEOUT);
+}
+TEST_F(FSMCRawNand, MalformedSpansCannotOverwriteEndpointOrAnyBusReceipt) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(nx_nand_prepare(&request, 100U), NX_SUCCESS);
+    request.operation = NX_NAND_READ_PAGE;
+    request.data = &nand;
+    request.bytes = page.size();
+    EXPECT_CALL(memory, Write(testing::_, testing::_, testing::_)).Times(0);
+    EXPECT_EQ(nx_nand_submit(&port, &request), NX_ERROR_INVALID);
+    EXPECT_EQ(nand.request, nullptr);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+}
+
+TEST_F(FSMCExtended, GenericGeometryOutputCannotOverwriteBusOwnership) {
+    ASSERT_EQ(extended_prepare(), NX_SUCCESS);
+    nx_stm32_fsmc_window_t binding{&bus, 0U};
+    nx_memory_window_port_t window{&nx_stm32_fsmc_window_ops, &binding};
+    const auto saved = bus;
+    EXPECT_EQ(
+        nx_memory_window_port_geometry(
+            &window, reinterpret_cast<nx_memory_window_geometry_t*>(&bus)),
+        NX_ERROR_INVALID);
+    bus = saved;
+}
+TEST_F(FSMCNand, SelectedNANDInterruptEnablesHaveAnUnownedConsumer) {
+    FSMC_Bank2_3->SR2 = FSMC_SR2_IREN;
+    EXPECT_EQ(extended_prepare(), NX_ERROR_BUSY);
+    EXPECT_EQ(FSMC_Bank2_3->SR2, uint32_t{FSMC_SR2_IREN});
+}
+TEST_F(FSMCExtended, UnselectedPCCARDDecoderCannotLoseItsGate) {
+    FSMC_Bank4->PCR4 = FSMC_PCR4_PBKEN;
+    EXPECT_EQ(extended_prepare(), NX_ERROR_BUSY);
+    EXPECT_EQ(FSMC_Bank4->PCR4, uint32_t{FSMC_PCR4_PBKEN});
+}
+TEST_F(FSMCNor, EraseToggleStoppedWithoutErasedDataIsIO) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(nx_flash_async_prepare(&request, NX_FLASH_ASYNC_ERASE, 0U,
+                                     nullptr, 0x80000U, 100U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_flash_async_submit(&async, &request), NX_SUCCESS);
+    ready(0x20U);
+    EXPECT_EQ(nx_flash_async_service(&async), NX_SUCCESS);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+}
+TEST_F(FSMCNor, CFIValidatesEveryRegionBeforePublishingTheSameGeometry) {
+    nor_config.cfi = true;
+    ON_CALL(memory, Read(testing::_, testing::_))
+        .WillByDefault([](uintptr_t address, unsigned) {
+            switch ((address - 0x68000000U) / 2U) {
+                case 0x10U:
+                    return uint16_t{'Q'};
+                case 0x11U:
+                    return uint16_t{'R'};
+                case 0x12U:
+                    return uint16_t{'Y'};
+                case 0x13U:
+                    return uint16_t{2U};
+                case 0x27U:
+                    return uint16_t{20U};
+                case 0x2cU:
+                    return uint16_t{1U};
+                case 0x2dU:
+                    return uint16_t{1U};
+                case 0x30U:
+                    return uint16_t{8U};
+                case 0x14U:
+                case 0x2eU:
+                case 0x2fU:
+                    return uint16_t{0U};
+                default:
+                    return uint16_t{0xffffU};
+            }
+        });
+    ASSERT_EQ(open(), NX_SUCCESS);
+    EXPECT_EQ(nx_flash_port_geometry(&flash), &geometry);
+}
+TEST_F(FSMCNor, ExplicitEightBitNORUsesByteCommandsAndByteProgramUnit) {
+    profile.width = 8U;
+    profile.bytes = 0x80000U;
+    pins.erase(std::remove_if(pins.begin(), pins.end(),
+                              [](const auto& p) {
+                                  return (p.port_index == 3U && p.pin >= 8U &&
+                                          p.pin <= 10U) ||
+                                         (p.port_index == 4U &&
+                                          (p.pin == 1U || p.pin >= 11U));
+                              }),
+               pins.end());
+    config.pin_count = pins.size();
+    geometry.size = 0x80000U;
+    geometry.program_unit = 1U;
+    geometry.sector_count = 1U;
+    nor_config.unlock2 = 0x555U;
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(program(1U), NX_SUCCESS);
+    EXPECT_CALL(memory, Read(0x68000000U, 8U))
+        .Times(2)
+        .WillRepeatedly(testing::Return(0x34U));
+    EXPECT_EQ(nx_flash_async_service(&async), NX_SUCCESS);
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+    EXPECT_EQ(request.base.transferred, 1U);
+}
+TEST_F(FSMCRawNand, LastDataWriteCrossingDeadlineDoesNotLaunchProgramPulse) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    size_t count = 0U;
+    ON_CALL(memory, Write(testing::_, testing::_, testing::_))
+        .WillByDefault([&](uintptr_t address, uint16_t value, unsigned) {
+            if (address == 0x70010000U)
+                status_mode = value == 0x70U;
+            if (address == 0x70000000U && ++count == 528U)
+                model_time = 100U;
+        });
+    EXPECT_CALL(memory, Write(testing::_, testing::_, testing::_))
+        .Times(testing::AnyNumber());
+    EXPECT_CALL(memory, Write(0x70010000U, 0x10U, 8U)).Times(0);
+    EXPECT_CALL(memory, Write(0x70010000U, 0xffU, 8U)).Times(1);
+    ASSERT_EQ(start(NX_NAND_PROGRAM_PAGE), NX_SUCCESS);
+    drain();
+    EXPECT_EQ(request.base.result, NX_ERROR_TIMEOUT);
+}
+TEST_F(FSMCRawNand, FailedECCEnableReadbackRetainsActualEngineUntilDisable) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    uint32_t code = 0U;
+    ASSERT_EQ(nx_nand_prepare(&request, 100U), NX_SUCCESS);
+    request.operation = NX_NAND_READ_PAGE;
+    request.data = page.data();
+    request.bytes = page.size();
+    request.ecc = &code;
+    request.ecc_count = 1U;
+    ASSERT_EQ(nx_nand_submit(&port, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_nand_service(&port), NX_SUCCESS);
+    bad_register = &FSMC_Bank2_3->PCR2;
+    bad_when_value = FSMC_Bank2_3->PCR2 | uint32_t{FSMC_PCR2_ECCEN};
+    bad_xor = FSMC_PCR2_ECCEN;
+    EXPECT_EQ(nx_nand_service(&port), NX_ERROR_IO);
+    bad_register = nullptr;
+    FSMC_Bank2_3->SR2 = 0U;
+    EXPECT_EQ(nx_nand_service(&port), NX_ERROR_BUSY);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    FSMC_Bank2_3->SR2 = FSMC_SR2_FEMPT;
+    drain();
+    EXPECT_EQ(FSMC_Bank2_3->PCR2 & FSMC_PCR2_ECCEN, 0U);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+}
+TEST_F(FSMCRawNand, SixteenBitBusKeepsByteGeometryAndLowByteIDStatus) {
+    profile.width = 16U;
+    geometry.width = 16U;
+    const std::array<uint8_t, 8> extra{8U, 9U, 10U, 11U, 12U, 13U, 14U, 15U};
+    for (uint8_t pin : extra) {
+        uint8_t port_index = pin < 11U ? 3U : 4U;
+        pins.push_back({port_index == 3U ? GPIOD : GPIOE,
+                        &snapshots[pins.size()], port_index, pin});
+    }
+    config.pins = pins.data();
+    config.pin_count = pins.size();
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(start(NX_NAND_READ_PAGE), NX_SUCCESS);
+    drain();
+    EXPECT_EQ(request.base.transferred, 528U);
+    EXPECT_EQ(page[0], 0x5aU);
+    EXPECT_EQ(page[1], 0U);
+}
+
+TEST_F(FSMCExtended, PSRAMBurstPageSplitsAtExplicitCRAMBoundary) {
+    profile.burst_read = true;
+    profile.burst_page_bytes = 512U;
+    pins.push_back({GPIOD, &snapshots[pins.size()], 3U, 3U});
+    config.pins = pins.data();
+    config.pin_count = pins.size();
+    ASSERT_EQ(extended_prepare(), NX_SUCCESS);
+    EXPECT_EQ(FSMC_Bank1->BTCR[4] & FSMC_BCR1_CPSIZE, 3U << 16U);
+}
+TEST_F(FSMCExtended, DisabledExtendedModeUsesOneExplicitReadWriteTiming) {
+    profile.extended_mode = false;
+    profile.access_mode = 0U;
+    banks[0].write = banks[0].read;
+    ASSERT_EQ(extended_prepare(), NX_SUCCESS);
+    EXPECT_EQ(FSMC_Bank1->BTCR[4] & FSMC_BCR1_EXTMOD, 0U);
+}
+TEST_F(FSMCNor, ExplicitBusyAssertionDelayPreventsPrematureReadyObservation) {
+    nor_config.ready_delay_us = 3U;
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(program(), NX_SUCCESS);
+    EXPECT_CALL(memory, Read(testing::_, testing::_)).Times(0);
+    EXPECT_EQ(nx_flash_async_service(&async), NX_ERROR_BUSY);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    testing::Mock::VerifyAndClearExpectations(&memory);
+    model_time = 4U;
+    ready(input[0]);
+    EXPECT_EQ(nx_flash_async_service(&async), NX_SUCCESS);
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+}
+TEST_F(FSMCRawNand, ReadyPollingWaitsForExplicitDeviceBusyAssertionBound) {
+    nand_config.ready_delay_us = 3U;
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(start(NX_NAND_RESET), NX_SUCCESS);
+    EXPECT_CALL(memory, Read(testing::_, testing::_)).Times(0);
+    EXPECT_EQ(nx_nand_service(&port), NX_ERROR_BUSY);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    testing::Mock::VerifyAndClearExpectations(&memory);
+    model_time = 4U;
+    drain();
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+}
+
+TEST_F(FSMCNor, FailedIdlePulseRestoresReadArrayWithoutReplayingThePulse) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    ASSERT_EQ(program(), NX_SUCCESS);
+    ready(0xffffU);
+    EXPECT_CALL(memory, Write(0x68000000U, 0xf0U, 16U)).Times(1);
+    EXPECT_EQ(nx_flash_async_service(&async), NX_SUCCESS);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+}
 
 TEST_F(FSMC, MalformedOrBootBackedConfigurationHasNoHardwareEffect) {
     config.boot_backed = true;
@@ -733,6 +1480,8 @@ extern "C" uint32_t nx_fsmc_model_read(const volatile uint32_t* reg) {
     return observed(reg);
 }
 extern "C" uint16_t nx_fsmc_model_read16(const volatile uint16_t* address) {
+    if (memory_port != nullptr)
+        return memory_port->Read(reinterpret_cast<uintptr_t>(address), 16U);
     model_time += word_time;
     if (read_position < read_words.size())
         return read_words[read_position++];
@@ -740,6 +1489,10 @@ extern "C" uint16_t nx_fsmc_model_read16(const volatile uint16_t* address) {
 }
 extern "C" void nx_fsmc_model_write16(volatile uint16_t* address,
                                       uint16_t value) {
+    if (memory_port != nullptr) {
+        memory_port->Write(reinterpret_cast<uintptr_t>(address), value, 16U);
+        return;
+    }
     if (release_during_write != nullptr) {
         auto* lease = release_during_write;
         release_during_write = nullptr;
@@ -748,4 +1501,17 @@ extern "C" void nx_fsmc_model_write16(volatile uint16_t* address,
     writes.emplace_back(reinterpret_cast<uintptr_t>(address), value);
     *address = value;
     model_time += word_time;
+}
+
+extern "C" uint8_t nx_fsmc_model_read8(const volatile uint8_t* address) {
+    return memory_port == nullptr
+               ? *address
+               : static_cast<uint8_t>(memory_port->Read(
+                     reinterpret_cast<uintptr_t>(address), 8U));
+}
+extern "C" void nx_fsmc_model_write8(volatile uint8_t* address, uint8_t value) {
+    if (memory_port != nullptr)
+        memory_port->Write(reinterpret_cast<uintptr_t>(address), value, 8U);
+    else
+        *address = value;
 }

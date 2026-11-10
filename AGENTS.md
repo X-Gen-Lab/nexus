@@ -13,8 +13,9 @@ agent review for high-risk changes; never invent GitHub CODEOWNERS accounts or
 claim remote branch protection from a local policy file.
 
 Read [the design contracts](docs/design/README.md),
-[delivery evidence](docs/delivery/README.md) and the relevant layer README before
-changing behavior. `docs/archive/` contains historical contracts and results.
+[delivery boundaries](docs/delivery/README.md) and the relevant layer README
+before changing behavior. Historical contracts and results remain in immutable
+[Git history](https://github.com/X-Gen-Lab/nexus/tree/83a27dfbee4e8fbf4d35875b1e9db85af7516eec).
 They do not establish current support or qualification.
 
 ## Architecture and configuration
@@ -104,8 +105,7 @@ production configuration examples without installing tools or using the network.
 Prepare the hash-locked documentation tuple explicitly with
 `python tools/documentation/install.py`; `dev.py docs test` executes the complete
 documentation suite using the same nonzero, no-skip result admission as other
-tool tests. Strict bilingual builds, whole-site translation checks and immutable
-packages use that tuple. Trusted publication only consumes verified bytes.
+tool tests. Strict bilingual builds and whole-site translation checks use that tuple.
 Every current page has complete English and Chinese prose through one canonical
 source and reviewed gettext catalogs. Mixed-source contracts may use a reviewed
 catalog for their declared source locale too. Keep symbols, configuration keys
@@ -143,23 +143,23 @@ source is never contemporaneous evidence of an earlier RED execution. Disclose
 any draft that predates its tests; retain later genuine RED/GREEN fixes without
 rewriting the earlier chronology.
 
-`python scripts/ci/tdd_gate.py --all --preset native-debug` builds the pinned,
-offline GoogleTest/GoogleMock targets and executes every discovered case with fresh
-reports. Its initial `doctor --target contracts` checks the prepared locked Native
-and ARM tools before expensive suites, without installation or Docker.
-It then configures and links the Native contract target before the tool suites,
-so compile/link failures stop early. The ordinary post-suite configure/build
-still runs before fresh GoogleTest execution and matrix capture; preflight does
-not reuse a successful test report. The commit hook runs this gate for behavioral
-changes. It rejects differing unstaged/untracked behavior before and after
-execution and requires an unchanged Git index tree. The hook reads the complete
-staged index, including deletions,
-and runs once per commit without filename batching. CI executes the gate independently of
-local hooks. Do not disable cases, filters, shards or hooks to create acceptance
-evidence. Record RED/GREEN commands and the failure reason in the change review;
-automation verifies real execution, not the historical order of developer work.
-The framework enables C++17 only for Native tests. Firmware remains C11 and never
-links GoogleTest, GoogleMock, C++ test fixtures or their runtime.
+`python scripts/ci/tdd_gate.py --all --preset native-debug` builds and runs
+all offline GoogleTest/GoogleMock contracts and the four complete tool domains.
+The gate checks locked tools required by the selected domains (Native plus ARM
+for tool fixtures), configures once and builds once before test
+execution. It never reuses successful reports. The ordinary commit hook selects
+complete affected tool domains from the complete staged index, including deleted
+paths; it always runs the full Native GoogleTest plan for behavioral changes.
+Broad build/configuration-policy changes select all four tool domains.
+`--tools none` is available for an explicitly separate Native CI execution only;
+the commit hook uses the ordinary changed-domain policy. Independent CI owns the
+retained tool suites and all four Native runtime modes. Do not disable tests,
+use runtime filters/shards, or bypass hooks to create acceptance evidence.
+
+The hook rejects differing unstaged/untracked behavior before and after execution
+and requires an unchanged Git index tree. Record actual RED/GREEN commands and
+failure reasons in the PR. Automation verifies execution, not historical order.
+C++17, GoogleTest and GoogleMock belong only in host tests; firmware stays C11.
 
 Deliver one complete functional increment at a time: implementation, focused
 regressions, current documentation and the ordinary complete-index gates. Report
@@ -175,7 +175,9 @@ after identifying its obsolete contract or equivalent independent coverage;
 preserve meaningful failure regressions. Move mode-independent Python and SDK
 checks to the explicit tool domains instead of repeating them in each Native
 preset. Keep all four Native C/Google modes and the ordinary complete-index
-commit gate. Analyze every distinct compiler context; bound concurrency and
+commit gate. Shared contracts run once per meaningful implementation class;
+small compile-time variants retain their distinguishing IRQ, ABI and feature
+contracts instead of repeating the entire behavior suite. Analyze every distinct compiler context; bound concurrency and
 retain cancellation, diagnostics and fresh reports. Cache verified tool inputs,
 never successful test reports.
 
@@ -198,8 +200,9 @@ Compile common components for maintained F4 parts. Native models establish softw
 behavior, ARM ELF checks establish linking/resources, and physical station results
 establish hardware behavior. Never inherit old test counts or hardware status.
 
-A software candidate binds clean Git source, exact configuration, dependency and
-OCI/toolchain identities, executed raw logs and the same ELF/BIN/map bytes. Two
-fresh network-disabled builds establish reproducibility. A digest alone does not.
-No unsigned software candidate is a product release, safety certification or LTS
-promise. Record physical tests as not executed until real equipment runs them.
+Builds, tests, SDK checks and physical HIL have separate scopes. Preserve fresh
+raw failures and actual source/configuration identities in build outputs and PRs.
+Retired candidate, promotion, archive recovery and task-ledger engines are not
+platform runtime/build requirements. Never restore them merely to retain an old
+test count. No software result is a product release, safety certification or LTS
+promise. Physical tests remain `not_executed` until equipment executes them.

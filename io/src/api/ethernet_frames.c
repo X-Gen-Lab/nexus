@@ -26,6 +26,7 @@ nx_result_t nx_eth_frames_tx_prepare(nx_eth_frames_tx_request_t* request,
         request->fragments = fragments;
         request->fragment_count = count;
         request->timestamp_requested = timestamp;
+        request->checksum = NX_ETH_FRAMES_CHECKSUM_NONE;
         request->stamp = (nx_io_timestamp_t){0};
         request->capture_flags = 0U;
     }

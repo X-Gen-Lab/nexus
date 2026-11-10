@@ -8,7 +8,9 @@
  */
 #include "nexus/arch/arch.h"
 #include "nexus/io/entropy.h"
+#include "stm32f407_clock.h"
 #include "stm32f407_entropy.h"
+#include "stm32f407_system.h"
 #include <algorithm>
 #include <array>
 #include <cstring>
@@ -19,6 +21,7 @@
 extern "C" {
 RNG_TypeDef nx_entropy_model_rng{};
 RCC_TypeDef nx_entropy_model_rcc{};
+nx_stm32_system_t g_nx_stm32_system{};
 }
 
 namespace {
@@ -188,17 +191,26 @@ size_t data_reads = 0;
 class F407Entropy : public testing::Test {
   protected:
     nx_stm32f407_entropy_state_t state{};
-    const nx_stm32f407_entropy_config_t config{8000000, 168000000};
+    FLASH_TypeDef flash{};
     const nx_entropy_port_t port{&nx_stm32f407_entropy_ops, &state};
 
     void SetUp() override {
         std::memset(&nx_entropy_model_rng, 0, sizeof(nx_entropy_model_rng));
         std::memset(&nx_entropy_model_rcc, 0, sizeof(nx_entropy_model_rcc));
-        nx_entropy_model_rcc.CR = RCC_CR_HSERDY | RCC_CR_PLLRDY;
+        nx_entropy_model_rcc.CR =
+            RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
         nx_entropy_model_rcc.PLLCFGR = 8U | (336U << RCC_PLLCFGR_PLLN_Pos) |
                                        RCC_PLLCFGR_PLLSRC |
                                        (7U << RCC_PLLCFGR_PLLQ_Pos);
-        nx_entropy_model_rcc.CFGR = RCC_CFGR_SWS_PLL;
+        nx_entropy_model_rcc.CFGR = RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL |
+                                    RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
+        flash.ACR = NEXUS_FLASH_WAIT_STATES;
+        g_nx_stm32_system = {};
+        g_nx_stm32_system.rcc = &nx_entropy_model_rcc;
+        g_nx_stm32_system.flash = &flash;
+        g_nx_stm32_system.started = true;
+        g_nx_stm32_system.core_hz = NEXUS_CORE_HZ;
+        g_nx_stm32_system.time_epoch = 1U;
         pending_words.clear();
         after_read_error = 0;
         after_read_clock_loss = block_gate_enable = block_rng_disable = false;
@@ -214,7 +226,7 @@ class F407Entropy : public testing::Test {
     }
 
     void start() {
-        ASSERT_EQ(nx_stm32f407_entropy_start(&state, &config), NX_SUCCESS);
+        ASSERT_EQ(nx_stm32f407_entropy_start(&state), NX_SUCCESS);
     }
 };
 
@@ -308,13 +320,67 @@ TEST_F(F407Entropy, ClockLossAfterReadRejectsSampleAndNeverChangesPll) {
     EXPECT_EQ(nx_entropy_model_rcc.PLLCFGR, pll);
 }
 
+TEST_F(F407Entropy, ReadyBitsCannotReplacePoweredSelectedOscillators) {
+    for (uint32_t bit : {static_cast<uint32_t>(RCC_CR_HSEON),
+                         static_cast<uint32_t>(RCC_CR_PLLON)}) {
+        nx_entropy_model_rcc.CR &= ~bit;
+        EXPECT_NE(nx_stm32f407_entropy_start(&state), NX_SUCCESS);
+        EXPECT_EQ(nx_entropy_model_rcc.AHB2ENR, 0U);
+        EXPECT_EQ(nx_stm32f407_entropy_stop(&state), NX_SUCCESS);
+        nx_entropy_model_rcc.CR |= bit;
+    }
+}
+
+TEST_F(F407Entropy, InactiveSystemCannotLendTheSelectedPll48) {
+    g_nx_stm32_system.started = false;
+    EXPECT_EQ(nx_stm32f407_entropy_start(&state), NX_ERROR_STATE);
+    EXPECT_EQ(nx_entropy_model_rcc.AHB2ENR, 0U);
+    EXPECT_EQ(nx_stm32f407_entropy_stop(&state), NX_SUCCESS);
+}
+
+TEST_F(F407Entropy, NewSystemEpochRejectsOutputButStillPermitsOwnerCleanup) {
+    start();
+    words({1, 2});
+    uint32_t output = 99U;
+    ASSERT_EQ(nx_entropy_port_try_read(&port, &output), NX_ERROR_BUSY);
+    ++g_nx_stm32_system.time_epoch;
+    EXPECT_EQ(nx_entropy_port_try_read(&port, &output), NX_ERROR_IO);
+    EXPECT_EQ(output, 99U);
+    g_nx_stm32_system.started = false;
+    block_rng_disable = true;
+    EXPECT_EQ(nx_stm32f407_entropy_stop(&state), NX_ERROR_IO);
+    EXPECT_TRUE(state.rng_owned);
+    EXPECT_TRUE(state.gate_owned);
+    block_rng_disable = false;
+    EXPECT_EQ(nx_stm32f407_entropy_stop(&state), NX_SUCCESS);
+    EXPECT_EQ(nx_entropy_model_rcc.AHB2ENR, 0U);
+}
+
+TEST_F(F407Entropy, AChangedBusPlanCannotKeepTheRngLeaseLive) {
+    start();
+    words({1, 2});
+    uint32_t output = 99U;
+    ASSERT_EQ(nx_entropy_port_try_read(&port, &output), NX_ERROR_BUSY);
+    nx_entropy_model_rcc.CFGR ^= RCC_CFGR_PPRE1_0;
+    EXPECT_EQ(nx_entropy_port_try_read(&port, &output), NX_ERROR_IO);
+    EXPECT_EQ(output, 99U);
+    EXPECT_EQ(nx_stm32f407_entropy_stop(&state), NX_SUCCESS);
+}
+
+TEST_F(F407Entropy, ForeignSpreadSpectrumCannotInheritTheSelectedClockPlan) {
+    nx_entropy_model_rcc.SSCGR = RCC_SSCGR_SSCGEN;
+    EXPECT_NE(nx_stm32f407_entropy_start(&state), NX_SUCCESS);
+    EXPECT_EQ(nx_entropy_model_rcc.AHB2ENR, 0U);
+    EXPECT_EQ(nx_stm32f407_entropy_stop(&state), NX_SUCCESS);
+}
+
 TEST_F(F407Entropy, ExistingRngOrInterruptIsNotStolen) {
     nx_entropy_model_rcc.AHB2ENR = RCC_AHB2ENR_RNGEN;
     nx_entropy_model_rng.CR = RNG_CR_RNGEN;
-    EXPECT_EQ(nx_stm32f407_entropy_start(&state, &config), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_stm32f407_entropy_start(&state), NX_ERROR_BUSY);
     EXPECT_FALSE(state.gate_owned);
     nx_entropy_model_rng.CR = RNG_CR_IE;
-    EXPECT_EQ(nx_stm32f407_entropy_start(&state, &config), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_stm32f407_entropy_start(&state), NX_ERROR_BUSY);
     EXPECT_EQ(nx_entropy_model_rng.CR, RNG_CR_IE);
 }
 
@@ -327,23 +393,23 @@ TEST_F(F407Entropy, ExistingGateRemainsEnabledAfterStop) {
 }
 
 TEST_F(F407Entropy, ClockProfileMismatchRejectsBeforeAcquiringGate) {
-    auto wrong = config;
-    wrong.hclk_hz = 84000000;
-    EXPECT_EQ(nx_stm32f407_entropy_start(&state, &wrong), NX_ERROR_UNSUPPORTED);
+    g_nx_stm32_system.core_hz = 84000000U;
+    EXPECT_EQ(nx_stm32f407_entropy_start(&state), NX_ERROR_STATE);
+    g_nx_stm32_system.core_hz = NEXUS_CORE_HZ;
     nx_entropy_model_rcc.PLLCFGR ^= 1U << RCC_PLLCFGR_PLLQ_Pos;
-    EXPECT_EQ(nx_stm32f407_entropy_start(&state, &config),
-              NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(nx_stm32f407_entropy_start(&state), NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(nx_entropy_model_rcc.AHB2ENR, 0U);
     EXPECT_EQ(nx_entropy_model_rng.CR, 0U);
     nx_entropy_model_rcc.CR = 0;
-    EXPECT_EQ(nx_stm32f407_entropy_start(&state, &config), NX_ERROR_STATE);
+    EXPECT_EQ(nx_stm32f407_entropy_start(&state), NX_ERROR_STATE);
 }
 
-TEST_F(F407Entropy, ValidTwoMegahertzPllInputUsesOfficialMultiplicationRange) {
+TEST_F(F407Entropy, AnotherNominal48TupleCannotOverrideTheSelectedPlan) {
     nx_entropy_model_rcc.PLLCFGR = 4U | (168U << RCC_PLLCFGR_PLLN_Pos) |
                                    RCC_PLLCFGR_PLLSRC |
                                    (7U << RCC_PLLCFGR_PLLQ_Pos);
-    EXPECT_EQ(nx_stm32f407_entropy_start(&state, &config), NX_SUCCESS);
+    EXPECT_EQ(nx_stm32f407_entropy_start(&state), NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(nx_entropy_model_rcc.AHB2ENR, 0U);
     EXPECT_EQ(nx_stm32f407_entropy_stop(&state), NX_SUCCESS);
 }
 
@@ -356,7 +422,7 @@ TEST_F(F407Entropy, FailedDisableRetainsOwnershipAndClosesAdmission) {
     EXPECT_FALSE(state.running);
     uint32_t output = 99;
     EXPECT_EQ(nx_entropy_port_try_read(&port, &output), NX_ERROR_STATE);
-    EXPECT_EQ(nx_stm32f407_entropy_start(&state, &config), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_stm32f407_entropy_start(&state), NX_ERROR_BUSY);
     block_rng_disable = false;
     EXPECT_EQ(nx_stm32f407_entropy_stop(&state), NX_SUCCESS);
     EXPECT_FALSE(state.rng_owned);
@@ -365,7 +431,7 @@ TEST_F(F407Entropy, FailedDisableRetainsOwnershipAndClosesAdmission) {
 
 TEST_F(F407Entropy, GateEnableFailureCanBeExplicitlyWithdrawn) {
     block_gate_enable = true;
-    EXPECT_EQ(nx_stm32f407_entropy_start(&state, &config), NX_ERROR_IO);
+    EXPECT_EQ(nx_stm32f407_entropy_start(&state), NX_ERROR_IO);
     EXPECT_TRUE(state.gate_owned);
     EXPECT_FALSE(state.running);
     EXPECT_EQ(nx_entropy_model_rng.CR, 0U);
@@ -399,64 +465,6 @@ TEST_F(F407Entropy, FiniteFillPrimesHardwareAndProducesOnlyAdmittedWords) {
     EXPECT_EQ(data_reads, 3U);
 }
 
-class F407EntropyInstance : public F407Entropy {
-  protected:
-    void TearDown() override {
-        block_rng_disable = false;
-        nx_entropy_model_rcc.AHB2ENR |= RCC_AHB2ENR_RNGEN;
-        EXPECT_EQ(nx_stm32f407_entropy_instance_stop(), NX_SUCCESS);
-    }
-};
-
-TEST_F(F407EntropyInstance, GetterIsPureStableAndExposesOnlyTheDirectFace) {
-    const auto gates = nx_entropy_model_rcc.AHB2ENR;
-    const auto* face = nx_stm32f407_entropy_instance();
-    ASSERT_NE(face, nullptr);
-    EXPECT_EQ(nx_stm32f407_entropy_instance(), face);
-    EXPECT_EQ(face->ops, &nx_stm32f407_entropy_ops);
-    EXPECT_NE(face->context, nullptr);
-    EXPECT_EQ(nx_entropy_model_rcc.AHB2ENR, gates);
-    EXPECT_EQ(nx_entropy_model_rng.CR, 0U);
-    uint32_t output = 99;
-    EXPECT_EQ(nx_entropy_port_try_read(face, &output), NX_ERROR_STATE);
-    EXPECT_EQ(output, 99U);
-    EXPECT_EQ(data_reads, 0U);
-}
-
-TEST_F(F407EntropyInstance, ExplicitStartRejectsDuplicateAndPreservesFace) {
-    const auto* face = nx_stm32f407_entropy_instance();
-    ASSERT_EQ(nx_stm32f407_entropy_instance_start(&config), NX_SUCCESS);
-    EXPECT_EQ(nx_stm32f407_entropy_instance_start(&config), NX_ERROR_BUSY);
-    EXPECT_EQ(nx_stm32f407_entropy_instance(), face);
-    words({1, 2});
-    uint32_t output = 99;
-    EXPECT_EQ(nx_entropy_port_try_read(face, &output), NX_ERROR_BUSY);
-    EXPECT_EQ(nx_entropy_port_try_read(face, &output), NX_SUCCESS);
-    EXPECT_EQ(output, 2U);
-    EXPECT_EQ(nx_stm32f407_entropy_instance_stop(), NX_SUCCESS);
-    EXPECT_EQ(nx_entropy_port_try_read(face, &output), NX_ERROR_STATE);
-    EXPECT_EQ(nx_stm32f407_entropy_instance(), face);
-    EXPECT_EQ(config.hse_hz, 8000000U);
-    EXPECT_EQ(config.hclk_hz, 168000000U);
-}
-
-TEST_F(F407EntropyInstance, FailedStopRetainsTheUniqueOwnerUntilRetry) {
-    nx_entropy_model_rcc.CR = 0;
-    EXPECT_EQ(nx_stm32f407_entropy_instance_start(&config), NX_ERROR_STATE);
-    EXPECT_EQ(nx_entropy_model_rcc.AHB2ENR, 0U);
-    nx_entropy_model_rcc.CR = RCC_CR_HSERDY | RCC_CR_PLLRDY;
-    ASSERT_EQ(nx_stm32f407_entropy_instance_start(&config), NX_SUCCESS);
-    block_rng_disable = true;
-    EXPECT_EQ(nx_stm32f407_entropy_instance_stop(), NX_ERROR_IO);
-    EXPECT_EQ(nx_stm32f407_entropy_instance_start(&config), NX_ERROR_BUSY);
-    uint32_t output = 99;
-    EXPECT_EQ(
-        nx_entropy_port_try_read(nx_stm32f407_entropy_instance(), &output),
-        NX_ERROR_STATE);
-    block_rng_disable = false;
-    EXPECT_EQ(nx_stm32f407_entropy_instance_stop(), NX_SUCCESS);
-    EXPECT_EQ(nx_stm32f407_entropy_instance_start(&config), NX_SUCCESS);
-}
 } /* namespace */
 
 /** \brief Consume only RNG_DR; ordinary register reads retain their semantics.

@@ -8,12 +8,12 @@
 #include "usb_device_controller.h"
 typedef struct {
     uint32_t status;
-    uint32_t words[16];
+    uint32_t words[256];
 } nx_native_usb_packet_t;
 typedef struct {
     uint32_t registers[1024];
-    uint32_t tx[4][16];
-    size_t tx_count[4];
+    uint32_t tx[6][256];
+    size_t tx_count[6];
     nx_native_usb_packet_t rx[16];
     size_t rx_head;
     size_t rx_count;
@@ -38,7 +38,11 @@ typedef struct {
     bool hold_irq_disable;
     bool hold_clear;
     bool hold_address_clear;
-    uint8_t hold_stall_clear_mask;
+    uint16_t hold_stall_clear_mask;
+    uint8_t endpoint_numbers;
+    uint8_t config_read_gap;
+    bool delay_config_read;
+    bool early_config_read;
     /** \brief Native-only selected endpoint-mask write-fault control. */
     uint32_t hold_ep_mask_bits;
     bool hold_in_nak;
@@ -52,6 +56,8 @@ typedef struct {
     nx_usb_controller_t controller;
     nx_native_usb_hardware_t hardware;
 } nx_native_usb_device_t;
+/** \brief Model-only selected HCLK fact, independent of the monotonic clock. */
+extern uint32_t g_nx_usb_soc_hclk_hz;
 nx_result_t nx_native_usb_initialize(nx_native_usb_device_t* model);
 nx_result_t nx_native_usb_receive(nx_native_usb_device_t* model,
                                   uint8_t endpoint, const uint8_t* bytes,

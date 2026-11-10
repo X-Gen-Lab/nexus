@@ -1,5 +1,5 @@
 schema = 2
-board = "stm32f407_qiming_v31"
+board_package = "f407-audio-reference/zg"
 backend = "baremetal"
 clock = "hse8-pll168"
 optimization = "Os"
@@ -10,6 +10,14 @@ flash_load_limit_bytes = 65536
 static_ram_limit_bytes = 32768
 libc_heap_bytes = 0
 
-# Chip pin capability only; no audio PCB or external master is qualified.
-[i2s2]
-profile = "slave-tx-stereo16-pb12-pb13-pb15"
+# Software reference for the ZG part; no audio PCB or codec is qualified.
+[audio.sound]
+binding = "audio-reference"
+mode = "slave-tx"
+standard = "philips"
+sample_bits = 16
+slot_bits = 16
+mclk = false
+cpol_high = false
+poll_limit = 4096
+irq = {priority = 5, calls_os = false}

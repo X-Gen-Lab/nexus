@@ -314,14 +314,17 @@ nx_result_t nx_eth_frames_mac_initialize(nx_eth_frames_mac_t* mac,
     result = wait_clear(mac, BUS, 1U, deadline);
     if (result != NX_SUCCESS)
         return result;
-    bool valid = checked(mac, BUS, (32U << 8U) | 0x80U, UINT32_MAX) &&
-                 checked(mac, MAC, 0U, 0x02ffffffU) &&
-                 checked(mac, FILTER, 0U, UINT32_MAX) &&
-                 checked(mac, FLOW, 0U, UINT32_MAX) &&
-                 checked(mac, VLAN, 0U, UINT32_MAX) &&
-                 checked(mac, MASK, 0x208U, 0x208U) &&
-                 checked(mac, INTERRUPTS, 0U, SOURCES) &&
-                 checked(mac, CONTROL, 0x02200080U, UINT32_MAX);
+    bool valid =
+        checked(mac, BUS, (32U << 8U) | 0x80U, UINT32_MAX) &&
+        checked(mac, MAC, mac->checksum_offload ? 0x400U : 0U, 0x02ffffffU) &&
+        checked(mac, FILTER, 0U, UINT32_MAX) &&
+        checked(mac, FLOW, 0U, UINT32_MAX) &&
+        checked(mac, VLAN, 0U, UINT32_MAX) &&
+        checked(mac, MASK, 0x208U, 0x208U) &&
+        checked(mac, INTERRUPTS, 0U, SOURCES) &&
+        checked(mac, CONTROL,
+                0x02200080U | (mac->checksum_offload ? 0x04000000U : 0U),
+                UINT32_MAX);
     uint32_t low =
         (uint32_t)mac->address[0] | ((uint32_t)mac->address[1] << 8U) |
         ((uint32_t)mac->address[2] << 16U) | ((uint32_t)mac->address[3] << 24U);
@@ -567,6 +570,7 @@ static void progress_rx(nx_eth_frames_mac_t* mac) {
         head->flags = (bits & 0x200U) == 0U ? NX_ETH_RX_FRAGMENT : 0U;
         head->stamp = (nx_io_timestamp_t){0};
         head->capture_flags = 0U;
+        head->checksum_flags = 0U;
     }
     slot->state = NX_ETH_FRAMES_RX_PARTIAL;
     slot->first = first;
@@ -582,6 +586,14 @@ static void progress_rx(nx_eth_frames_mac_t* mac) {
         wire - preceding > slot->capacity || (bits & 0x20U) == 0U)
         head->flags |= NX_ETH_RX_LENGTH;
     head->length = wire >= 4U ? wire - 4U : 0U;
+    if (mac->checksum_offload && (bits & 1U) != 0U) {
+        uint32_t extended = mac->rx_descriptors[index].extended;
+        bool valid = (extended & 7U) <= 3U && (extended & 0xc0U) != 0xc0U &&
+                     (extended & ~UINT32_C(0x3fff)) == 0U;
+        if (valid)
+            head->checksum_flags =
+                NX_ETH_FRAMES_RX_CHECKSUM_AVAILABLE | (extended & 0xffU);
+    }
     /* RX buffers have at least 64 bytes, so the complete L2 header is in
      * the first descriptor. No frame-sized scratch or hidden copy is used. */
     nx_eth_fragment_t header = {head->data, head->length};
@@ -669,6 +681,11 @@ static nx_result_t submit(void* context, nx_eth_frames_tx_request_t* request) {
         return NX_ERROR_IO;
     if (output_overlap(mac, request, sizeof(*request)))
         return NX_ERROR_INVALID;
+    if ((unsigned)request->checksum > NX_ETH_FRAMES_CHECKSUM_FULL)
+        return NX_ERROR_INVALID;
+    if (request->checksum != NX_ETH_FRAMES_CHECKSUM_NONE &&
+        !mac->checksum_offload)
+        return NX_ERROR_UNSUPPORTED;
     /* Prove metadata and DMA spans before interpreting either the fragment
      * array or Ethernet header. Rejection must not read a control window. */
     if (request->fragment_count == 0U ||
@@ -744,7 +761,8 @@ static nx_result_t submit(void* context, nx_eth_frames_tx_request_t* request) {
         descriptor->timestamp_low = descriptor->timestamp_high = 0U;
         uint32_t bits = CHAIN;
         if (i == 0U)
-            bits |= FS | (request->timestamp_requested ? TTSE : 0U);
+            bits |= FS | (request->timestamp_requested ? TTSE : 0U) |
+                    ((uint32_t)request->checksum << 22U);
         if (i + 1U == request->fragment_count)
             bits |= LS | 0x40000000U;
         nx_arch_dmb();
@@ -930,7 +948,8 @@ static nx_result_t acquire(void* context, nx_eth_frames_rx_loan_t* loan,
                                           NX_IO_TIMESTAMP_ACQUIRE_OBSERVATION,
                                       .vlan = head->vlan,
                                       .stamp = head->stamp,
-                                      .capture_flags = head->capture_flags};
+                                      .capture_flags = head->capture_flags,
+                                      .checksum_flags = head->checksum_flags};
     nx_arch_irq_restore(guard);
     size_t remaining = head->length, cursor = first;
     for (size_t i = 0U; i < count; ++i) {
@@ -961,6 +980,7 @@ static nx_result_t release(void* context, const nx_eth_frames_rx_loan_t* loan) {
         loan->vlan.present != slot->vlan.present ||
         loan->vlan.tci != slot->vlan.tci ||
         loan->capture_flags != slot->capture_flags ||
+        loan->checksum_flags != slot->checksum_flags ||
         loan->stamp.ticks != slot->stamp.ticks ||
         loan->stamp.ticks_per_second != slot->stamp.ticks_per_second ||
         loan->stamp.domain != slot->stamp.domain ||
@@ -1043,9 +1063,10 @@ static nx_result_t apply_link(void* context, const nx_eth_link_t* link) {
         return NX_ERROR_BUSY;
     }
     uint32_t bits = (link->speed_mbps == 100U ? 0x4000U : 0U) |
-                    (link->full_duplex ? 0x800U : 0U) | 12U;
+                    (link->full_duplex ? 0x800U : 0U) |
+                    (mac->checksum_offload ? 0x400U : 0U) | 12U;
     bool valid =
-        checked(mac, MAC, bits, 0x480cU) &&
+        checked(mac, MAC, bits, 0x4c0cU) &&
         checked(mac, CONTROL, read_reg(mac, CONTROL) | TX_START | RX_START,
                 TX_START | RX_START);
     if (valid) {

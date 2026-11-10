@@ -12,6 +12,20 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/io/uart.h"
+#include "nexus/io/uart_wire.h"
+
+/** \brief Prepare the explicit descriptor shape reserved for LIN breaks. */
+nx_result_t nx_uart_lin_break_prepare(nx_uart_tx_request_t* request,
+                                      nx_time_us_t deadline) {
+    if (request == NULL)
+        return NX_ERROR_INVALID;
+    nx_result_t result = nx_request_prepare(&request->base, deadline);
+    if (result != NX_SUCCESS)
+        return result;
+    request->data = NULL;
+    request->length = 0U;
+    return NX_SUCCESS;
+}
 
 /** \brief Optional explicit hint target, never an implicit owner worker. */
 nx_result_t nx_uart_port_attach_wake(const nx_uart_port_t* port,

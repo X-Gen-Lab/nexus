@@ -22,6 +22,8 @@ function(_nexus_component_bindings output)
         "tls=Nexus::TLS"
         "mqtt=Nexus::CoreMQTT"
         "mcuboot=Nexus::MCUBootControl"
+        "st-usb-host=Nexus::STUSBHost"
+        "st-usb-device=Nexus::STUSBDevice"
         PARENT_SCOPE)
 endfunction()
 
@@ -60,6 +62,10 @@ function(nexus_resolve_components output)
             nexus_add_coremqtt()
         elseif(component STREQUAL "mcuboot")
             nexus_add_mcuboot_control()
+        elseif(component STREQUAL "st-usb-host")
+            nexus_add_st_usb_host()
+        elseif(component STREQUAL "st-usb-device")
+            nexus_add_st_usb_device()
         endif()
         if(NOT TARGET "${target}")
             message(FATAL_ERROR

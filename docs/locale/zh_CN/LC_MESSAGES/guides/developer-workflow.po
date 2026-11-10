@@ -7,57 +7,57 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 3acce062ea027f89c310163e7986087464892032230a9c36e4ce056ade76af03\n"
+"X-Nexus-Source-SHA256: 386821d6c45a3352c56c9737910e07730fac2bfd084b257dc333ba455556b147\n"
 
-#: docs/guides/developer-workflow.md:9
+#: ../../../docs/guides/developer-workflow.md:9
 msgid "Configure a product and make I/O progress"
 msgstr "配置产品并推进 I/O"
 
-#: docs/guides/developer-workflow.md:11
+#: ../../../docs/guides/developer-workflow.md:11
 msgid ""
 "Start with the [external application tutorial](../tutorials/source-sdk.md). "
-"Use the same fixed SDK or checkout for the commands below. Commands run from "
-"its source root; product TOML, tasks, buffers and recovery policy stay in the"
-" product repository. The resolver reports supported software choices, not "
-"electrical verification of a connected board."
+"Use the same fixed SDK or checkout for the commands below. Commands run from"
+" its source root; product TOML, tasks, buffers and recovery policy stay in "
+"the product repository. The resolver reports supported software choices, not"
+" electrical verification of a connected board."
 msgstr ""
 "从[外部应用教程](../tutorials/source-sdk.md)开始。下面的命令使用同一固定 SDK 或源码检出，并从其源码根目录执行；产品 "
 "TOML、任务、缓冲区与恢复策略保留在产品仓库。解析器报告支持的软件选择，不验证连接板卡的电气事实。"
 
-#: docs/guides/developer-workflow.md:17
+#: ../../../docs/guides/developer-workflow.md:17
 msgid "Choose and compare a complete configuration"
 msgstr "选择并比较完整配置"
 
-#: docs/guides/developer-workflow.md:19
+#: ../../../docs/guides/developer-workflow.md:19
 msgid ""
-"Inspect choices before authoring a complete assembly. This query requires no "
-"guessed backend or clock:"
+"Inspect choices before authoring a complete assembly. This query requires no"
+" guessed backend or clock:"
 msgstr "编写完整装配之前先查询可选项。该查询不需要猜测后端或时钟："
 
-#: docs/guides/developer-workflow.md:32
+#: ../../../docs/guides/developer-workflow.md:32
 msgid ""
 "`init` refuses an existing file. Profiles `empty`, `gpio` and `uart` write "
-"visible TOML values and run the normal resolver; nonempty profiles require an"
-" explicit binding. A rejected route is not replaced with another one. Read "
-"the generated TOML before adopting its baud rate, event capacity, IRQ "
-"priority and budgets. For an external Board, both `init` and `list-bindings` "
-"accept `--board-package` instead of `--board`. The command resolves that "
-"package path from the working directory; `init` writes it relative to the new"
-" TOML directory. Moving the whole product tree preserves this relationship. "
-"The reviewed Board package remains separate from the product assembly; use "
-"the [Board porting guide](board-porting.md) for package contents and provider"
-" boundaries."
+"visible TOML values and run the normal resolver; nonempty profiles require "
+"an explicit binding. A rejected route is not replaced with another one. Read"
+" the generated TOML before adopting its baud rate, event capacity, IRQ "
+"priority and budgets. For an external Board, both `init` and `list-bindings`"
+" accept `--board-package` instead of `--board`. The command resolves that "
+"package path from the working directory; `init` writes it relative to the "
+"new TOML directory. Moving the whole product tree preserves this "
+"relationship. The reviewed Board package remains separate from the product "
+"assembly; use the [Board porting guide](board-porting.md) for package "
+"contents and provider boundaries."
 msgstr ""
-"`init` 拒绝已有文件。`empty`、`gpio` 和 `uart` profile 写出可见的 TOML 值并执行正常解析器；非空 profile"
-" 需要显式 binding。被拒绝的路由不会替换为其他路由。采用波特率、事件容量、IRQ 优先级和预算前先阅读生成的 TOML。对外部 "
+"`init` 拒绝已有文件。`empty`、`gpio` 和 `uart` profile 写出可见的 TOML 值并执行正常解析器；非空 "
+"profile 需要显式 binding。被拒绝的路由不会替换为其他路由。采用波特率、事件容量、IRQ 优先级和预算前先阅读生成的 TOML。对外部 "
 "Board，`init` 和 `list-bindings` 都接受 `--board-package` 代替 "
 "`--board`。命令相对于工作目录解析包路径；`init` 将其写为相对于新 TOML 目录的路径。整体移动产品目录树仍保留这一关系。经过复核的 "
 "Board 包与产品装配分开维护；包内容和 provider 边界见 [Board 接入指南](board-porting.md)。"
 
-#: docs/guides/developer-workflow.md:43
+#: ../../../docs/guides/developer-workflow.md:43
 msgid ""
-"The explanation lists public faces, modes, clock, resources, memory domains, "
-"declared budgets and execution duties. `list-bindings --json` includes "
+"The explanation lists public faces, modes, clock, resources, memory domains,"
+" declared budgets and execution duties. `list-bindings --json` includes "
 "`mode_contracts`, resource claims, `fact_sources` and `limitations`. A "
 "binding is still `configuration-required`: backend, clock and all selected "
 "instances must resolve together. Missing physical PCB facts remain unknown. "
@@ -69,39 +69,40 @@ msgstr ""
 "`configuration-required`：后端、时钟和全部实例必须一起通过解析。缺失的物理 PCB 事实仍未知。MCU 查询标为 "
 "`not_established_by_configuration`；Native 标为 `not_applicable`。"
 
-#: docs/guides/developer-workflow.md:50
+#: ../../../docs/guides/developer-workflow.md:50
 msgid ""
 "Each candidate mode lists its own `resource_keys`, `occupied_resources` and "
 "`resource_scope`. A polling mode does not claim the alternative DMA route. "
-"Board-first queries retain known SoC and Board reservations without inventing"
-" an OS owner before a backend is selected. Assembly queries read facts "
-"matching the resolved input hashes. Options can add requirements, so this "
-"projection does not replace full-assembly admission. Use the [exact support "
-"query](../delivery/capabilities.md) to separate configuration acceptance from"
-" model, ARM, SDK and physical evidence."
+"Board-first queries retain known SoC and Board reservations without "
+"inventing an OS owner before a backend is selected. Assembly queries read "
+"facts matching the resolved input hashes. Options can add requirements, so "
+"this projection does not replace full-assembly admission. Use the [exact "
+"support query](../delivery/capabilities.md) to separate configuration "
+"acceptance from model, ARM, SDK and physical evidence."
 msgstr ""
-"每个候选模式分别列出 `resource_keys`、`occupied_resources` 和 `resource_scope`。轮询模式不会占用备选"
-" DMA 路由。先选 Board 的查询保留已知 SoC 和 Board 预留资源，在未选择后端时不虚构 OS "
+"每个候选模式分别列出 `resource_keys`、`occupied_resources` 和 "
+"`resource_scope`。轮询模式不会占用备选 DMA 路由。先选 Board 的查询保留已知 SoC 和 Board "
+"预留资源，在未选择后端时不虚构 OS "
 "owner。装配查询读取与解析输入哈希一致的事实。选项可能增加要求，因此该投影不能替代完整装配准入。使用[精确支持查询](../delivery/capabilities.md)区分配置接受、模型、ARM、SDK"
 " 和物理证据。"
 
-#: docs/guides/developer-workflow.md:58
+#: ../../../docs/guides/developer-workflow.md:58
 msgid "After editing a separate next assembly, compare effective changes:"
 msgstr "编辑独立的下一份装配后，比较有效变化："
 
-#: docs/guides/developer-workflow.md:67
+#: ../../../docs/guides/developer-workflow.md:67
 msgid ""
 "Both assemblies must resolve. The diff reports effective platform, route, "
 "mode, endpoint, storage and budget changes; renaming a source file alone is "
-"not a behavior change. JSON distinguishes absent fields from explicit `null`."
-" Scripts that previously consumed default JSON from `explain` must now pass "
-"`--json`. Editor hints are assistance; the resolver remains the acceptance "
-"authority."
+"not a behavior change. JSON distinguishes absent fields from explicit "
+"`null`. Scripts that previously consumed default JSON from `explain` must "
+"now pass `--json`. Editor hints are assistance; the resolver remains the "
+"acceptance authority."
 msgstr ""
 "两份装配都必须成功解析。diff 报告有效的平台、路由、模式、端点、存储和预算变化；只重命名源文件不构成行为变化。JSON 区分缺失字段和显式 "
 "`null`。以前依赖 `explain` 默认 JSON 的脚本现在必须传入 `--json`。编辑器提示仅提供帮助；解析器仍是准入权威。"
 
-#: docs/guides/developer-workflow.md:73
+#: ../../../docs/guides/developer-workflow.md:73
 msgid ""
 "The diff also groups `impacts` into `factory_ids`, `public_interface`, "
 "`transfer_contract`, `execution` and `storage`. Each item identifies its "
@@ -116,138 +117,48 @@ msgstr ""
 "`storage`。每项指出有效路径、变更前后值和审查责任。factory ID 变化或重排可能需要修改消费者；新执行者或 DMA "
 "模式需要审查其生命周期和存储合同。这些是配置声明带来的影响，不是实测时序、内存节省或消费者已完成迁移的结论。"
 
-#: docs/guides/developer-workflow.md:81
+#: ../../../docs/guides/developer-workflow.md:81
 msgid ""
-"A conflict diagnostic identifies the authored file/key and competing resource"
-" owners. Correct those inputs, then configure again. Never fix generated C, "
-"weaken a DMA reservation or change a clock implicitly to make a build pass. "
-"Configuration budgets are declarations; measure the actual linked image "
-"before claiming resource savings. See the [assembly "
+"A conflict diagnostic identifies the authored file/key and competing "
+"resource owners. Correct those inputs, then configure again. Never fix "
+"generated C, weaken a DMA reservation or change a clock implicitly to make a"
+" build pass. Configuration budgets are declarations; measure the actual "
+"linked image before claiming resource savings. See the [assembly "
 "reference](../reference/configuration/assembly.md) and [support "
 "matrix](../reference/platforms/support.md)."
 msgstr ""
 "冲突诊断指出 authored 文件／key 及争用资源的 owner。修正这些输入后重新配置。不要修补生成 C、削弱 DMA reservation "
 "或隐式改变时钟来让构建通过。配置预算是声明；宣称资源节省前必须测量实际链接镜像。见[装配参考](../reference/configuration/assembly.md)与[支持矩阵](../reference/platforms/support.md)。"
 
-#: docs/guides/developer-workflow.md:88
+#: ../../../docs/guides/developer-workflow.md:88
 msgid ""
 "Automation can add `--diagnostics-json` to receive one structured rejection "
 "on standard error, with exit code 1; successful standard output keeps its "
 "existing format. Human and JSON diagnostics use the same error record. "
 "Unknown/missing fields preserve their context and key sets; resource "
 "conflicts identify the resource and competing claims, including owner, mode "
-"and source. These records locate authored inputs without silently correcting "
-"them. CLI argument syntax errors retain argparse diagnostics and exit code 2."
+"and source. These records locate authored inputs without silently correcting"
+" them. CLI argument syntax errors retain argparse diagnostics and exit code "
+"2."
 msgstr ""
 "自动化可加 `--diagnostics-json`，在标准错误中取得一条结构化拒绝记录并以状态码 1 退出；成功时的标准输出保持原有格式。人读和 "
 "JSON 诊断使用同一错误记录。未知或缺失字段保留上下文和键集合；资源冲突指出资源与竞争声明，包括 owner、mode 和 "
 "source。这些记录定位手写输入，不会静默修正输入。CLI 参数语法错误仍使用 argparse 诊断并以状态码 2 退出。"
 
-#: docs/guides/developer-workflow.md:96
-msgid "Preview the maintained software plan"
-msgstr "预览维护的软件计划"
+#: ../../../docs/guides/developer-workflow.md:96
+msgid "Inspect actual build outputs"
+msgstr "检查实际构建产物"
 
-#: docs/guides/developer-workflow.md:98
+#: ../../../docs/guides/developer-workflow.md:98
 msgid ""
-"The plan/artifact commands, Settings, wait selection and serial extensions in"
-" this iteration require a development checkout containing those changes. They"
-" do not modify the published `v0.2.1` archive; installed-SDK support follows "
-"actual verification of the corresponding new SDK."
-msgstr ""
-"本轮 plan/artifact 命令、Settings、wait selection 与串口扩展要求使用包含这些改动的开发 "
-"checkout。它们不改变已发布的 `v0.2.1` 归档；安装版 SDK 支持以对应新 SDK 的实际验证为准。"
-
-#: docs/guides/developer-workflow.md:103
-msgid ""
-"From the fixed development checkout, inspect the existing complete software "
-"plan before starting expensive validation:"
-msgstr "在固定开发 checkout 的源码根目录，先检查既有完整软件计划，再启动昂贵的验证："
-
-#: docs/guides/developer-workflow.md:112
-msgid ""
-"Choose a new JSON path in an existing parent directory; the future run "
-"directory is not created. The preview derives ordered commands, deadlines, "
-"selection reasons, checker and preset metadata, and input identities from the"
-" maintained plan. It does not execute a process, install tools, use equipment"
-" or access the network. With no observation, case counts remain unknown and "
-"the operation needs no prior test run. `--preset` filtering is rejected; the "
-"complete authored plan remains the selection authority."
-msgstr ""
-"在已有父目录中选择新的 JSON 路径；未来执行目录不会创建。预览从维护中的计划派生命令顺序、时限、选择原因、检查器与 preset "
-"元数据以及输入身份。它不执行进程、不安装工具、不使用设备或访问网络。未提供观察记录时，case 数量保持未知，使用预览无需先运行测试。拒绝通过 "
-"`--preset` 过滤；完整的作者计划仍是选择依据。"
-
-#: docs/guides/developer-workflow.md:120
-msgid ""
-"To include previously observed cases, first build the selected Native preset,"
-" then explicitly collect case-list evidence with the existing Native "
-"producer:"
-msgstr ""
-"若要显示此前观察到的 case，先构建选定的 Native preset，再显式使用现有 Native producer 收集 case 列表证据："
-
-#: docs/guides/developer-workflow.md:131
-msgid ""
-"`--observe-only` executes each manifest binary's unfiltered case-list "
-"process; it does not execute test cases or CTest, and writes no execution-"
-"success summary. Prior summaries and snapshots retain unique `before-observe`"
-" paths. The normal producer still executes the complete CTest and Google "
-"plan, including disabled cases. The same snapshot binds all manifest "
-"binaries, their object contexts and a deduplicated conservative superset of "
-"current materialized compiler inputs, shared dependencies and linked files. "
-"Ninja supplies the metadata through original command receipts; preview itself"
-" never launches Ninja. These facts bind current bytes, without proving a "
-"fresh compilation or inventing another build graph. See the [development tool"
-" contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/dev/README.md) for bounds and exact receipt requirements."
-msgstr ""
-"`--observe-only` 会执行 manifest 中每个二进制的未过滤 case-list 进程；它不执行测试 case 或 "
-"CTest，也不写入执行成功摘要。此前的摘要和快照保留在唯一的 `before-observe` 路径中。普通 producer 仍执行完整 CTest "
-"与 Google 计划，包括 disabled case。同一快照绑定全部 manifest "
-"二进制、对象编译上下文，以及去重后的当前已生成编译输入、共享依赖和链接文件的保守超集。Ninja 通过原始命令收据提供元数据；预览本身从不启动 "
-"Ninja。这些事实绑定当前字节，不证明进行了新编译，也不创建另一套构建图。大小边界与精确收据要求见[开发工具合同](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/dev/README.md)。"
-
-#: docs/guides/developer-workflow.md:143
-msgid ""
-"Preview accepts an explicit observation only while its source, objects, "
-"headers, archives, binaries, metadata and successful original discovery "
-"receipts still match. Receipts must belong to this build and follow its "
-"snapshot. Stale, failed, changed or incomplete observations reject; a "
-"relocated checkout or SDK needs a new observation. Parameterized and disabled"
-" identities are preserved. Cases present in the reviewed lifecycle catalogue "
-"show its invariant and limitations; unreviewed cases remain `unknown`, "
-"without a coverage percentage. The displayed result means “previously "
-"observed and current inputs match”; it never means these cases executed "
-"during preview or passed."
-msgstr ""
-"只有显式观察记录中的源码、对象、头文件、归档、二进制、元数据和成功的原始发现收据仍然匹配时，预览才接受该记录。收据必须属于当前构建且晚于其快照。过期、失败、变化或不完整的观察记录会被拒绝；移动后的源码检出或"
-" SDK 需要重新观察。参数化与 disabled 身份原样保留。已复核生命周期目录中的 case 显示其不变量和限制；未复核的 case 保持 "
-"`unknown`，不计算覆盖率。显示结果仅表示“此前已观察，且当前输入匹配”；绝不表示这些 case 在预览期间执行或已经通过。"
-
-#: docs/guides/developer-workflow.md:153
-msgid ""
-"Known host stages need no equipment. A HIL preparation stage can show "
-"declared fixture tests and pending measurements, but missing resolved "
-"configuration stays `configuration_pending`; routes and station facts are not"
-" guessed. Unknown hardware needs stay `unknown`, and physical status stays "
-"`not_executed`. Every preview stage remains `not_executed` and qualification "
-"remains false. Remove only your own preview JSON when no longer needed."
-msgstr ""
-"已知的宿主阶段无需设备。HIL 准备阶段可以展示声明的工装测试与待测项目，但缺少已解析配置时保持 "
-"`configuration_pending`；不猜测路由或站点事实。未知硬件需求保持 `unknown`，物理状态保持 "
-"`not_executed`。每个预览阶段仍为 `not_executed`，qualification 始终为 "
-"false。仅在不再需要时删除自己创建的预览 JSON。"
-
-#: docs/guides/developer-workflow.md:160
-msgid ""
-"After a successful build, inspect its captured outputs without guessing which"
-" ELF belongs to the selected configuration. Replace the path below with that "
-"build's actual `quality/build-provenance.json`:"
+"After a successful build, inspect its captured outputs without guessing "
+"which ELF belongs to the selected configuration. Replace the path below with"
+" that build's actual `quality/build-provenance.json`:"
 msgstr ""
 "构建成功后，查询实际捕获的输出，避免猜测哪个 ELF 属于选定配置。将下面路径替换为该次构建实际的 `quality/build-"
 "provenance.json`："
 
-#: docs/guides/developer-workflow.md:170
+#: ../../../docs/guides/developer-workflow.md:108
 msgid ""
 "The command verifies the provenance and resolved identity before listing "
 "source, configuration, artifact roles and the original command receipt. "
@@ -260,45 +171,46 @@ msgstr ""
 "receipt。缺失、变化、陈旧或不匹配的输入必须拒绝，不能生成成功产物视图。可选 JSON 路径必须是新文件。查询不构建或访问设备，也不为当前 "
 "checkout、软件或硬件建立新资格。"
 
-#: docs/guides/developer-workflow.md:177
+#: ../../../docs/guides/developer-workflow.md:115
 msgid "Use optional Settings and networking mechanisms"
 msgstr "使用可选 Settings 与联网机制"
 
-#: docs/guides/developer-workflow.md:179
+#: ../../../docs/guides/developer-workflow.md:117
 msgid ""
-"Select `settings` in the assembly's component list to link `Nexus::Settings`."
-" The caller first opens Storage, then supplies Settings metadata, a disjoint "
-"staging buffer, entry capacity and a product-defined schema. Integer keys and"
-" copied byte values stay bounded. Get/set/remove operate on staging; only "
-"explicit commit writes Storage, and close discards uncommitted changes. "
-"Unknown schemas or corrupt loads are errors, not empty writable stores. After"
-" a mutating commit failure, reopen Storage and Settings to observe the "
-"surviving commit before retrying. Defaults, migration, authorization and "
-"Flash regions remain product policy. Read {ref}`settings.h <settings_8h>` and"
-" the [component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/components/settings/README.md) for detailed ownership."
+"Select `settings` in the assembly's component list to link "
+"`Nexus::Settings`. The caller first opens Storage, then supplies Settings "
+"metadata, a disjoint staging buffer, entry capacity and a product-defined "
+"schema. Integer keys and copied byte values stay bounded. Get/set/remove "
+"operate on staging; only explicit commit writes Storage, and close discards "
+"uncommitted changes. Unknown schemas or corrupt loads are errors, not empty "
+"writable stores. After a mutating commit failure, reopen Storage and "
+"Settings to observe the surviving commit before retrying. Defaults, "
+"migration, authorization and Flash regions remain product policy. Read "
+"{ref}`settings.h <settings_8h>` and the [component "
+"contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/settings/README.md) for detailed ownership."
 msgstr ""
 "在装配的组件列表选择 `settings`，链接 `Nexus::Settings`。调用者先打开 Storage，再提供 Settings "
-"元数据、独立暂存 buffer、条目容量和产品定义的 schema。整数 key 和复制的字节值保持有界。Get/set/remove 操作暂存；只有显式"
-" commit 写 Storage，close 丢弃未提交变更。未知 schema 或损坏加载是错误，不是空的可写存储。发生变更性 commit "
-"失败后，先重新打开 Storage 和 Settings，观察实际保留的提交，再决定重试。默认值、迁移、授权和 Flash region "
+"元数据、独立暂存 buffer、条目容量和产品定义的 schema。整数 key 和复制的字节值保持有界。Get/set/remove "
+"操作暂存；只有显式 commit 写 Storage，close 丢弃未提交变更。未知 schema 或损坏加载是错误，不是空的可写存储。发生变更性 "
+"commit 失败后，先重新打开 Storage 和 Settings，观察实际保留的提交，再决定重试。默认值、迁移、授权和 Flash region "
 "由产品决定。详细所有权见 {ref}`settings.h <settings_8h>` "
 "与[组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/components/settings/README.md)。"
 
-#: docs/guides/developer-workflow.md:190
+#: ../../../docs/guides/developer-workflow.md:128
 msgid ""
 "The optional `Nexus::LwIP` target admits the organization-hosted `X-Gen-"
 "Lab/lwip` 2.2.1 gitlink `77dcd25a` and its fixed source closure. It is "
 "excluded from the default build until explicitly selected. It uses "
-"`NO_SYS=1`: a product loop or task advances one serialized owner, without an "
-"implicit RTOS stack port. It reuses Ethernet frame loans and bounded memory. "
-"The reviewed slice covers static IPv4/ARP/ICMP/UDP and limited TCP "
+"`NO_SYS=1`: a product loop or task advances one serialized owner, without an"
+" implicit RTOS stack port. It reuses Ethernet frame loans and bounded "
+"memory. The reviewed slice covers static IPv4/ARP/ICMP/UDP and limited TCP "
 "integration; complete TCP connection lifecycles, DHCP, DNS, IPv6, VLAN, TLS "
 "and MQTT remain separate exits. Read the [network integration "
 "contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/network/README.md) for source, SDK, clock, memory and stop "
-"prerequisites. Source admission and development SDK consumption do not "
+"SOURCE/components/network/README.md) for source, SDK, clock, memory and stop"
+" prerequisites. Source admission and development SDK consumption do not "
 "establish a software candidate, full network-platform, ARM or physical "
 "acceptance."
 msgstr ""
@@ -310,115 +222,118 @@ msgstr ""
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/components/network/README.md)。源码准入和开发 SDK 消费不建立软件候选、完整联网平台、ARM 或物理资格。"
 
-#: docs/guides/developer-workflow.md:202
+#: ../../../docs/guides/developer-workflow.md:140
 msgid "Assign one executor and retain borrowed storage"
 msgstr "指定唯一执行者并保留借用存储"
 
-#: docs/guides/developer-workflow.md:204
+#: ../../../docs/guides/developer-workflow.md:142
 msgid ""
 "The factory returns an existing typed face. Platform start, request "
 "admission, progress, completion, recovery and shutdown remain separate "
 "operations. Choose one execution recipe explicitly:"
 msgstr ""
-"factory 返回已有的 typed face。Platform start、请求准入、执行推进、完成、恢复和停机仍是分开的操作。显式选择一种执行配方："
+"factory 返回已有的 typed face。Platform "
+"start、请求准入、执行推进、完成、恢复和停机仍是分开的操作。显式选择一种执行配方："
 
-#: docs/guides/developer-workflow.md:0
+#: ../../../docs/guides/developer-workflow.md:0
 msgid "Recipe"
 msgstr "配方"
 
-#: docs/guides/developer-workflow.md:0
+#: ../../../docs/guides/developer-workflow.md:0
 msgid "Progress owner"
 msgstr "进度责任方"
 
-#: docs/guides/developer-workflow.md:0
+#: ../../../docs/guides/developer-workflow.md:0
 msgid "Storage and shutdown responsibility"
 msgstr "存储与停机责任"
 
-#: docs/guides/developer-workflow.md:0
+#: ../../../docs/guides/developer-workflow.md:0
 msgid "Main loop"
 msgstr "主循环"
 
-#: docs/guides/developer-workflow.md:0
+#: ../../../docs/guides/developer-workflow.md:0
 msgid ""
-"The loop calls the selected service steps; fixed IRQ entries perform bounded "
-"IRQ work"
+"The loop calls the selected service steps; fixed IRQ entries perform bounded"
+" IRQ work"
 msgstr "循环调用选定的 service 步骤；固定 IRQ 入口执行有界 IRQ 工作"
 
-#: docs/guides/developer-workflow.md:0
+#: ../../../docs/guides/developer-workflow.md:0
 msgid ""
-"Keep request and buffers alive through settlement; stop admission, cancel or "
-"drain, observe settlement, join observers, then stop"
+"Keep request and buffers alive through settlement; stop admission, cancel or"
+" drain, observe settlement, join observers, then stop"
 msgstr "请求和缓冲区保持有效直至结清；关闭准入、取消或排空、观察结清、join observer，然后停止"
 
-#: docs/guides/developer-workflow.md:0
+#: ../../../docs/guides/developer-workflow.md:0
 msgid "Exclusive task"
 msgstr "独占任务"
 
-#: docs/guides/developer-workflow.md:0
+#: ../../../docs/guides/developer-workflow.md:0
 msgid ""
-"One product task owns direct operations; declared IRQ policy permits only its"
-" selected OS interaction"
+"One product task owns direct operations; declared IRQ policy permits only "
+"its selected OS interaction"
 msgstr "一个产品任务拥有直接操作；声明的 IRQ 策略仅允许选定的 OS 交互"
 
-#: docs/guides/developer-workflow.md:0
+#: ../../../docs/guides/developer-workflow.md:0
 msgid ""
-"Wake and service explicitly; a task timeout does not revoke a borrowed buffer"
-" or permit task-stack destruction"
+"Wake and service explicitly; a task timeout does not revoke a borrowed "
+"buffer or permit task-stack destruction"
 msgstr "显式唤醒和 service；任务超时不能撤销缓冲借用，也不能允许销毁任务栈"
 
-#: docs/guides/developer-workflow.md:0
+#: ../../../docs/guides/developer-workflow.md:0
 msgid "Shared bus owner"
 msgstr "共享总线 owner"
 
-#: docs/guides/developer-workflow.md:0
+#: ../../../docs/guides/developer-workflow.md:0
 msgid ""
-"Callers submit bounded slots; one owner services the controller and endpoints"
+"Callers submit bounded slots; one owner services the controller and "
+"endpoints"
 msgstr "调用者提交有界 slot；一个 owner service 控制器和端点"
 
-#: docs/guides/developer-workflow.md:0
+#: ../../../docs/guides/developer-workflow.md:0
 msgid ""
 "Queue capacity, callbacks and storage are explicit; stop admission, drain "
 "accepted slots and controller references, join observers, then destroy the "
 "owner"
-msgstr "队列容量、callback 与存储显式提供；关闭准入、排空已接受的 slot 和控制器引用、join observer，然后销毁 owner"
+msgstr ""
+"队列容量、callback 与存储显式提供；关闭准入、排空已接受的 slot 和控制器引用、join observer，然后销毁 owner"
 
-#: docs/guides/developer-workflow.md:214
+#: ../../../docs/guides/developer-workflow.md:152
 msgid ""
 "These are application choices, not three hidden driver workers. Product "
 "examples live in [nexus-examples](https://github.com/X-Gen-Lab/nexus-"
 "examples): `templates/{native,qiming,sky,liangshan}`, "
 "`apps/shared_spi_runtime` and `apps/stream_recovery`. Use their README with "
 "the fixed examples revision associated with your platform. The SPI Native "
-"example and FreeRTOS POSIX-host exercise are separate scopes; Native Platform"
-" does not accept `backend = \"freertos\"`. A software two-CS fixture does not"
-" establish a second physical CS on a launch board."
+"example and FreeRTOS POSIX-host exercise are separate scopes; Native "
+"Platform does not accept `backend = \"freertos\"`. A software two-CS fixture"
+" does not establish a second physical CS on a launch board."
 msgstr ""
 "这些是应用选择，不是三个隐藏驱动 worker。产品示例位于 [nexus-examples](https://github.com/X-Gen-"
 "Lab/nexus-"
 "examples)：`templates/{native,qiming,sky,liangshan}`、`apps/shared_spi_runtime`"
 " 和 `apps/stream_recovery`。使用与平台对应的固定示例版本及其 README。SPI Native 示例与 FreeRTOS "
-"POSIX-host 演练范围不同；Native Platform 不接受 `backend = \"freertos\"`。软件双 CS fixture"
-" 不能证明首发实板存在第二条 CS 接线。"
+"POSIX-host 演练范围不同；Native Platform 不接受 `backend = \"freertos\"`。软件双 CS "
+"fixture 不能证明首发实板存在第二条 CS 接线。"
 
-#: docs/guides/developer-workflow.md:223
+#: ../../../docs/guides/developer-workflow.md:161
 msgid ""
-"For finite requests, REJECTED retains no caller references. ACCEPTED borrows "
-"request and transfer storage until acquire-observed SETTLED. Cancel and "
+"For finite requests, REJECTED retains no caller references. ACCEPTED borrows"
+" request and transfer storage until acquire-observed SETTLED. Cancel and "
 "deadline expiry request progress toward withdrawal; they do not settle the "
-"request. QUARANTINED preserves storage and cleanup obligations. SETTLED does "
-"not imply a successful transfer or that callbacks and observers have already "
-"joined. Read [ownership](../explanation/ownership.md) before placing "
-"asynchronous storage on a stack or stopping a worker."
+"request. QUARANTINED preserves storage and cleanup obligations. SETTLED does"
+" not imply a successful transfer or that callbacks and observers have "
+"already joined. Read [ownership](../explanation/ownership.md) before placing"
+" asynchronous storage on a stack or stopping a worker."
 msgstr ""
 "有限请求的 REJECTED 不保留调用者引用。ACCEPTED 借用请求和传输存储，直到 acquire 观察到 SETTLED。取消与 "
 "deadline 到期要求向撤销引用推进，并不结清请求。QUARANTINED 保留存储及清理义务。SETTLED 不表示传输成功，也不表示 "
 "callback 和 observer 已 join。在栈上放置异步存储或停止 worker "
 "前先阅读[所有权](../explanation/ownership.md)。"
 
-#: docs/guides/developer-workflow.md:231
+#: ../../../docs/guides/developer-workflow.md:169
 msgid ""
-"For several authoritative predicates sharing one wait port, `nx_wait_select` "
-"checks a caller-owned source array from an explicit cyclic start index. It "
+"For several authoritative predicates sharing one wait port, `nx_wait_select`"
+" checks a caller-owned source array from an explicit cyclic start index. It "
 "returns an observed-ready index without acquiring or consuming that source. "
 "The caller chooses fairness by advancing the next start index, wires every "
 "publisher to the same port, and owns service/timer progress. Stop and join "
@@ -426,95 +341,95 @@ msgid ""
 "subscription, dispatch, worker or resource transfer; the public {ref}`wait "
 "contract <wait_8h>` still governs arm/recheck and the absolute deadline."
 msgstr ""
-"多个权威谓词共享一个 wait port 时，`nx_wait_select` 从显式循环起始索引检查调用者 source 数组。它返回观察到 ready"
-" 的索引，不取得或消费对应 source。调用者推进下一次起始索引以选择公平性，把每个 publisher 接到同一 port，并负责 "
-"service/timer 进度。回收状态前须停止并 join publisher 和 waiter。没有隐式订阅、派发、worker 或资源转移；公共 "
-"{ref}`wait 合同 <wait_8h>` 仍约束 arm/recheck 与绝对 deadline。"
+"多个权威谓词共享一个 wait port 时，`nx_wait_select` 从显式循环起始索引检查调用者 source 数组。它返回观察到 "
+"ready 的索引，不取得或消费对应 source。调用者推进下一次起始索引以选择公平性，把每个 publisher 接到同一 port，并负责 "
+"service/timer 进度。回收状态前须停止并 join publisher 和 waiter。没有隐式订阅、派发、worker 或资源转移；公共"
+" {ref}`wait 合同 <wait_8h>` 仍约束 arm/recheck 与绝对 deadline。"
 
-#: docs/guides/developer-workflow.md:240
+#: ../../../docs/guides/developer-workflow.md:178
 msgid ""
 "For streams, a consumer releases each acquired block explicitly. Slow "
 "consumers can cause loss or stop on backpressure according to the selected "
 "mode; providers must not overwrite outstanding loans. Stop may return BUSY "
-"until loans and hardware references drain. Restart uses a new valid lifecycle"
-" after complete stop; clearing counters is not recovery. Select each F407 "
-"Board, route and continuous mode independently; one assembly does not "
-"authorize another Board."
+"until loans and hardware references drain. Restart uses a new valid "
+"lifecycle after complete stop; clearing counters is not recovery. Select "
+"each F407 Board, route and continuous mode independently; one assembly does "
+"not authorize another Board."
 msgstr ""
 "对于流，消费者显式释放每个已取得块。慢消费者可能按所选模式在背压下造成丢失或停机；provider "
-"不得覆盖尚未归还的借用。在借用与硬件引用排空前，stop 可能返回 BUSY。重启必须在完整停止后进入新的有效生命周期；清零计数器不是恢复。分别选择每个 "
-"F407 Board、路线与连续模式；一个 assembly 不授权另一 Board。"
+"不得覆盖尚未归还的借用。在借用与硬件引用排空前，stop 可能返回 BUSY。重启必须在完整停止后进入新的有效生命周期；清零计数器不是恢复。分别选择每个"
+" F407 Board、路线与连续模式；一个 assembly 不授权另一 Board。"
 
-#: docs/guides/developer-workflow.md:247
+#: ../../../docs/guides/developer-workflow.md:185
 msgid "Diagnose facts without changing ownership"
 msgstr "诊断事实，不改变所有权"
 
-#: docs/guides/developer-workflow.md:249
+#: ../../../docs/guides/developer-workflow.md:187
 msgid ""
 "`nx_io_diagnose` in `nexus/io/diagnostic.h` composes copied request and "
-"stream observations with explicitly known lifecycle, owner, service-time and "
-"observer facts. It neither reads live MMIO nor invokes service or recovery. "
-"Its independent finding bits can coexist; `unknown_facts` preserves missing "
-"information. No findings does not certify health."
+"stream observations with explicitly known lifecycle, owner, service-time and"
+" observer facts. It neither reads live MMIO nor invokes service or recovery."
+" Its independent finding bits can coexist; `unknown_facts` preserves missing"
+" information. No findings does not certify health."
 msgstr ""
 "`nexus/io/diagnostic.h` 中的 `nx_io_diagnose` 组合复制的 request 和 stream "
-"观察，以及明确已知的生命周期、owner、service 时间与 observer 事实。它既不读取实际 MMIO，也不调用 service 或恢复。独立"
-" finding 位可以并存；`unknown_facts` 保留缺失信息。没有 finding 不构成健康证明。"
+"观察，以及明确已知的生命周期、owner、service 时间与 observer 事实。它既不读取实际 MMIO，也不调用 service "
+"或恢复。独立 finding 位可以并存；`unknown_facts` 保留缺失信息。没有 finding 不构成健康证明。"
 
-#: docs/guides/developer-workflow.md:255
+#: ../../../docs/guides/developer-workflow.md:193
 msgid ""
 "A request that stops advancing does not prove the service loop was omitted. "
-"`SERVICE_OVERDUE` requires finite timestamps in the same monotonic domain and"
-" a positive declared maximum gap; reversed time rejects with STATE. Owner "
-"admission fields are known only after a successful owner diagnostic snapshot."
-" BUSY alone does not prove a full queue. Outstanding stream blocks can be "
-"producer, ready or consumer loans; the ordinary cursor says nothing about a "
-"private preposted slot. Application escalation still owns retry, safe outputs"
-" and reset policy."
+"`SERVICE_OVERDUE` requires finite timestamps in the same monotonic domain "
+"and a positive declared maximum gap; reversed time rejects with STATE. Owner"
+" admission fields are known only after a successful owner diagnostic "
+"snapshot. BUSY alone does not prove a full queue. Outstanding stream blocks "
+"can be producer, ready or consumer loans; the ordinary cursor says nothing "
+"about a private preposted slot. Application escalation still owns retry, "
+"safe outputs and reset policy."
 msgstr ""
 "request 停止推进不能证明遗漏 service 循环。`SERVICE_OVERDUE` "
 "需要同一单调时钟域的有限时间戳及正的最大间隔声明；时间倒退以 STATE 拒绝。只有成功取得 owner 诊断快照，准入字段才算已知。仅凭 BUSY "
 "不能证明队列满。未结清 stream 块可以属于生产者、ready 或消费者；普通 cursor 不说明私有预投递 "
 "slot。应用仍拥有重试、安全输出与复位策略。"
 
-#: docs/guides/developer-workflow.md:263
+#: ../../../docs/guides/developer-workflow.md:201
 msgid ""
-"`nx_dma_storage_validate` checks the complete explicit reservation separately"
-" from its payload. For example, a 17-byte payload may use a caller-owned "
-"64-byte reservation aligned to 32-byte cache lines. The entire reservation "
-"must already fit its declared DMA-visible domain and whole-line ownership. "
-"The helper does not round, allocate, bounce, perform cache maintenance or "
-"replace provider mode admission. Deadline expiry never permits reusing the "
-"reservation before drain."
+"`nx_dma_storage_validate` checks the complete explicit reservation "
+"separately from its payload. For example, a 17-byte payload may use a "
+"caller-owned 64-byte reservation aligned to 32-byte cache lines. The entire "
+"reservation must already fit its declared DMA-visible domain and whole-line "
+"ownership. The helper does not round, allocate, bounce, perform cache "
+"maintenance or replace provider mode admission. Deadline expiry never "
+"permits reusing the reservation before drain."
 msgstr ""
 "`nx_dma_storage_validate` 将完整的显式 reservation 与 payload 分开验证。例如17 字节 payload "
 "可以放在调用者拥有、按32 字节 cache line 对齐的64 字节 reservation 中。完整 reservation 必须已经满足声明的 "
 "DMA 可达域和完整行所有权。该函数不取整、不分配、不 bounce、不执行 cache 维护，也不替代 provider 模式准入。deadline "
 "到期绝不允许在排空前重用 reservation。"
 
-#: docs/guides/developer-workflow.md:270
+#: ../../../docs/guides/developer-workflow.md:208
 msgid ""
 "The optional owner observation adds `accepting`, `queued` and "
-"`slot_available`. Recompile consumers because its public observation/sidecar "
-"layout changed. Default owner and provider structures do not gain these "
+"`slot_available`. Recompile consumers because its public observation/sidecar"
+" layout changed. Default owner and provider structures do not gain these "
 "fields. Measure optional sidecar storage for the selected ABI; it is not "
 "assumed to be free."
 msgstr ""
-"可选 owner 观察增加 `accepting`、`queued` 和 `slot_available`。其公共 observation／sidecar"
-" 布局已改变，消费方须重新编译。默认 owner 与 provider 结构不增加这些字段。按选定 ABI 测量可选 sidecar "
-"存储，不能假定它没有成本。"
+"可选 owner 观察增加 `accepting`、`queued` 和 `slot_available`。其公共 "
+"observation／sidecar 布局已改变，消费方须重新编译。默认 owner 与 provider 结构不增加这些字段。按选定 ABI "
+"测量可选 sidecar 存储，不能假定它没有成本。"
 
-#: docs/guides/developer-workflow.md:275
+#: ../../../docs/guides/developer-workflow.md:213
 msgid "Plan daily device operations separately from qualification"
 msgstr "日常设备操作计划与资格验收分开"
 
-#: docs/guides/developer-workflow.md:277
+#: ../../../docs/guides/developer-workflow.md:215
 msgid ""
 "For flash/debug, use an identified equipment file and provenance from the "
 "actual successful build. Monitor may run without build association:"
 msgstr "对于 flash／debug，使用已识别的设备文件和实际成功构建的 provenance。Monitor 可以不关联构建："
 
-#: docs/guides/developer-workflow.md:289
+#: ../../../docs/guides/developer-workflow.md:227
 msgid ""
 "The default prints a plan. Actual execution requires `--execute --output` "
 "with a new owned directory. Flash/debug require matching board/part, image, "
@@ -526,21 +441,21 @@ msgid ""
 "duration; 115200 remains the default. Unknown rates or a TTY configuration "
 "mismatch fail rather than selecting a different speed. Host acceptance does "
 "not prove the physical device baud rate. EOF or disconnection fails. Debug "
-"binds loopback. Failed or cancelled device operations retain their locks for "
-"explicit inspection; normal completion releases them. A successful daily "
+"binds loopback. Failed or cancelled device operations retain their locks for"
+" explicit inspection; normal completion releases them. A successful daily "
 "operation does not qualify HIL. Until real equipment is connected, record "
 "physical execution as `not_executed`. The [performance and HIL "
 "guide](performance-hil.md) owns capture and qualification."
 msgstr ""
 "默认打印计划。实际执行要求 `--execute --output` 与新建的自有目录。Flash/debug 要求 "
-"board/part、镜像、探针序列号及锁定工具/配置字节匹配，不要求串口控制台。Monitor 要求 board、稳定的 serial by-id 和 "
-"station lock，但可省略 build provenance；此时记录 `image_linkage = "
-"unassociated`，不表示镜像已关联。Monitor 使用显式选定且主机支持的标准波特率、8N1 和有限时长；默认仍为 115200。未知速率或 "
-"TTY 配置不匹配必须失败，不能改用其他速度。主机接受配置不证明物理设备波特率。EOF 或断开视为失败。Debug 绑定 "
+"board/part、镜像、探针序列号及锁定工具/配置字节匹配，不要求串口控制台。Monitor 要求 board、稳定的 serial by-id 和"
+" station lock，但可省略 build provenance；此时记录 `image_linkage = "
+"unassociated`，不表示镜像已关联。Monitor 使用显式选定且主机支持的标准波特率、8N1 和有限时长；默认仍为 115200。未知速率或"
+" TTY 配置不匹配必须失败，不能改用其他速度。主机接受配置不证明物理设备波特率。EOF 或断开视为失败。Debug 绑定 "
 "loopback。设备操作失败或取消后保留锁等待明确检查，正常完成释放锁。日常操作成功不建立 HIL 资格。设备未接入前，物理执行记录为 "
 "`not_executed`。[性能与 HIL 指南](performance-hil.md)负责采集和资格规则。"
 
-#: docs/guides/developer-workflow.md:304
+#: ../../../docs/guides/developer-workflow.md:242
 msgid ""
 "For one bounded Linux batch, add `--client` to `debug`. This uses the "
 "official GDB/OpenOCD pipe transport and rejects `--port`; the default debug "
@@ -548,8 +463,8 @@ msgid ""
 "identify the GDB executable in `gdb_client.tool` with `path`, `size` and "
 "`sha256`. Optional `gdb_client.commands` uses the same file identity fields "
 "and replaces the default `info threads` command. Review that file as "
-"executable operator input. GDB starts with automatic scripts disabled, loads "
-"the exact provenance-bound ELF, attaches, runs the selected commands and "
+"executable operator input. GDB starts with automatic scripts disabled, loads"
+" the exact provenance-bound ELF, attaches, runs the selected commands and "
 "detaches. Tool/configuration/ELF identities are checked before and after "
 "execution. The finite timeout covers the owned process chain; failure or "
 "cancellation withdraws it and retains station quarantine. No executable or "
@@ -559,35 +474,35 @@ msgid ""
 "Host pipe fixtures do not establish physical probe support."
 msgstr ""
 "对于一次有界 Linux 批处理，在 `debug` 上增加 `--client`。它使用官方 GDB/OpenOCD 管道传输并拒绝 "
-"`--port`；默认调试服务器仍保持回环 TCP 流程。目标 JSON 必须在 `gdb_client.tool` 中通过 `path`、`size` "
-"与 `sha256` 显式标识 GDB 可执行文件。可选 `gdb_client.commands` 使用相同文件身份字段，替代默认 `info "
+"`--port`；默认调试服务器仍保持回环 TCP 流程。目标 JSON 必须在 `gdb_client.tool` 中通过 `path`、`size`"
+" 与 `sha256` 显式标识 GDB 可执行文件。可选 `gdb_client.commands` 使用相同文件身份字段，替代默认 `info "
 "threads` 命令。应将该文件作为可执行操作人员输入审查。GDB 启动时禁用自动脚本，加载与 provenance 精确绑定的 "
 "ELF，附加、执行所选命令后分离。执行前后检查工具、配置与 ELF 身份。有限超时覆盖拥有的进程链；失败或取消会撤回该链并保留 station "
 "隔离。不会自动发现可执行文件或目标。设备 schema 与命令示例见[开发工具合同](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/dev/README.md)。主机管道 fixture "
 "不能证明物理探针支持。"
 
-#: docs/guides/developer-workflow.md:318
+#: ../../../docs/guides/developer-workflow.md:256
 msgid ""
 "Development monitor remains Linux/POSIX. The session-bound terminal phases "
-"are `acquiring`, `owned`, `releasing` and `released`. After confirmed helper "
-"withdrawal, the parent may restore its originally held descriptor only when "
-"`owned` proves this session's exclusive ownership. An already `released` "
+"are `acquiring`, `owned`, `releasing` and `released`. After confirmed helper"
+" withdrawal, the parent may restore its originally held descriptor only when"
+" `owned` proves this session's exclusive ownership. An already `released` "
 "helper does not authorize another restore or exclusive-release operation: "
 "another process may now own the terminal. Unknown, corrupt or intermediate "
 "phases, unconfirmed withdrawal and identity failures retain quarantine "
 "without touching another owner's terminal. The parent never opens a "
 "replacement by-id device."
 msgstr ""
-"开发 monitor 仍限于 Linux/POSIX。会话绑定的终端 phase 为 `acquiring`、`owned`、`releasing` 和 "
-"`released`。确认 helper 已撤回后，只有 `owned` 证明本会话持有独占所有权时，父进程才可通过原先持有的 descriptor "
+"开发 monitor 仍限于 Linux/POSIX。会话绑定的终端 phase 为 `acquiring`、`owned`、`releasing` 和"
+" `released`。确认 helper 已撤回后，只有 `owned` 证明本会话持有独占所有权时，父进程才可通过原先持有的 descriptor "
 "恢复。Helper 已为 `released` 时，不授权再次恢复或清除独占：另一个进程可能已经取得终端。未知、损坏或中间 "
 "phase、未确认撤回及身份错误均保留隔离，不修改其他 owner 的终端。父进程不打开 by-id 指向的替换设备。"
 
-#: docs/guides/developer-workflow.md:327
+#: ../../../docs/guides/developer-workflow.md:265
 msgid ""
-"Primary I/O failure and cleanup failure remain separately visible, including "
-"their exception cause/context chains; a cleanup exception must not hide an "
+"Primary I/O failure and cleanup failure remain separately visible, including"
+" their exception cause/context chains; a cleanup exception must not hide an "
 "earlier EOF or read failure. Independent cleanup errors remain in the "
 "operation record. External SIGKILL of the parent cannot guarantee "
 "restoration. The baud-rate extension does not expand formal HIL console "

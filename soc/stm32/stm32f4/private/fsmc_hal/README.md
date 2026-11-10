@@ -5,15 +5,24 @@
 
 ## 私有库与共享资源
 
-此私有配置只选入锁定且未修改的官方 STM32F4 `stm32f4xx_ll_fsmc.c` NOR/SRAM
-引擎，最小 HAL 配置仅用于厂商源文件，不覆盖 UART 的 HAL 配置，不调用全局 HAL
-初始化，也不引入 HAL tick。NAND ECC／PCCARD 引擎及其函数未选入；NE3／NE4
-仍是 NOR/SRAM 的片选 bank。
+此私有配置选入锁定且未修改的官方 STM32F4 `stm32f4xx_ll_fsmc.c` NOR/SRAM
+引擎；只有静态选择 `nand` 端点时才定义 `NEXUS_STM32_FSMC_NAND`，选入 NAND
+初始化、common/attribute 时序及 ECC enable/disable。最小 HAL 配置仅用于厂商
+源文件，不覆盖 UART 的 HAL 配置，不调用全局 HAL 初始化。带 tick 等待的
+`FSMC_NAND_GetECC` 不被引用，function-section 链接排除该路径；ECC 原始码由同一
+owner 有界观察 FEMPT/ECCR。最终 ARM ELF 不含 `HAL_GetTick`。PCCARD 仍未开放；
+外来已运行 PCCARD/NAND 或 IRQ consumer 会阻止取得共享控制域。NE1..4 始终是
+NOR/SRAM 片选，与 NAND2/3 的独立寄存器 bank 不混淆。
+
+新 PSRAM/NOR/NAND 的精确参数、封装限制、有限请求和软件参考范围见
+[F407 FSMC 合同](../../../../../docs/design/f407-fsmc.md)。所有端点继续共享本页的
+唯一 bus owner；NOR 异步 pulse 不削弱公共同步 Flash 的返回即 idle 合同。
 
 实际 owner 为 [`drivers/fsmc.c`](../../drivers/fsmc.c)，一个 bus 持有一份 AHB3 门控收条和精确数量的
 bank 状态；普通 GPIO 原值和门控只由外层 Platform 保存。LCD／SRAM／两者的
 AF12 引脚并集为 20／40／41；只选 LCD 不取得 SRAM 地址线或 GPIOF。各 bank
-独立声明访问模式 A 的读写周期。官方 LL 保留 BWTR 的保留位，配置核验只比较
+旧 SRAM/LCD 独立声明访问模式 A 的读写周期；新显式参数另外选择 A..D、EXTMOD、
+复用地址、8/16 位、WAIT、burst 与 CRAM 页边界。官方 LL 保留 BWTR 的保留位，配置核验只比较
 有定义的字段，清理时仍恢复捕获的完整原值。
 
 ## Bank 端点和借用

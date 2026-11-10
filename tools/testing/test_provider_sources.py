@@ -21,7 +21,8 @@ class ProviderSourceSelectionTests(unittest.TestCase):
             (directory / "drivers" / name).as_posix() for name in (
                 "platform_coordinator.c", "platform_lifecycle.c",
                 "system_lifecycle.c", "platform_cold.c",
-                "lifecycle_pins.c")}
+                "lifecycle_pins.c", "chip.c")} | {
+            (directory / name).as_posix() for name in ("reset.c", "supervision.c")}
 
     def configure_sources(self, family, controllers):
         """Inspect production targets without claiming an ARM link proof."""
@@ -30,8 +31,9 @@ class ProviderSourceSelectionTests(unittest.TestCase):
             generated = source / "generated"
             generated.mkdir()
             (generated / "resolved.json").write_text(json.dumps({
-                "controllers": [{"kind": kind, "mode": mode}
-                                for kind, mode in controllers],
+                "controllers": [{"kind": item[0], "mode": item[1],
+                                 **({'controller': item[2]} if len(item) == 3 else {})}
+                                for item in controllers],
             }))
             # Every family consumes its actual locked SDK and real CMake
             # integration. Configuration inspects selection, not ARM behavior.
@@ -79,14 +81,14 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             self.assertEqual(len(units), len({unit["file"] for unit in units}))
             return provider, sdk
 
-    # Cold lifecycle mechanisms are real C units now. Exact expected sets below
-    # include the F4 shared resource, context and pin transaction mechanisms.
+    # Base units own cold lifecycle, reset/fault records and silicon queries.
+    # Exact sets retain the shared resource, context and pin mechanisms.
     # Selected GPIO/UART/SPI classes also own their C lifecycle adapters; ELF
     # retention remains a separate contract from compilation-unit selection.
     # UART modes share one cold unit. None of these mechanisms selects another
     # device, GPIO face, DMA engine or stream. Keep complete set equality so an
     # unrelated source added by CMake still fails these isolation contracts.
-    def test_empty_f4_compiles_only_shared_cold_mechanisms(self):
+    def test_empty_f4_compiles_only_base_platform_sources(self):
         self.assertEqual(self.configure_sources("stm32f4", []),
                          (self.private_sources("stm32f4", set()), set()))
 
@@ -104,7 +106,8 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             with self.subTest(family=family):
                 provider, sdk = self.configure_sources(
                     family, [("uart", "irq-byte-event")])
-                expected = {"gpio.c", "uart.c", "uart_cold.c", "lifecycle_uart.c",
+                expected = {"gpio.c", "uart.c", "uart_cold.c",
+                            "uart_hardware.c", "lifecycle_uart.c",
                             "platform_cold.c"}
                 self.assertEqual(provider, self.private_sources(family, expected))
 
@@ -114,6 +117,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 provider, sdk = self.configure_sources(
                     family, [("uart", "dma-tx"), ("spi", spi_mode)])
                 expected = {"gpio.c", "uart.c", "uart_hal.c", "uart_cold.c",
+                            "uart_hardware.c",
                             "lifecycle_uart.c", "spi.c", "spi_dma.c",
                             "lifecycle_spi.c", "platform_cold.c"}
                 self.assertEqual(provider, self.private_sources(family, expected))
@@ -124,8 +128,9 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 provider, _ = self.configure_sources(
                     family, [("uart", "irq-blocks"), ("adc", "trigger-dma")])
                 expected = {"gpio.c", "uart.c", "uart_stream.c", "uart_cold.c",
+                            "uart_hardware.c",
                             "lifecycle_uart.c",
-                            "adc.c", "adc_stream.c", "platform_cold.c"}
+                            "adc.c", "adc_stream.c", "adc_trigger.c", "platform_cold.c"}
                 self.assertEqual(provider, self.private_sources(family, expected))
 
 
@@ -151,6 +156,44 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 self.assertEqual(sdk, set())
                 self.assertEqual(provider, self.private_sources(family, expected))
 
+    def test_window_watchdog_keeps_reset_but_selects_independent_only_on_request(self):
+        for modes in (("window",), ("independent", "window")):
+            with self.subTest(modes=modes):
+                provider, sdk = self.configure_sources(
+                    "stm32f4", [("watchdog", mode) for mode in modes])
+                expected = {"window_watchdog.c", "platform_cold.c"}
+                if "independent" in modes:
+                    expected.add("watchdog.c")
+                self.assertEqual(provider, self.private_sources("stm32f4", expected))
+                self.assertEqual(sdk, set())
+
+    def test_pvd_selects_no_gpio_and_only_event_mode_retains_exti(self):
+        for mode in ('pvd-level', 'pvd-events'):
+            with self.subTest(mode=mode):
+                provider, sdk = self.configure_sources('stm32f4', [('exti', mode)])
+                expected = {'pvd.c', 'platform_cold.c'}
+                if mode == 'pvd-events':
+                    expected.add('exti.c')
+                self.assertEqual(provider, self.private_sources('stm32f4', expected))
+                self.assertEqual(sdk, set())
+
+    def test_timers_compile_only_the_selected_controller_specializations(self):
+        for kind, mode, names, files in (
+                ('advanced_pwm', 'complementary-pwm', ('TIM1', 'TIM8'),
+                 ('advanced_pwm.c', 'advanced_pwm_tim8.c')),
+                ('timer_capture', 'edge-capture', ('TIM3', 'TIM4', 'TIM5'),
+                 ('timer_capture_tim3.c', 'timer_capture.c', 'timer_capture_tim5.c'))):
+            sources = dict(zip(names, files))
+            for controllers in (*((name,) for name in names), names):
+                with self.subTest(kind=kind, controllers=controllers):
+                    provider, sdk = self.configure_sources('stm32f4', [
+                        (kind, mode, name) for name in controllers])
+                    expected = {'gpio.c', 'platform_cold.c'} | {
+                        sources[name] for name in controllers}
+                    self.assertEqual(provider,
+                                     self.private_sources('stm32f4', expected))
+                    self.assertEqual(sdk, set())
+
     def test_multiple_instances_share_one_compilation_unit(self):
         for family in ("stm32f4",):
             with self.subTest(family=family):
@@ -158,6 +201,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                     family, [("uart", "irq-byte-event"),
                              ("uart", "irq-blocks")])
                 expected = {"gpio.c", "uart.c", "uart_stream.c", "uart_cold.c",
+                            "uart_hardware.c",
                             "lifecycle_uart.c",
                             "platform_cold.c"}
                 self.assertEqual(provider, self.private_sources(family, expected))

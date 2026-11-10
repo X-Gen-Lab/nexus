@@ -221,7 +221,7 @@ class FormatToolTests(unittest.TestCase):
                    "nexus-missing-clang-format", "--files",
                    str(REPO / "arch/arm/cortex_m/nx_arch_cortex_m.c")]
         result = subprocess.run(command, cwd=self.root, capture_output=True, text=True, timeout=30)
-        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("nexus-missing-clang-format", result.stderr)
         self.assertNotIn("Checked", result.stdout)
 

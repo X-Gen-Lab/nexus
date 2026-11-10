@@ -1,0 +1,37 @@
+schema = 2
+board_package = "ve-board"
+backend = "baremetal"
+clock = "custom"
+optimization = "Os"
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 16384
+[i2c_target.target]
+binding = "target0"
+mode = "target-irq"
+own_address = 82
+address_bits = 7
+second_address = 0
+max_hz = 100000
+irq_latency_us = 4
+pec = false
+alert = false
+[i2c_target.target.irq]
+priority = 5
+calls_os = false
+
+[clock_parameters]
+source = "hse"
+input_hz = 8000000
+pll_m = 8
+pll_n = 336
+pll_p = 4
+pll_q = 7
+ahb_div = 1
+apb1_div = 4
+apb2_div = 2
+adc_div = 4
+supply_mv = 3300
+css = false

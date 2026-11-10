@@ -2,6 +2,8 @@
 
 from pathlib import Path
 import shutil
+import os
+import signal
 import subprocess
 import sys
 import tempfile
@@ -9,7 +11,7 @@ import tomllib
 import unittest
 
 from tools.evidence.common import EvidenceError, atomic_json
-from tools.measurement.compare import compare, tool_identity, profile_input
+from tools.measurement.compare import compare, tool_identity, profile_input, run_logged
 
 
 def authored_fixture(root):
@@ -171,6 +173,93 @@ class MeasurementMatrixTests(unittest.TestCase):
             self.assertNotEqual(execution["exit_code"], 0)
             self.assertIn("CMakeLists.txt", Path(execution["raw"]["path"]).read_text())
             self.assertTrue((root / "build/matrix.json").is_file())
+
+
+
+class MeasurementCommandTests(unittest.TestCase):
+    def test_actual_external_nonzero_exit_and_raw_log_retained(self):
+        with tempfile.TemporaryDirectory() as directory:
+            report = run_logged([sys.executable, "-c", "print('actual failure'); raise SystemExit(37)"],
+                                Path(directory) / "raw.log")
+            self.assertEqual(report["exit_code"], 37)
+            self.assertIn("actual failure", Path(report["raw"]["path"]).read_text())
+
+
+    def test_missing_external_tool_is_nonzero(self):
+        with tempfile.TemporaryDirectory() as directory:
+            report = run_logged(["/does/not/exist"], Path(directory) / "raw.log")
+            self.assertEqual(report["exit_code"], 127)
+            self.assertIsNotNone(report["failure"])
+
+
+    def test_actual_timeout_is_nonzero(self):
+        with tempfile.TemporaryDirectory() as directory:
+            report = run_logged([sys.executable, "-c", "import time; time.sleep(10)"],
+                                Path(directory) / "raw.log", timeout_s=1)
+            self.assertEqual(report["exit_code"], 124)
+
+
+    def test_fast_success_cannot_exceed_the_actual_raw_log_bound(self):
+        with tempfile.TemporaryDirectory() as directory:
+            report = run_logged([
+                sys.executable, "-c",
+                "import sys; sys.stdout.buffer.write(b'x' * (33 * 1024 * 1024))"
+            ], Path(directory) / "raw.log")
+            self.assertEqual(report["exit_code"], 125)
+            self.assertIn("32 MiB", report["failure"])
+            self.assertGreater(Path(report["raw"]["path"]).stat().st_size,
+                               32 * 1024 * 1024)
+
+
+    def test_background_process_cannot_fake_success(self):
+        with tempfile.TemporaryDirectory() as directory:
+            code = "import subprocess; subprocess.Popen(['sleep','10'])"
+            report = run_logged([sys.executable, "-c", code], Path(directory) / "raw.log")
+            self.assertEqual(report["exit_code"], 125)
+
+
+    def test_keyboard_interrupt_reaps_the_actual_command_process_group(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            child = root / "child.py"
+            child.write_text(
+                "import os, pathlib, signal, sys, time\n"
+                "pathlib.Path(sys.argv[1]).write_text(str(os.getpid()))\n"
+                "os.kill(os.getppid(), signal.SIGINT)\n"
+                "time.sleep(30)\n")
+            driver = root / "driver.py"
+            driver.write_text(
+                "import os, pathlib, sys\n"
+                "from tools.measurement.compare import run_logged\n"
+                "try:\n"
+                "    run_logged([sys.executable, sys.argv[1], sys.argv[2]],\n"
+                "               pathlib.Path(sys.argv[3]))\n"
+                "except KeyboardInterrupt:\n"
+                "    pid = int(pathlib.Path(sys.argv[2]).read_text())\n"
+                "    try:\n"
+                "        os.kill(pid, 0)\n"
+                "    except ProcessLookupError:\n"
+                "        raise SystemExit(0)\n"
+                "    raise SystemExit(9)\n"
+                "raise SystemExit(10)\n")
+            pid_path = root / "child.pid"
+            environment = dict(os.environ)
+            environment["PYTHONPATH"] = str(Path(__file__).resolve().parents[2])
+            try:
+                result = subprocess.run(
+                    [sys.executable, str(driver), str(child), str(pid_path),
+                     str(root / "raw.log")], env=environment,
+                    capture_output=True, text=True, timeout=10,
+                    start_new_session=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+            finally:
+                if pid_path.exists():
+                    try:
+                        os.killpg(int(pid_path.read_text()), signal.SIGKILL)
+                    except ProcessLookupError:
+                        # The fixture group may already have exited.
+                        pass
+
 
 
 if __name__ == "__main__":

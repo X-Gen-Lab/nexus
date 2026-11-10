@@ -15,7 +15,6 @@ Public headers define API contracts. Configuration and platform references conne
 api/index
 configuration/index
 platforms/index
-documentation-delivery
 documentation-tools
 history
 ../assets/diagrams/README

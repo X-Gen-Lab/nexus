@@ -164,7 +164,7 @@ explicit cell count. These are bounded software costs, not measured MCU latency
 or power. SVC/CMSE entry, an actual kernel principal/copy/session authority,
 MPU/TrustZone enforcement, NS RTOS, borrowed-user asynchronous SPI/CAN transports
 and physical HIL remain outside this increment. The original
-[IO-39](io-evolution-execution.csv) and [SOC-36](soc-refinement-execution.csv)
+[IO-39](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/io-evolution-execution.csv) and [SOC-36](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/soc-refinement-execution.csv)
 exits remain open; this common mechanism does not complete them.
 
 ## Software validation boundary

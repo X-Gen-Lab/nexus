@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "f407-ve-mmc8-silicon-pad-reference",
+  "soc": "STM32F407VET6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-only-mmc-width-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "mmc4",
+      "controller": "SDIO",
+      "route": "sdio-pc8-pd2"
+    },
+    {
+      "id": "mmc8",
+      "controller": "SDIO",
+      "route": "sdio-mmc8-pc8-pd2"
+    },
+    {
+      "id": "console",
+      "controller": "USART1",
+      "route": "usart1-pa9-pa10"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Silicon-pad software reference; no PCB, MMC population, power, pull-up or signal-integrity qualification.",
+    "No physical card commands, throughput or HIL execution."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "DS8626 F407 bonded package pads and SDIO alternate functions only; the actual electrical design is not specified."
+    }
+  ]
+}

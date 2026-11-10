@@ -8,46 +8,30 @@ source_language: en
 (docs-guides-source-checkout)=
 # Obtain the exact source and pinned dependencies
 
-Use this guide before running repository commands in a tutorial, configuration
-reference or maintenance workflow. You will obtain a detached, exact Nexus source
-revision and its reviewed dependency closure. This requires Git, Python 3.11+ and
-network access for the initial clone and dependency retrieval. It does not build,
-flash or establish software or hardware qualification.
+Use this guide before executing a repository tutorial. You will obtain an exact
+Nexus commit and the dependencies selected by your task. Initial retrieval needs
+Git, Python 3.11+ and network access; it does not build or flash firmware.
 
-## Select the revision described by your documentation
+## Select the documented source commit
 
-Open the immutable documentation version identified by the page's version
-banner. Download `documentation-manifest.json` from that version's root, or use
-the file already present at the root of its verified offline package. Keep it
-outside your future checkout, for example as `nexus-documentation-manifest.json`
-in your working parent directory. If you entered through `stable/`, record the
-resolved immutable version before downloading; do not mix two versions.
+Read the full commit from the documentation source link, source banner or
+`source.commit` in `documentation-build.json`. A dirty documentation preview is
+not an immutable source delivery. Record an approved clean commit before using
+these commands; branch names and version strings do not identify exact bytes.
 
-| Manifest field | Use |
-| --- | --- |
-| `documentation_source.commit` | Exact source containing these pages and their tools |
-| `code_source.commit` | Source described by the package; inspect its identity separately |
-| `qualification_references[]` | Explicitly verified candidate references in a schema 2 package, each with its original source and scope; may be empty |
+Historical documentation packages retain their original manifests and fields.
+Use their matching fixed instructions when recovering them. Current builds write
+`documentation-build.json`; a documentation archive manifest is not required to
+obtain current source. Historical reports do not establish current qualification.
 
-Historical schema 1 packages retain their original `qualified_code.commit` field
-for read-only recovery. Do not interpret it as a current schema 2 reference.
+## Retrieve only that source revision
 
-The default GitHub branch may lag a reviewed documentation branch. A branch
-name, successful clone or documentation release is not a substitute for the
-exact commit. The previously reviewed documentation snapshot is
-`5a7a75c321ea173df8692714f95a8df13715293d`; choosing it recreates that snapshot,
-not later documentation. Its [immutable package manifest](https://x-gen-lab.github.io/nexus/versions/docs-20261014-5a7a75c321ea/documentation-manifest.json)
-is one concrete example. Use your version's manifest for the current tutorial.
-
-## Clone and initialize that exact revision
-
-Run these POSIX-shell commands from the parent directory containing the downloaded
-manifest. Choose a new checkout directory; the commands do not replace one that
-already exists. The Python command validates the identity before passing it to
-Git:
+Run from a working parent directory. Replace the placeholder with the selected
+40-character commit; choose a new checkout directory:
 
 ```sh
-nexus_source_revision=$(python -c 'import json, re; from pathlib import Path; manifest = json.loads(Path("nexus-documentation-manifest.json").read_text()); revision = manifest["documentation_source"]["commit"]; assert re.fullmatch(r"[0-9a-f]{40}", revision), "invalid documentation commit"; print(revision)')
+nexus_source_revision=REPLACE_WITH_APPROVED_40_CHARACTER_COMMIT
+python -c 'import re, sys; assert re.fullmatch(r"[0-9a-f]{40}", sys.argv[1]), "invalid source commit"' "$nexus_source_revision"
 git init nexus
 cd nexus
 git remote add origin https://github.com/X-Gen-Lab/nexus.git
@@ -55,46 +39,38 @@ git fetch --no-tags origin "$nexus_source_revision"
 git checkout --detach "$nexus_source_revision"
 python tools/dev/dev.py prepare --scope native --allow-network
 git rev-parse HEAD
-git submodule status --recursive
 git status --short
 ```
 
-Check every command's exit status. `git rev-parse HEAD` must equal the manifest's
-full commit. Recursive submodule lines must have neither a leading `-` (missing),
-`+` (different revision) nor `U` (conflict), and `git status --short` must be empty
-before starting a clean-source workflow. Stop on an unavailable commit or failed
-dependency retrieval; never substitute `main`, `HEAD` or a latest dependency.
-The preparation command audits the source-owned catalogue and each parent
-Gitlink before initializing its explicitly selected paths. Firmware configuration
-does not retrieve dependencies. For historical revisions predating this command,
-use the matching immutable documentation rather than applying current commands
-to an older source tree.
-For a preview without a package manifest, record the full commit from its source
-banner or `documentation-build.json` and use that validated commit explicitly.
+Check each exit status and stop on failure. HEAD must match the selected commit
+and the checkout must be clean. Preparation checks the catalogue, parent gitlinks
+and only the selected recursive dependency closure. Unselected inventory may
+remain uninitialized; `git submodule status --recursive` therefore does not
+require every repository dependency to be populated. Firmware configuration
+never downloads dependencies or substitutes a newer revision.
 
-Fetching the exact source commit avoids downloading unrelated artifact branches.
-The `documentation-assets` branch holds large historical evidence archives; it
-is not a source dependency. Retrieve only an archive identified by the
-[software evidence entry](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-verification.md) when you need its
-original raw evidence. A verified Source SDK is another supported consumption
-path; it does not require the source repository's artifact history.
+For an MCU task, prepare the exact maintained preset instead of unrelated SDKs:
 
-On Windows, run the POSIX snippet in Git Bash, or read the same manifest field
-and perform the corresponding Git commands in your shell. Do not treat the shell
-variable syntax as a portable PowerShell command.
+```sh
+python tools/dev/dev.py prepare \
+    --preset stm32-qiming-baremetal --allow-network
+```
 
-## Prepare only the tools required by your task
+A verified Source SDK is an independent consumption path. Its full prefix contains
+source, selected dependencies, licenses and CMake package metadata; it does not
+need the repository's historical artifact branches. Follow the
+[Source SDK tutorial](../tutorials/source-sdk.md) for export and consumption.
 
-| Task | Next preparation |
+## Prepare tools for the selected task
+
+| Task | Required preparation |
 | --- | --- |
-| Native consumer or I/O fixtures | Host Python, CMake, Ninja and C/C++ compiler required by the selected tutorial |
-| Configuration inspection | Python and the maintained resolver; ARM compilation remains a separate step |
+| Native consumer or models | Python, CMake, Ninja and the maintained host compiler |
+| Configuration inspection | Python and the current resolver |
 | Platform maintenance | [Development tools, TDD and hooks](../development/workflow.md) |
-| Documentation check, build or package | [Locked documentation tuple and unified CLI](../reference/documentation-tools.md) |
-| MCU linking or hardware preparation | [Exact toolchain and HIL preparation](performance-hil.md) |
+| Documentation | [Locked documentation tools and CLI](../reference/documentation-tools.md) |
+| MCU linking or HIL preparation | [Exact toolchain and station preparation](performance-hil.md) |
 
-Each tutorial starts from the repository root established above. Keep independent
-consumer and package outputs outside the source checkout when instructed. Retain
-manifests, source identities and required reports before deleting only directories
-you created. A clean checkout supplies input identity; actual execution and
-[qualification evidence](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-verification.md) remain separate.
+Tutorials run from the repository root. Keep independent consumers outside that
+checkout and retain actual reports before removing only your own output. A clean
+source identity does not replace tests, independent SDK checks or physical HIL.

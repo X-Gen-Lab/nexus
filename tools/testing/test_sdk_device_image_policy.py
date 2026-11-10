@@ -10,7 +10,7 @@ import unittest
 
 from tools.configure import configure
 from tools.evidence.common import file_identity
-from tools.release import transport
+from tools.maintenance import consumer_profiles
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -32,7 +32,7 @@ class SDKDeviceImagePolicyTests(unittest.TestCase):
         self.directory = Path(self.temporary.name)
 
     def profile(self, name):
-        return next(item for item in transport.SERVICE_CONSUMERS
+        return next(item for item in consumer_profiles.SERVICE_CONSUMERS
                     if item.name == name)
 
     def prepared(self, name):

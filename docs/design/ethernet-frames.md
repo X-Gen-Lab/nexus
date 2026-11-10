@@ -7,7 +7,9 @@ keeps its contiguous untagged-frame contract, four-word descriptors and existing
 operations table. Selecting one does not expand the other.
 
 The production implementation is owned by `soc/stm32/stm32f4/` and currently
-selects exact STM32F407ZGT6 RMII facts at HCLK 168 MHz. It does not imply full
+selects exact STM32F407VET6/ZGT6 MII and STM32F407ZGT6 RMII facts at HCLK
+168 MHz. The seventeen-pad MII A/B/C route includes both PHY clock inputs,
+CRS, COL and RX_ER; it does not inherit any PCB wiring. It does not imply full
 STM32F4 family coverage or authorize the VE package's missing PG pins. Native is
 an explicit C hardware model under `tests/support/native/`, enabled only for host
 tests. Public contracts, the MAC engine, the F407 binding, static factory
@@ -20,8 +22,9 @@ RMII, PHY behavior, bus timing, timestamp accuracy and station HIL remain
 ## Assembly and hardware ownership
 
 The maintained normal assembly contract uses an authored
-`eth_frames.mac` controller to select `rmii-vlan-sg-ptp`, a reviewed
-RMII route, MAC address, exact TX/RX ring sizes, RX-buffer size, IRQ policy and
+`eth_frames.mac` controller to select `rmii-vlan-sg-ptp` or `mii-vlan-sg-ptp`,
+a reviewed matching route, MAC address, exact TX/RX ring sizes, RX-buffer size,
+IRQ policy and
 finite initialization/drain budgets. The factory contract returns the existing static
 `nx_eth_frames_port_t` through `nx_factory_eth_frames(NX_ETH_FRAMES_ID_MAC)`.
 Lookup must perform no hardware access, allocation or initialization. The paired
@@ -62,7 +65,24 @@ contain 18..1518, excluding preamble, hardware padding and hardware FCS.
 
 The selected mode performs no tag insertion or stripping. PCP/DEI/VID policy,
 access-port/trunk policy and VLAN membership belong to the product. Hardware
-padding/FCS remain enabled and checksum offload remains disabled.
+padding/FCS remain enabled. `checksum_offload` explicitly selects hardware
+checksum processing and defaults to false. Raw Ethernet keeps offload disabled.
+
+TX preparation selects `CHECKSUM_NONE`. The READY owner may select IP-header,
+payload with caller pseudo-header seed, or full hardware pseudo-header insertion.
+Only the first scatter-gather descriptor receives CIC bits; timestamp selection
+and all fragments retain their existing whole-frame borrow. An unselected mode
+or invalid checksum choice rejects before OWN publication. Hardware format/error
+writeback controls success; the driver supplies no software checksum fallback,
+packet repair or IP-stack policy.
+
+RX checksum observations require both selected IPC processing and actual last
+descriptor ESA. The loan retains explicit IPv4/IPv6, header/payload error,
+bypass and payload-type facts; absent or malformed writeback stays unknown.
+Checksum-error dropping is disabled so the consumer receives these hardware
+facts. L2/DMA errors retain the existing whole-frame discard behavior. Altering
+checksum metadata invalidates release identity, just like altering a timestamp
+or geometry. Native ingress/egress does not invent computed IP checksums.
 
 | Fact | TX | RX |
 |---|---|---|

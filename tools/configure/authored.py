@@ -7,7 +7,7 @@ from types import MappingProxyType
 from tools.configure.ir import Record, freeze
 from tools.configure.contracts import (
     CONTROLLER_CONTRACTS, CONTROLLER_KINDS, ENDPOINT_FIELDS, USB_ENDPOINT_FIELDS,
-    EXTERNAL_ENDPOINT_FIELDS, EXTERNAL_ENDPOINT_KINDS)
+    EXTERNAL_ENDPOINT_FIELDS, EXTERNAL_ENDPOINT_KINDS, EXTERNAL_ENDPOINT_REQUIRED)
 
 
 @dataclass(frozen=True)
@@ -28,9 +28,9 @@ class AuthoredAssembly(Record):
     factory: Mapping | None = None
     can_domain: Mapping | None = None
     power: Mapping | None = None
-    i2s2: Mapping | None = None
     soc_package: str | None = None
     hardware: Mapping | None = None
+    clock_parameters: Mapping | None = None
 
     @classmethod
     def create(cls, values):
@@ -49,7 +49,9 @@ MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes"
                  "flash_load_limit_bytes", "image_prefix_bytes",
                  "image_suffix_bytes", "regions"}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
-TOP_OPTIONAL = {"board", "board_package", "soc_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain", "power", "i2s2", "hardware"}
+TOP_OPTIONAL = {"board", "board_package", "soc_package", "optimization",
+                "components", "layout", "abi", "os", "factory", "can_domain",
+                "power", "hardware", "clock_parameters"}
 
 
 
@@ -114,9 +116,8 @@ def normalize(data, path, root, fail, obj, integer, text, *,
         if not isinstance(instances, dict):
             fail(f"{kind}: expected endpoint tables")
         for name, definition in instances.items():
-            required = EXTERNAL_ENDPOINT_FIELDS | (
-                {"mode"} if kind == "memory_window" else set())
-            obj(definition, required, (), f"{kind}.{name}")
+            required = EXTERNAL_ENDPOINT_REQUIRED[kind]
+            obj(definition, required, {"parameters"} if kind == "memory_window" else (), f"{kind}.{name}")
             devices.append({**definition, "id": name,
                             "driver": kind + "-endpoint",
                             "authored_kind": kind})
@@ -146,12 +147,9 @@ def normalize(data, path, root, fail, obj, integer, text, *,
               "backend": data["backend"], "clock_profile": data["clock"],
               "controllers": controllers, "devices": devices,
               "memory_budgets": budgets, "layout": data.get("layout")}
-    for field in ("soc_package", "abi", "optimization", "components", "os", "factory", "can_domain", "power", "hardware"):
+    for field in ("soc_package", "abi", "optimization", "components", "os", "factory", "can_domain", "power", "hardware", "clock_parameters"):
         if field in data:
             result[field] = data[field]
-    if "i2s2" in data:
-        result["i2s2"] = dict(obj(data["i2s2"], {"profile"}, (),
-                                   "I2S2 chip hardware role"))
     return AuthoredAssembly.create(result)
 
 
@@ -181,7 +179,9 @@ def editor_schema():
             properties["pull"]["enum"] = ["none", "up", "down"]
         if "output_type" in fields:
             properties["output_type"]["enum"] = ["push-pull", "open-drain"]
-        block_bounds = {"bus_width": {"type": "integer", "enum": [1, 4]},
+        if "speed" in fields:
+            properties["speed"]["enum"] = ["low", "medium", "high", "very-high"]
+        block_bounds = {"bus_width": {"type": "integer", "enum": [1, 4, 8]},
                         "max_blocks": {"type": "integer", "minimum": 1,
                                        "maximum": 32},
                         "poll_budget": {"type": "integer", "minimum": 1,
@@ -207,9 +207,33 @@ def editor_schema():
             properties[name]["maximum"] = 2**32 - 1
         for name in fields & {"channels", "sample_times"}:
             properties[name] = {"type": "array", "items": {"type": "integer", "minimum": 0}}
+        if "resolution_bits" in fields:
+            from tools.configure.adc import RESOLUTION_BITS
+            properties["resolution_bits"] = {
+                "type": "integer", "enum": list(RESOLUTION_BITS), "default": 12}
+        if "delay_cycles" in fields:
+            properties["delay_cycles"] = {
+                "type": "integer", "minimum": 5, "maximum": 20, "default": 5}
+        if "address_bits" in fields:
+            properties["address_bits"] = {
+                "type": "integer", "enum": [7, 10], "default": 7}
+        if "window_ticks" in fields:
+            properties["window_ticks"] = {
+                "type": "integer", "minimum": 1, "maximum": 62, "default": 1}
+        if "threshold_code" in fields:
+            properties["threshold_code"] = {
+                "type": "integer", "minimum": 0, "maximum": 7,
+                "description": "PVD PLS encoding; consult the exact datasheet "
+                               "threshold bounds and hysteresis. No voltage "
+                               "policy is selected by default."}
         for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing",
-                             "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b"}:
+                             "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b", "lsb_first", "maintenance", "checksum_offload"}:
             properties[name] = {"type": "boolean"}
+        if "lsb_first" in fields:
+            properties["lsb_first"].update(
+                default=False,
+                description="Shift each SPI frame LSB first; false keeps MSB "
+                            "first. Requires a reviewed endpoint provider.")
         if "timing" in fields:
             properties["timing"] = record(
                 {"prescaler", "segment1", "segment2", "sjw"},
@@ -219,7 +243,13 @@ def editor_schema():
         if "irq" in fields:
             properties["irq"] = record({"priority", "calls_os"}, {"priority"})
             properties["irq"]["properties"]["calls_os"] = {"type": "boolean"}
+        from tools.configure import usb_otg
+        usb_otg.nested_editor_schema(properties, fields, record)
         uart_formats.receive_editor_schema(properties, fields, record)
+        from tools.configure import uart_wires
+        uart_wires.editor_schema(properties, fields)
+        from tools.configure import spi_frames
+        spi_frames.editor_schema(properties, fields)
         stream_profiles.nested_editor_schema(properties, fields, record)
         if "watchdog" in fields:
             properties["watchdog"] = record({"lower", "upper"},
@@ -240,9 +270,6 @@ def editor_schema():
     properties["power"] = record({"mode", "controllers"}, {"mode", "controllers"})
     properties["power"]["properties"]["mode"] = {"const": "fixed-run"}
     properties["power"]["properties"]["controllers"] = {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string"}, "uniqueItems": True}
-    properties["i2s2"] = record({"profile"}, {"profile"})
-    properties["i2s2"]["properties"]["profile"] = {
-        "const": "slave-tx-stereo16-pb12-pb13-pb15"}
     properties["components"] = {"type": "array", "items": {"type": "string"}, "uniqueItems": True}
     properties["abi"] = record({"arch", "fpu", "float_abi"}, {"arch", "fpu", "float_abi"})
     properties["memory"] = record(MEMORY_FIELDS, {"main_stack_bytes"})
@@ -267,8 +294,36 @@ def editor_schema():
     properties["factory"] = {
         "type": "object", "properties": {"capabilities": {"type": "boolean"}},
         "additionalProperties": False}
+    from tools.configure.stm32f4.clocks import DEFAULT, AHB, APB
+    clock_fields = {name: {"type": "integer", "minimum": 1}
+                    for name in DEFAULT}
+    clock_fields.update(source={"enum": ["hse", "hsi"]},
+                        css={"type": "boolean"})
+    clock_fields.update(sysclk_source={"enum": ["pll", "input"],
+                                      "default": "pll"},
+                        pll48={"type": "boolean", "default": False})
+    for name, values in (("pll_p", (2, 4, 6, 8)), ("ahb_div", AHB),
+                         ("apb1_div", APB), ("apb2_div", APB),
+                         ("adc_div", (2, 4, 6, 8))):
+        clock_fields[name] = {"type": "integer", "enum": list(values)}
+    properties["clock_parameters"] = {
+        "type": "object", "additionalProperties": False,
+        "required": list(DEFAULT), "properties": clock_fields}
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
+        if kind in {"pwm_group", "timer_pulse", "timer_sequence"}:
+            shape = properties[kind]["additionalProperties"]["properties"]
+            shape["master_trigger"] = {"enum": ["none", "enable", "update", "oc4ref"]}
+            shape["synchronization"] = record({"source", "mode"}, {"source", "mode"})
+            shape["synchronization"]["properties"]["mode"] = {"enum": ["reset", "gated", "trigger"]}
+            for field in {"poll_limit", "burst_budget_hclk_cycles"} & shape.keys():
+                shape[field] = {"type": "integer", "minimum": 1}
+        if kind in {"capture", "audio"}:
+            from tools.configure.stm32f4.capture_audio import editor_schema
+            editor_schema(kind, properties[kind]["additionalProperties"])
+        if kind == "i2c_target":
+            from tools.configure import i2c_target
+            i2c_target.editor_schema(properties[kind]["additionalProperties"])
         if kind == "rtc":
             from tools.configure import rtc
             rtc.editor_schema(properties[kind]["additionalProperties"])
@@ -284,19 +339,31 @@ def editor_schema():
         if kind == "i2c":
             i2c_timing_selection.controller_editor_schema(
                 properties[kind]["additionalProperties"], record)
+        if kind == "dac":
+            from tools.configure import dac
+            dac.editor_schema(properties[kind]["additionalProperties"][
+                "properties"])
         if kind in {"eth", "eth_frames"}:
             ethernet.controller_editor_schema(
                 properties[kind]["additionalProperties"])
     for kind, fields in ENDPOINT_FIELDS.items():
         properties[kind + "_device"] = {"type": "object", "additionalProperties": record(fields, {"controller"})}
     for kind in EXTERNAL_ENDPOINT_KINDS:
-        fields = EXTERNAL_ENDPOINT_FIELDS | (
-            {"mode"} if kind == "memory_window" else set())
-        endpoint = record(fields, fields)
+        required = EXTERNAL_ENDPOINT_REQUIRED[kind]
+        fields = required | ({"parameters"} if kind == "memory_window" else set())
+        endpoint = record(fields, required)
+        if "ready_delay_us" in fields:
+            endpoint["properties"]["ready_delay_us"] = {
+                "type": "integer", "minimum": 1, "maximum": 1000000}
+        for field in ("parameters", "nor", "geometry"):
+            if field in fields:
+                endpoint["properties"][field] = {"type": "object"}
         if kind == "memory_window":
             endpoint["properties"]["mode"] = {
-                "enum": ["cpu-window", "startup-memory"]}
+                "enum": ["cpu-window", "startup-memory", "psram-window"]}
         for field in ("read_timing", "write_timing"):
+            if field not in fields:
+                continue
             endpoint["properties"][field] = {
                 "type": "object", "additionalProperties": False,
                 "required": ["address_setup", "address_hold", "data_setup", "bus_turn"],
@@ -311,7 +378,7 @@ def editor_schema():
     endpoint_schema = record(USB_ENDPOINT_FIELDS, USB_ENDPOINT_FIELDS - {"fifo_words"})
     endpoint_schema["properties"]["direction"] = {"enum": ["in", "out"]}
     endpoint_schema["properties"]["transfer"] = {
-        "enum": ["control", "bulk", "interrupt"]}
+        "enum": ["control", "bulk", "interrupt", "isochronous"]}
     properties["usb_endpoint"] = {"type": "object", "additionalProperties": endpoint_schema}
     schema["oneOf"] = [{"required": ["board"], "not": {"required": ["board_package"]}},
                        {"required": ["board_package"], "not": {"required": ["board"]}}]
@@ -322,6 +389,8 @@ def editor_schema():
 def explain_schema(schema):
     """Attach editor help to the same fields without duplicating constraints."""
     descriptions = {
+        "window_ticks": ("Minimum WWDG counter decrements before feeding; "
+                         "the hardware divider is selected at enable."),
         "binding": "Exact reviewed Board binding; no route fallback.",
         "controller": "Authored controller instance id, not an endpoint id.",
         "mode": ("Explicit maintained mode; the product owns service "
@@ -339,6 +408,8 @@ def explain_schema(schema):
                      "its ceiling is checked."),
         "reference_mv": ("Declared analog reference in millivolts; "
                          "not a measurement."),
+        "resolution_bits": ("ADC raw resolution: 6, 8, 10 or 12 bits; "
+                            "omitted selects 12, subject to provider support."),
         "main_stack_bytes": ("Reserved main stack in bytes, not measured "
                              "high-water."),
         "libc_heap_bytes": ("Explicit libc heap reservation in bytes; "

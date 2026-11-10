@@ -12,6 +12,7 @@ class PinElectricalConstraintIR(Record):
     mode: str
     pull: str | None = None
     output_type: str | None = None
+    speed: str | None = None
     initial: int | None = None
 
     def projection(self):
@@ -33,11 +34,12 @@ def validate_binding(binding, route, mask):
         fail("Board electrical mode must match its reviewed route")
     allowed = {"mode", "pull"}
     if mode == "output":
-        allowed.update(("output_type", "initial"))
+        allowed.update(("output_type", "initial", "speed"))
     if definition.keys() - allowed:
         fail("Board electrical constraint contains inapplicable fields")
     for name, choices in (("pull", {"none", "up", "down"}),
-                          ("output_type", {"push-pull", "open-drain"})):
+                          ("output_type", {"push-pull", "open-drain"}),
+                          ("speed", {"low", "medium", "high", "very-high"})):
         if name in definition and (
                 type(definition[name]) is not str or
                 definition[name] not in choices):
@@ -60,8 +62,24 @@ def require_selection(selection, binding):
     actual = {"mode": selection["mode"],
               "pull": selection.get("pull", "none"),
               "output_type": selection.get("output_type", "push-pull"),
-              "initial": selection.get("initial", 0)}
+              "initial": selection.get("initial", 0),
+              "speed": selection.get("speed", "preserve")}
     for name, expected in required.projection().items():
         if actual[name] != expected:
             fail(f"Board electrical {binding['id']}.{name} requires "
                  f"{expected!r}; selected {actual[name]!r}")
+
+
+def validate_speed(selection, route):
+    """Output slew is explicit; the backup-domain pads only support LOW."""
+    if "speed" not in selection:
+        return
+    speed = selection["speed"]
+    if selection["mode"] != "output":
+        fail("GPIO speed requires output mode")
+    if type(speed) is not str or speed not in {
+            "low", "medium", "high", "very-high"}:
+        fail("Unsupported GPIO speed")
+    if speed != "low" and any(
+            pin["pin"] in {"PC13", "PC14", "PC15"} for pin in route["pins"]):
+        fail("PC13/14/15 output speed requires low")

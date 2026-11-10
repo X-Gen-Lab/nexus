@@ -5,7 +5,7 @@
 位于独立 examples/product 工程。
 
 当前机制的完整合同在 [OS contracts](../design/os-contracts.md)，逐项实际状态在
-[OS01–OS55 台账](../design/os-execution.csv)。`implemented` 只表示代码存在，只有
+[OS01–OS55 台账](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/os-execution.csv)。`implemented` 只表示代码存在，只有
 与当前 clean Git/配置/dependency/工具身份绑定的实际执行才建立软件资格。
 
 | 机制 | 交付边界 |

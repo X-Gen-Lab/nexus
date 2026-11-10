@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407zg-usb-device-hs-fs-software-fixture",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-only-F407-OTG-HS-embedded-FS-PHY-PB14-PB15-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "usbhs",
+      "controller": "OTG_HS",
+      "route": "usbhs-device-pb14-pb15"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only PHY pad contract; connector, PHY power, VBUS/backfeed and signal integrity are not measured.",
+    "External owner authorizes PHY/VBUS handover before Platform start; selected nominal frequency does not prove oscillator tolerance.",
+    "No physical USB waveform, enumeration or attach/detach qualification was executed."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "RM0090 Rev22 OTG_HS device core, embedded FS or external ULPI PHY; the selected pads are separate from PCB qualification."
+    },
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "DS8626 F407ZG alternate-function pads; no external PHY or connector routing is inferred."
+    }
+  ]
+}

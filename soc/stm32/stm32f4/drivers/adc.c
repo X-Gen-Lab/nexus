@@ -1,17 +1,167 @@
 /**
  * \file            adc.c
- * \brief           Fixed ADC1 software shots and low-rate scans
+ * \brief           Independent ADC software shots and low-rate scans
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_provider.h"
 #include "stm32f4xx_ll_adc.h"
+
+#define NX_ADC_COMMON_CLOCK                                                    \
+    ((NEXUS_CLOCK_ADC_DIV / 2U - 1U) << ADC_CCR_ADCPRE_Pos)
 
 #ifndef NX_STM32_IO_POLL
 #define NX_STM32_IO_POLL(kind, port) ((void)(kind), (void)(port))
 #endif
+#ifndef NX_PLATFORM_REGISTER_WRITE
+#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
+#endif
+
+nx_result_t nx_stm32_adc_sequence_validate(ADC_TypeDef* registers,
+                                           const uint8_t* channels,
+                                           const uint8_t* sample_times,
+                                           size_t count) {
+    if (registers == NULL || channels == NULL || sample_times == NULL ||
+        count == 0U || count > 16U)
+        return NX_ERROR_INVALID;
+    for (size_t i = 0U; i < count; ++i) {
+        if (channels[i] > 18U || sample_times[i] > 7U ||
+            (channels[i] > 15U && (registers != ADC1 || sample_times[i] != 7U)))
+            return NX_ERROR_UNSUPPORTED;
+        for (size_t j = 0U; j < i; ++j) {
+            if (channels[i] == channels[j] &&
+                sample_times[i] != sample_times[j])
+                return NX_ERROR_UNSUPPORTED;
+        }
+    }
+    return NX_SUCCESS;
+}
+
+uint32_t nx_stm32_adc_internal_mask(const nx_stm32_adc_state_t* port) {
+    uint32_t mask = 0U;
+    for (size_t i = 0U; i < port->channel_count; ++i) {
+        if (port->channels[i] == 16U || port->channels[i] == 17U)
+            mask |= ADC_CCR_TSVREFE;
+        else if (port->channels[i] == 18U)
+            mask |= ADC_CCR_VBATE;
+    }
+    return mask;
+}
+
+nx_result_t nx_stm32_adc_internal_prepare(nx_stm32_adc_state_t* port) {
+    const uint32_t mask = nx_stm32_adc_internal_mask(port);
+    if (mask == 0U)
+        return NX_SUCCESS;
+    if ((port->common->CCR & mask) != 0U)
+        return NX_ERROR_BUSY;
+    /* Retain ownership before the first fallible write. Preserve unrelated
+     * common paths and clock fields; only this acquired mask is released. */
+    port->cold_effects |= NX_STM32_ADC_INTERNAL;
+    NX_PLATFORM_REGISTER_WRITE(port->common->CCR, port->common->CCR | mask);
+    nx_arch_dsb();
+    return (port->common->CCR & mask) == mask ? NX_SUCCESS : NX_ERROR_IO;
+}
+
+nx_result_t nx_stm32_adc_internal_close(nx_stm32_adc_state_t* port) {
+    if ((port->cold_effects & NX_STM32_ADC_INTERNAL) == 0U)
+        return NX_SUCCESS;
+    const uint32_t mask = nx_stm32_adc_internal_mask(port);
+    NX_PLATFORM_REGISTER_WRITE(port->common->CCR, port->common->CCR & ~mask);
+    nx_arch_dsb();
+    if ((port->common->CCR & mask) != 0U)
+        return NX_ERROR_IO;
+    port->cold_effects &= (uint8_t)~NX_STM32_ADC_INTERNAL;
+    return NX_SUCCESS;
+}
+
+/** \brief Release only interface clocks temporarily acquired for observation.
+ */
+nx_result_t nx_stm32_adc_probe_close(nx_stm32_adc_state_t* port) {
+    uint32_t clocks = 0U;
+    if ((port->cold_effects & NX_STM32_ADC_PROBE1) != 0U) {
+        clocks |= RCC_APB2ENR_ADC1EN;
+    }
+    if ((port->cold_effects & NX_STM32_ADC_PROBE2) != 0U) {
+        clocks |= RCC_APB2ENR_ADC2EN;
+    }
+    if ((port->cold_effects & NX_STM32_ADC_PROBE3) != 0U) {
+        clocks |= RCC_APB2ENR_ADC3EN;
+    }
+    if (clocks == 0U) {
+        return NX_SUCCESS;
+    }
+    NX_PLATFORM_REGISTER_WRITE(RCC->APB2ENR, RCC->APB2ENR & ~clocks);
+    nx_arch_dsb();
+    if ((RCC->APB2ENR & clocks) != 0U) {
+        return NX_ERROR_IO;
+    }
+    port->cold_effects &= (uint8_t)~NX_STM32_ADC_PROBES;
+    return NX_SUCCESS;
+}
+
+/** \brief Prepare the fixed domain before tasks can start any converter.
+ * \note ADON cannot be assessed through a gated digital interface. Observe
+ *       all three interfaces before retuning; a matching selected divider needs
+ * no writes. Caller serializes all ADC preparation/start during this cold
+ * phase.
+ */
+nx_result_t nx_stm32_adc_common_prepare(nx_stm32_adc_state_t* port) {
+    if ((ADC->CCR & (ADC_CCR_MULTI | ADC_CCR_DMA | ADC_CCR_DDS)) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    if (LL_ADC_GetCommonClock(ADC) == NX_ADC_COMMON_CLOCK) {
+        return NX_SUCCESS;
+    }
+    const uint32_t all =
+        RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN | RCC_APB2ENR_ADC3EN;
+    uint32_t missing = all & ~RCC->APB2ENR;
+    if ((missing & RCC_APB2ENR_ADC1EN) != 0U) {
+        port->cold_effects |= NX_STM32_ADC_PROBE1;
+    }
+    if ((missing & RCC_APB2ENR_ADC2EN) != 0U) {
+        port->cold_effects |= NX_STM32_ADC_PROBE2;
+    }
+    if ((missing & RCC_APB2ENR_ADC3EN) != 0U) {
+        port->cold_effects |= NX_STM32_ADC_PROBE3;
+    }
+    if (missing != 0U) {
+        NX_PLATFORM_REGISTER_WRITE(RCC->APB2ENR, RCC->APB2ENR | all);
+        nx_arch_dsb();
+    }
+    if ((RCC->APB2ENR & all) != all) {
+        return NX_ERROR_IO;
+    }
+    nx_result_t result = NX_ERROR_BUSY;
+    if (((ADC1->CR2 | ADC2->CR2 | ADC3->CR2) & ADC_CR2_ADON) == 0U) {
+        LL_ADC_SetCommonClock(ADC, NX_ADC_COMMON_CLOCK);
+        nx_arch_dsb();
+        result = LL_ADC_GetCommonClock(ADC) == NX_ADC_COMMON_CLOCK
+                     ? NX_SUCCESS
+                     : NX_ERROR_IO;
+    }
+    nx_result_t cleanup = nx_stm32_adc_probe_close(port);
+    return cleanup == NX_SUCCESS ? result : cleanup;
+}
+
+/** \brief No caller buffer survives this turn, even if device stop is refused.
+ */
+nx_result_t nx_stm32_adc_quiesce(nx_stm32_adc_state_t* port) {
+    if (port == NULL || port->registers == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    NX_PLATFORM_REGISTER_WRITE(port->registers->CR2, 0U);
+    nx_arch_dsb();
+    if (port->registers->CR2 != 0U) {
+        port->active = true;
+        return NX_ERROR_IO;
+    }
+    port->registers->SR = 0U;
+    port->active = false;
+    return NX_SUCCESS;
+}
 
 /** \brief Initialize only independent ADC, no trigger, DMA or hidden scan task.
  */
@@ -22,18 +172,30 @@ nx_result_t nx_stm32_adc_initialize(nx_stm32_adc_state_t* port) {
         port->reference_mv == 0U || port->active) {
         return NX_ERROR_INVALID;
     }
-    for (size_t i = 0U; i < port->channel_count; ++i) {
-        if (port->channels[i] > 15U || port->sample_times[i] > 7U) {
-            return NX_ERROR_UNSUPPORTED;
-        }
+    if (port->resolution > 3U) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    nx_result_t sequence =
+        nx_stm32_adc_sequence_validate(port->registers, port->channels,
+                                       port->sample_times, port->channel_count);
+    if (sequence != NX_SUCCESS)
+        return sequence;
+    if (nx_stm32_adc_internal_mask(port) != 0U &&
+        (port->cold_effects & NX_STM32_ADC_INTERNAL) == 0U)
+        return NX_ERROR_STATE;
+    if ((port->common->CCR & (ADC_CCR_MULTI | ADC_CCR_DMA | ADC_CCR_DDS)) !=
+            0U ||
+        LL_ADC_GetCommonClock(port->common) != NX_ADC_COMMON_CLOCK) {
+        return NX_ERROR_BUSY;
     }
     port->registers->CR2 = 0U;
     port->registers->CR1 = 0U;
+    LL_ADC_SetResolution(port->registers,
+                         (uint32_t)port->resolution << ADC_CR1_RES_Pos);
     port->registers->SQR1 = 0U;
     port->registers->SQR2 = 0U;
     port->registers->SQR3 = 0U;
     port->registers->SR = 0U;
-    LL_ADC_SetCommonClock(port->common, LL_ADC_CLOCK_SYNC_PCLK_DIV4);
     port->initialized = true;
     return NX_SUCCESS;
 }
@@ -45,7 +207,8 @@ nx_result_t nx_stm32_adc_info(const void* context, nx_adc_info_t* info) {
     if (port == NULL || !port->initialized || info == NULL) {
         return NX_ERROR_INVALID;
     }
-    *info = (nx_adc_info_t){.resolution_bits = 12U,
+    *info = (nx_adc_info_t){.resolution_bits =
+                                (uint8_t)(12U - 2U * port->resolution),
                             .reference_mv = port->reference_mv,
                             .channel_count = port->channel_count};
     return NX_SUCCESS;
@@ -61,7 +224,8 @@ nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
         return NX_ERROR_INVALID;
     }
     *count = 0U;
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
     if (deadline == NX_DEADLINE_NEVER) {
@@ -78,10 +242,18 @@ nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
      * Restore independent single-rank shots before enabling the converter.
      */
     port->registers->CR1 = 0U;
+    LL_ADC_SetResolution(port->registers,
+                         (uint32_t)port->resolution << ADC_CR1_RES_Pos);
     port->registers->SQR1 = 0U;
     port->registers->SQR2 = 0U;
     port->registers->CR2 = ADC_CR2_ADON;
-    nx_time_us_t stable = nx_deadline_after(nx_time_now_us(), 3U);
+    nx_arch_dsb();
+    if (LL_ADC_IsEnabled(port->registers) == 0U) {
+        (void)nx_stm32_adc_quiesce(port);
+        return NX_ERROR_IO;
+    }
+    nx_time_us_t stable = nx_deadline_after(
+        nx_time_now_us(), nx_stm32_adc_startup_delay_us(port));
     while (!nx_deadline_expired(stable, nx_time_now_us())) {
         NX_STM32_IO_POLL(5U, port);
     }
@@ -122,10 +294,10 @@ nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
             break;
         }
     }
-    port->registers->CR2 = 0U;
-    nx_arch_dsb();
-    port->registers->SR = 0U;
-    port->active = false;
+    nx_result_t stopped = nx_stm32_adc_quiesce(port);
+    if (stopped != NX_SUCCESS) {
+        return stopped;
+    }
     if (result == NX_SUCCESS &&
         nx_deadline_expired(deadline, nx_time_now_us())) {
         return NX_ERROR_TIMEOUT;

@@ -9,20 +9,8 @@ import urllib.parse
 import urllib.request
 
 EXCLUDED = {"archive", "locale", "_build", ".doctrees"}
-# Keep immutable execution narratives in place while the current site follows
-# the active support scope. Sphinx consumes this same explicit policy.
-HISTORICAL_PAGES = (
-    "design/documentation-improvements.md",
-    "delivery/build-system-verification.md",
-    "delivery/io-evolution-next-wave.md",
-    "delivery/soc-extensions-verification.md",
-    "delivery/soc-refinement-verification.md",
-    "delivery/verification.md",
-    "status/software-verification.md",
-    "status/release-0.1.0.md",
-    "status/documentation-acceptance.md",
-)
-HISTORICAL_PREFIXES = ("status/ledgers/",)
+HISTORICAL_PAGES = ()
+HISTORICAL_PREFIXES = ()
 LEGACY_SPHINX = {"index.rst", "api/index.rst", "api.rst", "getting_started.rst",
                  "architecture.rst", "configuration.rst", "migration.rst",
                  "os.rst", "support.rst", "development/index.rst"}
@@ -263,31 +251,6 @@ def validate_svg(path):
     diagrams.validate_svg(path.read_bytes())
 
 
-def validate_ledger(path):
-    with path.open() as stream:
-        rows = list(csv.DictReader(stream))
-    identifiers = [row["task_id"] for row in rows]
-    if len(set(identifiers)) != len(rows):
-        raise ValueError("duplicate task ID")
-    tasks = {row["task_id"]: row for row in rows}
-    visiting, visited = set(), set()
-
-    def visit(task):
-        if task in visiting:
-            raise ValueError("documentation dependency cycle")
-        if task in visited:
-            return
-        visiting.add(task)
-        for dependency in filter(None, tasks[task]["dependencies"].split(";")):
-            if dependency not in tasks:
-                raise ValueError("missing documentation dependency: " + dependency)
-            visit(dependency)
-        visiting.remove(task)
-        visited.add(task)
-
-    for task in tasks:
-        visit(task)
-    return rows
 
 
 def validate_translations(root, *, pot_root=None, languages=("en", "zh_CN"),
@@ -354,27 +317,6 @@ def external_links(urls, *, timeout=5, retries=1):
     return records
 
 
-def validate_maintained_sources(root):
-    """Check current authority mappings and unchanged retained ledger views."""
-    from tools.documentation import status
-    root = Path(root)
-    page = root / "docs/index.md"
-    current = (page.is_file()
-               and metadata(page.read_text()).get("id") == "index")
-    ledger_inputs = [root / "docs/status/ledgers"] + [
-        root / "docs/design" / filename
-        for filename, _, _ in status.SPECIFICATIONS]
-    selected_ledgers = current or any(
-        path.exists() or path.is_symlink() for path in ledger_inputs)
-    errors = []
-    if selected_ledgers:
-        errors.extend(status.generate(root, check=True)["errors"])
-    mapping_inputs = (root / "docs/design/documentation-migration.csv",
-                      root / "docs/reference/redirects.csv")
-    if selected_ledgers or any(path.exists() or path.is_symlink()
-                               for path in mapping_inputs):
-        errors.extend(status.check_mapping(root)["errors"])
-    return {"status": "failed" if errors else "passed", "errors": errors}
 
 
 def scan(root, *, check_diagrams=True, check_configuration=True,
@@ -481,34 +423,13 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
                     continue
             from tools.documentation import diagrams
             errors.extend(diagrams.check(root, full=False)["errors"])
-    ledger = root / "docs/design/documentation-system-execution.csv"
-    if ledger.is_file():
-        try:
-            rows = validate_ledger(ledger)
-            view = root / "docs/design/documentation-improvements.md"
-            if view.is_file():
-                contents = view.read_text()
-                for row in rows:
-                    expected = "| " + " | ".join(row[key].replace("|", "\\|") for key in
-                        ("task_id", "priority", "task", "exit_condition")) + " |"
-                    if contents.splitlines().count(expected) != 1:
-                        errors.append(row["task_id"] + ": checklist differs from ledger")
-        except (OSError, ValueError, KeyError) as error:
-            errors.append(str(error))
-    index = root / "docs/status/documentation-results.json"
-    if index.is_file() or ledger.is_file():
-        from tools.documentation import results
-        errors.extend(results.validate(root))
     try:
         dependencies(root, pages)
     except (OSError, UnicodeError, ValueError) as error:
         errors.append(str(error))
-    maintained = validate_maintained_sources(root)
-    errors.extend(maintained["errors"])
     probes = external_links(urls) if external else []
     return {"schema_version": 1, "kind": "nexus_documentation_source_check",
             "status": "failed" if errors else "passed", "errors": errors,
             "pages": len(pages), "page_ids": len(identifiers),
             "configuration_examples": config_records,
-            "maintained_sources": maintained,
             "external_links": probes, "qualification": False}

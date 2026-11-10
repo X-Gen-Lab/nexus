@@ -1,12 +1,14 @@
 /**
  * \file            i2c.c
- * \brief           STM32F407 I2C1 standard-mode messages and bounded abort
+ * \brief           STM32F407 standard-mode I2C messages and bounded abort
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "stm32f407_clock.h"
 #include "stm32f407_i2c_cold.h"
+#include "stm32f407_i2c_port.h"
 #include "stm32f407_provider.h"
 #include "stm32f4xx_ll_i2c.h"
 
@@ -32,10 +34,10 @@ nx_result_t nx_stm32_i2c_prepare(nx_stm32_i2c_state_t* port,
     if (result != NX_SUCCESS)
         return result;
     port->registers = config->registers;
-    port->line_gpio = GPIOB;
+    port->line_gpio = config->registers == I2C3 ? GPIOA : GPIOB;
     port->line_mask = (1U << config->pins[0].pin) | (1U << config->pins[1].pin);
     port->peripheral_mhz = config->clock_hz / 1000000U;
-    port->rate_hz = 100000U;
+    port->rate_hz = config->max_hz;
     result = nx_stm32_i2c_initialize(port);
     if (result == NX_SUCCESS) {
         receipt->effects |= NX_STM32_I2C_COLD_PREPARED;
@@ -88,19 +90,25 @@ nx_result_t nx_stm32_i2c_close(nx_stm32_i2c_state_t* port,
 #define NX_STM32_I2C_ADDRESS_CLEARED(port) ((void)(port))
 #endif
 
-/** \brief Apply only the reviewed 42 MHz / 100 kHz standard-mode profile. */
+/** \brief Apply the selected whole-MHz APB standard/Fast timing. */
 nx_result_t nx_stm32_i2c_initialize(nx_stm32_i2c_state_t* port) {
     if (port == NULL || port->registers == NULL || port->line_gpio == NULL ||
         port->line_mask == 0U || (port->line_mask & ~UINT32_C(0xFFFF)) != 0U) {
         return NX_ERROR_INVALID;
     }
-    if (port->peripheral_mhz != 42U || port->rate_hz != 100000U) {
+    uint16_t ccr;
+    uint8_t rise;
+    if (NEXUS_APB1_HZ % 1000000U != 0U ||
+        port->peripheral_mhz != NEXUS_APB1_HZ / 1000000U ||
+        port->peripheral_mhz < 2U || port->peripheral_mhz > 50U ||
+        !nx_i2c_v1_timing((uint8_t)port->peripheral_mhz, port->rate_hz, &ccr,
+                          &rise)) {
         return NX_ERROR_UNSUPPORTED;
     }
     port->registers->CR1 = 0U;
-    port->registers->CR2 = 42U;
-    port->registers->CCR = 210U;
-    port->registers->TRISE = 43U;
+    port->registers->CR2 = port->peripheral_mhz;
+    port->registers->CCR = ccr;
+    port->registers->TRISE = rise;
     port->registers->OAR1 = (1U << 14U);
     LL_I2C_Enable(port->registers);
     port->active = false;
@@ -255,8 +263,8 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
                                               size_t* transferred) {
     const nx_stm32_i2c_endpoint_state_t* endpoint = context;
     if (endpoint == NULL || endpoint->port == NULL ||
-        endpoint->address > 0x7FU || messages == NULL || count == 0U ||
-        transferred == NULL) {
+        !nx_i2c_v1_address_valid(endpoint->address, endpoint->address_bits) ||
+        messages == NULL || count == 0U || transferred == NULL) {
         return NX_ERROR_INVALID;
     }
     *transferred = 0U;
@@ -285,6 +293,11 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
         (port->registers->CR1 & I2C_CR1_PE) == 0U) {
         return NX_ERROR_STATE;
     }
+    if (endpoint->address_bits == 10U &&
+        !nx_i2c_v1_ten_timing((uint16_t)port->registers->CCR,
+                              (uint8_t)port->peripheral_mhz)) {
+        return NX_ERROR_UNSUPPORTED;
+    }
     if (nx_deadline_expired(deadline, nx_time_now_us())) {
         return NX_ERROR_TIMEOUT;
     }
@@ -306,8 +319,36 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
             (port->registers->CR1 & ~(uint32_t)(I2C_CR1_POS | I2C_CR1_START)) |
             I2C_CR1_ACK;
         start_requested = false;
-        NX_STM32_I2C_WRITE_DATA(port, ((uint32_t)endpoint->address << 1U) |
-                                          (messages[message].read ? 1U : 0U));
+        if (endpoint->address_bits == 10U) {
+            uint32_t header =
+                0xF0U | (((uint32_t)endpoint->address >> 7U) & 6U);
+            NX_STM32_I2C_WRITE_DATA(port, header);
+            result = wait_flag(port, I2C_SR1_ADD10, deadline);
+            if (result != NX_SUCCESS) {
+                break;
+            }
+            NX_STM32_I2C_WRITE_DATA(port, endpoint->address & 0xFFU);
+            result = wait_flag(port, I2C_SR1_ADDR, deadline);
+            if (result != NX_SUCCESS) {
+                break;
+            }
+            if (messages[message].read) {
+                /* The first ADDR is transmitter-side: release it solely for
+                 * the internal repeated START, without consuming payload. */
+                clear_address(port);
+                LL_I2C_GenerateStartCondition(port->registers);
+                result = wait_flag(port, I2C_SR1_SB, deadline);
+                if (result != NX_SUCCESS) {
+                    break;
+                }
+                port->registers->CR1 &= ~(uint32_t)I2C_CR1_START;
+                NX_STM32_I2C_WRITE_DATA(port, header | 1U);
+            }
+        } else {
+            NX_STM32_I2C_WRITE_DATA(port,
+                                    ((uint32_t)endpoint->address << 1U) |
+                                        (messages[message].read ? 1U : 0U));
+        }
         result = wait_flag(port, I2C_SR1_ADDR, deadline);
         if (result != NX_SUCCESS) {
             break;
@@ -378,7 +419,8 @@ nx_result_t nx_stm32_i2c_recover(void* context) {
     NX_STM32_IO_POLL(2U, port);
     if (result == NX_SUCCESS &&
         ((port->registers->SR2 & I2C_SR2_BUSY) != 0U ||
-         (port->line_gpio->IDR & port->line_mask) != port->line_mask)) {
+         !nx_stm32_i2c_lines_high(port->registers, &port->line_gpio->IDR,
+                                  port->line_mask))) {
         port->fault = true;
         return NX_ERROR_IO;
     }
@@ -395,7 +437,7 @@ static bool on_port(const void* context, const nx_i2c_port_t* port) {
     const nx_stm32_i2c_endpoint_state_t* endpoint = context;
     return endpoint != NULL && port != NULL && port->ops == &nx_stm32_i2c_ops &&
            port->context != NULL && endpoint->port == port->context &&
-           endpoint->address >= 8U && endpoint->address <= 119U;
+           nx_i2c_v1_address_valid(endpoint->address, endpoint->address_bits);
 }
 
 /** \brief One shared immutable method table for this execution mode. */

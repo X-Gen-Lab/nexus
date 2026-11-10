@@ -61,6 +61,7 @@ typedef struct {
     nx_eth_vlan_t vlan;
     uint32_t flags;
     uint32_t capture_flags;
+    uint32_t checksum_flags;
 } nx_eth_frames_rx_slot_t;
 /**
  * \brief Exact selected state; no legacy face/state/ops expansion.
@@ -111,6 +112,8 @@ typedef struct nx_eth_frames_mac {
     bool tx_closing;
     bool flush_started;
     bool retained;
+    bool mii;
+    bool checksum_offload;
 } nx_eth_frames_mac_t;
 extern const nx_eth_frames_ops_t nx_eth_frames_mac_ops;
 extern const nx_mdio_ops_t nx_eth_frames_mdio_ops;

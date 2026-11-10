@@ -1,4 +1,4 @@
-# Reviewed against the exact current canonical source and gettext messages.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,118 +7,94 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 542693c40a4fb8925085b37dc75fe303ade2e4fc08feda0f31c0a8bd1a8706ee\n"
+"X-Nexus-Source-SHA256: b70e60f88c0d5100a06a81ac267bd9a25f18a1363188fd49aa3f5bc7006f4187\n"
 
-#: docs/explanation/platform-architecture.md:9
 msgid "How the platform is assembled and executed"
 msgstr "平台如何装配与执行"
 
-#: docs/explanation/platform-architecture.md:11
 msgid ""
 "Nexus is a statically assembled C11 MCU platform. It separates reusable "
 "mechanisms from external product policy. One authored TOML selects exact "
-"hardware and optional adapters; immutable I/O faces expose the chosen private"
-" providers. The application owns execution and recovery. These are current "
-"design boundaries, not whole-platform physical qualification."
+"hardware and optional adapters; immutable I/O faces expose the chosen "
+"private providers. The application owns execution and recovery. These are "
+"current design boundaries, not whole-platform physical qualification."
 msgstr ""
-"Nexus 是静态装配的 C11 MCU 平台，将通用机制与外部产品策略分开。一份人工编写的 TOML 选择精确硬件与可选 adapter；不可变 I/O"
-" 接口面暴露所选私有提供者。应用负责执行与恢复。这些是当前设计边界，不代表整个平台已经取得物理资格。"
+"Nexus 是静态装配的 C11 MCU 平台，将通用机制与外部产品策略分开。一份人工编写的 TOML 选择精确硬件与可选 adapter；不可变 "
+"I/O 接口面暴露所选私有提供者。应用负责执行与恢复。这些是当前设计边界，不代表整个平台已经取得物理资格。"
 
-#: docs/explanation/platform-architecture.md:17
 msgid ""
 "![Current platform layers and external product "
 "boundary](../assets/diagrams/platform-architecture.svg)"
 msgstr "![当前平台分层与外部产品边界](../assets/diagrams/platform-architecture.svg)"
 
-#: docs/explanation/platform-architecture.md:17
 msgid "Current platform layers and external product boundary"
 msgstr "当前平台分层与外部产品边界"
 
-#: docs/explanation/platform-architecture.md:19
 msgid ""
 "FIG-01 expresses current layer responsibilities. Arrows describe labeled "
 "dependencies or access; it is not an initialization sequence."
 msgstr "FIG-01 表达当前各层责任。箭头描述已标明的依赖或访问，不是初始化顺序。"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Layer"
 msgstr "层"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "State and responsibility"
 msgstr "状态与责任"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Core"
 msgstr "Core"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Results, monotonic deadline, request publication and stable epochs"
 msgstr "结果、绝对单调截止时间、请求发布与稳定 epoch"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Arch"
 msgstr "Arch"
 
-#: docs/explanation/platform-architecture.md:0
 msgid ""
-"Compile-time CPU primitives; incoming masks, barriers, optional Cache/MPU/SAU"
+"Compile-time CPU primitives; incoming masks, barriers, optional "
+"Cache/MPU/SAU"
 msgstr "编译期 CPU 原语；输入中断掩码、屏障和可选缓存／MPU／SAU"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "SoC"
 msgstr "SoC"
 
-#: docs/explanation/platform-architecture.md:0
 msgid ""
 "Exact chip clocks, memory, startup, IRQ/DMA and controller implementation"
 msgstr "精确芯片时钟、内存、启动、IRQ／DMA 和控制器实现"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Board"
 msgstr "Board"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Reviewed PCB routes, oscillator/safe-level facts and explicit unknowns"
 msgstr "已审查 PCB 路由、晶振／安全电平事实及明确未知项"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "I/O"
 msgstr "I/O"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Typed public faces and operation contracts; no vendor layout"
 msgstr "类型化公共接口面与操作合同；不暴露厂商布局"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Optional OS/owner"
 msgstr "可选 OS／owner"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Explicit per-object wait, task or shared-resource execution storage"
 msgstr "显式逐对象等待、任务或共享资源执行存储"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Optional component"
 msgstr "可选组件"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Bounded algorithms through narrow ports"
 msgstr "通过窄端口实现有界算法"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "External product"
 msgstr "外部产品"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Main, workers, roles, private PCB, budgets, partitions and recovery"
 msgstr "main、执行任务、角色、私有 PCB、预算、分区与恢复"
 
-#: docs/explanation/platform-architecture.md:33
 msgid "Current source organization"
 msgstr "当前源码组织"
 
-#: docs/explanation/platform-architecture.md:35
 msgid ""
 "The production MCU tree contains one series package, `soc/stm32/stm32f4/`. "
 "Its current concrete implementations remain limited to STM32F407VET6 and "
@@ -128,33 +104,42 @@ msgstr ""
 "生产 MCU 树只有一个系列包：`soc/stm32/stm32f4/`。当前具体实现仍限于 STM32F407VET6 和 "
 "STM32F407ZGT6；系列目录或官方 HAL 宏不能证明已支持其他精确料号或模式。"
 
-#: docs/explanation/platform-architecture.md:40
 msgid ""
 "Private IP sources now belong to the F4 package. SoC targets select and "
 "compile those sources directly; source ownership adds no runtime dispatch "
-"layer. Native models live under `tests/support/native/` and require explicit "
-"`test_support=True`, CLI `--test-support` or `NEXUS_TEST_SUPPORT=ON` in "
+"layer. Native models live under `tests/support/native/` and require explicit"
+" `test_support=True`, CLI `--test-support` or `NEXUS_TEST_SUPPORT=ON` in "
 "CMake. They are test support, not a second production SoC."
 msgstr ""
 "私有 IP 源码现归 F4 包所有。SoC 目标直接选择和编译这些源码；源码归属不会增加运行时分派层。Native 模型位于 "
 "`tests/support/native/`，须显式使用 `test_support=True`、CLI `--test-support` 或 "
 "CMake 的 `NEXUS_TEST_SUPPORT=ON`。它们是测试支持，不是第二个生产 SoC。"
 
-#: docs/explanation/platform-architecture.md:52
+msgid ""
+"The [source map](source-map.md) links authoritative layer contracts. Board "
+"and SoC directories contain no Python plugins. The default host generator "
+"uses Python for validation and static connections. Core's handwritten C "
+"platform coordinator owns startup, stop, rollback and diagnostics; F4's "
+"private C coordinator owns System and shared-resource sequencing. There is "
+"one maintained host configuration implementation; its code is not linked "
+"into firmware."
+msgstr ""
+"[源码定位](source-map.md)链接各层权威合同。Board 和 SoC 目录不含 Python 插件。默认主机生成器使用 Python "
+"校验配置并生成静态连接。Core 的手写 C 平台协调器负责启动、停止、回滚和诊断；F4 私有 C 协调器负责 System "
+"和共享资源顺序。主机配置只维护一套实现，其代码不链接到固件。"
+
 msgid ""
 "All vendor sources, Gitlinks, locks and licenses remain available. Only "
-"selected dependencies enter preparation, verification, compilation or Source "
-"SDK output. An unused SDK is neither current platform support nor a required "
-"F4 build input."
+"selected dependencies enter preparation, verification, compilation or Source"
+" SDK output. An unused SDK is neither current platform support nor a "
+"required F4 build input."
 msgstr ""
 "全部厂商源码、Gitlink、锁和许可证继续保留。只有所选依赖进入准备、验证、编译或 Source SDK 输出。未选用的 SDK "
 "既不表示当前平台支持，也不是 F4 构建的必需输入。"
 
-#: docs/explanation/platform-architecture.md:56
 msgid "Optional network data and boot boundaries"
 msgstr "可选网络数据与 boot 边界"
 
-#: docs/explanation/platform-architecture.md:58
 msgid ""
 "Optional network targets keep copied RX and payload-loaned RX as distinct, "
 "explicit stack profiles; one image selects one profile. The copied TCP byte "
@@ -162,10 +147,10 @@ msgid ""
 "frame instead has a copied writable prefix and immutable MAC-backed tails. "
 "Final pbuf free marks release readiness; the serialized owner performs the "
 "actual MAC release later. Outstanding references or failed release retain "
-"storage and withdrawal responsibility. The {ref}`network composition contract"
-" <lwip-loaned-rx-contract>` owns the exact public/Storage targets, capacities"
-" and failure rules. These optional components fit FIG-01's component boundary"
-" without adding a worker or runtime registry."
+"storage and withdrawal responsibility. The {ref}`network composition "
+"contract <lwip-loaned-rx-contract>` owns the exact public/Storage targets, "
+"capacities and failure rules. These optional components fit FIG-01's "
+"component boundary without adding a worker or runtime registry."
 msgstr ""
 "可选网络 target 将复制 RX 与负载借用 RX 保持为独立、显式选择的协议栈配置；每个镜像选择一种配置。复制 TCP "
 "字节接口面将已接纳的写入复制到有界协议栈存储。负载借用 RX 帧则有复制的可写前缀和不可变的 MAC 原始负载尾段。最后一次 pbuf free "
@@ -173,7 +158,6 @@ msgstr ""
 "loaned-rx-contract>`负责定义精确的公共／Storage target、容量和失败规则。这些可选组件符合 FIG-01 "
 "的组件边界，不增加 worker 或运行时注册表。"
 
-#: docs/explanation/platform-architecture.md:69
 msgid ""
 "MCUboot exposes distinct control and full-boot targets. The reference links "
 "the application and bootloader as separate images. The generic C11 control "
@@ -184,97 +168,83 @@ msgid ""
 "diagram](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/components/mcuboot/README.md) own those dependencies and product "
 "reset/recovery duties. The selected profile provides permanent overwrite "
-"only; partial trailer writes leave product recovery responsibility and imply "
-"no rollback. The {ref}`control API <mcuboot-control-contract>` neither "
+"only; partial trailer writes leave product recovery responsibility and imply"
+" no rollback. The {ref}`control API <mcuboot-control-contract>` neither "
 "authenticates candidate bytes nor starts hardware. Source documentation, "
-"software models and linked budgets do not establish new firmware-candidate or"
-" physical HIL qualification."
+"software models and linked budgets do not establish new firmware-candidate "
+"or physical HIL qualification."
 msgstr ""
-"MCUboot 提供独立的控制与完整 boot target；参考配置将应用与 bootloader 链接为两个独立镜像。通用 C11 控制 target"
-" 请求或查询 trailer 状态；显式具体 Flash port 为每次 operation 使用调用方持有的 region、有效时钟和一个有限 "
-"deadline。只有独立 boot 镜像选择校验与覆盖复制代码。[MCUboot "
+"MCUboot 提供独立的控制与完整 boot target；参考配置将应用与 bootloader 链接为两个独立镜像。通用 C11 控制 "
+"target 请求或查询 trailer 状态；显式具体 Flash port 为每次 operation 使用调用方持有的 "
+"region、有效时钟和一个有限 deadline。只有独立 boot 镜像选择校验与覆盖复制代码。[MCUboot "
 "权威合同及所有权图](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/components/mcuboot/README.md)负责定义这些依赖，以及产品复位／恢复责任。所选配置仅提供永久覆盖；部分 "
 "trailer 写入仍留下产品恢复责任，不代表有回滚。{ref}`控制 API <mcuboot-control-"
 "contract>`不鉴别候选字节，也不启动硬件。源码文档、软件模型和链接预算不建立新的固件候选或物理 HIL 资格。"
 
-#: docs/explanation/platform-architecture.md:82
 msgid "Platform and CPU-only Runtime"
 msgstr "Platform 与仅 CPU 的 Runtime"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Consumption entry"
 msgstr "消费入口"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Provided assembly"
 msgstr "提供的装配"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "External responsibility"
 msgstr "外部责任"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "`Nexus::Platform`"
 msgstr "`Nexus::Platform`"
 
-#: docs/explanation/platform-architecture.md:0
 msgid ""
 "Exact SoC/Board facts, selected providers, static factory and explicit "
 "lifecycle"
 msgstr "精确 SoC／Board 事实、所选 provider、静态 factory 与显式生命周期"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Product sources, workers, budgets, storage regions and recovery"
 msgstr "产品源码、执行任务、预算、存储区域与恢复"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "`Nexus::Runtime`"
 msgstr "`Nexus::Runtime`"
 
-#: docs/explanation/platform-architecture.md:0
 msgid "Core, Arch, public I/O faces and the explicitly selected OS adapter"
 msgstr "Core、Arch、公共 I/O 接口面与显式选择的 OS adapter"
 
-#: docs/explanation/platform-architecture.md:0
 msgid ""
 "Startup, vectors, memory/clock facts, Board wiring and concrete device "
 "providers"
 msgstr "启动、向量、内存／时钟事实、Board 接线及具体设备 provider"
 
-#: docs/explanation/platform-architecture.md:89
 msgid ""
 "One build directory admits one resolved assembly. Use separate build "
 "directories for different boards or CPU/security images; a product build "
-"coordinator or CI matrix owns their orchestration. Runtime and Platform reuse"
-" the same production mechanisms but are separate consumption modes."
+"coordinator or CI matrix owns their orchestration. Runtime and Platform "
+"reuse the same production mechanisms but are separate consumption modes."
 msgstr ""
 "一个构建目录只接纳一份解析后的装配。不同板卡或 CPU／安全域镜像使用独立构建目录，由产品构建协调器或 CI 矩阵编排。Runtime 与 "
 "Platform 复用相同生产机制，但属于不同的消费模式。"
 
-#: docs/explanation/platform-architecture.md:94
 msgid ""
 "The common OS boundary is the wait/wake port. Task, queue, join and storage "
-"APIs remain backend-specific, including the real kernel control-block types. "
-"Products switching kernels must adapt that lifecycle explicitly; no universal"
-" object pool or hidden scheduling task is supplied."
+"APIs remain backend-specific, including the real kernel control-block types."
+" Products switching kernels must adapt that lifecycle explicitly; no "
+"universal object pool or hidden scheduling task is supplied."
 msgstr ""
 "共同 OS 边界是等待／唤醒端口。任务、队列、join 和存储 API "
 "仍为后端专用，包括真实内核控制块类型。产品切换内核时必须显式适配生命周期；平台不提供统一对象池或隐藏调度任务。"
 
-#: docs/explanation/platform-architecture.md:99
 msgid "Build-time decisions and runtime work"
 msgstr "构建期决策与运行时工作"
 
-#: docs/explanation/platform-architecture.md:101
 msgid ""
 "TOML schema 2 is the only authored platform input. The parser freezes user "
 "intent as `AuthoredAssembly`; `resolve_ir()` combines it with reviewed "
 "SoC/Board facts and validates modes, resources, clocks, IRQs, ABI, DMA "
-"reachability and budgets. It returns `ConfigurationIR` directly. Named frozen"
-" records hold each decision once; they do not expose a Mapping facade or a "
-"duplicate `values` store. Hardware fact leaves and keyed indexes still use "
-"immutable mappings, and local resolver validation drafts may use "
+"reachability and budgets. It returns `ConfigurationIR` directly. Named "
+"frozen records hold each decision once; they do not expose a Mapping facade "
+"or a duplicate `values` store. Hardware fact leaves and keyed indexes still "
+"use immutable mappings, and local resolver validation drafts may use "
 "dictionaries. These are explicit data boundaries, not a promise to assign a "
 "separate nominal type to every JSON field."
 msgstr ""
@@ -284,238 +254,34 @@ msgstr ""
 "`values`。硬件事实叶数据和按键索引仍使用不可变 mapping，resolver 的局部校验草稿也可用字典。这些是明确的数据边界，不承诺为每个 "
 "JSON 字段创建独立名义类型。"
 
-#: docs/explanation/platform-architecture.md:110
 msgid ""
 "Factory and emitters consume the same typed result. `to_dict()` derives the "
-"schema-1 `resolved.json` audit/artifact projection; it is never read back as "
-"an authored platform input. Private typed source epoch 2 is separate from "
+"schema-1 `resolved.json` audit/artifact projection; it is never read back as"
+" an authored platform input. Private typed source epoch 2 is separate from "
 "that serialized format and from the public C factory epoch. Old JSON "
 "assemblies are rejected. Historical evidence keeps its original bytes and "
 "read-only verification. CMake owns the source dependency graph; resolution "
 "does not discover software from device names or generate product workers."
 msgstr ""
 "Factory 和 emitter 消费同一类型化结果。`to_dict()` 派生 schema-1 `resolved.json` "
-"审计／产物投影，绝不会将其读回为人工编写的平台输入。私有 typed source epoch 2 与该序列化格式、公共 C factory epoch "
-"分别计代。旧 JSON 装配会被拒绝。历史证据保留原字节与只读校验。CMake 拥有源码依赖图；解析不会从设备名称发现软件，也不会生成产品 worker。"
+"审计／产物投影，绝不会将其读回为人工编写的平台输入。私有 typed source epoch 2 与该序列化格式、公共 C factory epoch"
+" 分别计代。旧 JSON 装配会被拒绝。历史证据保留原字节与只读校验。CMake 拥有源码依赖图；解析不会从设备名称发现软件，也不会生成产品 "
+"worker。"
 
-#: docs/explanation/platform-architecture.md:118
 msgid ""
 "Firmware execution is C11 plus necessary architecture assembly. Python runs "
-"on the host to validate inputs and generate static C/H; the MCU has no Python"
-" interpreter. Hardware algorithms belong in C: register access, admission, "
-"waits, resource acquisition, rollback, stop and recovery. Generation connects"
-" immutable configuration, exact instances, factory getters and fixed IRQ "
-"handlers. Constant addresses and thin typed call sequences can remain "
-"generated without adding a runtime interpreter or another dispatch layer."
+"on the host to validate inputs and generate static C/H; the MCU has no "
+"Python interpreter. Hardware algorithms belong in C: register access, "
+"admission, waits, resource acquisition, rollback, stop and recovery. "
+"Generation connects immutable configuration, exact instances, factory "
+"getters and fixed IRQ handlers. Constant addresses and thin typed call "
+"sequences can remain generated without adding a runtime interpreter or "
+"another dispatch layer."
 msgstr ""
 "固件执行使用 C11 和必要的架构汇编。Python 在主机上校验输入并生成静态 C/H；MCU 不包含 Python 解释器。硬件算法归 C "
 "实现：寄存器访问、准入、等待、资源取得、回滚、停止和恢复。生成器连接不可变配置、精确实例、factory getter 和固定 IRQ "
 "handler。常量地址与简短的类型化调用序列可以继续生成，不增加运行时解释器或另一层分派。"
 
-#: docs/explanation/platform-architecture.md:132
-msgid ""
-"A cold receipt proves which resources this caller actually acquired. "
-"Rejection with an empty receipt cannot stop or overwrite an existing owner. "
-"Partial acquisition and failed restoration retain the original snapshot and "
-"unfinished effects for retry; a public peripheral stop does not discard the "
-"enclosing Platform lease. These checks run on the real C helpers in the "
-"register models. Factory lookup and ordinary I/O retain their existing direct"
-" typed paths."
-msgstr ""
-"冷态收据证明调用者实际取得了哪些资源。获取被拒绝且收据为空时，不能停止或覆盖已有 "
-"owner。部分取得和恢复失败会保留原始快照及未完成的效果，供后续重试；公开外设接口的停止不会丢弃外层 Platform "
-"租约。这些检查通过寄存器模型执行真实 C 辅助函数。Factory 查询与普通 I/O 继续使用现有直接类型化路径。"
-
-#: docs/explanation/platform-architecture.md:139
-msgid ""
-"Generated static C and maintained C use the same firmware toolchain. Moving "
-"an algorithm changes its maintenance and test ownership; it does not promise "
-"a universal resource reduction. The recorded F407 I2C owner-guard comparison "
-"saves RAM while increasing IRQ/DMA Flash. Linked costs and physical timing "
-"retain their own source, configuration and measurement requirements."
-msgstr ""
-"生成的静态 C 与维护中的 C 使用同一固件工具链。迁移算法改变的是维护和测试责任，并不保证所有配置的资源占用都下降。已记录的 F407 I2C "
-"owner 防护对照节省 RAM，但增加 IRQ／DMA 的 Flash 占用。链接资源成本与物理时序各自保留源码、配置和测量要求。"
-
-#: docs/explanation/platform-architecture.md:145
-msgid ""
-"![Actual compile-target dependency relationships](../assets/diagrams/build-"
-"targets.svg)"
-msgstr "![实际编译目标依赖关系](../assets/diagrams/build-targets.svg)"
-
-#: docs/explanation/platform-architecture.md:145
-msgid "Actual compile-target dependency relationships"
-msgstr "实际编译目标依赖关系"
-
-#: docs/explanation/platform-architecture.md:147
-msgid ""
-"FIG-02 is the checked compile graph. Vendor and provider includes remain "
-"private; public consumers receive Nexus types and selected compile/link "
-"policy."
-msgstr "FIG-02 是已核对的编译图。厂商和提供者包含路径保持私有；公共消费工程获得 Nexus 类型及所选编译／链接策略。"
-
-#: docs/explanation/platform-architecture.md:150
-msgid ""
-"![Authored inputs, atomic generation and firmware "
-"artifacts](../assets/diagrams/configuration-generation.svg)"
-msgstr "![编写的输入、原子生成与固件产物](../assets/diagrams/configuration-generation.svg)"
-
-#: docs/explanation/platform-architecture.md:150
-msgid "Authored inputs, atomic generation and firmware artifacts"
-msgstr "编写的输入、原子生成与固件产物"
-
-#: docs/explanation/platform-architecture.md:152
-msgid ""
-"FIG-03 shows current generation. Unknown and conflicting selections fail; no "
-"Kconfig/cache/old-header fallback repairs them. Runtime factory lookup "
-"returns an existing face. After explicit successful platform start, ordinary "
-"operations call its shared ops table with its instance context. IRQ dispatch "
-"is fixed to provider instances and does not repeat factory lookup for every "
-"byte."
-msgstr ""
-"FIG-03 表达当前生成流程。未知或冲突选择必须失败；不得通过 "
-"Kconfig／缓存／旧头文件回退修补。运行时类型化工厂查找返回已有接口面。平台显式启动成功后，普通操作通过共享 ops 表调用该实例上下文。IRQ "
-"分发固定到提供者实例，不为每个字节重复执行工厂查找。"
-
-#: docs/explanation/platform-architecture.md:158
-msgid ""
-"The explicit F4 descriptor is `tools/configure/stm32f4_descriptor.py`; the "
-"centralized configuration adapter lives under `tools/configure/stm32f4/`. "
-"Production family enumeration contains only F4; Native uses an explicit test-"
-"support context. Descriptors identify inputs and selected code, without "
-"becoming a second source graph."
-msgstr ""
-"显式 F4 descriptor 位于 `tools/configure/stm32f4_descriptor.py`，集中维护的配置适配器位于 "
-"`tools/configure/stm32f4/`。生产系列枚举只有 F4；Native 使用显式测试支持上下文。Descriptor "
-"标识输入和所选代码，不成为第二份源码图。"
-
-#: docs/explanation/platform-architecture.md:163
-msgid ""
-"The constructor contract uses named immutable IR and direct calls for fixed "
-"connections. Vendor types and mutable Handles stay private. Generated "
-"definitions still require compiler, model and linked-image validation. The "
-"selected F407 UART `dma-tx` transport combines finite official HAL TX and "
-"disjoint LL IRQ RX under one owner. Other modes retain their explicit "
-"implementations. See the [official driver contract](../design/official-"
-"stm32-provider.md)."
-msgstr ""
-"构造合同使用不可变具名 IR 与直接调用建立固定连接。厂商类型及可变 Handle 保持私有。生成定义仍须经过编译器、模型与链接镜像验证。所选 F407 "
-"UART `dma-tx` transport 在同一所有者下组合有限官方 HAL TX 与职责不重叠的 LL IRQ "
-"RX。其他模式保留各自明确实现。参阅[官方驱动合同](../design/official-stm32-provider.md)。"
-
-#: docs/explanation/platform-architecture.md:170
-msgid "Lifecycle and failure responsibility"
-msgstr "生命周期与失败责任"
-
-#: docs/explanation/platform-architecture.md:172
-msgid ""
-"![Current initialization, failure withdrawal and retained cleanup "
-"responsibility](../assets/diagrams/platform-lifecycle.svg)"
-msgstr "![当前初始化、失败撤回与保留的清理责任](../assets/diagrams/platform-lifecycle.svg)"
-
-#: docs/explanation/platform-architecture.md:172
-msgid ""
-"Current initialization, failure withdrawal and retained cleanup "
-"responsibility"
-msgstr "当前初始化、失败撤回与保留的清理责任"
-
-#: docs/explanation/platform-architecture.md:174
-msgid ""
-"FIG-05 shows explicit startup and reverse cleanup. A static face can exist "
-"before start and after stop; its pointer is not a capability to execute cold "
-"hardware. Partial failure can retain irreversible watchdog effects or busy "
-"borrows. Products must inspect primary and cleanup outcomes, continue the "
-"real executor, and retain quarantined resources. Platform start never starts "
-"a scheduler."
-msgstr ""
-"FIG-05 表达显式启动与逆序清理。静态接口面可以在启动前和停止后存在；其指针不授予操作未启动硬件的权限。部分失败可能留下不可逆 watchdog "
-"效果或活跃借用。产品必须检查主要结果与清理结果，继续运行真实执行器，并保留隔离资源。平台启动从不启动调度器。"
-
-#: docs/explanation/platform-architecture.md:180
-msgid ""
-"Physical Flash reports exact geometry and `program_flags`. An ECC fresh-erase"
-" requirement belongs to the caller's provenance contract: all-FF readback "
-"cannot prove unused ECC state, and a failed pulse requires another erase. "
-"All-FF source units issue no pulse. A started pulse must settle before "
-"return; an expired deadline prevents later pulses and never cancels hardware "
-"already programming. Products own writable regions, voltage, execution "
-"stalls, watchdog and power loss."
-msgstr ""
-"物理 Flash 报告精确 geometry 和 `program_flags`。ECC fresh-erase 是调用方的真实历史合同：全 FF "
-"读回不能证明 ECC 未被编程，失败脉冲后必须重新擦除。全 FF 输入单元不产生脉冲。已启动的脉冲必须先排空才能返回；过期 deadline "
-"只能阻止后续脉冲，不能取消正在编程的硬件。产品负责可写 region、电压、执行停顿、watchdog 与掉电策略。"
-
-#: docs/explanation/platform-architecture.md:187
-msgid ""
-"Optional generated diagnosed start/stop entries write phase and controller "
-"location to caller-owned cold-path storage. They retain no diagnostic pointer"
-" and do not replace the primary/cleanup results or remaining-effect "
-"obligations. See [the diagnostic contract](../design/official-"
-"stm32-provider.md) for index meaning and failure responsibilities. The "
-"{ref}`factory diagnostic mapping <factory-controller-diagnostics>` adds named"
-" assembly-local ordinals and optional immutable labels; it does not create a "
-"device-ready state machine or a second capability object."
-msgstr ""
-"可选生成的 diagnosed start/stop 入口把 phase 与 controller 位置写入调用者拥有的冷态存储。不保留 "
-"diagnostic 指针，也不替代 primary/cleanup "
-"结果或剩余影响责任。索引含义和失败责任见[诊断合同](../design/official-"
-"stm32-provider.md)。{ref}`Factory 诊断映射 <factory-controller-"
-"diagnostics>`增加装配局部具名序号和可选不可变标签，不建立 device-ready 状态机或第二个 capability 对象。"
-
-#: docs/explanation/platform-architecture.md:196
-msgid "Costs and tradeoffs"
-msgstr "成本与取舍"
-
-#: docs/explanation/platform-architecture.md:198
-msgid ""
-"A 32-bit face contains two pointers: eight bytes of readonly storage. "
-"Provider/mode ops are shared; exact mutable state and selected buffers remain"
-" separate. Indirection lets one public interface serve independent concrete "
-"providers and GoogleMock ports. Its cost is one public dispatch and "
-"code/readonly table retention; actual Flash/RAM and timing are measured on "
-"the selected linked image."
-msgstr ""
-"32 位接口面包含两个指针，占用八字节只读存储。提供者／模式的 ops 共享；精确可变状态与所选缓冲区分开。间接调用允许同一公共接口服务独立具体提供者与 "
-"GoogleMock 端口。成本是一次公共分发以及保留代码／只读表；实际 Flash／RAM 与时序必须在所选链接镜像上测量。"
-
-#: docs/explanation/platform-architecture.md:204
-msgid ""
-"Static assembly rejects conflicts early and prunes unselected drivers. It "
-"deliberately forgoes hotplug discovery, runtime string registries, arbitrary "
-"dynamic clock changes and automatic recovery policy. Optional shared owners "
-"add explicitly budgeted slots and synchronization; direct single-executor "
-"paths need no default OS lock or worker."
-msgstr ""
-"静态装配提前拒绝冲突，裁剪未选择驱动。它不提供热插拔发现、运行时字符串注册表、任意动态时钟变化或自动恢复策略。可选共享 owner "
-"增加显式预算的槽与同步；直接单执行器路径不需要默认 OS 锁或执行任务。"
-
-#: docs/explanation/platform-architecture.md:209
-msgid ""
-"Read [factory](factory.md), [ownership](ownership.md), the [integration "
-"contract](../design/integration-contracts.md) and [exact "
-"support](../reference/platforms/support.md). Architecture diagrams explain "
-"mechanisms; tests, image checks and HIL establish their separate execution "
-"scopes."
-msgstr ""
-"阅读[类型化工厂](factory.md)、[所有权](ownership.md)、[接入合同](../design/integration-"
-"contracts.md)和[精确支持范围](../reference/platforms/support.md)。架构图解释机制；测试、镜像检查和 "
-"HIL 分别建立各自执行范围。"
-
-#: docs/explanation/platform-architecture.md:46
-msgid ""
-"The [source map](source-map.md) links authoritative layer contracts. Board "
-"and SoC directories contain no Python plugins. The default host generator "
-"uses Python for validation and static connections. Core's handwritten C "
-"platform coordinator owns startup, stop, rollback and diagnostics; F4's "
-"private C coordinator owns System and shared-resource sequencing. The "
-"independent Host C11 tool is an optional pilot, not a prerequisite for "
-"firmware behavior in C or software delivery."
-msgstr ""
-"[源码定位](source-map.md)链接各层权威合同。Board 和 SoC 目录没有 Python 插件。默认主机生成器使用 Python "
-"进行校验与静态连接。Core 的手写 C 整平台协调器负责启动、停止、回滚与诊断；F4 私有 C 协调器负责 System 与共享资源顺序。独立 "
-"Host C11 工具是可选试点，不是固件行为采用 C 或软件交付的前置条件。"
-
-#: docs/explanation/platform-architecture.md:127
 msgid ""
 "F4 C owners implement admission, acquired-resource receipts, withdrawal and "
 "readback. The default generated plan connects fixed typed callbacks and "
@@ -531,3 +297,173 @@ msgstr ""
 "controller 顺序中的 ordinal 连接到 `nx_platform_lifecycle_start/stop`；C "
 "引擎维护控制流，并只重试保留的前缀。既有 `nx_lifecycle_*` 可撤销资源引擎仍是独立可选机制。Native 明确限定为测试支撑。实际生成 "
 "factory、模型和 ARM 镜像各自需要验证；历史跨系列结果不授予本次重构资格。"
+
+msgid ""
+"A cold receipt proves which resources this caller actually acquired. "
+"Rejection with an empty receipt cannot stop or overwrite an existing owner. "
+"Partial acquisition and failed restoration retain the original snapshot and "
+"unfinished effects for retry; a public peripheral stop does not discard the "
+"enclosing Platform lease. These checks run on the real C helpers in the "
+"register models. Factory lookup and ordinary I/O retain their existing "
+"direct typed paths."
+msgstr ""
+"冷态收据证明调用者实际取得了哪些资源。获取被拒绝且收据为空时，不能停止或覆盖已有 "
+"owner。部分取得和恢复失败会保留原始快照及未完成的效果，供后续重试；公开外设接口的停止不会丢弃外层 Platform "
+"租约。这些检查通过寄存器模型执行真实 C 辅助函数。Factory 查询与普通 I/O 继续使用现有直接类型化路径。"
+
+msgid ""
+"Generated static C and maintained C use the same firmware toolchain. Moving "
+"an algorithm changes its maintenance and test ownership; it does not promise"
+" a universal resource reduction. The recorded F407 I2C owner-guard "
+"comparison saves RAM while increasing IRQ/DMA Flash. Linked costs and "
+"physical timing retain their own source, configuration and measurement "
+"requirements."
+msgstr ""
+"生成的静态 C 与维护中的 C 使用同一固件工具链。迁移算法改变的是维护和测试责任，并不保证所有配置的资源占用都下降。已记录的 F407 I2C "
+"owner 防护对照节省 RAM，但增加 IRQ／DMA 的 Flash 占用。链接资源成本与物理时序各自保留源码、配置和测量要求。"
+
+msgid ""
+"![Actual compile-target dependency relationships](../assets/diagrams/build-"
+"targets.svg)"
+msgstr "![实际编译目标依赖关系](../assets/diagrams/build-targets.svg)"
+
+msgid "Actual compile-target dependency relationships"
+msgstr "实际编译目标依赖关系"
+
+msgid ""
+"FIG-02 is the checked compile graph. Vendor and provider includes remain "
+"private; public consumers receive Nexus types and selected compile/link "
+"policy."
+msgstr "FIG-02 是已核对的编译图。厂商和提供者包含路径保持私有；公共消费工程获得 Nexus 类型及所选编译／链接策略。"
+
+msgid ""
+"![Authored inputs, atomic generation and firmware "
+"artifacts](../assets/diagrams/configuration-generation.svg)"
+msgstr "![编写的输入、原子生成与固件产物](../assets/diagrams/configuration-generation.svg)"
+
+msgid "Authored inputs, atomic generation and firmware artifacts"
+msgstr "编写的输入、原子生成与固件产物"
+
+msgid ""
+"FIG-03 shows current generation. Unknown and conflicting selections fail; no"
+" Kconfig/cache/old-header fallback repairs them. Runtime factory lookup "
+"returns an existing face. After explicit successful platform start, ordinary"
+" operations call its shared ops table with its instance context. IRQ "
+"dispatch is fixed to provider instances and does not repeat factory lookup "
+"for every byte."
+msgstr ""
+"FIG-03 表达当前生成流程。未知或冲突选择必须失败；不得通过 "
+"Kconfig／缓存／旧头文件回退修补。运行时类型化工厂查找返回已有接口面。平台显式启动成功后，普通操作通过共享 ops 表调用该实例上下文。IRQ "
+"分发固定到提供者实例，不为每个字节重复执行工厂查找。"
+
+msgid ""
+"The explicit F4 descriptor is `tools/configure/stm32f4_descriptor.py`; the "
+"centralized configuration adapter lives under `tools/configure/stm32f4/`. "
+"Production family enumeration contains only F4; Native uses an explicit "
+"test-support context. Descriptors identify inputs and selected code, without"
+" becoming a second source graph."
+msgstr ""
+"显式 F4 descriptor 位于 `tools/configure/stm32f4_descriptor.py`，集中维护的配置适配器位于 "
+"`tools/configure/stm32f4/`。生产系列枚举只有 F4；Native 使用显式测试支持上下文。Descriptor "
+"标识输入和所选代码，不成为第二份源码图。"
+
+msgid ""
+"The constructor contract uses named immutable IR and direct calls for fixed "
+"connections. Vendor types and mutable Handles stay private. Generated "
+"definitions still require compiler, model and linked-image validation. The "
+"selected F407 UART `dma-tx` transport combines finite official HAL TX and "
+"disjoint LL IRQ RX under one owner. Other modes retain their explicit "
+"implementations. See the [official driver contract](../design/official-"
+"stm32-provider.md)."
+msgstr ""
+"构造合同使用不可变具名 IR 与直接调用建立固定连接。厂商类型及可变 Handle 保持私有。生成定义仍须经过编译器、模型与链接镜像验证。所选 F407"
+" UART `dma-tx` transport 在同一所有者下组合有限官方 HAL TX 与职责不重叠的 LL IRQ "
+"RX。其他模式保留各自明确实现。参阅[官方驱动合同](../design/official-stm32-provider.md)。"
+
+msgid "Lifecycle and failure responsibility"
+msgstr "生命周期与失败责任"
+
+msgid ""
+"![Current initialization, failure withdrawal and retained cleanup "
+"responsibility](../assets/diagrams/platform-lifecycle.svg)"
+msgstr "![当前初始化、失败撤回与保留的清理责任](../assets/diagrams/platform-lifecycle.svg)"
+
+msgid ""
+"Current initialization, failure withdrawal and retained cleanup "
+"responsibility"
+msgstr "当前初始化、失败撤回与保留的清理责任"
+
+msgid ""
+"FIG-05 shows explicit startup and reverse cleanup. A static face can exist "
+"before start and after stop; its pointer is not a capability to execute cold"
+" hardware. Partial failure can retain irreversible watchdog effects or busy "
+"borrows. Products must inspect primary and cleanup outcomes, continue the "
+"real executor, and retain quarantined resources. Platform start never starts"
+" a scheduler."
+msgstr ""
+"FIG-05 表达显式启动与逆序清理。静态接口面可以在启动前和停止后存在；其指针不授予操作未启动硬件的权限。部分失败可能留下不可逆 watchdog "
+"效果或活跃借用。产品必须检查主要结果与清理结果，继续运行真实执行器，并保留隔离资源。平台启动从不启动调度器。"
+
+msgid ""
+"Physical Flash reports exact geometry and `program_flags`. An ECC fresh-"
+"erase requirement belongs to the caller's provenance contract: all-FF "
+"readback cannot prove unused ECC state, and a failed pulse requires another "
+"erase. All-FF source units issue no pulse. A started pulse must settle "
+"before return; an expired deadline prevents later pulses and never cancels "
+"hardware already programming. Products own writable regions, voltage, "
+"execution stalls, watchdog and power loss."
+msgstr ""
+"物理 Flash 报告精确 geometry 和 `program_flags`。ECC fresh-erase 是调用方的真实历史合同：全 FF "
+"读回不能证明 ECC 未被编程，失败脉冲后必须重新擦除。全 FF 输入单元不产生脉冲。已启动的脉冲必须先排空才能返回；过期 deadline "
+"只能阻止后续脉冲，不能取消正在编程的硬件。产品负责可写 region、电压、执行停顿、watchdog 与掉电策略。"
+
+msgid ""
+"Optional generated diagnosed start/stop entries write phase and controller "
+"location to caller-owned cold-path storage. They retain no diagnostic "
+"pointer and do not replace the primary/cleanup results or remaining-effect "
+"obligations. See [the diagnostic contract](../design/official-"
+"stm32-provider.md) for index meaning and failure responsibilities. The "
+"{ref}`factory diagnostic mapping <factory-controller-diagnostics>` adds "
+"named assembly-local ordinals and optional immutable labels; it does not "
+"create a device-ready state machine or a second capability object."
+msgstr ""
+"可选生成的 diagnosed start/stop 入口把 phase 与 controller 位置写入调用者拥有的冷态存储。不保留 "
+"diagnostic 指针，也不替代 primary/cleanup "
+"结果或剩余影响责任。索引含义和失败责任见[诊断合同](../design/official-"
+"stm32-provider.md)。{ref}`Factory 诊断映射 <factory-controller-"
+"diagnostics>`增加装配局部具名序号和可选不可变标签，不建立 device-ready 状态机或第二个 capability 对象。"
+
+msgid "Costs and tradeoffs"
+msgstr "成本与取舍"
+
+msgid ""
+"A 32-bit face contains two pointers: eight bytes of readonly storage. "
+"Provider/mode ops are shared; exact mutable state and selected buffers "
+"remain separate. Indirection lets one public interface serve independent "
+"concrete providers and GoogleMock ports. Its cost is one public dispatch and"
+" code/readonly table retention; actual Flash/RAM and timing are measured on "
+"the selected linked image."
+msgstr ""
+"32 位接口面包含两个指针，占用八字节只读存储。提供者／模式的 ops 共享；精确可变状态与所选缓冲区分开。间接调用允许同一公共接口服务独立具体提供者与"
+" GoogleMock 端口。成本是一次公共分发以及保留代码／只读表；实际 Flash／RAM 与时序必须在所选链接镜像上测量。"
+
+msgid ""
+"Static assembly rejects conflicts early and prunes unselected drivers. It "
+"deliberately forgoes hotplug discovery, runtime string registries, arbitrary"
+" dynamic clock changes and automatic recovery policy. Optional shared owners"
+" add explicitly budgeted slots and synchronization; direct single-executor "
+"paths need no default OS lock or worker."
+msgstr ""
+"静态装配提前拒绝冲突，裁剪未选择驱动。它不提供热插拔发现、运行时字符串注册表、任意动态时钟变化或自动恢复策略。可选共享 owner "
+"增加显式预算的槽与同步；直接单执行器路径不需要默认 OS 锁或执行任务。"
+
+msgid ""
+"Read [factory](factory.md), [ownership](ownership.md), the [integration "
+"contract](../design/integration-contracts.md) and [exact "
+"support](../reference/platforms/support.md). Architecture diagrams explain "
+"mechanisms; tests, image checks and HIL establish their separate execution "
+"scopes."
+msgstr ""
+"阅读[类型化工厂](factory.md)、[所有权](ownership.md)、[接入合同](../design/integration-"
+"contracts.md)和[精确支持范围](../reference/platforms/support.md)。架构图解释机制；测试、镜像检查和 "
+"HIL 分别建立各自执行范围。"

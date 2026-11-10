@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "ve-advanced-timer-input-software-reference",
+  "soc": "STM32F407VET6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-only-silicon-input-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "capture1",
+      "controller": "TIM1",
+      "route": "capture-tim1-ch1-pa8"
+    },
+    {
+      "id": "capture8",
+      "controller": "TIM8",
+      "route": "capture-tim8-ch1-pc6"
+    },
+    {
+      "id": "position1",
+      "controller": "TIM1",
+      "route": "tim1-encoder-pa8-pa9"
+    },
+    {
+      "id": "position8",
+      "controller": "TIM8",
+      "route": "tim8-encoder-pc6-pc7"
+    },
+    {
+      "id": "capture9",
+      "controller": "TIM9",
+      "route": "capture-tim9-ch1-pa2"
+    },
+    {
+      "id": "capture10",
+      "controller": "TIM10",
+      "route": "capture-tim10-ch1-pb8"
+    },
+    {
+      "id": "capture11",
+      "controller": "TIM11",
+      "route": "capture-tim11-ch1-pb9"
+    },
+    {
+      "id": "capture12",
+      "controller": "TIM12",
+      "route": "capture-tim12-ch1-pb14"
+    },
+    {
+      "id": "capture13",
+      "controller": "TIM13",
+      "route": "capture-tim13-ch1-pa6"
+    },
+    {
+      "id": "capture14",
+      "controller": "TIM14",
+      "route": "capture-tim14-ch1-pa7"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only reviewed silicon inputs; no PCB, sensor, input frequency or physical capture qualification."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "DS8626 AF1 PA8/PA9 and AF3 PC6/PC7 silicon inputs; not a PCB wiring claim."
+    }
+  ]
+}

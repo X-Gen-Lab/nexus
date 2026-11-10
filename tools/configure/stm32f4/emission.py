@@ -13,14 +13,23 @@ def implementation(item):
 def operations(item):
     """Name the actual readonly table; shared algorithms keep one identity."""
     selected = implementation(item)
+    if item.kind == 'advanced_pwm' and item.controller == 'TIM8':
+        return 'nx_stm32_tim8_advanced_pwm_ops'
+    if item.kind == 'timer_capture' and item.controller != 'TIM4':
+        return f'nx_stm32_{item.controller.lower()}_timer_capture_ops'
     if item.interface_kind == "spi_dma_transaction":
         return "nx_spi_dma_sequence_port_ops"
     if item.kind in {"eth", "eth_frames"}:
         return f"nx_{item.kind}_mac_ops"
+    if item.kind == "entropy":
+        return "nx_stm32f407_entropy_ops"
     if item.kind == "can":
         return "nx_classic_can_ops"
     if item.kind == "usb_device":
-        return "nx_usb_fs_device_ops"
+        return ("nx_stm32_usb_otg_device_ops" if item.mode.startswith("otg-")
+                else "nx_usb_fs_device_ops")
+    if item.kind == "usb_host":
+        return "nx_stm32_usb_host_ops"
     if item.kind == "external_bus":
         return "nx_stm32_fsmc_external_bus_ops"
     if selected == "i2c_async":
@@ -31,8 +40,28 @@ def operations(item):
 def includes(result):
     selections = result.controllers
     source = []
+    if any(item.kind == 'adc_group' for item in selections):
+        source.append('#include "stm32f407_adc_group.h"')
     source.append('#include "stm32f407_provider.h"')
     source.append('#include "stm32f407_platform_cold.h"')
+    for kind in ("capture", "audio"):
+        if any(item.kind == kind for item in selections):
+            source.append(f'#include "stm32f407_{kind}.h"')
+    if any(item.kind == 'exti' and item.mode in {'pvd-level', 'pvd-events'}
+           for item in selections):
+        source.append('#include "stm32f407_pvd.h"')
+    if any(item.kind == "watchdog" and item.mode == "window" for item in selections):
+        source.append('#include "stm32f407_window_watchdog.h"')
+    if any(item.kind == "entropy" for item in selections):
+        source.append('#include "stm32f407_entropy.h"')
+    if any(item.kind == "crc" for item in selections):
+        source.append('#include "stm32f4_crc.h"')
+    if any(item.kind == "encoder" for item in selections):
+        source.append('#include "stm32f4_encoder.h"')
+    if any(item.kind == "dac" for item in selections):
+        source.append('#include "stm32f407_dac.h"')
+    if any(implementation(item) == "dac_dma" for item in selections):
+        source.append('#include "stm32f407_dac_dma.h"')
     source.append('#include "stm32f4_platform_lifecycle_impl.h"')
     if any(item.kind in {"exti", "pwm", "adc"} for item in selections):
         source.append('#include "stm32f407_control_cold.h"')
@@ -40,6 +69,10 @@ def includes(result):
         source.append('#include "stm32f407_basic_cold.h"')
     if any(item.kind == "spi" for item in selections):
         source.append('#include "stm32f407_spi_cold.h"')
+    if any(item.kind == "spi" and item.mode == "irq-frames" for item in selections):
+        source.append('#include "stm32f407_spi_frames.h"')
+    if any(item.kind == "i2c_target" for item in selections):
+        source.append('#include "stm32f407_i2c_target.h"')
     if any(item.kind == "i2c" for item in selections):
         source.append('#include "stm32f407_i2c_cold.h"')
     if any(item.kind == "uart" for item in selections):
@@ -64,6 +97,8 @@ def includes(result):
     if any(item.kind == "i2c" and mode_traits(item.kind, item.mode).irq
            for item in selections):
         source.append('#include "stm32f407_i2c_async.h"')
+    if any(item.kind in {"pwm_group", "timer_pulse", "timer_sequence"} for item in selections):
+        source.append('#include "stm32f407_timer_waveform.h"')
     if any(item.kind in timer_advanced.KINDS for item in selections):
         source.append('#include "stm32f407_timer_cold.h"')
     if any(item.kind == "eth" for item in selections):
@@ -74,12 +109,24 @@ def includes(result):
         source.append('#include "stm32f407_can_cold.h"')
     if any(item.kind == "usb_device" for item in selections):
         source.append('#include "stm32f407_usb_cold.h"')
+    if any(item.kind == "usb_device" and item.mode not in {"device-fs", "otg-fs"}
+           for item in selections):
+        source.append('#include "stm32f407_usb_hs_cold.h"')
+    if any(item.kind == "usb_device" and item.mode.startswith("otg-")
+           for item in selections):
+        source.append('#include "stm32f407_usb_otg.h"')
+    if any(item.kind == "usb_host" for item in selections):
+        source.append('#include "stm32f407_usb_host_cold.h"')
     if any(item.kind == "block" for item in selections):
         source.append('#include "stm32f407_sdio.h"')
     if any(item.kind == "rtc" for item in selections):
         source.append('#include "stm32f407_rtc.h"')
     if any(item.kind == "external_bus" for item in selections):
         source.append('#include "stm32f407_fsmc.h"')
+        if any(item.driver=="flash_async-endpoint" for item in result.devices):
+            source.append('#include "stm32f407_fsmc_nor.h"')
+        if any(item.driver=="nand-endpoint" for item in result.devices):
+            source.append('#include "stm32f407_fsmc_nand.h"')
     source += ['void _init(void);', 'void _fini(void);',
                r'/** \brief C runtime hooks; constructors use .init_array. */',
                'void _init(void) {}', 'void _fini(void) {}']
@@ -90,12 +137,13 @@ def instance_declarations(item, result):
     source = []
     name = item.id.replace("-", "_")
     kind = item.kind
-    if kind in {"spi", "i2c"}:
+    if kind in {"spi", "i2c"} and item.mode != "irq-frames":
         initializer = ""
         if kind == "i2c":
             child = next((device for device in result.devices if device.controller == item.id), None)
             if child is not None:
-                initializer = f" = {{ .port = &s_nx_port_{name}, .address = {child.options.address}u }}"
+                initializer = (f" = {{ .port = &s_nx_port_{name}, .address = {child.options.address}u,"
+                               f" .address_bits = {child.options.address_bits}u }}")
         source.append('static nx_stm32'
                       f"_{implementation(item)}_endpoint_state_t "
                       f"s_nx_endpoint_{name}{initializer};")
@@ -118,8 +166,10 @@ def state_declarations(result):
     source = []
     if has_dma(result):
         source.append("static uint32_t s_nx_platform_dma_clocks_added;")
-    if any(item.kind == "exti" for item in selections):
+    if any(item.kind == "exti" and item.mode == 'edge-event' for item in selections):
         source.append('static uint32_t s_nx_platform_syscfg_clock_added;')
+    if any(item.kind == "audio" for item in selections):
+        source.append("static nx_stm32_audio_clock_t s_nx_audio_clock;")
     source.extend(can.state_declarations(result, "stm32"))
     source.extend(packet.state_declarations(result))
     from .sram import declarations
@@ -206,6 +256,40 @@ def platform_resources_acquire(result):
         Address("s_nx_platform_lifecycle_config"),))
 
 
+def platform_resources_resume(result):
+    """Reconnect shared pins/resources after the exclusive System restore."""
+    del result
+    return DirectCall("nx_stm32f4_platform_resources_resume_local", (
+        Address("s_nx_platform_lifecycle_config"),))
+
+
+def platform_power_controllers(result, initialization_indices):
+    """Keep autonomous RTC wake ownership while other owners close normally."""
+    rtc = [(index, result.controllers[ordinal])
+           for index, ordinal in enumerate(initialization_indices)
+           if result.controllers[ordinal].kind == "rtc"]
+    if not rtc:
+        return [], "NULL", "NULL"
+    lines = [r'/** \brief Static autonomous-owner drain, no request replay. */',
+             'static nx_result_t nx_platform_suspend_controller(size_t index) {',
+             '    switch (index) {']
+    for index, item in rtc:
+        name = item.id.replace("-", "_")
+        lines += [f'    case {index}u:',
+                  f'        return nx_stm32_rtc_suspend(&s_nx_port_{name});']
+    lines += ['    default: return nx_platform_release(index);', '    }', '}',
+              r'/** \brief Revalidate retained RTC; cold-rebuild other owners. */',
+              'static nx_lifecycle_acquisition_t nx_platform_resume_controller(size_t index) {',
+              '    switch (index) {']
+    for index, item in rtc:
+        name = item.id.replace("-", "_")
+        lines += [f'    case {index}u:',
+                  '        return (nx_lifecycle_acquisition_t){ ' +
+                  f'nx_stm32_rtc_resume(&s_nx_port_{name}), true }};']
+    lines += ['    default: return nx_platform_acquire(index);', '    }', '}']
+    return lines, "nx_platform_suspend_controller", "nx_platform_resume_controller"
+
+
 def platform_resources_release(result):
     """Connect fixed C permanent/domain/pad/shared-clock withdrawal."""
     del result
@@ -224,5 +308,6 @@ def _resource_slots(result):
     """Name only selected receipt storage; absent resources allocate nothing."""
     dma = '&s_nx_platform_dma_clocks_added' if has_dma(result) else 'NULL'
     syscfg = ('&s_nx_platform_syscfg_clock_added' if
-              any(item.kind == 'exti' for item in result.controllers) else 'NULL')
+              any(item.kind == 'exti' and item.mode == 'edge-event'
+                  for item in result.controllers) else 'NULL')
     return dma, syscfg

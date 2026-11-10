@@ -56,6 +56,7 @@ class UsbSoc : public testing::Test {
         return NX_SUCCESS;
     }
     void SetUp() override {
+        g_nx_usb_soc_hclk_hz = 168000000U;
         ASSERT_NE(mmap(reinterpret_cast<void*>(0x40023000U), 0x1000U,
                        PROT_READ | PROT_WRITE,
                        MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0),
@@ -69,6 +70,8 @@ class UsbSoc : public testing::Test {
         ASSERT_EQ(nx_native_clock_configure(true, 100), NX_SUCCESS);
         RCC->PLLCFGR = 8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U);
         RCC->CR = RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
+        RCC->CFGR = RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL | RCC_CFGR_PPRE1_DIV4 |
+                    RCC_CFGR_PPRE2_DIV2;
         ASSERT_EQ(CLOCK_START(&clock, true, 200), NX_SUCCESS);
         controller.endpoints = endpoints;
         controller.endpoint_count = 4;
@@ -201,6 +204,107 @@ TEST_F(UsbSoc, RealRegisterFactsAndClockConsumerSurviveUntilDetach) {
     EXPECT_EQ(nx_usb_device_stop(&port), NX_SUCCESS);
     EXPECT_EQ(clock.consumers, 0U);
 }
+
+TEST_F(UsbSoc, HsInternalPhyUsesSixDirectionsAndFullSpeedDeviceEncoding) {
+    ASSERT_EQ(nx_usb_device_stop(&port), NX_SUCCESS);
+    ASSERT_NE(mmap(reinterpret_cast<void*>(0x40040000U), 0x10000U,
+                   PROT_READ | PROT_WRITE,
+                   MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0),
+              MAP_FAILED);
+    auto* hs = reinterpret_cast<nx_native_usb_hardware_t*>(0x40040000U);
+    hs->endpoint_numbers = 6U;
+    hs->registers[0x10U / 4U] = 1U << 31U;
+    RCC->AHB1ENR |= RCC_AHB1ENR_OTGHSEN;
+    controller.registers = 0U;
+    endpoints[2].number = endpoints[3].number = 5U;
+    auto domain = controller.clock;
+    const auto initialized =
+        nx_stm32_usb_device_hs_initialize(&controller, &domain, false);
+    EXPECT_EQ(initialized, NX_SUCCESS);
+    if (initialized == NX_SUCCESS) {
+        EXPECT_EQ(controller.registers, 0x40040000U);
+        EXPECT_EQ(controller.irq.irq_number, 77);
+        EXPECT_EQ(hs->registers[0x800U / 4U] & 3U, 3U);
+        EXPECT_NE(hs->registers[0xCU / 4U] & (1U << 6U), 0U);
+        EXPECT_EQ(ActivateSelected(), NX_SUCCESS);
+        hs->registers[0x808U / 4U] = 6U;
+        hs->registers[0x14U / 4U] |= 1U << 13U;
+        nx_usb_controller_irq(&controller);
+        EXPECT_FALSE(controller.snapshot.closing);
+        EXPECT_EQ((hs->registers[0x9A0U / 4U] >> 18U) & 3U, 2U);
+        EXPECT_EQ(hs->registers[0xB00U / 4U] & 0x7FFU, 0U);
+        EXPECT_EQ(nx_usb_device_stop(&port), NX_SUCCESS);
+    }
+    controller.snapshot.started = false;
+    controller.clock_retained = false;
+    EXPECT_EQ(munmap(reinterpret_cast<void*>(0x40040000U), 0x10000U), 0);
+}
+
+TEST_F(UsbSoc, UlpiHighSpeedBulkPacketUses512BytesAndDedicatedFifo) {
+    ASSERT_EQ(nx_usb_device_stop(&port), NX_SUCCESS);
+    ASSERT_NE(mmap(reinterpret_cast<void*>(0x40040000U), 0x10000U,
+                   PROT_READ | PROT_WRITE,
+                   MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0),
+              MAP_FAILED);
+    auto* hs = reinterpret_cast<nx_native_usb_hardware_t*>(0x40040000U);
+    hs->endpoint_numbers = 6U;
+    hs->registers[0x10U / 4U] = 1U << 31U;
+    RCC->AHB1ENR |= RCC_AHB1ENR_OTGHSEN | RCC_AHB1ENR_OTGHSULPIEN;
+    controller.registers = 0U;
+    endpoints[2].max_packet = endpoints[3].max_packet = 512U;
+    controller.rx_fifo_words = 512U;
+    endpoints[0].fifo_start = 512U;
+    endpoints[2].fifo_start = 544U;
+    endpoints[2].fifo_words = 128U;
+    auto domain = controller.clock;
+    const auto initialized =
+        nx_stm32_usb_device_hs_initialize(&controller, &domain, true);
+    EXPECT_EQ(initialized, NX_SUCCESS);
+    if (initialized == NX_SUCCESS) {
+        EXPECT_EQ(hs->registers[0x800U / 4U] & 3U, 0U);
+        EXPECT_EQ(hs->registers[0xCU / 4U] & (1U << 6U), 0U);
+        EXPECT_EQ(hs->registers[0x38U / 4U] & (1U << 16U), 0U);
+        ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
+        uint8_t bytes[512];
+        std::memset(bytes, 0x5AU, sizeof(bytes));
+        nx_usb_request_t request = {};
+        nx_request_initialize(&request.base);
+        nx_usb_endpoint_port_t in = {&nx_usb_fs_endpoint_ops, &endpoints[2]};
+        ASSERT_EQ(nx_usb_in_prepare(&request, bytes, sizeof(bytes), NX_USB_DATA,
+                                    0U, 200U),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+        EXPECT_EQ(hs->tx_count[1], 128U);
+        EXPECT_EQ(hs->registers[0x930U / 4U], (1U << 19U) | 512U);
+        EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+        hs->registers[0x920U / 4U] &= ~(1U << 31U);
+        hs->registers[0x928U / 4U] |= 1U;
+        hs->registers[0x938U / 4U] = 128U;
+        hs->tx_count[1] = 0U;
+        nx_usb_controller_irq(&controller);
+        EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        EXPECT_EQ(request.base.transferred, 512U);
+        hs->registers[0x14U / 4U] |= 1U << 12U;
+        nx_usb_controller_irq(&controller);
+        hs->registers[0x808U / 4U] = 2U;
+        hs->registers[0x14U / 4U] |= 1U << 13U;
+        nx_usb_controller_irq(&controller);
+        nx_usb_device_state_t snapshot = {};
+        ASSERT_EQ(nx_usb_device_state(&port, &snapshot), NX_SUCCESS);
+        EXPECT_EQ(snapshot.speed, NX_USB_DEVICE_FULL_SPEED);
+        EXPECT_FALSE(snapshot.closing);
+        EXPECT_EQ(ActivateSelected(), NX_SUCCESS);
+        EXPECT_EQ(hs->registers[0x920U / 4U] & 0x7FFU, 64U);
+        ASSERT_EQ(nx_usb_in_prepare(&request, bytes, sizeof(bytes), NX_USB_DATA,
+                                    0U, 200U),
+                  NX_SUCCESS);
+        EXPECT_EQ(nx_usb_endpoint_submit(&in, &request), NX_ERROR_INVALID);
+        EXPECT_EQ(nx_usb_device_stop(&port), NX_SUCCESS);
+    }
+    controller.snapshot.started = false;
+    controller.clock_retained = false;
+    EXPECT_EQ(munmap(reinterpret_cast<void*>(0x40040000U), 0x10000U), 0);
+}
 TEST_F(UsbSoc, ActualSdkEndpointOffsetWritesPioAndWaitsForHostXfrc) {
     uint8_t bytes[3] = {1, 2, 3};
     nx_usb_request_t request = {};
@@ -224,6 +328,38 @@ TEST_F(UsbSoc, FalseCpuFactsRejectBeforeBorrowingTheClock) {
     controller.irq_policy.priority_bits = 3;
     EXPECT_EQ(DEVICE_INIT(&controller, &clock), NX_ERROR_INVALID);
     EXPECT_EQ(clock.consumers, 0U);
+}
+
+TEST_F(UsbSoc, LowSelectedAhbRejectsBeforeClockRetainOrCoreAccess) {
+    ASSERT_EQ(nx_usb_device_stop(&port), NX_SUCCESS);
+    g_nx_usb_soc_hclk_hz = 14000000U;
+    const auto reads = hardware->mmio_reads;
+    const auto writes = hardware->mmio_writes;
+    EXPECT_EQ(DEVICE_INIT(&controller, &clock), NX_ERROR_INVALID);
+    EXPECT_EQ(clock.consumers, 0U);
+    EXPECT_EQ(hardware->mmio_reads, reads);
+    EXPECT_EQ(hardware->mmio_writes, writes);
+    g_nx_usb_soc_hclk_hz = 168000000U;
+}
+
+TEST(UsbClockFacts, TurnaroundTracksActualAhbAndTheSelectedPhy) {
+    struct Selection {
+        uint32_t hz;
+        uint8_t value;
+    };
+    const Selection selections[] = {
+        {14000000U, 0U},  {14200000U, 0U},  {14900000U, 15U}, {15000000U, 14U},
+        {16000000U, 13U}, {17200000U, 12U}, {18500000U, 11U}, {20000000U, 10U},
+        {21800000U, 9U},  {24000000U, 8U},  {27500000U, 7U},  {32000000U, 6U},
+        {168000000U, 6U}};
+    for (const auto& selection : selections) {
+        EXPECT_EQ(nx_usb_turnaround(NX_USB_CORE_FS, selection.hz),
+                  selection.value);
+    }
+    EXPECT_EQ(nx_usb_turnaround(NX_USB_CORE_HS_INTERNAL_FS, 26000000U), 0U);
+    EXPECT_EQ(nx_usb_turnaround(NX_USB_CORE_HS_ULPI, 30000000U), 0U);
+    EXPECT_EQ(nx_usb_turnaround(NX_USB_CORE_HS_INTERNAL_FS, 31500000U), 7U);
+    EXPECT_EQ(nx_usb_turnaround(NX_USB_CORE_HS_ULPI, 168000000U), 9U);
 }
 TEST_F(UsbSoc, ForeignCoreIsNotReboundOrReset) {
     EXPECT_EQ(nx_usb_device_stop(&port), NX_SUCCESS);

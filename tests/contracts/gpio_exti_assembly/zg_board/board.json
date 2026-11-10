@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "id": "f407-zg-gpio-exti-software-contract",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "DS8626-Rev12-package-RM0090-pad-mapping",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "edge0",
+      "controller": "EXTI0",
+      "route": "exti0-pc0"
+    },
+    {
+      "id": "edge1",
+      "controller": "EXTI1",
+      "route": "exti1-pc1"
+    },
+    {
+      "id": "edge2",
+      "controller": "EXTI2",
+      "route": "exti2-pc2"
+    },
+    {
+      "id": "edge3",
+      "controller": "EXTI3",
+      "route": "exti3-pc3"
+    },
+    {
+      "id": "edge4",
+      "controller": "EXTI4",
+      "route": "exti4-pc4"
+    },
+    {
+      "id": "edge5",
+      "controller": "EXTI5",
+      "route": "exti5-pc5"
+    },
+    {
+      "id": "edge6",
+      "controller": "EXTI6",
+      "route": "exti6-pc6"
+    },
+    {
+      "id": "edge7",
+      "controller": "EXTI7",
+      "route": "exti7-pc7"
+    },
+    {
+      "id": "edge8",
+      "controller": "EXTI8",
+      "route": "exti8-pc8"
+    },
+    {
+      "id": "edge9",
+      "controller": "EXTI9",
+      "route": "exti9-pc9"
+    },
+    {
+      "id": "edge10",
+      "controller": "EXTI10",
+      "route": "exti10-pc10"
+    },
+    {
+      "id": "edge11",
+      "controller": "EXTI11",
+      "route": "exti11-pc11"
+    },
+    {
+      "id": "edge12",
+      "controller": "EXTI12",
+      "route": "exti12-pc12"
+    },
+    {
+      "id": "edge13",
+      "controller": "EXTI13",
+      "route": "exti13-pc13"
+    },
+    {
+      "id": "edge14",
+      "controller": "EXTI14",
+      "route": "exti14-pc14"
+    },
+    {
+      "id": "edge15",
+      "controller": "EXTI15",
+      "route": "exti15-pc15"
+    },
+    {
+      "id": "drive",
+      "controller": "GPIOH",
+      "route": "gpio-ph0",
+      "mask": 1,
+      "initial": 0
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Silicon-only software fixture; no physical PCB route or HIL qualification."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "DS8626 Rev12 Table7 and package pinouts; RM0090 GPIO/SYSCFG/EXTI."
+    }
+  ]
+}

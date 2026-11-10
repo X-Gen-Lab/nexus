@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "cmake/package"))
 import package_source_sdk as source_sdk
 from tools.configure import integration_package
-from tools.release import transport
+from tools.maintenance import consumer_profiles
 
 REFERENCE = "tests/support/external_provider"
 
@@ -33,9 +33,7 @@ class ProviderSDKStarterTests(unittest.TestCase):
         self.assertFalse((ROOT /
             "cmake/package/verification/external_provider").exists())
         self.assertFalse(any(item.scenario == "external_provider"
-                             for item in transport.SERVICE_CONSUMERS))
-        self.assertFalse(any("external provider" in image
-                             for image in transport.IMAGES))
+                             for item in consumer_profiles.SERVICE_CONSUMERS))
 
 
 if __name__ == "__main__":

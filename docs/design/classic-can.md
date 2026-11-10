@@ -97,7 +97,7 @@ F4 绑定位于 `soc/stm32/stm32f4/drivers/can.c`，控制器机制位于
 `tests/support/native/drivers/can*`。当前 GoogleTest/GoogleMock、配置／factory／
 向量集成与精确 ARM ELF 分别验证其合同，不由一个旧开发 harness 代替。
 
-[原始跨系列开发证据（历史）](../../tools/testing/evidence/can-iteration/manifest.json)
+[原始跨系列开发证据（历史）](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/tools/testing/evidence/can-iteration/manifest.json)
 保留当时的固定源码哈希、工具身份、RED／GREEN 与执行范围，原始字节不修改。
 其中已退役系列和旧接口的计数不属于当前 F4 候选验收；当前用例数、资源与完整
 门禁结论必须绑定本次提交，不能继承历史通过状态。
