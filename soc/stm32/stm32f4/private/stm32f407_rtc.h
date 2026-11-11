@@ -16,7 +16,11 @@ typedef enum {
     NX_STM32_RTC_PROVISION_EMPTY
 } nx_stm32_rtc_policy_t;
 /** \brief Static disjoint configuration, borrowed through close and joins.
- * \note LSE32768 crystal, BCD24h, BYPSHAD, PRER127/255 only. Adopt requires
+ * \note LSE32768 crystal or explicitly authored bypass, BCD24h, BYPSHAD,
+ *       PRER127/255 only. A bypass requires exact external Board facts.
+ *       ES0182 2.2.18 requires quiet analog PC13 for a crystal source;
+ *       provision acquires that pad, adopt requires it already quiet.
+ *       PC13 timestamp/tamper requires bypass. Adopt requires
  *       prepared clocks, DBP and externally asserted calendar provenance,
  *       including YY00. Provision requires an empty reset-like backup domain
  *       and an explicit initial calendar. No backup reset or implicit date.
@@ -33,17 +37,18 @@ typedef struct {
     uint32_t poll_limit;
     nx_stm32_rtc_policy_t policy;
     bool allow_set;
+    bool lse_bypass;
     bool has_initial;
     nx_rtc_calendar_t initial;
 } nx_stm32_rtc_config_t;
 /** \brief Stable single privileged unmasked task owner, initially zeroed.
  * \note Stop closes alarm admission and restores borrowed Alarm A fields.
  *       Provision leaves autonomous backup clocks on; private close remains
- *       BUSY until explicit backup_handoff transfers persistent effects to an
- *       external owner. Neither operation disables autonomous backup time.
- *       Adopt creates no backup clock effects and can close cleanly. Neither
- *       mode guarantees physical VBAT retention or erases backup data
- * registers.
+ *       BUSY until explicit backup_handoff transfers persistent effects and
+ *       crystal PC13 quietness to an external owner. Neither operation disables
+ * autonomous backup time. Adopt creates no backup clock effects and can close
+ * cleanly. Neither mode guarantees physical VBAT retention or erases backup
+ * data registers.
  */
 typedef struct {
     const nx_stm32_rtc_config_t* config;
@@ -70,6 +75,7 @@ typedef struct {
     uint8_t sram_effects;
     nx_result_t terminal;
     uint8_t stage;
+    uint8_t saved_pc13;
     bool opened;
     bool closing;
     bool terminal_set;
@@ -95,8 +101,10 @@ nx_time_us_t nx_stm32_rtc_clock_read(void* context);
  * \param[in] config: Valid static configuration and copied initial calendar.
  * \return SUCCESS or INVALID/CONTEXT/STATE/BUSY/EXHAUSTED before effects;
  *         TIMEOUT/IO can retain reported cold effects after acquisition.
- *         Pin conflicts reject before backup effects; observing gated PC14/15
- *         temporarily acquires and restores GPIOC without changing any pad.
+ *         Pin conflicts reject before backup effects; observing oscillator
+ *         pads temporarily acquires and restores GPIOC. Crystal provisioning
+ *         first acquires free PC13 as analog; an unopened failure can restore
+ *         its snapshot only while LSE is off. A live crystal retains the pad.
  *         Failed inspection-gate readback/restore retains explicit effects
  *         and requires private close before retry. Preowned gates survive.
  * \note Bounded by both Core deadline and poll count; no SysTick or HAL_Init.
@@ -127,7 +135,8 @@ nx_result_t nx_stm32_rtc_resume(nx_stm32_rtc_state_t* state);
 /** \brief Read exact persistent ownership receipt; no hardware mutation.
  * \param[in] state: Stable aligned owner, or NULL.
  * \return Nonzero effects retain responsibility. Bits0..5 are transferable
- * autonomous resources; bit6 is the temporary GPIO inspection gate. Bits8/9
+ * autonomous resources; bit6 is the temporary GPIO inspection gate, bit7 the
+ * transferable crystal PC13 quiet pad. Bits8/9
  * are added SRAM gate/regulator, bit10 auxiliary sources, bit11 an SRAM loan,
  * bit12 suspended ownership, bit13 a Standby preparation receipt.
  */

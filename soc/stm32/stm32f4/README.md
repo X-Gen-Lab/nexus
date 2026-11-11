@@ -9,6 +9,11 @@
 只携带 manifest 声明的所选源码；使用 SDK 时，按根 `.nexus-source-sdk.json` 的
 `source_revision` 在原仓库阅读这些合同，不推定所有相对链接都包含在离线 payload 中。
 
+ES0182 Rev19 的 92 条勘误在 [references.json](references.json) 逐项记录八种硅片
+标识的适用性、当前模式、C 实现、回归入口与外部约束。运行期型号／revision 准入
+由[唯一 C 规则](private/stm32f407_silicon.h)执行，未知 revision 在硬件效果前拒绝。
+软件审计不表示所有硬件限制都有修复，也不表示已观察到实板 cut 或完成 HIL。
+
 ## 源码与状态归属
 
 | 入口 | 责任 |
@@ -28,6 +33,10 @@
 
 `devices.json` 的 SDK 编译覆盖不代表其他 F4 型号已具备资源准入、驱动、
 Board 或运行时模式；当前具体支持以 F407VE／ZG 配置和执行范围为准。
+System、预 C 外部 SRAM 和受控 handoff 共用同一精确硅片准入规则：
+`DEV_ID=0x413`，`REV_ID` 仅接纳 `0x1001`、`0x1003`、`0x1007`、`0x100f`
+和 `0x101f`。未知修订无写拒绝，不以通用器件信息查询替代准入；资料中另有器件
+身份的 A cut 不自动加入。该规则只建立软件维护范围，不证明实板已验收。
 Board／SoC 中没有 Python 插件。默认集中主机工具仍使用 Python，连接手写 C 的
 System／资源与整平台协调器。配置工具只维护一套权威实现；
 源码实现、模型回归、ARM 链接和实板资格分别说明。
@@ -147,7 +156,23 @@ enable 先写并核对 CFR 与 CPU debug freeze，最后一次 CR 写同时提�
 factory 与唯一 Platform 冷态引脚 owner／快照。路线覆盖所维护封装实际引出的 pad；
 接线和负载仍须由 Board 授权。两个不同 port 的同号 EXTI 线不能同时取得，因为它们
 共享同一 EXTICR 选择。
-EXTI5–9 和 EXTI10–15 分别使用共享 IRQ；只有最后一个 owner 退出才撤回该向量。
+`mode="edge-event"` 的 EXTI5–9 和 EXTI10–15 分别使用共享 IRQ；只有最后一个
+IRQ owner 退出才撤回该向量。
+
+`mode="hardware-event"` 选择同一 GPIO／EXTICR 线的 EMR 硬件事件脉冲，
+显式选择 `edge="rising"`、`"falling"` 或 `"both"` 与可选 `pull`。
+它不接纳 `irq`／`event_capacity`，不声明 NVIC vector、不生成 handler，也不分配
+事件队列或 wake callback。强类型 factory 仍返回已有的 `nx_exti_port_t`；
+`level` 采样 pad，`stop` 撤回同一个 EMR owner，`read` 与 `attach_wake` 明确返回
+UNSUPPORTED。硬件事件可合并，CPU 事件锁存与 WFE 协议由调用者拥有，不伪造边沿
+历史、计数或时间戳。Platform suspend 默认关闭该 owner；本模式不自动保留为
+STOP／Standby 唤醒源。
+
+硬件事件的 C owner 在 GPIO／SYSCFG gate 已取得后配置输入与 mux，最后启用 EMR。
+它只保存本线的原 EXTICR nibble，失败保留静态 config 与清理责任；stop 确认本线
+EMR、触发源及 pending 退出，再恢复 mux，随后由唯一 Platform 快照恢复 GPIO。
+同一共享 vector 的 IRQ peer 与其他 EMR 线保持不变。对单线字段直接写入的边界是
+精确写入顺序、回读及失败保留；GPIO 电气操作复用官方 LL，不引入第二套寄存器脚本。
 
 普通 `mode="output"` 的 `speed` 可选 `low`、`medium`、`high` 或 `very-high`。
 省略该字段表示保持已有 OSPEEDR，不接受用户填写 `preserve`。`input` 和 EXTI
@@ -162,10 +187,17 @@ owner／clock 并负责清理。普通 stop 维持声明的 inactive 电平并�
 publisher 退出后，最终 OSPEEDR、AF、pull 和 latch 恢复仍由唯一冷态快照完成，
 不增加另一套恢复存储。
 
+ES0182 §2.2.18 的 PC13／LSE 耦合独立于输出速度：晶振 LSE 的 ON 或 RDY 任一仍
+置位时，普通 GPIO、IRQ EXTI 和硬件事件的 PC13 冷态准入均无写拒绝；明确的 LSE
+bypass 不受此项耦合限制。RTC 的晶振模式另外保留 PC13 静默责任，不能与 PC13
+GPIO／AF／EXTI 同时选择；LSE bypass 的板级授权与 RTC 生命周期由 RTC owner 维护。
+
 软件参考见 `tests/contracts/gpio_exti_assembly/`，分别选择 VE 裸机与 ZG FreeRTOS
 装配。它们验证静态实例、实际 ARM 链接、资源预算与方法保留，不证明调度器已经
 运行、真实边沿已经采集或 PCB 电气已经验收。事件仍按既有合同保留 COALESCED／LOSS，
 不提供自动消抖或精确物理边沿时间。
+同目录 `ve-hardware-baremetal.toml`／`zg-hardware-freertos.toml` 复用相同 Board
+与 C 消费者，验证全部十六条硬件事件线的静态 factory、无 IRQ／队列及真实 ARM 链接。
 
 ## PVD 电压检测与内部 EXTI
 
@@ -388,9 +420,14 @@ SPI3 的 AF6 pad 是 PC10／11／12 或 PB3／4／5，APB1 为 42 MHz；固定 D
 TX stream5 channel0、RX stream0 channel0。初始化先检查选中 vector 的 enable、
 pending 和 active，再取得 publisher；恢复只脉冲 SPI3 的 APB1 reset 位。
 
-I2C 的 `max_hz` 默认 100000，允许名义 5129–400000 Hz。公共 C 时序计算向上取整
-12-bit CCR，使非整除配置也不超过所选名义上限；超过 100 kHz 时使用 Fast-mode
-2:1 duty 和 300 ns TRISE 公式。依据 RM0090 §27.6.8，固定 42 MHz PCLK 下
+I2C 的 `max_hz` 默认 100000，允许名义 5129–400000 Hz，表示上界而非精确速率。
+公共 C 时序计算向上取整 12-bit CCR；Standard mode 的计算上界统一不超过 88 kHz，
+覆盖 ES0182 Rev19 §2.10.4 的所有 repeated START，而不是仅限制 10-bit endpoint。
+超过 100 kHz 时显式使用 Fast-mode 2:1 duty 和 300 ns TRISE 公式，不自动变更模式。
+固定 42 MHz PCLK 下默认配置选择 CCR=239，名义约 87.866 kHz；只读 trait 保留
+`configured_max_hz`，并用 `nominal_hz` 报告整数分频后的名义速率（向下取整 Hz）。
+该字段为零表示缺少实际时钟集成，不能作为测量结果。依据 RM0090 §27.6.8，
+固定 42 MHz PCLK 下
 `max_hz=400000` 选择 CCR=36，名义约 388.9 kHz，不声称达到精确 400 kHz。
 该计算不保证实际时钟误差、上拉和总线电容满足规范。
 冷态取得后保存 CCR；局部 recover 复用该配置并保留已挂接的 wake，不继承可能损坏的
@@ -405,9 +442,11 @@ I2C endpoint 的 `address_bits` 默认 7，地址限于 8–119；显式 10 时�
 payload，内部 restart 不重新编程 DMA stream。NACK、仲裁、取消和 timeout 继续
 进入同一 drain；硬件或 publisher 未退出时保留借用，不隐式重放事务。
 
-ES0182 Rev19 §2.10.4 的 Standard-mode repeated START 限制与 PCLK 无关。
-因此 10-bit 只准入 `max_hz <= 88000` 或显式 Fast `max_hz > 100000`，C 入口也校验
-实际 CCR；默认 100 kHz 配置须显式修改后才能选 10-bit。该选择不建立物理时序资格。
+ES0182 Rev19 §2.10.4 的 Standard-mode repeated START 限制与 PCLK、地址宽度无关。
+默认 100 kHz 上界可以同时接入 7／10-bit endpoint；7-bit 多消息与 10-bit 内部
+restart 在任何借用或传输效果前再次检查实际 CCR，拒绝外部改成不安全速率的配置。
+不在事务中动态改分频，不依赖 target 不拉伸时钟或小于 300 ns 的上升时间假设。
+该处理不建立物理时序资格；F4 V1 尚不接受 V2 的 `bus_hz_min` 时序 envelope。
 ARM 实际编译比较：endpoint 仍为 8 字节、异步 state 仍为 64 字节。控制器 trait 的
 `address_bits=0` 表示宽度归 endpoint；具名 endpoint 的 selected contract 返回 7 或 10。
 Native 未因此取得 10-bit 支持，I2C target／SMBus／PEC 也未由 master 扩展推定实现。

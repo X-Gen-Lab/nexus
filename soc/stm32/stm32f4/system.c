@@ -10,6 +10,7 @@
 #include "nexus/core/time.h"
 #include "nexus_config.h"
 #include "stm32f407_clock.h"
+#include "stm32f407_silicon.h"
 #include "stm32f407_system.h"
 #if defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM
 #include "memory_init.h"
@@ -79,6 +80,8 @@ void TIM2_IRQHandler(void) {
     }
     nx_arch_irq_restore(saved);
 #endif
+    /* ES0182 2.1.3: the final overflow/alarm stores follow the inner ack. */
+    nx_arch_dsb();
 }
 
 #ifndef NX_STM32_POLL
@@ -263,9 +266,10 @@ static int restore_hsi(nx_stm32_system_t* system, uint32_t limit) {
     if (!wait_bits(system, &system->rcc->CFGR, RCC_CFGR_SWS, 0U, limit)) {
         return -1;
     }
-    /* HPRE is one throughout the reviewed profile. Publish the confirmed HSI
-     * switch even if a later PLL, prescaler or resource cleanup is refused. */
-    system->core_hz = 16000000U / NEXUS_CLOCK_AHB_DIV;
+    /* Startup may fail before establishing the selected divider. Publish
+     * the observed HSI/HPRE pair even if later withdrawal is refused. */
+    uint32_t hpre = (uint32_t)((system->rcc->CFGR & RCC_CFGR_HPRE) >> 4U);
+    system->core_hz = 16000000U >> AHBPrescTable[hpre];
     SystemCoreClock = system->core_hz;
     NX_STM32_WRITE(&system->rcc->CR,
                    system->rcc->CR &
@@ -687,9 +691,8 @@ nx_result_t nx_stm32_validate_identity(uint32_t expected_flash_bytes) {
 #define NX_STM32_DEVICE_ID() (DBGMCU->IDCODE)
 #endif
     uint32_t observed_bytes = (uint32_t)NX_STM32_FLASH_KIB() * 1024U;
-    if (observed_bytes != expected_flash_bytes ||
-        (NX_STM32_DEVICE_ID() & 0xFFFU) != 0x413U) {
+    if (observed_bytes != expected_flash_bytes) {
         return NX_ERROR_IO;
     }
-    return NX_SUCCESS;
+    return nx_stm32f407_silicon_admit(NX_STM32_DEVICE_ID());
 }

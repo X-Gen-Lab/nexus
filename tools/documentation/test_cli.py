@@ -110,6 +110,20 @@ class DocumentationCommandTests(unittest.TestCase):
             result = cli.main(["check", "--staged"], root=self.root)
         self.assertNotEqual(result, 0)
 
+    def test_staged_check_rejects_unstaged_source_adjacent_readme(self):
+        subprocess.run(["git", "init", "-q", str(self.root)], check=True)
+        board = self.root / "boards/reference/README.md"
+        board.parent.mkdir(parents=True)
+        board.write_text("# Reviewed board contract\n")
+        subprocess.run(["git", "-C", str(self.root), "add", "docs", "boards"],
+                       check=True)
+        board.write_text("# Changed outside the index\n")
+        output = io.StringIO()
+        with redirect_stdout(io.StringIO()), redirect_stderr(output):
+            result = cli.main(["check", "--staged"], root=self.root)
+        self.assertNotEqual(result, 0)
+        self.assertIn("boards/reference/README.md", output.getvalue())
+
     def test_staged_check_rejects_configuration_code_outside_the_index(self):
         subprocess.run(["git", "init", "-q", str(self.root)], check=True)
         paths = (
@@ -644,6 +658,42 @@ class DocumentationWorkspaceTests(unittest.TestCase):
         expected = self.root / "build/documentation-attempts"
         self.assertTrue(self.receipt.is_relative_to(expected))
         self.assertEqual(len(list(expected.iterdir())), 1)
+
+    def test_chinese_output_keeps_canonical_gettext_and_chinese_html(self):
+        (self.root / "docs/assets/diagrams").mkdir(parents=True)
+        (self.root / "LICENSE").write_text("fixture source license" + chr(10))
+        (self.prefix / "licenses").mkdir(parents=True)
+        observations = {}
+
+        def successful_command(command, **kwargs):
+            log = kwargs["log"]
+            log.write_text("fixture command success" + chr(10))
+            receipt = log.with_suffix(".receipt.json")
+            receipt.write_text(json.dumps({"exit_code": 0}))
+            # Copy the environment at the external port before later stages
+            # change the same mutable mapping for their selected output.
+            observations[kwargs["stage"]] = (list(command), dict(kwargs["env"]))
+            if kwargs["stage"] == "documentation-doxygen":
+                (log.parent / "api/html").mkdir(parents=True)
+            return SimpleNamespace(returncode=0, stdout="", stderr="",
+                                   receipt_path=receipt)
+
+        self.run.side_effect = successful_command
+        with patch.object(cli.check, "validate_translations", return_value={
+                "status": "passed", "errors": [], "records": []}), \
+                redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            metadata = cli.build(self.root, self.external, language="zh_CN",
+                                 tool_prefix=self.prefix)
+        _, extraction = observations["documentation-gettext"]
+        command, rendering = observations["documentation-html-zh_CN"]
+        self.assertEqual(extraction["NEXUS_DOCS_LANGUAGE"], "en")
+        self.assertEqual(set(extraction["NEXUS_DOCS_LANGUAGES"].split(",")),
+                         {"en", "zh_CN"})
+        self.assertEqual(rendering["NEXUS_DOCS_LANGUAGE"], "zh_CN")
+        self.assertEqual(rendering["NEXUS_DOCS_LANGUAGES"], "zh_CN")
+        self.assertIn("language=zh_CN", command)
+        self.assertEqual(metadata["languages"], ["zh_CN"])
+        self.assertNotIn("documentation-html-en", observations)
 
 
 if __name__ == "__main__":

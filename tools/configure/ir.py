@@ -336,6 +336,12 @@ class ExtiOptions:
 
 
 @dataclass(frozen=True)
+class ExtiHardwareOptions:
+    edge: str
+    pull: str = "none"
+
+
+@dataclass(frozen=True)
 class PvdOptions:
     threshold_code: int
 
@@ -665,6 +671,7 @@ class RtcOptions:
     timeout_us: int
     poll_limit: int
     initial: RtcCalendarOptions | None
+    lse_bypass: bool = False
 
 
 @dataclass(frozen=True)
@@ -755,10 +762,13 @@ class AudioOptions:
     rate_numerator: int
     rate_denominator: int
     irq: IrqOptions
+    continuous: bool = False
+    max_sample_rate_hz: int = 0
+    max_service_gap_us: int = 0
 
 
 ControllerOptions = (CaptureOptions | AudioOptions | GpioOptions | BlockOptions | FlashOptions | PinStateOptions | UartOptions | SpiOptions | I2cOptions | I2cTargetOptions |
-                     ExtiOptions | PvdOptions | PvdEventsOptions | PwmOptions | PwmGroupOptions | TimerWaveformOptions | EncoderOptions | AdcOptions | DacOptions | CanOptions |
+                     ExtiOptions | ExtiHardwareOptions | PvdOptions | PvdEventsOptions | PwmOptions | PwmGroupOptions | TimerWaveformOptions | EncoderOptions | AdcOptions | DacOptions | CanOptions |
                      UsbDeviceOptions | UsbHostOptions | EthernetOptions | EthernetFramesOptions |
                      TimerCaptureOptions |
                      AdvancedPwmOptions | PwmAdcOptions | CanFdOptions |
@@ -795,7 +805,10 @@ def mode_options(values):
             "standard", "sample_bits", "slot_bits", "mclk", "cpol_high",
             "poll_limit", "sample_rate_hz", "pll_n", "pll_r", "max_error_ppm",
             "pll_input_hz", "pll_m", "pll_hse", "divider", "odd",
-            "rate_numerator", "rate_denominator")), irq)
+            "rate_numerator", "rate_denominator")), irq,
+            values.get("continuous", False),
+            values.get("max_sample_rate_hz", 0),
+            values.get("max_service_gap_us", 0))
     if kind == "adc_group":
         plan = values["adc_group_resolution"]
         return AdcGroupOptions(
@@ -906,6 +919,9 @@ def mode_options(values):
             "own_address", "address_bits", "second_address", "max_hz",
             "irq_latency_us", "pec", "alert")), irq)
     if kind == "exti":
+        if values['mode'] == 'hardware-event':
+            return ExtiHardwareOptions(values['edge'],
+                                       values.get('pull', 'none'))
         if values['mode'] == 'pvd-level':
             return PvdOptions(values['threshold_code'])
         if values['mode'] == 'pvd-events':
@@ -939,7 +955,8 @@ def mode_options(values):
             return RtcOptions(values["allow_set"], values["timeout_us"],
                               values["poll_limit"],
                               RtcCalendarOptions(**initial)
-                              if initial is not None else None)
+                              if initial is not None else None,
+                              values.get("lse_bypass", False))
     if kind == "watchdog" and values["mode"] == "window":
         return WindowWatchdogOptions(values.get("window_ticks", 1))
     if kind in {"watchdog", "rtc", "crc", "entropy"}:

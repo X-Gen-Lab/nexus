@@ -1,6 +1,6 @@
 # Translation from the exact fresh8 gettext extraction; independent review pending.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: f3823278141806958306f5fcbf82238080b57cec3ffbc2413c5c2e0e28b82bc8\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 81af89211f9d0dc7aa288fd35517ebcad31b0d64c82b26721e2509a197c28fdd\n"
 
 msgid "当前架构与工程合同"
 msgstr "Current architecture and engineering contracts"
@@ -86,11 +86,11 @@ msgstr "Sampling, control and capture"
 msgid "[多 ADC／注入组](f407-adc-groups.md)、[高级定时器](timer-advanced.md)、[有限脉冲／波形序列](f407-timer-waveform.md)、[DCMI／I2S2／3](f407-capture-audio.md)"
 msgstr "[Multiple/injected ADC groups](f407-adc-groups.md), [Advanced timers](timer-advanced.md), [Finite pulses/waveform sequences](f407-timer-waveform.md), [DCMI/I2S2/3](f407-capture-audio.md)"
 
-msgid "有限音频与外部主机协调"
-msgstr "Finite audio and external-master coordination"
+msgid "有限／连续音频与外部时钟协调"
+msgstr "Finite/continuous audio and external-clock coordination"
 
-msgid "[标准 audio／Platform slave TX 路径](f407-i2s2-slave-tx.md)、[帧与流所有权](io-evolution.md)"
-msgstr "[Standard audio / Platform slave TX path](f407-i2s2-slave-tx.md), [frame and stream ownership](io-evolution.md)"
+msgid "[DCMI／I2S 主合同](f407-capture-audio.md)、[Platform 有限 slave TX 路径](f407-i2s2-slave-tx.md)、[帧与流所有权](io-evolution.md)"
+msgstr "[DCMI/I2S primary contract](f407-capture-audio.md), [Platform finite slave TX path](f407-i2s2-slave-tx.md), [frame and stream ownership](io-evolution.md)"
 
 msgid "日历、唤醒与备份域"
 msgstr "Calendar, wakeup and backup domain"

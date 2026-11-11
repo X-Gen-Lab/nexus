@@ -145,6 +145,7 @@ typedef struct {
     uint32_t supply_mv;
     bool active;
     bool power_on_reset_required;
+    bool options_owned;
 } nx_stm32_flash_state_t;
 /** \brief Explicitly assembled optional face shares the physical pulse owner.
  */

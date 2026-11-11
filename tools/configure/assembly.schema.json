@@ -357,6 +357,18 @@
             "minimum": 0,
             "maximum": 4294967295
           },
+          "max_sample_rate_hz": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295,
+            "description": "Frequency in hertz; exact provider limits still apply."
+          },
+          "max_service_gap_us": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295,
+            "description": "Time interval in microseconds; not a measured hardware guarantee."
+          },
           "mclk": {
             "type": "boolean"
           },
@@ -2581,6 +2593,10 @@
               }
             }
           },
+          "lse_bypass": {
+            "type": "boolean",
+            "default": false
+          },
           "mode": {
             "type": "string",
             "description": "Explicit maintained mode; the product owns service and shutdown."
@@ -2635,6 +2651,11 @@
                   {
                     "required": [
                       "initial"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "lse_bypass"
                     ]
                   },
                   {

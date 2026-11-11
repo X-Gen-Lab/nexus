@@ -21,7 +21,7 @@ and mutable provider state remain private.
 
 | Task | Public headers |
 | --- | --- |
-| Samples, camera storage and finite audio | `adc.h`, `adc_group.h`, `capture.h`, `audio.h`, `frame_stream.h` |
+| Samples, camera storage and finite/continuous audio | `adc.h`, `adc_group.h`, `capture.h`, `audio.h`, `frame_stream.h` |
 | Serial data and wire formats | `uart.h`, `uart_word.h`, `uart_wire.h`, `uart_rs485.h`, `spi.h`, `spi_transaction.h`, `spi_dma_transaction.h`, `spi_frames.h`, `i2c.h`, `i2c_target.h` |
 | Media and physical storage | `block.h`, `block_async.h`, `sdio_io.h`, `flash.h`, `flash_async.h`, `flash_maintenance.h`, `nand.h`, `external_bus.h`, `memory_window.h`, `parallel16.h` |
 | Calendar and backup resources | `rtc.h`, `rtc_aux.h` |

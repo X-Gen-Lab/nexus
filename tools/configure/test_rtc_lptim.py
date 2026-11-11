@@ -124,7 +124,7 @@ class NativeTimeAssemblyTests(unittest.TestCase):
         self.assertIn("lptim", schema["properties"])
         self.assertEqual(set(schema["properties"]["rtc"]["additionalProperties"]["properties"]),
                          {"binding", "mode", "allow_set", "timeout_us",
-                          "poll_limit", "initial"})
+                          "poll_limit", "initial", "lse_bypass"})
         self.assertIn("tick_hz", schema["properties"]["lptim"]["additionalProperties"]["required"])
         self.assertEqual(json.loads((gate.ROOT / "tools/configure/assembly.schema.json").read_text()), schema)
 

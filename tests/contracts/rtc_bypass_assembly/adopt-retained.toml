@@ -1,0 +1,14 @@
+schema=2
+board_package="board"
+backend="baremetal"
+clock="hse8-pll168"
+[memory]
+main_stack_bytes=2048
+libc_heap_bytes=0
+[rtc.calendar]
+binding="calendar"
+mode="adopt-retained"
+allow_set=false
+timeout_us=2000000
+poll_limit=1000000
+lse_bypass=true

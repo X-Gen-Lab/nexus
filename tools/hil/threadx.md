@@ -24,7 +24,6 @@ and verifies the selected Board's exact part in its owned `board.json`.
 | `native-reference` | `linux/gnu` | Host software only |
 | `stm32f407zg-qiming-v31` | `cortex_m4/gnu` | Exact M4 station preparation |
 | `stm32f407ve-sky-qingchun` | `cortex_m4/gnu` | Exact M4 station preparation |
-| `gd32f470zg-liangshan` | `cortex_m4/gnu` | Exact M4 station preparation |
 
 Native ThreadX support remains available for host software validation. Host
 observations cannot qualify MCU hardware. These contracts do not add another

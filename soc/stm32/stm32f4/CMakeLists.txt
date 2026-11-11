@@ -32,6 +32,9 @@ foreach(kind gpio uart spi i2c i2c_target flash watchdog exti pwm encoder adc ad
         list(APPEND stm32_sources drivers/av.c drivers/timer_waveform.c)
     elseif(kind STREQUAL "capture" OR kind STREQUAL "audio")
         list(APPEND stm32_sources drivers/av.c "drivers/${kind}.c")
+        if(kind STREQUAL "audio" AND "${modes}" MATCHES "-blocks")
+            list(APPEND stm32_sources drivers/audio_blocks.c)
+        endif()
     elseif(kind STREQUAL "eth")
         list(APPEND stm32_sources drivers/ethernet.c)
     elseif(kind STREQUAL "eth_frames")
@@ -71,6 +74,9 @@ foreach(kind gpio uart spi i2c i2c_target flash watchdog exti pwm encoder adc ad
             endif()
         endforeach()
     elseif(kind STREQUAL "exti")
+        if("hardware-event" IN_LIST modes)
+            list(APPEND stm32_sources drivers/exti_hardware.c)
+        endif()
         if("edge-event" IN_LIST modes OR "pvd-events" IN_LIST modes)
             list(APPEND stm32_sources drivers/exti.c)
         endif()
@@ -97,7 +103,8 @@ foreach(kind gpio uart spi i2c i2c_target flash watchdog exti pwm encoder adc ad
     endif()
     # Pin acquisition and rollback share GPIO helpers, including CS/PWM pins.
     if(kind MATCHES "^(gpio|uart|spi|i2c|i2c_target|exti|pwm|encoder|adc|adc_group|dac|can|usb_device|usb_host|eth|eth_frames|timer_capture|advanced_pwm|block|external_bus|capture|audio|pwm_group|timer_pulse|timer_sequence)$"
-        AND (NOT kind STREQUAL "exti" OR "edge-event" IN_LIST modes))
+        AND (NOT kind STREQUAL "exti" OR "edge-event" IN_LIST modes
+            OR "hardware-event" IN_LIST modes))
         list(APPEND stm32_sources drivers/gpio.c)
     endif()
     if(kind STREQUAL "uart")

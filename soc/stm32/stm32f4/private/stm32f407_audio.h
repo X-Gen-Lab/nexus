@@ -110,6 +110,23 @@ void nx_stm32_audio_irq(nx_stm32_audio_state_t* state);
 /** \brief Selected finite DMA entry; master RX performs terminal clock stop. */
 void nx_stm32_audio_dma_irq(nx_stm32_audio_state_t* state, bool receive);
 
+/** \brief Observe the shared cold clock, peripheral and retained epoch facts.
+ * \note Internal finite/blocks helper; the caller checks its own session epoch.
+ */
+bool nx_stm32_audio_live(nx_stm32_audio_state_t* state);
+/** \brief Preserve read-clear source faults in the same cold hardware owner.
+ * \note Internal helper; never consumes DR or caller payload storage.
+ */
+uint32_t nx_stm32_audio_status(nx_stm32_audio_state_t* state, SPI_TypeDef* bus);
+/** \brief Observe a bounded actual DWT delay in selected serial-clock bits.
+ * \note Internal master RX withdrawal helper; no counter reset is performed.
+ */
+bool nx_stm32_audio_cycle_delay(nx_stm32_audio_state_t* state, uint32_t bits);
+/** \brief Require a fresh TXE followed by a fresh BSY0 observation.
+ * \note Internal serialized withdrawal helper; failure retains the wire loan.
+ */
+bool nx_stm32_audio_tx_idle(nx_stm32_audio_state_t* state, SPI_TypeDef* bus);
+
 #ifndef NX_AV_CYCLES
 #define NX_AV_CYCLES()        (DWT->CYCCNT)
 #define NX_AV_TRACE           (&DCB->DEMCR)

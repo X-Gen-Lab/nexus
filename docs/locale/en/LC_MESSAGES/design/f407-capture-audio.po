@@ -1,15 +1,30 @@
-# Current exact gettext entries; independent delta review pending.
+# Exact gettext entries with independently reviewed current translations.
 msgid ""
 msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 4d9c52f7df197ad4f6b9395f5dc3243f2945951520a2845be93fa6782dc4ba45\n"
+
+msgid "![FIG-31：F4 源码归属与接口边界](../assets/diagrams/driver-source-ownership.svg)"
+msgstr "![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)"
+
+msgid "FIG-31：F4 源码归属与接口边界"
+msgstr "FIG-31: F4 source ownership and interface boundaries"
 
 msgid "F407 DCMI 与 I2S2／3"
 msgstr "F407 DCMI and I2S2/3"
 
-msgid "这里记录 `capture.c`、`audio.c` 和同源静态装配的合同。芯片 AF 路线来自 DS8626 Rev12；寄存器、DMA 与关闭时序来自 RM0090 Rev22。软件参考限定 STM32F407VE／ZG，不代表摄像头、codec、PCB 接线、电气时序或物理 HIL 已执行。"
-msgstr "This page records the contracts of `capture.c`, `audio.c` and their shared static assembly. Silicon AF routes come from DS8626 Rev12; register, DMA and stop ordering come from RM0090 Rev22. Software references target STM32F407VE/ZG and do not establish camera, codec, PCB wiring, electrical timing or physical HIL execution."
+msgid "这里记录 `capture.c`、`audio.c`、`audio_blocks.c` 和同源静态装配的合同。芯片 AF 路线来自 DS8626 Rev12；寄存器、DMA 与关闭时序来自 RM0090 Rev22。软件参考限定 STM32F407VE／ZG，不代表摄像头、codec、PCB 接线、电气时序或物理 HIL 已执行。"
+msgstr "This page records the contracts of `capture.c`, `audio.c`, `audio_blocks.c` and their shared static assembly. Silicon AF routes come from DS8626 Rev12; register, DMA and stop ordering come from RM0090 Rev22. Software references target STM32F407VE/ZG and do not establish camera, codec, PCB wiring, electrical timing or physical HIL execution."
+
+msgid "静态配置、资源责任与公共调用边界参见共享图示。"
+msgstr "See the shared diagram for static configuration, resource responsibility and public call boundaries."
+
+msgid "[F4 源码归属与接口边界](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[F4 source ownership and interface boundaries](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 
 msgid "图表示当前源码和依赖关系；具体模式、关闭证明和时间域规则以下文为准。"
 msgstr "The diagram shows current source and dependency relationships. The sections below define exact modes, shutdown proof and time-domain rules."
+
+msgid "图示区分构建输入与运行期调用，不表示吞吐保证。factory 只返回已有 `nx_capture_t` 或 `nx_audio_t`。Platform prepare 取得资源并配置格式，不启动 CAPTURE、I2SE 或一次 DMA 传输；应用通过公共 face 提交请求或启动 RAW blocks。 Platform close 调用同一个 C owner 排空，失败会阻止 System 退出，保留全部借用和 精确清理责任。没有 heap、运行时名字注册表、默认 buffer pool 或后台任务。"
+msgstr "The diagram distinguishes build inputs from runtime calls; it provides no throughput guarantee. Factory lookup returns an existing `nx_capture_t` or `nx_audio_t`. Platform prepare acquires resources and configures the format without starting CAPTURE, I2SE or DMA. Applications submit requests or start RAW blocks through public faces. Platform close uses that same C owner to drain. Failure prevents System withdrawal and retains every borrow and exact cleanup responsibility. There is no heap, runtime name registry, default buffer pool or background task."
 
 msgid "DCMI 输入与模式"
 msgstr "DCMI inputs and modes"
@@ -67,6 +82,30 @@ msgstr "TX shutdown observes DMA EN0, TXE1, then a fresh BSY0 before withdrawing
 
 msgid "错误／取消报告零个有效音频字节。DMA TC、NDTR0、timeout 或停止 clock 都不直接 归还借用；Serializer／DMA／IRQ／地址全部排空后才归还 TX 或发布 RX。任何失败 保留完整 request 和未归还 loans，close 不允许 System 提前退出。所有 deadline 包含最终排空，重新建立 System epoch 后的旧借用保持 quarantine。"
 msgstr "Error/cancellation reports zero valid audio bytes. DMA TC, NDTR0, timeout or stopping clocks never directly returns a borrow. TX is returned or RX published only after serializer/DMA/IRQ/address drain. Failure retains the complete request and outstanding loans and prevents premature System close. Deadlines include final drain. Outstanding borrows from the previous System epoch remain quarantined after a new epoch is established."
+
+msgid "连续 I2S blocks"
+msgstr "Continuous I2S blocks"
+
+msgid "显式 `master-tx-blocks`、`master-rx-blocks`、`master-duplex-blocks` 和对应 `slave-*` 模式使用独立的连续 state/config。普通有限实例不增加运行时字段； 同一 `nx_audio_port_t` 的只读 ops 追加可选 `start_blocks`，有限表该项为 NULL。 连续表不提供有限 `submit`／`cancel`，会话通过已有 `service`／`stop` 推进和退出。 factory 仍然只查询已有静态对象，不把一个控制器同时装成两种 personality。"
+msgstr "Explicit `master-tx-blocks`, `master-rx-blocks`, `master-duplex-blocks` and corresponding `slave-*` modes use separate continuous state/configuration. Ordinary finite instances gain no runtime fields. The read-only ops of the same `nx_audio_port_t` gain an optional `start_blocks`; the finite table leaves it NULL. The continuous table provides no finite `submit`/`cancel`: sessions progress and exit through the existing `service`/`stop`. Factory lookup still returns existing static objects and never assembles one controller as two simultaneous personalities."
+
+msgid "调用者准备 `nx_audio_blocks_request_t.base`、显式 `block_bytes` 及所选 TX／RX `nx_stream_t`。两方向控制、slot 元数据和全部 capacity 必须互不重叠；每块是完整 音频 frame 的整数倍，每方向最多 65535 个 DMA halfwords。格式仍遵守上述原始 halfword／slot 合同，不复制、重排或转换数据。"
+msgstr "The caller prepares `nx_audio_blocks_request_t.base`, explicit `block_bytes` and the selected TX/RX `nx_stream_t` objects. Controls, slot metadata and all buffer capacities of both directions must be disjoint. Each block contains an integer number of complete audio frames, with at most 65535 DMA halfwords per direction. The raw halfword/slot contract above still applies; data is never copied, reordered or converted."
+
+msgid "TX 至少提供两个 READY block。provider 取得两个精确 consumer token，作为两个 DMA bank；每次可信 TC 后先取得下一块、替换非活动地址，再回读 CT／事件和时间预算， 最后归还旧 block。数据生产者通过原 stream 的 producer 操作补充后续 READY block。 RX 至少提供三个 FREE slot，复用 posted producer 同时借用两个 FILLING bank； 先取得第三块并完成相同的地址替换证明，才 FIFO 发布旧块。消费者使用原 stream acquire／release，仍可持有已发布块；provider 不覆盖 READY／BORROWED。"
+msgstr "TX supplies at least two READY blocks. The provider acquires two exact consumer tokens as the two DMA banks. After each trustworthy TC, it first acquires the next block and replaces the inactive address, then reads back CT/events and checks the time budget before returning the old block. The data producer replenishes subsequent READY blocks through the original stream producer operations. RX supplies at least three FREE slots and reuses the posted producer to borrow two FILLING banks concurrently. It acquires the third block and proves the same address replacement before publishing the old block in FIFO order. Consumers use the original stream acquire/release and may retain published blocks; the provider never overwrites READY/BORROWED storage."
+
+msgid "装配必须声明 `max_sample_rate_hz` 和 `max_service_gap_us`。master 的精确有理数 rate 不得超过前者；slave 的值是调用者必须保证的外部 clock 上界，rate 查询仍为 0/0 unknown。block 时长必须大于两倍 service 上界加两微秒裕量。每次 service 及地址替换前后观察真实单调时间、CT、硬件和 IRQ 锁存 TC／error；无法区分多次回卷 时停止并报告 LOSS，不从一个 CT bit 推造精确丢失样本数。IRQ 只锁存事实；source OVR 等 level 错误先撤 ERRIE，使任务能够执行完整排空。"
+msgstr "The assembly must declare `max_sample_rate_hz` and `max_service_gap_us`. The exact rational master rate must not exceed the former. For a slave, this value is an external-clock upper bound the caller must uphold; the rate query still returns unknown 0/0. A block must last longer than twice the service bound plus a two-microsecond margin. Each service and both sides of address replacement observe actual monotonic time, CT, hardware and IRQ-latched TC/error facts. If multiple wraps cannot be distinguished, the session stops and reports LOSS; one CT bit never invents an exact number of lost samples. IRQs only latch facts. Level errors such as source OVR first withdraw ERRIE so the task can perform complete drain."
+
+msgid "这些预算不是物理吞吐资格。持续运行要求应用在预算内推进 service、补充 TX READY 和归还 RX consumer blocks；没有隐藏 worker、默认 buffer pool、软件补静音或自动 重放政策。违反外部时钟或服务预算时，硬件在软件观察之前的欠载、回卷及 wire 行为 不能由软件结果追溯保证。duplex 两方向独立观察 bank，内存块不附加伪造的 aperture 时间或相位同步测量。"
+msgstr "These budgets do not establish physical throughput qualification. Continuous operation requires the application to call service within budget, replenish TX READY blocks and return RX consumer blocks. There is no hidden worker, default buffer pool, software silence insertion or automatic replay policy. If external-clock or service bounds are violated, software results cannot retrospectively guarantee underrun, wrap or wire behavior that occurred before observation. Duplex observes each direction independently; memory blocks carry no invented aperture times or measured phase synchronization."
+
+msgid "slave TX 的 ACTIVE 仍要求 DR prefill、NDTR=N−1、TXE0、三个实际微秒 tick 和 稳定 idle CK／WS；之后才能启动外部 clock。stop 先撤请求、观察 DMA／serializer／ IRQ 与全部地址真正退出，再归还两个 TX token 和撤销未完成 RX fills。主 RX 停止 额外观察实际 DWT 的 terminal bit 时间；当前部分 block 不发布为完整 frame。 拒撤、地址不清、未退出 IRQ 或 time-domain 历史丢失时保留 QUARANTINED 会话和 全部存储，Platform close 不归还其时钟。普通可恢复拒撤可在同一实例重试；历史丢失 不因把寄存器恢复成 reset 外观而自动解除。"
+msgstr "Slave TX ACTIVE still requires DR prefill, NDTR=N-1, TXE0, three actual microsecond ticks and stable idle CK/WS. Only then may external clocks start. Stop first withdraws requests and observes actual DMA/serializer/IRQ and address detachment before returning both TX tokens and aborting incomplete RX fills. Master RX stop additionally observes the terminal-bit time with actual DWT. The current partial block is never published as a complete frame. Refused withdrawal, uncleared addresses, unjoined IRQs or lost time-domain history retain the QUARANTINED session and all storage; Platform close retains its clocks. An ordinary recoverable withdrawal refusal can be retried on the same instance. Lost history is not cleared automatically by making registers look reset-like."
+
+msgid "`SETTLED` 是 provider 对会话及 producer/consumer 权限的最后访问。之前发布的 RX consumer loans 继续有效，应用需独立 join 它们再回收 stream 或 buffers；未被 DMA 取得的 TX READY blocks 仍在原队列。`base.transferred` 在选择 RX 时统计已发布 RX 字节，否则统计已脱离 DMA 并归还的 TX 字节；错误／取消也可返回先前完整前缀， 不代表实际播放／采样的精确 wire frame 数。整段持续会话可显式使用 `NX_DEADLINE_NEVER`，或由一个绝对 deadline 触发有界排空。"
+msgstr "`SETTLED` is the provider's final access to the session and producer/consumer rights. Previously published RX consumer loans remain valid; the application must join them separately before reclaiming streams or buffers. TX READY blocks never acquired by DMA remain in the original queue. With RX selected, `base.transferred` counts published RX bytes; otherwise it counts TX bytes detached from DMA and returned. Errors/cancellation may therefore report a previously completed prefix, never an exact count of physical playback/capture wire frames. A continuous session may explicitly use `NX_DEADLINE_NEVER`, or one absolute deadline may initiate bounded drain."
 
 msgid "装配与验证入口"
 msgstr "Assembly and validation"
@@ -137,20 +176,5 @@ msgstr "Execution context and shared state"
 msgid "privilege／ISR／三个 incoming masks、共享 PLL、邻 DMA、IRQ 原优先级"
 msgstr "Privilege/ISR/three incoming masks, shared PLL, neighboring DMA and original IRQ priorities"
 
-msgid "原手动 face／storage ABI 的布局检查随该 ABI 退出。原 System 特殊 gate 分支的三项 测试只证明手动调用者已自行 join 的前提，随该架构删除；标准 Platform 现在实际调用 audio close，无法完成借用排空就拒绝资源撤回。cold 状态及共享 GPIO／DMA 门由已有 Platform 资源 owner 统一取得，factory 不再允许调用者构造第二个硬件 owner。 linked provider 验证沿用普通 generated face→五方法表→真实私有函数的同一机制， 无需专用角色、公共 opaque storage 或另一个硬件发现入口。"
-msgstr "Layout checks of the manual face/storage ABI retire with that ABI. Three tests of special System gates proved only that manual callers had joined their users and retire with that architecture. Standard Platform now actually calls audio close and refuses resource withdrawal without complete borrow drain. Existing Platform resource owners acquire cold state and shared GPIO/DMA gates. Factory no longer lets callers construct a second hardware owner. Linked-provider verification uses the same generated-face→five-method-table→actual-private-function mechanism without a dedicated role, public opaque storage or another discovery entry point."
-
-msgid "![FIG-31：F4 源码归属与接口边界](../assets/diagrams/driver-source-ownership.svg)"
-msgstr "![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)"
-
-msgid "FIG-31：F4 源码归属与接口边界"
-msgstr "FIG-31: F4 source ownership and interface boundaries"
-
-msgid "[F4 源码归属与接口边界](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
-msgstr "[F4 source ownership and interface boundaries](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
-
-msgid "图示区分构建输入与运行期调用，不表示吞吐保证。factory 只返回已有 `nx_capture_t` 或 `nx_audio_t`。Platform prepare 取得资源并配置格式，不启动 CAPTURE、I2SE 或一次 DMA 传输；应用通过公共 face 提交请求或启动 RAW blocks。 Platform close 调用同一个 C owner 排空，失败会阻止 System 退出，保留全部借用和 精确清理责任。没有 heap、运行时名字注册表、默认 buffer pool 或后台任务。"
-msgstr "The diagram distinguishes build inputs from runtime calls; it provides no throughput guarantee. Factory lookup returns an existing `nx_capture_t` or `nx_audio_t`. Platform prepare acquires resources and configures the format without starting CAPTURE, I2SE or DMA. Applications submit requests or start RAW blocks through public faces. Platform close uses that same C owner to drain. Failure prevents System withdrawal and retains every borrow and exact cleanup responsibility. There is no heap, runtime name registry, default buffer pool or background task."
-
-msgid "静态配置、资源责任与公共调用边界参见共享图示。"
-msgstr "See the shared diagram for static configuration, resource responsibility and public call boundaries."
+msgid "原手动 face／storage ABI 的布局检查随该 ABI 退出。原 System 特殊 gate 分支的三项 测试只证明手动调用者已自行 join 的前提，随该架构删除；标准 Platform 现在实际调用 audio close，无法完成借用排空就拒绝资源撤回。cold 状态及共享 GPIO／DMA 门由已有 Platform 资源 owner 统一取得，factory 不再允许调用者构造第二个硬件 owner。 linked provider 验证沿用普通 generated face→共享只读方法表→真实私有函数的同一机制， 无需专用角色、公共 opaque storage 或另一个硬件发现入口。"
+msgstr "Layout checks of the manual face/storage ABI retire with that ABI. Three tests of special System gates proved only that manual callers had joined their users and retire with that architecture. Standard Platform now actually calls audio close and refuses resource withdrawal without complete borrow drain. Existing Platform resource owners acquire cold state and shared GPIO/DMA gates. Factory no longer lets callers construct a second hardware owner. Linked-provider verification uses the same generated-face→shared-read-only-method-table→actual-private-function mechanism without a dedicated role, public opaque storage or another discovery entry point."

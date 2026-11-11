@@ -25,8 +25,9 @@ executor、IRQ、DMA、notification 和 memory owner。关闭准入后，以真�
 权限在没有活跃 FP owner 时可接纳；尾部以 DSB／ISB 禁用 CP10／11，随后替换 MSP
 并跳转。
 
-[FIG-23 所有权图](../../../../docs/assets/diagrams/io-extension-ownership.svg) 中的
-镜像交接分支表示此类显式会合责任，不表示通用 boot 或已执行物理交接。
+[FIG-05 Platform 生命周期](../../../../docs/assets/diagrams/platform-lifecycle.svg)
+说明平台停止前的排空与失败保留；镜像交接还须满足本文的 masks、向量和存储前提。
+图不表示通用 boot 或已执行物理交接。
 
 拒绝保留 masks 且不写 MMIO，但读取 SysTick CTRL 会消费 COUNTFLAG。off gate
 只阻止执行，不能认证 controller 的潜在配置已清除；目标在开 gate 前 reset controllers。

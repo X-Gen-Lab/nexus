@@ -270,6 +270,7 @@ const nx_flash_ops_t nx_native_flash_ops = {
     .read = native_flash_read,
     .program = native_flash_program,
     .erase = native_flash_erase,
+    .recover = NULL,
 };
 
 /** \brief Select exactly one Native face without affecting default fixtures. */

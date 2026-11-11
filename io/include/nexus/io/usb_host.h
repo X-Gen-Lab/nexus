@@ -147,6 +147,14 @@ nx_result_t nx_usb_host_state(const nx_usb_host_port_t* port,
  * \param[in] port: Same controller owner; all channel loans are settled.
  * \param[in] deadline: Finite absolute Core deadline.
  * \return SUCCESS or failure; reset never revokes an active request.
+ * \note Admission requires strictly more than 10 ms plus one microsecond of
+ *       clock-quantization guard; insufficient or expired budget returns
+ *       TIMEOUT without port effects. An admitted reset keeps
+ *       its minimum signal even if preemption crosses the deadline, then
+ *       reports TIMEOUT after withdrawal. Failed withdrawal closes admission
+ *       and retains the controller until stop can join the signal. An invalid
+ *       or persistently frozen Core clock observes a terminal fault and parks
+ *       with effects retained; it cannot authorize a short signal.
  */
 nx_result_t nx_usb_host_reset(const nx_usb_host_port_t* port,
                               nx_time_us_t deadline);
@@ -156,6 +164,12 @@ nx_result_t nx_usb_host_reset(const nx_usb_host_port_t* port,
  * \param[in] suspended: Requested suspended state.
  * \param[in] deadline: Finite absolute Core deadline.
  * \return SUCCESS after readback or failure retaining controller ownership.
+ * \note Resume requires strictly more than 20 ms plus one microsecond of
+ *       clock-quantization guard before port effects. Its admitted minimum
+ *       hold, late TIMEOUT, retained withdrawal
+ *       and terminal clock-failure rules match reset. A late completed resume
+ *       still publishes the actual resumed state; it does not retain a stale
+ *       suspended snapshot solely because the deadline elapsed.
  */
 nx_result_t nx_usb_host_suspend(const nx_usb_host_port_t* port, bool suspended,
                                 nx_time_us_t deadline);

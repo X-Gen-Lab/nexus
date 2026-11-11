@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 01816824f76ef8599bc3bd8981e1539ba6c5bcf9341b183da32a1bf6f0727420\n"
+"X-Nexus-Source-SHA256: 1ada80fba68283ad5f29de15b9886796f52a97d886533a6a15bc4c676d204741\n"
 
 #: docs/design/usb-device.md:1
 msgid "USB Device、Host 与显式角色所有权"
@@ -835,3 +835,11 @@ msgstr "Non-ISO IN drain requests SNAK, observes actual NAK state, then requests
 
 msgid "非 ISO IN 的每次有限 data／ZLP 长度寄存器写入 `(1U << 19) | length`（PKTCNT=1）， MCNT／保留高位保持零；ISO IN 同样 PKTCNT=1，但 MCNT=1，按下一节选择帧奇偶。 interrupt 不增加 odd/even-frame 命令。 每个选定 IN direction 使用独立 Tx FIFO， PIO 一次同步装入整个不超过所选 MPS 的包，没有剩余软件 refill 工作；TX-empty mask 保持零， 不创建 TXFE refill worker。IN FIFO 写入不是完成，只有 XFRC、EP enable 已清、 FIFO 空闲容量恢复并且观察到的 W1C completion 清除读回成功才发布 SUCCESS。 OUT 必须同时读到包数据和 XFRC， short packet 正常完成；越界包的所有 FIFO words 都被消费，最多复制 caller capacity， 之后报告 OVERFLOW 并排空，不越界写 caller buffer。"
 msgstr "Each finite non-ISO IN data/ZLP length register is `(1U << 19) | length` (PKTCNT=1); MCNT and reserved upper bits remain zero. ISO IN also uses PKTCNT=1 but sets MCNT=1 and selects frame parity as described below. Interrupt adds no odd/even-frame command. Each selected IN direction has its own Tx FIFO. PIO synchronously loads the complete packet, at most the selected MPS, with no remaining software refill work. TX-empty masks stay zero and no TXFE refill worker is created. Writing the IN FIFO is not completion: SUCCESS requires XFRC, cleared EP enable, recovered FIFO free capacity and successful W1C-completion clear readback. OUT must observe packet data and XFRC. Short packets complete normally. For an oversized packet, every FIFO word is consumed but at most the caller capacity is copied; OVERFLOW then starts drain without writing beyond the buffer."
+
+#: docs/design/usb-device.md:394
+msgid "Host control pipe 的 MPS 按实际速度准入：low-speed 为 8，full-speed 为 8／16／32／64，high-speed 为 64；非法组合在 HAL 和 channel 副作用前拒绝。 reset／resume 在任何 HPRT 写入前分别要求严格多于 10 ms／20 ms 加 1 µs 的剩余 deadline；额外一 tick 覆盖整数微秒采样隐藏的相位。不足、已到期或恰好耗尽预算 时返回 TIMEOUT，不发出短复位／恢复脉冲。"
+msgstr "Host control-pipe MPS admission follows the actual speed: 8 at low speed, 8/16/32/64 at full speed and 64 at high speed. Invalid combinations are rejected before HAL or channel effects. Before any HPRT write, reset/resume require strictly more than 10 ms/20 ms plus a 1 us guard remaining. The extra tick covers the fractional phase hidden by integer-microsecond samples. Insufficient, expired or exactly exhausted budgets return TIMEOUT without issuing a short reset/resume pulse."
+
+#: docs/design/usb-device.md:399
+msgid "已经开始的 reset／resume 必须保持最低信号时间。抢占越过 deadline 时，先完成 最低保持与撤信号读回，再返回 TIMEOUT；实际已恢复时仍发布 resumed 状态。 撤信号失败进入 closing，保留原 controller／clock 责任，stop 首先重试信号撤回， 成功前不调用 HAL stop 或释放 gate。已开始信号的时钟倒退、无效或持续无进展， 以有限观察预算进入 fault observer 和不返回的 park，保留信号而不伪造最低保持。 不增加实例字段、后台任务或另一套时钟；这些软件检查不构成物理脉宽测量。"
+msgstr "Once reset/resume starts, its minimum signal duration must be maintained. If preemption crosses the deadline, the provider completes the minimum hold and verifies signal withdrawal before returning TIMEOUT; an actually resumed port still publishes its resumed state. Failed withdrawal closes admission and retains the original controller/clock responsibility. Stop first retries signal withdrawal and does not call HAL stop or release the gate before it succeeds. Backward, invalid or persistently stalled time during an admitted signal reaches the fault observer and a non-returning park within a finite observation budget, retaining the signal without inventing minimum-duration proof. No instance fields, background tasks or second clock are added. These software checks do not measure physical pulse widths."

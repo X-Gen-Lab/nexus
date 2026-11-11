@@ -7,14 +7,20 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "nexus/core/fault.h"
 #include "nexus/io/native/model.h"
 #include "stm32f407_usb_host.h"
 #include "stm32f407_usb_host_cold.h"
 }
+#undef nx_time_now_us
+extern "C" nx_time_us_t nx_time_now_us(void);
+#include <cstdlib>
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
+#include <unistd.h>
+#include <vector>
 
 using testing::_;
 using testing::Invoke;
@@ -51,6 +57,61 @@ static bool irq_enabled[82];
 static bool irq_active[82];
 static bool hold_gate;
 static bool hold_dma_address;
+struct PortWrite {
+    uint32_t value;
+    nx_time_us_t time;
+    uint64_t fine_time;
+};
+static std::vector<PortWrite> port_writes;
+static bool signal_clock;
+static bool backward_signal_clock;
+static bool fine_signal_clock;
+static uint64_t fine_now;
+static nx_time_us_t signal_now;
+static uint32_t signal_step;
+static uint32_t signal_jump;
+static unsigned signal_jump_read;
+static unsigned signal_reads;
+static uint32_t active_signal;
+static uint32_t held_port_clear;
+static bool terminal_fault;
+static nx_stm32_usb_host_t* signal_owner;
+
+extern "C" nx_time_us_t nx_usb_host_model_now(void) {
+    if (!signal_clock)
+        return nx_time_now_us();
+    if (fine_signal_clock) {
+        signal_now = fine_now / 10U;
+        if (active_signal != 0U)
+            ++fine_now;
+        return signal_now;
+    }
+    if (active_signal != 0U) {
+        ++signal_reads;
+        if (signal_reads == signal_jump_read)
+            signal_now += signal_jump;
+        nx_time_us_t value = signal_now;
+        signal_now =
+            backward_signal_clock ? signal_now - 1U : signal_now + signal_step;
+        return value;
+    }
+    return signal_now;
+}
+
+extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
+                                 const char* file, unsigned line) {
+    terminal_fault = domain == NX_FAULT_PLATFORM && reason != NX_SUCCESS &&
+                     file != nullptr && line != 0U;
+}
+
+extern "C" void nx_usb_host_model_park(void) {
+    const bool retained =
+        terminal_fault && active_signal != 0U && signal_owner != nullptr &&
+        signal_owner->config != nullptr && signal_owner->snapshot.closing &&
+        signal_owner->clock_receipt != 0U;
+    std::_Exit(retained ? 70 : 72);
+}
+
 extern "C" void nx_usb_host_model_write(volatile uint32_t* reg,
                                         uint32_t value) {
     const auto address = reinterpret_cast<uintptr_t>(reg);
@@ -61,6 +122,14 @@ extern "C" void nx_usb_host_model_write(volatile uint32_t* reg,
         ((address >= 0x50000500U && address < 0x50000700U) ||
          (address >= 0x40040500U && address < 0x40040700U)) &&
         (address & 31U) == 20U) {
+        return;
+    }
+    if (address == 0x50000440U || address == 0x40040440U) {
+        *reg = value | (*reg & held_port_clear);
+        const nx_time_us_t now = signal_clock ? signal_now : nx_time_now_us();
+        port_writes.push_back(
+            {*reg, now, fine_signal_clock ? fine_now : now * 10U});
+        active_signal = *reg & (USB_OTG_HPRT_PRST | USB_OTG_HPRT_PRES);
         return;
     }
     if ((address >= 0x50000500U && address < 0x50000700U &&
@@ -180,6 +249,16 @@ class UsbHostHal : public testing::Test {
         std::memset(irq_active, 0, sizeof(irq_active));
         hold_gate = false;
         hold_dma_address = false;
+        port_writes.clear();
+        signal_clock = backward_signal_clock = false;
+        fine_signal_clock = false;
+        fine_now = 1000U;
+        signal_now = 100U;
+        signal_step = 1000U;
+        signal_jump = signal_jump_read = signal_reads = 0U;
+        active_signal = held_port_clear = 0U;
+        terminal_fault = false;
+        signal_owner = &state;
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         config.channels = channels;
         config.regions = &region;
@@ -204,6 +283,26 @@ class UsbHostHal : public testing::Test {
         EXPECT_CALL(hal, Start(&state.hal)).WillOnce(Return(HAL_OK));
         ASSERT_EQ(nx_stm32_usb_host_initialize(&state, &config, 1000U),
                   NX_SUCCESS);
+    }
+    volatile uint32_t* Port() {
+        return reinterpret_cast<volatile uint32_t*>(
+            reinterpret_cast<uintptr_t>(core) + USB_OTG_HOST_PORT_BASE);
+    }
+    void SignalClock() {
+        signal_clock = true;
+        signal_now = 100U;
+        signal_reads = 0U;
+        port_writes.clear();
+    }
+    void Suspended() {
+        *Port() |= USB_OTG_HPRT_PSUSP;
+        state.snapshot.suspended = true;
+    }
+    void CheckSignal(uint32_t bit, nx_time_us_t minimum) {
+        ASSERT_EQ(port_writes.size(), 2U);
+        EXPECT_NE(port_writes[0].value & bit, 0U);
+        EXPECT_EQ(port_writes[1].value & bit, 0U);
+        EXPECT_GE(port_writes[1].time - port_writes[0].time, minimum);
     }
     void Open(bool in = true, uint16_t mps = 64U) {
         nx_usb_host_pipe_t pipe = {mps, 3U,
@@ -260,6 +359,8 @@ class UsbHostHal : public testing::Test {
     void TearDown() override {
         hold_gate = false;
         hold_dma_address = false;
+        held_port_clear = 0U;
+        signal_clock = false;
         irq_active[67] = irq_active[77] = false;
         core->GRSTCTL = USB_OTG_GRSTCTL_AHBIDL;
         core->GINTSTS = 0U;
@@ -270,6 +371,212 @@ class UsbHostHal : public testing::Test {
         HostHal::active = nullptr;
     }
 };
+
+TEST_F(UsbHostHal, ResetRejectsShortAndExactBudgetBeforePortEffects) {
+    Start();
+    state.hal.ConnectCallback(&state.hal);
+    SignalClock();
+    for (nx_time_us_t budget : {1U, 1000U, 10000U, 10001U}) {
+        EXPECT_EQ(nx_usb_host_reset(&port, signal_now + budget),
+                  NX_ERROR_TIMEOUT);
+        EXPECT_TRUE(port_writes.empty());
+        EXPECT_EQ(*Port() & USB_OTG_HPRT_PRST, 0U);
+    }
+}
+
+TEST_F(UsbHostHal, ResumeRejectsShortAndExactBudgetWithoutChangingSuspend) {
+    Start();
+    Suspended();
+    SignalClock();
+    for (nx_time_us_t budget : {1U, 1000U, 20000U, 20001U}) {
+        EXPECT_EQ(nx_usb_host_suspend(&port, false, signal_now + budget),
+                  NX_ERROR_TIMEOUT);
+        EXPECT_TRUE(port_writes.empty());
+        EXPECT_NE(*Port() & USB_OTG_HPRT_PSUSP, 0U);
+        EXPECT_EQ(*Port() & USB_OTG_HPRT_PRES, 0U);
+        EXPECT_TRUE(state.snapshot.suspended);
+    }
+}
+
+TEST_F(UsbHostHal, ExpiredPortSignalsReturnTimeoutWithoutHardwareEffects) {
+    Start();
+    state.hal.ConnectCallback(&state.hal);
+    SignalClock();
+    for (nx_time_us_t deadline : {99U, 100U}) {
+        EXPECT_EQ(nx_usb_host_reset(&port, deadline), NX_ERROR_TIMEOUT);
+        EXPECT_EQ(nx_usb_host_suspend(&port, true, deadline), NX_ERROR_TIMEOUT);
+        EXPECT_TRUE(port_writes.empty());
+    }
+    Suspended();
+    EXPECT_EQ(nx_usb_host_suspend(&port, false, 100U), NX_ERROR_TIMEOUT);
+    EXPECT_TRUE(port_writes.empty());
+    EXPECT_TRUE(state.snapshot.suspended);
+}
+
+TEST_F(UsbHostHal, ResetKeepsItsMinimumSignalAndPreservesPortChangeFacts) {
+    Start();
+    state.hal.ConnectCallback(&state.hal);
+    *Port() = USB_OTG_HPRT_PENA | USB_OTG_HPRT_PCDET | USB_OTG_HPRT_PENCHNG |
+              USB_OTG_HPRT_POCCHNG | USB_OTG_HPRT_PPWR;
+    SignalClock();
+    EXPECT_EQ(nx_usb_host_reset(&port, 50000U), NX_SUCCESS);
+    CheckSignal(USB_OTG_HPRT_PRST, 10000U);
+    for (const auto& write : port_writes)
+        EXPECT_EQ(write.value & (USB_OTG_HPRT_PENA | USB_OTG_HPRT_PCDET |
+                                 USB_OTG_HPRT_PENCHNG | USB_OTG_HPRT_POCCHNG),
+                  0U);
+    EXPECT_NE(*Port() & USB_OTG_HPRT_PPWR, 0U);
+}
+
+TEST_F(UsbHostHal, SuspendAndResumeKeepTheFullResumeSignal) {
+    Start();
+    SignalClock();
+    EXPECT_EQ(nx_usb_host_suspend(&port, true, 50000U), NX_SUCCESS);
+    EXPECT_TRUE(state.snapshot.suspended);
+    EXPECT_NE(*Port() & USB_OTG_HPRT_PSUSP, 0U);
+    port_writes.clear();
+    EXPECT_EQ(nx_usb_host_suspend(&port, false, 50000U), NX_SUCCESS);
+    CheckSignal(USB_OTG_HPRT_PRES, 20000U);
+    EXPECT_FALSE(state.snapshot.suspended);
+    EXPECT_EQ(*Port() & USB_OTG_HPRT_PSUSP, 0U);
+}
+
+TEST_F(UsbHostHal, ResetMinimumHoldCoversTheUnknownIntegerTickPhase) {
+    Start();
+    state.hal.ConnectCallback(&state.hal);
+    SignalClock();
+    fine_signal_clock = true;
+    fine_now = 1009U;
+    EXPECT_EQ(nx_usb_host_reset(&port, 50000U), NX_SUCCESS);
+    ASSERT_EQ(port_writes.size(), 2U);
+    EXPECT_GE(port_writes[1].fine_time - port_writes[0].fine_time, 100000U);
+}
+
+TEST_F(UsbHostHal, ResumeMinimumHoldCoversTheUnknownIntegerTickPhase) {
+    Start();
+    Suspended();
+    SignalClock();
+    fine_signal_clock = true;
+    fine_now = 1009U;
+    EXPECT_EQ(nx_usb_host_suspend(&port, false, 50000U), NX_SUCCESS);
+    ASSERT_EQ(port_writes.size(), 2U);
+    EXPECT_GE(port_writes[1].fine_time - port_writes[0].fine_time, 200000U);
+}
+
+TEST_F(UsbHostHal, LateResetReportsTimeoutAfterTheRealSignalWithdrawal) {
+    Start();
+    state.hal.ConnectCallback(&state.hal);
+    SignalClock();
+    signal_jump_read = 4U;
+    signal_jump = 30000U;
+    EXPECT_EQ(nx_usb_host_reset(&port, 20100U), NX_ERROR_TIMEOUT);
+    CheckSignal(USB_OTG_HPRT_PRST, 10000U);
+    EXPECT_FALSE(state.snapshot.closing);
+}
+
+TEST_F(UsbHostHal, LateResumeReportsTimeoutAndPublishesTheActualResumedState) {
+    Start();
+    Suspended();
+    SignalClock();
+    signal_jump_read = 4U;
+    signal_jump = 40000U;
+    EXPECT_EQ(nx_usb_host_suspend(&port, false, 30100U), NX_ERROR_TIMEOUT);
+    CheckSignal(USB_OTG_HPRT_PRES, 20000U);
+    EXPECT_FALSE(state.snapshot.suspended);
+    EXPECT_FALSE(state.snapshot.closing);
+}
+
+TEST_F(UsbHostHal, FailedResetWithdrawalRetainsTheSignalUntilStopCanJoin) {
+    Start();
+    state.hal.ConnectCallback(&state.hal);
+    SignalClock();
+    held_port_clear = USB_OTG_HPRT_PRST;
+    EXPECT_EQ(nx_usb_host_reset(&port, 50000U), NX_ERROR_IO);
+    EXPECT_TRUE(state.snapshot.closing);
+    EXPECT_NE(*Port() & USB_OTG_HPRT_PRST, 0U);
+    EXPECT_EQ(nx_usb_host_stop(&port), NX_ERROR_BUSY);
+    EXPECT_EQ(state.config, &config);
+    EXPECT_NE(RCC->AHB2ENR & RCC_AHB2ENR_OTGFSEN, 0U);
+    held_port_clear = 0U;
+    Stop();
+    EXPECT_EQ(*Port() & USB_OTG_HPRT_PRST, 0U);
+    EXPECT_EQ(state.config, nullptr);
+}
+
+TEST_F(UsbHostHal, FailedResumeWithdrawalRetainsItsOwnerAndBlocksNewWork) {
+    Start();
+    Suspended();
+    SignalClock();
+    held_port_clear = USB_OTG_HPRT_PRES;
+    EXPECT_EQ(nx_usb_host_suspend(&port, false, 50000U), NX_ERROR_IO);
+    EXPECT_TRUE(state.snapshot.closing);
+    EXPECT_NE(*Port() & USB_OTG_HPRT_PRES, 0U);
+    EXPECT_EQ(nx_usb_host_reset(&port, 100000U), NX_ERROR_STATE);
+    EXPECT_EQ(nx_usb_host_stop(&port), NX_ERROR_BUSY);
+    EXPECT_EQ(state.config, &config);
+    held_port_clear = 0U;
+    Stop();
+    EXPECT_EQ(*Port() & USB_OTG_HPRT_PRES, 0U);
+}
+
+TEST_F(UsbHostHal, FrozenSignalTimeParksWithTheMinimumSignalStillRetained) {
+    Start();
+    state.hal.ConnectCallback(&state.hal);
+    SignalClock();
+    ASSERT_EXIT(
+        {
+            signal_step = 0U;
+            alarm(2U);
+            (void)nx_usb_host_reset(&port, 50000U);
+            std::_Exit(71);
+        },
+        testing::ExitedWithCode(70), "");
+}
+
+TEST_F(UsbHostHal, BackwardSignalTimeCannotInventASuccessfulResume) {
+    Start();
+    Suspended();
+    SignalClock();
+    ASSERT_EXIT(
+        {
+            backward_signal_clock = true;
+            alarm(2U);
+            (void)nx_usb_host_suspend(&port, false, 50000U);
+            std::_Exit(71);
+        },
+        testing::ExitedWithCode(70), "");
+}
+
+TEST_F(UsbHostHal, ControlPacketSizeMatchesEachActualSpeedBeforeHalEffects) {
+    config.phy = NX_STM32_USB_HS_ULPI;
+    config.ulpi_clock_hz = 60000000U;
+    Start();
+    const uint16_t invalid_sizes[] = {8U, 16U, 32U};
+    for (uint16_t mps : invalid_sizes) {
+        const nx_usb_host_pipe_t pipe = {mps, 3U, 0x80U, NX_USB_HOST_HIGH_SPEED,
+                                         NX_USB_HOST_CONTROL};
+        EXPECT_EQ(nx_usb_host_open(&port, 0U, &pipe), NX_ERROR_INVALID);
+        EXPECT_FALSE(channels[0].configured);
+    }
+    for (auto speed : {NX_USB_HOST_LOW_SPEED, NX_USB_HOST_FULL_SPEED,
+                       NX_USB_HOST_HIGH_SPEED}) {
+        const uint16_t packet_sizes[] = {8U, 16U, 32U, 64U};
+        for (uint16_t mps : packet_sizes) {
+            const nx_usb_host_pipe_t pipe = {mps, 3U, 0x80U, speed,
+                                             NX_USB_HOST_CONTROL};
+            if ((speed == NX_USB_HOST_LOW_SPEED && mps != 8U) ||
+                (speed == NX_USB_HOST_HIGH_SPEED && mps != 64U))
+                continue;
+            const uint8_t hal_speed = speed == NX_USB_HOST_LOW_SPEED    ? 2U
+                                      : speed == NX_USB_HOST_FULL_SPEED ? 1U
+                                                                        : 0U;
+            EXPECT_CALL(hal, Open(&state.hal, 0U, 0x80U, 3U, hal_speed,
+                                  EP_TYPE_CTRL, mps))
+                .WillOnce(Return(HAL_OK));
+            EXPECT_EQ(nx_usb_host_open(&port, 0U, &pipe), NX_SUCCESS);
+        }
+    }
+}
 
 TEST_F(UsbHostHal, FsHcdUsesSelectedFifosAndDoesNotLeakVendorState) {
     Start();

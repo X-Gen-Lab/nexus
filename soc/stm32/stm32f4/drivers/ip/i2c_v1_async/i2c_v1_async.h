@@ -14,9 +14,11 @@
  * \param[out] ccr: Standard or Fast-mode duty-2 CCR on success only.
  * \param[out] rise: ST's standard 1 us or Fast-mode 300 ns TRISE formula.
  * \return True for a representable 12-bit divisor; otherwise no outputs.
- * \note Pure arithmetic, no hardware or retained references. Rounding the
- *       divider upward respects the nominal maximum; oscillator tolerance
- *       and electrical rise times require separate Board qualification.
+ * \note Standard mode is capped at 88 kHz for ES0182 2.10.4 repeated STARTs,
+ *       independently of endpoint width. The authored maximum is an upper
+ *       bound, not an exact rate; Fast mode remains an explicit selection.
+ *       Pure arithmetic with no hardware or retained references. Oscillator
+ *       tolerance and electrical rise times need separate Board qualification.
  */
 static inline bool nx_i2c_v1_timing(uint8_t mhz, uint32_t maximum_hz,
                                     uint16_t* ccr, uint8_t* rise) {
@@ -27,6 +29,9 @@ static inline bool nx_i2c_v1_timing(uint8_t mhz, uint32_t maximum_hz,
     bool fast = maximum_hz > 100000U;
     if (fast && mhz < 4U) {
         return false;
+    }
+    if (!fast && maximum_hz > 88000U) {
+        maximum_hz = 88000U;
     }
     uint32_t clocks = (uint32_t)mhz * 1000000U;
     uint32_t denominator = maximum_hz * (fast ? 3U : 2U);
@@ -60,7 +65,7 @@ static inline bool nx_i2c_v1_address_valid(uint16_t address, uint8_t bits) {
  * \note Check the actual CCR profile, including direct C callers. Fast-mode
  *       timing has its separate electrical Board qualification.
  */
-static inline bool nx_i2c_v1_ten_timing(uint16_t ccr, uint8_t mhz) {
+static inline bool nx_i2c_v1_restart_timing(uint16_t ccr, uint8_t mhz) {
     uint32_t divisor = (uint32_t)ccr & 0xFFFU;
     return divisor != 0U && ((ccr & 0x8000U) != 0U ||
                              divisor * 176000U >= (uint32_t)mhz * 1000000U);

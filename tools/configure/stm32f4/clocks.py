@@ -116,8 +116,10 @@ def plan(profile_name, profile):
                                    minimum_hz=0, maximum_hz=0)
     return dict(profile=profile_name, input=domain(p["source"], source),
                 domains={key: domain(key, hz) for key, hz in domains.items()},
-                parameters=p, reviewed_revision_ids=(),
-                provenance="RM0090 Rev22 RCC; DS8626 Rev12 clock/Flash limits",
+                parameters=p,
+                reviewed_revision_ids=(0x1001, 0x1003, 0x1007, 0x100F, 0x101F),
+                provenance=("RM0090 Rev22 RCC; DS8626 Rev12 clock/Flash limits; "
+                            "ES0182 Rev19 software audit with constraints"),
                 physical_qualified=False)
 
 
@@ -189,6 +191,8 @@ def validate_consumers(selected, controllers):
     """Reject impossible selected consumers before generating an image."""
     domain = lambda name: selected["domains"][name]["nominal_hz"]
     for item in controllers:
+        if item.kind in {"eth", "eth_frames"} and domain("core") < 25000000:
+            fail("F407 Ethernet requires an AHB clock of at least 25 MHz")
         if item.kind == "entropy" and domain("pll48") != 48000000:
             fail("F407 RNG requires selected nominal PLL48=48MHz")
         kernel48 = item.kind == "block"

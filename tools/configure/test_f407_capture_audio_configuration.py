@@ -152,3 +152,54 @@ class CaptureAudioConfigurationTests(unittest.TestCase):
             self.resolve(suffix, routes=[
                 ("sound", "I2S2", "i2s2-simplex"),
                 ("bus", "SPI2", "spi2-pb13-pb14-pb15")])
+
+    def test_continuous_audio_uses_separate_static_state_and_irq_owners(self):
+        for number in (2, 3):
+            for role in ("master", "slave"):
+                for direction in ("tx", "rx", "duplex"):
+                    with self.subTest(number=number, role=role,
+                                      direction=direction):
+                        mode = role + "-" + direction + "-blocks"
+                        extra = ("max_sample_rate_hz = 96000\n"
+                                 "max_service_gap_us = 20\n")
+                        if role == "master":
+                            extra += ("sample_rate_hz = 48000\npll_n = 192\n"
+                                      "pll_r = 2\nmax_error_ppm = 10000\n")
+                        result = self.resolve(self.audio(mode, extra), routes=[
+                            ("sound", "I2S" + str(number),
+                             "i2s" + str(number) +
+                             ("-duplex" if direction == "duplex" else
+                              "-simplex"))])
+                        item, = result.controllers
+                        self.assertTrue(item.options.continuous)
+                        self.assertEqual(item.options.max_sample_rate_hz,
+                                         96000)
+                        self.assertEqual(item.options.max_service_gap_us, 20)
+                        source = bindings.emit(result)[1]
+                        self.assertIn("nx_stm32_audio_blocks_state_t", source)
+                        self.assertIn("nx_stm32_audio_blocks_prepare(", source)
+                        self.assertIn("nx_stm32_audio_blocks_close(", source)
+                        self.assertIn("nx_stm32_audio_blocks_dma_irq(", source)
+                        self.assertIn("nx_factory_audio", factory.emit(result)[0])
+                        self.assertEqual(len(item.dma),
+                                         2 if direction == "duplex" else 1)
+
+    def test_continuous_audio_requires_both_explicit_observation_bounds(self):
+        for extra in ("", "max_sample_rate_hz = 96000\n",
+                      "max_service_gap_us = 20\n",
+                      "max_sample_rate_hz = 0\nmax_service_gap_us = 20\n",
+                      "max_sample_rate_hz = 96000\nmax_service_gap_us = 0\n"):
+            with self.subTest(extra=extra), self.assertRaises(ValueError):
+                self.resolve(self.audio("slave-rx-blocks", extra), routes=[
+                    ("sound", "I2S2", "i2s2-simplex")])
+
+    def test_finite_audio_does_not_carry_continuous_scheduling_fields(self):
+        result = self.resolve(self.audio("slave-rx"), routes=[
+            ("sound", "I2S2", "i2s2-simplex")])
+        source = bindings.emit(result)[1]
+        self.assertNotIn("nx_stm32_audio_blocks_state_t", source)
+        self.assertNotIn(".max_sample_rate_hz", source)
+        with self.assertRaises(ValueError):
+            self.resolve(self.audio("slave-rx", "max_sample_rate_hz = 96000\n"
+                                    "max_service_gap_us = 20\n"), routes=[
+                ("sound", "I2S2", "i2s2-simplex")])

@@ -474,6 +474,36 @@ TEST_F(EthernetFramesMac,
     EXPECT_EQ(memory, tx[count - 1U].next);
     EXPECT_NE(0U, mac.clock_epoch);
 }
+#if !defined(NX_ETH_FRAMES_TEST_STM32)
+struct HardwareClockCase {
+    uint32_t hclk_hz;
+    uint32_t increment_ns;
+    uint32_t addend;
+    uint8_t mdio;
+};
+class EthernetFramesClock
+    : public EthernetFramesMac,
+      public testing::WithParamInterface<HardwareClockCase> {};
+TEST_P(EthernetFramesClock, DerivesPtpAndMdioFromTheActualHclk) {
+    const auto selected = GetParam();
+    mac.hclk_hz = selected.hclk_hz;
+    ASSERT_EQ(NX_SUCCESS, Initialize());
+    EXPECT_EQ(selected.increment_ns, Regs()[0x704U / 4U]);
+    EXPECT_EQ(selected.addend, Regs()[0x718U / 4U]);
+    EXPECT_EQ(selected.increment_ns, mac.snapshot.timestamp_resolution_ns);
+    EXPECT_EQ(selected.mdio, mac.mdio_divider);
+}
+INSTANTIATE_TEST_SUITE_P(
+    ReviewedClockRanges, EthernetFramesClock,
+    testing::Values(HardwareClockCase{25000000U, 80U, 2147483648U, 8U},
+                    HardwareClockCase{50000000U, 40U, 2147483648U, 12U},
+                    HardwareClockCase{84000000U, 20U, 2556528152U, 0U},
+                    HardwareClockCase{100000000U, 20U, 2147483648U, 4U},
+                    HardwareClockCase{120000000U, 20U, 1789569707U, 4U},
+                    HardwareClockCase{168000000U, 20U, 1278264076U, 16U},
+                    HardwareClockCase{200000000U, 20U, 1073741824U, 16U},
+                    HardwareClockCase{240000000U, 20U, 894784853U, 16U}));
+#endif
 TEST_F(EthernetFramesMac,
        PublishesWholeFrameBeforeFirstOwnAndUsesOnlyLastStatus) {
     Start();

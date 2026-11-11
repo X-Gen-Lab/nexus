@@ -19,6 +19,17 @@ commit 在屏蔽 IRQ 后执行，validate／restore 允许屏蔽或未屏蔽的�
 
 ## 准备、设置和移交
 
+ES0182 Rev19 §2.2.18 要求晶体 LSE 运行时 PC13 不发生数字翻转。默认
+`lse_bypass=false` 与现有四板晶体事实一致；provision 在开启 LSE 前将空闲 PC13
+置为模拟、无上下拉，adopt 要求外部已经保持该静默状态。外来输出、AF、锁定或
+上下拉占用在备份域写入前拒绝。晶体已开启后，静默责任跟随 oscillator effects
+一同移交，close 不恢复可能重新扰动晶体的旧 GPIO 模式。
+
+`lse_bypass=true` 只接受 Board 同时声明 `lse_hz=32768` 与 `lse_bypass=true`
+的外部时钟输入；晶体板不能被配置选项重新解释。bypass 不受该勘误影响，因而
+允许明确交接 PC13 的 timestamp／tamper。当前四个 Board 没有该外部时钟事实，
+该路径仅由独立软件参考装配说明，未观察到的接线与时序保持未知。
+
 `adopt-retained` 只接纳已经准备的 PWREN、DBP、LSE、RTC 时钟与显式可信日历。
 准入与干净关闭不写备份寄存器。YY00 不以 INITS 推断无效；世纪、时区、UTC、
 掉电恢复和数据来源证明属于外部产品。
@@ -30,6 +41,11 @@ commit 在屏蔽 IRQ 后执行，validate／restore 允许屏蔽或未屏蔽的�
 日历设置只在无活动源时受理，并受 `allow_set` 授权。设置成功推进非回绕的
 setting generation。粗校准重新启动分频器，因此也要求该授权并推进 generation。
 平滑校准改变 RTC 频率，不重置 setting generation。两者都不调整 Core 时间。
+
+ES0182 Rev19 §2.9.4 要求反复进入 INIT 前完成真实同步。日历设置和粗校准共用
+同一路径：临时清 BYPSHAD、清 RSF、在原有有限预算内等待 RSF，再恢复原 bypass
+模式后进入 INIT。超时不进入新 INIT，不发布新的 setting generation；部分操作
+仍按原合同保留污染状态，不能把 INITF 清零或日历读回等同于这次同步。
 
 普通 stop 先关闭准入并撤掉 Alarm A／B、wakeup、timestamp、tamper、EXTI event
 及 SRAM 引用，再归还借用。provision 留下的自主 LSE／RTC、DBP／PWREN 和日历
@@ -45,8 +61,8 @@ setting generation。粗校准重新启动分频器，因此也要求该授权�
 | Alarm A | 一个有限 request；day/time 精确匹配，独立 Core deadline |
 | Alarm B | 同步复制精确 day/time 比较器；可与 Alarm A 并存，显式开／关 |
 | Wakeup | 16 位 reload，RTCCLK／16、8、4、2 或 1 Hz／扩展 1 Hz；WUTWF 握手 |
-| Timestamp | PC13／RTC_AF1，显式边沿；原始月／日／星期／时间／子秒与 overflow |
-| Tamper | PC13 tamper1，显式边沿／滤波、采样率、预充电与内部 pullup |
+| Timestamp | 仅 LSE bypass 的 PC13／RTC_AF1，显式边沿；原始月／日／星期／时间／子秒与 overflow |
+| Tamper | 仅 LSE bypass 的 PC13 tamper1，上升沿或滤波电平；采样率、预充电与内部 pullup |
 | Calibration | smooth 8／16／32 秒窗口或 coarse；等待 RECALPF／INITF，禁止同时使用 |
 | Backup registers | 精确 BKP0R..BKP19R，单 word 读写／读回，无数据布局或擦除策略 |
 | Backup SRAM | 显式 gate／可选 BRE 准备，4096 字节 CPU lease；不清零或测试内容 |
@@ -56,6 +72,12 @@ PI8／RTC_AF2 没有在当前 VE100／ZG144 封装引出，所以 AF2 和 tamper
 和外部拉电阻必须由外部装配责任者先接纳；配置捕获不擅自接管 GPIO。tamper 事件
 会由硬件清除全部 20 个 backup registers，启用该功能即要求调用者明确接受这一
 硬件效果；backup SRAM 不因 tamper 被自动清除。
+
+ES0182 Rev19 §2.9.1 的无滤波下降沿在禁用时可能误清备份寄存器，因此配置在写入前
+返回 `UNSUPPORTED`。无滤波上升沿按 §2.9.6 在启用后通过有效 GPIOC gate 立即读取
+PC13，已为高或检查失败时返回 `IO`，保留已启用的源并阻止备份写入；正常低电平才
+成功。Standby 的源恢复复用同一检查，失败保留原 receipt 和暂停状态，调用方可在
+输入恢复后显式重试。滤波电平检测独立保留；这些软件检查不保证物理防篡改认证。
 
 时间戳寄存器没有 year，接口不补出一个年份。子秒保留 downcounter 和 256 的分母，
 overflow 表示事件丢失，不转换成软件采样时间。读取事件／capture 不清标志；显式

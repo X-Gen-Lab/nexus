@@ -44,7 +44,7 @@ inline nx_result_t erase(void* context, uint32_t offset, size_t length,
                          nx_time_us_t deadline) {
     return static_cast<Device*>(context)->Erase(offset, length, deadline);
 }
-inline const nx_flash_ops_t operations{geometry, read, program, erase};
+inline const nx_flash_ops_t operations{geometry, read, program, erase, nullptr};
 inline const nx_mcuboot_flash_operation_t* active = nullptr;
 inline nx_time_us_t clock_now = 100U;
 

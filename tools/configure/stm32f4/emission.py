@@ -44,9 +44,15 @@ def includes(result):
         source.append('#include "stm32f407_adc_group.h"')
     source.append('#include "stm32f407_provider.h"')
     source.append('#include "stm32f407_platform_cold.h"')
+    if any(item.kind == 'exti' and item.mode == 'hardware-event'
+           for item in selections):
+        source.append('#include "stm32f4_exti_hardware.h"')
     for kind in ("capture", "audio"):
         if any(item.kind == kind for item in selections):
             source.append(f'#include "stm32f407_{kind}.h"')
+    if any(item.kind == "audio" and item.mode.endswith("-blocks")
+           for item in selections):
+        source.append('#include "stm32f407_audio_blocks.h"')
     if any(item.kind == 'exti' and item.mode in {'pvd-level', 'pvd-events'}
            for item in selections):
         source.append('#include "stm32f407_pvd.h"')
@@ -63,7 +69,9 @@ def includes(result):
     if any(implementation(item) == "dac_dma" for item in selections):
         source.append('#include "stm32f407_dac_dma.h"')
     source.append('#include "stm32f4_platform_lifecycle_impl.h"')
-    if any(item.kind in {"exti", "pwm", "adc"} for item in selections):
+    if any(item.kind in {"pwm", "adc"} or
+           (item.kind == 'exti' and item.mode == 'edge-event')
+           for item in selections):
         source.append('#include "stm32f407_control_cold.h"')
     if any(item.kind in {"gpio", "flash", "watchdog"} for item in selections):
         source.append('#include "stm32f407_basic_cold.h"')
@@ -166,7 +174,8 @@ def state_declarations(result):
     source = []
     if has_dma(result):
         source.append("static uint32_t s_nx_platform_dma_clocks_added;")
-    if any(item.kind == "exti" and item.mode == 'edge-event' for item in selections):
+    if any(item.kind == "exti" and item.mode in {'edge-event', 'hardware-event'}
+           for item in selections):
         source.append('static uint32_t s_nx_platform_syscfg_clock_added;')
     if any(item.kind == "audio" for item in selections):
         source.append("static nx_stm32_audio_clock_t s_nx_audio_clock;")
@@ -308,6 +317,6 @@ def _resource_slots(result):
     """Name only selected receipt storage; absent resources allocate nothing."""
     dma = '&s_nx_platform_dma_clocks_added' if has_dma(result) else 'NULL'
     syscfg = ('&s_nx_platform_syscfg_clock_added' if
-              any(item.kind == 'exti' and item.mode == 'edge-event'
+              any(item.kind == 'exti' and item.mode in {'edge-event', 'hardware-event'}
                   for item in result.controllers) else 'NULL')
     return dma, syscfg

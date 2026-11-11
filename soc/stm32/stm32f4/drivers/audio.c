@@ -297,7 +297,7 @@ nx_result_t nx_stm32_audio_prepare(nx_stm32_audio_state_t* s,
     s->initialized = true;
     return NX_SUCCESS;
 }
-static bool live(nx_stm32_audio_state_t* s) {
+bool nx_stm32_audio_live(nx_stm32_audio_state_t* s) {
     const nx_stm32_audio_config_t* c = s->config;
     RCC_TypeDef* rcc = g_nx_stm32_system.rcc;
     bool ok = !s->history_lost && g_nx_stm32_system.started &&
@@ -322,7 +322,7 @@ static bool live(nx_stm32_audio_state_t* s) {
         s->history_lost = true;
     return ok;
 }
-static uint32_t status(nx_stm32_audio_state_t* s, SPI_TypeDef* bus) {
+uint32_t nx_stm32_audio_status(nx_stm32_audio_state_t* s, SPI_TypeDef* bus) {
     uint32_t value = NX_AV_READ(&bus->SR);
     if ((value & AUDIO_ERRORS) != 0U) {
         __atomic_fetch_or(&s->events, value & AUDIO_ERRORS, __ATOMIC_RELAXED);
@@ -334,11 +334,20 @@ static uint32_t status(nx_stm32_audio_state_t* s, SPI_TypeDef* bus) {
 void nx_stm32_audio_irq(nx_stm32_audio_state_t* s) {
     if (s == NULL || !s->owned || s->active == NULL)
         return;
-    (void)status(s, s->config->registers);
+    uint32_t errors = nx_stm32_audio_status(s, s->config->registers);
     if (s->config->duplex)
-        (void)status(s, s->config->extension);
+        errors |= nx_stm32_audio_status(s, s->config->extension);
+    if ((errors & AUDIO_ERRORS) != 0U) {
+        /* OVR stays level-active until the task reads DR during its proved
+         * drain. Withdraw our source and vector before returning from IRQ. */
+        (void)nx_stm32_av_bits(&s->config->registers->CR2, SPI_CR2_ERRIE, 0U);
+        if (s->config->duplex)
+            (void)nx_stm32_av_bits(&s->config->extension->CR2, SPI_CR2_ERRIE,
+                                   0U);
+        NX_AV_IRQ_DISABLE(vector(s->config));
+    }
 }
-static bool cycle_delay(nx_stm32_audio_state_t* s, uint32_t bits) {
+bool nx_stm32_audio_cycle_delay(nx_stm32_audio_state_t* s, uint32_t bits) {
     const nx_stm32_audio_config_t* c = s->config;
     uint64_t frequency = (uint64_t)c->actual_rate.numerator_hz * c->slot_bits *
                          (c->standard >= 3U ? 1U : 2U);
@@ -367,7 +376,7 @@ static bool master_receive_terminal(nx_stm32_audio_state_t* s) {
     if (s->terminal_stopped)
         return true;
     SPI_TypeDef* bus = c->registers;
-    uint32_t value = status(s, bus);
+    uint32_t value = nx_stm32_audio_status(s, bus);
     if (s->receive_tail && (value & SPI_SR_RXNE) != 0U) {
         s->result = NX_ERROR_IO;
         return false;
@@ -375,8 +384,9 @@ static bool master_receive_terminal(nx_stm32_audio_state_t* s) {
     uint32_t bits =
         c->sample_bits == 16U && c->slot_bits == 32U && c->standard == 2U ? 17U
                                                                           : 1U;
-    if (!cycle_delay(s, bits) ||
-        (s->receive_tail && (status(s, bus) & SPI_SR_RXNE) != 0U)) {
+    if (!nx_stm32_audio_cycle_delay(s, bits) ||
+        (s->receive_tail &&
+         (nx_stm32_audio_status(s, bus) & SPI_SR_RXNE) != 0U)) {
         s->result = NX_ERROR_IO;
         return false;
     }
@@ -501,7 +511,7 @@ static nx_result_t submit(void* context, nx_audio_request_t* request) {
     if (s->active != NULL)
         return NX_ERROR_BUSY;
     const nx_stm32_audio_config_t* c = s->config;
-    if (!live(s))
+    if (!nx_stm32_audio_live(s))
         return NX_ERROR_STATE;
     bool tx = tx_bus(c) != NULL, rx = rx_bus(c) != NULL;
     if (nx_request_state(&request->base) != NX_REQUEST_READY ||
@@ -638,10 +648,11 @@ static nx_result_t quarantine(nx_stm32_audio_state_t* s, nx_result_t result) {
     (void)nx_request_transition(&s->active->base, NX_REQUEST_QUARANTINED);
     return result;
 }
-static bool tx_idle(nx_stm32_audio_state_t* s, SPI_TypeDef* bus) {
+bool nx_stm32_audio_tx_idle(nx_stm32_audio_state_t* s, SPI_TypeDef* bus) {
     for (uint32_t i = 0U; i < s->config->common.poll_limit; ++i) {
-        uint32_t value = status(s, bus);
-        if ((value & SPI_SR_TXE) != 0U && (status(s, bus) & SPI_SR_BSY) == 0U)
+        uint32_t value = nx_stm32_audio_status(s, bus);
+        if ((value & SPI_SR_TXE) != 0U &&
+            (nx_stm32_audio_status(s, bus) & SPI_SR_BSY) == 0U)
             return true;
         NX_AV_POLL();
     }
@@ -649,7 +660,7 @@ static bool tx_idle(nx_stm32_audio_state_t* s, SPI_TypeDef* bus) {
 }
 static nx_result_t drain(nx_stm32_audio_state_t* s) {
     const nx_stm32_audio_config_t* c = s->config;
-    if (!live(s))
+    if (!nx_stm32_audio_live(s))
         return quarantine(s, NX_ERROR_STATE);
     s->draining = true;
     nx_request_state_t state = nx_request_state(&s->active->base);
@@ -661,7 +672,7 @@ static nx_result_t drain(nx_stm32_audio_state_t* s) {
                        !nx_stm32_av_dma_detach(&c->tx, c->common.poll_limit)))
         return quarantine(s, NX_ERROR_BUSY);
     if (tx != NULL && s->tx_enable_attempted && !s->wire_quiet &&
-        !tx_idle(s, tx))
+        !nx_stm32_audio_tx_idle(s, tx))
         return quarantine(s, NX_ERROR_BUSY);
     if (c->master && c->receive && !c->duplex && s->result == NX_SUCCESS) {
         if (!master_receive_terminal(s))
@@ -669,7 +680,7 @@ static nx_result_t drain(nx_stm32_audio_state_t* s) {
         if (s->receive_tail) {
             bool last = false;
             for (uint32_t i = 0U; i < c->common.poll_limit; ++i) {
-                if ((status(s, rx) & SPI_SR_RXNE) != 0U) {
+                if ((nx_stm32_audio_status(s, rx) & SPI_SR_RXNE) != 0U) {
                     last = true;
                     break;
                 }
@@ -692,19 +703,20 @@ static nx_result_t drain(nx_stm32_audio_state_t* s) {
     s->wire_quiet = true;
     if (rx != NULL) {
         if (s->rx_enable_attempted && c->master && c->receive && !c->duplex &&
-            !cycle_delay(s, c->slot_bits))
+            !nx_stm32_audio_cycle_delay(s, c->slot_bits))
             return quarantine(s, NX_ERROR_BUSY);
         if (!nx_stm32_av_bits(&rx->CR2, SPI_CR2_RXDMAEN, 0U) ||
             !nx_stm32_av_dma_detach(&c->rx, c->common.poll_limit))
             return quarantine(s, NX_ERROR_BUSY);
         /* Drain residual DR/OVR only after memory is disabled; preserve every
          * read-clear error before the clearing read sequence. */
-        uint32_t value = status(s, rx);
+        uint32_t value = nx_stm32_audio_status(s, rx);
         if ((value & (SPI_SR_RXNE | SPI_SR_OVR)) != 0U) {
             (void)NX_AV_READ(&rx->DR);
-            (void)status(s, rx);
+            (void)nx_stm32_audio_status(s, rx);
         }
-        if ((status(s, rx) & (SPI_SR_RXNE | SPI_SR_OVR | SPI_SR_BSY)) != 0U)
+        if ((nx_stm32_audio_status(s, rx) &
+             (SPI_SR_RXNE | SPI_SR_OVR | SPI_SR_BSY)) != 0U)
             return quarantine(s, NX_ERROR_BUSY);
     }
     if (!nx_stm32_av_write(&c->registers->CR2, 0U, UINT32_MAX) ||
@@ -761,7 +773,7 @@ static nx_result_t service(void* context) {
         return NX_ERROR_STATE;
     if (s->active == NULL)
         return NX_SUCCESS;
-    if (!live(s))
+    if (!nx_stm32_audio_live(s))
         return quarantine(s, NX_ERROR_STATE);
     nx_stm32_audio_irq(s);
     if (tx_bus(s->config) != NULL)
@@ -786,7 +798,7 @@ static nx_result_t service(void* context) {
         bool armed =
             s->config->master || tx_bus(s->config) == NULL ||
             (NX_AV_READ(&s->config->tx.stream->NDTR) == s->bytes / 2U - 1U &&
-             (status(s, tx_bus(s->config)) & SPI_SR_TXE) == 0U);
+             (nx_stm32_audio_status(s, tx_bus(s->config)) & SPI_SR_TXE) == 0U);
         uint64_t warmup_us =
             (3000000U + (uint64_t)s->config->pclk_hz - 1U) / s->config->pclk_hz;
         if (warmup_us < 3U)
@@ -910,4 +922,5 @@ nx_result_t nx_stm32_audio_close(nx_stm32_audio_state_t* s) {
     s->config = NULL;
     return NX_SUCCESS;
 }
-const nx_audio_ops_t nx_stm32_audio_ops = {submit, service, cancel, stop, rate};
+const nx_audio_ops_t nx_stm32_audio_ops = {submit, service, cancel,
+                                           stop,   rate,    NULL};

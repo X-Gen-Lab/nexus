@@ -8,6 +8,29 @@ from tools.configure import stm32f4
 
 
 class F407ClockTests(unittest.TestCase):
+    def test_system_review_projects_exact_cuts_without_controller_approval(self):
+        from tools.configure import configure, selected_contracts
+        expected = (0x1001, 0x1003, 0x1007, 0x100F, 0x101F)
+        for board in ("qiming", "sky"):
+            with self.subTest(board=board):
+                result = configure.resolve_ir(configure.ROOT /
+                    f"tools/configure/assemblies/{board}-baremetal-gpio.toml")
+                policies = selected_contracts.silicon_policies(result)
+                system = policies[None]
+                self.assertIsNotNone(system)
+                self.assertEqual(expected,
+                                 result.clock_plan.reviewed_revision_ids)
+                self.assertEqual(expected, system.reviewed_revision_ids)
+                self.assertEqual(result.part, system.part)
+                self.assertEqual(result.clock_plan.profile, system.profile)
+                self.assertEqual("stm32f4", system.provider)
+                self.assertEqual("reject", system.unknown_revision)
+                self.assertFalse(system.physical_qualified)
+                self.assertIn("ES0182 Rev19", system.review_scope)
+                self.assertTrue(result.controllers)
+                for controller in result.controllers:
+                    self.assertIsNone(policies[controller.id])
+
     def test_managed_usb_roles_consume_the_selected_phy_clock(self):
         from types import SimpleNamespace
         parameters = {**self.parameters(), "source": "hse",
@@ -180,6 +203,18 @@ class F407ClockTests(unittest.TestCase):
         self.assertEqual(plan["domains"]["pll48"]["nominal_hz"], 48000000)
         self.assertTrue(plan["parameters"]["css"])
         self.assertEqual(parameters, before)
+
+    def test_ethernet_rejects_sub25mhz_before_hardware_admission(self):
+        from types import SimpleNamespace
+        parameters = {**self.parameters(), "sysclk_source": "input",
+                      "apb1_div": 1, "apb2_div": 1}
+        selected = stm32f4.clock_plan("custom", parameters)
+        for kind in ("eth", "eth_frames"):
+            item = SimpleNamespace(kind=kind, mode="raw-mii", controller="ETH",
+                                   options=None)
+            with self.subTest(kind=kind), self.assertRaisesRegex(
+                    ValueError, "Ethernet.*25"):
+                stm32f4.validate_clock_consumers(selected, (item,))
 
     def test_selected_clock_consumers_reject_impossible_kernel_and_baud(self):
         from types import SimpleNamespace

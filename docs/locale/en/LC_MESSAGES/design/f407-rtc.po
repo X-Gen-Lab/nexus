@@ -1,6 +1,6 @@
-# Current exact gettext entries; independent delta review pending.
+# Exact gettext entries with independently reviewed current translations.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 099b752b09b154fb61dcf1a9e6039169769e3388bc3a1078a769c84981b598b7\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 832481ce1b0983118c0c75f110b17ca4a14dc5441029e88b2e61e517b31bcbd2\n"
 
 msgid "F407 RTC 与备份域责任"
 msgstr "F407 RTC and backup-domain responsibilities"
@@ -14,6 +14,12 @@ msgstr "Finite Alarm A follows the [request lifecycle](../explanation/rtc-lptim.
 msgid "准备、设置和移交"
 msgstr "Preparation, setting and handoff"
 
+msgid "ES0182 Rev19 §2.2.18 要求晶体 LSE 运行时 PC13 不发生数字翻转。默认 `lse_bypass=false` 与现有四板晶体事实一致；provision 在开启 LSE 前将空闲 PC13 置为模拟、无上下拉，adopt 要求外部已经保持该静默状态。外来输出、AF、锁定或 上下拉占用在备份域写入前拒绝。晶体已开启后，静默责任跟随 oscillator effects 一同移交，close 不恢复可能重新扰动晶体的旧 GPIO 模式。"
+msgstr "ES0182 Rev19 section 2.2.18 requires no digital transitions on PC13 while a crystal LSE runs. The default `lse_bypass=false` matches the existing four Board crystal facts. Before enabling LSE, provision configures a free PC13 as analog without pulls; adopt requires that quiet state to have been established externally. Foreign output, AF, lock or pull ownership is rejected before backup-domain writes. Once the crystal is enabled, quiet-pad responsibility transfers with the oscillator effects; close never restores an old GPIO mode that could disturb the crystal again."
+
+msgid "`lse_bypass=true` 只接受 Board 同时声明 `lse_hz=32768` 与 `lse_bypass=true` 的外部时钟输入；晶体板不能被配置选项重新解释。bypass 不受该勘误影响，因而 允许明确交接 PC13 的 timestamp／tamper。当前四个 Board 没有该外部时钟事实， 该路径仅由独立软件参考装配说明，未观察到的接线与时序保持未知。"
+msgstr "`lse_bypass=true` accepts only an external clock input whose Board declares both `lse_hz=32768` and `lse_bypass=true`; an option cannot reinterpret a crystal Board. Bypass is unaffected by this erratum and therefore permits explicitly handed-off PC13 timestamp/tamper. None of the four current Boards declares that external clock fact. This path is described only by an independent software-reference assembly; unobserved wiring and timing remain unknown."
+
 msgid "`adopt-retained` 只接纳已经准备的 PWREN、DBP、LSE、RTC 时钟与显式可信日历。 准入与干净关闭不写备份寄存器。YY00 不以 INITS 推断无效；世纪、时区、UTC、 掉电恢复和数据来源证明属于外部产品。"
 msgstr "`adopt-retained` accepts only already-established PWREN, DBP, LSE, RTC clocks and an explicitly trusted calendar. Admission and clean close do not write backup registers. INITS does not make YY00 invalid. Century, timezone, UTC, power-loss recovery and data provenance belong to the external product."
 
@@ -22,6 +28,9 @@ msgstr "`provision-empty` requires an explicit initial calendar and a completely
 
 msgid "日历设置只在无活动源时受理，并受 `allow_set` 授权。设置成功推进非回绕的 setting generation。粗校准重新启动分频器，因此也要求该授权并推进 generation。 平滑校准改变 RTC 频率，不重置 setting generation。两者都不调整 Core 时间。"
 msgstr "Calendar setting requires no active sources and explicit `allow_set` authorization. Success advances a nonwrapping setting generation. Coarse calibration restarts the prescaler and therefore requires the same authorization and advances generation. Smooth calibration changes RTC frequency without resetting the setting generation. Neither operation adjusts Core time."
+
+msgid "ES0182 Rev19 §2.9.4 要求反复进入 INIT 前完成真实同步。日历设置和粗校准共用 同一路径：临时清 BYPSHAD、清 RSF、在原有有限预算内等待 RSF，再恢复原 bypass 模式后进入 INIT。超时不进入新 INIT，不发布新的 setting generation；部分操作 仍按原合同保留污染状态，不能把 INITF 清零或日历读回等同于这次同步。"
+msgstr "ES0182 Rev19 §2.9.4 requires actual synchronization before reentering INIT. Calendar writes and coarse calibration share one path: temporarily clear BYPSHAD, clear RSF, wait for RSF within the existing finite budget, restore the original bypass personality, and then enter INIT. A timeout does not enter a new INIT session or publish a new setting generation. Partial operations retain taint under the existing contract; clearing INITF or reading back the calendar does not replace this synchronization."
 
 msgid "普通 stop 先关闭准入并撤掉 Alarm A／B、wakeup、timestamp、tamper、EXTI event 及 SRAM 引用，再归还借用。provision 留下的自主 LSE／RTC、DBP／PWREN 和日历 责任仍使 private close 返回 `BUSY`。外部责任者在源已退出、没有 loan、所有用户 已 join 后，可显式调用 `nx_rtc_port_backup_handoff`，接受复制的资源／日历收条。 移交不写寄存器，不关闭自主时间，也不授予并发写权限；之后 private close 才能成功。 失败启动、污染日历和未完成排空不能通过移交抹去责任。"
 msgstr "Ordinary stop seals admission, withdraws Alarm A/B, wakeup, timestamp, tamper, EXTI events and SRAM references, then returns borrows. Autonomous LSE/RTC, DBP/PWREN and calendar effects left by provisioning still make private close return `BUSY`. After source withdrawal, loan return and joining all users, an external owner may explicitly call `nx_rtc_port_backup_handoff` to accept a copied resource/calendar receipt. Handoff writes no registers, does not stop autonomous time and grants no concurrent writer permission. Private close can then succeed. Handoff cannot erase responsibility for failed startup, a contaminated calendar or incomplete drain."
@@ -56,14 +65,14 @@ msgstr "16-bit reload; RTCCLK/16, 8, 4, 2, or 1 Hz/extended 1 Hz; WUTWF handshak
 msgid "Timestamp"
 msgstr "Timestamp"
 
-msgid "PC13／RTC_AF1，显式边沿；原始月／日／星期／时间／子秒与 overflow"
-msgstr "PC13/RTC_AF1, explicit edge; raw month/day/weekday/time/subsecond and overflow"
+msgid "仅 LSE bypass 的 PC13／RTC_AF1，显式边沿；原始月／日／星期／时间／子秒与 overflow"
+msgstr "PC13/RTC_AF1 with LSE bypass only; explicit edge, raw month/day/weekday/time/subsecond and overflow"
 
 msgid "Tamper"
 msgstr "Tamper"
 
-msgid "PC13 tamper1，显式边沿／滤波、采样率、预充电与内部 pullup"
-msgstr "PC13 tamper1; explicit edge/filter, sampling frequency, precharge and internal pullup"
+msgid "仅 LSE bypass 的 PC13 tamper1，上升沿或滤波电平；采样率、预充电与内部 pullup"
+msgstr "PC13 tamper1 with LSE bypass only; rising edge or filtered level, sampling rate, precharge and internal pull-up"
 
 msgid "Calibration"
 msgstr "Calibration"
@@ -85,6 +94,9 @@ msgstr "Explicit gate/optional BRE preparation; a 4096-byte CPU lease without cl
 
 msgid "PI8／RTC_AF2 没有在当前 VE100／ZG144 封装引出，所以 AF2 和 tamper2 返回 `UNSUPPORTED`。SDK 中存在 TAMP2 宏不构成包能力。PC13 的 pad 所有权、电气连接 和外部拉电阻必须由外部装配责任者先接纳；配置捕获不擅自接管 GPIO。tamper 事件 会由硬件清除全部 20 个 backup registers，启用该功能即要求调用者明确接受这一 硬件效果；backup SRAM 不因 tamper 被自动清除。"
 msgstr "PI8/RTC_AF2 is not bonded on the selected VE100/ZG144 packages, so AF2 and tamper2 return `UNSUPPORTED`. A TAMP2 SDK macro does not establish package capability. The external assembly owner must first authorize PC13 ownership, electrical connections and external pulls; capture configuration does not silently take GPIO ownership. A tamper event clears all twenty backup registers in hardware. Enabling tamper explicitly accepts that effect; it does not automatically clear backup SRAM."
+
+msgid "ES0182 Rev19 §2.9.1 的无滤波下降沿在禁用时可能误清备份寄存器，因此配置在写入前 返回 `UNSUPPORTED`。无滤波上升沿按 §2.9.6 在启用后通过有效 GPIOC gate 立即读取 PC13，已为高或检查失败时返回 `IO`，保留已启用的源并阻止备份写入；正常低电平才 成功。Standby 的源恢复复用同一检查，失败保留原 receipt 和暂停状态，调用方可在 输入恢复后显式重试。滤波电平检测独立保留；这些软件检查不保证物理防篡改认证。"
+msgstr "ES0182 Rev19 §2.9.1 describes spurious backup-register erasure when unfiltered falling-edge tamper is disabled, so configuration returns `UNSUPPORTED` before writes. For an unfiltered rising edge, §2.9.6 is handled by reading PC13 immediately after enabling detection through an effective GPIOC gate. An already-high input or failed inspection returns `IO`, retains the armed source, and blocks backup writes; only an inactive low input succeeds. Standby source restoration reuses the same check and retains the original receipt and suspended state on failure, allowing an explicit retry after the input recovers. Filtered level detection remains available independently. These software checks do not establish physical tamper certification."
 
 msgid "时间戳寄存器没有 year，接口不补出一个年份。子秒保留 downcounter 和 256 的分母， overflow 表示事件丢失，不转换成软件采样时间。读取事件／capture 不清标志；显式 ack 只清已观察的所选 W0C 位，并保留其他源。硬件只有一个锁存器，不提供无损队列。"
 msgstr "Timestamp registers have no year, and the API never invents one. Subseconds preserve the downcounter and denominator256. Overflow means a lost event and is not converted into software observation time. Reading events/capture does not clear flags. Explicit acknowledgement clears only selected observed W0C bits and preserves other sources. One hardware latch does not provide a lossless queue."

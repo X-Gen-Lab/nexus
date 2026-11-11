@@ -224,8 +224,9 @@ CONTROLLER_CONTRACTS = MappingProxyType({
         )), 'ethernet_frames'),
     'rtc': ControllerContract(
         frozenset(('binding', 'mode', 'allow_set', 'timeout_us', 'poll_limit',
-                   'initial')),
-        frozenset(('allow_set', 'timeout_us', 'poll_limit', 'initial')), 'rtc'),
+                   'initial', 'lse_bypass')),
+        frozenset(('allow_set', 'timeout_us', 'poll_limit', 'initial',
+                   'lse_bypass')), 'rtc'),
     'lptim': ControllerContract(
         frozenset(('binding', 'irq', 'mode', 'tick_hz')),
         frozenset(('tick_hz',)), 'lptim'),
@@ -245,10 +246,12 @@ CONTROLLER_CONTRACTS = MappingProxyType({
     'audio': ControllerContract(
         frozenset(('binding', 'mode', 'irq', 'standard', 'sample_bits',
                    'slot_bits', 'mclk', 'cpol_high', 'poll_limit',
-                   'sample_rate_hz', 'pll_n', 'pll_r', 'max_error_ppm')),
+                   'sample_rate_hz', 'pll_n', 'pll_r', 'max_error_ppm',
+                   'max_sample_rate_hz', 'max_service_gap_us')),
         frozenset(('irq_priority', 'calls_os', 'standard', 'sample_bits',
                    'slot_bits', 'mclk', 'cpol_high', 'poll_limit',
-                   'sample_rate_hz', 'pll_n', 'pll_r', 'max_error_ppm')), 'audio'),
+                   'sample_rate_hz', 'pll_n', 'pll_r', 'max_error_ppm',
+                   'max_sample_rate_hz', 'max_service_gap_us')), 'audio'),
     'external_bus': ControllerContract(
         frozenset(('binding', 'mode')), frozenset(), 'external_bus'),
 })

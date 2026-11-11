@@ -1,6 +1,6 @@
 # F407 DCMI 与 I2S2／3
 
-这里记录 `capture.c`、`audio.c` 和同源静态装配的合同。芯片 AF 路线来自
+这里记录 `capture.c`、`audio.c`、`audio_blocks.c` 和同源静态装配的合同。芯片 AF 路线来自
 DS8626 Rev12；寄存器、DMA 与关闭时序来自 RM0090 Rev22。软件参考限定
 STM32F407VE／ZG，不代表摄像头、codec、PCB 接线、电气时序或物理 HIL 已执行。
 
@@ -118,6 +118,54 @@ DWT CYCCNT 观察 1 CK（16-bit extended LSB 为17 CK），撤销 I2SE，必要�
 保留完整 request 和未归还 loans，close 不允许 System 提前退出。所有 deadline
 包含最终排空，重新建立 System epoch 后的旧借用保持 quarantine。
 
+## 连续 I2S blocks
+
+显式 `master-tx-blocks`、`master-rx-blocks`、`master-duplex-blocks` 和对应
+`slave-*` 模式使用独立的连续 state/config。普通有限实例不增加运行时字段；
+同一 `nx_audio_port_t` 的只读 ops 追加可选 `start_blocks`，有限表该项为 NULL。
+连续表不提供有限 `submit`／`cancel`，会话通过已有 `service`／`stop` 推进和退出。
+factory 仍然只查询已有静态对象，不把一个控制器同时装成两种 personality。
+
+调用者准备 `nx_audio_blocks_request_t.base`、显式 `block_bytes` 及所选 TX／RX
+`nx_stream_t`。两方向控制、slot 元数据和全部 capacity 必须互不重叠；每块是完整
+音频 frame 的整数倍，每方向最多 65535 个 DMA halfwords。格式仍遵守上述原始
+halfword／slot 合同，不复制、重排或转换数据。
+
+TX 至少提供两个 READY block。provider 取得两个精确 consumer token，作为两个
+DMA bank；每次可信 TC 后先取得下一块、替换非活动地址，再回读 CT／事件和时间预算，
+最后归还旧 block。数据生产者通过原 stream 的 producer 操作补充后续 READY block。
+RX 至少提供三个 FREE slot，复用 posted producer 同时借用两个 FILLING bank；
+先取得第三块并完成相同的地址替换证明，才 FIFO 发布旧块。消费者使用原 stream
+acquire／release，仍可持有已发布块；provider 不覆盖 READY／BORROWED。
+
+装配必须声明 `max_sample_rate_hz` 和 `max_service_gap_us`。master 的精确有理数
+rate 不得超过前者；slave 的值是调用者必须保证的外部 clock 上界，rate 查询仍为
+0/0 unknown。block 时长必须大于两倍 service 上界加两微秒裕量。每次 service
+及地址替换前后观察真实单调时间、CT、硬件和 IRQ 锁存 TC／error；无法区分多次回卷
+时停止并报告 LOSS，不从一个 CT bit 推造精确丢失样本数。IRQ 只锁存事实；source
+OVR 等 level 错误先撤 ERRIE，使任务能够执行完整排空。
+
+这些预算不是物理吞吐资格。持续运行要求应用在预算内推进 service、补充 TX READY
+和归还 RX consumer blocks；没有隐藏 worker、默认 buffer pool、软件补静音或自动
+重放政策。违反外部时钟或服务预算时，硬件在软件观察之前的欠载、回卷及 wire 行为
+不能由软件结果追溯保证。duplex 两方向独立观察 bank，内存块不附加伪造的 aperture
+时间或相位同步测量。
+
+slave TX 的 ACTIVE 仍要求 DR prefill、NDTR=N−1、TXE0、三个实际微秒 tick 和
+稳定 idle CK／WS；之后才能启动外部 clock。stop 先撤请求、观察 DMA／serializer／
+IRQ 与全部地址真正退出，再归还两个 TX token 和撤销未完成 RX fills。主 RX 停止
+额外观察实际 DWT 的 terminal bit 时间；当前部分 block 不发布为完整 frame。
+拒撤、地址不清、未退出 IRQ 或 time-domain 历史丢失时保留 QUARANTINED 会话和
+全部存储，Platform close 不归还其时钟。普通可恢复拒撤可在同一实例重试；历史丢失
+不因把寄存器恢复成 reset 外观而自动解除。
+
+`SETTLED` 是 provider 对会话及 producer/consumer 权限的最后访问。之前发布的 RX
+consumer loans 继续有效，应用需独立 join 它们再回收 stream 或 buffers；未被 DMA
+取得的 TX READY blocks 仍在原队列。`base.transferred` 在选择 RX 时统计已发布 RX
+字节，否则统计已脱离 DMA 并归还的 TX 字节；错误／取消也可返回先前完整前缀，
+不代表实际播放／采样的精确 wire frame 数。整段持续会话可显式使用
+`NX_DEADLINE_NEVER`，或由一个绝对 deadline 触发有界排空。
+
 ## 装配与验证入口
 
 `tests/contracts/f407_capture_audio/` 是外部 software-only Board 夹具，覆盖 VE RAW12
@@ -153,5 +201,5 @@ DWT CYCCNT 观察 1 CK（16-bit extended LSB 为17 CK），撤销 I2SE，必要�
 测试只证明手动调用者已自行 join 的前提，随该架构删除；标准 Platform 现在实际调用
 audio close，无法完成借用排空就拒绝资源撤回。cold 状态及共享 GPIO／DMA 门由已有
 Platform 资源 owner 统一取得，factory 不再允许调用者构造第二个硬件 owner。
-linked provider 验证沿用普通 generated face→五方法表→真实私有函数的同一机制，
+linked provider 验证沿用普通 generated face→共享只读方法表→真实私有函数的同一机制，
 无需专用角色、公共 opaque storage 或另一个硬件发现入口。

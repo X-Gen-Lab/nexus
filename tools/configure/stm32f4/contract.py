@@ -107,6 +107,8 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
        for mode in ('snapshot-raw', 'snapshot-jpeg', 'raw-blocks')},
     **{('audio', role + '-' + direction): 'audio'
        for role in ('master', 'slave') for direction in ('tx', 'rx', 'duplex')},
+    **{('audio', role + '-' + direction + '-blocks'): 'audio_blocks'
+       for role in ('master', 'slave') for direction in ('tx', 'rx', 'duplex')},
     ('pwm_group', 'coherent-pwm'): 'pwm_group',
     ('timer_pulse', 'one-pulse'): 'timer_pulse',
     ('timer_sequence', 'dma-burst'): 'timer_sequence',
@@ -164,6 +166,7 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('watchdog', 'independent'): 'watchdog',
     ('watchdog', 'window'): 'window_watchdog',
     ('exti', 'edge-event'): 'exti',
+    ('exti', 'hardware-event'): 'exti_hardware',
     ('exti', 'pvd-level'): 'pvd',
     ('exti', 'pvd-events'): 'pvd_events',
     ('pwm', 'fixed-pwm'): 'pwm',

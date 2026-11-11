@@ -69,6 +69,11 @@ nx_result_t nx_stm32_gpio_admit(const nx_stm32_gpio_state_t* port,
     if (gpio_bank_index(config->registers) == 9U ||
         g_nx_stm32_system.rcc == NULL)
         return NX_ERROR_INVALID;
+    if (config->registers == GPIOC && (config->mask & (1U << 13U)) != 0U &&
+        (g_nx_stm32_system.rcc->BDCR & RCC_BDCR_LSEBYP) == 0U &&
+        (g_nx_stm32_system.rcc->BDCR & (RCC_BDCR_LSEON | RCC_BDCR_LSERDY)) !=
+            0U)
+        return NX_ERROR_BUSY;
     return NX_SUCCESS;
 }
 

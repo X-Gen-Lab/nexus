@@ -216,6 +216,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     """Select immutable resources; concrete C owns every cold transition."""
     del board_bindings, routes, devices
     item = controller_ir(item, "stm32f4")
+    if item.kind == 'exti' and item.mode == 'hardware-event':
+        return _exti_hardware_constructor(item)
     if item.kind == 'exti' and item.mode in {'pvd-level', 'pvd-events'}:
         from .pvd import constructor as pvd_constructor
         return pvd_constructor(item)
@@ -342,6 +344,32 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                     f"nx_stm32_{mode_implementation(item.kind, item.mode)}_state_t"),
         definitions=definitions, initialize=initialize,
         stop=[stop], retain_on_failed_init=True)
+
+
+def _exti_hardware_constructor(item):
+    """Connect one static EMR owner without an IRQ, queue or hidden service."""
+    name = _symbol(item.id)
+    pin, = item.pins
+    wire = pin['pin']
+    line = int(item.controller.removeprefix('EXTI'))
+    if not 0 <= line <= 15 or int(wire[2:]) != line:
+        raise ValueError('EXTI hardware-event requires its exact GPIO mux line')
+    edge = {'rising': 'NX_EXTI_RISING', 'falling': 'NX_EXTI_FALLING',
+            'both': 'NX_EXTI_BOTH'}[item.options.edge]
+    config = f's_nx_control_config_{name}'
+    state = Address(f's_nx_port_{name}')
+    arguments = (state, Address(config))
+    definitions = [
+        f'static const nx_stm32_exti_hardware_config_t {config} = {{',
+        f'    .gpio = GPIO{wire[1]}, .edge = {edge},',
+        f'    .gpio_index = {ord(wire[1]) - ord("A")}u, .line = {line}u,',
+        f'    .pull = {_PULL_VALUES[item.options.pull]}u', '};']
+    return Construction(
+        state_type='nx_stm32_exti_hardware_state_t', definitions=definitions,
+        admission=(DirectCall('nx_stm32_exti_hardware_admit', arguments),),
+        initialize=DirectCall('nx_stm32_exti_hardware_prepare', arguments),
+        stop=(DirectCall('nx_stm32_exti_hardware_close', (state,)),),
+        retain_on_failed_init=True)
 
 
 def shared_irq_definitions(selections):

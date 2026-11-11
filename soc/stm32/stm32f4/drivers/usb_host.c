@@ -6,6 +6,7 @@
  * \date            2026-11-10
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/core/fault.h"
 #include "stm32f407_clock.h"
 #include "stm32f407_usb_host.h"
 #include <string.h>
@@ -40,6 +41,12 @@
 #ifndef NX_USB_HOST_AHB_HZ
 #define NX_USB_HOST_AHB_HZ NEXUS_CORE_HZ
 #endif
+#ifndef NX_USB_HOST_PARK
+#define NX_USB_HOST_PARK() nx_arch_dsb()
+#endif
+
+#define HOST_RESET_RETAINED  (1U << 2U)
+#define HOST_RESUME_RETAINED (1U << 3U)
 
 /** \brief Only the single privileged task may control this transport. */
 static bool task_context(void) {
@@ -114,8 +121,10 @@ static bool pipe_valid(const nx_stm32_usb_host_t* state,
         return false;
     }
     if (pipe->transfer == NX_USB_HOST_CONTROL) {
+        if (pipe->speed == NX_USB_HOST_HIGH_SPEED)
+            return pipe->max_packet == 64U;
         return pipe->max_packet == 8U ||
-               (pipe->speed != NX_USB_HOST_LOW_SPEED &&
+               (pipe->speed == NX_USB_HOST_FULL_SPEED &&
                 (pipe->max_packet == 16U || pipe->max_packet == 32U ||
                  pipe->max_packet == 64U));
     }
@@ -730,18 +739,104 @@ static uint32_t port_control(uint32_t value) {
                                USB_OTG_HPRT_PENCHNG | USB_OTG_HPRT_POCCHNG);
 }
 
-/** \brief Independent Core time bounds reset/resume electrical signaling. */
-static bool delay_until(nx_time_us_t deadline, uint32_t duration) {
-    nx_time_us_t end = nx_deadline_after(nx_time_now_us(), duration);
-    if (end >= deadline) {
-        return false;
+/** \brief An invalid clock cannot authorize a short pulse or release effects.
+ */
+static _Noreturn void signal_clock_failed(nx_stm32_usb_host_t* state) {
+    state->snapshot.closing = true;
+    nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_STATE, __FILE__, __LINE__);
+    for (;;) {
+        NX_USB_HOST_PARK();
     }
-    while (!nx_deadline_expired(end, nx_time_now_us())) {
-        if (nx_deadline_expired(deadline, nx_time_now_us())) {
-            return false;
+}
+
+/** \brief A failed signal withdrawal remains part of the existing clock lease.
+ * \note This is reached only after the full minimum hold, or by a later stop
+ *       retry. Invalid-clock holds fail-stop before either path can release.
+ */
+static bool withdraw_signal(nx_stm32_usb_host_t* state) {
+    uint8_t retained =
+        state->clock_receipt & (HOST_RESET_RETAINED | HOST_RESUME_RETAINED);
+    if (retained == 0U)
+        return true;
+    uint32_t mask =
+        (retained & HOST_RESET_RETAINED) != 0U ? USB_OTG_HPRT_PRST : 0U;
+    if ((retained & HOST_RESUME_RETAINED) != 0U)
+        mask |= USB_OTG_HPRT_PRES;
+    volatile uint32_t* port = port_register(state);
+    NX_USB_HOST_WRITE(*port, port_control(*port) & ~mask);
+    nx_arch_dsb();
+    uint32_t actual = *port;
+    if ((actual & mask) != 0U)
+        return false;
+    state->clock_receipt &=
+        (uint8_t) ~(HOST_RESET_RETAINED | HOST_RESUME_RETAINED);
+    if ((retained & HOST_RESUME_RETAINED) != 0U)
+        state->snapshot.suspended = (actual & USB_OTG_HPRT_PSUSP) != 0U;
+    return true;
+}
+
+/** \brief Once asserted, the minimum electrical hold outlives cancellation.
+ * \note The deadline admits the operation and decides its eventual result;
+ *       preemption cannot make it permission to shorten reset or resume.
+ */
+static nx_result_t signal_port(nx_stm32_usb_host_t* state,
+                               nx_time_us_t deadline, uint32_t duration,
+                               bool resume) {
+    nx_time_us_t observed = nx_time_now_us();
+    nx_time_us_t end;
+    /* An integer microsecond sample hides the fractional phase at assertion.
+     * One full tick of guard prevents a nearly-one-tick-short physical hold. */
+    const uint32_t hold = duration + 1U;
+    if (nx_deadline_finite_after(observed, hold, &end) != NX_SUCCESS ||
+        end >= deadline)
+        return NX_ERROR_TIMEOUT;
+    volatile uint32_t* port = port_register(state);
+    uint32_t bit = resume ? USB_OTG_HPRT_PRES : USB_OTG_HPRT_PRST;
+    uint32_t control = port_control(*port);
+    if (resume)
+        control &= ~(uint32_t)USB_OTG_HPRT_PSUSP;
+    state->clock_receipt |= resume ? HOST_RESUME_RETAINED : HOST_RESET_RETAINED;
+    NX_USB_HOST_WRITE(*port, control | bit);
+    nx_arch_dsb();
+    bool asserted =
+        (*port & bit) != 0U && (!resume || (*port & USB_OTG_HPRT_PSUSP) == 0U);
+    /* Sampling after the write also covers preemption between admission and
+     * assertion. Extra hold is safe; an old admission timestamp is not proof
+     * that the physical signal has already lasted the required interval. */
+    nx_time_us_t previous = nx_time_now_us();
+    if (previous < observed ||
+        nx_deadline_finite_after(previous, hold, &end) != NX_SUCCESS)
+        signal_clock_failed(state);
+    const uint32_t budget = NX_USB_HOST_AHB_HZ / 1000U + 1U;
+    uint32_t remaining = budget;
+    for (;;) {
+        nx_time_us_t now = nx_time_now_us();
+        if (now == NX_DEADLINE_NEVER || now < previous ||
+            !NX_USB_HOST_CLOCK_VALID())
+            signal_clock_failed(state);
+        if (nx_deadline_expired(end, now)) {
+            previous = now;
+            break;
+        }
+        if (now == previous) {
+            if (remaining == 0U)
+                signal_clock_failed(state);
+            --remaining;
+        } else {
+            previous = now;
+            remaining = budget;
         }
     }
-    return true;
+    if (!withdraw_signal(state) || !asserted ||
+        (resume && state->snapshot.suspended)) {
+        state->snapshot.closing = true;
+        return NX_ERROR_IO;
+    }
+    nx_time_us_t finished = nx_time_now_us();
+    if (finished == NX_DEADLINE_NEVER || finished < previous)
+        signal_clock_failed(state);
+    return nx_deadline_expired(deadline, finished) ? NX_ERROR_TIMEOUT
+                                                   : NX_SUCCESS;
 }
 
 /** \brief The HAL's fixed HAL_Delay reset is replaced for deadline semantics.
@@ -758,20 +853,12 @@ static nx_result_t reset(void* context, nx_time_us_t deadline) {
     if (loans(state)) {
         return NX_ERROR_BUSY;
     }
-    if (!state->snapshot.connected ||
-        nx_deadline_expired(deadline, nx_time_now_us())) {
+    if (!state->snapshot.connected) {
         return NX_ERROR_STATE;
     }
-    volatile uint32_t* port = port_register(state);
-    NX_USB_HOST_WRITE(*port, port_control(*port) | USB_OTG_HPRT_PRST);
-    bool elapsed = delay_until(deadline, 10000U);
-    NX_USB_HOST_WRITE(*port,
-                      port_control(*port) & ~(uint32_t)USB_OTG_HPRT_PRST);
-    nx_arch_dsb();
-    if ((*port & USB_OTG_HPRT_PRST) != 0U) {
-        return NX_ERROR_IO;
-    }
-    return elapsed ? NX_SUCCESS : NX_ERROR_TIMEOUT;
+    if (nx_deadline_expired(deadline, nx_time_now_us()))
+        return NX_ERROR_TIMEOUT;
+    return signal_port(state, deadline, 10000U, false);
 }
 
 /** \brief Suspend keeps the Core timebase running and owns resume signaling. */
@@ -791,26 +878,17 @@ static nx_result_t suspend(void* context, bool suspended,
     if (nx_deadline_expired(deadline, nx_time_now_us())) {
         return NX_ERROR_TIMEOUT;
     }
+    if (!suspended)
+        return signal_port(state, deadline, 20000U, true);
     volatile uint32_t* port = port_register(state);
-    uint32_t value = port_control(*port);
-    if (suspended) {
-        NX_USB_HOST_WRITE(*port, value | USB_OTG_HPRT_PSUSP);
-    } else {
-        NX_USB_HOST_WRITE(*port, (value & ~(uint32_t)USB_OTG_HPRT_PSUSP) |
-                                     USB_OTG_HPRT_PRES);
-        bool elapsed = delay_until(deadline, 20000U);
-        NX_USB_HOST_WRITE(*port,
-                          port_control(*port) & ~(uint32_t)USB_OTG_HPRT_PRES);
-        if (!elapsed) {
-            return NX_ERROR_TIMEOUT;
-        }
-    }
+    NX_USB_HOST_WRITE(*port, port_control(*port) | USB_OTG_HPRT_PSUSP);
     nx_arch_dsb();
     if (((*port & USB_OTG_HPRT_PSUSP) != 0U) != suspended) {
         return NX_ERROR_IO;
     }
     state->snapshot.suspended = suspended;
-    return NX_SUCCESS;
+    return nx_deadline_expired(deadline, nx_time_now_us()) ? NX_ERROR_TIMEOUT
+                                                           : NX_SUCCESS;
 }
 
 /** \brief Stop verifies actual withdrawal independently of HAL return values.
@@ -845,6 +923,8 @@ static nx_result_t stop(void* context) {
         return NX_SUCCESS;
     }
     state->snapshot.closing = true;
+    if (!withdraw_signal(state))
+        return NX_ERROR_BUSY;
     bool busy = false;
     for (uint8_t i = 0U; i < state->config->channel_count; ++i) {
         nx_stm32_usb_host_channel_t* channel = &state->config->channels[i];

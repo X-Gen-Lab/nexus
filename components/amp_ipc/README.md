@@ -5,8 +5,9 @@
 和接收方分别独占 offer／ACK cache line，每端只有一个串行特权 Thread 执行者。
 双向通信显式使用两条通道；组件不创建堆对象、注册表、中断或 worker。
 
-[FIG-23 共享机制所有权](../../docs/assets/diagrams/io-extension-ownership.svg)区分
-软件机制、外部证明与未完成物理退出，不代表新增硬件支持。
+[FIG-16 当前 I/O 装配](../../docs/assets/diagrams/io-evolution.svg)说明平台接口与
+可选软件机制的关系；本组件的 offer／ACK 与会合责任以下文为准。图不代表具体
+多核硬件已接入或物理退出已通过。
 
 ## 端口、身份与布局
 

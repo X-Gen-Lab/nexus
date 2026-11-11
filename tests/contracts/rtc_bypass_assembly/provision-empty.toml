@@ -1,0 +1,15 @@
+schema=2
+board_package="board"
+backend="baremetal"
+clock="hse8-pll168"
+[memory]
+main_stack_bytes=2048
+libc_heap_bytes=0
+[rtc.calendar]
+binding="calendar"
+mode="provision-empty"
+allow_set=false
+timeout_us=2000000
+poll_limit=1000000
+lse_bypass=true
+initial={year=24,month=1,day=1,weekday=1,hour=0,minute=0,second=0}

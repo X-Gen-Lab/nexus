@@ -391,6 +391,19 @@ Host 每个所选 channel 同时借用一个 packet；buffer capacity 覆盖 HAL
 回调只锁存事实；取消／超时保守排空整个共享 FIFO controller。旧 channel、DMA
 地址、FIFO 和 IRQ 全部退出才 SETTLED。Host 没有自动 hub split 策略。
 
+Host control pipe 的 MPS 按实际速度准入：low-speed 为 8，full-speed 为
+8／16／32／64，high-speed 为 64；非法组合在 HAL 和 channel 副作用前拒绝。
+reset／resume 在任何 HPRT 写入前分别要求严格多于 10 ms／20 ms 加 1 µs 的剩余
+deadline；额外一 tick 覆盖整数微秒采样隐藏的相位。不足、已到期或恰好耗尽预算
+时返回 TIMEOUT，不发出短复位／恢复脉冲。
+
+已经开始的 reset／resume 必须保持最低信号时间。抢占越过 deadline 时，先完成
+最低保持与撤信号读回，再返回 TIMEOUT；实际已恢复时仍发布 resumed 状态。
+撤信号失败进入 closing，保留原 controller／clock 责任，stop 首先重试信号撤回，
+成功前不调用 HAL stop 或释放 gate。已开始信号的时钟倒退、无效或持续无进展，
+以有限观察预算进入 fault observer 和不返回的 park，保留信号而不伪造最低保持。
+不增加实例字段、后台任务或另一套时钟；这些软件检查不构成物理脉宽测量。
+
 `Nexus::USBRole` 是通用供电和排空屏障，F407 managed OTG 将它接入真实 cold
 Device／Host。一个 composite 独占 core、PHY、pins、clock 和 IRQ；OFF prepare
 不启动 USB。显式 generation-bound 请求先真实 drain，再 source-off 读回和独立

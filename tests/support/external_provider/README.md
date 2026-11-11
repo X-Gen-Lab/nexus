@@ -49,6 +49,6 @@ SDK 复制仅展开验证后的 inputs（含嵌套私有头／helper），不递
 身份验证不代替对受信 Python／CMake 的代码审查。
 
 prefix 搬移（含空格路径）后使用 fresh build，普通 consumer compile row 不能出现
-vendor／adapter 私有 include。Native 只证明模型；已有 STM32／GD32 ARM 消费者
+vendor／adapter 私有 include。Native 只证明模型；当前 F407 ARM 消费者
 分别证明编译／链接。新硬件需事实、路由、C 生命周期与独立物理验收，产品任务、
 恢复策略、私有应用仍由外部仓库维护。

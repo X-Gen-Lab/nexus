@@ -78,7 +78,7 @@ class EccDevice {
             self.fresh[i] = true;
         return NX_SUCCESS;
     }
-    const nx_flash_ops_t ops{Geometry, Read, Program, Erase};
+    const nx_flash_ops_t ops{Geometry, Read, Program, Erase, nullptr};
     const nx_flash_port_t face{&ops, this};
 };
 class FlashProvenance : public testing::Test {

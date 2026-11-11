@@ -9,12 +9,22 @@
 #include "f407_capture_audio_model.h"
 extern "C" {
 #include "stm32f407_audio.h"
+#include "stm32f407_audio_blocks.h"
 #include "stm32f407_capture.h"
 }
 #include <cstring>
 #include <gtest/gtest.h>
 #include <numeric>
 #include <sys/mman.h>
+
+extern "C" nx_result_t
+nx_stm32_audio_blocks_prepare(nx_stm32_audio_blocks_state_t*,
+                              const nx_stm32_audio_blocks_config_t*)
+    __attribute__((weak));
+extern "C" nx_result_t
+nx_stm32_audio_blocks_close(nx_stm32_audio_blocks_state_t*)
+    __attribute__((weak));
+extern "C" const nx_audio_ops_t nx_stm32_audio_blocks_ops __attribute__((weak));
 
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
@@ -42,6 +52,10 @@ struct Model {
     bool read_dr = false;
     bool hold_priority_restore = false;
     bool inject_capture_error = false;
+    bool lose_epoch_on_bank_update = false;
+    bool jump_after_i2s_start = false;
+    unsigned time_jump_reads = 0U;
+    nx_time_us_t time_jump_to = 0U;
     bool lose_ws_after_prefill = false, clear_txe_on_disable = false;
     bool refuse_txdma_enable = false;
     bool refuse_i2se_enable = false, busy_on_txe_read = false;
@@ -73,6 +87,9 @@ class CaptureAudio : public testing::Test {
     nx_frame_dma_loan_t tx_loan = {};
     nx_capture_request_t snapshot = {};
     nx_audio_request_t audio_request = {};
+    nx_stm32_audio_blocks_config_t blocks_config = {};
+    nx_stm32_audio_blocks_state_t blocks = {};
+    nx_audio_blocks_request_t blocks_request = {};
 
     void SetUp() override {
         model = &hardware;
@@ -225,7 +242,438 @@ class CaptureAudio : public testing::Test {
         hardware.extension.SR = SPI_SR_TXE;
         flag(audio_config.tx.lane, 0x20U);
     }
+    void blocks_open(bool tx, bool rx, bool master = false,
+                     uint8_t controller = 2U) {
+        ASSERT_NE(nullptr, nx_stm32_audio_blocks_prepare);
+        ASSERT_NE(nullptr, &nx_stm32_audio_blocks_ops);
+        audio_config.master = master;
+        audio_config.receive = !tx;
+        audio_config.duplex = tx && rx;
+        audio_config.controller = controller;
+        audio_config.registers =
+            controller == 2U ? &hardware.spi : &hardware.spi3;
+        audio_config.tx =
+            tx ? dma(controller == 2U ? 4U : 5U, 0U) : nx_stm32_av_dma_t{};
+        audio_config.rx = rx ? dma(controller == 2U ? 3U : (tx ? 2U : 0U),
+                                   tx ? (controller == 2U ? 3U : 2U) : 0U)
+                             : nx_stm32_av_dma_t{};
+        audio_config.common.pin_count = tx && rx ? 4U : 3U;
+        if (master)
+            calculate_rate(&audio_config);
+        for (size_t i = 0U; i < audio_config.common.pin_count; ++i)
+            pins[i].af = controller == 2U ? 5U : 6U;
+        blocks_config = {audio_config, 96000U, 20U};
+        ASSERT_EQ(nx_stm32_audio_blocks_prepare(&blocks, &blocks_config),
+                  NX_SUCCESS);
+        nx_request_initialize(&blocks_request.base);
+        ASSERT_EQ(nx_request_prepare(&blocks_request.base, NX_DEADLINE_NEVER),
+                  NX_SUCCESS);
+        blocks_request.tx = tx ? &stream : nullptr;
+        blocks_request.rx = rx ? &rx_stream : nullptr;
+        blocks_request.block_bytes = 256U;
+    }
+    void blocks_tx_ready(size_t count) {
+        for (size_t i = 0U; i < count; ++i) {
+            nx_stream_fill_t fill;
+            ASSERT_EQ(nx_stream_reserve(&stream, &fill), NX_SUCCESS);
+            ASSERT_EQ(nx_stream_publish(&stream, &fill, 256U, 0U), NX_SUCCESS);
+        }
+    }
+    void blocks_start() {
+        ASSERT_EQ(
+            nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
+            NX_SUCCESS);
+        hardware.now = 3U;
+        EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+        EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_ACTIVE);
+    }
+    void blocks_tc(bool receive, uint8_t bank = 1U) {
+        auto& selected =
+            receive ? blocks_config.audio.rx : blocks_config.audio.tx;
+        auto* memory = selected.stream;
+        memory->CR = (memory->CR & ~static_cast<uint32_t>(DMA_SxCR_CT)) |
+                     (bank != 0U ? static_cast<uint32_t>(DMA_SxCR_CT) : 0U);
+        memory->NDTR = 128U;
+        flag(selected.lane, 0x20U);
+    }
+    void blocks_quiet() {
+        hardware.spi.SR = SPI_SR_TXE;
+        hardware.spi3.SR = SPI_SR_TXE;
+        hardware.extension.SR = SPI_SR_TXE;
+        /* Live TX DMA can prefill again before the stop withdraws requests.
+         * The external/master clock must finish that word during the drain. */
+        hardware.wire_polls = 1U;
+    }
 };
+
+TEST_F(CaptureAudio, ContinuousBlocksHaveAnExplicitOptionalPersonality) {
+    EXPECT_EQ(nx_stm32_audio_ops.start_blocks, nullptr);
+    ASSERT_NO_FATAL_FAILURE(blocks_open(true, false));
+    ASSERT_NE(nx_stm32_audio_blocks_ops.start_blocks, nullptr);
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.submit, nullptr);
+    EXPECT_EQ(hardware.streams[4].CR & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(hardware.spi.I2SCFGR & SPI_I2SCFGR_I2SE, 0U);
+}
+TEST_F(CaptureAudio, ContinuousBothControllersCoverEveryRoleAndDirection) {
+    for (uint8_t controller : {uint8_t{2U}, uint8_t{3U}}) {
+        for (bool master : {false, true}) {
+            for (unsigned direction = 0U; direction < 3U; ++direction) {
+                SCOPED_TRACE(testing::Message()
+                             << "controller=" << unsigned(controller)
+                             << " master=" << master
+                             << " direction=" << direction);
+                hardware = Model{};
+                clock = {};
+                audio_config = {};
+                blocks_config = {};
+                blocks = {};
+                blocks_request = {};
+                stream = {};
+                rx_stream = {};
+                SetUp();
+                bool tx = direction != 1U;
+                bool rx = direction != 0U;
+                ASSERT_NO_FATAL_FAILURE(
+                    blocks_open(tx, rx, master, controller));
+                if (tx) {
+                    ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(3U));
+                }
+                ASSERT_NO_FATAL_FAILURE(blocks_start());
+                if (rx) {
+                    blocks_tc(true);
+                    ASSERT_EQ(nx_stm32_audio_blocks_ops.service(&blocks),
+                              NX_ERROR_BUSY);
+                    EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_READY);
+                }
+                if (tx) {
+                    blocks_tc(false);
+                    ASSERT_EQ(nx_stm32_audio_blocks_ops.service(&blocks),
+                              NX_ERROR_BUSY);
+                    EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
+                }
+                blocks_quiet();
+                ASSERT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_SUCCESS);
+                EXPECT_EQ(nx_request_state(&blocks_request.base),
+                          NX_REQUEST_SETTLED);
+                EXPECT_EQ(blocks.active, nullptr);
+                ASSERT_EQ(nx_stm32_audio_blocks_close(&blocks), NX_SUCCESS);
+                EXPECT_FALSE(blocks.cold.owned);
+            }
+        }
+    }
+}
+TEST_F(CaptureAudio, ContinuousRxPublishesOnlyAfterTheOldBankIsReplaced) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_FILLING);
+    EXPECT_EQ(rx_slots[1].state, NX_STREAM_SLOT_FILLING);
+    EXPECT_NE(hardware.streams[3].CR & DMA_SxCR_DBM, 0U);
+    EXPECT_EQ(rx_stream.outstanding, 2U);
+    blocks_tc(true);
+    ASSERT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(hardware.streams[3].M0AR,
+              static_cast<uint32_t>(reinterpret_cast<uintptr_t>(rx_pool[2])));
+    EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_READY);
+    EXPECT_EQ(rx_slots[1].state, NX_STREAM_SLOT_FILLING);
+    EXPECT_EQ(rx_slots[2].state, NX_STREAM_SLOT_FILLING);
+    nx_stream_block_t block;
+    ASSERT_EQ(nx_stream_acquire(&rx_stream, &block), NX_SUCCESS);
+    EXPECT_EQ(block.data, rx_pool[0]);
+    EXPECT_EQ(block.length, 256U);
+}
+TEST_F(CaptureAudio, ContinuousTxReturnsOnlyTheDetachedCompletedBank) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(true, false));
+    ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(3U));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_BORROWED);
+    EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_BORROWED);
+    blocks_tc(false);
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(hardware.streams[4].M0AR,
+              static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pool[2])));
+    EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
+    EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_BORROWED);
+    EXPECT_EQ(slots[2].state, NX_STREAM_SLOT_BORROWED);
+    EXPECT_EQ(blocks.transferred, 256U);
+}
+TEST_F(CaptureAudio, ContinuousDuplexAdvancesEachPhysicalBankIndependently) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(true, true));
+    ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(4U));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    blocks_tc(true);
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_READY);
+    EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_BORROWED);
+    blocks_tc(false);
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
+    EXPECT_EQ(blocks.transferred, 256U);
+}
+TEST_F(CaptureAudio, ContinuousTxUnderrunNeverRepeatsAnOldBuffer) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(true, false));
+    ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(2U));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    blocks_tc(false);
+    hardware.hold_dma = true;
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_BORROWED);
+    EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_BORROWED);
+    hardware.hold_dma = false;
+    blocks_quiet();
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_SUCCESS);
+    EXPECT_EQ(blocks_request.base.result, NX_ERROR_OVERFLOW);
+    EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
+    EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_FREE);
+}
+TEST_F(CaptureAudio, ContinuousRxExhaustionPreservesPublishedConsumers) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    for (unsigned bank : {1U, 0U, 1U}) {
+        blocks_tc(true, static_cast<uint8_t>(bank));
+        ASSERT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    }
+    nx_stream_block_t consumer;
+    ASSERT_EQ(nx_stream_acquire(&rx_stream, &consumer), NX_SUCCESS);
+    blocks_tc(true, 0U);
+    blocks_quiet();
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_OVERFLOW);
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_BORROWED);
+    EXPECT_EQ(rx_slots[1].state, NX_STREAM_SLOT_READY);
+    EXPECT_EQ(nx_stream_release(&rx_stream, &consumer), NX_SUCCESS);
+}
+TEST_F(CaptureAudio, ContinuousBankRaceKeepsEveryUnprovedLoan) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    blocks_tc(true);
+    hardware.race_bank = true;
+    hardware.hold_dma = true;
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_FILLING);
+    EXPECT_EQ(rx_slots[2].state, NX_STREAM_SLOT_FILLING);
+    hardware.hold_dma = false;
+    blocks_quiet();
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_SUCCESS);
+    EXPECT_EQ(rx_stream.outstanding, 0U);
+}
+TEST_F(CaptureAudio, ContinuousServiceBudgetCannotHideTwoBankWraps) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    hardware.now = 24U;
+    blocks_quiet();
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_OVERFLOW);
+    EXPECT_EQ(blocks_request.base.result, NX_ERROR_OVERFLOW);
+    EXPECT_EQ(rx_stream.losses, 1U);
+    EXPECT_EQ(rx_stream.outstanding, 0U);
+}
+TEST_F(CaptureAudio, ContinuousStopRetainsAddressesUntilTheFinalReadback) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    hardware.hold_address = true;
+    blocks_quiet();
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(rx_stream.outstanding, 2U);
+    hardware.hold_address = false;
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(rx_stream.outstanding, 0U);
+    EXPECT_EQ(blocks_request.base.result, NX_ERROR_CANCELLED);
+}
+TEST_F(CaptureAudio, ContinuousStoppedExternalClockRetainsItsWireLoan) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(true, false));
+    ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(3U));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    hardware.spi.SR = SPI_SR_BSY;
+    hardware.wire_polls = 0U;
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_BORROWED);
+    EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_BORROWED);
+    hardware.wire_polls = 1U;
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_SETTLED);
+}
+TEST_F(CaptureAudio, ContinuousCloseCannotReopenARefusedDrain) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(true, false));
+    ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(3U));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    hardware.hold_dma = true;
+    blocks_quiet();
+    EXPECT_EQ(nx_stm32_audio_blocks_close(&blocks), NX_ERROR_BUSY);
+    EXPECT_FALSE(blocks.cold.initialized);
+    nx_audio_blocks_request_t another = {};
+    nx_request_initialize(&another.base);
+    ASSERT_EQ(nx_request_prepare(&another.base, NX_DEADLINE_NEVER), NX_SUCCESS);
+    another.tx = &stream;
+    another.block_bytes = 256U;
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &another),
+              NX_ERROR_STATE);
+    hardware.hold_dma = false;
+    nx_result_t result = nx_stm32_audio_blocks_close(&blocks);
+    EXPECT_EQ(result, NX_SUCCESS)
+        << "active=" << blocks.active << " owned=" << blocks.cold.owned
+        << " history=" << blocks.history_lost << " spi.SR=" << hardware.spi.SR
+        << " spi.CR2=" << hardware.spi.CR2
+        << " dma.CR=" << hardware.streams[4].CR
+        << " dma.FCR=" << hardware.streams[4].FCR
+        << " dma.M0AR=" << hardware.streams[4].M0AR
+        << " enabled=" << hardware.enabled[SPI2_IRQn];
+    EXPECT_FALSE(blocks.cold.owned);
+}
+TEST_F(CaptureAudio, ContinuousOldEpochNeverReleasesItsBankLoans) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    ++g_nx_stm32_system.time_epoch;
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_STATE);
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(rx_stream.outstanding, 2U);
+    --g_nx_stm32_system.time_epoch;
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(rx_stream.outstanding, 2U);
+}
+TEST_F(CaptureAudio,
+       ContinuousAdmissionRejectsAliasedDirectionsWithoutEffects) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(true, true));
+    ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(3U));
+    blocks_request.rx = &stream;
+    unsigned before = hardware.writes;
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_READY);
+    EXPECT_EQ(hardware.writes, before);
+    EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_READY);
+}
+TEST_F(CaptureAudio, ContinuousClockBoundsRejectAnUnobservableShortBlock) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
+    blocks_request.block_bytes = 4U;
+    unsigned before = hardware.writes;
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(hardware.writes, before);
+    EXPECT_EQ(rx_stream.outstanding, 0U);
+}
+TEST_F(CaptureAudio, ContinuousRateCannotOverwriteTheSharedClockOwner) {
+    alignas(8) nx_stm32_audio_clock_t shared_clock = {};
+    audio_config.clock = &shared_clock;
+    ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
+    shared_clock.saved_plli2s = 0x12345678U;
+    auto* output = reinterpret_cast<nx_audio_rate_t*>(&shared_clock);
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.rate(&blocks, output),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(shared_clock.saved_plli2s, 0x12345678U);
+}
+TEST_F(CaptureAudio, ContinuousDmaCannotOverwriteAColdPinSnapshot) {
+    pins[0].snapshot = reinterpret_cast<uint16_t*>(rx_pool[0]);
+    ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
+    const unsigned before = hardware.writes;
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_READY);
+    EXPECT_EQ(rx_stream.outstanding, 0U);
+    EXPECT_EQ(hardware.streams[3].CR & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(hardware.writes, before);
+}
+TEST_F(CaptureAudio, ContinuousFrequentServiceCannotRestartTheWarmupClock) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(true, false));
+    ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(3U));
+    ASSERT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
+              NX_SUCCESS);
+    for (nx_time_us_t now = 1U; now <= 3U; ++now) {
+        hardware.now = now;
+        EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    }
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_ACTIVE);
+}
+TEST_F(CaptureAudio,
+       ContinuousEpochLossAtPublicationRetainsBothOldAndNewBanks) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    blocks_tc(true);
+    hardware.lose_epoch_on_bank_update = true;
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_STATE);
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_FILLING);
+    EXPECT_EQ(rx_slots[1].state, NX_STREAM_SLOT_FILLING);
+    EXPECT_EQ(rx_slots[2].state, NX_STREAM_SLOT_FILLING);
+    EXPECT_EQ(rx_stream.outstanding, 3U);
+}
+TEST_F(CaptureAudio, ContinuousMasterArmCannotHideUnobservedBankWraps) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(false, true, true));
+    hardware.jump_after_i2s_start = true;
+    ASSERT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_OVERFLOW);
+    EXPECT_EQ(blocks_request.base.result, NX_ERROR_OVERFLOW);
+    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(rx_stream.losses, 1U);
+    EXPECT_EQ(rx_stream.outstanding, 0U);
+}
+TEST_F(CaptureAudio,
+       ContinuousServiceTailCannotEraseTheLastHardwareObservation) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
+    ASSERT_NO_FATAL_FAILURE(blocks_start());
+    /* The external monotonic source advances while this service is running.
+     * Earlier detection is also valid; neither call may publish a guessed TC.
+     */
+    hardware.time_jump_reads = 3U;
+    hardware.time_jump_to = 10000U;
+    nx_result_t result = nx_stm32_audio_blocks_ops.service(&blocks);
+    if (result != NX_ERROR_OVERFLOW) {
+        ASSERT_EQ(result, NX_ERROR_BUSY);
+        blocks_tc(true);
+        result = nx_stm32_audio_blocks_ops.service(&blocks);
+    }
+    EXPECT_EQ(result, NX_ERROR_OVERFLOW);
+    EXPECT_EQ(blocks_request.base.result, NX_ERROR_OVERFLOW);
+    EXPECT_EQ(rx_stream.losses, 1U);
+    EXPECT_EQ(rx_stream.outstanding, 0U);
+}
+TEST_F(CaptureAudio, ContinuousSettledSessionCanBecomeInaccessibleBeforeIrqs) {
+    ASSERT_NO_FATAL_FAILURE(blocks_open(true, false));
+    ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(3U));
+    void* mapping = mmap(nullptr, 4096U, PROT_READ | PROT_WRITE,
+                         MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    ASSERT_NE(mapping, MAP_FAILED);
+    auto* request = static_cast<nx_audio_blocks_request_t*>(mapping);
+    nx_request_initialize(&request->base);
+    ASSERT_EQ(nx_request_prepare(&request->base, NX_DEADLINE_NEVER),
+              NX_SUCCESS);
+    request->tx = &stream;
+    request->rx = nullptr;
+    request->block_bytes = 256U;
+    ASSERT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, request),
+              NX_SUCCESS);
+    hardware.now = 3U;
+    ASSERT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    blocks_quiet();
+    ASSERT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_SUCCESS);
+    ASSERT_EQ(nx_request_state(&request->base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(mprotect(mapping, 4096U, PROT_NONE), 0);
+    nx_stm32_audio_blocks_irq(&blocks);
+    nx_stm32_audio_blocks_dma_irq(&blocks, false);
+    nx_stm32_audio_blocks_dma_irq(&blocks, true);
+    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_SUCCESS);
+    EXPECT_EQ(nx_stm32_audio_blocks_close(&blocks), NX_SUCCESS);
+    EXPECT_EQ(munmap(mapping, 4096U), 0);
+}
+TEST_F(CaptureAudio, FiniteReceiveOverrunMasksItsLevelSourceBeforeIrqReturn) {
+    audio_config.receive = true;
+    audio_config.tx = {};
+    audio_config.rx = dma(3U, 0U);
+    audio_open();
+    audio_request.rx = &rx_frame;
+    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_NE(hardware.spi.CR2 & SPI_CR2_ERRIE, 0U);
+    hardware.spi.SR = SPI_SR_OVR | SPI_SR_BSY;
+    nx_stm32_audio_irq(&audio);
+    EXPECT_EQ(hardware.spi.CR2 & SPI_CR2_ERRIE, 0U);
+    EXPECT_EQ(audio.result, NX_ERROR_IO);
+    EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_FILLING);
+    EXPECT_NE(nx_request_state(&audio_request.base), NX_REQUEST_SETTLED);
+}
 
 TEST_F(CaptureAudio, RawSnapshotRequiresBothFrameAndExactStorage) {
     capture_open();
@@ -1290,6 +1738,11 @@ extern "C" void nx_av_model_write(volatile uint32_t* reg, uint32_t value) {
                 dma->CR ^= DMA_SxCR_CT;
                 model->race_bank = false;
             }
+            if (reg == &dma->M0AR && (dma->CR & DMA_SxCR_EN) != 0U &&
+                model->lose_epoch_on_bank_update) {
+                ++g_nx_stm32_system.time_epoch;
+                model->lose_epoch_on_bank_update = false;
+            }
         }
     }
     if (reg == &model->dma.LIFCR)
@@ -1316,6 +1769,14 @@ extern "C" void nx_av_model_write(volatile uint32_t* reg, uint32_t value) {
             model->spi.SR &= ~static_cast<uint32_t>(SPI_SR_TXE | SPI_SR_BSY);
     }
     *reg = value;
+    if (model->jump_after_i2s_start && reg == &model->spi.I2SCFGR &&
+        (value & SPI_I2SCFGR_I2SE) != 0U) {
+        model->jump_after_i2s_start = false;
+        model->now = 10000U;
+        model->streams[3].CR |= DMA_SxCR_CT;
+        model->streams[3].NDTR = 128U;
+        model->dma.LISR |= 0x20U << kLaneShift[3];
+    }
     if (model->master_tail && reg == &model->spi.I2SCFGR &&
         (value & SPI_I2SCFGR_I2SE) == 0U) {
         model->spi.DR = 0x5a3cU;
@@ -1346,7 +1807,9 @@ extern "C" void nx_av_model_poll(void) {
     if (model->fifo_polls > 0U && --model->fifo_polls == 0U)
         model->dcmi.SR = 0U;
     if (model->wire_polls > 0U && --model->wire_polls == 0U)
-        model->spi.SR = SPI_SR_TXE;
+        for (SPI_TypeDef* bus : {&model->spi, &model->extension, &model->spi3})
+            bus->SR =
+                (bus->SR & ~static_cast<uint32_t>(SPI_SR_BSY)) | SPI_SR_TXE;
     model->cycles += 100U;
     if (!model->hold_pll) {
         if ((model->rcc.CR & RCC_CR_PLLI2SON) != 0U)
@@ -1356,6 +1819,8 @@ extern "C" void nx_av_model_poll(void) {
     }
 }
 extern "C" nx_time_us_t nx_av_model_now(void) {
+    if (model->time_jump_reads > 0U && --model->time_jump_reads == 0U)
+        model->now = model->time_jump_to;
     return model->now;
 }
 extern "C" uint32_t nx_av_model_cycles(void) {

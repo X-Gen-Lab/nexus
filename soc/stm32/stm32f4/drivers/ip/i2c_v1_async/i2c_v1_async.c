@@ -206,9 +206,9 @@ static nx_result_t start(void* context, nx_i2c_request_t* request,
     if (!state->initialized || state->stopping || state->faulted) {
         return NX_ERROR_STATE;
     }
-    if (endpoint->address_bits == 10U &&
-        !nx_i2c_v1_ten_timing((uint16_t)state->registers[CKCFG],
-                              state->peripheral_mhz)) {
+    if ((endpoint->address_bits == 10U || request->count > 1U) &&
+        !nx_i2c_v1_restart_timing((uint16_t)state->registers[CKCFG],
+                                  state->peripheral_mhz)) {
         return NX_ERROR_UNSUPPORTED;
     }
     if (nx_request_state(&request->base) !=
@@ -281,21 +281,15 @@ static bool on_port(const void* context, const nx_i2c_port_t* port) {
 static bool clock_profile(const nx_i2c_v1_state_t* state, uint16_t* ccr,
                           uint8_t* rise) {
     if (state->timing_ccr == 0U) {
-        /* Preserve the admitted 8 MHz low-clock erratum-safe 80 kHz profile. */
-        return nx_i2c_v1_timing(state->peripheral_mhz,
-                                state->peripheral_mhz == 8U ? 80000U : 100000U,
-                                ccr, rise);
+        return nx_i2c_v1_timing(state->peripheral_mhz, 100000U, ccr, rise);
     }
     uint16_t selected = state->timing_ccr;
     uint32_t count = selected & 0xFFFU;
     bool fast = (selected & 0x8000U) != 0U;
-    uint32_t maximum = fast                          ? 400000U
-                       : state->peripheral_mhz == 8U ? 80000U
-                                                     : 100000U;
+    uint32_t maximum = fast ? 400000U : 100000U;
     uint16_t fastest;
     if (!nx_i2c_v1_timing(state->peripheral_mhz, maximum, &fastest, rise) ||
-        (selected & 0x7000U) != 0U || count < (fastest & 0xFFFU) ||
-        (fast && state->peripheral_mhz == 8U)) {
+        (selected & 0x7000U) != 0U || count < (fastest & 0xFFFU)) {
         return false;
     }
     *ccr = selected;

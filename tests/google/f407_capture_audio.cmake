@@ -5,6 +5,7 @@ nexus_google_test(nexus_f407_capture_audio_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/av.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/capture.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/audio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/audio_blocks.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/capture_hal"

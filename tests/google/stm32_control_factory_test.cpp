@@ -117,6 +117,43 @@ TEST_F(ControlFactory, ExactStaticFactoryStartsStopsAndRestarts) {
 }
 
 #ifdef NX_CONTROL_EXTI
+TEST_F(ControlFactory, CrystalLseRejectsPc13IrqBeforePinMuxOrNvicEffects) {
+    RCC->APB2ENR = RCC_APB2ENR_SYSCFGEN;
+    RCC->AHB1ENR = RCC_AHB1ENR_GPIOCEN;
+    nx_exti_event_t events[2]{};
+    const nx_stm32_exti_config_t config{GPIOC, events, 2U, NX_EXTI_BOTH,
+                                        2U,    13U,    5U, 0U};
+    for (uint32_t source :
+         {uint32_t{RCC_BDCR_LSEON}, uint32_t{RCC_BDCR_LSERDY}}) {
+        nx_stm32_exti_state_t state{};
+        RCC->BDCR = source;
+        const auto* bytes = static_cast<const uint8_t*>(mmio);
+        const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+        const NVIC_Type before_nvic = *NVIC;
+        EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_exti_prepare(&state, &config));
+        EXPECT_FALSE(state.cold_owned);
+        EXPECT_FALSE(state.initialized);
+        EXPECT_EQ(0, std::memcmp(before.data(), bytes, before.size()));
+        EXPECT_EQ(0, std::memcmp(&before_nvic, NVIC, sizeof(before_nvic)));
+        if (state.cold_owned) {
+            EXPECT_EQ(NX_SUCCESS, nx_stm32_exti_close(&state));
+        }
+    }
+}
+
+TEST_F(ControlFactory, ExplicitLseBypassAllowsPc13IrqOwnership) {
+    RCC->APB2ENR = RCC_APB2ENR_SYSCFGEN;
+    RCC->AHB1ENR = RCC_AHB1ENR_GPIOCEN;
+    RCC->BDCR = RCC_BDCR_LSEBYP | RCC_BDCR_LSEON | RCC_BDCR_LSERDY;
+    nx_exti_event_t events[2]{};
+    nx_stm32_exti_state_t state{};
+    const nx_stm32_exti_config_t config{GPIOC, events, 2U, NX_EXTI_BOTH,
+                                        2U,    13U,    5U, 0U};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_exti_prepare(&state, &config));
+    EXPECT_TRUE(state.initialized);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_exti_close(&state));
+}
+
 TEST_F(ControlFactory, EveryGPIOEXTILineUsesItsActualNVICVector) {
     RCC->APB2ENR = RCC_APB2ENR_SYSCFGEN;
     for (uint8_t line = 0U; line < 16U; ++line) {

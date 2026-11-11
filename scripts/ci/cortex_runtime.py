@@ -53,7 +53,8 @@ FREERTOS_SYMBOLS = frozenset({
     'nx_freertos_closable_queue_send_until',
     'nx_freertos_closable_queue_receive_until',
     'nx_freertos_closable_queue_close', 'nx_freertos_closable_queue_destroy',
-    'SVC_Handler', 'PendSV_Handler', 'SysTick_Handler', 'vTaskStartScheduler',
+    'SVC_Handler', 'PendSV_Handler', 'SysTick_Handler',
+    'nx_freertos_kernel_tick_handler', 'vTaskStartScheduler',
 })
 
 
@@ -148,6 +149,31 @@ def function_body(text: str, name: str) -> str:
     return match.group(1).lower()
 
 
+def check_kernel_tick_entry(text: str) -> None:
+    """Audit the owned linear IRQ connection and its real barrier callee."""
+    body = function_body(text, 'SysTick_Handler')
+    calls = list(re.finditer(
+        r'\b(b[a-z]*(?:\.[nw])?)\s+[0-9a-f]+\s+<([^>]+)>', body))
+    if (len(calls) != 2 or calls[0][1] not in {'bl', 'bl.w'} or
+            calls[0][2] != 'nx_freertos_kernel_tick_handler' or
+            calls[1][1] not in {'bl', 'bl.w', 'b', 'b.n', 'b.w'} or
+            calls[1][2] != 'nx_arch_dsb' or
+            re.search(r'\b(?:cbz|cbnz|tbb|tbh)\b', body) or
+            re.search(r'\bbx\b|\bpop\b[^\n]*\bpc\b',
+                      body[:calls[1].start()]) or
+            re.search(r'\b(?:str\w*|stm\w*|bl\w*|msr)\b',
+                      body[calls[1].end():])):
+        raise ValueError('SysTick entry must call the kernel then final DSB')
+    barrier = function_body(text, 'nx_arch_dsb')
+    instructions = re.findall(
+        r'^\s*[0-9a-f]+:\s+(?:[0-9a-f]{4,8}\s+)+'
+        r'([a-z][a-z0-9.]*)\s+([^\n]*)', barrier, flags=re.MULTILINE)
+    instructions = [(op, args.strip()) for op, args in instructions
+                    if op != 'nop']
+    if instructions != [('dsb', 'sy'), ('bx', 'lr')]:
+        raise ValueError('SysTick exit barrier has no actual DSB return path')
+
+
 def check_nonsecure_boundary(variant: dict, text: str) -> None:
     """Require a retained real CMSE path only in a Secure compiler image."""
     secure = variant['facts']['cpu']['security'] == 'secure'
@@ -173,7 +199,8 @@ def check_m7_integer_errata(variant: dict, text: str) -> None:
     irq = variant['profile']['irq']
     expected_mask = irq['syscall_priority'] << (8 - irq['priority_bits'])
     register = r'(?:r\d+|ip|sl|fp)'
-    for name in ('vPortEnterCritical', 'SysTick_Handler', 'PendSV_Handler'):
+    for name in ('vPortEnterCritical', 'nx_freertos_kernel_tick_handler',
+                 'PendSV_Handler'):
         values = {}
         disabled = False
         pending = None
@@ -482,6 +509,7 @@ def execute_variant(root: Path, recorder, selected_tools, variant: dict) -> dict
     check_probes(variant, text)
     check_nonsecure_boundary(variant, text)
     if variant['backend'] == 'freertos':
+        check_kernel_tick_entry(text)
         check_kernel_context(variant, text)
         check_coprocessor_initialization(variant, text)
     attributes = recorder.execute([selected_tools['readelf'], '-A', str(elf)],

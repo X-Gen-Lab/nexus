@@ -34,8 +34,11 @@ python tools/documentation/cli.py preview --build build/documentation
 成功要求 exit 0 与 `documentation-build.json` 的 passed 结果，旧 HTML 不代替本次执行。
 离线 commit hook 核对完整 staged 文档和配置示例，不联网、不自动修改或 stage。
 
-源码旁 README、站点正文和 include 闭包范围不同；检查不能代替说明内容与架构箭头的
-语义审查。工具行为修改遵守实际 RED／GREEN，纯文档变更执行文档检查和内容审查。
+源码检查同时核对平台自有、非历史源码旁 Markdown 的本地链接与锚点；它们不因此
+进入站点导航或翻译页计数。普通 staged 检查也绑定这些文件的索引字节，未提交的
+README 修复不能替另一份提交通过。第三方依赖、构建输出和冻结证据仍不参与此范围。
+站点正文与 include 闭包另行检查；工具不能代替内容与架构箭头的语义审查。工具行为
+修改遵守实际 RED／GREEN，纯文档变更执行文档检查和内容审查。
 文档、Source SDK 和 HIL 各有独立执行边界，见 [FIG-12](../../docs/assets/diagrams/release-recovery.svg)。
 写作与图示遵守[内容标准](../../docs/design/documentation-standards.md)、
 [页面模板](../../docs/design/documentation-templates.md)与[翻译合同](../../docs/locale/README.md)。

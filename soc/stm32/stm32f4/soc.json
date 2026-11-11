@@ -520,7 +520,8 @@
     "EXTI0": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI0_IRQn"
@@ -610,7 +611,8 @@
     "EXTI5": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI9_5_IRQn"
@@ -631,7 +633,8 @@
     "EXTI6": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI9_5_IRQn"
@@ -1126,7 +1129,8 @@
     "EXTI7": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI9_5_IRQn"
@@ -1147,7 +1151,8 @@
     "EXTI8": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI9_5_IRQn"
@@ -1168,7 +1173,8 @@
     "EXTI9": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI9_5_IRQn"
@@ -1189,7 +1195,8 @@
     "EXTI11": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI15_10_IRQn"
@@ -1329,7 +1336,8 @@
     "EXTI2": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI2_IRQn"
@@ -1829,7 +1837,13 @@
         "master-duplex",
         "slave-tx",
         "slave-rx",
-        "slave-duplex"
+        "slave-duplex",
+        "master-tx-blocks",
+        "master-rx-blocks",
+        "master-duplex-blocks",
+        "slave-tx-blocks",
+        "slave-rx-blocks",
+        "slave-duplex-blocks"
       ],
       "irq": [
         "SPI2_IRQn"
@@ -1853,7 +1867,13 @@
         "master-duplex",
         "slave-tx",
         "slave-rx",
-        "slave-duplex"
+        "slave-duplex",
+        "master-tx-blocks",
+        "master-rx-blocks",
+        "master-duplex-blocks",
+        "slave-tx-blocks",
+        "slave-rx-blocks",
+        "slave-duplex-blocks"
       ],
       "irq": [
         "SPI3_IRQn"
@@ -1937,7 +1957,8 @@
     "EXTI1": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI1_IRQn"
@@ -1959,7 +1980,8 @@
     "EXTI3": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI3_IRQn"
@@ -1980,7 +2002,8 @@
     "EXTI4": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI4_IRQn"
@@ -2001,7 +2024,8 @@
     "EXTI10": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI15_10_IRQn"
@@ -2022,7 +2046,8 @@
     "EXTI12": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI15_10_IRQn"
@@ -2043,7 +2068,8 @@
     "EXTI13": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI15_10_IRQn"
@@ -2064,7 +2090,8 @@
     "EXTI14": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI15_10_IRQn"
@@ -2085,7 +2112,8 @@
     "EXTI15": {
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "irq": [
         "EXTI15_10_IRQn"

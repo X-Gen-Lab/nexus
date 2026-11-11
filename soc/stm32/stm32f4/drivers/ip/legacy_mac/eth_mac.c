@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "eth_mac.h"
+#include "eth_clock.h"
 #ifdef NX_ETH_NATIVE
 #include "ethernet_access.h"
 #endif
@@ -215,17 +216,6 @@ static nx_result_t validate_storage(nx_eth_mac_t* mac) {
     }
     return NX_SUCCESS;
 }
-static uint8_t divider(uint32_t hz) {
-    if (hz < 35000000U)
-        return 8U;
-    if (hz < 60000000U)
-        return 12U;
-    if (hz < 100000000U)
-        return 0U;
-    if (hz < 150000000U)
-        return 4U;
-    return 16U;
-}
 static void rearm(nx_eth_mac_t* mac, size_t index) {
     nx_eth_rx_slot_t* slot = &mac->rx_slots[index];
     slot->state = NX_ETH_RX_DMA;
@@ -269,7 +259,7 @@ nx_result_t nx_eth_mac_initialize(nx_eth_mac_t* mac, nx_time_us_t deadline) {
     }
     if (nx_deadline_expired(deadline, nx_time_now_us()))
         return NX_ERROR_TIMEOUT;
-    mac->mdio_divider = divider(mac->hclk_hz);
+    mac->mdio_divider = nx_eth_mdio_divider(mac->hclk_hz);
     bool valid = write_checked(mac, DMA_BUS, 32U << 8U, UINT32_MAX) &&
                  write_checked(mac, MAC_CONTROL, 0U, UINT32_C(0x02FFFFFF)) &&
                  write_checked(mac, MAC_FILTER, 0U, UINT32_MAX) &&

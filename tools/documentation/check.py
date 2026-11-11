@@ -15,6 +15,9 @@ LEGACY_SPHINX = {"index.rst", "api/index.rst", "api.rst", "getting_started.rst",
                  "architecture.rst", "configuration.rst", "migration.rst",
                  "os.rst", "support.rst", "development/index.rst"}
 SITE_READMES = {"assets/diagrams/README.md", "design/README.md", "delivery/README.md"}
+OWNED_MARKDOWN_ROOTS = ("arch", "boards", "cmake", "components", "core", "docs",
+                        "io", "os", "scripts", "soc", "tests", "tools")
+ROOT_MARKDOWN = ("README.md", "README_CN.md")
 LINK = re.compile(r"!?\[[^\]]*\]\((<[^>]+>|[^)]+)\)")
 REFERENCE = re.compile(r"^\s*\[[^\]]+\]:\s*(\S+)", re.MULTILINE)
 FENCE = re.compile(r"^(`{3,}|~{3,})([^\n]*)\n(.*?)^\1\s*$",
@@ -87,6 +90,28 @@ def is_source(root, path):
 
 def sources(root):
     return sorted(path for path in (root / "docs").rglob("*") if is_source(root, path))
+
+
+def is_adjacent_source(root, path):
+    """Current repository guides also need valid links outside the site graph."""
+    if not path.is_relative_to(root) or path.suffix != ".md":
+        return False
+    relative = path.relative_to(root)
+    if relative.as_posix() in ROOT_MARKDOWN:
+        return True
+    return (relative.parts[0] in OWNED_MARKDOWN_ROOTS
+            and not EXCLUDED.intersection(relative.parts)
+            and not path.is_relative_to(root / "tests/evidence")
+            and not is_source(root, path))
+
+
+def adjacent_sources(root):
+    """Keep imported dependencies, frozen evidence and build output untouched."""
+    paths = {root / name for name in ROOT_MARKDOWN if (root / name).is_file()}
+    for directory in OWNED_MARKDOWN_ROOTS:
+        paths.update(path for path in (root / directory).rglob("*.md")
+                     if is_adjacent_source(root, path))
+    return sorted(paths)
 
 
 def file_inputs(contents, suffix):
@@ -211,6 +236,36 @@ def anchors(contents, suffix=".md"):
             used[slug] = number + 1
             result.add(slug if not number else f"{slug}-{number}")
     return result
+
+
+def reader_links(root, path, contents, urls):
+    """Check the same reader destinations in site and source-adjacent guides."""
+    label = str(path.relative_to(root))
+    errors = []
+    plain = FENCE.sub("", contents)
+    targets = [match[1] for match in LINK.finditer(plain)]
+    targets += REFERENCE.findall(plain)
+    if path.suffix == ".rst":
+        from tools.documentation import rst
+        targets = rst.target_links(contents)
+    for target in targets:
+        target = target.strip().split(' "', 1)[0].strip("<>")
+        parsed = urllib.parse.urlsplit(target)
+        if parsed.scheme or target.startswith("//"):
+            if parsed.scheme in {"http", "https"}:
+                urls.add(target)
+            continue
+        destination = (path.parent / urllib.parse.unquote(parsed.path)).resolve()
+        if not parsed.path:
+            destination = path
+        if not destination.exists():
+            errors.append(label + ": missing link " + target)
+        elif (destination.is_file() and parsed.fragment
+              and destination.suffix in {".md", ".rst"}):
+            if urllib.parse.unquote(parsed.fragment) not in anchors(
+                    destination.read_text(), destination.suffix):
+                errors.append(label + ": missing anchor " + target)
+    return errors
 
 
 def navigation(path, contents):
@@ -367,29 +422,7 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
                         runtime.resolve(destination)
                     config_records.append({"source": str(destination), "kind": "literalinclude",
                                            "resolved": True})
-            plain = FENCE.sub("", contents)
-            targets = [match[1] for match in LINK.finditer(plain)]
-            targets += REFERENCE.findall(plain)
-            if path.suffix == ".rst":
-                from tools.documentation import rst
-                targets = rst.target_links(contents)
-            for target in targets:
-                target = target.strip().split(' "', 1)[0].strip("<>")
-                parsed = urllib.parse.urlsplit(target)
-                if parsed.scheme or target.startswith("//"):
-                    if parsed.scheme in {"http", "https"}:
-                        urls.add(target)
-                    continue
-                destination = (path.parent / urllib.parse.unquote(parsed.path)).resolve()
-                if not parsed.path:
-                    destination = path
-                if not destination.exists():
-                    errors.append(label + ": missing link " + target)
-                elif (destination.is_file() and parsed.fragment
-                      and destination.suffix in {".md", ".rst"}):
-                    if urllib.parse.unquote(parsed.fragment) not in anchors(
-                            destination.read_text(), destination.suffix):
-                        errors.append(label + ": missing anchor " + target)
+            errors.extend(reader_links(root, path, contents, urls))
             normalized = configuration_content(contents, path.suffix)
             if check_configuration and "```toml" in normalized:
                 from tools.configure import documentation
@@ -400,6 +433,16 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
                     if block[2].strip() == "json":
                         json.loads(block[3], object_pairs_hook=pairs)
         except (OSError, ValueError, TypeError, KeyError) as error:
+            errors.append(label + ": " + str(error))
+    adjacent = adjacent_sources(root)
+    for path in adjacent:
+        label = str(path.relative_to(root))
+        if path.is_symlink() or any(parent.is_symlink() for parent in path.parents):
+            errors.append(label + ": source symlink rejected")
+            continue
+        try:
+            errors.extend(reader_links(root, path, path.read_text(), urls))
+        except (OSError, ValueError) as error:
             errors.append(label + ": " + str(error))
     if check_navigation:
         start = (root / "docs/index.md").resolve()
@@ -431,5 +474,6 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
     return {"schema_version": 1, "kind": "nexus_documentation_source_check",
             "status": "failed" if errors else "passed", "errors": errors,
             "pages": len(pages), "page_ids": len(identifiers),
+            "adjacent_markdown": len(adjacent),
             "configuration_examples": config_records,
             "external_links": probes, "qualification": False}

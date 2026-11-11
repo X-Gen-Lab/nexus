@@ -26,11 +26,17 @@ cancel、timing、power-loss 须各自物理测量。
 acquisition execute 才操作设备。软件证据与物理证据的边界可参照
 [FIG-11](../../docs/assets/diagrams/qualification-evidence.svg)，图不表示已有测量。
 
+先准备并配置同一受维护 preset，取得真实生成的 `resolved.json`。以下示例从仓库根
+执行，不运行固件或操作设备；`configure` 要求所选源码及锁定工具已就绪：
+
 ```sh
+python tools/dev/dev.py prepare --scope preset \
+    --preset stm32-qiming-baremetal --allow-network
+python tools/dev/dev.py configure --preset stm32-qiming-baremetal
 python tools/hil/prepare.py \
-    --fixture tools/hil/fixtures/gd32f470_liangshan.json \
-    --resolved build/gd32-liangshan-baremetal/generated/resolved.json \
-    --report build/gd32-liangshan-baremetal/hil-preparation.json
+    --fixture tools/hil/fixtures/stm32f407_qiming_v31.json \
+    --resolved build/stm32-qiming-baremetal/generated/resolved.json \
+    --report build/stm32-qiming-baremetal/hil-preparation.json
 ```
 
 从源码仓库根执行计划命令。设备接入后，将 `fixtures/station.template.json` 复制
@@ -45,42 +51,24 @@ population、jumpers、connector personality 和 PCB revision，复制声明不�
 
 ## Fixture 与精确模式边界
 
-三块首发 PCB fixtures 仍缺 observed PCB revisions／equipment。G474 HSE24、
-NUCLEO-H743ZI2、NUCLEO-U575ZI-Q 只给 software-reference part／console facts；
-精确 Board／part 必须维持 `software_reference`。删除 scope、换 part 或重标 Board
-不能升级资格，包括直接校验编辑后的 fixture 都拒绝。public raw validator 从真实
-artifacts 重建 admission，重新 hash metadata 不能绕过 reference／station identity。
-未来实板须另审 physical fixture 并修改对应 tooling；budgets 为 null，cases 全未执行。
+当前维护四份 F407 fixture，均未取得实板观察。文件名、Board 和精确 part 必须与
+同一构建的 `resolved.json` 一致，不能交换核心板、底板、V3.1 或天空星的身份。
 
-H743 reference 为 HSI64、caches off、PB0 GPIO、USART3 PD8／PD9 IRQ bytes；U575
-为 TZEN0／SWAP_BANK0、MSIS4MHz、PC7、USART1 PA9／PA10 IRQ bytes。实际 PCB、
-regulator fitting、供电和焊桥需观察，U575 option state 须 preboot 只读观察，不修改
-option bytes。这些 reference 不含 DMA、Cache、TrustZone、动态 clocks、deep STOP
-或运行态 handoff。
+| Fixture | 精确 part | 当前准入边界 |
+| --- | --- | --- |
+| `fixtures/stm32f407_qiming_v31.json` | STM32F407ZGT6 | 等待真实 PCB／station／预算和镜像绑定 |
+| `fixtures/stm32f407ve_sky_qingchun.json` | STM32F407VET6 | 等待真实 PCB／station／预算和镜像绑定 |
+| `fixtures/stm32f407zg_qiming_core.json` | STM32F407ZGT6 | `software_reference`，物理准入前须另审 fixture／tooling |
+| `fixtures/stm32f407zg_qiming_v41.json` | STM32F407ZGT6 | `software_reference`，物理准入前须另审 fixture／tooling |
 
-新增 `stm32f407zg_qiming_core.json`、`stm32f407zg_qiming_v41.json` 绑定独立
-STM32F407ZGT6 Board 和 schematic identity，仍为 `software_reference`，站点准入
-拒绝到另审物理 fixture／tooling。它们不修改旧 V3.1，也不禁止同 MCU 其他 Boards。
-budgets 为 null；ILI9341／XPT2046 型号确认不代表 fitting／electrical timing／实物
-执行已观察，audio／camera 接口不证明装有某 controller。
+`admit.py` 维护精确 Board／part 对及 reference 限制。编辑 scope、part 或重算文件
+hash 都不能升级资格；未审核的 revision、器件实装、跳线、电压和晶振精度保持未知。
+四份 fixture 的物理案例均为 `not_executed`，null budgets 不能绕过实测条件审核。
+ILI9341／XPT2046 型号确认不代表模块安装、电气时序或实物操作已观察。
 
-五项另选模式合同准备 H743 SPI4 Cache DMA、H743 continuous RX（Cache off／on、
-IRQ TX）、独立 H743 finite DMA TX＋continuous DMA RX、U575 finite USART1 hardware
-TX chains，以及 U575 LPTIM2 RUN one-shots。duplex 使用独立九场景 protocol 和双 lane
-identities，不继承 RX-only 结果；RX 采样窗口不承诺整个最长 TX 期间持续接收。
-model-only cache-clean cancel 不进入 physical HIL 义务。独立 raw parsers 已接既有
-SoC acquisition／validation，但 reference Board／part 仍不可准入；SPI-only、无 pin
-timer 的 control channel 保持未绑定。刺激、raw fields 与 boundary 见
-[选定模式合同](../../docs/design/selected-mode-hil.md)。计划仍为
-`prepared_unbound`／`not_executed`，parser tests 不认证硬件。
-
-可选 UART FIFO workload 复用公共示例和独立
-[reference／instrumented fixture](../../tests/contracts/uart_fifo_acquisition/README.md)。
-`uart_fifo.py` 通过普通平台入口解析 post-join device export、完整 wire bytes 与
-四列 IRQ CSV，不操作设备或准入 station。CSV 只生成未验证算术候选，两种 origin
-都保留 `irq_capture.measurement_status=not_executed`，无 `samples.irq_latency`。
-caller rate／window 仅保留，不是校准；IRQ assertion／dispatch 关联、双向重叠、完整
-capture／loss 和 clock 仍依完整 SOC-55。reference Boards 仍拒绝，HIL 未执行。
+HIL 的原始 trace、测量和 OS 记录分别准入。某个 packet／timer／DMA 模型通过，
+不提供设备 ready、PHY／cache coherence、波形、唤醒或掉电证明。已退出生产选择的
+GD32、G474、H743 和 U575 历史记录按原固定源码读取，不用于当前 F407 工装。
 
 ## 通用测量与前后比较
 
@@ -89,9 +77,9 @@ capture／loss 和 clock 仍依完整 SOC-55。reference Boards 仍拒绝，HIL 
 
 ```sh
 python tools/hil/measure.py plan \
-    --fixture tools/hil/fixtures/gd32f470_liangshan.json \
-    --resolved build/gd32-liangshan-baremetal/generated/resolved.json \
-    --report build/gd32-liangshan-baremetal/hil-measurement-plan.json
+    --fixture tools/hil/fixtures/stm32f407_qiming_v31.json \
+    --resolved build/stm32-qiming-baremetal/generated/resolved.json \
+    --report build/stm32-qiming-baremetal/hil-measurement-plan.json
 ```
 
 设备可用后 station owner 审核 workload／numeric budgets，通过
@@ -285,7 +273,7 @@ inputs、traces、context、workload、instrument 或 admitted tool／config。
 电气安全或 release。真实 station 执行已审 adapters 并保留 instrument bytes；软件
 fixtures 不建立物理结果。host-only 回归经过 commit TDD gate，mock 外部 admission
 服务，使用真实 synthetic hashes／parser inputs；admission／resource suite 另链接
-真实 ARM ELF，不能凭 synthetic records 认证三块板。
+真实 ARM ELF，不能凭 synthetic records 认证开发板。
 
 ## Workload 与采集配方
 
@@ -300,24 +288,20 @@ UART／SPI／DMA、I2C、ADC／PWM／EXTI、Flash 掉电、并发负荷、M4F �
 identity、wiring、safety 来自 station owner。缺少 selected controller／mode 保持
 `requires_selection`，不支持 CPU／backend 保持 `unsupported`。
 
-四个 typed I/O protocols 选精确 resolved faces：
+typed I/O protocol 还须选择匹配的公共 face。例如 `uart_word_wire` 要求 IRQ 9N1
+word port 与保留 bit8 的真实 peer；`spi_dma_whole_cs_segments` 要求同控制器的增强
+DMA endpoint。普通 UART 或 polling SPI 不能代替这些模式。目录中的其他 protocol
+只提供编写义务；planner 依实际 F407 resolved faces 返回 `selected`、
+`requires_selection` 或 `unsupported`，不从名字推定硬件支持。
 
-| Protocol | 必需绑定 |
-| --- | --- |
-| `uart_word_wire` | IRQ 9N1 word port，以及保留 bit8 的真实 nine-bit peer |
-| `spi_dma_whole_cs_segments` | same-controller enhanced DMA endpoint |
-| `i2c_v2_long_timing` | long endpoint，以及 authored G474／H743／U575 analog-filter-on、digital-filter-zero timing projection |
-| `pwm_group_comp_break` | 生成的 exclusive TIM1／COMP1 route |
-
-通用 SPI／I2C／advanced PWM 不能替代这些 faces。waveform／drain／instrument 义务
-和 null limits 保留到审核；状态仍未执行。word-only assembly 不能用 8-bit smoke
-adapter，full workload／station admission 前须另选已审 8N1 control console，离线
-mode selector 不建立该 console 或设备 ready。
+waveform、drain、instrument 与 null limits 保留到审核。word-only assembly 不能
+使用 8-bit smoke adapter；完整 workload／station admission 前须另选受审 8N1
+control console。离线 mode selector 不建立该 console 或设备 ready。
 
 ```sh
 python tools/hil/workloads.py plan \
-    --fixture tools/hil/fixtures/gd32f470_liangshan.json \
-    --resolved build/gd32-liangshan-baremetal/generated/resolved.json \
+    --fixture tools/hil/fixtures/stm32f407_qiming_v31.json \
+    --resolved build/stm32-qiming-baremetal/generated/resolved.json \
     --report station/workload-plan.json
 ```
 
@@ -330,7 +314,8 @@ recipe、measurement、OS acceptance 都按 admitted fixture 和 canonical resol
 bytes 或未审 limits。设备动作前校验编写义务，不能证明仪器描述或物理观察真实。
 
 ThreadX 有独立七项 task、IRQ-wake、context、stack、deadline、lifecycle、fail-stop
-观察合同，M4 准备只覆盖三块首发 Boards，Native 仅 host 软件；不继承 FreeRTOS
+观察合同，M4 准备只覆盖配置工具实际维护的 F407 ThreadX 组合，Native 仅 host
+软件；不继承 FreeRTOS
 低功耗验收。见 [ThreadX acquisition](threadx.md)。计划保持 prepared_unbound／
 not_executed，无真实 ThreadX station 结果。其他 peripheral protocols 不会自动提供
 CAN peer、USB host、Ethernet link 或 waveform drivers；validator 只准入记录的
@@ -363,7 +348,7 @@ argv 不经过 shell。整参数 `{record}`、`{session}`、`{admission}`、`{el
 attempt dir；每 adapter 必须接收前三项。adapter 读取真实 probe／instrument 并写
 新 `hil_adapter_observation`，含 `schema_version`、`kind`、`operation`、`session`、
 非空 observations。identify 必报真实 part／chip_uid／probe_serial，不符在 flash 前
-停止。runner 不猜 chip-ID register 或 GD32 target。
+停止。runner 不猜芯片身份或调试 target。
 
 仅连接且审核通过的站点可执行下列显式设备操作：
 
@@ -383,7 +368,7 @@ capture error／cancel 先 kill／reap process group，保留 raw partial stream
 完整采集成功仅 `captured`／`executed_unqualified`：命令结束不自动通过物理测试。
 将真实 smoke／measurement／OS records 分别交 `admit.py`、`measure.py` 和
 `os_acceptance.py`。
-host subprocess fixture 只测试失败和审计，不操作三块板或建立物理支持。
+host subprocess fixture 只测试失败和审计，不操作开发板或建立物理支持。
 
 ## 串口 echo adapter
 
@@ -411,18 +396,18 @@ clock、Flash power-loss、OS context 需要真实 station instrument 与 review
 ## SoC 专项验收
 
 `soc_acceptance.py` 覆盖 [SoC 台账](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/soc-refinement-execution.csv)
-SOC-37–55：十九项 ledger cases 和五项另选 modes 定义 hardware、stimuli、raw
-observations、invariants、metric units、safety 与 physical exits。plan 不操作
+SOC-37–55：十九项受维护 cases 定义 hardware、stimuli、raw observations、
+invariants、metric units、safety 与 physical exits。plan 不操作
 instrument、不补 numeric limits、不建立 station ready。
 
 ```sh
 python tools/hil/soc_acceptance.py plan \
-    --fixture tools/hil/fixtures/gd32f470_liangshan.json \
-    --resolved build/gd32-liangshan-baremetal/generated/resolved.json \
+    --fixture tools/hil/fixtures/stm32f407_qiming_v31.json \
+    --resolved build/stm32-qiming-baremetal/generated/resolved.json \
     --output station/soc-plan.json
 python tools/hil/soc_acceptance.py template --case SOC-43 \
-    --fixture tools/hil/fixtures/gd32f470_liangshan.json \
-    --resolved build/gd32-liangshan-baremetal/generated/resolved.json \
+    --fixture tools/hil/fixtures/stm32f407_qiming_v31.json \
+    --resolved build/stm32-qiming-baremetal/generated/resolved.json \
     --output station/soc-uart-template.json
 ```
 
@@ -430,8 +415,8 @@ template 的 protocol 复制到 station-owned storage。绑定实际 controller 
 instrument identities、reviewed stimuli／observations、isolation／recovery 与全部
 metric 的 minimum／maximum／unit。null instruments／limits 故意验证失败；离散
 工作量为整数且下界正，不变量失败计数两界均零。scope 服从实际 selected modes，不
-包括 case 描述中的所有模式。tickless 须显式 FreeRTOS tickless，G474 reference
-仍不能准入物理 station。
+包括 case 描述中的所有模式。tickless 须显式选择受维护的 FreeRTOS tickless；
+software-reference fixture 仍不能准入物理 station。
 
 正常 admit 和 reviewed workload 后，station serial／instrument operation 以整参数
 接绝对 SoC protocol path，recipe inputs 固定 protocol／instrument／calibration。

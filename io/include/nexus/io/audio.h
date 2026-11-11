@@ -1,6 +1,6 @@
 /**
  * \file            audio.h
- * \brief           Finite I2S transmit, receive and full duplex DMA loans
+ * \brief           Finite and continuous I2S transmit/receive DMA loans
  * \author          Nexus Team
  */
 #ifndef NEXUS_IO_AUDIO_H
@@ -39,6 +39,31 @@ typedef struct {
     nx_frame_stream_t* rx;
 } nx_audio_request_t;
 
+/** \brief Continuous fixed-size blocks with a caller-owned session lifetime.
+ * \note TX is a stream of READY immutable blocks; RX starts with FREE blocks.
+ *       Each selected direction supplies a distinct stream. DMA borrows two
+ *       blocks per direction; the next replacement must be available before
+ *       the hardware returns to the old bank. Published RX and returned TX
+ *       blocks are detached from every DMA address before consumer access.
+ *       Unselected directions are NULL. block_bytes is a positive whole audio
+ *       frame count, identical for both directions. No silence, sample repeat,
+ *       conversion, allocation or hidden replenishment is provided.
+ *       Initialize/prepare base first. The session and producer/consumer rights
+ *       remain borrowed through acquire-observed SETTLED. Consumer loans from
+ *       completed RX blocks remain valid after session stop and must be joined
+ *       separately before reclaiming the stream or buffers. Stop discards the
+ *       uncompleted hardware blocks but preserves previously published RX.
+ *       transferred counts detached RX bytes when RX is selected, otherwise
+ *       detached TX bytes; it describes a prefix even on error/cancel, never
+ *       the number of physical wire frames. NX_DEADLINE_NEVER is permitted.
+ */
+typedef struct {
+    nx_request_t base;
+    nx_stream_t* tx;
+    nx_stream_t* rx;
+    size_t block_bytes;
+} nx_audio_blocks_request_t;
+
 /** \brief Exact rational nominal rate; external slave rate is unknown (0/0).
  * \note This is prescaler arithmetic, not a physical clock measurement.
  */
@@ -69,6 +94,12 @@ typedef struct {
     nx_result_t (*cancel)(void* context, nx_audio_request_t* request);
     nx_result_t (*stop)(void* context);
     nx_result_t (*rate)(void* context, nx_audio_rate_t* rate);
+    /** \brief Optional continuous personality; NULL for a finite controller.
+     * \note SUCCESS accepts the full session, including a drained immediate
+     *       failure. Rejection retains no session or stream references.
+     */
+    nx_result_t (*start_blocks)(void* context,
+                                nx_audio_blocks_request_t* request);
 } nx_audio_ops_t;
 
 /** \brief Immutable controller identity; vendor Handles remain private. */

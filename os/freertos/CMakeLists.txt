@@ -122,6 +122,10 @@ target_include_directories(nx_freertos_kernel PUBLIC
     "${kernel_root}/include"
     "${port_root}")
 target_link_libraries(nx_freertos_kernel PRIVATE nexus_core nexus_build_options)
+# Some locked CPU ports spell the exception name directly instead of using
+# xPortSysTickHandler. Keep their implementation behind the same owned entry.
+target_compile_definitions(nx_freertos_kernel PRIVATE
+    SysTick_Handler=nx_freertos_kernel_tick_handler)
 if(NEXUS_OS_MEMORY_PROTECTION)
     target_include_directories(nx_freertos_kernel PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/mpu")
@@ -140,6 +144,9 @@ if(NEXUS_OS_TRUSTZONE)
 endif()
 
 add_library(nx_freertos_hooks OBJECT hooks.c)
+if(NOT NEXUS_OS_TIMEBASE_LOWPOWER)
+    target_sources(nx_freertos_hooks PRIVATE systick.c)
+endif()
 target_include_directories(nx_freertos_hooks PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${kernel_root}/include"

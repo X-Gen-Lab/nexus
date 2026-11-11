@@ -1076,6 +1076,10 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             if route["kind"] == "adc_group":
                 for resource in adc.group_trigger_resources(selection, provider):
                     claim(resource, name, mode, route["id"])
+            if route["kind"] == "rtc":
+                from tools.configure import rtc
+                for resource in rtc.selected_resources(selection, provider):
+                    claim(resource, name, mode, route["id"])
             if route["kind"] == "usb_host" and selection["engine"] == "dma":
                 claim("usb-dma:" + route["controller"], name, mode, route["id"])
             if traits.dma:

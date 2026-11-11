@@ -41,6 +41,8 @@ nx_clock_domain_t* nx_stm32f407_handoff_domain(void);
  *                  non-HSI16/reset buses, peripheral/DMA gates, busy Flash
  *                  and retained System effects. Ordinary inactive CP10/11
  *                  permissions from SystemInit are supported.
+ *                  Actual DEV_ID must be 0x413 with a reviewed REV_ID;
+ *                  an unknown cut returns UNSUPPORTED before transfer.
  *                  Main SRAM is preserved; MSP is 8-aligned in
  *                  (0x20000000,0x20020000]. All 98 vectors fit exact observed
  *                  and generated Flash geometry. Reset PC is Thumb with its

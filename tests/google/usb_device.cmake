@@ -39,7 +39,8 @@ nexus_google_test(nexus_stm32_usb_host_hal_test STM32F4_LL
     LIBRARIES Nexus::IOUSBHost Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/usb_hal")
-target_compile_definitions(nexus_stm32_usb_host_hal_test PRIVATE STM32F407xx)
+target_compile_definitions(nexus_stm32_usb_host_hal_test PRIVATE STM32F407xx
+    nx_time_now_us=nx_usb_host_model_now NX_USB_HOST_SIGNAL_MODEL=1)
 target_compile_options(nexus_stm32_usb_host_hal_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/usb_host_hal_model.h")
 target_include_directories(nexus_stm32_usb_host_hal_test SYSTEM PRIVATE

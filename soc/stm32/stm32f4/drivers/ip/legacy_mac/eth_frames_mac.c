@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "eth_frames_mac.h"
+#include "eth_clock.h"
 #include "eth_frames_validation.h"
 #ifdef NX_ETH_FRAMES_NATIVE
 #include "ethernet_frames_access.h"
@@ -174,9 +175,8 @@ static nx_result_t validate_storage(nx_eth_frames_mac_t* mac) {
         mac->rx_count > SIZE_MAX / sizeof(*mac->rx_descriptors) ||
         mac->rx_count > SIZE_MAX / sizeof(*mac->rx_slots) ||
         mac->region_count > SIZE_MAX / sizeof(*mac->regions) ||
-        mac->drain_timeout_us == 0U ||
-        (mac->hclk_hz != 168000000U && mac->hclk_hz != 200000000U) ||
-        (mac->address[0] & 1U) != 0U)
+        mac->drain_timeout_us == 0U || mac->hclk_hz < 25000000U ||
+        mac->hclk_hz > 240000000U || (mac->address[0] & 1U) != 0U)
         return NX_ERROR_INVALID;
     unsigned nonzero = 0U;
     for (size_t i = 0U; i < 6U; ++i)
@@ -268,12 +268,12 @@ static nx_result_t start_clock(nx_eth_frames_mac_t* mac,
     mac->clock_last_seconds = 0U;
     mac->clock_last_nanoseconds = 0U;
     mac->snapshot.clock_epoch = mac->clock_epoch;
-    mac->snapshot.timestamp_resolution_ns = 20U;
-    /* Digital rollover, timestamp every received frame, fine update. Desired
-     * accumulator overflow is 50 MHz; input is HCLK, never RMII REF_CLK. */
-    if (!checked(mac, INCREMENT, 20U, 0xffU) ||
-        !checked(mac, ADDEND,
-                 mac->hclk_hz == 168000000U ? 1278264076U : 1073741824U,
+    uint32_t increment = nx_eth_ptp_increment(mac->hclk_hz);
+    mac->snapshot.timestamp_resolution_ns = increment;
+    /* Digital rollover and fine update use the actual leased HCLK. A lower
+     * overflow rate at low HCLK avoids an unrepresentable 2^32 addend. */
+    if (!checked(mac, INCREMENT, increment, 0xffU) ||
+        !checked(mac, ADDEND, nx_eth_ptp_addend(mac->hclk_hz, increment),
                  UINT32_MAX) ||
         !checked(mac, PTP, 0x323U, 0x303U))
         return NX_ERROR_IO;
@@ -365,7 +365,7 @@ nx_result_t nx_eth_frames_mac_initialize(nx_eth_frames_mac_t* mac,
     mac->tx_closing = false;
     mac->flush_started = false;
     mac->drain_deadline = NX_DEADLINE_NEVER;
-    mac->mdio_divider = 16U; /* HCLK/102 at the two selected clock profiles. */
+    mac->mdio_divider = nx_eth_mdio_divider(mac->hclk_hz);
     write_reg(mac, STATUS, W1C);
     mac->snapshot.mac.started = true;
     if (mac->irq_control != NULL) {

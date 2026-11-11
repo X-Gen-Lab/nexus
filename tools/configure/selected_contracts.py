@@ -23,7 +23,7 @@ FORMAT_KINDS = ("uart", "spi", "i2c", "adc", "can", "eth", "eth_frames")
 FORMAT_FIELDS = MappingProxyType({
     "uart": ("data_bits", "parity", "stop_half_bits", "requested_baud"),
     "spi": ("word_bits", "configured_max_hz"),
-    "i2c": ("address_bits", "configured_max_hz"),
+    "i2c": ("address_bits", "configured_max_hz", "nominal_hz"),
     "adc": ("storage_bits", "signed_samples", "scan_channels"),
     "can": ("classic_payload_bytes", "hardware_tx_mailboxes"),
     "eth": ("vlan", "scatter_gather"),
@@ -92,8 +92,8 @@ class SelectedContract:
 class SiliconPolicy:
     """Selected review expectation, never an observed silicon identity.
 
-    This initial projection describes the existing clock review only. It does
-    not establish a complete peripheral errata review or execute admission.
+    Scope belongs to the selected provider's review and its stated constraints.
+    This projection does not execute admission or observe a physical device.
     """
     part: str
     provider: str
@@ -169,7 +169,7 @@ def _format(item, provider, shape):
     elif kind == "i2c":
         # Zero identifies endpoint-owned widths on a mixed-width controller.
         fields = dict(address_bits=0 if provider.ENDPOINT_POLICY.i2c_ten_bit else 7,
-                      configured_max_hz=options.max_hz)
+                      configured_max_hz=options.max_hz, nominal_hz=0)
     elif kind == "adc":
         fields = dict(storage_bits=16, signed_samples=0,
                       scan_channels=len(options.channels))

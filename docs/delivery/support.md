@@ -42,7 +42,7 @@ OS 的静态对象、权限、IRQ 和退出要求见 [OS 合同](../design/os-co
 | Sleep／STOP | 浅 Sleep 保留时间域；显式排空后进入 STOP，恢复建立新 Core epoch，旧 deadline 不继承。唤醒源、独立 elapsed bounds 和 OS 恢复由调用者承担 | [System 低功耗](../design/f407-system-power.md)、[ClockDomain 屏障](../design/clock-domain-sleep.md) |
 | Standby | 显式 WKUP／RTC 唤醒与同一 RTC owner 的准备收条；按勘误禁源、处理 WUF，RTC 事件只按明确授权丢弃。真实进入经复位重建启动；虚假返回建立新 Core epoch，restore 失败保留责任 | [System 低功耗](../design/f407-system-power.md)、[RTC 合同](../design/f407-rtc.md) |
 | 监督与故障 | IWDG／WWDG 显式启用；可选 WWDG EWI、HSE CSS／NMI、复位原因、首次故障记录与 DWT trace。无自动喂狗、任务重启或旧时间域降频续跑 | [监督与故障](../design/f407-system-power.md) |
-| GPIO／EXTI／PVD | 精确封装全部 GPIO 的 input／output、四档显式输出速度与 EXTI0–15；PVD 原始电平／事件。省略速度保留已有配置，PC13–15 输出限制为 LOW；晶振和调试引脚仍受资源约束。保留 COALESCED／LOSS，不提供自动消抖、精确边沿时间或 BOR 资格 | [F4 GPIO／PVD](../../soc/stm32/stm32f4/README.md)、[I/O 观察](../design/io-observation-recovery.md) |
+| GPIO／EXTI／PVD | 精确封装全部 GPIO 的 input／output、四档显式输出速度与 EXTI0–15；PVD 原始电平／事件。EXTI 的 `hardware-event` 只产生 EMR 硬件事件，不取得 IRQ 或软件队列。省略速度保留已有配置，PC13–15 输出限制为 LOW；晶振 LSE 占用时 PC13 保持静默，晶振和调试引脚仍受资源约束。软件事件保留 COALESCED／LOSS，不提供自动消抖、精确边沿时间或 BOR 资格 | [F4 GPIO／PVD](../../soc/stm32/stm32f4/README.md)、[I/O 观察](../design/io-observation-recovery.md) |
 | UART 数据传输 | 全部六实例：IRQ byte／event、独立 9N1 words、调用者存储的 blocks、有限 HAL TX DMA、有限／连续 RX DMA 和 duplex；各模式分别选择 | [UART DMA 与 RS485](../design/uart-dma-rs485.md) |
 | UART 线模式 | 全部六实例支持半双工、LIN、IrDA；同步 master、Smartcard、CTS／RTS 只用于 USART1／2／3／6。RS485 显式组合 DE 与既有传输 owner | [UART 线模式](../design/uart-wire-modes.md)、[RS485](../design/uart-dma-rs485.md) |
 | SPI | SPI1／2／3 polling、8／16-bit 分段事务、有限 DMA；`irq-frames` 提供 master／slave、单双线、Motorola／TI 与双线 CRC。单线 CRC 拒绝；主接收精确帧数以声明时序预算成立为条件 | [SPI 帧模式](../design/spi-frame-modes.md)、[公共 I/O](../reference/api/io.md) |
@@ -55,15 +55,15 @@ OS 的静态对象、权限、IRQ 和退出要求见 [OS 合同](../design/os-co
 | 多 ADC／注入采集 | `adc_group` 独占 ADC123 公共域；双／三同步、交错的有限 DMA，以及单／双／三注入组。显式触发、格式、采样时间与原始码看门狗；没有循环多 ADC 或 regular／injected 并行 | [多 ADC 合同](../design/f407-adc-groups.md) |
 | DAC | 单／双通道 direct、独占 timer trigger、noise／triangle、有限／循环 DMA 与显式 idle code。数字完成不承诺精确 N 次模拟转换、settling 或输出精度 | [F4 DAC](../../soc/stm32/stm32f4/README.md) |
 | DCMI | RAW／JPEG snapshot 与连续 RAW storage blocks；VE 最高 12-bit，ZG 可选 14-bit。JPEG 返回含硬件 padding 的 word 前缀，RAW blocks 不等于图像或精确帧数 | [DCMI／I2S 合同](../design/f407-capture-audio.md) |
-| I2S2／3 | master／slave × TX／RX／duplex 的有限 DMA；Philips、MSB／LSB justified、PCM short／long，16／24／32-bit 数据。master 显式 PLLI2S，slave 外部 rate 为 unknown；不转换音频格式 | [音频合同](../design/f407-capture-audio.md)、[有限 slave TX 路径](../design/f407-i2s2-slave-tx.md) |
-| RTC／备份域 | `adopt-retained`／`provision-empty`、Alarm A request、Alarm B、wakeup、timestamp、tamper、校准、20 个 backup registers、4 KiB backup SRAM CPU lease 与显式 handoff；不提供世纪／时区或保持性证明 | [RTC 合同](../design/f407-rtc.md) |
-| 内部 Flash／制造维护 | 精确 VE／ZG sector 几何；显式维护 face 提供 OTP、锁定、option／RDP 及保护降级的整阵列擦除效果。不可逆效果逐次声明，不自动回滚、重放或把软件复位当作所需 POR | [物理存储与维护](../design/f407-storage.md) |
+| I2S2／3 | master／slave × TX／RX／duplex 的有限 DMA 与连续 `*-blocks`；Philips、MSB／LSB justified、PCM short／long，16／24／32-bit 数据。master 显式 PLLI2S，slave 实际外部 rate 为 unknown；连续模式显式声明 rate／service 上界，使用调用者 block 存储，已发布 RX loan 单独归还。不转换音频格式 | [音频合同](../design/f407-capture-audio.md)、[有限 slave TX 路径](../design/f407-i2s2-slave-tx.md) |
+| RTC／备份域 | `adopt-retained`／`provision-empty`、Alarm A request、Alarm B、wakeup、timestamp、tamper、校准、20 个 backup registers、4 KiB backup SRAM CPU lease 与显式 handoff。PC13 timestamp／tamper 需要 Board 明确授权 LSE bypass；四个现有 Board 的晶体配置不能据 API 存在推定支持。不提供世纪／时区或保持性证明 | [RTC 合同](../design/f407-rtc.md) |
+| 内部 Flash／制造维护 | 精确 VE／ZG sector 几何；显式维护 face 提供 OTP、锁定、option／RDP 及保护降级的整阵列擦除效果。失败后的 `recover` 只排空、撤回并重锁，确认成功后才归还 owner；不可逆效果逐次声明，不自动回滚、重放或把软件复位当作所需 POR | [物理存储与维护](../design/f407-storage.md) |
 | SDIO／MMC／I/O functions | SD memory／MMC polling、有限 IRQ／DMA；SDIO functions 使用独立 face 的 CMD5／52／53。单卡、3.3 V，SD／SDIO 为 1／4 位，MMC 可显式选择经版本和 SWITCH 检查的 8 位十引脚软件参考。combo 不同时维护 memory portion；当前只接纳 `hse8-pll168`，不提供 HS／DDR／HS200 | [SDIO 合同](../../soc/stm32/stm32f4/private/sdio_hal/README.md) |
 | FSMC | 运行期 CPU window、永久 startup SRAM、parallel16，以及显式 PSRAM、有限 NOR program／erase、raw NAND／OOB／ECC 码；bank 与 mux／burst／WAIT 按封装和所选模式授权，无 FTL 或自动纠错 | [FSMC 合同](../design/f407-fsmc.md)、[存储边界](../design/f407-storage.md) |
 | CRC／芯片身份 | 固定 CRC-32 数值字序列；实际 UID、device／revision 与 Flash 容量。数据不证明完整订货号、封装身份或认证秘密 | [F4 CRC／身份](../../soc/stm32/stm32f4/README.md) |
 | RNG | 唯一 typed RNG factory 与 Platform 生命周期；精确 PLL48 和活跃 System epoch，保留官方 seed／clock／连续值错误检查；不建立 DRBG、熵池或质量认证 | [RNG 时钟合同](../design/f407-system-power.md)、[公共 I/O](../reference/api/io.md) |
 | CAN | CAN1／2 classic IRQ、mailbox 与共享 filter domain；F407 不提供 CAN FD | [Classic CAN](../design/classic-can.md) |
-| Ethernet | VE／ZG MII 与 ZG RMII、独立 MDIO；raw `eth` 与增强 `eth_frames` 分选。增强 face 提供整帧 SG、单 C-tag VLAN、显式 checksum offload 和 MAC 硬件事件／PTP 时间戳；PHY 接线、协议栈、同步与网络政策由外部提供 | [Ethernet 帧](../design/ethernet-frames.md)、[MAC／MDIO](../design/ethernet.md) |
+| Ethernet | VE／ZG MII 与 ZG RMII、独立 MDIO；raw `eth` 与增强 `eth_frames` 分选。已选 HCLK 为 25–168 MHz，MDC 与 PTP 20／40／80 ns 增量由计划推导。增强 face 提供整帧 SG、单 C-tag VLAN、显式 checksum offload 和 MAC 硬件事件／PTP 时间戳；这不建立同步或物理精度资格，PHY 接线、协议栈、同步与网络政策由外部提供 | [Ethernet 帧](../design/ethernet-frames.md)、[MAC／MDIO](../design/ethernet.md) |
 | USB | FS／HS 引擎的 Device／Host、PIO 与 HS AHB DMA；Device 支持 control、bulk、interrupt 和单 transaction ISO packet。Device ISO 使用实际速度的帧窗口，接纳时剩余期限至多 1 秒，并满足受审 FIFO 分区；无 ACK／自动重试或周期调度。内部 PHY 仍为 FS，外部 ULPI 提供 HS／FS 回退；显式 managed roles 与按需 ST 官方 Core 桥接。不维护高带宽 ISO、remote wake、自动 HNP／SRP、Host split 或即时 premature STATUS OUT | [USB 所有权](../design/usb-device.md) |
 | 可选器件组件 | ILI9341 parallel16、XPT2046、W25 等通过公共端口访问；板级供电、存储分区和恢复政策由外部工程提供 | [组件入口](../../components/README.md)、[I/O 所有权](../design/io-evolution.md) |
 

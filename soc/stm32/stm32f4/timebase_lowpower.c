@@ -88,4 +88,5 @@ void nx_stm32_lowpower_alarm_irq(void) {
 /** \brief The selected wrapper calls the renamed real kernel Tick function. */
 void SysTick_Handler(void) {
     nx_timebase_tick_irq(&s_context);
+    nx_arch_dsb();
 }

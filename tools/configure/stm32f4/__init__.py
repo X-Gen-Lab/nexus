@@ -73,5 +73,21 @@ from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS, CONTROLLER_PAIRS,
 from .integration import USB_DEVICE, ETHERNET, TIMER_ADVANCED
 from .integration import CAN_INTEGRATION
 from . import fsmc as EXTERNAL_BUS
+from .i2c_timing import selected_format
 
 from .capture_audio import resolve_fields as capture_audio_fields
+
+
+def silicon_policy(result, item=None):
+    """Project the system's reviewed C admission without observing a chip."""
+    from tools.configure.selected_contracts import SiliconPolicy
+    if item is not None or result.clock_plan is None:
+        return None
+    return SiliconPolicy(
+        part=result.part, provider=result.soc_family,
+        profile=result.clock_plan.profile,
+        reviewed_revision_ids=result.clock_plan.reviewed_revision_ids,
+        review_scope=(
+            "ES0182 Rev19 software audit with mode exclusions and external "
+            "constraints; stm32f407_silicon.h admits DEV_ID 0x413 and the "
+            "five reviewed cuts. Physical cut behavior has not been observed."))

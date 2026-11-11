@@ -16,6 +16,9 @@ void nx_usb_host_model_irq_disable(int irq);
 bool nx_usb_host_model_irq_enabled(int irq);
 bool nx_usb_host_model_irq_active(int irq);
 extern uint32_t g_nx_usb_host_hclk_hz;
+#ifdef NX_USB_HOST_SIGNAL_MODEL
+void nx_usb_host_model_park(void);
+#endif
 #ifdef __cplusplus
 }
 #endif
@@ -27,4 +30,7 @@ extern uint32_t g_nx_usb_host_hclk_hz;
 #define NX_USB_HOST_IRQ_ACTIVE(irq)  nx_usb_host_model_irq_active((int)(irq))
 #define NX_USB_HOST_CLOCK_VALID()    true
 #define NX_USB_HOST_AHB_HZ           g_nx_usb_host_hclk_hz
+#ifdef NX_USB_HOST_SIGNAL_MODEL
+#define NX_USB_HOST_PARK() nx_usb_host_model_park()
+#endif
 #endif

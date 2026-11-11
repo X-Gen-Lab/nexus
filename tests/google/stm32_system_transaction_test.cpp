@@ -31,6 +31,7 @@ extern uint32_t SystemCoreClock __attribute__((weak));
 uint32_t HAL_GetTick(void) __attribute__((weak));
 uint64_t nx_stm32_system_clock_read(void* context) __attribute__((weak));
 void nx_stm32_system_css_irq(nx_stm32_system_t*) __attribute__((weak));
+void TIM2_IRQHandler(void);
 bool nx_stm32_system_cpu_boot(SCB_Type*, volatile const uint32_t*, uintptr_t)
     __attribute__((weak));
 nx_result_t nx_stm32f407_fault_capture(nx_stm32_fault_record_t*, uint32_t,
@@ -119,6 +120,8 @@ nx_rtc_standby_t* expected_rtc_receipt;
 unsigned deep_waits;
 unsigned event_waits;
 bool fail_deep_restore;
+bool observe_irq_exit;
+uint64_t overflow_at_barrier;
 
 class Stm32System : public testing::Test {
   protected:
@@ -153,6 +156,8 @@ class Stm32System : public testing::Test {
         rtc_calls = nullptr;
         expected_rtc = nullptr;
         expected_rtc_receipt = nullptr;
+        observe_irq_exit = false;
+        overflow_at_barrier = 0U;
         nx_power_scr = nx_power_icsr = nx_power_tick = 0U;
         nx_power_emr = nx_power_ftsr = 0U;
         nx_power_imr = nx_power_rtsr = 1U;
@@ -249,6 +254,16 @@ TEST_F(Stm32System, ExactClockAndIndependentTimerHaveOneLiveEpoch) {
     EXPECT_EQ(5U, nx_stm32_system_now(&g_nx_stm32_system));
     ASSERT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
     EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
+}
+
+TEST_F(Stm32System, ReservedVectorCompletesOverflowStoreBeforeExceptionReturn) {
+    ASSERT_EQ(0, Start().primary);
+    timer.SR = TIM_SR_UIF;
+    observe_irq_exit = true;
+    TIM2_IRQHandler();
+    observe_irq_exit = false;
+    EXPECT_EQ(UINT64_C(1) << 32U, g_nx_stm32_system.overflow_us);
+    EXPECT_EQ(g_nx_stm32_system.overflow_us, overflow_at_barrier);
 }
 
 TEST_F(Stm32System, LiveRngClockLeaseBlocksSystemWithdrawalWithoutAnyWrite) {
@@ -1621,6 +1636,8 @@ extern "C" bool nx_arch_irq_is_masked(void) {
 }
 /** \brief Synchronous host register writes do not establish physical timing. */
 extern "C" void nx_arch_dsb(void) {
+    if (observe_irq_exit)
+        overflow_at_barrier = g_nx_stm32_system.overflow_us;
 }
 /** \brief The host model has no Cortex-M instruction pipeline. */
 extern "C" void nx_arch_isb(void) {

@@ -298,6 +298,7 @@ TEST_F(I2CAsyncRegisters, TenBitWriteThenReadRetainsOneRequestAcrossRestarts) {
 TEST_F(I2CAsyncRegisters, ExplicitWidthAndErratumRejectBeforeLoanOrHardware) {
     ASSERT_EQ(NX_SUCCESS,
               nx_i2c_request_prepare(&request, &message, 1U, 1000U));
+    registers[7] = 210U;
     const std::vector<uint32_t> before(registers, registers + 9U);
     const uint8_t widths[] = {0U, 8U, 9U};
     for (uint8_t bits : widths) {
@@ -308,6 +309,41 @@ TEST_F(I2CAsyncRegisters, ExplicitWidthAndErratumRejectBeforeLoanOrHardware) {
     }
     endpoint_state.address_bits = 10U;
     endpoint_state.address = 0x2ABU;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_i2c_endpoint_submit(&endpoint, &request));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+    EXPECT_EQ(nullptr, state.active);
+    EXPECT_EQ(before, std::vector<uint32_t>(registers, registers + 9U));
+}
+
+TEST_F(I2CAsyncRegisters, StandardTenBitReadUsesErrataSafeNominalTiming) {
+    endpoint_state.address = 0x2ABU;
+    endpoint_state.address_bits = 10U;
+    EXPECT_EQ(239U, registers[7]);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_i2c_request_prepare(&request, &message, 1U, 1000U));
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_submit(&endpoint, &request));
+    registers[6] = 3U;
+    for (uint32_t flags : {1U, 8U, 2U, 1U, 2U}) {
+        registers[5] = flags;
+        nx_i2c_v1_irq(&state);
+    }
+    input = {0x71U};
+    registers[5] = 1U << 6U;
+    nx_i2c_v1_irq(&state);
+    ReleaseWire();
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_SUCCESS, request.base.result);
+    EXPECT_EQ(1U, request.base.transferred);
+    EXPECT_EQ(output, std::vector<uint8_t>({0xF4U, 0xABU, 0xF5U}));
+}
+
+TEST_F(I2CAsyncRegisters, UnsafeSevenBitRestartRejectsBeforeLoanOrRegisters) {
+    registers[7] = 210U;
+    nx_i2c_message_t messages[] = {{bytes, 1U, false}, {bytes + 1U, 2U, true}};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_i2c_request_prepare(&request, messages, 2U, 1000U));
+    const std::vector<uint32_t> before(registers, registers + 9U);
     EXPECT_EQ(NX_ERROR_UNSUPPORTED,
               nx_i2c_endpoint_submit(&endpoint, &request));
     EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
@@ -369,7 +405,7 @@ TEST_F(I2CAsyncRegisters, RecoveryPreservesTheAttachedWakeAndClockProfile) {
     EXPECT_EQ(NX_SUCCESS, nx_i2c_port_recover(&bus));
     EXPECT_TRUE(state.initialized);
     EXPECT_EQ(&stop_from_wake, state.wake);
-    EXPECT_EQ(210U, registers[7]);
+    EXPECT_EQ(239U, registers[7]);
     EXPECT_EQ(NX_SUCCESS, nx_i2c_port_stop(&bus));
 }
 
@@ -401,12 +437,20 @@ TEST_F(I2CAsyncRegisters, InvalidTimingRejectsBeforeAnyPeripheralStore) {
 }
 
 #if !defined(NX_I2C_TEST_STM32)
-TEST_F(I2CAsyncRegisters, EightMhzUsesErrataSafeEightyKhzProfile) {
+TEST_F(I2CAsyncRegisters, EightMhzUsesReviewedStandardAndFastClockProfiles) {
     ASSERT_EQ(nx_i2c_port_stop(&bus), NX_SUCCESS);
     state.peripheral_mhz = 8U;
-    ASSERT_EQ(Initialize(), NX_SUCCESS);
-    EXPECT_EQ(registers[7], 50U);
-    EXPECT_EQ(registers[8], 9U);
+    for (uint16_t profile : {uint16_t(0U), uint16_t(46U), uint16_t(0x8007U)}) {
+        SCOPED_TRACE(profile);
+        state.timing_ccr = profile;
+        nx_result_t result = Initialize();
+        EXPECT_EQ(result, NX_SUCCESS);
+        if (result != NX_SUCCESS)
+            continue;
+        EXPECT_EQ(profile == 0x8007U ? 0x8007U : 46U, registers[7]);
+        EXPECT_EQ(profile == 0x8007U ? 3U : 9U, registers[8]);
+        EXPECT_EQ(NX_SUCCESS, nx_i2c_port_stop(&bus));
+    }
 }
 TEST_F(I2CAsyncRegisters, FailedVectorWithdrawalRetainsLiveState) {
     state.stop_irqs = [](void*) -> nx_result_t { return NX_ERROR_IO; };
@@ -622,6 +666,50 @@ class I2CDmaRegisters : public I2CAsyncRegisters {
     }
 };
 
+TEST_F(I2CDmaRegisters, StandardSevenBitDmaRestartUsesErrataSafeNominalTiming) {
+    EXPECT_EQ(239U, registers[7]);
+    nx_i2c_message_t messages[] = {{bytes, 1U, false}, {bytes + 1U, 3U, true}};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_i2c_request_prepare(&request, messages, 2U, 1000U));
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_submit(&endpoint, &request));
+    registers[6] = 3U;
+    registers[5] = 1U;
+    nx_i2c_v1_irq(&state);
+    registers[5] = 2U;
+    nx_i2c_v1_irq(&state);
+    Complete(false);
+    registers[5] = 1U << 2U;
+    nx_i2c_v1_irq(&state);
+    EXPECT_EQ(1U, state.message);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
+    registers[5] = 1U;
+    nx_i2c_v1_irq(&state);
+    registers[5] = 2U;
+    nx_i2c_v1_irq(&state);
+    EXPECT_EQ(3U, *dma.rx.count);
+    Complete(true);
+    ReleaseWire();
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_SUCCESS, request.base.result);
+    EXPECT_EQ(4U, request.base.transferred);
+    EXPECT_EQ(output, std::vector<uint8_t>({0xA0U, 0xA1U}));
+}
+
+TEST_F(I2CDmaRegisters, UnsafeSevenBitRestartRejectsBeforeDmaOrLoan) {
+    registers[7] = 210U;
+    nx_i2c_message_t messages[] = {{bytes, 1U, false}, {bytes + 1U, 3U, true}};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_i2c_request_prepare(&request, messages, 2U, 1000U));
+    const std::vector<uint32_t> before(registers, registers + 9U);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_i2c_endpoint_submit(&endpoint, &request));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+    EXPECT_EQ(nullptr, state.active);
+    EXPECT_EQ(0U, *dma.rx.control);
+    EXPECT_EQ(0U, *dma.tx.control);
+    EXPECT_EQ(before, std::vector<uint32_t>(registers, registers + 9U));
+}
+
 TEST_F(I2CDmaRegisters, TenBitReadDoesNotEnableDmaAtTransmitterAddress) {
     for (size_t length : {1U, 2U, 3U, 4U}) {
         SCOPED_TRACE(length);
@@ -775,6 +863,7 @@ TEST_F(I2CDmaRegisters, AllDomainsValidateBeforeAdmissionOrMmio) {
 }
 
 TEST_F(I2CAsyncRegisters, RepeatedStartKeepsOneLoanAndResetsReceiveWindow) {
+    EXPECT_EQ(239U, registers[7]);
     bytes[0] = 0x10U;
     nx_i2c_message_t sequence[2] = {{bytes, 1U, false}, {bytes + 1U, 2U, true}};
     ASSERT_EQ(nx_i2c_request_prepare(&request, sequence, 2U, 1000U),

@@ -58,7 +58,8 @@ class SelectedTraitsTests(unittest.TestCase):
         self.assertEqual(io_traits.describe(spi).fields,
                          {"word_bits": 8, "configured_max_hz": 1000000})
         self.assertEqual(io_traits.describe(i2c).fields,
-                         {"address_bits": 0, "configured_max_hz": 100000})
+                         {"address_bits": 0, "configured_max_hz": 100000,
+                          "nominal_hz": 0})
         self.assertNotIn("actual_hz", io_traits.describe(i2c).fields)
 
     def test_adc_storage_width_does_not_claim_effective_resolution(self):

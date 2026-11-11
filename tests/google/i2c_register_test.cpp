@@ -346,11 +346,43 @@ TEST_F(I2CRegisters, TenBitWriteReadPreservesMessageAndWireBoundaries) {
 TEST_F(I2CRegisters, TenBitStandardTimingErratumRejectsBeforeStart) {
     endpoint_state.address = 0x2ABU;
     endpoint_state.address_bits = 10U;
+    registers.CCR = 210U;
     nx_i2c_message_t message = {data, 1U, true};
     const auto before = registers;
     EXPECT_EQ(NX_ERROR_UNSUPPORTED,
               nx_i2c_endpoint_transaction(&endpoint, &message, 1U, 1000U,
                                           &transferred));
+    EXPECT_EQ(0U, transferred);
+    EXPECT_EQ(0, std::memcmp(&before, &registers, sizeof(registers)));
+    EXPECT_FALSE(state.active);
+}
+
+TEST_F(I2CRegisters, StandardSevenBitRestartUsesErrataSafeNominalTiming) {
+    EXPECT_EQ(239U, registers.CCR);
+    EXPECT_CALL(boundary, Call(0U, false));
+    EXPECT_CALL(boundary, Call(1U, true));
+    EXPECT_EQ(NX_SUCCESS, transact({{data, 1U, false}, {data + 1U, 2U, true}}));
+    EXPECT_EQ(3U, transferred);
+    EXPECT_EQ(2U, model_starts);
+}
+
+TEST_F(I2CRegisters, StandardTenBitReadUsesTheSameErrataSafeTiming) {
+    endpoint_state.address = 0x2ABU;
+    endpoint_state.address_bits = 10U;
+    model_endpoint_address = endpoint_state.address;
+    model_address_bits = 10U;
+    EXPECT_CALL(boundary, Call(0U, true));
+    EXPECT_EQ(NX_SUCCESS, transact({{data, 2U, true}}));
+    EXPECT_EQ(2U, transferred);
+    EXPECT_EQ(2U, model_starts);
+    EXPECT_EQ(model_address_bytes, std::vector<uint8_t>({0xF4U, 0xABU, 0xF5U}));
+}
+
+TEST_F(I2CRegisters, UnsafeSevenBitRestartRejectsBeforeAnyControllerEffect) {
+    registers.CCR = 210U;
+    const auto before = registers;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              transact({{data, 1U, false}, {data + 1U, 2U, true}}));
     EXPECT_EQ(0U, transferred);
     EXPECT_EQ(0, std::memcmp(&before, &registers, sizeof(registers)));
     EXPECT_FALSE(state.active);

@@ -4,8 +4,9 @@
 引用独立的调用者状态。调用者提供精确 read-loan slot、请求、backend context、
 aperture 和单调时钟；没有分配、注册表、队列、worker 或 OS 锁。
 
-[FIG-23 共享机制所有权](../../docs/assets/diagrams/io-extension-ownership.svg)说明
-读借用、唯一 writer 与外部平台证明的边界，不是实板执行证据。
+[FIG-06 请求生命周期](../../docs/assets/diagrams/request-lifecycle.svg)说明写请求的
+借用、排空与最终发布；映射读借用另外遵守下文的 slot／epoch 规则。图不证明具体
+存储控制器、cache 或 DMA 已通过实板验证。
 
 ## 读写互斥与生命周期
 

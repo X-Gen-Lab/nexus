@@ -29,7 +29,8 @@ def validate_binding(binding, route, mask):
     if kind not in {"gpio", "exti"} or not isinstance(definition, Mapping):
         fail("Board electrical constraints require a GPIO or EXTI object")
     mode = definition.get("mode")
-    modes = {"input", "output"} if kind == "gpio" else {"edge-event"}
+    modes = ({"input", "output"} if kind == "gpio" else
+             {"edge-event", "hardware-event"})
     if type(mode) is not str or mode not in modes or mode not in route["modes"]:
         fail("Board electrical mode must match its reviewed route")
     allowed = {"mode", "pull"}

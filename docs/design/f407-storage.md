@@ -54,6 +54,16 @@ RAM/system boot 及后续 option 修改，没有降级路径；该动作要求 P
 禁用的 Flash IRQ 并验证重新锁定；拒绝锁定或 IRQ 排空时保留同一 active owner，
 普通 Flash 访问和 Platform 停止均不能回收它。没有隐藏后台任务或隐式恢复策略。
 
+失败后的 owner 可显式调用普通 Flash face 的 `nx_flash_port_recover()`；Platform
+close 也执行同一有限清理重试。BSY 未退出、外来 enabled/active vector 或外来模式
+仍返回 BUSY；只有实际模式撤回、状态清除、IRQ 排空与重新锁定全部读回成立后才
+释放责任。仅本 owner 尝试解锁的 Option Bytes 才重试 OPTLOCK，不改写外来 options，
+不重新发出编程脉冲、不回滚或掩盖原失败，也不替代所需 POR。
+
+ES0182 Rev19 §2.2.9 限制无复位的连续 BOR 编程。本实现不保留额外启动历史，
+因此修改 BOR 必须使用实际 AHB 分频 1 或 2；分频大于 2 在任何解锁之前拒绝。
+BOR 不变的其他 options 维护不受此限制，平台不会自动修改系统时钟。
+
 ## 外部总线与介质
 
 现有 FSMC 的 NE3 SRAM、CPU 窗口、启动内存与 NE4 parallel16 合同见

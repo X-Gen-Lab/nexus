@@ -1,4 +1,6 @@
 """Static faces and common lifecycle order; SoC modules emit hardware wiring."""
+import re
+
 from tools.configure.providers import for_selection
 from tools.configure.ir import ConfigurationIR
 from tools.configure.factory import (interface_type, public_header,
@@ -12,6 +14,37 @@ from tools.configure.providers.common import fail
 
 def symbol(name):
     return name.replace("-", "_")
+
+
+def _irq_exit_barriers(lines):
+    """Complete stores at generator-owned F4 exception-return connections.
+
+    ES0182 2.1.3 requires a DSB before exception return. These entries contain
+    only fixed calls and shared dispatch; early returns must be reviewed rather
+    than silently bypassing the connection's final barrier.
+    """
+    source = "\n".join(lines)
+    # Match Construction's comment/literal boundary, preserving every offset.
+    # Only the original source is emitted; quoted IRQ spellings remain data.
+    code = re.sub(r'/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',
+                  lambda match: " " * len(match.group()), source,
+                  flags=re.DOTALL)
+    entries = re.finditer(r"\bvoid\s+\w+_IRQHandler\s*"
+                          r"\(\s*void\s*\)\s*\{", code)
+    closes = []
+    for entry in entries:
+        depth, end = 1, entry.end()
+        while depth and end < len(code):
+            depth += (code[end] == "{") - (code[end] == "}")
+            end += 1
+        if depth:
+            fail("Generated F4 IRQ connection is not closed")
+        if re.search(r"\breturn\b", code[entry.end():end - 1]):
+            fail("Generated F4 IRQ connection cannot return before DSB")
+        closes.append(end - 1)
+    for end in reversed(closes):
+        source = source[:end] + "nx_arch_dsb(); " + source[end:]
+    return source.splitlines()
 
 
 def _sequence(calls, indent="        "):
@@ -334,4 +367,6 @@ def emit(result):
                        '        &s_nx_platform_plan, &s_nx_platform_lifecycle, ' +
                        diagnostic + ', &s_nx_platform_identity);', '}']
     header += ['#ifdef __cplusplus', '}', '#endif', '#endif', '']
+    if result.soc_family == "stm32f4":
+        source = _irq_exit_barriers(source)
     return '\n'.join(header), '\n'.join(source) + '\n'

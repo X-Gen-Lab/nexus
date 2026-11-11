@@ -53,3 +53,12 @@ nx_result_t nx_flash_port_erase(const nx_flash_port_t* port, uint32_t offset,
     }
     return port->ops->erase(port->context, offset, length, deadline);
 }
+
+/** \brief Dispatch using this face's exact retained physical owner. */
+nx_result_t nx_flash_port_recover(const nx_flash_port_t* port) {
+    if (port == NULL || port->ops == NULL || port->context == NULL)
+        return NX_ERROR_INVALID;
+    if (port->ops->recover == NULL)
+        return NX_ERROR_UNSUPPORTED;
+    return port->ops->recover(port->context);
+}

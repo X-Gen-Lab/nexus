@@ -288,7 +288,8 @@
         }
       ],
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required."
     },
@@ -381,7 +382,8 @@
         }
       ],
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required."
     },
@@ -401,7 +403,8 @@
         }
       ],
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required."
     },
@@ -1499,7 +1502,8 @@
         }
       ],
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required."
     },
@@ -1518,7 +1522,8 @@
         }
       ],
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required."
     },
@@ -1537,7 +1542,8 @@
         }
       ],
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required."
     },
@@ -1556,7 +1562,8 @@
         }
       ],
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required."
     },
@@ -1575,7 +1582,8 @@
         }
       ],
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required."
     },
@@ -1652,7 +1660,7 @@
         "domain:backup",
         "alarm:RTC_A"
       ],
-      "source": "RM0090 Rev22 chapter26 and DS8626 PC14/OSC32_IN, PC15/OSC32_OUT: explicit LSE32768 crystal, BCD24h BYPSHAD PRER127/255 and polling Alarm A. C owns oscillator admission; claims never authorize GPIO pad writes. ADOPT requires externally prepared retained calendar provenance; PROVISION requires exact empty backup and explicit initial calendar. No physical retention or HIL claim."
+      "source": "RM0090 Rev22 RCC_BDCR crystal LSE owns PC14/PC15; ES0182 Rev19 2.2.18 additionally requires the PC13 quiet-input responsibility maintained by the C RTC owner. Crystal and bypass modes remain distinct; no PCB or physical qualification is inferred."
     },
     {
       "id": "fsmc-async16",
@@ -2075,7 +2083,8 @@
         }
       ],
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required."
     },
@@ -6883,7 +6892,11 @@
         "master-tx",
         "master-rx",
         "slave-tx",
-        "slave-rx"
+        "slave-rx",
+        "master-tx-blocks",
+        "master-rx-blocks",
+        "slave-tx-blocks",
+        "slave-rx-blocks"
       ],
       "mode_dma": {
         "master-tx": [
@@ -6896,6 +6909,18 @@
           "DMA1:stream4:channel0"
         ],
         "slave-rx": [
+          "DMA1:stream3:channel0"
+        ],
+        "master-tx-blocks": [
+          "DMA1:stream4:channel0"
+        ],
+        "master-rx-blocks": [
+          "DMA1:stream3:channel0"
+        ],
+        "slave-tx-blocks": [
+          "DMA1:stream4:channel0"
+        ],
+        "slave-rx-blocks": [
           "DMA1:stream3:channel0"
         ]
       },
@@ -6933,13 +6958,21 @@
       ],
       "modes": [
         "master-tx",
-        "master-rx"
+        "master-rx",
+        "master-tx-blocks",
+        "master-rx-blocks"
       ],
       "mode_dma": {
         "master-tx": [
           "DMA1:stream4:channel0"
         ],
         "master-rx": [
+          "DMA1:stream3:channel0"
+        ],
+        "master-tx-blocks": [
+          "DMA1:stream4:channel0"
+        ],
+        "master-rx-blocks": [
           "DMA1:stream3:channel0"
         ]
       },
@@ -6977,7 +7010,9 @@
       ],
       "modes": [
         "master-duplex",
-        "slave-duplex"
+        "slave-duplex",
+        "master-duplex-blocks",
+        "slave-duplex-blocks"
       ],
       "mode_dma": {
         "master-duplex": [
@@ -6985,6 +7020,14 @@
           "DMA1:stream3:channel3"
         ],
         "slave-duplex": [
+          "DMA1:stream4:channel0",
+          "DMA1:stream3:channel3"
+        ],
+        "master-duplex-blocks": [
+          "DMA1:stream4:channel0",
+          "DMA1:stream3:channel3"
+        ],
+        "slave-duplex-blocks": [
           "DMA1:stream4:channel0",
           "DMA1:stream3:channel3"
         ]
@@ -7027,10 +7070,15 @@
         }
       ],
       "modes": [
-        "master-duplex"
+        "master-duplex",
+        "master-duplex-blocks"
       ],
       "mode_dma": {
         "master-duplex": [
+          "DMA1:stream4:channel0",
+          "DMA1:stream3:channel3"
+        ],
+        "master-duplex-blocks": [
           "DMA1:stream4:channel0",
           "DMA1:stream3:channel3"
         ]
@@ -7066,7 +7114,11 @@
         "master-tx",
         "master-rx",
         "slave-tx",
-        "slave-rx"
+        "slave-rx",
+        "master-tx-blocks",
+        "master-rx-blocks",
+        "slave-tx-blocks",
+        "slave-rx-blocks"
       ],
       "mode_dma": {
         "master-tx": [
@@ -7079,6 +7131,18 @@
           "DMA1:stream5:channel0"
         ],
         "slave-rx": [
+          "DMA1:stream0:channel0"
+        ],
+        "master-tx-blocks": [
+          "DMA1:stream5:channel0"
+        ],
+        "master-rx-blocks": [
+          "DMA1:stream0:channel0"
+        ],
+        "slave-tx-blocks": [
+          "DMA1:stream5:channel0"
+        ],
+        "slave-rx-blocks": [
           "DMA1:stream0:channel0"
         ]
       },
@@ -7116,13 +7180,21 @@
       ],
       "modes": [
         "master-tx",
-        "master-rx"
+        "master-rx",
+        "master-tx-blocks",
+        "master-rx-blocks"
       ],
       "mode_dma": {
         "master-tx": [
           "DMA1:stream5:channel0"
         ],
         "master-rx": [
+          "DMA1:stream0:channel0"
+        ],
+        "master-tx-blocks": [
+          "DMA1:stream5:channel0"
+        ],
+        "master-rx-blocks": [
           "DMA1:stream0:channel0"
         ]
       },
@@ -7160,7 +7232,9 @@
       ],
       "modes": [
         "master-duplex",
-        "slave-duplex"
+        "slave-duplex",
+        "master-duplex-blocks",
+        "slave-duplex-blocks"
       ],
       "mode_dma": {
         "master-duplex": [
@@ -7168,6 +7242,14 @@
           "DMA1:stream2:channel2"
         ],
         "slave-duplex": [
+          "DMA1:stream5:channel0",
+          "DMA1:stream2:channel2"
+        ],
+        "master-duplex-blocks": [
+          "DMA1:stream5:channel0",
+          "DMA1:stream2:channel2"
+        ],
+        "slave-duplex-blocks": [
           "DMA1:stream5:channel0",
           "DMA1:stream2:channel2"
         ]
@@ -7210,10 +7292,15 @@
         }
       ],
       "modes": [
-        "master-duplex"
+        "master-duplex",
+        "master-duplex-blocks"
       ],
       "mode_dma": {
         "master-duplex": [
+          "DMA1:stream5:channel0",
+          "DMA1:stream2:channel2"
+        ],
+        "master-duplex-blocks": [
           "DMA1:stream5:channel0",
           "DMA1:stream2:channel2"
         ]
@@ -10715,7 +10802,8 @@
       "controller": "EXTI1",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -10756,7 +10844,8 @@
       "controller": "EXTI2",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -10797,7 +10886,8 @@
       "controller": "EXTI3",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -10838,7 +10928,8 @@
       "controller": "EXTI4",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -10900,7 +10991,8 @@
       "controller": "EXTI7",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -10941,7 +11033,8 @@
       "controller": "EXTI8",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -10982,7 +11075,8 @@
       "controller": "EXTI9",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11023,7 +11117,8 @@
       "controller": "EXTI10",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11064,7 +11159,8 @@
       "controller": "EXTI11",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11105,7 +11201,8 @@
       "controller": "EXTI12",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11146,7 +11243,8 @@
       "controller": "EXTI13",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11187,7 +11285,8 @@
       "controller": "EXTI14",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11207,7 +11306,8 @@
       "controller": "EXTI15",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11227,7 +11327,8 @@
       "controller": "EXTI0",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11247,7 +11348,8 @@
       "controller": "EXTI1",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11267,7 +11369,8 @@
       "controller": "EXTI2",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11308,7 +11411,8 @@
       "controller": "EXTI3",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11349,7 +11453,8 @@
       "controller": "EXTI4",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11390,7 +11495,8 @@
       "controller": "EXTI5",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11431,7 +11537,8 @@
       "controller": "EXTI6",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11472,7 +11579,8 @@
       "controller": "EXTI7",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11513,7 +11621,8 @@
       "controller": "EXTI8",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11554,7 +11663,8 @@
       "controller": "EXTI9",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11595,7 +11705,8 @@
       "controller": "EXTI10",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11636,7 +11747,8 @@
       "controller": "EXTI11",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11677,7 +11789,8 @@
       "controller": "EXTI12",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11718,7 +11831,8 @@
       "controller": "EXTI13",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11759,7 +11873,8 @@
       "controller": "EXTI14",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11800,7 +11915,8 @@
       "controller": "EXTI15",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11820,7 +11936,8 @@
       "controller": "EXTI0",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11861,7 +11978,8 @@
       "controller": "EXTI1",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11902,7 +12020,8 @@
       "controller": "EXTI2",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11943,7 +12062,8 @@
       "controller": "EXTI3",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -11984,7 +12104,8 @@
       "controller": "EXTI4",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12025,7 +12146,8 @@
       "controller": "EXTI5",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12066,7 +12188,8 @@
       "controller": "EXTI6",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12107,7 +12230,8 @@
       "controller": "EXTI7",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12148,7 +12272,8 @@
       "controller": "EXTI8",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12189,7 +12314,8 @@
       "controller": "EXTI9",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12230,7 +12356,8 @@
       "controller": "EXTI10",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12271,7 +12398,8 @@
       "controller": "EXTI11",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12312,7 +12440,8 @@
       "controller": "EXTI12",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12332,7 +12461,8 @@
       "controller": "EXTI13",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12373,7 +12503,8 @@
       "controller": "EXTI14",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12414,7 +12545,8 @@
       "controller": "EXTI15",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12434,7 +12566,8 @@
       "controller": "EXTI0",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12475,7 +12608,8 @@
       "controller": "EXTI1",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12516,7 +12650,8 @@
       "controller": "EXTI2",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12557,7 +12692,8 @@
       "controller": "EXTI3",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12598,7 +12734,8 @@
       "controller": "EXTI4",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12639,7 +12776,8 @@
       "controller": "EXTI5",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12659,7 +12797,8 @@
       "controller": "EXTI6",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12679,7 +12818,8 @@
       "controller": "EXTI7",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12720,7 +12860,8 @@
       "controller": "EXTI8",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12761,7 +12902,8 @@
       "controller": "EXTI9",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12802,7 +12944,8 @@
       "controller": "EXTI10",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12843,7 +12986,8 @@
       "controller": "EXTI11",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12884,7 +13028,8 @@
       "controller": "EXTI12",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12925,7 +13070,8 @@
       "controller": "EXTI13",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -12966,7 +13112,8 @@
       "controller": "EXTI14",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13007,7 +13154,8 @@
       "controller": "EXTI15",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13048,7 +13196,8 @@
       "controller": "EXTI0",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13089,7 +13238,8 @@
       "controller": "EXTI1",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13109,7 +13259,8 @@
       "controller": "EXTI3",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13129,7 +13280,8 @@
       "controller": "EXTI4",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13170,7 +13322,8 @@
       "controller": "EXTI5",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13211,7 +13364,8 @@
       "controller": "EXTI6",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13252,7 +13406,8 @@
       "controller": "EXTI7",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13293,7 +13448,8 @@
       "controller": "EXTI8",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13334,7 +13490,8 @@
       "controller": "EXTI9",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13375,7 +13532,8 @@
       "controller": "EXTI10",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13416,7 +13574,8 @@
       "controller": "EXTI11",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13457,7 +13616,8 @@
       "controller": "EXTI12",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13498,7 +13658,8 @@
       "controller": "EXTI13",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13539,7 +13700,8 @@
       "controller": "EXTI14",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13580,7 +13742,8 @@
       "controller": "EXTI15",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13619,7 +13782,8 @@
       "controller": "EXTI0",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13658,7 +13822,8 @@
       "controller": "EXTI1",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13697,7 +13862,8 @@
       "controller": "EXTI2",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13736,7 +13902,8 @@
       "controller": "EXTI3",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13775,7 +13942,8 @@
       "controller": "EXTI4",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13814,7 +13982,8 @@
       "controller": "EXTI5",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13833,7 +14002,8 @@
       "controller": "EXTI10",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13872,7 +14042,8 @@
       "controller": "EXTI12",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13911,7 +14082,8 @@
       "controller": "EXTI13",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13950,7 +14122,8 @@
       "controller": "EXTI14",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -13989,7 +14162,8 @@
       "controller": "EXTI15",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14028,7 +14202,8 @@
       "controller": "EXTI0",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14067,7 +14242,8 @@
       "controller": "EXTI1",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14106,7 +14282,8 @@
       "controller": "EXTI2",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14145,7 +14322,8 @@
       "controller": "EXTI3",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14184,7 +14362,8 @@
       "controller": "EXTI4",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14223,7 +14402,8 @@
       "controller": "EXTI5",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14242,7 +14422,8 @@
       "controller": "EXTI6",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14261,7 +14442,8 @@
       "controller": "EXTI7",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14280,7 +14462,8 @@
       "controller": "EXTI8",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14299,7 +14482,8 @@
       "controller": "EXTI9",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14338,7 +14522,8 @@
       "controller": "EXTI10",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14377,7 +14562,8 @@
       "controller": "EXTI11",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14416,7 +14602,8 @@
       "controller": "EXTI12",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14435,7 +14622,8 @@
       "controller": "EXTI13",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14454,7 +14642,8 @@
       "controller": "EXTI14",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14473,7 +14662,8 @@
       "controller": "EXTI15",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14514,7 +14704,8 @@
       "controller": "EXTI0",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14555,7 +14746,8 @@
       "controller": "EXTI1",
       "kind": "exti",
       "modes": [
-        "edge-event"
+        "edge-event",
+        "hardware-event"
       ],
       "source": "DS8626 Rev 12 Table 7 and LQFP100/LQFP144 pinouts; RM0090 GPIO and SYSCFG_EXTICR/EXTI mapping. Exact bonded silicon pad only; Board authorization and oscillator/debug resource ownership remain required.",
       "pins": [
@@ -14725,6 +14917,28 @@
         }
       ],
       "source": "DS8626 alternate-function table and reviewed existing TIM channel pad; RM0090 input capture. Silicon reference only; shared vector ownership is selected separately and does not imply PCB qualification."
+    },
+    {
+      "id": "rtc-lse-bypass-pc14",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "RTC",
+      "kind": "rtc",
+      "pins": [],
+      "modes": [
+        "adopt-retained",
+        "provision-empty"
+      ],
+      "resources": [
+        "pin:PC14",
+        "clock:LSE",
+        "clock:RTC",
+        "domain:backup",
+        "alarm:RTC_A"
+      ],
+      "source": "RM0090 Rev22 RCC_BDCR LSEBYP: explicit external 32768Hz clock input on PC14 only; exact Board lse_bypass fact required. ES0182 Rev19 2.2.18 excludes LSE bypass from the PC13 crystal disturbance limitation. PC13 capture requires an explicit external pad handoff; software reference does not establish a PCB or HIL."
     }
   ]
 }

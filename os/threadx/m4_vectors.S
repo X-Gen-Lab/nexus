@@ -22,6 +22,7 @@ SysTick_Handler:
     push {r0, lr}
     bl _tx_timer_interrupt
     pop {r0, lr}
+    dsb sy
     bx lr
 .size SysTick_Handler, .-SysTick_Handler
 #endif

@@ -57,7 +57,9 @@ nx_stm32_platform_pins_admit(const nx_stm32_platform_config_t* config,
          */
         if ((pin->registers == GPIOH && pin->pin <= 1U &&
              (RCC->CR & (RCC_CR_HSEON | RCC_CR_HSERDY)) != 0U) ||
-            (pin->registers == GPIOC && pin->pin >= 14U &&
+            (pin->registers == GPIOC &&
+             (pin->pin >= 14U ||
+              (pin->pin == 13U && (RCC->BDCR & RCC_BDCR_LSEBYP) == 0U)) &&
              (RCC->BDCR & (RCC_BDCR_LSEON | RCC_BDCR_LSERDY)) != 0U))
             return NX_ERROR_BUSY;
         if (powered_only && (RCC->AHB1ENR & (1U << pin->port_index)) == 0U)

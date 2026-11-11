@@ -293,9 +293,9 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
         (port->registers->CR1 & I2C_CR1_PE) == 0U) {
         return NX_ERROR_STATE;
     }
-    if (endpoint->address_bits == 10U &&
-        !nx_i2c_v1_ten_timing((uint16_t)port->registers->CCR,
-                              (uint8_t)port->peripheral_mhz)) {
+    if ((endpoint->address_bits == 10U || count > 1U) &&
+        !nx_i2c_v1_restart_timing((uint16_t)port->registers->CCR,
+                                  (uint8_t)port->peripheral_mhz)) {
         return NX_ERROR_UNSUPPORTED;
     }
     if (nx_deadline_expired(deadline, nx_time_now_us())) {

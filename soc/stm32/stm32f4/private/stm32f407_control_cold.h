@@ -123,6 +123,11 @@ nx_stm32_exti_prepare(nx_stm32_exti_state_t* port,
         return NX_ERROR_INVALID;
     if (port->initialized || port->cold_owned)
         return NX_ERROR_BUSY;
+    /* ES0182: even an input edge on PC13 can disturb a crystal LSE. */
+    if (config->gpio == GPIOC && config->line == 13U &&
+        (RCC->BDCR & RCC_BDCR_LSEBYP) == 0U &&
+        (RCC->BDCR & (RCC_BDCR_LSEON | RCC_BDCR_LSERDY)) != 0U)
+        return NX_ERROR_BUSY;
     uint32_t bit = 1U << config->line;
     if (((EXTI->IMR | EXTI->EMR | EXTI->PR) & bit) != 0U)
         return NX_ERROR_BUSY;

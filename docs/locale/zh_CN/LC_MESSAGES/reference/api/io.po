@@ -1,6 +1,6 @@
 # Current canonical messages; semantic review admission is tracked separately.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 4de08fac5bdf53d581b8966bab70551e4ec5161f800635c2b7b304adee785d30\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: bfdeb4f6ed0c34c2aa4de72734aef75bdf9c34fd2b863f7ddf19eea4820cee28\n"
 
 msgid "Typed I/O: devices and execution contracts"
 msgstr "类型化 I/O：设备与执行合同"
@@ -20,8 +20,8 @@ msgstr "任务"
 msgid "Public headers"
 msgstr "公共头"
 
-msgid "Samples, camera storage and finite audio"
-msgstr "采样、相机存储与有限音频"
+msgid "Samples, camera storage and finite/continuous audio"
+msgstr "采样、摄像头存储与有限／连续音频"
 
 msgid "`adc.h`, `adc_group.h`, `capture.h`, `audio.h`, `frame_stream.h`"
 msgstr "`adc.h`, `adc_group.h`, `capture.h`, `audio.h`, `frame_stream.h`"
@@ -1334,8 +1334,8 @@ msgstr "不可变身份；控制器状态与配置必须在所有 IRQ 完全退�
 msgid "audio.h"
 msgstr "audio.h"
 
-msgid "Finite I2S transmit, receive and full duplex DMA loans."
-msgstr "有限 I2S 发送、接收与全双工 DMA 借用。"
+msgid "Finite and continuous I2S transmit/receive DMA loans."
+msgstr "有限与连续 I2S 发送／接收 DMA 借用。"
 
 msgid "Typedefs"
 msgstr "类型定义"
@@ -1349,6 +1349,12 @@ msgstr "静态所选串行音频格式中的一个有限 block。"
 msgid "Initialize/prepare base first. TX takes one exact immutable frame consumer loan; RX takes one FILLING loan from an idle framed stream. Full duplex requires both and equal complete frame storage lengths. Unselected directions must be NULL. Format conversion is never done. Sixteen bit samples use one native little endian halfword per slot; 24/32 bit samples use HIGH halfword then LOW halfword, in DMA order. For 24 bit data the low halfword has eight trailing padding bits. This is a sequence of halfwords, not native little endian uint32 PCM. I2S/left/right justified blocks contain both channel slots; PCM blocks contain complete single channel synchronization periods. Data length determines stored halfwords; wire padding is not stored. Finite master RX requires at least two stored halfwords. ACCEPTED borrows this request and both controls until SETTLED. Only proved serializer, DMA, IRQ and address withdrawal returns TX or publishes RX. Error/cancel reports zero and aborts RX after drain. An external slave clock that stops while a word remains can prevent drain indefinitely; timeout and failed stop NEVER revoke the loan."
 msgstr "先初始化／prepare base。TX 取得一个精确的不可变 frame consumer 借用；RX 从空闲 framed stream 取得一个 FILLING 借用。全双工要求两者都有，且完整 frame 存储长度相等。未选择的方向必须为 NULL。绝不执行格式转换。16-bit sample 的每个 slot 使用一个原生小端 halfword；24／32-bit sample 按 DMA 次序先放 HIGH halfword，再放 LOW halfword。24-bit 数据的低 halfword 末尾有八个填充位。这是 halfword 序列，不是原生小端 uint32 PCM。I2S／左／右对齐 block 包含两个声道 slot；PCM block 包含完整的单声道同步周期。数据长度决定存储的 halfword 数；线上 padding 不存储。有限 master RX 至少需要两个已存储 halfword。ACCEPTED 借用本请求与两个控制对象，直到 SETTLED。只有证明串行器、DMA、IRQ 和地址均已撤回后，才归还 TX 或发布 RX。错误／取消报告零，并在排空后 abort RX。若外部 slave clock 在字尚未完成时停止，可能永远无法排空；超时和 stop 失败从不撤销借用。"
 
+msgid "Continuous fixed-size blocks with a caller-owned session lifetime."
+msgstr "调用者拥有会话生命周期的连续固定大小块。"
+
+msgid "TX is a stream of READY immutable blocks; RX starts with FREE blocks. Each selected direction supplies a distinct stream. DMA borrows two blocks per direction; the next replacement must be available before the hardware returns to the old bank. Published RX and returned TX blocks are detached from every DMA address before consumer access. Unselected directions are NULL. block_bytes is a positive whole audio frame count, identical for both directions. No silence, sample repeat, conversion, allocation or hidden replenishment is provided. Initialize/prepare base first. The session and producer/consumer rights remain borrowed through acquire-observed SETTLED. Consumer loans from completed RX blocks remain valid after session stop and must be joined separately before reclaiming the stream or buffers. Stop discards the uncompleted hardware blocks but preserves previously published RX. transferred counts detached RX bytes when RX is selected, otherwise detached TX bytes; it describes a prefix even on error/cancel, never the number of physical wire frames. NX_DEADLINE_NEVER is permitted."
+msgstr "TX 是由 READY 不可变块组成的 stream；RX 从 FREE 块开始。每个选中方向提供独立的 stream。DMA 在每个方向借用两个块；硬件回到旧 bank 前必须准备好下一个替代块。已发布的 RX 块和已归还的 TX 块在消费者访问前均已脱离全部 DMA 地址。未选方向为 NULL。block_bytes 为正数个完整音频 frame 的存储字节数，两个方向相同。不提供补静音、样本重播、转换、分配或隐式补充。先初始化／prepare base。直到以 acquire 语义观察到 SETTLED，会话及 producer／consumer 权限始终被借用。已完成 RX 块的 consumer 借用在会话停止后继续有效，必须独立 join 后才能回收 stream 或 buffers。stop 丢弃尚未完成的硬件块，保留之前发布的 RX。选择 RX 时，transferred 统计已脱离 DMA 的 RX 字节；否则统计已脱离 DMA 的 TX 字节。即使错误／取消也表示已完成前缀，绝不是实际 wire frame 数。允许 NX_DEADLINE_NEVER。"
+
 msgid "Exact rational nominal rate; external slave rate is unknown (0/0)."
 msgstr "精确有理数 nominal rate；外部 slave rate 未知，为 0/0。"
 
@@ -1360,6 +1366,12 @@ msgstr "不分配存储的串行化 owner，由显式 service 推进。"
 
 msgid "Platform prepare acquires pads, DMA, I2S and an optional shared compatible PLLI2S lease. Factory lookup never opens hardware. Start external slave CK only after acquire-observed ACTIVE; WS must be at the selected idle channel boundary during preparation. ACTIVE in a slave TX mode includes a real DR prefill, three actual microsecond ticks and at least three peripheral clocks with idle CK/WS retained. Caller controls external electrical timing and stop/drain clocks. IRQs latch errors/completion, with no task creation. One privileged unmasked task serializes methods and resource lifecycle; explicit service progresses operations. Late IRQs cannot settle an old loan. stop cancels and joins the current block; failed drain retains full request/loan/resource storage. Platform close prevents further admission before attempting resource release. Join this owner before Platform stop or clock changes."
 msgstr "Platform prepare 取得 pad、DMA、I2S，以及可选的共享兼容 PLLI2S lease。Factory 查询从不打开硬件。只有通过 acquire 观察到 ACTIVE 后，才启动外部 slave CK；准备期间 WS 必须保持所选空闲声道边界。在 slave TX 模式，ACTIVE 包含真实 DR 预填、三个真实微秒计时 tick，以及在 CK／WS 保持空闲时至少三个外设时钟。调用者控制外部电气时序及 stop／drain 所需时钟。IRQ 只锁存错误／完成，不创建任务。一个特权且未屏蔽中断的任务串行化全部方法和资源生命周期；显式 service 推进操作。迟到 IRQ 不能使旧借用 SETTLED。stop 取消并 join 当前 block；排空失败保留完整的请求／借用／资源存储。Platform close 先禁止后续准入，再尝试归还资源。Platform stop 或改变时钟之前，必须先 join 本 owner。"
+
+msgid "Optional continuous personality; NULL for a finite controller."
+msgstr "可选连续模式角色；有限控制器为 NULL。"
+
+msgid "SUCCESS accepts the full session, including a drained immediate failure. Rejection retains no session or stream references."
+msgstr "SUCCESS 表示接受完整会话，也包括立即失败但已排空的情况。拒绝不保留会话或 stream 引用。"
 
 msgid "Immutable controller identity; vendor Handles remain private."
 msgstr "不可变 controller 身份；厂商 Handle 保持私有。"
@@ -2494,6 +2506,18 @@ msgstr "[in] 在擦除脉冲之间检查的绝对 deadline。"
 
 msgid "Success or INVALID/TIMEOUT/IO; partial erase is possible on timeout/error. Return waits for current pulse to become idle."
 msgstr "成功或 INVALID/TIMEOUT/IO；超时或错误可能只完成部分擦除。返回前等待当前脉冲进入空闲。"
+
+msgid "Retry retained physical cleanup without another pulse."
+msgstr "重试保留的物理清理责任，不再启动操作脉冲。"
+
+msgid "Privileged unmasked Thread on MCU. This bounded attempt never waits for a busy pulse, replays data, rolls back an irreversible effect or substitutes for a required POR. Preserve the owner until recovery succeeds. Recovery does not turn the original failed operation into success."
+msgstr "MCU 上由特权且未屏蔽 IRQ 的 Thread 执行。这次有界尝试不等待 busy 脉冲结束，不重放数据、不回滚不可逆效果，也不能替代所需 POR。恢复成功前保留 owner。恢复不会把原失败操作改记为成功。"
+
+msgid "[in] Same serialized owner as the failed operation."
+msgstr "[in] 与失败操作相同的串行 owner。"
+
+msgid "SUCCESS after actual cleanup; BUSY while hardware remains active, IO while cleanup is refused, or UNSUPPORTED when this optional provider operation is absent."
+msgstr "实际清理完成后返回 SUCCESS；硬件仍活动时返回 BUSY，拒绝清理时返回 IO；提供者未实现该可选操作时返回 UNSUPPORTED。"
 
 msgid "Validate region bounds against physical geometry."
 msgstr "根据物理几何验证区域边界。"
@@ -4721,8 +4745,8 @@ msgstr "这是责任转移，不禁用自主时钟，也不选择后续关闭策
 msgid "[in] Closed serialized RTC owner; every external user joined."
 msgstr "[in] 已关闭的串行化 RTC owner；全部外部用户已完成 join。"
 
-msgid "[out] Disjoint receipt, unchanged on failure. The caller explicitly accepts continuing power/access/oscillator/calendar ownership."
-msgstr "[out] 独立收条，失败时保持不变。调用者显式接收后续电源／访问／振荡器／日历所有权。"
+msgid "[out] Disjoint receipt, unchanged on failure. The caller explicitly accepts continuing power/access/oscillator/calendar ownership, including any reported crystal-oscillator quiet-pad responsibility."
+msgstr "[out] 不重叠的收条，失败时不变。调用者显式接纳持续的电源／访问／振荡器／日历所有权，包括收条报告的晶体振荡器引脚静默责任。"
 
 msgid "SUCCESS, BUSY for live loans/sources, STATE without transferable effects, or exact provider error. No reset, erase or register write occurs."
 msgstr "SUCCESS；活跃借用／来源为 BUSY，没有可转移效果为 STATE，或返回精确 provider 错误。不执行 reset、erase 或寄存器写入。"
@@ -4799,8 +4823,8 @@ msgstr "启用的 counter 每 reload+1 个 tick 重载；extended 另加 65536�
 msgid "Explicit capture pins and hardware tamper semantics."
 msgstr "显式 capture pin 与硬件 tamper 语义。"
 
-msgid "Pin 1 means RTC_AF1; pin 2 means RTC_AF2 and requires an exact fitted package/route. Tamper detection erases all hardware backup registers. filter is 0=edge, 1/2/3=2/4/8 consecutive level samples. trigger bits mean falling edge without filter or high active level with filter. sample_rate is RTCCLK/(32768 >> value), 0..7; precharge is 1<<value RTCCLK cycles, 0..3. No GPIO, pull resistor or PCB route is inferred."
-msgstr "Pin 1 表示 RTC_AF1；pin 2 表示 RTC_AF2，需要精确实装封装／路线。Tamper 检测会擦除全部硬件 backup register。filter 为 0 时按边沿，1／2／3 对应 2／4／8 个连续电平 sample。无 filter 时 trigger 位表示下降沿，有 filter 时表示高有效电平。sample_rate 为 RTCCLK/(32768 >> value)，value 为 0..7；precharge 为 1<<value 个 RTCCLK 周期，value 为 0..3。不推断 GPIO、pull resistor 或 PCB route。"
+msgid "Pin 1 means RTC_AF1; pin 2 means RTC_AF2 and requires an exact fitted package/route. Tamper detection erases all hardware backup registers. filter is 0=edge, 1/2/3=2/4/8 consecutive level samples. trigger bits mean falling edge without filter or high active level with filter. sample_rate is RTCCLK/(32768 >> value), 0..7; precharge is 1<<value RTCCLK cycles, 0..3. No GPIO, pull resistor or PCB route is inferred. A provider may reject silicon-unsafe edges. A failed post-enable input check can retain an armed source; success never certifies tamper security or external setup/hold timing."
+msgstr "pin 1 表示 RTC_AF1；pin 2 表示 RTC_AF2，要求精确的实装封装／路线。tamper 检测会擦除全部硬件备份寄存器。filter 的 0 表示边沿，1／2／3 表示连续 2／4／8 次电平采样。trigger 位在无滤波时表示下降沿，在滤波时表示高有效电平。sample_rate 为 RTCCLK/(32768 >> value)，value 为 0..7；precharge 为 1<<value 个 RTCCLK 周期，value 为 0..3。不推定 GPIO、外部拉电阻或 PCB 路线。提供者可以拒绝受硅片限制的边沿。启用后的输入检查失败可能保留已启用的源；成功不证明防篡改安全性或外部 setup／hold 时序。"
 
 msgid "Timestamp excludes year, which the hardware does not capture."
 msgstr "Timestamp 不含 year，硬件未捕获该字段。"
@@ -6611,6 +6635,9 @@ msgstr "成功、INVALID 或 STATE；拒绝时不建立借用。"
 msgid "Admit one packet, never a hidden queue or complete USB transaction."
 msgstr "仅准入一个数据包，不隐式建立队列或执行完整 USB 事务。"
 
+msgid "One privileged task executor, IRQ masks clear. IN FIFO writes do not prove host ACK. OUT overrun drains all packet words without overflow. Selected F407 ISO packets require a remaining Core deadline at most one second, observed ULPI speed and exactly one transaction. Hardware selects next frame/microframe parity; it does not implement interval scheduling, retries or receive acknowledgment. An incomplete ISO opportunity settles IO only after source/FIFO/AHB withdrawal. Long execution stalls expire by Core time before modular frame comparison."
+msgstr "单一特权任务执行者，IRQ 屏蔽须解除。写入 IN FIFO 不能证明主机已 ACK。OUT 包超长时仍排空全部 FIFO 数据字，不越界写目标缓冲。选定的 F407 ISO packet 要求剩余 Core deadline 至多一秒、选用 ULPI 时须先观察实际速度，且每次只有一个 transaction。硬件选择下一个 frame／microframe 的奇偶，不实现 interval 调度、重试或接收确认。不完整 ISO 机会只有在 source／FIFO／AHB 撤回后才以 IO 结清。执行长停顿时，先按 Core time 判断超时，再进行模帧计数比较。"
+
 msgid "[in] Stable endpoint face and private state."
 msgstr "[in] 稳定的端点接口及私有状态。"
 
@@ -6640,6 +6667,9 @@ msgstr "[in] 已启动的串行化所有者，IRQ 屏蔽须解除。"
 
 msgid "[in] Desired STALL; clearing bulk/interrupt resets DATA0."
 msgstr "[in] 期望的 STALL；清除 bulk/interrupt STALL 时同时复位 DATA0。"
+
+msgid "Success after readback, BUSY retains a pending request; a selected ISO direction returns UNSUPPORTED without an endpoint write."
+msgstr "回读验证后成功；BUSY 保留待完成请求。选定的 ISO 方向返回 UNSUPPORTED，不写 endpoint 寄存器。"
 
 msgid "Task-only bounded progress; deadline never depends on USB SOF."
 msgstr "仅 Task 有界推进；截止时间绝不依赖 USB SOF。"
@@ -6851,6 +6881,9 @@ msgstr "SUCCESS 或拒绝；不据此推导物理速度资格。"
 msgid "Reset a connected idle port using the independent absolute deadline."
 msgstr "使用独立的绝对 deadline 复位已连接的空闲端口。"
 
+msgid "Admission requires strictly more than 10 ms plus one microsecond of clock-quantization guard; insufficient or expired budget returns TIMEOUT without port effects. An admitted reset keeps its minimum signal even if preemption crosses the deadline, then reports TIMEOUT after withdrawal. Failed withdrawal closes admission and retains the controller until stop can join the signal. An invalid or persistently frozen Core clock observes a terminal fault and parks with effects retained; it cannot authorize a short signal."
+msgstr "准入预算必须严格大于 10 ms + 1 µs，其中 1 µs 为时钟量化裕量。预算不足或已过期时返回 TIMEOUT，不产生 port 效果。已准入的 reset 即使因抢占越过 deadline，也保持最小信号时长，完成撤回后再报告 TIMEOUT。撤回失败将关闭后续准入并保留 controller，直到 stop 能够 join 该信号。Core 时钟无效或持续冻结时，触发终止故障观察并在保留效果的情况下停驻；这不能成为缩短信号的依据。"
+
 msgid "[in] Same controller owner; all channel loans are settled."
 msgstr "[in] 同一个 controller owner；全部通道借用均已结算。"
 
@@ -6862,6 +6895,9 @@ msgstr "SUCCESS 或失败；reset 不撤销活跃 request。"
 
 msgid "Suspend or resume an idle host port without stopping Core time."
 msgstr "挂起或恢复空闲 Host 端口，不停止 Core 时间。"
+
+msgid "Resume requires strictly more than 20 ms plus one microsecond of clock-quantization guard before port effects. Its admitted minimum hold, late TIMEOUT, retained withdrawal and terminal clock-failure rules match reset. A late completed resume still publishes the actual resumed state; it does not retain a stale suspended snapshot solely because the deadline elapsed."
+msgstr "resume 必须在产生 port 效果前取得严格大于 20 ms + 1 µs 的预算，其中 1 µs 为时钟量化裕量。准入后的最小保持、迟到 TIMEOUT、撤回责任保留及终止时钟失败规则与 reset 相同。迟到但已完成的 resume 仍发布实际恢复状态，不会只因 deadline 已过而保留陈旧的 suspended 快照。"
 
 msgid "[in] Same serialized owner with settled channel loans."
 msgstr "[in] 同一个串行调用的 owner，通道借用已结算。"
@@ -6958,6 +6994,9 @@ msgstr "选定事实不构成经实际观测建立的物理资格。"
 
 msgid "Validate exact selected FS/HS facts without observing the controller."
 msgstr "校验精确的选定 FS/HS 事实，不观测 controller。"
+
+msgid "Task/ISR bounded and read-only. Facts identify selected software support; they never imply PCB routing, VBUS wiring or physical qualification. Public metadata, endpoint arrays, faces and operations tables require their natural C alignment and nonwrapping extents. Numeric rejection is not a probe of arbitrary addresses or opaque private contexts. EP0 selects control/64; nonzero bulk selects 8/16/32/64-byte MPS at FS or 512 at HS. Interrupt selects nonzero IN/OUT with 1..64-byte MPS at FS or 1..1024 at HS. ISO selects 1..1023 bytes at FS or 1..1024 at HS, with one transaction per opportunity; full FIFO admission remains the controller's duty. ISO never supports STALL or ACK guarantees. Its request selects next-frame parity, keeps a finite remaining deadline of at most one second and never retries a missed opportunity. ULPI ISO submission requires an observed speed; FS fallback caps MPS at 1023. External descriptors own interval and synchronization; this profile does not schedule a periodic stream."
+msgstr "在 Task／ISR 中有界且只读。事实标识选定的软件支持；绝不表示 PCB 布线、VBUS 接线或物理资格。公共元数据、endpoint 数组、face 及 operations table 须按其 C 类型自然对齐，存储范围不能回绕。数值检查中的拒绝不能用于探测任意地址或不透明的私有 context。EP0 选择 control/64；非零 bulk 在 FS 选择 8/16/32/64-byte MPS，在 HS 选择 512-byte MPS。interrupt 选择非零 IN/OUT，FS MPS 为 1..64-byte，HS 为 1..1024。ISO 在 FS 选择 1..1023-byte、HS 选择 1..1024-byte，每次机会一个 transaction；完整 FIFO 准入仍由 controller 负责。ISO 不支持 STALL 或 ACK 保证。请求选择下一帧奇偶，剩余有限 deadline 至多一秒，错过机会不重试。ULPI ISO 提交要求已经观察到 speed；FS 回退将 MPS 限为 1023。interval 与同步由外部 descriptor 负责，该 profile 不调度周期流。"
 
 msgid "[in] Stable readable immutable facts, faces and endpoint array."
 msgstr "[in] 稳定、可读且不可变的事实、face 及 endpoint 数组。"
@@ -7117,12 +7156,3 @@ msgstr "硬件所选 timeout 界限，包含已声明的时钟不确定性。"
 
 msgid "A zero minimum and maximum mean the timeout bounds are unknown, for example while hardware shadow updates remain pending or no oscillator limits have been reviewed. The enabled and irreversible facts remain valid. debug_freeze reports the provider-supported firmware configuration. Providers with CPU-readable debug control observe its setting. A provider without CPU debug-control access supports false only; that value does not observe or describe an external debugger's setting. An unproved activation write may retain enabled and irreversible effects; the provider never retries it implicitly or infers safe shutdown from failed readback."
 msgstr "最小值和最大值均为零表示超时边界未知，例如硬件影子寄存器更新尚未完成，或振荡器限制尚未复核。enabled 和 irreversible 事实仍然有效。debug_freeze 报告提供者支持的固件配置。能够由 CPU 读取调试控制的提供者会观察该设置。不具备 CPU 调试控制访问能力的提供者仅支持 false；该值既未观察，也不描述外部调试器的设置。 未证实的激活写入也可保留 enabled 与 irreversible 效应；provider 不会隐式重试，也不会依据回读失败推断能够安全关闭。"
-
-msgid "One privileged task executor, IRQ masks clear. IN FIFO writes do not prove host ACK. OUT overrun drains all packet words without overflow. Selected F407 ISO packets require a remaining Core deadline at most one second, observed ULPI speed and exactly one transaction. Hardware selects next frame/microframe parity; it does not implement interval scheduling, retries or receive acknowledgment. An incomplete ISO opportunity settles IO only after source/FIFO/AHB withdrawal. Long execution stalls expire by Core time before modular frame comparison."
-msgstr "单一特权任务执行者，IRQ 屏蔽须解除。写入 IN FIFO 不能证明主机已 ACK。OUT 包超长时仍排空全部 FIFO 数据字，不越界写目标缓冲。选定的 F407 ISO packet 要求剩余 Core deadline 至多一秒、选用 ULPI 时须先观察实际速度，且每次只有一个 transaction。硬件选择下一个 frame／microframe 的奇偶，不实现 interval 调度、重试或接收确认。不完整 ISO 机会只有在 source／FIFO／AHB 撤回后才以 IO 结清。执行长停顿时，先按 Core time 判断超时，再进行模帧计数比较。"
-
-msgid "Success after readback, BUSY retains a pending request; a selected ISO direction returns UNSUPPORTED without an endpoint write."
-msgstr "回读验证后成功；BUSY 保留待完成请求。选定的 ISO 方向返回 UNSUPPORTED，不写 endpoint 寄存器。"
-
-msgid "Task/ISR bounded and read-only. Facts identify selected software support; they never imply PCB routing, VBUS wiring or physical qualification. Public metadata, endpoint arrays, faces and operations tables require their natural C alignment and nonwrapping extents. Numeric rejection is not a probe of arbitrary addresses or opaque private contexts. EP0 selects control/64; nonzero bulk selects 8/16/32/64-byte MPS at FS or 512 at HS. Interrupt selects nonzero IN/OUT with 1..64-byte MPS at FS or 1..1024 at HS. ISO selects 1..1023 bytes at FS or 1..1024 at HS, with one transaction per opportunity; full FIFO admission remains the controller's duty. ISO never supports STALL or ACK guarantees. Its request selects next-frame parity, keeps a finite remaining deadline of at most one second and never retries a missed opportunity. ULPI ISO submission requires an observed speed; FS fallback caps MPS at 1023. External descriptors own interval and synchronization; this profile does not schedule a periodic stream."
-msgstr "在 Task／ISR 中有界且只读。事实标识选定的软件支持；绝不表示 PCB 布线、VBUS 接线或物理资格。公共元数据、endpoint 数组、face 及 operations table 须按其 C 类型自然对齐，存储范围不能回绕。数值检查中的拒绝不能用于探测任意地址或不透明的私有 context。EP0 选择 control/64；非零 bulk 在 FS 选择 8/16/32/64-byte MPS，在 HS 选择 512-byte MPS。interrupt 选择非零 IN/OUT，FS MPS 为 1..64-byte，HS 为 1..1024。ISO 在 FS 选择 1..1023-byte、HS 选择 1..1024-byte，每次机会一个 transaction；完整 FIFO 准入仍由 controller 负责。ISO 不支持 STALL 或 ACK 保证。请求选择下一帧奇偶，剩余有限 deadline 至多一秒，错过机会不重试。ULPI ISO 提交要求已经观察到 speed；FS 回退将 MPS 限为 1023。interval 与同步由外部 descriptor 负责，该 profile 不调度周期流。"

@@ -521,6 +521,6 @@ static nx_result_t read_data(const void* context, uint32_t offset, void* data,
     return NX_SUCCESS;
 }
 const nx_flash_ops_t nx_stm32_fsmc_nor_flash_ops = {geometry, read_data, NULL,
-                                                    NULL};
+                                                    NULL, NULL};
 const nx_flash_async_ops_t nx_stm32_fsmc_nor_async_ops = {submit, cancel,
                                                           service, stop};

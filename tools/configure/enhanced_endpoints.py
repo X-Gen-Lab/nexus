@@ -283,9 +283,6 @@ def resolve_device(device, controller, provider, *, soc, clock_plan,
         width = device.get("address_bits", 7)
         integer(device["address"], 8 if width == 7 else 0,
                 119 if width == 7 else 1023, f"{width}-bit I2C address")
-        if width == 10 and 88000 < controller["max_hz"] <= 100000:
-            fail("10-bit I2C repeated START requires Standard <=88000 Hz "
-                 "or explicit Fast mode >100000 Hz (ES0182 2.10.4)")
         key = (controller["id"], width, device["address"])
         if key in addresses:
             fail("Duplicate I2C address on one bus")

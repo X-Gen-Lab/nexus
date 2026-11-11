@@ -1,6 +1,6 @@
 # Current canonical messages; semantic review admission is tracked separately.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 87a01258977024b0e83de65734929b78d89fb35a10ccdf6606cbaeb50e2b14fd\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: a18bdec764ee8cd0ed7054be3a58225bb82673c2ae4c30bc3522128ecab10433\n"
 
 msgid "当前精确支持范围"
 msgstr "Current exact support scope"
@@ -131,6 +131,9 @@ msgstr "[Supervision and faults](../design/f407-system-power.md)"
 msgid "GPIO／EXTI／PVD"
 msgstr "GPIO／EXTI／PVD"
 
+msgid "精确封装全部 GPIO 的 input／output、四档显式输出速度与 EXTI0–15；PVD 原始电平／事件。EXTI 的 `hardware-event` 只产生 EMR 硬件事件，不取得 IRQ 或软件队列。省略速度保留已有配置，PC13–15 输出限制为 LOW；晶振 LSE 占用时 PC13 保持静默，晶振和调试引脚仍受资源约束。软件事件保留 COALESCED／LOSS，不提供自动消抖、精确边沿时间或 BOR 资格"
+msgstr "Input/output on every bonded GPIO of the exact package, four explicit output-speed settings and EXTI0–15; raw PVD level/events. EXTI `hardware-event` produces only EMR hardware events and acquires no IRQ or software queue. Omitting speed preserves the existing setting; PC13–15 outputs are limited to LOW. PC13 stays quiet while a crystal LSE owns it; oscillator and debug pads remain resource-constrained. Software events retain COALESCED/LOSS. No automatic debounce, exact physical edge timing or BOR qualification is provided."
+
 msgid "[F4 GPIO／PVD](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)、[I/O 观察](../design/io-observation-recovery.md)"
 msgstr "[F4 GPIO / PVD](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md), [I/O observation](../design/io-observation-recovery.md)"
 
@@ -181,6 +184,9 @@ msgstr "[I2C target contract](../design/f407-i2c-target.md)"
 
 msgid "普通 PWM／capture／encoder"
 msgstr "Ordinary PWM / capture / encoder"
+
+msgid "已审 TIM3／4／5／9–14 PWM；TIM1／3／4／5／8／9–14 原始输入捕获，按实例开放 1／2／4 通道，TIM5 保留 32 位；TIM1／3／4／5／8 支持 x2／x4 正交计数。TIM2 保留给 Core，TIM6／7 用作专用触发；timer personality 独占，IRQ 只取得所选模式实际使用的向量"
+msgstr "Reviewed TIM3 / 4 / 5 / 9–14 PWM; TIM1 / 3 / 4 / 5 / 8 / 9–14 raw input capture, with 1 / 2 / 4 channels according to the instance and a full 32-bit count on TIM5. TIM1 / 3 / 4 / 5 / 8 support x2 / x4 quadrature counting. TIM2 is reserved for Core and TIM6 / 7 for dedicated triggers. Timer personalities are exclusive; an IRQ lease covers only the vector actually used by the selected mode"
 
 msgid "[定时器合同](../design/timer-advanced.md)、[F4 实现](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 msgstr "[Timer contract](../design/timer-advanced.md), [F4 implementation](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
@@ -242,8 +248,8 @@ msgstr "[DCMI/I2S contract](../design/f407-capture-audio.md)"
 msgid "I2S2／3"
 msgstr "I2S2／3"
 
-msgid "master／slave × TX／RX／duplex 的有限 DMA；Philips、MSB／LSB justified、PCM short／long，16／24／32-bit 数据。master 显式 PLLI2S，slave 外部 rate 为 unknown；不转换音频格式"
-msgstr "Finite DMA for master / slave × TX / RX / duplex; Philips, MSB / LSB justified, PCM short / long and 16 / 24 / 32-bit data. Master mode explicitly selects PLLI2S; external slave rate is unknown. Audio formats are not converted"
+msgid "master／slave × TX／RX／duplex 的有限 DMA 与连续 `*-blocks`；Philips、MSB／LSB justified、PCM short／long，16／24／32-bit 数据。master 显式 PLLI2S，slave 实际外部 rate 为 unknown；连续模式显式声明 rate／service 上界，使用调用者 block 存储，已发布 RX loan 单独归还。不转换音频格式"
+msgstr "Finite DMA and continuous `*-blocks` for master/slave × TX/RX/duplex; Philips, MSB/LSB justified, PCM short/long and 16/24/32-bit data. Masters explicitly select PLLI2S; the actual external slave rate is unknown. Continuous modes declare explicit rate/service upper bounds and use caller-owned block storage; published RX loans are returned separately. Audio formats are never converted."
 
 msgid "[音频合同](../design/f407-capture-audio.md)、[有限 slave TX 路径](../design/f407-i2s2-slave-tx.md)"
 msgstr "[Audio contract](../design/f407-capture-audio.md), [Finite slave TX path](../design/f407-i2s2-slave-tx.md)"
@@ -251,8 +257,8 @@ msgstr "[Audio contract](../design/f407-capture-audio.md), [Finite slave TX path
 msgid "RTC／备份域"
 msgstr "RTC / backup domain"
 
-msgid "`adopt-retained`／`provision-empty`、Alarm A request、Alarm B、wakeup、timestamp、tamper、校准、20 个 backup registers、4 KiB backup SRAM CPU lease 与显式 handoff；不提供世纪／时区或保持性证明"
-msgstr "`adopt-retained` / `provision-empty`, Alarm A requests, Alarm B, wakeup, timestamp, tamper, calibration, 20 backup registers, 4 KiB backup SRAM CPU leases and explicit handoff; no century / timezone or retention proof"
+msgid "`adopt-retained`／`provision-empty`、Alarm A request、Alarm B、wakeup、timestamp、tamper、校准、20 个 backup registers、4 KiB backup SRAM CPU lease 与显式 handoff。PC13 timestamp／tamper 需要 Board 明确授权 LSE bypass；四个现有 Board 的晶体配置不能据 API 存在推定支持。不提供世纪／时区或保持性证明"
+msgstr "`adopt-retained`/`provision-empty`, Alarm A requests, Alarm B, wakeup, timestamp, tamper, calibration, 20 backup registers, a 4 KiB backup-SRAM CPU lease and explicit handoff. PC13 timestamp/tamper requires explicit Board authorization of LSE bypass; the crystal configurations of the four current Boards do not gain support merely because an API exists. No century/timezone or retention proof is provided."
 
 msgid "[RTC 合同](../design/f407-rtc.md)"
 msgstr "[RTC contract](../design/f407-rtc.md)"
@@ -260,14 +266,17 @@ msgstr "[RTC contract](../design/f407-rtc.md)"
 msgid "内部 Flash／制造维护"
 msgstr "Internal Flash / manufacturing maintenance"
 
-msgid "精确 VE／ZG sector 几何；显式维护 face 提供 OTP、锁定、option／RDP 及保护降级的整阵列擦除效果。不可逆效果逐次声明，不自动回滚、重放或把软件复位当作所需 POR"
-msgstr "Exact VE / ZG sector geometry; an explicit maintenance face supplies OTP, locks, options / RDP and whole-array erase effects of protection downgrades. Irreversible effects are declared per operation; no automatic rollback, replay or substitution of a software reset for required POR"
+msgid "精确 VE／ZG sector 几何；显式维护 face 提供 OTP、锁定、option／RDP 及保护降级的整阵列擦除效果。失败后的 `recover` 只排空、撤回并重锁，确认成功后才归还 owner；不可逆效果逐次声明，不自动回滚、重放或把软件复位当作所需 POR"
+msgstr "Exact VE/ZG sector geometry; an explicit maintenance face exposes OTP, locking, option/RDP and whole-array erase effects of protection downgrade. After failure, `recover` only drains, withdraws and relocks, returning ownership only after confirmed success. Irreversible effects are declared individually. There is no automatic rollback/replay or substitution of a software reset for the required POR."
 
 msgid "[物理存储与维护](../design/f407-storage.md)"
 msgstr "[Physical storage and maintenance](../design/f407-storage.md)"
 
 msgid "SDIO／MMC／I/O functions"
 msgstr "SDIO／MMC／I/O functions"
+
+msgid "SD memory／MMC polling、有限 IRQ／DMA；SDIO functions 使用独立 face 的 CMD5／52／53。单卡、3.3 V，SD／SDIO 为 1／4 位，MMC 可显式选择经版本和 SWITCH 检查的 8 位十引脚软件参考。combo 不同时维护 memory portion；当前只接纳 `hse8-pll168`，不提供 HS／DDR／HS200"
+msgstr "SD memory / MMC polling and finite IRQ / DMA; SDIO functions use CMD5 / 52 / 53 through a separate face. One card, 3.3 V; SD / SDIO use 1 / 4-bit buses. MMC may explicitly select an 8-bit ten-pad software reference after version and SWITCH checks. Combo cards do not simultaneously maintain the memory portion. Only `hse8-pll168` is currently admitted; HS / DDR / HS200 are not provided"
 
 msgid "[SDIO 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/sdio_hal/README.md)"
 msgstr "[SDIO contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/sdio_hal/README.md)"
@@ -311,14 +320,17 @@ msgstr "[Classic CAN](../design/classic-can.md)"
 msgid "Ethernet"
 msgstr "Ethernet"
 
-msgid "VE／ZG MII 与 ZG RMII、独立 MDIO；raw `eth` 与增强 `eth_frames` 分选。增强 face 提供整帧 SG、单 C-tag VLAN、显式 checksum offload 和 MAC 硬件事件／PTP 时间戳；PHY 接线、协议栈、同步与网络政策由外部提供"
-msgstr "VE/ZG MII and ZG RMII with separate MDIO; raw `eth` and enhanced `eth_frames` are selected separately. The enhanced face provides complete-frame SG, one C-tag VLAN, explicit checksum offload and MAC hardware-event/PTP timestamps; PHY wiring, protocol stacks, synchronization and network policy remain external"
+msgid "VE／ZG MII 与 ZG RMII、独立 MDIO；raw `eth` 与增强 `eth_frames` 分选。已选 HCLK 为 25–168 MHz，MDC 与 PTP 20／40／80 ns 增量由计划推导。增强 face 提供整帧 SG、单 C-tag VLAN、显式 checksum offload 和 MAC 硬件事件／PTP 时间戳；这不建立同步或物理精度资格，PHY 接线、协议栈、同步与网络政策由外部提供"
+msgstr "VE/ZG MII and ZG RMII with independent MDIO; raw `eth` and enhanced `eth_frames` are selected separately. Selected HCLK is 25–168 MHz; MDC division and the 20/40/80 ns PTP increment derive from the plan. The enhanced face provides whole-frame SG, one VLAN C-tag, explicit checksum offload and MAC hardware-event/PTP timestamps. This establishes no synchronization or physical-accuracy qualification. PHY wiring, protocol stacks, synchronization and network policy are external."
 
 msgid "[Ethernet 帧](../design/ethernet-frames.md)、[MAC／MDIO](../design/ethernet.md)"
 msgstr "[Ethernet frames](../design/ethernet-frames.md), [MAC / MDIO](../design/ethernet.md)"
 
 msgid "USB"
 msgstr "USB"
+
+msgid "FS／HS 引擎的 Device／Host、PIO 与 HS AHB DMA；Device 支持 control、bulk、interrupt 和单 transaction ISO packet。Device ISO 使用实际速度的帧窗口，接纳时剩余期限至多 1 秒，并满足受审 FIFO 分区；无 ACK／自动重试或周期调度。内部 PHY 仍为 FS，外部 ULPI 提供 HS／FS 回退；显式 managed roles 与按需 ST 官方 Core 桥接。不维护高带宽 ISO、remote wake、自动 HNP／SRP、Host split 或即时 premature STATUS OUT"
+msgstr "Device/Host on FS/HS engines, PIO and HS AHB DMA. Device supports control, bulk, interrupt and single-transaction ISO packets. Device ISO uses the frame window for the observed speed, requires at most 1 second of remaining deadline on admission, and must fit the reviewed FIFO partition. It provides no ACK, automatic retry or periodic scheduling. The internal PHY remains FS; external ULPI provides HS/FS fallback. Explicit managed roles and optional ST Core bridges are available. High-bandwidth ISO, remote wake, automatic HNP/SRP, Host split and immediate premature STATUS OUT are not maintained"
 
 msgid "[USB 所有权](../design/usb-device.md)"
 msgstr "[USB ownership](../design/usb-device.md)"
@@ -346,15 +358,3 @@ msgstr "Source maintenance, grouped model regressions, ARM ELF, Source SDK, whol
 
 msgid "所有 vendor、子模块、锁与许可证保留。未选 SDK 不进入默认生产构建闭包； [器件目录](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/devices.json)只描述官方宏、启动和 IRQ 编译事实。 历史范围见[固定重构前源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)， 旧候选、计数和实板结果不重标为当前源码资格。"
 msgstr "All vendors, submodules, locks and licenses are retained. Unselected SDKs do not enter the default production build closure. The [device catalogue](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/devices.json) describes official macro, startup and IRQ compilation facts only. Historical scope is available in the [fixed pre-refactor source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18); old candidates, counts and physical results are not relabeled as qualification for the current source."
-
-msgid "FS／HS 引擎的 Device／Host、PIO 与 HS AHB DMA；Device 支持 control、bulk、interrupt 和单 transaction ISO packet。Device ISO 使用实际速度的帧窗口，接纳时剩余期限至多 1 秒，并满足受审 FIFO 分区；无 ACK／自动重试或周期调度。内部 PHY 仍为 FS，外部 ULPI 提供 HS／FS 回退；显式 managed roles 与按需 ST 官方 Core 桥接。不维护高带宽 ISO、remote wake、自动 HNP／SRP、Host split 或即时 premature STATUS OUT"
-msgstr "Device/Host on FS/HS engines, PIO and HS AHB DMA. Device supports control, bulk, interrupt and single-transaction ISO packets. Device ISO uses the frame window for the observed speed, requires at most 1 second of remaining deadline on admission, and must fit the reviewed FIFO partition. It provides no ACK, automatic retry or periodic scheduling. The internal PHY remains FS; external ULPI provides HS/FS fallback. Explicit managed roles and optional ST Core bridges are available. High-bandwidth ISO, remote wake, automatic HNP/SRP, Host split and immediate premature STATUS OUT are not maintained"
-
-msgid "SD memory／MMC polling、有限 IRQ／DMA；SDIO functions 使用独立 face 的 CMD5／52／53。单卡、3.3 V，SD／SDIO 为 1／4 位，MMC 可显式选择经版本和 SWITCH 检查的 8 位十引脚软件参考。combo 不同时维护 memory portion；当前只接纳 `hse8-pll168`，不提供 HS／DDR／HS200"
-msgstr "SD memory / MMC polling and finite IRQ / DMA; SDIO functions use CMD5 / 52 / 53 through a separate face. One card, 3.3 V; SD / SDIO use 1 / 4-bit buses. MMC may explicitly select an 8-bit ten-pad software reference after version and SWITCH checks. Combo cards do not simultaneously maintain the memory portion. Only `hse8-pll168` is currently admitted; HS / DDR / HS200 are not provided"
-
-msgid "已审 TIM3／4／5／9–14 PWM；TIM1／3／4／5／8／9–14 原始输入捕获，按实例开放 1／2／4 通道，TIM5 保留 32 位；TIM1／3／4／5／8 支持 x2／x4 正交计数。TIM2 保留给 Core，TIM6／7 用作专用触发；timer personality 独占，IRQ 只取得所选模式实际使用的向量"
-msgstr "Reviewed TIM3 / 4 / 5 / 9–14 PWM; TIM1 / 3 / 4 / 5 / 8 / 9–14 raw input capture, with 1 / 2 / 4 channels according to the instance and a full 32-bit count on TIM5. TIM1 / 3 / 4 / 5 / 8 support x2 / x4 quadrature counting. TIM2 is reserved for Core and TIM6 / 7 for dedicated triggers. Timer personalities are exclusive; an IRQ lease covers only the vector actually used by the selected mode"
-
-msgid "精确封装全部 GPIO 的 input／output、四档显式输出速度与 EXTI0–15；PVD 原始电平／事件。省略速度保留已有配置，PC13–15 输出限制为 LOW；晶振和调试引脚仍受资源约束。保留 COALESCED／LOSS，不提供自动消抖、精确边沿时间或 BOR 资格"
-msgstr "Input / output on every GPIO pad of the exact packages, four explicit output-speed grades and EXTI0–15; raw PVD levels / events. An omitted speed preserves the existing setting, except PC13–15 outputs are restricted to LOW. Oscillator and debug pads remain subject to resource constraints. COALESCED / LOSS are preserved; no automatic debounce, exact edge time or BOR qualification"

@@ -43,7 +43,7 @@ nx_result_t erase(void* context, uint32_t offset, size_t length,
                   nx_time_us_t deadline) {
     return static_cast<FlashPort*>(context)->Erase(offset, length, deadline);
 }
-const nx_flash_ops_t operations{geometry, read, program, erase};
+const nx_flash_ops_t operations{geometry, read, program, erase, nullptr};
 const nx_mcuboot_flash_operation_t* product_operation = nullptr;
 nx_time_us_t clock_now = 100U;
 size_t clock_reads = 0U;

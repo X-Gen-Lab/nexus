@@ -66,6 +66,7 @@ typedef struct {
                            size_t length, nx_time_us_t deadline);
     nx_result_t (*erase)(void* context, uint32_t offset, size_t length,
                          nx_time_us_t deadline);
+    nx_result_t (*recover)(void* context);
 } nx_flash_ops_t;
 /**
  * \brief           Immutable interface pointing to caller-owned state.
@@ -155,6 +156,22 @@ nx_result_t nx_flash_port_program(const nx_flash_port_t* port, uint32_t offset,
  */
 nx_result_t nx_flash_port_erase(const nx_flash_port_t* port, uint32_t offset,
                                 size_t length, nx_time_us_t deadline);
+/**
+ * \brief           Retry retained physical cleanup without another pulse.
+ *
+ * \param[in]       port: Same serialized owner as the failed operation.
+ *
+ * \return          SUCCESS after actual cleanup; BUSY while hardware remains
+ *                  active, IO while cleanup is refused, or UNSUPPORTED when
+ *                  this optional provider operation is absent.
+ *
+ * \note            Privileged unmasked Thread on MCU. This bounded attempt
+ *                  never waits for a busy pulse, replays data, rolls back an
+ *                  irreversible effect or substitutes for a required POR.
+ *                  Preserve the owner until recovery succeeds. Recovery does
+ *                  not turn the original failed operation into success.
+ */
+nx_result_t nx_flash_port_recover(const nx_flash_port_t* port);
 /**
  * \brief           Validate region bounds against physical geometry.
  *

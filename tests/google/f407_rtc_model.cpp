@@ -31,6 +31,8 @@ void nx_f407_rtc_model_reset(bool retained) {
     m.rtc.SSR = 255U;
     m.rtc.ISR = RTC_ISR_ALRAWF | RTC_ISR_ALRBWF | RTC_ISR_WUTWF;
     if (retained) {
+        m.rcc.AHB1ENR = RCC_AHB1ENR_GPIOCEN;
+        m.gpio_c.MODER = 3U << 26U;
         m.rcc.APB1ENR = RCC_APB1ENR_PWREN;
         m.power.CR = PWR_CR_DBP;
         m.rcc.BDCR = RCC_BDCR_LSEON | RCC_BDCR_LSERDY | RCC_BDCR_RTCSEL_0 |
@@ -45,9 +47,21 @@ void nx_f407_rtc_model_reset(bool retained) {
 }
 uint32_t nx_f407_rtc_model_read(volatile uint32_t* p) {
     auto& m = g_f407_rtc_model;
+    if (p == &m.gpio_c.IDR) {
+        ++m.capture_pad_reads;
+        if (!(m.rcc.AHB1ENR & RCC_AHB1ENR_GPIOCEN))
+            ++m.capture_unclocked_reads;
+    }
     if (p == &m.rcc.BDCR && (m.rcc.BDCR & RCC_BDCR_LSEON) && !m.hold_lse)
         m.rcc.BDCR |= RCC_BDCR_LSERDY;
     if (p == &m.rtc.ISR) {
+        if (m.synchronization_pending && !(m.rtc.CR & RTC_CR_BYPSHAD) &&
+            !m.hold_synchronization) {
+            m.rtc.ISR |= RTC_ISR_RSF;
+            m.synchronization_pending = false;
+            m.synchronization_required = false;
+            ++m.synchronizations;
+        }
         if ((m.rtc.ISR & RTC_ISR_INIT) && !m.hold_init)
             m.rtc.ISR |= RTC_ISR_INITF;
         if (!(m.rtc.CR & RTC_CR_ALRAE) && !m.hold_alarm &&
@@ -125,12 +139,20 @@ void nx_f407_rtc_model_write(volatile uint32_t* p, uint32_t v) {
             return;
         if (p == &m.rtc.ISR) {
             if ((v & RTC_ISR_INIT) && !(m.rtc.ISR & RTC_ISR_INIT)) {
+                if (m.synchronization_required)
+                    ++m.unsynchronized_init;
                 m.prior_time = m.rtc.TR;
                 m.prior_date = m.rtc.DR;
                 m.reload_pending = false;
             }
-            if (!(v & RTC_ISR_INIT) && (m.rtc.ISR & RTC_ISR_INIT))
+            if (!(v & RTC_ISR_INIT) && (m.rtc.ISR & RTC_ISR_INIT)) {
                 m.reload_pending = true;
+                m.synchronization_required = true;
+            }
+            if (!(v & RTC_ISR_RSF)) {
+                m.rtc.ISR &= ~uint32_t{RTC_ISR_RSF};
+                m.synchronization_pending = !(m.rtc.CR & RTC_CR_BYPSHAD);
+            }
             const uint32_t w0c = RTC_ISR_ALRAF | RTC_ISR_ALRBF | RTC_ISR_WUTF |
                                  RTC_ISR_TSF | RTC_ISR_TSOVF | RTC_ISR_TAMP1F |
                                  RTC_ISR_TAMP2F;

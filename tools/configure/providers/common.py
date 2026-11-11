@@ -359,6 +359,10 @@ _MODE_TRAITS = MappingProxyType({
     **{('audio', role + '-' + direction): ModeTraits(
         irq=True, tx_dma=direction != 'rx', rx_dma=direction != 'tx')
        for role in ('master', 'slave') for direction in ('tx', 'rx', 'duplex')},
+    **{('audio', role + '-' + direction + '-blocks'): ModeTraits(
+        irq=True, tx_dma=direction != 'rx', rx_dma=direction != 'tx',
+        continuous=True)
+       for role in ('master', 'slave') for direction in ('tx', 'rx', 'duplex')},
     ("dac", "direct"): ModeTraits(polling=True),
     ("crc", "crc32-words"): ModeTraits(polling=True),
     ("dac", "triggered"): ModeTraits(polling=True),
@@ -447,6 +451,7 @@ _MODE_TRAITS = MappingProxyType({
     ("watchdog", "independent"): ModeTraits(),
     ("watchdog", "window"): ModeTraits(),
     ("exti", "edge-event"): ModeTraits(irq=True),
+    ("exti", "hardware-event"): ModeTraits(),
     ("exti", "pvd-level"): ModeTraits(polling=True),
     ("exti", "pvd-events"): ModeTraits(irq=True),
     ("pwm", "fixed-pwm"): ModeTraits(),

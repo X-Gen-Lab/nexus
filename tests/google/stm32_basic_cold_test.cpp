@@ -11,6 +11,7 @@ extern "C" {
 #include "stm32f407_control_cold.h"
 nx_stm32_system_t g_nx_stm32_system;
 }
+#include <cstring>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
 
@@ -20,6 +21,11 @@ static bool masked;
 static bool refuse_restricted_speed;
 static bool refuse_gpio_speed;
 static nx_time_us_t model_time;
+static bool flash_irq_enabled;
+static bool flash_irq_pending;
+static bool flash_irq_active;
+static bool flash_refuse_lock;
+static unsigned flash_writes;
 class BasicCold : public testing::Test {
   protected:
     void* mapping = MAP_FAILED;
@@ -45,6 +51,9 @@ class BasicCold : public testing::Test {
         refuse_restricted_speed = false;
         refuse_gpio_speed = false;
         model_time = 100U;
+        flash_irq_enabled = flash_irq_pending = flash_irq_active = false;
+        flash_refuse_lock = false;
+        flash_writes = 0U;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
     }
@@ -86,6 +95,34 @@ TEST_F(BasicCold, GPIOInputUsesSameAuthorizedBankWithoutOutputMode) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32_gpio_prepare(&gpio, &config));
     EXPECT_FALSE(gpio.output);
     EXPECT_EQ(0U, GPIOD->MODER & (3U << 24U));
+}
+
+TEST_F(BasicCold, CrystalLseRejectsPc13BeforeAnyGpioClockOrPadWrite) {
+    config.registers = GPIOC;
+    config.mask = 1U << 13U;
+    config.initial = 0U;
+    config.output = false;
+    for (uint32_t source :
+         {uint32_t{RCC_BDCR_LSEON}, uint32_t{RCC_BDCR_LSERDY}}) {
+        gpio = {};
+        RCC->AHB1ENR = 0U;
+        RCC->BDCR = source;
+        const auto before = *GPIOC;
+        EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_gpio_prepare(&gpio, &config));
+        EXPECT_EQ(0U, RCC->AHB1ENR);
+        EXPECT_EQ(nullptr, gpio.registers);
+        EXPECT_EQ(0, std::memcmp(&before, GPIOC, sizeof(before)));
+    }
+}
+
+TEST_F(BasicCold, BypassedLseDoesNotApplyThePc13CrystalErratum) {
+    config.registers = GPIOC;
+    config.mask = 1U << 13U;
+    config.initial = 0U;
+    config.output = false;
+    RCC->BDCR = RCC_BDCR_LSEBYP | RCC_BDCR_LSEON | RCC_BDCR_LSERDY;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_gpio_prepare(&gpio, &config));
+    EXPECT_TRUE(gpio.initialized);
 }
 
 TEST_F(BasicCold, GPIOInputUsesExplicitPullWithoutChangingOtherPins) {
@@ -239,16 +276,39 @@ TEST_F(BasicCold, FlashRejectsMalformedGeometryBeforeBinding) {
     EXPECT_EQ(nullptr, flash.registers);
 }
 
-TEST_F(BasicCold, FlashCloseRetainsActiveOrPhysicallyBusyOwner) {
+TEST_F(BasicCold, FlashCloseRetriesOwnedCleanupAndRetainsUnsettledHardware) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32_flash_prepare(&flash, &geometry, 3300U));
     flash.active = true;
-    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_flash_close(&flash));
-    flash.active = false;
+    FLASH->CR = FLASH_CR_PG | FLASH_CR_EOPIE;
+    FLASH->SR = FLASH_SR_EOP;
+    flash_refuse_lock = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_flash_close(&flash));
+    EXPECT_TRUE(flash.active);
+    EXPECT_NE(0U, FLASH->CR & FLASH_CR_PG);
+    unsigned writes_before = flash_writes;
     FLASH->SR = FLASH_SR_BSY;
     EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_flash_close(&flash));
-    EXPECT_EQ(&geometry, flash.geometry);
+    EXPECT_TRUE(flash.active);
+    EXPECT_EQ(writes_before, flash_writes);
     FLASH->SR = 0U;
+    flash_irq_enabled = true;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_flash_close(&flash));
+    EXPECT_TRUE(flash.active);
+    EXPECT_EQ(writes_before, flash_writes);
+    flash_irq_enabled = false;
+    flash_irq_active = true;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_flash_close(&flash));
+    EXPECT_TRUE(flash.active);
+    EXPECT_EQ(writes_before, flash_writes);
+    flash_irq_active = false;
+    flash_irq_pending = true;
+    flash_refuse_lock = false;
+    EXPECT_EQ(&geometry, flash.geometry);
     EXPECT_EQ(NX_SUCCESS, nx_stm32_flash_close(&flash));
+    EXPECT_FALSE(flash.active);
+    EXPECT_FALSE(flash_irq_pending);
+    EXPECT_EQ(FLASH_CR_LOCK, FLASH->CR);
+    EXPECT_EQ(0U, FLASH->SR);
 }
 
 TEST_F(BasicCold, WatchdogBindingDoesNotStartOscillatorOrCounting) {
@@ -288,6 +348,38 @@ TEST_F(BasicCold, AllPreparationsRejectWrongContextBeforeBindingOrMMIO) {
 
 extern "C" bool nx_arch_is_privileged(void) {
     return privileged;
+}
+
+/** \brief Observe external W1C and a refused physical Flash lock write. */
+extern "C" void nx_basic_cold_flash_write(volatile uint32_t* reg,
+                                          uint32_t value) {
+    ++flash_writes;
+    if (reg == &FLASH->SR)
+        *reg &= ~value;
+    else if (!(reg == &FLASH->CR && flash_refuse_lock &&
+               (value & FLASH_CR_LOCK) != 0U))
+        *reg = value;
+}
+
+/** \brief External NVIC enable and pending facts, not cleanup outcomes. */
+extern "C" bool nx_basic_cold_flash_irq_idle(void) {
+    return !flash_irq_enabled && !flash_irq_pending;
+}
+
+/** \brief External Flash vector enable fact. */
+extern "C" bool nx_basic_cold_flash_irq_enabled(void) {
+    return flash_irq_enabled;
+}
+
+/** \brief External Flash handler activity fact. */
+extern "C" bool nx_basic_cold_flash_irq_active(void) {
+    return flash_irq_active;
+}
+
+/** \brief Model the disabled Flash vector's real pending acknowledgement. */
+extern "C" bool nx_basic_cold_flash_irq_clear(void) {
+    flash_irq_pending = false;
+    return !flash_irq_enabled && !flash_irq_active;
 }
 extern "C" bool nx_arch_in_isr(void) {
     return in_isr;

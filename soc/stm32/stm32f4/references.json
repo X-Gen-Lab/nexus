@@ -10,9 +10,9 @@
       "sha256": "1f41b4fa49a9960215ebb76cd0a75f20241db82eed60d308345a80463caeed22",
       "bytes": 2792056,
       "anchors": {
-        "package_gpio": "Table 7, printed pages 49\u201360; Figure 13 p44 (LQFP100) / Figure 14 p45 (LQFP144)",
+        "package_gpio": "Table 7, printed pages 49–60; Figure 13 p44 (LQFP100) / Figure 14 p45 (LQFP144)",
         "alternate_functions": "Table 9, printed page64 onward",
-        "device_features": "Table 2, printed pages 15\u201316"
+        "device_features": "Table 2, printed pages 15–16"
       }
     },
     "reference_manual": {
@@ -24,7 +24,7 @@
       "sha256": "f3ff2322eec21f4e49081f68481b764506eee81dba6031bc767e2f8955b27cca",
       "bytes": 21385881,
       "anchors": {
-        "memory": "Section 2.3.1\u20132.3.2 p68; Table 5 flash organization p75",
+        "memory": "Section 2.3.1–2.3.2 p68; Table 5 flash organization p75",
         "dma_mapping": "Tables 43/44 pp309/310",
         "irq": "Section 12.1.3 pp373ff, Table62 pp374ff (F405/407)",
         "clock": "STM32F405/407/415/417 Figure21 p217; Section7"
@@ -40,7 +40,8 @@
       "bytes": 2231932,
       "anchors": {
         "applicability": "Table1 and Table2 p1; revision-specific device limitations Table3 pp2ff",
-        "arm_776924": "ES0182 Rev19 section2.1.2 pp6-7, Table3 marks all listed cuts affected: FPU enabled, lazy context enabled, VDIV/VSQRT destination s0-s15, no-FP ISR and exception return within14cycles can lose the result. Workarounds are disabling LSPEN or ensuring every ISR executes more than2instructions excluding exception return. The platform retains the selected FreeRTOS CM4F lazy-frame ABI; generated and external ISR paths must satisfy the latter condition, counting reachable callees rather than unreachable padding/data. A selected image without VDIV/VSQRT does not exclude the condition in external application code; physical revision and qualification remain unobserved."
+        "arm_776924": "ES0182 Rev19 section2.1.2 pp6-7, Table3 marks all listed cuts affected: FPU enabled, lazy context enabled, VDIV/VSQRT destination s0-s15, no-FP ISR and exception return within14cycles can lose the result. Workarounds are disabling LSPEN or ensuring every ISR executes more than2instructions excluding exception return. The platform retains the selected FreeRTOS CM4F lazy-frame ABI; generated and external ISR paths must satisfy the latter condition, counting reachable callees rather than unreachable padding/data. A selected image without VDIV/VSQRT does not exclude the condition in external application code; physical revision and qualification remain unobserved.",
+        "software_audit": "errata_review.software_audit: all92 numbered ES0182 Rev19 sections, Table3 A/Z/1/2/Y/4/5/6 applicability and Table4 documentation erratum; per-mode constraints remain explicit. Runtime admission is implemented once in private/stm32f407_silicon.h; no physical cut is inferred."
       }
     }
   },
@@ -55,14 +56,1611 @@
   },
   "errata_review": {
     "document": "errata",
-    "status": "applicability_only",
+    "status": "software_audited_with_constraints",
     "silicon_revision": "not_observed",
-    "mode_workarounds": "not_fully_audited",
+    "mode_workarounds": "audited_with_constraints",
     "hardware_qualification": "not_executed",
-    "identification": "ES0182 Table2, device marking plus DBGMCU_IDCODE REV_ID[15:0]; Table3 per revision/application applicability"
+    "identification": "ES0182 Table2, device marking plus DBGMCU_IDCODE REV_ID[15:0]; Table3 per revision/application applicability",
+    "software_audit": {
+      "document_sha256": "1d3da0f99b85013548d17df07919516bf862f8f38cbd1a61f08e75abb8e4c54f",
+      "revision_order": [
+        "A",
+        "Z",
+        "1",
+        "2",
+        "Y",
+        "4",
+        "5",
+        "6"
+      ],
+      "maintained_modes": [
+        "adc:injected-shot",
+        "adc:low-rate-scan",
+        "adc:single-shot",
+        "adc:trigger-dma",
+        "adc:trigger-dma-continuous",
+        "adc_group:injected-sequence",
+        "adc_group:regular-sequence-dma",
+        "advanced_pwm:complementary-pwm",
+        "audio:master-duplex",
+        "audio:master-duplex-blocks",
+        "audio:master-rx",
+        "audio:master-rx-blocks",
+        "audio:master-tx",
+        "audio:master-tx-blocks",
+        "audio:slave-duplex",
+        "audio:slave-duplex-blocks",
+        "audio:slave-rx",
+        "audio:slave-rx-blocks",
+        "audio:slave-tx",
+        "audio:slave-tx-blocks",
+        "block:sdio-dma",
+        "block:sdio-irq",
+        "block:sdio-poll",
+        "can:classic-irq",
+        "capture:raw-blocks",
+        "capture:snapshot-jpeg",
+        "capture:snapshot-raw",
+        "crc:crc32-words",
+        "dac:direct",
+        "dac:noise",
+        "dac:triangle",
+        "dac:trigger-dma",
+        "dac:trigger-dma-circular",
+        "dac:triggered",
+        "encoder:quadrature",
+        "entropy:rng-words",
+        "eth:raw-mii",
+        "eth:raw-rmii",
+        "eth_frames:mii-vlan-sg-ptp",
+        "eth_frames:rmii-vlan-sg-ptp",
+        "external_bus:async16",
+        "external_bus:external-memory",
+        "exti:edge-event",
+        "exti:hardware-event",
+        "exti:pvd-events",
+        "exti:pvd-level",
+        "flash:poll-word",
+        "flash_async:nor-cfi",
+        "gpio:input",
+        "gpio:output",
+        "i2c:dma-messages",
+        "i2c:irq-messages",
+        "i2c:poll-messages",
+        "i2c_target:smbus-device",
+        "i2c_target:target-irq",
+        "memory_window:cpu-window",
+        "memory_window:psram-window",
+        "memory_window:startup-memory",
+        "nand:raw-page",
+        "parallel16:8080-16",
+        "pwm:fixed-pwm",
+        "pwm_group:coherent-pwm",
+        "rtc:adopt-retained",
+        "rtc:provision-empty",
+        "spi:dma",
+        "spi:irq-frames",
+        "spi:short-poll",
+        "timer_capture:edge-capture",
+        "timer_pulse:one-pulse",
+        "timer_sequence:dma-burst",
+        "uart:dma-duplex",
+        "uart:dma-duplex-continuous",
+        "uart:dma-tx",
+        "uart:irq-blocks",
+        "uart:irq-byte-event",
+        "uart:irq-wire",
+        "uart:irq-words",
+        "uart:rx-dma-continuous",
+        "uart:rx-dma-idle",
+        "usb_device:device-fs",
+        "usb_device:device-hs-fs",
+        "usb_device:device-hs-ulpi",
+        "usb_device:otg-fs",
+        "usb_device:otg-hs-fs",
+        "usb_device:otg-hs-ulpi",
+        "usb_host:host-fs",
+        "usb_host:host-hs-fs",
+        "usb_host:host-hs-ulpi",
+        "watchdog:independent",
+        "watchdog:window"
+      ],
+      "items": [
+        {
+          "section": "2.1.1",
+          "title": "Interrupted loads to SP can cause erroneous behavior",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "An interrupt interrupts an indexed or direct load into SP in handwritten assembly.",
+          "handling": "Maintained C compilation does not emit these SP loads. External assembly must load a general register then MOV SP; review linked reachable assembly when adding an ISR/context port. A host model cannot prove the silicon instruction interleaving.",
+          "implementation": [
+            "arch/arm/cortex_m/nx_arch_cortex_m.c",
+            "tools/configure/bindings.py"
+          ],
+          "regressions": [
+            "tools/configure/test_irq_errata.py"
+          ]
+        },
+        {
+          "section": "2.1.2",
+          "title": "VDIV or VSQRT instructions might not complete correctly when very short ISRs are used",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "FPU and lazy stacking enabled, VDIV/VSQRT result s0-s15, no-FP ISR returns within 14 cycles.",
+          "handling": "Retain the FreeRTOS CM4F lazy-frame ABI. Generated entries call real handlers and end in DSB; linked entries and external/kernel overrides must execute more than two instructions excluding exception return, counting reachable callees. The absence of VDIV in a platform-only image does not qualify external application code.",
+          "implementation": [
+            "arch/arm/cortex_m/nx_arch_cortex_m.c",
+            "tools/configure/bindings.py"
+          ],
+          "regressions": [
+            "tools/configure/test_irq_errata.py"
+          ]
+        },
+        {
+          "section": "2.1.3",
+          "title": "Store immediate overlapping exception return operation might vector to incorrect interrupt",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "A buffered immediate-offset store overlaps exception return and a late interrupt priority change.",
+          "handling": "Every generator-owned F4 IRQ entry ends in nx_arch_dsb before its outer return; generation handles accepted thin-entry whitespace and refuses early returns. The handwritten TIM2 and low-power SysTick entries also issue a final DSB after their real handlers. Normal FreeRTOS uses a Nexus-owned entry calling the renamed real kernel tick then DSB, without modifying vendor code. Arch restore barriers do not substitute for these final stores. External/overridden entries remain responsible for the same rule. The maintained ThreadX M4 SysTick assembly calls the real _tx_timer_interrupt, restores registers, executes DSB SY and only then BX LR; its actual linked entry is checked separately.",
+          "implementation": [
+            "arch/arm/cortex_m/nx_arch_cortex_m.c",
+            "tools/configure/bindings.py",
+            "soc/stm32/stm32f4/system.c",
+            "soc/stm32/stm32f4/timebase_lowpower.c",
+            "os/freertos/systick.c",
+            "os/freertos/include/FreeRTOSConfig.h",
+            "os/threadx/m4_vectors.S"
+          ],
+          "regressions": [
+            "tools/configure/test_irq_errata.py",
+            "tests/google/stm32_system_transaction_test.cpp",
+            "tests/google/timebase_soc_integration_test.cpp",
+            "scripts/ci/test_os_threadx.py"
+          ]
+        },
+        {
+          "section": "2.2.1",
+          "title": "ART Accelerator prefetch queue instruction is not supported",
+          "revisions": "N-------",
+          "assessment": "excluded_mode",
+          "condition": "ART instruction prefetch on revision A.",
+          "handling": "DEV_ID 0x413 plus the centralized five-cut whitelist rejects observed revision A and unknown cuts before System/platform/pre-C external-memory effects. No revision-A prefetch support is claimed.",
+          "implementation": [
+            "soc/stm32/stm32f4/private/stm32f407_silicon.h",
+            "soc/stm32/stm32f4/system.c",
+            "soc/stm32/stm32f4/sram_boot.c"
+          ],
+          "regressions": [
+            "tests/google/stm32_basic_cold_test.cpp",
+            "tests/google/f407_sram_boot_test.cpp",
+            "tests/google/stm32f407_handoff_test.cpp"
+          ]
+        },
+        {
+          "section": "2.2.2",
+          "title": "MCU device ID is incorrect",
+          "revisions": "A-------",
+          "assessment": "excluded_mode",
+          "condition": "Revision A reports the F2 device identity and observed REV_ID 0x2000 rather than nominal Table2 0x1000.",
+          "handling": "Revision A is deliberately rejected rather than guessed from a family macro. The same read-only C admission rule is used by System, controlled handoff and pre-C external SRAM; accepted table revisions are software allowlisted, not physically observed.",
+          "implementation": [
+            "soc/stm32/stm32f4/private/stm32f407_silicon.h",
+            "soc/stm32/stm32f4/system.c",
+            "soc/stm32/stm32f4/sram_boot.c"
+          ],
+          "regressions": [
+            "tests/google/stm32_basic_cold_test.cpp",
+            "tests/google/f407_sram_boot_test.cpp",
+            "tests/google/stm32f407_handoff_test.cpp"
+          ]
+        },
+        {
+          "section": "2.2.3",
+          "title": "Debugging Stop mode and SysTick timer",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "DBG_STOP and enabled SysTick interrupt cause an unwanted Stop wakeup.",
+          "handling": "Drained deep-power admission rejects enabled SysTick, TICKINT and pending SysTick before entry; OS suspension and exact wake publishers are explicit. Raw debugger writes after admission violate the exclusive configuration contract.",
+          "implementation": [
+            "soc/stm32/stm32f4/power.c",
+            "soc/stm32/stm32f4/drivers/rtc.c"
+          ],
+          "regressions": [
+            "tests/google/power_rtc_integration_test.cpp",
+            "tests/google/timebase_lowpower_test.cpp"
+          ]
+        },
+        {
+          "section": "2.2.4",
+          "title": "Debugging Stop mode with WFE entry",
+          "revisions": "AAAAAAAA",
+          "assessment": "excluded_mode",
+          "condition": "Stop debug uses WFE followed directly by sequential instructions.",
+          "handling": "The maintained F407 deep-power owner uses WFI; no WFE Stop entry mode is exposed. A future WFE mode must implement the dedicated WFE/NOP/BX sequence rather than inherit this exclusion.",
+          "implementation": [
+            "soc/stm32/stm32f4/power.c",
+            "soc/stm32/stm32f4/drivers/rtc.c"
+          ],
+          "regressions": [
+            "tests/google/power_rtc_integration_test.cpp",
+            "tests/google/timebase_lowpower_test.cpp"
+          ]
+        },
+        {
+          "section": "2.2.5",
+          "title": "Debugging Sleep/Stop mode with WFE/WFI entry",
+          "revisions": "AAAAAAAA",
+          "assessment": "excluded_mode",
+          "condition": "Debug Sleep/Stop, disabled ART prefetch, nonzero Flash wait states and the affected WFI/WFE alignment.",
+          "handling": "Maintained System configures prefetch enabled, so its supported sleep/stop profile excludes the combined condition. A product that changes ACR or supplies its own low-power entry must apply the three-NOP, SRAM-entry or active-AHB workaround; precision ADC advice is not an implicit authorization to mutate the platform clock owner.",
+          "implementation": [
+            "soc/stm32/stm32f4/system.c",
+            "tools/configure/stm32f4/clocks.py"
+          ],
+          "regressions": [
+            "tests/google/stm32_ahb_clock_test.cpp",
+            "tools/configure/test_f407_clocks.py"
+          ]
+        },
+        {
+          "section": "2.2.6",
+          "title": "Wake-up sequence from Standby mode when using more than one wake-up source",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Multiple Standby wake sources are ORed while one is already high when WUF is cleared.",
+          "handling": "Joined RTC Standby preparation disables sources, waits readiness, clears only authorized observed flags, then the power owner clears WUF before restoring sources and committing. A still-active physical input may cause an immediate reset, which is not reported as a successful software return.",
+          "implementation": [
+            "soc/stm32/stm32f4/power.c",
+            "soc/stm32/stm32f4/drivers/rtc.c"
+          ],
+          "regressions": [
+            "tests/google/power_rtc_integration_test.cpp",
+            "tests/google/timebase_lowpower_test.cpp"
+          ]
+        },
+        {
+          "section": "2.2.7",
+          "title": "Full JTAG configuration without NJTRST pin cannot be used",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "Full four-wire JTAG debugging while PB4/NJTRST is reused as GPIO.",
+          "handling": "Maintained reference debugging uses SWD. An external product choosing full JTAG must reserve NJTRST and must not infer a working four-wire JTAG configuration from ordinary GPIO capability; debugger electrical behavior is outside model qualification.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/gpio.c",
+            "soc/stm32/stm32f4/drivers/platform_cold.c",
+            "tools/configure/stm32f4/rtc.py"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.2.8",
+          "title": "PDR_ON pin not available on LQFP100 package except for revision A devices",
+          "revisions": "-NNNNNNN",
+          "assessment": "external_constraint",
+          "condition": "LQFP100 revision migration changes pin99 from PDR_ON on A to VSS on later cuts.",
+          "handling": "Only non-A cuts are admitted, and Board/package facts describe VSS. Supply minima and PCB grounding require schematic/electrical verification; firmware cannot repair a legacy revision-A board wired for PDR_ON. No voltage or physical cut is inferred from the order code.",
+          "implementation": [
+            "soc/stm32/stm32f4/private/stm32f407_silicon.h",
+            "soc/stm32/stm32f4/system.c",
+            "soc/stm32/stm32f4/sram_boot.c"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.2.9",
+          "title": "Incorrect BOR option byte when consecutively programming BOR option byte",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Consecutive BOR option programming without reset while actual AHB prescaler is greater than two.",
+          "handling": "Before any option unlock, an actual BOR change reads the live HPRE and rejects values above DIV2. Unchanged BOR and unrelated options do not require invented history. No automatic clock retuning occurs inside Flash maintenance.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/flash.c",
+            "docs/design/f407-storage.md"
+          ],
+          "regressions": [
+            "tests/google/flash_program_test.cpp",
+            "tests/google/flash_provenance_test.cpp"
+          ]
+        },
+        {
+          "section": "2.2.10",
+          "title": "Configuration of PH10 and PI10 as external interrupts is erroneous",
+          "revisions": "NNNNNNNN",
+          "assessment": "excluded_mode",
+          "condition": "PH10 or PI10 selected as EXTI10 also depends on PH2 or PI2 routing.",
+          "handling": "Neither PH10 nor PI10 is bonded in the two maintained VE100/ZG144 parts. Package/route validation rejects these sources before construction. Adding a larger package requires a new explicit EXTI errata decision.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/gpio.c",
+            "soc/stm32/stm32f4/drivers/platform_cold.c",
+            "tools/configure/stm32f4/rtc.py"
+          ],
+          "regressions": [
+            "tests/google/stm32_platform_cold_test.cpp",
+            "tests/google/stm32_basic_cold_test.cpp",
+            "tools/configure/test_f407_rtc_configuration.py"
+          ]
+        },
+        {
+          "section": "2.2.11",
+          "title": "Slowing down APB clock during a DMA transfer",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "APB is slowed while DMA writes that same APB peripheral.",
+          "handling": "RUN frequencies are selected statically. Runtime power transitions require joined controller borrowers and actual disabled DMA streams before the RCC owner changes frequency; cold clock operations precede selected peripheral start. Direct concurrent application RCC writes are outside the owner contract.",
+          "implementation": [
+            "soc/stm32/stm32f4/power.c",
+            "soc/stm32/stm32f4/drivers/rtc.c"
+          ],
+          "regressions": [
+            "tests/google/power_rtc_integration_test.cpp",
+            "tests/google/timebase_lowpower_test.cpp"
+          ]
+        },
+        {
+          "section": "2.2.12",
+          "title": "MPU attribute to RTC and IWDG registers incorrectly managed",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "MPU requests nonbufferable RTC/IWDG access while AHB/APB prescaler is one.",
+          "handling": "RTC control uses explicit readback and bounded readiness observations. Do not rely on the MPU nonbufferable attribute alone, particularly for write-only watchdog key commands: when completion is required, the external MPU/critical-sequence owner must issue a same-peripheral read after the write. No universal strongly-ordered MPU claim is made.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/watchdog.c",
+            "tools/configure/stm32f4/clocks.py",
+            "soc/stm32/stm32f4/power.c"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.2.13",
+          "title": "Delay after an RCC peripheral clock enabling",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "A peripheral register is accessed immediately after its RCC interface gate is enabled.",
+          "handling": "Cold GPIO/platform and independent peripheral owners retain acquired gates, issue DSB and read RCC gate state before peripheral access. Failed gate visibility retains cleanup responsibility; this is not replaced with an uncalibrated NOP delay.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/gpio.c",
+            "soc/stm32/stm32f4/drivers/platform_cold.c",
+            "tools/configure/stm32f4/rtc.py"
+          ],
+          "regressions": [
+            "tests/google/stm32_platform_cold_test.cpp",
+            "tests/google/stm32_basic_cold_test.cpp",
+            "tools/configure/test_f407_rtc_configuration.py"
+          ]
+        },
+        {
+          "section": "2.2.14",
+          "title": "Battery charge monitoring lower than 2.4 V",
+          "revisions": "PPPPPPPP",
+          "assessment": "external_constraint",
+          "condition": "VBAT/2 conversion with VDD=VDDA at or below 2.4 V or above the permitted ADC input margin.",
+          "handling": "Current static RUN supply profiles require 2.7..3.6 V, but this is authored data rather than a voltage measurement. Products using VBAT monitoring must establish actual VDDA>2.4 V and input margin over temperature; raw ADC codes do not certify battery voltage.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/adc.c",
+            "soc/stm32/stm32f4/drivers/adc_group.c",
+            "soc/stm32/stm32f4/drivers/adc_injected.c"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.2.15",
+          "title": "Internal noise impacting the ADC accuracy",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "Internal supply noise reduces ADC accuracy in any power mode.",
+          "handling": "ADC contracts expose raw codes, timing and buffer ownership, not ENOB or accuracy. The documented precision procedure is prefetch OFF with I/D caches ON plus averaging/filtering and AN4073 electrical measures. The default prefetch-ON performance profile is not claimed to implement that procedure; precision profiles need a reviewed System/sleep contract and physical measurements.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/adc.c",
+            "soc/stm32/stm32f4/drivers/adc_group.c",
+            "soc/stm32/stm32f4/drivers/adc_injected.c"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.2.16",
+          "title": "RDP level 2 and sector write protection configuration",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "RDP level2 does not make sector write protection immutable to privileged user code.",
+          "handling": "Generic maintenance rejects irreversible RDP2 promotion. Ordinary Flash capability is not an MPU/security boundary; a separate manufacturing/security design must protect sensitive sectors and OPTCR and audit ISR privilege. Do not claim RDP2 makes WRP immutable.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/flash.c",
+            "docs/design/f407-storage.md"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.2.17",
+          "title": "Possible delay in backup domain protection disabling/enabling after programming the DBP bit",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "DBP protection changes become effective later than the APB write.",
+          "handling": "RTC preparation and close use PWR_CR readback after DBP writes before any backup-domain access or lease release. Failed visibility keeps the same pending responsibility; no optimistic software flag substitutes for readback.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/rtc.c",
+            "docs/design/f407-rtc.md"
+          ],
+          "regressions": [
+            "tests/google/f407_rtc_test.cpp",
+            "tools/configure/test_f407_rtc_configuration.py"
+          ]
+        },
+        {
+          "section": "2.2.18",
+          "title": "PC13 signal transitions disturb LSE",
+          "revisions": "NNNNNNNN",
+          "assessment": "excluded_mode",
+          "condition": "Digital transitions on PC13 disturb a running crystal LSE; explicit external-clock bypass is unaffected.",
+          "handling": "Crystal RTC statically claims PC13, provisions it analog before LSEON, rejects foreign pulls/locks/driver and adopts only an already quiet pad. Generic GPIO/EXTI refuses live crystal ownership. Crystal timestamp/tamper is rejected. Quiet-pad responsibility remains with persistent oscillator handoff; a separately authored 32768-Hz bypass Board enables the PC13 capture path without inventing existing-board wiring.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/rtc.c",
+            "docs/design/f407-rtc.md"
+          ],
+          "regressions": [
+            "tests/google/f407_rtc_test.cpp",
+            "tools/configure/test_f407_rtc_configuration.py"
+          ]
+        },
+        {
+          "section": "2.2.19",
+          "title": "In some specific cases, DMA2 data corruption occurs when managing AHB and APB2 peripherals in a concurrent way",
+          "revisions": "AAAAAAAA",
+          "assessment": "excluded_mode",
+          "condition": "DMA2 AHB peripheral-port requests to a FIFO-like FSMC/QUADSPI target or GPIO writes run concurrently with APB2 requests.",
+          "handling": "Selected F407 DMA paths do not use DMA2 peripheral-port writes to GPIO or FIFO-like FSMC/QUADSPI. FSMC endpoints are CPU controlled and F407 has no QUADSPI provider. Do not prohibit unrelated ADC/SDIO concurrency or mislabel internal-SRAM repeated accesses as this FIFO corruption; a future affected route must choose the memory port explicitly.",
+          "implementation": [
+            "tools/configure/stm32f4/hardware.py",
+            "io/src/mechanisms/dma.c",
+            "docs/design/multiple-dma-controllers.md"
+          ],
+          "regressions": [
+            "tools/configure/test_f407_clocks.py"
+          ]
+        },
+        {
+          "section": "2.2.20",
+          "title": "Corrupted content of the backup domain due to a missed power-on reset after this domain supply voltage drop",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "A backup supply decay in the 100..700-mV retention window can miss power-on reset.",
+          "handling": "Adopt-retained requires externally established trusted backup provenance, not just INITS or a valid-looking BCD value. Products must satisfy the documented below-100-mV/200-ms power decay or intentionally erase the backup domain after a qualifying POR. The generic owner never destroys retained state automatically to hide an unknown supply history.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/rtc.c",
+            "docs/design/f407-rtc.md"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.3.1",
+          "title": "Dummy read cycles inserted when reading synchronous memories",
+          "revisions": "NNNNNNNN",
+          "assessment": "excluded_mode",
+          "condition": "Synchronous burst memory reads insert two unused dummy accesses.",
+          "handling": "Only reviewed asynchronous SRAM/PSRAM/NOR/NAND and 8080 endpoints are exposed. No synchronous burst mode is emitted or claimed.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/fsmc.c",
+            "soc/stm32/stm32f4/drivers/fsmc_nor.c",
+            "tools/configure/stm32f4/fsmc.py"
+          ],
+          "regressions": [
+            "tests/google/f407_fsmc_test.cpp",
+            "tests/google/f407_fsmc_boot_test.cpp"
+          ]
+        },
+        {
+          "section": "2.3.2",
+          "title": "FSMC synchronous mode and NWAIT signal disabled",
+          "revisions": "AAAAAAAA",
+          "assessment": "excluded_mode",
+          "condition": "Synchronous FSMC with disabled NWAIT and matching WAITPOL/input level can hang.",
+          "handling": "Current F407 endpoints keep synchronous BURSTEN/CBURSTRW disabled and do not expose a synchronous NWAIT option. A future synchronous endpoint needs its own PD6/WAITPOL contract.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/fsmc.c",
+            "soc/stm32/stm32f4/drivers/fsmc_nor.c",
+            "tools/configure/stm32f4/fsmc.py"
+          ],
+          "regressions": [
+            "tests/google/f407_fsmc_test.cpp",
+            "tests/google/f407_fsmc_boot_test.cpp"
+          ]
+        },
+        {
+          "section": "2.3.3",
+          "title": "FSMC NOR/PSRAM controller: asynchronous read access on bank 2 to 4 returns wrong data when bank 1 is in synchronous mode (BURSTEN bit is set)",
+          "revisions": "AAAAAAAA",
+          "assessment": "excluded_mode",
+          "condition": "Synchronous bank1 is mixed with CPU asynchronous reads on banks2..4.",
+          "handling": "All maintained banks are asynchronous; cold admission does not adopt foreign active banks or pre-C profiles outside the exact SRAM plan. Mixed synchronous/asynchronous bank selection is not exposed.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/fsmc.c",
+            "soc/stm32/stm32f4/drivers/fsmc_nor.c",
+            "tools/configure/stm32f4/fsmc.py"
+          ],
+          "regressions": [
+            "tests/google/f407_fsmc_test.cpp",
+            "tests/google/f407_fsmc_boot_test.cpp"
+          ]
+        },
+        {
+          "section": "2.4.1",
+          "title": "Wrong data written during SDIO hardware flow control",
+          "revisions": "NNNNNNNN",
+          "assessment": "excluded_mode",
+          "condition": "SDIO hardware flow control can corrupt transmitted data.",
+          "handling": "The only clock constructor explicitly selects HardwareFlowControl DISABLE and driver code handles FIFO overrun/underrun. No API can select HWFC_EN.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/sdio.c",
+            "tools/configure/stm32f4/block.py",
+            "docs/design/f407-storage.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_sdio_block_test.cpp"
+          ]
+        },
+        {
+          "section": "2.4.2",
+          "title": "Wrong CCRCFAIL status after a response without CRC is received",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "CRC-less CMD5 R4 (and other OCR responses) raises CCRCFAIL spuriously.",
+          "handling": "The typed response parser ignores CCRCFAIL only for R3/R4, still clears observed flags and keeps CRC-bearing R1/R2/R5/R6/R7 strict. CMD5 IO discovery uses R4 rather than globally suppressing command CRC errors.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/sdio.c",
+            "tools/configure/stm32f4/block.py",
+            "docs/design/f407-storage.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_sdio_block_test.cpp"
+          ]
+        },
+        {
+          "section": "2.4.3",
+          "title": "SDIO clock divider Bypass mode may not work properly",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "48-MHz bypass SDIO clock violates SD/MMC hold timing.",
+          "handling": "Clock construction explicitly disables bypass and selects reviewed CLKDIV values for 400-kHz initialization and 12-MHz transfer. PLL48 remains exact for shared USB/RNG users; no implicit 75-MHz retuning occurs.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/sdio.c",
+            "tools/configure/stm32f4/block.py",
+            "docs/design/f407-storage.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_sdio_block_test.cpp"
+          ]
+        },
+        {
+          "section": "2.4.4",
+          "title": "Data corruption in SDIO clock dephasing (NEGEDGE) mode",
+          "revisions": "NNNNNNNN",
+          "assessment": "excluded_mode",
+          "condition": "NEGEDGE dephasing can corrupt data and responses.",
+          "handling": "Clock construction fixes rising edge and exposes no NEGEDGE mode; owned selected-state checks do not authorize a foreign clock tuple.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/sdio.c",
+            "tools/configure/stm32f4/block.py",
+            "docs/design/f407-storage.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_sdio_block_test.cpp"
+          ]
+        },
+        {
+          "section": "2.4.5",
+          "title": "CE-ATA multiple write command and card busy signal management",
+          "revisions": "AAAAAAAA",
+          "assessment": "excluded_mode",
+          "condition": "CE-ATA writes start before the card deasserts its busy line.",
+          "handling": "Supported protocols are SD memory, MMC memory and SDIO functions; no CE-ATA RW_MULTIPLE/FAST_IO protocol is exposed. MMC ready/status polling is not a claim of CE-ATA support.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/sdio.c",
+            "tools/configure/stm32f4/block.py",
+            "docs/design/f407-storage.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_sdio_block_test.cpp"
+          ]
+        },
+        {
+          "section": "2.4.6",
+          "title": "No underrun detection with wrong data transmission",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "3/PCLK2+3/SDIOCLK is at least 32/(buswidth*SDIO_CK), permitting silent underrun corruption.",
+          "handling": "At the maintained SDIO RUN profile PCLK2=84 MHz, SDIOCLK=48 MHz, divider2 gives SDIO_CK=12 MHz; even width8 has 98.22 ns <333.33 ns. Board rates and future custom-clock acceptance must preserve the strict inequality. FIFO service latency still requires real bandwidth measurement; a CRC/status model is not a physical timing qualification.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/sdio.c",
+            "tools/configure/stm32f4/block.py",
+            "docs/design/f407-storage.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_sdio_block_test.cpp"
+          ]
+        },
+        {
+          "section": "2.5.1",
+          "title": "ADC sequencer modification during conversion",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Software-triggered ADC sequence registers are changed during an active conversion.",
+          "handling": "Regular/injected sequence preparation requires a stopped converter/trigger owner; active group changes return BUSY and stop drains triggers and DMA before changing ranks. No on-the-fly software-sequence mutation is exposed.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/adc.c",
+            "soc/stm32/stm32f4/drivers/adc_group.c",
+            "soc/stm32/stm32f4/drivers/adc_injected.c"
+          ],
+          "regressions": [
+            "tests/google/stm32_adc_cold_factory_test.cpp",
+            "tests/google/stm32_adc_group_test.cpp"
+          ]
+        },
+        {
+          "section": "2.6.1",
+          "title": "DMA request not automatically cleared by clearing DMAEN",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "Clearing DAC DMAEN or the DAC interface gate does not guarantee removal of a pending hardware DMA request.",
+          "handling": "The DMA owner gates the trigger before stream withdrawal and verifies source/stream shutdown before detaching buffers. A pending DAC request can survive reinitialization: do not claim DMAEN clear alone proves an empty request latch. Restart qualification must include the ES0182 underrun/clock/reconfigure sequence; current model ownership tests do not establish that silicon latch behavior.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/dac_dma.c",
+            "soc/stm32/stm32f4/drivers/dac.c"
+          ],
+          "regressions": [
+            "tests/google/stm32_dac_dma_test.cpp",
+            "tests/google/stm32_dac_test.cpp"
+          ]
+        },
+        {
+          "section": "2.6.2",
+          "title": "DMA underrun flag not set when an internal trigger is detected on the clock cycle of the DMA request acknowledge",
+          "revisions": "NNNNNNNN",
+          "assessment": "excluded_mode",
+          "condition": "Software and hardware DMA triggers are used concurrently and underrun acknowledgement overlaps a trigger.",
+          "handling": "DAC DMA owns one TIM6/TIM7 hardware trigger; its public control table excludes CPU writes/free-running start while that DMA owner is active. No concurrent software-trigger injection is exposed.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/dac_dma.c",
+            "soc/stm32/stm32f4/drivers/dac.c"
+          ],
+          "regressions": [
+            "tests/google/stm32_dac_dma_test.cpp",
+            "tests/google/stm32_dac_test.cpp"
+          ]
+        },
+        {
+          "section": "2.7.1",
+          "title": "PWM re-enabled in automatic output enable mode despite of system break",
+          "revisions": "PPPPPPPP",
+          "assessment": "workaround",
+          "condition": "AOE automatically rearms PWM after a nonlatched CSS system break.",
+          "handling": "Advanced-PWM and coherent waveform contracts keep AOE clear, use explicit fault handling and require an intentional joined recovery. No cycle-by-cycle AOE safety guarantee is advertised.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/timer_waveform.c",
+            "soc/stm32/stm32f4/drivers/ip/advanced_timer/advanced_pwm_impl.h",
+            "tools/configure/stm32f4/waveform.py"
+          ],
+          "regressions": [
+            "tests/google/f407_timer_waveform_test.cpp",
+            "tests/google/timer_advanced_test.cpp"
+          ]
+        },
+        {
+          "section": "2.7.2",
+          "title": "TRGO and TRGO2 trigger output failure",
+          "revisions": "DDDDDDDD",
+          "assessment": "workaround",
+          "condition": "A master trigger precedes the destination clock or the destination clock changes while receiving triggers; this is a documentation erratum.",
+          "handling": "Cold assembly prepares destination controllers before arming trigger generators; runtime DMA/ADC/DAC owners configure destinations with the timer stopped. Static selected frequencies do not change while trigger borrowers remain live.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/timer_waveform.c",
+            "soc/stm32/stm32f4/drivers/ip/advanced_timer/advanced_pwm_impl.h",
+            "tools/configure/stm32f4/waveform.py"
+          ],
+          "regressions": [
+            "tests/google/f407_timer_waveform_test.cpp",
+            "tests/google/timer_advanced_test.cpp"
+          ]
+        },
+        {
+          "section": "2.7.3",
+          "title": "Consecutive compare event missed in specific conditions",
+          "revisions": "NNNNNNNN",
+          "assessment": "external_constraint",
+          "condition": "Abrupt ARR-to0 or adjacent boundary CCR updates require two consecutive compare events in toggle/center modes.",
+          "handling": "PWM/group APIs use coherent preload update boundaries and do not promise a one-counter-cycle toggle pulse. Raw timer DMA-burst sequences must avoid the documented adjacent boundary cases; neither a completed DMA nor matching register readback proves the missing compare event was generated.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/timer_waveform.c",
+            "soc/stm32/stm32f4/drivers/ip/advanced_timer/advanced_pwm_impl.h",
+            "tools/configure/stm32f4/waveform.py"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.7.4",
+          "title": "Output compare clear not working with external counter reset",
+          "revisions": "PPPPPPPP",
+          "assessment": "excluded_mode",
+          "condition": "OCxCE output clear is combined with a slave reset before compare.",
+          "handling": "Maintained waveform/slave/advanced-PWM tuples do not combine OCxCE and the affected slave reset modes. An external complementary-break safety system must not infer this combination from generic timer capability.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/timer_waveform.c",
+            "soc/stm32/stm32f4/drivers/ip/advanced_timer/advanced_pwm_impl.h",
+            "tools/configure/stm32f4/waveform.py"
+          ],
+          "regressions": [
+            "tests/google/f407_timer_waveform_test.cpp",
+            "tests/google/timer_advanced_test.cpp"
+          ]
+        },
+        {
+          "section": "2.8.1",
+          "title": "RVU flag not reset in Stop",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "Stop is entered while IWDG RVU is set, permanently preventing later reload-register writes.",
+          "handling": "Watchdog activation waits actual SR readiness before success and an enabled watchdog retains an irreversible owner. The drained deep-power contract cannot consume an enabled retained watchdog as an ordinary stopped controller; foreign watchdog ownership must prove SR RVU clear before Stop. No generic low-power claim overrides this hardware restriction.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/watchdog.c",
+            "tools/configure/stm32f4/clocks.py",
+            "soc/stm32/stm32f4/power.c"
+          ],
+          "regressions": [
+            "tests/google/stm32_watchdog_test.cpp",
+            "tools/configure/test_f407_clocks.py"
+          ]
+        },
+        {
+          "section": "2.8.2",
+          "title": "PVU flag not reset in Stop",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "Stop is entered while IWDG PVU is set, permanently preventing later prescaler writes.",
+          "handling": "The same bounded SR-ready activation and irreversible-owner contract applies to PVU. Foreign/direct watchdog users must establish SR PVU clear before Stop; a source clock flag alone does not prove it.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/watchdog.c",
+            "tools/configure/stm32f4/clocks.py",
+            "soc/stm32/stm32f4/power.c"
+          ],
+          "regressions": [
+            "tests/google/stm32_watchdog_test.cpp",
+            "tools/configure/test_f407_clocks.py"
+          ]
+        },
+        {
+          "section": "2.8.3",
+          "title": "RVU flag not cleared at low APB clock frequency",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "APB frequency is below twice the IWDG oscillator frequency when RLR synchronization is requested.",
+          "handling": "Every admitted static RUN plan requires an integer-MHz TIM2 kernel; APB1 is that kernel or half of it and is therefore at least 500 kHz, exceeding twice the DS8626 LSI upper limit. Driver activation also bounds the SR wait. This proof does not authorize external low-frequency RCC changes.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/watchdog.c",
+            "tools/configure/stm32f4/clocks.py",
+            "soc/stm32/stm32f4/power.c"
+          ],
+          "regressions": [
+            "tests/google/stm32_watchdog_test.cpp",
+            "tools/configure/test_f407_clocks.py"
+          ]
+        },
+        {
+          "section": "2.8.4",
+          "title": "PVU flag not cleared at low APB clock frequency",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "APB frequency is below twice the IWDG oscillator frequency when PR synchronization is requested.",
+          "handling": "The same integer-MHz TIM2/APB1 minimum proof covers PR synchronization. Runtime frequency transitions require the joined clock owner; an external clock tree cannot inherit the static proof.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/watchdog.c",
+            "tools/configure/stm32f4/clocks.py",
+            "soc/stm32/stm32f4/power.c"
+          ],
+          "regressions": [
+            "tests/google/stm32_watchdog_test.cpp",
+            "tools/configure/test_f407_clocks.py"
+          ]
+        },
+        {
+          "section": "2.9.1",
+          "title": "Spurious tamper detection when disabling the tamper channel",
+          "revisions": "NNNNNNNN",
+          "assessment": "excluded_mode",
+          "condition": "Disabling unfiltered falling-edge tamper with the input high can spuriously erase backup registers.",
+          "handling": "Capture admission rejects filter0 falling-edge tamper before any MMIO effect. Rising-edge and filtered level detection remain available only with an explicitly authored bypass source and handed-off PC13; no synthetic safe erase or event suppression is invented.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/rtc.c",
+            "docs/design/f407-rtc.md"
+          ],
+          "regressions": [
+            "tests/google/f407_rtc_test.cpp",
+            "tools/configure/test_f407_rtc_configuration.py"
+          ]
+        },
+        {
+          "section": "2.9.2",
+          "title": "RTC calendar registers are not locked properly",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Shadow SSR/TR/DR reads fail to lock atomically around the calendar update edge.",
+          "handling": "Normal calendar reads require BYPSHAD and two equal complete SSR/TR/DR observations within a finite retry budget. Failed coherence returns BUSY without publishing a mixed snapshot.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/rtc.c",
+            "docs/design/f407-rtc.md"
+          ],
+          "regressions": [
+            "tests/google/f407_rtc_test.cpp",
+            "tools/configure/test_f407_rtc_configuration.py"
+          ]
+        },
+        {
+          "section": "2.9.3",
+          "title": "RTC interrupt can be masked by another RTC interrupt",
+          "revisions": "AAAAAAAA",
+          "assessment": "excluded_mode",
+          "condition": "Two RTC interrupt sources sharing EXTI can mask each other across delayed EXTI clear.",
+          "handling": "The maintained RTC runtime uses polling and explicit EXTI event routes with RTC NVIC interrupts quiet; it does not expose the affected shared interrupt ISR. Standby acknowledges authorized observed source flags separately and does not pretend to implement an AlarmA/B interrupt multiplexer.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/rtc.c",
+            "docs/design/f407-rtc.md"
+          ],
+          "regressions": [
+            "tests/google/f407_rtc_test.cpp",
+            "tools/configure/test_f407_rtc_configuration.py"
+          ]
+        },
+        {
+          "section": "2.9.4",
+          "title": "Calendar initialization may fail in case of consecutive INIT mode entry",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "INIT is reentered one to two RTCCLK cycles after leaving, before proper synchronization.",
+          "handling": "Both calendar writes and coarse calibration use synchronize_init: clear BYPSHAD, clear RSF, wait actual RSF within the existing finite budget and restore the original bypass personality before entering INIT. Timeout never publishes a new setting domain; a partial calendar operation retains tainted ownership.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/rtc.c",
+            "docs/design/f407-rtc.md"
+          ],
+          "regressions": [
+            "tests/google/f407_rtc_test.cpp",
+            "tools/configure/test_f407_rtc_configuration.py"
+          ]
+        },
+        {
+          "section": "2.9.5",
+          "title": "Alarm flag may be repeatedly set when the core is stopped in debug",
+          "revisions": "NNNNNNNN",
+          "assessment": "excluded_mode",
+          "condition": "Debug halt repeatedly sets an alarm whose subsecond MASKSS is nonzero.",
+          "handling": "Current public AlarmA/B patterns are whole-second fields and program the subsecond alarm mask to zero. Subsecond values in raw timestamps are not a claim of subsecond alarm support.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/rtc.c",
+            "docs/design/f407-rtc.md"
+          ],
+          "regressions": [
+            "tests/google/f407_rtc_test.cpp",
+            "tools/configure/test_f407_rtc_configuration.py"
+          ]
+        },
+        {
+          "section": "2.9.6",
+          "title": "Detection of a tamper event occurring before enabling the tamper detection is not supported in edge detection mode",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Edge tamper was already active before detection was enabled, or transitions during enable.",
+          "handling": "Falling edge is refused because disabling is unsafe under 2.9.1. Rising edge enables detection then reads actual PC13 IDR through an effective GPIOC gate; an analog pad, active input or gate failure returns IO and retains the armed source while blocking backup writes. Standby source reenable obeys the same check; filtered level detection is independent.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/rtc.c",
+            "docs/design/f407-rtc.md"
+          ],
+          "regressions": [
+            "tests/google/f407_rtc_test.cpp",
+            "tools/configure/test_f407_rtc_configuration.py"
+          ]
+        },
+        {
+          "section": "2.10.1",
+          "title": "Spurious bus error detection in controller mode",
+          "revisions": "AAAAAAAA",
+          "assessment": "silicon_limit",
+          "condition": "Controller operation can spuriously set BERR while the bus transaction continues.",
+          "handling": "Current polling/IRQ/DMA controllers conservatively terminate as IO and enter bounded STOP/recovery instead of silently treating a possibly real bus error as successful data. This preserves explicit failure ownership but can cause false error/retry; it is not the official clear-and-continue availability workaround.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/i2c.c",
+            "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
+          ],
+          "regressions": [
+            "tests/google/i2c_register_test.cpp",
+            "tests/google/i2c_async_register_test.cpp"
+          ]
+        },
+        {
+          "section": "2.10.2",
+          "title": "SMBus standard not fully supported",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "SMBus v2.0 requires NACK of an invalid byte/command, which this I2C IP cannot guarantee.",
+          "handling": "The smbus-device provider exposes transport/PEC and alert signaling, not unconditional SMBus2.0 conformance. The product must validate writes at a higher layer using alert/ARA/host-notify or an equivalent explicit acknowledgement. PEC success alone is not application-command acceptance.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/i2c_target.c",
+            "docs/design/f407-i2c-target.md"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.10.3",
+          "title": "Start cannot be generated after a misplaced Stop",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "A misplaced peer STOP races the local controller START request.",
+          "handling": "Malformed peers can cause bounded timeout/IO, followed by joined SWRST recovery and bus-clear policy. Recovery does not replay a write with unknown external effect. CBUS or other non-I2C STOP rules are not supported.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/i2c.c",
+            "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
+          ],
+          "regressions": [
+            "tests/google/i2c_register_test.cpp",
+            "tests/google/i2c_async_register_test.cpp"
+          ]
+        },
+        {
+          "section": "2.10.4",
+          "title": "Mismatch on the “Setup time for a repeated Start condition” timing parameter",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Standard-mode repeated START runs between 88 and100 kHz with stretching or excessive SCL rise time.",
+          "handling": "The reviewed standard-mode timing calculation caps actual frequency at88 kHz for repeated-START-capable controller operation; authored max_hz remains an upper bound. Fast mode is separate. Both7/10-bit and polling/IRQ/DMA modes must use the same actual timing constraint; peripheral-source clock proof alone is insufficient.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/i2c.c",
+            "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c",
+            "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.h"
+          ],
+          "regressions": [
+            "tests/google/i2c_register_test.cpp",
+            "tests/google/i2c_async_register_test.cpp"
+          ]
+        },
+        {
+          "section": "2.10.5",
+          "title": "Data valid time (tVD;DAT) violated without the OVR flag being set",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Target transmit software is late while NOSTRETCH=1 but hardware does not set OVR.",
+          "handling": "The target owner fixes clock stretching enabled, rejects foreign NOSTRETCH controls and feeds each held slot without speculative prefetch. No nonstretch target transmit mode is claimed.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/i2c_target.c",
+            "docs/design/f407-i2c-target.md"
+          ],
+          "regressions": [
+            "tests/google/i2c_target_exchange_test.cpp"
+          ]
+        },
+        {
+          "section": "2.10.6",
+          "title": "Both SDA and SCL maximum rise times (tr) violated when the VDD_I2C bus voltage is higher than ((VDD + 0.3) / 0.7) V",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "External I2C bus voltage exceeds (VDD+0.3)/0.7, increasing input capacitance and rise time.",
+          "handling": "Board electrical acceptance must establish supply, pull-ups and measured rise time. At3.3-V MCU supply the bus must not exceed5.14 V under this limitation, and all datasheet absolute limits still apply. Neither a TOML max_hz nor a digital register model measures these voltages.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/i2c_target.c",
+            "docs/design/f407-i2c-target.md"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.11.1",
+          "title": "Idle frame is not detected if the receiver clock speed is deviated",
+          "revisions": "NNNNNNNN",
+          "assessment": "silicon_limit",
+          "condition": "A faster peer begins a character before the receiver recognizes the preceding idle frame.",
+          "handling": "RX DMA idle is a notification/batching hint, never a lossless protocol frame delimiter. Explicit lengths, delimiters or a qualified protocol timeout belong to the consumer; no guaranteed idle-event count is advertised.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/uart.c",
+            "soc/stm32/stm32f4/drivers/uart_cold.c",
+            "docs/design/uart-wire-modes.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_uart_wire_test.cpp",
+            "tests/google/uart_formats_provider_test.cpp"
+          ]
+        },
+        {
+          "section": "2.11.2",
+          "title": "In full-duplex mode, the Parity Error (PE) flag can be cleared by writing to the data register",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Reading SR for TX followed by DR transmit write clears a concurrent receive parity error.",
+          "handling": "The formatted IRQ owner snapshots RX error state and consumes the RX sample before advancing TX from the same observed interrupt. DMA byte modes retain their restricted frame contract; do not infer parity evidence from an unrelated later SR read.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/uart.c",
+            "soc/stm32/stm32f4/drivers/uart_cold.c",
+            "docs/design/uart-wire-modes.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_uart_wire_test.cpp",
+            "tests/google/uart_formats_provider_test.cpp"
+          ]
+        },
+        {
+          "section": "2.11.3",
+          "title": "Parity Error (PE) flag is not set when receiving in Mute mode using address mark detection",
+          "revisions": "NNNNNNNN",
+          "assessment": "excluded_mode",
+          "condition": "Mute/address-mark wake exits on a valid address with a parity error but no PE flag.",
+          "handling": "No UART mute/address-mark receiver mode is exposed by the maintained wire modes. Adding one requires an explicit error contract rather than assuming PE is complete.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/uart.c",
+            "soc/stm32/stm32f4/drivers/uart_cold.c",
+            "docs/design/uart-wire-modes.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_uart_wire_test.cpp",
+            "tests/google/uart_formats_provider_test.cpp"
+          ]
+        },
+        {
+          "section": "2.11.4",
+          "title": "Break frame is transmitted regardless of CTS input line status",
+          "revisions": "NNNNNNNN",
+          "assessment": "external_constraint",
+          "condition": "A LIN break is transmitted despite deasserted CTS.",
+          "handling": "LIN break requests are explicit wire operations; CTS flow control is not asserted to gate break symbols. A protocol needing receiver-ready break delivery must establish peer readiness at the application/line-control layer. No hardware workaround is claimed.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/uart.c",
+            "soc/stm32/stm32f4/drivers/uart_cold.c",
+            "docs/design/uart-wire-modes.md"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.11.5",
+          "title": "RTS signal abnormally driven low after a protocol violation",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "A peer violates RTS and transmits an additional unread character, causing RTS to become falsely ready.",
+          "handling": "Receive ownership reports overrun/loss; hardware RTS cannot make a protocol-violating peer lossless. Products must obey RTS or prove every receive read/DMA service latency is below the second character interval, and use software RTS takeover when required. Model overflow reporting is not that physical latency proof.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/uart.c",
+            "soc/stm32/stm32f4/drivers/uart_cold.c",
+            "docs/design/uart-wire-modes.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_uart_wire_test.cpp",
+            "tests/google/uart_formats_provider_test.cpp"
+          ]
+        },
+        {
+          "section": "2.11.6",
+          "title": "Start bit detected too soon when sampling for NACK signal from the smartcard",
+          "revisions": "NNNNNNNN",
+          "assessment": "silicon_limit",
+          "condition": "Smartcard NACK monitoring ends around the receiver window rather than the full transmitter window.",
+          "handling": "Smartcard mode exposes the hardware timing and observed NACK/PE result, not ISO7816 certification. Cards/certification needing the full11-ETU transmitter window cannot rely on this silicon receiver; no software register setting is advertised as a repair.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/uart.c",
+            "soc/stm32/stm32f4/drivers/uart_cold.c",
+            "docs/design/uart-wire-modes.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_uart_wire_test.cpp",
+            "tests/google/uart_formats_provider_test.cpp"
+          ]
+        },
+        {
+          "section": "2.11.7",
+          "title": "Break request can prevent the transmission complete flag (TC) from being set",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "A break is queued before data TC and CTS deasserts before that data completes.",
+          "handling": "One active TX owner and the joined TC settlement prevent break submission over an unsettled data request. A break starts only after the prior wire TC and cannot bypass the same request slot.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/uart.c",
+            "soc/stm32/stm32f4/drivers/uart_cold.c",
+            "docs/design/uart-wire-modes.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_uart_wire_test.cpp",
+            "tests/google/uart_formats_provider_test.cpp"
+          ]
+        },
+        {
+          "section": "2.11.8",
+          "title": "Guard time not respected when data are sent on TXE events",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Smartcard data is written at TXE before the previous character guard time ends.",
+          "handling": "Smartcard requests admit exactly one byte and retain their unique request until observed TC, which includes guard time. The following request cannot write its first byte before that TC; TXE alone never completes a Smartcard character.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/uart.c",
+            "soc/stm32/stm32f4/drivers/uart_cold.c",
+            "docs/design/uart-wire-modes.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_uart_wire_test.cpp",
+            "tests/google/uart_formats_provider_test.cpp"
+          ]
+        },
+        {
+          "section": "2.11.9",
+          "title": "RTS is active while RE or UE = 0",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "RTSE is set while UE or RE is not yet enabled, driving a false ready level.",
+          "handling": "Cold RTS starts as a GPIO high. Lifecycle hands it to AF only after the exact wire UE/RE controls are live; stop clears RTSE before disabling UE. Initialization failures retain pad/control cleanup responsibility.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/uart.c",
+            "soc/stm32/stm32f4/drivers/uart_cold.c",
+            "docs/design/uart-wire-modes.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_uart_wire_test.cpp",
+            "tests/google/uart_formats_provider_test.cpp"
+          ]
+        },
+        {
+          "section": "2.12.1",
+          "title": "BSY bit may stay high when SPI is disabled",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "SPI is disabled with full TX DR, receive-only master timing or a peer removing slave NSS early.",
+          "handling": "Master TX requires TXE and BSY clear before disable; receive-only master withdrawal does not rely on BSY. Slave frame ownership uses actual RXNE/NSS or reviewed last-TXE disable sequencing. A peer removing NSS midframe remains an external protocol fault, not a successful completed transfer.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/spi_frames.c",
+            "tools/configure/stm32f4/spi_frames.py",
+            "docs/design/spi-frame-modes.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_spi_frames_test.cpp",
+            "tools/configure/test_spi_frames_modes.py"
+          ]
+        },
+        {
+          "section": "2.12.2",
+          "title": "Anticipated communication upon SPI transit from slave receiver to master",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Switching a receive-only slave to master can start SCK despite SPE=0.",
+          "handling": "Each owned frame transaction hardware-resets its selected SPI instance before applying the new role/line configuration, with verified reset ownership. No role transition reuses the residual slave receiver state.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/spi_frames.c",
+            "tools/configure/stm32f4/spi_frames.py",
+            "docs/design/spi-frame-modes.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_spi_frames_test.cpp",
+            "tools/configure/test_spi_frames_modes.py"
+          ]
+        },
+        {
+          "section": "2.12.3",
+          "title": "Wrong CRC calculation when the polynomial is even",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "SPI CRC polynomial is even.",
+          "handling": "Both static configuration and C frame admission reject a nonzero even polynomial before effect. The zero value selects CRC disabled rather than an even hardware polynomial.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/spi_frames.c",
+            "tools/configure/stm32f4/spi_frames.py",
+            "docs/design/spi-frame-modes.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_spi_frames_test.cpp",
+            "tools/configure/test_spi_frames_modes.py"
+          ]
+        },
+        {
+          "section": "2.12.4",
+          "title": "Corrupted last bit of data and/or CRC received in Master mode with delayed SCK feedback",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "Internal SCK feedback delay under actual load/temperature/VDD exceeds the APB timing margin.",
+          "handling": "SPI/I2S electrical facts select a reviewed fast SCK pad; table5 permits SPI APB up to84 MHz and I2S up to42 MHz at high/very-high speed and30-pF load. Actual capacitance, supply and temperature must satisfy the table or the product must lower APB/increase pad speed. A requested serial bitrate alone does not avoid this issue.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/spi_frames.c",
+            "tools/configure/stm32f4/spi_frames.py",
+            "docs/design/spi-frame-modes.md"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.12.5",
+          "title": "BSY flag may stay high at the end of a data transfer in Slave mode",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Slave BSY sticks at frame end due to CPU/external-SCK synchronization.",
+          "handling": "Slave receive completion uses final RXNE and actual hardware NSS where applicable. Transmit uses the last-TXE early-SPE-disable sequence with the explicit worst-case IRQ budget; no unconditional BSY-based idle proof is used. External SCK/NSS timing remains a required peer contract.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/spi_frames.c",
+            "tools/configure/stm32f4/spi_frames.py",
+            "docs/design/spi-frame-modes.md"
+          ],
+          "regressions": [
+            "tests/google/stm32_spi_frames_test.cpp",
+            "tools/configure/test_spi_frames_modes.py"
+          ]
+        },
+        {
+          "section": "2.12.6",
+          "title": "In I2S Slave mode, the WS level must be set by the external master when enabling the I2S",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "An I2S slave is enabled at the wrong external WS level while the peer is already clocking.",
+          "handling": "Slave start observes the real WS pad at the protocol-required idle level before enabling I2S. The external master must hold that level across admission/enable; no software model can establish an arbitrarily racing peer setup/hold time.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/audio.c",
+            "soc/stm32/stm32f4/drivers/audio_blocks.c",
+            "tools/configure/stm32f4/capture_audio.py"
+          ],
+          "regressions": [
+            "tests/google/f407_capture_audio_test.cpp",
+            "tools/configure/test_f407_capture_audio_configuration.py"
+          ]
+        },
+        {
+          "section": "2.12.7",
+          "title": "I2S2 in full-duplex mode may not work properly when SCK and WS signals are mapped on PI1 and PI0, respectively",
+          "revisions": "AAAAAAAA",
+          "assessment": "excluded_mode",
+          "condition": "I2S2 full-duplex maps SCK toPI1 and WS toPI0, starving the extension interface.",
+          "handling": "Maintained VE100/ZG144 routes do not bond PI0/PI1 and select the reviewed PB I2S2 mappings. The full-duplex extension shares the legal main clocks; family header macro existence is not route authorization.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/audio.c",
+            "soc/stm32/stm32f4/drivers/audio_blocks.c",
+            "tools/configure/stm32f4/capture_audio.py"
+          ],
+          "regressions": [
+            "tests/google/f407_capture_audio_test.cpp",
+            "tools/configure/test_f407_capture_audio_configuration.py"
+          ]
+        },
+        {
+          "section": "2.13.1",
+          "title": "bxCAN time-triggered communication mode not supported",
+          "revisions": "NNNNNNNN",
+          "assessment": "excluded_mode",
+          "condition": "bxCAN TTCM would expose unsupported time-triggered transmission and timestamp values.",
+          "handling": "The classic controller keeps TTCM clear and does not promise hardware timestamps; host observation time is a separate clock fact. No CAN-FD or time-triggered mode is inferred from the generic API.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c",
+            "soc/stm32/stm32f4/drivers/can.c"
+          ],
+          "regressions": [
+            "tests/google/can_controller_test.cpp",
+            "tests/google/can_soc_test.cpp"
+          ]
+        },
+        {
+          "section": "2.14.1",
+          "title": "Transmit data FIFO is corrupted when a write sequence to the FIFO is interrupted with accesses to certain OTG_FS registers",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "An OTG_FS Device FIFO write is interrupted by accesses to endpoint-specific registers.",
+          "handling": "PIO device FIFO writes and controller-state access occur under the same IRQ critical section and unique serialized owner. External direct OTG register access and reentrant class calls are forbidden while this owner is active.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c",
+            "soc/stm32/stm32f4/drivers/usb_device.c",
+            "docs/design/usb-device.md"
+          ],
+          "regressions": [
+            "tests/google/usb_device_test.cpp",
+            "tests/google/usb_device_soc_test.cpp"
+          ]
+        },
+        {
+          "section": "2.14.2",
+          "title": "Host packet transmission may hang when connecting through a hub to a low-speed device",
+          "revisions": "NNNNNNNN",
+          "assessment": "excluded_mode",
+          "condition": "An FS host reaches a low-speed device through a hub.",
+          "handling": "The maintained host contract supports direct root-port peers only; hub/split-transaction topology is not exposed. No capacitance workaround or universal hub support is claimed.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/usb_host.c",
+            "docs/design/usb-device.md"
+          ],
+          "regressions": [
+            "tests/google/usb_host_hal_test.cpp"
+          ]
+        },
+        {
+          "section": "2.14.3",
+          "title": "Data in RxFIFO is overwritten when all channels are disabled simultaneously",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Multiple IN channels halt while an undersized RxFIFO still contains the last packet/status.",
+          "handling": "HAL host initialization reserves RxFIFO space beyond two maximum packets plus status, and the serialized channel owner bounds halt/drain. No exact-one-packet FIFO profile is admitted.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/usb_host.c",
+            "docs/design/usb-device.md"
+          ],
+          "regressions": [
+            "tests/google/usb_host_hal_test.cpp"
+          ]
+        },
+        {
+          "section": "2.14.4",
+          "title": "OTG host blocks the receive channel when receiving IN packets and no TxFIFO is configured",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "IN-only host operation has no TxFIFO allocated.",
+          "handling": "Host initialization always assigns nonperiodic and periodic TxFIFO space as well as RxFIFO; IN-only channel use cannot remove those shared FIFO reservations.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/usb_host.c",
+            "docs/design/usb-device.md"
+          ],
+          "regressions": [
+            "tests/google/usb_host_hal_test.cpp"
+          ]
+        },
+        {
+          "section": "2.14.5",
+          "title": "Host channel-halted interrupt not generated when the channel is disabled",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "A host channel is disabled immediately after enable, before hardware starts and can emit CHH.",
+          "handling": "The owner keeps the transfer active through bounded channel halt, observing actual enable/count state and using bounded controller recovery when CHH cannot be obtained; it does not settle a request solely because HAL_HC_Halt returned. No guaranteed immediate-CHH behavior is assumed.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/usb_host.c",
+            "docs/design/usb-device.md"
+          ],
+          "regressions": [
+            "tests/google/usb_host_hal_test.cpp"
+          ]
+        },
+        {
+          "section": "2.14.6",
+          "title": "Wrong software-read OTG_FS_DCFG register values",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Immediate DCFG DAD/PFIVL readback is not reliable after programming.",
+          "handling": "Address state is retained in the controller owner and applied in its control-transfer phase; immediate DAD/PFIVL equality is not used as a device-address success oracle. Readback of unrelated core state does not prove these fields.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c",
+            "soc/stm32/stm32f4/drivers/usb_device.c",
+            "docs/design/usb-device.md"
+          ],
+          "regressions": [
+            "tests/google/usb_device_test.cpp",
+            "tests/google/usb_device_soc_test.cpp"
+          ]
+        },
+        {
+          "section": "2.15.1",
+          "title": "Transmit data FIFO is corrupted when a write sequence to the FIFO is interrupted with accesses to certain OTG_HS registers",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "An OTG_HS Device FIFO write is interrupted by endpoint-register access.",
+          "handling": "The shared device owner serializes HAL/PIO controller effects in IRQ critical sections; the selected HS DMA path additionally prevents this FIFO-write interleaving. DMA selection does not relax unique controller ownership or buffer reachability.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c",
+            "soc/stm32/stm32f4/drivers/usb_device.c",
+            "docs/design/usb-device.md"
+          ],
+          "regressions": [
+            "tests/google/usb_device_test.cpp",
+            "tests/google/usb_device_soc_test.cpp"
+          ]
+        },
+        {
+          "section": "2.15.2",
+          "title": "Host packet transmission may hang when connecting the full speed interface through a hub to a low-speed device",
+          "revisions": "NNNNNNNN",
+          "assessment": "excluded_mode",
+          "condition": "The HS core uses its internal full-speed interface to reach a low-speed peer through a hub.",
+          "handling": "HS-FS and HS-ULPI software references retain the same direct-root-only host topology restriction; an external hub stack cannot inherit the current support claim.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/usb_host.c",
+            "docs/design/usb-device.md"
+          ],
+          "regressions": [
+            "tests/google/usb_host_hal_test.cpp"
+          ]
+        },
+        {
+          "section": "2.16.1",
+          "title": "Incorrect L3 checksum is inserted in transmitted IPv6 packets without TCP, UDP or ICMP payloads",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "Automatic checksum insertion parses IPv6 packets lacking TCP/UDP/ICMP and can modify unrelated payload.",
+          "handling": "Raw mode disables offload. Advanced frame requests explicitly choose checksum intent, so the protocol owner must request NONE for unsupported IPv6 payloads/extension layouts; FULL is not a generic repair for arbitrary Ethernet bytes. Peer/network stack validation is independent of DMA completion.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
+            "docs/design/ethernet-frames.md"
+          ],
+          "regressions": [
+            "tests/google/ethernet_raw_errata_test.cpp",
+            "tests/google/ethernet_frames_mac_test.cpp"
+          ]
+        },
+        {
+          "section": "2.16.2",
+          "title": "The Ethernet MAC processes invalid extension headers in the received IPv6 frames",
+          "revisions": "NNNNNNNN",
+          "assessment": "silicon_limit",
+          "condition": "IPv6 hop-by-hop/extension order is invalid but the MAC accepts it and reports a good checksum.",
+          "handling": "A hardware checksum-valid status is only a checksum hint. The protocol/network stack must parse and reject invalid IPv6 extension ordering before dispatching payload; neither raw frames nor the advanced RX loan claims semantic IPv6 validity.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
+            "docs/design/ethernet-frames.md"
+          ],
+          "regressions": [
+            "tests/google/ethernet_raw_errata_test.cpp",
+            "tests/google/ethernet_frames_mac_test.cpp"
+          ]
+        },
+        {
+          "section": "2.16.3",
+          "title": "MAC stuck in the idle state on receiving the TxFIFO flush command exactly one clock cycle after a transmission completes",
+          "revisions": "PPPPPPPP",
+          "assessment": "workaround",
+          "condition": "TxFIFO flush is issued one cycle after transmission completes and wedges the MAC.",
+          "handling": "Raw withdrawal checks actual empty TxFIFO before FTF; advanced withdrawal uses stopped/reset-owned recovery instead of a flush while live. Failure retains descriptors/borrowers until actual stop/reset evidence.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
+            "docs/design/ethernet-frames.md"
+          ],
+          "regressions": [
+            "tests/google/ethernet_raw_errata_test.cpp",
+            "tests/google/ethernet_frames_mac_test.cpp"
+          ]
+        },
+        {
+          "section": "2.16.4",
+          "title": "Transmit frame data corruption",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Near-equal DMA/MAC Tx rates repeatedly empty the TxFIFO without an underrun indication.",
+          "handling": "Both raw and advanced MAC cold configuration force transmit Store-and-Forward. Descriptor completion is not substituted for that controller mode.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
+            "docs/design/ethernet-frames.md"
+          ],
+          "regressions": [
+            "tests/google/ethernet_raw_errata_test.cpp",
+            "tests/google/ethernet_frames_mac_test.cpp"
+          ]
+        },
+        {
+          "section": "2.16.5",
+          "title": "Incorrect status and corrupted frames when RxFIFO overflow occurs on the penultimate word of Rx frames",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Threshold-mode RX overflow on a penultimate word corrupts status and following frames.",
+          "handling": "Both MAC providers force receive Store-and-Forward and reject incomplete/error descriptor chains before loan/copy publication.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
+            "docs/design/ethernet-frames.md"
+          ],
+          "regressions": [
+            "tests/google/ethernet_raw_errata_test.cpp",
+            "tests/google/ethernet_frames_mac_test.cpp"
+          ]
+        },
+        {
+          "section": "2.16.6",
+          "title": "Successive write operations to the same register might not be fully taken into account",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Successive writes to affected MAC/PTP registers arrive within four RX/TX clock cycles.",
+          "handling": "Affected MAC/PTP writes are serialized through bounded clock-domain settle observations, with the configured PHY reference-clock contract. Repeated writes/readback alone are not treated as elapsed RX/TX clocks; missing clock/timeout retains ownership and fails.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
+            "docs/design/ethernet-frames.md"
+          ],
+          "regressions": [
+            "tests/google/ethernet_raw_errata_test.cpp",
+            "tests/google/ethernet_frames_mac_test.cpp"
+          ]
+        },
+        {
+          "section": "2.16.7",
+          "title": "Incorrect remote wakeup on global unicast packet",
+          "revisions": "PPPPPPPP",
+          "assessment": "excluded_mode",
+          "condition": "Global-unicast PMT wake is combined with inverse/hash destination filtering.",
+          "handling": "No PMT remote-wakeup or global-unicast wake mode is exposed by the current MAC providers; ordinary VLAN/filter capability does not imply PMT support.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
+            "docs/design/ethernet-frames.md"
+          ],
+          "regressions": [
+            "tests/google/ethernet_raw_errata_test.cpp",
+            "tests/google/ethernet_frames_mac_test.cpp"
+          ]
+        },
+        {
+          "section": "2.16.8",
+          "title": "Overflow status bits of missed frame and buffer overflow counters are cleared without a read operation",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "Missed-frame/FIFO counters roll over twice between reads and clear their sticky overflow indication.",
+          "handling": "Software ring drop/ownership counters remain separate. No API claims an exact monotonic total reconstructed from sparse DMAMFBOCR reads; a product requiring those hardware counters must sample them often enough for its measured worst-case ingress/drop rate.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
+            "docs/design/ethernet-frames.md"
+          ],
+          "regressions": []
+        },
+        {
+          "section": "2.16.9",
+          "title": "MAC may provide incorrect Rx status for the MAC control frames when receive checksum offload is enabled",
+          "revisions": "AAAAAAAA",
+          "assessment": "external_constraint",
+          "condition": "MAC control frame0x8808 plus receive checksum offload without extended status gives misleading IP status.",
+          "handling": "Raw offload is disabled. Advanced consumers must classify EtherType before interpreting checksum hints; control frames and unsupported protocol layouts cannot use a hardware good-IP hint as protocol validity. Software must ignore the affected RDES0 IP status for those frames.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
+            "docs/design/ethernet-frames.md"
+          ],
+          "regressions": [
+            "tests/google/ethernet_raw_errata_test.cpp",
+            "tests/google/ethernet_frames_mac_test.cpp"
+          ]
+        },
+        {
+          "section": "2.16.10",
+          "title": "MAC may provide an inaccurate Rx status when receive checksum offload is enabled in cut-through mode",
+          "revisions": "PPPPPPPP",
+          "assessment": "workaround",
+          "condition": "Receive checksum offload in cut-through mode gives incomplete payload-checksum error detail.",
+          "handling": "Both receive engines use Store-and-Forward; descriptor error-summary/drop logic does not depend on a missing individual checksum bit. Cut-through mode is not selectable.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
+            "docs/design/ethernet-frames.md"
+          ],
+          "regressions": [
+            "tests/google/ethernet_raw_errata_test.cpp",
+            "tests/google/ethernet_frames_mac_test.cpp"
+          ]
+        },
+        {
+          "section": "2.16.11",
+          "title": "MAC may not drop received giant error frames",
+          "revisions": "AAAAAAAA",
+          "assessment": "workaround",
+          "condition": "Giant frames pass the Store-and-Forward hardware error-drop filter.",
+          "handling": "RX validates the last-descriptor frame length and descriptor integrity against the actual buffer/wire limit before copying or publishing a loan. Giant or invalid chains are recycled/dropped in software and never trusted merely because the MAC accepted them.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
+            "docs/design/ethernet-frames.md"
+          ],
+          "regressions": [
+            "tests/google/ethernet_raw_errata_test.cpp",
+            "tests/google/ethernet_frames_mac_test.cpp"
+          ]
+        },
+        {
+          "section": "2.16.12",
+          "title": "Ethernet automatic pause frame functionality is not supported",
+          "revisions": "AAAAAAAA",
+          "assessment": "excluded_mode",
+          "condition": "Automatic hardware pause generation depends on an unavailable4096-byte RxFIFO.",
+          "handling": "Automatic pause/flow-control mode is not exposed or used as a no-loss guarantee. Software buffer availability and observed overflow/drop events govern backpressure; a future pause policy must send frames intentionally rather than enable a nonexistent automatic mechanism.",
+          "implementation": [
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+            "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
+            "docs/design/ethernet-frames.md"
+          ],
+          "regressions": [
+            "tests/google/ethernet_raw_errata_test.cpp",
+            "tests/google/ethernet_frames_mac_test.cpp"
+          ]
+        }
+      ]
+    }
   },
   "limitations": [
-    "Reference sections are a source index, not a complete register or errata implementation audit.",
-    "Observed silicon revision and mode-specific applicability are required before hardware qualification."
+    "The ES0182 software audit records current mode dispositions, exclusions and external constraints; it is not a blanket workaround or physical pass.",
+    "The five-cut runtime admission policy does not establish the observed physical cut. Hardware qualification remains not_executed.",
+    "ADC accuracy, bus electrical timing, peer protocol compliance and linked external ISR behavior require their stated integration checks; software models cannot establish physical limits."
   ]
 }

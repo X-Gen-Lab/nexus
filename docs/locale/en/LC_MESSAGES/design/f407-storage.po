@@ -1,6 +1,6 @@
 # Current canonical messages; semantic review admission is tracked separately.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 86cda2a3fce406f144d399fd7984adcff555c87981824554b961a0b3b4aebb8b\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 3892649cfba0071a5776d313a8b5362c1274e6cfa64560ebc536f21021942b4e\n"
 
 msgid "F407 物理存储与制造维护"
 msgstr "F407 physical storage and manufacturing maintenance"
@@ -49,3 +49,9 @@ msgstr "The [SDIO module contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS
 
 msgid "`protocol=\"mmc\"` 可显式选择 1／4／8 位 legacy SDR，保持 12 MHz。八位模式必须由 Board 授权完整十个 pad，按所选路线生成六或十份快照；SD memory 与 SDIO I/O functions 仍只接纳 1／4 位。MMC 在卡片 SWITCH 与 ready 检查成功后才提交主机宽度， 失败不隐式降宽。精确命令、错误位与引脚合同沿用上述 SDIO 模块说明； `tests/contracts/mmc8_assembly/` 是软件参考，不声明现有开发板 SD socket 已接八线。"
 msgstr "`protocol=\"mmc\"` may explicitly select 1 / 4 / 8-bit legacy SDR at 12 MHz. Eight-bit mode requires Board authorization for all ten pads; the selected route generates exactly six or ten snapshots. SD memory and SDIO I/O functions still admit only 1 / 4-bit operation. MMC commits the host width only after successful card SWITCH and ready checks; failure never silently falls back to a narrower bus. Exact commands, error bits and pad contracts remain in the SDIO module description linked above. `tests/contracts/mmc8_assembly/` is a software reference, not a claim that an existing development-board SD socket has eight data wires."
+
+msgid "失败后的 owner 可显式调用普通 Flash face 的 `nx_flash_port_recover()`；Platform close 也执行同一有限清理重试。BSY 未退出、外来 enabled/active vector 或外来模式 仍返回 BUSY；只有实际模式撤回、状态清除、IRQ 排空与重新锁定全部读回成立后才 释放责任。仅本 owner 尝试解锁的 Option Bytes 才重试 OPTLOCK，不改写外来 options， 不重新发出编程脉冲、不回滚或掩盖原失败，也不替代所需 POR。"
+msgstr "After a failure the owner may explicitly call `nx_flash_port_recover()` through its ordinary Flash face; Platform close performs the same bounded cleanup retry. BUSY persists while BSY remains set, a foreign vector is enabled/active, or a foreign mode remains. Ownership is released only after actual mode withdrawal, status acknowledgement, IRQ drain and relocking have all been read back. Only Option Bytes this owner attempted to unlock are relocked through OPTLOCK; foreign options are preserved. Recovery never issues another program pulse, rolls back or hides the original failure, or replaces a required POR."
+
+msgid "ES0182 Rev19 §2.2.9 限制无复位的连续 BOR 编程。本实现不保留额外启动历史， 因此修改 BOR 必须使用实际 AHB 分频 1 或 2；分频大于 2 在任何解锁之前拒绝。 BOR 不变的其他 options 维护不受此限制，平台不会自动修改系统时钟。"
+msgstr "ES0182 Rev19 section 2.2.9 constrains consecutive BOR programming without reset. This implementation keeps no extra boot-history state, so a BOR change requires an actual AHB divider of 1 or 2; a divider greater than 2 rejects before any unlock. Other option maintenance with unchanged BOR remains permitted, and the platform never changes system clocks automatically."

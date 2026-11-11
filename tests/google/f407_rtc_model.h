@@ -52,6 +52,13 @@ typedef struct {
     bool hold_gpio_clock_enable;
     bool hold_gpio_clock_restore;
     bool hold_reload;
+    bool hold_synchronization;
+    bool synchronization_pending;
+    bool synchronization_required;
+    uint32_t synchronizations;
+    uint32_t unsynchronized_init;
+    uint32_t capture_pad_reads;
+    uint32_t capture_unclocked_reads;
     bool hold_standby_flags;
     void (*observe_write)(volatile uint32_t*, uint32_t);
     bool reload_pending;

@@ -6,7 +6,7 @@
 
 `board.json` 绑定上传三页 PDF 的 SHA-256 和已审 MCU 接线，原 PDF 不再发布。
 声明不证明实装、导通、电气兼容或物理支持。底层行为见
-[F407 实现](../../soc/stm32/stm32f407/README.md)。
+[F407 实现](../../soc/stm32/stm32f4/README.md)。
 
 ## 已审绑定
 

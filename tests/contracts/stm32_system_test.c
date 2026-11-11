@@ -21,14 +21,15 @@ static unsigned s_fault;
 static unsigned s_polls;
 static uint32_t s_mask;
 static uint16_t s_flash_kib = 512U;
-static uint32_t s_device_id = 0x413U;
+static uint32_t s_device_id = 0x10010413U;
 
 /** \brief Supply an observed Flash-size register value. */
 uint16_t nx_stm32_model_flash_kib(void) {
     return s_flash_kib;
 }
 
-/** \brief Supply an observed device group register value. */
+/** \brief Supply the observed complete IDCODE, including reviewed Z revision.
+ */
 uint32_t nx_stm32_model_device_id(void) {
     return s_device_id;
 }

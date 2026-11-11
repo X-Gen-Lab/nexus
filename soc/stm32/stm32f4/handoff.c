@@ -9,6 +9,7 @@
 #include "clock_domain_impl.h"
 #include "nexus/components/stm32f407_handoff.h"
 #include "stm32f407_handoff_hw.h"
+#include "stm32f407_silicon.h"
 #include "stm32f407_system.h"
 
 #if NX_F407_HANDOFF_FLASH_BYTES != 524288 &&                                   \
@@ -145,8 +146,10 @@ nx_result_t nx_stm32f407_handoff(nx_clock_barrier_t owners,
     if (result != NX_SUCCESS) {
         return result;
     }
-    if ((NX_F407_READ(DBGMCU->IDCODE) & 0xfffU) != 0x413U ||
-        NX_F407_READ16(FLASHSIZE_BASE) != NX_F407_HANDOFF_FLASH_BYTES / 1024U) {
+    result = nx_stm32f407_silicon_admit(NX_F407_READ(DBGMCU->IDCODE));
+    if (result != NX_SUCCESS)
+        return result;
+    if (NX_F407_READ16(FLASHSIZE_BASE) != NX_F407_HANDOFF_FLASH_BYTES / 1024U) {
         return NX_ERROR_IO;
     }
     result = clocks_ready();

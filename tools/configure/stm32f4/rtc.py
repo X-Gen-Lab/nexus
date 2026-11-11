@@ -7,6 +7,10 @@ def validate(selection, route):
     """The two explicit policies share one exact oscillator and Alarm A."""
     if route["controller"] != "RTC" or route["pins"]:
         fail("F407 RTC requires its exact LSE oscillator ownership route")
+    expected = ("rtc-lse-bypass-pc14" if selection.get("lse_bypass", False)
+                else "rtc-lse-pc14-pc15")
+    if route["id"] != expected:
+        fail("F407 RTC oscillator source differs from its reviewed pad route")
 
 
 def validate_context(selection, route, *, backend, clock_profile):
@@ -30,6 +34,7 @@ def constructor(item, result):
         "    .clock = { nx_stm32_rtc_clock_read, &g_nx_stm32_system },",
         f"    .timeout_us = {options.timeout_us}u, .poll_limit = {options.poll_limit}u,",
         f"    .policy = {policy},",
+        f"    .lse_bypass = {str(options.lse_bypass).lower()},",
         f"    .allow_set = {str(options.allow_set).lower()}, .has_initial = {str(provision).lower()}"]
     if provision:
         initial = options.initial
