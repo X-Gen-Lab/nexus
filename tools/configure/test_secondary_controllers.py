@@ -322,8 +322,10 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 with self.subTest(part=part, field=field):
                     invalid = copy.deepcopy(facts)
                     invalid["controllers"][controller][field] = changed
+                    diagnostic = ("Controller IRQ identity" if field == "irq"
+                                  else "Secondary controller facts")
                     with self.assertRaisesRegex(
-                            ValueError, "Secondary controller facts"):
+                            ValueError, diagnostic):
                         gate.validate_soc(invalid, part)
 
     def test_typed_integration_cannot_drop_its_selected_dma_ownership(self):

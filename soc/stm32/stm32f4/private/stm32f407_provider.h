@@ -25,7 +25,7 @@
 #include "stm32f407_system.h"
 
 #include "stm32f407_timer_hardware.h"
-#include "stm32f407xx.h"
+#include "stm32f4xx.h"
 #if !defined(NEXUS_STM32_MODEL)
 #include "nexus_config.h"
 #endif

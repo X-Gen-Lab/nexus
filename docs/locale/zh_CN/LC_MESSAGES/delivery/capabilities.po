@@ -1,6 +1,6 @@
 # Current canonical messages; semantic review admission is tracked separately.
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 01375b97286d722df186bbd70888c2646190549d4523a8c9316d393d7d4d0c2e\n"
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: ee0299e0311ebba7fd1699711166613273933ce2208369071bd75104a277b24e\n"
 
 msgid "当前派生能力矩阵"
 msgstr "当前派生能力矩阵"

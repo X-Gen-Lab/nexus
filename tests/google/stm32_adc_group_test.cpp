@@ -698,3 +698,38 @@ TEST_F(Stm32AdcGroup, DomainLossDuringLastInjectedReadCannotPublishSuccess) {
     EXPECT_EQ(request.base.transferred, 0U);
     EXPECT_EQ(state.active, nullptr);
 }
+
+TEST_F(Stm32AdcGroup, WarmupExhaustionSettlesTheAcceptedRequestWithoutTrigger) {
+    ASSERT_EQ(nx_stm32_adc_group_prepare(&state, &config), NX_SUCCESS);
+    PrepareRequest(2U, 16U);
+    request.base.deadline = NX_DEADLINE_NEVER - 1U;
+    ASSERT_EQ(nx_native_clock_configure(true, NX_DEADLINE_NEVER - 3U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_adc_group_submit(&port, &request), NX_SUCCESS);
+    EXPECT_EQ(nx_adc_group_service(&port), NX_SUCCESS);
+    EXPECT_EQ(request.base.result, NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.transferred, 0U);
+    EXPECT_EQ(timer.CR1 & TIM_CR1_CEN, 0U);
+    EXPECT_EQ(memory.CR & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(nx_stm32_adc_group_close(&state), NX_SUCCESS);
+}
+
+TEST_F(Stm32AdcGroup, UnrepresentableDrainGraceQuarantinesWithoutInfiniteWait) {
+    Start();
+    s_hold_dma = true;
+    ASSERT_EQ(
+        nx_native_clock_advance(NX_DEADLINE_NEVER - 3U - nx_time_now_us()),
+        NX_SUCCESS);
+    ASSERT_EQ(nx_adc_group_cancel(&port, &request), NX_SUCCESS);
+    EXPECT_NE(state.drain_deadline, NX_DEADLINE_NEVER);
+    EXPECT_EQ(nx_adc_group_service(&port), NX_ERROR_IO);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.active, &request);
+    EXPECT_NE(memory.CR & DMA_SxCR_EN, 0U);
+    EXPECT_NE(memory.M0AR, 0U);
+    s_hold_dma = false;
+    EXPECT_EQ(nx_stm32_adc_group_close(&state), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+}

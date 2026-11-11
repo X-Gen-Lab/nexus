@@ -1,9 +1,10 @@
 # STM32F4 系列支持包
 
-本包按系列复用官方 STM32F4 HAL／LL 与 CMSIS Device。当前行为实现限定
-**STM32F407VET6**（LQFP100、512 KiB Flash）和 **STM32F407ZGT6**
-（LQFP144、1 MiB Flash）的固定类型 C 接口。公共接口在 `io/`，厂商类型与可变状态
-留在本包私有目录；Board 只授权已审接线，产品任务、分区和恢复策略由外部工程提供。
+本包按系列复用官方 STM32F4 HAL／LL 与 CMSIS Device。精确器件事实覆盖
+**STM32F405ZGT6／F407VET6／F407ZGT6／F415ZGT6／F417ZGT6**；F407VE 为
+LQFP100／512 KiB，所列 ZG 为 LQFP144／1 MiB，主 SRAM／CPU-only CCM 分别为
+128／64 KiB。公共接口在 `io/`，厂商类型与可变状态私有。模式与软件证据见
+[精确支持](../../../docs/delivery/support.md)，Board 只授权已审接线，产品策略在外部。
 
 本页的 `docs/`、`tests/` 和软件参考链接以完整 checkout 为上下文。Source SDK
 只携带 manifest 声明的所选源码；使用 SDK 时，按根 `.nexus-source-sdk.json` 的
@@ -31,15 +32,18 @@ ES0182 Rev19 的 92 条勘误在 [references.json](references.json) 逐项记录
 图表示构建期源码归属，不增加运行时转发层。公共 face 共享只读方法表，各实例保有
 独立 context；factory 只返回已有身份，不初始化硬件。
 
-`devices.json` 的 SDK 编译覆盖不代表其他 F4 型号已具备资源准入、驱动、
-Board 或运行时模式；当前具体支持以 F407VE／ZG 配置和执行范围为准。
-System、预 C 外部 SRAM 和受控 handoff 共用同一精确硅片准入规则：
-`DEV_ID=0x413`，`REV_ID` 仅接纳 `0x1001`、`0x1003`、`0x1007`、`0x100f`
-和 `0x101f`。未知修订无写拒绝，不以通用器件信息查询替代准入；资料中另有器件
-身份的 A cut 不自动加入。该规则只建立软件维护范围，不证明实板已验收。
-Board／SoC 中没有 Python 插件。默认集中主机工具仍使用 Python，连接手写 C 的
-System／资源与整平台协调器。配置工具只维护一套权威实现；
-源码实现、模型回归、ARM 链接和实板资格分别说明。
+`variants.<part>.device` 选择唯一器件 profile，再显式组合不重叠的 controller groups。
+67 项共同事实共享维护，ETH／DCMI 仅由 F407／F417 选择；CRYP／HASH 仍是厂商
+库存，不生成软件模式或 factory。DS8626 Rev12 对应 F405／F407，DS8597 Rev10 对应
+F415／F417；芯片选择、封装与所需 pad 仍分别校验，不把组的并集授权给单颗器件。
+新增三料号的[软件参考](../../../tests/contracts/stm32f4_family/README.md)只选 HSI16
+和内部 CRC，不含外部 PCB 接线。System、预 C 内存与 handoff 沿用同一已审硅片准入；
+资料、C 实现、模型、ARM／SDK 及物理资格分别判断。Board／SoC 没有 Python 插件，
+集中主机工具只校验并连接静态事实，硬件算法与生命周期由 C 维护。
+
+当前 C 准入要求 DEV_ID=`0x413`，仅接纳已审 REV_ID `0x1001`、`0x1003`、
+`0x1007`、`0x100f`、`0x101f`；未知值在硬件效果前拒绝。资料列出 A cut 不代表
+运行期自动接纳该 cut，订货号和封装也不能仅由芯片 ID 寄存器证明。
 
 ## 内存、启动与时钟
 
@@ -273,7 +277,7 @@ SPI endpoint 可通过 `[spi_device.<id>]` 的 `lsb_first = true` 选择硬件 L
 事务均使用同一冷配置；端点间可以有不同位序，只在线端与引擎空闲后写 CR1，不在
 传输中改变格式。内存中的字节或 `uint16_t` 数值保持不变，不隐式反转、复制或改动
 DMA 宽度。该选择不用于 I2S／TI；固定 MSB 的 BMP280 驱动拒绝 LSB 配置。
-新字段使用既有 padding，ARM endpoint state／只读配置仍分别为 20／16 字节。
+新字段使用既有 padding，ARM polling endpoint state／只读配置仍分别为 20／16 字节。
 
 SPI 每次 CS 命令都在原子 BSRR 写入后以 DSB 和官方 LL 读取 ODR，核验本 CS latch；
 这不证明外部引脚电压。通用 GPIO 写热路径不增加屏障。polling 返回后不再访问调用者
@@ -283,6 +287,16 @@ payload，仅保留静态 endpoint 身份与 fault，供显式 recover／close �
 复用既有整链 owner，在最终 CS 释放前保留全部段；关闭跳过已完成撤回的 CS。
 原 byte face 的 length 仍按字节计；增强 16 位数据是本机存储的 `uint16_t` 数值，
 长度与 NDTR 按 word 计，不做字节序转换或隐式复制。
+
+SPI1／2／3 的 DMA 冷态连接统一使用 `nx_stm32_spi_dma_prepare` 与
+`nx_stm32_spi_dma_close`，不再因无关 peer 是否存在切换另一套行为。foreign IRQ 和 DMA EN 先于 pin／clock 效果
+拒绝；保存两条实际 IRQ 的原始优先级，撤回与恢复均读回。prepare 失败通过共用
+cold receipt 恢复原 CR／GPIO／gate，拒撤时保留收条供同一 owner 重试。成功 close
+排空后撤回 CS／信号驱动和 SPI 责任，最终原 pad 与 GPIO clock 仍由唯一 Platform
+pin lease 归还。当前维护的
+M4F hard-float／short-enum ABI 下，DMA state／endpoint 保持 64／24 B，统一冷态
+收条为 32 B；相对旧 single 28 B、旧 pair 12 B 分别增加 4／20 B，用于完整快照和
+失败恢复。此项是对象布局测量，不代表整固件 Flash 或物理 IRQ 时延。
 
 ADC1／2 外部输入按 DS8626 Rev12 Table7 对应 PA0--7、PB0--1、PC0--5 的通道
 0--15。Board 必须明确授权相应 SoC route；新增 silicon route 不修改既有 PCB
@@ -366,6 +380,16 @@ close 先证明 ADC 停止，再只撤回所取模拟路径，最后释放 clock
 service rearm，块间可有间隙。消费者借用不能被覆盖，未释放时 stop 保持 BUSY；
 所选 timer 与其他 timer owner 独占冲突。独立 `trigger-dma-continuous` 维护双缓冲和 replacement，
 进度不足时停止而非覆盖消费者。
+
+stream、slot 表和每个 block 的完整容量必须独立于具体 provider 状态、DMA 域表、
+channel／sample-time 事实及 wake；连续模式的检查包含 base 之后的扩展状态。
+`stream_start` 的 SUCCESS 表示已接纳会话，warmup 和 trigger 可能尚未启动。
+首个 producer loan 前无法表示有限 warmup 时返回 EXHAUSTED，不取得存储；借用后
+ADON 回读或实际启动时间戳失败则锁存故障，由 service 观察，不能伪装成无借用拒绝。
+单块模式保留 FILLING，连续模式保留 posted targets；DMA 未证明停止时不归还 loan。
+发生过停止尝试后，继续使用同一 stop 完成退出，再回收 stream、buffer 或 owner。
+regular／injected CPU sample 的有限 warmup 也不会饱和成无限等待；返回前执行停止
+回读，不保留调用者的 sample／count 指针。
 
 普通 PWM 共用 TIM3／4／5 的四通道、TIM9／12 的双通道，以及 TIM10／11／13／14
 的单通道实现。精确 pad 与 AF2／3／9 路线以 `routes.json` 和所选 Board 绑定为准。
@@ -524,6 +548,17 @@ ceiling。IRQ 只锁存事实并发送提示；调用方推进 service 和处理
 观察后才结清。尾部可插入间隔或重复末码，不承诺恰好 N 次模拟转换或模拟 settling。
 循环模式跨回卷持续借用，直到 cancel／timeout／故障完成排空；transferred 是最后
 一轮已经消耗的字节前缀，不是总播放量。
+
+每次 DMA arm 还须处理 ES0182 Rev19 §2.6.1 的跨请求 pending 边界。请求已经
+ACCEPTED 后，先在旧 DMA、IRQ 和地址均退出时安装声明的 idle，再由独占 TIM6／7
+发出硬件触发并观察 UDR，随后撤回 DMAEN／输出／clock，重新配置 DAC、DMA 和
+trigger。恢复可能在波形计时开始前转换 idle，并短暂关闭输出；这些转换不计入
+payload 进度。两次请求之间不承诺持续电压保持、无毛刺或连续模拟波形。软件模型
+与 ARM 链接不建立 silicon workaround 或模拟负载资格，详见[官方库与恢复边界](../../../docs/design/official-stm32-provider.md#f407-dac-dma-restart-boundary)。
+
+只有显式受控恢复阶段诱发的内部 UDR 归属恢复，不计 payload，也不单独把已经
+到期的 TIMEOUT 改成 IO。正常运行的真实欠载仍须显式 stop 恢复；W1C 清零失败或
+真实 DMA 错误仍是 IO 并保留借用，不能将此归属规则扩大为忽略所有 UDR。
 
 排空必须回读请求／触发／中断源已撤销、DMA EN 已清除、计数稳定、内存地址已清零、
 NVIC 发布者已 join。失败保留 request、payload、clock 与 cleanup receipt，超过

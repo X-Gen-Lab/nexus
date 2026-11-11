@@ -1863,3 +1863,37 @@ extern "C" bool nx_av_model_in_isr(void) {
 extern "C" bool nx_av_model_masked(void) {
     return (model->masks[0] | model->masks[1] | model->masks[2]) != 0U;
 }
+
+namespace {
+
+TEST_F(CaptureAudio, CaptureSnapshotRejectsDmaOverItsPinRestoreReceipt) {
+    pins[0].snapshot = reinterpret_cast<uint16_t*>(pool[0]);
+    *pins[0].snapshot = 0x0315U;
+    ASSERT_NO_FATAL_FAILURE(capture_open());
+    const unsigned before = hardware.writes;
+    EXPECT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&snapshot.base), NX_REQUEST_READY);
+    EXPECT_EQ(stream.outstanding, 0U);
+    EXPECT_EQ(hardware.writes, before);
+    EXPECT_EQ(hardware.streams[1].CR & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(hardware.dcmi.CR & DCMI_CR_CAPTURE, 0U);
+    EXPECT_EQ(nx_stm32_capture_ops.stop(&capture), NX_SUCCESS);
+}
+
+TEST_F(CaptureAudio, CaptureBlocksRejectDmaOverItsPinRestoreReceipt) {
+    capture_config.continuous = true;
+    pins[0].snapshot = reinterpret_cast<uint16_t*>(pool[0]);
+    *pins[0].snapshot = 0x0315U;
+    ASSERT_NO_FATAL_FAILURE(capture_open());
+    const unsigned before = hardware.writes;
+    EXPECT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(stream.outstanding, 0U);
+    EXPECT_EQ(hardware.writes, before);
+    EXPECT_EQ(hardware.streams[1].CR & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(hardware.dcmi.CR & DCMI_CR_CAPTURE, 0U);
+    EXPECT_EQ(nx_stm32_capture_ops.stop(&capture), NX_SUCCESS);
+}
+
+} /* namespace */

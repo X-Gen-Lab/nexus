@@ -10,7 +10,7 @@
 #define NEXUS_STM32F407_CLOCK_H
 
 #include "nexus_config.h"
-#include "stm32f407xx.h"
+#include "stm32f4xx.h"
 #include <stdbool.h>
 #include <stddef.h>
 

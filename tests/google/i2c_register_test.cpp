@@ -41,6 +41,8 @@ bool model_sb_pending;
 bool model_restart_on_last_read;
 size_t model_duplicate_starts;
 bool model_hold_stop;
+size_t model_stop_polls;
+size_t model_release_stop_after;
 bool model_hold_master;
 bool model_complete_on_last_read;
 bool model_stop_completed;
@@ -100,6 +102,7 @@ class I2CRegisters : public testing::Test {
         model_restart_on_last_read = false;
         model_duplicate_starts = 0;
         model_hold_stop = false;
+        model_stop_polls = model_release_stop_after = 0U;
         model_hold_master = false;
         model_complete_on_last_read = false;
         model_stop_completed = false;
@@ -200,7 +203,10 @@ extern "C" void nx_i2c_model_poll(void* raw) {
         (model_messages.empty() || model_remaining == 0 ||
          (model_error != 0 && model_received >= model_error_after) ||
          model_received >= model_stall_after)) {
-        if (!model_hold_stop) {
+        ++model_stop_polls;
+        if (!model_hold_stop ||
+            (model_release_stop_after != 0U &&
+             model_stop_polls >= model_release_stop_after)) {
             control(state) &= ~stop;
             if (!model_hold_master) {
                 state->registers->SR2 = 0;
@@ -578,6 +584,18 @@ TEST_F(I2CRegisters, DeadlineDuringReadReturnsOnlyTheCompletedPrefix) {
         ASSERT_EQ(nx_i2c_port_recover(&port), NX_SUCCESS);
         std::memset(data, 0xCC, sizeof(data));
     }
+}
+
+TEST_F(I2CRegisters, ExhaustedStopBudgetDoesNotWaitForLaterBusRelease) {
+    model_time = UINT64_MAX - 100U;
+    model_hold_stop = true;
+    model_release_stop_after = 4U;
+    EXPECT_CALL(boundary, Call(0U, true));
+    EXPECT_EQ(transact({{data, 4U, true}}, UINT64_MAX - 1U), NX_ERROR_IO);
+    EXPECT_EQ(transferred, 4U);
+    EXPECT_TRUE(state.fault);
+    EXPECT_FALSE(state.active);
+    EXPECT_EQ(model_stop_polls, 1U);
 }
 
 TEST_F(I2CRegisters, StuckStopCannotReportSuccessAndRequiresRecovery) {

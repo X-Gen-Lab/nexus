@@ -7,21 +7,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: cbeaa98c5cab7624306ed671f310d30f44447cbd4bed9e72b20b41ad721295cc\n"
+"X-Nexus-Source-SHA256: da0bedb429670c2b4831a2e43b41d2b41269ada9773f0b96bef8274fccba7849\n"
 
 #: docs/guides/provider-porting.md:9
 msgid "Extend the STM32F4 support package"
 msgstr "扩展 STM32F4 支持包"
-
-#: docs/guides/provider-porting.md:11
-msgid ""
-"Use this guide to add an exact F4 part, reviewed route or concrete mode. "
-"Current production source ownership is one F4 package; existing concrete "
-"support remains F407VE/ZG. Do not create a parallel driver set for each part "
-"or infer support from a similar register name."
-msgstr ""
-"本指南用于新增精确 F4 型号、受审路线或具体模式。当前生产源码归属为一个 F4 包，已有具体支持仍限定 "
-"F407VE／ZG。不要为每个型号建立平行驱动，也不能从相似寄存器名称推定支持。"
 
 #: docs/guides/provider-porting.md:16
 msgid ""
@@ -170,3 +160,12 @@ msgid ""
 msgstr ""
 "随实现更新当前文档和翻译。历史跨系列接入可从[固定旧源码](https://github.com/X-Gen-"
 "Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)追溯，不定义新的生产支持目录。"
+
+msgid "References select the explicit `es0182-rev19` software-audit profile. The central `reference_profiles.py` owns the locked document identity and applicability table without importing a hardware provider. This is host build code, not a Board/SoC Python plugin or firmware register script. A profile name, catalog entry or header compile does not qualify another part, an implemented erratum workaround or physical hardware."
+msgstr "资料显式选择 `es0182-rev19` 软件审计 profile。中央 `reference_profiles.py` 直接维护锁定的文档身份和适用表，不导入硬件 provider。这是主机构建代码，不是 Board／SoC Python 插件或固件寄存器脚本。profile 名称、目录项或头文件编译不建立其他料号、已实现勘误方案或物理硬件资格。"
+
+msgid "Use this guide to add an exact F4 part, reviewed route or concrete mode. Current production ownership is one F4 package; the [support catalogue](../delivery/support.md) distinguishes reviewed part facts, F407 Boards and internal-CRC software references. Do not create a parallel driver set for each part or infer support from similar register names."
+msgstr "本指南用于增加精确 F4 料号、已审路线或具体模式。生产源码归于一个 F4 包；[支持目录](../delivery/support.md)区分已审器件事实、F407 Board 与内部 CRC 软件参考。不要为每颗料号建立平行驱动集，也不要从相似寄存器名推定支持。"
+
+msgid "The current catalog-backed F4 facts select exactly one `device_profiles.<device>` through `variants.<part>.device`, then compose disjoint `controller_groups` with separate physical `controllers` and maintained software `modes`. The immutable `DeviceView` keeps `ControllerFacts` and `ControllerModes` distinct. Reuse `resolve_device_facts` for resolution, support queries and derived matrices. Common F405/407/415/417 facts are shared, while only F407/417 select ETH/DCMI; package, memory and bonded-pad intersections remain exact. A Host-only all-device index supports route auditing; never use its union for admission, generation or firmware storage. A derived family display does not authorize another part."
+msgstr "当前 F4 事实由 `variants.<part>.device` 选择唯一 `device_profiles.<device>`，再组合不重叠的 `controller_groups`；物理 `controllers` 与软件 `modes` 分开。不可变 `DeviceView` 区分 `ControllerFacts` 和 `ControllerModes`，解析、支持查询和派生矩阵复用 `resolve_device_facts`。F405／407／415／417 共用已审共同事实，只有 F407／417 选择 ETH／DCMI；封装、内存和实际引脚交集仍精确检查。仅主机侧的全器件索引用于路线审计，不得将其并集用于准入、生成或固件存储。派生家族展示不授权其他料号。"

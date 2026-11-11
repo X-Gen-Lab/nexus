@@ -121,6 +121,11 @@ nx_result_t nx_usb_out_prepare(nx_usb_request_t* request, uint8_t* bytes,
  *       scheduling, retries or receive acknowledgment. An incomplete ISO
  *       opportunity settles IO only after source/FIFO/AHB withdrawal. Long
  *       execution stalls expire by Core time before modular frame comparison.
+ *       An epoch-matched zero-length EP0 STATUS OUT may be armed before or
+ *       during control DATA IN. Its valid wire completion closes further DATA
+ *       admission while independent DMA/FIFO/IRQ loans still require their own
+ *       settlement. An outer control owner must join both directions before
+ *       releasing shared reply storage.
  */
 nx_result_t nx_usb_endpoint_submit(const nx_usb_endpoint_port_t* port,
                                    nx_usb_request_t* request);

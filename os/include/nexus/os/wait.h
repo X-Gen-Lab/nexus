@@ -25,8 +25,10 @@ extern "C" {
  *                  arm and recheck. All deadlines are absolute monotonic
  *                  microseconds in the backend's clock domain, with
  *                  NX_DEADLINE_NEVER explicitly disabling timeout. Clocks must
- *                  continue while waiting and never change domain; construct
- *                  relative budgets with nx_deadline_after to avoid overflow.
+ *                  continue while waiting and never change domain. Construct
+ *                  finite budgets with nx_deadline_finite_after and handle its
+ *                  failure before waiting. nx_deadline_after may saturate to
+ *                  infinite wait and is only for callers intending that policy.
  *                  A timeout does not settle a request or release its buffers.
  *                  Before destroy,
  *                  stop and join every publisher and waiter; SETTLED alone does

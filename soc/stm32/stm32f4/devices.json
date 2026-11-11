@@ -23,7 +23,321 @@
         "TIM5": true,
         "LPTIM1": false
       },
-      "id": "stm32f405"
+      "id": "stm32f405",
+      "irq_bindings": {
+        "WWDG_IRQn": {
+          "number": 0,
+          "handler": "WWDG_IRQHandler"
+        },
+        "PVD_IRQn": {
+          "number": 1,
+          "handler": "PVD_IRQHandler"
+        },
+        "TAMP_STAMP_IRQn": {
+          "number": 2,
+          "handler": "TAMP_STAMP_IRQHandler"
+        },
+        "RTC_WKUP_IRQn": {
+          "number": 3,
+          "handler": "RTC_WKUP_IRQHandler"
+        },
+        "FLASH_IRQn": {
+          "number": 4,
+          "handler": "FLASH_IRQHandler"
+        },
+        "RCC_IRQn": {
+          "number": 5,
+          "handler": "RCC_IRQHandler"
+        },
+        "EXTI0_IRQn": {
+          "number": 6,
+          "handler": "EXTI0_IRQHandler"
+        },
+        "EXTI1_IRQn": {
+          "number": 7,
+          "handler": "EXTI1_IRQHandler"
+        },
+        "EXTI2_IRQn": {
+          "number": 8,
+          "handler": "EXTI2_IRQHandler"
+        },
+        "EXTI3_IRQn": {
+          "number": 9,
+          "handler": "EXTI3_IRQHandler"
+        },
+        "EXTI4_IRQn": {
+          "number": 10,
+          "handler": "EXTI4_IRQHandler"
+        },
+        "DMA1_Stream0_IRQn": {
+          "number": 11,
+          "handler": "DMA1_Stream0_IRQHandler"
+        },
+        "DMA1_Stream1_IRQn": {
+          "number": 12,
+          "handler": "DMA1_Stream1_IRQHandler"
+        },
+        "DMA1_Stream2_IRQn": {
+          "number": 13,
+          "handler": "DMA1_Stream2_IRQHandler"
+        },
+        "DMA1_Stream3_IRQn": {
+          "number": 14,
+          "handler": "DMA1_Stream3_IRQHandler"
+        },
+        "DMA1_Stream4_IRQn": {
+          "number": 15,
+          "handler": "DMA1_Stream4_IRQHandler"
+        },
+        "DMA1_Stream5_IRQn": {
+          "number": 16,
+          "handler": "DMA1_Stream5_IRQHandler"
+        },
+        "DMA1_Stream6_IRQn": {
+          "number": 17,
+          "handler": "DMA1_Stream6_IRQHandler"
+        },
+        "ADC_IRQn": {
+          "number": 18,
+          "handler": "ADC_IRQHandler"
+        },
+        "CAN1_TX_IRQn": {
+          "number": 19,
+          "handler": "CAN1_TX_IRQHandler"
+        },
+        "CAN1_RX0_IRQn": {
+          "number": 20,
+          "handler": "CAN1_RX0_IRQHandler"
+        },
+        "CAN1_RX1_IRQn": {
+          "number": 21,
+          "handler": "CAN1_RX1_IRQHandler"
+        },
+        "CAN1_SCE_IRQn": {
+          "number": 22,
+          "handler": "CAN1_SCE_IRQHandler"
+        },
+        "EXTI9_5_IRQn": {
+          "number": 23,
+          "handler": "EXTI9_5_IRQHandler"
+        },
+        "TIM1_BRK_TIM9_IRQn": {
+          "number": 24,
+          "handler": "TIM1_BRK_TIM9_IRQHandler"
+        },
+        "TIM1_UP_TIM10_IRQn": {
+          "number": 25,
+          "handler": "TIM1_UP_TIM10_IRQHandler"
+        },
+        "TIM1_TRG_COM_TIM11_IRQn": {
+          "number": 26,
+          "handler": "TIM1_TRG_COM_TIM11_IRQHandler"
+        },
+        "TIM1_CC_IRQn": {
+          "number": 27,
+          "handler": "TIM1_CC_IRQHandler"
+        },
+        "TIM2_IRQn": {
+          "number": 28,
+          "handler": "TIM2_IRQHandler"
+        },
+        "TIM3_IRQn": {
+          "number": 29,
+          "handler": "TIM3_IRQHandler"
+        },
+        "TIM4_IRQn": {
+          "number": 30,
+          "handler": "TIM4_IRQHandler"
+        },
+        "I2C1_EV_IRQn": {
+          "number": 31,
+          "handler": "I2C1_EV_IRQHandler"
+        },
+        "I2C1_ER_IRQn": {
+          "number": 32,
+          "handler": "I2C1_ER_IRQHandler"
+        },
+        "I2C2_EV_IRQn": {
+          "number": 33,
+          "handler": "I2C2_EV_IRQHandler"
+        },
+        "I2C2_ER_IRQn": {
+          "number": 34,
+          "handler": "I2C2_ER_IRQHandler"
+        },
+        "SPI1_IRQn": {
+          "number": 35,
+          "handler": "SPI1_IRQHandler"
+        },
+        "SPI2_IRQn": {
+          "number": 36,
+          "handler": "SPI2_IRQHandler"
+        },
+        "USART1_IRQn": {
+          "number": 37,
+          "handler": "USART1_IRQHandler"
+        },
+        "USART2_IRQn": {
+          "number": 38,
+          "handler": "USART2_IRQHandler"
+        },
+        "USART3_IRQn": {
+          "number": 39,
+          "handler": "USART3_IRQHandler"
+        },
+        "EXTI15_10_IRQn": {
+          "number": 40,
+          "handler": "EXTI15_10_IRQHandler"
+        },
+        "RTC_Alarm_IRQn": {
+          "number": 41,
+          "handler": "RTC_Alarm_IRQHandler"
+        },
+        "OTG_FS_WKUP_IRQn": {
+          "number": 42,
+          "handler": "OTG_FS_WKUP_IRQHandler"
+        },
+        "TIM8_BRK_TIM12_IRQn": {
+          "number": 43,
+          "handler": "TIM8_BRK_TIM12_IRQHandler"
+        },
+        "TIM8_UP_TIM13_IRQn": {
+          "number": 44,
+          "handler": "TIM8_UP_TIM13_IRQHandler"
+        },
+        "TIM8_TRG_COM_TIM14_IRQn": {
+          "number": 45,
+          "handler": "TIM8_TRG_COM_TIM14_IRQHandler"
+        },
+        "TIM8_CC_IRQn": {
+          "number": 46,
+          "handler": "TIM8_CC_IRQHandler"
+        },
+        "DMA1_Stream7_IRQn": {
+          "number": 47,
+          "handler": "DMA1_Stream7_IRQHandler"
+        },
+        "FSMC_IRQn": {
+          "number": 48,
+          "handler": "FSMC_IRQHandler"
+        },
+        "SDIO_IRQn": {
+          "number": 49,
+          "handler": "SDIO_IRQHandler"
+        },
+        "TIM5_IRQn": {
+          "number": 50,
+          "handler": "TIM5_IRQHandler"
+        },
+        "SPI3_IRQn": {
+          "number": 51,
+          "handler": "SPI3_IRQHandler"
+        },
+        "UART4_IRQn": {
+          "number": 52,
+          "handler": "UART4_IRQHandler"
+        },
+        "UART5_IRQn": {
+          "number": 53,
+          "handler": "UART5_IRQHandler"
+        },
+        "TIM6_DAC_IRQn": {
+          "number": 54,
+          "handler": "TIM6_DAC_IRQHandler"
+        },
+        "TIM7_IRQn": {
+          "number": 55,
+          "handler": "TIM7_IRQHandler"
+        },
+        "DMA2_Stream0_IRQn": {
+          "number": 56,
+          "handler": "DMA2_Stream0_IRQHandler"
+        },
+        "DMA2_Stream1_IRQn": {
+          "number": 57,
+          "handler": "DMA2_Stream1_IRQHandler"
+        },
+        "DMA2_Stream2_IRQn": {
+          "number": 58,
+          "handler": "DMA2_Stream2_IRQHandler"
+        },
+        "DMA2_Stream3_IRQn": {
+          "number": 59,
+          "handler": "DMA2_Stream3_IRQHandler"
+        },
+        "DMA2_Stream4_IRQn": {
+          "number": 60,
+          "handler": "DMA2_Stream4_IRQHandler"
+        },
+        "CAN2_TX_IRQn": {
+          "number": 63,
+          "handler": "CAN2_TX_IRQHandler"
+        },
+        "CAN2_RX0_IRQn": {
+          "number": 64,
+          "handler": "CAN2_RX0_IRQHandler"
+        },
+        "CAN2_RX1_IRQn": {
+          "number": 65,
+          "handler": "CAN2_RX1_IRQHandler"
+        },
+        "CAN2_SCE_IRQn": {
+          "number": 66,
+          "handler": "CAN2_SCE_IRQHandler"
+        },
+        "OTG_FS_IRQn": {
+          "number": 67,
+          "handler": "OTG_FS_IRQHandler"
+        },
+        "DMA2_Stream5_IRQn": {
+          "number": 68,
+          "handler": "DMA2_Stream5_IRQHandler"
+        },
+        "DMA2_Stream6_IRQn": {
+          "number": 69,
+          "handler": "DMA2_Stream6_IRQHandler"
+        },
+        "DMA2_Stream7_IRQn": {
+          "number": 70,
+          "handler": "DMA2_Stream7_IRQHandler"
+        },
+        "USART6_IRQn": {
+          "number": 71,
+          "handler": "USART6_IRQHandler"
+        },
+        "I2C3_EV_IRQn": {
+          "number": 72,
+          "handler": "I2C3_EV_IRQHandler"
+        },
+        "I2C3_ER_IRQn": {
+          "number": 73,
+          "handler": "I2C3_ER_IRQHandler"
+        },
+        "OTG_HS_EP1_OUT_IRQn": {
+          "number": 74,
+          "handler": "OTG_HS_EP1_OUT_IRQHandler"
+        },
+        "OTG_HS_EP1_IN_IRQn": {
+          "number": 75,
+          "handler": "OTG_HS_EP1_IN_IRQHandler"
+        },
+        "OTG_HS_WKUP_IRQn": {
+          "number": 76,
+          "handler": "OTG_HS_WKUP_IRQHandler"
+        },
+        "OTG_HS_IRQn": {
+          "number": 77,
+          "handler": "OTG_HS_IRQHandler"
+        },
+        "RNG_IRQn": {
+          "number": 80,
+          "handler": "HASH_RNG_IRQHandler"
+        },
+        "FPU_IRQn": {
+          "number": 81,
+          "handler": "FPU_IRQHandler"
+        }
+      }
     },
     {
       "define": "STM32F415xx",
@@ -40,7 +354,325 @@
         "TIM5": true,
         "LPTIM1": false
       },
-      "id": "stm32f415"
+      "id": "stm32f415",
+      "irq_bindings": {
+        "WWDG_IRQn": {
+          "number": 0,
+          "handler": "WWDG_IRQHandler"
+        },
+        "PVD_IRQn": {
+          "number": 1,
+          "handler": "PVD_IRQHandler"
+        },
+        "TAMP_STAMP_IRQn": {
+          "number": 2,
+          "handler": "TAMP_STAMP_IRQHandler"
+        },
+        "RTC_WKUP_IRQn": {
+          "number": 3,
+          "handler": "RTC_WKUP_IRQHandler"
+        },
+        "FLASH_IRQn": {
+          "number": 4,
+          "handler": "FLASH_IRQHandler"
+        },
+        "RCC_IRQn": {
+          "number": 5,
+          "handler": "RCC_IRQHandler"
+        },
+        "EXTI0_IRQn": {
+          "number": 6,
+          "handler": "EXTI0_IRQHandler"
+        },
+        "EXTI1_IRQn": {
+          "number": 7,
+          "handler": "EXTI1_IRQHandler"
+        },
+        "EXTI2_IRQn": {
+          "number": 8,
+          "handler": "EXTI2_IRQHandler"
+        },
+        "EXTI3_IRQn": {
+          "number": 9,
+          "handler": "EXTI3_IRQHandler"
+        },
+        "EXTI4_IRQn": {
+          "number": 10,
+          "handler": "EXTI4_IRQHandler"
+        },
+        "DMA1_Stream0_IRQn": {
+          "number": 11,
+          "handler": "DMA1_Stream0_IRQHandler"
+        },
+        "DMA1_Stream1_IRQn": {
+          "number": 12,
+          "handler": "DMA1_Stream1_IRQHandler"
+        },
+        "DMA1_Stream2_IRQn": {
+          "number": 13,
+          "handler": "DMA1_Stream2_IRQHandler"
+        },
+        "DMA1_Stream3_IRQn": {
+          "number": 14,
+          "handler": "DMA1_Stream3_IRQHandler"
+        },
+        "DMA1_Stream4_IRQn": {
+          "number": 15,
+          "handler": "DMA1_Stream4_IRQHandler"
+        },
+        "DMA1_Stream5_IRQn": {
+          "number": 16,
+          "handler": "DMA1_Stream5_IRQHandler"
+        },
+        "DMA1_Stream6_IRQn": {
+          "number": 17,
+          "handler": "DMA1_Stream6_IRQHandler"
+        },
+        "ADC_IRQn": {
+          "number": 18,
+          "handler": "ADC_IRQHandler"
+        },
+        "CAN1_TX_IRQn": {
+          "number": 19,
+          "handler": "CAN1_TX_IRQHandler"
+        },
+        "CAN1_RX0_IRQn": {
+          "number": 20,
+          "handler": "CAN1_RX0_IRQHandler"
+        },
+        "CAN1_RX1_IRQn": {
+          "number": 21,
+          "handler": "CAN1_RX1_IRQHandler"
+        },
+        "CAN1_SCE_IRQn": {
+          "number": 22,
+          "handler": "CAN1_SCE_IRQHandler"
+        },
+        "EXTI9_5_IRQn": {
+          "number": 23,
+          "handler": "EXTI9_5_IRQHandler"
+        },
+        "TIM1_BRK_TIM9_IRQn": {
+          "number": 24,
+          "handler": "TIM1_BRK_TIM9_IRQHandler"
+        },
+        "TIM1_UP_TIM10_IRQn": {
+          "number": 25,
+          "handler": "TIM1_UP_TIM10_IRQHandler"
+        },
+        "TIM1_TRG_COM_TIM11_IRQn": {
+          "number": 26,
+          "handler": "TIM1_TRG_COM_TIM11_IRQHandler"
+        },
+        "TIM1_CC_IRQn": {
+          "number": 27,
+          "handler": "TIM1_CC_IRQHandler"
+        },
+        "TIM2_IRQn": {
+          "number": 28,
+          "handler": "TIM2_IRQHandler"
+        },
+        "TIM3_IRQn": {
+          "number": 29,
+          "handler": "TIM3_IRQHandler"
+        },
+        "TIM4_IRQn": {
+          "number": 30,
+          "handler": "TIM4_IRQHandler"
+        },
+        "I2C1_EV_IRQn": {
+          "number": 31,
+          "handler": "I2C1_EV_IRQHandler"
+        },
+        "I2C1_ER_IRQn": {
+          "number": 32,
+          "handler": "I2C1_ER_IRQHandler"
+        },
+        "I2C2_EV_IRQn": {
+          "number": 33,
+          "handler": "I2C2_EV_IRQHandler"
+        },
+        "I2C2_ER_IRQn": {
+          "number": 34,
+          "handler": "I2C2_ER_IRQHandler"
+        },
+        "SPI1_IRQn": {
+          "number": 35,
+          "handler": "SPI1_IRQHandler"
+        },
+        "SPI2_IRQn": {
+          "number": 36,
+          "handler": "SPI2_IRQHandler"
+        },
+        "USART1_IRQn": {
+          "number": 37,
+          "handler": "USART1_IRQHandler"
+        },
+        "USART2_IRQn": {
+          "number": 38,
+          "handler": "USART2_IRQHandler"
+        },
+        "USART3_IRQn": {
+          "number": 39,
+          "handler": "USART3_IRQHandler"
+        },
+        "EXTI15_10_IRQn": {
+          "number": 40,
+          "handler": "EXTI15_10_IRQHandler"
+        },
+        "RTC_Alarm_IRQn": {
+          "number": 41,
+          "handler": "RTC_Alarm_IRQHandler"
+        },
+        "OTG_FS_WKUP_IRQn": {
+          "number": 42,
+          "handler": "OTG_FS_WKUP_IRQHandler"
+        },
+        "TIM8_BRK_TIM12_IRQn": {
+          "number": 43,
+          "handler": "TIM8_BRK_TIM12_IRQHandler"
+        },
+        "TIM8_UP_TIM13_IRQn": {
+          "number": 44,
+          "handler": "TIM8_UP_TIM13_IRQHandler"
+        },
+        "TIM8_TRG_COM_TIM14_IRQn": {
+          "number": 45,
+          "handler": "TIM8_TRG_COM_TIM14_IRQHandler"
+        },
+        "TIM8_CC_IRQn": {
+          "number": 46,
+          "handler": "TIM8_CC_IRQHandler"
+        },
+        "DMA1_Stream7_IRQn": {
+          "number": 47,
+          "handler": "DMA1_Stream7_IRQHandler"
+        },
+        "FSMC_IRQn": {
+          "number": 48,
+          "handler": "FSMC_IRQHandler"
+        },
+        "SDIO_IRQn": {
+          "number": 49,
+          "handler": "SDIO_IRQHandler"
+        },
+        "TIM5_IRQn": {
+          "number": 50,
+          "handler": "TIM5_IRQHandler"
+        },
+        "SPI3_IRQn": {
+          "number": 51,
+          "handler": "SPI3_IRQHandler"
+        },
+        "UART4_IRQn": {
+          "number": 52,
+          "handler": "UART4_IRQHandler"
+        },
+        "UART5_IRQn": {
+          "number": 53,
+          "handler": "UART5_IRQHandler"
+        },
+        "TIM6_DAC_IRQn": {
+          "number": 54,
+          "handler": "TIM6_DAC_IRQHandler"
+        },
+        "TIM7_IRQn": {
+          "number": 55,
+          "handler": "TIM7_IRQHandler"
+        },
+        "DMA2_Stream0_IRQn": {
+          "number": 56,
+          "handler": "DMA2_Stream0_IRQHandler"
+        },
+        "DMA2_Stream1_IRQn": {
+          "number": 57,
+          "handler": "DMA2_Stream1_IRQHandler"
+        },
+        "DMA2_Stream2_IRQn": {
+          "number": 58,
+          "handler": "DMA2_Stream2_IRQHandler"
+        },
+        "DMA2_Stream3_IRQn": {
+          "number": 59,
+          "handler": "DMA2_Stream3_IRQHandler"
+        },
+        "DMA2_Stream4_IRQn": {
+          "number": 60,
+          "handler": "DMA2_Stream4_IRQHandler"
+        },
+        "CAN2_TX_IRQn": {
+          "number": 63,
+          "handler": "CAN2_TX_IRQHandler"
+        },
+        "CAN2_RX0_IRQn": {
+          "number": 64,
+          "handler": "CAN2_RX0_IRQHandler"
+        },
+        "CAN2_RX1_IRQn": {
+          "number": 65,
+          "handler": "CAN2_RX1_IRQHandler"
+        },
+        "CAN2_SCE_IRQn": {
+          "number": 66,
+          "handler": "CAN2_SCE_IRQHandler"
+        },
+        "OTG_FS_IRQn": {
+          "number": 67,
+          "handler": "OTG_FS_IRQHandler"
+        },
+        "DMA2_Stream5_IRQn": {
+          "number": 68,
+          "handler": "DMA2_Stream5_IRQHandler"
+        },
+        "DMA2_Stream6_IRQn": {
+          "number": 69,
+          "handler": "DMA2_Stream6_IRQHandler"
+        },
+        "DMA2_Stream7_IRQn": {
+          "number": 70,
+          "handler": "DMA2_Stream7_IRQHandler"
+        },
+        "USART6_IRQn": {
+          "number": 71,
+          "handler": "USART6_IRQHandler"
+        },
+        "I2C3_EV_IRQn": {
+          "number": 72,
+          "handler": "I2C3_EV_IRQHandler"
+        },
+        "I2C3_ER_IRQn": {
+          "number": 73,
+          "handler": "I2C3_ER_IRQHandler"
+        },
+        "OTG_HS_EP1_OUT_IRQn": {
+          "number": 74,
+          "handler": "OTG_HS_EP1_OUT_IRQHandler"
+        },
+        "OTG_HS_EP1_IN_IRQn": {
+          "number": 75,
+          "handler": "OTG_HS_EP1_IN_IRQHandler"
+        },
+        "OTG_HS_WKUP_IRQn": {
+          "number": 76,
+          "handler": "OTG_HS_WKUP_IRQHandler"
+        },
+        "OTG_HS_IRQn": {
+          "number": 77,
+          "handler": "OTG_HS_IRQHandler"
+        },
+        "CRYP_IRQn": {
+          "number": 79,
+          "handler": "CRYP_IRQHandler"
+        },
+        "HASH_RNG_IRQn": {
+          "number": 80,
+          "handler": "HASH_RNG_IRQHandler"
+        },
+        "FPU_IRQn": {
+          "number": 81,
+          "handler": "FPU_IRQHandler"
+        }
+      }
     },
     {
       "define": "STM32F407xx",
@@ -57,7 +689,333 @@
         "TIM5": true,
         "LPTIM1": false
       },
-      "id": "stm32f407"
+      "id": "stm32f407",
+      "irq_bindings": {
+        "WWDG_IRQn": {
+          "number": 0,
+          "handler": "WWDG_IRQHandler"
+        },
+        "PVD_IRQn": {
+          "number": 1,
+          "handler": "PVD_IRQHandler"
+        },
+        "TAMP_STAMP_IRQn": {
+          "number": 2,
+          "handler": "TAMP_STAMP_IRQHandler"
+        },
+        "RTC_WKUP_IRQn": {
+          "number": 3,
+          "handler": "RTC_WKUP_IRQHandler"
+        },
+        "FLASH_IRQn": {
+          "number": 4,
+          "handler": "FLASH_IRQHandler"
+        },
+        "RCC_IRQn": {
+          "number": 5,
+          "handler": "RCC_IRQHandler"
+        },
+        "EXTI0_IRQn": {
+          "number": 6,
+          "handler": "EXTI0_IRQHandler"
+        },
+        "EXTI1_IRQn": {
+          "number": 7,
+          "handler": "EXTI1_IRQHandler"
+        },
+        "EXTI2_IRQn": {
+          "number": 8,
+          "handler": "EXTI2_IRQHandler"
+        },
+        "EXTI3_IRQn": {
+          "number": 9,
+          "handler": "EXTI3_IRQHandler"
+        },
+        "EXTI4_IRQn": {
+          "number": 10,
+          "handler": "EXTI4_IRQHandler"
+        },
+        "DMA1_Stream0_IRQn": {
+          "number": 11,
+          "handler": "DMA1_Stream0_IRQHandler"
+        },
+        "DMA1_Stream1_IRQn": {
+          "number": 12,
+          "handler": "DMA1_Stream1_IRQHandler"
+        },
+        "DMA1_Stream2_IRQn": {
+          "number": 13,
+          "handler": "DMA1_Stream2_IRQHandler"
+        },
+        "DMA1_Stream3_IRQn": {
+          "number": 14,
+          "handler": "DMA1_Stream3_IRQHandler"
+        },
+        "DMA1_Stream4_IRQn": {
+          "number": 15,
+          "handler": "DMA1_Stream4_IRQHandler"
+        },
+        "DMA1_Stream5_IRQn": {
+          "number": 16,
+          "handler": "DMA1_Stream5_IRQHandler"
+        },
+        "DMA1_Stream6_IRQn": {
+          "number": 17,
+          "handler": "DMA1_Stream6_IRQHandler"
+        },
+        "ADC_IRQn": {
+          "number": 18,
+          "handler": "ADC_IRQHandler"
+        },
+        "CAN1_TX_IRQn": {
+          "number": 19,
+          "handler": "CAN1_TX_IRQHandler"
+        },
+        "CAN1_RX0_IRQn": {
+          "number": 20,
+          "handler": "CAN1_RX0_IRQHandler"
+        },
+        "CAN1_RX1_IRQn": {
+          "number": 21,
+          "handler": "CAN1_RX1_IRQHandler"
+        },
+        "CAN1_SCE_IRQn": {
+          "number": 22,
+          "handler": "CAN1_SCE_IRQHandler"
+        },
+        "EXTI9_5_IRQn": {
+          "number": 23,
+          "handler": "EXTI9_5_IRQHandler"
+        },
+        "TIM1_BRK_TIM9_IRQn": {
+          "number": 24,
+          "handler": "TIM1_BRK_TIM9_IRQHandler"
+        },
+        "TIM1_UP_TIM10_IRQn": {
+          "number": 25,
+          "handler": "TIM1_UP_TIM10_IRQHandler"
+        },
+        "TIM1_TRG_COM_TIM11_IRQn": {
+          "number": 26,
+          "handler": "TIM1_TRG_COM_TIM11_IRQHandler"
+        },
+        "TIM1_CC_IRQn": {
+          "number": 27,
+          "handler": "TIM1_CC_IRQHandler"
+        },
+        "TIM2_IRQn": {
+          "number": 28,
+          "handler": "TIM2_IRQHandler"
+        },
+        "TIM3_IRQn": {
+          "number": 29,
+          "handler": "TIM3_IRQHandler"
+        },
+        "TIM4_IRQn": {
+          "number": 30,
+          "handler": "TIM4_IRQHandler"
+        },
+        "I2C1_EV_IRQn": {
+          "number": 31,
+          "handler": "I2C1_EV_IRQHandler"
+        },
+        "I2C1_ER_IRQn": {
+          "number": 32,
+          "handler": "I2C1_ER_IRQHandler"
+        },
+        "I2C2_EV_IRQn": {
+          "number": 33,
+          "handler": "I2C2_EV_IRQHandler"
+        },
+        "I2C2_ER_IRQn": {
+          "number": 34,
+          "handler": "I2C2_ER_IRQHandler"
+        },
+        "SPI1_IRQn": {
+          "number": 35,
+          "handler": "SPI1_IRQHandler"
+        },
+        "SPI2_IRQn": {
+          "number": 36,
+          "handler": "SPI2_IRQHandler"
+        },
+        "USART1_IRQn": {
+          "number": 37,
+          "handler": "USART1_IRQHandler"
+        },
+        "USART2_IRQn": {
+          "number": 38,
+          "handler": "USART2_IRQHandler"
+        },
+        "USART3_IRQn": {
+          "number": 39,
+          "handler": "USART3_IRQHandler"
+        },
+        "EXTI15_10_IRQn": {
+          "number": 40,
+          "handler": "EXTI15_10_IRQHandler"
+        },
+        "RTC_Alarm_IRQn": {
+          "number": 41,
+          "handler": "RTC_Alarm_IRQHandler"
+        },
+        "OTG_FS_WKUP_IRQn": {
+          "number": 42,
+          "handler": "OTG_FS_WKUP_IRQHandler"
+        },
+        "TIM8_BRK_TIM12_IRQn": {
+          "number": 43,
+          "handler": "TIM8_BRK_TIM12_IRQHandler"
+        },
+        "TIM8_UP_TIM13_IRQn": {
+          "number": 44,
+          "handler": "TIM8_UP_TIM13_IRQHandler"
+        },
+        "TIM8_TRG_COM_TIM14_IRQn": {
+          "number": 45,
+          "handler": "TIM8_TRG_COM_TIM14_IRQHandler"
+        },
+        "TIM8_CC_IRQn": {
+          "number": 46,
+          "handler": "TIM8_CC_IRQHandler"
+        },
+        "DMA1_Stream7_IRQn": {
+          "number": 47,
+          "handler": "DMA1_Stream7_IRQHandler"
+        },
+        "FSMC_IRQn": {
+          "number": 48,
+          "handler": "FSMC_IRQHandler"
+        },
+        "SDIO_IRQn": {
+          "number": 49,
+          "handler": "SDIO_IRQHandler"
+        },
+        "TIM5_IRQn": {
+          "number": 50,
+          "handler": "TIM5_IRQHandler"
+        },
+        "SPI3_IRQn": {
+          "number": 51,
+          "handler": "SPI3_IRQHandler"
+        },
+        "UART4_IRQn": {
+          "number": 52,
+          "handler": "UART4_IRQHandler"
+        },
+        "UART5_IRQn": {
+          "number": 53,
+          "handler": "UART5_IRQHandler"
+        },
+        "TIM6_DAC_IRQn": {
+          "number": 54,
+          "handler": "TIM6_DAC_IRQHandler"
+        },
+        "TIM7_IRQn": {
+          "number": 55,
+          "handler": "TIM7_IRQHandler"
+        },
+        "DMA2_Stream0_IRQn": {
+          "number": 56,
+          "handler": "DMA2_Stream0_IRQHandler"
+        },
+        "DMA2_Stream1_IRQn": {
+          "number": 57,
+          "handler": "DMA2_Stream1_IRQHandler"
+        },
+        "DMA2_Stream2_IRQn": {
+          "number": 58,
+          "handler": "DMA2_Stream2_IRQHandler"
+        },
+        "DMA2_Stream3_IRQn": {
+          "number": 59,
+          "handler": "DMA2_Stream3_IRQHandler"
+        },
+        "DMA2_Stream4_IRQn": {
+          "number": 60,
+          "handler": "DMA2_Stream4_IRQHandler"
+        },
+        "ETH_IRQn": {
+          "number": 61,
+          "handler": "ETH_IRQHandler"
+        },
+        "ETH_WKUP_IRQn": {
+          "number": 62,
+          "handler": "ETH_WKUP_IRQHandler"
+        },
+        "CAN2_TX_IRQn": {
+          "number": 63,
+          "handler": "CAN2_TX_IRQHandler"
+        },
+        "CAN2_RX0_IRQn": {
+          "number": 64,
+          "handler": "CAN2_RX0_IRQHandler"
+        },
+        "CAN2_RX1_IRQn": {
+          "number": 65,
+          "handler": "CAN2_RX1_IRQHandler"
+        },
+        "CAN2_SCE_IRQn": {
+          "number": 66,
+          "handler": "CAN2_SCE_IRQHandler"
+        },
+        "OTG_FS_IRQn": {
+          "number": 67,
+          "handler": "OTG_FS_IRQHandler"
+        },
+        "DMA2_Stream5_IRQn": {
+          "number": 68,
+          "handler": "DMA2_Stream5_IRQHandler"
+        },
+        "DMA2_Stream6_IRQn": {
+          "number": 69,
+          "handler": "DMA2_Stream6_IRQHandler"
+        },
+        "DMA2_Stream7_IRQn": {
+          "number": 70,
+          "handler": "DMA2_Stream7_IRQHandler"
+        },
+        "USART6_IRQn": {
+          "number": 71,
+          "handler": "USART6_IRQHandler"
+        },
+        "I2C3_EV_IRQn": {
+          "number": 72,
+          "handler": "I2C3_EV_IRQHandler"
+        },
+        "I2C3_ER_IRQn": {
+          "number": 73,
+          "handler": "I2C3_ER_IRQHandler"
+        },
+        "OTG_HS_EP1_OUT_IRQn": {
+          "number": 74,
+          "handler": "OTG_HS_EP1_OUT_IRQHandler"
+        },
+        "OTG_HS_EP1_IN_IRQn": {
+          "number": 75,
+          "handler": "OTG_HS_EP1_IN_IRQHandler"
+        },
+        "OTG_HS_WKUP_IRQn": {
+          "number": 76,
+          "handler": "OTG_HS_WKUP_IRQHandler"
+        },
+        "OTG_HS_IRQn": {
+          "number": 77,
+          "handler": "OTG_HS_IRQHandler"
+        },
+        "DCMI_IRQn": {
+          "number": 78,
+          "handler": "DCMI_IRQHandler"
+        },
+        "RNG_IRQn": {
+          "number": 80,
+          "handler": "HASH_RNG_IRQHandler"
+        },
+        "FPU_IRQn": {
+          "number": 81,
+          "handler": "FPU_IRQHandler"
+        }
+      }
     },
     {
       "define": "STM32F417xx",
@@ -74,7 +1032,337 @@
         "TIM5": true,
         "LPTIM1": false
       },
-      "id": "stm32f417"
+      "id": "stm32f417",
+      "irq_bindings": {
+        "WWDG_IRQn": {
+          "number": 0,
+          "handler": "WWDG_IRQHandler"
+        },
+        "PVD_IRQn": {
+          "number": 1,
+          "handler": "PVD_IRQHandler"
+        },
+        "TAMP_STAMP_IRQn": {
+          "number": 2,
+          "handler": "TAMP_STAMP_IRQHandler"
+        },
+        "RTC_WKUP_IRQn": {
+          "number": 3,
+          "handler": "RTC_WKUP_IRQHandler"
+        },
+        "FLASH_IRQn": {
+          "number": 4,
+          "handler": "FLASH_IRQHandler"
+        },
+        "RCC_IRQn": {
+          "number": 5,
+          "handler": "RCC_IRQHandler"
+        },
+        "EXTI0_IRQn": {
+          "number": 6,
+          "handler": "EXTI0_IRQHandler"
+        },
+        "EXTI1_IRQn": {
+          "number": 7,
+          "handler": "EXTI1_IRQHandler"
+        },
+        "EXTI2_IRQn": {
+          "number": 8,
+          "handler": "EXTI2_IRQHandler"
+        },
+        "EXTI3_IRQn": {
+          "number": 9,
+          "handler": "EXTI3_IRQHandler"
+        },
+        "EXTI4_IRQn": {
+          "number": 10,
+          "handler": "EXTI4_IRQHandler"
+        },
+        "DMA1_Stream0_IRQn": {
+          "number": 11,
+          "handler": "DMA1_Stream0_IRQHandler"
+        },
+        "DMA1_Stream1_IRQn": {
+          "number": 12,
+          "handler": "DMA1_Stream1_IRQHandler"
+        },
+        "DMA1_Stream2_IRQn": {
+          "number": 13,
+          "handler": "DMA1_Stream2_IRQHandler"
+        },
+        "DMA1_Stream3_IRQn": {
+          "number": 14,
+          "handler": "DMA1_Stream3_IRQHandler"
+        },
+        "DMA1_Stream4_IRQn": {
+          "number": 15,
+          "handler": "DMA1_Stream4_IRQHandler"
+        },
+        "DMA1_Stream5_IRQn": {
+          "number": 16,
+          "handler": "DMA1_Stream5_IRQHandler"
+        },
+        "DMA1_Stream6_IRQn": {
+          "number": 17,
+          "handler": "DMA1_Stream6_IRQHandler"
+        },
+        "ADC_IRQn": {
+          "number": 18,
+          "handler": "ADC_IRQHandler"
+        },
+        "CAN1_TX_IRQn": {
+          "number": 19,
+          "handler": "CAN1_TX_IRQHandler"
+        },
+        "CAN1_RX0_IRQn": {
+          "number": 20,
+          "handler": "CAN1_RX0_IRQHandler"
+        },
+        "CAN1_RX1_IRQn": {
+          "number": 21,
+          "handler": "CAN1_RX1_IRQHandler"
+        },
+        "CAN1_SCE_IRQn": {
+          "number": 22,
+          "handler": "CAN1_SCE_IRQHandler"
+        },
+        "EXTI9_5_IRQn": {
+          "number": 23,
+          "handler": "EXTI9_5_IRQHandler"
+        },
+        "TIM1_BRK_TIM9_IRQn": {
+          "number": 24,
+          "handler": "TIM1_BRK_TIM9_IRQHandler"
+        },
+        "TIM1_UP_TIM10_IRQn": {
+          "number": 25,
+          "handler": "TIM1_UP_TIM10_IRQHandler"
+        },
+        "TIM1_TRG_COM_TIM11_IRQn": {
+          "number": 26,
+          "handler": "TIM1_TRG_COM_TIM11_IRQHandler"
+        },
+        "TIM1_CC_IRQn": {
+          "number": 27,
+          "handler": "TIM1_CC_IRQHandler"
+        },
+        "TIM2_IRQn": {
+          "number": 28,
+          "handler": "TIM2_IRQHandler"
+        },
+        "TIM3_IRQn": {
+          "number": 29,
+          "handler": "TIM3_IRQHandler"
+        },
+        "TIM4_IRQn": {
+          "number": 30,
+          "handler": "TIM4_IRQHandler"
+        },
+        "I2C1_EV_IRQn": {
+          "number": 31,
+          "handler": "I2C1_EV_IRQHandler"
+        },
+        "I2C1_ER_IRQn": {
+          "number": 32,
+          "handler": "I2C1_ER_IRQHandler"
+        },
+        "I2C2_EV_IRQn": {
+          "number": 33,
+          "handler": "I2C2_EV_IRQHandler"
+        },
+        "I2C2_ER_IRQn": {
+          "number": 34,
+          "handler": "I2C2_ER_IRQHandler"
+        },
+        "SPI1_IRQn": {
+          "number": 35,
+          "handler": "SPI1_IRQHandler"
+        },
+        "SPI2_IRQn": {
+          "number": 36,
+          "handler": "SPI2_IRQHandler"
+        },
+        "USART1_IRQn": {
+          "number": 37,
+          "handler": "USART1_IRQHandler"
+        },
+        "USART2_IRQn": {
+          "number": 38,
+          "handler": "USART2_IRQHandler"
+        },
+        "USART3_IRQn": {
+          "number": 39,
+          "handler": "USART3_IRQHandler"
+        },
+        "EXTI15_10_IRQn": {
+          "number": 40,
+          "handler": "EXTI15_10_IRQHandler"
+        },
+        "RTC_Alarm_IRQn": {
+          "number": 41,
+          "handler": "RTC_Alarm_IRQHandler"
+        },
+        "OTG_FS_WKUP_IRQn": {
+          "number": 42,
+          "handler": "OTG_FS_WKUP_IRQHandler"
+        },
+        "TIM8_BRK_TIM12_IRQn": {
+          "number": 43,
+          "handler": "TIM8_BRK_TIM12_IRQHandler"
+        },
+        "TIM8_UP_TIM13_IRQn": {
+          "number": 44,
+          "handler": "TIM8_UP_TIM13_IRQHandler"
+        },
+        "TIM8_TRG_COM_TIM14_IRQn": {
+          "number": 45,
+          "handler": "TIM8_TRG_COM_TIM14_IRQHandler"
+        },
+        "TIM8_CC_IRQn": {
+          "number": 46,
+          "handler": "TIM8_CC_IRQHandler"
+        },
+        "DMA1_Stream7_IRQn": {
+          "number": 47,
+          "handler": "DMA1_Stream7_IRQHandler"
+        },
+        "FSMC_IRQn": {
+          "number": 48,
+          "handler": "FSMC_IRQHandler"
+        },
+        "SDIO_IRQn": {
+          "number": 49,
+          "handler": "SDIO_IRQHandler"
+        },
+        "TIM5_IRQn": {
+          "number": 50,
+          "handler": "TIM5_IRQHandler"
+        },
+        "SPI3_IRQn": {
+          "number": 51,
+          "handler": "SPI3_IRQHandler"
+        },
+        "UART4_IRQn": {
+          "number": 52,
+          "handler": "UART4_IRQHandler"
+        },
+        "UART5_IRQn": {
+          "number": 53,
+          "handler": "UART5_IRQHandler"
+        },
+        "TIM6_DAC_IRQn": {
+          "number": 54,
+          "handler": "TIM6_DAC_IRQHandler"
+        },
+        "TIM7_IRQn": {
+          "number": 55,
+          "handler": "TIM7_IRQHandler"
+        },
+        "DMA2_Stream0_IRQn": {
+          "number": 56,
+          "handler": "DMA2_Stream0_IRQHandler"
+        },
+        "DMA2_Stream1_IRQn": {
+          "number": 57,
+          "handler": "DMA2_Stream1_IRQHandler"
+        },
+        "DMA2_Stream2_IRQn": {
+          "number": 58,
+          "handler": "DMA2_Stream2_IRQHandler"
+        },
+        "DMA2_Stream3_IRQn": {
+          "number": 59,
+          "handler": "DMA2_Stream3_IRQHandler"
+        },
+        "DMA2_Stream4_IRQn": {
+          "number": 60,
+          "handler": "DMA2_Stream4_IRQHandler"
+        },
+        "ETH_IRQn": {
+          "number": 61,
+          "handler": "ETH_IRQHandler"
+        },
+        "ETH_WKUP_IRQn": {
+          "number": 62,
+          "handler": "ETH_WKUP_IRQHandler"
+        },
+        "CAN2_TX_IRQn": {
+          "number": 63,
+          "handler": "CAN2_TX_IRQHandler"
+        },
+        "CAN2_RX0_IRQn": {
+          "number": 64,
+          "handler": "CAN2_RX0_IRQHandler"
+        },
+        "CAN2_RX1_IRQn": {
+          "number": 65,
+          "handler": "CAN2_RX1_IRQHandler"
+        },
+        "CAN2_SCE_IRQn": {
+          "number": 66,
+          "handler": "CAN2_SCE_IRQHandler"
+        },
+        "OTG_FS_IRQn": {
+          "number": 67,
+          "handler": "OTG_FS_IRQHandler"
+        },
+        "DMA2_Stream5_IRQn": {
+          "number": 68,
+          "handler": "DMA2_Stream5_IRQHandler"
+        },
+        "DMA2_Stream6_IRQn": {
+          "number": 69,
+          "handler": "DMA2_Stream6_IRQHandler"
+        },
+        "DMA2_Stream7_IRQn": {
+          "number": 70,
+          "handler": "DMA2_Stream7_IRQHandler"
+        },
+        "USART6_IRQn": {
+          "number": 71,
+          "handler": "USART6_IRQHandler"
+        },
+        "I2C3_EV_IRQn": {
+          "number": 72,
+          "handler": "I2C3_EV_IRQHandler"
+        },
+        "I2C3_ER_IRQn": {
+          "number": 73,
+          "handler": "I2C3_ER_IRQHandler"
+        },
+        "OTG_HS_EP1_OUT_IRQn": {
+          "number": 74,
+          "handler": "OTG_HS_EP1_OUT_IRQHandler"
+        },
+        "OTG_HS_EP1_IN_IRQn": {
+          "number": 75,
+          "handler": "OTG_HS_EP1_IN_IRQHandler"
+        },
+        "OTG_HS_WKUP_IRQn": {
+          "number": 76,
+          "handler": "OTG_HS_WKUP_IRQHandler"
+        },
+        "OTG_HS_IRQn": {
+          "number": 77,
+          "handler": "OTG_HS_IRQHandler"
+        },
+        "DCMI_IRQn": {
+          "number": 78,
+          "handler": "DCMI_IRQHandler"
+        },
+        "CRYP_IRQn": {
+          "number": 79,
+          "handler": "CRYP_IRQHandler"
+        },
+        "HASH_RNG_IRQn": {
+          "number": 80,
+          "handler": "HASH_RNG_IRQHandler"
+        },
+        "FPU_IRQn": {
+          "number": 81,
+          "handler": "FPU_IRQHandler"
+        }
+      }
     },
     {
       "define": "STM32F427xx",

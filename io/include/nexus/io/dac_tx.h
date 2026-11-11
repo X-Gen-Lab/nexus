@@ -76,6 +76,10 @@ nx_result_t nx_dac_tx_prepare(nx_dac_tx_request_t* request, const void* data,
  *       not promise exactly length/frame-size analog conversions. A finite
  *       tail may pause and restart the exclusively owned trigger timer,
  *       extending the last interval; finite output is not strictly periodic.
+ *       Selected recovery can internally trigger the declared idle code before
+ *       waveform timing starts, then briefly disable converter outputs. These
+ *       conversions are not payload progress. No uninterrupted analog hold or
+ *       waveform is promised between requests.
  *       Circular transfers settle only after cancellation, stop or failure.
  *       Circular byte progress describes the final cycle's consumed prefix,
  *       not total playback. DMA progress never counts digital conversions.

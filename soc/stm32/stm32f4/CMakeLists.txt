@@ -211,12 +211,13 @@ target_include_directories(nexus_soc_stm32f4 PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/../../../io/private")
 target_include_directories(nexus_soc_stm32f4 PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_include_directories(nexus_soc_stm32f4 PRIVATE
+set(stm32_ip_includes
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers/ip/i2c_v1_async"
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers/ip/classic_can"
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers/ip/fs_device_pio"
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers/ip/legacy_mac"
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers/ip/advanced_timer")
+target_include_directories(nexus_soc_stm32f4 PRIVATE ${stm32_ip_includes})
 target_include_directories(nexus_soc_stm32f4 SYSTEM PRIVATE
     "${stm32_device}/Include")
 nexus_use_cmsis_core(nexus_soc_stm32f4)
@@ -272,7 +273,7 @@ set(NEXUS_STARTUP_SOURCE
     "${stm32_device}/Source/Templates/gcc/${NEXUS_STM32_STARTUP}" PARENT_SCOPE)
 set(stm32_system_includes
     "${CMAKE_CURRENT_SOURCE_DIR}/private" "${stm32_device}/Include"
-    "${stm32_cmsis}")
+    "${stm32_cmsis}" ${stm32_ip_includes})
 if(stm32_uart_hal)
     list(APPEND stm32_system_includes
         "${CMAKE_CURRENT_SOURCE_DIR}/private/hal"

@@ -9,7 +9,7 @@
 #include "nexus/io/usb_profile.h"
 #include "stm32f407_clock.h"
 #include "stm32f407_usb_device.h"
-#include "stm32f407xx.h"
+#include "stm32f4xx.h"
 #include <stddef.h>
 _Static_assert(USB_OTG_FS_MAX_IN_ENDPOINTS == NX_USB_FS_ENDPOINT_NUMBERS &&
                    USB_OTG_FS_MAX_OUT_ENDPOINTS == NX_USB_FS_ENDPOINT_NUMBERS &&

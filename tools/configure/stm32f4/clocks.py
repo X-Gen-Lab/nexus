@@ -118,7 +118,8 @@ def plan(profile_name, profile):
                 domains={key: domain(key, hz) for key, hz in domains.items()},
                 parameters=p,
                 reviewed_revision_ids=(0x1001, 0x1003, 0x1007, 0x100F, 0x101F),
-                provenance=("RM0090 Rev22 RCC; DS8626 Rev12 clock/Flash limits; "
+                provenance=("RM0090 Rev22 shared RCC; DS8626 Rev12 and "
+                            "DS8597 Rev10 group clock/Flash limits; "
                             "ES0182 Rev19 software audit with constraints"),
                 physical_qualified=False)
 
@@ -187,6 +188,23 @@ def header_lines(result):
     return lines
 
 
+def _sdio_divider(selected, width, minimum_divisor):
+    """Require a legal even wire divider from the selected static domains."""
+    kernel = selected["domains"]["pll48"]["nominal_hz"]
+    peripheral = selected["domains"]["apb2"]["nominal_hz"]
+    if (kernel != 48000000 or peripheral <= 0 or type(width) is not int or
+            width not in {1, 4, 8}):
+        fail("F407 SDIO requires exact PLL48, PCLK2 and bus width")
+    # RM0090 31.2 is non-strict; ES0182 2.4.6 must be strictly satisfied.
+    bus_minimum = (3 * kernel + 8 * peripheral - 1) // (8 * peripheral)
+    fifo_minimum = 3 * width * (kernel + peripheral) // (32 * peripheral) + 1
+    divisor = max(4, minimum_divisor, bus_minimum, fifo_minimum)
+    divisor = (divisor + 1) & ~1
+    if divisor > 256:
+        fail("F407 RM0090/ES0182 SDIO has no legal divider for PCLK2")
+    return divisor - 2
+
+
 def validate_consumers(selected, controllers):
     """Reject impossible selected consumers before generating an image."""
     domain = lambda name: selected["domains"][name]["nominal_hz"]
@@ -207,6 +225,9 @@ def validate_consumers(selected, controllers):
                 fail("F407 internal USB PHY requires an external HSE crystal")
         if kernel48 and domain("pll48") != 48000000:
             fail("F407 selected USB/SDIO requires exact nominal PLL48")
+        if item.kind == "block":
+            _sdio_divider(selected, item.options.bus_width, 4)
+            _sdio_divider(selected, 1, 122)
         if (item.kind in {"adc", "adc_group", "pwm_adc"} and
                 domain("adc") < 600000):
             fail("F407 selected ADC clock must be at least 0.6 MHz")

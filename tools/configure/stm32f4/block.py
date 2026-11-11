@@ -41,9 +41,8 @@ def constructor(item, result):
             "sdio-poll", "sdio-irq", "sdio-dma"} or
             tuple(pin["pin"] for pin in item.pins) != expected or
             any(pin["af"] != 12 for pin in item.pins) or
-            bool(item.dma) != (item.mode == "sdio-dma") or
-            result.clock_profile != "hse8-pll168"):
-        fail("SDIO requires the reviewed F407 PLLQ socket for its bus width")
+            bool(item.dma) != (item.mode == "sdio-dma")):
+        fail("SDIO requires the reviewed F407 socket for its bus width")
     name = item.id.replace("-", "_")
     saved = f"s_nx_sdio_pin_state_{name}"
     receipt = f"s_nx_sdio_cold_{name}"

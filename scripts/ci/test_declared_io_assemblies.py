@@ -59,6 +59,7 @@ class DeclaredModeIngress(unittest.TestCase):
                              .read_text(), Loader=yaml.BaseLoader)
         job = workflow["jobs"]["controller-routes"]
         self.assertIn("declared_io_assembly", job["strategy"]["matrix"]["fixture"])
+        self.assertIn("stm32f4_family", job["strategy"]["matrix"]["fixture"])
         commands = "\n".join(step.get("run", "") for step in job["steps"])
         self.assertIn('"$fixture"/*.toml', commands)
         self.assertIn("scripts/ci/provider_assemblies.py", commands)
@@ -98,10 +99,13 @@ class DeclaredModeIngress(unittest.TestCase):
         ]
         for family, part, controller, kind, mode in cases:
             path = ROOT / "soc/stm32" / family
-            facts = configure.load(path / "soc.json")
+            selected = configure.resolve_device_facts(
+                configure.load(path / "soc.json"), part,
+                configure.maintained(family),
+                catalog=configure.load(path / "devices.json"))
             routes = configure.resolve_routes(configure.load(path / "routes.json"),
-                                              facts, part,
-                                              configure.maintained(family))
+                selected.soc, part, configure.maintained(family),
+                controller_profiles=selected.controller_profiles)
             candidates = [route for route in routes.values()
                           if route["controller"] == controller
                           and route["kind"] == kind and mode in route["modes"]]

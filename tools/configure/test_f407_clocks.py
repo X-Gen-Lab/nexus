@@ -89,8 +89,9 @@ class F407ClockTests(unittest.TestCase):
     def test_direct_input_reserves_pll48_only_by_explicit_static_choice(self):
         from types import SimpleNamespace
         parameters = {**self.parameters(), "sysclk_source": "input"}
-        block = SimpleNamespace(kind="block", mode="sdio-native",
-                                controller="SDIO", options=None)
+        block = SimpleNamespace(kind="block", mode="sdio-poll",
+                                controller="SDIO",
+                                options=SimpleNamespace(bus_width=4))
         plan = stm32f4.clock_plan("custom", parameters)
         with self.assertRaises(ValueError):
             stm32f4.validate_clock_consumers(plan, (block,))
@@ -103,6 +104,28 @@ class F407ClockTests(unittest.TestCase):
         plan = stm32f4.clock_plan("custom", parameters)
         self.assertEqual(plan["parameters"]["sw"], 1)
         self.assertEqual(plan["domains"]["core"]["nominal_hz"], 8000000)
+
+    def test_sdio_width_uses_a_legal_divider_for_the_selected_pclk2(self):
+        from types import SimpleNamespace
+        parameters = {**self.parameters(), "source": "hse",
+                      "input_hz": 8000000, "pll_m": 8, "pll_n": 192,
+                      "pll_p": 2, "pll_q": 4, "sysclk_source": "input",
+                      "pll48": True, "ahb_div": 4,
+                      "apb1_div": 1, "apb2_div": 1}
+        # RM0090 31.2 and ES0182 2.4.6 admit slower clocks at every width.
+        for width in (1, 4, 8):
+            item = SimpleNamespace(kind="block", mode="sdio-poll",
+                                   controller="SDIO", options=SimpleNamespace(
+                                       bus_width=width))
+            with self.subTest(width=width):
+                stm32f4.validate_clock_consumers(
+                    stm32f4.clock_plan("custom", parameters), (item,))
+        # At 62.5 kHz PCLK2 even the largest even divider violates RM0090.
+        parameters.update(ahb_div=8, apb2_div=16)
+        item.options.bus_width = 1
+        with self.assertRaises(ValueError):
+            stm32f4.validate_clock_consumers(
+                stm32f4.clock_plan("custom", parameters), (item,))
 
     def test_internal_usb_rejects_hsi_nominal_48_without_crystal_accuracy(self):
         from types import SimpleNamespace

@@ -278,6 +278,51 @@ static bool arm(nx_stm32_capture_state_t* s, bool continuous) {
                             DCMI_CR_CAPTURE);
 }
 
+/** \brief DMA and mutable controls must preserve every cold restore fact. */
+static bool independent(const nx_stm32_capture_state_t* s, const void* data,
+                        size_t bytes) {
+    const nx_stm32_capture_config_t* c = s->config;
+    if (nx_stm32_av_overlap(data, bytes, c, sizeof(*c)) ||
+        nx_stm32_av_overlap(data, bytes, c->common.regions,
+                            c->common.region_count *
+                                sizeof(*c->common.regions)) ||
+        nx_stm32_av_overlap(data, bytes, c->common.pins,
+                            c->common.pin_count * sizeof(*c->common.pins)))
+        return false;
+    for (size_t i = 0U; i < c->common.pin_count; ++i)
+        if (nx_stm32_av_overlap(data, bytes, c->common.pins[i].snapshot,
+                                sizeof(*c->common.pins[i].snapshot)))
+            return false;
+    return true;
+}
+
+/** \brief Reject all live control aliases before admission or producer loans.
+ */
+static nx_result_t validate_stream(const nx_stm32_capture_state_t* s,
+                                   nx_stream_t* stream, size_t bytes,
+                                   nx_capture_request_t* request) {
+    if (s->config->common.region_count >
+        SIZE_MAX / sizeof(*s->config->common.regions))
+        return NX_ERROR_INVALID;
+    nx_result_t result = nx_stm32_av_stream_validate(
+        &s->config->common, stream, bytes, 4U, s, sizeof(*s), request,
+        request != NULL ? sizeof(*request) : 0U);
+    if (result != NX_SUCCESS)
+        return result;
+    if (!independent(s, stream, sizeof(*stream)) ||
+        !independent(s, stream->slots,
+                     stream->count * sizeof(*stream->slots)) ||
+        (request != NULL &&
+         (!independent(s, request, sizeof(*request)) ||
+          (request->raw_frame != NULL &&
+           !independent(s, request->raw_frame, sizeof(*request->raw_frame))))))
+        return NX_ERROR_INVALID;
+    for (size_t i = 0U; i < stream->count; ++i)
+        if (!independent(s, stream->slots[i].data, stream->slots[i].capacity))
+            return NX_ERROR_INVALID;
+    return NX_SUCCESS;
+}
+
 static nx_result_t snapshot(void* context, nx_capture_request_t* request) {
     nx_stm32_capture_state_t* s = context;
     if (!nx_stm32_av_task())
@@ -316,9 +361,8 @@ static nx_result_t snapshot(void* context, nx_capture_request_t* request) {
                                 request, sizeof(*request)))
             return NX_ERROR_INVALID;
     }
-    nx_result_t result = nx_stm32_av_stream_validate(
-        &s->config->common, request->destination, request->storage_bytes, 4U, s,
-        sizeof(*s), request, sizeof(*request));
+    nx_result_t result = validate_stream(s, request->destination,
+                                         request->storage_bytes, request);
     if (result != NX_SUCCESS)
         return result;
     if (request->raw_frame != NULL)
@@ -372,8 +416,7 @@ static nx_result_t start_blocks(void* context, nx_stream_t* stream) {
     if (bytes == 0U || bytes % 4U != 0U || bytes / 4U > 65535U ||
         (uint64_t)bytes * 1000000U <= 2U * in_gap + 32000000U)
         return NX_ERROR_INVALID;
-    nx_result_t result = nx_stm32_av_stream_validate(
-        &s->config->common, stream, bytes, 4U, s, sizeof(*s), NULL, 0U);
+    nx_result_t result = validate_stream(s, stream, bytes, NULL);
     if (result != NX_SUCCESS)
         return result;
     for (size_t i = 0U; i < stream->count; ++i)

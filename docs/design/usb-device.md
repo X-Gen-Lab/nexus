@@ -268,15 +268,16 @@ initialize 不启动硬件；prepare 不借用 payload，`nx_usb_control_begin` 
 权威 SETUP epoch 准入，成功才建立 outer 借用，且本身不提交包。IN 发送
 min(length, wLength)，OUT 容量必须覆盖 wLength；请求、控制存储与 payload
 须满足公共头文件的对齐和不重叠合同。
-`nx_usb_control_step` 每次最多调用一次 DCD service、读取一次权威 state，并执行
-一次 packet 提交／取消或 STALL 动作。它只检查两个固定 packet 槽，不在一步内循环
-完成多包事务，也不创建 worker；调用者在 suspend、cancel 或停机期间仍负责推进。
+`nx_usb_control_step` 每步至多一次 poll／权威 state 读取，再执行至多两次 submit
+或一次 cancel；为 DATA IN 先取得同 epoch 的零长 STATUS OUT，再提交 IN。
+只检查两个固定 packet 槽，不在一步内循环完成多包事务，不创建 worker。
+调用者在 suspend、cancel 或停机期间仍负责推进。
 
 | 事实 | 允许的结论与后续责任 |
 | --- | --- |
 | 一个 inner packet acquire SETTLED | 仅该包的 provider 已结束访问；DATA ACK 不完成整个 control 事务，也不返还 outer payload |
 | DATA 全部结束 | IN 按 MPS 分包，短于 wLength 且恰好落在 MPS 边界时发送必要的 DATA ZLP；OUT 进入 DATA_READY，尚不发送 STATUS IN |
-| 对应 STATUS 包真实 ACK | 可完成该 outer 事务的线上结果；已 acquire 的 STATUS ACK 先于随后观察到的新 epoch、closing 或超时判定 |
+| 对应 STATUS 包真实 ACK | 确定该 outer 事务的线上结果；已 acquire 的 STATUS ACK 先于后来观察到的 epoch、closing 或超时，但两个 packet 方向及其 DMA／FIFO／IRQ 借用都退出后才发布 outer SETTLED |
 | SET_ADDRESS staging 成功 | 仅暂存地址；STATUS IN 的实际 ACK 与 DCFG 地址写入／读回分别成立，线上成功不保证地址或外部 configuration 已提交 |
 
 `nx_usb_control_out_view` 只在同 epoch 的 DATA_READY 且没有 provider packet 引用时，
@@ -298,9 +299,12 @@ wire 时序仍需实板验证；outer request 的借用不因拒绝、epoch 更�
 设备地址、closing 与外部 configuration readiness 不能从 outer SUCCESS 推断。
 
 新 SETUP/reset 的 epoch、cancel、timeout 或 device stop 都不撤销旧借用。adapter
-先 acquire/fold 已完成 packet，再观察新 epoch；旧 packet 必须实际排空，才能最终
-发布 outer SETTLED。描述符字节、outer request、adapter context、profile 和其
-endpoint face 在此期间保持有效；一个 outer 结束也不替调用者 join 独立 observer。
+先 acquire/fold 已完成 packet，再观察新 epoch。零长 STATUS OUT 的有效 XFRC
+关闭线上 control admission，但不是尚未停止的 IN／OUT DMA、FIFO 或 IRQ 退出证明；
+AHB busy、地址拒清或另一方向未结清时继续保留两个槽及 outer payload。已经取得
+STATUS ACK 后不再发下一 DATA IN；只 join 旧方向再发布 outer SETTLED，不伪造
+额外 ACK 或重放 payload。描述符、outer request、adapter、profile 和 endpoint face
+全程保持有效，outer 结束仍不替调用者 join 独立 observer。
 
 如果 OUT0 packet 进入 QUARANTINED，adapter 暴露 `NEEDS_DEVICE_STOP` 并继续保留
 outer 借用。只有外部 controller owner 能授权 `nx_usb_device_stop`；adapter
@@ -343,7 +347,7 @@ control-line/break 请求在获批前不准入 STATUS。所有 mutation 都必�
 仍提交已批准的原 epoch 意图。已经 acquire 的 STATUS ACK 不被后来的 SETUP/reset、closing
 或 state 读取失败撤销，紧接的 GET 返回已提交的新 line coding。reset 后是否恢复
 初始类状态是外部 owner 的独立策略。每次 `nx_usb_acm_step` 最多推进一次既有
-packetizer，保持每步最多一次 service、一次 state 读取及一次 packet 动作；
+packetizer，沿用本节 packetizer 的一次 poll／state 与有界 submit／cancel 预算；
 外部仍须在取消、超时、suspend 和停机期间继续推进并保留所有 storage。
 OUT0 quarantine 仍须外部 controller owner 授权真实完整停止，组件不自动 stop。
 
@@ -419,11 +423,13 @@ VBUS 放电确认，才进行新角色的供电／cold prepare。切回 Device �
 staging、有限 deadline 和显式 Thread step。官方 Handle／class／descriptor 回调表
 留在私有接线边界，公共 I/O 不泄漏厂商类型；不选时不编译、不建立堆或后台任务。
 
-Device Core 复用现有 epoch、activation 和真实 packet settlement；多包控制 IN
-的提前零长 OUT 意图延后至真实 STATUS_OUT。即时 premature STATUS OUT 回调不由
-严格 DCD 提供，下一 SETUP／deadline 与完整 drain 恢复有软件回归，不能据此声称
-立即中止路径已经完整维护。Host Core 在断开后先排空，再允许 Core reset/class
-退出及应用明确的 cold restart。两者均锁存官方 Core 忽略的 LL 错误。
+Device Core 复用现有 epoch、activation 和真实 packet settlement。多包 DATA IN
+在同 epoch 提前接纳零长 STATUS OUT；线上 STATUS 已结束但 DMA 内存尚未 join 时，
+bridge 根据权威 `control_pending=false` 暂停 EP0 Core 续包派发，先会合双方向。
+只转交真实已结清的 IN ACK 和 STATUS，不补造 `EP0_TxSent`，不因这段合法间隔
+锁存 INVALID，也不重放下一 IN payload。新 SETUP、deadline 与停止仍须完整排空。
+Host Core 在断开后先排空，再允许 Core reset／class 退出及显式 cold restart。
+两者均锁存官方 Core 忽略的 LL 错误，不建立 ISO 周期调度或 remote wake。
 
 私有 Device Core bridge 把 profile ISO 显式映射到 `USBD_EP_TYPE_ISOC`，不把
 Nexus 枚举值当作官方 wire 类型。Core／class 仍由特权 Thread 显式 step，packet

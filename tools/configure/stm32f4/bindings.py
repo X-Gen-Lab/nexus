@@ -30,7 +30,7 @@ def _endpoint_face(kind, name, state, implementation=None):
             f"const nx_{kind}_endpoint_t* const nx_device_{name} = &s_nx_device_face_{name};"]
 
 
-def _spi_constructor(item, result, board_bindings, routes, devices, *, paired=False):
+def _spi_constructor(item, result, board_bindings, routes, devices):
     """Describe exact static connections; C owns cold hardware transitions."""
     selected = item.integration
     if selected is None or selected.clock_hz is None:
@@ -51,7 +51,7 @@ def _spi_constructor(item, result, board_bindings, routes, devices, *, paired=Fa
     pin_records = list(item.pins)
     endpoint_records = []
     definitions = []
-    cold_type = "nx_stm32_spi_dma_cold_t" if paired else "nx_stm32_spi_cold_receipt_t"
+    cold_type = "nx_stm32_spi_dma_cold_t" if dma else "nx_stm32_spi_cold_receipt_t"
     definitions.append(f"static {cold_type} s_nx_spi_cold_{name};")
     for index, child in enumerate(children):
         child_name = _symbol(child.id)
@@ -112,13 +112,12 @@ def _spi_constructor(item, result, board_bindings, routes, devices, *, paired=Fa
                         f"    .regions = s_nx_dma_regions_{name}, .region_count = {count}u,",
                         f"    .priority = {selected.irq.priority}u,",
                         f"    .kernel_bound = {'true' if result.kernel is not None else 'false'}"]
-    suffix = "_pair" if paired else ""
     arguments = (Address(state), Address(config),
                  Address(f"s_nx_spi_cold_{name}"))
-    initialize = DirectCall(f"nx_stm32_{implementation}{suffix}_prepare", arguments)
+    initialize = DirectCall(f"nx_stm32_{implementation}_prepare", arguments)
     stop = ([DirectCall("nx_spi_port_stop", (Symbol(f"nx_binding_{name}"),))]
             if dma else [])
-    stop.append(DirectCall(f"nx_stm32_{implementation}{suffix}_close", arguments))
+    stop.append(DirectCall(f"nx_stm32_{implementation}_close", arguments))
     definitions += ["};"]
     if dma:
         for vector, receive in ((tx_vector, "false"), (rx_vector, "true")):
@@ -551,7 +550,7 @@ def _uart_constructor(item, result):
                     indent + f".clock_hz = {selected.clock_hz}u, .baud = {options.baud}u,",
                     indent + f".profile = {profile}, .priority = {selected.irq.priority}u,",
                     indent + f".kernel_bound = {'true' if result.kernel is not None else 'false'},",
-                    indent + f".preload_tx = {'true' if secondary_controllers.applies(item, result, 'stm32') else 'false'}, .format = {frame}"]
+                    indent + f".format = {frame}"]
     if options.wire is not None:
         definitions[-1] += ","
         definitions += [indent + f".wire = &s_nx_uart_wire_{name}, .pin_count = {len(selected.pins)}u"]
@@ -631,8 +630,7 @@ def constructor(item, result, board_bindings, routes, devices):
             from .spi_frames import constructor as frames_constructor
             return frames_constructor(item)
         construction = _spi_constructor(
-            item, result, board_bindings, routes, devices,
-            paired=secondary_controllers.applies(item, result, "stm32"))
+            item, result, board_bindings, routes, devices)
         return enhanced_endpoints.dma_construction(item, construction, "stm32")
     if item.kind == "i2c_target":
         from .i2c_target import constructor as target_constructor

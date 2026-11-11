@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 2260a84754c9a731312d4807adf8fb609c939a69f8ef8933d3343bcc590ef189\n"
+"X-Nexus-Source-SHA256: e7aaee2b0b7c0b21302869e6ebf41a0ba016ed52106c4f5e12ced1a0627d8dd2\n"
 
 #: ../../../docs/delivery/qualification.md:1
 msgid "软件验证与物理资格"
@@ -118,20 +118,6 @@ msgstr ""
 " tool files or incomplete budgets. Preparing fixtures is not flashing, "
 "serial testing, waveform measurement or completed power-cut testing."
 
-#: ../../../docs/delivery/qualification.md:20
-msgid ""
-"当前重构的生产 SoC 只维护 F4，具体实现限定 F407VE／ZG。已有其他系列的原始 "
-"执行记录保留原源码身份，不成为本轮验收输入。ThreadX、FreeRTOS、Native 内核、 寄存器模型、ARM "
-"链接与物理执行分别判断；链接程序存在不证明 scheduler 已运行。 本轮必须重新取得适用的软件结果，不能复用历史测试数量或候选通过值。"
-msgstr ""
-"The current refactor maintains only F4 production SoC integration, limited "
-"to F407VE/ZG. Original execution records for other series retain their "
-"source identities and are not inputs to this acceptance. Judge ThreadX, "
-"FreeRTOS, Native kernels, register models, ARM links and physical execution "
-"independently; a linked program does not prove a running scheduler. This "
-"iteration must obtain applicable software results afresh, without reusing "
-"historical test counts or candidate passes."
-
 #: ../../../docs/delivery/qualification.md:25
 msgid ""
 "USB 的 packet/clock/factory 模型与软件 Board ELF 不提供 VBUS、connector、PHY、 "
@@ -206,3 +192,6 @@ msgstr ""
 "then measure cycles/latency/high-water and sustained load. External projects"
 " own private product policies, field deployment, keys and manufacturing "
 "permissions."
+
+msgid "当前生产 SoC 只维护 F4，精确器件与模式见[支持范围](support.md)。F407 Board 与 新增料号的内部 CRC 软件参考分别记录，不把某一参考的 ARM／SDK 结果扩展到全部 模式。其他系列原始记录保留原源码身份。ThreadX、FreeRTOS、Native、寄存器模型、 ARM 链接与物理执行分别判断，链接程序不证明 scheduler 已运行；本轮结果不继承历史计数。"
+msgstr "F4 is the only production SoC scope; see [support scope](support.md) for exact devices and modes. F407 Boards and internal-CRC software references for added parts are recorded separately; ARM/SDK evidence for one reference does not extend to every mode. Records for other series retain their original source identity. ThreadX, FreeRTOS, Native, register models, ARM linkage and physical execution are assessed separately. A linked program does not prove scheduler execution, and current results inherit no historical counts."

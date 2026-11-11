@@ -325,7 +325,9 @@ static void close_tx(nx_eth_mac_t* mac, nx_result_t terminal,
                      nx_time_us_t now) {
     if (!mac->tx_closing) {
         mac->tx_closing = true;
-        mac->drain_deadline = nx_deadline_after(now, mac->drain_timeout_us);
+        if (nx_deadline_finite_after(now, mac->drain_timeout_us,
+                                     &mac->drain_deadline) != NX_SUCCESS)
+            mac->drain_deadline = 0U;
         mac->flush_started = false;
     }
     if (terminal == NX_ERROR_IO)

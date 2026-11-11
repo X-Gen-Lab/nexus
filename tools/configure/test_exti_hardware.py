@@ -112,8 +112,9 @@ class ExtiHardwareConfigurationTests(unittest.TestCase):
                 configure.resolve_ir(path)
 
     def test_all_gpio_exti_routes_offer_both_explicit_personalities(self):
+        from tools.configure.tests.device_fixture import load_soc_facts
         package = configure.ROOT / "soc/stm32/stm32f4"
-        soc = configure.load(package / "soc.json")
+        soc = load_soc_facts(package / "soc.json")
         routes = configure.load(package / "routes.json")["routes"]
         for line in range(16):
             self.assertIn("hardware-event",

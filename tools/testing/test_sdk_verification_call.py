@@ -459,6 +459,11 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "mcuboot_control", "mcuboot_boot"):
             shutil.copytree(ROOT / "cmake/package/verification" / scenario,
                             self.sdk / "cmake/package/verification" / scenario)
+        family = Path("tests/contracts/stm32f4_family")
+        shutil.copytree(ROOT / family, self.sdk / family)
+        crc = Path("tests/contracts/crc_assembly/consumer.c")
+        (self.sdk / crc).parent.mkdir(parents=True)
+        shutil.copyfile(ROOT / crc, self.sdk / crc)
         specification = importlib.util.spec_from_file_location(
             "nexus_consumer_parallel_contract",
             ROOT / "cmake/package/verify_consumers.py")
@@ -579,11 +584,18 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 cpu = {"arch": "cortex-m4" if service.arm else "native"}
                 if service.scenario != "common_services" and service.arm:
                     cpu.update(float_abi="hard", fpu="fpv4-sp-d16")
-                (config / "resolved.json").write_text(json.dumps({
+                resolved = {
                     "backend": "baremetal" if service.arm else "native",
                     "soc_family": family, "cpu": cpu,
                     "enum_abi": "short-enums" if service.arm else "native-int",
-                    "controllers": []}))
+                    "controllers": []}
+                if service.scenario == "f4_family":
+                    authored = tomllib.loads(Path(assembly_arg).read_text())
+                    board = source / authored["board_package"] / "board.json"
+                    resolved["part"] = json.loads(board.read_text())["soc"]
+                    if self.selected_fault == "family_part":
+                        resolved["part"] = "STM32F407ZGT6"
+                (config / "resolved.json").write_text(json.dumps(resolved))
                 rows.append({"file": str(config / "bindings.c"),
                              "directory": str(build),
                              "arguments": ["cc", "-c", str(config / "bindings.c")]})
@@ -788,6 +800,12 @@ class SDKConsumerParallelTests(unittest.TestCase):
         status, _ = self.execute(("--parallel", "1"))
         self.assertEqual(status, 0)
         self.assert_complete_matrix()
+
+    def test_family_consumer_rejects_another_supported_exact_part(self):
+        self.selected_fault = "family_part"
+        status, report = self.execute(("--parallel", "1"))
+        self.assertEqual(status, 1)
+        self.assertIn("another exact part", report["first_failure"]["error"])
 
 
     def test_selected_audio_smoke_uses_the_standard_platform_factory(self):
@@ -1479,20 +1497,24 @@ finally:
                 result.append(self.real_execute(mode='validation'))
             except BaseException as error:
                 errors.append(error)
-                raise
         worker = threading.Thread(target=execute)
         worker.start()
         try:
-            deadline = time.monotonic() + 5
+            # Earlier consumers run real subprocesses before this retention
+            # stage. Its launch latency is not the publication contract.
+            deadline = time.monotonic() + 30
             while not (self.directory / 'validation-ready').exists():
                 if not worker.is_alive() or time.monotonic() >= deadline:
-                    self.fail('retention validation did not reach its barrier')
+                    self.fail(f'retention validation did not reach its barrier: {errors!r}')
                 time.sleep(0.01)
             self.assertTrue(worker.is_alive())
             self.assertFalse((self.output / 'verification.json').exists())
         finally:
             (self.directory / 'validation-release').write_text('release')
-            worker.join(timeout=8)
+            # Join the owned executor before TemporaryDirectory cleanup. Every
+            # child has the explicit eight-second process bound above; this
+            # join also includes peer cancellation and report publication.
+            worker.join()
         self.assertFalse(worker.is_alive())
         self.assertEqual(errors, [])
         status, report = result[0]

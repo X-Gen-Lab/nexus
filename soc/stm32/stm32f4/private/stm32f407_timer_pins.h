@@ -6,7 +6,7 @@
 #ifndef NX_STM32F407_TIMER_PINS_H
 #define NX_STM32F407_TIMER_PINS_H
 #include "stm32f407_timer_hardware.h"
-#include "stm32f407xx.h"
+#include "stm32f4xx.h"
 #include <stdbool.h>
 
 /** \brief Immutable silicon pad fact; GPIO bank clocks stay platform-owned. */

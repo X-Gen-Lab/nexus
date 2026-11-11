@@ -8,7 +8,7 @@
 #include "flash_map_backend/flash_map_backend.h"
 #include "nexus/io/native/model.h"
 #include "nexus_bindings.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 #include <stdlib.h>
 
 static uint8_t s_memory[8192];
@@ -41,7 +41,7 @@ int main(void) {
         started.remaining_effects != 0U) {
         return 1;
     }
-    const nx_flash_port_t* flash = nx_factory_flash(NX_FLASH_ID_PHYSICAL);
+    const nx_flash_port_t* flash = nx_factory_flash_ref(NX_FLASH_REF_PHYSICAL);
     if (nx_native_flash_model_configure(flash, s_memory, &s_geometry) !=
         NX_SUCCESS) {
         return 2;

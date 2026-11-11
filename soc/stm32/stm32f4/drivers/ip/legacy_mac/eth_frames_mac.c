@@ -465,7 +465,9 @@ static void close_tx(nx_eth_frames_mac_t* mac, nx_time_us_t now) {
     if (!mac->tx_closing) {
         mac->tx_closing = true;
         mac->flush_started = false;
-        mac->drain_deadline = nx_deadline_after(now, mac->drain_timeout_us);
+        if (nx_deadline_finite_after(now, mac->drain_timeout_us,
+                                     &mac->drain_deadline) != NX_SUCCESS)
+            mac->drain_deadline = 0U;
     }
     write_reg(mac, CONTROL, read_reg(mac, CONTROL) & ~TX_START);
     write_reg(mac, MAC, read_reg(mac, MAC) & ~8U);

@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-CONSUMER_POLICY = "nexus-sdk-consumers-v17"
+CONSUMER_POLICY = "nexus-sdk-consumers-v20"
 BASE_CONSUMERS = (("native", False, "native"), ("stm32", True, "stm32"))
 MODERN_CONSUMERS = ()
 SELECTED_CONSUMERS = (
@@ -53,6 +53,12 @@ SERVICE_CONSUMERS = (
                     True, "mcuboot_control"),
     ServiceConsumer("f407 mcuboot boot", "assembly.toml", "arm-boot", True,
                     "mcuboot_boot"),
+    ServiceConsumer("f405zg family", "f405zg.toml", "arm-family-f405zg", True,
+                    "f4_family"),
+    ServiceConsumer("f415zg family", "f415zg.toml", "arm-family-f415zg", True,
+                    "f4_family"),
+    ServiceConsumer("f417zg family", "f417zg.toml", "arm-family-f417zg", True,
+                    "f4_family"),
 )
 NATIVE_TIME_SMOKES = frozenset({"native-time-pair", "native-time-empty"})
 

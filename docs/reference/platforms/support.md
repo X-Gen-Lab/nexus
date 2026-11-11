@@ -8,8 +8,9 @@ source_language: zh_CN
 (docs-reference-platforms-support)=
 # 读取精确平台支持
 
-当前生产系列入口是 STM32F4，已迁入的实现限定 STM32F407VET6 与 STM32F407ZGT6。
-同系列名称、官方 SDK 文件或器件宏存在，不代表其他 F4 型号已经适配。
+当前生产系列入口是 STM32F4，精确器件与模式统一见[详细支持](../../delivery/support.md)。
+五个已审料号的事实、四个实体 F407 Board 包及新增料号的内部 CRC 软件参考分别维护。
+同系列名称、官方 SDK 文件或器件宏存在，不代表全部 F4、外设组合或实体 PCB 已验证。
 
 | 维度 | 当前含义 |
 |---|---|

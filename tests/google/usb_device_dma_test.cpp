@@ -235,3 +235,61 @@ TEST_F(UsbDeviceDma, AhbErrorRequiresEndpointAndDmaDrainBeforeIoSettlement) {
     EXPECT_EQ(model.hardware.registers[0x934U / 4U], 0U);
     EXPECT_EQ(model.hardware.registers[0x928U / 4U] & 4U, 0U);
 }
+
+/** \brief Protocol closure cannot wait for another endpoint's AHB join. */
+class UsbStatusJoin : public UsbDeviceDma,
+                      public testing::WithParamInterface<bool> {
+  protected:
+    nx_usb_request_t status_request = {};
+    nx_usb_request_t bulk_request = {};
+    void TearDown() override {
+        model.hardware.refused_dma_address_offset = 0U;
+        UsbDeviceDma::TearDown();
+    }
+};
+TEST_P(UsbStatusJoin, WireStatusEndsAdmissionWhileDmaStorageRemainsBorrowed) {
+    Start();
+    const uint8_t setup[8] = {0x80U, 6U, 0U, 1U, 0U, 0U, 128U, 0U};
+    std::memcpy(staging[1].bytes, setup, sizeof(setup));
+    model.hardware.registers[0xB00U / 4U] &= ~(1U << 31U);
+    model.hardware.registers[0xB08U / 4U] |= 8U;
+    nx_usb_controller_irq(&model.controller);
+    const uint64_t epoch = model.controller.snapshot.epoch;
+    const auto bulk = Port(2U);
+    const auto input = Port(0U);
+    const auto output = Port(1U);
+    nx_request_initialize(&bulk_request.base);
+    ASSERT_EQ(NX_SUCCESS, nx_usb_in_prepare(&bulk_request, bytes, 1U,
+                                            NX_USB_DATA, 0U, 500U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_endpoint_submit(&bulk, &bulk_request));
+    nx_request_initialize(&status_request.base);
+    ASSERT_EQ(NX_SUCCESS, nx_usb_out_prepare(&status_request, nullptr, 0U,
+                                             NX_USB_STATUS, epoch, 500U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_endpoint_submit(&output, &status_request));
+    model.hardware.registers[0xB10U / 4U] = (3U << 29U) | (1U << 19U) | 64U;
+    ASSERT_EQ(NX_SUCCESS, nx_native_usb_complete(&model, 0U, false));
+    if (GetParam())
+        model.hardware.refused_dma_address_offset = 0xB14U;
+    else
+        model.hardware.registers[0x10U / 4U] &= ~(1U << 31U);
+    nx_usb_controller_irq(&model.controller);
+    EXPECT_FALSE(model.controller.snapshot.control_pending);
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&status_request.base));
+    EXPECT_EQ(&status_request, endpoints[1].request);
+    ASSERT_EQ(NX_SUCCESS, nx_usb_in_prepare(&request, bytes + 1U, 1U,
+                                            NX_USB_DATA, epoch, 500U));
+    ASSERT_NE(NX_SUCCESS, nx_usb_endpoint_submit(&input, &request));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+    model.hardware.refused_dma_address_offset = 0U;
+    model.hardware.registers[0x10U / 4U] |= 1U << 31U;
+    nx_usb_controller_irq(&model.controller);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&status_request.base));
+    EXPECT_EQ(NX_SUCCESS, status_request.base.result);
+    EXPECT_EQ(nullptr, endpoints[1].request);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&bulk_request.base));
+    EXPECT_EQ(&bulk_request, endpoints[2].request);
+    EXPECT_EQ(0x20000800U, model.hardware.registers[0x934U / 4U]);
+    EXPECT_EQ(1U, model.hardware.consumers);
+}
+INSTANTIATE_TEST_SUITE_P(AhbBusyOrAddressWithdrawalRefused, UsbStatusJoin,
+                         testing::Values(false, true));

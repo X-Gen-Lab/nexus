@@ -7,25 +7,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: d4c82f107c028065858f55c762e7a64e00dd16b477824efb7e2e2b6e3716803f\n"
+"X-Nexus-Source-SHA256: 8b09c9d72c3a23cad9c58904e2fd872a9ea5bd63db8ff3581234bce88969fdbf\n"
 
 #: docs/delivery/cortex-m.md:1
 msgid "Cortex-M 软件支持与平台接入边界"
 msgstr "Cortex-M 软件支持与平台接入边界"
-
-#: docs/delivery/cortex-m.md:3
-msgid ""
-"Nexus 的 CPU 软件层支持 M0、M0+、M3、M4、M7、M23、M33、M55、M85。 同一不可变 CPU profile 解析器驱动 "
-"Core、Arch、原子操作及裸机/FreeRTOS 运行时配置；DSP、FPU、MVE、cache、MPU、DWT、security 和 SAU "
-"均显式声明。 选择某个内核不生成新 SoC、Board、向量表、启动、驱动、链接布局或 typed factory。 当前生产 SoC 只有 "
-"F4，具体实现限定 F407VE／ZG。CPU 软件能力不生成这些芯片 的时钟、IRQ、DMA 或板级接线；其他系列 SDK 保留也不代表生产支持。实板 "
-"HIL 未执行。"
-msgstr ""
-"Nexus 的 CPU 软件层支持 M0、M0+、M3、M4、M7、M23、M33、M55、M85。 同一不可变 CPU profile 解析器驱动 "
-"Core、Arch、原子操作及裸机/FreeRTOS 运行时配置；DSP、FPU、MVE、cache、MPU、DWT、security 和 SAU "
-"均显式声明。 选择某个内核不生成新 SoC、Board、向量表、启动、驱动、链接布局或 typed factory。 当前生产 SoC 只有 "
-"F4，具体实现限定 F407VE／ZG。CPU 软件能力不生成这些芯片 的时钟、IRQ、DMA 或板级接线；其他系列 SDK 保留也不代表生产支持。实板 "
-"HIL 未执行。"
 
 #: docs/delivery/cortex-m.md:10
 msgid ""
@@ -480,3 +466,6 @@ msgstr ""
 "coherence、MPU/SAU 行为、安全世界协作、stack high-water、时钟 和物理波形均保持未验收。正式 clean-source "
 "SDK、离线双构建、镜像 hash 和 candidate 封存须依据 [qualification](qualification.md) "
 "重新执行；软件支持不 自动提升为 production release、硬件资格、安全认证或 LTS。"
+
+msgid "Nexus 的 CPU 软件层支持 M0、M0+、M3、M4、M7、M23、M33、M55、M85。 同一不可变 CPU profile 解析器驱动 Core、Arch、原子操作及裸机／FreeRTOS 运行时配置；DSP、FPU、MVE、cache、MPU、DWT、security 和 SAU 均显式声明。 选择内核不生成具体 SoC、Board、向量、启动、驱动、链接布局或 typed factory。 当前生产 SoC 入口为 F4，[精确器件与模式](support.md)分别审查；保留其他系列 SDK 不代表生产支持。实板 HIL 未执行。"
+msgstr "Nexus 的 CPU 软件层支持 M0、M0+、M3、M4、M7、M23、M33、M55、M85。 同一不可变 CPU profile 解析器驱动 Core、Arch、原子操作及裸机／FreeRTOS 运行时配置；DSP、FPU、MVE、cache、MPU、DWT、security 和 SAU 均显式声明。 选择内核不生成具体 SoC、Board、向量、启动、驱动、链接布局或 typed factory。 当前生产 SoC 入口为 F4，[精确器件与模式](support.md)分别审查；保留其他系列 SDK 不代表生产支持。实板 HIL 未执行。"

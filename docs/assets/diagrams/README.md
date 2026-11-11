@@ -9,7 +9,8 @@ source_language: zh_CN
 
 图源为可编辑 DOT，输出为本地 SVG；`labels.json` 维护同一拓扑的中英文标签。
 实线和虚线以各边标签为准，不能把源码依赖理解为每次 I/O 的转发，也不能由图推导
-软件候选、吞吐、低功耗或物理 HIL。当前 MCU 接入只有 F4，精确实现限定 F407VE／ZG。
+软件候选、吞吐、低功耗或物理 HIL。当前 MCU 入口为 F4，精确器件与模式见
+[支持范围](../../delivery/support.md)；图中参考装配不授权其他配置。
 
 纯退役芯片图已退出当前图册，原图可从
 [固定旧源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/assets/diagrams)

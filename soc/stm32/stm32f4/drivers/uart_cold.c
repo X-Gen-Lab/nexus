@@ -279,10 +279,15 @@ nx_stm32_uart_cold_acquire(const nx_stm32_uart_cold_config_t* config,
                           (config->wire->mode == NX_UART_WIRE_HALF_DUPLEX ||
                            config->wire->mode == NX_UART_WIRE_SMARTCARD);
         bool rts = rts_pin(config, i);
-        if ((i == 0U && (config->preload_tx || open_drain)) || rts) {
-            NX_PLATFORM_REGISTER_WRITE(pin->registers->BSRR, 1U << pin->pin);
+        if (i == 0U || rts) {
+            /* RM0090 SIR is idle-low; other TX personalities idle high. */
+            const bool high = rts || config->wire == NULL ||
+                              config->wire->mode != NX_UART_WIRE_IRDA;
+            const uint32_t pin_mask = 1U << pin->pin;
+            NX_PLATFORM_REGISTER_WRITE(pin->registers->BSRR,
+                                       high ? pin_mask : pin_mask << 16U);
             nx_arch_dsb();
-            if ((pin->registers->ODR & (1U << pin->pin)) == 0U)
+            if ((pin->registers->ODR & pin_mask) != (high ? pin_mask : 0U))
                 return NX_ERROR_IO;
         }
         /* ES0182 2.11.9: keep RTS inactive until both UE and RE exist. */

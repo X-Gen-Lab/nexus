@@ -143,7 +143,11 @@ static void begin_drain(nx_i2c_v1_state_t* state, nx_result_t result) {
         state->registers[CTL0] &= ~START;
         state->registers[CTL0] |= STOP;
     }
-    state->drain_deadline = nx_deadline_after(nx_time_now_us(), 1000U);
+    if (nx_deadline_finite_after(nx_time_now_us(), 1000U,
+                                 &state->drain_deadline) != NX_SUCCESS) {
+        /* An exhausted grace quarantines; it never releases an owned wire. */
+        state->drain_deadline = 0U;
+    }
     (void)nx_request_transition(&state->active->base, NX_REQUEST_DRAINING);
     if (state->ack_irqs != NULL) {
         state->ack_irqs(state);

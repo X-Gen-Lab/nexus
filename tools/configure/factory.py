@@ -366,9 +366,9 @@ def emit(result):
 
 
 def emit_strong(result):
-    """Opt-in nominal IDs; wrappers own no storage or hardware effects."""
+    """Default nominal accessors own no storage or hardware effects."""
     header = ["/**", " * \\file            nexus_factory_strong.h",
-              " * \\brief           Optional nominal factory identities.",
+              " * \\brief           Nominal factory identities and pure accessors.",
               " * \\author          Nexus Team", " */",
               "#ifndef NEXUS_FACTORY_STRONG_H", "#define NEXUS_FACTORY_STRONG_H",
               '#include "nexus_factory.h"', "#ifdef __cplusplus",
@@ -404,6 +404,17 @@ def emit_strong(result):
         header += ["/** \\brief Pure getter; lifecycle remains explicit. */",
                    *signature,
                    f"    return nx_factory_{class_name}(id.value);", "}"]
+        if result.factory.capabilities:
+            declaration = f"nx_factory_{class_name}_capability_ref("
+            argument = f"{ref} id) {{"
+            signature = ([declaration + argument]
+                         if len(declaration + argument) <= 80 else
+                         [declaration, "    " + argument])
+            header += [
+                "/** \\brief Pure selected-mode metadata; no hardware access. */",
+                "static inline const nx_factory_io_capability_t*",
+                *signature,
+                f"    return nx_factory_{class_name}_capability(id.value);", "}"]
     if any(item.kind == "usb_device" and usb_otg.is_managed(item.mode)
            for item in result.controllers):
         header += [r'/** \brief Pure managed owner lookup using the same USB Device ref. */',

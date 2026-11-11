@@ -104,6 +104,50 @@ class SDKServicesPolicyTests(unittest.TestCase):
                 expected_revision="a" * 40, fixture=True)
         self.assertEqual(list(output.iterdir()), [])
 
+    def test_f4_family_profiles_share_one_explicit_twenty_consumer_plan(self):
+        profiles = tuple(item for item in consumer_profiles.SERVICE_CONSUMERS
+                         if item.scenario == "f4_family")
+        self.assertEqual([item.assembly for item in profiles], [
+            "f405zg.toml", "f415zg.toml", "f417zg.toml"])
+        self.assertEqual([item.domain for item in profiles], [
+            "arm-family-f405zg", "arm-family-f415zg", "arm-family-f417zg"])
+        self.assertTrue(all(item.arm for item in profiles))
+        self.assertEqual(len(consumer_profiles.consumer_plan()), 20)
+
+    def test_family_sources_prepare_exact_public_crc_and_board_bytes(self):
+        prefix = self.prefix()
+        sdk = prefix / "share/nexus/src"
+        fixture = Path("tests/contracts/stm32f4_family")
+        shutil.copytree(ROOT / fixture, sdk / fixture)
+        consumer = Path("tests/contracts/crc_assembly/consumer.c")
+        (sdk / consumer).parent.mkdir(parents=True)
+        shutil.copyfile(ROOT / consumer, sdk / consumer)
+        for chip in ("405", "415", "417"):
+            with self.subTest(chip=chip):
+                profile = consumer_profiles.ServiceConsumer(
+                    f"f{chip}zg family", f"f{chip}zg.toml",
+                    f"arm-family-f{chip}zg", True, "f4_family")
+                output = self.directory / chip
+                output.mkdir()
+                source, _, command = self.consumers.prepare_service_consumer(
+                    prefix, output, profile, self.command,
+                    expected_revision="a" * 40, fixture=True)
+                self.assertEqual((source / "main.c").read_bytes(),
+                                 (ROOT / consumer).read_bytes())
+                self.assertEqual((source / "assembly.toml").read_bytes(),
+                                 (ROOT / fixture / profile.assembly).read_bytes())
+                board = Path(f"f{chip}zg-board/board.json")
+                self.assertEqual((source / board).read_bytes(),
+                                 (ROOT / fixture / board).read_bytes())
+                resolved = configure.resolve_ir(source / "assembly.toml")
+                self.assertEqual(resolved.part, f"STM32F{chip}ZGT6")
+                self.assertFalse(resolved.physical_qualified)
+                self.assertEqual(resolved.memory_budget.libc_heap_bytes, 0)
+                self.assertIn("-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON", command)
+                self.assertEqual(self.consumers.service_symbols(profile), {
+                    "nx_platform_start", "nx_platform_stop", "nx_chip_info_read",
+                    "nx_factory_crc", "nx_crc_port_compute", "nx_stm32_crc_ops"})
+
     def image_fixture(self, profile_index=0):
         # Model external compiler/runtime ports; actual SDK execution is separate.
         prefix = self.prefix()

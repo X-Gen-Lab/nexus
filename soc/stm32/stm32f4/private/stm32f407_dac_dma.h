@@ -42,6 +42,7 @@ typedef struct {
     bool route_owned;
     bool initialized;
     bool closing;
+    bool clock_restore_pending; /**< Restore even an inherited DAC clock. */
 } nx_stm32_dac_dma_state_t;
 /** \brief Acquire only the selected route; failures keep partial receipts. */
 nx_result_t nx_stm32_dac_dma_prepare(nx_stm32_dac_dma_state_t* state,

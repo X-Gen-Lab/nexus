@@ -1,6 +1,7 @@
 # I/O observations, capacity and retained recovery
 
-本轮 IO07、IO09、IO10 使用显式、调用方持有的诊断对象。默认 request、stream、slot
+现有请求观察、owner 进度诊断和 stream 容量计算使用显式、调用方持有的诊断对象。
+它们不沿用旧批次的 I/O 任务编号。默认 request、stream、slot
 和 owner 的字段不变，平台不建立全局采样器、隐藏线程或自动恢复设备的策略。诊断
 观察实际状态；deadline、错误或诊断对象的 detach 都不撤销已经接受的借用。
 
@@ -102,7 +103,23 @@ observer join 和通知销毁仍须按原生命周期次序完成。
 故障 sink 在 guard 外执行，必须有界且不重入。应用保存阶段和故障状态并唤醒协调者；
 产品的安全输出、设备复位和现场处置仍归外部产品工程。这份示例策略不建立安全等级。
 
-## 存储与验证边界
+## 本轮有限排空预算
+
+首轮修正 CAN mailbox、通用／F407 I2C async、UART byte／word、UART DMA 和
+SPI DMA 的八个有限 grace 构造点；本轮继续覆盖 HAL TX、polling I2C STOP、
+SPI framed drain／tail 及 Ethernet raw／SG 的内部有限预算。统一使用现有 finite
+helper；时间域上限附近无法表示预算时保持立即到期，不静默饱和为 NEVER。
+
+实际硬件 quiet／abort／撤回证据先判断；已经退出的路径可以正常结清。仍未静止
+时，过期预算保留 QUARANTINED、request、buffer 和相关 CS，不把时间无法表达
+解释成撤销借用。ADC warmup／drain 与 RS485 最低 hold 各有领域合同，不能从通用
+finite helper 推导硬件已经开始或安全输出已撤回。调用方显式无限 request 与 Core
+饱和算术 API 仍保留原语义；其他未审路径不自动继承本次结论。
+
+## 既有观察机制的存储与验证边界
+
+以下布局与 case 数属于既有观察机制的固定 fixture，不是本轮有限 grace 修复的
+新增测试或当前整平台通过值。
 
 以下是实际 Cortex-M4F GNU Arm 14.3、`-fshort-enums` ABI 的 sizeof fixture，数组符号
 由实际 ARM 编译并用 nm 读取。它只量显式对象布局，不冒充整镜像代码大小或物理周期。
@@ -118,7 +135,7 @@ observer join 和通知销毁仍须按原生命周期次序完成。
 slot 48 字节。默认结构没有新增字段；未选择 observer 时不创建上述 sidecar。其他
 编译器、enum ABI 和 pointer width 必须重新测量，不能直接套用这些数值。
 
-新增 Google suite 为 15 项 observer/budget 与 7 项 descriptor/provider state-machine。
+当时新增 Google suite 为 15 项 observer/budget 与 7 项 descriptor/provider state-machine。
 其中 Native UART 执行 32 条序列、SPI 16 条序列、ADC 4 条消费/停止序列；这些循环不是
 额外 Google case 数。I2C 的公共 dispatch 序列 mock 外部异步 provider 依赖，证明公共
 借用/重试合同，不宣称 Native I2C 异步硬件实现。外部示例 28 项实际 owner/lifecycle

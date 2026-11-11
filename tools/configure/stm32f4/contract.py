@@ -12,8 +12,16 @@ from tools.configure.adc import RESOLUTION_BITS
 from . import waveform
 
 PARTS = MappingProxyType({
-    "STM32F407VET6": common.PartPolicy("LQFP100", frozenset(('ccm',))),
-    "STM32F407ZGT6": common.PartPolicy("LQFP144", frozenset(('ccm',))),
+    "STM32F405ZGT6": common.PartPolicy(
+        "LQFP144", frozenset(('ccm',)), "stm32f405"),
+    "STM32F407VET6": common.PartPolicy(
+        "LQFP100", frozenset(('ccm',)), "stm32f407"),
+    "STM32F407ZGT6": common.PartPolicy(
+        "LQFP144", frozenset(('ccm',)), "stm32f407"),
+    "STM32F415ZGT6": common.PartPolicy(
+        "LQFP144", frozenset(('ccm',)), "stm32f415"),
+    "STM32F417ZGT6": common.PartPolicy(
+        "LQFP144", frozenset(('ccm',)), "stm32f417"),
 })
 PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
                             "eth", "eth_frames"))

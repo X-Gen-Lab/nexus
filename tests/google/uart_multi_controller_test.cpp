@@ -40,6 +40,7 @@ volatile uint32_t* held;
 class UARTMultiple : public testing::Test {
   protected:
     DMA_STATE states[2]{};
+    nx_stm32_uart_dma_resources_t resources[2]{};
     nx_uart_port_t ports[2]{{&DMA_OPS, &states[0]}, {&DMA_OPS, &states[1]}};
     nx_uart_tx_request_t requests[2]{};
     uint8_t payload[2][4]{{1U, 2U, 3U, 4U}, {5U, 6U, 7U, 8U}};
@@ -67,15 +68,16 @@ class UARTMultiple : public testing::Test {
         held = nullptr;
         regions[0] = {(uintptr_t)payload, sizeof(payload), NX_DMA_MEMORY_READ};
         for (unsigned i = 0U; i < 2U; ++i) {
-            states[i].resources.regions = regions;
-            states[i].resources.region_count = 1U;
+            states[i].resources = &resources[i];
+            resources[i].regions = regions;
+            resources[i].region_count = 1U;
             states[i].uart.registers = uarts[i];
             states[i].uart.baud = 115200U;
             states[i].uart.profile = NX_UART_RX_BYTES;
             states[i].uart.rx_storage = rings[i];
             states[i].uart.rx_capacity = sizeof(rings[i]);
             states[i].uart.irq = i == 0U ? UIRQ0 : UIRQ1;
-            states[i].resources.dma = i == 0U ? DMA2 : DMA1;
+            resources[i].dma = i == 0U ? DMA2 : DMA1;
             states[i].transmit.tx = i == 0U ? DMA2_Stream7 : DMA1_Stream6;
             states[i].transmit.stream = i == 0U ? 7U : 6U;
             states[i].transmit.channel = 4U;

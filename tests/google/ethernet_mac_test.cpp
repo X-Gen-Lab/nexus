@@ -234,6 +234,31 @@ TEST_F(EthernetMac, CancellationWaitsForActualEngineAndFifoDrain) {
     EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
     EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
 }
+TEST_F(EthernetMac, ExhaustedDrainGraceRetainsDescriptorsUntilActualQuiet) {
+    Start();
+    ASSERT_EQ(NX_SUCCESS,
+              nx_eth_tx_prepare(&request, output, 64U, NX_DEADLINE_NEVER));
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_submit(&port, &request));
+    now = UINT64_MAX - 100U;
+    hold_engine = true;
+    regs[dma_status / 4U] |= 1U << 20U;
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_cancel(&port, &request));
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_service(&port));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, txslots[0].request);
+    EXPECT_NE(0U, tx[0].buffer);
+    hold_engine = false;
+    regs[ctl / 4U] &= ~0x2000U;
+    regs[dma_status / 4U] &= ~(7U << 20U);
+    nx_eth_model_poll(&mac);
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_service(&port));
+    nx_eth_model_poll(&mac);
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_service(&port));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(nullptr, txslots[0].request);
+}
+
 TEST_F(EthernetMac, InvalidDomainRejectsBeforeResetOrOwnPublication) {
     regions[0].permissions = NX_DMA_MEMORY_READ;
     EXPECT_EQ(NX_ERROR_PERMISSION, Initialize());

@@ -70,7 +70,7 @@ static nx_result_t admission(nx_st_usb_device_stack_t* state) {
 }
 /** \brief Release private intent only after its accepted packet is joined. */
 static void clear_intent(nx_st_usb_device_slot_t* slot) {
-    slot->busy = slot->pending = slot->deferred = slot->cancel_sent = false;
+    slot->busy = slot->pending = slot->cancel_sent = false;
     slot->bytes = NULL;
     slot->length = slot->offset = slot->packet = 0U;
 }
@@ -152,7 +152,9 @@ static nx_result_t submit_packet(nx_st_usb_device_stack_t* state,
     nx_usb_stage_t stage = NX_USB_DATA;
     if (slot->endpoint->number == 0U &&
         (state->middleware.ep0_state == USBD_EP0_STATUS_IN ||
-         state->middleware.ep0_state == USBD_EP0_STATUS_OUT))
+         state->middleware.ep0_state == USBD_EP0_STATUS_OUT ||
+         (!slot->endpoint->in && slot->length == 0U &&
+          state->middleware.ep0_state == USBD_EP0_DATA_IN)))
         stage = NX_USB_STATUS;
     nx_result_t result =
         slot->endpoint->in
@@ -166,6 +168,38 @@ static nx_result_t submit_packet(nx_st_usb_device_stack_t* state,
     if (result != NX_SUCCESS)
         clear_intent(slot);
     return result;
+}
+/** \brief An acquired STATUS fact must suppress every later DATA intent. */
+static bool status_out_received(nx_st_usb_device_stack_t* state) {
+    nx_st_usb_device_slot_t* slot = selected(state, 0U, false);
+    if (slot == NULL || !slot->pending || slot->epoch != state->epoch ||
+        slot->request.stage != NX_USB_STATUS)
+        return false;
+    /* The same-epoch DCD snapshot closes DATA admission at the wire fact.
+     * Its packet may still borrow memory while a DMA address cannot join. */
+    if (state->latest.epoch == state->epoch && !state->latest.control_pending)
+        return true;
+    return nx_request_state(&slot->request.base) == NX_REQUEST_SETTLED &&
+           slot->request.base.result == NX_SUCCESS &&
+           slot->request.base.transferred == 0U;
+}
+/** \brief Prearm OUT0 before the Core exposes its first DATA IN packet. */
+static nx_result_t arm_status_out(nx_st_usb_device_stack_t* state) {
+    nx_st_usb_device_slot_t* slot = selected(state, 0U, false);
+    if (slot == NULL || !slot->opened)
+        return NX_ERROR_STATE;
+    if (slot->busy)
+        return slot->pending && slot->epoch == state->epoch &&
+                       slot->request.stage == NX_USB_STATUS
+                   ? NX_SUCCESS
+                   : NX_ERROR_BUSY;
+    slot->bytes = NULL;
+    slot->length = slot->offset = slot->received = 0U;
+    slot->epoch = state->epoch;
+    slot->deadline = state->control_deadline;
+    slot->busy = true;
+    slot->cancel_sent = false;
+    return submit_packet(state, slot);
 }
 /** \brief One LL transfer never allocates, rounds length or refreshes deadline.
  */
@@ -181,17 +215,18 @@ static USBD_StatusTypeDef transfer(USBD_HandleTypeDef* device, uint8_t address,
     nx_st_usb_device_slot_t* slot = selected(state, address & 15U, in);
     if (slot == NULL || !slot->opened)
         return status(state, NX_ERROR_INVALID);
-    bool early_status = !in && slot->endpoint->number == 0U && length == 0U &&
-                        device->ep0_state == USBD_EP0_DATA_IN;
-    if (slot->busy && !slot->deferred)
+    if (slot->busy) {
+        /* Core repeats PrepareReceive during continued DATA and STATUS.
+         * Keep the one accepted request and its original deadline. */
+        if (!in && slot->endpoint->number == 0U && length == 0U &&
+            slot->pending && slot->epoch == state->epoch &&
+            slot->request.stage == NX_USB_STATUS)
+            return USBD_OK;
         return USBD_BUSY;
-    if (early_status) {
-        /* The Core prepares premature OUT0 while DATA_IN is still active.
-         * This carries no payload or DCD borrow. The actual final Core
-         * STATUS_OUT call replaces this intent only after real IN ACK. */
-        slot->busy = slot->deferred = true;
-        return USBD_OK;
     }
+    if (in && slot->endpoint->number == 0U &&
+        device->ep0_state == USBD_EP0_DATA_IN && status_out_received(state))
+        return USBD_BUSY;
     size_t actual = length;
     if (slot->endpoint->number == 0U) {
         if (!in && device->ep0_state == USBD_EP0_DATA_OUT &&
@@ -212,6 +247,14 @@ static USBD_StatusTypeDef transfer(USBD_HandleTypeDef* device, uint8_t address,
                                             &deadline);
     if (result != NX_SUCCESS)
         return status(state, result);
+    if (in && slot->endpoint->number == 0U &&
+        device->ep0_state == USBD_EP0_DATA_IN) {
+        result = arm_status_out(state);
+        if (result != NX_SUCCESS)
+            return result == NX_ERROR_BUSY ? USBD_BUSY : status(state, result);
+        if (status_out_received(state))
+            return USBD_BUSY;
+    }
     slot->bytes = bytes;
     slot->length = actual;
     slot->offset = 0U;
@@ -219,8 +262,12 @@ static USBD_StatusTypeDef transfer(USBD_HandleTypeDef* device, uint8_t address,
     slot->epoch = slot->endpoint->number == 0U ? state->epoch : 0U;
     slot->deadline = deadline;
     slot->busy = true;
-    slot->deferred = slot->cancel_sent = false;
-    return status(state, submit_packet(state, slot));
+    slot->cancel_sent = false;
+    result = submit_packet(state, slot);
+    if (result != NX_SUCCESS && in && slot->endpoint->number == 0U &&
+        status_out_received(state))
+        return USBD_BUSY;
+    return status(state, result);
 }
 /** \brief Join selected old packet epochs before Core can alter class storage.
  */
@@ -268,44 +315,98 @@ static bool reconfiguration(const nx_usb_setup_t* setup) {
     return (setup->request_type == 0U && setup->request == 9U) ||
            (setup->request_type == 1U && setup->request == 11U);
 }
-/** \brief One settled packet becomes one Core completion or another exact
- * packet. */
-static void complete_packets(nx_st_usb_device_stack_t* state) {
-    for (size_t i = 0U; i < state->config->slot_count; ++i) {
-        nx_st_usb_device_slot_t* slot = &state->config->slots[i];
-        if (!slot->pending ||
-            nx_request_state(&slot->request.base) != NX_REQUEST_SETTLED)
-            continue;
-        slot->pending = false;
-        nx_result_t result = slot->request.base.result;
-        size_t bytes = slot->request.base.transferred;
-        if (result != NX_SUCCESS || bytes > slot->packet ||
-            (slot->endpoint->in && bytes != slot->packet)) {
-            clear_intent(slot);
-            (void)status(state, result != NX_SUCCESS ? result : NX_ERROR_IO);
-            return;
-        }
-        if (!slot->endpoint->in && bytes != 0U)
-            memcpy(slot->bytes + slot->offset, slot->storage, bytes);
-        slot->offset += bytes;
-        slot->received = (uint32_t)slot->offset;
-        if (slot->endpoint->number != 0U && slot->offset < slot->length &&
-            bytes == slot->packet) {
-            (void)status(state, submit_packet(state, slot));
-            if (state->failure != NX_SUCCESS)
-                return;
-            continue;
-        }
-        bool in = slot->endpoint->in;
-        uint8_t number = slot->endpoint->number;
+/** \brief One acquired packet becomes one exact Core completion. */
+static void complete_packet(nx_st_usb_device_stack_t* state,
+                            nx_st_usb_device_slot_t* slot) {
+    if (!slot->pending ||
+        nx_request_state(&slot->request.base) != NX_REQUEST_SETTLED)
+        return;
+    slot->pending = false;
+    nx_result_t result = slot->request.base.result;
+    size_t bytes = slot->request.base.transferred;
+    if (result != NX_SUCCESS || bytes > slot->packet ||
+        (slot->endpoint->in && bytes != slot->packet)) {
         clear_intent(slot);
-        USBD_StatusTypeDef core =
-            in ? USBD_LL_DataInStage(&state->middleware, number, NULL)
-               : USBD_LL_DataOutStage(&state->middleware, number, NULL);
-        if (core != USBD_OK && state->failure == NX_SUCCESS)
-            state->failure = NX_ERROR_IO;
+        (void)status(state, result != NX_SUCCESS ? result : NX_ERROR_IO);
+        return;
+    }
+    if (!slot->endpoint->in && bytes != 0U)
+        memcpy(slot->bytes + slot->offset, slot->storage, bytes);
+    slot->offset += bytes;
+    slot->received = (uint32_t)slot->offset;
+    if (slot->endpoint->number != 0U && slot->offset < slot->length &&
+        bytes == slot->packet) {
+        (void)status(state, submit_packet(state, slot));
+        return;
+    }
+    bool in = slot->endpoint->in;
+    uint8_t number = slot->endpoint->number;
+    clear_intent(slot);
+    USBD_StatusTypeDef core =
+        in ? USBD_LL_DataInStage(&state->middleware, number, NULL)
+           : USBD_LL_DataOutStage(&state->middleware, number, NULL);
+    if (core != USBD_OK && state->failure == NX_SUCCESS)
+        state->failure = NX_ERROR_IO;
+}
+/** \brief STATUS owns its wire result, never another direction's loan. */
+static bool complete_status_out(nx_st_usb_device_stack_t* state) {
+    nx_st_usb_device_slot_t* output = selected(state, 0U, false);
+    if (output == NULL || !output->pending || output->epoch != state->epoch ||
+        output->request.stage != NX_USB_STATUS)
+        return false;
+    if (nx_request_state(&output->request.base) != NX_REQUEST_SETTLED)
+        return status_out_received(state);
+    if (output->request.base.result != NX_SUCCESS ||
+        output->request.base.transferred != 0U) {
+        (void)status(state, output->request.base.result != NX_SUCCESS
+                                ? output->request.base.result
+                                : NX_ERROR_IO);
+        return true;
+    }
+    nx_st_usb_device_slot_t* input = selected(state, 0U, true);
+    if (input != NULL && input->pending) {
+        if (nx_request_state(&input->request.base) != NX_REQUEST_SETTLED) {
+            if (!input->cancel_sent) {
+                nx_result_t result = nx_usb_endpoint_cancel(
+                    input->endpoint->port, &input->request);
+                if (result == NX_SUCCESS)
+                    input->cancel_sent = true;
+                else
+                    (void)status(state, result);
+            }
+            return true;
+        }
+        if (input->request.base.result == NX_ERROR_CANCELLED) {
+            clear_intent(input);
+        } else {
+            /* Preserve a real last ACK. Any further Core DATA intent sees
+             * the still-published STATUS fact and cannot launch a packet. */
+            complete_packet(state, input);
+            if (state->failure != NX_SUCCESS)
+                return true;
+        }
+    }
+    if (input != NULL && input->busy)
+        clear_intent(input);
+    state->middleware.ep0_state = USBD_EP0_STATUS_OUT;
+    clear_intent(output);
+    USBD_StatusTypeDef core =
+        USBD_LL_DataOutStage(&state->middleware, 0U, NULL);
+    if (core != USBD_OK)
+        (void)status(state, NX_ERROR_IO);
+    else
+        state->middleware.ep0_state = USBD_EP0_IDLE;
+    return true;
+}
+/** \brief Capture EP0 STATUS before any slot-ordered Core callbacks. */
+static void complete_packets(nx_st_usb_device_stack_t* state) {
+    bool status_seen = complete_status_out(state);
+    for (size_t i = 0U; i < state->config->slot_count; ++i) {
         if (state->failure != NX_SUCCESS)
             return;
+        nx_st_usb_device_slot_t* slot = &state->config->slots[i];
+        if (!status_seen || slot->endpoint->number != 0U)
+            complete_packet(state, slot);
     }
 }
 

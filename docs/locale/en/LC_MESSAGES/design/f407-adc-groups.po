@@ -1,6 +1,6 @@
 # Draft translation from the exact current gettext extraction; review pending.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 73cfafa66d359e2e5b0e29cc6897da156705c73446fd055b7083831ad5e7f603\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 7536f79cf4f613a0cb01b72987e31b92f21a0220ea8283d3bbe47d8a67952df9\n"
 
 msgid "F407 多 ADC 与注入采集"
 msgstr "F407 multiple-ADC and injected acquisition"
@@ -115,3 +115,6 @@ msgstr "Complete software assemblies in `tests/contracts/adc_group_assembly/` co
 
 msgid "当前不提供 regular 与 injected 同时运行、自动注入、DMA 循环多 ADC、运行期换 sequence、外部 trigger owner、内部通道多 ADC 或模拟工程量换算。所列模式不承诺 实测同步偏差、吞吐、IRQ 延迟、模拟精度或物理看门狗响应；实板为 `not_executed`。"
 msgstr "The current implementation excludes concurrent regular/injected operation, automatic injection, circular multiple-ADC DMA, runtime sequence replacement, external trigger owners, multiple-ADC internal channels and engineering-unit conversion. Listed modes do not promise measured synchronization error, throughput, IRQ latency, analog accuracy or physical watchdog response. Hardware execution remains `not_executed`."
+
+msgid "submit 返回 SUCCESS 只表示接纳请求。接纳后，prime 的有限 warmup 无法表示时， 同一 request 转入排空，service 在实际退出后以 EXHAUSTED 和零进度结清；不返回 虚假的无借用拒绝。有限排空预算无法表示时保持立即到期，不改成 NEVER；先尝试 真实硬件退出，仍不能退出才保留 QUARANTINED、request 和完整缓冲供同一 owner 重试。"
+msgstr "SUCCESS from submit means request acceptance. If finite warmup becomes unrepresentable during prime after acceptance, the same request enters drain. After actual withdrawal, service settles it with EXHAUSTED and zero progress instead of reporting a false rejection without a borrow. An unrepresentable finite drain budget remains immediately expired rather than becoming NEVER. Attempt actual hardware withdrawal first; if it still fails, retain QUARANTINED, the request and the whole buffer for the same owner to retry."

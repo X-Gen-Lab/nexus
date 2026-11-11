@@ -3,11 +3,10 @@
 Nexus 为工业 MCU 提供 C11 通用机制：Core、Arch、类型化 I/O、静态 factory、可选 OS
 适配和器件组件。产品任务、业务协议、私有 PCB、Flash 分区与恢复策略由外部工程维护。
 
-当前生产 SoC 入口收敛为 `soc/stm32/stm32f4/`，已迁入的具体实现仍限定
-**STM32F407VET6／STM32F407ZGT6**。系列目录和官方 HAL 的存在不表示全部 F4
-型号、外设模式或开发板已经适配。实际边界见[支持范围](docs/reference/platforms/support.md)。
-所有现有 `vendors/`、子模块、锁定资料与许可证保留；未选择的 SDK 不属于当前生产
-支持，也不应进入所选工程的准备、校验或编译闭包。
+当前生产 SoC 入口为 `soc/stm32/stm32f4/`，精确器件事实已覆盖
+**STM32F405ZGT6／F407VET6／F407ZGT6／F415ZGT6／F417ZGT6**。
+四个实体 Board 包仍为 F407；新增型号的内部 CRC 软件参考不授予其他外设组合或
+PCB 资格。实际模式与执行边界见[支持范围](docs/delivery/support.md)。
 
 源码版本号为 **0.2.1**，发布身份以 [GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases)
 为准。本次重构不重标已有标签、软件候选或硬件证据。当前重构源码仍需完成各自验收，

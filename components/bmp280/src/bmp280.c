@@ -193,22 +193,30 @@ nx_result_t nx_bmp280_begin(nx_bmp280_t* device, nx_time_us_t deadline) {
     if (device->measuring) {
         return NX_ERROR_BUSY;
     }
-    if (nx_deadline_expired(deadline, device->transport.clock.read(
-                                          device->transport.clock.context))) {
+    nx_time_us_t now =
+        device->transport.clock.read(device->transport.clock.context);
+    if (nx_deadline_expired(deadline, now)) {
         return NX_ERROR_TIMEOUT;
     }
+    nx_time_us_t ready;
+    nx_result_t result = nx_deadline_finite_after(now, 8000U, &ready);
+    if (result != NX_SUCCESS)
+        return result;
     uint8_t status;
-    nx_result_t result = read_registers(device, 0xf3, &status, 1, deadline);
+    result = read_registers(device, 0xf3, &status, 1, deadline);
     if (result != NX_SUCCESS || (status & 9u) != 0) {
         return result != NX_SUCCESS ? result : NX_ERROR_BUSY;
     }
     result = write_register(device, 0xf4, 0x25, deadline);
     if (result == NX_SUCCESS) {
-        device->deadline = deadline;
-        device->earliest_ready = nx_deadline_after(
+        result = nx_deadline_finite_after(
             device->transport.clock.read(device->transport.clock.context),
-            8000);
-        device->measuring = true;
+            8000U, &ready);
+        if (result == NX_SUCCESS) {
+            device->deadline = deadline;
+            device->earliest_ready = ready;
+            device->measuring = true;
+        }
     }
     return result;
 }

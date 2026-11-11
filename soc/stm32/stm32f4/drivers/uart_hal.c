@@ -397,8 +397,10 @@ static bool progress_dma(nx_stm32_uart_hal_state_t* state) {
         dma->ErrorCode == HAL_DMA_ERROR_NONE && dma->Instance->NDTR == 0U &&
         (uart->registers->CR3 & USART_CR3_DMAT) == 0U) {
         state->flags |= NX_HAL_MEMORY_COMPLETE;
-        uart->drain_deadline =
-            nx_deadline_after(nx_time_now_us(), 20000000U / uart->baud + 100U);
+        if (nx_deadline_finite_after(nx_time_now_us(),
+                                     20000000U / uart->baud + 100U,
+                                     &uart->drain_deadline) != NX_SUCCESS)
+            uart->drain_deadline = 0U;
     }
     return true;
 }
@@ -563,8 +565,10 @@ static nx_result_t abort_transfer(nx_stm32_uart_hal_state_t* state,
     state->flags |= NX_HAL_ABORTING;
     if (uart->terminal == NX_SUCCESS)
         uart->terminal = reason;
-    uart->drain_deadline =
-        nx_deadline_after(nx_time_now_us(), 20000000U / uart->baud + 100U);
+    if (nx_deadline_finite_after(nx_time_now_us(),
+                                 20000000U / uart->baud + 100U,
+                                 &uart->drain_deadline) != NX_SUCCESS)
+        uart->drain_deadline = 0U;
     state->hal_depth = 1U;
     nx_arch_irq_restore(saved);
     if (HAL_UART_AbortTransmit_IT(&state->handle) != HAL_OK)

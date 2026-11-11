@@ -19,7 +19,8 @@ foreach(sleep_family stm32f4)
         LIBRARIES nexus_clock_domain_test_provider Nexus::Arch
         INCLUDES "${NEXUS_SOC_SOURCE_${sleep_family}}/private"
             "${CMAKE_CURRENT_SOURCE_DIR}")
-    target_compile_definitions(${sleep_target} PRIVATE NEXUS_ARCH_SLEEP_MODEL)
+    target_compile_definitions(${sleep_target} PRIVATE
+        NEXUS_ARCH_SLEEP_MODEL STM32F407xx)
     target_compile_options(${sleep_target} PRIVATE
         "$<$<COMPILE_LANGUAGE:C>:-include${CMAKE_CURRENT_SOURCE_DIR}/clock_sleep_soc_model.h>")
     target_include_directories(${sleep_target} SYSTEM PRIVATE

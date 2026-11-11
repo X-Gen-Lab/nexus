@@ -14,6 +14,7 @@ target_include_directories(nexus_io_native PRIVATE
 set(native_ip "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip")
 set(native_ip_includes "${native_ip}/classic_can"
     "${native_ip}/legacy_mac" "${native_ip}/fs_device_pio")
+set(NEXUS_SYSTEM_PRIVATE_INCLUDES ${native_ip_includes} PARENT_SCOPE)
 target_include_directories(nexus_io_native PRIVATE ${native_ip_includes})
 add_library(nexus_can_native_engine OBJECT
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c")

@@ -87,6 +87,11 @@ TIM5 CH4／TRGO、TIM8 CH2／3／4。硬件触发采用 one-pulse，避免第二
 acquire 观察到 SETTLED。取消或超时只确定终止原因，不撤销借用。成功恰好报告请求
 的完整 frame 数；错误报告零个有效 frame，不能把 DMA 前缀当作成功数据。
 
+submit 返回 SUCCESS 只表示接纳请求。接纳后，prime 的有限 warmup 无法表示时，
+同一 request 转入排空，service 在实际退出后以 EXHAUSTED 和零进度结清；不返回
+虚假的无借用拒绝。有限排空预算无法表示时保持立即到期，不改成 NEVER；先尝试
+真实硬件退出，仍不能退出才保留 QUARANTINED、request 和完整缓冲供同一 owner 重试。
+
 排空依次停止触发与转换、撤 DMA 请求、禁用并回读 DMA EN、稳定 NDTR、清除实际
 硬件地址、join ADC／DMA IRQ，然后把 MULTI 撤回 independent。最终 ADC 错误和
 DMA 错误仍参与结果判定；最后一次观察不能因进入清理而被忽略。没有可信完成时间戳

@@ -16,7 +16,7 @@
 #include <string.h>
 
 enum { IDLE, ACTIVE, TAIL, DRAIN };
-enum { COUNTED = 1U, FAILED = 2U };
+enum { COUNTED = 1U, FAILED = 2U, RECOVERING = 4U };
 #define DRAIN_US 200U
 #define TIMER_HZ NEXUS_APB1_TIMER_HZ
 
@@ -99,7 +99,10 @@ static void begin_drain(nx_stm32_dac_dma_state_t* state, nx_result_t result,
     }
     if (state->phase != DRAIN) {
         state->terminal = result;
-        state->drain_deadline = nx_deadline_after(now, DRAIN_US);
+        if (nx_deadline_finite_after(now, DRAIN_US, &state->drain_deadline) !=
+            NX_SUCCESS) {
+            state->drain_deadline = now == NX_DEADLINE_NEVER ? now - 1U : now;
+        }
         state->phase = DRAIN;
     }
     if ((state->events & FAILED) != 0U) {
@@ -107,10 +110,25 @@ static void begin_drain(nx_stm32_dac_dma_state_t* state, nx_result_t result,
     }
     gate(state);
 }
+/** \brief Temporary gate withdrawal also retains inherited clock ownership.
+ */
+static bool restore_clock(nx_stm32_dac_dma_state_t* state) {
+    if (!state->clock_restore_pending) {
+        return true;
+    }
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_DAC1);
+    nx_arch_dsb();
+    if (LL_APB1_GRP1_IsEnabledClock(LL_APB1_GRP1_PERIPH_DAC1) == 0U) {
+        return false;
+    }
+    state->clock_restore_pending = false;
+    return true;
+}
 /** \brief No payload or descriptor is inspected by the IRQ latch. */
 static void latch(nx_stm32_dac_dma_state_t* state, nx_time_us_t now) {
     uint32_t flags = (DMA1->HISR >> flag_shift(state)) & 0x3dU;
-    if ((flags & 0x0dU) != 0U || underrun(state)) {
+    if ((flags & 0x0dU) != 0U ||
+        (underrun(state) && (state->events & RECOVERING) == 0U)) {
         begin_drain(state, NX_ERROR_IO, now);
     } else if ((flags & 0x20U) != 0U && state->phase == ACTIVE &&
                !config_of(state)->circular) {
@@ -198,7 +216,7 @@ nx_result_t nx_stm32_dac_dma_prepare(nx_stm32_dac_dma_state_t* state,
         return NX_ERROR_CONTEXT;
     }
     if (state->dac.config != NULL || state->initialized || state->clock_added ||
-        state->vector_leases != 0U) {
+        state->vector_leases != 0U || state->clock_restore_pending) {
         return NX_ERROR_BUSY;
     }
     IRQn_Type irq =
@@ -289,6 +307,118 @@ static uint32_t destination(const nx_stm32_dac_dma_state_t* state) {
         : config->format == NX_DAC_FORMAT_U12_LEFT
             ? LL_DAC_DMA_REG_DATA_12BITS_LEFT_ALIGNED
             : LL_DAC_DMA_REG_DATA_12BITS_RIGHT_ALIGNED);
+}
+/** \brief ES0182 2.6.1 requires observed underrun and a complete restart.
+ * \note DMAEN, a clock cycle or W1C alone never proves an empty request latch.
+ *       An idle, exclusively owned timer creates real TRGO events while every
+ *       memory target is detached. Expected UDR cannot publish an IRQ failure.
+ *       The following ordinary arm/start reconfigures DAC, DMA and triggers.
+ */
+static nx_result_t restart(nx_stm32_dac_dma_state_t* state) {
+    uint32_t selected = stream_id(state);
+    if (underrun(state)) {
+        return NX_ERROR_IO;
+    }
+    LL_DAC_DisableIT_DMAUDR1(DAC);
+    LL_DAC_DisableIT_DMAUDR2(DAC);
+    LL_DMA_DisableIT_TC(DMA1, selected);
+    LL_DMA_DisableIT_HT(DMA1, selected);
+    LL_DMA_DisableIT_TE(DMA1, selected);
+    LL_DMA_DisableIT_DME(DMA1, selected);
+    LL_DMA_DisableIT_FE(DMA1, selected);
+    for (unsigned index = 0U; index < 2U; ++index) {
+        NVIC_DisableIRQ(vector(state, index));
+        NVIC_ClearPendingIRQ(vector(state, index));
+    }
+    nx_arch_dsb();
+    if (LL_DMA_IsEnabledStream(DMA1, selected) != 0U ||
+        LL_TIM_IsEnabledCounter(timer(state)) != 0U) {
+        return NX_ERROR_IO;
+    }
+    for (unsigned index = 0U; index < 2U; ++index) {
+        if (vector_busy(vector(state, index))) {
+            return NX_ERROR_IO;
+        }
+    }
+    LL_DMA_SetMemoryAddress(DMA1, selected, 0U);
+    LL_DMA_SetMemory1Address(DMA1, selected, 0U);
+    LL_DMA_SetPeriphAddress(DMA1, selected, 0U);
+    LL_DMA_SetDataLength(DMA1, selected, 0U);
+    nx_arch_dsb();
+    if (stream(state)->M0AR != 0U || stream(state)->M1AR != 0U ||
+        stream(state)->PAR != 0U || stream(state)->NDTR != 0U) {
+        return NX_ERROR_IO;
+    }
+    /* UG is a peripheral event; DAC_SWTRIGR does not generate DMA requests.
+     * Three APB cycles plus a quantization tick allow the digital conversion
+     * to progress. Success still requires observing actual UDR, not elapsed
+     * time alone or waiting for the request's potentially 1 Hz waveform. */
+    const uint64_t spacing =
+        (UINT64_C(3000000) + NEXUS_APB1_HZ - 1U) / NEXUS_APB1_HZ + 1U;
+    LL_TIM_SetTriggerOutput(timer(state), LL_TIM_TRGO_RESET);
+    LL_DAC_EnableDMAReq(DAC, channel(state));
+    nx_arch_dsb();
+    if (LL_DAC_IsDMAReqEnabled(DAC, channel(state)) == 0U ||
+        READ_BIT(timer(state)->CR2, TIM_CR2_MMS) != LL_TIM_TRGO_RESET) {
+        return NX_ERROR_IO;
+    }
+    for (unsigned pulse = 0U; pulse < 2U; ++pulse) {
+        if (nx_deadline_expired(state->active->base.deadline,
+                                nx_time_now_us())) {
+            return NX_ERROR_TIMEOUT;
+        }
+        /* This source can only convert idle: every memory/IRQ target is off.
+         * Retain its UDR attribution even when the accepted deadline expires
+         * before the next observation; failed W1C remains a hardware fault. */
+        state->events |= RECOVERING;
+        LL_TIM_GenerateEvent_UPDATE(timer(state));
+        nx_arch_dsb();
+        nx_time_us_t began = nx_time_now_us();
+        nx_time_us_t after;
+        if (nx_deadline_finite_after(began, spacing, &after) != NX_SUCCESS) {
+            return NX_ERROR_TIMEOUT;
+        }
+        nx_time_us_t now;
+        do {
+            now = nx_time_now_us();
+            if (now < began ||
+                nx_deadline_expired(state->active->base.deadline, now)) {
+                return NX_ERROR_TIMEOUT;
+            }
+        } while (now < after);
+        if (underrun(state)) {
+            break;
+        }
+    }
+    if (!underrun(state)) {
+        return NX_ERROR_IO;
+    }
+    gate(state);
+    LL_DAC_Disable(DAC, LL_DAC_CHANNEL_1);
+    LL_DAC_Disable(DAC, LL_DAC_CHANNEL_2);
+    nx_arch_dsb();
+    if (LL_DAC_IsDMAReqEnabled(DAC, channel(state)) != 0U ||
+        LL_DAC_IsEnabled(DAC, LL_DAC_CHANNEL_1) != 0U ||
+        LL_DAC_IsEnabled(DAC, LL_DAC_CHANNEL_2) != 0U ||
+        LL_DAC_IsTriggerEnabled(DAC, channel(state)) != 0U) {
+        return NX_ERROR_IO;
+    }
+    state->clock_restore_pending = true;
+    LL_APB1_GRP1_DisableClock(LL_APB1_GRP1_PERIPH_DAC1);
+    nx_arch_dsb();
+    if (LL_APB1_GRP1_IsEnabledClock(LL_APB1_GRP1_PERIPH_DAC1) != 0U ||
+        !restore_clock(state)) {
+        return NX_ERROR_IO;
+    }
+    clear_underrun(state);
+    nx_arch_dsb();
+    if (underrun(state)) {
+        return NX_ERROR_IO;
+    }
+    state->events &= ~(uint32_t)RECOVERING;
+    state->dac.running = false;
+    return nx_stm32_dac_arm(&state->dac, state->active->trigger_hz,
+                            state->active->base.deadline, false);
 }
 /** \brief Direct mode has equal memory/peripheral widths and no FIFO loan. */
 static nx_result_t start_dma(nx_stm32_dac_dma_state_t* state) {
@@ -437,6 +567,9 @@ static nx_result_t submit(void* context, nx_dac_tx_request_t* request) {
                      : nx_stm32_dac_arm(&state->dac, request->trigger_hz,
                                         request->base.deadline, false);
     }
+    if (result == NX_SUCCESS) {
+        result = restart(state);
+    }
     saved = nx_arch_irq_save();
     if (result == NX_SUCCESS && state->phase == ACTIVE) {
         result = start_dma(state);
@@ -476,6 +609,9 @@ static bool last_latched(const nx_stm32_dac_dma_state_t* state) {
 /** \brief Stable EN/count and cleared hardware addresses precede publication.
  */
 static bool withdraw(nx_stm32_dac_dma_state_t* state) {
+    if (!restore_clock(state)) {
+        return false;
+    }
     uint32_t selected = stream_id(state);
     gate(state);
     LL_DMA_DisableIT_TC(DMA1, selected);
@@ -526,15 +662,22 @@ static bool withdraw(nx_stm32_dac_dma_state_t* state) {
         NVIC_DisableIRQ(vector(state, index));
         NVIC_ClearPendingIRQ(vector(state, index));
     }
-    if (underrun(state) || ((DMA1->HISR >> flag_shift(state)) & 0x0dU) != 0U) {
+    if ((underrun(state) && (state->events & RECOVERING) == 0U) ||
+        ((DMA1->HISR >> flag_shift(state)) & 0x0dU) != 0U) {
         state->terminal = NX_ERROR_IO;
         state->events |= FAILED;
     }
     clear_flags(state);
     clear_underrun(state);
     nx_arch_dsb();
+    if (underrun(state)) {
+        state->terminal = NX_ERROR_IO;
+        state->events |= FAILED;
+        state->dac.faulted = true;
+        return false;
+    }
     if (stream(state)->M0AR != 0U || stream(state)->M1AR != 0U ||
-        underrun(state) || ((DMA1->HISR >> flag_shift(state)) & 0x3dU) != 0U) {
+        ((DMA1->HISR >> flag_shift(state)) & 0x3dU) != 0U) {
         return false;
     }
     for (unsigned index = 0U; index < 2U; ++index) {
@@ -544,6 +687,7 @@ static bool withdraw(nx_stm32_dac_dma_state_t* state) {
             return false;
         }
     }
+    state->events &= ~(uint32_t)RECOVERING;
     return true;
 }
 /** \brief Progress is caller-owned; IRQs never retain a request reference. */
@@ -554,6 +698,15 @@ static void service(void* context) {
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
     nx_time_us_t now = nx_time_now_us();
+    if (!restore_clock(state)) {
+        nx_request_state_t next =
+            nx_deadline_expired(state->drain_deadline, now)
+                ? NX_REQUEST_QUARANTINED
+                : NX_REQUEST_DRAINING;
+        (void)nx_request_transition(&state->active->base, next);
+        nx_arch_irq_restore(saved);
+        return;
+    }
     latch(state, now);
     if (state->phase != DRAIN &&
         nx_deadline_expired(state->active->base.deadline, now)) {
@@ -672,7 +825,7 @@ static nx_result_t info(const void* context, nx_dac_info_t* output) {
 /** \brief Snapshot preserves the same read-only extended-state boundary. */
 static nx_result_t snapshot(const void* context, nx_dac_state_t* output) {
     const nx_stm32_dac_dma_state_t* state = context;
-    if (!state->initialized) {
+    if (!state->initialized || state->clock_restore_pending) {
         return NX_ERROR_STATE;
     }
     return independent(state, output, sizeof(*output), _Alignof(nx_dac_state_t))
@@ -687,6 +840,9 @@ static nx_result_t stop(void* context, nx_time_us_t deadline) {
     }
     if (!state->initialized) {
         return NX_ERROR_STATE;
+    }
+    if (!restore_clock(state)) {
+        return NX_ERROR_BUSY;
     }
     if (state->active != NULL) {
         (void)cancel(state, state->active);
@@ -715,6 +871,9 @@ nx_result_t nx_stm32_dac_dma_close(nx_stm32_dac_dma_state_t* state) {
         return NX_SUCCESS;
     }
     state->closing = true;
+    if (!restore_clock(state)) {
+        return NX_ERROR_BUSY;
+    }
     if (state->active != NULL) {
         (void)cancel(state, state->active);
         service(state);

@@ -2,9 +2,14 @@
 from tools.configure.providers.descriptor import source_directory
 import copy
 import json
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import tempfile
 import unittest
 
-from tools.configure import configure as gate, fact_references
+from tools.configure import configure as gate, dependencies, fact_references
 from tools.configure import stm32f4
 
 
@@ -43,7 +48,7 @@ class FactReferenceContractTests(unittest.TestCase):
         self.assertEqual(sorted(f"{kind}:{mode}"
                                 for kind, mode in stm32f4._MODE_IMPLEMENTATIONS),
                          audit["maintained_modes"])
-        self.assertEqual(data["documents"]["errata"]["sha256"],
+        self.assertEqual(data["documents"]["es0182"]["sha256"],
                          audit["document_sha256"])
         for row in audit["items"]:
             for name in row["implementation"] + row["regressions"]:
@@ -81,7 +86,7 @@ class FactReferenceContractTests(unittest.TestCase):
                     fact_references.validate(data, variants)
 
     def test_unknown_fields_cannot_invent_workaround_or_document_scope(self):
-        for path in ((), ("documents", "datasheet"), ("package_review",),
+        for path in ((), ("documents", "ds8626"), ("package_review", 0),
                      ("errata_review",)):
             with self.subTest(path=path):
                 data, variants = self.references()
@@ -100,7 +105,7 @@ class FactReferenceContractTests(unittest.TestCase):
                              ("bytes", 0), ("bytes", True)):
             with self.subTest(field=field, value=value):
                 data, variants = self.references()
-                data["documents"]["datasheet"][field] = value
+                data["documents"]["ds8626"][field] = value
                 with self.assertRaises(ValueError):
                     fact_references.validate(data, variants)
 
@@ -110,21 +115,21 @@ class FactReferenceContractTests(unittest.TestCase):
                              ("anchors", {"package_gpio": ""})):
             with self.subTest(field=field):
                 data, variants = self.references()
-                data["documents"]["datasheet"][field] = value
+                data["documents"]["ds8626"][field] = value
                 with self.assertRaises(ValueError):
                     fact_references.validate(data, variants)
 
     def test_document_kind_and_review_link_cannot_be_swapped(self):
         for field, value in (("document", "not-present"),
-                             ("document", "errata")):
+                             ("document", "es0182")):
             with self.subTest(value=value):
                 data, variants = self.references()
-                data["package_review"][field] = value
+                data["package_review"][0][field] = value
                 with self.assertRaisesRegex(ValueError, "package"):
                     fact_references.validate(data, variants)
         data, variants = self.references()
-        data["documents"]["errata"]["kind"] = "datasheet"
-        with self.assertRaisesRegex(ValueError, "kind"):
+        data["documents"]["es0182"]["kind"] = "datasheet"
+        with self.assertRaisesRegex(ValueError, "kind|errata"):
             fact_references.validate(data, variants)
 
     def test_missing_duplicate_or_foreign_part_cannot_share_review(self):
@@ -132,7 +137,7 @@ class FactReferenceContractTests(unittest.TestCase):
                       ["STM32F407VET6", "STM32F407VET6"]):
             with self.subTest(parts=parts):
                 data, variants = self.references()
-                data["package_review"]["variants"] = parts
+                data["package_review"][0]["variants"] = parts
                 with self.assertRaisesRegex(ValueError, "variants"):
                     fact_references.validate(data, variants)
 
@@ -147,10 +152,109 @@ class FactReferenceContractTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "qualification|scope"):
                     fact_references.validate(data, variants)
 
+    def test_named_datasheets_cannot_cover_another_device_group(self):
+        for part, wrong in (("STM32F405ZGT6", "ds8597"),
+                            ("STM32F415ZGT6", "ds8626"),
+                            ("STM32F417ZGT6", "ds8626")):
+            with self.subTest(part=part):
+                data, variants = self.references()
+                for package in data["package_review"]:
+                    if part in package["variants"]:
+                        package["variants"].remove(part)
+                    if package["document"] == wrong:
+                        package["variants"].append(part)
+                with self.assertRaisesRegex(ValueError, "datasheet"):
+                    fact_references.validate(data, variants)
 
+    def test_review_groups_reject_overlap_missing_and_stale_datasheets(self):
+        for change in ("overlap", "missing", "digest", "revision"):
+            with self.subTest(change=change):
+                data, variants = self.references()
+                if change == "overlap":
+                    data["package_review"][0]["variants"].append("STM32F415ZGT6")
+                elif change == "missing":
+                    data["package_review"][0]["variants"].remove("STM32F405ZGT6")
+                elif change == "digest":
+                    data["documents"]["ds8597"]["sha256"] = "a" * 64
+                else:
+                    data["documents"]["ds8597"]["revision"] = "11"
+                with self.assertRaises(ValueError):
+                    fact_references.validate(data, variants)
 
+    def test_current_audit_requires_its_explicit_review_profile(self):
+        data, variants = self.references()
+        data["errata_review"]["software_audit"].pop("profile", None)
+        with self.assertRaisesRegex(ValueError, "profile"):
+            fact_references.validate(data, variants)
 
+    def test_named_profile_binds_the_complete_locked_document(self):
+        data, variants = self.references()
+        audit = data["errata_review"]["software_audit"]
+        audit["profile"] = "es0182-rev19"
+        self.assertIs(fact_references.validate(data, variants), data)
+        data["documents"]["es0182"]["sha256"] = "a" * 64
+        audit["document_sha256"] = "a" * 64
+        with self.assertRaisesRegex(ValueError, "profile.*identity"):
+            fact_references.validate(data, variants)
 
+    def test_unknown_or_malformed_audit_profile_cannot_select_policy(self):
+        for profile in ("es0182-rev20", "../es0182-rev19", False):
+            with self.subTest(profile=profile):
+                data, variants = self.references()
+                data["errata_review"]["software_audit"]["profile"] = profile
+                with self.assertRaisesRegex(ValueError, "profile"):
+                    fact_references.validate(data, variants)
+
+    def test_external_code_closure_can_execute_complete_review_profile(self):
+        code = """
+import json
+import sys
+sys.path.insert(0, sys.argv[1])
+from tools.configure import reference_profiles
+profile = reference_profiles.select('es0182-rev19')
+assert 'tools.configure.stm32f4' not in sys.modules
+try:
+    profile.applicability['2.1.3'] = '--------'
+except TypeError:
+    pass
+else:
+    raise AssertionError('Review applicability is mutable')
+print(json.dumps({
+    'document': [profile.document_id, profile.revision, profile.sha256],
+    'revisions': profile.revision_order,
+    'sections': sorted(profile.sections),
+    'applicability': dict(profile.applicability)}))
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            capsule = Path(directory)
+            for name in dependencies.source_names(
+                    "platform", "external-example", external=True):
+                target = capsule / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(gate.ROOT / name, target)
+            result = subprocess.run(
+                [sys.executable, "-I", "-S", "-B", "-c", code, directory],
+                cwd=capsule, text=True, capture_output=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        profile = json.loads(result.stdout)
+        self.assertEqual(profile["document"], ["ES0182", "19",
+            "1d3da0f99b85013548d17df07919516bf862f8f38cbd1a61f08e75abb8e4c54f"])
+        self.assertEqual(profile["revisions"],
+                         ["A", "Z", "1", "2", "Y", "4", "5", "6"])
+        sections = {f"2.{group}.{item}"
+                    for group, count in enumerate(
+                        (3, 20, 3, 6, 1, 2, 4, 4, 6, 6, 9, 7, 1, 6, 2, 12), 1)
+                    for item in range(1, count + 1)}
+        self.assertEqual(len(sections), 92)
+        self.assertEqual(set(profile["sections"]), sections)
+        self.assertEqual(set(profile["applicability"]), sections)
+        for section, value in {
+                "2.1.3": "AAAAAAAA", "2.2.1": "N-------",
+                "2.2.2": "A-------", "2.2.8": "-NNNNNNN",
+                "2.4.1": "NNNNNNNN", "2.7.2": "DDDDDDDD",
+                "2.16.3": "PPPPPPPP"}.items():
+            with self.subTest(section=section):
+                self.assertEqual(profile["applicability"][section], value)
 
 if __name__ == "__main__":
     unittest.main()

@@ -94,6 +94,7 @@ DESCRIPTOR = FamilyDescriptor(
         "soc/stm32/stm32f4/private/stm32f407_can_cold.h",
         "soc/stm32/stm32f4/private/stm32f407_timer_cold.h",
         "soc/stm32/stm32f4/private/stm32f407_packet_cold.h",
+        "soc/stm32/stm32f4/private/stm32f4_ethernet_cold.h",
         "soc/stm32/stm32f4/private/stm32f407_usb_cold.h",
         "soc/stm32/stm32f4/private/stm32f407_usb_host.h",
         "soc/stm32/stm32f4/private/stm32f407_usb_host_cold.h",

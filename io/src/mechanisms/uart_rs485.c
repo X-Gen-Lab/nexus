@@ -9,9 +9,10 @@
 #include "nexus/io/uart_rs485.h"
 #include "nexus/arch/arch.h"
 
-#define PHASE_SETUP  1U
-#define PHASE_ACTIVE 2U
-#define PHASE_HOLD   3U
+#define PHASE_SETUP        1U
+#define PHASE_ACTIVE       2U
+#define PHASE_HOLD         3U
+#define PHASE_TIMING_FAULT 4U
 
 /** \brief The one serialized task owns adapter and underlying transport. */
 static nx_result_t control(const nx_uart_rs485_state_t* state) {
@@ -106,9 +107,14 @@ static nx_result_t validate(nx_uart_rs485_state_t* state,
     if (nx_request_state(&request->base) != required) {
         return NX_ERROR_STATE;
     }
-    if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
+    nx_time_us_t now = nx_time_now_us();
+    if (nx_deadline_expired(request->base.deadline, now)) {
         return NX_ERROR_TIMEOUT;
     }
+    nx_time_us_t boundary;
+    result = nx_deadline_finite_after(now, state->config->setup_us, &boundary);
+    if (result != NX_SUCCESS)
+        return result;
     return state->config->validate(state->config->transport->context, request);
 }
 
@@ -119,8 +125,17 @@ static void begin(nx_uart_rs485_state_t* state, nx_uart_tx_request_t* request) {
     state->terminal = direction(state, true);
     nx_time_us_t now = nx_time_now_us();
     state->phase = state->terminal == NX_SUCCESS ? PHASE_SETUP : PHASE_HOLD;
-    state->boundary = nx_deadline_after(
-        now, state->terminal == NX_SUCCESS ? state->config->setup_us : 0U);
+    nx_result_t result = nx_deadline_finite_after(
+        now, state->terminal == NX_SUCCESS ? state->config->setup_us : 0U,
+        &state->boundary);
+    if (result != NX_SUCCESS) {
+        if (state->terminal == NX_SUCCESS)
+            state->terminal = result;
+        /* No transport started, so zero hold can withdraw the accepted DE. */
+        state->phase = PHASE_HOLD;
+        state->boundary = 0U;
+        (void)nx_request_transition(&request->base, NX_REQUEST_DRAINING);
+    }
 }
 
 /** \brief No GPIO or transport effect occurs until unique admission succeeds.
@@ -156,8 +171,21 @@ static void begin_hold(nx_uart_rs485_state_t* state, nx_result_t terminal,
     state->inner.data = NULL;
     state->inner.length = 0U;
     state->phase = PHASE_HOLD;
-    state->boundary = nx_deadline_after(nx_time_now_us(), duration);
+    nx_result_t result =
+        nx_deadline_finite_after(nx_time_now_us(), duration, &state->boundary);
     (void)nx_request_transition(&state->active->base, NX_REQUEST_DRAINING);
+    if (result != NX_SUCCESS) {
+        if (state->terminal == NX_SUCCESS)
+            state->terminal = result;
+        if (duration == 0U) {
+            state->boundary = 0U;
+        } else {
+            /* A minimum electrical hold cannot be shortened to zero. */
+            state->phase = PHASE_TIMING_FAULT;
+            (void)nx_request_transition(&state->active->base,
+                                        NX_REQUEST_QUARANTINED);
+        }
+    }
 }
 
 /** \brief Each call makes one bounded transport or GPIO progress attempt. */

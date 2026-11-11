@@ -56,6 +56,16 @@ extern "C" void nx_hal_model_dma_disable(DMA_HandleTypeDef* handle) {
 extern "C" void nx_hal_model_cold_write(volatile uint32_t* reg,
                                         uint32_t value) {
     ++s_cold_writes;
+    for (GPIO_TypeDef* gpio :
+         {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI}) {
+        if (reg == &gpio->BSRR) {
+            if (reg == s_refused_cold_register)
+                value &= ~s_cold_held_bits;
+            gpio->ODR = (gpio->ODR & ~(value >> 16U)) | (value & 0xffffU);
+            *reg = value;
+            return;
+        }
+    }
     if (reg == s_refused_cold_register)
         value = (value & ~s_cold_held_bits) | (*reg & s_cold_held_bits);
     for (unsigned bank = 0U; bank < 8U; ++bank) {
@@ -820,6 +830,38 @@ static void ReceiveDuringMaskedHalHandler() {
     s_rx_arrived_during_hal = true;
 }
 
+class F407HalDrainBoundary : public F407HalContract,
+                             public testing::WithParamInterface<bool> {};
+
+TEST_P(F407HalDrainBoundary, ExhaustedGraceRetainsMemoryAndWireUntilQuiet) {
+    ASSERT_EQ(nx_uart_tx_prepare(&request, payload, 4U, NX_DEADLINE_NEVER),
+              NX_SUCCESS);
+    Submit();
+    ASSERT_FALSE(HasFatalFailure());
+    g_nx_stm32_system.overflow_us = UINT64_MAX & ~UINT64_C(0xFFFFFFFF);
+    TIM2->CNT = UINT32_MAX - 1U;
+    TIM2->SR = 0U;
+    ASSERT_EQ(nx_time_now_us(), UINT64_MAX - 1U);
+    if (GetParam()) {
+        DmaComplete();
+    } else {
+        DMA2_Stream7->NDTR = 2U;
+        ASSERT_EQ(nx_uart_port_cancel(&port, &request), NX_SUCCESS);
+    }
+    nx_uart_port_service(&port);
+    nx_uart_port_service(&port);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.uart.active, &request);
+    USART1->SR = USART_SR_TC;
+    UartIrq();
+    nx_uart_port_service(&port);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result,
+              GetParam() ? NX_ERROR_IO : NX_ERROR_CANCELLED);
+    EXPECT_EQ(state.uart.active, nullptr);
+}
+INSTANTIATE_TEST_SUITE_P(DrainOrigins, F407HalDrainBoundary, testing::Bool());
+
 TEST_F(F407HalContract, NewRxErrorDuringHalTxHandlerSurvivesForNextIrq) {
     Submit();
     DmaComplete();
@@ -939,6 +981,19 @@ TEST_F(F407HalCold, ExactLeaseStartsStopsRestoresAndRestarts) {
               NX_SUCCESS);
     Returned();
     Start();
+}
+
+TEST_F(F407HalCold, RefusedTxIdleLatchCannotPublishTheUart) {
+    s_refused_cold_register = &GPIOA->BSRR;
+    s_cold_held_bits = 1U << 9U;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_stm32_uart_hal_cold_prepare(&state, &config, &receipt));
+    EXPECT_EQ(0U, s_uart_enables);
+    EXPECT_FALSE(state.uart.initialized);
+    s_refused_cold_register = nullptr;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_stm32_uart_hal_cold_close(&state, &config, &receipt));
+    Returned();
 }
 
 TEST_F(F407HalCold, PreexistingUartGateRemainsAfterLeaseReturn) {

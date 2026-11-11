@@ -98,8 +98,8 @@ rx_hardware(const nx_stm32_uart_receive_state_t* state) {
 static inline uint32_t
 receive_flags(const nx_stm32_uart_receive_state_t* state) {
     const nx_stm32_uart_hardware_t* selected = rx_hardware(state);
-    uint32_t status = selected->receive_high ? state->resources.dma->HISR
-                                             : state->resources.dma->LISR;
+    uint32_t status = selected->receive_high ? state->resources->dma->HISR
+                                             : state->resources->dma->LISR;
     return (status >> selected->receive_shift) & 0x3DU;
 }
 
@@ -108,17 +108,17 @@ static inline void receive_ack(nx_stm32_uart_receive_state_t* state,
                                uint32_t flags) {
     const nx_stm32_uart_hardware_t* selected = rx_hardware(state);
     volatile uint32_t* clear = selected->receive_high
-                                   ? &state->resources.dma->HIFCR
-                                   : &state->resources.dma->LIFCR;
+                                   ? &state->resources->dma->HIFCR
+                                   : &state->resources->dma->LIFCR;
     NX_STM32_UART_RECEIVE_ACK(clear, flags << selected->receive_shift);
 }
 
 /** \brief Validate fixed cold facts before either independent constructor. */
 nx_result_t
 nx_stm32_uart_receive_prepare(nx_stm32_uart_receive_state_t* state) {
-    if (state == NULL || state->receive == NULL ||
-        state->resources.dma == NULL || state->resources.regions == NULL ||
-        state->resources.region_count == 0U ||
+    if (state == NULL || state->receive == NULL || state->resources == NULL ||
+        state->resources->dma == NULL || state->resources->regions == NULL ||
+        state->resources->region_count == 0U ||
         state->uart.profile != NX_UART_RX_BLOCKS) {
         return NX_ERROR_INVALID;
     }
@@ -131,7 +131,7 @@ nx_stm32_uart_receive_prepare(nx_stm32_uart_receive_state_t* state) {
     }
 #ifndef NEXUS_STM32_MODEL
     if (state->receive != selected->receive ||
-        state->resources.dma != selected->dma ||
+        state->resources->dma != selected->dma ||
         state->uart.registers != selected->registers) {
         return NX_ERROR_UNSUPPORTED;
     }
@@ -330,9 +330,18 @@ static nx_result_t validate_stream(const nx_stm32_uart_receive_state_t* state,
                                    const nx_stream_t* stream,
                                    size_t owner_size) {
     if (stream == NULL || stream->slots == NULL || stream->count == 0U ||
+        stream->count > SIZE_MAX / sizeof(*stream->slots) ||
         (state->continuous && stream->count < 3U)) {
         return NX_ERROR_INVALID;
     }
+    if (nx_stm32_uart_dma_resources_overlap(state->resources, state,
+                                            owner_size) ||
+        nx_stm32_uart_dma_resources_overlap(state->resources, stream,
+                                            sizeof(*stream)) ||
+        nx_stm32_uart_dma_resources_overlap(state->resources, stream->slots,
+                                            stream->count *
+                                                sizeof(*stream->slots)))
+        return NX_ERROR_INVALID;
     for (size_t index = 0U; index < stream->count; ++index) {
         const nx_stream_slot_t* slot = &stream->slots[index];
         if (slot->capacity == 0U || slot->capacity > UINT16_MAX ||
@@ -341,15 +350,17 @@ static nx_result_t validate_stream(const nx_stm32_uart_receive_state_t* state,
             return NX_ERROR_INVALID;
         }
         nx_result_t result = nx_dma_buffer_validate(
-            state->resources.regions, state->resources.region_count, slot->data,
-            slot->capacity, 1U, NX_DMA_FROM_DEVICE);
+            state->resources->regions, state->resources->region_count,
+            slot->data, slot->capacity, 1U, NX_DMA_FROM_DEVICE);
         if (result != NX_SUCCESS) {
             return result;
         }
         uintptr_t data = (uintptr_t)slot->data;
         uintptr_t control = (uintptr_t)state;
         if (owner_size > UINTPTR_MAX - control ||
-            (data < control + owner_size && control < data + slot->capacity)) {
+            (data < control + owner_size && control < data + slot->capacity) ||
+            nx_stm32_uart_dma_resources_overlap(state->resources, slot->data,
+                                                slot->capacity)) {
             return NX_ERROR_INVALID;
         }
     }
@@ -506,6 +517,9 @@ nx_stm32_uart_receive_validate(nx_stm32_uart_receive_state_t* state,
     if (state->stopping) {
         return NX_ERROR_STATE;
     }
+    if (request != NULL && nx_stm32_uart_dma_resources_overlap(
+                               state->resources, request, sizeof(*request)))
+        return NX_ERROR_INVALID;
     if (request != NULL && state->stream != NULL &&
         (overlaps_pool(state->stream, request, sizeof(*request)) ||
          overlaps_pool(state->stream, request->data, request->length))) {

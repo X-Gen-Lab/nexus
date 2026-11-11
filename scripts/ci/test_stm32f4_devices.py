@@ -2,8 +2,11 @@
 from copy import deepcopy
 import importlib.util
 import json
+import os
 from pathlib import Path
 import re
+import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -64,6 +67,37 @@ class STM32F4DeviceProbeTests(unittest.TestCase):
             with self.subTest(choices=choices):
                 with self.assertRaisesRegex(ValueError, "unknown|duplicate"):
                     gate.select_profiles(catalog, choices)
+
+    def test_irq_enum_slot_and_official_vector_are_independent(self):
+        gate = implementation()
+        catalog = gate.load_catalog(ROOT)
+        profiles = gate.vendor_device_catalog(catalog)
+        for chip, enum in (("405", "RNG_IRQn"), ("407", "RNG_IRQn"),
+                           ("415", "HASH_RNG_IRQn"), ("417", "HASH_RNG_IRQn")):
+            with self.subTest(chip=chip):
+                binding = profiles[f"stm32f{chip}"].irq_bindings[enum]
+                self.assertEqual(binding.number, 80)
+                self.assertEqual(binding.handler, "HASH_RNG_IRQHandler")
+                with self.assertRaises(TypeError):
+                    profiles[f"stm32f{chip}"].irq_bindings[enum] = binding
+
+    def test_guessed_or_missing_vector_cannot_replace_locked_startup(self):
+        gate = implementation()
+        for change in ("guessed", "missing", "number"):
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as temporary:
+                catalog = gate.load_catalog(ROOT)
+                row = next(item for item in catalog["devices"]
+                           if item["id"] == "stm32f407")
+                if change == "guessed":
+                    row["irq_bindings"]["RNG_IRQn"]["handler"] = "RNG_IRQHandler"
+                elif change == "missing":
+                    row["irq_bindings"].pop("RNG_IRQn")
+                else:
+                    row["irq_bindings"]["RNG_IRQn"]["number"] = 79
+                path = Path(temporary) / "catalog.json"
+                path.write_text(json.dumps(catalog))
+                with self.assertRaisesRegex(ValueError, "startup vector"):
+                    gate.load_catalog(ROOT, catalog_path=path)
 
     def test_redirected_startup_or_corrupted_catalog_identity_is_rejected(self):
         gate = implementation()
@@ -155,6 +189,92 @@ class STM32F4DeviceProbeTests(unittest.TestCase):
         for text in ("arm-none-eabi-gcc 13.2.1", "gcc 14.3.1"):
             with self.assertRaisesRegex(ValueError, "compiler|toolchain"):
                 gate.check_compiler_version(text, "14.3.rel1")
+
+
+class STM32F4PrivateHeaderCompileTests(unittest.TestCase):
+    """Private integration follows the selected SDK; no new runtime support."""
+
+    def compile(self, name, text, device, *, preprocess=False):
+        gate = implementation()
+        compiler = gate.tools("arm-none-eabi-gcc")["gcc"]
+        includes = (ROOT, ROOT / "soc/stm32/stm32f4/private",
+                    ROOT / "soc/stm32/stm32f4/private/usb_hal",
+                    ROOT / "soc/stm32/stm32f4/drivers/ip/fs_device_pio",
+                    ROOT / "soc/stm32/stm32f4/drivers/ip/legacy_mac",
+                    ROOT / "soc/stm32/stm32f4/drivers/ip/classic_can",
+                    ROOT / "soc/stm32/stm32f4/drivers/ip/advanced_timer",
+                    ROOT / "tests/contracts/multi_controller",
+                    ROOT / "core/include", ROOT / "arch/include",
+                    ROOT / "io/include", ROOT / "io/private",
+                    ROOT / "components/usb_control/include",
+                    ROOT / "vendors/st/cmsis_device_f4/Include",
+                    ROOT / "vendors/st/stm32f4_hal/Inc",
+                    ROOT / "vendors/arm/CMSIS_6/CMSIS/Core/Include")
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            source = directory / (name + ".c")
+            source.write_text(text)
+            obj = directory / (name + ".o")
+            command = [compiler, *gate.FLAGS, "-std=c11", "-Wall", "-Wextra",
+                       "-Werror", "-DNEXUS_STM32_MODEL", "-DNX_I2C_MULTI_STM32",
+                       "-D" + device,
+                       *["-I" + str(path) for path in includes]]
+            command += (["-E", "-dM", str(source)] if preprocess else
+                        ["-c", str(source), "-o", str(obj)])
+            result = subprocess.run(command, capture_output=True, text=True)
+            evidence = os.environ.get("NEXUS_DEVICE_HEADER_PROBE_EVIDENCE")
+            if evidence:
+                output = Path(evidence) / name
+                output.mkdir(parents=True, exist_ok=False)
+                shutil.copy2(source, output / source.name)
+                (output / "stdout.log").write_text(result.stdout)
+                (output / "stderr.log").write_text(result.stderr)
+                (output / "command.json").write_text(json.dumps(
+                    {"command": command, "returncode": result.returncode,
+                     "scope": "private_header_compile_only",
+                     "runtime_support": False}, indent=2) + "\n")
+                if obj.exists():
+                    shutil.copy2(obj, output / obj.name)
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_private_includes_preserve_the_exact_selected_device(self):
+        headers = ("stm32f407_clock.h", "stm32f407_system.h",
+                   "stm32f407_timer_output.h", "stm32f407_timer_hardware.h",
+                   "stm32f407_eth.h", "stm32f407_eth_frames.h",
+                   "stm32f407_timer_pins.h", "stm32f407_provider.h",
+                   "../drivers/usb_device.c", "../drivers/can.c")
+        for index, header in enumerate(headers):
+            with self.subTest(header=header):
+                self.compile(f"dispatch-{index}", f'#include "{header}"\n'
+                             '#if !defined(__STM32F405xx_H) || '
+                             'defined(__STM32F407xx_H)\n'
+                             '#error "private include changed the device"\n'
+                             '#endif\n', "STM32F405xx", preprocess=True)
+
+    def test_usb_cold_headers_do_not_require_an_ethernet_controller(self):
+        for device in ("STM32F405xx", "STM32F407xx"):
+            with self.subTest(device=device):
+                text = ('#include "stm32f407_usb_cold.h"\n'
+                        '#include "stm32f407_usb_hs_cold.h"\n'
+                        '#include "stm32f407_usb_host_cold.h"\n'
+                        '#include "stm32f4_platform_lifecycle.h"\n')
+                if device == "STM32F405xx":
+                    text += ('#ifdef ETH\n#error "unexpected ETH peripheral"\n'
+                             '#endif\n')
+                text += ('_Static_assert(sizeof(USB_OTG_GlobalTypeDef) > 0, '
+                         '"USB definition required");\n')
+                self.compile("usb-cold-" + device, text, device)
+
+    def test_ethernet_cold_headers_keep_their_complete_resource_contract(self):
+        self.compile("ethernet-cold-STM32F407xx",
+                     '#include "stm32f407_eth_cold.h"\n'
+                     '#include "stm32f407_eth_frames_cold.h"\n'
+                     '#include "stm32f4_platform_lifecycle.h"\n'
+                     'static nx_stm32_eth_resource_receipt_t resources;\n'
+                     'int main(void) {\n'
+                     '    nx_stm32_eth_resources_capture(&resources, true);\n'
+                     '    return (int)nx_stm32_eth_resources_close(&resources);\n'
+                     '}\n', "STM32F407xx")
 
 
 if __name__ == "__main__":

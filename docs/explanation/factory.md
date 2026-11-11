@@ -56,6 +56,18 @@ that class mismatch. They do not authenticate an external value or make an
 instance active. Optional capability records are separately selected by
 `factory.capabilities`.
 
+With `factory.capabilities = true`, metadata lookup has the same class-specific
+strong reference: for example,
+`nx_factory_gpio_capability_ref(NX_GPIO_REF_LED0)`. It returns the original
+immutable metadata object without a copy or second lookup table. The getter is
+not emitted when metadata is disabled. C11 and C++17 reject a different class
+reference or a bare scalar in this call, just as for the face getter.
+
+Scalar getters and their single underlying switch remain available. Migrating
+ordinary consumers to strong references does not remove that implementation.
+COUNT constants and lifecycle controller ordinals retain their distinct
+counting/diagnostic purposes; they are not class-specific device references.
+
 The factory header includes complete public APIs only for selected interface
 classes and preserves forward declarations for unselected getters. Include a
 specific public I/O header explicitly when code needs that API or its complete
@@ -102,7 +114,7 @@ receipts or new-source software qualification.
 
 | Action | Work performed |
 | --- | --- |
-| `nx_factory_uart(id)` | Select and return an existing readonly UART face |
+| `nx_factory_uart_ref(ref)` | Select and return an existing readonly UART face |
 | `nx_platform_start()` | Execute selected setup and retain cleanup outcomes |
 | Public I/O operation | Validate face, then dispatch `ops(context, ...)` |
 | IRQ entry | Access the fixed concrete provider and its owned hardware |

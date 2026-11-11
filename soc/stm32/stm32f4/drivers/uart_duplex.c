@@ -15,7 +15,7 @@ nx_result_t nx_stm32_uart_duplex_initialize(nx_stm32_uart_duplex_state_t* state,
     nx_result_t result = nx_stm32_uart_receive_prepare(&state->receive);
     if (result == NX_SUCCESS) {
         result = nx_stm32_uart_dma_initialize_parts(
-            &state->receive.uart, &state->receive.resources, &state->transmit,
+            &state->receive.uart, state->receive.resources, &state->transmit,
             clock_hz, true);
         if (result == NX_SUCCESS) {
             nx_stm32_uart_receive_finish_initialize(&state->receive, 5U);
@@ -36,7 +36,7 @@ nx_stm32_uart_duplex_tx_validate(void* context,
         nx_stm32_uart_receive_validate(&state->receive, request);
     return result == NX_SUCCESS
                ? nx_stm32_uart_dma_tx_validate_parts(&state->receive.uart,
-                                                     &state->receive.resources,
+                                                     state->receive.resources,
                                                      &state->transmit, request)
                : result;
 }
@@ -51,7 +51,7 @@ static nx_result_t submit(void* context, nx_uart_tx_request_t* request) {
         nx_stm32_uart_receive_validate(&state->receive, request);
     return result == NX_SUCCESS
                ? nx_stm32_uart_dma_submit_parts(&state->receive.uart,
-                                                &state->receive.resources,
+                                                state->receive.resources,
                                                 &state->transmit, request)
                : result;
 }
@@ -67,7 +67,7 @@ static nx_result_t start_admitted(void* context,
         nx_stm32_uart_receive_validate(&state->receive, request);
     return result == NX_SUCCESS
                ? nx_stm32_uart_dma_start_admitted_parts(
-                     &state->receive.uart, &state->receive.resources,
+                     &state->receive.uart, state->receive.resources,
                      &state->transmit, request)
                : result;
 }
@@ -78,7 +78,7 @@ static nx_result_t cancel(void* context, nx_uart_tx_request_t* request) {
     return state == NULL
                ? NX_ERROR_INVALID
                : nx_stm32_uart_dma_cancel_parts(&state->receive.uart,
-                                                &state->receive.resources,
+                                                state->receive.resources,
                                                 &state->transmit, request);
 }
 
@@ -90,8 +90,8 @@ static void service(void* context) {
         nx_arch_irq_is_masked()) {
         return;
     }
-    nx_stm32_uart_dma_service_parts(
-        &state->receive.uart, &state->receive.resources, &state->transmit);
+    nx_stm32_uart_dma_service_parts(&state->receive.uart,
+                                    state->receive.resources, &state->transmit);
     nx_stm32_uart_receive_service(&state->receive);
 }
 
@@ -124,7 +124,7 @@ static nx_result_t stop(void* context) {
     nx_result_t result = nx_stm32_uart_receive_stop(&state->receive);
     if (result == NX_SUCCESS) {
         result = nx_stm32_uart_dma_stop_parts(
-            &state->receive.uart, &state->receive.resources, &state->transmit);
+            &state->receive.uart, state->receive.resources, &state->transmit);
         if (result == NX_SUCCESS) {
             result = nx_stm32_uart_stop(&state->receive.uart);
             if (result == NX_SUCCESS) {
@@ -149,8 +149,8 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
  * owner. */
 void nx_stm32_uart_duplex_dma_irq(nx_stm32_uart_duplex_state_t* state) {
     if (state != NULL) {
-        nx_stm32_uart_dma_irq_parts(
-            &state->receive.uart, &state->receive.resources, &state->transmit);
+        nx_stm32_uart_dma_irq_parts(&state->receive.uart,
+                                    state->receive.resources, &state->transmit);
     }
 }
 

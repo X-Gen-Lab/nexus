@@ -23,13 +23,16 @@ polling 调度。字节只需 byte alignment，view metadata 须自然对齐。�
 
 USBControl 由一个特权、IRQ unmasked task 独占 EP0，不允许 callback、其他 task 或
 ISR 重入。bind 不访问硬件，begin 对当前精确非零 SETUP epoch 接受一个 reply，但
-不立即提交 packet；每次 step 至多一次 poll 和一个 packet action。一个独立绝对
+不立即提交 packet；每次 step 至多一次 poll／state 读取，再执行至多两次 submit 或一次 cancel。一个独立绝对
 deadline 覆盖全部阶段和外部策略等待。
 
 IN 回复按 wLength 裁剪，并在短 full-MPS 回复时处理 DATA ZLP；OUT 容量覆盖
 wLength，DATA_READY 只授予只读 inspection view。产品显式 stage SET_ADDRESS 并
 检查真实 ACK 后的权威 address／closing 状态。packet、outer request、payload、
 profile、context 在全部必要访问撤销且 acquire `SETTLED` 前保持存活。
+
+DATA IN 先接纳同 epoch 的零长 STATUS OUT。有效 STATUS ACK 确定线上结果，但两方向
+DMA／FIFO／IRQ loan 都退出后才能发布 outer SETTLED；wire 关闭后不续发下一 IN。
 
 cancel、reset、新 SETUP、timeout 或 device stop 后仍继续 step／drain；这些事件
 不撤销借用。OUT0 隔离显示 NEEDS_DEVICE_STOP，由外部 controller owner 授权 stop，

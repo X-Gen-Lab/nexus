@@ -420,8 +420,10 @@ static void begin_drain(nx_stm32_adc_group_state_t* state, nx_result_t result) {
     state->terminal = result;
     state->fault |= result == NX_ERROR_IO;
     state->phase = DRAINING;
-    state->drain_deadline =
-        nx_deadline_after(nx_time_now_us(), state->config->drain_timeout_us);
+    nx_time_us_t now = nx_time_now_us();
+    if (nx_deadline_finite_after(now, state->config->drain_timeout_us,
+                                 &state->drain_deadline) != NX_SUCCESS)
+        state->drain_deadline = now == NX_DEADLINE_NEVER ? now - 1U : now;
     (void)nx_request_transition(&state->active->base, NX_REQUEST_DRAINING);
 }
 /** \brief Program disabled converters, then start the post-store warmup. */
@@ -501,8 +503,7 @@ static nx_result_t prime(nx_stm32_adc_group_state_t* state) {
             return NX_ERROR_IO;
     if (config->common->CCR != common)
         return NX_ERROR_IO;
-    state->warm_until = nx_deadline_after(nx_time_now_us(), 4U);
-    return NX_SUCCESS;
+    return nx_deadline_finite_after(nx_time_now_us(), 4U, &state->warm_until);
 }
 /** \brief Arm memory, consumers, then the source; setup UG cannot sample. */
 static nx_result_t arm(nx_stm32_adc_group_state_t* state) {

@@ -76,6 +76,27 @@ class Stm32F4FamilyTests(unittest.TestCase):
                                     region["dma"] is False
                                     for region in result.memory))
 
+    def test_software_references_use_exact_devices_and_only_internal_resources(self):
+        for chip in ("405", "407", "415", "417"):
+            with self.subTest(chip=chip):
+                source = gate.ROOT / "tests/contracts/stm32f4_family" / (
+                    f"f{chip}zg.toml")
+                result = gate.resolve_ir(source)
+                self.assertEqual(result.part, f"STM32F{chip}ZGT6")
+                self.assertEqual(result.physical_part.device.macro,
+                                 f"STM32F{chip}xx")
+                self.assertEqual(result.clock["source"], "hsi")
+                self.assertEqual(result.clock["core_hz"], 16000000)
+                self.assertFalse(result.clock_plan.parameters["pll_enabled"])
+                self.assertFalse(result.clock_plan.parameters["pll48"])
+                self.assertEqual(gate.load(source.parent / (
+                    f"f{chip}zg-board/board.json"))["clocks"], {})
+                self.assertIsNone(result.physical_pcb_revision)
+                self.assertEqual([(item.kind, item.controller)
+                                  for item in result.controllers], [("crc", "CRC")])
+                self.assertEqual(result.memory_budget.libc_heap_bytes, 0)
+                self.assertFalse(result.physical_qualified)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -242,9 +242,27 @@ def service_profile(specification):
     return specification
 
 
+def service_directory(sdk, specification):
+    """Use the single owned scenario tree, including shared F4 references."""
+    return (Path(sdk) / "tests/contracts/stm32f4_family"
+            if specification.scenario == "f4_family" else
+            Path(sdk) / "cmake/package/verification" / specification.scenario)
+
+
 def service_sources(sdk, specification):
     """Return only the exact reviewed scenario's authored consumer sources."""
-    verification = Path(sdk) / "cmake/package/verification" / specification.scenario
+    verification = service_directory(sdk, specification)
+    if specification.scenario == "f4_family":
+        authored = tomllib.loads((verification / specification.assembly).read_text())
+        board = PurePosixPath(authored["board_package"])
+        if (board.is_absolute() or len(board.parts) != 1 or
+                board.parts[0] in {"", ".", ".."} or
+                board.as_posix() != authored["board_package"] or
+                "\\" in authored["board_package"]):
+            raise ValueError("F4 reference requires its canonical Board directory")
+        name = (board / "board.json").as_posix()
+        return {"main.c": Path(sdk) / "tests/contracts/crc_assembly/consumer.c",
+                name: verification / name}
     if specification.scenario == "secure_services":
         selected = verification / Path(specification.assembly).parent
         return {"application.c": selected / "application.c",
@@ -277,7 +295,7 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
     """Copy an installed public scenario; external packages stay consumer-owned."""
     specification = service_profile(specification)
     sdk = Path(prefix) / "share/nexus/src"
-    verification = sdk / "cmake/package/verification" / specification.scenario
+    verification = service_directory(sdk, specification)
     assembly = regular_file(verification / specification.assembly)
     canonical_sources = service_sources(sdk, specification)
     for path in canonical_sources.values():
@@ -294,7 +312,9 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
     else:
         shutil.copyfile(assembly, source / "assembly.toml")
     for name, path in canonical_sources.items():
-        shutil.copyfile(path, source / name)
+        target = source / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, target)
     secure = specification.scenario == "secure_services"
     boot = specification.scenario == "mcuboot_boot"
     (source / "private_headers.c").write_text(
@@ -320,6 +340,7 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
         "common_services": "Nexus::Settings Nexus::OSWait Nexus::LwIPStorage",
         "device_tmp117": "Nexus::TMP117I2C",
         "image_window": "",
+        "f4_family": "",
     }
     selected_setup = ""
     if specification.scenario in {"loaned_rx", "mcuboot_control"}:
@@ -667,11 +688,19 @@ def service_symbols(specification):
                           "flash_area_read", "flash_area_write",
                           "flash_area_erase", "nx_factory_flash", "bootutil_keys",
                           "bootutil_key_cnt"})
+    if specification.scenario == "f4_family":
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_chip_info_read", "nx_factory_crc",
+                          "nx_crc_port_compute", "nx_stm32_crc_ops"})
     return SERVICE_SYMBOLS
 
 
 def service_scope(specification):
     """Describe the executed software boundary without physical claims."""
+    if specification.scenario == "f4_family":
+        return ("Exact F405ZG/F415ZG/F417ZG internal HSI16/CRC C11 link, "
+                "resources and method retention only. No external PCB, "
+                "startup execution, measured stack or physical timing.")
     if specification.scenario == "loaned_rx":
         return ("Selected 2-slot/4-piece RX profile and two 512-byte spare pbufs; "
                 "ARM link/resource observation only. No physical MAC/PHY, packet "
@@ -747,7 +776,7 @@ def check_service_image(sdk, source, build, specification, run_checked):
     specification = service_profile(specification)
     if (build / "resolved-sdk.txt").read_text() != str(sdk):
         raise ValueError("Service consumer resolved another source SDK")
-    verification = sdk / "cmake/package/verification" / specification.scenario
+    verification = service_directory(sdk, specification)
     canonical = verification / specification.assembly
     canonical_sources = service_sources(sdk, specification)
     secure = specification.scenario == "secure_services"
@@ -772,6 +801,11 @@ def check_service_image(sdk, source, build, specification, run_checked):
         raise ValueError("Service configuration directory is not canonical")
     inputs.update(resolved=config / "resolved.json", bindings=config / "bindings.c")
     resolved = json.loads((config / "resolved.json").read_text())
+    if specification.scenario == "f4_family":
+        board = next(path for name, path in canonical_sources.items()
+                     if name.endswith("/board.json"))
+        if resolved.get("part") != json.loads(board.read_text())["soc"]:
+            raise ValueError("F4 reference resolved another exact part")
     native = resolved.get("cpu", {}).get("arch") == "native"
     if (native == specification.arm or
             resolved.get("backend") != ("baremetal" if specification.arm

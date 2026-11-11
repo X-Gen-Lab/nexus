@@ -711,6 +711,28 @@ TEST_F(EthernetFramesMac,
     EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&request.base));
     EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&second.base));
 }
+TEST_F(EthernetFramesMac, ExhaustedDrainGraceRetainsEveryScatterGatherLoan) {
+    Start();
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_tx_prepare(&request, pieces, 2U, true,
+                                                   NX_DEADLINE_NEVER));
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_submit(&port, &request));
+    now = UINT64_MAX - 100U;
+    oracle.hold_engine = true;
+    Regs()[status / 4U] |= 0x100000U;
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_cancel(&port, &request));
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_service(&port));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, txslots[0].request);
+    EXPECT_NE(0U, tx[0].buffer);
+    EXPECT_NE(0U, tx[1].buffer);
+    oracle.hold_engine = false;
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_recover(&port, UINT64_MAX - 1U));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(nullptr, txslots[0].request);
+    EXPECT_EQ(NX_SUCCESS, nx_eth_frames_port_stop(&port));
+}
+
 TEST_F(EthernetFramesMac,
        ExplicitProvenResetChangesClockEpochAndSettlesWithoutReplay) {
     Start();

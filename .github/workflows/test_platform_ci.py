@@ -556,7 +556,8 @@ class WorkflowContracts(unittest.TestCase):
         selected = set(job['strategy']['matrix'].get('fixture', []))
         self.assertEqual(selected, {
             'stm32_assembly', 'can_assembly', 'usb_assembly',
-            'ethernet_assembly', 'timer_assembly', 'multi_controller_assembly', 'declared_io_assembly'})
+            'ethernet_assembly', 'timer_assembly', 'multi_controller_assembly',
+            'declared_io_assembly', 'stm32f4_family'})
         for name in selected:
             self.assertTrue(list((ROOT / 'tests/contracts' / name).glob('*.toml')))
         commands = '\n'.join(step.get('run', '') for step in job['steps'])

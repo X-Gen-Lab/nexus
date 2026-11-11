@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "documents": {
-    "datasheet": {
+    "ds8626": {
       "document_id": "DS8626",
       "revision": "12",
       "document_date": "March 2026",
@@ -15,7 +15,21 @@
         "device_features": "Table 2, printed pages 15–16"
       }
     },
-    "reference_manual": {
+    "ds8597": {
+      "document_id": "DS8597",
+      "revision": "10",
+      "document_date": "September 2026",
+      "kind": "datasheet",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f415vg.pdf",
+      "sha256": "077d413280ce588eee4fb70b7bacde51aef5054b35bf3cfa4904d1c3de502672",
+      "bytes": 2805239,
+      "anchors": {
+        "package_gpio": "Table2 pp15-16; Figure14 p46, LQFP144",
+        "alternate_functions": "Table9, alternate-function mapping",
+        "device_features": "Table2 pp15-16"
+      }
+    },
+    "rm0090": {
       "document_id": "RM0090",
       "revision": "22",
       "document_date": "May 2026",
@@ -30,7 +44,7 @@
         "clock": "STM32F405/407/415/417 Figure21 p217; Section7"
       }
     },
-    "errata": {
+    "es0182": {
       "document_id": "ES0182",
       "revision": "19",
       "document_date": "July 2026",
@@ -45,23 +59,36 @@
       }
     }
   },
-  "package_review": {
-    "document": "datasheet",
-    "variants": [
-      "STM32F407VET6",
-      "STM32F407ZGT6"
-    ],
-    "status": "package_gpio_reviewed",
-    "scope": "GPIO package matrix independently agrees with the official pinout diagram; Board routes and mode support remain independent."
-  },
+  "package_review": [
+    {
+      "document": "ds8626",
+      "variants": [
+        "STM32F405ZGT6",
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "GPIO package matrix independently agrees with the official pinout diagram; Board routes and mode support remain independent."
+    },
+    {
+      "document": "ds8597",
+      "variants": [
+        "STM32F415ZGT6",
+        "STM32F417ZGT6"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "GPIO package matrix independently agrees with the official pinout diagram; Board routes and mode support remain independent."
+    }
+  ],
   "errata_review": {
-    "document": "errata",
+    "document": "es0182",
     "status": "software_audited_with_constraints",
     "silicon_revision": "not_observed",
     "mode_workarounds": "audited_with_constraints",
     "hardware_qualification": "not_executed",
     "identification": "ES0182 Table2, device marking plus DBGMCU_IDCODE REV_ID[15:0]; Table3 per revision/application applicability",
     "software_audit": {
+      "profile": "es0182-rev19",
       "document_sha256": "1d3da0f99b85013548d17df07919516bf862f8f38cbd1a61f08e75abb8e4c54f",
       "revision_order": [
         "A",
@@ -701,7 +728,7 @@
           "revisions": "AAAAAAAA",
           "assessment": "external_constraint",
           "condition": "Clearing DAC DMAEN or the DAC interface gate does not guarantee removal of a pending hardware DMA request.",
-          "handling": "The DMA owner gates the trigger before stream withdrawal and verifies source/stream shutdown before detaching buffers. A pending DAC request can survive reinitialization: do not claim DMAEN clear alone proves an empty request latch. Restart qualification must include the ES0182 underrun/clock/reconfigure sequence; current model ownership tests do not establish that silicon latch behavior.",
+          "handling": "The DMA owner detaches memory and IRQ targets, observes underrun from controlled idle-code triggers, then withdraws and restores the DAC clock before fully reconfiguring DAC, DMA and triggers. Failed clock restoration retains inherited gate responsibility. Internal recovery underrun does not replace a timeout; real DMA errors and refused flag clearing retain IO failure and the borrow. Software regressions cover inherited pending requests, repeated transfers and failed withdrawal. The sequence can briefly disable the analog output and does not promise continuous voltage hold. Physical silicon latch behavior remains unobserved.",
           "implementation": [
             "soc/stm32/stm32f4/drivers/dac_dma.c",
             "soc/stm32/stm32f4/drivers/dac.c"

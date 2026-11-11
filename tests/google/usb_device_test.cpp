@@ -1526,11 +1526,6 @@ TEST_F(UsbDevice, ControlShortResponseRequiresTerminatingZlpAcknowledgement) {
     ASSERT_EQ(nx_native_usb_complete(&model, 0, true), NX_SUCCESS);
     nx_usb_controller_irq(&model.controller);
     ASSERT_EQ(request.base.result, NX_SUCCESS);
-    ASSERT_EQ(
-        nx_usb_out_prepare(&request, nullptr, 0, NX_USB_STATUS, epoch, 200),
-        NX_SUCCESS);
-    EXPECT_EQ(nx_usb_endpoint_submit(&out, &request), NX_ERROR_INVALID);
-    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
     ASSERT_EQ(nx_usb_in_prepare(&request, nullptr, 0, NX_USB_DATA, epoch, 200),
               NX_SUCCESS);
     ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
@@ -2241,4 +2236,110 @@ TEST_F(UsbDevice, LatchedRawResetRejectsPacketsBeforeIrqCollectsTheEpoch) {
             ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
         }
     }
+}
+
+/** \brief Finite drain cannot silently become the infinite sentinel. */
+class UsbDeviceFiniteDrain : public UsbDevice,
+                             public testing::WithParamInterface<uint64_t> {};
+TEST_P(UsbDeviceFiniteDrain, UnrepresentableGraceRetainsTheLoanInQuarantine) {
+    const auto port = Port(2U);
+    model.hardware.hold_disable = true;
+    ASSERT_EQ(NX_SUCCESS, nx_usb_in_prepare(&request, bytes, 1U, NX_USB_DATA,
+                                            0U, UINT64_MAX - 1U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_endpoint_submit(&port, &request));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_native_clock_advance(UINT64_MAX - GetParam() - 100U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_endpoint_cancel(&port, &request));
+    EXPECT_NE(NX_DEADLINE_NEVER, endpoints[2].drain_deadline);
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_service(&device));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, endpoints[2].request);
+    EXPECT_EQ(1U, model.hardware.consumers);
+    model.hardware.hold_disable = false;
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_stop(&device));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+}
+INSTANTIATE_TEST_SUITE_P(GraceReachesOrCrossesNever, UsbDeviceFiniteDrain,
+                         testing::Values(UINT64_C(20), UINT64_C(19)));
+
+/** \brief A host may finish control-read before its last DATA IN ACK. */
+class UsbEarlyStatus : public UsbDevice,
+                       public testing::WithParamInterface<unsigned> {
+  protected:
+    nx_usb_request_t status_request = {};
+    nx_usb_request_t rejected_request = {};
+};
+TEST_P(UsbEarlyStatus, StatusOutClosesDataButRetainsTheUnacknowledgedInLoan) {
+    const uint8_t setup[8] = {0x80U, 6U, 0U, 1U, 0U, 0U, 128U, 0U};
+    ReceiveSetup(setup);
+    const uint64_t epoch = model.controller.snapshot.epoch;
+    const auto in = Port(0U);
+    const auto out = Port(1U);
+    ASSERT_EQ(NX_SUCCESS, nx_usb_in_prepare(&request, bytes, 64U, NX_USB_DATA,
+                                            epoch, 500U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_endpoint_submit(&in, &request));
+    if (GetParam() != 0U) {
+        ASSERT_EQ(NX_SUCCESS, nx_native_usb_complete(&model, 0U, true));
+        nx_usb_controller_irq(&model.controller);
+        ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+        ASSERT_EQ(NX_SUCCESS, nx_usb_in_prepare(&request, bytes,
+                                                GetParam() == 1U ? 64U : 0U,
+                                                NX_USB_DATA, epoch, 500U));
+        ASSERT_EQ(NX_SUCCESS, nx_usb_endpoint_submit(&in, &request));
+    }
+    nx_request_initialize(&status_request.base);
+    ASSERT_EQ(NX_SUCCESS, nx_usb_out_prepare(&status_request, nullptr, 0U,
+                                             NX_USB_STATUS, epoch, 500U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_endpoint_submit(&out, &status_request));
+    model.hardware.hold_disable = true;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_native_usb_receive(&model, 0U, nullptr, 0U, false));
+    ASSERT_EQ(NX_SUCCESS, nx_native_usb_complete(&model, 0U, false));
+    nx_usb_controller_irq(&model.controller);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&status_request.base));
+    EXPECT_EQ(NX_SUCCESS, status_request.base.result);
+    EXPECT_FALSE(model.controller.snapshot.control_pending);
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&request.base));
+    EXPECT_EQ(&request, endpoints[0].request);
+    EXPECT_EQ(1U, model.hardware.consumers);
+    nx_request_initialize(&rejected_request.base);
+    ASSERT_EQ(NX_SUCCESS, nx_usb_in_prepare(&rejected_request, bytes, 1U,
+                                            NX_USB_DATA, epoch, 500U));
+    EXPECT_NE(NX_SUCCESS, nx_usb_endpoint_submit(&in, &rejected_request));
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(20U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_service(&device));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, endpoints[0].request);
+    model.hardware.hold_disable = false;
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_service(&device));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(0U, request.base.transferred);
+    EXPECT_EQ(nullptr, endpoints[0].request);
+}
+INSTANTIATE_TEST_SUITE_P(FirstPacketBetweenPacketsOrDataZlp, UsbEarlyStatus,
+                         testing::Values(0U, 1U, 2U));
+
+TEST_F(UsbDevice, DisabledOutTokenDoesNotUndoTheCompletedStatusPacket) {
+    const uint8_t setup[8] = {0x80U, 6U, 0U, 1U, 0U, 0U, 8U, 0U};
+    ReceiveSetup(setup);
+    const uint64_t epoch = model.controller.snapshot.epoch;
+    const auto output = Port(1U);
+    ASSERT_EQ(NX_SUCCESS, nx_usb_out_prepare(&request, nullptr, 0U,
+                                             NX_USB_STATUS, epoch, 200U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_endpoint_submit(&output, &request));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_native_usb_receive(&model, 0U, nullptr, 0U, false));
+    ASSERT_EQ(NX_SUCCESS, nx_native_usb_complete(&model, 0U, false));
+    /* RM0090: a subsequent OUT token while disabled is OTEPDIS, not a
+     * payload overflow or a revocation of the preceding STATUS ACK. */
+    model.hardware.registers[0xB08U / 4U] |= 1U << 4U;
+    nx_usb_controller_irq(&model.controller);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_SUCCESS, request.base.result);
+    EXPECT_EQ(0U, request.base.transferred);
+    EXPECT_FALSE(model.controller.snapshot.control_pending);
+    EXPECT_EQ(nullptr, endpoints[1].request);
+    EXPECT_EQ(0U, model.hardware.registers[0xB08U / 4U] & (1U << 4U));
 }

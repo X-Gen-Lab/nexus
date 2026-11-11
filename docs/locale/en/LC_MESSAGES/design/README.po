@@ -1,12 +1,9 @@
-# Translation from the exact fresh8 gettext extraction; independent review pending.
+# Translation from the exact fresh8 gettext extraction; current delta independently reviewed.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 81af89211f9d0dc7aa288fd35517ebcad31b0d64c82b26721e2509a197c28fdd\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 0bfea7e49aba79d95f95c9fa0ef9ebcf4284592546845a393aceeb1c10195371\n"
 
 msgid "当前架构与工程合同"
 msgstr "Current architecture and engineering contracts"
-
-msgid "从本页选择要维护的合同：先核对精确型号、Board、模式和资源责任，再进入对应源码。 生产实现限定 STM32F407VET6／STM32F407ZGT6；设计页、公共头和厂商 SDK 不单独建立 新型号、软件候选或物理资格。当前 physical HIL 为 `not_executed`。"
-msgstr "Choose the contract to maintain here: check the exact part, Board, mode and resource responsibilities before opening its source. Production implementations cover STM32F407VET6 / STM32F407ZGT6. Design pages, public headers and vendor SDKs alone establish neither another part nor software-candidate or physical qualification. Current physical HIL is `not_executed`."
 
 msgid "平台与维护路径"
 msgstr "Platform and maintenance paths"
@@ -115,3 +112,12 @@ msgstr "Each entry maintains its call context, storage, deadlines, hardware with
 
 msgid "旧专项 CSV、实现和执行记录保留原始身份，范围从 [固定重构前源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design) 追溯；不据旧计数或退役平台文档扩大当前支持。"
 msgstr "Old specialized CSV files, implementations and execution records retain their original identities. Trace their scope through the [fixed pre-refactor source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design). Old counts and retired-platform documentation do not expand current support."
+
+msgid "审查本轮架构任务与剩余范围"
+msgstr "Review current architecture tasks and remaining scope"
+
+msgid "[WP01–WP12／IO01–IO20](../delivery/architecture.md#本轮架构迭代任务)、[验收边界](../delivery/qualification.md)"
+msgstr "[WP01–WP12/IO01–IO20](../delivery/architecture.md#本轮架构迭代任务), [acceptance boundaries](../delivery/qualification.md)"
+
+msgid "从本页选择要维护的合同：先核对[精确型号与模式](../delivery/support.md)、Board 和 资源责任，再进入对应源码。设计页、公共头和厂商 SDK 不单独建立新型号、软件候选 或物理资格；新增料号的内部 CRC 参考也不扩大 F407 专属模式的执行范围。 当前 physical HIL 为 `not_executed`。"
+msgstr "Choose a maintenance contract here after checking [exact devices and modes](../delivery/support.md), Board facts and resource ownership. Design pages, public headers and vendor SDKs alone do not establish new parts, software candidates or physical qualification. Internal-CRC references for added parts do not expand the execution scope of F407-specific modes. Physical HIL remains `not_executed`."

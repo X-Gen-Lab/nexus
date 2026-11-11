@@ -7,20 +7,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 62d17f66bb05cc77162eda66eab47bcb9fd0d9d3a83de9312524cf434a42d568\n"
+"X-Nexus-Source-SHA256: c6f12b34e93ca2ed92a506dd7c994942c1a2a5eabf93ef0f246f3e9f3a4fc607\n"
 
 msgid "Official STM32F4 drivers and Nexus contracts"
 msgstr "官方 STM32F4 驱动与 Nexus 合同"
-
-msgid ""
-"Current production integration is `soc/stm32/stm32f4/`, with concrete "
-"F407VE/ZG implementations. Reuse the locked official F4 HAL/LL and CMSIS "
-"Device sources; keep vendor types and Handles private. Another F4 macro or "
-"SDK directory does not establish a maintained mode, Board route or physical "
-"result."
-msgstr ""
-"当前生产集成为 `soc/stm32/stm32f4/`，具体实现限于 F407VE/ZG。复用锁定的官方 F4 HAL/LL 和 CMSIS "
-"Device 源码；厂商类型和 Handle 保持私有。其他 F4 宏或 SDK 目录不能证明已具备受维护模式、Board 路线或物理结果。"
 
 msgid "Responsibility boundary"
 msgstr "职责边界"
@@ -234,3 +224,18 @@ msgstr ""
 "所选镜像的软件审查必须对应其实际 ELF、resolved "
 "输入、编译命令和反汇编。审查只证明这些已安装路径，不证明所有声明模式或已连接设备的结果。新增或替换的外部 ISR "
 "若仍可能沿上述未满足规避条件的短指令路径返回，就继续保留为集成待办，直到审查其实际生成路径或另一项精确规避措施。"
+
+msgid "F407 DAC DMA restart boundary"
+msgstr "F407 DAC DMA 重启边界"
+
+msgid "The selected F407 DAC DMA path handles ES0182 Rev19 section 2.6.1 across requests. After request acceptance, restart first proves that the old DMA, IRQ and addresses are detached. It installs the declared idle code, uses the exclusively owned TIM6/7 hardware trigger to observe UDR, then withdraws DMAEN, converter output and clock before reconfiguring DAC, DMA and trigger state. The same owner retains every partial effect if cleanup or clock restoration fails; a timeout never releases the payload early."
+msgstr "所选 F407 DAC DMA 路径处理跨 request 的 ES0182 Rev19 第 2.6.1 节边界。请求受理后，重启先证明旧 DMA、IRQ 和地址已经退出，安装声明的 idle 码，通过独占 TIM6／7 硬件触发观察 UDR，再撤回 DMAEN、转换器输出和 clock，随后重新配置 DAC、DMA 与 trigger 状态。清理或时钟恢复失败时，同一 owner 保留每个部分效果；timeout 不提前归还 payload。"
+
+msgid "Only UDR induced during the explicitly controlled recovery phase belongs to recovery rather than payload progress or an independent operational error. It does not by itself replace an expired TIMEOUT with IO. Normal operational underrun still requires explicit stop recovery; failed W1C clearing and real DMA errors remain IO with borrows retained. This is not a rule to ignore every UDR observation."
+msgstr "只有显式受控恢复阶段诱发的 UDR 归属恢复，不作为 payload 进度或独立运行故障；它不会单独把已经到期的 TIMEOUT 改为 IO。正常运行欠载仍须显式 stop 恢复；W1C 清零失败和真实 DMA 错误仍是 IO 并保留借用。这不是忽略所有 UDR 观察的规则。"
+
+msgid "Recovery may internally convert the declared idle code before waveform timing starts and briefly disable converter output. These conversions are not payload progress. No uninterrupted analog hold, glitch-free transition or continuous waveform is promised between requests. The C model and ARM image do not establish a silicon-workaround or analog-load qualification. See the [near-source DAC contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md#dac-输出与触发所有权) and public `dac_tx.h` requirements; this is a selected recovery sequence, not a second HAL owner or a general register-script mechanism."
+msgstr "恢复可能在波形计时开始前内部转换所声明的 idle 码，并短暂关闭转换器输出。这些转换不是 payload 进度。两次 request 之间不承诺连续模拟保持、无毛刺切换或连续波形。C 模型与 ARM 镜像不建立硅片勘误方案或模拟负载资格。参见[近源 DAC 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md#dac-输出与触发所有权)和公共 `dac_tx.h` 要求；这是所选恢复序列，不是第二个 HAL owner 或通用寄存器脚本机制。"
+
+msgid "Production integration is `soc/stm32/stm32f4/`. Select reviewed exact device and mode facts from [current support](../delivery/support.md), then reuse the locked F4 HAL/LL and CMSIS Device sources. Vendor types and Handles stay private. Internal-CRC software references for added parts do not qualify every peripheral, Board route or physical behavior."
+msgstr "生产接入位于 `soc/stm32/stm32f4/`。从[当前支持](../delivery/support.md)选择已审精确器件与模式，再复用锁定的 F4 HAL／LL 和 CMSIS Device。厂商类型与 Handle 保持私有。新增料号的内部 CRC 软件参考不授予全部外设、Board 路线或物理行为资格。"

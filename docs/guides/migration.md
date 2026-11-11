@@ -73,10 +73,11 @@ a redirect does not make an old API contract equivalent to a new one.
 
 ## Update private source integrations
 
-Production ownership is now one `soc/stm32/stm32f4/` package. Its concrete
-implementations remain F407VE/ZG; obsolete family names are rejected rather than
-mapped to a replacement. Existing F407 assemblies now select `stm32f4` with an
-exact part. Public C interfaces remain the consumption boundary.
+Production ownership is one `soc/stm32/stm32f4/` package. Exact parts and modes
+follow the [current support catalogue](../delivery/support.md); obsolete family
+names are rejected rather than mapped to a replacement. Existing F407 assemblies
+select `stm32f4` with an exact part. Public C interfaces remain the consumption
+boundary; added internal-CRC references do not change product wiring.
 
 Board and SoC trees contain no Python plugins. Current generation is centralized
 under `tools/configure/stm32f4/`; firmware hardware algorithms and lifecycle

@@ -171,6 +171,32 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
                                     'missing required sources/licenses'):
             self.sdk.verify(self.root)
 
+    def test_family_reference_payload_is_exact_without_host_test_dependencies(self):
+        expected = {"tests/contracts/stm32f4_family/CMakeLists.txt",
+                    "tests/contracts/crc_assembly/consumer.c"}
+        expected.update(f"tests/contracts/stm32f4_family/f{chip}zg.toml"
+                        for chip in ("405", "407", "415", "417"))
+        expected.update(
+            f"tests/contracts/stm32f4_family/f{chip}zg-board/board.json"
+            for chip in ("405", "407", "415", "417"))
+        profile = self.sdk.source_profile(host_support=False)
+        required = set(self.sdk.required_files(ROOT, profile))
+        self.assertTrue(expected <= required)
+        self.assertTrue(all(self.sdk.selected(name, root=ROOT, profile=profile)
+                            for name in expected))
+        for name in ("tests/google/f407_crc_test.cpp",
+                     "tests/contracts/stm32f4_family/unreviewed.c",
+                     "tests/support/native/soc.json"):
+            with self.subTest(name=name):
+                self.assertFalse(self.sdk.selected(name, root=ROOT,
+                                                   profile=profile))
+        self.complete_required_map()
+        self.files.pop("tests/contracts/stm32f4_family/f415zg-board/board.json")
+        self.write_manifest()
+        with self.assertRaisesRegex(self.sdk.SDKError,
+                                    "missing required sources/licenses"):
+            self.sdk.verify(self.root)
+
     def test_schema_and_provenance_precede_required_name_admission(self):
         for changes, message in (
                 ({"schema": 1}, "Unsupported installed source SDK identity"),

@@ -1,11 +1,8 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 313fdb7c5f8f85f9ba852466c3780b0278613abd0c2cec60a0e5069fb23a0df0\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 18a5366261e4af8acabbd3cabbf663491bdc5173ddb888038a82dfa0d4b0ce05\n"
 
 msgid "当前架构图册"
 msgstr "Current architecture diagrams"
-
-msgid "图源为可编辑 DOT，输出为本地 SVG；`labels.json` 维护同一拓扑的中英文标签。 实线和虚线以各边标签为准，不能把源码依赖理解为每次 I/O 的转发，也不能由图推导 软件候选、吞吐、低功耗或物理 HIL。当前 MCU 接入只有 F4，精确实现限定 F407VE／ZG。"
-msgstr "Editable DOT sources produce local SVG files; `labels.json` maintains English and Chinese labels for the same topology. Read solid and dashed edges by their labels: a source dependency does not imply forwarding on each I/O call, and diagrams do not establish software candidates, throughput, low-power behavior or physical HIL. Current MCU integration is F4 only, with concrete implementations limited to F407VE/ZG."
 
 msgid "纯退役芯片图已退出当前图册，原图可从 [固定旧源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/assets/diagrams) 追溯。机器身份与范围见 {download}`diagram-index.csv <diagram-index.csv>`，原始执行证据不重标。"
 msgstr "Diagrams dedicated to retired chips have left the current gallery. Their originals remain traceable at the [fixed prior source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/assets/diagrams). Machine identities and scope are in {download}`diagram-index.csv <diagram-index.csv>`; original execution evidence is not relabeled."
@@ -300,3 +297,6 @@ msgstr "{download}`Editable DOT <lwip-tcp-tls-mqtt-host.dot>`."
 
 msgid "未注册的补充图保留自己的图内范围，仍参加成对输出和双语检查。当前结构的正文 以[架构](../../delivery/architecture.md)和[源码定位](../../explanation/source-map.md)为准。"
 msgstr "Unregistered supplemental diagrams keep their own stated scope and still undergo paired-output and bilingual checks. For the current structure, use [architecture](../../delivery/architecture.md) and the [source map](../../explanation/source-map.md)."
+
+msgid "图源为可编辑 DOT，输出为本地 SVG；`labels.json` 维护同一拓扑的中英文标签。 实线和虚线以各边标签为准，不能把源码依赖理解为每次 I/O 的转发，也不能由图推导 软件候选、吞吐、低功耗或物理 HIL。当前 MCU 入口为 F4，精确器件与模式见 [支持范围](../../delivery/support.md)；图中参考装配不授权其他配置。"
+msgstr "Editable DOT sources produce local SVG files; `labels.json` maintains English and Chinese labels for the same topology. Edge labels define solid and dashed arrows. Source dependencies do not imply forwarding on every I/O call, and diagrams establish no software candidate, throughput, low-power or physical HIL result. The current MCU entry is F4; see [support scope](../../delivery/support.md) for exact devices and modes. A diagram reference assembly authorizes no other configuration."

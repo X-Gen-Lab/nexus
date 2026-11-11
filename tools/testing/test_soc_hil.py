@@ -135,6 +135,17 @@ if operation == 'serial':
         capture = soc_acceptance.capture(protocol_path, acquisition.recipe_path,
                                          acquisition.admission_path, acquisition.output)
         capture_path = acquisition.output / "soc-capture.json"
+        diagnostics = None
+        if capture["status"] != "captured":
+            details = [f"Synthetic fixture capture failed: {capture!r}"]
+            for operation in capture["operations"]:
+                for stream in ("stdout", "stderr"):
+                    if stream in operation:
+                        path = Path(operation[stream]["path"])
+                        details.append(
+                            f"{operation['name']} {stream}: {path.read_bytes()!r}")
+            diagnostics = "\n".join(details)
+        self.assertEqual(capture["status"], "captured", diagnostics)
         import json
         serial_step = next(step for step in capture["operations"] if step["name"] == "serial")
         payload = json.loads(Path(serial_step["observation"]["path"]).read_text())["observations"]["soc"]

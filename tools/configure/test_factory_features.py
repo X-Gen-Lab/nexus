@@ -25,12 +25,14 @@ class OptionalFactoryTests(unittest.TestCase):
         self.assembly.write_text(self.contents + policy)
         return gate.configure(self.assembly, self.output, test_support=True)
 
-    def compile(self, compiler, standard, expression):
+    def compile(self, compiler, standard, expression, *,
+                getter="nx_factory_gpio_ref",
+                return_type="const nx_gpio_port_t*"):
         suffix = "c" if compiler == "cc" else "cpp"
         source = self.root / ("consumer." + suffix)
         source.write_text('#include "nexus_factory_strong.h"\n'
-                          'const nx_gpio_port_t* lookup(void) {\n'
-                          '    return nx_factory_gpio_ref(' + expression
+                          + return_type + ' lookup(void) {\n'
+                          '    return ' + getter + '(' + expression
                           + ');\n}\n')
         return subprocess.run(
             [compiler, "-std=" + standard, "-Wall", "-Wextra", "-Werror",
@@ -57,6 +59,21 @@ class OptionalFactoryTests(unittest.TestCase):
         self.assertIn("static inline", header)
         self.assertNotIn("static const", header)
         self.assertNotIn("malloc", header)
+
+    def test_capability_lookup_rejects_other_nominal_classes(self):
+        self.generate("\n[factory]\ncapabilities = true\n")
+        for compiler, standard in (("cc", "c11"), ("c++", "c++17")):
+            with self.subTest(compiler=compiler):
+                arguments = {"getter": "nx_factory_gpio_capability_ref",
+                             "return_type": "const nx_factory_io_capability_t*"}
+                valid = self.compile(compiler, standard, "NX_GPIO_REF_LED0",
+                                     **arguments)
+                self.assertEqual(valid.returncode, 0, valid.stderr)
+                for expression in ("NX_UART_REF_COUNT", "NX_GPIO_ID_LED0"):
+                    invalid = self.compile(compiler, standard, expression,
+                                           **arguments)
+                    self.assertNotEqual(invalid.returncode, 0)
+                    self.assertNotIn("No such file", invalid.stderr)
 
     def test_default_factory_has_no_capability_descriptors(self):
         result = self.generate()

@@ -143,9 +143,12 @@ void nx_stm32_adc_continuous_irq(nx_stm32_adc_continuous_state_t* state);
 nx_result_t nx_stm32_adc_stream_rate(nx_stm32_adc_stream_state_t* state,
                                      uint32_t hz, uint16_t* prescaler,
                                      uint16_t* period);
-/** \brief Shared private all-slot DMA and complete-scan validation. */
+/** \brief Validate all DMA slots against the complete concrete provider.
+ * \note state_bytes includes optional continuous fields beyond the base.
+ */
 nx_result_t nx_stm32_adc_stream_blocks(nx_stm32_adc_stream_state_t* state,
-                                       const nx_stream_t* stream);
+                                       const nx_stream_t* stream,
+                                       size_t state_bytes);
 /** \brief Shared private rank/sample register programming, engines stopped. */
 void nx_stm32_adc_stream_sequence(nx_stm32_adc_stream_state_t* state);
 

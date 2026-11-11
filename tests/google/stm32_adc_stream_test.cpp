@@ -23,11 +23,18 @@ extern "C" {
 static ADC_TypeDef* s_power_adc;
 static bool s_delay_power_store;
 static bool s_refuse_power_enable;
+static bool s_exhaust_after_power_store;
 static nx_time_us_t s_first_start;
 
 /** \brief Complete the modeled APB power store before the warmup timestamp. */
 extern "C" void nx_stm32_adc_model_barrier(void) {
     nx_arch_dsb();
+    if (s_exhaust_after_power_store && s_power_adc != nullptr &&
+        (s_power_adc->CR2 & ADC_CR2_ADON) != 0U) {
+        s_exhaust_after_power_store = false;
+        (void)nx_native_clock_advance(NX_DEADLINE_NEVER - 1U -
+                                      nx_time_now_us());
+    }
     if (s_refuse_power_enable && s_power_adc != nullptr) {
         s_power_adc->CR2 &= ~static_cast<uint32_t>(ADC_CR2_ADON);
     }
@@ -152,6 +159,7 @@ class Stm32AdcStream : public testing::Test {
         s_target_dma = &dma;
         s_delay_power_store = false;
         s_refuse_power_enable = false;
+        s_exhaust_after_power_store = false;
         s_first_start = 0U;
         s_power_adc = &adc;
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
@@ -548,6 +556,7 @@ class Stm32AdcContinuous : public testing::Test {
         s_target_dma = &dma;
         s_delay_power_store = false;
         s_refuse_power_enable = false;
+        s_exhaust_after_power_store = false;
         s_first_start = 0U;
         s_power_adc = &adc;
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
@@ -981,3 +990,169 @@ TEST_F(Stm32AdcContinuous, ContinuousCaptureUsesItsSelectedTrigger) {
     EXPECT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
     EXPECT_EQ(NX_SUCCESS, nx_adc_port_stream_stop(&port));
 }
+
+namespace {
+
+TEST_F(Stm32AdcStream, DiscreteDmaCannotBorrowItsPhysicalProviderState) {
+    region = {reinterpret_cast<uintptr_t>(&state), sizeof(state),
+              NX_DMA_MEMORY_WRITE};
+    slot.data = reinterpret_cast<uint8_t*>(&state);
+    slot.capacity = 4U;
+    ASSERT_EQ(nx_stream_initialize(&stream, &slot, 1U), NX_SUCCESS);
+    EXPECT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(stream.outstanding, 0U);
+    EXPECT_EQ(stream.epoch, 0U);
+    EXPECT_EQ(state.stream, nullptr);
+    EXPECT_FALSE(state.adc.active);
+    EXPECT_EQ(memory.CR & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(adc.CR2 & ADC_CR2_ADON, 0U);
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
+}
+
+TEST_F(Stm32AdcContinuous, ContinuousDmaCannotBorrowItsObserverPointerStorage) {
+    regions[0] = {reinterpret_cast<uintptr_t>(&state), sizeof(state),
+                  NX_DMA_MEMORY_WRITE};
+    slots[0].data = reinterpret_cast<uint8_t*>(&state.observer);
+    ASSERT_EQ(nx_stream_initialize(&stream, slots, 3U), NX_SUCCESS);
+    EXPECT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(stream.outstanding, 0U);
+    EXPECT_EQ(stream.epoch, 0U);
+    EXPECT_EQ(state.base.stream, nullptr);
+    EXPECT_FALSE(state.base.adc.active);
+    EXPECT_EQ(memory.CR & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(adc.CR2 & ADC_CR2_ADON, 0U);
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
+}
+
+} /* namespace */
+
+#include <unistd.h>
+
+namespace {
+
+TEST_F(Stm32AdcStream, PollWarmupExhaustionReturnsWithoutWaitingForever) {
+    EXPECT_EXIT(([&] {
+                    (void)alarm(2U);
+                    if (nx_native_clock_configure(true, NX_DEADLINE_NEVER -
+                                                            2U) != NX_SUCCESS)
+                        _exit(2);
+                    uint16_t output[2]{0xBEEFU, 0xCAFEU};
+                    size_t count{};
+                    const nx_result_t result = nx_adc_port_sample(
+                        &port, output, 2U, NX_DEADLINE_NEVER - 1U, &count);
+                    _exit(result == NX_ERROR_EXHAUSTED && count == 0U &&
+                                  !state.adc.active && adc.CR2 == 0U &&
+                                  output[0] == 0xBEEFU && output[1] == 0xCAFEU
+                              ? 0
+                              : 1);
+                }()),
+                testing::ExitedWithCode(0), "");
+}
+
+TEST_F(Stm32AdcStream, DiscreteWarmupExhaustionRejectsBeforeAnyLoan) {
+    ASSERT_EQ(nx_native_clock_configure(true, NX_DEADLINE_NEVER - 2U),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U),
+              NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(stream.outstanding, 0U);
+    EXPECT_EQ(stream.epoch, 0U);
+    EXPECT_EQ(state.stream, nullptr);
+    EXPECT_FALSE(state.adc.active);
+    EXPECT_EQ(memory.CR, 0U);
+    EXPECT_EQ(adc.CR2, 0U);
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
+}
+
+TEST_F(Stm32AdcContinuous, ContinuousWarmupExhaustionRejectsBeforeAnyLoan) {
+    ASSERT_EQ(nx_native_clock_configure(true, NX_DEADLINE_NEVER - 2U),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U),
+              NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(stream.outstanding, 0U);
+    EXPECT_EQ(stream.epoch, 0U);
+    EXPECT_EQ(state.base.stream, nullptr);
+    EXPECT_FALSE(state.base.adc.active);
+    EXPECT_EQ(memory.CR, 0U);
+    EXPECT_EQ(adc.CR2, 0U);
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
+}
+
+TEST_F(Stm32AdcStream, AcceptedWarmupExhaustionKeepsTheRefusedDmaLoan) {
+    s_exhaust_after_power_store = true;
+    s_hold_dma_enable = true;
+    ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
+    EXPECT_TRUE(state.fault);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_IO);
+    EXPECT_EQ(stream.outstanding, 1U);
+    EXPECT_EQ(state.stream, &stream);
+    EXPECT_TRUE(state.adc.active);
+    EXPECT_NE(memory.CR & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(timer.CR1 & TIM_CR1_CEN, 0U);
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_ERROR_BUSY);
+    s_hold_dma_enable = false;
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
+    EXPECT_EQ(stream.outstanding, 0U);
+    EXPECT_EQ(state.stream, nullptr);
+    EXPECT_FALSE(state.adc.active);
+}
+
+TEST_F(Stm32AdcContinuous, AcceptedWarmupExhaustionKeepsBothRefusedDmaLoans) {
+    s_exhaust_after_power_store = true;
+    s_hold_dma_enable = true;
+    ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
+    EXPECT_TRUE(state.halted);
+    EXPECT_TRUE(state.base.fault);
+    EXPECT_EQ(state.fault_result, NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
+    EXPECT_EQ(stream.outstanding, 2U);
+    EXPECT_EQ(state.base.stream, &stream);
+    EXPECT_TRUE(state.base.adc.active);
+    EXPECT_NE(memory.CR & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(timer.CR1 & TIM_CR1_CEN, 0U);
+    s_hold_dma_enable = false;
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(stream.outstanding, 0U);
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
+    EXPECT_EQ(state.base.stream, nullptr);
+    EXPECT_FALSE(state.base.adc.active);
+}
+
+} /* namespace */
+
+namespace {
+TEST_F(Stm32AdcStream, RefusedEnableIsAnAcceptedFaultUntilTheDmaLoanDrains) {
+    s_refuse_power_enable = true;
+    s_hold_dma_enable = true;
+    ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
+    EXPECT_TRUE(state.fault);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_IO);
+    EXPECT_EQ(stream.outstanding, 1U);
+    EXPECT_EQ(state.stream, &stream);
+    EXPECT_EQ(timer.CR1 & TIM_CR1_CEN, 0U);
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_ERROR_BUSY);
+    s_refuse_power_enable = false;
+    s_hold_dma_enable = false;
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
+    EXPECT_EQ(stream.outstanding, 0U);
+}
+TEST_F(Stm32AdcContinuous,
+       RefusedEnableIsAnAcceptedFaultWithBothLoansRetained) {
+    s_refuse_power_enable = true;
+    s_hold_dma_enable = true;
+    ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
+    EXPECT_TRUE(state.halted);
+    EXPECT_TRUE(state.base.fault);
+    EXPECT_EQ(state.fault_result, NX_ERROR_IO);
+    EXPECT_EQ(stream.outstanding, 2U);
+    EXPECT_EQ(state.base.stream, &stream);
+    EXPECT_EQ(timer.CR1 & TIM_CR1_CEN, 0U);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_ERROR_BUSY);
+    s_refuse_power_enable = false;
+    s_hold_dma_enable = false;
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
+    EXPECT_EQ(stream.outstanding, 0U);
+}
+} /* namespace */

@@ -32,7 +32,6 @@ typedef struct {
     uint8_t vector_count;
     uint8_t priority;
     bool kernel_bound;
-    bool preload_tx;
     const nx_uart_wire_config_t* wire;
     uint8_t pin_count;
 } nx_stm32_uart_cold_config_t;
@@ -328,7 +327,7 @@ nx_stm32_uart_dma_cold_prepare(nx_stm32_uart_dma_state_t* state,
     if (result != NX_SUCCESS)
         return result;
     nx_stm32_uart_cold_bind(&state->uart, &config->uart);
-    state->resources = config->resources;
+    state->resources = &config->resources;
     state->transmit.tx = config->transmit.registers;
     state->transmit.dma_irq = config->transmit.irq;
     state->transmit.stream = config->transmit.stream;
@@ -383,7 +382,7 @@ static inline nx_result_t nx_stm32_uart_receive_cold_prepare(
     if (result != NX_SUCCESS)
         return result;
     nx_stm32_uart_cold_bind(&state->uart, &config->uart);
-    state->resources = config->resources;
+    state->resources = &config->resources;
     state->receive = config->receive;
     state->continuous = config->continuous;
     result = nx_stm32_uart_receive_initialize(state, config->uart.clock_hz);
@@ -438,7 +437,7 @@ nx_stm32_uart_duplex_cold_prepare(nx_stm32_uart_duplex_state_t* state,
     if (result != NX_SUCCESS)
         return result;
     nx_stm32_uart_cold_bind(&state->receive.uart, &config->uart);
-    state->receive.resources = config->resources;
+    state->receive.resources = &config->resources;
     state->receive.receive = config->receive;
     state->receive.continuous = config->continuous;
     state->transmit.tx = config->transmit.registers;

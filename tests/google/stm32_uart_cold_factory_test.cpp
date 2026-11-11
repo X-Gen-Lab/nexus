@@ -324,7 +324,6 @@ TEST_F(UartColdFactory, AdditionalDmaOwnersWithdrawTheirActualNvicAndPads) {
                        (uint8_t)publishers.size(),
                        5U,
                        false,
-                       false,
                        nullptr,
                        0U};
         config.resources = {selected.dma, &memory, 1U};
@@ -688,7 +687,8 @@ TEST_F(UartColdFactory,
 #ifdef NX_COLD_WIRE_CASES
 TEST_F(UartColdFactory, WirePinsAcquireExactClockFlowAndOpenDrainAndRestore) {
     for (auto mode : {NX_UART_WIRE_HALF_DUPLEX, NX_UART_WIRE_SMARTCARD,
-                      NX_UART_WIRE_SYNCHRONOUS, NX_UART_WIRE_ASYNCHRONOUS}) {
+                      NX_UART_WIRE_SYNCHRONOUS, NX_UART_WIRE_ASYNCHRONOUS,
+                      NX_UART_WIRE_LIN, NX_UART_WIRE_IRDA}) {
         SCOPED_TRACE(static_cast<int>(mode));
         RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
         USART1->SR = USART_SR_TC | USART_SR_TXE;
@@ -713,6 +713,17 @@ TEST_F(UartColdFactory, WirePinsAcquireExactClockFlowAndOpenDrainAndRestore) {
             count = 4U;
             pins[2].pin = 11U;
             wire.flow = NX_UART_FLOW_RTS_CTS;
+        }
+        if (mode == NX_UART_WIRE_LIN) {
+            count = 2U;
+            wire.lin_break_bits = 10U;
+        }
+        if (mode == NX_UART_WIRE_IRDA) {
+            count = 2U;
+            wire.prescaler = 42U;
+            GPIOA->ODR |= 1U << 9U;
+        } else {
+            GPIOA->ODR &= ~static_cast<uint32_t>(1U << 9U);
         }
         const uint32_t prior_mode = GPIOA->MODER;
         const uint32_t prior_type = GPIOA->OTYPER;
@@ -739,9 +750,7 @@ TEST_F(UartColdFactory, WirePinsAcquireExactClockFlowAndOpenDrainAndRestore) {
         const bool open =
             mode == NX_UART_WIRE_HALF_DUPLEX || mode == NX_UART_WIRE_SMARTCARD;
         EXPECT_EQ((GPIOA->OTYPER & (1U << 9U)) != 0U, open);
-        if (open) {
-            EXPECT_NE(GPIOA->ODR & (1U << 9U), 0U);
-        }
+        EXPECT_EQ((GPIOA->ODR & (1U << 9U)) != 0U, mode != NX_UART_WIRE_IRDA);
         if (mode == NX_UART_WIRE_ASYNCHRONOUS) {
             EXPECT_FALSE(early_rts);
             refused = &USART1->CR3;

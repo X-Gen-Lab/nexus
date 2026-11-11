@@ -21,16 +21,23 @@ source_language: zh_CN
 | 入口 | 用途 |
 |---|---|
 | [当前架构](architecture.md) | 目录、依赖、运行路径和状态责任 |
+| [本轮架构任务](architecture.md#本轮架构迭代任务) | WP01–WP12 与 IO01–IO20 的既有基础、实施增量和退出条件 |
 | [精确支持](support.md) | 型号、板卡、模式与限制 |
 | [能力矩阵](capabilities.md) | 事实、路线、装配与实际生产定义关联 |
 | [源码定位](../explanation/source-map.md) | 各层权威入口与源码归属 |
 | [资格边界](../reference/platforms/qualification.md) | 模型、ARM、SDK、候选和物理验收分开 |
-| [本批变更与验证](https://github.com/X-Gen-Lab/nexus/pull/60) | 当前 PR 的源码 HEAD、实际本地 CI、ARM 和 SDK 记录；与历史记录分别读取 |
+| [本批变更与验证](https://github.com/X-Gen-Lab/nexus/pull/61) | PR #61 的源码与实际执行记录；后续增量不继承基线资格 |
 | [软件证据导航](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-verification.md) | 按原源码与配置读取执行记录 |
 
 当前源码版本号保持 0.2.1；已发布版本仍以
 [GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases)和其固定 manifest 为准。
 重构不移动旧标签，不重新标记旧产物。
+
+本轮架构迭代以固定源码
+[`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984)
+为既有基础。该版本已有的流式传输、恢复和勘误修正，与本轮工作包新增内容分别记录。
+PR、目录或公共接口存在不等于工作包完成；当前实施仍须取得对应源码的测试、ARM、
+资源、SDK 与文档结果。实板和远端 Actions 按用户要求暂缓，软件验收使用本地门禁。
 
 退出平台的原始实现和记录可从
 [重构前固定源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)

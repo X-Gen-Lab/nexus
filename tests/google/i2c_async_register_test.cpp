@@ -605,6 +605,20 @@ TEST_F(I2CAsyncRegisters, DrainTimeoutQuarantinesThenOnlyActualReleaseSettles) {
     EXPECT_EQ(state.active, nullptr);
 }
 
+TEST_F(I2CAsyncRegisters, ExhaustedDrainBudgetCannotCreateAnInfiniteWireLoan) {
+    Begin();
+    model_time = UINT64_MAX - 1U;
+    ASSERT_EQ(nx_i2c_port_cancel(&bus, &request), NX_SUCCESS);
+    nx_i2c_port_service(&bus);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.active, &request);
+    EXPECT_EQ(nx_i2c_port_stop(&bus), NX_ERROR_BUSY);
+    ReleaseWire();
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+    EXPECT_EQ(state.active, nullptr);
+}
+
 TEST_F(I2CAsyncRegisters, ExpiredAdmissionAndForeignIdentityHaveNoEffects) {
     ASSERT_EQ(nx_i2c_request_prepare(&request, &message, 1U, model_time),
               NX_SUCCESS);

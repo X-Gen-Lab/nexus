@@ -8,10 +8,11 @@ source_language: en
 (design-official-stm32-provider)=
 # Official STM32F4 drivers and Nexus contracts
 
-Current production integration is `soc/stm32/stm32f4/`, with concrete F407VE/ZG
-implementations. Reuse the locked official F4 HAL/LL and CMSIS Device sources;
-keep vendor types and Handles private. Another F4 macro or SDK directory does
-not establish a maintained mode, Board route or physical result.
+Production integration is `soc/stm32/stm32f4/`. Select reviewed exact device and
+mode facts from [current support](../delivery/support.md), then reuse the locked
+F4 HAL/LL and CMSIS Device sources. Vendor types and Handles stay private.
+Internal-CRC software references for added parts do not qualify every peripheral,
+Board route or physical behavior.
 
 ## Responsibility boundary
 
@@ -67,6 +68,32 @@ same storage and recovery responsibility.
 Do not unconditionally call `HAL_Init()`: default SysTick setup and NVIC grouping
 must respect Platform and RTOS ownership. Use the maintained time domain and
 validate any kernel ISR ceiling before entering a kernel API.
+
+## F407 DAC DMA restart boundary
+
+The selected F407 DAC DMA path handles ES0182 Rev19 section 2.6.1 across
+requests. After request acceptance, restart first proves that the old DMA,
+IRQ and addresses are detached. It installs the declared idle code, uses the
+exclusively owned TIM6/7 hardware trigger to observe UDR, then withdraws DMAEN,
+converter output and clock before reconfiguring DAC, DMA and trigger state.
+The same owner retains every partial effect if cleanup or clock restoration
+fails; a timeout never releases the payload early.
+
+Only UDR induced during the explicitly controlled recovery phase belongs to
+recovery rather than payload progress or an independent operational error. It
+does not by itself replace an expired TIMEOUT with IO. Normal operational
+underrun still requires explicit stop recovery; failed W1C clearing and real
+DMA errors remain IO with borrows retained. This is not a rule to ignore every
+UDR observation.
+
+Recovery may internally convert the declared idle code before waveform timing
+starts and briefly disable converter output. These conversions are not payload
+progress. No uninterrupted analog hold, glitch-free transition or continuous
+waveform is promised between requests. The C model and ARM image do not
+establish a silicon-workaround or analog-load qualification. See the
+[near-source DAC contract](../../soc/stm32/stm32f4/README.md#dac-输出与触发所有权)
+and public `dac_tx.h` requirements; this is a selected recovery sequence, not a
+second HAL owner or a general register-script mechanism.
 
 ## Replace a mode and verify it
 

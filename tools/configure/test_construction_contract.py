@@ -167,5 +167,44 @@ class ConstructionContractTests(unittest.TestCase):
 
 
 
+
+class InstanceConstructionIndependenceTests(unittest.TestCase):
+    def check_independent(self, kind, removed, selected):
+        import tempfile
+        from pathlib import Path
+        fixture = gate.ROOT / "tests/contracts/multi_controller_assembly"
+        original = (fixture / "stm32-ve.toml").read_text().replace(
+            'board_package = "stm32-ve-board"',
+            'board_package = "' + str(fixture / "stm32-ve-board") + '"')
+        retained, discard = [], False
+        for line in original.splitlines(keepends=True):
+            if line.startswith("["):
+                section = line.strip()[1:-1]
+                discard = any(section == prefix or section.startswith(prefix + ".")
+                              for prefix in removed)
+            if not discard:
+                retained.append(line)
+        with tempfile.TemporaryDirectory() as directory:
+            constructions = []
+            for name, contents in (("single", "".join(retained)), ("peer", original)):
+                path = Path(directory) / (name + ".toml")
+                path.write_text(contents)
+                result = gate.resolve_ir(path)
+                item = next(item for item in result.controllers
+                            if item.kind == kind and item.id == selected)
+                provider = maintained(result.soc_family)
+                constructions.append(provider.constructor(
+                    item, result, result.board_bindings, result.routes, result.devices))
+            self.assertEqual(constructions[0], constructions[1],
+                             "An unrelated controller changed static cold ownership")
+
+    def test_uart_cold_configuration_is_independent_of_a_peer(self):
+        self.check_independent("uart", ("uart.secondary_uart",), "primary_uart")
+
+    def test_spi_cold_ownership_is_independent_of_a_peer(self):
+        self.check_independent("spi", ("spi.secondary_spi", "spi_device.secondary_sensor"),
+                               "primary_spi")
+
+
 if __name__ == "__main__":
     unittest.main()

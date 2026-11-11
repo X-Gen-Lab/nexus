@@ -89,6 +89,20 @@ static bool cold_withdraw(const nx_stm32_spi_pin_config_t* pin) {
     return true;
 }
 
+/** \brief Inactive CS is proved before any retained pin is returned. */
+static bool cold_selects_inactive(const nx_stm32_spi_config_t* config,
+                                  size_t captured) {
+    for (size_t i = 3U; i < captured; ++i) {
+        const nx_stm32_spi_pin_config_t* pin = &config->pins[i];
+        const uint32_t mask = 1U << pin->pin;
+        NX_PLATFORM_REGISTER_WRITE(pin->registers->BSRR, mask);
+        nx_arch_dsb();
+        if ((pin->registers->ODR & mask) == 0U)
+            return false;
+    }
+    return true;
+}
+
 bool nx_stm32_spi_config_valid(const nx_stm32_spi_config_t* config) {
     if (config == NULL || config->pins == NULL || config->endpoints == NULL ||
         config->endpoint_count == 0U ||
@@ -150,6 +164,8 @@ nx_result_t nx_stm32_spi_cold_rollback(nx_stm32_spi_state_t* port,
                                        nx_stm32_spi_cold_receipt_t* receipt) {
     if (!receipt->rollback_pending)
         return NX_SUCCESS;
+    if (!cold_selects_inactive(config, receipt->captured))
+        return NX_ERROR_IO;
     if (receipt->registers_captured) {
         NX_PLATFORM_REGISTER_WRITE(config->registers->CR2, receipt->cr2);
         NX_PLATFORM_REGISTER_WRITE(config->registers->CR1, receipt->cr1);
@@ -224,7 +240,8 @@ nx_result_t nx_stm32_spi_cold_acquire(nx_stm32_spi_state_t* port,
     receipt->cr1 = config->registers->CR1;
     receipt->cr2 = config->registers->CR2;
     status = NX_ERROR_BUSY;
-    if ((receipt->cr1 & SPI_CR1_SPE) != 0U)
+    if ((receipt->cr1 & SPI_CR1_SPE) != 0U ||
+        (config->registers->SR & SPI_SR_BSY) != 0U)
         goto failed;
     receipt->registers_captured = true;
     NX_PLATFORM_REGISTER_WRITE(config->registers->CR1, 0U);
@@ -250,6 +267,13 @@ nx_result_t nx_stm32_spi_cold_acquire(nx_stm32_spi_state_t* port,
             cs->registers = pin->registers;
             cs->mask = 1U << pin->pin;
             cs->output = true;
+            /* Prove inactive CS before connecting its output driver. */
+            NX_PLATFORM_REGISTER_WRITE(pin->registers->BSRR, cs->mask);
+            nx_arch_dsb();
+            if ((pin->registers->ODR & cs->mask) == 0U) {
+                status = NX_ERROR_IO;
+                goto failed;
+            }
             status = nx_stm32_gpio_initialize(cs, cs->mask);
             if (status == NX_SUCCESS) {
                 endpoint->endpoint->port = port;
@@ -296,6 +320,8 @@ nx_result_t nx_stm32_spi_close(nx_stm32_spi_state_t* port,
     NX_PLATFORM_REGISTER_WRITE(port->registers->CR2, 0U);
     nx_arch_dsb();
     if (port->registers->CR1 != 0U || port->registers->CR2 != 0U)
+        return NX_ERROR_IO;
+    if (!cold_selects_inactive(config, receipt->captured))
         return NX_ERROR_IO;
     for (size_t i = 0U; i < config->endpoint_count; ++i) {
         nx_stm32_gpio_state_t* cs = config->endpoints[i].chip_select;

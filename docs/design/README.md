@@ -7,9 +7,10 @@ source_language: zh_CN
 
 # 当前架构与工程合同
 
-从本页选择要维护的合同：先核对精确型号、Board、模式和资源责任，再进入对应源码。
-生产实现限定 STM32F407VET6／STM32F407ZGT6；设计页、公共头和厂商 SDK 不单独建立
-新型号、软件候选或物理资格。当前 physical HIL 为 `not_executed`。
+从本页选择要维护的合同：先核对[精确型号与模式](../delivery/support.md)、Board 和
+资源责任，再进入对应源码。设计页、公共头和厂商 SDK 不单独建立新型号、软件候选
+或物理资格；新增料号的内部 CRC 参考也不扩大 F407 专属模式的执行范围。
+当前 physical HIL 为 `not_executed`。
 
 ## 平台与维护路径
 
@@ -17,6 +18,7 @@ source_language: zh_CN
 | --- | --- |
 | 选择型号、Board、模式与后端 | [支持矩阵](../delivery/support.md)、[派生事实](../delivery/capabilities.md)、[Board 包](../../boards/README.md) |
 | 理解目录、实例和依赖 | [当前架构](../delivery/architecture.md)、[源码定位](../explanation/source-map.md)、[factory](../explanation/factory.md) |
+| 审查本轮架构任务与剩余范围 | [WP01–WP12／IO01–IO20](../delivery/architecture.md#本轮架构迭代任务)、[验收边界](../delivery/qualification.md) |
 | 修改接口、借用、停止或恢复 | [所有权](../explanation/ownership.md)、[I/O 机制](io-evolution.md)、[观察与恢复](io-observation-recovery.md)、[公共声明](../reference/api/io.md) |
 | 修改冷启动、时钟或 STOP | [F407 System](f407-system-power.md)、[ClockDomain 屏障](clock-domain-sleep.md)、[时间基与 OS](timebase-lowpower.md) |
 | 接入 F4 型号或硬件模式 | [官方库边界](official-stm32-provider.md)、[接入合同](integration-contracts.md)、[多控制器](multiple-controllers.md) |

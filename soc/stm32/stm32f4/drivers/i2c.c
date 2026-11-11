@@ -239,7 +239,10 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
 /** \brief Bound STOP observation; reset local controller if the bus stays hung.
  */
 static bool drain_stop(nx_stm32_i2c_state_t* port) {
-    nx_time_us_t deadline = nx_deadline_after(nx_time_now_us(), 1000U);
+    nx_time_us_t deadline;
+    if (nx_deadline_finite_after(nx_time_now_us(), 1000U, &deadline) !=
+        NX_SUCCESS)
+        deadline = 0U;
     while ((port->registers->CR1 & I2C_CR1_STOP) != 0U ||
            (port->registers->SR2 & I2C_SR2_MSL) != 0U) {
         NX_STM32_IO_POLL(2U, port);

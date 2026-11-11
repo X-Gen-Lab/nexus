@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 1ada80fba68283ad5f29de15b9886796f52a97d886533a6a15bc4c676d204741\n"
+"X-Nexus-Source-SHA256: c1aba4eb0e7d38960a0478392b0509fc879affa6c7b0aab186bd23dc5cce0d15\n"
 
 #: docs/design/usb-device.md:1
 msgid "USB Device、Host 与显式角色所有权"
@@ -293,31 +293,6 @@ msgstr ""
 "application executor explicitly advances the EP0 component, which adds no "
 "lifecycle owner."
 
-#: docs/design/usb-device.md:222
-msgid ""
-"prepare 同样仅允许 Task 调用；其余 adapter API 还要求同一个序列化特权 Task 执行，incoming IRQ masks 须"
-" clear；不允许第二 Task、ISR 或 callback 重入。 initialize 不启动硬件；prepare 不借用 "
-"payload，`nx_usb_control_begin` 按当前 权威 SETUP epoch 准入，成功才建立 outer "
-"借用，且本身不提交包。IN 发送 min(length, wLength)，OUT 容量必须覆盖 wLength；请求、控制存储与 payload "
-"须满足公共头文件的对齐和不重叠合同。 `nx_usb_control_step` 每次最多调用一次 DCD service、读取一次权威 "
-"state，并执行 一次 packet 提交／取消或 STALL 动作。它只检查两个固定 packet 槽，不在一步内循环 完成多包事务，也不创建 "
-"worker；调用者在 suspend、cancel 或停机期间仍负责推进。"
-msgstr ""
-"prepare is also restricted to Task context; all other adapter APIs "
-"additionally require execution by the same serialized privileged Task with "
-"incoming IRQ masks clear. A second Task, ISR or callback must not reenter. "
-"initialize does not start hardware; prepare does not borrow the payload. "
-"`nx_usb_control_begin` admits against the current authoritative SETUP epoch, "
-"establishes the outer borrow only on success, and does not itself submit a "
-"packet. IN sends min(length, wLength); OUT capacity must cover wLength. "
-"Requests, control storage and payload must meet the alignment and nonoverlap "
-"contracts in the public header. Each `nx_usb_control_step` makes at most one "
-"DCD service call, reads authoritative state at most once, and performs at "
-"most one packet submission/cancellation or STALL action. It checks only the "
-"two fixed packet slots, does not loop through a multipacket transaction "
-"within one step, and creates no worker; callers remain responsible for "
-"advancing it during suspend, cancel or shutdown."
-
 #: docs/design/usb-device.md:0
 msgid "事实"
 msgstr "Fact"
@@ -352,13 +327,6 @@ msgstr ""
 #: docs/design/usb-device.md:0
 msgid "对应 STATUS 包真实 ACK"
 msgstr "Actual ACK of the corresponding STATUS packet"
-
-#: docs/design/usb-device.md:0
-msgid "可完成该 outer 事务的线上结果；已 acquire 的 STATUS ACK 先于随后观察到的新 epoch、closing 或超时判定"
-msgstr ""
-"The on-wire result of that outer transaction may complete; a STATUS ACK "
-"already observed with acquire semantics takes precedence over a subsequently "
-"observed new epoch, closing state or timeout decision"
 
 #: docs/design/usb-device.md:0
 msgid "SET_ADDRESS staging 成功"
@@ -424,21 +392,6 @@ msgstr ""
 " only copies the most recently acquired state; it neither replaces a refresh "
 "nor returns the borrow. Device address, closing and external configuration "
 "readiness cannot be inferred from outer SUCCESS."
-
-#: docs/design/usb-device.md:257
-msgid ""
-"新 SETUP/reset 的 epoch、cancel、timeout 或 device stop 都不撤销旧借用。adapter 先 "
-"acquire/fold 已完成 packet，再观察新 epoch；旧 packet 必须实际排空，才能最终 发布 outer "
-"SETTLED。描述符字节、outer request、adapter context、profile 和其 endpoint face "
-"在此期间保持有效；一个 outer 结束也不替调用者 join 独立 observer。"
-msgstr ""
-"A new SETUP/reset epoch, cancel, timeout or device stop never revokes an old "
-"borrow. The adapter first acquires/folds completed packets and then observes "
-"a new epoch; old packets must actually drain before it can finally publish "
-"outer SETTLED. Descriptor bytes, the outer request, adapter context, profile "
-"and its endpoint faces must remain valid throughout this interval; completion"
-" of one outer request does not join independent observers on the caller's "
-"behalf."
 
 #: docs/design/usb-device.md:262
 msgid ""
@@ -525,34 +478,6 @@ msgstr ""
 "subsequent STATUS only; it neither changes committed state nor applies "
 "physical lines early. Approval remains within the original absolute monotonic"
 " deadline."
-
-#: docs/design/usb-device.md:296
-msgid ""
-"只有对应 outer acquire SUCCESS、即真实 STATUS ACK 后，组件才提交批准的 软件意图并更新 "
-"`committed_epoch`。新 SETUP/reset/cancel 按既有 packetizer 规则排空，不撤销借用；未获得 outer "
-"SUCCESS 的终态不提交。cancel 成功只请求 排空：若撤回 endpoint 前，对应 STATUS 仍获真实 ACK，outer "
-"acquire SUCCESS 仍提交已批准的原 epoch 意图。已经 acquire 的 STATUS ACK 不被后来的 "
-"SETUP/reset、closing 或 state 读取失败撤销，紧接的 GET 返回已提交的新 line coding。reset 后是否恢复 "
-"初始类状态是外部 owner 的独立策略。每次 `nx_usb_acm_step` 最多推进一次既有 packetizer，保持每步最多一次 "
-"service、一次 state 读取及一次 packet 动作； 外部仍须在取消、超时、suspend 和停机期间继续推进并保留所有 storage。 "
-"OUT0 quarantine 仍须外部 controller owner 授权真实完整停止，组件不自动 stop。"
-msgstr ""
-"Only after the matching outer acquire SUCCESS, meaning a real STATUS ACK, "
-"does the component commit approved software intent and update "
-"`committed_epoch`. New SETUP/reset/cancel drains under the existing "
-"packetizer rules without revoking borrows; a terminal outcome without outer "
-"SUCCESS does not commit. Successful cancellation only requests drain: if the "
-"matching STATUS still receives a real ACK before endpoint withdrawal, outer "
-"acquire SUCCESS still commits the approved original epoch intent. An already "
-"acquired STATUS ACK is not revoked by later SETUP/reset, closing or a failed "
-"state read; an immediately following GET returns the newly committed line "
-"coding. Whether reset restores initial class state is separate external owner"
-" policy. Each `nx_usb_acm_step` advances the existing packetizer at most "
-"once, preserving the per-step bounds of one service, one state read and one "
-"packet action. The external executor must continue progress and retain all "
-"storage during cancellation, timeout, suspend and shutdown. OUT0 quarantine "
-"still requires the external controller owner to authorize real complete stop;"
-" the component does not stop it automatically."
 
 #: docs/design/usb-device.md:307
 msgid ""
@@ -680,19 +605,6 @@ msgstr ""
 "remain at the private wiring boundary; public I/O exposes no vendor types. "
 "Unselected components are not compiled and create neither a heap nor "
 "background tasks."
-
-#: docs/design/usb-device.md:365
-msgid "Device Core 复用现有 epoch、activation 和真实 packet settlement；多包控制 IN 的提前零长 OUT 意图延后至真实 STATUS_OUT。即时 premature STATUS OUT 回调不由 严格 DCD 提供，下一 SETUP／deadline 与完整 drain 恢复有软件回归，不能据此声称 立即中止路径已经完整维护。Host Core 在断开后先排空，再允许 Core reset/class 退出及应用明确的 cold restart。两者均锁存官方 Core 忽略的 LL 错误。"
-msgstr ""
-"Device Core reuses existing epochs, activation and actual packet settlement."
-" During multipacket control IN, an early zero-length OUT intent is deferred "
-"until actual STATUS_OUT. The strict DCD does not provide an immediate "
-"callback for premature STATUS OUT. Software regressions cover recovery "
-"through the next SETUP/deadline and a complete drain; they do not establish "
-"that the immediate abort path is fully maintained. After disconnection, Host"
-" Core drains first, then permits Core reset/class shutdown and an explicit "
-"application cold restart. Both owners latch LL errors ignored by the "
-"official Cores."
 
 #: docs/design/usb-device.md:371
 msgid "选入 HCD 的 `HAL_Delay` 与官方 Host Core 的 `USBH_Delay` 使用既有 Core timer， 不安装 SysTick。除了实际 deadline， 它对计数冻结保留有限无进展预算；invalid、后退或持续冻结时进入不返回的 park， 不把 void delay 早退当作成功。原 cold receipt 和所有借用仍保留，故障／reset 策略 由外部 owner 负责。System STOP 前必须完成所有 delay、request 和角色事务的撤回。"
@@ -843,3 +755,18 @@ msgstr "Host control-pipe MPS admission follows the actual speed: 8 at low speed
 #: docs/design/usb-device.md:399
 msgid "已经开始的 reset／resume 必须保持最低信号时间。抢占越过 deadline 时，先完成 最低保持与撤信号读回，再返回 TIMEOUT；实际已恢复时仍发布 resumed 状态。 撤信号失败进入 closing，保留原 controller／clock 责任，stop 首先重试信号撤回， 成功前不调用 HAL stop 或释放 gate。已开始信号的时钟倒退、无效或持续无进展， 以有限观察预算进入 fault observer 和不返回的 park，保留信号而不伪造最低保持。 不增加实例字段、后台任务或另一套时钟；这些软件检查不构成物理脉宽测量。"
 msgstr "Once reset/resume starts, its minimum signal duration must be maintained. If preemption crosses the deadline, the provider completes the minimum hold and verifies signal withdrawal before returning TIMEOUT; an actually resumed port still publishes its resumed state. Failed withdrawal closes admission and retains the original controller/clock responsibility. Stop first retries signal withdrawal and does not call HAL stop or release the gate before it succeeds. Backward, invalid or persistently stalled time during an admitted signal reaches the fault observer and a non-returning park within a finite observation budget, retaining the signal without inventing minimum-duration proof. No instance fields, background tasks or second clock are added. These software checks do not measure physical pulse widths."
+
+msgid "prepare 同样仅允许 Task 调用；其余 adapter API 还要求同一个序列化特权 Task 执行，incoming IRQ masks 须 clear；不允许第二 Task、ISR 或 callback 重入。 initialize 不启动硬件；prepare 不借用 payload，`nx_usb_control_begin` 按当前 权威 SETUP epoch 准入，成功才建立 outer 借用，且本身不提交包。IN 发送 min(length, wLength)，OUT 容量必须覆盖 wLength；请求、控制存储与 payload 须满足公共头文件的对齐和不重叠合同。 `nx_usb_control_step` 每步至多一次 poll／权威 state 读取，再执行至多两次 submit 或一次 cancel；为 DATA IN 先取得同 epoch 的零长 STATUS OUT，再提交 IN。 只检查两个固定 packet 槽，不在一步内循环完成多包事务，不创建 worker。 调用者在 suspend、cancel 或停机期间仍负责推进。"
+msgstr "Prepare permits Task calls only. Other adapter APIs require the same serialized privileged Task with incoming IRQ masks clear; a second Task, ISR or callback must not reenter. Initialize does not start hardware; prepare borrows no payload. `nx_usb_control_begin` admits the authoritative SETUP epoch and establishes the outer borrow on success without submitting a packet. IN sends min(length, wLength); OUT capacity covers wLength. Requests, control storage and payload meet the public alignment and non-overlap contract. Each `nx_usb_control_step` performs at most one poll/authoritative-state read, then at most two submits or one cancel. DATA IN first prearms zero-length STATUS OUT for the same epoch, then submits IN. It checks only two fixed packet slots, does not loop through a multi-packet transaction in one step and creates no worker. The caller continues progress during suspend, cancel and shutdown."
+
+msgid "确定该 outer 事务的线上结果；已 acquire 的 STATUS ACK 先于后来观察到的 epoch、closing 或超时，但两个 packet 方向及其 DMA／FIFO／IRQ 借用都退出后才发布 outer SETTLED"
+msgstr "Determines the outer transaction wire outcome. An acquired STATUS ACK precedes subsequently observed epoch changes, closing or timeout, but outer SETTLED is published only after both packet directions and their DMA/FIFO/IRQ borrows have withdrawn"
+
+msgid "新 SETUP/reset 的 epoch、cancel、timeout 或 device stop 都不撤销旧借用。adapter 先 acquire/fold 已完成 packet，再观察新 epoch。零长 STATUS OUT 的有效 XFRC 关闭线上 control admission，但不是尚未停止的 IN／OUT DMA、FIFO 或 IRQ 退出证明； AHB busy、地址拒清或另一方向未结清时继续保留两个槽及 outer payload。已经取得 STATUS ACK 后不再发下一 DATA IN；只 join 旧方向再发布 outer SETTLED，不伪造 额外 ACK 或重放 payload。描述符、outer request、adapter、profile 和 endpoint face 全程保持有效，outer 结束仍不替调用者 join 独立 observer。"
+msgstr "New SETUP/reset epochs, cancellation, timeout and device stop do not revoke old borrows. The adapter acquires/folds completed packets before observing a new epoch. A valid zero-length STATUS OUT XFRC closes wire control admission but does not prove withdrawal of pending IN/OUT DMA, FIFO or IRQ references. AHB busy, refused address clearing or an unsettled peer direction retain both slots and the outer payload. After STATUS ACK is acquired, no next DATA IN is submitted. Join the old directions before outer SETTLED without inventing another ACK or replaying payload. Descriptors, the outer request, adapter, profile and endpoint faces remain valid throughout. Outer completion still does not join independent observers."
+
+msgid "只有对应 outer acquire SUCCESS、即真实 STATUS ACK 后，组件才提交批准的 软件意图并更新 `committed_epoch`。新 SETUP/reset/cancel 按既有 packetizer 规则排空，不撤销借用；未获得 outer SUCCESS 的终态不提交。cancel 成功只请求 排空：若撤回 endpoint 前，对应 STATUS 仍获真实 ACK，outer acquire SUCCESS 仍提交已批准的原 epoch 意图。已经 acquire 的 STATUS ACK 不被后来的 SETUP/reset、closing 或 state 读取失败撤销，紧接的 GET 返回已提交的新 line coding。reset 后是否恢复 初始类状态是外部 owner 的独立策略。每次 `nx_usb_acm_step` 最多推进一次既有 packetizer，沿用本节 packetizer 的一次 poll／state 与有界 submit／cancel 预算； 外部仍须在取消、超时、suspend 和停机期间继续推进并保留所有 storage。 OUT0 quarantine 仍须外部 controller owner 授权真实完整停止，组件不自动 stop。"
+msgstr "Only after the matching outer acquire SUCCESS, meaning a real STATUS ACK, does the component commit approved software intent and update `committed_epoch`. New SETUP/reset/cancel drains under the existing packetizer rules without revoking borrows; a terminal outcome without outer SUCCESS does not commit. Successful cancellation only requests drain: if the matching STATUS still receives a real ACK before endpoint withdrawal, outer acquire SUCCESS still commits the approved original epoch intent. An already acquired STATUS ACK is not revoked by later SETUP/reset, closing or a failed state read; an immediately following GET returns the newly committed line coding. Whether reset restores initial class state is separate external owner policy. Each `nx_usb_acm_step` advances the existing packetizer at most once, preserving the packetizer's per-step bounds of one poll/state read and bounded submits/cancellation. The external executor must continue progress and retain all storage during cancellation, timeout, suspend and shutdown. OUT0 quarantine still requires the external controller owner to authorize real complete stop; the component does not stop it automatically."
+
+msgid "Device Core 复用现有 epoch、activation 和真实 packet settlement。多包 DATA IN 在同 epoch 提前接纳零长 STATUS OUT；线上 STATUS 已结束但 DMA 内存尚未 join 时， bridge 根据权威 `control_pending=false` 暂停 EP0 Core 续包派发，先会合双方向。 只转交真实已结清的 IN ACK 和 STATUS，不补造 `EP0_TxSent`，不因这段合法间隔 锁存 INVALID，也不重放下一 IN payload。新 SETUP、deadline 与停止仍须完整排空。 Host Core 在断开后先排空，再允许 Core reset／class 退出及显式 cold restart。 两者均锁存官方 Core 忽略的 LL 错误，不建立 ISO 周期调度或 remote wake。"
+msgstr "Device Core reuses existing epochs, activation and actual packet settlement. Multi-packet DATA IN prearms zero-length STATUS OUT for the same epoch. When STATUS has ended on the wire but DMA memory is not joined, authoritative `control_pending=false` stops EP0 Core continuation dispatch while the bridge joins both directions. It forwards only real settled IN ACKs and STATUS, without inventing `EP0_TxSent`, latching INVALID for that valid interval or replaying the next IN payload. New SETUP, deadlines and stop still require full drain. After disconnect, Host Core drains before Core reset/class exit and explicit cold restart. Both latch LL errors ignored by the official Core and establish neither ISO periodic scheduling nor remote wake."

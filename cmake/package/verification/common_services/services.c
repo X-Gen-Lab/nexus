@@ -17,7 +17,7 @@
 #include "nexus/network/lwip_storage.h"
 #include "nexus/os/wait.h"
 #include "nexus_bindings.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 #include <string.h>
 
 /** \brief Finite NOR model; all port calls are synchronous and settled. */
@@ -385,7 +385,7 @@ int main(void) {
     }
     int result = 0;
     uint32_t pins = 0U;
-    const nx_gpio_port_t* gpio = nx_factory_gpio(0U);
+    const nx_gpio_port_t* gpio = nx_factory_gpio_ref(NX_GPIO_REF_LED0);
     if (gpio == NULL || nx_gpio_port_read(gpio, &pins) != NX_SUCCESS) {
         result = 2;
     }

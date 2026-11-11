@@ -713,9 +713,6 @@ msgstr "SUCCESS、INVALID 或 STATE；拒绝时描述符保持不变。"
 msgid "Admit one direct finite or circular transfer selected by the port."
 msgstr "准入由端口静态选定的直接有限或循环传输。"
 
-msgid "REJECTED retains nothing. ACCEPTED borrows until acquire-observed SETTLED, including timeout and quarantine. Service must be progressed. Finite SUCCESS includes the last digital latch, not analog settling. The first trigger outputs the declared idle code before frame zero is fetched. Delayed service can repeat the final code; finite mode does not promise exactly length/frame-size analog conversions. A finite tail may pause and restart the exclusively owned trigger timer, extending the last interval; finite output is not strictly periodic. Circular transfers settle only after cancellation, stop or failure. Circular byte progress describes the final cycle's consumed prefix, not total playback. DMA progress never counts digital conversions."
-msgstr "REJECTED 不保留引用。ACCEPTED 持续借用至 acquire 观察到 SETTLED，超时或隔离期间亦如此。调用方必须推进 service。有限 SUCCESS 包含最后数字锁存，不表示模拟稳定。第一个 trigger 在取入第零帧前输出声明的 idle。延迟 service 可重复末码；有限模式不承诺恰好 length/frame-size 次模拟转换。有限尾部可暂停并重启独占触发 timer，延长最后间隔，因此有限输出不严格等周期。循环传输仅在取消、停止或失败后结清。循环字节进度表示最后一轮已消耗的前缀，不是总播放量。DMA 进度不统计数字转换次数。"
-
 msgid "[in] Initialized face owned by this serialized task executor."
 msgstr "[in] 由该串行 task executor 拥有的已初始化接口。"
 
@@ -872,14 +869,8 @@ msgstr "[in] 时钟域中的绝对 deadline。"
 msgid "[out] Complete valid samples; remaining output is untouched."
 msgstr "[out] 完整有效样本；其余输出保持不变。"
 
-msgid "Success or INVALID/BUSY/TIMEOUT/IO/CONTEXT/UNSUPPORTED. No caller buffer or count pointer is retained on return. A failed hardware stop returns IO and can retain device cleanup; new samples stay BUSY until its owner completes cleanup. Completed samples remain described by count."
-msgstr "返回成功或 INVALID/BUSY/TIMEOUT/IO/CONTEXT/UNSUPPORTED。返回后不再保留调用者的缓冲区或 count 指针。硬件停止失败返回 IO，并可保留设备清理责任；责任者完成清理前，新采样保持 BUSY。count 仍描述已经完成的样本。"
-
 msgid "Start selected trigger/block acquisition with caller storage."
 msgstr "使用调用者存储启动选定的触发／块采集。"
-
-msgid "Blocks contain native uint16_t raw counts in channel order. Capacities and lengths are multiples of a complete scan; DMA domains/alignment and physical rate require separate evidence."
-msgstr "block 包含按通道顺序排列的原生 uint16_t 原始计数。容量及长度必须为完整扫描的整数倍；DMA 域、对齐和物理速率需要独立证据。"
 
 msgid "[in] Trigger/block-capable provider, one task executor."
 msgstr "[in] 支持触发及 block 的 provider，由一个任务执行者控制。"
@@ -889,9 +880,6 @@ msgstr "[inout] 已初始化、供消费者不可变访问的 block 机制。"
 
 msgid "[in] Positive requested complete-scan rate; provider rejects rates outside its declared timer/ADC capability."
 msgstr "[in] 请求的完整扫描速率，为正值；超出所声明定时器或 ADC 能力的速率由 provider 拒绝。"
-
-msgid "Success or INVALID/BUSY/UNSUPPORTED before buffer admission."
-msgstr "缓冲区准入前返回成功或 INVALID/BUSY/UNSUPPORTED。"
 
 msgid "Stop trigger and memory sources without revoking consumer loans."
 msgstr "停止触发与内存写入源，不撤销消费者借用。"
@@ -908,14 +896,8 @@ msgstr "成功证明源已分离；BUSY 保留生产者存储；仅支持轮询�
 msgid "Explicitly resume discrete block acquisition after consumer drain."
 msgstr "消费者排空后，显式恢复离散块采集。"
 
-msgid "No task, retry or hidden rearm is created. Block modes state their trigger gaps; continuous zero-gap capture requires a separately declared hardware capability and qualification."
-msgstr "不会创建任务、重试或隐藏的重新 arm。block 模式明确说明触发间隙；连续无间隙捕获需要另外声明的硬件能力及资格验证。"
-
 msgid "[in] Same single task executor as start and stop."
 msgstr "[in] 与 start 和 stop 相同的唯一任务执行者。"
-
-msgid "Success when an engine is armed, BUSY during source drain or free-block backpressure, STATE after acquisition stops."
-msgstr "引擎已 arm 时返回成功；源排空或空闲 block 背压期间返回 BUSY；采集停止后返回 STATE。"
 
 msgid "Attach an optional hint sink after checking publisher IRQ priority."
 msgstr "检查发布者 IRQ 优先级后，附加可选提示接收端。"
@@ -6380,9 +6362,6 @@ msgstr "可选单所有者 RS485 方向与线尾适配器。"
 msgid "Bind exclusive transport and establish inactive DE."
 msgstr "绑定独占传输端口并建立非活动 DE。"
 
-msgid "Task-only, no wait. No physical transceiver is inferred. Setup starts after successful DE assertion; hold starts after acquire-observed true transport settlement. Transfer deadline includes setup and wire completion; mandatory drain/hold may extend the borrow beyond that deadline. Rejected TX leaves DE and transport unchanged. Failed drain or DE withdrawal keeps QUARANTINED outer storage and DE ownership until service retry."
-msgstr "仅限任务上下文，不等待。不推定物理收发器存在。成功置有效 DE 后开始 setup；通过 acquire 语义观测到传输真正结算后才开始 hold。传输时限包括 setup 和线路完成；必须执行的 drain/hold 可使借用持续到该时限之后。TX 被拒绝时 DE 和传输接口均不变。排空或 DE 撤离失败时，保留 QUARANTINED 外层存储及 DE 所有权，直到 service 重试。"
-
 msgid "[inout] Fresh zero-initialized caller control."
 msgstr "[inout] 调用方拥有的全新零初始化控制对象。"
 
@@ -6634,9 +6613,6 @@ msgstr "成功、INVALID 或 STATE；拒绝时不建立借用。"
 
 msgid "Admit one packet, never a hidden queue or complete USB transaction."
 msgstr "仅准入一个数据包，不隐式建立队列或执行完整 USB 事务。"
-
-msgid "One privileged task executor, IRQ masks clear. IN FIFO writes do not prove host ACK. OUT overrun drains all packet words without overflow. Selected F407 ISO packets require a remaining Core deadline at most one second, observed ULPI speed and exactly one transaction. Hardware selects next frame/microframe parity; it does not implement interval scheduling, retries or receive acknowledgment. An incomplete ISO opportunity settles IO only after source/FIFO/AHB withdrawal. Long execution stalls expire by Core time before modular frame comparison."
-msgstr "单一特权任务执行者，IRQ 屏蔽须解除。写入 IN FIFO 不能证明主机已 ACK。OUT 包超长时仍排空全部 FIFO 数据字，不越界写目标缓冲。选定的 F407 ISO packet 要求剩余 Core deadline 至多一秒、选用 ULPI 时须先观察实际速度，且每次只有一个 transaction。硬件选择下一个 frame／microframe 的奇偶，不实现 interval 调度、重试或接收确认。不完整 ISO 机会只有在 source／FIFO／AHB 撤回后才以 IO 结清。执行长停顿时，先按 Core time 判断超时，再进行模帧计数比较。"
 
 msgid "[in] Stable endpoint face and private state."
 msgstr "[in] 稳定的端点接口及私有状态。"
@@ -7156,3 +7132,27 @@ msgstr "硬件所选 timeout 界限，包含已声明的时钟不确定性。"
 
 msgid "A zero minimum and maximum mean the timeout bounds are unknown, for example while hardware shadow updates remain pending or no oscillator limits have been reviewed. The enabled and irreversible facts remain valid. debug_freeze reports the provider-supported firmware configuration. Providers with CPU-readable debug control observe its setting. A provider without CPU debug-control access supports false only; that value does not observe or describe an external debugger's setting. An unproved activation write may retain enabled and irreversible effects; the provider never retries it implicitly or infers safe shutdown from failed readback."
 msgstr "最小值和最大值均为零表示超时边界未知，例如硬件影子寄存器更新尚未完成，或振荡器限制尚未复核。enabled 和 irreversible 事实仍然有效。debug_freeze 报告提供者支持的固件配置。能够由 CPU 读取调试控制的提供者会观察该设置。不具备 CPU 调试控制访问能力的提供者仅支持 false；该值既未观察，也不描述外部调试器的设置。 未证实的激活写入也可保留 enabled 与 irreversible 效应；provider 不会隐式重试，也不会依据回读失败推断能够安全关闭。"
+
+msgid "REJECTED retains nothing. ACCEPTED borrows until acquire-observed SETTLED, including timeout and quarantine. Service must be progressed. Finite SUCCESS includes the last digital latch, not analog settling. The first trigger outputs the declared idle code before frame zero is fetched. Delayed service can repeat the final code; finite mode does not promise exactly length/frame-size analog conversions. A finite tail may pause and restart the exclusively owned trigger timer, extending the last interval; finite output is not strictly periodic. Selected recovery can internally trigger the declared idle code before waveform timing starts, then briefly disable converter outputs. These conversions are not payload progress. No uninterrupted analog hold or waveform is promised between requests. Circular transfers settle only after cancellation, stop or failure. Circular byte progress describes the final cycle's consumed prefix, not total playback. DMA progress never counts digital conversions."
+msgstr "REJECTED 不保留引用。ACCEPTED 持续借用至 acquire 观察到 SETTLED，超时或隔离期间亦如此。调用方必须推进 service。有限 SUCCESS 包含最后数字锁存，不表示模拟稳定。第一个 trigger 在取入第零帧前输出声明的 idle。延迟 service 可重复末码；有限模式不承诺恰好 length/frame-size 次模拟转换。有限尾部可暂停并重启独占触发 timer，延长最后间隔，因此有限输出不严格等周期。所选恢复可能在波形计时开始前内部触发所声明的 idle 码，随后短暂关闭转换器输出。这些转换不属于 payload 进度。两次请求之间不承诺持续模拟保持或连续波形。循环传输仅在取消、停止或失败后结清。循环字节进度表示最后一轮已消耗的前缀，不是总播放量。DMA 进度不统计数字转换次数。"
+
+msgid "Success or INVALID/BUSY/TIMEOUT/IO/CONTEXT/UNSUPPORTED; EXHAUSTED if a required finite warmup is unrepresentable. No caller buffer or count pointer is retained on return. A failed hardware stop returns IO and can retain device cleanup; new samples stay BUSY until its owner completes cleanup. Completed samples remain described by count."
+msgstr "成功，或 INVALID／BUSY／TIMEOUT／IO／CONTEXT／UNSUPPORTED；所需有限 warmup 无法表示时返回 EXHAUSTED。返回时不保留调用方 buffer 或 count 指针。硬件停止失败返回 IO，并可保留设备清理责任；owner 完成清理前新采样保持 BUSY。count 继续描述已完成样本。"
+
+msgid "Blocks contain native uint16_t raw counts in channel order. Capacities and lengths are multiples of a complete scan; DMA domains/alignment and physical rate require separate evidence. Acceptance does not mean warmup has completed or triggers are running. A failure after borrowing is latched and reported by service; retain stream and storage until stop joins every producer and consumer loan."
+msgstr "block 按通道顺序保存 native uint16_t 原始码。容量和长度须为完整 scan 的整数倍；DMA 域、对齐和物理速率分别取证。接纳不表示 warmup 已完成或 trigger 已运行。借用后的失败会锁存并由 service 报告；stop 会合所有 producer 和 consumer loan 前，保留 stream 与存储。"
+
+msgid "SUCCESS accepts the stream session. Admission errors, including an unrepresentable finite warmup (EXHAUSTED), occur before buffer borrowing."
+msgstr "SUCCESS 表示接纳 stream 会话。准入错误（包括有限 warmup 无法表示时的 EXHAUSTED）发生在借用 buffer 之前。"
+
+msgid "No task, retry or hidden rearm is created. Block modes state their trigger gaps; continuous zero-gap capture requires a separately declared hardware capability and qualification. A service error does not release borrowed storage; complete stop before reclaiming the stream or provider."
+msgstr "不创建 task、重试或隐藏 rearm。block 模式明确其 trigger 间隙；连续无间隙采集需要独立声明并验证硬件能力。service 错误不释放借用存储；回收 stream 或 provider 前须完成 stop。"
+
+msgid "Success when an engine is armed, BUSY during source drain or free-block backpressure, STATE after acquisition stops; IO or EXHAUSTED reports a latched provider failure."
+msgstr "引擎已 arm 时成功；源排空或无空闲 block 的背压期间返回 BUSY；采集停止后返回 STATE；IO 或 EXHAUSTED 报告已锁存的 provider 失败。"
+
+msgid "Task-only, no wait. No physical transceiver is inferred. Setup starts after successful DE assertion; hold starts after acquire-observed true transport settlement. Transfer deadline includes setup and wire completion; mandatory drain/hold may extend the borrow beyond that deadline. Rejected TX leaves DE and transport unchanged. Failed drain or DE withdrawal keeps QUARANTINED outer storage and DE ownership until service retry. Unrepresentable setup rejects with EXHAUSTED before DE assertion. Exhaustion after acceptance never revokes its borrow. If the minimum hold cannot be proved in the remaining time domain, DE and the outer loan remain QUARANTINED; stop stays BUSY until external isolation/recovery. Service never shortens that electrical hold or invents a new time domain."
+msgstr "仅 Task 调用，不等待，不推定物理收发器。DE 成功置有效后开始 setup；acquire 观察真实传输结清后开始 hold。transfer deadline 包含 setup 和线上完成，必需 drain／hold 可使借用超过该 deadline。TX 拒绝不改变 DE 或 transport。排空或 DE 撤回失败时保留 QUARANTINED outer 存储和 DE 所有权，等待 service 重试。setup 无法表示时在 DE 置有效前以 EXHAUSTED 拒绝；接纳后的耗尽不撤销借用。若剩余时间域内无法证明最低 hold，DE 与 outer loan 继续 QUARANTINED，stop 保持 BUSY，直到外部隔离／恢复。service 不缩短电气 hold，也不虚构新时间域。"
+
+msgid "One privileged task executor, IRQ masks clear. IN FIFO writes do not prove host ACK. OUT overrun drains all packet words without overflow. Selected F407 ISO packets require a remaining Core deadline at most one second, observed ULPI speed and exactly one transaction. Hardware selects next frame/microframe parity; it does not implement interval scheduling, retries or receive acknowledgment. An incomplete ISO opportunity settles IO only after source/FIFO/AHB withdrawal. Long execution stalls expire by Core time before modular frame comparison. An epoch-matched zero-length EP0 STATUS OUT may be armed before or during control DATA IN. Its valid wire completion closes further DATA admission while independent DMA/FIFO/IRQ loans still require their own settlement. An outer control owner must join both directions before releasing shared reply storage."
+msgstr "由一个特权 task 执行，IRQ masks 清除。写入 IN FIFO 不证明主机 ACK；OUT overrun 排空全部 packet word 且不溢出。所选 F407 ISO packet 要求剩余 Core deadline 至多一秒、已观察 ULPI 速度并且恰好一次 transaction。硬件选择下一 frame／microframe 奇偶，不实现 interval 调度、重试或接收 ACK。未完成 ISO 机会只在源／FIFO／AHB 退出后以 IO 结清。长时间执行停顿先按 Core 时间到期，再做模 frame 比较。同 epoch 的零长 EP0 STATUS OUT 可在 control DATA IN 之前或期间 arm；有效线上完成关闭后续 DATA 准入，独立 DMA／FIFO／IRQ loan 仍各自结清。outer control owner 必须 join 两方向后才释放共享 reply 存储。"

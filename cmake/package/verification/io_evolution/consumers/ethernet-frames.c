@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus_bindings.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 
 static nx_eth_frames_tx_request_t s_request;
 _Alignas(4) static uint8_t s_head[13] = {2U, 0U, 0U, 0U, 0U, 2U,   2U,
@@ -39,8 +39,8 @@ int main(void) {
         return close_platform(1);
     }
     const nx_eth_frames_port_t* port =
-        nx_factory_eth_frames(NX_ETH_FRAMES_ID_MAC);
-    const nx_mdio_port_t* mdio = nx_factory_mdio(NX_MDIO_ID_MAC);
+        nx_factory_eth_frames_ref(NX_ETH_FRAMES_REF_MAC);
+    const nx_mdio_port_t* mdio = nx_factory_mdio_ref(NX_MDIO_REF_MAC);
     nx_request_initialize(&s_request.base);
     if (port == NULL || mdio == NULL ||
         nx_eth_frames_tx_prepare(&s_request, s_fragments, 2U, true,

@@ -68,7 +68,7 @@ from .clocks import validate_consumers as validate_clock_consumers
 from .clocks import timer_domain as timer_clock_domain
 from . import gpio as GPIO_PHASE
 from . import sram as EXTERNAL_MEMORY
-from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS, CONTROLLER_PAIRS,
+from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS,
                        SECONDARY_FACTS, DAC_DMA_ROUTES)
 from .integration import USB_DEVICE, ETHERNET, TIMER_ADVANCED
 from .integration import CAN_INTEGRATION

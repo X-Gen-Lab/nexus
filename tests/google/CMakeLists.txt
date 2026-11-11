@@ -110,6 +110,8 @@ nexus_google_test(nexus_i2c_bus_clear_test
     LIBRARIES Nexus::IO)
 nexus_google_test(nexus_uart_rs485_test SOURCES uart_rs485_test.cpp
     LIBRARIES Nexus::NativeModel Nexus::Arch)
+nexus_google_test(nexus_bmp280_timing_test SOURCES bmp280_timing_test.cpp
+    LIBRARIES Nexus::BMP280)
 nexus_google_test(nexus_io_observer_test SOURCES io_observer_test.cpp
     LIBRARIES Nexus::OwnerObserver Nexus::IO)
 nexus_google_test(nexus_io_observation_contract_test

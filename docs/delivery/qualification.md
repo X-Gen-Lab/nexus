@@ -17,10 +17,10 @@ HIL fixture 和 station template 位于 `tools/hil/fixtures/`。空 station、�
 Board/PCB/芯片／probe／image/config、失效工具文件或不完整预算会被准入拒绝。
 准备工装不等于已经刷写、串口测试、测量波形或完成掉电试验。
 
-当前重构的生产 SoC 只维护 F4，具体实现限定 F407VE／ZG。已有其他系列的原始
-执行记录保留原源码身份，不成为本轮验收输入。ThreadX、FreeRTOS、Native 内核、
-寄存器模型、ARM 链接与物理执行分别判断；链接程序存在不证明 scheduler 已运行。
-本轮必须重新取得适用的软件结果，不能复用历史测试数量或候选通过值。
+当前生产 SoC 只维护 F4，精确器件与模式见[支持范围](support.md)。F407 Board 与
+新增料号的内部 CRC 软件参考分别记录，不把某一参考的 ARM／SDK 结果扩展到全部
+模式。其他系列原始记录保留原源码身份。ThreadX、FreeRTOS、Native、寄存器模型、
+ARM 链接与物理执行分别判断，链接程序不证明 scheduler 已运行；本轮结果不继承历史计数。
 
 USB 的 packet/clock/factory 模型与软件 Board ELF 不提供 VBUS、connector、PHY、
 enumeration 或 flush 周期的物理证明。浅 Sleep 的 1 MHz timer 模型只建立被执行

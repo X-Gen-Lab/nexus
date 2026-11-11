@@ -86,6 +86,18 @@ static nx_result_t rollback(nx_stm32_adc_continuous_state_t* state) {
     return NX_SUCCESS;
 }
 
+/** \brief Halt without publishing an uncertain last block or guessing loss. */
+static void halt(nx_stm32_adc_continuous_state_t* state, nx_result_t fault) {
+    state->base.fault = fault != NX_SUCCESS;
+    state->fault_result = fault;
+    state->halted = true;
+    if (state->observer != NULL) {
+        state->observer->discontinuity = true;
+    }
+    nx_stream_note_loss(state->base.stream, 1U);
+    (void)rollback(state);
+}
+
 /** \brief Acquire two future loans before enabling the double-buffer engine. */
 static nx_result_t arm(nx_stm32_adc_continuous_state_t* state) {
     nx_stm32_adc_stream_state_t* base = &state->base;
@@ -138,8 +150,16 @@ static nx_result_t arm(nx_stm32_adc_continuous_state_t* state) {
                 << ADC_CR2_EXTSEL_Pos);
     nx_arch_dsb();
     (void)adc->CR2;
-    base->ready_at = nx_deadline_after(
-        nx_time_now_us(), nx_stm32_adc_startup_delay_us(&base->adc));
+    result =
+        LL_ADC_IsEnabled(adc) != 0U
+            ? nx_deadline_finite_after(
+                  nx_time_now_us(), nx_stm32_adc_startup_delay_us(&base->adc),
+                  &base->ready_at)
+            : NX_ERROR_IO;
+    if (result != NX_SUCCESS) {
+        halt(state, result);
+        return result;
+    }
     base->warming = true;
     state->halted = false;
     return NX_SUCCESS;
@@ -170,8 +190,14 @@ static nx_result_t start(void* context, nx_stream_t* stream, uint32_t hz) {
     nx_result_t result =
         nx_stm32_adc_stream_rate(base, hz, &prescaler, &period);
     if (result == NX_SUCCESS) {
-        result = nx_stm32_adc_stream_blocks(base, stream);
+        result = nx_stm32_adc_stream_blocks(base, stream, sizeof(*state));
     }
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    nx_time_us_t ready_at;
+    result = nx_deadline_finite_after(
+        nx_time_now_us(), nx_stm32_adc_startup_delay_us(&base->adc), &ready_at);
     if (result != NX_SUCCESS) {
         return result;
     }
@@ -208,25 +234,19 @@ static nx_result_t start(void* context, nx_stream_t* stream, uint32_t hz) {
         base->adc.active = true;
         result = arm(state);
         if (result != NX_SUCCESS) {
-            base->stream = NULL;
-            base->adc.active = false;
-            (void)nx_adc_observer_unbind(state->observer);
+            if (base->fault) {
+                /* Hardware effects and loans make this an accepted failure.
+                 * service reports it; stop remains the final storage join. */
+                result = NX_SUCCESS;
+            } else {
+                base->stream = NULL;
+                base->adc.active = false;
+                (void)nx_adc_observer_unbind(state->observer);
+            }
         }
     }
     nx_arch_irq_restore(saved);
     return result;
-}
-
-/** \brief Halt without publishing an uncertain last block or guessing loss. */
-static void halt(nx_stm32_adc_continuous_state_t* state, nx_result_t fault) {
-    state->base.fault = fault != NX_SUCCESS;
-    state->fault_result = fault;
-    state->halted = true;
-    if (state->observer != NULL) {
-        state->observer->discontinuity = true;
-    }
-    nx_stream_note_loss(state->base.stream, 1U);
-    (void)rollback(state);
 }
 
 /** \brief Swap inactive target and check hardware facts before READY publish.

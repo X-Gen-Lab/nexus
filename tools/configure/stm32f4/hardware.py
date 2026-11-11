@@ -92,9 +92,6 @@ CONTROLLER_BINDINGS = (
 DMA_IRQS = ((1, (11, 12, 13, 14, 15, 16, 17, 47)),
             (2, (56, 57, 58, 59, 60, 68, 69, 70)))
 FIXED_DMA = fixed_dma_bindings(CONTROLLER_BINDINGS)
-CONTROLLER_PAIRS = MappingProxyType({
-    "uart": ("USART1", "USART2"), "spi": ("SPI1", "SPI2"),
-    "i2c": ("I2C1", "I2C2")})
 SECONDARY_FACTS = MappingProxyType({
     "USART2": MappingProxyType({
         "kind": "uart", "modes": ("dma-tx", "irq-byte-event", "rx-dma-idle",

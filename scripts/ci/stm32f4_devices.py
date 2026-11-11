@@ -102,8 +102,9 @@ def load_catalog(root, *, catalog_path=None):
         raise ValueError("unknown or missing SDK device selector")
     expected_inputs = {"Include/stm32f4xx.h", "Include/system_stm32f4xx.h", "LICENSE.md"}
     for profile in catalog["devices"]:
-        if set(profile) != {"id", "define", "header", "startup", "external_irq_count",
-                            "last_external_irq", "nvic_priority_bits", "timebase_presence"}:
+        fields = {"id", "define", "header", "startup", "external_irq_count",
+                  "last_external_irq", "nvic_priority_bits", "timebase_presence"}
+        if not fields.issubset(profile) or set(profile) - fields - {"irq_bindings"}:
             raise ValueError("exact SDK device profile fields required")
         if (not isinstance(profile["timebase_presence"], dict) or
                 set(profile["timebase_presence"]) != set(TIMEBASE_NAMES) or
@@ -114,7 +115,8 @@ def load_catalog(root, *, catalog_path=None):
         if profile["header"] != header or profile["startup"] != startup:
             raise ValueError("device header/startup identity mismatch")
         expected_inputs.update((header, startup))
-        facts = header_facts(regular(directory / header).read_text())
+        header_text = regular(directory / header).read_text()
+        facts = header_facts(header_text)
         if any(profile[key] != value for key, value in facts.items()):
             raise ValueError("device IRQ/timebase facts differ from official header")
         table = regular(directory / startup).read_text().split("g_pfnVectors:", 1)[1]
@@ -122,6 +124,14 @@ def load_catalog(root, *, catalog_path=None):
         words = re.findall(r"^\s*\.word\s+(\w+)", table, re.MULTILINE)
         if len(words) != 16 + profile["external_irq_count"]:
             raise ValueError("startup vector span differs from official IRQ enum")
+        if "irq_bindings" in profile:
+            irqs = {name: int(number) for name, number in re.findall(
+                r"\b(\w+_IRQn)\s*=\s*(-?\d+)", header_text)
+                    if int(number) >= 0}
+            actual = {name: {"number": number, "handler": words[16 + number]}
+                      for name, number in irqs.items()}
+            if profile["irq_bindings"] != actual:
+                raise ValueError("IRQ enum/handler differs from locked startup vector")
     if not isinstance(catalog["inputs"], dict) or set(catalog["inputs"]) != expected_inputs:
         raise ValueError("complete SDK input identity set required")
     for name, expected in catalog["inputs"].items():

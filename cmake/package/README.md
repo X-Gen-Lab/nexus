@@ -14,8 +14,10 @@ source interface epoch `1` 与 assembly schema `2` 分别计代，不随语义�
 python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-sdk
 ```
 
-包记录源码 commit／tree、每个文件摘要、递归依赖 commit／tree、已审 GD32 导入和
-许可通知。安装 CMake 在配置前验证全部字节；修改、缺失、额外或 symlink 文件拒绝。
+包记录源码 commit／tree、每个文件摘要、所选依赖 commit／tree 和许可通知。
+受审导入仍按当前 provider 声明精确验证；当前 F4 使用锁定 Git 依赖，导入记录为空，
+不自动携带历史 GD32 源码或消费者。安装 CMake 在配置前验证全部字节；修改、缺失、
+额外或 symlink 文件拒绝。
 准备／校验不下载缺失依赖。dirty 源仅可用 `--development-fixture` 生成不可发布包，
 消费者需显式 `NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON`，不建立发行资格。
 
@@ -52,11 +54,17 @@ C11／C++17 拒绝跨类别引用、controller 传 endpoint getter 和裸 scalar
 true 输出 metadata，`factory.strong` 未知并拒绝。旧 scalar getter 仍可用，二者
 返回同一静态对象，没有额外运行层。
 
+选择 `capabilities=true` 时，metadata 查找也使用同类强类型引用，例如
+`nx_factory_gpio_capability_ref(NX_GPIO_REF_LED0)`；未选择时不生成该 getter。
+它返回原有不可变 metadata，不复制记录或增加另一套查找表。旧 scalar switch
+仍是唯一底层实现，不能将消费者迁移描述为数字入口已经全部删除。
+
 MCU 输出 ELF／BIN／map／资源报告，ELF 绑定配置摘要和真实向量。精确 CPU facts
 决定指令、FPU、float／enum ABI，目标传递相同参数。C++ 消费采用自己的嵌入式
 runtime 策略，已测路径例如 `-fno-exceptions -fno-rtti`。
 `tests/contracts/test_source_sdk.py` 对真实包做含空格路径搬移、篡改／身份拒绝、
-独立 Native C／C++ 执行及两 MCU 家族 ARM startup／linker／资源检查，不证明实板。
+独立 Native C／C++ 执行及 F407 ARM startup／linker／资源检查；每次结果绑定实际
+执行的源码与消费者，不证明其他 MCU 家族或实板。
 
 实际资产清单和执行收条标识 SDK、工具、依赖许可与结果；最低 Python／CMake
 声明不表示所有 host 已验证。维护的已执行 host 为 Linux，HIL 为 `not_executed`。
@@ -65,6 +73,10 @@ runtime 策略，已测路径例如 `-fno-exceptions -fno-rtti`。
 ## 完整安装消费者验证
 
 发行自动化验证已有可发布 prefix，不使用开发 opt-in：
+
+上方默认导出是精简裸机包。完整 `nexus-sdk-consumers-v20` 计划还需要显式 host
+支撑、FreeRTOS 与所选网络／安全／USB 供应方；按[Source SDK 教程](../../docs/tutorials/source-sdk.md)
+准备并导出完整 profile，再执行以下验证。验证器不会跳过缺失消费者来接纳精简包。
 
 ```sh
 python cmake/package/verify_consumers.py \
@@ -89,11 +101,16 @@ typed resolver／factory、维护 assembly 和来源 lock 属于 SDK；host goog
 
 ## 器件与执行窗口消费者
 
-当前版本化消费计划由 `tools/maintenance/consumer_profiles.py` 唯一维护，在下述设备与镜像
-场景之外包括标准 Native 外置 provider 生命周期工程。每个精确的源码／构建
-根目录和链接镜像都必须执行；计划结构本身不代表验收通过。此前的设备扩展
-引入五个独立 C11 工程：F407／GD470 借用 RX、Native／F407 MCUboot Control，
-以及单独的 F407 完整引导镜像。
+当前版本化消费计划由 `tools/maintenance/consumer_profiles.py` 唯一维护，共 20 项：
+2 个基础消费者、4 个所选模式消费者及 14 个服务／器件／镜像／家族消费者。包括标准
+Native 外置 provider 生命周期工程；Native 是测试范围，ARM 消费者选择已声明的精确器件。
+每个精确源码／构建根和链接镜像都必须执行，计划结构本身不代表验收通过。设备与
+镜像扩展包括 F407 借用 RX、Native／F407 MCUboot Control 及独立 F407 完整引导
+镜像；当前计划没有 GD470 消费者。历史结果保留其原源码身份，不转成当前支持。
+新增三项 F405ZG／F415ZG／F417ZG 消费者复用
+`tests/contracts/stm32f4_family/` 的 HSI16／内部 CRC 装配与同一公共 consumer。
+计划为 `nexus-sdk-consumers-v20`；开发 SDK 三项已测不等于最终 clean-source 包
+20 项已通过，实际结果必须绑定新包和同一源码。
 
 TMP117 组合显式链接 `Nexus::TMP117I2C`，调用者持有完全结清的软件 I2C endpoint，
 并使用六个公共组件函数。Native 实际执行有界的正向采样与清理；F407 使用同一软件
@@ -121,8 +138,9 @@ MCUboot Control 使用官方 trailer 公共实现。Native 在公开的非持久
 布局派生的区域。它只提供链接证据，未执行镜像认证、Flash 修改、跳转、复位、
 回滚或实板验证，不提供生产密钥。
 
-完整的 311 文件 lwIP 与 80 文件 MCUboot 已评审源码／许可闭包、组件 helper、
-通用与显式头文件、标准消费输入均属于 SDK 必需内容。MCUboot CLI 先调用完整 SDK
-验证器，局部源码 hash 检查不能单独准入不完整 SDK。ARM 继续检查实际 C11／CPU／
+选择对应组件时，锁定 lwIP／MCUboot 的受审源码／许可闭包、组件 helper、通用与
+显式头文件、标准消费输入均是所选 SDK 的必需内容；默认精简包不继承这些供应方。
+MCUboot CLI 先调用完整 SDK 验证器，局部源码 hash 检查不能单独准入不完整 SDK。
+ARM 继续检查实际 C11／CPU／
 枚举参数并拒绝链接 libc heap／C++ 运行时；Native heap 仍未评估。必须实际执行
 当前完整计划后才能形成软件资格。

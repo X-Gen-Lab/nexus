@@ -16,6 +16,11 @@ CAPTURE、I2SE 或一次 DMA 传输；应用通过公共 face 提交请求或启
 Platform close 调用同一个 C owner 排空，失败会阻止 System 退出，保留全部借用和
 精确清理责任。没有 heap、运行时名字注册表、默认 buffer pool 或后台任务。
 
+DCMI 的 stream、slot 表、request／RAW frame 控制及每个 payload 的完整容量不得
+覆盖 provider 配置、DMA 域表、引脚事实或逐 pin 的恢复 snapshot。所有未来 block
+在首个 producer loan 或 request 接纳前一起检查，不能把尚未使用的 payload 尾部
+用作仍需读取的配置或关闭收条。此检查不增加 frame／buffer 分配或新的采集模式。
+
 ## DCMI 输入与模式
 
 `capture` 有 `snapshot-raw`、`snapshot-jpeg` 和 `raw-blocks` 三种装配模式。

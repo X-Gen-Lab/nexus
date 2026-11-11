@@ -153,7 +153,7 @@ into this page. These literal inputs are the same templates exercised by the tes
 ## Maintainer: prepare a publishable prefix
 
 From a clean, committed checkout, prepare the exact dependencies for the complete
-17-consumer maintenance plan, then choose a new owned output path. This profile
+20-consumer maintenance plan, then choose a new owned output path. This profile
 includes explicit Native support, the FreeRTOS supplier and the network, TLS,
 MQTT, MCUboot and optional ST USB suppliers. The ARM consumer images still state
 their own selected backend; a supplier in the package does not prove its scheduler
@@ -176,7 +176,7 @@ python cmake/package/package_source_sdk.py \
 For a small bare-metal firmware package, omit those profile switches when
 exporting to a different prefix. The default intentionally has no Native models
 or optional supplier payloads. Its package-integrity check remains valid, but the
-complete 17-consumer verifier below requires the full profile above. It never
+complete 20-consumer verifier below requires the full profile above. It never
 silently skips a consumer to admit a smaller package.
 
 Move the entire prefix, including its identity and licenses, before consumption.

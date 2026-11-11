@@ -101,8 +101,33 @@ static bool valid_config(const nx_stm32_sdio_config_t* config) {
     return true;
 }
 
-static bool live_clock(void) {
-    return NEXUS_PLL48_HZ == 48000000U &&
+/** \brief Select an even wire divider from the immutable clock domains. */
+static uint32_t clock_divider(uint8_t width, uint32_t minimum_divisor) {
+    const uint64_t kernel = NEXUS_PLL48_HZ;
+    const uint64_t peripheral = NEXUS_APB2_HZ;
+    if (kernel != 48000000U || peripheral == 0U ||
+        (width != 1U && width != 4U && width != 8U))
+        return UINT32_MAX;
+    /* RM0090 31.2: 8*PCLK2*q >= 3*SDIOCLK. ES0182 2.4.6 adds the
+     * strict 32*PCLK2*q > 3*width*(SDIOCLK+PCLK2), q=CLKDIV+2. */
+    uint64_t bus_minimum =
+        (3U * kernel + 8U * peripheral - 1U) / (8U * peripheral);
+    uint64_t fifo_minimum =
+        3U * width * (kernel + peripheral) / (32U * peripheral) + 1U;
+    uint64_t divisor = minimum_divisor < 4U ? 4U : minimum_divisor;
+    if (divisor < bus_minimum)
+        divisor = bus_minimum;
+    if (divisor < fifo_minimum)
+        divisor = fifo_minimum;
+    /* Even CLKDIV retains the recommended 50% duty cycle. The register is
+     * eight bits; no saturation may turn an impossible clock into support. */
+    divisor = (divisor + 1U) & ~UINT64_C(1);
+    return divisor <= 256U ? (uint32_t)divisor - 2U : UINT32_MAX;
+}
+
+static bool live_clock(uint8_t width) {
+    return clock_divider(width, 4U) != UINT32_MAX &&
+           clock_divider(1U, 122U) != UINT32_MAX &&
            nx_stm32_clock_profile_matches(RCC, NULL);
 }
 
@@ -159,15 +184,24 @@ static nx_result_t poll_next(sdio_poll_t* poll) {
 }
 
 static nx_result_t control_settled(sdio_poll_t* poll) {
-    /* RM0090 31.9.1/2/9 require 3 SDIOCLK + 2 PCLK2 cycles between
-     * clock-domain control writes, plus 7 HCLK cycles for POWER. At the
-     * reviewed 48/84/168 MHz profile one measured microsecond exceeds all
-     * three bounds. No uncalibrated delay loop or hidden HAL tick is used. */
+    uint64_t core = NEXUS_CORE_HZ;
+    uint64_t kernel = NEXUS_PLL48_HZ;
+    uint64_t peripheral = NEXUS_APB2_HZ;
+    if (core == 0U || kernel == 0U || peripheral == 0U)
+        return NX_ERROR_UNSUPPORTED;
+    uint64_t power = (UINT64_C(7000000) + core - 1U) / core;
+    uint64_t divisor = kernel * peripheral;
+    uint64_t crossing =
+        (UINT64_C(1000000) * (3U * peripheral + 2U * kernel) + divisor - 1U) /
+        divisor;
+    /* Core reports floor microseconds. The extra tick proves the physical
+     * interval even when the first observation occurs just before a tick. */
+    nx_time_us_t ticks = (power > crossing ? power : crossing) + 1U;
     nx_result_t result = poll_next(poll);
     if (result != NX_SUCCESS)
         return result;
     nx_time_us_t settled;
-    result = nx_deadline_finite_after(poll->observed, 1U, &settled);
+    result = nx_deadline_finite_after(poll->observed, ticks, &settled);
     if (result != NX_SUCCESS)
         return result;
     do {
@@ -180,12 +214,16 @@ static nx_result_t control_settled(sdio_poll_t* poll) {
 
 static nx_result_t command(uint32_t index, uint32_t argument,
                            sdio_response_t response, sdio_poll_t* poll,
-                           uint32_t* value) {
+                           uint32_t* value,
+                           nx_stm32_sdio_state_t* effect_owner) {
     nx_result_t result = poll_next(poll);
     if (result != NX_SUCCESS)
         return result;
     if ((NX_SDIO_READ(SDIO->STA) & SDIO_STA_CMDACT) != 0U)
         return NX_ERROR_BUSY;
+    result = control_settled(poll);
+    if (result != NX_SUCCESS)
+        return result;
     NX_SDIO_WRITE(SDIO->ICR, COMMAND_FLAGS);
     SDIO_CmdInitTypeDef selected = {
         .Argument = argument,
@@ -196,6 +234,13 @@ static nx_result_t command(uint32_t index, uint32_t argument,
         .WaitForInterrupt = SDIO_WAIT_NO,
         .CPSM = SDIO_CPSM_ENABLE,
     };
+    /* All no-effect checks precede the first possible CPSM write. Lost
+     * responses retain the exact session effect; they never revoke it. */
+    if (effect_owner != NULL) {
+        effect_owner->transfer_pending = true;
+        if (index == 24U || index == 25U)
+            effect_owner->programming_pending = true;
+    }
     if (SDIO_SendCommand(SDIO, &selected) != HAL_OK)
         return NX_ERROR_IO;
     uint32_t status;
@@ -240,7 +285,8 @@ static nx_result_t io_register(uint8_t function, uint32_t address,
     if (readback)
         argument |= UINT32_C(1) << 27U;
     uint32_t reply = 0U;
-    nx_result_t result = command(52U, argument, RESPONSE_R5, poll, &reply);
+    nx_result_t result =
+        command(52U, argument, RESPONSE_R5, poll, &reply, NULL);
     if (result == NX_SUCCESS && (!write || readback))
         *value = (uint8_t)reply;
     return result;
@@ -250,13 +296,13 @@ static nx_result_t app_command(nx_stm32_sdio_state_t* state, uint32_t index,
                                uint32_t argument, sdio_response_t response,
                                sdio_poll_t* poll, uint32_t* value) {
     uint32_t prefix = 0U;
-    nx_result_t result =
-        command(55U, (uint32_t)state->rca << 16U, RESPONSE_R1, poll, &prefix);
+    nx_result_t result = command(55U, (uint32_t)state->rca << 16U, RESPONSE_R1,
+                                 poll, &prefix, NULL);
     if (result != NX_SUCCESS)
         return result;
     if ((prefix & (1U << 5U)) == 0U)
         return NX_ERROR_UNSUPPORTED;
-    return command(index, argument, response, poll, value);
+    return command(index, argument, response, poll, value, NULL);
 }
 
 static nx_result_t host_withdraw(sdio_poll_t* poll, uint32_t* flags) {
@@ -287,7 +333,7 @@ static nx_result_t card_ready(nx_stm32_sdio_state_t* state, sdio_poll_t* poll,
     for (;;) {
         uint32_t status = 0U;
         nx_result_t result = command(13U, (uint32_t)state->rca << 16U,
-                                     RESPONSE_R1, poll, &status);
+                                     RESPONSE_R1, poll, &status, NULL);
         if (result != NX_SUCCESS)
             return result;
         if (state->config->protocol == NX_STM32_SDIO_MMC &&
@@ -297,6 +343,7 @@ static nx_result_t card_ready(nx_stm32_sdio_state_t* state, sdio_poll_t* poll,
         if ((status & (1U << 8U)) != 0U &&
             (card_state == 4U || (stopping && card_state == 3U))) {
             state->programming_pending = false;
+            state->transfer_pending = false;
             if (card_state == 3U)
                 state->selected = false;
             return host_idle() ? NX_SUCCESS : NX_ERROR_BUSY;
@@ -304,12 +351,29 @@ static nx_result_t card_ready(nx_stm32_sdio_state_t* state, sdio_poll_t* poll,
         if (card_state == 5U || card_state == 6U) {
             /* Even a single-block transfer can leave the card sending or
              * receiving after host abort. CMD12 is recovery, never a claim
-             * that this profile supports multi-block command streams. */
-            result = command(12U, 0U, RESPONSE_R1, poll, NULL);
+             * accepting either an aborted finite packet or an open stream. */
+            result = command(12U, 0U, RESPONSE_R1, poll, NULL, NULL);
             if (result != NX_SUCCESS)
                 return result;
         }
     }
+}
+
+static nx_result_t memory_finish(nx_stm32_sdio_state_t* state,
+                                 sdio_poll_t* poll, bool multiple,
+                                 bool writing) {
+    nx_result_t result = poll_next(poll);
+    if (result != NX_SUCCESS)
+        return result;
+    if (multiple) {
+        result = command(12U, 0U, RESPONSE_R1, poll, NULL, NULL);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+    if (multiple || writing)
+        return card_ready(state, poll, false);
+    state->transfer_pending = false;
+    return NX_SUCCESS;
 }
 
 static nx_result_t data_configure(const nx_stm32_sdio_state_t* state,
@@ -321,10 +385,11 @@ static nx_result_t data_configure(const nx_stm32_sdio_state_t* state,
     if (result != NX_SUCCESS)
         return result;
     NX_SDIO_WRITE(SDIO->ICR, DATA_FLAGS);
-    uint32_t block_bits = 0U;
-    while ((UINT32_C(1) << block_bits) < bytes && block_bits < 11U)
-        ++block_bits;
     bool io = state->config->protocol == NX_STM32_SDIO_IO;
+    uint32_t packet = !io && bytes > 512U ? 512U : bytes;
+    uint32_t block_bits = 0U;
+    while ((UINT32_C(1) << block_bits) < packet && block_bits < 11U)
+        ++block_bits;
     const SDIO_DataInitTypeDef data = {
         .DataTimeOut = UINT32_C(0x00FFFFFF),
         .DataLength = bytes,
@@ -354,9 +419,12 @@ static nx_result_t data_configure(const nx_stm32_sdio_state_t* state,
 }
 
 static nx_result_t fifo_transfer(void* data, uint32_t bytes, bool reading,
-                                 sdio_poll_t* poll) {
+                                 sdio_poll_t* poll,
+                                 uint32_t* confirmed_prefix) {
     uint32_t words = (bytes + 3U) / 4U;
     uint32_t copied = 0U;
+    uint32_t crc_blocks = 0U;
+    bool crc_seen = false;
     uint8_t* buffer = data;
     for (;;) {
         nx_result_t result = poll_next(poll);
@@ -366,6 +434,15 @@ static nx_result_t fifo_transfer(void* data, uint32_t bytes, bool reading,
         if ((status & DATA_ERRORS) != 0U)
             return (status & SDIO_STA_DTIMEOUT) != 0U ? NX_ERROR_TIMEOUT
                                                       : NX_ERROR_IO;
+        if ((status & SDIO_STA_DBCKEND) != 0U) {
+            crc_seen = true;
+            if (confirmed_prefix != NULL && crc_blocks < bytes / 512U)
+                ++crc_blocks;
+            NX_SDIO_WRITE(SDIO->ICR, SDIO_STA_DBCKEND);
+            nx_arch_dsb();
+            if ((NX_SDIO_READ(SDIO->STA) & SDIO_STA_DBCKEND) != 0U)
+                return NX_ERROR_IO;
+        }
         if (reading && (status & SDIO_STA_RXDAVL) != 0U && copied < words) {
             uint32_t word = NX_SDIO_FIFO_READ(SDIO);
             size_t count = bytes - copied * 4U;
@@ -384,10 +461,12 @@ static nx_result_t fifo_transfer(void* data, uint32_t bytes, bool reading,
                 return NX_ERROR_IO;
             ++copied;
         }
+        if (confirmed_prefix != NULL)
+            *confirmed_prefix =
+                crc_blocks < copied / 128U ? crc_blocks : copied / 128U;
         /* DATAEND only means DCOUNT reached zero. It can precede CRC
          * acceptance and the final CPU FIFO drain; DBCKEND proves CRC. */
-        if ((status & (SDIO_STA_DATAEND | SDIO_STA_DBCKEND)) ==
-                (SDIO_STA_DATAEND | SDIO_STA_DBCKEND) &&
+        if ((status & SDIO_STA_DATAEND) != 0U && crc_seen &&
             (status & (SDIO_STA_TXACT | SDIO_STA_RXACT)) == 0U) {
             /* CRC/counter completion is independent of the APB FIFO tail.
              * Drain only the remaining selected extent, re-observing flags;
@@ -399,8 +478,11 @@ static nx_result_t fifo_transfer(void* data, uint32_t bytes, bool reading,
             if (reading && copied < words && (status & SDIO_STA_RXDAVL) != 0U)
                 continue;
             if (copied != words || NX_SDIO_READ(SDIO->DCOUNT) != 0U ||
-                (reading && (status & SDIO_STA_RXDAVL) != 0U))
+                (reading && (status & SDIO_STA_RXDAVL) != 0U)) {
+                if (confirmed_prefix != NULL)
+                    *confirmed_prefix = 0U;
                 return NX_ERROR_IO;
+            }
             result = control_settled(poll);
             if (result != NX_SUCCESS)
                 return result;
@@ -461,8 +543,24 @@ static nx_result_t decode_csd(nx_stm32_sdio_state_t* state) {
     return NX_SUCCESS;
 }
 
-static nx_result_t configured_clock(uint32_t divider, uint32_t width,
+static nx_result_t configured_clock(const nx_stm32_sdio_state_t* state,
+                                    uint32_t divider, uint32_t width,
                                     sdio_poll_t* poll) {
+    uint8_t bits = width == SDIO_BUS_WIDE_1B   ? 1U
+                   : width == SDIO_BUS_WIDE_4B ? 4U
+                   : width == SDIO_BUS_WIDE_8B ? 8U
+                                               : 0U;
+    if (divider > 254U || (divider & 1U) != 0U ||
+        divider < clock_divider(bits, 4U))
+        return NX_ERROR_UNSUPPORTED;
+    if (!host_idle() ||
+        (NX_SDIO_READ(SDIO->DCTRL) & (SDIO_DCTRL_DTEN | SDIO_DCTRL_DMAEN)) !=
+            0U ||
+        (state->config->async != NULL &&
+         state->config->async->active != NULL) ||
+        (state->config->engine == NX_STM32_SDIO_DMA &&
+         LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) != 0U))
+        return NX_ERROR_BUSY;
     const SDIO_InitTypeDef clock = {
         .ClockEdge = SDIO_CLOCK_EDGE_RISING,
         .ClockBypass = SDIO_CLOCK_BYPASS_DISABLE,
@@ -522,8 +620,8 @@ static nx_result_t initialize_io(nx_stm32_sdio_state_t* state,
      * explicitly reset I/O, then repeat voltage/readiness negotiation. */
     for (unsigned pass = 0U; pass < 2U; ++pass) {
         do {
-            nx_result_t result =
-                command(5U, UINT32_C(0x00ff8000), RESPONSE_R4, poll, &ocr);
+            nx_result_t result = command(5U, UINT32_C(0x00ff8000), RESPONSE_R4,
+                                         poll, &ocr, NULL);
             if (result != NX_SUCCESS)
                 return result;
         } while ((ocr & (UINT32_C(1) << 31U)) == 0U);
@@ -539,14 +637,15 @@ static nx_result_t initialize_io(nx_stm32_sdio_state_t* state,
         }
     }
     uint32_t rca = 0U;
-    nx_result_t result = command(3U, 0U, RESPONSE_R6, poll, &rca);
+    nx_result_t result = command(3U, 0U, RESPONSE_R6, poll, &rca, NULL);
     if (result != NX_SUCCESS)
         return result;
     state->rca = (uint16_t)(rca >> 16U);
     if (state->rca == 0U)
         return NX_ERROR_IO;
     state->selected = true;
-    result = command(7U, (uint32_t)state->rca << 16U, RESPONSE_R1, poll, NULL);
+    result =
+        command(7U, (uint32_t)state->rca << 16U, RESPONSE_R1, poll, NULL, NULL);
     if (result != NX_SUCCESS)
         return result;
     uint8_t capabilities = 0U;
@@ -564,10 +663,10 @@ static nx_result_t initialize_io(nx_stm32_sdio_state_t* state,
         if (result != NX_SUCCESS)
             return result;
     }
-    return configured_clock(low_speed ? 118U : 2U,
-                            state->config->bus_width == 4U ? SDIO_BUS_WIDE_4B
-                                                           : SDIO_BUS_WIDE_1B,
-                            poll);
+    return configured_clock(
+        state, clock_divider(state->config->bus_width, low_speed ? 122U : 4U),
+        state->config->bus_width == 4U ? SDIO_BUS_WIDE_4B : SDIO_BUS_WIDE_1B,
+        poll);
 }
 
 static nx_result_t io_shutdown(nx_stm32_sdio_state_t* state,
@@ -600,14 +699,15 @@ static nx_result_t initialize_mmc(nx_stm32_sdio_state_t* state,
     uint32_t ocr = 0U;
     nx_result_t result;
     do {
-        result = command(1U, UINT32_C(0x40ff8000), RESPONSE_R3, poll, &ocr);
+        result =
+            command(1U, UINT32_C(0x40ff8000), RESPONSE_R3, poll, &ocr, NULL);
         if (result != NX_SUCCESS)
             return result;
     } while ((ocr & (UINT32_C(1) << 31U)) == 0U);
     if ((ocr & UINT32_C(0x00ff8000)) == 0U)
         return NX_ERROR_UNSUPPORTED;
     state->high_capacity = (ocr & (UINT32_C(1) << 30U)) != 0U;
-    result = command(2U, 0U, RESPONSE_R2, poll, NULL);
+    result = command(2U, 0U, RESPONSE_R2, poll, NULL, NULL);
     if (result != NX_SUCCESS)
         return result;
     state->cid[0] = NX_SDIO_READ(SDIO->RESP1);
@@ -617,10 +717,10 @@ static nx_result_t initialize_mmc(nx_stm32_sdio_state_t* state,
     /* MMC assigns RCA from the host; SD SEND_RELATIVE_ADDR instead returns
      * an RCA in R6. These are distinct protocols, not a fallback probe. */
     state->rca = 1U;
-    result = command(3U, UINT32_C(1) << 16U, RESPONSE_R1, poll, NULL);
+    result = command(3U, UINT32_C(1) << 16U, RESPONSE_R1, poll, NULL, NULL);
     if (result != NX_SUCCESS)
         return result;
-    result = command(9U, UINT32_C(1) << 16U, RESPONSE_R2, poll, NULL);
+    result = command(9U, UINT32_C(1) << 16U, RESPONSE_R2, poll, NULL, NULL);
     if (result != NX_SUCCESS)
         return result;
     uint8_t csd[16];
@@ -635,7 +735,7 @@ static nx_result_t initialize_mmc(nx_stm32_sdio_state_t* state,
             return result;
     }
     state->selected = true;
-    result = command(7U, UINT32_C(1) << 16U, RESPONSE_R1, poll, NULL);
+    result = command(7U, UINT32_C(1) << 16U, RESPONSE_R1, poll, NULL, NULL);
     if (result == NX_SUCCESS)
         result = card_ready(state, poll, false);
     if (result != NX_SUCCESS)
@@ -646,9 +746,9 @@ static nx_result_t initialize_mmc(nx_stm32_sdio_state_t* state,
         uint32_t extended[128];
         result = data_configure(state, 512U, true, poll, false, false);
         if (result == NX_SUCCESS)
-            result = command(8U, 0U, RESPONSE_R1, poll, NULL);
+            result = command(8U, 0U, RESPONSE_R1, poll, NULL, NULL);
         if (result == NX_SUCCESS)
-            result = fifo_transfer(extended, 512U, true, poll);
+            result = fifo_transfer(extended, 512U, true, poll, NULL);
         if (result != NX_SUCCESS)
             return result;
         const uint8_t* bytes = (const uint8_t*)extended;
@@ -665,7 +765,7 @@ static nx_result_t initialize_mmc(nx_stm32_sdio_state_t* state,
             .writable = (csd[14] & 48U) == 0U,
         };
     } else {
-        result = command(16U, 512U, RESPONSE_R1, poll, NULL);
+        result = command(16U, 512U, RESPONSE_R1, poll, NULL, NULL);
         if (result != NX_SUCCESS)
             return result;
     }
@@ -673,7 +773,7 @@ static nx_result_t initialize_mmc(nx_stm32_sdio_state_t* state,
         uint32_t width = state->config->bus_width == 8U ? 2U : 1U;
         uint32_t status = 0U;
         result = command(6U, UINT32_C(0x03b70000) | (width << 8U), RESPONSE_R1,
-                         poll, &status);
+                         poll, &status, NULL);
         if (result == NX_SUCCESS && (status & MMC_SWITCH_ERROR) != 0U)
             result = NX_ERROR_IO;
         if (result == NX_SUCCESS)
@@ -681,7 +781,7 @@ static nx_result_t initialize_mmc(nx_stm32_sdio_state_t* state,
         if (result != NX_SUCCESS)
             return result;
     }
-    return configured_clock(2U,
+    return configured_clock(state, clock_divider(state->config->bus_width, 4U),
                             state->config->bus_width == 8U   ? SDIO_BUS_WIDE_8B
                             : state->config->bus_width == 4U ? SDIO_BUS_WIDE_4B
                                                              : SDIO_BUS_WIDE_1B,
@@ -697,7 +797,8 @@ static nx_result_t initialize_card(nx_stm32_sdio_state_t* state,
     if (SDIO_PowerState_ON(SDIO) != HAL_OK ||
         NX_SDIO_READ(SDIO->POWER) != SDIO_POWER_PWRCTRL)
         return NX_ERROR_IO;
-    result = configured_clock(118U, SDIO_BUS_WIDE_1B, poll);
+    result = configured_clock(state, clock_divider(1U, 122U), SDIO_BUS_WIDE_1B,
+                              poll);
     if (result != NX_SUCCESS)
         return result;
     /* At 400 kHz this exceeds 74 clocks and the power-on settling interval.
@@ -711,7 +812,7 @@ static nx_result_t initialize_card(nx_stm32_sdio_state_t* state,
         if (result != NX_SUCCESS)
             return result;
     } while (poll->observed < ready_at);
-    result = command(0U, 0U, RESPONSE_NONE, poll, NULL);
+    result = command(0U, 0U, RESPONSE_NONE, poll, NULL, NULL);
     if (result != NX_SUCCESS)
         return result;
     if (state->config->protocol == NX_STM32_SDIO_MMC)
@@ -719,7 +820,7 @@ static nx_result_t initialize_card(nx_stm32_sdio_state_t* state,
     if (state->config->protocol == NX_STM32_SDIO_IO)
         return initialize_io(state, poll);
     uint32_t echo = 0U;
-    result = command(8U, 0x1AAU, RESPONSE_R7, poll, &echo);
+    result = command(8U, 0x1AAU, RESPONSE_R7, poll, &echo, NULL);
     bool illegal = (echo & CARD_ERRORS) == (1U << 22U);
     bool version2 = result == NX_SUCCESS && !illegal;
     if (result != NX_SUCCESS && result != NX_ERROR_TIMEOUT)
@@ -738,7 +839,7 @@ static nx_result_t initialize_card(nx_stm32_sdio_state_t* state,
         (!version2 && (ocr & (1U << 30U)) != 0U))
         return NX_ERROR_UNSUPPORTED;
     state->high_capacity = (ocr & (1U << 30U)) != 0U;
-    result = command(2U, 0U, RESPONSE_R2, poll, NULL);
+    result = command(2U, 0U, RESPONSE_R2, poll, NULL, NULL);
     if (result != NX_SUCCESS)
         return result;
     state->cid[0] = NX_SDIO_READ(SDIO->RESP1);
@@ -746,27 +847,29 @@ static nx_result_t initialize_card(nx_stm32_sdio_state_t* state,
     state->cid[2] = NX_SDIO_READ(SDIO->RESP3);
     state->cid[3] = NX_SDIO_READ(SDIO->RESP4);
     uint32_t rca = 0U;
-    result = command(3U, 0U, RESPONSE_R6, poll, &rca);
+    result = command(3U, 0U, RESPONSE_R6, poll, &rca, NULL);
     if (result != NX_SUCCESS)
         return result;
     state->rca = (uint16_t)(rca >> 16U);
     if (state->rca == 0U)
         return NX_ERROR_IO;
-    result = command(9U, (uint32_t)state->rca << 16U, RESPONSE_R2, poll, NULL);
+    result =
+        command(9U, (uint32_t)state->rca << 16U, RESPONSE_R2, poll, NULL, NULL);
     if (result == NX_SUCCESS)
         result = decode_csd(state);
     if (result != NX_SUCCESS)
         return result;
     /* Selection may have reached the card even if the response is lost. */
     state->selected = true;
-    result = command(7U, (uint32_t)state->rca << 16U, RESPONSE_R1, poll, NULL);
+    result =
+        command(7U, (uint32_t)state->rca << 16U, RESPONSE_R1, poll, NULL, NULL);
     if (result != NX_SUCCESS)
         return result;
     result = card_ready(state, poll, false);
     if (result != NX_SUCCESS)
         return result;
     if (!state->high_capacity) {
-        result = command(16U, 512U, RESPONSE_R1, poll, NULL);
+        result = command(16U, 512U, RESPONSE_R1, poll, NULL, NULL);
         if (result != NX_SUCCESS)
             return result;
     }
@@ -776,7 +879,7 @@ static nx_result_t initialize_card(nx_stm32_sdio_state_t* state,
         if (result == NX_SUCCESS)
             result = app_command(state, 51U, 0U, RESPONSE_R1, poll, NULL);
         if (result == NX_SUCCESS)
-            result = fifo_transfer(scr, 8U, true, poll);
+            result = fifo_transfer(scr, 8U, true, poll, NULL);
         if (result != NX_SUCCESS)
             return result;
         if ((((uint8_t*)scr)[1] & 4U) == 0U)
@@ -785,7 +888,7 @@ static nx_result_t initialize_card(nx_stm32_sdio_state_t* state,
         if (result != NX_SUCCESS)
             return result;
     }
-    return configured_clock(2U,
+    return configured_clock(state, clock_divider(state->config->bus_width, 4U),
                             state->config->bus_width == 4U ? SDIO_BUS_WIDE_4B
                                                            : SDIO_BUS_WIDE_1B,
                             poll);
@@ -801,7 +904,7 @@ static nx_result_t operation_valid(nx_stm32_sdio_state_t* state,
         return NX_ERROR_STATE;
     if (state->state == NX_BLOCK_ACTIVE)
         return NX_ERROR_BUSY;
-    if (!live_clock() ||
+    if (!live_clock(state->config->bus_width) ||
         (NX_SDIO_READ(RCC->APB2ENR) & RCC_APB2ENR_SDIOEN) == 0U ||
         (NX_SDIO_READ(RCC->AHB1ENR) &
          (RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIODEN)) !=
@@ -928,36 +1031,37 @@ block_transfer(void* context, uint64_t first, void* data, size_t bytes,
         return outcome;
     }
     sdio_poll_t poll = {deadline, state->config->poll_budget, 0U};
-    for (uint32_t i = 0U; i < blocks; ++i) {
-        uint64_t sector = first + i;
-        uint32_t argument =
-            (uint32_t)(state->high_capacity ? sector : sector * 512U);
-        if (reading) {
-            outcome.result =
-                data_configure(state, 512U, true, &poll, false, false);
-            if (outcome.result == NX_SUCCESS)
-                outcome.result =
-                    command(17U, argument, RESPONSE_R1, &poll, NULL);
-        } else {
-            state->programming_pending = true;
-            outcome.result = command(24U, argument, RESPONSE_R1, &poll, NULL);
-            if (outcome.result == NX_SUCCESS)
-                outcome.result =
-                    data_configure(state, 512U, false, &poll, false, false);
-        }
+    uint32_t argument = (uint32_t)(state->high_capacity ? first : first * 512U);
+    if (reading) {
+        outcome.result =
+            data_configure(state, (uint32_t)needed, true, &poll, false, false);
         if (outcome.result == NX_SUCCESS)
-            outcome.result = fifo_transfer((uint8_t*)data + (size_t)i * 512U,
-                                           512U, reading, &poll);
-        if (outcome.result == NX_SUCCESS && !reading)
-            outcome.result = card_ready(state, &poll, false);
-        if (outcome.result != NX_SUCCESS)
-            break;
-        ++outcome.completed_blocks;
+            outcome.result = command(blocks > 1U ? 18U : 17U, argument,
+                                     RESPONSE_R1, &poll, NULL, state);
+    } else {
+        outcome.result = command(blocks > 1U ? 25U : 24U, argument, RESPONSE_R1,
+                                 &poll, NULL, state);
+        if (outcome.result == NX_SUCCESS)
+            outcome.result = data_configure(state, (uint32_t)needed, false,
+                                            &poll, false, false);
     }
+    if (outcome.result == NX_SUCCESS)
+        outcome.result =
+            fifo_transfer(data, (uint32_t)needed, reading, &poll,
+                          reading ? &outcome.completed_blocks : NULL);
+    if (outcome.result == NX_SUCCESS)
+        outcome.result = memory_finish(state, &poll, blocks > 1U, !reading);
+    if (outcome.result == NX_SUCCESS)
+        outcome.completed_blocks = blocks;
+
     if (outcome.result != NX_SUCCESS) {
         /* CPU buffer references end regardless of host/card readiness. There
          * is no DMA descriptor, ISR publisher or retained pointer to caller. */
-        (void)host_withdraw(&poll, NULL);
+        nx_result_t withdrawn = host_withdraw(&poll, NULL);
+        if (withdrawn == NX_SUCCESS && state->transfer_pending)
+            (void)card_ready(state, &poll, false);
+        if (!reading || state->transfer_pending)
+            outcome.completed_blocks = 0U;
         state->state = NX_BLOCK_UNCERTAIN;
     } else {
         state->state = NX_BLOCK_READY;
@@ -1027,6 +1131,7 @@ static nx_result_t block_stop(void* context, nx_time_us_t deadline) {
          * No response from an absent card is fabricated as media readiness. */
         state->selected = false;
         state->programming_pending = false;
+        state->transfer_pending = false;
     }
     if (result == NX_SUCCESS && !state->removed &&
         state->config->protocol == NX_STM32_SDIO_IO)
@@ -1035,7 +1140,7 @@ static nx_result_t block_stop(void* context, nx_time_us_t deadline) {
         state->config->protocol != NX_STM32_SDIO_IO)
         result = card_ready(state, &poll, true);
     if (result == NX_SUCCESS && state->selected) {
-        result = command(7U, 0U, RESPONSE_NONE, &poll, NULL);
+        result = command(7U, 0U, RESPONSE_NONE, &poll, NULL, NULL);
         if (result == NX_SUCCESS)
             state->selected = false;
     }
@@ -1058,6 +1163,7 @@ static nx_result_t block_stop(void* context, nx_time_us_t deadline) {
         state->protocol_started = false;
         state->selected = false;
         state->programming_pending = false;
+        state->transfer_pending = false;
         state->rca = 0U;
         state->state = NX_BLOCK_STOPPED;
     } else {
@@ -1081,9 +1187,90 @@ const nx_block_ops_t nx_stm32_sdio_ops = {
 
 #define NX_SDIO_DMA_FLAGS  (UINT32_C(0x3d) << 22U)
 #define NX_SDIO_DMA_ERRORS (UINT32_C(0x0d) << 22U)
+#define NX_SDIO_DMA_TC     (UINT32_C(1) << 27U)
+#define NX_SDIO_DMA_IRQS                                                       \
+    (DMA_SxCR_TCIE | DMA_SxCR_HTIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE)
+
+/** \brief EN=0 alone does not join peripheral-to-memory FIFO writes. */
+static bool dma_fifo_empty(void) {
+    return (NX_SDIO_READ(DMA2_Stream3->FCR) & DMA_SxFCR_FS) ==
+           LL_DMA_FIFOSTATUS_EMPTY;
+}
+
+/** \brief Copied TX FIFO data remains a cold resource, never new payload. */
+static bool dma_fifo_available(void) {
+    return (NX_SDIO_READ(DMA2_Stream3->FCR) & DMA_SxFCR_DMDIS) == 0U ||
+           dma_fifo_empty();
+}
+
+/** \brief Memory frames span the request; functions retain one CMD53 unit. */
+static uint32_t async_bytes(const nx_stm32_sdio_async_state_t* execution) {
+    return execution->function != 0U ? execution->unit_bytes
+                                     : execution->active->blocks * 512U;
+}
+
+/** \brief Count distinct good CRC observations without inventing missed IRQs.
+ */
+static void data_flags(nx_stm32_sdio_async_state_t* execution,
+                       uint32_t status) {
+    execution->flags |= status & DATA_FLAGS;
+    if (!execution->draining && execution->function == 0U &&
+        execution->active != NULL && !execution->active->write &&
+        (execution->flags & DATA_ERRORS) == 0U &&
+        (status & SDIO_STA_DBCKEND) != 0U) {
+        if (execution->completed_blocks < execution->active->blocks)
+            ++execution->completed_blocks;
+        NX_SDIO_WRITE(SDIO->ICR, SDIO_STA_DBCKEND);
+        nx_arch_dsb();
+        uint32_t remaining = NX_SDIO_READ(SDIO->STA);
+        execution->flags |= remaining & DATA_ERRORS;
+        /* An unacknowledged static bit is not a second packet and must not
+         * keep a level publisher live while Thread owns recovery. */
+        if ((remaining & SDIO_STA_DBCKEND) != 0U)
+            execution->flags |= SDIO_STA_RXOVERR;
+    }
+}
+
+/** \brief Interpret the selected flow counter only after memory completion. */
+static uint32_t
+dma_transferred_words(const nx_stm32_sdio_async_state_t* execution) {
+    uint32_t initial = execution->active->write ? async_bytes(execution) / 4U
+                                                : UINT32_C(0xffff);
+    uint32_t remaining = NX_SDIO_READ(DMA2_Stream3->NDTR);
+    return remaining <= initial ? initial - remaining : UINT32_MAX;
+}
+
+/** \brief A refused peripheral mask must not starve its Thread drain. */
+static void data_irq_quiet(const nx_stm32_sdio_state_t* state) {
+    if (state->config->engine == NX_STM32_SDIO_POLL)
+        return;
+    NX_SDIO_WRITE(SDIO->MASK, 0U);
+    nx_arch_dsb();
+    if (NX_SDIO_READ(SDIO->MASK) != 0U)
+        NVIC_DisableIRQ(SDIO_IRQn);
+}
+
+/** \brief Mask this stream's publishers without stopping its memory engine. */
+static bool dma_irqs_quiet(void) {
+    if ((NX_SDIO_READ(DMA2_Stream3->CR) & NX_SDIO_DMA_IRQS) == 0U &&
+        (NX_SDIO_READ(DMA2_Stream3->FCR) & DMA_SxFCR_FEIE) == 0U)
+        return true;
+    LL_DMA_DisableIT_HT(DMA2, LL_DMA_STREAM_3);
+    LL_DMA_DisableIT_TC(DMA2, LL_DMA_STREAM_3);
+    LL_DMA_DisableIT_TE(DMA2, LL_DMA_STREAM_3);
+    LL_DMA_DisableIT_DME(DMA2, LL_DMA_STREAM_3);
+    LL_DMA_DisableIT_FE(DMA2, LL_DMA_STREAM_3);
+    nx_arch_dsb();
+    bool quiet = (NX_SDIO_READ(DMA2_Stream3->CR) & NX_SDIO_DMA_IRQS) == 0U &&
+                 (NX_SDIO_READ(DMA2_Stream3->FCR) & DMA_SxFCR_FEIE) == 0U;
+    if (!quiet)
+        NVIC_DisableIRQ(DMA2_Stream3_IRQn);
+    return quiet;
+}
 
 static void async_drain(nx_stm32_sdio_state_t* state, nx_result_t result) {
     nx_stm32_sdio_async_state_t* execution = state->config->async;
+    nx_arch_irq_state_t previous = nx_arch_irq_save();
     if (!execution->draining) {
         if (result != NX_SUCCESS && state->config->io != NULL)
             state->config->io->interrupt_armed = false;
@@ -1091,28 +1278,43 @@ static void async_drain(nx_stm32_sdio_state_t* state, nx_result_t result) {
         execution->draining = true;
         (void)nx_request_transition(&execution->active->base,
                                     NX_REQUEST_DRAINING);
+        /* Cancel returns with data publishers quiet. A pending handler may
+         * still latch facts, but can no longer touch the borrowed payload. */
+        data_irq_quiet(state);
+        if (state->config->engine == NX_STM32_SDIO_DMA)
+            (void)dma_irqs_quiet();
     }
+    nx_arch_irq_restore(previous);
 }
 
 static bool dma_detach(const nx_stm32_sdio_state_t* state) {
     if (state->config->engine != NX_STM32_SDIO_DMA)
         return true;
+    nx_stm32_sdio_async_state_t* execution = state->config->async;
+    bool irq_quiet = dma_irqs_quiet();
     LL_DMA_DisableStream(DMA2, LL_DMA_STREAM_3);
-    LL_DMA_DisableIT_HT(DMA2, LL_DMA_STREAM_3);
-    LL_DMA_DisableIT_TC(DMA2, LL_DMA_STREAM_3);
-    LL_DMA_DisableIT_TE(DMA2, LL_DMA_STREAM_3);
-    LL_DMA_DisableIT_DME(DMA2, LL_DMA_STREAM_3);
-    LL_DMA_DisableIT_FE(DMA2, LL_DMA_STREAM_3);
     nx_arch_dsb();
-    if ((NX_SDIO_READ(DMA2_Stream3->CR) &
-         (DMA_SxCR_EN | DMA_SxCR_TCIE | DMA_SxCR_HTIE | DMA_SxCR_TEIE |
-          DMA_SxCR_DMEIE)) != 0U ||
-        (NX_SDIO_READ(DMA2_Stream3->FCR) & DMA_SxFCR_FEIE) != 0U)
+    if (!irq_quiet || (NX_SDIO_READ(DMA2_Stream3->CR) & DMA_SxCR_EN) != 0U)
         return false;
+    if (execution->dma_started) {
+        uint32_t flags = NX_SDIO_READ(DMA2->LISR) & NX_SDIO_DMA_FLAGS;
+        if ((flags & NX_SDIO_DMA_ERRORS) != 0U)
+            execution->flags |= SDIO_STA_RXOVERR;
+        if ((flags & NX_SDIO_DMA_TC) != 0U)
+            execution->dma_complete = true;
+        /* RM0090 10.3.12/13/15: RX may still write RAM after EN=0. TX
+         * copies left in the FIFO no longer access the borrowed source,
+         * but still block a later arm or cold close. Neither direction
+         * treats a fatal error without TC as proof of memory completion. */
+        if (execution->active == NULL || !execution->dma_complete ||
+            (!execution->active->write && !dma_fifo_empty()))
+            return false;
+        execution->words = dma_transferred_words(execution);
+    }
     LL_DMA_SetMemoryAddress(DMA2, LL_DMA_STREAM_3, 0U);
+    LL_DMA_SetMemory1Address(DMA2, LL_DMA_STREAM_3, 0U);
     LL_DMA_SetPeriphAddress(DMA2, LL_DMA_STREAM_3, 0U);
     LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_3, 0U);
-    nx_stm32_sdio_async_state_t* execution = state->config->async;
     if (execution->active != NULL &&
         (execution->draining || execution->dma_complete) &&
         (NX_SDIO_READ(DMA2->LISR) & NX_SDIO_DMA_ERRORS) != 0U)
@@ -1120,37 +1322,55 @@ static bool dma_detach(const nx_stm32_sdio_state_t* state) {
     NX_SDIO_WRITE(DMA2->LIFCR, NX_SDIO_DMA_FLAGS);
     NVIC_ClearPendingIRQ(DMA2_Stream3_IRQn);
     nx_arch_dsb();
-    return NX_SDIO_READ(DMA2_Stream3->M0AR) == 0U &&
-           NX_SDIO_READ(DMA2_Stream3->PAR) == 0U &&
-           (NX_SDIO_READ(DMA2->LISR) & NX_SDIO_DMA_FLAGS) == 0U &&
-           NVIC_GetPendingIRQ(DMA2_Stream3_IRQn) == 0U &&
-           NVIC_GetActive(DMA2_Stream3_IRQn) == 0U;
+    bool detached = NX_SDIO_READ(DMA2_Stream3->M0AR) == 0U &&
+                    NX_SDIO_READ(DMA2_Stream3->M1AR) == 0U &&
+                    NX_SDIO_READ(DMA2_Stream3->PAR) == 0U &&
+                    NX_SDIO_READ(DMA2_Stream3->NDTR) == 0U &&
+                    (NX_SDIO_READ(DMA2->LISR) & NX_SDIO_DMA_FLAGS) == 0U &&
+                    NVIC_GetPendingIRQ(DMA2_Stream3_IRQn) == 0U &&
+                    NVIC_GetActive(DMA2_Stream3_IRQn) == 0U;
+    if (detached)
+        execution->dma_started = false;
+    return detached;
 }
 
-static nx_result_t async_start_block(nx_stm32_sdio_state_t* state) {
+static nx_result_t async_start_transfer(nx_stm32_sdio_state_t* state) {
     nx_stm32_sdio_async_state_t* execution = state->config->async;
     nx_block_request_t* request = execution->active;
-    uint8_t* data = (uint8_t*)request->data +
-                    (size_t)execution->completed_blocks * execution->unit_bytes;
+    uint8_t* data =
+        (uint8_t*)request->data +
+        (execution->function != 0U
+             ? (size_t)execution->completed_blocks * execution->unit_bytes
+             : 0U);
     execution->words = 0U;
     execution->flags = 0U;
     execution->dma_complete = false;
     if (state->config->engine == NX_STM32_SDIO_DMA) {
-        if (!dma_detach(state))
+        if (!dma_fifo_available() || !dma_detach(state))
             return NX_ERROR_IO;
         LL_DMA_SetChannelSelection(DMA2, LL_DMA_STREAM_3, LL_DMA_CHANNEL_4);
+        uint32_t flow =
+            request->write ? LL_DMA_MODE_NORMAL : LL_DMA_MODE_PFCTRL;
+        /* ConfigTransfer does not own DBM, CT or either burst field. A
+         * retired stream profile must never introduce a second RAM target
+         * or a longer burst into this finite single-buffer owner. */
+        LL_DMA_DisableDoubleBufferMode(DMA2, LL_DMA_STREAM_3);
+        LL_DMA_SetCurrentTargetMem(DMA2, LL_DMA_STREAM_3,
+                                   LL_DMA_CURRENTTARGETMEM0);
         LL_DMA_ConfigTransfer(
             DMA2, LL_DMA_STREAM_3,
             (request->write ? LL_DMA_DIRECTION_MEMORY_TO_PERIPH
                             : LL_DMA_DIRECTION_PERIPH_TO_MEMORY) |
-                LL_DMA_MODE_NORMAL | LL_DMA_PERIPH_NOINCREMENT |
-                LL_DMA_MEMORY_INCREMENT | LL_DMA_PDATAALIGN_WORD |
-                LL_DMA_MDATAALIGN_WORD | LL_DMA_PRIORITY_HIGH |
-                LL_DMA_MBURST_INC4 | LL_DMA_PBURST_INC4);
-        /* The F4 LL has no PFCTRL setter. SDIO is the peripheral flow
-         * controller; the reviewed four-word FIFO bursts are never circular. */
-        NX_SDIO_WRITE(DMA2_Stream3->CR,
-                      NX_SDIO_READ(DMA2_Stream3->CR) | DMA_SxCR_PFCTRL);
+                flow | LL_DMA_PERIPH_NOINCREMENT | LL_DMA_MEMORY_INCREMENT |
+                LL_DMA_PDATAALIGN_WORD | LL_DMA_MDATAALIGN_WORD |
+                LL_DMA_PRIORITY_HIGH);
+        LL_DMA_SetMemoryBurstxfer(DMA2, LL_DMA_STREAM_3, LL_DMA_MBURST_INC4);
+        LL_DMA_SetPeriphBurstxfer(DMA2, LL_DMA_STREAM_3, LL_DMA_PBURST_INC4);
+        uint32_t profile = DMA_SxCR_CIRC | DMA_SxCR_PFCTRL | DMA_SxCR_DBM |
+                           DMA_SxCR_CT | DMA_SxCR_MBURST | DMA_SxCR_PBURST;
+        if ((NX_SDIO_READ(DMA2_Stream3->CR) & profile) !=
+            (flow | LL_DMA_MBURST_INC4 | LL_DMA_PBURST_INC4))
+            return NX_ERROR_IO;
         LL_DMA_EnableFifoMode(DMA2, LL_DMA_STREAM_3);
         LL_DMA_SetFIFOThreshold(DMA2, LL_DMA_STREAM_3,
                                 LL_DMA_FIFOTHRESHOLD_FULL);
@@ -1158,18 +1378,26 @@ static nx_result_t async_start_block(nx_stm32_sdio_state_t* state) {
                                 (uint32_t)(uintptr_t)&SDIO->FIFO);
         LL_DMA_SetMemoryAddress(DMA2, LL_DMA_STREAM_3,
                                 (uint32_t)(uintptr_t)data);
-        LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_3, execution->unit_bytes / 4U);
+        /* TX uses DMA flow so its exact count also bounds source prefetch.
+         * RX PFCTRL forces FFFF on EN; the software extent is independent. */
+        if (request->write) {
+            uint32_t words = async_bytes(execution) / 4U;
+            LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_3, words);
+            if (LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_3) != words)
+                return NX_ERROR_IO;
+        }
         LL_DMA_EnableIT_TC(DMA2, LL_DMA_STREAM_3);
         LL_DMA_EnableIT_TE(DMA2, LL_DMA_STREAM_3);
         LL_DMA_EnableIT_DME(DMA2, LL_DMA_STREAM_3);
         LL_DMA_EnableIT_FE(DMA2, LL_DMA_STREAM_3);
+        execution->dma_started = true;
         LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_3);
         nx_arch_dsb();
         if (LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) == 0U)
             return NX_ERROR_IO;
     }
     sdio_poll_t poll = {request->base.deadline, state->config->poll_budget, 0U};
-    uint64_t sector = request->first_block + execution->completed_blocks;
+    uint64_t sector = request->first_block;
     uint32_t argument =
         (uint32_t)(state->high_capacity ? sector : sector * 512U);
     nx_result_t result;
@@ -1189,20 +1417,21 @@ static nx_result_t async_start_block(nx_stm32_sdio_state_t* state) {
             state, execution->unit_bytes, !request->write, &poll,
             state->config->engine == NX_STM32_SDIO_DMA, !execution->block_mode);
         if (result == NX_SUCCESS)
-            result = command(53U, argument, RESPONSE_R5, &poll, NULL);
+            result = command(53U, argument, RESPONSE_R5, &poll, NULL, NULL);
     } else if (request->write) {
-        state->programming_pending = true;
-        result = command(24U, argument, RESPONSE_R1, &poll, NULL);
+        result = command(request->blocks > 1U ? 25U : 24U, argument,
+                         RESPONSE_R1, &poll, NULL, state);
         if (result == NX_SUCCESS)
-            result = data_configure(state, 512U, false, &poll,
+            result = data_configure(state, async_bytes(execution), false, &poll,
                                     state->config->engine == NX_STM32_SDIO_DMA,
                                     false);
     } else {
         result =
-            data_configure(state, 512U, true, &poll,
+            data_configure(state, async_bytes(execution), true, &poll,
                            state->config->engine == NX_STM32_SDIO_DMA, false);
         if (result == NX_SUCCESS)
-            result = command(17U, argument, RESPONSE_R1, &poll, NULL);
+            result = command(request->blocks > 1U ? 18U : 17U, argument,
+                             RESPONSE_R1, &poll, NULL, state);
     }
     if (result != NX_SUCCESS)
         return result;
@@ -1256,7 +1485,8 @@ static nx_result_t async_submit(void* context, nx_block_request_t* request) {
         return NX_ERROR_STATE;
     if (config->engine == NX_STM32_SDIO_DMA) {
         if ((NX_SDIO_READ(RCC->AHB1ENR) & RCC_AHB1ENR_DMA2EN) == 0U ||
-            LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) != 0U)
+            LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) != 0U ||
+            !dma_fifo_available())
             return NX_ERROR_BUSY;
         result = nx_dma_buffer_validate(
             config->dma_regions, config->dma_region_count, request->data,
@@ -1276,7 +1506,7 @@ static nx_result_t async_submit(void* context, nx_block_request_t* request) {
         (nx_stm32_sdio_async_state_t){.active = request, .unit_bytes = 512U};
     state->state = NX_BLOCK_ACTIVE;
     nx_arch_irq_restore(previous);
-    result = async_start_block(state);
+    result = async_start_transfer(state);
     if (result != NX_SUCCESS)
         async_drain(state, result);
     return NX_SUCCESS;
@@ -1302,15 +1532,24 @@ static void async_service(void* context) {
         return;
     nx_stm32_sdio_async_state_t* execution = state->config->async;
     nx_block_request_t* request = execution->active;
+    bool sources_withdrawn = false;
     nx_arch_irq_state_t previous = nx_arch_irq_save();
     uint32_t flags = execution->flags;
     uint32_t words = execution->words;
-    bool memory_done = state->config->engine == NX_STM32_SDIO_DMA
-                           ? execution->dma_complete
-                           : words == (execution->unit_bytes + 3U) / 4U;
+    bool memory_done = words == (async_bytes(execution) + 3U) / 4U;
+    bool dma_terminal = false;
+    if (state->config->engine == NX_STM32_SDIO_DMA) {
+        dma_terminal = execution->dma_complete &&
+                       LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) == 0U &&
+                       (request->write || dma_fifo_empty());
+        memory_done = dma_terminal && dma_transferred_words(execution) ==
+                                          async_bytes(execution) / 4U;
+    }
     if ((flags & DATA_ERRORS) != 0U)
         async_drain(state, (flags & SDIO_STA_DTIMEOUT) != 0U ? NX_ERROR_TIMEOUT
                                                              : NX_ERROR_IO);
+    if (!execution->draining && dma_terminal && !memory_done)
+        async_drain(state, NX_ERROR_IO);
     nx_arch_irq_restore(previous);
     if (!execution->draining && nx_time_now_us() >= request->base.deadline)
         async_drain(state, NX_ERROR_TIMEOUT);
@@ -1318,28 +1557,30 @@ static void async_service(void* context) {
         (flags & (SDIO_STA_DATAEND | SDIO_STA_DBCKEND)) ==
             (SDIO_STA_DATAEND | SDIO_STA_DBCKEND) &&
         host_idle() && NX_SDIO_READ(SDIO->DCOUNT) == 0U) {
-        NX_SDIO_WRITE(SDIO->MASK, 0U);
-        sdio_poll_t poll = {request->base.deadline, state->config->poll_budget,
-                            0U};
-        nx_result_t result = host_withdraw(&poll, &execution->flags);
-        bool memory_detached = dma_detach(state);
-        if (!memory_detached || (execution->flags & DATA_ERRORS) != 0U)
-            result = NX_ERROR_IO;
-        if (result == NX_SUCCESS && request->write && execution->function == 0U)
-            result = card_ready(state, &poll, false);
-        if (result != NX_SUCCESS) {
-            async_drain(state, result);
+        if (execution->function == 0U) {
+            async_drain(state, NX_SUCCESS);
         } else {
-            if (execution->function != 0U)
+            NX_SDIO_WRITE(SDIO->MASK, 0U);
+            sdio_poll_t unit = {request->base.deadline,
+                                state->config->poll_budget, 0U};
+            nx_result_t result = host_withdraw(&unit, &execution->flags);
+            bool memory_detached = dma_detach(state);
+            sources_withdrawn = result == NX_SUCCESS && memory_detached;
+            if (!memory_detached || (execution->flags & DATA_ERRORS) != 0U)
+                result = NX_ERROR_IO;
+            if (result != NX_SUCCESS) {
+                async_drain(state, result);
+            } else {
                 state->config->io->inflight = 0U;
-            ++execution->completed_blocks;
-            if (execution->completed_blocks == request->blocks)
-                async_drain(state, NX_SUCCESS);
-            else {
-                result = async_start_block(state);
-                if (result != NX_SUCCESS)
-                    async_drain(state, result);
-                return;
+                ++execution->completed_blocks;
+                if (execution->completed_blocks == request->blocks) {
+                    async_drain(state, NX_SUCCESS);
+                } else {
+                    result = async_start_transfer(state);
+                    if (result != NX_SUCCESS)
+                        async_drain(state, result);
+                    return;
+                }
             }
         }
     }
@@ -1351,13 +1592,36 @@ static void async_service(void* context) {
         nx_time_now_us(), state->config->stop_timeout_us, &deadline);
     uint32_t restore_mask = 0U;
     sdio_poll_t poll = {deadline, state->config->poll_budget, 0U};
-    if (result == NX_SUCCESS) {
+    if (result == NX_SUCCESS && !sources_withdrawn)
         result = host_withdraw(&poll, &execution->flags);
-    }
-    /* Withdraw the peripheral request producer before disabling its memory
-     * consumer. Even a failed host drain still attempts DMA isolation. */
-    bool detached = dma_detach(state);
+    /* Always isolate the memory consumer, even when the host refuses stop.
+     * Reuse a function-unit join instead of withdrawing the same epoch twice.
+     */
+    bool detached = sources_withdrawn || dma_detach(state);
     if (result == NX_SUCCESS && detached) {
+        if (state->removed) {
+            state->selected = false;
+            state->programming_pending = false;
+            state->transfer_pending = false;
+        } else if (execution->function == 0U) {
+            if (execution->terminal == NX_SUCCESS) {
+                sdio_poll_t media = {request->base.deadline,
+                                     state->config->poll_budget, 0U};
+                nx_result_t ready = memory_finish(
+                    state, &media, request->blocks > 1U, request->write);
+                if (ready != NX_SUCCESS) {
+                    execution->terminal = ready;
+                    execution->completed_blocks = 0U;
+                }
+            } else if (state->transfer_pending) {
+                /* Protocol uncertainty is not an outstanding RAM reference.
+                 * Failure retains the session receipt, never replays data. */
+                (void)card_ready(state, &poll, false);
+            }
+        }
+        if (execution->terminal == NX_SUCCESS &&
+            nx_time_now_us() >= request->base.deadline)
+            execution->terminal = NX_ERROR_TIMEOUT;
         if (execution->terminal == NX_SUCCESS &&
             (execution->flags & DATA_ERRORS) == 0U &&
             state->config->io != NULL && state->config->io->interrupt_armed &&
@@ -1382,6 +1646,19 @@ static void async_service(void* context) {
                          NVIC_GetActive(SDIO_IRQn) == 0U);
     detached = detached && result == NX_SUCCESS &&
                NX_SDIO_READ(SDIO->MASK) == 0U && irq_detached;
+    if (detached && state->config->engine != NX_STM32_SDIO_POLL) {
+        /* Preparation exclusively acquired these disabled vectors. Restore
+         * a fallback disable only after the old sources and references join. */
+        if (NVIC_GetEnableIRQ(SDIO_IRQn) == 0U)
+            NVIC_EnableIRQ(SDIO_IRQn);
+        if (state->config->engine == NX_STM32_SDIO_DMA &&
+            NVIC_GetEnableIRQ(DMA2_Stream3_IRQn) == 0U)
+            NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+        nx_arch_dsb();
+        detached = NVIC_GetEnableIRQ(SDIO_IRQn) != 0U &&
+                   (state->config->engine != NX_STM32_SDIO_DMA ||
+                    NVIC_GetEnableIRQ(DMA2_Stream3_IRQn) != 0U);
+    }
     if (detached && restore_mask != 0U) {
         /* Join the old data-vector epoch before arming an independent
          * function hint. Global masking keeps that new hint from observing
@@ -1396,10 +1673,16 @@ static void async_service(void* context) {
         return;
     }
     nx_result_t terminal = execution->terminal;
-    if (terminal == NX_SUCCESS && (execution->flags & DATA_ERRORS) != 0U) {
+    if (terminal == NX_SUCCESS && (execution->flags & DATA_ERRORS) != 0U)
         terminal = NX_ERROR_IO;
-        if (execution->completed_blocks != 0U)
-            --execution->completed_blocks;
+    if (execution->function == 0U) {
+        if (terminal == NX_SUCCESS)
+            execution->completed_blocks = request->blocks;
+        else if (request->write || state->config->engine == NX_STM32_SDIO_DMA ||
+                 state->transfer_pending)
+            execution->completed_blocks = 0U;
+        else if (execution->completed_blocks > execution->words / 128U)
+            execution->completed_blocks = execution->words / 128U;
     }
     if (terminal != NX_SUCCESS && state->config->io != NULL)
         state->config->io->interrupt_armed = false;
@@ -1439,12 +1722,12 @@ const nx_block_async_ops_t nx_stm32_sdio_async_ops = {
 };
 
 static void data_step(nx_stm32_sdio_state_t* state) {
-    if (state == NULL || state->config == NULL ||
-        state->config->async == NULL ||
-        (state->config->engine != NX_STM32_SDIO_POLL &&
-         NX_SDIO_READ(SDIO->MASK) == 0U))
+    if (state == NULL || state->config == NULL || state->config->async == NULL)
         return;
     nx_stm32_sdio_async_state_t* execution = state->config->async;
+    if (state->config->engine != NX_STM32_SDIO_POLL &&
+        NX_SDIO_READ(SDIO->MASK) == 0U && !execution->draining)
+        return;
     uint32_t status = NX_SDIO_READ(SDIO->STA);
     if (state->config->io != NULL &&
         (status & NX_SDIO_READ(SDIO->MASK) & SDIO_STA_SDIOIT) != 0U) {
@@ -1454,27 +1737,34 @@ static void data_step(nx_stm32_sdio_state_t* state) {
                       NX_SDIO_READ(SDIO->MASK) & ~(uint32_t)SDIO_STA_SDIOIT);
         NX_SDIO_WRITE(SDIO->ICR, SDIO_STA_SDIOIT);
     }
-    if (execution->active == NULL || execution->draining)
+    if (execution->active == NULL)
         return;
-    execution->flags |= status & DATA_FLAGS;
+    data_flags(execution, status);
+    if (execution->draining) {
+        data_irq_quiet(state);
+        NX_SDIO_WRITE(SDIO->ICR, status & DATA_FLAGS);
+        return;
+    }
     if ((status & DATA_ERRORS) != 0U) {
-        NX_SDIO_WRITE(SDIO->MASK, 0U);
+        data_irq_quiet(state);
         return;
     }
     if (state->config->engine != NX_STM32_SDIO_DMA) {
         nx_block_request_t* request = execution->active;
         uint8_t* data =
             (uint8_t*)request->data +
-            (size_t)execution->completed_blocks * execution->unit_bytes;
-        uint32_t words = (execution->unit_bytes + 3U) / 4U;
+            (execution->function != 0U
+                 ? (size_t)execution->completed_blocks * execution->unit_bytes
+                 : 0U);
+        uint32_t words = (async_bytes(execution) + 3U) / 4U;
         for (unsigned count = 0U; count < 8U && execution->words < words;
              ++count) {
             status = NX_SDIO_READ(SDIO->STA);
-            execution->flags |= status & DATA_FLAGS;
+            data_flags(execution, status);
             if ((status & DATA_ERRORS) != 0U)
                 break;
             uint32_t word = 0U;
-            size_t bytes = execution->unit_bytes - execution->words * 4U;
+            size_t bytes = async_bytes(execution) - execution->words * 4U;
             if (bytes > 4U)
                 bytes = 4U;
             if (!request->write && (status & SDIO_STA_RXDAVL) != 0U) {
@@ -1492,7 +1782,7 @@ static void data_step(nx_stm32_sdio_state_t* state) {
             ++execution->words;
         }
         status = NX_SDIO_READ(SDIO->STA);
-        execution->flags |= status & DATA_FLAGS;
+        data_flags(execution, status);
         if (execution->words == words) {
             NX_SDIO_WRITE(SDIO->MASK,
                           NX_SDIO_READ(SDIO->MASK) &
@@ -1505,8 +1795,8 @@ static void data_step(nx_stm32_sdio_state_t* state) {
         ((execution->flags & (SDIO_STA_DATAEND | SDIO_STA_DBCKEND)) ==
              (SDIO_STA_DATAEND | SDIO_STA_DBCKEND) &&
          (state->config->engine == NX_STM32_SDIO_DMA ||
-          execution->words == (execution->unit_bytes + 3U) / 4U)))
-        NX_SDIO_WRITE(SDIO->MASK, 0U);
+          execution->words == (async_bytes(execution) + 3U) / 4U)))
+        data_irq_quiet(state);
 }
 
 void nx_stm32_sdio_irq(nx_stm32_sdio_state_t* state) {
@@ -1519,21 +1809,23 @@ void nx_stm32_sdio_irq(nx_stm32_sdio_state_t* state) {
 void nx_stm32_sdio_dma_irq(nx_stm32_sdio_state_t* state) {
     if (state == NULL || state->config == NULL ||
         state->config->engine != NX_STM32_SDIO_DMA ||
-        state->config->async == NULL || state->config->async->active == NULL ||
-        state->config->async->draining)
+        state->config->async == NULL || state->config->async->active == NULL)
         return;
-    if ((NX_SDIO_READ(DMA2_Stream3->CR) &
+    nx_stm32_sdio_async_state_t* execution = state->config->async;
+    if (!execution->draining &&
+        (NX_SDIO_READ(DMA2_Stream3->CR) &
          (DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE)) == 0U &&
         (NX_SDIO_READ(DMA2_Stream3->FCR) & DMA_SxFCR_FEIE) == 0U)
         return;
-    nx_stm32_sdio_async_state_t* execution = state->config->async;
     uint32_t flags = NX_SDIO_READ(DMA2->LISR) & NX_SDIO_DMA_FLAGS;
     if ((flags & NX_SDIO_DMA_ERRORS) != 0U)
         execution->flags |= SDIO_STA_RXOVERR;
-    if ((flags & (UINT32_C(1) << 27U)) != 0U &&
-        NX_SDIO_READ(DMA2_Stream3->NDTR) == 0U)
+    if ((flags & NX_SDIO_DMA_TC) != 0U)
         execution->dma_complete = true;
     NX_SDIO_WRITE(DMA2->LIFCR, flags);
+    nx_arch_dsb();
+    if ((NX_SDIO_READ(DMA2->LISR) & flags) != 0U)
+        NVIC_DisableIRQ(DMA2_Stream3_IRQn);
 }
 
 static nx_result_t io_check(nx_stm32_sdio_state_t* state, nx_time_us_t deadline,
@@ -1860,7 +2152,8 @@ static nx_result_t io_submit(void* context, nx_sdio_io_request_t* request) {
         if ((request->unit_bytes & 15U) != 0U)
             return NX_ERROR_UNSUPPORTED;
         if ((NX_SDIO_READ(RCC->AHB1ENR) & RCC_AHB1ENR_DMA2EN) == 0U ||
-            LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) != 0U)
+            LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) != 0U ||
+            !dma_fifo_available())
             return NX_ERROR_BUSY;
         result = nx_dma_buffer_validate(
             config->dma_regions, config->dma_region_count, transfer->data,
@@ -1886,7 +2179,7 @@ static nx_result_t io_submit(void* context, nx_sdio_io_request_t* request) {
     };
     state->state = NX_BLOCK_ACTIVE;
     nx_arch_irq_restore(previous);
-    result = async_start_block(state);
+    result = async_start_transfer(state);
     if (result != NX_SUCCESS)
         async_drain(state, result);
     return NX_SUCCESS;
@@ -2029,12 +2322,13 @@ nx_result_t nx_stm32_sdio_prepare(nx_stm32_sdio_state_t* state,
     if (state->infrastructure || state->config != NULL || receipt->owned ||
         receipt->pin_mask != 0U || receipt->clock_added != 0U ||
         receipt->vectors ||
-        (config->async != NULL && config->async->active != NULL))
+        (config->async != NULL &&
+         (config->async->active != NULL || config->async->dma_started)))
         return NX_ERROR_BUSY;
     const uint32_t gpio_clocks =
         RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIODEN |
         (config->bus_width == 8U ? RCC_AHB1ENR_GPIOBEN : 0U);
-    if (!live_clock() ||
+    if (!live_clock(config->bus_width) ||
         (NX_SDIO_READ(RCC->AHB1ENR) & gpio_clocks) != gpio_clocks)
         return NX_ERROR_STATE;
     uint32_t bank = (uint32_t)SDIO_IRQn / 32U;
@@ -2048,7 +2342,8 @@ nx_result_t nx_stm32_sdio_prepare(nx_stm32_sdio_state_t* state,
         if (NVIC_GetEnableIRQ(DMA2_Stream3_IRQn) != 0U ||
             NVIC_GetPendingIRQ(DMA2_Stream3_IRQn) != 0U ||
             NVIC_GetActive(DMA2_Stream3_IRQn) != 0U ||
-            LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) != 0U)
+            LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) != 0U ||
+            !dma_fifo_available())
             return NX_ERROR_BUSY;
     }
     if ((NX_SDIO_READ(RCC->APB2ENR) & RCC_APB2ENR_SDIOEN) != 0U &&
@@ -2138,6 +2433,8 @@ nx_result_t nx_stm32_sdio_close(nx_stm32_sdio_state_t* state,
         return NX_ERROR_INVALID;
     if (state->state == NX_BLOCK_ACTIVE ||
         (config->async != NULL && config->async->active != NULL))
+        return NX_ERROR_BUSY;
+    if (config->engine == NX_STM32_SDIO_DMA && !dma_fifo_available())
         return NX_ERROR_BUSY;
     if (state->protocol_started) {
         nx_time_us_t deadline;

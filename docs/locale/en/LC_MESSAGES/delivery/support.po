@@ -1,12 +1,9 @@
 # Current canonical messages; semantic review admission is tracked separately.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: a18bdec764ee8cd0ed7054be3a58225bb82673c2ae4c30bc3522128ecab10433\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 3b5416be373079a1c606d474a0de0ae4603692d991b30b9f3edcd685e1a9169d\n"
 
 msgid "当前精确支持范围"
 msgstr "Current exact support scope"
-
-msgid "本页帮助消费者选择当前维护的 F407 型号、Board、后端与外设模式。生产实现限定 STM32F407VET6／STM32F407ZGT6；其他 F4 型号、SDK 宏或公共头的存在不授予相同模式。 下表描述源码维护范围，实际选择仍须通过同一 TOML／typed IR resolver。"
-msgstr "This page helps consumers select maintained F407 parts, Boards, backends and peripheral modes. Production implementations cover STM32F407VET6 / STM32F407ZGT6. Other F4 parts, SDK macros and public headers do not grant the same modes. The table describes source-maintenance scope; actual selections must still pass the same TOML / typed IR resolver."
 
 msgid "型号、Board 与 OS 边界"
 msgstr "Part, Board and OS boundaries"
@@ -275,9 +272,6 @@ msgstr "[Physical storage and maintenance](../design/f407-storage.md)"
 msgid "SDIO／MMC／I/O functions"
 msgstr "SDIO／MMC／I/O functions"
 
-msgid "SD memory／MMC polling、有限 IRQ／DMA；SDIO functions 使用独立 face 的 CMD5／52／53。单卡、3.3 V，SD／SDIO 为 1／4 位，MMC 可显式选择经版本和 SWITCH 检查的 8 位十引脚软件参考。combo 不同时维护 memory portion；当前只接纳 `hse8-pll168`，不提供 HS／DDR／HS200"
-msgstr "SD memory / MMC polling and finite IRQ / DMA; SDIO functions use CMD5 / 52 / 53 through a separate face. One card, 3.3 V; SD / SDIO use 1 / 4-bit buses. MMC may explicitly select an 8-bit ten-pad software reference after version and SWITCH checks. Combo cards do not simultaneously maintain the memory portion. Only `hse8-pll168` is currently admitted; HS / DDR / HS200 are not provided"
-
 msgid "[SDIO 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/sdio_hal/README.md)"
 msgstr "[SDIO contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/sdio_hal/README.md)"
 
@@ -329,9 +323,6 @@ msgstr "[Ethernet frames](../design/ethernet-frames.md), [MAC / MDIO](../design/
 msgid "USB"
 msgstr "USB"
 
-msgid "FS／HS 引擎的 Device／Host、PIO 与 HS AHB DMA；Device 支持 control、bulk、interrupt 和单 transaction ISO packet。Device ISO 使用实际速度的帧窗口，接纳时剩余期限至多 1 秒，并满足受审 FIFO 分区；无 ACK／自动重试或周期调度。内部 PHY 仍为 FS，外部 ULPI 提供 HS／FS 回退；显式 managed roles 与按需 ST 官方 Core 桥接。不维护高带宽 ISO、remote wake、自动 HNP／SRP、Host split 或即时 premature STATUS OUT"
-msgstr "Device/Host on FS/HS engines, PIO and HS AHB DMA. Device supports control, bulk, interrupt and single-transaction ISO packets. Device ISO uses the frame window for the observed speed, requires at most 1 second of remaining deadline on admission, and must fit the reviewed FIFO partition. It provides no ACK, automatic retry or periodic scheduling. The internal PHY remains FS; external ULPI provides HS/FS fallback. Explicit managed roles and optional ST Core bridges are available. High-bandwidth ISO, remote wake, automatic HNP/SRP, Host split and immediate premature STATUS OUT are not maintained"
-
 msgid "[USB 所有权](../design/usb-device.md)"
 msgstr "[USB ownership](../design/usb-device.md)"
 
@@ -358,3 +349,21 @@ msgstr "Source maintenance, grouped model regressions, ARM ELF, Source SDK, whol
 
 msgid "所有 vendor、子模块、锁与许可证保留。未选 SDK 不进入默认生产构建闭包； [器件目录](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/devices.json)只描述官方宏、启动和 IRQ 编译事实。 历史范围见[固定重构前源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)， 旧候选、计数和实板结果不重标为当前源码资格。"
 msgstr "All vendors, submodules, locks and licenses are retained. Unselected SDKs do not enter the default production build closure. The [device catalogue](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/devices.json) describes official macro, startup and IRQ compilation facts only. Historical scope is available in the [fixed pre-refactor source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18); old candidates, counts and physical results are not relabeled as qualification for the current source."
+
+msgid "本页帮助消费者选择当前维护的精确器件、Board、后端与外设模式。当前事实包含 STM32F405ZGT6、F407VET6、F407ZGT6、F415ZGT6 和 F417ZGT6；实际模式仍由 同一 TOML／typed IR resolver 按所选器件、封装和 Board 取交集。新增三料号已有 内部 CRC 软件参考，不继承 F407 专属模式的执行结果，也不授予整系列物理资格。"
+msgstr "This page helps consumers select maintained exact devices, Boards, backends and peripheral modes. Current facts include STM32F405ZGT6, F407VET6, F407ZGT6, F415ZGT6 and F417ZGT6. The same TOML/typed-IR resolver intersects actual modes with the selected device, package and Board. Internal-CRC software references exist for the three added parts; they inherit neither execution results for F407-specific modes nor physical qualification for the entire family."
+
+msgid "F405ZG／F415ZG／F417ZG"
+msgstr "F405ZG / F415ZG / F417ZG"
+
+msgid "LQFP144、1 MiB Flash、128 KiB 主 SRAM、64 KiB CCM；[内部 CRC 软件参考](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/stm32f4_family/README.md)只使用 HSI16，未声明实体 PCB 或外接振荡源"
+msgstr "LQFP144, 1 MiB Flash, 128 KiB main SRAM and 64 KiB CCM; [internal-CRC software references](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/stm32f4_family/README.md) use HSI16 only and declare no physical PCB or external oscillator"
+
+msgid "F405／F407 共用 DS8626 Rev12，F415／F417 共用 DS8597 Rev10；精确 package、 IRQ、DMA 和路线仍逐料号检查。67 项共同控制器事实共享，ETH／DCMI 只由 F407／ F417 选择，CRYP／HASH 仍仅为厂商库存。新增三料号已有独立 ARM CRC 链接与开发 SDK 消费，开发包的 `publishable=false` 不等于最终 clean-source 候选通过；全部外设组合 及任何 PCB／HIL 结论仍须各自取得证据。"
+msgstr "F405/F407 share DS8626 Rev12, and F415/F417 share DS8597 Rev10; exact packages, IRQs, DMA and routes are still checked per part. Sixty-seven common controller facts are shared. Only F407/F417 select ETH/DCMI; CRYP/HASH remain vendor inventory. Independent ARM CRC links and development-SDK consumers exist for the three added parts. A development package with `publishable=false` is not an accepted final clean-source candidate. Every peripheral combination and any PCB/HIL conclusion still require their own evidence."
+
+msgid "SD memory／MMC polling、有限 IRQ／DMA；SDIO functions 使用独立 face 的 CMD5／52／53。单卡、3.3 V，SD／SDIO 为 1／4 位，MMC 可显式选择经版本和 SWITCH 检查的 8 位十引脚软件参考。memory 单块 CMD17／24，多块以一次 CMD18／25、CMD12 和 CMD13 READY 结束；combo 不同时维护 memory portion。静态 ClockPlan 要求精确 PLL48 与经 RM／勘误联合验证的分频；不提供 HS／DDR／HS200"
+msgstr "SD memory/MMC polling and finite IRQ/DMA; SDIO functions use independent CMD5/52/53 faces. One 3.3 V card; SD/SDIO use 1/4-bit buses. MMC can explicitly select an eight-bit, ten-pad software reference after version and SWITCH checks. Memory uses CMD17/24 for a single block and one CMD18/25 followed by CMD12 and CMD13 READY for multiple blocks. Combo cards do not maintain their memory portion concurrently. A static ClockPlan requires exact PLL48 and dividers jointly validated against the reference manual and errata. HS/DDR/HS200 are not provided."
+
+msgid "FS／HS 引擎的 Device／Host、PIO 与 HS AHB DMA；Device 支持 control、bulk、interrupt 和单 transaction ISO packet。Device ISO 使用实际速度的帧窗口，接纳时剩余期限至多 1 秒，并满足受审 FIFO 分区；无 ACK／自动重试或周期调度。内部 PHY 仍为 FS，外部 ULPI 提供 HS／FS 回退；显式 managed roles 与按需 ST 官方 Core 桥接。同 epoch 提前零长 STATUS OUT 与 DATA IN 可并存，线上闭合后仍须双方向内存 join。不维护高带宽 ISO、remote wake、自动 HNP／SRP 或 Host split"
+msgstr "Device/Host on FS/HS engines, PIO and HS AHB DMA. Device supports control, bulk, interrupt and single-transaction ISO packets. Device ISO uses frame windows at the actual speed, an admission deadline at most one second away and the reviewed FIFO partition. It provides no ACK/automatic retry or periodic scheduling. The internal PHY remains FS; external ULPI supports HS/FS fallback. Managed roles and ST Core bridges are explicit and optional. Same-epoch early zero-length STATUS OUT may coexist with DATA IN; wire closure still requires a two-direction memory join. High-bandwidth ISO, remote wake, automatic HNP/SRP and Host split are not maintained."

@@ -226,8 +226,13 @@ static void begin_drain(nx_stm32_uart_state_t* port, nx_result_t terminal) {
     uint32_t drain_bits = (port->registers->CR3 & USART_CR3_SCEN) != 0U
                               ? 24U + ((port->registers->GTPR >> 8U) & 255U)
                               : 28U;
-    port->drain_deadline = nx_deadline_after(
-        nx_time_now_us(), drain_bits * 1000000U / port->baud + 100U);
+    if (nx_deadline_finite_after(nx_time_now_us(),
+                                 drain_bits * 1000000U / port->baud + 100U,
+                                 &port->drain_deadline) != NX_SUCCESS) {
+        /* No finite grace remains; only actual wire idle can release the loan.
+         */
+        port->drain_deadline = 0U;
+    }
     bool started = port->tx_position != 0U || port->active->length == 0U;
     if (!started || ((port->registers->SR & USART_SR_TC) != 0U &&
                      (port->registers->CR1 & USART_CR1_SBK) == 0U)) {

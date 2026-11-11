@@ -11,7 +11,7 @@
 
 #include "nexus/arch/arch.h"
 #include "nexus/core/status.h"
-#include "stm32f407xx.h"
+#include "stm32f4xx.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

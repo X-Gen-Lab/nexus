@@ -952,3 +952,43 @@ TEST_F(UsbHostHal, FailedGateSnapshotCannotReadAnUnpublishedRegisterBank) {
         testing::ExitedWithCode(0), "");
     hold_gate = false;
 }
+
+/** \brief A finite halt grace cannot select an infinite accepted borrow. */
+class UsbHostFiniteDrain : public UsbHostHal,
+                           public testing::WithParamInterface<uint64_t> {};
+TEST_P(UsbHostFiniteDrain, UnrepresentableGraceRetainsTheLoanInQuarantine) {
+    Start();
+    Open(false);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_usb_host_prepare(&request, bytes, sizeof(bytes), 3U, false,
+                                  false, UINT64_MAX - 1U));
+    EXPECT_CALL(hal,
+                Submit(&state.hal, 0U, 0U, EP_TYPE_BULK, 1U, bytes, 3U, 0U))
+        .WillOnce(Invoke([this](HCD_HandleTypeDef* h, uint8_t, uint8_t, uint8_t,
+                                uint8_t, uint8_t* data, uint16_t, uint8_t) {
+            h->hc[0].xfer_buff = data;
+            Channel(0U)->HCCHAR |= USB_OTG_HCCHAR_CHENA;
+            return HAL_OK;
+        }));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_host_submit(&port, 0U, &request));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_native_clock_advance(UINT64_MAX - GetParam() - 100U));
+    EXPECT_CALL(hal, Halt(&state.hal, 0U)).WillRepeatedly(Return(HAL_OK));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_host_cancel(&port, 0U, &request));
+    EXPECT_NE(NX_DEADLINE_NEVER, channels[0].drain_deadline);
+    EXPECT_CALL(hal, Stop(&state.hal)).WillRepeatedly(Return(HAL_OK));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_usb_host_stop(&port));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, channels[0].request);
+    EXPECT_EQ(bytes, state.hal.hc[0].xfer_buff);
+    EXPECT_NE(0U, state.clock_receipt);
+    Channel(0U)->HCCHAR &= ~static_cast<uint32_t>(USB_OTG_HCCHAR_CHENA);
+    EXPECT_CALL(hal, FlushRx(core)).WillOnce(Return(HAL_OK));
+    EXPECT_CALL(hal, FlushTx(core, 0x10U)).WillOnce(Return(HAL_OK));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_host_stop(&port));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(nullptr, channels[0].request);
+}
+INSTANTIATE_TEST_SUITE_P(GraceReachesOrCrossesNever, UsbHostFiniteDrain,
+                         testing::Values(UINT64_C(20), UINT64_C(19)));

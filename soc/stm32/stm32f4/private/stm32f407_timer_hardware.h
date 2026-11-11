@@ -5,7 +5,7 @@
  */
 #ifndef NX_STM32F407_TIMER_HARDWARE_H
 #define NX_STM32F407_TIMER_HARDWARE_H
-#include "stm32f407xx.h"
+#include "stm32f4xx.h"
 #include <stdbool.h>
 
 /** \brief Identify advanced and small timers in the selected APB2 domain. */

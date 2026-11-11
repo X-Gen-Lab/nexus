@@ -722,6 +722,7 @@ REQUIRED_FILES = (
     'soc/stm32/stm32f4/private/stm32f407_i2c_port.h',
     'soc/stm32/stm32f4/private/stm32f407_lowpower.h',
     'soc/stm32/stm32f4/private/stm32f407_packet_cold.h',
+    'soc/stm32/stm32f4/private/stm32f4_ethernet_cold.h',
     'soc/stm32/stm32f4/private/stm32f407_platform_cold.h',
     'soc/stm32/stm32f4/private/stm32f407_provider.h',
     'soc/stm32/stm32f4/private/stm32f407_rtc.h',
@@ -773,6 +774,7 @@ REQUIRED_FILES = (
     'tools/configure/coupled_io.py',
     'tools/configure/cpu.py',
     'tools/configure/dependencies.py',
+    'tools/configure/device_view.py',
     'tools/configure/dma_topology.py',
     'tools/configure/documentation.py',
     'tools/configure/emission.py',
@@ -790,6 +792,7 @@ REQUIRED_FILES = (
     'tools/configure/io_traits.py',
     'tools/configure/ir.py',
     'tools/configure/records.py',
+    'tools/configure/reference_profiles.py',
     'tools/configure/kernel.py',
     'tools/configure/lowpower.py',
     'tools/configure/matrix.py',
@@ -958,7 +961,16 @@ HOST_SUPPORT_FILES = tuple(dict.fromkeys((*HOST_SUPPORT_FILES,
                                           *_HOST_VERIFICATION_FILES)))
 
 # Generator code identity has one authority; packaging consumes its closure.
+F4_FAMILY_VERIFICATION_FILES = (
+    "tests/contracts/crc_assembly/consumer.c",
+    "tests/contracts/stm32f4_family/CMakeLists.txt",
+    *(f"tests/contracts/stm32f4_family/f{chip}zg.toml"
+      for chip in ("405", "407", "415", "417")),
+    *(f"tests/contracts/stm32f4_family/f{chip}zg-board/board.json"
+      for chip in ("405", "407", "415", "417")),
+)
 REQUIRED_FILES = tuple(dict.fromkeys((*REQUIRED_FILES,
+    *F4_FAMILY_VERIFICATION_FILES,
     *(name for mode in ("platform", "runtime")
       for name in configuration_dependencies.source_names(mode, None, sdk=True)))))
 
@@ -1231,6 +1243,8 @@ def dependency_entries(root, dependency):
 
 def selected(name, *, root=SOURCE_ROOT, profile=None):
     profile = source_profile() if profile is None else checked_profile(profile)
+    if name in F4_FAMILY_VERIFICATION_FILES:
+        return True
     if name in HOST_SUPPORT_FILES or name.startswith("tests/"):
         return profile["host_support"] and name in HOST_SUPPORT_FILES
     # Export the checked build-tool closure, not the repository's maintainer

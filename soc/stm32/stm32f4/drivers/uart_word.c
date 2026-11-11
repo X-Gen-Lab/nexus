@@ -196,9 +196,15 @@ static void begin_drain(nx_stm32_uart_word_state_t* state,
                       state->registers->CR1 & (~(uint32_t)USART_CR1_TXEIE));
     state->terminal = terminal;
     (void)nx_request_transition(&state->active->base, NX_REQUEST_DRAINING);
-    state->drain_deadline = nx_deadline_after(
-        nx_time_now_us(), 22000000U / state->baud +
-                              (22000000U % state->baud != 0U ? 1U : 0U) + 100U);
+    if (nx_deadline_finite_after(nx_time_now_us(),
+                                 22000000U / state->baud +
+                                     (22000000U % state->baud != 0U ? 1U : 0U) +
+                                     100U,
+                                 &state->drain_deadline) != NX_SUCCESS) {
+        /* No finite grace remains; only actual wire idle can release the loan.
+         */
+        state->drain_deadline = 0U;
+    }
     if (state->position == 0U || (state->registers->SR & USART_SR_TC) != 0U) {
         state->tc = true;
     } else {

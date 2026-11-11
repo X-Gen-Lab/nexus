@@ -10,7 +10,7 @@ if(NEXUS_EXACT_PART STREQUAL "STM32F407VET6")
 elseif(NEXUS_EXACT_PART STREQUAL "STM32F407ZGT6")
     set(handoff_flash_bytes 1048576)
 else()
-    message(FATAL_ERROR "F407 handoff requires a reviewed exact VE/ZG part")
+    return()
 endif()
 add_library(nexus_stm32f407_handoff STATIC EXCLUDE_FROM_ALL
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/handoff.c")

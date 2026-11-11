@@ -16,8 +16,8 @@ foreach(memory_variant default ccm invalid)
         set(memory_selected 1)
     endif()
     # Reset-only controlled configuration does not establish factory support.
-    file(WRITE "${memory_model}/nexus_config.h"
-        "#define NEXUS_MEMORY_CCM ${memory_selected}\n")
+    file(CONFIGURE OUTPUT "${memory_model}/nexus_config.h"
+        CONTENT "#define NEXUS_MEMORY_CCM ${memory_selected}\n" @ONLY)
     nexus_google_test(${memory_target} SOURCES stm32_memory_boot_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"

@@ -16,7 +16,11 @@ extern "C" {
 #include "stm32f407_dma.h"
 }
 #include "nexus/io/native/model.h"
+#include <cstddef>
 #include <gtest/gtest.h>
+#include <new>
+#include <sys/mman.h>
+#include <unistd.h>
 
 GPIO_TypeDef g_nx_stm32_gpioa_model;
 
@@ -58,6 +62,7 @@ class Stm32UartDma : public testing::Test {
     uint8_t rx[8] = {};
     uint8_t payload[4] = {1U, 2U, 3U, 4U};
     nx_dma_memory_region_t region = {};
+    nx_stm32_uart_dma_resources_t resources = {};
     nx_stm32_uart_dma_state_t state = {};
     nx_uart_port_t port = {&nx_stm32_uart_dma_ops, &state};
     nx_uart_tx_request_t request = {};
@@ -76,10 +81,11 @@ class Stm32UartDma : public testing::Test {
         state.uart.profile = NX_UART_RX_BYTES;
         state.uart.baud = 115200U;
         state.uart.irq = USART1_IRQn;
-        state.resources.dma = &dma;
+        resources.dma = &dma;
+        state.resources = &resources;
         state.transmit.tx = &tx;
-        state.resources.regions = &region;
-        state.resources.region_count = 1U;
+        resources.regions = &region;
+        resources.region_count = 1U;
         state.transmit.stream = 7U;
         state.transmit.channel = 4U;
         state.transmit.dma_irq = DMA2_Stream7_IRQn;
@@ -89,6 +95,81 @@ class Stm32UartDma : public testing::Test {
                   NX_SUCCESS);
     }
 };
+
+TEST_F(Stm32UartDma, StoppedOwnerRejectsBeforeReadingRetiredConfiguration) {
+    ASSERT_EXIT(
+        {
+            uart.SR = USART_SR_TC;
+            if (nx_uart_port_stop(&port) != NX_SUCCESS)
+                _exit(2);
+            const long page = sysconf(_SC_PAGESIZE);
+            if (page <= 0)
+                _exit(3);
+            void* mapping =
+                mmap(nullptr, static_cast<size_t>(page), PROT_READ | PROT_WRITE,
+                     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+            if (mapping == MAP_FAILED)
+                _exit(4);
+            auto* retained = new (mapping) nx_stm32_uart_dma_resources_t{};
+            retained->dma = &dma;
+            retained->regions = &region;
+            retained->region_count = 1U;
+            state.resources = retained;
+            if (nx_stm32_uart_dma_initialize(&state, 84000000U) != NX_SUCCESS)
+                _exit(5);
+            uart.SR = USART_SR_TC;
+            if (nx_uart_port_stop(&port) != NX_SUCCESS)
+                _exit(6);
+            nx_uart_tx_request_t next{};
+            nx_request_initialize(&next.base);
+            if (nx_uart_tx_prepare(&next, payload, 2U, 1000U) != NX_SUCCESS)
+                _exit(7);
+            if (mprotect(mapping, static_cast<size_t>(page), PROT_NONE) != 0)
+                _exit(8);
+            if (nx_stm32_uart_dma_tx_validate(&state, &next) != NX_ERROR_STATE)
+                _exit(9);
+            const nx_result_t result = nx_uart_port_stop(&port);
+            munmap(mapping, static_cast<size_t>(page));
+            _exit(result == NX_SUCCESS ? 0 : 10);
+        },
+        testing::ExitedWithCode(0), "");
+}
+
+TEST_F(Stm32UartDma, QueuedRequestCannotOverwriteRetainedDmaFacts) {
+    struct Pending {
+        DMA_TypeDef* dma;
+        const nx_dma_memory_region_t* regions;
+        nx_uart_tx_request_t request;
+    } pending{};
+    static_assert(offsetof(Pending, request) ==
+                  offsetof(nx_stm32_uart_dma_resources_t, region_count));
+    pending.dma = &dma;
+    pending.regions = &region;
+    nx_request_initialize(&pending.request.base);
+    ASSERT_EQ(NX_SUCCESS, nx_uart_tx_prepare(&pending.request, payload,
+                                             sizeof(payload), 1000U));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_request_admit(&pending.request.base, NX_REQUEST_QUEUED));
+    uart.SR = USART_SR_TC;
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_stop(&port));
+    state.resources =
+        reinterpret_cast<const nx_stm32_uart_dma_resources_t*>(&pending);
+    ASSERT_EQ(1U, state.resources->region_count);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_dma_initialize(&state, 84000000U));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_uart_port_start_admitted(&port, &pending.request));
+    EXPECT_EQ(NX_REQUEST_QUEUED, nx_request_state(&pending.request.base));
+    EXPECT_EQ(nullptr, state.uart.active);
+    EXPECT_EQ(0U, tx.CR & DMA_SxCR_EN);
+    if (state.uart.active != nullptr) {
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_cancel(&port, &pending.request));
+        uart.SR |= USART_SR_TC;
+        nx_uart_port_service(&port);
+        ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&pending.request.base));
+    } else {
+        nx_request_settle(&pending.request.base, NX_ERROR_INVALID, 0U);
+    }
+}
 
 TEST_F(Stm32UartDma, DmaTransferCompleteCannotSettleUntilUartTc) {
     ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
@@ -190,6 +271,37 @@ TEST_F(Stm32UartDma, DmaCompletionBoundsWireDrainWithoutRequestDeadline) {
     EXPECT_EQ(request.base.result, NX_ERROR_IO);
     EXPECT_EQ(request.base.transferred, 0U);
 }
+
+/** \brief DMA completion and cancellation each own a finite wire-drain budget.
+ */
+class Stm32UartDrainBoundary : public Stm32UartDma,
+                               public testing::WithParamInterface<bool> {};
+
+TEST_P(Stm32UartDrainBoundary, ExhaustedBudgetRetainsTheInflightWireLoan) {
+    request.base.deadline = NX_DEADLINE_NEVER;
+    ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(UINT64_MAX - 101U), NX_SUCCESS);
+    if (GetParam()) {
+        tx.NDTR = 0U;
+        const_cast<uint32_t&>(dma.HISR) = 1U << 27U;
+        nx_stm32_uart_dma_irq(&state);
+    } else {
+        tx.NDTR = 3U;
+        ASSERT_EQ(nx_uart_port_cancel(&port, &request), NX_SUCCESS);
+    }
+    nx_uart_port_service(&port);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.uart.active, &request);
+    uart.SR |= USART_SR_TC;
+    nx_stm32_uart_dma_uart_irq(&state);
+    nx_uart_port_service(&port);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result,
+              GetParam() ? NX_ERROR_IO : NX_ERROR_CANCELLED);
+    EXPECT_EQ(state.uart.active, nullptr);
+}
+
+INSTANTIATE_TEST_SUITE_P(DrainOrigins, Stm32UartDrainBoundary, testing::Bool());
 
 TEST_F(Stm32UartDma, LateServiceWithWireAndEngineProofPreservesSuccess) {
     request.base.deadline = NX_DEADLINE_NEVER;

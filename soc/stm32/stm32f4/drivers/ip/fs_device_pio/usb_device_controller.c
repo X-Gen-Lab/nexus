@@ -709,8 +709,12 @@ static void begin_drain(nx_usb_endpoint_t* ep, nx_result_t reason) {
     nx_request_state_t state = nx_request_state(&ep->request->base);
     if (state == NX_REQUEST_ACTIVE) {
         ep->terminal = reason;
-        ep->drain_deadline = nx_deadline_after(
-            nx_time_now_us(), ep->controller->drain_timeout_us);
+        if (nx_deadline_finite_after(nx_time_now_us(),
+                                     ep->controller->drain_timeout_us,
+                                     &ep->drain_deadline) != NX_SUCCESS) {
+            /* An exhausted grace never selects an infinite accepted borrow. */
+            ep->drain_deadline = 0U;
+        }
         (void)nx_request_transition(&ep->request->base, NX_REQUEST_DRAINING);
     } else if (reason == NX_ERROR_STATE) {
         ep->terminal = reason;
@@ -957,10 +961,9 @@ static bool clear_halts(nx_usb_controller_t* c, bool reset) {
     }
     return true;
 }
-/** \brief Advance EP0 only after real packet completion in the current epoch.
- */
-static void control_complete(nx_usb_endpoint_t* ep, nx_result_t result,
-                             size_t count) {
+/** \brief Advance the wire transaction; each packet retains its own loan. */
+static void control_wire_complete(nx_usb_endpoint_t* ep, nx_result_t result,
+                                  size_t count) {
     nx_usb_controller_t* c = ep->controller;
     nx_usb_request_t* r = ep->request;
     if (ep->number != 0U || result != NX_SUCCESS ||
@@ -985,13 +988,22 @@ static void control_complete(nx_usb_endpoint_t* ep, nx_result_t result,
         }
         c->address_pending = false;
         c->snapshot.control_pending = false;
+        if (!ep->in) {
+            /* STATUS OUT may precede the last DATA IN ACK. Close admission
+             * now, but retain that independent loan through its real drain. */
+            nx_usb_endpoint_t* input = endpoint(c, 0U, true);
+            if (input != NULL && input->request != NULL &&
+                input->request->control_epoch == c->snapshot.epoch) {
+                begin_drain(input, NX_ERROR_CANCELLED);
+            }
+        }
     }
 }
 /** \brief References detach before SETTLED, which is the final request access.
  */
 static void finish(nx_usb_endpoint_t* ep, nx_result_t result, size_t count) {
     nx_usb_request_t* request = ep->request;
-    control_complete(ep, result, count);
+    control_wire_complete(ep, result, count);
     ep->request = NULL;
     ep->disable_requested = false;
     nx_request_settle(&request->base, result, count);
@@ -1023,6 +1035,17 @@ static void progress(nx_usb_controller_t* c) {
             begin_drain(ep, NX_ERROR_IO);
             state = NX_REQUEST_DRAINING;
         }
+        if (!ep->in && ep->number == 0U && state == NX_REQUEST_ACTIVE &&
+            ep->request->stage == NX_USB_STATUS && (flags & 1U) != 0U &&
+            (NX_USB_READ(base, offset) & ENABLE) == 0U &&
+            (c->dma ? (NX_USB_READ(base, offset + 16U) & 0x7FFFFU) ==
+                          effective_mps(ep)
+                    : ep->rx_seen && ep->received == 0U)) {
+            /* XFRC closes the wire transaction even if a peer keeps AHB busy
+             * or this DMA-address withdrawal is refused. Neither fact may
+             * release the independent packet storage before its full join. */
+            control_wire_complete(ep, NX_SUCCESS, 0U);
+        }
         if (c->dma && !ep->in && state == NX_REQUEST_ACTIVE &&
             (flags & 1U) != 0U && !ep->rx_seen && dma_detached(ep)) {
             size_t residual = NX_USB_READ(base, offset + 16U) & 0x7FFFFU;
@@ -1044,12 +1067,14 @@ static void progress(nx_usb_controller_t* c) {
                 }
             }
         }
-        uint32_t hints = flags & (ep->in ? 0x50U : 0x48U);
+        /* OTEPDIS is a token observed while disabled, not payload overflow
+         * (RM0090 DOEPINT; the locked PCD also only acknowledges this hint). */
+        uint32_t hints = flags & (ep->in ? 0x50U : 0x58U);
         if (hints != 0U) {
             NX_USB_WRITE(base, offset + 8U, hints);
         }
-        if (state == NX_REQUEST_ACTIVE && (flags & (ep->in ? 8U : 16U)) != 0U) {
-            begin_drain(ep, ep->in ? NX_ERROR_IO : NX_ERROR_OVERFLOW);
+        if (state == NX_REQUEST_ACTIVE && ep->in && (flags & 8U) != 0U) {
+            begin_drain(ep, NX_ERROR_IO);
             state = NX_REQUEST_DRAINING;
         }
         bool complete =
@@ -1245,11 +1270,14 @@ static bool request_valid(nx_usb_endpoint_t* ep, nx_usb_request_t* r) {
     if (ep->number != 0U) {
         return r->control_epoch == 0U && r->stage == NX_USB_DATA;
     }
+    bool data_in = (c->snapshot.setup.request_type & 0x80U) != 0U;
+    bool early_status = !ep->in && data_in && r->stage == NX_USB_STATUS &&
+                        c->control_stage == NX_USB_DATA;
     if (!c->snapshot.control_pending || c->setup_pending || c->reset_pending ||
-        r->control_epoch != c->snapshot.epoch || r->stage != c->control_stage) {
+        r->control_epoch != c->snapshot.epoch ||
+        (r->stage != c->control_stage && !early_status)) {
         return false;
     }
-    bool data_in = (c->snapshot.setup.request_type & 0x80U) != 0U;
     bool wanted_in = r->stage == NX_USB_DATA
                          ? data_in
                          : (c->snapshot.setup.length == 0U || !data_in);

@@ -157,8 +157,12 @@ static void begin_drain(nx_stm32_usb_host_t* state, uint8_t number,
     if (channel->request != NULL &&
         nx_request_state(&channel->request->base) == NX_REQUEST_ACTIVE) {
         channel->terminal = reason;
-        channel->drain_deadline = nx_deadline_after(
-            nx_time_now_us(), state->config->drain_timeout_us);
+        if (nx_deadline_finite_after(nx_time_now_us(),
+                                     state->config->drain_timeout_us,
+                                     &channel->drain_deadline) != NX_SUCCESS) {
+            /* Only real late withdrawal may release an exhausted borrow. */
+            channel->drain_deadline = 0U;
+        }
         (void)nx_request_transition(&channel->request->base,
                                     NX_REQUEST_DRAINING);
     }

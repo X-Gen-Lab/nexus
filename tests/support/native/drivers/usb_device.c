@@ -128,6 +128,11 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
         hw->config_read_gap = 0U;
     }
     ++hw->mmio_writes;
+    if (offset == hw->refused_dma_address_offset && value == 0U &&
+        ((offset >= 0x900U && offset < 0x9C0U) ||
+         (offset >= 0xB00U && offset < 0xBC0U)) &&
+        offset % 32U == 20U)
+        return;
     /* FIFO writes consume model space; no physical USB transfer occurs here. */
     if (offset >= 0x1000U) {
         unsigned ep = offset / 0x1000U - 1U;

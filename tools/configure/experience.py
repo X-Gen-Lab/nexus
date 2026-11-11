@@ -293,17 +293,19 @@ def board_catalogue(gate, root, *, board=None, board_package=None,
     if context.external and "source_lock" in soc:
         gate.fail("External SDK sources must be bound by package inputs; "
                   "Nexus source_lock belongs to internal integrations")
+    catalog = None
     if context.descriptor.device_catalog is not None:
         catalog = read(gate.contained_file(
             soc_dir, context.descriptor.device_catalog))
-        soc, _ = gate.catalog_soc_facts(soc, part, catalog)
-    gate.validate_soc(soc, part, provider)
+    selected = gate.resolve_device_facts(soc, part, provider, catalog=catalog)
+    soc, device = selected.soc, selected.device
     if soc["id"] != family:
         gate.fail("Board SoC family differs from the package identity")
     routes_doc = gate.obj(read(gate.contained_file(soc_dir, "routes.json")),
                           {"schema_version", "routes"}, (), "routes")
     gate.integer(routes_doc["schema_version"], 1, 1, "routes schema")
-    routes = gate.resolve_routes(routes_doc, soc, part, provider)
+    routes = gate.resolve_routes(routes_doc, soc, part, provider,
+                                 controller_profiles=selected.controller_profiles)
     bindings = gate.resolve_bindings(board_data, routes, part,
                                      hardware_conditions)
     reservations = gate.reserved_claims(soc, board_data, provider)
@@ -317,11 +319,11 @@ def board_catalogue(gate, root, *, board=None, board_package=None,
     gate.bind_input_identities(inputs, root, snapshots, None, context)
     return {**({"hardware": hardware_conditions.to_dict()}
                 if hardware_conditions is not None else {}),
-            "_provider_context": context, "cpu": soc["cpu"],
+            "_provider_context": context, "cpu": device.cpu,
             "board": board_data["id"], "part": part, "soc_family": family,
             "board_bindings": bindings, "routes": routes,
             "claims": reservations,
-            "controller_facts": soc["controllers"],
+            "controller_facts": thaw(soc["controllers"]),
             "controllers": [], "limitations": board_data["unknowns"],
             "physical_pcb_revision": board_data["physical_pcb_revision"],
             "board_clocks": board_data["clocks"],
@@ -349,7 +351,21 @@ def binding_facts(gate, result, root):
     if expected is None or actual != expected:
         gate.fail("Binding query SoC facts differ from the resolved input: "
                   + str(path))
-    return {**data, "controller_facts": facts["controllers"],
+    catalog = None
+    if selected.device_catalog is not None:
+        catalog_path = path.parent / selected.device_catalog
+        catalog_relative = str(Path(relative).parent / selected.device_catalog)
+        catalog_expected = next((item["sha256"] for item in data["inputs"]
+                                 if item["path"] == catalog_relative), None)
+        catalog = gate.load(catalog_path, snapshot)
+        if (catalog_expected is None or
+                hashlib.sha256(snapshot[catalog_path]).hexdigest() != catalog_expected):
+            gate.fail("Binding query device catalog differs from the resolved input: "
+                      + str(catalog_path))
+    provider = context.provider if context is not None else maintained(data["soc_family"])
+    selected = gate.resolve_device_facts(facts, data["part"], provider,
+                                        catalog=catalog)
+    return {**data, "controller_facts": thaw(selected.soc["controllers"]),
             "_provider_context": context}
 
 

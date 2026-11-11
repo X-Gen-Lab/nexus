@@ -1087,3 +1087,31 @@ TEST_F(AdcColdFactory, FailedTimerGateAcquireKeepsItsExactCleanupReceipt) {
     refuse_probe_enable = 0U;
 }
 #endif
+
+#include <unistd.h>
+#if defined(NX_ADC_INTERNAL_CONTRACT)
+TEST_F(AdcColdFactory, InjectedWarmupExhaustionCannotWaitOnAnInfiniteSentinel) {
+    EXPECT_EXIT(
+        ([&] {
+            (void)alarm(2U);
+            const uint8_t channels[]{0U};
+            const uint8_t timing[]{7U};
+            const nx_stm32_adc_config_t config{channels, timing, 1U,
+                                               3300U,    0U,     ADC1};
+            nx_stm32_adc_state_t state{};
+            if (nx_stm32_adc_injected_prepare(&state, &config) != NX_SUCCESS)
+                _exit(2);
+            const nx_adc_port_t face{&nx_stm32_adc_injected_ops, &state};
+            now = NX_DEADLINE_NEVER - 4U;
+            uint16_t output = 0xBEEFU;
+            size_t count{};
+            const nx_result_t result = nx_adc_port_sample(
+                &face, &output, 1U, NX_DEADLINE_NEVER - 1U, &count);
+            const bool correct = result == NX_ERROR_EXHAUSTED && count == 0U &&
+                                 output == 0xBEEFU && !state.active &&
+                                 ADC1->CR2 == 0U && injected_launches == 0U;
+            _exit(correct ? 0 : 1);
+        }()),
+        testing::ExitedWithCode(0), "");
+}
+#endif

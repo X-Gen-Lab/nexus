@@ -117,6 +117,59 @@ TEST_F(UartRs485, RejectsInvalidTransportBeforeDirectionOrBorrow) {
     EXPECT_FALSE(de);
 }
 
+TEST_F(UartRs485, UnrepresentableSetupRejectsBeforeDirectionOrBorrow) {
+    ASSERT_EQ(NX_SUCCESS, nx_uart_tx_prepare(&request, payload, sizeof(payload),
+                                             NX_DEADLINE_NEVER));
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_configure(true, UINT64_MAX - 5U));
+    EXPECT_CALL(hardware, Write(testing::_, testing::_)).Times(0);
+    EXPECT_CALL(hardware, Start(testing::_)).Times(0);
+    EXPECT_EQ(NX_ERROR_EXHAUSTED, nx_uart_port_submit(&port, &request));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+    EXPECT_EQ(nullptr, state.active);
+    EXPECT_FALSE(de);
+}
+
+TEST_F(UartRs485, ExhaustionAfterDirectionIsAcceptedAndActuallyWithdrawn) {
+    ASSERT_EQ(NX_SUCCESS, nx_uart_tx_prepare(&request, payload, sizeof(payload),
+                                             NX_DEADLINE_NEVER));
+    EXPECT_CALL(hardware, Write(8U, 0U))
+        .WillOnce(testing::Invoke([this](uint32_t, uint32_t) {
+            de = true;
+            EXPECT_EQ(NX_SUCCESS,
+                      nx_native_clock_configure(true, UINT64_MAX - 5U));
+            return NX_SUCCESS;
+        }));
+    EXPECT_CALL(hardware, Write(0U, 8U)).Times(1);
+    EXPECT_CALL(hardware, Start(testing::_)).Times(0);
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+    EXPECT_TRUE(de);
+    nx_uart_port_service(&port);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_EXHAUSTED, request.base.result);
+    EXPECT_EQ(nullptr, state.active);
+    EXPECT_FALSE(de);
+}
+
+TEST_F(UartRs485, UnprovableMinimumHoldKeepsDirectionAndOuterLoanQuarantined) {
+    ASSERT_EQ(NX_SUCCESS, nx_uart_tx_prepare(&request, payload, sizeof(payload),
+                                             NX_DEADLINE_NEVER));
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+    advance(10U);
+    ASSERT_NE(nullptr, executing);
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_configure(true, UINT64_MAX - 5U));
+    EXPECT_CALL(hardware, Write(0U, 8U)).Times(0);
+    EXPECT_CALL(hardware, Stop()).Times(0);
+    complete(NX_SUCCESS, sizeof(payload));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, state.active);
+    EXPECT_EQ(nullptr, state.inner.data);
+    EXPECT_TRUE(de);
+    nx_uart_port_service(&port);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_stop(&port));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_TRUE(de);
+}
+
 TEST_F(UartRs485, SetupThenTrueTransportSettlementThenMinimumHold) {
     ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
     EXPECT_TRUE(de);

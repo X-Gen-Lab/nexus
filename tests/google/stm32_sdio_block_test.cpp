@@ -24,6 +24,20 @@ uint32_t SystemCoreClock = 168000000U;
 #include <vector>
 
 namespace {
+bool expire_data_command_on_enable;
+nx_time_us_t data_command_expiration;
+bool lose_write_command_response;
+bool precise_clock;
+bool addressed_payload;
+uint64_t physical_ns;
+bool multi_card_active;
+unsigned multi_crc_blocks;
+struct ControlObservation {
+    uintptr_t address;
+    uint32_t value;
+    uint64_t nanoseconds;
+};
+std::vector<ControlObservation> control_trace;
 bool privileged;
 nx_time_us_t now;
 unsigned time_calls;
@@ -68,6 +82,8 @@ bool dataend_early;
 unsigned terminal_tail;
 int fifo_delta;
 bool missing_crc_end;
+bool terminal_crc_emitted;
+bool last_packet_crc_error;
 bool card_read_only;
 unsigned card_recovery_state;
 unsigned fail_command;
@@ -83,6 +99,48 @@ unsigned fifo_limit;
 bool fifo_reading;
 bool fifo_writing;
 std::vector<uint32_t> written_words;
+bool dma_hold_rx_flush;
+bool dma_rx_word_pending;
+bool dma_reprogrammed_during_flush;
+uintptr_t dma_memory_cursor;
+uint32_t dma_pending_word;
+unsigned dma_prefetched_words;
+std::array<uint32_t, 4> dma_tx_fifo{};
+unsigned dma_tx_fifo_words;
+
+/** \brief External memory-port reads obey the selected DMA flow controller. */
+void PrefetchTxDmaWords() {
+    const uint32_t remaining = DMA2_Stream3->NDTR;
+    const auto count = (DMA2_Stream3->CR & DMA_SxCR_PFCTRL) != 0U
+                           ? 4U
+                           : std::min<uint32_t>(4U, remaining);
+    auto* words = reinterpret_cast<volatile const uint32_t*>(dma_memory_cursor);
+    for (unsigned word = 0U; word < count; ++word) {
+        dma_tx_fifo[word] = words[word];
+        ++dma_prefetched_words;
+    }
+    dma_memory_cursor += count * sizeof(uint32_t);
+    dma_tx_fifo_words = count;
+    DMA2_Stream3->FCR =
+        (DMA2_Stream3->FCR & ~static_cast<uint32_t>(DMA_SxFCR_FS)) |
+        DMA_SxFCR_FS_2 | (count == 0U ? 0U : DMA_SxFCR_FS_0);
+}
+
+/** \brief The external memory bus completes a previously held RX FIFO write. */
+#ifndef NX_SDIO_LOW_CLOCK_ONLY
+void CompleteRxDmaFlush() {
+    if (dma_rx_word_pending) {
+        *reinterpret_cast<volatile uint32_t*>(dma_memory_cursor) =
+            dma_pending_word;
+        dma_rx_word_pending = false;
+    }
+    dma_hold_rx_flush = false;
+    DMA2_Stream3->FCR =
+        (DMA2_Stream3->FCR & ~static_cast<uint32_t>(DMA_SxFCR_FS)) |
+        DMA_SxFCR_FS_2;
+    DMA2->LISR |= UINT32_C(1) << 27U;
+}
+#endif
 
 uint32_t WordAt(const uint8_t* data, size_t index) {
     uint32_t word;
@@ -101,6 +159,7 @@ void SetResponse(const std::array<uint8_t, 16>& bytes) {
 
 void DataStarted(unsigned count, bool reading) {
     fifo_words = 0U;
+    terminal_crc_emitted = false;
     fifo_limit = count;
     fifo_reading = reading;
     fifo_writing = !reading;
@@ -223,7 +282,18 @@ void CardCommand(uint32_t cmd) {
         if (card_mmc && mmc_switch_write != 0U && mmc_status_switch_error)
             *const_cast<volatile uint32_t*>(&SDIO->RESP1) |= 1U << 7U;
     } else if (cmd == 12U) {
+        multi_card_active = false;
         card_recovery_state = 0U;
+    } else if (cmd == 18U || cmd == 25U) {
+        multi_card_active = true;
+        multi_crc_blocks = 0U;
+        card_recovery_state = cmd == 18U ? 5U : 6U;
+        if (cmd == 18U) {
+            ++read_number;
+            DataStarted(SDIO->DLEN / 4U, true);
+        } else if ((SDIO->DCTRL & SDIO_DCTRL_DTEN) != 0U) {
+            DataStarted(SDIO->DLEN / 4U, false);
+        }
     } else if (cmd == 17U) {
         ++read_number;
         DataStarted(static_cast<unsigned>(128 + fifo_delta), true);
@@ -232,6 +302,13 @@ void CardCommand(uint32_t cmd) {
             DataStarted(128U, false);
     } else if (cmd == 51U) {
         DataStarted(2U, true);
+    }
+    if (lose_write_command_response && (cmd == 24U || cmd == 25U)) {
+        lose_write_command_response = false;
+        card_recovery_state = 6U;
+        *const_cast<volatile uint32_t*>(&SDIO->STA) &=
+            ~static_cast<uint32_t>(SDIO_STA_CMDREND);
+        *const_cast<volatile uint32_t*>(&SDIO->STA) |= SDIO_STA_CTIMEOUT;
     }
 }
 
@@ -256,6 +333,15 @@ class SdioBlock : public testing::Test {
         g_f4_model_isr = false;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
+        expire_data_command_on_enable = false;
+        data_command_expiration = 0U;
+        lose_write_command_response = false;
+        precise_clock = false;
+        addressed_payload = false;
+        physical_ns = 0U;
+        multi_card_active = false;
+        multi_crc_blocks = 0U;
+        control_trace.clear();
         privileged = true;
         now = 1000U;
         time_calls = writes = 0U;
@@ -285,6 +371,7 @@ class SdioBlock : public testing::Test {
         silence_commands = r3_crc = bad_csd = write_busy = host_stuck = false;
         card_four_bit = true;
         dataend_early = missing_crc_end = card_read_only = false;
+        terminal_crc_emitted = last_packet_crc_error = false;
         terminal_tail = 0U;
         fifo_delta = 0;
         card_recovery_state = fail_command = 0U;
@@ -294,6 +381,14 @@ class SdioBlock : public testing::Test {
         csd_size = 1023U;
         read_number = fail_read_number = fifo_words = fifo_limit = 0U;
         fifo_reading = fifo_writing = false;
+        dma_hold_rx_flush = dma_rx_word_pending = false;
+        dma_reprogrammed_during_flush = false;
+        dma_memory_cursor = 0U;
+        dma_pending_word = 0U;
+        dma_prefetched_words = 0U;
+        dma_tx_fifo_words = 0U;
+        dma_tx_fifo.fill(0U);
+        DMA2_Stream3->FCR = DMA_SxFCR_FS_2;
         RCC->CR = RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
         RCC->CFGR = RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL | RCC_CFGR_PPRE1_DIV4 |
                     RCC_CFGR_PPRE2_DIV2;
@@ -311,6 +406,12 @@ class SdioBlock : public testing::Test {
         config.poll_budget = 50000U;
         config.stop_timeout_us = 10000U;
         config.bus_width = 4U;
+#ifdef NX_SDIO_LOW_CLOCK_ONLY
+        RCC->PLLCFGR = NEXUS_CLOCK_PLLCFGR;
+        RCC->CFGR = NEXUS_CLOCK_CFGR | NEXUS_CLOCK_SW | (NEXUS_CLOCK_SW << 2U);
+        SystemCoreClock = NEXUS_CORE_HZ;
+        config.bus_width = 1U;
+#endif
     }
     void TearDown() override {
         privileged = true;
@@ -345,6 +446,7 @@ class SdioBlock : public testing::Test {
 };
 } /* namespace */
 
+#ifndef NX_SDIO_LOW_CLOCK_ONLY
 TEST_F(SdioBlock, GeometryUnavailableUntilExplicitCardActivation) {
     EXPECT_EQ(nullptr, nx_block_port_geometry(&face));
     EXPECT_EQ(NX_BLOCK_UNAVAILABLE, nx_block_port_state(&face));
@@ -859,6 +961,7 @@ TEST_F(SdioBlock, RefusedGateWithdrawalRetainsAuthorityForObservedRetry) {
     EXPECT_EQ(NX_SUCCESS, nx_stm32_sdio_close(&owner, &config, &receipt));
     EXPECT_EQ(RCC_APB2ENR_USART6EN, RCC->APB2ENR);
 }
+#endif
 
 /** \brief Real finite IRQ engine; only the external FIFO/CPU are modeled. */
 class SdioAsync : public SdioBlock {
@@ -891,6 +994,7 @@ class SdioAsync : public SdioBlock {
     }
 };
 
+#ifndef NX_SDIO_LOW_CLOCK_ONLY
 TEST_F(SdioAsync, ExactIrqLeaseIsAcquiredAndRestored) {
     NVIC_SetPriority(SDIO_IRQn, 11U);
     Prepare();
@@ -1041,6 +1145,7 @@ TEST_F(SdioAsync, RequestAndBufferCannotOverlap) {
     EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
     EXPECT_EQ(nullptr, execution.active);
 }
+#endif
 
 /** \brief A model DMA master can reach only an explicitly mapped SRAM span. */
 class SdioDma : public SdioAsync {
@@ -1073,17 +1178,41 @@ class SdioDma : public SdioAsync {
         g_f4_model_isr = false;
     }
     void FinishDma() {
-        DMA2_Stream3->NDTR = 0U;
+        DMA2_Stream3->NDTR = (DMA2_Stream3->CR & DMA_SxCR_PFCTRL) != 0U
+                                 ? UINT32_C(0xffff) - SDIO->DLEN / 4U
+                                 : 0U;
+        DMA2_Stream3->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+        DMA2_Stream3->FCR =
+            (DMA2_Stream3->FCR & ~static_cast<uint32_t>(DMA_SxFCR_FS)) |
+            DMA_SxFCR_FS_2;
+        DMA2->LISR |= UINT32_C(1) << 27U;
+        DmaIrq();
+    }
+    void TransferBoundedTx(uint32_t maximum_words = UINT32_MAX) {
+        uint32_t transferred = 0U;
+        while (DMA2_Stream3->NDTR != 0U && transferred < maximum_words) {
+            ASSERT_EQ(4U, dma_tx_fifo_words);
+            for (unsigned word = 0U; word < dma_tx_fifo_words; ++word) {
+                ASSERT_EQ(HAL_OK,
+                          nx_sdio_model_fifo_write(SDIO, &dma_tx_fifo[word]));
+                --DMA2_Stream3->NDTR;
+                ++transferred;
+            }
+            PrefetchTxDmaWords();
+        }
+        if (DMA2_Stream3->NDTR != 0U)
+            return;
         DMA2_Stream3->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
         DMA2->LISR |= UINT32_C(1) << 27U;
         DmaIrq();
     }
 };
 
+#ifndef NX_SDIO_LOW_CLOCK_ONLY
 TEST_F(SdioDma, DmaCompletionWaitsForSdioCrcAndCounter) {
     Activate();
     ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
-    EXPECT_EQ(128U, DMA2_Stream3->NDTR);
+    EXPECT_EQ(UINT32_C(0xffff), DMA2_Stream3->NDTR);
     EXPECT_EQ(UINT32_C(0x20000000), DMA2_Stream3->M0AR);
     EXPECT_NE(0U, SDIO->DCTRL & SDIO_DCTRL_DMAEN);
     FinishDma();
@@ -1133,11 +1262,160 @@ TEST_F(SdioDma, DmaTransferErrorCannotBeHiddenBySdioDataEnd) {
     Activate();
     ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
     DMA2->LISR |= UINT32_C(1) << 25U;
+    DMA2_Stream3->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+    DmaIrq();
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(UINT32_C(0x20000000), DMA2_Stream3->M0AR);
+    /* TE does not promise a later TC. This separate hardware flush event
+     * exercises only the case where an actual terminal receipt does arrive. */
+    CompleteRxDmaFlush();
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_IO, request.base.result);
+    EXPECT_EQ(0U, request.base.transferred);
+}
+
+TEST_F(SdioDma, ForcedTerminalCountCannotValidateAnIncompletePayload) {
+    Activate();
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    DMA2_Stream3->NDTR = UINT32_C(0xffff) - 16U;
+    nx_sdio_model_write(&DMA2_Stream3->CR,
+                        DMA2_Stream3->CR & ~static_cast<uint32_t>(DMA_SxCR_EN));
+    ASSERT_NE(0U, DMA2->LISR & (UINT32_C(1) << 27U));
     DmaIrq();
     nx_block_async_service(&async_face);
     EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
     EXPECT_EQ(NX_ERROR_IO, request.base.result);
     EXPECT_EQ(0U, request.base.transferred);
+    EXPECT_EQ(nullptr, execution.active);
+}
+
+TEST_F(SdioDma, ReceiveFifoWritesRemainBorrowedAfterTheEnableBitClears) {
+    Activate();
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    dma_hold_rx_flush = dma_rx_word_pending = true;
+    dma_pending_word = UINT32_C(0xcafebabe);
+    DMA2_Stream3->NDTR = UINT32_C(0xfffe);
+    DMA2_Stream3->FCR =
+        (DMA2_Stream3->FCR & ~static_cast<uint32_t>(DMA_SxFCR_FS)) |
+        DMA_SxFCR_FS_0;
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(0U, DMA2_Stream3->CR & DMA_SxCR_EN);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(UINT32_C(0x20000000), DMA2_Stream3->M0AR);
+    EXPECT_EQ(UINT32_C(0xfffe), DMA2_Stream3->NDTR);
+    EXPECT_FALSE(dma_reprogrammed_during_flush);
+    EXPECT_EQ(0U, *static_cast<uint32_t*>(sram));
+    CompleteRxDmaFlush();
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(dma_pending_word, *static_cast<uint32_t*>(sram));
+    EXPECT_EQ(nullptr, execution.active);
+}
+
+TEST_F(SdioDma, TransmitCopiesRetainColdResponsibilityWithoutBorrowingRam) {
+    nx_block_request_t next{};
+    Activate();
+    request.write = true;
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    ASSERT_EQ(4U, dma_prefetched_words);
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(nullptr, execution.active);
+    EXPECT_EQ(DMA_SxFCR_FS_2 | DMA_SxFCR_FS_0,
+              DMA2_Stream3->FCR & DMA_SxFCR_FS);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_sdio_close(&owner, &config, &receipt));
+    EXPECT_TRUE(receipt.owned);
+    if (nx_request_state(&request.base) == NX_REQUEST_SETTLED) {
+        ASSERT_EQ(NX_SUCCESS, nx_block_port_sync(&face, 1000000U));
+        nx_request_initialize(&next.base);
+        ASSERT_EQ(NX_SUCCESS, nx_request_prepare(&next.base, 1000000U));
+        next.data = sram;
+        next.data_bytes = 4096U;
+        next.blocks = 1U;
+        EXPECT_EQ(NX_ERROR_BUSY, nx_block_async_submit(&async_face, &next));
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&next.base));
+        EXPECT_EQ(nullptr, execution.active);
+        EXPECT_EQ(4U, dma_prefetched_words);
+    }
+    /* A separately supplied empty-FIFO fact allows cold cleanup. This is an
+     * external fixture event, not a production DMA reset/recovery promise. */
+    DMA2_Stream3->FCR =
+        (DMA2_Stream3->FCR & ~static_cast<uint32_t>(DMA_SxFCR_FS)) |
+        DMA_SxFCR_FS_2;
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_sdio_close(&owner, &config, &receipt));
+}
+
+TEST_F(SdioDma, BoundedTransmitReadsOnlyItsSpanAndWaitsForMediaReadiness) {
+    Activate();
+    request.write = true;
+    request.data = static_cast<uint8_t*>(sram) + 4096U - 512U;
+    request.data_bytes = 512U;
+    std::memset(request.data, 0xa5, 512U);
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    EXPECT_EQ(0U, DMA2_Stream3->CR & DMA_SxCR_PFCTRL);
+    EXPECT_EQ(128U, DMA2_Stream3->NDTR);
+    if ((DMA2_Stream3->CR & DMA_SxCR_PFCTRL) != 0U) {
+        ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
+        nx_block_async_service(&async_face);
+        /* Failed-mode cleanup supplies no fictional bounded-flow event. */
+        DMA2_Stream3->FCR = DMA_SxFCR_FS_2;
+        return;
+    }
+    missing_crc_end = true;
+    TransferBoundedTx();
+    EXPECT_EQ(128U, dma_prefetched_words);
+    EXPECT_EQ(reinterpret_cast<uintptr_t>(sram) + 4096U, dma_memory_cursor);
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
+    missing_crc_end = false;
+    *const_cast<volatile uint32_t*>(&SDIO->STA) =
+        SDIO_STA_DATAEND | SDIO_STA_DBCKEND;
+    Irq();
+    write_busy = true;
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_TIMEOUT, request.base.result);
+    EXPECT_EQ(0U, request.base.transferred);
+    EXPECT_TRUE(owner.programming_pending);
+    ASSERT_EQ(128U, written_words.size());
+    EXPECT_TRUE(std::all_of(
+        written_words.begin(), written_words.end(),
+        [](uint32_t word) { return word == UINT32_C(0xa5a5a5a5); }));
+    write_busy = false;
+}
+
+TEST_F(SdioDma, RetiredStreamProfileCannotRetainAnotherMemoryTargetOrBurst) {
+    DMA2_Stream3->CR =
+        DMA_SxCR_DBM | DMA_SxCR_CT | DMA_SxCR_MBURST_1 | DMA_SxCR_PBURST_1;
+    DMA2_Stream3->M1AR = UINT32_C(0x20000400);
+    Activate();
+    request.write = true;
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    EXPECT_EQ(0U,
+              DMA2_Stream3->CR & (DMA_SxCR_DBM | DMA_SxCR_CT | DMA_SxCR_CIRC));
+    EXPECT_EQ(DMA_SxCR_MBURST_0, DMA2_Stream3->CR & DMA_SxCR_MBURST);
+    EXPECT_EQ(DMA_SxCR_PBURST_0, DMA2_Stream3->CR & DMA_SxCR_PBURST);
+    EXPECT_EQ(0U, DMA2_Stream3->M1AR);
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
+    if ((DMA2_Stream3->CR & DMA_SxCR_EN) == 0U) {
+        /* An independent terminal event permits obsolete-profile cleanup;
+         * the FIFO fault itself never promises TC or ends an RX borrow. */
+        CompleteRxDmaFlush();
+    }
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(0U, DMA2_Stream3->M1AR);
+    DMA2_Stream3->FCR = DMA_SxFCR_FS_2;
 }
 
 TEST_F(SdioBlock, ReadyFlagWithoutEnabledSourceIsNotAClockLease) {
@@ -1175,6 +1453,72 @@ TEST_F(SdioAsync, IrqWritesWaitForMediaProgrammingReadiness) {
     EXPECT_FALSE(owner.programming_pending);
 }
 
+TEST_F(SdioAsync, CancelledFifoLevelCannotStarveTheThreadThatDrainsIt) {
+    Activate();
+    request.write = true;
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    refused_write = &SDIO->MASK;
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
+    EXPECT_EQ(0U, NVIC_GetEnableIRQ(SDIO_IRQn));
+    *const_cast<volatile uint32_t*>(&SDIO->STA) |=
+        SDIO_STA_TXFIFOHE | SDIO_STA_DCRCFAIL;
+    Irq();
+    EXPECT_EQ(0U, NVIC_GetEnableIRQ(SDIO_IRQn));
+    EXPECT_NE(0U, execution.flags & SDIO_STA_DCRCFAIL);
+    EXPECT_EQ(0U, execution.words);
+    EXPECT_TRUE(written_words.empty());
+    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&request.base));
+    refused_write = nullptr;
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(1U, NVIC_GetEnableIRQ(SDIO_IRQn));
+    EXPECT_EQ(0U, SDIO->MASK);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_sdio_close(&owner, &config, &receipt));
+    Irq();
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+}
+
+TEST_F(SdioDma, CancelledLateDmaFlagsAreRetainedWithoutALevelInterruptLoop) {
+    Activate();
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
+    EXPECT_EQ(0U, SDIO->MASK);
+    EXPECT_EQ(0U, DMA2_Stream3->CR & (DMA_SxCR_TCIE | DMA_SxCR_HTIE |
+                                      DMA_SxCR_TEIE | DMA_SxCR_DMEIE));
+    EXPECT_EQ(0U, DMA2_Stream3->FCR & DMA_SxFCR_FEIE);
+    DMA2_Stream3->NDTR = UINT32_C(0xffff) - 128U;
+    DMA2_Stream3->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+    DMA2->LISR |= (UINT32_C(1) << 27U) | (UINT32_C(1) << 25U);
+    refused_write = &DMA2->LIFCR;
+    DmaIrq();
+    EXPECT_EQ(0U, NVIC_GetEnableIRQ(DMA2_Stream3_IRQn));
+    EXPECT_TRUE(execution.dma_complete);
+    EXPECT_NE(0U, execution.flags & SDIO_STA_RXOVERR);
+    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&request.base));
+    EXPECT_EQ(UINT32_C(0x20000000), DMA2_Stream3->M0AR);
+    refused_write = nullptr;
+    *const_cast<volatile uint32_t*>(&SDIO->STA) |=
+        SDIO_STA_DATAEND | SDIO_STA_DBCKEND;
+    Irq();
+    EXPECT_EQ(0U, SDIO->MASK);
+    EXPECT_NE(0U, execution.flags & SDIO_STA_DATAEND);
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(1U, NVIC_GetEnableIRQ(DMA2_Stream3_IRQn));
+    EXPECT_EQ(0U, DMA2->LISR & (UINT32_C(0x3d) << 22U));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_sdio_close(&owner, &config, &receipt));
+    Irq();
+    DmaIrq();
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+}
+#endif
+
 /** \brief MMC uses CMD1, host-assigned RCA, EXT_CSD and SWITCH semantics. */
 class MmcBlock : public SdioBlock {
   protected:
@@ -1185,6 +1529,7 @@ class MmcBlock : public SdioBlock {
     }
 };
 
+#ifndef NX_SDIO_LOW_CLOCK_ONLY
 TEST_F(MmcBlock, SectorMmcUsesExtCsdWithoutSdApplicationCommands) {
     Activate();
     const auto* geometry = nx_block_port_geometry(&face);
@@ -1225,6 +1570,7 @@ TEST_F(MmcBlock, ZeroExtCsdSectorCountCannotPublishGeometry) {
     EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_block_port_activate(&face, 1000000U));
     EXPECT_EQ(nullptr, nx_block_port_geometry(&face));
 }
+#endif
 
 /** \brief Exact MMC-only silicon pads, never an eight-wire SD socket claim. */
 class MmcEight : public MmcBlock {
@@ -1247,6 +1593,7 @@ class MmcEight : public MmcBlock {
     }
 };
 
+#ifndef NX_SDIO_LOW_CLOCK_ONLY
 TEST_F(MmcEight, CardSwitchAndReadyPrecedeHostEightBitClock) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32_sdio_prepare(&owner, &config, &receipt));
     EXPECT_EQ(1023U, receipt.pin_mask);
@@ -1352,6 +1699,7 @@ TEST_F(MmcEight, SdMemoryAndIoNeverAcceptAnEightBitBus) {
     }
     config.protocol = NX_STM32_SDIO_MMC;
 }
+#endif
 
 /** \brief Wire width reuses both finite engines and their actual IRQ leaves. */
 class MmcEightAsync : public MmcEight {
@@ -1379,6 +1727,7 @@ class MmcEightAsync : public MmcEight {
     }
 };
 
+#ifndef NX_SDIO_LOW_CLOCK_ONLY
 TEST_F(MmcEightAsync, IrqAndDmaRetainTheSameEightBitDataAndDrainContract) {
     const nx_block_async_port_t async_face{&nx_stm32_sdio_async_ops, &owner};
     for (const auto engine : {NX_STM32_SDIO_IRQ, NX_STM32_SDIO_DMA}) {
@@ -1397,7 +1746,7 @@ TEST_F(MmcEightAsync, IrqAndDmaRetainTheSameEightBitDataAndDrainContract) {
         ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
         EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
         if (engine == NX_STM32_SDIO_DMA) {
-            DMA2_Stream3->NDTR = 0U;
+            DMA2_Stream3->NDTR = UINT32_C(0xffff) - 128U;
             DMA2_Stream3->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
             DMA2->LISR |= UINT32_C(1) << 27U;
             g_f4_model_isr = true;
@@ -1462,13 +1811,14 @@ TEST_F(SdioDma, MaskedDmaVectorCannotLatchAnUnarmedCompletion) {
     DMA2_Stream3->CR &=
         ~static_cast<uint32_t>(DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE);
     DMA2_Stream3->FCR &= ~static_cast<uint32_t>(DMA_SxFCR_FEIE);
-    DMA2_Stream3->NDTR = 0U;
+    DMA2_Stream3->NDTR = UINT32_C(0xffff) - 128U;
     DMA2->LISR |= UINT32_C(1) << 27U;
     DmaIrq();
     EXPECT_FALSE(execution.dma_complete);
     ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
     nx_block_async_service(&async_face);
 }
+#endif
 
 /** \brief Independent CCCR/FBR card image, no implementation under test mocked.
  */
@@ -1520,6 +1870,7 @@ class SdioIo : public SdioAsync {
     }
 };
 
+#ifndef NX_SDIO_LOW_CLOCK_ONLY
 TEST_F(SdioIo, Cmd5CccrFbrAndCisAreDistinctFromMemoryGeometry) {
     r3_crc = true;
     Activate();
@@ -1871,7 +2222,7 @@ TEST_F(SdioIo, LowSpeedOneBitKeepsTheIdentificationClock) {
     io_registers[0][8] = 64U;
     config.bus_width = 1U;
     Activate();
-    EXPECT_EQ(118U, SDIO->CLKCR & SDIO_CLKCR_CLKDIV);
+    EXPECT_EQ(120U, SDIO->CLKCR & SDIO_CLKCR_CLKDIV);
     EXPECT_EQ(0U, SDIO->CLKCR & SDIO_CLKCR_WIDBUS);
 }
 
@@ -1884,7 +2235,7 @@ TEST_F(SdioIo, LowSpeedFourBitRequiresTheActualCardCapability) {
     ASSERT_EQ(NX_SUCCESS, nx_block_port_stop(&face, 1000000U));
     io_registers[0][8] = 64U | 128U;
     ASSERT_EQ(NX_SUCCESS, nx_block_port_activate(&face, 1000000U));
-    EXPECT_EQ(118U, SDIO->CLKCR & SDIO_CLKCR_CLKDIV);
+    EXPECT_EQ(120U, SDIO->CLKCR & SDIO_CLKCR_CLKDIV);
     EXPECT_EQ(static_cast<uint32_t>(SDIO_CLKCR_WIDBUS_0),
               SDIO->CLKCR & SDIO_CLKCR_WIDBUS);
 }
@@ -1903,6 +2254,7 @@ TEST_F(SdioIo, RemovalDrainsTheBorrowWithoutInventingAnAbsentResponse) {
     EXPECT_EQ(before, commands.size());
     silence_commands = false;
 }
+#endif
 
 class SdioIoDma : public SdioDma {
   protected:
@@ -1927,11 +2279,12 @@ class SdioIoDma : public SdioDma {
     }
 };
 
+#ifndef NX_SDIO_LOW_CLOCK_ONLY
 TEST_F(SdioIoDma, DmaCmd53StillRequiresCrcBeforeReleasingTheExactBorrow) {
     Activate();
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_enable(&io_face, 1U, true, 1000000U));
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
-    EXPECT_EQ(16U, DMA2_Stream3->NDTR);
+    EXPECT_EQ(UINT32_C(0xffff), DMA2_Stream3->NDTR);
     FinishDma();
     nx_sdio_io_service(&io_face);
     EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&io_request.transfer.base));
@@ -1946,6 +2299,45 @@ TEST_F(SdioIoDma, DmaCmd53StillRequiresCrcBeforeReleasingTheExactBorrow) {
     EXPECT_EQ(nullptr, execution.active);
 }
 
+TEST_F(SdioIoDma, WholeBurstCmd53TransmitUsesItsExactDmaReadExtent) {
+    Activate();
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_enable(&io_face, 1U, true, 1000000U));
+    io_request.transfer.write = true;
+    io_request.transfer.data = static_cast<uint8_t*>(sram) + 4096U - 16U;
+    io_request.transfer.data_bytes = 16U;
+    io_request.unit_bytes = 16U;
+    std::memset(io_request.transfer.data, 0x5a, 16U);
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
+    EXPECT_EQ(0U, DMA2_Stream3->CR & DMA_SxCR_PFCTRL);
+    EXPECT_EQ(4U, DMA2_Stream3->NDTR);
+    if ((DMA2_Stream3->CR & DMA_SxCR_PFCTRL) != 0U) {
+        ASSERT_EQ(NX_SUCCESS, nx_sdio_io_cancel(&io_face, &io_request));
+        nx_sdio_io_service(&io_face);
+        DMA2_Stream3->FCR = DMA_SxFCR_FS_2;
+        return;
+    }
+    const auto before = commands.size();
+    missing_crc_end = true;
+    TransferBoundedTx();
+    EXPECT_EQ(4U, dma_prefetched_words);
+    EXPECT_EQ(reinterpret_cast<uintptr_t>(sram) + 4096U, dma_memory_cursor);
+    nx_sdio_io_service(&io_face);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&io_request.transfer.base));
+    missing_crc_end = false;
+    *const_cast<volatile uint32_t*>(&SDIO->STA) =
+        SDIO_STA_DATAEND | SDIO_STA_DBCKEND;
+    Irq();
+    nx_sdio_io_service(&io_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
+    EXPECT_EQ(NX_SUCCESS, io_request.transfer.base.result);
+    EXPECT_EQ(16U, io_request.transfer.base.transferred);
+    EXPECT_EQ(commands.end(),
+              std::find(commands.begin() + static_cast<ptrdiff_t>(before),
+                        commands.end(), 13U));
+    for (size_t byte = 0U; byte < 16U; ++byte)
+        EXPECT_EQ(0x5aU, io_registers[1][0x100U + byte]);
+}
+
 TEST_F(SdioIoDma, OddDmaExtentIsRejectedWithoutBounceStorageOrCommands) {
     Activate();
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_enable(&io_face, 1U, true, 1000000U));
@@ -1954,6 +2346,24 @@ TEST_F(SdioIoDma, OddDmaExtentIsRejectedWithoutBounceStorageOrCommands) {
     EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_sdio_io_submit(&io_face, &io_request));
     EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&io_request.transfer.base));
     EXPECT_EQ(before, commands.size());
+}
+
+TEST_F(SdioIoDma, SubBurstWordsNeverStartDmaOrExposeCallerPadding) {
+    Activate();
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_enable(&io_face, 1U, true, 1000000U));
+    auto before = commands.size();
+    for (uint16_t bytes : {uint16_t{4U}, uint16_t{8U}, uint16_t{12U}}) {
+        SCOPED_TRACE(bytes);
+        io_request.unit_bytes = bytes;
+        io_request.transfer.write = true;
+        EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+                  nx_sdio_io_submit(&io_face, &io_request));
+        EXPECT_EQ(NX_REQUEST_READY,
+                  nx_request_state(&io_request.transfer.base));
+        EXPECT_EQ(before, commands.size());
+        EXPECT_EQ(0U, dma_prefetched_words);
+        EXPECT_EQ(0U, DMA2_Stream3->CR & DMA_SxCR_EN);
+    }
 }
 
 TEST_F(SdioIoDma, RefusedDmaWithdrawalQuarantinesTheWholeFunctionRequest) {
@@ -2037,6 +2447,314 @@ TEST_F(SdioIoDma, ProducerRequestsStopBeforeTheDmaMemoryEngine) {
     enforce_dma_request_order = false;
     nx_sdio_io_service(&io_face);
 }
+#endif
+
+#ifndef NX_SDIO_LOW_CLOCK_ONLY
+TEST_F(SdioBlock, ContinuousMemoryReadIsOne512BytePacketStreamWithAStop) {
+    Activate();
+    addressed_payload = true;
+    const auto begin = commands.size();
+    alignas(4) std::array<uint8_t, 1024> payload{};
+    const auto result = nx_block_port_read(&face, 1U, payload.data(),
+                                           payload.size(), 2U, 1000000U);
+    EXPECT_EQ(NX_SUCCESS, result.result);
+    EXPECT_EQ(2U, result.completed_blocks);
+    const auto first = commands.begin() + static_cast<ptrdiff_t>(begin);
+    EXPECT_EQ(1, std::count(first, commands.end(), 18U));
+    EXPECT_EQ(0, std::count(first, commands.end(), 17U));
+    EXPECT_EQ(1, std::count(first, commands.end(), 12U));
+    EXPECT_EQ(0xa5000100U, WordAt(payload.data(), 128U));
+    const auto stop = std::find(first, commands.end(), 12U);
+    EXPECT_NE(commands.end(), stop);
+    if (stop != commands.end()) {
+        EXPECT_NE(commands.end(), std::find(stop, commands.end(), 13U));
+    }
+}
+
+TEST_F(SdioDma, ContinuousWriteOwnsOneBoundedDmaFrameUntilStopAndProgramReady) {
+    Activate();
+    request.write = true;
+    request.blocks = 2U;
+    request.data_bytes = 1024U;
+    const auto begin = commands.size();
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    EXPECT_EQ(1024U, SDIO->DLEN);
+    EXPECT_EQ(9U << 4U, SDIO->DCTRL & SDIO_DCTRL_DBLOCKSIZE);
+    EXPECT_EQ(256U, DMA2_Stream3->NDTR);
+    EXPECT_EQ(0U, DMA2_Stream3->CR & DMA_SxCR_PFCTRL);
+    const auto first = commands.begin() + static_cast<ptrdiff_t>(begin);
+    EXPECT_EQ(1, std::count(first, commands.end(), 25U));
+    if (std::find(first, commands.end(), 25U) == commands.end()) {
+        ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
+        nx_block_async_service(&async_face);
+        DMA2_Stream3->FCR = DMA_SxFCR_FS_2;
+        return;
+    }
+    TransferBoundedTx(128U);
+    Irq();
+    EXPECT_NE(0U, execution.flags & SDIO_STA_DBCKEND);
+    missing_crc_end = true;
+    TransferBoundedTx();
+    Irq();
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
+    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(256U, dma_prefetched_words);
+    missing_crc_end = false;
+    write_busy = true;
+    Irq();
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_TIMEOUT, request.base.result);
+    EXPECT_EQ(0U, request.base.transferred);
+    EXPECT_TRUE(owner.programming_pending);
+    const auto start = commands.begin() + static_cast<ptrdiff_t>(begin);
+    const auto stop = std::find(start, commands.end(), 12U);
+    EXPECT_NE(commands.end(), stop);
+    if (stop != commands.end()) {
+        EXPECT_NE(commands.end(), std::find(stop, commands.end(), 13U));
+    }
+    write_busy = false;
+}
+
+TEST_F(SdioDma, ContinuousReadKeepsTheWholeBorrowThroughTheLastRxFifoWrite) {
+    Activate();
+    request.blocks = 2U;
+    request.data_bytes = 1024U;
+    const auto begin = commands.size();
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    EXPECT_EQ(1024U, SDIO->DLEN);
+    EXPECT_EQ(9U << 4U, SDIO->DCTRL & SDIO_DCTRL_DBLOCKSIZE);
+    EXPECT_EQ(0xffffU, DMA2_Stream3->NDTR);
+    const auto first = commands.begin() + static_cast<ptrdiff_t>(begin);
+    EXPECT_EQ(1, std::count(first, commands.end(), 18U));
+    if (std::find(first, commands.end(), 18U) == commands.end()) {
+        ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
+        nx_block_async_service(&async_face);
+        return;
+    }
+    dma_hold_rx_flush = dma_rx_word_pending = true;
+    dma_memory_cursor = reinterpret_cast<uintptr_t>(sram) + 1020U;
+    dma_pending_word = 0xa50000ffU;
+    DMA2_Stream3->NDTR = 0xffffU - 256U;
+    DMA2_Stream3->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+    DMA2_Stream3->FCR =
+        (DMA2_Stream3->FCR & ~static_cast<uint32_t>(DMA_SxFCR_FS)) |
+        DMA_SxFCR_FS_0;
+    fifo_words = fifo_limit = 256U;
+    *const_cast<volatile uint32_t*>(&SDIO->DCOUNT) = 0U;
+    *const_cast<volatile uint32_t*>(&SDIO->STA) =
+        SDIO_STA_DATAEND | SDIO_STA_DBCKEND;
+    Irq();
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(0x20000000U, DMA2_Stream3->M0AR);
+    EXPECT_FALSE(dma_reprogrammed_during_flush);
+    CompleteRxDmaFlush();
+    DmaIrq();
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(dma_pending_word, static_cast<uint32_t*>(sram)[255]);
+    const auto start = commands.begin() + static_cast<ptrdiff_t>(begin);
+    EXPECT_EQ(1, std::count(start, commands.end(), 12U));
+}
+
+TEST_F(SdioIoDma, MultipleFunctionUnitsNeverAcquireMemoryStopOrProgramPolicy) {
+    Activate();
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_enable(&io_face, 1U, true, 1000000U));
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_block_size(&io_face, 1U, 16U, 1000000U));
+    io_request.transfer.write = true;
+    io_request.transfer.blocks = 2U;
+    io_request.transfer.data_bytes = 32U;
+    io_request.unit_bytes = 16U;
+    io_request.block_mode = true;
+    std::memset(sram, 0x3c, 32U);
+    const auto begin = commands.size();
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
+    for (unsigned unit = 0U; unit < 2U; ++unit) {
+        TransferBoundedTx();
+        Irq();
+        nx_sdio_io_service(&io_face);
+    }
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
+    EXPECT_EQ(NX_SUCCESS, io_request.transfer.base.result);
+    EXPECT_EQ(32U, io_request.transfer.base.transferred);
+    const auto first = commands.begin() + static_cast<ptrdiff_t>(begin);
+    EXPECT_EQ(2, std::count(first, commands.end(), 53U));
+    for (const auto command : {12U, 13U, 18U, 25U})
+        EXPECT_EQ(0, std::count(first, commands.end(), command));
+    for (size_t byte = 0U; byte < 32U; ++byte)
+        EXPECT_EQ(0x3cU, io_registers[1][0x100U + byte]);
+}
+
+TEST_F(SdioBlock, AStillActiveDataPathCannotChangeItsWireClock) {
+    Prepare();
+    card_enabled = true;
+    *const_cast<volatile uint32_t*>(&SDIO->STA) = SDIO_STA_RXACT;
+    SDIO->DCTRL = SDIO_DCTRL_DTEN;
+    host_stuck = true;
+    const auto before = control_trace.size();
+    EXPECT_NE(NX_SUCCESS, nx_block_port_activate(&face, 1000000U));
+    for (auto i = before; i < control_trace.size(); ++i)
+        EXPECT_NE(reinterpret_cast<uintptr_t>(&SDIO->CLKCR),
+                  control_trace[i].address);
+    host_stuck = false;
+}
+
+TEST_F(SdioDma, ExpiredBeforeCpsmRetainsNoCardProgrammingResponsibility) {
+    Activate();
+    request.write = true;
+    expire_data_command_on_enable = true;
+    data_command_expiration = request.base.deadline;
+    const auto begin = commands.size();
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    EXPECT_EQ(begin, commands.size());
+    EXPECT_FALSE(owner.programming_pending);
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_TIMEOUT, request.base.result);
+    EXPECT_FALSE(owner.programming_pending);
+    const auto first = commands.begin() + static_cast<ptrdiff_t>(begin);
+    EXPECT_EQ(0, std::count(first, commands.end(), 12U));
+    EXPECT_EQ(0, std::count(first, commands.end(), 13U));
+    DMA2_Stream3->FCR = DMA_SxFCR_FS_2;
+}
+
+TEST_F(SdioIoDma, CompletedMemoryCannotHideARefusedHostWithdrawal) {
+    Activate();
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_enable(&io_face, 1U, true, 1000000U));
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
+    FinishDma();
+    fifo_words = fifo_limit;
+    *const_cast<volatile uint32_t*>(&SDIO->DCOUNT) = 0U;
+    *const_cast<volatile uint32_t*>(&SDIO->STA) =
+        SDIO_STA_DATAEND | SDIO_STA_DBCKEND;
+    Irq();
+    refused_write = &SDIO->DCTRL;
+    nx_sdio_io_service(&io_face);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED,
+              nx_request_state(&io_request.transfer.base));
+    EXPECT_EQ(&io_request.transfer, execution.active);
+    refused_write = nullptr;
+    nx_sdio_io_service(&io_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
+    EXPECT_NE(NX_SUCCESS, io_request.transfer.base.result);
+    EXPECT_EQ(nullptr, execution.active);
+}
+
+TEST_F(SdioAsync, AStuckCrcFlagCannotConfirmTheFollowingBadPacket) {
+    Activate();
+    request.blocks = 2U;
+    request.data_bytes = data.size();
+    last_packet_crc_error = true;
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    for (unsigned i = 0U; i < 15U; ++i)
+        Irq();
+    refused_write = &SDIO->ICR;
+    for (unsigned i = 15U; i < 33U; ++i)
+        Irq();
+    refused_write = nullptr;
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_IO, request.base.result);
+    EXPECT_EQ(512U, request.base.transferred);
+    EXPECT_EQ(nullptr, execution.active);
+}
+
+TEST_F(SdioDma, LostWriteResponseKeepsMediaRepairWithoutReplayingPayload) {
+    Activate();
+    request.write = true;
+    lose_write_command_response = true;
+    const auto begin = commands.size();
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    nx_block_async_service(&async_face);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_TIMEOUT, request.base.result);
+    EXPECT_EQ(0U, request.base.transferred);
+    EXPECT_FALSE(owner.programming_pending);
+    const auto first = commands.begin() + static_cast<ptrdiff_t>(begin);
+    EXPECT_EQ(1, std::count(first, commands.end(), 24U));
+    EXPECT_EQ(1, std::count(first, commands.end(), 12U));
+    const auto stop = std::find(first, commands.end(), 12U);
+    EXPECT_NE(commands.end(), stop);
+    if (stop != commands.end()) {
+        EXPECT_NE(commands.end(), std::find(stop, commands.end(), 13U));
+    }
+    DMA2_Stream3->FCR = DMA_SxFCR_FS_2;
+}
+
+#endif
+
+#ifdef NX_SDIO_LOW_CLOCK_ONLY
+TEST_F(SdioBlock, SelectedLowPclkHonorsTheActualControlClockCrossing) {
+    precise_clock = true;
+    physical_ns = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_sdio_prepare(&owner, &config, &receipt));
+    card_enabled = true;
+    ASSERT_EQ(NX_SUCCESS, nx_block_port_activate(&face, 1000000U));
+    const uint64_t divisor = (SDIO->CLKCR & SDIO_CLKCR_CLKDIV) + 2U;
+    EXPECT_GE(UINT64_C(8) * NEXUS_APB2_HZ * divisor,
+              UINT64_C(3) * NEXUS_PLL48_HZ);
+    EXPECT_EQ(8U, SDIO->CLKCR & SDIO_CLKCR_CLKDIV);
+    alignas(4) std::array<uint8_t, 512> payload{};
+    ASSERT_EQ(NX_SUCCESS, nx_block_port_read(&face, 0U, payload.data(),
+                                             payload.size(), 1U, 1000000U)
+                              .result);
+    EXPECT_EQ(0xa5000000U, WordAt(payload.data(), 0U));
+    const uint64_t crossing_ns =
+        (UINT64_C(1000000000) * (3U * NEXUS_APB2_HZ + 2U * NEXUS_PLL48_HZ) +
+         static_cast<uint64_t>(NEXUS_PLL48_HZ) * NEXUS_APB2_HZ - 1U) /
+        (static_cast<uint64_t>(NEXUS_PLL48_HZ) * NEXUS_APB2_HZ);
+    std::array<uintptr_t, 4> registers{
+        reinterpret_cast<uintptr_t>(&SDIO->POWER),
+        reinterpret_cast<uintptr_t>(&SDIO->CLKCR),
+        reinterpret_cast<uintptr_t>(&SDIO->CMD),
+        reinterpret_cast<uintptr_t>(&SDIO->DCTRL)};
+    std::array<uint64_t, 4> previous{};
+    std::array<bool, 4> seen{};
+    unsigned violations = 0U;
+    uint64_t shortest_command_ns = UINT64_MAX;
+    for (const auto& observation : control_trace) {
+        for (size_t index = 0U; index < registers.size(); ++index) {
+            if (observation.address != registers[index])
+                continue;
+            const uint64_t minimum =
+                index == 0U ? std::max<uint64_t>(3500U, crossing_ns)
+                            : crossing_ns;
+            if (seen[index]) {
+                const auto interval = observation.nanoseconds - previous[index];
+                if (interval < minimum)
+                    ++violations;
+                if (index == 2U)
+                    shortest_command_ns =
+                        std::min(shortest_command_ns, interval);
+            }
+            previous[index] = observation.nanoseconds;
+            seen[index] = true;
+        }
+    }
+    EXPECT_EQ(0U, violations);
+    EXPECT_GE(shortest_command_ns, crossing_ns);
+}
+
+TEST_F(SdioBlock, LowPclkUsesFourDataBitsAtAReviewedSlowerWireClock) {
+    config.bus_width = 4U;
+    Prepare();
+    card_enabled = true;
+    ASSERT_EQ(NX_SUCCESS, nx_block_port_activate(&face, 1000000U));
+    EXPECT_EQ(SDIO_BUS_WIDE_4B, SDIO->CLKCR & SDIO_CLKCR_WIDBUS);
+    EXPECT_EQ(8U, SDIO->CLKCR & SDIO_CLKCR_CLKDIV);
+    alignas(4) std::array<uint8_t, 512> payload{};
+    const auto result = nx_block_port_read(&face, 0U, payload.data(),
+                                           payload.size(), 1U, 1000000U);
+    EXPECT_EQ(NX_SUCCESS, result.result);
+    EXPECT_EQ(1U, result.completed_blocks);
+    EXPECT_EQ(0xa500007fU, WordAt(payload.data(), 127U));
+}
+#endif
 
 extern "C" bool nx_arch_is_privileged(void) {
     return privileged;
@@ -2071,13 +2789,21 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
                                reentrant_data.size(), 1U, now + 10000U)
                 .result;
     }
+    if (precise_clock) {
+        if (clock_advances)
+            physical_ns += 500U;
+        now = physical_ns / 1000U;
+        return now;
+    }
     return clock_advances ? ++now : now;
 }
 extern "C" uint32_t nx_sdio_model_read(volatile const uint32_t* reg) {
     if (card_enabled && reg == &SDIO->STA && fifo_limit != 0U) {
         uint32_t status = *reg;
         if (fifo_reading && fail_read_number != 0U &&
-            read_number == fail_read_number && fifo_words >= 16U) {
+            (multi_card_active ? fifo_words / 128U + 1U : read_number) ==
+                fail_read_number &&
+            fifo_words % 128U >= 16U) {
             status &= ~static_cast<uint32_t>(SDIO_STA_RXACT | SDIO_STA_RXDAVL);
             status |= SDIO_STA_DCRCFAIL;
         } else if (fifo_words >= fifo_limit) {
@@ -2085,13 +2811,28 @@ extern "C" uint32_t nx_sdio_model_read(volatile const uint32_t* reg) {
                 ~static_cast<uint32_t>(SDIO_STA_RXACT | SDIO_STA_TXACT |
                                        SDIO_STA_RXDAVL | SDIO_STA_TXFIFOHE);
             status |= SDIO_STA_DATAEND;
-            if (!missing_crc_end)
+            if (last_packet_crc_error && multi_card_active) {
+                status |= SDIO_STA_DCRCFAIL;
+            } else if (!missing_crc_end && !terminal_crc_emitted) {
                 status |= SDIO_STA_DBCKEND;
+                terminal_crc_emitted = true;
+            } else if (missing_crc_end && multi_card_active)
+                status |= fifo_reading ? SDIO_STA_RXACT : SDIO_STA_TXACT;
+        }
+        if (multi_card_active && !missing_crc_end &&
+            fifo_words / 128U > multi_crc_blocks &&
+            (status & SDIO_STA_DCRCFAIL) == 0U) {
+            status |= SDIO_STA_DBCKEND;
+            multi_crc_blocks = fifo_words / 128U;
         }
         if (terminal_tail != 0U && fifo_reading &&
             fifo_words >= fifo_limit - terminal_tail) {
             status &= ~static_cast<uint32_t>(SDIO_STA_RXACT);
-            status |= SDIO_STA_DATAEND | SDIO_STA_DBCKEND;
+            status |= SDIO_STA_DATAEND;
+            if (!terminal_crc_emitted) {
+                status |= SDIO_STA_DBCKEND;
+                terminal_crc_emitted = true;
+            }
             *const_cast<volatile uint32_t*>(&SDIO->DCOUNT) = 0U;
         }
         if (dataend_early && fifo_reading && fifo_words != 0U)
@@ -2121,7 +2862,58 @@ extern "C" void nx_sdio_model_write(volatile uint32_t* reg, uint32_t value) {
     if (card_mmc && reg == &SDIO->CLKCR &&
         (value & SDIO_CLKCR_WIDBUS) == SDIO_BUS_WIDE_8B)
         mmc_host_width_write = writes;
+    uint32_t previous = *reg;
+    if (reg == &DMA2_Stream3->FCR)
+        value = (value & ~static_cast<uint32_t>(DMA_SxFCR_FS)) |
+                (previous & DMA_SxFCR_FS);
+    if (dma_rx_word_pending &&
+        (reg == &DMA2_Stream3->M0AR || reg == &DMA2_Stream3->M1AR ||
+         reg == &DMA2_Stream3->PAR || reg == &DMA2_Stream3->NDTR))
+        dma_reprogrammed_during_flush = true;
     *reg = value;
+    if (reg == &SDIO->POWER || reg == &SDIO->CLKCR || reg == &SDIO->CMD ||
+        reg == &SDIO->DCTRL) {
+        control_trace.push_back({reinterpret_cast<uintptr_t>(reg), value,
+                                 precise_clock ? physical_ns : now * 1000U});
+    }
+    if (reg == &DMA2_Stream3->CR) {
+        if ((previous & DMA_SxCR_EN) == 0U && (value & DMA_SxCR_EN) != 0U) {
+            if ((value & DMA_SxCR_DBM) != 0U)
+                DMA2_Stream3->CR |= DMA_SxCR_CIRC;
+            if ((DMA2_Stream3->FCR & (DMA_SxFCR_DMDIS | DMA_SxFCR_FTH)) ==
+                    (DMA_SxFCR_DMDIS | DMA_SxFCR_FTH) &&
+                (value & DMA_SxCR_MSIZE) == DMA_SxCR_MSIZE_1 &&
+                ((value & DMA_SxCR_MBURST) == DMA_SxCR_MBURST_1 ||
+                 (value & DMA_SxCR_MBURST) == DMA_SxCR_MBURST)) {
+                /* RM0090 table49: this threshold/burst mismatch raises FE
+                 * and disables the stream without a terminal-flush proof. */
+                DMA2_Stream3->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+                DMA2->LISR |= UINT32_C(1) << 22U;
+                return;
+            }
+            /* RM0090 10.3.15 ignores programmed NDTR in this exact mode. */
+            if ((value & DMA_SxCR_PFCTRL) != 0U)
+                DMA2_Stream3->NDTR = UINT32_C(0xffff);
+            dma_memory_cursor = (value & (DMA_SxCR_DBM | DMA_SxCR_CT)) ==
+                                        (DMA_SxCR_DBM | DMA_SxCR_CT)
+                                    ? DMA2_Stream3->M1AR
+                                    : DMA2_Stream3->M0AR;
+            if ((value & DMA_SxCR_DIR) == DMA_SxCR_DIR_0)
+                PrefetchTxDmaWords();
+            if (expire_data_command_on_enable) {
+                expire_data_command_on_enable = false;
+                now = data_command_expiration;
+            }
+        } else if ((previous & DMA_SxCR_EN) != 0U &&
+                   (value & DMA_SxCR_EN) == 0U && !dma_hold_rx_flush) {
+            /* A software interruption also raises TC; it is not data CRC. */
+            if ((value & DMA_SxCR_DIR) == 0U)
+                DMA2_Stream3->FCR =
+                    (DMA2_Stream3->FCR & ~static_cast<uint32_t>(DMA_SxFCR_FS)) |
+                    DMA_SxFCR_FS_2;
+            DMA2->LISR |= UINT32_C(1) << 27U;
+        }
+    }
     if (reg == &SDIO->CMD && (value & SDIO_CMD_CPSMEN) != 0U) {
         commands.push_back(value & SDIO_CMD_CMDINDEX);
         arguments.push_back(static_cast<uint32_t>(SDIO->ARG));
@@ -2143,8 +2935,8 @@ extern "C" void nx_sdio_model_write(volatile uint32_t* reg, uint32_t value) {
             fifo_limit = 0U;
             fifo_reading = fifo_writing = false;
         } else if (card_enabled && !commands.empty() &&
-                   commands.back() == 24U) {
-            DataStarted(128U, false);
+                   (commands.back() == 24U || commands.back() == 25U)) {
+            DataStarted(commands.back() == 25U ? SDIO->DLEN / 4U : 128U, false);
         }
     }
     if (reg == &SDIO->ICR)
@@ -2159,6 +2951,11 @@ extern "C" void nx_platform_cold_model_write(volatile uint32_t* reg,
 extern "C" uint32_t nx_sdio_model_fifo_read(SDIO_TypeDef* registers) {
     if (card_enabled) {
         uint32_t value = 0xA5000000U | fifo_words;
+        if (addressed_payload && !commands.empty() &&
+            (commands.back() == 17U || commands.back() == 18U)) {
+            const uint32_t sector = arguments.back() / (card_sdsc ? 512U : 1U);
+            value = 0xA5000000U | (sector * 128U + fifo_words);
+        }
         if (!commands.empty() && commands.back() == 51U)
             value = fifo_words == 0U
                         ? (card_four_bit ? 0x00000502U : 0x00000102U)

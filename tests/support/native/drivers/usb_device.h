@@ -51,6 +51,8 @@ typedef struct {
     bool out_zero_disable_requested;
     bool reserved_ep0_pid_command;
     bool hold_bulk_pid;
+    /** \brief Test-only DMA register offset whose zero writes are refused. */
+    uint32_t refused_dma_address_offset;
 } nx_native_usb_hardware_t;
 typedef struct {
     nx_usb_controller_t controller;
