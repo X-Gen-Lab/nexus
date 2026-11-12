@@ -11,6 +11,12 @@ def validate_selection(selection, ram_size):
             fail('PVD has no GPIO pull policy')
     elif 'threshold_code' in selection:
         fail('threshold_code requires a PVD mode')
+    if selection['mode'] == 'hardware-event':
+        if {'event_capacity', 'irq_priority', 'calls_os'} & selection.keys():
+            fail('EXTI hardware-event has no IRQ or queue storage')
+        if selection.get('edge') not in {'rising', 'falling', 'both'}:
+            fail('EXTI hardware-event requires an explicit valid edge')
+        return
     if selection['mode'] == 'pvd-level':
         if {'edge', 'event_capacity', 'irq_priority', 'calls_os'} & selection.keys():
             fail('PVD level mode has no IRQ or event storage')

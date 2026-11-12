@@ -100,6 +100,8 @@ def emit_controllers(controllers):
             ' * it does not assert that cache is enabled. Unknown timestamp',
             ' * means no usable source described, never event time zero.',
             ' * I2C address_bits zero means width belongs to each endpoint.',
+            ' * I2C nominal_hz is rounded down from the selected clock and',
+            ' * divider; zero means no physical timing integration is known.',
             ' */',
             'typedef struct {',
             *[f"    uint32_t {name};" for name in _FIELDS[kind]],

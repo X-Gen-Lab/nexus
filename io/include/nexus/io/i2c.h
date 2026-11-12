@@ -114,7 +114,11 @@ struct nx_i2c_endpoint {
  *                  Controller settlement does not establish bus recovery.
  *
  * \note            Task-only, one executor. No hidden scan or GPIO recovery.
- *                  Failed bus recovery is never reported as transfer success.
+ *                  Descriptors, progress and payloads cannot overlap provider
+ *                  control metadata. Progress cannot alias descriptors or any
+ *                  payload; opposite-direction payloads must not overlap.
+ *                  Context or invalid storage/shape rejection leaves progress
+ *                  unchanged. Failed recovery never reports transfer success.
  */
 nx_result_t nx_i2c_endpoint_transaction(const nx_i2c_endpoint_t* endpoint,
                                         nx_i2c_message_t* messages,

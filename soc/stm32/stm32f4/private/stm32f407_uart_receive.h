@@ -11,7 +11,7 @@
 /** \brief Only selected receive modes own these exact hardware targets. */
 typedef struct {
     nx_stm32_uart_state_t uart;
-    nx_stm32_uart_dma_resources_t resources;
+    const nx_stm32_uart_dma_resources_t* resources;
     DMA_Stream_TypeDef* receive;
     nx_stream_t* stream;
     nx_stream_producer_t producer;

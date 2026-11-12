@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 044b11038a04d18fd8fa495414c465ab37bafe321eab71394d5ef4c217b39eb9\n"
+"X-Nexus-Source-SHA256: 7a8db0dfb3e448b6995b996f79bba5bf70a2e01f6b7c333966e223ed901021a6\n"
 
 #: docs/explanation/factory.md:9
 msgid "Typed factory, static instances and polymorphic faces"
@@ -252,10 +252,6 @@ msgid "Work performed"
 msgstr "实际工作"
 
 #: docs/explanation/factory.md:0
-msgid "`nx_factory_uart(id)`"
-msgstr "`nx_factory_uart(id)`"
-
-#: docs/explanation/factory.md:0
 msgid "Select and return an existing readonly UART face"
 msgstr "选择并返回已有只读 UART 接口面"
 
@@ -340,3 +336,12 @@ msgstr ""
 "[异步教程](../tutorials/async-io.md)运行完整生成 factory 可执行文件，验证冷态查找、共享 ops "
 "下的独立上下文、总线/端点身份、无效 ID、停止/重启和隔离保留。这些接口的权威是[接入合同](../design/integration-"
 "contracts.md)及生成/公开头文件；本页解释设计，不重复函数声明。"
+
+msgid "With `factory.capabilities = true`, metadata lookup has the same class-specific strong reference: for example, `nx_factory_gpio_capability_ref(NX_GPIO_REF_LED0)`. It returns the original immutable metadata object without a copy or second lookup table. The getter is not emitted when metadata is disabled. C11 and C++17 reject a different class reference or a bare scalar in this call, just as for the face getter."
+msgstr "选择 `factory.capabilities = true` 时，metadata 查找使用同一类别的强类型引用，例如 `nx_factory_gpio_capability_ref(NX_GPIO_REF_LED0)`。它返回原有不可变 metadata 对象，不复制记录或增加另一套查找表。关闭 metadata 时不生成该 getter。C11 与 C++17 会像 face getter 一样，在此调用中拒绝其他类别引用或裸 scalar。"
+
+msgid "Scalar getters and their single underlying switch remain available. Migrating ordinary consumers to strong references does not remove that implementation. COUNT constants and lifecycle controller ordinals retain their distinct counting/diagnostic purposes; they are not class-specific device references."
+msgstr "scalar getter 及其唯一底层 switch 仍保留。将普通消费者迁移到强类型引用不会删除该实现。COUNT 常量与生命周期 controller ordinal 分别用于计数和诊断，不是某一类别的设备引用。"
+
+msgid "`nx_factory_uart_ref(ref)`"
+msgstr "`nx_factory_uart_ref(ref)`"

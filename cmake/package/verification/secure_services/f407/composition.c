@@ -12,7 +12,7 @@
 #include "nexus/network/lwip_storage.h"
 #include "nexus/tls/storage.h"
 #include "nexus_bindings.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 #include "public_ca.h"
 #include <stdalign.h>
 
@@ -49,8 +49,8 @@ uint32_t nx_lwip_port_random_u32(void) {
     uint8_t bytes[4U];
     const nx_clock_t clock = {now, NULL};
     nx_result_t result = nx_entropy_fill(
-        nx_factory_entropy(NX_ENTROPY_ID_RANDOM), bytes, sizeof(bytes), &clock,
-        nx_deadline_after(nx_time_now_us(), 100000U));
+        nx_factory_entropy_ref(NX_ENTROPY_REF_RANDOM), bytes, sizeof(bytes),
+        &clock, nx_deadline_after(nx_time_now_us(), 100000U));
     if (result != NX_SUCCESS) {
         nx_lwip_port_assert("Unqualified link fixture RNG source failed");
         for (;;) {
@@ -167,7 +167,7 @@ int main(void) {
         return 1;
     }
     /* Exact facts of the selected reviewed hse8-pll168 Qiming assembly. */
-    nx_result_t result = nx_factory_entropy(NX_ENTROPY_ID_RANDOM) != NULL
+    nx_result_t result = nx_factory_entropy_ref(NX_ENTROPY_REF_RANDOM) != NULL
                              ? NX_SUCCESS
                              : NX_ERROR_STATE;
     bool joined = true;
@@ -183,7 +183,7 @@ int main(void) {
         const nx_tls_runtime_config_t runtime_config = {
             tls_arena,
             sizeof(tls_arena),
-            nx_factory_entropy(NX_ENTROPY_ID_RANDOM),
+            nx_factory_entropy_ref(NX_ENTROPY_REF_RANDOM),
             {now, NULL},
             {untrusted_utc, NULL},
             100000U,

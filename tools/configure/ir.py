@@ -336,6 +336,12 @@ class ExtiOptions:
 
 
 @dataclass(frozen=True)
+class ExtiHardwareOptions:
+    edge: str
+    pull: str = "none"
+
+
+@dataclass(frozen=True)
 class PvdOptions:
     threshold_code: int
 
@@ -447,6 +453,8 @@ class DacOptions:
     trigger: str
     amplitude: int = 0
     irq: IrqOptions | None = None
+    trigger_input: str | None = None
+    recovery_trigger: str | None = None
 
 
 @dataclass(frozen=True)
@@ -486,6 +494,28 @@ class AdcWatchdogOptions:
 
 
 @dataclass(frozen=True)
+class AdcInjectedTimerOptions:
+    source: str
+    timer: str
+    index: int
+    delay_us: int
+    timer_clock_hz: int
+    prescaler: int
+    period: int
+    trigger_identity: int
+
+
+@dataclass(frozen=True)
+class AdcInjectedOptions:
+    channels: tuple[int, ...]
+    sample_times: tuple[int, ...]
+    min_interval_us: int
+    converters: tuple[int, ...]
+    ranks: int
+    timer: AdcInjectedTimerOptions | None = None
+
+
+@dataclass(frozen=True)
 class AdcGroupOptions:
     channels: tuple[int, ...]
     sample_times: tuple[int, ...]
@@ -507,6 +537,8 @@ class AdcGroupOptions:
     adc_clock_hz: int
     timer_clock_hz: int
     trigger_identity: int
+    max_service_gap_us: int = 0
+    injected: AdcInjectedOptions | None = None
 
 
 @dataclass(frozen=True)
@@ -562,6 +594,7 @@ class UsbDeviceOptions:
     engine: str = "pio"
     host: "UsbHostOptions | None" = None
     power: "UsbOtgPowerOptions | None" = None
+    remote_wakeup: bool = False
 
 
 @dataclass(frozen=True)
@@ -665,6 +698,13 @@ class RtcOptions:
     timeout_us: int
     poll_limit: int
     initial: RtcCalendarOptions | None
+    lse_bypass: bool = False
+
+
+@dataclass(frozen=True)
+class CryptoOptions:
+    """One selected static engine; algorithms and byte spans are per request."""
+    irq: IrqOptions
 
 
 @dataclass(frozen=True)
@@ -755,15 +795,82 @@ class AudioOptions:
     rate_numerator: int
     rate_denominator: int
     irq: IrqOptions
+    continuous: bool = False
+    max_sample_rate_hz: int = 0
+    max_service_gap_us: int = 0
 
 
-ControllerOptions = (CaptureOptions | AudioOptions | GpioOptions | BlockOptions | FlashOptions | PinStateOptions | UartOptions | SpiOptions | I2cOptions | I2cTargetOptions |
-                     ExtiOptions | PvdOptions | PvdEventsOptions | PwmOptions | PwmGroupOptions | TimerWaveformOptions | EncoderOptions | AdcOptions | DacOptions | CanOptions |
+@dataclass(frozen=True)
+class SaiOptions:
+    """One exact free-frame geometry; System retains auxiliary PLL choices."""
+    sample_bits: int
+    slot_bits: int
+    slots: int
+    frame_sync_bits: int
+    first_bit_offset: int
+    frame_sync_high: bool
+    frame_sync_before: bool
+    frame_sync_channels: bool
+    first_lsb: bool
+    sample_rising: bool
+    mclk: bool
+    no_divider: bool
+    mckdiv: int
+    max_bit_clock_hz: int
+    poll_limit: int
+    source_block: str
+    irq: IrqOptions
+
+
+@dataclass(frozen=True)
+class DisplayTimingOptions:
+    width: int
+    height: int
+    hsync: int
+    hback_porch: int
+    hfront_porch: int
+    vsync: int
+    vback_porch: int
+    vfront_porch: int
+    hsync_polarity: str
+    vsync_polarity: str
+    de_polarity: str
+    clock_polarity: str
+
+
+@dataclass(frozen=True)
+class DisplayLayerOptions:
+    layer: int
+    x: int
+    y: int
+    width: int
+    height: int
+    formats: tuple[str, ...]
+    alpha: int
+    pixel_alpha: bool
+
+
+@dataclass(frozen=True)
+class DisplayOptions:
+    timing: DisplayTimingOptions
+    layers: tuple[DisplayLayerOptions, ...]
+    drain_us: int
+    irq: IrqOptions
+
+
+@dataclass(frozen=True)
+class ImageOptions:
+    drain_us: int
+    irq: IrqOptions
+
+
+ControllerOptions = (DisplayOptions | ImageOptions | CaptureOptions | AudioOptions | SaiOptions | GpioOptions | BlockOptions | FlashOptions | PinStateOptions | UartOptions | SpiOptions | I2cOptions | I2cTargetOptions |
+                     ExtiOptions | ExtiHardwareOptions | PvdOptions | PvdEventsOptions | PwmOptions | PwmGroupOptions | TimerWaveformOptions | EncoderOptions | AdcOptions | DacOptions | CanOptions |
                      UsbDeviceOptions | UsbHostOptions | EthernetOptions | EthernetFramesOptions |
                      TimerCaptureOptions |
                      AdvancedPwmOptions | PwmAdcOptions | CanFdOptions |
                      AdcGroupOptions | LptimOptions | RtcOptions | ExternalBusOptions |
-                     WindowWatchdogOptions | NoOptions)
+                     WindowWatchdogOptions | CryptoOptions | NoOptions)
 
 
 def mode_options(values):
@@ -783,6 +890,21 @@ def mode_options(values):
     irq = (IrqOptions(values["irq_priority"], values.get("calls_os", False),
                       values.get("irq_probe", False))
            if "irq_priority" in values else None)
+    if kind in {"cipher", "hash"}:
+        if irq is None:
+            raise ValueError("Crypto transport requires an explicit IRQ policy")
+        return CryptoOptions(irq)
+    if kind in {"display", "image"}:
+        if irq is None:
+            raise ValueError("Graphics requires an explicit IRQ policy")
+        if kind == "image":
+            return ImageOptions(values["drain_us"], irq)
+        return DisplayOptions(
+            DisplayTimingOptions(**values["timing"]),
+            tuple(DisplayLayerOptions(
+                **{key: value for key, value in layer.items() if key != "formats"},
+                formats=tuple(layer["formats"])) for layer in values["layers"]),
+            values["drain_us"], irq)
     if kind == "capture":
         return CaptureOptions(*(values[key] for key in (
             "pixel_clock_hz", "poll_limit", "frame_divisor", "pclk_falling",
@@ -790,12 +912,22 @@ def mode_options(values):
             tuple(values["codes"]),
             CaptureCropOptions(**values["crop"]) if values["crop"] is not None else None,
             values["max_service_gap_us"], irq)
+    if kind == "audio" and values["controller"] == "SAI1":
+        return SaiOptions(*(values[key] for key in (
+            "sample_bits", "slot_bits", "slots", "frame_sync_bits",
+            "first_bit_offset", "frame_sync_high", "frame_sync_before",
+            "frame_sync_channels", "first_lsb", "sample_rising", "mclk",
+            "no_divider", "mckdiv", "max_bit_clock_hz", "poll_limit",
+            "source_block")), irq)
     if kind == "audio":
         return AudioOptions(*(values[key] for key in (
             "standard", "sample_bits", "slot_bits", "mclk", "cpol_high",
             "poll_limit", "sample_rate_hz", "pll_n", "pll_r", "max_error_ppm",
             "pll_input_hz", "pll_m", "pll_hse", "divider", "odd",
-            "rate_numerator", "rate_denominator")), irq)
+            "rate_numerator", "rate_denominator")), irq,
+            values.get("continuous", False),
+            values.get("max_sample_rate_hz", 0),
+            values.get("max_service_gap_us", 0))
     if kind == "adc_group":
         plan = values["adc_group_resolution"]
         return AdcGroupOptions(
@@ -809,7 +941,16 @@ def mode_options(values):
             values["drain_timeout_us"], tuple(plan["converters"]),
             *(plan[key] for key in (
                 "ranks", "sample_stride", "scan_stride", "max_frames",
-                "adc_clock_hz", "timer_clock_hz", "trigger_identity")))
+                "adc_clock_hz", "timer_clock_hz", "trigger_identity")),
+            max_service_gap_us=values.get("max_service_gap_us", 0),
+            injected=(AdcInjectedOptions(
+                tuple(values["injected"]["channels"]),
+                tuple(values["injected"]["sample_times"]),
+                values["injected"]["min_interval_us"],
+                tuple(plan["injected_converters"]), plan["injected_ranks"],
+                timer=(AdcInjectedTimerOptions(**plan["injected_timer"])
+                       if "injected_timer" in plan else None))
+                if "injected" in values else None))
     if kind == "pwm_adc":
         return PwmAdcOptions(*(values[key] for key in (
             "tick_hz", "period_ticks", "trigger_ticks", "deadtime_ticks")),
@@ -839,7 +980,8 @@ def mode_options(values):
                             electrical_handover=values["electrical_handover"])
              if "host" in values else None),
             (UsbOtgPowerOptions(**values["power"])
-             if "power" in values else None))
+             if "power" in values else None),
+            values.get("remote_wakeup", False))
     if kind == "usb_host":
         return UsbHostOptions(*(values[key] for key in (
             "channel_count", "rx_fifo_words", "nonperiodic_fifo_words",
@@ -906,6 +1048,9 @@ def mode_options(values):
             "own_address", "address_bits", "second_address", "max_hz",
             "irq_latency_us", "pec", "alert")), irq)
     if kind == "exti":
+        if values['mode'] == 'hardware-event':
+            return ExtiHardwareOptions(values['edge'],
+                                       values.get('pull', 'none'))
         if values['mode'] == 'pvd-level':
             return PvdOptions(values['threshold_code'])
         if values['mode'] == 'pvd-events':
@@ -928,7 +1073,9 @@ def mode_options(values):
     if kind == "dac":
         return DacOptions(tuple(values["channels"]), values["format"],
                           tuple(values["idle_codes"]), values["output_buffer"],
-                          values["trigger"], values.get("amplitude", 0), irq)
+                          values["trigger"], values.get("amplitude", 0), irq,
+                          values.get("trigger_input"),
+                          values.get("recovery_trigger"))
     if kind == "lptim":
         return LptimOptions(values["tick_hz"], irq)
     if kind == "rtc":
@@ -939,7 +1086,8 @@ def mode_options(values):
             return RtcOptions(values["allow_set"], values["timeout_us"],
                               values["poll_limit"],
                               RtcCalendarOptions(**initial)
-                              if initial is not None else None)
+                              if initial is not None else None,
+                              values.get("lse_bypass", False))
     if kind == "watchdog" and values["mode"] == "window":
         return WindowWatchdogOptions(values.get("window_ticks", 1))
     if kind in {"watchdog", "rtc", "crc", "entropy"}:
@@ -1014,6 +1162,21 @@ class ControllerIR(Record):
             result["adc_group_resolution"] = {name: getattr(self.options, name)
                 for name in ("converters", "ranks", "sample_stride", "scan_stride",
                     "max_frames", "adc_clock_hz", "timer_clock_hz", "trigger_identity")}
+            if self.options.injected is not None:
+                injected = self.options.injected
+                result["injected"] = {name: getattr(injected, name)
+                    for name in ("channels", "sample_times", "min_interval_us")}
+                result["adc_group_resolution"].update(
+                    injected_converters=injected.converters,
+                    injected_ranks=injected.ranks)
+                if injected.timer is not None:
+                    timer = injected.timer
+                    result["injected"].update(trigger=timer.source,
+                                              delay_us=timer.delay_us)
+                    result["adc_group_resolution"]["injected_timer"] = {
+                        name: getattr(timer, name) for name in (
+                            "source", "timer", "index", "delay_us", "timer_clock_hz",
+                            "prescaler", "period", "trigger_identity")}
         if isinstance(self.options, TimerWaveformOptions):
             result["waveform_resolution"] = {name: getattr(self.options, name)
                 for name in ("channels", "complementary", "internal_trigger",
@@ -1128,9 +1291,10 @@ class FsmcParameters:
 
 
 @dataclass(frozen=True)
-class NorSectorOptions:
+class FlashEraseSpanOptions:
     offset: int
-    size: int
+    erase_bytes: int
+    count: int
 
 
 @dataclass(frozen=True)
@@ -1140,7 +1304,7 @@ class FsmcNorOptions:
     unlock1: int
     unlock2: int
     cfi_address: int
-    sectors: tuple[NorSectorOptions, ...]
+    erase_spans: tuple[FlashEraseSpanOptions, ...]
     ready_delay_us: int
     requires_fresh_erase: bool
 
@@ -1179,6 +1343,59 @@ class NandOptions:
 
 
 @dataclass(frozen=True)
+class SdramMinimum:
+    """Original device minimum in nanoseconds and memory clock cycles."""
+    nanoseconds: int
+    cycles: int
+
+
+@dataclass(frozen=True)
+class SdramTiming:
+    mrd: SdramMinimum
+    xsr: SdramMinimum
+    ras: SdramMinimum
+    rc: SdramMinimum
+    wr: SdramMinimum
+    rp: SdramMinimum
+    rcd: SdramMinimum
+
+
+@dataclass(frozen=True)
+class SdramParameters:
+    bytes: int
+    row_bits: int
+    column_bits: int
+    internal_banks: int
+    width_bits: int
+    cas: int
+    sdclk_div: int
+    read_pipe: int
+    initial_refreshes: int
+    max_sdclk_hz: int
+    refresh_window_us: int
+    powerup_us: int
+    prepare_budget_us: int
+    stop_budget_us: int
+    timing: SdramTiming
+
+
+@dataclass(frozen=True)
+class SdramWindowOptions:
+    """One CPU window; physical geometry remains in the endpoint parameters."""
+    binding: str
+    mode: str
+    parameters: SdramParameters
+
+    @property
+    def address(self):
+        return 0xc0000000
+
+    @property
+    def bytes(self):
+        return self.parameters.bytes
+
+
+@dataclass(frozen=True)
 class MemoryWindowOptions:
     mode: str
     binding: str
@@ -1199,6 +1416,24 @@ class Parallel16Options:
 
 
 @dataclass(frozen=True)
+class QspiParameters:
+    """Exact serial part and bounded transport choices, without derived geometry."""
+    part: str
+    prescaler: int
+    cs_high_cycles: int
+    read_budget_us: int
+    prepare_budget_us: int
+    stop_budget_us: int
+
+
+@dataclass(frozen=True)
+class QspiFlashOptions:
+    binding: str
+    mode: str
+    parameters: QspiParameters
+
+
+@dataclass(frozen=True)
 class EndpointIR(Record):
     id: str
     controller: str
@@ -1207,7 +1442,8 @@ class EndpointIR(Record):
     options: (SpiEndpointOptions | SpiTransactionEndpointOptions |
               SpiDMATransactionEndpointOptions |
               I2cEndpointOptions | I2cLongEndpointOptions | UsbEndpointOptions |
-              MemoryWindowOptions | Parallel16Options | FlashAsyncOptions | NandOptions)
+              MemoryWindowOptions | SdramWindowOptions | Parallel16Options |
+              FlashAsyncOptions | QspiFlashOptions | NandOptions)
     source_fields: tuple[str, ...]
 
     def projection(self):
@@ -1250,6 +1486,15 @@ class EndpointIR(Record):
             options = UsbEndpointOptions(values["endpoint_index"], *(values[key]
                 for key in ("number", "direction", "transfer", "max_packet",
                             "fifo_start", "fifo_words")))
+        elif kind == "external_bus" and controller.mode == "qspi-indirect-sdr":
+            options = QspiFlashOptions(values["binding"], values["mode"],
+                QspiParameters(**values["parameters"]))
+        elif kind == "external_bus" and controller.mode == "sdram-controller":
+            parameters = values["parameters"]
+            timing = SdramTiming(**{name: SdramMinimum(**minimum)
+                                    for name, minimum in parameters["timing"].items()})
+            options = SdramWindowOptions(values["binding"], values["mode"],
+                SdramParameters(**{**parameters, "timing": timing}))
         elif kind == "external_bus":
             p = values.get("parameters")
             if p is not None:
@@ -1266,8 +1511,8 @@ class EndpointIR(Record):
                     ParallelTimingOptions(**values["write_timing"]))
                 if values["driver"] == "flash_async-endpoint":
                     nor=values["nor"]
-                    protocol=FsmcNorOptions(**{**nor,"sectors":tuple(
-                        NorSectorOptions(**sector) for sector in nor["sectors"])})
+                    protocol=FsmcNorOptions(**{**nor,"erase_spans":tuple(
+                        FlashEraseSpanOptions(**span) for span in nor["erase_spans"])})
                     options=FlashAsyncOptions(*arguments,p,protocol,values["mode"],
                         values["address"],values["bytes"])
                 elif values["driver"] == "memory_window-endpoint":
@@ -1346,6 +1591,39 @@ class ClockDomainIR:
 
 
 @dataclass(frozen=True)
+class PllSaiQClockIR:
+    """Selected SAI1 kernel output of the one System auxiliary PLL."""
+    q: int
+    post_divider: int
+    kernel_hz: int
+
+
+@dataclass(frozen=True)
+class PllSaiRClockIR:
+    """Selected LTDC pixel output of the same System auxiliary PLL."""
+    r: int
+    post_divider: int
+    pixel_hz: int
+
+
+@dataclass(frozen=True)
+class PllSaiClockIR:
+    """Shared source/M/N; only declared Q and R outputs acquire ownership."""
+    m: int
+    n: int
+    sai1: PllSaiQClockIR | None
+    ltdc: PllSaiRClockIR | None
+
+    @classmethod
+    def from_validated(cls, record):
+        return cls(record["m"], record["n"],
+                   PllSaiQClockIR(**record["sai1"])
+                   if record["sai1"] is not None else None,
+                   PllSaiRClockIR(**record["ltdc"])
+                   if record["ltdc"] is not None else None)
+
+
+@dataclass(frozen=True)
 class ClockPlanIR:
     """Selected-only cold clock facts; no public runtime clock manager."""
     profile: str
@@ -1355,6 +1633,7 @@ class ClockPlanIR:
     provenance: str
     physical_qualified: bool
     parameters: Mapping | None = None
+    pll_sai: PllSaiClockIR | None = None
 
     @classmethod
     def from_validated(cls, record):
@@ -1363,7 +1642,9 @@ class ClockPlanIR:
                                      for name, value in record["domains"].items()}),
                    tuple(record["reviewed_revision_ids"]),
                    record["provenance"], record["physical_qualified"],
-                   freeze(record["parameters"]) if "parameters" in record else None)
+                   freeze(record["parameters"]) if "parameters" in record else None,
+                   PllSaiClockIR.from_validated(record["pll_sai"])
+                   if record.get("pll_sai") is not None else None)
 
 
 @dataclass(frozen=True)

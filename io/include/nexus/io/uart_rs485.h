@@ -63,7 +63,11 @@ extern const nx_uart_ops_t nx_uart_rs485_ops;
  * setup and wire completion; mandatory drain/hold may extend the borrow beyond
  * that deadline. Rejected TX leaves DE and transport unchanged. Failed drain or
  * DE withdrawal keeps QUARANTINED outer storage and DE ownership until service
- * retry.
+ * retry. Unrepresentable setup rejects with EXHAUSTED before DE assertion.
+ * Exhaustion after acceptance never revokes its borrow. If the minimum hold
+ * cannot be proved in the remaining time domain, DE and the outer loan remain
+ * QUARANTINED; stop stays BUSY until external isolation/recovery. Service never
+ * shortens that electrical hold or invents a new time domain.
  */
 nx_result_t nx_uart_rs485_initialize(nx_uart_rs485_state_t* state,
                                      const nx_uart_rs485_config_t* config);

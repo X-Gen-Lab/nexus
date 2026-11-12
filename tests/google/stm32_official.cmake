@@ -18,7 +18,7 @@ target_include_directories(nexus_stm32_official_test SYSTEM PRIVATE
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
 nexus_use_cmsis_core(nexus_stm32_official_test)
 target_compile_definitions(nexus_stm32_official_test PRIVATE
-    NEXUS_STM32_MODEL STM32F407xx)
+    NEXUS_STM32_MODEL STM32F407xx NX_STM32_GPIO_LATCH_MODEL)
 
 nexus_google_test(nexus_stm32_watchdog_test STM32F4_LL SOURCES stm32_watchdog_test.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/watchdog.c"

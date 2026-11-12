@@ -1,6 +1,6 @@
 """One typed decision owns both generation and the exported JSON projection."""
 from tools.configure.tests.native_fixture import native_fixture
-from dataclasses import fields, replace
+from dataclasses import FrozenInstanceError, fields, replace
 from collections.abc import Mapping
 from pathlib import Path
 from operator import getitem
@@ -8,7 +8,7 @@ import tempfile
 import unittest
 
 from tools.configure import configure, emission, factory
-from tools.configure.ir import ConfigurationIR
+from tools.configure.ir import ConfigurationIR, ControllerIR, EndpointIR
 
 
 class UnifiedIrTests(unittest.TestCase):
@@ -73,6 +73,27 @@ class UnifiedIrTests(unittest.TestCase):
             path.write_text("{}", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "TOML"):
                 configure.load_assembly(path, test_support=native_fixture(path))
+
+    def test_serial_flash_endpoint_keeps_one_immutable_geometry_selection(self):
+        # This is the typed boundary, not a substitute for exact Board/resource
+        # resolution. The same C constructor receives these actual records.
+        bus = ControllerIR.create(dict(id="bus", kind="external_bus",
+            controller="QUADSPI", binding="control", mode="qspi-indirect-sdr",
+            pins=[], route="quadspi-indirect-control", mask=0, initial=0),
+            "stm32f4")
+        parameters = dict(part="W25Q128JV", prescaler=1, cs_high_cycles=2,
+            read_budget_us=1000, prepare_budget_us=2000, stop_budget_us=3000)
+        values = dict(id="nor", controller="bus", driver="flash_async-endpoint",
+            binding="flash1", mode="nor-indirect", parameters=parameters)
+        endpoint = EndpointIR.create(values, (bus,))
+        self.assertEqual("QspiFlashOptions", type(endpoint.options).__name__)
+        selected = endpoint.options.parameters
+        self.assertEqual("QspiParameters", type(selected).__name__)
+        self.assertNotIsInstance(selected, Mapping)
+        self.assertEqual(set(parameters), {item.name for item in fields(selected)})
+        self.assertEqual(values, endpoint.to_dict())
+        with self.assertRaises(FrozenInstanceError):
+            selected.prescaler = 3
 
 
 if __name__ == "__main__":

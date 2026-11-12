@@ -77,7 +77,7 @@ class F407Handoff : public ::testing::Test {
         registers = {{kCpuid, 0x410fc241U},
                      {kRcc, 0x00000083U},
                      {kFlashRegisters + 0x10U, 0x80000000U},
-                     {kDebugIdentity, 0x10000413U},
+                     {kDebugIdentity, 0x10010413U},
                      {kVector, kStack},
                      {kVector + 4U, kPc}};
         ON_CALL(cpu, Read(_)).WillByDefault(Invoke([this](uintptr_t address) {
@@ -113,6 +113,11 @@ class F407Handoff : public ::testing::Test {
 TEST_F(F407Handoff, TransfersExactVectorStackAndThumbPcWithoutReturning) {
     EXPECT_CALL(cpu, Tail(kVector, kStack, kPc)).Times(1);
     EXPECT_THROW(Run(), Transfer);
+}
+
+TEST_F(F407Handoff, UnreviewedObservedCutCannotTransferToAnotherImage) {
+    registers[kDebugIdentity] = 0x10020413U;
+    Rejected(NX_ERROR_UNSUPPORTED);
 }
 TEST_F(F407Handoff, OrdinarySystemInitFpuPermissionWithNoFpOwnerIsSupported) {
     registers[kCpacr] = 0x00f00000U;
@@ -195,7 +200,7 @@ TEST_F(F407Handoff, RejectsWrongCpuAndPhysicalDensityOrDeviceGroup) {
     registers[kCpuid] = 0x410fc241U;
     registers[kDebugIdentity] = 0x10000450U;
     EXPECT_EQ(Run(), NX_ERROR_IO);
-    registers[kDebugIdentity] = 0x10000413U;
+    registers[kDebugIdentity] = 0x10010413U;
     EXPECT_CALL(cpu, Read16(kFlashDensity)).WillOnce(Return(2048U));
     EXPECT_EQ(Run(), NX_ERROR_IO);
 }

@@ -239,7 +239,10 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
 /** \brief Bound STOP observation; reset local controller if the bus stays hung.
  */
 static bool drain_stop(nx_stm32_i2c_state_t* port) {
-    nx_time_us_t deadline = nx_deadline_after(nx_time_now_us(), 1000U);
+    nx_time_us_t deadline;
+    if (nx_deadline_finite_after(nx_time_now_us(), 1000U, &deadline) !=
+        NX_SUCCESS)
+        deadline = 0U;
     while ((port->registers->CR1 & I2C_CR1_STOP) != 0U ||
            (port->registers->SR2 & I2C_SR2_MSL) != 0U) {
         NX_STM32_IO_POLL(2U, port);
@@ -254,6 +257,53 @@ static bool drain_stop(nx_stm32_i2c_state_t* port) {
     return true;
 }
 
+/** \brief Polling borrows cannot alias this exact controller's known bytes. */
+static bool polling_storage(const nx_stm32_i2c_endpoint_state_t* endpoint,
+                            const void* storage, size_t bytes) {
+    const nx_stm32_i2c_state_t* port = endpoint->port;
+    return nx_i2c_v1_storage_outside(storage, bytes, port, sizeof(*port)) &&
+           nx_i2c_v1_storage_outside(storage, bytes, endpoint,
+                                     sizeof(*endpoint)) &&
+           nx_i2c_v1_storage_outside(storage, bytes, &nx_stm32_i2c_ops,
+                                     sizeof(nx_stm32_i2c_ops)) &&
+           nx_i2c_v1_storage_outside(storage, bytes, &nx_stm32_i2c_endpoint_ops,
+                                     sizeof(nx_stm32_i2c_endpoint_ops)) &&
+           nx_i2c_v1_storage_outside(storage, bytes, port->registers,
+                                     sizeof(*port->registers)) &&
+           nx_i2c_v1_storage_outside(storage, bytes, port->line_gpio,
+                                     sizeof(*port->line_gpio)) &&
+           (port->registers != I2C3 ||
+            nx_i2c_v1_storage_outside(storage, bytes, GPIOC, sizeof(*GPIOC)));
+}
+
+/** \brief Reuse public message rules before the first progress/payload write.
+ */
+static nx_result_t
+polling_request(const nx_stm32_i2c_endpoint_state_t* endpoint,
+                nx_i2c_message_t* messages, size_t count, size_t* transferred) {
+    size_t descriptors = count * sizeof(*messages);
+    if ((uintptr_t)transferred % _Alignof(size_t) != 0U ||
+        !polling_storage(endpoint, messages, descriptors) ||
+        !polling_storage(endpoint, transferred, sizeof(*transferred)) ||
+        !nx_i2c_v1_storage_outside(transferred, sizeof(*transferred), messages,
+                                   descriptors))
+        return NX_ERROR_INVALID;
+    /* This local view is never admitted, initialized or retained. The existing
+     * validator owns bounded message shape and RX/immutable-TX separation. */
+    const nx_i2c_request_t view = {.messages = messages, .count = count};
+    nx_result_t result = nx_i2c_request_validate(&view);
+    if (result != NX_SUCCESS)
+        return result;
+    for (size_t index = 0U; index < count; ++index) {
+        const nx_i2c_message_t* message = &messages[index];
+        if (!polling_storage(endpoint, message->data, message->length) ||
+            !nx_i2c_v1_storage_outside(message->data, message->length,
+                                       transferred, sizeof(*transferred)))
+            return NX_ERROR_INVALID;
+    }
+    return NX_SUCCESS;
+}
+
 /** \brief Execute a fixed-address, explicitly bounded repeated-START sequence.
  */
 nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
@@ -261,30 +311,30 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
                                               size_t count,
                                               nx_time_us_t deadline,
                                               size_t* transferred) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
     const nx_stm32_i2c_endpoint_state_t* endpoint = context;
     if (endpoint == NULL || endpoint->port == NULL ||
         !nx_i2c_v1_address_valid(endpoint->address, endpoint->address_bits) ||
         messages == NULL || count == 0U || transferred == NULL) {
         return NX_ERROR_INVALID;
     }
-    *transferred = 0U;
-    if (count > NX_I2C_MAX_MESSAGES || deadline == NX_DEADLINE_NEVER) {
+    if (count > NX_I2C_MAX_MESSAGES) {
         return NX_ERROR_UNSUPPORTED;
-    }
-    for (size_t i = 0U; i < count; ++i) {
-        if (messages[i].data == NULL || messages[i].length == 0U) {
-            return NX_ERROR_INVALID;
-        }
-        if (messages[i].length > NX_I2C_MAX_MESSAGE_BYTES) {
-            return NX_ERROR_UNSUPPORTED;
-        }
     }
     nx_stm32_i2c_state_t* port = endpoint->port;
     if (port->registers == NULL) {
         return NX_ERROR_INVALID;
     }
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
-        return NX_ERROR_CONTEXT;
+    nx_result_t result =
+        polling_request(endpoint, messages, count, transferred);
+    if (result != NX_SUCCESS)
+        return result;
+    *transferred = 0U;
+    if (deadline == NX_DEADLINE_NEVER) {
+        return NX_ERROR_UNSUPPORTED;
     }
     if (port->active || (port->registers->SR2 & I2C_SR2_BUSY) != 0U) {
         return NX_ERROR_BUSY;
@@ -293,16 +343,16 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
         (port->registers->CR1 & I2C_CR1_PE) == 0U) {
         return NX_ERROR_STATE;
     }
-    if (endpoint->address_bits == 10U &&
-        !nx_i2c_v1_ten_timing((uint16_t)port->registers->CCR,
-                              (uint8_t)port->peripheral_mhz)) {
+    if ((endpoint->address_bits == 10U || count > 1U) &&
+        !nx_i2c_v1_restart_timing((uint16_t)port->registers->CCR,
+                                  (uint8_t)port->peripheral_mhz)) {
         return NX_ERROR_UNSUPPORTED;
     }
     if (nx_deadline_expired(deadline, nx_time_now_us())) {
         return NX_ERROR_TIMEOUT;
     }
     port->active = true;
-    nx_result_t result = NX_SUCCESS;
+    result = NX_SUCCESS;
     bool start_requested = false;
     for (size_t message = 0U; message < count; ++message) {
         if (!start_requested) {

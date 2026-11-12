@@ -45,7 +45,7 @@ class TDDToolPreflightTests(unittest.TestCase):
         self.assertGreater(first_suite, commands.index(build))
         self.assertEqual([command[command.index("--suite") + 1]
                           for command in commands if "--suite" in command],
-                         ["testing", "configure", "ci", "workflows"])
+                         ["workflows", "ci", "configure", "testing"])
 
     def test_failed_preflight_never_runs_tools_or_reuses_previous_success(self):
         for action in ("doctor", "configure", "build"):

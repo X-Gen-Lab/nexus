@@ -2,7 +2,7 @@
 
 状态：**当前 factory + 多态平台架构合同；实现与验收映射见[当前交付](../delivery/README.md)。** 代码采用 TOML 静态装配、纯 typed factory、共享只读方法表、独立私有实例和显式所有权边界。本文的伪代码解释合同；精确可编译接口以当前公共头文件及测试为准。软件执行、离线可复现构建和实板资格分别记录，历史[架构](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/archive/strategy/target-architecture.md)仅用于迁移对照。
 
-本次迭代将设计、工程规范、接入契约与33项实施清单落实为新的生产代码和构建链。新源码与产物建立独立资格；历史通过结果不能继承。
+本文保留架构推导与历史33项清单的上下文。本轮工作以固定源码为基础，使用[WP01–WP12 与 IO01–IO20](../delivery/architecture.md#本轮架构迭代任务)区分已有机制、实施增量和未完成任务；不以设计合同宣告整个平台已完成。新源码与产物建立独立资格，历史通过结果不能继承。
 
 用户明确要求代码格式和注释风格保持当前仓库规范。架构可以重构，排版、命名和Doxygen形式沿用现有配置及贡献/注释指南；通过完善合同内容提高可维护性。
 
@@ -25,7 +25,9 @@ MCU 平台的本质是把固定硬件、并发执行和有限资源连接起来�
 
 优先顺序：满足正确性和产品硬约束；减少必需运行成本；减少预留资源；降低接入与维护成本。不能用提前交还 DMA buffer、遗漏错误或未检查的越界换取更小的 benchmark 数值。
 
-当前生产范围为 F4，具体实现限定 F407VE／ZG 与四个独立 Board 包；Native 是显式测试支撑。其他厂商 SDK 保留，原跨系列计划不扩大当前支持。芯片精确型号、路线、执行模式和证据分别管理。
+当前生产入口为 F4，精确器件和模式见[支持范围](../delivery/support.md)；四个 F407
+Board 包与新增料号的软件参考分开。Native 是显式测试支撑，其他厂商 SDK 保留；
+原跨系列计划不扩大当前支持。精确型号、路线、执行模式和证据分别管理。
 
 现有 controller 支持、引脚资料和故障测试仅用于识别需求。新实现可以直接替换不良结构。暂无实板接入，首阶段交付软件和 HIL 工装准备。
 
@@ -43,7 +45,7 @@ MCU 平台的本质是把固定硬件、并发执行和有限资源连接起来�
 
 参考官方机制说明：[Zephyr Devicetree](https://docs.zephyrproject.org/latest/build/dts/index.html)、[Zephyr device model](https://docs.zephyrproject.org/latest/kernel/drivers/index.html)、[FreeRTOS静态任务API](https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/include/task.h)、[RT-Thread I/O框架](https://www.rt-thread.io/document/site/programming-manual/device/device/)、[Embassy executor](https://docs.embassy.dev/embassy-executor/)。这些参考用于架构取舍；正式依赖仍须锁定精确revision并另行验收。
 
-选择依据是两SoC、三板、固定BOM、十人维护和C产品接入：构建期描述硬件，链接期选择实现，运行期只维护实际执行与借用状态。工业控制中的高频固定输出与企业设备管理中的运行时发现不是相同问题，需要不同的成本模型。
+首轮选择依据是F407VE／ZG、四个独立Board包、固定BOM和C产品接入：构建期描述硬件，链接期选择实现，运行期只维护实际执行与借用状态。工业控制中的高频固定输出与企业设备管理中的运行时发现不是相同问题，需要不同的成本模型。
 
 ## 2. 默认运行模型：静态装配、固定绑定、最小驱动
 

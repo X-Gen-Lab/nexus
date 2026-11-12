@@ -18,7 +18,7 @@ from tools.measurement.resources import (resolved_float_abi,
 
 ROOT = Path(__file__).resolve().parents[2]
 FACE_DECLARATION = re.compile(
-    r"static\s+const\s+(nx_\w+_t)\s+(s_nx_(?:device_)?face_\w+)\s*="
+    r"static\s+const\s+(nx_\w+_t)\s+(s_nx_(?:(?:device_)?face_|flash_readonly_)\w+)\s*="
 )
 FACE_INITIALIZER = re.compile(
     FACE_DECLARATION.pattern + r"\s*\{\s*&(nx_\w+_ops)\s*,\s*"

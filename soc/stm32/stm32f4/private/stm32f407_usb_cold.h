@@ -35,8 +35,48 @@ typedef struct {
     uint32_t clock_timeout_us;
     uint16_t rx_fifo_words;
     uint8_t priority;
+    nx_usb_remote_runtime_t* remote;
 } nx_stm32_usb_cold_config_t;
 
+/** \brief A selected runtime must not be erased by its cold assembly.
+ * \param[in] remote: Optional static remote runtime.
+ * \param[in] object: One live cold metadata or snapshot region.
+ * \param[in] bytes: Region extent, with no wrapping arithmetic.
+ * \return True when the remote object is naturally aligned and disjoint.
+ */
+static inline bool
+nx_stm32_usb_remote_separate(const nx_usb_remote_runtime_t* remote,
+                             const void* object, size_t bytes) {
+    if (remote == NULL)
+        return true;
+    uintptr_t r = (uintptr_t)remote, p = (uintptr_t)object;
+#ifdef __cplusplus
+    const size_t alignment = alignof(nx_usb_remote_runtime_t);
+#else
+    const size_t alignment = _Alignof(nx_usb_remote_runtime_t);
+#endif
+    return r % alignment == 0U && sizeof(*remote) <= UINTPTR_MAX - r &&
+           bytes <= UINTPTR_MAX - p &&
+           (bytes == 0U || r >= p + bytes || p >= r + sizeof(*remote));
+}
+/** \brief Gate withdrawal has no wait; exhausted room never means infinite.
+ * \param[in] timeout_us: Original finite cold budget.
+ * \param[out] deadline: Finite future bound, or current observation at
+ * exhaustion. \return SUCCESS or an invalid clock value; output remains finite
+ * on success. \note Only the already-drained, bounded USB clock gate stop uses
+ * this helper. An expired finite observation permits a final readback; it
+ *       cannot authorize waiting, signal shortening or a new acquisition.
+ */
+static inline nx_result_t
+nx_stm32_usb_withdraw_deadline(uint32_t timeout_us, nx_time_us_t* deadline) {
+    const nx_time_us_t now = nx_time_now_us();
+    nx_result_t result = nx_deadline_finite_after(now, timeout_us, deadline);
+    if (result == NX_ERROR_EXHAUSTED && now != NX_DEADLINE_NEVER) {
+        *deadline = now;
+        return NX_SUCCESS;
+    }
+    return result;
+}
 /** \brief Assemble FS storage and acquire pins/clock without hidden workers.
  * \note Privileged unmasked Thread only. Config, endpoint/event/snapshot and
  *       clock storage outlive successful close. Failed prepare retains effects
@@ -56,6 +96,36 @@ nx_stm32_usb_cold_prepare(nx_usb_controller_t* port,
         config->clock_timeout_us == 0U || config->drain_timeout_us == 0U ||
         config->priority > 15U || !nx_stm32_packet_pins_valid(config->pins, 2U))
         return NX_ERROR_INVALID;
+    if (config->remote != NULL) {
+        const nx_usb_remote_runtime_t* remote = config->remote;
+        if (config->capacity > SIZE_MAX / sizeof(*config->events) ||
+            !nx_stm32_usb_remote_separate(remote, port, sizeof(*port)) ||
+            !nx_stm32_usb_remote_separate(remote, config, sizeof(*config)) ||
+            !nx_stm32_usb_remote_separate(remote, leases, sizeof(*leases)) ||
+            !nx_stm32_usb_remote_separate(remote, config->clock,
+                                          sizeof(*config->clock)) ||
+            !nx_stm32_usb_remote_separate(remote, &nx_stm32_usb_clock_ops,
+                                          sizeof(nx_stm32_usb_clock_ops)) ||
+            !nx_stm32_usb_remote_separate(remote, config->endpoints,
+                                          config->endpoint_count *
+                                              sizeof(*config->endpoints)) ||
+            !nx_stm32_usb_remote_separate(remote, config->plan,
+                                          config->endpoint_count *
+                                              sizeof(*config->plan)) ||
+            !nx_stm32_usb_remote_separate(remote, config->events,
+                                          config->capacity *
+                                              sizeof(*config->events)) ||
+            !nx_stm32_usb_remote_separate(remote, config->pins,
+                                          2U * sizeof(*config->pins)))
+            return NX_ERROR_INVALID;
+        for (size_t i = 0U; i < 2U; ++i)
+            if (!nx_stm32_usb_remote_separate(
+                    remote, config->pins[i].snapshot,
+                    sizeof(*config->pins[i].snapshot)))
+                return NX_ERROR_INVALID;
+        if (remote->request != NULL)
+            return NX_ERROR_BUSY;
+    }
     if (nx_usb_turnaround(NX_USB_CORE_FS, NEXUS_CORE_HZ) == 0U)
         return NX_ERROR_INVALID;
     if (port->snapshot.epoch == UINT64_MAX)
@@ -68,6 +138,11 @@ nx_stm32_usb_cold_prepare(nx_usb_controller_t* port,
         if (config->endpoints[i].request != NULL)
             return NX_ERROR_BUSY;
     }
+    nx_time_us_t deadline;
+    const nx_result_t budget_status = nx_deadline_finite_after(
+        nx_time_now_us(), config->clock_timeout_us, &deadline);
+    if (budget_status != NX_SUCCESS)
+        return budget_status;
     uint64_t epoch = port->snapshot.epoch;
     memset(port, 0, sizeof(*port));
     port->snapshot.epoch = epoch;
@@ -80,6 +155,7 @@ nx_stm32_usb_cold_prepare(nx_usb_controller_t* port,
     port->poll_limit = config->poll_limit;
     port->drain_timeout_us = config->drain_timeout_us;
     port->rx_fifo_words = config->rx_fifo_words;
+    port->remote = config->remote;
     for (size_t i = 0U; i < config->endpoint_count; ++i) {
         nx_usb_endpoint_t* endpoint = &config->endpoints[i];
         const nx_stm32_usb_endpoint_config_t* selected = &config->plan[i];
@@ -103,9 +179,8 @@ nx_stm32_usb_cold_prepare(nx_usb_controller_t* port,
         if (status != NX_SUCCESS)
             return status;
     }
-    nx_result_t status = nx_stm32_usb_clock_start(
-        config->clock, true,
-        nx_deadline_after(nx_time_now_us(), config->clock_timeout_us));
+    nx_result_t status =
+        nx_stm32_usb_clock_start(config->clock, true, deadline);
     if (status != NX_SUCCESS)
         return status;
     return nx_stm32_usb_device_initialize(port, config->clock);
@@ -133,9 +208,12 @@ nx_stm32_usb_cold_close(nx_usb_controller_t* port,
     nx_result_t status = nx_usb_fs_device_ops.stop(port);
     if (status != NX_SUCCESS)
         return status;
-    status = nx_stm32_usb_clock_stop(
-        config->clock,
-        nx_deadline_after(nx_time_now_us(), config->clock_timeout_us));
+    nx_time_us_t deadline;
+    status =
+        nx_stm32_usb_withdraw_deadline(config->clock_timeout_us, &deadline);
+    if (status != NX_SUCCESS)
+        return status;
+    status = nx_stm32_usb_clock_stop(config->clock, deadline);
     if (status != NX_SUCCESS)
         return status;
     for (size_t i = 2U; i != 0U; --i) {

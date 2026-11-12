@@ -9,6 +9,7 @@ import argparse
 import json
 from pathlib import Path
 import re
+import shlex
 import shutil
 import struct
 import sys
@@ -37,7 +38,8 @@ def check_domains(table: dict[str, tuple[int, int]]) -> None:
     groups = {
         'privileged_flash': ('nx_freertos_mpu_task_start', 'nx_freertos_mpu_task_delete',
                              'nx_freertos_mpu_layout', 'nx_freertos_permanent_task_start',
-                             'MPU_vTaskDelayImpl', 'MPU_xTaskGetTickCountImpl'),
+                             'MPU_vTaskDelayImpl', 'MPU_xTaskGetTickCountImpl',
+                             'SysTick_Handler', 'nx_freertos_kernel_tick_handler'),
         'user_flash': ('nx_freertos_user_delay', 'nx_freertos_user_ticks', 'user_entry'),
         'syscall_flash': ('MPU_vTaskDelay', 'MPU_xTaskGetTickCount'),
         'privileged_ram': ('uxSystemCallImplementations', 'task', 'idle_task'),
@@ -62,6 +64,15 @@ def check_domains(table: dict[str, tuple[int, int]]) -> None:
                name.endswith(('Impl', '_Priv', '_Unpriv'))}
     if veneers != {'MPU_vTaskDelay', 'MPU_xTaskGetTickCount'}:
         raise ValueError('Unreviewed MPU veneers are exposed')
+
+
+def check_tick_object(text: str) -> None:
+    """The linker must not conceal a lost privileged function attribute."""
+    rows = re.findall(
+        r'^\s*[0-9a-fA-F]+\s+g\s+F\s+privileged_functions\s+'
+        r'([0-9a-fA-F]+)\s+SysTick_Handler\s*$', text, re.MULTILINE)
+    if len(rows) != 1 or int(rows[0], 16) == 0:
+        raise ValueError('SysTick must own a privileged input function section')
 
 
 def matrix() -> tuple[dict, ...]:
@@ -210,6 +221,16 @@ def execute(root: Path, recorder, tools: dict, variant: dict) -> dict:
     if value['cpu_profile'] != variant['profile'] or value['kernel_profile'] != variant['kernel']:
         raise ValueError('Actual MPU runtime resolution differs from its authored policy')
     database = json.loads((build / 'compile_commands.json').read_text())
+    entries = [entry for entry in database if Path(entry['file']).resolve() ==
+               (root / 'os/freertos/systick.c').resolve()]
+    if len(entries) != 1:
+        raise ValueError('Actual MPU graph requires one owned SysTick entry')
+    entry = entries[0]
+    arguments = entry.get('arguments') or shlex.split(entry['command'])
+    tick_object = Path(entry['directory']) / arguments[arguments.index('-o') + 1]
+    check_tick_object(recorder.execute(
+        [tools['objdump'], '-t', str(tick_object)],
+        variant['name'] + '-tick-input-section', nonempty=True))
     sources = {Path(item['file']).resolve() for item in database}
     if any(path.name == 'mpu_wrappers_v2.c' for path in sources):
         raise ValueError('The global-object-pool omnibus wrapper was compiled')
@@ -230,6 +251,7 @@ def execute(root: Path, recorder, tools: dict, variant: dict) -> dict:
         raise ValueError('Actual protected task and syscall-stack sizes are inconsistent')
     return {'name': variant['name'], 'status': 'real_mpu_port_link_passed',
             'physical_status': 'not_executed', 'kernel_port': variant['profile']['irq']['kernel_port'],
+            'tick_entry_object': compiler_gate.digest(tick_object),
             'sizes': sizes, 'elf': compiler_gate.digest(elf),
             'map': compiler_gate.digest(build / 'nexus_os_mpu.map'),
             'resolved': compiler_gate.digest(resolved),

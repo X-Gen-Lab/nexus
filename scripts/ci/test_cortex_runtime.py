@@ -270,9 +270,19 @@ class RuntimeAuditTests(unittest.TestCase):
                  ' 800100e: f3bf 8f4f dsb sy\n'
                  ' 8001012: f3bf 8f6f isb sy\n'
                  ' 8001016: f382 8810 msr primask, r2\n')
-        functions = ('vPortEnterCritical', 'SysTick_Handler', 'PendSV_Handler')
+        functions = ('vPortEnterCritical', 'nx_freertos_kernel_tick_handler',
+                     'PendSV_Handler')
         text = ''.join('08001000 <' + name + '>:\n' + guard
                        for name in functions)
+        text += ('08002000 <SysTick_Handler>:\n'
+                 ' 8002000: b508 push {r3, lr}\n'
+                 ' 8002002: f000 f801 bl 8001000 '
+                 '<nx_freertos_kernel_tick_handler>\n'
+                 ' 8002006: e8bd 4008 ldmia.w sp!, {r3, lr}\n'
+                 ' 800200a: f000 b801 b.w 8003000 <nx_arch_dsb>\n'
+                 '08003000 <nx_arch_dsb>:\n'
+                 ' 8003000: f3bf 8f4f dsb sy\n'
+                 ' 8003004: 4770 bx lr\n')
         gate.check_kernel_context(variant, text)
         for name in functions:
             for bad_guard in (guard.replace('cpsid i', 'nop i'),
@@ -286,6 +296,35 @@ class RuntimeAuditTests(unittest.TestCase):
                     gate.check_kernel_context(variant, text.replace(
                         '08001000 <' + name + '>:\n' + guard,
                         '08001000 <' + name + '>:\n' + bad_guard))
+
+    def test_tick_entry_reaches_the_real_kernel_then_final_barrier(self):
+        text = ('08002000 <SysTick_Handler>:\n'
+                ' 8002000: b508 push {r3, lr}\n'
+                ' 8002002: f000 f801 bl 8001000 '
+                '<nx_freertos_kernel_tick_handler>\n'
+                ' 8002006: e8bd 4008 ldmia.w sp!, {r3, lr}\n'
+                ' 800200a: f000 b801 b.w 8003000 <nx_arch_dsb>\n'
+                '08003000 <nx_arch_dsb>:\n'
+                ' 8003000: f3bf 8f4f dsb sy\n'
+                ' 8003004: 4770 bx lr\n')
+        gate.check_kernel_tick_entry(text)
+        for bad in (text.replace('<nx_freertos_kernel_tick_handler>',
+                                 '<unrelated>'),
+                    text.replace('dsb sy', 'nop sy'),
+                    text.replace(' 8003000: f3bf 8f4f dsb sy',
+                                 ' 8002ffe: 4770 bx lr\n'
+                                 ' 8003000: f3bf 8f4f dsb sy'),
+                    text.replace('b.w 8003000 <nx_arch_dsb>',
+                                 'b.w 8003000 <unrelated>'),
+                    text.replace('b508 push {r3, lr}',
+                                 'd001 beq.n 8002006 '
+                                 '<SysTick_Handler+0x6>'),
+                    text.replace('08003000 <nx_arch_dsb>:',
+                                 ' 800200e: 6001 str r1, [r0, #0]\n'
+                                 '08003000 <nx_arch_dsb>:')):
+            with self.subTest(disassembly=bad):
+                with self.assertRaisesRegex(ValueError, 'SysTick'):
+                    gate.check_kernel_tick_entry(bad)
 
     def test_changed_production_input_cannot_qualify_a_mixed_matrix(self):
         with tempfile.TemporaryDirectory() as value:

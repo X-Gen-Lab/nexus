@@ -15,6 +15,13 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class CapabilityDocumentationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.matrix = capabilities.collect(ROOT)
+
+    def setUp(self):
+        self.rows = copy.deepcopy(self.matrix)
+
     def test_generated_block_requires_exact_content_and_single_markers(self):
         expected = "| UART | dma-tx |\n"
         document = ("intro\n" + capabilities.START + "\n" + expected
@@ -37,7 +44,7 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
                          {"nx_sample_uart_ops_extra", "nx_sample_uart_ops"})
 
     def test_current_matrix_uses_actual_resolver_and_preserves_scope(self):
-        rows = capabilities.collect(ROOT)
+        rows = self.rows
         self.assertTrue(rows)
         uart_dma = [row for row in rows if row["family"] == "stm32f4"
                     and row["controller"] == "USART1"
@@ -50,9 +57,24 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
                    and row["controller"] == "SPI1" and row["mode"] == "dma")
         self.assertEqual(set(spi["boards"]), {
             "stm32f407zg-qiming-core", "stm32f407zg-qiming-v41"})
+        nested = (
+            ("DCMI", "capture", "jpeg-blocks",
+             "tests/contracts/f407_capture_audio/jpeg_blocks/ve-jpeg-blocks.toml",
+             "soc/stm32/stm32f4/drivers/capture.c"),
+            ("SPI1", "spi", "short-poll",
+             "tests/contracts/io_storage_cost/spi_endpoints/endpoints-1.toml",
+             "soc/stm32/stm32f4/drivers/spi.c"))
+        for controller, kind, mode, fixture, source in nested:
+            with self.subTest(fixture=fixture):
+                selected = next(row for row in rows
+                                if (row["family"], row["controller"],
+                                    row["kind"], row["mode"]) ==
+                                ("stm32f4", controller, kind, mode))
+                self.assertIn(fixture, selected["fixtures"])
+                self.assertEqual(selected["exports"], [source])
 
     def test_selected_shared_ip_exports_keep_the_actual_driver_path(self):
-        rows = capabilities.collect(ROOT)
+        rows = self.rows
         selected = [row for row in rows if row["family"] == "stm32f4"
                     and row["kind"] == "i2c" and row["exports"]
                     and row["mode"] in {"irq-messages", "dma-messages"}]
@@ -63,7 +85,7 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
                                  ["soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"])
 
     def test_native_models_require_explicit_scope_outside_production_matrix(self):
-        rows = capabilities.collect(ROOT)
+        rows = self.rows
         self.assertEqual({row["family"] for row in rows}, {"stm32f4"})
         fixture = ROOT / "cmake/package/verification/io_evolution/native-time-pair.toml"
         with self.assertRaisesRegex(ValueError, "explicit test support"):
@@ -87,7 +109,7 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         self.assertNotIn("| native |", rendered)
 
     def test_checked_document_matches_facts_and_selected_implementation(self):
-        expected = capabilities.render(capabilities.collect(ROOT))
+        expected = capabilities.render(self.rows)
         document = (ROOT / capabilities.DOCUMENT).read_text()
         capabilities.check_block(document, expected)
 
@@ -95,7 +117,7 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         directory = ROOT / "cmake/package/verification/io_evolution"
         fixtures = sorted(directory.glob("*.toml"))
         self.assertTrue(fixtures)
-        rows = capabilities.collect(ROOT)
+        rows = self.rows
         for fixture in fixtures:
             host = tomllib.loads(fixture.read_text())["backend"] == "native"
             resolved = capabilities.configure.resolve_ir(

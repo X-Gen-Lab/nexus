@@ -183,6 +183,6 @@ restore、查询和 barrier 也分别检查，不能用同一目标内另一个�
 
 本轮执行证据由当前源码重新生成；正式 clean-source SDK、离线双构建和 candidate
 封存还须遵循 [qualification](../delivery/qualification.md)。旧 HEAD 的通过数、
-candidate 或硬件状态不能继承。当前生产 SoC 入口只有 F4，已迁入 F407VE／ZG。
-通用 M7 Cache 和其他 CPU-only 原语仍按自身软件范围验证，不重新建立已退出芯片
-的 SoC 支持。全部物理 HIL 未执行，成功编译不升级产品发布资格。
+candidate 或硬件状态不能继承。当前生产 SoC 入口为 F4，精确器件与模式见
+[支持范围](../delivery/support.md)。通用 M7 Cache 和其他 CPU-only 原语仍按自身
+软件范围验证，不重新建立已退出芯片的 SoC 支持。物理 HIL 未执行，编译不升级产品资格。

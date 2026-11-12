@@ -22,12 +22,14 @@ foreach(row IN LISTS boot_platform_linker_rows)
 endforeach()
 string(APPEND boot_platform_linker_source
     "const uint32_t g_pfnVectors[] = {0U};\n")
-file(WRITE "${boot_platform_bundle}/host-linker-symbols.c"
-    "${boot_platform_linker_source}")
+# Model-only symbols do not belong to the atomically published product bundle.
+set(boot_platform_model "${CMAKE_CURRENT_BINARY_DIR}/qiming-boot-model")
+file(CONFIGURE OUTPUT "${boot_platform_model}/host-linker-symbols.c"
+    CONTENT "${boot_platform_linker_source}" @ONLY)
 nexus_google_test(nexus_qiming_boot_platform_test STM32F4_LL
     SOURCES qiming_boot_platform_test.cpp
         "${boot_platform_bundle}/bindings.c"
-        "${boot_platform_bundle}/host-linker-symbols.c"
+        "${boot_platform_model}/host-linker-symbols.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/fsmc.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"

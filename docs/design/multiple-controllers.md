@@ -15,6 +15,23 @@ actual SDK. Their EV, ER, RX DMA and TX DMA IRQs come from the selected
 controller identity. Initialization of an already enabled physical controller
 returns `BUSY` before changing its control registers or IRQ priorities.
 
+For every maintained F407 polling, IRQ and DMA master, `max_hz` is a nominal
+upper bound. Standard mode uses the smaller of that bound and 88 kHz before
+rounding the 12-bit CCR upward. This applies ES0182 Rev19 section 2.10.4 to
+seven-bit multi-message requests and ten-bit internal repeated STARTs alike.
+The default 100 kHz bound therefore selects CCR 239 at 42 MHz PCLK, about
+87.866 kHz; it can serve both endpoint widths without changing the authored
+mode. A bound above 100 kHz explicitly selects Fast mode, whose existing
+divider and electrical requirements remain unchanged. Repeated-START admission
+also checks the actual CCR before borrowing storage or touching the transfer
+registers. It never changes the divider inside a transaction.
+
+Readonly traits retain `configured_max_hz` and report `nominal_hz`, rounded down
+to integer Hz from the selected nominal PCLK and CCR. Zero means the fixture
+has no physical clock integration; this field is never a measured bus rate.
+F4 V1 does not accept the V2 `bus_hz_min` timing envelope. Oscillator tolerance,
+target timing and Board pull-ups still require electrical qualification.
+
 | SoC controller | GPIOB pins and AF | Peripheral clock | Finite RX / TX route |
 | --- | --- | --- | --- |
 | STM32F407 I2C1 | PB6/PB7 or PB8/PB9, AF4 | 42 MHz | DMA1 stream0 / stream6, channel1 |

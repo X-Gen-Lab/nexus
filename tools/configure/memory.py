@@ -4,6 +4,9 @@ Internal physical memory facts remain authoritative in the SoC package. A
 reviewed selected external bank retains its own immutable backing reference.
 Placement and per-domain budgets never add bus-master reachability.
 """
+from collections.abc import Mapping
+
+_FLASH_UINT32_MAX = (1 << 32) - 1
 
 
 def select(regions, budgets, maintained, *, obj, integer, fail):
@@ -27,22 +30,73 @@ def select(regions, budgets, maintained, *, obj, integer, fail):
             for region in ordered]
 
 
-def flash_geometry(result, *, symbol, sector_symbol, program_unit,
+def _flash_uint32(value, minimum=0, *, context):
+    if type(value) is not int or not minimum <= value <= _FLASH_UINT32_MAX:
+        raise ValueError(
+            f"{context}: integer required in [{minimum}, {_FLASH_UINT32_MAX}]")
+    return value
+
+
+def flash_erase_spans(flash, *, program_unit=1):
+    """Validate one complete physical span sequence without expanding sectors."""
+    size = _flash_uint32(flash.get("size"), 1, context="Flash size")
+    _flash_uint32(program_unit, 1, context="Flash program unit")
+    spans = flash.get("erase_spans")
+    if not isinstance(spans, (list, tuple)):
+        raise ValueError("Flash erase geometry: expected array")
+    if not spans or "erase_blocks" in flash:
+        raise ValueError("Flash erase geometry requires only complete erase spans")
+    cursor = count = 0
+    for span in spans:
+        if (not isinstance(span, Mapping) or
+                set(span) != {"offset", "erase_bytes", "count"}):
+            raise ValueError(
+                "Flash erase geometry requires exact offset/erase_bytes/count")
+        offset = _flash_uint32(span["offset"], context="erase span offset")
+        erase_bytes = _flash_uint32(span["erase_bytes"], 1,
+                                   context="erase span bytes")
+        sectors = _flash_uint32(span["count"], 1, context="erase span count")
+        if offset != cursor or erase_bytes % program_unit:
+            raise ValueError(
+                "Flash erase geometry is unordered or not a whole program unit")
+        cursor += erase_bytes * sectors
+        count += sectors
+        if cursor > size or count > _FLASH_UINT32_MAX:
+            raise ValueError(
+                "Flash erase geometry overflows physical Flash or sector count")
+    if cursor != size:
+        raise ValueError("Flash erase geometry does not cover exact physical Flash")
+    return spans
+
+
+def flash_erase_boundary(flash, address):
+    """Check an absolute physical boundary in O(spans), including device end."""
+    spans = flash_erase_spans(flash)
+    offset = address - flash["origin"]
+    if offset == flash["size"]:
+        return True
+    return any(span["offset"] <= offset < span["offset"] +
+               span["erase_bytes"] * span["count"] and
+               (offset - span["offset"]) % span["erase_bytes"] == 0
+               for span in spans)
+
+
+def flash_geometry(result, *, symbol, span_symbol, program_unit,
                    program_flags="0u", static=True):
     """Emit one readonly physical geometry from the selected immutable facts."""
     flash = result.physical_part.flash
-    lines = [f"static const nx_flash_sector_t {sector_symbol}[] = {{"]
-    offset = 0
-    for block in flash["erase_blocks"]:
-        lines.append(f"    {{ {offset}u, {block}u }},")
-        offset += block
+    spans = flash_erase_spans(flash, program_unit=program_unit)
+    lines = [f"static const nx_flash_erase_span_t {span_symbol}[] = {{"]
+    for span in spans:
+        lines.append(f"    {{ {span['offset']}u, {span['erase_bytes']}u, "
+                     f"{span['count']}u }},")
     storage = "static " if static else ""
     return lines + ["};", f"{storage}const nx_flash_geometry_t {symbol} = {{",
                    f"    .base_address = 0x{flash['origin']:08x}u,",
                    f"    .size = {flash['size']}u,",
                    f"    .program_unit = {program_unit}u,",
-                   f"    .sectors = {sector_symbol},",
-                   f"    .sector_count = {len(flash['erase_blocks'])}u,",
+                   f"    .erase_spans = {span_symbol},",
+                   f"    .erase_span_count = {len(spans)}u,",
                    f"    .program_flags = {program_flags}", "};"]
 
 

@@ -23,7 +23,7 @@ FORMAT_KINDS = ("uart", "spi", "i2c", "adc", "can", "eth", "eth_frames")
 FORMAT_FIELDS = MappingProxyType({
     "uart": ("data_bits", "parity", "stop_half_bits", "requested_baud"),
     "spi": ("word_bits", "configured_max_hz"),
-    "i2c": ("address_bits", "configured_max_hz"),
+    "i2c": ("address_bits", "configured_max_hz", "nominal_hz"),
     "adc": ("storage_bits", "signed_samples", "scan_channels"),
     "can": ("classic_payload_bytes", "hardware_tx_mailboxes"),
     "eth": ("vlan", "scatter_gather"),
@@ -92,8 +92,8 @@ class SelectedContract:
 class SiliconPolicy:
     """Selected review expectation, never an observed silicon identity.
 
-    This initial projection describes the existing clock review only. It does
-    not establish a complete peripheral errata review or execute admission.
+    Scope belongs to the selected provider's review and its stated constraints.
+    This projection does not execute admission or observe a physical device.
     """
     part: str
     provider: str
@@ -169,13 +169,25 @@ def _format(item, provider, shape):
     elif kind == "i2c":
         # Zero identifies endpoint-owned widths on a mixed-width controller.
         fields = dict(address_bits=0 if provider.ENDPOINT_POLICY.i2c_ten_bit else 7,
-                      configured_max_hz=options.max_hz)
+                      configured_max_hz=options.max_hz, nominal_hz=0)
     elif kind == "adc":
         fields = dict(storage_bits=16, signed_samples=0,
                       scan_channels=len(options.channels))
         if shape.block_stream:
             continuity = "double_buffer" if shape.continuous else "rearm_gap"
             source = "irq_observation"
+    elif kind == "adc_group" and shape.continuous:
+        abort = "controller_pending"
+        continuity = "double_buffer"
+        source = "service_observation"
+    elif kind == "capture" and item.mode == "jpeg-blocks":
+        abort = "controller_pending"
+        continuity = "double_buffer"
+        source = "service_observation"
+    elif kind == "capture" and item.mode in {"frames-raw", "frames-jpeg"}:
+        abort = "controller_pending"
+        continuity = "rearm_gap"
+        source = "service_observation"
     elif kind == "can":
         mailboxes = getattr(provider, "CLASSIC_CAN_MAILBOXES", None)
         if type(mailboxes) is not int or mailboxes <= 0:
@@ -293,6 +305,11 @@ def describe(item, endpoint=None, *, public_class=None):
                       buffer_alignment=width,
                       max_transfer_units=item.options.max_frames,
                       word_bits=(item.options.resolution_bits,))
+    elif kind == "capture" and item.mode == "jpeg-blocks":
+        limits.update(unit="words", unit_bytes=4, buffer_alignment=4,
+                      max_transfer_units=65535, word_bits=(32,))
+    elif kind == "capture" and item.mode in {"frames-raw", "frames-jpeg"}:
+        limits.update(unit="frames", buffer_alignment=4)
     elif kind in {"can", "can_fd"}:
         limits.update(max_transfer_units=64 if kind == "can_fd" else 8,
                       max_messages=1)

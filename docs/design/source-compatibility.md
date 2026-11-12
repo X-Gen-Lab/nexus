@@ -14,13 +14,13 @@ provider、生成 bindings 和调用者；当前不交付稳定二进制 ABI。�
 | 项目 | 当前值 | 合同 |
 |---|---|---|
 | 平台 semantic version | `0.2.1` | 唯一人工维护值来自兼容性 JSON；CMake、生成头文件和包元数据派生并保持一致 |
-| `factory_abi_epoch` | `1` | 当前唯一认可的生成源码接口代际；不是 binary ABI 保证 |
+| `factory_abi_epoch` | `2` | 当前唯一认可的生成源码接口代际；不是 binary ABI 保证 |
 | source SDK | `source_only` / `exact` | CMake package 只接受相同完整版本，拒绝 ranges |
 | authored assembly | `2` | 简化的 TOML 选择面；不改变 Board/SoC 事实 |
 | resolved JSON projection / typed IR | `1` / `2` | 单向 JSON 输出格式与私有 Python 类型化源码接口分别计代 |
 | Board / SoC / routes | `1` / `1` / `1` | 物理事实文件及生产 validator 必须一致 |
 | CPU runtime assembly / facts / resolved | `1` / `1` / `1` | CPU 软件配置，不能升格 SoC/Board 资格 |
-| installed source SDK manifest | `1` | 既有完整 file-map/源依赖/package-export 校验 |
+| installed source SDK manifest | `2` | 既有完整 file-map/源依赖/package-export 校验 |
 
 这些数字不能互相替代。修改文档或新增可选机制通常不改变配置 schema；改变 schema
 意味着生产 validator/emitter 明确维护了新的格式，并更新策略断言与负测。策略不能
@@ -37,8 +37,10 @@ factory 和 emitter 使用具名字段，不提供字典接口或 schema-1 JSON 
 C factory 接口。维护工具直接观察实际 IR 类的两项声明，并核对唯一版本策略。
 
 当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。
-既有 `v0.2.0` 标签保留原始预览源码身份。本次 semantic version 变化保留 epoch `1`、
-exact 匹配和 authored schema `2`；版本值不把旧 SDK／候选的资格转移到新源码。
+既有 `v0.2.0` 及其他标签保留原始源码身份，不移动标签。本批破坏性源码结果视图
+改动将 factory／source interface epoch 提升为 `2`，semantic version 仍是开发快照
+`0.2.1`，exact 匹配和 authored schema `2` 不变。相同版本号不能让旧 epoch `1` SDK
+通过当前代际检查，版本值也不把旧 SDK／候选资格转移到新源码。
 新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。
 
 `0.1.0` 是 2026-10-15（Asia/Shanghai）首个公开源码 SDK 开发者预览版。
@@ -51,7 +53,7 @@ factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静�
 不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后
 拿到另一 bundle 使用。`factory_abi_epoch` 命名保留 ABI 字样，但目前只标记生成
 源码接口代际：消费者、factory header、公共 face 和实现必须重新编译。当前 epoch
-为 1；指定 0、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。
+为 2；指定 0、旧值 1、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。
 
 生成配置须把策略原字节加入既有 inputs/snapshots/hash 闭包，并从唯一 loader
 生成 `NEXUS_PLATFORM_VERSION` 和 `NEXUS_FACTORY_ABI_EPOCH`。这些是编译期常量，
@@ -59,13 +61,29 @@ factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静�
 生成 header 校验和真实 SDK 消费才构成这条链路的完整验收；仅有维护工具不能代替
 它们。历史 SDK 缺少该新策略，不被新工具自动认定为已维护代际。
 
+## epoch 2 的源码迁移
+
+本次 `nx_adc_group_request_t.frames` 改为显式 `output.frames`，并由
+`results_kind` 区分 RAW 与 regular／injected paired 结果。原始字段访问必须迁移；
+不保留 `frames` 影子、旧大小兼容或按运行态猜测结果布局。优先继续调用
+`nx_adc_group_prepare()` 准备 raw 请求，由它设置 RAW discriminant；paired 结果使用
+`nx_adc_group_prepare_results()`，请求、descriptor 与两个 span 共用一次借用生命周期。
+直接读取 union 时必须先确认对应 `results_kind`，不能把 raw frame 指针当 descriptor。
+
+使用当前精确提交重新生成 bundle，并在同一配置和工具链下重新编译全部调用者、
+公共 face／ops、factory、provider 和组件；不得混用 epoch 1 header、旧对象或缓存。
+当前生成头、SDK 及维护消费者只认可 epoch 2；旧 epoch 1 应明确拒绝，不自动迁移、
+降级或以 `--development-fixture` 放宽接口检查。外部产品的迁移步骤见
+[迁移指南](../guides/migration.md)。manifest schema 2 与 interface epoch 2 是独立字段，
+数字相同不表示彼此推导；本次只纠正文档中过时的 manifest 格式说明。
+
 ## 自动检查
 
 ```sh
 PATH="$(pwd)/.venv/bin:$PATH" .venv/bin/python \
     tools/maintenance/compatibility.py
 PATH="$(pwd)/.venv/bin:$PATH" .venv/bin/python \
-    tools/maintenance/compatibility.py --expected-factory-epoch 1 \
+    tools/maintenance/compatibility.py --expected-factory-epoch 2 \
     --generated build/native-debug/generated/nexus_factory.h
 PATH="$(pwd)/.venv/bin:$PATH" .venv/bin/python \
     tools/maintenance/compatibility.py --sdk /abs/prefix/share/nexus/src

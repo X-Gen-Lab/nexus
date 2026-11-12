@@ -30,7 +30,7 @@ def _endpoint_face(kind, name, state, implementation=None):
             f"const nx_{kind}_endpoint_t* const nx_device_{name} = &s_nx_device_face_{name};"]
 
 
-def _spi_constructor(item, result, board_bindings, routes, devices, *, paired=False):
+def _spi_constructor(item, result, board_bindings, routes, devices):
     """Describe exact static connections; C owns cold hardware transitions."""
     selected = item.integration
     if selected is None or selected.clock_hz is None:
@@ -51,7 +51,7 @@ def _spi_constructor(item, result, board_bindings, routes, devices, *, paired=Fa
     pin_records = list(item.pins)
     endpoint_records = []
     definitions = []
-    cold_type = "nx_stm32_spi_dma_cold_t" if paired else "nx_stm32_spi_cold_receipt_t"
+    cold_type = "nx_stm32_spi_dma_cold_t" if dma else "nx_stm32_spi_cold_receipt_t"
     definitions.append(f"static {cold_type} s_nx_spi_cold_{name};")
     for index, child in enumerate(children):
         child_name = _symbol(child.id)
@@ -112,13 +112,12 @@ def _spi_constructor(item, result, board_bindings, routes, devices, *, paired=Fa
                         f"    .regions = s_nx_dma_regions_{name}, .region_count = {count}u,",
                         f"    .priority = {selected.irq.priority}u,",
                         f"    .kernel_bound = {'true' if result.kernel is not None else 'false'}"]
-    suffix = "_pair" if paired else ""
     arguments = (Address(state), Address(config),
                  Address(f"s_nx_spi_cold_{name}"))
-    initialize = DirectCall(f"nx_stm32_{implementation}{suffix}_prepare", arguments)
+    initialize = DirectCall(f"nx_stm32_{implementation}_prepare", arguments)
     stop = ([DirectCall("nx_spi_port_stop", (Symbol(f"nx_binding_{name}"),))]
             if dma else [])
-    stop.append(DirectCall(f"nx_stm32_{implementation}{suffix}_close", arguments))
+    stop.append(DirectCall(f"nx_stm32_{implementation}_close", arguments))
     definitions += ["};"]
     if dma:
         for vector, receive in ((tx_vector, "false"), (rx_vector, "true")):
@@ -216,10 +215,18 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     """Select immutable resources; concrete C owns every cold transition."""
     del board_bindings, routes, devices
     item = controller_ir(item, "stm32f4")
+    if item.kind == 'exti' and item.mode == 'hardware-event':
+        return _exti_hardware_constructor(item)
     if item.kind == 'exti' and item.mode in {'pvd-level', 'pvd-events'}:
         from .pvd import constructor as pvd_constructor
         return pvd_constructor(item)
     if item.kind == "external_bus":
+        if item.mode == "qspi-indirect-sdr":
+            from .qspi import constructor as qspi_constructor
+            return qspi_constructor(item, result)
+        if item.mode == "sdram-controller":
+            from .sdram import constructor as sdram_constructor
+            return sdram_constructor(item, result)
         from .fsmc import constructor as fsmc_constructor
         return fsmc_constructor(item, result)
     if item.kind in {"capture", "audio"}:
@@ -344,6 +351,32 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         stop=[stop], retain_on_failed_init=True)
 
 
+def _exti_hardware_constructor(item):
+    """Connect one static EMR owner without an IRQ, queue or hidden service."""
+    name = _symbol(item.id)
+    pin, = item.pins
+    wire = pin['pin']
+    line = int(item.controller.removeprefix('EXTI'))
+    if not 0 <= line <= 15 or int(wire[2:]) != line:
+        raise ValueError('EXTI hardware-event requires its exact GPIO mux line')
+    edge = {'rising': 'NX_EXTI_RISING', 'falling': 'NX_EXTI_FALLING',
+            'both': 'NX_EXTI_BOTH'}[item.options.edge]
+    config = f's_nx_control_config_{name}'
+    state = Address(f's_nx_port_{name}')
+    arguments = (state, Address(config))
+    definitions = [
+        f'static const nx_stm32_exti_hardware_config_t {config} = {{',
+        f'    .gpio = GPIO{wire[1]}, .edge = {edge},',
+        f'    .gpio_index = {ord(wire[1]) - ord("A")}u, .line = {line}u,',
+        f'    .pull = {_PULL_VALUES[item.options.pull]}u', '};']
+    return Construction(
+        state_type='nx_stm32_exti_hardware_state_t', definitions=definitions,
+        admission=(DirectCall('nx_stm32_exti_hardware_admit', arguments),),
+        initialize=DirectCall('nx_stm32_exti_hardware_prepare', arguments),
+        stop=(DirectCall('nx_stm32_exti_hardware_close', (state,)),),
+        retain_on_failed_init=True)
+
+
 def shared_irq_definitions(selections):
     """Emit one bounded static dispatcher per selected hardware vector."""
     selections = [controller_ir(item, "stm32f4") for item in selections]
@@ -421,7 +454,7 @@ def _basic_constructor(item, result):
     exact_part(PARTS, result.part)
     geometry = f"s_nx_flash_geometry_{name}"
     definitions = flash_geometry(
-        result, symbol=geometry, sector_symbol=f"s_nx_flash_sectors_{name}",
+        result, symbol=geometry, span_symbol=f"s_nx_flash_erase_spans_{name}",
         program_unit=FLASH_PROGRAM_UNIT)
     flash = result.physical_part.flash
     definitions += [f'_Static_assert(FLASH_BASE == 0x{flash["origin"]:08x}u,',
@@ -523,7 +556,7 @@ def _uart_constructor(item, result):
                     indent + f".clock_hz = {selected.clock_hz}u, .baud = {options.baud}u,",
                     indent + f".profile = {profile}, .priority = {selected.irq.priority}u,",
                     indent + f".kernel_bound = {'true' if result.kernel is not None else 'false'},",
-                    indent + f".preload_tx = {'true' if secondary_controllers.applies(item, result, 'stm32') else 'false'}, .format = {frame}"]
+                    indent + f".format = {frame}"]
     if options.wire is not None:
         definitions[-1] += ","
         definitions += [indent + f".wire = &s_nx_uart_wire_{name}, .pin_count = {len(selected.pins)}u"]
@@ -572,12 +605,18 @@ def _uart_constructor(item, result):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed STM32 instance, including its rollback and stop."""
     item = controller_ir(item, "stm32f4")
+    if item.kind in {"display", "image"}:
+        from .graphics import constructor as graphics_constructor
+        return graphics_constructor(item, result)
     if item.kind == "adc_group":
         from .adc_group import constructor as group_constructor
         return group_constructor(item, result)
     if item.kind == "encoder":
         from .encoder import constructor as encoder_constructor
         return encoder_constructor(item)
+    if item.kind in {"cipher", "hash"}:
+        from .crypto import constructor as crypto_constructor
+        return crypto_constructor(item, result)
     if item.kind == "entropy":
         state = Address("s_nx_port_" + _symbol(item.id))
         return Construction(state_type="nx_stm32f407_entropy_state_t",
@@ -603,8 +642,7 @@ def constructor(item, result, board_bindings, routes, devices):
             from .spi_frames import constructor as frames_constructor
             return frames_constructor(item)
         construction = _spi_constructor(
-            item, result, board_bindings, routes, devices,
-            paired=secondary_controllers.applies(item, result, "stm32"))
+            item, result, board_bindings, routes, devices)
         return enhanced_endpoints.dma_construction(item, construction, "stm32")
     if item.kind == "i2c_target":
         from .i2c_target import constructor as target_constructor

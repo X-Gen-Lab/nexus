@@ -50,6 +50,10 @@ SYSCLK/AHB 不超过 168 MHz，APB1/2 不超过 42/84 MHz，ADC 不超过 36 MHz
 所有已使用域必须产生精确整数 Hz，TIM2 必须能整数分频到 1 MHz。AHB 与 APB
 分频器按 RM0090 编码；APB 除 1 时 timer 不倍频，其他分频时 timer 为两倍 PCLK。
 
+启动失败或停止时，确认切回 HSI 后的 `SystemCoreClock`／`core_hz` 按实际
+`CFGR.HPRE` 计算；配置中的目标 AHB 分频尚未建立时不会假定它已经生效。
+源关闭或后续恢复失败仍保留观察到的频率与原清理责任，重试不重放旧时间域。
+
 `ClockPlanIR` 是唯一已选时钟计划。`nexus_config.h` 与
 `private/stm32f407_clock.h` 的 `NEXUS_*_HZ`、PLL/CFGR、ADC divider 和 Flash
 wait-state 常量由该计划产生；UART/SPI/I2C/CAN、timer、ADC/DAC 与监督机制使用
@@ -72,6 +76,15 @@ source ready、PLL、总线、CSS、SSCG、所需 Flash latency 和 HSI reset tr
 RCC 状态来掩盖 warm handoff；普通启动的只读 preflight 仍要求可证明的冷时钟、
 独占 TIM2、正确 FPU/MPU/vector。RAM 尚不可用的失败路径仅使用 reset stack
 与 Flash 常量并 park，不依赖日志、scheduler 或 libc。
+
+普通 Platform 在取得引脚与时钟前读取实际 Flash 密度与完整 `DBGMCU_IDCODE`。
+DEV_ID 必须为 `0x413`，REV_ID 只接纳已审的 `0x1001`、`0x1003`、`0x1007`、
+`0x100F`、`0x101F`；未知、缺失及旧 A 标识不按“更新芯片”自动准入。
+DEV／密度不符返回 IO，未审 cut 返回 UNSUPPORTED，均不建立平台资源责任。
+同一纯只读 C 规则也用于 pre-C 外部 SRAM bootstrap 和受控镜像 handoff：
+前者在不可撤销内存／FSMC 设置前拒绝并 park，后者在最终转移前拒绝。
+订货号、封装与 PCB 仍由 Board／实物核对；资料白名单和主机模型不表示开发环境
+已经观察到某块实板，也不建立物理资格。
 
 | 域 | F407VE／ZG 事实与使用边界 |
 | --- | --- |

@@ -63,7 +63,8 @@ enum {
     EFFECT_SOURCE = 8U,
     EFFECT_RTC = 16U,
     EFFECT_CALENDAR = 32U,
-    EFFECT_GPIOC_INSPECTION = 64U
+    EFFECT_GPIOC_INSPECTION = 64U,
+    EFFECT_QUIET_PC13 = 128U
 };
 #define PROFILE UINT32_C(0x007f00ff)
 #define BACKUP_MASK                                                            \
@@ -79,6 +80,8 @@ enum {
      RTC_ISR_TAMP1F | RTC_ISR_TAMP2F)
 #define WAKE_LINES ((1U << 17U) | (1U << 21U) | (1U << 22U))
 static nx_result_t auxiliary_close(nx_stm32_rtc_state_t* s);
+static bool inspection_clock(nx_stm32_rtc_state_t* s);
+static bool restore_inspection(nx_stm32_rtc_state_t* s);
 static const nx_rtc_aux_ops_t auxiliary_ops;
 /** \brief Backup access belongs to one privileged unmasked task executor. */
 static bool task(void) {
@@ -133,7 +136,7 @@ static bool system_live(void) {
            g_nx_stm32_system.timer_error == NX_SUCCESS;
 }
 /** \brief INITS depends on year != 00; it is never a validity oracle. */
-static bool live(const nx_stm32_rtc_state_t* s) {
+static bool live_source(const nx_stm32_rtc_state_t* s, bool bypass) {
     uint32_t events = s->wake_lines;
     return system_live() && NX_F407_RTC_IRQ_QUIET() &&
            (NX_F407_RTC_READ(&NX_F407_RTC_EXTI->IMR) & WAKE_LINES) == 0U &&
@@ -145,7 +148,7 @@ static bool live(const nx_stm32_rtc_state_t* s) {
            (NX_F407_RTC_READ(&NX_F407_RTC_RCC->APB1ENR) & RCC_APB1ENR_PWREN) &&
            (NX_F407_RTC_READ(&NX_F407_RTC_PWR->CR) & PWR_CR_DBP) &&
            (NX_F407_RTC_READ(&NX_F407_RTC_RCC->BDCR) & BACKUP_MASK) ==
-               BACKUP_LIVE &&
+               (BACKUP_LIVE | (bypass ? RCC_BDCR_LSEBYP : 0U)) &&
            (NX_F407_RTC_READ(&NX_F407_RTC->CR) & ~(uint32_t)RTC_CR_ALRAE) ==
                (RTC_CR_BYPSHAD | s->auxiliary_cr) &&
            NX_F407_RTC_READ(&NX_F407_RTC->PRER) == PROFILE &&
@@ -154,6 +157,10 @@ static bool live(const nx_stm32_rtc_state_t* s) {
            NX_F407_RTC_READ(&NX_F407_RTC->TAFCR) == s->auxiliary_tafcr &&
            (NX_F407_RTC_READ(&NX_F407_RTC->ISR) &
             (RTC_ISR_SHPF | RTC_ISR_INIT | RTC_ISR_INITF)) == 0U;
+}
+/** \brief A live owner retains its exact authored oscillator personality. */
+static bool live(const nx_stm32_rtc_state_t* s) {
+    return live_source(s, s->config != NULL && s->config->lse_bypass);
 }
 static bool bcd(uint32_t value, uint8_t* out) {
     if ((value & 15U) > 9U || ((value >> 4U) & 15U) > 9U)
@@ -242,15 +249,34 @@ static nx_result_t wait_bits(const nx_stm32_rtc_config_t* c,
     }
     return NX_ERROR_TIMEOUT;
 }
+/** \brief ES0182 2.9.4 requires actual shadow synchronization before INIT.
+ * \note Every path uses the same finite budget, including coarse calibration.
+ *       Restore the original bypass personality even when RSF never arrives.
+ */
+static nx_result_t synchronize_init(nx_stm32_rtc_state_t* s,
+                                    nx_time_us_t deadline) {
+    uint32_t controls = NX_F407_RTC_READ(&NX_F407_RTC->CR);
+    if (!checked(&NX_F407_RTC->CR, controls & ~(uint32_t)RTC_CR_BYPSHAD))
+        return NX_ERROR_IO;
+    unlock();
+    LL_RTC_ClearFlag_RS(NX_F407_RTC);
+    nx_arch_dsb();
+    lock();
+    nx_result_t result = wait_bits(s->config, &NX_F407_RTC->ISR, RTC_ISR_RSF,
+                                   RTC_ISR_RSF, deadline);
+    return checked(&NX_F407_RTC->CR, controls) ? result : NX_ERROR_IO;
+}
 /** \brief Programming starts only after admission and INITF. No rollback date.
  */
 static nx_result_t program_calendar(nx_stm32_rtc_state_t* s,
                                     const nx_rtc_calendar_t* c,
                                     nx_time_us_t deadline, bool provision) {
     RTC_TypeDef* p = NX_F407_RTC;
+    nx_result_t r = synchronize_init(s, deadline);
+    if (r != NX_SUCCESS)
+        return r;
     status_write(true, false);
-    nx_result_t r =
-        wait_bits(s->config, &p->ISR, RTC_ISR_INITF, RTC_ISR_INITF, deadline);
+    r = wait_bits(s->config, &p->ISR, RTC_ISR_INITF, RTC_ISR_INITF, deadline);
     if (r != NX_SUCCESS) {
         /* A bounded readiness failure must not deliberately leave INIT set.
          * The caller still retains a tainted ownership receipt; this best
@@ -655,6 +681,24 @@ static nx_result_t wakeup(void* raw, const nx_rtc_wakeup_t* config) {
         controls |= RTC_CR_WUTE;
     return auxiliary_control(s, controls);
 }
+/** \brief ES0182 2.9.6 applies every time an edge source is enabled again. */
+static nx_result_t capture_input(nx_stm32_rtc_state_t* s, uint32_t tafcr) {
+    if ((tafcr & (RTC_TAFCR_TAMP1E | RTC_TAFCR_TAMPFLT)) != RTC_TAFCR_TAMP1E)
+        return NX_SUCCESS;
+    /* The caller handed off this input. Observe it after enabling detection,
+     * through a live gate, before backup writes may be treated as protected.
+     * Failure retains the armed source and any refused inspection gate. */
+    if (!inspection_clock(s))
+        return NX_ERROR_IO;
+    /* Analog mode disconnects the digital input buffer; IDR zero then cannot
+     * establish an inactive tamper input. Never configure the handed-off pad.
+     */
+    bool active =
+        ((NX_F407_RTC_READ(&NX_F407_RTC_GPIOC->MODER) >> 26U) & 3U) == 3U ||
+        (NX_F407_RTC_READ(&NX_F407_RTC_GPIOC->IDR) & (1U << 13U)) != 0U;
+    bool restored = restore_inspection(s);
+    return active || !restored ? NX_ERROR_IO : NX_SUCCESS;
+}
 /** \brief Inputs are explicit pad handoffs, not inferred PCB capabilities. */
 static nx_result_t capture_configure(void* raw,
                                      const nx_rtc_capture_config_t* config) {
@@ -682,6 +726,16 @@ static nx_result_t capture_configure(void* raw,
     if (config->timestamp_pin == 2U || config->tamper1_pin == 2U ||
         (config->tamper_mask & 2U))
         return NX_ERROR_UNSUPPORTED;
+    /* ES0182 2.2.18: digital PC13 transitions disturb a crystal LSE. The
+     * separately authored external-clock bypass input is not affected. */
+    if (!s->config->lse_bypass &&
+        (config->timestamp_enabled || config->tamper_mask != 0U))
+        return NX_ERROR_UNSUPPORTED;
+    /* ES0182 2.9.1 has no workaround for false backup erasure on disabling
+     * unfiltered falling-edge tamper. Filtered level detection is separate. */
+    if (config->filter == 0U &&
+        (config->tamper_mask & config->trigger_mask) != 0U)
+        return NX_ERROR_UNSUPPORTED;
     if (NX_F407_RTC_READ(&NX_F407_RTC->ISR) &
         (RTC_ISR_TSF | RTC_ISR_TSOVF | RTC_ISR_TAMP1F | RTC_ISR_TAMP2F))
         return NX_ERROR_BUSY;
@@ -705,6 +759,9 @@ static nx_result_t capture_configure(void* raw,
     s->auxiliary_tafcr = tafcr;
     if (!checked(&NX_F407_RTC->TAFCR, tafcr))
         return auxiliary_failure(s, NX_ERROR_IO);
+    r = capture_input(s, tafcr);
+    if (r != NX_SUCCESS)
+        return auxiliary_failure(s, r);
     cr |= (copied.timestamp_enabled ? RTC_CR_TSE : 0U) |
           (copied.timestamp_falling ? RTC_CR_TSEDGE : 0U);
     return auxiliary_control(s, cr);
@@ -790,9 +847,12 @@ static nx_result_t acknowledge(void* raw, uint32_t selected) {
 /** \brief Coarse calibration requires the actual INITF handshake. */
 static nx_result_t coarse_write(nx_stm32_rtc_state_t* s, uint32_t value,
                                 nx_time_us_t deadline) {
+    nx_result_t r = synchronize_init(s, deadline);
+    if (r != NX_SUCCESS)
+        return r;
     status_write(true, false);
-    nx_result_t r = wait_bits(s->config, &NX_F407_RTC->ISR, RTC_ISR_INITF,
-                              RTC_ISR_INITF, deadline);
+    r = wait_bits(s->config, &NX_F407_RTC->ISR, RTC_ISR_INITF, RTC_ISR_INITF,
+                  deadline);
     if (r == NX_SUCCESS && !checked(&NX_F407_RTC->CALIBR, value))
         r = NX_ERROR_IO;
     status_write(false, false);
@@ -1109,7 +1169,7 @@ static nx_result_t handoff(void* raw, nx_rtc_backup_handoff_t* out) {
         return NX_ERROR_INVALID;
     if (s->opened || !s->closing || s->active != NULL ||
         s->sram_lease != NULL || s->auxiliary_dirty || s->sram_effects != 0U ||
-        s->tainted || (s->effects & ~UINT32_C(0x3f)) != 0U)
+        s->tainted || (s->effects & ~UINT32_C(0xbf)) != 0U)
         return NX_ERROR_BUSY;
     if (s->effects == 0U || !live(s))
         return NX_ERROR_STATE;
@@ -1144,7 +1204,7 @@ static bool standby_hardware(const nx_stm32_rtc_state_t* s) {
                0U &&
            (NX_F407_RTC_READ(&NX_F407_RTC_PWR->CR) & PWR_CR_DBP) != 0U &&
            (NX_F407_RTC_READ(&NX_F407_RTC_RCC->BDCR) & BACKUP_MASK) ==
-               BACKUP_LIVE &&
+               (BACKUP_LIVE | (s->config->lse_bypass ? RCC_BDCR_LSEBYP : 0U)) &&
            (NX_F407_RTC_READ(&NX_F407_RTC_EXTI->IMR) & WAKE_LINES) == 0U &&
            (NX_F407_RTC_READ(&NX_F407_RTC_EXTI->FTSR) & WAKE_LINES) == 0U &&
            (NX_F407_RTC_READ(&NX_F407_RTC_EXTI->EMR) & WAKE_LINES) ==
@@ -1313,6 +1373,9 @@ static nx_result_t standby_sources_restore(nx_stm32_rtc_state_t* s) {
     if (!checked(&NX_F407_RTC->TAFCR, s->standby_tafcr) ||
         !checked(&NX_F407_RTC->CR, s->standby_cr))
         return NX_ERROR_IO;
+    nx_result_t result = capture_input(s, s->standby_tafcr);
+    if (result != NX_SUCCESS)
+        return result;
     return standby_hardware(s) ? NX_SUCCESS : NX_ERROR_STATE;
 }
 static nx_result_t standby_commit(void* raw, nx_rtc_standby_t* receipt) {
@@ -1392,30 +1455,74 @@ static bool restore_inspection(nx_stm32_rtc_state_t* s) {
     s->effects &= ~(uint32_t)EFFECT_GPIOC_INSPECTION;
     return true;
 }
-/** \brief LSE overrides PC14/15: exclude foreign pad owners before BDCR writes.
- * \note Powered-off GPIO cannot prove pad state. The cold owner temporarily
- *       enables GPIOC, observes without changing pads, then restores its gate.
- *       A failed observation/restore retains the exact gate responsibility.
- */
-static nx_result_t inspect_oscillator_pads(nx_stm32_rtc_state_t* s) {
+/** \brief Temporarily observe oscillator pads through their real GPIO gate. */
+static bool inspection_clock(nx_stm32_rtc_state_t* s) {
     uint32_t current = NX_F407_RTC_READ(&NX_F407_RTC_RCC->AHB1ENR);
     if (!(current & RCC_AHB1ENR_GPIOCEN)) {
         s->effects |= EFFECT_GPIOC_INSPECTION;
         NX_F407_RTC_WRITE(&NX_F407_RTC_RCC->AHB1ENR,
                           current | RCC_AHB1ENR_GPIOCEN);
         nx_arch_dsb();
-        if (!(NX_F407_RTC_READ(&NX_F407_RTC_RCC->AHB1ENR) &
-              RCC_AHB1ENR_GPIOCEN))
-            return NX_ERROR_IO;
+        return (NX_F407_RTC_READ(&NX_F407_RTC_RCC->AHB1ENR) &
+                RCC_AHB1ENR_GPIOCEN) != 0U;
     }
+    return true;
+}
+/** \brief Return the quiet pad only before any crystal LSE could own it. */
+static bool restore_quiet_pad(nx_stm32_rtc_state_t* s) {
+    if (!(s->effects & EFFECT_QUIET_PC13) ||
+        (NX_F407_RTC_READ(&NX_F407_RTC_RCC->BDCR) &
+         (RCC_BDCR_LSEON | RCC_BDCR_LSERDY)) != 0U)
+        return true;
+    if (!inspection_clock(s))
+        return false;
+    const uint32_t mask = UINT32_C(3) << 26U;
+    uint32_t mode = NX_F407_RTC_READ(&NX_F407_RTC_GPIOC->MODER);
+    NX_F407_RTC_WRITE(&NX_F407_RTC_GPIOC->MODER,
+                      (mode & ~mask) | ((uint32_t)s->saved_pc13 << 26U));
+    nx_arch_dsb();
+    if ((NX_F407_RTC_READ(&NX_F407_RTC_GPIOC->MODER) & mask) !=
+        ((uint32_t)s->saved_pc13 << 26U))
+        return false;
+    s->effects &= ~(uint32_t)EFFECT_QUIET_PC13;
+    return true;
+}
+/** \brief Enforce crystal quietness before BDCR effects or retained adoption.
+ * \note ES0182 2.2.18 requires digital PC13 silence while crystal LSE runs.
+ *       Provision can acquire a free input as analog; adoption requires an
+ *       already quiet pad. The persistent pad follows oscillator handoff.
+ */
+static nx_result_t inspect_oscillator_pads(nx_stm32_rtc_state_t* s,
+                                           const nx_stm32_rtc_config_t* c) {
+    if (!inspection_clock(s))
+        return NX_ERROR_IO;
     uint32_t mode = NX_F407_RTC_READ(&NX_F407_RTC_GPIOC->MODER);
     uint32_t pull = NX_F407_RTC_READ(&NX_F407_RTC_GPIOC->PUPDR);
     uint32_t lock_bits = NX_F407_RTC_READ(&NX_F407_RTC_GPIOC->LCKR);
-    bool good = (lock_bits & UINT32_C(0xc000)) == 0U &&
-                (pull & UINT32_C(0xf0000000)) == 0U;
-    for (uint32_t pin = 14U; pin < 16U; ++pin) {
+    uint32_t oscillator = c->lse_bypass ? UINT32_C(0x4000) : UINT32_C(0xc000);
+    uint32_t pull_mask =
+        c->lse_bypass ? UINT32_C(0x30000000) : UINT32_C(0xf0000000);
+    bool good = (lock_bits & oscillator) == 0U && (pull & pull_mask) == 0U;
+    for (uint32_t pin = 14U; pin < (c->lse_bypass ? 15U : 16U); ++pin) {
         uint32_t selected = (mode >> (pin * 2U)) & 3U;
         good = good && (selected == 0U || selected == 3U);
+    }
+    if (!c->lse_bypass) {
+        uint32_t pc13 = (mode >> 26U) & 3U;
+        good = good && (lock_bits & (1U << 13U)) == 0U &&
+               (pull & (UINT32_C(3) << 26U)) == 0U &&
+               (pc13 == 3U ||
+                (pc13 == 0U && c->policy == NX_STM32_RTC_PROVISION_EMPTY));
+        if (good && c->policy == NX_STM32_RTC_PROVISION_EMPTY) {
+            s->saved_pc13 = (uint8_t)pc13;
+            s->effects |= EFFECT_QUIET_PC13;
+            NX_F407_RTC_WRITE(&NX_F407_RTC_GPIOC->MODER,
+                              mode | (UINT32_C(3) << 26U));
+            nx_arch_dsb();
+            if (((NX_F407_RTC_READ(&NX_F407_RTC_GPIOC->MODER) >> 26U) & 3U) !=
+                3U)
+                return NX_ERROR_IO;
+        }
     }
     if (!restore_inspection(s))
         return NX_ERROR_IO;
@@ -1447,7 +1554,8 @@ nx_result_t nx_stm32_rtc_prepare(nx_stm32_rtc_state_t* s,
         return NX_ERROR_BUSY;
     nx_rtc_calendar_t retained;
     if (c->policy == NX_STM32_RTC_ADOPT_RETAINED) {
-        if (!live(s) || (NX_F407_RTC_READ(&NX_F407_RTC->CR) & RTC_CR_ALRAE) ||
+        if (!live_source(s, c->lse_bypass) ||
+            (NX_F407_RTC_READ(&NX_F407_RTC->CR) & RTC_CR_ALRAE) ||
             (NX_F407_RTC_READ(&NX_F407_RTC->ISR) &
              (FOREIGN_STATUS | RTC_ISR_ALRAF)))
             return NX_ERROR_STATE;
@@ -1463,11 +1571,9 @@ nx_result_t nx_stm32_rtc_prepare(nx_stm32_rtc_state_t* s,
                                              c->timeout_us, &deadline);
     if (r != NX_SUCCESS)
         return r;
-    if (c->policy == NX_STM32_RTC_PROVISION_EMPTY) {
-        nx_result_t inspection = inspect_oscillator_pads(s);
-        if (inspection != NX_SUCCESS)
-            return inspection;
-    }
+    nx_result_t inspection = inspect_oscillator_pads(s, c);
+    if (inspection != NX_SUCCESS)
+        return inspection;
     s->config = c;
     if (c->policy == NX_STM32_RTC_PROVISION_EMPTY) {
         uint32_t power = NX_F407_RTC_READ(&NX_F407_RTC_RCC->APB1ENR);
@@ -1487,15 +1593,16 @@ nx_result_t nx_stm32_rtc_prepare(nx_stm32_rtc_state_t* s,
                 return NX_ERROR_IO;
         }
         s->effects |= EFFECT_LSE;
-        NX_F407_RTC_WRITE(&NX_F407_RTC_RCC->BDCR, RCC_BDCR_LSEON);
+        uint32_t source = c->lse_bypass ? RCC_BDCR_LSEBYP : 0U;
+        NX_F407_RTC_WRITE(&NX_F407_RTC_RCC->BDCR, source | RCC_BDCR_LSEON);
         r = wait_bits(c, &NX_F407_RTC_RCC->BDCR, RCC_BDCR_LSERDY,
                       RCC_BDCR_LSERDY, deadline);
         if (r != NX_SUCCESS)
             return r;
         s->effects |= EFFECT_SOURCE | EFFECT_RTC;
-        NX_F407_RTC_WRITE(&NX_F407_RTC_RCC->BDCR, BACKUP_LIVE);
+        NX_F407_RTC_WRITE(&NX_F407_RTC_RCC->BDCR, BACKUP_LIVE | source);
         if ((NX_F407_RTC_READ(&NX_F407_RTC_RCC->BDCR) & BACKUP_MASK) !=
-            BACKUP_LIVE)
+            (BACKUP_LIVE | source))
             return NX_ERROR_IO;
         s->effects |= EFFECT_CALENDAR;
         r = program_calendar(s, &c->initial, deadline, true);
@@ -1520,7 +1627,7 @@ nx_result_t nx_stm32_rtc_close(nx_stm32_rtc_state_t* s) {
     nx_result_t r = stop(s);
     if (r != NX_SUCCESS)
         return r;
-    if (!restore_inspection(s))
+    if (!restore_quiet_pad(s) || !restore_inspection(s))
         return NX_ERROR_BUSY;
     return s->effects ? NX_ERROR_BUSY : NX_SUCCESS;
 }

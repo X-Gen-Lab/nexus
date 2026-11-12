@@ -17,6 +17,7 @@ extern "C" {
 #include <sys/wait.h>
 #include <unistd.h>
 nx_f407_sram_boot_model_t g_f407_sram_boot_model;
+static uint32_t expected_failure_cfgr;
 uint32_t nx_f407_sram_boot_read(volatile uint32_t* reg) {
     auto& m = g_f407_sram_boot_model;
     if (reg == &RCC->AHB3ENR) {
@@ -93,8 +94,9 @@ class SramBoot : public testing::Test {
         source[0] = 11U;
         source[1] = 12U;
         g_f407_sram_boot_model = {};
+        expected_failure_cfgr = 0U;
         g_f407_sram_boot_model.msp = 0x2001ff00U;
-        g_f407_sram_boot_model.device_id = 0x413U;
+        g_f407_sram_boot_model.device_id = 0x10010413U;
         g_f407_sram_boot_model.flash_kib = 1024U;
         RCC->CR = RCC_CR_HSION | RCC_CR_HSIRDY | (16U << RCC_CR_HSITRIM_Pos);
         RCC->PLLCFGR = 0x24003010U;
@@ -251,10 +253,12 @@ asm(".globl g_nx_stm32_sram_boot_plan\n"
 extern "C" nx_stm32_system_t g_nx_stm32_system;
 nx_stm32_system_t g_nx_stm32_system;
 extern "C" void nx_f407_sram_boot_failure(uint32_t reason) {
-    if (RCC->CFGR != (RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL))
+    if (RCC->CFGR != expected_failure_cfgr)
         _exit(91);
     if (*reinterpret_cast<uint32_t*>(0x68000004U) != 0xa5a5a5a5U)
         _exit(92);
+    if (g_f407_sram_boot_model.writes != 0U)
+        _exit(93);
     _exit(static_cast<int>(reason));
 }
 TEST_F(SramBoot, ActualSystemInitBootstrapsBeforeInitializedRam) {
@@ -273,6 +277,21 @@ TEST_F(SramBoot, ActualSystemInitRejectsWarmHandoffBeforeAnyClockRewrite) {
     ASSERT_GE(child, 0);
     if (child == 0) {
         RCC->CFGR = RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL;
+        expected_failure_cfgr = RCC->CFGR;
+        SystemInit();
+        _exit(90);
+    }
+    int status = 0;
+    ASSERT_EQ(child, waitpid(child, &status, 0));
+    ASSERT_TRUE(WIFEXITED(status));
+    EXPECT_EQ(3, WEXITSTATUS(status));
+}
+
+TEST_F(SramBoot, ActualSystemInitRejectsUnknownCutBeforePermanentSramSetup) {
+    const pid_t child = fork();
+    ASSERT_GE(child, 0);
+    if (child == 0) {
+        g_f407_sram_boot_model.device_id = 0x10020413U;
         SystemInit();
         _exit(90);
     }
@@ -288,6 +307,20 @@ TEST_F(SramBoot, WrongDieIdRejectsBeforeAnyGateOrDestinationWrite) {
     EXPECT_FALSE(nx_stm32_sram_bootstrap(plan));
     EXPECT_EQ(0U, g_f407_sram_boot_model.writes);
     unchanged();
+}
+TEST_F(SramBoot, UnknownObservedCutRejectsBeforeAnyGateOrDestinationWrite) {
+    g_f407_sram_boot_model.device_id = 0x10020413U;
+    EXPECT_FALSE(nx_stm32_sram_bootstrap(plan));
+    EXPECT_EQ(0U, g_f407_sram_boot_model.writes);
+    unchanged();
+}
+
+TEST_F(SramBoot, ReadonlyBootIdentityRevalidationRejectsAnUnreviewedCut) {
+    ASSERT_TRUE(nx_stm32_sram_bootstrap(plan));
+    const unsigned writes = g_f407_sram_boot_model.writes;
+    g_f407_sram_boot_model.device_id = 0x10020413U;
+    EXPECT_FALSE(nx_stm32_sram_boot_matches(plan));
+    EXPECT_EQ(writes, g_f407_sram_boot_model.writes);
 }
 TEST_F(SramBoot, WrongFlashDensityRejectsBeforeAnyGateOrDestinationWrite) {
     g_f407_sram_boot_model.flash_kib = 512U;

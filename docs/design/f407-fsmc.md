@@ -5,9 +5,11 @@ audience: maintainer
 source_language: zh_CN
 ---
 
-# F407 FSMC 外部存储器
+# STM32F4 外部存储器
 
-当前软件实现限定 STM32F407VET6（LQFP100）与 STM32F407ZGT6（LQFP144）。
+本页分别说明 F407 FSMC 和 F479 FMC／QuadSPI，三种控制器不因名称相近共享硬件
+权限。F407 FSMC 实现限定 STM32F407VET6（LQFP100）与 STM32F407ZGT6（LQFP144）；
+F479 软件参考的 CPU-only SDRAM 与间接串行 NOR 见本页后续章节。
 一个 `nx_stm32_fsmc_t` 管理唯一 FSMC gate、共享 AF12 pads 和所选 bank receipt。
 SRAM、LCD、PSRAM、NOR、NAND 端点借用这个 owner；端点不会另建 RCC、GPIO 或
 控制器注册表。原有 NE3 启动 SRAM 仍由复位计划的同一 const bank 描述符证明，
@@ -42,7 +44,7 @@ CPU 总线访问由外部电平延长；有限 service 步数不构成错误电�
 
 ## NOR 的两种合同
 
-`nx_factory_flash_async()` 返回已有 NOR 端点；`nx_factory_fsmc_nor_flash()` 使用同一个
+`nx_factory_flash_async()` 返回已有 NOR 端点；`nx_factory_flash_async_flash()` 使用同一个
 `nx_flash_async_id_t` 返回同一状态的同步只读 Flash face。geometry/read 不保留目标；
 同步 program/erase 返回 `UNSUPPORTED`，不会发起一条返回时仍可能忙的 pulse。
 已有同步 Flash 的“返回证明 pulse idle”合同不变。
@@ -105,3 +107,72 @@ GoogleTest/Mock 执行真实 C owner、官方 LL 和命令状态，仅替换 MMI
 外部存储器端口。完整程序覆盖取消、late deadline、busy、gate/readback 失败、8/16 位、
 CFI region 和 ECC drain。ARM 消费者只证明精确 part 的选择、C11 编译、链接和资源预算；
 物理 program/erase、WAIT 电气与 retention 仍是 `not_executed`。
+
+## F479 SDRAM 的首个软件参考
+
+`STM32F479NIH6` 的 FMC 增加独立 `sdram-controller` 模式，复用现有
+`external_bus` 控制器和 `memory_window-endpoint`：两种 face 指向同一 C owner，
+factory 只返回静态对象。本切片仅为 Bank1、8 MiB、16 bit、12 行位／8 列位、
+4 个内部 bank 的 CPU 数据窗口；它不授予 DMA、XIP、堆、启动对象或自动内存探测。
+具体器件时序必须由端点显式声明；软件参考数值不证明 RAM 实装或电气资格。
+
+参数保留七组 `nanoseconds`／`cycles` 最小值、CAS、SDCLK 分频、读管线、首次刷新
+次数、刷新窗口、上电等待和有限启停预算。配置工具拒绝几何不匹配、超过端点
+`max_sdclk_hz`、不可编码的时序和非法刷新范围；C 在每次启动独立向上取整、满足
+RC／WR 关系、计算 COUNT，并避开 RM0386 的禁止值。C 完成 CLK_ENABLE、实际完成后
+计时等待、PALL、AUTOREFRESH、LOAD_MODE 和刷新设置；读回不把 MODE／CTB 的只写位
+当作成功证据。System 的原始 `time_epoch` 必须持续有效，同频率／同 RCC 值不能
+将旧 owner 接到新时间域。元数据预检在 System 之前只读执行，实际硬件行为全部在 C。
+
+默认 CPU 窗口要求 SYSCFG 时钟与 `SWP_FMC=0` 的实际可观察状态，驱动不修改全局
+交换或 MPU。原始稳定 lease、代次和派生指针使用者都退出后才能释放；停止以实际
+Self-refresh／BUSY 状态证明写 FIFO 排空和 tRAS，随后恢复自己取得的资源。
+失去 lease、时间域或读回证据时保留清理责任，不撤销已有 CPU 指针。同一持久 owner
+可以恢复自己的 Self-refresh，并从实际 NORMAL 完成之后等待完整 tXSR／上电间隔。
+
+ES0321 §2.3.4 要求保持共享 `FMC_BCR1.WFDIS=0`。FMC gate 关闭时不能可靠读取
+该位：静态预检不假装完成物理证明，prepare 取得 gate 后在引脚／首条命令前检查，
+后续命令与新借用再次检查。驱动不自动修改外来 WFDIS；已初始化后约束失效会阻止
+新借用和普通停止并保留 owner／gate。只有尚未发命令／借用的 phase0 冷拒绝，
+能够保持原 BCR1 不变并归还自己取得的 gate。实现见
+[SDRAM 私有合同](../../soc/stm32/stm32f4/private/stm32f4_sdram.h)。
+
+## F479 间接 QuadSPI 与串行 NOR
+
+首个软件参考固定 `STM32F479NIH6`、QUADSPI Flash1 和 `W25Q128JV`，控制器
+`external_bus/qspi-indirect-sdr` 与既有 `flash_async-endpoint/nor-indirect`
+保持独立身份、共享同一 C owner。此处仅支持 1-1-1 SDR、24 bit 地址、READ03、
+256 B page program 和 4 KiB erase；16 MiB 物理几何以单个 erase span 表达。
+`base_address=0` 只描述未映射的物理地址，不授予 CPU 映射。物理 Flash 的
+`erase_spans` 完整覆盖容量，checked sector 查询不向下舍入、不保留展开表；失败不
+修改查询输出。产品分区仍由外部工程明确声明，不能把 geometry 当作分区政策。
+同步 Flash face 只提供有界读／几何／恢复，
+写擦通过调用者持有的有限请求和显式 task `service` 推进，不新增驱动线程或队列。
+
+完整官方 HAL command／receive／transmit／IRQ／abort transport 在该 task 中推进，
+独占 IRQ 线保持禁用，硬件 DMA 不启用。每个 Handle 的回调 ABI 固定为 1，厂商类型
+保留在私有头；官方 HAL DMA 实现由所选 target 共享一次，不以测试 stub 代替。
+Nexus 在交出缓冲区之前读回实际 CCR／AR／DLR，防止 HAL 从错误 DLR 扩展访问范围。
+HAL 回调、CPU 数据退出、控制器 ABORT／FIFO／IRQ join、外部 Flash WIP 清零是不同
+事实；当前单元读回确认之后才增加完成前缀。全 `0xff` 输入不发 program 脉冲。
+
+取消或 deadline 阻止下一脉冲，不能撤销已发生的写擦；中途 ABORT 仍可能启动部分
+page program。请求／输入持续借用，直到控制器和器件实际退出并发布 SETTLED。
+清源或退出被拒绝时保留同一请求和冷态责任；重试必须完成真实 join，不能只清软件
+active，也不能把 service 一次成功推进误报为 recover 已完成。首个错误保留，
+已经确认的前缀单独报告。`flash_async.stop` 只封闭新请求并取消／排空当前请求，
+保留 bank、配置、时钟与同步只读 face；失败退出保持 QUARANTINED 借用，不能冒报
+已完成。只有 Platform 的冷停止才能归还控制器资源。任何停止都不能越过未结清
+请求或重置共享 DMA／外来控制器。
+
+端点显式提供 prescaler、NCS 高电平周期数和读／准备／停止预算；配置与 C 均审核
+READ03 不超过 50 MHz、NCS 高电平至少 50 ns，并使用原 System 时间域。四个已审
+SoC pad 不证明 PCB：外部集成须提供额定稳定电源与上电准备，WP#／HOLD# 或确切
+后缀的 RESET# 处于数据手册允许的非活动状态。软件不自动修改保护、QE、QPI、
+DDR 或复位器件，也不推断具体 Flash 封装／后缀已经实装。
+
+本切片不支持 DMA、quad／DDR、dual Flash、映射或 XIP。ES0321 §2.4.5 进一步要求
+整个 provider 生命周期都禁止访问 `0x90000000` aperture，包括其它 CPU、IRQ、
+DMA 和调试访问；仅不返回 mapped pointer 不足以满足约束。精确物理验收保持
+`not_executed`，模型与 ARM 软件证据不替代电气／时序／实物验证。实现见
+[QuadSPI 私有合同](../../soc/stm32/stm32f4/private/stm32f4_qspi.h)。

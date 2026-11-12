@@ -137,7 +137,8 @@ nx_result_t nx_adc_port_block_observation(const nx_adc_port_t* port,
  * \param[out]      count: Complete valid samples; remaining output is
  *                  untouched.
  *
- * \return          Success or INVALID/BUSY/TIMEOUT/IO/CONTEXT/UNSUPPORTED.
+ * \return          Success or INVALID/BUSY/TIMEOUT/IO/CONTEXT/UNSUPPORTED;
+ *                  EXHAUSTED if a required finite warmup is unrepresentable.
  *                  No caller buffer or count pointer is retained on return.
  *                  A failed hardware stop returns IO and can retain device
  *                  cleanup; new samples stay BUSY until its owner completes
@@ -161,12 +162,17 @@ nx_result_t nx_adc_port_sample(const nx_adc_port_t* port, uint16_t* samples,
  * \param[in]       trigger_hz: Positive requested complete-scan rate; provider
  *                  rejects rates outside its declared timer/ADC capability.
  *
- * \return          Success or INVALID/BUSY/UNSUPPORTED before buffer admission.
+ * \return          SUCCESS accepts the stream session. Admission errors,
+ *                  including an unrepresentable finite warmup (EXHAUSTED),
+ *                  occur before buffer borrowing.
  *
  * \note            Blocks contain native uint16_t raw counts in channel order.
  *                  Capacities and lengths are multiples of a complete scan; DMA
  *                  domains/alignment and physical rate require separate
- *                  evidence.
+ *                  evidence. Acceptance does not mean warmup has completed or
+ *                  triggers are running. A failure after borrowing is latched
+ *                  and reported by service; retain stream and storage until
+ *                  stop joins every producer and consumer loan.
  */
 nx_result_t nx_adc_port_stream_start(const nx_adc_port_t* port,
                                      nx_stream_t* stream, uint32_t trigger_hz);
@@ -190,11 +196,14 @@ nx_result_t nx_adc_port_stream_stop(const nx_adc_port_t* port);
  * \param[in]       port: Same single task executor as start and stop.
  *
  * \return          Success when an engine is armed, BUSY during source drain or
- *                  free-block backpressure, STATE after acquisition stops.
+ *                  free-block backpressure, STATE after acquisition stops;
+ *                  IO or EXHAUSTED reports a latched provider failure.
  *
  * \note            No task, retry or hidden rearm is created. Block modes state
  *                  their trigger gaps; continuous zero-gap capture requires a
  *                  separately declared hardware capability and qualification.
+ *                  A service error does not release borrowed storage; complete
+ *                  stop before reclaiming the stream or provider.
  */
 nx_result_t nx_adc_port_stream_service(const nx_adc_port_t* port);
 /**

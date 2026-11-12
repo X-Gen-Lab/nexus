@@ -72,15 +72,21 @@ class ExactSupportSelectionTests(unittest.TestCase):
                 self.assertEqual(selected["capabilities"]["joinable_task"],
                                  backend == "native")
 
-
-
-
-    def test_absent_revision_review_remains_explicitly_unknown(self):
+    def test_system_review_does_not_invent_controller_or_physical_approval(self):
         for name in ("qiming-baremetal-uart.toml", "native-uart.toml"):
             with self.subTest(assembly=name):
                 result = capabilities.selection(canonical_assembly(ROOT, name), ROOT, test_support=native_fixture(canonical_assembly(ROOT, name)))
                 self.assertIn("silicon_admission", result)
-                self.assertIsNone(result["silicon_admission"])
+                review = result["silicon_admission"]
+                if name == "native-uart.toml":
+                    self.assertIsNone(review)
+                else:
+                    self.assertEqual("stm32f4", review["provider"])
+                    self.assertEqual(result["selection"]["part"], review["part"])
+                    self.assertEqual("reject", review["unknown_revision"])
+                    self.assertTrue(review["reviewed_revision_ids"])
+                    self.assertIn("ES0182 Rev19", review["review_scope"])
+                    self.assertIs(review["physical_qualified"], False)
                 self.assertTrue(all(item.get("silicon_admission", "missing")
                                     is None for item in result["controllers"]))
                 self.assertIs(result["physical_qualified"], False)

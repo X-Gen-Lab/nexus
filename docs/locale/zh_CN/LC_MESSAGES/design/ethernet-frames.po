@@ -1,6 +1,6 @@
 # Current gettext translation draft; independent review pending.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 560979a36af7dc7d1e53d962536e1150dce93b702c7dbffe11d697d00c7dd260\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 2fc49bd9a7a681b0cba19c166d1b492a7a73a5958dd42d95755f4092f524a9c2\n"
 
 msgid "Ethernet frame loans and the MAC hardware clock"
 msgstr "以太网帧借用与 MAC 硬件时钟"
@@ -8,8 +8,8 @@ msgstr "以太网帧借用与 MAC 硬件时钟"
 msgid "The optional `eth_frames` face adds complete scatter-gather frames, one in-band VLAN C-tag and MAC hardware-event timestamps. It selects independent provider state, eight-word descriptors and caller-owned storage. The existing `eth` face keeps its contiguous untagged-frame contract, four-word descriptors and existing operations table. Selecting one does not expand the other."
 msgstr "可选的 `eth_frames` 接口提供完整的分散聚集帧、一个带内 VLAN C-tag 和 MAC硬件事件时间戳。它选择独立的 provider 状态、八字描述符和调用方存储。现有 `eth` 接口保留连续无标签帧契约、四字描述符及原有操作表。选择其中一个接口不会扩大另一个接口的能力。"
 
-msgid "The production implementation is owned by `soc/stm32/stm32f4/` and currently selects exact STM32F407VET6/ZGT6 MII and STM32F407ZGT6 RMII facts at HCLK 168 MHz. The seventeen-pad MII A/B/C route includes both PHY clock inputs, CRS, COL and RX_ER; it does not inherit any PCB wiring. It does not imply full STM32F4 family coverage or authorize the VE package's missing PG pins. Native is an explicit C hardware model under `tests/support/native/`, enabled only for host tests. Public contracts, the MAC engine, the F407 binding, static factory composition and the canonical ARM image have separate software checks. Physical RMII, PHY behavior, bus timing, timestamp accuracy and station HIL remain `not_executed`."
-msgstr "生产实现归属 `soc/stm32/stm32f4/`，当前在 HCLK 168 MHz 下选择精确 STM32F407VET6/ZGT6 的 MII 事实，以及 STM32F407ZGT6 的 RMII 事实。MII 的 A/B/C 共十七个引脚包括两个 PHY 时钟输入、CRS、COL 和 RX_ER，不继承任何 PCB 接线。这不表示完整覆盖 STM32F4，也不允许使用 VE 封装缺少的 PG 引脚。Native 是位于 `tests/support/native/`、仅对主机测试显式启用的 C 硬件模型。公共合同、MAC 引擎、F407 绑定、静态 factory 装配和标准 ARM 镜像分别进行软件验证。物理 RMII、PHY 行为、总线时序、时间戳精度和工位 HIL 均仍为 `not_executed`。"
+msgid "The production implementation is owned by `soc/stm32/stm32f4/` and currently selects exact STM32F407VET6/ZGT6 MII and STM32F407ZGT6 RMII facts. The selected static ClockPlan supplies HCLK from 25 through 168 MHz. The seventeen-pad MII A/B/C route includes both PHY clock inputs, CRS, COL and RX_ER; it does not inherit any PCB wiring. It does not imply full STM32F4 family coverage or authorize the VE package's missing PG pins. Native is an explicit C hardware model under `tests/support/native/`, enabled only for host tests. Public contracts, the MAC engine, the F407 binding, static factory composition and the canonical ARM image have separate software checks. Physical RMII, PHY behavior, bus timing, timestamp accuracy and station HIL remain `not_executed`."
+msgstr "生产实现归属 `soc/stm32/stm32f4/`，当前选择精确 STM32F407VET6/ZGT6 的 MII 事实，以及 STM32F407ZGT6 的 RMII 事实。所选静态 ClockPlan 提供 25 至 168 MHz 的 HCLK。MII 的 A/B/C 共十七个引脚包括两个 PHY 时钟输入、CRS、COL 和 RX_ER，不继承任何 PCB 接线。这不表示完整覆盖 STM32F4，也不允许使用 VE 封装缺少的 PG 引脚。Native 是位于 `tests/support/native/`、仅对主机测试显式启用的 C 硬件模型。公共合同、MAC 引擎、F407 绑定、静态 factory 装配和标准 ARM 镜像分别进行软件验证。物理 RMII、PHY 行为、总线时序、时间戳精度和工位 HIL 均仍为 `not_executed`。"
 
 msgid "![FIG-16: build-time assembly selects one immutable face and one private physical owner; normal frame calls dispatch directly to that owner](../assets/diagrams/io-evolution.svg)"
 msgstr "![FIG-16：构建期装配选择一个不可变接口和一个私有物理所有者；普通帧调用直接派发给该所有者](../assets/diagrams/io-evolution.svg)"
@@ -26,8 +26,11 @@ msgstr "维护中的普通装配使用 authored `eth_frames.mac` 控制器选择
 msgid "Platform owns the System clock lease, pins, RMII selection and MAC/TX/RX/PTP clock gates. The provider manages its MAC, DMA, PTP counter and IRQ inside that lease. Old raw Ethernet and enhanced frames cannot own the same MAC concurrently. A product supplies PHY reset, address, power, autonegotiation/link observation, network stack, packet classification and shutdown policy outside this repository."
 msgstr "Platform 拥有 System 时钟租约、引脚、RMII 选择及 MAC／TX／RX／PTP 时钟门。provider 在该租约内管理 MAC、DMA、PTP 计数器和 IRQ。旧 raw Ethernet 与增强帧不能同时拥有同一 MAC。产品在本仓库之外提供 PHY 复位、地址、电源、自协商／链路观测、网络栈、报文分类和关闭策略。"
 
-msgid "Startup establishes actual HSE8/PLL168 before MAC access. The F407 provider checks fresh oscillator/PLL readiness, actual source status, PLL factors, AHB/APB dividers, RMII selection and the separate PTP gate. Merely requesting PLL selection or declaring a configured frequency cannot authorize 16 MHz fallback or a different actual divider. RM0090 requires Ethernet AHB at least 25 MHz. External RMII REF_CLK at 50 MHz does not establish HCLK or the PTP input clock."
-msgstr "启动在访问 MAC 前建立实际 HSE8／PLL168。F407 provider 重新核对晶振／PLL ready、实际源状态、PLL 因子、AHB／APB 分频、RMII 选择和独立 PTP gate。仅请求选择 PLL 或声明频率，不能授权 16 MHz 回退或不同实际分频。RM0090 要求 Ethernet AHB 至少 25 MHz。外部 50 MHz RMII REF_CLK 不证明 HCLK 或 PTP 输入时钟。"
+msgid "Startup establishes the selected System ClockPlan before MAC access. The F407 provider checks fresh source readiness, actual source status, PLL factors, AHB/APB dividers, RMII selection and the separate PTP gate. Merely requesting PLL selection or declaring a configured frequency cannot authorize 16 MHz fallback or a different actual divider. RM0090 requires Ethernet AHB at least 25 MHz. External RMII REF_CLK at 50 MHz does not establish HCLK or the PTP input clock."
+msgstr "启动在访问 MAC 前建立所选 System ClockPlan。F407 provider 重新核对时钟源 ready、实际源状态、PLL 因子、AHB／APB 分频、RMII 选择和独立 PTP gate。仅请求选择 PLL 或声明频率，不能授权 16 MHz 回退或不同实际分频。RM0090 要求 Ethernet AHB 至少 25 MHz。外部 50 MHz RMII REF_CLK 不证明 HCLK 或 PTP 输入时钟。"
+
+msgid "MDC division follows the reviewed HCLK ranges in RM0090. Fine PTP update uses a 20 ns increment above 50 MHz, 40 ns above 25 MHz and 80 ns at 25 MHz; each choice keeps the accumulator ratio representable. The addend is rounded from the actual leased HCLK and the selected increment. Snapshot resolution reports that increment. These are nominal digital counter facts, not measured PHY clock accuracy or network synchronization."
+msgstr "MDC 分频遵循 RM0090 中已审核的 HCLK 区间。精细 PTP 更新在 HCLK 大于 50 MHz 时使用 20 ns 增量，大于 25 MHz 且不超过 50 MHz 时使用 40 ns，在 25 MHz 时使用 80 ns；每个选择都使累加器比值可表示。addend 由实际租用的 HCLK 与所选增量计算并舍入。快照分辨率报告该增量。这些是标称数字计数器事实，不表示已测得 PHY 时钟精度或网络同步。"
 
 msgid "The provider rejects foreign/live descriptor tables before reset. Descriptors and packet storage must be in the reviewed F407 main-SRAM DMA domain: 128 KiB at 0x20000000. CCM is excluded. Software metadata may use other CPU-accessible storage. The hardware descriptor stride is 32 bytes; the ST HAL descriptor type has additional software backup words and is not used as the hardware stride. Official headers supply reviewed layout/mask definitions; vendor C runtimes, descriptor pools, mutable global cursors and HAL tick initialization are not selected."
 msgstr "provider 在 reset 前拒绝外来或活动描述符表。描述符和包存储必须位于受审 F407 主 SRAM DMA 域：0x20000000 起的 128 KiB；排除 CCM。软件元数据可放其他 CPU 可访问存储。硬件描述符步长为 32 字节，ST HAL 描述符类型带额外软件备份字，不能用作硬件步长。官方头提供受审布局／mask 定义；不选用厂商 C runtime、描述符池、全局可变游标或 HAL tick 初始化。"
@@ -143,8 +146,8 @@ msgstr "时间戳含义"
 msgid "Every time fact uses the existing `nx_io_timestamp_t`. The assembly contract allocates one nonzero 32-bit domain from its namespace of real counters; applications cannot make unrelated counters comparable by assigning the same local device ID."
 msgstr "所有时间事实都使用已有 `nx_io_timestamp_t`。装配契约从实际计数器的统一命名空间分配一个非零 32 位 domain；应用不能通过赋予相同本地设备 ID，就使互不相关的计数器具备可比较性。"
 
-msgid "The selected clock uses digital nanosecond rollover, 20 ns subsecond increment and fine update. Its accumulator input is HCLK, with addend 1278264076 at the selected 168 MHz. This value and the stated units are not measured oscillator accuracy. The counter is not UTC, TAI or a synchronized network clock."
-msgstr "所选时钟使用数字纳秒回绕、20 ns 亚秒增量和精细更新。累加器输入是 HCLK，所选 168 MHz 对应 addend 1278264076。该值和所述单位不表示已测得晶振精度。计数器不是 UTC、TAI 或已同步网络时钟。"
+msgid "The selected clock uses digital nanosecond rollover, the HCLK-derived subsecond increment and fine update. Its accumulator input is HCLK, with addend 1278264076 at the selected 168 MHz. This value and the stated units are not measured oscillator accuracy. The counter is not UTC, TAI or a synchronized network clock."
+msgstr "所选时钟使用数字纳秒回绕、由 HCLK 推导的亚秒增量和精细更新。累加器输入是 HCLK，所选 168 MHz 对应 addend 1278264076。该值和所述单位不表示已测得晶振精度。计数器不是 UTC、TAI 或已同步网络时钟。"
 
 msgid "Observation"
 msgstr "观测"

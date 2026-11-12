@@ -59,6 +59,9 @@ enum {
 #define DATA_PID       (UINT32_C(1) << 16U)
 #define NAK_STATUS     (UINT32_C(1) << 17U)
 #define DATA0          (UINT32_C(1) << 28U)
+#define DMA_REQUEST    (UINT32_C(1) << 30U)
+#define SETUP_DONE     UINT32_C(8)
+#define SETUP_LOST     UINT32_C(64)
 #define ISO_OUT_DROP   (UINT32_C(1) << 14U)
 #define ISO_INCOMP_IN  (UINT32_C(1) << 20U)
 #define ISO_INCOMP_OUT (UINT32_C(1) << 21U)
@@ -136,6 +139,115 @@ static bool overlap(const void* a, size_t an, const void* b, size_t bn) {
     }
     return an != 0U && bn != 0U && av < bv + bn && bv < av + an;
 }
+enum {
+    REMOTE_CONFIGURED = 1U,
+    REMOTE_AUTHORIZED = 2U,
+    REMOTE_SUSPEND_TIME = 4U,
+    REMOTE_ISSUED = 8U,
+    REMOTE_SUSPEND_ACKED = 16U,
+    REMOTE_PULSE_US = 2001U,
+    REMOTE_BOUND_MAX_US = 12998U
+};
+/** \brief New clock history is never substituted for an old suspend receipt. */
+static uint64_t remote_epoch(const nx_usb_controller_t* c) {
+    return c->clock.ops->epoch == NULL ? 0U
+                                       : c->clock.ops->epoch(c->clock.context);
+}
+/** \brief The caller request carries the retained first terminal cause. */
+static void remote_fail(nx_usb_remote_runtime_t* r, nx_result_t reason) {
+    if (r->request == NULL)
+        return;
+    if (r->request->base.result == NX_SUCCESS ||
+        (r->request->base.result == NX_ERROR_CANCELLED &&
+         reason != NX_ERROR_CANCELLED))
+        r->request->base.result = reason;
+    if (nx_request_state(&r->request->base) == NX_REQUEST_ACTIVE)
+        (void)nx_request_transition(&r->request->base, NX_REQUEST_DRAINING);
+}
+/** \brief Explicit service withdraws a pulse; no background timer is created.
+ * A declared delay bound is an external proof obligation. Actual late service
+ * remains a fault even when a later RWUSIG clear succeeds.
+ */
+static void remote_progress(nx_usb_controller_t* c) {
+    if (!NEXUS_STM32F4_USB_REMOTE_WAKEUP)
+        return;
+    nx_usb_remote_runtime_t* r = c->remote;
+    if (r == NULL || r->request == NULL)
+        return;
+    nx_usb_remote_wakeup_request_t* request = r->request;
+    bool live = r->time_epoch != 0U && remote_epoch(c) == r->time_epoch;
+    nx_time_us_t now = live ? nx_time_now_us() : 0U;
+    live = live && remote_epoch(c) == r->time_epoch && now >= r->time_us &&
+           now >= r->before_us && now != NX_DEADLINE_NEVER;
+    const uint64_t limit =
+        REMOTE_PULSE_US + (uint64_t)request->max_service_delay_us;
+    if (!live) {
+        remote_fail(r, NX_ERROR_STATE);
+        c->snapshot.closing = true;
+    } else if (now - r->before_us > limit || now >= request->base.deadline) {
+        remote_fail(r, NX_ERROR_TIMEOUT);
+        c->snapshot.closing = true;
+    }
+    const nx_result_t reason = request->base.result;
+    if (live && now - r->time_us < REMOTE_PULSE_US &&
+        reason != NX_ERROR_STATE && reason != NX_ERROR_IO)
+        return;
+    NX_USB_WRITE(c->registers, CONTROL,
+                 NX_USB_READ(c->registers, CONTROL) & ~1U);
+    nx_arch_dsb();
+    if ((NX_USB_READ(c->registers, CONTROL) & 1U) != 0U) {
+        remote_fail(r, NX_ERROR_IO);
+        c->snapshot.closing = true;
+        (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
+        return;
+    }
+    /* Observe actual withdrawal before publishing any successful timing. */
+    live = live && remote_epoch(c) == r->time_epoch;
+    now = live ? nx_time_now_us() : 0U;
+    live = live && remote_epoch(c) == r->time_epoch && now >= r->time_us &&
+           now >= r->before_us && now != NX_DEADLINE_NEVER;
+    if (!live) {
+        remote_fail(r, NX_ERROR_STATE);
+        c->snapshot.closing = true;
+    } else if (now - r->before_us > limit || now >= request->base.deadline) {
+        remote_fail(r, NX_ERROR_TIMEOUT);
+        c->snapshot.closing = true;
+    }
+    const nx_result_t result = request->base.result;
+    r->request = NULL;
+    if (!c->snapshot.suspended)
+        r->flags &= (uint8_t) ~(REMOTE_SUSPEND_TIME | REMOTE_ISSUED |
+                                REMOTE_SUSPEND_ACKED);
+    nx_request_settle(&request->base, result, 0U);
+}
+/** \brief Optional runtime belongs to the same static controller lifetime. */
+static bool remote_plan_valid(const nx_usb_controller_t* c) {
+    if (!NEXUS_STM32F4_USB_REMOTE_WAKEUP)
+        return c->remote == NULL;
+    const nx_usb_remote_runtime_t* r = c->remote;
+    if (r == NULL)
+        return true;
+    if (c->clock.ops->epoch == NULL || overlap(r, sizeof(*r), c, sizeof(*c)) ||
+        overlap(r, sizeof(*r), c->endpoints,
+                c->endpoint_count * sizeof(*c->endpoints)) ||
+        overlap(r, sizeof(*r), c->events, c->capacity * sizeof(*c->events)) ||
+        overlap(r, sizeof(*r), c->clock.context, c->clock.context_size) ||
+        overlap(r, sizeof(*r), c->clock.ops, sizeof(*c->clock.ops)) ||
+        (c->wake != NULL && overlap(r, sizeof(*r), c->wake, sizeof(*c->wake))))
+        return false;
+    if (c->dma) {
+        if (overlap(r, sizeof(*r), c->dma_storage,
+                    c->endpoint_count * sizeof(*c->dma_storage)) ||
+            overlap(r, sizeof(*r), c->dma_regions,
+                    c->dma_region_count * sizeof(*c->dma_regions)))
+            return false;
+        for (size_t i = 0U; i < c->endpoint_count; ++i)
+            if (overlap(r, sizeof(*r), c->dma_storage[i].bytes,
+                        c->dma_storage[i].capacity))
+                return false;
+    }
+    return r->request == NULL;
+}
 /** \brief Core geometry never infers the negotiated PHY from the name HS. */
 static uint8_t endpoint_numbers(const nx_usb_controller_t* c) {
     return c->core == NX_USB_CORE_FS ? 4U : 6U;
@@ -178,6 +290,13 @@ static uint32_t ep_offset(const nx_usb_endpoint_t* ep) {
 static uint32_t ep_flags(const nx_usb_endpoint_t* ep) {
     return NX_USB_READ(ep->controller->registers, ep_offset(ep) + 8U) &
            (ep->controller->dma ? 0x5FU : 0x5BU);
+}
+/** \brief OUT0 SETUP belongs to its controller epoch, not an old packet. */
+static uint32_t packet_flags(const nx_usb_endpoint_t* ep) {
+    uint32_t flags = ep_flags(ep);
+    if (ep->controller->dma && !ep->in && ep->number == 0U)
+        flags &= ~(SETUP_DONE | SETUP_LOST);
+    return flags;
 }
 /** \brief Selected bulk/interrupt DATA PID commands never apply to EP0. */
 static bool uses_data_toggle(const nx_usb_endpoint_t* ep) {
@@ -288,7 +407,12 @@ static bool plan_valid(nx_usb_controller_t* c) {
             const nx_usb_dma_storage_t* storage = &c->dma_storage[i];
             size_t minimum =
                 ((size_t)c->endpoints[i].max_packet + 3U) & ~(size_t)3U;
-            if (minimum < 24U)
+            /* A control OUT packet and up to three SETUPs use one advancing
+             * DMA address (RM0090 35.12.4, DOEPDMA0). Keep their entire tail.
+             */
+            if (!c->endpoints[i].in && c->endpoints[i].number == 0U)
+                minimum += 24U;
+            else if (minimum < 24U)
                 minimum = 24U;
             if (storage->capacity < minimum || storage->capacity > UINT32_MAX ||
                 (uintptr_t)storage->bytes >
@@ -404,7 +528,7 @@ static bool plan_valid(nx_usb_controller_t* c) {
     size_t minimum_rx =
         11U + packet_words * (iso_out_count > 1U ? 2U : 1U) + out_count;
     return in0 && out0 && c->rx_fifo_words >= minimum_rx &&
-           fifo_end <= fifo_words(c);
+           fifo_end <= fifo_words(c) && remote_plan_valid(c);
 }
 /** \brief Pure validation also admits cold plans before their pin effects. */
 nx_result_t nx_usb_controller_plan_validate(nx_usb_controller_t* c) {
@@ -420,13 +544,19 @@ static bool dma_detached(nx_usb_endpoint_t* ep) {
     nx_usb_controller_t* c = ep->controller;
     if (!c->dma)
         return true;
+    /* A pending controller SETUP receipt still needs this advancing address.
+     * Joining the old packet must not erase a different epoch's final slot. */
+    if (!ep->in && ep->number == 0U &&
+        ((ep->observed | ep_flags(ep)) & (SETUP_DONE | SETUP_LOST)) != 0U)
+        return false;
     if ((NX_USB_READ(c->registers, ep_offset(ep)) & ENABLE) != 0U ||
-        (NX_USB_READ(c->registers, RESET) & ENABLE) == 0U)
+        (NX_USB_READ(c->registers, RESET) & (ENABLE | DMA_REQUEST)) != ENABLE)
         return false;
     NX_USB_WRITE(c->registers, ep_offset(ep) + 20U, 0U);
     nx_arch_dsb();
     return NX_USB_READ(c->registers, ep_offset(ep) + 20U) == 0U &&
-           (NX_USB_READ(c->registers, RESET) & ENABLE) != 0U;
+           (NX_USB_READ(c->registers, RESET) & (ENABLE | DMA_REQUEST)) ==
+               ENABLE;
 }
 /** \brief Exact selected direction bit; EP0 has separate lifecycle ownership.
  */
@@ -531,6 +661,14 @@ static void arm_setup(nx_usb_controller_t* c) {
         return;
     }
     uint32_t offset = ep_offset(ep);
+    /* DOEPTSIZ0 is software-owned only with EPENA clear (RM0090 p1456).
+     * Never rewind a live/unfinished SETUP epoch or a delayed AHB write. */
+    if ((NX_USB_READ(c->registers, offset) & ENABLE) != 0U ||
+        (c->dma &&
+         (((ep->observed | ep_flags(ep)) & (SETUP_DONE | SETUP_LOST)) != 0U ||
+          (NX_USB_READ(c->registers, RESET) & (ENABLE | DMA_REQUEST)) !=
+              ENABLE)))
+        return;
     if (c->dma) {
         NX_USB_WRITE(c->registers, offset + 20U,
                      (uint32_t)(uintptr_t)dma_storage(ep)->bytes);
@@ -557,6 +695,8 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
         return result;
     }
     c->clock_retained = true;
+    if (NEXUS_STM32F4_USB_REMOTE_WAKEUP && c->remote != NULL)
+        memset(c->remote, 0, sizeof(*c->remote));
     c->snapshot.started = true;
     c->snapshot.closing = true;
     c->snapshot.speed = NX_USB_DEVICE_SPEED_UNKNOWN;
@@ -614,6 +754,7 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
         ep->received = 0U;
         ep->rx_seen = false;
         ep->disable_requested = false;
+        ep->observed = 0U;
         uint32_t offset = ep_offset(ep);
         uint32_t control = SNAK | (ep->number == 0U ? ACTIVE : 0U);
         if (ep->number != 0U) {
@@ -709,11 +850,33 @@ static void begin_drain(nx_usb_endpoint_t* ep, nx_result_t reason) {
     nx_request_state_t state = nx_request_state(&ep->request->base);
     if (state == NX_REQUEST_ACTIVE) {
         ep->terminal = reason;
-        ep->drain_deadline = nx_deadline_after(
-            nx_time_now_us(), ep->controller->drain_timeout_us);
+        if (nx_deadline_finite_after(nx_time_now_us(),
+                                     ep->controller->drain_timeout_us,
+                                     &ep->drain_deadline) != NX_SUCCESS) {
+            /* An exhausted grace never selects an infinite accepted borrow. */
+            ep->drain_deadline = 0U;
+        }
         (void)nx_request_transition(&ep->request->base, NX_REQUEST_DRAINING);
     } else if (reason == NX_ERROR_STATE) {
         ep->terminal = reason;
+    }
+}
+/** \brief Latch completion before W1C, independently of memory withdrawal. */
+static void completion_facts(nx_usb_endpoint_t* ep, uint32_t flags) {
+    const uint32_t facts = flags & 3U;
+    if (facts == 0U)
+        return;
+    ep->observed = (uint8_t)(ep->observed | facts);
+    nx_usb_controller_t* c = ep->controller;
+    NX_USB_WRITE(c->registers, ep_offset(ep) + 8U, facts);
+    nx_arch_dsb();
+    if ((ep_flags(ep) & facts) != 0U) {
+        /* Only a failed source acknowledgement isolates this controller.
+         * Keep every loan/clock for explicit Thread recovery, never reset. */
+        begin_drain(ep, NX_ERROR_IO);
+        c->snapshot.closing = true;
+        NX_USB_IRQ_DISABLE(c->registers, c->irq.irq_number);
+        nx_arch_dsb();
     }
 }
 /** \brief USB FS has 11 frame bits; HS includes three microframe bits. */
@@ -741,7 +904,7 @@ static void incomplete_iso(nx_usb_controller_t* c, uint32_t flags) {
              (ep->in ? ISO_INCOMP_IN : ISO_INCOMP_OUT | ISO_OUT_DROP)) == 0U)
             continue;
         /* A completed controller packet wins an unrelated old indication. */
-        if ((ep_flags(ep) & 1U) != 0U &&
+        if (((ep_flags(ep) | ep->observed) & 1U) != 0U &&
             (NX_USB_READ(c->registers, ep_offset(ep)) & ENABLE) == 0U)
             continue;
         if (now >= ep->request->base.deadline) {
@@ -768,8 +931,14 @@ static void invalidate(nx_usb_controller_t* c, bool reset) {
         if (reset || c->endpoints[i].number == 0U) {
             begin_drain(&c->endpoints[i], NX_ERROR_STATE);
         }
+        if (reset)
+            c->endpoints[i].observed &= (uint8_t)~SETUP_DONE;
     }
     if (reset) {
+        if (NEXUS_STM32F4_USB_REMOTE_WAKEUP && c->remote != NULL) {
+            c->remote->flags = 0U;
+            remote_fail(c->remote, NX_ERROR_STATE);
+        }
         c->reset_pending = true;
         c->snapshot.speed = NX_USB_DEVICE_SPEED_UNKNOWN;
     } else {
@@ -778,8 +947,7 @@ static void invalidate(nx_usb_controller_t* c, bool reset) {
 }
 /** \brief One SETUP is exactly eight little-endian bytes, not a class callback.
  */
-static void setup_packet(nx_usb_controller_t* c, const uint8_t* b) {
-    invalidate(c, false);
+static void save_setup(nx_usb_controller_t* c, const uint8_t* b) {
     c->snapshot.setup = (nx_usb_setup_t){
         .request_type = b[0],
         .request = b[1],
@@ -792,19 +960,113 @@ static void setup_packet(nx_usb_controller_t* c, const uint8_t* b) {
     c->snapshot.control_pending = true;
     event(c, NX_USB_EVENT_SETUP);
 }
+/** \brief PIO has already copied its complete eight-byte FIFO entry. */
+static void setup_packet(nx_usb_controller_t* c, const uint8_t* b) {
+    invalidate(c, false);
+    save_setup(c, b);
+}
+/** \brief Untrusted SETUP data cannot reopen admission or release any loan. */
+static void setup_failure(nx_usb_controller_t* c, nx_usb_endpoint_t* ep) {
+    c->snapshot.closing = true;
+    c->snapshot.control_pending = false;
+    c->address_pending = false;
+    ep->observed &= (uint8_t)~SETUP_DONE;
+    for (size_t i = 0U; i < c->endpoint_count; ++i) {
+        if (c->endpoints[i].number == 0U)
+            begin_drain(&c->endpoints[i], NX_ERROR_IO);
+    }
+    NX_USB_WRITE(c->registers, ep_offset(ep) + 8U,
+                 SETUP_DONE | SETUP_LOST | 4U);
+    nx_arch_dsb();
+    if ((ep_flags(ep) & (SETUP_DONE | SETUP_LOST | 4U)) != 0U) {
+        NX_USB_IRQ_DISABLE(c->registers, c->irq.irq_number);
+        nx_arch_dsb();
+    }
+}
+/** \brief Three finite DMA SETUP slots precede every permitted bank rewind.
+ * STUP receipt closes old control admission immediately. Only quiescent AHB
+ * and an unchanged complete slot permit decoding; later writes append within
+ * the reserved tail. B2BSTUP rejects any cycle that could overwrite a slot.
+ */
+static void receive_dma_setup(nx_usb_controller_t* c) {
+    nx_usb_endpoint_t* ep = endpoint(c, 0U, false);
+    const uint32_t offset = ep_offset(ep);
+    uint32_t flags = ep_flags(ep);
+    if (c->snapshot.closing || c->reset_pending) {
+        ep->observed &= (uint8_t)~SETUP_DONE;
+        NX_USB_WRITE(c->registers, offset + 8U,
+                     flags & (SETUP_DONE | SETUP_LOST | 4U));
+        nx_arch_dsb();
+        if ((ep_flags(ep) & (SETUP_DONE | SETUP_LOST | 4U)) != 0U)
+            NX_USB_IRQ_DISABLE(c->registers, c->irq.irq_number);
+        return;
+    }
+    if ((flags & (SETUP_LOST | 4U)) != 0U) {
+        setup_failure(c, ep);
+        return;
+    }
+    if ((flags & SETUP_DONE) != 0U) {
+        if ((ep->observed & SETUP_DONE) == 0U) {
+            invalidate(c, false);
+            ep->observed |= (uint8_t)SETUP_DONE;
+        }
+        NX_USB_WRITE(c->registers, offset + 8U, SETUP_DONE);
+        nx_arch_dsb();
+        if ((ep_flags(ep) & SETUP_DONE) != 0U) {
+            setup_failure(c, ep);
+            return;
+        }
+    }
+    if ((ep->observed & SETUP_DONE) == 0U ||
+        (NX_USB_READ(c->registers, RESET) & (ENABLE | DMA_REQUEST)) != ENABLE)
+        return;
+    if ((NX_USB_READ(c->registers, offset) & ENABLE) != 0U) {
+        setup_failure(c, ep);
+        return;
+    }
+    const uint32_t remaining =
+        (NX_USB_READ(c->registers, offset + 16U) >> 29U) & 3U;
+    const uint32_t address = NX_USB_READ(c->registers, offset + 20U);
+    const uintptr_t begin = (uintptr_t)dma_storage(ep)->bytes;
+    const size_t packets = 3U - remaining;
+    const size_t maximum = ((size_t)ep->max_packet + 3U) & ~(size_t)3U;
+    /* New DMA may have started since the first idle sample. An unfinished
+     * address/count pair is a retry, not proof of a corrupt committed slot. */
+    if ((NX_USB_READ(c->registers, RESET) & (ENABLE | DMA_REQUEST)) != ENABLE ||
+        (NX_USB_READ(c->registers, offset) & ENABLE) != 0U)
+        return;
+    if (packets == 0U || address < begin || (address - begin) % 4U != 0U ||
+        address - begin < packets * 8U ||
+        address - begin > maximum + packets * 8U) {
+        setup_failure(c, ep);
+        return;
+    }
+    uint8_t setup[8];
+    memcpy(setup, (const void*)(uintptr_t)(address - 8U), sizeof(setup));
+    nx_arch_dsb();
+    /* No repeated-counter equality proof: a bank cannot wrap in this finite
+     * epoch. SETUP_LOST remains sticky until its explicit recovery path. */
+    if ((NX_USB_READ(c->registers, RESET) & (ENABLE | DMA_REQUEST)) != ENABLE ||
+        (NX_USB_READ(c->registers, offset) & ENABLE) != 0U ||
+        NX_USB_READ(c->registers, offset + 20U) != address ||
+        ((NX_USB_READ(c->registers, offset + 16U) >> 29U) & 3U) != remaining)
+        return;
+    flags = ep_flags(ep);
+    if ((flags & (SETUP_LOST | 4U)) != 0U) {
+        setup_failure(c, ep);
+        return;
+    }
+    if ((flags & SETUP_DONE) != 0U)
+        return;
+    ep->observed &= (uint8_t)~SETUP_DONE;
+    save_setup(c, setup);
+}
 /** \brief RX status/data work is limited to eight headers and 128 payload
  * words. */
 static void receive(nx_usb_controller_t* c) {
     uintptr_t base = c->registers;
     if (c->dma) {
-        nx_usb_endpoint_t* out0 = endpoint(c, 0U, false);
-        uint32_t flags = ep_flags(out0);
-        if ((flags & 8U) != 0U) {
-            nx_arch_dsb();
-            if (!c->snapshot.closing && !c->reset_pending)
-                setup_packet(c, dma_storage(out0)->bytes);
-            NX_USB_WRITE(base, ep_offset(out0) + 8U, 8U);
-        }
+        receive_dma_setup(c);
         return;
     }
     size_t words_left = fifo_words(c);
@@ -898,7 +1160,9 @@ static bool drain(nx_usb_endpoint_t* ep) {
         ep->disable_requested = true;
         nx_arch_dsb();
     }
-    uint32_t flags = ep_flags(ep);
+    uint32_t flags = packet_flags(ep);
+    completion_facts(ep, flags);
+    flags |= ep->observed & 3U;
     if ((NX_USB_READ(base, offset) & ENABLE) != 0U ||
         (ep->disable_requested && (flags & 2U) == 0U)) {
         return false;
@@ -923,7 +1187,7 @@ static bool drain(nx_usb_endpoint_t* ep) {
     }
     NX_USB_WRITE(base, offset + 8U, flags);
     nx_arch_dsb();
-    bool clear = ep_flags(ep) == 0U;
+    bool clear = packet_flags(ep) == 0U;
     if (clear) {
         ep->disable_requested = false;
     }
@@ -957,10 +1221,9 @@ static bool clear_halts(nx_usb_controller_t* c, bool reset) {
     }
     return true;
 }
-/** \brief Advance EP0 only after real packet completion in the current epoch.
- */
-static void control_complete(nx_usb_endpoint_t* ep, nx_result_t result,
-                             size_t count) {
+/** \brief Advance the wire transaction; each packet retains its own loan. */
+static void control_wire_complete(nx_usb_endpoint_t* ep, nx_result_t result,
+                                  size_t count) {
     nx_usb_controller_t* c = ep->controller;
     nx_usb_request_t* r = ep->request;
     if (ep->number != 0U || result != NX_SUCCESS ||
@@ -974,6 +1237,24 @@ static void control_complete(nx_usb_endpoint_t* ep, nx_result_t result,
             c->control_stage = NX_USB_STATUS;
         }
     } else {
+        const nx_usb_setup_t* setup = &c->snapshot.setup;
+        if (NEXUS_STM32F4_USB_REMOTE_WAKEUP && ep->in && c->remote != NULL &&
+            setup->request_type == 0U && setup->index == 0U &&
+            setup->length == 0U) {
+            nx_usb_remote_runtime_t* remote = c->remote;
+            if (setup->request == 9U && setup->value <= 255U) {
+                remote->flags &=
+                    (uint8_t) ~(REMOTE_CONFIGURED | REMOTE_AUTHORIZED);
+                if (setup->value != 0U)
+                    remote->flags |= REMOTE_CONFIGURED;
+            } else if (setup->value == 1U &&
+                       (remote->flags & REMOTE_CONFIGURED) != 0U) {
+                if (setup->request == 3U)
+                    remote->flags |= REMOTE_AUTHORIZED;
+                else if (setup->request == 1U)
+                    remote->flags &= (uint8_t)~REMOTE_AUTHORIZED;
+            }
+        }
         if (ep->in && c->address_pending) {
             uint32_t value = (NX_USB_READ(c->registers, CONFIG) & ~0x7F0U) |
                              ((uint32_t)c->pending_address << 4U);
@@ -985,15 +1266,25 @@ static void control_complete(nx_usb_endpoint_t* ep, nx_result_t result,
         }
         c->address_pending = false;
         c->snapshot.control_pending = false;
+        if (!ep->in) {
+            /* STATUS OUT may precede the last DATA IN ACK. Close admission
+             * now, but retain that independent loan through its real drain. */
+            nx_usb_endpoint_t* input = endpoint(c, 0U, true);
+            if (input != NULL && input->request != NULL &&
+                input->request->control_epoch == c->snapshot.epoch) {
+                begin_drain(input, NX_ERROR_CANCELLED);
+            }
+        }
     }
 }
 /** \brief References detach before SETTLED, which is the final request access.
  */
 static void finish(nx_usb_endpoint_t* ep, nx_result_t result, size_t count) {
     nx_usb_request_t* request = ep->request;
-    control_complete(ep, result, count);
+    control_wire_complete(ep, result, count);
     ep->request = NULL;
     ep->disable_requested = false;
+    ep->observed &= (uint8_t)SETUP_DONE;
     nx_request_settle(&request->base, result, count);
 }
 /** \brief Completion, error, cancel and deadline all require actual detach
@@ -1007,7 +1298,7 @@ static void progress(nx_usb_controller_t* c) {
         nx_usb_endpoint_t* ep = &c->endpoints[i];
         if (ep->request == NULL) {
             uint32_t idle = ep_offset(ep) + 8U;
-            uint32_t observed = ep_flags(ep);
+            uint32_t observed = packet_flags(ep);
             if (observed != 0U) {
                 NX_USB_WRITE(base, idle, observed);
                 if (ep_flags(ep) != 0U) {
@@ -1017,11 +1308,31 @@ static void progress(nx_usb_controller_t* c) {
             continue;
         }
         uint32_t offset = ep_offset(ep);
-        uint32_t flags = ep_flags(ep);
+        uint32_t flags = packet_flags(ep);
+        completion_facts(ep, flags);
+        flags |= ep->observed & 3U;
         nx_request_state_t state = nx_request_state(&ep->request->base);
         if (c->dma && state == NX_REQUEST_ACTIVE && (flags & 4U) != 0U) {
             begin_drain(ep, NX_ERROR_IO);
             state = NX_REQUEST_DRAINING;
+        }
+        if (state == NX_REQUEST_ACTIVE && ep->in && (flags & 8U) != 0U) {
+            begin_drain(ep, NX_ERROR_IO);
+            state = NX_REQUEST_DRAINING;
+        }
+        if (ep->number == 0U && ep->request->stage == NX_USB_STATUS &&
+            (flags & 1U) != 0U && (flags & (c->dma ? 4U : 0U)) == 0U &&
+            (!ep->in || (flags & 8U) == 0U) &&
+            (NX_USB_READ(base, offset) & ENABLE) == 0U &&
+            (ep->in   ? NX_USB_READ(base, offset + 24U) == ep->fifo_words
+             : c->dma ? (NX_USB_READ(base, offset + 16U) & 0x7FFFFU) ==
+                            effective_mps(ep)
+                      : ep->rx_seen && ep->received == 0U)) {
+            /* STATUS ACK commits permission in either direction even when
+             * AHB or address withdrawal retains this independent DMA loan.
+             * Cancellation or a deadline cannot undo an already ACKed wire
+             * effect. SETTLED still needs the full memory/IRQ join below. */
+            control_wire_complete(ep, NX_SUCCESS, 0U);
         }
         if (c->dma && !ep->in && state == NX_REQUEST_ACTIVE &&
             (flags & 1U) != 0U && !ep->rx_seen && dma_detached(ep)) {
@@ -1044,13 +1355,11 @@ static void progress(nx_usb_controller_t* c) {
                 }
             }
         }
-        uint32_t hints = flags & (ep->in ? 0x50U : 0x48U);
+        /* OTEPDIS is a token observed while disabled, not payload overflow
+         * (RM0090 DOEPINT; the locked PCD also only acknowledges this hint). */
+        uint32_t hints = flags & (ep->in ? 0x50U : 0x58U);
         if (hints != 0U) {
             NX_USB_WRITE(base, offset + 8U, hints);
-        }
-        if (state == NX_REQUEST_ACTIVE && (flags & (ep->in ? 8U : 16U)) != 0U) {
-            begin_drain(ep, ep->in ? NX_ERROR_IO : NX_ERROR_OVERFLOW);
-            state = NX_REQUEST_DRAINING;
         }
         bool complete =
             (flags & 1U) != 0U && (NX_USB_READ(base, offset) & ENABLE) == 0U &&
@@ -1060,7 +1369,7 @@ static void progress(nx_usb_controller_t* c) {
         if (state == NX_REQUEST_ACTIVE && complete) {
             NX_USB_WRITE(base, offset + 8U, flags);
             nx_arch_dsb();
-            if (ep_flags(ep) == 0U) {
+            if (packet_flags(ep) == 0U) {
                 finish(ep, NX_SUCCESS,
                        ep->in ? ep->request->length : ep->received);
                 continue;
@@ -1096,6 +1405,7 @@ static void progress(nx_usb_controller_t* c) {
         }
     }
     if (c->setup_pending && !c->reset_pending &&
+        (endpoint(c, 0U, false)->observed & SETUP_DONE) == 0U &&
         endpoint(c, 0U, true)->request == NULL &&
         endpoint(c, 0U, false)->request == NULL && clear_halts(c, false)) {
         endpoint(c, 0U, true)->halted = false;
@@ -1157,12 +1467,40 @@ void nx_usb_controller_irq(nx_usb_controller_t* c) {
         NX_USB_WRITE(c->registers, INTERRUPT, 1U << 12U);
     }
     if ((flags & (1U << 11U)) != 0U) {
+        nx_usb_remote_runtime_t* remote =
+            NEXUS_STM32F4_USB_REMOTE_WAKEUP ? c->remote : NULL;
+        const bool fresh =
+            remote != NULL && ((remote->flags & REMOTE_SUSPEND_TIME) == 0U ||
+                               (remote->flags & REMOTE_SUSPEND_ACKED) != 0U);
+        if (remote != NULL)
+            remote->flags &= (uint8_t)~REMOTE_SUSPEND_ACKED;
+        if (fresh && remote->request == NULL) {
+            const uint64_t epoch = remote_epoch(c);
+            if (epoch != 0U) {
+                const nx_time_us_t now = nx_time_now_us();
+                if (remote_epoch(c) == epoch && now != NX_DEADLINE_NEVER) {
+                    remote->time_us = now;
+                    remote->time_epoch = epoch;
+                    remote->flags &= (uint8_t)~REMOTE_ISSUED;
+                    remote->flags |= REMOTE_SUSPEND_TIME;
+                }
+            }
+        }
         c->snapshot.suspended = true;
         event(c, NX_USB_EVENT_SUSPEND);
         NX_USB_WRITE(c->registers, INTERRUPT, 1U << 11U);
+        /* Only an observed W1C join makes a later SUSP a different idle
+         * receipt. A stuck old level never authorizes a repeated pulse. */
+        if (remote != NULL &&
+            (NX_USB_READ(c->registers, INTERRUPT) & (1U << 11U)) == 0U)
+            remote->flags |= REMOTE_SUSPEND_ACKED;
     }
     if ((flags & ENABLE) != 0U) {
         c->snapshot.suspended = false;
+        if (NEXUS_STM32F4_USB_REMOTE_WAKEUP && c->remote != NULL &&
+            c->remote->request == NULL)
+            c->remote->flags &= (uint8_t) ~(
+                REMOTE_SUSPEND_TIME | REMOTE_ISSUED | REMOTE_SUSPEND_ACKED);
         event(c, NX_USB_EVENT_RESUME);
         NX_USB_WRITE(c->registers, INTERRUPT, ENABLE);
     }
@@ -1200,6 +1538,11 @@ static bool storage_valid(const nx_usb_controller_t* c, const void* bytes,
         overlap(bytes, length, c->events, c->capacity * sizeof(*c->events)) ||
         overlap(bytes, length, c->clock.context, c->clock.context_size) ||
         overlap(bytes, length, c->clock.ops, sizeof(*c->clock.ops)) ||
+        (NEXUS_STM32F4_USB_REMOTE_WAKEUP && c->remote != NULL &&
+         (overlap(bytes, length, c->remote, sizeof(*c->remote)) ||
+          (c->remote->request != NULL &&
+           overlap(bytes, length, c->remote->request,
+                   sizeof(*c->remote->request))))) ||
         (protect_wake && c->wake != NULL &&
          overlap(bytes, length, c->wake, sizeof(*c->wake)))) {
         return false;
@@ -1225,6 +1568,119 @@ static bool storage_valid(const nx_usb_controller_t* c, const void* bytes,
     }
     return true;
 }
+/** \brief Read-only admission checks keep their order under caller IRQ guard.
+ */
+static nx_result_t remote_check(const nx_usb_controller_t* c,
+                                const nx_usb_remote_wakeup_request_t* request) {
+    const nx_usb_remote_runtime_t* r = c->remote;
+    if (!c->snapshot.started || c->snapshot.closing || c->clock.ops == NULL)
+        return NX_ERROR_STATE;
+    if (r == NULL || c->clock.ops->epoch == NULL)
+        return NX_ERROR_UNSUPPORTED;
+    if (!storage_valid(c, request, sizeof(*request), true))
+        return NX_ERROR_INVALID;
+    if (c->reset_pending ||
+        (NX_USB_READ(c->registers, INTERRUPT) & ((1U << 12U) | ENABLE)) != 0U)
+        return NX_ERROR_STATE;
+    if (r->request != NULL)
+        return NX_ERROR_BUSY;
+    if (request->max_service_delay_us == 0U ||
+        request->max_service_delay_us > REMOTE_BOUND_MAX_US ||
+        request->base.deadline == NX_DEADLINE_NEVER)
+        return NX_ERROR_INVALID;
+    if ((r->flags & (REMOTE_CONFIGURED | REMOTE_AUTHORIZED)) !=
+        (REMOTE_CONFIGURED | REMOTE_AUTHORIZED))
+        return NX_ERROR_PERMISSION;
+    if (!c->snapshot.suspended || (r->flags & REMOTE_SUSPEND_TIME) == 0U ||
+        (r->flags & REMOTE_ISSUED) != 0U ||
+        (NX_USB_READ(c->registers, 0x808U) & 1U) == 0U ||
+        (NX_USB_READ(c->registers, CONTROL) & 2U) != 0U ||
+        r->time_epoch == 0U || remote_epoch(c) != r->time_epoch)
+        return NX_ERROR_STATE;
+    if ((NX_USB_READ(c->registers, CONTROL) & 1U) != 0U)
+        return NX_ERROR_BUSY;
+    return NX_SUCCESS;
+}
+/** \brief Admit one ACK-authorized pulse without waiting for idle or time. */
+static nx_result_t remote_wakeup(void* context,
+                                 nx_usb_remote_wakeup_request_t* request) {
+    nx_usb_controller_t* c = context;
+    if (c == NULL || request == NULL)
+        return NX_ERROR_INVALID;
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (!NEXUS_STM32F4_USB_REMOTE_WAKEUP)
+        return NX_ERROR_UNSUPPORTED;
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    nx_usb_remote_runtime_t* r = c->remote;
+    nx_result_t result = remote_check(c, request);
+    if (result == NX_SUCCESS) {
+        const nx_time_us_t now = nx_time_now_us();
+        nx_time_us_t end;
+        if (remote_epoch(c) != r->time_epoch || now < r->time_us) {
+            result = NX_ERROR_STATE;
+        } else if (now - r->time_us < 5001U) {
+            result = NX_ERROR_BUSY;
+        } else if ((result = nx_deadline_finite_after(
+                        now,
+                        REMOTE_PULSE_US +
+                            (uint64_t)request->max_service_delay_us,
+                        &end)) == NX_SUCCESS) {
+            if (request->base.deadline <= end) {
+                result = NX_ERROR_TIMEOUT;
+            } else if ((result = nx_request_admit(
+                            &request->base, NX_REQUEST_ACTIVE)) == NX_SUCCESS) {
+                r->request = request;
+                r->flags |= REMOTE_ISSUED;
+                r->before_us = now;
+                r->time_us = now;
+                NX_USB_WRITE(c->registers, CONTROL,
+                             NX_USB_READ(c->registers, CONTROL) | 1U);
+                nx_arch_dsb();
+                const bool asserted =
+                    (NX_USB_READ(c->registers, CONTROL) & 1U) != 0U;
+                if (remote_epoch(c) == r->time_epoch)
+                    r->time_us = nx_time_now_us();
+                if (!asserted || remote_epoch(c) != r->time_epoch ||
+                    r->time_us < r->before_us) {
+                    remote_fail(r, asserted ? NX_ERROR_STATE : NX_ERROR_IO);
+                    c->snapshot.closing = true;
+                    remote_progress(c);
+                } else if (r->time_us - r->before_us >
+                               REMOTE_PULSE_US +
+                                   (uint64_t)request->max_service_delay_us ||
+                           r->time_us >= request->base.deadline) {
+                    remote_fail(r, NX_ERROR_TIMEOUT);
+                    c->snapshot.closing = true;
+                    remote_progress(c);
+                }
+            }
+        }
+    }
+    nx_arch_irq_restore(saved);
+    return result;
+}
+/** \brief Cancellation keeps the signal and request until their safe join. */
+static nx_result_t remote_cancel(void* context,
+                                 nx_usb_remote_wakeup_request_t* request) {
+    nx_usb_controller_t* c = context;
+    if (c == NULL || request == NULL)
+        return NX_ERROR_INVALID;
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (!NEXUS_STM32F4_USB_REMOTE_WAKEUP)
+        return NX_ERROR_UNSUPPORTED;
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    nx_result_t result = NX_ERROR_STATE;
+    if (c->remote == NULL) {
+        result = NX_ERROR_UNSUPPORTED;
+    } else if (c->remote->request == request) {
+        remote_fail(c->remote, NX_ERROR_CANCELLED);
+        result = NX_SUCCESS;
+    }
+    nx_arch_irq_restore(saved);
+    return result;
+}
 /** \brief Reject all request/buffer aliases to private or other borrowed
  * storage. */
 static bool request_valid(nx_usb_endpoint_t* ep, nx_usb_request_t* r) {
@@ -1245,11 +1701,14 @@ static bool request_valid(nx_usb_endpoint_t* ep, nx_usb_request_t* r) {
     if (ep->number != 0U) {
         return r->control_epoch == 0U && r->stage == NX_USB_DATA;
     }
+    bool data_in = (c->snapshot.setup.request_type & 0x80U) != 0U;
+    bool early_status = !ep->in && data_in && r->stage == NX_USB_STATUS &&
+                        c->control_stage == NX_USB_DATA;
     if (!c->snapshot.control_pending || c->setup_pending || c->reset_pending ||
-        r->control_epoch != c->snapshot.epoch || r->stage != c->control_stage) {
+        r->control_epoch != c->snapshot.epoch ||
+        (r->stage != c->control_stage && !early_status)) {
         return false;
     }
-    bool data_in = (c->snapshot.setup.request_type & 0x80U) != 0U;
     bool wanted_in = r->stage == NX_USB_DATA
                          ? data_in
                          : (c->snapshot.setup.length == 0U || !data_in);
@@ -1318,6 +1777,7 @@ static nx_result_t submit(void* context, nx_usb_request_t* r) {
     ep->received = 0U;
     ep->rx_seen = false;
     ep->disable_requested = false;
+    ep->observed = 0U;
     ep->terminal = NX_SUCCESS;
     if (c->dma) {
         const nx_usb_dma_storage_t* storage = dma_storage(ep);
@@ -1532,7 +1992,13 @@ static nx_result_t service(void* context) {
     if (!c->snapshot.started) {
         return NX_ERROR_STATE;
     }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    remote_progress(c);
+    nx_arch_irq_restore(saved);
     nx_usb_controller_irq(c);
+    saved = nx_arch_irq_save();
+    remote_progress(c);
+    nx_arch_irq_restore(saved);
     return NX_SUCCESS;
 }
 /** \brief Copy bounded value events; successful stop excludes ring access. */
@@ -1592,6 +2058,9 @@ static nx_result_t state(void* context, nx_usb_device_state_t* output) {
         return NX_ERROR_INVALID;
     }
     *output = c->snapshot;
+    output->remote_wakeup_enabled =
+        NEXUS_STM32F4_USB_REMOTE_WAKEUP && c->remote != NULL &&
+        (c->remote->flags & REMOTE_AUTHORIZED) != 0U;
     nx_arch_irq_restore(saved);
     return NX_SUCCESS;
 }
@@ -1668,6 +2137,15 @@ static nx_result_t stop(void* context) {
         return NX_SUCCESS;
     }
     c->snapshot.closing = true;
+    if (NEXUS_STM32F4_USB_REMOTE_WAKEUP && c->remote != NULL &&
+        c->remote->request != NULL) {
+        remote_fail(c->remote, NX_ERROR_CANCELLED);
+        remote_progress(c);
+        if (c->remote->request != NULL) {
+            nx_arch_irq_restore(saved);
+            return NX_ERROR_BUSY;
+        }
+    }
     nx_usb_endpoint_t* out0 = endpoint(c, 0U, false);
     if (out0 == NULL) {
         /* Cold admission requires OUT0. An invalid private plan cannot
@@ -1780,17 +2258,22 @@ static nx_result_t stop(void* context) {
     c->clock_retained = false;
     c->snapshot.started = false;
     c->wake = NULL;
+    if (NEXUS_STM32F4_USB_REMOTE_WAKEUP && c->remote != NULL)
+        memset(c->remote, 0, sizeof(*c->remote));
     nx_arch_irq_restore(saved);
     return NX_SUCCESS;
 }
 const nx_usb_endpoint_ops_t nx_usb_fs_endpoint_ops = {
     .submit = submit, .cancel = cancel, .stall = stall};
-const nx_usb_device_ops_t nx_usb_fs_device_ops = {.service = service,
-                                                  .read_events = read_events,
-                                                  .state = state,
-                                                  .address = address,
-                                                  .attach_wake = attach_wake,
-                                                  .stop = stop};
+const nx_usb_device_ops_t nx_usb_fs_device_ops = {
+    .service = service,
+    .read_events = read_events,
+    .state = state,
+    .address = address,
+    .attach_wake = attach_wake,
+    .stop = stop,
+    .remote_wakeup = remote_wakeup,
+    .remote_cancel = remote_cancel};
 
 const nx_usb_setup_decision_ops_t nx_usb_fs_setup_decision_ops = {
     .reject = reject_setup};

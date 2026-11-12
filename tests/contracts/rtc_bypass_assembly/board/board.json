@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407zg-lse-bypass-software-reference",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-only-external-lse32768",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000,
+    "lse_hz": 32768,
+    "lse_bypass": true
+  },
+  "bindings": [
+    {
+      "id": "calendar",
+      "controller": "RTC",
+      "route": "rtc-lse-bypass-pc14"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software source and pin reference only; no populated Board, oscillator accuracy, loading, wiring or physical RTC capture qualification.",
+    "External32768Hz input on PC14 must remain powered during low-power modes; no current crystal Board inherits this declaration."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "RM0090 Rev22 RCC_BDCR LSEBYP selects the declared external clock input; ES0182 Rev19 2.2.18 exempts bypass from PC13 crystal disturbance."
+    }
+  ]
+}

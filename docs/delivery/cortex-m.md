@@ -1,11 +1,11 @@
 # Cortex-M 软件支持与平台接入边界
 
 Nexus 的 CPU 软件层支持 M0、M0+、M3、M4、M7、M23、M33、M55、M85。
-同一不可变 CPU profile 解析器驱动 Core、Arch、原子操作及裸机/FreeRTOS
+同一不可变 CPU profile 解析器驱动 Core、Arch、原子操作及裸机／FreeRTOS
 运行时配置；DSP、FPU、MVE、cache、MPU、DWT、security 和 SAU 均显式声明。
-选择某个内核不生成新 SoC、Board、向量表、启动、驱动、链接布局或 typed factory。
-当前生产 SoC 只有 F4，具体实现限定 F407VE／ZG。CPU 软件能力不生成这些芯片
-的时钟、IRQ、DMA 或板级接线；其他系列 SDK 保留也不代表生产支持。实板 HIL 未执行。
+选择内核不生成具体 SoC、Board、向量、启动、驱动、链接布局或 typed factory。
+当前生产 SoC 入口为 F4，[精确器件与模式](support.md)分别审查；保留其他系列
+SDK 不代表生产支持。实板 HIL 未执行。
 
 详细所有权、上下文与拒绝语义见 [Arch 契约](../design/arch-contracts.md)，
 OS 生命周期见 [OS 适配](../../os/README.md)，精确整平台范围见

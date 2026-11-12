@@ -6,6 +6,7 @@
  * \date            2026-11-10
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/core/fault.h"
 #include "stm32f407_clock.h"
 #include "stm32f407_usb_host.h"
 #include <string.h>
@@ -40,6 +41,15 @@
 #ifndef NX_USB_HOST_AHB_HZ
 #define NX_USB_HOST_AHB_HZ NEXUS_CORE_HZ
 #endif
+#ifndef NX_USB_HOST_PARK
+#define NX_USB_HOST_PARK() nx_arch_dsb()
+#endif
+
+#define HOST_RESET_RETAINED  (1U << 2U)
+#define HOST_RESUME_RETAINED (1U << 3U)
+#define HOST_TRANSFER_ERRORS                                                   \
+    (USB_OTG_HCINT_AHBERR | USB_OTG_HCINT_FRMOR | USB_OTG_HCINT_TXERR |        \
+     USB_OTG_HCINT_BBERR | USB_OTG_HCINT_DTERR | USB_OTG_HCINT_STALL)
 
 /** \brief Only the single privileged task may control this transport. */
 static bool task_context(void) {
@@ -114,8 +124,10 @@ static bool pipe_valid(const nx_stm32_usb_host_t* state,
         return false;
     }
     if (pipe->transfer == NX_USB_HOST_CONTROL) {
+        if (pipe->speed == NX_USB_HOST_HIGH_SPEED)
+            return pipe->max_packet == 64U;
         return pipe->max_packet == 8U ||
-               (pipe->speed != NX_USB_HOST_LOW_SPEED &&
+               (pipe->speed == NX_USB_HOST_FULL_SPEED &&
                 (pipe->max_packet == 16U || pipe->max_packet == 32U ||
                  pipe->max_packet == 64U));
     }
@@ -148,8 +160,12 @@ static void begin_drain(nx_stm32_usb_host_t* state, uint8_t number,
     if (channel->request != NULL &&
         nx_request_state(&channel->request->base) == NX_REQUEST_ACTIVE) {
         channel->terminal = reason;
-        channel->drain_deadline = nx_deadline_after(
-            nx_time_now_us(), state->config->drain_timeout_us);
+        if (nx_deadline_finite_after(nx_time_now_us(),
+                                     state->config->drain_timeout_us,
+                                     &channel->drain_deadline) != NX_SUCCESS) {
+            /* Only real late withdrawal may release an exhausted borrow. */
+            channel->drain_deadline = 0U;
+        }
         (void)nx_request_transition(&channel->request->base,
                                     NX_REQUEST_DRAINING);
     }
@@ -168,11 +184,18 @@ static void completed(HCD_HandleTypeDef* hal, uint8_t number,
         return;
     }
     if (nx_request_state(&channel->request->base) == NX_REQUEST_ACTIVE) {
+        const bool handshake =
+            channel->pipe.transfer != NX_USB_HOST_ISOCHRONOUS &&
+            (result == URB_NOTREADY || result == URB_NYET);
         channel->terminal = result == URB_DONE ? NX_SUCCESS
-                            : result == URB_NOTREADY || result == URB_NYET
-                                ? NX_ERROR_NACK
-                                : NX_ERROR_IO;
-        channel->transferred = hal->hc[number].xfer_count;
+                            : handshake        ? NX_ERROR_NACK
+                                               : NX_ERROR_IO;
+        /* HCD updates xfer_count only for IN. OUT DONE proves this one
+         * admitted packet, never an automatically retried packet queue. */
+        channel->transferred =
+            result == URB_DONE && (channel->pipe.endpoint_address & 0x80U) == 0U
+                ? (uint32_t)channel->request->length
+                : hal->hc[number].xfer_count;
         channel->complete = true;
     }
 }
@@ -356,13 +379,47 @@ nx_stm32_usb_host_initialize(nx_stm32_usb_host_t* state,
     return NX_SUCCESS;
 }
 
+/** \brief ISO errors end this opportunity before HCD can retry DMA OUT.
+ * The pinned HCD retries XACTERR even for ISO and loses FRMOR's terminal
+ * result. Isolate only this channel, capture its error, then use HCD halt.
+ */
+static bool iso_errors(nx_stm32_usb_host_t* state) {
+    for (uint8_t i = 0U; i < state->config->channel_count; ++i) {
+        nx_stm32_usb_host_channel_t* channel = &state->config->channels[i];
+        if (channel->request == NULL ||
+            channel->pipe.transfer != NX_USB_HOST_ISOCHRONOUS ||
+            nx_request_state(&channel->request->base) != NX_REQUEST_ACTIVE)
+            continue;
+        USB_OTG_HostChannelTypeDef* registers = channel_registers(state, i);
+        const uint32_t pending =
+            registers->HCINT & registers->HCINTMSK & HOST_TRANSFER_ERRORS;
+        if (pending == 0U)
+            continue;
+        begin_drain(state, i, NX_ERROR_IO);
+        channel->transferred = 0U;
+        channel->complete = true;
+        NX_USB_HOST_WRITE(registers->HCINTMSK, 0U);
+        NX_USB_HOST_WRITE(registers->HCINT, pending);
+        nx_arch_dsb();
+        if (registers->HCINTMSK != 0U || (registers->HCINT & pending) != 0U) {
+            state->snapshot.closing = true;
+            NX_USB_HOST_IRQ_DISABLE(vector(state));
+            nx_arch_dsb();
+            return false;
+        }
+        (void)HAL_HCD_HC_Halt(&state->hal, i);
+        channel->halt_requested = true;
+    }
+    return true;
+}
 /** \brief IRQ dispatch retains its publisher until all HAL callbacks return. */
 void nx_stm32_usb_host_irq(nx_stm32_usb_host_t* state) {
     if (state == NULL || state->config == NULL || !state->snapshot.started) {
         return;
     }
     ++state->publishers;
-    HAL_HCD_IRQHandler(&state->hal);
+    if (iso_errors(state))
+        HAL_HCD_IRQHandler(&state->hal);
     --state->publishers;
 }
 
@@ -444,7 +501,8 @@ static nx_result_t submit(void* context, uint8_t number,
     }
     nx_stm32_usb_host_channel_t* channel = &state->config->channels[number];
     const bool in = (channel->pipe.endpoint_address & 0x80U) != 0U;
-    if (!channel->configured || request->length > channel->pipe.max_packet) {
+    if (!channel->configured || request->length > channel->pipe.max_packet ||
+        (channel->pipe.transfer == NX_USB_HOST_ISOCHRONOUS && request->data1)) {
         return NX_ERROR_INVALID;
     }
     /* The pinned PIO writer reads a full final word. DMA also owns padding. */
@@ -495,6 +553,19 @@ static nx_result_t submit(void* context, uint8_t number,
         }
     }
     nx_arch_irq_state_t key = nx_arch_irq_save();
+    if (!state->config->dma && !in) {
+        /* The pinned PIO writer immediately copies a complete packet. An
+         * empty queue or partial FIFO budget cannot be ACCEPTED safely. */
+        const bool periodic = channel->pipe.transfer == NX_USB_HOST_INTERRUPT ||
+                              channel->pipe.transfer == NX_USB_HOST_ISOCHRONOUS;
+        const uint32_t available = periodic ? host_registers(state)->HPTXSTS
+                                            : state->hal.Instance->HNPTXSTS;
+        if ((available & 0xFFFFU) < extent / 4U ||
+            ((available >> 16U) & 0xFFU) == 0U) {
+            nx_arch_irq_restore(key);
+            return NX_ERROR_BUSY;
+        }
+    }
     status = nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
     if (status != NX_SUCCESS) {
         nx_arch_irq_restore(key);
@@ -513,6 +584,10 @@ static nx_result_t submit(void* context, uint8_t number,
     nx_arch_irq_restore(key);
     uint8_t* bytes =
         extent == 0U ? (uint8_t*)&state->zero_word : request->bytes;
+    /* IN already reserves one MPS. HCD drains that complete admitted extent;
+     * request.length remains the caller's overflow/reporting boundary. */
+    const uint16_t wire_length =
+        in ? channel->pipe.max_packet : (uint16_t)request->length;
     HAL_StatusTypeDef submitted;
     if (channel->pipe.transfer == NX_USB_HOST_CONTROL && !request->setup) {
         /* The pinned HAL forces DATA1 for every unsplit control IN and for
@@ -524,7 +599,7 @@ static nx_result_t submit(void* context, uint8_t number,
         hc->data_pid = request->data1 ? HC_PID_DATA1 : HC_PID_DATA0;
         hc->do_ping = 0U;
         hc->xfer_buff = bytes;
-        hc->xfer_len = (uint32_t)request->length;
+        hc->xfer_len = wire_length;
         hc->xfer_count = 0U;
         hc->urb_state = URB_IDLE;
         hc->state = HC_IDLE;
@@ -534,8 +609,7 @@ static nx_result_t submit(void* context, uint8_t number,
     } else {
         submitted = HAL_HCD_HC_SubmitRequest(
             &state->hal, number, in ? 1U : 0U, (uint8_t)channel->pipe.transfer,
-            (uint8_t)(request->setup ? 0U : 1U), bytes,
-            (uint16_t)request->length, 0U);
+            (uint8_t)(request->setup ? 0U : 1U), bytes, wire_length, 0U);
     }
     if (submitted != HAL_OK) {
         begin_drain(state, number, NX_ERROR_IO);
@@ -581,16 +655,31 @@ static void quarantine(nx_stm32_usb_host_channel_t* channel) {
 static bool settle(nx_stm32_usb_host_t* state, uint8_t number) {
     nx_stm32_usb_host_channel_t* channel = &state->config->channels[number];
     nx_usb_host_request_t* request = channel->request;
+    USB_OTG_HostChannelTypeDef* registers = channel_registers(state, number);
+    NX_USB_HOST_WRITE(registers->HCDMA, 0U);
+    nx_arch_dsb();
+    if (registers->HCDMA != 0U) {
+        return false;
+    }
+    const uint32_t pending = registers->HCINT & 0x7FFU;
+    if (pending != 0U) {
+        /* Masked late facts still belong to this incarnation. A real error
+         * invalidates the old DONE count, including any overflow prefix. */
+        if ((pending & HOST_TRANSFER_ERRORS) != 0U) {
+            channel->terminal = NX_ERROR_IO;
+            channel->transferred = 0U;
+        }
+        NX_USB_HOST_WRITE(registers->HCINT, pending);
+        nx_arch_dsb();
+        if ((registers->HCINT & 0x7FFU) != 0U) {
+            return false;
+        }
+    }
     size_t transferred = channel->transferred;
     nx_result_t terminal = channel->terminal;
     if (transferred > request->length) {
         transferred = request->length;
         terminal = NX_ERROR_OVERFLOW;
-    }
-    NX_USB_HOST_WRITE(channel_registers(state, number)->HCDMA, 0U);
-    nx_arch_dsb();
-    if (channel_registers(state, number)->HCDMA != 0U) {
-        return false;
     }
     state->hal.hc[number].xfer_buff = NULL;
     state->hal.hc[number].xfer_len = 0U;
@@ -730,18 +819,104 @@ static uint32_t port_control(uint32_t value) {
                                USB_OTG_HPRT_PENCHNG | USB_OTG_HPRT_POCCHNG);
 }
 
-/** \brief Independent Core time bounds reset/resume electrical signaling. */
-static bool delay_until(nx_time_us_t deadline, uint32_t duration) {
-    nx_time_us_t end = nx_deadline_after(nx_time_now_us(), duration);
-    if (end >= deadline) {
-        return false;
+/** \brief An invalid clock cannot authorize a short pulse or release effects.
+ */
+static _Noreturn void signal_clock_failed(nx_stm32_usb_host_t* state) {
+    state->snapshot.closing = true;
+    nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_STATE, __FILE__, __LINE__);
+    for (;;) {
+        NX_USB_HOST_PARK();
     }
-    while (!nx_deadline_expired(end, nx_time_now_us())) {
-        if (nx_deadline_expired(deadline, nx_time_now_us())) {
-            return false;
+}
+
+/** \brief A failed signal withdrawal remains part of the existing clock lease.
+ * \note This is reached only after the full minimum hold, or by a later stop
+ *       retry. Invalid-clock holds fail-stop before either path can release.
+ */
+static bool withdraw_signal(nx_stm32_usb_host_t* state) {
+    uint8_t retained =
+        state->clock_receipt & (HOST_RESET_RETAINED | HOST_RESUME_RETAINED);
+    if (retained == 0U)
+        return true;
+    uint32_t mask =
+        (retained & HOST_RESET_RETAINED) != 0U ? USB_OTG_HPRT_PRST : 0U;
+    if ((retained & HOST_RESUME_RETAINED) != 0U)
+        mask |= USB_OTG_HPRT_PRES;
+    volatile uint32_t* port = port_register(state);
+    NX_USB_HOST_WRITE(*port, port_control(*port) & ~mask);
+    nx_arch_dsb();
+    uint32_t actual = *port;
+    if ((actual & mask) != 0U)
+        return false;
+    state->clock_receipt &=
+        (uint8_t) ~(HOST_RESET_RETAINED | HOST_RESUME_RETAINED);
+    if ((retained & HOST_RESUME_RETAINED) != 0U)
+        state->snapshot.suspended = (actual & USB_OTG_HPRT_PSUSP) != 0U;
+    return true;
+}
+
+/** \brief Once asserted, the minimum electrical hold outlives cancellation.
+ * \note The deadline admits the operation and decides its eventual result;
+ *       preemption cannot make it permission to shorten reset or resume.
+ */
+static nx_result_t signal_port(nx_stm32_usb_host_t* state,
+                               nx_time_us_t deadline, uint32_t duration,
+                               bool resume) {
+    nx_time_us_t observed = nx_time_now_us();
+    nx_time_us_t end;
+    /* An integer microsecond sample hides the fractional phase at assertion.
+     * One full tick of guard prevents a nearly-one-tick-short physical hold. */
+    const uint32_t hold = duration + 1U;
+    if (nx_deadline_finite_after(observed, hold, &end) != NX_SUCCESS ||
+        end >= deadline)
+        return NX_ERROR_TIMEOUT;
+    volatile uint32_t* port = port_register(state);
+    uint32_t bit = resume ? USB_OTG_HPRT_PRES : USB_OTG_HPRT_PRST;
+    uint32_t control = port_control(*port);
+    if (resume)
+        control &= ~(uint32_t)USB_OTG_HPRT_PSUSP;
+    state->clock_receipt |= resume ? HOST_RESUME_RETAINED : HOST_RESET_RETAINED;
+    NX_USB_HOST_WRITE(*port, control | bit);
+    nx_arch_dsb();
+    bool asserted =
+        (*port & bit) != 0U && (!resume || (*port & USB_OTG_HPRT_PSUSP) == 0U);
+    /* Sampling after the write also covers preemption between admission and
+     * assertion. Extra hold is safe; an old admission timestamp is not proof
+     * that the physical signal has already lasted the required interval. */
+    nx_time_us_t previous = nx_time_now_us();
+    if (previous < observed ||
+        nx_deadline_finite_after(previous, hold, &end) != NX_SUCCESS)
+        signal_clock_failed(state);
+    const uint32_t budget = NX_USB_HOST_AHB_HZ / 1000U + 1U;
+    uint32_t remaining = budget;
+    for (;;) {
+        nx_time_us_t now = nx_time_now_us();
+        if (now == NX_DEADLINE_NEVER || now < previous ||
+            !NX_USB_HOST_CLOCK_VALID())
+            signal_clock_failed(state);
+        if (nx_deadline_expired(end, now)) {
+            previous = now;
+            break;
+        }
+        if (now == previous) {
+            if (remaining == 0U)
+                signal_clock_failed(state);
+            --remaining;
+        } else {
+            previous = now;
+            remaining = budget;
         }
     }
-    return true;
+    if (!withdraw_signal(state) || !asserted ||
+        (resume && state->snapshot.suspended)) {
+        state->snapshot.closing = true;
+        return NX_ERROR_IO;
+    }
+    nx_time_us_t finished = nx_time_now_us();
+    if (finished == NX_DEADLINE_NEVER || finished < previous)
+        signal_clock_failed(state);
+    return nx_deadline_expired(deadline, finished) ? NX_ERROR_TIMEOUT
+                                                   : NX_SUCCESS;
 }
 
 /** \brief The HAL's fixed HAL_Delay reset is replaced for deadline semantics.
@@ -758,20 +933,12 @@ static nx_result_t reset(void* context, nx_time_us_t deadline) {
     if (loans(state)) {
         return NX_ERROR_BUSY;
     }
-    if (!state->snapshot.connected ||
-        nx_deadline_expired(deadline, nx_time_now_us())) {
+    if (!state->snapshot.connected) {
         return NX_ERROR_STATE;
     }
-    volatile uint32_t* port = port_register(state);
-    NX_USB_HOST_WRITE(*port, port_control(*port) | USB_OTG_HPRT_PRST);
-    bool elapsed = delay_until(deadline, 10000U);
-    NX_USB_HOST_WRITE(*port,
-                      port_control(*port) & ~(uint32_t)USB_OTG_HPRT_PRST);
-    nx_arch_dsb();
-    if ((*port & USB_OTG_HPRT_PRST) != 0U) {
-        return NX_ERROR_IO;
-    }
-    return elapsed ? NX_SUCCESS : NX_ERROR_TIMEOUT;
+    if (nx_deadline_expired(deadline, nx_time_now_us()))
+        return NX_ERROR_TIMEOUT;
+    return signal_port(state, deadline, 10000U, false);
 }
 
 /** \brief Suspend keeps the Core timebase running and owns resume signaling. */
@@ -791,26 +958,17 @@ static nx_result_t suspend(void* context, bool suspended,
     if (nx_deadline_expired(deadline, nx_time_now_us())) {
         return NX_ERROR_TIMEOUT;
     }
+    if (!suspended)
+        return signal_port(state, deadline, 20000U, true);
     volatile uint32_t* port = port_register(state);
-    uint32_t value = port_control(*port);
-    if (suspended) {
-        NX_USB_HOST_WRITE(*port, value | USB_OTG_HPRT_PSUSP);
-    } else {
-        NX_USB_HOST_WRITE(*port, (value & ~(uint32_t)USB_OTG_HPRT_PSUSP) |
-                                     USB_OTG_HPRT_PRES);
-        bool elapsed = delay_until(deadline, 20000U);
-        NX_USB_HOST_WRITE(*port,
-                          port_control(*port) & ~(uint32_t)USB_OTG_HPRT_PRES);
-        if (!elapsed) {
-            return NX_ERROR_TIMEOUT;
-        }
-    }
+    NX_USB_HOST_WRITE(*port, port_control(*port) | USB_OTG_HPRT_PSUSP);
     nx_arch_dsb();
     if (((*port & USB_OTG_HPRT_PSUSP) != 0U) != suspended) {
         return NX_ERROR_IO;
     }
     state->snapshot.suspended = suspended;
-    return NX_SUCCESS;
+    return nx_deadline_expired(deadline, nx_time_now_us()) ? NX_ERROR_TIMEOUT
+                                                           : NX_SUCCESS;
 }
 
 /** \brief Stop verifies actual withdrawal independently of HAL return values.
@@ -845,6 +1003,8 @@ static nx_result_t stop(void* context) {
         return NX_SUCCESS;
     }
     state->snapshot.closing = true;
+    if (!withdraw_signal(state))
+        return NX_ERROR_BUSY;
     bool busy = false;
     for (uint8_t i = 0U; i < state->config->channel_count; ++i) {
         nx_stm32_usb_host_channel_t* channel = &state->config->channels[i];

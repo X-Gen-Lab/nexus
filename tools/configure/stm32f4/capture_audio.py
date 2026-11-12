@@ -7,8 +7,11 @@ from tools.configure.calls import Address, DirectCall
 from tools.configure.memory import dma_regions
 from tools.configure.providers.common import Construction, fail, integer
 
-CAPTURE_MODES = ("snapshot-raw", "snapshot-jpeg", "raw-blocks")
-AUDIO_MODES = tuple(role + "-" + direction for role in ("master", "slave")
+CAPTURE_MODES = ("snapshot-raw", "snapshot-jpeg", "raw-blocks", "jpeg-blocks",
+                 "frames-raw", "frames-jpeg")
+AUDIO_MODES = tuple(role + "-" + direction + suffix
+                    for suffix in ("", "-blocks")
+                    for role in ("master", "slave")
                     for direction in ("tx", "rx", "duplex"))
 STANDARDS = ("philips", "msb", "lsb", "pcm-short", "pcm-long")
 CAPTURE_FIELDS = frozenset(("pixel_clock_hz", "poll_limit", "frame_divisor",
@@ -16,7 +19,8 @@ CAPTURE_FIELDS = frozenset(("pixel_clock_hz", "poll_limit", "frame_divisor",
     "max_service_gap_us", "irq_priority", "calls_os"))
 AUDIO_FIELDS = frozenset(("standard", "sample_bits", "slot_bits", "mclk",
     "cpol_high", "poll_limit", "sample_rate_hz", "pll_n", "pll_r",
-    "max_error_ppm", "irq_priority", "calls_os"))
+    "max_error_ppm", "max_sample_rate_hz", "max_service_gap_us",
+    "irq_priority", "calls_os"))
 CROP_FIELDS = ("x_clocks", "y_lines", "width_clocks", "height_lines")
 
 
@@ -27,11 +31,17 @@ def boolean(value, name):
 
 def validate(selection, route):
     """No inferred synchronization, unselected pads or silent format changes."""
+    if route["kind"] == "audio" and route["controller"] == "SAI1":
+        from .sai import validate as validate_sai
+        return validate_sai(selection, route)
     kind, mode = route["kind"], selection["mode"]
+    continuous_audio = kind == "audio" and mode.endswith("-blocks")
+    audio_mode = mode.removesuffix("-blocks")
     fields = CAPTURE_FIELDS if kind == "capture" else AUDIO_FIELDS
     required = (fields - {"codes", "crop", "max_service_gap_us", "calls_os"}
                 if kind == "capture" else fields - {
-                    "sample_rate_hz", "pll_n", "pll_r", "max_error_ppm", "calls_os"})
+                    "sample_rate_hz", "pll_n", "pll_r", "max_error_ppm", "calls_os",
+                    "max_sample_rate_hz", "max_service_gap_us"})
     if required - selection.keys():
         fail(kind + " requires explicit " + ", ".join(sorted(required - selection.keys())))
     integer(selection["poll_limit"], 1, 10000000, kind + " poll_limit")
@@ -58,7 +68,7 @@ def validate(selection, route):
         integer(selection["pixel_clock_hz"], 1, 54000000, "DCMI PIXCLK")
         if selection["frame_divisor"] not in (1, 2, 4) or type(selection["frame_divisor"]) is not int:
             fail("DCMI frame_divisor must be 1, 2 or 4")
-        if mode != "raw-blocks" and selection["frame_divisor"] != 1:
+        if mode not in {"raw-blocks", "jpeg-blocks"} and selection["frame_divisor"] != 1:
             fail("DCMI snapshot ignores FCRC; frame_divisor must be one")
         if embedded:
             codes = selection.get("codes")
@@ -75,14 +85,21 @@ def validate(selection, route):
             for name in CROP_FIELDS:
                 integer(crop[name], 0, 0x1fff if name == "y_lines" else 0x3fff,
                         "DCMI crop " + name)
-        if mode == "snapshot-jpeg" and (bits != 8 or embedded or crop is not None):
+        if mode in {"snapshot-jpeg", "frames-jpeg", "jpeg-blocks"} and (bits != 8 or embedded or crop is not None):
             fail("DCMI JPEG requires 8-bit hardware synchronization without crop")
-        if mode == "raw-blocks":
+        if mode in {"raw-blocks", "jpeg-blocks"}:
             integer(selection.get("max_service_gap_us"), 1, 1000000,
                     "DCMI maximum service gap")
         elif "max_service_gap_us" in selection:
-            fail("DCMI maximum service gap belongs to raw storage blocks")
+            fail("DCMI maximum service gap belongs to continuous storage blocks")
     else:
+        if continuous_audio:
+            integer(selection.get("max_sample_rate_hz"), 1, 192000,
+                    "I2S maximum external sample rate")
+            integer(selection.get("max_service_gap_us"), 1, 1000000,
+                    "I2S maximum service gap")
+        elif {"max_sample_rate_hz", "max_service_gap_us"} & selection.keys():
+            fail("Finite I2S does not select continuous scheduling bounds")
         if selection["standard"] not in STANDARDS:
             fail("I2S standard requires Philips, MSB, LSB or PCM short/long")
         if selection["sample_bits"] not in (16, 24, 32) or type(selection["sample_bits"]) is not int:
@@ -98,7 +115,7 @@ def validate(selection, route):
                 integer(selection.get(name), low, high, "I2S " + name)
         elif selection["mclk"] or {"sample_rate_hz", "pll_n", "pll_r", "max_error_ppm"} & selection.keys():
             fail("Slave I2S does not select PLLI2S, MCLK or a fabricated rate")
-        duplex = mode.endswith("duplex")
+        duplex = audio_mode.endswith("duplex")
         mclk = selection["mclk"]
         number = int(route["controller"][-1])
         expected = ([('PB12', 'ws', 5), ('PB13', 'ck', 5), ('PB15', 'sd', 5)]
@@ -114,6 +131,9 @@ def validate(selection, route):
 
 def resolve_fields(selection, route, clock, clock_plan):
     """Resolve arithmetic once into named immutable option fields."""
+    if route["kind"] == "audio" and route["controller"] == "SAI1":
+        from .sai import resolve_fields as resolve_sai
+        return resolve_sai(selection, route, clock, clock_plan)
     if route["kind"] == "capture":
         if selection["pixel_clock_hz"] * 5 > clock["core_hz"] * 2:
             fail("DCMI PIXCLK/HCLK must not exceed 0.4")
@@ -123,10 +143,14 @@ def resolve_fields(selection, route, clock, clock_plan):
                 "crop": selection.get("crop"),
                 "max_service_gap_us": selection.get("max_service_gap_us", 0)}
     master = selection["mode"].startswith("master-")
+    continuous = selection["mode"].endswith("-blocks")
+    bounds = dict(continuous=continuous,
+                  max_sample_rate_hz=selection.get("max_sample_rate_hz", 0),
+                  max_service_gap_us=selection.get("max_service_gap_us", 0))
     if not master:
         return dict(pll_input_hz=0, pll_m=0, pll_hse=False, divider=2, odd=False,
                     rate_numerator=0, rate_denominator=0, sample_rate_hz=0,
-                    pll_n=0, pll_r=0, max_error_ppm=0)
+                    pll_n=0, pll_r=0, max_error_ppm=0, **bounds)
     parameters = clock_plan.get("parameters") if clock_plan is not None else None
     # The old sole profile has no separate plan. Its reviewed M=8 is the only
     # legacy bridge; every additional profile requires the System's own plan.
@@ -150,18 +174,21 @@ def resolve_fields(selection, route, clock, clock_plan):
     actual = vco / (r * factor * divider)
     if actual > 192000:
         fail("I2S actual sample rate exceeds the 192 kHz electrical limit")
+    if continuous and actual > bounds["max_sample_rate_hz"]:
+        fail("I2S actual sample rate exceeds its continuous clock bound")
     error = abs(actual - selection["sample_rate_hz"]) / selection["sample_rate_hz"]
     if error * 1000000 > selection["max_error_ppm"]:
         fail("I2S actual sample rate exceeds the explicit ppm bound")
     return dict(pll_input_hz=source, pll_m=m,
                 pll_hse=parameters["source"] == "hse", divider=divider // 2,
                 odd=bool(divider & 1), rate_numerator=actual.numerator,
-                rate_denominator=actual.denominator)
+                rate_denominator=actual.denominator, **bounds)
 
 
 def dma_paths(controller, mode):
     """RM0090 DMA1 mappings; duplex uses the extension's receive request."""
     number = int(controller[-1])
+    mode = mode.removesuffix("-blocks")
     tx = (1, 4 if number == 2 else 5, 0)
     rx = (1, 3 if number == 2 else 0, 0)
     ext = (1, 3, 3) if number == 2 else (1, 2, 2)
@@ -176,12 +203,20 @@ def _dma_initializer(path):
 
 def constructor(item, result):
     """Emit constants and fixed calls only; C owns all register algorithms."""
+    if item.kind == "audio" and item.controller == "SAI1":
+        from .sai import constructor as construct_sai
+        return construct_sai(item, result)
     name, kind = item.id.replace("-", "_"), item.kind
     state = "s_nx_port_" + name
     config = "s_nx_av_config_" + name
     saved = "s_nx_av_saved_" + name
     pin_records = "s_nx_av_pins_" + name
     options = item.options
+    audio_blocks = kind == "audio" and options.continuous
+    frame_sessions = kind == "capture" and item.mode.startswith("frames-")
+    selected = ("audio_blocks" if audio_blocks else
+                "capture_frames" if frame_sessions else kind)
+    configuration = "capture" if frame_sessions else selected
     definitions = [f"static uint16_t {saved}[{len(item.pins)}];",
                    f"static const nx_stm32_av_pin_t {pin_records}[] = {{"]
     snapshots = {}
@@ -193,7 +228,10 @@ def constructor(item, result):
     definitions.append("};")
     regions, count = dma_regions(name, result, include_flash=kind == "audio")
     definitions += regions
-    definitions += [f"static const nx_stm32_{kind}_config_t {config} = {{",
+    definitions += [f"static const nx_stm32_{configuration}_config_t {config} = {{"]
+    if audio_blocks:
+        definitions += ["    .audio = {"]
+    definitions += [
         "    .common = {",
         f"        .pins = {pin_records}, .pin_count = {len(item.pins)}u,",
         f"        .regions = s_nx_dma_regions_{name}, .region_count = {count}u,",
@@ -211,19 +249,22 @@ def constructor(item, result):
             f"    .bits = {options.bits}u, .frame_divisor = {options.frame_divisor}u,",
             "    .codes = { " + ", ".join(str(code) + "u" for code in options.codes) + " },",
             f"    .embedded = {str(options.embedded).lower()},",
-            f"    .jpeg = {str(item.mode == 'snapshot-jpeg').lower()},",
-            f"    .continuous = {str(item.mode == 'raw-blocks').lower()},",
+            f"    .jpeg = {str(item.mode in {'snapshot-jpeg', 'frames-jpeg', 'jpeg-blocks'}).lower()},",
+            f"    .continuous = {str(item.mode in {'raw-blocks', 'jpeg-blocks'}).lower()},",
             f"    .pclk_falling = {str(options.pclk_falling).lower()},",
             f"    .hsync_high = {str(options.hsync_high).lower()},",
             f"    .vsync_high = {str(options.vsync_high).lower()},"]
         if options.crop is not None:
             definitions += ["    .crop = { " + ", ".join(str(getattr(options.crop, key)) + "u" for key in CROP_FIELDS) + ", true },"]
-        irqs += [("DCMI", f"nx_stm32_capture_irq(&{state})"),
-                 (f"DMA{paths[0][0]}_Stream{paths[0][1]}", f"nx_stm32_capture_dma_irq(&{state})")]
+        interrupt_owner = state + ".base" if frame_sessions else state
+        irqs += [("DCMI", f"nx_stm32_capture_irq(&{interrupt_owner})"),
+                 (f"DMA{paths[0][0]}_Stream{paths[0][1]}",
+                  f"nx_stm32_capture_dma_irq(&{interrupt_owner})")]
     else:
         number = int(item.controller[-1])
-        rx = item.mode.endswith("rx")
-        duplex = item.mode.endswith("duplex")
+        mode = item.mode.removesuffix("-blocks")
+        rx = mode.endswith("rx")
+        duplex = mode.endswith("duplex")
         tx_path = paths[0] if not rx else None
         rx_path = paths[1] if duplex else paths[0] if rx else None
         definitions += [f"    .registers = SPI{number}, .extension = I2S{number}ext,",
@@ -244,18 +285,22 @@ def constructor(item, result):
             if path is not None:
                 definitions += [f"    .{direction} = {_dma_initializer(path)},"]
                 irqs += [(f"DMA{path[0]}_Stream{path[1]}",
-                    f"nx_stm32_audio_dma_irq(&{state}, {str(direction == 'rx').lower()})")]
-        irqs += [("SPI" + str(number), f"nx_stm32_audio_irq(&{state})")]
+                    f"nx_stm32_{selected}_dma_irq(&{state}, {str(direction == 'rx').lower()})")]
+        irqs += [("SPI" + str(number), f"nx_stm32_{selected}_irq(&{state})")]
+    if audio_blocks:
+        definitions += ["    },",
+            f"    .max_sample_rate_hz = {options.max_sample_rate_hz}u,",
+            f"    .max_service_gap_us = {options.max_service_gap_us}u,"]
     definitions += ["};"]
     for vector, call in irqs:
         definitions += [f"void {vector}_IRQHandler(void);",
             r"/** \brief Exact selected source; no callback owns user storage. */",
             f"void {vector}_IRQHandler(void) {{ {call}; }}"]
-    return Construction(state_type=f"nx_stm32_{kind}_state_t",
+    return Construction(state_type=f"nx_stm32_{selected}_state_t",
         definitions=definitions,
-        admission=(DirectCall(f"nx_stm32_{kind}_admit", (Address(state), Address(config))),),
-        initialize=DirectCall(f"nx_stm32_{kind}_prepare", (Address(state), Address(config))),
-        stop=(DirectCall(f"nx_stm32_{kind}_close", (Address(state),)),),
+        admission=(DirectCall(f"nx_stm32_{selected}_admit", (Address(state), Address(config))),),
+        initialize=DirectCall(f"nx_stm32_{selected}_prepare", (Address(state), Address(config))),
+        stop=(DirectCall(f"nx_stm32_{selected}_close", (Address(state),)),),
         retain_on_failed_init=True, pin_snapshots=snapshots)
 
 
@@ -263,10 +308,14 @@ def editor_schema(kind, schema):
     """Editor projection; resolution remains the independent strict gate."""
     properties = schema["properties"]
     for field in ("poll_limit", "pixel_clock_hz", "frame_divisor", "max_service_gap_us",
-                  "sample_bits", "slot_bits", "sample_rate_hz", "pll_n", "pll_r", "max_error_ppm"):
+                  "sample_bits", "slot_bits", "sample_rate_hz", "pll_n", "pll_r", "max_error_ppm",
+                  "max_sample_rate_hz", "slots", "frame_sync_bits",
+                  "first_bit_offset", "mckdiv", "max_bit_clock_hz"):
         if field in properties:
             properties[field] = {"type": "integer", "minimum": 0, "maximum": 0xffffffff}
-    for field in ("pclk_falling", "hsync_high", "vsync_high", "mclk", "cpol_high"):
+    for field in ("pclk_falling", "hsync_high", "vsync_high", "mclk", "cpol_high",
+                  "frame_sync_high", "frame_sync_before", "frame_sync_channels",
+                  "first_lsb", "sample_rising", "no_divider"):
         if field in properties:
             properties[field] = {"type": "boolean"}
     if kind == "capture":

@@ -18,3 +18,5 @@ target_compile_definitions(nexus_stm32_basic_cold_test PRIVATE STM32F407xx
     nx_arch_in_isr=nx_basic_cold_in_isr
     nx_arch_irq_is_masked=nx_basic_cold_masked
     nx_arch_dsb=nx_basic_cold_dsb)
+target_compile_options(nexus_stm32_basic_cold_test PRIVATE
+    "-include${NEXUS_SOURCE_DIR}/tests/google/stm32_basic_cold_flash_model.h")

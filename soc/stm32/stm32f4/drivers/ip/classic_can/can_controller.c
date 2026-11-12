@@ -423,8 +423,11 @@ static void drain(nx_can_controller_t* controller, unsigned mailbox,
     nx_can_mailbox_t* slot = &controller->slots[mailbox];
     if (slot->terminal == NX_SUCCESS) {
         slot->terminal = result;
-        slot->drain_deadline =
-            nx_deadline_after(now, controller->drain_timeout_us);
+        if (nx_deadline_finite_after(now, controller->drain_timeout_us,
+                                     &slot->drain_deadline) != NX_SUCCESS) {
+            /* The mailbox loan survives exhaustion until abort is proven. */
+            slot->drain_deadline = 0U;
+        }
         (void)nx_request_transition(&slot->request->base, NX_REQUEST_DRAINING);
     }
     NX_CAN_WRITE(controller->registers, CAN_TX_STATUS,

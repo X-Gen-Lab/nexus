@@ -7,7 +7,7 @@
 #define NX_STM32F407_ETH_COLD_H
 #include "stm32f407_clock.h"
 #include "stm32f407_eth.h"
-#include "stm32f407_packet_cold.h"
+#include "stm32f4_ethernet_cold.h"
 #include <string.h>
 
 /** \brief Exact storage selection and immutable MII/RMII policy. */

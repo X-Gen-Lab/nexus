@@ -80,6 +80,39 @@ class ThreadXGateTest(unittest.TestCase):
             self.gate().check_symbols(self.symbols().replace(
                 '08000100 T nx_threadx_task_start', ''))
 
+    def tick_entry(self):
+        return ('08000100 <SysTick_Handler>:\n'
+                ' 8000100: b501       push {r0, lr}\n'
+                ' 8000102: f000 f805  bl 8000110 <_tx_timer_interrupt>\n'
+                ' 8000106: e8bd 4001  ldmia.w sp!, {r0, lr}\n'
+                ' 800010a: f3bf 8f4f  dsb sy\n'
+                ' 800010e: 4770       bx lr\n')
+
+    def test_tick_machine_entry_completes_kernel_before_final_dsb_return(self):
+        text = self.tick_entry()
+        self.gate().check_tick_entry(text)
+        self.gate().check_tick_entry(text.replace('ldmia.w sp!,', 'pop.w'))
+
+    def test_tick_machine_entry_rejects_missing_unreachable_or_early_barrier(self):
+        text = self.tick_entry()
+        barrier = ' 800010a: f3bf 8f4f  dsb sy\n'
+        invalid = (
+            text.replace(barrier, ''),
+            text.replace('dsb sy', 'dmb sy'),
+            text.replace('_tx_timer_interrupt', 'another_handler'),
+            text.replace(barrier, ' 800010a: 4770 bx lr\n' + barrier),
+            text.replace(barrier, barrier + ' 800010e: 6001 str r1, [r0]\n'),
+            text.replace(barrier, ' 800010a: e000 b.n 800010e <SysTick_Handler+0xe>\n' + barrier),
+            text.replace(barrier, '') +
+            '08000110 <_tx_timer_interrupt>:\n 8000110: f3bf 8f4f dsb sy\n',
+            text.replace(barrier, '') + ' 8000110: f3bf 8f4f dsb sy\n',
+            text.replace('dsb sy', '.word 0xf3bf8f4f'),
+            text + text,
+        )
+        for disassembly in invalid:
+            with self.subTest(disassembly=disassembly), self.assertRaises(ValueError):
+                self.gate().check_tick_entry(disassembly)
+
     def test_fresh_output_rejects_occupied_and_symlink_paths(self):
         gate = self.gate()
         with tempfile.TemporaryDirectory() as temporary:

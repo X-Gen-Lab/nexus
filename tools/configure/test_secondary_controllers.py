@@ -1,5 +1,6 @@
 """Exact secondary controllers assemble without hidden pools or route repair."""
-from tools.configure.tests.device_fixture import load_soc_facts
+from tools.configure.tests.device_fixture import (load_soc_facts,
+                                                   validate_soc_facts)
 from tools.configure.tests.native_fixture import native_fixture
 import copy
 from dataclasses import replace
@@ -314,7 +315,7 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
     def test_secondary_facts_keep_independent_sdk_assertions(self):
         for directory, part, controller in (('soc/stm32/stm32f4', 'STM32F407ZGT6', 'USART2'),):
             facts = load_soc_facts(gate.ROOT / directory / "soc.json")
-            gate.validate_soc(facts, part)
+            validate_soc_facts(facts, part)
             for field, changed in (("modes", ["irq-byte-event"]),
                                    ("pins", ["PA0", "PA1"]),
                                    ("irq", ["USART0_IRQn"]),
@@ -322,9 +323,11 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 with self.subTest(part=part, field=field):
                     invalid = copy.deepcopy(facts)
                     invalid["controllers"][controller][field] = changed
+                    diagnostic = ("Controller IRQ identity" if field == "irq"
+                                  else "Secondary controller facts")
                     with self.assertRaisesRegex(
-                            ValueError, "Secondary controller facts"):
-                        gate.validate_soc(invalid, part)
+                            ValueError, diagnostic):
+                        validate_soc_facts(invalid, part)
 
     def test_typed_integration_cannot_drop_its_selected_dma_ownership(self):
         for label, prefix in (('stm32-zg', 'stm32'),):

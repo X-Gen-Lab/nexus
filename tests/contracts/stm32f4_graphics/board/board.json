@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "f479ni-graphics-software-reference",
+  "soc": "STM32F479NIH6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-reference-draft",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "panel565",
+      "controller": "LTDC",
+      "route": "ltdc-rgb565-reference"
+    },
+    {
+      "id": "panel888",
+      "controller": "LTDC",
+      "route": "ltdc-rgb888-reference"
+    },
+    {
+      "id": "blitter",
+      "controller": "DMA2D",
+      "route": "dma2d-memory"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only; no PCB, external oscillator, electrical measurement or physical qualification",
+    "The authored 3.3 V supply is a software clock/Flash assumption, not an observed supply",
+    "Proposed LCD RGB565 and DMA2D reference routes; no physical PCB, panel or executed graphics qualification"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f479ni.pdf",
+      "scope": "DS11118 Rev8 exact TFBGA216 AF14 pad facts and maximum83MHz LCD clock; software reference only, no PCB/panel/physical qualification"
+    },
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00127514-stm32f469xx-and-stm32f479xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "scope": "Proposed exact internal HSI16/CRC software reference; no PCB, wiring, hardware execution or accepted runtime support"
+    }
+  ]
+}

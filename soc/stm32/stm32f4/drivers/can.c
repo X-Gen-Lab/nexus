@@ -8,7 +8,7 @@
  */
 #include "stm32f407_can.h"
 #include "stm32f407_clock.h"
-#include "stm32f407xx.h"
+#include "stm32f4xx.h"
 #include <stddef.h>
 
 _Static_assert(offsetof(CAN_TypeDef, MCR) == 0x00U, "CAN control layout");

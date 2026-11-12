@@ -13,7 +13,7 @@
 #include "nexus/io/gpio.h"
 #include "nexus/network/lwip_loaned_rx_storage.h"
 #include "nexus_bindings.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 
 static nx_lwip_adapter_t s_adapter;
 static uint8_t s_transmit[NX_ETH_FRAME_MAX];
@@ -83,7 +83,7 @@ int main(void) {
     if (started.primary != NX_SUCCESS || started.cleanup != NX_SUCCESS) {
         return 1;
     }
-    const nx_gpio_port_t* led = nx_factory_gpio(NX_GPIO_ID_LED0);
+    const nx_gpio_port_t* led = nx_factory_gpio_ref(NX_GPIO_REF_LED0);
     uint32_t pins = 0U;
     if (nx_gpio_port_read(led, &pins) != NX_SUCCESS) {
         return 2;

@@ -1,7 +1,9 @@
 /**
  * \file            lifecycle_spi.c
- * \brief           Static polling SPI lifecycle retaining partial cold
- * rollback. \author          Nexus Team \version         1.0.0 \date 2026-11-07
+ * \brief           Polling SPI lifecycle with retained cold rollback
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-11-07
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f4_lifecycle.h"

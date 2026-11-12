@@ -14,7 +14,7 @@ def constructor(item, result):
     idle = dict(zip(option.channels, option.idle_codes))
     formats = {"u8": "U8", "u12-right": "U12_RIGHT", "u12-left": "U12_LEFT"}
     triggers = {"none": "NONE", "software": "SOFTWARE",
-                "tim6-trgo": "TIM6", "tim7-trgo": "TIM7"}
+                "tim6-trgo": "TIM6", "tim7-trgo": "TIM7", "exti9": "EXTI9"}
     dma = item.mode in DMA_MODES
     mode = "TRIGGERED" if dma else item.mode.upper().replace("-", "_")
     fields = [
@@ -26,7 +26,13 @@ def constructor(item, result):
         f"    .idle_codes = {{ {idle.get(1, 0)}u, {idle.get(2, 0)}u }},",
         f"    .output_buffer = {str(option.output_buffer).lower()},",
         f"    .amplitude = {option.amplitude}u"]
+    if option.trigger_input is not None:
+        fields[-1] += ','
+        fields.append("    .external = &s_nx_port_" +
+                      option.trigger_input.replace('-', '_'))
     if dma:
+        recovery = ("NONE" if option.recovery_trigger is None
+                    else triggers[option.recovery_trigger])
         definitions, count = dma_regions(name, result, include_flash=True)
         definitions += [
             f"static const nx_stm32_dac_dma_config_t {config} = {{",
@@ -34,7 +40,8 @@ def constructor(item, result):
             f"    .regions = s_nx_dma_regions_{name}, .region_count = {count}u,",
             f"    .priority = {option.irq.priority}u,",
             f"    .kernel_bound = {str(option.irq.calls_os).lower()},",
-            f"    .circular = {str(item.mode == 'trigger-dma-circular').lower()}",
+            f"    .circular = {str(item.mode == 'trigger-dma-circular').lower()},",
+            f"    .recovery_trigger = NX_STM32_DAC_TRIGGER_{recovery}",
             "};",
             f"static const nx_dac_tx_port_t s_nx_dac_tx_{name} = {{",
             f"    &nx_stm32_dac_dma_tx_ops, &s_nx_port_{name}", "};"]

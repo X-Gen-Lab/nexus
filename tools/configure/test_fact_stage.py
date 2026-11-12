@@ -33,6 +33,8 @@ class FactStageTests(unittest.TestCase):
         self.assertEqual(selected.part, "STM32F407ZGT6")
         self.assertEqual(selected.family, 'stm32f4')
         self.assertIs(selected.variant, selected.soc["variants"][selected.part])
+        self.assertIs(selected.soc["controllers"],
+                      selected.controller_profiles[selected.variant["device"]])
         stored = {field.name for field in fields(selected)}
         self.assertFalse({"part", "family", "variant"} & stored)
 

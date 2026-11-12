@@ -15,7 +15,8 @@ Chapter 9 owner 负责，packet 机制不能单独证明完整枚举／物理 re
 `Nexus::USBDescriptors` 校验外部描述符结构。两者不创建任务或分配内存。
 具体 class 分派、描述符字节与查找、VID/PID、字符串、配置及恢复策略由外部工程提供。
 可选 `Nexus::USBACM` 只组合下述 CDC ACM 控制子集；没有数据泵或完整 CDC/HID 类栈，
-其合同不建立完整 class 栈；Device ISO 由下述有限 packet 合同提供，remote wake 未接入。
+其合同不建立完整 class 栈；Device ISO 使用下述有限 packet 合同，远程唤醒由独立的
+调用者请求和显式 service 推进。
 独立的 `nexus/io/usb_host.h` 提供 Host packet transport，
 `nexus/io/usb_otg.h` 提供按需显式 managed role；自动 ID、SRP、HNP 策略不在范围内。
 
@@ -174,8 +175,8 @@ incomplete。取消、超时、reset 和 stop 都继续实际 drain，失败仍�
 并可进入 QUARANTINED，不能强制释放借用。
 
 软件参考位于 `tests/contracts/usb_iso_assembly/`，分别覆盖 FS 最大 IN、HS core
-内置 PHY 的全速 OUT 和 ULPI HS DMA。它们不提供完整 USB 音视频 class、remote wake
-或物理吞吐／时序资格。
+内置 PHY 的全速 OUT 和 ULPI HS DMA。这些 ISO 参考不验证远程唤醒，也不提供完整
+USB 音视频 class 或物理吞吐／时序资格；远程唤醒使用下述独立合同。
 
 ## 非零 endpoint 显式 activation
 
@@ -268,15 +269,16 @@ initialize 不启动硬件；prepare 不借用 payload，`nx_usb_control_begin` 
 权威 SETUP epoch 准入，成功才建立 outer 借用，且本身不提交包。IN 发送
 min(length, wLength)，OUT 容量必须覆盖 wLength；请求、控制存储与 payload
 须满足公共头文件的对齐和不重叠合同。
-`nx_usb_control_step` 每次最多调用一次 DCD service、读取一次权威 state，并执行
-一次 packet 提交／取消或 STALL 动作。它只检查两个固定 packet 槽，不在一步内循环
-完成多包事务，也不创建 worker；调用者在 suspend、cancel 或停机期间仍负责推进。
+`nx_usb_control_step` 每步至多一次 poll／权威 state 读取，再执行至多两次 submit
+或一次 cancel；为 DATA IN 先取得同 epoch 的零长 STATUS OUT，再提交 IN。
+只检查两个固定 packet 槽，不在一步内循环完成多包事务，不创建 worker。
+调用者在 suspend、cancel 或停机期间仍负责推进。
 
 | 事实 | 允许的结论与后续责任 |
 | --- | --- |
 | 一个 inner packet acquire SETTLED | 仅该包的 provider 已结束访问；DATA ACK 不完成整个 control 事务，也不返还 outer payload |
 | DATA 全部结束 | IN 按 MPS 分包，短于 wLength 且恰好落在 MPS 边界时发送必要的 DATA ZLP；OUT 进入 DATA_READY，尚不发送 STATUS IN |
-| 对应 STATUS 包真实 ACK | 可完成该 outer 事务的线上结果；已 acquire 的 STATUS ACK 先于随后观察到的新 epoch、closing 或超时判定 |
+| 对应 STATUS 包真实 ACK | 确定该 outer 事务的线上结果；已 acquire 的 STATUS ACK 先于后来观察到的 epoch、closing 或超时，但两个 packet 方向及其 DMA／FIFO／IRQ 借用都退出后才发布 outer SETTLED |
 | SET_ADDRESS staging 成功 | 仅暂存地址；STATUS IN 的实际 ACK 与 DCFG 地址写入／读回分别成立，线上成功不保证地址或外部 configuration 已提交 |
 
 `nx_usb_control_out_view` 只在同 epoch 的 DATA_READY 且没有 provider packet 引用时，
@@ -298,9 +300,12 @@ wire 时序仍需实板验证；outer request 的借用不因拒绝、epoch 更�
 设备地址、closing 与外部 configuration readiness 不能从 outer SUCCESS 推断。
 
 新 SETUP/reset 的 epoch、cancel、timeout 或 device stop 都不撤销旧借用。adapter
-先 acquire/fold 已完成 packet，再观察新 epoch；旧 packet 必须实际排空，才能最终
-发布 outer SETTLED。描述符字节、outer request、adapter context、profile 和其
-endpoint face 在此期间保持有效；一个 outer 结束也不替调用者 join 独立 observer。
+先 acquire/fold 已完成 packet，再观察新 epoch。零长 STATUS OUT 的有效 XFRC
+关闭线上 control admission，但不是尚未停止的 IN／OUT DMA、FIFO 或 IRQ 退出证明；
+AHB busy、地址拒清或另一方向未结清时继续保留两个槽及 outer payload。已经取得
+STATUS ACK 后不再发下一 DATA IN；只 join 旧方向再发布 outer SETTLED，不伪造
+额外 ACK 或重放 payload。描述符、outer request、adapter、profile 和 endpoint face
+全程保持有效，outer 结束仍不替调用者 join 独立 observer。
 
 如果 OUT0 packet 进入 QUARANTINED，adapter 暴露 `NEEDS_DEVICE_STOP` 并继续保留
 outer 借用。只有外部 controller owner 能授权 `nx_usb_device_stop`；adapter
@@ -343,7 +348,7 @@ control-line/break 请求在获批前不准入 STATUS。所有 mutation 都必�
 仍提交已批准的原 epoch 意图。已经 acquire 的 STATUS ACK 不被后来的 SETUP/reset、closing
 或 state 读取失败撤销，紧接的 GET 返回已提交的新 line coding。reset 后是否恢复
 初始类状态是外部 owner 的独立策略。每次 `nx_usb_acm_step` 最多推进一次既有
-packetizer，保持每步最多一次 service、一次 state 读取及一次 packet 动作；
+packetizer，沿用本节 packetizer 的一次 poll／state 与有界 submit／cancel 预算；
 外部仍须在取消、超时、suspend 和停机期间继续推进并保留所有 storage。
 OUT0 quarantine 仍须外部 controller owner 授权真实完整停止，组件不自动 stop。
 
@@ -391,6 +396,19 @@ Host 每个所选 channel 同时借用一个 packet；buffer capacity 覆盖 HAL
 回调只锁存事实；取消／超时保守排空整个共享 FIFO controller。旧 channel、DMA
 地址、FIFO 和 IRQ 全部退出才 SETTLED。Host 没有自动 hub split 策略。
 
+Host control pipe 的 MPS 按实际速度准入：low-speed 为 8，full-speed 为
+8／16／32／64，high-speed 为 64；非法组合在 HAL 和 channel 副作用前拒绝。
+reset／resume 在任何 HPRT 写入前分别要求严格多于 10 ms／20 ms 加 1 µs 的剩余
+deadline；额外一 tick 覆盖整数微秒采样隐藏的相位。不足、已到期或恰好耗尽预算
+时返回 TIMEOUT，不发出短复位／恢复脉冲。
+
+已经开始的 reset／resume 必须保持最低信号时间。抢占越过 deadline 时，先完成
+最低保持与撤信号读回，再返回 TIMEOUT；实际已恢复时仍发布 resumed 状态。
+撤信号失败进入 closing，保留原 controller／clock 责任，stop 首先重试信号撤回，
+成功前不调用 HAL stop 或释放 gate。已开始信号的时钟倒退、无效或持续无进展，
+以有限观察预算进入 fault observer 和不返回的 park，保留信号而不伪造最低保持。
+不增加实例字段、后台任务或另一套时钟；这些软件检查不构成物理脉宽测量。
+
 `Nexus::USBRole` 是通用供电和排空屏障，F407 managed OTG 将它接入真实 cold
 Device／Host。一个 composite 独占 core、PHY、pins、clock 和 IRQ；OFF prepare
 不启动 USB。显式 generation-bound 请求先真实 drain，再 source-off 读回和独立
@@ -399,6 +417,64 @@ VBUS 放电确认，才进行新角色的供电／cold prepare。切回 Device �
 显式 service 进入同一撤回屏障；硬件限流与实际放电路径由外部电源 owner 提供。
 详见 `tests/contracts/usb_otg_assembly/README.md` 的软件信号合同。
 
+## Device 显式远程唤醒
+
+F407 的固定 Device 及 managed Role 的 Device 阶段均可显式选择
+`remote_wakeup=true`。静态配置仅接入
+可选 runtime，不自动发信号，也不创建任务、定时器或等待线程。描述符是否声明
+remote wake、Chapter 9 请求是否合法及业务何时需要唤醒，仍由外部控制 owner 决定。
+
+`remote_wakeup` 同时选择静态 runtime 与对应协议代码。Host 从同一 typed IR 推导
+构建选择，SoC 私有编译常量裁剪未选的协议算法；公共请求、方法表和数据布局
+保持同一合同。未选功能通过原接口报告 UNSUPPORTED，通用 USB、DMA／IRQ 排空
+以及 cold 元数据安全检查继续执行。Native 完整模型只在相关 USB target 选择
+功能以运行全部合同；固件的 Flash／RAM 成本按同源配置与编译器的 ELF 计量。
+
+DCD 只在精确 Device `SET_FEATURE(DEVICE_REMOTE_WAKEUP)` 的 STATUS IN 真正 ACK
+后锁存许可；`CLEAR_FEATURE` 同样在 ACK 后生效。RESET 与成功 SET_CONFIGURATION
+清除旧许可。新的 SETUP 取消尚未 ACK 的修改意图；公开
+`state.remote_wakeup_enabled` 只报告已提交值。ST bridge 在新 SETUP 前用此值同步
+Core，GET_STATUS 不会报告被取消的 SET／CLEAR intent。线上 STATUS ACK 立即提交
+权限，与该 packet 的 DMA 内存 join 分开；应用已 cancel 或 deadline 到期也不能
+撤销真实已 ACK 的协议作用。AHB、地址或 EPDISD 未会合时，原 packet 仍被借用。
+
+调用者静态提供 `nx_usb_remote_wakeup_request_t`，用 Core prepare 设置有限绝对
+`deadline`，并提供正的 `max_service_delay_us`，记为 B。B 必须覆盖信号保持期间的
+调度、抢占、IRQ 屏蔽及撤信号延迟之和，范围为 1..12998 µs；填写参数不会证明此
+上界。准入还要求真实硬件 SUSPSTS、首次 suspend 观察与当前有效 System epoch
+相同，并已等待至少 5001 µs；这一 tick 余量覆盖整数微秒相位。效果前检查剩余
+budget 严格大于 `2001+B` µs。拒绝不保留 request，也不触发 RWUSIG。
+
+SUCCESS 表示 ACCEPTED。调用者按已证明的 B 在已有事件循环或任务中执行 service，
+约 2 ms 后撤回并读回 RWUSIG，才发布 SETTLED。控制器分别保留断言前后时间界：
+后界证明最低保持，前界检查上限，避免断言后抢占被一次迟到时间采样隐藏。满足
+Core 时间与 B 合同时，物理脉冲处于 USB 要求的 1..15 ms；实际超窗必须报告错误，
+之后撤回成功也不能把它改写成 SUCCESS。成功只证明本端信号已撤回，host resume
+仍由真实 WKUPINT／RESUME 事实发布。本地 pulse 后没有 host resume 时，不重用旧
+suspend 起点；只有前次 SUSP W1C 已读回完成、之后又观察到新的 SUSP，才建立下一
+次 5001 µs idle 收条。撤不掉的旧状态位不能反复授权发送。
+
+cancel 与 stop 保留已接纳的请求，不能提前缩短最低保持。读回拒绝保持
+QUARANTINED、runtime 和 clock 责任，后续 service／stop 只能凭真实撤回完成 join。
+可返回的 epoch／时间异常尽力撤信号并报告错误；Core 自身的终态 fail-stop 不保证
+还会返回执行清理，不能据此承诺无界 CPU 停机后的 15 ms 上限。epoch 异常路径仅
+针对 System 时间域失效而 USB 寄存器域与保留的 clock receipt 仍有效；不能将未知
+USB gate／PHY 失电后的读回零当作真实退出证明。
+
+managed Role 的 Device face 直接转交同一个 DCD，不建立第二套 pulse 状态或 owner。
+角色退出先调用同一 stop 排空；最低保持尚未结束或 RWUSIG 撤回拒绝时，仍保留
+原 Device transport、clock 与 pin receipt。可选 runtime 以及请求必须避开整个
+composite，包括暂时 inactive 的 Host 状态与 channel storage、cold 配置、VBUS
+GPIO face／ops、共享 pins 数组、逐 pin snapshot 和端点 plan。已知尺寸范围在
+C 准入时检查；外部 GPIO context 没有可知尺寸，由调用者保证它与 runtime／request
+均不别名。模式开放以精确 provider 支持矩阵和当前软件证据为准，不从共用 C 头
+推导电气资格。
+
+维护的 F407 ARM ABI 中，普通 controller 仍为 160 B，可选指针填入原有 padding；
+未选 runtime RAM 为 0 B，选中 runtime 为 32 B，调用者请求为 32 B。共享 ops 和
+函数的 Flash 成本另按实际链接镜像计量，不能把这组 RAM 数字称为零 Flash 开销。
+主机模型与 ARM 链接分别证明软件行为和资源，物理脉宽／WCET 仍需实板测量。
+
 ## 按需官方 Core middleware
 
 `st-usb-device` 与 `st-usb-host` 只准备精确锁定的相应 middleware Core。
@@ -406,11 +482,14 @@ VBUS 放电确认，才进行新角色的供电／cold prepare。切回 Device �
 staging、有限 deadline 和显式 Thread step。官方 Handle／class／descriptor 回调表
 留在私有接线边界，公共 I/O 不泄漏厂商类型；不选时不编译、不建立堆或后台任务。
 
-Device Core 复用现有 epoch、activation 和真实 packet settlement；多包控制 IN
-的提前零长 OUT 意图延后至真实 STATUS_OUT。即时 premature STATUS OUT 回调不由
-严格 DCD 提供，下一 SETUP／deadline 与完整 drain 恢复有软件回归，不能据此声称
-立即中止路径已经完整维护。Host Core 在断开后先排空，再允许 Core reset/class
-退出及应用明确的 cold restart。两者均锁存官方 Core 忽略的 LL 错误。
+Device Core 复用现有 epoch、activation 和真实 packet settlement。多包 DATA IN
+在同 epoch 提前接纳零长 STATUS OUT；线上 STATUS 已结束但 DMA 内存尚未 join 时，
+bridge 根据权威 `control_pending=false` 暂停 EP0 Core 续包派发，先会合双方向。
+只转交真实已结清的 IN ACK 和 STATUS，不补造 `EP0_TxSent`，不因这段合法间隔
+锁存 INVALID，也不重放下一 IN payload。新 SETUP、deadline 与停止仍须完整排空。
+Host Core 在断开后先排空，再允许 Core reset／class 退出及显式 cold restart。
+两者均锁存官方 Core 忽略的 LL 错误，不建立 ISO 周期调度。Device Core 的 feature
+意图不能替代实际 STATUS ACK，远程唤醒仍服从上述协议许可与 service 合同。
 
 私有 Device Core bridge 把 profile ISO 显式映射到 `USBD_EP_TYPE_ISOC`，不把
 Nexus 枚举值当作官方 wire 类型。Core／class 仍由特权 Thread 显式 step，packet

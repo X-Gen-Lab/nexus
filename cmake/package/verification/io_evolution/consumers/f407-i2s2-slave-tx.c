@@ -10,7 +10,7 @@
 #include "nexus/io/audio.h"
 #include "nexus_bindings.h"
 #include "nexus_config.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 
 static uint16_t s_samples[4] = {0x1234U, 0x5678U, 0x9abcU, 0xdef0U};
 static nx_stream_slot_t s_slot = {.data = (uint8_t*)s_samples,
@@ -30,7 +30,7 @@ int main(void) {
     if (started.primary != NX_SUCCESS)
         for (;;) {
         }
-    const nx_audio_t* audio = nx_factory_audio(NX_AUDIO_ID_SOUND);
+    const nx_audio_t* audio = nx_factory_audio_ref(NX_AUDIO_REF_SOUND);
     nx_audio_rate_t rate;
     const nx_frame_audio_format_t format = {NX_FRAME_AUDIO_I2S,
                                             NX_FRAME_PCM_SIGNED,

@@ -189,8 +189,7 @@ nx_result_t nx_usb_control_status_prepare(nx_usb_control_request_t* request,
 nx_result_t nx_usb_control_begin(nx_usb_control_t* control,
                                  nx_usb_control_request_t* request);
 /**
- * \brief           Make one bounded progress step, at most one poll and one
- *                  packet action.
+ * \brief           Poll once, submit at most two packets or cancel one loan.
  *
  * \param[in,out]   control: Same serialized executor and lifetime as begin.
  *
@@ -204,8 +203,11 @@ nx_result_t nx_usb_control_begin(nx_usb_control_t* control,
  *                  bytes and outer context. OUT0 quarantine exposes
  *                  NEEDS_DEVICE_STOP; only the external controller owner may
  *                  authorize stop. This adapter never stops the shared
- *                  controller automatically. One SETTLED packet is folded
- *                  before observing newer controller epochs.
+ *                  controller automatically. Control DATA IN prearms one
+ *                  zero-length STATUS OUT before exposing its first IN packet.
+ *                  A STATUS ACK fixes the wire outcome, but both accepted
+ *                  directions must join before outer SETTLED. Acquired packet
+ *                  facts are folded before observing newer controller epochs.
  */
 nx_result_t nx_usb_control_step(nx_usb_control_t* control);
 /**

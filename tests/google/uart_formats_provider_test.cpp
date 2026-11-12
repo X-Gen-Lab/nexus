@@ -198,6 +198,51 @@ TEST_F(UartFormatProvider, CancellationDoesNotReleaseTheInflightWord) {
     EXPECT_EQ(state.active, nullptr);
 }
 
+TEST_F(UartFormatProvider, ExhaustedWordDrainBudgetRetainsTheInflightWord) {
+    ASSERT_EQ(nx_uart_word_tx_prepare(&request, payload, 2U, NX_DEADLINE_NEVER),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_uart_word_port_submit(&port, &request), NX_SUCCESS);
+    irq(empty);
+    advance(UINT64_MAX - 11U);
+    ASSERT_EQ(nx_uart_word_port_cancel(&port, &request), NX_SUCCESS);
+    nx_uart_word_port_service(&port);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.active, &request);
+    irq(complete);
+    nx_uart_word_port_service(&port);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+}
+
+TEST_F(UartFormatProvider, ExhaustedByteDrainBudgetRetainsTheInflightByte) {
+    ASSERT_EQ(nx_stm32_uart_word_ops.stop(&state), NX_SUCCESS);
+    reset_ports();
+    registers = {};
+    ByteState bytes = {};
+    uint8_t storage[4] = {};
+    const uint8_t data[2] = {0x12U, 0x34U};
+    ASSERT_EQ(initialize_bytes(&bytes, storage), NX_SUCCESS);
+    auto face = bytes_face(&bytes);
+    nx_uart_tx_request_t transfer = {};
+    nx_request_initialize(&transfer.base);
+    ASSERT_EQ(nx_uart_tx_prepare(&transfer, data, 2U, NX_DEADLINE_NEVER),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_uart_port_submit(&face, &transfer), NX_SUCCESS);
+    registers.SR = USART_SR_TXE;
+    nx_stm32_uart_format_irq(&bytes);
+    advance(UINT64_MAX - 11U);
+    ASSERT_EQ(nx_uart_port_cancel(&face, &transfer), NX_SUCCESS);
+    nx_uart_port_service(&face);
+    EXPECT_EQ(nx_request_state(&transfer.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(bytes.active, &transfer);
+    registers.SR = USART_SR_TC;
+    nx_stm32_uart_format_irq(&bytes);
+    nx_uart_port_service(&face);
+    EXPECT_EQ(nx_request_state(&transfer.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(transfer.base.result, NX_ERROR_CANCELLED);
+    ASSERT_EQ(nx_stm32_uart_stop(&bytes), NX_SUCCESS);
+}
+
 TEST_F(UartFormatProvider, RxPreservesNinthBitWithoutByteFaceStorage) {
     registers.DR = 0x1AAU;
     irq(ready);
@@ -279,6 +324,40 @@ TEST(UartByteFormat, F407SupportsEightDataBitsWithParityWithoutGrowingState) {
     const_cast<uint32_t&>(registers.SR) = USART_SR_RXNE;
     nx_stm32_uart_format_irq(&state);
     EXPECT_EQ(rx[0], 0x7AU);
+}
+
+TEST(UartByteFormat, LiveRtsFrameChangesRejectWithoutEffects) {
+    for (const bool prior_rts : {false, true}) {
+        SCOPED_TRACE(prior_rts);
+        reset_ports();
+        USART_TypeDef registers = {};
+        nx_stm32_uart_state_t state = {};
+        uint8_t rx[4] = {};
+        state.registers = &registers;
+        state.irq = USART1_IRQn;
+        state.baud = 115200U;
+        state.rx_storage = rx;
+        state.rx_capacity = sizeof(rx);
+        state.profile = NX_UART_RX_BYTES;
+        ASSERT_EQ(nx_stm32_uart_initialize(&state, 84000000U), NX_SUCCESS);
+        if (prior_rts) {
+            ASSERT_EQ(nx_stm32_uart_flow_configure(&state, true, false),
+                      NX_SUCCESS);
+        }
+        unsigned char before_state[sizeof(state)] = {};
+        unsigned char before_registers[sizeof(registers)] = {};
+        std::memcpy(before_state, &state, sizeof(state));
+        std::memcpy(before_registers, &registers, sizeof(registers));
+        const nx_uart_format_t selected = {
+            8U, NX_UART_PARITY_EVEN, NX_UART_STOP_2,
+            prior_rts ? NX_UART_FLOW_NONE : NX_UART_FLOW_RTS};
+        EXPECT_EQ(nx_stm32_uart_format_configure(&state, selected),
+                  NX_ERROR_UNSUPPORTED);
+        EXPECT_EQ(std::memcmp(before_state, &state, sizeof(state)), 0);
+        EXPECT_EQ(std::memcmp(before_registers, &registers, sizeof(registers)),
+                  0);
+        ASSERT_EQ(nx_stm32_uart_stop(&state), NX_SUCCESS);
+    }
 }
 
 TEST(UartColdFormat, F407FirstEnableAlreadyHasTheSelectedWireFormat) {

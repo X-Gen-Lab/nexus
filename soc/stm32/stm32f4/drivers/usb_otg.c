@@ -77,6 +77,37 @@ static bool independent(const nx_gpio_port_t* a, uint32_t am,
     return a != b && (a->context != b->context || (am & bm) == 0U);
 }
 
+/** \brief Optional pulse storage cannot alias the inactive physical owner. */
+static bool remote_storage(const nx_stm32_usb_otg_t* state,
+                           const nx_stm32_usb_otg_config_t* config,
+                           const nx_usb_remote_runtime_t* remote) {
+    if (!NEXUS_STM32F4_USB_REMOTE_WAKEUP)
+        return remote == NULL;
+    if (remote == NULL)
+        return true;
+    return separate(state, remote, sizeof(*remote)) &&
+           nx_stm32_usb_remote_separate(remote, config, sizeof(*config)) &&
+           nx_stm32_usb_remote_separate(remote, config->host,
+                                        sizeof(*config->host)) &&
+           nx_stm32_usb_remote_separate(
+               remote, config->host->transport.channels,
+               (size_t)config->host->transport.channel_count *
+                   sizeof(*config->host->transport.channels)) &&
+           nx_stm32_usb_remote_separate(remote, config->source,
+                                        sizeof(*config->source)) &&
+           nx_stm32_usb_remote_separate(remote, config->present,
+                                        sizeof(*config->present)) &&
+           nx_stm32_usb_remote_separate(remote, config->overcurrent,
+                                        sizeof(*config->overcurrent)) &&
+           nx_stm32_usb_remote_separate(remote, config->source->ops,
+                                        sizeof(*config->source->ops)) &&
+           nx_stm32_usb_remote_separate(remote, config->present->ops,
+                                        sizeof(*config->present->ops)) &&
+           nx_stm32_usb_remote_separate(remote, config->overcurrent->ops,
+                                        sizeof(*config->overcurrent->ops)) &&
+           remote->request == NULL;
+}
+
 /** \brief Host and Device use one exact pad/snapshot and interrupt plan. */
 static bool config_valid(const nx_stm32_usb_otg_t* state,
                          const nx_stm32_usb_otg_config_t* config) {
@@ -112,7 +143,8 @@ static bool config_valid(const nx_stm32_usb_otg_t* state,
             config->device_hs != NULL)
             return false;
         const nx_stm32_usb_cold_config_t* d = config->device_fs;
-        if (!device_storage(state, d->endpoints, d->endpoint_count, d->plan,
+        if (!remote_storage(state, config, d->remote) ||
+            !device_storage(state, d->endpoints, d->endpoint_count, d->plan,
                             d->events, d->capacity, d->pins, 2U, d->clock,
                             sizeof(*d->clock)))
             return false;
@@ -130,7 +162,8 @@ static bool config_valid(const nx_stm32_usb_otg_t* state,
                 config->host->transport.ulpi_clock_hz)
             return false;
         const nx_stm32_usb_hs_cold_config_t* d = config->device_hs;
-        if (!device_storage(state, d->endpoints, d->endpoint_count, d->plan,
+        if (!remote_storage(state, config, d->remote) ||
+            !device_storage(state, d->endpoints, d->endpoint_count, d->plan,
                             d->events, d->capacity, d->pins, d->pin_count,
                             d->clock, sizeof(*d->clock)))
             return false;
@@ -468,9 +501,86 @@ static nx_result_t device_stop(void* context) {
     return nx_usb_fs_device_ops.stop(&state->device);
 }
 
+/** \brief A pulse cannot borrow cold metadata still needed by role exit. */
+static bool
+device_remote_storage(const nx_stm32_usb_otg_t* state,
+                      const nx_usb_remote_wakeup_request_t* request) {
+    const nx_stm32_usb_otg_config_t* config = state->config;
+    const nx_stm32_platform_pin_config_t* pins;
+    const nx_stm32_usb_endpoint_config_t* plan;
+    size_t count;
+    uint8_t pin_count;
+    if (config->device_fs != NULL) {
+        pins = config->device_fs->pins;
+        plan = config->device_fs->plan;
+        count = config->device_fs->endpoint_count;
+        pin_count = 2U;
+    } else {
+        pins = config->device_hs->pins;
+        plan = config->device_hs->plan;
+        count = config->device_hs->endpoint_count;
+        pin_count = config->device_hs->pin_count;
+    }
+    if (!outside(state, request, sizeof(*request)) ||
+        overlaps(request, sizeof(*request), config->host->transport.channels,
+                 (size_t)config->host->transport.channel_count *
+                     sizeof(*config->host->transport.channels)) ||
+        overlaps(request, sizeof(*request), config->source,
+                 sizeof(*config->source)) ||
+        overlaps(request, sizeof(*request), config->present,
+                 sizeof(*config->present)) ||
+        overlaps(request, sizeof(*request), config->overcurrent,
+                 sizeof(*config->overcurrent)) ||
+        overlaps(request, sizeof(*request), config->source->ops,
+                 sizeof(*config->source->ops)) ||
+        overlaps(request, sizeof(*request), config->present->ops,
+                 sizeof(*config->present->ops)) ||
+        overlaps(request, sizeof(*request), config->overcurrent->ops,
+                 sizeof(*config->overcurrent->ops)) ||
+        overlaps(request, sizeof(*request), pins,
+                 (size_t)pin_count * sizeof(*pins)) ||
+        overlaps(request, sizeof(*request), plan, count * sizeof(*plan)))
+        return false;
+    for (uint8_t i = 0U; i < pin_count; ++i)
+        if (overlaps(request, sizeof(*request), pins[i].snapshot,
+                     sizeof(*pins[i].snapshot)))
+            return false;
+    return true;
+}
+
+/** \brief A current Device face admits through its existing physical DCD. */
+static nx_result_t
+device_remote_wakeup(void* context, nx_usb_remote_wakeup_request_t* request) {
+    nx_stm32_usb_otg_t* state = context;
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (!ready(state, NX_USB_ROLE_DEVICE))
+        return NX_ERROR_STATE;
+    if (!NEXUS_STM32F4_USB_REMOTE_WAKEUP)
+        return NX_ERROR_UNSUPPORTED;
+    if (!device_remote_storage(state, request))
+        return NX_ERROR_INVALID;
+    return nx_usb_fs_device_ops.remote_wakeup(&state->device, request);
+}
+
+/** \brief The same retained DCD keeps cancellation and pulse withdrawal. */
+static nx_result_t
+device_remote_cancel(void* context, nx_usb_remote_wakeup_request_t* request) {
+    nx_stm32_usb_otg_t* state = context;
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (!active(state, NX_USB_ROLE_DEVICE))
+        return NX_ERROR_STATE;
+    if (!NEXUS_STM32F4_USB_REMOTE_WAKEUP)
+        return NX_ERROR_UNSUPPORTED;
+    if (!device_remote_storage(state, request))
+        return NX_ERROR_INVALID;
+    return nx_usb_fs_device_ops.remote_cancel(&state->device, request);
+}
+
 const nx_usb_device_ops_t nx_stm32_usb_otg_device_ops = {
-    device_service, device_events, device_state,
-    device_address, device_wake,   device_stop};
+    device_service, device_events, device_state,         device_address,
+    device_wake,    device_stop,   device_remote_wakeup, device_remote_cancel};
 
 /** \brief Endpoint wrappers select only raw directions of this composite. */
 static bool endpoint_ready(const nx_stm32_usb_otg_endpoint_t* endpoint) {

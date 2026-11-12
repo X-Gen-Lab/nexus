@@ -18,10 +18,17 @@ or generator-source identity.
 
 CMake owns source lists and target dependencies. The resolver emits selected
 facts and its configuration-code dependencies, never a parallel software build
-graph. The selected SoC-local `descriptor.py` is an explicit configuration-code
-input and Source SDK source dependency. Moving that immutable metadata preserves
-all firmware payloads; `selection.cmake` gains the selected file dependency.
-Descriptor enumeration does not select C source units. Private compile templates
+graph. The selected central provider descriptor, currently
+`tools/configure/stm32f4_descriptor.py`, is an explicit configuration-code input
+and Source SDK source dependency. Board and SoC packages contain no Python
+plugins. Descriptor enumeration does not select C source units.
+
+The selected provider supplies its actual private include directories through
+the existing `NEXUS_SYSTEM_PRIVATE_INCLUDES` connection. Root CMake consumes that
+declaration with PRIVATE scope; it no longer owns a fixed list of F4 IP paths.
+External provider bindings therefore do not automatically inherit F4 private
+headers. Mode/IP selection and supplier sources remain in the one CMake graph;
+this connection adds no registry or second build framework. Private compile templates
 validate required specialization bindings and preserve wrapper-owned macro scope;
 CMake still selects and checks each actual translation unit.
 ABI, optimization, diagnostics and firmware link policy have explicit

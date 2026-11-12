@@ -11,6 +11,6 @@
  * reset profile remain real C code under test. */
 #undef NX_SRAM_BOOT_DEVICE_ID
 #undef NX_SRAM_BOOT_FLASH_KIB
-#define NX_SRAM_BOOT_DEVICE_ID() UINT32_C(0x413)
+#define NX_SRAM_BOOT_DEVICE_ID() UINT32_C(0x10010413)
 #define NX_SRAM_BOOT_FLASH_KIB() UINT16_C(1024)
 #endif

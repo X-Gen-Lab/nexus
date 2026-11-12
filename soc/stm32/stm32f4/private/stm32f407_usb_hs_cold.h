@@ -30,6 +30,7 @@ typedef struct {
     const nx_dma_memory_region_t* dma_regions;
     size_t dma_region_count;
     bool dma;
+    nx_usb_remote_runtime_t* remote;
 } nx_stm32_usb_hs_cold_config_t;
 
 typedef struct {
@@ -65,6 +66,54 @@ nx_stm32_usb_hs_cold_prepare(nx_usb_controller_t* port,
             (config->phy == NX_STM32_USB_HS_ULPI ? 60000000U : 0U) ||
         port->snapshot.epoch == UINT64_MAX)
         return NX_ERROR_INVALID;
+    if (config->remote != NULL) {
+        const nx_usb_remote_runtime_t* remote = config->remote;
+        if (config->capacity > SIZE_MAX / sizeof(*config->events) ||
+            !nx_stm32_usb_remote_separate(remote, port, sizeof(*port)) ||
+            !nx_stm32_usb_remote_separate(remote, config, sizeof(*config)) ||
+            !nx_stm32_usb_remote_separate(remote, receipt, sizeof(*receipt)) ||
+            !nx_stm32_usb_remote_separate(remote, config->clock,
+                                          sizeof(*config->clock)) ||
+            !nx_stm32_usb_remote_separate(remote, &nx_stm32_usb_hs_clock_ops,
+                                          sizeof(nx_stm32_usb_hs_clock_ops)) ||
+            !nx_stm32_usb_remote_separate(remote, config->endpoints,
+                                          config->endpoint_count *
+                                              sizeof(*config->endpoints)) ||
+            !nx_stm32_usb_remote_separate(remote, config->plan,
+                                          config->endpoint_count *
+                                              sizeof(*config->plan)) ||
+            !nx_stm32_usb_remote_separate(remote, config->events,
+                                          config->capacity *
+                                              sizeof(*config->events)) ||
+            !nx_stm32_usb_remote_separate(remote, config->pins,
+                                          (size_t)config->pin_count *
+                                              sizeof(*config->pins)))
+            return NX_ERROR_INVALID;
+        for (uint8_t i = 0U; i < config->pin_count; ++i)
+            if (!nx_stm32_usb_remote_separate(
+                    remote, config->pins[i].snapshot,
+                    sizeof(*config->pins[i].snapshot)))
+                return NX_ERROR_INVALID;
+        if (config->dma) {
+            if (config->dma_storage == NULL || config->dma_regions == NULL ||
+                config->dma_region_count >
+                    SIZE_MAX / sizeof(*config->dma_regions) ||
+                !nx_stm32_usb_remote_separate(
+                    remote, config->dma_storage,
+                    config->endpoint_count * sizeof(*config->dma_storage)) ||
+                !nx_stm32_usb_remote_separate(remote, config->dma_regions,
+                                              config->dma_region_count *
+                                                  sizeof(*config->dma_regions)))
+                return NX_ERROR_INVALID;
+            for (size_t i = 0U; i < config->endpoint_count; ++i)
+                if (!nx_stm32_usb_remote_separate(
+                        remote, config->dma_storage[i].bytes,
+                        config->dma_storage[i].capacity))
+                    return NX_ERROR_INVALID;
+        }
+        if (remote->request != NULL)
+            return NX_ERROR_BUSY;
+    }
     uint8_t core = config->phy == NX_STM32_USB_HS_ULPI
                        ? NX_USB_CORE_HS_ULPI
                        : NX_USB_CORE_HS_INTERNAL_FS;
@@ -104,6 +153,7 @@ nx_stm32_usb_hs_cold_prepare(nx_usb_controller_t* port,
     port->dma_storage = config->dma_storage;
     port->dma_regions = config->dma_regions;
     port->dma_region_count = config->dma_region_count;
+    port->remote = config->remote;
     port->clock = (nx_usb_clock_domain_t){
         &nx_stm32_usb_hs_clock_ops, config->clock, sizeof(*config->clock)};
     for (size_t i = 0U; i < config->endpoint_count; ++i) {
@@ -178,8 +228,8 @@ nx_stm32_usb_hs_cold_close(nx_usb_controller_t* port,
     if (status != NX_SUCCESS)
         return status;
     nx_time_us_t deadline;
-    status = nx_deadline_finite_after(nx_time_now_us(),
-                                      config->clock_timeout_us, &deadline);
+    status =
+        nx_stm32_usb_withdraw_deadline(config->clock_timeout_us, &deadline);
     if (status != NX_SUCCESS)
         return status;
     status = nx_stm32_usb_hs_clock_stop(config->clock, deadline);

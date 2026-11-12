@@ -52,7 +52,7 @@ class AudioMigrationTests(unittest.TestCase):
     def test_sdk_consumer_gets_its_existing_owner_from_the_factory(self):
         source = (gate.ROOT / "cmake/package/verification/io_evolution/consumers"
                   / "f407-i2s2-slave-tx.c").read_text()
-        self.assertIn("nx_factory_audio(", source)
+        self.assertIn("nx_factory_audio_ref(NX_AUDIO_REF_SOUND)", source)
         self.assertIn("nx_audio_request_t", source)
         for retired in ("nx_f407_i2s2_slave_tx_initialize", "s_owner",
                         "NEXUS_F407_I2S2_SLAVE_TX_SELECTED"):

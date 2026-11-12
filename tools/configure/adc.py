@@ -113,3 +113,8 @@ def complete_triggers(selected, triggers):
             item["adc_group_resolution"]["trigger_identity"] = next(
                 index + 1 for index, edge in enumerate(triggers.edges)
                 if edge.target == item["id"] + ":adc")
+        plan = item.get("adc_group_resolution", {})
+        if "injected_timer" in plan:
+            plan["injected_timer"]["trigger_identity"] = next(
+                index + 1 for index, edge in enumerate(triggers.edges)
+                if edge.target == item["id"] + ":injected")

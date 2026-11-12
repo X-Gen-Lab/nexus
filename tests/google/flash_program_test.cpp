@@ -8,6 +8,7 @@
  */
 extern "C" {
 #include "nexus/io/native/model.h"
+#include "stm32f407_basic_cold.h"
 #include "stm32f407_provider.h"
 }
 #include <array>
@@ -22,17 +23,21 @@ static unsigned program_pulses;
 static unsigned erase_pulses, erase_attempts, refused_erase_attempt;
 static bool refuse_start, refuse_flags, refuse_second_flags, missing_end;
 static bool refuse_relock, irq_enabled, irq_pending, refuse_pending_clear;
+static bool refuse_option_relock;
 static bool using_write_ports;
 static bool irq_active;
 static bool privileged = true;
+static uint32_t clock_hpre;
 /** \brief Independent RM0090 density oracle for the production engine. */
 static const nx_flash_sector_t s_sectors[] = {
     {0x00000U, 0x04000U}, {0x04000U, 0x04000U}, {0x08000U, 0x04000U},
     {0x0C000U, 0x04000U}, {0x10000U, 0x10000U}, {0x20000U, 0x20000U},
     {0x40000U, 0x20000U}, {0x60000U, 0x20000U}, {0x80000U, 0x20000U},
     {0xA0000U, 0x20000U}, {0xC0000U, 0x20000U}, {0xE0000U, 0x20000U}};
+static const nx_flash_erase_span_t s_spans[] = {
+    {0U, 0x4000U, 4U}, {0x10000U, 0x10000U, 1U}, {0x20000U, 0x20000U, 3U}};
 const nx_flash_geometry_t g_nx_stm32_flash_ve = {0x08000000U, 524288U, 4U,
-                                                 s_sectors,   8U,      0U};
+                                                 s_spans,     3U,      0U};
 
 static nx_stm32_flash_state_t* model;
 static void complete(bool erase) {
@@ -44,8 +49,8 @@ static void complete(bool erase) {
     if (erase) {
         size_t sector = (model->registers->CR & FLASH_CR_SNB) >> 3U;
         std::memset(const_cast<uint8_t*>(model->memory) +
-                        model->geometry->sectors[sector].offset,
-                    0xff, model->geometry->sectors[sector].size);
+                        s_sectors[sector].offset,
+                    0xff, s_sectors[sector].size);
     }
 }
 extern "C" void nx_flash_program_model_poll(unsigned kind, void* context) {
@@ -79,6 +84,9 @@ extern "C" void nx_flash_program_model_write(volatile uint32_t* reg,
         return;
     }
     using_write_ports = true;
+    if (reg == &model->registers->OPTCR && refuse_option_relock &&
+        (value & FLASH_OPTCR_OPTLOCK) != 0U)
+        return;
     if (reg == &model->registers->CR) {
         if (refuse_relock && (value & FLASH_CR_LOCK) != 0U)
             return;
@@ -127,8 +135,14 @@ extern "C" bool nx_flash_program_model_irq_clear(void) {
 extern "C" bool nx_flash_program_model_irq_active(void) {
     return irq_active;
 }
+extern "C" bool nx_flash_program_model_irq_enabled(void) {
+    return irq_enabled;
+}
 extern "C" bool nx_flash_program_model_privileged(void) {
     return privileged;
+}
+extern "C" uint32_t nx_flash_program_model_hpre(void) {
+    return clock_hpre;
 }
 
 /** \brief Exercise production methods using actual private provider state. */
@@ -147,9 +161,11 @@ class PhysicalFlashProgram : public testing::Test {
         refuse_start = refuse_flags = refuse_second_flags = missing_end = false;
         refuse_relock = irq_enabled = irq_pending = refuse_pending_clear =
             false;
+        refuse_option_relock = false;
         using_write_ports = false;
         irq_active = false;
         privileged = true;
+        clock_hpre = 0U;
         storage.fill(0xffU);
         state.registers = &registers;
         state.geometry = &g_nx_stm32_flash_ve;
@@ -277,6 +293,93 @@ TEST_F(PhysicalFlashProgram, FailedRelockNeverReleasesConcreteLease) {
     EXPECT_EQ(NX_ERROR_IO, nx_flash_port_erase(&face, 0U, EraseUnit(), 1000U));
     EXPECT_TRUE(state.active);
     refuse_relock = false;
+}
+TEST_F(PhysicalFlashProgram, ExplicitCloseRetriesAnOwnedFailedRelock) {
+    refuse_relock = true;
+    ASSERT_EQ(NX_ERROR_IO, nx_flash_port_erase(&face, 0U, EraseUnit(), 1000U));
+    ASSERT_TRUE(state.active);
+    unsigned pulses = erase_pulses;
+    refuse_relock = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_flash_close(&state));
+    EXPECT_FALSE(state.active);
+    EXPECT_NE(0U, registers.CR & FLASH_CR_LOCK);
+    EXPECT_EQ(pulses, erase_pulses);
+    EXPECT_FALSE(irq_pending);
+}
+TEST_F(PhysicalFlashProgram, ExplicitCloseRetriesAnOwnedPendingWithdrawal) {
+    refuse_pending_clear = true;
+    ASSERT_EQ(NX_ERROR_IO, nx_flash_port_erase(&face, 0U, EraseUnit(), 1000U));
+    ASSERT_TRUE(state.active);
+    unsigned pulses = erase_pulses;
+    refuse_pending_clear = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_flash_close(&state));
+    EXPECT_FALSE(state.active);
+    EXPECT_FALSE(irq_pending);
+    EXPECT_EQ(pulses, erase_pulses);
+}
+TEST_F(PhysicalFlashProgram, ExplicitCloseCannotWithdrawAForeignActiveVector) {
+    refuse_relock = true;
+    ASSERT_EQ(NX_ERROR_IO, nx_flash_port_erase(&face, 0U, EraseUnit(), 1000U));
+    refuse_relock = false;
+    irq_active = true;
+    uint32_t before = Control();
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_flash_close(&state));
+    EXPECT_TRUE(state.active);
+    EXPECT_EQ(before, Control());
+    irq_active = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_flash_close(&state));
+    EXPECT_FALSE(state.active);
+}
+TEST_F(PhysicalFlashProgram, ExplicitClosePreservesForeignUnlockedOptions) {
+    registers.OPTCR = 0x0fffaaecU;
+    uint32_t before = registers.OPTCR;
+    refuse_relock = true;
+    ASSERT_EQ(NX_ERROR_IO, nx_flash_port_erase(&face, 0U, EraseUnit(), 1000U));
+    refuse_relock = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_flash_close(&state));
+    EXPECT_FALSE(state.active);
+    EXPECT_EQ(before, registers.OPTCR);
+}
+TEST_F(PhysicalFlashProgram, PublicRecoveryRequiresActualHardwareWithdrawal) {
+    refuse_relock = true;
+    ASSERT_EQ(NX_ERROR_IO, nx_flash_port_erase(&face, 0U, EraseUnit(), 1000U));
+    unsigned pulses = erase_pulses;
+    uint32_t before = Control();
+    registers.SR |= FLASH_SR_BSY;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_flash_port_recover(&face));
+    EXPECT_EQ(before, Control());
+    registers.SR &= ~static_cast<uint32_t>(FLASH_SR_BSY);
+    irq_enabled = true;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_flash_port_recover(&face));
+    EXPECT_TRUE(state.active);
+    EXPECT_EQ(before, Control());
+    irq_enabled = false;
+    privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_flash_port_recover(&face));
+    privileged = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_flash_port_recover(&face));
+    EXPECT_TRUE(state.active);
+    refuse_relock = false;
+    EXPECT_EQ(NX_SUCCESS, nx_flash_port_recover(&face));
+    EXPECT_FALSE(state.active);
+    EXPECT_EQ(pulses, erase_pulses);
+}
+TEST_F(PhysicalFlashProgram, IdleRecoveryPreservesForeignPendingEvidence) {
+    irq_pending = true;
+    uint32_t before = Control();
+    EXPECT_EQ(NX_SUCCESS, nx_flash_port_recover(&face));
+    EXPECT_TRUE(irq_pending);
+    EXPECT_EQ(before, Control());
+}
+TEST_F(PhysicalFlashProgram, RecoveryIsAnOptionalCheckedPublicOperation) {
+    nx_flash_ops_t methods = nx_stm32_flash_ops;
+    methods.recover = nullptr;
+    nx_flash_port_t unsupported{&methods, &state};
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_flash_port_recover(&unsupported));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_flash_port_recover(nullptr));
+    EXPECT_FALSE(state.active);
+    EXPECT_EQ(0U, erase_pulses);
+    EXPECT_EQ(0U, program_pulses);
 }
 TEST_F(PhysicalFlashProgram, FailedPendingWithdrawalCannotReportSuccess) {
     refuse_pending_clear = true;
@@ -495,6 +598,42 @@ TEST_F(PhysicalFlashMaintenance, OptionsRequirePorAndNeverResetTheMachine) {
     EXPECT_NE(0U, registers.OPTCR & FLASH_OPTCR_OPTLOCK);
     EXPECT_FALSE(state.active);
 }
+TEST_F(PhysicalFlashMaintenance, BorChangeRejectsUnsafeAhbDividerBeforeUnlock) {
+    auto desired = OpenOptions();
+    desired.brownout_level = 2U;
+    clock_hpre = RCC_CFGR_HPRE_DIV4;
+    uint32_t before = registers.OPTCR;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_flash_maintenance_set_options(
+                  &maintenance, &desired, NX_FLASH_MAINTAIN_OPTIONS, 1000U));
+    EXPECT_EQ(before, registers.OPTCR);
+    EXPECT_EQ(0U, registers.KEYR);
+    EXPECT_EQ(0U, registers.OPTKEYR);
+    EXPECT_FALSE(state.active);
+    EXPECT_FALSE(state.power_on_reset_required);
+}
+TEST_F(PhysicalFlashMaintenance, NonBorOptionsDoNotRequireAnAhbDividerChange) {
+    auto desired = OpenOptions();
+    desired.write_protected_sectors = 1U;
+    clock_hpre = RCC_CFGR_HPRE_DIV4;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_flash_maintenance_set_options(
+                  &maintenance, &desired, NX_FLASH_MAINTAIN_OPTIONS, 1000U));
+    EXPECT_EQ(RCC_CFGR_HPRE_DIV4, clock_hpre);
+}
+TEST_F(PhysicalFlashMaintenance, BorChangeSupportsBothSafeAhbDividers) {
+    auto desired = OpenOptions();
+    desired.brownout_level = 2U;
+    clock_hpre = RCC_CFGR_HPRE_DIV2;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_flash_maintenance_set_options(
+                  &maintenance, &desired, NX_FLASH_MAINTAIN_OPTIONS, 1000U));
+    desired.brownout_level = 1U;
+    clock_hpre = RCC_CFGR_HPRE_DIV1;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_flash_maintenance_set_options(
+                  &maintenance, &desired, NX_FLASH_MAINTAIN_OPTIONS, 1000U));
+}
 
 TEST_F(PhysicalFlashMaintenance, MissingPulseCompletionRetainsError) {
     uint32_t word = 0U;
@@ -514,6 +653,23 @@ TEST_F(PhysicalFlashMaintenance, FailedRelockRetainsTheSharedPhysicalOwner) {
     EXPECT_TRUE(state.active);
     EXPECT_EQ(NX_ERROR_BUSY, nx_flash_port_erase(&face, 0U, 16384U, 1000U));
     refuse_relock = false;
+}
+TEST_F(PhysicalFlashMaintenance, ExplicitCloseRetriesItsOwnOptionRelock) {
+    auto desired = OpenOptions();
+    desired.write_protected_sectors = 1U;
+    refuse_option_relock = true;
+    ASSERT_EQ(NX_ERROR_IO,
+              nx_flash_maintenance_set_options(
+                  &maintenance, &desired, NX_FLASH_MAINTAIN_OPTIONS, 1000U));
+    ASSERT_TRUE(state.active);
+    ASSERT_EQ(0U, registers.OPTCR & FLASH_OPTCR_OPTLOCK);
+    unsigned pulses = program_pulses + erase_pulses;
+    refuse_option_relock = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_flash_close(&state));
+    EXPECT_FALSE(state.active);
+    EXPECT_NE(0U, registers.OPTCR & FLASH_OPTCR_OPTLOCK);
+    EXPECT_TRUE(state.power_on_reset_required);
+    EXPECT_EQ(pulses, program_pulses + erase_pulses);
 }
 
 TEST_F(PhysicalFlashMaintenance, ForeignUnlockedOptionsCannotBeOverwritten) {

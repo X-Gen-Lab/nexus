@@ -28,7 +28,8 @@ typedef struct {
     nx_request_t base;
     const void* data;
     size_t length;
-    uint32_t trigger_hz;
+    uint32_t
+        trigger_hz; /**< Zero explicitly denotes an unknown external rate. */
 } nx_dac_tx_request_t;
 
 /** \brief Shared immutable methods receive the selected instance context. */
@@ -52,7 +53,8 @@ struct nx_dac_tx_port {
  * \param[in,out] request: Initialized READY or consumed SETTLED storage.
  * \param[in] data: Independent immutable frames, live through settlement.
  * \param[in] length: Nonzero byte extent; provider validates frame geometry.
- * \param[in] trigger_hz: Nonzero requested hardware trigger frequency.
+ * \param[in] trigger_hz: Requested internal rate; zero for an external source
+ *                        whose frequency is unknown to this port.
  * \param[in] deadline: Absolute live Core deadline, never a duration.
  * \return SUCCESS, INVALID or STATE; rejection leaves the descriptor intact.
  * \note Serialized task owner only. Preparation does not touch hardware or
@@ -76,6 +78,14 @@ nx_result_t nx_dac_tx_prepare(nx_dac_tx_request_t* request, const void* data,
  *       not promise exactly length/frame-size analog conversions. A finite
  *       tail may pause and restart the exclusively owned trigger timer,
  *       extending the last interval; finite output is not strictly periodic.
+ *       Selected recovery can internally trigger the declared idle code before
+ *       waveform timing starts, then briefly disable converter outputs. These
+ *       conversions are not payload progress. No uninterrupted analog hold or
+ *       waveform is promised between requests.
+ *       External circular modes can retain an exclusively leased timer only
+ *       for the same idle-output recovery. Playback starts detection only
+ *       after its memory route is armed and never starts that timer. A mode
+ *       with no proven final external conversion rejects finite playback.
  *       Circular transfers settle only after cancellation, stop or failure.
  *       Circular byte progress describes the final cycle's consumed prefix,
  *       not total playback. DMA progress never counts digital conversions.

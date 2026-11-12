@@ -15,6 +15,9 @@ _Static_assert(offsetof(I2C_TypeDef, DR) == 4U * sizeof(uint32_t),
                "Selected LL receive uses the reviewed V1 DATA offset");
 _Static_assert(I2C_DR_DR == UINT32_C(0xff),
                "Selected LL receive consumes exactly eight DATA bits");
+/* The selected SDK includes the complete controller register metadata. */
+#define NX_I2C_V1_REGISTER_BYTES sizeof(I2C_TypeDef)
+
 #ifndef NX_I2C_V1_READ_DATA
 #define NX_I2C_V1_READ_DATA(state)                                             \
     LL_I2C_ReceiveData8((I2C_TypeDef*)(state)->registers)

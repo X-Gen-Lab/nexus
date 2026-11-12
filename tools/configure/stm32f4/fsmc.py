@@ -24,7 +24,7 @@ def _timing(value):
 
 
 def resolve_endpoint(device, controller, *, authored_kind, bindings, routes,
-                     claim, board_conditions):
+                     claim, board_conditions, clock=None):
     """Admit an exact bank without making a second shared GPIO owner."""
     if authored_kind in {'nand','flash_async'} or device.get('mode')=='psram-window':
         return _reference_resolve(device,controller,authored_kind,bindings,routes,
@@ -297,7 +297,7 @@ def _reference_protocol(device, kind, p):
             g['page_bytes']%p['ecc_bytes']): fail('Inconsistent NAND address/ECC geometry')
     elif kind=='flash_async':
         n=device['nor']
-        _exact(n, {'command_set','cfi','unlock1','unlock2','cfi_address','sectors','ready_delay_us','requires_fresh_erase'}, 'NOR protocol')
+        _exact(n, {'command_set','cfi','unlock1','unlock2','cfi_address','erase_spans','ready_delay_us','requires_fresh_erase'}, 'NOR protocol')
         if type(n['command_set']) is not int or n['command_set'] not in (1,2) or type(n['cfi']) is not bool:
             fail('NOR requires explicit CFI choice and command set 1/2')
         integer(n['ready_delay_us'],1,1000000,'NOR busy assertion bound')
@@ -308,16 +308,9 @@ def _reference_protocol(device, kind, p):
         for key in ('unlock1','unlock2','cfi_address'):
             integer(n[key],0,p['bytes']-1,'NOR command byte offset')
             if n[key]%(p['width']//8): fail('Misaligned NOR byte address')
-        if not isinstance(n['sectors'],list) or not 1<=len(n['sectors'])<=1024:
-            fail('NOR requires complete physical sectors')
-        end=0
-        for sector in n['sectors']:
-            _exact(sector,{'offset','size'},'NOR sector')
-            if sector['offset']!=end: fail('NOR sectors must cover physical Flash in order')
-            integer(sector['size'],1,p['bytes']-end,'NOR sector bytes')
-            if sector['size']%(p['width']//8): fail('NOR sector is not a whole bus unit')
-            end+=sector['size']
-        if end!=p['bytes']: fail('NOR sectors must cover every declared byte')
+        from tools.configure.memory import flash_erase_spans
+        flash_erase_spans({"size": p["bytes"], "erase_spans": n["erase_spans"]},
+                          program_unit=p["width"] // 8)
 
 
 def _reference_resolve(device, controller, kind, bindings, routes, claim, conditions):
@@ -412,11 +405,11 @@ def _reference_constructor(item,result):
             facts='s_nx_fsmc_'+suffix+'_config_'+endpoint
             geometry='s_nx_fsmc_geometry_'+endpoint
             if nor:
-                sectors='s_nx_fsmc_sectors_'+endpoint;protocol=child.options.nor
-                definitions += [f'static const nx_flash_sector_t {sectors}[] = {{']
-                definitions += [f'    {{ {sector.offset}u, {sector.size}u }},' for sector in protocol.sectors]
+                spans='s_nx_fsmc_erase_spans_'+endpoint;protocol=child.options.nor
+                definitions += [f'static const nx_flash_erase_span_t {spans}[] = {{']
+                definitions += [f'    {{ {span.offset}u, {span.erase_bytes}u, {span.count}u }},' for span in protocol.erase_spans]
                 definitions += ['};',f'static const nx_flash_geometry_t {geometry} = {{',
-                    f'    {child.options.address}u, {p.bytes}u, {p.width//8}u, {sectors}, {len(protocol.sectors)}u, {"NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE" if protocol.requires_fresh_erase else "0u"}','};',
+                    f'    {child.options.address}u, {p.bytes}u, {p.width//8}u, {spans}, {len(protocol.erase_spans)}u, {"NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE" if protocol.requires_fresh_erase else "0u"}','};',
                     f'static const nx_stm32_fsmc_nor_config_t {facts} = {{',
                     f'    &{geometry}, {protocol.unlock1}u, {protocol.unlock2}u, {protocol.cfi_address}u, {protocol.command_set}u, {str(protocol.cfi).lower()}, {protocol.ready_delay_us}u','};']
                 typename='nx_flash_async_port_t';operations='nx_stm32_fsmc_nor_async_ops'
@@ -428,7 +421,7 @@ def _reference_constructor(item,result):
                 typename='nx_nand_port_t';operations='nx_stm32_fsmc_nand_ops'
             definitions.append(f'static nx_stm32_fsmc_{suffix}_t {context};')
             if nor:
-                definitions += [f'static const nx_flash_port_t s_nx_fsmc_flash_{endpoint} = {{',
+                definitions += [f'static const nx_flash_port_t s_nx_flash_readonly_{endpoint} = {{',
                     f'    &nx_stm32_fsmc_nor_flash_ops, &{context}','};']
             start.append(DirectCall('nx_stm32_fsmc_'+suffix+'_prepare',(Address(context),Address(bus),index,Address(facts))))
             stop.append(DirectCall('nx_stm32_fsmc_'+suffix+'_close',(Address(context),)))

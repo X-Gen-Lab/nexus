@@ -6,5 +6,5 @@
 #ifndef NEXUS_STM32F407_ETH_FRAMES_H
 #define NEXUS_STM32F407_ETH_FRAMES_H
 #include "eth_frames_mac.h"
-#include "stm32f407xx.h"
+#include "stm32f4xx.h"
 #endif

@@ -142,6 +142,23 @@ TEST_F(ClassicCan, CompletionRacingCancellationPreservesWireSuccess) {
     ASSERT_EQ(nx_can_port_cancel(&port, &requests[0]), NX_SUCCESS);
     EXPECT_EQ(requests[0].base.result, NX_SUCCESS);
 }
+TEST_F(ClassicCan,
+       ExhaustedDrainBudgetQuarantinesUntilRealAbortAcknowledgement) {
+    model.hardware.hold_abort = true;
+    ASSERT_EQ(nx_can_port_submit(&port, &requests[0]), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(UINT64_MAX - 101U), NX_SUCCESS);
+    ASSERT_EQ(nx_can_port_cancel(&port, &requests[0]), NX_SUCCESS);
+    ASSERT_EQ(nx_can_port_service(&port), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&requests[0].base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(model.controller.slots[0].request, &requests[0]);
+    EXPECT_EQ(nx_can_port_stop(&port), NX_ERROR_BUSY);
+    ASSERT_EQ(nx_native_can_complete(&model, 0U, NX_ERROR_CANCELLED),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_can_port_service(&port), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&requests[0].base), NX_REQUEST_SETTLED);
+    /* Cancellation first services the already expired transfer deadline. */
+    EXPECT_EQ(requests[0].base.result, NX_ERROR_TIMEOUT);
+}
 TEST_F(ClassicCan, TimeoutUsesAbsoluteDeadlineAndRetainsAbortResponsibility) {
     model.hardware.hold_abort = true;
     ASSERT_EQ(nx_can_port_submit(&port, &requests[0]), NX_SUCCESS);

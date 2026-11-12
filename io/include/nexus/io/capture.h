@@ -1,6 +1,6 @@
 /**
  * \file            capture.h
- * \brief           Explicit camera snapshots and raw storage block streams
+ * \brief           Explicit camera snapshots and opaque storage block streams
  * \author          Nexus Team
  */
 #ifndef NEXUS_IO_CAPTURE_H
@@ -34,6 +34,25 @@ typedef struct {
     size_t storage_bytes;
 } nx_capture_request_t;
 
+/** \brief A finite series of complete snapshot frames with explicit gaps.
+ * \note base.transferred counts successfully published whole frames, including
+ *       a valid prefix on failure. storage_bytes is each RAW exact frame size
+ *       or each JPEG capacity; JPEG words include hardware padding, not an
+ *       exact codestream length. frame_count and deadline are positive/finite.
+ *       Each frame fully joins source/FIFO/DMA/IRQs/addresses before publish
+ *       and rearm. This is CM1 snapshots with gaps, never gapless CM0 capture.
+ *       Missing free slots leaves the source off while the session deadline
+ *       continues. Stop cancels and joins this session; it cannot revoke
+ *       READY/BORROWED consumer frames, which retain their independent loans.
+ */
+typedef struct {
+    nx_request_t base;
+    nx_stream_t* destination;
+    nx_frame_stream_t* raw_frame;
+    size_t storage_bytes;
+    size_t frame_count;
+} nx_capture_frames_request_t;
+
 /** \brief Selected camera operation; no sensor, clock or codec policy.
  * \note One privileged serialized task owns every operation.
  *       IRQ entries only latch hardware observations in provider state. The
@@ -47,7 +66,10 @@ typedef struct {
  *       observing disabled DMA and detached IRQs; it never resets shared DMA.
  *       Recovery invalidates format configuration. Join and restart Platform
  *       before submitting a new capture after a successful recovery.
- *       Blocks are RAW storage chunks, NOT images or an exact frame counter.
+ *       Blocks are RAW storage chunks or native 32-bit JPEG storage words,
+ *       NOT images or an exact frame counter. JPEG words may include frame-end
+ *       zero padding; block length is never a JPEG codestream byte length.
+ *       No frame-boundary flags or parser are supplied for continuous blocks.
  *       Missing replacement or ambiguous DMA bank progress halts with LOSS;
  *       READY/BORROWED blocks are never reused. Stop does not revoke consumer
  *       blocks, which remain with the original stream until explicitly freed.
@@ -60,6 +82,8 @@ typedef struct {
     nx_result_t (*cancel)(void* context, nx_capture_request_t* request);
     nx_result_t (*stop)(void* context);
     nx_result_t (*recover)(void* context);
+    nx_result_t (*start_frames)(void* context,
+                                nx_capture_frames_request_t* request);
 } nx_capture_ops_t;
 
 /** \brief Immutable selected controller face; context outlives every loan. */

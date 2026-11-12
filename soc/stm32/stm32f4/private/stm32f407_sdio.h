@@ -55,7 +55,8 @@ typedef struct {
     bool block_mode;
     bool increment;
     bool draining;
-    bool dma_complete;
+    bool dma_complete; /**< Observed terminal receipt, not media completion. */
+    bool dma_started;
 } nx_stm32_sdio_async_state_t;
 
 /** \brief Exact six/ten-pad socket, selected engine and finite bounds. */
@@ -99,6 +100,7 @@ typedef struct {
     bool selected;
     bool protocol_started;
     bool programming_pending;
+    bool transfer_pending; /**< Issued command requires media repair. */
     bool removed;
 } nx_stm32_sdio_state_t;
 
@@ -129,8 +131,10 @@ void nx_stm32_sdio_dma_irq(nx_stm32_sdio_state_t* state);
  * \param[in,out] receipt: Zero entry owner, retained through failed cleanup.
  * \return Success or refusal with any partial effects in the same receipt.
  * \note Privileged unmasked Thread startup. Platform already owns GPIOC/D (and
- * GPIOB for MMC8) clocks and the HSE8/PLL168 time domain with live 48 MHz PLLQ
- * output. The selected finite engine leases fixed IRQ vectors. Platform owns
+ * GPIOB for MMC8) clocks and the selected static ClockPlan: nominal PLL48 is
+ * exactly 48 MHz; PCLK2 supports an even wire divider satisfying RM0090
+ * section 31.2 and ES0182 section 2.4.6 for the selected bus width.
+ * The finite engine leases fixed IRQ vectors. Platform owns
  *       the DMA2 gate before DMA preparation; only submit enables a stream.
  *       This owner does not enable USB, discover media or create a task.
  */
@@ -147,7 +151,10 @@ nx_result_t nx_stm32_sdio_prepare(nx_stm32_sdio_state_t* state,
  * access ends at each synchronous return or acquire-observed asynchronous
  * SETTLED. Uncertain card programming is
  * separate: a deadline or clock-gate write cannot prove media completion. No
- * implicit card replacement or power cycle occurs.
+ * implicit card replacement or power cycle occurs. A TX FIFO copy can outlive
+ * SETTLED without retaining caller RAM: it keeps the cold owner and makes
+ * DMA submission and close return BUSY. No isolated FIFO reset is provided;
+ * the caller must arrange system recovery without disrupting peer DMA owners.
  */
 nx_result_t nx_stm32_sdio_close(nx_stm32_sdio_state_t* state,
                                 const nx_stm32_sdio_config_t* config,

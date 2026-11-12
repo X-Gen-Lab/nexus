@@ -66,7 +66,11 @@ DAC_DMA_ROUTES = MappingProxyType({
 
 CONTROLLER_BINDINGS = (
     ControllerBinding("ADC123", "adc_group", 2, (("ADC", 18),), (
-        ("regular-sequence-dma", ((2, 0, 0),)),)),
+        ("regular-sequence-dma", ((2, 0, 0),)),
+        ("regular-blocks", ((2, 0, 0),)),
+        ("regular-software-injected-blocks", ((2, 0, 0),)),
+        ("regular-timer-injected-blocks", ((2, 0, 0),)),
+        ("regular-auto-injected", ((2, 0, 0),)),)),
     uart_binding("USART1", 2, 37, (2, 7, 4), (2, 2, 4)),
     uart_binding("USART2", 1, 38, (1, 6, 4), (1, 5, 4)),
     uart_binding("USART3", 1, 39, (1, 3, 4), (1, 1, 4)),
@@ -92,9 +96,6 @@ CONTROLLER_BINDINGS = (
 DMA_IRQS = ((1, (11, 12, 13, 14, 15, 16, 17, 47)),
             (2, (56, 57, 58, 59, 60, 68, 69, 70)))
 FIXED_DMA = fixed_dma_bindings(CONTROLLER_BINDINGS)
-CONTROLLER_PAIRS = MappingProxyType({
-    "uart": ("USART1", "USART2"), "spi": ("SPI1", "SPI2"),
-    "i2c": ("I2C1", "I2C2")})
 SECONDARY_FACTS = MappingProxyType({
     "USART2": MappingProxyType({
         "kind": "uart", "modes": ("dma-tx", "irq-byte-event", "rx-dma-idle",

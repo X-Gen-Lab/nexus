@@ -66,6 +66,8 @@ def _staged_sources(root):
                           capture_output=True, text=True, timeout=30).stdout.strip()
     def relevant(path):
         name = path.relative_to(root).as_posix()
+        if check.is_adjacent_source(root, path):
+            return True
         if name.startswith("docs/"):
             parts = path.relative_to(root / "docs").parts
             return (parts[0] != "api"
@@ -81,7 +83,8 @@ def _staged_sources(root):
     indexed_names = subprocess.run(["git", "ls-files", "-z", "--", "docs/", "Doxyfile",
                                    "dependencies/docs-*", "tools/__init__.py",
                                    "tools/documentation/",
-                                   "tools/configure/", "boards/", "soc/"],
+                                   "tools/configure/", *check.OWNED_MARKDOWN_ROOTS,
+                                   *check.ROOT_MARKDOWN],
                                    cwd=root, check=True, capture_output=True,
                                    timeout=30).stdout.split(b"\0")
     indexed_paths = {root / os.fsdecode(name) for name in indexed_names if name}
@@ -93,6 +96,7 @@ def _staged_sources(root):
                           if path.is_file() and relevant(path)
                           and "__pycache__" not in path.parts)
     candidates.update(check.dependencies(root))
+    candidates.update(check.adjacent_sources(root))
     for path in sorted(candidates):
         relative = path.relative_to(root).as_posix()
         indexed = subprocess.run(["git", "show", ":" + relative], cwd=root,
@@ -229,11 +233,14 @@ def build(root, destination, *, language="all", tool_prefix=None, timeout=600):
                            + 'PROJECT_NUMBER = "' + policy["semantic_version"] + '"\n')
         receipts.append(_execute([str(prefix / "bin/doxygen"), str(doxygen)],
                                  root, environment, workspace, "doxygen", timeout))
+        # Doxygen field labels need stable gettext keys across output languages;
+        # HTML rendering below still selects each requested language.
         environment.update({"NEXUS_DOCS_REVISION": source["commit"],
                             "NEXUS_DOCS_CODE_REVISION": source["commit"],
                             "NEXUS_DOCS_VERSION": policy["semantic_version"],
-                            "NEXUS_DOCS_LANGUAGES": ",".join(languages),
-                            "NEXUS_DOCS_LANGUAGE": languages[0],
+                            "NEXUS_DOCS_LANGUAGES": ",".join(
+                                dict.fromkeys(("en", *languages))),
+                            "NEXUS_DOCS_LANGUAGE": "en",
                             "NEXUS_DOCS_DOXYGEN_XML": str(api_work / "xml"),
                             "NEXUS_DOCS_GETTEXT_ROOT": str(workspace / "gettext")})
         base = [str(python), "-m", "sphinx", "-n", "-W", "--keep-going",
@@ -246,6 +253,7 @@ def build(root, destination, *, language="all", tool_prefix=None, timeout=600):
         if translation_report["errors"]:
             raise ValueError("translation gate failed: " + "\n".join(translation_report["errors"]))
         metadata["translations"] = translation_report
+        environment["NEXUS_DOCS_LANGUAGES"] = ",".join(languages)
         for selected in languages:
             environment["NEXUS_DOCS_LANGUAGE"] = selected
             command = base + ["-E", "-b", "html", "-D", "language=" + selected,

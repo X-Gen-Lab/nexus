@@ -1,0 +1,96 @@
+schema = 2
+board_package = "ve_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 32768
+flash_load_limit_bytes = 65536
+
+[exti.edge0]
+binding = "edge0"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge1]
+binding = "edge1"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge2]
+binding = "edge2"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge3]
+binding = "edge3"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge4]
+binding = "edge4"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge5]
+binding = "edge5"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge6]
+binding = "edge6"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge7]
+binding = "edge7"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge8]
+binding = "edge8"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge9]
+binding = "edge9"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge10]
+binding = "edge10"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge11]
+binding = "edge11"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge12]
+binding = "edge12"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge13]
+binding = "edge13"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge14]
+binding = "edge14"
+mode = "hardware-event"
+edge = "both"
+
+[exti.edge15]
+binding = "edge15"
+mode = "hardware-event"
+edge = "both"
+
+[gpio.drive]
+binding = "drive"
+mode = "output"
+speed = "high"

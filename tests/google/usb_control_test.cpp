@@ -61,8 +61,8 @@ nx_result_t RejectSetup(void* context, uint64_t epoch) {
 }
 const nx_usb_setup_decision_ops_t setup_ops = {RejectSetup};
 const nx_usb_endpoint_ops_t endpoint_ops = {Submit, Cancel, Stall};
-const nx_usb_device_ops_t device_ops = {Service, nullptr, State,
-                                        Address, nullptr, Stop};
+const nx_usb_device_ops_t device_ops = {Service, nullptr, State,   Address,
+                                        nullptr, Stop,    nullptr, nullptr};
 
 class UsbControl : public testing::Test {
   protected:
@@ -103,6 +103,12 @@ class UsbControl : public testing::Test {
             return epoch == observed.epoch ? NX_SUCCESS : NX_ERROR_STATE;
         });
         ON_CALL(ports, Service()).WillByDefault([this] {
+            /* Observe the currently borrowed lane, never the last submit. */
+            if (control.borrowed[1]) {
+                inner = &control.packets[1];
+            } else if (control.borrowed[0]) {
+                inner = &control.packets[0];
+            }
             return observed.started ? NX_SUCCESS : NX_ERROR_STATE;
         });
         ON_CALL(ports, State(_)).WillByDefault([this](auto* state) {
@@ -318,6 +324,13 @@ TEST_F(UsbControl, ExactLengthReplySkipsDataZlpAndDoesNotPipelinePackets) {
 TEST_F(UsbControl, SupersedingSetupDrainsOldPacketBeforeNewAdmission) {
     observed.setup.request_type = 128U;
     observed.setup.length = 8U;
+    EXPECT_CALL(ports, Submit(false, _)).WillOnce([this](bool, auto* packet) {
+        return Admit(packet);
+    });
+    EXPECT_CALL(ports, Cancel(false, _)).WillOnce([](bool, auto* packet) {
+        nx_request_settle(&packet->base, NX_ERROR_CANCELLED, 0U);
+        return NX_SUCCESS;
+    });
     EXPECT_CALL(ports, Submit(true, _)).WillOnce([this](bool, auto* p) {
         return Admit(p);
     });
@@ -336,6 +349,7 @@ TEST_F(UsbControl, SupersedingSetupDrainsOldPacketBeforeNewAdmission) {
         999U; /* Authoritative state survives a full event ring. */
     ASSERT_EQ(nx_usb_control_step(&control), NX_SUCCESS);
     EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(nx_usb_control_step(&control), NX_SUCCESS);
     nx_usb_control_request_t next{};
     nx_request_initialize(&next.base);
     ASSERT_EQ(
@@ -453,6 +467,13 @@ TEST_F(UsbControl, StaleOutApprovalCannotAcknowledgeOrStallNewSetup) {
 TEST_F(UsbControl, DeadlineRetainsPacketUntilItsIndependentDrainCompletes) {
     observed.setup.request_type = 128U;
     observed.setup.length = 8U;
+    EXPECT_CALL(ports, Submit(false, _)).WillOnce([this](bool, auto* packet) {
+        return Admit(packet);
+    });
+    EXPECT_CALL(ports, Cancel(false, _)).WillOnce([](bool, auto* packet) {
+        nx_request_settle(&packet->base, NX_ERROR_CANCELLED, 0U);
+        return NX_SUCCESS;
+    });
     EXPECT_CALL(ports, Submit(true, _)).WillOnce([this](bool, auto* p) {
         return Admit(p);
     });
@@ -468,6 +489,7 @@ TEST_F(UsbControl, DeadlineRetainsPacketUntilItsIndependentDrainCompletes) {
     ASSERT_EQ(nx_native_clock_advance(10U), NX_SUCCESS);
     ASSERT_EQ(nx_usb_control_step(&control), NX_SUCCESS);
     EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(nx_usb_control_step(&control), NX_SUCCESS);
     EXPECT_EQ(
         nx_usb_control_in_prepare(&request, payload, 8U, 7U, NX_DEADLINE_NEVER),
         NX_ERROR_STATE);
@@ -517,6 +539,16 @@ TEST_F(UsbControl, SeparateControllerOwnersCannotCancelEachOthersLoan) {
         *value = other_state;
         return NX_SUCCESS;
     });
+    EXPECT_CALL(ports, Submit(false, _)).WillOnce([this](bool, auto* packet) {
+        return Admit(packet);
+    });
+    EXPECT_CALL(other_ports, Submit(false, _)).WillOnce([](bool, auto* packet) {
+        return nx_request_admit(&packet->base, NX_REQUEST_ACTIVE);
+    });
+    EXPECT_CALL(other_ports, Cancel(false, _)).WillOnce([](bool, auto* packet) {
+        nx_request_settle(&packet->base, NX_ERROR_CANCELLED, 0U);
+        return NX_SUCCESS;
+    });
     EXPECT_CALL(ports, Submit(true, _)).WillOnce([this](bool, auto* p) {
         return Admit(p);
     });
@@ -550,10 +582,16 @@ TEST_F(UsbControl, SeparateControllerOwnersCannotCancelEachOthersLoan) {
     ASSERT_EQ(nx_usb_control_cancel(&other, &other_request, 9U), NX_SUCCESS);
     ASSERT_EQ(nx_usb_control_step(&other), NX_SUCCESS);
     ASSERT_EQ(nx_usb_control_step(&other), NX_SUCCESS);
+    ASSERT_EQ(nx_usb_control_step(&other), NX_SUCCESS);
     EXPECT_EQ(nx_request_state(&other_request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(other_request.base.result, NX_ERROR_CANCELLED);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+    EXPECT_CALL(ports, Cancel(false, _)).WillOnce([](bool, auto* packet) {
+        nx_request_settle(&packet->base, NX_ERROR_CANCELLED, 0U);
+        return NX_SUCCESS;
+    });
     nx_request_settle(&inner->base, NX_ERROR_IO, 0U);
+    ASSERT_EQ(nx_usb_control_step(&control), NX_SUCCESS);
     ASSERT_EQ(nx_usb_control_step(&control), NX_SUCCESS);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
 }
@@ -630,3 +668,141 @@ TEST_F(UsbControl, UnalignedAdapterRejectsBeforeAnyProviderReadOrOutputWrite) {
     EXPECT_EQ(std::memcmp(raw, before, sizeof(raw)), 0);
 }
 } /* namespace */
+
+/** \brief Model quiescence joins every accepted test-port loan on exit. */
+class UsbControlDuplex : public UsbControl {
+  protected:
+    nx_usb_request_t* data_packet = nullptr;
+    nx_usb_request_t* status_packet = nullptr;
+    void TearDown() override {
+        for (unsigned lane = 0U; lane < 2U; ++lane) {
+            if (control.borrowed[lane]) {
+                auto* packet = &control.packets[lane];
+                if (nx_request_state(&packet->base) != NX_REQUEST_SETTLED) {
+                    nx_request_settle(&packet->base, NX_ERROR_CANCELLED, 0U);
+                }
+                EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&packet->base));
+                control.borrowed[lane] = false;
+            }
+        }
+        if (control.active != nullptr) {
+            observed.started = false;
+            observed.closing = true;
+            (void)nx_usb_control_step(&control);
+        }
+        UsbControl::TearDown();
+    }
+};
+class UsbControlEarlyStatus : public UsbControlDuplex,
+                              public testing::WithParamInterface<bool> {};
+TEST_P(UsbControlEarlyStatus, StatusAckJoinsBothLoansBeforeReleasingTheReply) {
+    observed.setup.request_type = 0x80U;
+    observed.setup.length = 128U;
+    EXPECT_CALL(ports, Submit(false, _)).WillOnce([this](bool, auto* packet) {
+        status_packet = packet;
+        EXPECT_EQ(NX_USB_STATUS, packet->stage);
+        EXPECT_EQ(0U, packet->length);
+        return Admit(packet);
+    });
+    EXPECT_CALL(ports, Submit(true, _)).WillOnce([this](bool, auto* packet) {
+        data_packet = packet;
+        EXPECT_NE(nullptr, status_packet);
+        return Admit(packet);
+    });
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_initialize(&control, &profile));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_in_prepare(
+                              &request, payload, sizeof(payload), 7U, 100000U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_begin(&control, &request));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_step(&control));
+    ASSERT_NE(nullptr, status_packet);
+    ASSERT_NE(nullptr, data_packet);
+    EXPECT_TRUE(control.borrowed[0]);
+    EXPECT_TRUE(control.borrowed[1]);
+    nx_request_settle(&status_packet->base, NX_SUCCESS, 0U);
+    observed.control_pending = false;
+    EXPECT_CALL(ports, Cancel(true, data_packet))
+        .WillOnce([](bool, auto* packet) {
+            return nx_request_transition(&packet->base, NX_REQUEST_DRAINING);
+        });
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_step(&control));
+    ASSERT_NE(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, control.active);
+    EXPECT_TRUE(control.borrowed[1]);
+    ASSERT_EQ(NX_SUCCESS, nx_request_transition(&data_packet->base,
+                                                NX_REQUEST_QUARANTINED));
+    (void)nx_usb_control_step(&control);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, control.active);
+    observed.epoch = observed.setup.epoch = 8U;
+    observed.control_pending = true;
+    const size_t confirmed = GetParam() ? sizeof(payload) : 0U;
+    nx_request_settle(&data_packet->base,
+                      GetParam() ? NX_SUCCESS : NX_ERROR_CANCELLED, confirmed);
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_step(&control));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_SUCCESS, request.base.result);
+    EXPECT_EQ(confirmed, request.base.transferred);
+    EXPECT_EQ(nullptr, control.active);
+    EXPECT_FALSE(control.borrowed[0]);
+    EXPECT_FALSE(control.borrowed[1]);
+}
+INSTANTIATE_TEST_SUITE_P(CancelledOrReallyAcknowledgedData,
+                         UsbControlEarlyStatus, testing::Values(false, true));
+
+TEST_F(UsbControlDuplex, RejectedDataCannotReleaseTheArmedStatusLoan) {
+    observed.setup.request_type = 0x80U;
+    observed.setup.length = 128U;
+    EXPECT_CALL(ports, Stop()).Times(0);
+    EXPECT_CALL(ports, Submit(false, _)).WillOnce([this](bool, auto* packet) {
+        status_packet = packet;
+        return Admit(packet);
+    });
+    EXPECT_CALL(ports, Submit(true, _)).WillOnce(Return(NX_ERROR_INVALID));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_initialize(&control, &profile));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_in_prepare(
+                              &request, payload, sizeof(payload), 7U, 100000U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_begin(&control, &request));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_usb_control_step(&control));
+    ASSERT_NE(nullptr, status_packet);
+    ASSERT_NE(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, control.active);
+    EXPECT_TRUE(control.borrowed[0]);
+    EXPECT_CALL(ports, Cancel(false, status_packet))
+        .WillOnce([](bool, auto* packet) {
+            EXPECT_EQ(NX_SUCCESS, nx_request_transition(&packet->base,
+                                                        NX_REQUEST_DRAINING));
+            return nx_request_transition(&packet->base, NX_REQUEST_QUARANTINED);
+        });
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_step(&control));
+    (void)nx_usb_control_step(&control);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    nx_request_settle(&status_packet->base, NX_ERROR_CANCELLED, 0U);
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_step(&control));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_INVALID, request.base.result);
+    EXPECT_FALSE(control.borrowed[0]);
+}
+
+TEST_F(UsbControlDuplex, StatusCanCompleteBeforeTheFirstDataSubmission) {
+    observed.setup.request_type = 0x80U;
+    observed.setup.length = 128U;
+    EXPECT_CALL(ports, Submit(false, _)).WillOnce([this](bool, auto* packet) {
+        status_packet = packet;
+        nx_result_t result = Admit(packet);
+        nx_request_settle(&packet->base, NX_SUCCESS, 0U);
+        observed.control_pending = false;
+        return result;
+    });
+    EXPECT_CALL(ports, Submit(true, _)).Times(0);
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_initialize(&control, &profile));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_in_prepare(
+                              &request, payload, sizeof(payload), 7U, 100000U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_begin(&control, &request));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_step(&control));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_control_step(&control));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_SUCCESS, request.base.result);
+    EXPECT_EQ(0U, request.base.transferred);
+    EXPECT_FALSE(control.borrowed[0]);
+    EXPECT_FALSE(control.borrowed[1]);
+}

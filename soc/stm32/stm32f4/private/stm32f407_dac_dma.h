@@ -22,6 +22,10 @@ typedef struct {
     uint8_t priority;
     bool circular;
     bool kernel_bound;
+    /** \brief External circular mode leases TIM6/7 only for ES0182 recovery.
+     * \note Internal modes leave NONE; no runtime timer frequency is invented.
+     */
+    nx_stm32_dac_trigger_t recovery_trigger;
 } nx_stm32_dac_dma_config_t;
 /** \brief Only a selected DMA mode owns this finite extension. */
 typedef struct {
@@ -42,6 +46,7 @@ typedef struct {
     bool route_owned;
     bool initialized;
     bool closing;
+    bool clock_restore_pending; /**< Restore even an inherited DAC clock. */
 } nx_stm32_dac_dma_state_t;
 /** \brief Acquire only the selected route; failures keep partial receipts. */
 nx_result_t nx_stm32_dac_dma_prepare(nx_stm32_dac_dma_state_t* state,

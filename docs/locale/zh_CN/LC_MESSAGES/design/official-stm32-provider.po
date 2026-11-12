@@ -7,20 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 62d17f66bb05cc77162eda66eab47bcb9fd0d9d3a83de9312524cf434a42d568\n"
+"X-Nexus-Source-SHA256: a827f6c39aa3b5dd9aeec4ca56360b9d2f789fbf5f60b86ab743692502e9ff05\n"
 
 msgid "Official STM32F4 drivers and Nexus contracts"
 msgstr "官方 STM32F4 驱动与 Nexus 合同"
 
-msgid ""
-"Current production integration is `soc/stm32/stm32f4/`, with concrete "
-"F407VE/ZG implementations. Reuse the locked official F4 HAL/LL and CMSIS "
-"Device sources; keep vendor types and Handles private. Another F4 macro or "
-"SDK directory does not establish a maintained mode, Board route or physical "
-"result."
-msgstr ""
-"当前生产集成为 `soc/stm32/stm32f4/`，具体实现限于 F407VE/ZG。复用锁定的官方 F4 HAL/LL 和 CMSIS "
-"Device 源码；厂商类型和 Handle 保持私有。其他 F4 宏或 SDK 目录不能证明已具备受维护模式、Board 路线或物理结果。"
+msgid "Production integration is `soc/stm32/stm32f4/`. Select reviewed exact device and mode facts from [current support](../delivery/support.md), then reuse the locked F4 HAL/LL and CMSIS Device sources. Vendor types and Handles stay private. Internal-CRC software references for added parts do not qualify every peripheral, Board route or physical behavior."
+msgstr "生产接入位于 `soc/stm32/stm32f4/`。从[当前支持](../delivery/support.md)选择已审精确器件与模式，再复用锁定的 F4 HAL／LL 和 CMSIS Device。厂商类型与 Handle 保持私有。新增料号的内部 CRC 软件参考不授予全部外设、Board 路线或物理行为资格。"
 
 msgid "Responsibility boundary"
 msgstr "职责边界"
@@ -147,6 +140,84 @@ msgid ""
 msgstr ""
 "不得无条件调用 `HAL_Init()`：默认 SysTick 设置与 NVIC 分组必须遵守 Platform 和 RTOS "
 "所有权。使用受维护的时间域，并在进入内核 API 前验证对应的内核 ISR 优先级上限。"
+
+msgid "F407 DAC DMA restart boundary"
+msgstr "F407 DAC DMA 重启边界"
+
+msgid "The selected F407 DAC DMA path handles ES0182 Rev19 section 2.6.1 across requests. After request acceptance, restart first proves that the old DMA, IRQ and addresses are detached. It installs the declared idle code, uses the exclusively owned TIM6/7 hardware trigger to observe UDR, then withdraws DMAEN, converter output and clock before reconfiguring DAC, DMA and trigger state. The same owner retains every partial effect if cleanup or clock restoration fails; a timeout never releases the payload early."
+msgstr "所选 F407 DAC DMA 路径处理跨 request 的 ES0182 Rev19 第 2.6.1 节边界。请求受理后，重启先证明旧 DMA、IRQ 和地址已经退出，安装声明的 idle 码，通过独占 TIM6／7 硬件触发观察 UDR，再撤回 DMAEN、转换器输出和 clock，随后重新配置 DAC、DMA 与 trigger 状态。清理或时钟恢复失败时，同一 owner 保留每个部分效果；timeout 不提前归还 payload。"
+
+msgid "Only UDR induced during the explicitly controlled recovery phase belongs to recovery rather than payload progress or an independent operational error. It does not by itself replace an expired TIMEOUT with IO. Normal operational underrun still requires explicit stop recovery; failed W1C clearing and real DMA errors remain IO with borrows retained. This is not a rule to ignore every UDR observation."
+msgstr "只有显式受控恢复阶段诱发的 UDR 归属恢复，不作为 payload 进度或独立运行故障；它不会单独把已经到期的 TIMEOUT 改为 IO。正常运行欠载仍须显式 stop 恢复；W1C 清零失败和真实 DMA 错误仍是 IO 并保留借用。这不是忽略所有 UDR 观察的规则。"
+
+msgid "Recovery may internally convert the declared idle code before waveform timing starts and briefly disable converter output. These conversions are not payload progress. No uninterrupted analog hold, glitch-free transition or continuous waveform is promised between requests. The C model and ARM image do not establish a silicon-workaround or analog-load qualification. See the [near-source DAC contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md#dac-输出与触发所有权) and public `dac_tx.h` requirements; this is a selected recovery sequence, not a second HAL owner or a general register-script mechanism."
+msgstr "恢复可能在波形计时开始前内部转换所声明的 idle 码，并短暂关闭转换器输出。这些转换不是 payload 进度。两次 request 之间不承诺连续模拟保持、无毛刺切换或连续波形。C 模型与 ARM 镜像不建立硅片勘误方案或模拟负载资格。参见[近源 DAC 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md#dac-输出与触发所有权)和公共 `dac_tx.h` 要求；这是所选恢复序列，不是第二个 HAL owner 或通用寄存器脚本机制。"
+
+msgid "F479 LTDC scanout and DMA2D memory operations"
+msgstr "F479 LTDC 扫描输出与 DMA2D 内存操作"
+
+msgid "The selected software reference is STM32F479NIH6. LTDC uses the reviewed AF14 RGB565 or RGB888 wire route; framebuffer memory independently uses RGB565 or ARGB8888. DMA2D has no external pins or DMA1/2 stream. These selections do not qualify a panel, PCB, external framebuffer, bus bandwidth or physical output. FMC presence alone never adds an external region to either engine's DMA domains."
+msgstr "所选软件参考为 STM32F479NIH6。LTDC 使用经审核的 AF14 RGB565 或 RGB888 线上路线；帧缓冲内存独立选择 RGB565 或 ARGB8888。DMA2D 没有外部引脚，也不取得 DMA1／2 stream。这些选择不建立面板、PCB、外部帧缓冲、总线带宽或物理输出资格。仅存在 FMC 不会把外部区域加入任一引擎的 DMA 域。"
+
+msgid "Exact responsibility"
+msgstr "精确责任"
+
+msgid "System"
+msgstr "System"
+
+msgid "Live bus/time domain and the one PLLSAI plan; LTDC consumes its R output and optional SAI shares Q"
+msgstr "有效总线／时间域和唯一 PLLSAI 计划；LTDC 使用 R 输出，可选 SAI 共享 Q"
+
+msgid "Platform"
+msgstr "Platform"
+
+msgid "GPIO gates, original pad snapshots and final pad restoration"
+msgstr "GPIO 时钟、原引脚快照和最终引脚恢复"
+
+msgid "LTDC"
+msgstr "LTDC"
+
+msgid "One HAL/controller, two IRQs, selected AF14 pad leases, its gate, two active frame loans and one global pending reload"
+msgstr "唯一 HAL／控制器、两个 IRQ、所选 AF14 引脚借用、自有时钟、两个 active frame loans 和一个全局 pending reload"
+
+msgid "DMA2D"
+msgstr "DMA2D"
+
+msgid "One HAL/controller, its gate/IRQ and one operation with independently checked source/destination spans"
+msgstr "唯一 HAL／控制器、自有时钟／IRQ，以及一项源／目标范围独立校验的操作"
+
+msgid "Application"
+msgstr "应用"
+
+msgid "Pixel storage, panel setup, execution progress, wake adapter and recovery policy"
+msgstr "像素存储、面板设置、执行推进、wake 适配和恢复策略"
+
+msgid "The shared source-ownership diagram also applies to these two implementations. Solid edges label runtime interface calls; dashed edges label selected source, SDK and static assembly relationships. It adds no runtime forwarding layer and makes no software or physical qualification claim. The table above states the specific runtime resource ownership for this selected graphics slice."
+msgstr "共享源码归属图也适用于这两个实现。实线标记运行期接口调用，虚线标记所选源码、SDK 和静态装配关系。图不增加运行时转发层，也不建立软件或物理资格。上表说明本图形切片的具体运行期资源所有权。"
+
+msgid "![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)"
+msgstr "![FIG-31：F4 源码归属与接口边界](../assets/diagrams/driver-source-ownership.svg)"
+
+msgid "FIG-31: F4 source ownership and interface boundaries"
+msgstr "FIG-31：F4 源码归属与接口边界"
+
+msgid "Pure `admit` runs before System/GPIO startup. It validates static extents and refuses foreign selected gates or vectors without effects or retained references. `prepare` then acquires each engine's own gate. LTDC programs AF14 through the locked official GPIO HAL and independently checks the resulting fields. Its snapshot storage cannot overlap configuration, layer/region facts, System state or caller pixels. Platform keeps the single original snapshot; the controller withdraws its leased pads to analog after scanout/IRQ retirement, and Platform restores their original values later. Partial failures retain the exact receipt and configuration; they do not authorize reclamation or a second engine owner."
+msgstr "纯 `admit` 在 System／GPIO 启动前执行，校验静态范围并拒绝外来所选 gate 或向量，不产生效果或保留引用。随后 `prepare` 取得各引擎自己的时钟。LTDC 通过锁定的官方 GPIO HAL 配置 AF14，并独立检查实际字段。恢复快照不得覆盖配置、layer／region 事实、System 状态或调用者像素。Platform 保留唯一原快照；控制器在 scanout／IRQ 退出后将借用引脚撤为 analog，Platform 随后恢复原值。部分失败保留精确收条和配置，不授权回收存储或建立第二个引擎 owner。"
+
+msgid "`display` exposes one controller face. `query` and `snapshot` select a physical layer; `stop` covers the whole controller. A frame becoming visible does not end its borrow. A replacement can settle the old frame only after its vertical blanking reload took effect and the relevant active configuration and memory access retirement were proved. The shared shadow bank permits one global pending replacement. Cancelling one layer preserves its peer; stopping the controller joins both layers, all publishers and both IRQs before final release."
+msgstr "`display` 只提供一个控制器 face。`query` 和 `snapshot` 显式选择物理 layer，`stop` 覆盖整个控制器。frame 可见不表示借用结束；只有垂直消隐 reload 真正生效，并证明相关 active 配置与内存读取退出后，替换才能终止旧 frame。共享 shadow bank 只允许一个全局 pending replacement。取消一层保留另一层；停止控制器必须 join 两层、全部 publisher 与两个 IRQ 才能最终释放。"
+
+msgid "LTDC reload/line IRQs capture actual blanking and active-address evidence for the current stage generation and retirement mask. A reload hint alone is not proof. Task `service` checks current geometry/domain and joins references before publishing SETTLED, including when Task execution occurs after the short blanking window. Old-stage or old-domain evidence is unusable. No hidden worker or mandatory high-rate Task polling is introduced. Clock loss, unproved retirement or refused withdrawal retains the affected loans in quarantine. GCR/reset readback or a CPU barrier alone never proves external memory withdrawal."
+msgstr "LTDC reload／line IRQ 在实际消隐中采集与当前 stage 代次、retirement mask 对应的 active 地址证据；仅有 reload hint 不构成证明。Task `service` 检查当前几何／时间域并 join 引用后才发布 SETTLED，即使任务执行已错过短暂消隐窗口。旧 stage 或旧时间域证据不可复用。不引入隐藏 worker 或强制高速 Task 轮询。时钟丢失、无法证明读取退出或拒绝撤回会使相关 loans 保持 quarantine。GCR／reset 读回或单独 CPU 屏障从不证明外部内存退出。"
+
+msgid "DMA2D supports native RGB565/ARGB8888 fill, copy, conversion and straight-alpha blend through the official HAL. Strides use the corresponding source/output pixel width. RGB565-to8888 expands channel bits and adds opaque alpha; 8888-to565 truncates channel low bits. Blend alpha is explicitly multiplied or replaced. RGB at an ARGB result with zero alpha is unspecified; blend-to565 needs a parameter-proven positive input alpha. The provider does not scan pixels to admit an operation, allocate scratch pixels or implement a CPU fallback."
+msgstr "DMA2D 通过官方 HAL 提供原生 RGB565／ARGB8888 fill、copy、格式转换与 straight-alpha blend。stride 使用对应源／输出像素宽度。RGB565 转 8888 扩展通道位并补不透明 alpha，8888 转 565 截去通道低位。blend 显式选择 alpha 相乘或替换；ARGB 结果 alpha 为零时 RGB 未定义，blend 到 565 要求参数能够证明输入 alpha 为正。provider 不扫描像素做准入，不分配 scratch 像素，也不提供 CPU fallback。"
+
+msgid "Every complete source/destination capacity must satisfy reachability and alias checks, including request/control/immutable owner metadata. TC is an intent hint; actual START withdrawal, sources, IRQ, publishers and all address references join before SETTLED. Raw hardware errors are collected before W1C even if no ISR ran. An error cannot preserve an old SUCCESS or a valid-output byte count. An already selected TIMEOUT/CANCELLED remains the first terminal cause; a failed withdrawal still quarantines and retains all storage. Partial output is not rolled back."
+msgstr "全部源／目标 capacity 都必须通过可达性与别名校验，包括 request／control／不可变 owner 元数据。TC 只是完成意图的 hint；实际 START、源、IRQ、publisher 和所有地址引用退出后才发布 SETTLED。即使 ISR 未执行，也在 W1C 前收集原始硬件错误。错误不能保留旧 SUCCESS 或有效输出字节数；此前已选定的 TIMEOUT／CANCELLED 保留为首个终止原因。撤回失败仍 quarantine 并保留全部存储，部分输出不回滚。"
+
+msgid "The authored timing uses pixel/line counts and explicit polarities; the generator only computes static HAL accumulated values. Pixel frequency comes from the single System PLLSAI R plan and must satisfy the selected DS11118 83 MHz nominal limit. This check is not physical oscillator, load or panel qualification. CLUT/extra packed formats, watermark/suspend modes and additional exact parts remain outside this selected graphics slice."
+msgstr "配置时序使用像素／行计数和明确极性；生成器只计算静态 HAL 累计值。像素频率来自唯一 System PLLSAI R 计划，必须满足所选 DS11118 的 83 MHz 名义上限。该检查不是物理振荡器、负载或面板资格。CLUT／额外打包格式、watermark／suspend 模式及其他精确料号仍不在本图形切片范围。"
 
 msgid "Replace a mode and verify it"
 msgstr "替换并验证一个模式"

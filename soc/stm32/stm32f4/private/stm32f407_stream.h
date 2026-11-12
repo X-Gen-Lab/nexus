@@ -84,39 +84,79 @@ typedef struct {
 /** \brief Exact RM0090 Table44 routes, without per-instance route storage. */
 static inline DMA_Stream_TypeDef*
 nx_stm32_adc_dma_memory(const ADC_TypeDef* adc) {
-    return adc == ADC2   ? DMA2_Stream2
-           : adc == ADC3 ? DMA2_Stream1
-                         : DMA2_Stream4;
+#if !defined(ADC2) && !defined(ADC3)
+    (void)adc;
+#endif
+    return
+#if defined(ADC2)
+        adc == ADC2 ? DMA2_Stream2 :
+#endif
+#if defined(ADC3)
+        adc == ADC3 ? DMA2_Stream1
+                    :
+#endif
+                    DMA2_Stream4;
 }
 
 /** \brief The selected converter has one fixed DMA publisher. */
 static inline IRQn_Type nx_stm32_adc_dma_irq(const ADC_TypeDef* adc) {
-    return adc == ADC2   ? DMA2_Stream2_IRQn
-           : adc == ADC3 ? DMA2_Stream1_IRQn
-                         : DMA2_Stream4_IRQn;
+#if !defined(ADC2) && !defined(ADC3)
+    (void)adc;
+#endif
+    return
+#if defined(ADC2)
+        adc == ADC2 ? DMA2_Stream2_IRQn :
+#endif
+#if defined(ADC3)
+        adc == ADC3 ? DMA2_Stream1_IRQn
+                    :
+#endif
+                    DMA2_Stream4_IRQn;
 }
 
 /** \brief Channel selectors are register encodings, not stream indexes. */
 static inline uint32_t nx_stm32_adc_dma_channel(const ADC_TypeDef* adc) {
-    return adc == ADC2 ? DMA_SxCR_CHSEL_0 : adc == ADC3 ? DMA_SxCR_CHSEL_1 : 0U;
+#if !defined(ADC2) && !defined(ADC3)
+    (void)adc;
+#endif
+    return
+#if defined(ADC2)
+        adc == ADC2 ? DMA_SxCR_CHSEL_0 :
+#endif
+#if defined(ADC3)
+        adc == ADC3 ? DMA_SxCR_CHSEL_1
+                    :
+#endif
+                    0U;
 }
 
 /** \brief Normalize one stream's status before interpreting completion. */
 static inline uint32_t
 nx_stm32_adc_dma_flags(const nx_stm32_adc_stream_state_t* state) {
-    return state->adc.registers == ADC2   ? (state->dma->LISR >> 16U) & 0x3DU
-           : state->adc.registers == ADC3 ? (state->dma->LISR >> 6U) & 0x3DU
-                                          : state->dma->HISR & 0x3DU;
+    return
+#if defined(ADC2)
+        state->adc.registers == ADC2 ? (state->dma->LISR >> 16U) & 0x3DU :
+#endif
+#if defined(ADC3)
+        state->adc.registers == ADC3 ? (state->dma->LISR >> 6U) & 0x3DU
+                                     :
+#endif
+                                     state->dma->HISR & 0x3DU;
 }
 
 /** \brief W1C only this lane, preserving every neighbouring DMA owner. */
 static inline void
 nx_stm32_adc_dma_ack(const nx_stm32_adc_stream_state_t* state, uint32_t flags) {
+#if defined(ADC2)
     if (state->adc.registers == ADC2)
         state->dma->LIFCR = flags << 16U;
-    else if (state->adc.registers == ADC3)
+    else
+#endif
+#if defined(ADC3)
+        if (state->adc.registers == ADC3)
         state->dma->LIFCR = flags << 6U;
     else
+#endif
         state->dma->HIFCR = flags;
 }
 
@@ -143,9 +183,12 @@ void nx_stm32_adc_continuous_irq(nx_stm32_adc_continuous_state_t* state);
 nx_result_t nx_stm32_adc_stream_rate(nx_stm32_adc_stream_state_t* state,
                                      uint32_t hz, uint16_t* prescaler,
                                      uint16_t* period);
-/** \brief Shared private all-slot DMA and complete-scan validation. */
+/** \brief Validate all DMA slots against the complete concrete provider.
+ * \note state_bytes includes optional continuous fields beyond the base.
+ */
 nx_result_t nx_stm32_adc_stream_blocks(nx_stm32_adc_stream_state_t* state,
-                                       const nx_stream_t* stream);
+                                       const nx_stream_t* stream,
+                                       size_t state_bytes);
 /** \brief Shared private rank/sample register programming, engines stopped. */
 void nx_stm32_adc_stream_sequence(nx_stm32_adc_stream_state_t* state);
 

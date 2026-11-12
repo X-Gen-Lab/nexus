@@ -7,15 +7,22 @@
       "flash": {
         "origin": 134217728,
         "size": 524288,
-        "erase_blocks": [
-          16384,
-          16384,
-          16384,
-          16384,
-          65536,
-          131072,
-          131072,
-          131072
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 3
+          }
         ]
       },
       "memory": [
@@ -125,19 +132,22 @@
       "flash": {
         "origin": 134217728,
         "size": 1048576,
-        "erase_blocks": [
-          16384,
-          16384,
-          16384,
-          16384,
-          65536,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 7
+          }
         ]
       },
       "memory": [
@@ -273,6 +283,930 @@
         "PH1"
       ],
       "device": "stm32f407"
+    },
+    "STM32F405ZGT6": {
+      "package": "LQFP144",
+      "flash": {
+        "origin": 134217728,
+        "size": 1048576,
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 7
+          }
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 131072,
+          "dma": true,
+          "linker": true
+        },
+        {
+          "id": "ccm",
+          "origin": 268435456,
+          "size": 65536,
+          "dma": false,
+          "linker": false
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD0",
+        "PD1",
+        "PD2",
+        "PD3",
+        "PD4",
+        "PD5",
+        "PD6",
+        "PD7",
+        "PD8",
+        "PD9",
+        "PD10",
+        "PD11",
+        "PD12",
+        "PD13",
+        "PD14",
+        "PD15",
+        "PE0",
+        "PE1",
+        "PE2",
+        "PE3",
+        "PE4",
+        "PE5",
+        "PE6",
+        "PE7",
+        "PE8",
+        "PE9",
+        "PE10",
+        "PE11",
+        "PE12",
+        "PE13",
+        "PE14",
+        "PE15",
+        "PF0",
+        "PF1",
+        "PF2",
+        "PF3",
+        "PF4",
+        "PF5",
+        "PF6",
+        "PF7",
+        "PF8",
+        "PF9",
+        "PF10",
+        "PF11",
+        "PF12",
+        "PF13",
+        "PF14",
+        "PF15",
+        "PG0",
+        "PG1",
+        "PG2",
+        "PG3",
+        "PG4",
+        "PG5",
+        "PG6",
+        "PG7",
+        "PG8",
+        "PG9",
+        "PG10",
+        "PG11",
+        "PG12",
+        "PG13",
+        "PG14",
+        "PG15",
+        "PH0",
+        "PH1"
+      ],
+      "device": "stm32f405"
+    },
+    "STM32F415ZGT6": {
+      "package": "LQFP144",
+      "flash": {
+        "origin": 134217728,
+        "size": 1048576,
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 7
+          }
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 131072,
+          "dma": true,
+          "linker": true
+        },
+        {
+          "id": "ccm",
+          "origin": 268435456,
+          "size": 65536,
+          "dma": false,
+          "linker": false
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD0",
+        "PD1",
+        "PD2",
+        "PD3",
+        "PD4",
+        "PD5",
+        "PD6",
+        "PD7",
+        "PD8",
+        "PD9",
+        "PD10",
+        "PD11",
+        "PD12",
+        "PD13",
+        "PD14",
+        "PD15",
+        "PE0",
+        "PE1",
+        "PE2",
+        "PE3",
+        "PE4",
+        "PE5",
+        "PE6",
+        "PE7",
+        "PE8",
+        "PE9",
+        "PE10",
+        "PE11",
+        "PE12",
+        "PE13",
+        "PE14",
+        "PE15",
+        "PF0",
+        "PF1",
+        "PF2",
+        "PF3",
+        "PF4",
+        "PF5",
+        "PF6",
+        "PF7",
+        "PF8",
+        "PF9",
+        "PF10",
+        "PF11",
+        "PF12",
+        "PF13",
+        "PF14",
+        "PF15",
+        "PG0",
+        "PG1",
+        "PG2",
+        "PG3",
+        "PG4",
+        "PG5",
+        "PG6",
+        "PG7",
+        "PG8",
+        "PG9",
+        "PG10",
+        "PG11",
+        "PG12",
+        "PG13",
+        "PG14",
+        "PG15",
+        "PH0",
+        "PH1"
+      ],
+      "device": "stm32f415"
+    },
+    "STM32F417ZGT6": {
+      "package": "LQFP144",
+      "flash": {
+        "origin": 134217728,
+        "size": 1048576,
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 7
+          }
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 131072,
+          "dma": true,
+          "linker": true
+        },
+        {
+          "id": "ccm",
+          "origin": 268435456,
+          "size": 65536,
+          "dma": false,
+          "linker": false
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD0",
+        "PD1",
+        "PD2",
+        "PD3",
+        "PD4",
+        "PD5",
+        "PD6",
+        "PD7",
+        "PD8",
+        "PD9",
+        "PD10",
+        "PD11",
+        "PD12",
+        "PD13",
+        "PD14",
+        "PD15",
+        "PE0",
+        "PE1",
+        "PE2",
+        "PE3",
+        "PE4",
+        "PE5",
+        "PE6",
+        "PE7",
+        "PE8",
+        "PE9",
+        "PE10",
+        "PE11",
+        "PE12",
+        "PE13",
+        "PE14",
+        "PE15",
+        "PF0",
+        "PF1",
+        "PF2",
+        "PF3",
+        "PF4",
+        "PF5",
+        "PF6",
+        "PF7",
+        "PF8",
+        "PF9",
+        "PF10",
+        "PF11",
+        "PF12",
+        "PF13",
+        "PF14",
+        "PF15",
+        "PG0",
+        "PG1",
+        "PG2",
+        "PG3",
+        "PG4",
+        "PG5",
+        "PG6",
+        "PG7",
+        "PG8",
+        "PG9",
+        "PG10",
+        "PG11",
+        "PG12",
+        "PG13",
+        "PG14",
+        "PG15",
+        "PH0",
+        "PH1"
+      ],
+      "device": "stm32f417"
+    },
+    "STM32F411RET6": {
+      "package": "LQFP64",
+      "flash": {
+        "origin": 134217728,
+        "size": 524288,
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 3
+          }
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 131072,
+          "dma": true,
+          "linker": true
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD2",
+        "PH0",
+        "PH1"
+      ],
+      "device": "stm32f411xe"
+    },
+    "STM32F446ZET6": {
+      "package": "LQFP144",
+      "flash": {
+        "origin": 134217728,
+        "size": 524288,
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 3
+          }
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 131072,
+          "dma": true,
+          "linker": true
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD0",
+        "PD1",
+        "PD2",
+        "PD3",
+        "PD4",
+        "PD5",
+        "PD6",
+        "PD7",
+        "PD8",
+        "PD9",
+        "PD10",
+        "PD11",
+        "PD12",
+        "PD13",
+        "PD14",
+        "PD15",
+        "PE0",
+        "PE1",
+        "PE2",
+        "PE3",
+        "PE4",
+        "PE5",
+        "PE6",
+        "PE7",
+        "PE8",
+        "PE9",
+        "PE10",
+        "PE11",
+        "PE12",
+        "PE13",
+        "PE14",
+        "PE15",
+        "PF0",
+        "PF1",
+        "PF2",
+        "PF3",
+        "PF4",
+        "PF5",
+        "PF6",
+        "PF7",
+        "PF8",
+        "PF9",
+        "PF10",
+        "PF11",
+        "PF12",
+        "PF13",
+        "PF14",
+        "PF15",
+        "PG0",
+        "PG1",
+        "PG2",
+        "PG3",
+        "PG4",
+        "PG5",
+        "PG6",
+        "PG7",
+        "PG8",
+        "PG9",
+        "PG10",
+        "PG11",
+        "PG12",
+        "PG13",
+        "PG14",
+        "PG15",
+        "PH0",
+        "PH1"
+      ],
+      "device": "stm32f446"
+    },
+    "STM32F479NIH6": {
+      "package": "TFBGA216",
+      "flash": {
+        "origin": 134217728,
+        "size": 2097152,
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 7
+          },
+          {
+            "offset": 1048576,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 1114112,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 1179648,
+            "erase_bytes": 131072,
+            "count": 7
+          }
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 327680,
+          "dma": true,
+          "linker": true
+        },
+        {
+          "id": "ccm",
+          "origin": 268435456,
+          "size": 65536,
+          "dma": false,
+          "linker": false
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD0",
+        "PD1",
+        "PD2",
+        "PD3",
+        "PD4",
+        "PD5",
+        "PD6",
+        "PD7",
+        "PD8",
+        "PD9",
+        "PD10",
+        "PD11",
+        "PD12",
+        "PD13",
+        "PD14",
+        "PD15",
+        "PE0",
+        "PE1",
+        "PE2",
+        "PE3",
+        "PE4",
+        "PE5",
+        "PE6",
+        "PE7",
+        "PE8",
+        "PE9",
+        "PE10",
+        "PE11",
+        "PE12",
+        "PE13",
+        "PE14",
+        "PE15",
+        "PF0",
+        "PF1",
+        "PF2",
+        "PF3",
+        "PF4",
+        "PF5",
+        "PF6",
+        "PF7",
+        "PF8",
+        "PF9",
+        "PF10",
+        "PF11",
+        "PF12",
+        "PF13",
+        "PF14",
+        "PF15",
+        "PG0",
+        "PG1",
+        "PG2",
+        "PG3",
+        "PG4",
+        "PG5",
+        "PG6",
+        "PG7",
+        "PG8",
+        "PG9",
+        "PG10",
+        "PG11",
+        "PG12",
+        "PG13",
+        "PG14",
+        "PG15",
+        "PH0",
+        "PH1",
+        "PH2",
+        "PH3",
+        "PH4",
+        "PH5",
+        "PH6",
+        "PH7",
+        "PH8",
+        "PH9",
+        "PH10",
+        "PH11",
+        "PH12",
+        "PH13",
+        "PH14",
+        "PH15",
+        "PI0",
+        "PI1",
+        "PI2",
+        "PI3",
+        "PI4",
+        "PI5",
+        "PI6",
+        "PI7",
+        "PI8",
+        "PI9",
+        "PI10",
+        "PI11",
+        "PI12",
+        "PI13",
+        "PI14",
+        "PI15",
+        "PJ0",
+        "PJ1",
+        "PJ2",
+        "PJ3",
+        "PJ4",
+        "PJ5",
+        "PJ12",
+        "PJ13",
+        "PJ14",
+        "PJ15",
+        "PK3",
+        "PK4",
+        "PK5",
+        "PK6",
+        "PK7"
+      ],
+      "device": "stm32f479"
     }
   },
   "cpu": {
@@ -297,1811 +1231,63 @@
       "apb2_hz": 84000000
     }
   },
-  "controllers": {
-    "GPIOA": {
-      "kind": "gpio",
-      "modes": [
-        "output",
-        "input"
-      ],
-      "irq": [],
-      "pins": [
-        "PA0",
-        "PA1",
-        "PA2",
-        "PA3",
-        "PA4",
-        "PA5",
-        "PA6",
-        "PA7",
-        "PA8",
-        "PA9",
-        "PA10",
-        "PA11",
-        "PA12",
-        "PA13",
-        "PA14",
-        "PA15"
-      ]
-    },
-    "GPIOB": {
-      "kind": "gpio",
-      "modes": [
-        "output",
-        "input"
-      ],
-      "irq": [],
-      "pins": [
-        "PB0",
-        "PB1",
-        "PB2",
-        "PB3",
-        "PB4",
-        "PB5",
-        "PB6",
-        "PB7",
-        "PB8",
-        "PB9",
-        "PB10",
-        "PB11",
-        "PB12",
-        "PB13",
-        "PB14",
-        "PB15"
-      ]
-    },
-    "GPIOE": {
-      "kind": "gpio",
-      "modes": [
-        "output",
-        "input"
-      ],
-      "irq": [],
-      "pins": [
-        "PE0",
-        "PE1",
-        "PE2",
-        "PE3",
-        "PE4",
-        "PE5",
-        "PE6",
-        "PE7",
-        "PE8",
-        "PE9",
-        "PE10",
-        "PE11",
-        "PE12",
-        "PE13",
-        "PE14",
-        "PE15"
-      ]
-    },
-    "GPIOG": {
-      "kind": "gpio",
-      "modes": [
-        "output",
-        "input"
-      ],
-      "irq": [],
-      "pins": [
-        "PG0",
-        "PG1",
-        "PG2",
-        "PG3",
-        "PG4",
-        "PG5",
-        "PG6",
-        "PG7",
-        "PG8",
-        "PG9",
-        "PG10",
-        "PG11",
-        "PG12",
-        "PG13",
-        "PG14",
-        "PG15"
-      ]
-    },
-    "USART1": {
-      "kind": "uart",
-      "clock_domain": "apb2",
-      "modes": [
-        "irq-byte-event",
-        "dma-tx",
-        "irq-blocks",
-        "rx-dma-idle",
-        "dma-duplex",
-        "rx-dma-continuous",
-        "dma-duplex-continuous",
-        "irq-words",
-        "irq-wire"
-      ],
-      "irq": [
-        "USART1_IRQn"
-      ],
-      "pins": [
-        "PA9",
-        "PA10",
-        "PA8",
-        "PA11",
-        "PA12"
-      ]
-    },
-    "SPI1": {
-      "kind": "spi",
-      "clock_domain": "apb2",
-      "modes": [
-        "short-poll",
-        "dma",
-        "irq-frames"
-      ],
-      "irq": [],
-      "pins": [
-        "PA5",
-        "PA6",
-        "PA7",
-        "PB3",
-        "PB4",
-        "PB5",
-        "PA4"
-      ],
-      "max_hz": 42000000
-    },
-    "I2C1": {
-      "kind": "i2c",
-      "modes": [
-        "poll-messages",
-        "irq-messages",
-        "dma-messages"
-      ],
-      "irq": [
-        "I2C1_EV",
-        "I2C1_ER"
-      ],
-      "pins": [
-        "PB6",
-        "PB7",
-        "PB8",
-        "PB9",
-        "PB5"
-      ],
-      "max_hz": 400000,
-      "irq_numbers": {
-        "I2C1_EV": 31,
-        "I2C1_ER": 32
-      },
-      "interfaces": {
-        "i2c_target": [
-          "target-irq",
-          "smbus-device"
-        ]
-      }
-    },
-    "FLASH": {
-      "kind": "flash",
-      "modes": [
-        "poll-word"
-      ],
-      "irq": [
-        "FLASH_IRQn"
-      ],
-      "pins": [],
-      "irq_numbers": {
-        "FLASH_IRQn": 4
-      },
-      "resources": [
-        "irq:FLASH_IRQn"
-      ]
-    },
-    "IWDG": {
-      "kind": "watchdog",
-      "modes": [
-        "independent"
-      ],
-      "irq": [],
-      "pins": []
-    },
-    "WWDG": {
-      "kind": "watchdog",
-      "modes": [
-        "window"
-      ],
-      "irq": [
-        "WWDG_IRQn"
-      ],
-      "irq_numbers": {
-        "WWDG_IRQn": 0
-      },
-      "resources": [
-        "irq:WWDG_IRQn"
-      ],
-      "pins": []
-    },
-    "EXTI0": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI0_IRQn"
-      ],
-      "pins": [
-        "PA0",
-        "PB0",
-        "PC0",
-        "PD0",
-        "PE0",
-        "PF0",
-        "PG0",
-        "PH0"
-      ],
-      "resources": [
-        "exti:line:0"
-      ]
-    },
-    "TIM3": {
-      "kind": "pwm",
-      "modes": [
-        "fixed-pwm"
-      ],
-      "irq": [
-        "TIM3"
-      ],
-      "pins": [
-        "PA6",
-        "PA7",
-        "PB0",
-        "PB1"
-      ],
-      "resources": [
-        "timer:TIM3"
-      ],
-      "interfaces": {
-        "encoder": [
-          "quadrature"
-        ],
-        "timer_capture": [
-          "edge-capture"
-        ],
-        "timer_sequence": [
-          "dma-burst"
-        ],
-        "pwm_group": [
-          "coherent-pwm"
-        ],
-        "timer_pulse": [
-          "one-pulse"
-        ]
-      },
-      "irq_numbers": [
-        29
-      ],
-      "clock_hz": 84000000
-    },
-    "ADC1": {
-      "kind": "adc",
-      "modes": [
-        "single-shot",
-        "low-rate-scan",
-        "trigger-dma",
-        "trigger-dma-continuous",
-        "injected-shot"
-      ],
-      "irq": [],
-      "pins": [
-        "PA0",
-        "PA1",
-        "PA2",
-        "PA3",
-        "PA4",
-        "PA5",
-        "PA6",
-        "PA7",
-        "PB0",
-        "PB1",
-        "PC0",
-        "PC1",
-        "PC2",
-        "PC3",
-        "PC4",
-        "PC5"
-      ]
-    },
-    "EXTI5": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI9_5_IRQn"
-      ],
-      "pins": [
-        "PA5",
-        "PB5",
-        "PC5",
-        "PD5",
-        "PE5",
-        "PF5",
-        "PG5"
-      ],
-      "resources": [
-        "exti:line:5"
-      ]
-    },
-    "EXTI6": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI9_5_IRQn"
-      ],
-      "pins": [
-        "PA6",
-        "PB6",
-        "PC6",
-        "PD6",
-        "PE6",
-        "PF6",
-        "PG6"
-      ],
-      "resources": [
-        "exti:line:6"
-      ]
-    },
-    "CAN1": {
-      "kind": "can",
-      "modes": [
-        "classic-irq"
-      ],
-      "irq": [
-        "CAN1_TX",
-        "CAN1_RX0",
-        "CAN1_RX1",
-        "CAN1_SCE"
-      ],
-      "irq_numbers": [
-        19,
-        20,
-        21,
-        22
-      ],
-      "clock_hz": 42000000,
-      "pins": [
-        "PA11",
-        "PA12",
-        "PB8",
-        "PB9"
-      ]
-    },
-    "CAN2": {
-      "kind": "can",
-      "modes": [
-        "classic-irq"
-      ],
-      "irq": [
-        "CAN2_TX",
-        "CAN2_RX0",
-        "CAN2_RX1",
-        "CAN2_SCE"
-      ],
-      "irq_numbers": [
-        63,
-        64,
-        65,
-        66
-      ],
-      "clock_hz": 42000000,
-      "pins": [
-        "PB12",
-        "PB13"
-      ]
-    },
-    "OTG_FS": {
-      "kind": "usb_device",
-      "modes": [
-        "device-fs",
-        "otg-fs"
-      ],
-      "irq": [
-        "OTG_FS"
-      ],
-      "pins": [
-        "PA11",
-        "PA12"
-      ],
-      "resources": [
-        "clock:USBFS48"
-      ],
-      "irq_numbers": [
-        67
-      ],
-      "clock_hz": 48000000,
-      "fifo_words": 320,
-      "endpoint_numbers": 4,
-      "interfaces": {
-        "usb_host": [
-          "host-fs"
-        ]
-      }
-    },
-    "ETH": {
-      "kind": "eth",
-      "modes": [
-        "raw-rmii",
-        "raw-mii"
-      ],
-      "irq": [
-        "ETH"
-      ],
-      "irq_numbers": [
-        61
-      ],
-      "clock_hz": 168000000,
-      "pins": [
-        "PA1",
-        "PA2",
-        "PA7",
-        "PC1",
-        "PC4",
-        "PC5",
-        "PG11",
-        "PG13",
-        "PG14",
-        "PA0",
-        "PA3",
-        "PB0",
-        "PB1",
-        "PB8",
-        "PB10",
-        "PB11",
-        "PB12",
-        "PB13",
-        "PC2",
-        "PC3"
-      ],
-      "resources": [
-        "clock:ETHMAC",
-        "clock:ETHMACTX",
-        "clock:ETHMACRX",
-        "controller:SYSCFG_RMII"
-      ],
-      "interfaces": {
-        "eth_frames": [
-          "rmii-vlan-sg-ptp",
-          "mii-vlan-sg-ptp"
-        ]
-      }
-    },
-    "TIM4": {
-      "kind": "timer_capture",
-      "modes": [
-        "edge-capture"
-      ],
-      "irq": [
-        "TIM4"
-      ],
-      "irq_numbers": [
-        30
-      ],
-      "clock_hz": 84000000,
-      "pins": [
-        "PB6",
-        "PB7",
-        "PB8",
-        "PB9"
-      ],
-      "resources": [
-        "clock:TIM4"
-      ],
-      "interfaces": {
-        "pwm": [
-          "fixed-pwm"
-        ],
-        "encoder": [
-          "quadrature"
-        ],
-        "timer_sequence": [
-          "dma-burst"
-        ],
-        "pwm_group": [
-          "coherent-pwm"
-        ],
-        "timer_pulse": [
-          "one-pulse"
-        ]
-      }
-    },
-    "TIM1": {
-      "kind": "advanced_pwm",
-      "modes": [
-        "complementary-pwm"
-      ],
-      "irq": [
-        "TIM1_BRK_TIM9",
-        "TIM1_CC"
-      ],
-      "irq_numbers": [
-        24,
-        27
-      ],
-      "clock_hz": 168000000,
-      "pins": [
-        "PA8",
-        "PB13",
-        "PB12",
-        "PA9",
-        "PB14",
-        "PA10",
-        "PB15",
-        "PA11"
-      ],
-      "resources": [
-        "clock:TIM1"
-      ],
-      "interfaces": {
-        "timer_sequence": [
-          "dma-burst"
-        ],
-        "pwm_group": [
-          "coherent-pwm"
-        ],
-        "timer_pulse": [
-          "one-pulse"
-        ],
-        "timer_capture": [
-          "edge-capture"
-        ],
-        "encoder": [
-          "quadrature"
-        ]
-      }
-    },
-    "USART2": {
-      "kind": "uart",
-      "clock_domain": "apb1",
-      "modes": [
-        "dma-tx",
-        "irq-byte-event",
-        "rx-dma-idle",
-        "rx-dma-continuous",
-        "dma-duplex",
-        "dma-duplex-continuous",
-        "irq-words",
-        "irq-blocks",
-        "irq-wire"
-      ],
-      "irq": [
-        "USART2_IRQn"
-      ],
-      "pins": [
-        "PA2",
-        "PA3",
-        "PA4",
-        "PA0",
-        "PA1"
-      ],
-      "clock_hz": 42000000,
-      "max_hz": 1000000
-    },
-    "SPI2": {
-      "kind": "spi",
-      "clock_domain": "apb1",
-      "modes": [
-        "short-poll",
-        "dma",
-        "irq-frames"
-      ],
-      "irq": [],
-      "pins": [
-        "PB13",
-        "PB14",
-        "PB15",
-        "PB12"
-      ],
-      "clock_hz": 42000000,
-      "max_hz": 21000000
-    },
-    "I2C2": {
-      "kind": "i2c",
-      "modes": [
-        "poll-messages",
-        "irq-messages",
-        "dma-messages"
-      ],
-      "irq": [
-        "I2C2_EV",
-        "I2C2_ER"
-      ],
-      "pins": [
-        "PB10",
-        "PB11",
-        "PB12"
-      ],
-      "clock_hz": 42000000,
-      "max_hz": 400000,
-      "irq_numbers": {
-        "I2C2_EV": 33,
-        "I2C2_ER": 34
-      },
-      "interfaces": {
-        "i2c_target": [
-          "target-irq",
-          "smbus-device"
-        ]
-      }
-    },
-    "GPIOC": {
-      "kind": "gpio",
-      "modes": [
-        "output",
-        "input"
-      ],
-      "irq": [],
-      "pins": [
-        "PC0",
-        "PC1",
-        "PC2",
-        "PC3",
-        "PC4",
-        "PC5",
-        "PC6",
-        "PC7",
-        "PC8",
-        "PC9",
-        "PC10",
-        "PC11",
-        "PC12",
-        "PC13",
-        "PC14",
-        "PC15"
-      ]
-    },
-    "GPIOD": {
-      "kind": "gpio",
-      "modes": [
-        "output",
-        "input"
-      ],
-      "irq": [],
-      "pins": [
-        "PD0",
-        "PD1",
-        "PD2",
-        "PD3",
-        "PD4",
-        "PD5",
-        "PD6",
-        "PD7",
-        "PD8",
-        "PD9",
-        "PD10",
-        "PD11",
-        "PD12",
-        "PD13",
-        "PD14",
-        "PD15"
-      ]
-    },
-    "GPIOF": {
-      "kind": "gpio",
-      "modes": [
-        "output",
-        "input"
-      ],
-      "irq": [],
-      "pins": [
-        "PF0",
-        "PF1",
-        "PF2",
-        "PF3",
-        "PF4",
-        "PF5",
-        "PF6",
-        "PF7",
-        "PF8",
-        "PF9",
-        "PF10",
-        "PF11",
-        "PF12",
-        "PF13",
-        "PF14",
-        "PF15"
-      ]
-    },
-    "USART3": {
-      "kind": "uart",
-      "clock_domain": "apb1",
-      "modes": [
-        "irq-byte-event",
-        "dma-tx",
-        "rx-dma-idle",
-        "rx-dma-continuous",
-        "dma-duplex",
-        "dma-duplex-continuous",
-        "irq-words",
-        "irq-blocks",
-        "irq-wire"
-      ],
-      "irq": [
-        "USART3_IRQn"
-      ],
-      "irq_numbers": [
-        39
-      ],
-      "pins": [
-        "PB10",
-        "PB11",
-        "PB12",
-        "PB13",
-        "PB14"
-      ],
-      "clock_hz": 42000000,
-      "max_hz": 1000000
-    },
-    "UART4": {
-      "kind": "uart",
-      "clock_domain": "apb1",
-      "modes": [
-        "irq-byte-event",
-        "dma-tx",
-        "rx-dma-idle",
-        "rx-dma-continuous",
-        "dma-duplex",
-        "dma-duplex-continuous",
-        "irq-words",
-        "irq-blocks",
-        "irq-wire"
-      ],
-      "irq": [
-        "UART4_IRQn"
-      ],
-      "irq_numbers": [
-        52
-      ],
-      "pins": [
-        "PA0",
-        "PA1"
-      ],
-      "clock_hz": 42000000,
-      "max_hz": 1000000
-    },
-    "UART5": {
-      "kind": "uart",
-      "clock_domain": "apb1",
-      "modes": [
-        "irq-byte-event",
-        "dma-tx",
-        "rx-dma-idle",
-        "rx-dma-continuous",
-        "dma-duplex",
-        "dma-duplex-continuous",
-        "irq-words",
-        "irq-blocks",
-        "irq-wire"
-      ],
-      "irq": [
-        "UART5_IRQn"
-      ],
-      "irq_numbers": [
-        53
-      ],
-      "pins": [
-        "PC12",
-        "PD2"
-      ],
-      "clock_hz": 42000000,
-      "max_hz": 1000000
-    },
-    "USART6": {
-      "kind": "uart",
-      "clock_domain": "apb2",
-      "modes": [
-        "irq-byte-event",
-        "dma-tx",
-        "rx-dma-idle",
-        "rx-dma-continuous",
-        "dma-duplex",
-        "dma-duplex-continuous",
-        "irq-words",
-        "irq-blocks",
-        "irq-wire"
-      ],
-      "irq": [
-        "USART6_IRQn"
-      ],
-      "irq_numbers": [
-        71
-      ],
-      "pins": [
-        "PC6",
-        "PC7",
-        "PC8",
-        "PG13",
-        "PG8"
-      ],
-      "clock_hz": 84000000,
-      "max_hz": 1000000
-    },
-    "EXTI7": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI9_5_IRQn"
-      ],
-      "pins": [
-        "PA7",
-        "PB7",
-        "PC7",
-        "PD7",
-        "PE7",
-        "PF7",
-        "PG7"
-      ],
-      "resources": [
-        "exti:line:7"
-      ]
-    },
-    "EXTI8": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI9_5_IRQn"
-      ],
-      "pins": [
-        "PA8",
-        "PB8",
-        "PC8",
-        "PD8",
-        "PE8",
-        "PF8",
-        "PG8"
-      ],
-      "resources": [
-        "exti:line:8"
-      ]
-    },
-    "EXTI9": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI9_5_IRQn"
-      ],
-      "pins": [
-        "PA9",
-        "PB9",
-        "PC9",
-        "PD9",
-        "PE9",
-        "PF9",
-        "PG9"
-      ],
-      "resources": [
-        "exti:line:9"
-      ]
-    },
-    "EXTI11": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI15_10_IRQn"
-      ],
-      "pins": [
-        "PA11",
-        "PB11",
-        "PC11",
-        "PD11",
-        "PE11",
-        "PF11",
-        "PG11"
-      ],
-      "resources": [
-        "exti:line:11"
-      ]
-    },
-    "SDIO": {
-      "kind": "block",
-      "modes": [
-        "sdio-poll",
-        "sdio-irq",
-        "sdio-dma"
-      ],
-      "irq": [
-        "SDIO_IRQn"
-      ],
-      "pins": [
-        "PC8",
-        "PC9",
-        "PC10",
-        "PC11",
-        "PC12",
-        "PD2",
-        "PB8",
-        "PB9",
-        "PC6",
-        "PC7"
-      ],
-      "clock_hz": 48000000,
-      "resources": [
-        "clock:SDIO48"
-      ],
-      "irq_numbers": {
-        "SDIO_IRQn": 49
-      }
-    },
-    "RTC": {
-      "kind": "rtc",
-      "modes": [
-        "adopt-retained",
-        "provision-empty"
-      ],
-      "irq": [],
-      "pins": []
-    },
-    "FSMC": {
-      "kind": "external_bus",
-      "modes": [
-        "async16",
-        "external-memory"
-      ],
-      "irq": [],
-      "pins": [
-        "PB7",
-        "PD0",
-        "PD1",
-        "PD10",
-        "PD11",
-        "PD12",
-        "PD13",
-        "PD14",
-        "PD15",
-        "PD3",
-        "PD4",
-        "PD5",
-        "PD6",
-        "PD7",
-        "PD8",
-        "PD9",
-        "PE0",
-        "PE1",
-        "PE10",
-        "PE11",
-        "PE12",
-        "PE13",
-        "PE14",
-        "PE15",
-        "PE2",
-        "PE3",
-        "PE4",
-        "PE5",
-        "PE6",
-        "PE7",
-        "PE8",
-        "PE9",
-        "PF0",
-        "PF1",
-        "PF12",
-        "PF13",
-        "PF14",
-        "PF15",
-        "PF2",
-        "PF3",
-        "PF4",
-        "PF5",
-        "PG0",
-        "PG1",
-        "PG10",
-        "PG12",
-        "PG13",
-        "PG14",
-        "PG2",
-        "PG3",
-        "PG4",
-        "PG5",
-        "PG9"
-      ],
-      "clock_hz": 168000000,
-      "interfaces": {
-        "memory_window": [
-          "cpu-window",
-          "startup-memory",
-          "psram-window"
-        ],
-        "parallel16": [
-          "8080-16"
-        ],
-        "flash_async": [
-          "nor-cfi"
-        ],
-        "nand": [
-          "raw-page"
-        ]
-      }
-    },
-    "EXTI2": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI2_IRQn"
-      ],
-      "pins": [
-        "PA2",
-        "PB2",
-        "PC2",
-        "PD2",
-        "PE2",
-        "PF2",
-        "PG2"
-      ],
-      "resources": [
-        "exti:line:2"
-      ]
-    },
-    "DAC": {
-      "kind": "dac",
-      "modes": [
-        "direct",
-        "triggered",
-        "noise",
-        "triangle",
-        "trigger-dma",
-        "trigger-dma-circular"
-      ],
-      "irq": [
-        "TIM6_DAC_IRQn"
-      ],
-      "pins": [
-        "PA4",
-        "PA5"
-      ]
-    },
-    "CRC": {
-      "kind": "crc",
-      "modes": [
-        "crc32-words"
-      ],
-      "irq": [],
-      "pins": []
-    },
-    "ADC2": {
-      "kind": "adc",
-      "modes": [
-        "single-shot",
-        "low-rate-scan",
-        "trigger-dma",
-        "trigger-dma-continuous",
-        "injected-shot"
-      ],
-      "irq": [],
-      "pins": [
-        "PA0",
-        "PA1",
-        "PA2",
-        "PA3",
-        "PA4",
-        "PA5",
-        "PA6",
-        "PA7",
-        "PB0",
-        "PB1",
-        "PC0",
-        "PC1",
-        "PC2",
-        "PC3",
-        "PC4",
-        "PC5"
-      ]
-    },
-    "ADC3": {
-      "kind": "adc",
-      "modes": [
-        "single-shot",
-        "low-rate-scan",
-        "trigger-dma",
-        "trigger-dma-continuous",
-        "injected-shot"
-      ],
-      "irq": [],
-      "pins": [
-        "PA0",
-        "PA1",
-        "PA2",
-        "PA3",
-        "PF6",
-        "PF7",
-        "PF8",
-        "PF9",
-        "PF10",
-        "PF3",
-        "PC0",
-        "PC1",
-        "PC2",
-        "PC3",
-        "PF4",
-        "PF5"
-      ]
-    },
-    "SPI3": {
-      "kind": "spi",
-      "clock_domain": "apb1",
-      "modes": [
-        "short-poll",
-        "dma",
-        "irq-frames"
-      ],
-      "irq": [],
-      "pins": [
-        "PC10",
-        "PC11",
-        "PC12",
-        "PB3",
-        "PB4",
-        "PB5",
-        "PA15"
-      ],
-      "clock_hz": 42000000,
-      "max_hz": 21000000
-    },
-    "I2C3": {
-      "kind": "i2c",
-      "modes": [
-        "poll-messages",
-        "irq-messages",
-        "dma-messages"
-      ],
-      "pins": [
-        "PA8",
-        "PC9",
-        "PA9"
-      ],
-      "irq": [
-        "I2C3_EV",
-        "I2C3_ER"
-      ],
-      "clock_hz": 42000000,
-      "irq_numbers": {
-        "I2C3_EV": 72,
-        "I2C3_ER": 73
-      },
-      "max_hz": 400000,
-      "interfaces": {
-        "i2c_target": [
-          "target-irq",
-          "smbus-device"
-        ]
-      }
-    },
-    "TIM5": {
-      "kind": "pwm",
-      "modes": [
-        "fixed-pwm"
-      ],
-      "irq": [
-        "TIM5"
-      ],
-      "pins": [
-        "PA0",
-        "PA1",
-        "PA2",
-        "PA3"
-      ],
-      "resources": [
-        "timer:TIM5"
-      ],
-      "interfaces": {
-        "encoder": [
-          "quadrature"
-        ],
-        "timer_capture": [
-          "edge-capture"
-        ],
-        "timer_sequence": [
-          "dma-burst"
-        ],
-        "pwm_group": [
-          "coherent-pwm"
-        ],
-        "timer_pulse": [
-          "one-pulse"
-        ]
-      },
-      "irq_numbers": [
-        50
-      ],
-      "clock_hz": 84000000
-    },
-    "TIM9": {
-      "kind": "pwm",
-      "modes": [
-        "fixed-pwm"
-      ],
-      "irq": [
-        "TIM1_BRK_TIM9"
-      ],
-      "pins": [
-        "PA2",
-        "PA3"
-      ],
-      "resources": [
-        "timer:TIM9"
-      ],
-      "interfaces": {
-        "pwm_group": [
-          "coherent-pwm"
-        ],
-        "timer_pulse": [
-          "one-pulse"
-        ],
-        "timer_capture": [
-          "edge-capture"
-        ]
-      },
-      "irq_numbers": [
-        24
-      ],
-      "clock_hz": 168000000
-    },
-    "TIM10": {
-      "kind": "pwm",
-      "modes": [
-        "fixed-pwm"
-      ],
-      "irq": [
-        "TIM1_UP_TIM10"
-      ],
-      "pins": [
-        "PB8"
-      ],
-      "resources": [
-        "timer:TIM10"
-      ],
-      "interfaces": {
-        "timer_pulse": [
-          "one-pulse"
-        ],
-        "timer_capture": [
-          "edge-capture"
-        ]
-      },
-      "irq_numbers": [
-        25
-      ],
-      "clock_hz": 168000000
-    },
-    "TIM11": {
-      "kind": "pwm",
-      "modes": [
-        "fixed-pwm"
-      ],
-      "irq": [
-        "TIM1_TRG_COM_TIM11"
-      ],
-      "pins": [
-        "PB9"
-      ],
-      "resources": [
-        "timer:TIM11"
-      ],
-      "interfaces": {
-        "timer_pulse": [
-          "one-pulse"
-        ],
-        "timer_capture": [
-          "edge-capture"
-        ]
-      },
-      "irq_numbers": [
-        26
-      ],
-      "clock_hz": 168000000
-    },
-    "TIM12": {
-      "kind": "pwm",
-      "modes": [
-        "fixed-pwm"
-      ],
-      "irq": [
-        "TIM8_BRK_TIM12"
-      ],
-      "pins": [
-        "PB14",
-        "PB15"
-      ],
-      "resources": [
-        "timer:TIM12"
-      ],
-      "interfaces": {
-        "pwm_group": [
-          "coherent-pwm"
-        ],
-        "timer_pulse": [
-          "one-pulse"
-        ],
-        "timer_capture": [
-          "edge-capture"
-        ]
-      },
-      "irq_numbers": [
-        43
-      ],
-      "clock_hz": 84000000
-    },
-    "TIM13": {
-      "kind": "pwm",
-      "modes": [
-        "fixed-pwm"
-      ],
-      "irq": [
-        "TIM8_UP_TIM13"
-      ],
-      "pins": [
-        "PA6"
-      ],
-      "resources": [
-        "timer:TIM13"
-      ],
-      "interfaces": {
-        "timer_pulse": [
-          "one-pulse"
-        ],
-        "timer_capture": [
-          "edge-capture"
-        ]
-      },
-      "irq_numbers": [
-        44
-      ],
-      "clock_hz": 84000000
-    },
-    "TIM14": {
-      "kind": "pwm",
-      "modes": [
-        "fixed-pwm"
-      ],
-      "irq": [
-        "TIM8_TRG_COM_TIM14"
-      ],
-      "pins": [
-        "PA7"
-      ],
-      "resources": [
-        "timer:TIM14"
-      ],
-      "interfaces": {
-        "timer_pulse": [
-          "one-pulse"
-        ],
-        "timer_capture": [
-          "edge-capture"
-        ]
-      },
-      "irq_numbers": [
-        45
-      ],
-      "clock_hz": 84000000
-    },
-    "EXTI16": {
-      "kind": "exti",
-      "modes": [
-        "pvd-level",
-        "pvd-events"
-      ],
-      "irq": [
-        "PVD_IRQn"
-      ],
-      "pins": [],
-      "resources": [
-        "exti:line:16",
-        "pwr:pvd"
-      ]
-    },
-    "TIM8": {
-      "kind": "advanced_pwm",
-      "modes": [
-        "complementary-pwm"
-      ],
-      "irq": [
-        "TIM8_BRK_TIM12",
-        "TIM8_CC"
-      ],
-      "irq_numbers": [
-        43,
-        46
-      ],
-      "clock_hz": 168000000,
-      "pins": [
-        "PC6",
-        "PA7",
-        "PA6",
-        "PC7",
-        "PB0",
-        "PC8",
-        "PB1",
-        "PC9"
-      ],
-      "resources": [
-        "clock:TIM8"
-      ],
-      "interfaces": {
-        "timer_sequence": [
-          "dma-burst"
-        ],
-        "pwm_group": [
-          "coherent-pwm"
-        ],
-        "timer_pulse": [
-          "one-pulse"
-        ],
-        "timer_capture": [
-          "edge-capture"
-        ],
-        "encoder": [
-          "quadrature"
-        ]
-      }
-    },
-    "ADC123": {
-      "kind": "adc_group",
-      "modes": [
-        "regular-sequence-dma",
-        "injected-sequence"
-      ],
-      "irq": [
-        "ADC_IRQn"
-      ],
-      "pins": [
-        "PA0",
-        "PA1",
-        "PA2",
-        "PA3",
-        "PA4",
-        "PA5",
-        "PA6",
-        "PA7",
-        "PB0",
-        "PB1",
-        "PC0",
-        "PC1",
-        "PC2",
-        "PC3",
-        "PC4",
-        "PC5",
-        "PF10",
-        "PF3",
-        "PF4",
-        "PF5",
-        "PF6",
-        "PF7",
-        "PF8",
-        "PF9"
-      ],
-      "resources": [
-        "controller:ADC1",
-        "controller:ADC2",
-        "controller:ADC3"
-      ]
-    },
-    "DCMI": {
-      "kind": "capture",
-      "modes": [
-        "snapshot-raw",
-        "snapshot-jpeg",
-        "raw-blocks"
-      ],
-      "irq": [
-        "DCMI_IRQn"
-      ],
-      "pins": [
-        "PA6",
-        "PA4",
-        "PB7",
-        "PC6",
-        "PC7",
-        "PC8",
-        "PC9",
-        "PC11",
-        "PB6",
-        "PB8",
-        "PB9",
-        "PC10",
-        "PC12",
-        "PB5",
-        "PD2",
-        "PF11",
-        "PG15"
-      ]
-    },
-    "I2S2": {
-      "kind": "audio",
-      "modes": [
-        "master-tx",
-        "master-rx",
-        "master-duplex",
-        "slave-tx",
-        "slave-rx",
-        "slave-duplex"
-      ],
-      "irq": [
-        "SPI2_IRQn"
-      ],
-      "pins": [
-        "PB12",
-        "PB13",
-        "PB14",
-        "PB15",
-        "PC6"
-      ],
-      "resources": [
-        "controller:SPI2"
-      ]
-    },
-    "I2S3": {
-      "kind": "audio",
-      "modes": [
-        "master-tx",
-        "master-rx",
-        "master-duplex",
-        "slave-tx",
-        "slave-rx",
-        "slave-duplex"
-      ],
-      "irq": [
-        "SPI3_IRQn"
-      ],
-      "pins": [
-        "PA15",
-        "PC10",
-        "PC11",
-        "PC12",
-        "PC7"
-      ],
-      "resources": [
-        "controller:SPI3"
-      ]
-    },
-    "RNG": {
-      "kind": "entropy",
-      "modes": [
-        "rng-words"
-      ],
-      "irq": [],
-      "pins": [],
-      "clock_hz": 48000000
-    },
-    "OTG_HS": {
-      "kind": "usb_host",
-      "modes": [
-        "host-hs-fs",
-        "host-hs-ulpi"
-      ],
-      "irq": [
-        "OTG_HS"
-      ],
-      "pins": [
-        "PA3",
-        "PA5",
-        "PB0",
-        "PB1",
-        "PB5",
-        "PB10",
-        "PB11",
-        "PB12",
-        "PB13",
-        "PB14",
-        "PB15",
-        "PC0",
-        "PC2",
-        "PC3"
-      ],
-      "resources": [
-        "clock:USBHS"
-      ],
-      "irq_numbers": [
-        77
-      ],
-      "clock_hz": 48000000,
-      "fifo_words": 1024,
-      "channel_count": 12,
-      "interfaces": {
-        "usb_device": [
-          "device-hs-fs",
-          "device-hs-ulpi",
-          "otg-hs-fs",
-          "otg-hs-ulpi"
-        ]
-      },
-      "endpoint_numbers": 6
-    },
-    "GPIOH": {
-      "kind": "gpio",
-      "modes": [
-        "output",
-        "input"
-      ],
-      "irq": [],
-      "pins": [
-        "PH0",
-        "PH1"
-      ]
-    },
-    "EXTI1": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI1_IRQn"
-      ],
-      "pins": [
-        "PA1",
-        "PB1",
-        "PC1",
-        "PD1",
-        "PE1",
-        "PF1",
-        "PG1",
-        "PH1"
-      ],
-      "resources": [
-        "exti:line:1"
-      ]
-    },
-    "EXTI3": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI3_IRQn"
-      ],
-      "pins": [
-        "PA3",
-        "PB3",
-        "PC3",
-        "PD3",
-        "PE3",
-        "PF3",
-        "PG3"
-      ],
-      "resources": [
-        "exti:line:3"
-      ]
-    },
-    "EXTI4": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI4_IRQn"
-      ],
-      "pins": [
-        "PA4",
-        "PB4",
-        "PC4",
-        "PD4",
-        "PE4",
-        "PF4",
-        "PG4"
-      ],
-      "resources": [
-        "exti:line:4"
-      ]
-    },
-    "EXTI10": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI15_10_IRQn"
-      ],
-      "pins": [
-        "PA10",
-        "PB10",
-        "PC10",
-        "PD10",
-        "PE10",
-        "PF10",
-        "PG10"
-      ],
-      "resources": [
-        "exti:line:10"
-      ]
-    },
-    "EXTI12": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI15_10_IRQn"
-      ],
-      "pins": [
-        "PA12",
-        "PB12",
-        "PC12",
-        "PD12",
-        "PE12",
-        "PF12",
-        "PG12"
-      ],
-      "resources": [
-        "exti:line:12"
-      ]
-    },
-    "EXTI13": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI15_10_IRQn"
-      ],
-      "pins": [
-        "PA13",
-        "PB13",
-        "PC13",
-        "PD13",
-        "PE13",
-        "PF13",
-        "PG13"
-      ],
-      "resources": [
-        "exti:line:13"
-      ]
-    },
-    "EXTI14": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI15_10_IRQn"
-      ],
-      "pins": [
-        "PA14",
-        "PB14",
-        "PC14",
-        "PD14",
-        "PE14",
-        "PF14",
-        "PG14"
-      ],
-      "resources": [
-        "exti:line:14"
-      ]
-    },
-    "EXTI15": {
-      "kind": "exti",
-      "modes": [
-        "edge-event"
-      ],
-      "irq": [
-        "EXTI15_10_IRQn"
-      ],
-      "pins": [
-        "PA15",
-        "PB15",
-        "PC15",
-        "PD15",
-        "PE15",
-        "PF15",
-        "PG15"
-      ],
-      "resources": [
-        "exti:line:15"
-      ]
+  "device_profiles": {
+    "stm32f405": {
+      "controller_groups": [
+        "rm0090-common",
+        "crc-fixed-polynomial"
+      ],
+      "clock_policy": "rm0090-run"
+    },
+    "stm32f407": {
+      "controller_groups": [
+        "rm0090-common",
+        "ethernet-f4",
+        "dcmi-v1",
+        "crc-fixed-polynomial"
+      ],
+      "clock_policy": "rm0090-run"
+    },
+    "stm32f415": {
+      "controller_groups": [
+        "rm0090-common",
+        "crc-fixed-polynomial",
+        "rm0090-basic-crypto"
+      ],
+      "clock_policy": "rm0090-run"
+    },
+    "stm32f417": {
+      "controller_groups": [
+        "rm0090-common",
+        "ethernet-f4",
+        "dcmi-v1",
+        "crc-fixed-polynomial",
+        "rm0090-basic-crypto"
+      ],
+      "clock_policy": "rm0090-run"
+    },
+    "stm32f411xe": {
+      "controller_groups": [
+        "crc-fixed-polynomial"
+      ],
+      "clock_policy": "hsi16-only"
+    },
+    "stm32f446": {
+      "controller_groups": [
+        "crc-fixed-polynomial",
+        "sai1-framed"
+      ],
+      "clock_policy": "hsi16-pllsai-independent-m"
+    },
+    "stm32f479": {
+      "controller_groups": [
+        "crc-fixed-polynomial",
+        "f479-fmc-sdram",
+        "sai1-framed",
+        "f479-graphics",
+        "f479-quadspi-indirect"
+      ],
+      "clock_policy": "hsi16-pllsai-shared-m"
     }
   },
   "reserved_resources": [
@@ -2115,7 +1301,8 @@
   },
   "provenance": [
     "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
-    "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf"
+    "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+    "https://www.st.com/resource/en/datasheet/stm32f415vg.pdf"
   ],
   "can_domain": {
     "primary": "CAN1",
@@ -2125,5 +1312,2244 @@
     ],
     "filter_banks": 28
   },
-  "references": "references.json"
+  "references": "references.json",
+  "controller_groups": {
+    "rm0090-common": {
+      "controllers": {
+        "ADC1": {
+          "kind": "adc",
+          "irq": [],
+          "pins": [
+            "PA0",
+            "PA1",
+            "PA2",
+            "PA3",
+            "PA4",
+            "PA5",
+            "PA6",
+            "PA7",
+            "PB0",
+            "PB1",
+            "PC0",
+            "PC1",
+            "PC2",
+            "PC3",
+            "PC4",
+            "PC5"
+          ]
+        },
+        "ADC123": {
+          "kind": "adc_group",
+          "irq": [
+            "ADC_IRQn"
+          ],
+          "pins": [
+            "PA0",
+            "PA1",
+            "PA2",
+            "PA3",
+            "PA4",
+            "PA5",
+            "PA6",
+            "PA7",
+            "PB0",
+            "PB1",
+            "PC0",
+            "PC1",
+            "PC2",
+            "PC3",
+            "PC4",
+            "PC5",
+            "PF10",
+            "PF3",
+            "PF4",
+            "PF5",
+            "PF6",
+            "PF7",
+            "PF8",
+            "PF9"
+          ],
+          "resources": [
+            "controller:ADC1",
+            "controller:ADC2",
+            "controller:ADC3"
+          ]
+        },
+        "ADC2": {
+          "kind": "adc",
+          "irq": [],
+          "pins": [
+            "PA0",
+            "PA1",
+            "PA2",
+            "PA3",
+            "PA4",
+            "PA5",
+            "PA6",
+            "PA7",
+            "PB0",
+            "PB1",
+            "PC0",
+            "PC1",
+            "PC2",
+            "PC3",
+            "PC4",
+            "PC5"
+          ]
+        },
+        "ADC3": {
+          "kind": "adc",
+          "irq": [],
+          "pins": [
+            "PA0",
+            "PA1",
+            "PA2",
+            "PA3",
+            "PF6",
+            "PF7",
+            "PF8",
+            "PF9",
+            "PF10",
+            "PF3",
+            "PC0",
+            "PC1",
+            "PC2",
+            "PC3",
+            "PF4",
+            "PF5"
+          ]
+        },
+        "CAN1": {
+          "kind": "can",
+          "irq": [
+            "CAN1_TX",
+            "CAN1_RX0",
+            "CAN1_RX1",
+            "CAN1_SCE"
+          ],
+          "irq_numbers": [
+            19,
+            20,
+            21,
+            22
+          ],
+          "clock_hz": 42000000,
+          "pins": [
+            "PA11",
+            "PA12",
+            "PB8",
+            "PB9"
+          ]
+        },
+        "CAN2": {
+          "kind": "can",
+          "irq": [
+            "CAN2_TX",
+            "CAN2_RX0",
+            "CAN2_RX1",
+            "CAN2_SCE"
+          ],
+          "irq_numbers": [
+            63,
+            64,
+            65,
+            66
+          ],
+          "clock_hz": 42000000,
+          "pins": [
+            "PB12",
+            "PB13"
+          ]
+        },
+        "DAC": {
+          "kind": "dac",
+          "irq": [
+            "TIM6_DAC_IRQn"
+          ],
+          "pins": [
+            "PA4",
+            "PA5"
+          ]
+        },
+        "EXTI0": {
+          "kind": "exti",
+          "irq": [
+            "EXTI0_IRQn"
+          ],
+          "pins": [
+            "PA0",
+            "PB0",
+            "PC0",
+            "PD0",
+            "PE0",
+            "PF0",
+            "PG0",
+            "PH0"
+          ],
+          "resources": [
+            "exti:line:0"
+          ]
+        },
+        "EXTI1": {
+          "kind": "exti",
+          "irq": [
+            "EXTI1_IRQn"
+          ],
+          "pins": [
+            "PA1",
+            "PB1",
+            "PC1",
+            "PD1",
+            "PE1",
+            "PF1",
+            "PG1",
+            "PH1"
+          ],
+          "resources": [
+            "exti:line:1"
+          ]
+        },
+        "EXTI10": {
+          "kind": "exti",
+          "irq": [
+            "EXTI15_10_IRQn"
+          ],
+          "pins": [
+            "PA10",
+            "PB10",
+            "PC10",
+            "PD10",
+            "PE10",
+            "PF10",
+            "PG10"
+          ],
+          "resources": [
+            "exti:line:10"
+          ]
+        },
+        "EXTI11": {
+          "kind": "exti",
+          "irq": [
+            "EXTI15_10_IRQn"
+          ],
+          "pins": [
+            "PA11",
+            "PB11",
+            "PC11",
+            "PD11",
+            "PE11",
+            "PF11",
+            "PG11"
+          ],
+          "resources": [
+            "exti:line:11"
+          ]
+        },
+        "EXTI12": {
+          "kind": "exti",
+          "irq": [
+            "EXTI15_10_IRQn"
+          ],
+          "pins": [
+            "PA12",
+            "PB12",
+            "PC12",
+            "PD12",
+            "PE12",
+            "PF12",
+            "PG12"
+          ],
+          "resources": [
+            "exti:line:12"
+          ]
+        },
+        "EXTI13": {
+          "kind": "exti",
+          "irq": [
+            "EXTI15_10_IRQn"
+          ],
+          "pins": [
+            "PA13",
+            "PB13",
+            "PC13",
+            "PD13",
+            "PE13",
+            "PF13",
+            "PG13"
+          ],
+          "resources": [
+            "exti:line:13"
+          ]
+        },
+        "EXTI14": {
+          "kind": "exti",
+          "irq": [
+            "EXTI15_10_IRQn"
+          ],
+          "pins": [
+            "PA14",
+            "PB14",
+            "PC14",
+            "PD14",
+            "PE14",
+            "PF14",
+            "PG14"
+          ],
+          "resources": [
+            "exti:line:14"
+          ]
+        },
+        "EXTI15": {
+          "kind": "exti",
+          "irq": [
+            "EXTI15_10_IRQn"
+          ],
+          "pins": [
+            "PA15",
+            "PB15",
+            "PC15",
+            "PD15",
+            "PE15",
+            "PF15",
+            "PG15"
+          ],
+          "resources": [
+            "exti:line:15"
+          ]
+        },
+        "EXTI16": {
+          "kind": "exti",
+          "irq": [
+            "PVD_IRQn"
+          ],
+          "pins": [],
+          "resources": [
+            "exti:line:16",
+            "pwr:pvd"
+          ]
+        },
+        "EXTI2": {
+          "kind": "exti",
+          "irq": [
+            "EXTI2_IRQn"
+          ],
+          "pins": [
+            "PA2",
+            "PB2",
+            "PC2",
+            "PD2",
+            "PE2",
+            "PF2",
+            "PG2"
+          ],
+          "resources": [
+            "exti:line:2"
+          ]
+        },
+        "EXTI3": {
+          "kind": "exti",
+          "irq": [
+            "EXTI3_IRQn"
+          ],
+          "pins": [
+            "PA3",
+            "PB3",
+            "PC3",
+            "PD3",
+            "PE3",
+            "PF3",
+            "PG3"
+          ],
+          "resources": [
+            "exti:line:3"
+          ]
+        },
+        "EXTI4": {
+          "kind": "exti",
+          "irq": [
+            "EXTI4_IRQn"
+          ],
+          "pins": [
+            "PA4",
+            "PB4",
+            "PC4",
+            "PD4",
+            "PE4",
+            "PF4",
+            "PG4"
+          ],
+          "resources": [
+            "exti:line:4"
+          ]
+        },
+        "EXTI5": {
+          "kind": "exti",
+          "irq": [
+            "EXTI9_5_IRQn"
+          ],
+          "pins": [
+            "PA5",
+            "PB5",
+            "PC5",
+            "PD5",
+            "PE5",
+            "PF5",
+            "PG5"
+          ],
+          "resources": [
+            "exti:line:5"
+          ]
+        },
+        "EXTI6": {
+          "kind": "exti",
+          "irq": [
+            "EXTI9_5_IRQn"
+          ],
+          "pins": [
+            "PA6",
+            "PB6",
+            "PC6",
+            "PD6",
+            "PE6",
+            "PF6",
+            "PG6"
+          ],
+          "resources": [
+            "exti:line:6"
+          ]
+        },
+        "EXTI7": {
+          "kind": "exti",
+          "irq": [
+            "EXTI9_5_IRQn"
+          ],
+          "pins": [
+            "PA7",
+            "PB7",
+            "PC7",
+            "PD7",
+            "PE7",
+            "PF7",
+            "PG7"
+          ],
+          "resources": [
+            "exti:line:7"
+          ]
+        },
+        "EXTI8": {
+          "kind": "exti",
+          "irq": [
+            "EXTI9_5_IRQn"
+          ],
+          "pins": [
+            "PA8",
+            "PB8",
+            "PC8",
+            "PD8",
+            "PE8",
+            "PF8",
+            "PG8"
+          ],
+          "resources": [
+            "exti:line:8"
+          ]
+        },
+        "EXTI9": {
+          "kind": "exti",
+          "irq": [
+            "EXTI9_5_IRQn"
+          ],
+          "pins": [
+            "PA9",
+            "PB9",
+            "PC9",
+            "PD9",
+            "PE9",
+            "PF9",
+            "PG9"
+          ],
+          "resources": [
+            "exti:line:9"
+          ]
+        },
+        "FLASH": {
+          "kind": "flash",
+          "irq": [
+            "FLASH_IRQn"
+          ],
+          "pins": [],
+          "irq_numbers": {
+            "FLASH_IRQn": 4
+          },
+          "resources": [
+            "irq:FLASH_IRQn"
+          ]
+        },
+        "FSMC": {
+          "kind": "external_bus",
+          "irq": [],
+          "pins": [
+            "PB7",
+            "PD0",
+            "PD1",
+            "PD10",
+            "PD11",
+            "PD12",
+            "PD13",
+            "PD14",
+            "PD15",
+            "PD3",
+            "PD4",
+            "PD5",
+            "PD6",
+            "PD7",
+            "PD8",
+            "PD9",
+            "PE0",
+            "PE1",
+            "PE10",
+            "PE11",
+            "PE12",
+            "PE13",
+            "PE14",
+            "PE15",
+            "PE2",
+            "PE3",
+            "PE4",
+            "PE5",
+            "PE6",
+            "PE7",
+            "PE8",
+            "PE9",
+            "PF0",
+            "PF1",
+            "PF12",
+            "PF13",
+            "PF14",
+            "PF15",
+            "PF2",
+            "PF3",
+            "PF4",
+            "PF5",
+            "PG0",
+            "PG1",
+            "PG10",
+            "PG12",
+            "PG13",
+            "PG14",
+            "PG2",
+            "PG3",
+            "PG4",
+            "PG5",
+            "PG9"
+          ],
+          "clock_hz": 168000000
+        },
+        "GPIOA": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PA0",
+            "PA1",
+            "PA2",
+            "PA3",
+            "PA4",
+            "PA5",
+            "PA6",
+            "PA7",
+            "PA8",
+            "PA9",
+            "PA10",
+            "PA11",
+            "PA12",
+            "PA13",
+            "PA14",
+            "PA15"
+          ]
+        },
+        "GPIOB": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PB0",
+            "PB1",
+            "PB2",
+            "PB3",
+            "PB4",
+            "PB5",
+            "PB6",
+            "PB7",
+            "PB8",
+            "PB9",
+            "PB10",
+            "PB11",
+            "PB12",
+            "PB13",
+            "PB14",
+            "PB15"
+          ]
+        },
+        "GPIOC": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PC0",
+            "PC1",
+            "PC2",
+            "PC3",
+            "PC4",
+            "PC5",
+            "PC6",
+            "PC7",
+            "PC8",
+            "PC9",
+            "PC10",
+            "PC11",
+            "PC12",
+            "PC13",
+            "PC14",
+            "PC15"
+          ]
+        },
+        "GPIOD": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PD0",
+            "PD1",
+            "PD2",
+            "PD3",
+            "PD4",
+            "PD5",
+            "PD6",
+            "PD7",
+            "PD8",
+            "PD9",
+            "PD10",
+            "PD11",
+            "PD12",
+            "PD13",
+            "PD14",
+            "PD15"
+          ]
+        },
+        "GPIOE": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PE0",
+            "PE1",
+            "PE2",
+            "PE3",
+            "PE4",
+            "PE5",
+            "PE6",
+            "PE7",
+            "PE8",
+            "PE9",
+            "PE10",
+            "PE11",
+            "PE12",
+            "PE13",
+            "PE14",
+            "PE15"
+          ]
+        },
+        "GPIOF": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PF0",
+            "PF1",
+            "PF2",
+            "PF3",
+            "PF4",
+            "PF5",
+            "PF6",
+            "PF7",
+            "PF8",
+            "PF9",
+            "PF10",
+            "PF11",
+            "PF12",
+            "PF13",
+            "PF14",
+            "PF15"
+          ]
+        },
+        "GPIOG": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PG0",
+            "PG1",
+            "PG2",
+            "PG3",
+            "PG4",
+            "PG5",
+            "PG6",
+            "PG7",
+            "PG8",
+            "PG9",
+            "PG10",
+            "PG11",
+            "PG12",
+            "PG13",
+            "PG14",
+            "PG15"
+          ]
+        },
+        "GPIOH": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PH0",
+            "PH1"
+          ]
+        },
+        "I2C1": {
+          "kind": "i2c",
+          "irq": [
+            "I2C1_EV",
+            "I2C1_ER"
+          ],
+          "pins": [
+            "PB6",
+            "PB7",
+            "PB8",
+            "PB9",
+            "PB5"
+          ],
+          "max_hz": 400000,
+          "irq_numbers": {
+            "I2C1_EV": 31,
+            "I2C1_ER": 32
+          }
+        },
+        "I2C2": {
+          "kind": "i2c",
+          "irq": [
+            "I2C2_EV",
+            "I2C2_ER"
+          ],
+          "pins": [
+            "PB10",
+            "PB11",
+            "PB12"
+          ],
+          "clock_hz": 42000000,
+          "max_hz": 400000,
+          "irq_numbers": {
+            "I2C2_EV": 33,
+            "I2C2_ER": 34
+          }
+        },
+        "I2C3": {
+          "kind": "i2c",
+          "pins": [
+            "PA8",
+            "PC9",
+            "PA9"
+          ],
+          "irq": [
+            "I2C3_EV",
+            "I2C3_ER"
+          ],
+          "clock_hz": 42000000,
+          "irq_numbers": {
+            "I2C3_EV": 72,
+            "I2C3_ER": 73
+          },
+          "max_hz": 400000
+        },
+        "I2S2": {
+          "kind": "audio",
+          "irq": [
+            "SPI2_IRQn"
+          ],
+          "pins": [
+            "PB12",
+            "PB13",
+            "PB14",
+            "PB15",
+            "PC6"
+          ],
+          "resources": [
+            "controller:SPI2"
+          ]
+        },
+        "I2S3": {
+          "kind": "audio",
+          "irq": [
+            "SPI3_IRQn"
+          ],
+          "pins": [
+            "PA15",
+            "PC10",
+            "PC11",
+            "PC12",
+            "PC7"
+          ],
+          "resources": [
+            "controller:SPI3"
+          ]
+        },
+        "IWDG": {
+          "kind": "watchdog",
+          "irq": [],
+          "pins": []
+        },
+        "OTG_FS": {
+          "kind": "usb_device",
+          "irq": [
+            "OTG_FS"
+          ],
+          "pins": [
+            "PA11",
+            "PA12"
+          ],
+          "resources": [
+            "clock:USBFS48"
+          ],
+          "irq_numbers": [
+            67
+          ],
+          "clock_hz": 48000000,
+          "fifo_words": 320,
+          "endpoint_numbers": 4
+        },
+        "OTG_HS": {
+          "kind": "usb_host",
+          "irq": [
+            "OTG_HS"
+          ],
+          "pins": [
+            "PA3",
+            "PA5",
+            "PB0",
+            "PB1",
+            "PB5",
+            "PB10",
+            "PB11",
+            "PB12",
+            "PB13",
+            "PB14",
+            "PB15",
+            "PC0",
+            "PC2",
+            "PC3"
+          ],
+          "resources": [
+            "clock:USBHS"
+          ],
+          "irq_numbers": [
+            77
+          ],
+          "clock_hz": 48000000,
+          "fifo_words": 1024,
+          "channel_count": 12,
+          "endpoint_numbers": 6
+        },
+        "RNG": {
+          "kind": "entropy",
+          "irq": [],
+          "pins": [],
+          "clock_hz": 48000000
+        },
+        "RTC": {
+          "kind": "rtc",
+          "irq": [],
+          "pins": []
+        },
+        "SDIO": {
+          "kind": "block",
+          "irq": [
+            "SDIO_IRQn"
+          ],
+          "pins": [
+            "PC8",
+            "PC9",
+            "PC10",
+            "PC11",
+            "PC12",
+            "PD2",
+            "PB8",
+            "PB9",
+            "PC6",
+            "PC7"
+          ],
+          "clock_hz": 48000000,
+          "resources": [
+            "clock:SDIO48"
+          ],
+          "irq_numbers": {
+            "SDIO_IRQn": 49
+          }
+        },
+        "SPI1": {
+          "kind": "spi",
+          "clock_domain": "apb2",
+          "irq": [],
+          "pins": [
+            "PA5",
+            "PA6",
+            "PA7",
+            "PB3",
+            "PB4",
+            "PB5",
+            "PA4"
+          ],
+          "max_hz": 42000000
+        },
+        "SPI2": {
+          "kind": "spi",
+          "clock_domain": "apb1",
+          "irq": [],
+          "pins": [
+            "PB13",
+            "PB14",
+            "PB15",
+            "PB12"
+          ],
+          "clock_hz": 42000000,
+          "max_hz": 21000000
+        },
+        "SPI3": {
+          "kind": "spi",
+          "clock_domain": "apb1",
+          "irq": [],
+          "pins": [
+            "PC10",
+            "PC11",
+            "PC12",
+            "PB3",
+            "PB4",
+            "PB5",
+            "PA15"
+          ],
+          "clock_hz": 42000000,
+          "max_hz": 21000000
+        },
+        "TIM1": {
+          "kind": "advanced_pwm",
+          "irq": [
+            "TIM1_BRK_TIM9",
+            "TIM1_CC"
+          ],
+          "irq_numbers": [
+            24,
+            27
+          ],
+          "clock_hz": 168000000,
+          "pins": [
+            "PA8",
+            "PB13",
+            "PB12",
+            "PA9",
+            "PB14",
+            "PA10",
+            "PB15",
+            "PA11"
+          ],
+          "resources": [
+            "clock:TIM1"
+          ]
+        },
+        "TIM10": {
+          "kind": "pwm",
+          "irq": [
+            "TIM1_UP_TIM10"
+          ],
+          "pins": [
+            "PB8"
+          ],
+          "resources": [
+            "timer:TIM10"
+          ],
+          "irq_numbers": [
+            25
+          ],
+          "clock_hz": 168000000
+        },
+        "TIM11": {
+          "kind": "pwm",
+          "irq": [
+            "TIM1_TRG_COM_TIM11"
+          ],
+          "pins": [
+            "PB9"
+          ],
+          "resources": [
+            "timer:TIM11"
+          ],
+          "irq_numbers": [
+            26
+          ],
+          "clock_hz": 168000000
+        },
+        "TIM12": {
+          "kind": "pwm",
+          "irq": [
+            "TIM8_BRK_TIM12"
+          ],
+          "pins": [
+            "PB14",
+            "PB15"
+          ],
+          "resources": [
+            "timer:TIM12"
+          ],
+          "irq_numbers": [
+            43
+          ],
+          "clock_hz": 84000000
+        },
+        "TIM13": {
+          "kind": "pwm",
+          "irq": [
+            "TIM8_UP_TIM13"
+          ],
+          "pins": [
+            "PA6"
+          ],
+          "resources": [
+            "timer:TIM13"
+          ],
+          "irq_numbers": [
+            44
+          ],
+          "clock_hz": 84000000
+        },
+        "TIM14": {
+          "kind": "pwm",
+          "irq": [
+            "TIM8_TRG_COM_TIM14"
+          ],
+          "pins": [
+            "PA7"
+          ],
+          "resources": [
+            "timer:TIM14"
+          ],
+          "irq_numbers": [
+            45
+          ],
+          "clock_hz": 84000000
+        },
+        "TIM3": {
+          "kind": "pwm",
+          "irq": [
+            "TIM3"
+          ],
+          "pins": [
+            "PA6",
+            "PA7",
+            "PB0",
+            "PB1"
+          ],
+          "resources": [
+            "timer:TIM3"
+          ],
+          "irq_numbers": [
+            29
+          ],
+          "clock_hz": 84000000
+        },
+        "TIM4": {
+          "kind": "timer_capture",
+          "irq": [
+            "TIM4"
+          ],
+          "irq_numbers": [
+            30
+          ],
+          "clock_hz": 84000000,
+          "pins": [
+            "PB6",
+            "PB7",
+            "PB8",
+            "PB9"
+          ],
+          "resources": [
+            "clock:TIM4"
+          ]
+        },
+        "TIM5": {
+          "kind": "pwm",
+          "irq": [
+            "TIM5"
+          ],
+          "pins": [
+            "PA0",
+            "PA1",
+            "PA2",
+            "PA3"
+          ],
+          "resources": [
+            "timer:TIM5"
+          ],
+          "irq_numbers": [
+            50
+          ],
+          "clock_hz": 84000000
+        },
+        "TIM8": {
+          "kind": "advanced_pwm",
+          "irq": [
+            "TIM8_BRK_TIM12",
+            "TIM8_CC"
+          ],
+          "irq_numbers": [
+            43,
+            46
+          ],
+          "clock_hz": 168000000,
+          "pins": [
+            "PC6",
+            "PA7",
+            "PA6",
+            "PC7",
+            "PB0",
+            "PC8",
+            "PB1",
+            "PC9"
+          ],
+          "resources": [
+            "clock:TIM8"
+          ]
+        },
+        "TIM9": {
+          "kind": "pwm",
+          "irq": [
+            "TIM1_BRK_TIM9"
+          ],
+          "pins": [
+            "PA2",
+            "PA3"
+          ],
+          "resources": [
+            "timer:TIM9"
+          ],
+          "irq_numbers": [
+            24
+          ],
+          "clock_hz": 168000000
+        },
+        "UART4": {
+          "kind": "uart",
+          "clock_domain": "apb1",
+          "irq": [
+            "UART4_IRQn"
+          ],
+          "irq_numbers": [
+            52
+          ],
+          "pins": [
+            "PA0",
+            "PA1"
+          ],
+          "clock_hz": 42000000,
+          "max_hz": 1000000
+        },
+        "UART5": {
+          "kind": "uart",
+          "clock_domain": "apb1",
+          "irq": [
+            "UART5_IRQn"
+          ],
+          "irq_numbers": [
+            53
+          ],
+          "pins": [
+            "PC12",
+            "PD2"
+          ],
+          "clock_hz": 42000000,
+          "max_hz": 1000000
+        },
+        "USART1": {
+          "kind": "uart",
+          "clock_domain": "apb2",
+          "irq": [
+            "USART1_IRQn"
+          ],
+          "pins": [
+            "PA9",
+            "PA10",
+            "PA8",
+            "PA11",
+            "PA12"
+          ]
+        },
+        "USART2": {
+          "kind": "uart",
+          "clock_domain": "apb1",
+          "irq": [
+            "USART2_IRQn"
+          ],
+          "pins": [
+            "PA2",
+            "PA3",
+            "PA4",
+            "PA0",
+            "PA1"
+          ],
+          "clock_hz": 42000000,
+          "max_hz": 1000000
+        },
+        "USART3": {
+          "kind": "uart",
+          "clock_domain": "apb1",
+          "irq": [
+            "USART3_IRQn"
+          ],
+          "irq_numbers": [
+            39
+          ],
+          "pins": [
+            "PB10",
+            "PB11",
+            "PB12",
+            "PB13",
+            "PB14"
+          ],
+          "clock_hz": 42000000,
+          "max_hz": 1000000
+        },
+        "USART6": {
+          "kind": "uart",
+          "clock_domain": "apb2",
+          "irq": [
+            "USART6_IRQn"
+          ],
+          "irq_numbers": [
+            71
+          ],
+          "pins": [
+            "PC6",
+            "PC7",
+            "PC8",
+            "PG13",
+            "PG8"
+          ],
+          "clock_hz": 84000000,
+          "max_hz": 1000000
+        },
+        "WWDG": {
+          "kind": "watchdog",
+          "irq": [
+            "WWDG_IRQn"
+          ],
+          "irq_numbers": {
+            "WWDG_IRQn": 0
+          },
+          "resources": [
+            "irq:WWDG_IRQn"
+          ],
+          "pins": []
+        }
+      },
+      "modes": {
+        "ADC1": {
+          "modes": [
+            "single-shot",
+            "low-rate-scan",
+            "trigger-dma",
+            "trigger-dma-continuous",
+            "injected-shot"
+          ]
+        },
+        "ADC123": {
+          "modes": [
+            "regular-sequence-dma",
+            "injected-sequence",
+            "regular-blocks",
+            "regular-software-injected-blocks",
+            "regular-timer-injected-blocks",
+            "regular-auto-injected"
+          ]
+        },
+        "ADC2": {
+          "modes": [
+            "single-shot",
+            "low-rate-scan",
+            "trigger-dma",
+            "trigger-dma-continuous",
+            "injected-shot"
+          ]
+        },
+        "ADC3": {
+          "modes": [
+            "single-shot",
+            "low-rate-scan",
+            "trigger-dma",
+            "trigger-dma-continuous",
+            "injected-shot"
+          ]
+        },
+        "CAN1": {
+          "modes": [
+            "classic-irq"
+          ]
+        },
+        "CAN2": {
+          "modes": [
+            "classic-irq"
+          ]
+        },
+        "DAC": {
+          "modes": [
+            "direct",
+            "triggered",
+            "noise",
+            "triangle",
+            "trigger-dma",
+            "trigger-dma-circular"
+          ]
+        },
+        "EXTI0": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI1": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI10": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI11": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI12": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI13": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI14": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI15": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI16": {
+          "modes": [
+            "pvd-level",
+            "pvd-events"
+          ]
+        },
+        "EXTI2": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI3": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI4": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI5": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI6": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI7": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI8": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "EXTI9": {
+          "modes": [
+            "edge-event",
+            "hardware-event"
+          ]
+        },
+        "FLASH": {
+          "modes": [
+            "poll-word"
+          ]
+        },
+        "FSMC": {
+          "modes": [
+            "async16",
+            "external-memory"
+          ],
+          "interfaces": {
+            "memory_window": [
+              "cpu-window",
+              "startup-memory",
+              "psram-window"
+            ],
+            "parallel16": [
+              "8080-16"
+            ],
+            "flash_async": [
+              "nor-cfi"
+            ],
+            "nand": [
+              "raw-page"
+            ]
+          }
+        },
+        "GPIOA": {
+          "modes": [
+            "output",
+            "input"
+          ]
+        },
+        "GPIOB": {
+          "modes": [
+            "output",
+            "input"
+          ]
+        },
+        "GPIOC": {
+          "modes": [
+            "output",
+            "input"
+          ]
+        },
+        "GPIOD": {
+          "modes": [
+            "output",
+            "input"
+          ]
+        },
+        "GPIOE": {
+          "modes": [
+            "output",
+            "input"
+          ]
+        },
+        "GPIOF": {
+          "modes": [
+            "output",
+            "input"
+          ]
+        },
+        "GPIOG": {
+          "modes": [
+            "output",
+            "input"
+          ]
+        },
+        "GPIOH": {
+          "modes": [
+            "output",
+            "input"
+          ]
+        },
+        "I2C1": {
+          "modes": [
+            "poll-messages",
+            "irq-messages",
+            "dma-messages"
+          ],
+          "interfaces": {
+            "i2c_target": [
+              "target-irq",
+              "smbus-device"
+            ]
+          }
+        },
+        "I2C2": {
+          "modes": [
+            "poll-messages",
+            "irq-messages",
+            "dma-messages"
+          ],
+          "interfaces": {
+            "i2c_target": [
+              "target-irq",
+              "smbus-device"
+            ]
+          }
+        },
+        "I2C3": {
+          "modes": [
+            "poll-messages",
+            "irq-messages",
+            "dma-messages"
+          ],
+          "interfaces": {
+            "i2c_target": [
+              "target-irq",
+              "smbus-device"
+            ]
+          }
+        },
+        "I2S2": {
+          "modes": [
+            "master-tx",
+            "master-rx",
+            "master-duplex",
+            "slave-tx",
+            "slave-rx",
+            "slave-duplex",
+            "master-tx-blocks",
+            "master-rx-blocks",
+            "master-duplex-blocks",
+            "slave-tx-blocks",
+            "slave-rx-blocks",
+            "slave-duplex-blocks"
+          ]
+        },
+        "I2S3": {
+          "modes": [
+            "master-tx",
+            "master-rx",
+            "master-duplex",
+            "slave-tx",
+            "slave-rx",
+            "slave-duplex",
+            "master-tx-blocks",
+            "master-rx-blocks",
+            "master-duplex-blocks",
+            "slave-tx-blocks",
+            "slave-rx-blocks",
+            "slave-duplex-blocks"
+          ]
+        },
+        "IWDG": {
+          "modes": [
+            "independent"
+          ]
+        },
+        "OTG_FS": {
+          "modes": [
+            "device-fs",
+            "otg-fs"
+          ],
+          "interfaces": {
+            "usb_host": [
+              "host-fs"
+            ]
+          }
+        },
+        "OTG_HS": {
+          "modes": [
+            "host-hs-fs",
+            "host-hs-ulpi"
+          ],
+          "interfaces": {
+            "usb_device": [
+              "device-hs-fs",
+              "device-hs-ulpi",
+              "otg-hs-fs",
+              "otg-hs-ulpi"
+            ]
+          }
+        },
+        "RNG": {
+          "modes": [
+            "rng-words"
+          ]
+        },
+        "RTC": {
+          "modes": [
+            "adopt-retained",
+            "provision-empty"
+          ]
+        },
+        "SDIO": {
+          "modes": [
+            "sdio-poll",
+            "sdio-irq",
+            "sdio-dma"
+          ]
+        },
+        "SPI1": {
+          "modes": [
+            "short-poll",
+            "dma",
+            "irq-frames"
+          ]
+        },
+        "SPI2": {
+          "modes": [
+            "short-poll",
+            "dma",
+            "irq-frames"
+          ]
+        },
+        "SPI3": {
+          "modes": [
+            "short-poll",
+            "dma",
+            "irq-frames"
+          ]
+        },
+        "TIM1": {
+          "modes": [
+            "complementary-pwm"
+          ],
+          "interfaces": {
+            "timer_sequence": [
+              "dma-burst"
+            ],
+            "pwm_group": [
+              "coherent-pwm"
+            ],
+            "timer_pulse": [
+              "one-pulse"
+            ],
+            "timer_capture": [
+              "edge-capture"
+            ],
+            "encoder": [
+              "quadrature"
+            ]
+          }
+        },
+        "TIM10": {
+          "modes": [
+            "fixed-pwm"
+          ],
+          "interfaces": {
+            "timer_pulse": [
+              "one-pulse"
+            ],
+            "timer_capture": [
+              "edge-capture"
+            ]
+          }
+        },
+        "TIM11": {
+          "modes": [
+            "fixed-pwm"
+          ],
+          "interfaces": {
+            "timer_pulse": [
+              "one-pulse"
+            ],
+            "timer_capture": [
+              "edge-capture"
+            ]
+          }
+        },
+        "TIM12": {
+          "modes": [
+            "fixed-pwm"
+          ],
+          "interfaces": {
+            "pwm_group": [
+              "coherent-pwm"
+            ],
+            "timer_pulse": [
+              "one-pulse"
+            ],
+            "timer_capture": [
+              "edge-capture"
+            ]
+          }
+        },
+        "TIM13": {
+          "modes": [
+            "fixed-pwm"
+          ],
+          "interfaces": {
+            "timer_pulse": [
+              "one-pulse"
+            ],
+            "timer_capture": [
+              "edge-capture"
+            ]
+          }
+        },
+        "TIM14": {
+          "modes": [
+            "fixed-pwm"
+          ],
+          "interfaces": {
+            "timer_pulse": [
+              "one-pulse"
+            ],
+            "timer_capture": [
+              "edge-capture"
+            ]
+          }
+        },
+        "TIM3": {
+          "modes": [
+            "fixed-pwm"
+          ],
+          "interfaces": {
+            "encoder": [
+              "quadrature"
+            ],
+            "timer_capture": [
+              "edge-capture"
+            ],
+            "timer_sequence": [
+              "dma-burst"
+            ],
+            "pwm_group": [
+              "coherent-pwm"
+            ],
+            "timer_pulse": [
+              "one-pulse"
+            ]
+          }
+        },
+        "TIM4": {
+          "modes": [
+            "edge-capture"
+          ],
+          "interfaces": {
+            "pwm": [
+              "fixed-pwm"
+            ],
+            "encoder": [
+              "quadrature"
+            ],
+            "timer_sequence": [
+              "dma-burst"
+            ],
+            "pwm_group": [
+              "coherent-pwm"
+            ],
+            "timer_pulse": [
+              "one-pulse"
+            ]
+          }
+        },
+        "TIM5": {
+          "modes": [
+            "fixed-pwm"
+          ],
+          "interfaces": {
+            "encoder": [
+              "quadrature"
+            ],
+            "timer_capture": [
+              "edge-capture"
+            ],
+            "timer_sequence": [
+              "dma-burst"
+            ],
+            "pwm_group": [
+              "coherent-pwm"
+            ],
+            "timer_pulse": [
+              "one-pulse"
+            ]
+          }
+        },
+        "TIM8": {
+          "modes": [
+            "complementary-pwm"
+          ],
+          "interfaces": {
+            "timer_sequence": [
+              "dma-burst"
+            ],
+            "pwm_group": [
+              "coherent-pwm"
+            ],
+            "timer_pulse": [
+              "one-pulse"
+            ],
+            "timer_capture": [
+              "edge-capture"
+            ],
+            "encoder": [
+              "quadrature"
+            ]
+          }
+        },
+        "TIM9": {
+          "modes": [
+            "fixed-pwm"
+          ],
+          "interfaces": {
+            "pwm_group": [
+              "coherent-pwm"
+            ],
+            "timer_pulse": [
+              "one-pulse"
+            ],
+            "timer_capture": [
+              "edge-capture"
+            ]
+          }
+        },
+        "UART4": {
+          "modes": [
+            "irq-byte-event",
+            "dma-tx",
+            "rx-dma-idle",
+            "rx-dma-continuous",
+            "dma-duplex",
+            "dma-duplex-continuous",
+            "irq-words",
+            "irq-blocks",
+            "irq-wire"
+          ]
+        },
+        "UART5": {
+          "modes": [
+            "irq-byte-event",
+            "dma-tx",
+            "rx-dma-idle",
+            "rx-dma-continuous",
+            "dma-duplex",
+            "dma-duplex-continuous",
+            "irq-words",
+            "irq-blocks",
+            "irq-wire"
+          ]
+        },
+        "USART1": {
+          "modes": [
+            "irq-byte-event",
+            "dma-tx",
+            "irq-blocks",
+            "rx-dma-idle",
+            "dma-duplex",
+            "rx-dma-continuous",
+            "dma-duplex-continuous",
+            "irq-words",
+            "irq-wire"
+          ]
+        },
+        "USART2": {
+          "modes": [
+            "dma-tx",
+            "irq-byte-event",
+            "rx-dma-idle",
+            "rx-dma-continuous",
+            "dma-duplex",
+            "dma-duplex-continuous",
+            "irq-words",
+            "irq-blocks",
+            "irq-wire"
+          ]
+        },
+        "USART3": {
+          "modes": [
+            "irq-byte-event",
+            "dma-tx",
+            "rx-dma-idle",
+            "rx-dma-continuous",
+            "dma-duplex",
+            "dma-duplex-continuous",
+            "irq-words",
+            "irq-blocks",
+            "irq-wire"
+          ]
+        },
+        "USART6": {
+          "modes": [
+            "irq-byte-event",
+            "dma-tx",
+            "rx-dma-idle",
+            "rx-dma-continuous",
+            "dma-duplex",
+            "dma-duplex-continuous",
+            "irq-words",
+            "irq-blocks",
+            "irq-wire"
+          ]
+        },
+        "WWDG": {
+          "modes": [
+            "window"
+          ]
+        }
+      }
+    },
+    "ethernet-f4": {
+      "controllers": {
+        "ETH": {
+          "kind": "eth",
+          "irq": [
+            "ETH"
+          ],
+          "irq_numbers": [
+            61
+          ],
+          "clock_hz": 168000000,
+          "pins": [
+            "PA1",
+            "PA2",
+            "PA7",
+            "PC1",
+            "PC4",
+            "PC5",
+            "PG11",
+            "PG13",
+            "PG14",
+            "PA0",
+            "PA3",
+            "PB0",
+            "PB1",
+            "PB8",
+            "PB10",
+            "PB11",
+            "PB12",
+            "PB13",
+            "PC2",
+            "PC3"
+          ],
+          "resources": [
+            "clock:ETHMAC",
+            "clock:ETHMACTX",
+            "clock:ETHMACRX",
+            "controller:SYSCFG_RMII"
+          ]
+        }
+      },
+      "modes": {
+        "ETH": {
+          "modes": [
+            "raw-rmii",
+            "raw-mii"
+          ],
+          "interfaces": {
+            "eth_frames": [
+              "rmii-vlan-sg-ptp",
+              "mii-vlan-sg-ptp"
+            ]
+          }
+        }
+      }
+    },
+    "dcmi-v1": {
+      "controllers": {
+        "DCMI": {
+          "kind": "capture",
+          "irq": [
+            "DCMI_IRQn"
+          ],
+          "pins": [
+            "PA6",
+            "PA4",
+            "PB7",
+            "PC6",
+            "PC7",
+            "PC8",
+            "PC9",
+            "PC11",
+            "PB6",
+            "PB8",
+            "PB9",
+            "PC10",
+            "PC12",
+            "PB5",
+            "PD2",
+            "PF11",
+            "PG15"
+          ]
+        }
+      },
+      "modes": {
+        "DCMI": {
+          "modes": [
+            "snapshot-raw",
+            "snapshot-jpeg",
+            "raw-blocks",
+            "jpeg-blocks",
+            "frames-raw",
+            "frames-jpeg"
+          ]
+        }
+      }
+    },
+    "crc-fixed-polynomial": {
+      "controllers": {
+        "CRC": {
+          "kind": "crc",
+          "irq": [],
+          "pins": []
+        }
+      },
+      "modes": {
+        "CRC": {
+          "modes": [
+            "crc32-words"
+          ]
+        }
+      }
+    },
+    "rm0090-basic-crypto": {
+      "controllers": {
+        "CRYP": {
+          "kind": "cipher",
+          "irq": [
+            "CRYP_IRQn"
+          ],
+          "irq_numbers": [
+            79
+          ],
+          "pins": []
+        },
+        "HASH": {
+          "kind": "hash",
+          "irq": [
+            "HASH_RNG_IRQn"
+          ],
+          "irq_numbers": [
+            80
+          ],
+          "pins": []
+        }
+      },
+      "modes": {
+        "CRYP": {
+          "modes": [
+            "irq-blocks"
+          ]
+        },
+        "HASH": {
+          "modes": [
+            "irq-blocks"
+          ]
+        }
+      }
+    },
+    "f479-fmc-sdram": {
+      "controllers": {
+        "FMC": {
+          "kind": "external_bus",
+          "irq": [
+            "FMC_IRQn"
+          ],
+          "irq_numbers": {
+            "FMC_IRQn": 48
+          },
+          "pins": [
+            "PC0",
+            "PC2",
+            "PC3",
+            "PD0",
+            "PD1",
+            "PD8",
+            "PD9",
+            "PD10",
+            "PD14",
+            "PD15",
+            "PE0",
+            "PE1",
+            "PE7",
+            "PE8",
+            "PE9",
+            "PE10",
+            "PE11",
+            "PE12",
+            "PE13",
+            "PE14",
+            "PE15",
+            "PF0",
+            "PF1",
+            "PF2",
+            "PF3",
+            "PF4",
+            "PF5",
+            "PF11",
+            "PF12",
+            "PF13",
+            "PF14",
+            "PF15",
+            "PG0",
+            "PG1",
+            "PG4",
+            "PG5",
+            "PG8",
+            "PG15"
+          ]
+        }
+      },
+      "modes": {
+        "FMC": {
+          "modes": [
+            "sdram-controller"
+          ],
+          "interfaces": {
+            "memory_window": [
+              "cpu-window"
+            ]
+          }
+        }
+      }
+    },
+    "sai1-framed": {
+      "controllers": {
+        "SAI1": {
+          "kind": "audio",
+          "irq": [
+            "SAI1_IRQn"
+          ],
+          "irq_numbers": {
+            "SAI1_IRQn": 87
+          },
+          "pins": [
+            "PE2",
+            "PE3",
+            "PE4",
+            "PE5",
+            "PE6",
+            "PF7",
+            "PF8",
+            "PF9"
+          ],
+          "clock_domain": "apb2"
+        }
+      },
+      "modes": {
+        "SAI1": {
+          "modes": [
+            "master-tx",
+            "master-rx",
+            "master-duplex",
+            "slave-tx",
+            "slave-rx",
+            "slave-duplex"
+          ]
+        }
+      }
+    },
+    "f479-graphics": {
+      "controllers": {
+        "LTDC": {
+          "kind": "display",
+          "irq": [
+            "LTDC_IRQn",
+            "LTDC_ER_IRQn"
+          ],
+          "irq_numbers": {
+            "LTDC_IRQn": 88,
+            "LTDC_ER_IRQn": 89
+          },
+          "pins": [
+            "PE4",
+            "PE5",
+            "PE6",
+            "PF10",
+            "PG6",
+            "PG10",
+            "PG11",
+            "PG12",
+            "PH2",
+            "PH3",
+            "PH8",
+            "PH9",
+            "PH10",
+            "PH11",
+            "PH12",
+            "PH13",
+            "PH14",
+            "PH15",
+            "PI0",
+            "PI1",
+            "PI2",
+            "PI4",
+            "PI5",
+            "PI6",
+            "PI7",
+            "PI12",
+            "PI13",
+            "PI14"
+          ]
+        },
+        "DMA2D": {
+          "kind": "image",
+          "irq": [
+            "DMA2D_IRQn"
+          ],
+          "irq_numbers": {
+            "DMA2D_IRQn": 90
+          },
+          "pins": []
+        }
+      },
+      "modes": {
+        "LTDC": {
+          "modes": [
+            "rgb-scanout"
+          ]
+        },
+        "DMA2D": {
+          "modes": [
+            "irq-blit"
+          ]
+        }
+      }
+    },
+    "f479-quadspi-indirect": {
+      "controllers": {
+        "QUADSPI": {
+          "kind": "external_bus",
+          "irq": [
+            "QUADSPI_IRQn"
+          ],
+          "irq_numbers": {
+            "QUADSPI_IRQn": 91
+          },
+          "pins": [
+            "PB6",
+            "PF8",
+            "PF9",
+            "PF10"
+          ]
+        }
+      },
+      "modes": {
+        "QUADSPI": {
+          "modes": [
+            "qspi-indirect-sdr"
+          ],
+          "interfaces": {
+            "flash_async": [
+              "nor-indirect"
+            ]
+          }
+        }
+      }
+    }
+  }
 }

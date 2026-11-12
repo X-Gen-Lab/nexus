@@ -174,6 +174,67 @@
           "exclusive": {
             "type": "boolean"
           },
+          "injected": {
+            "type": "object",
+            "properties": {
+              "channels": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "delay_us": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295,
+                "description": "Time interval in microseconds; not a measured hardware guarantee."
+              },
+              "min_interval_us": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295,
+                "description": "Time interval in microseconds; not a measured hardware guarantee."
+              },
+              "sample_times": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "trigger": {
+                "enum": [
+                  "tim1-ch4",
+                  "tim1-trgo",
+                  "tim3-ch2",
+                  "tim3-ch4",
+                  "tim4-ch1",
+                  "tim4-ch2",
+                  "tim4-ch3",
+                  "tim4-trgo",
+                  "tim5-ch4",
+                  "tim5-trgo",
+                  "tim8-ch2",
+                  "tim8-ch3",
+                  "tim8-ch4"
+                ]
+              }
+            },
+            "required": [
+              "channels",
+              "sample_times"
+            ],
+            "additionalProperties": false,
+            "dependentRequired": {
+              "trigger": [
+                "delay_us"
+              ],
+              "delay_us": [
+                "trigger"
+              ]
+            }
+          },
           "irq": {
             "type": "object",
             "properties": {
@@ -191,6 +252,12 @@
               "priority"
             ],
             "additionalProperties": false
+          },
+          "max_service_gap_us": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295,
+            "description": "Time interval in microseconds; not a measured hardware guarantee."
           },
           "mode": {
             "type": "string",
@@ -253,7 +320,41 @@
           "binding",
           "mode"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "regular-auto-injected"
+                }
+              },
+              "required": [
+                "mode"
+              ]
+            },
+            "then": {
+              "properties": {
+                "injected": {
+                  "properties": {
+                    "min_interval_us": false,
+                    "trigger": false,
+                    "delay_us": false
+                  }
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "injected": {
+                  "required": [
+                    "min_interval_us"
+                  ]
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "advanced_pwm": {
@@ -334,6 +435,28 @@
           "cpol_high": {
             "type": "boolean"
           },
+          "first_bit_offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "first_lsb": {
+            "type": "boolean"
+          },
+          "frame_sync_before": {
+            "type": "boolean"
+          },
+          "frame_sync_bits": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "frame_sync_channels": {
+            "type": "boolean"
+          },
+          "frame_sync_high": {
+            "type": "boolean"
+          },
           "irq": {
             "type": "object",
             "properties": {
@@ -352,7 +475,30 @@
             ],
             "additionalProperties": false
           },
+          "max_bit_clock_hz": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295,
+            "description": "Frequency in hertz; exact provider limits still apply."
+          },
           "max_error_ppm": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "max_sample_rate_hz": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295,
+            "description": "Frequency in hertz; exact provider limits still apply."
+          },
+          "max_service_gap_us": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295,
+            "description": "Time interval in microseconds; not a measured hardware guarantee."
+          },
+          "mckdiv": {
             "type": "integer",
             "minimum": 0,
             "maximum": 4294967295
@@ -363,6 +509,9 @@
           "mode": {
             "type": "string",
             "description": "Explicit maintained mode; the product owns service and shutdown."
+          },
+          "no_divider": {
+            "type": "boolean"
           },
           "pll_n": {
             "type": "integer",
@@ -390,7 +539,15 @@
             "maximum": 4294967295,
             "description": "Frequency in hertz; exact provider limits still apply."
           },
+          "sample_rising": {
+            "type": "boolean"
+          },
           "slot_bits": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "slots": {
             "type": "integer",
             "minimum": 0,
             "maximum": 4294967295
@@ -884,6 +1041,45 @@
         "additionalProperties": false
       }
     },
+    "cipher": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string",
+            "description": "Exact reviewed Board binding; no route fallback."
+          },
+          "irq": {
+            "type": "object",
+            "properties": {
+              "calls_os": {
+                "type": "boolean",
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked."
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Logical NVIC priority; lower numeric values are more urgent."
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "additionalProperties": false
+          },
+          "mode": {
+            "type": "string",
+            "description": "Explicit maintained mode; the product owns service and shutdown."
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
+    },
     "clock": {
       "type": "string",
       "description": "Reviewed clock profile matching the Board oscillator facts."
@@ -999,6 +1195,114 @@
         "pll48": {
           "type": "boolean",
           "default": false
+        },
+        "pll_sai": {
+          "type": "object",
+          "properties": {
+            "ltdc": {
+              "type": "object",
+              "properties": {
+                "post_divider": {
+                  "type": "integer",
+                  "enum": [
+                    2,
+                    4,
+                    8,
+                    16
+                  ]
+                },
+                "r": {
+                  "type": "integer",
+                  "minimum": 2,
+                  "maximum": 7
+                }
+              },
+              "required": [
+                "post_divider",
+                "r"
+              ],
+              "additionalProperties": false
+            },
+            "m": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 63
+            },
+            "n": {
+              "type": "integer",
+              "minimum": 50,
+              "maximum": 432
+            },
+            "sai1": {
+              "type": "object",
+              "properties": {
+                "post_divider": {
+                  "type": "integer",
+                  "enum": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    25,
+                    26,
+                    27,
+                    28,
+                    29,
+                    30,
+                    31,
+                    32
+                  ]
+                },
+                "q": {
+                  "type": "integer",
+                  "minimum": 2,
+                  "maximum": 15
+                }
+              },
+              "required": [
+                "post_divider",
+                "q"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "m",
+            "n"
+          ],
+          "additionalProperties": false,
+          "anyOf": [
+            {
+              "required": [
+                "sai1"
+              ]
+            },
+            {
+              "required": [
+                "ltdc"
+              ]
+            }
+          ]
         }
       }
     },
@@ -1112,14 +1416,205 @@
           "output_buffer": {
             "type": "boolean"
           },
+          "recovery_trigger": {
+            "type": "string",
+            "enum": [
+              "tim6-trgo",
+              "tim7-trgo"
+            ]
+          },
           "trigger": {
             "type": "string",
             "enum": [
               "none",
               "software",
               "tim6-trgo",
-              "tim7-trgo"
+              "tim7-trgo",
+              "exti9"
             ]
+          },
+          "trigger_input": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "display": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string",
+            "description": "Exact reviewed Board binding; no route fallback."
+          },
+          "drain_us": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Time interval in microseconds; not a measured hardware guarantee."
+          },
+          "irq": {
+            "type": "object",
+            "properties": {
+              "calls_os": {
+                "type": "boolean",
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked."
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Logical NVIC priority; lower numeric values are more urgent."
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "additionalProperties": false
+          },
+          "layers": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 2,
+            "items": {
+              "type": "object",
+              "properties": {
+                "alpha": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "formats": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "rgb565",
+                      "argb8888"
+                    ]
+                  }
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "layer": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "pixel_alpha": {
+                  "type": "boolean"
+                },
+                "width": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "x": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "y": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "alpha",
+                "formats",
+                "height",
+                "layer",
+                "pixel_alpha",
+                "width",
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "mode": {
+            "type": "string",
+            "description": "Explicit maintained mode; the product owns service and shutdown."
+          },
+          "timing": {
+            "type": "object",
+            "properties": {
+              "clock_polarity": {
+                "enum": [
+                  "normal",
+                  "inverted"
+                ]
+              },
+              "de_polarity": {
+                "enum": [
+                  "active-low",
+                  "active-high"
+                ]
+              },
+              "hback_porch": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "hfront_porch": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "hsync": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "hsync_polarity": {
+                "enum": [
+                  "active-low",
+                  "active-high"
+                ]
+              },
+              "vback_porch": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "vfront_porch": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "vsync": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "vsync_polarity": {
+                "enum": [
+                  "active-low",
+                  "active-high"
+                ]
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "clock_polarity",
+              "de_polarity",
+              "hback_porch",
+              "height",
+              "hfront_porch",
+              "hsync",
+              "hsync_polarity",
+              "vback_porch",
+              "vfront_porch",
+              "vsync",
+              "vsync_polarity",
+              "width"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -1465,6 +1960,12 @@
             "type": "string",
             "description": "Authored controller instance id, not an endpoint id."
           },
+          "mode": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3,
+            "description": "Explicit maintained mode; the product owns service and shutdown."
+          },
           "nor": {
             "type": "object"
           },
@@ -1539,12 +2040,59 @@
         "required": [
           "binding",
           "controller",
-          "nor",
-          "parameters",
-          "read_timing",
-          "write_timing"
+          "parameters"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "binding",
+              "controller",
+              "nor",
+              "parameters",
+              "read_timing",
+              "write_timing"
+            ],
+            "not": {
+              "required": [
+                "mode"
+              ]
+            }
+          },
+          {
+            "required": [
+              "binding",
+              "controller",
+              "mode",
+              "parameters"
+            ],
+            "properties": {
+              "mode": {
+                "const": "nor-indirect",
+                "description": "Explicit maintained mode; the product owns service and shutdown."
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "read_timing"
+                  ]
+                },
+                {
+                  "required": [
+                    "write_timing"
+                  ]
+                },
+                {
+                  "required": [
+                    "nor"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
       }
     },
     "gpio": {
@@ -1596,6 +2144,45 @@
       "type": "object",
       "additionalProperties": {
         "type": "string"
+      }
+    },
+    "hash": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string",
+            "description": "Exact reviewed Board binding; no route fallback."
+          },
+          "irq": {
+            "type": "object",
+            "properties": {
+              "calls_os": {
+                "type": "boolean",
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked."
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Logical NVIC priority; lower numeric values are more urgent."
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "additionalProperties": false
+          },
+          "mode": {
+            "type": "string",
+            "description": "Explicit maintained mode; the product owns service and shutdown."
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
       }
     },
     "i2c": {
@@ -1803,6 +2390,50 @@
         "additionalProperties": false
       }
     },
+    "image": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string",
+            "description": "Exact reviewed Board binding; no route fallback."
+          },
+          "drain_us": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Time interval in microseconds; not a measured hardware guarantee."
+          },
+          "irq": {
+            "type": "object",
+            "properties": {
+              "calls_os": {
+                "type": "boolean",
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked."
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Logical NVIC priority; lower numeric values are more urgent."
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "additionalProperties": false
+          },
+          "mode": {
+            "type": "string",
+            "description": "Explicit maintained mode; the product owns service and shutdown."
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
+    },
     "layout": {
       "type": "string"
     },
@@ -2003,11 +2634,36 @@
         "required": [
           "binding",
           "controller",
-          "mode",
-          "read_timing",
-          "write_timing"
+          "mode"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "read_timing",
+              "write_timing"
+            ]
+          },
+          {
+            "required": [
+              "parameters"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "read_timing"
+                  ]
+                },
+                {
+                  "required": [
+                    "write_timing"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
       }
     },
     "nand": {
@@ -2581,6 +3237,10 @@
               }
             }
           },
+          "lse_bypass": {
+            "type": "boolean",
+            "default": false
+          },
           "mode": {
             "type": "string",
             "description": "Explicit maintained mode; the product owns service and shutdown."
@@ -2635,6 +3295,11 @@
                   {
                     "required": [
                       "initial"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "lse_bypass"
                     ]
                   },
                   {
@@ -3501,6 +4166,9 @@
               "source_active_high"
             ],
             "additionalProperties": false
+          },
+          "remote_wakeup": {
+            "type": "boolean"
           },
           "rx_fifo_words": {
             "type": "integer",

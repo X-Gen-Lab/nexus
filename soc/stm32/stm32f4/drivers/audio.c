@@ -110,8 +110,21 @@ nx_result_t nx_stm32_audio_admit(const nx_stm32_audio_state_t* s,
                                  const nx_stm32_audio_config_t* c) {
     if (!nx_stm32_av_task())
         return NX_ERROR_CONTEXT;
-    if (s == NULL || !valid(c) || s->owned)
+    if (!nx_stm32_av_system_disjoint(s, sizeof(*s)) ||
+        !nx_stm32_av_system_disjoint(c, sizeof(*c)) || !valid(c) || s->owned ||
+        c->common.pin_count > SIZE_MAX / sizeof(*c->common.pins) ||
+        c->common.region_count > SIZE_MAX / sizeof(*c->common.regions) ||
+        !nx_stm32_av_system_disjoint(c->clock, sizeof(*c->clock)) ||
+        !nx_stm32_av_system_disjoint(
+            c->common.pins, c->common.pin_count * sizeof(*c->common.pins)) ||
+        !nx_stm32_av_system_disjoint(c->common.regions,
+                                     c->common.region_count *
+                                         sizeof(*c->common.regions)))
         return NX_ERROR_INVALID;
+    for (size_t i = 0U; i < c->common.pin_count; ++i)
+        if (!nx_stm32_av_system_disjoint(c->common.pins[i].snapshot,
+                                         sizeof(*c->common.pins[i].snapshot)))
+            return NX_ERROR_INVALID;
     RCC_TypeDef* rcc = g_nx_stm32_system.rcc;
     if (rcc == NULL)
         return NX_ERROR_STATE;
@@ -297,7 +310,7 @@ nx_result_t nx_stm32_audio_prepare(nx_stm32_audio_state_t* s,
     s->initialized = true;
     return NX_SUCCESS;
 }
-static bool live(nx_stm32_audio_state_t* s) {
+bool nx_stm32_audio_live(nx_stm32_audio_state_t* s) {
     const nx_stm32_audio_config_t* c = s->config;
     RCC_TypeDef* rcc = g_nx_stm32_system.rcc;
     bool ok = !s->history_lost && g_nx_stm32_system.started &&
@@ -322,7 +335,7 @@ static bool live(nx_stm32_audio_state_t* s) {
         s->history_lost = true;
     return ok;
 }
-static uint32_t status(nx_stm32_audio_state_t* s, SPI_TypeDef* bus) {
+uint32_t nx_stm32_audio_status(nx_stm32_audio_state_t* s, SPI_TypeDef* bus) {
     uint32_t value = NX_AV_READ(&bus->SR);
     if ((value & AUDIO_ERRORS) != 0U) {
         __atomic_fetch_or(&s->events, value & AUDIO_ERRORS, __ATOMIC_RELAXED);
@@ -334,11 +347,20 @@ static uint32_t status(nx_stm32_audio_state_t* s, SPI_TypeDef* bus) {
 void nx_stm32_audio_irq(nx_stm32_audio_state_t* s) {
     if (s == NULL || !s->owned || s->active == NULL)
         return;
-    (void)status(s, s->config->registers);
+    uint32_t errors = nx_stm32_audio_status(s, s->config->registers);
     if (s->config->duplex)
-        (void)status(s, s->config->extension);
+        errors |= nx_stm32_audio_status(s, s->config->extension);
+    if ((errors & AUDIO_ERRORS) != 0U) {
+        /* OVR stays level-active until the task reads DR during its proved
+         * drain. Withdraw our source and vector before returning from IRQ. */
+        (void)nx_stm32_av_bits(&s->config->registers->CR2, SPI_CR2_ERRIE, 0U);
+        if (s->config->duplex)
+            (void)nx_stm32_av_bits(&s->config->extension->CR2, SPI_CR2_ERRIE,
+                                   0U);
+        NX_AV_IRQ_DISABLE(vector(s->config));
+    }
 }
-static bool cycle_delay(nx_stm32_audio_state_t* s, uint32_t bits) {
+bool nx_stm32_audio_cycle_delay(nx_stm32_audio_state_t* s, uint32_t bits) {
     const nx_stm32_audio_config_t* c = s->config;
     uint64_t frequency = (uint64_t)c->actual_rate.numerator_hz * c->slot_bits *
                          (c->standard >= 3U ? 1U : 2U);
@@ -367,7 +389,7 @@ static bool master_receive_terminal(nx_stm32_audio_state_t* s) {
     if (s->terminal_stopped)
         return true;
     SPI_TypeDef* bus = c->registers;
-    uint32_t value = status(s, bus);
+    uint32_t value = nx_stm32_audio_status(s, bus);
     if (s->receive_tail && (value & SPI_SR_RXNE) != 0U) {
         s->result = NX_ERROR_IO;
         return false;
@@ -375,8 +397,9 @@ static bool master_receive_terminal(nx_stm32_audio_state_t* s) {
     uint32_t bits =
         c->sample_bits == 16U && c->slot_bits == 32U && c->standard == 2U ? 17U
                                                                           : 1U;
-    if (!cycle_delay(s, bits) ||
-        (s->receive_tail && (status(s, bus) & SPI_SR_RXNE) != 0U)) {
+    if (!nx_stm32_audio_cycle_delay(s, bits) ||
+        (s->receive_tail &&
+         (nx_stm32_audio_status(s, bus) & SPI_SR_RXNE) != 0U)) {
         s->result = NX_ERROR_IO;
         return false;
     }
@@ -426,10 +449,12 @@ static nx_result_t tx_validate(nx_stm32_audio_state_t* s,
                                nx_audio_request_t* request,
                                nx_frame_dma_view_t* output) {
     nx_frame_dma_loan_t* loan = request->tx;
-    if (loan == NULL || (uintptr_t)loan % _Alignof(nx_frame_dma_loan_t) != 0U ||
-        loan->owner == NULL ||
+    if (!nx_stm32_av_system_disjoint(loan, sizeof(*loan)) ||
+        (uintptr_t)loan % _Alignof(nx_frame_dma_loan_t) != 0U ||
+        !nx_stm32_av_system_disjoint(loan->owner, sizeof(*loan->owner)) ||
         (uintptr_t)loan->owner % _Alignof(nx_frame_stream_t) != 0U ||
-        loan->owner->stream == NULL ||
+        !nx_stm32_av_system_disjoint(loan->owner->stream,
+                                     sizeof(*loan->owner->stream)) ||
         (uintptr_t)loan->owner->stream % _Alignof(nx_stream_t) != 0U ||
         loan->identity != loan || !contiguous_frame(loan->owner))
         return NX_ERROR_INVALID;
@@ -448,7 +473,10 @@ static nx_result_t tx_validate(nx_stm32_audio_state_t* s,
     if (result != NX_SUCCESS)
         return result;
     nx_stream_t* stream = loan->owner->stream;
-    if (nx_stm32_av_overlap(request, sizeof(*request), loan, sizeof(*loan)) ||
+    if (stream->count > SIZE_MAX / sizeof(*stream->slots) ||
+        !nx_stm32_av_system_disjoint(stream->slots,
+                                     stream->count * sizeof(*stream->slots)) ||
+        nx_stm32_av_overlap(request, sizeof(*request), loan, sizeof(*loan)) ||
         nx_stm32_av_overlap(request, sizeof(*request), loan->owner,
                             sizeof(*loan->owner)) ||
         nx_stm32_av_overlap(request, sizeof(*request), stream,
@@ -457,7 +485,9 @@ static nx_result_t tx_validate(nx_stm32_audio_state_t* s,
                             stream->count * sizeof(*stream->slots)))
         return NX_ERROR_INVALID;
     for (size_t i = 0U; i < stream->count; ++i)
-        if (nx_stm32_av_overlap(request, sizeof(*request),
+        if (!nx_stm32_av_system_disjoint(stream->slots[i].data,
+                                         stream->slots[i].capacity) ||
+            nx_stm32_av_overlap(request, sizeof(*request),
                                 stream->slots[i].data,
                                 stream->slots[i].capacity) ||
             nx_stm32_av_overlap(s, sizeof(*s), stream->slots[i].data,
@@ -494,14 +524,14 @@ static nx_result_t submit(void* context, nx_audio_request_t* request) {
     nx_stm32_audio_state_t* s = context;
     if (!nx_stm32_av_task())
         return NX_ERROR_CONTEXT;
-    if (s == NULL || request == NULL ||
+    if (s == NULL || !nx_stm32_av_system_disjoint(request, sizeof(*request)) ||
         (uintptr_t)request % _Alignof(nx_audio_request_t) != 0U ||
         !s->initialized)
         return NX_ERROR_INVALID;
     if (s->active != NULL)
         return NX_ERROR_BUSY;
     const nx_stm32_audio_config_t* c = s->config;
-    if (!live(s))
+    if (!nx_stm32_audio_live(s))
         return NX_ERROR_STATE;
     bool tx = tx_bus(c) != NULL, rx = rx_bus(c) != NULL;
     if (nx_request_state(&request->base) != NX_REQUEST_READY ||
@@ -519,7 +549,8 @@ static nx_result_t submit(void* context, nx_audio_request_t* request) {
     }
     if (rx) {
         nx_frame_stream_t* frame = request->rx;
-        if (!contiguous_frame(frame) || (tx && frame->layout.bytes != bytes) ||
+        if (!nx_stm32_av_system_disjoint(frame, sizeof(*frame)) ||
+            !contiguous_frame(frame) || (tx && frame->layout.bytes != bytes) ||
             nx_stm32_av_overlap(frame, sizeof(*frame), s, sizeof(*s)) ||
             nx_stm32_av_overlap(frame, sizeof(*frame), request,
                                 sizeof(*request)))
@@ -638,10 +669,11 @@ static nx_result_t quarantine(nx_stm32_audio_state_t* s, nx_result_t result) {
     (void)nx_request_transition(&s->active->base, NX_REQUEST_QUARANTINED);
     return result;
 }
-static bool tx_idle(nx_stm32_audio_state_t* s, SPI_TypeDef* bus) {
+bool nx_stm32_audio_tx_idle(nx_stm32_audio_state_t* s, SPI_TypeDef* bus) {
     for (uint32_t i = 0U; i < s->config->common.poll_limit; ++i) {
-        uint32_t value = status(s, bus);
-        if ((value & SPI_SR_TXE) != 0U && (status(s, bus) & SPI_SR_BSY) == 0U)
+        uint32_t value = nx_stm32_audio_status(s, bus);
+        if ((value & SPI_SR_TXE) != 0U &&
+            (nx_stm32_audio_status(s, bus) & SPI_SR_BSY) == 0U)
             return true;
         NX_AV_POLL();
     }
@@ -649,7 +681,7 @@ static bool tx_idle(nx_stm32_audio_state_t* s, SPI_TypeDef* bus) {
 }
 static nx_result_t drain(nx_stm32_audio_state_t* s) {
     const nx_stm32_audio_config_t* c = s->config;
-    if (!live(s))
+    if (!nx_stm32_audio_live(s))
         return quarantine(s, NX_ERROR_STATE);
     s->draining = true;
     nx_request_state_t state = nx_request_state(&s->active->base);
@@ -661,7 +693,7 @@ static nx_result_t drain(nx_stm32_audio_state_t* s) {
                        !nx_stm32_av_dma_detach(&c->tx, c->common.poll_limit)))
         return quarantine(s, NX_ERROR_BUSY);
     if (tx != NULL && s->tx_enable_attempted && !s->wire_quiet &&
-        !tx_idle(s, tx))
+        !nx_stm32_audio_tx_idle(s, tx))
         return quarantine(s, NX_ERROR_BUSY);
     if (c->master && c->receive && !c->duplex && s->result == NX_SUCCESS) {
         if (!master_receive_terminal(s))
@@ -669,7 +701,7 @@ static nx_result_t drain(nx_stm32_audio_state_t* s) {
         if (s->receive_tail) {
             bool last = false;
             for (uint32_t i = 0U; i < c->common.poll_limit; ++i) {
-                if ((status(s, rx) & SPI_SR_RXNE) != 0U) {
+                if ((nx_stm32_audio_status(s, rx) & SPI_SR_RXNE) != 0U) {
                     last = true;
                     break;
                 }
@@ -692,19 +724,20 @@ static nx_result_t drain(nx_stm32_audio_state_t* s) {
     s->wire_quiet = true;
     if (rx != NULL) {
         if (s->rx_enable_attempted && c->master && c->receive && !c->duplex &&
-            !cycle_delay(s, c->slot_bits))
+            !nx_stm32_audio_cycle_delay(s, c->slot_bits))
             return quarantine(s, NX_ERROR_BUSY);
         if (!nx_stm32_av_bits(&rx->CR2, SPI_CR2_RXDMAEN, 0U) ||
             !nx_stm32_av_dma_detach(&c->rx, c->common.poll_limit))
             return quarantine(s, NX_ERROR_BUSY);
         /* Drain residual DR/OVR only after memory is disabled; preserve every
          * read-clear error before the clearing read sequence. */
-        uint32_t value = status(s, rx);
+        uint32_t value = nx_stm32_audio_status(s, rx);
         if ((value & (SPI_SR_RXNE | SPI_SR_OVR)) != 0U) {
             (void)NX_AV_READ(&rx->DR);
-            (void)status(s, rx);
+            (void)nx_stm32_audio_status(s, rx);
         }
-        if ((status(s, rx) & (SPI_SR_RXNE | SPI_SR_OVR | SPI_SR_BSY)) != 0U)
+        if ((nx_stm32_audio_status(s, rx) &
+             (SPI_SR_RXNE | SPI_SR_OVR | SPI_SR_BSY)) != 0U)
             return quarantine(s, NX_ERROR_BUSY);
     }
     if (!nx_stm32_av_write(&c->registers->CR2, 0U, UINT32_MAX) ||
@@ -761,7 +794,7 @@ static nx_result_t service(void* context) {
         return NX_ERROR_STATE;
     if (s->active == NULL)
         return NX_SUCCESS;
-    if (!live(s))
+    if (!nx_stm32_audio_live(s))
         return quarantine(s, NX_ERROR_STATE);
     nx_stm32_audio_irq(s);
     if (tx_bus(s->config) != NULL)
@@ -786,7 +819,7 @@ static nx_result_t service(void* context) {
         bool armed =
             s->config->master || tx_bus(s->config) == NULL ||
             (NX_AV_READ(&s->config->tx.stream->NDTR) == s->bytes / 2U - 1U &&
-             (status(s, tx_bus(s->config)) & SPI_SR_TXE) == 0U);
+             (nx_stm32_audio_status(s, tx_bus(s->config)) & SPI_SR_TXE) == 0U);
         uint64_t warmup_us =
             (3000000U + (uint64_t)s->config->pclk_hz - 1U) / s->config->pclk_hz;
         if (warmup_us < 3U)
@@ -824,45 +857,82 @@ static nx_result_t stop(void* context) {
     }
     return NX_SUCCESS;
 }
+/** \brief Metadata queries preserve both private controls and active loans. */
+static bool query_output(const nx_stm32_audio_state_t* s, const void* output,
+                         size_t bytes, size_t alignment) {
+    if (s == NULL || !s->owned || output == NULL ||
+        !nx_stm32_av_system_disjoint(output, bytes) ||
+        (uintptr_t)output % alignment != 0U ||
+        bytes > UINTPTR_MAX - (uintptr_t)output ||
+        nx_stm32_av_overlap(output, bytes, s, sizeof(*s)))
+        return false;
+    const nx_stm32_audio_config_t* c = s->config;
+    if (nx_stm32_av_overlap(output, bytes, c, sizeof(*c)) ||
+        nx_stm32_av_overlap(output, bytes, c->clock, sizeof(*c->clock)) ||
+        nx_stm32_av_overlap(output, bytes, c->common.regions,
+                            c->common.region_count *
+                                sizeof(*c->common.regions)) ||
+        nx_stm32_av_overlap(output, bytes, c->common.pins,
+                            c->common.pin_count * sizeof(*c->common.pins)))
+        return false;
+    for (size_t i = 0U; i < c->common.pin_count; ++i)
+        if (nx_stm32_av_overlap(output, bytes, c->common.pins[i].snapshot,
+                                sizeof(*c->common.pins[i].snapshot)))
+            return false;
+    if (s->active == NULL)
+        return true;
+    nx_audio_request_t* request = s->active;
+    if (nx_stm32_av_overlap(output, bytes, request, sizeof(*request)) ||
+        (request->tx != NULL &&
+         nx_stm32_av_overlap(output, bytes, request->tx, sizeof(*request->tx))))
+        return false;
+    nx_frame_stream_t* frames[2] = {
+        request->tx == NULL ? NULL : request->tx->owner, request->rx};
+    for (size_t d = 0U; d < 2U; ++d) {
+        nx_frame_stream_t* frame = frames[d];
+        if (frame == NULL)
+            continue;
+        nx_stream_t* stream = frame->stream;
+        if (nx_stm32_av_overlap(output, bytes, frame, sizeof(*frame)) ||
+            nx_stm32_av_overlap(output, bytes, stream, sizeof(*stream)) ||
+            nx_stm32_av_overlap(output, bytes, stream->slots,
+                                stream->count * sizeof(*stream->slots)))
+            return false;
+        for (size_t i = 0U; i < stream->count; ++i)
+            if (nx_stm32_av_overlap(output, bytes, stream->slots[i].data,
+                                    stream->slots[i].capacity))
+                return false;
+    }
+    return true;
+}
+void nx_stm32_audio_storage_layout(const nx_stm32_audio_config_t* c,
+                                   nx_audio_layout_t* output) {
+    uint8_t slots = c->standard >= 3U ? 1U : 2U;
+    *output = (nx_audio_layout_t){
+        c->sample_bits == 16U ? NX_AUDIO_STORAGE_LITTLE_ENDIAN
+                              : NX_AUDIO_STORAGE_HIGH_HALFWORD_FIRST,
+        c->sample_bits == 24U ? NX_FRAME_SAMPLE_MSB : NX_FRAME_SAMPLE_LSB,
+        (uint16_t)((1U << slots) - 1U),
+        c->sample_bits,
+        c->sample_bits == 16U ? 16U : 32U,
+        slots};
+}
+static nx_result_t layout(void* context, nx_audio_layout_t* output) {
+    nx_stm32_audio_state_t* s = context;
+    if (!query_output(s, output, sizeof(*output), _Alignof(nx_audio_layout_t)))
+        return NX_ERROR_INVALID;
+    nx_stm32_audio_storage_layout(s->config, output);
+    return NX_SUCCESS;
+}
 static nx_result_t rate(void* context, nx_audio_rate_t* output) {
     nx_stm32_audio_state_t* s = context;
-    if (s == NULL || output == NULL || !s->owned ||
-        nx_stm32_av_overlap(output, sizeof(*output), s, sizeof(*s)))
+    if (!query_output(s, output, sizeof(*output), _Alignof(nx_audio_rate_t)))
         return NX_ERROR_INVALID;
-    if (s->active != NULL) {
-        nx_audio_request_t* request = s->active;
-        if (nx_stm32_av_overlap(output, sizeof(*output), request,
-                                sizeof(*request)))
-            return NX_ERROR_INVALID;
-        nx_frame_stream_t* frames[2] = {
-            request->tx == NULL ? NULL : request->tx->owner, request->rx};
-        if (request->tx != NULL &&
-            nx_stm32_av_overlap(output, sizeof(*output), request->tx,
-                                sizeof(*request->tx)))
-            return NX_ERROR_INVALID;
-        for (size_t direction = 0U; direction < 2U; ++direction) {
-            nx_frame_stream_t* frame = frames[direction];
-            if (frame == NULL)
-                continue;
-            nx_stream_t* stream = frame->stream;
-            if (nx_stm32_av_overlap(output, sizeof(*output), frame,
-                                    sizeof(*frame)) ||
-                nx_stm32_av_overlap(output, sizeof(*output), stream,
-                                    sizeof(*stream)) ||
-                nx_stm32_av_overlap(output, sizeof(*output), stream->slots,
-                                    stream->count * sizeof(*stream->slots)))
-                return NX_ERROR_INVALID;
-            for (size_t i = 0U; i < stream->count; ++i)
-                if (nx_stm32_av_overlap(output, sizeof(*output),
-                                        stream->slots[i].data,
-                                        stream->slots[i].capacity))
-                    return NX_ERROR_INVALID;
-        }
-    }
     *output =
         s->config->master ? s->config->actual_rate : (nx_audio_rate_t){0U, 0U};
     return NX_SUCCESS;
 }
+
 nx_result_t nx_stm32_audio_close(nx_stm32_audio_state_t* s) {
     if (!nx_stm32_av_task())
         return NX_ERROR_CONTEXT;
@@ -910,4 +980,5 @@ nx_result_t nx_stm32_audio_close(nx_stm32_audio_state_t* s) {
     s->config = NULL;
     return NX_SUCCESS;
 }
-const nx_audio_ops_t nx_stm32_audio_ops = {submit, service, cancel, stop, rate};
+const nx_audio_ops_t nx_stm32_audio_ops = {submit, service, cancel, stop,
+                                           rate,   NULL,    layout};

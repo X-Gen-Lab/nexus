@@ -27,8 +27,8 @@
  */
 int main(void) {
     uint8_t memory[512];
-    const nx_flash_sector_t sectors[] = {{0, 128}, {128, 128}, {256, 256}};
-    const nx_flash_geometry_t geometry = {0, 512, 4, sectors, 3, 0};
+    const nx_flash_erase_span_t spans[] = {{0U, 128U, 2U}, {256U, 256U, 1U}};
+    const nx_flash_geometry_t geometry = {0, 512, 4, spans, 2, 0};
     CHECK(nx_native_clock_configure(true, 0) == NX_SUCCESS);
     CHECK(nx_native_flash_configure(memory, &geometry) == NX_SUCCESS);
     nx_flash_storage_adapter_t adapter;

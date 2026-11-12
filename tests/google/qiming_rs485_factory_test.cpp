@@ -346,6 +346,12 @@ extern "C" void nx_platform_cold_model_write(volatile uint32_t* reg,
         }
     }
     *reg = value;
+    for (GPIO_TypeDef* gpio : {GPIOA, GPIOG}) {
+        if (reg == &gpio->BSRR) {
+            gpio->ODR = (gpio->ODR | (value & 0xFFFFU)) & ~(value >> 16U);
+            return;
+        }
+    }
 }
 extern "C" void nx_control_model_clear(volatile uint32_t* reg, uint32_t mask) {
     *reg &= ~mask;

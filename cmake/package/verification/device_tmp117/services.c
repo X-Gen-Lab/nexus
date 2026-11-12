@@ -8,7 +8,7 @@
  */
 #include "nexus/components/tmp117_i2c.h"
 #include "nexus_bindings.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 
 /** \brief Consumer-owned endpoint state; no physical sensor is emulated by IO.
  */
@@ -84,7 +84,7 @@ int main(void) {
     nx_platform_start_result_t boot = nx_platform_start();
     if (boot.primary != NX_SUCCESS || boot.cleanup != NX_SUCCESS ||
         boot.remaining_effects != 0U ||
-        nx_factory_gpio(NX_GPIO_ID_LED0) == NULL) {
+        nx_factory_gpio_ref(NX_GPIO_REF_LED0) == NULL) {
         return 1;
     }
     const nx_tmp117_config_t config = {1U, 1U, 0};

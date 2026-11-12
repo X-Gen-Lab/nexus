@@ -1,12 +1,12 @@
 # Current canonical messages; semantic review admission is tracked separately.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 87a01258977024b0e83de65734929b78d89fb35a10ccdf6606cbaeb50e2b14fd\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: d535db3ab70a0b4e1bea4489bd8e6b12214a3acd28b5fdf4e9bced89b768d4d9\n"
 
 msgid "当前精确支持范围"
 msgstr "Current exact support scope"
 
-msgid "本页帮助消费者选择当前维护的 F407 型号、Board、后端与外设模式。生产实现限定 STM32F407VET6／STM32F407ZGT6；其他 F4 型号、SDK 宏或公共头的存在不授予相同模式。 下表描述源码维护范围，实际选择仍须通过同一 TOML／typed IR resolver。"
-msgstr "This page helps consumers select maintained F407 parts, Boards, backends and peripheral modes. Production implementations cover STM32F407VET6 / STM32F407ZGT6. Other F4 parts, SDK macros and public headers do not grant the same modes. The table describes source-maintenance scope; actual selections must still pass the same TOML / typed IR resolver."
+msgid "本页帮助消费者选择当前维护的精确器件、Board、后端与外设模式。当前事实包含 STM32F405ZGT6、F407VET6、F407ZGT6、F415ZGT6、F417ZGT6、F411RET6、F446ZET6 和 F479NIH6，组成七个器件视图；厂商 SDK 目录的 23 个选择器不等于这八料号的 全部模式资格。实际模式由同一 TOML／typed IR resolver 对器件、封装、Board、 时钟和资源取交集。当前新 IP 所选 fixture 已有 ARM 链接；最终 clean-source 消费和物理执行分别验收， 不继承 F407 专属模式的结果，也不授予整系列资格。"
+msgstr "This page helps consumers choose maintained exact devices, Boards, backends and peripheral modes. Current facts include STM32F405ZGT6, F407VET6, F407ZGT6, F415ZGT6, F417ZGT6, F411RET6, F446ZET6 and F479NIH6 in seven device views. The vendor SDK catalog's 23 selectors do not establish every mode on these eight parts. One TOML/typed IR resolver intersects device, package, Board, clock and resources. Selected fixtures for new IP have linked on ARM; final clean-source consumption and physical execution remain separately accepted. They inherit no F407-only results or whole-family qualification."
 
 msgid "型号、Board 与 OS 边界"
 msgstr "Part, Board and OS boundaries"
@@ -28,6 +28,30 @@ msgstr "STM32F407ZGT6"
 
 msgid "LQFP144，1 MiB Flash、128 KiB 主 SRAM、64 KiB CPU-only CCM；额外引脚不自动授权 PCB 接线"
 msgstr "LQFP144, 1 MiB Flash, 128 KiB main SRAM and 64 KiB CPU-only CCM; extra pins do not automatically authorize PCB wiring"
+
+msgid "F405ZG／F415ZG／F417ZG"
+msgstr "F405ZG / F415ZG / F417ZG"
+
+msgid "LQFP144、1 MiB Flash、128 KiB 主 SRAM、64 KiB CCM；[内部 CRC 软件参考](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/stm32f4_family/README.md)只使用 HSI16，未声明实体 PCB 或外接振荡源"
+msgstr "LQFP144, 1 MiB Flash, 128 KiB main SRAM and 64 KiB CCM; [internal-CRC software references](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/stm32f4_family/README.md) use HSI16 only and declare no physical PCB or external oscillator"
+
+msgid "STM32F411RET6"
+msgstr "STM32F411RET6"
+
+msgid "LQFP64、512 KiB Flash、128 KiB 主 SRAM、无 CCM；首片为 HSI16 RUN、TIM2 和 CRC，未接其它外设模式"
+msgstr "LQFP64, 512 KiB Flash, 128 KiB main SRAM and no CCM. Initial scope is HSI16 RUN, TIM2 and CRC; other peripheral modes are not integrated."
+
+msgid "STM32F446ZET6"
+msgstr "STM32F446ZET6"
+
+msgid "LQFP144、512 KiB Flash、128 KiB 主 SRAM、无 CCM；HSI16 RUN，SAI1 可消费独立 M 的 PLLSAI Q，不开放 LTDC R"
+msgstr "LQFP144, 512 KiB Flash, 128 KiB main SRAM and no CCM. HSI16 RUN; SAI1 may consume PLLSAI Q with independent M. LTDC R is not enabled."
+
+msgid "STM32F479NIH6"
+msgstr "STM32F479NIH6"
+
+msgid "TFBGA216、2 MiB Flash、320 KiB 主 SRAM、64 KiB CPU-only CCM；HSI16 RUN，按精确模式开放 FMC／SAI／LTDC／DMA2D／QuadSPI，PLLSAI 共享 M；不自动授权 bank2 写擦"
+msgstr "TFBGA216, 2 MiB Flash, 320 KiB main SRAM and 64 KiB CPU-only CCM. HSI16 RUN with exact FMC/SAI/LTDC/DMA2D/QuadSPI modes and shared PLLSAI M. Bank2 write/erase is not automatically authorized."
 
 msgid "启明 ZG Board"
 msgstr "Qiming ZG Boards"
@@ -71,6 +95,12 @@ msgstr "Pins, AF, DMA, IRQ, Flash geometry and resource conflicts are maintained
 msgid "OS 的静态对象、权限、IRQ 和退出要求见 [OS 合同](../design/os-contracts.md)与 [后端入口](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/README.md)。选择一个后端不自动验证每种外设／低功耗组合。"
 msgstr "Static OS objects, privilege, IRQ and exit requirements are defined by the [OS contract](../design/os-contracts.md) and [backend entry](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/README.md). Selecting a backend does not automatically validate every peripheral / low-power combination."
 
+msgid "F405／F407 共用 DS8626 Rev12，F415／F417 共用 DS8597 Rev10；经典四款器件复用 67 项共同控制器事实，ETH／DCMI 只由 F407／F417 选择，基础 CRYP／HASH 限定 F415／F417。F411、F446、F479 分别绑定独立 RM／ES profile；F446 的 PLLSAI M 独立，F479 与主 PLL 共用 M，同一 System owner 管理所选 Q／R 输出。"
+msgstr "F405/F407 share DS8626 Rev12; F415/F417 share DS8597 Rev10. These four classic devices reuse 67 common controller facts. Only F407/F417 select ETH/DCMI; basic CRYP/HASH is restricted to F415/F417. F411, F446 and F479 bind independent RM/ES profiles. F446 has independent PLLSAI M; F479 shares M with the main PLL. One System owner manages the selected Q/R outputs."
+
+msgid "精确 package、IRQ、DMA 和路线仍逐料号检查。F479NI 当前显式 GPIO 名单为 159 项， 与资料摘要 161 项的差异保持未知，不补猜 pad。新料号与 IP 的软件参考不声明 PCB 接线；开发包 `publishable=false`、ARM 对象或单个 ELF 不能代替最终 clean-source 候选及全部消费者。原四板范围不变，全部物理 HIL 保持未执行。"
+msgstr "Package, IRQ, DMA and routes are checked per exact part. F479NI currently has 159 explicit GPIO names; the difference from the datasheet summary's 161 remains unknown rather than inventing pads. New-part/IP software references make no PCB-wiring claims. A `publishable=false` development package, ARM object or single ELF cannot replace the final clean-source candidate and every consumer. The original four Board identities are unchanged; all physical HIL remains unexecuted."
+
 msgid "当前模式矩阵"
 msgstr "Current mode matrix"
 
@@ -95,8 +125,8 @@ msgstr "[Ownership](../explanation/ownership.md), [F4 implementation](https://gi
 msgid "System／时钟"
 msgstr "System / clocks"
 
-msgid "默认 `hse8-pll168`；显式 custom HSE／HSI、直接输入或 PLL、AHB／APB／ADC 分频与 Flash latency。频率来自同一静态 ClockPlanIR，不提供运行期 DVFS"
-msgstr "Default `hse8-pll168`; explicit custom HSE / HSI, direct input or PLL, AHB / APB / ADC division and Flash latency. Frequencies come from one static ClockPlanIR; runtime DVFS is not provided"
+msgid "默认 F407 `hse8-pll168`；显式 custom HSE／HSI、PLL／总线分频及 Flash latency 来自同一 ClockPlanIR。新增 F411／446／479 限 HSI16 RUN；F446／479 的所选 PLLSAI Q／R 由同一 System owner 校验与撤回。不提供运行期 DVFS，也不把新料号首片扩大到最大主频／低功耗。"
+msgstr "F407 defaults to `hse8-pll168`. Explicit custom HSE/HSI, PLL/bus divisions and Flash latency come from one ClockPlanIR. New F411/446/479 support is HSI16 RUN only. One System owner validates and withdraws selected PLLSAI Q/R on F446/479. There is no runtime DVFS or inferred maximum-frequency/low-power support on new parts."
 
 msgid "[System 与时钟](../design/f407-system-power.md)"
 msgstr "[System and clocks](../design/f407-system-power.md)"
@@ -130,6 +160,9 @@ msgstr "[Supervision and faults](../design/f407-system-power.md)"
 
 msgid "GPIO／EXTI／PVD"
 msgstr "GPIO／EXTI／PVD"
+
+msgid "精确封装全部 GPIO 的 input／output、四档显式输出速度与 EXTI0–15；PVD 原始电平／事件。EXTI 的 `hardware-event` 只产生 EMR 硬件事件，不取得 IRQ 或软件队列。省略速度保留已有配置，PC13–15 输出限制为 LOW；晶振 LSE 占用时 PC13 保持静默，晶振和调试引脚仍受资源约束。软件事件保留 COALESCED／LOSS，不提供自动消抖、精确边沿时间或 BOR 资格"
+msgstr "Input/output on every bonded GPIO of the exact package, four explicit output-speed settings and EXTI0–15; raw PVD level/events. EXTI `hardware-event` produces only EMR hardware events and acquires no IRQ or software queue. Omitting speed preserves the existing setting; PC13–15 outputs are limited to LOW. PC13 stays quiet while a crystal LSE owns it; oscillator and debug pads remain resource-constrained. Software events retain COALESCED/LOSS. No automatic debounce, exact physical edge timing or BOR qualification is provided."
 
 msgid "[F4 GPIO／PVD](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)、[I/O 观察](../design/io-observation-recovery.md)"
 msgstr "[F4 GPIO / PVD](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md), [I/O observation](../design/io-observation-recovery.md)"
@@ -182,6 +215,9 @@ msgstr "[I2C target contract](../design/f407-i2c-target.md)"
 msgid "普通 PWM／capture／encoder"
 msgstr "Ordinary PWM / capture / encoder"
 
+msgid "已审 TIM3／4／5／9–14 PWM；TIM1／3／4／5／8／9–14 原始输入捕获，按实例开放 1／2／4 通道，TIM5 保留 32 位；TIM1／3／4／5／8 支持 x2／x4 正交计数。TIM2 保留给 Core，TIM6／7 用作专用触发；timer personality 独占，IRQ 只取得所选模式实际使用的向量"
+msgstr "Reviewed TIM3 / 4 / 5 / 9–14 PWM; TIM1 / 3 / 4 / 5 / 8 / 9–14 raw input capture, with 1 / 2 / 4 channels according to the instance and a full 32-bit count on TIM5. TIM1 / 3 / 4 / 5 / 8 support x2 / x4 quadrature counting. TIM2 is reserved for Core and TIM6 / 7 for dedicated triggers. Timer personalities are exclusive; an IRQ lease covers only the vector actually used by the selected mode"
+
 msgid "[定时器合同](../design/timer-advanced.md)、[F4 实现](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 msgstr "[Timer contract](../design/timer-advanced.md), [F4 implementation](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 
@@ -215,8 +251,8 @@ msgstr "[F4 ADC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOU
 msgid "多 ADC／注入采集"
 msgstr "Multiple ADCs / injected acquisition"
 
-msgid "`adc_group` 独占 ADC123 公共域；双／三同步、交错的有限 DMA，以及单／双／三注入组。显式触发、格式、采样时间与原始码看门狗；没有循环多 ADC 或 regular／injected 并行"
-msgstr "`adc_group` exclusively owns the shared ADC123 domain: dual / triple simultaneous and interleaved finite DMA, plus single / dual / triple injected groups. Trigger, format, sampling time and raw-code watchdog are explicit; no circular multi-ADC mode or concurrent regular / injected operation"
+msgid "`adc_group` 独占 ADC123 域；保留有限 regular／injected 与双／三 ADC 同步或交错，新增对应 regular DBM blocks。同一同步 owner 可接一次软件或独占 Table69 timer 注入；有限 `regular-auto-injected` 用具名 descriptor 联合借用 regular／injected 两个 span，TC＋全部 JEOC＋真实 join 才共同终止。交错 blocks 按原生 CDR 几何、最快吞吐和 service gap 准入，不承诺均匀 aperture。未建立连续 JAUTO 逐次 JDR、交错＋注入或未知外来 trigger 合同。"
+msgstr "`adc_group` exclusively owns ADC123. Finite regular/injected and dual/triple simultaneous or interleaved acquisition remain, with corresponding regular DBM blocks added. One simultaneous owner can accept a software or exclusive Table69 timer injection. Finite `regular-auto-injected` jointly borrows two regular/injected spans through a named descriptor and terminates them together only after TC, all JEOC and actual join. Interleaved blocks use native CDR geometry, fastest throughput and service-gap admission without promising uniform aperture. Per-conversion JDR guarantees for continuous JAUTO, interleaved+injected operation and unknown external triggers have no current contract."
 
 msgid "[多 ADC 合同](../design/f407-adc-groups.md)"
 msgstr "[Multi-ADC contract](../design/f407-adc-groups.md)"
@@ -224,8 +260,8 @@ msgstr "[Multi-ADC contract](../design/f407-adc-groups.md)"
 msgid "DAC"
 msgstr "DAC"
 
-msgid "单／双通道 direct、独占 timer trigger、noise／triangle、有限／循环 DMA 与显式 idle code。数字完成不承诺精确 N 次模拟转换、settling 或输出精度"
-msgstr "Single / dual-channel direct output, exclusive timer trigger, noise / triangle, finite / circular DMA and explicit idle code. Digital completion promises neither exactly N analog conversions nor settling or output accuracy"
+msgid "单／双通道 direct、独占 timer、noise／triangle、有限／循环 DMA 与 idle code；可选 EXTI9 event-only 外部触发 CPU／循环 DMA，实际外部 rate 为 unknown，有限外部尾部拒绝。ES0182 恢复可内部转换声明的 idle，随后短时禁输出，不计 payload，不保证请求间模拟连续。"
+msgstr "Single/dual-channel direct, exclusive timer, noise/triangle, finite/circular DMA and idle code. Optional EXTI9 event-only external triggering covers CPU/circular DMA; actual external rate remains unknown and finite external tails are rejected. ES0182 recovery may internally convert the declared idle code, then briefly disable outputs. These conversions are not payload progress and do not guarantee uninterrupted analog output between requests."
 
 msgid "[F4 DAC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 msgstr "[F4 DAC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
@@ -233,26 +269,35 @@ msgstr "[F4 DAC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOU
 msgid "DCMI"
 msgstr "DCMI"
 
-msgid "RAW／JPEG snapshot 与连续 RAW storage blocks；VE 最高 12-bit，ZG 可选 14-bit。JPEG 返回含硬件 padding 的 word 前缀，RAW blocks 不等于图像或精确帧数"
-msgstr "RAW / JPEG snapshots and continuous RAW storage blocks; VE supports up to 12-bit, ZG optionally 14-bit. JPEG returns a word prefix containing hardware padding; RAW blocks are neither images nor an exact frame count"
+msgid "RAW／JPEG snapshot、连续 RAW storage blocks，及有限 frames-raw／frames-jpeg CM1 会话。每帧完整 join 后发布并重启，允许间隙和缺 FREE 时 source-off 等待；会话 transferred 统计完整帧前缀。JPEG word padding 不等于码流长度，无 CM0 无缝完整帧。VE 最高 12-bit，ZG 可选 14-bit。"
+msgstr "RAW/JPEG snapshots, continuous RAW storage blocks and finite frames-raw/frames-jpeg CM1 sessions. Every frame fully joins before publication and restart, with gaps and source-off waiting without a FREE slot. Session transferred counts the complete-frame prefix. JPEG word padding does not identify codestream length; no gapless CM0 complete frames. VE supports up to 12 bits; ZG may select 14 bits."
 
-msgid "[DCMI／I2S 合同](../design/f407-capture-audio.md)"
-msgstr "[DCMI/I2S contract](../design/f407-capture-audio.md)"
+msgid "[DCMI／音频合同](../design/f407-capture-audio.md)"
+msgstr "[DCMI/audio contract](../design/f407-capture-audio.md)"
 
 msgid "I2S2／3"
 msgstr "I2S2／3"
 
-msgid "master／slave × TX／RX／duplex 的有限 DMA；Philips、MSB／LSB justified、PCM short／long，16／24／32-bit 数据。master 显式 PLLI2S，slave 外部 rate 为 unknown；不转换音频格式"
-msgstr "Finite DMA for master / slave × TX / RX / duplex; Philips, MSB / LSB justified, PCM short / long and 16 / 24 / 32-bit data. Master mode explicitly selects PLLI2S; external slave rate is unknown. Audio formats are not converted"
+msgid "master／slave × TX／RX／duplex 的有限 DMA 与连续 `*-blocks`；Philips、MSB／LSB justified、PCM short／long，16／24／32-bit 数据。master 显式 PLLI2S，slave 实际外部 rate 为 unknown；连续模式显式声明 rate／service 上界，使用调用者 block 存储，已发布 RX loan 单独归还。不转换音频格式"
+msgstr "Finite DMA and continuous `*-blocks` for master/slave × TX/RX/duplex; Philips, MSB/LSB justified, PCM short/long and 16/24/32-bit data. Masters explicitly select PLLI2S; the actual external slave rate is unknown. Continuous modes declare explicit rate/service upper bounds and use caller-owned block storage; published RX loans are returned separately. Audio formats are never converted."
 
 msgid "[音频合同](../design/f407-capture-audio.md)、[有限 slave TX 路径](../design/f407-i2s2-slave-tx.md)"
 msgstr "[Audio contract](../design/f407-capture-audio.md), [Finite slave TX path](../design/f407-i2s2-slave-tx.md)"
 
+msgid "SAI1"
+msgstr "SAI1"
+
+msgid "F446／F479 的 A／B 有限 master／slave TX／RX／同步 duplex；6 种模式、8／10／16／20／24／32 有效位、全部 slots 有效且至多 16。layout 明确原始容器和顺序，不转换音频。master 消费唯一 System PLLSAI Q，APB2 严格大于两倍 SCK；外部 slave rate 为 unknown。无 SAI2、连续 blocks、稀疏 slots、AC97／SPDIF"
+msgstr "SAI1 A/B finite master/slave TX/RX/synchronous duplex on F446/F479: six modes, 8/10/16/20/24/32 significant bits and up to 16 all-active slots. Layout states native containers and order; no audio conversion. Master consumes the sole System PLLSAI Q output; APB2 is strictly greater than twice SCK. External slave rate remains unknown. No SAI2, continuous blocks, sparse slots or AC97/SPDIF."
+
+msgid "[SAI 与布局](../design/f407-capture-audio.md)"
+msgstr "[SAI and layout](../design/f407-capture-audio.md)"
+
 msgid "RTC／备份域"
 msgstr "RTC / backup domain"
 
-msgid "`adopt-retained`／`provision-empty`、Alarm A request、Alarm B、wakeup、timestamp、tamper、校准、20 个 backup registers、4 KiB backup SRAM CPU lease 与显式 handoff；不提供世纪／时区或保持性证明"
-msgstr "`adopt-retained` / `provision-empty`, Alarm A requests, Alarm B, wakeup, timestamp, tamper, calibration, 20 backup registers, 4 KiB backup SRAM CPU leases and explicit handoff; no century / timezone or retention proof"
+msgid "`adopt-retained`／`provision-empty`、Alarm A request、Alarm B、wakeup、timestamp、tamper、校准、20 个 backup registers、4 KiB backup SRAM CPU lease 与显式 handoff。PC13 timestamp／tamper 需要 Board 明确授权 LSE bypass；四个现有 Board 的晶体配置不能据 API 存在推定支持。不提供世纪／时区或保持性证明"
+msgstr "`adopt-retained`/`provision-empty`, Alarm A requests, Alarm B, wakeup, timestamp, tamper, calibration, 20 backup registers, a 4 KiB backup-SRAM CPU lease and explicit handoff. PC13 timestamp/tamper requires explicit Board authorization of LSE bypass; the crystal configurations of the four current Boards do not gain support merely because an API exists. No century/timezone or retention proof is provided."
 
 msgid "[RTC 合同](../design/f407-rtc.md)"
 msgstr "[RTC contract](../design/f407-rtc.md)"
@@ -260,14 +305,17 @@ msgstr "[RTC contract](../design/f407-rtc.md)"
 msgid "内部 Flash／制造维护"
 msgstr "Internal Flash / manufacturing maintenance"
 
-msgid "精确 VE／ZG sector 几何；显式维护 face 提供 OTP、锁定、option／RDP 及保护降级的整阵列擦除效果。不可逆效果逐次声明，不自动回滚、重放或把软件复位当作所需 POR"
-msgstr "Exact VE / ZG sector geometry; an explicit maintenance face supplies OTP, locks, options / RDP and whole-array erase effects of protection downgrades. Irreversible effects are declared per operation; no automatic rollback, replay or substitution of a software reset for required POR"
+msgid "精确 VE／ZG sector 几何；显式维护 face 提供 OTP、锁定、option／RDP 及保护降级的整阵列擦除效果。失败后的 `recover` 只排空、撤回并重锁，确认成功后才归还 owner；不可逆效果逐次声明，不自动回滚、重放或把软件复位当作所需 POR"
+msgstr "Exact VE/ZG sector geometry; an explicit maintenance face exposes OTP, locking, option/RDP and whole-array erase effects of protection downgrade. After failure, `recover` only drains, withdraws and relocks, returning ownership only after confirmed success. Irreversible effects are declared individually. There is no automatic rollback/replay or substitution of a software reset for the required POR."
 
 msgid "[物理存储与维护](../design/f407-storage.md)"
 msgstr "[Physical storage and maintenance](../design/f407-storage.md)"
 
 msgid "SDIO／MMC／I/O functions"
 msgstr "SDIO／MMC／I/O functions"
+
+msgid "SD memory／MMC polling、有限 IRQ／DMA；SDIO functions 使用独立 face 的 CMD5／52／53。单卡、3.3 V，SD／SDIO 为 1／4 位，MMC 可显式选择经版本和 SWITCH 检查的 8 位十引脚软件参考。memory 单块 CMD17／24，多块以一次 CMD18／25、CMD12 和 CMD13 READY 结束；combo 不同时维护 memory portion。静态 ClockPlan 要求精确 PLL48 与经 RM／勘误联合验证的分频；不提供 HS／DDR／HS200"
+msgstr "SD memory/MMC polling and finite IRQ/DMA; SDIO functions use independent CMD5/52/53 faces. One 3.3 V card; SD/SDIO use 1/4-bit buses. MMC can explicitly select an eight-bit, ten-pad software reference after version and SWITCH checks. Memory uses CMD17/24 for a single block and one CMD18/25 followed by CMD12 and CMD13 READY for multiple blocks. Combo cards do not maintain their memory portion concurrently. A static ClockPlan requires exact PLL48 and dividers jointly validated against the reference manual and errata. HS/DDR/HS200 are not provided."
 
 msgid "[SDIO 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/sdio_hal/README.md)"
 msgstr "[SDIO contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/sdio_hal/README.md)"
@@ -280,6 +328,42 @@ msgstr "Runtime CPU windows, permanent startup SRAM, parallel16, explicit PSRAM,
 
 msgid "[FSMC 合同](../design/f407-fsmc.md)、[存储边界](../design/f407-storage.md)"
 msgstr "[FSMC contract](../design/f407-fsmc.md), [storage boundaries](../design/f407-storage.md)"
+
+msgid "FMC SDRAM"
+msgstr "FMC SDRAM"
+
+msgid "F479NI Bank1、8 MiB、16-bit、row12／column8 的 CPU 数据窗口；显式七组时序、上电／刷新／自刷新等待、lease 和原 System epoch。WFDIS 共享约束在取得 gate 后实际观察。不授予 DMA、启动 RAM、XIP、自动 MPU 或实装 RAM 时序资格"
+msgstr "F479NI Bank1, 8 MiB 16-bit row12/column8 CPU data window. Seven explicit timing groups, power-up/refresh/Self-refresh waits, leases and the original System epoch. The shared WFDIS constraint is actually observed after acquiring the gate. No DMA, startup RAM, XIP, automatic MPU configuration or installed-RAM timing qualification."
+
+msgid "[FMC／外部存储](../design/f407-fsmc.md)"
+msgstr "[FMC/external memory](../design/f407-fsmc.md)"
+
+msgid "QuadSPI／串行 NOR"
+msgstr "QuadSPI/serial NOR"
+
+msgid "F479NI＋W25Q128JV Flash1，24-bit、SDR 1-1-1、PIO task-service；READ03、page program、4 KiB erase 和完整 erase spans。公共 async stop 排空并保留 PREPARED／只读 face，Platform cold stop 归还硬件；WIP 与控制器 join 分开。整个 provider 生命周期禁止所有外部 bus master 访问 0x90000000 aperture。无 DMA、映射／XIP、quad／DDR／dual 或自动保护更改"
+msgstr "F479NI+W25Q128JV Flash1, 24-bit SDR 1-1-1 PIO task-service: READ03, page program, 4 KiB erase and complete erase spans. Public async stop drains while retaining PREPARED/the readonly face; Platform cold stop returns hardware. WIP and controller join are separate. All external bus masters must avoid the 0x90000000 aperture throughout the provider lifetime. No DMA, mapping/XIP, quad/DDR/dual or automatic protection changes."
+
+msgid "[间接 QuadSPI](../design/f407-fsmc.md)"
+msgstr "[Indirect QuadSPI](../design/f407-fsmc.md)"
+
+msgid "LTDC／DMA2D"
+msgstr "LTDC/DMA2D"
+
+msgid "F479NI 原生并行 RGB565／RGB888；RGB565／ARGB8888 内存，一／二 layer、2 active＋1 全局 pending。IRQ 在真实 blanking 锁存同代退休证明，task join 后才归还旧 frame；visible 不等于 SETTLED。独立 DMA2D 提供 fill／copy／convert／blend。无 DSI、CLUT、隐藏 frame buffers 或对 FMC CPU-only 窗口的 DMA 授权"
+msgstr "F479NI native parallel RGB565/RGB888 with RGB565/ARGB8888 memory. One/two layers, two active frames and one global pending replacement. IRQs latch same-generation retirement proof during actual blanking; task join returns old frames. Visible does not mean SETTLED. Independent DMA2D offers fill/copy/convert/blend. No DSI, CLUT, hidden framebuffers or DMA authorization for an FMC CPU-only window."
+
+msgid "[图形所有权](../design/official-stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations)"
+msgstr "[Graphics ownership](../design/official-stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations)"
+
+msgid "基础 CRYP／HASH"
+msgstr "Basic CRYP/HASH"
+
+msgid "F415／F417 的有限 IRQ blocks：AES ECB／CBC／CTR、DES／TDES ECB／CBC，SHA1／MD5／HMAC；key／IV／context 清理与真实 IRQ／源退出后才终止。caller key 不擦除，无 worker／堆。无 AEAD、crypto DMA 或 F479 增强 IP 资格"
+msgstr "F415/F417 finite IRQ blocks: AES ECB/CBC/CTR, DES/TDES ECB/CBC and SHA1/MD5/HMAC. Terminal publication follows key/IV/context cleanup and actual IRQ/source withdrawal. Caller keys are not erased. No worker/heap, AEAD, crypto DMA or F479 enhanced-IP qualification."
+
+msgid "[F4 实现](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr "[F4 implementation](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
 
 msgid "CRC／芯片身份"
 msgstr "CRC / chip identity"
@@ -311,8 +395,8 @@ msgstr "[Classic CAN](../design/classic-can.md)"
 msgid "Ethernet"
 msgstr "Ethernet"
 
-msgid "VE／ZG MII 与 ZG RMII、独立 MDIO；raw `eth` 与增强 `eth_frames` 分选。增强 face 提供整帧 SG、单 C-tag VLAN、显式 checksum offload 和 MAC 硬件事件／PTP 时间戳；PHY 接线、协议栈、同步与网络政策由外部提供"
-msgstr "VE/ZG MII and ZG RMII with separate MDIO; raw `eth` and enhanced `eth_frames` are selected separately. The enhanced face provides complete-frame SG, one C-tag VLAN, explicit checksum offload and MAC hardware-event/PTP timestamps; PHY wiring, protocol stacks, synchronization and network policy remain external"
+msgid "VE／ZG MII 与 ZG RMII、独立 MDIO；raw `eth` 与增强 `eth_frames` 分选。已选 HCLK 为 25–168 MHz，MDC 与 PTP 20／40／80 ns 增量由计划推导。增强 face 提供整帧 SG、单 C-tag VLAN、显式 checksum offload 和 MAC 硬件事件／PTP 时间戳；这不建立同步或物理精度资格，PHY 接线、协议栈、同步与网络政策由外部提供"
+msgstr "VE/ZG MII and ZG RMII with independent MDIO; raw `eth` and enhanced `eth_frames` are selected separately. Selected HCLK is 25–168 MHz; MDC division and the 20/40/80 ns PTP increment derive from the plan. The enhanced face provides whole-frame SG, one VLAN C-tag, explicit checksum offload and MAC hardware-event/PTP timestamps. This establishes no synchronization or physical-accuracy qualification. PHY wiring, protocol stacks, synchronization and network policy are external."
 
 msgid "[Ethernet 帧](../design/ethernet-frames.md)、[MAC／MDIO](../design/ethernet.md)"
 msgstr "[Ethernet frames](../design/ethernet-frames.md), [MAC / MDIO](../design/ethernet.md)"
@@ -320,8 +404,20 @@ msgstr "[Ethernet frames](../design/ethernet-frames.md), [MAC / MDIO](../design/
 msgid "USB"
 msgstr "USB"
 
+msgid "FS／HS 引擎的 Device／Host、PIO 与 HS AHB DMA；Device 支持 control、bulk、interrupt 和单 transaction ISO packet。Device ISO 使用实际速度的帧窗口，接纳时剩余期限至多 1 秒，并满足受审 FIFO 分区；无 ACK／自动重试或周期调度。内部 PHY 仍为 FS，外部 ULPI 提供 HS／FS 回退；显式 managed roles 与按需 ST 官方 Core 桥接。同 epoch 提前零长 STATUS OUT 与 DATA IN 可并存，线上闭合后仍须双方向内存 join。不维护高带宽 ISO、自动 HNP／SRP 或 Host split。"
+msgstr "Device/Host on FS/HS engines, PIO and HS AHB DMA. Device supports control, bulk, interrupt and single-transaction ISO packets. Device ISO uses actual-speed frame windows, admission deadlines at most one second away and reviewed FIFO partitions, with no ACK/automatic retry or periodic scheduling. Internal PHY remains FS; external ULPI supplies HS/FS fallback. Explicit managed roles and optional ST official Core bridging are selected as needed. Same-epoch early zero-length STATUS OUT may coexist with DATA IN; closing the wire still requires both memory directions to join. No high-bandwidth ISO, automatic HNP/SRP or Host split."
+
 msgid "[USB 所有权](../design/usb-device.md)"
 msgstr "[USB ownership](../design/usb-device.md)"
+
+msgid "USB Device 远程唤醒"
+msgstr "USB Device remote wake"
+
+msgid "F407 的固定 Device 与 managed Device 阶段按需选择；FS、HS 内部 FS、ULPI 均由所选控制器的唯一 DCD 负责。host SET／CLEAR_FEATURE 在 STATUS IN 真实 ACK 后生效，取消或超时不撤销线上已提交作用。新 suspend 收条至少 5001 µs；有限 request 显式声明 service 延迟 B，满足 Core 时间／B 合同才证明 1–15 ms 信号。cancel／stop、拒撤或角色切换保留原 request／clock／pins，外部 USB 域失电或 CPU 停机不由该合同保证。共享 Flash 开销按实际链接另测"
+msgstr "Selected as needed on F407 fixed Device or managed Device phases. FS, HS internal-FS and ULPI configurations each retain their selected controller's one DCD. Host SET/CLEAR_FEATURE takes effect only on the actual STATUS IN ACK; cancellation or timeout cannot undo the committed wire effect. A fresh suspend receipt must be at least 5001us old. The finite request declares service-delay bound B; satisfying Core time/B contracts proves a 1–15 ms signal. Cancel/stop, refused withdrawal and role changes retain the original request/clocks/pins. The contract does not cover external USB-domain power loss or CPU halt. Shared Flash costs require separate actual linked measurements."
+
+msgid "[远程唤醒合同](../design/usb-device.md)"
+msgstr "[Remote-wake contract](../design/usb-device.md)"
 
 msgid "可选器件组件"
 msgstr "Optional device components"
@@ -341,20 +437,11 @@ msgstr "Selection, evidence and sources"
 msgid "先确定精确型号和 Board 授权，再选择模式并通过 resolver 检查资源、内存域和时钟。 [派生能力表](capabilities.md)用于追踪声明、路线、装配和生产 ops；它不是第二份 配置输入，也不证明相关运行、排空或物理时序已通过。"
 msgstr "Establish the exact part and Board authorization, then select a mode and pass the resolver's resource, memory-domain and clock checks. The [derived capability table](capabilities.md) traces declarations, routes, assemblies and production operations. It is neither a second configuration input nor proof that the corresponding execution, drain or physical timing passed."
 
+msgid "本次所列模型与 ARM 结果只覆盖各自精确配置，不把单个程序、对象或 ELF 扩大为 全系列／全部模式通过。最终软件候选及 [完整维护消费者计划](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/consumer_profiles.py) 仍须在完整门禁中使用相同源码验证；本页不提前宣布它们已经完成。"
+msgstr "The listed model/ARM results cover their exact configurations only. An individual program, object or ELF does not establish whole-family or all-mode acceptance. The final software candidate and [complete maintained consumer plan](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/consumer_profiles.py) must still validate identical source through the complete gates; this page does not announce that work complete in advance."
+
 msgid "源码维护、分组模型回归、ARM ELF、Source SDK、完整软件候选和物理 station 分别 建立证据，并绑定各自源码与配置。代理的 GREEN 或单个 ELF 不构成全候选通过。 当前 physical HIL 为 `not_executed`；未知 PCB、晶振精度、跳线、负载和波形保持未知。"
 msgstr "Source maintenance, grouped model regressions, ARM ELF, Source SDK, whole software candidates and physical stations establish separate evidence bound to their own source and configuration. An agent's GREEN or a single ELF does not establish whole-candidate acceptance. Current physical HIL is `not_executed`; unknown PCBs, oscillator accuracy, jumpers, loads and waveforms remain unknown."
 
 msgid "所有 vendor、子模块、锁与许可证保留。未选 SDK 不进入默认生产构建闭包； [器件目录](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/devices.json)只描述官方宏、启动和 IRQ 编译事实。 历史范围见[固定重构前源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)， 旧候选、计数和实板结果不重标为当前源码资格。"
 msgstr "All vendors, submodules, locks and licenses are retained. Unselected SDKs do not enter the default production build closure. The [device catalogue](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/devices.json) describes official macro, startup and IRQ compilation facts only. Historical scope is available in the [fixed pre-refactor source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18); old candidates, counts and physical results are not relabeled as qualification for the current source."
-
-msgid "FS／HS 引擎的 Device／Host、PIO 与 HS AHB DMA；Device 支持 control、bulk、interrupt 和单 transaction ISO packet。Device ISO 使用实际速度的帧窗口，接纳时剩余期限至多 1 秒，并满足受审 FIFO 分区；无 ACK／自动重试或周期调度。内部 PHY 仍为 FS，外部 ULPI 提供 HS／FS 回退；显式 managed roles 与按需 ST 官方 Core 桥接。不维护高带宽 ISO、remote wake、自动 HNP／SRP、Host split 或即时 premature STATUS OUT"
-msgstr "Device/Host on FS/HS engines, PIO and HS AHB DMA. Device supports control, bulk, interrupt and single-transaction ISO packets. Device ISO uses the frame window for the observed speed, requires at most 1 second of remaining deadline on admission, and must fit the reviewed FIFO partition. It provides no ACK, automatic retry or periodic scheduling. The internal PHY remains FS; external ULPI provides HS/FS fallback. Explicit managed roles and optional ST Core bridges are available. High-bandwidth ISO, remote wake, automatic HNP/SRP, Host split and immediate premature STATUS OUT are not maintained"
-
-msgid "SD memory／MMC polling、有限 IRQ／DMA；SDIO functions 使用独立 face 的 CMD5／52／53。单卡、3.3 V，SD／SDIO 为 1／4 位，MMC 可显式选择经版本和 SWITCH 检查的 8 位十引脚软件参考。combo 不同时维护 memory portion；当前只接纳 `hse8-pll168`，不提供 HS／DDR／HS200"
-msgstr "SD memory / MMC polling and finite IRQ / DMA; SDIO functions use CMD5 / 52 / 53 through a separate face. One card, 3.3 V; SD / SDIO use 1 / 4-bit buses. MMC may explicitly select an 8-bit ten-pad software reference after version and SWITCH checks. Combo cards do not simultaneously maintain the memory portion. Only `hse8-pll168` is currently admitted; HS / DDR / HS200 are not provided"
-
-msgid "已审 TIM3／4／5／9–14 PWM；TIM1／3／4／5／8／9–14 原始输入捕获，按实例开放 1／2／4 通道，TIM5 保留 32 位；TIM1／3／4／5／8 支持 x2／x4 正交计数。TIM2 保留给 Core，TIM6／7 用作专用触发；timer personality 独占，IRQ 只取得所选模式实际使用的向量"
-msgstr "Reviewed TIM3 / 4 / 5 / 9–14 PWM; TIM1 / 3 / 4 / 5 / 8 / 9–14 raw input capture, with 1 / 2 / 4 channels according to the instance and a full 32-bit count on TIM5. TIM1 / 3 / 4 / 5 / 8 support x2 / x4 quadrature counting. TIM2 is reserved for Core and TIM6 / 7 for dedicated triggers. Timer personalities are exclusive; an IRQ lease covers only the vector actually used by the selected mode"
-
-msgid "精确封装全部 GPIO 的 input／output、四档显式输出速度与 EXTI0–15；PVD 原始电平／事件。省略速度保留已有配置，PC13–15 输出限制为 LOW；晶振和调试引脚仍受资源约束。保留 COALESCED／LOSS，不提供自动消抖、精确边沿时间或 BOR 资格"
-msgstr "Input / output on every GPIO pad of the exact packages, four explicit output-speed grades and EXTI0–15; raw PVD levels / events. An omitted speed preserves the existing setting, except PC13–15 outputs are restricted to LOW. Oscillator and debug pads remain subject to resource constraints. COALESCED / LOSS are preserved; no automatic debounce, exact edge time or BOR qualification"

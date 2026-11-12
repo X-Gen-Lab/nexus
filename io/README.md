@@ -22,7 +22,7 @@ I/O 为应用和组件提供公共 C11 类型，为 SoC 的具体实现规定操
 | `private/` | 无硬件依赖的验证、序列身份和日历 |
 | `../soc/stm32/stm32f4/drivers/ip/` | F4 私有选编的受审 IP 算法 |
 | `../tests/support/native/drivers/` | 显式测试 scope 的独立宿主模型 |
-| `../soc/stm32/stm32f4/drivers/` | 当前 F407VE／ZG 具体实现和模式 |
+| `../soc/stm32/stm32f4/drivers/` | 按精确器件与模式选编的控制器实现 |
 
 物理 Platform 按 CMake 源码合同编译选定控制器域与组件依赖；空装配仍有时间戳
 和诊断辅助。显式 Native 测试模型与仅复用 CPU 的 Runtime

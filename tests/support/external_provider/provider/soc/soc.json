@@ -7,8 +7,12 @@
       "flash": {
         "origin": 134217728,
         "size": 1048576,
-        "erase_blocks": [
-          1048576
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 1048576,
+            "count": 1
+          }
         ]
       },
       "memory": [

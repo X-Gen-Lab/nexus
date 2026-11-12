@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: b6b00cd679e61bdb0babad59cf9e3ab612f1063f3f2f9f42ae6220abf1ff24ca\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 2225a308d745c74fc48302580a33c918a0da2ef75d8b52f33b5674df21c02585\n"
 
 msgid "当前平台交付边界"
 msgstr "Current platform delivery boundaries"
@@ -61,8 +61,17 @@ msgstr "The current source version remains 0.2.1. Published versions are defined
 msgid "退出平台的原始实现和记录可从 [重构前固定源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18) 追溯。原日志、来源和状态保持原身份，恢复或阅读它们不授予新源码资格。"
 msgstr "Retired implementations and records remain traceable at the [fixed pre-refactor source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18). Original logs, sources and states retain their identities; restoring or reading them does not qualify the new source."
 
-msgid "[本批变更与验证](https://github.com/X-Gen-Lab/nexus/pull/60)"
-msgstr "[Changes and verification for this batch](https://github.com/X-Gen-Lab/nexus/pull/60)"
+msgid "[本轮架构任务](architecture.md#本轮架构迭代任务)"
+msgstr "[Current architecture tasks](architecture.md#本轮架构迭代任务)"
 
-msgid "当前 PR 的源码 HEAD、实际本地 CI、ARM 和 SDK 记录；与历史记录分别读取"
-msgstr "Read the current PR source HEAD and actual local CI, ARM and SDK records separately from historical records"
+msgid "WP01–WP12 与 IO01–IO20 的既有基础、实施增量和退出条件"
+msgstr "Existing foundations, implementation increments and exit criteria for WP01–WP12 and IO01–IO20"
+
+msgid "[本批变更与验证](https://github.com/X-Gen-Lab/nexus/pull/61)"
+msgstr "[Current changes and verification](https://github.com/X-Gen-Lab/nexus/pull/61)"
+
+msgid "PR #61 的源码与实际执行记录；后续增量不继承基线资格"
+msgstr "PR #61 source and actual execution records; later increments do not inherit baseline qualification"
+
+msgid "本轮架构迭代以固定源码 [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984) 为既有基础。该版本已有的流式传输、恢复和勘误修正，与本轮工作包新增内容分别记录。 PR、目录或公共接口存在不等于工作包完成；当前实施仍须取得对应源码的测试、ARM、 资源、SDK 与文档结果。实板和远端 Actions 按用户要求暂缓，软件验收使用本地门禁。"
+msgstr "This architecture iteration uses fixed source [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984) as its existing baseline. Its streaming, recovery and errata fixes are recorded separately from new work-package changes. A PR, directory or public interface does not establish package completion. Current changes still need source-specific tests, ARM, resource, SDK and documentation results. Physical boards and remote Actions are deferred at the user's request; software acceptance uses local gates."

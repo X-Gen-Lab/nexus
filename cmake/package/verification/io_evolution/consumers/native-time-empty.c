@@ -6,7 +6,7 @@
  */
 #include "nexus/io/native/model.h"
 #include "nexus_bindings.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 /** \brief Failure always maps to a real nonzero process result. */
 #define CHECK(condition)                                                       \
     do {                                                                       \
@@ -22,16 +22,17 @@ int main(void) {
     _Static_assert(NX_RTC_ID_COUNT == 0, "No selected RTC state");
     _Static_assert(NX_LPTIM_ID_COUNT == 0, "No selected LPTIM state");
     CHECK(nx_native_clock_configure(true, 19) == NX_SUCCESS);
-    CHECK(nx_factory_rtc(0) == NULL);
-    CHECK(nx_factory_lptim(0) == NULL);
-    CHECK(nx_factory_rtc_capability(0) == NULL);
-    CHECK(nx_factory_lptim_capability(0) == NULL);
+    CHECK(nx_factory_rtc_ref(NX_RTC_REF_COUNT) == NULL);
+    CHECK(nx_factory_lptim_ref(NX_LPTIM_REF_COUNT) == NULL);
+    CHECK(nx_factory_rtc_capability_ref(NX_RTC_REF_COUNT) == NULL);
+    CHECK(nx_factory_lptim_capability_ref(NX_LPTIM_REF_COUNT) == NULL);
     CHECK(nx_time_now_us() == 19U);
     for (unsigned cycle = 0; cycle < 2; ++cycle) {
         nx_platform_start_result_t start = nx_platform_start();
         CHECK(start.primary == NX_SUCCESS && start.cleanup == NX_SUCCESS &&
               start.remaining_effects == 0U);
-        CHECK(nx_factory_rtc(0) == NULL && nx_factory_lptim(0) == NULL);
+        CHECK(nx_factory_rtc_ref(NX_RTC_REF_COUNT) == NULL &&
+              nx_factory_lptim_ref(NX_LPTIM_REF_COUNT) == NULL);
         CHECK(nx_time_now_us() == 19U);
         CHECK(nx_platform_stop() == NX_SUCCESS);
         CHECK(nx_platform_stop() == NX_SUCCESS);

@@ -9,6 +9,9 @@
 #include "nexus/core/platform_lifecycle.h"
 #include "stm32f407_packet_cold.h"
 
+/** \brief Optional Ethernet receipt; its concrete owner supplies the type. */
+typedef struct nx_stm32_eth_resource_receipt nx_stm32_eth_resource_receipt_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif

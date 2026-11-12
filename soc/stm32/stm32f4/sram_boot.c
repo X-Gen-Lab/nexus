@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "private/stm32f407_fsmc_profile.h"
+#include "private/stm32f407_silicon.h"
 #include "private/stm32f407_sram_boot.h"
 #include "stm32f4xx_ll_fsmc.h"
 #include "stm32f4xx_ll_gpio.h"
@@ -94,7 +95,7 @@ bool nx_stm32_sram_boot_plan_valid(const nx_stm32_sram_boot_plan_t* p) {
 }
 /** \brief Die/density can be observed; package/PCB identity stays authored. */
 static bool device_matches(void) {
-    return (NX_SRAM_BOOT_DEVICE_ID() & DBGMCU_IDCODE_DEV_ID) == 0x413U &&
+    return nx_stm32f407_silicon_admit(NX_SRAM_BOOT_DEVICE_ID()) == NX_SUCCESS &&
            NX_SRAM_BOOT_FLASH_KIB() == 1024U;
 }
 /** \brief Reset entry is a contract; register equality cannot prove provenance.

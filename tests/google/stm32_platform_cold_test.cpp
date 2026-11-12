@@ -566,6 +566,7 @@ TEST_F(PlatformCold, ActiveOscillatorPadsRejectBeforeBankClockOrSnapshot) {
     };
     const OscillatorPad pads[]{{GPIOH, 7U, 0U, true},
                                {GPIOH, 7U, 1U, true},
+                               {GPIOC, 2U, 13U, false},
                                {GPIOC, 2U, 14U, false},
                                {GPIOC, 2U, 15U, false}};
     config.pin_count = 1U;
@@ -591,4 +592,15 @@ TEST_F(PlatformCold, ActiveOscillatorPadsRejectBeforeBankClockOrSnapshot) {
             EXPECT_EQ(NX_SUCCESS, nx_stm32_platform_pins_admit(&config, false));
         }
     }
+}
+
+TEST_F(PlatformCold, BypassedLseAllowsAnIndependentPc13Owner) {
+    config.pin_count = 1U;
+    pins[0] = {GPIOC, &snapshots[0], 2U, 13U};
+    RCC->BDCR = RCC_BDCR_LSEON | RCC_BDCR_LSERDY | RCC_BDCR_LSEBYP;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_platform_pins_admit(&config, true));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_platform_pins_admit(&config, false));
+    EXPECT_EQ(0U, RCC->AHB1ENR);
+    EXPECT_EQ(0U, writes);
+    EXPECT_EQ(0U, captures);
 }

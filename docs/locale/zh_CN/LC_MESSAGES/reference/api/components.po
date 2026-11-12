@@ -4141,20 +4141,12 @@ msgid "Start one forced temperature/pressure conversion."
 msgstr "启动一次强制温度／压力转换。"
 
 #: docs/reference/api/components.md:482
-msgid "Task-only serialized driver owner; oversampling x1/x1."
-msgstr "仅限任务上下文的串行驱动所有者；过采样为 x1/x1。"
-
-#: docs/reference/api/components.md:482
 msgid "[inout] Initialized non-measuring instance"
 msgstr "[inout] 已初始化且未在测量的实例"
 
 #: docs/reference/api/components.md:482
 msgid "[in] Absolute deadline covering conversion and reads"
 msgstr "[in] 覆盖转换与读取的绝对截止时间"
-
-#: docs/reference/api/components.md:482
-msgid "SUCCESS, BUSY, TIMEOUT or transport error"
-msgstr "SUCCESS、BUSY、TIMEOUT 或传输错误"
 
 #: docs/reference/api/components.md:482
 msgid "Poll conversion without an implicit worker or blocking delay."
@@ -6125,26 +6117,6 @@ msgid "Success means ACCEPTED; every failure retains no request or payload."
 msgstr "成功表示 ACCEPTED；任何失败均不保留 request 或 payload。"
 
 #: docs/reference/api/components.md:612
-msgid "Make one bounded progress step, at most one poll and one packet action."
-msgstr "推进一个有界步骤，至多进行一次 poll 和一次 packet 动作。"
-
-#: docs/reference/api/components.md:612
-msgid ""
-"No queue or worker. All packet deadlines use the outer independent absolute "
-"monotonic deadline. Poll while borrowed, even after cancel, reset, SETUP "
-"supersession or device stop. Cancel/drain/quarantine retain descriptor bytes "
-"and outer context. OUT0 quarantine exposes NEEDS_DEVICE_STOP; only the "
-"external controller owner may authorize stop. This adapter never stops the "
-"shared controller automatically. One SETTLED packet is folded before "
-"observing newer controller epochs."
-msgstr ""
-"不使用队列或 worker。所有 packet deadline 均使用 outer 独立的绝对单调 deadline。借用期间须持续 "
-"poll，即使已发生 cancel、reset、SETUP 替代或 device stop。cancel／drain／quarantine 均保留 "
-"descriptor 字节与 outer context。OUT0 quarantine 暴露 NEEDS_DEVICE_STOP；仅外部 "
-"controller owner 能授权 stop。该 adapter 绝不会自动停止共享 controller。在观察更新的 controller "
-"epoch 前，先折叠一个已 SETTLED 的 packet。"
-
-#: docs/reference/api/components.md:612
 msgid "[inout] Same serialized executor and lifetime as begin."
 msgstr "[inout] 同一个串行化执行者；沿用 begin 的生命周期要求。"
 
@@ -6383,3 +6355,15 @@ msgstr ""
 
 msgid "Configuration views require alternate zero, endpoint plans matching selected bulk, interrupt or ISO ports, consistent totals and unique interface numbers. ISO bInterval is 1..16, an exponent of FS frames or HS microframes; ISO synchronization/usage encodings remain class policy after reserved-value validation. Only one transaction is selected; HS high-bandwidth multipliers return UNSUPPORTED. Interrupt bInterval in external descriptor bytes is a 1..255 linear count of 1 ms frames at FS, or a 1..16 exponent of 125 us microframes at HS. Bulk bInterval is not interpreted; no polling is scheduled. Class-specific subordinate bytes are bounds-checked but not decoded. Class dispatch, VID/PID, strings, policy, CDC/HID and descriptor lookup remain external. Success is structural validation, not enumeration or physical qualification. To send bytes, preserve their lifetime through the control adapter's acquire-observed outer SETTLED. The view struct requires natural C alignment; rejection is not an arbitrary address probe. Descriptor bytes need only byte alignment and remain externally readable."
 msgstr "configuration 视图要求 alternate zero、与选定 bulk、interrupt 或 ISO 端口匹配的 endpoint 计划、一致的总长度及唯一的 interface 编号。ISO bInterval 为 1..16，表示 FS frame 或 HS microframe 的指数；ISO 同步／用途编码在保留值校验后仍属 class 策略。每次仅选择一个 transaction；HS 高带宽 multiplier 返回 UNSUPPORTED。外部 descriptor 字节中的 interrupt bInterval 在 FS 为 1..255 的线性计数，单位为 1 ms frame；在 HS 为 1..16 的指数编码，单位为 125 µs microframe。bulk bInterval 不作解析，也不调度轮询。class-specific 从属字节仅检查边界，不作解码。class 分派、VID/PID、字符串、策略、CDC/HID 及 descriptor 查找仍由外部负责。成功仅表示结构校验通过，不表示枚举或物理资格。发送字节时，必须保持其有效，直到以 acquire 语义观察到 control adapter 的 outer SETTLED。view 结构体须按 C 类型自然对齐；拒绝机制不能用于探测任意地址。descriptor 字节仅需 byte alignment，且须保持外部可读。"
+
+msgid "Task-only serialized driver owner; oversampling x1/x1. Ready time is finite even with an explicit infinite caller deadline. EXHAUSTED retains no software conversion or MCU buffer; a completed configuration write can still have started the sensor. Retry uses its actual idle status."
+msgstr "仅由串行 Task 驱动 owner 调用，过采样 x1／x1。即使调用方显式选择无限 deadline，ready 等待仍有限。EXHAUSTED 不保留软件转换状态或 MCU buffer；已经完成的配置写入仍可能启动传感器。重试须观察其实际 idle 状态。"
+
+msgid "SUCCESS, BUSY, TIMEOUT, EXHAUSTED or transport error"
+msgstr "SUCCESS、BUSY、TIMEOUT、EXHAUSTED 或传输错误"
+
+msgid "Poll once, submit at most two packets or cancel one loan."
+msgstr "poll 一次，至多提交两个 packet 或取消一个 loan。"
+
+msgid "No queue or worker. All packet deadlines use the outer independent absolute monotonic deadline. Poll while borrowed, even after cancel, reset, SETUP supersession or device stop. Cancel/drain/quarantine retain descriptor bytes and outer context. OUT0 quarantine exposes NEEDS_DEVICE_STOP; only the external controller owner may authorize stop. This adapter never stops the shared controller automatically. Control DATA IN prearms one zero-length STATUS OUT before exposing its first IN packet. A STATUS ACK fixes the wire outcome, but both accepted directions must join before outer SETTLED. Acquired packet facts are folded before observing newer controller epochs."
+msgstr "没有队列或 worker。所有 packet 使用 outer 独立绝对单调 deadline。借用期间持续 poll，包括 cancel、reset、新 SETUP 替代或设备停止后。取消、排空或隔离保留描述符字节和 outer context。OUT0 隔离暴露 NEEDS_DEVICE_STOP，仅外部 controller owner 可授权 stop；adapter 不自动停止共享 controller。control DATA IN 在暴露首个 IN packet 前，先预置一个零长 STATUS OUT。STATUS ACK 确定线上结果，但两个已接纳方向都 join 后才发布 outer SETTLED。先汇总已 acquire 的 packet 事实，再观察更新的 controller epoch。"

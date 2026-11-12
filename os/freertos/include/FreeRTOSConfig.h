@@ -65,11 +65,8 @@ extern "C" {
 #define INCLUDE_uxTaskGetStackHighWaterMark 1
 #define vPortSVCHandler                     SVC_Handler
 #define xPortPendSVHandler                  PendSV_Handler
-#if defined(NEXUS_OS_TIMEBASE_LOWPOWER) && NEXUS_OS_TIMEBASE_LOWPOWER
+/* Nexus owns the exception exit; the locked port retains the real tick. */
 #define xPortSysTickHandler nx_freertos_kernel_tick_handler
-#else
-#define xPortSysTickHandler SysTick_Handler
-#endif
 
 #if NEXUS_OS_MEMORY_PROTECTION
 #define configUSE_MPU_WRAPPERS_V1                   0

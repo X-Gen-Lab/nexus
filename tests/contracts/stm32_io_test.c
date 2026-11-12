@@ -17,17 +17,21 @@ static const nx_flash_sector_t s_sectors[] = {
     {0x0C000U, 0x04000U}, {0x10000U, 0x10000U}, {0x20000U, 0x20000U},
     {0x40000U, 0x20000U}, {0x60000U, 0x20000U}, {0x80000U, 0x20000U},
     {0xA0000U, 0x20000U}, {0xC0000U, 0x20000U}, {0xE0000U, 0x20000U}};
+static const nx_flash_erase_span_t s_spans_ve[] = {
+    {0U, 0x4000U, 4U}, {0x10000U, 0x10000U, 1U}, {0x20000U, 0x20000U, 3U}};
+static const nx_flash_erase_span_t s_spans_zg[] = {
+    {0U, 0x4000U, 4U}, {0x10000U, 0x10000U, 1U}, {0x20000U, 0x20000U, 7U}};
 const nx_flash_geometry_t g_nx_stm32_flash_ve = {.base_address = 0x08000000U,
                                                  .size = 524288U,
                                                  .program_unit = 4U,
-                                                 .sectors = s_sectors,
-                                                 .sector_count = 8U,
+                                                 .erase_spans = s_spans_ve,
+                                                 .erase_span_count = 3U,
                                                  .program_flags = 0U};
 const nx_flash_geometry_t g_nx_stm32_flash_zg = {.base_address = 0x08000000U,
                                                  .size = 1048576U,
                                                  .program_unit = 4U,
-                                                 .sectors = s_sectors,
-                                                 .sector_count = 12U,
+                                                 .erase_spans = s_spans_zg,
+                                                 .erase_span_count = 3U,
                                                  .program_flags = 0U};
 
 nx_stm32_system_t g_nx_stm32_system;
@@ -43,7 +47,17 @@ static unsigned s_nvic_clear;
 static int s_nvic_irq;
 static unsigned s_delayed_clock_read;
 static unsigned s_delayed_barrier;
+static GPIO_TypeDef* s_gpio_latch_bank;
 static uint8_t s_flash_memory[1048576] __attribute__((aligned(4)));
+
+/** \brief Apply the selected local GPIO's external BSRR latch effect. */
+void nx_stm32_gpio_latch_model_write(volatile uint32_t* reg, uint32_t value) {
+    *reg = value;
+    if (s_gpio_latch_bank != NULL && reg == &s_gpio_latch_bank->BSRR) {
+        s_gpio_latch_bank->ODR = (s_gpio_latch_bank->ODR & ~(value >> 16U)) |
+                                 (value & UINT32_C(0xFFFF));
+    }
+}
 
 /** \brief Expose the ordinary model readback, preserving the real pointer. */
 uint32_t nx_stm32_model_gpio_clock_read(const volatile uint32_t* reg) {
@@ -148,8 +162,7 @@ void nx_stm32_model_io_poll(unsigned kind, void* raw) {
             port->registers->SR = 0U;
             if ((port->registers->CR & FLASH_CR_STRT) != 0U) {
                 size_t index = (port->registers->CR & FLASH_CR_SNB) >> 3U;
-                const nx_flash_sector_t* sector =
-                    &port->geometry->sectors[index];
+                const nx_flash_sector_t* sector = &s_sectors[index];
                 memset((void*)(port->memory + sector->offset), 0xFF,
                        sector->size);
                 port->registers->CR &= ~(uint32_t)FLASH_CR_STRT;
@@ -197,6 +210,7 @@ static void gpio_test(void) {
     assert((g_nx_stm32_gpioa_model.MODER & (3U << 26U)) == (3U << 26U));
     assert((g_nx_stm32_gpioa_model.AFR[1] & 0xFF0U) == 0x770U);
     GPIO_TypeDef registers = {0};
+    s_gpio_latch_bank = &registers;
     nx_stm32_gpio_state_t port = {
         .registers = &registers, .mask = 0x18U, .output = true};
     const nx_gpio_port_t port_api = {&nx_stm32_gpio_ops, &port};
@@ -237,6 +251,7 @@ static void gpio_test(void) {
            registers.AFR[0] == af && registers.BSRR == (1U << 3U));
     /* The global model borrows this local RCC only inside this fixture scope.
      */
+    s_gpio_latch_bank = NULL;
     g_nx_stm32_system.rcc = previous_rcc;
 }
 
@@ -415,6 +430,7 @@ static void spi_test(void) {
     SPI_TypeDef registers = {0};
     RCC_TypeDef rcc = {0};
     GPIO_TypeDef gpio = {0};
+    s_gpio_latch_bank = &gpio;
     nx_stm32_gpio_state_t cs = {.registers = &gpio, .mask = 1U, .output = true};
     const nx_gpio_port_t cs_api = {&nx_stm32_gpio_ops, &cs};
     (void)cs_api;
@@ -464,6 +480,7 @@ static void spi_test(void) {
     s_fault = 2U;
     assert(nx_spi_endpoint_transfer(&endpoint_api, tx, rx, 3U, s_time + 4U,
                                     &count) == NX_ERROR_IO);
+    s_gpio_latch_bank = NULL;
 }
 
 /** \brief Verify repeated START profiles, explicit NACK/arbitration and
@@ -539,7 +556,10 @@ static void flash_test(void) {
     const nx_flash_port_t port_api = {&nx_stm32_flash_ops, &port};
     (void)port_api;
     memset(s_flash_memory, 0xFF, sizeof(s_flash_memory));
-    assert(nx_flash_port_geometry(&port_api)->sector_count == 8U);
+    uint32_t sector_count;
+    assert(nx_flash_geometry_sector_count(nx_flash_port_geometry(&port_api),
+                                          &sector_count) == NX_SUCCESS);
+    assert(sector_count == 8U);
     uint8_t buffer[8] = {0};
     assert(nx_flash_port_read(&port_api, UINT32_MAX, buffer, sizeof(buffer)) ==
            NX_ERROR_INVALID);
@@ -575,7 +595,9 @@ static void flash_test(void) {
            NX_ERROR_IO);
     assert(!port.active && (registers.CR & FLASH_CR_LOCK) != 0U);
     port.geometry = &g_nx_stm32_flash_zg;
-    assert(nx_flash_port_geometry(&port_api)->sector_count == 12U);
+    assert(nx_flash_geometry_sector_count(nx_flash_port_geometry(&port_api),
+                                          &sector_count) == NX_SUCCESS);
+    assert(sector_count == 12U);
     assert(nx_flash_port_geometry(&port_api)->size == 1048576U);
 }
 
@@ -688,6 +710,7 @@ static void exti_test(void) {
 static void timer_adc_test(void) {
     TIM_TypeDef timer = {0};
     GPIO_TypeDef gpio = {0};
+    s_gpio_latch_bank = &gpio;
     nx_stm32_gpio_state_t idle = {
         .registers = &gpio, .mask = 64U, .output = true};
     const nx_gpio_port_t idle_api = {&nx_stm32_gpio_ops, &idle};
@@ -744,6 +767,7 @@ static void timer_adc_test(void) {
     assert(nx_adc_port_sample(&port_api, samples, 2U, s_time + 20U, &count) ==
            NX_ERROR_IO);
     assert(count == 0U && adc.CR2 == 0U);
+    s_gpio_latch_bank = NULL;
 }
 
 /** \brief Execute actual provider functions, never a stand-in API

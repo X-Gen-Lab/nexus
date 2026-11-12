@@ -57,7 +57,9 @@ nx_stm32_platform_pins_admit(const nx_stm32_platform_config_t* config,
          */
         if ((pin->registers == GPIOH && pin->pin <= 1U &&
              (RCC->CR & (RCC_CR_HSEON | RCC_CR_HSERDY)) != 0U) ||
-            (pin->registers == GPIOC && pin->pin >= 14U &&
+            (pin->registers == GPIOC &&
+             (pin->pin >= 14U ||
+              (pin->pin == 13U && (RCC->BDCR & RCC_BDCR_LSEBYP) == 0U)) &&
              (RCC->BDCR & (RCC_BDCR_LSEON | RCC_BDCR_LSERDY)) != 0U))
             return NX_ERROR_BUSY;
         if (powered_only && (RCC->AHB1ENR & (1U << pin->port_index)) == 0U)
@@ -84,7 +86,8 @@ nx_stm32_platform_selected_preflight(const nx_stm32_platform_config_t* config) {
     if (config->exti_lines != 0U &&
         ((EXTI->IMR | EXTI->EMR | EXTI->PR) & config->exti_lines) != 0U)
         return NX_ERROR_BUSY;
-    for (size_t i = 0U; i < 3U; ++i) {
+    for (size_t i = 0U;
+         i < sizeof(config->irq_masks) / sizeof(config->irq_masks[0]); ++i) {
         if (config->irq_masks[i] != 0U &&
             ((NVIC->ISER[i] | NVIC->ISPR[i] | NVIC->IABR[i]) &
              config->irq_masks[i]) != 0U)

@@ -104,6 +104,119 @@ class SDKServicesPolicyTests(unittest.TestCase):
                 expected_revision="a" * 40, fixture=True)
         self.assertEqual(list(output.iterdir()), [])
 
+    def test_f4_family_profiles_share_one_explicit_consumer_plan(self):
+        profiles = tuple(item for item in consumer_profiles.SERVICE_CONSUMERS
+                         if item.scenario == "f4_family")
+        self.assertEqual([item.assembly for item in profiles], [
+            "f405zg.toml", "f415zg.toml", "f417zg.toml",
+            "f411re.toml", "f446ze.toml", "f479ni.toml"])
+        self.assertEqual([item.domain for item in profiles], [
+            "arm-family-f405zg", "arm-family-f415zg", "arm-family-f417zg",
+            "arm-family-f411re", "arm-family-f446ze", "arm-family-f479ni"])
+        self.assertTrue(all(item.arm for item in profiles))
+
+    def test_new_ip_profiles_copy_exact_public_consumers_and_board_identity(self):
+        prefix = self.prefix()
+        sdk = prefix / "share/nexus/src"
+        for scenario in ("f4_crypto", "f4_sdram", "f4_graphics", "f4_sai", "f4_qspi"):
+            relative = Path("tests/contracts") / ("stm32" + scenario)
+            shutil.copytree(ROOT / relative, sdk / relative)
+        expected = (("f415zg crypto", "f415zg.toml", "arm-crypto-f415zg", "f4_crypto"),
+                    ("f417zg crypto", "f417zg.toml", "arm-crypto-f417zg", "f4_crypto"),
+                    ("f479ni sdram", "f479ni-sdram.toml", "arm-sdram-f479ni", "f4_sdram"),
+                    ("f479ni qspi", "f479ni-qspi.toml", "arm-qspi-f479ni", "f4_qspi"),
+                    ("f479ni graphics", "combined.toml", "arm-graphics-f479ni", "f4_graphics"),
+                    ("f479ni image", "image-only.toml", "arm-image-f479ni", "f4_graphics"),
+                    *((f"{part} sai {role}", f"{part}-{role}.toml",
+                       f"arm-sai-{part}-{role}", "f4_sai")
+                      for part in ("f446ze", "f479ni") for role in ("master", "slave")))
+        for name, assembly, domain, scenario in expected:
+            with self.subTest(name=name):
+                profile = consumer_profiles.ServiceConsumer(
+                    name, assembly, domain, True, scenario)
+                self.assertIn(profile, consumer_profiles.SERVICE_CONSUMERS)
+                output = self.directory / domain
+                output.mkdir()
+                source, _, _ = self.consumers.prepare_service_consumer(
+                    prefix, output, profile, self.command,
+                    expected_revision="a" * 40, fixture=True)
+                directory = ROOT / "tests/contracts" / ("stm32" + scenario)
+                self.assertEqual((source / "main.c").read_bytes(),
+                                 (directory / "consumer.c").read_bytes())
+                resolved = configure.resolve_ir(source / "assembly.toml")
+                self.assertFalse(resolved.physical_qualified)
+                self.assertEqual(resolved.memory_budget.libc_heap_bytes, 0)
+                self.assertIn("nx_platform_stop",
+                              self.consumers.service_symbols(profile))
+                self.assertNotEqual(self.consumers.service_symbols(profile),
+                                    self.consumers.SERVICE_SYMBOLS)
+                self.assertIn("No physical", self.consumers.service_scope(profile))
+
+    def test_qspi_sdk_payload_retains_one_owned_provider_and_public_reference(self):
+        specification = importlib.util.spec_from_file_location(
+            "qspi_source_sdk_policy", ROOT / "cmake/package/package_source_sdk.py")
+        source_sdk = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(source_sdk)
+        owned = {
+            "cmake/platform/STM32QSPI.cmake",
+            "soc/stm32/stm32f4/drivers/qspi.c",
+            "soc/stm32/stm32f4/private/stm32f4_qspi.h",
+            "soc/stm32/stm32f4/private/qspi_hal/stm32f4xx_hal_conf.h",
+        }
+        reference = {"tests/contracts/stm32f4_qspi/" + name for name in (
+            "consumer.c", "CMakeLists.txt", "f479ni-qspi.toml",
+            "f479ni-qspi-board/board.json")}
+        payload = source_sdk.provider_descriptors.maintained("stm32f4").owned_payload
+        self.assertLessEqual(owned, set(payload))
+        self.assertLessEqual(owned | reference, set(source_sdk.REQUIRED_FILES))
+        for name in sorted(owned | reference):
+            with self.subTest(path=name):
+                self.assertTrue(source_sdk.selected(name))
+                self.assertTrue((ROOT / name).is_file())
+        # Host byte/FIFO simulation is not a firmware SDK dependency.
+        for name in ("vendor_model.py", "model-config/nexus_config.h"):
+            self.assertFalse(source_sdk.selected(
+                "tests/contracts/stm32f4_qspi/" + name))
+
+    def test_family_sources_prepare_exact_public_crc_and_board_bytes(self):
+        prefix = self.prefix()
+        sdk = prefix / "share/nexus/src"
+        fixture = Path("tests/contracts/stm32f4_family")
+        shutil.copytree(ROOT / fixture, sdk / fixture)
+        consumer = Path("tests/contracts/crc_assembly/consumer.c")
+        (sdk / consumer).parent.mkdir(parents=True)
+        shutil.copyfile(ROOT / consumer, sdk / consumer)
+        for stem, part in (("f405zg", "STM32F405ZGT6"),
+                           ("f415zg", "STM32F415ZGT6"),
+                           ("f417zg", "STM32F417ZGT6"),
+                           ("f411re", "STM32F411RET6"),
+                           ("f446ze", "STM32F446ZET6"),
+                           ("f479ni", "STM32F479NIH6")):
+            with self.subTest(part=part):
+                profile = consumer_profiles.ServiceConsumer(
+                    f"{stem} family", f"{stem}.toml",
+                    f"arm-family-{stem}", True, "f4_family")
+                output = self.directory / stem
+                output.mkdir()
+                source, _, command = self.consumers.prepare_service_consumer(
+                    prefix, output, profile, self.command,
+                    expected_revision="a" * 40, fixture=True)
+                self.assertEqual((source / "main.c").read_bytes(),
+                                 (ROOT / consumer).read_bytes())
+                self.assertEqual((source / "assembly.toml").read_bytes(),
+                                 (ROOT / fixture / profile.assembly).read_bytes())
+                board = Path(f"{stem}-board/board.json")
+                self.assertEqual((source / board).read_bytes(),
+                                 (ROOT / fixture / board).read_bytes())
+                resolved = configure.resolve_ir(source / "assembly.toml")
+                self.assertEqual(resolved.part, part)
+                self.assertFalse(resolved.physical_qualified)
+                self.assertEqual(resolved.memory_budget.libc_heap_bytes, 0)
+                self.assertIn("-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON", command)
+                self.assertEqual(self.consumers.service_symbols(profile), {
+                    "nx_platform_start", "nx_platform_stop", "nx_chip_info_read",
+                    "nx_factory_crc", "nx_crc_port_compute", "nx_stm32_crc_ops"})
+
     def image_fixture(self, profile_index=0):
         # Model external compiler/runtime ports; actual SDK execution is separate.
         prefix = self.prefix()

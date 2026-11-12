@@ -178,26 +178,22 @@ def image_window(resolved: dict) -> dict:
         raise EvidenceError("selected Flash image leaves physical Flash")
     if "kind" in selected and selected["kind"] != "image":
         raise EvidenceError("selected Flash layout is not an image")
-    blocks = physical.get("erase_blocks")
-    boundaries = {physical_start}
-    if blocks is not None:
-        if (not isinstance(blocks, list) or not blocks or
-                any(type(size) is not int or size <= 0 for size in blocks)):
-            raise EvidenceError("invalid physical Flash erase geometry")
-        cursor = physical_start
-        for size in blocks:
-            cursor += size
-            if cursor > physical_end:
-                raise EvidenceError("physical Flash erase geometry overflows")
-            boundaries.add(cursor)
-        if cursor != physical_end:
-            raise EvidenceError("physical Flash erase geometry is incomplete")
+    from tools.configure.memory import flash_erase_boundary, flash_erase_spans
+    spans = physical.get("erase_spans")
+    if "erase_blocks" in physical:
+        raise EvidenceError("invalid physical Flash erase geometry")
+    if spans is not None:
+        try:
+            flash_erase_spans(physical)
+        except ValueError as error:
+            raise EvidenceError("invalid physical Flash erase geometry") from error
     for key, value in physical.items():
         if (key not in {"origin", "size", "id", "kind"} and
                 key in selected and not _same_image_fact(value, selected[key])):
             raise EvidenceError("image cannot redefine physical Flash geometry")
     if (start, end) != (physical_start, physical_end):
-        if blocks is None or start not in boundaries or end not in boundaries:
+        if spans is None or not all(flash_erase_boundary(physical, value)
+                                    for value in (start, end)):
             raise EvidenceError("selected image requires physical erase boundaries")
     budget = resolved.get("memory_budgets", {})
     if not isinstance(budget, dict):
@@ -207,7 +203,7 @@ def image_window(resolved: dict) -> dict:
     if (any(type(value) is not int or not 0 <= value < 2**32
             for value in (prefix, suffix)) or prefix + suffix >= end - start):
         raise EvidenceError("image reservations leave the physical owner")
-    if (prefix or suffix) and blocks is None:
+    if (prefix or suffix) and spans is None:
         raise EvidenceError("image reservations require complete physical Flash erase geometry")
     start += prefix
     end -= suffix

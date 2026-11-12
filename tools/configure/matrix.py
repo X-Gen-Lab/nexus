@@ -44,13 +44,16 @@ def support_catalogue(root):
                                   integration.device_catalog)
                    if integration.device_catalog is not None else None)
         for part in sorted(soc["variants"]):
-            selected = (configure.catalog_soc_facts(soc, part, catalog)[0]
-                        if catalog is not None else soc)
-            configure.validate_soc(selected, part)
-            reviewed = configure.resolve_routes(routes, selected, part, provider)
-            for controller, facts in sorted(soc["controllers"].items()):
-                interfaces = [(facts["kind"], facts["modes"])]
-                interfaces += sorted(facts.get("interfaces", {}).items())
+            selected = configure.resolve_device_facts(
+                soc, part, provider, catalog=catalog)
+            device = selected.device
+            reviewed = configure.resolve_routes(
+                routes, selected.soc, part, provider,
+                controller_profiles=selected.controller_profiles)
+            for controller, facts in sorted(device.controllers.items()):
+                policy = device.modes[controller]
+                interfaces = [(facts.kind, policy.modes)]
+                interfaces += sorted(policy.interfaces.items())
                 for kind, modes in interfaces:
                     for mode in sorted(modes):
                         implementation = provider.mode_implementation(
@@ -108,24 +111,10 @@ def check_contracts(root=configure.ROOT):
     selected = component_choices(root)
     if selected != COMPONENTS:
         raise ValueError("Maintained components differ from CMake target selection")
-    for family in descriptor.families():
-        provider = maintained(family.family)
-        soc = configure.load(root / source_directory(family.family) / "soc.json")
-        catalog = (configure.load(root / family.source_directory / family.device_catalog)
-                   if family.device_catalog is not None else None)
-        for part in soc["variants"]:
-            selected = (configure.catalog_soc_facts(soc, part, catalog)[0]
-                        if catalog is not None else soc)
-            configure.validate_soc(selected, part)
-        for controller in soc["controllers"].values():
-            interfaces = [(controller["kind"], controller["modes"])]
-            interfaces += sorted(controller.get("interfaces", {}).items())
-            for kind, modes in interfaces:
-                if kind not in FACT_INTERFACE_KINDS or kind not in properties:
-                    raise ValueError("Provider kind has no authored/factory contract: " + kind)
-                for mode in modes:
-                    provider.mode_implementation(kind, mode)
-                    mode_traits(kind, mode)
+    for contract in support_catalogue(root):
+        if contract.kind not in FACT_INTERFACE_KINDS or contract.kind not in properties:
+            raise ValueError("Provider kind has no authored/factory contract: " +
+                             contract.kind)
     return {"kinds": sorted(kinds), "components": sorted(COMPONENTS),
             "families": [item.family for item in descriptor.families()]}
 

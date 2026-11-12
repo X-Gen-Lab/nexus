@@ -41,8 +41,15 @@ class StagedExecutionTests(unittest.TestCase):
         return subprocess.run(["git", *arguments], cwd=self.root,
                               capture_output=True, text=True, check=True)
 
-    def pipeline(self, mutation, arguments=None):
+    def pipeline(self, mutation, arguments=None, fail_suite=None):
+        self.tool_calls = []
+
         def execute(command, _environment, _log):
+            if "--suite" in command:
+                suite = command[command.index("--suite") + 1]
+                self.tool_calls.append(suite)
+                if suite == fail_suite:
+                    raise ValueError("Explicit external tool-domain failure")
             if "--report" in command:
                 report = Path(command[command.index("--report") + 1])
                 report.write_text(json.dumps({"passed": 1}))
@@ -94,6 +101,13 @@ class StagedExecutionTests(unittest.TestCase):
         self.assertEqual(result, 0, output)
         summary = self.build / "tdd" / "execution.json"
         self.assertEqual(json.loads(summary.read_text())["passed"], 1)
+        self.assertCountEqual(self.tool_calls, tdd_gate.TOOL_SUITES)
+
+    def test_workflow_failure_stops_before_expensive_tool_domains(self):
+        result, output = self.pipeline(lambda: None, fail_suite="workflows")
+        self.assertEqual(result, 1, output)
+        self.assertEqual(self.tool_calls, ["workflows"])
+        self.assertFalse((self.build / "tdd" / "execution.json").exists())
 
     def assert_index_executed(self, arguments):
         result, output = self.pipeline(lambda: None, arguments)

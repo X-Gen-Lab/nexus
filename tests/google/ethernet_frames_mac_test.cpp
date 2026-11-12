@@ -474,6 +474,36 @@ TEST_F(EthernetFramesMac,
     EXPECT_EQ(memory, tx[count - 1U].next);
     EXPECT_NE(0U, mac.clock_epoch);
 }
+#if !defined(NX_ETH_FRAMES_TEST_STM32)
+struct HardwareClockCase {
+    uint32_t hclk_hz;
+    uint32_t increment_ns;
+    uint32_t addend;
+    uint8_t mdio;
+};
+class EthernetFramesClock
+    : public EthernetFramesMac,
+      public testing::WithParamInterface<HardwareClockCase> {};
+TEST_P(EthernetFramesClock, DerivesPtpAndMdioFromTheActualHclk) {
+    const auto selected = GetParam();
+    mac.hclk_hz = selected.hclk_hz;
+    ASSERT_EQ(NX_SUCCESS, Initialize());
+    EXPECT_EQ(selected.increment_ns, Regs()[0x704U / 4U]);
+    EXPECT_EQ(selected.addend, Regs()[0x718U / 4U]);
+    EXPECT_EQ(selected.increment_ns, mac.snapshot.timestamp_resolution_ns);
+    EXPECT_EQ(selected.mdio, mac.mdio_divider);
+}
+INSTANTIATE_TEST_SUITE_P(
+    ReviewedClockRanges, EthernetFramesClock,
+    testing::Values(HardwareClockCase{25000000U, 80U, 2147483648U, 8U},
+                    HardwareClockCase{50000000U, 40U, 2147483648U, 12U},
+                    HardwareClockCase{84000000U, 20U, 2556528152U, 0U},
+                    HardwareClockCase{100000000U, 20U, 2147483648U, 4U},
+                    HardwareClockCase{120000000U, 20U, 1789569707U, 4U},
+                    HardwareClockCase{168000000U, 20U, 1278264076U, 16U},
+                    HardwareClockCase{200000000U, 20U, 1073741824U, 16U},
+                    HardwareClockCase{240000000U, 20U, 894784853U, 16U}));
+#endif
 TEST_F(EthernetFramesMac,
        PublishesWholeFrameBeforeFirstOwnAndUsesOnlyLastStatus) {
     Start();
@@ -681,6 +711,28 @@ TEST_F(EthernetFramesMac,
     EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&request.base));
     EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&second.base));
 }
+TEST_F(EthernetFramesMac, ExhaustedDrainGraceRetainsEveryScatterGatherLoan) {
+    Start();
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_tx_prepare(&request, pieces, 2U, true,
+                                                   NX_DEADLINE_NEVER));
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_submit(&port, &request));
+    now = UINT64_MAX - 100U;
+    oracle.hold_engine = true;
+    Regs()[status / 4U] |= 0x100000U;
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_cancel(&port, &request));
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_service(&port));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(&request, txslots[0].request);
+    EXPECT_NE(0U, tx[0].buffer);
+    EXPECT_NE(0U, tx[1].buffer);
+    oracle.hold_engine = false;
+    ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_recover(&port, UINT64_MAX - 1U));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
+    EXPECT_EQ(nullptr, txslots[0].request);
+    EXPECT_EQ(NX_SUCCESS, nx_eth_frames_port_stop(&port));
+}
+
 TEST_F(EthernetFramesMac,
        ExplicitProvenResetChangesClockEpochAndSettlesWithoutReplay) {
     Start();

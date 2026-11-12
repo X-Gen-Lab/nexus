@@ -7,8 +7,8 @@ keeps its contiguous untagged-frame contract, four-word descriptors and existing
 operations table. Selecting one does not expand the other.
 
 The production implementation is owned by `soc/stm32/stm32f4/` and currently
-selects exact STM32F407VET6/ZGT6 MII and STM32F407ZGT6 RMII facts at HCLK
-168 MHz. The seventeen-pad MII A/B/C route includes both PHY clock inputs,
+selects exact STM32F407VET6/ZGT6 MII and STM32F407ZGT6 RMII facts.
+The selected static ClockPlan supplies HCLK from 25 through 168 MHz. The seventeen-pad MII A/B/C route includes both PHY clock inputs,
 CRS, COL and RX_ER; it does not inherit any PCB wiring. It does not imply full
 STM32F4 family coverage or authorize the VE package's missing PG pins. Native is
 an explicit C hardware model under `tests/support/native/`, enabled only for host
@@ -39,12 +39,19 @@ lease. Old raw Ethernet and enhanced frames cannot own the same MAC concurrently
 A product supplies PHY reset, address, power, autonegotiation/link observation,
 network stack, packet classification and shutdown policy outside this repository.
 
-Startup establishes actual HSE8/PLL168 before MAC access. The F407 provider
-checks fresh oscillator/PLL readiness, actual source status, PLL factors,
+Startup establishes the selected System ClockPlan before MAC access. The F407
+provider checks fresh source readiness, actual source status, PLL factors,
 AHB/APB dividers, RMII selection and the separate PTP gate. Merely requesting PLL
 selection or declaring a configured frequency cannot authorize 16 MHz fallback
 or a different actual divider. RM0090 requires Ethernet AHB at least 25 MHz. External RMII REF_CLK at 50 MHz does not establish HCLK or the
 PTP input clock.
+
+MDC division follows the reviewed HCLK ranges in RM0090. Fine PTP update
+uses a 20 ns increment above 50 MHz, 40 ns above 25 MHz and 80 ns at
+25 MHz; each choice keeps the accumulator ratio representable. The addend is
+rounded from the actual leased HCLK and the selected increment. Snapshot
+resolution reports that increment. These are nominal digital counter facts,
+not measured PHY clock accuracy or network synchronization.
 
 The provider rejects foreign/live descriptor tables before reset. Descriptors
 and packet storage must be in the reviewed F407 main-SRAM DMA domain: 128 KiB
@@ -154,7 +161,7 @@ Every time fact uses the existing `nx_io_timestamp_t`. The assembly contract all
 nonzero 32-bit domain from its namespace of real counters; applications cannot
 make unrelated counters comparable by assigning the same local device ID.
 
-The selected clock uses digital nanosecond rollover, 20 ns subsecond increment
+The selected clock uses digital nanosecond rollover, the HCLK-derived subsecond increment
 and fine update. Its accumulator input is HCLK, with addend 1278264076 at the
 selected 168 MHz. This value and the stated units are not measured oscillator
 accuracy. The counter is not UTC, TAI or a synchronized network clock.

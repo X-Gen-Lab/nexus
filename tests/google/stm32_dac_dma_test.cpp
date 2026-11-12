@@ -13,6 +13,7 @@ extern "C" {
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <new>
 #include <sys/mman.h>
 #include <vector>
 
@@ -41,10 +42,30 @@ bool hold_underrun;
 bool foreign_stream_on_clock;
 bool update_while_clearing;
 bool expire_on_dma_enable;
+bool delay_dma_ack;
+bool refuse_dac_clock_enable;
+bool refuse_dac_clock_disable;
+bool suppress_hardware_trigger;
+bool expire_on_recovery_trigger;
+bool dac_clock_withdrawn;
+bool changed_tsel_while_enabled;
+bool lose_time_on_dma_enable;
+bool lose_time_in_recovery_wait;
+bool clock_lost;
+unsigned recovery_reads;
 unsigned wake_count;
-uint16_t reload_count;
-size_t next_frame;
-bool request_pending;
+uint32_t reload_count[2];
+size_t next_frame[2];
+bool request_pending[2];
+bool underrun_blocked[2];
+uint8_t restart_steps[2];
+enum {
+    DMA_OFF = 1U,
+    CLOCK_OFF = 2U,
+    DAC_CONFIGURED = 4U,
+    TRIGGER_CONFIGURED = 8U,
+    DMA_CONFIGURED = 16U
+};
 struct CpuModel {
     bool enabled[82];
     bool pending[82];
@@ -80,6 +101,95 @@ uint32_t request_mask(uint8_t channels) {
 uint32_t underrun_mask(uint8_t channels) {
     return channels == 2U ? DAC_SR_DMAUDR2 : DAC_SR_DMAUDR1;
 }
+/** \brief A pending peripheral request is serviced on valid reenable too. */
+void service_pending(unsigned index) {
+    auto* stream = index == 0U ? DMA1_Stream5 : DMA1_Stream6;
+    const uint32_t shift = 16U * index;
+    if (delay_dma_ack || !request_pending[index] || underrun_blocked[index] ||
+        (RCC->APB1ENR & RCC_APB1ENR_DACEN) == 0U ||
+        (RCC->AHB1ENR & RCC_AHB1ENR_DMA1EN) == 0U ||
+        (DAC->CR & (DAC_CR_EN1 << shift)) == 0U ||
+        (DAC->CR & (DAC_CR_DMAEN1 << shift)) == 0U ||
+        (stream->CR & DMA_SxCR_EN) == 0U || stream->NDTR == 0U) {
+        return;
+    }
+    const size_t width =
+        size_t{1U} << ((stream->CR & DMA_SxCR_MSIZE) >> DMA_SxCR_MSIZE_Pos);
+    uint32_t frame = 0U;
+    std::memcpy(&frame,
+                reinterpret_cast<const uint8_t*>(stream->M0AR) +
+                    next_frame[index] * width,
+                width);
+    request_pending[index] = false;
+    nx_dac_model_write(reinterpret_cast<volatile uint32_t*>(stream->PAR),
+                       frame);
+    ++next_frame[index];
+    --stream->NDTR;
+    if (stream->NDTR == 0U) {
+        DMA1->HISR |= stream_tc(static_cast<uint8_t>(index + 1U));
+        if ((stream->CR & DMA_SxCR_CIRC) != 0U) {
+            stream->NDTR = reload_count[index];
+            next_frame[index] = 0U;
+        } else {
+            stream->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+        }
+    }
+}
+/** \brief Only the documented full restart exits an underrun-blocked domain.
+ */
+void restart_if_complete(unsigned index) {
+    constexpr uint8_t complete = DMA_OFF | CLOCK_OFF | DAC_CONFIGURED |
+                                 TRIGGER_CONFIGURED | DMA_CONFIGURED;
+    const uint32_t shift = 16U * index;
+    if (restart_steps[index] == complete &&
+        (DAC->CR & (DAC_CR_EN1 << shift)) != 0U &&
+        (DAC->CR & (DAC_CR_DMAEN1 << shift)) != 0U &&
+        (RCC->APB1ENR & RCC_APB1ENR_DACEN) != 0U) {
+        request_pending[index] = underrun_blocked[index] = false;
+        restart_steps[index] = 0U;
+    }
+}
+/** \brief A second hardware event before acknowledge underruns, never queues.
+ */
+void hardware_trigger(TIM_TypeDef* timer) {
+    if (suppress_hardware_trigger || (RCC->APB1ENR & RCC_APB1ENR_DACEN) == 0U) {
+        return;
+    }
+    if (timer == nullptr && ((EXTI->EMR & EXTI->RTSR & (1U << 9U)) == 0U ||
+                             ((SYSCFG->EXTICR[2] >> 4U) & 15U) != 1U))
+        return;
+    for (unsigned index = 0U; index < 2U; ++index) {
+        const uint32_t shift = 16U * index;
+        const uint32_t source = timer == TIM6 ? 0U
+                                : timer == TIM7
+                                    ? DAC_CR_TSEL1_1
+                                    : DAC_CR_TSEL1_2 | DAC_CR_TSEL1_1;
+        if ((DAC->CR & (DAC_CR_EN1 << shift)) == 0U ||
+            (DAC->CR & (DAC_CR_TEN1 << shift)) == 0U ||
+            ((DAC->CR >> shift) & DAC_CR_TSEL1) != source) {
+            continue;
+        }
+        if (index == 0U) {
+            DAC->DOR1 = DAC->DHR12R1;
+        } else {
+            DAC->DOR2 = DAC->DHR12R2;
+        }
+        if ((DAC->CR & (DAC_CR_DMAEN1 << shift)) != 0U) {
+            if (expire_on_recovery_trigger && timer != nullptr &&
+                (timer->CR1 & TIM_CR1_CEN) == 0U) {
+                clock_us = 10000U;
+            }
+            if (request_pending[index]) {
+                DAC->SR |= static_cast<uint32_t>(DAC_SR_DMAUDR1) << shift;
+                underrun_blocked[index] = true;
+                restart_steps[index] = 0U;
+            } else {
+                request_pending[index] = true;
+            }
+            service_pending(index);
+        }
+    }
+}
 nx_result_t wake(void*) {
     ++wake_count;
     return NX_SUCCESS;
@@ -88,6 +198,16 @@ nx_result_t wake(void*) {
 
 extern "C" void nx_dac_model_write(volatile uint32_t* reg, uint32_t value) {
     stores.push_back({reg, value});
+    if (reg == &EXTI->PR) {
+        *reg &= ~value;
+        return;
+    }
+    if (reinterpret_cast<uintptr_t>(reg) >= reinterpret_cast<uintptr_t>(DAC) &&
+        reinterpret_cast<uintptr_t>(reg) <
+            reinterpret_cast<uintptr_t>(DAC) + sizeof(*DAC) &&
+        (RCC->APB1ENR & RCC_APB1ENR_DACEN) == 0U) {
+        return;
+    }
     if (reg == &DMA1->HIFCR) {
         DMA1->HISR &= ~value;
         *reg = value;
@@ -110,6 +230,8 @@ extern "C" void nx_dac_model_write(volatile uint32_t* reg, uint32_t value) {
         return;
     }
     if (reg == &DMA1_Stream5->CR || reg == &DMA1_Stream6->CR) {
+        if (lose_time_on_dma_enable && (value & DMA_SxCR_EN) != 0U)
+            clock_lost = true;
         if (expire_on_dma_enable && (value & DMA_SxCR_EN) != 0U) {
             clock_us = 10000U;
         }
@@ -147,7 +269,78 @@ extern "C" void nx_dac_model_write(volatile uint32_t* reg, uint32_t value) {
         value &= ~static_cast<uint32_t>(TIM_CR1_CEN);
     }
     if (reg == &TIM6->EGR || reg == &TIM7->EGR) {
-        (reg == &TIM6->EGR ? TIM6 : TIM7)->SR |= TIM_SR_UIF;
+        auto* timer = reg == &TIM6->EGR ? TIM6 : TIM7;
+        timer->SR |= TIM_SR_UIF;
+        for (unsigned index = 0U; index < 2U; ++index) {
+            const uint32_t shift = 16U * index;
+            if ((restart_steps[index] & CLOCK_OFF) != 0U &&
+                (DAC->CR & (DAC_CR_TEN1 << shift)) == 0U) {
+                restart_steps[index] |= TRIGGER_CONFIGURED;
+            }
+        }
+        if ((timer->CR2 & TIM_CR2_MMS) == 0U ||
+            (timer->CR2 & TIM_CR2_MMS) == TIM_CR2_MMS_1) {
+            hardware_trigger(timer);
+        }
+    }
+    if (reg == &RCC->APB1ENR) {
+        if (refuse_dac_clock_disable) {
+            value |= RCC->APB1ENR & static_cast<uint32_t>(RCC_APB1ENR_DACEN);
+        }
+        const bool falling = (RCC->APB1ENR & RCC_APB1ENR_DACEN) != 0U &&
+                             (value & RCC_APB1ENR_DACEN) == 0U;
+        if (falling) {
+            dac_clock_withdrawn = true;
+            for (unsigned index = 0U; index < 2U; ++index) {
+                if (underrun_blocked[index] &&
+                    (restart_steps[index] & DMA_OFF) != 0U) {
+                    restart_steps[index] |= CLOCK_OFF;
+                }
+            }
+        }
+        if (refuse_dac_clock_enable && dac_clock_withdrawn) {
+            value &= ~static_cast<uint32_t>(RCC_APB1ENR_DACEN);
+        }
+    }
+    if (reg == &DAC->CR) {
+        for (unsigned index = 0U; index < 2U; ++index) {
+            const uint32_t shift = 16U * index;
+            if ((DAC->CR & (DAC_CR_EN1 << shift)) != 0U &&
+                ((DAC->CR ^ value) & (DAC_CR_TSEL1 << shift)) != 0U)
+                changed_tsel_while_enabled = true;
+            if (lose_time_in_recovery_wait &&
+                ((DAC->CR >> shift) & DAC_CR_TSEL1) ==
+                    (DAC_CR_TSEL1_2 | DAC_CR_TSEL1_1) &&
+                ((value >> shift) & DAC_CR_TSEL1) !=
+                    (DAC_CR_TSEL1_2 | DAC_CR_TSEL1_1))
+                recovery_reads = 2U;
+            if (underrun_blocked[index] &&
+                (DAC->CR & (DAC_CR_DMAEN1 << shift)) != 0U &&
+                (value & (DAC_CR_DMAEN1 << shift)) == 0U) {
+                restart_steps[index] |= DMA_OFF;
+            }
+            if ((restart_steps[index] & CLOCK_OFF) != 0U &&
+                (value & (DAC_CR_EN1 << shift)) == 0U) {
+                restart_steps[index] |= DAC_CONFIGURED;
+                if ((value & (DAC_CR_TEN1 << shift)) == 0U &&
+                    ((value >> shift) & DAC_CR_TSEL1) ==
+                        (DAC_CR_TSEL1_2 | DAC_CR_TSEL1_1))
+                    restart_steps[index] |= TRIGGER_CONFIGURED;
+            }
+        }
+    }
+    if (reg == &DMA1_Stream5->CR || reg == &DMA1_Stream6->CR) {
+        unsigned index = reg == &DMA1_Stream5->CR ? 0U : 1U;
+        if ((*reg & DMA_SxCR_EN) == 0U && (value & DMA_SxCR_EN) != 0U) {
+            auto* stream = index == 0U ? DMA1_Stream5 : DMA1_Stream6;
+            reload_count[index] = stream->NDTR;
+            next_frame[index] = 0U;
+            if ((restart_steps[index] & CLOCK_OFF) != 0U &&
+                stream->NDTR != 0U && stream->PAR != 0U && stream->M0AR != 0U &&
+                ((value & DMA_SxCR_CHSEL) >> DMA_SxCR_CHSEL_Pos) == 7U) {
+                restart_steps[index] |= DMA_CONFIGURED;
+            }
+        }
     }
     *reg = value;
     if (reg == &DAC->DHR12R1 || reg == &DAC->DHR12L1 || reg == &DAC->DHR8R1) {
@@ -166,6 +359,10 @@ extern "C" void nx_dac_model_write(volatile uint32_t* reg, uint32_t value) {
     } else if (reg == &DAC->DHR8RD) {
         holding(0U, (value & 0xffU) << 4U);
         holding(1U, ((value >> 8U) & 0xffU) << 4U);
+    }
+    for (unsigned index = 0U; index < 2U; ++index) {
+        restart_if_complete(index);
+        service_pending(index);
     }
 }
 extern "C" void nx_dac_dma_model_enable(IRQn_Type irq) {
@@ -220,6 +417,10 @@ extern "C" void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
 extern "C" void nx_arch_dsb(void) {
 }
 extern "C" nx_time_us_t nx_time_now_us(void) {
+    if (recovery_reads != 0U && --recovery_reads == 0U)
+        clock_lost = true;
+    if (clock_lost)
+        return NX_DEADLINE_NEVER;
     return clock_us++;
 }
 
@@ -255,8 +456,18 @@ class DacDma : public testing::Test {
                 reject_stream_enable = reject_timer_enable = false;
         clock_us = 100U;
         wake_count = 0U;
-        next_frame = 0U;
-        request_pending = false;
+        for (unsigned index = 0U; index < 2U; ++index) {
+            next_frame[index] = reload_count[index] = 0U;
+            request_pending[index] = underrun_blocked[index] = false;
+            restart_steps[index] = 0U;
+        }
+        delay_dma_ack = refuse_dac_clock_enable = dac_clock_withdrawn = false;
+        changed_tsel_while_enabled = false;
+        lose_time_on_dma_enable = lose_time_in_recovery_wait = false;
+        clock_lost = false;
+        recovery_reads = 0U;
+        refuse_dac_clock_disable = suppress_hardware_trigger =
+            expire_on_recovery_trigger = false;
         hold_trigger = hold_interrupt = hold_underrun =
             foreign_stream_on_clock = false;
         update_while_clearing = expire_on_dma_enable = false;
@@ -281,8 +492,12 @@ class DacDma : public testing::Test {
         hold_trigger = hold_interrupt = hold_underrun =
             foreign_stream_on_clock = false;
         update_while_clearing = expire_on_dma_enable = false;
+        delay_dma_ack = refuse_dac_clock_enable = false;
+        refuse_dac_clock_disable = suppress_hardware_trigger =
+            expire_on_recovery_trigger = false;
         privileged = true;
         in_isr = masked = false;
+        clock_us = 100U;
         if (peripheral != MAP_FAILED) {
             for (bool& active : cpu_model.active) {
                 active = false;
@@ -304,8 +519,6 @@ class DacDma : public testing::Test {
             nx_dac_tx_prepare(&request, data, count * width, 1000U, deadline),
             NX_SUCCESS);
         ASSERT_EQ(nx_dac_tx_port_submit(&tx, &request), NX_SUCCESS);
-        reload_count = static_cast<uint16_t>(count);
-        next_frame = 0U;
     }
     void irq() {
         in_isr = true;
@@ -320,37 +533,7 @@ class DacDma : public testing::Test {
         }
         clock_us += 1000U;
         timer->SR |= TIM_SR_UIF;
-        if ((config.dac.channels & 1U) != 0U && (DAC->CR & DAC_CR_TEN1)) {
-            DAC->DOR1 = DAC->DHR12R1;
-        }
-        if ((config.dac.channels & 2U) != 0U && (DAC->CR & DAC_CR_TEN2)) {
-            DAC->DOR2 = DAC->DHR12R2;
-        }
-        if ((DAC->CR & request_mask(config.dac.channels)) != 0U) {
-            auto* stream = stream_for(config.dac.channels);
-            if ((stream->CR & DMA_SxCR_EN) != 0U && stream->NDTR != 0U) {
-                uint32_t frame = 0U;
-                std::memcpy(&frame, data + next_frame * width, width);
-                nx_dac_model_write(
-                    reinterpret_cast<volatile uint32_t*>(stream->PAR), frame);
-                ++next_frame;
-                --stream->NDTR;
-                if (stream->NDTR == 0U) {
-                    DMA1->HISR |= stream_tc(config.dac.channels);
-                    if ((stream->CR & DMA_SxCR_CIRC) != 0U) {
-                        stream->NDTR = reload_count;
-                        next_frame = 0U;
-                    } else {
-                        stream->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
-                    }
-                }
-                request_pending = false;
-            } else if (request_pending) {
-                DAC->SR |= underrun_mask(config.dac.channels);
-            } else {
-                request_pending = true;
-            }
-        }
+        hardware_trigger(timer);
         clock_us += 4U;
         if (deliver_irq &&
             ((DMA1->HISR & stream_tc(config.dac.channels)) != 0U ||
@@ -745,8 +928,172 @@ TEST_F(DacDma, QuarantineDoesNotRequestAContinuousBusyServiceLoop) {
     EXPECT_EQ(nx_dac_tx_port_next_service(&tx), NX_DEADLINE_NEVER);
 }
 
+TEST_F(DacDma, ExhaustedFiniteDrainBudgetNeverBecomesAnInfiniteDeadline) {
+    prepare();
+    start();
+    hold_stream = true;
+    clock_us = NX_DEADLINE_NEVER - 150U;
+    ASSERT_EQ(nx_dac_tx_port_cancel(&tx, &request), NX_SUCCESS);
+    nx_dac_tx_port_service(&tx);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_LT(state.drain_deadline, NX_DEADLINE_NEVER);
+    EXPECT_EQ(state.active, &request);
+}
+
+TEST_F(DacDma, CancelledPendingRequestCannotConsumeTheNextDescriptor) {
+    prepare();
+    start();
+    delay_dma_ack = true;
+    pulse(false);
+    ASSERT_TRUE(request_pending[0]);
+    ASSERT_EQ(nx_dac_tx_port_cancel(&tx, &request), NX_SUCCESS);
+    nx_dac_tx_port_service(&tx);
+    result(NX_ERROR_CANCELLED);
+    delay_dma_ack = false;
+    data += 32U;
+    const uint16_t codes[] = {0x789U, 0xabcU};
+    std::memcpy(data, codes, sizeof(codes));
+    start();
+    EXPECT_EQ(DMA1_Stream5->NDTR, 2U);
+    EXPECT_EQ(DAC->DHR12R1, config.dac.idle_codes[0]);
+    pulse();
+    EXPECT_EQ(DMA1_Stream5->NDTR, 1U);
+    EXPECT_EQ(DAC->DOR1, config.dac.idle_codes[0]);
+    EXPECT_EQ(DAC->DHR12R1, 0x789U);
+}
+
+TEST_F(DacDma, LateFiniteTailPendingCannotShiftTheNextPlayback) {
+    prepare();
+    start();
+    pulse(false);
+    pulse(false);
+    pulse(false);
+    ASSERT_TRUE(request_pending[0]);
+    nx_dac_tx_port_service(&tx);
+    pulse();
+    nx_dac_tx_port_service(&tx);
+    result(NX_SUCCESS);
+    start();
+    EXPECT_EQ(DMA1_Stream5->NDTR, 2U);
+    EXPECT_EQ(DAC->DHR12R1, config.dac.idle_codes[0]);
+}
+
+TEST_F(DacDma, FailedTemporaryGateRestorationRetainsTheInheritedClockReceipt) {
+    RCC->APB1ENR = RCC_APB1ENR_DACEN;
+    prepare();
+    request_pending[0] = true;
+    refuse_dac_clock_enable = true;
+    start();
+    clock_us += 1000U;
+    nx_dac_tx_port_service(&tx);
+    EXPECT_EQ(RCC->APB1ENR & RCC_APB1ENR_DACEN, 0U);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(nx_dac_port_stop(&control, NX_DEADLINE_NEVER), NX_ERROR_BUSY);
+    EXPECT_EQ(state.active, &request);
+    nx_dac_state_t output{};
+    output.trigger_divisor = 123U;
+    EXPECT_EQ(nx_dac_port_state(&control, &output), NX_ERROR_STATE);
+    EXPECT_EQ(output.trigger_divisor, 123U);
+    EXPECT_NE(nx_stm32_dac_dma_close(&state), NX_SUCCESS);
+    EXPECT_NE(state.dac.config, nullptr);
+    EXPECT_EQ(state.active, &request);
+    refuse_dac_clock_enable = false;
+    EXPECT_EQ(nx_stm32_dac_dma_close(&state), NX_SUCCESS);
+    EXPECT_NE(RCC->APB1ENR & RCC_APB1ENR_DACEN, 0U);
+    result(NX_ERROR_IO);
+}
+
+TEST_F(DacDma, MissingHardwareUnderrunCannotBeReplacedByAClockCycle) {
+    prepare();
+    suppress_hardware_trigger = true;
+    const auto began = clock_us;
+    start();
+    EXPECT_LT(clock_us - began, 100U);
+    EXPECT_FALSE(dac_clock_withdrawn);
+    EXPECT_EQ(DMA1_Stream5->NDTR, 0U);
+    EXPECT_EQ(DMA1_Stream5->CR & DMA_SxCR_EN, 0U);
+    nx_dac_tx_port_service(&tx);
+    result(NX_ERROR_IO);
+}
+
+TEST_F(DacDma, RefusedGateWithdrawalFailsWithoutLosingTheClockReceipt) {
+    RCC->APB1ENR = RCC_APB1ENR_DACEN;
+    prepare();
+    refuse_dac_clock_disable = true;
+    start();
+    EXPECT_NE(RCC->APB1ENR & RCC_APB1ENR_DACEN, 0U);
+    EXPECT_EQ(DMA1_Stream5->CR & DMA_SxCR_EN, 0U);
+    nx_dac_tx_port_service(&tx);
+    result(NX_ERROR_IO);
+    EXPECT_EQ(nx_stm32_dac_dma_close(&state), NX_SUCCESS);
+    EXPECT_NE(RCC->APB1ENR & RCC_APB1ENR_DACEN, 0U);
+}
+
+TEST_F(DacDma, ARecoveryTriggerCannotRunBeyondTheAcceptedDeadline) {
+    for (bool pending : {false, true}) {
+        SCOPED_TRACE(pending);
+        clock_us = 100U;
+        prepare();
+        request_pending[0] = pending;
+        expire_on_recovery_trigger = true;
+        start(2U, 10000U);
+        EXPECT_EQ(DMA1_Stream5->M0AR, 0U);
+        EXPECT_EQ(DMA1_Stream5->CR & DMA_SxCR_EN, 0U);
+        nx_dac_tx_port_service(&tx);
+        result(NX_ERROR_TIMEOUT);
+        EXPECT_FALSE(state.dac.faulted);
+        expire_on_recovery_trigger = false;
+        ASSERT_EQ(nx_stm32_dac_dma_close(&state), NX_SUCCESS);
+    }
+}
+
+TEST_F(DacDma, RefusingToClearInternalUnderrunKeepsTheFailedBorrow) {
+    prepare();
+    request_pending[0] = true;
+    expire_on_recovery_trigger = hold_underrun = true;
+    start(2U, 10000U);
+    clock_us += 1000U;
+    nx_dac_tx_port_service(&tx);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.active, &request);
+    EXPECT_TRUE(state.dac.faulted);
+    hold_underrun = false;
+    nx_dac_tx_port_service(&tx);
+    result(NX_ERROR_IO);
+}
+
 class DacDmaFormat : public DacDma,
                      public testing::WithParamInterface<unsigned> {};
+TEST_P(DacDmaFormat, InheritedPendingRequiresAFullRestartBeforeFirstArm) {
+    const unsigned selection = GetParam();
+    config.dac.channels = static_cast<uint8_t>(selection / 3U + 1U);
+    config.dac.format = static_cast<nx_dac_format_t>(selection % 3U);
+    config.dac.trigger = selection % 2U == 0U ? NX_STM32_DAC_TRIGGER_TIM6
+                                              : NX_STM32_DAC_TRIGGER_TIM7;
+    width = (config.dac.format == NX_DAC_FORMAT_U8 ? 1U : 2U) *
+            (config.dac.channels == 3U ? 2U : 1U);
+    const uint32_t encoded =
+        config.dac.format == NX_DAC_FORMAT_U8
+            ? (config.dac.channels == 3U ? 0x4512U : 0x12U)
+        : config.dac.format == NX_DAC_FORMAT_U12_LEFT
+            ? (config.dac.channels == 3U ? 0x45601230U : 0x1230U)
+            : (config.dac.channels == 3U ? 0x04560123U : 0x123U);
+    std::memcpy(data, &encoded, width);
+    std::memcpy(data + width, &encoded, width);
+    const unsigned index = config.dac.channels == 2U ? 1U : 0U;
+    request_pending[index] = true;
+    RCC->APB1ENR = RCC_APB1ENR_DACEN;
+    nx_dac_model_write(&DAC->CR, 0U);
+    nx_dac_model_write(&RCC->APB1ENR, 0U);
+    nx_dac_model_write(&DAC->SR, underrun_mask(config.dac.channels));
+    nx_dac_model_write(&RCC->APB1ENR, RCC_APB1ENR_DACEN);
+    ASSERT_TRUE(request_pending[index]);
+    prepare();
+    start();
+    EXPECT_EQ(stream_for(config.dac.channels)->NDTR, 2U);
+    pulse();
+    EXPECT_EQ(stream_for(config.dac.channels)->NDTR, 1U);
+}
 TEST_P(DacDmaFormat, ExactFrameWidthAndRequestRouteMatchSelectedChannels) {
     const unsigned selection = GetParam();
     config.dac.channels = static_cast<uint8_t>(selection / 3U + 1U);
@@ -801,3 +1148,227 @@ TEST_P(DacDmaFormat, ExactFrameWidthAndRequestRouteMatchSelectedChannels) {
     EXPECT_EQ(DAC->DOR2, (config.dac.channels & 2U) != 0U ? second : 0U);
 }
 INSTANTIATE_TEST_SUITE_P(SelectedLayout, DacDmaFormat, testing::Range(0U, 9U));
+
+class DacExternalDma : public DacDma {
+  protected:
+    nx_stm32_exti_hardware_config_t event_config{GPIOB, NX_EXTI_RISING, 1U, 9U,
+                                                 0U};
+    nx_stm32_exti_hardware_state_t event{};
+    void SelectSource(bool circular = true) {
+        RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+        RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+        ASSERT_EQ(nx_stm32_exti_hardware_prepare(&event, &event_config),
+                  NX_SUCCESS);
+        config.dac.trigger = NX_STM32_DAC_TRIGGER_EXTI9;
+        config.dac.external = &event;
+        config.circular = circular;
+        config.recovery_trigger = NX_STM32_DAC_TRIGGER_TIM6;
+    }
+    void StartExternal() {
+        ASSERT_EQ(nx_dac_tx_prepare(&request, data, 2U * width, 0U, 10000U),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_dac_tx_port_submit(&tx, &request), NX_SUCCESS);
+        ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+    }
+    void Edge() {
+        clock_us += 100U;
+        hardware_trigger(nullptr);
+        if ((DAC->SR & underrun_mask(config.dac.channels)) != 0U)
+            irq();
+    }
+    void Close() {
+        ASSERT_EQ(nx_stm32_dac_dma_close(&state), NX_SUCCESS);
+        ASSERT_EQ(nx_stm32_exti_hardware_close(&event), NX_SUCCESS);
+    }
+};
+
+TEST_F(DacExternalDma,
+       CircularPlaybackRequiresElectricalEdgesNotRecoveryTimer) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_NO_FATAL_FAILURE(prepare());
+    ASSERT_NO_FATAL_FAILURE(StartExternal());
+    EXPECT_EQ(next_frame[0], 0U);
+    EXPECT_EQ(TIM6->CR1 & TIM_CR1_CEN, 0U);
+    EXPECT_EQ(TIM7->CR1 & TIM_CR1_CEN, 0U);
+    EXPECT_EQ(DAC->CR & DAC_CR_TSEL1, DAC_CR_TSEL1_2 | DAC_CR_TSEL1_1);
+    Edge();
+    EXPECT_EQ(DAC->DOR1, 0U);
+    Edge();
+    EXPECT_EQ(DAC->DOR1, 0x123U);
+    Edge();
+    EXPECT_EQ(DAC->DOR1, 0x456U);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+    EXPECT_FALSE(changed_tsel_while_enabled);
+    nx_dac_state_t observed{};
+    ASSERT_EQ(nx_dac_port_state(&control, &observed), NX_SUCCESS);
+    EXPECT_EQ(observed.timer_clock_hz | observed.trigger_divisor, 0U);
+    ASSERT_EQ(nx_dac_tx_port_cancel(&tx, &request), NX_SUCCESS);
+    nx_dac_tx_port_service(&tx);
+    result(NX_ERROR_CANCELLED);
+    ASSERT_NO_FATAL_FAILURE(Close());
+}
+
+TEST_F(DacExternalDma, FiniteExternalPlaybackRejectsWithoutInventingATail) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource(false));
+    const size_t before = stores.size();
+    EXPECT_EQ(nx_stm32_dac_dma_prepare(&state, &config), NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(stores.size(), before);
+    EXPECT_EQ(state.dac.config, nullptr);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    ASSERT_NO_FATAL_FAILURE(Close());
+}
+
+TEST_F(DacExternalDma, RecoveryTimerMustBeExplicitAndExclusivelyIdle) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    config.recovery_trigger = NX_STM32_DAC_TRIGGER_NONE;
+    const size_t before = stores.size();
+    EXPECT_EQ(nx_stm32_dac_dma_prepare(&state, &config), NX_ERROR_INVALID);
+    config.recovery_trigger = NX_STM32_DAC_TRIGGER_TIM6;
+    TIM6->CR1 = TIM_CR1_CEN;
+    EXPECT_EQ(nx_stm32_dac_dma_prepare(&state, &config), NX_ERROR_BUSY);
+    EXPECT_EQ(stores.size(), before);
+    EXPECT_EQ(state.dac.config, nullptr);
+    TIM6->CR1 = 0U;
+    ASSERT_NO_FATAL_FAILURE(Close());
+}
+
+TEST_F(DacExternalDma, ChannelTwoCanLeaseTimSevenOnlyForRecovery) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    config.dac.channels = 2U;
+    config.recovery_trigger = NX_STM32_DAC_TRIGGER_TIM7;
+    ASSERT_NO_FATAL_FAILURE(prepare());
+    ASSERT_NO_FATAL_FAILURE(StartExternal());
+    EXPECT_NE(DMA1_Stream6->CR & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(DMA1_Stream5->CR & DMA_SxCR_EN, 0U);
+    EXPECT_NE(RCC->APB1ENR & RCC_APB1ENR_TIM7EN, 0U);
+    EXPECT_EQ(RCC->APB1ENR & RCC_APB1ENR_TIM6EN, 0U);
+    EXPECT_EQ((DAC->CR >> 16U) & DAC_CR_TSEL1, DAC_CR_TSEL1_2 | DAC_CR_TSEL1_1);
+    EXPECT_EQ(TIM7->CR1 & TIM_CR1_CEN, 0U);
+    Edge();
+    Edge();
+    EXPECT_EQ(DAC->DOR2, 0x123U);
+    EXPECT_FALSE(changed_tsel_while_enabled);
+    ASSERT_NO_FATAL_FAILURE(Close());
+}
+
+TEST_F(DacExternalDma, InternalTimerStillRejectsUnknownRateBeforeAdmission) {
+    ASSERT_NO_FATAL_FAILURE(prepare());
+    ASSERT_EQ(nx_dac_tx_prepare(&request, data, 4U, 0U, 10000U), NX_SUCCESS);
+    const size_t before = stores.size();
+    EXPECT_EQ(nx_dac_tx_port_submit(&tx, &request), NX_ERROR_INVALID);
+    EXPECT_EQ(stores.size(), before);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    ASSERT_NO_FATAL_FAILURE(Close());
+}
+
+TEST_F(DacExternalDma, CancelledExternalPendingCannotPrefetchTheNextPayload) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_NO_FATAL_FAILURE(prepare());
+    ASSERT_NO_FATAL_FAILURE(StartExternal());
+    delay_dma_ack = true;
+    Edge();
+    ASSERT_TRUE(request_pending[0]);
+    ASSERT_EQ(nx_dac_tx_port_cancel(&tx, &request), NX_SUCCESS);
+    nx_dac_tx_port_service(&tx);
+    result(NX_ERROR_CANCELLED);
+    delay_dma_ack = false;
+    const uint16_t next[] = {0x789U, 0xabcU};
+    std::memcpy(data, next, sizeof(next));
+    ASSERT_NO_FATAL_FAILURE(StartExternal());
+    EXPECT_EQ(next_frame[0], 0U);
+    EXPECT_FALSE(request_pending[0]);
+    EXPECT_FALSE(underrun_blocked[0]);
+    Edge();
+    EXPECT_EQ(DAC->DOR1, 0U);
+    Edge();
+    EXPECT_EQ(DAC->DOR1, 0x789U);
+    EXPECT_FALSE(changed_tsel_while_enabled);
+    ASSERT_NO_FATAL_FAILURE(Close());
+}
+
+TEST_F(DacExternalDma, LostEventOwnerRetainsAnUndrainedCircularBorrow) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_NO_FATAL_FAILURE(prepare());
+    ASSERT_NO_FATAL_FAILURE(StartExternal());
+    ASSERT_EQ(nx_stm32_exti_hardware_close(&event), NX_SUCCESS);
+    hold_stream = true;
+    nx_dac_tx_port_service(&tx);
+    clock_us += 201U;
+    nx_dac_tx_port_service(&tx);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.active, &request);
+    EXPECT_NE(DMA1_Stream5->M0AR, 0U);
+    hold_stream = false;
+    nx_dac_tx_port_service(&tx);
+    result(NX_ERROR_IO);
+    ASSERT_NO_FATAL_FAILURE(Close());
+}
+
+TEST_F(DacExternalDma, RefusedExternalTriggerWithdrawalKeepsTheMemoryLoan) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_NO_FATAL_FAILURE(prepare());
+    ASSERT_NO_FATAL_FAILURE(StartExternal());
+    hold_trigger = true;
+    ASSERT_EQ(nx_dac_tx_port_cancel(&tx, &request), NX_SUCCESS);
+    nx_dac_tx_port_service(&tx);
+    clock_us += 201U;
+    nx_dac_tx_port_service(&tx);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.active, &request);
+    EXPECT_NE(DMA1_Stream5->M0AR, 0U);
+    hold_trigger = false;
+    nx_dac_tx_port_service(&tx);
+    result(NX_ERROR_CANCELLED);
+    ASSERT_NO_FATAL_FAILURE(Close());
+}
+
+TEST_F(DacExternalDma, ExternalOwnerStorageCannotBecomeImmutableDmaPayload) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_EQ(nx_stm32_exti_hardware_close(&event), NX_SUCCESS);
+    auto* owner = new (reinterpret_cast<void*>(0x20003000U))
+        nx_stm32_exti_hardware_state_t{};
+    ASSERT_EQ(nx_stm32_exti_hardware_prepare(owner, &event_config), NX_SUCCESS);
+    config.dac.external = owner;
+    ASSERT_NO_FATAL_FAILURE(prepare());
+    ASSERT_EQ(nx_dac_tx_prepare(&request, owner, sizeof(*owner), 0U, 10000U),
+              NX_SUCCESS);
+    const size_t before = stores.size();
+    EXPECT_EQ(nx_dac_tx_port_submit(&tx, &request), NX_ERROR_INVALID);
+    EXPECT_EQ(stores.size(), before);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    ASSERT_EQ(nx_stm32_dac_dma_close(&state), NX_SUCCESS);
+    ASSERT_EQ(nx_stm32_exti_hardware_close(owner), NX_SUCCESS);
+}
+
+TEST_F(DacExternalDma, InvalidTimeAfterDmaEnableCannotOpenExternalDetection) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_NO_FATAL_FAILURE(prepare());
+    ASSERT_EQ(nx_dac_tx_prepare(&request, data, 4U, 0U, NX_DEADLINE_NEVER),
+              NX_SUCCESS);
+    lose_time_on_dma_enable = true;
+    ASSERT_EQ(nx_dac_tx_port_submit(&tx, &request), NX_SUCCESS);
+    EXPECT_TRUE(clock_lost);
+    EXPECT_EQ(DAC->CR & DAC_CR_TEN1, 0U);
+    nx_dac_tx_port_service(&tx);
+    result(NX_ERROR_IO);
+    EXPECT_EQ(DMA1_Stream5->CR & DMA_SxCR_EN, 0U);
+    clock_lost = lose_time_on_dma_enable = false;
+    ASSERT_NO_FATAL_FAILURE(Close());
+}
+
+TEST_F(DacExternalDma,
+       InvalidTimeDuringRecoveryWaitCannotAuthorizeTheNewStream) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_NO_FATAL_FAILURE(prepare());
+    ASSERT_EQ(nx_dac_tx_prepare(&request, data, 4U, 0U, NX_DEADLINE_NEVER),
+              NX_SUCCESS);
+    lose_time_in_recovery_wait = true;
+    ASSERT_EQ(nx_dac_tx_port_submit(&tx, &request), NX_SUCCESS);
+    EXPECT_TRUE(clock_lost);
+    EXPECT_EQ(DAC->CR & DAC_CR_TEN1, 0U);
+    EXPECT_EQ(DMA1_Stream5->CR & DMA_SxCR_EN, 0U);
+    nx_dac_tx_port_service(&tx);
+    result(NX_ERROR_IO);
+    clock_lost = lose_time_in_recovery_wait = false;
+    ASSERT_NO_FATAL_FAILURE(Close());
+}

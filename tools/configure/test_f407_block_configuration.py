@@ -59,6 +59,26 @@ class F407BlockConfigurationTests(unittest.TestCase):
             self.assertEqual(described.features, ("POLLING",))
             self.assertFalse(selected.dma)
 
+    def test_custom_clock_plan_emits_the_same_reviewed_socket(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path = self.fixture(Path(temporary), width=1)
+            source = path.read_text().replace('clock="hse8-pll168"',
+                                              'clock="custom"')
+            source += ('\n[clock_parameters]\nsource="hse"\n'
+                       'input_hz=8000000\npll_m=8\npll_n=192\n'
+                       'pll_p=2\npll_q=4\nahb_div=4\napb1_div=1\n'
+                       'apb2_div=1\nadc_div=4\nsupply_mv=3300\ncss=false\n'
+                       'sysclk_source="input"\npll48=true\n')
+            path.write_text(source)
+            result = gate.resolve_ir(path, test_support=native_fixture(path))
+            selected, = result.controllers
+            self.assertEqual(2000000, result.clock["apb2_hz"])
+            self.assertEqual(48000000, selected.integration.clock_hz)
+            emitted = bindings.emit(result)[1]
+            self.assertIn(".bus_width = 1u", emitted)
+            self.assertIn("nx_stm32_sdio_prepare", emitted)
+            self.assertNotIn("SDIO_SendCommand", emitted)
+
     def test_one_bit_mode_still_reserves_the_complete_six_pad_socket(self):
         with tempfile.TemporaryDirectory() as temporary:
             result = gate.resolve_ir(self.fixture(Path(temporary), width=1), test_support=native_fixture(self.fixture(Path(temporary), width=1)))

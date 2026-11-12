@@ -41,6 +41,14 @@ def validate_vendor_device(value):
 
 
 @dataclass(frozen=True)
+class VendorIrqBinding:
+    """An enum slot and the independently reviewed official startup symbol."""
+
+    number: int
+    handler: str
+
+
+@dataclass(frozen=True)
 class VendorDeviceProfile:
     """Catalog compile facts; existence does not grant a supported exact part."""
 
@@ -49,6 +57,27 @@ class VendorDeviceProfile:
     startup: str
     priority_bits: int
     external_irq_count: int
+    irq_bindings: Mapping
+
+
+def vendor_irq_bindings(value, count):
+    """Validate declared bindings; original SDK comparison remains independent."""
+    if not isinstance(value, Mapping) or not value:
+        fail("Vendor IRQ bindings require a nonempty reviewed enum map")
+    bindings, numbers = {}, set()
+    for name, item in value.items():
+        if (not isinstance(name, str) or
+                re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*_IRQn", name) is None or
+                not isinstance(item, Mapping) or set(item) != {"number", "handler"}):
+            fail("Vendor IRQ binding requires exact enum, number and handler")
+        number = integer(item["number"], 0, count - 1, "Vendor IRQ number")
+        handler = item["handler"]
+        if (number in numbers or not isinstance(handler, str) or
+                re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*_IRQHandler", handler) is None):
+            fail("Vendor IRQ bindings require unique slots and exact handlers")
+        numbers.add(number)
+        bindings[name] = VendorIrqBinding(number, handler)
+    return MappingProxyType(bindings)
 
 
 def vendor_device_catalog(value):
@@ -70,9 +99,10 @@ def vendor_device_catalog(value):
     entries = {}
     macros = set()
     for row in sequence(value["devices"], "Vendor device catalog entries"):
-        if (not isinstance(row, Mapping) or set(row) != {
-                "id", "define", "header", "startup", "external_irq_count",
-                "last_external_irq", "nvic_priority_bits", "timebase_presence"}):
+        fields = {"id", "define", "header", "startup", "external_irq_count",
+                  "last_external_irq", "nvic_priority_bits", "timebase_presence"}
+        if (not isinstance(row, Mapping) or not fields.issubset(row) or
+                set(row) - fields - {"irq_bindings"}):
             fail("Vendor device catalog requires exact entry fields")
         macro, identifier = row["define"], row["id"]
         if (not isinstance(macro, str) or not isinstance(identifier, str) or
@@ -98,7 +128,10 @@ def vendor_device_catalog(value):
                 set(timebases) != {"TIM2", "TIM5", "LPTIM1"} or
                 any(type(flag) is not bool for flag in timebases.values())):
             fail("Vendor device catalog requires boolean timebase presence")
-        entries[identifier] = VendorDeviceProfile(identifier, macro, startup, bits, count)
+        bindings = (vendor_irq_bindings(row["irq_bindings"], count)
+                    if "irq_bindings" in row else MappingProxyType({}))
+        entries[identifier] = VendorDeviceProfile(
+            identifier, macro, startup, bits, count, bindings)
         macros.add(macro)
     if not entries or not isinstance(value["inputs"], Mapping) or not value["inputs"]:
         fail("Vendor device catalog entries and input identities are required")
@@ -119,10 +152,13 @@ class PartPolicy:
 
     package: str
     optional_memory: frozenset[str] = frozenset()
+    device: str | None = None
 
     def validate(self, variant):
         if variant["package"] != self.package:
             fail("Physical package differs from the reviewed exact part")
+        if self.device is not None and variant.get("device") != self.device:
+            fail("Exact part device selector differs from its reviewed policy")
         domains = {region["id"]: region for region in variant["memory"]}
         if not self.optional_memory.issubset(domains) or any(
                 domains[name]["linker"] for name in self.optional_memory):
@@ -355,12 +391,24 @@ class ModeTraits:
 _MODE_TRAITS = MappingProxyType({
     ('capture', 'snapshot-raw'): ModeTraits(irq=True, rx_dma=True),
     ('capture', 'snapshot-jpeg'): ModeTraits(irq=True, rx_dma=True),
+    ('capture', 'frames-raw'): ModeTraits(irq=True, rx_dma=True),
+    ('capture', 'frames-jpeg'): ModeTraits(irq=True, rx_dma=True),
     ('capture', 'raw-blocks'): ModeTraits(irq=True, rx_dma=True, continuous=True),
+    ('capture', 'jpeg-blocks'): ModeTraits(irq=True, rx_dma=True, continuous=True),
     **{('audio', role + '-' + direction): ModeTraits(
         irq=True, tx_dma=direction != 'rx', rx_dma=direction != 'tx')
        for role in ('master', 'slave') for direction in ('tx', 'rx', 'duplex')},
+    **{('audio', role + '-' + direction + '-blocks'): ModeTraits(
+        irq=True, tx_dma=direction != 'rx', rx_dma=direction != 'tx',
+        continuous=True)
+       for role in ('master', 'slave') for direction in ('tx', 'rx', 'duplex')},
     ("dac", "direct"): ModeTraits(polling=True),
     ("crc", "crc32-words"): ModeTraits(polling=True),
+    ("cipher", "irq-blocks"): ModeTraits(irq=True),
+    ("hash", "irq-blocks"): ModeTraits(irq=True),
+    ("display", "rgb-scanout"): ModeTraits(irq=True, bus_master=True,
+                                          continuous=True),
+    ("image", "irq-blit"): ModeTraits(irq=True, bus_master=True),
     ("dac", "triggered"): ModeTraits(polling=True),
     ("dac", "noise"): ModeTraits(polling=True),
     ("dac", "triangle"): ModeTraits(polling=True),
@@ -370,6 +418,9 @@ _MODE_TRAITS = MappingProxyType({
     ("memory_window", "startup-memory"): ModeTraits(),
     ("external_bus", "async16"): ModeTraits(polling=True),
     ("external_bus", "external-memory"): ModeTraits(polling=True),
+    ("external_bus", "sdram-controller"): ModeTraits(polling=True),
+    ("external_bus", "qspi-indirect-sdr"): ModeTraits(polling=True),
+    ("flash_async", "nor-indirect"): ModeTraits(polling=True),
     ("memory_window", "psram-window"): ModeTraits(),
     ("flash_async", "nor-cfi"): ModeTraits(polling=True),
     ("nand", "raw-page"): ModeTraits(polling=True),
@@ -385,6 +436,13 @@ _MODE_TRAITS = MappingProxyType({
     ("lptim", "counter16-oneshot"): ModeTraits(),
     ("lptim", "irq-counter16-oneshot"): ModeTraits(irq=True),
     ("adc_group", "regular-sequence-dma"): ModeTraits(irq=True, rx_dma=True),
+    ("adc_group", "regular-blocks"): ModeTraits(
+        irq=True, rx_dma=True, block_stream=True, continuous=True),
+    ("adc_group", "regular-software-injected-blocks"): ModeTraits(
+        irq=True, rx_dma=True, block_stream=True, continuous=True),
+    ("adc_group", "regular-timer-injected-blocks"): ModeTraits(
+        irq=True, rx_dma=True, block_stream=True, continuous=True),
+    ("adc_group", "regular-auto-injected"): ModeTraits(irq=True, rx_dma=True),
     ("adc_group", "injected-sequence"): ModeTraits(irq=True),
     ("pwm_adc", "finite-regular-dma"): ModeTraits(irq=True, rx_dma=True),
     ("can_fd", "iso-fd-loopback"): ModeTraits(irq=True),
@@ -447,6 +505,7 @@ _MODE_TRAITS = MappingProxyType({
     ("watchdog", "independent"): ModeTraits(),
     ("watchdog", "window"): ModeTraits(),
     ("exti", "edge-event"): ModeTraits(irq=True),
+    ("exti", "hardware-event"): ModeTraits(),
     ("exti", "pvd-level"): ModeTraits(polling=True),
     ("exti", "pvd-events"): ModeTraits(irq=True),
     ("pwm", "fixed-pwm"): ModeTraits(),

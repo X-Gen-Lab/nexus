@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "usb_device.h"
+#include "nexus/io/native/model.h"
 uint32_t g_nx_usb_soc_hclk_hz = 168000000U;
 #include <string.h>
 
@@ -35,9 +36,15 @@ static nx_result_t clock_release(void* context) {
     --hw->consumers;
     return NX_SUCCESS;
 }
+/** \brief The model exposes the independent live Core domain identity. */
+static uint64_t clock_epoch(const void* context) {
+    const nx_native_usb_hardware_t* hw = context;
+    return hw->clock_ready ? hw->time_epoch : 0U;
+}
 static const nx_usb_clock_ops_t clock_ops = {.retain = clock_retain,
                                              .release = clock_release,
-                                             .validate = clock_validate};
+                                             .validate = clock_validate,
+                                             .epoch = clock_epoch};
 /** \brief Recompute level endpoint summary without clearing unrelated W1C bits.
  */
 static void summaries(nx_native_usb_hardware_t* hw) {
@@ -74,6 +81,8 @@ nx_result_t nx_native_usb_initialize(nx_native_usb_device_t* model) {
     }
     if (!c->snapshot.started) {
         model->hardware.registers[0x10U / 4U] = 1U << 31U;
+        if (model->hardware.time_epoch == 0U)
+            model->hardware.time_epoch = 1U;
     }
     c->registers = (uintptr_t)&model->hardware;
     c->clock = (nx_usb_clock_domain_t){.ops = &clock_ops,
@@ -84,6 +93,8 @@ nx_result_t nx_native_usb_initialize(nx_native_usb_device_t* model) {
 /** \brief Pop external RX status and then expose its FIFO words. */
 uint32_t nx_native_usb_read(uintptr_t base, uint32_t offset) {
     nx_native_usb_hardware_t* hw = (nx_native_usb_hardware_t*)base;
+    if (hw->before_read != NULL)
+        hw->before_read(hw->read_context, offset);
     if (offset == 0x800U && hw->delay_config_read &&
         hw->config_read_gap == 0U) {
         hw->early_config_read = true;
@@ -128,6 +139,11 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
         hw->config_read_gap = 0U;
     }
     ++hw->mmio_writes;
+    if (offset == hw->refused_dma_address_offset && value == 0U &&
+        ((offset >= 0x900U && offset < 0x9C0U) ||
+         (offset >= 0xB00U && offset < 0xBC0U)) &&
+        offset % 32U == 20U)
+        return;
     /* FIFO writes consume model space; no physical USB transfer occurs here. */
     if (offset >= 0x1000U) {
         unsigned ep = offset / 0x1000U - 1U;
@@ -196,7 +212,21 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
         if ((value & (1U << 10U)) != 0U) {
             result &= ~8U;
         }
+        const uint32_t old = hw->registers[offset / 4U];
+        if (hw->hold_remote_assert && (old & 1U) == 0U)
+            result &= ~1U;
+        if (hw->hold_remote_clear)
+            result |= old & 1U;
+        if ((old & 1U) == 0U && (result & 1U) != 0U)
+            hw->remote_asserted_at = nx_time_now_us();
+        if ((old & 1U) != 0U && (result & 1U) == 0U)
+            hw->remote_cleared_at = nx_time_now_us();
         hw->registers[offset / 4U] = result;
+        if ((old & 1U) == 0U && (result & 1U) != 0U &&
+            hw->delay_after_remote_assert_us != 0U) {
+            (void)nx_native_clock_advance(hw->delay_after_remote_assert_us);
+            hw->delay_after_remote_assert_us = 0U;
+        }
         return;
     }
     /* Endpoint commands self-clear and acknowledge NAK/disable separately. */

@@ -23,6 +23,9 @@ extern "C" {
 /** \brief Shared silicon data; TIM2 belongs to Core and EXTI needs a pin owner.
  */
 extern const nx_stm32_adc_trigger_fact_t nx_stm32_adc_triggers[11];
+/** \brief Unique Table69 mapping; excludes Core TIM2 and unowned EXTI15. */
+const nx_stm32_adc_trigger_fact_t*
+nx_stm32_adc_injected_trigger_fact(uint8_t trigger);
 /** \brief Install an idle owned timer before enabling ADC external detection.
  * \param[in,out] timer: Exclusively owned stopped timer.
  * \param[in] facts: Exact reviewed internal trigger event.

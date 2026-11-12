@@ -85,6 +85,9 @@ class F407RtcStandby : public F407Rtc {
         RTC_CR_ALRAE | RTC_CR_ALRBE | RTC_CR_WUTE | RTC_CR_TSE | RTC_CR_ALRAIE |
         RTC_CR_ALRBIE | RTC_CR_WUTIE | RTC_CR_TSIE;
     void suspended() {
+        config.lse_bypass = true;
+        g_f407_rtc_model.rcc.BDCR |= RCC_BDCR_LSEBYP;
+        g_f407_rtc_model.gpio_c.MODER = 0U;
         open();
         nx_rtc_alarm_t alarm{2U, 3U, 4U, 5U};
         ASSERT_EQ(NX_SUCCESS, nx_rtc_port_alarm_b(&port, true, &alarm));
@@ -367,6 +370,29 @@ TEST_F(F407RtcStandby, CommitRejectsFaultmaskEvenWhenPrimaskIsSet) {
     EXPECT_EQ(0U, m.rtc.CR & cr_mask);
 }
 
+TEST_F(F407RtcStandby, ReenablingEdgeTamperChecksPadAndRetainsFailedReceipt) {
+    suspended();
+    auto& m = g_f407_rtc_model;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_standby_prepare(&port, 0U, 8U, &receipt));
+    const auto reads = m.capture_pad_reads;
+    m.gpio_c.IDR = 1U << 13U;
+    m.masked = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_rtc_port_standby_commit(&port, &receipt));
+    EXPECT_EQ(&state, receipt.owner);
+    EXPECT_TRUE(state.suspended);
+    EXPECT_NE(0U, m.rtc.TAFCR & RTC_TAFCR_TAMP1E);
+    EXPECT_EQ(reads + 1U, m.capture_pad_reads);
+    m.masked = false;
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_backup_write(&port, 0U, 42U));
+    m.masked = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_rtc_port_standby_restore(&port, &receipt));
+    EXPECT_EQ(&state, receipt.owner);
+    m.gpio_c.IDR = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_standby_restore(&port, &receipt));
+    EXPECT_EQ(nullptr, receipt.owner);
+    EXPECT_EQ(0U, m.capture_unclocked_reads);
+}
+
 TEST_F(F407Rtc, AuxiliaryAlarmBUsesOwnWriteFlagAndPreservesAlarmA) {
     open();
     prepare();
@@ -403,6 +429,8 @@ TEST_F(F407Rtc, WakeupRejectsForbiddenFastZeroBeforeWritesAndUsesWutwf) {
     EXPECT_NE(0U, g_f407_rtc_model.rtc.ISR & RTC_ISR_TAMP1F);
 }
 TEST_F(F407Rtc, TimestampRetainsRawSubsecondsAndOverflowWithoutInventingYear) {
+    config.lse_bypass = true;
+    g_f407_rtc_model.rcc.BDCR |= RCC_BDCR_LSEBYP;
     open();
     nx_rtc_capture_config_t capture{};
     capture.timestamp_enabled = true;
@@ -574,7 +602,7 @@ TEST_F(F407Rtc, ProvisionCanTransferOnlyClosedJoinedAutonomousResponsibility) {
     const auto backup = g_f407_rtc_model.rcc.BDCR;
     ASSERT_EQ(NX_SUCCESS, nx_rtc_port_backup_handoff(&port, &handoff));
     EXPECT_EQ(32768U, handoff.oscillator_hz);
-    EXPECT_EQ(0x3fU, handoff.resources);
+    EXPECT_EQ(0xbfU, handoff.resources);
     EXPECT_EQ(0, std::memcmp(&initial, &handoff.calendar, sizeof(initial)));
     EXPECT_EQ(backup, g_f407_rtc_model.rcc.BDCR);
     EXPECT_EQ(before, g_f407_rtc_model.writes);
@@ -1025,6 +1053,133 @@ TEST_F(F407Rtc, CalendarReloadMustBeObservedBeforeSuccessfulSet) {
     EXPECT_EQ(0U, g_f407_rtc_model.rtc.ISR & RTC_ISR_INIT);
 }
 
+TEST_F(F407Rtc, CalendarAndCoarseInitReentryRequireObservedShadowSync) {
+    config.allow_set = true;
+    open();
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_set(&port, &initial));
+    ++initial.second;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_set(&port, &initial));
+    nx_rtc_calibration_t coarse{NX_RTC_CALIBRATION_COARSE, 2U, 0U, false, true};
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_calibrate(&port, &coarse));
+    EXPECT_EQ(0U, g_f407_rtc_model.unsynchronized_init);
+    EXPECT_GE(g_f407_rtc_model.synchronizations, 3U);
+    EXPECT_NE(0U, g_f407_rtc_model.rtc.CR & RTC_CR_BYPSHAD);
+    EXPECT_EQ(0U, g_f407_rtc_model.illegal_writes);
+}
+
+TEST_F(F407Rtc, ShadowSyncTimeoutNeverEntersInitOrPublishesNewDomain) {
+    config.allow_set = true;
+    open();
+    const auto generation = state.generation;
+    const auto time = g_f407_rtc_model.rtc.TR;
+    const auto date = g_f407_rtc_model.rtc.DR;
+    g_f407_rtc_model.hold_synchronization = true;
+    EXPECT_EQ(NX_ERROR_TIMEOUT, nx_rtc_port_set(&port, &initial));
+    EXPECT_EQ(generation, state.generation);
+    EXPECT_EQ(time, g_f407_rtc_model.rtc.TR);
+    EXPECT_EQ(date, g_f407_rtc_model.rtc.DR);
+    EXPECT_EQ(0U, g_f407_rtc_model.rtc.ISR & RTC_ISR_INIT);
+    EXPECT_NE(0U, g_f407_rtc_model.rtc.CR & RTC_CR_BYPSHAD);
+    EXPECT_TRUE(state.tainted);
+}
+
+TEST_F(F407Rtc, FallingEdgeTamperRejectsBeforeEffects) {
+    config.lse_bypass = true;
+    g_f407_rtc_model.rcc.BDCR |= RCC_BDCR_LSEBYP;
+    open();
+    nx_rtc_capture_config_t capture{};
+    capture.timestamp_pin = capture.tamper1_pin = 1U;
+    capture.tamper_mask = 1U;
+    capture.trigger_mask = 1U;
+    const auto writes = g_f407_rtc_model.writes;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_rtc_port_capture_configure(&port, &capture));
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+    EXPECT_EQ(0U, g_f407_rtc_model.rtc.TAFCR);
+}
+
+TEST_F(F407Rtc, RisingEdgeTamperRejectsActiveInputAndBlocksBackupWrites) {
+    config.lse_bypass = true;
+    auto& m = g_f407_rtc_model;
+    m.rcc.BDCR |= RCC_BDCR_LSEBYP;
+    m.gpio_c.MODER = 0U;
+    open();
+    m.gpio_c.IDR = 1U << 13U;
+    m.rtc.BKP0R = 0x12345678U;
+    nx_rtc_capture_config_t capture{};
+    capture.timestamp_pin = capture.tamper1_pin = 1U;
+    capture.tamper_mask = 1U;
+    EXPECT_EQ(NX_ERROR_IO, nx_rtc_port_capture_configure(&port, &capture));
+    EXPECT_TRUE(state.auxiliary_faulted);
+    EXPECT_NE(0U, m.rtc.TAFCR & RTC_TAFCR_TAMP1E);
+    EXPECT_EQ(1U, m.capture_pad_reads);
+    EXPECT_EQ(0U, m.capture_unclocked_reads);
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_backup_write(&port, 0U, 42U));
+    EXPECT_EQ(0x12345678U, m.rtc.BKP0R);
+}
+
+TEST_F(F407Rtc, RisingEdgeTamperObservesAnInputTransitionDuringEnable) {
+    config.lse_bypass = true;
+    auto& m = g_f407_rtc_model;
+    m.rcc.BDCR |= RCC_BDCR_LSEBYP;
+    m.gpio_c.MODER = 0U;
+    open();
+    RtcWriteObserver observer;
+    standby_observer = &observer;
+    m.observe_write = [](volatile uint32_t* p, uint32_t v) {
+        standby_observer->Call(p, v);
+    };
+    EXPECT_CALL(observer, Call(testing::_, testing::_))
+        .WillRepeatedly(testing::Invoke([](volatile uint32_t* p, uint32_t v) {
+            auto& model = g_f407_rtc_model;
+            if (p == &model.rtc.TAFCR && (v & RTC_TAFCR_TAMP1E))
+                model.gpio_c.IDR |= 1U << 13U;
+        }));
+    nx_rtc_capture_config_t capture{};
+    capture.timestamp_pin = capture.tamper1_pin = 1U;
+    capture.tamper_mask = 1U;
+    EXPECT_EQ(NX_ERROR_IO, nx_rtc_port_capture_configure(&port, &capture));
+    EXPECT_TRUE(state.auxiliary_faulted);
+    EXPECT_EQ(1U, m.capture_pad_reads);
+    m.observe_write = nullptr;
+    standby_observer = nullptr;
+}
+
+TEST_F(F407Rtc, RisingEdgeTamperReadsInactiveInputWithItsTemporaryGate) {
+    config.lse_bypass = true;
+    auto& m = g_f407_rtc_model;
+    m.rcc.BDCR |= RCC_BDCR_LSEBYP;
+    m.gpio_c.MODER = 0U;
+    open();
+    m.rcc.AHB1ENR &= ~uint32_t{RCC_AHB1ENR_GPIOCEN};
+    m.rcc.AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    nx_rtc_capture_config_t capture{};
+    capture.timestamp_pin = capture.tamper1_pin = 1U;
+    capture.tamper_mask = 1U;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_capture_configure(&port, &capture));
+    EXPECT_FALSE(state.auxiliary_faulted);
+    EXPECT_EQ(1U, m.capture_pad_reads);
+    EXPECT_EQ(0U, m.capture_unclocked_reads);
+    EXPECT_EQ(RCC_AHB1ENR_GPIOAEN, m.rcc.AHB1ENR);
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_backup_write(&port, 0U, 42U));
+    EXPECT_EQ(42U, m.rtc.BKP0R);
+}
+
+TEST_F(F407Rtc, AnalogPadCannotProveAnInactiveDigitalTamperInput) {
+    config.lse_bypass = true;
+    auto& m = g_f407_rtc_model;
+    m.rcc.BDCR |= RCC_BDCR_LSEBYP;
+    open();
+    m.gpio_c.MODER |= 3U << 26U;
+    nx_rtc_capture_config_t capture{};
+    capture.timestamp_pin = capture.tamper1_pin = 1U;
+    capture.tamper_mask = 1U;
+    EXPECT_EQ(NX_ERROR_IO, nx_rtc_port_capture_configure(&port, &capture));
+    EXPECT_TRUE(state.auxiliary_faulted);
+    EXPECT_EQ(0U, m.capture_pad_reads);
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_backup_write(&port, 0U, 42U));
+}
+
 TEST_F(F407Rtc, ProvisionInspectsForeignOscillatorPadsBeforeBackupEffects) {
     for (unsigned pin : {14U, 15U}) {
         for (unsigned conflict = 0U; conflict < 3U; ++conflict) {
@@ -1056,7 +1211,7 @@ TEST_F(F407Rtc, ProvisionKeepsPreownedGpioClockAndAnalogPadConfiguration) {
     open();
     EXPECT_EQ(RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIODEN,
               g_f407_rtc_model.rcc.AHB1ENR);
-    EXPECT_EQ(15U << 28U, g_f407_rtc_model.gpio_c.MODER);
+    EXPECT_EQ((15U << 28U) | (3U << 26U), g_f407_rtc_model.gpio_c.MODER);
 }
 TEST_F(F407Rtc, FailedGpioClockReadbackRetainsInspectionResponsibility) {
     provision();
@@ -1087,4 +1242,122 @@ TEST_F(F407Rtc, ConfiguredClockCallbackBindsOnlyTheExactSystemOwner) {
     EXPECT_EQ(0U, nx_stm32_rtc_clock_read(nullptr));
     EXPECT_EQ(0U, nx_stm32_rtc_clock_read(&state));
     EXPECT_EQ(1U, g_f407_rtc_model.clock_reads);
+}
+
+TEST_F(F407Rtc, CrystalProvisionQuietsPc13BeforeStartingLse) {
+    provision();
+    auto& model = g_f407_rtc_model;
+    testing::MockFunction<void(volatile uint32_t*, uint32_t)> observer;
+    unsigned starts = 0U;
+    EXPECT_CALL(observer, Call(testing::_, testing::_))
+        .WillRepeatedly(
+            testing::Invoke([&](volatile uint32_t* reg, uint32_t value) {
+                if (reg == &model.rcc.BDCR && (value & RCC_BDCR_LSEON)) {
+                    ++starts;
+                    EXPECT_EQ(3U, (model.gpio_c.MODER >> 26U) & 3U);
+                }
+            }));
+    standby_observer = &observer;
+    model.observe_write = [](volatile uint32_t* reg, uint32_t value) {
+        standby_observer->Call(reg, value);
+    };
+    const auto status = nx_stm32_rtc_prepare(&state, &config);
+    model.observe_write = nullptr;
+    standby_observer = nullptr;
+    EXPECT_EQ(NX_SUCCESS, status);
+    EXPECT_GT(starts, 0U);
+    EXPECT_EQ(3U, (model.gpio_c.MODER >> 26U) & 3U);
+    EXPECT_EQ(0U, (model.gpio_c.PUPDR >> 26U) & 3U);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_rtc_close(&state));
+    nx_rtc_backup_handoff_t receipt{};
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_backup_handoff(&port, &receipt));
+    EXPECT_EQ(3U, (model.gpio_c.MODER >> 26U) & 3U);
+}
+
+TEST_F(F407Rtc, CrystalProvisionRejectsForeignPc13BeforeBackupEffects) {
+    provision();
+    auto& model = g_f407_rtc_model;
+    model.gpio_c.MODER = 2U << 26U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_rtc_prepare(&state, &config));
+    EXPECT_EQ(0U, model.rcc.BDCR);
+    EXPECT_EQ(0U, model.power.CR);
+    EXPECT_EQ(2U, (model.gpio_c.MODER >> 26U) & 3U);
+}
+
+TEST_F(F407Rtc, CrystalAdoptionRejectsForeignPc13BeforeCalendarWrites) {
+    auto& model = g_f407_rtc_model;
+    model.gpio_c.MODER = 1U << 26U;
+    const auto calendar = model.rtc.TR;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_rtc_prepare(&state, &config));
+    EXPECT_EQ(calendar, model.rtc.TR);
+    EXPECT_EQ(1U, (model.gpio_c.MODER >> 26U) & 3U);
+    EXPECT_FALSE(state.opened);
+}
+
+TEST_F(F407Rtc, CrystalCaptureRejectsPc13TimestampAndTamperWithoutEffects) {
+    open();
+    nx_rtc_capture_config_t capture{};
+    capture.timestamp_pin = capture.tamper1_pin = 1U;
+    capture.timestamp_enabled = true;
+    const auto writes = g_f407_rtc_model.writes;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_rtc_port_capture_configure(&port, &capture));
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+    capture.timestamp_enabled = false;
+    capture.tamper_mask = 1U;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_rtc_port_capture_configure(&port, &capture));
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+}
+
+TEST_F(F407Rtc, ExplicitBypassRetainsPc13CaptureWithoutCrystalNoiseConflict) {
+    config.lse_bypass = true;
+    g_f407_rtc_model.rcc.BDCR |= RCC_BDCR_LSEBYP;
+    g_f407_rtc_model.gpio_c.MODER = 2U << 26U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_prepare(&state, &config));
+    nx_rtc_capture_config_t capture{};
+    capture.timestamp_pin = capture.tamper1_pin = 1U;
+    capture.timestamp_enabled = true;
+    capture.tamper_mask = 1U;
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_capture_configure(&port, &capture));
+    EXPECT_NE(0U, g_f407_rtc_model.rtc.CR & RTC_CR_TSE);
+    EXPECT_NE(0U, g_f407_rtc_model.rtc.TAFCR & RTC_TAFCR_TAMP1E);
+    EXPECT_EQ(2U, (g_f407_rtc_model.gpio_c.MODER >> 26U) & 3U);
+}
+
+TEST_F(F407Rtc, BypassProvisionRequiresAndPreservesExternalSourceIdentity) {
+    provision();
+    config.lse_bypass = true;
+    g_f407_rtc_model.gpio_c.MODER = 1U << 26U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_prepare(&state, &config));
+    EXPECT_NE(0U, g_f407_rtc_model.rcc.BDCR & RCC_BDCR_LSEBYP);
+    EXPECT_EQ(1U, (g_f407_rtc_model.gpio_c.MODER >> 26U) & 3U);
+    EXPECT_EQ(0U, state.effects & NX_RTC_BACKUP_QUIET_PC13);
+}
+
+TEST_F(F407Rtc, CrystalAdoptionRequiresAnAlreadyQuietDigitalInput) {
+    g_f407_rtc_model.gpio_c.MODER = 0U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_rtc_prepare(&state, &config));
+    EXPECT_EQ(0U, state.effects);
+    EXPECT_FALSE(state.opened);
+    EXPECT_EQ(0U, g_f407_rtc_model.writes);
+}
+
+TEST_F(F407Rtc, RetainedQuietPadInspectionRestoresOnlyItsTemporaryGate) {
+    auto& model = g_f407_rtc_model;
+    model.rcc.AHB1ENR = RCC_AHB1ENR_GPIODEN;
+    open();
+    EXPECT_EQ(RCC_AHB1ENR_GPIODEN, model.rcc.AHB1ENR);
+    EXPECT_EQ(3U, (model.gpio_c.MODER >> 26U) & 3U);
+    EXPECT_EQ(0U, state.effects);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_rtc_close(&state));
+    EXPECT_EQ(RCC_AHB1ENR_GPIODEN, model.rcc.AHB1ENR);
+}
+
+TEST_F(F407Rtc, AuthoredBypassCannotAdoptAnObservedCrystalSource) {
+    config.lse_bypass = true;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32_rtc_prepare(&state, &config));
+    EXPECT_EQ(0U, g_f407_rtc_model.writes);
+    EXPECT_EQ(0U, state.effects);
+    EXPECT_FALSE(state.opened);
 }

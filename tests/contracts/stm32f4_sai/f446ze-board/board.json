@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "f446ze-sai-software-reference",
+  "soc": "STM32F446ZET6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "source_a",
+      "controller": "SAI1",
+      "route": "sai1-a-duplex-mclk"
+    },
+    {
+      "id": "source_b",
+      "controller": "SAI1",
+      "route": "sai1-b-simplex"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only: no PCB, codec, clock accuracy, physical timing or audio qualification",
+    "The authored3.3V and external slave SCK ceiling are software assumptions, not observations"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f446ze.pdf",
+      "scope": "Reviewed exact SAI1 package/AF6 pads only; no PCB connection inferred"
+    },
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/rm0390-stm32f446xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "scope": "Reviewed SAI1 A/B and DMA2 request routes; no hardware execution"
+    }
+  ]
+}

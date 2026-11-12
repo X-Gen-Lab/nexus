@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "f479ni-sdram-software-reference",
+  "soc": "STM32F479NIH6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-reference-draft",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "control",
+      "controller": "FMC",
+      "route": "fmc-sdram-control"
+    },
+    {
+      "id": "ram",
+      "controller": "FMC",
+      "route": "fmc-sdram-bank1-16"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only; no PCB, external oscillator, electrical measurement or physical qualification",
+    "The authored 3.3 V supply is a software clock/Flash assumption, not an observed supply",
+    "No external SDRAM part is selected or soldering/wiring established; geometry and every timing value are explicit synthetic software assumptions, not a manufacturer datasheet or electrical qualification",
+    "No startup RAM, DMA, executable mapping, MPU/cache policy or product persistence behavior is granted"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f479ni.pdf",
+      "scope": "Exact F479NI TFBGA216 SDRAM AF12 software reference only; no PCB, fitted memory or physical execution qualification"
+    },
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00127514-stm32f469xx-and-stm32f479xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "scope": "Exact F479NI TFBGA216 SDRAM AF12 software reference only; no PCB, fitted memory or physical execution qualification"
+    }
+  ]
+}

@@ -7,21 +7,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 93fd10703541a2d6f078de742f3f64d21c6b50f0a007b471a61e0ca877754103\n"
+"X-Nexus-Source-SHA256: 3c4e9044f6aab1e3b7e67fe6b83ba52d8c2c4fe9ad662535843c04b5c9e872cc\n"
 
 #: docs/reference/platforms/support.md:9
 msgid "读取精确平台支持"
 msgstr "Read exact platform support"
-
-#: docs/reference/platforms/support.md:11
-msgid ""
-"当前生产系列入口是 STM32F4，已迁入的实现限定 STM32F407VET6 与 STM32F407ZGT6。 同系列名称、官方 SDK "
-"文件或器件宏存在，不代表其他 F4 型号已经适配。"
-msgstr ""
-"The current production series entry point is STM32F4. Migrated "
-"implementations are limited to STM32F407VET6 and STM32F407ZGT6. A series "
-"name, official SDK file or device macro does not imply other F4 parts are "
-"integrated."
 
 #: docs/reference/platforms/support.md:0
 msgid "维度"
@@ -171,3 +161,6 @@ msgstr ""
 "Physical HIL is currently `not_executed`, and unknown PCB revisions remain "
 "unknown. See the [qualification reference](qualification.md) for complete "
 "boundaries."
+
+msgid "当前生产系列入口是 STM32F4，精确器件与模式统一见[详细支持](../../delivery/support.md)。 五个已审料号的事实、四个实体 F407 Board 包及新增料号的内部 CRC 软件参考分别维护。 同系列名称、官方 SDK 文件或器件宏存在，不代表全部 F4、外设组合或实体 PCB 已验证。"
+msgstr "STM32F4 is the production family entry; [detailed support](../../delivery/support.md) is the authority for exact devices and modes. Facts for five reviewed parts, four physical F407 Board packages and internal-CRC software references for added parts are maintained separately. A family name, official SDK file or device macro does not validate all F4 parts, peripheral combinations or physical PCBs."

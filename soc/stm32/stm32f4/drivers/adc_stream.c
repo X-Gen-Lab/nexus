@@ -140,15 +140,47 @@ nx_result_t nx_stm32_adc_stream_rate(nx_stm32_adc_stream_state_t* state,
     return NX_ERROR_UNSUPPORTED;
 }
 
-/** \brief Validate every future block before the first successful producer
- * loan. */
+/** \brief Treat invalid spans as aliases, including wrapped end addresses. */
+static bool overlap(const void* a, size_t an, const void* b, size_t bn) {
+    uintptr_t ap = (uintptr_t)a, bp = (uintptr_t)b;
+    return a == NULL || b == NULL || an == 0U || bn == 0U ||
+           an > UINTPTR_MAX - ap || bn > UINTPTR_MAX - bp ||
+           (ap < bp + bn && bp < ap + an);
+}
+
+/** \brief Preserve the concrete owner and facts through all future DMA loans.
+ */
+static bool independent(const nx_stm32_adc_stream_state_t* state,
+                        size_t state_bytes, const void* data, size_t bytes) {
+    return !overlap(data, bytes, state, state_bytes) &&
+           !overlap(data, bytes, state->regions,
+                    state->region_count * sizeof(*state->regions)) &&
+           !overlap(data, bytes, state->adc.channels,
+                    state->adc.channel_count * sizeof(*state->adc.channels)) &&
+           !overlap(data, bytes, state->adc.sample_times,
+                    state->adc.channel_count *
+                        sizeof(*state->adc.sample_times)) &&
+           (state->wake == NULL ||
+            !overlap(data, bytes, state->wake, sizeof(*state->wake)));
+}
+
+/** \brief Validate all complete blocks and control spans before any loan. */
 nx_result_t nx_stm32_adc_stream_blocks(nx_stm32_adc_stream_state_t* state,
-                                       const nx_stream_t* stream) {
+                                       const nx_stream_t* stream,
+                                       size_t state_bytes) {
+    if (state_bytes < sizeof(*state) ||
+        stream->count > SIZE_MAX / sizeof(*stream->slots) ||
+        state->region_count > SIZE_MAX / sizeof(*state->regions) ||
+        !independent(state, state_bytes, stream, sizeof(*stream)) ||
+        !independent(state, state_bytes, stream->slots,
+                     stream->count * sizeof(*stream->slots)))
+        return NX_ERROR_INVALID;
     size_t scan_bytes = state->adc.channel_count * sizeof(uint16_t);
     for (size_t i = 0U; i < stream->count; ++i) {
         const nx_stream_slot_t* slot = &stream->slots[i];
         if (slot->capacity == 0U || slot->capacity % scan_bytes != 0U ||
-            slot->capacity / sizeof(uint16_t) > 65535U) {
+            slot->capacity / sizeof(uint16_t) > 65535U ||
+            !independent(state, state_bytes, slot->data, slot->capacity)) {
             return NX_ERROR_INVALID;
         }
         nx_result_t result = nx_dma_buffer_validate(
@@ -218,8 +250,17 @@ static void arm(nx_stm32_adc_stream_state_t* state) {
                 << ADC_CR2_EXTSEL_Pos);
     nx_arch_dsb();
     (void)adc->CR2;
-    state->ready_at = nx_deadline_after(
-        nx_time_now_us(), nx_stm32_adc_startup_delay_us(&state->adc));
+    if (LL_ADC_IsEnabled(adc) == 0U ||
+        nx_deadline_finite_after(nx_time_now_us(),
+                                 nx_stm32_adc_startup_delay_us(&state->adc),
+                                 &state->ready_at) != NX_SUCCESS) {
+        /* The stream was accepted before hardware was armed. A failed
+         * post-store proof keeps its loan until service/stop proves detach. */
+        state->fault = true;
+        state->terminal = true;
+        detach(state);
+        return;
+    }
     state->warming = true;
 }
 
@@ -243,8 +284,15 @@ static nx_result_t stream_start(void* context, nx_stream_t* stream,
     nx_result_t result =
         nx_stm32_adc_stream_rate(state, trigger_hz, &prescaler, &period);
     if (result == NX_SUCCESS) {
-        result = nx_stm32_adc_stream_blocks(state, stream);
+        result = nx_stm32_adc_stream_blocks(state, stream, sizeof(*state));
     }
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    nx_time_us_t ready_at;
+    result = nx_deadline_finite_after(
+        nx_time_now_us(), nx_stm32_adc_startup_delay_us(&state->adc),
+        &ready_at);
     if (result != NX_SUCCESS) {
         return result;
     }

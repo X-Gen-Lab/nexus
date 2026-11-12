@@ -50,13 +50,14 @@ SETUP 到 STATUS 使用同一预算，不在 Core 逐包回调时延长。接收
 Core 的 OUT 尾包会传入 `MAX(remainder,MPS)`；bridge 按真实剩余范围验证和借用，
 不把相邻对象当作接收容量。
 
-Core 在多包 DATA_IN 中提前要求零长度 OUT0，bridge 只保存该意图，直到真实最后
-IN packet 已确认且 Core 进入 STATUS_OUT 才提交。当前 DCD 的严格阶段合同不提供
-即时 premature STATUS OUT 回调；提前到达的状态包由下一 SETUP 或有限 deadline 的
-取消/排空恢复，不能声称已完整维护该提前中止路径。正常多包控制传输由真实 Native
-DCD 回归验证。ST Core 的保护性 EP0 STALL 使用普通 endpoint stall，不能把它解释成
-整体 SETUP 拒绝。SET_ADDRESS 只向同 epoch 的 DCD 暂存，地址提交仍由 STATUS_IN
-的真实完成负责。
+Core 在多包 DATA_IN 中提前要求的零长度 OUT0 现在按同 epoch 接纳，先于后续 IN
+取得 STATUS 方向。真实零长 STATUS XFRC 可关闭 wire，即使 AHB／DMA 地址退出仍在
+进行。bridge 根据权威 `control_pending=false` 屏蔽 EP0 Core 续包派发，先 join
+两方向存储，再转交真实已结清的 IN ACK／STATUS；不补造 `EP0_TxSent`、不锁存
+这段合法间隔为 INVALID，也不重放下一 IN。下一 SETUP、deadline 或停止仍须排空，
+不能由 wire 闭合推定 class／staging 已归还。ST Core 的保护性 EP0 STALL 仍使用普通
+endpoint stall，不等于整体 SETUP 拒绝。SET_ADDRESS 只向同 epoch DCD 暂存，
+地址提交仍由 STATUS_IN 的真实完成负责。
 
 ULPI 的高速和全速回退使用各自显式选中的 profile 与描述符；官方 `pConfDesc` 对应
 同一选中速度。已经观察到的速度和后续 ENUMERATED 事实必须与该 profile 一致；

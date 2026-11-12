@@ -54,6 +54,16 @@ RAM/system boot 及后续 option 修改，没有降级路径；该动作要求 P
 禁用的 Flash IRQ 并验证重新锁定；拒绝锁定或 IRQ 排空时保留同一 active owner，
 普通 Flash 访问和 Platform 停止均不能回收它。没有隐藏后台任务或隐式恢复策略。
 
+失败后的 owner 可显式调用普通 Flash face 的 `nx_flash_port_recover()`；Platform
+close 也执行同一有限清理重试。BSY 未退出、外来 enabled/active vector 或外来模式
+仍返回 BUSY；只有实际模式撤回、状态清除、IRQ 排空与重新锁定全部读回成立后才
+释放责任。仅本 owner 尝试解锁的 Option Bytes 才重试 OPTLOCK，不改写外来 options，
+不重新发出编程脉冲、不回滚或掩盖原失败，也不替代所需 POR。
+
+ES0182 Rev19 §2.2.9 限制无复位的连续 BOR 编程。本实现不保留额外启动历史，
+因此修改 BOR 必须使用实际 AHB 分频 1 或 2；分频大于 2 在任何解锁之前拒绝。
+BOR 不变的其他 options 维护不受此限制，平台不会自动修改系统时钟。
+
 ## 外部总线与介质
 
 现有 FSMC 的 NE3 SRAM、CPU 窗口、启动内存与 NE4 parallel16 合同见
@@ -66,7 +76,27 @@ SDIO 的有限 IRQ/DMA、CRC、取消、排空及拔卡责任见
 [SDIO 模块合同](../../soc/stm32/stm32f4/private/sdio_hal/README.md)。所有介质发现均为
 显式运行期动作；冷态启动和 factory 查询不替换卡片或运行产品文件系统。
 
-`protocol="mmc"` 可显式选择 1／4／8 位 legacy SDR，保持 12 MHz。八位模式必须由
+RX 使用 PFCTRL，NDTR 在启用后从 `0xffff` 计数；TX 使用 DMA-controller flow 与
+精确 word count，不依赖 LAST 限制源预取，也不要求未声明 padding。两方向的 DMA
+TC 都可能由 software disable 产生，不表示数据、CRC 或卡编程成功。RX 在 EN=0
+后仍可能有 FIFO 到 RAM 的写入，
+须等真实 TC、FIFO_EMPTY 与全部 IRQ／地址退出后才结清借用。TX 的 RAM 引用退出
+后，FIFO 内部副本仍可能使冷态 owner、后续 arm 和 close 保持 BUSY；平台不自动
+清副本、重发或复位共享 DMA2。上层系统恢复与普通 stop 是不同责任。
+
+memory 单块使用 CMD17／24，2..max_blocks（上限 32）使用一次 CMD18／25 和
+`N * 512` DLEN，保持 512 字节 packet；多块以 CMD12 和 CMD13 READY 收口，写入
+还须实际编程 ready。命令可能生效后丢响应保留 repair 收条，不重放 payload。
+CMD53 仍按 function unit 推进，不发 memory-only CMD12／13；完整 burst、16 字节
+对齐和短 CMD53 DMA 拒绝保持不变。
+
+所选静态 ClockPlan 要求精确 PLL48=48 MHz，并联合满足 RM0090 的 PCLK2／
+SDIO_CK 下界与 ES0182 的按宽度计算的严格 FIFO 约束。最小合法偶数分频使数据
+不超过 12 MHz、识别／low-speed 严格低于 400 kHz；低 PCLK2 选择更慢时钟，非法
+组合直接拒绝。只在无 host／DMA 借用时变更 CLKCR，控制间隔使用所选真实域的
+生成常量与微秒量化余量；不提供运行期 DVFS 或高速协议切换。
+
+`protocol="mmc"` 可显式选择 1／4／8 位 legacy SDR，数据时钟最多 12 MHz。八位模式必须由
 Board 授权完整十个 pad，按所选路线生成六或十份快照；SD memory 与 SDIO I/O
 functions 仍只接纳 1／4 位。MMC 在卡片 SWITCH 与 ready 检查成功后才提交主机宽度，
 失败不隐式降宽。精确命令、错误位与引脚合同沿用上述 SDIO 模块说明；

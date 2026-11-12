@@ -9,9 +9,10 @@ source_language: en
 # Extend the STM32F4 support package
 
 Use this guide to add an exact F4 part, reviewed route or concrete mode. Current
-production source ownership is one F4 package; existing concrete support remains
-F407VE/ZG. Do not create a parallel driver set for each part or infer support
-from a similar register name.
+production ownership is one F4 package; the [support catalogue](../delivery/support.md)
+distinguishes reviewed part facts, F407 Boards and internal-CRC software references.
+Do not create a parallel driver set for each part or infer support from similar
+register names.
 
 Read the [integration contract](../design/integration-contracts.md),
 [official-library boundary](../design/official-stm32-provider.md#build-time-provider-contract)
@@ -44,6 +45,23 @@ source selection from runtime calls; it does not add another dispatch layer.
    Factory lookup returns existing objects and does not initialize hardware.
 6. Select sources in CMake and reject unsupported parts, modes or resource
    combinations before firmware generation.
+
+The current catalog-backed F4 facts select exactly one `device_profiles.<device>`
+through `variants.<part>.device`, then compose disjoint `controller_groups` with
+separate physical `controllers` and maintained software `modes`. The immutable
+`DeviceView` keeps `ControllerFacts` and `ControllerModes` distinct. Reuse
+`resolve_device_facts` for resolution, support queries and derived matrices.
+Common F405/407/415/417 facts are shared, while only F407/417 select ETH/DCMI;
+package, memory and bonded-pad intersections remain exact. A Host-only all-device
+index supports route auditing; never use its union for admission, generation or
+firmware storage. A derived family display does not authorize another part.
+
+References select the explicit `es0182-rev19` software-audit profile. The central
+`reference_profiles.py` owns the locked document identity and applicability table
+without importing a hardware provider. This is host build code, not a Board/SoC
+Python plugin or firmware register script. A profile name, catalog entry or header
+compile does not qualify another part, an implemented erratum workaround or
+physical hardware.
 
 ## Validate the complete contract
 

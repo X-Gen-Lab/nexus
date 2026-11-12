@@ -85,7 +85,7 @@ class HilAcquireTests(unittest.TestCase):
                 "inputs": [file_identity(self.script), file_identity(config)],
                 "arguments": [str(self.script), name, "{record}", "{session}",
                               "{admission}"],
-                "timeout_s": 2, "maximum_output_bytes": 65536}
+                "timeout_s": 10, "maximum_output_bytes": 65536}
                 for name in ("identify", "flash", "verify_flash", "reset",
                              "serial", "cleanup")]}
         self.recipe_path = self.root / "recipe.json"

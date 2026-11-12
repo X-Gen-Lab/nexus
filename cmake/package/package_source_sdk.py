@@ -473,6 +473,15 @@ REQUIRED_FILES = (
     'io/include/nexus/io/dac.h',
     'io/include/nexus/io/chip.h',
     'io/include/nexus/io/crc.h',
+    'io/include/nexus/io/cipher.h',
+    'io/include/nexus/io/hash.h',
+    'io/include/nexus/io/display.h',
+    'io/include/nexus/io/image.h',
+    'io/private/graphics_checks.h',
+    'io/src/api/display.c',
+    'io/src/api/audio.c',
+    'io/src/api/image.c',
+    'io/private/crypto_validation.h',
     'io/include/nexus/io/dac_tx.h',
     'io/include/nexus/io/dma.h',
     'io/include/nexus/io/encoder.h',
@@ -530,6 +539,8 @@ REQUIRED_FILES = (
     'io/src/api/can_fd.c',
     'io/src/api/dac.c',
     'io/src/api/crc.c',
+    'io/src/api/cipher.c',
+    'io/src/api/hash.c',
     'io/src/api/dac_tx.c',
     'io/src/api/encoder.c',
     'io/src/api/entropy.c',
@@ -722,6 +733,7 @@ REQUIRED_FILES = (
     'soc/stm32/stm32f4/private/stm32f407_i2c_port.h',
     'soc/stm32/stm32f4/private/stm32f407_lowpower.h',
     'soc/stm32/stm32f4/private/stm32f407_packet_cold.h',
+    'soc/stm32/stm32f4/private/stm32f4_ethernet_cold.h',
     'soc/stm32/stm32f4/private/stm32f407_platform_cold.h',
     'soc/stm32/stm32f4/private/stm32f407_provider.h',
     'soc/stm32/stm32f4/private/stm32f407_rtc.h',
@@ -773,6 +785,7 @@ REQUIRED_FILES = (
     'tools/configure/coupled_io.py',
     'tools/configure/cpu.py',
     'tools/configure/dependencies.py',
+    'tools/configure/device_view.py',
     'tools/configure/dma_topology.py',
     'tools/configure/documentation.py',
     'tools/configure/emission.py',
@@ -790,6 +803,7 @@ REQUIRED_FILES = (
     'tools/configure/io_traits.py',
     'tools/configure/ir.py',
     'tools/configure/records.py',
+    'tools/configure/reference_profiles.py',
     'tools/configure/kernel.py',
     'tools/configure/lowpower.py',
     'tools/configure/matrix.py',
@@ -958,7 +972,37 @@ HOST_SUPPORT_FILES = tuple(dict.fromkeys((*HOST_SUPPORT_FILES,
                                           *_HOST_VERIFICATION_FILES)))
 
 # Generator code identity has one authority; packaging consumes its closure.
+F4_FAMILY_VERIFICATION_FILES = (
+    "tests/contracts/crc_assembly/consumer.c",
+    "tests/contracts/stm32f4_family/CMakeLists.txt",
+    *(f"tests/contracts/stm32f4_family/f{chip}zg.toml"
+      for chip in ("405", "407", "415", "417")),
+    *(f"tests/contracts/stm32f4_family/f{chip}zg-board/board.json"
+      for chip in ("405", "407", "415", "417")),
+    *(f"tests/contracts/stm32f4_family/{stem}.toml"
+      for stem in ("f411re", "f446ze", "f479ni")),
+    *(f"tests/contracts/stm32f4_family/{stem}-board/board.json"
+      for stem in ("f411re", "f446ze", "f479ni")),
+    *(f"tests/contracts/stm32f4_crypto/{name}"
+      for name in ("consumer.c", "CMakeLists.txt", "f415zg.toml", "f417zg.toml",
+                   "f415zg-board/board.json", "f417zg-board/board.json")),
+    *(f"tests/contracts/stm32f4_sdram/{name}"
+      for name in ("consumer.c", "CMakeLists.txt", "f479ni-sdram.toml",
+                   "f479ni-sdram-board/board.json")),
+    *(f"tests/contracts/stm32f4_qspi/{name}"
+      for name in ("consumer.c", "CMakeLists.txt", "f479ni-qspi.toml",
+                   "f479ni-qspi-board/board.json")),
+    *(f"tests/contracts/stm32f4_graphics/{name}"
+      for name in ("consumer.c", "CMakeLists.txt", "combined.toml",
+                   "dual-rgb888.toml", "image-only.toml", "board/board.json")),
+    *(f"tests/contracts/stm32f4_sai/{name}"
+      for name in ("consumer.c", "CMakeLists.txt", "README.md",
+                   "f446ze-master.toml", "f446ze-slave.toml",
+                   "f479ni-master.toml", "f479ni-slave.toml",
+                   "f446ze-board/board.json", "f479ni-board/board.json")),
+)
 REQUIRED_FILES = tuple(dict.fromkeys((*REQUIRED_FILES,
+    *F4_FAMILY_VERIFICATION_FILES,
     *(name for mode in ("platform", "runtime")
       for name in configuration_dependencies.source_names(mode, None, sdk=True)))))
 
@@ -1231,6 +1275,8 @@ def dependency_entries(root, dependency):
 
 def selected(name, *, root=SOURCE_ROOT, profile=None):
     profile = source_profile() if profile is None else checked_profile(profile)
+    if name in F4_FAMILY_VERIFICATION_FILES:
+        return True
     if name in HOST_SUPPORT_FILES or name.startswith("tests/"):
         return profile["host_support"] and name in HOST_SUPPORT_FILES
     # Export the checked build-tool closure, not the repository's maintainer

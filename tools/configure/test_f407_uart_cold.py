@@ -77,10 +77,10 @@ class F407UartColdTests(unittest.TestCase):
                     self.assertIn(".profile = " + profile, source)
                     self.assertIn(
                         "void USART1_IRQHandler(void) { "
-                        "nx_stm32_uart_hal_irq(&s_nx_port_uart1); }", source)
+                        "nx_stm32_uart_hal_irq(&s_nx_port_uart1); nx_arch_dsb(); }", source)
                     self.assertIn(
                         "void DMA2_Stream7_IRQHandler(void) { "
-                        "nx_stm32_uart_hal_dma_irq(&s_nx_port_uart1); }",
+                        "nx_stm32_uart_hal_dma_irq(&s_nx_port_uart1); nx_arch_dsb(); }",
                         source)
                     self.assertNotIn("nx_stm32_uart_dma_uart_irq(", source)
                     self.assertNotIn("nx_stm32_uart_dma_irq(", source)

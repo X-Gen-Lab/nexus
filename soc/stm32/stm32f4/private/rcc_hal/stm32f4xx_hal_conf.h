@@ -1,0 +1,29 @@
+/**
+ * \file            stm32f4xx_hal_conf.h
+ * \brief           Private shared RCC objects with selected oscillator facts
+ * \author          Nexus Team
+ */
+#ifndef NEXUS_STM32F4_RCC_HAL_CONF_H
+#define NEXUS_STM32F4_RCC_HAL_CONF_H
+#include "nexus_config.h"
+#define HAL_RCC_MODULE_ENABLED
+#define HAL_FLASH_MODULE_ENABLED
+#define HAL_PWR_MODULE_ENABLED
+#if defined(NEXUS_CLOCK_SOURCE_HSE) && NEXUS_CLOCK_SOURCE_HSE &&               \
+    defined(NEXUS_CLOCK_INPUT_HZ)
+#define HSE_VALUE NEXUS_CLOCK_INPUT_HZ
+#else
+#define HSE_VALUE 8000000U
+#endif
+#define HSI_VALUE            16000000U
+#define LSE_VALUE            32768U
+#define LSI_VALUE            32000U
+#define EXTERNAL_CLOCK_VALUE 12288000U
+#define HSE_STARTUP_TIMEOUT  100U
+#define LSE_STARTUP_TIMEOUT  5000U
+#define assert_param(expr)   ((void)0U)
+#include "stm32f4xx_hal_flash.h"
+#include "stm32f4xx_hal_gpio.h"
+#include "stm32f4xx_hal_pwr.h"
+#include "stm32f4xx_hal_rcc.h"
+#endif

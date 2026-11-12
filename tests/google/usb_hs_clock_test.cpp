@@ -8,7 +8,11 @@
  */
 extern "C" {
 #include "stm32f407_clock.h"
+#include "stm32f407_system.h"
 #include "stm32f407_usb_hs_clock.h"
+}
+extern "C" {
+nx_stm32_system_t g_nx_stm32_system;
 }
 #include <cstring>
 #include <gtest/gtest.h>

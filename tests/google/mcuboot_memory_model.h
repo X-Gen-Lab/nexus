@@ -44,7 +44,7 @@ inline nx_result_t erase(void* context, uint32_t offset, size_t length,
                          nx_time_us_t deadline) {
     return static_cast<Device*>(context)->Erase(offset, length, deadline);
 }
-inline const nx_flash_ops_t operations{geometry, read, program, erase};
+inline const nx_flash_ops_t operations{geometry, read, program, erase, nullptr};
 inline const nx_mcuboot_flash_operation_t* active = nullptr;
 inline nx_time_us_t clock_now = 100U;
 
@@ -97,16 +97,12 @@ class Memory : public ::testing::Test {
                 }));
     }
     StrictMock<Device> mock;
-    const std::array<nx_flash_sector_t, 8> sectors{{{0U, 0x4000U},
-                                                    {0x4000U, 0x4000U},
-                                                    {0x8000U, 0x4000U},
-                                                    {0xc000U, 0x4000U},
-                                                    {0x10000U, 0x10000U},
-                                                    {0x20000U, 0x20000U},
-                                                    {0x40000U, 0x20000U},
-                                                    {0x60000U, 0x20000U}}};
-    nx_flash_geometry_t physical{0x08000000U,    0x80000U,       4U,
-                                 sectors.data(), sectors.size(), 0U};
+    const std::array<nx_flash_erase_span_t, 3> spans{
+        {{0U, 0x4000U, 4U},
+         {0x10000U, 0x10000U, 1U},
+         {0x20000U, 0x20000U, 3U}}};
+    nx_flash_geometry_t physical{0x08000000U,  0x80000U,     4U,
+                                 spans.data(), spans.size(), 0U};
     const nx_flash_port_t port{&operations, &mock};
     nx_flash_region_t primary_region{&port, 0x20000U, 0x20000U, true};
     nx_flash_region_t secondary_region{&port, 0x40000U, 0x20000U, true};

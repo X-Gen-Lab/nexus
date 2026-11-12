@@ -13,7 +13,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
-from types import ModuleType
+from types import MappingProxyType, ModuleType
 import re
 import subprocess
 import sys
@@ -28,7 +28,7 @@ if __package__ in (None, ""):
 
 from tools.configure import cpu as cpu_profiles
 from tools.configure import bundle, dependencies, sdk, enhanced_endpoints
-from tools.configure import integration_package, adc, dac
+from tools.configure import integration_package, adc, dac, device_view
 from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
 from tools.configure.ir import (
     CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
@@ -45,7 +45,7 @@ from tools.configure.selection import (
     validate_selection, validate_controller_execution, normalize_controller)
 from tools.configure.providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                mode_traits, route_dma,
-                               sequence, vendor_device_catalog)
+                               sequence, vendor_device_catalog, VendorDeviceProfile)
 
 ROOT = Path(__file__).resolve().parents[2]
 UINT32_MAX = (1 << 32) - 1
@@ -270,13 +270,10 @@ def _validate_physical_variant(value, provider, policy):
             variant.get("pins"), variant.get("pad_conditions", {}),
             getattr(provider, "CONDITIONAL_PACKAGE_PADS", ()))
     text(variant["package"], "package")
-    flash = obj(variant["flash"], {"origin", "size", "erase_blocks"}, (),
+    flash = obj(variant["flash"], {"origin", "size", "erase_spans"}, (),
                 "physical Flash")
     address_range(flash["origin"], flash["size"], "Flash")
-    blocks = sequence(flash["erase_blocks"], "Flash erase blocks")
-    if not blocks or sum(integer(size, 1, context="erase block")
-                         for size in blocks) != flash["size"]:
-        fail("Flash erase geometry does not cover exact physical Flash")
+    memory_regions.flash_erase_spans(flash)
     memory = sequence(variant["memory"], "memory domains")
     if not memory:
         fail("At least one memory domain is required")
@@ -301,10 +298,11 @@ def _validate_physical_variant(value, provider, policy):
     return variant
 
 
-def validate_soc(soc, part, provider=None):
+def validate_soc(soc, part, provider=None, *, catalog_device=None):
     obj(soc, {"schema_version", "id", "variants", "cpu", "irq", "clock_profiles",
               "controllers"}, {"provenance", "source_lock", "reserved_resources",
-                               "can_domain", "references", "adc_group_review"},
+                               "can_domain", "references", "adc_group_review",
+                               "clock_policy"},
         "SoC")
     integer(soc["schema_version"], 1, 1, "SoC schema")
     identity(soc["id"], "SoC id")
@@ -337,19 +335,29 @@ def validate_soc(soc, part, provider=None):
     bits = integer(irq["priority_bits"], 1, 8, "IRQ priority bits")
     if bits != provider.IRQ_PRIORITY_BITS:
         fail("IRQ priority bits differ from maintained SoC facts")
+    clock_policy = getattr(provider, "validate_clock_policy", None)
+    if clock_policy is not None:
+        clock_policy(soc.get("clock_policy"))
     count = integer(irq["external_count"], 0, 496, "External IRQ count")
-    if count != provider.EXTERNAL_IRQ_COUNT:
-        fail("External IRQ count differs from maintained SoC facts")
+    if catalog_device is not None:
+        if (not isinstance(catalog_device, VendorDeviceProfile) or
+                variant.get("device") != catalog_device.identifier):
+            fail("Selected catalog device differs from exact part facts")
+        expected_count = catalog_device.external_irq_count
+    else:
+        expected_count = getattr(provider, "EXTERNAL_IRQ_COUNT", None)
+        if expected_count is None:
+            fail("Selected catalog device is required for external IRQ facts")
+    if count != expected_count:
+        fail("External IRQ count differs from selected device facts")
     cpu_profiles.resolve(cpu, irq, "native" if provider.MODEL else "baremetal",
                          enum_abi=provider.ENUM_ABI)
     if not isinstance(soc["controllers"], dict):
         fail("SoC controllers must be an object")
     for name, controller in soc["controllers"].items():
         identity(name, "controller")
-        obj(controller, {"kind", "modes", "irq", "pins"},
-            {"resources", "max_hz", "irq_numbers", "channel_count", "clock_hz",
-             "clock_domain", "fifo_words", "endpoint_numbers", "interfaces",
-             "message_ram_words"}, name)
+        obj(controller, device_view.CONTROLLER_REQUIRED | {"modes"},
+            device_view.CONTROLLER_OPTIONAL | {"interfaces"}, name)
         if controller["kind"] not in KINDS:
             fail(f"Unmaintained controller kind: {controller['kind']}")
         binding = next((item for item in getattr(provider, "CONTROLLER_BINDINGS", ())
@@ -365,6 +373,28 @@ def validate_soc(soc, part, provider=None):
             unique(values, f"{name}.{field}")
             for value in values:
                 text(value, f"{name}.{field}")
+        if binding is not None:
+            observed = tuple(value.removesuffix("_IRQn")
+                             for value in controller["irq"])
+            if observed != tuple(vector for vector, _ in binding.irqs):
+                fail(f"Controller IRQ identity differs from reviewed SDK facts: {name}")
+            numbers = controller.get("irq_numbers")
+            if numbers is not None:
+                if isinstance(numbers, Mapping):
+                    if (len(numbers) != len(observed) or
+                            any(not isinstance(key, str) or type(value) is not int
+                                for key, value in numbers.items())):
+                        fail(f"Controller IRQ numbers require exact integers: {name}")
+                    actual = {key.removesuffix("_IRQn"): value
+                              for key, value in numbers.items()}
+                else:
+                    numbers = sequence(numbers, "Controller IRQ numbers")
+                    if (len(numbers) != len(observed) or
+                            any(type(value) is not int for value in numbers)):
+                        fail(f"Controller IRQ numbers require exact integers: {name}")
+                    actual = dict(zip(observed, numbers))
+                if actual != dict(binding.irqs):
+                    fail(f"Controller IRQ numbers differ from reviewed SDK facts: {name}")
         if not controller["modes"]:
             fail(f"Controller {name} has no maintained mode")
         for mode in controller["modes"]:
@@ -416,7 +446,7 @@ def load_assembly(path, root=ROOT, snapshots=None, *, test_support=False):
     fail("Assembly must use authored TOML (.toml)")
 
 
-def resolve_routes(routes_doc, soc, part, provider):
+def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None):
     """Validate reviewed route facts before selecting instances."""
     routes = {}
     for route in sequence(routes_doc["routes"], "routes"):
@@ -434,14 +464,20 @@ def resolve_routes(routes_doc, soc, part, provider):
             fail("Route must have exact variants and maintained modes")
         if any(value not in soc["variants"] for value in route["variants"]):
             fail(f"Route {route['id']} has unknown exact variant")
-        controller = soc["controllers"].get(route["controller"])
-        modes = (None if controller is None else
-                 controller["modes"] if controller["kind"] == route["kind"] else
-                 controller.get("interfaces", {}).get(route["kind"]))
-        if modes is None:
-            fail(f"Route {route['id']} does not match a maintained controller")
-        if not set(route["modes"]).issubset(modes):
-            fail(f"Route {route['id']} advertises unsupported modes")
+        profiles = ([soc["controllers"]] if not controller_profiles else
+                    [controller_profiles[soc["variants"][exact]["device"]]
+                     for exact in route["variants"]])
+        controllers = []
+        for profile in profiles:
+            controller = profile.get(route["controller"])
+            modes = (None if controller is None else
+                     controller["modes"] if controller["kind"] == route["kind"] else
+                     controller.get("interfaces", {}).get(route["kind"]))
+            if modes is None:
+                fail(f"Route {route['id']} does not match a maintained controller")
+            if not set(route["modes"]).issubset(modes):
+                fail(f"Route {route['id']} advertises unsupported modes")
+            controllers.append(controller)
         for dma in sequence(route.get("dma", []), "DMA route"):
             provider.dma_irq(text(dma, "DMA route resource"))
         mode_dma = obj(route.get("mode_dma", {}), set(), set(route["modes"]),
@@ -471,7 +507,7 @@ def resolve_routes(routes_doc, soc, part, provider):
             obj(pin, {"pin", "function", "af"}, (), "route pin")
             if not isinstance(pin["pin"], str) or not PIN.fullmatch(pin["pin"]):
                 fail(f"Invalid pin: {pin['pin']}")
-            if pin["pin"] not in controller["pins"]:
+            if any(pin["pin"] not in item["pins"] for item in controllers):
                 fail(f"Route pin not permitted by controller: {pin['pin']}")
             for exact in route["variants"]:
                 available = soc["variants"][exact].get("pins")
@@ -723,17 +759,13 @@ def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read,
                           *, offset_alignment=None, vector_symbol=None,
                           memory_budget=None):
     """Select a physical owner and admit its derived executable window."""
+    memory_regions.flash_erase_spans(physical_flash)
     layout = physical_flash.copy()
     layout_path = None
     if layout_name is not None:
         layout_path = (assembly_directory / text(layout_name, "layout path")).resolve()
         layout_doc = obj(read(layout_path), {"schema_version", "regions"}, (), "layout")
         integer(layout_doc["schema_version"], 1, 1, "layout schema")
-        boundaries = {physical_flash["origin"]}
-        cursor = physical_flash["origin"]
-        for size in physical_flash["erase_blocks"]:
-            cursor += size
-            boundaries.add(cursor)
         spans = []
         region_ids = []
         images = []
@@ -742,7 +774,8 @@ def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read,
             identity(region["id"], "region ID")
             region_ids.append(region["id"])
             start, end = address_range(region["origin"], region["size"], "region")
-            if start not in boundaries or end not in boundaries:
+            if not all(memory_regions.flash_erase_boundary(physical_flash, value)
+                       for value in (start, end)):
                 fail("Flash region is not on exact erase boundaries")
             if any(start < b and a < end for a, b in spans):
                 fail("Flash layout overlap")
@@ -817,11 +850,31 @@ def _resolve_source_dependencies(soc, provider, family, root, backend, read,
     return _SourceResolution(freeze(source_dependencies), tuple(inputs))
 
 
+@dataclass(frozen=True)
+class _CatalogFacts:
+    """Local normalization only; final admission freezes the whole fact owner."""
+
+    soc: Mapping
+    device: VendorDeviceProfile
+    controller_profiles: Mapping
+
+
+@dataclass(frozen=True)
+class DeviceFacts:
+    """One immutable host fact owner; the complete index is never firmware IR."""
+
+    soc: Mapping
+    device: device_view.DeviceView
+    controller_profiles: Mapping
+
+
 def catalog_soc_facts(soc, part, catalog):
     """Derive one part's compile and IRQ facts without reading vendor sources."""
     devices = vendor_device_catalog(catalog)
     if "irq" in soc:
         fail("Catalog-backed SoC cannot repeat IRQ facts")
+    if "clock_policy" in soc:
+        fail("Catalog-backed SoC cannot repeat selected clock policy")
     variants = soc.get("variants")
     if not isinstance(variants, Mapping) or part not in variants:
         fail(f"Unmaintained exact part: {part}")
@@ -838,9 +891,47 @@ def catalog_soc_facts(soc, part, catalog):
             catalog["sdk"]["core_commit"] != lock.get("cmsis_core")):
         fail("Device catalog source identity differs from SoC source lock")
     # These local derived facts are not another authored IRQ authority.
-    normalized = {**soc, "irq": {"priority_bits": selected.priority_bits,
-                                "external_count": selected.external_irq_count}}
-    return normalized, VendorDeviceIR(selected.macro, selected.startup)
+    profiles = device_view.controller_profiles(soc)
+    for name, controllers in profiles.items():
+        device_view.validate_controller_irqs(controllers, devices[name].irq_bindings)
+    controllers = profiles[variants[part]["device"]]
+    normalized = {key: value for key, value in soc.items()
+                  if key not in {"device_profiles", "controller_groups"}}
+    if not any(item["kind"] == "can" for item in controllers.values()):
+        normalized.pop("can_domain", None)
+    normalized.update(controllers=controllers,
+                      clock_policy=soc["device_profiles"][selected.identifier]["clock_policy"],
+                      irq={"priority_bits": selected.priority_bits,
+                           "external_count": selected.external_irq_count})
+    return _CatalogFacts(normalized, selected, profiles)
+
+
+def resolve_device_facts(soc, part, provider, *, catalog=None):
+    """Admit facts once for both assembly resolution and read-only queries.
+
+    The normalized JSON leaf exists for the current validation helpers; it is
+    not another authored source or a resolved-IR mapping compatibility path.
+    """
+    catalog_device = None
+    profiles = {}
+    if catalog is not None:
+        normalized = catalog_soc_facts(soc, part, catalog)
+        soc, catalog_device = normalized.soc, normalized.device
+        profiles = normalized.controller_profiles
+    validate_soc(soc, part, provider, catalog_device=catalog_device)
+    vendor_device = (VendorDeviceIR(catalog_device.macro, catalog_device.startup)
+                     if catalog_device is not None else None)
+    profiles = freeze(profiles)
+    if profiles:
+        # Freeze each controller leaf once; selected facts reference the index.
+        remaining = freeze({key: value for key, value in soc.items()
+                            if key != "controllers"})
+        soc = MappingProxyType({**remaining,
+            "controllers": profiles[soc["variants"][part]["device"]]})
+    else:
+        soc = freeze(soc)
+    return DeviceFacts(soc, device_view.from_validated(soc, part, vendor_device),
+                       profiles)
 
 
 @dataclass(frozen=True)
@@ -855,19 +946,20 @@ class _FactResolution:
     inputs: tuple[Path, ...]
     provider_context: integration_package.ProviderContext
     hardware: board_hardware.BoardHardwareIR | None
-    vendor_device: VendorDeviceIR | None
+    device: device_view.DeviceView
+    controller_profiles: Mapping
 
     @property
     def family(self):
-        return self.board["soc_family"]
+        return self.device.family
 
     @property
     def part(self):
-        return self.board["soc"]
+        return self.device.part
 
     @property
     def variant(self):
-        return self.soc["variants"][self.part]
+        return self.device.physical
 
 
 def _resolve_facts(assembly, *, root, assembly_directory, read,
@@ -902,26 +994,30 @@ def _resolve_facts(assembly, *, root, assembly_directory, read,
     soc_path, routes_path = soc_dir / "soc.json", soc_dir / "routes.json"
     soc, routes_doc = read(soc_path), read(routes_path)
     catalog_path = None
-    vendor_device = None
+    catalog = None
     if context.descriptor.device_catalog is not None:
         catalog_path = contained_file(soc_dir, context.descriptor.device_catalog)
         catalog = read(catalog_path)
-        soc, vendor_device = catalog_soc_facts(soc, part, catalog)
     if context.external and "source_lock" in soc:
         fail("External SDK sources must be bound by package inputs; "
              "Nexus source_lock belongs to internal integrations")
-    validate_soc(soc, part, provider)
+    selected = resolve_device_facts(soc, part, provider, catalog=catalog)
+    soc, device = selected.soc, selected.device
     reference_path = None
     references = None
     if "references" in soc:
         reference_path = contained_file(soc_dir, soc["references"])
         references = fact_references.validate(read(reference_path),
                                              soc["variants"])
+        review = fact_references.select_review(references,
+                                               device.physical["device"])
+        fact_references.admit_clock_policy(review, device.clock_policy)
     if soc["id"] != family:
         fail("Board SoC family differs from the package identity")
     obj(routes_doc, {"schema_version", "routes"}, (), "routes")
     integer(routes_doc["schema_version"], 1, 1, "routes schema")
-    routes = resolve_routes(routes_doc, soc, part, provider)
+    routes = resolve_routes(routes_doc, soc, part, provider,
+                            controller_profiles=selected.controller_profiles)
     hardware = board_hardware.select(validate_board_context(board),
                                      assembly.hardware)
     bindings = resolve_bindings(board, routes, part, hardware)
@@ -934,9 +1030,10 @@ def _resolve_facts(assembly, *, root, assembly_directory, read,
         inputs.append(contained_file(board_dir, name))
     return _FactResolution(
         board=freeze(board), soc=freeze(soc), routes=freeze(routes),
+        controller_profiles=selected.controller_profiles,
         bindings=freeze(bindings), provider=provider,
         references=freeze(references), inputs=tuple(inputs),
-        provider_context=context, hardware=hardware, vendor_device=vendor_device)
+        provider_context=context, hardware=hardware, device=device)
 
 
 @dataclass(frozen=True)
@@ -1076,6 +1173,10 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             if route["kind"] == "adc_group":
                 for resource in adc.group_trigger_resources(selection, provider):
                     claim(resource, name, mode, route["id"])
+            if route["kind"] == "rtc":
+                from tools.configure import rtc
+                for resource in rtc.selected_resources(selection, provider):
+                    claim(resource, name, mode, route["id"])
             if route["kind"] == "usb_host" and selection["engine"] == "dma":
                 claim("usb-dma:" + route["controller"], name, mode, route["id"])
             if traits.dma:
@@ -1134,7 +1235,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                 extension.resolve_endpoint(
                     device, controller, authored_kind=authored_kind,
                     bindings=bindings, routes=routes, claim=claim,
-                    board_conditions=board_conditions)
+                    board_conditions=board_conditions, clock=clock)
                 continue
             if authored_kind != controller["kind"]:
                 fail("Authored device kind differs from controller binding kind")
@@ -1217,13 +1318,13 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
     backend = assembly.backend
     if backend not in {"baremetal", "freertos", "native", "threadx"}:
         fail(f"Unsupported OS backend: {backend}")
-    host = soc["cpu"]["arch"] == "native"
+    host = facts.device.cpu["arch"] == "native"
     if (host and backend not in {"native", "threadx"}) or (
             not host and backend == "native"):
         fail("Native is a host model; its backend cannot qualify MCU execution")
     if backend == "threadx":
         threadx.validate_platform(board["id"], family)
-    cpu_profile = cpu_profiles.resolve(soc["cpu"], soc["irq"], backend,
+    cpu_profile = cpu_profiles.resolve(facts.device.cpu, facts.device.irq, backend,
                                        enum_abi=provider.ENUM_ABI)
     validate_interrupt_profile(cpu_profile, provider)
     if assembly.clock_parameters is not None:
@@ -1231,10 +1332,13 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
             fail("Clock parameters require the explicit F407 custom profile")
         clock = thaw(assembly.clock_parameters)
     else:
-        clock = soc["clock_profiles"].get(assembly.clock_profile)
+        clock = facts.device.clock_profiles.get(assembly.clock_profile)
     if clock is None:
         fail(f"Unknown clock profile: {assembly.clock_profile}")
     clock_plan = provider.clock_plan(assembly.clock_profile, clock)
+    clock_policy = getattr(provider, "validate_clock_policy", None)
+    if clock_policy is not None:
+        clock_policy(facts.device.clock_policy, clock_plan)
     clock = provider.normalize_clock(clock)
     clocks.match_board(clock, board["clocks"])
     if assembly.os is not None and not isinstance(assembly.os, Mapping):
@@ -1246,7 +1350,7 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
         fail("Timebase lowpower requires the maintained STM32F407 SoC alarm")
     cpu_profile = kernel.bind(cpu_profile, kernel_profile)
     irq_profile = cpu_profile.irq
-    if assembly.abi is not None and assembly.abi != cpu_abi(soc["cpu"]):
+    if assembly.abi is not None and assembly.abi != cpu_abi(facts.device.cpu):
         fail("Assembly ABI contradicts the selected SoC")
     optimization = assembly.optimization
     if optimization not in {"O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
@@ -1259,6 +1363,19 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
         kernel_profile=kernel_profile, irq_profile=irq_profile,
         memory=selected_memory, read=read,
         snapshots=snapshots, board_conditions=facts.hardware)
+    if references is not None:
+        review = fact_references.select_review(references, variant["device"])
+        profile = fact_references.admit_selection(
+            review, device_graph.controllers, backend)
+        documents = references["documents"]
+        names = (review["manual"], review["document"])
+        provenance = "; ".join(
+            documents[name]["document_id"] + " Rev" + documents[name]["revision"]
+            for name in names)
+        clock_plan = {**clock_plan,
+            "reviewed_revision_ids": profile.reviewed_revision_ids,
+            "provenance": provenance + "; selected software review " +
+                          review["software_audit"]["profile"]}
     consumer_clocks = getattr(provider, "validate_clock_consumers", None)
     if consumer_clocks is not None:
         consumer_clocks(clock_plan, device_graph.controllers)
@@ -1296,7 +1413,7 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
                     if clock_plan is not None else None),
         physical_part=PhysicalPartIR(part, variant["package"],
             freeze(variant["flash"]), selected_memory.regions,
-            facts.vendor_device),
+            facts.device.vendor_device),
         clock=freeze(clock), clock_profile=assembly.clock_profile,
         layout=selected_layout.layout, board_bindings=freeze(bindings),
         routes=freeze(routes), platform_metadata=freeze(platform_metadata),
@@ -1338,9 +1455,9 @@ def resolve_ir(assembly_path, root=ROOT, *, input_paths=None,
     try:
         return _resolve(assembly_path, root, input_paths=input_paths,
                         test_support=test_support)
-    except ConfigurationError as error:
-        raise ConfigurationError(f"{assembly_path}: {error}",
-                                 **error.details) from error
+    except ValueError as error:
+        details = error.details if isinstance(error, ConfigurationError) else {}
+        raise ConfigurationError(f"{assembly_path}: {error}", **details) from error
 
 
 def generate(result, output):

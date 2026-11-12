@@ -60,11 +60,11 @@ class FlashPollingIrqTests(unittest.TestCase):
                                  gate.normalize_resource("irq:" + vector))
 
     def test_facts_bind_each_exact_cmsis_name_to_vector_four(self):
+        from tools.configure.tests.device_fixture import load_soc_facts
         headers = {'stm32': 'vendors/st/cmsis_device_f4/Include/stm32f407xx.h'}
         for label, family, controller, vector in CASES:
             with self.subTest(family=family):
-                facts = json.loads((ROOT / source_directory(family) /
-                                    "soc.json").read_text(encoding="utf-8"))
+                facts = load_soc_facts(ROOT / source_directory(family) / "soc.json")
                 physical = facts["controllers"][controller]
                 self.assertEqual([vector], physical["irq"])
                 self.assertEqual({vector: 4}, physical["irq_numbers"])

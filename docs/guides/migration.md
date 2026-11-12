@@ -71,12 +71,36 @@ link the exact MCU configuration with the locked compiler. Retain evidence for
 the migrated source and configuration. Old HAL/OSAL documentation remains historical;
 a redirect does not make an old API contract equivalent to a new one.
 
+## Rebuild for source interface epoch 2
+
+The current development snapshot keeps semantic version `0.2.1` and uses
+factory/source interface epoch `2`. Pin its exact commit, regenerate the bundle
+and rebuild every caller, public face/ops, generated factory, provider and
+component with one configuration and toolchain. Current interface admission
+rejects epoch-1 SDKs; rebuild old headers and objects rather than mixing them
+into the new application. No stable binary ABI is supplied. A development-fixture
+opt-in does not relax interface checks. Existing tags are unchanged.
+
+For ADC groups, direct `request.frames` access becomes `request.output.frames`.
+Prefer `nx_adc_group_prepare()` for raw requests: it installs the explicit RAW
+`results_kind`. Use `nx_adc_group_prepare_results()` for a paired regular/injected
+result descriptor. Inspect the selected discriminant before reading the union;
+a raw pointer must never be reinterpreted as a paired descriptor. No compatibility
+shadow field or runtime layout inference is provided. Request, descriptor and
+both spans retain one lifetime through acquire-observed SETTLED.
+
+Discard old generated output and rebuild from the pinned source. The
+[compatibility contract](../design/source-compatibility.md) defines epoch and
+manifest admission; a matching semantic version alone does not permit mixing
+source generations or binary objects.
+
 ## Update private source integrations
 
-Production ownership is now one `soc/stm32/stm32f4/` package. Its concrete
-implementations remain F407VE/ZG; obsolete family names are rejected rather than
-mapped to a replacement. Existing F407 assemblies now select `stm32f4` with an
-exact part. Public C interfaces remain the consumption boundary.
+Production ownership is one `soc/stm32/stm32f4/` package. Exact parts and modes
+follow the [current support catalogue](../delivery/support.md); obsolete family
+names are rejected rather than mapped to a replacement. Existing F407 assemblies
+select `stm32f4` with an exact part. Public C interfaces remain the consumption
+boundary; added internal-CRC references do not change product wiring.
 
 Board and SoC trees contain no Python plugins. Current generation is centralized
 under `tools/configure/stm32f4/`; firmware hardware algorithms and lifecycle

@@ -226,8 +226,13 @@ static void begin_drain(nx_stm32_uart_state_t* port, nx_result_t terminal) {
     uint32_t drain_bits = (port->registers->CR3 & USART_CR3_SCEN) != 0U
                               ? 24U + ((port->registers->GTPR >> 8U) & 255U)
                               : 28U;
-    port->drain_deadline = nx_deadline_after(
-        nx_time_now_us(), drain_bits * 1000000U / port->baud + 100U);
+    if (nx_deadline_finite_after(nx_time_now_us(),
+                                 drain_bits * 1000000U / port->baud + 100U,
+                                 &port->drain_deadline) != NX_SUCCESS) {
+        /* No finite grace remains; only actual wire idle can release the loan.
+         */
+        port->drain_deadline = 0U;
+    }
     bool started = port->tx_position != 0U || port->active->length == 0U;
     if (!started || ((port->registers->SR & USART_SR_TC) != 0U &&
                      (port->registers->CR1 & USART_CR1_SBK) == 0U)) {
@@ -689,6 +694,15 @@ nx_result_t nx_stm32_uart_format_configure(nx_stm32_uart_state_t* state,
     /* Exclude the RX producer while checking idle state and changing framing.
      */
     nx_arch_irq_state_t saved = nx_arch_irq_save();
+    /* This legacy helper owns no pad to hold RTS high while UE is withdrawn.
+     * ES0182 2.11.9 requires the separately owned static wire cold sequence.
+     */
+    if (format.flow == NX_UART_FLOW_RTS ||
+        format.flow == NX_UART_FLOW_RTS_CTS ||
+        (state->registers->CR3 & USART_CR3_RTSE) != 0U) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_UNSUPPORTED;
+    }
     if (state->active != NULL || state->rx_count != 0U ||
         (state->registers->CR3 & (USART_CR3_DMAR | USART_CR3_DMAT)) != 0U ||
         (state->registers->SR & USART_SR_RXNE) != 0U) {

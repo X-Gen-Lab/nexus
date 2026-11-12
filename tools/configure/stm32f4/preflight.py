@@ -48,7 +48,13 @@ def admission_declarations(result, pins, pin_count):
         elif item.kind == 'capture':
             clocks.add(('RCC->AHB2ENR', 'RCC_AHB2ENR_DCMIEN'))
         elif item.kind == 'audio':
-            clocks.add(('RCC->APB1ENR', f'RCC_APB1ENR_SPI{item.controller[-1]}EN'))
+            if item.controller == 'SAI1':
+                clocks.add(('RCC->APB2ENR', 'RCC_APB2ENR_SAI1EN'))
+            elif item.controller in {'I2S2', 'I2S3'}:
+                clocks.add(('RCC->APB1ENR',
+                            f'RCC_APB1ENR_SPI{item.controller[-1]}EN'))
+            else:
+                fail('No maintained audio cold gate for ' + item.controller)
         elif item.kind == 'block':
             clocks.add(('RCC->APB2ENR', 'RCC_APB2ENR_SDIOEN'))
         elif item.kind in {'eth', 'eth_frames'}:
@@ -87,7 +93,7 @@ def admission_declarations(result, pins, pin_count):
     vectors = sorted({item.key.removeprefix('irq:') + '_IRQn' for item in claims
                       if item.key.startswith('irq:')})
     source += ['    .irq_masks = {']
-    for bank in range(3):
+    for bank in range((result.cpu_profile.irq.external_count + 31) // 32):
         terms = [f'NX_STM32_PLATFORM_IRQ_MASK({vector}, {bank}u)'
                  for vector in vectors]
         source.append('        ' + (' | '.join(terms) if terms else '0u') + ',')

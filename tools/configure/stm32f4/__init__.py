@@ -25,7 +25,6 @@ from .contract import (
     ENDPOINT_POLICY,
     ENUM_ABI,
     ETH_CONTROLLER,
-    EXTERNAL_IRQ_COUNT,
     FACT_REFERENCES,
     FLASH_INPUT_ALIGNMENT,
     FLASH_PROGRAM_UNIT,
@@ -49,6 +48,7 @@ from .contract import (
     mode_implementation,
     shares_irq,
     validate_controller_set,
+    validate_clock_policy,
     validate_dma,
     validate_dma_resource,
     validate_endpoint_clock,
@@ -68,10 +68,27 @@ from .clocks import validate_consumers as validate_clock_consumers
 from .clocks import timer_domain as timer_clock_domain
 from . import gpio as GPIO_PHASE
 from . import sram as EXTERNAL_MEMORY
-from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS, CONTROLLER_PAIRS,
+from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS,
                        SECONDARY_FACTS, DAC_DMA_ROUTES)
 from .integration import USB_DEVICE, ETHERNET, TIMER_ADVANCED
 from .integration import CAN_INTEGRATION
-from . import fsmc as EXTERNAL_BUS
+from . import external_bus as EXTERNAL_BUS
+from .i2c_timing import selected_format
 
 from .capture_audio import resolve_fields as capture_audio_fields
+
+
+def silicon_policy(result, item=None):
+    """Project the system's reviewed C admission without observing a chip."""
+    from tools.configure.selected_contracts import SiliconPolicy
+    if item is not None or result.clock_plan is None:
+        return None
+    return SiliconPolicy(
+        part=result.part, provider=result.soc_family,
+        profile=result.clock_plan.profile,
+        reviewed_revision_ids=result.clock_plan.reviewed_revision_ids,
+        review_scope=(
+            result.clock_plan.provenance + "; mode exclusions and external "
+            "constraints remain in the selected review. The C silicon rule "
+            "uses the selected SDK group; physical cut behavior has not been "
+            "observed."))

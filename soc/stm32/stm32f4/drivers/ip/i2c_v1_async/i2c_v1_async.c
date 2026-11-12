@@ -58,6 +58,10 @@ _Static_assert(NX_I2C_MAX_MESSAGES <= UINT8_MAX &&
 #define DMA_ERRORS   UINT32_C(0x0D)
 #define DMA_COMPLETE UINT32_C(0x20)
 
+#ifndef NX_I2C_V1_REGISTER_BYTES
+#define NX_I2C_V1_REGISTER_BYTES (9U * sizeof(uint32_t))
+#endif
+
 #ifndef NX_I2C_V1_READ_DATA
 #define NX_I2C_V1_READ_DATA(state) ((uint8_t)(state)->registers[DATA])
 #endif
@@ -83,6 +87,57 @@ static bool engine_valid(const nx_i2c_v1_dma_engine_t* engine) {
            engine->fifo != NULL && engine->flags != NULL &&
            engine->clear != NULL && engine->flag_shift <= 26U &&
            (engine->configuration & DMA_ENABLE) == 0U;
+}
+
+/** \brief Physical DATA/count/control addresses remain hardware metadata. */
+static bool engine_storage(const nx_i2c_v1_dma_engine_t* engine,
+                           const void* storage, size_t bytes) {
+    const volatile uint32_t* registers[] = {
+        engine->control, engine->count, engine->peripheral, engine->memory,
+        engine->fifo,    engine->flags, engine->clear};
+    for (size_t index = 0U; index < sizeof(registers) / sizeof(registers[0]);
+         ++index) {
+        if (!nx_i2c_v1_storage_outside(storage, bytes,
+                                       (const void*)(uintptr_t)registers[index],
+                                       sizeof(*registers[index])))
+            return false;
+    }
+    return true;
+}
+
+/** \brief Admission is pure; known metadata spans never become payloads. */
+static bool storage_separate(const nx_i2c_v1_endpoint_t* endpoint,
+                             const void* storage, size_t bytes) {
+    const nx_i2c_v1_state_t* state = endpoint->port;
+    if (!nx_i2c_v1_storage_outside(storage, bytes, state, sizeof(*state)) ||
+        !nx_i2c_v1_storage_outside(storage, bytes, endpoint,
+                                   sizeof(*endpoint)) ||
+        !nx_i2c_v1_storage_outside(storage, bytes, &nx_i2c_v1_async_ops,
+                                   sizeof(nx_i2c_v1_async_ops)) ||
+        !nx_i2c_v1_storage_outside(storage, bytes,
+                                   &nx_i2c_v1_async_endpoint_ops,
+                                   sizeof(nx_i2c_v1_async_endpoint_ops)) ||
+        !nx_i2c_v1_storage_outside(storage, bytes,
+                                   (const void*)(uintptr_t)state->registers,
+                                   NX_I2C_V1_REGISTER_BYTES) ||
+        !nx_i2c_v1_storage_outside(storage, bytes,
+                                   (const void*)(uintptr_t)state->line_inputs,
+                                   sizeof(*state->line_inputs)) ||
+        (state->wake != NULL &&
+         !nx_i2c_v1_storage_outside(storage, bytes, state->wake,
+                                    sizeof(*state->wake))))
+        return false;
+    if (state->dma == NULL)
+        return true;
+    const nx_i2c_v1_dma_t* dma = state->dma;
+    return dma->region_count != 0U &&
+           dma->region_count <= SIZE_MAX / sizeof(*dma->regions) &&
+           nx_i2c_v1_storage_outside(storage, bytes, dma, sizeof(*dma)) &&
+           nx_i2c_v1_storage_outside(storage, bytes, dma->regions,
+                                     dma->region_count *
+                                         sizeof(*dma->regions)) &&
+           engine_storage(&dma->tx, storage, bytes) &&
+           engine_storage(&dma->rx, storage, bytes);
 }
 
 /** \brief Withdrawal is bounded; failure to clear EN retains the whole loan. */
@@ -143,7 +198,11 @@ static void begin_drain(nx_i2c_v1_state_t* state, nx_result_t result) {
         state->registers[CTL0] &= ~START;
         state->registers[CTL0] |= STOP;
     }
-    state->drain_deadline = nx_deadline_after(nx_time_now_us(), 1000U);
+    if (nx_deadline_finite_after(nx_time_now_us(), 1000U,
+                                 &state->drain_deadline) != NX_SUCCESS) {
+        /* An exhausted grace quarantines; it never releases an owned wire. */
+        state->drain_deadline = 0U;
+    }
     (void)nx_request_transition(&state->active->base, NX_REQUEST_DRAINING);
     if (state->ack_irqs != NULL) {
         state->ack_irqs(state);
@@ -170,9 +229,9 @@ static void prepare_message(nx_i2c_v1_state_t* state) {
         *engine->control |= DMA_ENABLE;
     }
     state->registers[CTL1] = state->peripheral_mhz | ERROR_IRQ | EVENT_IRQ;
-    /* Do not change ACK/POS while START can be cleared asynchronously. Their
-     * next values are installed after SB and before the ADDR read sequence. */
-    state->registers[CTL0] |= START;
+    /* A preceding receive/transmit tail already requested its repeated START.
+     * Do not write CR1 again: hardware may have completed it while retiring
+     * the old DATA or DMA publisher. ACK/POS change only after observed SB. */
 }
 
 /** \brief Full message prefixes are reported only after protocol completion. */
@@ -206,9 +265,18 @@ static nx_result_t start(void* context, nx_i2c_request_t* request,
     if (!state->initialized || state->stopping || state->faulted) {
         return NX_ERROR_STATE;
     }
-    if (endpoint->address_bits == 10U &&
-        !nx_i2c_v1_ten_timing((uint16_t)state->registers[CKCFG],
-                              state->peripheral_mhz)) {
+    if (!storage_separate(endpoint, request, sizeof(*request)) ||
+        !storage_separate(endpoint, request->messages,
+                          request->count * sizeof(*request->messages)))
+        return NX_ERROR_INVALID;
+    for (size_t index = 0U; index < request->count; ++index) {
+        const nx_i2c_message_t* message = &request->messages[index];
+        if (!storage_separate(endpoint, message->data, message->length))
+            return NX_ERROR_INVALID;
+    }
+    if ((endpoint->address_bits == 10U || request->count > 1U) &&
+        !nx_i2c_v1_restart_timing((uint16_t)state->registers[CKCFG],
+                                  state->peripheral_mhz)) {
         return NX_ERROR_UNSUPPORTED;
     }
     if (nx_request_state(&request->base) !=
@@ -253,6 +321,7 @@ static nx_result_t start(void* context, nx_i2c_request_t* request,
         state->terminal = NX_SUCCESS;
         state->registers[STAT0] &= ~(NACK | ARBITRATION | BUS_ERROR | OVERRUN);
         prepare_message(state);
+        state->registers[CTL0] |= START;
     }
     nx_arch_irq_restore(mask);
     return result;
@@ -281,21 +350,15 @@ static bool on_port(const void* context, const nx_i2c_port_t* port) {
 static bool clock_profile(const nx_i2c_v1_state_t* state, uint16_t* ccr,
                           uint8_t* rise) {
     if (state->timing_ccr == 0U) {
-        /* Preserve the admitted 8 MHz low-clock erratum-safe 80 kHz profile. */
-        return nx_i2c_v1_timing(state->peripheral_mhz,
-                                state->peripheral_mhz == 8U ? 80000U : 100000U,
-                                ccr, rise);
+        return nx_i2c_v1_timing(state->peripheral_mhz, 100000U, ccr, rise);
     }
     uint16_t selected = state->timing_ccr;
     uint32_t count = selected & 0xFFFU;
     bool fast = (selected & 0x8000U) != 0U;
-    uint32_t maximum = fast                          ? 400000U
-                       : state->peripheral_mhz == 8U ? 80000U
-                                                     : 100000U;
+    uint32_t maximum = fast ? 400000U : 100000U;
     uint16_t fastest;
     if (!nx_i2c_v1_timing(state->peripheral_mhz, maximum, &fastest, rise) ||
-        (selected & 0x7000U) != 0U || count < (fastest & 0xFFFU) ||
-        (fast && state->peripheral_mhz == 8U)) {
+        (selected & 0x7000U) != 0U || count < (fastest & 0xFFFU)) {
         return false;
     }
     *ccr = selected;

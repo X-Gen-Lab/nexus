@@ -156,3 +156,24 @@ nx_result_t nx_usb_activation_set(const nx_usb_activation_port_t* port,
                ? NX_ERROR_UNSUPPORTED
                : port->ops->set(port->context, epoch, endpoint_address, active);
 }
+
+/** \brief Dispatch an explicit remote request through the selected face. */
+nx_result_t
+nx_usb_device_remote_wakeup(const nx_usb_device_port_t* port,
+                            nx_usb_remote_wakeup_request_t* request) {
+    if (port == NULL || port->ops == NULL || port->context == NULL)
+        return NX_ERROR_INVALID;
+    return port->ops->remote_wakeup == NULL
+               ? NX_ERROR_UNSUPPORTED
+               : port->ops->remote_wakeup(port->context, request);
+}
+/** \brief Dispatch cancellation without revoking an accepted pulse loan. */
+nx_result_t
+nx_usb_device_remote_cancel(const nx_usb_device_port_t* port,
+                            nx_usb_remote_wakeup_request_t* request) {
+    if (port == NULL || port->ops == NULL || port->context == NULL)
+        return NX_ERROR_INVALID;
+    return port->ops->remote_cancel == NULL
+               ? NX_ERROR_UNSUPPORTED
+               : port->ops->remote_cancel(port->context, request);
+}

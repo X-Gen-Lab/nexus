@@ -93,6 +93,22 @@ def check_symbols(text):
         raise ValueError('Unexpected dynamic or host service in MCU image')
 
 
+def check_tick_entry(text):
+    """Require the real thin exception entry to finish with a reachable DSB."""
+    body = compiler_gate.function_bodies(text).get('SysTick_Handler')
+    if body is None:
+        raise ValueError('Actual ThreadX SysTick entry is missing')
+    instructions = compiler_gate.instruction_lines(body)
+    expected = (r'push(?:\.w)?\s+\{r0,\s*lr\}',
+                r'bl(?:\.w)?\s+[0-9a-f]+\s+<_tx_timer_interrupt>',
+                r'(?:ldmia\.w\s+sp!,|pop(?:\.w)?)\s+\{r0,\s*lr\}',
+                r'dsb\s+sy', r'bx\s+lr')
+    if (len(instructions) != len(expected) or
+            any(re.fullmatch(pattern, instruction) is None
+                for pattern, instruction in zip(expected, instructions))):
+        raise ValueError('ThreadX SysTick must call the kernel then final DSB before return')
+
+
 def source_inputs(root):
     paths = set()
     for layer in ('core', 'arch', 'io', 'os', 'soc', 'drivers', 'boards', 'tools/configure',
@@ -175,6 +191,9 @@ def execute_variant(root, recorder, tools, row):
     names = recorder.execute([tools['nm'], '--defined-only', str(elf)],
                              row['name'] + '-symbols', nonempty=True)
     check_symbols(names)
+    tick = recorder.execute([tools['objdump'], '-d', '--disassemble=SysTick_Handler',
+                             str(elf)], row['name'] + '-tick-entry', nonempty=True)
+    check_tick_entry(tick)
     report_path = build / 'bin/nexus_threadx_runtime.resources.json'
     resources = json.loads(report_path.read_text())
     if resources['status'] != 'passed' or resources['physical_status'] != 'not_executed':

@@ -194,7 +194,7 @@ extern "C" uint16_t nx_eth_frames_factory_flash_kib(void) {
     return 1024U;
 }
 extern "C" uint32_t nx_eth_frames_factory_device_id(void) {
-    return 0x413U;
+    return 0x10010413U;
 }
 extern "C" void nx_stm32_system_model_poll(void*) {
     ClockFacts();

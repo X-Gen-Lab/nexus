@@ -20,20 +20,6 @@ def validate_clock_profiles(soc, provider):
 
 
 
-def resolve_interrupts(cpu, irq, backend, provider):
-    """Bind logical IRQ range and syscall policy to a maintained kernel port."""
-    from tools.configure import cpu as profiles
-    if cpu_abi(cpu) != provider.CPU_ABI:
-        fail("FreeRTOS kernel CPU ABI differs from the selected SoC")
-    # Direct provider-contract tests may supply ABI assertions alone. Their
-    # missing capabilities come from the exact maintained provider, never an
-    # architecture-name guess; public CPU resolution requires every fact.
-    facts = {**provider.CPU_FEATURES, **cpu}
-    irq = {"external_count": provider.EXTERNAL_IRQ_COUNT, **irq}
-    profile = profiles.resolve(facts, irq, backend, enum_abi=provider.ENUM_ABI)
-    return validate_interrupt_profile(profile, provider)
-
-
 def validate_interrupt_profile(profile, provider):
     """Bind the resolved CPU once to the exact provider's maintained port."""
     if cpu_abi(profile.cpu) != provider.CPU_ABI:
@@ -166,6 +152,9 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
     the enclosing graph and never published as a second configuration result.
     """
     mode = selection["mode"]
+    if route["kind"] in {"display", "image"}:
+        from tools.configure.stm32f4.graphics import validate_clock
+        validate_clock(selection, route, clock_plan)
     if route["kind"] in {"usb_device", "usb_host"}:
         from tools.configure import usb_host
         usb_host.validate_clock(route["controller"], clock["core_hz"])

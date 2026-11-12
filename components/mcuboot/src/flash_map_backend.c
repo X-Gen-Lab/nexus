@@ -12,7 +12,7 @@
 /** \brief Temporary view of existing facts; never a retained descriptor. */
 typedef struct {
     const nx_flash_geometry_t* geometry;
-    size_t first;
+    uint32_t first;
     uint32_t count;
 } region_view_t;
 
@@ -50,39 +50,21 @@ static int region_view(const nx_flash_region_t* region, region_view_t* view) {
     if (geometry->program_unit != 4U || geometry->program_flags != 0U) {
         return -ENOTSUP;
     }
-    if (geometry->sectors == NULL || geometry->sector_count == 0U) {
+    uint32_t count, first, limit;
+    if (nx_flash_geometry_sector_count(geometry, &count) != NX_SUCCESS ||
+        nx_flash_geometry_sector_index(geometry, region->offset, &first) !=
+            NX_SUCCESS)
         return -EINVAL;
-    }
-    const uint32_t finish = region->offset + region->size;
-    uint32_t cursor = 0U;
-    uint32_t count = 0U;
-    size_t first = 0U;
-    bool started = false;
-    bool ended = false;
-    for (size_t index = 0U; index < geometry->sector_count; ++index) {
-        const nx_flash_sector_t* sector = &geometry->sectors[index];
-        if (sector->offset != cursor || sector->size == 0U ||
-            sector->size > geometry->size - cursor) {
-            return -EINVAL;
-        }
-        if (cursor == region->offset) {
-            started = true;
-            first = index;
-        }
-        if (started && !ended) {
-            ++count;
-        }
-        cursor += sector->size;
-        if (cursor == finish) {
-            ended = true;
-        }
-    }
-    if (cursor != geometry->size || !started || !ended || count == 0U) {
+    uint32_t finish = region->offset + region->size;
+    if (finish == geometry->size)
+        limit = count;
+    else if (nx_flash_geometry_sector_index(geometry, finish, &limit) !=
+             NX_SUCCESS)
         return -EINVAL;
-    }
-    if (view != NULL) {
-        *view = (region_view_t){geometry, first, count};
-    }
+    if (limit <= first)
+        return -EINVAL;
+    if (view != NULL)
+        *view = (region_view_t){geometry, first, limit - first};
     return 0;
 }
 
@@ -270,10 +252,12 @@ int flash_area_get_sectors(int area_id, uint32_t* count,
         return -EINVAL;
     }
     for (uint32_t index = 0U; index < view.count; ++index) {
-        const nx_flash_sector_t* sector =
-            &view.geometry->sectors[view.first + index];
+        nx_flash_sector_t sector;
+        if (nx_flash_geometry_sector_at(view.geometry, view.first + index,
+                                        &sector) != NX_SUCCESS)
+            return -EINVAL;
         sectors[index] = (struct flash_sector){
-            sector->offset - area->region->offset, sector->size};
+            sector.offset - area->region->offset, sector.size};
     }
     return 0;
 }
@@ -297,12 +281,14 @@ int flash_area_get_sector(const struct flash_area* area, uint32_t offset,
     }
     const uint32_t physical = area->region->offset + offset;
     for (uint32_t index = 0U; index < view.count; ++index) {
-        const nx_flash_sector_t* current =
-            &view.geometry->sectors[view.first + index];
-        if (physical >= current->offset &&
-            physical - current->offset < current->size) {
+        nx_flash_sector_t current;
+        if (nx_flash_geometry_sector_at(view.geometry, view.first + index,
+                                        &current) != NX_SUCCESS)
+            return -EINVAL;
+        if (physical >= current.offset &&
+            physical - current.offset < current.size) {
             *sector = (struct flash_sector){
-                current->offset - area->region->offset, current->size};
+                current.offset - area->region->offset, current.size};
             return 0;
         }
     }

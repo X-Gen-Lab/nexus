@@ -8,10 +8,11 @@ source_language: en
 (design-official-stm32-provider)=
 # Official STM32F4 drivers and Nexus contracts
 
-Current production integration is `soc/stm32/stm32f4/`, with concrete F407VE/ZG
-implementations. Reuse the locked official F4 HAL/LL and CMSIS Device sources;
-keep vendor types and Handles private. Another F4 macro or SDK directory does
-not establish a maintained mode, Board route or physical result.
+Production integration is `soc/stm32/stm32f4/`. Select reviewed exact device and
+mode facts from [current support](../delivery/support.md), then reuse the locked
+F4 HAL/LL and CMSIS Device sources. Vendor types and Handles stay private.
+Internal-CRC software references for added parts do not qualify every peripheral,
+Board route or physical behavior.
 
 ## Responsibility boundary
 
@@ -67,6 +68,106 @@ same storage and recovery responsibility.
 Do not unconditionally call `HAL_Init()`: default SysTick setup and NVIC grouping
 must respect Platform and RTOS ownership. Use the maintained time domain and
 validate any kernel ISR ceiling before entering a kernel API.
+
+## F407 DAC DMA restart boundary
+
+The selected F407 DAC DMA path handles ES0182 Rev19 section 2.6.1 across
+requests. After request acceptance, restart first proves that the old DMA,
+IRQ and addresses are detached. It installs the declared idle code, uses the
+exclusively owned TIM6/7 hardware trigger to observe UDR, then withdraws DMAEN,
+converter output and clock before reconfiguring DAC, DMA and trigger state.
+The same owner retains every partial effect if cleanup or clock restoration
+fails; a timeout never releases the payload early.
+
+Only UDR induced during the explicitly controlled recovery phase belongs to
+recovery rather than payload progress or an independent operational error. It
+does not by itself replace an expired TIMEOUT with IO. Normal operational
+underrun still requires explicit stop recovery; failed W1C clearing and real
+DMA errors remain IO with borrows retained. This is not a rule to ignore every
+UDR observation.
+
+Recovery may internally convert the declared idle code before waveform timing
+starts and briefly disable converter output. These conversions are not payload
+progress. No uninterrupted analog hold, glitch-free transition or continuous
+waveform is promised between requests. The C model and ARM image do not
+establish a silicon-workaround or analog-load qualification. See the
+[near-source DAC contract](../../soc/stm32/stm32f4/README.md#dac-输出与触发所有权)
+and public `dac_tx.h` requirements; this is a selected recovery sequence, not a
+second HAL owner or a general register-script mechanism.
+
+## F479 LTDC scanout and DMA2D memory operations
+
+The selected software reference is STM32F479NIH6. LTDC uses the reviewed AF14
+RGB565 or RGB888 wire route; framebuffer memory independently uses RGB565 or
+ARGB8888. DMA2D has no external pins or DMA1/2 stream. These selections do not
+qualify a panel, PCB, external framebuffer, bus bandwidth or physical output.
+FMC presence alone never adds an external region to either engine's DMA domains.
+
+| Owner | Exact responsibility |
+| --- | --- |
+| System | Live bus/time domain and the one PLLSAI plan; LTDC consumes its R output and optional SAI shares Q |
+| Platform | GPIO gates, original pad snapshots and final pad restoration |
+| LTDC | One HAL/controller, two IRQs, selected AF14 pad leases, its gate, two active frame loans and one global pending reload |
+| DMA2D | One HAL/controller, its gate/IRQ and one operation with independently checked source/destination spans |
+| Application | Pixel storage, panel setup, execution progress, wake adapter and recovery policy |
+
+The shared source-ownership diagram also applies to these two implementations.
+Solid edges label runtime interface calls; dashed edges label selected source,
+SDK and static assembly relationships. It adds no runtime forwarding layer and
+makes no software or physical qualification claim. The table above states the
+specific runtime resource ownership for this selected graphics slice.
+
+![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)
+
+Pure `admit` runs before System/GPIO startup. It validates static extents and
+refuses foreign selected gates or vectors without effects or retained references.
+`prepare` then acquires each engine's own gate. LTDC programs AF14 through the
+locked official GPIO HAL and independently checks the resulting fields. Its
+snapshot storage cannot overlap configuration, layer/region facts, System state
+or caller pixels. Platform keeps the single original snapshot; the controller
+withdraws its leased pads to analog after scanout/IRQ retirement, and Platform
+restores their original values later. Partial failures retain the exact receipt
+and configuration; they do not authorize reclamation or a second engine owner.
+
+`display` exposes one controller face. `query` and `snapshot` select a physical
+layer; `stop` covers the whole controller. A frame becoming visible does not end
+its borrow. A replacement can settle the old frame only after its vertical
+blanking reload took effect and the relevant active configuration and memory
+access retirement were proved. The shared shadow bank permits one global
+pending replacement. Cancelling one layer preserves its peer; stopping the
+controller joins both layers, all publishers and both IRQs before final release.
+
+LTDC reload/line IRQs capture actual blanking and active-address evidence for the
+current stage generation and retirement mask. A reload hint alone is not proof.
+Task `service` checks current geometry/domain and joins references before
+publishing SETTLED, including when Task execution occurs after the short blanking
+window. Old-stage or old-domain evidence is unusable. No hidden worker or
+mandatory high-rate Task polling is introduced. Clock loss, unproved retirement
+or refused withdrawal retains the affected loans in quarantine. GCR/reset readback
+or a CPU barrier alone never proves external memory withdrawal.
+
+DMA2D supports native RGB565/ARGB8888 fill, copy, conversion and straight-alpha
+blend through the official HAL. Strides use the corresponding source/output
+pixel width. RGB565-to8888 expands channel bits and adds opaque alpha;
+8888-to565 truncates channel low bits. Blend alpha is explicitly multiplied or
+replaced. RGB at an ARGB result with zero alpha is unspecified; blend-to565 needs
+a parameter-proven positive input alpha. The provider does not scan pixels to
+admit an operation, allocate scratch pixels or implement a CPU fallback.
+
+Every complete source/destination capacity must satisfy reachability and alias
+checks, including request/control/immutable owner metadata. TC is an intent hint;
+actual START withdrawal, sources, IRQ, publishers and all address references join
+before SETTLED. Raw hardware errors are collected before W1C even if no ISR ran.
+An error cannot preserve an old SUCCESS or a valid-output byte count. An already
+selected TIMEOUT/CANCELLED remains the first terminal cause; a failed withdrawal
+still quarantines and retains all storage. Partial output is not rolled back.
+
+The authored timing uses pixel/line counts and explicit polarities; the generator
+only computes static HAL accumulated values. Pixel frequency comes from the
+single System PLLSAI R plan and must satisfy the selected DS11118 83 MHz nominal
+limit. This check is not physical oscillator, load or panel qualification.
+CLUT/extra packed formats, watermark/suspend modes and additional exact parts
+remain outside this selected graphics slice.
 
 ## Replace a mode and verify it
 

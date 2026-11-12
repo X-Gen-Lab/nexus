@@ -1,20 +1,22 @@
 /**
  * \file            native.c
- * \brief           Positive MCUboot control on the public nonpersistent Native
- * NOR model \author          Nexus Team \version         1.0.0 \date 2026-11-02
+ * \brief           MCUboot control on nonpersistent Native NOR
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-11-02
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "application.h"
 #include "flash_map_backend/flash_map_backend.h"
 #include "nexus/io/native/model.h"
 #include "nexus_bindings.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 #include <stdlib.h>
 
 static uint8_t s_memory[8192];
-static const nx_flash_sector_t s_sectors[] = {{0U, 4096U}, {4096U, 4096U}};
+static const nx_flash_erase_span_t s_erase_spans[] = {{0U, 4096U, 2U}};
 static const nx_flash_geometry_t s_geometry = {
-    0U, sizeof(s_memory), 4U, s_sectors, 2U, 0U};
+    0U, sizeof(s_memory), 4U, s_erase_spans, 1U, 0U};
 static nx_flash_region_t s_primary_region;
 static nx_flash_region_t s_secondary_region;
 static const struct flash_area s_primary = {1U, &s_primary_region};
@@ -41,7 +43,7 @@ int main(void) {
         started.remaining_effects != 0U) {
         return 1;
     }
-    const nx_flash_port_t* flash = nx_factory_flash(NX_FLASH_ID_PHYSICAL);
+    const nx_flash_port_t* flash = nx_factory_flash_ref(NX_FLASH_REF_PHYSICAL);
     if (nx_native_flash_model_configure(flash, s_memory, &s_geometry) !=
         NX_SUCCESS) {
         return 2;

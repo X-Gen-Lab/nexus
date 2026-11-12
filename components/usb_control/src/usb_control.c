@@ -138,9 +138,10 @@ static void fold(nx_usb_control_t* c) {
             continue;
         }
         if (p->stage == NX_USB_STATUS) {
-            /* STATUS ACK is terminal even when a later SETUP is now visible.
-             * It does not promise address/configuration policy committed. */
-            settle(c, NX_SUCCESS);
+            /* The wire outcome wins, but another lane may still borrow the
+             * reply. Reuse ordinary drain until both provider loans join. */
+            abort_reply(c, NX_SUCCESS);
+            c->terminal = NX_SUCCESS;
             continue;
         }
         c->confirmed_bytes += transferred;
@@ -159,6 +160,10 @@ static void fold(nx_usb_control_t* c) {
         } else if (transferred < p->length || c->confirmed_bytes == c->goal) {
             c->phase = NX_USB_CONTROL_DATA_READY;
         }
+    }
+    if (c->active != NULL && c->cancel_pending && !c->borrowed[0] &&
+        !c->borrowed[1]) {
+        settle(c, c->terminal);
     }
 }
 /** \brief Preparation creates no adapter/provider references or payload access.
@@ -303,23 +308,11 @@ static nx_result_t drain(nx_usb_control_t* c) {
     }
     return NX_SUCCESS;
 }
-/** \brief Emit only the current packet; FIFO admission is not its completion.
- */
-static nx_result_t launch(nx_usb_control_t* c) {
-    bool input = c->phase == NX_USB_CONTROL_DATA_IN ||
-                 c->phase == NX_USB_CONTROL_DATA_IN_ZLP ||
-                 c->phase == NX_USB_CONTROL_STATUS_IN;
-    bool status = c->phase == NX_USB_CONTROL_STATUS_IN ||
-                  c->phase == NX_USB_CONTROL_STATUS_OUT;
-    unsigned lane = input ? 1U : 0U;
+/** \brief Retain any independently accepted lane when another launch fails. */
+static nx_result_t submit_packet(nx_usb_control_t* c, unsigned lane,
+                                 bool status, size_t length) {
+    bool input = lane != 0U;
     nx_usb_request_t* p = &c->packets[lane];
-    size_t length = 0U;
-    if (!status && c->phase != NX_USB_CONTROL_DATA_IN_ZLP) {
-        length = c->goal - c->confirmed_bytes;
-        if (length > NX_USB_FS_MAX_PACKET) {
-            length = NX_USB_FS_MAX_PACKET;
-        }
-    }
     nx_usb_stage_t stage = status ? NX_USB_STATUS : NX_USB_DATA;
     const uint8_t* in =
         !input || length == 0U ? NULL : c->active->in + c->confirmed_bytes;
@@ -338,9 +331,39 @@ static nx_result_t launch(nx_usb_control_t* c) {
         c->cancel_sent[lane] = false;
     } else if (result != NX_ERROR_BUSY) {
         abort_reply(c, result);
-        settle(c, c->terminal);
+        if (!c->borrowed[0] && !c->borrowed[1]) {
+            settle(c, c->terminal);
+        }
     }
     return result;
+}
+/** \brief Arm premature STATUS OUT before exposing a DATA IN opportunity. */
+static nx_result_t launch(nx_usb_control_t* c) {
+    bool input = c->phase == NX_USB_CONTROL_DATA_IN ||
+                 c->phase == NX_USB_CONTROL_DATA_IN_ZLP ||
+                 c->phase == NX_USB_CONTROL_STATUS_IN;
+    bool status = c->phase == NX_USB_CONTROL_STATUS_IN ||
+                  c->phase == NX_USB_CONTROL_STATUS_OUT;
+    if (input && !status && !c->borrowed[0]) {
+        nx_result_t result = submit_packet(c, 0U, true, 0U);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+    }
+    /* A zero-byte STATUS may finish before the first IN is even launched.
+     * Fold its fact on the next step; never expose another DATA opportunity. */
+    if (input && !status &&
+        nx_request_state(&c->packets[0].base) != NX_REQUEST_ACTIVE) {
+        return NX_SUCCESS;
+    }
+    size_t length = 0U;
+    if (!status && c->phase != NX_USB_CONTROL_DATA_IN_ZLP) {
+        length = c->goal - c->confirmed_bytes;
+        if (length > NX_USB_FS_MAX_PACKET) {
+            length = NX_USB_FS_MAX_PACKET;
+        }
+    }
+    return submit_packet(c, input ? 1U : 0U, status, length);
 }
 nx_result_t nx_usb_control_step(nx_usb_control_t* c) {
     if (!task()) {
@@ -385,9 +408,13 @@ nx_result_t nx_usb_control_step(nx_usb_control_t* c) {
             }
             return result;
         }
-        if (!c->borrowed[0] && !c->borrowed[1] &&
-            c->phase != NX_USB_CONTROL_DATA_READY) {
-            return launch(c);
+        if (c->phase != NX_USB_CONTROL_DATA_READY) {
+            bool input = c->phase == NX_USB_CONTROL_DATA_IN ||
+                         c->phase == NX_USB_CONTROL_DATA_IN_ZLP ||
+                         c->phase == NX_USB_CONTROL_STATUS_IN;
+            if (!c->borrowed[input ? 1U : 0U]) {
+                return launch(c);
+            }
         }
     } else if (result == NX_SUCCESS) {
         c->phase = !state.started || state.closing ? NX_USB_CONTROL_CLOSED

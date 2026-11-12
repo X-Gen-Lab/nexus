@@ -975,3 +975,76 @@ TEST_F(MultipleFactory, FullReverseCleanupAllowsOnlyQuiescentColdRestart) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
     EXPECT_TRUE(i2c_state->initialized);
 }
+
+/** \brief One DMA controller owns cold resources independently of peers. */
+struct IndependentSpiCold {
+    nx_stm32_spi_dma_state_t state{};
+    nx_stm32_spi_dma_endpoint_state_t endpoint{};
+    nx_stm32_gpio_state_t cs{};
+    uint16_t snapshots[4]{};
+    nx_stm32_spi_pin_config_t pins[4]{{GPIOC, &snapshots[0], 2U, 10U, 6U},
+                                      {GPIOC, &snapshots[1], 2U, 11U, 6U},
+                                      {GPIOC, &snapshots[2], 2U, 12U, 6U},
+                                      {GPIOA, &snapshots[3], 0U, 4U, 0U}};
+    nx_stm32_spi_endpoint_config_t child{&endpoint.endpoint, &cs, 1000000U, 0U,
+                                         false};
+    nx_dma_memory_region_t region{0x20000000U, 0x20000U,
+                                  NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
+    nx_stm32_spi_dma_config_t config{{SPI3, 42000000U, pins, 4U, &child, 1U},
+                                     DMA1,
+                                     DMA1_Stream5,
+                                     DMA1_Stream0,
+                                     &region,
+                                     1U,
+                                     5U,
+                                     false};
+    nx_stm32_spi_dma_cold_t receipt{};
+};
+
+TEST_F(MultipleFactory, IndependentSpiColdRestoresBothOriginalIrqPriorities) {
+    IndependentSpiCold owner;
+    SPI3->SR = SPI_SR_TXE;
+    NVIC_SetPriority(DMA1_Stream5_IRQn, 9U);
+    NVIC_SetPriority(DMA1_Stream0_IRQn, 7U);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_spi_dma_prepare(&owner.state, &owner.config,
+                                                   &owner.receipt));
+    EXPECT_EQ(5U, NVIC_GetPriority(DMA1_Stream5_IRQn));
+    EXPECT_EQ(5U, NVIC_GetPriority(DMA1_Stream0_IRQn));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_spi_dma_close(&owner.state, &owner.config,
+                                                 &owner.receipt));
+    EXPECT_EQ(9U, NVIC_GetPriority(DMA1_Stream5_IRQn));
+    EXPECT_EQ(7U, NVIC_GetPriority(DMA1_Stream0_IRQn));
+}
+
+TEST_F(MultipleFactory, IndependentSpiColdRejectsForeignIrqBeforePinEffects) {
+    IndependentSpiCold owner;
+    SPI3->SR = SPI_SR_TXE;
+    NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+    const unsigned before_capture = s_captures;
+    const unsigned before_configure = s_configures;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_spi_dma_prepare(
+                                 &owner.state, &owner.config, &owner.receipt));
+    EXPECT_EQ(before_capture, s_captures);
+    EXPECT_EQ(before_configure, s_configures);
+    EXPECT_NE(0U, NVIC->ISER[0] & (1UL << DMA1_Stream0_IRQn));
+    NVIC_DisableIRQ(DMA1_Stream0_IRQn);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_spi_dma_close(&owner.state, &owner.config,
+                                                 &owner.receipt));
+}
+
+TEST_F(MultipleFactory, IndependentSpiColdObservesRefusedPriorityPublication) {
+    IndependentSpiCold owner;
+    SPI3->SR = SPI_SR_TXE;
+    SPI3->CR1 = SPI_CR1_MSTR | SPI_CR1_CPHA;
+    SPI3->CR2 = SPI_CR2_SSOE;
+    NVIC_SetPriority(DMA1_Stream0_IRQn, 9U);
+    s_priority_refused = &NVIC->IPR[DMA1_Stream0_IRQn];
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_spi_dma_prepare(&owner.state, &owner.config,
+                                                    &owner.receipt));
+    s_priority_refused = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_spi_dma_close(&owner.state, &owner.config,
+                                                 &owner.receipt));
+    EXPECT_EQ(9U, NVIC_GetPriority(DMA1_Stream0_IRQn));
+    EXPECT_EQ(SPI_CR1_MSTR | SPI_CR1_CPHA, SPI3->CR1);
+    EXPECT_EQ(SPI_CR2_SSOE, SPI3->CR2);
+}

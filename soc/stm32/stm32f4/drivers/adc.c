@@ -252,13 +252,18 @@ nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
         (void)nx_stm32_adc_quiesce(port);
         return NX_ERROR_IO;
     }
-    nx_time_us_t stable = nx_deadline_after(
-        nx_time_now_us(), nx_stm32_adc_startup_delay_us(port));
-    while (!nx_deadline_expired(stable, nx_time_now_us())) {
+    nx_time_us_t stable = 0U;
+    nx_result_t result = nx_deadline_finite_after(
+        nx_time_now_us(), nx_stm32_adc_startup_delay_us(port), &stable);
+    while (result == NX_SUCCESS &&
+           !nx_deadline_expired(stable, nx_time_now_us())) {
+        if (nx_deadline_expired(deadline, nx_time_now_us())) {
+            result = NX_ERROR_TIMEOUT;
+            break;
+        }
         NX_STM32_IO_POLL(5U, port);
     }
-    nx_result_t result = NX_SUCCESS;
-    for (size_t i = 0U; i < port->channel_count; ++i) {
+    for (size_t i = 0U; result == NX_SUCCESS && i < port->channel_count; ++i) {
         uint32_t channel = port->channels[i];
         volatile uint32_t* sample =
             channel < 10U ? &port->registers->SMPR2 : &port->registers->SMPR1;

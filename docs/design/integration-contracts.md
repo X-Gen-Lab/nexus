@@ -4,7 +4,10 @@
 
 本文说明通用平台如何接入 CPU、SoC、Board、外部器件、协议和组件，以及外部工程如何形成可审核的固件。总体边界见 [下一代平台设计](next-generation-platform.md)，开发、验证和维护流程见 [工程手册](engineering-handbook.md)。
 
-当前生产入口只有 STM32F4，已迁入 F407VE／ZG 及四个独立 Board 包。现在不连接硬件；源资料、软件实现、编译链接、模型行为和物理资格必须分开陈述。未知的实际 PCB revision、跳线、电气或器件型号保持未知。
+当前生产入口只有 STM32F4，精确型号和模式见[支持范围](../delivery/support.md)。
+四个 F407 Board 包与新增料号的内部 CRC 软件参考分别维护；现在不连接硬件。
+源资料、实现、编译链接、模型行为和物理资格分别陈述，未知 PCB revision、跳线、
+电气或器件型号保持未知。
 
 ## 1. 第一原则与工具边界
 
@@ -48,7 +51,10 @@ soc/<vendor>/<family>/
   ...                      # startup、controller、clock/IRQ、linker 实现
 ```
 
-系列目录复用代码，`soc.json` 分别定义 STM32F407VET6、STM32F407ZGT6 的精确物理事实；`devices.json` 记录官方器件宏、启动和 IRQ 编译事实。型号、封装、Flash、SRAM 域和 IRQ 表不能被家族字符串代替，编译目录不扩大运行时模式支持。
+系列目录复用代码，`soc.json` 按精确订货号选择已审 device profile 和不重叠的
+controller groups；物理事实与软件模式分开。`devices.json` 记录官方宏、startup、
+IRQ enum／number／handler。型号、封装、Flash、SRAM 域和 IRQ 表不能被家族字符串
+代替，厂商编译目录不扩大运行时模式支持。
 
 当前生产源码只有 `soc/stm32/stm32f4/`，私有共享 IP 位于其 `drivers/ip/`。
 Board／SoC 不放 Python 插件；当前 F4 配置适配集中在 `tools/configure/stm32f4/`，

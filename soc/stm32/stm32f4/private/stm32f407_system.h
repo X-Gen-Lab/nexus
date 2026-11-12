@@ -11,7 +11,8 @@
 
 #include "nexus/arch/arch.h"
 #include "nexus/core/status.h"
-#include "stm32f407xx.h"
+#include "nexus_config.h"
+#include "stm32f4xx.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -28,6 +29,10 @@ typedef struct {
     uint32_t core_hz;
     volatile uint32_t remaining_effects;
     uint32_t saved_pll;
+#if defined(NEXUS_CLOCK_PLLSAI_ENABLED) && NEXUS_CLOCK_PLLSAI_ENABLED
+    uint32_t saved_aux_pll;
+    uint32_t saved_aux_mux;
+#endif
     uint32_t saved_flash;
     uint32_t saved_power;
     /** \brief Terminal IO diagnostic; never permission to resume or reclaim.
@@ -98,6 +103,9 @@ nx_stm32_start_result_t nx_stm32_system_restore(nx_stm32_system_t* system,
  *                  An active RNG/IRQ source retains its explicit PLL48 lease;
  *                  stop refuses it before any write or epoch invalidation.
  *                  The RNG owner must withdraw RNGEN before retrying.
+ *                  A selected PLLSAI similarly retains its shared input until
+ *                  every SAI/LTDC gate and other auxiliary PLL owner is joined;
+ *                  refusal precedes invalidating the live time epoch.
  */
 int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit);
 
@@ -182,14 +190,17 @@ bool nx_stm32_system_cpu_boot(SCB_Type* scb,
 uint32_t HAL_GetTick(void);
 
 /**
- * \brief           Check device group and exact Flash density.
+ * \brief           Check observed device group, reviewed cut and Flash density.
  *
  * \param[in]       expected_flash_bytes: Reviewed VE/ZG density.
  *
- * \return          SUCCESS or INVALID/IO for mismatched silicon facts.
+ * \return          SUCCESS; INVALID for an invalid expected density, IO for
+ *                  die/density mismatch, UNSUPPORTED for an unreviewed cut.
  *
  * \note            Package and F405/F407 identity require fixture inspection;
- *                  these parts share a device group ID.
+ *                  these parts share a device group ID. The actual complete
+ *                  IDCODE is read once; no configured revision substitutes for
+ *                  observation. Unknown revisions never inherit compatibility.
  */
 nx_result_t nx_stm32_validate_identity(uint32_t expected_flash_bytes);
 

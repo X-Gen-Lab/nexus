@@ -135,6 +135,17 @@ if operation == 'serial':
         capture = soc_acceptance.capture(protocol_path, acquisition.recipe_path,
                                          acquisition.admission_path, acquisition.output)
         capture_path = acquisition.output / "soc-capture.json"
+        diagnostics = None
+        if capture["status"] != "captured":
+            details = [f"Synthetic fixture capture failed: {capture!r}"]
+            for operation in capture["operations"]:
+                for stream in ("stdout", "stderr"):
+                    if stream in operation:
+                        path = Path(operation[stream]["path"])
+                        details.append(
+                            f"{operation['name']} {stream}: {path.read_bytes()!r}")
+            diagnostics = "\n".join(details)
+        self.assertEqual(capture["status"], "captured", diagnostics)
         import json
         serial_step = next(step for step in capture["operations"] if step["name"] == "serial")
         payload = json.loads(Path(serial_step["observation"]["path"]).read_text())["observations"]["soc"]
@@ -294,7 +305,10 @@ if operation == 'serial':
         protocol = self.protocol("SOC-52")
         protocol["controller_ids"] = ["flash0"]
         self.resolved["flash"] = {"origin": 0x08000000, "size": 0x100000,
-                                   "erase_blocks": [16384]*4 + [65536] + [131072]*7}
+                                   "erase_spans": [
+                                       {"offset": 0, "erase_bytes": 16384, "count": 4},
+                                       {"offset": 65536, "erase_bytes": 65536, "count": 1},
+                                       {"offset": 131072, "erase_bytes": 131072, "count": 7}]}
         layout_path = self.root / "product-layout.json"
         layout = {"schema_version": 1, "kind": "product_flash_test_layout",
                   "board": self.fixture["board"], "part": self.fixture["part"],

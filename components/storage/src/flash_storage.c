@@ -76,24 +76,24 @@ nx_result_t nx_flash_storage_bind(nx_flash_storage_adapter_t* adapter,
     if (geometry == NULL || geometry->program_unit == 0) {
         return NX_ERROR_INVALID;
     }
-    uint32_t erase_size = 0;
-    uint32_t cursor = region.offset;
+    uint32_t first;
+    nx_flash_sector_t sector;
     uint32_t end = region.offset + region.size;
-    for (size_t i = 0; i < geometry->sector_count && cursor < end; ++i) {
-        nx_flash_sector_t sector = geometry->sectors[i];
-        if (sector.offset < cursor) {
-            continue;
-        }
-        if (sector.offset != cursor || sector.size > end - cursor ||
-            (erase_size != 0 && sector.size != erase_size)) {
-            return NX_ERROR_UNSUPPORTED;
-        }
-        erase_size = sector.size;
-        cursor += sector.size;
-    }
-    if (cursor != end || erase_size == 0 ||
-        erase_size % geometry->program_unit != 0) {
+    if (nx_flash_geometry_sector_index(geometry, region.offset, &first) !=
+            NX_SUCCESS ||
+        nx_flash_geometry_sector_at(geometry, first, &sector) != NX_SUCCESS)
         return NX_ERROR_UNSUPPORTED;
+    uint32_t erase_size = sector.size;
+    if (end != geometry->size &&
+        nx_flash_geometry_sector_index(geometry, end, &first) != NX_SUCCESS)
+        return NX_ERROR_UNSUPPORTED;
+    for (size_t index = 0U; index < geometry->erase_span_count; ++index) {
+        const nx_flash_erase_span_t* span = &geometry->erase_spans[index];
+        uint64_t span_end =
+            (uint64_t)span->offset + (uint64_t)span->erase_bytes * span->count;
+        if (span->offset < end && region.offset < span_end &&
+            span->erase_bytes != erase_size)
+            return NX_ERROR_UNSUPPORTED;
     }
     adapter->region = region;
     adapter->deadline = deadline;

@@ -1,0 +1,49 @@
+# Software-only link fixture; no PCB, codec or physical execution.
+schema = 2
+board_package = "f446ze-board"
+backend = "baremetal"
+clock = "custom"
+optimization = "Os"
+
+[clock_parameters]
+source = "hsi"
+input_hz = 16000000
+sysclk_source = "input"
+pll48 = false
+pll_m = 16
+pll_n = 336
+pll_p = 4
+pll_q = 7
+ahb_div = 1
+apb1_div = 1
+apb2_div = 1
+adc_div = 4
+supply_mv = 3300
+css = false
+pll_sai = { m = 10, n = 192, sai1 = { q = 5, post_divider = 5 } }
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[audio.sound]
+binding = "source_a"
+mode = "master-duplex"
+sample_bits = 24
+slot_bits = 32
+slots = 2
+frame_sync_bits = 32
+first_bit_offset = 0
+frame_sync_high = false
+frame_sync_before = true
+frame_sync_channels = true
+first_lsb = false
+sample_rising = true
+mclk = true
+no_divider = false
+mckdiv = 0
+max_bit_clock_hz = 3072000
+poll_limit = 128
+irq = { priority = 5 }

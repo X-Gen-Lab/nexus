@@ -33,9 +33,9 @@ static bool storage(const nx_stm32_fsmc_nor_t* n, const void* p, size_t bytes,
            !nx_fsmc_overlap(p, bytes, n->config, sizeof(*n->config)) &&
            !nx_fsmc_overlap(p, bytes, n->config->geometry,
                             sizeof(*n->config->geometry)) &&
-           !nx_fsmc_overlap(p, bytes, n->config->geometry->sectors,
-                            n->config->geometry->sector_count *
-                                sizeof(nx_flash_sector_t)) &&
+           !nx_fsmc_overlap(p, bytes, n->config->geometry->erase_spans,
+                            n->config->geometry->erase_span_count *
+                                sizeof(nx_flash_erase_span_t)) &&
            nx_stm32_fsmc_storage(n->lease.owner, p, bytes, writable);
 }
 static nx_result_t clock_now(nx_stm32_fsmc_nor_t* n, nx_time_us_t* now) {
@@ -50,23 +50,16 @@ static bool geometry_valid(const nx_flash_geometry_t* g, uint8_t width,
                            uintptr_t address, size_t bytes) {
     if (!nx_fsmc_span(g, sizeof(*g), _Alignof(nx_flash_geometry_t), false) ||
         g->base_address != address || g->size == 0U || g->size > bytes ||
-        g->program_unit != width / 8U || g->sector_count == 0U ||
-        g->sector_count > 1024U ||
-        !nx_fsmc_span(g->sectors, g->sector_count * sizeof(*g->sectors),
-                      _Alignof(nx_flash_sector_t), false) ||
+        g->program_unit != width / 8U || g->erase_span_count == 0U ||
+        g->erase_span_count > SIZE_MAX / sizeof(*g->erase_spans) ||
+        !nx_fsmc_span(g->erase_spans,
+                      g->erase_span_count * sizeof(*g->erase_spans),
+                      _Alignof(nx_flash_erase_span_t), false) ||
         (g->program_flags & ~(uint32_t)NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE) !=
             0U)
         return false;
-    uint32_t end = 0U;
-    for (size_t i = 0U; i < g->sector_count; ++i) {
-        const nx_flash_sector_t* sector = &g->sectors[i];
-        if (sector->offset != end || sector->size == 0U ||
-            sector->size > g->size - end ||
-            sector->size % g->program_unit != 0U)
-            return false;
-        end += sector->size;
-    }
-    return end == g->size;
+    uint32_t count;
+    return nx_flash_geometry_sector_count(g, &count) == NX_SUCCESS;
 }
 /** \brief CFI indices are device words; caller separately supplied query byte
  * address. */
@@ -87,20 +80,39 @@ static bool cfi_matches(nx_stm32_fsmc_nor_t* n) {
     valid = valid && exponent < 32U &&
             (UINT32_C(1) << exponent) == n->config->geometry->size &&
             regions != 0U && regions <= 32U;
-    size_t sector = 0U;
+    size_t expected_span = 0U;
+    uint32_t used = 0U;
+    const nx_flash_geometry_t* geometry = n->config->geometry;
     for (uint32_t region = 0U; valid && region < regions; ++region) {
         uint32_t count = (uint32_t)cfi_half(n, 0x2dU + region * 4U) + 1U;
         uint32_t size = (uint32_t)cfi_half(n, 0x2fU + region * 4U) * 256U;
         if (size == 0U)
             size = 128U;
-        if (count > n->config->geometry->sector_count - sector) {
-            valid = false;
-            break;
+        /* Compare runs directly. CFI can split an equal-size region; no
+         * temporary sector array or per-sector expansion is required. */
+        while (valid && count != 0U) {
+            if (expected_span == geometry->erase_span_count) {
+                valid = false;
+                break;
+            }
+            const nx_flash_erase_span_t* expected =
+                &geometry->erase_spans[expected_span];
+            if (expected->erase_bytes != size) {
+                valid = false;
+                break;
+            }
+            uint32_t available = expected->count - used;
+            if (count >= available) {
+                count -= available;
+                ++expected_span;
+                used = 0U;
+            } else {
+                used += count;
+                count = 0U;
+            }
         }
-        for (uint32_t block = 0U; block < count; ++block)
-            valid &= n->config->geometry->sectors[sector++].size == size;
     }
-    valid &= sector == n->config->geometry->sector_count;
+    valid &= expected_span == geometry->erase_span_count && used == 0U;
     read_array(n);
     return valid;
 }
@@ -180,9 +192,9 @@ nx_stm32_fsmc_nor_prepare(nx_stm32_fsmc_nor_t* n, nx_stm32_fsmc_t* bus,
         nx_fsmc_overlap(n, sizeof(*n), config, sizeof(*config)) ||
         nx_fsmc_overlap(n, sizeof(*n), config->geometry,
                         sizeof(*config->geometry)) ||
-        nx_fsmc_overlap(n, sizeof(*n), config->geometry->sectors,
-                        config->geometry->sector_count *
-                            sizeof(nx_flash_sector_t)))
+        nx_fsmc_overlap(n, sizeof(*n), config->geometry->erase_spans,
+                        config->geometry->erase_span_count *
+                            sizeof(nx_flash_erase_span_t)))
         return NX_ERROR_INVALID;
     nx_time_us_t now = bus->config->clock.read(bus->config->clock.context);
     if (now == NX_DEADLINE_NEVER)
@@ -219,13 +231,13 @@ static void settle(nx_stm32_fsmc_nor_t* n) {
     nx_arch_dsb();
     nx_request_settle(&request->base, result, done);
 }
-static const nx_flash_sector_t* sector_at(const nx_stm32_fsmc_nor_t* n,
-                                          uint32_t offset) {
-    const nx_flash_geometry_t* g = n->config->geometry;
-    for (size_t i = 0U; i < g->sector_count; ++i)
-        if (g->sectors[i].offset == offset)
-            return &g->sectors[i];
-    return NULL;
+static bool sector_at(const nx_stm32_fsmc_nor_t* n, uint32_t offset,
+                      nx_flash_sector_t* sector) {
+    uint32_t ordinal;
+    return nx_flash_geometry_sector_index(n->config->geometry, offset,
+                                          &ordinal) == NX_SUCCESS &&
+           nx_flash_geometry_sector_at(n->config->geometry, ordinal, sector) ==
+               NX_SUCCESS;
 }
 static void unlock(nx_stm32_fsmc_nor_t* n) {
     command(n, n->config->unlock1, 0xaaU);
@@ -335,7 +347,13 @@ static nx_result_t service_inner(nx_stm32_fsmc_nor_t* n) {
             command(n, n->pulse_offset, 0x40U);
         command(n, n->pulse_offset, n->pulse_value);
     } else {
-        n->pulse_bytes = sector_at(n, n->pulse_offset)->size;
+        nx_flash_sector_t sector;
+        if (!sector_at(n, n->pulse_offset, &sector)) {
+            terminal(n, NX_ERROR_INVALID);
+            settle(n);
+            return NX_SUCCESS;
+        }
+        n->pulse_bytes = sector.size;
         if (n->config->command_set == 2U) {
             unlock(n);
             command(n, n->config->unlock1, 0x80U);
@@ -403,11 +421,11 @@ static nx_result_t submit(void* context, nx_flash_async_request_t* r) {
     } else if (r->operation == NX_FLASH_ASYNC_ERASE) {
         size_t end = 0U;
         while (end < r->length) {
-            const nx_flash_sector_t* sector =
-                sector_at(n, r->offset + (uint32_t)end);
-            if (sector == NULL || sector->size > r->length - end)
+            nx_flash_sector_t sector;
+            if (!sector_at(n, r->offset + (uint32_t)end, &sector) ||
+                sector.size > r->length - end)
                 return NX_ERROR_INVALID;
-            end += sector->size;
+            end += sector.size;
         }
         if (r->data != NULL)
             return NX_ERROR_INVALID;
@@ -521,6 +539,6 @@ static nx_result_t read_data(const void* context, uint32_t offset, void* data,
     return NX_SUCCESS;
 }
 const nx_flash_ops_t nx_stm32_fsmc_nor_flash_ops = {geometry, read_data, NULL,
-                                                    NULL};
+                                                    NULL, NULL};
 const nx_flash_async_ops_t nx_stm32_fsmc_nor_async_ops = {submit, cancel,
                                                           service, stop};

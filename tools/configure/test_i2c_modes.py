@@ -122,24 +122,75 @@ class I2cAsyncConfigurationTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, '10-bit I2C address'):
                     gate.resolve_ir(path, test_support=native_fixture(path))
 
-    def test_ten_bit_rejects_unsafe_repeated_start_timing_and_duplicates(self):
+    def test_standard_mode_ceiling_keeps_all_endpoint_widths_restart_safe(self):
+        from tools.configure import selected_contracts
+        for mode in ("poll-messages", "irq-messages", "dma-messages"):
+            for rate, divisor in ((80000, 263), (88000, 239), (88001, 239),
+                                  (100000, 239), (100001, 140), (400000, 36)):
+                with self.subTest(mode=mode, rate=rate):
+                    path = self.authored('stm32f4', mode,
+                                         irq=mode != "poll-messages")
+                    text = path.read_text().replace('max_hz=100000',
+                                                    f'max_hz={rate}')
+                    text += ('[i2c_device.wide]\ncontroller="bus"\n'
+                             'driver="i2c-endpoint"\naddress=683\n'
+                             'address_bits=10\n')
+                    path.write_text(text)
+                    ir = gate.resolve_ir(path, test_support=native_fixture(path))
+                    controller = ir.controllers[0]
+                    for device in (None, *ir.devices):
+                        fields = selected_contracts.describe(controller,
+                                                            device).fields
+                        self.assertEqual(fields['configured_max_hz'], rate)
+                        self.assertEqual(fields.get('nominal_hz'),
+                                         42000000 // (divisor *
+                                             (3 if rate > 100000 else 2)))
+                    output = self.root / f'{mode}-{rate}'
+                    gate.configure(path, output, test_support=native_fixture(path))
+                    source = (output / 'nexus_factory.h').read_text()
+                    self.assertIn('uint32_t nominal_hz;', source)
+
+    def test_ten_bit_address_duplicates_reject(self):
         path = self.authored('stm32f4', 'irq-messages')
         text = path.read_text().replace('address=80', 'address=683\naddress_bits=10')
-        for rate in (88001, 100000):
-            with self.subTest(rate=rate):
-                path.write_text(text.replace('max_hz=100000', f'max_hz={rate}'))
-                with self.assertRaisesRegex(ValueError, 'repeated START'):
-                    gate.resolve_ir(path, test_support=native_fixture(path))
-        for rate in (88000, 100001, 400000):
-            with self.subTest(rate=rate):
-                path.write_text(text.replace('max_hz=100000', f'max_hz={rate}'))
-                ir = gate.resolve_ir(path, test_support=native_fixture(path))
-                self.assertEqual(683, ir.devices[0].options.address)
         path.write_text(text.replace('max_hz=100000', 'max_hz=80000') +
                         '[i2c_device.duplicate]\ncontroller="bus"\n'
                         'driver="i2c-endpoint"\naddress=683\naddress_bits=10\n')
         with self.assertRaisesRegex(ValueError, 'Duplicate I2C address'):
             gate.resolve_ir(path, test_support=native_fixture(path))
+
+    def test_nominal_timing_uses_the_selected_apb_clock(self):
+        from tools.configure import selected_contracts
+        for pclk, source, apb_div in ((21000000, "pll", 4),
+                                      (8000000, "input", 2)):
+            for mode in ("poll-messages", "irq-messages", "dma-messages"):
+                for rate, divisor in ((100000, 120 if pclk == 21000000 else 46),
+                                       (400000, 18 if pclk == 21000000 else 7)):
+                    with self.subTest(pclk=pclk, mode=mode, rate=rate):
+                        path = self.authored('stm32f4', mode,
+                                             irq=mode != "poll-messages")
+                        text = path.read_text().replace('clock="hse8-pll168"',
+                                                        'clock="custom"')
+                        text = text.replace('max_hz=100000', f'max_hz={rate}')
+                        text += ('[clock_parameters]\nsource="hsi"\n'
+                                 'input_hz=16000000\npll_m=16\npll_n=336\n'
+                                 'pll_p=4\npll_q=7\nahb_div=1\n'
+                                 f'apb1_div={apb_div}\napb2_div=2\nadc_div=4\n'
+                                 f'sysclk_source="{source}"\n'
+                                 'supply_mv=3300\ncss=false\n')
+                        path.write_text(text)
+                        ir = gate.resolve_ir(path, test_support=native_fixture(path))
+                        item = ir.controllers[0]
+                        self.assertEqual(item.integration.clock_hz, pclk)
+                        fields = selected_contracts.describe(item).fields
+                        self.assertEqual(fields['nominal_hz'],
+                                         pclk // (divisor *
+                                             (3 if rate > 100000 else 2)))
+
+    def test_nominal_projection_participates_in_generator_freshness(self):
+        from tools.configure.dependencies import source_names
+        self.assertIn("tools/configure/stm32f4/i2c_timing.py",
+                      source_names("platform", "stm32f4"))
 
     def test_endpoint_width_is_an_exact_integer_and_native_stays_seven_bit(self):
         from tools.configure import authored

@@ -17,4 +17,4 @@ binding="nor"
 read_timing={address_setup=2,address_hold=1,data_setup=9,bus_turn=1}
 write_timing={address_setup=2,address_hold=1,data_setup=9,bus_turn=1}
 parameters={bank=1,width=16,address_lines=19,bytes=1048576,multiplexed=true,extended_mode=false,burst_page_bytes=0,byte_lanes=true,burst_read=false,burst_write=false,clock_division=3,data_latency=4,access_mode="A",wait_signal=false,asynchronous_wait=false,wait_high=false,wait_before=false,wrap=false}
-nor={command_set=2,cfi=true,unlock1=2730,unlock2=1364,cfi_address=170,ready_delay_us=1,requires_fresh_erase=true,sectors=[{offset=0,size=524288},{offset=524288,size=524288}]}
+nor={command_set=2,cfi=true,unlock1=2730,unlock2=1364,cfi_address=170,ready_delay_us=1,requires_fresh_erase=true,erase_spans=[{offset=0,erase_bytes=524288,count=2}]}

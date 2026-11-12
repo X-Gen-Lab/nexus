@@ -21,7 +21,7 @@ and mutable provider state remain private.
 
 | Task | Public headers |
 | --- | --- |
-| Samples, camera storage and finite audio | `adc.h`, `adc_group.h`, `capture.h`, `audio.h`, `frame_stream.h` |
+| Samples, camera storage and finite/continuous audio | `adc.h`, `adc_group.h`, `capture.h`, `audio.h`, `frame_stream.h` |
 | Serial data and wire formats | `uart.h`, `uart_word.h`, `uart_wire.h`, `uart_rs485.h`, `spi.h`, `spi_transaction.h`, `spi_dma_transaction.h`, `spi_frames.h`, `i2c.h`, `i2c_target.h` |
 | Media and physical storage | `block.h`, `block_async.h`, `sdio_io.h`, `flash.h`, `flash_async.h`, `flash_maintenance.h`, `nand.h`, `external_bus.h`, `memory_window.h`, `parallel16.h` |
 | Calendar and backup resources | `rtc.h`, `rtc_aux.h` |
@@ -119,6 +119,14 @@ test interfaces. They establish no MCU discovery or physical support.
 ## chip.h
 
 ```{doxygenfile} io/include/nexus/io/chip.h
+:project: nexus
+```
+
+(cipher_8h)=
+
+## cipher.h
+
+```{doxygenfile} io/include/nexus/io/cipher.h
 :project: nexus
 ```
 
@@ -241,6 +249,14 @@ finite positive `maximum_service_gap_us`. Unknown groups stay unknown.
 :project: nexus
 ```
 
+(display_8h)=
+
+## display.h
+
+```{doxygenfile} io/include/nexus/io/display.h
+:project: nexus
+```
+
 (dma_8h)=
 
 ## dma.h
@@ -345,6 +361,14 @@ Platform lifecycle and clock prerequisites. Other retained SDKs do not grant an 
 :project: nexus
 ```
 
+(hash_8h)=
+
+## hash.h
+
+```{doxygenfile} io/include/nexus/io/hash.h
+:project: nexus
+```
+
 (i2c_8h)=
 
 ## i2c.h
@@ -374,6 +398,14 @@ Platform lifecycle and clock prerequisites. Other retained SDKs do not grant an 
 ## i2c_target.h
 
 ```{doxygenfile} io/include/nexus/io/i2c_target.h
+:project: nexus
+```
+
+(image_8h)=
+
+## image.h
+
+```{doxygenfile} io/include/nexus/io/image.h
 :project: nexus
 ```
 

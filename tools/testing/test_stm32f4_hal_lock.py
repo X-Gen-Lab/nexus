@@ -2,6 +2,7 @@
 from __future__ import annotations
 import copy
 import json
+import importlib.util
 from pathlib import Path
 import shutil
 import subprocess
@@ -90,6 +91,20 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
                 changed["files"].pop(name)
                 with self.assertRaisesRegex(ValueError, "reviewed graph"):
                     official.contract(changed)
+
+    def test_new_ip_official_sources_survive_the_actual_sdk_selection(self):
+        specification = importlib.util.spec_from_file_location(
+            "new_ip_locked_sdk_sources", ROOT / "cmake/package/package_source_sdk.py")
+        sdk = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(sdk)
+        selected = sdk.dependency_entries(ROOT, official.DIRECTORY)
+        required = {"Src/stm32f4xx_hal_qspi.c", "Inc/stm32f4xx_hal_qspi.h",
+                    "Src/stm32f4xx_ll_fmc.c", "Inc/stm32f4xx_ll_fmc.h",
+                    "Src/stm32f4xx_hal_cryp.c", "Src/stm32f4xx_hal_sai.c",
+                    "Src/stm32f4xx_hal_dma2d.c"}
+        self.assertLessEqual(required, set(selected))
+        self.assertTrue(all((ROOT / official.DIRECTORY / name).is_file()
+                            for name in required))
 
     def test_real_official_checkout_and_cli_are_read_only(self):
         self.git_patch.stop()

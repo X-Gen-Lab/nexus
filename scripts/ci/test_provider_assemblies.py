@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import contextlib
+from copy import deepcopy
 import hashlib
 import io
 import json
@@ -19,6 +20,83 @@ from tools.configure import configure
 
 ROOT = Path(__file__).resolve().parents[2]
 USB = ROOT / "tests/contracts/usb_assembly/stm32-zg.toml"
+
+
+class USBRemoteCompileSelection(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.fixtures = gate.validate_fixtures(ROOT, [
+            USB.with_name("stm32-ve.toml"), USB.with_name("stm32-ve-remote.toml")])
+
+    def setUp(self):
+        self.macro = "NEXUS_STM32F4_USB_REMOTE_WAKEUP"
+        self.device = ROOT / (
+            "soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c")
+        self.resolved = deepcopy(self.fixtures[1]["resolved"])
+
+    def entry(self, flags=(), *, source=None, owner="nexus_soc_stm32f4"):
+        source = self.device if source is None else source
+        output = f"CMakeFiles/{owner}.dir/{source.name}.obj"
+        return {"directory": str(ROOT), "file": str(source), "output": output,
+                "arguments": ["arm-none-eabi-gcc", *flags, "-c", str(source),
+                              "-o", output]}
+
+    def test_selected_capability_uses_every_private_dcd_compilation(self):
+        selected = self.entry(["-D" + self.macro + "=1"])
+        separate = self.entry(["-D", self.macro + "=1"])
+        gate.require_usb_remote_selection(self.resolved, [selected, separate])
+
+    def test_selected_capability_requires_actual_dcd_compilation(self):
+        with self.assertRaisesRegex(EvidenceError, "USB remote"):
+            gate.require_usb_remote_selection(self.resolved, [])
+
+    def test_one_enabled_context_cannot_hide_another_disabled_context(self):
+        selected = self.entry(["-D" + self.macro + "=1"])
+        for flags in ([], ["-D" + self.macro + "=0"]):
+            with self.subTest(flags=flags), \
+                    self.assertRaisesRegex(EvidenceError, "USB remote"):
+                gate.require_usb_remote_selection(
+                    self.resolved, [selected, self.entry(flags)])
+
+    def test_duplicate_conflicting_or_undefined_selection_is_not_enabled(self):
+        enabled = "-D" + self.macro + "=1"
+        for flags in ([enabled, enabled],
+                      [enabled, "-D" + self.macro + "=0"],
+                      [enabled, "-U" + self.macro],
+                      [enabled, "-U", self.macro],
+                      ["-D" + self.macro],
+                      ["-U" + self.macro, enabled]):
+            with self.subTest(flags=flags), \
+                    self.assertRaisesRegex(EvidenceError, "USB remote"):
+                gate.require_usb_remote_selection(self.resolved, [self.entry(flags)])
+
+    def test_private_selection_cannot_escape_into_consumer_or_vendor_target(self):
+        enabled = "-D" + self.macro + "=1"
+        for owner in ("usb_controller_fixture", "vendor_usb"):
+            with self.subTest(owner=owner), \
+                    self.assertRaisesRegex(EvidenceError, "USB remote"):
+                gate.require_usb_remote_selection(self.resolved, [
+                    self.entry([enabled]), self.entry([enabled],
+                        source=USB.parent / "controller_main.c", owner=owner)])
+
+    def test_default_can_omit_or_explicitly_disable_optional_algorithm(self):
+        self.resolved = deepcopy(self.fixtures[0]["resolved"])
+        for flags in ([], ["-D" + self.macro + "=0"]):
+            with self.subTest(flags=flags):
+                gate.require_usb_remote_selection(self.resolved, [self.entry(flags)])
+        with self.assertRaisesRegex(EvidenceError, "USB remote"):
+            gate.require_usb_remote_selection(self.resolved, [
+                self.entry(["-D" + self.macro + "=1"])])
+
+    def test_command_form_and_relative_source_still_require_real_selection(self):
+        import shlex
+        entry = self.entry(["-D", self.macro + "=1"])
+        entry["file"] = str(self.device.relative_to(ROOT))
+        entry["command"] = shlex.join(entry.pop("arguments"))
+        gate.require_usb_remote_selection(self.resolved, [entry])
+        entry["command"] += " -U" + self.macro
+        with self.assertRaisesRegex(EvidenceError, "USB remote"):
+            gate.require_usb_remote_selection(self.resolved, [entry])
 
 
 class FixtureAdmission(unittest.TestCase):

@@ -175,6 +175,11 @@ static inline bool nx_stm32_av_overlap(const void* a, size_t an, const void* b,
            an > UINTPTR_MAX - ap || bn > UINTPTR_MAX - bp ||
            (ap < bp + bn && bp < ap + an);
 }
+/** \brief No caller storage may overlap the shared clock/resource owner. */
+static inline bool nx_stm32_av_system_disjoint(const void* data, size_t bytes) {
+    return !nx_stm32_av_overlap(data, bytes, &g_nx_stm32_system,
+                                sizeof(g_nx_stm32_system));
+}
 /** \brief Validate all producer buffers before any request is accepted. */
 nx_result_t nx_stm32_av_stream_validate(const nx_stm32_av_config_t* config,
                                         nx_stream_t* stream, size_t bytes,

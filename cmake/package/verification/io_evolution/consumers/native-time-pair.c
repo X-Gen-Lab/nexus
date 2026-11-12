@@ -9,7 +9,7 @@
 #include "nexus/io/native/model.h"
 #include "nexus/io/native/rtc_lptim_model.h"
 #include "nexus_bindings.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 #include <inttypes.h>
 #include <stdio.h>
 
@@ -87,18 +87,18 @@ int main(void) {
     _Static_assert(NX_RTC_ID_COUNT == 2, "Exact pair has two RTC identities");
     _Static_assert(NX_LPTIM_ID_COUNT == 2,
                    "Exact pair has two tick identities");
-    const nx_rtc_port_t* a = nx_factory_rtc(NX_RTC_ID_CALENDAR_A);
-    const nx_rtc_port_t* b = nx_factory_rtc(NX_RTC_ID_CALENDAR_B);
-    const nx_lptim_port_t* x = nx_factory_lptim(NX_LPTIM_ID_COUNTER_A);
-    const nx_lptim_port_t* y = nx_factory_lptim(NX_LPTIM_ID_COUNTER_B);
+    const nx_rtc_port_t* a = nx_factory_rtc_ref(NX_RTC_REF_CALENDAR_A);
+    const nx_rtc_port_t* b = nx_factory_rtc_ref(NX_RTC_REF_CALENDAR_B);
+    const nx_lptim_port_t* x = nx_factory_lptim_ref(NX_LPTIM_REF_COUNTER_A);
+    const nx_lptim_port_t* y = nx_factory_lptim_ref(NX_LPTIM_REF_COUNTER_B);
     CHECK(a != NULL && b != NULL && x != NULL && y != NULL);
     CHECK(a != b && a->context != b->context);
     CHECK(x != y && x->context != y->context);
     CHECK(a->context != x->context && a->context != y->context);
     CHECK(b->context != x->context && b->context != y->context);
     CHECK(a->ops == b->ops && x->ops == y->ops);
-    CHECK(nx_factory_rtc(NX_RTC_ID_COUNT) == NULL);
-    CHECK(nx_factory_lptim(NX_LPTIM_ID_COUNT) == NULL);
+    CHECK(nx_factory_rtc_ref(NX_RTC_REF_COUNT) == NULL);
+    CHECK(nx_factory_lptim_ref(NX_LPTIM_REF_COUNT) == NULL);
     CHECK(readonly_mapping(a, sizeof(*a)) && readonly_mapping(b, sizeof(*b)));
     CHECK(readonly_mapping(x, sizeof(*x)) && readonly_mapping(y, sizeof(*y)));
     CHECK(readonly_mapping(a->ops, sizeof(*a->ops)));
@@ -184,8 +184,8 @@ int main(void) {
     start = nx_platform_start();
     CHECK(start.primary == NX_SUCCESS && start.cleanup == NX_SUCCESS &&
           start.remaining_effects == 0U);
-    CHECK(nx_factory_rtc(NX_RTC_ID_CALENDAR_A) == a);
-    CHECK(nx_factory_lptim(NX_LPTIM_ID_COUNTER_A) == x);
+    CHECK(nx_factory_rtc_ref(NX_RTC_REF_CALENDAR_A) == a);
+    CHECK(nx_factory_lptim_ref(NX_LPTIM_REF_COUNTER_A) == x);
     CHECK(nx_rtc_port_submit(a, &stale_alarm) == NX_ERROR_STATE);
     CHECK(nx_lptim_port_submit(x, &stale_shot) == NX_ERROR_STATE);
     CHECK(nx_rtc_port_read(a, &first) == NX_SUCCESS &&
@@ -210,8 +210,9 @@ int main(void) {
     CHECK(nx_lptim_port_service(x) == NX_SUCCESS);
     CHECK(settled(&full.base, NX_ERROR_TIMEOUT, 0));
     CHECK(nx_time_now_us() == 22U);
-    CHECK(nx_factory_rtc_capability(NX_RTC_ID_CALENDAR_A)->unit_bytes == 0U);
-    CHECK(nx_factory_lptim_capability(NX_LPTIM_ID_COUNTER_A)
+    CHECK(nx_factory_rtc_capability_ref(NX_RTC_REF_CALENDAR_A)->unit_bytes ==
+          0U);
+    CHECK(nx_factory_lptim_capability_ref(NX_LPTIM_REF_COUNTER_A)
               ->max_transfer_units == 65536U);
     CHECK(nx_platform_stop() == NX_SUCCESS);
     CHECK(nx_platform_stop() == NX_SUCCESS);

@@ -17,6 +17,7 @@ GPIO_TypeDef g_nx_stm32_gpioa_model;
 #include <gtest/gtest.h>
 
 static nx_time_us_t model_now;
+static unsigned model_time_reads;
 static bool model_clock_running;
 static volatile uint32_t* refused_register;
 static uint32_t held_bits;
@@ -37,6 +38,7 @@ static bool clock_loss_on_disable;
 static unsigned invalid_time_queries;
 
 extern "C" nx_time_us_t nx_time_now_us(void) {
+    ++model_time_reads;
     if (!g_nx_stm32_system.started ||
         g_nx_stm32_system.timer_error != NX_SUCCESS)
         ++invalid_time_queries;
@@ -67,6 +69,7 @@ class SpiFrames : public testing::Test {
         enabled.fill(0U);
         priorities.fill(0U);
         model_now = 100U;
+        model_time_reads = 0U;
         model_clock_running = true;
         std::memset(gpio_banks, 0, sizeof(gpio_banks));
         std::memset(spi_banks, 0, sizeof(spi_banks));
@@ -313,6 +316,46 @@ TEST_F(SpiFrames, RefusedReceiveClockWithdrawalCannotBecomeSuccess) {
     Irq(SPI_SR_RXNE, 0xACEDU);
     Service();
     model_now += 1000U;
+    Service();
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+}
+
+TEST_F(SpiFrames, ExhaustedDrainGraceKeepsTheControllerAndPayloadBorrowed) {
+    Initialize();
+    Prepare(tx, rx, 2U);
+    Submit();
+    ASSERT_FALSE(HasFatalFailure());
+    model_clock_running = false;
+    model_now = UINT64_MAX - 1U;
+    registers.SR = SPI_SR_TXE | SPI_SR_BSY;
+    held_reset = true;
+    ASSERT_EQ(nx_stm32_spi_frames_ops.cancel(&state, &request), NX_SUCCESS);
+    Service();
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.active, &request);
+    held_reset = false;
+    registers.SR = SPI_SR_TXE;
+    Service();
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+}
+
+TEST_F(SpiFrames, ExhaustedReceiveTailBudgetDoesNotBurnTheFallbackSpinLimit) {
+    config.wire.lines = NX_SPI_FRAMES_RECEIVE_ONLY;
+    Initialize();
+    Prepare(nullptr, rx, 2U);
+    Submit();
+    ASSERT_FALSE(HasFatalFailure());
+    model_clock_running = false;
+    model_now = UINT64_MAX - 1U;
+    held_reset = true;
+    model_time_reads = 0U;
+    Irq(SPI_SR_RXNE, 0x1919U);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.active, &request);
+    EXPECT_LE(model_time_reads, 4U);
+    held_reset = false;
     Service();
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(request.base.result, NX_ERROR_IO);

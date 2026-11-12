@@ -10,7 +10,7 @@
 #include "flash_map_backend/flash_map_backend.h"
 #include "mcuboot_config/mcuboot_config.h"
 #include "nexus_bindings.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 #include "reference_regions.h"
 
 static nx_flash_region_t primary_region;
@@ -45,7 +45,7 @@ int main(void) {
         started.remaining_effects != 0U) {
         return 1;
     }
-    const nx_flash_port_t* flash = nx_factory_flash(NX_FLASH_ID_PHYSICAL);
+    const nx_flash_port_t* flash = nx_factory_flash_ref(NX_FLASH_REF_PHYSICAL);
     const nx_flash_geometry_t* geometry = nx_flash_port_geometry(flash);
     if (geometry == NULL || REFERENCE_PRIMARY_ORIGIN < geometry->base_address ||
         REFERENCE_SECONDARY_ORIGIN < geometry->base_address) {

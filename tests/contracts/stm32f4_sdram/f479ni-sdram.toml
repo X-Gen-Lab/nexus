@@ -1,0 +1,39 @@
+# Software reference only; not a physical Board or executed image.
+schema = 2
+board_package = "f479ni-sdram-board"
+backend = "baremetal"
+clock = "custom"
+optimization = "Os"
+
+[clock_parameters]
+source = "hsi"
+input_hz = 16000000
+sysclk_source = "input"
+pll48 = false
+pll_m = 16
+pll_n = 336
+pll_p = 4
+pll_q = 7
+ahb_div = 1
+apb1_div = 1
+apb2_div = 1
+adc_div = 4
+supply_mv = 3300
+css = false
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 16384
+libc_heap_bytes = 0
+
+# Synthetic endpoint limits, not a fitted SDRAM datasheet.
+[external_bus.memory]
+binding = "control"
+mode = "sdram-controller"
+
+[memory_window.ram]
+controller = "memory"
+binding = "ram"
+mode = "cpu-window"
+parameters = { bytes = 8388608, row_bits = 12, column_bits = 8, internal_banks = 4, width_bits = 16, cas = 3, sdclk_div = 2, read_pipe = 1, initial_refreshes = 8, max_sdclk_hz = 8000000, refresh_window_us = 64000, powerup_us = 100, prepare_budget_us = 1000, stop_budget_us = 1000, timing = { mrd = { nanoseconds = 0, cycles = 2 }, xsr = { nanoseconds = 70, cycles = 1 }, ras = { nanoseconds = 42, cycles = 1 }, rc = { nanoseconds = 63, cycles = 1 }, wr = { nanoseconds = 0, cycles = 2 }, rp = { nanoseconds = 18, cycles = 1 }, rcd = { nanoseconds = 18, cycles = 1 } } }

@@ -42,6 +42,8 @@ def _usb(item, result):
               f"static const nx_stm32_usb_endpoint_config_t s_nx_usb_plan_{name}[] = {{"]
     if not managed:
         lines.insert(-1, f"static {receipt_type} s_nx_usb_pin_leases_{name};")
+    if options.remote_wakeup:
+        lines.insert(-1, f"static nx_usb_remote_runtime_t s_nx_usb_remote_{name};")
     for child in children:
         value = child.options
         transfer = {"control": "NX_USB_PROFILE_CONTROL", "bulk": "NX_USB_PROFILE_BULK",
@@ -57,6 +59,9 @@ def _usb(item, result):
               f"    .poll_limit = {options.poll_limit}u, .drain_timeout_us = {options.drain_timeout_us}u,",
               f"    .clock_timeout_us = {options.clock_timeout_us}u,",
               f"    .rx_fifo_words = {options.rx_fifo_words}u, .priority = {options.irq.priority}u" + ("," if hs else "")]
+    if options.remote_wakeup:
+        start = lines.index(f"static const {config_type} s_nx_usb_config_{name} = {{")
+        lines.insert(start + 1, f"    .remote = &s_nx_usb_remote_{name},")
     if options.engine == "dma":
         regions = [region for region in result.physical_part.memory
                    if region.get("dma") is True]
@@ -65,7 +70,11 @@ def _usb(item, result):
         declarations = []
         for child in children:
             identity = child.id.replace("-", "_")
-            extent = max(24, (child.options.max_packet + 3) // 4 * 4)
+            extent = (child.options.max_packet + 3) // 4 * 4
+            if child.options.number == 0 and child.options.direction == "out":
+                extent += 24  # One OUT packet may precede three DMA SETUP slots.
+            else:
+                extent = max(24, extent)
             declarations += [f"_Alignas(4) static uint8_t s_nx_usb_dma_{identity}[{extent}];"]
         declarations += [f"static const nx_usb_dma_storage_t s_nx_usb_dma_storage_{name}[] = {{"]
         for child in children:

@@ -6,7 +6,7 @@
 #ifndef NEXUS_STM32F407_ETH_H
 #define NEXUS_STM32F407_ETH_H
 #include "eth_mac.h"
-#include "stm32f407xx.h"
+#include "stm32f4xx.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

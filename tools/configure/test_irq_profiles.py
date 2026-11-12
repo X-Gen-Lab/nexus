@@ -1,5 +1,6 @@
 """CPU facts and interrupt policy remain one validated assembly decision."""
-from tools.configure.tests.device_fixture import load_soc_facts
+from tools.configure.tests.device_fixture import (load_soc_facts,
+                                                   validate_soc_facts)
 from tools.configure.tests.native_fixture import native_fixture, canonical_assembly
 from tools.configure.providers.descriptor import source_directory
 from dataclasses import FrozenInstanceError
@@ -23,7 +24,7 @@ class InterruptProfileTests(unittest.TestCase):
                     soc["cpu"]["dwt_cyccnt"] = value
                     with self.assertRaisesRegex(gate.ConfigurationError,
                                                 "DWT cycle counter"):
-                        gate.validate_soc(soc, part, gate.maintained(
+                        validate_soc_facts(soc, part, gate.maintained(
                             family, test_support=family == "native"))
 
     def test_irq_width_cannot_contradict_verified_soc_facts(self):
@@ -33,41 +34,52 @@ class InterruptProfileTests(unittest.TestCase):
                 soc["irq"]["priority_bits"] = value
                 with self.assertRaisesRegex(gate.ConfigurationError,
                                             "IRQ priority bits"):
-                    gate.validate_soc(soc, "STM32F407ZGT6")
+                    validate_soc_facts(soc, "STM32F407ZGT6")
 
     def test_unknown_interrupt_fact_is_rejected(self):
         soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
         soc["irq"] = {"priority_bits": 4, "syscall_priority": 1}
         with self.assertRaisesRegex(gate.ConfigurationError, "unknown"):
-            gate.validate_soc(soc, "STM32F407ZGT6")
+            validate_soc_facts(soc, "STM32F407ZGT6")
+
+    def selected_cpu_profile(self, bits):
+        from tools.configure import cpu
+        provider = maintained("stm32f4")
+        facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
+        profile = cpu.resolve({**provider.CPU_FEATURES, **provider.CPU_ABI},
+                              {**facts["irq"], "priority_bits": bits},
+                              "freertos", enum_abi=provider.ENUM_ABI)
+        return profile
 
     def test_kernel_profile_derives_the_irq_range_and_ceiling(self):
         provider = maintained("stm32f4")
         for bits in (3, 4, 8):
             with self.subTest(bits=bits):
-                irq = selection.resolve_interrupts(provider.CPU_ABI,
-                                                 {"priority_bits": bits},
-                                                 "freertos", provider)
+                profile = self.selected_cpu_profile(bits)
+                irq = selection.validate_interrupt_profile(profile, provider)
                 self.assertEqual(irq.maximum_priority, (1 << bits) - 1)
                 self.assertEqual(irq.syscall_priority, 10 if bits == 8 else 5)
                 self.assertEqual(irq.kernel_port, "GCC/ARM_CM4F")
         with self.assertRaisesRegex(gate.ConfigurationError,
                                     "IRQ priority bits"):
-            selection.resolve_interrupts(provider.CPU_ABI,
-                                      {"priority_bits": 2}, "freertos", provider)
+            self.selected_cpu_profile(2)
 
     def test_kernel_profile_cannot_inherit_another_cpu_or_unknown_port(self):
+        from tools.configure import cpu
         provider = maintained("stm32f4")
+        m0 = dict(arch="cortex-m0", fpu="none", float_abi="soft",
+                  dwt_cyccnt=False, mpu_version=0, mpu_regions=0,
+                  icache_line_bytes=0, dcache_line_bytes=0,
+                  security="single", sau=False, mve="none", dsp=False)
+        profile = cpu.resolve(m0, dict(priority_bits=2, external_count=32),
+                              "freertos")
         with self.assertRaisesRegex(gate.ConfigurationError, "kernel CPU ABI"):
-            selection.resolve_interrupts({"arch": "cortex-m0", "fpu": "none",
-                                       "float_abi": "soft"},
-                                      {"priority_bits": 4}, "freertos", provider)
+            selection.validate_interrupt_profile(profile, provider)
+        profile = self.selected_cpu_profile(4)
         with patch.object(provider, "FREERTOS_PORT", "GCC/ARM_CM0"):
             with self.assertRaisesRegex(gate.ConfigurationError,
                                         "Unmaintained FreeRTOS port"):
-                selection.resolve_interrupts(provider.CPU_ABI,
-                                          {"priority_bits": 4},
-                                          "freertos", provider)
+                selection.validate_interrupt_profile(profile, provider)
 
     def test_irq_policy_is_typed_immutable_and_exported_for_each_backend(self):
         for stem, backend, dwt in (('native', 'native', False), ('qiming', 'baremetal', True), ('qiming', 'freertos', True)):
@@ -129,6 +141,37 @@ class InterruptProfileTests(unittest.TestCase):
                                                     "IRQ priority|syscall ceiling"):
                             gate.configure(source, output, test_support=native_fixture(source))
                         self.assertFalse(output.exists())
+
+
+class PreflightIrqGeometryTests(unittest.TestCase):
+    """Serializer fragments do not grant new hardware modes or exact parts."""
+
+    def emit(self, count, vector):
+        from types import SimpleNamespace
+        from tools.configure import resource_graph
+        from tools.configure.stm32f4 import preflight
+        claim = resource_graph.ResourceClaimIR(
+            "irq:" + vector, "serializer-owner", "fixture",
+            "serializer-input", "exclusive", (), None)
+        selected = SimpleNamespace(
+            controllers=(SimpleNamespace(id="serializer-owner", kind="crc",
+                                         controller="CRC"),), can_domain=None,
+            resource_plan=resource_graph.ResourcePlanIR((claim,)),
+            cpu_profile=SimpleNamespace(irq=SimpleNamespace(external_count=count)))
+        return "\n".join(preflight.admission_declarations(selected, "NULL", 0))
+
+    def test_existing_82_slot_profile_keeps_three_mask_words(self):
+        source = self.emit(82, "FPU")
+        for bank in range(3):
+            self.assertIn(f"NX_STM32_PLATFORM_IRQ_MASK(FPU_IRQn, {bank}u)", source)
+        self.assertNotIn("FPU_IRQn, 3u", source)
+
+    def test_97_slot_profile_keeps_the_fourth_bank_vector(self):
+        source = self.emit(97, "FMPI2C1_ER")
+        for bank in range(4):
+            self.assertIn(
+                f"NX_STM32_PLATFORM_IRQ_MASK(FMPI2C1_ER_IRQn, {bank}u)", source)
+        self.assertNotIn("FMPI2C1_ER_IRQn, 4u", source)
 
 
 if __name__ == "__main__":

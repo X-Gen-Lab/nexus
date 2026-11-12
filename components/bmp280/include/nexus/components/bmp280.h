@@ -98,8 +98,12 @@ nx_result_t nx_bmp280_init(nx_bmp280_t* device,
  * \brief           Start one forced temperature/pressure conversion
  * \param[in,out]   device: Initialized non-measuring instance
  * \param[in]       deadline: Absolute deadline covering conversion and reads
- * \return          SUCCESS, BUSY, TIMEOUT or transport error
+ * \return          SUCCESS, BUSY, TIMEOUT, EXHAUSTED or transport error
  * \note            Task-only serialized driver owner; oversampling x1/x1.
+ *                  Ready time is finite even with an explicit infinite caller
+ *                  deadline. EXHAUSTED retains no software conversion or MCU
+ *                  buffer; a completed configuration write can still have
+ *                  started the sensor. Retry uses its actual idle status.
  */
 nx_result_t nx_bmp280_begin(nx_bmp280_t* device, nx_time_us_t deadline);
 /**

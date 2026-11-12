@@ -126,7 +126,7 @@ class F407RtcConfigurationTests(unittest.TestCase):
     def test_oscillator_claims_conflict_but_never_get_gpio_snapshots(self):
         result = self.resolve()
         claims = {item.key for item in result.claims if item.owner == "calendar"}
-        self.assertEqual({"controller:RTC", "pin:PC14", "pin:PC15",
+        self.assertEqual({"controller:RTC", "pin:PC13", "pin:PC14", "pin:PC15",
                           "clock:LSE", "clock:RTC", "domain:backup",
                           "alarm:RTC_A"}, claims)
         self.assertEqual((), result.controllers[0].pins)
@@ -237,6 +237,46 @@ class F407RtcConfigurationTests(unittest.TestCase):
         with self.assertRaisesRegex(gate.ConfigurationError, "initial"):
             gate.configure(path, output, test_support=native_fixture(path))
         self.assertFalse(output.exists())
+
+
+    def test_default_crystal_keeps_explicit_immutable_source_choice(self):
+        result = self.resolve()
+        self.assertFalse(result.controllers[0].options.lse_bypass)
+
+    def test_bypass_requires_matching_external_clock_fact(self):
+        def bypass(board):
+            board["clocks"]["lse_bypass"] = True
+            rtc = next(item for item in board["bindings"]
+                       if item["controller"] == "RTC")
+            rtc["route"] = "rtc-lse-bypass-pc14"
+        text = self.private_board(bypass)
+        result = self.resolve(text + 'lse_bypass = true\n')
+        self.assertTrue(result.controllers[0].options.lse_bypass)
+        self.assertIn(".lse_bypass = true", bindings.emit(result)[1])
+        self.assertNotIn("pin:PC13", [item.key for item in result.resource_plan.claims
+                                    if item.owner == "calendar"])
+
+    def test_bypass_cannot_reuse_a_crystal_pad_route(self):
+        text = self.private_board(
+            lambda board: board["clocks"].update(lse_bypass=True))
+        with self.assertRaisesRegex(gate.ConfigurationError, "RTC.*route"):
+            self.resolve(text + 'lse_bypass = true\n')
+
+    def test_bypass_cannot_relabel_a_crystal_board(self):
+        with self.assertRaisesRegex(gate.ConfigurationError, "[Bb]ypass|source"):
+            self.resolve(self.text() + 'lse_bypass = true\n')
+
+    def test_crystal_reserves_pc13_against_gpio_transitions(self):
+        def pin(board):
+            board["bindings"].append({
+                "id": "pc13", "controller": "GPIOC", "route": "gpio-pc13",
+                "mask": 1 << 13, "initial": 0,
+                "electrical": {"mode": "input", "pull": "none"}})
+        text = self.private_board(pin)
+        text += '[gpio.pad]\nbinding="pc13"\nmode="input"\n'
+        with self.assertRaisesRegex(gate.ConfigurationError,
+                                    "Resource conflict pin:PC13"):
+            self.resolve(text)
 
 
 if __name__ == "__main__":

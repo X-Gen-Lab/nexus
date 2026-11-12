@@ -55,8 +55,8 @@ nx_result_t Stop(void* context) {
 }
 const nx_usb_setup_decision_ops_t decision_ops{Reject};
 const nx_usb_endpoint_ops_t endpoint_ops{Submit, Cancel, Stall};
-const nx_usb_device_ops_t device_ops{Service, nullptr, State,
-                                     nullptr, nullptr, Stop};
+const nx_usb_device_ops_t device_ops{Service, nullptr, State,   nullptr,
+                                     nullptr, Stop,    nullptr, nullptr};
 
 class UsbAcm : public testing::Test {
   protected:
@@ -85,6 +85,7 @@ class UsbAcm : public testing::Test {
     nx_usb_acm_state_t initial{{115200U, 0U, 0U, 8U}, 0U, 0U};
     nx_usb_acm_t acm{};
     nx_usb_request_t* inner = nullptr;
+    nx_usb_request_t* status_out = nullptr;
 
     void SetUp() override {
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
@@ -112,11 +113,15 @@ class UsbAcm : public testing::Test {
             EXPECT_CALL(ports, Stop()).WillOnce([this] {
                 observed.started = false;
                 observed.closing = true;
-                if (inner != nullptr) {
-                    nx_request_state_t state = nx_request_state(&inner->base);
-                    if (state != NX_REQUEST_READY &&
-                        state != NX_REQUEST_SETTLED) {
-                        nx_request_settle(&inner->base, NX_ERROR_CANCELLED, 0U);
+                for (nx_usb_request_t* packet : {inner, status_out}) {
+                    if (packet != nullptr) {
+                        nx_request_state_t state =
+                            nx_request_state(&packet->base);
+                        if (state != NX_REQUEST_READY &&
+                            state != NX_REQUEST_SETTLED) {
+                            nx_request_settle(&packet->base, NX_ERROR_CANCELLED,
+                                              0U);
+                        }
                     }
                 }
                 return NX_SUCCESS;
@@ -195,7 +200,8 @@ TEST_F(UsbAcm, GetUsesSevenCommittedBytesAndWaitsForStatusAck) {
     EXPECT_CALL(ports, Submit(false, _)).WillOnce([this](bool, auto* packet) {
         EXPECT_EQ(packet->stage, NX_USB_STATUS);
         EXPECT_EQ(packet->length, 0U);
-        return Admit(packet);
+        status_out = packet;
+        return nx_request_admit(&packet->base, NX_REQUEST_ACTIVE);
     });
     ASSERT_EQ(nx_usb_acm_begin(&acm, 7U, 100000U), NX_SUCCESS);
     ASSERT_EQ(nx_usb_acm_approve(&acm, 7U, true), NX_ERROR_STATE);
@@ -204,7 +210,9 @@ TEST_F(UsbAcm, GetUsesSevenCommittedBytesAndWaitsForStatusAck) {
     ASSERT_EQ(nx_usb_acm_step(&acm), NX_SUCCESS);
     EXPECT_TRUE(Snapshot().active);
     observed.control_pending = false;
-    nx_request_settle(&inner->base, NX_SUCCESS, 0U);
+    ASSERT_NE(status_out, nullptr);
+    EXPECT_NE(status_out, inner);
+    nx_request_settle(&status_out->base, NX_SUCCESS, 0U);
     ASSERT_EQ(nx_usb_acm_step(&acm), NX_SUCCESS);
     EXPECT_FALSE(Snapshot().active);
     EXPECT_EQ(Snapshot().result, NX_SUCCESS);
@@ -354,6 +362,13 @@ TEST_F(UsbAcm, AcquiredStatusAckCommitsBeforeFollowingGetDespiteNewSetup) {
     EXPECT_EQ(Snapshot().committed.line_coding.rate, 9600U);
     EXPECT_EQ(Snapshot().committed_epoch, 7U);
     ASSERT_EQ(nx_usb_acm_begin(&acm, 8U, 100000U), NX_SUCCESS);
+    EXPECT_CALL(ports, Submit(false, _)).WillOnce([this](bool, auto* packet) {
+        EXPECT_EQ(packet->stage, NX_USB_STATUS);
+        EXPECT_EQ(packet->length, 0U);
+        EXPECT_EQ(packet->control_epoch, 8U);
+        status_out = packet;
+        return nx_request_admit(&packet->base, NX_REQUEST_ACTIVE);
+    });
     EXPECT_CALL(ports, Submit(true, _))
         .WillOnce([this, &bytes](bool, auto* packet) {
             EXPECT_EQ(packet->length, sizeof(bytes));

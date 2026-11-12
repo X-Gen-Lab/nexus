@@ -28,6 +28,7 @@ std::vector<uint8_t> output;
 unsigned data_reads;
 bool hold_dma;
 bool model_privileged;
+bool model_restart_on_final_read;
 
 class I2CAsyncRegisters : public testing::Test {
   protected:
@@ -98,6 +99,7 @@ class I2CAsyncRegisters : public testing::Test {
         data_reads = 0U;
         hold_dma = false;
         model_privileged = true;
+        model_restart_on_final_read = false;
         input.clear();
         output.clear();
         address_windows.clear();
@@ -145,6 +147,33 @@ class I2CAsyncRegisters : public testing::Test {
             EXPECT_EQ(munmap(mapping, 0x80000U), 0);
         }
 #endif
+    }
+    void RejectMetadataPayload(uint8_t* data) {
+        for (bool read : {false, true}) {
+            SCOPED_TRACE(read);
+            message = {data, 1U, read};
+            ASSERT_EQ(NX_SUCCESS,
+                      nx_i2c_request_prepare(&request, &message, 1U, 1000U));
+            const std::vector<uint32_t> before(registers, registers + 9U);
+            const nx_result_t result =
+                nx_i2c_endpoint_submit(&endpoint, &request);
+            EXPECT_EQ(NX_ERROR_INVALID, result);
+            EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+            EXPECT_EQ(nullptr, state.active);
+            EXPECT_EQ(before, std::vector<uint32_t>(registers, registers + 9U));
+            if (state.active != nullptr) {
+                ASSERT_EQ(NX_SUCCESS, nx_i2c_port_cancel(&bus, &request));
+                if (state.dma != nullptr) {
+                    *state.dma->rx.control = 0U;
+                    *state.dma->tx.control = 0U;
+                }
+                registers[0] &= ~((1U << 8U) | (1U << 9U));
+                registers[6] = 0U;
+                nx_i2c_port_service(&bus);
+                ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+                ASSERT_EQ(NX_SUCCESS, nx_i2c_port_recover(&bus));
+            }
+        }
     }
     void Begin() {
         ASSERT_EQ(nx_i2c_request_prepare(&request, &message, 1U, 1000U),
@@ -298,6 +327,7 @@ TEST_F(I2CAsyncRegisters, TenBitWriteThenReadRetainsOneRequestAcrossRestarts) {
 TEST_F(I2CAsyncRegisters, ExplicitWidthAndErratumRejectBeforeLoanOrHardware) {
     ASSERT_EQ(NX_SUCCESS,
               nx_i2c_request_prepare(&request, &message, 1U, 1000U));
+    registers[7] = 210U;
     const std::vector<uint32_t> before(registers, registers + 9U);
     const uint8_t widths[] = {0U, 8U, 9U};
     for (uint8_t bits : widths) {
@@ -308,6 +338,41 @@ TEST_F(I2CAsyncRegisters, ExplicitWidthAndErratumRejectBeforeLoanOrHardware) {
     }
     endpoint_state.address_bits = 10U;
     endpoint_state.address = 0x2ABU;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_i2c_endpoint_submit(&endpoint, &request));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+    EXPECT_EQ(nullptr, state.active);
+    EXPECT_EQ(before, std::vector<uint32_t>(registers, registers + 9U));
+}
+
+TEST_F(I2CAsyncRegisters, StandardTenBitReadUsesErrataSafeNominalTiming) {
+    endpoint_state.address = 0x2ABU;
+    endpoint_state.address_bits = 10U;
+    EXPECT_EQ(239U, registers[7]);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_i2c_request_prepare(&request, &message, 1U, 1000U));
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_submit(&endpoint, &request));
+    registers[6] = 3U;
+    for (uint32_t flags : {1U, 8U, 2U, 1U, 2U}) {
+        registers[5] = flags;
+        nx_i2c_v1_irq(&state);
+    }
+    input = {0x71U};
+    registers[5] = 1U << 6U;
+    nx_i2c_v1_irq(&state);
+    ReleaseWire();
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_SUCCESS, request.base.result);
+    EXPECT_EQ(1U, request.base.transferred);
+    EXPECT_EQ(output, std::vector<uint8_t>({0xF4U, 0xABU, 0xF5U}));
+}
+
+TEST_F(I2CAsyncRegisters, UnsafeSevenBitRestartRejectsBeforeLoanOrRegisters) {
+    registers[7] = 210U;
+    nx_i2c_message_t messages[] = {{bytes, 1U, false}, {bytes + 1U, 2U, true}};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_i2c_request_prepare(&request, messages, 2U, 1000U));
+    const std::vector<uint32_t> before(registers, registers + 9U);
     EXPECT_EQ(NX_ERROR_UNSUPPORTED,
               nx_i2c_endpoint_submit(&endpoint, &request));
     EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
@@ -369,7 +434,7 @@ TEST_F(I2CAsyncRegisters, RecoveryPreservesTheAttachedWakeAndClockProfile) {
     EXPECT_EQ(NX_SUCCESS, nx_i2c_port_recover(&bus));
     EXPECT_TRUE(state.initialized);
     EXPECT_EQ(&stop_from_wake, state.wake);
-    EXPECT_EQ(210U, registers[7]);
+    EXPECT_EQ(239U, registers[7]);
     EXPECT_EQ(NX_SUCCESS, nx_i2c_port_stop(&bus));
 }
 
@@ -401,12 +466,20 @@ TEST_F(I2CAsyncRegisters, InvalidTimingRejectsBeforeAnyPeripheralStore) {
 }
 
 #if !defined(NX_I2C_TEST_STM32)
-TEST_F(I2CAsyncRegisters, EightMhzUsesErrataSafeEightyKhzProfile) {
+TEST_F(I2CAsyncRegisters, EightMhzUsesReviewedStandardAndFastClockProfiles) {
     ASSERT_EQ(nx_i2c_port_stop(&bus), NX_SUCCESS);
     state.peripheral_mhz = 8U;
-    ASSERT_EQ(Initialize(), NX_SUCCESS);
-    EXPECT_EQ(registers[7], 50U);
-    EXPECT_EQ(registers[8], 9U);
+    for (uint16_t profile : {uint16_t(0U), uint16_t(46U), uint16_t(0x8007U)}) {
+        SCOPED_TRACE(profile);
+        state.timing_ccr = profile;
+        nx_result_t result = Initialize();
+        EXPECT_EQ(result, NX_SUCCESS);
+        if (result != NX_SUCCESS)
+            continue;
+        EXPECT_EQ(profile == 0x8007U ? 0x8007U : 46U, registers[7]);
+        EXPECT_EQ(profile == 0x8007U ? 3U : 9U, registers[8]);
+        EXPECT_EQ(NX_SUCCESS, nx_i2c_port_stop(&bus));
+    }
 }
 TEST_F(I2CAsyncRegisters, FailedVectorWithdrawalRetainsLiveState) {
     state.stop_irqs = [](void*) -> nx_result_t { return NX_ERROR_IO; };
@@ -561,6 +634,20 @@ TEST_F(I2CAsyncRegisters, DrainTimeoutQuarantinesThenOnlyActualReleaseSettles) {
     EXPECT_EQ(state.active, nullptr);
 }
 
+TEST_F(I2CAsyncRegisters, ExhaustedDrainBudgetCannotCreateAnInfiniteWireLoan) {
+    Begin();
+    model_time = UINT64_MAX - 1U;
+    ASSERT_EQ(nx_i2c_port_cancel(&bus, &request), NX_SUCCESS);
+    nx_i2c_port_service(&bus);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.active, &request);
+    EXPECT_EQ(nx_i2c_port_stop(&bus), NX_ERROR_BUSY);
+    ReleaseWire();
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+    EXPECT_EQ(state.active, nullptr);
+}
+
 TEST_F(I2CAsyncRegisters, ExpiredAdmissionAndForeignIdentityHaveNoEffects) {
     ASSERT_EQ(nx_i2c_request_prepare(&request, &message, 1U, model_time),
               NX_SUCCESS);
@@ -621,6 +708,50 @@ class I2CDmaRegisters : public I2CAsyncRegisters {
         nx_i2c_v1_dma_irq(&state, read);
     }
 };
+
+TEST_F(I2CDmaRegisters, StandardSevenBitDmaRestartUsesErrataSafeNominalTiming) {
+    EXPECT_EQ(239U, registers[7]);
+    nx_i2c_message_t messages[] = {{bytes, 1U, false}, {bytes + 1U, 3U, true}};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_i2c_request_prepare(&request, messages, 2U, 1000U));
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_submit(&endpoint, &request));
+    registers[6] = 3U;
+    registers[5] = 1U;
+    nx_i2c_v1_irq(&state);
+    registers[5] = 2U;
+    nx_i2c_v1_irq(&state);
+    Complete(false);
+    registers[5] = 1U << 2U;
+    nx_i2c_v1_irq(&state);
+    EXPECT_EQ(1U, state.message);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
+    registers[5] = 1U;
+    nx_i2c_v1_irq(&state);
+    registers[5] = 2U;
+    nx_i2c_v1_irq(&state);
+    EXPECT_EQ(3U, *dma.rx.count);
+    Complete(true);
+    ReleaseWire();
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_SUCCESS, request.base.result);
+    EXPECT_EQ(4U, request.base.transferred);
+    EXPECT_EQ(output, std::vector<uint8_t>({0xA0U, 0xA1U}));
+}
+
+TEST_F(I2CDmaRegisters, UnsafeSevenBitRestartRejectsBeforeDmaOrLoan) {
+    registers[7] = 210U;
+    nx_i2c_message_t messages[] = {{bytes, 1U, false}, {bytes + 1U, 3U, true}};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_i2c_request_prepare(&request, messages, 2U, 1000U));
+    const std::vector<uint32_t> before(registers, registers + 9U);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_i2c_endpoint_submit(&endpoint, &request));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+    EXPECT_EQ(nullptr, state.active);
+    EXPECT_EQ(0U, *dma.rx.control);
+    EXPECT_EQ(0U, *dma.tx.control);
+    EXPECT_EQ(before, std::vector<uint32_t>(registers, registers + 9U));
+}
 
 TEST_F(I2CDmaRegisters, TenBitReadDoesNotEnableDmaAtTransmitterAddress) {
     for (size_t length : {1U, 2U, 3U, 4U}) {
@@ -775,6 +906,7 @@ TEST_F(I2CDmaRegisters, AllDomainsValidateBeforeAdmissionOrMmio) {
 }
 
 TEST_F(I2CAsyncRegisters, RepeatedStartKeepsOneLoanAndResetsReceiveWindow) {
+    EXPECT_EQ(239U, registers[7]);
     bytes[0] = 0x10U;
     nx_i2c_message_t sequence[2] = {{bytes, 1U, false}, {bytes + 1U, 2U, true}};
     ASSERT_EQ(nx_i2c_request_prepare(&request, sequence, 2U, 1000U),
@@ -921,6 +1053,84 @@ TEST_F(I2CDmaRegisters, ColdRouteTamperingRejectsBeforeRegistersOrPublishers) {
 }
 #endif
 
+TEST_F(I2CAsyncRegisters,
+       ReceivedTailDoesNotRequestAnAlreadyCompletedRestartAgain) {
+    nx_i2c_message_t sequence[] = {{bytes, 2U, true}, {bytes + 2U, 1U, false}};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_i2c_request_prepare(&request, sequence, 2U, 1000U));
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_submit(&endpoint, &request));
+    registers[6] = 3U;
+    registers[5] = 1U;
+    nx_i2c_v1_irq(&state);
+    registers[5] = 2U;
+    nx_i2c_v1_irq(&state);
+    input = {0x31U, 0x32U};
+    model_restart_on_final_read = true;
+    registers[5] = (1U << 6U) | (1U << 2U);
+    nx_i2c_v1_irq(&state);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
+    EXPECT_EQ(0U, registers[0] & (1U << 8U));
+    EXPECT_NE(0U, registers[5] & 1U);
+    EXPECT_EQ(1U, state.message);
+    EXPECT_EQ(2U, state.transferred);
+}
+
+TEST_F(I2CDmaRegisters, ReceivedDmaByteDoesNotRepeatItsCompletedRestartAtTc) {
+    nx_i2c_message_t sequence[] = {{bytes, 1U, true}, {bytes + 1U, 1U, false}};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_i2c_request_prepare(&request, sequence, 2U, 1000U));
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_submit(&endpoint, &request));
+    registers[6] = 3U;
+    registers[5] = 1U;
+    nx_i2c_v1_irq(&state);
+    registers[5] = 2U;
+    nx_i2c_v1_irq(&state);
+    ASSERT_NE(0U, registers[0] & (1U << 8U));
+    /* DMA has consumed the final byte and the requested Sr has completed.
+     * The DMA publisher is simply serviced later than that hardware event. */
+    registers[0] &= ~(1U << 8U);
+    registers[5] = 1U;
+    Complete(true);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
+    EXPECT_EQ(0U, registers[0] & (1U << 8U));
+    EXPECT_NE(0U, registers[5] & 1U);
+    EXPECT_EQ(1U, state.message);
+    EXPECT_EQ(1U, state.transferred);
+}
+
+TEST_F(I2CAsyncRegisters,
+       PayloadCannotOverwriteOrBorrowControllerAndEndpointMetadata) {
+    RejectMetadataPayload(reinterpret_cast<uint8_t*>(&state.dma));
+    RejectMetadataPayload(reinterpret_cast<uint8_t*>(&endpoint_state.address));
+}
+
+TEST_F(I2CAsyncRegisters, PayloadCannotUsePhysicalControllerOrLineRegisters) {
+    RejectMetadataPayload(reinterpret_cast<uint8_t*>(registers));
+    RejectMetadataPayload(
+        reinterpret_cast<uint8_t*>(const_cast<uint32_t*>(state.line_inputs)));
+}
+
+TEST_F(I2CDmaRegisters,
+       PayloadCannotUseRetainedDmaFactsDomainsOrPhysicalMetadata) {
+    auto reject = [&](uint8_t* data, size_t extent) {
+        region.begin = reinterpret_cast<uintptr_t>(data);
+        region.size = extent;
+        RejectMetadataPayload(data);
+    };
+    reject(reinterpret_cast<uint8_t*>(&dma), sizeof(dma));
+    reject(reinterpret_cast<uint8_t*>(&region), sizeof(region));
+    const nx_i2c_v1_dma_engine_t* selected[] = {&dma.rx, &dma.tx};
+    for (const auto* engine : selected) {
+        const volatile uint32_t* metadata[] = {
+            engine->control, engine->count, engine->peripheral, engine->memory,
+            engine->fifo,    engine->flags, engine->clear};
+        for (const auto* field : metadata) {
+            reject(reinterpret_cast<uint8_t*>(const_cast<uint32_t*>(field)),
+                   sizeof(*field));
+        }
+    }
+}
+
 } /* namespace */
 
 extern "C" nx_time_us_t nx_time_now_us(void) {
@@ -940,6 +1150,14 @@ extern "C" uint8_t nx_i2c_v1_model_read(void* raw) {
     input.pop_front();
     if (input.empty()) {
         state->registers[5] &= ~((1U << 6U) | (1U << 2U));
+        if (model_restart_on_final_read &&
+            (state->registers[0] & (1U << 8U)) != 0U) {
+            /* The real peripheral can finish the already requested Sr before
+             * software advances from the last received DATA to its next slot.
+             */
+            state->registers[0] &= ~(1U << 8U);
+            state->registers[5] |= 1U;
+        }
     }
     return value;
 }

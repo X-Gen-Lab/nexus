@@ -462,6 +462,55 @@ const nx_probe_ops_t nx_probe_ops = {start, &child_operations, stop};
 
 
 class ProviderRetentionTests(unittest.TestCase):
+    def test_readonly_secondary_face_is_included_in_the_linked_proof(self):
+        elf = image()
+        struct.pack_into("<5I", elf.data, 64,
+                         0x08002081, 0x08002091, 0, 0, 0)
+        struct.pack_into("<2I", elf.data, 96, 0x08001040, 0x20000040)
+        elf.defined_symbols.extend([
+            {"name": "nx_stm32_fsmc_nor_flash_ops", "value": 0x08001040,
+             "size": 20, "section": 0, "type": 1, "binding": 1},
+            {"name": "s_nx_flash_readonly_storage", "value": 0x08001060,
+             "size": 8, "section": 0, "type": 1, "binding": 0},
+            {"name": "s_nx_nor", "value": 0x20000040,
+             "size": 32, "section": 2, "type": 1, "binding": 0},
+            {"name": "geometry", "value": 0x08002081, "size": 16,
+             "section": 1, "type": 2, "binding": 0, "file": "fsmc_nor.c"},
+            {"name": "read_data", "value": 0x08002091, "size": 16,
+             "section": 1, "type": 2, "binding": 0, "file": "fsmc_nor.c"},
+        ])
+        bindings = BINDINGS + """
+static const nx_flash_port_t s_nx_flash_readonly_storage = {
+    &nx_stm32_fsmc_nor_flash_ops, &s_nx_nor
+};
+"""
+        report = inspect_provider_retention(elf, bindings)
+        self.assertEqual(report["face_count"], 3)
+        self.assertEqual(report["operations_table_count"], 3)
+        self.assertEqual(report["method_count"], 5)
+        self.assertIn("s_nx_flash_readonly_storage",
+                      {face["name"] for face in report["faces"]})
+
+    def test_empty_selection_rejects_a_readonly_face_declaration(self):
+        from scripts.ci.provider_assemblies import empty_retention
+        elf = SimpleNamespace(defined_symbols=[])
+        resolved = {"controllers": [], "devices": []}
+        bindings = """
+static const nx_flash_port_t s_nx_flash_readonly_storage = {
+    &nx_stm32_fsmc_nor_flash_ops, &s_nx_nor
+};
+"""
+        with self.assertRaisesRegex(EvidenceError, "selected provider"):
+            empty_retention(elf, bindings, resolved)
+
+    def test_empty_selection_rejects_an_unselected_readonly_face_symbol(self):
+        from scripts.ci.provider_assemblies import empty_retention
+        elf = SimpleNamespace(defined_symbols=[
+            {"name": "s_nx_flash_readonly_storage"}])
+        resolved = {"controllers": [], "devices": []}
+        with self.assertRaisesRegex(EvidenceError, "survived GC"):
+            empty_retention(elf, "", resolved)
+
     def test_shared_can_provider_uses_actual_source_and_public_face(self):
         faces, layouts, providers, _ = source_contracts()
         self.assertEqual(faces.get("nx_can_port_t"), "nx_can_ops_t")
@@ -680,36 +729,44 @@ class ProviderRetentionTests(unittest.TestCase):
             inspect_provider_retention(image(), "")
 
 
-def audio_image():
-    """Standard factory audio uses the ordinary five-method pointer audit."""
+def audio_image(continuous=False):
+    """The exact seven-slot ABI keeps finite and blocks methods distinct."""
     elf = image()
+    operations = ("nx_stm32_audio_blocks_ops" if continuous else
+                  "nx_stm32_audio_ops")
+    source = "audio_blocks.c" if continuous else "audio.c"
+    methods = ((None, "service", None, "stop", "rate", "start", "layout")
+               if continuous else
+               ("submit", "service", "cancel", "stop", "rate", None, "layout"))
     elf.defined_symbols = [
         {"name": name, "value": value, "size": size, "section": section,
          "type": 1, "binding": int(name.endswith("_ops"))}
         for name, value, size, section in (
             ("s_nx_face_sound", 0x08001000, 8, 0),
-            ("nx_stm32_audio_ops", 0x08001010, 20, 0),
+            (operations, 0x08001010, 28, 0),
             ("s_nx_port_sound", 0x20000000, 128, 2))]
     elf.defined_symbols.extend(
         {"name": name, "value": 0x08002001 + index * 16, "size": 16,
-         "section": 1, "type": 2, "binding": 0, "file": "audio.c"}
-        for index, name in enumerate(("submit", "service", "cancel", "stop",
-                                      "rate")))
-    struct.pack_into("<9I", elf.data, 0, 0x08001010, 0x20000000, 0, 0,
-                     0x08002001, 0x08002011, 0x08002021, 0x08002031,
-                     0x08002041)
+         "section": 1, "type": 2, "binding": 0, "file": source}
+        for index, name in enumerate(methods) if name is not None)
+    pointers = [0x08002001 + index * 16 if name is not None else 0
+                for index, name in enumerate(methods)]
+    struct.pack_into("<11I", elf.data, 0, 0x08001010, 0x20000000, 0, 0,
+                     *pointers)
     bindings = "static const nx_audio_port_t s_nx_face_sound = {" + (
-        "&nx_stm32_audio_ops, &s_nx_port_sound};")
+        "&" + operations + ", &s_nx_port_sound};")
     return elf, bindings
 
 
 class AudioFactoryRetentionTests(unittest.TestCase):
-    def test_audio_uses_generated_context_and_all_five_public_methods(self):
+    def test_audio_uses_generated_context_and_all_six_public_methods(self):
         elf, bindings = audio_image()
         report = inspect_provider_retention(elf, bindings)
-        self.assertEqual((report["face_count"], report["method_count"]), (1, 5))
+        self.assertEqual((report["face_count"], report["method_count"]), (1, 6))
         self.assertEqual(report["tables"][0]["slots"],
-                         ["submit", "service", "cancel", "stop", "rate"])
+                         ["submit", "service", "cancel", "stop", "rate",
+                          "start_blocks", "layout"])
+        self.assertEqual(report["tables"][0]["null_methods"], 1)
         self.assertNotIn("origin", report["faces"][0])
 
     def test_audio_cannot_substitute_another_owner_or_private_method(self):
@@ -723,6 +780,26 @@ class AudioFactoryRetentionTests(unittest.TestCase):
         elf.defined_symbols[3]["file"] = "another_provider.c"
         with self.assertRaises(EvidenceError):
             inspect_provider_retention(elf, bindings)
+
+    def test_continuous_audio_requires_its_five_selected_methods(self):
+        elf, bindings = audio_image(continuous=True)
+        report = inspect_provider_retention(elf, bindings)
+        self.assertEqual(report["method_count"], 5)
+        self.assertEqual(report["tables"][0]["null_methods"], 2)
+        for slot in (1, 3, 4, 5, 6):
+            with self.subTest(slot=slot):
+                elf, bindings = audio_image(continuous=True)
+                struct.pack_into("<I", elf.data, 16 + 4 * slot, 0)
+                with self.assertRaises(EvidenceError):
+                    inspect_provider_retention(elf, bindings)
+
+    def test_unselected_audio_methods_cannot_secretly_become_callable(self):
+        for continuous, slot in ((False, 5), (True, 0), (True, 2)):
+            with self.subTest(continuous=continuous, slot=slot):
+                elf, bindings = audio_image(continuous=continuous)
+                struct.pack_into("<I", elf.data, 16 + 4 * slot, 0x08002011)
+                with self.assertRaises(EvidenceError):
+                    inspect_provider_retention(elf, bindings)
 
     def test_retired_manual_role_never_authorizes_an_empty_generated_graph(self):
         elf, _ = audio_image()

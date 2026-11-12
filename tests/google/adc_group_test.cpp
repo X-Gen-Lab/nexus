@@ -17,7 +17,7 @@ TEST(ADCGroupAPI, PreparationCopiesOnlyUnborrowedRequestMetadata) {
     nx_request_initialize(&request.base);
     ASSERT_EQ(nx_adc_group_prepare(&request, data, sizeof(data), 3U, 1000U),
               NX_SUCCESS);
-    EXPECT_EQ(request.frames, data);
+    EXPECT_EQ(request.output.frames, data);
     EXPECT_EQ(request.bytes, sizeof(data));
     EXPECT_EQ(request.frame_count, 3U);
     EXPECT_EQ(request.base.deadline, 1000U);
@@ -56,7 +56,7 @@ TEST(ADCGroupAPI, WrappingPayloadCannotBeAdmittedByPreparation) {
     void* data = reinterpret_cast<void*>(UINTPTR_MAX - 1U);
     EXPECT_EQ(nx_adc_group_prepare(&request, data, 4U, 1U, 1000U),
               NX_ERROR_INVALID);
-    EXPECT_EQ(request.frames, nullptr);
+    EXPECT_EQ(request.output.frames, nullptr);
 }
 TEST(ADCGroupAPI, RequestCannotBeItsOwnWritablePayload) {
     nx_adc_group_request_t request{};
@@ -64,7 +64,7 @@ TEST(ADCGroupAPI, RequestCannotBeItsOwnWritablePayload) {
     EXPECT_EQ(
         nx_adc_group_prepare(&request, &request, sizeof(request), 1U, 1000U),
         NX_ERROR_INVALID);
-    EXPECT_EQ(request.frames, nullptr);
+    EXPECT_EQ(request.output.frames, nullptr);
 }
 TEST(ADCGroupAPI, MissingSelectedMethodsHaveExplicitUnsupportedResult) {
     const nx_adc_group_ops_t operations{};
@@ -121,7 +121,7 @@ TEST(ADCGroupAPI, PayloadCannotOverwriteTheImmutableFaceBeforeDispatch) {
     const nx_adc_group_port_t port{&methods, &context};
     nx_adc_group_request_t request{};
     nx_request_initialize(&request.base);
-    request.frames = const_cast<nx_adc_group_port_t*>(&port);
+    request.output.frames = const_cast<nx_adc_group_port_t*>(&port);
     request.bytes = sizeof(port);
     request.frame_count = 1U;
     request.base.deadline = 1000U;

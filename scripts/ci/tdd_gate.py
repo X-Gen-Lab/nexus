@@ -173,7 +173,9 @@ def main(arguments=None):
                  "--target", "nexus_google_contracts"], env,
                 output / "build.txt")
         tool_results = []
-        for suite in suites:
+        # Keep the same complete selection, running cheap workflow/CI checks
+        # before configuration and SDK consumers so failures stop work early.
+        for suite in reversed(suites):
             tool_report = output / f"tools-{suite}.json"
             tool_report.unlink(missing_ok=True)
             execute([python, "-B", "tools/testing/run_tool_tests.py", "--suite",

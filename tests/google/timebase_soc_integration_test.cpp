@@ -34,6 +34,8 @@ SCB_Type g_timebase_model_scb{};
 namespace {
 bool inject_compare;
 unsigned ticks;
+unsigned ticks_at_barrier;
+uint64_t overflow_at_barrier;
 const nx_freertos_lowpower_port_t* face;
 
 /** \brief Clock SDK/CPU boundaries are modeled, not the timer or binding. */
@@ -54,6 +56,8 @@ class TimebaseIntegration : public testing::Test {
         SCB->ICSR = 0U;
         inject_compare = false;
         ticks = 0U;
+        ticks_at_barrier = UINT32_MAX;
+        overflow_at_barrier = 0U;
         face = nullptr;
         g_nx_stm32_system = {};
         g_nx_stm32_system.rcc = RCC;
@@ -118,6 +122,19 @@ TEST_F(TimebaseIntegration, VectorDispatchesCompareAfterMonotonicOverflow) {
     EXPECT_FALSE(state->armed);
     EXPECT_TRUE(state->paused);
 }
+
+TEST_F(TimebaseIntegration, VectorExitCompletesTheFinalOverflowStore) {
+    TIMER_FLAGS = TIM_SR_UIF;
+    TIMER_HANDLER();
+    EXPECT_EQ(UINT64_C(1) << 32U, g_nx_stm32_system.overflow_us);
+    EXPECT_EQ(g_nx_stm32_system.overflow_us, overflow_at_barrier);
+}
+
+TEST_F(TimebaseIntegration, TickExitCompletesTheRealKernelTickDispatch) {
+    SysTick_Handler();
+    EXPECT_EQ(1U, ticks);
+    EXPECT_EQ(ticks, ticks_at_barrier);
+}
 TEST_F(TimebaseIntegration, FreshCompareBetweenFlagReadAndAckStillWakes) {
     PauseAndArm();
     TIMER_FLAGS = 1U;
@@ -177,6 +194,8 @@ extern "C" nx_arch_irq_masks_t nx_arch_irq_masks(void) {
 extern "C" void nx_arch_isb(void) {
 }
 extern "C" void nx_arch_dsb(void) {
+    ticks_at_barrier = ticks;
+    overflow_at_barrier = g_nx_stm32_system.overflow_us;
     if ((SysTick->CTRL & 1U) != 0U && SysTick->VAL == 0U)
         SysTick->VAL = SysTick->LOAD;
 }

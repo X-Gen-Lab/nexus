@@ -210,23 +210,27 @@ def collect(root=ROOT):
         if soc["id"] == "native":
             continue
         integration = descriptor.maintained(soc["id"])
+        provider = configure.maintained(soc["id"])
         catalog = (configure.load(path.parent / integration.device_catalog)
                    if integration.device_catalog is not None else None)
+        selected_parts = {}
+        normalized_parts = {}
         for part in soc["variants"]:
-            selected = (configure.catalog_soc_facts(soc, part, catalog)[0]
-                        if catalog is not None else soc)
-            configure.validate_soc(selected, part)
-        facts[soc["id"]] = soc
+            selected = configure.resolve_device_facts(
+                soc, part, provider, catalog=catalog)
+            normalized_parts[part] = selected
+            selected_parts[part] = selected.device
+        facts[soc["id"]] = selected_parts
         route_doc = configure.load(path.parent / "routes.json")
         configure.obj(route_doc, {"schema_version", "routes"}, (), "routes")
         configure.integer(route_doc["schema_version"], 1, 1, "routes schema")
         # Use the resolver's complete reviewed physical/interface validation.
         # Union exact-part results without inventing a documentation mode gate.
         route_index = {}
-        provider = configure.maintained(soc["id"])
-        for part in soc["variants"]:
+        for part, selected in normalized_parts.items():
             route_index.update(configure.resolve_routes(
-                route_doc, soc, part, provider))
+                route_doc, selected.soc, part, provider,
+                controller_profiles=selected.controller_profiles))
         routes[soc["id"]] = route_index
         for source in sorted((path.parent / "drivers").rglob("*.c")):
             for symbol in source_ops(source, root):
@@ -248,7 +252,7 @@ def collect(root=ROOT):
         family = board["soc_family"]
         if family == "native":
             continue
-        if family not in facts or board["soc"] not in facts[family]["variants"]:
+        if family not in facts or board["soc"] not in facts[family]:
             raise ValueError(f"Board has no maintained part: {board_path}")
         for binding in board["bindings"]:
             route = routes[family].get(binding["route"])
@@ -261,7 +265,7 @@ def collect(root=ROOT):
     selected = defaultdict(lambda: {"fixtures": set(), "exports": set()})
     assembly_paths = (root / "tools/configure/assemblies").glob("*.toml")
     contract_paths = []
-    for path in (root / "tests/contracts").glob("*/*.toml"):
+    for path in (root / "tests/contracts").rglob("*.toml"):
         # Authored inputs carry schema even outside the assembly directories.
         # Existing assembly directories retain strict validation if it is absent.
         if (path.parent.name.endswith("_assembly") or
@@ -291,23 +295,28 @@ def collect(root=ROOT):
             selected[key]["fixtures"].add(fixture.relative_to(root).as_posix())
             selected[key]["exports"].add(exports[matches[0]])
     rows = []
-    for family, soc in sorted(facts.items()):
-        for controller, facts_item in sorted(soc["controllers"].items()):
-            interfaces = [(facts_item["kind"], facts_item["modes"])]
-            interfaces += sorted(facts_item.get("interfaces", {}).items())
-            for kind, modes in interfaces:
-                for mode in sorted(modes):
-                    key = family, controller, kind, mode
-                    reviewed = [route["id"] for route in routes[family].values()
-                                if route["controller"] == controller and
-                                route["kind"] == kind and mode in route["modes"]]
-                    row = {"family": family, "controller": controller,
-                           "kind": kind, "mode": mode,
-                           "routes": sorted(reviewed),
-                           "boards": sorted(declared[key]),
-                           "fixtures": sorted(selected[key]["fixtures"]),
-                           "exports": sorted(selected[key]["exports"])}
-                    rows.append(row)
+    for family, parts in sorted(facts.items()):
+        personalities = set()
+        for view in parts.values():
+            for controller, hardware in view.controllers.items():
+                policy = view.modes[controller]
+                interfaces = [(hardware.kind, policy.modes)]
+                interfaces += list(policy.interfaces.items())
+                personalities.update((controller, kind, mode)
+                                     for kind, modes in interfaces
+                                     for mode in modes)
+        for controller, kind, mode in sorted(personalities):
+            key = family, controller, kind, mode
+            reviewed = [route["id"] for route in routes[family].values()
+                        if route["controller"] == controller and
+                        route["kind"] == kind and mode in route["modes"]]
+            row = {"family": family, "controller": controller,
+                   "kind": kind, "mode": mode,
+                   "routes": sorted(reviewed),
+                   "boards": sorted(declared[key]),
+                   "fixtures": sorted(selected[key]["fixtures"]),
+                   "exports": sorted(selected[key]["exports"])}
+            rows.append(row)
     known = {(row["family"], row["controller"], row["kind"], row["mode"])
              for row in rows}
     if selected.keys() - known:

@@ -65,8 +65,8 @@ For a development checkout, select `--source /absolute/path/to/nexus` instead of
 `--sdk-prefix`. The emitted configure command selects that same checkout through
 `NEXUS_SOURCE`; it does not qualify an installed SDK. The two source selectors
 are mutually exclusive. Without either selector, creation uses its current
-checkout explicitly. Select `qiming`, `sky` or `liangshan` for a maintained MCU
-template. The emitted MCU configure command includes the selected platform's
+checkout explicitly. Select a `qiming` or `sky` template whose pinned manifest
+selects a maintained F407 part and Board. The emitted MCU configure command includes the selected platform's
 ARM toolchain file; Native selections do not receive an ARM toolchain. Use the
 locked ARM compiler. An MCU link is software evidence; board bring-up and
 electrical verification remain separate.
@@ -108,6 +108,23 @@ Review the product's `find_package()` version requirement and changed assembly
 constraints; do not automatically loosen that version requirement. Rerun the
 product's required Native tests and MCU links before accepting the upgrade. An older SDK's results do not qualify
 the new SDK, and a successful link does not qualify physical hardware.
+
+## Source interface epoch 2
+
+The current `0.2.1` development snapshot uses factory/source interface epoch `2`;
+its installed SDK manifest uses schema `2` independently. Select the exact
+reviewed commit, regenerate and rebuild all callers, faces/ops, generated code,
+providers and components together. Current interface admission rejects epoch-1
+SDKs; old objects must be rebuilt. `--development-fixture` never bypasses interface
+checks or permits mixed binaries. No existing tag is moved.
+
+Direct ADC group `request.frames` access must become `request.output.frames`.
+Prefer `nx_adc_group_prepare()` for raw requests so it sets the RAW discriminant;
+paired results use `nx_adc_group_prepare_results()`. Check `results_kind` before
+reading the union. There is no old-field shadow or inferred layout. Follow the
+[migration guide](../guides/migration.md#rebuild-for-source-interface-epoch-2) and
+[compatibility contract](../design/source-compatibility.md) before accepting a
+new SDK; a matching semantic version alone is insufficient.
 
 ## Maintainer: verify the complete SDK consumer
 
@@ -152,12 +169,33 @@ into this page. These literal inputs are the same templates exercised by the tes
 
 ## Maintainer: prepare a publishable prefix
 
-From an initialized, clean, committed checkout, choose a new owned output path:
+From a clean, committed checkout, prepare the exact dependencies for the
+[complete maintained consumer plan](../../tools/maintenance/consumer_profiles.py),
+then choose a new owned output path. This profile
+includes explicit Native support, the FreeRTOS supplier and the network, TLS,
+MQTT, MCUboot and optional ST USB suppliers. The ARM consumer images still state
+their own selected backend; a supplier in the package does not prove its scheduler
+or hardware has executed. Preparation may use the network; export and verification
+use the pinned local bytes.
 
 ```sh
-python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-source-sdk
-python cmake/package/package_source_sdk.py     --verify /tmp/nexus-source-sdk/share/nexus/src
+python tools/dev/dev.py prepare --scope sdk --backend freertos --host-support \
+    --component network --component network-loaned-rx --component tls \
+    --component mqtt --component mcuboot --component st-usb-device \
+    --component st-usb-host --allow-network
+python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-source-sdk \
+    --backend freertos --host-support --component network \
+    --component network-loaned-rx --component tls --component mqtt \
+    --component mcuboot --component st-usb-device --component st-usb-host
+python cmake/package/package_source_sdk.py \
+    --verify /tmp/nexus-source-sdk/share/nexus/src
 ```
+
+For a small bare-metal firmware package, omit those profile switches when
+exporting to a different prefix. The default intentionally has no Native models
+or optional supplier payloads. Its package-integrity check remains valid, but the
+verifier for that complete maintained plan requires the full profile above. It never
+silently skips a consumer to admit a smaller package.
 
 Move the entire prefix, including its identity and licenses, before consumption.
 The [Source SDK contract](../design/source-compatibility.md) defines

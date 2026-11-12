@@ -42,8 +42,10 @@ class ImageArtifactTests(unittest.TestCase):
         elf, config, budget = link_fixture(path)
         resolved = json.loads(config.read_text())
         resolved["soc_family"] = family
-        blocks = [16384] * 4 + [65536] + [131072] * 7
-        resolved["flash"]["erase_blocks"] = blocks
+        resolved["flash"]["erase_spans"] = [
+            {"offset": 0, "erase_bytes": 16384, "count": 4},
+            {"offset": 65536, "erase_bytes": 65536, "count": 1},
+            {"offset": 131072, "erase_bytes": 131072, "count": 7}]
         resolved["layout"] = {
             **resolved["flash"], "id": "application", "kind": "image",
             "origin": resolved["flash"]["origin"] + offset, "size": size}
@@ -164,7 +166,8 @@ class ImageArtifactTests(unittest.TestCase):
             with self.subTest(origin=origin, size=size), self.assertRaises(EvidenceError):
                 selected(changed)
         changed = deepcopy(original)
-        changed["layout"]["erase_blocks"] = [changed["flash"]["size"]]
+        changed["layout"]["erase_spans"] = [
+            {"offset": 0, "erase_bytes": changed["flash"]["size"], "count": 1}]
         with self.assertRaises(EvidenceError):
             selected(changed)
         for value in (8, 4.0, True):

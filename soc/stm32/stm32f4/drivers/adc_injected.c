@@ -60,13 +60,21 @@ static nx_result_t sample(void* context, uint16_t* samples, size_t capacity,
         LL_ADC_IsEnabled(regs) != 0U ? NX_SUCCESS : NX_ERROR_IO;
     uint16_t values[4];
     if (result == NX_SUCCESS) {
-        const nx_time_us_t stable = nx_deadline_after(
-            nx_time_now_us(), nx_stm32_adc_startup_delay_us(port));
-        while (!nx_deadline_expired(stable, nx_time_now_us()))
+        nx_time_us_t stable = 0U;
+        result = nx_deadline_finite_after(
+            nx_time_now_us(), nx_stm32_adc_startup_delay_us(port), &stable);
+        while (result == NX_SUCCESS &&
+               !nx_deadline_expired(stable, nx_time_now_us())) {
+            if (nx_deadline_expired(deadline, nx_time_now_us())) {
+                result = NX_ERROR_TIMEOUT;
+                break;
+            }
             NX_STM32_IO_POLL(5U, port);
-        if (nx_deadline_expired(deadline, nx_time_now_us())) {
+        }
+        if (result == NX_SUCCESS &&
+            nx_deadline_expired(deadline, nx_time_now_us()))
             result = NX_ERROR_TIMEOUT;
-        } else {
+        if (result == NX_SUCCESS) {
             LL_ADC_INJ_StartConversionSWStart(regs);
             for (;;) {
                 NX_STM32_IO_POLL(5U, port);

@@ -12,9 +12,19 @@ extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
 GPIO_TypeDef g_nx_stm32_gpioa_model;
 }
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <gtest/gtest.h>
+
+/** \brief This target's GPIO stores address only real SDK BSRR members. */
+extern "C" void nx_stm32_gpio_latch_model_write(volatile uint32_t* reg,
+                                                uint32_t value) {
+    auto* bank = reinterpret_cast<GPIO_TypeDef*>(
+        reinterpret_cast<uintptr_t>(reg) - offsetof(GPIO_TypeDef, BSRR));
+    *reg = value;
+    bank->ODR = (bank->ODR & ~(value >> 16U)) | (value & UINT32_C(0xFFFF));
+}
 
 class Stm32Official : public testing::Test {
   protected:

@@ -32,6 +32,9 @@ typedef struct {
  *       mean falling edge without filter or high active level with filter.
  *       sample_rate is RTCCLK/(32768 >> value), 0..7; precharge is 1<<value
  *       RTCCLK cycles, 0..3. No GPIO, pull resistor or PCB route is inferred.
+ *       A provider may reject silicon-unsafe edges. A failed post-enable
+ *       input check can retain an armed source; success never certifies
+ *       tamper security or external setup/hold timing.
  */
 typedef struct {
     bool timestamp_enabled;
@@ -103,7 +106,8 @@ enum nx_rtc_backup_effects {
     NX_RTC_BACKUP_OSCILLATOR = 4U,
     NX_RTC_BACKUP_CLOCK_SOURCE = 8U,
     NX_RTC_BACKUP_CLOCK_GATE = 16U,
-    NX_RTC_BACKUP_CALENDAR = 32U
+    NX_RTC_BACKUP_CALENDAR = 32U,
+    NX_RTC_BACKUP_QUIET_PC13 = 128U
 };
 /** \brief Copied transfer receipt, never proof of physical VBAT retention. */
 typedef struct {
@@ -244,7 +248,8 @@ nx_result_t nx_rtc_port_sram_release(const nx_rtc_port_t* port,
 /** \brief Transfer retained provisioning effects after actual source stop.
  * \param[in] port: Closed serialized RTC owner; every external user joined.
  * \param[out] handoff: Disjoint receipt, unchanged on failure. The caller
- * explicitly accepts continuing power/access/oscillator/calendar ownership.
+ * explicitly accepts continuing power/access/oscillator/calendar ownership,
+ * including any reported crystal-oscillator quiet-pad responsibility.
  * \return SUCCESS, BUSY for live loans/sources, STATE without transferable
  * effects, or exact provider error. No reset, erase or register write occurs.
  * \note This is a responsibility transfer. It does not disable autonomous

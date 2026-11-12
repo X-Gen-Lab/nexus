@@ -54,8 +54,14 @@ class F4SourceSDKScopeTests(unittest.TestCase):
             self.assertEqual({item["path"] for item in identity["dependencies"]}, {
                 "vendors/arm/CMSIS_6", "vendors/st/cmsis_device_f4",
                 "vendors/st/stm32f4_hal"})
-            self.assertFalse(any(path.startswith(("ext/tomlc99/", "ext/cjson/", "tests/"))
-                for path in identity["files_sha256"]))
+            files = set(identity["files_sha256"])
+            public_consumers = {path for path in sdk.F4_FAMILY_VERIFICATION_FILES
+                                if path.startswith("tests/")}
+            self.assertEqual({path for path in files if path.startswith("tests/")},
+                             public_consumers)
+            forbidden = ("ext/tomlc99/", "ext/cjson/", "ext/googletest/",
+                         "tests/google/", "tests/support/", "tests/cmsis_host/")
+            self.assertFalse(any(path.startswith(forbidden) for path in files))
 
 
     def test_rehashed_unselected_vendor_payload_is_rejected(self):

@@ -27,7 +27,6 @@ typedef struct {
     bool opened;
     bool busy;
     bool pending;
-    bool deferred;
     bool cancel_sent;
     bool stalled;
 } nx_st_usb_device_slot_t;

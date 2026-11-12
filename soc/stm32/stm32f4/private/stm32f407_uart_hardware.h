@@ -55,12 +55,18 @@ nx_stm32_uart_hardware_for_irq(IRQn_Type irq) {
             return &nx_stm32_uart_hardware[0];
         case USART2_IRQn:
             return &nx_stm32_uart_hardware[1];
+#if defined(USART3)
         case USART3_IRQn:
             return &nx_stm32_uart_hardware[2];
+#endif
+#if defined(UART4)
         case UART4_IRQn:
             return &nx_stm32_uart_hardware[3];
+#endif
+#if defined(UART5)
         case UART5_IRQn:
             return &nx_stm32_uart_hardware[4];
+#endif
         case USART6_IRQn:
             return &nx_stm32_uart_hardware[5];
         default:

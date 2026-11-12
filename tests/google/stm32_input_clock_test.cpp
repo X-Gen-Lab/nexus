@@ -1,7 +1,9 @@
 /**
  * \file            stm32_input_clock_test.cpp
- * \brief           Real static input-clock startup with explicit PLL48
- * ownership \author          Nexus Team \version         1.0.0 \date 2026-11-10
+ * \brief           Static input-clock startup with explicit PLL48 ownership
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-11-10
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
@@ -103,8 +105,24 @@ TEST_F(InputClock, UnselectedPllIsNeverEnabledEvenTransiently) {
 }
 
 TEST_F(InputClock, SharedPllInputFieldsAreStaticEvenWithTheMainPllOff) {
+    uint32_t original = rcc.PLLCFGR;
+    uint32_t owned_fields = RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLSRC;
+#if NEXUS_CLOCK_PLL_ENABLED
+    owned_fields |= RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ;
+#endif
+    /* RM0090 7.2.3/7.3.2: unselected outputs and reserved bits stay parked. */
+    EXPECT_CALL(writes, Call(testing::Ne(&rcc.PLLCFGR), testing::_))
+        .Times(testing::AnyNumber());
+    EXPECT_CALL(writes,
+                Call(&rcc.PLLCFGR,
+                     testing::Truly([original, owned_fields](uint32_t value) {
+                         return (value & ~owned_fields) ==
+                                (original & ~owned_fields);
+                     })))
+        .Times(testing::AnyNumber());
     ASSERT_EQ(0, Start().primary);
-    EXPECT_EQ(NEXUS_CLOCK_PLLCFGR, rcc.PLLCFGR);
+    EXPECT_EQ(NEXUS_CLOCK_PLLCFGR & owned_fields, rcc.PLLCFGR & owned_fields);
+    EXPECT_EQ(original & ~owned_fields, rcc.PLLCFGR & ~owned_fields);
     EXPECT_EQ(NEXUS_CLOCK_PLLM, rcc.PLLCFGR & RCC_PLLCFGR_PLLM);
     EXPECT_EQ(NEXUS_INPUT_HSE != 0,
               (rcc.PLLCFGR & RCC_PLLCFGR_PLLSRC_HSE) != 0U);

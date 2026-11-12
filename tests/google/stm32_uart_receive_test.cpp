@@ -1,7 +1,9 @@
 /**
  * \file            stm32_uart_receive_test.cpp
- * \brief           Real UART receive DMA loan, route and IDLE register
- * contracts \author          Nexus Team \version         1.0.0 \date 2026-10-11
+ * \brief           UART RX DMA loans, routes and IDLE register contracts
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
@@ -11,6 +13,9 @@ extern "C" {
 #include "nexus/io/uart_rs485.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <new>
+#include <sys/mman.h>
+#include <unistd.h>
 
 GPIO_TypeDef g_nx_stm32_gpioa_model;
 
@@ -106,6 +111,7 @@ class Stm32UartReceive : public testing::Test {
     nx_stream_slot_t slots[3] = {};
     nx_stream_t stream = {};
     nx_dma_memory_region_t region = {};
+    nx_stm32_uart_dma_resources_t resources = {};
     nx_stm32_uart_receive_state_t state = {};
     nx_stm32_uart_duplex_state_t duplex = {};
     nx_uart_port_t port = {&nx_stm32_uart_receive_ops, &state};
@@ -136,10 +142,11 @@ class Stm32UartReceive : public testing::Test {
         state.uart.baud = 115200U;
         state.uart.profile = NX_UART_RX_BLOCKS;
         state.uart.irq = USART1_IRQn;
-        state.resources.dma = &dma;
+        resources.dma = &dma;
+        state.resources = &resources;
         duplex.transmit.tx = &transmit;
-        state.resources.regions = &region;
-        state.resources.region_count = 1U;
+        resources.regions = &region;
+        resources.region_count = 1U;
         duplex.transmit.stream = 7U;
         duplex.transmit.channel = 4U;
         duplex.transmit.dma_irq = DMA2_Stream7_IRQn;
@@ -148,6 +155,80 @@ class Stm32UartReceive : public testing::Test {
                   NX_SUCCESS);
     }
 };
+
+class UartReceiveImmutableResources : public Stm32UartReceive,
+                                      public testing::WithParamInterface<bool> {
+};
+
+TEST_P(UartReceiveImmutableResources, WritableBlockCannotCoverRetainedFacts) {
+    nx_dma_memory_region_t writable{1U, UINTPTR_MAX - 1U,
+                                    NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
+    resources.regions = &writable;
+    slots[0].data = GetParam() ? reinterpret_cast<uint8_t*>(&resources)
+                               : reinterpret_cast<uint8_t*>(&writable);
+    slots[0].capacity = GetParam() ? sizeof(resources) : sizeof(writable);
+    ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, slots, 3U));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_uart_port_rx_start(&port, &stream));
+    EXPECT_EQ(0U, stream.outstanding);
+    EXPECT_EQ(0U, receive.CR & DMA_SxCR_EN);
+    EXPECT_EQ(nullptr, state.stream);
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_rx_stop(&port));
+}
+
+INSTANTIATE_TEST_SUITE_P(SelectedFacts, UartReceiveImmutableResources,
+                         testing::Bool());
+
+TEST_F(Stm32UartReceive, StoppedOwnerRejectsBeforeReadingRetiredConfiguration) {
+    ASSERT_EXIT(
+        {
+            uart.SR = USART_SR_TC;
+            if (nx_uart_port_stop(&port) != NX_SUCCESS)
+                _exit(2);
+            const long page = sysconf(_SC_PAGESIZE);
+            if (page <= 0)
+                _exit(3);
+            void* mapping =
+                mmap(nullptr, static_cast<size_t>(page), PROT_READ | PROT_WRITE,
+                     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+            if (mapping == MAP_FAILED)
+                _exit(4);
+            auto* retained = new (mapping) nx_stm32_uart_dma_resources_t{};
+            retained->dma = &dma;
+            retained->regions = &region;
+            retained->region_count = 1U;
+            state.resources = retained;
+            if (nx_stm32_uart_receive_initialize(&state, 84000000U) !=
+                NX_SUCCESS)
+                _exit(5);
+            uart.SR = USART_SR_TC;
+            if (nx_uart_port_stop(&port) != NX_SUCCESS)
+                _exit(6);
+            nx_uart_tx_request_t next{};
+            nx_request_initialize(&next.base);
+            if (nx_uart_tx_prepare(&next, payload[0], 2U, 1000U) != NX_SUCCESS)
+                _exit(7);
+            if (mprotect(mapping, static_cast<size_t>(page), PROT_NONE) != 0)
+                _exit(8);
+            const nx_result_t result =
+                nx_stm32_uart_receive_tx_validate(&state, &next);
+            munmap(mapping, static_cast<size_t>(page));
+            _exit(result == NX_ERROR_STATE ? 0 : 9);
+        },
+        testing::ExitedWithCode(0), "");
+}
+
+TEST_F(Stm32UartReceive, MutableSlotMetadataCannotServeAsDmaRegionFacts) {
+    ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, slots, 1U));
+    slots[0].length = NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE;
+    const auto* table =
+        reinterpret_cast<const nx_dma_memory_region_t*>(&slots[0]);
+    resources.regions = table;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_uart_port_rx_start(&port, &stream));
+    EXPECT_EQ(0U, stream.outstanding);
+    EXPECT_EQ(0U, receive.CR & DMA_SxCR_EN);
+    EXPECT_EQ(nullptr, state.stream);
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_rx_stop(&port));
+}
 
 TEST_F(Stm32UartReceive, StartProgramsCallerBufferWithoutCpuPayloadCopy) {
     ASSERT_EQ(nx_uart_port_rx_start(&port, &stream), NX_SUCCESS);
@@ -617,8 +698,8 @@ TEST_F(Stm32UartReceive,
     nx_dma_memory_region_t domains[2] = {
         region,
         {reinterpret_cast<uintptr_t>(tx), sizeof(tx), NX_DMA_MEMORY_READ}};
-    duplex.receive.resources.regions = domains;
-    duplex.receive.resources.region_count = 2U;
+    resources.regions = domains;
+    resources.region_count = 2U;
     ASSERT_EQ(nx_uart_port_rx_start(&port, &stream), NX_SUCCESS);
     nx_uart_tx_request_t request = {};
     nx_request_initialize(&request.base);
@@ -908,7 +989,7 @@ TEST_F(Stm32UartReceive, TransmitDescriptorPrecedesReceiveRejectsCrossLoan) {
     nx_dma_memory_region_t descriptor_region = {
         reinterpret_cast<uintptr_t>(descriptors), sizeof(descriptors),
         NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
-    state.resources.regions = &descriptor_region;
+    resources.regions = &descriptor_region;
     for (size_t index = 0U; index < 3U; ++index) {
         descriptor_slots[index].data =
             reinterpret_cast<uint8_t*>(&descriptors[index]);
@@ -936,7 +1017,7 @@ TEST_F(Stm32UartReceive,
     nx_dma_memory_region_t descriptor_region = {
         reinterpret_cast<uintptr_t>(descriptors), sizeof(descriptors),
         NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
-    state.resources.regions = &descriptor_region;
+    resources.regions = &descriptor_region;
     for (size_t index = 0U; index < 3U; ++index) {
         descriptor_slots[index].data =
             reinterpret_cast<uint8_t*>(&descriptors[index]);

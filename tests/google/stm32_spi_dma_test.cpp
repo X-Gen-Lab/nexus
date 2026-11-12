@@ -332,6 +332,36 @@ TEST_F(Stm32SpiDma, CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline) {
     EXPECT_EQ(request.base.transferred, 0U);
 }
 
+/** \brief Cancellation and memory completion construct independent budgets. */
+class Stm32SpiDrainBoundary : public Stm32SpiDma,
+                              public testing::WithParamInterface<bool> {};
+
+TEST_P(Stm32SpiDrainBoundary, ExhaustedBudgetRetainsBothEnginesAndChipSelect) {
+    request.base.deadline = NX_DEADLINE_NEVER;
+    ASSERT_EQ(nx_spi_endpoint_submit(&endpoint, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(UINT64_MAX - 101U), NX_SUCCESS);
+    s_hold_dma_enable = true;
+    if (GetParam()) {
+        CompleteMemory();
+    } else {
+        ASSERT_EQ(nx_spi_port_cancel(&bus, &request), NX_SUCCESS);
+    }
+    nx_spi_port_service(&bus);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(state.active, &request);
+    EXPECT_EQ(gpio.BSRR, 1U << 16U);
+    s_hold_dma_enable = false;
+    tx.CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+    rx.CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+    nx_spi_port_service(&bus);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result,
+              GetParam() ? NX_ERROR_IO : NX_ERROR_CANCELLED);
+    EXPECT_EQ(state.active, nullptr);
+}
+
+INSTANTIATE_TEST_SUITE_P(DrainOrigins, Stm32SpiDrainBoundary, testing::Bool());
+
 TEST_F(Stm32SpiDma, LateServiceWithRealCompletionProofPreservesSuccess) {
     request.base.deadline = NX_DEADLINE_NEVER;
     ASSERT_EQ(nx_spi_endpoint_submit(&endpoint, &request), NX_SUCCESS);

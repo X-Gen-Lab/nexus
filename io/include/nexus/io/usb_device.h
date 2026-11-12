@@ -25,6 +25,16 @@ typedef struct {
     uint64_t control_epoch;
     nx_usb_stage_t stage;
 } nx_usb_request_t;
+/** \brief Caller-owned remote wake pulse, borrowed until acquire SETTLED.
+ * \note Prepare base with a finite Core deadline. max_service_delay_us is a
+ *       positive product proof bound for total pulse scheduling, preemption,
+ *       interrupt masking and signal-withdrawal delay, at most 12998 us.
+ *       It is a caller guarantee, never a measured scheduler guarantee.
+ */
+typedef struct {
+    nx_request_t base;
+    uint32_t max_service_delay_us;
+} nx_usb_remote_wakeup_request_t;
 typedef struct {
     uint8_t request_type;
     uint8_t request;
@@ -58,6 +68,8 @@ typedef struct {
     uint8_t address;
     /** \brief UNKNOWN after reset; ENUMERATED publishes the observed speed. */
     nx_usb_device_speed_t speed;
+    /** \brief Host-ACKed DEVICE_REMOTE_WAKEUP; false when unselected. */
+    bool remote_wakeup_enabled;
 } nx_usb_device_state_t;
 /** \brief Shared readonly packet methods; context is a selected endpoint. */
 typedef struct {
@@ -77,6 +89,8 @@ typedef struct {
     nx_result_t (*address)(void*, uint64_t, uint8_t);
     nx_result_t (*attach_wake)(void*, const nx_irq_wake_t*, uint8_t);
     nx_result_t (*stop)(void*);
+    nx_result_t (*remote_wakeup)(void*, nx_usb_remote_wakeup_request_t*);
+    nx_result_t (*remote_cancel)(void*, nx_usb_remote_wakeup_request_t*);
 } nx_usb_device_ops_t;
 struct nx_usb_device_port {
     const nx_usb_device_ops_t* ops;
@@ -121,6 +135,11 @@ nx_result_t nx_usb_out_prepare(nx_usb_request_t* request, uint8_t* bytes,
  *       scheduling, retries or receive acknowledgment. An incomplete ISO
  *       opportunity settles IO only after source/FIFO/AHB withdrawal. Long
  *       execution stalls expire by Core time before modular frame comparison.
+ *       An epoch-matched zero-length EP0 STATUS OUT may be armed before or
+ *       during control DATA IN. Its valid wire completion closes further DATA
+ *       admission while independent DMA/FIFO/IRQ loans still require their own
+ *       settlement. An outer control owner must join both directions before
+ *       releasing shared reply storage.
  */
 nx_result_t nx_usb_endpoint_submit(const nx_usb_endpoint_port_t* port,
                                    nx_usb_request_t* request);
@@ -201,6 +220,37 @@ nx_result_t nx_usb_device_attach_wake(const nx_usb_device_port_t* port,
  * before final SETTLED. No forced reset revokes an unproved accepted borrow.
  */
 nx_result_t nx_usb_device_stop(const nx_usb_device_port_t* port);
+/**
+ * \brief Admit one asynchronous remote wake pulse without a busy wait.
+ * \param[in] port: Started serialized privileged unmasked controller owner.
+ * \param[in,out] request: READY, finite deadline, explicit positive service
+ *                         bound; storage disjoint from all provider loans.
+ * \return SUCCESS means ACCEPTED; rejection retains no references/effects.
+ * \note Requires an ACKed SET_FEATURE(DEVICE_REMOTE_WAKEUP) after ACKed
+ *       nonzero SET_CONFIGURATION, a first real suspend observed at least
+ *       5001 us earlier, matching live System epoch and hardware SUSPSTS.
+ *       Existing explicit service advances an approximately 2 ms pulse.
+ *       The declared total delay bound must prove a 1..15 ms physical pulse;
+ *       late service is a timing violation even after a successful clear.
+ *       Core time and its epoch must remain live through SETTLED. Terminal
+ *       Core fail-stop cannot promise subsequent cleanup. No worker, timer
+ *       allocation, scheduler start or implicit OS wait is introduced.
+ *       Failed RWUSIG clear retains quarantine and controller ownership.
+ */
+nx_result_t
+nx_usb_device_remote_wakeup(const nx_usb_device_port_t* port,
+                            nx_usb_remote_wakeup_request_t* request);
+/**
+ * \brief Cancel an accepted wake pulse while preserving its minimum duration.
+ * \param[in] port: Same serialized privileged unmasked controller owner.
+ * \param[in,out] request: Exact accepted request incarnation, still alive.
+ * \return SUCCESS requests drain; failures retain every prior loan.
+ * \note Cancel and device stop cannot revoke the pulse or request early.
+ *       Service must still withdraw the signal and release-publish SETTLED.
+ */
+nx_result_t
+nx_usb_device_remote_cancel(const nx_usb_device_port_t* port,
+                            nx_usb_remote_wakeup_request_t* request);
 #ifdef __cplusplus
 }
 #endif

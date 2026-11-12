@@ -115,6 +115,12 @@ setup/hold 使用 `nx_time_now_us` 的 monotonic 域；service 的最坏间隔�
 边界偏差。hold 保证至少声明时长，并不保证精确到时刻就撤 DE。精确波形
 需求需要显式硬件 timer/电气预算，当前不会猜测收发器或提供假定时资格。
 
+无法表达 setup 预算时，在准入和 DE 效果前返回 EXHAUSTED；接纳后的失败仍须
+实际撤回 DE。若底层传输已退出，却无法证明所声明的最低 hold，adapter 进入
+TIMING_FAULT，保留 QUARANTINED、DE 与 outer loan；stop 返回 BUSY，不把 hold
+清零或从过期 deadline 推定安全归还。此状态须由外部产品完成电气隔离与恢复，
+普通重试不能虚构最低保持时间。
+
 ## 软件证据和实板验收
 
 GoogleTest/GoogleMock 直接执行生产 provider，覆盖银行替换拒绝、CT 翻转、
@@ -128,6 +134,12 @@ status/data 清除竞态、epoch 耗尽、双向取消、flow 配置、RS485 set
 冷态资源归还由同目录的 `uart_cold.c` 管理。公共 RS485 adapter 在 `io/src/`
 实现，Native 叶模型位于 `tests/support/native/drivers/`。模式与 factory 装配测试、
 寄存器模型和 ARM 链接分别验证对应合同。
+
+RX 与 duplex 共用不可变资源描述符，request、queue metadata 和每个完整 payload
+不得覆盖配置或 DMA region 表。成功 stop 归还配置后，重复 stop 只检查已停止状态，
+不再解引用归还的资源。在维护的 M4 ABI 下，RX 状态由 184 降至 176 B，duplex 由
+200 降至 192 B；对应 ARM fixture SRAM 各少 8 B。该批还包含 CF03 与别名 guard，
+loaded Flash 分别增加 176／248 B，不能把状态缩减宣传为整固件零成本。
 
 历史成对开发 ELF 只描述其记录的固定源码、配置和工具身份；跨系列计数、状态
 大小或 text 差值不能继承为本轮 F4 候选预算。当前候选必须重新绑定配置、源码、

@@ -4,9 +4,9 @@
 request、clock 与 typed I/O，但不能直接推广到整个家族。组件存在不等于新增完整
 SoC／Board provider，也不建立实板资格。
 
-[FIG-23 有界软件机制的所有权](../../docs/assets/diagrams/io-extension-ownership.svg)
-展示其中映射存储、AMP、镜像交接等机制的责任边界；图中所选范围不包含本目录全部
-后续扩展，也不表示任意模式已经接入或完成实板验证。
+[FIG-31 F4 源码归属](../../docs/assets/diagrams/driver-source-ownership.svg)说明
+当前 F4 provider、公共接口与官方库边界。可选组件遵守各自的所有权合同，链接一项
+组件不会授予其他型号、模式或物理资格。
 
 ## 架构与职责
 
@@ -25,14 +25,11 @@ stop／recover、borrow 与外部 join。ClockDomain 只能证明已登记消费
 | --- | --- |
 | F407 音频 | [标准 audio 合同](../../docs/design/f407-i2s2-slave-tx.md)；静态 factory、Platform 生命周期与有限帧借用 |
 | F407 image handoff | [合同](stm32/stm32f407_handoff/README.md)；已停止裸机平台、掩码 MSP 交接 |
-| H743 W25Q128JV | [合同](stm32/stm32h743_w25q128/README.md)；单线 Flash、CPU read mapping、显式 MPU 防护 |
-| H743 DMA2D frame | [公共头](stm32/stm32h743_frame_dma2d/include/nexus/components/frame_dma2d.h)；精确内存加速，不能当显示控制器 |
-| H747 AMP | [合同](stm32/stm32h747_amp/README.md)；外部 paired boot、HSEM、显式共享 SRAM4 |
-| H563 I3C port | [私有端口](stm32/stm32h563_i3c/private/stm32h563_i3c_port.h) 与 [CMake](stm32/stm32h563_i3c/CMakeLists.txt)；有限轮询软件参考，不是内置 H563 Board |
-| U575 retained time | [公共头](stm32/stm32u575_retained_time/include/nexus/components/stm32u575_retained_time.h)；独立 RTC 时间域，外部 boot 预备 |
-| U575 LPDMA copy | [公共头](stm32/stm32u575_lpdma_copy/include/nexus/components/stm32u575_lpdma_copy.h)；精确 SRAM4 receiver，与 Stop2 复合退出 |
-| U575 LPTIM1 | [合同](stm32/stm32u575_lpdma_lptim1/README.md)；一组固定 tuple 与有限 write-OK 证明 |
-| U575 Stop2 | [合同](stm32/stm32u575_stop2/README.md)；WUT、copy、LPTIM1 变体明确互斥 |
+
+当前目录只保留上述 F407 组件。H743／H747／H563／U575 的历史扩展已退出当前生产
+范围，原始实现与记录可从
+[固定重构前源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/components/soc)
+追溯。历史链接不成为当前 CMake 目标或支持声明。
 
 ## 验证与产品责任
 

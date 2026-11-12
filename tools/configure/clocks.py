@@ -37,9 +37,14 @@ def plan(profile_name, profile):
 
 def validate_board(clocks):
     """Internal oscillators are SoC facts; external oscillator data is optional."""
-    if not isinstance(clocks, Mapping) or set(clocks) - {"hse_hz", "lse_hz"}:
+    if not isinstance(clocks, Mapping) or set(clocks) - {
+            "hse_hz", "lse_hz", "lse_bypass"}:
         fail("Board clocks require reviewed external oscillator facts")
     for name, frequency in clocks.items():
+        if name == "lse_bypass":
+            if type(frequency) is not bool or "lse_hz" not in clocks:
+                fail("Board LSE bypass requires explicit boolean and frequency")
+            continue
         integer(frequency, 1, context="Board " + name)
 
 

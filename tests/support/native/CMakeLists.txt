@@ -14,6 +14,7 @@ target_include_directories(nexus_io_native PRIVATE
 set(native_ip "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip")
 set(native_ip_includes "${native_ip}/classic_can"
     "${native_ip}/legacy_mac" "${native_ip}/fs_device_pio")
+set(NEXUS_SYSTEM_PRIVATE_INCLUDES ${native_ip_includes} PARENT_SCOPE)
 target_include_directories(nexus_io_native PRIVATE ${native_ip_includes})
 add_library(nexus_can_native_engine OBJECT
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c")
@@ -62,5 +63,8 @@ target_link_libraries(nexus_usb_native_engine PRIVATE nexus_io nexus_arch
     nexus_build_options nexus_owned_warnings)
 target_compile_options(nexus_usb_native_engine PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/drivers/usb_device_access.h")
+# The complete USB model retains the selected optional protocol contracts.
+target_compile_definitions(nexus_usb_native_engine PRIVATE
+    NEXUS_STM32F4_USB_REMOTE_WAKEUP=1)
 target_sources(nexus_io_native PRIVATE $<TARGET_OBJECTS:nexus_usb_native_engine>)
 add_library(Nexus::NativeModel ALIAS nexus_io_native)

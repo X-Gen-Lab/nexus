@@ -25,7 +25,7 @@
 #include "stm32f407_system.h"
 
 #include "stm32f407_timer_hardware.h"
-#include "stm32f407xx.h"
+#include "stm32f4xx.h"
 #if !defined(NEXUS_STM32_MODEL)
 #include "nexus_config.h"
 #endif
@@ -145,6 +145,7 @@ typedef struct {
     uint32_t supply_mv;
     bool active;
     bool power_on_reset_required;
+    bool options_owned;
 } nx_stm32_flash_state_t;
 /** \brief Explicitly assembled optional face shares the physical pulse owner.
  */
@@ -273,13 +274,16 @@ nx_result_t nx_stm32_uart_initialize_format(nx_stm32_uart_state_t* port,
                                             nx_uart_format_t format);
 /** \brief Apply a selected byte format only under quiescent cold ownership.
  * \param[in,out] state: Initialized byte UART; no TX/RX loan or queued RX.
- * \param[in] format: 7E/O or 8N/E/O with one/two stop bits and reviewed flow.
+ * \param[in] format: 7E/O or 8N/E/O with one/two stop bits and no flow or CTS.
  * \return Success or INVALID/UNSUPPORTED/CONTEXT/STATE/BUSY before writes;
  *         IO attempts rollback after failed register readback. If rollback
  *         cannot be proven, initialized remains true and closing rejects new
  *         work. Retain pins, clock and storage until stop proves withdrawal.
  * \note Startup task must quiesce the peer. Seven-bit receive uses the separate
  *         format_irq entry. Format selection adds no default state or ops slot.
+ *         Existing or requested RTS is UNSUPPORTED without effects: this helper
+ *         has no pad owner for the ES0182 2.11.9 UE withdrawal sequence. Select
+ *         RTS through the static wire cold owner instead.
  */
 nx_result_t nx_stm32_uart_format_configure(nx_stm32_uart_state_t* state,
                                            nx_uart_format_t format);

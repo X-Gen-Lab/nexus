@@ -37,7 +37,10 @@ nx_result_t nx_flash_region_validate(const nx_flash_region_t* region) {
         return NX_ERROR_INVALID;
     }
     const nx_flash_geometry_t* geometry = nx_flash_port_geometry(region->port);
-    if (geometry == NULL || region->offset > geometry->size ||
+    uint32_t sector_count;
+    if (geometry == NULL ||
+        nx_flash_geometry_sector_count(geometry, &sector_count) != NX_SUCCESS ||
+        region->offset > geometry->size ||
         region->size > geometry->size - region->offset) {
         return NX_ERROR_INVALID;
     }

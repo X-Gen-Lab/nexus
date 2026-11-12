@@ -13,6 +13,7 @@ extern "C" {
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
+#include <unistd.h>
 #include <vector>
 
 struct DacWrite {
@@ -33,6 +34,10 @@ static nx_time_us_t enabled_at;
 static nx_time_us_t expire_on_timer_enable;
 static uint32_t refused_control_bits;
 static bool refuse_trigger_clear;
+static bool preempt_on_first_time;
+static bool lose_time_on_output_enable;
+static bool model_time_lost;
+static nx_time_us_t external_enabled_at;
 
 /** \brief Model the peripheral's DHR encoding and automatic DOR transfer. */
 static void holding(unsigned channel, uint32_t code) {
@@ -46,6 +51,10 @@ static void holding(unsigned channel, uint32_t code) {
 
 extern "C" void nx_dac_model_write(volatile uint32_t* reg, uint32_t value) {
     writes.push_back({reg, value});
+    if (reg == &EXTI->PR) {
+        *reg &= ~value;
+        return;
+    }
     if (advance_on_write) {
         ++model_time;
     }
@@ -75,7 +84,13 @@ extern "C" void nx_dac_model_write(volatile uint32_t* reg, uint32_t value) {
     if (reg == &DAC->CR && (value & DAC_CR_EN2) != 0U &&
         (DAC->CR & DAC_CR_EN2) == 0U) {
         enabled_at = model_time;
+        if (lose_time_on_output_enable)
+            model_time_lost = true;
     }
+    if (reg == &DAC->CR && (DAC->CR & DAC_CR_TEN1) == 0U &&
+        (value & DAC_CR_TEN1) != 0U && (value & DAC_CR_EN1) != 0U &&
+        (value & DAC_CR_TSEL1) == (DAC_CR_TSEL1_2 | DAC_CR_TSEL1_1))
+        external_enabled_at = model_time;
     if (reg == &TIM6->SR || reg == &TIM7->SR) {
         *reg &= value;
         return;
@@ -123,7 +138,14 @@ extern "C" bool nx_arch_irq_is_masked(void) {
 extern "C" void nx_arch_dsb(void) {
 }
 extern "C" nx_time_us_t nx_time_now_us(void) {
-    return model_time++;
+    if (model_time_lost)
+        return NX_DEADLINE_NEVER;
+    nx_time_us_t observed = model_time++;
+    if (preempt_on_first_time) {
+        preempt_on_first_time = false;
+        model_time += 5000U;
+    }
+    return observed;
 }
 
 class DacOwner : public testing::Test {
@@ -146,6 +168,9 @@ class DacOwner : public testing::Test {
         expire_on_timer_enable = 0U;
         refused_control_bits = 0U;
         refuse_trigger_clear = false;
+        preempt_on_first_time = lose_time_on_output_enable = false;
+        model_time_lost = false;
+        external_enabled_at = 0U;
         model_time = 100U;
         RCC->AHB1ENR = RCC_AHB1ENR_GPIOAEN;
         config.registers = DAC;
@@ -538,4 +563,167 @@ TEST(DacDispatch, InvalidFaceAndOutputAliasesAreRejectedBeforeDispatch) {
     EXPECT_EQ(&ops, face.ops);
     EXPECT_EQ(&state, face.context);
     EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_dac_port_write(&face, 1U, 1U));
+}
+
+class DacExternal : public DacOwner {
+  protected:
+    nx_stm32_exti_hardware_config_t event_config{};
+    nx_stm32_exti_hardware_state_t event{};
+    void SelectSource(uint8_t line = 9U) {
+        RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+        RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+        event_config = {GPIOB, NX_EXTI_RISING, 1U, line, 0U};
+        ASSERT_EQ(nx_stm32_exti_hardware_prepare(&event, &event_config),
+                  NX_SUCCESS);
+        config.mode = NX_STM32_DAC_TRIGGERED;
+        config.trigger = NX_STM32_DAC_TRIGGER_EXTI9;
+        config.external = &event;
+    }
+    void Edge() {
+        /* Physical input/event routing, followed by the documented TSEL=110
+         * digital transfer. There is no provider call or synthetic timer. */
+        constexpr uint32_t bit = 1U << 9U;
+        if ((EXTI->EMR & EXTI->RTSR & bit) == 0U ||
+            ((SYSCFG->EXTICR[2] >> 4U) & 15U) != 1U ||
+            (RCC->APB1ENR & RCC_APB1ENR_DACEN) == 0U)
+            return;
+        for (unsigned index = 0U; index < 2U; ++index) {
+            uint32_t shift = 16U * index;
+            if ((DAC->CR & (DAC_CR_EN1 << shift)) != 0U &&
+                (DAC->CR & (DAC_CR_TEN1 << shift)) != 0U &&
+                ((DAC->CR >> shift) & DAC_CR_TSEL1) ==
+                    (DAC_CR_TSEL1_2 | DAC_CR_TSEL1_1)) {
+                if (index == 0U)
+                    DAC->DOR1 = DAC->DHR12R1;
+                else
+                    DAC->DOR2 = DAC->DHR12R2;
+            }
+        }
+    }
+    void TearDown() override {
+        refuse_trigger_clear = refuse_disable = refuse_gate_clear = false;
+        refuse_wave_clear = false;
+        refused_control_bits = 0U;
+        (void)nx_stm32_dac_close(&state);
+        (void)nx_stm32_exti_hardware_close(&event);
+        DacOwner::TearDown();
+    }
+};
+
+TEST_F(DacExternal, MissingOrWrongEventOwnerRejectsBeforeDacEffects) {
+    config.mode = NX_STM32_DAC_TRIGGERED;
+    config.trigger = NX_STM32_DAC_TRIGGER_EXTI9;
+    EXPECT_EQ(nx_stm32_dac_prepare(&state, &config), NX_ERROR_STATE);
+    EXPECT_TRUE(writes.empty());
+    ASSERT_NO_FATAL_FAILURE(SelectSource(8U));
+    const size_t before = writes.size();
+    EXPECT_EQ(nx_stm32_dac_prepare(&state, &config), NX_ERROR_INVALID);
+    EXPECT_EQ(writes.size(), before);
+    EXPECT_EQ(state.config, nullptr);
+}
+
+TEST_F(DacExternal, DualStagingUsesOnlyTheOwnedExternalElectricalEdge) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_EQ(nx_stm32_dac_prepare(&state, &config), NX_SUCCESS);
+    EXPECT_EQ(DAC->CR & (DAC_CR_TEN1 | DAC_CR_TEN2), 0U);
+    EXPECT_EQ(nx_dac_port_write_pair(&face, 0x123U, 0x456U), NX_ERROR_STATE);
+    preempt_on_first_time = true;
+    ASSERT_EQ(nx_dac_port_start(&face, 0U, 10000U), NX_SUCCESS);
+    EXPECT_GE(external_enabled_at - enabled_at, 15U);
+    ASSERT_EQ(nx_dac_port_write_pair(&face, 0x123U, 0x456U), NX_SUCCESS);
+    EXPECT_EQ(DAC->DOR1 | DAC->DOR2, 0U);
+    Edge();
+    EXPECT_EQ(DAC->DOR1, 0x123U);
+    EXPECT_EQ(DAC->DOR2, 0x456U);
+    nx_dac_info_t info{};
+    ASSERT_EQ(nx_dac_port_info(&face, &info), NX_SUCCESS);
+    EXPECT_TRUE(info.external_trigger);
+    EXPECT_FALSE(info.timer_trigger || info.software_trigger);
+    nx_dac_state_t observed{};
+    ASSERT_EQ(nx_dac_port_state(&face, &observed), NX_SUCCESS);
+    EXPECT_EQ(observed.timer_clock_hz | observed.trigger_divisor, 0U);
+    EXPECT_EQ(TIM6->CR1 | TIM7->CR1, 0U);
+    EXPECT_EQ(RCC->APB1ENR & (RCC_APB1ENR_TIM6EN | RCC_APB1ENR_TIM7EN), 0U);
+    ASSERT_EQ(nx_dac_port_stop(&face, 10000U), NX_SUCCESS);
+    Edge();
+    EXPECT_EQ(DAC->DOR1 | DAC->DOR2, 0U);
+    EXPECT_TRUE(event.initialized);
+}
+
+TEST_F(DacExternal, NoiseAndTriangleUseTheSameOwnedEventWithoutATimer) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    for (nx_stm32_dac_mode_t mode :
+         {NX_STM32_DAC_NOISE, NX_STM32_DAC_TRIANGLE}) {
+        config.mode = mode;
+        config.amplitude = 255U;
+        ASSERT_EQ(nx_stm32_dac_prepare(&state, &config), NX_SUCCESS);
+        ASSERT_EQ(nx_dac_port_start(&face, 0U, 10000U), NX_SUCCESS);
+        EXPECT_EQ(DAC->CR & DAC_CR_WAVE1,
+                  mode == NX_STM32_DAC_NOISE ? DAC_CR_WAVE1_0 : DAC_CR_WAVE1_1);
+        EXPECT_EQ(DAC->CR & DAC_CR_TSEL1, DAC_CR_TSEL1_2 | DAC_CR_TSEL1_1);
+        EXPECT_EQ(TIM6->CR1 | TIM7->CR1, 0U);
+        ASSERT_EQ(nx_stm32_dac_close(&state), NX_SUCCESS);
+    }
+}
+
+TEST_F(DacExternal, InventedFrequencyRejectsWithoutStartingAnyTrigger) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_EQ(nx_stm32_dac_prepare(&state, &config), NX_SUCCESS);
+    const size_t before = writes.size();
+    EXPECT_EQ(nx_dac_port_start(&face, 1000U, 10000U), NX_ERROR_INVALID);
+    EXPECT_EQ(writes.size(), before);
+    EXPECT_EQ(DAC->CR & (DAC_CR_EN1 | DAC_CR_EN2 | DAC_CR_TEN1 | DAC_CR_TEN2),
+              0U);
+}
+
+TEST_F(DacExternal, AWithdrawnEventOwnerCannotAuthorizeFurtherWrites) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_EQ(nx_stm32_dac_prepare(&state, &config), NX_SUCCESS);
+    ASSERT_EQ(nx_dac_port_start(&face, 0U, 10000U), NX_SUCCESS);
+    ASSERT_EQ(nx_stm32_exti_hardware_close(&event), NX_SUCCESS);
+    const size_t before = writes.size();
+    EXPECT_EQ(nx_dac_port_write(&face, 1U, 0x123U), NX_ERROR_STATE);
+    EXPECT_EQ(writes.size(), before);
+    EXPECT_EQ(nx_dac_port_stop(&face, 10000U), NX_SUCCESS);
+}
+
+TEST_F(DacExternal, ChangedMuxCannotArmTheStaticExternalSelection) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_EQ(nx_stm32_dac_prepare(&state, &config), NX_SUCCESS);
+    SYSCFG->EXTICR[2] ^= 1U << 4U;
+    const size_t before = writes.size();
+    EXPECT_EQ(nx_dac_port_start(&face, 0U, 10000U), NX_ERROR_STATE);
+    EXPECT_EQ(writes.size(), before);
+    EXPECT_EQ(DAC->CR & (DAC_CR_EN1 | DAC_CR_EN2), 0U);
+}
+
+TEST_F(DacExternal, RefusedDacGateRetainsBothIndependentColdOwners) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_EQ(nx_stm32_dac_prepare(&state, &config), NX_SUCCESS);
+    ASSERT_EQ(nx_dac_port_start(&face, 0U, 10000U), NX_SUCCESS);
+    refuse_trigger_clear = true;
+    EXPECT_NE(nx_dac_port_stop(&face, 10000U), NX_SUCCESS);
+    EXPECT_EQ(state.config, &config);
+    EXPECT_TRUE(event.initialized);
+    EXPECT_NE(RCC->APB1ENR & RCC_APB1ENR_DACEN, 0U);
+    refuse_trigger_clear = false;
+    EXPECT_EQ(nx_dac_port_stop(&face, 10000U), NX_SUCCESS);
+}
+
+TEST_F(DacExternal, InvalidTimeAfterOutputEnableCannotBecomeInfiniteWarmup) {
+    ASSERT_NO_FATAL_FAILURE(SelectSource());
+    ASSERT_EQ(nx_stm32_dac_prepare(&state, &config), NX_SUCCESS);
+    lose_time_on_output_enable = true;
+    EXPECT_EXIT(
+        {
+            alarm(2U);
+            nx_result_t result =
+                nx_dac_port_start(&face, 0U, NX_DEADLINE_NEVER);
+            alarm(0U);
+            _exit(result == NX_ERROR_STATE &&
+                          (DAC->CR & (DAC_CR_TEN1 | DAC_CR_TEN2)) == 0U
+                      ? 0
+                      : 1);
+        },
+        testing::ExitedWithCode(0), "");
 }

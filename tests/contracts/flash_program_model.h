@@ -19,7 +19,9 @@ void nx_flash_program_model_store_byte(volatile uint8_t* address,
 bool nx_flash_program_model_irq_idle(void);
 bool nx_flash_program_model_irq_clear(void);
 bool nx_flash_program_model_irq_active(void);
+bool nx_flash_program_model_irq_enabled(void);
 bool nx_flash_program_model_privileged(void);
+uint32_t nx_flash_program_model_hpre(void);
 #ifdef __cplusplus
 }
 #endif
@@ -35,7 +37,9 @@ bool nx_flash_program_model_privileged(void);
     nx_flash_program_model_store((address), (value))
 #define NX_STM32_FLASH_STORE_BYTE(address, value)                              \
     nx_flash_program_model_store_byte((address), (value))
-#define NX_STM32_FLASH_IRQ_IDLE()   nx_flash_program_model_irq_idle()
-#define NX_STM32_FLASH_IRQ_CLEAR()  nx_flash_program_model_irq_clear()
-#define NX_STM32_FLASH_IRQ_ACTIVE() nx_flash_program_model_irq_active()
+#define NX_STM32_FLASH_IRQ_IDLE()    nx_flash_program_model_irq_idle()
+#define NX_STM32_FLASH_IRQ_CLEAR()   nx_flash_program_model_irq_clear()
+#define NX_STM32_FLASH_IRQ_ACTIVE()  nx_flash_program_model_irq_active()
+#define NX_STM32_FLASH_IRQ_ENABLED() nx_flash_program_model_irq_enabled()
+#define NX_STM32_FLASH_HPRE()        nx_flash_program_model_hpre()
 #endif

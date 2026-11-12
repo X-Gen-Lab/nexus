@@ -6,7 +6,7 @@
 #ifndef NX_STM32F407_TIMER_OUTPUT_H
 #define NX_STM32F407_TIMER_OUTPUT_H
 #include "nexus/arch/arch.h"
-#include "stm32f407xx.h"
+#include "stm32f4xx.h"
 #ifndef NX_TIMER_WRITE
 #define NX_TIMER_WRITE(reg, value) ((reg) = (uint32_t)(value))
 #endif

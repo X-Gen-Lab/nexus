@@ -21,12 +21,37 @@
  *                  exclude CPU-only CCM. RX uses the existing independent IRQ
  *                  ring.
  */
-/** \brief Immutable selected DMA domain facts, independent of TX storage. */
+/** \brief Immutable selected DMA domain facts, independent of TX storage.
+ * \note The cold configuration retains these facts through successful stop;
+ *       selected runtime owners retain only a pointer and never modify them.
+ */
 typedef struct {
     DMA_TypeDef* dma;
     const nx_dma_memory_region_t* regions;
     size_t region_count;
 } nx_stm32_uart_dma_resources_t;
+
+/** \brief Reject mutable storage over retained UART DMA configuration facts.
+ * \note Task admission only; malformed or wrapped metadata is also rejected.
+ *       These checks precede descriptor writes and producer/DMA borrowing.
+ */
+static inline bool nx_stm32_uart_dma_resources_overlap(
+    const nx_stm32_uart_dma_resources_t* resources, const void* storage,
+    size_t length) {
+    if (resources == NULL || resources->regions == NULL ||
+        resources->region_count == 0U ||
+        resources->region_count > SIZE_MAX / sizeof(*resources->regions))
+        return true;
+    uintptr_t first = (uintptr_t)storage;
+    uintptr_t config = (uintptr_t)resources;
+    uintptr_t regions = (uintptr_t)resources->regions;
+    size_t bytes = resources->region_count * sizeof(*resources->regions);
+    return length > UINTPTR_MAX - first ||
+           sizeof(*resources) > UINTPTR_MAX - config ||
+           bytes > UINTPTR_MAX - regions ||
+           (first < config + sizeof(*resources) && config < first + length) ||
+           (first < regions + bytes && regions < first + length);
+}
 
 /** \brief Only TX-DMA modes allocate these exact engine and drain facts. */
 typedef struct {
@@ -41,7 +66,7 @@ typedef struct {
 /** \brief One UART owner plus its selected finite TX-DMA extension. */
 typedef struct {
     nx_stm32_uart_state_t uart;
-    nx_stm32_uart_dma_resources_t resources;
+    const nx_stm32_uart_dma_resources_t* resources;
     nx_stm32_uart_tx_dma_extension_t transmit;
 } nx_stm32_uart_dma_state_t;
 
@@ -86,16 +111,15 @@ typedef struct {
     bool kernel_bound;
 } nx_stm32_spi_dma_config_t;
 
-/** \brief Exact paired-controller cold effects; pin snapshots stay shared.
- * \note Each bit names a selected pad, never a maximum-size object pool.
- *       A failed pin, vector, priority or gate withdrawal retains its marker.
+/** \brief One controller's retained cold effects and original IRQ priorities.
+ * \note Failed preparation restores the original SPI tuple through the shared
+ *       cold receipt. Normal close joins IRQs and withdraws CS before the
+ *       enclosing Platform restores its original pin snapshots.
  */
 typedef struct {
-    uint32_t clock_added;
-    uint16_t pin_leases;
+    nx_stm32_spi_cold_receipt_t spi;
     uint8_t priorities[2];
     bool vectors;
-    bool constructed;
 } nx_stm32_spi_dma_cold_t;
 
 #ifdef __cplusplus
@@ -128,7 +152,7 @@ nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state);
  */
 nx_result_t nx_stm32_spi_dma_prepare(nx_stm32_spi_dma_state_t* state,
                                      const nx_stm32_spi_dma_config_t* config,
-                                     nx_stm32_spi_cold_receipt_t* receipt);
+                                     nx_stm32_spi_dma_cold_t* receipt);
 /** \brief Join DMA and wire references before returning pins and SPI clock.
  * \param[in,out] state: The same serialized owner as prepare.
  * \param[in] config: Unchanged static assembly resources.
@@ -137,27 +161,7 @@ nx_result_t nx_stm32_spi_dma_prepare(nx_stm32_spi_dma_state_t* state,
  */
 nx_result_t nx_stm32_spi_dma_close(nx_stm32_spi_dma_state_t* state,
                                    const nx_stm32_spi_dma_config_t* config,
-                                   nx_stm32_spi_cold_receipt_t* receipt);
-
-/** \brief Acquire one member of a selected independent SPI controller pair.
- * \param[in,out] state: Serialized cold owner, no active requests or vectors.
- * \param[in] config: Exact controller, route and shared Platform snapshots.
- * \param[in,out] cold: Zero or fully withdrawn cold effects, private per owner.
- * \return Success or error; every partial effect remains in cold until close.
- */
-nx_result_t
-nx_stm32_spi_dma_pair_prepare(nx_stm32_spi_dma_state_t* state,
-                              const nx_stm32_spi_dma_config_t* config,
-                              nx_stm32_spi_dma_cold_t* cold);
-/** \brief Join publisher, IRQ, priority, pin and gate ownership in that order.
- * \param[in,out] state: Same exclusive owner as prepare.
- * \param[in] config: Unchanged selected static resources.
- * \param[in,out] cold: Actual retained markers from prepare or failed close.
- * \return Success only after every marker is withdrawn; failure allows retry.
- */
-nx_result_t nx_stm32_spi_dma_pair_close(nx_stm32_spi_dma_state_t* state,
-                                        const nx_stm32_spi_dma_config_t* config,
-                                        nx_stm32_spi_dma_cold_t* cold);
+                                   nx_stm32_spi_dma_cold_t* receipt);
 
 /**
  * \brief           Observe one selected finite DMA source without polling

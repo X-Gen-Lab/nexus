@@ -71,8 +71,8 @@ nx_result_t nx_stm32_eth_frames_initialize(nx_eth_frames_mac_t* mac,
         mac->irq_policy.external_irq_count != 82U)
         return NX_ERROR_INVALID;
     if (mac->registers != UINT32_C(0x40028000) ||
-        mac->hclk_hz != NEXUS_CORE_HZ || mac->hclk_hz != 168000000U ||
-        mac->source.irq_number != ETH_IRQn)
+        mac->hclk_hz != NEXUS_CORE_HZ || mac->hclk_hz < 25000000U ||
+        mac->hclk_hz > 168000000U || mac->source.irq_number != ETH_IRQn)
         return NX_ERROR_UNSUPPORTED;
     if (mac->regions == NULL || mac->region_count == 0U ||
         mac->region_count > SIZE_MAX / sizeof(*mac->regions) ||

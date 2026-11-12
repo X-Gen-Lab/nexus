@@ -51,10 +51,11 @@ class ImageReservationTests(unittest.TestCase):
         self.assertEqual(result.layout.origin, 0x08020000)
         self.assertEqual(result.layout.size, 0x20000)
         self.assertEqual(result.layout.id, "application")
-        self.assertFalse(hasattr(result.layout, "erase_blocks"))
-        self.assertEqual(tuple(result.to_dict()["layout"]["erase_blocks"]),
-                         (16384, 16384, 16384, 16384, 65536,
-                          131072, 131072, 131072))
+        self.assertFalse(hasattr(result.layout, "erase_spans"))
+        self.assertEqual(result.to_dict()["layout"]["erase_spans"], [
+            {"offset": 0, "erase_bytes": 16384, "count": 4},
+            {"offset": 65536, "erase_bytes": 65536, "count": 1},
+            {"offset": 131072, "erase_bytes": 131072, "count": 3}])
         self.assertEqual(result.image_origin, 0x08020200)
         self.assertEqual(result.image_size, 0x20000 - 512 - 1024)
         self.assertEqual(result.memory_budget.image_prefix_bytes, 512)
@@ -161,8 +162,8 @@ class ImageReservationTests(unittest.TestCase):
 
     def test_nonzero_reservations_require_complete_physical_erase_geometry(self):
         resolved = self.select(explicit=False).to_dict()
-        del resolved["flash"]["erase_blocks"]
-        del resolved["layout"]["erase_blocks"]
+        del resolved["flash"]["erase_spans"]
+        del resolved["layout"]["erase_spans"]
         with self.assertRaisesRegex(EvidenceError, "erase geometry"):
             image_window(resolved)
 

@@ -57,6 +57,32 @@ class DocumentationCheckTests(unittest.TestCase):
         self.write("page.md", "# Page\n\n```c\n[not a link](absent)\n```\n")
         self.assertEqual(self.scan()["errors"], [])
 
+    def test_source_adjacent_readme_broken_link_is_reported(self):
+        board = self.root / "boards/reference/README.md"
+        board.parent.mkdir(parents=True)
+        board.write_text("# Board\n[provider](../../soc/removed/README.md)\n")
+        self.assertIn("boards/reference/README.md: missing link",
+                      " ".join(self.scan()["errors"]))
+
+    def test_source_adjacent_links_keep_fences_and_history_separate(self):
+        board = self.root / "boards/reference/README.md"
+        board.parent.mkdir(parents=True)
+        board.write_text("# Board\n[contract](../../docs/page.md#contract)\n"
+                         "```markdown\n[example](absent.md)\n```\n")
+        history = self.root / "tests/evidence/old/README.md"
+        history.parent.mkdir(parents=True)
+        history.write_text("# Frozen record\n[old](absent.md)\n")
+        (self.root / "CHANGELOG.md").write_text(
+            "# Historical changes\n[removed](absent.md)\n")
+        self.assertEqual(self.scan()["errors"], [])
+
+    def test_source_adjacent_markdown_anchor_is_checked(self):
+        page = self.root / "components/reference/README.md"
+        page.parent.mkdir(parents=True)
+        page.write_text("# Component\n[contract](../../docs/page.md#absent)\n")
+        self.assertIn("components/reference/README.md: missing anchor",
+                      " ".join(self.scan()["errors"]))
+
     def test_literalinclude_missing_file_is_reported(self):
         self.write("page.md", "# Page\n\n```{literalinclude} absent.c\n```\n")
         self.assertIn("literalinclude", " ".join(self.scan()["errors"]))
@@ -282,6 +308,43 @@ class DottedDocnameRegression(unittest.TestCase):
                              [(docs / "release-0.1.0.md").resolve()])
             result = check.scan(root, check_diagrams=False, check_configuration=False)
             self.assertIn("missing toctree target", " ".join(result["errors"]))
+
+
+class SourceSDKInstructionTests(unittest.TestCase):
+    def test_complete_consumer_instructions_export_the_required_profile(self):
+        import importlib.util
+        import shlex
+        from contextlib import redirect_stdout
+        import io
+        from unittest.mock import patch
+
+        root = Path(__file__).resolve().parents[2]
+        module_spec = importlib.util.spec_from_file_location(
+            "documented_source_sdk", root / "cmake/package/package_source_sdk.py")
+        packager = importlib.util.module_from_spec(module_spec)
+        module_spec.loader.exec_module(packager)
+        source = (root / "docs/tutorials/source-sdk.md").read_text()
+        commands = [shlex.split(line) for block in check.FENCE.finditer(source)
+                    if block[2].strip() == "sh"
+                    for line in block[3].replace("\\\n", " ").splitlines()
+                    if line.strip()]
+        command = next(argv for argv in commands
+                       if len(argv) > 2 and argv[1].endswith(
+                           "cmake/package/package_source_sdk.py")
+                       and "--source" in argv and "--output" in argv)
+        result = {"kind": "source_snapshot", "source_revision": "a" * 40,
+                  "publishable": True, "files_sha256": {},
+                  "snapshot_sha256": "b" * 64}
+        with patch.object(packager, "prepare", return_value=result) as prepare, \
+                redirect_stdout(io.StringIO()):
+            self.assertEqual(packager.main(command[2:]), 0)
+        profile = prepare.call_args.kwargs["profile"]
+        self.assertTrue(profile["host_support"],
+                        "The complete plan starts with a Native consumer")
+        selected = set(packager.runtime_dependency_closure(profile))
+        self.assertTrue({"ext/lwip", "ext/mbedtls", "ext/coremqtt",
+                         "ext/mcuboot"}.issubset(selected),
+                        "The complete plan includes network, TLS and boot users")
 
 
 if __name__ == "__main__":

@@ -317,13 +317,13 @@ def validate_protocol(protocol, fixture, resolved):
                 flash.get("origin", 0) <= start < start + size <=
                 flash.get("origin", 0) + flash.get("size", 0),
                 "SoC Flash region leaves exact physical Flash")
-        boundary = flash["origin"]
-        boundaries = {boundary}
-        for erase_bytes in flash["erase_blocks"]:
-            boundary += erase_bytes
-            boundaries.add(boundary)
-        require(start in boundaries and start + size in boundaries,
-                "SoC Flash region must use exact erase boundaries")
+        from tools.configure.memory import flash_erase_boundary
+        try:
+            aligned = all(flash_erase_boundary(flash, value)
+                          for value in (start, start + size))
+        except ValueError as error:
+            raise EvidenceError("Invalid physical Flash erase geometry") from error
+        require(aligned, "SoC Flash region must use exact erase boundaries")
         protected = layout["protected_regions"]
         require(isinstance(protected, list) and 0 < len(protected) <= 128,
                 "external product protected Flash regions required")

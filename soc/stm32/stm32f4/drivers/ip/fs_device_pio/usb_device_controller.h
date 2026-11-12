@@ -5,6 +5,10 @@
  */
 #ifndef NEXUS_PRIVATE_USB_DEVICE_CONTROLLER_H
 #define NEXUS_PRIVATE_USB_DEVICE_CONTROLLER_H
+/** \brief Private code selection, derived from the sole typed assembly. */
+#ifndef NEXUS_STM32F4_USB_REMOTE_WAKEUP
+#define NEXUS_STM32F4_USB_REMOTE_WAKEUP 0
+#endif
 #include "nexus/arch/arch.h"
 #include "nexus/io/dma.h"
 #include "nexus/io/usb_activation.h"
@@ -18,6 +22,8 @@ typedef struct {
     nx_result_t (*retain)(void*);
     nx_result_t (*release)(void*);
     nx_result_t (*validate)(const void*);
+    /** \brief Live Core epoch under caller IRQ exclusion, zero if absent. */
+    uint64_t (*epoch)(const void*);
 } nx_usb_clock_ops_t;
 typedef struct {
     const nx_usb_clock_ops_t* ops;
@@ -25,6 +31,18 @@ typedef struct {
     size_t context_size;
 } nx_usb_clock_domain_t;
 typedef struct nx_usb_controller nx_usb_controller_t;
+/** \brief Optional selected remote-wakeup runtime, no worker or second owner.
+ * \note Static storage outlives controller stop; packet-only plans use NULL.
+ */
+typedef struct {
+    /** \brief Suspend observation, then the post-assertion minimum bound. */
+    nx_time_us_t time_us;
+    /** \brief Pre-assertion bound also exposes delay before timestamping. */
+    nx_time_us_t before_us;
+    uint64_t time_epoch;
+    nx_usb_remote_wakeup_request_t* request;
+    uint8_t flags;
+} nx_usb_remote_runtime_t;
 /** \brief Per-direction static DMA bounce storage, separate from user loans. */
 typedef struct {
     uint8_t* bytes;
@@ -51,6 +69,8 @@ typedef struct {
     bool halted;
     bool rx_seen;
     bool disable_requested;
+    /** \brief Packet completion and independent pending DMA SETUP receipts. */
+    uint8_t observed;
 } nx_usb_endpoint_t;
 /** \brief One selected static controller, endpoint array and exact event ring.
  */
@@ -87,6 +107,7 @@ struct nx_usb_controller {
     bool setup_pending;
     bool vbus_sensing;
     bool dma;
+    nx_usb_remote_runtime_t* remote;
 };
 extern const nx_usb_endpoint_ops_t nx_usb_fs_endpoint_ops;
 extern const nx_usb_device_ops_t nx_usb_fs_device_ops;

@@ -1,8 +1,10 @@
 /**
  * \file            power.c
- * \brief           Drained F407 deep power with explicit timer epoch
- * replacement \author          Nexus Team \version         1.0.0 \date
- * 2026-11-10 \copyright       Copyright (c) 2026 Nexus Team
+ * \brief           F407 deep power with drain and explicit timer epochs
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-11-10
+ * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "clock_domain_impl.h"
 #include "nexus/core/fault.h"

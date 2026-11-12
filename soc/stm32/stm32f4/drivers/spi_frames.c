@@ -313,13 +313,13 @@ static void begin_drain(nx_stm32_spi_frames_state_t* state,
     if (!state->terminal_latched) {
         state->terminal = terminal;
         state->terminal_latched = true;
-        state->drain_deadline =
-            !domain_live(state->config, state->time_epoch)
-                ? 0U
-                : nx_deadline_after(
-                      nx_time_now_us(),
-                      100U + (uint64_t)state->config->wire.word_bits *
-                                 state->receive_tail_delay_us * 2U);
+        if (!domain_live(state->config, state->time_epoch) ||
+            nx_deadline_finite_after(
+                nx_time_now_us(),
+                100U + (uint64_t)state->config->wire.word_bits *
+                           state->receive_tail_delay_us * 2U,
+                &state->drain_deadline) != NX_SUCCESS)
+            state->drain_deadline = 0U;
     }
     if (!domain_live(state->config, state->time_epoch))
         (void)nx_request_transition(&state->active->base,
@@ -341,8 +341,10 @@ static bool receive_tail(nx_stm32_spi_frames_state_t* state) {
         return false;
     }
     nx_time_us_t start = nx_time_now_us();
-    nx_time_us_t target =
-        nx_deadline_after(start, state->receive_tail_delay_us + 1U);
+    nx_time_us_t target;
+    if (nx_deadline_finite_after(start, state->receive_tail_delay_us + 1U,
+                                 &target) != NX_SUCCESS)
+        goto failed;
     nx_time_us_t previous = start;
     for (unsigned spin = 0U; spin < 10000U; ++spin) {
         if (!domain_live(state->config, state->time_epoch))
@@ -364,6 +366,7 @@ static bool receive_tail(nx_stm32_spi_frames_state_t* state) {
             return true;
         break;
     }
+failed:
     begin_drain(state, NX_ERROR_IO);
     (void)nx_request_transition(&state->active->base, NX_REQUEST_QUARANTINED);
     return false;

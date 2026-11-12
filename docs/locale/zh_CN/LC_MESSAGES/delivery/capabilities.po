@@ -1,6 +1,6 @@
 # Current canonical messages; semantic review admission is tracked separately.
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: c434546078ccb2543874a8307e14c3bd4ed6b9cf09b0c6c3b0634ce61ce9b070\n"
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 9d0f9f766e0d3dd51e07bda3d5e967f568ccf3c27efd5a3030c4619512783216\n"
 
 msgid "当前派生能力矩阵"
 msgstr "当前派生能力矩阵"
@@ -128,11 +128,23 @@ msgstr "`tests/contracts/adc_group_assembly/ve-dual-injected.toml`, `tests/contr
 msgid "`soc/stm32/stm32f4/drivers/adc_group.c`"
 msgstr "`soc/stm32/stm32f4/drivers/adc_group.c`"
 
+msgid "regular-auto-injected"
+msgstr "regular-auto-injected"
+
+msgid "regular-blocks"
+msgstr "regular-blocks"
+
 msgid "regular-sequence-dma"
 msgstr "regular-sequence-dma"
 
 msgid "`tests/contracts/adc_group_assembly/ve-dual-interleaved.toml`, `tests/contracts/adc_group_assembly/ve-dual-regular.toml`, `tests/contracts/adc_group_assembly/zg-triple-interleaved.toml`, `tests/contracts/adc_group_assembly/zg-triple-regular-freertos.toml`"
 msgstr "`tests/contracts/adc_group_assembly/ve-dual-interleaved.toml`, `tests/contracts/adc_group_assembly/ve-dual-regular.toml`, `tests/contracts/adc_group_assembly/zg-triple-interleaved.toml`, `tests/contracts/adc_group_assembly/zg-triple-regular-freertos.toml`"
+
+msgid "regular-software-injected-blocks"
+msgstr "regular-software-injected-blocks"
+
+msgid "regular-timer-injected-blocks"
+msgstr "regular-timer-injected-blocks"
 
 msgid "ADC2"
 msgstr "ADC2"
@@ -212,11 +224,29 @@ msgstr "`crc-internal`"
 msgid "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41`"
 msgstr "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41`"
 
-msgid "`tests/contracts/crc_assembly/ve.toml`, `tests/contracts/crc_assembly/zg.toml`"
-msgstr "`tests/contracts/crc_assembly/ve.toml`, `tests/contracts/crc_assembly/zg.toml`"
+msgid "`tests/contracts/crc_assembly/ve.toml`, `tests/contracts/crc_assembly/zg.toml`, `tests/contracts/stm32f4_family/f405zg.toml`, `tests/contracts/stm32f4_family/f407zg.toml`, `tests/contracts/stm32f4_family/f411re.toml`, `tests/contracts/stm32f4_family/f415zg.toml`, `tests/contracts/stm32f4_family/f417zg.toml`, `tests/contracts/stm32f4_family/f446ze.toml`, `tests/contracts/stm32f4_family/f479ni.toml`"
+msgstr "`tests/contracts/crc_assembly/ve.toml`, `tests/contracts/crc_assembly/zg.toml`, `tests/contracts/stm32f4_family/f405zg.toml`, `tests/contracts/stm32f4_family/f407zg.toml`, `tests/contracts/stm32f4_family/f411re.toml`, `tests/contracts/stm32f4_family/f415zg.toml`, `tests/contracts/stm32f4_family/f417zg.toml`, `tests/contracts/stm32f4_family/f446ze.toml`, `tests/contracts/stm32f4_family/f479ni.toml`"
 
 msgid "`soc/stm32/stm32f4/drivers/crc.c`"
 msgstr "`soc/stm32/stm32f4/drivers/crc.c`"
+
+msgid "CRYP"
+msgstr "CRYP"
+
+msgid "cipher"
+msgstr "cipher"
+
+msgid "irq-blocks"
+msgstr "irq-blocks"
+
+msgid "`cryp-internal`"
+msgstr "`cryp-internal`"
+
+msgid "`tests/contracts/stm32f4_crypto/f415zg.toml`, `tests/contracts/stm32f4_crypto/f417zg.toml`"
+msgstr "`tests/contracts/stm32f4_crypto/f415zg.toml`, `tests/contracts/stm32f4_crypto/f417zg.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/cipher.c`"
+msgstr "`soc/stm32/stm32f4/drivers/cipher.c`"
 
 msgid "DAC"
 msgstr "DAC"
@@ -263,20 +293,56 @@ msgstr "DCMI"
 msgid "capture"
 msgstr "capture"
 
-msgid "raw-blocks"
-msgstr "raw-blocks"
-
-msgid "`dcmi10-hardware-s1`, `dcmi10-hardware-s7`, `dcmi12-hardware-s1`, `dcmi12-hardware-s7`, `dcmi14-hardware-s1`, `dcmi14-hardware-s7`, `dcmi8-embedded-s1`, `dcmi8-embedded-s7`, `dcmi8-hardware-s1`, `dcmi8-hardware-s7`"
-msgstr "`dcmi10-hardware-s1`, `dcmi10-hardware-s7`, `dcmi12-hardware-s1`, `dcmi12-hardware-s7`, `dcmi14-hardware-s1`, `dcmi14-hardware-s7`, `dcmi8-embedded-s1`, `dcmi8-embedded-s7`, `dcmi8-hardware-s1`, `dcmi8-hardware-s7`"
-
-msgid "snapshot-jpeg"
-msgstr "snapshot-jpeg"
+msgid "frames-jpeg"
+msgstr "frames-jpeg"
 
 msgid "`dcmi8-hardware-s1`, `dcmi8-hardware-s7`"
 msgstr "`dcmi8-hardware-s1`, `dcmi8-hardware-s7`"
 
+msgid "frames-raw"
+msgstr "frames-raw"
+
+msgid "`dcmi10-hardware-s1`, `dcmi10-hardware-s7`, `dcmi12-hardware-s1`, `dcmi12-hardware-s7`, `dcmi14-hardware-s1`, `dcmi14-hardware-s7`, `dcmi8-embedded-s1`, `dcmi8-embedded-s7`, `dcmi8-hardware-s1`, `dcmi8-hardware-s7`"
+msgstr "`dcmi10-hardware-s1`, `dcmi10-hardware-s7`, `dcmi12-hardware-s1`, `dcmi12-hardware-s7`, `dcmi14-hardware-s1`, `dcmi14-hardware-s7`, `dcmi8-embedded-s1`, `dcmi8-embedded-s7`, `dcmi8-hardware-s1`, `dcmi8-hardware-s7`"
+
+msgid "raw-blocks"
+msgstr "raw-blocks"
+
+msgid "`tests/contracts/f407_capture_audio/zg-raw8-blocks-i2s3.toml`"
+msgstr "`tests/contracts/f407_capture_audio/zg-raw8-blocks-i2s3.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/capture.c`"
+msgstr "`soc/stm32/stm32f4/drivers/capture.c`"
+
+msgid "snapshot-jpeg"
+msgstr "snapshot-jpeg"
+
+msgid "`tests/contracts/f407_capture_audio/ve-jpeg.toml`"
+msgstr "`tests/contracts/f407_capture_audio/ve-jpeg.toml`"
+
 msgid "snapshot-raw"
 msgstr "snapshot-raw"
+
+msgid "`tests/contracts/f407_capture_audio/ve-capture-audio-uart.toml`, `tests/contracts/f407_capture_audio/ve-raw12-duplex.toml`, `tests/contracts/f407_capture_audio/zg-raw14.toml`"
+msgstr "`tests/contracts/f407_capture_audio/ve-capture-audio-uart.toml`, `tests/contracts/f407_capture_audio/ve-raw12-duplex.toml`, `tests/contracts/f407_capture_audio/zg-raw14.toml`"
+
+msgid "DMA2D"
+msgstr "DMA2D"
+
+msgid "image"
+msgstr "image"
+
+msgid "irq-blit"
+msgstr "irq-blit"
+
+msgid "`dma2d-memory`"
+msgstr "`dma2d-memory`"
+
+msgid "`tests/contracts/stm32f4_graphics/combined.toml`, `tests/contracts/stm32f4_graphics/dual-rgb888.toml`, `tests/contracts/stm32f4_graphics/image-only.toml`"
+msgstr "`tests/contracts/stm32f4_graphics/combined.toml`, `tests/contracts/stm32f4_graphics/dual-rgb888.toml`, `tests/contracts/stm32f4_graphics/image-only.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/dma2d.c`"
+msgstr "`soc/stm32/stm32f4/drivers/dma2d.c`"
 
 msgid "ETH"
 msgstr "ETH"
@@ -317,6 +383,9 @@ msgstr "rmii-vlan-sg-ptp"
 msgid "`rmii-frames-a-c-g`"
 msgstr "`rmii-frames-a-c-g`"
 
+msgid "`cmake/package/verification/io_evolution/f407zg-eth-frames.toml`, `tests/contracts/f407_qiming_network/assembly.toml`"
+msgstr "`cmake/package/verification/io_evolution/f407zg-eth-frames.toml`, `tests/contracts/f407_qiming_network/assembly.toml`"
+
 msgid "`soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c`"
 msgstr "`soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c`"
 
@@ -329,17 +398,71 @@ msgstr "exti"
 msgid "edge-event"
 msgstr "edge-event"
 
-msgid "`tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml`"
-msgstr "`tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml`"
+msgid "`exti0-pa0`, `exti0-pb0`, `exti0-pc0`, `exti0-pd0`, `exti0-pe0`, `exti0-pf0`, `exti0-pg0`, `exti0-ph0`"
+msgstr "`exti0-pa0`, `exti0-pb0`, `exti0-pc0`, `exti0-pd0`, `exti0-pe0`, `exti0-pf0`, `exti0-pg0`, `exti0-ph0`"
+
+msgid "`tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml`, `tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-freertos.toml`"
+msgstr "`tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml`, `tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-freertos.toml`"
 
 msgid "`soc/stm32/stm32f4/drivers/exti.c`"
 msgstr "`soc/stm32/stm32f4/drivers/exti.c`"
 
+msgid "hardware-event"
+msgstr "hardware-event"
+
+msgid "`tests/contracts/gpio_exti_assembly/ve-hardware-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-hardware-freertos.toml`"
+msgstr "`tests/contracts/gpio_exti_assembly/ve-hardware-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-hardware-freertos.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/exti_hardware.c`"
+msgstr "`soc/stm32/stm32f4/drivers/exti_hardware.c`"
+
+msgid "EXTI1"
+msgstr "EXTI1"
+
+msgid "`exti1-pa1`, `exti1-pb1`, `exti1-pc1`, `exti1-pd1`, `exti1-pe1`, `exti1-pf1`, `exti1-pg1`, `exti1-ph1`"
+msgstr "`exti1-pa1`, `exti1-pb1`, `exti1-pc1`, `exti1-pd1`, `exti1-pe1`, `exti1-pf1`, `exti1-pg1`, `exti1-ph1`"
+
+msgid "`tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-freertos.toml`"
+msgstr "`tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-freertos.toml`"
+
+msgid "EXTI10"
+msgstr "EXTI10"
+
+msgid "`exti10-pa10`, `exti10-pb10`, `exti10-pc10`, `exti10-pd10`, `exti10-pe10`, `exti10-pf10`, `exti10-pg10`"
+msgstr "`exti10-pa10`, `exti10-pb10`, `exti10-pc10`, `exti10-pd10`, `exti10-pe10`, `exti10-pf10`, `exti10-pg10`"
+
 msgid "EXTI11"
 msgstr "EXTI11"
 
+msgid "`exti11-pa11`, `exti11-pb11`, `exti11-pc11`, `exti11-pd11`, `exti11-pe11`, `exti11-pf11`, `exti11-pg11`"
+msgstr "`exti11-pa11`, `exti11-pb11`, `exti11-pc11`, `exti11-pd11`, `exti11-pe11`, `exti11-pf11`, `exti11-pg11`"
+
 msgid "`stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41`"
 msgstr "`stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41`"
+
+msgid "EXTI12"
+msgstr "EXTI12"
+
+msgid "`exti12-pa12`, `exti12-pb12`, `exti12-pc12`, `exti12-pd12`, `exti12-pe12`, `exti12-pf12`, `exti12-pg12`"
+msgstr "`exti12-pa12`, `exti12-pb12`, `exti12-pc12`, `exti12-pd12`, `exti12-pe12`, `exti12-pf12`, `exti12-pg12`"
+
+msgid "EXTI13"
+msgstr "EXTI13"
+
+msgid "`exti13-pa13`, `exti13-pb13`, `exti13-pc13`, `exti13-pd13`, `exti13-pe13`, `exti13-pf13`, `exti13-pg13`"
+msgstr "`exti13-pa13`, `exti13-pb13`, `exti13-pc13`, `exti13-pd13`, `exti13-pe13`, `exti13-pf13`, `exti13-pg13`"
+
+msgid "EXTI14"
+msgstr "EXTI14"
+
+msgid "`exti14-pa14`, `exti14-pb14`, `exti14-pc14`, `exti14-pd14`, `exti14-pe14`, `exti14-pf14`, `exti14-pg14`"
+msgstr "`exti14-pa14`, `exti14-pb14`, `exti14-pc14`, `exti14-pd14`, `exti14-pe14`, `exti14-pf14`, `exti14-pg14`"
+
+msgid "EXTI15"
+msgstr "EXTI15"
+
+msgid "`exti15-pa15`, `exti15-pb15`, `exti15-pc15`, `exti15-pd15`, `exti15-pe15`, `exti15-pf15`, `exti15-pg15`"
+msgstr "`exti15-pa15`, `exti15-pb15`, `exti15-pc15`, `exti15-pd15`, `exti15-pe15`, `exti15-pf15`, `exti15-pg15`"
 
 msgid "EXTI16"
 msgstr "EXTI16"
@@ -365,23 +488,56 @@ msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-pvd-baremetal.toml`"
 msgid "EXTI2"
 msgstr "EXTI2"
 
+msgid "`exti2-pa2`, `exti2-pb2`, `exti2-pc2`, `exti2-pd2`, `exti2-pe2`, `exti2-pf2`, `exti2-pg2`"
+msgstr "`exti2-pa2`, `exti2-pb2`, `exti2-pc2`, `exti2-pd2`, `exti2-pe2`, `exti2-pf2`, `exti2-pg2`"
+
 msgid "`stm32f407zg-qiming-v41`"
 msgstr "`stm32f407zg-qiming-v41`"
+
+msgid "EXTI3"
+msgstr "EXTI3"
+
+msgid "`exti3-pa3`, `exti3-pb3`, `exti3-pc3`, `exti3-pd3`, `exti3-pe3`, `exti3-pf3`, `exti3-pg3`"
+msgstr "`exti3-pa3`, `exti3-pb3`, `exti3-pc3`, `exti3-pd3`, `exti3-pe3`, `exti3-pf3`, `exti3-pg3`"
+
+msgid "EXTI4"
+msgstr "EXTI4"
+
+msgid "`exti4-pa4`, `exti4-pb4`, `exti4-pc4`, `exti4-pd4`, `exti4-pe4`, `exti4-pf4`, `exti4-pg4`"
+msgstr "`exti4-pa4`, `exti4-pb4`, `exti4-pc4`, `exti4-pd4`, `exti4-pe4`, `exti4-pf4`, `exti4-pg4`"
 
 msgid "EXTI5"
 msgstr "EXTI5"
 
+msgid "`exti5-pa5`, `exti5-pb5`, `exti5-pc5`, `exti5-pd5`, `exti5-pe5`, `exti5-pf5`, `exti5-pg5`"
+msgstr "`exti5-pa5`, `exti5-pb5`, `exti5-pc5`, `exti5-pd5`, `exti5-pe5`, `exti5-pf5`, `exti5-pg5`"
+
+msgid "`tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-freertos.toml`, `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml`"
+msgstr "`tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-freertos.toml`, `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml`"
+
 msgid "EXTI6"
 msgstr "EXTI6"
+
+msgid "`exti6-pa6`, `exti6-pb6`, `exti6-pc6`, `exti6-pd6`, `exti6-pe6`, `exti6-pf6`, `exti6-pg6`"
+msgstr "`exti6-pa6`, `exti6-pb6`, `exti6-pc6`, `exti6-pd6`, `exti6-pe6`, `exti6-pf6`, `exti6-pg6`"
 
 msgid "EXTI7"
 msgstr "EXTI7"
 
+msgid "`exti7-pa7`, `exti7-pb7`, `exti7-pc7`, `exti7-pd7`, `exti7-pe7`, `exti7-pf7`, `exti7-pg7`"
+msgstr "`exti7-pa7`, `exti7-pb7`, `exti7-pc7`, `exti7-pd7`, `exti7-pe7`, `exti7-pf7`, `exti7-pg7`"
+
 msgid "EXTI8"
 msgstr "EXTI8"
 
+msgid "`exti8-pa8`, `exti8-pb8`, `exti8-pc8`, `exti8-pd8`, `exti8-pe8`, `exti8-pf8`, `exti8-pg8`"
+msgstr "`exti8-pa8`, `exti8-pb8`, `exti8-pc8`, `exti8-pd8`, `exti8-pe8`, `exti8-pf8`, `exti8-pg8`"
+
 msgid "EXTI9"
 msgstr "EXTI9"
+
+msgid "`exti9-pa9`, `exti9-pb9`, `exti9-pc9`, `exti9-pd9`, `exti9-pe9`, `exti9-pf9`, `exti9-pg9`"
+msgstr "`exti9-pa9`, `exti9-pb9`, `exti9-pc9`, `exti9-pd9`, `exti9-pe9`, `exti9-pf9`, `exti9-pg9`"
 
 msgid "FLASH"
 msgstr "FLASH"
@@ -395,14 +551,41 @@ msgstr "poll-word"
 msgid "`flash-internal`"
 msgstr "`flash-internal`"
 
+msgid "`tests/contracts/flash_factory/stm32.toml`, `tests/contracts/mcuboot_link/assembly.toml`, `tests/contracts/mcuboot_link/payload-assembly.generated.toml`, `tests/contracts/physical_platform_assembly/f407-pinless-arm.toml`, `tests/contracts/stm32_assembly/ve-flash.toml`, `tests/contracts/stm32_assembly/zg-flash.toml`"
+msgstr "`tests/contracts/flash_factory/stm32.toml`, `tests/contracts/mcuboot_link/assembly.toml`, `tests/contracts/mcuboot_link/payload-assembly.generated.toml`, `tests/contracts/physical_platform_assembly/f407-pinless-arm.toml`, `tests/contracts/stm32_assembly/ve-flash.toml`, `tests/contracts/stm32_assembly/zg-flash.toml`"
+
 msgid "`soc/stm32/stm32f4/drivers/flash.c`"
 msgstr "`soc/stm32/stm32f4/drivers/flash.c`"
 
-msgid "FSMC"
-msgstr "FSMC"
+msgid "FMC"
+msgstr "FMC"
 
 msgid "external_bus"
 msgstr "external_bus"
+
+msgid "sdram-controller"
+msgstr "sdram-controller"
+
+msgid "`fmc-sdram-control`"
+msgstr "`fmc-sdram-control`"
+
+msgid "`tests/contracts/stm32f4_sdram/f479ni-sdram.toml`"
+msgstr "`tests/contracts/stm32f4_sdram/f479ni-sdram.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/fmc_sdram.c`"
+msgstr "`soc/stm32/stm32f4/drivers/fmc_sdram.c`"
+
+msgid "memory_window"
+msgstr "memory_window"
+
+msgid "cpu-window"
+msgstr "cpu-window"
+
+msgid "`fmc-sdram-bank1-16`"
+msgstr "`fmc-sdram-bank1-16`"
+
+msgid "FSMC"
+msgstr "FSMC"
 
 msgid "async16"
 msgstr "async16"
@@ -430,12 +613,6 @@ msgstr "nor-cfi"
 
 msgid "`fsmc-reference-flash_async-ve`, `fsmc-reference-flash_async-zg`"
 msgstr "`fsmc-reference-flash_async-ve`, `fsmc-reference-flash_async-zg`"
-
-msgid "memory_window"
-msgstr "memory_window"
-
-msgid "cpu-window"
-msgstr "cpu-window"
 
 msgid "`fsmc-ne3-is62wv51216`"
 msgstr "`fsmc-ne3-is62wv51216`"
@@ -476,8 +653,8 @@ msgstr "gpio"
 msgid "input"
 msgstr "input"
 
-msgid "`tests/contracts/declared_io_assembly/f407-input.toml`, `tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, `tests/contracts/usb_otg_assembly/ve-fs.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`"
-msgstr "`tests/contracts/declared_io_assembly/f407-input.toml`, `tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, `tests/contracts/usb_otg_assembly/ve-fs.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`"
+msgid "`gpio-pa0`, `gpio-pa1`, `gpio-pa10`, `gpio-pa11`, `gpio-pa12`, `gpio-pa13`, `gpio-pa14`, `gpio-pa15`, `gpio-pa2`, `gpio-pa3`, `gpio-pa4`, `gpio-pa5`, `gpio-pa6`, `gpio-pa7`, `gpio-pa8`, `gpio-pa9`"
+msgstr "`gpio-pa0`, `gpio-pa1`, `gpio-pa10`, `gpio-pa11`, `gpio-pa12`, `gpio-pa13`, `gpio-pa14`, `gpio-pa15`, `gpio-pa2`, `gpio-pa3`, `gpio-pa4`, `gpio-pa5`, `gpio-pa6`, `gpio-pa7`, `gpio-pa8`, `gpio-pa9`"
 
 msgid "`soc/stm32/stm32f4/drivers/gpio.c`"
 msgstr "`soc/stm32/stm32f4/drivers/gpio.c`"
@@ -491,8 +668,17 @@ msgstr "`tests/contracts/declared_io_assembly/f407-output.toml`, `tests/contract
 msgid "GPIOB"
 msgstr "GPIOB"
 
+msgid "`gpio-input-pb2`, `gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb12`, `gpio-pb13`, `gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9`"
+msgstr "`gpio-input-pb2`, `gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb12`, `gpio-pb13`, `gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9`"
+
 msgid "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41`"
 msgstr "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-core`, `stm32f407zg-qiming-v41`"
+
+msgid "`tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml`"
+msgstr "`tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml`"
+
+msgid "`gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb12`, `gpio-pb13`, `gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9`"
+msgstr "`gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb12`, `gpio-pb13`, `gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9`"
 
 msgid "`tests/contracts/declared_io_assembly/f407-output.toml`, `tools/configure/assemblies/sky-baremetal-gpio.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-gpio.toml`, `tools/configure/assemblies/sky-freertos.toml`"
 msgstr "`tests/contracts/declared_io_assembly/f407-output.toml`, `tools/configure/assemblies/sky-baremetal-gpio.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-gpio.toml`, `tools/configure/assemblies/sky-freertos.toml`"
@@ -500,32 +686,65 @@ msgstr "`tests/contracts/declared_io_assembly/f407-output.toml`, `tools/configur
 msgid "GPIOC"
 msgstr "GPIOC"
 
+msgid "`gpio-pc0`, `gpio-pc1`, `gpio-pc10`, `gpio-pc11`, `gpio-pc12`, `gpio-pc13`, `gpio-pc14`, `gpio-pc15`, `gpio-pc2`, `gpio-pc3`, `gpio-pc4`, `gpio-pc5`, `gpio-pc6`, `gpio-pc7`, `gpio-pc8`, `gpio-pc9`"
+msgstr "`gpio-pc0`, `gpio-pc1`, `gpio-pc10`, `gpio-pc11`, `gpio-pc12`, `gpio-pc13`, `gpio-pc14`, `gpio-pc15`, `gpio-pc2`, `gpio-pc3`, `gpio-pc4`, `gpio-pc5`, `gpio-pc6`, `gpio-pc7`, `gpio-pc8`, `gpio-pc9`"
+
 msgid "GPIOD"
 msgstr "GPIOD"
+
+msgid "`gpio-pd0`, `gpio-pd1`, `gpio-pd10`, `gpio-pd11`, `gpio-pd12`, `gpio-pd13`, `gpio-pd14`, `gpio-pd15`, `gpio-pd2`, `gpio-pd3`, `gpio-pd4`, `gpio-pd5`, `gpio-pd6`, `gpio-pd7`, `gpio-pd8`, `gpio-pd9`"
+msgstr "`gpio-pd0`, `gpio-pd1`, `gpio-pd10`, `gpio-pd11`, `gpio-pd12`, `gpio-pd13`, `gpio-pd14`, `gpio-pd15`, `gpio-pd2`, `gpio-pd3`, `gpio-pd4`, `gpio-pd5`, `gpio-pd6`, `gpio-pd7`, `gpio-pd8`, `gpio-pd9`"
+
+msgid "`tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/ve-hardware-baremetal.toml`"
+msgstr "`tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/ve-hardware-baremetal.toml`"
 
 msgid "GPIOE"
 msgstr "GPIOE"
 
+msgid "`gpio-pe0`, `gpio-pe1`, `gpio-pe10`, `gpio-pe11`, `gpio-pe12`, `gpio-pe13`, `gpio-pe14`, `gpio-pe15`, `gpio-pe2`, `gpio-pe3`, `gpio-pe4`, `gpio-pe5`, `gpio-pe6`, `gpio-pe7`, `gpio-pe8`, `gpio-pe9`"
+msgstr "`gpio-pe0`, `gpio-pe1`, `gpio-pe10`, `gpio-pe11`, `gpio-pe12`, `gpio-pe13`, `gpio-pe14`, `gpio-pe15`, `gpio-pe2`, `gpio-pe3`, `gpio-pe4`, `gpio-pe5`, `gpio-pe6`, `gpio-pe7`, `gpio-pe8`, `gpio-pe9`"
+
 msgid "`stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41`"
 msgstr "`stm32f407zg-qiming-v31`, `stm32f407zg-qiming-v41`"
-
-msgid "`tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml`, `tests/contracts/usb_otg_assembly/ve-fs.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`"
-msgstr "`tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml`, `tests/contracts/usb_otg_assembly/ve-fs.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`"
-
-msgid "`tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, `tests/contracts/physical_platform_assembly/stm32-gpio.toml`, `tests/contracts/usb_otg_assembly/ve-fs.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`, `tools/configure/assemblies/qiming-baremetal-gpio.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-gpio.toml`, `tools/configure/assemblies/qiming-freertos.toml`"
-msgstr "`tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, `tests/contracts/physical_platform_assembly/stm32-gpio.toml`, `tests/contracts/usb_otg_assembly/ve-fs.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`, `tools/configure/assemblies/qiming-baremetal-gpio.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-gpio.toml`, `tools/configure/assemblies/qiming-freertos.toml`"
 
 msgid "GPIOF"
 msgstr "GPIOF"
 
+msgid "`gpio-pf0`, `gpio-pf1`, `gpio-pf10`, `gpio-pf11`, `gpio-pf12`, `gpio-pf13`, `gpio-pf14`, `gpio-pf15`, `gpio-pf2`, `gpio-pf3`, `gpio-pf4`, `gpio-pf5`, `gpio-pf6`, `gpio-pf7`, `gpio-pf8`, `gpio-pf9`"
+msgstr "`gpio-pf0`, `gpio-pf1`, `gpio-pf10`, `gpio-pf11`, `gpio-pf12`, `gpio-pf13`, `gpio-pf14`, `gpio-pf15`, `gpio-pf2`, `gpio-pf3`, `gpio-pf4`, `gpio-pf5`, `gpio-pf6`, `gpio-pf7`, `gpio-pf8`, `gpio-pf9`"
+
 msgid "GPIOG"
 msgstr "GPIOG"
+
+msgid "`gpio-pg0`, `gpio-pg1`, `gpio-pg10`, `gpio-pg11`, `gpio-pg12`, `gpio-pg13`, `gpio-pg14`, `gpio-pg15`, `gpio-pg2`, `gpio-pg3`, `gpio-pg4`, `gpio-pg5`, `gpio-pg6`, `gpio-pg7`, `gpio-pg8`, `gpio-pg9`"
+msgstr "`gpio-pg0`, `gpio-pg1`, `gpio-pg10`, `gpio-pg11`, `gpio-pg12`, `gpio-pg13`, `gpio-pg14`, `gpio-pg15`, `gpio-pg2`, `gpio-pg3`, `gpio-pg4`, `gpio-pg5`, `gpio-pg6`, `gpio-pg7`, `gpio-pg8`, `gpio-pg9`"
 
 msgid "`tests/contracts/declared_io_assembly/f407-input.toml`"
 msgstr "`tests/contracts/declared_io_assembly/f407-input.toml`"
 
 msgid "`tests/contracts/declared_io_assembly/f407.toml`"
 msgstr "`tests/contracts/declared_io_assembly/f407.toml`"
+
+msgid "GPIOH"
+msgstr "GPIOH"
+
+msgid "`gpio-ph0`, `gpio-ph1`"
+msgstr "`gpio-ph0`, `gpio-ph1`"
+
+msgid "`tests/contracts/gpio_exti_assembly/zg-freertos.toml`, `tests/contracts/gpio_exti_assembly/zg-hardware-freertos.toml`"
+msgstr "`tests/contracts/gpio_exti_assembly/zg-freertos.toml`, `tests/contracts/gpio_exti_assembly/zg-hardware-freertos.toml`"
+
+msgid "HASH"
+msgstr "HASH"
+
+msgid "hash"
+msgstr "hash"
+
+msgid "`hash-internal`"
+msgstr "`hash-internal`"
+
+msgid "`soc/stm32/stm32f4/drivers/hash.c`"
+msgstr "`soc/stm32/stm32f4/drivers/hash.c`"
 
 msgid "I2C1"
 msgstr "I2C1"
@@ -569,11 +788,20 @@ msgstr "smbus-device"
 msgid "`target-i2c1-pb6-pb7`, `target-i2c1-pb6-pb7-pb5`, `target-i2c1-pb8-pb9`, `target-i2c1-pb8-pb9-pb5`"
 msgstr "`target-i2c1-pb6-pb7`, `target-i2c1-pb6-pb7-pb5`, `target-i2c1-pb8-pb9`, `target-i2c1-pb8-pb9-pb5`"
 
+msgid "`tests/contracts/i2c_target/ve-smbus.toml`, `tests/contracts/i2c_target/zg-smbus.toml`"
+msgstr "`tests/contracts/i2c_target/ve-smbus.toml`, `tests/contracts/i2c_target/zg-smbus.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/i2c_target.c`"
+msgstr "`soc/stm32/stm32f4/drivers/i2c_target.c`"
+
 msgid "target-irq"
 msgstr "target-irq"
 
 msgid "`target-i2c1-pb6-pb7`, `target-i2c1-pb8-pb9`"
 msgstr "`target-i2c1-pb6-pb7`, `target-i2c1-pb8-pb9`"
+
+msgid "`tests/contracts/i2c_target/ve-target-84.toml`, `tests/contracts/i2c_target/ve-target.toml`, `tests/contracts/i2c_target/zg-target.toml`"
+msgstr "`tests/contracts/i2c_target/ve-target-84.toml`, `tests/contracts/i2c_target/ve-target.toml`, `tests/contracts/i2c_target/zg-target.toml`"
 
 msgid "I2C2"
 msgstr "I2C2"
@@ -629,14 +857,29 @@ msgstr "master-duplex"
 msgid "`i2s2-duplex`, `i2s2-duplex-mclk`"
 msgstr "`i2s2-duplex`, `i2s2-duplex-mclk`"
 
+msgid "`tests/contracts/f407_capture_audio/ve-capture-audio-uart.toml`, `tests/contracts/f407_capture_audio/ve-raw12-duplex.toml`"
+msgstr "`tests/contracts/f407_capture_audio/ve-capture-audio-uart.toml`, `tests/contracts/f407_capture_audio/ve-raw12-duplex.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/audio.c`"
+msgstr "`soc/stm32/stm32f4/drivers/audio.c`"
+
+msgid "master-duplex-blocks"
+msgstr "master-duplex-blocks"
+
 msgid "master-rx"
 msgstr "master-rx"
 
 msgid "`i2s2-simplex`, `i2s2-simplex-mclk`"
 msgstr "`i2s2-simplex`, `i2s2-simplex-mclk`"
 
+msgid "master-rx-blocks"
+msgstr "master-rx-blocks"
+
 msgid "master-tx"
 msgstr "master-tx"
+
+msgid "master-tx-blocks"
+msgstr "master-tx-blocks"
 
 msgid "slave-duplex"
 msgstr "slave-duplex"
@@ -644,11 +887,23 @@ msgstr "slave-duplex"
 msgid "`i2s2-duplex`"
 msgstr "`i2s2-duplex`"
 
+msgid "slave-duplex-blocks"
+msgstr "slave-duplex-blocks"
+
+msgid "`tests/contracts/f407_capture_audio/ve-i2s2-duplex-blocks.toml`"
+msgstr "`tests/contracts/f407_capture_audio/ve-i2s2-duplex-blocks.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/audio_blocks.c`"
+msgstr "`soc/stm32/stm32f4/drivers/audio_blocks.c`"
+
 msgid "slave-rx"
 msgstr "slave-rx"
 
 msgid "`i2s2-simplex`"
 msgstr "`i2s2-simplex`"
+
+msgid "slave-rx-blocks"
+msgstr "slave-rx-blocks"
 
 msgid "slave-tx"
 msgstr "slave-tx"
@@ -656,14 +911,20 @@ msgstr "slave-tx"
 msgid "`tools/configure/assemblies/qiming-i2s2-slave-tx.toml`, `tools/configure/assemblies/sky-i2s2-slave-tx.toml`"
 msgstr "`tools/configure/assemblies/qiming-i2s2-slave-tx.toml`, `tools/configure/assemblies/sky-i2s2-slave-tx.toml`"
 
-msgid "`soc/stm32/stm32f4/drivers/audio.c`"
-msgstr "`soc/stm32/stm32f4/drivers/audio.c`"
+msgid "slave-tx-blocks"
+msgstr "slave-tx-blocks"
 
 msgid "I2S3"
 msgstr "I2S3"
 
 msgid "`i2s3-duplex`, `i2s3-duplex-mclk`"
 msgstr "`i2s3-duplex`, `i2s3-duplex-mclk`"
+
+msgid "`tests/contracts/f407_capture_audio/zg-i2s3-duplex-mclk.toml`"
+msgstr "`tests/contracts/f407_capture_audio/zg-i2s3-duplex-mclk.toml`"
+
+msgid "`tests/contracts/f407_capture_audio/zg-i2s3-duplex-blocks.toml`"
+msgstr "`tests/contracts/f407_capture_audio/zg-i2s3-duplex-blocks.toml`"
 
 msgid "`i2s3-simplex`, `i2s3-simplex-mclk`"
 msgstr "`i2s3-simplex`, `i2s3-simplex-mclk`"
@@ -692,6 +953,24 @@ msgstr "`tests/contracts/multi_controller_assembly/stm32-zg-watchdogs-freertos.t
 msgid "`soc/stm32/stm32f4/drivers/watchdog.c`"
 msgstr "`soc/stm32/stm32f4/drivers/watchdog.c`"
 
+msgid "LTDC"
+msgstr "LTDC"
+
+msgid "display"
+msgstr "display"
+
+msgid "rgb-scanout"
+msgstr "rgb-scanout"
+
+msgid "`ltdc-rgb565-reference`, `ltdc-rgb888-reference`"
+msgstr "`ltdc-rgb565-reference`, `ltdc-rgb888-reference`"
+
+msgid "`tests/contracts/stm32f4_graphics/combined.toml`, `tests/contracts/stm32f4_graphics/dual-rgb888.toml`"
+msgstr "`tests/contracts/stm32f4_graphics/combined.toml`, `tests/contracts/stm32f4_graphics/dual-rgb888.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/ltdc.c`"
+msgstr "`soc/stm32/stm32f4/drivers/ltdc.c`"
+
 msgid "OTG_FS"
 msgstr "OTG_FS"
 
@@ -703,6 +982,9 @@ msgstr "device-fs"
 
 msgid "`usbfs-pa11-pa12`"
 msgstr "`usbfs-pa11-pa12`"
+
+msgid "`tests/contracts/st_usb_device_assembly/stm32-ve-fs.toml`, `tests/contracts/usb_assembly/stm32-ve-freertos.toml`, `tests/contracts/usb_assembly/stm32-ve-interrupt.toml`, `tests/contracts/usb_assembly/stm32-ve-remote.toml`, `tests/contracts/usb_assembly/stm32-ve.toml`, `tests/contracts/usb_assembly/stm32-zg-freertos.toml`, `tests/contracts/usb_assembly/stm32-zg-interrupt.toml`, `tests/contracts/usb_assembly/stm32-zg.toml`, `tests/contracts/usb_iso_assembly/ve-fs-max-in.toml`"
+msgstr "`tests/contracts/st_usb_device_assembly/stm32-ve-fs.toml`, `tests/contracts/usb_assembly/stm32-ve-freertos.toml`, `tests/contracts/usb_assembly/stm32-ve-interrupt.toml`, `tests/contracts/usb_assembly/stm32-ve-remote.toml`, `tests/contracts/usb_assembly/stm32-ve.toml`, `tests/contracts/usb_assembly/stm32-zg-freertos.toml`, `tests/contracts/usb_assembly/stm32-zg-interrupt.toml`, `tests/contracts/usb_assembly/stm32-zg.toml`, `tests/contracts/usb_iso_assembly/ve-fs-max-in.toml`"
 
 msgid "`soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c`"
 msgstr "`soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c`"
@@ -734,6 +1016,30 @@ msgstr "`soc/stm32/stm32f4/drivers/usb_host.c`"
 msgid "OTG_HS"
 msgstr "OTG_HS"
 
+msgid "device-hs-fs"
+msgstr "device-hs-fs"
+
+msgid "`usbhs-device-pb14-pb15`"
+msgstr "`usbhs-device-pb14-pb15`"
+
+msgid "`tests/contracts/st_usb_device_assembly/stm32-zg-hs-fs-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-hs-fs-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-hs-fs.toml`, `tests/contracts/usb_iso_assembly/zg-hs-core-fs-out.toml`"
+msgstr "`tests/contracts/st_usb_device_assembly/stm32-zg-hs-fs-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-hs-fs-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-hs-fs.toml`, `tests/contracts/usb_iso_assembly/zg-hs-core-fs-out.toml`"
+
+msgid "device-hs-ulpi"
+msgstr "device-hs-ulpi"
+
+msgid "`usbhs-device-ulpi`"
+msgstr "`usbhs-device-ulpi`"
+
+msgid "`tests/contracts/st_usb_device_assembly/stm32-zg-ulpi-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-ulpi-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-ulpi.toml`, `tests/contracts/usb_iso_assembly/zg-hs-ulpi-dma.toml`"
+msgstr "`tests/contracts/st_usb_device_assembly/stm32-zg-ulpi-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-ulpi-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-ulpi.toml`, `tests/contracts/usb_iso_assembly/zg-hs-ulpi-dma.toml`"
+
+msgid "otg-hs-fs"
+msgstr "otg-hs-fs"
+
+msgid "otg-hs-ulpi"
+msgstr "otg-hs-ulpi"
+
 msgid "host-hs-fs"
 msgstr "host-hs-fs"
 
@@ -752,29 +1058,26 @@ msgstr "`usbhs-host-ulpi`"
 msgid "`tests/contracts/st_usb_host_assembly/stm32-zg-ulpi-dma.toml`, `tests/contracts/usb_host_assembly/stm32-zg-ulpi-dma.toml`"
 msgstr "`tests/contracts/st_usb_host_assembly/stm32-zg-ulpi-dma.toml`, `tests/contracts/usb_host_assembly/stm32-zg-ulpi-dma.toml`"
 
-msgid "device-hs-fs"
-msgstr "device-hs-fs"
+msgid "QUADSPI"
+msgstr "QUADSPI"
 
-msgid "`usbhs-device-pb14-pb15`"
-msgstr "`usbhs-device-pb14-pb15`"
+msgid "qspi-indirect-sdr"
+msgstr "qspi-indirect-sdr"
 
-msgid "device-hs-ulpi"
-msgstr "device-hs-ulpi"
+msgid "`quadspi-indirect-control`"
+msgstr "`quadspi-indirect-control`"
 
-msgid "`usbhs-device-ulpi`"
-msgstr "`usbhs-device-ulpi`"
+msgid "`tests/contracts/stm32f4_qspi/f479ni-qspi.toml`"
+msgstr "`tests/contracts/stm32f4_qspi/f479ni-qspi.toml`"
 
-msgid "otg-hs-fs"
-msgstr "otg-hs-fs"
+msgid "`soc/stm32/stm32f4/drivers/qspi.c`"
+msgstr "`soc/stm32/stm32f4/drivers/qspi.c`"
 
-msgid "`tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`"
-msgstr "`tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`"
+msgid "nor-indirect"
+msgstr "nor-indirect"
 
-msgid "otg-hs-ulpi"
-msgstr "otg-hs-ulpi"
-
-msgid "`tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`"
-msgstr "`tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`"
+msgid "`quadspi-bank1-sdr111`"
+msgstr "`quadspi-bank1-sdr111`"
 
 msgid "RNG"
 msgstr "RNG"
@@ -788,6 +1091,9 @@ msgstr "rng-words"
 msgid "`rng-internal`"
 msgstr "`rng-internal`"
 
+msgid "`tests/contracts/entropy_assembly/ve.toml`, `tests/contracts/entropy_assembly/zg.toml`, `tests/contracts/f407_qiming_network/assembly.toml`"
+msgstr "`tests/contracts/entropy_assembly/ve.toml`, `tests/contracts/entropy_assembly/zg.toml`, `tests/contracts/f407_qiming_network/assembly.toml`"
+
 msgid "`soc/stm32/stm32f4/drivers/entropy.c`"
 msgstr "`soc/stm32/stm32f4/drivers/entropy.c`"
 
@@ -800,11 +1106,50 @@ msgstr "rtc"
 msgid "adopt-retained"
 msgstr "adopt-retained"
 
-msgid "`rtc-lse-pc14-pc15`"
-msgstr "`rtc-lse-pc14-pc15`"
+msgid "`rtc-lse-bypass-pc14`, `rtc-lse-pc14-pc15`"
+msgstr "`rtc-lse-bypass-pc14`, `rtc-lse-pc14-pc15`"
+
+msgid "`tests/contracts/rtc_bypass_assembly/adopt-retained.toml`"
+msgstr "`tests/contracts/rtc_bypass_assembly/adopt-retained.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/rtc.c`"
+msgstr "`soc/stm32/stm32f4/drivers/rtc.c`"
 
 msgid "provision-empty"
 msgstr "provision-empty"
+
+msgid "`tests/contracts/rtc_bypass_assembly/provision-empty.toml`"
+msgstr "`tests/contracts/rtc_bypass_assembly/provision-empty.toml`"
+
+msgid "SAI1"
+msgstr "SAI1"
+
+msgid "`sai1-a-duplex`, `sai1-a-duplex-mclk`, `sai1-b-duplex`, `sai1-b-duplex-mclk`"
+msgstr "`sai1-a-duplex`, `sai1-a-duplex-mclk`, `sai1-b-duplex`, `sai1-b-duplex-mclk`"
+
+msgid "`tests/contracts/stm32f4_sai/f446ze-master.toml`"
+msgstr "`tests/contracts/stm32f4_sai/f446ze-master.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/audio_sai.c`"
+msgstr "`soc/stm32/stm32f4/drivers/audio_sai.c`"
+
+msgid "`sai1-a-simplex`, `sai1-a-simplex-mclk`, `sai1-b-simplex`, `sai1-b-simplex-mclk`"
+msgstr "`sai1-a-simplex`, `sai1-a-simplex-mclk`, `sai1-b-simplex`, `sai1-b-simplex-mclk`"
+
+msgid "`tests/contracts/stm32f4_sai/f479ni-master.toml`"
+msgstr "`tests/contracts/stm32f4_sai/f479ni-master.toml`"
+
+msgid "`sai1-a-duplex`, `sai1-b-duplex`"
+msgstr "`sai1-a-duplex`, `sai1-b-duplex`"
+
+msgid "`sai1-a-simplex`, `sai1-b-simplex`"
+msgstr "`sai1-a-simplex`, `sai1-b-simplex`"
+
+msgid "`tests/contracts/stm32f4_sai/f446ze-slave.toml`"
+msgstr "`tests/contracts/stm32f4_sai/f446ze-slave.toml`"
+
+msgid "`tests/contracts/stm32f4_sai/f479ni-slave.toml`"
+msgstr "`tests/contracts/stm32f4_sai/f479ni-slave.toml`"
 
 msgid "SDIO"
 msgstr "SDIO"
@@ -815,17 +1160,26 @@ msgstr "block"
 msgid "sdio-dma"
 msgstr "sdio-dma"
 
+msgid "`sdio-mmc8-pc8-pd2`, `sdio-pc8-pd2`"
+msgstr "`sdio-mmc8-pc8-pd2`, `sdio-pc8-pd2`"
+
+msgid "`tests/contracts/mmc8_assembly/ve-8-dma.toml`"
+msgstr "`tests/contracts/mmc8_assembly/ve-8-dma.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/sdio.c`"
+msgstr "`soc/stm32/stm32f4/drivers/sdio.c`"
+
 msgid "sdio-irq"
 msgstr "sdio-irq"
+
+msgid "`tests/contracts/mmc8_assembly/zg-4-irq.toml`, `tests/contracts/mmc8_assembly/zg-8-irq.toml`"
+msgstr "`tests/contracts/mmc8_assembly/zg-4-irq.toml`, `tests/contracts/mmc8_assembly/zg-8-irq.toml`"
 
 msgid "sdio-poll"
 msgstr "sdio-poll"
 
-msgid "`tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`"
-msgstr "`tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`"
-
-msgid "`soc/stm32/stm32f4/drivers/sdio.c`"
-msgstr "`soc/stm32/stm32f4/drivers/sdio.c`"
+msgid "`tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`, `tests/contracts/sdio_clock/low-pclk.toml`"
+msgstr "`tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`, `tests/contracts/sdio_clock/low-pclk.toml`"
 
 msgid "SPI1"
 msgstr "SPI1"
@@ -859,9 +1213,6 @@ msgstr "`soc/stm32/stm32f4/drivers/spi_frames.c`"
 
 msgid "short-poll"
 msgstr "short-poll"
-
-msgid "`tests/contracts/io_evolution_assembly/f407-spi-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-buses-poll.toml`, `tests/contracts/stm32_assembly/ve-spi.toml`, `tests/contracts/stm32_assembly/zg-spi.toml`"
-msgstr "`tests/contracts/io_evolution_assembly/f407-spi-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-buses-poll.toml`, `tests/contracts/stm32_assembly/ve-spi.toml`, `tests/contracts/stm32_assembly/zg-spi.toml`"
 
 msgid "`soc/stm32/stm32f4/drivers/spi.c`"
 msgstr "`soc/stm32/stm32f4/drivers/spi.c`"
@@ -908,8 +1259,26 @@ msgstr "complementary-pwm"
 msgid "`complementary-pa8-pb12-pb13`, `complementary-tim1-ch2-pa9-pb14-pb12`, `complementary-tim1-ch3-pa10-pb15-pb12`"
 msgstr "`complementary-pa8-pb12-pb13`, `complementary-tim1-ch2-pa9-pb14-pb12`, `complementary-tim1-ch3-pa10-pb15-pb12`"
 
+msgid "`tests/contracts/multi_controller_assembly/stm32-ve-advanced-pair-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-timer-channels-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-advanced-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-timer-channels-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, `tests/contracts/timer_assembly/stm32-zg-freertos.toml`, `tests/contracts/timer_assembly/stm32-zg.toml`, `tests/contracts/timer_clock/hsi16.toml`, `tests/contracts/timer_clock/pll84.toml`"
+msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-advanced-pair-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-timer-channels-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-advanced-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-timer-channels-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, `tests/contracts/timer_assembly/stm32-zg-freertos.toml`, `tests/contracts/timer_assembly/stm32-zg.toml`, `tests/contracts/timer_clock/hsi16.toml`, `tests/contracts/timer_clock/pll84.toml`"
+
 msgid "`soc/stm32/stm32f4/drivers/advanced_pwm.c`"
 msgstr "`soc/stm32/stm32f4/drivers/advanced_pwm.c`"
+
+msgid "encoder"
+msgstr "encoder"
+
+msgid "quadrature"
+msgstr "quadrature"
+
+msgid "`tim1-encoder-pa8-pa9`"
+msgstr "`tim1-encoder-pa8-pa9`"
+
+msgid "`tests/contracts/timer_advanced_inputs/ve-capture8-encoder1.toml`, `tests/contracts/timer_advanced_inputs/zg-capture8-encoder1.toml`"
+msgstr "`tests/contracts/timer_advanced_inputs/ve-capture8-encoder1.toml`, `tests/contracts/timer_advanced_inputs/zg-capture8-encoder1.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/encoder.c`"
+msgstr "`soc/stm32/stm32f4/drivers/encoder.c`"
 
 msgid "pwm_group"
 msgstr "pwm_group"
@@ -925,6 +1294,21 @@ msgstr "`tests/contracts/timer_waveform_assembly/zg-group.toml`"
 
 msgid "`soc/stm32/stm32f4/drivers/timer_waveform.c`"
 msgstr "`soc/stm32/stm32f4/drivers/timer_waveform.c`"
+
+msgid "timer_capture"
+msgstr "timer_capture"
+
+msgid "edge-capture"
+msgstr "edge-capture"
+
+msgid "`capture-tim1-ch1-pa8`, `capture-tim1-ch2-pa9`, `capture-tim1-ch3-pa10`, `capture-tim1-ch4-pa11`"
+msgstr "`capture-tim1-ch1-pa8`, `capture-tim1-ch2-pa9`, `capture-tim1-ch3-pa10`, `capture-tim1-ch4-pa11`"
+
+msgid "`tests/contracts/timer_advanced_inputs/ve-capture1-encoder8.toml`, `tests/contracts/timer_advanced_inputs/zg-capture1-encoder8.toml`"
+msgstr "`tests/contracts/timer_advanced_inputs/ve-capture1-encoder8.toml`, `tests/contracts/timer_advanced_inputs/zg-capture1-encoder8.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim1.c`"
+msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim1.c`"
 
 msgid "timer_pulse"
 msgstr "timer_pulse"
@@ -962,6 +1346,15 @@ msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-pwm-family-baremetal
 msgid "`soc/stm32/stm32f4/drivers/timer.c`"
 msgstr "`soc/stm32/stm32f4/drivers/timer.c`"
 
+msgid "`capture-tim10-ch1-pb8`"
+msgstr "`capture-tim10-ch1-pb8`"
+
+msgid "`tests/contracts/timer_advanced_inputs/ve-small-captures.toml`, `tests/contracts/timer_advanced_inputs/zg-small-captures.toml`"
+msgstr "`tests/contracts/timer_advanced_inputs/ve-small-captures.toml`, `tests/contracts/timer_advanced_inputs/zg-small-captures.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim10.c`"
+msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim10.c`"
+
 msgid "`tim10-pulse1`"
 msgstr "`tim10-pulse1`"
 
@@ -973,6 +1366,12 @@ msgstr "TIM11"
 
 msgid "`tim11-ch1-pb9`"
 msgstr "`tim11-ch1-pb9`"
+
+msgid "`capture-tim11-ch1-pb9`"
+msgstr "`capture-tim11-ch1-pb9`"
+
+msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim11.c`"
+msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim11.c`"
 
 msgid "`tim11-pulse1`"
 msgstr "`tim11-pulse1`"
@@ -989,6 +1388,12 @@ msgstr "`tim12-group2`"
 msgid "`tests/contracts/timer_waveform_assembly/ve-peers.toml`"
 msgstr "`tests/contracts/timer_waveform_assembly/ve-peers.toml`"
 
+msgid "`capture-tim12-ch1-pb14`, `capture-tim12-ch2-pb15`"
+msgstr "`capture-tim12-ch1-pb14`, `capture-tim12-ch2-pb15`"
+
+msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim12.c`"
+msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim12.c`"
+
 msgid "`tim12-pulse1`, `tim12-pulse2`"
 msgstr "`tim12-pulse1`, `tim12-pulse2`"
 
@@ -997,6 +1402,12 @@ msgstr "TIM13"
 
 msgid "`tim13-ch1-pa6`"
 msgstr "`tim13-ch1-pa6`"
+
+msgid "`capture-tim13-ch1-pa6`"
+msgstr "`capture-tim13-ch1-pa6`"
+
+msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim13.c`"
+msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim13.c`"
 
 msgid "`tim13-pulse1`"
 msgstr "`tim13-pulse1`"
@@ -1007,23 +1418,17 @@ msgstr "TIM14"
 msgid "`tim14-ch1-pa7`"
 msgstr "`tim14-ch1-pa7`"
 
+msgid "`capture-tim14-ch1-pa7`"
+msgstr "`capture-tim14-ch1-pa7`"
+
+msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim14.c`"
+msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim14.c`"
+
 msgid "`tim14-pulse1`"
 msgstr "`tim14-pulse1`"
 
 msgid "TIM3"
 msgstr "TIM3"
-
-msgid "`tim3-ch1-pa6`, `tim3-ch2-pa7`, `tim3-ch3-pb0`, `tim3-ch4-pb1`"
-msgstr "`tim3-ch1-pa6`, `tim3-ch2-pa7`, `tim3-ch3-pb0`, `tim3-ch4-pb1`"
-
-msgid "`tests/contracts/multi_controller_assembly/stm32-ve-pwm-family-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-pwm35-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-adc-injected-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-pwm-family-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-pwm35-freertos.toml`, `tests/contracts/stm32_assembly/ve-pwm.toml`, `tests/contracts/stm32_assembly/zg-pwm.toml`"
-msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-pwm-family-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-pwm35-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-adc-injected-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-pwm-family-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-pwm35-freertos.toml`, `tests/contracts/stm32_assembly/ve-pwm.toml`, `tests/contracts/stm32_assembly/zg-pwm.toml`"
-
-msgid "encoder"
-msgstr "encoder"
-
-msgid "quadrature"
-msgstr "quadrature"
 
 msgid "`tim3-encoder-pa6-pa7`"
 msgstr "`tim3-encoder-pa6-pa7`"
@@ -1031,17 +1436,14 @@ msgstr "`tim3-encoder-pa6-pa7`"
 msgid "`tests/contracts/multi_controller_assembly/stm32-ve-encoders-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-encoders-freertos.toml`"
 msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-encoders-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-encoders-freertos.toml`"
 
-msgid "`soc/stm32/stm32f4/drivers/encoder.c`"
-msgstr "`soc/stm32/stm32f4/drivers/encoder.c`"
+msgid "`tim3-ch1-pa6`, `tim3-ch2-pa7`, `tim3-ch3-pb0`, `tim3-ch4-pb1`"
+msgstr "`tim3-ch1-pa6`, `tim3-ch2-pa7`, `tim3-ch3-pb0`, `tim3-ch4-pb1`"
+
+msgid "`tests/contracts/multi_controller_assembly/stm32-ve-pwm-family-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-pwm35-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-adc-injected-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-pwm-family-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-pwm35-freertos.toml`, `tests/contracts/stm32_assembly/ve-pwm.toml`, `tests/contracts/stm32_assembly/zg-pwm.toml`"
+msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-pwm-family-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-pwm35-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-adc-injected-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-pwm-family-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-pwm35-freertos.toml`, `tests/contracts/stm32_assembly/ve-pwm.toml`, `tests/contracts/stm32_assembly/zg-pwm.toml`"
 
 msgid "`tim3-group4`"
 msgstr "`tim3-group4`"
-
-msgid "timer_capture"
-msgstr "timer_capture"
-
-msgid "edge-capture"
-msgstr "edge-capture"
 
 msgid "`capture-tim3-ch1-pa6`, `capture-tim3-ch2-pa7`, `capture-tim3-ch3-pb0`, `capture-tim3-ch4-pb1`"
 msgstr "`capture-tim3-ch1-pa6`, `capture-tim3-ch2-pa7`, `capture-tim3-ch3-pb0`, `capture-tim3-ch4-pb1`"
@@ -1064,12 +1466,6 @@ msgstr "`tests/contracts/timer_waveform_assembly/ve-sequence.toml`"
 msgid "TIM4"
 msgstr "TIM4"
 
-msgid "`capture-pb6`, `capture-tim4-ch2-pb7`, `capture-tim4-ch3-pb8`, `capture-tim4-ch4-pb9`"
-msgstr "`capture-pb6`, `capture-tim4-ch2-pb7`, `capture-tim4-ch3-pb8`, `capture-tim4-ch4-pb9`"
-
-msgid "`soc/stm32/stm32f4/drivers/timer_capture.c`"
-msgstr "`soc/stm32/stm32f4/drivers/timer_capture.c`"
-
 msgid "`tim4-encoder-pb6-pb7`"
 msgstr "`tim4-encoder-pb6-pb7`"
 
@@ -1078,6 +1474,15 @@ msgstr "`tim4-ch1-pb6`, `tim4-ch2-pb7`, `tim4-ch3-pb8`, `tim4-ch4-pb9`"
 
 msgid "`tim4-group4`"
 msgstr "`tim4-group4`"
+
+msgid "`capture-pb6`, `capture-tim4-ch2-pb7`, `capture-tim4-ch3-pb8`, `capture-tim4-ch4-pb9`"
+msgstr "`capture-pb6`, `capture-tim4-ch2-pb7`, `capture-tim4-ch3-pb8`, `capture-tim4-ch4-pb9`"
+
+msgid "`tests/contracts/multi_controller_assembly/stm32-ve-timer-channels-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-timer-channels-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, `tests/contracts/timer_assembly/stm32-zg-freertos.toml`, `tests/contracts/timer_assembly/stm32-zg.toml`, `tests/contracts/timer_clock/hsi16.toml`, `tests/contracts/timer_clock/pll84.toml`"
+msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-timer-channels-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-timer-channels-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, `tests/contracts/timer_assembly/stm32-zg-freertos.toml`, `tests/contracts/timer_assembly/stm32-zg.toml`, `tests/contracts/timer_clock/hsi16.toml`, `tests/contracts/timer_clock/pll84.toml`"
+
+msgid "`soc/stm32/stm32f4/drivers/timer_capture.c`"
+msgstr "`soc/stm32/stm32f4/drivers/timer_capture.c`"
 
 msgid "`tim4-pulse1`, `tim4-pulse4`"
 msgstr "`tim4-pulse1`, `tim4-pulse4`"
@@ -1088,14 +1493,14 @@ msgstr "`tim4-sequence`"
 msgid "TIM5"
 msgstr "TIM5"
 
+msgid "`tim5-encoder-pa0-pa1`"
+msgstr "`tim5-encoder-pa0-pa1`"
+
 msgid "`tim5-ch1-pa0`, `tim5-ch2-pa1`, `tim5-ch3-pa2`, `tim5-ch4-pa3`"
 msgstr "`tim5-ch1-pa0`, `tim5-ch2-pa1`, `tim5-ch3-pa2`, `tim5-ch4-pa3`"
 
 msgid "`tests/contracts/multi_controller_assembly/stm32-ve-pwm-family-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-pwm35-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-pwm-family-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-pwm35-freertos.toml`"
 msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-pwm-family-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-pwm35-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-pwm-family-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-pwm35-freertos.toml`"
-
-msgid "`tim5-encoder-pa0-pa1`"
-msgstr "`tim5-encoder-pa0-pa1`"
 
 msgid "`tim5-group4`"
 msgstr "`tim5-group4`"
@@ -1127,8 +1532,17 @@ msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-advanced-pair-bareme
 msgid "`soc/stm32/stm32f4/drivers/advanced_pwm_tim8.c`"
 msgstr "`soc/stm32/stm32f4/drivers/advanced_pwm_tim8.c`"
 
+msgid "`tim8-encoder-pc6-pc7`"
+msgstr "`tim8-encoder-pc6-pc7`"
+
 msgid "`tim8-group-complementary`, `tim8-group4`"
 msgstr "`tim8-group-complementary`, `tim8-group4`"
+
+msgid "`capture-tim8-ch1-pc6`, `capture-tim8-ch2-pc7`, `capture-tim8-ch3-pc8`, `capture-tim8-ch4-pc9`"
+msgstr "`capture-tim8-ch1-pc6`, `capture-tim8-ch2-pc7`, `capture-tim8-ch3-pc8`, `capture-tim8-ch4-pc9`"
+
+msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim8.c`"
+msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim8.c`"
 
 msgid "`tim8-pulse1`, `tim8-pulse4`"
 msgstr "`tim8-pulse1`, `tim8-pulse4`"
@@ -1147,6 +1561,12 @@ msgstr "`tim9-ch1-pa2`, `tim9-ch2-pa3`"
 
 msgid "`tim9-group2`"
 msgstr "`tim9-group2`"
+
+msgid "`capture-tim9-ch1-pa2`, `capture-tim9-ch2-pa3`"
+msgstr "`capture-tim9-ch1-pa2`, `capture-tim9-ch2-pa3`"
+
+msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim9.c`"
+msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim9.c`"
 
 msgid "`tim9-pulse1`, `tim9-pulse2`"
 msgstr "`tim9-pulse1`, `tim9-pulse2`"
@@ -1183,9 +1603,6 @@ msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-uart6.toml`, `tests/
 
 msgid "`soc/stm32/stm32f4/drivers/uart_hal.c`"
 msgstr "`soc/stm32/stm32f4/drivers/uart_hal.c`"
-
-msgid "irq-blocks"
-msgstr "irq-blocks"
 
 msgid "`tests/contracts/multi_controller_assembly/stm32-zg-uart6-irq-blocks-freertos.toml`"
 msgstr "`tests/contracts/multi_controller_assembly/stm32-zg-uart6-irq-blocks-freertos.toml`"
@@ -1256,8 +1673,14 @@ msgstr "`tests/contracts/declared_io_assembly/ve-duplex.toml`, `tests/contracts/
 msgid "`tests/contracts/declared_io_assembly/ve-duplex-continuous.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-uart6-dma-duplex-continuous-freertos.toml`, `tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-duplex-continuous.toml`"
 msgstr "`tests/contracts/declared_io_assembly/ve-duplex-continuous.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-uart6-dma-duplex-continuous-freertos.toml`, `tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-duplex-continuous.toml`"
 
+msgid "`tests/contracts/f407_capture_audio/ve-capture-audio-uart.toml`, `tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-uart6.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-uart6-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-dma.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml`, `tools/configure/assemblies/qiming-baremetal-uart-dma.toml`"
+msgstr "`tests/contracts/f407_capture_audio/ve-capture-audio-uart.toml`, `tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-uart6.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-uart6-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-dma.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml`, `tools/configure/assemblies/qiming-baremetal-uart-dma.toml`"
+
 msgid "`tests/contracts/multi_controller_assembly/stm32-zg-uart6-irq-blocks-freertos.toml`, `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml`, `tests/contracts/uart_rx_compact_assembly/f407-irq-blocks.toml`"
 msgstr "`tests/contracts/multi_controller_assembly/stm32-zg-uart6-irq-blocks-freertos.toml`, `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml`, `tests/contracts/uart_rx_compact_assembly/f407-irq-blocks.toml`"
+
+msgid "`tests/contracts/io_evolution_assembly/f407-uart7e2.toml`, `tests/contracts/mmc8_assembly/ve-8-dma.toml`, `tests/contracts/mmc8_assembly/zg-4-irq.toml`, `tests/contracts/mmc8_assembly/zg-8-irq.toml`, `tests/contracts/physical_platform_assembly/f407-uart-arm.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`, `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml`, `tests/contracts/uart_rx_compact_assembly/f407-irq.toml`, `tools/configure/assemblies/qiming-baremetal-uart.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-uart.toml`, `tools/configure/assemblies/qiming-freertos.toml`, `tools/configure/assemblies/sky-baremetal-uart.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-uart.toml`, `tools/configure/assemblies/sky-freertos.toml`"
+msgstr "`tests/contracts/io_evolution_assembly/f407-uart7e2.toml`, `tests/contracts/mmc8_assembly/ve-8-dma.toml`, `tests/contracts/mmc8_assembly/zg-4-irq.toml`, `tests/contracts/mmc8_assembly/zg-8-irq.toml`, `tests/contracts/physical_platform_assembly/f407-uart-arm.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`, `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml`, `tests/contracts/uart_rx_compact_assembly/f407-irq.toml`, `tools/configure/assemblies/qiming-baremetal-uart.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-uart.toml`, `tools/configure/assemblies/qiming-freertos.toml`, `tools/configure/assemblies/sky-baremetal-uart.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-uart.toml`, `tools/configure/assemblies/sky-freertos.toml`"
 
 msgid "`usart1-cts-pa9-pa10-pa11`, `usart1-half-duplex-pa9`, `usart1-pa9-pa10`, `usart1-rts-cts-pa9-pa10-pa11-pa12`, `usart1-rts-pa9-pa10-pa12`, `usart1-smartcard-pa9-pa8`, `usart1-synchronous-pa9-pa10-pa8`"
 msgstr "`usart1-cts-pa9-pa10-pa11`, `usart1-half-duplex-pa9`, `usart1-pa9-pa10`, `usart1-rts-cts-pa9-pa10-pa11-pa12`, `usart1-rts-pa9-pa10-pa12`, `usart1-smartcard-pa9-pa8`, `usart1-synchronous-pa9-pa10-pa8`"
@@ -1319,248 +1742,41 @@ msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-wwdg-baremetal.toml`
 msgid "`soc/stm32/stm32f4/drivers/window_watchdog.c`"
 msgstr "`soc/stm32/stm32f4/drivers/window_watchdog.c`"
 
-msgid "EXTI1"
-msgstr "EXTI1"
+msgid "`soc/stm32/stm32f4/drivers/adc_group_automatic.c`"
+msgstr "`soc/stm32/stm32f4/drivers/adc_group_automatic.c`"
 
-msgid "EXTI10"
-msgstr "EXTI10"
+msgid "`soc/stm32/stm32f4/drivers/adc_group_blocks.c`"
+msgstr "`soc/stm32/stm32f4/drivers/adc_group_blocks.c`"
 
-msgid "EXTI12"
-msgstr "EXTI12"
+msgid "`tests/contracts/adc_group_assembly/ve-dual-auto-injected.toml`"
+msgstr "`tests/contracts/adc_group_assembly/ve-dual-auto-injected.toml`"
 
-msgid "EXTI13"
-msgstr "EXTI13"
+msgid "`tests/contracts/adc_group_assembly/ve-dual-blocks.toml`, `tests/contracts/adc_group_assembly/zg-triple-interleaved-blocks.toml`"
+msgstr "`tests/contracts/adc_group_assembly/ve-dual-blocks.toml`, `tests/contracts/adc_group_assembly/zg-triple-interleaved-blocks.toml`"
 
-msgid "EXTI14"
-msgstr "EXTI14"
+msgid "`tests/contracts/adc_group_assembly/zg-triple-timer-injected-blocks.toml`"
+msgstr "`tests/contracts/adc_group_assembly/zg-triple-timer-injected-blocks.toml`"
 
-msgid "EXTI15"
-msgstr "EXTI15"
+msgid "`tests/contracts/declared_io_assembly/f407-input.toml`, `tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, `tests/contracts/usb_otg_assembly/ve-fs.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma-remote.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma-remote.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`"
+msgstr "`tests/contracts/declared_io_assembly/f407-input.toml`, `tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, `tests/contracts/usb_otg_assembly/ve-fs.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma-remote.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma-remote.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`"
 
-msgid "EXTI3"
-msgstr "EXTI3"
+msgid "`tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml`, `tests/contracts/usb_otg_assembly/ve-fs.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma-remote.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma-remote.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`"
+msgstr "`tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml`, `tests/contracts/usb_otg_assembly/ve-fs.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma-remote.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma-remote.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`"
 
-msgid "EXTI4"
-msgstr "EXTI4"
+msgid "`tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, `tests/contracts/physical_platform_assembly/stm32-gpio.toml`, `tests/contracts/usb_otg_assembly/ve-fs.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma-remote.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma-remote.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`, `tools/configure/assemblies/qiming-baremetal-gpio.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-gpio.toml`, `tools/configure/assemblies/qiming-freertos.toml`"
+msgstr "`tests/contracts/declared_io_assembly/ve-rx-continuous.toml`, `tests/contracts/physical_platform_assembly/stm32-gpio.toml`, `tests/contracts/usb_otg_assembly/ve-fs.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma-remote.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma-remote.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`, `tools/configure/assemblies/qiming-baremetal-gpio.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-gpio.toml`, `tools/configure/assemblies/qiming-freertos.toml`"
 
-msgid "GPIOH"
-msgstr "GPIOH"
+msgid "`tests/contracts/usb_otg_assembly/ve-hs-fs-dma-remote.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`"
+msgstr "`tests/contracts/usb_otg_assembly/ve-hs-fs-dma-remote.toml`, `tests/contracts/usb_otg_assembly/ve-hs-fs-dma.toml`"
 
-msgid "`capture-tim1-ch1-pa8`, `capture-tim1-ch2-pa9`, `capture-tim1-ch3-pa10`, `capture-tim1-ch4-pa11`"
-msgstr "`capture-tim1-ch1-pa8`, `capture-tim1-ch2-pa9`, `capture-tim1-ch3-pa10`, `capture-tim1-ch4-pa11`"
+msgid "`tests/contracts/usb_otg_assembly/zg-ulpi-dma-remote.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`"
+msgstr "`tests/contracts/usb_otg_assembly/zg-ulpi-dma-remote.toml`, `tests/contracts/usb_otg_assembly/zg-ulpi-dma.toml`"
 
-msgid "`capture-tim10-ch1-pb8`"
-msgstr "`capture-tim10-ch1-pb8`"
+msgid "`tests/contracts/f407_capture_audio/jpeg_blocks/ve-jpeg-blocks.toml`"
+msgstr "`tests/contracts/f407_capture_audio/jpeg_blocks/ve-jpeg-blocks.toml`"
 
-msgid "`capture-tim11-ch1-pb9`"
-msgstr "`capture-tim11-ch1-pb9`"
+msgid "`tests/contracts/io_evolution_assembly/f407-spi-transaction.toml`, `tests/contracts/io_storage_cost/spi_endpoints/endpoints-1.toml`, `tests/contracts/io_storage_cost/spi_endpoints/endpoints-2.toml`, `tests/contracts/io_storage_cost/spi_endpoints/endpoints-4.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-buses-poll.toml`, `tests/contracts/stm32_assembly/ve-spi.toml`, `tests/contracts/stm32_assembly/zg-spi.toml`"
+msgstr "`tests/contracts/io_evolution_assembly/f407-spi-transaction.toml`, `tests/contracts/io_storage_cost/spi_endpoints/endpoints-1.toml`, `tests/contracts/io_storage_cost/spi_endpoints/endpoints-2.toml`, `tests/contracts/io_storage_cost/spi_endpoints/endpoints-4.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-buses-poll.toml`, `tests/contracts/stm32_assembly/ve-spi.toml`, `tests/contracts/stm32_assembly/zg-spi.toml`"
 
-msgid "`capture-tim12-ch1-pb14`, `capture-tim12-ch2-pb15`"
-msgstr "`capture-tim12-ch1-pb14`, `capture-tim12-ch2-pb15`"
-
-msgid "`capture-tim13-ch1-pa6`"
-msgstr "`capture-tim13-ch1-pa6`"
-
-msgid "`capture-tim14-ch1-pa7`"
-msgstr "`capture-tim14-ch1-pa7`"
-
-msgid "`capture-tim8-ch1-pc6`, `capture-tim8-ch2-pc7`, `capture-tim8-ch3-pc8`, `capture-tim8-ch4-pc9`"
-msgstr "`capture-tim8-ch1-pc6`, `capture-tim8-ch2-pc7`, `capture-tim8-ch3-pc8`, `capture-tim8-ch4-pc9`"
-
-msgid "`capture-tim9-ch1-pa2`, `capture-tim9-ch2-pa3`"
-msgstr "`capture-tim9-ch1-pa2`, `capture-tim9-ch2-pa3`"
-
-msgid "`exti0-pa0`, `exti0-pb0`, `exti0-pc0`, `exti0-pd0`, `exti0-pe0`, `exti0-pf0`, `exti0-pg0`, `exti0-ph0`"
-msgstr "`exti0-pa0`, `exti0-pb0`, `exti0-pc0`, `exti0-pd0`, `exti0-pe0`, `exti0-pf0`, `exti0-pg0`, `exti0-ph0`"
-
-msgid "`exti1-pa1`, `exti1-pb1`, `exti1-pc1`, `exti1-pd1`, `exti1-pe1`, `exti1-pf1`, `exti1-pg1`, `exti1-ph1`"
-msgstr "`exti1-pa1`, `exti1-pb1`, `exti1-pc1`, `exti1-pd1`, `exti1-pe1`, `exti1-pf1`, `exti1-pg1`, `exti1-ph1`"
-
-msgid "`exti10-pa10`, `exti10-pb10`, `exti10-pc10`, `exti10-pd10`, `exti10-pe10`, `exti10-pf10`, `exti10-pg10`"
-msgstr "`exti10-pa10`, `exti10-pb10`, `exti10-pc10`, `exti10-pd10`, `exti10-pe10`, `exti10-pf10`, `exti10-pg10`"
-
-msgid "`exti11-pa11`, `exti11-pb11`, `exti11-pc11`, `exti11-pd11`, `exti11-pe11`, `exti11-pf11`, `exti11-pg11`"
-msgstr "`exti11-pa11`, `exti11-pb11`, `exti11-pc11`, `exti11-pd11`, `exti11-pe11`, `exti11-pf11`, `exti11-pg11`"
-
-msgid "`exti12-pa12`, `exti12-pb12`, `exti12-pc12`, `exti12-pd12`, `exti12-pe12`, `exti12-pf12`, `exti12-pg12`"
-msgstr "`exti12-pa12`, `exti12-pb12`, `exti12-pc12`, `exti12-pd12`, `exti12-pe12`, `exti12-pf12`, `exti12-pg12`"
-
-msgid "`exti13-pa13`, `exti13-pb13`, `exti13-pc13`, `exti13-pd13`, `exti13-pe13`, `exti13-pf13`, `exti13-pg13`"
-msgstr "`exti13-pa13`, `exti13-pb13`, `exti13-pc13`, `exti13-pd13`, `exti13-pe13`, `exti13-pf13`, `exti13-pg13`"
-
-msgid "`exti14-pa14`, `exti14-pb14`, `exti14-pc14`, `exti14-pd14`, `exti14-pe14`, `exti14-pf14`, `exti14-pg14`"
-msgstr "`exti14-pa14`, `exti14-pb14`, `exti14-pc14`, `exti14-pd14`, `exti14-pe14`, `exti14-pf14`, `exti14-pg14`"
-
-msgid "`exti15-pa15`, `exti15-pb15`, `exti15-pc15`, `exti15-pd15`, `exti15-pe15`, `exti15-pf15`, `exti15-pg15`"
-msgstr "`exti15-pa15`, `exti15-pb15`, `exti15-pc15`, `exti15-pd15`, `exti15-pe15`, `exti15-pf15`, `exti15-pg15`"
-
-msgid "`exti2-pa2`, `exti2-pb2`, `exti2-pc2`, `exti2-pd2`, `exti2-pe2`, `exti2-pf2`, `exti2-pg2`"
-msgstr "`exti2-pa2`, `exti2-pb2`, `exti2-pc2`, `exti2-pd2`, `exti2-pe2`, `exti2-pf2`, `exti2-pg2`"
-
-msgid "`exti3-pa3`, `exti3-pb3`, `exti3-pc3`, `exti3-pd3`, `exti3-pe3`, `exti3-pf3`, `exti3-pg3`"
-msgstr "`exti3-pa3`, `exti3-pb3`, `exti3-pc3`, `exti3-pd3`, `exti3-pe3`, `exti3-pf3`, `exti3-pg3`"
-
-msgid "`exti4-pa4`, `exti4-pb4`, `exti4-pc4`, `exti4-pd4`, `exti4-pe4`, `exti4-pf4`, `exti4-pg4`"
-msgstr "`exti4-pa4`, `exti4-pb4`, `exti4-pc4`, `exti4-pd4`, `exti4-pe4`, `exti4-pf4`, `exti4-pg4`"
-
-msgid "`exti5-pa5`, `exti5-pb5`, `exti5-pc5`, `exti5-pd5`, `exti5-pe5`, `exti5-pf5`, `exti5-pg5`"
-msgstr "`exti5-pa5`, `exti5-pb5`, `exti5-pc5`, `exti5-pd5`, `exti5-pe5`, `exti5-pf5`, `exti5-pg5`"
-
-msgid "`exti6-pa6`, `exti6-pb6`, `exti6-pc6`, `exti6-pd6`, `exti6-pe6`, `exti6-pf6`, `exti6-pg6`"
-msgstr "`exti6-pa6`, `exti6-pb6`, `exti6-pc6`, `exti6-pd6`, `exti6-pe6`, `exti6-pf6`, `exti6-pg6`"
-
-msgid "`exti7-pa7`, `exti7-pb7`, `exti7-pc7`, `exti7-pd7`, `exti7-pe7`, `exti7-pf7`, `exti7-pg7`"
-msgstr "`exti7-pa7`, `exti7-pb7`, `exti7-pc7`, `exti7-pd7`, `exti7-pe7`, `exti7-pf7`, `exti7-pg7`"
-
-msgid "`exti8-pa8`, `exti8-pb8`, `exti8-pc8`, `exti8-pd8`, `exti8-pe8`, `exti8-pf8`, `exti8-pg8`"
-msgstr "`exti8-pa8`, `exti8-pb8`, `exti8-pc8`, `exti8-pd8`, `exti8-pe8`, `exti8-pf8`, `exti8-pg8`"
-
-msgid "`exti9-pa9`, `exti9-pb9`, `exti9-pc9`, `exti9-pd9`, `exti9-pe9`, `exti9-pf9`, `exti9-pg9`"
-msgstr "`exti9-pa9`, `exti9-pb9`, `exti9-pc9`, `exti9-pd9`, `exti9-pe9`, `exti9-pf9`, `exti9-pg9`"
-
-msgid "`gpio-input-pb2`, `gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb12`, `gpio-pb13`, `gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9`"
-msgstr "`gpio-input-pb2`, `gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb12`, `gpio-pb13`, `gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9`"
-
-msgid "`gpio-pa0`, `gpio-pa1`, `gpio-pa10`, `gpio-pa11`, `gpio-pa12`, `gpio-pa13`, `gpio-pa14`, `gpio-pa15`, `gpio-pa2`, `gpio-pa3`, `gpio-pa4`, `gpio-pa5`, `gpio-pa6`, `gpio-pa7`, `gpio-pa8`, `gpio-pa9`"
-msgstr "`gpio-pa0`, `gpio-pa1`, `gpio-pa10`, `gpio-pa11`, `gpio-pa12`, `gpio-pa13`, `gpio-pa14`, `gpio-pa15`, `gpio-pa2`, `gpio-pa3`, `gpio-pa4`, `gpio-pa5`, `gpio-pa6`, `gpio-pa7`, `gpio-pa8`, `gpio-pa9`"
-
-msgid "`gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb12`, `gpio-pb13`, `gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9`"
-msgstr "`gpio-pb0`, `gpio-pb1`, `gpio-pb10`, `gpio-pb11`, `gpio-pb12`, `gpio-pb13`, `gpio-pb14`, `gpio-pb15`, `gpio-pb2`, `gpio-pb3`, `gpio-pb4`, `gpio-pb5`, `gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9`"
-
-msgid "`gpio-pc0`, `gpio-pc1`, `gpio-pc10`, `gpio-pc11`, `gpio-pc12`, `gpio-pc13`, `gpio-pc14`, `gpio-pc15`, `gpio-pc2`, `gpio-pc3`, `gpio-pc4`, `gpio-pc5`, `gpio-pc6`, `gpio-pc7`, `gpio-pc8`, `gpio-pc9`"
-msgstr "`gpio-pc0`, `gpio-pc1`, `gpio-pc10`, `gpio-pc11`, `gpio-pc12`, `gpio-pc13`, `gpio-pc14`, `gpio-pc15`, `gpio-pc2`, `gpio-pc3`, `gpio-pc4`, `gpio-pc5`, `gpio-pc6`, `gpio-pc7`, `gpio-pc8`, `gpio-pc9`"
-
-msgid "`gpio-pd0`, `gpio-pd1`, `gpio-pd10`, `gpio-pd11`, `gpio-pd12`, `gpio-pd13`, `gpio-pd14`, `gpio-pd15`, `gpio-pd2`, `gpio-pd3`, `gpio-pd4`, `gpio-pd5`, `gpio-pd6`, `gpio-pd7`, `gpio-pd8`, `gpio-pd9`"
-msgstr "`gpio-pd0`, `gpio-pd1`, `gpio-pd10`, `gpio-pd11`, `gpio-pd12`, `gpio-pd13`, `gpio-pd14`, `gpio-pd15`, `gpio-pd2`, `gpio-pd3`, `gpio-pd4`, `gpio-pd5`, `gpio-pd6`, `gpio-pd7`, `gpio-pd8`, `gpio-pd9`"
-
-msgid "`gpio-pe0`, `gpio-pe1`, `gpio-pe10`, `gpio-pe11`, `gpio-pe12`, `gpio-pe13`, `gpio-pe14`, `gpio-pe15`, `gpio-pe2`, `gpio-pe3`, `gpio-pe4`, `gpio-pe5`, `gpio-pe6`, `gpio-pe7`, `gpio-pe8`, `gpio-pe9`"
-msgstr "`gpio-pe0`, `gpio-pe1`, `gpio-pe10`, `gpio-pe11`, `gpio-pe12`, `gpio-pe13`, `gpio-pe14`, `gpio-pe15`, `gpio-pe2`, `gpio-pe3`, `gpio-pe4`, `gpio-pe5`, `gpio-pe6`, `gpio-pe7`, `gpio-pe8`, `gpio-pe9`"
-
-msgid "`gpio-pf0`, `gpio-pf1`, `gpio-pf10`, `gpio-pf11`, `gpio-pf12`, `gpio-pf13`, `gpio-pf14`, `gpio-pf15`, `gpio-pf2`, `gpio-pf3`, `gpio-pf4`, `gpio-pf5`, `gpio-pf6`, `gpio-pf7`, `gpio-pf8`, `gpio-pf9`"
-msgstr "`gpio-pf0`, `gpio-pf1`, `gpio-pf10`, `gpio-pf11`, `gpio-pf12`, `gpio-pf13`, `gpio-pf14`, `gpio-pf15`, `gpio-pf2`, `gpio-pf3`, `gpio-pf4`, `gpio-pf5`, `gpio-pf6`, `gpio-pf7`, `gpio-pf8`, `gpio-pf9`"
-
-msgid "`gpio-pg0`, `gpio-pg1`, `gpio-pg10`, `gpio-pg11`, `gpio-pg12`, `gpio-pg13`, `gpio-pg14`, `gpio-pg15`, `gpio-pg2`, `gpio-pg3`, `gpio-pg4`, `gpio-pg5`, `gpio-pg6`, `gpio-pg7`, `gpio-pg8`, `gpio-pg9`"
-msgstr "`gpio-pg0`, `gpio-pg1`, `gpio-pg10`, `gpio-pg11`, `gpio-pg12`, `gpio-pg13`, `gpio-pg14`, `gpio-pg15`, `gpio-pg2`, `gpio-pg3`, `gpio-pg4`, `gpio-pg5`, `gpio-pg6`, `gpio-pg7`, `gpio-pg8`, `gpio-pg9`"
-
-msgid "`gpio-ph0`, `gpio-ph1`"
-msgstr "`gpio-ph0`, `gpio-ph1`"
-
-msgid "`sdio-mmc8-pc8-pd2`, `sdio-pc8-pd2`"
-msgstr "`sdio-mmc8-pc8-pd2`, `sdio-pc8-pd2`"
-
-msgid "`tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml`, `tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-freertos.toml`"
-msgstr "`tests/contracts/declared_io_assembly/f407.toml`, `tests/contracts/declared_io_assembly/ve-rx-idle.toml`, `tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-freertos.toml`"
-
-msgid "`tests/contracts/gpio_exti_assembly/ve-baremetal.toml`"
-msgstr "`tests/contracts/gpio_exti_assembly/ve-baremetal.toml`"
-
-msgid "`tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-freertos.toml`"
-msgstr "`tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-freertos.toml`"
-
-msgid "`tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-freertos.toml`, `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml`"
-msgstr "`tests/contracts/gpio_exti_assembly/ve-baremetal.toml`, `tests/contracts/gpio_exti_assembly/zg-freertos.toml`, `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml`"
-
-msgid "`tests/contracts/gpio_exti_assembly/zg-freertos.toml`"
-msgstr "`tests/contracts/gpio_exti_assembly/zg-freertos.toml`"
-
-msgid "`tests/contracts/io_evolution_assembly/f407-uart7e2.toml`, `tests/contracts/mmc8_assembly/ve-8-dma.toml`, `tests/contracts/mmc8_assembly/zg-4-irq.toml`, `tests/contracts/mmc8_assembly/zg-8-irq.toml`, `tests/contracts/physical_platform_assembly/f407-uart-arm.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`, `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml`, `tests/contracts/uart_rx_compact_assembly/f407-irq.toml`, `tools/configure/assemblies/qiming-baremetal-uart.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-uart.toml`, `tools/configure/assemblies/qiming-freertos.toml`, `tools/configure/assemblies/sky-baremetal-uart.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-uart.toml`, `tools/configure/assemblies/sky-freertos.toml`"
-msgstr "`tests/contracts/io_evolution_assembly/f407-uart7e2.toml`, `tests/contracts/mmc8_assembly/ve-8-dma.toml`, `tests/contracts/mmc8_assembly/zg-4-irq.toml`, `tests/contracts/mmc8_assembly/zg-8-irq.toml`, `tests/contracts/physical_platform_assembly/f407-uart-arm.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd.toml`, `tests/contracts/qiming_uart_assembly/six-irq-uarts.toml`, `tests/contracts/uart_rx_compact_assembly/f407-irq.toml`, `tools/configure/assemblies/qiming-baremetal-uart.toml`, `tools/configure/assemblies/qiming-baremetal.toml`, `tools/configure/assemblies/qiming-freertos-uart.toml`, `tools/configure/assemblies/qiming-freertos.toml`, `tools/configure/assemblies/sky-baremetal-uart.toml`, `tools/configure/assemblies/sky-baremetal.toml`, `tools/configure/assemblies/sky-freertos-uart.toml`, `tools/configure/assemblies/sky-freertos.toml`"
-
-msgid "`tests/contracts/mmc8_assembly/ve-8-dma.toml`"
-msgstr "`tests/contracts/mmc8_assembly/ve-8-dma.toml`"
-
-msgid "`tests/contracts/mmc8_assembly/zg-4-irq.toml`, `tests/contracts/mmc8_assembly/zg-8-irq.toml`"
-msgstr "`tests/contracts/mmc8_assembly/zg-4-irq.toml`, `tests/contracts/mmc8_assembly/zg-8-irq.toml`"
-
-msgid "`tests/contracts/st_usb_device_assembly/stm32-ve-fs.toml`, `tests/contracts/usb_assembly/stm32-ve-freertos.toml`, `tests/contracts/usb_assembly/stm32-ve-interrupt.toml`, `tests/contracts/usb_assembly/stm32-ve.toml`, `tests/contracts/usb_assembly/stm32-zg-freertos.toml`, `tests/contracts/usb_assembly/stm32-zg-interrupt.toml`, `tests/contracts/usb_assembly/stm32-zg.toml`, `tests/contracts/usb_iso_assembly/ve-fs-max-in.toml`"
-msgstr "`tests/contracts/st_usb_device_assembly/stm32-ve-fs.toml`, `tests/contracts/usb_assembly/stm32-ve-freertos.toml`, `tests/contracts/usb_assembly/stm32-ve-interrupt.toml`, `tests/contracts/usb_assembly/stm32-ve.toml`, `tests/contracts/usb_assembly/stm32-zg-freertos.toml`, `tests/contracts/usb_assembly/stm32-zg-interrupt.toml`, `tests/contracts/usb_assembly/stm32-zg.toml`, `tests/contracts/usb_iso_assembly/ve-fs-max-in.toml`"
-
-msgid "`tests/contracts/st_usb_device_assembly/stm32-zg-hs-fs-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-hs-fs-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-hs-fs.toml`, `tests/contracts/usb_iso_assembly/zg-hs-core-fs-out.toml`"
-msgstr "`tests/contracts/st_usb_device_assembly/stm32-zg-hs-fs-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-hs-fs-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-hs-fs.toml`, `tests/contracts/usb_iso_assembly/zg-hs-core-fs-out.toml`"
-
-msgid "`tests/contracts/st_usb_device_assembly/stm32-zg-ulpi-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-ulpi-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-ulpi.toml`, `tests/contracts/usb_iso_assembly/zg-hs-ulpi-dma.toml`"
-msgstr "`tests/contracts/st_usb_device_assembly/stm32-zg-ulpi-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-ulpi-dma.toml`, `tests/contracts/usb_device_hs_assembly/stm32-zg-ulpi.toml`, `tests/contracts/usb_iso_assembly/zg-hs-ulpi-dma.toml`"
-
-msgid "`tim1-encoder-pa8-pa9`"
-msgstr "`tim1-encoder-pa8-pa9`"
-
-msgid "`tim8-encoder-pc6-pc7`"
-msgstr "`tim8-encoder-pc6-pc7`"
-
-msgid "`cmake/package/verification/io_evolution/f407zg-eth-frames.toml`, `tests/contracts/f407_qiming_network/assembly.toml`"
-msgstr "`cmake/package/verification/io_evolution/f407zg-eth-frames.toml`, `tests/contracts/f407_qiming_network/assembly.toml`"
-
-msgid "`soc/stm32/stm32f4/drivers/capture.c`"
-msgstr "`soc/stm32/stm32f4/drivers/capture.c`"
-
-msgid "`soc/stm32/stm32f4/drivers/i2c_target.c`"
-msgstr "`soc/stm32/stm32f4/drivers/i2c_target.c`"
-
-msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim1.c`"
-msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim1.c`"
-
-msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim10.c`"
-msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim10.c`"
-
-msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim11.c`"
-msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim11.c`"
-
-msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim12.c`"
-msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim12.c`"
-
-msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim13.c`"
-msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim13.c`"
-
-msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim14.c`"
-msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim14.c`"
-
-msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim8.c`"
-msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim8.c`"
-
-msgid "`soc/stm32/stm32f4/drivers/timer_capture_tim9.c`"
-msgstr "`soc/stm32/stm32f4/drivers/timer_capture_tim9.c`"
-
-msgid "`tests/contracts/entropy_assembly/ve.toml`, `tests/contracts/entropy_assembly/zg.toml`, `tests/contracts/f407_qiming_network/assembly.toml`"
-msgstr "`tests/contracts/entropy_assembly/ve.toml`, `tests/contracts/entropy_assembly/zg.toml`, `tests/contracts/f407_qiming_network/assembly.toml`"
-
-msgid "`tests/contracts/f407_capture_audio/ve-capture-audio-uart.toml`, `tests/contracts/f407_capture_audio/ve-raw12-duplex.toml`"
-msgstr "`tests/contracts/f407_capture_audio/ve-capture-audio-uart.toml`, `tests/contracts/f407_capture_audio/ve-raw12-duplex.toml`"
-
-msgid "`tests/contracts/f407_capture_audio/ve-capture-audio-uart.toml`, `tests/contracts/f407_capture_audio/ve-raw12-duplex.toml`, `tests/contracts/f407_capture_audio/zg-raw14.toml`"
-msgstr "`tests/contracts/f407_capture_audio/ve-capture-audio-uart.toml`, `tests/contracts/f407_capture_audio/ve-raw12-duplex.toml`, `tests/contracts/f407_capture_audio/zg-raw14.toml`"
-
-msgid "`tests/contracts/f407_capture_audio/ve-capture-audio-uart.toml`, `tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-uart6.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-uart6-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-dma.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml`, `tools/configure/assemblies/qiming-baremetal-uart-dma.toml`"
-msgstr "`tests/contracts/f407_capture_audio/ve-capture-audio-uart.toml`, `tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-uart6.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-uart6-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/qiming_sdio_assembly/polling-sd-uart-dma.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-dma.toml`, `tests/contracts/uart_rx_compact_assembly/f407-dma-tx.toml`, `tools/configure/assemblies/qiming-baremetal-uart-dma.toml`"
-
-msgid "`tests/contracts/f407_capture_audio/ve-jpeg.toml`"
-msgstr "`tests/contracts/f407_capture_audio/ve-jpeg.toml`"
-
-msgid "`tests/contracts/f407_capture_audio/zg-i2s3-duplex-mclk.toml`"
-msgstr "`tests/contracts/f407_capture_audio/zg-i2s3-duplex-mclk.toml`"
-
-msgid "`tests/contracts/f407_capture_audio/zg-raw8-blocks-i2s3.toml`"
-msgstr "`tests/contracts/f407_capture_audio/zg-raw8-blocks-i2s3.toml`"
-
-msgid "`tests/contracts/flash_factory/stm32.toml`, `tests/contracts/mcuboot_link/assembly.toml`, `tests/contracts/mcuboot_link/payload-assembly.generated.toml`, `tests/contracts/physical_platform_assembly/f407-pinless-arm.toml`, `tests/contracts/stm32_assembly/ve-flash.toml`, `tests/contracts/stm32_assembly/zg-flash.toml`"
-msgstr "`tests/contracts/flash_factory/stm32.toml`, `tests/contracts/mcuboot_link/assembly.toml`, `tests/contracts/mcuboot_link/payload-assembly.generated.toml`, `tests/contracts/physical_platform_assembly/f407-pinless-arm.toml`, `tests/contracts/stm32_assembly/ve-flash.toml`, `tests/contracts/stm32_assembly/zg-flash.toml`"
-
-msgid "`tests/contracts/i2c_target/ve-smbus.toml`, `tests/contracts/i2c_target/zg-smbus.toml`"
-msgstr "`tests/contracts/i2c_target/ve-smbus.toml`, `tests/contracts/i2c_target/zg-smbus.toml`"
-
-msgid "`tests/contracts/i2c_target/ve-target-84.toml`, `tests/contracts/i2c_target/ve-target.toml`, `tests/contracts/i2c_target/zg-target.toml`"
-msgstr "`tests/contracts/i2c_target/ve-target-84.toml`, `tests/contracts/i2c_target/ve-target.toml`, `tests/contracts/i2c_target/zg-target.toml`"
-
-msgid "`tests/contracts/multi_controller_assembly/stm32-ve-advanced-pair-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-timer-channels-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-advanced-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-timer-channels-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, `tests/contracts/timer_assembly/stm32-zg-freertos.toml`, `tests/contracts/timer_assembly/stm32-zg.toml`, `tests/contracts/timer_clock/hsi16.toml`, `tests/contracts/timer_clock/pll84.toml`"
-msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-advanced-pair-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-timer-channels-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-advanced-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-timer-channels-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, `tests/contracts/timer_assembly/stm32-zg-freertos.toml`, `tests/contracts/timer_assembly/stm32-zg.toml`, `tests/contracts/timer_clock/hsi16.toml`, `tests/contracts/timer_clock/pll84.toml`"
-
-msgid "`tests/contracts/multi_controller_assembly/stm32-ve-timer-channels-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-timer-channels-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, `tests/contracts/timer_assembly/stm32-zg-freertos.toml`, `tests/contracts/timer_assembly/stm32-zg.toml`, `tests/contracts/timer_clock/hsi16.toml`, `tests/contracts/timer_clock/pll84.toml`"
-msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-timer-channels-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-timer-channels-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve-freertos.toml`, `tests/contracts/timer_assembly/stm32-ve.toml`, `tests/contracts/timer_assembly/stm32-zg-freertos.toml`, `tests/contracts/timer_assembly/stm32-zg.toml`, `tests/contracts/timer_clock/hsi16.toml`, `tests/contracts/timer_clock/pll84.toml`"
-
-msgid "`tests/contracts/timer_advanced_inputs/ve-capture1-encoder8.toml`, `tests/contracts/timer_advanced_inputs/zg-capture1-encoder8.toml`"
-msgstr "`tests/contracts/timer_advanced_inputs/ve-capture1-encoder8.toml`, `tests/contracts/timer_advanced_inputs/zg-capture1-encoder8.toml`"
-
-msgid "`tests/contracts/timer_advanced_inputs/ve-capture8-encoder1.toml`, `tests/contracts/timer_advanced_inputs/zg-capture8-encoder1.toml`"
-msgstr "`tests/contracts/timer_advanced_inputs/ve-capture8-encoder1.toml`, `tests/contracts/timer_advanced_inputs/zg-capture8-encoder1.toml`"
-
-msgid "`tests/contracts/timer_advanced_inputs/ve-small-captures.toml`, `tests/contracts/timer_advanced_inputs/zg-small-captures.toml`"
-msgstr "`tests/contracts/timer_advanced_inputs/ve-small-captures.toml`, `tests/contracts/timer_advanced_inputs/zg-small-captures.toml`"
+msgid "jpeg-blocks"
+msgstr "jpeg-blocks"

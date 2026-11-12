@@ -1,8 +1,8 @@
 # Pre-runtime C with actual official LL; MMIO/CPU input boundaries only.
 set(sram_model "${CMAKE_CURRENT_BINARY_DIR}/f407-sram-reset")
 file(MAKE_DIRECTORY "${sram_model}")
-file(WRITE "${sram_model}/nexus_config.h"
-    "#define NEXUS_MEMORY_CCM 0\n#define NEXUS_MEMORY_ADDSRAM 1\n")
+file(CONFIGURE OUTPUT "${sram_model}/nexus_config.h"
+    CONTENT "#define NEXUS_MEMORY_CCM 0\n#define NEXUS_MEMORY_ADDSRAM 1\n" @ONLY)
 nexus_google_test(nexus_f407_sram_boot_test STM32F4_LL
     SOURCES f407_sram_boot_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sram_boot.c"

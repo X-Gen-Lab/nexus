@@ -77,7 +77,7 @@ class F407FSMCConfigurationTests(unittest.TestCase):
         if kind == "memory_window": text += 'mode="psram-window"\n'
         if kind == "flash_async":
             text += ('nor={command_set=2,cfi=true,unlock1=2730,unlock2=1364,'
-                     'cfi_address=170,ready_delay_us=1,requires_fresh_erase=true,sectors=[{offset=0,size=524288},{offset=524288,size=524288}]}\n')
+                     'cfi_address=170,ready_delay_us=1,requires_fresh_erase=true,erase_spans=[{offset=0,erase_bytes=524288,count=2}]}\n')
         if kind == "nand":
             text += ('ready_delay_us=1\ngeometry={page_bytes=512,oob_bytes=16,pages_per_block=32,'
                      'blocks=4,column_cycles=1,row_cycles=2}\n')
@@ -104,7 +104,9 @@ class F407FSMCConfigurationTests(unittest.TestCase):
             result=gate.resolve_ir(path,test_support=native_fixture(path))
             header,_=factory.emit(result);_,source=bindings.emit(result)
             self.assertIn("nx_factory_flash_async",header)
-            self.assertIn("nx_factory_fsmc_nor_flash",header)
+            self.assertIn("nx_factory_flash_async_flash",header)
+            self.assertIn("nx_factory_flash_async_flash_ref", factory.emit_strong(result))
+            self.assertIn("s_nx_flash_readonly_", source)
             self.assertIn("nx_stm32_fsmc_nor_prepare",source)
             self.assertIn("nx_stm32_fsmc_nor_close",source)
             self.assertIn("nx_stm32_fsmc_nor_flash_ops",source)

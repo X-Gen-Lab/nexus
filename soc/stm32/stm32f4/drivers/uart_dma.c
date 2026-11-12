@@ -137,14 +137,17 @@ validate_tx(nx_stm32_uart_state_t* uart,
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
+    if (!uart->initialized || uart->closing) {
+        return NX_ERROR_STATE;
+    }
+    if (nx_stm32_uart_dma_resources_overlap(resources, request,
+                                            sizeof(*request)))
+        return NX_ERROR_INVALID;
     nx_result_t result = nx_dma_buffer_validate(
         resources->regions, resources->region_count, request->data,
         request->length, 1U, NX_DMA_TO_DEVICE);
     if (result != NX_SUCCESS) {
         return result;
-    }
-    if (!uart->initialized || uart->closing) {
-        return NX_ERROR_STATE;
     }
     if (uart->active != NULL || (transmit->tx->CR & DMA_SxCR_EN) != 0U) {
         return NX_ERROR_BUSY;
@@ -203,8 +206,12 @@ static void begin_drain(nx_stm32_uart_state_t* uart,
     transmit->aborting = true;
     uart->terminal = terminal;
     (void)nx_request_transition(&uart->active->base, NX_REQUEST_DRAINING);
-    uart->drain_deadline =
-        nx_deadline_after(nx_time_now_us(), 20000000U / uart->baud + 100U);
+    if (nx_deadline_finite_after(nx_time_now_us(),
+                                 20000000U / uart->baud + 100U,
+                                 &uart->drain_deadline) != NX_SUCCESS) {
+        /* Exhaustion cannot grant DMA or the wire an infinite drain grace. */
+        uart->drain_deadline = 0U;
+    }
     bool untouched = (transmit->tx->CR & DMA_SxCR_EN) == 0U &&
                      transmit->tx->NDTR == uart->active->length;
     uart->tx_complete =
@@ -265,8 +272,11 @@ void nx_stm32_uart_dma_irq_parts(nx_stm32_uart_state_t* uart,
         if ((status & 0x0DU) != 0U || transmit->tx->NDTR != 0U) {
             begin_drain(uart, resources, transmit, NX_ERROR_IO);
         } else {
-            uart->drain_deadline = nx_deadline_after(
-                nx_time_now_us(), 20000000U / uart->baud + 100U);
+            if (nx_deadline_finite_after(nx_time_now_us(),
+                                         20000000U / uart->baud + 100U,
+                                         &uart->drain_deadline) != NX_SUCCESS) {
+                uart->drain_deadline = 0U;
+            }
             detach(uart, resources, transmit);
             if ((flags(resources, transmit) & 0x0DU) != 0U) {
                 begin_drain(uart, resources, transmit, NX_ERROR_IO);
@@ -356,6 +366,9 @@ nx_stm32_uart_dma_stop_parts(nx_stm32_uart_state_t* uart,
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
+    if (!uart->initialized) {
+        return NX_SUCCESS;
+    }
     uart->closing = true;
     if (uart->active != NULL) {
         (void)nx_stm32_uart_dma_cancel_parts(uart, resources, transmit,
@@ -409,7 +422,7 @@ nx_result_t nx_stm32_uart_dma_initialize(nx_stm32_uart_dma_state_t* state,
         return NX_ERROR_INVALID;
     }
     return nx_stm32_uart_dma_initialize_parts(
-        &state->uart, &state->resources, &state->transmit, clock_hz, false);
+        &state->uart, state->resources, &state->transmit, clock_hz, false);
 }
 
 /** \brief Decode one finite TX owner; storage remains allocation-free. */
@@ -418,7 +431,7 @@ nx_result_t nx_stm32_uart_dma_block_initialize(nx_stm32_uart_dma_state_t* state,
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
-    return nx_stm32_uart_dma_initialize_parts(&state->uart, &state->resources,
+    return nx_stm32_uart_dma_initialize_parts(&state->uart, state->resources,
                                               &state->transmit, clock_hz, true);
 }
 
@@ -429,7 +442,7 @@ nx_result_t nx_stm32_uart_dma_submit(void* context,
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
-    return nx_stm32_uart_dma_submit_parts(&state->uart, &state->resources,
+    return nx_stm32_uart_dma_submit_parts(&state->uart, state->resources,
                                           &state->transmit, request);
 }
 
@@ -441,7 +454,7 @@ nx_result_t nx_stm32_uart_dma_start_admitted(void* context,
         return NX_ERROR_INVALID;
     }
     return nx_stm32_uart_dma_start_admitted_parts(
-        &state->uart, &state->resources, &state->transmit, request);
+        &state->uart, state->resources, &state->transmit, request);
 }
 
 /** \brief Decode the immutable face context into explicit typed components. */
@@ -451,7 +464,7 @@ nx_result_t nx_stm32_uart_dma_cancel(void* context,
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
-    return nx_stm32_uart_dma_cancel_parts(&state->uart, &state->resources,
+    return nx_stm32_uart_dma_cancel_parts(&state->uart, state->resources,
                                           &state->transmit, request);
 }
 
@@ -461,7 +474,7 @@ void nx_stm32_uart_dma_service(void* context) {
     if (state == NULL) {
         return;
     }
-    nx_stm32_uart_dma_service_parts(&state->uart, &state->resources,
+    nx_stm32_uart_dma_service_parts(&state->uart, state->resources,
                                     &state->transmit);
 }
 
@@ -470,7 +483,7 @@ void nx_stm32_uart_dma_irq(nx_stm32_uart_dma_state_t* state) {
     if (state == NULL) {
         return;
     }
-    nx_stm32_uart_dma_irq_parts(&state->uart, &state->resources,
+    nx_stm32_uart_dma_irq_parts(&state->uart, state->resources,
                                 &state->transmit);
 }
 
@@ -481,7 +494,7 @@ nx_result_t nx_stm32_uart_dma_stop(void* context) {
         return NX_ERROR_INVALID;
     }
     nx_result_t result = nx_stm32_uart_dma_stop_parts(
-        &state->uart, &state->resources, &state->transmit);
+        &state->uart, state->resources, &state->transmit);
     return result == NX_SUCCESS ? nx_stm32_uart_stop(&state->uart) : result;
 }
 
@@ -543,6 +556,6 @@ nx_result_t nx_stm32_uart_dma_tx_validate(void* context,
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
-    return nx_stm32_uart_dma_tx_validate_parts(&state->uart, &state->resources,
+    return nx_stm32_uart_dma_tx_validate_parts(&state->uart, state->resources,
                                                &state->transmit, request);
 }

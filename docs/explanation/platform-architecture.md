@@ -32,10 +32,11 @@ or access; it is not an initialization sequence.
 
 ## Current source organization
 
-The production MCU tree contains one series package,
-`soc/stm32/stm32f4/`. Its current concrete implementations remain limited to
-STM32F407VET6 and STM32F407ZGT6; a family directory or official HAL macro does
-not establish support for another exact part or mode.
+The production MCU tree contains one series package, `soc/stm32/stm32f4/`.
+The selected device, package and mode come from its reviewed catalogue; see
+[exact support](../delivery/support.md). F407 Board integration and the new
+internal-CRC software references have distinct evidence. A family directory or
+official HAL macro does not establish another part, mode or physical result.
 
 Private IP sources now belong to the F4 package. SoC targets select and compile
 those sources directly; source ownership adds no runtime dispatch layer.

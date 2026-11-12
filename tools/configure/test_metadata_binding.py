@@ -56,8 +56,8 @@ class MetadataBindingTests(unittest.TestCase):
             self.policy_path.read_bytes()).hexdigest())
         header = (output / "nexus_config.h").read_text()
         self.assertIn(f'#define NEXUS_PLATFORM_VERSION "{self.version}"', header)
-        self.assertIn('#define NEXUS_FACTORY_ABI_EPOCH 1U', header)
-        self.assertEqual(factory.FACTORY_ABI_EPOCH, 1)
+        self.assertIn('#define NEXUS_FACTORY_ABI_EPOCH 2U', header)
+        self.assertEqual(factory.FACTORY_ABI_EPOCH, 2)
 
     def test_assembly_policy_change_invalidates_configuration_identity(self):
         before = gate.resolve_ir(self.assembly, self.root, test_support=True).configuration_sha256
@@ -69,11 +69,14 @@ class MetadataBindingTests(unittest.TestCase):
 
     def test_unsupported_factory_epoch_rejects_owned_assembly_bundle(self):
         output = self.root / "platform"
-        gate.configure(self.assembly, output, self.root, test_support=True)
-        self.change_policy(factory_abi_epoch=2)
-        with self.assertRaisesRegex(ValueError, "factory epoch"):
-            gate.configure(self.assembly, output, self.root, test_support=True)
-        self.assertFalse(output.exists())
+        for epoch in (1, 3):
+            with self.subTest(epoch=epoch):
+                self.change_policy(factory_abi_epoch=2)
+                gate.configure(self.assembly, output, self.root, test_support=True)
+                self.change_policy(factory_abi_epoch=epoch)
+                with self.assertRaisesRegex(ValueError, "factory epoch"):
+                    gate.configure(self.assembly, output, self.root, test_support=True)
+                self.assertFalse(output.exists())
 
     def test_owned_output_marker_cannot_authorize_policy_input_deletion(self):
         directory = self.policy_path.parent
@@ -92,7 +95,7 @@ class MetadataBindingTests(unittest.TestCase):
             self.assertIn(str(self.policy_path), before.snapshots)
             header = (output / "nexus_config.h").read_text()
             self.assertIn(f'#define NEXUS_PLATFORM_VERSION "{self.version}"', header)
-            self.assertIn('#define NEXUS_FACTORY_ABI_EPOCH 1U', header)
+            self.assertIn('#define NEXUS_FACTORY_ABI_EPOCH 2U', header)
             self.change_policy(semantic_version=self.other_version)
             after = runtime.configure(self.runtime, output)
             self.assertNotEqual(before.input_sha256, after.input_sha256)
@@ -102,11 +105,14 @@ class MetadataBindingTests(unittest.TestCase):
     def test_runtime_epoch_mismatch_invalidates_owned_bundle(self):
         output = self.root / "runtime-output"
         with patch.object(runtime, "ROOT", self.root, create=True):
-            runtime.configure(self.runtime, output)
-            self.change_policy(factory_abi_epoch=2)
-            with self.assertRaisesRegex(ValueError, "factory epoch"):
-                runtime.configure(self.runtime, output)
-        self.assertFalse(output.exists())
+            for epoch in (1, 3):
+                with self.subTest(epoch=epoch):
+                    self.change_policy(factory_abi_epoch=2)
+                    runtime.configure(self.runtime, output)
+                    self.change_policy(factory_abi_epoch=epoch)
+                    with self.assertRaisesRegex(ValueError, "factory epoch"):
+                        runtime.configure(self.runtime, output)
+                    self.assertFalse(output.exists())
 
     def test_assembly_policy_change_during_emission_is_rejected(self):
         output = self.root / "platform"
@@ -143,7 +149,7 @@ class MetadataBindingTests(unittest.TestCase):
         with patch.object(cpu, "ROOT", self.root, create=True):
             self.assertEqual(cpu.main(args), 0)
             before = json.loads((output / "resolved-cpu.json").read_text())
-            self.assertIn('#define NEXUS_FACTORY_ABI_EPOCH 1U',
+            self.assertIn('#define NEXUS_FACTORY_ABI_EPOCH 2U',
                           (output / "nexus_config.h").read_text())
             self.change_policy(semantic_version=self.other_version)
             self.assertEqual(cpu.main(args), 0)

@@ -17,7 +17,7 @@ flash_load_limit_bytes = 65536
 [i2c.first]
 binding = "primary-i2c"
 mode = "poll-messages"
-max_hz = 80000
+max_hz = 100000
 
 [i2c_device.narrow]
 controller = "first"

@@ -1,6 +1,7 @@
 """Selected provider build inputs reject before firmware targets are requested."""
 
 from pathlib import Path
+import json
 import shutil
 import subprocess
 import sys
@@ -167,6 +168,16 @@ cmake_language(DEFER DIRECTORY "${NEXUS_SOURCE_DIR}" CALL export_provider_policy
             "add_library(external_provider INTERFACE)\n"
             "add_library(nexus_soc_partner_model ALIAS external_provider)\n")
         self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+
+    def test_external_assembly_does_not_inherit_unselected_f4_ip_headers(self):
+        process, build = self.configure_package(
+            "add_library(nexus_soc_partner_model INTERFACE)\n"
+            "target_link_libraries(nexus_soc_partner_model INTERFACE Nexus::IO)\n")
+        self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+        commands = json.loads((build / "compile_commands.json").read_text())
+        binding, = [entry for entry in commands
+                    if Path(entry["file"]).name == "bindings.c"]
+        self.assertNotIn("soc/stm32/stm32f4/drivers/ip/", binding["command"])
 
 
 if __name__ == "__main__":

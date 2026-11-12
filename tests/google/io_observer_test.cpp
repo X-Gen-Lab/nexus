@@ -9,6 +9,8 @@
 #include "nexus/components/owner_observer.h"
 #include "nexus/core/request_observer.h"
 #include "nexus/io/stream_budget.h"
+#include <array>
+#include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <limits>
@@ -82,6 +84,16 @@ TEST_F(RequestObservation, ReversedClockPreservesOutputAndSaturatesCounters) {
     EXPECT_EQ(nx_request_observer_sample(&observer, 99U, &output), NX_ERROR_IO);
     EXPECT_EQ(output.observed_at, 777U);
     EXPECT_EQ(observer.clock_errors, UINT32_MAX);
+    std::array<unsigned char, sizeof(observer)> observer_before{};
+    std::array<unsigned char, sizeof(output)> output_before{};
+    std::memcpy(observer_before.data(), &observer, observer_before.size());
+    std::memcpy(output_before.data(), &output, output_before.size());
+    EXPECT_EQ(nx_request_observer_sample(&observer, NX_DEADLINE_NEVER, &output),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(0, std::memcmp(observer_before.data(), &observer,
+                             observer_before.size()));
+    EXPECT_EQ(0,
+              std::memcmp(output_before.data(), &output, output_before.size()));
     ASSERT_EQ(nx_request_observer_sample(&observer, 150U, &output), NX_SUCCESS);
     EXPECT_EQ(observer.samples, UINT32_MAX);
     EXPECT_EQ(observer.max_gap, 50U);

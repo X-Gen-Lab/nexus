@@ -123,7 +123,9 @@ const nx_usb_device_ops_t controller_ops = {Controller::Poll,
                                             Controller::Snapshot,
                                             Controller::SetAddress,
                                             nullptr,
-                                            Controller::Close};
+                                            Controller::Close,
+                                            nullptr,
+                                            nullptr};
 const nx_usb_activation_ops_t activation_ops = {Controller::Activate};
 nx_result_t RejectSetup(void*, uint64_t) {
     return NX_SUCCESS;
@@ -292,19 +294,24 @@ TEST_F(StUsbDeviceStack, OfficialGetDescriptorBorrowsOnlyOwnedStaging) {
     Step();
     EXPECT_TRUE(slots[0].pending);
 }
-TEST_F(StUsbDeviceStack, ControlInUsesCorePacketSplittingAndDeferredStatus) {
+TEST_F(StUsbDeviceStack, ControlInUsesCorePacketSplittingAndOnePrearmedStatus) {
     Start();
     Setup(0x80U, 6U, 0x200U, 150U);
     Step();
     EXPECT_EQ(64U, slots[0].request.length);
+    ASSERT_TRUE(slots[1].pending);
+    const nx_time_us_t status_deadline = slots[1].deadline;
+    EXPECT_EQ(NX_USB_STATUS, slots[1].request.stage);
     Finish(0U, 64U);
     Step();
     EXPECT_EQ(64U, slots[0].request.length);
-    EXPECT_FALSE(slots[1].pending);
+    EXPECT_TRUE(slots[1].pending);
+    EXPECT_EQ(status_deadline, slots[1].deadline);
     Finish(0U, 64U);
     Step();
     EXPECT_EQ(22U, slots[0].request.length);
-    EXPECT_FALSE(slots[1].pending);
+    EXPECT_TRUE(slots[1].pending);
+    EXPECT_EQ(status_deadline, slots[1].deadline);
     Finish(0U, 22U);
     Step();
     EXPECT_TRUE(slots[1].pending);
