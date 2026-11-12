@@ -10,27 +10,36 @@
 
 /** \brief Identify advanced and small timers in the selected APB2 domain. */
 static inline bool nx_stm32_timer_apb2(const TIM_TypeDef* registers) {
-    return registers == TIM1 || registers == TIM8 || registers == TIM9 ||
-           registers == TIM10 || registers == TIM11;
+    return registers == TIM1 ||
+#if defined(TIM8)
+           registers == TIM8 ||
+#endif
+           registers == TIM9 || registers == TIM10 || registers == TIM11;
 }
 
 /** \brief Select the reviewed alternate function without mutable metadata. */
 static inline uint32_t nx_stm32_timer_af(const TIM_TypeDef* registers) {
     if (registers == TIM1)
         return 1U;
+#if defined(TIM12) && defined(TIM13) && defined(TIM14)
     return nx_stm32_timer_apb2(registers)
                ? 3U
                : (registers == TIM12 || registers == TIM13 || registers == TIM14
                       ? 9U
                       : 2U);
+#else
+    return nx_stm32_timer_apb2(registers) ? 3U : 2U;
+#endif
 }
 
 /** \brief Exact gate in the separately selected APB register, or zero. */
 static inline uint32_t nx_stm32_timer_gate(const TIM_TypeDef* registers) {
     if (registers == TIM1)
         return RCC_APB2ENR_TIM1EN;
+#if defined(TIM8) && defined(RCC_APB2ENR_TIM8EN)
     if (registers == TIM8)
         return RCC_APB2ENR_TIM8EN;
+#endif
     if (registers == TIM3)
         return RCC_APB1ENR_TIM3EN;
     if (registers == TIM4)
@@ -43,23 +52,43 @@ static inline uint32_t nx_stm32_timer_gate(const TIM_TypeDef* registers) {
         return RCC_APB2ENR_TIM10EN;
     if (registers == TIM11)
         return RCC_APB2ENR_TIM11EN;
+#if defined(TIM12) && defined(RCC_APB1ENR_TIM12EN)
     if (registers == TIM12)
         return RCC_APB1ENR_TIM12EN;
+#endif
+#if defined(TIM13) && defined(RCC_APB1ENR_TIM13EN)
     if (registers == TIM13)
         return RCC_APB1ENR_TIM13EN;
+#endif
+#if defined(TIM14) && defined(RCC_APB1ENR_TIM14EN)
     if (registers == TIM14)
         return RCC_APB1ENR_TIM14EN;
+#endif
     return 0U;
 }
 /** \brief Exact CC register count; basic timers and the Core timer are absent.
  */
 static inline uint8_t nx_stm32_capture_channels(const TIM_TypeDef* timer) {
-    if (timer == TIM1 || timer == TIM3 || timer == TIM4 || timer == TIM5 ||
-        timer == TIM8)
+    if (timer == TIM1 || timer == TIM3 || timer == TIM4 || timer == TIM5
+#if defined(TIM8)
+        || timer == TIM8
+#endif
+    )
         return 4U;
-    if (timer == TIM9 || timer == TIM12)
+    if (timer == TIM9
+#if defined(TIM12)
+        || timer == TIM12
+#endif
+    )
         return 2U;
-    if (timer == TIM10 || timer == TIM11 || timer == TIM13 || timer == TIM14)
+    if (timer == TIM10 || timer == TIM11
+#if defined(TIM13)
+        || timer == TIM13
+#endif
+#if defined(TIM14)
+        || timer == TIM14
+#endif
+    )
         return 1U;
     return 0U;
 }
@@ -75,6 +104,8 @@ static inline bool nx_stm32_capture_peer_busy(const TIM_TypeDef* timer) {
         mask = timer == TIM9    ? TIM_DIER_BIE
                : timer == TIM10 ? TIM_DIER_UIE
                                 : TIM_DIER_TIE | TIM_DIER_COMIE;
+#if defined(TIM8) && defined(RCC_APB2ENR_TIM8EN) && defined(TIM12) &&          \
+    defined(TIM13) && defined(TIM14)
     } else if (timer == TIM12 || timer == TIM13 || timer == TIM14) {
         if ((RCC->APB2ENR & RCC_APB2ENR_TIM8EN) == 0U)
             return false;
@@ -82,6 +113,7 @@ static inline bool nx_stm32_capture_peer_busy(const TIM_TypeDef* timer) {
         mask = timer == TIM12   ? TIM_DIER_BIE
                : timer == TIM13 ? TIM_DIER_UIE
                                 : TIM_DIER_TIE | TIM_DIER_COMIE;
+#endif
     } else {
         return false;
     }
