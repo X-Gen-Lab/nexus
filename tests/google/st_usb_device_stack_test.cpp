@@ -123,7 +123,9 @@ const nx_usb_device_ops_t controller_ops = {Controller::Poll,
                                             Controller::Snapshot,
                                             Controller::SetAddress,
                                             nullptr,
-                                            Controller::Close};
+                                            Controller::Close,
+                                            nullptr,
+                                            nullptr};
 const nx_usb_activation_ops_t activation_ops = {Controller::Activate};
 nx_result_t RejectSetup(void*, uint64_t) {
     return NX_SUCCESS;

@@ -176,6 +176,18 @@ def _format(item, provider, shape):
         if shape.block_stream:
             continuity = "double_buffer" if shape.continuous else "rearm_gap"
             source = "irq_observation"
+    elif kind == "adc_group" and shape.continuous:
+        abort = "controller_pending"
+        continuity = "double_buffer"
+        source = "service_observation"
+    elif kind == "capture" and item.mode == "jpeg-blocks":
+        abort = "controller_pending"
+        continuity = "double_buffer"
+        source = "service_observation"
+    elif kind == "capture" and item.mode in {"frames-raw", "frames-jpeg"}:
+        abort = "controller_pending"
+        continuity = "rearm_gap"
+        source = "service_observation"
     elif kind == "can":
         mailboxes = getattr(provider, "CLASSIC_CAN_MAILBOXES", None)
         if type(mailboxes) is not int or mailboxes <= 0:
@@ -293,6 +305,11 @@ def describe(item, endpoint=None, *, public_class=None):
                       buffer_alignment=width,
                       max_transfer_units=item.options.max_frames,
                       word_bits=(item.options.resolution_bits,))
+    elif kind == "capture" and item.mode == "jpeg-blocks":
+        limits.update(unit="words", unit_bytes=4, buffer_alignment=4,
+                      max_transfer_units=65535, word_bits=(32,))
+    elif kind == "capture" and item.mode in {"frames-raw", "frames-jpeg"}:
+        limits.update(unit="frames", buffer_alignment=4)
     elif kind in {"can", "can_fd"}:
         limits.update(max_transfer_units=64 if kind == "can_fd" else 8,
                       max_messages=1)

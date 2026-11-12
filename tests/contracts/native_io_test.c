@@ -325,8 +325,8 @@ static bool i2c_transaction_and_recovery(void) {
  */
 static bool flash_regions_and_pulses(void) {
     uint8_t memory[64];
-    const nx_flash_sector_t sectors[] = {{0, 16}, {16, 16}, {32, 32}};
-    const nx_flash_geometry_t geometry = {0x08000000, 64, 4, sectors, 3, 0};
+    const nx_flash_erase_span_t spans[] = {{0U, 16U, 2U}, {32U, 32U, 1U}};
+    const nx_flash_geometry_t geometry = {0x08000000, 64, 4, spans, 2, 0};
     CHECK(nx_native_flash_configure(memory, &geometry) == NX_SUCCESS);
     uint8_t data[8] = {1, 2, 3, 4, 5, 6, 7, 8};
     CHECK(nx_flash_port_program(nx_native_flash, UINT32_MAX - 1, data, 8,

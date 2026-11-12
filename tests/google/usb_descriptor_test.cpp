@@ -28,8 +28,8 @@ nx_result_t RejectSetup(void*, uint64_t) {
 }
 const nx_usb_setup_decision_ops_t setup_ops{RejectSetup};
 const nx_usb_endpoint_ops_t ep_ops{Packet, Packet, Stall};
-const nx_usb_device_ops_t dev_ops{Poll,    nullptr, State,
-                                  nullptr, nullptr, nullptr};
+const nx_usb_device_ops_t dev_ops{Poll,    nullptr, State,   nullptr,
+                                  nullptr, nullptr, nullptr, nullptr};
 class UsbDescriptors : public testing::Test {
   protected:
     int storage[5]{};

@@ -7,8 +7,11 @@
 #define NX_STM32F407_PLATFORM_COLD_H
 
 #include "stm32f407_provider.h"
+#include "stm32f4_traits.h"
 
-/** \brief Constant-expression membership in the three F407 NVIC banks. */
+#define NX_STM32_PLATFORM_IRQ_BANKS ((NX_STM32_EXTERNAL_IRQ_COUNT + 31U) / 32U)
+
+/** \brief Constant-expression membership in the selected SDK NVIC banks. */
 #define NX_STM32_PLATFORM_IRQ_MASK(irq, bank)                                  \
     (((uint32_t)(irq) / 32U == (bank))                                         \
          ? (UINT32_C(1) << ((uint32_t)(irq) % 32U))                            \
@@ -39,7 +42,7 @@ typedef struct {
     uint32_t apb2_clocks;
     uint32_t ahb1_clocks;
     uint32_t ahb2_clocks;
-    uint32_t irq_masks[3];
+    uint32_t irq_masks[NX_STM32_PLATFORM_IRQ_BANKS];
     uint32_t exti_lines;
 } nx_stm32_platform_config_t;
 

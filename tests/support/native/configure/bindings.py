@@ -98,16 +98,15 @@ def constructor(item, result, board_bindings, routes, devices):
                 else DirectCall("nx_native_i2c_stop_instance", (state_address,))]
     elif kind == "flash":
         flash = result.flash
-        offset = 0
         definitions = [f"static uint8_t s_nx_model_flash_{name}[{flash['size']}];",
-                       f"static const nx_flash_sector_t s_nx_sectors_{name}[] = {{"]
-        for size in flash["erase_blocks"]:
-            definitions.append(f"    {{ {offset}u, {size}u }},")
-            offset += size
+                       f"static const nx_flash_erase_span_t s_nx_erase_spans_{name}[] = {{"]
+        for span in flash["erase_spans"]:
+            definitions.append(f"    {{ {span['offset']}u, {span['erase_bytes']}u, "
+                               f"{span['count']}u }},")
         definitions += ["};",
                         f"static const nx_flash_geometry_t s_nx_geometry_{name} = {{",
                         f"    {flash['origin']}u, {flash['size']}u, 1u,",
-                        f"    s_nx_sectors_{name}, {len(flash['erase_blocks'])}u, 0u",
+                        f"    s_nx_erase_spans_{name}, {len(flash['erase_spans'])}u, 0u",
                         "};"]
         initialize = DirectCall("nx_native_flash_initialize_instance",
             (state_address, Symbol(f"s_nx_model_flash_{name}"),

@@ -473,6 +473,15 @@ REQUIRED_FILES = (
     'io/include/nexus/io/dac.h',
     'io/include/nexus/io/chip.h',
     'io/include/nexus/io/crc.h',
+    'io/include/nexus/io/cipher.h',
+    'io/include/nexus/io/hash.h',
+    'io/include/nexus/io/display.h',
+    'io/include/nexus/io/image.h',
+    'io/private/graphics_checks.h',
+    'io/src/api/display.c',
+    'io/src/api/audio.c',
+    'io/src/api/image.c',
+    'io/private/crypto_validation.h',
     'io/include/nexus/io/dac_tx.h',
     'io/include/nexus/io/dma.h',
     'io/include/nexus/io/encoder.h',
@@ -530,6 +539,8 @@ REQUIRED_FILES = (
     'io/src/api/can_fd.c',
     'io/src/api/dac.c',
     'io/src/api/crc.c',
+    'io/src/api/cipher.c',
+    'io/src/api/hash.c',
     'io/src/api/dac_tx.c',
     'io/src/api/encoder.c',
     'io/src/api/entropy.c',
@@ -968,6 +979,27 @@ F4_FAMILY_VERIFICATION_FILES = (
       for chip in ("405", "407", "415", "417")),
     *(f"tests/contracts/stm32f4_family/f{chip}zg-board/board.json"
       for chip in ("405", "407", "415", "417")),
+    *(f"tests/contracts/stm32f4_family/{stem}.toml"
+      for stem in ("f411re", "f446ze", "f479ni")),
+    *(f"tests/contracts/stm32f4_family/{stem}-board/board.json"
+      for stem in ("f411re", "f446ze", "f479ni")),
+    *(f"tests/contracts/stm32f4_crypto/{name}"
+      for name in ("consumer.c", "CMakeLists.txt", "f415zg.toml", "f417zg.toml",
+                   "f415zg-board/board.json", "f417zg-board/board.json")),
+    *(f"tests/contracts/stm32f4_sdram/{name}"
+      for name in ("consumer.c", "CMakeLists.txt", "f479ni-sdram.toml",
+                   "f479ni-sdram-board/board.json")),
+    *(f"tests/contracts/stm32f4_qspi/{name}"
+      for name in ("consumer.c", "CMakeLists.txt", "f479ni-qspi.toml",
+                   "f479ni-qspi-board/board.json")),
+    *(f"tests/contracts/stm32f4_graphics/{name}"
+      for name in ("consumer.c", "CMakeLists.txt", "combined.toml",
+                   "dual-rgb888.toml", "image-only.toml", "board/board.json")),
+    *(f"tests/contracts/stm32f4_sai/{name}"
+      for name in ("consumer.c", "CMakeLists.txt", "README.md",
+                   "f446ze-master.toml", "f446ze-slave.toml",
+                   "f479ni-master.toml", "f479ni-slave.toml",
+                   "f446ze-board/board.json", "f479ni-board/board.json")),
 )
 REQUIRED_FILES = tuple(dict.fromkeys((*REQUIRED_FILES,
     *F4_FAMILY_VERIFICATION_FILES,

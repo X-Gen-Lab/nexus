@@ -326,6 +326,40 @@ TEST(UartByteFormat, F407SupportsEightDataBitsWithParityWithoutGrowingState) {
     EXPECT_EQ(rx[0], 0x7AU);
 }
 
+TEST(UartByteFormat, LiveRtsFrameChangesRejectWithoutEffects) {
+    for (const bool prior_rts : {false, true}) {
+        SCOPED_TRACE(prior_rts);
+        reset_ports();
+        USART_TypeDef registers = {};
+        nx_stm32_uart_state_t state = {};
+        uint8_t rx[4] = {};
+        state.registers = &registers;
+        state.irq = USART1_IRQn;
+        state.baud = 115200U;
+        state.rx_storage = rx;
+        state.rx_capacity = sizeof(rx);
+        state.profile = NX_UART_RX_BYTES;
+        ASSERT_EQ(nx_stm32_uart_initialize(&state, 84000000U), NX_SUCCESS);
+        if (prior_rts) {
+            ASSERT_EQ(nx_stm32_uart_flow_configure(&state, true, false),
+                      NX_SUCCESS);
+        }
+        unsigned char before_state[sizeof(state)] = {};
+        unsigned char before_registers[sizeof(registers)] = {};
+        std::memcpy(before_state, &state, sizeof(state));
+        std::memcpy(before_registers, &registers, sizeof(registers));
+        const nx_uart_format_t selected = {
+            8U, NX_UART_PARITY_EVEN, NX_UART_STOP_2,
+            prior_rts ? NX_UART_FLOW_NONE : NX_UART_FLOW_RTS};
+        EXPECT_EQ(nx_stm32_uart_format_configure(&state, selected),
+                  NX_ERROR_UNSUPPORTED);
+        EXPECT_EQ(std::memcmp(before_state, &state, sizeof(state)), 0);
+        EXPECT_EQ(std::memcmp(before_registers, &registers, sizeof(registers)),
+                  0);
+        ASSERT_EQ(nx_stm32_uart_stop(&state), NX_SUCCESS);
+    }
+}
+
 TEST(UartColdFormat, F407FirstEnableAlreadyHasTheSelectedWireFormat) {
     reset_ports();
     USART_TypeDef registers = {};

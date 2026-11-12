@@ -49,7 +49,7 @@ nx_result_t nx_request_observer_bind(nx_request_observer_t* observer,
 nx_result_t nx_request_observer_sample(nx_request_observer_t* observer,
                                        nx_time_us_t now,
                                        nx_request_observation_t* out) {
-    if (observer == NULL || out == NULL ||
+    if (observer == NULL || out == NULL || now == NX_DEADLINE_NEVER ||
         overlaps(out, sizeof(*out), observer, sizeof(*observer))) {
         return NX_ERROR_INVALID;
     }

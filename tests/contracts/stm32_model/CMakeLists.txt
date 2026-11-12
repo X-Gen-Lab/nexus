@@ -52,6 +52,8 @@ foreach(target contract_stm32_system_model contract_stm32_io_model
 endforeach()
 target_compile_options(contract_stm32_system_model PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/model_poll.h")
+target_compile_definitions(contract_stm32_io_model PRIVATE
+    NX_STM32_GPIO_LATCH_MODEL)
 target_compile_options(contract_stm32_io_model PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/io_poll.h")
 target_compile_definitions(contract_stm32_constructor_model PRIVATE _GNU_SOURCE)

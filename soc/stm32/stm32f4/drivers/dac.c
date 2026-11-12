@@ -54,7 +54,11 @@ static bool config_valid(const nx_stm32_dac_config_t* config) {
         (config->channels & ~3U) != 0U ||
         (unsigned)config->format > (unsigned)NX_DAC_FORMAT_U12_LEFT ||
         (unsigned)config->mode > (unsigned)NX_STM32_DAC_TRIANGLE ||
-        (unsigned)config->trigger > (unsigned)NX_STM32_DAC_TRIGGER_TIM7 ||
+        (unsigned)config->trigger > (unsigned)NX_STM32_DAC_TRIGGER_EXTI9 ||
+        (config->trigger != NX_STM32_DAC_TRIGGER_EXTI9 &&
+         config->external != NULL) ||
+        (config->external != NULL && config->external->config != NULL &&
+         config->external->config->line != 9U) ||
         ((config->mode == NX_STM32_DAC_DIRECT) !=
          (config->trigger == NX_STM32_DAC_TRIGGER_NONE))) {
         return false;
@@ -76,12 +80,38 @@ static bool config_valid(const nx_stm32_dac_config_t* config) {
     }
     return true;
 }
+bool nx_stm32_dac_external_live(const nx_stm32_dac_config_t* config) {
+    if (config->trigger != NX_STM32_DAC_TRIGGER_EXTI9)
+        return true;
+    const nx_stm32_exti_hardware_state_t* source = config->external;
+    if (source == NULL || !source->owned || !source->initialized ||
+        source->config == NULL)
+        return false;
+    const nx_stm32_exti_hardware_config_t* route = source->config;
+    const uint32_t bit = 1U << 9U;
+    uint32_t rising = (route->edge & NX_EXTI_RISING) != 0 ? bit : 0U;
+    uint32_t falling = (route->edge & NX_EXTI_FALLING) != 0 ? bit : 0U;
+    return route->line == 9U && route->gpio_index <= 8U &&
+           route->gpio ==
+               (GPIO_TypeDef*)(uintptr_t)(GPIOA_BASE +
+                                          (uintptr_t)route->gpio_index *
+                                              UINT32_C(0x400)) &&
+           (RCC->APB2ENR & RCC_APB2ENR_SYSCFGEN) != 0U &&
+           (RCC->AHB1ENR & (1U << route->gpio_index)) != 0U &&
+           (RCC->APB2RSTR & RCC_APB2RSTR_SYSCFGRST) == 0U &&
+           (RCC->AHB1RSTR & (1U << route->gpio_index)) == 0U &&
+           ((SYSCFG->EXTICR[2] >> 4U) & 15U) == route->gpio_index &&
+           (EXTI->EMR & bit) != 0U && (EXTI->IMR & bit) == 0U &&
+           (EXTI->RTSR & bit) == rising && (EXTI->FTSR & bit) == falling;
+}
 /** \brief Program each selected channel using its exact supplier literal. */
 static bool configure(const nx_stm32_dac_config_t* config) {
     uint32_t trigger = config->trigger == NX_STM32_DAC_TRIGGER_TIM6
                            ? LL_DAC_TRIG_EXT_TIM6_TRGO
                        : config->trigger == NX_STM32_DAC_TRIGGER_TIM7
                            ? LL_DAC_TRIG_EXT_TIM7_TRGO
+                       : config->trigger == NX_STM32_DAC_TRIGGER_EXTI9
+                           ? LL_DAC_TRIG_EXT_EXTI_LINE9
                            : LL_DAC_TRIG_SOFTWARE;
     uint32_t wave = config->mode == NX_STM32_DAC_NOISE
                         ? LL_DAC_WAVE_AUTO_GENERATION_NOISE
@@ -111,7 +141,8 @@ static bool configure(const nx_stm32_dac_config_t* config) {
             LL_DAC_SetWaveTriangleAmplitude(config->registers, selected,
                                             level << DAC_CR_MAMP1_Pos);
         }
-        if (config->trigger == NX_STM32_DAC_TRIGGER_NONE) {
+        if (config->trigger == NX_STM32_DAC_TRIGGER_NONE ||
+            config->trigger == NX_STM32_DAC_TRIGGER_EXTI9) {
             LL_DAC_DisableTrigger(config->registers, selected);
         } else {
             LL_DAC_EnableTrigger(config->registers, selected);
@@ -130,7 +161,8 @@ static bool configure(const nx_stm32_dac_config_t* config) {
             LL_DAC_GetWaveAutoGeneration(config->registers, selected) != wave ||
             LL_DAC_IsDMAReqEnabled(config->registers, selected) != 0U ||
             (LL_DAC_IsTriggerEnabled(config->registers, selected) != 0U) !=
-                (config->trigger != NX_STM32_DAC_TRIGGER_NONE) ||
+                (config->trigger != NX_STM32_DAC_TRIGGER_NONE &&
+                 config->trigger != NX_STM32_DAC_TRIGGER_EXTI9) ||
             (wave != LL_DAC_WAVE_AUTO_GENERATION_NONE &&
              LL_DAC_GetWaveTriangleAmplitude(config->registers, selected) !=
                  level << DAC_CR_MAMP1_Pos)) {
@@ -185,6 +217,8 @@ nx_result_t nx_stm32_dac_prepare(nx_stm32_dac_state_t* state,
     if (state->config != NULL || state->clocks_added != 0U || state->owned) {
         return NX_ERROR_BUSY;
     }
+    if (!nx_stm32_dac_external_live(config))
+        return NX_ERROR_STATE;
     if ((RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN) == 0U) {
         return NX_ERROR_STATE;
     }
@@ -231,13 +265,23 @@ nx_result_t nx_stm32_dac_prepare(nx_stm32_dac_state_t* state,
     return NX_SUCCESS;
 }
 /** \brief An observation cannot replace its provider state or ROM settings. */
-static bool observation(const nx_stm32_dac_state_t* state, const void* data,
-                        size_t size, size_t alignment) {
+bool nx_stm32_dac_independent(const nx_stm32_dac_state_t* state,
+                              size_t state_bytes, const void* data, size_t size,
+                              size_t alignment) {
     uintptr_t begin = (uintptr_t)data;
-    if (data == NULL || begin % alignment != 0U || size > UINTPTR_MAX - begin) {
+    if (state_bytes < sizeof(*state) || data == NULL || size == 0U ||
+        begin % alignment != 0U || size > UINTPTR_MAX - begin) {
         return false;
     }
-    return !(begin < (uintptr_t)state + sizeof(*state) &&
+    const nx_stm32_exti_hardware_state_t* source = state->config->external;
+    if (source != NULL &&
+        ((begin < (uintptr_t)source + sizeof(*source) &&
+          (uintptr_t)source < begin + size) ||
+         (source->config != NULL &&
+          begin < (uintptr_t)source->config + sizeof(*source->config) &&
+          (uintptr_t)source->config < begin + size)))
+        return false;
+    return !(begin < (uintptr_t)state + state_bytes &&
              (uintptr_t)state < begin + size) &&
            !(begin < (uintptr_t)state->config + sizeof(*state->config) &&
              (uintptr_t)state->config < begin + size);
@@ -248,7 +292,8 @@ nx_result_t nx_stm32_dac_info(const void* context, nx_dac_info_t* output) {
     if (!ready(state)) {
         return NX_ERROR_STATE;
     }
-    if (!observation(state, output, sizeof(*output), _Alignof(nx_dac_info_t))) {
+    if (!nx_stm32_dac_independent(state, sizeof(*state), output,
+                                  sizeof(*output), _Alignof(nx_dac_info_t))) {
         return NX_ERROR_INVALID;
     }
     const nx_stm32_dac_config_t* config = state->config;
@@ -262,12 +307,29 @@ nx_result_t nx_stm32_dac_info(const void* context, nx_dac_info_t* output) {
         .channel_mask = config->channels,
         .software_trigger = config->trigger == NX_STM32_DAC_TRIGGER_SOFTWARE,
         .timer_trigger = timer(config) != NULL,
+        .external_trigger = config->trigger == NX_STM32_DAC_TRIGGER_EXTI9,
         .output_buffer = config->output_buffer};
     return NX_SUCCESS;
 }
 /** \brief Wave amplitude addition must not overflow the selected raw code. */
 static bool code_valid(const nx_stm32_dac_config_t* config, uint16_t code) {
     return (uint32_t)code + config->amplitude <= maximum(config);
+}
+/** \brief An external edge can arrive now; stopped writes cannot rearm TEN. */
+static bool external_running(const nx_stm32_dac_state_t* state) {
+    const nx_stm32_dac_config_t* config = state->config;
+    if (config->trigger != NX_STM32_DAC_TRIGGER_EXTI9)
+        return true;
+    if (!state->running || !nx_stm32_dac_external_live(config))
+        return false;
+    for (unsigned index = 0U; index < 2U; ++index)
+        if ((config->channels & (1U << index)) != 0U &&
+            (LL_DAC_IsEnabled(config->registers, channel(index)) == 0U ||
+             LL_DAC_IsTriggerEnabled(config->registers, channel(index)) == 0U ||
+             LL_DAC_GetTriggerSource(config->registers, channel(index)) !=
+                 LL_DAC_TRIG_EXT_EXTI_LINE9))
+            return false;
+    return true;
 }
 /** \brief A scalar operation modifies only its authorized channel. */
 static nx_result_t write(void* context, uint8_t selected, uint16_t code) {
@@ -278,6 +340,8 @@ static nx_result_t write(void* context, uint8_t selected, uint16_t code) {
     if (!context_ok()) {
         return NX_ERROR_CONTEXT;
     }
+    if (!external_running(state))
+        return NX_ERROR_STATE;
     if (selected < 1U || selected > 2U || !code_valid(state->config, code)) {
         return NX_ERROR_INVALID;
     }
@@ -300,6 +364,8 @@ static nx_result_t write_pair(void* context, uint16_t first, uint16_t second) {
     if (!context_ok()) {
         return NX_ERROR_CONTEXT;
     }
+    if (!external_running(state))
+        return NX_ERROR_STATE;
     if (state->config->channels != 3U) {
         return NX_ERROR_PERMISSION;
     }
@@ -314,6 +380,52 @@ static nx_result_t write_pair(void* context, uint16_t first, uint16_t second) {
     put_pair(state->config, first, second);
     return NX_SUCCESS;
 }
+nx_result_t nx_stm32_dac_enable_external(nx_stm32_dac_state_t* state,
+                                         nx_time_us_t deadline) {
+    if (!nx_stm32_dac_external_live(state->config))
+        return NX_ERROR_STATE;
+    nx_time_us_t began = nx_time_now_us();
+    if (began == NX_DEADLINE_NEVER)
+        return NX_ERROR_STATE;
+    if (nx_deadline_expired(deadline, began))
+        return NX_ERROR_TIMEOUT;
+    const nx_stm32_dac_config_t* config = state->config;
+    for (unsigned index = 0U; index < 2U; ++index)
+        if ((config->channels & (1U << index)) != 0U)
+            LL_DAC_EnableTrigger(config->registers, channel(index));
+    nx_arch_dsb();
+    for (unsigned index = 0U; index < 2U; ++index)
+        if ((config->channels & (1U << index)) != 0U &&
+            (LL_DAC_IsTriggerEnabled(config->registers, channel(index)) == 0U ||
+             LL_DAC_GetTriggerSource(config->registers, channel(index)) !=
+                 LL_DAC_TRIG_EXT_EXTI_LINE9))
+            return NX_ERROR_IO;
+    if (!nx_stm32_dac_external_live(config))
+        return NX_ERROR_STATE;
+    nx_time_us_t now = nx_time_now_us();
+    if (now == NX_DEADLINE_NEVER || now < began)
+        return NX_ERROR_STATE;
+    return nx_deadline_expired(deadline, now) ? NX_ERROR_TIMEOUT : NX_SUCCESS;
+}
+nx_result_t nx_stm32_dac_wait_startup(nx_time_us_t deadline) {
+    nx_time_us_t began = nx_time_now_us(), until;
+    if (began == NX_DEADLINE_NEVER)
+        return NX_ERROR_STATE;
+    /* One extra microsecond covers the fractional tick at the EN boundary. */
+    nx_result_t result = nx_deadline_finite_after(
+        began, LL_DAC_DELAY_STARTUP_VOLTAGE_SETTLING_US + 1U, &until);
+    if (result != NX_SUCCESS)
+        return result;
+    for (;;) {
+        nx_time_us_t now = nx_time_now_us();
+        if (now == NX_DEADLINE_NEVER || now < began)
+            return NX_ERROR_STATE;
+        if (nx_deadline_expired(deadline, now))
+            return NX_ERROR_TIMEOUT;
+        if (now >= until)
+            return NX_SUCCESS;
+    }
+}
 /** \brief Disable DAC triggers while timer EGR installs its divider. */
 nx_result_t nx_stm32_dac_arm(nx_stm32_dac_state_t* state, uint32_t hz,
                              nx_time_us_t deadline, bool run_timer) {
@@ -327,12 +439,16 @@ nx_result_t nx_stm32_dac_arm(nx_stm32_dac_state_t* state, uint32_t hz,
         return NX_ERROR_BUSY;
     }
     const nx_stm32_dac_config_t* config = state->config;
+    if (!nx_stm32_dac_external_live(config))
+        return NX_ERROR_STATE;
     TIM_TypeDef* counter = timer(config);
     if ((counter == NULL && hz != 0U) ||
         (counter != NULL && (hz == 0U || hz > 1000000U))) {
         return NX_ERROR_INVALID;
     }
     nx_time_us_t began = nx_time_now_us();
+    if (began == NX_DEADLINE_NEVER)
+        return NX_ERROR_STATE;
     if (nx_deadline_expired(deadline, began)) {
         return NX_ERROR_TIMEOUT;
     }
@@ -377,7 +493,6 @@ nx_result_t nx_stm32_dac_arm(nx_stm32_dac_state_t* state, uint32_t hz,
         }
     }
     nx_arch_dsb();
-    began = nx_time_now_us();
     state->running = true;
     for (unsigned index = 0U; index < 2U; ++index) {
         if ((config->channels & (1U << index)) != 0U &&
@@ -386,16 +501,10 @@ nx_result_t nx_stm32_dac_arm(nx_stm32_dac_state_t* state, uint32_t hz,
             return NX_ERROR_IO;
         }
     }
-    while (nx_time_now_us() - began <
-           LL_DAC_DELAY_STARTUP_VOLTAGE_SETTLING_US) {
-        if (nx_deadline_expired(deadline, nx_time_now_us())) {
-            state->faulted = true;
-            return NX_ERROR_TIMEOUT;
-        }
-    }
-    if (nx_deadline_expired(deadline, nx_time_now_us())) {
+    nx_result_t stable = nx_stm32_dac_wait_startup(deadline);
+    if (stable != NX_SUCCESS) {
         state->faulted = true;
-        return NX_ERROR_TIMEOUT;
+        return stable;
     }
     if (counter != NULL) {
         if ((counter->CR1 &
@@ -417,7 +526,19 @@ nx_result_t nx_stm32_dac_arm(nx_stm32_dac_state_t* state, uint32_t hz,
             return NX_ERROR_IO;
         }
     }
-    if (nx_deadline_expired(deadline, nx_time_now_us())) {
+    if (config->trigger == NX_STM32_DAC_TRIGGER_EXTI9 && run_timer) {
+        nx_result_t result = nx_stm32_dac_enable_external(state, deadline);
+        if (result != NX_SUCCESS) {
+            state->faulted = true;
+            return result;
+        }
+    }
+    nx_time_us_t now = nx_time_now_us();
+    if (now == NX_DEADLINE_NEVER || now < began) {
+        state->faulted = true;
+        return NX_ERROR_STATE;
+    }
+    if (nx_deadline_expired(deadline, now)) {
         state->faulted = true;
         return NX_ERROR_TIMEOUT;
     }
@@ -526,8 +647,8 @@ nx_result_t nx_stm32_dac_snapshot(const void* context, nx_dac_state_t* output) {
     if (!context_ok()) {
         return NX_ERROR_CONTEXT;
     }
-    if (!observation(state, output, sizeof(*output),
-                     _Alignof(nx_dac_state_t))) {
+    if (!nx_stm32_dac_independent(state, sizeof(*state), output,
+                                  sizeof(*output), _Alignof(nx_dac_state_t))) {
         return NX_ERROR_INVALID;
     }
     *output = (nx_dac_state_t){

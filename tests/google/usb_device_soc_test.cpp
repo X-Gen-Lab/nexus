@@ -9,9 +9,13 @@
 extern "C" {
 #include "nexus/io/native/model.h"
 #include "nexus/io/usb_activation.h"
+#include "stm32f407_system.h"
 #include "stm32f407_usb_device.h"
 #include "stm32f407xx.h"
 #include "usb_device.h"
+}
+extern "C" {
+nx_stm32_system_t g_nx_stm32_system;
 }
 #include <cstring>
 #include <gtest/gtest.h>

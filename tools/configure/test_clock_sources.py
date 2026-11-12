@@ -1,5 +1,6 @@
 """Clock input identity never invents an external Board oscillator."""
-from tools.configure.tests.device_fixture import load_soc_facts
+from tools.configure.tests.device_fixture import (load_soc_facts,
+                                                   validate_soc_facts)
 from tools.configure.providers.descriptor import source_directory
 import unittest
 
@@ -20,7 +21,7 @@ class ClockSourceContractTests(unittest.TestCase):
                 self.assertEqual(domain, f"apb{binding.apb}")
                 for clock in soc["clock_profiles"].values():
                     self.assertGreater(clock[domain + "_hz"], 0)
-        gate.validate_soc(soc, "STM32F407ZGT6")
+        validate_soc_facts(soc, "STM32F407ZGT6")
 
     def test_missing_uart_spi_clock_domain_is_rejected(self):
         for controller in ("USART1", "SPI2"):
@@ -28,7 +29,7 @@ class ClockSourceContractTests(unittest.TestCase):
             soc["controllers"][controller].pop("clock_domain", None)
             with self.subTest(controller=controller), self.assertRaisesRegex(
                     ValueError, "clock domain"):
-                gate.validate_soc(soc, "STM32F407ZGT6")
+                validate_soc_facts(soc, "STM32F407ZGT6")
 
     def test_unknown_or_wrong_reviewed_clock_domain_is_rejected(self):
         for domain in ("ahb", "apb1", False):
@@ -36,7 +37,7 @@ class ClockSourceContractTests(unittest.TestCase):
             soc["controllers"]["USART1"]["clock_domain"] = domain
             with self.subTest(domain=domain), self.assertRaisesRegex(
                     ValueError, "clock domain"):
-                gate.validate_soc(soc, "STM32F407ZGT6")
+                validate_soc_facts(soc, "STM32F407ZGT6")
 
     def test_existing_hse_facts_accept_one_explicit_source_identity(self):
         for family, part in (("stm32f4", "STM32F407ZGT6"),):
@@ -45,7 +46,7 @@ class ClockSourceContractTests(unittest.TestCase):
                 for profile in soc["clock_profiles"].values():
                     profile["source"] = "hse"
                     profile["input_hz"] = profile.pop("hse_hz")
-                gate.validate_soc(soc, part)
+                validate_soc_facts(soc, part)
 
     def test_legacy_hse_normalizes_once_without_mutating_input(self):
         from tools.configure import clocks

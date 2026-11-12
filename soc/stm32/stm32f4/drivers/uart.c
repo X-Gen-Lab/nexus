@@ -694,6 +694,15 @@ nx_result_t nx_stm32_uart_format_configure(nx_stm32_uart_state_t* state,
     /* Exclude the RX producer while checking idle state and changing framing.
      */
     nx_arch_irq_state_t saved = nx_arch_irq_save();
+    /* This legacy helper owns no pad to hold RTS high while UE is withdrawn.
+     * ES0182 2.11.9 requires the separately owned static wire cold sequence.
+     */
+    if (format.flow == NX_UART_FLOW_RTS ||
+        format.flow == NX_UART_FLOW_RTS_CTS ||
+        (state->registers->CR3 & USART_CR3_RTSE) != 0U) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_UNSUPPORTED;
+    }
     if (state->active != NULL || state->rx_count != 0U ||
         (state->registers->CR3 & (USART_CR3_DMAR | USART_CR3_DMAT)) != 0U ||
         (state->registers->SR & USART_SR_RXNE) != 0U) {

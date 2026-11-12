@@ -38,6 +38,7 @@ typedef struct {
     bool software_trigger;
     bool timer_trigger;
     bool output_buffer;
+    bool external_trigger; /**< Physical source; rate remains unknown. */
 } nx_dac_info_t;
 /** \brief DOR codes always use 12-bit right alignment, including u8 input. */
 typedef struct {
@@ -79,6 +80,8 @@ nx_result_t nx_dac_port_info(const nx_dac_port_t* port, nx_dac_info_t* info);
  * \return SUCCESS, INVALID, PERMISSION, STATE, CONTEXT or UNSUPPORTED.
  * \note No buffer is retained. Triggered output waits for a later trigger;
  *       waveform offsets must leave room for the selected amplitude.
+ *       External-event ports require a running source; stopped writes do not
+ *       implicitly reopen trigger detection.
  */
 nx_result_t nx_dac_port_write(const nx_dac_port_t* port, uint8_t channel,
                               uint16_t code);
@@ -96,9 +99,11 @@ nx_result_t nx_dac_port_write_pair(const nx_dac_port_t* port, uint16_t first,
 /**
  * \brief Enable selected outputs and their explicitly owned trigger source.
  * \param[in] port: Prepared exclusive task owner; no concurrent controls.
- * \param[in] trigger_hz: Positive for an owned timer; zero for direct/software.
+ * \param[in] trigger_hz: Positive for an owned timer; zero for direct/software
+ *                        or an external source with unknown frequency.
  * \param[in] deadline: Absolute monotonic deadline including startup delay.
- * \return SUCCESS, INVALID, BUSY, STATE, TIMEOUT, IO, CONTEXT or UNSUPPORTED.
+ * \return SUCCESS, INVALID, BUSY, STATE, TIMEOUT, EXHAUSTED, IO, CONTEXT or
+ *         UNSUPPORTED.
  * \note Failure may retain enabled hardware; stop/close must observe release.
  *       Declared digital startup does not qualify an unknown analog load.
  */

@@ -126,3 +126,77 @@ foreach(input_profile hsi hse hsi_pll48 hse_pll48)
     target_compile_options(${input_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_input_clock_model.h")
 endforeach()
+
+foreach(family_profile f407 f411 f446 f479)
+    if(family_profile STREQUAL "f407")
+        set(family_macro STM32F407xx)
+        set(family_device 0x413U)
+        set(family_cut 0x1001U)
+        set(family_kib 1024U)
+    elseif(family_profile STREQUAL "f411")
+        set(family_macro STM32F411xE)
+        set(family_device 0x431U)
+        set(family_cut 0x1000U)
+        set(family_kib 512U)
+    elseif(family_profile STREQUAL "f446")
+        set(family_macro STM32F446xx)
+        set(family_device 0x421U)
+        set(family_cut 0x1000U)
+        set(family_kib 512U)
+    else()
+        set(family_macro STM32F479xx)
+        set(family_device 0x434U)
+        set(family_cut 0x1000U)
+        set(family_kib 2048U)
+    endif()
+    set(family_target "nexus_stm32_${family_profile}_system_test")
+    nexus_google_test(${family_target}
+        SOURCES stm32_family_system_test.cpp
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+        LIBRARIES Nexus::IO Nexus::Arch
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    target_include_directories(${family_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+    nexus_use_cmsis_core(${family_target})
+    target_compile_definitions(${family_target} PRIVATE ${family_macro}
+        NEXUS_STM32_MODEL NX_TEST_DEVICE=${family_device}
+        NX_TEST_CUT=${family_cut} NX_TEST_FLASH_KIB=${family_kib})
+    target_compile_options(${family_target} PRIVATE
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_family_system_model.h")
+endforeach()
+
+
+# One complete aux suite per distinct M layout; R-only / Q+R retain only their
+# output-specific contract slice through NX_TEST_R_OUTPUT at compile time.
+foreach(aux_case f446_q f479_q f479_r f479_qr)
+    if(aux_case STREQUAL "f446_q")
+        set(aux_device STM32F446xx)
+    else()
+        set(aux_device STM32F479xx)
+    endif()
+    if(aux_case STREQUAL "f479_r")
+        set(aux_kind 2)
+    elseif(aux_case STREQUAL "f479_qr")
+        set(aux_kind 3)
+    else()
+        set(aux_kind 1)
+    endif()
+    set(aux_target "nexus_stm32_system_aux_${aux_case}_test")
+    nexus_google_test(${aux_target}
+        SOURCES stm32_sai_system_test.cpp
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+        LIBRARIES Nexus::Core
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            "${NEXUS_SOURCE_DIR}/arch/include")
+    target_include_directories(${aux_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${aux_target})
+    target_compile_definitions(${aux_target} PRIVATE
+        ${aux_device} NEXUS_STM32_MODEL NX_TEST_AUX_KIND=${aux_kind}U)
+    if(NOT aux_kind EQUAL 1)
+        target_compile_definitions(${aux_target} PRIVATE NX_TEST_R_OUTPUT=1)
+    endif()
+    target_compile_options(${aux_target} PRIVATE
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_sai_system_model.h")
+endforeach()

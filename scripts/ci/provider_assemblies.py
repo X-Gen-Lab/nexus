@@ -216,7 +216,8 @@ def empty_retention(elf, bindings, resolved, *, root=ROOT):
     _, _, providers, public = retention.source_contracts(root)
     symbols = {item["name"] for item in elf.defined_symbols}
     if symbols & providers.keys() or any(name.startswith((
-            "s_nx_face_", "s_nx_device_face_")) for name in symbols):
+            "s_nx_face_", "s_nx_device_face_", "s_nx_flash_readonly_"))
+            for name in symbols):
         raise EvidenceError("unselected concrete provider or face survived GC")
     return {"schema_version": 1, "kind": "empty_provider_gc",
             "status": "passed", "face_count": 0, "operations_table_count": 0,
@@ -229,6 +230,46 @@ def one(paths, label):
     if len(selected) != 1:
         raise EvidenceError(f"expected one actual {label}, found {len(selected)}")
     return regular_file(selected[0])
+
+
+def require_usb_remote_selection(resolved, entries, *, root=ROOT):
+    """Bind optional USB behavior to the actual private DCD compile contexts."""
+    if resolved["soc_family"] != "stm32f4":
+        return
+    devices = [item for item in resolved["controllers"]
+               if item["kind"] == "usb_device"]
+    selected = any(item.get("remote_wakeup", False) for item in devices)
+    macro = "NEXUS_STM32F4_USB_REMOTE_WAKEUP"
+    device_source = root / (
+        "soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c")
+    count = 0
+    for entry in entries:
+        argv = entry.get("arguments") or shlex.split(entry["command"])
+        tokens = iter(argv[1:])
+        definitions = []
+        for token in tokens:
+            if token.startswith(("-D", "-U")):
+                value = token[2:] or next(tokens, "")
+                name, _, assigned = value.partition("=")
+                if name == macro:
+                    definitions.append((token[:2], assigned))
+        if len(definitions) > 1 or (definitions and definitions[0] not in (
+                ("-D", "0"), ("-D", "1"), ("-U", ""))):
+            raise EvidenceError("USB remote selection has ambiguous compiler definitions")
+        enabled = definitions == [("-D", "1")]
+        output = Path(entry.get("output", ""))
+        private = "nexus_soc_stm32f4.dir" in output.parts
+        if enabled and (not private or not selected):
+            raise EvidenceError("USB remote selection escaped its selected private target")
+        path = Path(entry["file"])
+        if not path.is_absolute():
+            path = Path(entry["directory"]) / path
+        if path.resolve() == device_source.resolve():
+            count += 1
+            if not private or enabled != selected:
+                raise EvidenceError("USB remote selection differs from actual DCD compilation")
+    if devices and count == 0:
+        raise EvidenceError("USB remote selection has no actual DCD compilation")
 
 
 def inspect(build, fixture, compiler, *, root=ROOT):
@@ -276,6 +317,7 @@ def inspect(build, fixture, compiler, *, root=ROOT):
     entries = json.loads(database.read_text())
     if not isinstance(entries, list) or not entries:
         raise EvidenceError("actual compile database is empty")
+    require_usb_remote_selection(resolved, entries, root=root)
     compile_sources = []
     for entry in entries:
         argv = entry.get("arguments") or shlex.split(entry["command"])

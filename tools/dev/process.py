@@ -136,8 +136,8 @@ def _linux_descendants(known, deadline=None):
 
 
 def _linux_signal(known, signum):
-    # Descendants were captured before any parent was allowed to exit. Sessions
-    # created by nested owned runners remain addressable after reparenting.
+    # Known descendants remain addressable after entering another session.
+    # An incomplete census can omit members of a still-owned leader's group.
     selected = list(known.items())
     if signum != signal.SIGSTOP:
         selected.reverse()
@@ -147,8 +147,8 @@ def _linux_signal(known, signum):
                 or current["state"] == "Z"):
             continue
         try:
-            if signum == signal.SIGSTOP and current["group"] == pid:
-                # Every member of this owned leader's group stops together.
+            if signum in (signal.SIGSTOP, signal.SIGKILL) and current["group"] == pid:
+                # Freeze and withdraw every member of the verified owned group.
                 os.killpg(pid, signum)
             else:
                 os.kill(pid, signum)

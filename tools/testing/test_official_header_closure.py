@@ -32,14 +32,39 @@ F4_HAL_SOURCES = {f'Src/stm32f4xx_hal_{unit}.c'
                   for unit in ('uart', 'dma', 'rcc', 'dcmi', 'hcd')}
 F4_LL_SOURCES = {f'Src/stm32f4xx_ll_{unit}.c'
                  for unit in ('fsmc', 'sdmmc', 'usb')}
+F4_NEW_IP_FILES = {
+    'Inc/stm32f4xx_hal_cryp.h',
+    'Inc/stm32f4xx_hal_dma2d.h',
+    'Inc/stm32f4xx_hal_dsi.h',
+    'Inc/stm32f4xx_hal_hash.h',
+    'Inc/stm32f4xx_hal_hash_ex.h',
+    'Inc/stm32f4xx_hal_ltdc.h',
+    'Inc/stm32f4xx_hal_ltdc_ex.h',
+    'Inc/stm32f4xx_hal_pwr.h',
+    'Inc/stm32f4xx_hal_pwr_ex.h',
+    'Inc/stm32f4xx_hal_qspi.h',
+    'Inc/stm32f4xx_hal_sai.h',
+    'Inc/stm32f4xx_hal_sai_ex.h',
+    'Inc/stm32f4xx_ll_fmc.h',
+    'Src/stm32f4xx_hal_cryp.c',
+    'Src/stm32f4xx_hal_dma2d.c',
+    'Src/stm32f4xx_hal_gpio.c',
+    'Src/stm32f4xx_hal_hash.c',
+    'Src/stm32f4xx_hal_ltdc.c',
+    'Src/stm32f4xx_hal_qspi.c',
+    'Src/stm32f4xx_hal_rcc_ex.c',
+    'Src/stm32f4xx_hal_sai.c',
+    'Src/stm32f4xx_hal_sai_ex.c',
+    'Src/stm32f4xx_ll_fmc.c',
+}
 F4_REQUIRED_FILES = {
     'LICENSE.md', 'Inc/stm32f4xx_hal_eth.h', *F4_HAL_HEADERS,
-    *F4_HAL_SOURCES, *F4_LL_SOURCES,
+    *F4_HAL_SOURCES, *F4_LL_SOURCES, *F4_NEW_IP_FILES,
     *(f'Inc/stm32f4xx_ll_{unit}.h' for unit in
                       ('gpio', 'usart', 'spi', 'adc', 'dac', 'dma', 'tim',
                        'iwdg', 'wwdg', 'i2c', 'bus', 'rcc', 'rng', 'fsmc', 'sdmmc', 'rtc', 'pwr',
                        'crc', 'utils', 'system'))}
-F4_SELECTED_API = 'stm32f407-reviewed-hal-ll-controllers'
+F4_SELECTED_API = 'stm32f4-reviewed-hal-ll-controllers'
 
 ADDITIONS = {
     'h7': {
@@ -192,7 +217,8 @@ class OfficialHeaderClosureTests(unittest.TestCase):
                 'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
         expected = F4_REQUIRED_FILES
         self.assertEqual({name for name in expected if name.endswith('.c')},
-                         F4_HAL_SOURCES | F4_LL_SOURCES)
+                         F4_HAL_SOURCES | F4_LL_SOURCES |
+                         {name for name in F4_NEW_IP_FILES if name.endswith('.c')})
         self.assertEqual(original['selected_api'], F4_SELECTED_API)
         self.assertEqual(f4.REVIEWED_FILES, expected)
         self.assertEqual(f4.contract(candidate), expected)
@@ -228,6 +254,7 @@ class OfficialHeaderClosureTests(unittest.TestCase):
         sys.path.insert(0, str(ROOT / 'cmake/package'))
         spec.loader.exec_module(module)
         selected = module.dependency_entries(ROOT, f4.DIRECTORY)
+        self.assertEqual(set(selected), F4_REQUIRED_FILES)
         with tempfile.TemporaryDirectory(
                 prefix='nexus-f4-hal-closure-') as temporary:
             retained = os.environ.get('NEXUS_HAL_CLOSURE_TEST_ROOT')

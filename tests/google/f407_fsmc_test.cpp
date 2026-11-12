@@ -286,10 +286,9 @@ class FSMCNor : public FSMCExtended {
   protected:
     testing::NiceMock<MemoryPort> memory;
     nx_stm32_fsmc_nor_t nor{};
-    std::array<nx_flash_sector_t, 2> sectors{
-        {{0U, 0x80000U}, {0x80000U, 0x80000U}}};
-    nx_flash_geometry_t geometry{0x68000000U,    0x100000U,      2U,
-                                 sectors.data(), sectors.size(), 0U};
+    std::array<nx_flash_erase_span_t, 1> spans{{{0U, 0x80000U, 2U}}};
+    nx_flash_geometry_t geometry{0x68000000U,  0x100000U,    2U,
+                                 spans.data(), spans.size(), 0U};
     nx_stm32_fsmc_nor_config_t nor_config{&geometry, 0xaaaU, 0x554U, 0xaaU,
                                           2U,        false,  0U};
     nx_flash_port_t flash{&nx_stm32_fsmc_nor_flash_ops, &nor};
@@ -754,7 +753,7 @@ TEST_F(FSMCNor, ExplicitEightBitNORUsesByteCommandsAndByteProgramUnit) {
     config.pin_count = pins.size();
     geometry.size = 0x80000U;
     geometry.program_unit = 1U;
-    geometry.sector_count = 1U;
+    spans[0].count = 1U;
     nor_config.unlock2 = 0x555U;
     ASSERT_EQ(open(), NX_SUCCESS);
     ASSERT_EQ(program(1U), NX_SUCCESS);

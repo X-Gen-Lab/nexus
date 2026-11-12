@@ -13,13 +13,18 @@ nx_result_t nx_stm32_av_stream_validate(const nx_stm32_av_config_t* config,
                                         size_t alignment, const void* state,
                                         size_t state_bytes, const void* request,
                                         size_t request_bytes) {
-    if (stream == NULL || stream->slots == NULL || stream->count == 0U ||
+    if (!nx_stm32_av_system_disjoint(state, state_bytes) ||
+        !nx_stm32_av_system_disjoint(stream, sizeof(*stream)) ||
+        (request != NULL &&
+         !nx_stm32_av_system_disjoint(request, request_bytes)) ||
+        stream->slots == NULL || stream->count == 0U ||
         stream->count > SIZE_MAX / sizeof(*stream->slots) || bytes == 0U)
         return NX_ERROR_INVALID;
     if (stream->stopping || stream->outstanding != 0U)
         return NX_ERROR_BUSY;
     size_t metadata = stream->count * sizeof(*stream->slots);
-    if (nx_stm32_av_overlap(stream, sizeof(*stream), state, state_bytes) ||
+    if (!nx_stm32_av_system_disjoint(stream->slots, metadata) ||
+        nx_stm32_av_overlap(stream, sizeof(*stream), state, state_bytes) ||
         nx_stm32_av_overlap(stream->slots, metadata, state, state_bytes) ||
         (request != NULL &&
          (nx_stm32_av_overlap(request, request_bytes, stream,
@@ -36,6 +41,7 @@ nx_result_t nx_stm32_av_stream_validate(const nx_stm32_av_config_t* config,
         if (result != NX_SUCCESS)
             return result;
         if (slot->state != NX_STREAM_SLOT_FREE ||
+            !nx_stm32_av_system_disjoint(slot->data, slot->capacity) ||
             nx_stm32_av_overlap(slot->data, slot->capacity, state,
                                 state_bytes) ||
             (request != NULL && nx_stm32_av_overlap(slot->data, slot->capacity,

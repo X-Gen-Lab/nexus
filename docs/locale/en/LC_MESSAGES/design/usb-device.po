@@ -7,15 +7,81 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: c1aba4eb0e7d38960a0478392b0509fc879affa6c7b0aab186bd23dc5cce0d15\n"
+"X-Nexus-Source-SHA256: 93cf537b3b967e0344451bc37264f019d9ec788d09ebf2559bf08e9a8259dd5a\n"
 
 #: docs/design/usb-device.md:1
 msgid "USB Device、Host 与显式角色所有权"
 msgstr "USB Device, Host and explicit role ownership"
 
-#: docs/design/usb-device.md:22
+#: docs/design/usb-device.md:3
+msgid ""
+"公共接口是 `nexus/io/usb_device.h`。生产实现归属 `soc/stm32/stm32f4/`， 当前精确适配 STM32F"
+"407VET6／ZGT6 的 OTG FS 与 HS core：内置 PHY 的全速、 外部 ULPI 的高速／全速回退，以及 PIO 和 HS"
+" AHB DMA。Host 使用锁定官方 HCD／LL， Device 复用已有控制阶段与 errata IP owner。 目录按 STM32"
+"F4 家族组织，不表示该系列全部器件已完成接入。Native 位于 `tests/support/native/`，仅作为显式启用的主机测试模型"
+"。维护范围是 EP0 control、显式选择的非零 bulk／interrupt／ISO IN/OUT、 SETUP/reset/suspen"
+"d/resume 事实、合法类型的 STALL、SET_ADDRESS、取消与退出。 DCD 的一次 request 仍是一个不超过 MPS 的"
+"包；非零 endpoint 的 active／mask 由 独立可选 activation face 显式控制。SET_CONFIGURATIO"
+"N、配置就绪及其回滚由外部 Chapter 9 owner 负责，packet 机制不能单独证明完整枚举／物理 reset 恢复。 可选 `Ne"
+"xus::USBControl` 组合 EP0 多包 DATA、必要 ZLP 与 STATUS；独立的 `Nexus::USBDescripto"
+"rs` 校验外部描述符结构。两者不创建任务或分配内存。 具体 class 分派、描述符字节与查找、VID/PID、字符串、配置及恢复策略由外部工"
+"程提供。 可选 `Nexus::USBACM` 只组合下述 CDC ACM 控制子集；没有数据泵或完整 CDC/HID 类栈， 其合同不建立完整"
+" class 栈；Device ISO 使用下述有限 packet 合同，远程唤醒由独立的 调用者请求和显式 service 推进。 独立的 `"
+"nexus/io/usb_host.h` 提供 Host packet transport， `nexus/io/usb_otg.h` 提供按需"
+"显式 managed role；自动 ID、SRP、HNP 策略不在范围内。"
+msgstr ""
+"The public interface is `nexus/io/usb_device.h`. Production implementati"
+"on belongs to `soc/stm32/stm32f4/`, currently adapting the OTG FS and HS"
+" cores of the exact STM32F407VET6/ZGT6 parts: full speed with an interna"
+"l PHY, high speed with external ULPI and full-speed fallback, and PIO or"
+" HS AHB DMA. Host uses the pinned official HCD/LL; Device reuses the exi"
+"sting control-stage machinery and errata IP owner. Organizing directorie"
+"s by STM32F4 family does not mean every device in that series is integra"
+"ted. Native resides in `tests/support/native/` solely as an explicitly e"
+"nabled host-test model. Maintained scope covers EP0 control, explicitly "
+"selected nonzero bulk/interrupt/ISO IN/OUT endpoints, SETUP/reset/suspen"
+"d/resume facts, STALL for applicable types, SET_ADDRESS, cancellation an"
+"d shutdown. One DCD request remains one packet no larger than MPS. A sep"
+"arate optional activation face explicitly controls nonzero endpoint acti"
+"ve/mask state. An external Chapter 9 owner handles SET_CONFIGURATION, co"
+"nfiguration readiness and rollback. Packet mechanisms alone cannot prove"
+" complete enumeration or physical-reset recovery. Optional `Nexus::USBCo"
+"ntrol` composes EP0 multipacket DATA, required ZLP and STATUS; separate "
+"`Nexus::USBDescriptors` checks external descriptor structure. Neither cr"
+"eates tasks nor allocates memory. External projects supply concrete clas"
+"s dispatch, descriptor bytes/lookup, VID/PID, strings, configuration and"
+" recovery policy. Optional `Nexus::USBACM` composes only the CDC ACM con"
+"trol subset described below; it supplies no data pump or complete CDC/HI"
+"D class stack, and its contract does not establish a complete class stac"
+"k. Device ISO is supplied through the finite packet contract below; remo"
+"te wake is driven by a separate caller-owned request and explicit servic"
+"e. Separate `nexus/io/usb_host.h` provides Host packet transport, and `n"
+"exus/io/usb_otg.h` provides optional explicitly managed roles. Automatic"
+" ID, SRP and HNP policy are outside the scope."
+
+#: docs/design/usb-device.md:23
 msgid "对象、资源与时钟"
 msgstr "Objects, resources and clocks"
+
+#: docs/design/usb-device.md:25
+msgid "controller 和 endpoint 保持独立 identity；公共 face 只有 readonly ops 与 context。 装配拥有一个 controller、精确 endpoint 数组、精确事件环和所选 PHY／controller clock owner。实例共享只读方法表，没有全局可变 registry、endpoint 最大池、隐藏 worker 或必选 OS。未选实例不产生状态，MCU 热路径用 direct volatile MMIO。模型编译只 替换外部 MMIO/NVIC 叶端口，MCU 不携带模型函数表或运行时模拟分支。"
+msgstr "Controller and endpoint retain separate identities; public faces contain only read-only ops and context. Assembly owns one controller, an exact endpoint array and event ring, and the selected PHY/controller clock owner. Instances share read-only method tables without global mutable registries, maximum endpoint pools, hidden workers or mandatory OS. Unselected instances create no state, and MCU hot paths use direct volatile MMIO. Model builds replace only external MMIO/NVIC leaves; MCUs carry no model-function tables or runtime-simulation branches."
+
+#: docs/design/usb-device.md:31
+msgid "STM32F407 的 OTG_FS 基址是 `0x50000000`，四个 IN / 四个 OUT 方向、320-word FIFO， 单一 IRQ 67；绑定用锁定 SDK 验证实际 offset、stride、容量和 W1C/只读位。 OTG_HS 基址是 `0x40040000`，六个 IN／六个 OUT、1024-word FIFO、IRQ 77。 内置 FS PHY 使用 PB14／PB15 AF12；ULPI 使用十二根 AF10 pad 和外部 60 MHz。 EP0 固定 64-byte MPS；全速 bulk 为 8/16/32/64，高速 bulk 为 512。 全速 interrupt IN/OUT 为 1–64 B，高速为 1–1024 B。ISO 的协议 MPS 上界为 全速 1023 B、高速 1024 B，每次机会只支持一个 transaction，实际选择还须通过 FIFO 准入。 RX FIFO 采用审核下限 48 words，不自动改变既有默认；FS core 的 RXFD 上限为 256 words， HS core 为 1024 words； 总 FIFO 容量不能当作 RX 上限。每个选中及低编号未选 IN FIFO 至少留 16 words， HS AHB DMA 另留 32 words。完整 TX 分区由 controller 验证无重叠且不超总容量， 非法方向、类型、MPS、FIFO 和重复 identity 在 clock validate／retain 与 MMIO 之前拒绝。"
+msgstr "STM32F407 OTG_FS starts at `0x50000000`, with four IN/four OUT directions, a 320-word FIFO and IRQ 67. Binding checks actual offsets, stride, capacity and W1C/read-only bits against the pinned SDK. OTG_HS starts at `0x40040000`, with six IN/six OUT directions, a 1024-word FIFO and IRQ 77. The internal FS PHY uses PB14/PB15 AF12; ULPI uses twelve AF10 pads and an external 60 MHz clock. EP0 fixes MPS at 64 bytes; full-speed bulk uses 8/16/32/64 bytes and high-speed bulk uses 512. Full-speed interrupt IN/OUT uses 1–64 B, high-speed 1–1024 B. ISO protocol MPS limits are 1023 B at full speed and 1024 B at high speed, one transaction per opportunity; each actual selection must also pass FIFO admission. RX uses a reviewed minimum of 48 words without changing existing defaults. The FS core RXFD maximum is 256 words and the HS core maximum is 1024; total FIFO capacity is not an RX limit. Each selected IN FIFO and each lower-numbered unselected IN FIFO reserves at least 16 words; HS AHB DMA reserves another 32 words. The controller validates the complete TX partition for overlap and total capacity. Invalid direction, type, MPS, FIFO or duplicate identity rejects before clock validate/retain or MMIO."
+
+#: docs/design/usb-device.md:44
+msgid "RX 还须覆盖 SETUP/status 与最大 OUT packet；多个 ISO OUT 至少保留两份最大 OUT packet 及其状态字空间。配置器、公开 profile 的 RX 检查和 C 准入使用同一需求。 FS core 的最大 ISO IN 参考为 48 RX＋16 EP0 TX＋256 ISO TX＝320 words。 whole-packet FS core OUT 1023 B 需要 270 RX words，超过 RXFD 上限而拒绝； HS core 的内置 PHY 全速模式可用足够 RX 接纳该 MPS。这是精确资源组合，不是所有 MPS／endpoint 组合均可装配的承诺。"
+msgstr "RX must also cover SETUP/status and the largest OUT packet. Multiple ISO OUT directions reserve at least two largest-OUT packets and their status words. The configurator, public-profile RX checks and C admission use the same requirement. The maximum ISO IN reference on the FS core uses 48 RX + 16 EP0 TX + 256 ISO TX = 320 words. A whole-packet 1023 B OUT on the FS core requires 270 RX words, exceeding RXFD and therefore rejecting. The HS core with its internal PHY at full speed can admit that MPS with enough RX space. These are exact resource combinations, not a promise that every MPS/endpoint combination can be assembled."
+
+#: docs/design/usb-device.md:0
+msgid "PHY 选择"
+msgstr "PHY selection"
+
+#: docs/design/usb-device.md:0
+msgid "所选 PHY 时钟条件"
+msgstr "Selected PHY clock conditions"
 
 #: docs/design/usb-device.md:0
 msgid "接入行为"
@@ -47,7 +113,7 @@ msgstr "Externally supplied 60 MHz"
 msgid "管理 HS 与 ULPI gate；不隐式要求 PLL48"
 msgstr "Manage HS and ULPI gates; do not implicitly require PLL48"
 
-#: docs/design/usb-device.md:47
+#: docs/design/usb-device.md:56
 msgid "clock owner 管理精确 consumer count；失败回滚缺少读回证明时仍保留清理责任。 DCD 先 validate/retain，退出完成后 release consumer，最后由外部 owner stop 时钟。pin/electrical/VBUS 和所有共享时钟消费者必须由外部资源 owner 先授权并 静止，不能仅凭 gate 为零推断系统独占。FS core AHB 必须大于 14.2 MHz， HS core 必须大于 30 MHz，TRDT 按实际 AHB 选择。内置 PHY 不接受仅有 nominal 48 MHz 的 HSI 精度假设；实际晶振精度和 PCB 仍需外部电气证据。"
 msgstr ""
 "The clock owner tracks the exact consumer count and retains cleanup "
@@ -62,11 +128,27 @@ msgstr ""
 "nominal 48 MHz. Actual crystal accuracy and PCB behavior still require "
 "external electrical evidence."
 
-#: docs/design/usb-device.md:60
+#: docs/design/usb-device.md:63
+msgid "controller、endpoint、事件环与 request 按所选实例静态分配；可选 ROM profile、 EP0 adapter 和 outer request 分别计入其 owner 的资源预算。私有 endpoint 保存类型 与本次 ISO 的目标帧；目标帧复用已验证 ARM ABI 的原 padding。 `bInterval` 仍属外部 descriptor，不新增调度队列或 worker。结构尺寸、 未选 section GC 与完整 Flash／RAM 成本须由同源配置的 ARM ELF／map 建立， 不以 host sizeof 或旧版本 probe 代替当前镜像测量。"
+msgstr "Controllers, endpoints, event rings and requests are statically allocated for selected instances. Optional ROM profiles, EP0 adapters and outer requests count separately toward their owners' resource budgets. A private endpoint stores its type and the current ISO target frame; the latter reuses padding in the verified ARM ABI. `bInterval` remains with the external descriptor; no scheduling queue or worker is added. Structure sizes, unselected-section GC and complete Flash/RAM cost require ARM ELF/map evidence from the same source and configuration; host sizeof or old probes cannot replace current-image measurement."
+
+#: docs/design/usb-device.md:70
 msgid "选定 ROM profile 与描述符"
 msgstr "Selected ROM profile and descriptors"
 
-#: docs/design/usb-device.md:85
+#: docs/design/usb-device.md:72
+msgid "`nexus/io/usb_profile.h` 的只读 profile 绑定既有 controller／endpoint face，以及 选定的方向、类型、MPS、FIFO、PHY 时钟、速度和 PIO／AHB DMA 事实。 只有 USB 被选入且 `factory.capabilities = true` 时，生成器才产生 profile、精确 endpoint 数组与 `nx_factory_usb_profile` getter。设为 `false` 时不生成这些对象 或 getter；普通 USB face、方法表、provider context 与既有 generic capability 类型不因此扩大。getter 不初始化硬件，也不发现新 endpoint。 ULPI 使用独立的高速与全速回退 profile；`nx_factory_usb_profile_for_speed` 只返回选定速度对应的 ROM 记录，不把高速 512 B MPS 用于全速。 公共 `NX_USB_PROFILE_INTERRUPT` 的枚举值是 2，USB wire／寄存器 EPTYP 值是 3； `NX_USB_PROFILE_ISOCHRONOUS` 的枚举值是 3，wire EPTYP 为 1。provider 显式映射类型， 不把两者直接强转混用。"
+msgstr "The read-only profile in `nexus/io/usb_profile.h` binds existing controller/endpoint faces and selected direction, type, MPS, FIFO, PHY-clock, speed and PIO/AHB DMA facts. Only selected USB with `factory.capabilities = true` generates the profile, exact endpoint array and `nx_factory_usb_profile` getter. Setting it to `false` omits those objects and getter without enlarging ordinary USB faces, method tables, provider contexts or existing generic capability types. The getter neither initializes hardware nor discovers endpoints. ULPI has separate high-speed and full-speed fallback profiles; `nx_factory_usb_profile_for_speed` returns only the selected ROM record for that speed and never uses high-speed 512 B MPS at full speed. Public `NX_USB_PROFILE_INTERRUPT` is 2 while USB wire/register EPTYP is 3; `NX_USB_PROFILE_ISOCHRONOUS` is 3 while wire EPTYP is 1. The provider maps these types explicitly rather than interchanging them with a cast."
+
+#: docs/design/usb-device.md:84
+msgid "`nx_usb_profile_validate` 只读检查选定事实，不能证明实际时钟、PCB、VBUS 或枚举。 外部 descriptor 通过 `nx_usb_descriptor_view_t` 传给 `nx_usb_descriptor_validate`：device、configuration、string 必须完整；校验 length／total、EP0 MPS、唯一 interface、alternate 0，以及 bulk／interrupt／ISO IN/OUT endpoint 的方向／编号／类型／MPS 与选定 profile 的对应关系。interrupt 描述符的 `bInterval` 全速为 1–255 个 1 ms frame，高速为 1–16 的指数编码；ISO 在两种速度下 均为 1–16 指数编码，单位分别是 1 ms frame 和 125 µs microframe。interval 由外部 descriptor 独占，不复制到 TOML、IR、profile 或 provider state。DCD 不调度 host poll， 也不承诺实际间隔；bulk 的既有 interval 处理保持不变。ISO 同步／用途字段校验标准 编码，不推导音频反馈或 class 拓扑；保留 usage／位非法时拒绝。HS 高带宽 multiplier 仍不支持，不静默裁剪成单 transaction。"
+msgstr "`nx_usb_profile_validate` checks selected facts read-only; it cannot prove actual clocks, PCB, VBUS or enumeration. External descriptors reach `nx_usb_descriptor_validate` through `nx_usb_descriptor_view_t`. Device, configuration and string descriptors must be complete. Validation checks length/total, EP0 MPS, unique interfaces, alternate 0, and correspondence of bulk/interrupt/ISO IN/OUT endpoint direction, number, type and MPS to the selected profile. Interrupt `bInterval` is 1–255 frames of 1 ms at full speed and an exponent encoding of 1–16 at high speed. ISO uses 1–16 exponent encoding at both speeds, in units of 1 ms frames or 125 µs microframes respectively. The external descriptor owns the interval; it is not copied into TOML, IR, profiles or provider state. The DCD neither schedules host polls nor promises an actual interval; existing bulk interval handling stays unchanged. ISO synchronization/usage fields receive standard-encoding checks without inferring audio feedback or class topology; reserved usage or bits reject. HS high-bandwidth multipliers remain unsupported and are not silently reduced to one transaction."
+
+#: docs/design/usb-device.md:96
+msgid "选定类型不符、描述的 endpoint 未选入 profile 或 MPS 不符返回 INVALID；非零 control 与 alternate setting 仍为 UNSUPPORTED，保留字段非法仍为 INVALID。 class-specific 子结构只检查边界，不解码其类语义。"
+msgstr "A selected-type mismatch, an endpoint absent from the selected profile or an MPS mismatch returns INVALID. Nonzero control and alternate settings remain UNSUPPORTED; invalid reserved fields remain INVALID. Class-specific substructures receive bounds checks only, without decoding class semantics."
+
+#: docs/design/usb-device.md:100
 msgid ""
 "描述符校验按给定完整长度扫描，不读取硬件、不复制或保留 descriptor；通过只表示 结构合法。选择哪段描述符、处理何种请求及 class "
 "内容仍属外部策略。发送后， descriptor／reply 字节必须保持有效且不变，直到 outer request 的 acquire "
@@ -79,7 +161,7 @@ msgstr ""
 " valid and unchanged until the outer request's SETTLED is observed with "
 "acquire semantics."
 
-#: docs/design/usb-device.md:89
+#: docs/design/usb-device.md:104
 msgid ""
 "profile、endpoint 数组、face／ops、adapter、request 和 view／snapshot 元数据 须按其 C "
 "类型自然对齐，地址范围不能回绕；非法对齐在 typed 访问前拒绝。 descriptor bytes 只需 byte "
@@ -92,11 +174,11 @@ msgstr ""
 "accessibility of arbitrary addresses or opaque private contexts; callers must"
 " still supply valid readable/writable storage and keep it valid."
 
-#: docs/design/usb-device.md:94
+#: docs/design/usb-device.md:109
 msgid "包完成与控制 epoch"
 msgstr "Packet completion and control epochs"
 
-#: docs/design/usb-device.md:96
+#: docs/design/usb-device.md:111
 msgid ""
 "prepare 不访问 payload；拒绝 admission 不保留新引用。ACCEPTED 借用 request 与 payload，直到 "
 "acquire-observed SETTLED。所有 request、payload、输出、count、 immutable clock ops 和 "
@@ -110,7 +192,15 @@ msgstr ""
 " loans for overlap. Rejected state/read_events output aliases preserve "
 "outputs."
 
-#: docs/design/usb-device.md:118
+#: docs/design/usb-device.md:116
+msgid "非 ISO IN 的每次有限 data／ZLP 长度寄存器写入 `(1U << 19) | length`（PKTCNT=1）， MCNT／保留高位保持零；ISO IN 同样 PKTCNT=1，但 MCNT=1，按下一节选择帧奇偶。 interrupt 不增加 odd/even-frame 命令。 每个选定 IN direction 使用独立 Tx FIFO， PIO 一次同步装入整个不超过所选 MPS 的包，没有剩余软件 refill 工作；TX-empty mask 保持零， 不创建 TXFE refill worker。IN FIFO 写入不是完成，只有 XFRC、EP enable 已清、 FIFO 空闲容量恢复并且观察到的 W1C completion 清除读回成功才发布 SUCCESS。 OUT 必须同时读到包数据和 XFRC， short packet 正常完成；越界包的所有 FIFO words 都被消费，最多复制 caller capacity， 之后报告 OVERFLOW 并排空，不越界写 caller buffer。"
+msgstr "Each finite non-ISO IN data/ZLP length register is `(1U << 19) | length` (PKTCNT=1); MCNT and reserved upper bits remain zero. ISO IN also uses PKTCNT=1 but sets MCNT=1 and selects frame parity as described below. Interrupt adds no odd/even-frame command. Each selected IN direction has its own Tx FIFO. PIO synchronously loads the complete packet, at most the selected MPS, with no remaining software refill work. TX-empty masks stay zero and no TXFE refill worker is created. Writing the IN FIFO is not completion: SUCCESS requires XFRC, cleared EP enable, recovered FIFO free capacity and successful W1C-completion clear readback. OUT must observe packet data and XFRC. Short packets complete normally. For an oversized packet, every FIFO word is consumed but at most the caller capacity is copied; OVERFLOW then starts drain without writing beyond the buffer."
+
+#: docs/design/usb-device.md:127
+msgid "IN TXFE 是只读状态，不参与 W1C 清除/完成的零值证明。ITTXFE 是主机 IN token 在 FIFO 尚空时到达的可重试信息，OUT STUP 是正常 SETUP phase 事实；两者不错误地终止 包。IN control timeout 和 OUT FIFO overrun 使用对应方向的真实事件位。EP0 的 DATA PID 由 SETUP/core 管理：bits 29:28/16 对 EP0 是 reserved，软件只对非零 bulk／interrupt endpoint 使用 DATA0 命令。对这些 endpoint，reset／clear-halt 须核对 DATA0 读回；失败保留 reset admission 屏障或 halt，不提前允许新包借用。"
+msgstr "IN TXFE is read-only and does not participate in W1C clearing or zero-value completion proof. ITTXFE is a retriable fact that a host IN token arrived while the FIFO was empty; OUT STUP is a normal SETUP-phase fact. Neither incorrectly terminates a packet. IN control timeout and OUT FIFO overrun use their direction-specific event bits. SETUP/core manages the EP0 DATA PID: bits 29:28/16 are reserved for EP0. Software uses DATA0 commands only for nonzero bulk/interrupt endpoints. For those endpoints, reset/clear-halt must prove DATA0 readback; failure retains the reset-admission barrier or halt and does not admit another packet loan early."
+
+#: docs/design/usb-device.md:134
 msgid ""
 "SETUP 严格解码八个 little-endian bytes，并产生单调递增 epoch。新 SETUP/reset 使旧 control loan "
 "进入排空，不能仅改 epoch 就撤销借用。reset 与 queued SETUP 在同一 snapshot 中没有先后证明，先前 queued "
@@ -132,7 +222,7 @@ msgstr ""
 "only after the corresponding status-IN actually reaches XFRC. Failed address "
 "readback closes the controller."
 
-#: docs/design/usb-device.md:127
+#: docs/design/usb-device.md:143
 msgid ""
 "STM32F407 总线 reset 清除非零 endpoint 的 USBAEP，模型保留这个硬件事实。 生产路径仍在 loan 排空后显式清除非零 "
 "active／mask 并核对读回，不仅依赖 reset 事件来证明平台后置条件。完成 reset 后仍需以新当前 epoch 显式 "
@@ -151,7 +241,7 @@ msgstr ""
 "its existing contract. DATA0 restoration, a reset event or a controller not "
 "being closing does not prove that an external configuration committed."
 
-#: docs/design/usb-device.md:135
+#: docs/design/usb-device.md:151
 msgid ""
 "事件环保存 value facts，满时不覆盖旧事件；精确软件 loss marker 排在原队列后。 最新 SETUP/epoch/closing "
 "状态不依赖事件环空间。时间戳是 IRQ acquisition time， 不是 USB 总线采样时刻；reset 批次中的无序旧 SETUP "
@@ -163,11 +253,39 @@ msgstr ""
 "acquisition times, not USB bus sampling times; unordered old SETUP in reset "
 "batches is not counted as newly received control."
 
-#: docs/design/usb-device.md:139
+#: docs/design/usb-device.md:155
+msgid "ISO 有限单包与帧边界"
+msgstr "Finite ISO packets and frame boundaries"
+
+#: docs/design/usb-device.md:157
+msgid "`transfer=\"isochronous\"` 沿用现有 packet request、调用者 payload 与唯一 controller owner。每次 submit 从实际 DSTS 选择下一 frame／microframe 的奇偶；FS 使用 11-bit 帧计数，HS 使用 14-bit 计数。ULPI 必须先观察到 ENUMERATED speed，才能提交 ISO。 每次提交的剩余 Core deadline 至多一秒，小于两种速度帧半环的 1.024 秒。收集 incomplete 事实时先检查 Core 超时，避免长停顿把旧目标误判成未来；Core 与 SOF 之间不建立时间换算。"
+msgstr "`transfer=\"isochronous\"` reuses the existing packet request, caller payload and sole controller owner. Each submit reads actual DSTS to select the next frame/microframe parity: FS uses an 11-bit frame count and HS a 14-bit count. ULPI must first observe an ENUMERATED speed before admitting ISO. Each submission has at most one second of remaining Core deadline, less than the 1.024-second frame half-ring at either speed. Incomplete-fact collection checks Core timeout first so a long execution stall cannot misidentify an old target as future. No conversion between Core time and SOF is established."
+
+#: docs/design/usb-device.md:164
+msgid "IN 以单个 transaction 提交，OUT 的硬件接收计划为一个 MPS packet。ISO 的控制位 28／29 表示 even／odd frame，不表示 DATA toggle，不执行 bulk 的 DATA0 重置证明。 ISO endpoint 的 STALL 操作返回 UNSUPPORTED，不写端点寄存器。ISO 没有 ACK／NAK 握手；SUCCESS 只证明控制器完成且必要源、FIFO、AHB 和 IRQ 引用已撤回，不能证明 host 或其应用已收到数据。周期调度、同步、用途和 class 策略由外部 owner 明确提供， 不自动重试错过的机会，也不按 `bInterval` 创建数据泵。"
+msgstr "IN submits a single transaction; the OUT hardware receive plan is one MPS packet. ISO control bits 28/29 select even/odd frames rather than DATA toggle, so the bulk DATA0-reset proof does not apply. STALL on an ISO endpoint returns UNSUPPORTED without an endpoint-register write. ISO has no ACK/NAK handshake. SUCCESS proves only controller completion and withdrawal of the required source, FIFO, AHB and IRQ references; it cannot prove receipt by the host or its application. An explicit external owner supplies periodic scheduling, synchronization, usage and class policy. Missed opportunities are not retried automatically, and no data pump is created from `bInterval`."
+
+#: docs/design/usb-device.md:171
+msgid "已有未清的 global incomplete／drop 事实会在新 admission 前拒绝。ISOODRP（bit14）、 incomplete IN／OUT（bit20／21）只使已到机会的 active ISO borrow 进入 IO 排空， 不取消仍属未来帧的请求，也不影响其它 bulk borrow；已观察到的真实完成优先于并发旧 incomplete。取消、超时、reset 和 stop 都继续实际 drain，失败仍保留 request／payload 并可进入 QUARANTINED，不能强制释放借用。"
+msgstr "Uncleared global incomplete/drop facts reject before new admission. ISOODRP (bit14) and incomplete IN/OUT (bit20/21) begin IO drain only for an active ISO borrow whose opportunity has arrived. They do not cancel requests for future frames or affect another bulk borrow; an observed real completion takes precedence over a concurrent old incomplete indication. Cancellation, timeout, reset and stop still perform actual drain. Failure retains the request/payload and may enter QUARANTINED; the borrow cannot be forcibly released."
+
+#: docs/design/usb-device.md:177
+msgid ""
+"软件参考位于 `tests/contracts/usb_iso_assembly/`，分别覆盖 FS 最大 IN、HS core 内置 PHY "
+"的全速 OUT 和 ULPI HS DMA。这些 ISO 参考不验证远程唤醒，也不提供完整 USB 音视频 class 或物理吞吐／时序资格；远"
+"程唤醒使用下述独立合同。"
+msgstr ""
+"Software references in `tests/contracts/usb_iso_assembly/` cover maximum"
+" FS IN, full-speed OUT on the HS core with its internal PHY, and ULPI HS"
+" DMA. These ISO references do not validate remote wake or provide a comp"
+"lete USB audio/video class or physical throughput/timing qualification; "
+"remote wake follows the separate contract below."
+
+#: docs/design/usb-device.md:181
 msgid "非零 endpoint 显式 activation"
 msgstr "Explicit nonzero endpoint activation"
 
-#: docs/design/usb-device.md:141
+#: docs/design/usb-device.md:183
 msgid ""
 "独立的 `nexus/io/usb_activation.h` 提供 `nx_usb_activation_port_t`：face 是共享 只读 ops"
 " 与既有 controller context 两指针，只提供一个同步 `nx_usb_activation_set(port, epoch, "
@@ -193,7 +311,11 @@ msgstr ""
 " complete-image cost require separate evidence from the corresponding ARM "
 "ELF."
 
-#: docs/design/usb-device.md:161
+#: docs/design/usb-device.md:193
+msgid "操作只面向已经选定的非零 endpoint 某一个方向：FS engine 为 EP1–EP3，HS engine 为 EP1–EP5；拒绝两个 EP0 地址及保留／未选地址。OUT 可为 bulk、interrupt 或通过 FIFO 准入的 ISO，各速度 MPS 按选中 profile 限定。调用者须是同一个 序列化特权 Task，进入时 incoming IRQ masks clear。controller 须 started、持有 clock、没有 closing／reset 屏障，参数 `epoch` 等于最新权威软件 control/reset epoch；冷态 epoch 0 合法。无效 identity 或已知旧软件 epoch 在 MMIO 前拒绝。软件检查通过后，已观察到的 raw USBRST 也使本次调用在写入前返回 STATE。尚未采集的物理 SETUP/reset 仍可能随后发生， IRQ 临界区不提供总线原子性；stop/restart 后外部须丢弃旧缓存的 epoch。"
+msgstr "The operation applies to one direction of an already selected nonzero endpoint: EP1–EP3 on the FS engine and EP1–EP5 on the HS engine. Both EP0 addresses and reserved or unselected addresses reject. OUT may be bulk, interrupt or ISO that passes FIFO admission; each speed's MPS is constrained by the selected profile. The caller must be the same serialized privileged Task with incoming IRQ masks clear. The controller must be started, retain its clock and have no closing/reset barrier. The `epoch` argument must equal the latest authoritative software control/reset epoch; cold epoch 0 is valid. Invalid identities and already-known stale software epochs reject before MMIO. After software checks pass, an observed raw USBRST also returns STATE before writes. A physical SETUP/reset not yet acquired may still arrive later; the IRQ guard is not a wire-atomic transaction. External callers must discard cached epochs after stop/restart."
+
+#: docs/design/usb-device.md:203
 msgid ""
 "目标方向必须没有 request loan、disable 工作、EPENA、待确认的定义事件或尚未完成的 SETUP 清理。IN 还要求专用 FIFO "
 "全空且没有 flush；OUT 要求共享 RX status FIFO 空。 否则返回 BUSY，不暗中取消请求、消费其他方向的 RX "
@@ -209,7 +331,11 @@ msgstr ""
 "writes and creates no new loan. Activation itself never borrows a request or "
 "payload and cannot replace an existing packet's cancel/drain/acquire SETTLED."
 
-#: docs/design/usb-device.md:177
+#: docs/design/usb-device.md:209
+msgid "冷启动仅使两个 EP0 方向 active 并解除其 endpoint mask；其余选定方向保留 immutable 几何但 inactive／SNAK。使能一个 inactive 方向时，先按选定 MPS、wire 类型和仅 IN 的 FIFO selector 配置目标，清 STALL、置 active 与 SNAK；bulk／interrupt 同时建立 DATA0，ISO 不使用 DATA toggle。保持 EPENA clear，不写 TSIZ 或 payload FIFO。 核对稳定控制字段、适用的 DATA0 与 NAK 状态， 仅处理命令后新出现的目标 IN NAK-effective／token-empty 提示（0x50），并证明其 W1C 清除；其他新事件使本次操作失败，进入 partial IO／closing。调用前已有的 定义事件仍返回 BUSY，不在前置拒绝中清除。随后解除目标 EP_MASK 位并读回完整 预期 mask。OUT 不写 reserved TxFIFO 字段。active、传输使能与 IRQ mask 是三个独立条件；mask 或 active 单独成立均不代表已经接受一个包。"
+msgstr "Cold start activates and unmasks only the two EP0 directions. Other selected directions retain immutable geometry but remain inactive/SNAK. Enabling an inactive direction first applies its selected MPS and wire type and the FIFO selector for IN only, clears STALL and sets active/SNAK. Bulk/interrupt additionally establishes DATA0; ISO does not use DATA toggle. EPENA stays clear; neither TSIZ nor the payload FIFO is written. The operation proves stable control fields, applicable DATA0 and NAK state, then handles only new target IN NAK-effective/token-empty hints (0x50) arising after the command and proves their W1C clear. Any other new event fails the operation with partial IO/closing. Defined events already present on entry still return BUSY and are not cleared during preflight rejection. It then unmasks the target EP_MASK bit and reads back the complete expected mask. OUT never writes reserved TxFIFO fields. Active state, transfer enable and IRQ masking are independent conditions; a mask or active bit alone does not mean a packet was admitted."
+
+#: docs/design/usb-device.md:220
 msgid ""
 "反激活之前，外部必须实际 cancel／drain 并 acquire 目标 packet 的 SETTLED。 操作先屏蔽目标方向且核对其他 mask "
 "位未变，再设置 SNAK、清 active 并核对。 每次仅修改对应方向，保留其他 endpoint 和两个 EP0 位，物理 "
@@ -229,7 +355,11 @@ msgstr ""
 "service to continue; it does not introduce this Task wait loop into IRQ "
 "execution."
 
-#: docs/design/usb-device.md:192
+#: docs/design/usb-device.md:228
+msgid "幂等调用必须先满足同样的无 loan／无 pending 前置条件。已经 active 的 enable 先核对 immutable 几何，不重放控制寄存器配置，只按需修正目标 mask；重复 enable 不得重置 bulk／interrupt 的 DATA1、清除真实 HALT 或发送包。已经 inactive 的 disable 不重新编程几何，只证明目标 mask 关闭及事件清除。只有显式 disable 后重新 enable 才为 bulk／interrupt 建立新 DATA0 并在读回成功后清 halt；disable 保留其 PID。 已 active 但 immutable 几何损坏时返回 IO／closing，不通过重写控制寄存器掩盖错误。"
+msgstr "Idempotent calls require the same no-loan/no-pending preflight. Enable on an already active direction first validates immutable geometry, does not replay control-register configuration and only repairs the target mask if needed. Repeated enable must not reset bulk/interrupt DATA1, clear a real HALT or send a packet. Disable on an already inactive direction does not reprogram geometry; it only proves the target mask is off and events are clear. Only explicit disable followed by enable establishes fresh DATA0 for bulk/interrupt and clears halt after successful readback; disable preserves their PID. Corrupt immutable geometry on an active direction returns IO/closing without concealing the fault by rewriting control registers."
+
+#: docs/design/usb-device.md:236
 msgid ""
 "控制或 mask 写入后的读回失败返回 IO，并保留既有 `closing` 屏障；IO 可以已有 部分硬件效果，不能作为无操作拒绝。只对目标 best-"
 "effort mask／inactive 回滚， 若观察到 EPENA 意外为一，不能假装写零已完成 disable。失败不能通过重试 "
@@ -245,7 +375,7 @@ msgstr ""
 "full stop. Stop may still return BUSY, retaining the clock and caller storage"
 " until existing disable/flush/IRQ-join proofs complete."
 
-#: docs/design/usb-device.md:198
+#: docs/design/usb-device.md:242
 msgid ""
 "外部 Chapter 9/configuration owner 根据配置或 alternate 选择方向，先 cancel／ drain／disable"
 " 旧方向，再 stage 新方向，随后提交该请求的 STATUS IN。这与 ST 手册及参考 Zephyr 的 before-status "
@@ -269,11 +399,15 @@ msgstr ""
 "deadline/rejection policy decides whether to accept; the DCD does not decode "
 "configuration values."
 
-#: docs/design/usb-device.md:213
+#: docs/design/usb-device.md:251
+msgid "activation 补充既有 FIG-16 的显式控制调用，不新增生命周期 owner 或执行线程。 它不提供 Chapter 9／class stack、CDC notification、多配置／alternate 策略、 连续传输或电气接入；ISO packet、HS、DMA、Host 和角色由各自独立选入路径提供。 activation 机制不证明 物理枚举／reset 时序、完整 IO-35 退出、clean candidate 或 HIL。"
+msgstr "Activation supplements the explicit control call in existing FIG-16 without adding a lifecycle owner or execution thread. It supplies no Chapter 9/class stack, CDC notification, multiple-configuration/alternate policy, continuous transfer or electrical integration. ISO packets, HS, DMA, Host and roles are provided by their independently selected paths. Activation does not prove physical enumeration/reset timing, complete IO-35 shutdown, a clean candidate or HIL."
+
+#: docs/design/usb-device.md:257
 msgid "可选 EP0 packetizer 与外层借用"
 msgstr "Optional EP0 packetizer and outer borrow"
 
-#: docs/design/usb-device.md:215
+#: docs/design/usb-device.md:259
 msgid ""
 "`nexus/components/usb_control.h` 使用调用者零初始化的 `nx_usb_control_t`，内部 只有两个固定的 "
 "packet request 槽；outer `nx_usb_control_request_t` 与 payload "
@@ -292,6 +426,10 @@ msgstr ""
 "diagram](../assets/diagrams/README.md) represents packet-layer calls; the "
 "application executor explicitly advances the EP0 component, which adds no "
 "lifecycle owner."
+
+#: docs/design/usb-device.md:266
+msgid "prepare 同样仅允许 Task 调用；其余 adapter API 还要求同一个序列化特权 Task 执行，incoming IRQ masks 须 clear；不允许第二 Task、ISR 或 callback 重入。 initialize 不启动硬件；prepare 不借用 payload，`nx_usb_control_begin` 按当前 权威 SETUP epoch 准入，成功才建立 outer 借用，且本身不提交包。IN 发送 min(length, wLength)，OUT 容量必须覆盖 wLength；请求、控制存储与 payload 须满足公共头文件的对齐和不重叠合同。 `nx_usb_control_step` 每步至多一次 poll／权威 state 读取，再执行至多两次 submit 或一次 cancel；为 DATA IN 先取得同 epoch 的零长 STATUS OUT，再提交 IN。 只检查两个固定 packet 槽，不在一步内循环完成多包事务，不创建 worker。 调用者在 suspend、cancel 或停机期间仍负责推进。"
+msgstr "Prepare permits Task calls only. Other adapter APIs require the same serialized privileged Task with incoming IRQ masks clear; a second Task, ISR or callback must not reenter. Initialize does not start hardware; prepare borrows no payload. `nx_usb_control_begin` admits the authoritative SETUP epoch and establishes the outer borrow on success without submitting a packet. IN sends min(length, wLength); OUT capacity covers wLength. Requests, control storage and payload meet the public alignment and non-overlap contract. Each `nx_usb_control_step` performs at most one poll/authoritative-state read, then at most two submits or one cancel. DATA IN first prearms zero-length STATUS OUT for the same epoch, then submits IN. It checks only two fixed packet slots, does not loop through a multi-packet transaction in one step and creates no worker. The caller continues progress during suspend, cancel and shutdown."
 
 #: docs/design/usb-device.md:0
 msgid "事实"
@@ -329,6 +467,10 @@ msgid "对应 STATUS 包真实 ACK"
 msgstr "Actual ACK of the corresponding STATUS packet"
 
 #: docs/design/usb-device.md:0
+msgid "确定该 outer 事务的线上结果；已 acquire 的 STATUS ACK 先于后来观察到的 epoch、closing 或超时，但两个 packet 方向及其 DMA／FIFO／IRQ 借用都退出后才发布 outer SETTLED"
+msgstr "Determines the outer transaction wire outcome. An acquired STATUS ACK precedes subsequently observed epoch changes, closing or timeout, but outer SETTLED is published only after both packet directions and their DMA/FIFO/IRQ borrows have withdrawn"
+
+#: docs/design/usb-device.md:0
 msgid "SET_ADDRESS staging 成功"
 msgstr "Successful SET_ADDRESS staging"
 
@@ -340,7 +482,7 @@ msgstr ""
 "write/readback are established separately. On-wire success does not guarantee"
 " that the address or external configuration has been committed"
 
-#: docs/design/usb-device.md:239
+#: docs/design/usb-device.md:284
 msgid ""
 "`nx_usb_control_out_view` 只在同 epoch 的 DATA_READY 且没有 provider packet 引用时， 提供 "
 "const 检查视图；outer 借用继续，视图在下一次同 owner adapter 调用时失效， 不能修改、释放或跨 Task "
@@ -357,7 +499,7 @@ msgstr ""
 "rejection decision for an old transaction is not accepted once software has "
 "observed a new epoch."
 
-#: docs/design/usb-device.md:245
+#: docs/design/usb-device.md:290
 msgid ""
 "拒绝路径使用选定 ROM profile 的 `setup_decision`：它是一个 "
 "`nx_usb_setup_decision_port_t`，仍由共享只读 ops 与既有实例 context 构成两指针 "
@@ -381,7 +523,7 @@ msgstr ""
 "hardware verification; rejection, epoch changes or leaving the critical "
 "section do not revoke the outer request's borrow."
 
-#: docs/design/usb-device.md:253
+#: docs/design/usb-device.md:298
 msgid ""
 "地址策略显式调用 `nx_usb_device_address`，并在 step 刷新后检查权威 device state； "
 "`nx_usb_control_snapshot` 只复制最近一次已获取的 state，不替代刷新，也不返还借用。 设备地址、closing 与外部 "
@@ -393,7 +535,11 @@ msgstr ""
 "nor returns the borrow. Device address, closing and external configuration "
 "readiness cannot be inferred from outer SUCCESS."
 
-#: docs/design/usb-device.md:262
+#: docs/design/usb-device.md:302
+msgid "新 SETUP/reset 的 epoch、cancel、timeout 或 device stop 都不撤销旧借用。adapter 先 acquire/fold 已完成 packet，再观察新 epoch。零长 STATUS OUT 的有效 XFRC 关闭线上 control admission，但不是尚未停止的 IN／OUT DMA、FIFO 或 IRQ 退出证明； AHB busy、地址拒清或另一方向未结清时继续保留两个槽及 outer payload。已经取得 STATUS ACK 后不再发下一 DATA IN；只 join 旧方向再发布 outer SETTLED，不伪造 额外 ACK 或重放 payload。描述符、outer request、adapter、profile 和 endpoint face 全程保持有效，outer 结束仍不替调用者 join 独立 observer。"
+msgstr "New SETUP/reset epochs, cancellation, timeout and device stop do not revoke old borrows. The adapter acquires/folds completed packets before observing a new epoch. A valid zero-length STATUS OUT XFRC closes wire control admission but does not prove withdrawal of pending IN/OUT DMA, FIFO or IRQ references. AHB busy, refused address clearing or an unsettled peer direction retain both slots and the outer payload. After STATUS ACK is acquired, no next DATA IN is submitted. Join the old directions before outer SETTLED without inventing another ACK or replaying payload. Descriptors, the outer request, adapter, profile and endpoint faces remain valid throughout. Outer completion still does not join independent observers."
+
+#: docs/design/usb-device.md:310
 msgid ""
 "如果 OUT0 packet 进入 QUARANTINED，adapter 暴露 `NEEDS_DEVICE_STOP` 并继续保留 outer "
 "借用。只有外部 controller owner 能授权 `nx_usb_device_stop`；adapter 不自动停止共享 "
@@ -408,11 +554,11 @@ msgstr ""
 "the packet's terminal state and finish the old outer request; storage remains"
 " retained without the required proof."
 
-#: docs/design/usb-device.md:267
+#: docs/design/usb-device.md:315
 msgid "可选 CDC ACM 控制子集"
 msgstr "Optional CDC ACM control subset"
 
-#: docs/design/usb-device.md:269
+#: docs/design/usb-device.md:317
 msgid ""
 "`nexus/components/usb_acm.h` 使用调用者零初始化、自然对齐的 `nx_usb_acm_t`， 其中包含一个既有 EP0 "
 "packetizer、一个 outer request 和七个 wire bytes。 调用者显式提供 communication interface "
@@ -438,7 +584,7 @@ msgstr ""
 "provide all its required request/notification contracts; this control subset "
 "alone does not establish complete CDC compliance."
 
-#: docs/design/usb-device.md:280
+#: docs/design/usb-device.md:328
 msgid ""
 "仅支持 `SET_LINE_CODING`、`GET_LINE_CODING`、`SET_CONTROL_LINE_STATE` 和 "
 "`SEND_BREAK`。`bmRequestType` 必须分别是 OUT `0x21` 或 GET 的 IN `0xa1`， `wIndex` "
@@ -458,7 +604,7 @@ msgstr ""
 "completed. External dispatch must not misroute other valid class requests to "
 "this narrow subset."
 
-#: docs/design/usb-device.md:288
+#: docs/design/usb-device.md:336
 msgid ""
 "`SET_LINE_CODING` 先接收七字节暂存到 DATA_READY， `nx_usb_acm_pending` "
 "仅复制值供外部检查。线编码的共享格式检查只接受非零 rate、 stop bits `0..2`、parity `0..4` 与 data bits "
@@ -479,7 +625,11 @@ msgstr ""
 "physical lines early. Approval remains within the original absolute monotonic"
 " deadline."
 
-#: docs/design/usb-device.md:307
+#: docs/design/usb-device.md:344
+msgid "只有对应 outer acquire SUCCESS、即真实 STATUS ACK 后，组件才提交批准的 软件意图并更新 `committed_epoch`。新 SETUP/reset/cancel 按既有 packetizer 规则排空，不撤销借用；未获得 outer SUCCESS 的终态不提交。cancel 成功只请求 排空：若撤回 endpoint 前，对应 STATUS 仍获真实 ACK，outer acquire SUCCESS 仍提交已批准的原 epoch 意图。已经 acquire 的 STATUS ACK 不被后来的 SETUP/reset、closing 或 state 读取失败撤销，紧接的 GET 返回已提交的新 line coding。reset 后是否恢复 初始类状态是外部 owner 的独立策略。每次 `nx_usb_acm_step` 最多推进一次既有 packetizer，沿用本节 packetizer 的一次 poll／state 与有界 submit／cancel 预算； 外部仍须在取消、超时、suspend 和停机期间继续推进并保留所有 storage。 OUT0 quarantine 仍须外部 controller owner 授权真实完整停止，组件不自动 stop。"
+msgstr "Only after the matching outer acquire SUCCESS, meaning a real STATUS ACK, does the component commit approved software intent and update `committed_epoch`. New SETUP/reset/cancel drains under the existing packetizer rules without revoking borrows; a terminal outcome without outer SUCCESS does not commit. Successful cancellation only requests drain: if the matching STATUS still receives a real ACK before endpoint withdrawal, outer acquire SUCCESS still commits the approved original epoch intent. An already acquired STATUS ACK is not revoked by later SETUP/reset, closing or a failed state read; an immediately following GET returns the newly committed line coding. Whether reset restores initial class state is separate external owner policy. Each `nx_usb_acm_step` advances the existing packetizer at most once, preserving the packetizer's per-step bounds of one poll/state read and bounded submits/cancellation. The external executor must continue progress and retain all storage during cancellation, timeout, suspend and shutdown. OUT0 quarantine still requires the external controller owner to authorize real complete stop; the component does not stop it automatically."
+
+#: docs/design/usb-device.md:355
 msgid ""
 "外部在每次 step 后、派发下一请求前读取 snapshot，按新的 `committed_epoch` 应用 UART 参数、DTR/RTS 或 "
 "break，并独立处理应用失败与恢复；snapshot 不是事件队列， 软件提交不证明外设已应用。`SEND_BREAK` 仅记录 "
@@ -496,11 +646,11 @@ msgstr ""
 "provides no bulk data movement, serial-state notification, complete CDC "
 "enumeration, other classes or physical qualification."
 
-#: docs/design/usb-device.md:313
+#: docs/design/usb-device.md:361
 msgid "取消、失败与完整停止"
 msgstr "Cancellation, failure and complete stop"
 
-#: docs/design/usb-device.md:315
+#: docs/design/usb-device.md:363
 msgid ""
 "任务入口要求单一序列化特权执行者、Handler 外与 incoming IRQ masks clear。IRQ 保存/恢复 mask；一次最多消费八个 "
 "RX status、128 payload words 和八个选中方向。 冷热路径分开：cold reset/flush 有有限 poll "
@@ -515,7 +665,11 @@ msgstr ""
 "uses independent monotonic deadlines; USB suspend/unplug still needs external"
 " executor service, not SOF or hidden timers."
 
-#: docs/design/usb-device.md:325
+#: docs/design/usb-device.md:369
+msgid "非 ISO IN drain 先请求 SNAK、读到实际 NAK 状态，再请求 disable。ISO IN 不等待 不适用的 NAK-effective 证明，仍执行 SNAK／EPDIS；EN clear、EPDISD、FIFO flush、 AHB 与 W1C clear 仍须成立。OUT 非零方向（包括 ISO）先确认 global OUT NAK， 再 disable 及排空 RX。drain 超时保留 QUARANTINED，不能撤销 buffer loan。"
+msgstr "Non-ISO IN drain requests SNAK, observes actual NAK state, then requests disable. ISO IN does not await the inapplicable NAK-effective proof, but still executes SNAK/EPDIS. EN clear, EPDISD, FIFO flush, AHB and W1C clear must still be established. Nonzero OUT directions, including ISO, first confirm global OUT NAK, then disable and drain RX. A drain timeout retains QUARANTINED storage and cannot revoke the buffer loan."
+
+#: docs/design/usb-device.md:374
 msgid ""
 "Control OUT0 的 EPD 位固定为零，SETUP 也可绕过 NAK。不能模拟一个不存在的 disable ack 来完成取消。OUT0 "
 "individual cancel 在缺少真实完成证明时保持 DRAINING，随后 QUARANTINED；用户可选择完整 device "
@@ -538,7 +692,7 @@ msgstr ""
 "proof at any step returns BUSY with caller storage and clock consumer "
 "retained."
 
-#: docs/design/usb-device.md:334
+#: docs/design/usb-device.md:383
 msgid ""
 "捕获 wake target 后 publisher count 仍保留该借用；stop/detach 在 notify 未返回时 拒绝 "
 "BUSY。wake 必须同时支持 service/cancel 的 task 上下文和真正 IRQ 上下文， 绑定读取实际 priority/group "
@@ -550,11 +704,11 @@ msgstr ""
 "priority/grouping to validate syscall ceilings without changing global "
 "grouping."
 
-#: docs/design/usb-device.md:338
+#: docs/design/usb-device.md:387
 msgid "HS AHB DMA、Host 与 managed role"
 msgstr "HS AHB DMA, Host and managed roles"
 
-#: docs/design/usb-device.md:340
+#: docs/design/usb-device.md:389
 msgid "HS Device DMA 使用每方向静态 SRAM staging 和独立 24 B SETUP staging；CPU 复制 公共 payload，不要求它额外声明 DMA word padding。AHB master 不占 DMA2 stream， CCM 不可选。完成还必须证明 endpoint disabled、AHB idle、DMA 地址撤回读回和 IRQ 会合；失败保持 QUARANTINED，不能只看 XFRC 或 timeout 释放调用者存储。"
 msgstr ""
 "HS Device DMA uses static SRAM staging per direction and separate 24 B SETUP"
@@ -565,7 +719,7 @@ msgstr ""
 "readback, and IRQ observers have joined. Failure retains QUARANTINED "
 "storage; XFRC or timeout alone cannot release caller storage."
 
-#: docs/design/usb-device.md:345
+#: docs/design/usb-device.md:394
 msgid "Host 每个所选 channel 同时借用一个 packet；buffer capacity 覆盖 HAL 的完整 word 访问，IN 还覆盖 MPS。NAK／NYET 返回 NACK，由协议 owner 明确重试。锁定 HCD 的 回调只锁存事实；取消／超时保守排空整个共享 FIFO controller。旧 channel、DMA 地址、FIFO 和 IRQ 全部退出才 SETTLED。Host 没有自动 hub split 策略。"
 msgstr ""
 "Each selected Host channel borrows one packet at a time. Buffer capacity "
@@ -576,7 +730,15 @@ msgstr ""
 " FIFO and IRQ must all withdraw before SETTLED. Host provides no automatic "
 "hub split policy."
 
-#: docs/design/usb-device.md:350
+#: docs/design/usb-device.md:399
+msgid "Host control pipe 的 MPS 按实际速度准入：low-speed 为 8，full-speed 为 8／16／32／64，high-speed 为 64；非法组合在 HAL 和 channel 副作用前拒绝。 reset／resume 在任何 HPRT 写入前分别要求严格多于 10 ms／20 ms 加 1 µs 的剩余 deadline；额外一 tick 覆盖整数微秒采样隐藏的相位。不足、已到期或恰好耗尽预算 时返回 TIMEOUT，不发出短复位／恢复脉冲。"
+msgstr "Host control-pipe MPS admission follows the actual speed: 8 at low speed, 8/16/32/64 at full speed and 64 at high speed. Invalid combinations are rejected before HAL or channel effects. Before any HPRT write, reset/resume require strictly more than 10 ms/20 ms plus a 1 us guard remaining. The extra tick covers the fractional phase hidden by integer-microsecond samples. Insufficient, expired or exactly exhausted budgets return TIMEOUT without issuing a short reset/resume pulse."
+
+#: docs/design/usb-device.md:405
+msgid "已经开始的 reset／resume 必须保持最低信号时间。抢占越过 deadline 时，先完成 最低保持与撤信号读回，再返回 TIMEOUT；实际已恢复时仍发布 resumed 状态。 撤信号失败进入 closing，保留原 controller／clock 责任，stop 首先重试信号撤回， 成功前不调用 HAL stop 或释放 gate。已开始信号的时钟倒退、无效或持续无进展， 以有限观察预算进入 fault observer 和不返回的 park，保留信号而不伪造最低保持。 不增加实例字段、后台任务或另一套时钟；这些软件检查不构成物理脉宽测量。"
+msgstr "Once reset/resume starts, its minimum signal duration must be maintained. If preemption crosses the deadline, the provider completes the minimum hold and verifies signal withdrawal before returning TIMEOUT; an actually resumed port still publishes its resumed state. Failed withdrawal closes admission and retains the original controller/clock responsibility. Stop first retries signal withdrawal and does not call HAL stop or release the gate before it succeeds. Backward, invalid or persistently stalled time during an admitted signal reaches the fault observer and a non-returning park within a finite observation budget, retaining the signal without inventing minimum-duration proof. No instance fields, background tasks or second clock are added. These software checks do not measure physical pulse widths."
+
+#: docs/design/usb-device.md:412
 msgid "`Nexus::USBRole` 是通用供电和排空屏障，F407 managed OTG 将它接入真实 cold Device／Host。一个 composite 独占 core、PHY、pins、clock 和 IRQ；OFF prepare 不启动 USB。显式 generation-bound 请求先真实 drain，再 source-off 读回和独立 VBUS 放电确认，才进行新角色的供电／cold prepare。切回 Device 等待至少 50 ms 并确认实际 CMOD；inactive face 纯拒绝，旧 SETUP epoch 不跨角色复用。过流通过 显式 service 进入同一撤回屏障；硬件限流与实际放电路径由外部电源 owner 提供。 详见 `tests/contracts/usb_otg_assembly/README.md` 的软件信号合同。"
 msgstr ""
 "`Nexus::USBRole` is a common power and drain barrier; F407 managed OTG "
@@ -591,11 +753,167 @@ msgstr ""
 "supplies hardware current limiting and the actual discharge path. See the "
 "software signal contract in `tests/contracts/usb_otg_assembly/README.md`."
 
-#: docs/design/usb-device.md:358
+#: docs/design/usb-device.md:420
+msgid "Device 显式远程唤醒"
+msgstr "Explicit Device remote wakeup"
+
+#: docs/design/usb-device.md:422
+msgid ""
+"F407 的固定 Device 及 managed Role 的 Device 阶段均可显式选择 `remote_wakeup=true`。静态"
+"配置仅接入 可选 runtime，不自动发信号，也不创建任务、定时器或等待线程。描述符是否声明 remote wake、Chapter 9 请求"
+"是否合法及业务何时需要唤醒，仍由外部控制 owner 决定。"
+msgstr ""
+"F407 fixed Device and the Device phase of a managed Role can explicitly "
+"select `remote_wakeup=true`. Static configuration only wires the optiona"
+"l runtime; it neither signals automatically nor creates tasks, timers or"
+" waiting threads. The external control owner remains responsible for adv"
+"ertising remote wake in descriptors, validating Chapter 9 requests and d"
+"eciding when the application needs to wake the host."
+
+#: docs/design/usb-device.md:427
+msgid ""
+"`remote_wakeup` 同时选择静态 runtime 与对应协议代码。Host 从同一 typed IR 推导 构建选择，SoC 私有编"
+"译常量裁剪未选的协议算法；公共请求、方法表和数据布局 保持同一合同。未选功能通过原接口报告 UNSUPPORTED，通用 USB、DMA／IRQ"
+" 排空 以及 cold 元数据安全检查继续执行。Native 完整模型只在相关 USB target 选择 功能以运行全部合同；固件的 Flas"
+"h／RAM 成本按同源配置与编译器的 ELF 计量。"
+msgstr ""
+"`remote_wakeup` selects both static runtime storage and the correspondin"
+"g protocol code. Host configuration tools derive build selection from th"
+"e same typed IR; SoC-private compile-time constants remove unselected pr"
+"otocol algorithms while public requests, method tables and data layouts "
+"retain the same contract. An unselected feature reports UNSUPPORTED thro"
+"ugh the existing interface. Generic USB, DMA/IRQ drain and cold-metadata"
+" safety checks continue to run. The complete Native model selects the fe"
+"ature only for relevant USB targets to exercise all contracts. Firmware "
+"Flash/RAM costs are measured from an ELF with the same source configurat"
+"ion and compiler."
+
+#: docs/design/usb-device.md:433
+msgid ""
+"DCD 只在精确 Device `SET_FEATURE(DEVICE_REMOTE_WAKEUP)` 的 STATUS IN 真正 ACK 后"
+"锁存许可；`CLEAR_FEATURE` 同样在 ACK 后生效。RESET 与成功 SET_CONFIGURATION 清除旧许可。新的 SE"
+"TUP 取消尚未 ACK 的修改意图；公开 `state.remote_wakeup_enabled` 只报告已提交值。ST bridge 在新"
+" SETUP 前用此值同步 Core，GET_STATUS 不会报告被取消的 SET／CLEAR intent。线上 STATUS ACK 立即"
+"提交 权限，与该 packet 的 DMA 内存 join 分开；应用已 cancel 或 deadline 到期也不能 撤销真实已 ACK 的"
+"协议作用。AHB、地址或 EPDISD 未会合时，原 packet 仍被借用。"
+msgstr ""
+"DCD latches permission only after a real STATUS IN ACK for the exact Dev"
+"ice `SET_FEATURE(DEVICE_REMOTE_WAKEUP)` request; `CLEAR_FEATURE` also ta"
+"kes effect only after ACK. RESET and successful SET_CONFIGURATION clear "
+"the old permission. A new SETUP cancels modification intent not yet ACKe"
+"d; public `state.remote_wakeup_enabled` reports only committed values. T"
+"he ST bridge synchronizes Core from this value before processing a new S"
+"ETUP, so GET_STATUS never reports cancelled SET/CLEAR intent. A wire STA"
+"TUS ACK commits permission immediately, independently of that packet's D"
+"MA-memory join. Application cancellation or an expired deadline cannot r"
+"evoke a real ACKed protocol effect. If AHB, address withdrawal or EPDISD"
+" has not joined, the original packet remains borrowed."
+
+#: docs/design/usb-device.md:441
+msgid ""
+"调用者静态提供 `nx_usb_remote_wakeup_request_t`，用 Core prepare 设置有限绝对 `deadline"
+"`，并提供正的 `max_service_delay_us`，记为 B。B 必须覆盖信号保持期间的 调度、抢占、IRQ 屏蔽及撤信号延迟之和，范"
+"围为 1..12998 µs；填写参数不会证明此 上界。准入还要求真实硬件 SUSPSTS、首次 suspend 观察与当前有效 System "
+"epoch 相同，并已等待至少 5001 µs；这一 tick 余量覆盖整数微秒相位。效果前检查剩余 budget 严格大于 `2001+B` "
+"µs。拒绝不保留 request，也不触发 RWUSIG。"
+msgstr ""
+"The caller statically supplies `nx_usb_remote_wakeup_request_t`, uses Co"
+"re prepare to set a finite absolute `deadline`, and supplies a positive "
+"`max_service_delay_us`, denoted B. B must cover the sum of scheduling, p"
+"reemption, IRQ masking and signal-withdrawal delays during the pulse, wi"
+"thin 1..12998 µs; setting the parameter does not prove this bound. Admis"
+"sion also requires actual hardware SUSPSTS, the first suspend observatio"
+"n in the same currently live System epoch, and at least 5001 µs elapsed."
+" This tick guard covers the phase hidden by integer-microsecond samples."
+" Before any effect, remaining budget must be strictly greater than `2001"
+"+B` µs. Rejection neither retains the request nor asserts RWUSIG."
+
+#: docs/design/usb-device.md:448
+msgid ""
+"SUCCESS 表示 ACCEPTED。调用者按已证明的 B 在已有事件循环或任务中执行 service， 约 2 ms 后撤回并读回 RWUS"
+"IG，才发布 SETTLED。控制器分别保留断言前后时间界： 后界证明最低保持，前界检查上限，避免断言后抢占被一次迟到时间采样隐藏。满足 Cor"
+"e 时间与 B 合同时，物理脉冲处于 USB 要求的 1..15 ms；实际超窗必须报告错误， 之后撤回成功也不能把它改写成 SUCCESS。成"
+"功只证明本端信号已撤回，host resume 仍由真实 WKUPINT／RESUME 事实发布。本地 pulse 后没有 host resum"
+"e 时，不重用旧 suspend 起点；只有前次 SUSP W1C 已读回完成、之后又观察到新的 SUSP，才建立下一 次 5001 µs id"
+"le 收条。撤不掉的旧状态位不能反复授权发送。"
+msgstr ""
+"SUCCESS means ACCEPTED. The caller runs explicit service in its existing"
+" event loop or task under the proved B delay bound, withdrawing and read"
+"ing back RWUSIG after approximately 2 ms before publishing SETTLED. The "
+"controller retains separate pre-assertion and post-assertion time bounds"
+": the latter proves minimum hold, while the former checks the upper limi"
+"t, preventing preemption after assertion from being hidden by one late t"
+"ime sample. When Core time and B meet their contracts, the physical puls"
+"e stays within USB's required 1..15 ms. An actual violation must report "
+"an error; later successful withdrawal cannot turn it into SUCCESS. Succe"
+"ss proves only local signal withdrawal. Host resume is still published f"
+"rom real WKUPINT/RESUME facts. Without host resume after a local pulse, "
+"the old suspend start is not reused. A new 5001 µs idle receipt requires"
+" successful readback of the previous SUSP W1C clear followed by a newly "
+"observed SUSP. An uncleared old status bit cannot authorize repeated sig"
+"naling."
+
+#: docs/design/usb-device.md:457
+msgid ""
+"cancel 与 stop 保留已接纳的请求，不能提前缩短最低保持。读回拒绝保持 QUARANTINED、runtime 和 clock 责任，"
+"后续 service／stop 只能凭真实撤回完成 join。 可返回的 epoch／时间异常尽力撤信号并报告错误；Core 自身的终态 fai"
+"l-stop 不保证 还会返回执行清理，不能据此承诺无界 CPU 停机后的 15 ms 上限。epoch 异常路径仅 针对 System 时间域"
+"失效而 USB 寄存器域与保留的 clock receipt 仍有效；不能将未知 USB gate／PHY 失电后的读回零当作真实退出证明。"
+msgstr ""
+"Cancel and stop retain the accepted request and cannot shorten minimum h"
+"old. Refused readback retains QUARANTINED storage, runtime and clock res"
+"ponsibility; subsequent service/stop can complete join only through actu"
+"al withdrawal. When an epoch/time fault returns control, the driver make"
+"s a best-effort signal withdrawal and reports an error. A terminal fail-"
+"stop of Core itself does not guarantee returning to perform cleanup, so "
+"no 15 ms upper bound may be promised after an unbounded CPU halt. The ep"
+"och-fault path only covers loss of the System time domain while the USB "
+"register domain and retained clock receipt remain valid. Zero readback a"
+"fter an unknown USB gate state or PHY power loss is not proof of actual "
+"withdrawal."
+
+#: docs/design/usb-device.md:464
+msgid ""
+"managed Role 的 Device face 直接转交同一个 DCD，不建立第二套 pulse 状态或 owner。 角色退出先调用同一"
+" stop 排空；最低保持尚未结束或 RWUSIG 撤回拒绝时，仍保留 原 Device transport、clock 与 pin recei"
+"pt。可选 runtime 以及请求必须避开整个 composite，包括暂时 inactive 的 Host 状态与 channel stor"
+"age、cold 配置、VBUS GPIO face／ops、共享 pins 数组、逐 pin snapshot 和端点 plan。已知尺寸范围"
+"在 C 准入时检查；外部 GPIO context 没有可知尺寸，由调用者保证它与 runtime／request 均不别名。模式开放以精确 p"
+"rovider 支持矩阵和当前软件证据为准，不从共用 C 头 推导电气资格。"
+msgstr ""
+"The Device face of a managed Role forwards directly to the same DCD, wit"
+"hout a second pulse state or owner. Role exit first drains through the s"
+"ame stop. While minimum hold is incomplete or RWUSIG withdrawal is refus"
+"ed, the original Device transport, clock and pin receipt remain retained"
+". The optional runtime and request must be disjoint from the entire comp"
+"osite, including temporarily inactive Host state and channel storage, co"
+"ld configuration, VBUS GPIO face/ops, shared pin arrays, per-pin snapsho"
+"ts and endpoint plans. C admission checks ranges whose sizes are known. "
+"Because the external GPIO context size is unknown, the caller must ensur"
+"e it aliases neither runtime nor request. Mode availability follows the "
+"exact provider support matrix and current software evidence; a shared C "
+"header does not establish electrical qualification."
+
+#: docs/design/usb-device.md:473
+msgid ""
+"维护的 F407 ARM ABI 中，普通 controller 仍为 160 B，可选指针填入原有 padding； 未选 runtime R"
+"AM 为 0 B，选中 runtime 为 32 B，调用者请求为 32 B。共享 ops 和 函数的 Flash 成本另按实际链接镜像计量，不"
+"能把这组 RAM 数字称为零 Flash 开销。 主机模型与 ARM 链接分别证明软件行为和资源，物理脉宽／WCET 仍需实板测量。"
+msgstr ""
+"In the maintained F407 ARM ABI, the ordinary controller remains 160 B; t"
+"he optional pointer occupies existing padding. Unselected runtime RAM is"
+" 0 B, selected runtime is 32 B and the caller-owned request is 32 B. Sha"
+"red ops and function Flash costs are measured separately in the actual l"
+"inked image; these RAM figures must not be described as zero Flash overh"
+"ead. Host models and ARM links establish software behavior and resources"
+" respectively. Physical pulse widths and WCET still require board measur"
+"ements."
+
+#: docs/design/usb-device.md:478
 msgid "按需官方 Core middleware"
 msgstr "Optional official Core middleware"
 
-#: docs/design/usb-device.md:360
+#: docs/design/usb-device.md:480
 msgid "`st-usb-device` 与 `st-usb-host` 只准备精确锁定的相应 middleware Core。 `components/st_usb_device` 和 `components/st_usb` 使用调用者静态 state、slots、 staging、有限 deadline 和显式 Thread step。官方 Handle／class／descriptor 回调表 留在私有接线边界，公共 I/O 不泄漏厂商类型；不选时不编译、不建立堆或后台任务。"
 msgstr ""
 "`st-usb-device` and `st-usb-host` prepare only their precisely pinned "
@@ -606,7 +924,35 @@ msgstr ""
 "Unselected components are not compiled and create neither a heap nor "
 "background tasks."
 
-#: docs/design/usb-device.md:371
+#: docs/design/usb-device.md:485
+msgid ""
+"Device Core 复用现有 epoch、activation 和真实 packet settlement。多包 DATA IN 在同 ep"
+"och 提前接纳零长 STATUS OUT；线上 STATUS 已结束但 DMA 内存尚未 join 时， bridge 根据权威 `contr"
+"ol_pending=false` 暂停 EP0 Core 续包派发，先会合双方向。 只转交真实已结清的 IN ACK 和 STATUS，不补造"
+" `EP0_TxSent`，不因这段合法间隔 锁存 INVALID，也不重放下一 IN payload。新 SETUP、deadline 与停止"
+"仍须完整排空。 Host Core 在断开后先排空，再允许 Core reset／class 退出及显式 cold restart。 两者均锁存"
+"官方 Core 忽略的 LL 错误，不建立 ISO 周期调度。Device Core 的 feature 意图不能替代实际 STATUS ACK"
+"，远程唤醒仍服从上述协议许可与 service 合同。"
+msgstr ""
+"Device Core reuses existing epochs, activation and actual packet settlem"
+"ent. Multi-packet DATA IN prearms zero-length STATUS OUT for the same ep"
+"och. When STATUS has ended on the wire but DMA memory is not joined, aut"
+"horitative `control_pending=false` stops EP0 Core continuation dispatch "
+"while the bridge joins both directions. It forwards only real settled IN"
+" ACKs and STATUS, without inventing `EP0_TxSent`, latching INVALID for t"
+"hat valid interval or replaying the next IN payload. New SETUP, deadline"
+"s and stop still require full drain. After disconnect, Host Core drains "
+"before Core reset/class exit and explicit cold restart. Both latch LL er"
+"rors ignored by the official Core and do not establish ISO periodic sche"
+"duling. Device Core feature intent cannot replace an actual STATUS ACK; "
+"remote wake remains subject to the protocol permission and service contr"
+"act above."
+
+#: docs/design/usb-device.md:494
+msgid "私有 Device Core bridge 把 profile ISO 显式映射到 `USBD_EP_TYPE_ISOC`，不把 Nexus 枚举值当作官方 wire 类型。Core／class 仍由特权 Thread 显式 step，packet 失败沿既有收条传播，不增加自动 class 恢复或完整音视频协议栈。"
+msgstr "The private Device Core bridge explicitly maps profile ISO to `USBD_EP_TYPE_ISOC` rather than treating a Nexus enum value as the official wire type. Core/class still runs through an explicit privileged-Thread step. Packet failures propagate through existing receipts without adding automatic class recovery or a complete audio/video protocol stack."
+
+#: docs/design/usb-device.md:498
 msgid "选入 HCD 的 `HAL_Delay` 与官方 Host Core 的 `USBH_Delay` 使用既有 Core timer， 不安装 SysTick。除了实际 deadline， 它对计数冻结保留有限无进展预算；invalid、后退或持续冻结时进入不返回的 park， 不把 void delay 早退当作成功。原 cold receipt 和所有借用仍保留，故障／reset 策略 由外部 owner 负责。System STOP 前必须完成所有 delay、request 和角色事务的撤回。"
 msgstr ""
 "Selected HCD `HAL_Delay` and official Host Core `USBH_Delay` use the "
@@ -618,11 +964,11 @@ msgstr ""
 "fault/reset policy belongs to the external owner. All delay, request and "
 "role transactions must be withdrawn before System STOP."
 
-#: docs/design/usb-device.md:377
+#: docs/design/usb-device.md:504
 msgid "实现位置与验收边界"
 msgstr "Implementation locations and acceptance boundaries"
 
-#: docs/design/usb-device.md:379
+#: docs/design/usb-device.md:506
 msgid ""
 "F4 绑定在 `soc/stm32/stm32f4/drivers/usb_device.c`；PIO 控制器机制在 "
 "`soc/stm32/stm32f4/drivers/ip/fs_device_pio/`。厂商寄存器布局与位定义来自锁定的 "
@@ -642,7 +988,7 @@ msgstr ""
 "tests and exact ARM assemblies. Case counts and resource conclusions come "
 "from actual execution reports for the current commit."
 
-#: docs/design/usb-device.md:386
+#: docs/design/usb-device.md:513
 msgid ""
 "历史跨系列开发报告只描述其记录的固定源码、配置和工具身份，不代表本轮保留的 平台范围，也不覆盖后续 profile、descriptor、EP0 或 "
 "activation 修改。原始报告 保持原字节；旧计数不能作为当前候选的完成证明。当前提交仍须分别通过公共合同、 F4 寄存器模型、ARM "
@@ -656,7 +1002,7 @@ msgstr ""
 "must independently pass public contracts, F4 register models, ARM links, "
 "resource budgets, SDK consumers and complete local gates."
 
-#: docs/design/usb-device.md:391
+#: docs/design/usb-device.md:518
 msgid ""
 "当前精确芯片范围为 F407VE／ZG，板卡范围是启明 V3.1、ZG 核心板、V4.1 和 天空星青春版；这不表示四板均已取得每项 USB "
 "电气资格。板级必须逐项确认 USB role、VBUS sensing/power/backfeed、pull-up/ESD、跳帽及共享引脚约束。 "
@@ -669,7 +1015,7 @@ msgstr ""
 "constraints individually. Software assembly may select PA11/PA12, but a pin "
 "claim proves neither actual wiring nor the correct role."
 
-#: docs/design/usb-device.md:396
+#: docs/design/usb-device.md:523
 msgid "可选官方 Device／Host Core 通过私有桥接接入，见上述独立 owner。产品 class、 描述符身份和外部配置事务仍由应用提供。物理枚举、主机重试、reset／拔线、 PHY flush 时序、IRQ／WCET 与 HIL 必须另行验收；本环境没有连接实板，均未执行。"
 msgstr ""
 "Optional official Device/Host Cores connect through private bridges under "
@@ -679,94 +1025,11 @@ msgstr ""
 "IRQ/WCET and HIL require separate acceptance. No physical board is connected"
 " in this environment; none of those physical checks was executed."
 
-msgid "IN TXFE 是只读状态，不参与 W1C 清除/完成的零值证明。ITTXFE 是主机 IN token 在 FIFO 尚空时到达的可重试信息，OUT STUP 是正常 SETUP phase 事实；两者不错误地终止 包。IN control timeout 和 OUT FIFO overrun 使用对应方向的真实事件位。EP0 的 DATA PID 由 SETUP/core 管理：bits 29:28/16 对 EP0 是 reserved，软件只对非零 bulk／interrupt endpoint 使用 DATA0 命令。对这些 endpoint，reset／clear-halt 须核对 DATA0 读回；失败保留 reset admission 屏障或 halt，不提前允许新包借用。"
-msgstr "IN TXFE is read-only and does not participate in W1C clearing or zero-value completion proof. ITTXFE is a retriable fact that a host IN token arrived while the FIFO was empty; OUT STUP is a normal SETUP-phase fact. Neither incorrectly terminates a packet. IN control timeout and OUT FIFO overrun use their direction-specific event bits. SETUP/core manages the EP0 DATA PID: bits 29:28/16 are reserved for EP0. Software uses DATA0 commands only for nonzero bulk/interrupt endpoints. For those endpoints, reset/clear-halt must prove DATA0 readback; failure retains the reset-admission barrier or halt and does not admit another packet loan early."
+#~ msgid "Device Core 复用现有 epoch、activation 和真实 packet settlement。多包 DATA IN 在同 epoch 提前接纳零长 STATUS OUT；线上 STATUS 已结束但 DMA 内存尚未 join 时， bridge 根据权威 `control_pending=false` 暂停 EP0 Core 续包派发，先会合双方向。 只转交真实已结清的 IN ACK 和 STATUS，不补造 `EP0_TxSent`，不因这段合法间隔 锁存 INVALID，也不重放下一 IN payload。新 SETUP、deadline 与停止仍须完整排空。 Host Core 在断开后先排空，再允许 Core reset／class 退出及显式 cold restart。 两者均锁存官方 Core 忽略的 LL 错误，不建立 ISO 周期调度或 remote wake。"
+#~ msgstr "Device Core reuses existing epochs, activation and actual packet settlement. Multi-packet DATA IN prearms zero-length STATUS OUT for the same epoch. When STATUS has ended on the wire but DMA memory is not joined, authoritative `control_pending=false` stops EP0 Core continuation dispatch while the bridge joins both directions. It forwards only real settled IN ACKs and STATUS, without inventing `EP0_TxSent`, latching INVALID for that valid interval or replaying the next IN payload. New SETUP, deadlines and stop still require full drain. After disconnect, Host Core drains before Core reset/class exit and explicit cold restart. Both latch LL errors ignored by the official Core and establish neither ISO periodic scheduling nor remote wake."
 
-msgid "IN 以单个 transaction 提交，OUT 的硬件接收计划为一个 MPS packet。ISO 的控制位 28／29 表示 even／odd frame，不表示 DATA toggle，不执行 bulk 的 DATA0 重置证明。 ISO endpoint 的 STALL 操作返回 UNSUPPORTED，不写端点寄存器。ISO 没有 ACK／NAK 握手；SUCCESS 只证明控制器完成且必要源、FIFO、AHB 和 IRQ 引用已撤回，不能证明 host 或其应用已收到数据。周期调度、同步、用途和 class 策略由外部 owner 明确提供， 不自动重试错过的机会，也不按 `bInterval` 创建数据泵。"
-msgstr "IN submits a single transaction; the OUT hardware receive plan is one MPS packet. ISO control bits 28/29 select even/odd frames rather than DATA toggle, so the bulk DATA0-reset proof does not apply. STALL on an ISO endpoint returns UNSUPPORTED without an endpoint-register write. ISO has no ACK/NAK handshake. SUCCESS proves only controller completion and withdrawal of the required source, FIFO, AHB and IRQ references; it cannot prove receipt by the host or its application. An explicit external owner supplies periodic scheduling, synchronization, usage and class policy. Missed opportunities are not retried automatically, and no data pump is created from `bInterval`."
+#~ msgid "公共接口是 `nexus/io/usb_device.h`。生产实现归属 `soc/stm32/stm32f4/`， 当前精确适配 STM32F407VET6／ZGT6 的 OTG FS 与 HS core：内置 PHY 的全速、 外部 ULPI 的高速／全速回退，以及 PIO 和 HS AHB DMA。Host 使用锁定官方 HCD／LL， Device 复用已有控制阶段与 errata IP owner。 目录按 STM32F4 家族组织，不表示该系列全部器件已完成接入。Native 位于 `tests/support/native/`，仅作为显式启用的主机测试模型。维护范围是 EP0 control、显式选择的非零 bulk／interrupt／ISO IN/OUT、 SETUP/reset/suspend/resume 事实、合法类型的 STALL、SET_ADDRESS、取消与退出。 DCD 的一次 request 仍是一个不超过 MPS 的包；非零 endpoint 的 active／mask 由 独立可选 activation face 显式控制。SET_CONFIGURATION、配置就绪及其回滚由外部 Chapter 9 owner 负责，packet 机制不能单独证明完整枚举／物理 reset 恢复。 可选 `Nexus::USBControl` 组合 EP0 多包 DATA、必要 ZLP 与 STATUS；独立的 `Nexus::USBDescriptors` 校验外部描述符结构。两者不创建任务或分配内存。 具体 class 分派、描述符字节与查找、VID/PID、字符串、配置及恢复策略由外部工程提供。 可选 `Nexus::USBACM` 只组合下述 CDC ACM 控制子集；没有数据泵或完整 CDC/HID 类栈， 其合同不建立完整 class 栈；Device ISO 由下述有限 packet 合同提供，remote wake 未接入。 独立的 `nexus/io/usb_host.h` 提供 Host packet transport， `nexus/io/usb_otg.h` 提供按需显式 managed role；自动 ID、SRP、HNP 策略不在范围内。"
+#~ msgstr "The public interface is `nexus/io/usb_device.h`. Production implementation belongs to `soc/stm32/stm32f4/`, currently adapting the OTG FS and HS cores of the exact STM32F407VET6/ZGT6 parts: full speed with an internal PHY, high speed with external ULPI and full-speed fallback, and PIO or HS AHB DMA. Host uses the pinned official HCD/LL; Device reuses the existing control-stage machinery and errata IP owner. Organizing directories by STM32F4 family does not mean every device in that series is integrated. Native resides in `tests/support/native/` solely as an explicitly enabled host-test model. Maintained scope covers EP0 control, explicitly selected nonzero bulk/interrupt/ISO IN/OUT endpoints, SETUP/reset/suspend/resume facts, STALL for applicable types, SET_ADDRESS, cancellation and shutdown. One DCD request remains one packet no larger than MPS. A separate optional activation face explicitly controls nonzero endpoint active/mask state. An external Chapter 9 owner handles SET_CONFIGURATION, configuration readiness and rollback. Packet mechanisms alone cannot prove complete enumeration or physical-reset recovery. Optional `Nexus::USBControl` composes EP0 multipacket DATA, required ZLP and STATUS; separate `Nexus::USBDescriptors` checks external descriptor structure. Neither creates tasks nor allocates memory. External projects supply concrete class dispatch, descriptor bytes/lookup, VID/PID, strings, configuration and recovery policy. Optional `Nexus::USBACM` composes only the CDC ACM control subset described below; it supplies no data pump or complete CDC/HID class stack, and its contract does not establish a complete class stack. Device ISO is supplied through the finite packet contract below; remote wake is not integrated. Separate `nexus/io/usb_host.h` provides Host packet transport, and `nexus/io/usb_otg.h` provides optional explicitly managed roles. Automatic ID, SRP and HNP policy are outside the scope."
 
-msgid "ISO 有限单包与帧边界"
-msgstr "Finite ISO packets and frame boundaries"
-
-msgid "PHY 选择"
-msgstr "PHY selection"
-
-msgid "RX 还须覆盖 SETUP/status 与最大 OUT packet；多个 ISO OUT 至少保留两份最大 OUT packet 及其状态字空间。配置器、公开 profile 的 RX 检查和 C 准入使用同一需求。 FS core 的最大 ISO IN 参考为 48 RX＋16 EP0 TX＋256 ISO TX＝320 words。 whole-packet FS core OUT 1023 B 需要 270 RX words，超过 RXFD 上限而拒绝； HS core 的内置 PHY 全速模式可用足够 RX 接纳该 MPS。这是精确资源组合，不是所有 MPS／endpoint 组合均可装配的承诺。"
-msgstr "RX must also cover SETUP/status and the largest OUT packet. Multiple ISO OUT directions reserve at least two largest-OUT packets and their status words. The configurator, public-profile RX checks and C admission use the same requirement. The maximum ISO IN reference on the FS core uses 48 RX + 16 EP0 TX + 256 ISO TX = 320 words. A whole-packet 1023 B OUT on the FS core requires 270 RX words, exceeding RXFD and therefore rejecting. The HS core with its internal PHY at full speed can admit that MPS with enough RX space. These are exact resource combinations, not a promise that every MPS/endpoint combination can be assembled."
-
-msgid "STM32F407 的 OTG_FS 基址是 `0x50000000`，四个 IN / 四个 OUT 方向、320-word FIFO， 单一 IRQ 67；绑定用锁定 SDK 验证实际 offset、stride、容量和 W1C/只读位。 OTG_HS 基址是 `0x40040000`，六个 IN／六个 OUT、1024-word FIFO、IRQ 77。 内置 FS PHY 使用 PB14／PB15 AF12；ULPI 使用十二根 AF10 pad 和外部 60 MHz。 EP0 固定 64-byte MPS；全速 bulk 为 8/16/32/64，高速 bulk 为 512。 全速 interrupt IN/OUT 为 1–64 B，高速为 1–1024 B。ISO 的协议 MPS 上界为 全速 1023 B、高速 1024 B，每次机会只支持一个 transaction，实际选择还须通过 FIFO 准入。 RX FIFO 采用审核下限 48 words，不自动改变既有默认；FS core 的 RXFD 上限为 256 words， HS core 为 1024 words； 总 FIFO 容量不能当作 RX 上限。每个选中及低编号未选 IN FIFO 至少留 16 words， HS AHB DMA 另留 32 words。完整 TX 分区由 controller 验证无重叠且不超总容量， 非法方向、类型、MPS、FIFO 和重复 identity 在 clock validate／retain 与 MMIO 之前拒绝。"
-msgstr "STM32F407 OTG_FS starts at `0x50000000`, with four IN/four OUT directions, a 320-word FIFO and IRQ 67. Binding checks actual offsets, stride, capacity and W1C/read-only bits against the pinned SDK. OTG_HS starts at `0x40040000`, with six IN/six OUT directions, a 1024-word FIFO and IRQ 77. The internal FS PHY uses PB14/PB15 AF12; ULPI uses twelve AF10 pads and an external 60 MHz clock. EP0 fixes MPS at 64 bytes; full-speed bulk uses 8/16/32/64 bytes and high-speed bulk uses 512. Full-speed interrupt IN/OUT uses 1–64 B, high-speed 1–1024 B. ISO protocol MPS limits are 1023 B at full speed and 1024 B at high speed, one transaction per opportunity; each actual selection must also pass FIFO admission. RX uses a reviewed minimum of 48 words without changing existing defaults. The FS core RXFD maximum is 256 words and the HS core maximum is 1024; total FIFO capacity is not an RX limit. Each selected IN FIFO and each lower-numbered unselected IN FIFO reserves at least 16 words; HS AHB DMA reserves another 32 words. The controller validates the complete TX partition for overlap and total capacity. Invalid direction, type, MPS, FIFO or duplicate identity rejects before clock validate/retain or MMIO."
-
-msgid "`nexus/io/usb_profile.h` 的只读 profile 绑定既有 controller／endpoint face，以及 选定的方向、类型、MPS、FIFO、PHY 时钟、速度和 PIO／AHB DMA 事实。 只有 USB 被选入且 `factory.capabilities = true` 时，生成器才产生 profile、精确 endpoint 数组与 `nx_factory_usb_profile` getter。设为 `false` 时不生成这些对象 或 getter；普通 USB face、方法表、provider context 与既有 generic capability 类型不因此扩大。getter 不初始化硬件，也不发现新 endpoint。 ULPI 使用独立的高速与全速回退 profile；`nx_factory_usb_profile_for_speed` 只返回选定速度对应的 ROM 记录，不把高速 512 B MPS 用于全速。 公共 `NX_USB_PROFILE_INTERRUPT` 的枚举值是 2，USB wire／寄存器 EPTYP 值是 3； `NX_USB_PROFILE_ISOCHRONOUS` 的枚举值是 3，wire EPTYP 为 1。provider 显式映射类型， 不把两者直接强转混用。"
-msgstr "The read-only profile in `nexus/io/usb_profile.h` binds existing controller/endpoint faces and selected direction, type, MPS, FIFO, PHY-clock, speed and PIO/AHB DMA facts. Only selected USB with `factory.capabilities = true` generates the profile, exact endpoint array and `nx_factory_usb_profile` getter. Setting it to `false` omits those objects and getter without enlarging ordinary USB faces, method tables, provider contexts or existing generic capability types. The getter neither initializes hardware nor discovers endpoints. ULPI has separate high-speed and full-speed fallback profiles; `nx_factory_usb_profile_for_speed` returns only the selected ROM record for that speed and never uses high-speed 512 B MPS at full speed. Public `NX_USB_PROFILE_INTERRUPT` is 2 while USB wire/register EPTYP is 3; `NX_USB_PROFILE_ISOCHRONOUS` is 3 while wire EPTYP is 1. The provider maps these types explicitly rather than interchanging them with a cast."
-
-msgid "`nx_usb_profile_validate` 只读检查选定事实，不能证明实际时钟、PCB、VBUS 或枚举。 外部 descriptor 通过 `nx_usb_descriptor_view_t` 传给 `nx_usb_descriptor_validate`：device、configuration、string 必须完整；校验 length／total、EP0 MPS、唯一 interface、alternate 0，以及 bulk／interrupt／ISO IN/OUT endpoint 的方向／编号／类型／MPS 与选定 profile 的对应关系。interrupt 描述符的 `bInterval` 全速为 1–255 个 1 ms frame，高速为 1–16 的指数编码；ISO 在两种速度下 均为 1–16 指数编码，单位分别是 1 ms frame 和 125 µs microframe。interval 由外部 descriptor 独占，不复制到 TOML、IR、profile 或 provider state。DCD 不调度 host poll， 也不承诺实际间隔；bulk 的既有 interval 处理保持不变。ISO 同步／用途字段校验标准 编码，不推导音频反馈或 class 拓扑；保留 usage／位非法时拒绝。HS 高带宽 multiplier 仍不支持，不静默裁剪成单 transaction。"
-msgstr "`nx_usb_profile_validate` checks selected facts read-only; it cannot prove actual clocks, PCB, VBUS or enumeration. External descriptors reach `nx_usb_descriptor_validate` through `nx_usb_descriptor_view_t`. Device, configuration and string descriptors must be complete. Validation checks length/total, EP0 MPS, unique interfaces, alternate 0, and correspondence of bulk/interrupt/ISO IN/OUT endpoint direction, number, type and MPS to the selected profile. Interrupt `bInterval` is 1–255 frames of 1 ms at full speed and an exponent encoding of 1–16 at high speed. ISO uses 1–16 exponent encoding at both speeds, in units of 1 ms frames or 125 µs microframes respectively. The external descriptor owns the interval; it is not copied into TOML, IR, profiles or provider state. The DCD neither schedules host polls nor promises an actual interval; existing bulk interval handling stays unchanged. ISO synchronization/usage fields receive standard-encoding checks without inferring audio feedback or class topology; reserved usage or bits reject. HS high-bandwidth multipliers remain unsupported and are not silently reduced to one transaction."
-
-msgid "`transfer=\"isochronous\"` 沿用现有 packet request、调用者 payload 与唯一 controller owner。每次 submit 从实际 DSTS 选择下一 frame／microframe 的奇偶；FS 使用 11-bit 帧计数，HS 使用 14-bit 计数。ULPI 必须先观察到 ENUMERATED speed，才能提交 ISO。 每次提交的剩余 Core deadline 至多一秒，小于两种速度帧半环的 1.024 秒。收集 incomplete 事实时先检查 Core 超时，避免长停顿把旧目标误判成未来；Core 与 SOF 之间不建立时间换算。"
-msgstr "`transfer=\"isochronous\"` reuses the existing packet request, caller payload and sole controller owner. Each submit reads actual DSTS to select the next frame/microframe parity: FS uses an 11-bit frame count and HS a 14-bit count. ULPI must first observe an ENUMERATED speed before admitting ISO. Each submission has at most one second of remaining Core deadline, less than the 1.024-second frame half-ring at either speed. Incomplete-fact collection checks Core timeout first so a long execution stall cannot misidentify an old target as future. No conversion between Core time and SOF is established."
-
-msgid "activation 补充既有 FIG-16 的显式控制调用，不新增生命周期 owner 或执行线程。 它不提供 Chapter 9／class stack、CDC notification、多配置／alternate 策略、 连续传输或电气接入；ISO packet、HS、DMA、Host 和角色由各自独立选入路径提供。 activation 机制不证明 物理枚举／reset 时序、完整 IO-35 退出、clean candidate 或 HIL。"
-msgstr "Activation supplements the explicit control call in existing FIG-16 without adding a lifecycle owner or execution thread. It supplies no Chapter 9/class stack, CDC notification, multiple-configuration/alternate policy, continuous transfer or electrical integration. ISO packets, HS, DMA, Host and roles are provided by their independently selected paths. Activation does not prove physical enumeration/reset timing, complete IO-35 shutdown, a clean candidate or HIL."
-
-msgid "controller 和 endpoint 保持独立 identity；公共 face 只有 readonly ops 与 context。 装配拥有一个 controller、精确 endpoint 数组、精确事件环和所选 PHY／controller clock owner。实例共享只读方法表，没有全局可变 registry、endpoint 最大池、隐藏 worker 或必选 OS。未选实例不产生状态，MCU 热路径用 direct volatile MMIO。模型编译只 替换外部 MMIO/NVIC 叶端口，MCU 不携带模型函数表或运行时模拟分支。"
-msgstr "Controller and endpoint retain separate identities; public faces contain only read-only ops and context. Assembly owns one controller, an exact endpoint array and event ring, and the selected PHY/controller clock owner. Instances share read-only method tables without global mutable registries, maximum endpoint pools, hidden workers or mandatory OS. Unselected instances create no state, and MCU hot paths use direct volatile MMIO. Model builds replace only external MMIO/NVIC leaves; MCUs carry no model-function tables or runtime-simulation branches."
-
-msgid "controller、endpoint、事件环与 request 按所选实例静态分配；可选 ROM profile、 EP0 adapter 和 outer request 分别计入其 owner 的资源预算。私有 endpoint 保存类型 与本次 ISO 的目标帧；目标帧复用已验证 ARM ABI 的原 padding。 `bInterval` 仍属外部 descriptor，不新增调度队列或 worker。结构尺寸、 未选 section GC 与完整 Flash／RAM 成本须由同源配置的 ARM ELF／map 建立， 不以 host sizeof 或旧版本 probe 代替当前镜像测量。"
-msgstr "Controllers, endpoints, event rings and requests are statically allocated for selected instances. Optional ROM profiles, EP0 adapters and outer requests count separately toward their owners' resource budgets. A private endpoint stores its type and the current ISO target frame; the latter reuses padding in the verified ARM ABI. `bInterval` remains with the external descriptor; no scheduling queue or worker is added. Structure sizes, unselected-section GC and complete Flash/RAM cost require ARM ELF/map evidence from the same source and configuration; host sizeof or old probes cannot replace current-image measurement."
-
-msgid "公共接口是 `nexus/io/usb_device.h`。生产实现归属 `soc/stm32/stm32f4/`， 当前精确适配 STM32F407VET6／ZGT6 的 OTG FS 与 HS core：内置 PHY 的全速、 外部 ULPI 的高速／全速回退，以及 PIO 和 HS AHB DMA。Host 使用锁定官方 HCD／LL， Device 复用已有控制阶段与 errata IP owner。 目录按 STM32F4 家族组织，不表示该系列全部器件已完成接入。Native 位于 `tests/support/native/`，仅作为显式启用的主机测试模型。维护范围是 EP0 control、显式选择的非零 bulk／interrupt／ISO IN/OUT、 SETUP/reset/suspend/resume 事实、合法类型的 STALL、SET_ADDRESS、取消与退出。 DCD 的一次 request 仍是一个不超过 MPS 的包；非零 endpoint 的 active／mask 由 独立可选 activation face 显式控制。SET_CONFIGURATION、配置就绪及其回滚由外部 Chapter 9 owner 负责，packet 机制不能单独证明完整枚举／物理 reset 恢复。 可选 `Nexus::USBControl` 组合 EP0 多包 DATA、必要 ZLP 与 STATUS；独立的 `Nexus::USBDescriptors` 校验外部描述符结构。两者不创建任务或分配内存。 具体 class 分派、描述符字节与查找、VID/PID、字符串、配置及恢复策略由外部工程提供。 可选 `Nexus::USBACM` 只组合下述 CDC ACM 控制子集；没有数据泵或完整 CDC/HID 类栈， 其合同不建立完整 class 栈；Device ISO 由下述有限 packet 合同提供，remote wake 未接入。 独立的 `nexus/io/usb_host.h` 提供 Host packet transport， `nexus/io/usb_otg.h` 提供按需显式 managed role；自动 ID、SRP、HNP 策略不在范围内。"
-msgstr "The public interface is `nexus/io/usb_device.h`. Production implementation belongs to `soc/stm32/stm32f4/`, currently adapting the OTG FS and HS cores of the exact STM32F407VET6/ZGT6 parts: full speed with an internal PHY, high speed with external ULPI and full-speed fallback, and PIO or HS AHB DMA. Host uses the pinned official HCD/LL; Device reuses the existing control-stage machinery and errata IP owner. Organizing directories by STM32F4 family does not mean every device in that series is integrated. Native resides in `tests/support/native/` solely as an explicitly enabled host-test model. Maintained scope covers EP0 control, explicitly selected nonzero bulk/interrupt/ISO IN/OUT endpoints, SETUP/reset/suspend/resume facts, STALL for applicable types, SET_ADDRESS, cancellation and shutdown. One DCD request remains one packet no larger than MPS. A separate optional activation face explicitly controls nonzero endpoint active/mask state. An external Chapter 9 owner handles SET_CONFIGURATION, configuration readiness and rollback. Packet mechanisms alone cannot prove complete enumeration or physical-reset recovery. Optional `Nexus::USBControl` composes EP0 multipacket DATA, required ZLP and STATUS; separate `Nexus::USBDescriptors` checks external descriptor structure. Neither creates tasks nor allocates memory. External projects supply concrete class dispatch, descriptor bytes/lookup, VID/PID, strings, configuration and recovery policy. Optional `Nexus::USBACM` composes only the CDC ACM control subset described below; it supplies no data pump or complete CDC/HID class stack, and its contract does not establish a complete class stack. Device ISO is supplied through the finite packet contract below; remote wake is not integrated. Separate `nexus/io/usb_host.h` provides Host packet transport, and `nexus/io/usb_otg.h` provides optional explicitly managed roles. Automatic ID, SRP and HNP policy are outside the scope."
-
-msgid "冷启动仅使两个 EP0 方向 active 并解除其 endpoint mask；其余选定方向保留 immutable 几何但 inactive／SNAK。使能一个 inactive 方向时，先按选定 MPS、wire 类型和仅 IN 的 FIFO selector 配置目标，清 STALL、置 active 与 SNAK；bulk／interrupt 同时建立 DATA0，ISO 不使用 DATA toggle。保持 EPENA clear，不写 TSIZ 或 payload FIFO。 核对稳定控制字段、适用的 DATA0 与 NAK 状态， 仅处理命令后新出现的目标 IN NAK-effective／token-empty 提示（0x50），并证明其 W1C 清除；其他新事件使本次操作失败，进入 partial IO／closing。调用前已有的 定义事件仍返回 BUSY，不在前置拒绝中清除。随后解除目标 EP_MASK 位并读回完整 预期 mask。OUT 不写 reserved TxFIFO 字段。active、传输使能与 IRQ mask 是三个独立条件；mask 或 active 单独成立均不代表已经接受一个包。"
-msgstr "Cold start activates and unmasks only the two EP0 directions. Other selected directions retain immutable geometry but remain inactive/SNAK. Enabling an inactive direction first applies its selected MPS and wire type and the FIFO selector for IN only, clears STALL and sets active/SNAK. Bulk/interrupt additionally establishes DATA0; ISO does not use DATA toggle. EPENA stays clear; neither TSIZ nor the payload FIFO is written. The operation proves stable control fields, applicable DATA0 and NAK state, then handles only new target IN NAK-effective/token-empty hints (0x50) arising after the command and proves their W1C clear. Any other new event fails the operation with partial IO/closing. Defined events already present on entry still return BUSY and are not cleared during preflight rejection. It then unmasks the target EP_MASK bit and reads back the complete expected mask. OUT never writes reserved TxFIFO fields. Active state, transfer enable and IRQ masking are independent conditions; a mask or active bit alone does not mean a packet was admitted."
-
-msgid "已有未清的 global incomplete／drop 事实会在新 admission 前拒绝。ISOODRP（bit14）、 incomplete IN／OUT（bit20／21）只使已到机会的 active ISO borrow 进入 IO 排空， 不取消仍属未来帧的请求，也不影响其它 bulk borrow；已观察到的真实完成优先于并发旧 incomplete。取消、超时、reset 和 stop 都继续实际 drain，失败仍保留 request／payload 并可进入 QUARANTINED，不能强制释放借用。"
-msgstr "Uncleared global incomplete/drop facts reject before new admission. ISOODRP (bit14) and incomplete IN/OUT (bit20/21) begin IO drain only for an active ISO borrow whose opportunity has arrived. They do not cancel requests for future frames or affect another bulk borrow; an observed real completion takes precedence over a concurrent old incomplete indication. Cancellation, timeout, reset and stop still perform actual drain. Failure retains the request/payload and may enter QUARANTINED; the borrow cannot be forcibly released."
-
-msgid "幂等调用必须先满足同样的无 loan／无 pending 前置条件。已经 active 的 enable 先核对 immutable 几何，不重放控制寄存器配置，只按需修正目标 mask；重复 enable 不得重置 bulk／interrupt 的 DATA1、清除真实 HALT 或发送包。已经 inactive 的 disable 不重新编程几何，只证明目标 mask 关闭及事件清除。只有显式 disable 后重新 enable 才为 bulk／interrupt 建立新 DATA0 并在读回成功后清 halt；disable 保留其 PID。 已 active 但 immutable 几何损坏时返回 IO／closing，不通过重写控制寄存器掩盖错误。"
-msgstr "Idempotent calls require the same no-loan/no-pending preflight. Enable on an already active direction first validates immutable geometry, does not replay control-register configuration and only repairs the target mask if needed. Repeated enable must not reset bulk/interrupt DATA1, clear a real HALT or send a packet. Disable on an already inactive direction does not reprogram geometry; it only proves the target mask is off and events are clear. Only explicit disable followed by enable establishes fresh DATA0 for bulk/interrupt and clears halt after successful readback; disable preserves their PID. Corrupt immutable geometry on an active direction returns IO/closing without concealing the fault by rewriting control registers."
-
-msgid "所选 PHY 时钟条件"
-msgstr "Selected PHY clock conditions"
-
-msgid "操作只面向已经选定的非零 endpoint 某一个方向：FS engine 为 EP1–EP3，HS engine 为 EP1–EP5；拒绝两个 EP0 地址及保留／未选地址。OUT 可为 bulk、interrupt 或通过 FIFO 准入的 ISO，各速度 MPS 按选中 profile 限定。调用者须是同一个 序列化特权 Task，进入时 incoming IRQ masks clear。controller 须 started、持有 clock、没有 closing／reset 屏障，参数 `epoch` 等于最新权威软件 control/reset epoch；冷态 epoch 0 合法。无效 identity 或已知旧软件 epoch 在 MMIO 前拒绝。软件检查通过后，已观察到的 raw USBRST 也使本次调用在写入前返回 STATE。尚未采集的物理 SETUP/reset 仍可能随后发生， IRQ 临界区不提供总线原子性；stop/restart 后外部须丢弃旧缓存的 epoch。"
-msgstr "The operation applies to one direction of an already selected nonzero endpoint: EP1–EP3 on the FS engine and EP1–EP5 on the HS engine. Both EP0 addresses and reserved or unselected addresses reject. OUT may be bulk, interrupt or ISO that passes FIFO admission; each speed's MPS is constrained by the selected profile. The caller must be the same serialized privileged Task with incoming IRQ masks clear. The controller must be started, retain its clock and have no closing/reset barrier. The `epoch` argument must equal the latest authoritative software control/reset epoch; cold epoch 0 is valid. Invalid identities and already-known stale software epochs reject before MMIO. After software checks pass, an observed raw USBRST also returns STATE before writes. A physical SETUP/reset not yet acquired may still arrive later; the IRQ guard is not a wire-atomic transaction. External callers must discard cached epochs after stop/restart."
-
-msgid "私有 Device Core bridge 把 profile ISO 显式映射到 `USBD_EP_TYPE_ISOC`，不把 Nexus 枚举值当作官方 wire 类型。Core／class 仍由特权 Thread 显式 step，packet 失败沿既有收条传播，不增加自动 class 恢复或完整音视频协议栈。"
-msgstr "The private Device Core bridge explicitly maps profile ISO to `USBD_EP_TYPE_ISOC` rather than treating a Nexus enum value as the official wire type. Core/class still runs through an explicit privileged-Thread step. Packet failures propagate through existing receipts without adding automatic class recovery or a complete audio/video protocol stack."
-
-msgid "软件参考位于 `tests/contracts/usb_iso_assembly/`，分别覆盖 FS 最大 IN、HS core 内置 PHY 的全速 OUT 和 ULPI HS DMA。它们不提供完整 USB 音视频 class、remote wake 或物理吞吐／时序资格。"
-msgstr "Software references in `tests/contracts/usb_iso_assembly/` cover maximum FS IN, full-speed OUT on the HS core with its internal PHY, and ULPI HS DMA. They provide neither a complete USB audio/video class nor remote wake or physical throughput/timing qualification."
-
-msgid "选定类型不符、描述的 endpoint 未选入 profile 或 MPS 不符返回 INVALID；非零 control 与 alternate setting 仍为 UNSUPPORTED，保留字段非法仍为 INVALID。 class-specific 子结构只检查边界，不解码其类语义。"
-msgstr "A selected-type mismatch, an endpoint absent from the selected profile or an MPS mismatch returns INVALID. Nonzero control and alternate settings remain UNSUPPORTED; invalid reserved fields remain INVALID. Class-specific substructures receive bounds checks only, without decoding class semantics."
-
-msgid "非 ISO IN drain 先请求 SNAK、读到实际 NAK 状态，再请求 disable。ISO IN 不等待 不适用的 NAK-effective 证明，仍执行 SNAK／EPDIS；EN clear、EPDISD、FIFO flush、 AHB 与 W1C clear 仍须成立。OUT 非零方向（包括 ISO）先确认 global OUT NAK， 再 disable 及排空 RX。drain 超时保留 QUARANTINED，不能撤销 buffer loan。"
-msgstr "Non-ISO IN drain requests SNAK, observes actual NAK state, then requests disable. ISO IN does not await the inapplicable NAK-effective proof, but still executes SNAK/EPDIS. EN clear, EPDISD, FIFO flush, AHB and W1C clear must still be established. Nonzero OUT directions, including ISO, first confirm global OUT NAK, then disable and drain RX. A drain timeout retains QUARANTINED storage and cannot revoke the buffer loan."
-
-msgid "非 ISO IN 的每次有限 data／ZLP 长度寄存器写入 `(1U << 19) | length`（PKTCNT=1）， MCNT／保留高位保持零；ISO IN 同样 PKTCNT=1，但 MCNT=1，按下一节选择帧奇偶。 interrupt 不增加 odd/even-frame 命令。 每个选定 IN direction 使用独立 Tx FIFO， PIO 一次同步装入整个不超过所选 MPS 的包，没有剩余软件 refill 工作；TX-empty mask 保持零， 不创建 TXFE refill worker。IN FIFO 写入不是完成，只有 XFRC、EP enable 已清、 FIFO 空闲容量恢复并且观察到的 W1C completion 清除读回成功才发布 SUCCESS。 OUT 必须同时读到包数据和 XFRC， short packet 正常完成；越界包的所有 FIFO words 都被消费，最多复制 caller capacity， 之后报告 OVERFLOW 并排空，不越界写 caller buffer。"
-msgstr "Each finite non-ISO IN data/ZLP length register is `(1U << 19) | length` (PKTCNT=1); MCNT and reserved upper bits remain zero. ISO IN also uses PKTCNT=1 but sets MCNT=1 and selects frame parity as described below. Interrupt adds no odd/even-frame command. Each selected IN direction has its own Tx FIFO. PIO synchronously loads the complete packet, at most the selected MPS, with no remaining software refill work. TX-empty masks stay zero and no TXFE refill worker is created. Writing the IN FIFO is not completion: SUCCESS requires XFRC, cleared EP enable, recovered FIFO free capacity and successful W1C-completion clear readback. OUT must observe packet data and XFRC. Short packets complete normally. For an oversized packet, every FIFO word is consumed but at most the caller capacity is copied; OVERFLOW then starts drain without writing beyond the buffer."
-
-#: docs/design/usb-device.md:394
-msgid "Host control pipe 的 MPS 按实际速度准入：low-speed 为 8，full-speed 为 8／16／32／64，high-speed 为 64；非法组合在 HAL 和 channel 副作用前拒绝。 reset／resume 在任何 HPRT 写入前分别要求严格多于 10 ms／20 ms 加 1 µs 的剩余 deadline；额外一 tick 覆盖整数微秒采样隐藏的相位。不足、已到期或恰好耗尽预算 时返回 TIMEOUT，不发出短复位／恢复脉冲。"
-msgstr "Host control-pipe MPS admission follows the actual speed: 8 at low speed, 8/16/32/64 at full speed and 64 at high speed. Invalid combinations are rejected before HAL or channel effects. Before any HPRT write, reset/resume require strictly more than 10 ms/20 ms plus a 1 us guard remaining. The extra tick covers the fractional phase hidden by integer-microsecond samples. Insufficient, expired or exactly exhausted budgets return TIMEOUT without issuing a short reset/resume pulse."
-
-#: docs/design/usb-device.md:399
-msgid "已经开始的 reset／resume 必须保持最低信号时间。抢占越过 deadline 时，先完成 最低保持与撤信号读回，再返回 TIMEOUT；实际已恢复时仍发布 resumed 状态。 撤信号失败进入 closing，保留原 controller／clock 责任，stop 首先重试信号撤回， 成功前不调用 HAL stop 或释放 gate。已开始信号的时钟倒退、无效或持续无进展， 以有限观察预算进入 fault observer 和不返回的 park，保留信号而不伪造最低保持。 不增加实例字段、后台任务或另一套时钟；这些软件检查不构成物理脉宽测量。"
-msgstr "Once reset/resume starts, its minimum signal duration must be maintained. If preemption crosses the deadline, the provider completes the minimum hold and verifies signal withdrawal before returning TIMEOUT; an actually resumed port still publishes its resumed state. Failed withdrawal closes admission and retains the original controller/clock responsibility. Stop first retries signal withdrawal and does not call HAL stop or release the gate before it succeeds. Backward, invalid or persistently stalled time during an admitted signal reaches the fault observer and a non-returning park within a finite observation budget, retaining the signal without inventing minimum-duration proof. No instance fields, background tasks or second clock are added. These software checks do not measure physical pulse widths."
-
-msgid "prepare 同样仅允许 Task 调用；其余 adapter API 还要求同一个序列化特权 Task 执行，incoming IRQ masks 须 clear；不允许第二 Task、ISR 或 callback 重入。 initialize 不启动硬件；prepare 不借用 payload，`nx_usb_control_begin` 按当前 权威 SETUP epoch 准入，成功才建立 outer 借用，且本身不提交包。IN 发送 min(length, wLength)，OUT 容量必须覆盖 wLength；请求、控制存储与 payload 须满足公共头文件的对齐和不重叠合同。 `nx_usb_control_step` 每步至多一次 poll／权威 state 读取，再执行至多两次 submit 或一次 cancel；为 DATA IN 先取得同 epoch 的零长 STATUS OUT，再提交 IN。 只检查两个固定 packet 槽，不在一步内循环完成多包事务，不创建 worker。 调用者在 suspend、cancel 或停机期间仍负责推进。"
-msgstr "Prepare permits Task calls only. Other adapter APIs require the same serialized privileged Task with incoming IRQ masks clear; a second Task, ISR or callback must not reenter. Initialize does not start hardware; prepare borrows no payload. `nx_usb_control_begin` admits the authoritative SETUP epoch and establishes the outer borrow on success without submitting a packet. IN sends min(length, wLength); OUT capacity covers wLength. Requests, control storage and payload meet the public alignment and non-overlap contract. Each `nx_usb_control_step` performs at most one poll/authoritative-state read, then at most two submits or one cancel. DATA IN first prearms zero-length STATUS OUT for the same epoch, then submits IN. It checks only two fixed packet slots, does not loop through a multi-packet transaction in one step and creates no worker. The caller continues progress during suspend, cancel and shutdown."
-
-msgid "确定该 outer 事务的线上结果；已 acquire 的 STATUS ACK 先于后来观察到的 epoch、closing 或超时，但两个 packet 方向及其 DMA／FIFO／IRQ 借用都退出后才发布 outer SETTLED"
-msgstr "Determines the outer transaction wire outcome. An acquired STATUS ACK precedes subsequently observed epoch changes, closing or timeout, but outer SETTLED is published only after both packet directions and their DMA/FIFO/IRQ borrows have withdrawn"
-
-msgid "新 SETUP/reset 的 epoch、cancel、timeout 或 device stop 都不撤销旧借用。adapter 先 acquire/fold 已完成 packet，再观察新 epoch。零长 STATUS OUT 的有效 XFRC 关闭线上 control admission，但不是尚未停止的 IN／OUT DMA、FIFO 或 IRQ 退出证明； AHB busy、地址拒清或另一方向未结清时继续保留两个槽及 outer payload。已经取得 STATUS ACK 后不再发下一 DATA IN；只 join 旧方向再发布 outer SETTLED，不伪造 额外 ACK 或重放 payload。描述符、outer request、adapter、profile 和 endpoint face 全程保持有效，outer 结束仍不替调用者 join 独立 observer。"
-msgstr "New SETUP/reset epochs, cancellation, timeout and device stop do not revoke old borrows. The adapter acquires/folds completed packets before observing a new epoch. A valid zero-length STATUS OUT XFRC closes wire control admission but does not prove withdrawal of pending IN/OUT DMA, FIFO or IRQ references. AHB busy, refused address clearing or an unsettled peer direction retain both slots and the outer payload. After STATUS ACK is acquired, no next DATA IN is submitted. Join the old directions before outer SETTLED without inventing another ACK or replaying payload. Descriptors, the outer request, adapter, profile and endpoint faces remain valid throughout. Outer completion still does not join independent observers."
-
-msgid "只有对应 outer acquire SUCCESS、即真实 STATUS ACK 后，组件才提交批准的 软件意图并更新 `committed_epoch`。新 SETUP/reset/cancel 按既有 packetizer 规则排空，不撤销借用；未获得 outer SUCCESS 的终态不提交。cancel 成功只请求 排空：若撤回 endpoint 前，对应 STATUS 仍获真实 ACK，outer acquire SUCCESS 仍提交已批准的原 epoch 意图。已经 acquire 的 STATUS ACK 不被后来的 SETUP/reset、closing 或 state 读取失败撤销，紧接的 GET 返回已提交的新 line coding。reset 后是否恢复 初始类状态是外部 owner 的独立策略。每次 `nx_usb_acm_step` 最多推进一次既有 packetizer，沿用本节 packetizer 的一次 poll／state 与有界 submit／cancel 预算； 外部仍须在取消、超时、suspend 和停机期间继续推进并保留所有 storage。 OUT0 quarantine 仍须外部 controller owner 授权真实完整停止，组件不自动 stop。"
-msgstr "Only after the matching outer acquire SUCCESS, meaning a real STATUS ACK, does the component commit approved software intent and update `committed_epoch`. New SETUP/reset/cancel drains under the existing packetizer rules without revoking borrows; a terminal outcome without outer SUCCESS does not commit. Successful cancellation only requests drain: if the matching STATUS still receives a real ACK before endpoint withdrawal, outer acquire SUCCESS still commits the approved original epoch intent. An already acquired STATUS ACK is not revoked by later SETUP/reset, closing or a failed state read; an immediately following GET returns the newly committed line coding. Whether reset restores initial class state is separate external owner policy. Each `nx_usb_acm_step` advances the existing packetizer at most once, preserving the packetizer's per-step bounds of one poll/state read and bounded submits/cancellation. The external executor must continue progress and retain all storage during cancellation, timeout, suspend and shutdown. OUT0 quarantine still requires the external controller owner to authorize real complete stop; the component does not stop it automatically."
-
-msgid "Device Core 复用现有 epoch、activation 和真实 packet settlement。多包 DATA IN 在同 epoch 提前接纳零长 STATUS OUT；线上 STATUS 已结束但 DMA 内存尚未 join 时， bridge 根据权威 `control_pending=false` 暂停 EP0 Core 续包派发，先会合双方向。 只转交真实已结清的 IN ACK 和 STATUS，不补造 `EP0_TxSent`，不因这段合法间隔 锁存 INVALID，也不重放下一 IN payload。新 SETUP、deadline 与停止仍须完整排空。 Host Core 在断开后先排空，再允许 Core reset／class 退出及显式 cold restart。 两者均锁存官方 Core 忽略的 LL 错误，不建立 ISO 周期调度或 remote wake。"
-msgstr "Device Core reuses existing epochs, activation and actual packet settlement. Multi-packet DATA IN prearms zero-length STATUS OUT for the same epoch. When STATUS has ended on the wire but DMA memory is not joined, authoritative `control_pending=false` stops EP0 Core continuation dispatch while the bridge joins both directions. It forwards only real settled IN ACKs and STATUS, without inventing `EP0_TxSent`, latching INVALID for that valid interval or replaying the next IN payload. New SETUP, deadlines and stop still require full drain. After disconnect, Host Core drains before Core reset/class exit and explicit cold restart. Both latch LL errors ignored by the official Core and establish neither ISO periodic scheduling nor remote wake."
+#~ msgid "软件参考位于 `tests/contracts/usb_iso_assembly/`，分别覆盖 FS 最大 IN、HS core 内置 PHY 的全速 OUT 和 ULPI HS DMA。它们不提供完整 USB 音视频 class、remote wake 或物理吞吐／时序资格。"
+#~ msgstr "Software references in `tests/contracts/usb_iso_assembly/` cover maximum FS IN, full-speed OUT on the HS core with its internal PHY, and ULPI HS DMA. They provide neither a complete USB audio/video class nor remote wake or physical throughput/timing qualification."

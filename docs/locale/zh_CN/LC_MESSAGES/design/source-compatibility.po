@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: f0a7a2f853e3c62f02a89370f7d81bf2a3c9b78da9472a37c191e887b20314bf\n"
+"X-Nexus-Source-SHA256: c245c95dc4294c53382906da7982c59e57cd01b9c1f66f6454ed0b1e2cba1804\n"
 
 #: ../../../docs/design/source-compatibility.md:1
 msgid "源码版本、factory 代际与依赖维护"
@@ -66,8 +66,8 @@ msgid "`factory_abi_epoch`"
 msgstr "`factory_abi_epoch`"
 
 #: ../../../docs/design/source-compatibility.md:0
-msgid "`1`"
-msgstr "`1`"
+msgid "`2`"
+msgstr "`2`"
 
 #: ../../../docs/design/source-compatibility.md:0
 msgid "当前唯一认可的生成源码接口代际；不是 binary ABI 保证"
@@ -88,10 +88,6 @@ msgstr "CMake package 只接受相同完整版本，拒绝 ranges"
 #: ../../../docs/design/source-compatibility.md:0
 msgid "authored assembly"
 msgstr "作者装配"
-
-#: ../../../docs/design/source-compatibility.md:0
-msgid "`2`"
-msgstr "`2`"
 
 #: ../../../docs/design/source-compatibility.md:0
 msgid "简化的 TOML 选择面；不改变 Board/SoC 事实"
@@ -164,15 +160,8 @@ msgstr ""
 "版单向输出，用于审计和独立产物检查，不是可信配置入口。 `source_epoch` 是 Python 类级合同，不写入 JSON，也不增加 MCU "
 "状态或改变公共 C factory 接口。维护工具直接观察实际 IR 类的两项声明，并核对唯一版本策略。"
 
-#: ../../../docs/design/source-compatibility.md:39
-msgid ""
-"当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。 既有 `v0.2.0` 标签保留原始预览源码身份。本次 "
-"semantic version 变化保留 epoch `1`、 exact 匹配和 authored schema `2`；版本值不把旧 "
-"SDK／候选的资格转移到新源码。 新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。"
-msgstr ""
-"当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。 既有 `v0.2.0` 标签保留原始预览源码身份。本次 "
-"semantic version 变化保留 epoch `1`、 exact 匹配和 authored schema `2`；版本值不把旧 "
-"SDK／候选的资格转移到新源码。 新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。"
+msgid "当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。 既有 `v0.2.0` 及其他标签保留原始源码身份，不移动标签。本批破坏性源码结果视图 改动将 factory／source interface epoch 提升为 `2`，semantic version 仍是开发快照 `0.2.1`，exact 匹配和 authored schema `2` 不变。相同版本号不能让旧 epoch `1` SDK 通过当前代际检查，版本值也不把旧 SDK／候选资格转移到新源码。 新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。"
+msgstr "当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。 既有 `v0.2.0` 及其他标签保留原始源码身份，不移动标签。本批破坏性源码结果视图 改动将 factory／source interface epoch 提升为 `2`，semantic version 仍是开发快照 `0.2.1`，exact 匹配和 authored schema `2` 不变。相同版本号不能让旧 epoch `1` SDK 通过当前代际检查，版本值也不把旧 SDK／候选资格转移到新源码。 新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。"
 
 #: ../../../docs/design/source-compatibility.md:44
 msgid ""
@@ -188,17 +177,8 @@ msgstr ""
 "Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/release-0.1.0.md)，准确"
 " source／tree 以其发行 manifest 为准。既有 tag、发行附件和证据保持原始身份，不随当前开发版本改写。"
 
-#: ../../../docs/design/source-compatibility.md:50
-msgid ""
-"factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face， "
-"不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后 拿到另一 bundle 使用。`factory_abi_epoch`"
-" 命名保留 ABI 字样，但目前只标记生成 源码接口代际：消费者、factory header、公共 face 和实现必须重新编译。当前 epoch 为"
-" 1；指定 0、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。"
-msgstr ""
-"factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face， "
-"不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后 拿到另一 bundle 使用。`factory_abi_epoch`"
-" 命名保留 ABI 字样，但目前只标记生成 源码接口代际：消费者、factory header、公共 face 和实现必须重新编译。当前 epoch 为"
-" 1；指定 0、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。"
+msgid "factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face， 不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后 拿到另一 bundle 使用。`factory_abi_epoch` 命名保留 ABI 字样，但目前只标记生成 源码接口代际：消费者、factory header、公共 face 和实现必须重新编译。当前 epoch 为 2；指定 0、旧值 1、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。"
+msgstr "factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face， 不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后 拿到另一 bundle 使用。`factory_abi_epoch` 命名保留 ABI 字样，但目前只标记生成 源码接口代际：消费者、factory header、公共 face 和实现必须重新编译。当前 epoch 为 2；指定 0、旧值 1、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。"
 
 #: ../../../docs/design/source-compatibility.md:56
 msgid ""
@@ -211,6 +191,15 @@ msgstr ""
 "`NEXUS_PLATFORM_VERSION` 和 `NEXUS_FACTORY_ABI_EPOCH`。这些是编译期常量， 不会增加运行时 "
 "registry、实例数量或 RAM。生产 emitter 与 SDK 打包注册完成后， 生成 header 校验和真实 SDK "
 "消费才构成这条链路的完整验收；仅有维护工具不能代替 它们。历史 SDK 缺少该新策略，不被新工具自动认定为已维护代际。"
+
+msgid "epoch 2 的源码迁移"
+msgstr "epoch 2 的源码迁移"
+
+msgid "本次 `nx_adc_group_request_t.frames` 改为显式 `output.frames`，并由 `results_kind` 区分 RAW 与 regular／injected paired 结果。原始字段访问必须迁移； 不保留 `frames` 影子、旧大小兼容或按运行态猜测结果布局。优先继续调用 `nx_adc_group_prepare()` 准备 raw 请求，由它设置 RAW discriminant；paired 结果使用 `nx_adc_group_prepare_results()`，请求、descriptor 与两个 span 共用一次借用生命周期。 直接读取 union 时必须先确认对应 `results_kind`，不能把 raw frame 指针当 descriptor。"
+msgstr "本次 `nx_adc_group_request_t.frames` 改为显式 `output.frames`，并由 `results_kind` 区分 RAW 与 regular／injected paired 结果。原始字段访问必须迁移； 不保留 `frames` 影子、旧大小兼容或按运行态猜测结果布局。优先继续调用 `nx_adc_group_prepare()` 准备 raw 请求，由它设置 RAW discriminant；paired 结果使用 `nx_adc_group_prepare_results()`，请求、descriptor 与两个 span 共用一次借用生命周期。 直接读取 union 时必须先确认对应 `results_kind`，不能把 raw frame 指针当 descriptor。"
+
+msgid "使用当前精确提交重新生成 bundle，并在同一配置和工具链下重新编译全部调用者、 公共 face／ops、factory、provider 和组件；不得混用 epoch 1 header、旧对象或缓存。 当前生成头、SDK 及维护消费者只认可 epoch 2；旧 epoch 1 应明确拒绝，不自动迁移、 降级或以 `--development-fixture` 放宽接口检查。外部产品的迁移步骤见 [迁移指南](../guides/migration.md)。manifest schema 2 与 interface epoch 2 是独立字段， 数字相同不表示彼此推导；本次只纠正文档中过时的 manifest 格式说明。"
+msgstr "使用当前精确提交重新生成 bundle，并在同一配置和工具链下重新编译全部调用者、 公共 face／ops、factory、provider 和组件；不得混用 epoch 1 header、旧对象或缓存。 当前生成头、SDK 及维护消费者只认可 epoch 2；旧 epoch 1 应明确拒绝，不自动迁移、 降级或以 `--development-fixture` 放宽接口检查。外部产品的迁移步骤见 [迁移指南](../guides/migration.md)。manifest schema 2 与 interface epoch 2 是独立字段， 数字相同不表示彼此推导；本次只纠正文档中过时的 manifest 格式说明。"
 
 #: ../../../docs/design/source-compatibility.md:62
 msgid "自动检查"

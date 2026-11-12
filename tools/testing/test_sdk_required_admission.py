@@ -179,6 +179,9 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
         expected.update(
             f"tests/contracts/stm32f4_family/f{chip}zg-board/board.json"
             for chip in ("405", "407", "415", "417"))
+        for stem in ("f411re", "f446ze", "f479ni"):
+            expected.add(f"tests/contracts/stm32f4_family/{stem}.toml")
+            expected.add(f"tests/contracts/stm32f4_family/{stem}-board/board.json")
         profile = self.sdk.source_profile(host_support=False)
         required = set(self.sdk.required_files(ROOT, profile))
         self.assertTrue(expected <= required)

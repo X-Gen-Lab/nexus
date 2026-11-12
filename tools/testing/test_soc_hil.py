@@ -305,7 +305,10 @@ if operation == 'serial':
         protocol = self.protocol("SOC-52")
         protocol["controller_ids"] = ["flash0"]
         self.resolved["flash"] = {"origin": 0x08000000, "size": 0x100000,
-                                   "erase_blocks": [16384]*4 + [65536] + [131072]*7}
+                                   "erase_spans": [
+                                       {"offset": 0, "erase_bytes": 16384, "count": 4},
+                                       {"offset": 65536, "erase_bytes": 65536, "count": 1},
+                                       {"offset": 131072, "erase_bytes": 131072, "count": 7}]}
         layout_path = self.root / "product-layout.json"
         layout = {"schema_version": 1, "kind": "product_flash_test_layout",
                   "board": self.fixture["board"], "part": self.fixture["part"],

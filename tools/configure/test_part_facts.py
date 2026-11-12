@@ -1,5 +1,6 @@
 """Exact part policy and emitted physical geometry share validated facts."""
-from tools.configure.tests.device_fixture import load_soc_facts
+from tools.configure.tests.device_fixture import (load_soc_facts,
+                                                   validate_soc_facts)
 from tools.configure.tests.native_fixture import native_fixture
 import copy
 from dataclasses import replace
@@ -41,13 +42,13 @@ class PartFactsTests(unittest.TestCase):
                 facts["variants"][unknown] = copy.deepcopy(
                     next(iter(facts["variants"].values())))
                 with self.assertRaisesRegex(ValueError, "part"):
-                    gate.validate_soc(facts, unknown)
+                    validate_soc_facts(facts, unknown)
 
     def test_package_identity_cannot_drift_from_exact_part(self):
         facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
         facts["variants"]["STM32F407VET6"]["package"] = "LQFP144"
         with self.assertRaisesRegex(ValueError, "package"):
-            gate.validate_soc(facts, "STM32F407VET6")
+            validate_soc_facts(facts, "STM32F407VET6")
 
     def test_unselected_variant_obeys_the_complete_physical_contract(self):
         def unknown_field(variant):
@@ -57,7 +58,7 @@ class PartFactsTests(unittest.TestCase):
             variant["package"] = "LQFP100"
 
         def flash_geometry(variant):
-            variant["flash"]["erase_blocks"].pop()
+            variant["flash"]["erase_spans"].pop()
 
         def dma_access(variant):
             variant["memory"][0]["dma"] = "true"
@@ -84,15 +85,17 @@ class PartFactsTests(unittest.TestCase):
                 facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
                 mutate(facts["variants"]["STM32F407ZGT6"])
                 with self.assertRaisesRegex(ValueError, error):
-                    gate.validate_soc(facts, "STM32F407VET6")
+                    validate_soc_facts(facts, "STM32F407VET6")
 
     def test_full_variant_validation_preserves_selected_fact_identity(self):
         for provider in descriptor.families():
-            facts = load_soc_facts(gate.ROOT / provider.source_directory / "soc.json")
-            original = copy.deepcopy(facts)
-            for part, variant in facts["variants"].items():
+            path = gate.ROOT / provider.source_directory / "soc.json"
+            for part in gate.load(path)["variants"]:
                 with self.subTest(family=provider.family, part=part):
-                    self.assertIs(gate.validate_soc(facts, part), variant)
+                    facts = load_soc_facts(path, part=part)
+                    original = copy.deepcopy(facts)
+                    variant = facts["variants"][part]
+                    self.assertIs(validate_soc_facts(facts, part), variant)
                     self.assertEqual(facts, original)
 
     def test_malformed_memory_entries_are_configuration_rejections(self):
@@ -101,7 +104,7 @@ class PartFactsTests(unittest.TestCase):
                 facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
                 facts["variants"]["STM32F407ZGT6"]["memory"] = [False]
                 with self.assertRaisesRegex(ValueError, "memory"):
-                    gate.validate_soc(facts, selected)
+                    validate_soc_facts(facts, selected)
 
     def test_unknown_f407_part_cannot_fall_through_to_zg_geometry(self):
         result = gate.resolve_ir(gate.ROOT /
@@ -120,16 +123,18 @@ class PartFactsTests(unittest.TestCase):
                     f"tests/contracts/stm32_assembly/{density}-flash.toml", test_support=native_fixture(gate.ROOT /
                     f"tests/contracts/stm32_assembly/{density}-flash.toml"))
                 source = bindings.emit(result)[1]
-                self.assertIn("static const nx_flash_sector_t "
-                              "s_nx_flash_sectors_flash0[]", source)
+                self.assertIn("static const nx_flash_erase_span_t "
+                              "s_nx_flash_erase_spans_flash0[]", source)
                 self.assertIn(".base_address = 0x08000000u", source)
                 self.assertIn(f".size = {size}u", source)
-                self.assertIn(f".sector_count = {count}u", source)
-                offset = 0
-                for block in result.flash["erase_blocks"]:
-                    self.assertIn(f"{{ {offset}u, {block}u }}", source)
-                    offset += block
-                self.assertEqual(offset, size)
+                self.assertIn(".erase_span_count = 3u", source)
+                self.assertEqual(sum(span["count"] for span in
+                                     result.flash["erase_spans"]), count)
+                for span in result.flash["erase_spans"]:
+                    self.assertIn("{ %du, %du, %du }" % (span["offset"],
+                        span["erase_bytes"], span["count"]), source)
+                self.assertEqual(sum(span["erase_bytes"] * span["count"]
+                                     for span in result.flash["erase_spans"]), size)
                 self.assertNotIn("g_nx_stm32_flash_", source)
 
 

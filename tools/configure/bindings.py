@@ -223,7 +223,7 @@ def emit(result):
                                     for item in selections):
         from tools.configure.memory import flash_geometry
         source.extend(flash_geometry(
-            result, symbol=geometry[0], sector_symbol=geometry[0] + "_sectors",
+            result, symbol=geometry[0], span_symbol=geometry[0] + "_erase_spans",
             program_unit=provider.FLASH_PROGRAM_UNIT,
             program_flags=geometry[1], static=False))
     source += ['static nx_platform_lifecycle_state_t s_nx_platform_lifecycle;',

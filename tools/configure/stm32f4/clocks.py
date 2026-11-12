@@ -1,4 +1,4 @@
-"""RM0090 F407 static PLL/bus calculations; no runtime clock policy."""
+"""Selected STM32F4 RCC calculations; no runtime clock policy."""
 from collections.abc import Mapping
 
 from tools.configure import clocks, usb_otg
@@ -37,7 +37,7 @@ def _parameters(name, profile):
         return dict(DEFAULT)
     if name != "custom" or not isinstance(profile, Mapping):
         fail("F407 clock requires a reviewed profile or explicit custom tuple")
-    optional = {"sysclk_source", "pll48"}
+    optional = {"sysclk_source", "pll48", "pll_sai"}
     if set(DEFAULT) - set(profile) or set(profile) - set(DEFAULT) - optional:
         fail("F407 clock parameters require one exact oscillator/PLL tuple")
     result = dict(profile)
@@ -60,6 +60,48 @@ def _parameters(name, profile):
     return result
 
 
+def _pll_sai_output(source, m, n, output, divider, allowed_post):
+    """One selected output has no authored frequency or second PLL source."""
+    if (not isinstance(output, Mapping) or
+            set(output) != {divider, "post_divider"}):
+        fail("PLLSAI output requires exact divider/post_divider fields")
+    value = integer(output[divider], 2, 15 if divider == "q" else 7,
+                    "PLLSAI " + divider)
+    post = output["post_divider"]
+    if type(post) is not int or post not in allowed_post:
+        fail("PLLSAI output has an unsupported post_divider")
+    if source * n > 216000000 * m * value:
+        fail("PLLSAI output exceeds 216 MHz")
+    hz = _divide(source * n, m * value * post, "PLLSAI " + divider + " output")
+    label = "kernel_hz" if divider == "q" else "pixel_hz"
+    return {**output, label: hz}
+
+
+def _pll_sai(source, parameters):
+    """Resolve a single System PLL with independently selected Q/R outputs.
+
+    These are common encoded limits. The selected DeviceView additionally
+    binds the exact device's VCO minimum, output existence and shared versus
+    dedicated M. Neither this tuple nor this leaf grants a device/mode review.
+    """
+    if (not isinstance(parameters, Mapping) or
+            not {"m", "n"}.issubset(parameters) or
+            set(parameters) - {"m", "n", "sai1", "ltdc"} or
+            not set(parameters).intersection({"sai1", "ltdc"})):
+        fail("PLLSAI requires m/n and at least one selected output")
+    m = integer(parameters["m"], 2, 63, "PLLSAI m")
+    n = integer(parameters["n"], 50, 432, "PLLSAI n")
+    if not 1000000 * m <= source <= 2000000 * m:
+        fail("PLLSAI nominal input must be in 1..2 MHz")
+    if not 100000000 * m <= source * n <= 432000000 * m:
+        fail("PLLSAI VCO must be in 100..432 MHz before device limits")
+    q = (_pll_sai_output(source, m, n, parameters["sai1"], "q", range(1, 33))
+         if "sai1" in parameters else None)
+    r = (_pll_sai_output(source, m, n, parameters["ltdc"], "r", (2, 4, 8, 16))
+         if "ltdc" in parameters else None)
+    return dict(m=m, n=n, sai1=q, ltdc=r)
+
+
 def plan(profile_name, profile):
     """Calculate all consumer domains once, rejecting fractional frequencies.
 
@@ -77,6 +119,8 @@ def plan(profile_name, profile):
         fail("F407 explicit PLL48 ownership must be boolean")
     p["pll_enabled"] = p["sysclk_source"] == "pll" or p["pll48"]
     source, m, n = p["input_hz"], p["pll_m"], p["pll_n"]
+    auxiliary = (_pll_sai(source, p.pop("pll_sai"))
+                 if "pll_sai" in p else None)
     if not 1000000 * m <= source <= 2000000 * m:
         fail("F407 PLL input must be in 1..2 MHz")
     if not 192000000 * m <= source * n <= 432000000 * m:
@@ -116,11 +160,10 @@ def plan(profile_name, profile):
                                    minimum_hz=0, maximum_hz=0)
     return dict(profile=profile_name, input=domain(p["source"], source),
                 domains={key: domain(key, hz) for key, hz in domains.items()},
-                parameters=p,
-                reviewed_revision_ids=(0x1001, 0x1003, 0x1007, 0x100F, 0x101F),
-                provenance=("RM0090 Rev22 shared RCC; DS8626 Rev12 and "
-                            "DS8597 Rev10 group clock/Flash limits; "
-                            "ES0182 Rev19 software audit with constraints"),
+                parameters=p, pll_sai=auxiliary,
+                reviewed_revision_ids=(),
+                provenance=("Selected STM32F4 static RCC plan; exact document/cut "
+                            "scope is bound by the selected device review"),
                 physical_qualified=False)
 
 
@@ -142,11 +185,11 @@ def projection(selected):
 
 def controller_hz(result, controller):
     """Derive a selected peripheral clock from the one resolved plan."""
-    if controller in {"USART1", "USART6", "SPI1", "ADC1", "ADC2", "ADC3"}:
+    if controller in {"USART1", "USART6", "SPI1", "ADC1", "ADC2", "ADC3", "SAI1"}:
         return result.clock["apb2_hz"]
     if controller.startswith("TIM"):
         return result.clock_plan.domains[timer_domain(controller)].nominal_hz
-    if (controller in {"ETH", "CRC", "FSMC", "DCMI"} or
+    if (controller in {"ETH", "CRC", "FSMC", "FMC", "DCMI"} or
             controller.startswith("GPIO")):
         return result.clock["core_hz"]
     if controller == "OTG_HS":
@@ -173,6 +216,7 @@ def header_lines(result):
     """Emit constants, never hardware algorithms or a second runtime owner."""
     selected = result.clock_plan
     p = selected.parameters
+    auxiliary = selected.pll_sai
     lines = [f"#define NEXUS_{key.upper()}_HZ {value.nominal_hz}u"
              for key, value in selected.domains.items() if key != "core"]
     for field in ("pll_m", "pll_n", "pll_p", "pll_q"):
@@ -181,6 +225,23 @@ def header_lines(result):
     for key in ("pllcfgr", "cfgr", "ahb_div", "adc_div", "css", "sw",
                 "pll_enabled"):
         lines.append(f"#define NEXUS_CLOCK_{key.upper()} {int(p[key])}u")
+    lines.append(f"#define NEXUS_CLOCK_PLLSAI_ENABLED {int(auxiliary is not None)}u")
+    for name in ("sai1", "ltdc"):
+        enabled = auxiliary is not None and getattr(auxiliary, name) is not None
+        lines.append(f"#define NEXUS_CLOCK_PLLSAI_{name.upper()}_ENABLED {int(enabled)}u")
+    if auxiliary is not None:
+        for macro, value in (("M", auxiliary.m), ("N", auxiliary.n)):
+            lines.append(f"#define NEXUS_CLOCK_PLLSAI_{macro} {value}u")
+        if auxiliary.sai1 is not None:
+            q = auxiliary.sai1
+            for macro, value in (("Q", q.q), ("DIVQ", q.post_divider),
+                                 ("SAI1_HZ", q.kernel_hz)):
+                lines.append(f"#define NEXUS_CLOCK_PLLSAI_{macro} {value}u")
+        if auxiliary.ltdc is not None:
+            r = auxiliary.ltdc
+            for macro, value in (("R", r.r), ("DIVR", r.post_divider),
+                                 ("LTDC_HZ", r.pixel_hz)):
+                lines.append(f"#define NEXUS_CLOCK_PLLSAI_{macro} {value}u")
     lines += [f"#define NEXUS_FLASH_WAIT_STATES {p['flash_wait_states']}u",
               "#ifndef NEXUS_CLOCK_SOURCE_HSE",
               f"#define NEXUS_CLOCK_SOURCE_HSE {int(p['source'] == 'hse')}u",
@@ -208,6 +269,19 @@ def _sdio_divider(selected, width, minimum_divisor):
 def validate_consumers(selected, controllers):
     """Reject impossible selected consumers before generating an image."""
     domain = lambda name: selected["domains"][name]["nominal_hz"]
+    auxiliary = selected.get("pll_sai")
+    sai_master = any(item.kind == "audio" and item.controller == "SAI1" and
+                     item.mode.startswith("master-") for item in controllers)
+    ltdc = any(item.kind == "display" and item.controller == "LTDC" and
+               item.mode == "rgb-scanout" for item in controllers)
+    if auxiliary is not None and auxiliary["sai1"] is not None and not sai_master:
+        fail("PLLSAI Q requires its explicitly selected SAI1 master consumer")
+    if sai_master and (auxiliary is None or auxiliary["sai1"] is None):
+        fail("SAI1 master requires the one declared System PLLSAI Q plan")
+    if auxiliary is not None and auxiliary["ltdc"] is not None and not ltdc:
+        fail("PLLSAI R requires its explicitly selected LTDC consumer")
+    if ltdc and (auxiliary is None or auxiliary["ltdc"] is None):
+        fail("LTDC requires the one declared System PLLSAI R plan")
     for item in controllers:
         if item.kind in {"eth", "eth_frames"} and domain("core") < 25000000:
             fail("F407 Ethernet requires an AHB clock of at least 25 MHz")

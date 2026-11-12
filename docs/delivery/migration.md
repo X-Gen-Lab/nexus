@@ -30,6 +30,13 @@ register 类型。SPI／I2C controller 和子设备 endpoint 分开获取，cont
 停机执行 `nx_platform_stop()`；BUSY／QUARANTINED 时保持状态和所有借用存储。
 在 start 前可以保存 face；在成功 stop 后 face 的身份不变，provider 拒绝操作。
 
+当前 factory／source interface epoch 为 2，`0.2.1` 仍为按精确提交消费的开发快照。
+ADC group 的直接 `request.frames` 访问迁为 `request.output.frames`；优先使用
+`nx_adc_group_prepare()` 设置 RAW 视图，paired 结果由独立 prepare 入口建立。
+旧 epoch 1 不作为兼容 fallback，全部调用者、生成代码和 provider 必须一起重编。
+具体字段与借用步骤见[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-2)，
+代际、manifest 和拒绝规则见[源码兼容性合同](../design/source-compatibility.md)。
+
 请求迁移必须同时更新所有权：prepare 不意味着 accepted，cancel 不意味着 settled。
 接受后保持 request 与 payload，到 acquire-observed SETTLED 才能复用。共享 owner
 的控制 handle 持有稳定 slot+epoch；不能用一个旧 request 指针取消新 operation。
@@ -40,6 +47,7 @@ OS storage 使用真实每对象 stack/TCB/depth。任务 entry 返回不等于�
 join 成功后才回收。超时保持 handle、stack 和 TCB。持久化实例拥有外部 workspace；
 mutating I/O 失败后 reopen 确认 generation，不能凭错误结果推断 commit 未发生。
 
-迁移验收依次为：严格输入负路径、Native/model 行为、独立源码 SDK 消费、六基础
-ARM ELF、精确预算、离线双构建与候选封存；最后按实际 PCB 和接线执行 HIL。
+迁移验收覆盖严格输入负路径、Native/model 行为、维护计划中的精确 ARM ELF 与预算、
+完整本地门禁及同源软件候选。可发布 SDK 必须从 clean commit 导出，再验证完整消费
+计划；最后按实际 PCB 和接线另行执行 HIL。
 外部 `nexus-examples` 是独立示例仓库，平台 CI 不把产品应用加入平台默认目标。

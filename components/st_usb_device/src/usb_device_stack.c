@@ -602,8 +602,13 @@ nx_result_t nx_st_usb_device_stack_step(nx_st_usb_device_stack_t* state) {
                     if (state->config->slots[i].endpoint->number == 0U)
                         state->config->slots[i].stalled = false;
                 setup_bytes(&event.setup, bytes);
-                if (result == NX_SUCCESS)
+                if (result == NX_SUCCESS) {
+                    /* A new SETUP may abort an earlier SET/CLEAR_FEATURE.
+                     * Core's eager intent cannot replace the DCD's ACK. */
+                    state->middleware.dev_remote_wakeup =
+                        state->latest.remote_wakeup_enabled ? 1U : 0U;
                     core = USBD_LL_SetupStage(&state->middleware, bytes);
+                }
             } else if (event.kind == NX_USB_EVENT_RESET) {
                 state->epoch = state->latest.epoch;
                 core = USBD_LL_Reset(&state->middleware);

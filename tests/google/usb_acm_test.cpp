@@ -55,8 +55,8 @@ nx_result_t Stop(void* context) {
 }
 const nx_usb_setup_decision_ops_t decision_ops{Reject};
 const nx_usb_endpoint_ops_t endpoint_ops{Submit, Cancel, Stall};
-const nx_usb_device_ops_t device_ops{Service, nullptr, State,
-                                     nullptr, nullptr, Stop};
+const nx_usb_device_ops_t device_ops{Service, nullptr, State,   nullptr,
+                                     nullptr, Stop,    nullptr, nullptr};
 
 class UsbAcm : public testing::Test {
   protected:

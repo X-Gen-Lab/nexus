@@ -27,16 +27,16 @@ class FactReferenceContractTests(unittest.TestCase):
                 before = copy.deepcopy(data)
                 self.assertEqual(fact_references.validate(data, variants), data)
                 self.assertEqual(data, before)
-                self.assertEqual(data["errata_review"]["status"],
+                self.assertEqual(fact_references.select_review(data, "stm32f407")["status"],
                                  "software_audited_with_constraints")
                 self.assertEqual(
-                    data["errata_review"]["hardware_qualification"],
+                    fact_references.select_review(data, "stm32f407")["hardware_qualification"],
                     "not_executed")
 
     def test_software_audit_covers_every_locked_section_cut_and_current_mode(self):
         data, variants = self.references()
         fact_references.validate(data, variants)
-        audit = data["errata_review"]["software_audit"]
+        audit = fact_references.select_review(data, "stm32f407")["software_audit"]
         expected = {f"2.{group}.{item}"
                     for group, count in enumerate(
                         (3, 20, 3, 6, 1, 2, 4, 4, 6, 6, 9, 7, 1, 6, 2, 12), 1)
@@ -47,19 +47,51 @@ class FactReferenceContractTests(unittest.TestCase):
                          audit["revision_order"])
         self.assertEqual(sorted(f"{kind}:{mode}"
                                 for kind, mode in stm32f4._MODE_IMPLEMENTATIONS),
-                         audit["maintained_modes"])
+                         sorted({mode for review in data["device_reviews"]
+                                 for mode in review["software_audit"]["maintained_modes"]}))
         self.assertEqual(data["documents"]["es0182"]["sha256"],
                          audit["document_sha256"])
-        for row in audit["items"]:
-            for name in row["implementation"] + row["regressions"]:
-                with self.subTest(section=row["section"], source=name):
-                    self.assertTrue((gate.ROOT / name).is_file())
+        for review in data["device_reviews"]:
+            for row in review["software_audit"]["items"]:
+                for name in row["implementation"] + row["regressions"]:
+                    with self.subTest(section=row["section"], source=name):
+                        self.assertTrue((gate.ROOT / name).is_file())
+
+    def test_f479_fmc_keeps_the_official_not_present_revision_entry(self):
+        data, _ = self.references()
+        audit = fact_references.select_review(data, "stm32f479")["software_audit"]
+        profile = fact_references.reference_profiles.select(audit["profile"])
+        rows = {row["section"]: row for row in audit["items"]}
+        # Locked ES0321 Rev14 Table3 marks 2.3.1 N for both A and1.
+        self.assertEqual(profile.applicability["2.3.1"], "NN")
+        self.assertEqual(rows["2.3.1"]["revisions"], "NN")
+        for section in ("2.3.2", "2.3.3", "2.3.4"):
+            self.assertEqual(profile.applicability[section], "AA")
+            self.assertEqual(rows[section]["revisions"], "AA")
+
+    def test_f479_indirect_qspi_keeps_partial_revision_and_aperture_duties(self):
+        data, variants = self.references()
+        audit = fact_references.select_review(data, "stm32f479")["software_audit"]
+        profile = fact_references.reference_profiles.select(audit["profile"])
+        rows = {row["section"]: row for row in audit["items"]}
+        # ES0321 Rev14 Table3 distinguishes the two partially applicable items.
+        for number in range(1, 6):
+            section = f"2.4.{number}"
+            expected = "PP" if number >= 4 else "AA"
+            self.assertEqual(profile.applicability[section], expected)
+            self.assertEqual(rows[section]["revisions"], expected)
+        self.assertEqual(rows["2.4.5"]["assessment"], "external_constraint")
+        self.assertIn("0x90000000", rows["2.4.5"]["handling"])
+        self.assertIn("debug", rows["2.4.5"]["handling"])
+        self.assertIn("external_bus:qspi-indirect-sdr", profile.mode_scope)
+        self.assertIn("flash_async:nor-indirect", profile.mode_scope)
+        fact_references.validate(data, variants)
 
     def test_audit_rejects_missing_duplicate_foreign_or_unassessed_items(self):
         for mutation in ("missing", "duplicate", "foreign", "unassessed"):
             with self.subTest(mutation=mutation):
                 data, variants = self.references()
-                items = data["errata_review"]["software_audit"]["items"]
+                items = fact_references.select_review(data, "stm32f407")["software_audit"]["items"]
                 if mutation == "missing":
                     items.pop()
                 elif mutation == "duplicate":
@@ -81,13 +113,13 @@ class FactReferenceContractTests(unittest.TestCase):
         for field, value in changes:
             with self.subTest(field=field, value=value):
                 data, variants = self.references()
-                data["errata_review"]["software_audit"]["items"][0][field] = value
+                fact_references.select_review(data, "stm32f407")["software_audit"]["items"][0][field] = value
                 with self.assertRaisesRegex(ValueError, "audit"):
                     fact_references.validate(data, variants)
 
     def test_unknown_fields_cannot_invent_workaround_or_document_scope(self):
         for path in ((), ("documents", "ds8626"), ("package_review", 0),
-                     ("errata_review",)):
+                     ("device_reviews", 0)):
             with self.subTest(path=path):
                 data, variants = self.references()
                 node = data
@@ -148,7 +180,7 @@ class FactReferenceContractTests(unittest.TestCase):
                              ("hardware_qualification", "passed")):
             with self.subTest(field=field):
                 data, variants = self.references()
-                data["errata_review"][field] = value
+                fact_references.select_review(data, "stm32f407")[field] = value
                 with self.assertRaisesRegex(ValueError, "qualification|scope"):
                     fact_references.validate(data, variants)
 
@@ -181,15 +213,47 @@ class FactReferenceContractTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     fact_references.validate(data, variants)
 
+    def test_device_reviews_are_disjoint_complete_and_bound_to_their_manual(self):
+        for change in ("overlap", "missing", "manual"):
+            with self.subTest(change=change):
+                data, variants = self.references()
+                if change == "overlap":
+                    data["device_reviews"].append(copy.deepcopy(data["device_reviews"][0]))
+                elif change == "missing":
+                    data["device_reviews"][0]["devices"].pop()
+                else:
+                    data["device_reviews"][-1]["manual"] = "rm0090"
+                with self.assertRaisesRegex(ValueError, "disjoint|cover|group"):
+                    fact_references.validate(data, variants)
+
+    def test_initial_slice_cannot_declare_or_select_another_reviewed_mode(self):
+        from types import SimpleNamespace
+        data, variants = self.references()
+        for index, review in enumerate(data["device_reviews"]):
+            if review["software_audit"]["profile"] == "es0182-rev19":
+                continue
+            with self.subTest(devices=review["devices"]):
+                changed = copy.deepcopy(data)
+                changed["device_reviews"][index]["software_audit"]["maintained_modes"].append(
+                    "uart:irq-byte-event")
+                with self.assertRaisesRegex(ValueError, "mode scope"):
+                    fact_references.validate(changed, variants)
+                with self.assertRaisesRegex(ValueError, "reviewed mode"):
+                    fact_references.admit_selection(review,
+                        (SimpleNamespace(kind="uart", mode="irq-byte-event"),),
+                        "baremetal")
+                with self.assertRaisesRegex(ValueError, "reviewed backend"):
+                    fact_references.admit_selection(review, (), "freertos")
+
     def test_current_audit_requires_its_explicit_review_profile(self):
         data, variants = self.references()
-        data["errata_review"]["software_audit"].pop("profile", None)
+        fact_references.select_review(data, "stm32f407")["software_audit"].pop("profile", None)
         with self.assertRaisesRegex(ValueError, "profile"):
             fact_references.validate(data, variants)
 
     def test_named_profile_binds_the_complete_locked_document(self):
         data, variants = self.references()
-        audit = data["errata_review"]["software_audit"]
+        audit = fact_references.select_review(data, "stm32f407")["software_audit"]
         audit["profile"] = "es0182-rev19"
         self.assertIs(fact_references.validate(data, variants), data)
         data["documents"]["es0182"]["sha256"] = "a" * 64
@@ -201,7 +265,7 @@ class FactReferenceContractTests(unittest.TestCase):
         for profile in ("es0182-rev20", "../es0182-rev19", False):
             with self.subTest(profile=profile):
                 data, variants = self.references()
-                data["errata_review"]["software_audit"]["profile"] = profile
+                fact_references.select_review(data, "stm32f407")["software_audit"]["profile"] = profile
                 with self.assertRaisesRegex(ValueError, "profile"):
                     fact_references.validate(data, variants)
 

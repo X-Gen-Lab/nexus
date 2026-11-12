@@ -86,7 +86,8 @@ nx_stm32_platform_selected_preflight(const nx_stm32_platform_config_t* config) {
     if (config->exti_lines != 0U &&
         ((EXTI->IMR | EXTI->EMR | EXTI->PR) & config->exti_lines) != 0U)
         return NX_ERROR_BUSY;
-    for (size_t i = 0U; i < 3U; ++i) {
+    for (size_t i = 0U;
+         i < sizeof(config->irq_masks) / sizeof(config->irq_masks[0]); ++i) {
         if (config->irq_masks[i] != 0U &&
             ((NVIC->ISER[i] | NVIC->ISPR[i] | NVIC->IABR[i]) &
              config->irq_masks[i]) != 0U)

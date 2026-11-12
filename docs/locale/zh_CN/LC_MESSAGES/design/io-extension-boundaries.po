@@ -7,11 +7,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 56c8bc7bf0c12b93d0d26a34525612fc8fd853ef9c7a8b6eef03811af0c38b7a\n"
+"X-Nexus-Source-SHA256: 98ef6f0e907dd13530d562ac80152912418d027b88217bf109c8f6fa68ca02e5\n"
 
 #: docs/design/io-extension-boundaries.md:9
-msgid "Optional storage, IPC, frames and F407 handoff"
-msgstr "可选存储、IPC、帧与 F407 跳转交接"
+msgid "Optional storage, cryptography, frames and F4 handoff"
+msgstr "可选存储、密码功能、帧与 F4 跳转交接"
 
 #: docs/design/io-extension-boundaries.md:11
 msgid ""
@@ -62,6 +62,16 @@ msgid ""
 msgstr "公共尺寸、步长与整帧借用；未保留 H743 DMA2D 适配器"
 
 #: docs/design/io-extension-boundaries.md:0
+msgid "Cipher and hash"
+msgstr "加解密与哈希"
+
+#: docs/design/io-extension-boundaries.md:0
+msgid ""
+"F415ZG/F417ZG selected CRYP/HASH owners; explicit byte spans and cleanup"
+", without a key store or protocol policy"
+msgstr "F415ZG/F417ZG 已选 CRYP/HASH 所有者；显式字节范围与清理，不提供密钥库或协议策略"
+
+#: docs/design/io-extension-boundaries.md:0
 msgid "F407 tail handoff"
 msgstr "F407 尾跳转交接"
 
@@ -69,7 +79,7 @@ msgstr "F407 尾跳转交接"
 msgid "Exact baremetal VE/ZG preconditions below; not live RTOS adoption"
 msgstr "以下给出 baremetal VE/ZG 的精确前提；不支持接管运行中的 RTOS"
 
-#: docs/design/io-extension-boundaries.md:23
+#: docs/design/io-extension-boundaries.md:24
 msgid ""
 "Accepted asynchronous operations retain metadata and buffer loans until "
 "acquire-observed SETTLED. Cancel and deadlines request withdrawal; callers "
@@ -80,11 +90,11 @@ msgstr ""
 "异步操作接纳后，保留元数据与缓冲区借用，直到通过 acquire 语义观测到 SETTLED。取消和 deadline "
 "请求退出；调用方继续提供所需服务。排空失败时继续保留存储与恢复责任。复用观察者和控制对象自身的存储前，也必须等待它们退出。"
 
-#: docs/design/io-extension-boundaries.md:28
+#: docs/design/io-extension-boundaries.md:29
 msgid "Mapped ownership and frame storage"
 msgstr "映射所有权与帧存储"
 
-#: docs/design/io-extension-boundaries.md:30
+#: docs/design/io-extension-boundaries.md:31
 msgid ""
 "The mapped owner serializes one writer against all aperture readers. Copying "
 "a token creates no new loan, epochs do not wrap, and a failed final unmap "
@@ -96,7 +106,7 @@ msgstr ""
 "CPU、DMA 或 cache 写入者都不得绕过所选后端。主机 NOR 模型建立的是软件规则，不赋予物理 QSPI、XIP、cache 或 Flash "
 "资格。"
 
-#: docs/design/io-extension-boundaries.md:36
+#: docs/design/io-extension-boundaries.md:37
 msgid ""
 "Frame contracts validate complete storage extents, format and stride. A "
 "format conversion API or generic frame description does not establish an MCU "
@@ -105,11 +115,105 @@ msgid ""
 msgstr ""
 "帧合同验证完整存储范围、格式与步长。格式转换 API 或通用帧描述不能证明存在 MCU 加速器或 Board 接线。存储与执行推进仍由调用方负责。"
 
-#: docs/design/io-extension-boundaries.md:40
+#: docs/design/io-extension-boundaries.md:41
+msgid "Selected F415/F417 cryptographic engines"
+msgstr "已选 F415/F417 密码引擎"
+
+#: docs/design/io-extension-boundaries.md:43
+msgid ""
+"`cipher.h` and `hash.h` expose separate two-pointer interfaces with shar"
+"ed read-only operations. The typed factory returns statically selected o"
+"bjects; neither lookup nor query acquires clocks or starts hardware. The"
+" F415ZG and F417ZG [software references](https://github.com/X-Gen-Lab/ne"
+"xus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/stm32f4_crypto/f415z"
+"g.toml) select the existing `irq-blocks` mode. F405/F407 do not acquire "
+"these engines merely because the same vendor family library contains the"
+"ir implementation."
+msgstr ""
+"`cipher.h` 与 `hash.h` 提供相互独立、各含两个指针的接口，并共享只读操作表。强类型 factory 返回静态选定的对象；查找"
+"和查询都不会取得时钟或启动硬件。F415ZG 与 F417ZG 的[软件参考](https://github.com/X-Gen-Lab/nex"
+"us/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/stm32f4_crypto/f415zg"
+".toml)选择现有 `irq-blocks` 模式。F405/F407 不会仅因同一厂商系列库包含其实现，就取得这些引擎。"
+
+#: docs/design/io-extension-boundaries.md:50
+msgid ""
+"CRYP supplies AES ECB/CBC/CTR and DES/TDES ECB/CBC. Query reports the ac"
+"tual key sizes, alignment, request granularity and in-place support. Thi"
+"s provider requires whole blocks, including CTR; the public interface pe"
+"rmits future providers to report byte-tail support without changing the "
+"ownership contract. Keys and IVs use algorithm byte order rather than ve"
+"ndor word types. The platform does not generate IVs, pad messages, authe"
+"nticate ciphertext or select product algorithms. SHA1, MD5 and their HMA"
+"C variants describe the capabilities of this HASH IP; they do not imply "
+"SHA256, AEAD or a TLS acceleration binding."
+msgstr ""
+"CRYP 提供 AES ECB/CBC/CTR 和 DES/TDES ECB/CBC。查询报告实际密钥长度、对齐、请求粒度和原位操作支持。此 p"
+"rovider 要求完整数据块，CTR 也不例外；公共接口允许未来 provider 在不改变所有权合同的前提下，报告对不足整块尾部字节的支持。"
+"密钥和 IV 使用算法规定的字节顺序，不使用厂商的字类型。平台不生成 IV、不填充消息、不认证密文，也不选择产品算法。SHA1、MD5 及其 H"
+"MAC 变体描述的是该 HASH IP 的能力；不表示支持 SHA256、AEAD 或 TLS 加速绑定。"
+
+#: docs/design/io-extension-boundaries.md:59
+msgid ""
+"One privileged task serializes each engine. ACCEPTED borrows the request"
+" and every referenced input, output, key and IV until acquire-observed S"
+"ETTLED. Inputs cannot overlap mutable request, provider or System storag"
+"e; output cannot overwrite key/IV or partially overlap input. Cipher fai"
+"lures can leave an explicitly counted output prefix. A digest is valid o"
+"nly on SUCCESS. Cancel and deadline select a terminal cause; neither rel"
+"eases the loan early."
+msgstr ""
+"每个引擎由一个特权任务串行驱动。ACCEPTED 后，请求及其引用的每个输入、输出、密钥和 IV 都保持借用，直到通过 acquire 语义观测"
+"到 SETTLED。输入不能与可变请求、provider 或 System 存储重叠；输出不能覆盖密钥/IV，也不能与输入部分重叠。加解密失败时"
+"，可能留下明确计数的输出前缀。仅在 SUCCESS 时摘要才有效。取消和 deadline 只选择终止原因，均不会提前释放借用。"
+
+#: docs/design/io-extension-boundaries.md:66
+msgid ""
+"CRYP uses the official HAL interrupt transport. HASH uses official initi"
+"alization and a bounded C FIFO protocol because the selected HAL transpo"
+"rt assumes padded word reads and can wait while advancing HMAC phases. E"
+"ach service call reads only bytes inside the declared spans; a partial f"
+"inal word is assembled locally. HMAC needs explicit task service between"
+" phases, even when no final-digest IRQ has arrived. There is no full-mes"
+"sage copy, queue or implicit worker."
+msgstr ""
+"CRYP 使用官方 HAL 中断传输。HASH 使用官方初始化与有界 C FIFO 协议，因为所选 HAL 传输假定可读取填充后的整字，并可能在"
+"推进 HMAC 阶段时等待。每次 service 调用仅读取声明范围内的字节；最后不足一字的数据在本地组装。HMAC 在各阶段之间需要显式任务侧"
+" service，即使最终摘要 IRQ 尚未到达也如此。没有整条消息复制、队列或隐式 worker。"
+
+#: docs/design/io-extension-boundaries.md:73
+msgid ""
+"Every terminal path withdraws IRQ and peripheral references, clears prov"
+"ider scratch and HAL pointers, and proves the exclusive hardware reset t"
+"hat removes key, context and FIFO residue. A refused reset or withdrawal"
+" retains QUARANTINED storage for recovery. Caller-owned key bytes are no"
+"t erased by the provider. CRYP owns IRQ79; HASH owns only its source on "
+"shared HASH/RNG IRQ80. The currently selected RNG path polls, and a futu"
+"re IRQ RNG transport must join the same vector owner rather than indepen"
+"dently disable or clear it."
+msgstr ""
+"每条终止路径都撤销 IRQ 和外设引用，清除 provider 暂存与 HAL 指针，并证明已完成独占硬件复位，以去除密钥、上下文和 FIFO "
+"残留。若复位或退出被拒绝，则保留 QUARANTINED 存储以供恢复。provider 不擦除调用方持有的密钥字节。CRYP 拥有 IRQ79"
+"；HASH 仅拥有共享 HASH/RNG IRQ80 中属于自己的中断源。当前选定的 RNG 路径使用轮询；未来的 IRQ RNG 传输必须加入"
+"同一向量所有者，不能独立禁用或清除该向量。"
+
+#: docs/design/io-extension-boundaries.md:81
+msgid ""
+"Models exercise the real C transport, ownership and failures. ARM refere"
+"nces check exact headers, static factory, linked methods and resource bu"
+"dgets. Neither result establishes silicon known-answer tests, throughput"
+", side-channel properties or physical qualification. Source SDK consumer"
+"s use the same public references and do not gain access to vendor handle"
+"s or private configuration."
+msgstr ""
+"模型验证实际 C 传输、所有权和失败路径。ARM 参考检查精确头文件、静态 factory、链接方法和资源预算。这些结果均不证明在芯片上执行过已"
+"知答案测试，也不证明吞吐量、侧信道特性或物理资格。Source SDK 消费者复用相同公共参考，不能因此取得厂商 Handle 或私有配置的访问"
+"权。"
+
+#: docs/design/io-extension-boundaries.md:87
 msgid "F407 masked tail handoff and clock barrier"
 msgstr "F407 屏蔽中断尾跳与时钟 barrier"
 
-#: docs/design/io-extension-boundaries.md:42
+#: docs/design/io-extension-boundaries.md:89
 msgid ""
 "The F407 handoff component reuses the ClockDomain barrier. Enroll every "
 "actual owner, close admission, cancel/drain/join users, stop Platform and "
@@ -119,7 +223,7 @@ msgstr ""
 "F407 交接组件复用 ClockDomain 屏障。登记每个实际所有者，关闭接纳，取消、排空并等待使用者退出，停止 Platform "
 "并释放精确租约。外来空 domain、过期 epoch 或仍被持有的租约均拒绝；domain 无法发现未登记的使用者或其他主设备。"
 
-#: docs/design/io-extension-boundaries.md:47
+#: docs/design/io-extension-boundaries.md:94
 msgid ""
 "The caller enters privileged MSP Thread with PRIMASK set and BASEPRI, "
 "FAULTMASK and CONTROL clear. It establishes stopped System, HSI16/reset "
@@ -134,7 +238,7 @@ msgstr ""
 "ART/prefetch 关闭的状态。拒绝必须发生在写入之前；读取 SysTick CTRL 会消耗 COUNTFLAG。验证精确 Flash "
 "容量、对齐的向量表、SRAM MSP 和 Thumb PC。共享 device ID 不能证明完整料号或 PCB 身份。"
 
-#: docs/design/io-extension-boundaries.md:54
+#: docs/design/io-extension-boundaries.md:101
 msgid ""
 "Successful tail transfer never returns. It replaces VTOR/MSP and branches "
 "while masked; target startup must accept that entry and reset controllers "
@@ -146,7 +250,7 @@ msgstr ""
 "并跳转；目标启动代码必须接受该入口，并在启用门控前复位控制器。认证、镜像选择、分区、NMI/调试器/其他主设备排除和恢复仍由外部负责。此交接不提供运行中 "
 "RTOS/FPU 接管、DVFS 或深 STOP 连续性。"
 
-#: docs/design/io-extension-boundaries.md:60
+#: docs/design/io-extension-boundaries.md:107
 msgid ""
 "Read the [public API](../reference/api/extension-components.md), [ownership "
 "contract](../explanation/ownership.md) and [current "

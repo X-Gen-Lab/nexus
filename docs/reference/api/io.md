@@ -122,6 +122,14 @@ test interfaces. They establish no MCU discovery or physical support.
 :project: nexus
 ```
 
+(cipher_8h)=
+
+## cipher.h
+
+```{doxygenfile} io/include/nexus/io/cipher.h
+:project: nexus
+```
+
 (crc_8h)=
 
 ## crc.h
@@ -241,6 +249,14 @@ finite positive `maximum_service_gap_us`. Unknown groups stay unknown.
 :project: nexus
 ```
 
+(display_8h)=
+
+## display.h
+
+```{doxygenfile} io/include/nexus/io/display.h
+:project: nexus
+```
+
 (dma_8h)=
 
 ## dma.h
@@ -345,6 +361,14 @@ Platform lifecycle and clock prerequisites. Other retained SDKs do not grant an 
 :project: nexus
 ```
 
+(hash_8h)=
+
+## hash.h
+
+```{doxygenfile} io/include/nexus/io/hash.h
+:project: nexus
+```
+
 (i2c_8h)=
 
 ## i2c.h
@@ -374,6 +398,14 @@ Platform lifecycle and clock prerequisites. Other retained SDKs do not grant an 
 ## i2c_target.h
 
 ```{doxygenfile} io/include/nexus/io/i2c_target.h
+:project: nexus
+```
+
+(image_8h)=
+
+## image.h
+
+```{doxygenfile} io/include/nexus/io/image.h
 :project: nexus
 ```
 

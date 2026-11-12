@@ -234,7 +234,43 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
                               "route": timer + ":" + event + ":ADC1:" + item["mode"],
                               "cross_domain": True})
                 startup.append((adc, trigger))
-            if item["mode"] == "regular-sequence-dma":
+            if item["mode"] == "regular-timer-injected-blocks":
+                source = item["injected"]["trigger"]
+                if adc_injected_triggers is None or source not in adc_injected_triggers:
+                    fail("ADC injected trigger lacks an exact selected event")
+                timer = adc_injected_triggers[source]
+                signal = source.split("-", 1)[1]
+                event = "update" if signal == "trgo" else "compare" + signal[2:]
+                injected = owner + ":injected"
+                pulse = owner + ":injected-trigger"
+                nodes += [{"id": injected, "owner": owner,
+                           "clock_domain": "controller:ADC1",
+                           "events": ["sample-ready"], "actions": ["sample", "stop"],
+                           "stop_actions": ["stop"]},
+                          {"id": pulse, "owner": owner,
+                           "clock_domain": "controller:" + timer,
+                           "events": [event], "actions": ["stop"],
+                           "stop_actions": ["stop"]}]
+                edges.append({"source": pulse, "event": event,
+                              "target": injected, "action": "sample",
+                              "route": timer + ":" + event + ":ADC1:injected",
+                              "cross_domain": True})
+                startup.append((injected, pulse))
+            if item["mode"] == "regular-auto-injected":
+                # JAUTO follows this complete regular sequence, never each CDR
+                # word and never a second independently owned trigger timer.
+                next(node for node in nodes if node["id"] == adc)["events"].append("sequence-complete")
+                injected = owner + ":injected"
+                nodes.append({"id": injected, "owner": owner,
+                              "clock_domain": "controller:ADC1",
+                              "events": ["sample-ready"], "actions": ["sample", "stop"],
+                              "stop_actions": ["stop"]})
+                edges.append({"source": adc, "event": "sequence-complete",
+                              "target": injected, "action": "sample",
+                              "route": "ADC1:regular:JAUTO:injected",
+                              "cross_domain": False})
+                startup.append((injected, adc))
+            if item.get("dma"):
                 dma = owner + ":dma"
                 nodes.append({"id": dma, "owner": owner,
                               "clock_domain": "engine:" + item["dma"][0].split(":")[0],

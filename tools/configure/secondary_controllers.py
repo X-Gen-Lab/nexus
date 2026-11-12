@@ -12,7 +12,9 @@ def validate_soc(soc, provider):
     """Compare independent JSON facts with the selected SDK constructor."""
     for name, expected in getattr(provider, "SECONDARY_FACTS", {}).items():
         item = soc["controllers"].get(name)
-        if item is None or any(
+        if item is None:
+            continue
+        if any(
                 item.get(key) != (list(value) if isinstance(value, tuple)
                                   else value)
                 for key, value in expected.items()):

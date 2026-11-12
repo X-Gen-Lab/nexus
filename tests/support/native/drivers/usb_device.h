@@ -53,6 +53,16 @@ typedef struct {
     bool hold_bulk_pid;
     /** \brief Test-only DMA register offset whose zero writes are refused. */
     uint32_t refused_dma_address_offset;
+    /** \brief External hardware may append SETUP between ordered MMIO reads. */
+    void (*before_read)(void*, uint32_t);
+    void* read_context;
+    /** \brief External Core epoch and RWUSIG store faults for wake tests. */
+    uint64_t time_epoch;
+    nx_time_us_t remote_asserted_at;
+    nx_time_us_t remote_cleared_at;
+    bool hold_remote_assert;
+    bool hold_remote_clear;
+    uint32_t delay_after_remote_assert_us;
 } nx_native_usb_hardware_t;
 typedef struct {
     nx_usb_controller_t controller;

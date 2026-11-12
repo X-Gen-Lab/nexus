@@ -49,7 +49,7 @@ class ResolutionPhaseTests(unittest.TestCase):
         self.assertIsNone(selected.input_path)
         self.assertEqual(selected.layout.origin, self.variant['flash']['origin'])
         self.assertEqual(selected.layout.size, self.variant['flash']['size'])
-        self.assertFalse(hasattr(selected.layout, 'erase_blocks'))
+        self.assertFalse(hasattr(selected.layout, 'erase_spans'))
         with self.assertRaises(FrozenInstanceError):
             selected.layout.size = 0
 
@@ -58,7 +58,7 @@ class ResolutionPhaseTests(unittest.TestCase):
             root = Path(directory)
             physical = self.variant['flash']
             image = {'id': 'image', 'origin': physical['origin'],
-                     'size': physical['erase_blocks'][0], 'kind': 'image'}
+                     'size': physical['erase_spans'][0]['erase_bytes'], 'kind': 'image'}
             path = root / 'layout.json'
             path.write_text(json.dumps({'schema_version': 1,
                                         'regions': [image]}))

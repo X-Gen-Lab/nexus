@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b7bf8ade5b1eccd79875278ad95aee68f94f1da6bc3eb8c04d879f0958e6a280\n"
+"X-Nexus-Source-SHA256: 6c0c7bd875d819345e9fe2d5e347d728c3d859bd6f75b8e69bcff410592d2afa\n"
 
 msgid "Migrate legacy configuration and interface access"
 msgstr "迁移旧配置与接口访问"
@@ -143,8 +143,23 @@ msgstr ""
 "构建独立搬移的 [SDK 消费者](../tutorials/source-sdk.md)，再用锁定编译器链接精确 MCU "
 "配置。保留迁移源码/配置的证据。旧 HAL/OSAL 文档保持历史身份；redirect 不使旧 API 合同等同于新合同。"
 
+msgid "Rebuild for source interface epoch 2"
+msgstr "为源码接口 epoch 2 重新编译"
+
+msgid "The current development snapshot keeps semantic version `0.2.1` and uses factory/source interface epoch `2`. Pin its exact commit, regenerate the bundle and rebuild every caller, public face/ops, generated factory, provider and component with one configuration and toolchain. Current interface admission rejects epoch-1 SDKs; rebuild old headers and objects rather than mixing them into the new application. No stable binary ABI is supplied. A development-fixture opt-in does not relax interface checks. Existing tags are unchanged."
+msgstr "当前开发快照保持语义版本 `0.2.1`，factory／source interface epoch 为 `2`。固定精确提交，重新生成 bundle，并在同一配置和工具链下重编所有调用者、公共 face／ops、生成 factory、provider 和组件。当前接口准入拒绝 epoch 1 SDK；旧头文件和对象必须重编，不能混入新应用。平台不提供稳定二进制 ABI，development-fixture opt-in 也不会放宽接口检查。现有标签不变。"
+
+msgid "For ADC groups, direct `request.frames` access becomes `request.output.frames`. Prefer `nx_adc_group_prepare()` for raw requests: it installs the explicit RAW `results_kind`. Use `nx_adc_group_prepare_results()` for a paired regular/injected result descriptor. Inspect the selected discriminant before reading the union; a raw pointer must never be reinterpreted as a paired descriptor. No compatibility shadow field or runtime layout inference is provided. Request, descriptor and both spans retain one lifetime through acquire-observed SETTLED."
+msgstr "ADC group 的直接 `request.frames` 访问改为 `request.output.frames`。raw 请求优先使用 `nx_adc_group_prepare()`，由它设置明确的 RAW `results_kind`；paired regular／injected descriptor 使用 `nx_adc_group_prepare_results()`。读取 union 前确认所选 discriminant，不能把 raw 指针重新解释成 paired descriptor。不提供兼容影子字段或运行期布局推断。request、descriptor 和两个 span 持续共用一次借用，直到 acquire-observed SETTLED。"
+
+msgid "Discard old generated output and rebuild from the pinned source. The [compatibility contract](../design/source-compatibility.md) defines epoch and manifest admission; a matching semantic version alone does not permit mixing source generations or binary objects."
+msgstr "丢弃旧生成输出，从固定源码重建。[兼容性合同](../design/source-compatibility.md)定义 epoch 与 manifest 准入；仅语义版本相同不允许混用源码代际或二进制对象。"
+
 msgid "Update private source integrations"
 msgstr "更新私有源码接入"
+
+msgid "Production ownership is one `soc/stm32/stm32f4/` package. Exact parts and modes follow the [current support catalogue](../delivery/support.md); obsolete family names are rejected rather than mapped to a replacement. Existing F407 assemblies select `stm32f4` with an exact part. Public C interfaces remain the consumption boundary; added internal-CRC references do not change product wiring."
+msgstr "生产源码归入同一个 `soc/stm32/stm32f4/` 包。精确料号与模式遵循[当前支持目录](../delivery/support.md)；失效系列名直接拒绝，不映射为替代实现。已有 F407 装配以精确料号选择 `stm32f4`。公共 C 接口仍是消费边界；新增内部 CRC 参考不改变产品接线。"
 
 msgid ""
 "Board and SoC trees contain no Python plugins. Current generation is "
@@ -177,6 +192,3 @@ msgid ""
 "physical qualification; no previous candidate transfers to this revision."
 msgstr ""
 "解析真实 assembly，执行完整 provider 合同并构建可搬移消费者。源码移动既不建立新模式，也不赋予物理资格；原候选不能转移到本次修订。"
-
-msgid "Production ownership is one `soc/stm32/stm32f4/` package. Exact parts and modes follow the [current support catalogue](../delivery/support.md); obsolete family names are rejected rather than mapped to a replacement. Existing F407 assemblies select `stm32f4` with an exact part. Public C interfaces remain the consumption boundary; added internal-CRC references do not change product wiring."
-msgstr "生产源码归入同一个 `soc/stm32/stm32f4/` 包。精确料号与模式遵循[当前支持目录](../delivery/support.md)；失效系列名直接拒绝，不映射为替代实现。已有 F407 装配以精确料号选择 `stm32f4`。公共 C 接口仍是消费边界；新增内部 CRC 参考不改变产品接线。"

@@ -1,0 +1,39 @@
+# Software reference only; not a physical Board or executed image.
+schema = 2
+board_package = "f479ni-qspi-board"
+backend = "baremetal"
+clock = "custom"
+optimization = "Os"
+
+[clock_parameters]
+source = "hsi"
+input_hz = 16000000
+sysclk_source = "input"
+pll48 = false
+pll_m = 16
+pll_n = 336
+pll_p = 4
+pll_q = 7
+ahb_div = 1
+apb1_div = 1
+apb2_div = 1
+adc_div = 4
+supply_mv = 3300
+css = false
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 16384
+libc_heap_bytes = 0
+
+# W25Q128JV functional software reference; exact suffix/PCB not selected.
+[external_bus.serial]
+binding = "control"
+mode = "qspi-indirect-sdr"
+
+[flash_async.storage]
+controller = "serial"
+binding = "storage"
+mode = "nor-indirect"
+parameters = { part = "W25Q128JV", prescaler = 1, cs_high_cycles = 2, read_budget_us = 1000, prepare_budget_us = 1000, stop_budget_us = 1000 }

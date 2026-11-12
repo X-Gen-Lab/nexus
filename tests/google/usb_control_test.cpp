@@ -61,8 +61,8 @@ nx_result_t RejectSetup(void* context, uint64_t epoch) {
 }
 const nx_usb_setup_decision_ops_t setup_ops = {RejectSetup};
 const nx_usb_endpoint_ops_t endpoint_ops = {Submit, Cancel, Stall};
-const nx_usb_device_ops_t device_ops = {Service, nullptr, State,
-                                        Address, nullptr, Stop};
+const nx_usb_device_ops_t device_ops = {Service, nullptr, State,   Address,
+                                        nullptr, Stop,    nullptr, nullptr};
 
 class UsbControl : public testing::Test {
   protected:

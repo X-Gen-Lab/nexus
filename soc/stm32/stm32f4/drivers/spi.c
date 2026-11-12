@@ -1,7 +1,9 @@
 /**
  * \file            spi.c
- * \brief           Shared STM32F4 short polling transactions with explicit CS
- * drain \author          Nexus Team \version         1.0.0 \date 2026-10-09
+ * \brief           STM32F4 short-poll SPI transactions and CS drain
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/io/spi_transaction.h"

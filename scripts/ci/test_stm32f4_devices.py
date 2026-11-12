@@ -68,6 +68,19 @@ class STM32F4DeviceProbeTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "unknown|duplicate"):
                     gate.select_profiles(catalog, choices)
 
+    def test_irq_count_and_tail_tamper_are_rejected_by_the_actual_sdk(self):
+        gate = implementation()
+        catalog = gate.load_catalog(ROOT)
+        row = next(item for item in catalog["devices"]
+                   if item["define"] == "STM32F407xx")
+        row["external_irq_count"] += 1
+        row["last_external_irq"]["number"] += 1
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "catalog.json"
+            path.write_text(json.dumps(catalog))
+            with self.assertRaisesRegex(ValueError, "official header"):
+                gate.load_catalog(ROOT, catalog_path=path)
+
     def test_irq_enum_slot_and_official_vector_are_independent(self):
         gate = implementation()
         catalog = gate.load_catalog(ROOT)

@@ -60,8 +60,8 @@ class ImageLayoutTests(unittest.TestCase):
         self.assertEqual(result.controllers, original.controllers)
         self.assertEqual(result.layout.origin, image["origin"])
         self.assertEqual(result.layout.size, image["size"])
-        self.assertEqual(result.to_dict()["layout"]["erase_blocks"],
-                         list(original.flash["erase_blocks"]))
+        self.assertEqual(result.to_dict()["layout"]["erase_spans"],
+                         original.to_dict()["flash"]["erase_spans"])
         linker = memory.linker(result)
         self.assertIn("ORIGIN = 0x%08x, LENGTH = %d" % (
             image["origin"], image["size"]), linker)
@@ -119,7 +119,7 @@ class ImageLayoutTests(unittest.TestCase):
     def test_image_cannot_extend_beyond_physical_flash(self):
         original = self.baseline("qiming-baremetal-empty.toml")
         image = self.image(original)
-        image["size"] += original.flash["erase_blocks"][-1]
+        image["size"] += original.flash["erase_spans"][-1]["erase_bytes"]
         with self.assertRaisesRegex(configure.ConfigurationError,
                                     "erase boundaries"):
             self.select(

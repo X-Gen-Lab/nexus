@@ -8,6 +8,19 @@
 #include "nexus/io/dma.h"
 #include "nexus/io/i2c.h"
 
+/** \brief Checked storage cannot overwrite or borrow retained control bytes. */
+static inline bool nx_i2c_v1_storage_outside(const void* storage, size_t bytes,
+                                             const void* metadata,
+                                             size_t metadata_bytes) {
+    uintptr_t first = (uintptr_t)storage;
+    uintptr_t second = (uintptr_t)metadata;
+    return storage != NULL && bytes != 0U && metadata != NULL &&
+           metadata_bytes != 0U && bytes <= UINTPTR_MAX - first &&
+           metadata_bytes <= UINTPTR_MAX - second &&
+           (first <= second ? second - first >= bytes
+                            : first - second >= metadata_bytes);
+}
+
 /** \brief Resolve clock counts under the authored nominal SCL maximum.
  * \param[in] mhz: Reviewed nominal whole-MHz PCLK, between 2 and 50.
  * \param[in] maximum_hz: Nonzero nominal SCL ceiling, at most 400 kHz.

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "f479ni-sai-software-reference",
+  "soc": "STM32F479NIH6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "source_a",
+      "controller": "SAI1",
+      "route": "sai1-a-simplex"
+    },
+    {
+      "id": "source_b",
+      "controller": "SAI1",
+      "route": "sai1-b-simplex"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only: no PCB, codec, clock accuracy, physical timing or audio qualification",
+    "The authored3.3V and external slave SCK ceiling are software assumptions, not observations"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f479ni.pdf",
+      "scope": "Reviewed exact SAI1 package/AF6 pads only; no PCB connection inferred"
+    },
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/rm0386-stm32f469xx-and-stm32f479xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "scope": "Reviewed SAI1 A/B and DMA2 request routes; no hardware execution"
+    }
+  ]
+}

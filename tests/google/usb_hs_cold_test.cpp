@@ -9,8 +9,12 @@
 extern "C" {
 #include "nexus/io/native/model.h"
 #include "stm32f407_clock.h"
+#include "stm32f407_system.h"
 #include "stm32f407_usb_hs_cold.h"
 #include "usb_device.h"
+}
+extern "C" {
+nx_stm32_system_t g_nx_stm32_system;
 }
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -55,6 +59,7 @@ class UsbHsCold : public testing::Test {
   protected:
     NiceMock<HsPads> pads;
     nx_usb_controller_t controller = {};
+    nx_usb_remote_runtime_t remote_runtime = {};
     nx_stm32_usb_hs_clock_state_t clock = {};
     nx_usb_endpoint_t endpoints[4] = {};
     nx_usb_event_t events[2] = {};
@@ -82,8 +87,8 @@ class UsbHsCold : public testing::Test {
                        MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0),
                   MAP_FAILED);
         for (size_t i = 0U; i < 4U; ++i)
-            staging[i] = {reinterpret_cast<uint8_t*>(0x20000000U + i * 64U),
-                          64U};
+            staging[i] = {reinterpret_cast<uint8_t*>(0x20000000U + i * 128U),
+                          128U};
         hardware = reinterpret_cast<nx_native_usb_hardware_t*>(0x40040000U);
         hardware->endpoint_numbers = 6U;
         hardware->registers[0x10U / 4U] = 1U << 31U;
@@ -204,6 +209,118 @@ TEST_F(UsbHsCold, DmaColdPlanBindsStaticStorageBeforeTransportAcquisition) {
     EXPECT_TRUE(controller.dma);
     EXPECT_EQ(controller.dma_storage, staging);
     EXPECT_EQ(controller.dma_regions, &region);
-    EXPECT_EQ(hardware->registers[0xB14U / 4U], 0x20000040U);
+    EXPECT_EQ(hardware->registers[0xB14U / 4U], 0x20000080U);
     EXPECT_NE(hardware->registers[8U / 4U] & (1U << 5U), 0U);
+}
+TEST_F(UsbHsCold, SelectedRemoteRuntimeIsInstalledWithoutASecondOwner) {
+    config.remote = &remote_runtime;
+    ASSERT_EQ(nx_stm32_usb_hs_cold_prepare(&controller, &config, &receipt),
+              NX_SUCCESS);
+    EXPECT_EQ(controller.remote, &remote_runtime);
+    EXPECT_EQ(remote_runtime.request, nullptr);
+    EXPECT_EQ(clock.consumers, 1U);
+}
+TEST_F(UsbHsCold, RemoteRuntimeAliasesRejectBeforeSnapshotsOrPinEffects) {
+    for (auto* alias : {reinterpret_cast<nx_usb_remote_runtime_t*>(&controller),
+                        reinterpret_cast<nx_usb_remote_runtime_t*>(saved)}) {
+        SCOPED_TRACE(alias == reinterpret_cast<void*>(&controller)
+                         ? "controller overwritten by cold assembly"
+                         : "nested pin snapshot overwritten at acquisition");
+        config.remote = alias;
+        EXPECT_CALL(pads, Clock(_)).Times(0);
+        EXPECT_CALL(pads, Configure(_)).Times(0);
+        EXPECT_EQ(nx_stm32_usb_hs_cold_prepare(&controller, &config, &receipt),
+                  NX_ERROR_INVALID);
+        EXPECT_FALSE(controller.snapshot.started);
+        testing::Mock::VerifyAndClearExpectations(&pads);
+        if (receipt.config != nullptr) {
+            EXPECT_EQ(
+                nx_stm32_usb_hs_cold_close(&controller, &config, &receipt),
+                NX_SUCCESS);
+        }
+    }
+}
+TEST_F(UsbHsCold, FsColdInstallsRuntimeAndNeverConvertsFiniteCleanupToNever) {
+    auto* fs = static_cast<nx_native_usb_hardware_t*>(mmap(
+        reinterpret_cast<void*>(0x50000000U), 0x20000U, PROT_READ | PROT_WRITE,
+        MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0));
+    ASSERT_NE(fs, MAP_FAILED);
+    fs->registers[0x10U / 4U] = 1U << 31U;
+    nx_usb_controller_t selected{};
+    nx_stm32_usb_clock_state_t fs_clock{};
+    nx_usb_remote_runtime_t runtime{};
+    uint8_t leases = 0U;
+    nx_stm32_platform_pin_config_t fs_pins[] = {{GPIOA, &saved[0], 0U, 11U},
+                                                {GPIOA, &saved[1], 0U, 12U}};
+    nx_stm32_usb_cold_config_t cfg{};
+    cfg.clock = &fs_clock;
+    cfg.pins = fs_pins;
+    cfg.endpoints = endpoints;
+    cfg.plan = plan;
+    cfg.events = events;
+    cfg.endpoint_count = 4U;
+    cfg.capacity = 2U;
+    cfg.irq_policy = config.irq_policy;
+    cfg.poll_limit = config.poll_limit;
+    cfg.drain_timeout_us = config.drain_timeout_us;
+    cfg.clock_timeout_us = config.clock_timeout_us;
+    cfg.rx_fifo_words = config.rx_fifo_words;
+    cfg.priority = config.priority;
+    cfg.remote = &runtime;
+    struct Cleanup {
+        nx_usb_controller_t* port;
+        const nx_stm32_usb_cold_config_t* config;
+        uint8_t* leases;
+        ~Cleanup() {
+            if (port->snapshot.started || *leases != 0U ||
+                config->clock->phase != 0U) {
+                (void)nx_stm32_usb_cold_close(port, config, leases);
+                /* Failure evidence remains failed. This bounded fixture
+                 * recovery closes an idle clock without inventing a future
+                 * deadline, then restores the captured pad values. */
+                (void)nx_stm32_usb_clock_stop(config->clock, nx_time_now_us());
+                for (size_t i = 2U; i != 0U; --i)
+                    if ((*leases & (1U << (i - 1U))) != 0U)
+                        (void)nx_stm32_packet_pin_close(&config->pins[i - 1U]);
+            }
+            EXPECT_EQ(munmap(reinterpret_cast<void*>(0x50000000U), 0x20000U),
+                      0);
+        }
+    } cleanup{&selected, &cfg, &leases};
+    cfg.remote = reinterpret_cast<nx_usb_remote_runtime_t*>(&selected);
+    EXPECT_CALL(pads, Clock(_)).Times(0);
+    EXPECT_CALL(pads, Configure(_)).Times(0);
+    EXPECT_EQ(nx_stm32_usb_cold_prepare(&selected, &cfg, &leases),
+              NX_ERROR_INVALID);
+    testing::Mock::VerifyAndClearExpectations(&pads);
+    if (leases != 0U || selected.snapshot.started) {
+        EXPECT_EQ(nx_stm32_usb_cold_close(&selected, &cfg, &leases),
+                  NX_SUCCESS);
+    }
+    cfg.remote = &runtime;
+    ASSERT_EQ(nx_stm32_usb_cold_prepare(&selected, &cfg, &leases), NX_SUCCESS);
+    EXPECT_EQ(selected.remote, &runtime);
+    EXPECT_EQ(fs_clock.consumers, 1U);
+    ASSERT_EQ(nx_native_clock_advance(UINT64_MAX - 1U - nx_time_now_us()),
+              NX_SUCCESS);
+    const nx_result_t closed =
+        nx_stm32_usb_cold_close(&selected, &cfg, &leases);
+    EXPECT_EQ(closed, NX_SUCCESS);
+    EXPECT_EQ(leases, 0U);
+    EXPECT_EQ(fs_clock.phase, 0U);
+    EXPECT_EQ(fs_clock.consumers, 0U);
+    if (closed != NX_SUCCESS) {
+        ASSERT_EQ(nx_stm32_usb_clock_stop(&fs_clock, nx_time_now_us()),
+                  NX_SUCCESS);
+        for (size_t i = 2U; i != 0U; --i) {
+            ASSERT_EQ(nx_stm32_packet_pin_close(&fs_pins[i - 1U]), NX_SUCCESS);
+            leases &= static_cast<uint8_t>(~(1U << (i - 1U)));
+        }
+    }
+    EXPECT_CALL(pads, Clock(_)).Times(0);
+    EXPECT_CALL(pads, Configure(_)).Times(0);
+    EXPECT_EQ(nx_stm32_usb_cold_prepare(&selected, &cfg, &leases),
+              NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(leases, 0U);
+    testing::Mock::VerifyAndClearExpectations(&pads);
 }

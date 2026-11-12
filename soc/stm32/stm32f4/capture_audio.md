@@ -1,8 +1,10 @@
-# F407 DCMI 与 I2S2／3
+# STM32F4 DCMI、I2S2／3 与 SAI1
 
-这里记录 `capture.c`、`audio.c`、`audio_blocks.c` 和同源静态装配的合同。芯片 AF 路线来自
-DS8626 Rev12；寄存器、DMA 与关闭时序来自 RM0090 Rev22。软件参考限定
-STM32F407VE／ZG，不代表摄像头、codec、PCB 接线、电气时序或物理 HIL 已执行。
+这里记录 `capture.c`、`audio.c`、`audio_blocks.c`、`audio_sai.c` 与同源静态装配的合同。
+F407 DCMI／I2S 的 AF 路线来自 DS8626 Rev12，寄存器、DMA 与关闭时序来自 RM0090 Rev22，
+精确软件参考为 STM32F407VET6／ZGT6。SAI1 另外限定 STM32F446ZET6 与
+STM32F479NIH6，分别依据 DS10693 Rev11／RM0390 Rev9、DS11118 Rev8／RM0386 Rev6。
+这些软件范围不表示摄像头、codec、PCB 接线、电气时序或物理 HIL 已执行。
 
 静态配置、资源责任与公共调用边界参见共享图示。
 
@@ -12,7 +14,8 @@ STM32F407VE／ZG，不代表摄像头、codec、PCB 接线、电气时序或物�
 
 图示区分构建输入与运行期调用，不表示吞吐保证。factory 只返回已有
 `nx_capture_t` 或 `nx_audio_t`。Platform prepare 取得资源并配置格式，不启动
-CAPTURE、I2SE 或一次 DMA 传输；应用通过公共 face 提交请求或启动 RAW blocks。
+CAPTURE、I2SE、SAIEN 或一次 DMA 传输；应用通过公共 face 提交有限请求、启动 RAW／JPEG
+storage blocks 或 CM1 帧会话。
 Platform close 调用同一个 C owner 排空，失败会阻止 System 退出，保留全部借用和
 精确清理责任。没有 heap、运行时名字注册表、默认 buffer pool 或后台任务。
 
@@ -23,7 +26,8 @@ DCMI 的 stream、slot 表、request／RAW frame 控制及每个 payload 的完�
 
 ## DCMI 输入与模式
 
-`capture` 有 `snapshot-raw`、`snapshot-jpeg` 和 `raw-blocks` 三种装配模式。
+`capture` 选择 `snapshot-raw`、`snapshot-jpeg`、`raw-blocks`、`jpeg-blocks`、`frames-raw`
+或 `frames-jpeg`；后两种是有限 CM1 快照会话，不能解释为无缝连续图像。
 8-bit RAW 每四个输入样本存入一个 32-bit DMA word；10／12／14-bit RAW 的每个样本
 占一个 16-bit 容器，有效数据在低位，不是紧密位打包。VE 最多选择 12-bit；14-bit
 需要 ZG 的 PF11／PG15。所有路线 AF13，D0–D7 为
@@ -57,24 +61,43 @@ P2M peripheral port→SRAM memory port 没有选择上述外部 FIFO／GPIO 写�
 
 JPEG 使用普通 stream，`raw_frame=NULL`。正常短图不会触发 DMA TC：FRAME 到达后
 等待 CAPTURE 退出和 DCMI FIFO 排空，再停止 DMA，观察稳定 NDTR。返回的
-`base.transferred` 和 block length 是已存储的 32-bit word 前缀，包含最后一字中的
-硬件补零，绝不等于 JPEG 有效 codestream 字节数。应用自行解析 SOI／EOI／长度。
+`base.transferred` 和 block length 以字节计，表示按 32-bit word 对齐的已存储前缀，
+包含最后一字中的硬件补零，绝不等于 JPEG 有效 codestream 字节数。应用自行解析
+SOI／EOI／长度。
 RAW 和 JPEG 每次 snapshot 的存储上界为 65535 个 DMA words，且须完整位于已审
-DMA 可达域；CCM 被排除。大图可用 RAW storage blocks，但这些块没有图像边界保证。
+DMA 可达域；CCM 被排除。大图可用相应的 RAW／JPEG storage blocks，但这些块没有图像边界保证。
 
-snapshot 硬件忽略 FCRC，因此 snapshot 的 `frame_divisor` 只能为 1。连续 RAW 可
+snapshot 硬件忽略 FCRC，因此 snapshot 的 `frame_divisor` 只能为 1。连续 RAW／JPEG 可
 选择 1／2／4，表示输入帧筛选，而非准确输出 N 帧。没有按可合并 FRAME bit 与
 NDTR 推导精确帧数的接口。
 
-## 连续 RAW storage blocks
+## 连续 RAW／JPEG storage blocks
 
 应用给出至少三个等容量、四字节对齐的 stream slots 和明确
 `max_service_gap_us`。owner 用已有 posted producer 借用两个 DMA targets，并在每个
 可信 TC 后取得 replacement、更新非活动 target、再次观察 CT／TC，然后 FIFO
-发布脱离硬件的旧 target。块是连续 RAW 存储片段，不是完整图像或精确帧数。
+发布脱离硬件的旧 target。块是连续存储片段，不是完整图像或精确帧数。
 
-双缓冲 CT 只能观察当前 bank，不能恢复丢失的两次或三次翻转。这里按 PIXCLK 上界、
-8／16-bit 存储宽度和 FIFO 余量检查 block 容量；两次显式 service 的间隔必须在预算内。
+`jpeg-blocks` 明确选择 CM0、8-bit hardware sync 和 JPEG packing，禁止 embedded sync
+或 crop。RM0090 Rev22 §15.5.6 p467 规定每个完整 32-bit word 触发 DMA，帧尾残字补零
+后同样触发 DMA。因此它原样发布存储字，不解析 SOI／EOI，不提供精确 JPEG 字节长或
+帧边界标志；一个 block 可以跨帧并包含 padding。FRAME 不作为完成依据，连续 JPEG
+只启用 DCMI error／overrun IRQ；DMA TC 和两个 bank 的借用交接决定 block 发布。
+selected-contract 的单位为四字节 word；普通 stream 的 block length 仍以字节计，
+且为四的整数倍。
+
+双缓冲 CT 只能观察当前 bank，不能恢复丢失的两次或三次翻转。两次显式 service 的间隔
+必须在 `max_service_gap_us=G` 内。两种 blocks 共用保守准入：容量 `B` 为四字节整数倍，
+每个 bank 不超过 65535 DMA words，并满足 `(B-44)*1000000 > (2*G+2)*R`。
+`R` 的单位为 byte/s：8-bit RAW 使用 `PIXCLK`，10／12／14-bit RAW 使用 `2*PIXCLK`，
+JPEG 使用 `4*PIXCLK`，不能以平均每四拍一个 word 忽略短帧补零。44 B 保守预留一个
+packing word、DCMI 四 word FIFO、DMA 四 word FIFO，以及两个独立 AHB master 各一个
+SINGLE 在途 word；两微秒另覆盖 tick 观察相位。依据是 §15.5.6／7、§15.8.11 的
+packing／FIFO 和 §10.3 的 DMA 双端口；这不是总线吞吐实测。
+
+共用检查收紧了旧 RAW 仅预留 32 B 的过松准入；例如 8-bit RAW 在 1 MHz／10 µs 的 64 B bank
+现在拒绝，68 B 可准入，不静默增加应用 buffer。全部 bank 仍由调用者显式提供。
+
 超预算、CT 歧义、替换期间 bank 切换或没有 replacement 时停止并报告 LOSS，不能
 覆盖 READY／BORROWED。LOSS 只表示确实观察到一次无法继续的边界，不虚构错过的帧数。
 IRQ 只锁存事实，应用必须主动 service，不创建隐式 worker。
@@ -83,6 +106,64 @@ IRQ 只锁存事实，应用必须主动 service，不创建隐式 worker。
 失败保留 request、stream、两个 targets 以及已经取得的第三个 replacement。
 显式 `recover` 先观察 DMA 禁用和 IRQ 排空，再只复位独占的 DCMI；绝不 reset 共享
 DMA2。丢失 clock／reset／System epoch 历史的借用不能靠恢复成 reset 外观来撤销。
+
+source／DMA 已退出也不撤销 READY／BORROWED consumer；这些块未归还时 stop 返回
+BUSY，调用者显式 acquire／release 后重试，才完成整个 stream 的关闭。
+
+## 有限 CM1 完整帧会话
+
+`frames-raw`／`frames-jpeg` 使用 `nx_capture_frames_request_t` 和显式
+`capture->ops->start_frames(capture->context, &request)`。调用者提供正
+`frame_count`、有限绝对 deadline、完整 stream 及每帧存储；RAW 要求与 `raw_frame`
+的精确布局相等，JPEG 将
+`storage_bytes` 作为每帧容量。每帧仍受 65535 DMA words 上限和完整 DMA 域约束。
+
+每次 CM1 快照都先完成 source、FIFO、DMA、IRQ 和地址 join，再发布该完整帧并
+重启下一帧。两个帧之间存在间隙，不提供 CM0 无缝完整帧或无丢帧保证。
+
+CM0 连续 JPEG 的精确帧边界尚未开放。RM0090 Rev22 §15.5 pp458–462 明确帧同步、
+变长 JPEG 和 32-bit packing，§15.8 的 FRAME 状态没有同时锁存 DMA NDTR／CT 的
+寄存器。FRAME IRQ 后读取 DMA 指针不能证明该字节属于前一帧；FIFO／最后 word
+还可能包含 padding。这里限制的是当前可证明的软件合同，不否认芯片能够连续接收
+JPEG。`jpeg-blocks` 已覆盖无帧界的 CM0 存储字流。当前完整帧替代是上述 CM1 rearm；
+如产品确需 CM0 完整帧，应先明确传感器边界握手、
+最坏 IRQ／DMA 观测界限或外部帧解析接口，再建立单独可验证的合同。
+
+没有 FREE slot 时 source 保持关闭，等待调用者归还 consumer block；会话的绝对
+时间预算继续消耗，驱动不覆盖 READY／BORROWED，也不分配替代 buffer。
+
+会话 `base.transferred` 统计已成功发布的完整帧数，失败保留这个有效前缀；JPEG
+每帧 block length 以字节计，仍含 DMA 最后 word 的硬件 padding，不是 codestream
+字节数。stop 取消并 join 当前 producer／硬件责任，不能撤销之前已发布的 consumer
+loans。
+应用独立归还这些 loans 后才能回收 stream、控制或 payload。
+
+同一会话保留最初 System epoch，包括每个 deliberate source-off 间隙。clock 历史
+丢失、DMA／IRQ／地址拒撤时保留 request、stream 和当前存储，不把重新启动外设
+或寄存器 reset 外观当作过去借用已经退出。该合同只规定软件退出与帧发布边界，
+不建立 sensor 配置、电气连接或实测图像质量资格。
+
+## 音频存储布局查询
+
+应用通过同一个 `nx_audio_t` 和 `nx_audio_port_layout` 查询已准备实例的存储事实；
+不能仅凭 24-bit／32-bit 采样精度推测内存顺序。查询不分配、等待时钟或转换数据，
+原始 output 指针直接交给 provider 检查，不用临时结果绕过私有控制与借用别名约束。
+
+| 实现 | 有效采样位 | 每个样本的内存容器 | 有效位位置／存储顺序 |
+| --- | --- | --- | --- |
+| I2S | 16 | 16 bit | LSB；little endian halfword |
+| I2S | 24 | 32 bit | MSB；HIGH halfword 后接 LOW halfword |
+| I2S | 32 | 32 bit | 全部有效；HIGH halfword 后接 LOW halfword |
+| SAI | 8／10／16／20／24／32 | 8／16／16／32／32／32 bit | LSB；native little endian |
+
+`sample_alignment` 表示容器内有效位的位置，不是 buffer 地址对齐；`container_bits`
+表示内存宽度，不是包含 padding 的 wire slot 宽度。`slots` 和 `active_slots` 明确
+每帧的存储 slots 与 wire mask；首批 SAI 只允许全部 slots 有效，不压缩稀疏 mask。
+SAI 10-bit 数据使用既有 frame planner 的 16-bit 容器，不能把该格式传成 I2S。
+
+layout／rate 的结果不得覆盖完整 System 对象、私有 state／config、资源描述表、引脚
+恢复 snapshot 或任一在借控制与 payload 的完整 capacity。查询没有新增每实例状态；
+只读共享 ops 增加可选 layout 方法，原接口仍直接进入同一个硬件 owner。
 
 ## I2S2／3 格式、时钟与有限 DMA
 
@@ -171,10 +252,58 @@ consumer loans 继续有效，应用需独立 join 它们再回收 stream 或 bu
 不代表实际播放／采样的精确 wire frame 数。整段持续会话可显式使用
 `NX_DEADLINE_NEVER`，或由一个绝对 deadline 触发有界排空。
 
+## F446／F479 SAI1 有限帧
+
+SAI1 复用公共 `audio` request、frame stream 与借用状态机，使用独立 C provider，
+不经过 I2S 运行时转发层。首批只选择六种 `master-*`／`slave-*` 的
+`tx`、`rx`、`duplex`；不声明 SAI2、连续 blocks、稀疏 slots、AC97、SPDIF、PDM
+或软件格式转换。`frame_sync_*`、有效位宽、slot 宽度、偏移、位序和采样边沿都是
+显式静态配置，不能把 I2S 的 `standard` 或 PLLI2S 参数塞入 SAI 配置。
+
+| 时钟源 block | AF6 基础 pads | 可选数据与 MCLK | DMA2 |
+| --- | --- | --- | --- |
+| A | PE4 FS_A、PE5 SCK_A、PE6 SD_A | duplex 接 PE3 SD_B；MCLK_A 为 PE2 | A 为 stream1/channel0 |
+| B | PF9 FS_B、PF8 SCK_B、PE3 SD_B | duplex 接 PE6 SD_A；MCLK_B 为 PF7 | B 为 stream4/channel1 |
+
+source block 由精确 route 推导，不额外维护一份 authored block 选择。simplex 可以
+TX 或 RX；duplex 的 source 为 TX，另一 block 为同步 RX。一个静态 owner 独占整个
+SAI1、两个 blocks 与共享 IRQ87，处理两条 DMA 路线；没有两个相互竞争的全局 owner。
+
+master 只消费 System ClockPlan 的 `pll_sai.sai1`，禁止驱动晚改 PLLM、PLLSRC、
+PLLSAI 或 SAI mux。F446 的 auxiliary M 独立，F479 与主 PLL 输入共享 M；共同
+PLLSAI N／M、SAI Q／postQ 与可选 LTDC R／postR 都由同一个 System owner 校验和撤回。
+LTDC-only 不要求 SAI，SAI-only 不取得 R；兼容 Q＋R 才能同时选择。普通 master 使用
+`mckdiv=0` 的除1或 `2*mckdiv`，frame bits 必须为二次幂；rate 是精确有理数。
+`no_divider=true` 时禁止 MCLK、要求 mckdiv0，rate 为 kernel/frame bits，不强行取整。
+
+所有模式保守要求 APB2 严格大于两倍 SCK；slave 的 `max_bit_clock_hz` 是调用者保证的
+外部上界，rate 仍为0/0 unknown。该全模式约束直接覆盖 DS11118 Table67 脚注2；
+F446 使用同一保守边界，不把其不同脚注说成同一条款。实际选择 PE2／PF7 MCLK 输出时
+还要求共同已审 2.048–45MHz 范围；没有 MCLK pad 的低速精确分数模式不附加任意最小
+采样率。引脚使用两份数据手册表中的 OSPEEDR 二进制10，保留 Platform 原恢复收条。
+这些是静态准入条件，不是外部振荡器精度、吞吐或负载电气测量。
+
+官方 `HAL_SAI_Init` 负责联合冷态格式配置，Handle 仅在栈上存在。已保留的真实 SDK
+回归表明其 DMA start／stop／abort 路径含私有等待或未完成撤回，不能直接满足 Nexus
+借用合同；热态因此使用有界 C DMA 协议，不自造音频算法或修改厂商库。IRQ 只锁存
+事实与首个错误，显式 service 推进；发送 FIFO prime 不在 IRQ 内忙等。
+
+启用前后都重新检查绝对 deadline 和 System epoch。已受理后的超时、clock 历史丢失、
+DMA 地址拒清或 serializer／IRQ 未退出，均保留 request 与 loans；不是返回拒绝就
+归还内存。正常关闭先停 source、再同步 sink，确认完整帧／FIFO、DMA、IRQ 与地址全部
+脱离，才发布 SETTLED。System 看到仍在用的 SAI／LTDC gate 会保持时钟与 time epoch。
+
+`tests/contracts/stm32f4_sai/` 提供 F446／F479 的 master／slave 最小软件装配；
+`consumer.c` 只链接 factory、布局、frame planner 与生命周期，不实际传输音频。
+GoogleTest 模型验证 C 生命周期与故障协议，ARM ELF／Source SDK 验证真实选编和符号；
+实板外部时钟、引脚波形、FIFO 余量、音质和长时间运行需要独立物理执行。
+
 ## 装配与验证入口
 
 `tests/contracts/f407_capture_audio/` 是外部 software-only Board 夹具，覆盖 VE RAW12
 配 I2S2 duplex、ZG embedded RAW blocks 配 I2S3、ZG RAW14、JPEG 以及 I2S3 MCLK。
+`jpeg_blocks/ve-jpeg-blocks.toml` 复用 VE 软件路线，独立强类型消费者显式提供三个
+4096 B bank 并调用 start／service／acquire／release／stop；不增加其他有限夹具的 RAM。
 它们不修改公共 Board 的接线事实。`tools/configure/test_f407_capture_audio_configuration.py`
 检查严格字段、typed IR、真实 claims、pure factory 及固定生命周期连接。
 `tests/google/f407_capture_audio_test.cpp` 编译真实 C11 owner 和官方 DCMI cold Init，

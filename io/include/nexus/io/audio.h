@@ -19,16 +19,18 @@ extern "C" {
  *       consumer loan; RX takes one FILLING loan from an idle framed stream.
  *       Full duplex requires both and equal complete frame storage lengths.
  *       Unselected directions must be NULL. Format conversion is never done.
- *       Sixteen bit samples use one native little endian halfword per slot;
- *       24/32 bit samples use HIGH halfword then LOW halfword, in DMA order.
- *       For 24 bit data the low halfword has eight trailing padding bits.
- *       This is a sequence of halfwords, not native little endian uint32 PCM.
- *       I2S/left/right justified blocks contain both channel slots; PCM blocks
- *       contain complete single channel synchronization periods.
- *       Data length determines stored halfwords; wire padding is not stored.
- *       Finite master RX requires at least two stored halfwords.
- *       ACCEPTED borrows this request and both controls until SETTLED. Only
- *       proved serializer, DMA, IRQ and address withdrawal returns TX or
+ *       Storage is queried from the selected prepared owner with layout.
+ *       The I2S provider uses one little endian halfword per 16-bit slot;
+ *       I2S 24/32 bit samples use HIGH halfword then LOW halfword, in DMA
+ * order. For 24 bit data the low halfword has eight trailing padding bits. This
+ * is a sequence of halfwords, not native little endian uint32 PCM. SAI stores
+ * each sample in one native little endian 8/16/32-bit right-aligned container,
+ * with no implicit I2S halfword conversion. The I2S/left/right justified blocks
+ * contain both channel slots; PCM blocks contain complete single channel
+ * synchronization periods. Data length determines stored halfwords; wire
+ * padding is not stored. I2S finite master RX requires at least two stored
+ * halfwords. ACCEPTED borrows this request and both controls until SETTLED.
+ * Only proved serializer, DMA, IRQ and address withdrawal returns TX or
  *       publishes RX. Error/cancel reports zero and aborts RX after drain.
  *       An external slave clock that stops while a word remains can prevent
  *       drain indefinitely; timeout and failed stop NEVER revoke the loan.
@@ -72,12 +74,36 @@ typedef struct {
     uint64_t denominator;
 } nx_audio_rate_t;
 
+/** \brief Byte/halfword ordering of one stored sample, not wire bit order. */
+typedef enum {
+    NX_AUDIO_STORAGE_LITTLE_ENDIAN,
+    NX_AUDIO_STORAGE_HIGH_HALFWORD_FIRST
+} nx_audio_storage_order_t;
+/** \brief Exact selected storage; wire padding is never silently stored.
+ * \note container_bits is the DMA storage width, not the wire slot width.
+ *       sample_alignment names useful bits within that container, not address
+ *       alignment. HIGH_HALFWORD_FIRST stores two little endian halfwords,
+ *       the most significant one first. I2S24 therefore reports container32,
+ *       MSB alignment and HIGH_HALFWORD_FIRST; SAI24 reports container32,
+ *       LSB alignment and LITTLE_ENDIAN. slots is 1..16 stored slots per frame;
+ *       active_slots is their wire mask. The first F4 SAI mode requires every
+ *       slot active and never compacts a sparse mask. No conversion is done.
+ */
+typedef struct {
+    nx_audio_storage_order_t storage_order;
+    nx_frame_alignment_t sample_alignment;
+    uint16_t active_slots;
+    uint8_t sample_bits;
+    uint8_t container_bits;
+    uint8_t slots;
+} nx_audio_layout_t;
+
 /** \brief Allocation-free serialized owner, driven by explicit service.
  * \note Platform prepare acquires pads, DMA, I2S and an optional shared
  *       compatible PLLI2S lease. Factory lookup never opens hardware. Start
  *       external slave CK only after acquire-observed ACTIVE; WS must be at
  *       the selected idle channel boundary during preparation. ACTIVE in a
- *       slave TX mode includes a real DR prefill, three actual microsecond
+ *       I2S slave TX mode includes a real DR prefill, three actual microsecond
  *       ticks and at least three peripheral clocks with idle CK/WS retained.
  *       Caller controls external electrical timing and stop/drain clocks.
  *       IRQs latch errors/completion, with no task creation. One privileged
@@ -100,6 +126,8 @@ typedef struct {
      */
     nx_result_t (*start_blocks)(void* context,
                                 nx_audio_blocks_request_t* request);
+    /** \brief Optional read-only layout of the selected prepared owner. */
+    nx_result_t (*layout)(void* context, nx_audio_layout_t* result);
 } nx_audio_ops_t;
 
 /** \brief Immutable controller identity; vendor Handles remain private. */
@@ -109,6 +137,19 @@ struct nx_audio_port {
 };
 /** \brief Same immutable typed controller face for direct operation use. */
 typedef nx_audio_port_t nx_audio_t;
+
+/** \brief Query exact sample storage without hardware access or borrowing.
+ * \param[in] port: Prepared owner under its existing serialized task contract.
+ * \param[out] result: Separate output, changed only on success.
+ * \return SUCCESS, UNSUPPORTED, INVALID, STATE or a provider error.
+ * \note The original output pointer reaches the selected provider, which
+ *       rejects aliases with state/config and all active loan storage before
+ *       writing. No query allocation, task, clock wait or payload conversion
+ *       is supplied. Closed owners may report STATE without reading retired
+ *       configuration. Physical clock and audio quality remain unmeasured.
+ */
+nx_result_t nx_audio_port_layout(const nx_audio_port_t* port,
+                                 nx_audio_layout_t* result);
 
 #ifdef __cplusplus
 }

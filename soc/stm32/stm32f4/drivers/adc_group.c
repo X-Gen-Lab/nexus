@@ -6,7 +6,8 @@
  * \date            2026-11-10
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "stm32f407_adc_group.h"
+#include "stm32f407_adc_group_combined.h"
+#include "stm32f407_adc_group_internal.h"
 #include "stm32f407_clock.h"
 #include "stm32f4_adc_pins.h"
 #include "stm32f4_adc_trigger.h"
@@ -20,9 +21,6 @@
 #define NX_STM32_ADC_GROUP_ACK(dma, flags) ((dma)->LIFCR = (flags))
 #endif
 
-enum { IDLE, WARM, ACQUIRING, DRAINING };
-enum { CLOCKS = 1U, COMMON = 2U, VECTORS = 4U };
-enum { CONVERSION_ERROR = 256U, TRANSFER_COMPLETE = 512U };
 /** \brief Table69 injected sources; TIM2 is reserved by Core. */
 static const nx_stm32_adc_trigger_fact_t s_injected[] = {
     {TIM1, RCC_APB2ENR_TIM1EN, 0U, 4U, true},
@@ -39,6 +37,12 @@ static const nx_stm32_adc_trigger_fact_t s_injected[] = {
     {TIM8, RCC_APB2ENR_TIM8EN, 13U, 3U, true},
     {TIM8, RCC_APB2ENR_TIM8EN, 14U, 4U, true},
 };
+const nx_stm32_adc_trigger_fact_t*
+nx_stm32_adc_injected_trigger_fact(uint8_t selection) {
+    return selection < sizeof(s_injected) / sizeof(s_injected[0])
+               ? &s_injected[selection]
+               : NULL;
+}
 static const uint16_t s_sample_cycles[8] = {3U,  15U,  28U,  56U,
                                             84U, 112U, 144U, 480U};
 static const uint16_t s_sample_halfcycles[8] = {6U,   30U,  56U,  112U,
@@ -63,67 +67,46 @@ static bool clock_live(const nx_stm32_adc_group_config_t* config) {
            g_nx_stm32_system.rcc == config->rcc &&
            nx_stm32_clock_profile_matches(config->rcc, g_nx_stm32_system.flash);
 }
-static bool epoch_live(const nx_stm32_adc_group_state_t* state) {
+bool nx_stm32_adc_group_epoch_live(const nx_stm32_adc_group_state_t* state) {
     return clock_live(state->config) &&
            state->time_epoch == g_nx_stm32_system.time_epoch;
 }
 static bool injected(const nx_stm32_adc_group_config_t* config) {
     return config->mode >= NX_STM32_ADC_SINGLE_INJECTED;
 }
-static bool interleaved(const nx_stm32_adc_group_config_t* config) {
-    return config->mode == NX_STM32_ADC_DUAL_INTERLEAVED ||
-           config->mode == NX_STM32_ADC_TRIPLE_INTERLEAVED;
-}
-static unsigned converters(const nx_stm32_adc_group_config_t* config) {
-    return config->mode == NX_STM32_ADC_SINGLE_INJECTED ? 1U
-           : config->mode == NX_STM32_ADC_TRIPLE_REGULAR ||
-                   config->mode == NX_STM32_ADC_TRIPLE_INTERLEAVED ||
-                   config->mode == NX_STM32_ADC_TRIPLE_INJECTED
-               ? 3U
-               : 2U;
-}
-static unsigned scan_samples(const nx_stm32_adc_group_config_t* config) {
-    return config->mode == NX_STM32_ADC_TRIPLE_INTERLEAVED
-               ? 6U
-               : converters(config) * config->ranks;
-}
-/** \brief Mode3 stores native low-resolution interleaved byte pairs. */
-static unsigned storage_bytes(const nx_stm32_adc_group_config_t* config) {
-    return interleaved(config) && config->resolution >= 2U ? 1U : 2U;
-}
-static unsigned dma_width(const nx_stm32_adc_group_config_t* config) {
-    return config->mode == NX_STM32_ADC_TRIPLE_REGULAR ||
-                   storage_bytes(config) == 1U
-               ? 2U
-               : 4U;
-}
 static bool timer_used(const nx_stm32_adc_group_config_t* config) {
-    return !interleaved(config) && config->period_us != 0U;
+    return !nx_stm32_adc_group_interleaved(config) && config->period_us != 0U;
 }
 static const nx_stm32_adc_trigger_fact_t*
 trigger(const nx_stm32_adc_group_config_t* config) {
     if (!timer_used(config))
         return NULL;
     return injected(config)
-               ? (config->trigger < 13U ? &s_injected[config->trigger] : NULL)
+               ? nx_stm32_adc_injected_trigger_fact(config->trigger)
                : nx_stm32_adc_trigger_fact(config->trigger);
 }
 static bool overlap(const void* a, size_t an, const void* b, size_t bn) {
     return (uintptr_t)a < (uintptr_t)b + bn && (uintptr_t)b < (uintptr_t)a + an;
 }
 /** \brief Exclude writable spans from every live control/configuration fact. */
-static bool independent(const nx_stm32_adc_group_state_t* state,
-                        const void* data, size_t bytes, size_t alignment) {
+bool nx_stm32_adc_group_independent(const nx_stm32_adc_group_state_t* state,
+                                    size_t state_bytes, const void* data,
+                                    size_t bytes, size_t alignment) {
     const nx_stm32_adc_group_config_t* config = state->config;
-    if (data == NULL || bytes == 0U || (uintptr_t)data % alignment != 0U ||
+    if (state_bytes < sizeof(*state) || data == NULL || bytes == 0U ||
+        (uintptr_t)data % alignment != 0U ||
         bytes > UINTPTR_MAX - (uintptr_t)data ||
-        overlap(data, bytes, state, sizeof(*state)) ||
+        overlap(data, bytes, state, state_bytes) ||
+        overlap(data, bytes, &g_nx_stm32_system, sizeof(g_nx_stm32_system)) ||
         overlap(data, bytes, config, sizeof(*config)) ||
         overlap(data, bytes, config->common, sizeof(*config->common)) ||
         overlap(data, bytes, config->rcc, sizeof(*config->rcc)) ||
-        overlap(data, bytes, config->channels, scan_samples(config)) ||
-        overlap(data, bytes, config->sample_times, scan_samples(config)) ||
-        overlap(data, bytes, config->converters, scan_samples(config)))
+        overlap(data, bytes, config->channels,
+                nx_stm32_adc_group_samples(config)) ||
+        overlap(data, bytes, config->sample_times,
+                nx_stm32_adc_group_samples(config)) ||
+        overlap(data, bytes, config->converters,
+                nx_stm32_adc_group_samples(config)))
         return false;
     for (unsigned i = 0U; i < 3U; ++i)
         if (overlap(data, bytes, config->adc[i], sizeof(*config->adc[i])))
@@ -161,19 +144,19 @@ static bool divider(const nx_stm32_adc_group_config_t* config, uint16_t* psc,
     return false;
 }
 /** \brief Check silicon, sequence and conversion budgets before any effect. */
-static bool facts(const nx_stm32_adc_group_config_t* config) {
+static bool facts(const nx_stm32_adc_group_config_t* config, bool one_pulse) {
     if (config == NULL || config->rcc == NULL || config->common == NULL ||
         config->channels == NULL || config->sample_times == NULL ||
         config->converters == NULL || (unsigned)config->mode >= 7U ||
         config->resolution > 3U || config->ranks == 0U ||
         config->ranks > (injected(config) ? 4U : 16U) ||
-        (interleaved(config) && config->ranks != 1U) ||
+        (nx_stm32_adc_group_interleaved(config) && config->ranks != 1U) ||
         config->priority > 15U || config->adc_clock_hz != NEXUS_ADC_HZ ||
         config->drain_timeout_us == 0U || config->delay_cycles < 5U ||
         config->delay_cycles > 20U ||
-        (!injected(config) && !interleaved(config) &&
+        (!injected(config) && !nx_stm32_adc_group_interleaved(config) &&
          config->period_us == 0U) ||
-        (interleaved(config) && config->period_us != 0U) ||
+        (nx_stm32_adc_group_interleaved(config) && config->period_us != 0U) ||
         (timer_used(config) && config->trigger_identity == 0U) ||
         (config->watchdog &&
          (config->lower > config->upper ||
@@ -187,7 +170,7 @@ static bool facts(const nx_stm32_adc_group_config_t* config) {
          config->regions == NULL || config->region_count == 0U ||
          config->region_count > SIZE_MAX / sizeof(*config->regions)))
         return false;
-    const unsigned count = converters(config);
+    const unsigned count = nx_stm32_adc_group_count(config);
     if (config->mode == NX_STM32_ADC_TRIPLE_INTERLEAVED)
         for (unsigned i = 0U; i < 3U; ++i)
             if (config->channels[i + 3U] != config->channels[i] ||
@@ -212,7 +195,7 @@ static bool facts(const nx_stm32_adc_group_config_t* config) {
                     config->sample_times[prior * count + i] !=
                         config->sample_times[index])
                     return false;
-            if (interleaved(config)) {
+            if (nx_stm32_adc_group_interleaved(config)) {
                 if (channel != config->channels[0] ||
                     (count == 3U && channel > 3U &&
                      (channel < 10U || channel > 13U)))
@@ -232,7 +215,7 @@ static bool facts(const nx_stm32_adc_group_config_t* config) {
             }
         }
     }
-    return !timer_used(config) ||
+    return one_pulse || !timer_used(config) ||
            (uint64_t)config->period_us * config->adc_clock_hz >
                (uint64_t)cycles * 1000000U;
 }
@@ -250,10 +233,10 @@ static bool foreign_vectors(const nx_stm32_adc_group_config_t* config) {
 #endif
     return false;
 }
-nx_result_t
-nx_stm32_adc_group_prepare(nx_stm32_adc_group_state_t* state,
-                           const nx_stm32_adc_group_config_t* config) {
-    if (state == NULL || !facts(config))
+static nx_result_t prepare_selected(nx_stm32_adc_group_state_t* state,
+                                    const nx_stm32_adc_group_config_t* config,
+                                    bool one_pulse) {
+    if (state == NULL || !facts(config, one_pulse))
         return NX_ERROR_INVALID;
     if (!task())
         return NX_ERROR_CONTEXT;
@@ -280,6 +263,7 @@ nx_stm32_adc_group_prepare(nx_stm32_adc_group_state_t* state,
             0U ||
         (timer_used(config) &&
          ((config->timer->CR1 & TIM_CR1_CEN) != 0U ||
+          (config->timer->SMCR & (TIM_SMCR_SMS | TIM_SMCR_ECE)) != 0U ||
           config->timer->CCER != 0U || config->timer->DIER != 0U)) ||
         (!injected(config) && (config->memory->CR & DMA_SxCR_EN) != 0U))
         return NX_ERROR_BUSY;
@@ -299,7 +283,7 @@ nx_stm32_adc_group_prepare(nx_stm32_adc_group_state_t* state,
     if (f != NULL && f->apb2)
         gates |= f->gate;
     state->gates_added = gates & ~config->rcc->APB2ENR;
-    state->effects = CLOCKS;
+    state->effects = NX_ADC_GROUP_CLOCKS;
     config->rcc->APB2ENR |= gates;
     /* A high receipt bit records APB1 without another per-instance word. */
     if (f != NULL && !f->apb2 && (config->rcc->APB1ENR & f->gate) == 0U) {
@@ -317,6 +301,7 @@ nx_stm32_adc_group_prepare(nx_stm32_adc_group_state_t* state,
             0U ||
         (timer_used(config) &&
          ((config->timer->CR1 & TIM_CR1_CEN) != 0U ||
+          (config->timer->SMCR & (TIM_SMCR_SMS | TIM_SMCR_ECE)) != 0U ||
           config->timer->CCER != 0U || config->timer->DIER != 0U)))
         return NX_ERROR_BUSY;
     for (unsigned i = 0U; i < 3U; ++i)
@@ -327,19 +312,22 @@ nx_stm32_adc_group_prepare(nx_stm32_adc_group_state_t* state,
                                     ADC_CR1_OVRIE | ADC_CR1_AWDIE)) != 0U)
             return NX_ERROR_BUSY;
     for (unsigned rank = 0U; rank < config->ranks; ++rank)
-        for (unsigned i = 0U; i < converters(config); ++i) {
-            uint8_t channel = config->channels[rank * converters(config) + i];
+        for (unsigned i = 0U; i < nx_stm32_adc_group_count(config); ++i) {
+            uint8_t channel =
+                config->channels[rank * nx_stm32_adc_group_count(config) + i];
             nx_result_t result = nx_stm32_adc_pin(s_converters[i], channel);
             if (result != NX_SUCCESS)
                 return result;
         }
     nx_arch_dsb();
     for (unsigned rank = 0U; rank < config->ranks; ++rank)
-        for (unsigned i = 0U; i < converters(config); ++i) {
+        for (unsigned i = 0U; i < nx_stm32_adc_group_count(config); ++i) {
             nx_stm32_adc_pad_t pad;
             if (!nx_stm32_adc_pad(
                     s_converters[i],
-                    config->channels[rank * converters(config) + i], &pad))
+                    config
+                        ->channels[rank * nx_stm32_adc_group_count(config) + i],
+                    &pad))
                 return NX_ERROR_INVALID;
             uint32_t shift = (uint32_t)pad.pin * 2U;
             if ((pad.gpio->MODER & (3U << shift)) != (3U << shift) ||
@@ -349,35 +337,49 @@ nx_stm32_adc_group_prepare(nx_stm32_adc_group_state_t* state,
     state->initialized = true;
     state->time_epoch = g_nx_stm32_system.time_epoch;
     state->closing = state->fault = false;
-    state->phase = IDLE;
+    state->phase = NX_ADC_GROUP_IDLE;
     return NX_SUCCESS;
+}
+nx_result_t
+nx_stm32_adc_group_prepare(nx_stm32_adc_group_state_t* state,
+                           const nx_stm32_adc_group_config_t* config) {
+    return prepare_selected(state, config, false);
+}
+nx_result_t
+nx_stm32_adc_group_prepare_once(nx_stm32_adc_group_state_t* state,
+                                const nx_stm32_adc_group_config_t* config) {
+    if (config == NULL || (config->mode != NX_STM32_ADC_DUAL_REGULAR &&
+                           config->mode != NX_STM32_ADC_TRIPLE_REGULAR))
+        return NX_ERROR_INVALID;
+    return prepare_selected(state, config, true);
 }
 /** \brief Bounded observations never touch a borrowed request or its samples.
  */
-static uint32_t observed(const nx_stm32_adc_group_config_t* config) {
+uint32_t
+nx_stm32_adc_group_observed(const nx_stm32_adc_group_config_t* config) {
     uint32_t events = 0U;
-    for (unsigned i = 0U; i < converters(config); ++i) {
+    for (unsigned i = 0U; i < nx_stm32_adc_group_count(config); ++i) {
         uint32_t sr = config->adc[i]->SR;
         if ((sr & (ADC_SR_OVR | (config->watchdog ? ADC_SR_AWD : 0U))) != 0U)
-            events |= CONVERSION_ERROR;
+            events |= NX_ADC_GROUP_ERROR;
         if ((sr & ADC_SR_JEOC) != 0U)
             events |= 1U << i;
     }
     if (!injected(config)) {
         uint32_t flags = config->dma->LISR;
         if ((flags & (DMA_LISR_TEIF0 | DMA_LISR_DMEIF0 | DMA_LISR_FEIF0)) != 0U)
-            events |= CONVERSION_ERROR;
+            events |= NX_ADC_GROUP_ERROR;
         if ((flags & DMA_LISR_TCIF0) != 0U)
-            events |= TRANSFER_COMPLETE;
+            events |= NX_ADC_GROUP_TRANSFER;
     }
     return events;
 }
 /** \brief Bound post-completion sampling before a task can run its full join.
  */
-static void gate(const nx_stm32_adc_group_config_t* config) {
+void nx_stm32_adc_group_gate(const nx_stm32_adc_group_config_t* config) {
     if (timer_used(config))
         LL_TIM_DisableCounter(config->timer);
-    for (unsigned i = 0U; i < converters(config); ++i) {
+    for (unsigned i = 0U; i < nx_stm32_adc_group_count(config); ++i) {
         config->adc[i]->CR1 &= ~(uint32_t)(ADC_CR1_EOCIE | ADC_CR1_JEOCIE |
                                            ADC_CR1_OVRIE | ADC_CR1_AWDIE);
         config->adc[i]->CR2 &=
@@ -391,17 +393,17 @@ static void gate(const nx_stm32_adc_group_config_t* config) {
 void nx_stm32_adc_group_irq(const nx_adc_group_port_t* port) {
     nx_stm32_adc_group_state_t* state = port == NULL ? NULL : port->context;
     if (state == NULL || !state->initialized || state->config == NULL ||
-        state->phase == IDLE)
+        state->phase == NX_ADC_GROUP_IDLE)
         return;
-    state->events |= observed(state->config);
-    if (!epoch_live(state)) {
-        state->events |= CONVERSION_ERROR;
-        gate(state->config);
+    state->events |= nx_stm32_adc_group_observed(state->config);
+    if (!nx_stm32_adc_group_epoch_live(state)) {
+        state->events |= NX_ADC_GROUP_ERROR;
+        nx_stm32_adc_group_gate(state->config);
         return;
     }
     /* Equal-priority vectors cannot nest one another. Mask level publishers
      * after latching, then let the unique task owner perform the full drain. */
-    for (unsigned i = 0U; i < converters(state->config); ++i)
+    for (unsigned i = 0U; i < nx_stm32_adc_group_count(state->config); ++i)
         state->config->adc[i]->CR1 &=
             ~(uint32_t)(ADC_CR1_JEOCIE | ADC_CR1_OVRIE | ADC_CR1_AWDIE);
     if (!injected(state->config)) {
@@ -409,17 +411,17 @@ void nx_stm32_adc_group_irq(const nx_adc_group_port_t* port) {
             ~(uint32_t)(DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE);
         state->config->memory->FCR &= ~(uint32_t)DMA_SxFCR_FEIE;
     }
-    uint32_t completed = (1U << converters(state->config)) - 1U;
-    if ((state->events & (CONVERSION_ERROR | TRANSFER_COMPLETE)) != 0U ||
+    uint32_t completed = (1U << nx_stm32_adc_group_count(state->config)) - 1U;
+    if ((state->events & (NX_ADC_GROUP_ERROR | NX_ADC_GROUP_TRANSFER)) != 0U ||
         (injected(state->config) && (state->events & completed) == completed))
-        gate(state->config);
+        nx_stm32_adc_group_gate(state->config);
 }
 static void begin_drain(nx_stm32_adc_group_state_t* state, nx_result_t result) {
-    if (state->phase == DRAINING)
+    if (state->phase == NX_ADC_GROUP_DRAINING)
         return;
     state->terminal = result;
     state->fault |= result == NX_ERROR_IO;
-    state->phase = DRAINING;
+    state->phase = NX_ADC_GROUP_DRAINING;
     nx_time_us_t now = nx_time_now_us();
     if (nx_deadline_finite_after(now, state->config->drain_timeout_us,
                                  &state->drain_deadline) != NX_SUCCESS)
@@ -427,12 +429,13 @@ static void begin_drain(nx_stm32_adc_group_state_t* state, nx_result_t result) {
     (void)nx_request_transition(&state->active->base, NX_REQUEST_DRAINING);
 }
 /** \brief Program disabled converters, then start the post-store warmup. */
-static nx_result_t prime(nx_stm32_adc_group_state_t* state) {
+static nx_result_t program(nx_stm32_adc_group_state_t* state,
+                           uint32_t* installed_common) {
     const nx_stm32_adc_group_config_t* config = state->config;
-    const unsigned count = converters(config);
+    const unsigned count = nx_stm32_adc_group_count(config);
     if (!injected(config))
         NX_STM32_ADC_GROUP_ACK(config->dma, UINT32_C(0x3d));
-    state->effects |= COMMON;
+    state->effects |= NX_ADC_GROUP_COMMON;
     /* Interrupted interleave must pass through independent MULTI=0. */
     LL_ADC_SetMultimode(config->common, LL_ADC_MULTI_INDEPENDENT);
     nx_arch_dsb();
@@ -447,8 +450,8 @@ static nx_result_t prime(nx_stm32_adc_group_state_t* state) {
               ((NEXUS_CLOCK_ADC_DIV / 2U - 1U) << ADC_CCR_ADCPRE_Pos);
     if (!injected(config))
         common |= (config->mode == NX_STM32_ADC_TRIPLE_REGULAR ? ADC_CCR_DMA_0
-                   : storage_bytes(config) == 1U               ? ADC_CCR_DMA
-                                                 : ADC_CCR_DMA_1) |
+                   : nx_stm32_adc_group_storage(config) == 1U  ? ADC_CCR_DMA
+                                                              : ADC_CCR_DMA_1) |
                   ADC_CCR_DDS;
     config->common->CCR = common;
     for (unsigned i = 0U; i < count; ++i) {
@@ -472,7 +475,9 @@ static nx_result_t prime(nx_stm32_adc_group_state_t* state) {
         adc->SMPR1 = adc->SMPR2 = 0U;
         adc->SQR1 = ((uint32_t)config->ranks - 1U) << ADC_SQR1_L_Pos;
         adc->SQR2 = adc->SQR3 = 0U;
-        adc->JSQR = ((uint32_t)config->ranks - 1U) << ADC_JSQR_JL_Pos;
+        adc->JSQR = injected(config)
+                        ? ((uint32_t)config->ranks - 1U) << ADC_JSQR_JL_Pos
+                        : 0U;
         adc->JOFR1 = adc->JOFR2 = adc->JOFR3 = adc->JOFR4 = 0U;
         for (unsigned rank = 0U; rank < config->ranks; ++rank) {
             unsigned index = rank * count + i;
@@ -494,49 +499,104 @@ static nx_result_t prime(nx_stm32_adc_group_state_t* state) {
         nx_arch_dsb();
         if (adc->CR1 != control || adc->CR2 != 0U)
             return NX_ERROR_IO;
+        /* ADC_SR is rc_w0. Old JEOC/OVR must be gone while ADON and every
+         * trigger are still off; a sticky old flag cannot certify this arm. */
         adc->SR = 0U;
-        LL_ADC_Enable(adc);
+        nx_arch_dsb();
+        if (adc->SR != 0U)
+            return NX_ERROR_IO;
     }
     nx_arch_dsb();
-    for (unsigned i = 0U; i < count; ++i)
+    if (config->common->CCR != common)
+        return NX_ERROR_IO;
+    *installed_common = common;
+    return NX_SUCCESS;
+}
+/** \brief Power only fully programmed converters and anchor a finite warmup. */
+static nx_result_t enable(nx_stm32_adc_group_state_t* state, uint32_t common) {
+    const nx_stm32_adc_group_config_t* config = state->config;
+    for (unsigned i = 0U; i < nx_stm32_adc_group_count(config); ++i)
+        LL_ADC_Enable(config->adc[i]);
+    nx_arch_dsb();
+    for (unsigned i = 0U; i < nx_stm32_adc_group_count(config); ++i)
         if (!LL_ADC_IsEnabled(config->adc[i]))
             return NX_ERROR_IO;
     if (config->common->CCR != common)
         return NX_ERROR_IO;
     return nx_deadline_finite_after(nx_time_now_us(), 4U, &state->warm_until);
 }
-/** \brief Arm memory, consumers, then the source; setup UG cannot sample. */
-static nx_result_t arm(nx_stm32_adc_group_state_t* state) {
-    const nx_stm32_adc_group_config_t* config = state->config;
-    const nx_stm32_adc_trigger_fact_t* f = trigger(config);
-    if (f != NULL) {
-        nx_stm32_adc_trigger_program(config->timer, f, state->prescaler,
-                                     state->period);
-        if (injected(config))
-            config->timer->CR1 |= TIM_CR1_OPM;
-    }
-    if (!injected(config)) {
-        DMA_Stream_TypeDef* memory = config->memory;
-        NX_STM32_ADC_GROUP_ACK(config->dma, UINT32_C(0x3d));
-        memory->CR =
-            DMA_SxCR_MINC | DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE |
-            (dma_width(config) == 4U ? DMA_SxCR_MSIZE_1 | DMA_SxCR_PSIZE_1
-                                     : DMA_SxCR_MSIZE_0 | DMA_SxCR_PSIZE_0);
-        memory->FCR = DMA_SxFCR_FEIE;
-        memory->PAR = (uint32_t)(uintptr_t)&config->common->CDR;
-        memory->M0AR = (uint32_t)(uintptr_t)state->active->frames;
-        memory->M1AR = 0U;
-        memory->NDTR = (uint32_t)(state->active->bytes / dma_width(config));
-        memory->CR |= DMA_SxCR_EN;
+nx_result_t nx_stm32_adc_group_prime(nx_stm32_adc_group_state_t* state) {
+    uint32_t common = 0U;
+    nx_result_t result = program(state, &common);
+    return result == NX_SUCCESS ? enable(state, common) : result;
+}
+static nx_result_t
+prime_groups(nx_stm32_adc_group_state_t* state,
+             const nx_stm32_adc_group_combined_config_t* config,
+             bool automatic) {
+    if (state == NULL || config == NULL ||
+        state->config != &config->regular.adc)
+        return NX_ERROR_INVALID;
+    uint32_t common = 0U;
+    nx_result_t result = program(state, &common);
+    if (result != NX_SUCCESS)
+        return result;
+    unsigned count = nx_stm32_adc_group_count(state->config);
+    common = (common & ~(uint32_t)ADC_CCR_MULTI) |
+             (count == 3U ? LL_ADC_MULTI_TRIPLE_REG_SIM_INJ_SIM
+                          : LL_ADC_MULTI_DUAL_REG_SIM_INJ_SIM);
+    state->config->common->CCR = common;
+    for (unsigned i = 0U; i < count; ++i) {
+        ADC_TypeDef* adc = state->config->adc[i];
+        uint32_t sequence = ((uint32_t)config->injected_ranks - 1U)
+                            << ADC_JSQR_JL_Pos;
+        if (config->injected_ranks > 1U)
+            adc->CR1 |= ADC_CR1_SCAN;
+        for (unsigned rank = 0U; rank < config->injected_ranks; ++rank) {
+            unsigned index = rank * count + i;
+            uint32_t channel = config->injected_channels[index];
+            uint32_t timing = config->injected_samples[index];
+            if (channel < 10U)
+                adc->SMPR2 |= timing << (channel * 3U);
+            else
+                adc->SMPR1 |= timing << ((channel - 10U) * 3U);
+            sequence |= channel << ((rank + 4U - config->injected_ranks) * 5U);
+        }
+        adc->JSQR = sequence;
+        if (automatic) {
+            LL_ADC_INJ_SetTrigAuto(adc, LL_ADC_INJ_TRIG_FROM_GRP_REGULAR);
+            adc->CR1 |= ADC_CR1_JEOCIE;
+            if (state->config->watchdog)
+                adc->CR1 |= ADC_CR1_JAWDEN;
+        }
         nx_arch_dsb();
-        if ((memory->CR & DMA_SxCR_EN) == 0U ||
-            memory->M0AR != (uint32_t)(uintptr_t)state->active->frames ||
-            memory->PAR != (uint32_t)(uintptr_t)&config->common->CDR ||
-            memory->NDTR != state->active->bytes / dma_width(config))
+        if (adc->JSQR != sequence || adc->CR2 != 0U ||
+            (config->injected_ranks > 1U && (adc->CR1 & ADC_CR1_SCAN) == 0U) ||
+            (automatic && (adc->CR1 & (ADC_CR1_JAUTO | ADC_CR1_JEOCIE)) !=
+                              (ADC_CR1_JAUTO | ADC_CR1_JEOCIE)))
             return NX_ERROR_IO;
     }
-    state->effects |= VECTORS;
+    nx_arch_dsb();
+    if (state->config->common->CCR != common)
+        return NX_ERROR_IO;
+    return enable(state, common);
+}
+nx_result_t nx_stm32_adc_group_prime_combined(
+    nx_stm32_adc_group_state_t* state,
+    const nx_stm32_adc_group_combined_config_t* config) {
+    return prime_groups(state, config, false);
+}
+nx_result_t nx_stm32_adc_group_prime_automatic(
+    nx_stm32_adc_group_state_t* state,
+    const nx_stm32_adc_group_combined_config_t* config) {
+    return prime_groups(state, config, true);
+}
+
+/** \brief Preserve vector ownership before either publisher is enabled. */
+void nx_stm32_adc_group_vectors_enable(nx_stm32_adc_group_state_t* state) {
+    state->effects |= NX_ADC_GROUP_VECTORS;
 #ifndef NEXUS_STM32_MODEL
+    const nx_stm32_adc_group_config_t* config = state->config;
     NVIC_ClearPendingIRQ(ADC_IRQn);
     NVIC_SetPriority(ADC_IRQn, config->priority);
     NVIC_EnableIRQ(ADC_IRQn);
@@ -546,6 +606,40 @@ static nx_result_t arm(nx_stm32_adc_group_state_t* state) {
         NVIC_EnableIRQ(DMA2_Stream0_IRQn);
     }
 #endif
+}
+nx_result_t nx_stm32_adc_group_arm_result(nx_stm32_adc_group_state_t* state,
+                                          void* data, size_t bytes,
+                                          bool one_pulse) {
+    const nx_stm32_adc_group_config_t* config = state->config;
+    const nx_stm32_adc_trigger_fact_t* f = trigger(config);
+    if (f != NULL) {
+        nx_stm32_adc_trigger_program(config->timer, f, state->prescaler,
+                                     state->period);
+        if (injected(config) || one_pulse)
+            config->timer->CR1 |= TIM_CR1_OPM;
+    }
+    if (!injected(config)) {
+        DMA_Stream_TypeDef* memory = config->memory;
+        NX_STM32_ADC_GROUP_ACK(config->dma, UINT32_C(0x3d));
+        memory->CR = DMA_SxCR_MINC | DMA_SxCR_TCIE | DMA_SxCR_TEIE |
+                     DMA_SxCR_DMEIE |
+                     (nx_stm32_adc_group_width(config) == 4U
+                          ? DMA_SxCR_MSIZE_1 | DMA_SxCR_PSIZE_1
+                          : DMA_SxCR_MSIZE_0 | DMA_SxCR_PSIZE_0);
+        memory->FCR = DMA_SxFCR_FEIE;
+        memory->PAR = (uint32_t)(uintptr_t)&config->common->CDR;
+        memory->M0AR = (uint32_t)(uintptr_t)data;
+        memory->M1AR = 0U;
+        memory->NDTR = (uint32_t)(bytes / nx_stm32_adc_group_width(config));
+        memory->CR |= DMA_SxCR_EN;
+        nx_arch_dsb();
+        if ((memory->CR & DMA_SxCR_EN) == 0U ||
+            memory->M0AR != (uint32_t)(uintptr_t)data ||
+            memory->PAR != (uint32_t)(uintptr_t)&config->common->CDR ||
+            memory->NDTR != bytes / nx_stm32_adc_group_width(config))
+            return NX_ERROR_IO;
+    }
+    nx_stm32_adc_group_vectors_enable(state);
     if (f != NULL) {
         uint32_t external =
             injected(config) ? ((uint32_t)f->selection << ADC_CR2_JEXTSEL_Pos) |
@@ -554,13 +648,21 @@ static nx_result_t arm(nx_stm32_adc_group_state_t* state) {
                                    ADC_CR2_EXTEN_0;
         config->adc[0]->CR2 |= external;
         nx_arch_dsb();
-        if ((config->adc[0]->CR2 & external) != external)
+        if ((config->adc[0]->CR2 & external) != external ||
+            (one_pulse && (config->timer->CR1 & TIM_CR1_OPM) == 0U))
             return NX_ERROR_IO;
+        if (one_pulse) {
+            nx_time_us_t now = nx_time_now_us();
+            if (now == NX_DEADLINE_NEVER || now < state->warm_until)
+                return NX_ERROR_STATE;
+            if (nx_deadline_expired(state->active->base.deadline, now))
+                return NX_ERROR_TIMEOUT;
+        }
         LL_TIM_EnableCounter(config->timer);
     } else if (injected(config)) {
         LL_ADC_INJ_StartConversionSWStart(config->adc[0]);
     } else {
-        for (unsigned i = 0U; i < converters(config); ++i)
+        for (unsigned i = 0U; i < nx_stm32_adc_group_count(config); ++i)
             LL_ADC_REG_SetContinuousMode(config->adc[i],
                                          LL_ADC_REG_CONV_CONTINUOUS);
         LL_ADC_REG_StartConversionSWStart(config->adc[0]);
@@ -569,40 +671,51 @@ static nx_result_t arm(nx_stm32_adc_group_state_t* state) {
     return f != NULL && (config->timer->CR1 & TIM_CR1_CEN) == 0U ? NX_ERROR_IO
                                                                  : NX_SUCCESS;
 }
+static nx_result_t arm(nx_stm32_adc_group_state_t* state) {
+    return nx_stm32_adc_group_arm_result(state, state->active->output.frames,
+                                         state->active->bytes, false);
+}
 static nx_result_t submit(void* context, nx_adc_group_request_t* request) {
     nx_stm32_adc_group_state_t* state = context;
     if (!task())
         return NX_ERROR_CONTEXT;
     if (!state->initialized || state->closing || state->fault)
         return NX_ERROR_STATE;
-    if (!epoch_live(state))
+    if (!nx_stm32_adc_group_epoch_live(state))
         return NX_ERROR_STATE;
     if (state->active != NULL)
         return NX_ERROR_BUSY;
     const nx_stm32_adc_group_config_t* config = state->config;
-    size_t stride = (size_t)scan_samples(config) * storage_bytes(config);
-    if (!independent(state, request, sizeof(*request),
-                     _Alignof(nx_adc_group_request_t)) ||
+    size_t stride = (size_t)nx_stm32_adc_group_samples(config) *
+                    nx_stm32_adc_group_storage(config);
+    if (!nx_stm32_adc_group_independent(state, sizeof(*state), request,
+                                        sizeof(*request),
+                                        _Alignof(nx_adc_group_request_t)) ||
         request->frame_count == 0U ||
+        request->results_kind != NX_ADC_GROUP_RAW_RESULTS ||
         request->frame_count > SIZE_MAX / stride ||
         request->bytes != request->frame_count * stride ||
         request->base.deadline == NX_DEADLINE_NEVER ||
-        !independent(state, request->frames, request->bytes,
-                     injected(config) ? _Alignof(uint16_t)
-                                      : dma_width(config)) ||
-        overlap(request, sizeof(*request), request->frames, request->bytes) ||
-        (injected(config) ? request->frame_count != 1U
-                          : request->bytes / dma_width(config) > 65535U))
+        !nx_stm32_adc_group_independent(
+            state, sizeof(*state), request->output.frames, request->bytes,
+            injected(config) ? _Alignof(uint16_t)
+                             : nx_stm32_adc_group_width(config)) ||
+        overlap(request, sizeof(*request), request->output.frames,
+                request->bytes) ||
+        (injected(config)
+             ? request->frame_count != 1U
+             : request->bytes / nx_stm32_adc_group_width(config) > 65535U))
         return NX_ERROR_INVALID;
     if (!injected(config)) {
         nx_result_t result = nx_dma_buffer_validate(
-            config->regions, config->region_count, request->frames,
-            request->bytes, dma_width(config), NX_DMA_FROM_DEVICE);
+            config->regions, config->region_count, request->output.frames,
+            request->bytes, nx_stm32_adc_group_width(config),
+            NX_DMA_FROM_DEVICE);
         if (result != NX_SUCCESS)
             return result;
 #ifndef NEXUS_STM32_MODEL
-        if ((uintptr_t)request->frames > UINT32_MAX ||
-            request->bytes > UINT32_MAX - (uintptr_t)request->frames)
+        if ((uintptr_t)request->output.frames > UINT32_MAX ||
+            request->bytes > UINT32_MAX - (uintptr_t)request->output.frames)
             return NX_ERROR_INVALID;
 #endif
     }
@@ -612,20 +725,20 @@ static nx_result_t submit(void* context, nx_adc_group_request_t* request) {
     if (result != NX_SUCCESS)
         return result;
     state->active = request;
-    state->phase = WARM;
+    state->phase = NX_ADC_GROUP_WARM;
     state->terminal = NX_SUCCESS;
     state->events = 0U;
-    result = prime(state);
+    result = nx_stm32_adc_group_prime(state);
     if (result != NX_SUCCESS)
         begin_drain(state, result);
     return NX_SUCCESS;
 }
 /** \brief Observe every final-access source before clearing hardware pointers.
  */
-static bool withdraw(nx_stm32_adc_group_state_t* state) {
+bool nx_stm32_adc_group_withdraw(nx_stm32_adc_group_state_t* state) {
     const nx_stm32_adc_group_config_t* config = state->config;
-    state->events |= observed(config);
-    gate(config);
+    state->events |= nx_stm32_adc_group_observed(config);
+    nx_stm32_adc_group_gate(config);
     if (!injected(config)) {
         NX_STM32_DMA_DISABLE(config->memory, DMA_SxCR_EN | DMA_SxCR_TCIE |
                                                  DMA_SxCR_HTIE | DMA_SxCR_TEIE |
@@ -636,7 +749,7 @@ static bool withdraw(nx_stm32_adc_group_state_t* state) {
     if ((timer_used(config) && (config->timer->CR1 & TIM_CR1_CEN) != 0U) ||
         (config->common->CCR & (ADC_CCR_DMA | ADC_CCR_DDS)) != 0U)
         return false;
-    for (unsigned i = 0U; i < converters(config); ++i)
+    for (unsigned i = 0U; i < nx_stm32_adc_group_count(config); ++i)
         if ((config->adc[i]->CR2 &
              (ADC_CR2_ADON | ADC_CR2_EXTEN | ADC_CR2_JEXTEN | ADC_CR2_DMA |
               ADC_CR2_DDS | ADC_CR2_CONT)) != 0U ||
@@ -649,7 +762,7 @@ static bool withdraw(nx_stm32_adc_group_state_t* state) {
          (config->memory->FCR & DMA_SxFCR_FEIE) != 0U))
         return false;
 #ifndef NEXUS_STM32_MODEL
-    if ((state->effects & VECTORS) != 0U) {
+    if ((state->effects & NX_ADC_GROUP_VECTORS) != 0U) {
         NVIC_DisableIRQ(ADC_IRQn);
         if (!injected(config))
             NVIC_DisableIRQ(DMA2_Stream0_IRQn);
@@ -667,13 +780,13 @@ static bool withdraw(nx_stm32_adc_group_state_t* state) {
             return false;
     }
 #endif
-    state->effects &= (uint8_t)~VECTORS;
+    state->effects &= (uint8_t)~NX_ADC_GROUP_VECTORS;
     if (!injected(config)) {
         uint32_t remaining = config->memory->NDTR;
-        state->events |= observed(config);
+        state->events |= nx_stm32_adc_group_observed(config);
         NX_STM32_ADC_GROUP_ACK(config->dma, UINT32_C(0x3d));
         nx_arch_dsb();
-        state->events |= observed(config);
+        state->events |= nx_stm32_adc_group_observed(config);
         if (remaining != config->memory->NDTR)
             return false;
         config->memory->PAR = config->memory->M0AR = config->memory->M1AR = 0U;
@@ -695,30 +808,31 @@ static nx_result_t service(void* context) {
     if (state->active == NULL)
         return NX_SUCCESS;
     const nx_stm32_adc_group_config_t* config = state->config;
-    const bool live = epoch_live(state);
+    const bool live = nx_stm32_adc_group_epoch_live(state);
     nx_time_us_t now = live ? nx_time_now_us() : 0U;
     nx_arch_irq_state_t saved = nx_arch_irq_save();
-    state->events |= observed(config);
-    if (state->phase != DRAINING) {
+    state->events |= nx_stm32_adc_group_observed(config);
+    if (state->phase != NX_ADC_GROUP_DRAINING) {
         if (!live)
             begin_drain(state, NX_ERROR_STATE);
-        else if ((state->events & CONVERSION_ERROR) != 0U)
+        else if ((state->events & NX_ADC_GROUP_ERROR) != 0U)
             begin_drain(state, NX_ERROR_IO);
         else if (nx_deadline_expired(state->active->base.deadline, now))
             begin_drain(state, NX_ERROR_TIMEOUT);
-        else if (state->phase == WARM &&
+        else if (state->phase == NX_ADC_GROUP_WARM &&
                  nx_deadline_expired(state->warm_until, now)) {
             nx_result_t result = arm(state);
             if (result == NX_SUCCESS)
-                state->phase = ACQUIRING;
+                state->phase = NX_ADC_GROUP_ACQUIRING;
             else
                 begin_drain(state, result);
-        } else if (state->phase == ACQUIRING) {
+        } else if (state->phase == NX_ADC_GROUP_ACQUIRING) {
             bool complete =
                 injected(config)
-                    ? (state->events & ((1U << converters(config)) - 1U)) ==
-                          ((1U << converters(config)) - 1U)
-                    : (state->events & TRANSFER_COMPLETE) != 0U;
+                    ? (state->events &
+                       ((1U << nx_stm32_adc_group_count(config)) - 1U)) ==
+                          ((1U << nx_stm32_adc_group_count(config)) - 1U)
+                    : (state->events & NX_ADC_GROUP_TRANSFER) != 0U;
             if (complete)
                 begin_drain(state,
                             !injected(config) && config->memory->NDTR != 0U
@@ -727,9 +841,9 @@ static nx_result_t service(void* context) {
         }
     }
     nx_arch_irq_restore(saved);
-    if (state->phase != DRAINING)
+    if (state->phase != NX_ADC_GROUP_DRAINING)
         return NX_SUCCESS;
-    if (!withdraw(state)) {
+    if (!nx_stm32_adc_group_withdraw(state)) {
         if (!live ||
             nx_deadline_expired(state->drain_deadline, nx_time_now_us())) {
             state->fault = true;
@@ -739,11 +853,11 @@ static nx_result_t service(void* context) {
         }
         return NX_ERROR_BUSY;
     }
-    state->events |= observed(config);
+    state->events |= nx_stm32_adc_group_observed(config);
     nx_result_t result = state->terminal;
-    if (result == NX_SUCCESS && !epoch_live(state))
+    if (result == NX_SUCCESS && !nx_stm32_adc_group_epoch_live(state))
         result = NX_ERROR_STATE;
-    if (result == NX_SUCCESS && (state->events & CONVERSION_ERROR) != 0U)
+    if (result == NX_SUCCESS && (state->events & NX_ADC_GROUP_ERROR) != 0U)
         result = NX_ERROR_IO;
     if (result == NX_SUCCESS &&
         nx_deadline_expired(state->active->base.deadline, nx_time_now_us()))
@@ -751,20 +865,20 @@ static nx_result_t service(void* context) {
     if (result == NX_SUCCESS && injected(config)) {
         static const uint32_t ranks[4] = {LL_ADC_INJ_RANK_1, LL_ADC_INJ_RANK_2,
                                           LL_ADC_INJ_RANK_3, LL_ADC_INJ_RANK_4};
-        uint16_t* data = state->active->frames;
-        const unsigned count = converters(config);
+        uint16_t* data = state->active->output.frames;
+        const unsigned count = nx_stm32_adc_group_count(config);
         for (unsigned rank = 0U; rank < config->ranks; ++rank)
             for (unsigned i = 0U; i < count; ++i)
                 data[rank * count + i] = LL_ADC_INJ_ReadConversionData12(
                     config->adc[i], ranks[rank]);
     }
-    if (result == NX_SUCCESS && !epoch_live(state))
+    if (result == NX_SUCCESS && !nx_stm32_adc_group_epoch_live(state))
         result = NX_ERROR_STATE;
     state->fault |= result == NX_ERROR_IO;
     nx_adc_group_request_t* request = state->active;
     size_t frames = result == NX_SUCCESS ? request->frame_count : 0U;
     state->active = NULL;
-    state->phase = IDLE;
+    state->phase = NX_ADC_GROUP_IDLE;
     nx_request_settle(&request->base, result, frames);
     return NX_SUCCESS;
 }
@@ -794,34 +908,37 @@ static nx_result_t stop(void* context) {
     state->fault = false;
     return NX_SUCCESS;
 }
-static nx_result_t info(const void* context, nx_adc_group_info_t* output) {
+nx_result_t nx_stm32_adc_group_info_snapshot(const void* context,
+                                             nx_adc_group_info_t* output) {
     const nx_stm32_adc_group_state_t* state = context;
     if (!task())
         return NX_ERROR_CONTEXT;
     if (!state->initialized)
         return NX_ERROR_STATE;
-    if (!independent(state, output, sizeof(*output),
-                     _Alignof(nx_adc_group_info_t)))
+    if (!nx_stm32_adc_group_independent(state, sizeof(*state), output,
+                                        sizeof(*output),
+                                        _Alignof(nx_adc_group_info_t)))
         return NX_ERROR_INVALID;
     if (state->active != NULL &&
         (overlap(output, sizeof(*output), state->active,
                  sizeof(*state->active)) ||
-         overlap(output, sizeof(*output), state->active->frames,
+         overlap(output, sizeof(*output), state->active->output.frames,
                  state->active->bytes)))
         return NX_ERROR_INVALID;
     const nx_stm32_adc_group_config_t* config = state->config;
-    unsigned count = scan_samples(config);
-    const size_t frame_bytes = (size_t)count * storage_bytes(config);
+    unsigned count = nx_stm32_adc_group_samples(config);
+    const size_t frame_bytes =
+        (size_t)count * nx_stm32_adc_group_storage(config);
     /* Prepare establishes this immutable, nonzero frame divisor. */
     if (frame_bytes == 0U)
         return NX_ERROR_STATE;
     nx_adc_group_info_t value = {0};
     value.format = (nx_adc_format_t){
-        .sample_stride = storage_bytes(config),
+        .sample_stride = nx_stm32_adc_group_storage(config),
         .scan_stride = frame_bytes,
         .trigger_identity = timer_used(config) ? config->trigger_identity : 0U,
         .channel_count = (uint16_t)count,
-        .storage_bytes = (uint8_t)storage_bytes(config),
+        .storage_bytes = (uint8_t)nx_stm32_adc_group_storage(config),
         .significant_bits = (uint8_t)(12U - 2U * config->resolution),
         .encoding = NX_ADC_UNSIGNED,
         .byte_order = NX_ADC_LITTLE_ENDIAN,
@@ -834,22 +951,24 @@ static nx_result_t info(const void* context, nx_adc_group_info_t* output) {
     value.sample_halfcycles = s_sample_halfcycles;
     value.sample_code_count = 8U;
     value.adc_clock_hz = config->adc_clock_hz;
-    if (!interleaved(config))
+    if (!nx_stm32_adc_group_interleaved(config))
         for (unsigned rank = 0U; rank < config->ranks; ++rank)
             value.physical_scan_halfcycles +=
                 2U *
                 (s_sample_cycles[config->sample_times[(size_t)rank *
-                                                      converters(config)]] +
+                                                      nx_stm32_adc_group_count(
+                                                          config)]] +
                  12U - 2U * config->resolution);
     value.interleave_delay_cycles =
-        interleaved(config) ? config->delay_cycles : 0U;
+        nx_stm32_adc_group_interleaved(config) ? config->delay_cycles : 0U;
     value.buffer_alignment =
-        (uint8_t)(injected(config) ? 2U : dma_width(config));
+        (uint8_t)(injected(config) ? 2U : nx_stm32_adc_group_width(config));
     value.timer_period_us = timer_used(config) ? config->period_us : 0U;
-    value.max_frames = injected(config)
-                           ? 1U
-                           : (size_t)65535U * dma_width(config) / frame_bytes;
-    value.physical_ranks = (uint16_t)scan_samples(config);
+    value.max_frames =
+        injected(config)
+            ? 1U
+            : (size_t)65535U * nx_stm32_adc_group_width(config) / frame_bytes;
+    value.physical_ranks = (uint16_t)nx_stm32_adc_group_samples(config);
     value.active = state->active != NULL;
     value.fault = state->fault;
     value.quarantined =
@@ -872,12 +991,12 @@ nx_result_t nx_stm32_adc_group_close(nx_stm32_adc_group_state_t* state) {
             return result;
     }
     const nx_stm32_adc_group_config_t* config = state->config;
-    if ((state->effects & COMMON) != 0U) {
+    if ((state->effects & NX_ADC_GROUP_COMMON) != 0U) {
         config->common->CCR = state->saved_common;
         nx_arch_dsb();
         if (config->common->CCR != state->saved_common)
             return NX_ERROR_IO;
-        state->effects &= (uint8_t)~COMMON;
+        state->effects &= (uint8_t)~NX_ADC_GROUP_COMMON;
     }
     const nx_stm32_adc_trigger_fact_t* f = trigger(config);
     if ((state->gates_added & UINT32_C(0x80000000)) != 0U) {
@@ -904,5 +1023,5 @@ const nx_adc_group_ops_t nx_stm32_adc_group_ops = {
     .cancel = cancel,
     .service = service,
     .stop = stop,
-    .info = info,
+    .info = nx_stm32_adc_group_info_snapshot,
 };

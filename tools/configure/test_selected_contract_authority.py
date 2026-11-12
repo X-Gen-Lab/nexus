@@ -39,7 +39,8 @@ class SelectedContractAuthorityTests(unittest.TestCase):
         rows = matrix.support_catalogue(configure.ROOT)
         self.assertEqual({row.part for row in rows}, {
             "STM32F405ZGT6", "STM32F407VET6", "STM32F407ZGT6",
-            "STM32F415ZGT6", "STM32F417ZGT6"})
+            "STM32F411RET6", "STM32F415ZGT6", "STM32F417ZGT6",
+            "STM32F446ZET6", "STM32F479NIH6"})
         self.assertTrue(all(not row.physical_qualified for row in rows))
         self.assertTrue(all(row.review_sources for row in rows))
 

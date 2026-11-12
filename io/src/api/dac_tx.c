@@ -36,7 +36,7 @@ nx_result_t nx_dac_tx_prepare(nx_dac_tx_request_t* request, const void* data,
                               size_t length, uint32_t trigger_hz,
                               nx_time_us_t deadline) {
     if (!span(request, sizeof(*request), _Alignof(nx_dac_tx_request_t)) ||
-        !span(data, length, 1U) || length == 0U || trigger_hz == 0U ||
+        !span(data, length, 1U) || length == 0U ||
         overlap(request, sizeof(*request), data, length)) {
         return NX_ERROR_INVALID;
     }

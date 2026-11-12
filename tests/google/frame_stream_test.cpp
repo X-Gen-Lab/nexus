@@ -547,3 +547,22 @@ TEST(FrameStreamCost, ReportsSuccessfulHostWorkAcrossPoolSizes) {
     }
 }
 } /* namespace */
+
+TEST(FrameLayout, SaiTenBitSamplesUseSixteenBitContainersWithoutChangingI2s) {
+    auto f = pcm();
+    f.kind = NX_FRAME_AUDIO_SAI;
+    f.sample_bits = 10U;
+    f.slot_bits = 16U;
+    f.alignment = NX_FRAME_SAMPLE_LSB;
+    f.frames = 3U;
+    nx_frame_layout_t layout{};
+    ASSERT_EQ(NX_SUCCESS, nx_frame_layout_audio(&f, &layout));
+    EXPECT_EQ(12U, layout.bytes);
+    EXPECT_EQ(4U, layout.planes[0].row_bytes);
+    f.kind = NX_FRAME_AUDIO_I2S;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_frame_layout_audio(&f, &layout));
+    f.kind = NX_FRAME_AUDIO_SAI;
+    f.slot_bits = 8U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_frame_layout_audio(&f, &layout));
+    EXPECT_EQ(12U, layout.bytes);
+}

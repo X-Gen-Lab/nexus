@@ -5,6 +5,7 @@
  */
 #ifndef NEXUS_STM32_EXTI_HARDWARE_MODEL_H
 #define NEXUS_STM32_EXTI_HARDWARE_MODEL_H
+#include "stm32_official_model.h"
 #include <stdint.h>
 #ifdef __cplusplus
 extern "C" {

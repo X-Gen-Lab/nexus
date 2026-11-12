@@ -15,7 +15,8 @@ foreach(clock_family stm32f4)
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
         "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
     nexus_use_cmsis_core(${clock_target})
-    target_compile_definitions(${clock_target} PRIVATE STM32F407xx)
+    target_compile_definitions(${clock_target} PRIVATE STM32F407xx
+        NEXUS_STM32F4_USB_REMOTE_WAKEUP=1)
 endforeach()
 nexus_google_test(nexus_stm32f4_usb_hs_clock_test
     SOURCES usb_hs_clock_test.cpp
@@ -28,7 +29,8 @@ target_compile_options(nexus_stm32f4_usb_hs_clock_test PRIVATE
 target_include_directories(nexus_stm32f4_usb_hs_clock_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 nexus_use_cmsis_core(nexus_stm32f4_usb_hs_clock_test)
-target_compile_definitions(nexus_stm32f4_usb_hs_clock_test PRIVATE STM32F407xx)
+target_compile_definitions(nexus_stm32f4_usb_hs_clock_test PRIVATE STM32F407xx
+    NEXUS_STM32F4_USB_REMOTE_WAKEUP=1)
 
 nexus_google_test(nexus_stm32_usb_hal_time_test
     SOURCES usb_hal_time_test.cpp

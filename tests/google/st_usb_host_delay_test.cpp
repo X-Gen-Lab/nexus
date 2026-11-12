@@ -1,7 +1,9 @@
 /**
  * \file            st_usb_host_delay_test.cpp
- * \brief           Official Core delay observes progress and never fakes
- * success \author          Nexus Team \version         1.0.0 \date 2026-11-10
+ * \brief           Official Core delays require observable progress
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-11-10
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {

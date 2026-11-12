@@ -4,6 +4,8 @@ nexus_google_test(nexus_adc_format_test SOURCES adc_format_test.cpp adc_group_te
 nexus_google_test(nexus_stm32_adc_group_test STM32F4_LL
     SOURCES stm32_adc_group_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_group.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_group_blocks.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_group_automatic.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_trigger.c"
     LIBRARIES Nexus::NativeModel Nexus::IO Nexus::Arch

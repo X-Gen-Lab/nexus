@@ -20,12 +20,12 @@ class CompatibilityTests(unittest.TestCase):
         self.other_version = f"{major}.{minor}.{patch_version + 1}"
         self.observed = {"semantic_version": self.version,
                          "schemas": dict(self.policy["schemas"]),
-                         "source_sdk_exact_only": True, "factory_abi_epoch": 1}
+                         "source_sdk_exact_only": True, "factory_abi_epoch": 2}
 
     def test_current_policy_matches_actual_authorities(self):
         report = compatibility.check(ROOT)
         self.assertEqual(report["status"], "consistent")
-        self.assertEqual(report["factory_abi_epoch"], 1)
+        self.assertEqual(report["factory_abi_epoch"], 2)
         self.assertFalse(report["binary_abi_supported"])
         self.assertFalse(report["physical_qualification"])
         self.assertGreaterEqual(len(report["inputs"]), 7)
@@ -61,15 +61,15 @@ class CompatibilityTests(unittest.TestCase):
                     compatibility.check(root)
 
     def test_snapshot_policy_checks_actual_supported_factory_epoch(self):
-        self.assertIs(metadata.policy_contract(self.policy, expected_factory_epoch=1), self.policy)
-        for epoch in (0, 2, True, "1"):
+        self.assertIs(metadata.policy_contract(self.policy, expected_factory_epoch=2), self.policy)
+        for epoch in (0, 1, 3, True, "2"):
             with self.subTest(epoch=epoch), self.assertRaisesRegex(ValueError, "epoch"):
                 metadata.policy_contract(self.policy, expected_factory_epoch=epoch)
 
     def test_header_lines_come_from_validated_policy(self):
         self.assertEqual(metadata.header_lines(self.policy), [
             f'#define NEXUS_PLATFORM_VERSION "{self.version}"',
-            '#define NEXUS_FACTORY_ABI_EPOCH 1U'])
+            '#define NEXUS_FACTORY_ABI_EPOCH 2U'])
         invalid = copy.deepcopy(self.policy)
         invalid["semantic_version"] = self.version + '"'
         with self.assertRaises(ValueError): metadata.header_lines(invalid)
@@ -78,7 +78,7 @@ class CompatibilityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = self.fixture(directory)
             path = root / "tools/configure/factory.py"
-            path.write_text(path.read_text().replace("FACTORY_ABI_EPOCH = 1", "FACTORY_ABI_EPOCH = 2"))
+            path.write_text(path.read_text().replace("FACTORY_ABI_EPOCH = 2", "FACTORY_ABI_EPOCH = 3"))
             with self.assertRaisesRegex(ValueError, "factory.*epoch"):
                 compatibility.check(root)
 
@@ -104,11 +104,11 @@ class CompatibilityTests(unittest.TestCase):
                             compatibility.check(root)
 
     def test_exact_source_generation_is_accepted(self):
-        report = compatibility.validate(self.policy, self.observed, 1)
+        report = compatibility.validate(self.policy, self.observed, 2)
         self.assertEqual(report["semantic_version"], self.version)
 
     def test_unknown_requested_epoch_is_rejected(self):
-        for epoch in (0, 2, 999, True, "1"):
+        for epoch in (0, 1, 3, 999, True, "2"):
             with self.subTest(epoch=epoch), self.assertRaises(ValueError):
                 compatibility.validate(self.policy, self.observed, epoch)
 
@@ -179,15 +179,17 @@ class CompatibilityTests(unittest.TestCase):
     def test_generated_factory_macro_mismatch_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             header = Path(directory) / "nexus_factory.h"
-            header.write_text('#define NEXUS_FACTORY_ABI_EPOCH 2U\n'
-                              f'#define NEXUS_PLATFORM_VERSION "{self.version}"\n')
-            with self.assertRaisesRegex(ValueError, "epoch"):
-                compatibility.check(ROOT, generated=header)
+            for epoch in (1, 3):
+                with self.subTest(epoch=epoch):
+                    header.write_text(f'#define NEXUS_FACTORY_ABI_EPOCH {epoch}U\n'
+                                      f'#define NEXUS_PLATFORM_VERSION "{self.version}"\n')
+                    with self.assertRaisesRegex(ValueError, "epoch"):
+                        compatibility.check(ROOT, generated=header)
 
     def test_generated_factory_version_mismatch_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             header = Path(directory) / "nexus_factory.h"
-            header.write_text('#define NEXUS_FACTORY_ABI_EPOCH 1U\n'
+            header.write_text('#define NEXUS_FACTORY_ABI_EPOCH 2U\n'
                               f'#define NEXUS_PLATFORM_VERSION "{self.other_version}"\n')
             with self.assertRaisesRegex(ValueError, "version"):
                 compatibility.check(ROOT, generated=header)
@@ -195,7 +197,7 @@ class CompatibilityTests(unittest.TestCase):
     def test_generated_factory_matching_macros_are_accepted(self):
         with tempfile.TemporaryDirectory() as directory:
             header = Path(directory) / "nexus_factory.h"
-            header.write_text('#define NEXUS_FACTORY_ABI_EPOCH 1U\n'
+            header.write_text('#define NEXUS_FACTORY_ABI_EPOCH 2U\n'
                               f'#define NEXUS_PLATFORM_VERSION "{self.version}"\n')
             self.assertEqual(compatibility.check(ROOT, generated=header)["status"], "consistent")
 
@@ -225,7 +227,7 @@ class CompatibilityTests(unittest.TestCase):
             root = self.fixture(directory)
             observed = compatibility.observe(root)
             def changing_reader(_root):
-                policy = copy.deepcopy(self.policy); policy["factory_abi_epoch"] = 2
+                policy = copy.deepcopy(self.policy); policy["factory_abi_epoch"] = 3
                 (root / compatibility.POLICY).write_text(json.dumps(policy))
                 return observed
             with patch.object(compatibility, "observe", side_effect=changing_reader):

@@ -143,7 +143,7 @@ extern "C" void nx_stm32_system_model_poll(void* opaque) {
     else
         rcc->CR &= ~(uint32_t)RCC_CR_PLLRDY;
     rcc->CFGR = (rcc->CFGR & ~(uint32_t)RCC_CFGR_SWS) |
-                ((rcc->CFGR & RCC_CFGR_SW) << 2U);
+                ((rcc->CFGR & static_cast<uint32_t>(RCC_CFGR_SW)) << 2U);
 }
 
 /** \brief Forward real production stores to the external hardware boundary. */

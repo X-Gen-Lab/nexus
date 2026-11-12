@@ -22,6 +22,10 @@ PARTS = MappingProxyType({
         "LQFP144", frozenset(('ccm',)), "stm32f415"),
     "STM32F417ZGT6": common.PartPolicy(
         "LQFP144", frozenset(('ccm',)), "stm32f417"),
+    "STM32F411RET6": common.PartPolicy("LQFP64", device="stm32f411xe"),
+    "STM32F446ZET6": common.PartPolicy("LQFP144", device="stm32f446"),
+    "STM32F479NIH6": common.PartPolicy(
+        "TFBGA216", frozenset(('ccm',)), "stm32f479"),
 })
 PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
                             "eth", "eth_frames"))
@@ -44,7 +48,6 @@ ENUM_ABI = 'short-enums'
 IRQ_PRIORITY_BITS = 4
 DWT_CYCCNT = True
 FREERTOS_PORT = 'GCC/ARM_CM4F'
-EXTERNAL_IRQ_COUNT = 82
 CPU_FEATURES = MappingProxyType({
     'dwt_cyccnt': True, 'mpu_version': 7, 'icache_line_bytes': 0,
     'dcache_line_bytes': 0, 'security': 'single', 'sau': False, 'mve': 'none',
@@ -81,7 +84,9 @@ _BASE_CONTROLLER_INTERFACES = MappingProxyType({
     'FSMC': MappingProxyType({
         'memory_window': ('cpu-window', 'startup-memory', 'psram-window'),
         'flash_async': ('nor-cfi',), 'nand': ('raw-page',),
-        'parallel16': ('8080-16',)})})
+        'parallel16': ('8080-16',)}),
+    'FMC': MappingProxyType({'memory_window': ('cpu-window',)}),
+    'QUADSPI': MappingProxyType({'flash_async': ('nor-indirect',)})})
 CONTROLLER_INTERFACES = MappingProxyType({
     name: MappingProxyType({**_BASE_CONTROLLER_INTERFACES.get(name, {}),
                             **waveform.controller_interfaces().get(name, {})})
@@ -110,9 +115,15 @@ PIN_ELECTRICAL = True
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('adc_group', 'regular-sequence-dma'): 'adc_group',
+    ('adc_group', 'regular-blocks'): 'adc_group_blocks',
+    ('adc_group', 'regular-software-injected-blocks'): 'adc_group_combined',
+    ('adc_group', 'regular-timer-injected-blocks'): 'adc_group_combined',
+    ('adc_group', 'regular-auto-injected'): 'adc_group_automatic',
     ('adc_group', 'injected-sequence'): 'adc_group',
     **{('capture', mode): 'capture'
-       for mode in ('snapshot-raw', 'snapshot-jpeg', 'raw-blocks')},
+       for mode in ('snapshot-raw', 'snapshot-jpeg', 'raw-blocks', 'jpeg-blocks')},
+    **{('capture', mode): 'capture_frames'
+       for mode in ('frames-raw', 'frames-jpeg')},
     **{('audio', role + '-' + direction): 'audio'
        for role in ('master', 'slave') for direction in ('tx', 'rx', 'duplex')},
     **{('audio', role + '-' + direction + '-blocks'): 'audio_blocks'
@@ -122,6 +133,10 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('timer_sequence', 'dma-burst'): 'timer_sequence',
     ('encoder', 'quadrature'): 'encoder',
     ('crc', 'crc32-words'): 'crc',
+    ('cipher', 'irq-blocks'): 'cipher',
+    ('hash', 'irq-blocks'): 'hash',
+    ('display', 'rgb-scanout'): 'ltdc',
+    ('image', 'irq-blit'): 'image',
     ('entropy', 'rng-words'): 'entropy',
     ('dac', 'direct'): 'dac',
     ('dac', 'triggered'): 'dac',
@@ -132,6 +147,9 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('memory_window', 'startup-memory'): 'fsmc',
     ('external_bus', 'async16'): 'fsmc',
     ('external_bus', 'external-memory'): 'fsmc',
+    ('external_bus', 'sdram-controller'): 'sdram',
+    ('external_bus', 'qspi-indirect-sdr'): 'qspi',
+    ('flash_async', 'nor-indirect'): 'qspi',
     ('memory_window', 'psram-window'): 'fsmc',
     ('flash_async', 'nor-cfi'): 'fsmc',
     ('nand', 'raw-page'): 'fsmc',
@@ -195,11 +213,19 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
 
 def validate_selection(selection, route):
     """Validate limits of the implemented provider, not theoretical silicon."""
+    if route["kind"] in {"display", "image"}:
+        from .graphics import validate
+        return validate(selection, route)
     kind = route["kind"]
     if kind in {"capture", "audio"}:
         from .capture_audio import validate
         validate(selection, route)
     mode_implementation(kind, selection["mode"])
+    if kind in {"cipher", "hash"}:
+        expected = "CRYP" if kind == "cipher" else "HASH"
+        if (route["controller"] != expected or route["pins"] or
+                "irq_priority" not in selection):
+            common.fail("Crypto requires an exact internal controller and IRQ policy")
     if kind == 'exti' and selection['mode'] in {'pvd-level', 'pvd-events'}:
         if route['controller'] != 'EXTI16' or route['pins']:
             common.fail('PVD requires its pinless EXTI16 controller')
@@ -273,9 +299,14 @@ def validate_dma(route, mode, normalize):
         stream = 7 if route['id'].endswith('-s7') else 1
         expected = (f'DMA2:stream{stream}:channel1',)
     elif route['kind'] == 'audio':
-        from .capture_audio import dma_paths
+        if route['controller'] == 'SAI1':
+            from .sai import dma_paths
+            paths = dma_paths(route, mode)
+        else:
+            from .capture_audio import dma_paths
+            paths = dma_paths(route['controller'], mode)
         expected = tuple(f'DMA{engine}:stream{lane}:channel{channel}'
-            for engine, lane, channel in dma_paths(route['controller'], mode))
+            for engine, lane, channel in paths)
     elif route['kind'] == 'dac':
         from .hardware import DAC_DMA_ROUTES
         mask = sum(1 << (DAC_PIN_CHANNELS[("DAC", pin["pin"])] - 1)
@@ -318,18 +349,25 @@ def validate_mode_context(selection, route, *, backend, clock_profile):
     from .rtc import validate_context
     validate_context(selection, route, backend=backend,
                      clock_profile=clock_profile)
-    if route['kind'] == 'external_bus' and (
+    if route['kind'] == 'external_bus' and selection['mode'] in {
+            'sdram-controller', 'qspi-indirect-sdr'}:
+        if backend != 'baremetal' or clock_profile != 'custom':
+            common.fail('External memory requires explicit baremetal custom RUN ownership')
+    elif route['kind'] == 'external_bus' and (
             backend != 'baremetal' or clock_profile != 'hse8-pll168'):
         common.fail('FSMC requires exact baremetal hse8-pll168 RUN ownership')
 
 
 mode_fields = common.mode_fields
 def validate_controller_set(selected, *, clock_profile):
-    """Both audio cells share exactly one compatible PLLI2S tuple."""
+    """Keep shared audio clocks and DAC source-before-consumer ownership."""
     del clock_profile
     waveform.resolve_edges(selected)
+    from tools.configure import dac
+    dac.resolve_sources(selected)
     tuples = {(item["pll_n"], item["pll_r"]) for item in selected
-              if item["kind"] == "audio" and item["mode"].startswith("master-")}
+              if item["kind"] == "audio" and item["controller"] in {"I2S2", "I2S3"}
+              and item["mode"].startswith("master-")}
     if len(tuples) > 1:
         common.fail("Selected I2S controllers require one compatible PLLI2S tuple")
 
@@ -337,3 +375,38 @@ validate_endpoint_clock = common.validate_endpoint_clock
 def configuration_header(result):
     from .clocks import header_lines
     return [*common.configuration_header(result), *header_lines(result)]
+
+
+def validate_clock_policy(policy, selected=None):
+    """Apply exact device input/output limits before any selected consumer.
+
+    The current new-device RUN scope is HSI16 without an active main PLL.
+    Auxiliary output availability and electrical ranges remain device-specific.
+    """
+    if not isinstance(policy, str) or policy not in {
+            "rm0090-run", "hsi16-only", "hsi16-pllsai-independent-m",
+            "hsi16-pllsai-shared-m"}:
+        common.fail("Unknown selected STM32F4 clock policy")
+    if selected is None:
+        return
+    auxiliary = selected.get("pll_sai")
+    if policy in {"rm0090-run", "hsi16-only"} and auxiliary is not None:
+        common.fail("Selected STM32F4 clock policy forbids PLLSAI")
+    if policy == "rm0090-run":
+        return
+    p, domains = selected["parameters"], selected["domains"]
+    if (p["source"] != "hsi" or p["input_hz"] != 16000000 or
+            p["sysclk_source"] != "input" or p["pll_enabled"] or p["css"] or
+            p["ahb_div"] != 1 or p["apb1_div"] != 1 or p["apb2_div"] != 1 or
+            any(domains[name]["nominal_hz"] != 16000000
+                for name in ("sysclk", "core", "apb1", "apb2"))):
+        common.fail("Selected STM32F4 clock policy requires direct HSI16 RUN")
+    if auxiliary is None:
+        return
+    if policy == "hsi16-pllsai-shared-m":
+        if auxiliary["m"] != p["pll_m"]:
+            common.fail("F479 shared PLLM differs from the selected System input")
+        if p["input_hz"] * auxiliary["n"] < 192000000 * auxiliary["m"]:
+            common.fail("F479 PLLSAI VCO must be at least 192 MHz")
+    elif auxiliary["ltdc"] is not None:
+        common.fail("F446 has no PLLSAI R output or LTDC")

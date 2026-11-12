@@ -7,6 +7,8 @@ from tools.configure import can, timer_advanced, gpio_phase
 
 def implementation(item):
     from .contract import mode_implementation
+    if item.kind == "audio" and item.controller == "SAI1":
+        return "sai"
     return mode_implementation(item.kind, item.mode)
 
 
@@ -21,6 +23,8 @@ def operations(item):
         return "nx_spi_dma_sequence_port_ops"
     if item.kind in {"eth", "eth_frames"}:
         return f"nx_{item.kind}_mac_ops"
+    if item.kind in {"cipher", "hash"}:
+        return f"nx_stm32f4_{item.kind}_ops"
     if item.kind == "entropy":
         return "nx_stm32f407_entropy_ops"
     if item.kind == "can":
@@ -31,7 +35,9 @@ def operations(item):
     if item.kind == "usb_host":
         return "nx_stm32_usb_host_ops"
     if item.kind == "external_bus":
-        return "nx_stm32_fsmc_external_bus_ops"
+        return ("nx_stm32_sdram_bus_ops" if item.mode == "sdram-controller"
+                else "nx_stm32_qspi_bus_ops" if item.mode == "qspi-indirect-sdr"
+                else "nx_stm32_fsmc_external_bus_ops")
     if selected == "i2c_async":
         return "nx_i2c_v1_async_ops"
     return f"nx_stm32_{selected}_ops"
@@ -42,22 +48,49 @@ def includes(result):
     source = []
     if any(item.kind == 'adc_group' for item in selections):
         source.append('#include "stm32f407_adc_group.h"')
+    if any(item.kind == 'adc_group' and item.mode == 'regular-blocks'
+           for item in selections):
+        source.append('#include "stm32f407_adc_group_blocks.h"')
+    if any(item.kind == 'adc_group' and
+           item.mode in {'regular-software-injected-blocks',
+                         'regular-timer-injected-blocks'}
+           for item in selections):
+        source.append('#include "stm32f407_adc_group_combined.h"')
+    if any(item.kind == "adc_group" and item.mode == "regular-auto-injected"
+           for item in selections):
+        source.append('#include "stm32f407_adc_group_automatic.h"')
     source.append('#include "stm32f407_provider.h"')
     source.append('#include "stm32f407_platform_cold.h"')
     if any(item.kind == 'exti' and item.mode == 'hardware-event'
            for item in selections):
         source.append('#include "stm32f4_exti_hardware.h"')
-    for kind in ("capture", "audio"):
-        if any(item.kind == kind for item in selections):
-            source.append(f'#include "stm32f407_{kind}.h"')
-    if any(item.kind == "audio" and item.mode.endswith("-blocks")
+    if any(item.kind == "capture" for item in selections):
+        source.append('#include "stm32f407_capture.h"')
+    i2s = tuple(item for item in selections if item.kind == "audio" and
+                item.controller in {"I2S2", "I2S3"})
+    if i2s:
+        source.append('#include "stm32f407_audio.h"')
+    if any(item.kind == "audio" and item.controller == "SAI1"
            for item in selections):
+        source.append('#include "stm32f4_sai.h"')
+    if any(item.kind == "capture" and item.mode.startswith("frames-")
+           for item in selections):
+        source.append('#include "stm32f407_capture_frames.h"')
+    if any(item.mode.endswith("-blocks") for item in i2s):
         source.append('#include "stm32f407_audio_blocks.h"')
     if any(item.kind == 'exti' and item.mode in {'pvd-level', 'pvd-events'}
            for item in selections):
         source.append('#include "stm32f407_pvd.h"')
     if any(item.kind == "watchdog" and item.mode == "window" for item in selections):
         source.append('#include "stm32f407_window_watchdog.h"')
+    if any(item.kind in {"cipher", "hash"} for item in selections):
+        source.append('#include "stm32f4_crypto_irq.h"')
+    for kind in ("cipher", "hash"):
+        if any(item.kind == kind for item in selections):
+            source.append(f'#include "stm32f4_{kind}.h"')
+    for kind, header in (("display", "ltdc"), ("image", "dma2d")):
+        if any(item.kind == kind for item in selections):
+            source.append(f'#include "stm32f4_{header}.h"')
     if any(item.kind == "entropy" for item in selections):
         source.append('#include "stm32f407_entropy.h"')
     if any(item.kind == "crc" for item in selections):
@@ -129,7 +162,14 @@ def includes(result):
         source.append('#include "stm32f407_sdio.h"')
     if any(item.kind == "rtc" for item in selections):
         source.append('#include "stm32f407_rtc.h"')
-    if any(item.kind == "external_bus" for item in selections):
+    if any(item.kind == "external_bus" and item.mode == "sdram-controller"
+           for item in selections):
+        source.append('#include "stm32f4_sdram.h"')
+    if any(item.kind == "external_bus" and item.mode == "qspi-indirect-sdr"
+           for item in selections):
+        source.append('#include "stm32f4_qspi.h"')
+    if any(item.kind == "external_bus" and item.mode in {"async16", "external-memory"}
+           for item in selections):
         source.append('#include "stm32f407_fsmc.h"')
         if any(item.driver=="flash_async-endpoint" for item in result.devices):
             source.append('#include "stm32f407_fsmc_nor.h"')
@@ -174,10 +214,10 @@ def state_declarations(result):
     source = []
     if has_dma(result):
         source.append("static uint32_t s_nx_platform_dma_clocks_added;")
-    if any(item.kind == "exti" and item.mode in {'edge-event', 'hardware-event'}
-           for item in selections):
+    if needs_syscfg(result):
         source.append('static uint32_t s_nx_platform_syscfg_clock_added;')
-    if any(item.kind == "audio" for item in selections):
+    if any(item.kind == "audio" and item.controller in {"I2S2", "I2S3"}
+           for item in selections):
         source.append("static nx_stm32_audio_clock_t s_nx_audio_clock;")
     source.extend(can.state_declarations(result, "stm32"))
     source.extend(packet.state_declarations(result))
@@ -316,7 +356,13 @@ def platform_system_release(result, started):
 def _resource_slots(result):
     """Name only selected receipt storage; absent resources allocate nothing."""
     dma = '&s_nx_platform_dma_clocks_added' if has_dma(result) else 'NULL'
-    syscfg = ('&s_nx_platform_syscfg_clock_added' if
-              any(item.kind == 'exti' and item.mode in {'edge-event', 'hardware-event'}
-                  for item in result.controllers) else 'NULL')
+    syscfg = '&s_nx_platform_syscfg_clock_added' if needs_syscfg(result) else 'NULL'
     return dma, syscfg
+
+
+def needs_syscfg(result):
+    """EXTI mux and FMC aperture readback share the same cold gate receipt."""
+    return any((item.kind == 'exti' and
+                item.mode in {'edge-event', 'hardware-event'}) or
+               (item.kind == 'external_bus' and item.mode == 'sdram-controller')
+               for item in result.controllers)

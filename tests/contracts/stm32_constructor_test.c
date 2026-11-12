@@ -19,6 +19,19 @@ static unsigned s_clock_failure;
 
 #include "stm32_constructors.h"
 
+/** \brief Model BSRR set/reset commands without changing provider behavior. */
+void nx_stm32_constructor_write(volatile uint32_t* reg, uint32_t value) {
+    *reg = value;
+    for (unsigned bank = 0U; bank < 9U; ++bank) {
+        GPIO_TypeDef* gpio =
+            (GPIO_TypeDef*)(uintptr_t)(GPIOA_BASE + bank * 0x400U);
+        if (reg == &gpio->BSRR) {
+            gpio->ODR = (gpio->ODR & ~(value >> 16U)) | (value & 0xFFFFU);
+            return;
+        }
+    }
+}
+
 /** \brief Inject a late GPIO readback failure after earlier pin mutation. */
 uint32_t nx_stm32_model_gpio_clock_read(const volatile uint32_t* reg) {
     if (s_clock_failure != 0U && --s_clock_failure == 0U) {
@@ -159,6 +172,7 @@ static void pwm_rollback_test(void) {
 static void spi_rollback_test(void) {
     RCC->AHB1ENR = 1U << 2U;
     RCC->APB2ENR = RCC_APB2ENR_USART1EN;
+    GPIOE->ODR = 1U << 6U;
     uint16_t before = nx_stm32_pin_capture(GPIOA, 5U);
     s_clock_failure = 2U;
     assert(nx_test_prepare_spi0() == NX_ERROR_IO);
@@ -169,6 +183,7 @@ static void spi_rollback_test(void) {
     assert(!s_nx_cs_sensor0.initialized);
     assert(nx_test_prepare_spi0() == NX_SUCCESS);
     assert(s_nx_cs_sensor0.initialized && SPI1->CR1 == 0U);
+    assert(GPIOE->ODR == ((1U << 6U) | (1U << 3U)));
     assert(nx_test_stop_spi0() == NX_SUCCESS);
     assert(!s_nx_cs_sensor0.initialized && GPIOE->BSRR == 8U);
     assert((RCC->APB2ENR & RCC_APB2ENR_SPI1EN) == 0U);

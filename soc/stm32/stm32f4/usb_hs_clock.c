@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_clock.h"
+#include "stm32f407_usb_clock.h"
 #include "stm32f407_usb_hs_clock.h"
 
 #ifndef NX_USB_CLOCK_WRITE
@@ -156,5 +157,6 @@ nx_result_t nx_stm32_usb_hs_clock_stop(nx_stm32_usb_hs_clock_state_t* state,
     state->phase = IDLE;
     return NX_SUCCESS;
 }
-const nx_usb_clock_ops_t nx_stm32_usb_hs_clock_ops = {retain, release,
-                                                      validate};
+const nx_usb_clock_ops_t nx_stm32_usb_hs_clock_ops = {
+    retain, release, validate,
+    NEXUS_STM32F4_USB_REMOTE_WAKEUP ? nx_stm32_usb_epoch : NULL};

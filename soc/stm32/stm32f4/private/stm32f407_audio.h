@@ -86,6 +86,13 @@ typedef struct {
     bool receive_tail;
     bool terminal_stopped;
 } nx_stm32_audio_state_t;
+/** \brief Copy storage facts from already validated immutable wire settings.
+ * \param[in] config: Valid selected I2S format; no hardware is accessed.
+ * \param[out] output: Separate admitted query result with no live aliases.
+ * \note Internal finite/blocks helper; no conversion or runtime state.
+ */
+void nx_stm32_audio_storage_layout(const nx_stm32_audio_config_t* config,
+                                   nx_audio_layout_t* output);
 /** \brief One shared immutable operations table for I2S2 and I2S3. */
 extern const nx_audio_ops_t nx_stm32_audio_ops;
 /** \brief Cold no-write admission before shared Platform resource changes. */

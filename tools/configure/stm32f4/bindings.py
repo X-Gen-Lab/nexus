@@ -221,6 +221,12 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         from .pvd import constructor as pvd_constructor
         return pvd_constructor(item)
     if item.kind == "external_bus":
+        if item.mode == "qspi-indirect-sdr":
+            from .qspi import constructor as qspi_constructor
+            return qspi_constructor(item, result)
+        if item.mode == "sdram-controller":
+            from .sdram import constructor as sdram_constructor
+            return sdram_constructor(item, result)
         from .fsmc import constructor as fsmc_constructor
         return fsmc_constructor(item, result)
     if item.kind in {"capture", "audio"}:
@@ -448,7 +454,7 @@ def _basic_constructor(item, result):
     exact_part(PARTS, result.part)
     geometry = f"s_nx_flash_geometry_{name}"
     definitions = flash_geometry(
-        result, symbol=geometry, sector_symbol=f"s_nx_flash_sectors_{name}",
+        result, symbol=geometry, span_symbol=f"s_nx_flash_erase_spans_{name}",
         program_unit=FLASH_PROGRAM_UNIT)
     flash = result.physical_part.flash
     definitions += [f'_Static_assert(FLASH_BASE == 0x{flash["origin"]:08x}u,',
@@ -599,12 +605,18 @@ def _uart_constructor(item, result):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed STM32 instance, including its rollback and stop."""
     item = controller_ir(item, "stm32f4")
+    if item.kind in {"display", "image"}:
+        from .graphics import constructor as graphics_constructor
+        return graphics_constructor(item, result)
     if item.kind == "adc_group":
         from .adc_group import constructor as group_constructor
         return group_constructor(item, result)
     if item.kind == "encoder":
         from .encoder import constructor as encoder_constructor
         return encoder_constructor(item)
+    if item.kind in {"cipher", "hash"}:
+        from .crypto import constructor as crypto_constructor
+        return crypto_constructor(item, result)
     if item.kind == "entropy":
         state = Address("s_nx_port_" + _symbol(item.id))
         return Construction(state_type="nx_stm32f407_entropy_state_t",

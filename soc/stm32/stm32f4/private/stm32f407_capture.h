@@ -1,6 +1,6 @@
 /**
  * \file            stm32f407_capture.h
- * \brief           Exact DCMI snapshot and raw storage block owner
+ * \brief           Exact DCMI snapshots and opaque storage block owner
  * \author          Nexus Team
  */
 #ifndef NX_STM32F407_CAPTURE_H

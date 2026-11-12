@@ -391,7 +391,10 @@ class ModeTraits:
 _MODE_TRAITS = MappingProxyType({
     ('capture', 'snapshot-raw'): ModeTraits(irq=True, rx_dma=True),
     ('capture', 'snapshot-jpeg'): ModeTraits(irq=True, rx_dma=True),
+    ('capture', 'frames-raw'): ModeTraits(irq=True, rx_dma=True),
+    ('capture', 'frames-jpeg'): ModeTraits(irq=True, rx_dma=True),
     ('capture', 'raw-blocks'): ModeTraits(irq=True, rx_dma=True, continuous=True),
+    ('capture', 'jpeg-blocks'): ModeTraits(irq=True, rx_dma=True, continuous=True),
     **{('audio', role + '-' + direction): ModeTraits(
         irq=True, tx_dma=direction != 'rx', rx_dma=direction != 'tx')
        for role in ('master', 'slave') for direction in ('tx', 'rx', 'duplex')},
@@ -401,6 +404,11 @@ _MODE_TRAITS = MappingProxyType({
        for role in ('master', 'slave') for direction in ('tx', 'rx', 'duplex')},
     ("dac", "direct"): ModeTraits(polling=True),
     ("crc", "crc32-words"): ModeTraits(polling=True),
+    ("cipher", "irq-blocks"): ModeTraits(irq=True),
+    ("hash", "irq-blocks"): ModeTraits(irq=True),
+    ("display", "rgb-scanout"): ModeTraits(irq=True, bus_master=True,
+                                          continuous=True),
+    ("image", "irq-blit"): ModeTraits(irq=True, bus_master=True),
     ("dac", "triggered"): ModeTraits(polling=True),
     ("dac", "noise"): ModeTraits(polling=True),
     ("dac", "triangle"): ModeTraits(polling=True),
@@ -410,6 +418,9 @@ _MODE_TRAITS = MappingProxyType({
     ("memory_window", "startup-memory"): ModeTraits(),
     ("external_bus", "async16"): ModeTraits(polling=True),
     ("external_bus", "external-memory"): ModeTraits(polling=True),
+    ("external_bus", "sdram-controller"): ModeTraits(polling=True),
+    ("external_bus", "qspi-indirect-sdr"): ModeTraits(polling=True),
+    ("flash_async", "nor-indirect"): ModeTraits(polling=True),
     ("memory_window", "psram-window"): ModeTraits(),
     ("flash_async", "nor-cfi"): ModeTraits(polling=True),
     ("nand", "raw-page"): ModeTraits(polling=True),
@@ -425,6 +436,13 @@ _MODE_TRAITS = MappingProxyType({
     ("lptim", "counter16-oneshot"): ModeTraits(),
     ("lptim", "irq-counter16-oneshot"): ModeTraits(irq=True),
     ("adc_group", "regular-sequence-dma"): ModeTraits(irq=True, rx_dma=True),
+    ("adc_group", "regular-blocks"): ModeTraits(
+        irq=True, rx_dma=True, block_stream=True, continuous=True),
+    ("adc_group", "regular-software-injected-blocks"): ModeTraits(
+        irq=True, rx_dma=True, block_stream=True, continuous=True),
+    ("adc_group", "regular-timer-injected-blocks"): ModeTraits(
+        irq=True, rx_dma=True, block_stream=True, continuous=True),
+    ("adc_group", "regular-auto-injected"): ModeTraits(irq=True, rx_dma=True),
     ("adc_group", "injected-sequence"): ModeTraits(irq=True),
     ("pwm_adc", "finite-regular-dma"): ModeTraits(irq=True, rx_dma=True),
     ("can_fd", "iso-fd-loopback"): ModeTraits(irq=True),

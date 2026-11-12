@@ -2940,13 +2940,16 @@
         "STM32F407ZGT6",
         "STM32F405ZGT6",
         "STM32F415ZGT6",
-        "STM32F417ZGT6"
+        "STM32F417ZGT6",
+        "STM32F411RET6",
+        "STM32F446ZET6",
+        "STM32F479NIH6"
       ],
       "pins": [],
       "modes": [
         "crc32-words"
       ],
-      "source": "RM0090 Rev22 section4: fixed 0x04c11db7 polynomial, initial 0xffffffff, 32-bit word access; SoC-internal, no PCB signal"
+      "source": "RM0090 section4, RM0383/RM0390/RM0386 CRC chapters: fixed 0x04c11db7 polynomial, initial 0xffffffff, 32-bit word access; SoC-internal, no PCB signal"
     },
     {
       "id": "adc2-ch0-pa0",
@@ -5357,11 +5360,27 @@
       ],
       "modes": [
         "regular-sequence-dma",
-        "injected-sequence"
+        "injected-sequence",
+        "regular-blocks",
+        "regular-software-injected-blocks",
+        "regular-timer-injected-blocks",
+        "regular-auto-injected"
       ],
       "source": "RM0090 Rev22 sections 13.9 and 13.13; DS8626 Rev12 Table 7. Silicon-only common-ADC inputs, no PCB authorization.; DS8597 Rev10 Table9 same reviewed AF mapping and RM0090 shared IP for selected F415/F417",
       "mode_dma": {
         "regular-sequence-dma": [
+          "DMA2:stream0:channel0"
+        ],
+        "regular-blocks": [
+          "DMA2:stream0:channel0"
+        ],
+        "regular-software-injected-blocks": [
+          "DMA2:stream0:channel0"
+        ],
+        "regular-timer-injected-blocks": [
+          "DMA2:stream0:channel0"
+        ],
+        "regular-auto-injected": [
           "DMA2:stream0:channel0"
         ]
       }
@@ -5460,11 +5479,27 @@
       ],
       "modes": [
         "regular-sequence-dma",
-        "injected-sequence"
+        "injected-sequence",
+        "regular-blocks",
+        "regular-software-injected-blocks",
+        "regular-timer-injected-blocks",
+        "regular-auto-injected"
       ],
       "source": "RM0090 Rev22 sections 13.9 and 13.13; DS8626 Rev12 Table 7. Silicon-only common-ADC inputs, no PCB authorization.; DS8597 Rev10 Table9 same reviewed AF mapping and RM0090 shared IP for selected F415/F417",
       "mode_dma": {
         "regular-sequence-dma": [
+          "DMA2:stream0:channel0"
+        ],
+        "regular-blocks": [
+          "DMA2:stream0:channel0"
+        ],
+        "regular-software-injected-blocks": [
+          "DMA2:stream0:channel0"
+        ],
+        "regular-timer-injected-blocks": [
+          "DMA2:stream0:channel0"
+        ],
+        "regular-auto-injected": [
           "DMA2:stream0:channel0"
         ]
       }
@@ -5603,11 +5638,27 @@
       ],
       "modes": [
         "regular-sequence-dma",
-        "injected-sequence"
+        "injected-sequence",
+        "regular-blocks",
+        "regular-software-injected-blocks",
+        "regular-timer-injected-blocks",
+        "regular-auto-injected"
       ],
       "source": "RM0090 Rev22 sections 13.9 and 13.13; DS8626 Rev12 Table 7. Silicon-only common-ADC inputs, no PCB authorization.; DS8597 Rev10 Table9 same reviewed AF mapping and RM0090 shared IP for selected F415/F417",
       "mode_dma": {
         "regular-sequence-dma": [
+          "DMA2:stream0:channel0"
+        ],
+        "regular-blocks": [
+          "DMA2:stream0:channel0"
+        ],
+        "regular-software-injected-blocks": [
+          "DMA2:stream0:channel0"
+        ],
+        "regular-timer-injected-blocks": [
+          "DMA2:stream0:channel0"
+        ],
+        "regular-auto-injected": [
           "DMA2:stream0:channel0"
         ]
       }
@@ -6678,7 +6729,10 @@
       "modes": [
         "snapshot-raw",
         "snapshot-jpeg",
-        "raw-blocks"
+        "raw-blocks",
+        "jpeg-blocks",
+        "frames-raw",
+        "frames-jpeg"
       ],
       "dma": [
         "DMA2:stream1:channel1"
@@ -6754,7 +6808,10 @@
       "modes": [
         "snapshot-raw",
         "snapshot-jpeg",
-        "raw-blocks"
+        "raw-blocks",
+        "jpeg-blocks",
+        "frames-raw",
+        "frames-jpeg"
       ],
       "dma": [
         "DMA2:stream7:channel1"
@@ -6819,7 +6876,8 @@
       ],
       "modes": [
         "snapshot-raw",
-        "raw-blocks"
+        "raw-blocks",
+        "frames-raw"
       ],
       "dma": [
         "DMA2:stream1:channel1"
@@ -6884,7 +6942,8 @@
       ],
       "modes": [
         "snapshot-raw",
-        "raw-blocks"
+        "raw-blocks",
+        "frames-raw"
       ],
       "dma": [
         "DMA2:stream7:channel1"
@@ -6969,7 +7028,8 @@
       ],
       "modes": [
         "snapshot-raw",
-        "raw-blocks"
+        "raw-blocks",
+        "frames-raw"
       ],
       "dma": [
         "DMA2:stream1:channel1"
@@ -7054,7 +7114,8 @@
       ],
       "modes": [
         "snapshot-raw",
-        "raw-blocks"
+        "raw-blocks",
+        "frames-raw"
       ],
       "dma": [
         "DMA2:stream7:channel1"
@@ -7149,7 +7210,8 @@
       ],
       "modes": [
         "snapshot-raw",
-        "raw-blocks"
+        "raw-blocks",
+        "frames-raw"
       ],
       "dma": [
         "DMA2:stream1:channel1"
@@ -7244,7 +7306,8 @@
       ],
       "modes": [
         "snapshot-raw",
-        "raw-blocks"
+        "raw-blocks",
+        "frames-raw"
       ],
       "dma": [
         "DMA2:stream7:channel1"
@@ -7348,7 +7411,8 @@
       ],
       "modes": [
         "snapshot-raw",
-        "raw-blocks"
+        "raw-blocks",
+        "frames-raw"
       ],
       "dma": [
         "DMA2:stream1:channel1"
@@ -7452,7 +7516,8 @@
       ],
       "modes": [
         "snapshot-raw",
-        "raw-blocks"
+        "raw-blocks",
+        "frames-raw"
       ],
       "dma": [
         "DMA2:stream7:channel1"
@@ -16399,6 +16464,951 @@
         "alarm:RTC_A"
       ],
       "source": "RM0090 Rev22 RCC_BDCR LSEBYP: explicit external 32768Hz clock input on PC14 only; exact Board lse_bypass fact required. ES0182 Rev19 2.2.18 excludes LSE bypass from the PC13 crystal disturbance limitation. PC13 capture requires an explicit external pad handoff; software reference does not establish a PCB or HIL.; DS8597 Rev10 Table9 same reviewed AF mapping and RM0090 shared IP for selected F415/F417"
+    },
+    {
+      "id": "cryp-internal",
+      "controller": "CRYP",
+      "kind": "cipher",
+      "variants": [
+        "STM32F415ZGT6",
+        "STM32F417ZGT6"
+      ],
+      "pins": [],
+      "modes": [
+        "irq-blocks"
+      ],
+      "source": "RM0090 Rev22 chapter 23 basic CRYP on F415/F417; original selected CMSIS IRQ slot 79 and startup vector; no PCB or DMA route"
+    },
+    {
+      "id": "hash-internal",
+      "controller": "HASH",
+      "kind": "hash",
+      "variants": [
+        "STM32F415ZGT6",
+        "STM32F417ZGT6"
+      ],
+      "pins": [],
+      "modes": [
+        "irq-blocks"
+      ],
+      "source": "RM0090 Rev22 chapter 25 basic HASH on F415/F417; original selected CMSIS IRQ slot 80 and startup vector; no PCB or DMA route"
+    },
+    {
+      "id": "fmc-sdram-control",
+      "variants": [
+        "STM32F479NIH6"
+      ],
+      "controller": "FMC",
+      "kind": "external_bus",
+      "pins": [],
+      "modes": [
+        "sdram-controller"
+      ],
+      "resources": [
+        "ip:FMC/control"
+      ],
+      "source": "DS11118 Rev8 Table10 TFBGA216 explicit bonded pins; Table11 SDRAM signal identity and Table12 AF12; RM0386 Rev6 FMC SDRAM Bank1 16-bit row12/column8; ES0321 Rev14 2.2.14 selects PC0 SDNWE and never PA7. Software reference route only, no PCB or fitted SDRAM timing qualification."
+    },
+    {
+      "id": "fmc-sdram-bank1-16",
+      "variants": [
+        "STM32F479NIH6"
+      ],
+      "controller": "FMC",
+      "kind": "memory_window",
+      "pins": [
+        {
+          "pin": "PC0",
+          "function": "FMC_SDNWE",
+          "af": 12
+        },
+        {
+          "pin": "PC2",
+          "function": "FMC_SDNE0",
+          "af": 12
+        },
+        {
+          "pin": "PC3",
+          "function": "FMC_SDCKE0",
+          "af": 12
+        },
+        {
+          "pin": "PD0",
+          "function": "FMC_D2",
+          "af": 12
+        },
+        {
+          "pin": "PD1",
+          "function": "FMC_D3",
+          "af": 12
+        },
+        {
+          "pin": "PD8",
+          "function": "FMC_D13",
+          "af": 12
+        },
+        {
+          "pin": "PD9",
+          "function": "FMC_D14",
+          "af": 12
+        },
+        {
+          "pin": "PD10",
+          "function": "FMC_D15",
+          "af": 12
+        },
+        {
+          "pin": "PD14",
+          "function": "FMC_D0",
+          "af": 12
+        },
+        {
+          "pin": "PD15",
+          "function": "FMC_D1",
+          "af": 12
+        },
+        {
+          "pin": "PE0",
+          "function": "FMC_NBL0",
+          "af": 12
+        },
+        {
+          "pin": "PE1",
+          "function": "FMC_NBL1",
+          "af": 12
+        },
+        {
+          "pin": "PE7",
+          "function": "FMC_D4",
+          "af": 12
+        },
+        {
+          "pin": "PE8",
+          "function": "FMC_D5",
+          "af": 12
+        },
+        {
+          "pin": "PE9",
+          "function": "FMC_D6",
+          "af": 12
+        },
+        {
+          "pin": "PE10",
+          "function": "FMC_D7",
+          "af": 12
+        },
+        {
+          "pin": "PE11",
+          "function": "FMC_D8",
+          "af": 12
+        },
+        {
+          "pin": "PE12",
+          "function": "FMC_D9",
+          "af": 12
+        },
+        {
+          "pin": "PE13",
+          "function": "FMC_D10",
+          "af": 12
+        },
+        {
+          "pin": "PE14",
+          "function": "FMC_D11",
+          "af": 12
+        },
+        {
+          "pin": "PE15",
+          "function": "FMC_D12",
+          "af": 12
+        },
+        {
+          "pin": "PF0",
+          "function": "FMC_A0",
+          "af": 12
+        },
+        {
+          "pin": "PF1",
+          "function": "FMC_A1",
+          "af": 12
+        },
+        {
+          "pin": "PF2",
+          "function": "FMC_A2",
+          "af": 12
+        },
+        {
+          "pin": "PF3",
+          "function": "FMC_A3",
+          "af": 12
+        },
+        {
+          "pin": "PF4",
+          "function": "FMC_A4",
+          "af": 12
+        },
+        {
+          "pin": "PF5",
+          "function": "FMC_A5",
+          "af": 12
+        },
+        {
+          "pin": "PF11",
+          "function": "FMC_SDNRAS",
+          "af": 12
+        },
+        {
+          "pin": "PF12",
+          "function": "FMC_A6",
+          "af": 12
+        },
+        {
+          "pin": "PF13",
+          "function": "FMC_A7",
+          "af": 12
+        },
+        {
+          "pin": "PF14",
+          "function": "FMC_A8",
+          "af": 12
+        },
+        {
+          "pin": "PF15",
+          "function": "FMC_A9",
+          "af": 12
+        },
+        {
+          "pin": "PG0",
+          "function": "FMC_A10",
+          "af": 12
+        },
+        {
+          "pin": "PG1",
+          "function": "FMC_A11",
+          "af": 12
+        },
+        {
+          "pin": "PG4",
+          "function": "FMC_BA0",
+          "af": 12
+        },
+        {
+          "pin": "PG5",
+          "function": "FMC_BA1",
+          "af": 12
+        },
+        {
+          "pin": "PG8",
+          "function": "FMC_SDCLK",
+          "af": 12
+        },
+        {
+          "pin": "PG15",
+          "function": "FMC_SDNCAS",
+          "af": 12
+        }
+      ],
+      "modes": [
+        "cpu-window"
+      ],
+      "source": "DS11118 Rev8 Table10 TFBGA216 explicit bonded pins; Table11 SDRAM signal identity and Table12 AF12; RM0386 Rev6 FMC SDRAM Bank1 16-bit row12/column8; ES0321 Rev14 2.2.14 selects PC0 SDNWE and never PA7. Software reference route only, no PCB or fitted SDRAM timing qualification."
+    },
+    {
+      "id": "sai1-a-simplex",
+      "variants": [
+        "STM32F446ZET6",
+        "STM32F479NIH6"
+      ],
+      "controller": "SAI1",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PE4",
+          "function": "fs_a",
+          "af": 6
+        },
+        {
+          "pin": "PE5",
+          "function": "ck_a",
+          "af": 6
+        },
+        {
+          "pin": "PE6",
+          "function": "sd_a",
+          "af": 6
+        }
+      ],
+      "modes": [
+        "master-tx",
+        "master-rx",
+        "slave-tx",
+        "slave-rx"
+      ],
+      "mode_dma": {
+        "master-tx": [
+          "DMA2:stream1:channel0"
+        ],
+        "master-rx": [
+          "DMA2:stream1:channel0"
+        ],
+        "slave-tx": [
+          "DMA2:stream1:channel0"
+        ],
+        "slave-rx": [
+          "DMA2:stream1:channel0"
+        ]
+      },
+      "source": "DS10693 Rev11/DS11118 Rev8 exact package bonding and AF6 mapping: PE2 MCLK_A, PE3 SD_B, PE4 FS_A, PE5 SCK_A, PE6 SD_A, PF7 MCLK_B, PF8 SCK_B, PF9 FS_B; RM0390 Rev9 Table29/RM0386 Rev6 Table30: SAI1_A DMA2 stream1 channel0, SAI1_B stream4 channel1. Finite software reference only, no PCB/audio-clock accuracy/HIL qualification."
+    },
+    {
+      "id": "sai1-a-simplex-mclk",
+      "variants": [
+        "STM32F446ZET6",
+        "STM32F479NIH6"
+      ],
+      "controller": "SAI1",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PE4",
+          "function": "fs_a",
+          "af": 6
+        },
+        {
+          "pin": "PE5",
+          "function": "ck_a",
+          "af": 6
+        },
+        {
+          "pin": "PE6",
+          "function": "sd_a",
+          "af": 6
+        },
+        {
+          "pin": "PE2",
+          "function": "mclk_a",
+          "af": 6
+        }
+      ],
+      "modes": [
+        "master-tx",
+        "master-rx"
+      ],
+      "mode_dma": {
+        "master-tx": [
+          "DMA2:stream1:channel0"
+        ],
+        "master-rx": [
+          "DMA2:stream1:channel0"
+        ]
+      },
+      "source": "DS10693 Rev11/DS11118 Rev8 exact package bonding and AF6 mapping: PE2 MCLK_A, PE3 SD_B, PE4 FS_A, PE5 SCK_A, PE6 SD_A, PF7 MCLK_B, PF8 SCK_B, PF9 FS_B; RM0390 Rev9 Table29/RM0386 Rev6 Table30: SAI1_A DMA2 stream1 channel0, SAI1_B stream4 channel1. Finite software reference only, no PCB/audio-clock accuracy/HIL qualification."
+    },
+    {
+      "id": "sai1-a-duplex",
+      "variants": [
+        "STM32F446ZET6",
+        "STM32F479NIH6"
+      ],
+      "controller": "SAI1",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PE4",
+          "function": "fs_a",
+          "af": 6
+        },
+        {
+          "pin": "PE5",
+          "function": "ck_a",
+          "af": 6
+        },
+        {
+          "pin": "PE6",
+          "function": "sd_a",
+          "af": 6
+        },
+        {
+          "pin": "PE3",
+          "function": "sd_b",
+          "af": 6
+        }
+      ],
+      "modes": [
+        "master-duplex",
+        "slave-duplex"
+      ],
+      "mode_dma": {
+        "master-duplex": [
+          "DMA2:stream1:channel0",
+          "DMA2:stream4:channel1"
+        ],
+        "slave-duplex": [
+          "DMA2:stream1:channel0",
+          "DMA2:stream4:channel1"
+        ]
+      },
+      "source": "DS10693 Rev11/DS11118 Rev8 exact package bonding and AF6 mapping: PE2 MCLK_A, PE3 SD_B, PE4 FS_A, PE5 SCK_A, PE6 SD_A, PF7 MCLK_B, PF8 SCK_B, PF9 FS_B; RM0390 Rev9 Table29/RM0386 Rev6 Table30: SAI1_A DMA2 stream1 channel0, SAI1_B stream4 channel1. Finite software reference only, no PCB/audio-clock accuracy/HIL qualification."
+    },
+    {
+      "id": "sai1-a-duplex-mclk",
+      "variants": [
+        "STM32F446ZET6",
+        "STM32F479NIH6"
+      ],
+      "controller": "SAI1",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PE4",
+          "function": "fs_a",
+          "af": 6
+        },
+        {
+          "pin": "PE5",
+          "function": "ck_a",
+          "af": 6
+        },
+        {
+          "pin": "PE6",
+          "function": "sd_a",
+          "af": 6
+        },
+        {
+          "pin": "PE3",
+          "function": "sd_b",
+          "af": 6
+        },
+        {
+          "pin": "PE2",
+          "function": "mclk_a",
+          "af": 6
+        }
+      ],
+      "modes": [
+        "master-duplex"
+      ],
+      "mode_dma": {
+        "master-duplex": [
+          "DMA2:stream1:channel0",
+          "DMA2:stream4:channel1"
+        ]
+      },
+      "source": "DS10693 Rev11/DS11118 Rev8 exact package bonding and AF6 mapping: PE2 MCLK_A, PE3 SD_B, PE4 FS_A, PE5 SCK_A, PE6 SD_A, PF7 MCLK_B, PF8 SCK_B, PF9 FS_B; RM0390 Rev9 Table29/RM0386 Rev6 Table30: SAI1_A DMA2 stream1 channel0, SAI1_B stream4 channel1. Finite software reference only, no PCB/audio-clock accuracy/HIL qualification."
+    },
+    {
+      "id": "sai1-b-simplex",
+      "variants": [
+        "STM32F446ZET6",
+        "STM32F479NIH6"
+      ],
+      "controller": "SAI1",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PF9",
+          "function": "fs_b",
+          "af": 6
+        },
+        {
+          "pin": "PF8",
+          "function": "ck_b",
+          "af": 6
+        },
+        {
+          "pin": "PE3",
+          "function": "sd_b",
+          "af": 6
+        }
+      ],
+      "modes": [
+        "master-tx",
+        "master-rx",
+        "slave-tx",
+        "slave-rx"
+      ],
+      "mode_dma": {
+        "master-tx": [
+          "DMA2:stream4:channel1"
+        ],
+        "master-rx": [
+          "DMA2:stream4:channel1"
+        ],
+        "slave-tx": [
+          "DMA2:stream4:channel1"
+        ],
+        "slave-rx": [
+          "DMA2:stream4:channel1"
+        ]
+      },
+      "source": "DS10693 Rev11/DS11118 Rev8 exact package bonding and AF6 mapping: PE2 MCLK_A, PE3 SD_B, PE4 FS_A, PE5 SCK_A, PE6 SD_A, PF7 MCLK_B, PF8 SCK_B, PF9 FS_B; RM0390 Rev9 Table29/RM0386 Rev6 Table30: SAI1_A DMA2 stream1 channel0, SAI1_B stream4 channel1. Finite software reference only, no PCB/audio-clock accuracy/HIL qualification."
+    },
+    {
+      "id": "sai1-b-simplex-mclk",
+      "variants": [
+        "STM32F446ZET6",
+        "STM32F479NIH6"
+      ],
+      "controller": "SAI1",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PF9",
+          "function": "fs_b",
+          "af": 6
+        },
+        {
+          "pin": "PF8",
+          "function": "ck_b",
+          "af": 6
+        },
+        {
+          "pin": "PE3",
+          "function": "sd_b",
+          "af": 6
+        },
+        {
+          "pin": "PF7",
+          "function": "mclk_b",
+          "af": 6
+        }
+      ],
+      "modes": [
+        "master-tx",
+        "master-rx"
+      ],
+      "mode_dma": {
+        "master-tx": [
+          "DMA2:stream4:channel1"
+        ],
+        "master-rx": [
+          "DMA2:stream4:channel1"
+        ]
+      },
+      "source": "DS10693 Rev11/DS11118 Rev8 exact package bonding and AF6 mapping: PE2 MCLK_A, PE3 SD_B, PE4 FS_A, PE5 SCK_A, PE6 SD_A, PF7 MCLK_B, PF8 SCK_B, PF9 FS_B; RM0390 Rev9 Table29/RM0386 Rev6 Table30: SAI1_A DMA2 stream1 channel0, SAI1_B stream4 channel1. Finite software reference only, no PCB/audio-clock accuracy/HIL qualification."
+    },
+    {
+      "id": "sai1-b-duplex",
+      "variants": [
+        "STM32F446ZET6",
+        "STM32F479NIH6"
+      ],
+      "controller": "SAI1",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PF9",
+          "function": "fs_b",
+          "af": 6
+        },
+        {
+          "pin": "PF8",
+          "function": "ck_b",
+          "af": 6
+        },
+        {
+          "pin": "PE3",
+          "function": "sd_b",
+          "af": 6
+        },
+        {
+          "pin": "PE6",
+          "function": "sd_a",
+          "af": 6
+        }
+      ],
+      "modes": [
+        "master-duplex",
+        "slave-duplex"
+      ],
+      "mode_dma": {
+        "master-duplex": [
+          "DMA2:stream4:channel1",
+          "DMA2:stream1:channel0"
+        ],
+        "slave-duplex": [
+          "DMA2:stream4:channel1",
+          "DMA2:stream1:channel0"
+        ]
+      },
+      "source": "DS10693 Rev11/DS11118 Rev8 exact package bonding and AF6 mapping: PE2 MCLK_A, PE3 SD_B, PE4 FS_A, PE5 SCK_A, PE6 SD_A, PF7 MCLK_B, PF8 SCK_B, PF9 FS_B; RM0390 Rev9 Table29/RM0386 Rev6 Table30: SAI1_A DMA2 stream1 channel0, SAI1_B stream4 channel1. Finite software reference only, no PCB/audio-clock accuracy/HIL qualification."
+    },
+    {
+      "id": "sai1-b-duplex-mclk",
+      "variants": [
+        "STM32F446ZET6",
+        "STM32F479NIH6"
+      ],
+      "controller": "SAI1",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PF9",
+          "function": "fs_b",
+          "af": 6
+        },
+        {
+          "pin": "PF8",
+          "function": "ck_b",
+          "af": 6
+        },
+        {
+          "pin": "PE3",
+          "function": "sd_b",
+          "af": 6
+        },
+        {
+          "pin": "PE6",
+          "function": "sd_a",
+          "af": 6
+        },
+        {
+          "pin": "PF7",
+          "function": "mclk_b",
+          "af": 6
+        }
+      ],
+      "modes": [
+        "master-duplex"
+      ],
+      "mode_dma": {
+        "master-duplex": [
+          "DMA2:stream4:channel1",
+          "DMA2:stream1:channel0"
+        ]
+      },
+      "source": "DS10693 Rev11/DS11118 Rev8 exact package bonding and AF6 mapping: PE2 MCLK_A, PE3 SD_B, PE4 FS_A, PE5 SCK_A, PE6 SD_A, PF7 MCLK_B, PF8 SCK_B, PF9 FS_B; RM0390 Rev9 Table29/RM0386 Rev6 Table30: SAI1_A DMA2 stream1 channel0, SAI1_B stream4 channel1. Finite software reference only, no PCB/audio-clock accuracy/HIL qualification."
+    },
+    {
+      "id": "ltdc-rgb565-reference",
+      "variants": [
+        "STM32F479NIH6"
+      ],
+      "controller": "LTDC",
+      "kind": "display",
+      "pins": [
+        {
+          "pin": "PH9",
+          "function": "r3",
+          "af": 14
+        },
+        {
+          "pin": "PH10",
+          "function": "r4",
+          "af": 14
+        },
+        {
+          "pin": "PH11",
+          "function": "r5",
+          "af": 14
+        },
+        {
+          "pin": "PH12",
+          "function": "r6",
+          "af": 14
+        },
+        {
+          "pin": "PG6",
+          "function": "r7",
+          "af": 14
+        },
+        {
+          "pin": "PH13",
+          "function": "g2",
+          "af": 14
+        },
+        {
+          "pin": "PH14",
+          "function": "g3",
+          "af": 14
+        },
+        {
+          "pin": "PH15",
+          "function": "g4",
+          "af": 14
+        },
+        {
+          "pin": "PI0",
+          "function": "g5",
+          "af": 14
+        },
+        {
+          "pin": "PI1",
+          "function": "g6",
+          "af": 14
+        },
+        {
+          "pin": "PI2",
+          "function": "g7",
+          "af": 14
+        },
+        {
+          "pin": "PG11",
+          "function": "b3",
+          "af": 14
+        },
+        {
+          "pin": "PI4",
+          "function": "b4",
+          "af": 14
+        },
+        {
+          "pin": "PI5",
+          "function": "b5",
+          "af": 14
+        },
+        {
+          "pin": "PI6",
+          "function": "b6",
+          "af": 14
+        },
+        {
+          "pin": "PI7",
+          "function": "b7",
+          "af": 14
+        },
+        {
+          "pin": "PI12",
+          "function": "hsync",
+          "af": 14
+        },
+        {
+          "pin": "PI13",
+          "function": "vsync",
+          "af": 14
+        },
+        {
+          "pin": "PI14",
+          "function": "clk",
+          "af": 14
+        },
+        {
+          "pin": "PF10",
+          "function": "de",
+          "af": 14
+        }
+      ],
+      "modes": [
+        "rgb-scanout"
+      ],
+      "source": "DS11118 Rev8 Table12 AF14 pp77\u201381 and Table10 TFBGA216 column; RM0386 Rev6 LTDC. Exact F479NIH6 software reference, no PCB/panel or HIL assertion."
+    },
+    {
+      "id": "ltdc-rgb888-reference",
+      "variants": [
+        "STM32F479NIH6"
+      ],
+      "controller": "LTDC",
+      "kind": "display",
+      "pins": [
+        {
+          "pin": "PH2",
+          "function": "r0",
+          "af": 14
+        },
+        {
+          "pin": "PH3",
+          "function": "r1",
+          "af": 14
+        },
+        {
+          "pin": "PH8",
+          "function": "r2",
+          "af": 14
+        },
+        {
+          "pin": "PH9",
+          "function": "r3",
+          "af": 14
+        },
+        {
+          "pin": "PH10",
+          "function": "r4",
+          "af": 14
+        },
+        {
+          "pin": "PH11",
+          "function": "r5",
+          "af": 14
+        },
+        {
+          "pin": "PH12",
+          "function": "r6",
+          "af": 14
+        },
+        {
+          "pin": "PG6",
+          "function": "r7",
+          "af": 14
+        },
+        {
+          "pin": "PE5",
+          "function": "g0",
+          "af": 14
+        },
+        {
+          "pin": "PE6",
+          "function": "g1",
+          "af": 14
+        },
+        {
+          "pin": "PH13",
+          "function": "g2",
+          "af": 14
+        },
+        {
+          "pin": "PH14",
+          "function": "g3",
+          "af": 14
+        },
+        {
+          "pin": "PH15",
+          "function": "g4",
+          "af": 14
+        },
+        {
+          "pin": "PI0",
+          "function": "g5",
+          "af": 14
+        },
+        {
+          "pin": "PI1",
+          "function": "g6",
+          "af": 14
+        },
+        {
+          "pin": "PI2",
+          "function": "g7",
+          "af": 14
+        },
+        {
+          "pin": "PE4",
+          "function": "b0",
+          "af": 14
+        },
+        {
+          "pin": "PG12",
+          "function": "b1",
+          "af": 14
+        },
+        {
+          "pin": "PG10",
+          "function": "b2",
+          "af": 14
+        },
+        {
+          "pin": "PG11",
+          "function": "b3",
+          "af": 14
+        },
+        {
+          "pin": "PI4",
+          "function": "b4",
+          "af": 14
+        },
+        {
+          "pin": "PI5",
+          "function": "b5",
+          "af": 14
+        },
+        {
+          "pin": "PI6",
+          "function": "b6",
+          "af": 14
+        },
+        {
+          "pin": "PI7",
+          "function": "b7",
+          "af": 14
+        },
+        {
+          "pin": "PI12",
+          "function": "hsync",
+          "af": 14
+        },
+        {
+          "pin": "PI13",
+          "function": "vsync",
+          "af": 14
+        },
+        {
+          "pin": "PI14",
+          "function": "clk",
+          "af": 14
+        },
+        {
+          "pin": "PF10",
+          "function": "de",
+          "af": 14
+        }
+      ],
+      "modes": [
+        "rgb-scanout"
+      ],
+      "source": "DS11118 Rev8 Table12 AF14 pp77\u201381 and Table10 TFBGA216 column; RM0386 Rev6 LTDC. Exact F479NIH6 software reference, no PCB/panel or HIL assertion."
+    },
+    {
+      "id": "dma2d-memory",
+      "variants": [
+        "STM32F479NIH6"
+      ],
+      "controller": "DMA2D",
+      "kind": "image",
+      "pins": [],
+      "modes": [
+        "irq-blit"
+      ],
+      "source": "RM0386 Rev6 chapter10; memory bus engine, no external pin or peripheral DMA stream. Software mode independently reviewed; no physical qualification."
+    },
+    {
+      "id": "quadspi-indirect-control",
+      "variants": [
+        "STM32F479NIH6"
+      ],
+      "controller": "QUADSPI",
+      "kind": "external_bus",
+      "pins": [],
+      "modes": [
+        "qspi-indirect-sdr"
+      ],
+      "resources": [
+        "ip:QUADSPI/control"
+      ],
+      "source": "DS11118 Rev8 Table10 TFBGA216 explicit bonding and Table12 AF9/AF10; RM0386 Rev6 QUADSPI Flash1 indirect SDR 1-1-1. Exact software reference only; W25Q128JV rated supply, power-up readiness and inactive WP/HOLD or suffix RESET remain explicit external prerequisites. No PCB, fitted package or HIL qualification."
+    },
+    {
+      "id": "quadspi-bank1-sdr111",
+      "variants": [
+        "STM32F479NIH6"
+      ],
+      "controller": "QUADSPI",
+      "kind": "flash_async",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "QUADSPI_BK1_NCS",
+          "af": 10
+        },
+        {
+          "pin": "PF8",
+          "function": "QUADSPI_BK1_IO0",
+          "af": 10
+        },
+        {
+          "pin": "PF9",
+          "function": "QUADSPI_BK1_IO1",
+          "af": 10
+        },
+        {
+          "pin": "PF10",
+          "function": "QUADSPI_CLK",
+          "af": 9
+        }
+      ],
+      "modes": [
+        "nor-indirect"
+      ],
+      "source": "DS11118 Rev8 Table10 TFBGA216 explicit bonding and Table12 AF9/AF10; RM0386 Rev6 QUADSPI Flash1 indirect SDR 1-1-1. Exact software reference only; W25Q128JV rated supply, power-up readiness and inactive WP/HOLD or suffix RESET remain explicit external prerequisites. No PCB, fitted package or HIL qualification."
     }
   ]
 }

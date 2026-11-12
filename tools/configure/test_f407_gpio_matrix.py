@@ -1,10 +1,10 @@
-"""Exact bonded F407 pads share GPIO and all sixteen EXTI line owners."""
+"""Reviewed classic F4 pads share GPIO and all sixteen EXTI line owners."""
 import json
 from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure as gate
+from tools.configure import bindings, configure as gate, device_view
 from tools.configure.tests.native_fixture import native_fixture
 
 
@@ -43,7 +43,18 @@ class F407GpioMatrixTests(unittest.TestCase):
     def test_every_bonded_pad_has_gpio_and_matching_exti_routes(self):
         package = gate.ROOT / "soc/stm32/stm32f4"
         soc, routes = gate.load(package / "soc.json"), gate.load(package / "routes.json")
-        for part, facts in soc["variants"].items():
+        parts = {"STM32F405ZGT6", "STM32F407VET6", "STM32F407ZGT6",
+                 "STM32F415ZGT6", "STM32F417ZGT6"}
+        profiles = device_view.controller_profiles(soc)
+        for kind, modes in (("gpio", {"input", "output"}),
+                            ("exti", {"edge-event"})):
+            declared = {part for part, facts in soc["variants"].items()
+                        if any(item["kind"] == kind and
+                               modes <= set(item["modes"])
+                               for item in profiles[facts["device"]].values())}
+            self.assertEqual(parts, declared, kind)
+        for part in sorted(parts):
+            facts = soc["variants"][part]
             for pin in facts["pins"]:
                 with self.subTest(part=part, pin=pin):
                     eligible = [route for route in routes["routes"]

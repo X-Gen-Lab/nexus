@@ -95,6 +95,80 @@ establish a silicon-workaround or analog-load qualification. See the
 and public `dac_tx.h` requirements; this is a selected recovery sequence, not a
 second HAL owner or a general register-script mechanism.
 
+## F479 LTDC scanout and DMA2D memory operations
+
+The selected software reference is STM32F479NIH6. LTDC uses the reviewed AF14
+RGB565 or RGB888 wire route; framebuffer memory independently uses RGB565 or
+ARGB8888. DMA2D has no external pins or DMA1/2 stream. These selections do not
+qualify a panel, PCB, external framebuffer, bus bandwidth or physical output.
+FMC presence alone never adds an external region to either engine's DMA domains.
+
+| Owner | Exact responsibility |
+| --- | --- |
+| System | Live bus/time domain and the one PLLSAI plan; LTDC consumes its R output and optional SAI shares Q |
+| Platform | GPIO gates, original pad snapshots and final pad restoration |
+| LTDC | One HAL/controller, two IRQs, selected AF14 pad leases, its gate, two active frame loans and one global pending reload |
+| DMA2D | One HAL/controller, its gate/IRQ and one operation with independently checked source/destination spans |
+| Application | Pixel storage, panel setup, execution progress, wake adapter and recovery policy |
+
+The shared source-ownership diagram also applies to these two implementations.
+Solid edges label runtime interface calls; dashed edges label selected source,
+SDK and static assembly relationships. It adds no runtime forwarding layer and
+makes no software or physical qualification claim. The table above states the
+specific runtime resource ownership for this selected graphics slice.
+
+![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)
+
+Pure `admit` runs before System/GPIO startup. It validates static extents and
+refuses foreign selected gates or vectors without effects or retained references.
+`prepare` then acquires each engine's own gate. LTDC programs AF14 through the
+locked official GPIO HAL and independently checks the resulting fields. Its
+snapshot storage cannot overlap configuration, layer/region facts, System state
+or caller pixels. Platform keeps the single original snapshot; the controller
+withdraws its leased pads to analog after scanout/IRQ retirement, and Platform
+restores their original values later. Partial failures retain the exact receipt
+and configuration; they do not authorize reclamation or a second engine owner.
+
+`display` exposes one controller face. `query` and `snapshot` select a physical
+layer; `stop` covers the whole controller. A frame becoming visible does not end
+its borrow. A replacement can settle the old frame only after its vertical
+blanking reload took effect and the relevant active configuration and memory
+access retirement were proved. The shared shadow bank permits one global
+pending replacement. Cancelling one layer preserves its peer; stopping the
+controller joins both layers, all publishers and both IRQs before final release.
+
+LTDC reload/line IRQs capture actual blanking and active-address evidence for the
+current stage generation and retirement mask. A reload hint alone is not proof.
+Task `service` checks current geometry/domain and joins references before
+publishing SETTLED, including when Task execution occurs after the short blanking
+window. Old-stage or old-domain evidence is unusable. No hidden worker or
+mandatory high-rate Task polling is introduced. Clock loss, unproved retirement
+or refused withdrawal retains the affected loans in quarantine. GCR/reset readback
+or a CPU barrier alone never proves external memory withdrawal.
+
+DMA2D supports native RGB565/ARGB8888 fill, copy, conversion and straight-alpha
+blend through the official HAL. Strides use the corresponding source/output
+pixel width. RGB565-to8888 expands channel bits and adds opaque alpha;
+8888-to565 truncates channel low bits. Blend alpha is explicitly multiplied or
+replaced. RGB at an ARGB result with zero alpha is unspecified; blend-to565 needs
+a parameter-proven positive input alpha. The provider does not scan pixels to
+admit an operation, allocate scratch pixels or implement a CPU fallback.
+
+Every complete source/destination capacity must satisfy reachability and alias
+checks, including request/control/immutable owner metadata. TC is an intent hint;
+actual START withdrawal, sources, IRQ, publishers and all address references join
+before SETTLED. Raw hardware errors are collected before W1C even if no ISR ran.
+An error cannot preserve an old SUCCESS or a valid-output byte count. An already
+selected TIMEOUT/CANCELLED remains the first terminal cause; a failed withdrawal
+still quarantines and retains all storage. Partial output is not rolled back.
+
+The authored timing uses pixel/line counts and explicit polarities; the generator
+only computes static HAL accumulated values. Pixel frequency comes from the
+single System PLLSAI R plan and must satisfy the selected DS11118 83 MHz nominal
+limit. This check is not physical oscillator, load or panel qualification.
+CLUT/extra packed formats, watermark/suspend modes and additional exact parts
+remain outside this selected graphics slice.
+
 ## Replace a mode and verify it
 
 Start from a complete selected mode and its tests. Preserve RX duties, instance

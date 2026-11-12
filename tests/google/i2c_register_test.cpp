@@ -25,6 +25,7 @@ uint64_t model_time;
 uint32_t model_mask;
 uint32_t model_ordering;
 bool model_isr;
+bool model_privileged;
 size_t model_message;
 size_t model_remaining;
 size_t model_received;
@@ -86,6 +87,7 @@ class I2CRegisters : public testing::Test {
         model_time = 0;
         model_mask = 0;
         model_isr = false;
+        model_privileged = true;
         model_message = 0;
         model_remaining = 0;
         model_received = 0;
@@ -177,7 +179,7 @@ extern "C" uint32_t nx_arch_exception_number(void) {
 }
 /** \brief Unprivileged CPU faults are exercised by the dedicated Arch model. */
 extern "C" bool nx_arch_is_privileged(void) {
-    return true;
+    return model_privileged;
 }
 /** \brief Preserve host ordering without claiming hardware timing. */
 extern "C" void nx_arch_dmb(void) {
@@ -777,4 +779,61 @@ TEST(I2CPollingIdentity, FixedNonreservedAddressIsValidatedWithoutStartup) {
         EXPECT_EQ(child.address, address);
         EXPECT_EQ(child.port, &state);
     }
+}
+
+TEST_F(I2CRegisters, PollingPayloadCannotBorrowMutableProviderControlBytes) {
+    EXPECT_CALL(boundary, Call(testing::_, testing::_))
+        .Times(testing::AnyNumber());
+    EXPECT_FALSE(state.active);
+    auto* control_byte = reinterpret_cast<uint8_t*>(&state.active);
+    EXPECT_EQ(NX_ERROR_INVALID, transact({{control_byte, 1U, false}}));
+    EXPECT_EQ(0U, model_starts);
+    EXPECT_EQ(0U, registers.DR);
+}
+
+TEST_F(I2CRegisters, FirstReceiveCannotRewriteALaterValidatedMessageLength) {
+    EXPECT_CALL(boundary, Call(testing::_, testing::_))
+        .Times(testing::AnyNumber());
+    uint8_t guarded[258] = {};
+    guarded[256] = 0xA5U;
+    model_messages.resize(2U);
+    model_messages[0] = {reinterpret_cast<uint8_t*>(&model_messages[1].length),
+                         1U, true};
+    model_messages[1] = {guarded, 256U, true};
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_i2c_endpoint_transaction(&endpoint, model_messages.data(),
+                                          model_messages.size(), 10000U,
+                                          &transferred));
+    EXPECT_EQ(0U, model_starts);
+    EXPECT_EQ(256U, model_messages[1].length);
+    EXPECT_EQ(0xA5U, guarded[256]);
+}
+
+TEST_F(I2CRegisters, ProgressOutputCannotOverwriteDescriptorsOrImmutableTx) {
+    model_messages = {{data, 1U, true}};
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_i2c_endpoint_transaction(&endpoint, model_messages.data(),
+                                          model_messages.size(), 1000U,
+                                          &model_messages[0].length));
+    EXPECT_EQ(1U, model_messages[0].length);
+    EXPECT_EQ(0U, model_starts);
+    EXPECT_CALL(boundary, Call(testing::_, testing::_))
+        .Times(testing::AnyNumber());
+    transferred = 0x37U;
+    EXPECT_EQ(
+        NX_ERROR_INVALID,
+        transact({{reinterpret_cast<uint8_t*>(&transferred), 1U, false}}));
+    EXPECT_EQ(0x37U, transferred);
+    EXPECT_EQ(0U, model_starts);
+}
+
+TEST_F(I2CRegisters, UnprivilegedPollingCannotStartProtectedReceiveWindows) {
+    EXPECT_CALL(boundary, Call(testing::_, testing::_))
+        .Times(testing::AnyNumber());
+    const auto before = registers;
+    model_privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT, transact({{data, 2U, true}}));
+    EXPECT_EQ(0U, model_starts);
+    EXPECT_EQ(0, std::memcmp(&before, &registers, sizeof(registers)));
+    EXPECT_EQ(0U, model_mask);
 }

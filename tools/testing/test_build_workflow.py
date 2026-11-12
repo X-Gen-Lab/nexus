@@ -673,6 +673,100 @@ class ProcessExecutionTests(unittest.TestCase):
             record = json.loads((root / "partial.command.json").read_text())
             self.assertFalse(record["withdrawal_complete"])
 
+    @unittest.skipUnless(os.name == "posix" and Path("/proc/self/stat").is_file(),
+                         "Linux kernel process-group withdrawal")
+    def test_partial_inspection_still_withdraws_the_owned_group(self):
+        from concurrent.futures import ThreadPoolExecutor
+        import signal
+        import threading
+        from tools.dev import process
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            child_file = root / "child.json"
+            child = ("import json,os,pathlib,time; "
+                     "fields=pathlib.Path('/proc/self/stat').read_text()."
+                     "rsplit(')',1)[1].split(); "
+                     f"pathlib.Path({str(child_file.with_suffix('.pending'))!r}).write_text(json.dumps("
+                     "{'pid':os.getpid(),'start_time':int(fields[19])})); "
+                     f"os.replace({str(child_file.with_suffix('.pending'))!r}, {str(child_file)!r}); "
+                     "time.sleep(30)")
+            parent = ("import subprocess,sys,time; "
+                      f"subprocess.Popen([sys.executable,'-c',{child!r}]); "
+                      "time.sleep(30)")
+            unrelated = subprocess.Popen(
+                [sys.executable, "-c", "import time; time.sleep(30)"],
+                start_new_session=True)
+            child_identity = None
+            inspections = []
+            cancel = threading.Event()
+            freeze = process._linux_freeze
+
+            def exhaust_inspection(owned, deadline):
+                inspections.append(tuple(owned))
+                # Exercise real STOP/KILL and identity checks; only discovery
+                # misses the child while its finite inspection budget expires.
+                time.sleep(max(0, deadline - time.monotonic()) + 0.005)
+                return False
+
+            try:
+                with patch.object(process, "_linux_descendants",
+                                  side_effect=exhaust_inspection), \
+                        patch.object(process, "_linux_freeze",
+                                     side_effect=lambda owned: freeze(owned, budget=0.2)), \
+                        ThreadPoolExecutor(max_workers=1) as pool:
+                    future = pool.submit(process.run, [sys.executable, "-c", parent],
+                        cwd=root, env=os.environ.copy(), log=root / "partial-group.txt",
+                        timeout=20, cancel_event=cancel)
+                    try:
+                        deadline = time.monotonic() + 5
+                        while not child_file.exists() and not future.done() and time.monotonic() < deadline:
+                            time.sleep(0.005)
+                        self.assertTrue(child_file.is_file(), "Real child did not start")
+                        child_identity = json.loads(child_file.read_text())
+                        live = process._linux_process(child_identity["pid"])
+                        self.assertIsNotNone(live)
+                        leader = process._linux_process(live["parent"])
+                        self.assertIsNotNone(leader)
+                        self.assertEqual(leader["group"], leader["pid"])
+                        self.assertEqual(live["group"], leader["pid"])
+                        self.assertNotEqual(os.getpgid(unrelated.pid), leader["pid"])
+                        cancel.set()
+                        self.assertEqual(future.result(timeout=5).returncode, 130)
+                    finally:
+                        cancel.set()
+                record = json.loads((root / "partial-group.command.json").read_text())
+                self.assertEqual(record["outcome"], "cancelled")
+                self.assertFalse(record["withdrawal_stable"])
+                self.assertFalse(record["withdrawal_complete"])
+                self.assertEqual(inspections, [(leader["pid"],)])
+                self.assertEqual(len(record["withdrawn_processes"]), 1)
+                self.assertIsNone(unrelated.poll(), "Withdrawal reached another group")
+                deadline = time.monotonic() + 0.5
+                while time.monotonic() < deadline:
+                    live = process._linux_process(child_identity["pid"])
+                    if (live is None or live["start_time"] != child_identity["start_time"]
+                            or live["state"] in {"Z", "X"}):
+                        break
+                    time.sleep(0.005)
+                self.assertTrue(live is None or live["start_time"] != child_identity["start_time"]
+                                or live["state"] in {"Z", "X"},
+                                f"Undiscovered child survived owned group withdrawal: {live}")
+            finally:
+                cancel.set()
+                if child_identity is not None:
+                    live = process._linux_process(child_identity["pid"])
+                    if (live is not None and live["start_time"] == child_identity["start_time"]
+                            and live["state"] not in {"Z", "X"}):
+                        try:
+                            os.kill(child_identity["pid"], signal.SIGKILL)
+                        except ProcessLookupError:
+                            # The exact fixture may exit after observation.
+                            pass
+                if unrelated.poll() is None:
+                    unrelated.kill()
+                unrelated.wait(timeout=5)
+
 
 class DeveloperWorkflowTests(unittest.TestCase):
     def test_interleaved_real_commands_keep_each_own_provenance_receipt(self):

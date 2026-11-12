@@ -16,4 +16,9 @@
 #undef GPIOA
 #define GPIOA ((GPIO_TypeDef*)GPIOA_BASE)
 
+/** \brief Apply cold register writes and the GPIO output-latch side effect. */
+void nx_stm32_constructor_write(volatile uint32_t* reg, uint32_t value);
+#define NX_PLATFORM_REGISTER_WRITE(reg, value)                                 \
+    nx_stm32_constructor_write(&(reg), (uint32_t)(value))
+
 #endif

@@ -1,5 +1,6 @@
 """Maintained kernel policy, startup frame and Tick admission regressions."""
-from tools.configure.tests.device_fixture import load_soc_facts
+from tools.configure.tests.device_fixture import (load_soc_facts,
+                                                   validate_soc_facts)
 from tools.configure.tests.native_fixture import native_fixture
 import importlib
 import json
@@ -345,7 +346,7 @@ class KernelAssemblyTests(unittest.TestCase):
         soc = load_soc_facts(ROOT / "soc/stm32/stm32f4/soc.json")
         soc["cpu"].pop("mpu_regions")
         with self.assertRaisesRegex(ValueError, "capabilities differ"):
-            configure.validate_soc(soc, "STM32F407ZGT6")
+            validate_soc_facts(soc, "STM32F407ZGT6")
 
 
 if __name__ == "__main__":

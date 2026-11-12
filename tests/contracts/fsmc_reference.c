@@ -10,7 +10,7 @@
 #include "nexus/io/memory_window.h"
 #include "nexus/io/nand.h"
 #include "nexus_bindings.h"
-#include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 
 static volatile bool execute;
 static volatile nx_result_t observation;
@@ -36,9 +36,9 @@ int main(void) {
         (void)nx_platform_start();
 #if defined(NX_REFERENCE_NOR)
         const nx_flash_async_port_t* async =
-            nx_factory_flash_async(NX_FLASH_ASYNC_ID_NOR0);
+            nx_factory_flash_async_ref(NX_FLASH_ASYNC_REF_NOR0);
         const nx_flash_port_t* flash =
-            nx_factory_fsmc_nor_flash(NX_FLASH_ASYNC_ID_NOR0);
+            nx_factory_flash_async_flash_ref(NX_FLASH_ASYNC_REF_NOR0);
         const nx_flash_geometry_t* geometry = nx_flash_port_geometry(flash);
         nx_request_initialize(&nor_request.base);
         observation = nx_flash_async_prepare(

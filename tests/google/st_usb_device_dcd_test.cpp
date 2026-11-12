@@ -39,13 +39,31 @@ uint8_t RejectClass(USBD_HandleTypeDef* device, USBD_SetupReqTypedef* setup) {
     return USBD_FAIL;
 }
 } /* namespace */
-enum class ControlTrace { Complete, Premature, ConcurrentAck, DmaStatusHeld };
+enum class ControlTrace {
+    Complete,
+    Premature,
+    ConcurrentAck,
+    DmaStatusHeld,
+    RemoteWakeup
+};
 static void RunCoreInput(ControlTrace trace, bool reverse_slots) {
     const bool premature = trace != ControlTrace::Complete;
     const bool concurrent_ack = trace == ControlTrace::ConcurrentAck;
     const bool dma = trace == ControlTrace::DmaStatusHeld;
+    const bool remote = trace == ControlTrace::RemoteWakeup;
+    struct DescriptorRestore {
+        uint8_t attributes;
+        ~DescriptorRestore() {
+            dcd_config[7] = attributes;
+        }
+    } descriptor_restore{dcd_config[7]};
+    if (remote)
+        dcd_config[7] |= 0x20U;
     ASSERT_EQ(NX_SUCCESS, nx_native_clock_configure(true, 100U));
     nx_native_usb_device_t model{};
+    nx_usb_remote_runtime_t remote_runtime{};
+    if (remote)
+        model.controller.remote = &remote_runtime;
     nx_usb_endpoint_t directions[2]{};
     auto& input = directions[reverse_slots ? 1U : 0U];
     auto& output = directions[reverse_slots ? 0U : 1U];
@@ -116,8 +134,8 @@ static void RunCoreInput(ControlTrace trace, bool reverse_slots) {
         slots[i].storage = storage[i];
         slots[i].capacity = sizeof(storage[i]);
     }
-    const nx_st_usb_device_stack_config_t config{&profile, nullptr, slots,
-                                                 2U,       1000U,   nullptr};
+    const nx_st_usb_device_stack_config_t config{
+        &profile, nullptr, slots, 2U, remote ? 30000U : 1000U, nullptr};
     nx_st_usb_device_stack_t stack{};
     USBD_DescriptorsTypeDef descriptors{};
     descriptors.GetDeviceDescriptor = GetDevice;
@@ -152,8 +170,12 @@ static void RunCoreInput(ControlTrace trace, bool reverse_slots) {
     } cleanup{&stack, &model.hardware, dma};
     auto deliver_setup = [&](const uint8_t* command) {
         if (dma) {
-            std::memcpy(dma_staging[reverse_slots ? 0U : 1U].bytes, command,
-                        8U);
+            const uint32_t address = model.hardware.registers[0xB14U / 4U];
+            std::memcpy(
+                reinterpret_cast<void*>(static_cast<uintptr_t>(address)),
+                command, 8U);
+            model.hardware.registers[0xB14U / 4U] = address + 8U;
+            model.hardware.registers[0xB10U / 4U] -= 1U << 29U;
             model.hardware.registers[0xB00U / 4U] &= ~(1U << 31U);
             model.hardware.registers[0xB08U / 4U] |= 8U;
         } else {
@@ -177,6 +199,97 @@ static void RunCoreInput(ControlTrace trace, bool reverse_slots) {
     }
     ASSERT_EQ(USBD_STATE_CONFIGURED, stack.middleware.dev_state);
     dcd_tx_sent = 0U;
+    if (remote) {
+        struct PulseCleanup {
+            const nx_usb_device_port_t* device;
+            ~PulseCleanup() {
+                (void)nx_native_clock_advance(20000U);
+                (void)nx_usb_device_service(device);
+            }
+        } pulse_cleanup{&device};
+        nx_usb_remote_wakeup_request_t pulse{};
+        nx_request_initialize(&pulse.base);
+        pulse.max_service_delay_us = 100U;
+        const uint8_t feature[8] = {0U, 3U, 1U, 0U, 0U, 0U, 0U, 0U};
+        ASSERT_NO_FATAL_FAILURE(deliver_setup(feature));
+        ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+        ASSERT_NE(nullptr, input.request);
+        ASSERT_EQ(NX_USB_STATUS, input.request->stage);
+        EXPECT_NE(0U, stack.middleware.dev_remote_wakeup);
+        /* A new SETUP aborts that unacknowledged permission intent. The
+         * real Core's next GET_STATUS must report the committed DCD value. */
+        auto get_feature_status = [&](unsigned expected) {
+            const uint8_t get_status[8] = {0x80U, 0U, 0U, 0U, 0U, 0U, 2U, 0U};
+            ASSERT_NO_FATAL_FAILURE(deliver_setup(get_status));
+            ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+            ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+            ASSERT_NE(nullptr, input.request);
+            ASSERT_EQ(2U, input.request->length);
+            ASSERT_NE(nullptr, input.request->in);
+            EXPECT_EQ(expected, input.request->in[0] & 2U);
+            ASSERT_EQ(NX_SUCCESS, nx_native_usb_complete(&model, 0U, true));
+            nx_usb_controller_irq(&controller);
+            ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+            ASSERT_EQ(NX_SUCCESS,
+                      nx_native_usb_receive(&model, 0U, nullptr, 0U, false));
+            ASSERT_EQ(NX_SUCCESS, nx_native_usb_complete(&model, 0U, false));
+            nx_usb_controller_irq(&controller);
+            ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+        };
+        ASSERT_NO_FATAL_FAILURE(get_feature_status(0U));
+        ASSERT_NO_FATAL_FAILURE(deliver_setup(feature));
+        ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+        ASSERT_NE(nullptr, input.request);
+        ASSERT_EQ(NX_USB_STATUS, input.request->stage);
+        model.hardware.registers[0x808U / 4U] |= 1U;
+        model.hardware.registers[0x14U / 4U] |= 1U << 11U;
+        nx_usb_controller_irq(&controller);
+        ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+        ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(5001U));
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_request_prepare(&pulse.base, nx_time_now_us() + 10000U));
+        EXPECT_EQ(NX_ERROR_PERMISSION,
+                  nx_usb_device_remote_wakeup(&device, &pulse));
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&pulse.base));
+        EXPECT_EQ(0U, model.hardware.registers[0x804U / 4U] & 1U);
+        model.hardware.registers[0x808U / 4U] &= ~1U;
+        model.hardware.registers[0x14U / 4U] |= 1U << 31U;
+        nx_usb_controller_irq(&controller);
+        ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+        ASSERT_EQ(NX_SUCCESS, nx_native_usb_complete(&model, 0U, true));
+        nx_usb_controller_irq(&controller);
+        ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+        EXPECT_EQ(nullptr, input.request);
+        model.hardware.registers[0x808U / 4U] |= 1U;
+        model.hardware.registers[0x14U / 4U] |= 1U << 11U;
+        nx_usb_controller_irq(&controller);
+        ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+        ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(5001U));
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_request_prepare(&pulse.base, nx_time_now_us() + 10000U));
+        const nx_time_us_t before = nx_time_now_us();
+        ASSERT_EQ(NX_SUCCESS, nx_usb_device_remote_wakeup(&device, &pulse));
+        EXPECT_EQ(before, nx_time_now_us());
+        EXPECT_NE(0U, model.hardware.registers[0x804U / 4U] & 1U);
+        ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(2001U));
+        ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+        EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+        EXPECT_EQ(NX_SUCCESS, pulse.base.result);
+        EXPECT_EQ(0U, model.hardware.registers[0x804U / 4U] & 1U);
+        EXPECT_EQ(USBD_STATE_SUSPENDED, stack.middleware.dev_state);
+        EXPECT_TRUE(controller.snapshot.suspended);
+        model.hardware.registers[0x808U / 4U] &= ~1U;
+        model.hardware.registers[0x14U / 4U] |= 1U << 31U;
+        nx_usb_controller_irq(&controller);
+        ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+        const uint8_t clear[8] = {0U, 1U, 1U, 0U, 0U, 0U, 0U, 0U};
+        ASSERT_NO_FATAL_FAILURE(deliver_setup(clear));
+        ASSERT_EQ(NX_SUCCESS, nx_st_usb_device_stack_step(&stack));
+        EXPECT_EQ(0U, stack.middleware.dev_remote_wakeup);
+        ASSERT_NO_FATAL_FAILURE(get_feature_status(2U));
+        EXPECT_EQ(NX_SUCCESS, stack.failure);
+        return;
+    }
     auto& input_slot = slots[reverse_slots ? 1U : 0U];
     auto& output_slot = slots[reverse_slots ? 0U : 1U];
     const uint8_t setup[8] = {0x80U, 6U, 0U, 2U, 0U, 0U, 150U, 0U};
@@ -308,3 +421,7 @@ TEST_P(StUsbDeviceDcd, DmaWireStatusCannotBecomeAStickyCoreSubmissionFailure) {
 }
 INSTANTIATE_TEST_SUITE_P(EitherSlotOrder, StUsbDeviceDcd,
                          testing::Values(false, true));
+
+TEST(StUsbDeviceDcdRemote, CoreIntentNeedsARealStatusAckBeforeRemoteWake) {
+    RunCoreInput(ControlTrace::RemoteWakeup, false);
+}

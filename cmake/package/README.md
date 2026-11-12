@@ -4,7 +4,7 @@
 编译器／ABI、工作任务与资源预算；vendor 头和具体 provider 状态私有，不导出通用
 预编译 MCU ABI 或应用生成器。版本唯一权威是
 `dependencies/platform-compatibility.json`；CMake、生成头、安装包从它派生。
-source interface epoch `1` 与 assembly schema `2` 分别计代，不随语义版本自动改变。
+source interface epoch `2` 与 assembly schema `2` 分别计代，不随语义版本自动改变。
 
 ## 打包与消费
 
@@ -70,12 +70,22 @@ runtime 策略，已测路径例如 `-fno-exceptions -fno-rtti`。
 声明不表示所有 host 已验证。维护的已执行 host 为 Linux，HIL 为 `not_executed`。
 历史候选保留原身份，[0.1.0 范围](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/status/release-0.1.0.md)不资格化新版本。
 
+## 当前源码接口代际
+
+当前开发快照保留版本 `0.2.1`，factory／source interface epoch 为 2，SDK manifest
+格式为 2；二者由各自 authority 校验，不从相同数字推导兼容。当前消费者明确拒绝
+旧 epoch 1，所有调用者、face／ops、factory 和 provider 必须用同一精确源码重编。
+ADC group 的直接 `request.frames` 访问迁为 `request.output.frames`，优先用
+`nx_adc_group_prepare()` 设置 RAW discriminant；paired 请求使用独立 prepare 入口。
+不提供旧字段影子或二进制混用。详细步骤见[迁移指南](../../docs/guides/migration.md)，
+策略见[源码兼容性合同](../../docs/design/source-compatibility.md)。
+
 ## 完整安装消费者验证
 
 发行自动化验证已有可发布 prefix，不使用开发 opt-in：
 
-上方默认导出是精简裸机包。完整 `nexus-sdk-consumers-v20` 计划还需要显式 host
-支撑、FreeRTOS 与所选网络／安全／USB 供应方；按[Source SDK 教程](../../docs/tutorials/source-sdk.md)
+上方默认导出是精简裸机包。[完整维护消费者计划](../../tools/maintenance/consumer_profiles.py)
+还需要显式 host 支撑、FreeRTOS 与所选网络／安全／USB 供应方；按[Source SDK 教程](../../docs/tutorials/source-sdk.md)
 准备并导出完整 profile，再执行以下验证。验证器不会跳过缺失消费者来接纳精简包。
 
 ```sh
@@ -101,16 +111,15 @@ typed resolver／factory、维护 assembly 和来源 lock 属于 SDK；host goog
 
 ## 器件与执行窗口消费者
 
-当前版本化消费计划由 `tools/maintenance/consumer_profiles.py` 唯一维护，共 20 项：
-2 个基础消费者、4 个所选模式消费者及 14 个服务／器件／镜像／家族消费者。包括标准
-Native 外置 provider 生命周期工程；Native 是测试范围，ARM 消费者选择已声明的精确器件。
-每个精确源码／构建根和链接镜像都必须执行，计划结构本身不代表验收通过。设备与
-镜像扩展包括 F407 借用 RX、Native／F407 MCUboot Control 及独立 F407 完整引导
-镜像；当前计划没有 GD470 消费者。历史结果保留其原源码身份，不转成当前支持。
-新增三项 F405ZG／F415ZG／F417ZG 消费者复用
-`tests/contracts/stm32f4_family/` 的 HSI16／内部 CRC 装配与同一公共 consumer。
-计划为 `nexus-sdk-consumers-v20`；开发 SDK 三项已测不等于最终 clean-source 包
-20 项已通过，实际结果必须绑定新包和同一源码。
+当前版本化消费计划由 [consumer_profiles.py](../../tools/maintenance/consumer_profiles.py)
+唯一维护，枚举基础、所选模式及服务／器件／镜像／家族消费者。计划包括标准
+Native 外置 provider 生命周期工程；Native 是测试范围，ARM 消费者选择已声明的
+精确器件。每个源码／构建根和链接镜像都必须实际执行，计划结构本身不代表通过。
+家族消费者复用 `tests/contracts/stm32f4_family/` 的 HSI16／内部 CRC 装配与同一公共
+consumer，新 IP 使用其各自已维护的软件装配。F407 借用 RX、Native／F407 MCUboot
+Control 及独立 F407 完整引导镜像沿同一计划维护，不在本页复制消费者计数或版本号。
+开发 SDK 的局部结果不能代替最终 clean-source 包的完整消费验证；历史结果保留
+原源码与配置身份，不转换为当前支持。
 
 TMP117 组合显式链接 `Nexus::TMP117I2C`，调用者持有完全结清的软件 I2C endpoint，
 并使用六个公共组件函数。Native 实际执行有界的正向采样与清理；F407 使用同一软件

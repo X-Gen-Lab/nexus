@@ -204,5 +204,110 @@ class F407DacConfigurationTests(unittest.TestCase):
         self.assertEqual("boolean", schema["output_buffer"]["type"])
 
 
+class F407DacExternalConfigurationTests(unittest.TestCase):
+    def assembly(self, directory, *, mode="triggered", trigger="exti9",
+                 trigger_input="source", source_mode="hardware-event",
+                 source_line=9, recovery=None, reserved=()):
+        board = gate.load(gate.ROOT /
+                          "tests/contracts/dac_assembly/ve_board/board.json")
+        board["bindings"] = [
+            {"id": "output", "controller": "DAC", "route": "dac-pa4-pa5"},
+            {"id": "source", "controller": f"EXTI{source_line}",
+             "route": f"exti{source_line}-pb{source_line}"}]
+        board["reserved_resources"] += list(reserved)
+        (directory / "board.json").write_text(json.dumps(board))
+        extra = ""
+        if trigger_input is not None:
+            extra += f'trigger_input="{trigger_input}"\n'
+        if recovery is not None:
+            extra += f'recovery_trigger="{recovery}"\n'
+        if mode.startswith("trigger-dma"):
+            extra += 'irq={priority=5}\n'
+        if mode in {"noise", "triangle"}:
+            extra += 'amplitude=255\n'
+        source_fields = '' if source_mode == 'hardware-event' else (
+            'event_capacity=2\nirq={priority=5}\n')
+        source = (
+            'schema=2\nboard_package="."\nbackend="baremetal"\n'
+            'clock="hse8-pll168"\n[memory]\n'
+            'main_stack_bytes=2048\nlibc_heap_bytes=0\n'
+            '[dac.output]\nbinding="output"\n'
+            f'mode="{mode}"\nchannels=[1,2]\nformat="u12-right"\n'
+            f'idle_codes=[0,0]\noutput_buffer=true\ntrigger="{trigger}"\n'
+            + extra + '[exti.source]\nbinding="source"\n'
+            f'mode="{source_mode}"\nedge="rising"\npull="down"\n'
+            + source_fields)
+        path = directory / "assembly.toml"
+        path.write_text(source)
+        return path
+
+    def test_cpu_wave_sources_resolve_and_prepare_event_before_dac(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            for mode in ("triggered", "noise", "triangle"):
+                with self.subTest(mode=mode):
+                    ir = gate.resolve_ir(self.assembly(Path(temporary), mode=mode))
+                    source = next(x for x in ir.controllers if x.id == "source")
+                    output = next(x for x in ir.controllers if x.id == "output")
+                    self.assertEqual("source", output.options.trigger_input)
+                    self.assertIsNone(output.options.recovery_trigger)
+                    self.assertLess(ir.controllers.index(source),
+                                    ir.controllers.index(output))
+                    emitted = bindings.emit(ir)[1]
+                    self.assertIn(".external = &s_nx_port_source", emitted)
+                    self.assertIn("NX_STM32_DAC_TRIGGER_EXTI9", emitted)
+                    output_claims = {x.key for x in ir.claims if x.owner == "output"}
+                    self.assertFalse(any("TIM6" in x or "TIM7" in x
+                                         for x in output_claims))
+
+    def test_circular_external_dma_claims_only_selected_recovery_timer(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            for recovery in ("tim6-trgo", "tim7-trgo"):
+                with self.subTest(recovery=recovery):
+                    ir = gate.resolve_ir(self.assembly(Path(temporary),
+                        mode="trigger-dma-circular", recovery=recovery))
+                    item = next(x for x in ir.controllers if x.id == "output")
+                    self.assertEqual(recovery, item.options.recovery_trigger)
+                    keys = {x.key for x in ir.claims if x.owner == "output"}
+                    timer = recovery.split('-')[0].upper()
+                    self.assertTrue({"controller:" + timer,
+                                     "irq:TIM6_DAC", "dma:DMA1:stream5"}
+                                    .issubset(keys))
+                    self.assertNotIn("timer:" + timer, keys)
+                    emitted = bindings.emit(ir)[1]
+                    self.assertIn(".recovery_trigger = NX_STM32_DAC_TRIGGER_" +
+                                  timer, emitted)
+
+    def test_finite_external_and_missing_recovery_refuse_explicitly(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            with self.assertRaisesRegex(ValueError, "external.*finite|finite.*external"):
+                gate.resolve_ir(self.assembly(Path(temporary),
+                    mode="trigger-dma", recovery="tim6-trgo"))
+            with self.assertRaisesRegex(ValueError, "recovery.*(timer|TIM6|TIM7)"):
+                gate.resolve_ir(self.assembly(Path(temporary),
+                    mode="trigger-dma-circular"))
+
+    def test_source_is_exact_hardware_event_line_nine(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            for fields in ({"trigger_input": None}, {"trigger_input": "missing"},
+                           {"source_mode": "edge-event"}, {"source_line": 8}):
+                with self.subTest(fields=fields), self.assertRaisesRegex(
+                        ValueError, "trigger_input|hardware.event|EXTI9"):
+                    gate.resolve_ir(self.assembly(Path(temporary), **fields))
+
+    def test_recovery_timer_conflict_is_detected_by_the_existing_resource_plan(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            with self.assertRaisesRegex(ValueError, "Resource conflict.*TIM6"):
+                gate.resolve_ir(self.assembly(Path(temporary),
+                    mode="trigger-dma-circular", recovery="tim6-trgo",
+                    reserved=("controller:TIM6",)))
+
+    def test_internal_sources_refuse_unused_external_fields(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            with self.assertRaisesRegex(ValueError, "external|trigger_input"):
+                gate.resolve_ir(self.assembly(Path(temporary), trigger="software"))
+            with self.assertRaisesRegex(ValueError, "recovery.*DMA|DMA.*recovery"):
+                gate.resolve_ir(self.assembly(Path(temporary), recovery="tim6-trgo"))
+
+
 if __name__ == "__main__":
     unittest.main()

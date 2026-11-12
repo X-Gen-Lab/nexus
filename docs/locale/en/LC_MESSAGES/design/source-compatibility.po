@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: f0a7a2f853e3c62f02a89370f7d81bf2a3c9b78da9472a37c191e887b20314bf\n"
+"X-Nexus-Source-SHA256: c245c95dc4294c53382906da7982c59e57cd01b9c1f66f6454ed0b1e2cba1804\n"
 
 #: ../../../docs/design/source-compatibility.md:1
 msgid "源码版本、factory 代际与依赖维护"
@@ -73,8 +73,8 @@ msgid "`factory_abi_epoch`"
 msgstr "`factory_abi_epoch`"
 
 #: ../../../docs/design/source-compatibility.md:0
-msgid "`1`"
-msgstr "`1`"
+msgid "`2`"
+msgstr "`2`"
 
 #: ../../../docs/design/source-compatibility.md:0
 msgid "当前唯一认可的生成源码接口代际；不是 binary ABI 保证"
@@ -97,10 +97,6 @@ msgstr "CMake packages accept only the exact full version and reject ranges"
 #: ../../../docs/design/source-compatibility.md:0
 msgid "authored assembly"
 msgstr "authored assembly"
-
-#: ../../../docs/design/source-compatibility.md:0
-msgid "`2`"
-msgstr "`2`"
 
 #: ../../../docs/design/source-compatibility.md:0
 msgid "简化的 TOML 选择面；不改变 Board/SoC 事实"
@@ -187,20 +183,8 @@ msgstr ""
 "tools observe both declarations on the actual IR class and check them "
 "against the sole version policy."
 
-#: ../../../docs/design/source-compatibility.md:39
-msgid ""
-"当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。 既有 `v0.2.0` 标签保留原始预览源码身份。本次 "
-"semantic version 变化保留 epoch `1`、 exact 匹配和 authored schema `2`；版本值不把旧 "
-"SDK／候选的资格转移到新源码。 新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。"
-msgstr ""
-"The current `0.2.1` version is for development and software-candidate "
-"preparation. A version value alone does not establish publication or "
-"candidate acceptance. The existing `v0.2.0` tag retains its original preview"
-" source identity. This semantic-version change preserves epoch `1`, exact "
-"matching and authored schema `2`. A version value does not transfer old "
-"SDK/candidate qualification to new source. A new candidate must "
-"independently bind actual clean source, configuration, dependencies, tools "
-"and executed evidence."
+msgid "当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。 既有 `v0.2.0` 及其他标签保留原始源码身份，不移动标签。本批破坏性源码结果视图 改动将 factory／source interface epoch 提升为 `2`，semantic version 仍是开发快照 `0.2.1`，exact 匹配和 authored schema `2` 不变。相同版本号不能让旧 epoch `1` SDK 通过当前代际检查，版本值也不把旧 SDK／候选资格转移到新源码。 新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。"
+msgstr "Current `0.2.1` is used for development and software-candidate preparation. Its version value does not establish public release or passed candidate acceptance. Existing `v0.2.0` and other tags retain their original source identities; no tags move. This iteration's breaking source result-view change raises the factory/source interface epoch to `2`. Semantic version remains the `0.2.1` development snapshot, with exact matching and authored schema `2` unchanged. A matching version cannot admit an old epoch-1 SDK into the current interface generation, nor transfer old SDK/candidate qualification. A new candidate must independently bind actual clean source, configuration, dependencies, tools and execution evidence."
 
 #: ../../../docs/design/source-compatibility.md:44
 msgid ""
@@ -221,22 +205,8 @@ msgstr ""
 "retain their original identities and are not rewritten to match the current "
 "development version."
 
-#: ../../../docs/design/source-compatibility.md:50
-msgid ""
-"factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face， "
-"不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后 拿到另一 bundle 使用。`factory_abi_epoch`"
-" 命名保留 ABI 字样，但目前只标记生成 源码接口代际：消费者、factory header、公共 face 和实现必须重新编译。当前 epoch 为"
-" 1；指定 0、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。"
-msgstr ""
-"Factory compact IDs mean something only within their generated bundle. The "
-"factory returns existing static read-only faces without allocation or "
-"hardware initialization. Reordering instances or changing configuration may "
-"change IDs; persisted IDs cannot be used with another bundle. "
-"`factory_abi_epoch` retains ABI in its name but currently marks only "
-"generated-source interface generations: consumers, factory headers, public "
-"faces and implementations require recompilation. Current epoch is 1; zero, "
-"future values, nonintegers or missing policy must reject rather than become "
-"compatibility fallbacks."
+msgid "factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face， 不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后 拿到另一 bundle 使用。`factory_abi_epoch` 命名保留 ABI 字样，但目前只标记生成 源码接口代际：消费者、factory header、公共 face 和实现必须重新编译。当前 epoch 为 2；指定 0、旧值 1、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。"
+msgstr "Factory compact IDs are meaningful only inside their generated bundle. Lookup returns existing static readonly faces without allocation or hardware initialization. Reordering instances or changing configuration can change IDs; never persist them for another bundle. Despite its ABI name, `factory_abi_epoch` currently identifies a generated-source interface generation: consumers, factory headers, public faces and implementations must be rebuilt together. The current epoch is 2. Zero, old value 1, future values, nonintegers and missing policy must be rejected rather than treated as a compatibility fallback."
 
 #: ../../../docs/design/source-compatibility.md:56
 msgid ""
@@ -253,6 +223,15 @@ msgstr ""
 "consumption establish complete acceptance; maintenance tools alone cannot "
 "replace them. Historical SDKs missing this policy are not automatically "
 "recognized by new tools as maintained generations."
+
+msgid "epoch 2 的源码迁移"
+msgstr "Source migration for epoch 2"
+
+msgid "本次 `nx_adc_group_request_t.frames` 改为显式 `output.frames`，并由 `results_kind` 区分 RAW 与 regular／injected paired 结果。原始字段访问必须迁移； 不保留 `frames` 影子、旧大小兼容或按运行态猜测结果布局。优先继续调用 `nx_adc_group_prepare()` 准备 raw 请求，由它设置 RAW discriminant；paired 结果使用 `nx_adc_group_prepare_results()`，请求、descriptor 与两个 span 共用一次借用生命周期。 直接读取 union 时必须先确认对应 `results_kind`，不能把 raw frame 指针当 descriptor。"
+msgstr "This change replaces `nx_adc_group_request_t.frames` with explicit `output.frames`; `results_kind` distinguishes RAW from paired regular/injected results. Direct field access must migrate. There is no `frames` shadow, old-size compatibility or runtime inference of the result layout. Prefer the existing `nx_adc_group_prepare()` for raw requests so it installs the RAW discriminant. Paired results use `nx_adc_group_prepare_results()` and retain one joint borrow across request, descriptor and both spans. Check the corresponding `results_kind` before reading the union; a raw frame pointer must not be treated as a descriptor."
+
+msgid "使用当前精确提交重新生成 bundle，并在同一配置和工具链下重新编译全部调用者、 公共 face／ops、factory、provider 和组件；不得混用 epoch 1 header、旧对象或缓存。 当前生成头、SDK 及维护消费者只认可 epoch 2；旧 epoch 1 应明确拒绝，不自动迁移、 降级或以 `--development-fixture` 放宽接口检查。外部产品的迁移步骤见 [迁移指南](../guides/migration.md)。manifest schema 2 与 interface epoch 2 是独立字段， 数字相同不表示彼此推导；本次只纠正文档中过时的 manifest 格式说明。"
+msgstr "Regenerate the bundle from the current exact commit, then rebuild all callers, public faces/ops, factories, providers and components under one configuration and toolchain. Do not mix epoch-1 headers, old objects or caches. Current generated headers, SDKs and maintained consumers recognize epoch 2 only; old epoch 1 must be explicitly rejected, with no automatic migration, downgrade or relaxed interface checks through `--development-fixture`. See the external product [migration guide](../guides/migration.md). Manifest schema 2 and interface epoch 2 are independent fields; equal numbers do not derive compatibility. This iteration only corrects the obsolete manifest-format documentation."
 
 #: ../../../docs/design/source-compatibility.md:62
 msgid "自动检查"

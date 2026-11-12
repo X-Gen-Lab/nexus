@@ -81,6 +81,10 @@ def emit_bundle(result, output):
         'NEXUS_SOC_SOURCE_' + item.family for item in sources) + '")']
     cmake.append('set(NEXUS_RUNTIME_POWER "' + ("ON" if result.runtime_power is not None else "OFF") + '")')
     cmake.append("set(NEXUS_IO_CYCLE_PROBES " + ("ON" if probes else "OFF") + ")")
+    remote_wakeup = any(item.kind == "usb_device" and
+                        item.options.remote_wakeup for item in result.controllers)
+    cmake.append("set(NEXUS_USB_REMOTE_WAKEUP " +
+                 ("ON" if remote_wakeup else "OFF") + ")")
     for selection in result.controllers:
         prefix = "NEXUS_" + selection.id.replace("-", "_").upper()
         header.append(f"#define {prefix}_SELECTED 1")

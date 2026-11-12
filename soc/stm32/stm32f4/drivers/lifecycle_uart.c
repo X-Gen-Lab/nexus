@@ -1,7 +1,9 @@
 /**
  * \file            lifecycle_uart.c
- * \brief           Static IRQ UART lifecycle retaining its original cold
- * receipt. \author          Nexus Team \version         1.0.0 \date 2026-11-07
+ * \brief           Static IRQ UART lifecycle with retained cold receipts
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-11-07
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f4_lifecycle.h"

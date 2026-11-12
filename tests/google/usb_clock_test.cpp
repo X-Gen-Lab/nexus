@@ -7,9 +7,13 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "stm32f407_system.h"
 #include "stm32f407_usb_clock.h"
 #include "stm32f407xx.h"
 #include "usb_device_controller.h"
+}
+extern "C" {
+nx_stm32_system_t g_nx_stm32_system;
 }
 #include <cstring>
 #include <gtest/gtest.h>
@@ -202,4 +206,22 @@ TEST_F(UsbClock, FailedAcquisitionDrainCannotBecomeReadyAfterSourceRecovery) {
     EXPECT_EQ(state.consumers, 0U);
     s_refuse_stop = false;
     EXPECT_EQ(CLOCK_STOP(&state, 200U), NX_SUCCESS);
+}
+TEST_F(UsbClock, OptionalEpochReflectsOnlyTheLiveUnfailedSystem) {
+    const auto read = [this] {
+        return CLOCK_OPS.epoch == nullptr ? uint64_t{0U}
+                                          : CLOCK_OPS.epoch(&state);
+    };
+    g_nx_stm32_system.started = false;
+    g_nx_stm32_system.time_epoch = 42U;
+    g_nx_stm32_system.timer_error = NX_SUCCESS;
+    EXPECT_EQ(read(), 0U);
+    g_nx_stm32_system.started = true;
+    EXPECT_EQ(read(), 42U);
+    g_nx_stm32_system.timer_error = NX_ERROR_IO;
+    EXPECT_EQ(read(), 0U);
+    g_nx_stm32_system.timer_error = NX_SUCCESS;
+    g_nx_stm32_system.time_epoch = 43U;
+    EXPECT_EQ(read(), 43U);
+    g_nx_stm32_system.started = false;
 }

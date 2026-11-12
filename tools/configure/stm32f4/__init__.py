@@ -25,7 +25,6 @@ from .contract import (
     ENDPOINT_POLICY,
     ENUM_ABI,
     ETH_CONTROLLER,
-    EXTERNAL_IRQ_COUNT,
     FACT_REFERENCES,
     FLASH_INPUT_ALIGNMENT,
     FLASH_PROGRAM_UNIT,
@@ -49,6 +48,7 @@ from .contract import (
     mode_implementation,
     shares_irq,
     validate_controller_set,
+    validate_clock_policy,
     validate_dma,
     validate_dma_resource,
     validate_endpoint_clock,
@@ -72,7 +72,7 @@ from .hardware import (CONTROLLER_BINDINGS, DMA_IRQS,
                        SECONDARY_FACTS, DAC_DMA_ROUTES)
 from .integration import USB_DEVICE, ETHERNET, TIMER_ADVANCED
 from .integration import CAN_INTEGRATION
-from . import fsmc as EXTERNAL_BUS
+from . import external_bus as EXTERNAL_BUS
 from .i2c_timing import selected_format
 
 from .capture_audio import resolve_fields as capture_audio_fields
@@ -88,6 +88,7 @@ def silicon_policy(result, item=None):
         profile=result.clock_plan.profile,
         reviewed_revision_ids=result.clock_plan.reviewed_revision_ids,
         review_scope=(
-            "ES0182 Rev19 software audit with mode exclusions and external "
-            "constraints; stm32f407_silicon.h admits DEV_ID 0x413 and the "
-            "five reviewed cuts. Physical cut behavior has not been observed."))
+            result.clock_plan.provenance + "; mode exclusions and external "
+            "constraints remain in the selected review. The C silicon rule "
+            "uses the selected SDK group; physical cut behavior has not been "
+            "observed."))

@@ -34,8 +34,10 @@ static const nx_flash_sector_t s_sectors[] = {
     {0x0C000U, 0x04000U}, {0x10000U, 0x10000U}, {0x20000U, 0x20000U},
     {0x40000U, 0x20000U}, {0x60000U, 0x20000U}, {0x80000U, 0x20000U},
     {0xA0000U, 0x20000U}, {0xC0000U, 0x20000U}, {0xE0000U, 0x20000U}};
+static const nx_flash_erase_span_t s_spans[] = {
+    {0U, 0x4000U, 4U}, {0x10000U, 0x10000U, 1U}, {0x20000U, 0x20000U, 3U}};
 const nx_flash_geometry_t g_nx_stm32_flash_ve = {0x08000000U, 524288U, 4U,
-                                                 s_sectors,   8U,      0U};
+                                                 s_spans,     3U,      0U};
 
 static nx_stm32_flash_state_t* model;
 static void complete(bool erase) {
@@ -47,8 +49,8 @@ static void complete(bool erase) {
     if (erase) {
         size_t sector = (model->registers->CR & FLASH_CR_SNB) >> 3U;
         std::memset(const_cast<uint8_t*>(model->memory) +
-                        model->geometry->sectors[sector].offset,
-                    0xff, model->geometry->sectors[sector].size);
+                        s_sectors[sector].offset,
+                    0xff, s_sectors[sector].size);
     }
 }
 extern "C" void nx_flash_program_model_poll(unsigned kind, void* context) {

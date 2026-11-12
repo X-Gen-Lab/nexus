@@ -5,7 +5,7 @@ from tools.configure.providers.common import fail, integer, sequence
 FORMATS = ("u8", "u12-right", "u12-left")
 WAVE_MODES = frozenset(("noise", "triangle"))
 DMA_MODES = frozenset(("trigger-dma", "trigger-dma-circular"))
-TRIGGERS = ("none", "software", "tim6-trgo", "tim7-trgo")
+TRIGGERS = ("none", "software", "tim6-trgo", "tim7-trgo", "exti9")
 AMPLITUDES = tuple((1 << bits) - 1 for bits in range(1, 13))
 
 
@@ -43,10 +43,24 @@ def validate_selection(selection, route, provider):
         fail("DAC trigger lacks a maintained source owner")
     if (mode == "direct") != (trigger == "none"):
         fail("DAC direct mode requires no trigger; triggered modes require one")
+    external = trigger == "exti9"
+    if external:
+        source = selection.get("trigger_input")
+        if not isinstance(source, str) or not source:
+            fail("DAC EXTI9 requires an explicit trigger_input hardware-event owner")
+        if mode == "trigger-dma":
+            fail("DAC external finite DMA has no proven final-trigger tail")
+        if mode == "trigger-dma-circular":
+            if selection.get("recovery_trigger") not in ("tim6-trgo", "tim7-trgo"):
+                fail("DAC external DMA requires a recovery timer TIM6 or TIM7")
+        elif "recovery_trigger" in selection:
+            fail("DAC recovery timer requires circular DMA")
+    elif {"trigger_input", "recovery_trigger"} & selection.keys():
+        fail("DAC external fields trigger_input/recovery_trigger require EXTI9")
     if mode in DMA_MODES:
         if "irq_priority" not in selection:
             fail("DAC DMA requires an explicit IRQ priority")
-        if trigger not in {"tim6-trgo", "tim7-trgo"}:
+        if not external and trigger not in {"tim6-trgo", "tim7-trgo"}:
             fail("DAC DMA requires an exclusively owned TIM6 or TIM7 timer")
     elif {"irq_priority", "calls_os"} & selection.keys():
         fail("DAC CPU modes have no IRQ options")
@@ -72,12 +86,50 @@ def selected_route(selection, route, provider):
     if selection["trigger"].startswith("tim"):
         timer = selection["trigger"].split("-", 1)[0].upper()
         resources += ["controller:" + timer, "timer:" + timer]
+    elif selection["trigger"] == "exti9" and selection["mode"] in DMA_MODES:
+        timer = selection["recovery_trigger"].split("-", 1)[0].upper()
+        resources += ["controller:" + timer, "timer:" + timer]
     selected = {**route, "pins": pins, "resources": resources}
     if selection["mode"] in DMA_MODES:
         mask = sum(1 << (channel - 1) for channel in chosen)
         selected["mode_dma"] = {
             selection["mode"]: list(provider.DAC_DMA_ROUTES[mask])}
     return selected
+
+
+def resolve_sources(selected):
+    """Validate static EXTI9 references and order the same owner before DAC.
+
+    The graph-local list is still a draft. No second runtime dependency graph
+    or executable hardware sequence is produced; ordinary reverse close owns
+    the corresponding consumer-before-source withdrawal.
+    """
+    sources = {}
+    for item in selected:
+        if item["kind"] != "dac" or item["trigger"] != "exti9":
+            continue
+        matches = [source for source in selected
+                   if source["id"] == item["trigger_input"]]
+        if len(matches) != 1:
+            fail("DAC trigger_input requires one existing EXTI9 hardware-event owner")
+        source, = matches
+        if (source["kind"] != "exti" or source["controller"] != "EXTI9" or
+                source["mode"] != "hardware-event"):
+            fail("DAC trigger_input requires the exact EXTI9 hardware-event owner")
+        sources[item["id"]] = source
+    if not sources:
+        return
+    moved = {source["id"] for source in sources.values()}
+    ordered, appended = [], set()
+    for item in selected:
+        if item["id"] in moved:
+            continue
+        source = sources.get(item["id"])
+        if source is not None and source["id"] not in appended:
+            ordered.append(source)
+            appended.add(source["id"])
+        ordered.append(item)
+    selected[:] = ordered
 
 
 def editor_schema(properties):
@@ -91,4 +143,7 @@ def editor_schema(properties):
                                           "maximum": 4095}}
     properties["output_buffer"] = {"type": "boolean"}
     properties["trigger"] = {"type": "string", "enum": list(TRIGGERS)}
+    properties["trigger_input"] = {"type": "string", "minLength": 1}
+    properties["recovery_trigger"] = {
+        "type": "string", "enum": ["tim6-trgo", "tim7-trgo"]}
     properties["amplitude"] = {"type": "integer", "enum": list(AMPLITUDES)}

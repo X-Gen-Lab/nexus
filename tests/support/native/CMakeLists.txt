@@ -63,5 +63,8 @@ target_link_libraries(nexus_usb_native_engine PRIVATE nexus_io nexus_arch
     nexus_build_options nexus_owned_warnings)
 target_compile_options(nexus_usb_native_engine PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/drivers/usb_device_access.h")
+# The complete USB model retains the selected optional protocol contracts.
+target_compile_definitions(nexus_usb_native_engine PRIVATE
+    NEXUS_STM32F4_USB_REMOTE_WAKEUP=1)
 target_sources(nexus_io_native PRIVATE $<TARGET_OBJECTS:nexus_usb_native_engine>)
 add_library(Nexus::NativeModel ALIAS nexus_io_native)

@@ -65,8 +65,18 @@ extern "C" bool nx_physical_factory_is_privileged(void) {
 extern "C" void nx_physical_factory_write(volatile uint32_t* reg,
                                           uint32_t value) {
     ++s_writes;
-    if (!s_refuse_selected_gpio_mode || reg != &selected_gpio(0U))
-        *reg = value;
+    if (s_refuse_selected_gpio_mode && reg == &selected_gpio(0U))
+        return;
+    *reg = value;
+    for (unsigned bank = 0U; bank < 9U; ++bank) {
+        auto* gpio = reinterpret_cast<GPIO_TypeDef*>(GPIOA_BASE +
+                                                     bank * UINT32_C(0x400));
+        if (reg == &gpio->BSRR) {
+            gpio->ODR =
+                (gpio->ODR & ~(value >> 16U)) | (value & UINT32_C(0xFFFF));
+            break;
+        }
+    }
 }
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;

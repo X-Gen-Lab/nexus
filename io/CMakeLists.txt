@@ -59,6 +59,14 @@ nexus_io_domain(exti ALIAS IOEXTI SOURCES src/api/exti.c DEPENDS nexus_io_wake)
 nexus_io_domain(pwm ALIAS IOTimer SOURCES src/api/timer.c)
 nexus_io_domain(dac ALIAS IODAC SOURCES src/api/dac.c)
 nexus_io_domain(crc ALIAS IOCRC SOURCES src/api/crc.c)
+nexus_io_domain(cipher ALIAS IOCipher SOURCES src/api/cipher.c
+    DEPENDS nexus_io_wake)
+nexus_io_domain(hash ALIAS IOHash SOURCES src/api/hash.c
+    DEPENDS nexus_io_wake)
+nexus_io_domain(display ALIAS IODisplay SOURCES src/api/display.c
+    DEPENDS nexus_io_dma nexus_io_wake)
+nexus_io_domain(image ALIAS IOImage SOURCES src/api/image.c
+    DEPENDS nexus_io_dma nexus_io_wake)
 nexus_io_domain(dac_tx ALIAS IODACTx SOURCES src/api/dac_tx.c
     DEPENDS nexus_io_dma nexus_io_wake)
 nexus_io_domain(adc ALIAS IOADC
@@ -94,7 +102,9 @@ nexus_io_domain(adc_group ALIAS IOADCGroup SOURCES src/api/adc_group.c
 nexus_io_domain(rtc ALIAS IORTC SOURCES src/api/rtc.c DEPENDS nexus_io_wake)
 nexus_io_domain(lptim ALIAS IOLPTIM SOURCES src/api/lptim.c DEPENDS nexus_io_wake)
 nexus_io_domain(entropy ALIAS IOEntropy SOURCES src/api/entropy.c)
-foreach(domain capture audio timer_pulse timer_sequence)
+nexus_io_domain(audio ALIAS IOAudio SOURCES src/api/audio.c
+    DEPENDS nexus_io_stream)
+foreach(domain capture timer_pulse timer_sequence)
     add_library(nexus_io_${domain} INTERFACE)
     target_link_libraries(nexus_io_${domain} INTERFACE
         nexus_io_contract nexus_io_stream)
@@ -102,7 +112,6 @@ endforeach()
 add_library(Nexus::IOCapture ALIAS nexus_io_capture)
 add_library(Nexus::IOTimerPulse ALIAS nexus_io_timer_pulse)
 add_library(Nexus::IOTimerSequence ALIAS nexus_io_timer_sequence)
-add_library(Nexus::IOAudio ALIAS nexus_io_audio)
 
 # Common observation is usable without a physical controller. Every other
 # source is compiled only through a selected domain or explicit consumer target.
@@ -121,7 +130,7 @@ endif()
 # Runtime and Native admit caller-defined providers, independently of Board facts.
 if(_nexus_runtime_scope OR NOT DEFINED NEXUS_SOC_FAMILY OR
         NEXUS_SOC_FAMILY STREQUAL "native")
-    set(_nexus_io_domains gpio uart spi i2c i2c_target flash watchdog exti pwm adc dac dac_tx crc can
+    set(_nexus_io_domains gpio uart spi i2c i2c_target flash watchdog exti pwm adc dac dac_tx crc cipher hash display image can
         usb_device usb_host eth eth_frames timer_capture advanced_pwm pwm_group encoder
         pwm_adc can_fd adc_group rtc lptim entropy block external_bus
         parallel16 memory_window flash_async nand capture audio

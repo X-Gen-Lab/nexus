@@ -265,7 +265,7 @@ def collect(root=ROOT):
     selected = defaultdict(lambda: {"fixtures": set(), "exports": set()})
     assembly_paths = (root / "tools/configure/assemblies").glob("*.toml")
     contract_paths = []
-    for path in (root / "tests/contracts").glob("*/*.toml"):
+    for path in (root / "tests/contracts").rglob("*.toml"):
         # Authored inputs carry schema even outside the assembly directories.
         # Existing assembly directories retain strict validation if it is absent.
         if (path.parent.name.endswith("_assembly") or

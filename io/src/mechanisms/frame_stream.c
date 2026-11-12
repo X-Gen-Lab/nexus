@@ -78,9 +78,11 @@ nx_result_t nx_frame_layout_audio(const nx_frame_audio_format_t* format,
     } else {
         if ((format->sample != NX_FRAME_PCM_SIGNED &&
              format->sample != NX_FRAME_PCM_UNSIGNED) ||
-            (format->sample_bits != 8U && format->sample_bits != 16U &&
-             format->sample_bits != 20U && format->sample_bits != 24U &&
-             format->sample_bits != 32U) ||
+            (format->sample_bits != 8U &&
+             !(format->kind == NX_FRAME_AUDIO_SAI &&
+               format->sample_bits == 10U) &&
+             format->sample_bits != 16U && format->sample_bits != 20U &&
+             format->sample_bits != 24U && format->sample_bits != 32U) ||
             format->sample_bits > format->slot_bits ||
             (format->slot_bits != 8U && format->slot_bits != 16U &&
              format->slot_bits != 32U)) {

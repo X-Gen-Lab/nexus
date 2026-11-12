@@ -7,10 +7,32 @@
 #define NEXUS_IO_ADC_GROUP_H
 #include "nexus/core/request.h"
 #include "nexus/io/adc_format.h"
+#include "nexus/io/adc_observer.h"
 #include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
+/** \brief A request names raw frames or one explicit two-group result view. */
+typedef enum {
+    NX_ADC_GROUP_RESULTS_UNKNOWN,
+    NX_ADC_GROUP_RAW_RESULTS,
+    NX_ADC_GROUP_REGULAR_INJECTED_RESULTS
+} nx_adc_group_results_kind_t;
+/** \brief One exact result span; format belongs to its queried ADC group. */
+typedef struct {
+    void* data;
+    size_t bytes;
+} nx_adc_group_result_t;
+/** \brief Both group spans and this descriptor have one request lifetime.
+ * \note The producer borrows this immutable descriptor and both disjoint
+ *       spans until one acquire-observed SETTLED. No independent subgroup
+ *       success or partial valid frame is published.
+ */
+typedef struct {
+    nx_adc_group_result_t regular;
+    nx_adc_group_result_t injected;
+} nx_adc_group_results_t;
+
 /** \brief Complete raw frame span with an explicit finite request lifetime.
  * \note base.transferred counts complete frames, never bytes or individual
  *       ranks. SUCCESS means exactly frame_count; errors guarantee zero valid
@@ -18,9 +40,13 @@ extern "C" {
  */
 typedef struct {
     nx_request_t base;
-    void* frames;       /**< Exclusive producer storage, including padding. */
-    size_t bytes;       /**< Exact frame_count * info.format.scan_stride. */
+    union {
+        void* frames; /**< Raw frame storage, including declared padding. */
+        nx_adc_group_results_t* results; /**< Explicit paired descriptor. */
+    } output;     /**< Explicit result view selected by results_kind. */
+    size_t bytes; /**< Raw bytes, or sizeof(*output.results) when paired. */
     size_t frame_count; /**< Positive complete frames, within selected bound. */
+    nx_adc_group_results_kind_t results_kind; /**< Explicit active view. */
 } nx_adc_group_request_t;
 /** \brief Cold selected rank order, actual integer layout and scheduling facts.
  * \note Arrays belong to immutable selected facts and outlive this port. A
@@ -58,6 +84,15 @@ typedef struct {
     nx_result_t (*service)(void* context);
     nx_result_t (*stop)(void* context);
     nx_result_t (*info)(const void* context, nx_adc_group_info_t* info);
+    nx_result_t (*start_blocks)(void* context, nx_stream_t* stream);
+    nx_result_t (*attach_observer)(void* context, nx_adc_observer_t* observer);
+    nx_result_t (*block_observation)(const void* context,
+                                     const nx_stream_block_t* block,
+                                     nx_adc_observation_t* observation);
+    nx_result_t (*submit_injected)(void* context,
+                                   nx_adc_group_request_t* request);
+    nx_result_t (*injected_info)(const void* context,
+                                 nx_adc_group_info_t* info);
 } nx_adc_group_ops_t;
 /** \brief Immutable selected face, sharing one const table across instances.
  * \note Face/context/configuration outlive every request, vector and retained
@@ -82,6 +117,20 @@ struct nx_adc_group_port {
 nx_result_t nx_adc_group_prepare(nx_adc_group_request_t* request, void* frames,
                                  size_t bytes, size_t frame_count,
                                  nx_time_us_t deadline);
+/** \brief Prepare one explicit regular/injected result descriptor.
+ * \param[in,out] request: Initialized READY or consumed SETTLED metadata.
+ * \param[in,out] results: Stable descriptor naming two disjoint output spans.
+ * \param[in] frame_count: Positive joint frames; provider checks its limit.
+ * \param[in] deadline: Finite absolute deadline for both results and
+ * withdrawal. \return SUCCESS or pure INVALID/STATE; no sample data is read or
+ * written. \note Selection must expose paired acquisition. Admission borrows
+ * descriptor, both spans and request jointly. Errors guarantee zero valid joint
+ *       frames; cancel or failed drain cannot revoke either storage loan.
+ */
+nx_result_t nx_adc_group_prepare_results(nx_adc_group_request_t* request,
+                                         nx_adc_group_results_t* results,
+                                         size_t frame_count,
+                                         nx_time_us_t deadline);
 /** \brief Accept and start one selected finite acquisition under a sole owner.
  * \param[in] port: Initialized selected face with immutable retained facts.
  * \param[in,out] request: Exact READY descriptor and exclusive writable span.
@@ -129,6 +178,52 @@ nx_result_t nx_adc_group_stop(const nx_adc_group_port_t* port);
  */
 nx_result_t nx_adc_group_info(const nx_adc_group_port_t* port,
                               nx_adc_group_info_t* info);
+/** \brief Accept caller-owned continuous complete-scan blocks.
+ * \param[in] port: Static blocks provider, one serialized privileged executor.
+ * \param[in,out] stream: At least three equal complete-frame DMA slots.
+ * \return SUCCESS accepts the session; it does not certify completed warmup.
+ * \note Errors after acceptance latch until joined stop. Service is explicit;
+ *       no heap, default buffers or worker exists. Budget loss never publishes
+ *       an unproved bank. Consumer loans survive stop until released.
+ */
+nx_result_t nx_adc_group_start_blocks(const nx_adc_group_port_t* port,
+                                      nx_stream_t* stream);
+/** \brief Attach existing caller-owned ADC observation records while idle.
+ * \param[in] port: Same selected continuous group port.
+ * \param[in,out] observer: Initialized optional control, or NULL to detach.
+ * \return SUCCESS or pure INVALID/BUSY/CONTEXT/UNSUPPORTED rejection.
+ * \note Observation timestamps are software completion observations, never
+ *       trigger counts or sample-aperture timestamps. Stop joins before reuse.
+ */
+nx_result_t nx_adc_group_attach_observer(const nx_adc_group_port_t* port,
+                                         nx_adc_observer_t* observer);
+/** \brief Read one acquired block's exact existing ADC observation.
+ * \param[in] port: Same bound observation-capable group port.
+ * \param[in] block: Current immutable consumer loan from that exact stream.
+ * \param[out] observation: Separate copied record, unchanged on rejection.
+ * \return SUCCESS or INVALID/STATE/UNSUPPORTED with no retained output.
+ */
+nx_result_t nx_adc_group_block_observation(const nx_adc_group_port_t* port,
+                                           const nx_stream_block_t* block,
+                                           nx_adc_observation_t* observation);
+/** \brief Accept one explicit software injection alongside regular blocks.
+ * \param[in] port: Sole selected combined regular/injected controller owner.
+ * \param[in,out] request: One frame in the separately queried injected layout.
+ * \return SUCCESS accepts and borrows; other results have no retained effects.
+ * \note The selected minimum interval bounds regular conversion disruption.
+ *       Only one injected request may be live. Cancellation waits for all JEOC
+ *       or a complete controller withdrawal. No automatic injection is implied.
+ */
+nx_result_t nx_adc_group_submit_injected(const nx_adc_group_port_t* port,
+                                         nx_adc_group_request_t* request);
+/** \brief Query the separate selected injected integer rank layout.
+ * \param[in] port: Same initialized combined controller owner.
+ * \param[out] info: Distinct output; unchanged on refusal.
+ * \return SUCCESS, UNSUPPORTED for finite/regular-only faces, or admission
+ * error.
+ */
+nx_result_t nx_adc_group_injected_info(const nx_adc_group_port_t* port,
+                                       nx_adc_group_info_t* info);
 #ifdef __cplusplus
 }
 #endif

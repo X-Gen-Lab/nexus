@@ -1,7 +1,9 @@
 /**
  * \file            uart_duplex.c
- * \brief           Compact RX owner with a selected independent TX DMA
- * extension \author          Nexus Team \version         1.0.0 \date 2026-10-17
+ * \brief           Compact UART RX owner with optional independent TX DMA
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-17
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_uart_receive.h"

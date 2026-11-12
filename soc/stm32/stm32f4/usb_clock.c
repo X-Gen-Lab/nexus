@@ -75,7 +75,9 @@ static nx_result_t release(void* context) {
     return NX_SUCCESS;
 }
 
-const nx_usb_clock_ops_t nx_stm32_usb_clock_ops = {retain, release, validate};
+const nx_usb_clock_ops_t nx_stm32_usb_clock_ops = {
+    retain, release, validate,
+    NEXUS_STM32F4_USB_REMOTE_WAKEUP ? nx_stm32_usb_epoch : NULL};
 
 /** \brief Establish only the independent USBFS gate after profile validation.
  */

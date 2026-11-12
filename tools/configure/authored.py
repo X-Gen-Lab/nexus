@@ -7,7 +7,8 @@ from types import MappingProxyType
 from tools.configure.ir import Record, freeze
 from tools.configure.contracts import (
     CONTROLLER_CONTRACTS, CONTROLLER_KINDS, ENDPOINT_FIELDS, USB_ENDPOINT_FIELDS,
-    EXTERNAL_ENDPOINT_FIELDS, EXTERNAL_ENDPOINT_KINDS, EXTERNAL_ENDPOINT_REQUIRED)
+    EXTERNAL_ENDPOINT_FIELDS, EXTERNAL_ENDPOINT_KINDS, EXTERNAL_ENDPOINT_REQUIRED,
+    SERIAL_FLASH_FIELDS)
 
 
 @dataclass(frozen=True)
@@ -117,7 +118,15 @@ def normalize(data, path, root, fail, obj, integer, text, *,
             fail(f"{kind}: expected endpoint tables")
         for name, definition in instances.items():
             required = EXTERNAL_ENDPOINT_REQUIRED[kind]
-            obj(definition, required, {"parameters"} if kind == "memory_window" else (), f"{kind}.{name}")
+            optional = {"parameters"} if kind == "memory_window" else set()
+            if (kind == "flash_async" and isinstance(definition, dict) and
+                    definition.get("mode") == "nor-indirect"):
+                required = SERIAL_FLASH_FIELDS
+            if (kind == "memory_window" and isinstance(definition, dict) and
+                    not ({"read_timing", "write_timing"} & set(definition))):
+                required = required - {"read_timing", "write_timing"} | {"parameters"}
+                optional = set()
+            obj(definition, required, optional, f"{kind}.{name}")
             devices.append({**definition, "id": name,
                             "driver": kind + "-endpoint",
                             "authored_kind": kind})
@@ -198,7 +207,7 @@ def editor_schema():
                    "tx_count", "rx_count", "rx_storage_bytes", "init_timeout_us",
                    "filter", "filter_a", "filter_b", "deadtime_ticks",
                    "trigger_ticks", "data_bitrate", "period_us", "lower",
-                   "upper", "image_prefix_bytes", "image_suffix_bytes"}
+                   "upper", "image_prefix_bytes", "image_suffix_bytes", "drain_us"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
         for name in fields & block_bounds.keys():
@@ -226,7 +235,7 @@ def editor_schema():
                 "description": "PVD PLS encoding; consult the exact datasheet "
                                "threshold bounds and hysteresis. No voltage "
                                "policy is selected by default."}
-        for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing",
+        for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing", "remote_wakeup",
                              "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b", "lsb_first", "maintenance", "checksum_offload"}:
             properties[name] = {"type": "boolean"}
         if "lsb_first" in fields:
@@ -238,6 +247,30 @@ def editor_schema():
             properties["timing"] = record(
                 {"prescaler", "segment1", "segment2", "sjw"},
                 {"prescaler", "segment1", "segment2", "sjw"})
+        if "layers" in fields:
+            dimensions = {"width", "height", "hsync", "hback_porch", "hfront_porch",
+                          "vsync", "vback_porch", "vfront_porch"}
+            polarities = {"hsync_polarity", "vsync_polarity", "de_polarity",
+                          "clock_polarity"}
+            timing = record(dimensions | polarities, dimensions | polarities)
+            for name in dimensions:
+                timing["properties"][name] = {
+                    "type": "integer",
+                    "minimum": 0 if name in {"hback_porch", "vback_porch"} else 1}
+            for name in polarities - {"clock_polarity"}:
+                timing["properties"][name] = {"enum": ["active-low", "active-high"]}
+            timing["properties"]["clock_polarity"] = {"enum": ["normal", "inverted"]}
+            properties["timing"] = timing
+            names = {"layer", "x", "y", "width", "height", "formats", "alpha", "pixel_alpha"}
+            layer = record(names, names)
+            for name in names - {"formats", "pixel_alpha"}:
+                layer["properties"][name] = {"type": "integer", "minimum": 0}
+            layer["properties"]["formats"] = {
+                "type": "array", "minItems": 1, "uniqueItems": True,
+                "items": {"enum": ["rgb565", "argb8888"]}}
+            layer["properties"]["pixel_alpha"] = {"type": "boolean"}
+            properties["layers"] = {"type": "array", "minItems": 1,
+                                     "maxItems": 2, "items": layer}
         if "mode" in fields and "controller" in fields:
             properties["mode"] = {"type": "integer", "minimum": 0, "maximum": 3}
         if "irq" in fields:
@@ -254,9 +287,34 @@ def editor_schema():
         if "watchdog" in fields:
             properties["watchdog"] = record({"lower", "upper"},
                                              {"lower", "upper"})
+        if "max_service_gap_us" in fields:
+            properties["max_service_gap_us"] = {
+                "type": "integer", "minimum": 1, "maximum": 2**32 - 1}
+        if "injected" in fields:
+            injected_fields = {"channels", "sample_times", "min_interval_us"}
+            properties["injected"] = record(
+                injected_fields | {"trigger", "delay_us"}, {"channels", "sample_times"})
+            properties["injected"]["properties"]["trigger"] = {
+                "enum": ["tim1-ch4", "tim1-trgo", "tim3-ch2", "tim3-ch4",
+                         "tim4-ch1", "tim4-ch2", "tim4-ch3", "tim4-trgo",
+                         "tim5-ch4", "tim5-trgo", "tim8-ch2", "tim8-ch3", "tim8-ch4"]}
+            properties["injected"]["properties"]["delay_us"] = {
+                "type": "integer", "minimum": 1, "maximum": 0xffffffff}
+            properties["injected"]["dependentRequired"] = {
+                "trigger": ["delay_us"], "delay_us": ["trigger"]}
+            properties["injected"]["properties"]["min_interval_us"] = {
+                "type": "integer", "minimum": 1, "maximum": 2**32 - 1}
         uart_formats.fifo_editor_schema(properties, fields, record)
-        return {"type": "object", "properties": properties,
-                "required": sorted(required), "additionalProperties": False}
+        result = {"type": "object", "properties": properties,
+                  "required": sorted(required), "additionalProperties": False}
+        if "injected" in fields:
+            result["allOf"] = [{
+                "if": {"properties": {"mode": {"const": "regular-auto-injected"}},
+                       "required": ["mode"]},
+                "then": {"properties": {"injected": {"properties": {
+                    "min_interval_us": False, "trigger": False, "delay_us": False}}}},
+                "else": {"properties": {"injected": {"required": ["min_interval_us"]}}}}]
+        return result
     schema = record(TOP_REQUIRED | TOP_OPTIONAL | KINDS | set(EXTERNAL_ENDPOINT_KINDS) | {"spi_device", "i2c_device", "usb_endpoint"},
                     TOP_REQUIRED)
     schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
@@ -306,6 +364,19 @@ def editor_schema():
                          ("apb1_div", APB), ("apb2_div", APB),
                          ("adc_div", (2, 4, 6, 8))):
         clock_fields[name] = {"type": "integer", "enum": list(values)}
+    auxiliary = record({"m", "n", "sai1", "ltdc"}, {"m", "n"})
+    auxiliary["properties"].update(
+        m={"type": "integer", "minimum": 2, "maximum": 63},
+        n={"type": "integer", "minimum": 50, "maximum": 432})
+    for output, divider, posts in (("sai1", "q", range(1, 33)),
+                                    ("ltdc", "r", (2, 4, 8, 16))):
+        shape = record({divider, "post_divider"}, {divider, "post_divider"})
+        shape["properties"][divider] = {
+            "type": "integer", "minimum": 2, "maximum": 15 if divider == "q" else 7}
+        shape["properties"]["post_divider"] = {"type": "integer", "enum": list(posts)}
+        auxiliary["properties"][output] = shape
+    auxiliary["anyOf"] = [{"required": ["sai1"]}, {"required": ["ltdc"]}]
+    clock_fields["pll_sai"] = auxiliary
     properties["clock_parameters"] = {
         "type": "object", "additionalProperties": False,
         "required": list(DEFAULT), "properties": clock_fields}
@@ -351,7 +422,17 @@ def editor_schema():
     for kind in EXTERNAL_ENDPOINT_KINDS:
         required = EXTERNAL_ENDPOINT_REQUIRED[kind]
         fields = required | ({"parameters"} if kind == "memory_window" else set())
+        if kind == "flash_async":
+            fields |= SERIAL_FLASH_FIELDS
         endpoint = record(fields, required)
+        if kind == "flash_async":
+            endpoint["required"] = sorted(required & SERIAL_FLASH_FIELDS)
+            endpoint["oneOf"] = [
+                {"required": sorted(required), "not": {"required": ["mode"]}},
+                {"required": sorted(SERIAL_FLASH_FIELDS),
+                 "properties": {"mode": {"const": "nor-indirect"}},
+                 "not": {"anyOf": [{"required": [field]} for field in
+                                   ("read_timing", "write_timing", "nor")]}}]
         if "ready_delay_us" in fields:
             endpoint["properties"]["ready_delay_us"] = {
                 "type": "integer", "minimum": 1, "maximum": 1000000}
@@ -359,6 +440,12 @@ def editor_schema():
             if field in fields:
                 endpoint["properties"][field] = {"type": "object"}
         if kind == "memory_window":
+            endpoint["required"] = sorted(required - {"read_timing", "write_timing"})
+            endpoint["oneOf"] = [
+                {"required": ["read_timing", "write_timing"]},
+                {"required": ["parameters"],
+                 "not": {"anyOf": [{"required": ["read_timing"]},
+                                    {"required": ["write_timing"]}]}}]
             endpoint["properties"]["mode"] = {
                 "enum": ["cpu-window", "startup-memory", "psram-window"]}
         for field in ("read_timing", "write_timing"):
@@ -434,6 +521,8 @@ def explain_schema(schema):
                 visit(child)
         elif isinstance(value, dict):
             for name, field in value.get("properties", {}).items():
+                if isinstance(field, bool):
+                    continue
                 if name in descriptions:
                     field["description"] = descriptions[name]
                 elif name.endswith("_hz"):

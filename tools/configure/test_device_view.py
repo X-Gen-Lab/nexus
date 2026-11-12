@@ -5,7 +5,8 @@ import unittest
 
 from tools.configure import configure as gate, dependencies
 from tools.configure.providers import maintained
-from tools.configure.tests.device_fixture import load_soc_facts
+from tools.configure.tests.device_fixture import (load_soc_facts,
+                                                   validate_soc_facts)
 
 
 class DeviceViewTests(unittest.TestCase):
@@ -40,13 +41,39 @@ class DeviceViewTests(unittest.TestCase):
                 self.assertFalse(hasattr(view.controllers["USART1"], "modes"))
                 self.assertIn("irq-byte-event", view.modes["USART1"].modes)
                 media = part.startswith(("STM32F407", "STM32F417"))
-                self.assertEqual(len(view.controllers), 69 if media else 67)
+                crypto = part.startswith(("STM32F415", "STM32F417"))
+                self.assertEqual(len(view.controllers), 67 + 2 * media + 2 * crypto)
                 self.assertEqual("ETH" in view.controllers, media)
                 self.assertEqual("DCMI" in view.controllers, media)
-                self.assertNotIn("CRYP", view.modes)
-                self.assertNotIn("HASH", view.modes)
+                self.assertEqual("CRYP" in view.modes, crypto)
+                self.assertEqual("HASH" in view.modes, crypto)
+                if crypto:
+                    self.assertEqual(view.modes["CRYP"].modes, ("irq-blocks",))
+                    self.assertEqual(view.modes["HASH"].modes, ("irq-blocks",))
                 self.assertIs(selected.soc["controllers"],
                               selected.controller_profiles[view.physical["device"]])
+
+    def test_initial_exact_reference_entries_keep_their_own_review_and_layout(self):
+        from tools.configure import selected_contracts
+        entries = (("f411re", "STM32F411RET6", "LQFP64", 524288, 86, "ES0287 Rev6"),
+                   ("f446ze", "STM32F446ZET6", "LQFP144", 524288, 97, "ES0298 Rev8"),
+                   ("f479ni", "STM32F479NIH6", "TFBGA216", 2097152, 93, "ES0321 Rev14"))
+        for stem, part, package, flash, irqs, document in entries:
+            with self.subTest(part=part):
+                result = gate.resolve_ir(gate.ROOT /
+                    f"tests/contracts/stm32f4_family/{stem}.toml")
+                self.assertEqual((result.part, result.package), (part, package))
+                self.assertEqual(result.flash["size"], flash)
+                self.assertEqual(result.cpu_profile.irq.external_count, irqs)
+                self.assertEqual(result.clock_plan.reviewed_revision_ids, (0x1000,))
+                policy = selected_contracts.silicon_policy(result)
+                self.assertIn(document, policy.review_scope)
+                self.assertNotIn("DEV_ID 0x413", policy.review_scope)
+                self.assertEqual(result.clock["core_hz"], 16000000)
+                self.assertEqual([(item.kind, item.controller)
+                                  for item in result.controllers], [("crc", "CRC")])
+                self.assertIsNone(result.physical_pcb_revision)
+                self.assertFalse(result.physical_qualified)
 
     def test_view_cannot_be_mutated_by_consumer_or_authored_input(self):
         soc, catalog = self.inputs()
@@ -63,6 +90,39 @@ class DeviceViewTests(unittest.TestCase):
         soc["controller_groups"]["rm0090-common"]["modes"]["USART1"]["modes"].clear()
         self.assertEqual(view.physical["flash"]["size"], 524288)
         self.assertIn("irq-byte-event", view.modes["USART1"].modes)
+
+    def test_f479_sdram_route_has_exact_bonded_pins_and_one_fmc_identity(self):
+        soc, catalog = self.inputs()
+        selected = self.resolve(soc, catalog, "STM32F479NIH6")
+        view = selected.device
+        self.assertEqual(view.controllers["FMC"].irqs, ("FMC_IRQn",))
+        self.assertEqual(dict(view.controllers["FMC"].irq_numbers), {"FMC_IRQn": 48})
+        self.assertEqual(view.modes["FMC"].modes, ("sdram-controller",))
+        self.assertEqual(view.modes["FMC"].interfaces["memory_window"], ("cpu-window",))
+        routes = gate.resolve_routes(gate.load(gate.ROOT /
+            "soc/stm32/stm32f4/routes.json"), selected.soc, view.part,
+            maintained("stm32f4"), controller_profiles=selected.controller_profiles)
+        route = routes["fmc-sdram-bank1-16"]
+        self.assertEqual(route["variants"], ["STM32F479NIH6"])
+        self.assertEqual(len(route["pins"]), 38)
+        self.assertTrue(all(pin["af"] == 12 for pin in route["pins"]))
+        wires = {pin["pin"]: pin["function"] for pin in route["pins"]}
+        self.assertEqual(wires["PC0"], "FMC_SDNWE")
+        self.assertNotIn("PA7", wires)
+        self.assertTrue(set(wires).issubset(view.physical["pins"]))
+        for part in ("STM32F407ZGT6", "STM32F411RET6", "STM32F446ZET6"):
+            self.assertNotIn("FMC", self.resolve(soc, catalog, part).device.controllers)
+
+    def test_f479_sdram_route_cannot_be_assigned_to_the_f446_profile(self):
+        soc, catalog = self.inputs()
+        selected = self.resolve(soc, catalog, "STM32F479NIH6")
+        routes = gate.load(gate.ROOT / "soc/stm32/stm32f4/routes.json")
+        route = next(item for item in routes["routes"]
+                     if item["id"] == "fmc-sdram-bank1-16")
+        route["variants"].append("STM32F446ZET6")
+        with self.assertRaisesRegex(ValueError, "maintained controller"):
+            gate.resolve_routes(routes, selected.soc, selected.device.part,
+                maintained("stm32f4"), controller_profiles=selected.controller_profiles)
 
     def test_catalog_backed_soc_rejects_a_second_global_controller_authority(self):
         soc, catalog = self.inputs()
@@ -165,7 +225,7 @@ class DeviceViewTests(unittest.TestCase):
                 soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
                 soc["controllers"][controller][field] = value
                 with self.assertRaisesRegex(ValueError, "IRQ"):
-                    gate.validate_soc(soc, "STM32F407VET6")
+                    validate_soc_facts(soc, "STM32F407VET6")
 
 
 if __name__ == "__main__":

@@ -26,28 +26,12 @@ static nx_result_t configure(nx_native_flash_state_t* port, uint8_t* memory,
     if (port == NULL) {
         return NX_ERROR_INVALID;
     }
-    if (memory == NULL || geometry == NULL || geometry->size == 0 ||
-        geometry->program_unit == 0 || geometry->sectors == NULL ||
-        geometry->sector_count == 0 ||
-        geometry->size % geometry->program_unit != 0) {
+    uint32_t count;
+    if (memory == NULL || geometry == NULL ||
+        nx_flash_geometry_sector_count(geometry, &count) != NX_SUCCESS)
         return NX_ERROR_INVALID;
-    }
-    if (geometry->program_flags != 0U) {
+    if (geometry->program_flags != 0U)
         return NX_ERROR_UNSUPPORTED;
-    }
-    uint32_t end = 0;
-    for (size_t i = 0; i < geometry->sector_count; i++) {
-        const nx_flash_sector_t* sector = &geometry->sectors[i];
-        if (sector->offset != end || sector->size == 0 ||
-            sector->size % geometry->program_unit != 0 ||
-            sector->size > geometry->size - end) {
-            return NX_ERROR_INVALID;
-        }
-        end += sector->size;
-    }
-    if (end != geometry->size) {
-        return NX_ERROR_INVALID;
-    }
     if (port->active) {
         return NX_ERROR_BUSY;
     }
@@ -219,30 +203,30 @@ static nx_result_t native_flash_erase(void* context, uint32_t offset,
     if (port->active) {
         return NX_ERROR_BUSY;
     }
-    size_t first = SIZE_MAX;
-    size_t last = SIZE_MAX;
+    uint32_t count, first, limit;
     uint32_t end = offset + (uint32_t)length;
-    for (size_t i = 0; i < port->geometry->sector_count; i++) {
-        const nx_flash_sector_t* sector = &port->geometry->sectors[i];
-        if (sector->offset == offset) {
-            first = i;
-        }
-        if (sector->offset + sector->size == end) {
-            last = i;
-        }
-    }
-    if (first == SIZE_MAX || last == SIZE_MAX || first > last) {
+    if (nx_flash_geometry_sector_count(port->geometry, &count) != NX_SUCCESS ||
+        nx_flash_geometry_sector_index(port->geometry, offset, &first) !=
+            NX_SUCCESS)
         return NX_ERROR_INVALID;
-    }
+    if (end == port->geometry->size)
+        limit = count;
+    else if (nx_flash_geometry_sector_index(port->geometry, end, &limit) !=
+             NX_SUCCESS)
+        return NX_ERROR_INVALID;
+    if (first >= limit)
+        return NX_ERROR_INVALID;
     port->active = true;
     nx_result_t result = NX_SUCCESS;
-    for (size_t i = first; i <= last; i++) {
-        result = begin_pulse(port, deadline);
-        if (result != NX_SUCCESS) {
+    for (uint32_t i = first; i < limit; ++i) {
+        nx_flash_sector_t sector;
+        result = nx_flash_geometry_sector_at(port->geometry, i, &sector);
+        if (result != NX_SUCCESS)
             break;
-        }
-        const nx_flash_sector_t* sector = &port->geometry->sectors[i];
-        memset(&port->memory[sector->offset], 0xff, sector->size);
+        result = begin_pulse(port, deadline);
+        if (result != NX_SUCCESS)
+            break;
+        memset(&port->memory[sector.offset], 0xff, sector.size);
         (void)nx_native_clock_advance(100);
     }
     port->active = false;

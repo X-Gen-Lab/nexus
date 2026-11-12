@@ -1,0 +1,31 @@
+schema = 2
+board_package = "ve_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[adc_group.group]
+binding = "group"
+mode = "regular-auto-injected"
+operation = "dual-simultaneous"
+channels = [0, 1, 2, 3]
+sample_times = [7, 7, 7, 7]
+reference_mv = 3300
+resolution_bits = 12
+exclusive = true
+trigger = "tim4-ch4"
+period_us = 1
+delay_cycles = 5
+drain_timeout_us = 1000
+
+injected = { channels = [2, 3], sample_times = [7, 7] }
+
+[adc_group.group.irq]
+priority = 5
+calls_os = false

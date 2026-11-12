@@ -25,7 +25,7 @@ APPLICATION = """#include "nexus/arch/arch.h"
 #ifndef NEXUS_PLATFORM_VERSION
 #error "Missing generated source interface version"
 #endif
-#if NEXUS_FACTORY_ABI_EPOCH != 1U
+#if NEXUS_FACTORY_ABI_EPOCH != 2U
 #error "Unsupported generated factory interface epoch"
 #endif
 

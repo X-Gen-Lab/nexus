@@ -275,10 +275,10 @@ class UsbHostHal : public testing::Test {
     void Start() {
         core = config.phy == NX_STM32_USB_FS_INTERNAL ? USB_OTG_FS : USB_OTG_HS;
         core->GRSTCTL = USB_OTG_GRSTCTL_AHBIDL;
-        core->HNPTXSTS = config.nonperiodic_fifo_words;
+        core->HNPTXSTS = (4U << 16U) | config.nonperiodic_fifo_words;
         *reinterpret_cast<volatile uint32_t*>(
             reinterpret_cast<uintptr_t>(core) + 0x410U) =
-            config.periodic_fifo_words;
+            (4U << 16U) | config.periodic_fifo_words;
         EXPECT_CALL(hal, Init(&state.hal)).WillOnce(Return(HAL_OK));
         EXPECT_CALL(hal, Start(&state.hal)).WillOnce(Return(HAL_OK));
         ASSERT_EQ(nx_stm32_usb_host_initialize(&state, &config, 1000U),
@@ -324,8 +324,11 @@ class UsbHostHal : public testing::Test {
         ASSERT_EQ(nx_usb_host_prepare(&request, bytes, sizeof(bytes), length,
                                       false, false, 500U),
                   NX_SUCCESS);
-        EXPECT_CALL(hal, Submit(&state.hal, 0U, in ? 1U : 0U, EP_TYPE_BULK, 1U,
-                                bytes, static_cast<uint16_t>(length), 0U))
+        EXPECT_CALL(
+            hal, Submit(&state.hal, 0U, in ? 1U : 0U, EP_TYPE_BULK, 1U, bytes,
+                        static_cast<uint16_t>(in ? channels[0].pipe.max_packet
+                                                 : length),
+                        0U))
             .WillOnce(
                 Invoke([this](HCD_HandleTypeDef* h, uint8_t, uint8_t, uint8_t,
                               uint8_t, uint8_t* data, uint16_t, uint8_t) {
@@ -649,7 +652,7 @@ TEST_F(UsbHostHal, ControlDataUsesOfficialLlToPreserveExplicitDataZeroPid) {
             Invoke([this](USB_OTG_GlobalTypeDef*, auto* channel, uint8_t) {
                 EXPECT_EQ(channel->data_pid, HC_PID_DATA0);
                 EXPECT_EQ(channel->xfer_buff, bytes);
-                EXPECT_EQ(channel->xfer_len, 3U);
+                EXPECT_EQ(channel->xfer_len, 64U);
                 Channel(0U)->HCCHAR |= USB_OTG_HCCHAR_CHENA;
                 return HAL_OK;
             }));

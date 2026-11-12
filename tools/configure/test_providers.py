@@ -1,5 +1,6 @@
 """Maintained provider boundaries and immutable mode decisions."""
-from tools.configure.tests.device_fixture import load_soc_facts
+from tools.configure.tests.device_fixture import (load_soc_facts,
+                                                   validate_soc_facts)
 from tools.configure.tests.native_fixture import native_fixture
 from tools.configure.providers.descriptor import source_directory
 from dataclasses import FrozenInstanceError, replace
@@ -25,7 +26,7 @@ class ProviderContractTests(unittest.TestCase):
                                   if item["kind"] == "gpio")
                 controller["modes"].append("invented-unselected-mode")
                 with self.assertRaisesRegex(ValueError, "provider mode|mode"):
-                    gate.validate_soc(soc, part, maintained(family, test_support=(family == "native")))
+                    validate_soc_facts(soc, part, maintained(family, test_support=(family == "native")))
 
     def test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile(self):
         for family, part, profile in (('stm32f4', 'STM32F407ZGT6', 'hse8-pll168'),):
@@ -41,7 +42,7 @@ class ProviderContractTests(unittest.TestCase):
                     else:
                         soc['clock_profiles'][profile][field] = value
                     with self.assertRaisesRegex(ValueError, '(?i)clock'):
-                        gate.validate_soc(soc, part, maintained(family, test_support=(family == "native")))
+                        validate_soc_facts(soc, part, maintained(family, test_support=(family == "native")))
 
     def test_physical_key_normalization_has_no_silicon_topology(self):
         self.assertEqual(
@@ -131,7 +132,7 @@ class ProviderContractTests(unittest.TestCase):
         soc["id"] = "unmaintained-m4"
         with self.assertRaisesRegex(gate.ConfigurationError,
                                     "Unmaintained SoC integration descriptor"):
-            gate.validate_soc(soc, "STM32F407ZGT6")
+            validate_soc_facts(soc, "STM32F407ZGT6")
 
     def test_unknown_emitter_cannot_fall_back_to_native(self):
         result = gate.resolve_ir(gate.ROOT /

@@ -80,7 +80,7 @@ struct nx_usb_host_port {
  * \param[in] capacity: Actual writable IN storage or readable OUT extent.
  * \param[in] length: Requested packet bytes, at most the configured MPS.
  * \param[in] setup: Eight-byte SETUP token on an OUT control channel.
- * \param[in] data1: Explicit data toggle for a DATA transaction.
+ * \param[in] data1: Explicit DATA toggle; false for single-transaction ISO.
  * \param[in] deadline: Absolute Core deadline, independent of USB SOF.
  * \return SUCCESS, INVALID or STATE; rejection retains no storage.
  */
@@ -112,8 +112,13 @@ nx_result_t nx_usb_host_close(const nx_usb_host_port_t* port, uint8_t channel);
  * \param[in,out] request: READY request alive until acquire-observed SETTLED.
  * \return SUCCESS means ACCEPTED; rejection has no retained references.
  * \note IN capacity must cover MPS. DMA buffers also require aligned reviewed
- *       DMA-visible storage. NAK/NYET settles as NACK for explicit caller
- * retry.
+ *       DMA-visible storage. PIO OUT returns BUSY without borrowing when the
+ *       selected FIFO or request queue cannot accept the complete packet.
+ *       Control/bulk/interrupt NAK/NYET settles as NACK for explicit retry.
+ *       ISO admits one DATA0 opportunity; frame/error failure settles IO after
+ *       actual withdrawal, without implicit retry or interval scheduling.
+ *       Copied PIO OUT FIFO data may retain recovery responsibility until a
+ *       controller stop that also joins its other channels.
  */
 nx_result_t nx_usb_host_submit(const nx_usb_host_port_t* port, uint8_t channel,
                                nx_usb_host_request_t* request);

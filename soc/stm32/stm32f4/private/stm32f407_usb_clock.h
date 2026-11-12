@@ -6,10 +6,24 @@
 #ifndef NEXUS_STM32F407_USB_CLOCK_H
 #define NEXUS_STM32F407_USB_CLOCK_H
 #include "nexus/core/time.h"
+#include "stm32f407_system.h"
 #include "usb_device_controller.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
+extern nx_stm32_system_t g_nx_stm32_system;
+/** \brief Read the established Core domain under caller IRQ exclusion.
+ * \param[in] context: Stable selected USB clock context, never retained here.
+ * \return Live nonzero System epoch, or zero before startup/after failure.
+ * \note The controller already holds its short IRQ exclusion. This leaf
+ *       neither changes masks nor substitutes clock startup for readiness.
+ */
+static inline uint64_t nx_stm32_usb_epoch(const void* context) {
+    return context != NULL && g_nx_stm32_system.started &&
+                   g_nx_stm32_system.timer_error == NX_SUCCESS
+               ? g_nx_stm32_system.time_epoch
+               : 0U;
+}
 /**
  * \brief           Optional clock control; zero-initialize, never edit fields.
  * \note            One privileged Thread owner serializes all methods. No

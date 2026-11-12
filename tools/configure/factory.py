@@ -12,7 +12,7 @@ from tools.configure import stream_profiles, uart_formats, usb_profiles
 from tools.configure.calls import Symbol
 from tools.configure import usb_otg
 
-FACTORY_ABI_EPOCH = 1
+FACTORY_ABI_EPOCH = 2
 
 KINDS = CONTROLLER_KINDS
 
@@ -331,14 +331,14 @@ def emit(result):
     nor=[item for item in result.devices if item.driver=="flash_async-endpoint"]
     if nor:
         header += [r'/** \brief Same NOR endpoint ID; readonly synchronous Flash face. */',
-                   'const nx_flash_port_t* nx_factory_fsmc_nor_flash(nx_flash_async_id_t id);']
+                   'const nx_flash_port_t* nx_factory_flash_async_flash(nx_flash_async_id_t id);']
         source += [r'/** \brief Return the same NOR owner without effects. */',
-                   'const nx_flash_port_t* nx_factory_fsmc_nor_flash(nx_flash_async_id_t id) {',
+                   'const nx_flash_port_t* nx_factory_flash_async_flash(nx_flash_async_id_t id) {',
                    '    switch (id) {']
         for item in nor:
             name=symbol(item.id)
             source += [f'        case NX_FLASH_ASYNC_ID_{name.upper()}:',
-                       f'            return &s_nx_fsmc_flash_{name};']
+                       f'            return &s_nx_flash_readonly_{name};']
         source += ['        default:', '            return NULL;', '    }', '}']
     owner_header, owner_source = enhanced_endpoints.emit_owner_factory(result)
     header.extend(owner_header)
@@ -415,6 +415,12 @@ def emit_strong(result):
                 "static inline const nx_factory_io_capability_t*",
                 *signature,
                 f"    return nx_factory_{class_name}_capability(id.value);", "}"]
+    if any(item.driver == "flash_async-endpoint" for item in result.devices):
+        header += [
+            r'/** \brief Pure readonly lookup on the same asynchronous Flash owner. */',
+            'static inline const nx_flash_port_t*',
+            'nx_factory_flash_async_flash_ref(nx_flash_async_ref_t id) {',
+            '    return nx_factory_flash_async_flash(id.value);', '}']
     if any(item.kind == "usb_device" and usb_otg.is_managed(item.mode)
            for item in result.controllers):
         header += [r'/** \brief Pure managed owner lookup using the same USB Device ref. */',

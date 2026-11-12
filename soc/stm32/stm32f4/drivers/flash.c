@@ -17,21 +17,24 @@ nx_result_t nx_stm32_flash_prepare(nx_stm32_flash_state_t* port,
                                    uint32_t supply_mv) {
     if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
         return NX_ERROR_CONTEXT;
-    if (port == NULL || geometry == NULL || geometry->sectors == NULL ||
+    uint32_t sector_count = 0U;
+    if (port == NULL || geometry == NULL ||
+        nx_flash_geometry_sector_count(geometry, &sector_count) != NX_SUCCESS ||
         geometry->base_address != FLASH_BASE || geometry->program_unit != 4U ||
         geometry->program_flags != 0U ||
-        !((geometry->size == 0x80000U && geometry->sector_count == 8U) ||
-          (geometry->size == 0x100000U && geometry->sector_count == 12U)))
+        !((geometry->size == 0x80000U && sector_count == 8U) ||
+          (geometry->size == 0x100000U && sector_count == 12U)))
         return NX_ERROR_INVALID;
     if (supply_mv < 2700U || supply_mv > 3600U)
         return NX_ERROR_UNSUPPORTED;
     if (port->active || port->options_owned)
         return NX_ERROR_BUSY;
     uint32_t offset = 0U;
-    for (size_t i = 0U; i < geometry->sector_count; ++i) {
+    for (uint32_t i = 0U; i < sector_count; ++i) {
         uint32_t size = i < 4U ? 0x4000U : i == 4U ? 0x10000U : 0x20000U;
-        if (geometry->sectors[i].offset != offset ||
-            geometry->sectors[i].size != size)
+        nx_flash_sector_t sector;
+        if (nx_flash_geometry_sector_at(geometry, i, &sector) != NX_SUCCESS ||
+            sector.offset != offset || sector.size != size)
             return NX_ERROR_INVALID;
         offset += size;
     }
@@ -312,22 +315,20 @@ nx_result_t nx_stm32_flash_erase(void* context, uint32_t offset, size_t length,
         port->registers == NULL) {
         return NX_ERROR_INVALID;
     }
-    size_t first = port->geometry->sector_count;
-    size_t last = first;
+    uint32_t sector_count, first, limit;
     uint32_t finish = offset + (uint32_t)length;
-    for (size_t i = 0U; i < port->geometry->sector_count; ++i) {
-        if (port->geometry->sectors[i].offset == offset) {
-            first = i;
-        }
-        if (port->geometry->sectors[i].offset +
-                port->geometry->sectors[i].size ==
-            finish) {
-            last = i;
-        }
-    }
-    if (first > last || last >= port->geometry->sector_count) {
+    if (nx_flash_geometry_sector_count(port->geometry, &sector_count) !=
+            NX_SUCCESS ||
+        nx_flash_geometry_sector_index(port->geometry, offset, &first) !=
+            NX_SUCCESS)
         return NX_ERROR_INVALID;
-    }
+    if (finish == port->geometry->size)
+        limit = sector_count;
+    else if (nx_flash_geometry_sector_index(port->geometry, finish, &limit) !=
+             NX_SUCCESS)
+        return NX_ERROR_INVALID;
+    if (first >= limit)
+        return NX_ERROR_INVALID;
     if (nx_deadline_expired(deadline, nx_time_now_us())) {
         return NX_ERROR_TIMEOUT;
     }
@@ -335,7 +336,7 @@ nx_result_t nx_stm32_flash_erase(void* context, uint32_t offset, size_t length,
     if (result != NX_SUCCESS) {
         return result;
     }
-    for (size_t sector = first; sector <= last; ++sector) {
+    for (uint32_t sector = first; sector < limit; ++sector) {
         if (nx_deadline_expired(deadline, nx_time_now_us())) {
             result = NX_ERROR_TIMEOUT;
             break;
@@ -395,8 +396,10 @@ static volatile uint8_t* otp_memory(void) {
 static nx_result_t maintenance_idle(nx_stm32_flash_state_t* port) {
     if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
         return NX_ERROR_CONTEXT;
-    if (!range(port, 0U, 0U) || (port->geometry->sector_count != 8U &&
-                                 port->geometry->sector_count != 12U))
+    uint32_t count;
+    if (!range(port, 0U, 0U) ||
+        nx_flash_geometry_sector_count(port->geometry, &count) != NX_SUCCESS ||
+        (count != 8U && count != 12U))
         return NX_ERROR_STATE;
     return port->active || (NX_STM32_FLASH_READ(&port->registers->SR) &
                             FLASH_SR_BSY) != 0U
@@ -412,7 +415,11 @@ static nx_flash_read_protection_t protection(uint32_t options) {
 }
 
 static uint32_t sector_mask(const nx_stm32_flash_state_t* port) {
-    return (UINT32_C(1) << port->geometry->sector_count) - 1U;
+    uint32_t count;
+    if (nx_flash_geometry_sector_count(port->geometry, &count) != NX_SUCCESS ||
+        count >= 32U)
+        return 0U;
+    return (UINT32_C(1) << count) - 1U;
 }
 
 static bool acknowledged(uint32_t effects, uint32_t required) {
@@ -432,7 +439,7 @@ static bool maintenance_buffer(const nx_stm32_flash_state_t* port,
     uintptr_t owner = (uintptr_t)port;
     uintptr_t registers = (uintptr_t)port->registers;
     uintptr_t geometry = (uintptr_t)port->geometry;
-    uintptr_t sectors = (uintptr_t)port->geometry->sectors;
+    uintptr_t spans = (uintptr_t)port->geometry->erase_spans;
     bool system_overlap = UINT32_C(0xe0000000) < last;
 #if UINTPTR_MAX > UINT32_MAX
     system_overlap = system_overlap && address < UINT64_C(0x100000000);
@@ -441,9 +448,9 @@ static bool maintenance_buffer(const nx_stm32_flash_state_t* port,
            !(address < registers + sizeof(*port->registers) &&
              registers < last) &&
            !(address < geometry + sizeof(*port->geometry) && geometry < last) &&
-           !(address < sectors + port->geometry->sector_count *
-                                     sizeof(*port->geometry->sectors) &&
-             sectors < last) &&
+           !(address < spans + port->geometry->erase_span_count *
+                                   sizeof(*port->geometry->erase_spans) &&
+             spans < last) &&
            !(address < UINT32_C(0x1fff7a10) && NX_FLASH_OTP_ADDRESS < last) &&
            !(address < UINT32_C(0x60000000) && UINT32_C(0x40000000) < last) &&
            !system_overlap &&
@@ -467,6 +474,10 @@ maintenance_snapshot(void* context, nx_flash_maintenance_snapshot_t* snapshot) {
         if (value == 0U)
             locked |= UINT32_C(1) << block;
     }
+    uint32_t sector_count;
+    if (nx_flash_geometry_sector_count(port->geometry, &sector_count) !=
+        NX_SUCCESS)
+        return NX_ERROR_INVALID;
     uint32_t options = NX_STM32_FLASH_READ(&port->registers->OPTCR);
     *snapshot = (nx_flash_maintenance_snapshot_t){
         .options =
@@ -483,7 +494,7 @@ maintenance_snapshot(void* context, nx_flash_maintenance_snapshot_t* snapshot) {
         .otp_bytes = NX_FLASH_OTP_BYTES,
         .otp_block_bytes = NX_FLASH_OTP_BLOCK,
         .otp_locked_blocks = locked,
-        .sector_count = (uint32_t)port->geometry->sector_count,
+        .sector_count = sector_count,
         .power_on_reset_required = port->power_on_reset_required,
     };
     return NX_SUCCESS;

@@ -6,7 +6,7 @@ source_language: en
 ---
 
 (io-extension-boundaries)=
-# Optional storage, IPC, frames and F407 handoff
+# Optional storage, cryptography, frames and F4 handoff
 
 Public generic mechanisms are separate from concrete MCU adapters. Current
 production integration is F4; retired H5/H7/U5 adapters are not selected merely
@@ -18,6 +18,7 @@ executed and source presence does not create a software candidate.
 | Mapped storage owner | Caller-owned slots, exact epochs and a sole writer; explicit host model where selected |
 | AMP IPC core | Public lane/epoch/cache contract with external boot and coherency proof; no current production dual-core adapter |
 | Frame layout | Public dimensions, stride and full-frame loans; no retained H743 DMA2D adapter |
+| Cipher and hash | F415ZG/F417ZG selected CRYP/HASH owners; explicit byte spans and cleanup, without a key store or protocol policy |
 | F407 tail handoff | Exact baremetal VE/ZG preconditions below; not live RTOS adoption |
 
 Accepted asynchronous operations retain metadata and buffer loans until
@@ -36,6 +37,52 @@ cache or Flash qualification.
 Frame contracts validate complete storage extents, format and stride. A format
 conversion API or generic frame description does not establish an MCU accelerator
 or Board connection. Storage and execution progress stay caller-owned.
+
+## Selected F415/F417 cryptographic engines
+
+`cipher.h` and `hash.h` expose separate two-pointer interfaces with shared
+read-only operations. The typed factory returns statically selected objects;
+neither lookup nor query acquires clocks or starts hardware. The F415ZG and
+F417ZG [software references](../../tests/contracts/stm32f4_crypto/f415zg.toml)
+select the existing `irq-blocks` mode. F405/F407 do not acquire these engines
+merely because the same vendor family library contains their implementation.
+
+CRYP supplies AES ECB/CBC/CTR and DES/TDES ECB/CBC. Query reports the actual
+key sizes, alignment, request granularity and in-place support. This provider
+requires whole blocks, including CTR; the public interface permits future
+providers to report byte-tail support without changing the ownership contract.
+Keys and IVs use algorithm byte order rather than vendor word types. The
+platform does not generate IVs, pad messages, authenticate ciphertext or select
+product algorithms. SHA1, MD5 and their HMAC variants describe the capabilities
+of this HASH IP; they do not imply SHA256, AEAD or a TLS acceleration binding.
+
+One privileged task serializes each engine. ACCEPTED borrows the request and
+every referenced input, output, key and IV until acquire-observed SETTLED.
+Inputs cannot overlap mutable request, provider or System storage; output
+cannot overwrite key/IV or partially overlap input. Cipher failures can leave
+an explicitly counted output prefix. A digest is valid only on SUCCESS.
+Cancel and deadline select a terminal cause; neither releases the loan early.
+
+CRYP uses the official HAL interrupt transport. HASH uses official initialization
+and a bounded C FIFO protocol because the selected HAL transport assumes padded
+word reads and can wait while advancing HMAC phases. Each service call reads
+only bytes inside the declared spans; a partial final word is assembled locally.
+HMAC needs explicit task service between phases, even when no final-digest IRQ
+has arrived. There is no full-message copy, queue or implicit worker.
+
+Every terminal path withdraws IRQ and peripheral references, clears provider
+scratch and HAL pointers, and proves the exclusive hardware reset that removes
+key, context and FIFO residue. A refused reset or withdrawal retains
+QUARANTINED storage for recovery. Caller-owned key bytes are not erased by the
+provider. CRYP owns IRQ79; HASH owns only its source on shared HASH/RNG IRQ80.
+The currently selected RNG path polls, and a future IRQ RNG transport must join
+the same vector owner rather than independently disable or clear it.
+
+Models exercise the real C transport, ownership and failures. ARM references
+check exact headers, static factory, linked methods and resource budgets.
+Neither result establishes silicon known-answer tests, throughput, side-channel
+properties or physical qualification. Source SDK consumers use the same public
+references and do not gain access to vendor handles or private configuration.
 
 ## F407 masked tail handoff and clock barrier
 

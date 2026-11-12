@@ -21,6 +21,15 @@ typedef struct {
     uint32_t offset;
     uint32_t size;
 } nx_flash_sector_t;
+/** \brief Consecutive equal erase sectors, relative to one physical device.
+ * \note Positive erase_bytes/count; ordered spans exactly cover size with no
+ *       gaps, overlap, overflow or CPU mapping/partition authorization.
+ */
+typedef struct {
+    uint32_t offset;
+    uint32_t erase_bytes;
+    uint32_t count;
+} nx_flash_erase_span_t;
 /**
  * \brief           Physical programming requirements beyond unit alignment.
  */
@@ -32,15 +41,45 @@ enum nx_flash_program_flags {
  *                  storage.
  * \note            program_flags states additional unit requirements. Zero
  *                  does not waive the selected provider's programming rules.
+ * \note            base_address is descriptive metadata, not a CPU mapping
+ *                  or permission to dereference Flash. All I/O offsets remain
+ *                  relative to this physical device; products own regions.
  */
 typedef struct {
     uint32_t base_address;
     uint32_t size;
     uint32_t program_unit;
-    const nx_flash_sector_t* sectors;
-    size_t sector_count;
+    const nx_flash_erase_span_t* erase_spans;
+    size_t erase_span_count;
     uint32_t program_flags;
 } nx_flash_geometry_t;
+/** \brief Check complete immutable spans and derive their sector count.
+ * \param[in] geometry: Stable readable geometry and complete readable spans.
+ * \param[out] count: Aligned stable output disjoint from geometry and spans.
+ * \return SUCCESS; INVALID leaves output and all inputs unchanged.
+ * \note No MMIO, allocation, mapping permission or physical qualification.
+ */
+nx_result_t nx_flash_geometry_sector_count(const nx_flash_geometry_t* geometry,
+                                           uint32_t* count);
+/** \brief Resolve a logical sector ordinal to a physical relative value.
+ * \param[in] geometry: Stable immutable complete physical description.
+ * \param[in] ordinal: Zero-based sector index, strictly below derived count.
+ * \param[out] sector: Aligned output disjoint from geometry and spans.
+ * \return SUCCESS; INVALID leaves output and all inputs unchanged.
+ * \note No pointer into provider metadata is returned.
+ */
+nx_result_t nx_flash_geometry_sector_at(const nx_flash_geometry_t* geometry,
+                                        uint32_t ordinal,
+                                        nx_flash_sector_t* sector);
+/** \brief Find an exact sector start without rounding a physical offset.
+ * \param[in] geometry: Stable immutable complete physical description.
+ * \param[in] offset: Exact sector start; physical end is not a sector.
+ * \param[out] ordinal: Aligned output disjoint from geometry and spans.
+ * \return SUCCESS; INVALID leaves output and all inputs unchanged.
+ */
+nx_result_t nx_flash_geometry_sector_index(const nx_flash_geometry_t* geometry,
+                                           uint32_t offset, uint32_t* ordinal);
+
 /**
  * \brief           Explicit consumer-selected bounds; no implicit product
  *                  partition.

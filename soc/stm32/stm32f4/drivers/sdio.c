@@ -113,7 +113,7 @@ static uint32_t clock_divider(uint8_t width, uint32_t minimum_divisor) {
     uint64_t bus_minimum =
         (3U * kernel + 8U * peripheral - 1U) / (8U * peripheral);
     uint64_t fifo_minimum =
-        3U * width * (kernel + peripheral) / (32U * peripheral) + 1U;
+        UINT64_C(3) * width * (kernel + peripheral) / (32U * peripheral) + 1U;
     uint64_t divisor = minimum_divisor < 4U ? 4U : minimum_divisor;
     if (divisor < bus_minimum)
         divisor = bus_minimum;

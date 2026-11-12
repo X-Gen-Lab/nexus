@@ -130,6 +130,29 @@ class UsbOtgConfigurationTests(unittest.TestCase):
         self.assertNotIn("nx_stm32_usb_otg_t", source)
         self.assertNotIn("nx_stm32_usb_host_t", source)
 
+    def test_remote_wakeup_uses_the_same_managed_owner_for_each_reviewed_phy(self):
+        fixtures = gate.ROOT / "tests/contracts/usb_otg_assembly"
+        for name in ("ve-fs", "ve-hs-fs-dma", "zg-ulpi-dma"):
+            with self.subTest(phy=name):
+                board = fixtures / "boards" / name / "board.json"
+                (self.root / "board/board.json").write_bytes(board.read_bytes())
+                path = self.root / "assembly.toml"
+                text = (fixtures / (name + ".toml")).read_text().replace(
+                    'board_package="boards/' + name + '"',
+                    'board_package="board"')
+                path.write_text(text.replace('vbus_sensing=false',
+                    'vbus_sensing=false\nremote_wakeup=true'))
+                ir = gate.resolve_ir(path, test_support=native_fixture(path))
+                device = next(c for c in ir.controllers if c.kind == "usb_device")
+                self.assertTrue(device.options.remote_wakeup)
+                output = self.root / name
+                gate.configure(path, output, test_support=native_fixture(path))
+                source = (output / "bindings.c").read_text()
+                self.assertEqual(source.count("static nx_usb_remote_runtime_t"), 1)
+                self.assertIn(".remote = &s_nx_usb_remote_fs", source)
+                self.assertEqual(source.count("static nx_stm32_usb_otg_t"), 1)
+                self.assertEqual(source.count("nx_stm32_usb_otg_irq("), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

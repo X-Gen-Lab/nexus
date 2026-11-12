@@ -1,7 +1,9 @@
 /**
  * \file            stm32_uart_receive_test.cpp
- * \brief           Real UART receive DMA loan, route and IDLE register
- * contracts \author          Nexus Team \version         1.0.0 \date 2026-10-11
+ * \brief           UART RX DMA loans, routes and IDLE register contracts
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {

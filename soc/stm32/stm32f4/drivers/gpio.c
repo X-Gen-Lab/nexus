@@ -115,12 +115,22 @@ static nx_result_t initialize_electrical(nx_stm32_gpio_state_t* port,
         return NX_ERROR_BUSY;
     }
     GPIO_TypeDef* regs = port->registers;
-    regs->BSRR = initial | ((port->mask & ~initial) << 16U);
+    NX_PLATFORM_REGISTER_WRITE(regs->BSRR,
+                               initial | ((port->mask & ~initial) << 16U));
+    if (port->output) {
+        nx_arch_dsb();
+        if ((LL_GPIO_ReadOutputPort(regs) & port->mask) != initial)
+            return NX_ERROR_IO;
+    }
     for (unsigned pin = 0U; pin < 16U; ++pin) {
         if ((port->mask & (1U << pin)) != 0U) {
             uint32_t selected = 1U << pin;
             LL_GPIO_SetPinOutputType(regs, selected, output_type);
             LL_GPIO_SetPinPull(regs, selected, pull);
+            nx_arch_dsb();
+            if (LL_GPIO_GetPinOutputType(regs, selected) != output_type ||
+                LL_GPIO_GetPinPull(regs, selected) != pull)
+                return NX_ERROR_IO;
             bool restricted = regs == GPIOC && pin >= 13U;
             if (port->output &&
                 (speed != NX_STM32_GPIO_SPEED_PRESERVE || restricted)) {
@@ -135,9 +145,12 @@ static nx_result_t initialize_electrical(nx_stm32_gpio_state_t* port,
                 if (LL_GPIO_GetPinSpeed(regs, selected) != selected_speed)
                     return NX_ERROR_IO;
             }
-            LL_GPIO_SetPinMode(regs, selected,
-                               port->output ? LL_GPIO_MODE_OUTPUT
-                                            : LL_GPIO_MODE_INPUT);
+            uint32_t mode =
+                port->output ? LL_GPIO_MODE_OUTPUT : LL_GPIO_MODE_INPUT;
+            LL_GPIO_SetPinMode(regs, selected, mode);
+            nx_arch_dsb();
+            if (LL_GPIO_GetPinMode(regs, selected) != mode)
+                return NX_ERROR_IO;
         }
     }
     port->initialized = true;
@@ -162,7 +175,8 @@ nx_result_t nx_stm32_gpio_write(void* context, uint32_t set_mask,
     if (((set_mask | reset_mask) & ~port->mask) != 0U) {
         return NX_ERROR_PERMISSION;
     }
-    port->registers->BSRR = set_mask | (reset_mask << 16U);
+    NX_PLATFORM_REGISTER_WRITE(port->registers->BSRR,
+                               set_mask | (reset_mask << 16U));
     return NX_SUCCESS;
 }
 
@@ -257,10 +271,13 @@ nx_result_t nx_stm32_gpio_stop(nx_stm32_gpio_state_t* port, uint32_t inactive) {
     }
     nx_result_t result =
         nx_stm32_gpio_write(port, inactive, port->mask & ~inactive);
-    if (result == NX_SUCCESS) {
-        port->initialized = false;
-    }
-    return result;
+    if (result != NX_SUCCESS)
+        return result;
+    nx_arch_dsb();
+    if ((LL_GPIO_ReadOutputPort(port->registers) & port->mask) != inactive)
+        return NX_ERROR_IO;
+    port->initialized = false;
+    return NX_SUCCESS;
 }
 
 /** \brief Configure only explicit reviewed electrical fields, preserving peers.

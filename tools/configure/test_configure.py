@@ -198,7 +198,7 @@ class ResolverTests(unittest.TestCase):
         self.rejected("not permitted")
 
     def test_flash_geometry_rejected(self):
-        self.mutate(self.soc_path, lambda item: item["variants"]["NATIVE_MODEL"]["flash"].update(erase_blocks=[1]))
+        self.mutate(self.soc_path, lambda item: item["variants"]["NATIVE_MODEL"]["flash"].update(erase_spans=[{"offset": 0, "erase_bytes": 1, "count": 1}]))
         self.rejected("geometry")
 
     def test_memory_overlap_rejected(self):

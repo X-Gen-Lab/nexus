@@ -1,7 +1,9 @@
 /**
  * \file            ethernet_factory_test.cpp
- * \brief           Generated RMII storage, paired faces and retained cold
- * effects \author          Nexus Team \version         1.0.0 \date 2026-10-11
+ * \brief           Generated RMII faces, storage and retained cold effects
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {

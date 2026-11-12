@@ -1,0 +1,29 @@
+# Software reference only; not a physical PCB or observed display.
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "custom"
+[clock_parameters]
+source = "hsi"
+input_hz = 16000000
+sysclk_source = "input"
+pll48 = false
+pll_m = 10
+pll_n = 192
+pll_p = 4
+pll_q = 5
+ahb_div = 1
+apb1_div = 1
+apb2_div = 1
+adc_div = 4
+supply_mv = 3300
+css = false
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+
+[image.blitter]
+binding = "blitter"
+mode = "irq-blit"
+irq = { priority = 5, calls_os = false }
+drain_us = 1000

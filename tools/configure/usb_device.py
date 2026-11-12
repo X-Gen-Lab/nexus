@@ -59,6 +59,11 @@ def validate_selection(selection, route, provider, ram_size):
     integer(selection["event_capacity"], 1, min(4096, ram_size // 64),
             "USB event capacity")
     managed = usb_otg.is_managed(selection["mode"])
+    remote = selection.get("remote_wakeup", False)
+    if type(remote) is not bool:
+        fail("USB remote_wakeup requires an explicit boolean")
+    if remote and provider.PREFIX != "stm32":
+        fail("USB remote_wakeup requires a reviewed STM32 Device owner")
     mode = usb_otg.device_mode(selection["mode"])
     hs = mode in {"device-hs-fs", "device-hs-ulpi"}
     ulpi = mode == "device-hs-ulpi"

@@ -41,7 +41,8 @@ static bool controls(const nx_stm32_audio_blocks_state_t* s,
                      const nx_audio_blocks_request_t* request, const void* data,
                      size_t bytes) {
     const nx_stm32_audio_blocks_config_t* c = s->config;
-    if (overlap(data, bytes, s, sizeof(*s)) ||
+    if (!nx_stm32_av_system_disjoint(data, bytes) ||
+        overlap(data, bytes, s, sizeof(*s)) ||
         overlap(data, bytes, c, sizeof(*c)) ||
         overlap(data, bytes, c->audio.clock, sizeof(*c->audio.clock)) ||
         overlap(data, bytes, c->audio.common.regions,
@@ -71,7 +72,9 @@ nx_stm32_audio_blocks_admit(const nx_stm32_audio_blocks_state_t* s,
                             const nx_stm32_audio_blocks_config_t* c) {
     if (!nx_stm32_av_task())
         return NX_ERROR_CONTEXT;
-    if (s == NULL || !bounds(c) || s->active != NULL || s->config != NULL ||
+    if (!nx_stm32_av_system_disjoint(s, sizeof(*s)) ||
+        !nx_stm32_av_system_disjoint(c, sizeof(*c)) || !bounds(c) ||
+        s->active != NULL || s->config != NULL ||
         overlap(s, sizeof(*s), c, sizeof(*c)))
         return NX_ERROR_INVALID;
     return nx_stm32_audio_admit(&s->cold, &c->audio);
@@ -611,36 +614,51 @@ static nx_result_t stop(void* context) {
     }
     return NX_SUCCESS;
 }
+/** \brief The complete blocks owner participates in readonly query admission.
+ */
+static bool query_output(const nx_stm32_audio_blocks_state_t* s,
+                         const void* output, size_t bytes, size_t alignment) {
+    if (s == NULL || !s->cold.owned || !span(output, bytes, alignment) ||
+        !controls(s, s->active, output, bytes))
+        return false;
+    if (s->active == NULL)
+        return true;
+    nx_stream_t* streams[2] = {s->active->rx, s->active->tx};
+    for (unsigned d = 0U; d < 2U; ++d) {
+        nx_stream_t* stream = streams[d];
+        if (stream == NULL)
+            continue;
+        if (overlap(output, bytes, stream, sizeof(*stream)) ||
+            overlap(output, bytes, stream->slots,
+                    stream->count * sizeof(*stream->slots)))
+            return false;
+        for (size_t i = 0U; i < stream->count; ++i)
+            if (overlap(output, bytes, stream->slots[i].data,
+                        stream->slots[i].capacity))
+                return false;
+    }
+    return true;
+}
+static nx_result_t layout(void* context, nx_audio_layout_t* output) {
+    nx_stm32_audio_blocks_state_t* s = context;
+    if (!nx_stm32_av_task())
+        return NX_ERROR_CONTEXT;
+    if (!query_output(s, output, sizeof(*output), _Alignof(nx_audio_layout_t)))
+        return NX_ERROR_INVALID;
+    nx_stm32_audio_storage_layout(&s->config->audio, output);
+    return NX_SUCCESS;
+}
 static nx_result_t rate(void* context, nx_audio_rate_t* output) {
     nx_stm32_audio_blocks_state_t* s = context;
     if (!nx_stm32_av_task())
         return NX_ERROR_CONTEXT;
-    if (s == NULL || !s->cold.owned ||
-        !span(output, sizeof(*output), _Alignof(nx_audio_rate_t)) ||
-        !controls(s, s->active, output, sizeof(*output)))
+    if (!query_output(s, output, sizeof(*output), _Alignof(nx_audio_rate_t)))
         return NX_ERROR_INVALID;
-    if (s->active != NULL) {
-        if (!controls(s, s->active, output, sizeof(*output)))
-            return NX_ERROR_INVALID;
-        nx_stream_t* streams[2] = {s->active->rx, s->active->tx};
-        for (unsigned d = 0U; d < 2U; ++d) {
-            nx_stream_t* stream = streams[d];
-            if (stream == NULL)
-                continue;
-            if (overlap(output, sizeof(*output), stream, sizeof(*stream)) ||
-                overlap(output, sizeof(*output), stream->slots,
-                        stream->count * sizeof(*stream->slots)))
-                return NX_ERROR_INVALID;
-            for (size_t i = 0U; i < stream->count; ++i)
-                if (overlap(output, sizeof(*output), stream->slots[i].data,
-                            stream->slots[i].capacity))
-                    return NX_ERROR_INVALID;
-        }
-    }
     *output = s->config->audio.master ? s->config->audio.actual_rate
                                       : (nx_audio_rate_t){0U, 0U};
     return NX_SUCCESS;
 }
+
 nx_result_t nx_stm32_audio_blocks_close(nx_stm32_audio_blocks_state_t* s) {
     if (!nx_stm32_av_task())
         return NX_ERROR_CONTEXT;
@@ -664,4 +682,5 @@ const nx_audio_ops_t nx_stm32_audio_blocks_ops = {.submit = NULL,
                                                   .cancel = NULL,
                                                   .stop = stop,
                                                   .rate = rate,
-                                                  .start_blocks = start};
+                                                  .start_blocks = start,
+                                                  .layout = layout};

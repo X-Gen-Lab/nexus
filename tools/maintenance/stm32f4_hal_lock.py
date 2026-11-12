@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""Verify selected STM32F4 LL/HAL sources with their official CMSIS pairing.
+"""Verify the selected STM32F4 HAL/LL source graph and paired CMSIS pin.
 
-STM32CubeF4 v1.28.3 pins both reviewed components. The graph closes inline LL,
-ETH definitions and explicitly selected UART/DMA/RCC/DCMI/HCD C, stateless
-FSMC/SDIO/USB LL C and RTC/PWR/DAC/DMA/CRC/identity inline operations with their
-closed headers. PCD headers close the private USB configuration; PCD C is not
-selected by this source graph.
-GPIO/Flash headers supply RCC declarations only; their C, global HAL
-initialization and SysTick are not selected.
-Source admission does not qualify a transport or create mutable Handles.
+The reviewed source inventory closes the maintained F407 primitives and exact
+F415/F417 crypto, F446/F479 SAI, F479 FMC/graphics/QSPI compile contexts. CMake
+still selects only each mode's actual sources; inventory does not enable them.
+The transitive DSI/PWR headers do not select DSI or PWR C transports. Whole HAL
+initialization, SysTick and unreviewed peripheral C remain outside this graph.
+Vendor Handles stay private. Source identity neither qualifies a transport nor
+expands any exact part's declared runtime modes or physical support.
 """
 from __future__ import annotations
 import argparse
@@ -58,6 +57,29 @@ REVIEWED_FILES = frozenset({
     "Src/stm32f4xx_hal_dcmi.c", "Inc/stm32f4xx_hal_hcd.h",
     "Src/stm32f4xx_hal_hcd.c", "Inc/stm32f4xx_ll_usb.h",
     "Src/stm32f4xx_ll_usb.c", "Inc/stm32f4xx_hal_pcd.h",
+    "Inc/stm32f4xx_hal_cryp.h",
+    "Inc/stm32f4xx_hal_dma2d.h",
+    "Inc/stm32f4xx_hal_dsi.h",
+    "Inc/stm32f4xx_hal_hash.h",
+    "Inc/stm32f4xx_hal_hash_ex.h",
+    "Inc/stm32f4xx_hal_ltdc.h",
+    "Inc/stm32f4xx_hal_ltdc_ex.h",
+    "Inc/stm32f4xx_hal_pwr.h",
+    "Inc/stm32f4xx_hal_pwr_ex.h",
+    "Inc/stm32f4xx_hal_qspi.h",
+    "Inc/stm32f4xx_hal_sai.h",
+    "Inc/stm32f4xx_hal_sai_ex.h",
+    "Inc/stm32f4xx_ll_fmc.h",
+    "Src/stm32f4xx_hal_cryp.c",
+    "Src/stm32f4xx_hal_dma2d.c",
+    "Src/stm32f4xx_hal_gpio.c",
+    "Src/stm32f4xx_hal_hash.c",
+    "Src/stm32f4xx_hal_ltdc.c",
+    "Src/stm32f4xx_hal_qspi.c",
+    "Src/stm32f4xx_hal_rcc_ex.c",
+    "Src/stm32f4xx_hal_sai.c",
+    "Src/stm32f4xx_hal_sai_ex.c",
+    "Src/stm32f4xx_ll_fmc.c",
     "Inc/stm32f4xx_hal_pcd_ex.h",
 })
 PAIRING = {
@@ -79,7 +101,7 @@ def contract(lock):
     if (lock["repository"] != ORIGIN or lock["commit"] != COMMIT or
             lock["release"] != "v1.8.5" or
             lock["selected_api"] != (
-                "stm32f407-reviewed-hal-ll-controllers") or
+                "stm32f4-reviewed-hal-ll-controllers") or
             lock["pairing"] != PAIRING):
         raise ValueError("Exact official STM32F4 release and CMSIS pairing required")
     if not isinstance(lock["files"], dict) or set(lock["files"]) != REVIEWED_FILES:

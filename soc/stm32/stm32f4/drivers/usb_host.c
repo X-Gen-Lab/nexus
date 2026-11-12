@@ -47,6 +47,9 @@
 
 #define HOST_RESET_RETAINED  (1U << 2U)
 #define HOST_RESUME_RETAINED (1U << 3U)
+#define HOST_TRANSFER_ERRORS                                                   \
+    (USB_OTG_HCINT_AHBERR | USB_OTG_HCINT_FRMOR | USB_OTG_HCINT_TXERR |        \
+     USB_OTG_HCINT_BBERR | USB_OTG_HCINT_DTERR | USB_OTG_HCINT_STALL)
 
 /** \brief Only the single privileged task may control this transport. */
 static bool task_context(void) {
@@ -181,11 +184,18 @@ static void completed(HCD_HandleTypeDef* hal, uint8_t number,
         return;
     }
     if (nx_request_state(&channel->request->base) == NX_REQUEST_ACTIVE) {
+        const bool handshake =
+            channel->pipe.transfer != NX_USB_HOST_ISOCHRONOUS &&
+            (result == URB_NOTREADY || result == URB_NYET);
         channel->terminal = result == URB_DONE ? NX_SUCCESS
-                            : result == URB_NOTREADY || result == URB_NYET
-                                ? NX_ERROR_NACK
-                                : NX_ERROR_IO;
-        channel->transferred = hal->hc[number].xfer_count;
+                            : handshake        ? NX_ERROR_NACK
+                                               : NX_ERROR_IO;
+        /* HCD updates xfer_count only for IN. OUT DONE proves this one
+         * admitted packet, never an automatically retried packet queue. */
+        channel->transferred =
+            result == URB_DONE && (channel->pipe.endpoint_address & 0x80U) == 0U
+                ? (uint32_t)channel->request->length
+                : hal->hc[number].xfer_count;
         channel->complete = true;
     }
 }
@@ -369,13 +379,47 @@ nx_stm32_usb_host_initialize(nx_stm32_usb_host_t* state,
     return NX_SUCCESS;
 }
 
+/** \brief ISO errors end this opportunity before HCD can retry DMA OUT.
+ * The pinned HCD retries XACTERR even for ISO and loses FRMOR's terminal
+ * result. Isolate only this channel, capture its error, then use HCD halt.
+ */
+static bool iso_errors(nx_stm32_usb_host_t* state) {
+    for (uint8_t i = 0U; i < state->config->channel_count; ++i) {
+        nx_stm32_usb_host_channel_t* channel = &state->config->channels[i];
+        if (channel->request == NULL ||
+            channel->pipe.transfer != NX_USB_HOST_ISOCHRONOUS ||
+            nx_request_state(&channel->request->base) != NX_REQUEST_ACTIVE)
+            continue;
+        USB_OTG_HostChannelTypeDef* registers = channel_registers(state, i);
+        const uint32_t pending =
+            registers->HCINT & registers->HCINTMSK & HOST_TRANSFER_ERRORS;
+        if (pending == 0U)
+            continue;
+        begin_drain(state, i, NX_ERROR_IO);
+        channel->transferred = 0U;
+        channel->complete = true;
+        NX_USB_HOST_WRITE(registers->HCINTMSK, 0U);
+        NX_USB_HOST_WRITE(registers->HCINT, pending);
+        nx_arch_dsb();
+        if (registers->HCINTMSK != 0U || (registers->HCINT & pending) != 0U) {
+            state->snapshot.closing = true;
+            NX_USB_HOST_IRQ_DISABLE(vector(state));
+            nx_arch_dsb();
+            return false;
+        }
+        (void)HAL_HCD_HC_Halt(&state->hal, i);
+        channel->halt_requested = true;
+    }
+    return true;
+}
 /** \brief IRQ dispatch retains its publisher until all HAL callbacks return. */
 void nx_stm32_usb_host_irq(nx_stm32_usb_host_t* state) {
     if (state == NULL || state->config == NULL || !state->snapshot.started) {
         return;
     }
     ++state->publishers;
-    HAL_HCD_IRQHandler(&state->hal);
+    if (iso_errors(state))
+        HAL_HCD_IRQHandler(&state->hal);
     --state->publishers;
 }
 
@@ -457,7 +501,8 @@ static nx_result_t submit(void* context, uint8_t number,
     }
     nx_stm32_usb_host_channel_t* channel = &state->config->channels[number];
     const bool in = (channel->pipe.endpoint_address & 0x80U) != 0U;
-    if (!channel->configured || request->length > channel->pipe.max_packet) {
+    if (!channel->configured || request->length > channel->pipe.max_packet ||
+        (channel->pipe.transfer == NX_USB_HOST_ISOCHRONOUS && request->data1)) {
         return NX_ERROR_INVALID;
     }
     /* The pinned PIO writer reads a full final word. DMA also owns padding. */
@@ -508,6 +553,19 @@ static nx_result_t submit(void* context, uint8_t number,
         }
     }
     nx_arch_irq_state_t key = nx_arch_irq_save();
+    if (!state->config->dma && !in) {
+        /* The pinned PIO writer immediately copies a complete packet. An
+         * empty queue or partial FIFO budget cannot be ACCEPTED safely. */
+        const bool periodic = channel->pipe.transfer == NX_USB_HOST_INTERRUPT ||
+                              channel->pipe.transfer == NX_USB_HOST_ISOCHRONOUS;
+        const uint32_t available = periodic ? host_registers(state)->HPTXSTS
+                                            : state->hal.Instance->HNPTXSTS;
+        if ((available & 0xFFFFU) < extent / 4U ||
+            ((available >> 16U) & 0xFFU) == 0U) {
+            nx_arch_irq_restore(key);
+            return NX_ERROR_BUSY;
+        }
+    }
     status = nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
     if (status != NX_SUCCESS) {
         nx_arch_irq_restore(key);
@@ -526,6 +584,10 @@ static nx_result_t submit(void* context, uint8_t number,
     nx_arch_irq_restore(key);
     uint8_t* bytes =
         extent == 0U ? (uint8_t*)&state->zero_word : request->bytes;
+    /* IN already reserves one MPS. HCD drains that complete admitted extent;
+     * request.length remains the caller's overflow/reporting boundary. */
+    const uint16_t wire_length =
+        in ? channel->pipe.max_packet : (uint16_t)request->length;
     HAL_StatusTypeDef submitted;
     if (channel->pipe.transfer == NX_USB_HOST_CONTROL && !request->setup) {
         /* The pinned HAL forces DATA1 for every unsplit control IN and for
@@ -537,7 +599,7 @@ static nx_result_t submit(void* context, uint8_t number,
         hc->data_pid = request->data1 ? HC_PID_DATA1 : HC_PID_DATA0;
         hc->do_ping = 0U;
         hc->xfer_buff = bytes;
-        hc->xfer_len = (uint32_t)request->length;
+        hc->xfer_len = wire_length;
         hc->xfer_count = 0U;
         hc->urb_state = URB_IDLE;
         hc->state = HC_IDLE;
@@ -547,8 +609,7 @@ static nx_result_t submit(void* context, uint8_t number,
     } else {
         submitted = HAL_HCD_HC_SubmitRequest(
             &state->hal, number, in ? 1U : 0U, (uint8_t)channel->pipe.transfer,
-            (uint8_t)(request->setup ? 0U : 1U), bytes,
-            (uint16_t)request->length, 0U);
+            (uint8_t)(request->setup ? 0U : 1U), bytes, wire_length, 0U);
     }
     if (submitted != HAL_OK) {
         begin_drain(state, number, NX_ERROR_IO);
@@ -594,16 +655,31 @@ static void quarantine(nx_stm32_usb_host_channel_t* channel) {
 static bool settle(nx_stm32_usb_host_t* state, uint8_t number) {
     nx_stm32_usb_host_channel_t* channel = &state->config->channels[number];
     nx_usb_host_request_t* request = channel->request;
+    USB_OTG_HostChannelTypeDef* registers = channel_registers(state, number);
+    NX_USB_HOST_WRITE(registers->HCDMA, 0U);
+    nx_arch_dsb();
+    if (registers->HCDMA != 0U) {
+        return false;
+    }
+    const uint32_t pending = registers->HCINT & 0x7FFU;
+    if (pending != 0U) {
+        /* Masked late facts still belong to this incarnation. A real error
+         * invalidates the old DONE count, including any overflow prefix. */
+        if ((pending & HOST_TRANSFER_ERRORS) != 0U) {
+            channel->terminal = NX_ERROR_IO;
+            channel->transferred = 0U;
+        }
+        NX_USB_HOST_WRITE(registers->HCINT, pending);
+        nx_arch_dsb();
+        if ((registers->HCINT & 0x7FFU) != 0U) {
+            return false;
+        }
+    }
     size_t transferred = channel->transferred;
     nx_result_t terminal = channel->terminal;
     if (transferred > request->length) {
         transferred = request->length;
         terminal = NX_ERROR_OVERFLOW;
-    }
-    NX_USB_HOST_WRITE(channel_registers(state, number)->HCDMA, 0U);
-    nx_arch_dsb();
-    if (channel_registers(state, number)->HCDMA != 0U) {
-        return false;
     }
     state->hal.hc[number].xfer_buff = NULL;
     state->hal.hc[number].xfer_len = 0U;

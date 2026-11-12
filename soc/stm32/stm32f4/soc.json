@@ -7,15 +7,22 @@
       "flash": {
         "origin": 134217728,
         "size": 524288,
-        "erase_blocks": [
-          16384,
-          16384,
-          16384,
-          16384,
-          65536,
-          131072,
-          131072,
-          131072
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 3
+          }
         ]
       },
       "memory": [
@@ -125,19 +132,22 @@
       "flash": {
         "origin": 134217728,
         "size": 1048576,
-        "erase_blocks": [
-          16384,
-          16384,
-          16384,
-          16384,
-          65536,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 7
+          }
         ]
       },
       "memory": [
@@ -279,19 +289,22 @@
       "flash": {
         "origin": 134217728,
         "size": 1048576,
-        "erase_blocks": [
-          16384,
-          16384,
-          16384,
-          16384,
-          65536,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 7
+          }
         ]
       },
       "memory": [
@@ -433,19 +446,22 @@
       "flash": {
         "origin": 134217728,
         "size": 1048576,
-        "erase_blocks": [
-          16384,
-          16384,
-          16384,
-          16384,
-          65536,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 7
+          }
         ]
       },
       "memory": [
@@ -587,19 +603,22 @@
       "flash": {
         "origin": 134217728,
         "size": 1048576,
-        "erase_blocks": [
-          16384,
-          16384,
-          16384,
-          16384,
-          65536,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072,
-          131072
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 7
+          }
         ]
       },
       "memory": [
@@ -735,6 +754,459 @@
         "PH1"
       ],
       "device": "stm32f417"
+    },
+    "STM32F411RET6": {
+      "package": "LQFP64",
+      "flash": {
+        "origin": 134217728,
+        "size": 524288,
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 3
+          }
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 131072,
+          "dma": true,
+          "linker": true
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD2",
+        "PH0",
+        "PH1"
+      ],
+      "device": "stm32f411xe"
+    },
+    "STM32F446ZET6": {
+      "package": "LQFP144",
+      "flash": {
+        "origin": 134217728,
+        "size": 524288,
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 3
+          }
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 131072,
+          "dma": true,
+          "linker": true
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD0",
+        "PD1",
+        "PD2",
+        "PD3",
+        "PD4",
+        "PD5",
+        "PD6",
+        "PD7",
+        "PD8",
+        "PD9",
+        "PD10",
+        "PD11",
+        "PD12",
+        "PD13",
+        "PD14",
+        "PD15",
+        "PE0",
+        "PE1",
+        "PE2",
+        "PE3",
+        "PE4",
+        "PE5",
+        "PE6",
+        "PE7",
+        "PE8",
+        "PE9",
+        "PE10",
+        "PE11",
+        "PE12",
+        "PE13",
+        "PE14",
+        "PE15",
+        "PF0",
+        "PF1",
+        "PF2",
+        "PF3",
+        "PF4",
+        "PF5",
+        "PF6",
+        "PF7",
+        "PF8",
+        "PF9",
+        "PF10",
+        "PF11",
+        "PF12",
+        "PF13",
+        "PF14",
+        "PF15",
+        "PG0",
+        "PG1",
+        "PG2",
+        "PG3",
+        "PG4",
+        "PG5",
+        "PG6",
+        "PG7",
+        "PG8",
+        "PG9",
+        "PG10",
+        "PG11",
+        "PG12",
+        "PG13",
+        "PG14",
+        "PG15",
+        "PH0",
+        "PH1"
+      ],
+      "device": "stm32f446"
+    },
+    "STM32F479NIH6": {
+      "package": "TFBGA216",
+      "flash": {
+        "origin": 134217728,
+        "size": 2097152,
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 65536,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 131072,
+            "erase_bytes": 131072,
+            "count": 7
+          },
+          {
+            "offset": 1048576,
+            "erase_bytes": 16384,
+            "count": 4
+          },
+          {
+            "offset": 1114112,
+            "erase_bytes": 65536,
+            "count": 1
+          },
+          {
+            "offset": 1179648,
+            "erase_bytes": 131072,
+            "count": 7
+          }
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 327680,
+          "dma": true,
+          "linker": true
+        },
+        {
+          "id": "ccm",
+          "origin": 268435456,
+          "size": 65536,
+          "dma": false,
+          "linker": false
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD0",
+        "PD1",
+        "PD2",
+        "PD3",
+        "PD4",
+        "PD5",
+        "PD6",
+        "PD7",
+        "PD8",
+        "PD9",
+        "PD10",
+        "PD11",
+        "PD12",
+        "PD13",
+        "PD14",
+        "PD15",
+        "PE0",
+        "PE1",
+        "PE2",
+        "PE3",
+        "PE4",
+        "PE5",
+        "PE6",
+        "PE7",
+        "PE8",
+        "PE9",
+        "PE10",
+        "PE11",
+        "PE12",
+        "PE13",
+        "PE14",
+        "PE15",
+        "PF0",
+        "PF1",
+        "PF2",
+        "PF3",
+        "PF4",
+        "PF5",
+        "PF6",
+        "PF7",
+        "PF8",
+        "PF9",
+        "PF10",
+        "PF11",
+        "PF12",
+        "PF13",
+        "PF14",
+        "PF15",
+        "PG0",
+        "PG1",
+        "PG2",
+        "PG3",
+        "PG4",
+        "PG5",
+        "PG6",
+        "PG7",
+        "PG8",
+        "PG9",
+        "PG10",
+        "PG11",
+        "PG12",
+        "PG13",
+        "PG14",
+        "PG15",
+        "PH0",
+        "PH1",
+        "PH2",
+        "PH3",
+        "PH4",
+        "PH5",
+        "PH6",
+        "PH7",
+        "PH8",
+        "PH9",
+        "PH10",
+        "PH11",
+        "PH12",
+        "PH13",
+        "PH14",
+        "PH15",
+        "PI0",
+        "PI1",
+        "PI2",
+        "PI3",
+        "PI4",
+        "PI5",
+        "PI6",
+        "PI7",
+        "PI8",
+        "PI9",
+        "PI10",
+        "PI11",
+        "PI12",
+        "PI13",
+        "PI14",
+        "PI15",
+        "PJ0",
+        "PJ1",
+        "PJ2",
+        "PJ3",
+        "PJ4",
+        "PJ5",
+        "PJ12",
+        "PJ13",
+        "PJ14",
+        "PJ15",
+        "PK3",
+        "PK4",
+        "PK5",
+        "PK6",
+        "PK7"
+      ],
+      "device": "stm32f479"
     }
   },
   "cpu": {
@@ -762,27 +1234,60 @@
   "device_profiles": {
     "stm32f405": {
       "controller_groups": [
-        "rm0090-common"
-      ]
+        "rm0090-common",
+        "crc-fixed-polynomial"
+      ],
+      "clock_policy": "rm0090-run"
     },
     "stm32f407": {
       "controller_groups": [
         "rm0090-common",
         "ethernet-f4",
-        "dcmi-v1"
-      ]
+        "dcmi-v1",
+        "crc-fixed-polynomial"
+      ],
+      "clock_policy": "rm0090-run"
     },
     "stm32f415": {
       "controller_groups": [
-        "rm0090-common"
-      ]
+        "rm0090-common",
+        "crc-fixed-polynomial",
+        "rm0090-basic-crypto"
+      ],
+      "clock_policy": "rm0090-run"
     },
     "stm32f417": {
       "controller_groups": [
         "rm0090-common",
         "ethernet-f4",
-        "dcmi-v1"
-      ]
+        "dcmi-v1",
+        "crc-fixed-polynomial",
+        "rm0090-basic-crypto"
+      ],
+      "clock_policy": "rm0090-run"
+    },
+    "stm32f411xe": {
+      "controller_groups": [
+        "crc-fixed-polynomial"
+      ],
+      "clock_policy": "hsi16-only"
+    },
+    "stm32f446": {
+      "controller_groups": [
+        "crc-fixed-polynomial",
+        "sai1-framed"
+      ],
+      "clock_policy": "hsi16-pllsai-independent-m"
+    },
+    "stm32f479": {
+      "controller_groups": [
+        "crc-fixed-polynomial",
+        "f479-fmc-sdram",
+        "sai1-framed",
+        "f479-graphics",
+        "f479-quadspi-indirect"
+      ],
+      "clock_policy": "hsi16-pllsai-shared-m"
     }
   },
   "reserved_resources": [
@@ -955,11 +1460,6 @@
             "PB12",
             "PB13"
           ]
-        },
-        "CRC": {
-          "kind": "crc",
-          "irq": [],
-          "pins": []
         },
         "DAC": {
           "kind": "dac",
@@ -2062,7 +2562,11 @@
         "ADC123": {
           "modes": [
             "regular-sequence-dma",
-            "injected-sequence"
+            "injected-sequence",
+            "regular-blocks",
+            "regular-software-injected-blocks",
+            "regular-timer-injected-blocks",
+            "regular-auto-injected"
           ]
         },
         "ADC2": {
@@ -2091,11 +2595,6 @@
         "CAN2": {
           "modes": [
             "classic-irq"
-          ]
-        },
-        "CRC": {
-          "modes": [
-            "crc32-words"
           ]
         },
         "DAC": {
@@ -2793,8 +3292,262 @@
           "modes": [
             "snapshot-raw",
             "snapshot-jpeg",
-            "raw-blocks"
+            "raw-blocks",
+            "jpeg-blocks",
+            "frames-raw",
+            "frames-jpeg"
           ]
+        }
+      }
+    },
+    "crc-fixed-polynomial": {
+      "controllers": {
+        "CRC": {
+          "kind": "crc",
+          "irq": [],
+          "pins": []
+        }
+      },
+      "modes": {
+        "CRC": {
+          "modes": [
+            "crc32-words"
+          ]
+        }
+      }
+    },
+    "rm0090-basic-crypto": {
+      "controllers": {
+        "CRYP": {
+          "kind": "cipher",
+          "irq": [
+            "CRYP_IRQn"
+          ],
+          "irq_numbers": [
+            79
+          ],
+          "pins": []
+        },
+        "HASH": {
+          "kind": "hash",
+          "irq": [
+            "HASH_RNG_IRQn"
+          ],
+          "irq_numbers": [
+            80
+          ],
+          "pins": []
+        }
+      },
+      "modes": {
+        "CRYP": {
+          "modes": [
+            "irq-blocks"
+          ]
+        },
+        "HASH": {
+          "modes": [
+            "irq-blocks"
+          ]
+        }
+      }
+    },
+    "f479-fmc-sdram": {
+      "controllers": {
+        "FMC": {
+          "kind": "external_bus",
+          "irq": [
+            "FMC_IRQn"
+          ],
+          "irq_numbers": {
+            "FMC_IRQn": 48
+          },
+          "pins": [
+            "PC0",
+            "PC2",
+            "PC3",
+            "PD0",
+            "PD1",
+            "PD8",
+            "PD9",
+            "PD10",
+            "PD14",
+            "PD15",
+            "PE0",
+            "PE1",
+            "PE7",
+            "PE8",
+            "PE9",
+            "PE10",
+            "PE11",
+            "PE12",
+            "PE13",
+            "PE14",
+            "PE15",
+            "PF0",
+            "PF1",
+            "PF2",
+            "PF3",
+            "PF4",
+            "PF5",
+            "PF11",
+            "PF12",
+            "PF13",
+            "PF14",
+            "PF15",
+            "PG0",
+            "PG1",
+            "PG4",
+            "PG5",
+            "PG8",
+            "PG15"
+          ]
+        }
+      },
+      "modes": {
+        "FMC": {
+          "modes": [
+            "sdram-controller"
+          ],
+          "interfaces": {
+            "memory_window": [
+              "cpu-window"
+            ]
+          }
+        }
+      }
+    },
+    "sai1-framed": {
+      "controllers": {
+        "SAI1": {
+          "kind": "audio",
+          "irq": [
+            "SAI1_IRQn"
+          ],
+          "irq_numbers": {
+            "SAI1_IRQn": 87
+          },
+          "pins": [
+            "PE2",
+            "PE3",
+            "PE4",
+            "PE5",
+            "PE6",
+            "PF7",
+            "PF8",
+            "PF9"
+          ],
+          "clock_domain": "apb2"
+        }
+      },
+      "modes": {
+        "SAI1": {
+          "modes": [
+            "master-tx",
+            "master-rx",
+            "master-duplex",
+            "slave-tx",
+            "slave-rx",
+            "slave-duplex"
+          ]
+        }
+      }
+    },
+    "f479-graphics": {
+      "controllers": {
+        "LTDC": {
+          "kind": "display",
+          "irq": [
+            "LTDC_IRQn",
+            "LTDC_ER_IRQn"
+          ],
+          "irq_numbers": {
+            "LTDC_IRQn": 88,
+            "LTDC_ER_IRQn": 89
+          },
+          "pins": [
+            "PE4",
+            "PE5",
+            "PE6",
+            "PF10",
+            "PG6",
+            "PG10",
+            "PG11",
+            "PG12",
+            "PH2",
+            "PH3",
+            "PH8",
+            "PH9",
+            "PH10",
+            "PH11",
+            "PH12",
+            "PH13",
+            "PH14",
+            "PH15",
+            "PI0",
+            "PI1",
+            "PI2",
+            "PI4",
+            "PI5",
+            "PI6",
+            "PI7",
+            "PI12",
+            "PI13",
+            "PI14"
+          ]
+        },
+        "DMA2D": {
+          "kind": "image",
+          "irq": [
+            "DMA2D_IRQn"
+          ],
+          "irq_numbers": {
+            "DMA2D_IRQn": 90
+          },
+          "pins": []
+        }
+      },
+      "modes": {
+        "LTDC": {
+          "modes": [
+            "rgb-scanout"
+          ]
+        },
+        "DMA2D": {
+          "modes": [
+            "irq-blit"
+          ]
+        }
+      }
+    },
+    "f479-quadspi-indirect": {
+      "controllers": {
+        "QUADSPI": {
+          "kind": "external_bus",
+          "irq": [
+            "QUADSPI_IRQn"
+          ],
+          "irq_numbers": {
+            "QUADSPI_IRQn": 91
+          },
+          "pins": [
+            "PB6",
+            "PF8",
+            "PF9",
+            "PF10"
+          ]
+        }
+      },
+      "modes": {
+        "QUADSPI": {
+          "modes": [
+            "qspi-indirect-sdr"
+          ],
+          "interfaces": {
+            "flash_async": [
+              "nor-indirect"
+            ]
+          }
         }
       }
     }

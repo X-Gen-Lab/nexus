@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, factory
+from tools.configure import bindings, factory, selected_contracts
 from tools.configure import configure as gate
 
 
@@ -203,3 +203,81 @@ class CaptureAudioConfigurationTests(unittest.TestCase):
             self.resolve(self.audio("slave-rx", "max_sample_rate_hz = 96000\n"
                                     "max_service_gap_us = 20\n"), routes=[
                 ("sound", "I2S2", "i2s2-simplex")])
+
+    def test_frame_sessions_select_cold_owner_and_explicit_frame_units(self):
+        for part in ("STM32F407VET6", "STM32F407ZGT6", "STM32F417ZGT6"):
+            for mode in ("frames-raw", "frames-jpeg"):
+                with self.subTest(part=part, mode=mode):
+                    result = self.resolve(self.capture(mode), part=part)
+                    item, = result.controllers
+                    source = bindings.emit(result)[1]
+                    self.assertIn("nx_stm32_capture_frames_state_t", source)
+                    self.assertIn("nx_stm32_capture_config_t", source)
+                    self.assertNotIn("nx_stm32_capture_frames_config_t", source)
+                    for operation in ("admit", "prepare", "close"):
+                        self.assertIn("nx_stm32_capture_frames_" + operation + "(", source)
+                    self.assertIn('#include "stm32f407_capture_frames.h"', source)
+                    self.assertIn("nx_stm32_capture_irq(&s_nx_port_camera.base)", source)
+                    self.assertIn("nx_stm32_capture_dma_irq(&s_nx_port_camera.base)", source)
+                    self.assertIn("&nx_stm32_capture_frames_ops", source)
+                    self.assertIn(".jpeg = " + str(mode == "frames-jpeg").lower(), source)
+                    self.assertIn(".continuous = false", source)
+                    description = selected_contracts.describe(item)
+                    self.assertEqual(description.unit, "frames")
+                    self.assertIsNone(description.unit_bytes)
+                    self.assertEqual(description.buffer_alignment, 4)
+                    self.assertEqual(description.continuity, "rearm_gap")
+                    self.assertEqual(description.abort_scope, "controller_pending")
+                    self.assertIn("nx_factory_capture", factory.emit(result)[0])
+
+    def test_frame_sessions_preserve_snapshot_and_jpeg_hardware_limits(self):
+        for mode in ("frames-raw", "frames-jpeg"):
+            with self.subTest(mode=mode), self.assertRaisesRegex(ValueError, "frame_divisor"):
+                self.resolve(self.capture(mode).replace("frame_divisor = 1", "frame_divisor = 2"))
+        with self.assertRaisesRegex(ValueError, "JPEG requires|Unsupported mode frames-jpeg"):
+            self.resolve(self.capture("frames-jpeg", "codes=[1,2,3,4]\n"),
+                         routes=[("camera", "DCMI", "dcmi8-embedded-s1")])
+        with self.assertRaisesRegex(ValueError, "JPEG requires|Unsupported mode frames-jpeg"):
+            self.resolve(self.capture("frames-jpeg", "crop={x_clocks=0,y_lines=0,width_clocks=1,height_lines=1}\n"))
+        with self.assertRaisesRegex(ValueError, "JPEG requires|Unsupported mode frames-jpeg"):
+            self.resolve(self.capture("frames-jpeg"),
+                         routes=[("camera", "DCMI", "dcmi10-hardware-s1")])
+        with self.assertRaisesRegex(ValueError, "maximum service gap"):
+            self.resolve(self.capture("frames-raw", "max_service_gap_us=10\n"))
+
+    def test_jpeg_blocks_select_only_opaque_word_storage(self):
+        for part in ("STM32F407VET6", "STM32F407ZGT6", "STM32F417ZGT6"):
+            for lane in (1, 7):
+                with self.subTest(part=part, lane=lane):
+                    result = self.resolve(self.capture("jpeg-blocks", "max_service_gap_us = 10\n").replace("frame_divisor = 1", "frame_divisor = 2"),
+                        part=part, routes=[("camera", "DCMI", "dcmi8-hardware-s" + str(lane))])
+                    item, = result.controllers
+                    self.assertEqual("CaptureOptions", type(item.options).__name__)
+                    self.assertEqual(8, item.options.bits)
+                    self.assertEqual(10, item.options.max_service_gap_us)
+                    source = bindings.emit(result)[1]
+                    self.assertIn(".jpeg = true", source)
+                    self.assertIn(".continuous = true", source)
+                    self.assertIn("nx_stm32_capture_prepare(", source)
+                    self.assertIn("&nx_stm32_capture_ops", source)
+                    self.assertNotIn("nx_stm32_capture_frames", source)
+                    contract = selected_contracts.describe(item)
+                    self.assertEqual("words", contract.unit)
+                    self.assertEqual(4, contract.unit_bytes)
+                    self.assertEqual(4, contract.buffer_alignment)
+                    self.assertEqual("double_buffer", contract.continuity)
+                    self.assertEqual("controller_pending", contract.abort_scope)
+                    self.assertIn("nx_factory_capture", factory.emit(result)[0])
+
+    def test_jpeg_blocks_reject_unbounded_or_incompatible_hardware(self):
+        for extra in ("", "max_service_gap_us = 0\n"):
+            with self.subTest(extra=extra), self.assertRaises(ValueError):
+                self.resolve(self.capture("jpeg-blocks", extra))
+        for route in ("dcmi8-embedded-s1", "dcmi10-hardware-s1", "dcmi12-hardware-s7", "dcmi14-hardware-s7"):
+            extra = "max_service_gap_us = 10\n"
+            if "embedded" in route:
+                extra += "codes = [1,2,3,4]\n"
+            with self.subTest(route=route), self.assertRaises(ValueError):
+                self.resolve(self.capture("jpeg-blocks", extra), routes=[("camera", "DCMI", route)])
+        with self.assertRaises(ValueError):
+            self.resolve(self.capture("jpeg-blocks", "max_service_gap_us=10\ncrop={x_clocks=0,y_lines=0,width_clocks=1,height_lines=1}\n"))

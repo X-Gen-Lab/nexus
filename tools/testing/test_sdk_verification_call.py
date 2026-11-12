@@ -461,6 +461,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
                             self.sdk / "cmake/package/verification" / scenario)
         family = Path("tests/contracts/stm32f4_family")
         shutil.copytree(ROOT / family, self.sdk / family)
+        for name in ("stm32f4_crypto", "stm32f4_sdram", "stm32f4_graphics",
+                     "stm32f4_sai", "stm32f4_qspi"):
+            relative = Path("tests/contracts") / name
+            shutil.copytree(ROOT / relative, self.sdk / relative)
         crc = Path("tests/contracts/crc_assembly/consumer.c")
         (self.sdk / crc).parent.mkdir(parents=True)
         shutil.copyfile(ROOT / crc, self.sdk / crc)
@@ -589,7 +593,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     "soc_family": family, "cpu": cpu,
                     "enum_abi": "short-enums" if service.arm else "native-int",
                     "controllers": []}
-                if service.scenario == "f4_family":
+                if service.scenario.startswith("f4_"):
                     authored = tomllib.loads(Path(assembly_arg).read_text())
                     board = source / authored["board_package"] / "board.json"
                     resolved["part"] = json.loads(board.read_text())["soc"]

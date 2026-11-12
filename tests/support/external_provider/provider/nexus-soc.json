@@ -12,7 +12,7 @@
     "soc/lifecycle_adapter.c": "00641f5e1da4d8d43c374ed5e6d5847767bcbc82ee9817427041383bfa91a4bf",
     "soc/lifecycle_adapter.h": "91713b5dbcbba0ceac379a9e40ee3804f2a9b1e61b963795b6d27d48059e18a4",
     "soc/routes.json": "0d6871a67065449f76f4b28398798a721005d27f5abefe8770b038392d0e7d45",
-    "soc/soc.json": "fe685db43d6213e92de8f57334a29facebb6b148ae1cd57a4480c5ef3669c1db"
+    "soc/soc.json": "cddf9b50018b7128daeb26c3bf615f3735441bb4a4a8c4ea0f651a89250ec7fb"
   },
   "interface_version": 1,
   "schema_version": 1,

@@ -13,6 +13,7 @@
  */
 #include "nexus/arch/arch.h"
 #include "provider.h"
+#include <array>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <vector>
@@ -245,8 +246,8 @@ TEST_F(NativeInstances, FlashProgramAndFaultsDoNotCrossInstanceMemory) {
     const nx_flash_port_t second_api = {&nx_native_flash_ops, &second};
     uint8_t first_memory[8] = {};
     uint8_t second_memory[8] = {};
-    const nx_flash_sector_t sectors[] = {{0, 8}};
-    const nx_flash_geometry_t geometry = {0, 8, 1, sectors, 1, 0};
+    const nx_flash_erase_span_t spans[] = {{0U, 8U, 1U}};
+    const nx_flash_geometry_t geometry = {0, 8, 1, spans, 1, 0};
     ASSERT_EQ(
         nx_native_flash_configure_instance(&first, first_memory, &geometry),
         NX_SUCCESS);
@@ -351,8 +352,8 @@ TEST_F(NativeInstances, PlatformStopWithdrawsFlashADCAndPWMAdmission) {
     nx_native_flash_state_t flash = {};
     const nx_flash_port_t flash_api = {&nx_native_flash_ops, &flash};
     uint8_t bytes[8] = {};
-    const nx_flash_sector_t sector = {0, 8};
-    const nx_flash_geometry_t geometry = {0, 8, 1, &sector, 1, 0};
+    const nx_flash_erase_span_t span = {0U, 8U, 1U};
+    const nx_flash_geometry_t geometry = {0, 8, 1, &span, 1, 0};
     ASSERT_EQ(nx_native_flash_configure_instance(&flash, bytes, &geometry),
               NX_SUCCESS);
     ASSERT_EQ(nx_native_flash_stop_instance(&flash), NX_SUCCESS);
@@ -491,8 +492,8 @@ TEST_F(NativeInstances, ErasedFlashInputDoesNotConsumeFaultBudgetOrTime) {
     nx_native_flash_state_t state{};
     const nx_flash_port_t face{&nx_native_flash_ops, &state};
     uint8_t memory[8]{};
-    const nx_flash_sector_t sector{0U, 8U};
-    const nx_flash_geometry_t geometry{0U, 8U, 2U, &sector, 1U, 0U};
+    const nx_flash_erase_span_t span{0U, 8U, 1U};
+    const nx_flash_geometry_t geometry{0U, 8U, 2U, &span, 1U, 0U};
     ASSERT_EQ(NX_SUCCESS,
               nx_native_flash_configure_instance(&state, memory, &geometry));
     nx_native_flash_fault_instance(&state, 0U);
@@ -511,9 +512,9 @@ TEST_F(NativeInstances,
        NorModelRejectsUnimplementedEccEraseHistoryRequirements) {
     nx_native_flash_state_t state{};
     uint8_t memory[8]{};
-    const nx_flash_sector_t sector{0U, 8U};
+    const nx_flash_erase_span_t span{0U, 8U, 1U};
     const nx_flash_geometry_t geometry{
-        0U, 8U, 2U, &sector, 1U, NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE};
+        0U, 8U, 2U, &span, 1U, NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE};
     EXPECT_EQ(NX_ERROR_UNSUPPORTED,
               nx_native_flash_configure_instance(&state, memory, &geometry));
     EXPECT_EQ(nullptr, state.geometry);
@@ -524,8 +525,8 @@ TEST_F(NativeInstances, ErasedInputLeavesPreviouslyProgrammedBytesUnchanged) {
     nx_native_flash_state_t state{};
     const nx_flash_port_t face{&nx_native_flash_ops, &state};
     uint8_t memory[8]{};
-    const nx_flash_sector_t sector{0U, 8U};
-    const nx_flash_geometry_t geometry{0U, 8U, 2U, &sector, 1U, 0U};
+    const nx_flash_erase_span_t span{0U, 8U, 1U};
+    const nx_flash_geometry_t geometry{0U, 8U, 2U, &span, 1U, 0U};
     ASSERT_EQ(NX_SUCCESS,
               nx_native_flash_configure_instance(&state, memory, &geometry));
     const uint16_t value = 0U;
@@ -542,3 +543,26 @@ TEST_F(NativeInstances, ErasedInputLeavesPreviouslyProgrammedBytesUnchanged) {
 }
 
 } /* namespace */
+
+/** \brief Retain per-sector physical failure across a size/span boundary. */
+TEST_F(NativeInstances, FlashEraseFailureCrossesOnlyTheConfirmedSectorPrefix) {
+    nx_native_flash_state_t state{};
+    const nx_flash_port_t face{&nx_native_flash_ops, &state};
+    std::array<uint8_t, 64> memory{};
+    const nx_flash_erase_span_t spans[] = {{0U, 16U, 2U}, {32U, 32U, 1U}};
+    const nx_flash_geometry_t geometry{0U, 64U, 4U, spans, 2U, 0U};
+    ASSERT_EQ(NX_SUCCESS, nx_native_flash_configure_instance(
+                              &state, memory.data(), &geometry));
+    memory.fill(0U);
+    const nx_flash_region_t selected{&face, 16U, 48U, true};
+    nx_native_flash_fault_instance(&state, 1U);
+    EXPECT_EQ(NX_ERROR_IO, nx_flash_region_erase(&selected, 0U, 48U, 1000U));
+    for (size_t index = 0U; index < memory.size(); ++index)
+        EXPECT_EQ(index >= 16U && index < 32U ? 0xffU : 0U, memory[index]);
+    nx_native_flash_fault_instance(&state, SIZE_MAX);
+    EXPECT_EQ(NX_SUCCESS, nx_flash_region_erase(&selected, 16U, 32U, 1000U));
+    for (size_t index = 0U; index < 16U; ++index)
+        EXPECT_EQ(0U, memory[index]);
+    for (size_t index = 16U; index < memory.size(); ++index)
+        EXPECT_EQ(0xffU, memory[index]);
+}

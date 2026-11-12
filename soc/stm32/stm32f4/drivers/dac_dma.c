@@ -52,8 +52,10 @@ static IRQn_Type vector(const nx_stm32_dac_dma_state_t* state, unsigned index) {
 }
 /** \brief The selected basic timer has no shared timebase or IRQ client. */
 static TIM_TypeDef* timer(const nx_stm32_dac_dma_state_t* state) {
-    return state->dac.config->trigger == NX_STM32_DAC_TRIGGER_TIM6 ? TIM6
-                                                                   : TIM7;
+    nx_stm32_dac_trigger_t source = state->dac.config->trigger;
+    if (source == NX_STM32_DAC_TRIGGER_EXTI9)
+        source = config_of(state)->recovery_trigger;
+    return source == NX_STM32_DAC_TRIGGER_TIM6 ? TIM6 : TIM7;
 }
 /** \brief Stream flags occupy one independent W1C field in HISR/HIFCR. */
 static unsigned flag_shift(const nx_stm32_dac_dma_state_t* state) {
@@ -80,13 +82,13 @@ static bool underrun(const nx_stm32_dac_dma_state_t* state) {
 /** \brief Freeze request generation before draining the memory engine. */
 static void gate(const nx_stm32_dac_dma_state_t* state) {
     LL_TIM_DisableCounter(timer(state));
-    LL_DAC_DisableDMAReq(DAC, channel(state));
     if ((state->dac.config->channels & 1U) != 0U) {
         LL_DAC_DisableTrigger(DAC, LL_DAC_CHANNEL_1);
     }
     if ((state->dac.config->channels & 2U) != 0U) {
         LL_DAC_DisableTrigger(DAC, LL_DAC_CHANNEL_2);
     }
+    LL_DAC_DisableDMAReq(DAC, channel(state));
     nx_arch_dsb();
 }
 /** \brief Error precedence and the drain timer survive repeated cancellation.
@@ -209,9 +211,17 @@ nx_result_t nx_stm32_dac_dma_prepare(nx_stm32_dac_dma_state_t* state,
         config->region_count > SIZE_MAX / sizeof(*config->regions) ||
         config->priority > 15U || config->dac.mode != NX_STM32_DAC_TRIGGERED ||
         (config->dac.trigger != NX_STM32_DAC_TRIGGER_TIM6 &&
-         config->dac.trigger != NX_STM32_DAC_TRIGGER_TIM7)) {
+         config->dac.trigger != NX_STM32_DAC_TRIGGER_TIM7 &&
+         config->dac.trigger != NX_STM32_DAC_TRIGGER_EXTI9)) {
         return NX_ERROR_INVALID;
     }
+    bool external = config->dac.trigger == NX_STM32_DAC_TRIGGER_EXTI9;
+    if (external && !config->circular)
+        return NX_ERROR_UNSUPPORTED;
+    if ((external && config->recovery_trigger != NX_STM32_DAC_TRIGGER_TIM6 &&
+         config->recovery_trigger != NX_STM32_DAC_TRIGGER_TIM7) ||
+        (!external && config->recovery_trigger != NX_STM32_DAC_TRIGGER_NONE))
+        return NX_ERROR_INVALID;
     if (!context_ok()) {
         return NX_ERROR_CONTEXT;
     }
@@ -219,6 +229,11 @@ nx_result_t nx_stm32_dac_dma_prepare(nx_stm32_dac_dma_state_t* state,
         state->vector_leases != 0U || state->clock_restore_pending) {
         return NX_ERROR_BUSY;
     }
+    TIM_TypeDef* recovery =
+        config->recovery_trigger == NX_STM32_DAC_TRIGGER_TIM6 ? TIM6 : TIM7;
+    if (external &&
+        ((recovery->CR1 & TIM_CR1_CEN) != 0U || recovery->DIER != 0U))
+        return NX_ERROR_BUSY;
     IRQn_Type irq =
         config->dac.channels == 2U ? DMA1_Stream6_IRQn : DMA1_Stream5_IRQn;
     DMA_Stream_TypeDef* selected =
@@ -230,6 +245,20 @@ nx_result_t nx_stm32_dac_dma_prepare(nx_stm32_dac_dma_state_t* state,
     nx_result_t result = nx_stm32_dac_prepare(&state->dac, &config->dac);
     if (result != NX_SUCCESS) {
         return result;
+    }
+    if (external) {
+        uint32_t bit = config->recovery_trigger == NX_STM32_DAC_TRIGGER_TIM6
+                           ? (uint32_t)RCC_APB1ENR_TIM6EN
+                           : (uint32_t)RCC_APB1ENR_TIM7EN;
+        /* One existing cold receipt owns this recovery-only gate too. No
+         * event source or counter is started by taking the static lease. */
+        state->dac.clocks_added |= bit & ~RCC->APB1ENR;
+        LL_APB1_GRP1_EnableClock(bit);
+        nx_arch_dsb();
+        if ((RCC->APB1ENR & bit) == 0U)
+            return NX_ERROR_IO;
+        if ((recovery->CR1 & TIM_CR1_CEN) != 0U || recovery->DIER != 0U)
+            return NX_ERROR_BUSY;
     }
     state->frame_bytes =
         (uint8_t)((config->dac.format == NX_DAC_FORMAT_U8 ? 1U : 2U) *
@@ -267,21 +296,20 @@ nx_result_t nx_stm32_dac_dma_prepare(nx_stm32_dac_dma_state_t* state,
 static bool independent(const nx_stm32_dac_dma_state_t* state, const void* data,
                         size_t size, size_t alignment) {
     uintptr_t begin = (uintptr_t)data;
-    if (data == NULL || begin % alignment != 0U || size > UINTPTR_MAX - begin) {
+    if (!nx_stm32_dac_independent(&state->dac, sizeof(*state), data, size,
+                                  alignment)) {
         return false;
     }
     const nx_stm32_dac_dma_config_t* config = config_of(state);
     const void* objects[] = {
-        state,           config,
-        config->regions, state->wake,
-        state->active,   state->active != NULL ? state->active->data : NULL};
-    size_t sizes[] = {sizeof(*state),
-                      sizeof(*config),
+        config, config->regions, state->wake, state->active,
+        state->active != NULL ? state->active->data : NULL};
+    size_t sizes[] = {sizeof(*config),
                       config->region_count * sizeof(*config->regions),
                       state->wake != NULL ? sizeof(*state->wake) : 0U,
                       state->active != NULL ? sizeof(*state->active) : 0U,
                       state->active != NULL ? state->active->length : 0U};
-    for (unsigned index = 0U; index < 6U; ++index) {
+    for (unsigned index = 0U; index < 5U; ++index) {
         if (sizes[index] != 0U &&
             begin < (uintptr_t)objects[index] + sizes[index] &&
             (uintptr_t)objects[index] < begin + size) {
@@ -307,6 +335,42 @@ static uint32_t destination(const nx_stm32_dac_dma_state_t* state) {
         : config->format == NX_DAC_FORMAT_U12_LEFT
             ? LL_DAC_DMA_REG_DATA_12BITS_LEFT_ALIGNED
             : LL_DAC_DMA_REG_DATA_12BITS_RIGHT_ALIGNED);
+}
+/** \brief External playback still needs real internal events for ES0182.
+ * \note No memory address is attached here. TSEL changes only with EN clear;
+ *       the exclusively leased recovery timer stays stopped during playback.
+ */
+static nx_result_t recovery_source(nx_stm32_dac_dma_state_t* state) {
+    if (state->dac.config->trigger != NX_STM32_DAC_TRIGGER_EXTI9)
+        return NX_SUCCESS;
+    const uint8_t channels = state->dac.config->channels;
+    LL_DAC_Disable(DAC, LL_DAC_CHANNEL_1);
+    LL_DAC_Disable(DAC, LL_DAC_CHANNEL_2);
+    nx_arch_dsb();
+    if (LL_DAC_IsEnabled(DAC, LL_DAC_CHANNEL_1) != 0U ||
+        LL_DAC_IsEnabled(DAC, LL_DAC_CHANNEL_2) != 0U)
+        return NX_ERROR_IO;
+    uint32_t source = timer(state) == TIM6 ? LL_DAC_TRIG_EXT_TIM6_TRGO
+                                           : LL_DAC_TRIG_EXT_TIM7_TRGO;
+    for (unsigned index = 0U; index < 2U; ++index) {
+        if ((channels & (1U << index)) == 0U)
+            continue;
+        uint32_t selected = index == 0U ? LL_DAC_CHANNEL_1 : LL_DAC_CHANNEL_2;
+        LL_DAC_SetTriggerSource(DAC, selected, source);
+        LL_DAC_EnableTrigger(DAC, selected);
+        LL_DAC_Enable(DAC, selected);
+    }
+    nx_arch_dsb();
+    for (unsigned index = 0U; index < 2U; ++index) {
+        if ((channels & (1U << index)) == 0U)
+            continue;
+        uint32_t selected = index == 0U ? LL_DAC_CHANNEL_1 : LL_DAC_CHANNEL_2;
+        if (LL_DAC_GetTriggerSource(DAC, selected) != source ||
+            LL_DAC_IsTriggerEnabled(DAC, selected) == 0U ||
+            LL_DAC_IsEnabled(DAC, selected) == 0U)
+            return NX_ERROR_IO;
+    }
+    return nx_stm32_dac_wait_startup(state->active->base.deadline);
 }
 /** \brief ES0182 2.6.1 requires observed underrun and a complete restart.
  * \note DMAEN, a clock cycle or W1C alone never proves an empty request latch.
@@ -356,6 +420,9 @@ static nx_result_t restart(nx_stm32_dac_dma_state_t* state) {
     const uint64_t spacing =
         (UINT64_C(3000000) + NEXUS_APB1_HZ - 1U) / NEXUS_APB1_HZ + 1U;
     LL_TIM_SetTriggerOutput(timer(state), LL_TIM_TRGO_RESET);
+    nx_result_t ready = recovery_source(state);
+    if (ready != NX_SUCCESS)
+        return ready;
     LL_DAC_EnableDMAReq(DAC, channel(state));
     nx_arch_dsb();
     if (LL_DAC_IsDMAReqEnabled(DAC, channel(state)) == 0U ||
@@ -363,8 +430,10 @@ static nx_result_t restart(nx_stm32_dac_dma_state_t* state) {
         return NX_ERROR_IO;
     }
     for (unsigned pulse = 0U; pulse < 2U; ++pulse) {
-        if (nx_deadline_expired(state->active->base.deadline,
-                                nx_time_now_us())) {
+        nx_time_us_t before = nx_time_now_us();
+        if (before == NX_DEADLINE_NEVER)
+            return NX_ERROR_STATE;
+        if (nx_deadline_expired(state->active->base.deadline, before)) {
             return NX_ERROR_TIMEOUT;
         }
         /* This source can only convert idle: every memory/IRQ target is off.
@@ -375,14 +444,17 @@ static nx_result_t restart(nx_stm32_dac_dma_state_t* state) {
         nx_arch_dsb();
         nx_time_us_t began = nx_time_now_us();
         nx_time_us_t after;
+        if (began == NX_DEADLINE_NEVER)
+            return NX_ERROR_STATE;
         if (nx_deadline_finite_after(began, spacing, &after) != NX_SUCCESS) {
-            return NX_ERROR_TIMEOUT;
+            return NX_ERROR_EXHAUSTED;
         }
         nx_time_us_t now;
         do {
             now = nx_time_now_us();
-            if (now < began ||
-                nx_deadline_expired(state->active->base.deadline, now)) {
+            if (now == NX_DEADLINE_NEVER || now < began)
+                return NX_ERROR_STATE;
+            if (nx_deadline_expired(state->active->base.deadline, now)) {
                 return NX_ERROR_TIMEOUT;
             }
         } while (now < after);
@@ -483,15 +555,24 @@ static nx_result_t start_dma(nx_stm32_dac_dma_state_t* state) {
     if (LL_DAC_IsDMAReqEnabled(DAC, channel(state)) == 0U) {
         return NX_ERROR_IO;
     }
-    if (nx_deadline_expired(state->active->base.deadline, nx_time_now_us())) {
+    nx_time_us_t now = nx_time_now_us();
+    if (now == NX_DEADLINE_NEVER)
+        return NX_ERROR_STATE;
+    if (nx_deadline_expired(state->active->base.deadline, now)) {
         return NX_ERROR_TIMEOUT;
     }
+    if (state->dac.config->trigger == NX_STM32_DAC_TRIGGER_EXTI9)
+        return nx_stm32_dac_enable_external(&state->dac,
+                                            state->active->base.deadline);
     LL_TIM_EnableCounter(timer(state));
     nx_arch_dsb();
     if (LL_TIM_IsEnabledCounter(timer(state)) == 0U) {
         return NX_ERROR_IO;
     }
-    return nx_deadline_expired(state->active->base.deadline, nx_time_now_us())
+    now = nx_time_now_us();
+    if (now == NX_DEADLINE_NEVER)
+        return NX_ERROR_STATE;
+    return nx_deadline_expired(state->active->base.deadline, now)
                ? NX_ERROR_TIMEOUT
                : NX_SUCCESS;
 }
@@ -507,13 +588,18 @@ static nx_result_t submit(void* context, nx_dac_tx_request_t* request) {
     if (state->active != NULL) {
         return NX_ERROR_BUSY;
     }
+    bool external = state->dac.config->trigger == NX_STM32_DAC_TRIGGER_EXTI9;
+    if (!nx_stm32_dac_external_live(state->dac.config))
+        return NX_ERROR_STATE;
     if (!independent(state, request, sizeof(*request),
                      _Alignof(nx_dac_tx_request_t)) ||
         !independent(state, request->data, request->length,
                      state->frame_bytes) ||
         request->length == 0U || request->length % state->frame_bytes != 0U ||
         request->length / state->frame_bytes > 65535U ||
-        request->trigger_hz == 0U || request->trigger_hz > 1000000U ||
+        (external
+             ? request->trigger_hz != 0U
+             : request->trigger_hz == 0U || request->trigger_hz > 1000000U) ||
         (uintptr_t)request->data > UINT32_MAX ||
         request->length > UINT32_MAX - (uintptr_t)request->data) {
         return NX_ERROR_INVALID;
@@ -529,6 +615,8 @@ static nx_result_t submit(void* context, nx_dac_tx_request_t* request) {
         return result;
     }
     nx_time_us_t now = nx_time_now_us();
+    if (now == NX_DEADLINE_NEVER)
+        return NX_ERROR_STATE;
     if (nx_deadline_expired(request->base.deadline, now)) {
         return NX_ERROR_TIMEOUT;
     }
@@ -707,6 +795,10 @@ static void service(void* context) {
         nx_arch_irq_restore(saved);
         return;
     }
+    if (state->phase != DRAIN &&
+        (now == NX_DEADLINE_NEVER ||
+         !nx_stm32_dac_external_live(state->dac.config)))
+        begin_drain(state, NX_ERROR_IO, now);
     latch(state, now);
     if (state->phase != DRAIN &&
         nx_deadline_expired(state->active->base.deadline, now)) {

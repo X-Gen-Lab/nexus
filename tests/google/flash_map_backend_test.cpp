@@ -72,16 +72,12 @@ class FlashMap : public ::testing::Test {
         return area;
     }
     StrictMock<FlashPort> mock;
-    const std::array<nx_flash_sector_t, 8> sectors{{{0U, 0x4000U},
-                                                    {0x4000U, 0x4000U},
-                                                    {0x8000U, 0x4000U},
-                                                    {0xc000U, 0x4000U},
-                                                    {0x10000U, 0x10000U},
-                                                    {0x20000U, 0x20000U},
-                                                    {0x40000U, 0x20000U},
-                                                    {0x60000U, 0x20000U}}};
-    nx_flash_geometry_t physical{0x08000000U,    0x80000U,       4U,
-                                 sectors.data(), sectors.size(), 0U};
+    const std::array<nx_flash_erase_span_t, 3> spans{
+        {{0U, 0x4000U, 4U},
+         {0x10000U, 0x10000U, 1U},
+         {0x20000U, 0x20000U, 3U}}};
+    nx_flash_geometry_t physical{0x08000000U,  0x80000U,     4U,
+                                 spans.data(), spans.size(), 0U};
     const nx_flash_port_t port{&operations, &mock};
     nx_flash_region_t primary_region{&port, 0x20000U, 0x20000U, true};
     nx_flash_region_t secondary_region{&port, 0x40000U, 0x20000U, true};
@@ -236,7 +232,7 @@ TEST_F(FlashMap, OpenRejectsPartialSectorOrIncompletePhysicalGeometry) {
     EXPECT_EQ(nullptr, output);
     primary_region.offset -= 4U;
     primary_region.size += 4U;
-    physical.sector_count -= 1U;
+    physical.erase_span_count -= 1U;
     EXPECT_EQ(-EINVAL, flash_area_open(1U, &output));
 }
 

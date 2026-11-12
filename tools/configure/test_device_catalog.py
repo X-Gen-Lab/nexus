@@ -71,15 +71,34 @@ class DeviceCatalogConfigurationTests(unittest.TestCase):
         with self.assertRaisesRegex(gate.ConfigurationError, "device.*ID|device.*identifier"):
             self.resolve()
 
-    def test_catalog_irq_change_is_observed_and_rejected_by_runtime_contract(self):
+    def test_catalog_irq_change_is_projected_and_bound_without_vendor_checkout(self):
+        before = self.resolve()
         def mutate(catalog):
             selected = next(item for item in catalog["devices"]
                             if item["define"] == "STM32F407xx")
             selected["external_irq_count"] += 1
             selected["last_external_irq"]["number"] += 1
         self.update(CATALOG, mutate)
+        after = self.resolve()
+        self.assertFalse((self.root / "vendors").exists())
+        self.assertEqual(after.cpu_profile.irq.external_count, 83)
+        before_inputs = {item["path"]: item["sha256"] for item in before.inputs}
+        after_inputs = {item["path"]: item["sha256"] for item in after.inputs}
+        self.assertNotEqual(before_inputs[CATALOG], after_inputs[CATALOG])
+        self.assertEqual(after_inputs[CATALOG], hashlib.sha256(
+            (self.root / CATALOG).read_bytes()).hexdigest())
+
+    def test_normalized_irq_requires_the_same_selected_catalog_record(self):
+        raw = gate.load(self.root / SOC)
+        catalog = gate.load(self.root / CATALOG)
+        selected = gate.catalog_soc_facts(raw, "STM32F407VET6", catalog)
+        self.assertEqual(selected.device.external_irq_count, 82)
+        with self.assertRaisesRegex(gate.ConfigurationError, "catalog device"):
+            gate.validate_soc(selected.soc, "STM32F407VET6")
+        selected.soc["irq"]["external_count"] += 1
         with self.assertRaisesRegex(gate.ConfigurationError, "IRQ count"):
-            self.resolve()
+            gate.validate_soc(selected.soc, "STM32F407VET6",
+                              catalog_device=selected.device)
 
     def test_duplicate_device_id_and_header_startup_mismatch_are_rejected(self):
         for case in ("duplicate", "startup"):

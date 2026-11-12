@@ -1,7 +1,9 @@
 /**
  * \file            stm32_static_lifecycle_test.cpp
- * \brief           Real F4 static acquisition, partial effects and cleanup
- * retry. \author          Nexus Team \version         1.0.0 \date 2026-11-07
+ * \brief           F4 static acquisition, partial effects and cleanup retry
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-11-07
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {

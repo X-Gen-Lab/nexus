@@ -41,6 +41,7 @@ class DeviceView:
     cpu: Mapping
     irq: Mapping
     clock_profiles: Mapping
+    clock_policy: str | None
     controllers: Mapping[str, ControllerFacts]
     modes: Mapping[str, ControllerModes]
     vendor_device: VendorDeviceIR | None
@@ -82,8 +83,11 @@ def controller_profiles(soc):
     composed = {}
     used = set()
     for device, profile in profiles.items():
-        if not isinstance(profile, dict) or set(profile) != {"controller_groups"}:
-            fail("Device profile requires an explicit controller group list")
+        if (not isinstance(profile, dict) or
+                set(profile) != {"controller_groups", "clock_policy"}):
+            fail("Device profile requires explicit controller groups and clock policy")
+        if not isinstance(profile["clock_policy"], str) or not profile["clock_policy"]:
+            fail("Device profile requires a named clock policy")
         names = profile["controller_groups"]
         if (not isinstance(names, list) or not names or
                 any(not isinstance(name, str) or name not in reviewed
@@ -153,5 +157,6 @@ def from_validated(soc, part, vendor_device):
         family=soc["id"], part=part, physical=freeze(soc["variants"][part]),
         cpu=freeze(soc["cpu"]), irq=freeze(soc["irq"]),
         clock_profiles=freeze(soc["clock_profiles"]),
+        clock_policy=soc.get("clock_policy"),
         controllers=freeze(controllers), modes=freeze(policies),
         vendor_device=vendor_device)

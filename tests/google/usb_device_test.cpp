@@ -479,7 +479,8 @@ TEST_F(UsbDevice, InvalidTransferPlansRejectBeforeClockCallsOrMmio) {
         [](const void* context) {
             ++static_cast<const Calls*>(context)->validate;
             return NX_ERROR_IO;
-        }};
+        },
+        nullptr};
     const auto clock = model.controller.clock;
     model.controller.clock = {&ops, &calls, sizeof(calls)};
     const auto control = endpoints[0];
@@ -2342,4 +2343,399 @@ TEST_F(UsbDevice, DisabledOutTokenDoesNotUndoTheCompletedStatusPacket) {
     EXPECT_FALSE(model.controller.snapshot.control_pending);
     EXPECT_EQ(nullptr, endpoints[1].request);
     EXPECT_EQ(0U, model.hardware.registers[0xB08U / 4U] & (1U << 4U));
+}
+
+/** \brief Explicit service owns a selected pulse; no hidden worker exists. */
+class UsbRemoteWakeup : public UsbDevice {
+  protected:
+    nx_usb_remote_runtime_t runtime{};
+    nx_usb_remote_wakeup_request_t pulse{};
+    void SetUp() override {
+        model.controller.remote = &runtime;
+        UsbDevice::SetUp();
+        nx_request_initialize(&pulse.base);
+        model.hardware.registers[0x808U / 4U] = 6U;
+        model.hardware.registers[0x14U / 4U] |= 1U << 13U;
+        nx_usb_controller_irq(&model.controller);
+    }
+    void TearDown() override {
+        model.hardware.hold_remote_assert = false;
+        model.hardware.hold_remote_clear = false;
+        model.hardware.clock_ready = true;
+        (void)nx_native_clock_advance(20000U);
+        if (model.controller.snapshot.started)
+            (void)nx_usb_device_service(&device);
+        UsbDevice::TearDown();
+    }
+    void Control(uint8_t number, uint16_t value, bool acknowledge = true) {
+        const uint8_t setup[] = {0U,
+                                 number,
+                                 static_cast<uint8_t>(value),
+                                 static_cast<uint8_t>(value >> 8U),
+                                 0U,
+                                 0U,
+                                 0U,
+                                 0U};
+        ReceiveSetup(setup);
+        if (number == 5U) {
+            ASSERT_EQ(nx_usb_device_address(&device,
+                                            model.controller.snapshot.epoch,
+                                            static_cast<uint8_t>(value)),
+                      NX_SUCCESS);
+        }
+        if (!acknowledge)
+            return;
+        ASSERT_EQ(nx_usb_in_prepare(&request, nullptr, 0U, NX_USB_STATUS,
+                                    model.controller.snapshot.epoch,
+                                    nx_time_now_us() + 30000U),
+                  NX_SUCCESS);
+        const auto input = Port(0U);
+        ASSERT_EQ(nx_usb_endpoint_submit(&input, &request), NX_SUCCESS);
+        ASSERT_EQ(nx_native_usb_complete(&model, 0U, true), NX_SUCCESS);
+        nx_usb_controller_irq(&model.controller);
+        ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        ASSERT_EQ(request.base.result, NX_SUCCESS);
+    }
+    void Configure(bool authorize = true) {
+        Control(5U, 3U);
+        Control(9U, 1U);
+        if (authorize)
+            Control(3U, 1U);
+    }
+    void Suspend(nx_time_us_t age = 5001U) {
+        model.hardware.registers[0x808U / 4U] |= 1U;
+        model.hardware.registers[0x14U / 4U] |= 1U << 11U;
+        nx_usb_controller_irq(&model.controller);
+        ASSERT_TRUE(model.controller.snapshot.suspended);
+        ASSERT_EQ(nx_native_clock_advance(age), NX_SUCCESS);
+    }
+    void Prepare(uint32_t bound = 100U, nx_time_us_t budget = 10000U) {
+        ASSERT_EQ(nx_request_prepare(&pulse.base, nx_time_now_us() + budget),
+                  NX_SUCCESS);
+        pulse.max_service_delay_us = bound;
+    }
+    bool Signal() const {
+        return (model.hardware.registers[0x804U / 4U] & 1U) != 0U;
+    }
+};
+TEST_F(UsbRemoteWakeup, OnlyAcknowledgedFeatureAuthorizesTheAsyncPulse) {
+    Configure(false);
+    Control(3U, 1U, false);
+    Suspend();
+    Prepare();
+    EXPECT_EQ(nx_usb_device_remote_wakeup(&device, &pulse),
+              NX_ERROR_PERMISSION);
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_READY);
+    EXPECT_FALSE(Signal());
+    model.hardware.registers[0x808U / 4U] &= ~1U;
+    model.hardware.registers[0x14U / 4U] |= 1U << 31U;
+    nx_usb_controller_irq(&model.controller);
+    Control(3U, 1U);
+    Suspend();
+    Prepare();
+    const auto before = nx_time_now_us();
+    ASSERT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_SUCCESS);
+    EXPECT_EQ(nx_time_now_us(), before);
+    EXPECT_TRUE(Signal());
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_ACTIVE);
+    ASSERT_EQ(nx_native_clock_advance(1999U), NX_SUCCESS);
+    ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    EXPECT_TRUE(Signal());
+    EXPECT_NE(nx_request_state(&pulse.base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(nx_native_clock_advance(2U), NX_SUCCESS);
+    ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    EXPECT_FALSE(Signal());
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(pulse.base.result, NX_SUCCESS);
+    EXPECT_EQ(pulse.base.transferred, 0U);
+    EXPECT_EQ(runtime.request, nullptr);
+    EXPECT_TRUE(model.controller.snapshot.suspended);
+    EXPECT_GE(model.hardware.remote_cleared_at -
+                  model.hardware.remote_asserted_at,
+              1000U);
+    EXPECT_LE(model.hardware.remote_cleared_at -
+                  model.hardware.remote_asserted_at,
+              15000U);
+    Prepare();
+    EXPECT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_ERROR_STATE);
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_READY);
+}
+TEST_F(UsbRemoteWakeup, IdleAndFiniteSignalBudgetsRejectBeforeAnyEffect) {
+    Configure();
+    Suspend(5000U);
+    Prepare();
+    EXPECT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_ERROR_BUSY);
+    EXPECT_FALSE(Signal());
+    EXPECT_EQ(runtime.request, nullptr);
+    ASSERT_EQ(nx_native_clock_advance(1U), NX_SUCCESS);
+    for (uint32_t bound : {0U, 12999U}) {
+        Prepare(bound);
+        EXPECT_EQ(nx_usb_device_remote_wakeup(&device, &pulse),
+                  NX_ERROR_INVALID);
+        EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_READY);
+        EXPECT_FALSE(Signal());
+    }
+    Prepare(100U, 2101U);
+    EXPECT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_ERROR_TIMEOUT);
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_READY);
+    EXPECT_FALSE(Signal());
+    Prepare();
+    pulse.base.deadline = NX_DEADLINE_NEVER;
+    EXPECT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_ERROR_INVALID);
+    EXPECT_FALSE(Signal());
+    Prepare();
+    model.hardware.registers[0x808U / 4U] &= ~1U;
+    EXPECT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_ERROR_STATE);
+    EXPECT_FALSE(Signal());
+    model.hardware.registers[0x808U / 4U] |= 1U;
+    ASSERT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(2001U), NX_SUCCESS);
+    ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    EXPECT_EQ(pulse.base.result, NX_SUCCESS);
+}
+TEST_F(UsbRemoteWakeup, ClearAndNewConfigurationRevokeOnlyAtStatusAck) {
+    Configure();
+    Control(1U, 1U, false);
+    Suspend();
+    Prepare();
+    ASSERT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(2001U), NX_SUCCESS);
+    ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    model.hardware.registers[0x808U / 4U] &= ~1U;
+    model.hardware.registers[0x14U / 4U] |= 1U << 31U;
+    nx_usb_controller_irq(&model.controller);
+    Control(1U, 1U);
+    Suspend();
+    Prepare();
+    EXPECT_EQ(nx_usb_device_remote_wakeup(&device, &pulse),
+              NX_ERROR_PERMISSION);
+    model.hardware.registers[0x808U / 4U] &= ~1U;
+    model.hardware.registers[0x14U / 4U] |= 1U << 31U;
+    nx_usb_controller_irq(&model.controller);
+    Control(3U, 1U);
+    Control(9U, 1U);
+    Suspend();
+    Prepare();
+    EXPECT_EQ(nx_usb_device_remote_wakeup(&device, &pulse),
+              NX_ERROR_PERMISSION);
+    EXPECT_FALSE(Signal());
+}
+TEST_F(UsbRemoteWakeup, CancelAndStopKeepTheMinimumPulseAndItsBorrow) {
+    Configure();
+    Suspend();
+    Prepare();
+    ASSERT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_SUCCESS);
+    ASSERT_EQ(nx_usb_device_remote_cancel(&device, &pulse), NX_SUCCESS);
+    EXPECT_NE(nx_request_state(&pulse.base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(nx_native_clock_advance(500U), NX_SUCCESS);
+    EXPECT_EQ(nx_usb_device_stop(&device), NX_ERROR_BUSY);
+    EXPECT_TRUE(Signal());
+    EXPECT_EQ(runtime.request, &pulse);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    ASSERT_EQ(nx_native_clock_advance(1501U), NX_SUCCESS);
+    ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    EXPECT_FALSE(Signal());
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(pulse.base.result, NX_ERROR_CANCELLED);
+    EXPECT_GE(model.hardware.remote_cleared_at -
+                  model.hardware.remote_asserted_at,
+              1000U);
+    EXPECT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    EXPECT_EQ(model.hardware.consumers, 0U);
+}
+TEST_F(UsbRemoteWakeup, LateServiceReportsTheRealTimingViolationAfterClear) {
+    Configure();
+    Suspend();
+    Prepare();
+    ASSERT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(16000U), NX_SUCCESS);
+    EXPECT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    EXPECT_FALSE(Signal());
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(pulse.base.result, NX_ERROR_TIMEOUT);
+    EXPECT_TRUE(model.controller.snapshot.closing);
+    EXPECT_TRUE(model.controller.clock_retained);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    EXPECT_GT(model.hardware.remote_cleared_at -
+                  model.hardware.remote_asserted_at,
+              15000U);
+}
+TEST_F(UsbRemoteWakeup, RefusedClearRetainsRequestSignalAndClockUntilLateJoin) {
+    Configure();
+    Suspend();
+    Prepare();
+    ASSERT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_SUCCESS);
+    model.hardware.hold_remote_clear = true;
+    ASSERT_EQ(nx_native_clock_advance(2001U), NX_SUCCESS);
+    EXPECT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    EXPECT_TRUE(Signal());
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(runtime.request, &pulse);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    EXPECT_EQ(nx_usb_device_stop(&device), NX_ERROR_BUSY);
+    model.hardware.hold_remote_clear = false;
+    ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    EXPECT_FALSE(Signal());
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(pulse.base.result, NX_ERROR_IO);
+    EXPECT_EQ(runtime.request, nullptr);
+    EXPECT_TRUE(model.controller.clock_retained);
+}
+TEST_F(UsbRemoteWakeup, EpochLossClearsBestEffortAndNeverClaimsPulseSuccess) {
+    Configure();
+    Suspend();
+    Prepare();
+    ++model.hardware.time_epoch;
+    EXPECT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_ERROR_STATE);
+    EXPECT_FALSE(Signal());
+    model.hardware.registers[0x808U / 4U] &= ~1U;
+    model.hardware.registers[0x14U / 4U] |= 1U << 31U;
+    nx_usb_controller_irq(&model.controller);
+    Suspend();
+    Prepare();
+    ASSERT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_SUCCESS);
+    ++model.hardware.time_epoch;
+    EXPECT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    EXPECT_FALSE(Signal());
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(pulse.base.result, NX_ERROR_STATE);
+    EXPECT_TRUE(model.controller.snapshot.closing);
+    EXPECT_TRUE(model.controller.clock_retained);
+}
+TEST_F(UsbRemoteWakeup, FailedAssertIsAcceptedFailureWithoutClaimingAWake) {
+    Configure();
+    Suspend();
+    Prepare();
+    model.hardware.hold_remote_assert = true;
+    ASSERT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_SUCCESS);
+    EXPECT_FALSE(Signal());
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(pulse.base.result, NX_ERROR_IO);
+    EXPECT_TRUE(model.controller.snapshot.closing);
+    EXPECT_TRUE(model.controller.clock_retained);
+}
+TEST_F(UsbRemoteWakeup, OrdinaryControllerHasNoRemoteRuntimeOrBorrow) {
+    Configure();
+    Suspend();
+    Prepare();
+    model.controller.remote = nullptr;
+    EXPECT_EQ(nx_usb_device_remote_wakeup(&device, &pulse),
+              NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_READY);
+    EXPECT_FALSE(Signal());
+}
+TEST_F(UsbRemoteWakeup, PulseAndPacketStorageRemainSeparateUntilTheirOwnJoin) {
+    Configure();
+    const auto output = Port(3U);
+    ASSERT_EQ(nx_usb_out_prepare(&request, bytes, 64U, NX_USB_DATA, 0U,
+                                 nx_time_now_us() + 30000U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&output, &request), NX_SUCCESS);
+    Suspend();
+    Prepare();
+    EXPECT_EQ(nx_usb_device_remote_wakeup(
+                  &device, reinterpret_cast<nx_usb_remote_wakeup_request_t*>(
+                               &model.controller)),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(
+        nx_usb_device_remote_wakeup(
+            &device, reinterpret_cast<nx_usb_remote_wakeup_request_t*>(bytes)),
+        NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+    EXPECT_EQ(runtime.request, nullptr);
+    EXPECT_FALSE(Signal());
+    ASSERT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_SUCCESS);
+    size_t count = 123U;
+    EXPECT_EQ(
+        nx_usb_device_read_events(
+            &device, reinterpret_cast<nx_usb_event_t*>(&pulse), 1U, &count),
+        NX_ERROR_INVALID);
+    EXPECT_EQ(count, 123U);
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_ACTIVE);
+    ASSERT_EQ(nx_native_clock_advance(2001U), NX_SUCCESS);
+    ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+}
+TEST_F(UsbRemoteWakeup, SelectedRuntimeCannotOverlapItsControllerAtColdEntry) {
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    model.controller.remote =
+        reinterpret_cast<nx_usb_remote_runtime_t*>(&model.controller);
+    const auto reads = model.hardware.mmio_reads;
+    const auto writes = model.hardware.mmio_writes;
+    EXPECT_EQ(nx_usb_controller_plan_validate(&model.controller),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(model.hardware.mmio_reads, reads);
+    EXPECT_EQ(model.hardware.mmio_writes, writes);
+    model.controller.remote = &runtime;
+}
+TEST_F(UsbRemoteWakeup, UncollectedResetPreventsStalePermissionAdmission) {
+    Configure();
+    Suspend();
+    Prepare();
+    model.hardware.registers[0x14U / 4U] |= 1U << 12U;
+    EXPECT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_ERROR_STATE);
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_READY);
+    EXPECT_EQ(runtime.request, nullptr);
+    EXPECT_FALSE(Signal());
+}
+TEST_F(UsbRemoteWakeup, DelayedAssertReturnCannotHideAnOverlongPhysicalPulse) {
+    Configure();
+    Suspend();
+    Prepare(100U, 100000U);
+    model.hardware.delay_after_remote_assert_us = 15001U;
+    ASSERT_EQ(nx_usb_device_remote_wakeup(&device, &pulse), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(2001U), NX_SUCCESS);
+    EXPECT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    EXPECT_FALSE(Signal());
+    EXPECT_EQ(nx_request_state(&pulse.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(pulse.base.result, NX_ERROR_TIMEOUT);
+    EXPECT_TRUE(model.controller.snapshot.closing);
+    EXPECT_GT(model.hardware.remote_cleared_at -
+                  model.hardware.remote_asserted_at,
+              15000U);
+}
+
+TEST_F(UsbRemoteWakeup, FreshSuspendAfterAnUnansweredPulseRequiresNewIdleTime) {
+    Configure();
+    Suspend();
+    Prepare();
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_remote_wakeup(&device, &pulse));
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(2001U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_service(&device));
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+    ASSERT_EQ(NX_SUCCESS, pulse.base.result);
+    /* No host resume was observed; the old suspend must not be replayed. */
+    Prepare();
+    EXPECT_EQ(NX_ERROR_STATE, nx_usb_device_remote_wakeup(&device, &pulse));
+    Suspend(0U);
+    Prepare();
+    EXPECT_EQ(NX_ERROR_BUSY, nx_usb_device_remote_wakeup(&device, &pulse));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&pulse.base));
+    EXPECT_FALSE(Signal());
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(5001U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_remote_wakeup(&device, &pulse));
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(2001U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_service(&device));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+    EXPECT_EQ(NX_SUCCESS, pulse.base.result);
+}
+TEST_F(UsbRemoteWakeup, RefusedSuspendAckCannotReplayAnOldSuspendAsNewIdle) {
+    Configure();
+    model.hardware.hold_clear = true;
+    Suspend();
+    Prepare();
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_remote_wakeup(&device, &pulse));
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(2001U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_service(&device));
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+    ASSERT_EQ(NX_SUCCESS, pulse.base.result);
+    nx_usb_controller_irq(&model.controller);
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(5001U));
+    nx_usb_controller_irq(&model.controller);
+    Prepare();
+    EXPECT_EQ(NX_ERROR_STATE, nx_usb_device_remote_wakeup(&device, &pulse));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&pulse.base));
+    EXPECT_FALSE(Signal());
+    model.hardware.hold_clear = false;
 }

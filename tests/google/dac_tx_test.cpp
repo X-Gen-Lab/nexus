@@ -73,8 +73,6 @@ TEST_F(DacTxContract, InvalidPreparationDoesNotModifyUnborrowedMetadata) {
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_dac_tx_prepare(&request, frames, 0U, 1U, 4U),
               NX_ERROR_INVALID);
-    EXPECT_EQ(nx_dac_tx_prepare(&request, frames, 4U, 0U, 4U),
-              NX_ERROR_INVALID);
     EXPECT_EQ(nx_dac_tx_prepare(nullptr, frames, 4U, 1U, 4U), NX_ERROR_INVALID);
     EXPECT_EQ(std::memcmp(&request, original.data(), sizeof(request)), 0);
 }
@@ -189,5 +187,12 @@ TEST_F(DacTxContract, InvalidOrAbsentSchedulingMethodsCannotCallAPublisher) {
     EXPECT_EQ(nx_dac_tx_port_attach_wake(&no_methods, nullptr, 0U),
               NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(nx_dac_tx_port_next_service(&no_methods), NX_DEADLINE_NEVER);
+}
+TEST_F(DacTxContract, ZeroRatePreservesAnExplicitUnknownExternalFrequency) {
+    ASSERT_EQ(nx_dac_tx_prepare(&request, frames, sizeof(frames), 0U, 123456U),
+              NX_SUCCESS);
+    EXPECT_EQ(request.trigger_hz, 0U);
+    EXPECT_EQ(request.data, frames);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
 }
 } /* namespace */

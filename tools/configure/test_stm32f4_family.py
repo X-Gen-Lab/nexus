@@ -37,7 +37,8 @@ class Stm32F4FamilyTests(unittest.TestCase):
                 self.assertEqual(result.part, part)
                 self.assertEqual(result.package, package)
                 self.assertEqual(result.flash["size"], flash_bytes)
-                self.assertEqual(sum(result.flash["erase_blocks"]),
+                self.assertEqual(sum(span["erase_bytes"] * span["count"]
+                                     for span in result.flash["erase_spans"]),
                                  flash_bytes)
                 self.assertEqual(result.clock["core_hz"], 168000000)
                 self.assertFalse(result.physical_qualified)
@@ -68,10 +69,11 @@ class Stm32F4FamilyTests(unittest.TestCase):
                     density + "-flash.toml")
                 result = gate.resolve_ir(source)
                 self.assertEqual(result.flash["size"], size)
-                self.assertEqual(len(result.flash["erase_blocks"]), sectors)
+                self.assertEqual(sum(span["count"] for span in result.flash["erase_spans"]), sectors)
                 self.assertEqual(result.physical_part.flash["origin"],
                                  0x08000000)
-                self.assertEqual(sum(result.flash["erase_blocks"]), size)
+                self.assertEqual(sum(span["erase_bytes"] * span["count"]
+                                     for span in result.flash["erase_spans"]), size)
                 self.assertTrue(all(region["id"] != "ccm" or
                                     region["dma"] is False
                                     for region in result.memory))

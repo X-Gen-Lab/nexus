@@ -80,6 +80,10 @@ class UsbHsDeviceConfigurationTests(unittest.TestCase):
         self.assertIn("s_nx_usb_dma_regions_fs", source)
         self.assertIn(".dma = true", source)
         self.assertIn("NX_USB_PROFILE_AHB_DMA", source)
+        self.assertIn("s_nx_usb_dma_control_out[88]", source)
+        self.assertIn("s_nx_usb_dma_control_in[64]", source)
+        self.assertIn("s_nx_usb_dma_bulk_out[512]", source)
+        self.assertIn("s_nx_usb_dma_bulk_in[512]", source)
 
     def test_isochronous_hs_dma_has_one_transaction_and_fs_fallback_mps(self):
         path = self.assembly(True)
@@ -108,6 +112,52 @@ class UsbHsDeviceConfigurationTests(unittest.TestCase):
                                                  'rx_fifo_words=64'))
         with self.assertRaisesRegex(ValueError, "RX|FIFO"):
             gate.resolve_ir(path, test_support=native_fixture(path))
+
+    def test_remote_wakeup_defaults_to_no_selected_runtime(self):
+        path = self.assembly()
+        ir = gate.resolve_ir(path, test_support=native_fixture(path))
+        self.assertFalse(ir.controllers[0].options.remote_wakeup)
+        output = self.root / "no-remote"
+        gate.configure(path, output, test_support=native_fixture(path))
+        source = (output / "bindings.c").read_text()
+        self.assertNotIn("static nx_usb_remote_runtime_t", source)
+        self.assertIn("set(NEXUS_USB_REMOTE_WAKEUP OFF)",
+                      (output / "selection.cmake").read_text())
+
+    def test_remote_wakeup_selects_one_static_runtime_for_fs_and_hs(self):
+        for hs in (False, True):
+            with self.subTest(hs=hs):
+                if hs:
+                    path = self.assembly(True)
+                else:
+                    fixture = gate.ROOT / "tests/contracts/usb_assembly"
+                    board = fixture / "stm32-zg-board/board.json"
+                    (self.package / "board.json").write_bytes(board.read_bytes())
+                    path = self.root / "assembly.toml"
+                    path.write_text((fixture / "stm32-zg.toml").read_text().replace(
+                        'board_package="stm32-zg-board"', 'board_package="board"'))
+                path.write_text(path.read_text().replace(
+                    'vbus_sensing=false', 'vbus_sensing=false\nremote_wakeup=true'))
+                ir = gate.resolve_ir(path, test_support=native_fixture(path))
+                self.assertTrue(ir.controllers[0].options.remote_wakeup)
+                output = self.root / ("remote-hs" if hs else "remote-fs")
+                gate.configure(path, output, test_support=native_fixture(path))
+                source = (output / "bindings.c").read_text()
+                self.assertEqual(source.count("static nx_usb_remote_runtime_t"), 1)
+                self.assertIn(".remote = &s_nx_usb_remote_fs", source)
+                self.assertIn("set(NEXUS_USB_REMOTE_WAKEUP ON)",
+                              (output / "selection.cmake").read_text())
+                self.assertNotIn("malloc", source)
+
+    def test_remote_wakeup_rejects_non_boolean_authored_values(self):
+        path = self.assembly()
+        text = path.read_text()
+        for value in ('1', '"true"'):
+            with self.subTest(value=value):
+                path.write_text(text.replace('vbus_sensing=false',
+                    'vbus_sensing=false\nremote_wakeup=' + value))
+                with self.assertRaisesRegex(ValueError, "boolean"):
+                    gate.resolve_ir(path, test_support=native_fixture(path))
 
 
 if __name__ == "__main__":

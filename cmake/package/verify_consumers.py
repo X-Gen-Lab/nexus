@@ -177,7 +177,7 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
             '#ifndef NEXUS_PLATFORM_VERSION\n'
             '#error "Missing source interface version"\n'
             '#endif\n'
-            '#if NEXUS_FACTORY_ABI_EPOCH != 1U\n'
+            '#if NEXUS_FACTORY_ABI_EPOCH != 2U\n'
             '#error "Unsupported factory interface epoch"\n'
             '#endif\n'
             '#if __has_include("stm32f4xx.h") || __has_include("gd32f4xx.h")\n'
@@ -244,15 +244,15 @@ def service_profile(specification):
 
 def service_directory(sdk, specification):
     """Use the single owned scenario tree, including shared F4 references."""
-    return (Path(sdk) / "tests/contracts/stm32f4_family"
-            if specification.scenario == "f4_family" else
+    return (Path(sdk) / "tests/contracts" / ("stm32" + specification.scenario)
+            if specification.scenario.startswith("f4_") else
             Path(sdk) / "cmake/package/verification" / specification.scenario)
 
 
 def service_sources(sdk, specification):
     """Return only the exact reviewed scenario's authored consumer sources."""
     verification = service_directory(sdk, specification)
-    if specification.scenario == "f4_family":
+    if specification.scenario.startswith("f4_"):
         authored = tomllib.loads((verification / specification.assembly).read_text())
         board = PurePosixPath(authored["board_package"])
         if (board.is_absolute() or len(board.parts) != 1 or
@@ -261,7 +261,10 @@ def service_sources(sdk, specification):
                 "\\" in authored["board_package"]):
             raise ValueError("F4 reference requires its canonical Board directory")
         name = (board / "board.json").as_posix()
-        return {"main.c": Path(sdk) / "tests/contracts/crc_assembly/consumer.c",
+        consumer = (Path(sdk) / "tests/contracts/crc_assembly/consumer.c"
+                    if specification.scenario == "f4_family" else
+                    verification / "consumer.c")
+        return {"main.c": consumer,
                 name: verification / name}
     if specification.scenario == "secure_services":
         selected = verification / Path(specification.assembly).parent
@@ -341,6 +344,11 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
         "device_tmp117": "Nexus::TMP117I2C",
         "image_window": "",
         "f4_family": "",
+        "f4_crypto": "",
+        "f4_sdram": "",
+        "f4_qspi": "",
+        "f4_graphics": "",
+        "f4_sai": "",
     }
     selected_setup = ""
     if specification.scenario in {"loaned_rx", "mcuboot_control"}:
@@ -692,15 +700,55 @@ def service_symbols(specification):
         return frozenset({"nx_platform_start", "nx_platform_stop",
                           "nx_chip_info_read", "nx_factory_crc",
                           "nx_crc_port_compute", "nx_stm32_crc_ops"})
+    if specification.scenario == "f4_crypto":
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_factory_cipher", "nx_factory_hash",
+                          "nx_cipher_port_query", "nx_hash_port_query",
+                          "nx_stm32f4_cipher_ops", "nx_stm32f4_hash_ops"})
+    if specification.scenario == "f4_sdram":
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_factory_external_bus", "nx_factory_memory_window",
+                          "nx_external_bus_port_state", "nx_memory_window_port_acquire",
+                          "nx_memory_window_port_release", "nx_memory_window_port_geometry"})
+    if specification.scenario == "f4_qspi":
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_factory_external_bus", "nx_factory_flash_async",
+                          "nx_factory_flash_async_flash",
+                          "nx_external_bus_port_state", "nx_external_bus_port_stop",
+                          "nx_flash_geometry_sector_count",
+                          "nx_flash_port_geometry", "nx_flash_port_read",
+                          "nx_flash_port_recover", "nx_flash_async_prepare",
+                          "nx_flash_async_submit", "nx_flash_async_cancel",
+                          "nx_flash_async_service", "nx_flash_async_stop",
+                          "nx_stm32_qspi_bus_ops", "nx_stm32_qspi_async_ops",
+                          "nx_stm32_qspi_flash_ops", "HAL_QSPI_Init"})
+    if specification.scenario == "f4_graphics":
+        symbols = {"nx_platform_start", "nx_platform_stop", "nx_factory_image",
+                   "nx_image_port_query", "nx_stm32_image_ops"}
+        if specification.assembly != "image-only.toml":
+            symbols.update({"nx_factory_display", "nx_display_port_query",
+                            "nx_display_port_snapshot", "nx_stm32_ltdc_ops"})
+        return frozenset(symbols)
+    if specification.scenario == "f4_sai":
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_factory_audio", "nx_audio_port_layout",
+                          "nx_frame_layout_audio", "nx_stm32_sai_ops",
+                          "nx_stm32_sai_prepare", "HAL_SAI_Init", "SAI1_IRQHandler"})
     return SERVICE_SYMBOLS
 
 
 def service_scope(specification):
     """Describe the executed software boundary without physical claims."""
     if specification.scenario == "f4_family":
-        return ("Exact F405ZG/F415ZG/F417ZG internal HSI16/CRC C11 link, "
+        return ("Selected exact F4 internal HSI16/CRC C11 link, "
                 "resources and method retention only. No external PCB, "
                 "startup execution, measured stack or physical timing.")
+    if specification.scenario in {"f4_crypto", "f4_sdram", "f4_graphics",
+                                   "f4_sai", "f4_qspi"}:
+        return ("Selected exact F4 public factory C11 link, resources and "
+                "method retention only. No physical hardware execution, "
+                "memory validation, cryptographic known-answer qualification, "
+                "measured stack or physical timing.")
     if specification.scenario == "loaned_rx":
         return ("Selected 2-slot/4-piece RX profile and two 512-byte spare pbufs; "
                 "ARM link/resource observation only. No physical MAC/PHY, packet "
@@ -801,7 +849,7 @@ def check_service_image(sdk, source, build, specification, run_checked):
         raise ValueError("Service configuration directory is not canonical")
     inputs.update(resolved=config / "resolved.json", bindings=config / "bindings.c")
     resolved = json.loads((config / "resolved.json").read_text())
-    if specification.scenario == "f4_family":
+    if specification.scenario.startswith("f4_"):
         board = next(path for name, path in canonical_sources.items()
                      if name.endswith("/board.json"))
         if resolved.get("part") != json.loads(board.read_text())["soc"]:

@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-CONSUMER_POLICY = "nexus-sdk-consumers-v20"
+CONSUMER_POLICY = "nexus-sdk-consumers-v26"
 BASE_CONSUMERS = (("native", False, "native"), ("stm32", True, "stm32"))
 MODERN_CONSUMERS = ()
 SELECTED_CONSUMERS = (
@@ -59,6 +59,27 @@ SERVICE_CONSUMERS = (
                     "f4_family"),
     ServiceConsumer("f417zg family", "f417zg.toml", "arm-family-f417zg", True,
                     "f4_family"),
+    ServiceConsumer("f411re family", "f411re.toml", "arm-family-f411re", True,
+                    "f4_family"),
+    ServiceConsumer("f446ze family", "f446ze.toml", "arm-family-f446ze", True,
+                    "f4_family"),
+    ServiceConsumer("f479ni family", "f479ni.toml", "arm-family-f479ni", True,
+                    "f4_family"),
+    ServiceConsumer("f415zg crypto", "f415zg.toml", "arm-crypto-f415zg", True,
+                    "f4_crypto"),
+    ServiceConsumer("f417zg crypto", "f417zg.toml", "arm-crypto-f417zg", True,
+                    "f4_crypto"),
+    ServiceConsumer("f479ni sdram", "f479ni-sdram.toml", "arm-sdram-f479ni", True,
+                    "f4_sdram"),
+    ServiceConsumer("f479ni qspi", "f479ni-qspi.toml", "arm-qspi-f479ni", True,
+                    "f4_qspi"),
+    ServiceConsumer("f479ni graphics", "combined.toml", "arm-graphics-f479ni", True,
+                    "f4_graphics"),
+    ServiceConsumer("f479ni image", "image-only.toml", "arm-image-f479ni", True,
+                    "f4_graphics"),
+    *(ServiceConsumer(f"{part} sai {role}", f"{part}-{role}.toml",
+                       f"arm-sai-{part}-{role}", True, "f4_sai")
+      for part in ("f446ze", "f479ni") for role in ("master", "slave")),
 )
 NATIVE_TIME_SMOKES = frozenset({"native-time-pair", "native-time-empty"})
 

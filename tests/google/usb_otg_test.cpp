@@ -9,13 +9,18 @@
 extern "C" {
 #include "nexus/io/native/model.h"
 #include "stm32f407_clock.h"
+#include "stm32f407_system.h"
 #include "stm32f407_usb_otg.h"
 #include "usb_device.h"
+}
+extern "C" {
+nx_stm32_system_t g_nx_stm32_system;
 }
 #include <algorithm>
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <new>
 #include <sys/mman.h>
 #include <vector>
 
@@ -48,6 +53,7 @@ uint32_t g_nx_usb_host_hclk_hz = 168000000U;
 static bool s_irq[82];
 static bool s_mode_ack = true, s_mode_seen = false;
 static nx_time_us_t s_mode_started = 0U;
+static uint16_t s_pin_snapshot = 0U;
 static unsigned s_mode_polls = 0U;
 extern "C" void nx_usb_host_model_write(volatile uint32_t* reg,
                                         uint32_t value) {
@@ -133,7 +139,7 @@ extern "C" nx_result_t nx_stm32_gpio_clock_enable(unsigned port) {
     return NX_SUCCESS;
 }
 extern "C" uint16_t nx_stm32_pin_capture(const GPIO_TypeDef*, uint8_t) {
-    return 0U;
+    return s_pin_snapshot;
 }
 extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef*, uint8_t, uint8_t,
                                               uint8_t, uint8_t, bool) {
@@ -325,6 +331,7 @@ class UsbOtgCold : public testing::Test {
         s_mode_ack = true;
         s_mode_seen = false;
         s_mode_started = 0U;
+        s_pin_snapshot = 0U;
         s_mode_polls = 0U;
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         g_nx_usb_soc_hclk_hz = g_nx_usb_host_hclk_hz = 168000000U;
@@ -380,9 +387,10 @@ class UsbOtgCold : public testing::Test {
                  ~static_cast<uint32_t>(USB_OTG_GUSBCFG_FDMOD)) |
                 USB_OTG_GUSBCFG_FHMOD;
             h->Instance->GRSTCTL = USB_OTG_GRSTCTL_AHBIDL;
-            h->Instance->HNPTXSTS = 96U;
+            h->Instance->HNPTXSTS = (1U << 16U) | 96U;
             *reinterpret_cast<volatile uint32_t*>(
-                reinterpret_cast<uintptr_t>(h->Instance) + 0x410U) = 96U;
+                reinterpret_cast<uintptr_t>(h->Instance) + 0x410U) =
+                (1U << 16U) | 96U;
             return HAL_OK;
         }));
         EXPECT_CALL(hcd, Stop(_)).WillRepeatedly(Invoke([this](auto*) {
@@ -890,4 +898,369 @@ TEST_F(UsbOtgCold, CloseRetainsDischargeDebtAndClearsItsCompletedDeadline) {
     EXPECT_EQ(mmio_reads, hardware->mmio_reads);
     EXPECT_EQ(mmio_writes, hardware->mmio_writes);
     EXPECT_EQ(irqs, host_irqs);
+}
+
+/** \brief Managed role faces retain the one physical remote-wake owner. */
+class UsbOtgRemote : public UsbOtgCold {
+  protected:
+    nx_usb_remote_runtime_t remote{};
+    nx_usb_remote_wakeup_request_t pulse{};
+    void SetUp() override {
+        UsbOtgCold::SetUp();
+        g_nx_stm32_system = {};
+        g_nx_stm32_system.started = true;
+        g_nx_stm32_system.time_epoch = 1U;
+        g_nx_stm32_system.timer_error = NX_SUCCESS;
+        device.remote = &remote;
+        config.fault_timeout_us = 10000U;
+        nx_request_initialize(&pulse.base);
+    }
+    void TearDown() override {
+        hardware->hold_remote_clear = false;
+        (void)nx_native_clock_advance(2001U);
+        if (owner.device.snapshot.started)
+            (void)nx_usb_fs_device_ops.service(&owner.device);
+        UsbOtgCold::TearDown();
+    }
+    const nx_usb_device_port_t* Face() {
+        return nx_usb_otg_device(&port, Snapshot().generation);
+    }
+    void Control(uint8_t number, uint16_t value) {
+        const uint8_t setup[8] = {0U,
+                                  number,
+                                  static_cast<uint8_t>(value),
+                                  static_cast<uint8_t>(value >> 8U),
+                                  0U,
+                                  0U,
+                                  0U,
+                                  0U};
+        ASSERT_EQ(NX_SUCCESS, ReceiveSetup(setup));
+        if (number == 5U) {
+            ASSERT_EQ(NX_SUCCESS,
+                      nx_usb_device_address(Face(), owner.device.snapshot.epoch,
+                                            static_cast<uint8_t>(value)));
+        }
+        nx_stm32_usb_otg_endpoint_t context = {&owner, &endpoints[0]};
+        const nx_usb_endpoint_port_t control = {&nx_stm32_usb_otg_endpoint_ops,
+                                                &context};
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_usb_in_prepare(&request, nullptr, 0U, NX_USB_STATUS,
+                                    owner.device.snapshot.epoch,
+                                    nx_time_now_us() + 30000U));
+        ASSERT_EQ(NX_SUCCESS, nx_usb_endpoint_submit(&control, &request));
+        hardware->registers[0x900U / 4U] &= ~(1U << 31U);
+        hardware->registers[0x908U / 4U] |= 1U;
+        hardware->registers[0x918U / 4U] = 32U;
+        hardware->tx_count[0] = 0U;
+        nx_stm32_usb_otg_irq(&owner);
+        ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+        ASSERT_EQ(NX_SUCCESS, request.base.result);
+    }
+    void ReadyPulse() {
+        ASSERT_EQ(NX_SUCCESS, StartDevice());
+        Control(5U, 3U);
+        Control(9U, 1U);
+        Control(3U, 1U);
+        hardware->registers[0x808U / 4U] |= 1U;
+        hardware->registers[0x14U / 4U] |= 1U << 11U;
+        nx_stm32_usb_otg_irq(&owner);
+        ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(5001U));
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_request_prepare(&pulse.base, nx_time_now_us() + 10000U));
+        pulse.max_service_delay_us = 100U;
+    }
+    bool Signal() const {
+        return (hardware->registers[0x804U / 4U] & 1U) != 0U;
+    }
+};
+TEST_F(UsbOtgRemote, DeviceFaceForwardsPulseAndCancelToItsOneDcd) {
+    ReadyPulse();
+    ASSERT_NE(nullptr, Face());
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_remote_wakeup(Face(), &pulse));
+    EXPECT_EQ(&remote, owner.device.remote);
+    EXPECT_EQ(&pulse, remote.request);
+    EXPECT_TRUE(Signal());
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_remote_cancel(Face(), &pulse));
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(2001U));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_service(Face()));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, pulse.base.result);
+    EXPECT_FALSE(Signal());
+}
+TEST_F(UsbOtgRemote, RuntimeInsideInactiveHostIsRejectedBeforeColdReset) {
+    device.remote = reinterpret_cast<nx_usb_remote_runtime_t*>(&owner.host);
+    const auto reads = power_reads;
+    const auto writes = power_writes;
+    EXPECT_EQ(NX_ERROR_INVALID, Prepare());
+    EXPECT_FALSE(owner.initialized);
+    EXPECT_EQ(reads, power_reads);
+    EXPECT_EQ(writes, power_writes);
+    EXPECT_EQ(0U, RCC->AHB2ENR & RCC_AHB2ENR_OTGFSEN);
+    device.remote = &remote;
+}
+TEST_F(UsbOtgRemote, RequestCannotOverwriteTheInactiveHostOrOuterRoleOwner) {
+    ReadyPulse();
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_usb_device_remote_wakeup(
+                  Face(), reinterpret_cast<nx_usb_remote_wakeup_request_t*>(
+                              &owner.host)));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_usb_device_remote_wakeup(
+                  Face(), reinterpret_cast<nx_usb_remote_wakeup_request_t*>(
+                              &owner.role)));
+    EXPECT_EQ(nullptr, remote.request);
+    EXPECT_FALSE(Signal());
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&pulse.base));
+}
+TEST_F(UsbOtgRemote, RoleExitJoinsPulseBeforeClockAndPinsCanChangeOwner) {
+    ReadyPulse();
+    const nx_usb_device_port_t raw = {&nx_usb_fs_device_ops, &owner.device};
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_remote_wakeup(&raw, &pulse));
+    ASSERT_EQ(NX_SUCCESS, Request(NX_USB_OTG_OFF));
+    const auto generation = Snapshot().generation;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_usb_otg_service(&port));
+    EXPECT_TRUE(Signal());
+    EXPECT_EQ(NX_USB_ROLE_DEVICE, owner.transport);
+    EXPECT_NE(0U, RCC->AHB2ENR & RCC_AHB2ENR_OTGFSEN);
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+    hardware->hold_remote_clear = true;
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(2001U));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_usb_otg_service(&port));
+    EXPECT_TRUE(Signal());
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&pulse.base));
+    EXPECT_EQ(NX_USB_ROLE_DEVICE, owner.transport);
+    EXPECT_NE(0U, RCC->AHB2ENR & RCC_AHB2ENR_OTGFSEN);
+    hardware->hold_remote_clear = false;
+    levels[1] = 0U;
+    EXPECT_EQ(NX_SUCCESS, Drive());
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+    EXPECT_EQ(NX_ERROR_IO, pulse.base.result);
+    EXPECT_FALSE(Signal());
+    EXPECT_EQ(NX_USB_OTG_OFF, Snapshot().active);
+    EXPECT_EQ(generation, Snapshot().generation);
+    EXPECT_EQ(0U, RCC->AHB2ENR & RCC_AHB2ENR_OTGFSEN);
+}
+
+/** \brief HS PHY variants retain the common role and pulse contracts. */
+class UsbOtgRemoteHs : public UsbOtgRemote,
+                       public testing::WithParamInterface<bool> {
+  protected:
+    nx_stm32_usb_hs_clock_state_t hs_clock{};
+    nx_stm32_usb_hs_cold_config_t hs{};
+    uint16_t hs_saved[12]{};
+    nx_stm32_platform_pin_config_t hs_pins[12]{};
+    void SetUp() override {
+        UsbOtgRemote::SetUp();
+        hardware = reinterpret_cast<nx_native_usb_hardware_t*>(0x40040000U);
+        hardware->registers[0x10U / 4U] = 1U << 31U;
+        hardware->clock_ready = true;
+        hardware->endpoint_numbers = 6U;
+        const uint8_t banks[] = {0U, 0U, 1U, 1U, 1U, 1U,
+                                 1U, 1U, 1U, 2U, 2U, 2U};
+        const uint8_t pads[] = {3U,  5U,  0U,  1U, 5U, 10U,
+                                11U, 12U, 13U, 0U, 2U, 3U};
+        const uint8_t count = GetParam() ? 12U : 2U;
+        for (uint8_t i = 0U; i < count; ++i) {
+            const uint8_t bank = GetParam() ? banks[i] : 1U;
+            const uint8_t pad =
+                GetParam() ? pads[i] : static_cast<uint8_t>(14U + i);
+            hs_pins[i] = {
+                reinterpret_cast<GPIO_TypeDef*>(
+                    reinterpret_cast<uintptr_t>(GPIOA) + bank * 0x400U),
+                &hs_saved[i], bank, pad};
+        }
+        hs.clock = &hs_clock;
+        hs.pins = hs_pins;
+        hs.pin_count = count;
+        hs.endpoints = endpoints;
+        hs.plan = plan;
+        hs.events = events;
+        hs.endpoint_count = 4U;
+        hs.capacity = 4U;
+        hs.irq_policy = device.irq_policy;
+        hs.priority = device.priority;
+        hs.poll_limit = device.poll_limit;
+        hs.drain_timeout_us = device.drain_timeout_us;
+        hs.clock_timeout_us = device.clock_timeout_us;
+        hs.rx_fifo_words = GetParam() ? 256U : device.rx_fifo_words;
+        if (GetParam()) {
+            plan[0].fifo_start = 256U;
+            plan[2].max_packet = plan[3].max_packet = 512U;
+            plan[2].fifo_start = 288U;
+            plan[2].fifo_words = 128U;
+        }
+        hs.phy =
+            GetParam() ? NX_STM32_USB_HS_ULPI : NX_STM32_USB_HS_INTERNAL_FS;
+        hs.ulpi_clock_hz = GetParam() ? 60000000U : 0U;
+        hs.remote = &remote;
+        host.pins = hs_pins;
+        host.pin_count = count;
+        host.transport.phy = hs.phy;
+        host.transport.ulpi_clock_hz = hs.ulpi_clock_hz;
+        config.device_fs = nullptr;
+        config.device_hs = &hs;
+        config.phy = hs.phy;
+    }
+};
+TEST_P(UsbOtgRemoteHs, RuntimeAndRequestJoinBeforeThePhyPassesToHost) {
+    hs.remote = reinterpret_cast<nx_usb_remote_runtime_t*>(&owner.host);
+    EXPECT_EQ(NX_ERROR_INVALID, Prepare());
+    EXPECT_FALSE(owner.initialized);
+    EXPECT_EQ(0U, power_reads);
+    hs.remote = &remote;
+    ReadyPulse();
+    ASSERT_EQ(&remote, owner.device.remote);
+    EXPECT_EQ(GetParam() ? NX_USB_CORE_HS_ULPI : NX_USB_CORE_HS_INTERNAL_FS,
+              owner.device.core);
+    EXPECT_EQ(1U, hs_clock.consumers);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_usb_device_remote_wakeup(
+                  Face(), reinterpret_cast<nx_usb_remote_wakeup_request_t*>(
+                              &owner.host)));
+    ASSERT_EQ(NX_SUCCESS, nx_usb_device_remote_wakeup(Face(), &pulse));
+    ASSERT_TRUE(Signal());
+    EXPECT_CALL(hcd, Init(_)).WillOnce(Invoke([this](auto*) {
+        /* This assertion runs at the actual next-owner acquisition point. */
+        EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+        EXPECT_EQ(nullptr, remote.request);
+        EXPECT_FALSE(Signal());
+        EXPECT_EQ(0U, hs_clock.consumers);
+        EXPECT_EQ(0U, hs_clock.phase);
+        EXPECT_EQ(nullptr, owner.device_hs_receipt.config);
+        EXPECT_EQ(0U, owner.device_hs_receipt.leases);
+        return HAL_OK;
+    }));
+    ASSERT_EQ(NX_SUCCESS, Request(NX_USB_OTG_HOST));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_usb_otg_service(&port));
+    EXPECT_TRUE(Signal());
+    EXPECT_EQ(NX_USB_ROLE_DEVICE, owner.transport);
+    EXPECT_EQ(1U, hs_clock.consumers);
+    EXPECT_NE(0U, RCC->AHB1ENR & RCC_AHB1ENR_OTGHSEN);
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(2001U));
+    levels[1] = 0U;
+    EXPECT_EQ(NX_SUCCESS, Drive());
+    EXPECT_EQ(NX_USB_OTG_HOST, Snapshot().active);
+    EXPECT_EQ(NX_USB_ROLE_HOST, owner.transport);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, pulse.base.result);
+    EXPECT_FALSE(Signal());
+    EXPECT_TRUE(owner.host.snapshot.started);
+}
+INSTANTIATE_TEST_SUITE_P(InternalFsAndExternalUlpi, UsbOtgRemoteHs,
+                         testing::Values(false, true));
+
+TEST_F(UsbOtgRemote, ReadyRequestCannotBorrowInactiveHostChannelStorage) {
+    ReadyPulse();
+    static_assert(sizeof(channels) >= sizeof(nx_usb_remote_wakeup_request_t),
+                  "The disjointness probe needs an exact aligned extent");
+    auto* alias =
+        ::new (static_cast<void*>(channels)) nx_usb_remote_wakeup_request_t{};
+    nx_request_initialize(&alias->base);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_request_prepare(&alias->base, nx_time_now_us() + 10000U));
+    alias->max_service_delay_us = 100U;
+    const auto result = nx_usb_device_remote_wakeup(Face(), alias);
+    EXPECT_EQ(NX_ERROR_INVALID, result);
+    if (result == NX_SUCCESS) {
+        /* The RED still honors the actual accepted loan before cleanup. */
+        ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(2001U));
+        ASSERT_EQ(NX_SUCCESS, nx_usb_device_service(Face()));
+        ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&alias->base));
+    } else {
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&alias->base));
+        EXPECT_EQ(nullptr, remote.request);
+        EXPECT_FALSE(Signal());
+    }
+    for (auto& channel : channels)
+        ::new (static_cast<void*>(&channel)) nx_stm32_usb_host_channel_t{};
+}
+
+TEST_F(UsbOtgRemote, PulseCannotOverwriteTheLivePowerFaceDuringSettlement) {
+    static_assert(offsetof(nx_request_t, transferred) +
+                          sizeof(nx_gpio_port_t) <=
+                      sizeof(nx_request_t),
+                  "The Native alias probe needs two live metadata words");
+    ASSERT_EQ(NX_SUCCESS,
+              nx_request_prepare(&pulse.base, nx_time_now_us() + 100000U));
+    pulse.max_service_delay_us = 100U;
+    /* Face words remain valid throughout prepare and actual cold startup.
+     * Its context also encodes a finite future Native deadline. */
+    auto* shared = reinterpret_cast<nx_gpio_port_t*>(&pulse.base.transferred);
+    std::memcpy(shared, &gpio_faces[0], sizeof(*shared));
+    config.source = shared;
+    ASSERT_EQ(NX_SUCCESS, StartDevice());
+    Control(5U, 3U);
+    Control(9U, 1U);
+    Control(3U, 1U);
+    hardware->registers[0x808U / 4U] |= 1U;
+    hardware->registers[0x14U / 4U] |= 1U << 11U;
+    nx_stm32_usb_otg_irq(&owner);
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(5001U));
+    const auto result = nx_usb_device_remote_wakeup(Face(), &pulse);
+    EXPECT_EQ(NX_ERROR_INVALID, result);
+    if (result == NX_SUCCESS) {
+        /* Never repair an actually accepted request before the real join. */
+        ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(2001U));
+        ASSERT_EQ(NX_SUCCESS, nx_usb_device_service(Face()));
+        ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+    } else {
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&pulse.base));
+        EXPECT_EQ(nullptr, remote.request);
+        EXPECT_FALSE(Signal());
+    }
+    EXPECT_EQ(gpio_faces[0].ops, shared->ops);
+    EXPECT_EQ(gpio_faces[0].context, shared->context);
+    /* Restore the external face only after any real request has settled. */
+    std::memcpy(shared, &gpio_faces[0], sizeof(*shared));
+}
+
+TEST_F(UsbOtgRemote, PulseCannotOverwriteThePinSnapshotNeededByRoleClose) {
+    ASSERT_EQ(NX_SUCCESS,
+              nx_request_prepare(&pulse.base, nx_time_now_us() + 100000U));
+    pulse.max_service_delay_us = 100U;
+    pins[0].snapshot = reinterpret_cast<uint16_t*>(&pulse.base.transferred);
+    s_pin_snapshot = 0x135U;
+    ASSERT_EQ(NX_SUCCESS, StartDevice());
+    ASSERT_EQ(s_pin_snapshot, *pins[0].snapshot);
+    Control(5U, 3U);
+    Control(9U, 1U);
+    Control(3U, 1U);
+    hardware->registers[0x808U / 4U] |= 1U;
+    hardware->registers[0x14U / 4U] |= 1U << 11U;
+    nx_stm32_usb_otg_irq(&owner);
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(5001U));
+    const auto result = nx_usb_device_remote_wakeup(Face(), &pulse);
+    EXPECT_EQ(NX_ERROR_INVALID, result);
+    if (result == NX_SUCCESS) {
+        ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(2001U));
+        ASSERT_EQ(NX_SUCCESS, nx_usb_device_service(Face()));
+        ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&pulse.base));
+    } else {
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&pulse.base));
+        EXPECT_EQ(nullptr, remote.request);
+        EXPECT_FALSE(Signal());
+    }
+    EXPECT_EQ(s_pin_snapshot, *pins[0].snapshot);
+    /* Restore only after any actual accepted borrower has fully exited. */
+    *pins[0].snapshot = s_pin_snapshot;
+}
+
+TEST_F(UsbOtgRemote, RuntimeCannotEraseThePowerMethodsAtLaterColdEntry) {
+    struct alignas(nx_usb_remote_runtime_t) Shared {
+        nx_gpio_ops_t ops;
+        uint8_t padding[sizeof(nx_usb_remote_runtime_t)];
+    } storage = {gpio_ops, {}};
+    const nx_gpio_port_t face = {&storage.ops, &gpio_contexts[0]};
+    config.source = &face;
+    device.remote = reinterpret_cast<nx_usb_remote_runtime_t*>(&storage.ops);
+    EXPECT_EQ(NX_ERROR_INVALID, Prepare());
+    EXPECT_FALSE(owner.initialized);
+    EXPECT_EQ(0U, power_reads);
+    EXPECT_EQ(gpio_ops.read, storage.ops.read);
+    EXPECT_EQ(gpio_ops.write, storage.ops.write);
+    /* The RED retains no stack face after its failed rejection assertion. */
+    config.source = &gpio_faces[0];
+    device.remote = &remote;
 }
