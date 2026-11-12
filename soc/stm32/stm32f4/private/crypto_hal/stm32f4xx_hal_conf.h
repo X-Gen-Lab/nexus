@@ -12,7 +12,8 @@
 #define USE_HAL_HASH_REGISTER_CALLBACKS 0U
 #define assert_param(expression)        ((void)0U)
 /* DMA types are required by the vendor Handles, not a selected DMA runtime. */
-#include "stm32f4xx_hal_cryp.h"
 #include "stm32f4xx_hal_dma.h"
+
+#include "stm32f4xx_hal_cryp.h"
 #include "stm32f4xx_hal_hash.h"
 #endif
