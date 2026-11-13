@@ -84,7 +84,7 @@ class FactoryIncludeTests(unittest.TestCase):
         self.generate("native-uart.toml", "\n[factory]\ncapabilities = true\n")
         self.assertEqual(self.public_dependencies(),
                          {"fwd.h", "uart.h", "stream.h", "wake.h",
-                          "observation.h"})
+                          "observation.h", "traits.h"})
 
     def test_empty_getters_execute_without_complete_interface_definitions(self):
         self.generate("native-empty.toml")

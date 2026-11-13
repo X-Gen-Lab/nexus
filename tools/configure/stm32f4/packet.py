@@ -206,6 +206,9 @@ def _host_config(item, result, pins, options, mode, *, managed=False):
     if options.engine == "dma" and not regions:
         fail("USB Host DMA requires reviewed DMA-visible RAM")
     lines += [f"static nx_stm32_usb_host_channel_t s_nx_usb_channels_{name}[{options.channel_count}];"]
+    if options.pipe_channels:
+        channels = ", ".join(f"{channel}u" for channel in options.pipe_channels)
+        lines += [f"static const uint8_t s_nx_usb_pipe_channels_{name}[] = {{ {channels} }};"]
     if not managed:
         lines += [f"static nx_stm32_usb_host_cold_receipt_t s_nx_usb_host_receipt_{name};"]
     if options.engine == "dma":
@@ -227,6 +230,8 @@ def _host_config(item, result, pins, options, mode, *, managed=False):
               f"        .dma = {str(options.engine == 'dma').lower()},"]
     if options.engine == "dma":
         lines += [f"        .regions = s_nx_usb_host_regions_{name}, .region_count = {len(regions)}u,"]
+    if options.pipe_channels:
+        lines += [f"        .pipe_channels = s_nx_usb_pipe_channels_{name},"]
     lines += ["    },", f"    .pins = {pins}, .pin_count = {len(item.pins)}u,",
               f"    .init_timeout_us = {options.init_timeout_us}u", "};"]
     return lines

@@ -12,7 +12,7 @@ from tools.configure import stream_profiles, uart_formats, usb_profiles
 from tools.configure.calls import Symbol
 from tools.configure import usb_otg
 
-FACTORY_ABI_EPOCH = 2
+FACTORY_ABI_EPOCH = 3
 
 KINDS = CONTROLLER_KINDS
 
@@ -53,7 +53,6 @@ def public_header(kind):
     return {"spi_device": "spi", "i2c_device": "i2c",
             "usb_endpoint": "usb_device",
             "spi_transaction_device": "spi_transaction",
-            "i2c_long_device": "i2c_long",
             "spi_dma_transaction_device": "spi_dma_transaction"}.get(kind, kind)
 
 
@@ -77,8 +76,7 @@ def classes(result):
     records += [(kind + "_device", "endpoint", [item for item in result.devices
                   if enhanced_endpoints.class_name(item) == kind + "_device"])
                 for kind in ("spi", "i2c")]
-    for name in ("spi_transaction_device", "i2c_long_device",
-                 "spi_dma_transaction_device"):
+    for name in ("spi_transaction_device", "spi_dma_transaction_device"):
         instances = [item for item in result.devices
                      if enhanced_endpoints.class_name(item) == name]
         if instances:
@@ -412,7 +410,7 @@ def emit_strong(result):
                          [declaration, "    " + argument])
             header += [
                 "/** \\brief Pure selected-mode metadata; no hardware access. */",
-                "static inline const nx_factory_io_capability_t*",
+                "static inline const nx_io_capability_t*",
                 *signature,
                 f"    return nx_factory_{class_name}_capability(id.value);", "}"]
     if any(item.driver == "flash_async-endpoint" for item in result.devices):
@@ -455,7 +453,16 @@ def emit_strong(result):
             '/** \\brief Pure callback lookup; pair with the same UART ref. */',
             'static inline nx_uart_tx_validate_fn',
             'nx_factory_uart_tx_validator_ref(nx_uart_ref_t id) {',
-            '    return nx_factory_uart_tx_validator(id.value);', '}']
+            '    return nx_factory_uart_tx_validator(id.value);', '}',
+            '/** \\brief Pair one identity without storage or hardware access. */',
+            'static inline nx_uart_tx_binding_t',
+            'nx_factory_uart_tx_binding_ref(nx_uart_ref_t id) {',
+            '    nx_uart_tx_binding_t binding = {NULL, NULL};',
+            '    binding.validate = nx_factory_uart_tx_validator(id.value);',
+            '    if (binding.validate != NULL) {',
+            '        binding.transport = nx_factory_uart(id.value);',
+            '    }',
+            '    return binding;', '}']
     header += ["#ifdef __cplusplus", "}", "#endif", "#endif", ""]
     return "\n".join(header)
 
@@ -469,29 +476,7 @@ def _capability(item, model, endpoint=None, *, public_class=None):
 def emit_capabilities(result):
     """Optional selected-only readonly metadata stays outside the I/O face."""
     result = _typed(result)
-    header = [
-        '/** \\brief Maintained execution traits; no physical qualification. */',
-        'enum {', '    NX_FACTORY_CAP_MODEL = 1U << 0,',
-        '    NX_FACTORY_CAP_POLLING = 1U << 1,',
-        '    NX_FACTORY_CAP_IRQ = 1U << 2,',
-        '    NX_FACTORY_CAP_TX_DMA = 1U << 3,',
-        '    NX_FACTORY_CAP_RX_DMA = 1U << 4,',
-        '    NX_FACTORY_CAP_BLOCK_STREAM = 1U << 5,',
-        '    NX_FACTORY_CAP_STREAM_GAPS = 1U << 6,',
-        '    NX_FACTORY_CAP_BUS_MASTER_DMA = 1U << 7', '};',
-        '/**',
-        ' * \\brief Readonly bounds of the selected provider/mode.',
-        ' * \\note Zero units/messages means no bound described, not unlimited.',
-        ' * Zero unit_bytes means no fixed byte width; the typed face defines units.',
-        ' * For I2C, units bounds each message; unit_bytes is the payload unit.',
-        ' * For enhanced SPI, max_messages bounds segments, never I2C messages.',
-        ' * For Flash, unit_bytes constrains destination offset and length;',
-        ' * buffer_alignment describes caller input, independently of that unit.',
-        ' * Board wiring, memory domains and deadlines remain separate contracts.',
-        ' */', 'typedef struct {', '    uint32_t features;',
-        '    uint32_t max_transfer_units;', '    uint16_t unit_bytes;',
-        '    uint16_t buffer_alignment;', '    uint16_t max_messages;',
-        '} nx_factory_io_capability_t;']
+    header = ['#include "nexus/io/traits.h"']
     source = []
     for class_name, shape, instances in classes(result):
         for instance in instances:
@@ -506,16 +491,16 @@ def emit_capabilities(result):
             units = f"{units}U" if type(units) is int else units
             messages = f"{messages}U" if type(messages) is int else messages
             name = symbol(instance.id)
-            source += [f"static const nx_factory_io_capability_t "
+            source += [f"static const nx_io_capability_t "
                        f"s_nx_capability_{class_name}_{name} = {{",
                        f"    {flags}, {units}, {size}U, {alignment}U, {messages}",
                        "};"]
         function = f"nx_factory_{class_name}_capability"
         header += ['/** \\brief Pure lookup; NULL for an invalid assembly ID. */',
-                   f"const nx_factory_io_capability_t* {function}(",
+                   f"const nx_io_capability_t* {function}(",
                    f"    nx_{class_name}_id_t id);"]
         source += ['/** \\brief Pure selected-only capability lookup. */',
-                   f"const nx_factory_io_capability_t* {function}(",
+                   f"const nx_io_capability_t* {function}(",
                    f"    nx_{class_name}_id_t id) {{", "    switch (id) {"]
         for instance in instances:
             name = symbol(instance.id)
@@ -546,7 +531,7 @@ def emit_controller_metadata(result):
         ' * \\note Task/ISR safe before startup and after stop. No allocation,',
         ' * locks, hardware, clock or mutable-state access. No readiness implied.',
         ' */',
-        'const nx_factory_io_capability_t* nx_factory_controller_capability(',
+        'const nx_io_capability_t* nx_factory_controller_capability(',
         '    size_t controller_index);',
         '/**',
         ' * \\brief Locate immutable assembly, kind, hardware or mode text.',
@@ -560,7 +545,7 @@ def emit_controller_metadata(result):
         '    size_t controller_index, nx_factory_controller_field_t field);']
     source = [
         '/** \\brief Alias existing capabilities without another metadata table. */',
-        'const nx_factory_io_capability_t* nx_factory_controller_capability(',
+        'const nx_io_capability_t* nx_factory_controller_capability(',
         '    size_t controller_index) {',
         '    switch (controller_index) {']
     for index, item, _ in ordinals:

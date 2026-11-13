@@ -33,7 +33,8 @@ CLASSIC_CAN_MAILBOXES = 3
 
 UART_FORMATS = UartFormatPolicy(
     words=("USART1", "USART2", "USART3", "UART4", "UART5", "USART6"),
-    irq_probe=True, byte_frames=True)
+    irq_probe=True, byte_frames=((7, "even"), (7, "odd"), (8, "none"),
+                                (8, "even"), (8, "odd")))
 
 # Exact shared admission helper used by the byte-mode transport itself.
 UART_TX_VALIDATORS = MappingProxyType({
@@ -85,7 +86,7 @@ _BASE_CONTROLLER_INTERFACES = MappingProxyType({
         'memory_window': ('cpu-window', 'startup-memory', 'psram-window'),
         'flash_async': ('nor-cfi',), 'nand': ('raw-page',),
         'parallel16': ('8080-16',)}),
-    'FMC': MappingProxyType({'memory_window': ('cpu-window',)}),
+    'FMC': MappingProxyType({'memory_window': ('cpu-window', 'graphics-owned')}),
     'QUADSPI': MappingProxyType({'flash_async': ('nor-indirect',)})})
 CONTROLLER_INTERFACES = MappingProxyType({
     name: MappingProxyType({**_BASE_CONTROLLER_INTERFACES.get(name, {}),
@@ -154,6 +155,7 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('flash_async', 'nor-cfi'): 'fsmc',
     ('nand', 'raw-page'): 'fsmc',
     ('memory_window', 'cpu-window'): 'fsmc',
+    ('memory_window', 'graphics-owned'): 'sdram',
     ('parallel16', '8080-16'): 'fsmc',
     ('rtc', 'adopt-retained'): 'rtc',
     ('rtc', 'provision-empty'): 'rtc',

@@ -403,7 +403,8 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
                                &state->base, wake, syscall_ceiling);
 }
 
-/** \brief Cold facts describe cycles and channel order, never sample instants.
+/** \brief Private timing codes yield a copied nominal scan duration, not
+ * instants.
  */
 static nx_result_t sequence_info(const void* context,
                                  nx_adc_sequence_info_t* info) {
@@ -418,16 +419,9 @@ static nx_result_t sequence_info(const void* context,
         scan += cycles[base->adc.sample_times[i]] +
                 (12U - 2U * base->adc.resolution);
     }
-    *info = (nx_adc_sequence_info_t){
-        .channels = base->adc.channels,
-        .sample_times = base->adc.sample_times,
-        .sample_cycles = cycles,
-        .channel_count = base->adc.channel_count,
-        .sample_code_count = 8U,
-        .adc_clock_hz = base->adc_clock_hz,
-        .timer_clock_hz = base->timer_clock_hz,
-        .scan_cycles = scan,
-        .conversion_cycles = (uint16_t)(12U - 2U * base->adc.resolution)};
+    *info = (nx_adc_sequence_info_t){.channel_count = base->adc.channel_count,
+                                     .scan_ticks = scan,
+                                     .ticks_per_second = base->adc_clock_hz};
     return NX_SUCCESS;
 }
 

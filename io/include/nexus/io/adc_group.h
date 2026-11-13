@@ -53,6 +53,9 @@ typedef struct {
  *       physical rank can be discarded padding required by silicon errata;
  *       format describes only valid logical results. No implicit data packing,
  *       engineering units, aperture timestamp or trigger counter is promised.
+ *       format is the portable result layout. Channel/converter identifiers,
+ *       sample-code tables and physical-rank details are explicit native
+ *       diagnostics of this advanced acquisition profile, not portable IDs.
  */
 typedef struct {
     nx_adc_format_t format;

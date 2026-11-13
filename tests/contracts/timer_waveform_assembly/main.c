@@ -23,7 +23,17 @@ int main(void) {
     const nx_timer_sequence_port_t* face =
         nx_factory_timer_sequence_ref(NX_TIMER_SEQUENCE_REF_DRIVE);
 #endif
-    if (face == NULL || face->ops == NULL || face->context == NULL) {
+#if defined(NEXUS_WAVEFORM_GROUP)
+    nx_pwm_group_state_t state;
+    nx_result_t observed = nx_pwm_group_state(face, &state);
+#elif defined(NEXUS_WAVEFORM_PULSE)
+    nx_timer_pulse_state_t state;
+    nx_result_t observed = nx_timer_pulse_port_state(face, &state);
+#else
+    nx_timer_sequence_state_t state;
+    nx_result_t observed = nx_timer_sequence_port_state(face, &state);
+#endif
+    if (observed != NX_SUCCESS) {
         return 2;
     }
     return nx_platform_stop() == NX_SUCCESS ? 0 : 3;

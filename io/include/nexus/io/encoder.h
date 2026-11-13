@@ -10,25 +10,38 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/** \brief Exact edge counting personality, never a freely combinable mask. */
+/** \brief Logical A/B phase counting, never a freely combinable mask.
+ * \note A and B follow the statically bound input order. x2 counts both
+ *       edges of the selected phase; x4 counts both edges of both phases.
+ */
 typedef enum {
     NX_ENCODER_MODE_UNKNOWN = 0,
-    NX_ENCODER_MODE_X2_TI1,
-    NX_ENCODER_MODE_X2_TI2,
-    NX_ENCODER_MODE_X4_TI12
+    NX_ENCODER_MODE_X2_A,
+    NX_ENCODER_MODE_X2_B,
+    NX_ENCODER_MODE_X4
 } nx_encoder_mode_t;
 /** \brief One raw modulo counter and separate software observation time. */
 typedef struct {
     nx_time_us_t observed_at;
     uint32_t count;
 } nx_encoder_sample_t;
+/** \brief Input qualification in the reported filter clock domain.
+ * \note A zero divisor and sample count mean bypass. Otherwise the filter
+ *       samples at filter_clock_hz / clock_divisor and requires the declared
+ *       consecutive equal samples. This describes the selected digital filter,
+ *       not an exact debounce time, physical edge bandwidth or sensor quality.
+ */
+typedef struct {
+    uint8_t clock_divisor;
+    uint8_t consecutive_samples;
+} nx_encoder_filter_t;
 /** \brief Immutable input/filter facts and actual counter enable state. */
 typedef struct {
     uint32_t filter_clock_hz;
     nx_encoder_mode_t mode;
     uint8_t counter_bits;
-    uint8_t filter_a;
-    uint8_t filter_b;
+    nx_encoder_filter_t filter_a;
+    nx_encoder_filter_t filter_b;
     bool running;
 } nx_encoder_state_t;
 /** \brief Shared methods; no ring, request, allocation, callback or worker. */
@@ -72,12 +85,12 @@ nx_result_t nx_encoder_stop(const nx_encoder_t* port);
 nx_result_t nx_encoder_read(const nx_encoder_t* port,
                             nx_encoder_sample_t* sample);
 /**
- * \brief Report exact counter width and selected silicon filter codes.
+ * \brief Report counter width and semantic input qualification facts.
  * \param[in] port: Serialized privileged Thread-mode owner.
  * \param[out] state: Aligned separate output, unchanged on rejection.
  * \return SUCCESS or INVALID/STATE/CONTEXT/UNSUPPORTED.
- * \note Filter codes and their kernel clock do not qualify noise rejection,
- *       physical edge rate or electrical sensor/Board behavior.
+ * \note Declared sampling and their kernel clock do not qualify noise
+ * rejection, physical edge rate or electrical sensor/Board behavior.
  */
 nx_result_t nx_encoder_state(const nx_encoder_t* port,
                              nx_encoder_state_t* state);

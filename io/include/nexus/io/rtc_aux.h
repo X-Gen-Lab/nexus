@@ -10,7 +10,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/** \brief Raw periodic wake counter clock, independent of Core deadlines. */
+/** \brief F4 native wake counter clock for explicit integration controls.
+ * \note Ordinary consumers use nx_rtc_port_periodic_wakeup in rtc.h. These
+ *       native values do not describe a portable RTC counter layout.
+ */
 typedef enum {
     NX_RTC_WAKE_DIV16,
     NX_RTC_WAKE_DIV8,
@@ -107,7 +110,7 @@ enum nx_rtc_backup_effects {
     NX_RTC_BACKUP_CLOCK_SOURCE = 8U,
     NX_RTC_BACKUP_CLOCK_GATE = 16U,
     NX_RTC_BACKUP_CALENDAR = 32U,
-    NX_RTC_BACKUP_QUIET_PC13 = 128U
+    NX_RTC_BACKUP_QUIET_OSCILLATOR_PAD = 128U
 };
 /** \brief Copied transfer receipt, never proof of physical VBAT retention. */
 typedef struct {
@@ -145,6 +148,7 @@ typedef struct nx_rtc_aux_ops {
     nx_result_t (*standby_validate)(void*, const nx_rtc_standby_t*);
     nx_result_t (*standby_commit)(void*, nx_rtc_standby_t*);
     nx_result_t (*standby_restore)(void*, nx_rtc_standby_t*);
+    nx_result_t (*periodic_wakeup)(void*, uint64_t, uint32_t, nx_rtc_period_t*);
 } nx_rtc_aux_ops_t;
 /** \brief Configure/disable Alarm B; no retained caller pointer or request.
  * \param[in] port: Same serialized privileged unmasked RTC task owner.
@@ -155,7 +159,7 @@ typedef struct nx_rtc_aux_ops {
  */
 nx_result_t nx_rtc_port_alarm_b(const nx_rtc_port_t* port, bool enabled,
                                 const nx_rtc_alarm_t* alarm);
-/** \brief Configure the periodic counter with a bounded provider deadline.
+/** \brief Configure an explicitly selected native wake counter profile.
  * \param[in] port: Serialized RTC task owner.
  * \param[in] config: Copied clock/reload facts, never a Core deadline.
  * \return SUCCESS or provider error; failed withdrawal retains ownership.

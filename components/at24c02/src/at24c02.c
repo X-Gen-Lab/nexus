@@ -77,7 +77,7 @@ static nx_result_t observe_ready(nx_at24c02_t* device, nx_time_us_t deadline) {
             return result;
         }
         uint8_t ignored = 0U;
-        nx_i2c_message_t probe = {&ignored, 1U, true};
+        nx_i2c_message_t probe = nx_i2c_message_read(&ignored, 1U);
         size_t transferred = 0U;
         result = nx_i2c_endpoint_transaction(device->endpoint, &probe, 1U,
                                              deadline, &transferred);
@@ -150,8 +150,8 @@ nx_result_t nx_at24c02_read(nx_at24c02_t* device, size_t offset, uint8_t* data,
     result = observe_clock(device, deadline);
     if (result == NX_SUCCESS) {
         uint8_t address = (uint8_t)offset;
-        nx_i2c_message_t messages[2] = {{&address, 1U, false},
-                                        {data, bytes, true}};
+        nx_i2c_message_t messages[2] = {nx_i2c_message_write(&address, 1U),
+                                        nx_i2c_message_read(data, bytes)};
         size_t transferred = 0U;
         result = nx_i2c_endpoint_transaction(device->endpoint, messages, 2U,
                                              deadline, &transferred);
@@ -199,7 +199,7 @@ nx_result_t nx_at24c02_write(nx_at24c02_t* device, size_t offset,
         uint8_t packet[NX_AT24C02_PAGE_BYTES + 1U];
         packet[0] = (uint8_t)current;
         memcpy(&packet[1], data + completed.confirmed_bytes, count);
-        nx_i2c_message_t message = {packet, count + 1U, false};
+        nx_i2c_message_t message = nx_i2c_message_write(packet, count + 1U);
         size_t transferred = 0U;
         /* An issued transfer may have accepted data before reporting failure.
          */

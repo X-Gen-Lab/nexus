@@ -639,7 +639,7 @@ TEST_F(ControlFactory, ActualSharedVectorPublishesToItsExactPublicFace) {
     EXPECT_EQ(NX_SUCCESS, nx_exti_port_read(nx_factory_exti(NX_EXTI_ID_EDGE5),
                                             &event, 1U, &count));
     ASSERT_EQ(1U, count);
-    EXPECT_EQ(5U, event.line);
+    EXPECT_EQ(NX_EXTI_EVENT_COALESCED, event.flags);
     EXPECT_EQ(NX_EXTI_RISING, event.edge);
     EXPECT_EQ(0U, EXTI->PR & (1U << 5U));
     EXPECT_EQ(NX_ERROR_EMPTY,

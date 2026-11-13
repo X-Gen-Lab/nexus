@@ -316,7 +316,6 @@ TEST_F(Pvd, BothEdgesFollowPvdoAndAcknowledgeBeforePublishingWake) {
     ASSERT_EQ(2U, count);
     EXPECT_EQ(NX_EXTI_RISING, events[0].edge);
     EXPECT_EQ(NX_EXTI_FALLING, events[1].edge);
-    EXPECT_EQ(16U, events[0].line);
     EXPECT_EQ(123U, events[0].timestamp_us);
     EXPECT_EQ(NX_EXTI_EVENT_COALESCED, events[0].flags);
     ASSERT_EQ(NX_SUCCESS, nx_stm32_pvd_events_stop(&queued));

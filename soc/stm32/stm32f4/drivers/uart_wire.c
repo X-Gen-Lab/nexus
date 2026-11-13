@@ -15,8 +15,9 @@ static bool synchronous_instance(IRQn_Type irq) {
 }
 
 /** \brief Reject irrelevant fields instead of silently changing the tuple. */
-nx_result_t nx_stm32_uart_wire_validate(const nx_stm32_uart_state_t* port,
-                                        const nx_uart_wire_config_t* config) {
+nx_result_t
+nx_stm32_uart_wire_validate(const nx_stm32_uart_state_t* port,
+                            const nx_stm32_uart_wire_config_t* config) {
     if (port == NULL || config == NULL || port->registers == NULL ||
         config->mode > NX_UART_WIRE_SMARTCARD ||
         config->flow > NX_UART_FLOW_RTS_CTS)
@@ -54,9 +55,9 @@ nx_result_t nx_stm32_uart_wire_validate(const nx_stm32_uart_state_t* port,
 }
 
 /** \brief The complete wire tuple precedes the first UE and publisher. */
-nx_result_t nx_stm32_uart_wire_initialize(nx_stm32_uart_state_t* port,
-                                          uint32_t clock_hz,
-                                          const nx_uart_wire_config_t* config) {
+nx_result_t
+nx_stm32_uart_wire_initialize(nx_stm32_uart_state_t* port, uint32_t clock_hz,
+                              const nx_stm32_uart_wire_config_t* config) {
     nx_result_t checked = nx_stm32_uart_wire_validate(port, config);
     if (checked != NX_SUCCESS)
         return checked;

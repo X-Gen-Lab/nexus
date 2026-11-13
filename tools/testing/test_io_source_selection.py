@@ -12,6 +12,38 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class IOSourceSelectionTests(unittest.TestCase):
+    def test_uart_wire_public_surface_excludes_provider_register_settings(self):
+        compiler = shutil.which("cc")
+        self.assertIsNotNone(compiler, "Prepared C compiler is required")
+        with tempfile.TemporaryDirectory(prefix="nexus wire boundary ") as folder:
+            root = Path(folder)
+            sources = {
+                "public": ('#include "nexus/io/uart_wire.h"\n'
+                           'nx_uart_wire_mode_t mode = NX_UART_WIRE_LIN;\n'),
+                "private": ('#include "stm32f4_uart_wire_config.h"\n'
+                            'const nx_stm32_uart_wire_config_t wire = {\n'
+                            ' .mode = NX_UART_WIRE_SMARTCARD,\n'
+                            ' .prescaler = 21U, .guard_time = 16U };\n'),
+                "leaked": ('#include "nexus/io/uart_wire.h"\n'
+                           'nx_uart_wire_config_t wire;\n'),
+            }
+            for name, source in sources.items():
+                path = root / (name + ".c")
+                path.write_text(source)
+                command = [compiler, "-std=c11", "-Wall", "-Wextra", "-Werror",
+                           "-pedantic", "-I" + str(ROOT / "io/include"),
+                           "-I" + str(ROOT / "core/include"),
+                           "-I" + str(ROOT / "soc/stm32/stm32f4/private"),
+                           "-c", str(path), "-o", str(root / (name + ".o"))]
+                result = subprocess.run(command, capture_output=True,
+                                        text=True, timeout=30)
+                with self.subTest(name=name):
+                    if name == "leaked":
+                        self.assertNotEqual(result.returncode, 0,
+                                            "Public wire API leaks raw settings")
+                    else:
+                        self.assertEqual(result.returncode, 0, result.stderr)
+
     def sources(self, kinds=(), *, family="stm32f4", components=(),
                 external_component=False, required_target=None):
         with tempfile.TemporaryDirectory(prefix="nexus io sources ") as folder:
@@ -52,8 +84,8 @@ static nx_result_t exchange(void* context, nx_i2c_message_t* messages,
         messages[1].length != 2U || !messages[1].read)
         return NX_ERROR_INVALID;
     ++*(unsigned*)context;
-    messages[1].data[0] = 0x12U;
-    messages[1].data[1] = 0x34U;
+    messages[1].buffer.rx[0] = 0x12U;
+    messages[1].buffer.rx[1] = 0x34U;
     *transferred = 3U;
     return NX_SUCCESS;
 }

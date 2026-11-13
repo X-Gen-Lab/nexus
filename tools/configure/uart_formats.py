@@ -14,12 +14,16 @@ FIFO_THRESHOLDS = ("eighth", "quarter", "half", "three-quarters",
 
 @dataclass(frozen=True)
 class UartFormatPolicy:
-    """SoC-owned format review, independent of the actual mode support gate."""
+    """SoC-owned format review, independent of the actual mode support gate.
+
+    byte_frames lists exact (payload bits, parity) pairs. The generic frame
+    grammar does not inherit the first provider's hardware word lengths.
+    """
 
     fifo: tuple[str, int] | None = None
     words: tuple[str, ...] = ()
     irq_probe: bool = False
-    byte_frames: bool = False
+    byte_frames: tuple[tuple[int, str], ...] = ()
 
 
 _NO_FORMATS = UartFormatPolicy()
@@ -71,7 +75,7 @@ def validate(selection, route, provider):
         return
     if not isinstance(frame, dict) or set(frame) != set(DEFAULT):
         fail("UART frame requires data_bits, parity, stop_bits and flow")
-    bits = integer(frame["data_bits"], 7, 9, "UART frame data bits")
+    bits = integer(frame["data_bits"], 5, 9, "UART frame data bits")
     integer(frame["stop_bits"], 1, 2, "UART frame stop bits")
     if (not isinstance(frame["parity"], str) or
             frame["parity"] not in {"none", "even", "odd"}):
@@ -82,9 +86,6 @@ def validate(selection, route, provider):
         return
     if frame["flow"] != "none":
         fail("UART flow requires separately reviewed RTS/CTS Board routes")
-    if (bits == 7 and frame["parity"] == "none" or
-            bits == 9 and frame["parity"] != "none"):
-        fail("UART frame requires 7E/O, 8N/E/O or independent 9N1 words")
     if words:
         if frame != {**DEFAULT, "data_bits": 9}:
             fail("Word UART currently requires exact 9N1 without flow control")
@@ -95,9 +96,11 @@ def validate(selection, route, provider):
         fail("Nine-bit words require the independent irq-words mode")
     if frame == DEFAULT:
         return
-    if (not policy.byte_frames or
-            selection["mode"] != "irq-byte-event"):
+    if selection["mode"] != "irq-byte-event":
         fail("UART frame provider requires a reviewed byte IRQ mode")
+    if (bits, frame["parity"]) not in policy.byte_frames:
+        fail(f"UART frame provider does not support {bits}-bit data "
+             f"with {frame['parity']} parity")
 
 
 def expression(frame):
@@ -220,7 +223,7 @@ def receive_editor_schema(properties, fields, record):
             {"data_bits", "parity", "stop_bits", "flow"},
             {"data_bits", "parity", "stop_bits", "flow"})
         frame = properties["frame"]["properties"]
-        frame["data_bits"] = {"enum": [7, 8, 9]}
+        frame["data_bits"] = {"enum": [5, 6, 7, 8, 9]}
         frame["stop_bits"] = {"enum": [1, 2]}
         frame["parity"] = {"enum": ["none", "even", "odd"]}
         frame["flow"] = {"const": "none"}

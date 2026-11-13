@@ -68,6 +68,63 @@ struct nx_timer_pulse_port {
 };
 /** \brief The same typed face when operations are invoked directly. */
 typedef nx_timer_pulse_port_t nx_timer_pulse_t;
+/** \brief Admit one finite pulse without changing the selected waveform shape.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[in,out] request: Original stable storage under the operation
+ * loan contract. \return Provider result, INVALID for malformed public objects,
+ * or UNSUPPORTED when this selected operation is absent. \note The selected
+ * owner defines context and timing. Dispatch retains no references, starts no
+ * worker and never revokes a live borrow. Provider admission still checks
+ * private state and payload aliases. The original argument reaches that owner
+ * without a temporary or format conversion.
+ */
+nx_result_t nx_timer_pulse_port_submit(const nx_timer_pulse_port_t* port,
+                                       nx_timer_pulse_request_t* request);
+/** \brief Request pulse withdrawal while retaining the original request loan.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[in,out] request: Original stable storage under the operation
+ * loan contract. \return Provider result, INVALID for malformed public objects,
+ * or UNSUPPORTED when this selected operation is absent. \note The selected
+ * owner defines context and timing. Dispatch retains no references, starts no
+ * worker and never revokes a live borrow. Provider admission still checks
+ * private state and payload aliases. The original argument reaches that owner
+ * without a temporary or format conversion.
+ */
+nx_result_t nx_timer_pulse_port_cancel(const nx_timer_pulse_port_t* port,
+                                       nx_timer_pulse_request_t* request);
+/** \brief Advance bounded completion or withdrawal; SUCCESS alone is not
+ * settlement. \param[in] port: Stable face under the selected serialized
+ * execution contract. \return Provider result, INVALID for malformed public
+ * objects, or UNSUPPORTED when this selected operation is absent. \note The
+ * selected owner defines context and timing. Dispatch retains no references,
+ * starts no worker and never revokes a live borrow. Provider admission still
+ * checks private state and payload aliases. The original argument reaches that
+ * owner without a temporary or format conversion.
+ */
+nx_result_t nx_timer_pulse_port_service(const nx_timer_pulse_port_t* port);
+/** \brief Join the finite pulse before reporting that its source has stopped.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \return Provider result, INVALID for malformed public objects, or
+ *         UNSUPPORTED when this selected operation is absent.
+ * \note The selected owner defines context and timing. Dispatch retains no
+ *       references, starts no worker and never revokes a live borrow. Provider
+ *       admission still checks private state and payload aliases. The original
+ *       argument reaches that owner without a temporary or format conversion.
+ */
+nx_result_t nx_timer_pulse_port_stop(const nx_timer_pulse_port_t* port);
+/** \brief Copy selected units and current source observations.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[out] state: Independent output, changed only as the provider
+ * contract permits. \return Provider result, INVALID for malformed public
+ * objects, or UNSUPPORTED when this selected operation is absent. \note The
+ * selected owner defines context and timing. Dispatch retains no references,
+ * starts no worker and never revokes a live borrow. Provider admission still
+ * checks private state and payload aliases. The original argument reaches that
+ * owner without a temporary or format conversion.
+ */
+nx_result_t nx_timer_pulse_port_state(const nx_timer_pulse_port_t* port,
+                                      nx_timer_pulse_state_t* state);
+
 #ifdef __cplusplus
 }
 #endif

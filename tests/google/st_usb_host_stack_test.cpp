@@ -29,6 +29,14 @@ class StackTransport {
     MOCK_METHOD(nx_result_t, Submit, (uint8_t, nx_usb_host_request_t*));
     MOCK_METHOD(nx_result_t, Service, ());
     MOCK_METHOD(nx_result_t, Restart, (nx_time_us_t));
+    MOCK_METHOD(nx_result_t, Requirements,
+                (uint8_t, size_t, nx_usb_host_storage_requirements_t*),
+                (const));
+    static nx_result_t Storage(const void* p, uint8_t pipe, size_t length,
+                               nx_usb_host_storage_requirements_t* out) {
+        return static_cast<const StackTransport*>(p)->Requirements(pipe, length,
+                                                                   out);
+    }
     static nx_result_t StartAgain(void* p, nx_time_us_t deadline) {
         return static_cast<StackTransport*>(p)->Restart(deadline);
     }
@@ -61,7 +69,8 @@ static const nx_usb_host_ops_t stack_ops = {StackTransport::OpenPipe,
                                             StackTransport::Read,
                                             nullptr,
                                             nullptr,
-                                            StackTransport::Close};
+                                            StackTransport::Close,
+                                            StackTransport::Storage};
 
 class StUsbHostStack : public testing::Test {
   protected:
@@ -80,6 +89,16 @@ class StUsbHostStack : public testing::Test {
             slots[i].storage = staging[i];
             slots[i].capacity = sizeof(staging[i]);
         }
+        EXPECT_CALL(transport, Requirements(_, _, _))
+            .Times(testing::AnyNumber())
+            .WillRepeatedly(Invoke([this](uint8_t pipe, size_t length,
+                                          auto* out) {
+                const size_t bytes = (slots[pipe].pipe.endpoint_address & 0x80U)
+                                         ? slots[pipe].pipe.max_packet
+                                         : length;
+                *out = {(bytes + 3U) & ~size_t{3U}, 4U};
+                return NX_SUCCESS;
+            }));
     }
     void Start() {
         EXPECT_CALL(transport, State(_)).WillOnce(Invoke([](auto* out) {
@@ -133,6 +152,50 @@ class StUsbHostStack : public testing::Test {
         EXPECT_EQ(nx_st_usb_host_stack_close(&stack), NX_SUCCESS);
     }
 };
+
+TEST_F(StUsbHostStack,
+       QueriedStorageControlsPaddingWithoutFixedWordAssumptions) {
+    slots[0].storage = staging[0] + 1U;
+    slots[0].capacity = 127U;
+    Start();
+    Open(false);
+    uint8_t bytes[] = {1U, 2U, 3U};
+    std::memset(slots[0].storage, 0x5a, slots[0].capacity);
+    EXPECT_CALL(transport, Requirements(0U, 3U, _))
+        .WillOnce(Invoke([](uint8_t, size_t, auto* out) {
+            *out = {7U, 1U};
+            return NX_SUCCESS;
+        }));
+    EXPECT_CALL(transport, Submit(0U, &slots[0].request))
+        .WillOnce(Invoke([this, &bytes](uint8_t, auto* request) {
+            EXPECT_EQ(0, std::memcmp(request->bytes, bytes, sizeof(bytes)));
+            for (size_t i = 3U; i < 7U; ++i)
+                EXPECT_EQ(0U, request->bytes[i]);
+            EXPECT_EQ(0x5aU, request->bytes[7]);
+            return nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+        }));
+    ASSERT_EQ(USBH_OK, USBH_LL_SubmitURB(&stack.middleware, 0U, 0U,
+                                         USB_EP_TYPE_BULK, 1U, bytes, 3U, 0U));
+    nx_request_settle(&slots[0].request.base, NX_SUCCESS, 3U);
+}
+
+TEST_F(StUsbHostStack,
+       QueriedStorageOverBudgetRejectsBeforeStagingOrAdmission) {
+    Start();
+    Open(false);
+    uint8_t bytes[] = {1U, 2U, 3U};
+    std::memset(staging[0], 0x5a, sizeof(staging[0]));
+    EXPECT_CALL(transport, Requirements(0U, 3U, _))
+        .WillOnce(Invoke([](uint8_t, size_t, auto* out) {
+            *out = {2048U, 1U};
+            return NX_SUCCESS;
+        }));
+    EXPECT_EQ(USBH_FAIL,
+              USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_BULK, 1U,
+                                bytes, 3U, 0U));
+    EXPECT_EQ(0x5aU, staging[0][0]);
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&slots[0].request.base));
+}
 
 TEST_F(StUsbHostStack, InvalidStagingRejectsBeforeTransportOrVbusEffects) {
     slots[1].storage = slots[0].storage;

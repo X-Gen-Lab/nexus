@@ -28,11 +28,28 @@ typedef enum {
     NX_FLASH_READ_PERMANENT
 } nx_flash_read_protection_t;
 
+/** \brief Fixed-width intended-supply profile, never a register encoding. */
+typedef uint8_t nx_flash_brownout_t;
+/**
+ * \brief Named brownout supply profiles; providers declare supported choices.
+ * \note Supply names describe intended operating profiles, not exact reset
+ *       thresholds or measured voltages. Device limits and tolerances remain
+ *       authoritative; a provider rejects choices it cannot implement.
+ *       UNKNOWN is an unset selection and is always rejected before effects.
+ */
+enum nx_flash_brownout_profiles {
+    NX_FLASH_BROWNOUT_UNKNOWN = 0,
+    NX_FLASH_BROWNOUT_DISABLED,
+    NX_FLASH_BROWNOUT_SUPPLY_2V1,
+    NX_FLASH_BROWNOUT_SUPPLY_2V4,
+    NX_FLASH_BROWNOUT_SUPPLY_2V7
+};
+
 /** \brief Complete desired physical options; no product layout is implied. */
 typedef struct {
     nx_flash_read_protection_t read_protection;
     uint32_t write_protected_sectors;
-    uint8_t brownout_level; /**< Encoded BOR field: 0=level3 .. 3=disabled. */
+    nx_flash_brownout_t brownout; /**< Explicit intended-supply profile. */
     bool hardware_watchdog;
     bool reset_on_stop;
     bool reset_on_standby;

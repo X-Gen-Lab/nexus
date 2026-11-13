@@ -10,6 +10,7 @@
 extern "C" {
 #include "stm32f407_system.h"
 #include "stm32f4_dma2d.h"
+#include "stm32f4_graphics_memory.h"
 }
 #include <cstring>
 #include <gtest/gtest.h>
@@ -28,6 +29,10 @@ struct Hardware {
     bool transfer_error_on_abort = false;
     bool refuse_gate_enable = false, refuse_gate_disable = false;
     unsigned writes = 0, peripheral_reads = 0;
+    unsigned graphics_attaches = 0, graphics_checks = 0, graphics_detaches = 0;
+    alignas(8) uint8_t bank_metadata[64]{};
+    nx_result_t attach_result = NX_SUCCESS, check_result = NX_SUCCESS;
+    nx_result_t detach_result = NX_SUCCESS;
 } * hardware;
 
 /* External pixel memory behavior follows RM0386 10.3.4/6/7. This is not a
@@ -132,6 +137,8 @@ class ImageOwner : public testing::Test {
     uint8_t* memory = nullptr;
     nx_stm32_system_t* system = nullptr;
     nx_dma_memory_region_t region{};
+    /* Retained graphics metadata belongs to the whole fixture lifetime. */
+    nx_stm32_sdram_graphics_t graphics_binding{};
     nx_stm32_image_config_t config{};
     nx_stm32_image_state_t state{};
     nx_image_request_t request{}, other{};
@@ -161,7 +168,8 @@ class ImageOwner : public testing::Test {
                   {NX_IRQ_KERNEL_NONE, 93, 4, 0},
                   10,
                   0,
-                  5};
+                  5,
+                  nullptr};
         nx_request_initialize(&request.base);
         nx_request_initialize(&other.base);
     }
@@ -441,6 +449,19 @@ TEST_F(ImageOwner, RejectionLeavesRequestAndRegistersUnchanged) {
     EXPECT_EQ(nx_image_port_submit(&port, &request), NX_ERROR_TIMEOUT);
     EXPECT_EQ(std::memcmp(&before, &request, sizeof(request)), 0);
     EXPECT_EQ(std::memcmp(&regs, &model.registers, sizeof(regs)), 0);
+}
+
+TEST_F(ImageOwner, CpuOnlySdramAddressDoesNotGrantAnImageBusMasterLoan) {
+    open();
+    fill();
+    request.operation.destination.data =
+        reinterpret_cast<void*>(UINT32_C(0xc0000000));
+    const auto before = request;
+    const auto registers = model.registers;
+    EXPECT_EQ(NX_ERROR_PERMISSION, nx_image_port_submit(&port, &request));
+    EXPECT_EQ(0, std::memcmp(&before, &request, sizeof(request)));
+    EXPECT_EQ(0, std::memcmp(&registers, &model.registers, sizeof(registers)));
+    EXPECT_EQ(nullptr, state.active);
 }
 
 TEST_F(ImageOwner, RefusedIRQJoinAndPriorityRestoreRetainColdOwnership) {
@@ -760,6 +781,71 @@ TEST_F(ImageOwner, ProductionAdmissionExcludesTheWholeConcreteSystemOwner) {
     EXPECT_EQ(model.writes, writes);
 }
 
+TEST_F(ImageOwner, GraphicsAttachmentRefusalPrecedesAnyControllerEffect) {
+    config.graphics_memory = &graphics_binding;
+    model.attach_result = NX_ERROR_STATE;
+    const auto writes = model.writes;
+    EXPECT_EQ(nx_stm32_image_prepare(&state, &config), NX_ERROR_STATE);
+    EXPECT_EQ(model.graphics_attaches, 1U);
+    EXPECT_EQ(model.writes, writes);
+    EXPECT_EQ(model.rcc.AHB1ENR & RCC_AHB1ENR_DMA2DEN, 0U);
+    EXPECT_EQ(nx_stm32_image_close(&state), NX_SUCCESS);
+    EXPECT_EQ(model.graphics_detaches, 0U);
+}
+TEST_F(ImageOwner, GraphicsHoldSurvivesFailedIrqJoinUntilActualColdClose) {
+    config.graphics_memory = &graphics_binding;
+    open();
+    ASSERT_EQ(model.graphics_attaches, 1U);
+    model.refuse_irq = true;
+    EXPECT_EQ(nx_stm32_image_close(&state), NX_ERROR_BUSY);
+    EXPECT_EQ(model.graphics_detaches, 0U);
+    EXPECT_TRUE(state.memory_attached);
+    model.refuse_irq = false;
+    EXPECT_EQ(nx_stm32_image_close(&state), NX_SUCCESS);
+    EXPECT_EQ(model.graphics_detaches, 1U);
+    EXPECT_FALSE(state.memory_attached);
+}
+TEST_F(ImageOwner,
+       GraphicsDetachFailureRetainsOriginalOwnerAndCanRetryAfterGateOff) {
+    config.graphics_memory = &graphics_binding;
+    open();
+    model.detach_result = NX_ERROR_STATE;
+    EXPECT_EQ(nx_stm32_image_close(&state), NX_ERROR_STATE);
+    EXPECT_TRUE(state.owned);
+    EXPECT_TRUE(state.memory_attached);
+    EXPECT_EQ(model.rcc.AHB1ENR & RCC_AHB1ENR_DMA2DEN, 0U);
+    model.detach_result = NX_SUCCESS;
+    EXPECT_EQ(nx_stm32_image_close(&state), NX_SUCCESS);
+    EXPECT_EQ(model.graphics_detaches, 2U);
+    EXPECT_FALSE(state.owned);
+}
+TEST_F(ImageOwner, LostGraphicsBankEvidenceRejectsBeforeRequestBorrow) {
+    config.graphics_memory = &graphics_binding;
+    open();
+    fill();
+    model.check_result = NX_ERROR_STATE;
+    const auto writes = model.writes;
+    EXPECT_EQ(nx_image_port_submit(&port, &request), NX_ERROR_STATE);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    EXPECT_EQ(model.writes, writes);
+    EXPECT_EQ(model.graphics_checks, 1U);
+    EXPECT_EQ(nx_stm32_image_close(&state), NX_SUCCESS);
+}
+
+TEST_F(ImageOwner, QueryCannotOverwriteTheRetainedBankOwnerMetadata) {
+    config.graphics_memory = &graphics_binding;
+    open();
+    auto* output =
+        reinterpret_cast<nx_image_constraints_t*>(model.bank_metadata);
+    const auto before = model;
+    EXPECT_EQ(nx_image_port_query(&port, NX_IMAGE_FILL, NX_IMAGE_RGB565,
+                                  NX_IMAGE_RGB565, NX_IMAGE_RGB565, output),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(model.bank_metadata, before.bank_metadata,
+                          sizeof(model.bank_metadata)),
+              0);
+}
+
 } /* namespace */
 
 extern "C" uint32_t nx_img_model_read(volatile uint32_t* reg) {
@@ -841,4 +927,44 @@ extern "C" void nx_img_model_irq_set_priority(uint32_t priority) {
 }
 extern "C" uint32_t HAL_GetTick(void) {
     return static_cast<uint32_t>(hardware->now / 1000U);
+}
+
+/* The SDRAM owner is an external lifetime dependency in this engine model.
+ * Its original-lease rules are tested by the real SDRAM provider program. */
+extern "C" nx_result_t
+nx_stm32_sdram_graphics_attach(nx_stm32_sdram_graphics_t*,
+                               nx_stm32_sdram_graphics_master_t master,
+                               const void* consumer, const void* system) {
+    EXPECT_EQ(master, NX_STM32_SDRAM_GRAPHICS_DMA2D);
+    EXPECT_NE(consumer, nullptr);
+    EXPECT_NE(system, nullptr);
+    EXPECT_EQ(hardware->rcc.AHB1ENR & RCC_AHB1ENR_DMA2DEN, 0U);
+    ++hardware->graphics_attaches;
+    return hardware->attach_result;
+}
+extern "C" nx_result_t
+nx_stm32_sdram_graphics_check(const nx_stm32_sdram_graphics_t*,
+                              nx_stm32_sdram_graphics_master_t master,
+                              const void*, const void*) {
+    EXPECT_EQ(master, NX_STM32_SDRAM_GRAPHICS_DMA2D);
+    ++hardware->graphics_checks;
+    return hardware->check_result;
+}
+extern "C" nx_result_t
+nx_stm32_sdram_graphics_detach(nx_stm32_sdram_graphics_t*,
+                               nx_stm32_sdram_graphics_master_t master,
+                               const void*) {
+    EXPECT_EQ(master, NX_STM32_SDRAM_GRAPHICS_DMA2D);
+    EXPECT_EQ(hardware->rcc.AHB1ENR & RCC_AHB1ENR_DMA2DEN, 0U);
+    ++hardware->graphics_detaches;
+    return hardware->detach_result;
+}
+
+extern "C" bool
+nx_stm32_sdram_graphics_overlaps(const nx_stm32_sdram_graphics_t*,
+                                 const void* storage, size_t bytes) {
+    const auto first = reinterpret_cast<uintptr_t>(hardware->bank_metadata);
+    const auto start = reinterpret_cast<uintptr_t>(storage);
+    return start < first + sizeof(hardware->bank_metadata) &&
+           first < start + bytes;
 }

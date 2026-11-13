@@ -81,3 +81,36 @@ TEST_F(Stm32Chip, ObservationCannotReplaceTheReadOnlyUidRegisters) {
     EXPECT_EQ(g_nx_chip_model_uid[1], 0xabcdef23U);
     EXPECT_EQ(g_nx_chip_model_uid[2], 0x87654321U);
 }
+TEST_F(Stm32Chip, UidUsesCallerStorageAndOpaqueBytesWithoutWordLayout) {
+    size_t size = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_chip_uid_read(nullptr, 0U, &size));
+    EXPECT_EQ(12U, size);
+    uint8_t bytes[16];
+    std::memset(bytes, 0x55, sizeof(bytes));
+    ASSERT_EQ(NX_SUCCESS, nx_chip_uid_read(bytes, sizeof(bytes), &size));
+    const uint8_t expected[] = {0x78U, 0x56U, 0x34U, 0x12U, 0x23U, 0xefU,
+                                0xcdU, 0xabU, 0x21U, 0x43U, 0x65U, 0x87U};
+    EXPECT_EQ(12U, size);
+    EXPECT_EQ(0, std::memcmp(bytes, expected, sizeof(expected)));
+    EXPECT_EQ(0x55U, bytes[12]);
+}
+TEST_F(Stm32Chip, UidRejectionKeepsCallerOutputsAndRegistersUnchanged) {
+    size_t size = 123U;
+    uint8_t bytes[16];
+    std::memset(bytes, 0x55, sizeof(bytes));
+    EXPECT_EQ(NX_ERROR_OVERFLOW, nx_chip_uid_read(bytes, 11U, &size));
+    EXPECT_EQ(123U, size);
+    EXPECT_EQ(0x55U, bytes[0]);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_chip_uid_read(g_nx_chip_model_uid, 12U, &size));
+    EXPECT_EQ(0x12345678U, g_nx_chip_model_uid[0]);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_chip_uid_read(bytes, sizeof(bytes),
+                               reinterpret_cast<size_t*>(bytes)));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_chip_uid_read(nullptr, 1U, &size));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_chip_uid_read(bytes, 12U, nullptr));
+    privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_chip_uid_read(bytes, sizeof(bytes), &size));
+    EXPECT_EQ(123U, size);
+    EXPECT_EQ(0x55U, bytes[0]);
+}

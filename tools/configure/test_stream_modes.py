@@ -51,8 +51,8 @@ class AdcContinuousConfigurationTests(unittest.TestCase):
                 self.assertIn("nx_stm32_adc_continuous_prepare", source)
                 self.assertIn("nx_stm32_adc_stream_config_t", source)
                 self.assertIn("s_nx_adc_samples_samples[] = { 0u, 7u }", source)
-                self.assertIn("NX_FACTORY_CAP_RX_DMA", source)
-                self.assertIn("NX_FACTORY_CAP_BLOCK_STREAM", source)
+                self.assertIn("NX_IO_CAP_RX_DMA", source)
+                self.assertIn("NX_IO_CAP_BLOCK_STREAM", source)
 
     def test_continuous_requires_explicit_bounded_irq_policy(self):
         for family in ('stm32f4',):
@@ -125,7 +125,7 @@ class UartReceiveConfigurationTests(unittest.TestCase):
                     self.assertIn(
                         f"nx_{prefix}_{implementation}_cold_prepare", source)
                     self.assertNotIn(".dma_transmit", source)
-                    self.assertIn("NX_FACTORY_CAP_RX_DMA", source)
+                    self.assertIn("NX_IO_CAP_RX_DMA", source)
                     self.assertNotIn("static uint8_t s_nx_rx_link[", source)
                     self.assertNotIn("static nx_uart_rx_event_t s_nx_rx_link[", source)
                     self.assertIn(f"void {dma}_", source)

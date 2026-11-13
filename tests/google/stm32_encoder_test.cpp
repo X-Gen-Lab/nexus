@@ -30,7 +30,7 @@ class Stm32Encoder : public testing::Test {
     void* mapping = MAP_FAILED;
     alignas(nx_encoder_sample_t) nx_stm32_encoder_state_t state{};
     alignas(nx_encoder_sample_t) nx_stm32_encoder_config_t config{
-        TIM3, NX_ENCODER_MODE_X4_TI12, 3U, 7U, false, true};
+        TIM3, NX_ENCODER_MODE_X4, 3U, 7U, false, true};
     nx_encoder_t face{&nx_stm32_encoder_ops, &state};
     void SetUp() override {
         mapping =
@@ -93,11 +93,11 @@ TEST_F(Stm32Encoder, ThreeWidthsAndCountingModesKeepRawPositionAcrossStop) {
                {TIM4, GPIOB, RCC_APB1ENR_TIM4EN, 6U},
                {TIM5, GPIOA, RCC_APB1ENR_TIM5EN, 0U}};
     for (const auto& selected : timers) {
-        for (const auto mode : {NX_ENCODER_MODE_X2_TI1, NX_ENCODER_MODE_X2_TI2,
-                                NX_ENCODER_MODE_X4_TI12}) {
+        for (const auto mode :
+             {NX_ENCODER_MODE_X2_A, NX_ENCODER_MODE_X2_B, NX_ENCODER_MODE_X4}) {
             config.registers = selected.timer;
             config.mode = mode;
-            config.invert_a = mode == NX_ENCODER_MODE_X2_TI1;
+            config.invert_a = mode == NX_ENCODER_MODE_X2_A;
             ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_prepare(&state, &config));
             EXPECT_EQ(RCC_APB1ENR_TIM7EN | selected.clock, RCC->APB1ENR);
             EXPECT_EQ(0U, selected.timer->DIER);
@@ -129,8 +129,10 @@ TEST_F(Stm32Encoder, ThreeWidthsAndCountingModesKeepRawPositionAcrossStop) {
             EXPECT_EQ(selected.timer == TIM5 ? 32U : 16U, info.counter_bits);
             EXPECT_EQ(84000000U, info.filter_clock_hz);
             EXPECT_EQ(mode, info.mode);
-            EXPECT_EQ(3U, info.filter_a);
-            EXPECT_EQ(7U, info.filter_b);
+            EXPECT_EQ(1U, info.filter_a.clock_divisor);
+            EXPECT_EQ(8U, info.filter_a.consecutive_samples);
+            EXPECT_EQ(4U, info.filter_b.clock_divisor);
+            EXPECT_EQ(8U, info.filter_b.consecutive_samples);
             EXPECT_TRUE(info.running);
             ASSERT_EQ(NX_SUCCESS, nx_encoder_stop(&face));
             EXPECT_EQ(0U, selected.timer->CR1 & TIM_CR1_CEN);
@@ -145,12 +147,32 @@ TEST_F(Stm32Encoder, ThreeWidthsAndCountingModesKeepRawPositionAcrossStop) {
     }
 }
 
+TEST_F(Stm32Encoder, FilterFactsDescribeSamplingInsteadOfRegisterCodes) {
+    const uint8_t divisors[] = {0U, 1U, 1U,  1U,  2U,  2U,  4U,  4U,
+                                8U, 8U, 16U, 16U, 16U, 32U, 32U, 32U};
+    const uint8_t samples[] = {0U, 2U, 4U, 8U, 6U, 8U, 6U, 8U,
+                               6U, 8U, 5U, 6U, 8U, 5U, 6U, 8U};
+    for (uint8_t code = 0U; code < 16U; ++code) {
+        SCOPED_TRACE(code);
+        config.filter_a = code;
+        config.filter_b = 15U - code;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_prepare(&state, &config));
+        nx_encoder_state_t info{};
+        ASSERT_EQ(NX_SUCCESS, nx_encoder_state(&face, &info));
+        EXPECT_EQ(divisors[code], info.filter_a.clock_divisor);
+        EXPECT_EQ(samples[code], info.filter_a.consecutive_samples);
+        EXPECT_EQ(divisors[15U - code], info.filter_b.clock_divisor);
+        EXPECT_EQ(samples[15U - code], info.filter_b.consecutive_samples);
+        EXPECT_FALSE(info.running);
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_close(&state));
+    }
+}
+
 TEST_F(Stm32Encoder, AdvancedTimersKeepRawPositionAndUseTheirApb2FilterClock) {
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
     for (TIM_TypeDef* timer : {TIM1, TIM8}) {
         for (nx_encoder_mode_t mode :
-             {NX_ENCODER_MODE_X2_TI1, NX_ENCODER_MODE_X2_TI2,
-              NX_ENCODER_MODE_X4_TI12}) {
+             {NX_ENCODER_MODE_X2_A, NX_ENCODER_MODE_X2_B, NX_ENCODER_MODE_X4}) {
             SCOPED_TRACE(timer);
             SCOPED_TRACE(mode);
             config = {timer, mode, 3U, 7U, false, true};
@@ -185,7 +207,7 @@ TEST_F(Stm32Encoder,
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
     for (TIM_TypeDef* timer : {TIM1, TIM8}) {
         SCOPED_TRACE(timer);
-        config = {timer, NX_ENCODER_MODE_X4_TI12, 0U, 0U, false, false};
+        config = {timer, NX_ENCODER_MODE_X4, 0U, 0U, false, false};
         const uint32_t gate =
             timer == TIM1 ? RCC_APB2ENR_TIM1EN : RCC_APB2ENR_TIM8EN;
         const unsigned peer = timer == TIM1 ? 24U : 43U;
@@ -232,8 +254,8 @@ TEST_F(Stm32Encoder, RefusedSourceWithdrawalKeepsSessionAndClockForRetry) {
 TEST_F(Stm32Encoder, LiveCountersAndShutdownKeepOtherInstancesIndependent) {
     nx_stm32_encoder_state_t peers[2]{};
     const nx_stm32_encoder_config_t configs[]{
-        {TIM4, NX_ENCODER_MODE_X2_TI1, 0U, 0U, false, false},
-        {TIM5, NX_ENCODER_MODE_X2_TI2, 1U, 2U, true, false}};
+        {TIM4, NX_ENCODER_MODE_X2_A, 0U, 0U, false, false},
+        {TIM5, NX_ENCODER_MODE_X2_B, 1U, 2U, true, false}};
     const nx_encoder_t faces[]{face,
                                {&nx_stm32_encoder_ops, &peers[0]},
                                {&nx_stm32_encoder_ops, &peers[1]}};
@@ -319,7 +341,7 @@ TEST_F(Stm32Encoder, ForeignClockControllerAndVectorAreNeverAdopted) {
 
 TEST_F(Stm32Encoder, UnsupportedInputsRejectBeforeAnyHardwareWrite) {
     for (unsigned invalid = 0U; invalid < 4U; ++invalid) {
-        config = {TIM3, NX_ENCODER_MODE_X4_TI12, 0U, 0U, false, false};
+        config = {TIM3, NX_ENCODER_MODE_X4, 0U, 0U, false, false};
         if (invalid == 0U)
             config.registers = TIM9;
         if (invalid == 1U)

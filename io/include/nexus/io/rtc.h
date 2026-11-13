@@ -35,6 +35,15 @@ typedef struct {
     const void* identity;
     uint64_t generation;
 } nx_rtc_domain_t;
+/** \brief Nominal period as reference ticks divided by their declared rate.
+ * \note A zero tick count means disabled. The rate is positive. This reports
+ *       selected quantization, not measured oscillator accuracy, calibration
+ *       error, interrupt delivery time or elapsed Core time.
+ */
+typedef struct {
+    uint64_t ticks;
+    uint32_t ticks_per_second;
+} nx_rtc_period_t;
 /** \brief Calendar and setting domain copied in one serialized operation. */
 typedef struct {
     nx_rtc_domain_t domain;
@@ -158,6 +167,24 @@ nx_result_t nx_rtc_port_service(const nx_rtc_port_t* port);
  * lifetime still covers external joins.
  */
 nx_result_t nx_rtc_port_stop(const nx_rtc_port_t* port);
+/** \brief Configure periodic wake by duration without hardware counter codes.
+ * \param[in] port: Same serialized privileged RTC task owner.
+ * \param[in] period_us: Positive requested nominal period; zero disables.
+ * \param[in] tolerance_us: Maximum permitted absolute nominal quantization
+ *                         error. Zero requires exact representation.
+ * \param[out] actual: Separate stable output, unchanged on failure.
+ * \return SUCCESS, INVALID, UNSUPPORTED for an unrepresentable period within
+ *         the tolerance, or the provider's context/lifecycle/hardware error.
+ * \note Bounded synchronous control, no retained output or hidden worker.
+ *       The provider chooses the counter and reports its nominal period;
+ *       ties select the shorter period. Failed hardware withdrawal can retain
+ *       cleanup responsibility until stop succeeds. No wake route or Core
+ *       deadline is configured. Output must not overlap live provider storage.
+ */
+nx_result_t nx_rtc_port_periodic_wakeup(const nx_rtc_port_t* port,
+                                        uint64_t period_us,
+                                        uint32_t tolerance_us,
+                                        nx_rtc_period_t* actual);
 #ifdef __cplusplus
 }
 #endif

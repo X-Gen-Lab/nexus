@@ -1051,6 +1051,26 @@ TEST_F(F407HalCold, UnsupportedFrameRejectsBeforeAnyPinOrClockWrite) {
     Returned();
 }
 
+TEST_F(F407HalCold, GenericFramesStillRequireF407WordLengthAdmission) {
+    const nx_uart_format_t formats[] = {
+        {5U, NX_UART_PARITY_NONE, NX_UART_STOP_1, NX_UART_FLOW_NONE},
+        {6U, NX_UART_PARITY_EVEN, NX_UART_STOP_1, NX_UART_FLOW_NONE},
+        {7U, NX_UART_PARITY_NONE, NX_UART_STOP_1, NX_UART_FLOW_NONE},
+        {9U, NX_UART_PARITY_EVEN, NX_UART_STOP_1, NX_UART_FLOW_NONE},
+    };
+    for (auto selected : formats) {
+        format = selected;
+        config.uart.format = &format;
+        SCOPED_TRACE(static_cast<unsigned>(format.data_bits));
+        EXPECT_EQ(nx_stm32_uart_hal_cold_prepare(&state, &config, &receipt),
+                  NX_ERROR_UNSUPPORTED);
+        EXPECT_EQ(s_cold_writes, 0U);
+        EXPECT_EQ(s_uart_enables, 0U);
+        EXPECT_EQ(state.config, nullptr);
+        Returned();
+    }
+}
+
 TEST_F(F407HalCold, UnsupportedDmaRouteRejectsBeforeEffects) {
     config.transmit.channel = 3U;
     EXPECT_EQ(nx_stm32_uart_hal_cold_prepare(&state, &config, &receipt),

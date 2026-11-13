@@ -40,6 +40,38 @@ nx_result_t toggle(void* context, uint32_t mask) {
 
 const nx_gpio_ops_t operations = {write, read, toggle};
 
+TEST(PolymorphicGPIO, LogicalSignalsHidePhysicalPolarityAndPinMask) {
+    StrictMock<GPIOProvider> provider;
+    const nx_gpio_port_t port = {&operations, &provider};
+    const nx_gpio_signal_t enable = {&port, 8U, false};
+    EXPECT_CALL(provider, write(0U, 8U)).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(provider, write(8U, 0U)).WillOnce(Return(NX_SUCCESS));
+    EXPECT_EQ(nx_gpio_signal_write(&enable, true), NX_SUCCESS);
+    EXPECT_EQ(nx_gpio_signal_write(&enable, false), NX_SUCCESS);
+
+    bool active = false;
+    EXPECT_CALL(provider, read(::testing::_))
+        .WillOnce(::testing::DoAll(::testing::SetArgPointee<0>(0U),
+                                   Return(NX_SUCCESS)));
+    EXPECT_EQ(nx_gpio_signal_read(&enable, &active), NX_SUCCESS);
+    EXPECT_TRUE(active);
+    EXPECT_CALL(provider, read(::testing::_)).WillOnce(Return(NX_ERROR_IO));
+    EXPECT_EQ(nx_gpio_signal_read(&enable, &active), NX_ERROR_IO);
+    EXPECT_TRUE(active);
+}
+
+TEST(PolymorphicGPIO, InvalidLogicalBindingRejectsBeforeHardwareAccess) {
+    StrictMock<GPIOProvider> provider;
+    const nx_gpio_port_t port = {&operations, &provider};
+    const nx_gpio_signal_t empty = {&port, 0U, true};
+    const nx_gpio_signal_t group = {&port, 3U, true};
+    bool active = false;
+    EXPECT_EQ(nx_gpio_signal_write(&empty, true), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_gpio_signal_read(&group, &active), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_gpio_signal_read(nullptr, &active), NX_ERROR_INVALID);
+    EXPECT_FALSE(active);
+}
+
 TEST(PolymorphicGPIO, SharedOperationsKeepIndependentInstanceContext) {
     StrictMock<GPIOProvider> first;
     StrictMock<GPIOProvider> second;

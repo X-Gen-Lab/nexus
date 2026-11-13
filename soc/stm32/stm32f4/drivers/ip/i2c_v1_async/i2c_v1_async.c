@@ -17,9 +17,11 @@
 
 /* The SDK wrapper asserts every layout and mask before using this
  * algorithm. There is no per-byte virtual register access in firmware. */
-_Static_assert(NX_I2C_MAX_MESSAGES <= UINT8_MAX &&
-                   NX_I2C_MAX_MESSAGE_BYTES <= UINT16_MAX &&
-                   NX_I2C_MAX_MESSAGES * NX_I2C_MAX_MESSAGE_BYTES <= UINT16_MAX,
+_Static_assert(NX_I2C_BOUNDED_MAX_MESSAGES <= UINT8_MAX &&
+                   NX_I2C_BOUNDED_MAX_MESSAGE_BYTES <= UINT16_MAX &&
+                   NX_I2C_BOUNDED_MAX_MESSAGES *
+                           NX_I2C_BOUNDED_MAX_MESSAGE_BYTES <=
+                       UINT16_MAX,
                "bounded I2C controller indices fit their exact storage");
 
 #define CTL0         0U
@@ -221,7 +223,7 @@ static void prepare_message(nx_i2c_v1_state_t* state) {
             message->read ? &state->dma->rx : &state->dma->tx;
         NX_I2C_V1_DMA_ACK(engine->clear, DMA_FLAGS << engine->flag_shift);
         *engine->peripheral = (uint32_t)(uintptr_t)&state->registers[DATA];
-        *engine->memory = (uint32_t)(uintptr_t)message->data;
+        *engine->memory = (uint32_t)(uintptr_t)nx_i2c_message_data(message);
         *engine->count = (uint32_t)message->length;
         *engine->fifo = 0U;
         *engine->control = engine->configuration;
@@ -257,7 +259,8 @@ static nx_result_t start(void* context, nx_i2c_request_t* request,
         nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
-    nx_result_t result = nx_i2c_request_validate(request);
+    nx_result_t result =
+        nx_i2c_request_validate_limits(request, &nx_i2c_bounded_limits);
     if (result != NX_SUCCESS) {
         return result;
     }
@@ -271,7 +274,8 @@ static nx_result_t start(void* context, nx_i2c_request_t* request,
         return NX_ERROR_INVALID;
     for (size_t index = 0U; index < request->count; ++index) {
         const nx_i2c_message_t* message = &request->messages[index];
-        if (!storage_separate(endpoint, message->data, message->length))
+        if (!storage_separate(endpoint, nx_i2c_message_data(message),
+                              message->length))
             return NX_ERROR_INVALID;
     }
     if ((endpoint->address_bits == 10U || request->count > 1U) &&
@@ -293,8 +297,8 @@ static nx_result_t start(void* context, nx_i2c_request_t* request,
         for (size_t i = 0U; i < request->count; ++i) {
             const nx_i2c_message_t* message = &request->messages[i];
             result = nx_dma_buffer_validate(
-                state->dma->regions, state->dma->region_count, message->data,
-                message->length, 1U,
+                state->dma->regions, state->dma->region_count,
+                nx_i2c_message_data(message), message->length, 1U,
                 message->read ? NX_DMA_FROM_DEVICE : NX_DMA_TO_DEVICE);
             if (result != NX_SUCCESS) {
                 return result;
@@ -518,7 +522,7 @@ void nx_i2c_v1_irq(nx_i2c_v1_state_t* state) {
                     end_message(state);
                 }
             } else if (state->phase == NX_I2C_V1_WRITE && (flags & TXE) != 0U) {
-                NX_I2C_V1_WRITE_DATA(state, message->data[state->index]);
+                NX_I2C_V1_WRITE_DATA(state, message->buffer.tx[state->index]);
                 state->registers[CTL1] &= ~BUFFER_IRQ;
                 state->phase = NX_I2C_V1_WRITE_ACK;
             } else if (state->phase == NX_I2C_V1_WRITE_ACK &&
@@ -529,32 +533,33 @@ void nx_i2c_v1_irq(nx_i2c_v1_state_t* state) {
                     end_message(state);
                     next_message(state);
                 } else {
-                    NX_I2C_V1_WRITE_DATA(state, message->data[state->index]);
+                    NX_I2C_V1_WRITE_DATA(state,
+                                         message->buffer.tx[state->index]);
                 }
             } else if (state->phase == NX_I2C_V1_READ_ONE &&
                        (flags & RXNE) != 0U) {
                 /* Short reads order STOP before the final DR access sequence.
                  */
-                message->data[state->index++] = NX_I2C_V1_READ_DATA(state);
+                message->buffer.rx[state->index++] = NX_I2C_V1_READ_DATA(state);
                 ++state->transferred;
                 next_message(state);
             } else if ((state->phase == NX_I2C_V1_READ_TWO ||
                         (state->phase == NX_I2C_V1_READ && remaining == 2U)) &&
                        (flags & BTF) != 0U) {
                 end_message(state);
-                message->data[state->index++] = NX_I2C_V1_READ_DATA(state);
-                message->data[state->index++] = NX_I2C_V1_READ_DATA(state);
+                message->buffer.rx[state->index++] = NX_I2C_V1_READ_DATA(state);
+                message->buffer.rx[state->index++] = NX_I2C_V1_READ_DATA(state);
                 state->transferred += 2U;
                 next_message(state);
             } else if (state->phase == NX_I2C_V1_READ && remaining == 3U &&
                        (flags & BTF) != 0U) {
                 state->registers[CTL0] &= ~ACK;
-                message->data[state->index++] = NX_I2C_V1_READ_DATA(state);
+                message->buffer.rx[state->index++] = NX_I2C_V1_READ_DATA(state);
                 ++state->transferred;
                 state->registers[CTL1] &= ~BUFFER_IRQ;
             } else if (state->phase == NX_I2C_V1_READ && remaining > 3U &&
                        (flags & RXNE) != 0U) {
-                message->data[state->index++] = NX_I2C_V1_READ_DATA(state);
+                message->buffer.rx[state->index++] = NX_I2C_V1_READ_DATA(state);
                 ++state->transferred;
                 if (remaining == 4U) {
                     state->registers[CTL1] &= ~BUFFER_IRQ;

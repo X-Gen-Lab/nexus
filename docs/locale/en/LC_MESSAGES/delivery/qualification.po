@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: e7aaee2b0b7c0b21302869e6ebf41a0ba016ed52106c4f5e12ced1a0627d8dd2\n"
+"X-Nexus-Source-SHA256: 552538ca5afbd210c01b3357dab7d43f0d342a4e690301856b483ccafae05f94\n"
 
 #: ../../../docs/delivery/qualification.md:1
 msgid "软件验证与物理资格"
@@ -195,3 +195,6 @@ msgstr ""
 
 msgid "当前生产 SoC 只维护 F4，精确器件与模式见[支持范围](support.md)。F407 Board 与 新增料号的内部 CRC 软件参考分别记录，不把某一参考的 ARM／SDK 结果扩展到全部 模式。其他系列原始记录保留原源码身份。ThreadX、FreeRTOS、Native、寄存器模型、 ARM 链接与物理执行分别判断，链接程序不证明 scheduler 已运行；本轮结果不继承历史计数。"
 msgstr "F4 is the only production SoC scope; see [support scope](support.md) for exact devices and modes. F407 Boards and internal-CRC software references for added parts are recorded separately; ARM/SDK evidence for one reference does not extend to every mode. Records for other series retain their original source identity. ThreadX, FreeRTOS, Native, register models, ARM linkage and physical execution are assessed separately. A linked program does not prove scheduler execution, and current results inherit no historical counts."
+
+msgid "本轮便携 I/O 的结果入口为 [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62)。 平台实现 `6b59f666` 的四种 Native 模式分别完成完整执行；最终 `4bf4b5a2` 仅修正 SDK 参考调用者，并在 clean source 上完成 34 个消费者及搬移前后完整性验证。 原始失败和后续成功记录分别保留，完整 SDK 通过不把先前失败改为成功。静态分析 保留完整扫描及唯一受影响上下文的修正重验；文档与 ARM 参考构建保留各自实际输入， 不将它们改写为最终提交重新执行。后续文档和测试夹具修正须在同一 PR 保留各自 适用检查、合并源码及 SDK 身份，旧记录仍适用于原提交。"
+msgstr "[PR #62](https://github.com/X-Gen-Lab/nexus/pull/62) is the results entry point for this portable I/O iteration. The four Native modes for platform implementation `6b59f666` each completed their full execution; final `4bf4b5a2` only corrected an SDK reference caller and completed 34 consumers and integrity verification before and after relocation on clean source. Original failures and later successes are retained separately; a complete SDK pass does not turn earlier failures into successes. Static analysis retains the full scan and correction/replay of the sole affected context. Documentation and ARM reference builds retain their actual inputs and are not relabeled as new executions at the final commit. Subsequent documentation and test-fixture corrections must retain their own applicable checks, merged source and SDK identities in the same PR; old records continue to apply to their original commits."

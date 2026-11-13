@@ -22,20 +22,20 @@ typedef enum {
 #define NX_EXTI_EVENT_LOSS      1u
 #define NX_EXTI_EVENT_COALESCED 2u
 /**
- * \brief           Edge facts; timestamp precision and coalescing are
- *                  provider-specific.
+ * \brief           Facts from one bound input source, without physical IDs.
  *
  * \note            LOSS is an independent boundary after older buffered facts
  *                  and before later facts. Its edge is invalid; its timestamp
  *                  is detection/report time, never a reconstructed missing
  *                  edge. For COALESCED facts, edge may derive from the sampled
  *                  raw source after an IRQ and does not represent complete edge
- *                  history.
+ *                  history. The face identifies the source; queue consumers
+ *                  do not interpret physical EXTI line or IRQ numbers.
+ *                  Timestamp precision and coalescing remain provider-specific.
  */
 typedef struct {
     nx_time_us_t timestamp_us;
     uint32_t flags;
-    uint8_t line;
     nx_exti_edge_t edge;
 } nx_exti_event_t;
 
@@ -125,7 +125,9 @@ nx_result_t nx_exti_port_stop(const nx_exti_port_t* port);
  *
  * \return          Success or CONTEXT/STATE/PERMISSION/UNSUPPORTED.
  *
- * \note            Actual shared-vector priority must satisfy the target. Stop
+ * \note            Runtime integrators bind the configured kernel policy here;
+ *                  ordinary event consumers do not choose interrupt priorities.
+ *                  Actual shared-vector priority must satisfy the target. Stop
  *                  and join publishers before freeing old target storage. Wake
  *                  callbacks observe already-latched event or loss facts.
  */

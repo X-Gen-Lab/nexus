@@ -54,11 +54,21 @@ nx_result_t nx_nand_id(const nx_nand_port_t* p, uint8_t* bytes, size_t count) {
     return p->ops->id == NULL ? NX_ERROR_UNSUPPORTED
                               : p->ops->id(p->context, bytes, count);
 }
-nx_result_t nx_nand_status(const nx_nand_port_t* p, uint8_t* status) {
-    if (!valid(p) || !output(p, status, sizeof(*status), _Alignof(uint8_t)))
+nx_result_t nx_nand_status(const nx_nand_port_t* p, nx_nand_status_t* status) {
+    if (!valid(p) ||
+        !output(p, status, sizeof(*status), _Alignof(nx_nand_status_t)))
         return NX_ERROR_INVALID;
     return p->ops->status == NULL ? NX_ERROR_UNSUPPORTED
                                   : p->ops->status(p->context, status);
+}
+/** \brief The provider describes its actual code profile without conversion. */
+nx_result_t nx_nand_ecc_format(const nx_nand_port_t* p,
+                               nx_nand_ecc_format_t* format) {
+    if (!valid(p) ||
+        !output(p, format, sizeof(*format), _Alignof(nx_nand_ecc_format_t)))
+        return NX_ERROR_INVALID;
+    return p->ops->ecc_format == NULL ? NX_ERROR_UNSUPPORTED
+                                      : p->ops->ecc_format(p->context, format);
 }
 nx_result_t nx_nand_submit(const nx_nand_port_t* p,
                            nx_nand_request_t* request) {

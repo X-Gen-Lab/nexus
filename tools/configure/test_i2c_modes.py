@@ -59,16 +59,16 @@ class I2cAsyncConfigurationTests(unittest.TestCase):
                     self.assertNotIn(f"&nx_{prefix}_i2c_async_ops,", source)
                     self.assertIn("nx_i2c_v1_irq(&s_nx_port_bus)", source)
                     self.assertIn(f"nx_{prefix}_i2c_async_close(&s_nx_port_bus,", source)
-                    self.assertIn("NX_FACTORY_CAP_IRQ", source)
+                    self.assertIn("NX_IO_CAP_IRQ", source)
                     self.assertNotIn(f"nx_{prefix}_i2c_initialize(", source)
                     if mode == "dma-messages":
                         self.assertIn("nx_i2c_v1_dma_irq", source)
                         self.assertIn(dma + "EN", source)
-                        self.assertIn("NX_FACTORY_CAP_TX_DMA", source)
-                        self.assertIn("NX_FACTORY_CAP_RX_DMA", source)
+                        self.assertIn("NX_IO_CAP_TX_DMA", source)
+                        self.assertIn("NX_IO_CAP_RX_DMA", source)
                     else:
                         self.assertNotIn("static const nx_i2c_v1_dma_t", source)
-                        self.assertNotIn("NX_FACTORY_CAP_TX_DMA", source)
+                        self.assertNotIn("NX_IO_CAP_TX_DMA", source)
 
     def test_async_requires_explicit_irq_and_polling_rejects_irq_options(self):
         for family in ('stm32f4',):
@@ -148,7 +148,10 @@ class I2cAsyncConfigurationTests(unittest.TestCase):
                     output = self.root / f'{mode}-{rate}'
                     gate.configure(path, output, test_support=native_fixture(path))
                     source = (output / 'nexus_factory.h').read_text()
-                    self.assertIn('uint32_t nominal_hz;', source)
+                    self.assertIn('const nx_i2c_traits_t* nx_factory_i2c_traits(',
+                                  source)
+                    common = (gate.ROOT / 'io/include/nexus/io/traits.h').read_text()
+                    self.assertIn('uint32_t nominal_hz;', common)
 
     def test_ten_bit_address_duplicates_reject(self):
         path = self.authored('stm32f4', 'irq-messages')

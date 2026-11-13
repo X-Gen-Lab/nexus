@@ -977,7 +977,7 @@ class SdioAsync : public SdioBlock {
         config.irq_priority = 6U;
         nx_request_initialize(&request.base);
         ASSERT_EQ(NX_SUCCESS, nx_request_prepare(&request.base, 1000000U));
-        request.data = data.data();
+        request.buffer.rx = data.data();
         request.data_bytes = data.size();
         request.first_block = 1U;
         request.blocks = 1U;
@@ -995,6 +995,54 @@ class SdioAsync : public SdioBlock {
 };
 
 #ifndef NX_SDIO_LOW_CLOCK_ONLY
+TEST_F(SdioAsync, TypedWriteConsumesConstSourceUntilActualSettlement) {
+    Activate();
+    alignas(4) const std::array<uint8_t, 512> source{1U, 2U, 3U, 4U};
+    ASSERT_EQ(NX_SUCCESS, nx_block_write_prepare(&request, 1U, source.data(),
+                                                 source.size(), 1U, 1000000U));
+    EXPECT_EQ(source.data(), request.buffer.tx);
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    Pump();
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_SUCCESS, request.base.result);
+    EXPECT_EQ(source.size(), request.base.transferred);
+    ASSERT_EQ(128U, written_words.size());
+    EXPECT_EQ(WordAt(source.data(), 0U), written_words.front());
+}
+
+TEST_F(SdioAsync, TypedPreparationCannotReplaceAnAcceptedReceiveLoan) {
+    Activate();
+    ASSERT_EQ(NX_SUCCESS, nx_block_read_prepare(&request, 1U, data.data(),
+                                                data.size(), 1U, 1000000U));
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
+    alignas(4) const std::array<uint8_t, 512> source{};
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_block_write_prepare(&request, 2U, source.data(), source.size(),
+                                     1U, 1000000U));
+    EXPECT_FALSE(request.write);
+    EXPECT_EQ(data.data(), request.buffer.rx);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
+    ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
+    nx_block_async_service(&async_face);
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    ASSERT_EQ(NX_SUCCESS, nx_block_write_prepare(&request, 2U, source.data(),
+                                                 source.size(), 1U, 1000000U));
+    EXPECT_TRUE(request.write);
+    EXPECT_EQ(source.data(), request.buffer.tx);
+}
+
+TEST_F(SdioAsync, TypedPreparationRejectsOverlapAndAddressWrapWithoutMutation) {
+    std::array<uint8_t, sizeof(request)> before{};
+    std::memcpy(before.data(), &request, before.size());
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_block_read_prepare(&request, 1U, &request, sizeof(request), 1U,
+                                    1000000U));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_block_read_prepare(&request, UINT64_MAX, data.data(),
+                                    data.size(), 2U, 1000000U));
+    EXPECT_EQ(0, std::memcmp(before.data(), &request, sizeof(request)));
+}
+
 TEST_F(SdioAsync, ExactIrqLeaseIsAcquiredAndRestored) {
     NVIC_SetPriority(SDIO_IRQn, 11U);
     Prepare();
@@ -1009,7 +1057,7 @@ TEST_F(SdioAsync, IrqDataCompletesOnlyAfterThreadDrainAndCrc) {
     Activate();
     ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
     EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
-    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(&request.base, execution.active);
     for (unsigned i = 0U; i < 16U; ++i)
         Irq();
     EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
@@ -1030,7 +1078,7 @@ TEST_F(SdioAsync, LateIrqCannotAccessASettledRequestOrBuffer) {
     Pump();
     ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
     data.fill(0x6aU);
-    request.data = nullptr;
+    request.buffer.rx = nullptr;
     Irq();
     EXPECT_EQ(0x6aU, data[0]);
     EXPECT_EQ(0x6aU, data[511]);
@@ -1043,7 +1091,7 @@ TEST_F(SdioAsync, CancellationRetainsTheBorrowUntilHostWithdrawal) {
     Irq();
     ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
     EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&request.base));
-    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(&request.base, execution.active);
     nx_block_async_service(&async_face);
     EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
     EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
@@ -1059,7 +1107,7 @@ TEST_F(SdioAsync, RefusedWithdrawalQuarantinesAndRetainsColdOwner) {
     refused_write = &SDIO->DCTRL;
     nx_block_async_service(&async_face);
     EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
-    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(&request.base, execution.active);
     EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_sdio_close(&owner, &config, &receipt));
     EXPECT_TRUE(receipt.owned);
     refused_write = nullptr;
@@ -1139,7 +1187,7 @@ TEST_F(SdioAsync, InvalidAndConcurrentAdmissionHaveNoBorrowOrCommand) {
 
 TEST_F(SdioAsync, RequestAndBufferCannotOverlap) {
     Activate();
-    request.data = &request;
+    request.buffer.rx = &request;
     request.data_bytes = 512U;
     EXPECT_EQ(NX_ERROR_INVALID, nx_block_async_submit(&async_face, &request));
     EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
@@ -1162,7 +1210,7 @@ class SdioDma : public SdioAsync {
         config.engine = NX_STM32_SDIO_DMA;
         config.dma_regions = &region;
         config.dma_region_count = 1U;
-        request.data = sram;
+        request.buffer.rx = sram;
         request.data_bytes = 4096U;
         RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
     }
@@ -1235,7 +1283,7 @@ TEST_F(SdioDma, CcmAndExternalWindowsCannotBecomeDmaBuffers) {
     Activate();
     auto before = commands.size();
     for (uintptr_t address : {UINT32_C(0x10000000), UINT32_C(0x68000000)}) {
-        request.data = reinterpret_cast<void*>(address);
+        request.buffer.rx = reinterpret_cast<void*>(address);
         EXPECT_EQ(NX_ERROR_PERMISSION,
                   nx_block_async_submit(&async_face, &request));
         EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
@@ -1250,7 +1298,7 @@ TEST_F(SdioDma, RefusedDmaDisableKeepsMemoryAndRequestQuarantined) {
     refused_write = &DMA2_Stream3->CR;
     nx_block_async_service(&async_face);
     EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
-    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(&request.base, execution.active);
     EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_sdio_close(&owner, &config, &receipt));
     refused_write = nullptr;
     nx_block_async_service(&async_face);
@@ -1266,7 +1314,7 @@ TEST_F(SdioDma, DmaTransferErrorCannotBeHiddenBySdioDataEnd) {
     DmaIrq();
     nx_block_async_service(&async_face);
     EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
-    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(&request.base, execution.active);
     EXPECT_EQ(UINT32_C(0x20000000), DMA2_Stream3->M0AR);
     /* TE does not promise a later TC. This separate hardware flush event
      * exercises only the case where an actual terminal receipt does arrive. */
@@ -1305,7 +1353,7 @@ TEST_F(SdioDma, ReceiveFifoWritesRemainBorrowedAfterTheEnableBitClears) {
     nx_block_async_service(&async_face);
     EXPECT_EQ(0U, DMA2_Stream3->CR & DMA_SxCR_EN);
     EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
-    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(&request.base, execution.active);
     EXPECT_EQ(UINT32_C(0x20000000), DMA2_Stream3->M0AR);
     EXPECT_EQ(UINT32_C(0xfffe), DMA2_Stream3->NDTR);
     EXPECT_FALSE(dma_reprogrammed_during_flush);
@@ -1321,6 +1369,7 @@ TEST_F(SdioDma, ReceiveFifoWritesRemainBorrowedAfterTheEnableBitClears) {
 TEST_F(SdioDma, TransmitCopiesRetainColdResponsibilityWithoutBorrowingRam) {
     nx_block_request_t next{};
     Activate();
+    request.buffer.tx = nx_block_request_data(&request);
     request.write = true;
     ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
     ASSERT_EQ(4U, dma_prefetched_words);
@@ -1337,7 +1386,7 @@ TEST_F(SdioDma, TransmitCopiesRetainColdResponsibilityWithoutBorrowingRam) {
         ASSERT_EQ(NX_SUCCESS, nx_block_port_sync(&face, 1000000U));
         nx_request_initialize(&next.base);
         ASSERT_EQ(NX_SUCCESS, nx_request_prepare(&next.base, 1000000U));
-        next.data = sram;
+        next.buffer.rx = sram;
         next.data_bytes = 4096U;
         next.blocks = 1U;
         EXPECT_EQ(NX_ERROR_BUSY, nx_block_async_submit(&async_face, &next));
@@ -1356,10 +1405,11 @@ TEST_F(SdioDma, TransmitCopiesRetainColdResponsibilityWithoutBorrowingRam) {
 
 TEST_F(SdioDma, BoundedTransmitReadsOnlyItsSpanAndWaitsForMediaReadiness) {
     Activate();
+    request.buffer.tx = nx_block_request_data(&request);
     request.write = true;
-    request.data = static_cast<uint8_t*>(sram) + 4096U - 512U;
+    request.buffer.tx = static_cast<uint8_t*>(sram) + 4096U - 512U;
     request.data_bytes = 512U;
-    std::memset(request.data, 0xa5, 512U);
+    std::memset(static_cast<uint8_t*>(sram) + 4096U - 512U, 0xa5, 512U);
     ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
     EXPECT_EQ(0U, DMA2_Stream3->CR & DMA_SxCR_PFCTRL);
     EXPECT_EQ(128U, DMA2_Stream3->NDTR);
@@ -1398,6 +1448,7 @@ TEST_F(SdioDma, RetiredStreamProfileCannotRetainAnotherMemoryTargetOrBurst) {
         DMA_SxCR_DBM | DMA_SxCR_CT | DMA_SxCR_MBURST_1 | DMA_SxCR_PBURST_1;
     DMA2_Stream3->M1AR = UINT32_C(0x20000400);
     Activate();
+    request.buffer.tx = nx_block_request_data(&request);
     request.write = true;
     ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
     EXPECT_EQ(0U,
@@ -1442,6 +1493,7 @@ TEST_F(SdioDma, LateDmaErrorIsObservedBeforeFlagsAreAcknowledged) {
 
 TEST_F(SdioAsync, IrqWritesWaitForMediaProgrammingReadiness) {
     Activate();
+    request.buffer.tx = nx_block_request_data(&request);
     request.write = true;
     data.fill(0x5aU);
     ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
@@ -1455,6 +1507,7 @@ TEST_F(SdioAsync, IrqWritesWaitForMediaProgrammingReadiness) {
 
 TEST_F(SdioAsync, CancelledFifoLevelCannotStarveTheThreadThatDrainsIt) {
     Activate();
+    request.buffer.tx = nx_block_request_data(&request);
     request.write = true;
     ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
     refused_write = &SDIO->MASK;
@@ -1467,7 +1520,7 @@ TEST_F(SdioAsync, CancelledFifoLevelCannotStarveTheThreadThatDrainsIt) {
     EXPECT_NE(0U, execution.flags & SDIO_STA_DCRCFAIL);
     EXPECT_EQ(0U, execution.words);
     EXPECT_TRUE(written_words.empty());
-    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(&request.base, execution.active);
     EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&request.base));
     refused_write = nullptr;
     nx_block_async_service(&async_face);
@@ -1497,7 +1550,7 @@ TEST_F(SdioDma, CancelledLateDmaFlagsAreRetainedWithoutALevelInterruptLoop) {
     EXPECT_EQ(0U, NVIC_GetEnableIRQ(DMA2_Stream3_IRQn));
     EXPECT_TRUE(execution.dma_complete);
     EXPECT_NE(0U, execution.flags & SDIO_STA_RXOVERR);
-    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(&request.base, execution.active);
     EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&request.base));
     EXPECT_EQ(UINT32_C(0x20000000), DMA2_Stream3->M0AR);
     refused_write = nullptr;
@@ -1740,7 +1793,7 @@ TEST_F(MmcEightAsync, IrqAndDmaRetainTheSameEightBitDataAndDrainContract) {
         ASSERT_EQ(NX_SUCCESS, nx_block_port_activate(&face, 1000000U));
         nx_request_initialize(&request.base);
         ASSERT_EQ(NX_SUCCESS, nx_request_prepare(&request.base, 1000000U));
-        request.data = sram;
+        request.buffer.rx = sram;
         request.data_bytes = 512U;
         request.blocks = 1U;
         ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
@@ -1848,16 +1901,20 @@ class SdioIo : public SdioAsync {
         InitializeIoCard();
         config.protocol = NX_STM32_SDIO_IO;
         config.io = &io_state;
-        nx_request_initialize(&io_request.transfer.base);
-        ASSERT_EQ(NX_SUCCESS,
-                  nx_request_prepare(&io_request.transfer.base, 1000000U));
-        io_request.transfer.data = data.data();
-        io_request.transfer.data_bytes = data.size();
-        io_request.transfer.blocks = 1U;
+        nx_request_initialize(&io_request.base);
+        ASSERT_EQ(NX_SUCCESS, nx_request_prepare(&io_request.base, 1000000U));
+        io_request.data = data.data();
+        io_request.data_bytes = data.size();
+        io_request.blocks = 1U;
         io_request.function = 1U;
         io_request.address = 0x100U;
         io_request.unit_bytes = 5U;
         io_request.increment = true;
+    }
+    void Activate() {
+        Prepare();
+        card_enabled = true;
+        ASSERT_EQ(NX_SUCCESS, nx_sdio_io_activate(&io_face, 1000000U));
     }
     void Enable() {
         ASSERT_EQ(NX_SUCCESS, nx_sdio_io_enable(&io_face, 1U, true, 1000000U));
@@ -1871,6 +1928,58 @@ class SdioIo : public SdioAsync {
 };
 
 #ifndef NX_SDIO_LOW_CLOCK_ONLY
+TEST_F(SdioIo, LimitsDescribePreparedHostWithoutDiscoveringOrStartingACard) {
+    nx_sdio_io_limits_t limits{};
+    limits.max_blocks = 7U;
+    EXPECT_EQ(NX_ERROR_STATE, nx_sdio_io_limits(&io_face, &limits));
+    EXPECT_EQ(7U, limits.max_blocks);
+    Prepare();
+    const auto before_writes = writes;
+    const auto before_time = time_calls;
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_limits(&io_face, &limits));
+    EXPECT_EQ(config.max_blocks, limits.max_blocks);
+    EXPECT_EQ(2048U, limits.max_block_bytes);
+    EXPECT_EQ(4U, limits.buffer_alignment);
+    EXPECT_EQ(1U, limits.unit_bytes_multiple);
+    EXPECT_TRUE(limits.power_of_two_block_bytes);
+    EXPECT_EQ(before_writes, writes);
+    EXPECT_EQ(before_time, time_calls);
+    EXPECT_TRUE(commands.empty());
+    EXPECT_EQ(NX_BLOCK_STOPPED, nx_block_port_state(&face));
+}
+
+TEST_F(SdioIo, LimitsRejectOwnerOverlapAndIllegalContextWithoutEffects) {
+    Prepare();
+    const auto before_writes = writes;
+    auto* alias = reinterpret_cast<nx_sdio_io_limits_t*>(&owner);
+    EXPECT_EQ(NX_ERROR_INVALID, nx_sdio_io_limits(&io_face, alias));
+    EXPECT_EQ(&config, owner.config);
+    nx_sdio_io_limits_t limits{};
+    limits.max_blocks = 7U;
+    privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_sdio_io_limits(&io_face, &limits));
+    privileged = true;
+    EXPECT_EQ(7U, limits.max_blocks);
+    EXPECT_EQ(before_writes, writes);
+}
+
+TEST_F(SdioIo, DomainStopKeepsLiveLoanUntilExplicitTransferJoin) {
+    Activate();
+    Enable();
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
+    const auto before = commands.size();
+    EXPECT_EQ(NX_ERROR_BUSY, nx_sdio_io_stop(&io_face, 1000000U));
+    EXPECT_EQ(before, commands.size());
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&io_request.base));
+    EXPECT_EQ(&io_request.base, execution.active);
+    IoPump();
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_stop(&io_face, 1000000U));
+    EXPECT_EQ(0U, io_registers[0][2]);
+    EXPECT_EQ(0U, io_registers[0][3]);
+    EXPECT_EQ(0U, io_registers[0][4]);
+}
+
 TEST_F(SdioIo, Cmd5CccrFbrAndCisAreDistinctFromMemoryGeometry) {
     r3_crc = true;
     Activate();
@@ -1939,11 +2048,11 @@ TEST_F(SdioIo, ByteCmd53CopiesOnlyTheExactOddExtentAndNeverRounds) {
         io_registers[1][0x100U + index] = static_cast<uint8_t>(index + 1U);
     data[5] = 0xa5U;
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
-    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&io_request.transfer.base));
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&io_request.base));
     IoPump();
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(NX_SUCCESS, io_request.transfer.base.result);
-    EXPECT_EQ(5U, io_request.transfer.base.transferred);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(NX_SUCCESS, io_request.base.result);
+    EXPECT_EQ(5U, io_request.base.transferred);
     EXPECT_EQ(1U, data[0]);
     EXPECT_EQ(5U, data[4]);
     EXPECT_EQ(0xa5U, data[5]);
@@ -1958,13 +2067,13 @@ TEST_F(SdioIo, BlockCmd53UsesConfiguredUnitsAndConfirmedPrefixes) {
     Enable();
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_block_size(&io_face, 1U, 64U, 1000000U));
     io_request.unit_bytes = 64U;
-    io_request.transfer.blocks = 2U;
+    io_request.blocks = 2U;
     io_request.block_mode = true;
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
     IoPump();
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(NX_SUCCESS, io_request.transfer.base.result);
-    EXPECT_EQ(128U, io_request.transfer.base.transferred);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(NX_SUCCESS, io_request.base.result);
+    EXPECT_EQ(128U, io_request.base.transferred);
     std::vector<uint32_t> io_args;
     for (size_t index = 0U; index < commands.size(); ++index)
         if (commands[index] == 53U)
@@ -1982,12 +2091,12 @@ TEST_F(SdioIo, FixedAddressWritesKeepFunctionFifoSemantics) {
     data[2] = 0x56U;
     io_request.unit_bytes = 3U;
     io_request.increment = false;
-    io_request.transfer.write = true;
+    io_request.write = true;
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
     IoPump();
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(NX_SUCCESS, io_request.transfer.base.result);
-    EXPECT_EQ(3U, io_request.transfer.base.transferred);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(NX_SUCCESS, io_request.base.result);
+    EXPECT_EQ(3U, io_request.base.transferred);
     EXPECT_EQ(0x56U, io_registers[1][0x100U]);
 }
 
@@ -1998,8 +2107,8 @@ TEST_F(SdioIo, CancelledFunctionRequiresExplicitAbortBeforeRecovery) {
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_cancel(&io_face, &io_request));
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(NX_ERROR_CANCELLED, io_request.transfer.base.result);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, io_request.base.result);
     EXPECT_EQ(NX_BLOCK_UNCERTAIN, nx_block_port_state(&face));
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_sync(&io_face, 1000000U));
     EXPECT_EQ(1U, io_registers[0][6] & 7U);
@@ -2013,10 +2122,10 @@ TEST_F(SdioIo, WholeDescriptorAndIncrementingAddressArePreflighted) {
     io_request.address = 0x1fffeU;
     EXPECT_EQ(NX_ERROR_INVALID, nx_sdio_io_submit(&io_face, &io_request));
     io_request.address = 0x100U;
-    io_request.transfer.data = &io_request.address;
+    io_request.data = &io_request.address;
     EXPECT_EQ(NX_ERROR_INVALID, nx_sdio_io_submit(&io_face, &io_request));
     EXPECT_EQ(before, commands.size());
-    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&io_request.transfer.base));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&io_request.base));
 }
 
 TEST_F(SdioIo, FunctionInterruptIsOnlyAHintUntilPendingAndDeviceAck) {
@@ -2042,7 +2151,7 @@ TEST_F(SdioIo, FunctionInterruptIsOnlyAHintUntilPendingAndDeviceAck) {
 TEST_F(SdioIo, StoppingDisablesFunctionsAndNeverSendsMemoryStatus) {
     Activate();
     Enable();
-    ASSERT_EQ(NX_SUCCESS, nx_block_port_stop(&face, 1000000U));
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_stop(&io_face, 1000000U));
     EXPECT_EQ(0U, io_registers[0][2]);
     EXPECT_EQ(0U, io_registers[0][4]);
     EXPECT_EQ(commands.end(), std::find(commands.begin(), commands.end(), 13U));
@@ -2057,9 +2166,9 @@ TEST_F(SdioIo, PollingFunctionsUseTheSameFiniteLoanWithoutIrqOrWorker) {
     EXPECT_EQ(0U, SDIO->MASK);
     for (unsigned count = 0U; count < 8U; ++count)
         nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(NX_SUCCESS, io_request.transfer.base.result);
-    EXPECT_EQ(5U, io_request.transfer.base.transferred);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(NX_SUCCESS, io_request.base.result);
+    EXPECT_EQ(5U, io_request.base.transferred);
 }
 
 TEST_F(SdioIo, FailedIoResetCannotReleasePreviouslyEnabledFunctions) {
@@ -2089,7 +2198,7 @@ TEST_F(SdioIo, PollingFunctionDoesNotConsumeAnUnleasedVectorPendingBit) {
         UINT32_C(1) << (static_cast<unsigned>(SDIO_IRQn) % 32U);
     for (unsigned count = 0U; count < 8U; ++count)
         nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
     EXPECT_EQ(1U, NVIC_GetPendingIRQ(SDIO_IRQn));
 }
 
@@ -2127,9 +2236,9 @@ TEST_F(SdioIo, LateVectorCannotTouchAReusedEnclosingFunctionRequest) {
     Enable();
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
     IoPump();
-    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
     data.fill(0xa6U);
-    io_request.transfer.data = nullptr;
+    io_request.data = nullptr;
     io_request.function = 7U;
     Irq();
     EXPECT_EQ(0xa6U, data[0]);
@@ -2139,7 +2248,7 @@ TEST_F(SdioIo, LateVectorCannotTouchAReusedEnclosingFunctionRequest) {
 TEST_F(SdioIo, KnownRomCannotBecomeACmd53ReceiveDestination) {
     Activate();
     Enable();
-    io_request.transfer.data = reinterpret_cast<void*>(0x08000000U);
+    io_request.data = reinterpret_cast<void*>(0x08000000U);
     const auto before = commands.size();
     nx_result_t result = nx_sdio_io_submit(&io_face, &io_request);
     EXPECT_EQ(NX_ERROR_INVALID, result);
@@ -2167,8 +2276,8 @@ TEST_F(SdioIo, Exact512ByteModeUsesTheStandardZeroCountEncoding) {
     io_request.unit_bytes = 512U;
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
     IoPump();
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(512U, io_request.transfer.base.transferred);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(512U, io_request.base.transferred);
     auto command = std::find(commands.begin(), commands.end(), 53U);
     ASSERT_NE(commands.end(), command);
     EXPECT_EQ(0U, arguments[static_cast<size_t>(command - commands.begin())] &
@@ -2181,7 +2290,7 @@ TEST_F(SdioIo, DataCompletionPreservesAnUnconsumedFunctionInterruptArm) {
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_interrupts(&io_face, 2U, 1000000U));
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
     IoPump();
-    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
     EXPECT_NE(0U, SDIO->MASK & SDIO_STA_SDIOIT);
     nx_sdio_io_info_t info{};
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_inspect(&io_face, &info, 1000000U));
@@ -2200,7 +2309,7 @@ TEST_F(SdioIo, SyncRequiresAnExplicitNewInterruptArm) {
     EXPECT_FALSE(io_state.interrupt_armed);
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
     IoPump();
-    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
     EXPECT_EQ(0U, SDIO->MASK & SDIO_STA_SDIOIT);
 }
 
@@ -2248,8 +2357,8 @@ TEST_F(SdioIo, RemovalDrainsTheBorrowWithoutInventingAnAbsentResponse) {
     const auto before = commands.size();
     silence_commands = true;
     nx_sdio_io_service(&io_face);
-    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(NX_ERROR_IO, io_request.transfer.base.result);
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(NX_ERROR_IO, io_request.base.result);
     ASSERT_EQ(NX_SUCCESS, nx_block_port_stop(&face, 1000000U));
     EXPECT_EQ(before, commands.size());
     silence_commands = false;
@@ -2266,20 +2375,37 @@ class SdioIoDma : public SdioDma {
         InitializeIoCard();
         config.protocol = NX_STM32_SDIO_IO;
         config.io = &io_state;
-        nx_request_initialize(&io_request.transfer.base);
-        ASSERT_EQ(NX_SUCCESS,
-                  nx_request_prepare(&io_request.transfer.base, 1000000U));
-        io_request.transfer.data = sram;
-        io_request.transfer.data_bytes = 4096U;
-        io_request.transfer.blocks = 1U;
+        nx_request_initialize(&io_request.base);
+        ASSERT_EQ(NX_SUCCESS, nx_request_prepare(&io_request.base, 1000000U));
+        io_request.data = sram;
+        io_request.data_bytes = 4096U;
+        io_request.blocks = 1U;
         io_request.function = 1U;
         io_request.address = 0x100U;
         io_request.unit_bytes = 64U;
         io_request.increment = true;
     }
+    void Activate() {
+        Prepare();
+        card_enabled = true;
+        ASSERT_EQ(NX_SUCCESS, nx_sdio_io_activate(&io_face, 1000000U));
+    }
 };
 
 #ifndef NX_SDIO_LOW_CLOCK_ONLY
+TEST_F(SdioIoDma, LimitsExposeSelectedDmaStorageWithoutStartingTheEngine) {
+    Prepare();
+    nx_sdio_io_limits_t limits{};
+    const auto before_writes = writes;
+    ASSERT_EQ(NX_SUCCESS, nx_sdio_io_limits(&io_face, &limits));
+    EXPECT_EQ(16U, limits.buffer_alignment);
+    EXPECT_EQ(16U, limits.unit_bytes_multiple);
+    EXPECT_EQ(config.max_blocks, limits.max_blocks);
+    EXPECT_EQ(0U, DMA2_Stream3->CR & DMA_SxCR_EN);
+    EXPECT_EQ(before_writes, writes);
+    EXPECT_TRUE(commands.empty());
+}
+
 TEST_F(SdioIoDma, DmaCmd53StillRequiresCrcBeforeReleasingTheExactBorrow) {
     Activate();
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_enable(&io_face, 1U, true, 1000000U));
@@ -2287,26 +2413,26 @@ TEST_F(SdioIoDma, DmaCmd53StillRequiresCrcBeforeReleasingTheExactBorrow) {
     EXPECT_EQ(UINT32_C(0xffff), DMA2_Stream3->NDTR);
     FinishDma();
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&io_request.transfer.base));
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&io_request.base));
     *const_cast<volatile uint32_t*>(&SDIO->DCOUNT) = 0U;
     *const_cast<volatile uint32_t*>(&SDIO->STA) =
         SDIO_STA_DATAEND | SDIO_STA_DBCKEND;
     Irq();
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(NX_SUCCESS, io_request.transfer.base.result);
-    EXPECT_EQ(64U, io_request.transfer.base.transferred);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(NX_SUCCESS, io_request.base.result);
+    EXPECT_EQ(64U, io_request.base.transferred);
     EXPECT_EQ(nullptr, execution.active);
 }
 
 TEST_F(SdioIoDma, WholeBurstCmd53TransmitUsesItsExactDmaReadExtent) {
     Activate();
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_enable(&io_face, 1U, true, 1000000U));
-    io_request.transfer.write = true;
-    io_request.transfer.data = static_cast<uint8_t*>(sram) + 4096U - 16U;
-    io_request.transfer.data_bytes = 16U;
+    io_request.write = true;
+    io_request.data = static_cast<uint8_t*>(sram) + 4096U - 16U;
+    io_request.data_bytes = 16U;
     io_request.unit_bytes = 16U;
-    std::memset(io_request.transfer.data, 0x5a, 16U);
+    std::memset(io_request.data, 0x5a, 16U);
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_submit(&io_face, &io_request));
     EXPECT_EQ(0U, DMA2_Stream3->CR & DMA_SxCR_PFCTRL);
     EXPECT_EQ(4U, DMA2_Stream3->NDTR);
@@ -2322,15 +2448,15 @@ TEST_F(SdioIoDma, WholeBurstCmd53TransmitUsesItsExactDmaReadExtent) {
     EXPECT_EQ(4U, dma_prefetched_words);
     EXPECT_EQ(reinterpret_cast<uintptr_t>(sram) + 4096U, dma_memory_cursor);
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&io_request.transfer.base));
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&io_request.base));
     missing_crc_end = false;
     *const_cast<volatile uint32_t*>(&SDIO->STA) =
         SDIO_STA_DATAEND | SDIO_STA_DBCKEND;
     Irq();
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(NX_SUCCESS, io_request.transfer.base.result);
-    EXPECT_EQ(16U, io_request.transfer.base.transferred);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(NX_SUCCESS, io_request.base.result);
+    EXPECT_EQ(16U, io_request.base.transferred);
     EXPECT_EQ(commands.end(),
               std::find(commands.begin() + static_cast<ptrdiff_t>(before),
                         commands.end(), 13U));
@@ -2344,7 +2470,7 @@ TEST_F(SdioIoDma, OddDmaExtentIsRejectedWithoutBounceStorageOrCommands) {
     auto before = commands.size();
     io_request.unit_bytes = 5U;
     EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_sdio_io_submit(&io_face, &io_request));
-    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&io_request.transfer.base));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&io_request.base));
     EXPECT_EQ(before, commands.size());
 }
 
@@ -2355,11 +2481,10 @@ TEST_F(SdioIoDma, SubBurstWordsNeverStartDmaOrExposeCallerPadding) {
     for (uint16_t bytes : {uint16_t{4U}, uint16_t{8U}, uint16_t{12U}}) {
         SCOPED_TRACE(bytes);
         io_request.unit_bytes = bytes;
-        io_request.transfer.write = true;
+        io_request.write = true;
         EXPECT_EQ(NX_ERROR_UNSUPPORTED,
                   nx_sdio_io_submit(&io_face, &io_request));
-        EXPECT_EQ(NX_REQUEST_READY,
-                  nx_request_state(&io_request.transfer.base));
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&io_request.base));
         EXPECT_EQ(before, commands.size());
         EXPECT_EQ(0U, dma_prefetched_words);
         EXPECT_EQ(0U, DMA2_Stream3->CR & DMA_SxCR_EN);
@@ -2373,14 +2498,13 @@ TEST_F(SdioIoDma, RefusedDmaWithdrawalQuarantinesTheWholeFunctionRequest) {
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_cancel(&io_face, &io_request));
     refused_write = &DMA2_Stream3->CR;
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_QUARANTINED,
-              nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(&io_request.transfer, execution.active);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&io_request.base));
+    EXPECT_EQ(&io_request.base, execution.active);
     EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_sdio_close(&owner, &config, &receipt));
     refused_write = nullptr;
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(NX_ERROR_CANCELLED, io_request.transfer.base.result);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(NX_ERROR_CANCELLED, io_request.base.result);
 }
 
 TEST_F(SdioIoDma, RefusedCrInterruptWithdrawalAfterTcRetainsTheBorrow) {
@@ -2394,13 +2518,12 @@ TEST_F(SdioIoDma, RefusedCrInterruptWithdrawalAfterTcRetainsTheBorrow) {
     Irq();
     refused_write = &DMA2_Stream3->CR;
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_QUARANTINED,
-              nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(&io_request.transfer, execution.active);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&io_request.base));
+    EXPECT_EQ(&io_request.base, execution.active);
     refused_write = nullptr;
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(NX_ERROR_IO, io_request.transfer.base.result);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(NX_ERROR_IO, io_request.base.result);
 }
 
 TEST_F(SdioIoDma, RefusedFifoInterruptWithdrawalAfterTcRetainsTheBorrow) {
@@ -2414,13 +2537,12 @@ TEST_F(SdioIoDma, RefusedFifoInterruptWithdrawalAfterTcRetainsTheBorrow) {
     Irq();
     refused_write = &DMA2_Stream3->FCR;
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_QUARANTINED,
-              nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(&io_request.transfer, execution.active);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&io_request.base));
+    EXPECT_EQ(&io_request.base, execution.active);
     refused_write = nullptr;
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(NX_ERROR_IO, io_request.transfer.base.result);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(NX_ERROR_IO, io_request.base.result);
 }
 
 TEST_F(SdioIoDma, HalfTransferInterruptsNeverBelongToTheFiniteOwner) {
@@ -2431,7 +2553,7 @@ TEST_F(SdioIoDma, HalfTransferInterruptsNeverBelongToTheFiniteOwner) {
     EXPECT_EQ(0U, DMA2_Stream3->CR & DMA_SxCR_HTIE);
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_cancel(&io_face, &io_request));
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
     EXPECT_EQ(0U, DMA2_Stream3->CR & DMA_SxCR_HTIE);
 }
 
@@ -2443,7 +2565,7 @@ TEST_F(SdioIoDma, ProducerRequestsStopBeforeTheDmaMemoryEngine) {
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_cancel(&io_face, &io_request));
     nx_sdio_io_service(&io_face);
     EXPECT_FALSE(dma_request_order_failed);
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
     enforce_dma_request_order = false;
     nx_sdio_io_service(&io_face);
 }
@@ -2473,6 +2595,7 @@ TEST_F(SdioBlock, ContinuousMemoryReadIsOne512BytePacketStreamWithAStop) {
 
 TEST_F(SdioDma, ContinuousWriteOwnsOneBoundedDmaFrameUntilStopAndProgramReady) {
     Activate();
+    request.buffer.tx = nx_block_request_data(&request);
     request.write = true;
     request.blocks = 2U;
     request.data_bytes = 1024U;
@@ -2498,7 +2621,7 @@ TEST_F(SdioDma, ContinuousWriteOwnsOneBoundedDmaFrameUntilStopAndProgramReady) {
     Irq();
     nx_block_async_service(&async_face);
     EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
-    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(&request.base, execution.active);
     EXPECT_EQ(256U, dma_prefetched_words);
     missing_crc_end = false;
     write_busy = true;
@@ -2549,7 +2672,7 @@ TEST_F(SdioDma, ContinuousReadKeepsTheWholeBorrowThroughTheLastRxFifoWrite) {
     ASSERT_EQ(NX_SUCCESS, nx_block_async_cancel(&async_face, &request));
     nx_block_async_service(&async_face);
     EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
-    EXPECT_EQ(&request, execution.active);
+    EXPECT_EQ(&request.base, execution.active);
     EXPECT_EQ(0x20000000U, DMA2_Stream3->M0AR);
     EXPECT_FALSE(dma_reprogrammed_during_flush);
     CompleteRxDmaFlush();
@@ -2566,9 +2689,9 @@ TEST_F(SdioIoDma, MultipleFunctionUnitsNeverAcquireMemoryStopOrProgramPolicy) {
     Activate();
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_enable(&io_face, 1U, true, 1000000U));
     ASSERT_EQ(NX_SUCCESS, nx_sdio_io_block_size(&io_face, 1U, 16U, 1000000U));
-    io_request.transfer.write = true;
-    io_request.transfer.blocks = 2U;
-    io_request.transfer.data_bytes = 32U;
+    io_request.write = true;
+    io_request.blocks = 2U;
+    io_request.data_bytes = 32U;
     io_request.unit_bytes = 16U;
     io_request.block_mode = true;
     std::memset(sram, 0x3c, 32U);
@@ -2579,9 +2702,9 @@ TEST_F(SdioIoDma, MultipleFunctionUnitsNeverAcquireMemoryStopOrProgramPolicy) {
         Irq();
         nx_sdio_io_service(&io_face);
     }
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(NX_SUCCESS, io_request.transfer.base.result);
-    EXPECT_EQ(32U, io_request.transfer.base.transferred);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_EQ(NX_SUCCESS, io_request.base.result);
+    EXPECT_EQ(32U, io_request.base.transferred);
     const auto first = commands.begin() + static_cast<ptrdiff_t>(begin);
     EXPECT_EQ(2, std::count(first, commands.end(), 53U));
     for (const auto command : {12U, 13U, 18U, 25U})
@@ -2606,6 +2729,7 @@ TEST_F(SdioBlock, AStillActiveDataPathCannotChangeItsWireClock) {
 
 TEST_F(SdioDma, ExpiredBeforeCpsmRetainsNoCardProgrammingResponsibility) {
     Activate();
+    request.buffer.tx = nx_block_request_data(&request);
     request.write = true;
     expire_data_command_on_enable = true;
     data_command_expiration = request.base.deadline;
@@ -2635,13 +2759,12 @@ TEST_F(SdioIoDma, CompletedMemoryCannotHideARefusedHostWithdrawal) {
     Irq();
     refused_write = &SDIO->DCTRL;
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_QUARANTINED,
-              nx_request_state(&io_request.transfer.base));
-    EXPECT_EQ(&io_request.transfer, execution.active);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&io_request.base));
+    EXPECT_EQ(&io_request.base, execution.active);
     refused_write = nullptr;
     nx_sdio_io_service(&io_face);
-    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.transfer.base));
-    EXPECT_NE(NX_SUCCESS, io_request.transfer.base.result);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&io_request.base));
+    EXPECT_NE(NX_SUCCESS, io_request.base.result);
     EXPECT_EQ(nullptr, execution.active);
 }
 
@@ -2666,6 +2789,7 @@ TEST_F(SdioAsync, AStuckCrcFlagCannotConfirmTheFollowingBadPacket) {
 
 TEST_F(SdioDma, LostWriteResponseKeepsMediaRepairWithoutReplayingPayload) {
     Activate();
+    request.buffer.tx = nx_block_request_data(&request);
     request.write = true;
     lose_write_command_response = true;
     const auto begin = commands.size();

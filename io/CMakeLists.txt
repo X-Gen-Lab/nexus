@@ -39,7 +39,6 @@ nexus_io_domain(spi ALIAS IOSPI
     DEPENDS nexus_io_stream)
 nexus_io_domain(i2c ALIAS IOI2C
     SOURCES src/api/i2c.c src/mechanisms/i2c_bus_clear.c
-        src/mechanisms/i2c_long.c
     DEPENDS nexus_io_dma nexus_io_wake)
 nexus_io_domain(i2c_target ALIAS IOI2CTarget SOURCES src/api/i2c_target.c)
 nexus_io_domain(flash ALIAS IOFlash
@@ -104,14 +103,12 @@ nexus_io_domain(lptim ALIAS IOLPTIM SOURCES src/api/lptim.c DEPENDS nexus_io_wak
 nexus_io_domain(entropy ALIAS IOEntropy SOURCES src/api/entropy.c)
 nexus_io_domain(audio ALIAS IOAudio SOURCES src/api/audio.c
     DEPENDS nexus_io_stream)
-foreach(domain capture timer_pulse timer_sequence)
-    add_library(nexus_io_${domain} INTERFACE)
-    target_link_libraries(nexus_io_${domain} INTERFACE
-        nexus_io_contract nexus_io_stream)
-endforeach()
-add_library(Nexus::IOCapture ALIAS nexus_io_capture)
-add_library(Nexus::IOTimerPulse ALIAS nexus_io_timer_pulse)
-add_library(Nexus::IOTimerSequence ALIAS nexus_io_timer_sequence)
+nexus_io_domain(capture ALIAS IOCapture SOURCES src/api/capture.c
+    DEPENDS nexus_io_stream)
+nexus_io_domain(timer_pulse ALIAS IOTimerPulse SOURCES src/api/timer_pulse.c
+    DEPENDS nexus_io_stream)
+nexus_io_domain(timer_sequence ALIAS IOTimerSequence SOURCES src/api/timer_sequence.c
+    DEPENDS nexus_io_stream)
 
 # Common observation is usable without a physical controller. Every other
 # source is compiled only through a selected domain or explicit consumer target.

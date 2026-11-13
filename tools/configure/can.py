@@ -10,7 +10,7 @@ from tools.configure.providers import for_selection
 from tools.configure.providers.common import fail, integer, sequence
 
 FILTER_FIELDS = {"controller", "bank", "id", "mask", "format", "fifo",
-                 "remote", "match_remote"}
+                 "remote", "match_remote", "tag"}
 TIMING_FIELDS = {"prescaler", "segment1", "segment2", "sjw"}
 FIELDS = {"operation", "event_capacity", "bitrate", "timing", "irq_priority",
           "calls_os", "drain_timeout_us", "poll_limit", "fifo_order"}
@@ -34,8 +34,9 @@ def _integration(result, prefix):
     return policy
 
 
-def fields(value, names, context):
-    if not isinstance(value, dict) or set(value) != set(names):
+def fields(value, names, context, optional=()):
+    if (not isinstance(value, dict) or not set(names).issubset(value) or
+            set(value) - set(names) - set(optional)):
         fail(f"CAN {context}: exact fields required")
 
 
@@ -110,13 +111,21 @@ def resolve_domain(authored, selected, soc, provider, claim, claims):
         fail("CAN filter plan exceeds the physical bank domain")
     result = []
     banks = set()
+    tags = set()
+    ordinals = [0, 0]
     claim("can:filter-domain", "can-domain", "static-domain", soc["id"])
     for definition in filters:
-        fields(definition, FILTER_FIELDS, "filter")
+        fields(definition, FILTER_FIELDS - {"tag"}, "filter", {"tag"})
         port = ports.get(definition["controller"])
         if port is None:
             fail("CAN filter references an unselected controller")
         index = provider.CAN_CONTROLLERS.index(port["controller"])
+        ordinals[index] += 1
+        tag = integer(definition.get("tag", ordinals[index]), 1, 65535,
+                      "CAN filter tag")
+        if (index, tag) in tags:
+            fail("CAN filter tag is duplicated within its controller")
+        tags.add((index, tag))
         bank = integer(definition["bank"], 0, 27, "CAN filter bank")
         if bank in banks or (bank >= split if index == 0 else bank < split):
             fail("CAN filter bank is duplicated or belongs to another controller")
@@ -131,7 +140,21 @@ def resolve_domain(authored, selected, soc, provider, claim, claims):
             if type(definition[name]) is not bool:
                 fail("CAN filter " + name + " must be boolean")
         claim("can:filter-bank:" + str(bank), port["id"], "filter", soc["id"])
-        result.append({**definition, "controller_index": index})
+        result.append({**definition, "controller_index": index, "tag": tag})
+    by_bank = {item["bank"]: item for item in result}
+    # RM0090 Fig343 numbers each FIFO independently, including inactive banks.
+    # This provider programs selected banks as 32-bit mask filters and all
+    # remaining banks as inactive 16-bit mask/FIFO0 filters (two positions).
+    for begin, end in ((0, split), (split, 28)):
+        positions = [0, 0]
+        for bank in range(begin, end):
+            item = by_bank.get(bank)
+            if item is None:
+                positions[0] += 2
+            else:
+                fifo = item["fifo"]
+                item["match_index"] = positions[fifo]
+                positions[fifo] += 1
     return {"split": split, "filters": result}
 
 
@@ -145,11 +168,15 @@ def state_declarations(result, prefix):
     if filters:
         lines += ["static const nx_can_filter_t s_nx_can_filters[] = {"]
         for item in filters:
-            values = [f"{getattr(item, name)}u" for name in ("id", "mask", "bank")]
-            values += [f"{item.controller_index}u", f"{item.fifo}u",
-                       "NX_CAN_" + item.format.upper(),
-                       str(item.remote).lower(), str(item.match_remote).lower()]
-            lines.append("    { " + ", ".join(values) + " },")
+            lines += ["    {", f"        .id = {item.id}u, .mask = {item.mask}u,",
+                      f"        .format = NX_CAN_{item.format.upper()},",
+                      f"        .tag = {item.tag}u, .bank = {item.bank}u,",
+                      f"        .controller = {item.controller_index}u,",
+                      f"        .fifo = {item.fifo}u,",
+                      f"        .match_index = {item.match_index}u,",
+                      f"        .remote = {str(item.remote).lower()},",
+                      f"        .match_remote = {str(item.match_remote).lower()}",
+                      "    },"]
         lines.append("};")
     lines += ["static nx_can_filter_domain_t s_nx_can_domain = {",
               f"    .filters = {'s_nx_can_filters' if filters else 'NULL'},",

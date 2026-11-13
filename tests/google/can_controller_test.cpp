@@ -19,8 +19,11 @@ extern "C" {
 class ClassicCan : public testing::Test {
   protected:
     nx_native_can_t model = {};
-    nx_can_filter_t filter = {0x123U, 0x7FFU,          0U,    0U,
-                              0U,     NX_CAN_STANDARD, false, true};
+    nx_can_filter_t filters[2] = {
+        {0x123U, 0x7FFU, NX_CAN_STANDARD, 0x1234U, 0U, 0U, 0U, 0U, false, true},
+        {0x321U, 0x7FFU, NX_CAN_STANDARD, 0x5678U, 1U, 0U, 0U, 1U, false,
+         true}};
+    nx_can_filter_t& filter = filters[0];
     nx_can_filter_domain_t domain = {};
     nx_can_event_t events[2] = {};
     /* Keep the borrowed ring alive through fatal assertions and TearDown. */
@@ -66,7 +69,7 @@ class ClassicCan : public testing::Test {
         EXPECT_EQ(nx_can_port_stop(&port), NX_SUCCESS);
     }
     void Receive(unsigned fifo = 0, uint8_t raw_dlc = 8U) {
-        ASSERT_EQ(nx_native_can_receive(&model, fifo, &frame, raw_dlc, 7U),
+        ASSERT_EQ(nx_native_can_receive(&model, fifo, &frame, raw_dlc, 0U),
                   NX_SUCCESS);
         nx_can_controller_irq(&model.controller);
     }
@@ -82,6 +85,25 @@ TEST_F(ClassicCan, RejectsNonClassicFramesWithoutMutatingPreparedStorage) {
     frame.format = NX_CAN_EXTENDED;
     frame.id = 0x20000000U;
     EXPECT_EQ(nx_can_tx_prepare(&requests[0], &frame, 200U), NX_ERROR_INVALID);
+}
+TEST_F(ClassicCan, ErrorSnapshotUsesProtocolValuesInsteadOfSiliconCodes) {
+    const nx_can_protocol_error_t errors[] = {
+        NX_CAN_PROTOCOL_NONE,          NX_CAN_PROTOCOL_STUFF,
+        NX_CAN_PROTOCOL_FORM,          NX_CAN_PROTOCOL_ACK,
+        NX_CAN_PROTOCOL_BIT_RECESSIVE, NX_CAN_PROTOCOL_BIT_DOMINANT,
+        NX_CAN_PROTOCOL_CRC,           NX_CAN_PROTOCOL_UNKNOWN,
+    };
+    for (uint8_t code = 0U; code < sizeof(errors) / sizeof(errors[0]); ++code) {
+        SCOPED_TRACE(code);
+        nx_native_can_error(&model, false, 12U, 34U, code);
+        nx_can_controller_irq(&model.controller);
+        nx_can_state_t snapshot{};
+        ASSERT_EQ(NX_SUCCESS, nx_can_port_state(&port, &snapshot));
+        EXPECT_EQ(errors[code], snapshot.last_error);
+        EXPECT_EQ(12U, snapshot.transmit_errors);
+        EXPECT_EQ(34U, snapshot.receive_errors);
+        EXPECT_FALSE(snapshot.bus_off);
+    }
 }
 TEST_F(ClassicCan, ThreeMailboxesAndFourthRejectionHaveExactBorrowBoundaries) {
     for (unsigned i = 0; i < 3U; ++i) {
@@ -177,17 +199,78 @@ TEST_F(ClassicCan, DeadlineExpiredRejectsWithNoMailboxEffect) {
     EXPECT_EQ(model.hardware.registers[0x180U / 4U], 0U);
 }
 TEST_F(ClassicCan, ReceiveDlcFifteenCopiesOnlyEightBytesWithRawMetadata) {
-    Receive(1U, 15U);
+    Receive(0U, 15U);
     nx_can_event_t output = {};
     size_t count = 0;
     ASSERT_EQ(nx_can_port_read_events(&port, &output, 1U, &count), NX_SUCCESS);
     EXPECT_EQ(count, 1U);
     EXPECT_EQ(output.frame.dlc, 8U);
     EXPECT_EQ(output.raw_dlc, 15U);
-    EXPECT_EQ(output.fifo, 1U);
-    EXPECT_EQ(output.filter, 7U);
+    EXPECT_EQ(output.filter_tag, 0x1234U);
     EXPECT_NE(output.flags & NX_CAN_DLC_NORMALIZED, 0U);
     EXPECT_EQ(output.frame.data[7], 8U);
+}
+TEST_F(ClassicCan, UnknownFilterMatchDoesNotInventALogicalTag) {
+    ASSERT_EQ(nx_native_can_receive(&model, 0U, &frame, 8U, 7U), NX_SUCCESS);
+    nx_can_controller_irq(&model.controller);
+    nx_can_event_t output{};
+    size_t count = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_can_port_read_events(&port, &output, 1U, &count));
+    EXPECT_EQ(1U, count);
+    EXPECT_EQ(0U, output.filter_tag);
+    EXPECT_NE(0U, output.flags & NX_CAN_FILTER_UNKNOWN);
+    EXPECT_EQ(frame.id, output.frame.id);
+}
+TEST_F(ClassicCan, FilterTagIsIndependentOfThePhysicalBank) {
+    ASSERT_EQ(NX_SUCCESS, nx_can_port_stop(&port));
+    ASSERT_EQ(NX_SUCCESS, nx_can_filter_domain_stop(&domain));
+    filter.bank = 7U;
+    filter.match_index = 14U;
+    ASSERT_EQ(NX_SUCCESS, nx_native_can_initialize(&model));
+    ASSERT_EQ(nx_native_can_receive(&model, 0U, &frame, 8U, 14U), NX_SUCCESS);
+    nx_can_controller_irq(&model.controller);
+    nx_can_event_t output{};
+    size_t count = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_can_port_read_events(&port, &output, 1U, &count));
+    EXPECT_EQ(0x1234U, output.filter_tag);
+    EXPECT_EQ(0U, output.flags & NX_CAN_FILTER_UNKNOWN);
+}
+TEST_F(ClassicCan, ReservedFilterTagRejectsBeforeClockEffects) {
+    ASSERT_EQ(NX_SUCCESS, nx_can_port_stop(&port));
+    ASSERT_EQ(NX_SUCCESS, nx_can_filter_domain_stop(&domain));
+    filter.tag = 0U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_can_filter_domain_initialize(&domain));
+    EXPECT_EQ(0U, model.hardware.clock_enable);
+    filter.tag = 0x1234U;
+}
+TEST_F(ClassicCan, FifoFilterIndicesUseIndependentNumbering) {
+    ASSERT_EQ(NX_SUCCESS, nx_can_port_stop(&port));
+    ASSERT_EQ(NX_SUCCESS, nx_can_filter_domain_stop(&domain));
+    filter.bank = 7U;
+    filter.fifo = 1U;
+    filters[1].bank = 0U;
+    filters[1].match_index = 0U;
+    domain.filter_count = 2U;
+    ASSERT_EQ(NX_SUCCESS, nx_native_can_initialize(&model));
+    for (unsigned fifo = 0U; fifo < 2U; ++fifo) {
+        ASSERT_EQ(nx_native_can_receive(&model, fifo, &frame, 8U, 0U),
+                  NX_SUCCESS);
+        nx_can_controller_irq(&model.controller);
+        nx_can_event_t output{};
+        size_t count = 0U;
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_can_port_read_events(&port, &output, 1U, &count));
+        EXPECT_EQ(fifo == 0U ? 0x5678U : 0x1234U, output.filter_tag);
+        EXPECT_EQ(0U, output.flags & NX_CAN_FILTER_UNKNOWN);
+    }
+}
+TEST_F(ClassicCan, InvalidMatchIndexRejectsBeforeClockEffects) {
+    ASSERT_EQ(NX_SUCCESS, nx_can_port_stop(&port));
+    ASSERT_EQ(NX_SUCCESS, nx_can_filter_domain_stop(&domain));
+    filter.match_index = 1U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_can_filter_domain_initialize(&domain));
+    EXPECT_EQ(0U, model.hardware.clock_enable);
+    filter.match_index = 0U;
 }
 TEST_F(ClassicCan, FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames) {
     Receive();

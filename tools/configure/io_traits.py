@@ -60,57 +60,15 @@ def emit_controllers(controllers):
                      if item.kind in _KINDS)
     if not selected:
         return [], []
-    header = [
-        '#include "nexus/io/observation.h"',
-        '/** \\brief Abort effects never release borrowed storage. */',
-        'typedef enum {',
-        '    NX_IO_ABORT_UNKNOWN = 0,',
-        '    NX_IO_ABORT_REQUEST,',
-        '    NX_IO_ABORT_CONTROLLER_PENDING,',
-        '    NX_IO_ABORT_NOT_APPLICABLE',
-        '} nx_io_abort_scope_t;',
-        '/** \\brief Receive mechanism without throughput qualification. */',
-        'typedef enum {',
-        '    NX_IO_CONTINUITY_UNKNOWN = 0,',
-        '    NX_IO_CONTINUITY_NOT_APPLICABLE,',
-        '    NX_IO_CONTINUITY_IRQ_BUFFERED,',
-        '    NX_IO_CONTINUITY_REARM_GAP,',
-        '    NX_IO_CONTINUITY_DOUBLE_BUFFER,',
-        '    NX_IO_CONTINUITY_MODEL',
-        '} nx_io_continuity_t;',
-        '/** \\brief Selected DMA provider owns all memory checks. */',
-        'typedef enum {',
-        '    NX_IO_DMA_POLICY_NONE = 0,',
-        '    NX_IO_DMA_POLICY_PROVIDER_DOMAIN,',
-        '    NX_IO_DMA_POLICY_DOMAIN_CACHE_LINE',
-        '} nx_io_dma_policy_t;',
-    ]
+    header = ['#include "nexus/io/traits.h"']
     source = []
     groups = {}
     for item, record in selected:
         namespace = selected_contracts.controller_class(item)
         groups.setdefault((item.kind, namespace), []).append((item, record))
     for (kind, namespace), instances in sorted(groups.items()):
-        typename = f"nx_factory_{namespace}_traits_t"
+        typename = f"nx_{kind}_traits_t"
         header += [
-            '/**',
-            ' * \\brief Readonly selected format and execution restrictions.',
-            ' * \\note No clock measurement, physical HIL or unbounded claim.',
-            ' * Parity zero means none. Cache line applies to provider policy;',
-            ' * it does not assert that cache is enabled. Unknown timestamp',
-            ' * means no usable source described, never event time zero.',
-            ' * I2C address_bits zero means width belongs to each endpoint.',
-            ' * I2C nominal_hz is rounded down from the selected clock and',
-            ' * divider; zero means no physical timing integration is known.',
-            ' */',
-            'typedef struct {',
-            *[f"    uint32_t {name};" for name in _FIELDS[kind]],
-            '    nx_io_abort_scope_t abort_scope;',
-            '    nx_io_continuity_t continuity;',
-            '    nx_io_timestamp_source_t timestamp_source;',
-            '    nx_io_dma_policy_t dma_policy;',
-            '    uint32_t cache_line_bytes;',
-            f'}} {typename};',
             '/** \\brief Pure lookup; NULL means invalid ID. */',
             f'const {typename}* nx_factory_{namespace}_traits(',
             f'    nx_{namespace}_id_t id);',

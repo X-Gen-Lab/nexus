@@ -11,8 +11,10 @@ source_language: zh_CN
 STM32F405ZGT6、F407VET6、F407ZGT6、F415ZGT6、F417ZGT6、F411RET6、F446ZET6
 和 F479NIH6，组成七个器件视图；厂商 SDK 目录的 23 个选择器不等于这八料号的
 全部模式资格。实际模式由同一 TOML／typed IR resolver 对器件、封装、Board、
-时钟和资源取交集。当前新 IP 所选 fixture 已有 ARM 链接；最终 clean-source 消费和物理执行分别验收，
-不继承 F407 专属模式的结果，也不授予整系列资格。
+时钟和资源取交集。所选 fixture 的模型、ARM 和最终 clean-source SDK 消费已有
+各自执行记录，见 [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62) 与
+[架构说明](architecture.md#本轮重构退出范围)。物理执行仍为 `not_executed`；
+新增器件不继承 F407 专属模式结果，也不据此取得整系列资格。
 
 ## 型号、Board 与 OS 边界
 
@@ -78,9 +80,9 @@ F415／F417。F411、F446、F479 分别绑定独立 RM／ES profile；F446 的 P
 | 内部 Flash／制造维护 | 精确 VE／ZG sector 几何；显式维护 face 提供 OTP、锁定、option／RDP 及保护降级的整阵列擦除效果。失败后的 `recover` 只排空、撤回并重锁，确认成功后才归还 owner；不可逆效果逐次声明，不自动回滚、重放或把软件复位当作所需 POR | [物理存储与维护](../design/f407-storage.md) |
 | SDIO／MMC／I/O functions | SD memory／MMC polling、有限 IRQ／DMA；SDIO functions 使用独立 face 的 CMD5／52／53。单卡、3.3 V，SD／SDIO 为 1／4 位，MMC 可显式选择经版本和 SWITCH 检查的 8 位十引脚软件参考。memory 单块 CMD17／24，多块以一次 CMD18／25、CMD12 和 CMD13 READY 结束；combo 不同时维护 memory portion。静态 ClockPlan 要求精确 PLL48 与经 RM／勘误联合验证的分频；不提供 HS／DDR／HS200 | [SDIO 合同](../../soc/stm32/stm32f4/private/sdio_hal/README.md) |
 | FSMC | 运行期 CPU window、永久 startup SRAM、parallel16，以及显式 PSRAM、有限 NOR program／erase、raw NAND／OOB／ECC 码；bank 与 mux／burst／WAIT 按封装和所选模式授权，无 FTL 或自动纠错 | [FSMC 合同](../design/f407-fsmc.md)、[存储边界](../design/f407-storage.md) |
-| FMC SDRAM | F479NI Bank1、8 MiB、16-bit、row12／column8 的 CPU 数据窗口；显式七组时序、上电／刷新／自刷新等待、lease 和原 System epoch。WFDIS 共享约束在取得 gate 后实际观察。不授予 DMA、启动 RAM、XIP、自动 MPU 或实装 RAM 时序资格 | [FMC／外部存储](../design/f407-fsmc.md) |
+| FMC SDRAM | F479NI Bank1、8 MiB、16-bit、row12／column8；默认 CPU 数据窗口不授予 DMA。显式 `graphics-owned` 通过 `memory_window` 引用，仅给所选 LTDC 只读、DMA2D 读写区域，共同保留原始 bank lease 直至冷退出。两种模式均检查七组时序、上电／刷新／自刷新等待与原 System epoch；WFDIS 共享约束在取得 gate 后实际观察。不授予启动 RAM、XIP、自动 MPU 或实装 RAM 时序资格 | [FMC／外部存储](../design/f407-fsmc.md) |
 | QuadSPI／串行 NOR | F479NI＋W25Q128JV Flash1，24-bit、SDR 1-1-1、PIO task-service；READ03、page program、4 KiB erase 和完整 erase spans。公共 async stop 排空并保留 PREPARED／只读 face，Platform cold stop 归还硬件；WIP 与控制器 join 分开。整个 provider 生命周期禁止所有外部 bus master 访问 0x90000000 aperture。无 DMA、映射／XIP、quad／DDR／dual 或自动保护更改 | [间接 QuadSPI](../design/f407-fsmc.md) |
-| LTDC／DMA2D | F479NI 原生并行 RGB565／RGB888；RGB565／ARGB8888 内存，一／二 layer、2 active＋1 全局 pending。IRQ 在真实 blanking 锁存同代退休证明，task join 后才归还旧 frame；visible 不等于 SETTLED。独立 DMA2D 提供 fill／copy／convert／blend。无 DSI、CLUT、隐藏 frame buffers 或对 FMC CPU-only 窗口的 DMA 授权 | [图形所有权](../design/official-stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations) |
+| LTDC／DMA2D | F479NI 原生并行 RGB565／RGB888；RGB565／ARGB8888 内存，一／二 layer、2 active＋1 全局 pending。IRQ 在真实 blanking 锁存同代退休证明，task join 后才归还旧 frame；visible 不等于 SETTLED。独立 DMA2D 提供 fill／copy／convert／blend；所选 SDRAM 需显式 `graphics-owned` 连接并持有同一 bank lease。无 DSI、CLUT、隐藏 frame buffers 或对 FMC CPU-only 窗口的 DMA 授权 | [图形所有权](../design/official-stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations) |
 | 基础 CRYP／HASH | F415／F417 的有限 IRQ blocks：AES ECB／CBC／CTR、DES／TDES ECB／CBC，SHA1／MD5／HMAC；key／IV／context 清理与真实 IRQ／源退出后才终止。caller key 不擦除，无 worker／堆。无 AEAD、crypto DMA 或 F479 增强 IP 资格 | [F4 实现](../../soc/stm32/stm32f4/README.md) |
 | CRC／芯片身份 | 固定 CRC-32 数值字序列；实际 UID、device／revision 与 Flash 容量。数据不证明完整订货号、封装身份或认证秘密 | [F4 CRC／身份](../../soc/stm32/stm32f4/README.md) |
 | RNG | 唯一 typed RNG factory 与 Platform 生命周期；精确 PLL48 和活跃 System epoch，保留官方 seed／clock／连续值错误检查；不建立 DRBG、熵池或质量认证 | [RNG 时钟合同](../design/f407-system-power.md)、[公共 I/O](../reference/api/io.md) |
@@ -99,9 +101,14 @@ F415／F417。F411、F446、F479 分别绑定独立 RM／ES profile；F446 的 P
 [派生能力表](capabilities.md)用于追踪声明、路线、装配和生产 ops；它不是第二份
 配置输入，也不证明相关运行、排空或物理时序已通过。
 
-本次所列模型与 ARM 结果只覆盖各自精确配置，不把单个程序、对象或 ELF 扩大为
-全系列／全部模式通过。最终软件候选及 [完整维护消费者计划](../../tools/maintenance/consumer_profiles.py)
-仍须在完整门禁中使用相同源码验证；本页不提前宣布它们已经完成。
+本次所列模型与 ARM 结果只覆盖各自精确配置。平台实现固定在
+[`6b59f666`](https://github.com/X-Gen-Lab/nexus/tree/6b59f66628f0dbb415f6203ba917c1fe717bf3fd)；
+最终 SDK 固定在
+[`4bf4b5a2`](https://github.com/X-Gen-Lab/nexus/tree/4bf4b5a258b3120c24f6d834545ac3f300ce801b)，
+按 [完整维护消费者计划](../../tools/maintenance/consumer_profiles.py) 通过 34 个
+消费者、165 条命令及搬移前后完整性校验。两提交仅差 TMP117 参考调用者的 I2C
+字段迁移；四种 Native 编译输入未受影响的核查已记录。文档、ARM 和领域回归保留
+原实际输入身份，不重标为最终 SDK 提交重新执行，也不扩大为全系列／全部模式通过。
 
 源码维护、分组模型回归、ARM ELF、Source SDK、完整软件候选和物理 station 分别
 建立证据，并绑定各自源码与配置。代理的 GREEN 或单个 ELF 不构成全候选通过。

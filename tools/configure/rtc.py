@@ -6,7 +6,7 @@ from tools.configure.providers.common import fail, integer
 
 POLICY_MODES = frozenset(("adopt-retained", "provision-empty"))
 OPTION_FIELDS = frozenset(("allow_set", "timeout_us", "poll_limit", "initial",
-                           "lse_bypass"))
+                           "lse_bypass", "periodic_wakeup"))
 CALENDAR_FIELDS = ("year", "month", "day", "weekday", "hour", "minute", "second")
 
 
@@ -34,13 +34,15 @@ def validate_selection(selection):
         if OPTION_FIELDS & selection.keys():
             fail("RTC selected mode does not accept initialization options")
         return
-    required = OPTION_FIELDS - {"initial", "lse_bypass"}
+    required = OPTION_FIELDS - {"initial", "lse_bypass", "periodic_wakeup"}
     if not required.issubset(selection):
         fail("RTC requires explicit allow_set, timeout_us and poll_limit")
     if type(selection["allow_set"]) is not bool:
         fail("RTC allow_set must be boolean")
     if type(selection.get("lse_bypass", False)) is not bool:
         fail("RTC lse_bypass must be boolean")
+    if type(selection.get("periodic_wakeup", False)) is not bool:
+        fail("RTC periodic_wakeup must be boolean")
     for field in ("timeout_us", "poll_limit"):
         integer(selection[field], 1, 0xffffffff, "RTC " + field)
     provision = selection["mode"] == "provision-empty"
@@ -67,6 +69,7 @@ def editor_schema(schema):
     properties = schema["properties"]
     properties["allow_set"] = {"type": "boolean"}
     properties["lse_bypass"] = {"type": "boolean", "default": False}
+    properties["periodic_wakeup"] = {"type": "boolean", "default": False}
     for field in ("timeout_us", "poll_limit"):
         properties[field] = {"type": "integer", "minimum": 1,
                              "maximum": 0xffffffff}

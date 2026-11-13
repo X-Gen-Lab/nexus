@@ -21,3 +21,15 @@ TEST(NativeChip, UnsupportedReadPreservesTheCompleteCallerStorage) {
 TEST(NativeChip, NullOutputIsInvalidBeforeAnyBackendObservation) {
     EXPECT_EQ(nx_chip_info_read(nullptr), NX_ERROR_INVALID);
 }
+TEST(NativeChip, UidQueryAndCopyNeverManufacturePhysicalIdentity) {
+    size_t size = 123U;
+    uint8_t output[16];
+    std::memset(output, 0x55, sizeof(output));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_chip_uid_read(nullptr, 0U, &size));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_chip_uid_read(output, sizeof(output), &size));
+    EXPECT_EQ(123U, size);
+    EXPECT_EQ(0x55U, output[0]);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_chip_uid_read(output, sizeof(output), nullptr));
+}

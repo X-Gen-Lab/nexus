@@ -51,9 +51,6 @@
 #include "nexus/io/spi_dma_owner_binding.h"
 #include "nexus/io/spi_dma_transaction.h"
 #endif
-#if defined(NX_FIXTURE_I2C_LONG)
-#include "nexus/io/i2c_long.h"
-#endif
 #if defined(NX_FIXTURE_UART_STREAM_PROFILE) ||                                 \
     defined(NX_FIXTURE_ADC_STREAM_PROFILE)
 #include "nexus/io/stream_profile.h"
@@ -153,10 +150,6 @@ int main(void) {
                                      nx_io_cycle_observation_t*) =
         nx_io_cycle_probe_snapshot;
     (void)snapshot;
-#endif
-#if defined(NX_FIXTURE_I2C_LONG)
-    NX_FIXTURE_RETAIN_FACES(i2c_long_device, nx_i2c_long_endpoint_t,
-                            NX_I2C_LONG_DEVICE_ID_COUNT);
 #endif
 #if defined(NX_FIXTURE_UART_STREAM_PROFILE)
     for (size_t index = 0; index < NX_UART_ID_COUNT; ++index) {

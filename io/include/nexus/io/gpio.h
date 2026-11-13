@@ -35,6 +35,38 @@ struct nx_gpio_port {
     const nx_gpio_ops_t* ops;
     void* context;
 };
+
+/**
+ * \brief Immutable logical signal binding supplied by Board integration.
+ * \note One nonzero mask bit names the authorized pin. Consumers use logical
+ *       activity; physical polarity stays in this binding. Binding and port
+ *       outlive calls; this adds no mutable state, lock or resource ownership.
+ */
+typedef struct {
+    const nx_gpio_port_t* port;
+    uint32_t mask;
+    bool active_high;
+} nx_gpio_signal_t;
+
+/**
+ * \brief Set one logical signal to its requested active or inactive state.
+ * \param[in] signal: Immutable single-pin binding and live initialized port.
+ * \param[in] active: Logical activity, independent of electrical polarity.
+ * \return SUCCESS or the port error; malformed binding returns INVALID.
+ * \note Same bounded Task/IRQ and serialized-writer contract as port write.
+ *       No storage is retained; the underlying provider checks authorization.
+ */
+nx_result_t nx_gpio_signal_write(const nx_gpio_signal_t* signal, bool active);
+
+/**
+ * \brief Sample a logical input without exposing its physical pin mask.
+ * \param[in] signal: Immutable single-pin binding and live initialized port.
+ * \param[out] active: Separate writable result, unchanged on error.
+ * \return SUCCESS or the port error; malformed arguments return INVALID.
+ * \note Bounded Task/IRQ call; no retained storage or debounce policy. Output
+ *       is disjoint from the binding, face and all provider control storage.
+ */
+nx_result_t nx_gpio_signal_read(const nx_gpio_signal_t* signal, bool* active);
 /**
  * \brief           Atomically set/reset one port's authorized output mask.
  *

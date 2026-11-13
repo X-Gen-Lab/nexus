@@ -2,11 +2,12 @@
 from tools.configure.tests.native_fixture import native_fixture, canonical_assembly
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 import re
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure, factory, io_traits
+from tools.configure import bindings, configure, factory, io_traits, uart_formats
 
 
 class UARTFormatConfiguration(unittest.TestCase):
@@ -27,6 +28,27 @@ class UARTFormatConfiguration(unittest.TestCase):
         path = self.root / "assembly.toml"
         path.write_text(contents)
         return configure.resolve_ir(path, test_support=native_fixture(path))
+
+    def test_provider_frames_do_not_inherit_f4_payload_limits(self):
+        frames = ((5, "none"), (6, "even"), (7, "none"), (8, "odd"))
+        provider = SimpleNamespace(UART_FORMATS=uart_formats.UartFormatPolicy(
+            byte_frames=frames))
+        for bits, parity in frames:
+            with self.subTest(bits=bits, parity=parity):
+                selection = {"mode": "irq-byte-event", "frame": {
+                    "data_bits": bits, "parity": parity,
+                    "stop_bits": 1, "flow": "none"}}
+                uart_formats.validate(selection, {"controller": "UART0"},
+                                      provider)
+
+    def test_provider_frame_matrix_rejects_an_unselected_combination(self):
+        provider = SimpleNamespace(UART_FORMATS=uart_formats.UartFormatPolicy(
+            byte_frames=((8, "odd"),)))
+        selection = {"mode": "irq-byte-event", "frame": {
+            "data_bits": 7, "parity": "even", "stop_bits": 1,
+            "flow": "none"}}
+        with self.assertRaisesRegex(ValueError, "frame.*provider|provider.*frame"):
+            uart_formats.validate(selection, {"controller": "UART0"}, provider)
 
     def test_selected_word_vector_probe_has_one_sidecar_and_real_build_fact(self):
         for family, vector in (('f407', 'USART1'),):
@@ -171,11 +193,11 @@ class UARTFormatConfiguration(unittest.TestCase):
         selected = replace(result, factory=replace(result.factory,
                                                   capabilities=True))
         header, source = factory.emit(selected)
-        self.assertIn("nx_factory_uart_word_traits_t", header)
+        self.assertIn("nx_uart_traits_t", header)
         self.assertIn("nx_factory_uart_word_capability", header)
         self.assertIn("NX_UART_WORD_ID_UART0", source)
         self.assertIn("0U, 2U, 2U,", source)
-        self.assertNotIn("nx_factory_uart_traits_t", header)
+        self.assertNotIn("nx_factory_uart_traits(", header)
 
     def test_failed_formatted_constructor_retains_effects_for_cleanup(self):
         frame = 'data_bits=7\nparity="even"\nstop_bits=2\nflow="none"'

@@ -1,12 +1,15 @@
 # Reviewed against the exact current canonical source and gettext messages.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 7ab3ff1c3ae35327909c8f4536135642e93b3ac8ea8e584ed42b97aa9e4bf20e\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 14f6dfcc5e0d7cfcdbae996a69380fb943013855845eac16f25db23d082e9dd5\n"
 
 msgid "F407 USART 线模式与冷态资源"
 msgstr "F407 USART wire modes and cold resources"
 
 msgid "`irq-wire` 为 STM32F407VET6／ZGT6 提供显式 USART 线模式，公共面继续使用 `nx_uart_port_t`、字节请求和事件 ring。配置选择完整收发机制、精确引脚、 IRQ 与错误退出；不会从 HAL 函数存在推导其他器件、板卡或物理资格。"
 msgstr "`irq-wire` provides explicit USART wire modes for STM32F407VET6/ZGT6. The public face continues to use `nx_uart_port_t`, byte requests and an event ring. Configuration selects complete transmit/receive mechanisms, exact pads, IRQs and failure withdrawal. The presence of a HAL function does not establish another device, Board route or physical qualification."
+
+msgid "`nx_uart_format_validate` 校验通用 5–9 位数据、none／even／odd 校验、 1／2 停止位与已知流控枚举；它不判断具体控制器支持。F4 provider 在任何 硬件效果前另行校验 7E/O、8N/E/O 与独立 9N word 能力。Host 配置由 `UartFormatPolicy` 的显式帧集合限制所选模式；扩大通用表达不扩大 F4 模式、路线或物理资格。"
+msgstr "`nx_uart_format_validate` validates generic 5–9 data bits, none/even/odd parity, one/two stop bits and known flow-control values; it does not establish controller support. Before any hardware effect, the F4 provider separately checks its 7E/O, 8N/E/O and independent 9N word capabilities. Host configuration restricts the selected mode using the explicit frame set in `UartFormatPolicy`; broadening the generic representation does not broaden F4 modes, routes or physical qualification."
 
 msgid "`wire.protocol`"
 msgstr "`wire.protocol`"
@@ -65,8 +68,9 @@ msgstr "UART4/5 have no CK, Smartcard or RTS/CTS. C cold admission and TOML vali
 msgid "配置、状态与引脚"
 msgstr "Configuration, state and pads"
 
-msgid "公共配置类型在 `nexus/io/uart_wire.h`；厂商寄存器、Handle 与可变实现仍留在 SoC 私有目录。`[uart.<id>.wire]` 经不可变 `UartWireOptions` 生成只读配置， factory 返回原有 UART face。`uart_wire.c` 只在选择 `irq-wire` 时选编，普通 byte/event 状态和 `nx_uart_ops_t` 没有增加字段或方法槽。"
-msgstr "Public configuration types live in `nexus/io/uart_wire.h`; vendor registers, Handles and mutable implementation remain private to the SoC. `[uart.<id>.wire]` resolves through immutable `UartWireOptions` into readonly configuration, and the factory returns the existing UART face. `uart_wire.c` is selected only for `irq-wire`; ordinary byte/event state and `nx_uart_ops_t` gain no fields or method slots."
+#: docs/design/uart-wire-modes.md:0
+msgid "公共 `nexus/io/uart_wire.h` 保留协议模式与 LIN 请求准备；F4 冷态设置使用 SoC 私有 `nx_stm32_uart_wire_config_t`。PSC／guard 等原始参数属于显式 F4 专家 配置，不伪装成通用时间参数，普通组件不依赖该类型或厂商 Handle。 `[uart.<id>.wire]` 经不可变 `UartWireOptions` 生成私有只读配置，factory 返回 原有 UART face。`uart_wire.c` 只在选择 `irq-wire` 时选编，普通 byte/event 状态 和 `nx_uart_ops_t` 没有增加字段或方法槽。"
+msgstr "Public `nexus/io/uart_wire.h` retains protocol modes and LIN request preparation. F4 cold settings use private SoC `nx_stm32_uart_wire_config_t`. Raw PSC/guard parameters are explicit F4 expert configuration, not generic timing parameters; ordinary components depend on neither this type nor vendor Handles. `[uart.<id>.wire]` resolves through immutable `UartWireOptions` into private readonly configuration, and factory returns the existing UART face. `uart_wire.c` compiles only for `irq-wire`; ordinary byte/event state and `nx_uart_ops_t` gain no fields or method slots."
 
 msgid "![FIG-04：静态 factory 与独立状态](../assets/diagrams/factory-instances.svg)"
 msgstr "![FIG-04: static factory and independent state](../assets/diagrams/factory-instances.svg)"

@@ -85,6 +85,16 @@ def emit_bundle(result, output):
                         item.options.remote_wakeup for item in result.controllers)
     cmake.append("set(NEXUS_USB_REMOTE_WAKEUP " +
                  ("ON" if remote_wakeup else "OFF") + ")")
+    periodic_wakeup = any(item.kind == "rtc" and
+                          getattr(item.options, "periodic_wakeup", False)
+                          for item in result.controllers)
+    cmake.append("set(NEXUS_RTC_PERIODIC_WAKEUP " +
+                 ("ON" if periodic_wakeup else "OFF") + ")")
+    graphics_memory = any(item.driver == "memory_window-endpoint" and
+                          item.options.mode == "graphics-owned"
+                          for item in result.devices)
+    cmake.append("set(NEXUS_SDRAM_GRAPHICS " +
+                 ("ON" if graphics_memory else "OFF") + ")")
     for selection in result.controllers:
         prefix = "NEXUS_" + selection.id.replace("-", "_").upper()
         header.append(f"#define {prefix}_SELECTED 1")

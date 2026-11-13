@@ -392,6 +392,70 @@ const nx_probe_ops_t nx_probe_ops = {start, &child_operations, stop};
                          0x0800101c, 0x08002021, 0x08002031, 0x08002041)
         return data
 
+    def conditional_method(self, source):
+        source.write_text(source.read_text().replace(
+            ".ping = ping, .pong = pong",
+            "ping,\n#if defined(NX_PROBE_OPTIONAL)\npong\n#else\nNULL\n#endif\n"))
+
+    def test_conditional_method_follows_actual_linked_null_or_exact_code(self):
+        for enabled in (False, True):
+            with self.subTest(enabled=enabled), tempfile.TemporaryDirectory() as directory:
+                root, _, source = self.tree(directory)
+                self.conditional_method(source)
+                data = self.image()
+                if not enabled:
+                    struct.pack_into("<I", data, 0x120, 0)
+                report = inspect_provider_retention(Elf32(data), self.bindings,
+                                                    root=root)
+                leaf = next(item for item in report["tables"]
+                            if item["name"] == "leaf_operations")
+                self.assertEqual(report["method_count"], 5 if enabled else 4)
+                self.assertEqual(leaf["null_methods"], 0 if enabled else 1)
+                self.assertEqual(leaf["conditional_methods"], [{
+                    "slot": 1, "name": "pong", "if_defined": "NX_PROBE_OPTIONAL",
+                    "observed": "defined" if enabled else "undefined"}])
+
+    def test_conditional_method_still_requires_exact_code_and_local_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, source = self.tree(directory)
+            self.conditional_method(source)
+            data = self.image()
+            struct.pack_into("<I", data, 0x120, 0x08002031)
+            with self.assertRaisesRegex(EvidenceError, "another function"):
+                inspect_provider_retention(Elf32(data), self.bindings, root=root)
+            elf = Elf32(self.image())
+            next(item for item in elf.defined_symbols
+                 if item["name"] == "pong")["file"] = "other.c"
+            with self.assertRaisesRegex(EvidenceError, "initializer source"):
+                inspect_provider_retention(elf, self.bindings, root=root)
+
+    def test_conditional_method_grammar_refuses_ambiguous_preprocessing(self):
+        for expression in (
+                "#if NX_PROBE_OPTIONAL\npong\n#else\nNULL\n#endif",
+                "#if defined(NX_PROBE_OPTIONAL)\npong\n#else\nping\n#endif",
+                "#if defined(NX_PROBE_OPTIONAL)\nNULL\n#else\npong\n#endif",
+                "#if defined(NX_PROBE_OPTIONAL)\npong\n#elif OTHER\nNULL\n#endif",
+                "#if defined(NX_PROBE_OPTIONAL)\n#if OTHER\npong\n#endif\n"
+                "#else\nNULL\n#endif",
+                "#if defined(NX_PROBE_OPTIONAL)\n(pong)\n#else\nNULL\n#endif",
+                "#if defined(NX_PROBE_OPTIONAL)\npong, ping\n#else\nNULL\n#endif"):
+            with self.subTest(expression=expression), tempfile.TemporaryDirectory() as directory:
+                root, _, source = self.tree(directory)
+                source.write_text(source.read_text().replace(
+                    ".ping = ping, .pong = pong", "ping,\n" + expression + "\n"))
+                with self.assertRaisesRegex(EvidenceError, "operations initializer"):
+                    source_contracts(root)
+
+    def test_conditional_subtable_is_not_guessed_from_its_linked_pointer(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, source = self.tree(directory)
+            source.write_text(source.read_text().replace(
+                "start, &child_operations, stop",
+                "start,\n#if defined(NX_PROBE_OPTIONAL)\nchild_operations\n"
+                "#else\nNULL\n#endif\n, stop"))
+            with self.assertRaisesRegex(EvidenceError, "operations initializer"):
+                source_contracts(root)
+
     def test_recursive_const_tables_and_null_optional_pointer(self):
         with tempfile.TemporaryDirectory() as directory:
             root, _, source = self.tree(directory)

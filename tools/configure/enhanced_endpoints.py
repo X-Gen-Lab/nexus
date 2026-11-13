@@ -46,8 +46,6 @@ def face(device, state, legacy_operations, family=None):
     if device.driver == "spi-transaction":
         provider = _spi_provider(family, dma=False)
         operations = f"nx_{provider.PREFIX}_spi_transaction_ops"
-    elif device.driver == "i2c-long-endpoint":
-        operations = "nx_i2c_v2_long_endpoint_ops"
     return [f"static const {typename} s_nx_device_face_{name} = {{",
             f"    &{operations}, &{state}", "};",
             f"const {typename}* const nx_device_{name} = "
@@ -94,27 +92,14 @@ def dma_construction(item, construction, prefix):
 
 def emit_traits(result):
     """Optional selected-only endpoint facts use their actual data units."""
-    header, source = [], []
+    header, source = ['#include "nexus/io/traits.h"'], []
     controllers = {item.id: item for item in result.controllers}
     for driver, (_, namespace) in sorted(DRIVERS.items()):
         instances = [item for item in result.devices if item.driver == driver]
         if not instances:
             continue
-        typename = f"nx_factory_{namespace}_traits_t"
-        word_based = driver != "i2c-long-endpoint"
-        fields = (("supported_word_bits", "max_total_words",
-                   "max_segment_words", "max_segments") if word_based else
-                  ("address_bits", "max_message_bytes", "max_messages"))
+        typename = "nx_spi_transaction_traits_t"
         header += [
-            '/**',
-            ' * \\brief Exact enhanced-interface bounds, without physical proof.',
-            ' * \\note Zero bounds are unspecified, never unlimited. SPI counts',
-            ' * are words, independent of 8/16-bit spans. supported_word_bits',
-            ' * uses bit N for N-bit words; a request chooses one width.',
-            ' * I2C bounds each message. These do not replace provider checks.',
-            ' */', 'typedef struct {',
-            *[f"    uint32_t {name};" for name in fields],
-            f'}} {typename};',
             '/** \\brief Pure selected-only lookup, NULL for an invalid ID. */',
             f'const {typename}* nx_factory_{namespace}_traits(',
             f'    nx_{namespace}_id_t id);']
@@ -122,17 +107,12 @@ def emit_traits(result):
             name = item.id.replace("-", "_")
             contract = selected_contracts.describe(
                 controllers[item.controller], item)
-            if driver == "i2c-long-endpoint":
-                values = (contract.fields["address_bits"],
-                          contract.max_transfer_units,
-                          contract.max_messages)
-            else:
-                widths = [f"UINT32_C(1) << {bits}U"
-                          for bits in contract.word_bits]
-                width = (widths[0] if len(widths) == 1 else
-                         " | ".join(f"({value})" for value in widths))
-                values = (width, contract.max_total_units,
-                          contract.max_segment_units, contract.max_segments)
+            widths = [f"UINT32_C(1) << {bits}U"
+                      for bits in contract.word_bits]
+            width = (widths[0] if len(widths) == 1 else
+                     " | ".join(f"({value})" for value in widths))
+            values = (width, contract.max_total_units,
+                      contract.max_segment_units, contract.max_segments)
             values = tuple(f"{value}U" if type(value) is int else
                            "0U" if value is None else value for value in values)
             source += [f"static const {typename}",
@@ -183,7 +163,7 @@ def emit_owner_factory(result):
 def validate_transport(device, controller, provider, *, soc, clock_plan):
     """Admit endpoint transport and clocks before graph pin/address claims."""
     if device["driver"] not in {"spi-endpoint", "i2c-endpoint", "bmp280",
-                                "spi-transaction", "i2c-long-endpoint",
+                                "spi-transaction",
                                 "spi-dma-transaction"}:
         fail(f"Unknown maintained device driver: {device['driver']}")
     provider.ENDPOINT_POLICY.validate(device, controller)

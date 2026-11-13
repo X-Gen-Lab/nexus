@@ -97,12 +97,22 @@ class SelectedTraitsTests(unittest.TestCase):
         items = (controller("spi", "dma", irq_priority=6),)
         header, source = io_traits.emit_controllers(items)
         header, source = "\n".join(header), "\n".join(source)
-        self.assertIn("nx_factory_spi_traits_t", header)
-        self.assertNotIn("nx_factory_uart_traits_t", header)
+        self.assertIn("nx_spi_traits_t", header)
+        self.assertNotIn("nx_factory_uart_traits(", header)
         self.assertIn("nx_factory_spi_traits", source)
         self.assertIn("return NULL", source)
         self.assertIn("static const", source)
         self.assertNotIn("malloc", source)
+
+    def test_domain_types_are_public_and_not_redeclared_by_factory(self):
+        items = (controller("spi", "dma", irq_priority=6),)
+        header, source = io_traits.emit_controllers(items)
+        header, source = "\n".join(header), "\n".join(source)
+        self.assertIn('#include "nexus/io/traits.h"', header)
+        self.assertIn("const nx_spi_traits_t* nx_factory_spi_traits(", header)
+        self.assertIn("static const nx_spi_traits_t ", source)
+        self.assertNotIn("typedef ", header)
+        self.assertNotIn("nx_factory_spi_traits_t", header + source)
 
 
 class RevisionAdmissionTests(unittest.TestCase):
@@ -173,7 +183,7 @@ class ResolvedTraitsTests(unittest.TestCase):
                             if item.kind == kind)
                 self.assertEqual(io_traits.describe(item).abort_scope, scope)
                 header, source = factory.emit(result)
-                self.assertIn(f"nx_factory_{kind}_traits_t", header)
+                self.assertIn(f"nx_{kind}_traits_t", header)
                 self.assertIn("NX_IO_ABORT_" + scope.upper(), source)
 
     def test_disabled_capabilities_generate_no_traits_or_dependencies(self):

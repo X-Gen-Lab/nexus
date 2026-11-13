@@ -18,7 +18,7 @@ class EncoderConfigurationTests(unittest.TestCase):
         self.package = self.directory / 'board'
         self.package.mkdir()
 
-    def assembly(self, timer='TIM3', counting='x4-ti12'):
+    def assembly(self, timer='TIM3', counting='x4'):
         pins = {'TIM3': ('pa6', 'pa7'), 'TIM4': ('pb6', 'pb7'),
                 'TIM5': ('pa0', 'pa1'), 'TIM1': ('pa8', 'pa9'),
                 'TIM8': ('pc6', 'pc7')}[timer]
@@ -44,8 +44,8 @@ class EncoderConfigurationTests(unittest.TestCase):
 
     def test_three_timers_and_counting_modes_generate_static_c(self):
         for timer in ('TIM3', 'TIM4', 'TIM5'):
-            for counting, symbol in (('x2-ti1', 'X2_TI1'), ('x2-ti2', 'X2_TI2'),
-                                     ('x4-ti12', 'X4_TI12')):
+            for counting, symbol in (('x2-a', 'X2_A'), ('x2-b', 'X2_B'),
+                                     ('x4', 'X4')):
                 with self.subTest(timer=timer, counting=counting):
                     path = self.assembly(timer, counting)
                     result = gate.resolve_ir(path)
@@ -63,7 +63,7 @@ class EncoderConfigurationTests(unittest.TestCase):
                     self.assertIn('nx_stm32_encoder_close(', source)
 
     def test_unknown_mode_filter_and_nonexclusive_inputs_reject(self):
-        for old, new in (('"x4-ti12"', '"signed-position"'),
+        for old, new in (('"x4"', '"signed-position"'),
                          ('filter_a=0', 'filter_a=16'),
                          ('filter_b=15', 'filter_b=true'),
                          ('invert_a=false', 'invert_a=0'),

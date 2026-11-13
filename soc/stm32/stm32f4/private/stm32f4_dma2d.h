@@ -9,6 +9,7 @@
 #include "nexus/io/dma.h"
 #include "nexus/io/image.h"
 #include "stm32f407_system.h"
+#include "stm32f4_graphics_memory.h"
 #if !defined(USE_HAL_DMA2D_REGISTER_CALLBACKS)
 #define USE_HAL_DMA2D_REGISTER_CALLBACKS 0U
 #elif USE_HAL_DMA2D_REGISTER_CALLBACKS != 0U
@@ -36,7 +37,8 @@
 /** \brief Reviewed static DMA domains and live System ownership, not scripts.
  * \note Parent System owns the AHB domain; this controller owns its DMA2D
  *       gate through close. Config is kept alive until successful close.
- *       This ignored candidate has no production factory integration.
+ *       Selected external memory uses its original static bank hold; ordinary
+ *       internal-SRAM assemblies allocate no shared bank binding.
  */
 typedef struct {
     DMA2D_TypeDef* registers;
@@ -48,6 +50,7 @@ typedef struct {
     nx_time_us_t drain_us;
     uint32_t system_cfgr;
     uint8_t priority;
+    nx_stm32_sdram_graphics_t* graphics_memory;
 } nx_stm32_image_config_t;
 
 /** \brief One HAL context, active loan and exact retryable vector receipt. */
@@ -70,6 +73,7 @@ typedef struct {
     bool closing;
     bool executing;
     bool clock_fault;
+    bool memory_attached;
 } nx_stm32_image_state_t;
 
 /** \brief Pure pre-System admission; no gate, pad, snapshot or state effect.

@@ -5,11 +5,15 @@
 策略和枚举业务不隐式进入固件。官方 Handle 和 class 回调记录只出现在
 `private/usb_host_stack.h`，公共 transport 使用 `nexus/io/usb_host.h`。
 
-应用提供一个静态 stack、每个所选硬件 channel 的 slot、四字节对齐 staging、有限
+应用提供一个静态 stack、每个所选逻辑 pipe 的 slot、明确容量的 staging、有限
 timeout，以及串行特权 Thread 的显式 `step` 调用。桥接复制每实例 class 记录，
 不使用堆、运行期 registry、全局 active-context、隐藏任务或 OS 适配。只在真实
 packet SETTLED 后推进官方 Core；NAK 由上层下一步明确重试，完整传输共享同一
-绝对 deadline。IN staging 覆盖完整 MPS，短包只复制实际确认的字节。
+绝对 deadline。每次 packet 在复制或准入前调用 transport 的
+`nx_usb_host_storage_requirements`，按实际 capacity／alignment 检查调用者提供的
+staging；OUT 只显式补零所查询的尾部，包括需要存储的零长 packet。桥接不假定
+1024 B 最小容量或四字节对齐，不自动扩大存储；缺少查询或预算不足直接报告失败。
+IN staging 覆盖所选传输要求，短包只复制实际确认的字节。
 
 ```mermaid
 flowchart LR

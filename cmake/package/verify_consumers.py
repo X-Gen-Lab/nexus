@@ -177,7 +177,7 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
             '#ifndef NEXUS_PLATFORM_VERSION\n'
             '#error "Missing source interface version"\n'
             '#endif\n'
-            '#if NEXUS_FACTORY_ABI_EPOCH != 2U\n'
+            '#if NEXUS_FACTORY_ABI_EPOCH != 3U\n'
             '#error "Unsupported factory interface epoch"\n'
             '#endif\n'
             '#if __has_include("stm32f4xx.h") || __has_include("gd32f4xx.h")\n'
@@ -261,9 +261,12 @@ def service_sources(sdk, specification):
                 "\\" in authored["board_package"]):
             raise ValueError("F4 reference requires its canonical Board directory")
         name = (board / "board.json").as_posix()
-        consumer = (Path(sdk) / "tests/contracts/crc_assembly/consumer.c"
-                    if specification.scenario == "f4_family" else
-                    verification / "consumer.c")
+        if specification.scenario == "f4_family":
+            consumer = Path(sdk) / "tests/contracts/crc_assembly/consumer.c"
+        elif specification.scenario == "f4_graphics_sdram":
+            consumer = Path(sdk) / "tests/contracts/stm32f4_graphics/consumer.c"
+        else:
+            consumer = verification / "consumer.c"
         return {"main.c": consumer,
                 name: verification / name}
     if specification.scenario == "secure_services":
@@ -348,6 +351,7 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
         "f4_sdram": "",
         "f4_qspi": "",
         "f4_graphics": "",
+        "f4_graphics_sdram": "",
         "f4_sai": "",
     }
     selected_setup = ""
@@ -414,6 +418,9 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
            'nexus_add_firmware(installed_services SOURCES main.c private_headers.c\n'
            + ('  LIBRARIES ' + libraries[specification.scenario]
               if libraries[specification.scenario] else '') + ')\n')
+        + ('target_compile_definitions(installed_services PRIVATE '
+           'NX_GRAPHICS_SDRAM_REFERENCE=1)\n'
+           if specification.scenario == "f4_graphics_sdram" else '')
         + 'nexus_target_warnings(installed_services STRICT)\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
         'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
@@ -722,12 +729,24 @@ def service_symbols(specification):
                           "nx_flash_async_service", "nx_flash_async_stop",
                           "nx_stm32_qspi_bus_ops", "nx_stm32_qspi_async_ops",
                           "nx_stm32_qspi_flash_ops", "HAL_QSPI_Init"})
-    if specification.scenario == "f4_graphics":
+    if specification.scenario in {"f4_graphics", "f4_graphics_sdram"}:
         symbols = {"nx_platform_start", "nx_platform_stop", "nx_factory_image",
                    "nx_image_port_query", "nx_stm32_image_ops"}
         if specification.assembly != "image-only.toml":
             symbols.update({"nx_factory_display", "nx_display_port_query",
                             "nx_display_port_snapshot", "nx_stm32_ltdc_ops"})
+        if specification.scenario == "f4_graphics_sdram":
+            symbols.update({
+                "nx_image_prepare", "nx_image_port_submit", "nx_image_port_service",
+                "nx_display_prepare", "nx_display_port_submit",
+                "nx_display_port_service", "nx_display_port_stop",
+                "nx_request_initialize", "nx_request_state", "nx_request_result",
+                "nx_deadline_finite_after", "nx_time_now_us",
+                "nx_stm32_sdram_prepare", "nx_stm32_sdram_stop",
+                "nx_stm32_sdram_bus_ops", "nx_stm32_sdram_graphics_attach",
+                "nx_stm32_sdram_graphics_check", "nx_stm32_sdram_graphics_detach",
+                "nx_stm32_sdram_graphics_overlaps",
+            })
         return frozenset(symbols)
     if specification.scenario == "f4_sai":
         return frozenset({"nx_platform_start", "nx_platform_stop",
@@ -743,6 +762,12 @@ def service_scope(specification):
         return ("Selected exact F4 internal HSI16/CRC C11 link, "
                 "resources and method retention only. No external PCB, "
                 "startup execution, measured stack or physical timing.")
+    if specification.scenario == "f4_graphics_sdram":
+        return ("Selected F479NI public DMA2D to LTDC composition with an "
+                "explicit graphics-owned SDRAM endpoint; ARM C11 link, "
+                "resources and graphics-memory bridge retention only. "
+                "No physical SDRAM, panel, startup execution, bandwidth, "
+                "measured stack or physical timing qualification.")
     if specification.scenario in {"f4_crypto", "f4_sdram", "f4_graphics",
                                    "f4_sai", "f4_qspi"}:
         return ("Selected exact F4 public factory C11 link, resources and "

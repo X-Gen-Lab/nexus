@@ -1,14 +1,11 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 2225a308d745c74fc48302580a33c918a0da2ef75d8b52f33b5674df21c02585\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 128c1762233f6288c4a5110035d49977b65fecec77c4f2e85265e6dfc6201fb8\n"
 
 msgid "当前平台交付边界"
 msgstr "Current platform delivery boundaries"
 
 msgid "当前重构将生产 SoC 收敛为 STM32F4，现有 F407VE／ZG 及四个 Board 包迁入系列入口。 全部 vendor 来源保留；Native 移到显式测试支撑。应用任务、产品策略和私有 PCB 继续由外部工程维护。"
 msgstr "The current refactor narrows production SoCs to STM32F4 and moves existing F407VE/ZG implementations and four Board packages into the series entry point. All vendor sources are retained; Native moves to explicit test support. Application tasks, product policies and private PCBs remain in external projects."
-
-msgid "本页说明当前阅读与验收入口，不把源码存在、文档构建或历史软件结果写成本次通过。 默认 F407 路径的启动、停止、失败回滚、共享资源及诊断已由手写 C 维护，生成器负责 静态连接。后续主线是精确 F4 型号扩展、所需运行期能力和真实测量，按实际回归与源码 身份验收。当前物理 HIL 为 `not_executed`，本次重构没有自动建立软件候选。"
-msgstr "This page identifies current reading and acceptance entry points. Source presence, documentation builds and historical software results are not recorded as passes for this iteration. The default F407 startup, stop, failure rollback, shared resources and diagnostics are maintained in handwritten C; the generator provides static connections. Further work covers exact F4 parts, required runtime capabilities and physical measurements, accepted against actual regressions and source identity. Physical HIL remains `not_executed`; this refactor creates no software candidate automatically."
 
 msgid "主机配置统一由 `tools/configure/` 维护；配置代码不进入 MCU 镜像。"
 msgstr "Host configuration is maintained in `tools/configure/`; its code is not linked into the MCU image."
@@ -67,11 +64,23 @@ msgstr "[Current architecture tasks](architecture.md#本轮架构迭代任务)"
 msgid "WP01–WP12 与 IO01–IO20 的既有基础、实施增量和退出条件"
 msgstr "Existing foundations, implementation increments and exit criteria for WP01–WP12 and IO01–IO20"
 
-msgid "[本批变更与验证](https://github.com/X-Gen-Lab/nexus/pull/61)"
-msgstr "[Current changes and verification](https://github.com/X-Gen-Lab/nexus/pull/61)"
+msgid "本页说明当前阅读与验收入口，不把源码存在、文档构建或历史软件结果写成本次通过。 默认 F407 路径的启动、停止、失败回滚、共享资源及诊断已由手写 C 维护，生成器负责 静态连接。后续主线是精确 F4 型号扩展、所需运行期能力和真实测量，按实际回归与源码 身份验收。当前物理 HIL 为 `not_executed`。本轮已选软件范围的实际结果见下方固定 源码记录；文档更新不把这些结果转移到后续提交。"
+msgstr "This page identifies current reading and acceptance entry points. Source presence, documentation builds and historical software results are not recorded as passes for this iteration. The default F407 startup, stop, failure rollback, shared resources and diagnostics are maintained in handwritten C; the generator provides static connections. Further work covers exact F4 parts, required runtime capabilities and physical measurements, accepted against actual regressions and source identity. Physical HIL remains `not_executed`. Actual results for this iteration's selected software scope are bound to the fixed source records below; documentation updates do not transfer those results to later commits."
 
-msgid "PR #61 的源码与实际执行记录；后续增量不继承基线资格"
-msgstr "PR #61 source and actual execution records; later increments do not inherit baseline qualification"
+msgid "[本批变更与验证](https://github.com/X-Gen-Lab/nexus/pull/62)"
+msgstr "[Current changes and verification](https://github.com/X-Gen-Lab/nexus/pull/62)"
 
-msgid "本轮架构迭代以固定源码 [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984) 为既有基础。该版本已有的流式传输、恢复和勘误修正，与本轮工作包新增内容分别记录。 PR、目录或公共接口存在不等于工作包完成；当前实施仍须取得对应源码的测试、ARM、 资源、SDK 与文档结果。实板和远端 Actions 按用户要求暂缓，软件验收使用本地门禁。"
-msgstr "This architecture iteration uses fixed source [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984) as its existing baseline. Its streaming, recovery and errata fixes are recorded separately from new work-package changes. A PR, directory or public interface does not establish package completion. Current changes still need source-specific tests, ARM, resource, SDK and documentation results. Physical boards and remote Actions are deferred at the user's request; software acceptance uses local gates."
+msgid "便携 I/O 重构、实际源码身份、普通门禁、SDK 与资源结果"
+msgstr "Portable I/O refactor, actual source identities, ordinary gates, SDK and resource results"
+
+msgid "[前序变更](https://github.com/X-Gen-Lab/nexus/pull/61)"
+msgstr "[Preceding changes](https://github.com/X-Gen-Lab/nexus/pull/61)"
+
+msgid "PR #61 保留自己的源码与执行范围"
+msgstr "PR #61 retains its own source and execution scope"
+
+msgid "本轮架构迭代以固定源码 [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984) 为既有基础。该版本已有的流式传输、恢复和勘误修正，与本轮工作包新增内容分别记录。 本轮便携 I/O 的平台实现为 [`6b59f666`](https://github.com/X-Gen-Lab/nexus/tree/6b59f66628f0dbb415f6203ba917c1fe717bf3fd)， 其 Debug、Release、ASAN+UBSAN 和 TSAN 各执行完整 329 个 CTest 项、5982 个 GoogleTest 用例并通过。最终 [`4bf4b5a2`](https://github.com/X-Gen-Lab/nexus/tree/4bf4b5a258b3120c24f6d834545ac3f300ce801b) 仅继续迁移 TMP117 SDK 调用者；编译输入审计确认该文件不属于上述四种 Native 程序的输入，没有把前次运行写成该提交重新执行。"
+msgstr "This architecture iteration retains the fixed source [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984) as its existing foundation. Streaming, recovery and errata fixes already present there are recorded separately from this iteration's work-package increments. The portable I/O platform implementation is [`6b59f666`](https://github.com/X-Gen-Lab/nexus/tree/6b59f66628f0dbb415f6203ba917c1fe717bf3fd); Debug, Release, ASAN+UBSAN and TSAN each passed the complete 329 CTest entries and 5982 GoogleTest cases. The final [`4bf4b5a2`](https://github.com/X-Gen-Lab/nexus/tree/4bf4b5a258b3120c24f6d834545ac3f300ce801b) only continues the TMP117 SDK caller migration. A compiler-input audit confirms that file is not an input to those four Native programs; the earlier runs are not relabeled as executions at that commit."
+
+msgid "`4bf4b5a2` 的 clean-source SDK 已完成导出、验证、整体搬移、全部 34 个维护消费者 和消费后验证，165 条消费者子命令全部成功。SDK manifest、完整报告、失败尝试、 产物身份与本地交付包的校验值见 PR #62；它们不表示已上传 Release 附件。文档与 ARM 参考构建保留各自原始输入；[验收边界](qualification.md)说明不同结果的适用范围。 实板和远端 Actions 按用户要求暂缓，软件验收使用本地门禁。"
+msgstr "The clean-source SDK at `4bf4b5a2` completed export, verification, whole-prefix relocation, all 34 maintained consumers and post-consumption verification; all 165 consumer subcommands succeeded. PR #62 identifies the SDK manifest, complete reports, failed attempts, artifact identities and local delivery-package checksums; these do not imply uploaded Release assets. Documentation and ARM reference builds retain their original inputs; [acceptance boundaries](qualification.md) explain each result's scope. Physical tests and remote Actions are deferred at the user's request; software acceptance uses local gates."

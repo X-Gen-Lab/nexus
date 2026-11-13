@@ -681,6 +681,81 @@ static nx_result_t wakeup(void* raw, const nx_rtc_wakeup_t* config) {
         controls |= RTC_CR_WUTE;
     return auxiliary_control(s, controls);
 }
+#if defined(NX_STM32_RTC_PERIODIC_WAKEUP)
+/** \brief Find the nearest bounded counter without a 64-bit divide runtime.
+ * \note At most 17 iterations over the physical counter range. Ties retain
+ *       the shorter period. This runs only during explicit task-side setup.
+ */
+static uint32_t nearest_count(uint64_t target, uint64_t quantum,
+                              uint32_t minimum, uint32_t maximum) {
+    uint32_t low = minimum;
+    uint32_t high = maximum;
+    while (low < high) {
+        uint32_t middle = low + (high - low + 1U) / 2U;
+        if ((uint64_t)middle * quantum <= target)
+            low = middle;
+        else
+            high = middle - 1U;
+    }
+    if (low < maximum) {
+        uint64_t lower = (uint64_t)low * quantum;
+        uint64_t upper = (uint64_t)(low + 1U) * quantum;
+        if (lower <= target && upper - target < target - lower)
+            ++low;
+    }
+    return low;
+}
+/** \brief Select a native counter without exposing its divider/reload layout.
+ * \note The maintained profile uses a nominal 32768 Hz reference. All six
+ *       candidates are checked before hardware changes. Scaling is bounded
+ *       by the largest physical period, independently of caller tolerance.
+ */
+static nx_result_t periodic_wakeup(void* raw, uint64_t period_us,
+                                   uint32_t tolerance_us,
+                                   nx_rtc_period_t* actual) {
+    nx_stm32_rtc_state_t* s = raw;
+    nx_result_t result = auxiliary_admit(s);
+    if (result != NX_SUCCESS)
+        return result;
+    if (!external(s, actual, sizeof(*actual), _Alignof(nx_rtc_period_t), true))
+        return NX_ERROR_INVALID;
+    if (period_us > UINT64_C(131072000000))
+        return NX_ERROR_UNSUPPORTED;
+    nx_rtc_wakeup_t selected = {false, NX_RTC_WAKE_SECOND, 0U};
+    nx_rtc_period_t period = {0U, 32768U};
+    if (period_us != 0U) {
+        static const uint32_t divisors[] = {16U, 8U, 4U, 2U, 32768U, 32768U};
+        const uint64_t target = period_us * UINT64_C(32768);
+        uint64_t best_error = UINT64_MAX;
+        for (unsigned mode = 0U; mode < 6U; ++mode) {
+            const uint64_t quantum =
+                (uint64_t)divisors[mode] * UINT64_C(1000000);
+            const uint32_t minimum = mode == 5U ? 65537U : mode == 3U ? 2U : 1U;
+            const uint32_t maximum = mode == 5U ? 131072U : 65536U;
+            uint32_t count = nearest_count(target, quantum, minimum, maximum);
+            const uint64_t ticks = (uint64_t)count * divisors[mode];
+            const uint64_t candidate = ticks * UINT64_C(1000000);
+            const uint64_t error =
+                candidate > target ? candidate - target : target - candidate;
+            if (error < best_error ||
+                (error == best_error && ticks < period.ticks)) {
+                best_error = error;
+                period.ticks = ticks;
+                selected.enabled = true;
+                selected.clock = (nx_rtc_wake_clock_t)mode;
+                selected.reload =
+                    (uint16_t)(count - 1U - (mode == 5U ? 65536U : 0U));
+            }
+        }
+        if (best_error > (uint64_t)tolerance_us * UINT64_C(32768))
+            return NX_ERROR_UNSUPPORTED;
+    }
+    result = wakeup(s, &selected);
+    if (result == NX_SUCCESS)
+        *actual = period;
+    return result;
+}
+#endif
 /** \brief ES0182 2.9.6 applies every time an edge source is enabled again. */
 static nx_result_t capture_input(nx_stm32_rtc_state_t* s, uint32_t tafcr) {
     if ((tafcr & (RTC_TAFCR_TAMP1E | RTC_TAFCR_TAMPFLT)) != RTC_TAFCR_TAMP1E)
@@ -1420,11 +1495,17 @@ static nx_result_t standby_restore(void* raw, nx_rtc_standby_t* receipt) {
     return NX_SUCCESS;
 }
 static const nx_rtc_aux_ops_t auxiliary_ops = {
-    alarm_b,        wakeup,         capture_configure, capture_read,
-    events,         acknowledge,    calibrate,         wake_route,
-    backup_read,    backup_write,   sram_prepare,      sram_acquire,
-    sram_release,   handoff,        standby_prepare,   standby_validate,
-    standby_commit, standby_restore};
+    alarm_b,        wakeup,          capture_configure, capture_read,
+    events,         acknowledge,     calibrate,         wake_route,
+    backup_read,    backup_write,    sram_prepare,      sram_acquire,
+    sram_release,   handoff,         standby_prepare,   standby_validate,
+    standby_commit, standby_restore,
+#if defined(NX_STM32_RTC_PERIODIC_WAKEUP)
+    periodic_wakeup
+#else
+    NULL
+#endif
+};
 const nx_rtc_ops_t nx_stm32_rtc_ops = {
     read_calendar, set_calendar, submit, cancel, service, stop, &auxiliary_ops};
 /** \brief Empty means reset-like calendar/control, not INITS == 0 alone. */

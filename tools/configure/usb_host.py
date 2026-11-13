@@ -37,6 +37,15 @@ def validate_selection(selection, route, provider):
                   for pin in route["pins"]) != pins):
         fail("USB Host route differs from the exact selected PHY pads")
     integer(selection["channel_count"], 1, channels, "USB Host channels")
+    mapping = selection.get("pipe_channels")
+    if mapping is not None:
+        if not isinstance(mapping, (list, tuple)) or len(mapping) != selection["channel_count"]:
+            fail("USB Host pipe mapping must cover the selected capacity")
+        for channel in mapping:
+            integer(channel, 0, selection["channel_count"] - 1,
+                    "USB Host pipe channel")
+        if len(set(mapping)) != len(mapping):
+            fail("USB Host pipe mapping repeats a physical channel")
     integer(selection["rx_fifo_words"], 64, words, "USB Host RX FIFO")
     integer(selection["nonperiodic_fifo_words"], 16, words,
             "USB Host nonperiodic FIFO")
@@ -56,3 +65,12 @@ def validate_selection(selection, route, provider):
         integer(selection[key], 1, context="USB Host " + key)
     if selection["electrical_handover"] != "external-owner":
         fail("USB Host requires an explicit external VBUS/PHY electrical owner")
+
+
+def pipe_editor_schema(properties, fields):
+    """Expose the optional immutable permutation without another authority."""
+    if "pipe_channels" in fields:
+        properties["pipe_channels"] = {"type": "array", "minItems": 1,
+                                      "maxItems": 12, "uniqueItems": True,
+                                      "items": {"type": "integer", "minimum": 0,
+                                                "maximum": 11}}

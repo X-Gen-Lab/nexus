@@ -219,7 +219,8 @@ TEST_F(NativeInstances, I2CEndpointCursorAndFaultsHaveExplicitControllerScope) {
               NX_SUCCESS);
     uint8_t address = 0;
     uint8_t value = 0;
-    nx_i2c_message_t messages[] = {{&address, 1, false}, {&value, 1, true}};
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(&address, 1),
+                                   nx_i2c_message_read(&value, 1)};
     size_t count = 0;
     ASSERT_EQ(nx_i2c_endpoint_transaction(&first_api, messages, 2, 100, &count),
               NX_SUCCESS);
@@ -237,6 +238,34 @@ TEST_F(NativeInstances, I2CEndpointCursorAndFaultsHaveExplicitControllerScope) {
     ASSERT_EQ(nx_i2c_port_recover(&bus_api), NX_SUCCESS);
     EXPECT_EQ(nx_i2c_endpoint_transaction(&first_api, messages, 2, 100, &count),
               NX_SUCCESS);
+}
+
+TEST_F(NativeInstances, I2cConstWriteAndMutableReadUseTheSameEndpoint) {
+    nx_native_i2c_state_t state = {};
+    nx_native_i2c_endpoint_state_t device = {};
+    const nx_i2c_endpoint_t endpoint = {&nx_native_i2c_endpoint_ops, &device};
+    uint8_t memory[4] = {};
+    ASSERT_EQ(nx_native_i2c_port_configure_instance(&state), NX_SUCCESS);
+    ASSERT_EQ(nx_native_i2c_configure_instance(&device, &state, memory,
+                                               sizeof(memory), 0x50),
+              NX_SUCCESS);
+    const uint8_t tx[] = {1U, 0xA5U};
+    auto write = nx_i2c_message_write(tx, sizeof(tx));
+    size_t count = 0U;
+    ASSERT_EQ(nx_i2c_endpoint_transaction(&endpoint, &write, 1U, 1000U, &count),
+              NX_SUCCESS);
+    EXPECT_EQ(memory[1], 0xA5U);
+    const uint8_t address = 1U;
+    uint8_t value = 0U;
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(&address, 1U),
+                                   nx_i2c_message_read(&value, 1U)};
+    ASSERT_EQ(
+        nx_i2c_endpoint_transaction(&endpoint, messages, 2U, 1000U, &count),
+        NX_SUCCESS);
+    EXPECT_EQ(value, 0xA5U);
+    EXPECT_EQ(count, 2U);
+    EXPECT_EQ(tx[0], 1U);
+    EXPECT_EQ(tx[1], 0xA5U);
 }
 
 TEST_F(NativeInstances, FlashProgramAndFaultsDoNotCrossInstanceMemory) {
@@ -275,6 +304,10 @@ TEST_F(NativeInstances, EXTIQueuesAndStopAreIndependent) {
     ASSERT_EQ(nx_native_exti_configure_instance(&second, 2, NX_EXTI_BOTH,
                                                 second_storage, 1),
               NX_SUCCESS);
+    EXPECT_EQ(nx_native_exti_emit_instance(&first, 2, NX_EXTI_RISING),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(first.count, 0U);
+    EXPECT_EQ(second.count, 0U);
     ASSERT_EQ(nx_native_exti_emit_instance(&first, 1, NX_EXTI_RISING),
               NX_SUCCESS);
     EXPECT_EQ(nx_native_exti_emit_instance(&first, 1, NX_EXTI_RISING),
@@ -285,7 +318,8 @@ TEST_F(NativeInstances, EXTIQueuesAndStopAreIndependent) {
     nx_exti_event_t result = {};
     size_t count = 0;
     ASSERT_EQ(nx_exti_port_read(&second_api, &result, 1, &count), NX_SUCCESS);
-    EXPECT_EQ(result.line, 2);
+    EXPECT_EQ(count, 1U);
+    EXPECT_EQ(result.edge, NX_EXTI_FALLING);
     EXPECT_EQ(result.flags, 0u);
 }
 
@@ -411,7 +445,7 @@ TEST_F(NativeInstances, I2CLongReadUsesTheSameBoundedMessageContract) {
                                                sizeof(memory), 0x50),
               NX_SUCCESS);
     size_t transferred = 0;
-    nx_i2c_message_t read = {output, 256, true};
+    nx_i2c_message_t read = nx_i2c_message_read(output, 256);
     ASSERT_EQ(
         nx_i2c_endpoint_transaction(&endpoint, &read, 1, 1000, &transferred),
         NX_SUCCESS);
@@ -432,7 +466,7 @@ TEST_F(NativeInstances, I2CLongReadUsesTheSameBoundedMessageContract) {
     EXPECT_EQ(device.cursor, 0U);
     nx_i2c_message_t messages[9] = {};
     for (auto& message : messages) {
-        message = {output, 1, true};
+        message = nx_i2c_message_read(output, 1);
     }
     EXPECT_EQ(
         nx_i2c_endpoint_transaction(&endpoint, messages, 9, 1000, &transferred),
@@ -451,7 +485,7 @@ TEST_F(NativeInstances, I2CDeadlineAndRecoveryPreserveExecutionContracts) {
     ASSERT_EQ(nx_native_i2c_configure_instance(&device, &state, memory,
                                                sizeof(memory), 0x50),
               NX_SUCCESS);
-    nx_i2c_message_t read = {output, sizeof(output), true};
+    nx_i2c_message_t read = nx_i2c_message_read(output, sizeof(output));
     size_t transferred = 0;
     EXPECT_EQ(nx_i2c_endpoint_transaction(&endpoint, &read, 1, 3, &transferred),
               NX_ERROR_TIMEOUT);
@@ -479,7 +513,7 @@ TEST_F(NativeInstances, I2CDeadlineIncludesTheLastByteInterval) {
     ASSERT_EQ(nx_native_i2c_configure_instance(&device, &state, memory,
                                                sizeof(memory), 0x50),
               NX_SUCCESS);
-    nx_i2c_message_t read = {output, sizeof(output), true};
+    nx_i2c_message_t read = nx_i2c_message_read(output, sizeof(output));
     size_t transferred = 0;
     EXPECT_EQ(nx_i2c_endpoint_transaction(&endpoint, &read, 1, 3, &transferred),
               NX_ERROR_TIMEOUT);

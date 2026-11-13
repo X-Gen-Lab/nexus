@@ -43,7 +43,7 @@ class I2CAsyncRegisters : public testing::Test {
                                         &endpoint_state};
     nx_i2c_request_t request = {};
     uint8_t bytes[4] = {};
-    nx_i2c_message_t message = {bytes, 1U, true};
+    nx_i2c_message_t message = nx_i2c_message_read(bytes, 1U);
     nx_result_t stop_from_wake_result = NX_SUCCESS;
     /* The provider may retain this wake beyond TestBody after a fatal ASSERT.
      * Keep its callback and context alive until TearDown has joined it. */
@@ -151,7 +151,8 @@ class I2CAsyncRegisters : public testing::Test {
     void RejectMetadataPayload(uint8_t* data) {
         for (bool read : {false, true}) {
             SCOPED_TRACE(read);
-            message = {data, 1U, read};
+            message = read ? nx_i2c_message_read(data, 1U)
+                           : nx_i2c_message_write(data, 1U);
             ASSERT_EQ(NX_SUCCESS,
                       nx_i2c_request_prepare(&request, &message, 1U, 1000U));
             const std::vector<uint32_t> before(registers, registers + 9U);
@@ -299,7 +300,8 @@ TEST_F(I2CAsyncRegisters, TenBitWriteThenReadRetainsOneRequestAcrossRestarts) {
     endpoint_state.address_bits = 10U;
     registers[7] = state.timing_ccr = (1U << 15U) | 36U;
     bytes[0] = 0x30U;
-    nx_i2c_message_t messages[] = {{bytes, 1U, false}, {bytes + 1U, 2U, true}};
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(bytes, 1U),
+                                   nx_i2c_message_read(bytes + 1U, 2U)};
     ASSERT_EQ(NX_SUCCESS,
               nx_i2c_request_prepare(&request, messages, 2U, 1000U));
     ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_submit(&endpoint, &request));
@@ -369,7 +371,8 @@ TEST_F(I2CAsyncRegisters, StandardTenBitReadUsesErrataSafeNominalTiming) {
 
 TEST_F(I2CAsyncRegisters, UnsafeSevenBitRestartRejectsBeforeLoanOrRegisters) {
     registers[7] = 210U;
-    nx_i2c_message_t messages[] = {{bytes, 1U, false}, {bytes + 1U, 2U, true}};
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(bytes, 1U),
+                                   nx_i2c_message_read(bytes + 1U, 2U)};
     ASSERT_EQ(NX_SUCCESS,
               nx_i2c_request_prepare(&request, messages, 2U, 1000U));
     const std::vector<uint32_t> before(registers, registers + 9U);
@@ -568,9 +571,31 @@ TEST_F(I2CAsyncRegisters, FourBytesConsumesOneThenFinalOneAndTwo) {
     EXPECT_EQ(request.base.transferred, 4U);
 }
 
+TEST_F(I2CAsyncRegisters, ProviderRejectsLargerLegalMessageBeforeEffects) {
+    uint8_t oversized[300] = {};
+    auto selected = nx_i2c_message_read(oversized, sizeof(oversized));
+    ASSERT_EQ(nx_i2c_request_prepare(&request, &selected, 1U, 1000U),
+              NX_SUCCESS);
+    const std::vector<uint32_t> before(registers, registers + 9U);
+    EXPECT_EQ(nx_i2c_endpoint_submit(&endpoint, &request),
+              NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    EXPECT_EQ(state.active, nullptr);
+    EXPECT_EQ(before, std::vector<uint32_t>(registers, registers + 9U));
+    nx_i2c_message_t many[9] = {};
+    for (auto& item : many) {
+        item = nx_i2c_message_write(oversized, 1U);
+    }
+    ASSERT_EQ(nx_i2c_request_prepare(&request, many, 9U, 1000U), NX_SUCCESS);
+    EXPECT_EQ(nx_i2c_endpoint_submit(&endpoint, &request),
+              NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    EXPECT_EQ(state.active, nullptr);
+    EXPECT_EQ(before, std::vector<uint32_t>(registers, registers + 9U));
+}
+
 TEST_F(I2CAsyncRegisters, TransmitTxeDoesNotConfirmWirePrefix) {
-    message.length = 2U;
-    message.read = false;
+    message = nx_i2c_message_write(bytes, 2U);
     bytes[0] = 4U;
     bytes[1] = 5U;
     Begin();
@@ -711,7 +736,8 @@ class I2CDmaRegisters : public I2CAsyncRegisters {
 
 TEST_F(I2CDmaRegisters, StandardSevenBitDmaRestartUsesErrataSafeNominalTiming) {
     EXPECT_EQ(239U, registers[7]);
-    nx_i2c_message_t messages[] = {{bytes, 1U, false}, {bytes + 1U, 3U, true}};
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(bytes, 1U),
+                                   nx_i2c_message_read(bytes + 1U, 3U)};
     ASSERT_EQ(NX_SUCCESS,
               nx_i2c_request_prepare(&request, messages, 2U, 1000U));
     ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_submit(&endpoint, &request));
@@ -740,7 +766,8 @@ TEST_F(I2CDmaRegisters, StandardSevenBitDmaRestartUsesErrataSafeNominalTiming) {
 
 TEST_F(I2CDmaRegisters, UnsafeSevenBitRestartRejectsBeforeDmaOrLoan) {
     registers[7] = 210U;
-    nx_i2c_message_t messages[] = {{bytes, 1U, false}, {bytes + 1U, 3U, true}};
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(bytes, 1U),
+                                   nx_i2c_message_read(bytes + 1U, 3U)};
     ASSERT_EQ(NX_SUCCESS,
               nx_i2c_request_prepare(&request, messages, 2U, 1000U));
     const std::vector<uint32_t> before(registers, registers + 9U);
@@ -833,8 +860,7 @@ TEST_F(I2CDmaRegisters,
 }
 
 TEST_F(I2CDmaRegisters, TxCounterZeroStillWaitsForBtf) {
-    message.read = false;
-    message.length = 3U;
+    message = nx_i2c_message_write(bytes, 3U);
     Begin();
     Complete(false);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
@@ -908,7 +934,8 @@ TEST_F(I2CDmaRegisters, AllDomainsValidateBeforeAdmissionOrMmio) {
 TEST_F(I2CAsyncRegisters, RepeatedStartKeepsOneLoanAndResetsReceiveWindow) {
     EXPECT_EQ(239U, registers[7]);
     bytes[0] = 0x10U;
-    nx_i2c_message_t sequence[2] = {{bytes, 1U, false}, {bytes + 1U, 2U, true}};
+    nx_i2c_message_t sequence[2] = {nx_i2c_message_write(bytes, 1U),
+                                    nx_i2c_message_read(bytes + 1U, 2U)};
     ASSERT_EQ(nx_i2c_request_prepare(&request, sequence, 2U, 1000U),
               NX_SUCCESS);
     ASSERT_EQ(nx_i2c_endpoint_submit(&endpoint, &request), NX_SUCCESS);
@@ -946,7 +973,8 @@ TEST_F(I2CAsyncRegisters, RepeatedStartKeepsOneLoanAndResetsReceiveWindow) {
 
 TEST_F(I2CAsyncRegisters,
        ReadWriteAliasesAndDescriptorWrapRejectBeforeMutation) {
-    nx_i2c_message_t sequence[2] = {{bytes, 2U, false}, {bytes + 1U, 2U, true}};
+    nx_i2c_message_t sequence[2] = {nx_i2c_message_write(bytes, 2U),
+                                    nx_i2c_message_read(bytes + 1U, 2U)};
     EXPECT_EQ(nx_i2c_request_prepare(&request, sequence, 2U, 1000U),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
@@ -955,14 +983,10 @@ TEST_F(I2CAsyncRegisters,
         reinterpret_cast<nx_i2c_message_t*>(UINTPTR_MAX & ~uintptr_t(7U));
     EXPECT_EQ(nx_i2c_request_prepare(&request, wrap, 1U, 1000U),
               NX_ERROR_INVALID);
-    nx_i2c_message_t control = {reinterpret_cast<uint8_t*>(&request), 1U, true};
+    nx_i2c_message_t control =
+        nx_i2c_message_read(reinterpret_cast<uint8_t*>(&request), 1U);
     EXPECT_EQ(nx_i2c_request_prepare(&request, &control, 1U, 1000U),
               NX_ERROR_INVALID);
-    EXPECT_EQ(nx_i2c_request_prepare(&request, &message, 9U, 1000U),
-              NX_ERROR_UNSUPPORTED);
-    message.length = 257U;
-    EXPECT_EQ(nx_i2c_request_prepare(&request, &message, 1U, 1000U),
-              NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(state.active, nullptr);
 }
 
@@ -1055,7 +1079,8 @@ TEST_F(I2CDmaRegisters, ColdRouteTamperingRejectsBeforeRegistersOrPublishers) {
 
 TEST_F(I2CAsyncRegisters,
        ReceivedTailDoesNotRequestAnAlreadyCompletedRestartAgain) {
-    nx_i2c_message_t sequence[] = {{bytes, 2U, true}, {bytes + 2U, 1U, false}};
+    nx_i2c_message_t sequence[] = {nx_i2c_message_read(bytes, 2U),
+                                   nx_i2c_message_write(bytes + 2U, 1U)};
     ASSERT_EQ(NX_SUCCESS,
               nx_i2c_request_prepare(&request, sequence, 2U, 1000U));
     ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_submit(&endpoint, &request));
@@ -1076,7 +1101,8 @@ TEST_F(I2CAsyncRegisters,
 }
 
 TEST_F(I2CDmaRegisters, ReceivedDmaByteDoesNotRepeatItsCompletedRestartAtTc) {
-    nx_i2c_message_t sequence[] = {{bytes, 1U, true}, {bytes + 1U, 1U, false}};
+    nx_i2c_message_t sequence[] = {nx_i2c_message_read(bytes, 1U),
+                                   nx_i2c_message_write(bytes + 1U, 1U)};
     ASSERT_EQ(NX_SUCCESS,
               nx_i2c_request_prepare(&request, sequence, 2U, 1000U));
     ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_submit(&endpoint, &request));

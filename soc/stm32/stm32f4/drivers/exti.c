@@ -128,7 +128,6 @@ void nx_stm32_exti_dispatch(nx_stm32_exti_state_t* const* ports, size_t count,
         port->storage[port->head] =
             (nx_exti_event_t){.timestamp_us = nx_time_now_us(),
                               .flags = NX_EXTI_EVENT_COALESCED,
-                              .line = port->line,
                               .edge = edge};
         if (++port->head == port->capacity) {
             port->head = 0U;
@@ -171,7 +170,6 @@ nx_result_t nx_stm32_exti_read(void* context, nx_exti_event_t* events,
     if (loss) {
         events[(*count)++] = (nx_exti_event_t){.timestamp_us = nx_time_now_us(),
                                                .flags = NX_EXTI_EVENT_LOSS,
-                                               .line = port->line,
                                                .edge = port->edge};
     }
     return *count == 0U ? NX_ERROR_EMPTY : NX_SUCCESS;

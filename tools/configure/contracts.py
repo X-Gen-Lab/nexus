@@ -86,12 +86,15 @@ CONTROLLER_CONTRACTS = MappingProxyType({
     'hash': ControllerContract(frozenset(('binding', 'mode', 'irq')),
                                 frozenset(('irq_priority', 'calls_os')), 'hash'),
     'display': ControllerContract(
-        frozenset(('binding', 'mode', 'irq', 'drain_us', 'timing', 'layers')),
-        frozenset(('irq_priority', 'calls_os', 'drain_us', 'timing', 'layers')),
+        frozenset(('binding', 'mode', 'irq', 'drain_us', 'timing', 'layers',
+                   'memory_window')),
+        frozenset(('irq_priority', 'calls_os', 'drain_us', 'timing', 'layers',
+                   'memory_window')),
         'display'),
     'image': ControllerContract(
-        frozenset(('binding', 'mode', 'irq', 'drain_us')),
-        frozenset(('irq_priority', 'calls_os', 'drain_us')), 'image'),
+        frozenset(('binding', 'mode', 'irq', 'drain_us', 'memory_window')),
+        frozenset(('irq_priority', 'calls_os', 'drain_us', 'memory_window')),
+        'image'),
     'crc': ControllerContract(frozenset(('binding', 'mode')),
                               frozenset(), 'crc'),
     'can': ControllerContract(
@@ -120,11 +123,12 @@ CONTROLLER_CONTRACTS = MappingProxyType({
         frozenset(('binding', 'mode', 'channel_count', 'rx_fifo_words',
                    'nonperiodic_fifo_words', 'periodic_fifo_words', 'engine',
                    'ulpi_clock_hz', 'drain_timeout_us', 'init_timeout_us',
-                   'electrical_handover', 'irq')),
+                   'electrical_handover', 'irq', 'pipe_channels')),
         frozenset(('channel_count', 'rx_fifo_words',
                    'nonperiodic_fifo_words', 'periodic_fifo_words', 'engine',
                    'ulpi_clock_hz', 'drain_timeout_us', 'init_timeout_us',
-                   'electrical_handover', 'irq_priority', 'calls_os')),
+                   'electrical_handover', 'irq_priority', 'calls_os',
+                   'pipe_channels')),
         'usb_host'),
     'eth': ControllerContract(
         frozenset((
@@ -239,9 +243,9 @@ CONTROLLER_CONTRACTS = MappingProxyType({
         )), 'ethernet_frames'),
     'rtc': ControllerContract(
         frozenset(('binding', 'mode', 'allow_set', 'timeout_us', 'poll_limit',
-                   'initial', 'lse_bypass')),
+                   'initial', 'lse_bypass', 'periodic_wakeup')),
         frozenset(('allow_set', 'timeout_us', 'poll_limit', 'initial',
-                   'lse_bypass')), 'rtc'),
+                   'lse_bypass', 'periodic_wakeup')), 'rtc'),
     'lptim': ControllerContract(
         frozenset(('binding', 'irq', 'mode', 'tick_hz')),
         frozenset(('tick_hz',)), 'lptim'),

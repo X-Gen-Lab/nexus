@@ -13,6 +13,7 @@ extern "C" {
 #include <cstring>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
+#include <vector>
 
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
@@ -31,6 +32,7 @@ struct Hardware {
     nx_time_us_t now = 0U;
     volatile uint32_t* refused = nullptr;
     uint32_t refused_mask = UINT32_MAX;
+    unsigned reads = 0U;
     unsigned writes = 0U, compare_writes = 0U, shared_resets = 0U;
     bool inject_update = false, partial_active = false;
     bool break_on_compare = false, hold_irq = false;
@@ -194,7 +196,7 @@ class TimerWaveform : public testing::Test {
         frame.channel_count = 3U;
         frame.trigger_ticks = 500U;
     }
-    void sequence_source(size_t rows = 3U) {
+    void sequence_configuration() {
         config.kind = NX_STM32_WAVE_SEQUENCE;
         config.burst_budget_hclk_cycles = 128U;
         hardware.dma_lane = config.controller == 1U ? 5U : 2U;
@@ -203,6 +205,9 @@ class TimerWaveform : public testing::Test {
                                               : DMA1_Stream2_IRQn,
                       hardware.dma_lane,
                       static_cast<uint8_t>(config.controller == 1U ? 6U : 5U)};
+    }
+    void sequence_source(size_t rows = 3U, uint32_t first_period = 1000U) {
+        sequence_configuration();
         const size_t width = config.controller == 1U ? 4U : 2U;
         slot.data = reinterpret_cast<uint8_t*>(pool);
         slot.capacity = sizeof(pool);
@@ -216,13 +221,14 @@ class TimerWaveform : public testing::Test {
         ASSERT_EQ(nx_stream_reserve(&stream, &fill), NX_SUCCESS);
         for (size_t row = 0U; row < rows; ++row)
             for (size_t item = 0U; item < 6U; ++item) {
-                uint32_t value = item == 0U
-                                     ? 999U + 10U * static_cast<uint32_t>(row)
-                                 : item == 1U ? 0U
-                                 : (config.channels & (1U << (item - 2U))) != 0U
-                                     ? 100U * static_cast<uint32_t>(item - 1U) +
-                                           static_cast<uint32_t>(row)
-                                     : 0U;
+                uint32_t value =
+                    item == 0U
+                        ? first_period - 1U + 10U * static_cast<uint32_t>(row)
+                    : item == 1U ? 0U
+                    : (config.channels & (1U << (item - 2U))) != 0U
+                        ? 100U * static_cast<uint32_t>(item - 1U) +
+                              static_cast<uint32_t>(row)
+                        : 0U;
                 std::memcpy(fill.data + (row * 6U + item) * width, &value,
                             width);
             }
@@ -239,9 +245,9 @@ class TimerWaveform : public testing::Test {
         nx_stm32_waveform_dma_irq(&owner);
     }
     void sequence_tail() {
-        EXPECT_EQ(sequence.ops->service(sequence.context), NX_ERROR_BUSY);
+        EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_ERROR_BUSY);
         hardware.update();
-        EXPECT_EQ(sequence.ops->service(sequence.context), NX_ERROR_BUSY);
+        EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_ERROR_BUSY);
         hardware.update();
     }
     void coexist(uint8_t primary, uint8_t peer) {
@@ -289,6 +295,29 @@ class TimerWaveform : public testing::Test {
         EXPECT_EQ(nx_stm32_waveform_close(&owner), NX_SUCCESS);
     }
 };
+
+TEST_F(TimerWaveform, CheckedFacesRejectMalformedAndAbsentOperations) {
+    nx_timer_pulse_ops_t pulse_methods{};
+    nx_timer_sequence_ops_t sequence_methods{};
+    const nx_timer_pulse_t absent_pulse{&pulse_methods, &owner};
+    const nx_timer_sequence_t absent_sequence{&sequence_methods, &owner};
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_timer_pulse_port_submit(nullptr, &pulse_request));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_timer_sequence_port_service(nullptr));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_timer_pulse_port_submit(&pulse, nullptr));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_timer_sequence_port_submit(&sequence, nullptr));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_timer_pulse_port_service(&absent_pulse));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_timer_sequence_port_stop(&absent_sequence));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_timer_pulse_port_state(
+                  &pulse, reinterpret_cast<nx_timer_pulse_state_t*>(&pulse)));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_timer_sequence_port_state(
+                  &sequence,
+                  reinterpret_cast<nx_timer_sequence_state_t*>(&sequence)));
+}
 
 TEST_F(TimerWaveform, PlatformPrepareDoesNotStartAnyCounterOutputOrDma) {
     prepare();
@@ -395,7 +424,7 @@ TEST_F(TimerWaveform, ContextRejectionKeepsEveryIncomingMaskAndAllShadows) {
 TEST_F(TimerWaveform, OnePulseUsesPwmTwoAndJoinsAfterHardwareCounterStop) {
     config.kind = NX_STM32_WAVE_PULSE;
     prepare();
-    ASSERT_EQ(pulse.ops->submit(pulse.context, &pulse_request), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_submit(&pulse, &pulse_request), NX_SUCCESS);
     EXPECT_NE(hardware.timer.CR1 & TIM_CR1_OPM, 0U);
     EXPECT_EQ(hardware.timer.CCMR1 & 0x7070U, 0x7070U);
     EXPECT_EQ(hardware.timer.CCR1, 900U);
@@ -404,7 +433,7 @@ TEST_F(TimerWaveform, OnePulseUsesPwmTwoAndJoinsAfterHardwareCounterStop) {
     hardware.update();
     EXPECT_EQ(hardware.timer.CR1 & TIM_CR1_CEN, 0U);
     EXPECT_NE(nx_request_state(&pulse_request.base), NX_REQUEST_SETTLED);
-    EXPECT_EQ(pulse.ops->service(pulse.context), NX_SUCCESS);
+    EXPECT_EQ(nx_timer_pulse_port_service(&pulse), NX_SUCCESS);
     EXPECT_EQ(nx_request_state(&pulse_request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(pulse_request.base.transferred, 1U);
     EXPECT_EQ(hardware.timer.CCER, 0U);
@@ -413,14 +442,15 @@ TEST_F(TimerWaveform, OnePulseUsesPwmTwoAndJoinsAfterHardwareCounterStop) {
 TEST_F(TimerWaveform, CancelledPulseRetainsItsControlUntilCounterReadback) {
     config.kind = NX_STM32_WAVE_PULSE;
     prepare();
-    ASSERT_EQ(pulse.ops->submit(pulse.context, &pulse_request), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_submit(&pulse, &pulse_request), NX_SUCCESS);
     hardware.refused = &hardware.timer.CR1;
     hardware.refused_mask = TIM_CR1_CEN;
-    EXPECT_EQ(pulse.ops->cancel(pulse.context, &pulse_request), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_timer_pulse_port_cancel(&pulse, &pulse_request),
+              NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&pulse_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(owner.active, &pulse_request);
     hardware.refused = nullptr;
-    EXPECT_EQ(pulse.ops->service(pulse.context), NX_ERROR_CANCELLED);
+    EXPECT_EQ(nx_timer_pulse_port_service(&pulse), NX_ERROR_CANCELLED);
     EXPECT_EQ(nx_request_state(&pulse_request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(pulse_request.base.transferred, 0U);
 }
@@ -428,22 +458,22 @@ TEST_F(TimerWaveform, FirstObservedPulseCompletionAtDeadlineReportsTimeout) {
     config.kind = NX_STM32_WAVE_PULSE;
     prepare();
     ASSERT_EQ(nx_request_prepare(&pulse_request.base, 10U), NX_SUCCESS);
-    ASSERT_EQ(pulse.ops->submit(pulse.context, &pulse_request), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_submit(&pulse, &pulse_request), NX_SUCCESS);
     hardware.update();
     hardware.now = 10U;
-    EXPECT_EQ(pulse.ops->service(pulse.context), NX_ERROR_TIMEOUT);
+    EXPECT_EQ(nx_timer_pulse_port_service(&pulse), NX_ERROR_TIMEOUT);
     EXPECT_EQ(pulse_request.base.result, NX_ERROR_TIMEOUT);
     EXPECT_EQ(pulse_request.base.transferred, 0U);
 }
 TEST_F(TimerWaveform, PulseClockHistoryLossCannotReleaseARecoveredOldControl) {
     config.kind = NX_STM32_WAVE_PULSE;
     prepare();
-    ASSERT_EQ(pulse.ops->submit(pulse.context, &pulse_request), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_submit(&pulse, &pulse_request), NX_SUCCESS);
     hardware.rcc.APB1RSTR |= RCC_APB1RSTR_TIM3RST;
-    EXPECT_EQ(pulse.ops->service(pulse.context), NX_ERROR_STATE);
+    EXPECT_EQ(nx_timer_pulse_port_service(&pulse), NX_ERROR_STATE);
     hardware.rcc.APB1RSTR &= ~static_cast<uint32_t>(RCC_APB1RSTR_TIM3RST);
     hardware.update();
-    EXPECT_EQ(pulse.ops->service(pulse.context), NX_ERROR_STATE);
+    EXPECT_EQ(nx_timer_pulse_port_service(&pulse), NX_ERROR_STATE);
     EXPECT_EQ(nx_request_state(&pulse_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(owner.active, &pulse_request);
 }
@@ -466,13 +496,14 @@ TEST_F(TimerWaveform,
               NX_SUCCESS);
     controls->request.width_ticks = controls->widths;
     controls->request.channel_count = 4U;
-    ASSERT_EQ(pulse.ops->submit(pulse.context, &controls->request), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_submit(&pulse, &controls->request),
+              NX_SUCCESS);
     hardware.update();
-    ASSERT_EQ(pulse.ops->service(pulse.context), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_service(&pulse), NX_SUCCESS);
     ASSERT_EQ(nx_request_state(&controls->request.base), NX_REQUEST_SETTLED);
     ASSERT_EQ(mprotect(page, 4096U, PROT_NONE), 0);
     nx_stm32_waveform_irq(&owner);
-    EXPECT_EQ(pulse.ops->service(pulse.context), NX_SUCCESS);
+    EXPECT_EQ(nx_timer_pulse_port_service(&pulse), NX_SUCCESS);
     EXPECT_EQ(nx_stm32_waveform_close(&owner), NX_SUCCESS);
     EXPECT_EQ(munmap(page, 4096U), 0);
 }
@@ -483,9 +514,9 @@ TEST_F(TimerWaveform, FastPulseMayFinishBeforeTheCounterEnableReadback) {
         width = 1U;
     prepare();
     hardware.complete_on_enable = true;
-    ASSERT_EQ(pulse.ops->submit(pulse.context, &pulse_request), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_submit(&pulse, &pulse_request), NX_SUCCESS);
     EXPECT_EQ(hardware.timer.CR1 & TIM_CR1_CEN, 0U);
-    EXPECT_EQ(pulse.ops->service(pulse.context), NX_SUCCESS);
+    EXPECT_EQ(nx_timer_pulse_port_service(&pulse), NX_SUCCESS);
     EXPECT_EQ(pulse_request.base.result, NX_SUCCESS);
     EXPECT_EQ(pulse_request.base.transferred, 1U);
 }
@@ -493,8 +524,8 @@ TEST_F(TimerWaveform, RefusedUpdateClearCannotAuthorizeAFalseCompletedPulse) {
     config.kind = NX_STM32_WAVE_PULSE;
     prepare();
     hardware.hold_update_clear = true;
-    ASSERT_EQ(pulse.ops->submit(pulse.context, &pulse_request), NX_SUCCESS);
-    (void)pulse.ops->service(pulse.context);
+    ASSERT_EQ(nx_timer_pulse_port_submit(&pulse, &pulse_request), NX_SUCCESS);
+    (void)nx_timer_pulse_port_service(&pulse);
     EXPECT_EQ(hardware.enable_attempts, 0U);
     EXPECT_EQ(nx_request_state(&pulse_request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(pulse_request.base.result, NX_ERROR_IO);
@@ -509,20 +540,20 @@ TEST_F(TimerWaveform, CompletedPulseKeepsItsBorrowUntilBreakVectorReallyJoins) {
     pins[3].pin = 12U;
     pulse_request.channel_count = 3U;
     prepare();
-    ASSERT_EQ(pulse.ops->submit(pulse.context, &pulse_request), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_submit(&pulse, &pulse_request), NX_SUCCESS);
     hardware.update();
     hardware.hold_irq = true;
-    EXPECT_EQ(pulse.ops->service(pulse.context), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_timer_pulse_port_service(&pulse), NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&pulse_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(owner.active, &pulse_request);
     hardware.hold_irq = false;
-    EXPECT_EQ(pulse.ops->service(pulse.context), NX_SUCCESS);
+    EXPECT_EQ(nx_timer_pulse_port_service(&pulse), NX_SUCCESS);
     EXPECT_EQ(nx_request_state(&pulse_request.base), NX_REQUEST_SETTLED);
 }
 TEST_F(TimerWaveform, NativeDmaAdvancesEveryRowWithoutPerRowCpuService) {
     sequence_source();
     prepare();
-    ASSERT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     EXPECT_EQ(hardware.timer.DCR, 11U | (5U << 8U));
     EXPECT_EQ(hardware.stream.CR & (DMA_SxCR_PSIZE | DMA_SxCR_MSIZE),
@@ -539,7 +570,7 @@ TEST_F(TimerWaveform, NativeDmaAdvancesEveryRowWithoutPerRowCpuService) {
     sequence_tail();
     EXPECT_EQ(hardware.active_ccr[0], 102U);
     EXPECT_EQ(hardware.active_ccr[3], 402U);
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_SUCCESS);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_SUCCESS);
     EXPECT_EQ(sequence_request.base.transferred, 36U);
     EXPECT_EQ(slot.state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(hardware.stream.M0AR | hardware.stream.M1AR | hardware.stream.PAR,
@@ -555,7 +586,7 @@ TEST_F(TimerWaveform, AdvancedDmarUsesNativeWordsWithAnExplicitRcrZero) {
     pins[3].pin = 12U;
     sequence_source();
     prepare();
-    ASSERT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     EXPECT_EQ(hardware.stream.CR & (DMA_SxCR_PSIZE | DMA_SxCR_MSIZE),
               DMA_SxCR_PSIZE_1 | DMA_SxCR_MSIZE_1);
@@ -563,64 +594,258 @@ TEST_F(TimerWaveform, AdvancedDmarUsesNativeWordsWithAnExplicitRcrZero) {
     EXPECT_EQ(hardware.timer.RCR, 0U);
     EXPECT_EQ(hardware.timer.CCR4, 0U);
     sequence_tail();
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_SUCCESS);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_SUCCESS);
     EXPECT_EQ(sequence_request.base.transferred, 72U);
     EXPECT_EQ(hardware.timer.BDTR & TIM_BDTR_MOE, 0U);
 }
+TEST_F(TimerWaveform, NativeDmaWordDoesNotWidenTheAdvancedCounter) {
+    advanced();
+    config.complementary = false;
+    config.internal_trigger = false;
+    config.common.pin_count = 4U;
+    pins[3].pin = 12U;
+    sequence_source(3U, 70000U);
+    prepare();
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_timer_sequence_port_submit(&sequence, &sequence_request));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&sequence_request.base));
+    EXPECT_EQ(nullptr, owner.active);
+    EXPECT_EQ(0U, hardware.stream.CR & DMA_SxCR_EN);
+}
+
+TEST_F(TimerWaveform,
+       LogicalSequenceEncodesBeforePublicationAndRunsWithoutConversion) {
+    sequence_configuration();
+    prepare();
+    const uint32_t first[] = {100U, 200U, 300U, 400U};
+    const uint32_t second[] = {110U, 210U, 310U, 410U};
+    const nx_timer_sequence_step_t steps[] = {{1000U, first, 4U},
+                                              {1010U, second, 4U}};
+    slot.data = reinterpret_cast<uint8_t*>(pool);
+    slot.capacity = sizeof(pool);
+    ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, &slot, 1U));
+    const nx_frame_plane_t plane{0U, 12U, 12U, 2U};
+    nx_frame_layout_t layout{};
+    ASSERT_EQ(NX_SUCCESS, nx_frame_layout_planar(&plane, 1U, &layout));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_frame_stream_initialize(&source, &stream, &layout));
+    nx_stream_fill_t fill{};
+    ASSERT_EQ(NX_SUCCESS, nx_stream_reserve(&stream, &fill));
+    const unsigned reads = hardware.reads;
+    const unsigned writes = hardware.writes;
+    size_t bytes = 0U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_timer_sequence_port_encode(&sequence, steps, 2U, fill.data,
+                                            fill.capacity, &bytes));
+    EXPECT_EQ(24U, bytes);
+    EXPECT_EQ(reads, hardware.reads);
+    EXPECT_EQ(writes, hardware.writes);
+    const uint16_t expected[] = {999U,  0U, 100U, 200U, 300U, 400U,
+                                 1009U, 0U, 110U, 210U, 310U, 410U};
+    EXPECT_EQ(0, std::memcmp(fill.data, expected, sizeof(expected)));
+    ASSERT_EQ(NX_SUCCESS, nx_frame_stream_publish(&source, &fill, 0U));
+    ASSERT_EQ(NX_SUCCESS, nx_frame_stream_acquire(&source, &loan));
+    nx_request_initialize(&sequence_request.base);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_request_prepare(&sequence_request.base, NX_DEADLINE_NEVER));
+    sequence_request.source = &loan;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_timer_sequence_port_submit(&sequence, &sequence_request));
+    sequence_complete();
+    sequence_tail();
+    EXPECT_EQ(110U, hardware.active_ccr[0]);
+    EXPECT_EQ(410U, hardware.active_ccr[3]);
+    EXPECT_EQ(NX_SUCCESS, nx_timer_sequence_port_service(&sequence));
+    EXPECT_EQ(24U, sequence_request.base.transferred);
+}
+
+TEST_F(TimerWaveform, LogicalSequenceMapsSelectedChannelsToNativeWordRows) {
+    advanced();
+    config.complementary = false;
+    config.internal_trigger = false;
+    config.channels = 5U;
+    config.common.pin_count = 3U;
+    pins[2].pin = 12U;
+    sequence_configuration();
+    prepare();
+    const uint32_t widths[] = {0U, 1000U};
+    const nx_timer_sequence_step_t step{1000U, widths, 2U};
+    uint32_t native[7];
+    std::memset(native, 0x5a, sizeof(native));
+    size_t bytes = 0U;
+    const auto owner_before = owner;
+    const unsigned reads = hardware.reads;
+    const unsigned writes = hardware.writes;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_timer_sequence_port_encode(&sequence, &step, 1U, native,
+                                            sizeof(native), &bytes));
+    const uint32_t expected[] = {999U, 0U, 0U, 0U, 1000U, 0U};
+    EXPECT_EQ(24U, bytes);
+    EXPECT_EQ(0, std::memcmp(native, expected, sizeof(expected)));
+    EXPECT_EQ(0x5a5a5a5aU, native[6]);
+    EXPECT_EQ(0, std::memcmp(&owner, &owner_before, sizeof(owner)));
+    EXPECT_EQ(reads, hardware.reads);
+    EXPECT_EQ(writes, hardware.writes);
+}
+
+TEST_F(TimerWaveform, LogicalSequenceRejectsAllBadRowsBeforeWritingAnyOutput) {
+    sequence_configuration();
+    prepare();
+    uint32_t widths[] = {100U, 200U, 300U, 400U};
+    nx_timer_sequence_step_t steps[] = {{1000U, widths, 4U},
+                                        {1000U, widths, 4U}};
+    uint32_t native[16];
+    std::memset(native, 0x5a, sizeof(native));
+    uint32_t before[16];
+    std::memcpy(before, native, sizeof(before));
+    size_t bytes = 123U;
+    const unsigned reads = hardware.reads;
+    const unsigned writes = hardware.writes;
+    steps[1].period_ticks = 999U;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_timer_sequence_port_encode(&sequence, steps, 2U, native,
+                                            sizeof(native), &bytes));
+    steps[1].period_ticks = 70000U;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_timer_sequence_port_encode(&sequence, steps, 2U, native,
+                                            sizeof(native), &bytes));
+    steps[1].period_ticks = 1000U;
+    widths[3] = 1001U;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_timer_sequence_port_encode(&sequence, steps, 2U, native,
+                                            sizeof(native), &bytes));
+    widths[3] = 400U;
+    EXPECT_EQ(NX_ERROR_OVERFLOW,
+              nx_timer_sequence_port_encode(&sequence, steps, 2U, native, 23U,
+                                            &bytes));
+    const std::vector<nx_timer_sequence_step_t> too_many(10923U, steps[0]);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_timer_sequence_port_encode(&sequence, too_many.data(),
+                                            too_many.size(), native,
+                                            sizeof(native), &bytes));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_timer_sequence_port_encode(&sequence, steps, SIZE_MAX, native,
+                                            sizeof(native), &bytes));
+    EXPECT_EQ(0, std::memcmp(native, before, sizeof(before)));
+    EXPECT_EQ(123U, bytes);
+    EXPECT_EQ(reads, hardware.reads);
+    EXPECT_EQ(writes, hardware.writes);
+}
+
+TEST_F(TimerWaveform,
+       LogicalSequenceRejectsOutputAliasesAndKeepsControlsIntact) {
+    sequence_configuration();
+    prepare();
+    const uint32_t widths[] = {100U, 200U, 300U, 400U};
+    const nx_timer_sequence_step_t step{1000U, widths, 4U};
+    uint32_t native[16]{};
+    size_t bytes = 123U;
+    const auto before = owner;
+    const unsigned reads = hardware.reads;
+    const unsigned writes = hardware.writes;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_timer_sequence_port_encode(&sequence, &step, 1U, &owner,
+                                            sizeof(owner), &bytes));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_timer_sequence_port_encode(
+                  &sequence, &step, 1U,
+                  const_cast<nx_timer_sequence_step_t*>(&step), sizeof(step),
+                  &bytes));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_timer_sequence_port_encode(&sequence, &step, 1U,
+                                            const_cast<uint32_t*>(widths),
+                                            sizeof(widths), &bytes));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_timer_sequence_port_encode(
+                                    &sequence, &step, 1U, &hardware.timer,
+                                    sizeof(hardware.timer), &bytes));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_timer_sequence_port_encode(&sequence, &step, 1U, native,
+                                            sizeof(native),
+                                            reinterpret_cast<size_t*>(native)));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_timer_sequence_port_encode(&sequence, &step, 1U, native,
+                                            sizeof(native),
+                                            reinterpret_cast<size_t*>(&owner)));
+    EXPECT_EQ(0, std::memcmp(&owner, &before, sizeof(owner)));
+    EXPECT_EQ(123U, bytes);
+    EXPECT_EQ(reads, hardware.reads);
+    EXPECT_EQ(writes, hardware.writes);
+}
+
+TEST_F(TimerWaveform, LogicalSequencePreparationRequiresAnIdleSelectedOwner) {
+    sequence_source();
+    prepare();
+    const nx_timer_sequence_step_t step{1000U, duties, 4U};
+    uint32_t native[16]{};
+    size_t bytes = 123U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_timer_sequence_port_submit(&sequence, &sequence_request));
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_timer_sequence_port_encode(&sequence, &step, 1U, native,
+                                            sizeof(native), &bytes));
+    EXPECT_EQ(123U, bytes);
+    EXPECT_EQ(0U, native[0]);
+    hardware.in_isr = true;
+    EXPECT_EQ(NX_ERROR_CONTEXT,
+              nx_timer_sequence_port_encode(&sequence, &step, 1U, native,
+                                            sizeof(native), &bytes));
+    hardware.in_isr = false;
+}
+
 TEST_F(TimerWaveform, CounterZeroWithoutRealTcCannotReleaseSequenceStorage) {
     sequence_source();
     prepare();
-    ASSERT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     hardware.stream.NDTR = 0U;
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_ERROR_BUSY);
     EXPECT_EQ(slot.state, NX_STREAM_SLOT_BORROWED);
     EXPECT_EQ(owner.active, &sequence_request);
 }
 TEST_F(TimerWaveform, FailedDmaStopKeepsTheCompleteSequenceLoan) {
     sequence_source();
     prepare();
-    ASSERT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     hardware.refused = &hardware.stream.CR;
     hardware.refused_mask = DMA_SxCR_EN;
-    EXPECT_EQ(sequence.ops->cancel(sequence.context, &sequence_request),
+    EXPECT_EQ(nx_timer_sequence_port_cancel(&sequence, &sequence_request),
               NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&sequence_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(slot.state, NX_STREAM_SLOT_BORROWED);
     EXPECT_EQ(nx_stm32_waveform_close(&owner), NX_ERROR_BUSY);
     EXPECT_TRUE(owner.owned);
     hardware.refused = nullptr;
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_ERROR_CANCELLED);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_ERROR_CANCELLED);
     EXPECT_EQ(slot.state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(sequence_request.base.transferred, 0U);
 }
 TEST_F(TimerWaveform, CompletedSequenceStillJoinsTheActualDmaIrqAndAddress) {
     sequence_source();
     prepare();
-    ASSERT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     sequence_complete();
     hardware.hold_irq = true;
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_ERROR_BUSY);
     EXPECT_EQ(slot.state, NX_STREAM_SLOT_BORROWED);
     hardware.hold_irq = false;
     sequence_tail();
     hardware.refused = &hardware.stream.M0AR;
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_ERROR_BUSY);
     EXPECT_EQ(slot.state, NX_STREAM_SLOT_BORROWED);
     hardware.refused = nullptr;
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_SUCCESS);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_SUCCESS);
     EXPECT_EQ(slot.state, NX_STREAM_SLOT_FREE);
 }
 TEST_F(TimerWaveform, SequenceDmaErrorReportsNoGuaranteedBytesOrSharedReset) {
     sequence_source();
     prepare();
-    ASSERT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     hardware.dma_flags(1U << 3U);
     nx_stm32_waveform_dma_irq(&owner);
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_ERROR_IO);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_ERROR_IO);
     EXPECT_EQ(sequence_request.base.transferred, 0U);
     EXPECT_EQ(slot.state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(hardware.shared_resets, 0U);
@@ -628,12 +853,12 @@ TEST_F(TimerWaveform, SequenceDmaErrorReportsNoGuaranteedBytesOrSharedReset) {
 TEST_F(TimerWaveform, DmaResetHistoryRetainsTheLoanAfterRegistersAreRestored) {
     sequence_source();
     prepare();
-    ASSERT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     hardware.rcc.AHB1RSTR |= RCC_AHB1RSTR_DMA1RST;
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_ERROR_STATE);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_ERROR_STATE);
     hardware.rcc.AHB1RSTR = 0U;
-    EXPECT_EQ(sequence.ops->stop(sequence.context), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_timer_sequence_port_stop(&sequence), NX_ERROR_BUSY);
     EXPECT_EQ(nx_stm32_waveform_close(&owner), NX_ERROR_BUSY);
     EXPECT_EQ(slot.state, NX_STREAM_SLOT_BORROWED);
     EXPECT_EQ(owner.active, &sequence_request);
@@ -641,12 +866,13 @@ TEST_F(TimerWaveform, DmaResetHistoryRetainsTheLoanAfterRegistersAreRestored) {
 TEST_F(TimerWaveform, SequenceStateRejectsAnOutputInUnusedLoanCapacity) {
     sequence_source();
     prepare();
-    ASSERT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     auto* output = reinterpret_cast<nx_timer_sequence_state_t*>(pool + 64U);
     const uint32_t sentinel = 0xdeadbeefU;
     std::memcpy(output, &sentinel, sizeof(sentinel));
-    EXPECT_EQ(sequence.ops->state(sequence.context, output), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_timer_sequence_port_state(&sequence, output),
+              NX_ERROR_INVALID);
     uint32_t observed;
     std::memcpy(&observed, output, sizeof(observed));
     EXPECT_EQ(observed, sentinel);
@@ -656,7 +882,7 @@ TEST_F(TimerWaveform, InvalidSequencePaddingRejectsBeforeAnyHardwareEffects) {
     prepare();
     reinterpret_cast<uint16_t*>(pool)[1] = 1U;
     const unsigned writes = hardware.writes;
-    EXPECT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    EXPECT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_ERROR_INVALID);
     EXPECT_EQ(hardware.writes, writes);
     EXPECT_EQ(nx_request_state(&sequence_request.base), NX_REQUEST_READY);
@@ -667,51 +893,51 @@ TEST_F(TimerWaveform, SequenceDeadlineIncludesTheWholeFinalIrqJoin) {
     sequence_source();
     prepare();
     ASSERT_EQ(nx_request_prepare(&sequence_request.base, 10000U), NX_SUCCESS);
-    ASSERT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     sequence_complete();
     sequence_tail();
     hardware.now = 9999U;
     hardware.pending[config.dma.irq] = 1U;
     hardware.hold_irq = true;
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_ERROR_BUSY);
     hardware.now = 10000U;
     hardware.hold_irq = false;
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_ERROR_TIMEOUT);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_ERROR_TIMEOUT);
     EXPECT_EQ(sequence_request.base.transferred, 0U);
     EXPECT_EQ(slot.state, NX_STREAM_SLOT_FREE);
 }
 TEST_F(TimerWaveform, ASettledSequenceCanAcceptAnotherWholeLoan) {
     sequence_source();
     prepare();
-    ASSERT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     sequence_complete();
     sequence_tail();
-    ASSERT_EQ(sequence.ops->service(sequence.context), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_sequence_port_service(&sequence), NX_SUCCESS);
     nx_stream_fill_t fill;
     ASSERT_EQ(nx_stream_reserve(&stream, &fill), NX_SUCCESS);
     ASSERT_EQ(nx_frame_stream_publish(&source, &fill, 0U), NX_SUCCESS);
     ASSERT_EQ(nx_frame_stream_acquire(&source, &loan), NX_SUCCESS);
     ASSERT_EQ(nx_request_prepare(&sequence_request.base, NX_DEADLINE_NEVER),
               NX_SUCCESS);
-    EXPECT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    EXPECT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     EXPECT_EQ(hardware.stream.NDTR, 18U);
 }
 TEST_F(TimerWaveform, ALastBusErrorDuringDmaDisableIsObservedBeforeRelease) {
     sequence_source();
     prepare();
-    ASSERT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     sequence_complete();
     hardware.error_on_dma_stop = true;
-    nx_result_t result = sequence.ops->service(sequence.context);
+    nx_result_t result = nx_timer_sequence_port_service(&sequence);
     if (result == NX_ERROR_BUSY) {
         hardware.update();
-        (void)sequence.ops->service(sequence.context);
+        (void)nx_timer_sequence_port_service(&sequence);
         hardware.update();
-        result = sequence.ops->service(sequence.context);
+        result = nx_timer_sequence_port_service(&sequence);
     }
     EXPECT_EQ(result, NX_ERROR_IO);
     EXPECT_EQ(sequence_request.base.result, NX_ERROR_IO);
@@ -735,15 +961,15 @@ TEST_F(TimerWaveform, SettledSequenceDropsControlBeforeAnyLateIrqOrClose) {
     *request = sequence_request;
     request->source = protected_loan;
     prepare();
-    ASSERT_EQ(sequence.ops->submit(sequence.context, request), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, request), NX_SUCCESS);
     sequence_complete();
     sequence_tail();
-    ASSERT_EQ(sequence.ops->service(sequence.context), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_sequence_port_service(&sequence), NX_SUCCESS);
     ASSERT_EQ(nx_request_state(&request->base), NX_REQUEST_SETTLED);
     ASSERT_EQ(mprotect(page, 4096U, PROT_NONE), 0);
     nx_stm32_waveform_dma_irq(&owner);
     nx_stm32_waveform_irq(&owner);
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_SUCCESS);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_SUCCESS);
     EXPECT_EQ(nx_stm32_waveform_close(&owner), NX_SUCCESS);
     EXPECT_EQ(munmap(page, 4096U), 0);
 }
@@ -760,19 +986,19 @@ TEST_F(TimerWaveform, TriggerSlaveArmsWithoutCpuStartAndWaitsForSelectedItr) {
     config.sync_mode = 6U;
     config.itr = 3U;
     prepare();
-    ASSERT_EQ(pulse.ops->submit(pulse.context, &pulse_request), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_submit(&pulse, &pulse_request), NX_SUCCESS);
     EXPECT_EQ(hardware.timer.SMCR & (TIM_SMCR_SMS | TIM_SMCR_TS),
               6U | (3U << 4U));
     EXPECT_EQ(hardware.timer.CR1 & TIM_CR1_CEN, 0U);
     EXPECT_EQ(hardware.enable_attempts, 0U);
     nx_timer_pulse_state_t state;
-    ASSERT_EQ(pulse.ops->state(pulse.context, &state), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_state(&pulse, &state), NX_SUCCESS);
     EXPECT_TRUE(state.armed);
     EXPECT_FALSE(state.running);
     hardware.trigger(true);
     EXPECT_NE(hardware.timer.CR1 & TIM_CR1_CEN, 0U);
     hardware.update();
-    EXPECT_EQ(pulse.ops->service(pulse.context), NX_SUCCESS);
+    EXPECT_EQ(nx_timer_pulse_port_service(&pulse), NX_SUCCESS);
     EXPECT_EQ(hardware.timer.SMCR, 0U);
     hardware.trigger(true);
     EXPECT_EQ(hardware.timer.CR1 & TIM_CR1_CEN, 0U);
@@ -782,7 +1008,7 @@ TEST_F(TimerWaveform, EnableMasterStartsArmedSlaveOnlyAtCounterEnable) {
     config.sync_mode = 6U;
     config.itr = 3U;
     prepare();
-    ASSERT_EQ(pulse.ops->submit(pulse.context, &pulse_request), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_submit(&pulse, &pulse_request), NX_SUCCESS);
     nx_stm32_waveform_state_t master_owner = {};
     nx_stm32_waveform_config_t master_config = config;
     master_config.registers = &hardware.master;
@@ -803,7 +1029,7 @@ TEST_F(TimerWaveform, EnableMasterStartsArmedSlaveOnlyAtCounterEnable) {
     EXPECT_EQ(hardware.master.CR2 & TIM_CR2_MMS, 1U << 4U);
     EXPECT_NE(hardware.timer.CR1 & TIM_CR1_CEN, 0U);
     hardware.update();
-    ASSERT_EQ(pulse.ops->service(pulse.context), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_service(&pulse), NX_SUCCESS);
     EXPECT_EQ(nx_stm32_waveform_close(&master_owner), NX_SUCCESS);
 }
 TEST_F(TimerWaveform, ResetAndGatedSlavesKeepTheirActualSmsAndItrFields) {
@@ -911,33 +1137,33 @@ TEST_F(TimerWaveform, Tim10SingleChannelPulseAvoidsAbsentSlaveRegisters) {
     hardware.has_slave = false;
     pulse_request.channel_count = 1U;
     prepare();
-    ASSERT_EQ(pulse.ops->submit(pulse.context, &pulse_request), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_submit(&pulse, &pulse_request), NX_SUCCESS);
     hardware.update();
-    EXPECT_EQ(pulse.ops->service(pulse.context), NX_SUCCESS);
+    EXPECT_EQ(nx_timer_pulse_port_service(&pulse), NX_SUCCESS);
     EXPECT_EQ(hardware.unavailable_writes, 0U);
 }
 TEST_F(TimerWaveform, TriggerArmFailureRetainsBorrowUntilSmsReallyWithdraws) {
     config.kind = NX_STM32_WAVE_PULSE;
     config.sync_mode = 6U;
     prepare();
-    ASSERT_EQ(pulse.ops->submit(pulse.context, &pulse_request), NX_SUCCESS);
+    ASSERT_EQ(nx_timer_pulse_port_submit(&pulse, &pulse_request), NX_SUCCESS);
     hardware.refused = &hardware.timer.SMCR;
-    EXPECT_EQ(pulse.ops->stop(pulse.context), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_timer_pulse_port_stop(&pulse), NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&pulse_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(owner.active, &pulse_request);
     hardware.refused = nullptr;
-    EXPECT_EQ(pulse.ops->service(pulse.context), NX_ERROR_CANCELLED);
+    EXPECT_EQ(nx_timer_pulse_port_service(&pulse), NX_ERROR_CANCELLED);
     EXPECT_EQ(hardware.timer.SMCR, 0U);
 }
 TEST_F(TimerWaveform, SequenceEpochChangeCannotReleaseAnOldDomainLoan) {
     sequence_source();
     prepare();
-    ASSERT_EQ(sequence.ops->submit(sequence.context, &sequence_request),
+    ASSERT_EQ(nx_timer_sequence_port_submit(&sequence, &sequence_request),
               NX_SUCCESS);
     ++g_nx_stm32_system.time_epoch;
-    EXPECT_EQ(sequence.ops->service(sequence.context), NX_ERROR_STATE);
+    EXPECT_EQ(nx_timer_sequence_port_service(&sequence), NX_ERROR_STATE);
     --g_nx_stm32_system.time_epoch;
-    EXPECT_EQ(sequence.ops->stop(sequence.context), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_timer_sequence_port_stop(&sequence), NX_ERROR_BUSY);
     EXPECT_EQ(slot.state, NX_STREAM_SLOT_BORROWED);
 }
 TEST_F(TimerWaveform, Tim9PeerNeverTouchesTheRunningTim1OrItsSharedNvic) {
@@ -949,6 +1175,7 @@ TEST_F(TimerWaveform, Tim12PeerNeverTouchesTheRunningTim8OrItsSharedNvic) {
 } /* namespace */
 
 extern "C" uint32_t nx_av_model_read(volatile uint32_t* reg) {
+    ++hw->reads;
     return *reg;
 }
 extern "C" void nx_av_model_write(volatile uint32_t* reg, uint32_t value) {

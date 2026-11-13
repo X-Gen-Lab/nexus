@@ -3411,7 +3411,8 @@
           ],
           "interfaces": {
             "memory_window": [
-              "cpu-window"
+              "cpu-window",
+              "graphics-owned"
             ]
           }
         }

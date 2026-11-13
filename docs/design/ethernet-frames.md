@@ -83,11 +83,15 @@ or invalid checksum choice rejects before OWN publication. Hardware format/error
 writeback controls success; the driver supplies no software checksum fallback,
 packet repair or IP-stack policy.
 
-RX checksum observations require both selected IPC processing and actual last
-descriptor ESA. The loan retains explicit IPv4/IPv6, header/payload error,
-bypass and payload-type facts; absent or malformed writeback stays unknown.
-Checksum-error dropping is disabled so the consumer receives these hardware
-facts. L2/DMA errors retain the existing whole-frame discard behavior. Altering
+RX checksum observations require selected IPC processing and actual last
+descriptor ESA. The provider translates writeback into independent public
+IPv4/IPv6, UDP/TCP/ICMP, checked and error flags; no public value copies a hardware
+bit field. `HEADER_CHECKED` or `PAYLOAD_CHECKED` means that checksum was examined;
+absence of its corresponding error then reports success for that checksum only.
+IPv6 has no header checksum. Bypass grants neither checked nor error facts, and
+protocol identification alone grants no checksum assurance. Missing or malformed
+writeback stays unknown. Checksum-error dropping is disabled so the consumer can
+inspect the result. L2/DMA errors retain whole-frame discard behavior. Altering
 checksum metadata invalidates release identity, just like altering a timestamp
 or geometry. Native ingress/egress does not invent computed IP checksums.
 

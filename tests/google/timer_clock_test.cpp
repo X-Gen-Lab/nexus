@@ -217,7 +217,7 @@ TEST_F(TimerClock, EncoderDescribesActualFilterClockOnlyWhileGateRemainsLive) {
     RCC->APB1ENR = 0U;
     nx_stm32_encoder_state_t state{};
     const nx_stm32_encoder_config_t config{
-        TIM3, NX_ENCODER_MODE_X4_TI12, 3U, 7U, false, false};
+        TIM3, NX_ENCODER_MODE_X4, 3U, 7U, false, false};
     ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_prepare(&state, &config));
     nx_encoder_state_t info{};
     ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_ops.state(&state, &info));

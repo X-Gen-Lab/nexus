@@ -1890,19 +1890,8 @@ msgid "Consume one copied edge through the deterministic NEC state machine."
 msgstr "通过确定性 NEC 状态机消费一个已复制的边沿。"
 
 #: docs/reference/api/components.md:113
-msgid ""
-"Wrong line, unknown flags/edge and invalid spans reject unchanged. LOSS "
-"invalidates frame and repeat eligibility; its report timestamp is not a "
-"recovered edge and never advances the source clock history. Accepted "
-"COALESCED samples retain their observation time and flags. Equal/backward "
-"accepted timestamps latch clock_fault until stop/init. Malformed/truncated "
-"frames never publish partial commands. No RC5, NEC2 interpretation, automatic"
-" protocol discovery or calibration."
-msgstr ""
-"错误线路、未知标志／边沿和无效存储区间均被拒绝，状态保持不变。LOSS "
-"使当前帧及重复帧资格失效；其报告时间戳不是恢复出的边沿，绝不推进来源时钟历史。接纳的 COALESCED "
-"采样保留其观察时间和标志。接纳的时间戳若相等或回退，会锁存 clock_fault，直至 stop/init。畸形或截断帧绝不发布部分命令。不提供 "
-"RC5、NEC2 解释、自动协议发现或校准。"
+msgid "Feed exactly one bound input source to each owner; route multiplexed inputs before this call. Unknown flags/edge and invalid spans reject unchanged. Physical line numbers are not part of the decoder policy. LOSS invalidates frame and repeat eligibility; its report timestamp is not a recovered edge and never advances the source clock history. Accepted COALESCED samples retain their observation time and flags. Equal/backward accepted timestamps latch clock_fault until stop/init. Malformed/truncated frames never publish partial commands. No RC5, NEC2 interpretation, automatic protocol discovery or calibration."
+msgstr "每个 owner 仅消费一个已绑定的输入源；复用输入须在调用前按来源路由。未知标志／边沿和无效存储区间均被拒绝，状态保持不变。物理线号不属于 decoder 策略。LOSS 使当前帧及重复帧资格失效；其报告时间戳不是恢复出的边沿，绝不推进来源时钟历史。接纳的 COALESCED 采样保留其观察时间和标志。接纳的时间戳若相等或回退，会锁存 clock_fault，直至 stop/init。畸形或截断帧绝不发布部分命令。不提供 RC5、NEC2 解释、自动协议发现或校准。"
 
 #: docs/reference/api/components.md:113
 msgid "[inout] Initialized single consumer in its original epoch."

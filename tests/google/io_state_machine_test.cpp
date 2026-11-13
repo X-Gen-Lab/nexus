@@ -14,8 +14,97 @@
 #include "provider.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <type_traits>
 
 namespace {
+TEST(IOMessageFormat, I2cDirectionPreservesConstAndDescriptorFootprint) {
+    const uint8_t tx[] = {0x12U, 0x34U};
+    uint8_t rx[2] = {};
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(tx, sizeof(tx)),
+                                   nx_i2c_message_read(rx, sizeof(rx))};
+    static_assert(
+        std::is_same_v<decltype(messages[0].buffer.tx), const uint8_t*>);
+    static_assert(std::is_same_v<decltype(messages[1].buffer.rx), uint8_t*>);
+    struct PreviousStorage {
+        uint8_t* data;
+        size_t length;
+        bool read;
+    };
+    EXPECT_EQ(sizeof(messages[0]), sizeof(PreviousStorage));
+    EXPECT_FALSE(messages[0].read);
+    EXPECT_TRUE(messages[1].read);
+    EXPECT_EQ(messages[0].buffer.tx, tx);
+    EXPECT_EQ(messages[1].buffer.rx, rx);
+    EXPECT_EQ(nx_i2c_message_data(&messages[0]), tx);
+    EXPECT_EQ(nx_i2c_message_data(&messages[1]), rx);
+    nx_i2c_request_t request{};
+    nx_request_initialize(&request.base);
+    EXPECT_EQ(nx_i2c_request_prepare(&request, messages, 2U, 1000U),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+}
+
+TEST(IOMessageFormat, I2cGrammarDoesNotImposeOneProviderTransferBudget) {
+    const uint8_t bytes[300] = {};
+    auto message = nx_i2c_message_write(bytes, sizeof(bytes));
+    nx_i2c_request_t request{};
+    nx_request_initialize(&request.base);
+    EXPECT_EQ(nx_i2c_request_prepare(&request, &message, 1U, 1000U),
+              NX_SUCCESS);
+    nx_i2c_message_t messages[9] = {};
+    for (auto& selected : messages) {
+        selected = nx_i2c_message_write(bytes, 1U);
+    }
+    EXPECT_EQ(nx_i2c_request_prepare(&request, messages, 9U, 1000U),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+}
+
+TEST(IOMessageFormat, I2cSelectedLimitsBoundMessagesAndTheWholeSequence) {
+    const uint8_t bytes[300] = {};
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(bytes, sizeof(bytes)),
+                                   nx_i2c_message_write(bytes, sizeof(bytes))};
+    nx_i2c_request_t request{};
+    nx_request_initialize(&request.base);
+    ASSERT_EQ(nx_i2c_request_prepare(&request, messages, 2U, 1000U),
+              NX_SUCCESS);
+    const nx_i2c_limits_t broad = {4U, 512U, 1024U};
+    EXPECT_EQ(nx_i2c_request_validate_limits(&request, &broad), NX_SUCCESS);
+    EXPECT_EQ(nx_i2c_request_validate_limits(&request, &nx_i2c_bounded_limits),
+              NX_ERROR_UNSUPPORTED);
+    const nx_i2c_limits_t total = {4U, 512U, 512U};
+    EXPECT_EQ(nx_i2c_request_validate_limits(&request, &total),
+              NX_ERROR_UNSUPPORTED);
+    const nx_i2c_limits_t malformed = {0U, 512U, 1024U};
+    EXPECT_EQ(nx_i2c_request_validate_limits(&request, &malformed),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+}
+
+TEST(IOMessageFormat, I2cAggregateByteCountCannotWrapBeforeProviderSelection) {
+    /* Geometry-only immutable spans occupy the upper address half. No payload
+     * is dereferenced, and both real control objects stay outside that range.
+     */
+    const uintptr_t begin = UINTPTR_MAX / 2U + 1U;
+    const auto* data = reinterpret_cast<const uint8_t*>(begin);
+    const size_t length = SIZE_MAX / 2U;
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(data, length),
+                                   nx_i2c_message_write(data, length),
+                                   nx_i2c_message_write(data, length)};
+    nx_i2c_request_t request{};
+    ASSERT_LT(reinterpret_cast<uintptr_t>(&request), begin);
+    ASSERT_LT(reinterpret_cast<uintptr_t>(messages), begin);
+    nx_request_initialize(&request.base);
+    EXPECT_EQ(nx_i2c_request_prepare(&request, messages, 3U, 1000U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(request.messages, nullptr);
+    EXPECT_EQ(request.count, 0U);
+    request.messages = messages;
+    request.count = 3U;
+    EXPECT_EQ(nx_i2c_request_validate(&request), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+}
+
 /** \brief Execute production request helpers on a real public descriptor base.
  */
 void verify_sequence(nx_request_t* request) {
@@ -71,7 +160,7 @@ TEST(IODescriptorSequences, I2cCancellationAndEpochDoNotRevokeBorrow) {
     nx_i2c_request_t request{};
     nx_request_initialize(&request.base);
     uint8_t bytes[3]{};
-    nx_i2c_message_t messages[] = {{bytes, sizeof(bytes), false}};
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(bytes, sizeof(bytes))};
     ASSERT_EQ(nx_i2c_request_prepare(&request, messages, 1U, 1000U),
               NX_SUCCESS);
     verify_sequence(&request.base);
@@ -287,7 +376,7 @@ TEST(IOProviderSequences,
     const nx_i2c_port_t port{&port_ops, &dependency};
     const nx_i2c_endpoint_t endpoint{&endpoint_ops, &dependency};
     uint8_t bytes[3]{};
-    nx_i2c_message_t message{bytes, 3U, true};
+    nx_i2c_message_t message = nx_i2c_message_read(bytes, 3U);
     nx_i2c_request_t request{};
     nx_request_initialize(&request.base);
     ASSERT_EQ(nx_i2c_request_prepare(&request, &message, 1U, 100U), NX_SUCCESS);

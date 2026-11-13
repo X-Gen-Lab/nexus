@@ -1,0 +1,56 @@
+# Software reference only; synthetic SDRAM/panel assumptions, no physical execution.
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "custom"
+[clock_parameters]
+source = "hsi"
+input_hz = 16000000
+sysclk_source = "input"
+pll48 = false
+pll_m = 10
+pll_n = 192
+pll_p = 4
+pll_q = 5
+ahb_div = 1
+apb1_div = 1
+apb2_div = 1
+adc_div = 4
+supply_mv = 3300
+css = false
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+
+[clock_parameters.pll_sai]
+m = 10
+n = 192
+[clock_parameters.pll_sai.ltdc]
+r = 4
+post_divider = 16
+
+[display.panel]
+memory_window = "ram"
+binding = "panel"
+mode = "rgb-scanout"
+irq = { priority = 5, calls_os = false }
+drain_us = 25000
+timing = { width = 320, height = 240, hsync = 10, hback_porch = 20, hfront_porch = 10, vsync = 2, vback_porch = 2, vfront_porch = 4, hsync_polarity = "active-low", vsync_polarity = "active-low", de_polarity = "active-high", clock_polarity = "normal" }
+layers = [{ layer = 0, x = 0, y = 0, width = 64, height = 32, formats = ["rgb565", "argb8888"], alpha = 255, pixel_alpha = false }]
+
+[image.blitter]
+memory_window = "ram"
+binding = "blitter"
+mode = "irq-blit"
+irq = { priority = 5, calls_os = false }
+drain_us = 1000
+
+[external_bus.memory]
+binding = "control"
+mode = "sdram-controller"
+
+[memory_window.ram]
+controller = "memory"
+binding = "ram"
+mode = "graphics-owned"
+parameters = { bytes = 8388608, row_bits = 12, column_bits = 8, internal_banks = 4, width_bits = 16, cas = 3, sdclk_div = 2, read_pipe = 1, initial_refreshes = 8, max_sdclk_hz = 8000000, refresh_window_us = 64000, powerup_us = 100, prepare_budget_us = 1000, stop_budget_us = 1000, timing = { mrd = { nanoseconds = 0, cycles = 2 }, xsr = { nanoseconds = 70, cycles = 1 }, ras = { nanoseconds = 42, cycles = 1 }, rc = { nanoseconds = 63, cycles = 1 }, wr = { nanoseconds = 0, cycles = 2 }, rp = { nanoseconds = 18, cycles = 1 }, rcd = { nanoseconds = 18, cycles = 1 } } }

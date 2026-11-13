@@ -151,7 +151,9 @@ _F479_RUN = replace(
         "2.4.5": "PP"}),
     mode_scope=frozenset(("crc:crc32-words", "external_bus:sdram-controller",
                           "external_bus:qspi-indirect-sdr", "flash_async:nor-indirect",
-                          "display:rgb-scanout", "image:irq-blit")) | _SAI_FINITE_MODES,
+                          "display:rgb-scanout", "image:irq-blit",
+                          "memory_window:cpu-window",
+                          "memory_window:graphics-owned")) | _SAI_FINITE_MODES,
     clock_policies=frozenset(("hsi16-pllsai-shared-m",)))
 
 

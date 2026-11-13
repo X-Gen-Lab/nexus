@@ -8,6 +8,10 @@
  */
 #include "nexus/io/i2c.h"
 
+const nx_i2c_limits_t nx_i2c_bounded_limits = {
+    NX_I2C_BOUNDED_MAX_MESSAGES, NX_I2C_BOUNDED_MAX_MESSAGE_BYTES,
+    (size_t)NX_I2C_BOUNDED_MAX_MESSAGES* NX_I2C_BOUNDED_MAX_MESSAGE_BYTES};
+
 /** \brief Dispatch using this face's exact instance state. */
 nx_result_t nx_i2c_port_recover(const nx_i2c_port_t* port) {
     if (port == NULL || port->ops == NULL || port->context == NULL) {
@@ -44,14 +48,16 @@ static bool overlap(uintptr_t first, size_t first_size, uintptr_t second,
  */
 static nx_result_t validate_fields(const nx_i2c_request_t* request,
                                    const nx_i2c_message_t* messages,
-                                   size_t count) {
+                                   size_t count,
+                                   const nx_i2c_limits_t* limits) {
     if (request == NULL ||
         (uintptr_t)request % _Alignof(nx_i2c_request_t) != 0U ||
         messages == NULL || count == 0U ||
+        count > SIZE_MAX / sizeof(*messages) ||
         (uintptr_t)messages % _Alignof(nx_i2c_message_t) != 0U) {
         return NX_ERROR_INVALID;
     }
-    if (count > NX_I2C_MAX_MESSAGES) {
+    if (limits != NULL && count > limits->max_messages) {
         return NX_ERROR_UNSUPPORTED;
     }
     uintptr_t control = (uintptr_t)request;
@@ -62,16 +68,22 @@ static nx_result_t validate_fields(const nx_i2c_request_t* request,
         overlap(control, sizeof(*request), descriptors, descriptor_size)) {
         return NX_ERROR_INVALID;
     }
+    size_t total = 0U;
     for (size_t i = 0U; i < count; ++i) {
         const nx_i2c_message_t* item = &messages[i];
-        uintptr_t data = (uintptr_t)item->data;
-        if (item->data == NULL || item->length == 0U ||
-            item->length > UINTPTR_MAX - data) {
+        uintptr_t data = (uintptr_t)nx_i2c_message_data(item);
+        if (nx_i2c_message_data(item) == NULL || item->length == 0U ||
+            item->length > UINTPTR_MAX - data ||
+            item->length > SIZE_MAX - total) {
             return NX_ERROR_INVALID;
         }
-        if (item->length > NX_I2C_MAX_MESSAGE_BYTES) {
-            return NX_ERROR_UNSUPPORTED;
+        if (limits != NULL) {
+            if (item->length > limits->max_message_bytes ||
+                item->length > limits->max_total_bytes - total) {
+                return NX_ERROR_UNSUPPORTED;
+            }
         }
+        total += item->length;
         if (overlap(data, item->length, control, sizeof(*request)) ||
             overlap(data, item->length, descriptors, descriptor_size)) {
             return NX_ERROR_INVALID;
@@ -79,8 +91,8 @@ static nx_result_t validate_fields(const nx_i2c_request_t* request,
         for (size_t j = 0U; j < i; ++j) {
             const nx_i2c_message_t* prior = &messages[j];
             if (item->read != prior->read &&
-                overlap(data, item->length, (uintptr_t)prior->data,
-                        prior->length)) {
+                overlap(data, item->length,
+                        (uintptr_t)nx_i2c_message_data(prior), prior->length)) {
                 return NX_ERROR_INVALID;
             }
         }
@@ -94,7 +106,20 @@ nx_result_t nx_i2c_request_validate(const nx_i2c_request_t* request) {
         (uintptr_t)request % _Alignof(nx_i2c_request_t) != 0U) {
         return NX_ERROR_INVALID;
     }
-    return validate_fields(request, request->messages, request->count);
+    return validate_fields(request, request->messages, request->count, NULL);
+}
+
+/** \brief The selected counter budget is checked before any hardware effect.
+ */
+nx_result_t nx_i2c_request_validate_limits(const nx_i2c_request_t* request,
+                                           const nx_i2c_limits_t* limits) {
+    if (request == NULL ||
+        (uintptr_t)request % _Alignof(nx_i2c_request_t) != 0U ||
+        limits == NULL || limits->max_messages == 0U ||
+        limits->max_message_bytes == 0U || limits->max_total_bytes == 0U) {
+        return NX_ERROR_INVALID;
+    }
+    return validate_fields(request, request->messages, request->count, limits);
 }
 
 /** \brief Preparation cannot retain payload or change a hardware source. */
@@ -105,7 +130,7 @@ nx_result_t nx_i2c_request_prepare(nx_i2c_request_t* request,
         (uintptr_t)request % _Alignof(nx_i2c_request_t) != 0U) {
         return NX_ERROR_INVALID;
     }
-    nx_result_t result = validate_fields(request, messages, count);
+    nx_result_t result = validate_fields(request, messages, count, NULL);
     if (result != NX_SUCCESS) {
         return result;
     }

@@ -46,8 +46,7 @@ static bool windows_separate(nx_infrared_window_t a, nx_infrared_window_t b) {
 /** \brief Complete-frame cost uses bounded integer durations, never rounding.
  */
 static bool configuration_valid(const nx_infrared_nec_config_t* config) {
-    if (config->line > 15U ||
-        (config->protocol != NX_INFRARED_NEC_STANDARD &&
+    if ((config->protocol != NX_INFRARED_NEC_STANDARD &&
          config->protocol != NX_INFRARED_NEC_EXTENDED) ||
         (config->source_policy != NX_INFRARED_SOURCE_STRICT &&
          config->source_policy != NX_INFRARED_SOURCE_IRQ_OBSERVATION) ||
@@ -159,8 +158,7 @@ static nx_infrared_nec_result_t publish(nx_infrared_nec_t* owner,
  */
 static nx_infrared_nec_result_t consume(nx_infrared_nec_t* owner,
                                         const nx_exti_event_t* event) {
-    if (event->line != owner->config->line ||
-        (event->flags & ~(NX_EXTI_EVENT_LOSS | NX_EXTI_EVENT_COALESCED)) != 0U)
+    if ((event->flags & ~(NX_EXTI_EVENT_LOSS | NX_EXTI_EVENT_COALESCED)) != 0U)
         return outcome(NX_ERROR_INVALID);
     if ((event->flags & NX_EXTI_EVENT_LOSS) != 0U ||
         (event->flags != 0U &&

@@ -16,7 +16,6 @@ from tools.configure.providers.common import fail, mode_traits
 
 ENDPOINT_DRIVERS = MappingProxyType({
     "spi-transaction": ("spi", "spi_transaction_device"),
-    "i2c-long-endpoint": ("i2c", "i2c_long_device"),
     "spi-dma-transaction": ("spi", "spi_dma_transaction_device"),
 })
 FORMAT_KINDS = ("uart", "spi", "i2c", "adc", "can", "eth", "eth_frames")
@@ -284,8 +283,8 @@ def describe(item, endpoint=None, *, public_class=None):
     elif kind == "spi" and not shape.dma and not provider.MODEL:
         limits["max_transfer_units"] = 256
     elif kind == "i2c" and not provider.MODEL:
-        limits.update(max_transfer_units="NX_I2C_MAX_MESSAGE_BYTES",
-                      max_messages="NX_I2C_MAX_MESSAGES")
+        limits.update(max_transfer_units="NX_I2C_BOUNDED_MAX_MESSAGE_BYTES",
+                      max_messages="NX_I2C_BOUNDED_MAX_MESSAGES")
     elif kind == "i2c_target":
         # One WRITE_READ request has two bounded direction spans; address
         # phases are not independent messages or caller payload bytes.
@@ -380,11 +379,6 @@ def describe(item, endpoint=None, *, public_class=None):
                       if dma else bound)
         formatted["fields"] = {
             **formatted["fields"], "word_bits": 0 if len(bits) > 1 else bits[0]}
-    elif selected == "i2c_long_device":
-        if not provider.ENDPOINT_POLICY.i2c_long:
-            fail("Long I2C traits require the reviewed v2 provider")
-        limits.update(max_transfer_units="NX_I2C_LONG_MAX_MESSAGE_BYTES",
-                      max_messages="NX_I2C_MAX_MESSAGES")
     elif selected == "mdio":
         limits.update(unit="registers", unit_bytes=2, max_transfer_units=1,
                       buffer_alignment=1, max_messages=1, word_bits=(16,))
@@ -454,7 +448,7 @@ def capability(item, model, endpoint=None, *, public_class=None):
     record = describe(item, endpoint, public_class=public_class)
     if type(model) is not bool or model != record.model:
         fail("Capability model flag differs from the selected provider")
-    flags = " | ".join("NX_FACTORY_CAP_" + name for name in record.features)
+    flags = " | ".join("NX_IO_CAP_" + name for name in record.features)
     # The existing broad C field holds segment count for enhanced SPI only;
     # the canonical contract keeps messages and segments dimensionally apart.
     messages = (record.max_segments if record.public_class in {

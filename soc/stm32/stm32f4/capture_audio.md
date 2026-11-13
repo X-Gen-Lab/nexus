@@ -1,5 +1,7 @@
 # STM32F4 DCMI、I2S2／3 与 SAI1
 
+普通消费者通过 `nx_capture_port_*` 与 `nx_audio_port_*` 操作已经绑定的接口，无需解引用可选方法表。公共入口保留原始 request、stream 和输出指针，具体 owner 继续检查私有配置及活动借用别名。缺失能力返回 `UNSUPPORTED`；公共检查不添加复制、队列或线程。停止生产者不撤销已经发布的消费者借用，service 返回值也不替代 request 的终态。
+
 这里记录 `capture.c`、`audio.c`、`audio_blocks.c`、`audio_sai.c` 与同源静态装配的合同。
 F407 DCMI／I2S 的 AF 路线来自 DS8626 Rev12，寄存器、DMA 与关闭时序来自 RM0090 Rev22，
 精确软件参考为 STM32F407VET6／ZGT6。SAI1 另外限定 STM32F446ZET6 与

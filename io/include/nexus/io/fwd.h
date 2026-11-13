@@ -42,7 +42,6 @@ typedef struct nx_nand_port nx_nand_port_t;
 typedef struct nx_flash_port nx_flash_port_t;
 typedef struct nx_gpio_port nx_gpio_port_t;
 typedef struct nx_i2c_endpoint nx_i2c_endpoint_t;
-typedef struct nx_i2c_long_endpoint nx_i2c_long_endpoint_t;
 typedef struct nx_i2c_port nx_i2c_port_t;
 typedef struct nx_i2c_target_port nx_i2c_target_port_t;
 typedef struct nx_lptim_port nx_lptim_port_t;

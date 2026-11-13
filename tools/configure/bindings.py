@@ -146,7 +146,7 @@ def emit(result):
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')
     for kind in sorted({enhanced_endpoints.class_name(item)
                         for item in result.devices} &
-                       {"spi_transaction_device", "i2c_long_device",
+                       {"spi_transaction_device",
                         "spi_dma_transaction_device", "memory_window",
                         "parallel16", "flash_async", "nand"}):
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')

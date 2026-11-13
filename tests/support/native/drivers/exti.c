@@ -83,7 +83,7 @@ nx_result_t nx_native_exti_emit_instance(nx_native_exti_state_t* port,
     if (tail >= port->capacity) {
         tail -= port->capacity;
     }
-    port->events[tail] = (nx_exti_event_t){nx_time_now_us(), 0, line, edge};
+    port->events[tail] = (nx_exti_event_t){nx_time_now_us(), 0, edge};
     port->count++;
     const nx_irq_wake_t* wake = port->wake;
     nx_arch_irq_restore(token);
@@ -108,9 +108,8 @@ static nx_result_t native_exti_read(void* context, nx_exti_event_t* events,
         nx_arch_irq_state_t token = nx_arch_irq_save();
         if (port->count == 0) {
             if (port->loss) {
-                events[*count] =
-                    (nx_exti_event_t){port->loss_timestamp, NX_EXTI_EVENT_LOSS,
-                                      port->line, NX_EXTI_BOTH};
+                events[*count] = (nx_exti_event_t){
+                    port->loss_timestamp, NX_EXTI_EVENT_LOSS, NX_EXTI_BOTH};
                 port->loss = false;
                 nx_arch_irq_restore(token);
                 (*count)++;

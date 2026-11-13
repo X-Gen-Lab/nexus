@@ -320,17 +320,14 @@ TEST_F(EthernetFactory, ExactChosenStorageReviewedPadsAndNoGuessedPhyLink) {
     EXPECT_EQ(0x0e000000U, ahb() & 0x0e000000U);
 }
 TEST_F(EthernetFactory, PairedCapabilitiesDescribeBusMasterAndPollingMdio) {
-    const nx_factory_io_capability_t* eth =
-        nx_factory_eth_capability(NX_ETH_ID_MAC);
-    const nx_factory_io_capability_t* mdio =
-        nx_factory_mdio_capability(NX_MDIO_ID_MAC);
+    const nx_io_capability_t* eth = nx_factory_eth_capability(NX_ETH_ID_MAC);
+    const nx_io_capability_t* mdio = nx_factory_mdio_capability(NX_MDIO_ID_MAC);
     ASSERT_NE(nullptr, eth);
     ASSERT_NE(nullptr, mdio);
-    EXPECT_EQ(NX_FACTORY_CAP_IRQ | NX_FACTORY_CAP_BUS_MASTER_DMA,
-              eth->features);
+    EXPECT_EQ(NX_IO_CAP_IRQ | NX_IO_CAP_BUS_MASTER_DMA, eth->features);
     EXPECT_EQ(NX_ETH_FRAME_MAX, eth->max_transfer_units);
     EXPECT_EQ(4U, eth->buffer_alignment);
-    EXPECT_EQ(NX_FACTORY_CAP_POLLING, mdio->features);
+    EXPECT_EQ(NX_IO_CAP_POLLING, mdio->features);
 }
 TEST_F(EthernetFactory,
        BasePreflightRejectsBeforeClockPinAndControllerEffects) {

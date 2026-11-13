@@ -1,6 +1,6 @@
 # Exact gettext entries with independently reviewed current translations.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 832481ce1b0983118c0c75f110b17ca4a14dc5441029e88b2e61e517b31bcbd2\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 45c41882165735460871b702a2e91a47e54c086935f80f68f9c517c004891685\n"
 
 msgid "F407 RTC 与备份域责任"
 msgstr "F407 RTC and backup-domain responsibilities"
@@ -136,3 +136,12 @@ msgstr "Real Standby exits through reset. The new image must still satisfy `adop
 
 msgid "GoogleTest 执行真实 C11 提供者，外部模型提供写保护、W0C、时钟跨越、拒写、 拒撤及 NVIC／EXTI 事实。模型结果、选定 ARM 编译／链接与实物测量分开；LSE 精度、PC13／VBAT 电气、实际 STOP／Standby 唤醒、校准精度和保持性 HIL 仍为 `not_executed`。依据为只读 ST RM0090 Rev22 第26章和 DS8626 封装／AF 表。"
 msgstr "GoogleTest executes the actual C11 provider; external models supply write protection, W0C behavior, clock crossing, refused writes/withdrawal and NVIC/EXTI facts. Model results, selected ARM compilation/linking and physical measurements remain separate. HIL for LSE accuracy, PC13/VBAT electrical behavior, actual STOP/Standby wake, calibration accuracy and retention is still `not_executed`. Sources are the read-only ST RM0090 Rev22 chapter26 and DS8626 package/AF tables."
+
+msgid "普通周期唤醒使用 `nx_rtc_port_periodic_wakeup`，调用者给出微秒周期和允许的最大量化误差，零周期关闭。提供者选择计数器并返回 `nx_rtc_period_t` 的 ticks／ticks_per_second；该比例只描述名义周期，不证明振荡器精度、校准误差或中断送达时间。不可表示且超出容差的请求在写硬件前返回 `UNSUPPORTED`，输出保持不变。控制失败也不修改输出，原硬件清理责任仍由同一 RTC owner 持有。"
+msgstr "Ordinary periodic wake uses `nx_rtc_port_periodic_wakeup`: the caller supplies a period in microseconds and the maximum permitted quantization error; zero disables wake. The provider selects the counter and returns ticks/ticks_per_second in `nx_rtc_period_t`. This ratio describes only the nominal period, not oscillator accuracy, calibration error or interrupt delivery time. An unrepresentable request outside tolerance returns `UNSUPPORTED` before hardware writes and preserves output. Control failure also preserves output; the same RTC owner retains hardware cleanup responsibility."
+
+msgid "当前 F4 请求周期上限为 131072 秒，超过该范围即使给出较大容差也返回 `UNSUPPORTED`。实现在六个有限候选中选择最小名义误差，相同误差选择较短周期；禁用状态不新增可变存储。`nx_rtc_port_wakeup` 的 clock／reload 是明确的 F4 原生集成接口，普通使用者无需选择这些编码。周期控制不自动配置 EXTI route，也不改 Core deadline 或日历。"
+msgstr "The current F4 requested-period limit is 131072 seconds; a larger request returns `UNSUPPORTED` even with a large tolerance. The implementation selects the least nominal error among six bounded candidates and chooses the shorter period on a tie; disabled state adds no mutable storage. The clock/reload arguments of `nx_rtc_port_wakeup` form an explicit F4 native integration interface; ordinary consumers need not select these codes. Period control does not configure an EXTI route or change a Core deadline or calendar."
+
+msgid "时长唤醒能力通过 `[rtc.calendar]` 中的 `periodic_wakeup = true` 显式选编，默认关闭。未选时返回 `UNSUPPORTED`，F4 镜像不保留时长求解器；原生计数器集成操作仍可用。`tests/contracts/rtc_bypass_assembly/adopt-periodic.toml` 提供显式软件参考配置，不建立实板唤醒资格。"
+msgstr "Select duration-based wake explicitly with `periodic_wakeup = true` in `[rtc.calendar]`; the default is disabled. An unselected capability returns `UNSUPPORTED`, and the F4 image does not retain the duration solver; native counter integration remains available. `tests/contracts/rtc_bypass_assembly/adopt-periodic.toml` provides an explicit software-reference configuration, not physical wake qualification."

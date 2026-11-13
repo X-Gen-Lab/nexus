@@ -52,8 +52,10 @@ int main(void) {
 #endif
 #if defined(NX_REFERENCE_NAND)
         const nx_nand_port_t* raw = nx_factory_nand(NX_NAND_ID_NAND0);
-        uint8_t status;
+        nx_nand_status_t status;
         observation = nx_nand_status(raw, &status);
+        nx_nand_ecc_format_t format;
+        observation = nx_nand_ecc_format(raw, &format);
         observation = nx_nand_id(raw, page, 5U);
         nx_request_initialize(&nand_request.base);
         observation = nx_nand_prepare(&nand_request, 100U);

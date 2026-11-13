@@ -787,8 +787,8 @@ TEST_P(Stm32AdcContinuousResolution, FactsAndEngineUseTheSameResolution) {
     EXPECT_EQ(GetParam(), raw.resolution_bits);
     nx_adc_sequence_info_t facts{};
     ASSERT_EQ(NX_SUCCESS, nx_adc_port_sequence_info(&port, &facts));
-    EXPECT_EQ(GetParam(), facts.conversion_cycles);
-    EXPECT_EQ(2U * (15U + GetParam()), facts.scan_cycles);
+    EXPECT_EQ(2U * (15U + GetParam()), facts.scan_ticks);
+    EXPECT_EQ(21000000U, facts.ticks_per_second);
     EXPECT_EQ(0U, memory.CR & DMA_SxCR_EN);
     for (unsigned cycle = 0U; cycle < 2U; ++cycle) {
         Ready();
@@ -808,13 +808,9 @@ INSTANTIATE_TEST_SUITE_P(AllF407Resolutions, Stm32AdcContinuousResolution,
 TEST_F(Stm32AdcContinuous, SequenceFactsAreColdAndDescribeCompleteScanCost) {
     nx_adc_sequence_info_t facts = {};
     ASSERT_EQ(nx_adc_port_sequence_info(&port, &facts), NX_SUCCESS);
-    EXPECT_EQ(facts.channels, channels);
-    EXPECT_EQ(facts.sample_times, sample_times);
-    EXPECT_EQ(facts.channel_count, 2U);
-    EXPECT_EQ(facts.adc_clock_hz, 21000000U);
-    EXPECT_EQ(facts.timer_clock_hz, 84000000U);
-    EXPECT_EQ(facts.scan_cycles, 54U);
-    EXPECT_EQ(facts.conversion_cycles, 12U);
+    EXPECT_EQ(2U, facts.channel_count);
+    EXPECT_EQ(21000000U, facts.ticks_per_second);
+    EXPECT_EQ(54U, facts.scan_ticks);
     EXPECT_EQ(memory.CR & DMA_SxCR_EN, 0U);
     EXPECT_EQ(timer.CR1 & TIM_CR1_CEN, 0U);
     EXPECT_EQ(stream.epoch, 0U);

@@ -53,6 +53,10 @@ typedef struct {
     uint8_t priority;
     nx_stm32_usb_phy_t phy;
     bool dma;
+    /** \brief Optional immutable logical-pipe permutation, channel_count bytes.
+     * \note NULL selects identity. Keep it alive through complete cold stop.
+     */
+    const uint8_t* pipe_channels;
 } nx_stm32_usb_host_config_t;
 
 /** \brief One exact static transport; vendor Handle never enters public IO. */

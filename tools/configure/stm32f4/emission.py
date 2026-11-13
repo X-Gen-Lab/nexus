@@ -46,6 +46,9 @@ def operations(item):
 def includes(result):
     selections = result.controllers
     source = []
+    if any(item.driver == "memory_window-endpoint" and
+           item.options.mode == "graphics-owned" for item in result.devices):
+        source.append('#include "stm32f4_graphics_memory.h"')
     if any(item.kind == 'adc_group' for item in selections):
         source.append('#include "stm32f407_adc_group.h"')
     if any(item.kind == 'adc_group' and item.mode == 'regular-blocks'

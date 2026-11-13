@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-CONSUMER_POLICY = "nexus-sdk-consumers-v26"
+CONSUMER_POLICY = "nexus-sdk-consumers-v27"
 BASE_CONSUMERS = (("native", False, "native"), ("stm32", True, "stm32"))
 MODERN_CONSUMERS = ()
 SELECTED_CONSUMERS = (
@@ -77,6 +77,8 @@ SERVICE_CONSUMERS = (
                     "f4_graphics"),
     ServiceConsumer("f479ni image", "image-only.toml", "arm-image-f479ni", True,
                     "f4_graphics"),
+    ServiceConsumer("f479ni graphics sdram", "combined.toml",
+                    "arm-graphics-sdram-f479ni", True, "f4_graphics_sdram"),
     *(ServiceConsumer(f"{part} sai {role}", f"{part}-{role}.toml",
                        f"arm-sai-{part}-{role}", True, "f4_sai")
       for part in ("f446ze", "f479ni") for role in ("master", "slave")),

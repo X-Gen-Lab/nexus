@@ -502,7 +502,8 @@ static void i2c_test(void) {
     (void)endpoint_api;
     uint8_t command = 0x10U;
     uint8_t read[5] = {0};
-    nx_i2c_message_t messages[] = {{&command, 1U, false}, {read, 1U, true}};
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(&command, 1U),
+                                   nx_i2c_message_read(read, 1U)};
     size_t transferred = 0U;
     s_fault = 0U;
     assert(nx_stm32_i2c_initialize(&port) == NX_SUCCESS);

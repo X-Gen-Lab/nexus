@@ -76,6 +76,24 @@ class UsbHostConfigurationTests(unittest.TestCase):
         self.assertIn("usb-dma:OTG_HS", claims)
         self.assertFalse(any(key.startswith("dma:") for key in claims))
 
+    def test_logical_pipe_mapping_is_immutable_and_generated_only_when_selected(self):
+        path = self.assembly(pipe_channels=[1, 0])
+        result = self.resolve(path)
+        self.assertEqual(result.controllers[0].options.pipe_channels, (1, 0))
+        output = self.root / "mapped"
+        gate.configure(path, output, test_support=native_fixture(path))
+        source = (output / "bindings.c").read_text()
+        self.assertIn("static const uint8_t s_nx_usb_pipe_channels_link[]", source)
+        self.assertIn(".pipe_channels = s_nx_usb_pipe_channels_link", source)
+        path = self.assembly()
+        gate.configure(path, output, test_support=native_fixture(path))
+        self.assertNotIn("s_nx_usb_pipe_channels_link", (output / "bindings.c").read_text())
+
+    def test_logical_pipe_mapping_rejects_aliases_bounds_and_wrong_extent(self):
+        for mapping in ([0, 0], [0, 2], [0], [0, True], "identity"):
+            with self.subTest(mapping=mapping), self.assertRaisesRegex(ValueError, "USB.*pipe"):
+                self.resolve(self.assembly(pipe_channels=mapping))
+
     def test_selected_factory_has_exact_channels_and_explicit_handover(self):
         path = self.assembly("host-hs-fs")
         output = self.root / "generated"

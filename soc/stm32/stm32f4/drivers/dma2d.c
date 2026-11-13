@@ -89,6 +89,24 @@ static bool config_valid(nx_stm32_image_state_t* s,
         c->drain_us == 0U || c->drain_us == NX_DEADLINE_NEVER ||
         c->priority >= 16U)
         return false;
+    if (c->graphics_memory != NULL) {
+#if defined(NX_STM32_SDRAM_GRAPHICS)
+        if (!nx_graphics_span(c->graphics_memory, sizeof(*c->graphics_memory),
+                              _Alignof(nx_stm32_sdram_graphics_t)) ||
+            nx_graphics_overlap(c->graphics_memory, sizeof(*c->graphics_memory),
+                                s, sizeof(*s)) ||
+            nx_graphics_overlap(c->graphics_memory, sizeof(*c->graphics_memory),
+                                c, sizeof(*c)) ||
+            nx_graphics_overlap(c->graphics_memory, sizeof(*c->graphics_memory),
+                                c->system, sizeof(*c->system)) ||
+            nx_graphics_overlap(c->graphics_memory, sizeof(*c->graphics_memory),
+                                c->regions,
+                                c->region_count * sizeof(*c->regions)))
+            return false;
+#else
+        return false;
+#endif
+    }
 #ifndef NEXUS_STM32_MODEL
     if (c->registers != DMA2D || c->rcc != RCC)
         return false;
@@ -100,6 +118,11 @@ static bool config_valid(nx_stm32_image_state_t* s,
 static bool aliases_owner(const nx_stm32_image_state_t* s, const void* p,
                           size_t n) {
     const nx_stm32_image_config_t* c = s->config;
+#if defined(NX_STM32_SDRAM_GRAPHICS)
+    if (c->graphics_memory != NULL &&
+        nx_stm32_sdram_graphics_overlaps(c->graphics_memory, p, n))
+        return true;
+#endif
     return nx_graphics_overlap(p, n, s, sizeof(*s)) ||
            nx_graphics_overlap(p, n, c, sizeof(*c)) ||
            nx_graphics_overlap(p, n, c->regions,
@@ -107,6 +130,9 @@ static bool aliases_owner(const nx_stm32_image_state_t* s, const void* p,
            nx_graphics_overlap(p, n, c->system, sizeof(*c->system)) ||
            nx_graphics_overlap(p, n, c->registers, sizeof(*c->registers)) ||
            nx_graphics_overlap(p, n, c->rcc, sizeof(*c->rcc)) ||
+           (c->graphics_memory != NULL &&
+            nx_graphics_overlap(p, n, c->graphics_memory,
+                                sizeof(*c->graphics_memory))) ||
            (s->wake != NULL &&
             nx_graphics_overlap(p, n, s->wake, sizeof(*s->wake)));
 }
@@ -232,14 +258,69 @@ static nx_result_t retain(nx_stm32_image_state_t* s, nx_result_t result,
         (void)nx_request_transition(&s->active->base, NX_REQUEST_QUARANTINED);
     return result;
 }
+/** \brief Return a selected bank hold only after the engine has cold joined. */
+static nx_result_t memory_detach(nx_stm32_image_state_t* s) {
+#if defined(NX_STM32_SDRAM_GRAPHICS)
+    if (s->memory_attached) {
+        nx_result_t result = nx_stm32_sdram_graphics_detach(
+            s->config->graphics_memory, NX_STM32_SDRAM_GRAPHICS_DMA2D, s);
+        if (result != NX_SUCCESS)
+            return result;
+        s->memory_attached = false;
+    }
+#else
+    (void)s;
+#endif
+    return NX_SUCCESS;
+}
+/** \brief Keep request/config storage until even the selected bank hold joins.
+ */
+static nx_result_t finish(nx_stm32_image_state_t* s) {
+    if (s->closing) {
+        nx_result_t result = memory_detach(s);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+    nx_image_request_t* completed = s->active;
+    nx_result_t result =
+        completed != NULL ? completed->base.result : NX_SUCCESS;
+    if (result == NX_SUCCESS && (s->events & IMAGE_ERROR) != 0U)
+        result = NX_ERROR_IO;
+    size_t bytes = completed != NULL && result == NX_SUCCESS
+                       ? completed->operation.width *
+                             completed->operation.height *
+                             nx_graphics_pixel_bytes(
+                                 completed->operation.destination.format)
+                       : 0U;
+    s->active = NULL;
+    s->draining = false;
+    s->events = 0U;
+    s->handle.State = HAL_DMA2D_STATE_READY;
+    s->handle.Lock = HAL_UNLOCKED;
+    if (s->closing) {
+        s->wake = NULL;
+        s->initialized = false;
+        s->owned = false;
+        s->config = NULL;
+    }
+    if (completed != NULL)
+        nx_request_settle(&completed->base, result, bytes);
+    return NX_SUCCESS;
+}
 /** \brief One nonblocking hardware step; HAL_READY is never a join proof. */
 static nx_result_t progress(nx_stm32_image_state_t* s) {
     const nx_stm32_image_config_t* c = s->config;
     nx_time_us_t now = NX_IMG_NOW();
-    if (s->clock_fault || !clocks(c) || c->system->time_epoch != s->epoch ||
-        now == NX_DEADLINE_NEVER) {
+    bool joined = s->closing && !s->gate_owned;
+    if (s->clock_fault || !(joined ? domains(c) : clocks(c)) ||
+        c->system->time_epoch != s->epoch || now == NX_DEADLINE_NEVER) {
         s->clock_fault = true;
         return retain(s, NX_ERROR_IO, now);
+    }
+    if (joined) {
+        if ((NX_IMG_READ(&c->rcc->AHB1ENR) & RCC_AHB1ENR_DMA2DEN) != 0U)
+            return retain(s, NX_ERROR_IO, now);
+        return finish(s);
     }
     if (s->active != NULL) {
         errors(s);
@@ -276,32 +357,9 @@ static nx_result_t progress(nx_stm32_image_state_t* s) {
     }
     if (s->closing && !gate(s, false))
         return retain(s, NX_ERROR_BUSY, now);
-    nx_image_request_t* completed = s->active;
-    nx_result_t result =
-        completed != NULL ? completed->base.result : NX_SUCCESS;
-    if (result == NX_SUCCESS && (s->events & IMAGE_ERROR) != 0U)
-        result = NX_ERROR_IO;
-    size_t bytes = completed != NULL && result == NX_SUCCESS
-                       ? completed->operation.width *
-                             completed->operation.height *
-                             nx_graphics_pixel_bytes(
-                                 completed->operation.destination.format)
-                       : 0U;
-    s->active = NULL;
-    s->draining = false;
-    s->events = 0U;
-    s->handle.State = HAL_DMA2D_STATE_READY;
-    s->handle.Lock = HAL_UNLOCKED;
-    if (s->closing) {
-        s->wake = NULL;
-        s->initialized = false;
-        s->owned = false;
-        s->config = NULL;
-    }
-    if (completed != NULL)
-        nx_request_settle(&completed->base, result, bytes);
-    return NX_SUCCESS;
+    return finish(s);
 }
+
 /** \brief Enforce the entire hardware extent and explicit DMA permissions. */
 static nx_result_t span(nx_stm32_image_state_t* s, const void* p, size_t n,
                         nx_dma_direction_t direction) {
@@ -410,6 +468,15 @@ static nx_result_t submit(void* context, nx_image_request_t* request) {
         return NX_ERROR_STATE;
     if (s->executing || s->active != NULL)
         return NX_ERROR_BUSY;
+#if defined(NX_STM32_SDRAM_GRAPHICS)
+    if (s->memory_attached) {
+        nx_result_t result = nx_stm32_sdram_graphics_check(
+            s->config->graphics_memory, NX_STM32_SDRAM_GRAPHICS_DMA2D, s,
+            s->config->system);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+#endif
     const nx_image_operation_t* op = &request->operation;
     if (aliases_owner(s, request, sizeof(*request)))
         return NX_ERROR_INVALID;
@@ -561,6 +628,9 @@ nx_result_t nx_stm32_image_close(nx_stm32_image_state_t* s) {
     if (!s->controller_touched) {
         if (!domains(s->config) || !gate(s, false))
             return NX_ERROR_IO;
+        nx_result_t detached = memory_detach(s);
+        if (detached != NX_SUCCESS)
+            return detached;
         s->config = NULL;
         s->owned = false;
         return NX_SUCCESS;
@@ -613,6 +683,15 @@ nx_result_t nx_stm32_image_prepare(nx_stm32_image_state_t* s,
     s->owned = true;
     s->epoch = c->system->time_epoch;
     s->handle.Instance = c->registers;
+#if defined(NX_STM32_SDRAM_GRAPHICS)
+    if (c->graphics_memory != NULL) {
+        nx_result_t result = nx_stm32_sdram_graphics_attach(
+            c->graphics_memory, NX_STM32_SDRAM_GRAPHICS_DMA2D, s, c->system);
+        if (result != NX_SUCCESS)
+            return result;
+        s->memory_attached = true;
+    }
+#endif
     if (!gate(s, true))
         return NX_ERROR_IO;
     s->controller_touched = true;

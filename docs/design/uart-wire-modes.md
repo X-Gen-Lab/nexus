@@ -11,6 +11,12 @@ source_language: zh_CN
 `nx_uart_port_t`、字节请求和事件 ring。配置选择完整收发机制、精确引脚、
 IRQ 与错误退出；不会从 HAL 函数存在推导其他器件、板卡或物理资格。
 
+`nx_uart_format_validate` 校验通用 5–9 位数据、none／even／odd 校验、
+1／2 停止位与已知流控枚举；它不判断具体控制器支持。F4 provider 在任何
+硬件效果前另行校验 7E/O、8N/E/O 与独立 9N word 能力。Host 配置由
+`UartFormatPolicy` 的显式帧集合限制所选模式；扩大通用表达不扩大 F4
+模式、路线或物理资格。
+
 | `wire.protocol` | 精确实例 | 固定帧与执行合同 |
 | --- | --- | --- |
 | `asynchronous` | USART1／2／3／6 | 8N1；`flow` 可为 `none`、`rts`、`cts`、`rts-cts`，路线必须包含实际选定握手脚 |
@@ -26,10 +32,12 @@ UART4／5 缺少 CK、Smartcard 与 RTS／CTS。C 冷态准入和 TOML 验证都
 
 ## 配置、状态与引脚
 
-公共配置类型在 `nexus/io/uart_wire.h`；厂商寄存器、Handle 与可变实现仍留在
-SoC 私有目录。`[uart.<id>.wire]` 经不可变 `UartWireOptions` 生成只读配置，
-factory 返回原有 UART face。`uart_wire.c` 只在选择 `irq-wire` 时选编，普通
-byte/event 状态和 `nx_uart_ops_t` 没有增加字段或方法槽。
+公共 `nexus/io/uart_wire.h` 保留协议模式与 LIN 请求准备；F4 冷态设置使用
+SoC 私有 `nx_stm32_uart_wire_config_t`。PSC／guard 等原始参数属于显式 F4 专家
+配置，不伪装成通用时间参数，普通组件不依赖该类型或厂商 Handle。
+`[uart.<id>.wire]` 经不可变 `UartWireOptions` 生成私有只读配置，factory 返回
+原有 UART face。`uart_wire.c` 只在选择 `irq-wire` 时选编，普通 byte/event 状态
+和 `nx_uart_ops_t` 没有增加字段或方法槽。
 
 ![FIG-04：静态 factory 与独立状态](../assets/diagrams/factory-instances.svg)
 

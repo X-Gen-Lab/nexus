@@ -25,7 +25,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
         nexus_use_cmsis_core(${graphics_test})
         target_compile_definitions(${graphics_test} PRIVATE
-            STM32F479xx NEXUS_STM32_MODEL=1)
+            STM32F479xx NEXUS_STM32_MODEL=1 NX_STM32_SDRAM_GRAPHICS=1)
         target_compile_options(${graphics_test} PRIVATE
             "-include${graphics_model}" -ffunction-sections -fdata-sections)
         target_link_options(${graphics_test} PRIVATE -Wl,--gc-sections)

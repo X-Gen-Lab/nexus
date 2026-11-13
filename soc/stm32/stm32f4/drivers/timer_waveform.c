@@ -1080,13 +1080,13 @@ static nx_result_t sequence_validate(nx_stm32_waveform_state_t* s,
         for (size_t i = 0U; i < 6U; ++i)
             memcpy(&items[i], view->data + row * view->stride + i * width,
                    width);
-        if (items[0] == UINT32_MAX || items[0] + 1U < s->config->period_ticks ||
+        if (items[0] > UINT16_MAX || items[0] + 1U < s->config->period_ticks ||
             items[1] != 0U)
             return NX_ERROR_INVALID;
         for (unsigned i = 0U; i < 4U; ++i)
             if (((s->config->channels & (1U << i)) == 0U &&
                  items[i + 2U] != 0U) ||
-                items[i + 2U] > items[0] + 1U)
+                items[i + 2U] > UINT16_MAX || items[i + 2U] > items[0] + 1U)
                 return NX_ERROR_INVALID;
     }
     return NX_SUCCESS;
@@ -1376,7 +1376,142 @@ static nx_result_t sequence_state(const void* context,
         s->quarantined};
     return NX_SUCCESS;
 }
+/** \brief Ordinary preparation storage cannot overwrite retained metadata.
+ * \note Only pointer ranges are inspected; no peripheral register is read.
+ */
+static bool sequence_encode_external(const nx_stm32_waveform_state_t* s,
+                                     const void* data, size_t bytes) {
+    const nx_stm32_waveform_config_t* c = s->config;
+    if (c->common.pin_count > SIZE_MAX / sizeof(*c->common.pins) ||
+        c->common.region_count > SIZE_MAX / sizeof(*c->common.regions) ||
+        !nx_stm32_av_system_disjoint(data, bytes) ||
+        nx_stm32_av_overlap(data, bytes, s, sizeof(*s)) ||
+        nx_stm32_av_overlap(data, bytes, c, sizeof(*c)) ||
+        nx_stm32_av_overlap(data, bytes, c->common.pins,
+                            c->common.pin_count * sizeof(*c->common.pins)) ||
+        nx_stm32_av_overlap(data, bytes, c->common.regions,
+                            c->common.region_count *
+                                sizeof(*c->common.regions)) ||
+        nx_stm32_av_overlap(data, bytes, c->registers, sizeof(*c->registers)) ||
+        nx_stm32_av_overlap(data, bytes, c->dma.dma, sizeof(*c->dma.dma)) ||
+        nx_stm32_av_overlap(data, bytes, c->dma.stream,
+                            sizeof(*c->dma.stream)) ||
+        (c->break_input != NULL &&
+         nx_stm32_av_overlap(data, bytes, (const void*)c->break_input,
+                             sizeof(*c->break_input))) ||
+        (g_nx_stm32_system.rcc != NULL &&
+         nx_stm32_av_overlap(data, bytes, g_nx_stm32_system.rcc,
+                             sizeof(*g_nx_stm32_system.rcc))) ||
+        (g_nx_stm32_system.timer != NULL &&
+         nx_stm32_av_overlap(data, bytes, g_nx_stm32_system.timer,
+                             sizeof(*g_nx_stm32_system.timer)))) {
+        return false;
+    }
+    for (size_t i = 0U; i < c->common.pin_count; ++i) {
+        const nx_stm32_av_pin_t* pin = &c->common.pins[i];
+        if (nx_stm32_av_overlap(data, bytes, pin->registers,
+                                sizeof(*pin->registers)) ||
+            nx_stm32_av_overlap(data, bytes, pin->snapshot,
+                                sizeof(*pin->snapshot))) {
+            return false;
+        }
+    }
+    return true;
+}
+/** \brief Preflight every logical row before writing the first native item. */
+static nx_result_t sequence_encode(const void* context,
+                                   const nx_timer_sequence_step_t* steps,
+                                   size_t count, void* storage, size_t capacity,
+                                   size_t* bytes) {
+    const nx_stm32_waveform_state_t* s = context;
+    if (!nx_stm32_av_task()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (s == NULL || !s->owned || !s->initialized || s->closing ||
+        s->config == NULL || s->config->kind != NX_STM32_WAVE_SEQUENCE ||
+        s->fault || s->quarantined || s->history_lost) {
+        return NX_ERROR_STATE;
+    }
+    if (s->active != NULL) {
+        return NX_ERROR_BUSY;
+    }
+    if (count == 0U || count > SIZE_MAX / sizeof(*steps)) {
+        return NX_ERROR_INVALID;
+    }
+    if (count > 65535U / 6U) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    const nx_stm32_waveform_config_t* c = s->config;
+    const size_t width = advanced(c) ? 4U : 2U;
+    const size_t descriptor_bytes = count * sizeof(*steps);
+    const size_t encoded_bytes = count * 6U * width;
+    if (!object_span(steps, descriptor_bytes,
+                     _Alignof(nx_timer_sequence_step_t)) ||
+        !object_span(storage, capacity, width) ||
+        !object_span(bytes, sizeof(*bytes), _Alignof(size_t)) ||
+        !sequence_encode_external(s, steps, descriptor_bytes) ||
+        !sequence_encode_external(s, storage, capacity) ||
+        !sequence_encode_external(s, bytes, sizeof(*bytes)) ||
+        nx_stm32_av_overlap(storage, capacity, steps, descriptor_bytes) ||
+        nx_stm32_av_overlap(bytes, sizeof(*bytes), steps, descriptor_bytes) ||
+        nx_stm32_av_overlap(bytes, sizeof(*bytes), storage, capacity)) {
+        return NX_ERROR_INVALID;
+    }
+    if (capacity < encoded_bytes) {
+        return NX_ERROR_OVERFLOW;
+    }
+    const size_t channels = channel_count(c->channels);
+    for (size_t row = 0U; row < count; ++row) {
+        const nx_timer_sequence_step_t* step = &steps[row];
+        if (step->period_ticks == 0U) {
+            return NX_ERROR_INVALID;
+        }
+        if (step->channel_count != channels ||
+            step->period_ticks < c->period_ticks ||
+            step->period_ticks > UINT16_MAX + UINT32_C(1)) {
+            return NX_ERROR_UNSUPPORTED;
+        }
+        const size_t duty_bytes = channels * sizeof(*step->duty_ticks);
+        if (!object_span(step->duty_ticks, duty_bytes, _Alignof(uint32_t)) ||
+            !sequence_encode_external(s, step->duty_ticks, duty_bytes) ||
+            nx_stm32_av_overlap(step->duty_ticks, duty_bytes, steps,
+                                descriptor_bytes) ||
+            nx_stm32_av_overlap(step->duty_ticks, duty_bytes, storage,
+                                capacity) ||
+            nx_stm32_av_overlap(step->duty_ticks, duty_bytes, bytes,
+                                sizeof(*bytes))) {
+            return NX_ERROR_INVALID;
+        }
+        for (size_t channel = 0U; channel < channels; ++channel) {
+            const uint32_t duty = step->duty_ticks[channel];
+            if (duty > step->period_ticks) {
+                return NX_ERROR_INVALID;
+            }
+            if (duty > UINT16_MAX) {
+                return NX_ERROR_UNSUPPORTED;
+            }
+        }
+    }
+    /* The immutable input remains stable during both passes. Encoding is
+     * explicit task work; submit and every hardware UPDATE keep zero-copy. */
+    uint8_t* destination = storage;
+    for (size_t row = 0U; row < count; ++row) {
+        uint32_t items[6] = {steps[row].period_ticks - 1U, 0U, 0U, 0U, 0U, 0U};
+        size_t selected = 0U;
+        for (unsigned channel = 0U; channel < 4U; ++channel) {
+            if ((c->channels & (1U << channel)) != 0U) {
+                items[channel + 2U] = steps[row].duty_ticks[selected++];
+            }
+        }
+        for (size_t item = 0U; item < 6U; ++item) {
+            memcpy(destination + (row * 6U + item) * width, &items[item],
+                   width);
+        }
+    }
+    *bytes = encoded_bytes;
+    return NX_SUCCESS;
+}
 const nx_timer_sequence_ops_t nx_stm32_timer_sequence_ops = {
-    sequence_submit, sequence_cancel, sequence_service, sequence_stop,
-    sequence_state};
+    sequence_submit, sequence_cancel, sequence_service,
+    sequence_stop,   sequence_state,  sequence_encode};
 #endif

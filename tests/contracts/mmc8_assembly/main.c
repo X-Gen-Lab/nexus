@@ -34,10 +34,8 @@ int main(void) {
         result = nx_block_port_activate(block, deadline);
     nx_request_initialize(&s_request.base);
     if (result == NX_SUCCESS)
-        result = nx_request_prepare(&s_request.base, deadline);
-    s_request.data = s_sector;
-    s_request.data_bytes = sizeof(s_sector);
-    s_request.blocks = 1U;
+        result = nx_block_read_prepare(&s_request, 0U, s_sector,
+                                       sizeof(s_sector), 1U, deadline);
     if (result == NX_SUCCESS)
         result = nx_block_async_submit(transfer, &s_request);
     if (result == NX_SUCCESS) {

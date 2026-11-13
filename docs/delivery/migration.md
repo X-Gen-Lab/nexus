@@ -23,6 +23,8 @@ typed binding，调用者现在也可按类型 ID 获取接口并替换 provider
 Nexus 头和生成 `nexus_factory.h`／`nexus_bindings.h`，不读取 private provider storage 或 SDK
 register 类型。SPI／I2C controller 和子设备 endpoint 分开获取，controller factory
 不得返回第一个子设备的别名。无效 ID 返回 NULL；factory 不初始化、不分配内存。
+新调用优先包含每个 Platform bundle 都生成的 `nexus_factory_strong.h`，使用类别独立的
+引用常量和 getter；不需要增加配置开关。可选 capability metadata 单独选择。
 
 平台输入只接受 TOML schema 2，旧 schema 1 JSON 装配必须迁为完整 TOML。
 `resolved.json` 仅是审计／独立产物检查的单向输出，不能回填生成器。历史证据保留
@@ -30,12 +32,25 @@ register 类型。SPI／I2C controller 和子设备 endpoint 分开获取，cont
 停机执行 `nx_platform_stop()`；BUSY／QUARANTINED 时保持状态和所有借用存储。
 在 start 前可以保存 face；在成功 stop 后 face 的身份不变，provider 拒绝操作。
 
-当前 factory／source interface epoch 为 2，`0.2.1` 仍为按精确提交消费的开发快照。
+当前 factory／source interface epoch 为 3，`0.2.1` 仍为按精确提交消费的开发快照。
 ADC group 的直接 `request.frames` 访问迁为 `request.output.frames`；优先使用
 `nx_adc_group_prepare()` 设置 RAW 视图，paired 结果由独立 prepare 入口建立。
-旧 epoch 1 不作为兼容 fallback，全部调用者、生成代码和 provider 必须一起重编。
-具体字段与借用步骤见[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-2)，
+epoch 3 的公共 traits 使用 `nexus/io/traits.h` 中的领域类型；SDIO 请求直接使用
+`base`、数据跨度和 function 地址，删除 `transfer` 包装及无意义 LBA。旧 epoch
+1／2 不作为兼容 fallback，全部调用者、生成代码和 provider 必须一起重编。
+I2C message 和 block request 按方向使用 const TX／mutable RX，优先由各自 write／read
+构造或 prepare 入口设置，不能只翻转方向标志。EXTI 按接口绑定来源，UART 原生配置
+留在私有边界；CAN 使用逻辑 filter tag，USB Host 使用装配内逻辑 pipe，ADC／DAC
+查询按公共时间／数字码单位解释。完整字段映射仍由源码兼容性合同统一维护。
+具体字段与借用步骤见[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-3)，
 代际、manifest 和拒绝规则见[源码兼容性合同](../design/source-compatibility.md)。
+
+迁移时选择新的 build 目录，重新生成 bundle，并用同一配置、工具链和 ABI 重编全部
+调用者、公共 face／ops、factory、provider 与组件。旧工程和构建输出分开保留，不能
+混入新的 CMake cache、生成头或目标文件。作者 TOML schema 2、typed IR 代际 3、
+factory 代际 3、resolved projection 1 与 SDK manifest schema 2 各自独立，版本号
+相同也不能混用不同接口代际。按[现有产品升级步骤](../tutorials/source-sdk.md#upgrade-an-existing-product)
+验证所选 SDK 的精确源码身份，再执行产品自己的 Native 合同和选定 MCU 构建。
 
 请求迁移必须同时更新所有权：prepare 不意味着 accepted，cancel 不意味着 settled。
 接受后保持 request 与 payload，到 acquire-observed SETTLED 才能复用。共享 owner

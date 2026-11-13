@@ -551,6 +551,37 @@ static uint32_t receive_flags(uint32_t bits) {
         flags |= NX_ETH_RX_DMA_ERROR;
     return flags;
 }
+/** \brief Translate reviewed writeback into protocol facts, never raw bits. */
+static uint32_t checksum_flags(uint32_t extended) {
+    unsigned protocol = extended & 7U;
+    if (protocol > 3U || (extended & 0xc0U) == 0xc0U ||
+        (extended & ~UINT32_C(0x3fff)) != 0U)
+        return 0U;
+    static const uint32_t protocols[] = {
+        0U, NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_UDP,
+        NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_TCP,
+        NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_ICMP};
+    uint32_t flags = NX_ETH_FRAMES_RX_CHECKSUM_AVAILABLE | protocols[protocol];
+    bool ipv4 = (extended & 0x40U) != 0U;
+    bool ipv6 = (extended & 0x80U) != 0U;
+    if (ipv4)
+        flags |= NX_ETH_FRAMES_RX_CHECKSUM_IPV4;
+    if (ipv6)
+        flags |= NX_ETH_FRAMES_RX_CHECKSUM_IPV6;
+    if ((extended & 0x20U) != 0U)
+        return flags | NX_ETH_FRAMES_RX_CHECKSUM_BYPASSED;
+    if (ipv4) {
+        flags |= NX_ETH_FRAMES_RX_CHECKSUM_HEADER_CHECKED;
+        if ((extended & 8U) != 0U)
+            flags |= NX_ETH_FRAMES_RX_CHECKSUM_HEADER_ERROR;
+    }
+    if ((ipv4 || ipv6) && protocol != 0U) {
+        flags |= NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_CHECKED;
+        if ((extended & 0x10U) != 0U)
+            flags |= NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_ERROR;
+    }
+    return flags;
+}
 static void progress_rx(nx_eth_frames_mac_t* mac) {
     if (mac->snapshot.mac.closing || !mac->snapshot.mac.link.up)
         return;
@@ -589,12 +620,8 @@ static void progress_rx(nx_eth_frames_mac_t* mac) {
         head->flags |= NX_ETH_RX_LENGTH;
     head->length = wire >= 4U ? wire - 4U : 0U;
     if (mac->checksum_offload && (bits & 1U) != 0U) {
-        uint32_t extended = mac->rx_descriptors[index].extended;
-        bool valid = (extended & 7U) <= 3U && (extended & 0xc0U) != 0xc0U &&
-                     (extended & ~UINT32_C(0x3fff)) == 0U;
-        if (valid)
-            head->checksum_flags =
-                NX_ETH_FRAMES_RX_CHECKSUM_AVAILABLE | (extended & 0xffU);
+        head->checksum_flags =
+            checksum_flags(mac->rx_descriptors[index].extended);
     }
     /* RX buffers have at least 64 bytes, so the complete L2 header is in
      * the first descriptor. No frame-sized scratch or hidden copy is used. */

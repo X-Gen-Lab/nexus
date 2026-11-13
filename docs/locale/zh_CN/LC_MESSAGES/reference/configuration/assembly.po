@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 4e11518331367b30e59a09869e238071eed34a227beab34245a5b5f011bb5fcd\n"
+"X-Nexus-Source-SHA256: 6ee4a4d8d877069c42efe0927d3c92df292edd64f9ef7e5f138c02f97594a2a5\n"
 
 #: docs/reference/configuration/assembly.md:9
 msgid "Assembly input and rejected selections"
@@ -26,21 +26,6 @@ msgstr ""
 "人工编写的配置权威是一份 schema-2 TOML assembly。SoC 和 Board facts 仍为维护的 "
 "JSON；`resolved.json` 是输出，不是另一种人工编写入口。CMake 拥有软件依赖。TOML 解析失败不会回退到 "
 "Kconfig、cache 变量、schema-1 JSON 或旧生成头文件。旧 JSON 装配作为输入会被拒绝，不保留为另一种编写接口。"
-
-#: docs/reference/configuration/assembly.md:17
-msgid ""
-"The parser creates immutable `AuthoredAssembly` intent. Production consumers"
-" use `resolve_ir()` and named immutable `ConfigurationIR` decisions; only "
-"audit and artifact-boundary consumers request `to_dict()`. Typed source "
-"epoch 2 and the schema-1 JSON output projection are separate contracts. The "
-"[source compatibility policy](../../design/source-compatibility.md) owns "
-"their version declarations; neither introduces firmware metadata or runtime "
-"dispatch."
-msgstr ""
-"解析器创建不可变 `AuthoredAssembly` 意图。生产消费者使用 `resolve_ir()` 与具名、不可变的 "
-"`ConfigurationIR` 决策；只有审计和产物边界消费者调用 `to_dict()`。Typed source epoch 2 与 "
-"schema-1 JSON 输出投影是不同合同，其版本声明由[源码兼容策略](../../design/source-"
-"compatibility.md)维护；两者均不引入固件元数据或运行时分发。"
 
 #: docs/reference/configuration/assembly.md:24
 msgid ""
@@ -512,3 +497,6 @@ msgstr ""
 "节将已维护 F407 的 10-bit profile 限制为 Standard 的 `max_hz <= 88000`，或显式 Fast 的 "
 "`max_hz > 100000`。必须显式修改默认 100 kHz profile；42 MHz PCLK "
 "不豁免该勘误。固件也会在借用存储或启动硬件之前检查实际 CCR。人工配置的上限与 ARM 链接检查不建立实际上升时间、目标器件或总线时序资格。"
+
+msgid "The parser creates immutable `AuthoredAssembly` intent. Production consumers use `resolve_ir()` and named immutable `ConfigurationIR` decisions; only audit and artifact-boundary consumers request `to_dict()`. Typed source epoch 3 and the schema-1 JSON output projection are separate contracts. The [source compatibility policy](../../design/source-compatibility.md) owns their version declarations; neither introduces firmware metadata or runtime dispatch."
+msgstr "解析器创建不可变 `AuthoredAssembly` 意图。生产消费者使用 `resolve_ir()` 与具名、不可变的 `ConfigurationIR` 决策；只有审计和产物边界消费者调用 `to_dict()`。Typed source epoch 3 与 schema-1 JSON 输出投影是独立合同，其版本声明由[源码兼容策略](../../design/source-compatibility.md)维护；两者均不引入固件元数据或运行时分派。"

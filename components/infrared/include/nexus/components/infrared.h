@@ -58,7 +58,6 @@ typedef struct {
     nx_infrared_window_t one_space;
     uint32_t frame_max_us;
     uint32_t repeat_max_us;
-    uint8_t line;
     nx_infrared_nec_protocol_t protocol;
     nx_infrared_source_policy_t source_policy;
 } nx_infrared_nec_config_t;
@@ -126,7 +125,9 @@ nx_result_t nx_infrared_nec_init(nx_infrared_nec_t* owner,
  *         EMPTY awaits more edges; OVERFLOW rejects LOSS in every policy and
  *         COALESCED in STRICT. IRQ_OBSERVATION retains sampled uncertainty.
  *         IO rejects malformed waveform/clock, TIMEOUT rejects a stale frame.
- * \note Wrong line, unknown flags/edge and invalid spans reject unchanged.
+ * \note Feed exactly one bound input source to each owner; route multiplexed
+ *       inputs before this call. Unknown flags/edge and invalid spans reject
+ *       unchanged. Physical line numbers are not part of the decoder policy.
  *       LOSS invalidates frame and repeat eligibility; its report timestamp
  *       is not a recovered edge and never advances the source clock history.
  *       Accepted COALESCED samples retain their observation time and flags.

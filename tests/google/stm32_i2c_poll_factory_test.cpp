@@ -130,7 +130,7 @@ TEST_F(PollFactory, PlatformStartsStopsAndRestartsWithoutAnyDmaOrIrqLease) {
 TEST_F(PollFactory, PublicFiniteWriteUsesSelectedAddressAndDrainsStop) {
     Start();
     uint8_t payload[]{0x10U, 0x29U, 0xA5U};
-    nx_i2c_message_t message{payload, sizeof(payload), false};
+    nx_i2c_message_t message = nx_i2c_message_write(payload, sizeof(payload));
     size_t count = SIZE_MAX;
     ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_transaction(endpoint, &message, 1U,
                                                       1000U, &count));
@@ -145,7 +145,7 @@ TEST_F(PollFactory, PublicFiniteWriteUsesSelectedAddressAndDrainsStop) {
 TEST_F(PollFactory, ExpiredPublicRequestCreatesNoHardwareTransaction) {
     Start();
     uint8_t payload = 0x6AU;
-    nx_i2c_message_t message{&payload, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&payload, 1U);
     size_t count = SIZE_MAX;
     const uint32_t before = I2C1->CR1;
     EXPECT_EQ(NX_ERROR_TIMEOUT,
@@ -203,7 +203,7 @@ TEST_F(PollFactory, RefusedWithdrawalRetainsTheSessionUntilRealStopRetry) {
 TEST_F(PollFactory, FailedWireDrainReturnsErrorAndNeverReportsTransferSuccess) {
     Start();
     uint8_t payload = 0x72U;
-    nx_i2c_message_t message{&payload, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&payload, 1U);
     size_t count = 0U;
     hold_stop = true;
     EXPECT_EQ(NX_ERROR_IO, nx_i2c_endpoint_transaction(endpoint, &message, 1U,

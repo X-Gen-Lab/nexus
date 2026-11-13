@@ -12,6 +12,31 @@ static bool valid(const nx_sdio_io_port_t* port) {
     return port != NULL && port->ops != NULL && port->context != NULL;
 }
 
+nx_result_t nx_sdio_io_activate(const nx_sdio_io_port_t* port,
+                                nx_time_us_t deadline) {
+    if (!valid(port))
+        return NX_ERROR_INVALID;
+    return port->ops->activate != NULL
+               ? port->ops->activate(port->context, deadline)
+               : NX_ERROR_UNSUPPORTED;
+}
+
+nx_result_t nx_sdio_io_stop(const nx_sdio_io_port_t* port,
+                            nx_time_us_t deadline) {
+    if (!valid(port))
+        return NX_ERROR_INVALID;
+    return port->ops->stop != NULL ? port->ops->stop(port->context, deadline)
+                                   : NX_ERROR_UNSUPPORTED;
+}
+
+nx_result_t nx_sdio_io_limits(const nx_sdio_io_port_t* port,
+                              nx_sdio_io_limits_t* limits) {
+    if (!valid(port) || limits == NULL)
+        return NX_ERROR_INVALID;
+    return port->ops->limits != NULL ? port->ops->limits(port->context, limits)
+                                     : NX_ERROR_UNSUPPORTED;
+}
+
 nx_result_t nx_sdio_io_inspect(const nx_sdio_io_port_t* port,
                                nx_sdio_io_info_t* info, nx_time_us_t deadline) {
     if (!valid(port) || info == NULL)

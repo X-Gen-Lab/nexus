@@ -26,10 +26,12 @@ typedef struct {
 typedef struct {
     uint32_t id;
     uint32_t mask;
+    nx_can_format_t format;
+    uint16_t tag;
     uint8_t bank;
     uint8_t controller;
     uint8_t fifo;
-    nx_can_format_t format;
+    uint8_t match_index;
     bool remote;
     bool match_remote;
 } nx_can_filter_t;

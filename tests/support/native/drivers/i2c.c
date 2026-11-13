@@ -129,14 +129,15 @@ static nx_result_t native_i2c_transaction(void* context,
         return NX_ERROR_INVALID;
     }
     *transferred = 0;
-    if (count > NX_I2C_MAX_MESSAGES || deadline == NX_DEADLINE_NEVER) {
+    if (count > NX_I2C_BOUNDED_MAX_MESSAGES || deadline == NX_DEADLINE_NEVER) {
         return NX_ERROR_UNSUPPORTED;
     }
     for (size_t i = 0; i < count; i++) {
-        if (messages[i].data == NULL || messages[i].length == 0) {
+        if (nx_i2c_message_data(&messages[i]) == NULL ||
+            messages[i].length == 0) {
             return NX_ERROR_INVALID;
         }
-        if (messages[i].length > NX_I2C_MAX_MESSAGE_BYTES) {
+        if (messages[i].length > NX_I2C_BOUNDED_MAX_MESSAGE_BYTES) {
             return NX_ERROR_UNSUPPORTED;
         }
     }
@@ -162,14 +163,14 @@ static nx_result_t native_i2c_transaction(void* context,
                 break;
             }
             if (!messages[i].read && j == 0) {
-                endpoint->cursor = messages[i].data[j];
+                endpoint->cursor = messages[i].buffer.tx[j];
             } else if (endpoint->cursor >= endpoint->size) {
                 result = NX_ERROR_IO;
                 break;
             } else if (messages[i].read) {
-                messages[i].data[j] = endpoint->memory[endpoint->cursor++];
+                messages[i].buffer.rx[j] = endpoint->memory[endpoint->cursor++];
             } else {
-                endpoint->memory[endpoint->cursor++] = messages[i].data[j];
+                endpoint->memory[endpoint->cursor++] = messages[i].buffer.tx[j];
             }
             (*transferred)++;
             (void)nx_native_clock_advance(1);

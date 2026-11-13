@@ -1,6 +1,6 @@
 /**
  * \file            can.h
- * \brief           Classic CAN value frames and caller-owned mailbox requests
+ * \brief           Classic CAN value frames and caller-owned TX requests
  * \author          Nexus Team
  */
 #ifndef NEXUS_IO_CAN_H
@@ -15,6 +15,22 @@ extern "C" {
 
 typedef enum { NX_CAN_STANDARD, NX_CAN_EXTENDED } nx_can_format_t;
 typedef enum { NX_CAN_DATA, NX_CAN_REMOTE } nx_can_frame_kind_t;
+/** \brief Protocol error category stored in one byte, never a silicon code.
+ * \note BIT_RECESSIVE/DOMINANT name the level the transmitter intended.
+ *       UNKNOWN means no classified observation is available. These categories
+ *       do not identify the affected frame or prove a current bus condition.
+ */
+typedef uint8_t nx_can_protocol_error_t;
+enum nx_can_protocol_errors {
+    NX_CAN_PROTOCOL_NONE,
+    NX_CAN_PROTOCOL_ACK,
+    NX_CAN_PROTOCOL_STUFF,
+    NX_CAN_PROTOCOL_FORM,
+    NX_CAN_PROTOCOL_BIT_DOMINANT,
+    NX_CAN_PROTOCOL_BIT_RECESSIVE,
+    NX_CAN_PROTOCOL_CRC,
+    NX_CAN_PROTOCOL_UNKNOWN
+};
 /** \brief Classic 2.0A/B value frame; DLC is always 0..8, never CAN FD. */
 typedef struct {
     uint32_t id;
@@ -34,10 +50,14 @@ typedef enum { NX_CAN_EVENT_FRAME, NX_CAN_EVENT_LOSS } nx_can_event_kind_t;
 #define NX_CAN_LOSS_HARDWARE_LOWER_BOUND 2U
 #define NX_CAN_LOSS_SATURATED            4U
 #define NX_CAN_DLC_NORMALIZED            8U
+#define NX_CAN_FILTER_UNKNOWN            16U
 /**
  * \brief Value receive fact or ordered loss boundary.
  * \note Timestamp is IRQ acquisition/report time, not hardware SOF. Hardware
  *       overrun proves only a lower bound. Raw DLC 9..15 is normalized to 8.
+ *       filter_tag is the selected logical rule, independent of physical
+ *       filters/FIFOs. Zero with FILTER_UNKNOWN means no rule can be
+ * identified; it never authorizes policy based on an invented match.
  */
 typedef struct {
     nx_can_frame_t frame;
@@ -45,8 +65,7 @@ typedef struct {
     uint64_t lost;
     uint32_t flags;
     nx_can_event_kind_t kind;
-    uint8_t fifo;
-    uint8_t filter;
+    uint16_t filter_tag;
     uint8_t raw_dlc;
 } nx_can_event_t;
 /** \brief Latched controller state, independent of receive-ring fullness. */
@@ -57,7 +76,7 @@ typedef struct {
     uint8_t pending;
     uint8_t transmit_errors;
     uint8_t receive_errors;
-    uint8_t last_error;
+    nx_can_protocol_error_t last_error;
 } nx_can_state_t;
 /** \brief Shared immutable operations; execution owner serializes task methods.
  */
@@ -90,12 +109,13 @@ nx_result_t nx_can_tx_prepare(nx_can_tx_request_t* request,
                               const nx_can_frame_t* frame,
                               nx_time_us_t deadline);
 /**
- * \brief Admit one frame into one of three hardware mailboxes.
+ * \brief Admit one frame within the selected provider's finite TX capacity.
  * \param[in] port: Stable immutable face and private storage.
  * \param[in,out] request: READY value request, kept alive until SETTLED.
  * \return Success means ACCEPTED, not on-wire completion; other results reject.
  * \note Serialized privileged task owner, incoming IRQ masks clear. REJECTED
- *       retains nothing. TXOK plus completed/empty hardware proves success.
+ *       retains nothing. Success requires proven on-wire completion and
+ *       withdrawal of all hardware references before settlement.
  */
 nx_result_t nx_can_port_submit(const nx_can_port_t* port,
                                nx_can_tx_request_t* request);
@@ -113,7 +133,8 @@ nx_result_t nx_can_port_cancel(const nx_can_port_t* port,
  * \brief Process latched completions and absolute timeout/drain deadlines.
  * \param[in] port: Serialized task-owner face with incoming masks clear.
  * \return Success, STATE before start, CONTEXT for an illegal caller.
- * \note Bounded three-mailbox/six-frame work, no worker, blocking or replay.
+ * \note Provider-bounded work, no worker, blocking or replay. Final request
+ *       outcomes are read after SETTLED, independently of service success.
  */
 nx_result_t nx_can_port_service(const nx_can_port_t* port);
 /**

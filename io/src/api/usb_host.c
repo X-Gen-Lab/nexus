@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/io/usb_host.h"
+#include "dispatch_checks.h"
 
 /** \brief Prepare metadata without accessing or borrowing packet bytes. */
 nx_result_t nx_usb_host_prepare(nx_usb_host_request_t* request, uint8_t* bytes,
@@ -33,46 +34,73 @@ static bool valid(const nx_usb_host_port_t* port) {
     return port != NULL && port->ops != NULL && port->context != NULL;
 }
 
-/** \brief Open the exact selected hardware channel without discovery. */
-nx_result_t nx_usb_host_open(const nx_usb_host_port_t* port, uint8_t channel,
+/** \brief Open the selected logical pipe without hardware discovery. */
+nx_result_t nx_usb_host_open(const nx_usb_host_port_t* port,
+                             nx_usb_host_pipe_id_t pipe_id,
                              const nx_usb_host_pipe_t* pipe) {
     if (!valid(port)) {
         return NX_ERROR_INVALID;
     }
     return port->ops->open == NULL
                ? NX_ERROR_UNSUPPORTED
-               : port->ops->open(port->context, channel, pipe);
+               : port->ops->open(port->context, pipe_id, pipe);
 }
 
-/** \brief An unsuccessful close retains the same channel responsibility. */
-nx_result_t nx_usb_host_close(const nx_usb_host_port_t* port, uint8_t channel) {
+/** \brief An unsuccessful close retains the same pipe responsibility. */
+nx_result_t nx_usb_host_close(const nx_usb_host_port_t* port,
+                              nx_usb_host_pipe_id_t pipe_id) {
     if (!valid(port)) {
         return NX_ERROR_INVALID;
     }
     return port->ops->close == NULL ? NX_ERROR_UNSUPPORTED
-                                    : port->ops->close(port->context, channel);
+                                    : port->ops->close(port->context, pipe_id);
+}
+
+/** \brief Expose geometry only; output cannot overwrite the interface itself.
+ */
+nx_result_t nx_usb_host_storage_requirements(
+    const nx_usb_host_port_t* port, nx_usb_host_pipe_id_t pipe_id,
+    size_t length, nx_usb_host_storage_requirements_t* requirements) {
+    if (!nx_io_dispatch_span(port, sizeof(*port),
+                             _Alignof(nx_usb_host_port_t)) ||
+        !valid(port) ||
+        !nx_io_dispatch_span(port->ops, sizeof(*port->ops),
+                             _Alignof(nx_usb_host_ops_t)) ||
+        !nx_io_dispatch_span(requirements, sizeof(*requirements),
+                             _Alignof(nx_usb_host_storage_requirements_t)) ||
+        nx_io_dispatch_overlap(requirements, sizeof(*requirements), port,
+                               sizeof(*port)) ||
+        nx_io_dispatch_overlap(requirements, sizeof(*requirements), port->ops,
+                               sizeof(*port->ops)))
+        return NX_ERROR_INVALID;
+    return port->ops->requirements == NULL
+               ? NX_ERROR_UNSUPPORTED
+               : port->ops->requirements(port->context, pipe_id, length,
+                                         requirements);
 }
 
 /** \brief The provider owns actual admission and DMA memory validation. */
-nx_result_t nx_usb_host_submit(const nx_usb_host_port_t* port, uint8_t channel,
+nx_result_t nx_usb_host_submit(const nx_usb_host_port_t* port,
+                               nx_usb_host_pipe_id_t pipe_id,
                                nx_usb_host_request_t* request) {
     if (!valid(port)) {
         return NX_ERROR_INVALID;
     }
     return port->ops->submit == NULL
                ? NX_ERROR_UNSUPPORTED
-               : port->ops->submit(port->context, channel, request);
+               : port->ops->submit(port->context, pipe_id, request);
 }
 
 /** \brief Cancellation never makes an accepted request unborrowed. */
-nx_result_t nx_usb_host_cancel(const nx_usb_host_port_t* port, uint8_t channel,
+nx_result_t nx_usb_host_cancel(const nx_usb_host_port_t* port,
+                               nx_usb_host_pipe_id_t pipe_id,
                                nx_usb_host_request_t* request) {
     if (!valid(port)) {
         return NX_ERROR_INVALID;
     }
     return port->ops->cancel == NULL
                ? NX_ERROR_UNSUPPORTED
-               : port->ops->cancel(port->context, channel, request);
+               : port->ops->cancel(port->context, pipe_id, request);
 }
 
 /** \brief Service runs only in the caller's explicitly selected executor. */

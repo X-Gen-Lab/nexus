@@ -9,7 +9,7 @@ source_language: zh_CN
 
 本页分别说明 F407 FSMC 和 F479 FMC／QuadSPI，三种控制器不因名称相近共享硬件
 权限。F407 FSMC 实现限定 STM32F407VET6（LQFP100）与 STM32F407ZGT6（LQFP144）；
-F479 软件参考的 CPU-only SDRAM 与间接串行 NOR 见本页后续章节。
+F479 软件参考的 SDRAM 数据窗口、显式图形存储模式与间接串行 NOR 见后续章节。
 一个 `nx_stm32_fsmc_t` 管理唯一 FSMC gate、共享 AF12 pads 和所选 bank receipt。
 SRAM、LCD、PSRAM、NOR、NAND 端点借用这个 owner；端点不会另建 RCC、GPIO 或
 控制器注册表。原有 NE3 启动 SRAM 仍由复位计划的同一 const bank 描述符证明，
@@ -76,9 +76,9 @@ NAND 不映射成无坏块的普通 Flash。一个请求执行一页主数据及
 一个物理块擦除或显式复位。所有位置都是绝对物理页，包括坏块；库不扫描/跳过坏块，
 不解释 OOB，不分配逻辑地址，不提供 FTL、文件系统或产品坏块表。
 
-几何统一以字节表达；16 位总线只改变列地址和每次数据总线单位。512 字节的小页与
-大页使用各自的地址/确认序列。ID 与 status 是独立的同步 raw primitive，不能据此
-静默替换声明几何。写保护和状态 fail 位向请求返回明确错误。
+几何统一以字节表达；16 位总线只改变列地址和每次数据总线单位。512 字节的小页与大页使用各自的地址/确认序列。ID 读取不推断或替换声明几何；`nx_nand_status` 返回 ready、failed 和 write_protected 的类型化快照，调用者无需解码器件状态位。状态查询不归还活动请求，写保护和器件失败仍向请求返回明确错误。
+
+`nx_nand_ecc_format` 在空闲已准备的同一 owner 上返回编码身份、step_bytes 和 code_bytes，不发出 NAND 命令。当前身份 `NX_NAND_ECC_STM32_FSMC_RAW32` 表示每步一个数值 `uint32_t`；4 字节是存储容器，不代表有效校验位数，也不是跨平台序列化格式或标准纠错算法。查询不推导纠错能力、OOB 放置或坏块策略，输出别名与忙状态在访问前拒绝。
 
 ECC 是 FSMC 每 chunk 产生的原始代码：256..8192 字节的硬件 chunk 由配置选择，
 可选输出数组每个主数据 chunk 对应一个 `uint32_t`。数据循环每次最多 32 个 bus unit，
@@ -112,8 +112,9 @@ CFI region 和 ECC drain。ARM 消费者只证明精确 part 的选择、C11 编
 
 `STM32F479NIH6` 的 FMC 增加独立 `sdram-controller` 模式，复用现有
 `external_bus` 控制器和 `memory_window-endpoint`：两种 face 指向同一 C owner，
-factory 只返回静态对象。本切片仅为 Bank1、8 MiB、16 bit、12 行位／8 列位、
-4 个内部 bank 的 CPU 数据窗口；它不授予 DMA、XIP、堆、启动对象或自动内存探测。
+factory 只返回静态对象。本切片固定 Bank1、8 MiB、16 bit、12 行位／8 列位、
+4 个内部 bank。默认 `cpu-window` 只授予 CPU 数据借用；额外的图形访问必须显式
+选择下述 `graphics-owned` 模式。两种模式都不授予 XIP、堆、启动对象或自动内存探测。
 具体器件时序必须由端点显式声明；软件参考数值不证明 RAM 实装或电气资格。
 
 参数保留七组 `nanoseconds`／`cycles` 最小值、CAS、SDCLK 分频、读管线、首次刷新
@@ -124,7 +125,7 @@ RC／WR 关系、计算 COUNT，并避开 RM0386 的禁止值。C 完成 CLK_ENA
 当作成功证据。System 的原始 `time_epoch` 必须持续有效，同频率／同 RCC 值不能
 将旧 owner 接到新时间域。元数据预检在 System 之前只读执行，实际硬件行为全部在 C。
 
-默认 CPU 窗口要求 SYSCFG 时钟与 `SWP_FMC=0` 的实际可观察状态，驱动不修改全局
+两种窗口模式都要求 SYSCFG 时钟与 `SWP_FMC=0` 的实际可观察状态，驱动不修改全局
 交换或 MPU。原始稳定 lease、代次和派生指针使用者都退出后才能释放；停止以实际
 Self-refresh／BUSY 状态证明写 FIFO 排空和 tRAS，随后恢复自己取得的资源。
 失去 lease、时间域或读回证据时保留清理责任，不撤销已有 CPU 指针。同一持久 owner
@@ -136,6 +137,33 @@ ES0321 §2.3.4 要求保持共享 `FMC_BCR1.WFDIS=0`。FMC gate 关闭时不能�
 新借用和普通停止并保留 owner／gate。只有尚未发命令／借用的 phase0 冷拒绝，
 能够保持原 BCR1 不变并归还自己取得的 gate。实现见
 [SDRAM 私有合同](../../soc/stm32/stm32f4/private/stm32f4_sdram.h)。
+
+### 显式图形存储模式
+
+将 SDRAM 端点的 `mode` 设为 `graphics-owned`，并在所选 `display`／`image`
+控制器中用 `memory_window` 引用该端点 ID，才会建立图形连接。配置拒绝 CPU-only
+端点、未知引用和没有图形使用者的 `graphics-owned` 窗口。完整软件参考见
+[`stm32f4_graphics_sdram/combined.toml`](../../tests/contracts/stm32f4_graphics_sdram/combined.toml)。
+RM0386 Rev6 §2.1.8–9 说明 LTDC／DMA2D 到 FMC 的总线路径，§12.8 规定 SDRAM
+控制器行为；芯片总线可达性本身不构成 Nexus 的权限或生命周期授权。
+
+生成器为该 bank 建立一个静态私有连接，将原始稳定 window lease 与两个精确
+controller 身份关联。每个图形控制器在冷态 prepare 时附着，首个附着取得 lease，
+最后一个成功冷态 close 才归还。生成的区域只向具名 LTDC 授予读取，向具名 DMA2D
+授予读写；其他控制器和芯片全局 DMA 事实不变。图形请求继续检查完整容量、对齐、
+格式、步长和别名，且核对原 System／时间代次、bank 状态和选定映射。
+
+Platform 先启动 SDRAM，再准备图形控制器；冷停止按反序先退出图形硬件、IRQ 和
+保留引用，再尝试停止 bank。请求达到 SETTLED 不代表控制器完成冷态 close。公共
+`display.stop`／`image.stop` 只有在所选 provider 完成硬件／IRQ 冷退出并返回 SUCCESS
+后才解除附着；BUSY 或错误继续保留 bank 责任。仍附着的控制器使 bank 停止及
+Self-refresh 被拒绝；部分失败保留原连接和 lease，重试必须完成真实冷退出。
+
+该模式保留 geometry 查询，但公共 CPU window acquire／release 不可用，不能借其
+factory face 取得或提前归还私有图形 lease。这是配合式 provider 准入合同，不是
+MPU 或 BusMatrix 防火墙，不能物理阻止任意原始 CPU 指针。参考装配没有实装 SDRAM
+型号、PCB 或面板；带宽与物理验证边界见
+[图形 provider 合同](official-stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations)。
 
 ## F479 间接 QuadSPI 与串行 NOR
 

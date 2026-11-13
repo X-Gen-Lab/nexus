@@ -538,6 +538,155 @@ TEST_F(SDRAM, ChangedWriteFifoCannotGrantLoanOrFakeAnInitializedColdExit) {
     FMC_Bank1->BTCR[0] &= ~static_cast<uint32_t>(FMC_BCR1_WFDIS);
     EXPECT_EQ(NX_SUCCESS, nx_stm32_sdram_stop(&owner));
 }
+TEST_F(SDRAM, GraphicsBindingsHoldTheOriginalBankUntilBothOwnersColdJoin) {
+    config.graphics_only = true;
+    Open();
+    nx_stm32_sdram_graphics_t binding{&owner, {}, {nullptr, nullptr}};
+    int ltdc = 0, dma2d = 0;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_sdram_graphics_attach(
+                              &binding, NX_STM32_SDRAM_GRAPHICS_LTDC, &ltdc,
+                              &g_nx_stm32_system));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_sdram_graphics_attach(
+                              &binding, NX_STM32_SDRAM_GRAPHICS_DMA2D, &dma2d,
+                              &g_nx_stm32_system));
+    EXPECT_EQ(&binding.lease, owner.lease);
+    EXPECT_EQ(&owner, binding.lease.owner);
+    const auto original_epoch = binding.lease.epoch;
+    const auto issued = commands.size();
+    nx_memory_window_lease_t cpu{};
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_memory_window_port_acquire(&window, &cpu));
+    EXPECT_EQ(nullptr, cpu.owner);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_sdram_stop(&owner));
+    EXPECT_EQ(issued, commands.size());
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_sdram_graphics_detach(
+                              &binding, NX_STM32_SDRAM_GRAPHICS_LTDC, &ltdc));
+    EXPECT_EQ(original_epoch, binding.lease.epoch);
+    EXPECT_EQ(&binding.lease, owner.lease);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_sdram_stop(&owner));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_sdram_graphics_detach(
+                              &binding, NX_STM32_SDRAM_GRAPHICS_DMA2D, &dma2d));
+    EXPECT_EQ(nullptr, owner.lease);
+    EXPECT_EQ(nullptr, binding.lease.owner);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_sdram_stop(&owner));
+}
+TEST_F(SDRAM, GraphicsCannotPromoteACpuOnlyBankOrAForeignSystem) {
+    Open();
+    nx_stm32_sdram_graphics_t binding{&owner, {}, {nullptr, nullptr}};
+    int consumer = 0;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_sdram_graphics_attach(
+                                        &binding, NX_STM32_SDRAM_GRAPHICS_LTDC,
+                                        &consumer, &g_nx_stm32_system));
+    EXPECT_EQ(nullptr, owner.lease);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_sdram_stop(&owner));
+    config.graphics_only = true;
+    Open();
+    nx_stm32_system_t foreign = g_nx_stm32_system;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_sdram_graphics_attach(
+                  &binding, NX_STM32_SDRAM_GRAPHICS_LTDC, &consumer, &foreign));
+    EXPECT_EQ(nullptr, owner.lease);
+    EXPECT_EQ(nullptr, binding.consumers[NX_STM32_SDRAM_GRAPHICS_LTDC]);
+    ++g_nx_stm32_system.time_epoch;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32_sdram_graphics_attach(
+                                  &binding, NX_STM32_SDRAM_GRAPHICS_LTDC,
+                                  &consumer, &g_nx_stm32_system));
+    EXPECT_EQ(nullptr, owner.lease);
+}
+TEST_F(SDRAM, GraphicsDuplicateAndForeignDetachNeverReleaseAnotherOwner) {
+    config.graphics_only = true;
+    Open();
+    nx_stm32_sdram_graphics_t binding{&owner, {}, {nullptr, nullptr}};
+    int consumer = 0, foreign = 0;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_sdram_graphics_attach(
+                              &binding, NX_STM32_SDRAM_GRAPHICS_LTDC, &consumer,
+                              &g_nx_stm32_system));
+    const auto before = binding;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_sdram_graphics_attach(
+                                 &binding, NX_STM32_SDRAM_GRAPHICS_LTDC,
+                                 &foreign, &g_nx_stm32_system));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_sdram_graphics_detach(
+                  &binding, NX_STM32_SDRAM_GRAPHICS_LTDC, &foreign));
+    EXPECT_EQ(0, std::memcmp(&before, &binding, sizeof(binding)));
+    EXPECT_EQ(&binding.lease, owner.lease);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_sdram_stop(&owner));
+    EXPECT_EQ(NX_SUCCESS,
+              nx_stm32_sdram_graphics_detach(
+                  &binding, NX_STM32_SDRAM_GRAPHICS_LTDC, &consumer));
+}
+TEST_F(SDRAM, GraphicsRetainsItsOriginalLoanWhenTimeProofIsLost) {
+    config.graphics_only = true;
+    Open();
+    nx_stm32_sdram_graphics_t binding{&owner, {}, {nullptr, nullptr}};
+    int consumer = 0;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_sdram_graphics_attach(
+                              &binding, NX_STM32_SDRAM_GRAPHICS_DMA2D,
+                              &consumer, &g_nx_stm32_system));
+    const auto before = binding;
+    ++g_nx_stm32_system.time_epoch;
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_stm32_sdram_graphics_detach(
+                  &binding, NX_STM32_SDRAM_GRAPHICS_DMA2D, &consumer));
+    EXPECT_EQ(0, std::memcmp(&before, &binding, sizeof(binding)));
+    EXPECT_EQ(&binding.lease, owner.lease);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_sdram_stop(&owner));
+    --g_nx_stm32_system.time_epoch;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_stm32_sdram_graphics_detach(
+                  &binding, NX_STM32_SDRAM_GRAPHICS_DMA2D, &consumer));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_sdram_stop(&owner));
+}
+TEST_F(SDRAM,
+       GraphicsRejectsInvalidMasterContextAndMisalignedBindingBeforeLoan) {
+    config.graphics_only = true;
+    Open();
+    nx_stm32_sdram_graphics_t binding{&owner, {}, {nullptr, nullptr}};
+    int consumer = 0;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_sdram_graphics_attach(
+                  &binding, static_cast<nx_stm32_sdram_graphics_master_t>(2),
+                  &consumer, &g_nx_stm32_system));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_sdram_graphics_attach(
+                                    &binding, NX_STM32_SDRAM_GRAPHICS_LTDC,
+                                    nullptr, &g_nx_stm32_system));
+    irq_masked = true;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_stm32_sdram_graphics_attach(
+                                    &binding, NX_STM32_SDRAM_GRAPHICS_LTDC,
+                                    &consumer, &g_nx_stm32_system));
+    irq_masked = false;
+    const auto before = binding;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_sdram_graphics_attach(
+                  reinterpret_cast<nx_stm32_sdram_graphics_t*>(
+                      reinterpret_cast<uintptr_t>(&binding) + 1U),
+                  NX_STM32_SDRAM_GRAPHICS_LTDC, &consumer, &g_nx_stm32_system));
+    EXPECT_EQ(0, std::memcmp(&before, &binding, sizeof(binding)));
+    EXPECT_EQ(nullptr, owner.lease);
+}
+TEST_F(SDRAM, GraphicsMetadataCannotBecomeQueryOrPixelStorage) {
+    config.graphics_only = true;
+    Open();
+    nx_stm32_sdram_graphics_t binding{&owner, {}, {nullptr, nullptr}};
+    const auto issued = commands.size();
+    EXPECT_TRUE(
+        nx_stm32_sdram_graphics_overlaps(&binding, &owner, sizeof(owner)));
+    EXPECT_TRUE(
+        nx_stm32_sdram_graphics_overlaps(&binding, &config, sizeof(config)));
+    EXPECT_TRUE(nx_stm32_sdram_graphics_overlaps(
+        &binding, pins.data(), pins.size() * sizeof(pins[0])));
+    EXPECT_TRUE(nx_stm32_sdram_graphics_overlaps(&binding, pins[0].snapshot,
+                                                 sizeof(*pins[0].snapshot)));
+    EXPECT_TRUE(nx_stm32_sdram_graphics_overlaps(&binding, &binding.lease,
+                                                 sizeof(binding.lease)));
+    int separate = 0;
+    EXPECT_FALSE(nx_stm32_sdram_graphics_overlaps(&binding, &separate,
+                                                  sizeof(separate)));
+    EXPECT_EQ(issued, commands.size());
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_sdram_stop(&owner));
+    EXPECT_TRUE(nx_stm32_sdram_graphics_overlaps(&binding, &separate,
+                                                 sizeof(separate)));
+}
 } /* namespace */
 
 extern "C" uint32_t nx_sdram_model_read(const volatile uint32_t* reg) {

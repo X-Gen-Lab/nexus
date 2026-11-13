@@ -99,12 +99,11 @@ typedef struct {
 } nx_audio_layout_t;
 
 /** \brief Allocation-free serialized owner, driven by explicit service.
- * \note Platform prepare acquires pads, DMA, I2S and an optional shared
- *       compatible PLLI2S lease. Factory lookup never opens hardware. Start
- *       external slave CK only after acquire-observed ACTIVE; WS must be at
- *       the selected idle channel boundary during preparation. ACTIVE in a
- *       I2S slave TX mode includes a real DR prefill, three actual microsecond
- *       ticks and at least three peripheral clocks with idle CK/WS retained.
+ * \note Platform prepare acquires the selected source, transport and clock
+ *       resources. Factory lookup never opens hardware. Start external slave
+ *       clocks only after acquire-observed ACTIVE; frame synchronization must
+ *       remain at the selected idle boundary during preparation. ACTIVE proves
+ *       the selected provider's startup preparation, not physical timing.
  *       Caller controls external electrical timing and stop/drain clocks.
  *       IRQs latch errors/completion, with no task creation. One privileged
  *       unmasked task serializes methods and resource lifecycle; explicit
@@ -138,15 +137,83 @@ struct nx_audio_port {
 /** \brief Same immutable typed controller face for direct operation use. */
 typedef nx_audio_port_t nx_audio_t;
 
-/** \brief Query exact sample storage without hardware access or borrowing.
- * \param[in] port: Prepared owner under its existing serialized task contract.
- * \param[out] result: Separate output, changed only on success.
- * \return SUCCESS, UNSUPPORTED, INVALID, STATE or a provider error.
- * \note The original output pointer reaches the selected provider, which
- *       rejects aliases with state/config and all active loan storage before
- *       writing. No query allocation, task, clock wait or payload conversion
- *       is supplied. Closed owners may report STATE without reading retired
- *       configuration. Physical clock and audio quality remain unmeasured.
+/** \brief Admit one finite audio block without converting its stored samples.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[in,out] request: Original stable storage under the operation
+ * loan contract. \return Provider result, INVALID for malformed public objects,
+ * or UNSUPPORTED when this selected operation is absent. \note The selected
+ * owner defines context and timing. Dispatch retains no references, starts no
+ * worker and never revokes a live borrow. Provider admission still checks
+ * private state and payload aliases. The original argument reaches that owner
+ * without a temporary or format conversion.
+ */
+nx_result_t nx_audio_port_submit(const nx_audio_port_t* port,
+                                 nx_audio_request_t* request);
+/** \brief Advance bounded completion and withdrawal; final results belong to
+ * requests. \param[in] port: Stable face under the selected serialized
+ * execution contract. \return Provider result, INVALID for malformed public
+ * objects, or UNSUPPORTED when this selected operation is absent. \note The
+ * selected owner defines context and timing. Dispatch retains no references,
+ * starts no worker and never revokes a live borrow. Provider admission still
+ * checks private state and payload aliases. The original argument reaches that
+ * owner without a temporary or format conversion.
+ */
+nx_result_t nx_audio_port_service(const nx_audio_port_t* port);
+/** \brief Request finite-block withdrawal without revoking any outstanding
+ * loan. \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[in,out] request: Original stable storage under the operation
+ * loan contract. \return Provider result, INVALID for malformed public objects,
+ * or UNSUPPORTED when this selected operation is absent. \note The selected
+ * owner defines context and timing. Dispatch retains no references, starts no
+ * worker and never revokes a live borrow. Provider admission still checks
+ * private state and payload aliases. The original argument reaches that owner
+ * without a temporary or format conversion.
+ */
+nx_result_t nx_audio_port_cancel(const nx_audio_port_t* port,
+                                 nx_audio_request_t* request);
+/** \brief Join finite or continuous producers; consumer RX loans remain
+ * independent. \param[in] port: Stable face under the selected serialized
+ * execution contract. \return Provider result, INVALID for malformed public
+ * objects, or UNSUPPORTED when this selected operation is absent. \note The
+ * selected owner defines context and timing. Dispatch retains no references,
+ * starts no worker and never revokes a live borrow. Provider admission still
+ * checks private state and payload aliases. The original argument reaches that
+ * owner without a temporary or format conversion.
+ */
+nx_result_t nx_audio_port_stop(const nx_audio_port_t* port);
+/** \brief Copy the exact nominal rate; an external unknown rate remains
+ * unknown. \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[out] rate: Independent output, changed only as the provider
+ * contract permits. \return Provider result, INVALID for malformed public
+ * objects, or UNSUPPORTED when this selected operation is absent. \note The
+ * selected owner defines context and timing. Dispatch retains no references,
+ * starts no worker and never revokes a live borrow. Provider admission still
+ * checks private state and payload aliases. The original argument reaches that
+ * owner without a temporary or format conversion.
+ */
+nx_result_t nx_audio_port_rate(const nx_audio_port_t* port,
+                               nx_audio_rate_t* rate);
+/** \brief Admit a continuous caller-owned session without hidden replenishment.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[in,out] request: Original stable storage under the operation
+ * loan contract. \return Provider result, INVALID for malformed public objects,
+ * or UNSUPPORTED when this selected operation is absent. \note The selected
+ * owner defines context and timing. Dispatch retains no references, starts no
+ * worker and never revokes a live borrow. Provider admission still checks
+ * private state and payload aliases. The original argument reaches that owner
+ * without a temporary or format conversion.
+ */
+nx_result_t nx_audio_port_start_blocks(const nx_audio_port_t* port,
+                                       nx_audio_blocks_request_t* request);
+/** \brief Copy exact storage layout without converting or borrowing payloads.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[out] result: Independent output, changed only as the
+ * provider contract permits. \return Provider result, INVALID for malformed
+ * public objects, or UNSUPPORTED when this selected operation is absent. \note
+ * The selected owner defines context and timing. Dispatch retains no
+ *       references, starts no worker and never revokes a live borrow. Provider
+ *       admission still checks private state and payload aliases. The original
+ *       argument reaches that owner without a temporary or format conversion.
  */
 nx_result_t nx_audio_port_layout(const nx_audio_port_t* port,
                                  nx_audio_layout_t* result);

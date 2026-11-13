@@ -1260,6 +1260,10 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             provider.EXTERNAL_BUS.complete_controller(
                 controller, children, claim=claim, bindings=bindings, routes=routes)
         enhanced_endpoints.complete_controller(controller, children, provider)
+    external = getattr(provider, "EXTERNAL_BUS", None)
+    complete_plan = getattr(external, "complete_plan", None)
+    if complete_plan is not None:
+        complete_plan(selected, endpoint_selections)
     aliases = {"controller:" + item["controller"]:
                "ip:" + item["controller"] + "/control"
                for item in selected if item["kind"] == "external_bus"}

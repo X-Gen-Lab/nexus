@@ -83,13 +83,15 @@ TEST_F(DacFactory, PureTypedLookupAndActualProductionCallsRestorePins) {
     ASSERT_EQ(NX_SUCCESS, nx_dac_port_info(port, &info));
     EXPECT_EQ(NX_TEST_DAC_MAX, info.maximum_code);
     EXPECT_EQ(3U, info.channel_mask);
+    EXPECT_EQ(NX_TEST_DAC_MAX == 255U ? 8U : 12U, info.code_bits);
     EXPECT_EQ(0x55555f55U, GPIOA->MODER);
     ASSERT_EQ(NX_SUCCESS, nx_dac_port_write_pair(port, 123U, 231U));
     ASSERT_EQ(NX_SUCCESS, nx_dac_port_start(port, 0U, 1000U));
     nx_dac_state_t output{};
     ASSERT_EQ(NX_SUCCESS, nx_dac_port_state(port, &output));
-    EXPECT_EQ(123U * NX_TEST_DAC_SCALE, output.digital_output12[0]);
-    EXPECT_EQ(231U * NX_TEST_DAC_SCALE, output.digital_output12[1]);
+    EXPECT_EQ(info.code_bits, output.code_bits);
+    EXPECT_EQ(123U, output.output_codes[0]);
+    EXPECT_EQ(231U, output.output_codes[1]);
     ASSERT_EQ(NX_SUCCESS, nx_platform_stop());
     EXPECT_EQ(1U, starts);
     EXPECT_EQ(1U, stops);

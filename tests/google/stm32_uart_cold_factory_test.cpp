@@ -697,7 +697,7 @@ TEST_F(UartColdFactory, WirePinsAcquireExactClockFlowAndOpenDrainAndRestore) {
                                                   {GPIOA, &saved[1], 0U, 10U},
                                                   {GPIOA, &saved[2], 0U, 8U},
                                                   {GPIOA, &saved[3], 0U, 12U}};
-        nx_uart_wire_config_t wire = {};
+        nx_stm32_uart_wire_config_t wire = {};
         wire.mode = mode;
         uint8_t count = 3U;
         if (mode == NX_UART_WIRE_HALF_DUPLEX)

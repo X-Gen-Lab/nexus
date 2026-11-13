@@ -462,7 +462,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         family = Path("tests/contracts/stm32f4_family")
         shutil.copytree(ROOT / family, self.sdk / family)
         for name in ("stm32f4_crypto", "stm32f4_sdram", "stm32f4_graphics",
-                     "stm32f4_sai", "stm32f4_qspi"):
+                     "stm32f4_graphics_sdram", "stm32f4_sai", "stm32f4_qspi"):
             relative = Path("tests/contracts") / name
             shutil.copytree(ROOT / relative, self.sdk / relative)
         crc = Path("tests/contracts/crc_assembly/consumer.c")

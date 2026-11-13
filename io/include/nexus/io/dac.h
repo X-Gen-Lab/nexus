@@ -16,7 +16,7 @@ extern "C" {
 
 #define NX_DAC_CHANNEL_1 1U
 #define NX_DAC_CHANNEL_2 2U
-/** \brief Input storage encoding, distinct from the 12-bit digital output. */
+/** \brief Explicit native storage encoding, independent of analog precision. */
 typedef enum {
     NX_DAC_FORMAT_U8,
     NX_DAC_FORMAT_U12_RIGHT,
@@ -39,15 +39,23 @@ typedef struct {
     bool timer_trigger;
     bool output_buffer;
     bool external_trigger; /**< Physical source; rate remains unknown. */
+    uint8_t
+        code_bits; /**< Significant bits in each public write/output code. */
 } nx_dac_info_t;
-/** \brief DOR codes always use 12-bit right alignment, including u8 input. */
+/** \brief Digital output observations in the selected public write-code unit.
+ * \note This explicit two-channel profile reports code_bits and zero-based
+ *       output_codes slots in channel order. Codes do not measure voltage or
+ *       analog settling. The provider removes native alignment/scaling; unused
+ *       native low bits are not represented by a narrower selected code unit.
+ */
 typedef struct {
-    uint16_t digital_output12[2];
+    uint16_t output_codes[2];
     uint32_t timer_clock_hz;
     uint32_t trigger_divisor;
     uint8_t enabled_channels;
     bool running;
     bool faulted;
+    uint8_t code_bits;
 } nx_dac_state_t;
 /** \brief Shared immutable operations; callbacks receive instance context. */
 typedef struct {
@@ -127,9 +135,9 @@ nx_result_t nx_dac_port_trigger(const nx_dac_port_t* port, uint8_t channels);
  */
 nx_result_t nx_dac_port_stop(const nx_dac_port_t* port, nx_time_us_t deadline);
 /**
- * \brief Read digital DOR and declared timer division, not analog voltage.
+ * \brief Read digital codes and declared timer division, not analog voltage.
  * \param[in] port: Initialized task owner; no concurrent state mutation.
- * \param[out] state: Independent snapshot; u8 input reads back as code<<4.
+ * \param[out] state: Independent snapshot using the same code unit as write.
  * \return SUCCESS, INVALID, STATE, CONTEXT or UNSUPPORTED.
  */
 nx_result_t nx_dac_port_state(const nx_dac_port_t* port, nx_dac_state_t* state);

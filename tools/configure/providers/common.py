@@ -189,7 +189,6 @@ class EndpointPolicy:
     """Family-owned endpoint capabilities; hardware routes remain separate."""
 
     spi_transaction: bool = False
-    i2c_long: bool = False
     spi_dma: tuple[tuple[str, ...] | None, str] | None = None
     model_async_echo: bool = False
     spi_lsb_first: bool = False
@@ -217,9 +216,6 @@ class EndpointPolicy:
                 fail("SPI transaction provider is not maintained")
             if mode != "short-poll":
                 fail("SPI transaction requires the polling provider mode")
-        if driver == "i2c-long-endpoint" and (
-                kind != "i2c" or not self.i2c_long or mode != "poll-messages"):
-            fail("Long I2C requires a maintained polling V2 provider")
         if driver == "spi-dma-transaction":
             if (kind != "spi" or self.spi_dma is None or
                     mode != self.spi_dma[1] or
@@ -425,6 +421,7 @@ _MODE_TRAITS = MappingProxyType({
     ("flash_async", "nor-cfi"): ModeTraits(polling=True),
     ("nand", "raw-page"): ModeTraits(polling=True),
     ("memory_window", "cpu-window"): ModeTraits(),
+    ("memory_window", "graphics-owned"): ModeTraits(),
     ("parallel16", "8080-16"): ModeTraits(polling=True),
     ("block", "sdio-poll"): ModeTraits(polling=True),
     ("block", "sdio-irq"): ModeTraits(irq=True),

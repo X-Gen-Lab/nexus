@@ -180,7 +180,7 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
         if (result != NX_SUCCESS) {
             return result;
         }
-        message->data[0] = NX_STM32_I2C_READ_DATA(port);
+        message->buffer.rx[0] = NX_STM32_I2C_READ_DATA(port);
         ++*transferred;
         return NX_SUCCESS;
     }
@@ -196,8 +196,8 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
         }
         mask = nx_arch_irq_save();
         end_receive(port, last);
-        message->data[0] = NX_STM32_I2C_READ_DATA(port);
-        message->data[1] = NX_STM32_I2C_READ_DATA(port);
+        message->buffer.rx[0] = NX_STM32_I2C_READ_DATA(port);
+        message->buffer.rx[1] = NX_STM32_I2C_READ_DATA(port);
         nx_arch_irq_restore(mask);
         *transferred += 2U;
         return NX_SUCCESS;
@@ -208,7 +208,7 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
         if (result != NX_SUCCESS) {
             return result;
         }
-        message->data[index++] = NX_STM32_I2C_READ_DATA(port);
+        message->buffer.rx[index++] = NX_STM32_I2C_READ_DATA(port);
         --remaining;
         ++*transferred;
     }
@@ -220,7 +220,7 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
      * protected window. Hardware waits remain outside the interrupt mask. */
     nx_arch_irq_state_t mask = nx_arch_irq_save();
     LL_I2C_AcknowledgeNextData(regs, LL_I2C_NACK);
-    message->data[index++] = NX_STM32_I2C_READ_DATA(port);
+    message->buffer.rx[index++] = NX_STM32_I2C_READ_DATA(port);
     nx_arch_irq_restore(mask);
     ++*transferred;
     result = wait_flag(port, I2C_SR1_BTF, deadline);
@@ -229,8 +229,8 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
     }
     mask = nx_arch_irq_save();
     end_receive(port, last);
-    message->data[index++] = NX_STM32_I2C_READ_DATA(port);
-    message->data[index] = NX_STM32_I2C_READ_DATA(port);
+    message->buffer.rx[index++] = NX_STM32_I2C_READ_DATA(port);
+    message->buffer.rx[index] = NX_STM32_I2C_READ_DATA(port);
     nx_arch_irq_restore(mask);
     *transferred += 2U;
     return NX_SUCCESS;
@@ -291,14 +291,17 @@ polling_request(const nx_stm32_i2c_endpoint_state_t* endpoint,
     /* This local view is never admitted, initialized or retained. The existing
      * validator owns bounded message shape and RX/immutable-TX separation. */
     const nx_i2c_request_t view = {.messages = messages, .count = count};
-    nx_result_t result = nx_i2c_request_validate(&view);
+    nx_result_t result =
+        nx_i2c_request_validate_limits(&view, &nx_i2c_bounded_limits);
     if (result != NX_SUCCESS)
         return result;
     for (size_t index = 0U; index < count; ++index) {
         const nx_i2c_message_t* message = &messages[index];
-        if (!polling_storage(endpoint, message->data, message->length) ||
-            !nx_i2c_v1_storage_outside(message->data, message->length,
-                                       transferred, sizeof(*transferred)))
+        if (!polling_storage(endpoint, nx_i2c_message_data(message),
+                             message->length) ||
+            !nx_i2c_v1_storage_outside(nx_i2c_message_data(message),
+                                       message->length, transferred,
+                                       sizeof(*transferred)))
             return NX_ERROR_INVALID;
     }
     return NX_SUCCESS;
@@ -321,7 +324,7 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
         messages == NULL || count == 0U || transferred == NULL) {
         return NX_ERROR_INVALID;
     }
-    if (count > NX_I2C_MAX_MESSAGES) {
+    if (count > NX_I2C_BOUNDED_MAX_MESSAGES) {
         return NX_ERROR_UNSUPPORTED;
     }
     nx_stm32_i2c_state_t* port = endpoint->port;
@@ -414,7 +417,8 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
                 if (result != NX_SUCCESS) {
                     break;
                 }
-                NX_STM32_I2C_WRITE_DATA(port, messages[message].data[byte]);
+                NX_STM32_I2C_WRITE_DATA(port,
+                                        messages[message].buffer.tx[byte]);
                 result = wait_flag(port, I2C_SR1_BTF, deadline);
                 if (result != NX_SUCCESS) {
                     break;

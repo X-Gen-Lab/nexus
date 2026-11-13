@@ -5,7 +5,7 @@
  */
 #ifndef NEXUS_SDIO_IO_H
 #define NEXUS_SDIO_IO_H
-#include "nexus/io/block_async.h"
+#include "nexus/core/request.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,22 +31,39 @@ typedef struct {
 } nx_sdio_io_info_t;
 
 /**
- * \brief One finite CMD53 request, with the existing shared request storage.
- * \note Initialize and prepare transfer.base; configure transfer.data,
- *       data_bytes, blocks and write. transfer.first_block must remain zero.
- *       In byte mode blocks is one and unit_bytes is 1..512. In block mode
- *       unit_bytes matches the explicitly configured FBR size and blocks is
- *       positive and provider-bounded. The complete enclosing object and
- *       payload remain borrowed until acquire-observed transfer.base SETTLED.
- *       Payloads require four-byte alignment; DMA requires sixteen-byte
- *       alignment and a whole four-word burst in each unit. Never submit
- *       this interior transfer as an ordinary block request.
+ * \brief Copied selected-host transfer limits, independent of card readiness.
+ * \note Positive alignment and unit_bytes_multiple apply to every payload and
+ *       unit. max_blocks bounds block mode; byte mode contains one unit of at
+ *       most 512 bytes. The function's configured FBR size must also match.
+ *       These facts grant neither memory access nor initialization authority.
  */
 typedef struct {
-    nx_block_request_t transfer;
+    uint32_t max_blocks;
+    uint16_t max_block_bytes;
+    uint16_t buffer_alignment;
+    uint16_t unit_bytes_multiple;
+    bool power_of_two_block_bytes;
+} nx_sdio_io_limits_t;
+
+/**
+ * \brief One finite function-addressed SDIO byte or block request.
+ * \note Initialize and prepare base; configure data, data_bytes, blocks and
+ *       write. In byte mode blocks is one and unit_bytes is 1..512. In block
+ *       mode unit_bytes matches the explicitly configured FBR size and blocks
+ *       is positive and provider-bounded. The complete descriptor and payload
+ *       remain borrowed until acquire-observed base SETTLED. Buffer alignment,
+ *       supported unit sizes and transfer limits belong to the selected host;
+ *       submission never rounds, allocates or substitutes a transfer mode.
+ */
+typedef struct {
+    nx_request_t base;
+    void* data;
+    size_t data_bytes;
+    uint32_t blocks;
     uint32_t address;
     uint16_t unit_bytes;
     uint8_t function;
+    bool write;
     bool increment;
     bool block_mode;
 } nx_sdio_io_request_t;
@@ -72,6 +89,9 @@ typedef struct {
     nx_result_t (*cancel)(void* context, nx_sdio_io_request_t* request);
     void (*service)(void* context);
     nx_result_t (*sync)(void* context, nx_time_us_t deadline);
+    nx_result_t (*limits)(const void* context, nx_sdio_io_limits_t* limits);
+    nx_result_t (*activate)(void* context, nx_time_us_t deadline);
+    nx_result_t (*stop)(void* context, nx_time_us_t deadline);
 } nx_sdio_io_ops_t;
 
 /** \brief Immutable optional face; uses the same physical block controller ID.
@@ -82,13 +102,47 @@ typedef struct {
 } nx_sdio_io_port_t;
 
 /**
+ * \brief Activate the selected SDIO function-card session.
+ * \param[in] port: Prepared stopped host under one serialized task owner.
+ * \param[in] deadline: Finite absolute host-clock deadline.
+ * \return SUCCESS after discovery, or the actual admission/protocol error.
+ * \note Uses the same physical owner as all function operations. No block
+ *       geometry, implicit fallback or worker is created. A failed activation
+ *       can retain protocol effects; stop must establish session withdrawal.
+ */
+nx_result_t nx_sdio_io_activate(const nx_sdio_io_port_t* port,
+                                nx_time_us_t deadline);
+/**
+ * \brief Stop function activity and return the prepared host to idle.
+ * \param[in] port: Same session owner; join requests before stopping.
+ * \param[in] deadline: Finite absolute host-clock deadline including shutdown.
+ * \return SUCCESS after withdrawal; BUSY retains any outstanding request.
+ * \note Cancel and service active requests first. Success ends the card
+ *       session, not Platform ownership of pins, IRQs or clocks. A failed stop
+ *       retains the same host and protocol recovery responsibility.
+ */
+nx_result_t nx_sdio_io_stop(const nx_sdio_io_port_t* port,
+                            nx_time_us_t deadline);
+/**
+ * \brief Query host limits without discovering or activating a card.
+ * \param[in] port: Prepared host under one serialized task owner.
+ * \param[out] limits: Aligned distinct writable output, unchanged on rejection.
+ * \return SUCCESS, INVALID, STATE, CONTEXT, BUSY or UNSUPPORTED.
+ * \note No MMIO, time access, allocation or borrow. Query before transfers;
+ *       an outstanding request makes this output operation BUSY. Success
+ *       describes the selected implementation, not a live card or hardware
+ *       qualification. The same host validates every submitted request.
+ */
+nx_result_t nx_sdio_io_limits(const nx_sdio_io_port_t* port,
+                              nx_sdio_io_limits_t* limits);
+/**
  * \brief Read bounded CCCR/FBR facts and CIS pointers into a copied snapshot.
  * \param[in] port: Explicitly activated SDIO I/O session, same host owner.
  * \param[out] info: Distinct caller storage, retained only during this call.
  * \param[in] deadline: Finite absolute provider-clock deadline.
  * \return Success or actual control/protocol error, never invented functions.
  * \note All control calls require one privileged unmasked Thread executor.
- *       Ordinary block activation/stop owns this same physical host. No
+ *       Domain activation/stop owns this same physical host. No
  *       function-specific register policy, CIS tuple interpretation or worker.
  */
 nx_result_t nx_sdio_io_inspect(const nx_sdio_io_port_t* port,
@@ -168,7 +222,8 @@ nx_result_t nx_sdio_io_pending(const nx_sdio_io_port_t* port,
  * \param[in,out] request: Complete READY enclosing descriptor and payload.
  * \return SUCCESS means ACCEPTED; rejection retains no reference or effect.
  * \note Service advances polling, IRQ or DMA selection without a worker.
- *       DMA requires aligned whole four-word bursts; no bounce allocation.
+ *       The selected host validates buffer and unit constraints before
+ *       acceptance; no bounce allocation or implicit mode fallback occurs.
  *       Cancellation and timeout retain all borrows until actual drain and
  *       SETTLED. Whole confirmed units form the transferred byte prefix.
  */

@@ -44,7 +44,7 @@ typedef struct {
 
 /** \brief Only asynchronous selections allocate this persistent extension. */
 typedef struct {
-    nx_block_request_t* active;
+    nx_request_t* active;
     nx_result_t terminal;
     uint32_t words;
     uint32_t completed_blocks;
