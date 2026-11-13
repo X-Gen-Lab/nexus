@@ -34,14 +34,15 @@ static nx_result_t transaction(void* context, nx_i2c_message_t* messages,
     model_t* state = context;
     *transferred = 0U;
     if (deadline == NX_DEADLINE_NEVER || messages == NULL || count == 0U ||
-        messages[0].read || messages[0].data == NULL ||
+        messages[0].read || messages[0].buffer.tx == NULL ||
         messages[0].length == 0U) {
         return NX_ERROR_INVALID;
     }
-    uint8_t reg = messages[0].data[0];
+    uint8_t reg = messages[0].buffer.tx[0];
     if (count == 1U && messages[0].length == 3U && reg == 1U) {
-        state->configuration = (uint16_t)((uint16_t)messages[0].data[1] << 8U |
-                                          messages[0].data[2]);
+        state->configuration =
+            (uint16_t)((uint16_t)messages[0].buffer.tx[1] << 8U |
+                       messages[0].buffer.tx[2]);
         if ((state->configuration & 0x0c00U) == 0x0c00U) {
             state->configuration |= 0x2000U;
         }
@@ -49,7 +50,7 @@ static nx_result_t transaction(void* context, nx_i2c_message_t* messages,
         return NX_SUCCESS;
     }
     if (count != 2U || messages[0].length != 1U || !messages[1].read ||
-        messages[1].length != 2U || messages[1].data == NULL) {
+        messages[1].length != 2U || messages[1].buffer.rx == NULL) {
         return NX_ERROR_INVALID;
     }
     uint16_t value;
@@ -71,8 +72,8 @@ static nx_result_t transaction(void* context, nx_i2c_message_t* messages,
         default:
             return NX_ERROR_UNSUPPORTED;
     }
-    messages[1].data[0] = (uint8_t)(value >> 8U);
-    messages[1].data[1] = (uint8_t)value;
+    messages[1].buffer.rx[0] = (uint8_t)(value >> 8U);
+    messages[1].buffer.rx[1] = (uint8_t)value;
     *transferred = 3U;
     return NX_SUCCESS;
 }
