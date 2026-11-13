@@ -91,6 +91,8 @@ class I2CPairFactory : public testing::Test {
     nx_i2c_v1_state_t* states[2]{};
     nx_i2c_request_t requests[2]{};
     nx_i2c_message_t messages[2]{};
+    /* TestBody locals expire before TearDown drains retained transfers. */
+    uint8_t ordinary_buffer[3]{};
     void* mmio = nullptr;
     void* sram = nullptr;
     void SetUp() override {
@@ -530,8 +532,7 @@ TEST_F(I2CPairFactory, ExpiredAndInvisibleBufferAdmissionHasNoPeerEffects) {
               nx_i2c_request_prepare(&requests[0], &messages[0], 1U, now));
     EXPECT_EQ(NX_ERROR_TIMEOUT,
               nx_i2c_endpoint_submit(endpoints[0], &requests[0]));
-    uint8_t invisible[3]{};
-    messages[1].buffer.rx = invisible;
+    messages[1].buffer.rx = ordinary_buffer;
     ASSERT_EQ(NX_SUCCESS,
               nx_i2c_request_prepare(&requests[1], &messages[1], 1U, 1000U));
     EXPECT_EQ(NX_ERROR_PERMISSION,
@@ -595,8 +596,7 @@ TEST_F(I2CPairFactory, IrqThreeByteWindowCompletesOnlyAfterWireRelease) {
 
 TEST_F(I2CPairFactory, IrqModeCanUseOrdinaryBufferWithoutCreatingDmaOwnership) {
     Start();
-    uint8_t payload[3]{};
-    messages[0].buffer.rx = payload;
+    messages[0].buffer.rx = ordinary_buffer;
     ASSERT_EQ(NX_SUCCESS,
               nx_i2c_request_prepare(&requests[0], &messages[0], 1U, 1000U));
     EXPECT_EQ(NX_SUCCESS, nx_i2c_endpoint_submit(endpoints[0], &requests[0]));

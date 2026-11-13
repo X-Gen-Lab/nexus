@@ -16,7 +16,7 @@ are rejected as inputs, not retained as an alternate authoring interface.
 
 The parser creates immutable `AuthoredAssembly` intent. Production consumers use
 `resolve_ir()` and named immutable `ConfigurationIR` decisions; only audit and
-artifact-boundary consumers request `to_dict()`. Typed source epoch 2 and the
+artifact-boundary consumers request `to_dict()`. Typed source epoch 3 and the
 schema-1 JSON output projection are separate contracts. The
 [source compatibility policy](../../design/source-compatibility.md) owns their
 version declarations; neither introduces firmware metadata or runtime dispatch.

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 0b6bd2c1b9b3b87879360c0fa39e76eaa92a0086dbf1d48281771f1dd74b50df\n"
+"X-Nexus-Source-SHA256: a0864b1def6651ecfff5b418123519630174346fc18d96fc23c0451c6afc3943\n"
 
 #: ../../../docs/design/source-compatibility.md:1
 msgid "源码版本、factory 代际与依赖维护"

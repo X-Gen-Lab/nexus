@@ -44,6 +44,8 @@ class LtdcOwner : public testing::Test {
     uint8_t* memory = nullptr;
     nx_stm32_system_t* system = nullptr;
     nx_dma_memory_region_t region{};
+    /* Retained graphics metadata belongs to the whole fixture lifetime. */
+    nx_stm32_sdram_graphics_t graphics_binding{};
     nx_stm32_ltdc_config_t config{};
     nx_stm32_ltdc_layer_t layers[2]{};
     nx_stm32_ltdc_pin_t* pins = nullptr;
@@ -1031,8 +1033,7 @@ TEST_F(LtdcOwner, GenerationExhaustionRejectsBeforeAnyBorrowOrEffect) {
 }
 
 TEST_F(LtdcOwner, GraphicsAttachmentRefusalPrecedesAnyControllerEffect) {
-    nx_stm32_sdram_graphics_t binding{};
-    config.graphics_memory = &binding;
+    config.graphics_memory = &graphics_binding;
     model.attach_result = NX_ERROR_STATE;
     const auto writes = model.writes;
     EXPECT_EQ(nx_stm32_ltdc_prepare(&state, &config), NX_ERROR_STATE);
@@ -1043,8 +1044,7 @@ TEST_F(LtdcOwner, GraphicsAttachmentRefusalPrecedesAnyControllerEffect) {
     EXPECT_EQ(model.graphics_detaches, 0U);
 }
 TEST_F(LtdcOwner, GraphicsHoldSurvivesFailedIrqJoinUntilActualColdClose) {
-    nx_stm32_sdram_graphics_t binding{};
-    config.graphics_memory = &binding;
+    config.graphics_memory = &graphics_binding;
     open();
     ASSERT_EQ(model.graphics_attaches, 1U);
     model.hold_irq = true;
@@ -1058,8 +1058,7 @@ TEST_F(LtdcOwner, GraphicsHoldSurvivesFailedIrqJoinUntilActualColdClose) {
 }
 TEST_F(LtdcOwner,
        GraphicsDetachFailureRetainsOriginalOwnerAndCanRetryAfterGateOff) {
-    nx_stm32_sdram_graphics_t binding{};
-    config.graphics_memory = &binding;
+    config.graphics_memory = &graphics_binding;
     open();
     model.detach_result = NX_ERROR_STATE;
     EXPECT_EQ(nx_stm32_ltdc_close(&state), NX_ERROR_BUSY);
@@ -1075,8 +1074,7 @@ TEST_F(LtdcOwner,
     EXPECT_FALSE(state.owned);
 }
 TEST_F(LtdcOwner, LostGraphicsBankEvidenceRejectsBeforeRequestBorrow) {
-    nx_stm32_sdram_graphics_t binding{};
-    config.graphics_memory = &binding;
+    config.graphics_memory = &graphics_binding;
     open();
     prepare(&first, 0);
     model.check_result = NX_ERROR_STATE;
@@ -1089,8 +1087,7 @@ TEST_F(LtdcOwner, LostGraphicsBankEvidenceRejectsBeforeRequestBorrow) {
 }
 
 TEST_F(LtdcOwner, QueryCannotOverwriteTheRetainedBankOwnerMetadata) {
-    nx_stm32_sdram_graphics_t binding{};
-    config.graphics_memory = &binding;
+    config.graphics_memory = &graphics_binding;
     open();
     auto* output =
         reinterpret_cast<nx_display_constraints_t*>(model.bank_metadata);

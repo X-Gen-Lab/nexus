@@ -224,20 +224,23 @@ class WorkflowContracts(unittest.TestCase):
                 self.assertTrue(any(report == path or report.startswith(
                     path.rstrip('/') + '/') for path in paths))
 
-    def test_docs_tests_reuse_the_prepared_nondefault_tool_prefix(self):
+    def test_docs_commands_reuse_the_prepared_nondefault_tool_prefix(self):
         steps = workflow('docs-build.yml')['jobs']['build']['steps']
         prepared = next(step['run'] for step in steps
                         if 'tools/documentation/install.py' in step.get('run', ''))
-        execute = next(step['run'] for step in steps
-                       if 'tools/documentation/cli.py test' in step.get('run', ''))
         prepared_arguments = shlex.split(prepared.replace('\\\n', ' '))
-        test_arguments = shlex.split(execute.replace('\\\n', ' '))
         prefix = prepared_arguments[prepared_arguments.index('--prefix') + 1]
         self.assertEqual(prefix, '$RUNNER_TEMP/nexus-docs-tools')
-        self.assertEqual(test_arguments[0], 'python3')
-        self.assertIn('--tool-prefix', test_arguments)
-        self.assertEqual(test_arguments[test_arguments.index('--tool-prefix') + 1],
-                         prefix)
+        for action in ('check', 'test', 'build'):
+            with self.subTest(action=action):
+                execute = next(step['run'] for step in steps
+                               if 'tools/documentation/cli.py ' + action
+                               in step.get('run', ''))
+                arguments = shlex.split(execute.replace('\\\n', ' '))
+                self.assertEqual(arguments[0], 'python3')
+                self.assertIn('--tool-prefix', arguments)
+                self.assertEqual(arguments[arguments.index('--tool-prefix') + 1],
+                                 prefix)
         self.assertFalse(any('pages' in step.get('uses', '') for step in steps))
 
 

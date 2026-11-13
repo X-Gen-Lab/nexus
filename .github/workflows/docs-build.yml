@@ -30,7 +30,9 @@ jobs:
           --prefix "$RUNNER_TEMP/nexus-docs-tools"
           --cache "$RUNNER_TEMP/nexus-docs-cache"
       - name: Check documentation source and contracts
-        run: python3 tools/documentation/cli.py check --full
+        run: >-
+          python3 tools/documentation/cli.py check --full
+          --tool-prefix "$RUNNER_TEMP/nexus-docs-tools"
       - name: Execute documentation tool tests
         run: >-
           python3 tools/documentation/cli.py test

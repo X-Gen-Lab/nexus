@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: d1e593f5b7b6824e1a681a39db8dcf0b256e34ea624c5e9e6fe27395c338e392\n"
+"X-Nexus-Source-SHA256: 91e1c919f16199ea2f2487338b960b055a58e5fe52d76fd2731882b2d4a93b0f\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:1
 msgid "外部工程迁移"
@@ -116,20 +116,6 @@ msgstr "Historical support matrices/old test counts"
 msgid "当前 source/config/tool/dependency/ELF 与 fresh raw execution evidence"
 msgstr "Current source/config/tool/dependency/ELF and fresh raw execution evidence"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:21
-msgid ""
-"外部工程通过 `NEXUS_ASSEMBLY_FILE` 明确输入，链接 `Nexus::Platform`，由 `nexus_add_firmware()` 装入 "
-"startup/system/linker/resource gate。应用只包含公共 Nexus 头和生成 `nexus_factory.h`／`nexus_bindings.h`，不读取 "
-"private provider storage 或 SDK register 类型。SPI／I2C controller 和子设备 endpoint 分开获取，controller "
-"factory 不得返回第一个子设备的别名。无效 ID 返回 NULL；factory 不初始化、不分配内存。"
-msgstr ""
-"External projects supply explicit `NEXUS_ASSEMBLY_FILE`, link `Nexus::Platform`, and use "
-"`nexus_add_firmware()` for startup/system/linker/resource gates. Applications include only public "
-"Nexus headers and generated `nexus_factory.h`/`nexus_bindings.h`; they do not inspect private "
-"provider storage or SDK register types. SPI/I2C controllers and child-device endpoints are "
-"obtained separately; a controller factory must not return an alias of the first child. Invalid IDs"
-" return NULL. Factory lookup neither initializes nor allocates memory."
-
 msgid ""
 "平台输入只接受 TOML schema 2，旧 schema 1 JSON 装配必须迁为完整 TOML。 `resolved.json` "
 "仅是审计／独立产物检查的单向输出，不能回填生成器。历史证据保留 原字节及只读校验，不重新开放旧配置入口。冷启动仍显式执行 "
@@ -145,10 +131,6 @@ msgstr ""
 "`nx_platform_stop()`. Preserve state and all borrowed storage on "
 "BUSY/QUARANTINED. Faces may be retained before start; after successful "
 "stop their identity is unchanged and the provider rejects operations."
-
-#: docs/delivery/migration.md:0
-msgid "当前 factory／source interface epoch 为 3，`0.2.1` 仍为按精确提交消费的开发快照。 ADC group 的直接 `request.frames` 访问迁为 `request.output.frames`；优先使用 `nx_adc_group_prepare()` 设置 RAW 视图，paired 结果由独立 prepare 入口建立。 epoch 3 的公共 traits 使用 `nexus/io/traits.h` 中的领域类型；SDIO 请求直接使用 `base`、数据跨度和 function 地址，删除 `transfer` 包装及无意义 LBA。旧 epoch 1／2 不作为兼容 fallback，全部调用者、生成代码和 provider 必须一起重编。 具体字段与借用步骤见[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-3)， 代际、manifest 和拒绝规则见[源码兼容性合同](../design/source-compatibility.md)。"
-msgstr "The current factory/source interface epoch is 3; `0.2.1` remains a development snapshot consumed by exact commit. Direct ADC group `request.frames` access migrates to `request.output.frames`; prefer `nx_adc_group_prepare()` to install the RAW view, while a separate prepare entry creates paired results. Epoch-3 public traits use domain types from `nexus/io/traits.h`. SDIO requests directly contain `base`, payload spans and function addresses, removing the `transfer` wrapper and meaningless LBA. Epochs 1/2 are not compatibility fallbacks: rebuild all callers, generated code and providers together. See the [migration guide](../guides/migration.md#rebuild-for-source-interface-epoch-3) for fields and borrowing, and the [source compatibility contract](../design/source-compatibility.md) for generation, manifest and rejection rules."
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:32
 msgid ""
@@ -175,3 +157,12 @@ msgstr ""
 
 msgid "迁移验收覆盖严格输入负路径、Native/model 行为、维护计划中的精确 ARM ELF 与预算、 完整本地门禁及同源软件候选。可发布 SDK 必须从 clean commit 导出，再验证完整消费 计划；最后按实际 PCB 和接线另行执行 HIL。 外部 `nexus-examples` 是独立示例仓库，平台 CI 不把产品应用加入平台默认目标。"
 msgstr "Migration acceptance covers strict negative input paths, Native/model behavior, exact ARM ELFs/resources from the maintained plan, complete local gates and a same-source software candidate. A publishable SDK must be exported from a clean commit and then pass the complete consumer plan. Physical HIL is executed separately against actual PCB/wiring. External `nexus-examples` remains an independent repository; platform CI does not add product applications to default platform targets."
+
+msgid "外部工程通过 `NEXUS_ASSEMBLY_FILE` 明确输入，链接 `Nexus::Platform`，由 `nexus_add_firmware()` 装入 startup/system/linker/resource gate。应用只包含公共 Nexus 头和生成 `nexus_factory.h`／`nexus_bindings.h`，不读取 private provider storage 或 SDK register 类型。SPI／I2C controller 和子设备 endpoint 分开获取，controller factory 不得返回第一个子设备的别名。无效 ID 返回 NULL；factory 不初始化、不分配内存。 新调用优先包含每个 Platform bundle 都生成的 `nexus_factory_strong.h`，使用类别独立的 引用常量和 getter；不需要增加配置开关。可选 capability metadata 单独选择。"
+msgstr "External projects provide explicit input through `NEXUS_ASSEMBLY_FILE`, link `Nexus::Platform`, and use `nexus_add_firmware()` to install startup/system/linker/resource gates. Applications include only public Nexus headers and generated `nexus_factory.h`/`nexus_bindings.h`; they do not read private provider storage or SDK register types. SPI/I2C controllers and child-device endpoints are obtained separately; a controller factory must not return an alias for its first child. Invalid IDs return NULL; factory lookup neither initializes nor allocates memory. New calls should prefer `nexus_factory_strong.h`, generated by every Platform bundle, with class-specific reference constants and getters. No configuration switch is needed. Optional capability metadata is selected separately."
+
+msgid "当前 factory／source interface epoch 为 3，`0.2.1` 仍为按精确提交消费的开发快照。 ADC group 的直接 `request.frames` 访问迁为 `request.output.frames`；优先使用 `nx_adc_group_prepare()` 设置 RAW 视图，paired 结果由独立 prepare 入口建立。 epoch 3 的公共 traits 使用 `nexus/io/traits.h` 中的领域类型；SDIO 请求直接使用 `base`、数据跨度和 function 地址，删除 `transfer` 包装及无意义 LBA。旧 epoch 1／2 不作为兼容 fallback，全部调用者、生成代码和 provider 必须一起重编。 I2C message 和 block request 按方向使用 const TX／mutable RX，优先由各自 write／read 构造或 prepare 入口设置，不能只翻转方向标志。EXTI 按接口绑定来源，UART 原生配置 留在私有边界；CAN 使用逻辑 filter tag，USB Host 使用装配内逻辑 pipe，ADC／DAC 查询按公共时间／数字码单位解释。完整字段映射仍由源码兼容性合同统一维护。 具体字段与借用步骤见[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-3)， 代际、manifest 和拒绝规则见[源码兼容性合同](../design/source-compatibility.md)。"
+msgstr "The current factory/source interface epoch is 3; `0.2.1` remains a development snapshot consumed by exact commit. Direct ADC-group `request.frames` access becomes `request.output.frames`; prefer `nx_adc_group_prepare()` to install the RAW view, while a separate prepare entry creates paired results. Epoch-3 public traits use domain types from `nexus/io/traits.h`; SDIO requests directly use `base`, a data span and a function address, removing the `transfer` wrapper and meaningless LBA. Old epoch 1/2 is not a compatibility fallback: all callers, generated code and providers must be rebuilt together. I2C messages and block requests use const TX/mutable RX by direction; prefer their write/read constructors or prepare entries and do not merely flip a direction flag. EXTI sources are bound by interface; native UART configuration remains private. CAN uses logical filter tags, USB Host uses assembly-local logical pipes, and ADC/DAC queries use public time/digital-code units. The source compatibility contract remains the single field-mapping authority. See the [migration guide](../guides/migration.md#rebuild-for-source-interface-epoch-3) for fields and borrowing steps, and the [source compatibility contract](../design/source-compatibility.md) for epochs, manifests and rejection rules."
+
+msgid "迁移时选择新的 build 目录，重新生成 bundle，并用同一配置、工具链和 ABI 重编全部 调用者、公共 face／ops、factory、provider 与组件。旧工程和构建输出分开保留，不能 混入新的 CMake cache、生成头或目标文件。作者 TOML schema 2、typed IR 代际 3、 factory 代际 3、resolved projection 1 与 SDK manifest schema 2 各自独立，版本号 相同也不能混用不同接口代际。按[现有产品升级步骤](../tutorials/source-sdk.md#upgrade-an-existing-product) 验证所选 SDK 的精确源码身份，再执行产品自己的 Native 合同和选定 MCU 构建。"
+msgstr "During migration, select a new build directory, regenerate the bundle and rebuild all callers, public faces/ops, factory, provider and components with one configuration, toolchain and ABI. Keep the old project and build outputs separate; do not mix old CMake caches, generated headers or object files into the new build. Authored TOML schema 2, typed IR epoch 3, factory epoch 3, resolved projection 1 and SDK manifest schema 2 are independent. Matching version numbers do not permit mixing interface generations. Follow the [existing-product upgrade steps](../tutorials/source-sdk.md#upgrade-an-existing-product) to verify the selected SDK's exact source identity, then run the product's own Native contracts and selected MCU build."

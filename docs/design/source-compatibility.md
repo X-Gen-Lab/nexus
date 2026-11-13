@@ -131,7 +131,7 @@ PATH="$(pwd)/.venv/bin:$PATH" .venv/bin/python \
     tools/maintenance/compatibility.py
 PATH="$(pwd)/.venv/bin:$PATH" .venv/bin/python \
     tools/maintenance/compatibility.py --expected-factory-epoch 3 \
-    --generated build/native-debug/generated/nexus_factory.h
+    --generated build/native-debug/generated/nexus_config.h
 PATH="$(pwd)/.venv/bin:$PATH" .venv/bin/python \
     tools/maintenance/compatibility.py --sdk /abs/prefix/share/nexus/src
 ```

@@ -1,16 +1,12 @@
 # Current gettext translation draft; current delta independently reviewed.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 07ee159ed263d67402fb017d773028b8a323ea66ff21daad0256a42a4b17a3e9\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: bc5b2669827d56d5b758cc5ec897b995b4abd72f7bb4836b2d1792399ddbe2ea\n"
 
 msgid "当前系统架构"
 msgstr "Current system architecture"
 
 msgid "Nexus 提供静态 C11 通用机制。当前生产 SoC 入口只有 `soc/stm32/stm32f4/`； [精确支持](support.md)区分八个精确料号、七个器件视图、四个 F407 Board 和显式软件参考。 系列源码复用不等于每个模式都已执行。厂商依赖保留，只有实际选中闭包进入准备、 校验、编译与 SDK。"
 msgstr "Nexus provides statically assembled C11 common mechanisms. The sole production SoC entry is `soc/stm32/stm32f4/`. [Exact support](support.md) separates eight exact parts, seven device views, four F407 Boards and explicit software references. Family source reuse does not mean every mode has executed. Vendor dependencies remain retained; only the selected closure enters preparation, validation, compilation and the SDK."
-
-#: docs/delivery/architecture.md:0
-msgid "本页以固定源码 [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984) 及 [PR #61](https://github.com/X-Gen-Lab/nexus/pull/61) 保留为前序范围；本轮便携 I/O 重构基线为 `6eac971a07a5021d25ba57c3b6885e6e789f2910`。本页另行说明当前工作区已接入的 架构增量，最终同源门禁、SDK 与软件候选仍单独收口。既有接口、局部修复、精确模式 和整个工作包完成是不同状态，不把历史执行结果重标为当前候选资格。"
-msgstr "This page retains fixed source [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984) and [PR #61](https://github.com/X-Gen-Lab/nexus/pull/61) as prior scope. The portable-I/O refactoring baseline is `6eac971a07a5021d25ba57c3b6885e6e789f2910`. The page separately describes architecture increments integrated into the current workspace; final same-source gates, SDK and software-candidate acceptance remain distinct. Existing interfaces, local fixes, exact modes and completion of an entire work package are different states. Historical executions do not qualify the current candidate."
 
 msgid "![FIG-01：平台职责与外部产品边界](../assets/diagrams/platform-architecture.svg)"
 msgstr "![FIG-01: platform responsibilities and external product boundaries](../assets/diagrams/platform-architecture.svg)"
@@ -126,10 +122,6 @@ msgid "[FIG-16](../design/io-evolution.md)区分构建期装配与运行期调�
 msgstr "[FIG-16](../design/io-evolution.md) distinguishes build-time assembly from runtime calls. Public interfaces express logical devices, operations, data formats, results and loans. SoC/Board configuration owns register encodings, pins, DMA, IRQ and clock mapping. Components need not understand these mappings, but must still respect length, alignment, deadline and release conditions."
 
 #: docs/delivery/architecture.md:0
-msgid "本轮源码代际为 3，详见[迁移](migration.md)与[兼容性合同](../design/source-compatibility.md)。 公共领域 traits 与 factory 生成值分开；UART 的通用格式合法性和 F4 支持性分别校验。 SDIO function 请求按 function 地址表达，不再嵌套块设备 LBA 请求；逻辑 GPIO 绑定、编码器 A／B 语义及网络结果也沿各自领域合同收敛。源码接入不自动成为完整 软件候选；各组回归、ARM、资源与 SDK 验证仍需绑定最终相同源码。"
-msgstr "This iteration uses source generation 3; see [migration](migration.md) and the [compatibility contract](../design/source-compatibility.md). Public domain traits are separate from generated factory values; generic UART format validity and F4 support are checked separately. SDIO function requests express function addresses without nesting block-device LBA requests. Logical GPIO bindings, encoder A/B semantics and network results also converge on their domain contracts. Source integration does not establish a complete software candidate: group regressions, ARM, resource and SDK checks must still bind the final same source."
-
-#: docs/delivery/architecture.md:0
 msgid "普通同步调用不承担 request、stream、队列或 OS 状态；有限异步、连续流与跨任务 owner 按所选能力增加存储。原生波形与数据布局可作为显式扩展，仍经同一硬件 owner，准备／编码使用显式存储，提交不隐藏分配或整缓冲重排。同名公共类型不因 精简 profile 宏改变布局；未使用能力由实例和构建闭包裁剪，具体成本按 ELF 测量。"
 msgstr "Ordinary synchronous calls carry no request, stream, queue or OS state; finite asynchronous operations, continuous streams and cross-task owners add storage only for selected capabilities. Native waveforms and data layouts may remain explicit extensions under the same hardware owner. Preparation/encoding uses explicit storage; submission hides neither allocation nor whole-buffer rearrangement. Compact-profile macros do not change the layout of a public type with the same name. Instance and build closure selection removes unused capabilities, and ELF measurements determine actual cost."
 
@@ -158,10 +150,6 @@ msgid "R0–R2 公共合同与原型"
 msgstr "R0–R2: public contracts and prototypes"
 
 #: docs/delivery/architecture.md:0
-msgid "领域 traits、格式校验、独立 SDIO 请求和 epoch 3 消费者一致；源码接入后仍需最终完整门禁。"
-msgstr "Domain traits, format validation, independent SDIO requests and epoch-3 consumers agree; source integration still requires final complete gates."
-
-#: docs/delivery/architecture.md:0
 msgid "R3–R7 数字、串行、控制与采集"
 msgstr "R3–R7: digital, serial, control and acquisition"
 
@@ -188,10 +176,6 @@ msgstr "Compare actual compilation closure, static objects and ELF under the sam
 #: docs/delivery/architecture.md:0
 msgid "R13 集成交付"
 msgstr "R13: integrated delivery"
-
-#: docs/delivery/architecture.md:0
-msgid "变更后的 SDK、完整维护消费者、双语文档与源码身份一致；物理 HIL 与远端 Actions 按用户要求暂缓。"
-msgstr "The changed SDK, complete maintained consumers, bilingual documentation and source identity agree. Physical HIL and hosted Actions remain deferred at the user's request."
 
 msgid "生命周期与失败"
 msgstr "Lifecycle and failure"
@@ -235,9 +219,6 @@ msgstr "This iteration retains static C, shared read-only ops, one hardware exec
 msgid "工作包、当前状态与退出条件"
 msgstr "Work packages, current state and exit criteria"
 
-msgid "下表说明本轮的实现范围和验证要求。实现范围限定为所列精确器件与已声明模式； F407 模式回归不自动扩展到新增料号。源码接入、独立审查与最终候选验收分别记录， 资源测量、普通完整门禁、ARM、双语文档和 clean-source SDK 消费须绑定同一源码， 实际执行结果随候选 PR 提交。未选器件与模式保留明确边界，不从厂商库覆盖推导 整个 F4 全功能支持；实板暂缓也不等于已有软件机制未实现。"
-msgstr "The table describes this iteration's implemented scope and validation requirements. Scope is limited to the listed exact parts and declared modes; F407 mode regressions do not automatically qualify newly added parts. Source integration, independent review and final candidate acceptance are recorded separately. Resource measurements, ordinary complete gates, ARM, bilingual documentation and clean-source SDK consumption must bind to the same source; actual execution results accompany the candidate PR. Unselected parts and modes retain explicit boundaries. Vendor-library coverage does not establish full F4 support, and deferred hardware acceptance does not mean existing software mechanisms are absent."
-
 msgid "工作包"
 msgstr "Work package"
 
@@ -252,9 +233,6 @@ msgstr "WP01 Baseline"
 
 msgid "BL01 固定源码、支持和消费者；BL02 空／单／多实例／DMA 代表配置；BL03 资源、ABI、身份基线；BL04 合同与任务映射"
 msgstr "BL01 Pin source, support and consumers; BL02 Empty/single/multiple-instance/DMA representative configurations; BL03 Resource, ABI and identity baselines; BL04 Contract-to-task mapping"
-
-msgid "实现已有：BL01、BL02、BL04。集成收口：BL03。固定源码、唯一 Source SDK 消费者策略与空／单／多实例／DMA 代表装配均已有；新增 SAI、图形、加密、SDRAM 和 QSPI 沿同一维护计划接入，不另建验收引擎。BL03 仍须以最终相同输入、工具和 ABI 汇总资源身份，不能把历史测量重标为新候选。"
-msgstr "Existing implementation: BL01, BL02, BL04. Integration closure: BL03. Pinned source, the sole Source SDK consumer policy and representative empty/single/multiple-instance/DMA assemblies exist. SAI, graphics, crypto, SDRAM and QSPI extend that same maintained plan without a second acceptance engine. BL03 must still consolidate resource identities from final identical inputs, tools and ABI; historical measurements cannot be relabeled as a new candidate."
 
 msgid "WP02 精确事实"
 msgstr "WP02 Exact facts"
@@ -271,17 +249,11 @@ msgstr "WP03 Configuration"
 msgid "CF01 统一器件视图；CF02 模式合同；CF03 去首／次 controller 特判；CF04 严格诊断与原子 bundle；CF05 工程模板与接入说明"
 msgstr "CF01 Unified device view; CF02 Mode contracts; CF03 Remove first/secondary-controller special cases; CF04 Strict diagnostics and atomic bundles; CF05 Project templates and integration instructions"
 
-msgid "实现已有：CF01、CF02、CF03、CF04、CF05。DeviceView、模式合同、严格诊断／原子 bundle 与模板已有。SPI 删除 peer 选择、UART 删除 preload 特判；新增模式沿原 typed IR、静态 emitter、资源校验和唯一 System ClockPlan 接入。新增实例不引入行为生成器，最终完整工具域与候选仍待同源收口。"
-msgstr "Existing implementation: CF01, CF02, CF03, CF04, CF05. DeviceView, mode contracts, strict diagnostics/atomic bundles and templates exist. SPI peer selection and UART preload special cases are removed. New modes extend the original typed IR, static emitter, resource checks and single System ClockPlan. Adding an instance introduces no behavior generator. The complete tool domains and final candidate still require same-source closure."
-
 msgid "WP04 接口与成本"
 msgstr "WP04 Interfaces and cost"
 
 msgid "IF01 强类型 factory 默认；IF02 迁移重复数字入口；IF03 公共接口／可选扩展；IF04 只读资源配置；IF05 配置／状态测量；IF06 编译期特化成本"
 msgstr "IF01 Strong factory references by default; IF02 Migrate duplicate numeric entry points; IF03 Public interfaces/optional extensions; IF04 Read-only resource configuration; IF05 Configuration/state measurements; IF06 Compile-time specialization cost"
-
-msgid "实现已有：IF01、IF02、IF03、IF04。集成收口：IF05、IF06。默认强类型 factory、常规 SDK face／metadata 查询、公共 Nexus 接口及只读配置已有；底层 scalar switch 保留为唯一实现。新模式只扩展所选可选 ops 和自己的状态，不给所有实例增加最大对象。局部 ARM 布局／成本已有，最终仍须用同构装配比较状态、只读配置、Flash／RAM／ABI 和反汇编。"
-msgstr "Existing implementation: IF01, IF02, IF03, IF04. Integration closure: IF05, IF06. Strong factory references by default, normal SDK face/metadata queries, public Nexus interfaces and readonly configuration exist. The underlying scalar switch remains the sole implementation. New modes extend selected optional ops and their own state rather than adding maximum-sized objects to every instance. Focused ARM layouts/costs exist; final comparison must still use equivalent assemblies for state, readonly configuration, Flash/RAM/ABI and disassembly."
 
 msgid "WP05 共享资源"
 msgstr "WP05 Shared resources"
@@ -334,9 +306,6 @@ msgstr "WP10 Build/SDK"
 msgid "BU01 根 CMake 去 F4 私有目录；BU02 模式／IP 选编；BU03 私有 SDK 配置／callback ABI；BU04 SDK 精确器件闭包；BU05 外部消费者"
 msgstr "BU01 Remove F4 private directories from root CMake; BU02 Mode/IP source selection; BU03 Private SDK configuration/callback ABI; BU04 Exact-device SDK closure; BU05 External consumers"
 
-msgid "实现已有：BU01、BU02、BU03、BU04。集成收口：BU05。provider 私有 include、模式／IP 选源、私有 SDK／callback ABI 和精确器件头／startup 选择已有；新增 IP 按选中目标进入同一源码闭包。Source SDK 消费者以唯一维护计划为准，开发包、单个 ARM 对象或 ELF 不能代替最终 clean-source 包的全部消费验证。"
-msgstr "Existing implementation: BU01, BU02, BU03, BU04. Integration closure: BU05. Provider-private includes, mode/IP source selection, private SDK/callback ABI and exact-device headers/startup exist. New IP joins the same selected target/source closure. The sole maintained plan defines Source SDK consumers. Development packages, individual ARM objects or a single ELF cannot replace every consumer check against the final clean-source package."
-
 msgid "WP11 家族扩展"
 msgstr "WP11 Family extension"
 
@@ -351,9 +320,6 @@ msgstr "WP12 Verification/delivery"
 
 msgid "QA01 合同与差异测试精简；QA02 真实 TDD；QA03 ARM、资源与编译上下文；QA04 完整正常门禁和审查；QA05 文档、图、示例与矩阵；QA06 软件候选与版本"
 msgstr "QA01 Focused contract/differential tests; QA02 Actual TDD; QA03 ARM, resources and compiler contexts; QA04 Complete normal gates and review; QA05 Documentation, diagrams, examples and matrices; QA06 Software candidate and version"
-
-msgid "实现已有：QA02；QA01 的本轮合同保留审查已完成，过时脚手架归并随实际维护目标核对。集成收口：QA03、QA04、QA05、QA06。保留真实故障回归，按生产合同与编译差异分组，不用测试数量、filters 或重复小套件追求完成率。最终 ARM／资源、普通完整门禁、双语文档／SDK 和候选身份仍由相同源码收口；HIL 工装测试不是实板执行，历史失败保留原身份。"
-msgstr "Existing implementation: QA02. This iteration's QA01 contract-retention review is complete; merging obsolete scaffolding is checked against actual maintained targets. Integration closure: QA03, QA04, QA05, QA06. Preserve real fault regressions and group tests by production contracts and compiler differences. Test counts, filters and repeated small suites are not completion targets. Final ARM/resources, ordinary complete gates, bilingual documentation/SDK and candidate identity close on the same source. HIL-tool tests are not board execution; historical failures retain their original identity."
 
 msgid "I/O 覆盖与未完成边界"
 msgstr "I/O coverage and remaining boundaries"
@@ -375,9 +341,6 @@ msgstr "IO01"
 
 msgid "GPIO／EXTI"
 msgstr "GPIO/EXTI"
-
-msgid "已有输入、输出、IRQ 事件与 EMR 硬件事件；封装、电气、PC13／LSE 和 Board 授权继续受约束，本轮未关闭全类复核。"
-msgstr "Input, output, IRQ events and EMR hardware events exist. Package, electrical, PC13/LSE and Board authorization constraints remain; the whole-category review is not closed."
 
 msgid "IO02"
 msgstr "IO02"
@@ -456,9 +419,6 @@ msgstr "IO10"
 
 msgid "SDIO"
 msgstr "SDIO"
-
-msgid "已有 SD／MMC 与 SDIO functions。本轮完成 RX PFCTRL／TX 精确计数与 FIFO／IRQ join、memory CMD18／25＋CMD12／13 及静态 ClockPlan 的 RM／勘误联合分频；默认与低 PCLK2 实际程序及 ARM 对象通过。HS／DDR／HS200、linked candidate 和物理资格不在此通过范围。"
-msgstr "SD/MMC and SDIO functions exist. This increment implements RX PFCTRL/TX exact counts and FIFO/IRQ joins, memory CMD18/25 plus CMD12/13, and static-ClockPlan dividers jointly checked against the reference manual and errata. Actual default/low-PCLK2 programs and ARM objects pass. HS/DDR/HS200, a linked candidate and physical qualification are outside that result."
 
 msgid "IO11"
 msgstr "IO11"
@@ -548,11 +508,53 @@ msgstr "IO20"
 msgid "其他 F4 IP"
 msgstr "Other F4 IP"
 
-msgid "六类新 IP 已接入所选软件范围：F415／F417 基础 CRYP／HASH；F446／F479 SAI1；F479 LTDC、DMA2D 与间接 QuadSPI。图形为并行 scanout 一／二 layer 和 fill／copy／convert／blend，QuadSPI 为 W25Q128JV SDR 1-1-1 PIO。增强加密、crypto DMA／AEAD、SAI2／连续 SAI、DSI／CLUT、QSPI 映射／XIP／quad／DDR／dual 均不在本次已选模式范围；模型和 ARM 只证明对应配置，最终候选及 [完整维护计划](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/consumer_profiles.py) 的 Source SDK 消费仍待完整门禁。"
-msgstr "Six new IP classes are integrated in the selected software scope: basic CRYP/HASH on F415/F417, SAI1 on F446/F479, and LTDC, DMA2D and indirect QuadSPI on F479. Graphics covers one/two-layer parallel scanout and fill/copy/convert/blend; QuadSPI targets W25Q128JV SDR 1-1-1 PIO. Enhanced crypto, crypto DMA/AEAD, SAI2/continuous SAI, DSI/CLUT and QSPI mapping/XIP/quad/DDR/dual are outside this iteration's selected modes. Models and ARM results prove only their corresponding configurations; the final candidate and Source SDK consumption of the [complete maintained plan](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/consumer_profiles.py) still await complete gates."
-
 msgid "本表的未开放范围描述当前软件合同，不从缺少软件证据推断芯片不具备硬件能力。 CM0 JPEG 的无帧界存储字流由 `jpeg-blocks` 提供；精确完整帧仍需要额外的帧边界 归属／观测证明。有限 EXTI9 DAC 需要最后转换的可计数握手，连续 JAUTO 需要逐次 JDR 结果不被覆盖的联合生命周期。对应替代是有限 CM1 完整帧、循环外部 DAC 或 独占 timer 有限 DMA、有限 paired JAUTO，见各领域合同。不能用延时、TC、单次 状态读回或模型外观代替这些证明；CM1 的帧间停顿不能解释为 CM0 无缝采集。"
 msgstr "Unopened scope in this table describes current software contracts; missing software evidence does not imply that the chip lacks a hardware capability. `jpeg-blocks` provides the CM0 JPEG storage-word stream without frame boundaries; exact complete frames still require additional proof of frame-boundary ownership and observation. Finite EXTI9 DAC requires a countable handshake for the final conversion, and continuous JAUTO requires a joint lifecycle that prevents successive JDR results from being overwritten. The corresponding alternatives are finite complete CM1 frames, circular external DAC or finite DMA with an exclusive timer, and finite paired JAUTO; see the domain contracts. Delays, TC, a single state readback or a model's appearance cannot replace these proofs. The gap between CM1 frames must not be represented as seamless CM0 capture."
 
 msgid "任务结果只在该子项的退出条件满足后更新。未完成项保留原编号和边界，后续改动 继续进入现有源码、合同、测试和 CMake／SDK 路径；不以新增目录、空壳测试或另一套 通用注册机制代替实现。"
 msgstr "Task results change only after that subtask meets its exit criteria. Remaining tasks retain their IDs and boundaries. Further changes use the existing source, contracts, tests and CMake/SDK paths; new directories, empty tests or another generic registry never substitute for implementation."
+
+msgid "本轮便携 I/O 重构以 [PR #61](https://github.com/X-Gen-Lab/nexus/pull/61) 的合并提交 `6eac971a07a5021d25ba57c3b6885e6e789f2910` 为基线。平台实现固定在 [`6b59f666`](https://github.com/X-Gen-Lab/nexus/tree/6b59f66628f0dbb415f6203ba917c1fe717bf3fd)， 最终 Source SDK 固定在 [`4bf4b5a2`](https://github.com/X-Gen-Lab/nexus/tree/4bf4b5a258b3120c24f6d834545ac3f300ce801b)； 后一个提交仅迁移 TMP117 参考消费者的 I2C 字段。已选软件增量的执行结果见 [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62)。本页的后续文档修正不改变这些 原始执行身份，也不将已选模式的通过扩大为整个 F4 家族或实板资格。"
+msgstr "This portable I/O refactor starts from `6eac971a07a5021d25ba57c3b6885e6e789f2910`, the merge commit of [PR #61](https://github.com/X-Gen-Lab/nexus/pull/61). The platform implementation is fixed at [`6b59f666`](https://github.com/X-Gen-Lab/nexus/tree/6b59f66628f0dbb415f6203ba917c1fe717bf3fd), and the final Source SDK at [`4bf4b5a2`](https://github.com/X-Gen-Lab/nexus/tree/4bf4b5a258b3120c24f6d834545ac3f300ce801b); the latter commit only migrates the TMP117 reference consumer's I2C fields. [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62) records execution results for the selected software increments. Later corrections to this page do not change those original execution identities or extend selected-mode passes to the entire F4 family or physical qualification."
+
+msgid "本轮源码代际为 3，详见[迁移](migration.md)与[兼容性合同](../design/source-compatibility.md)。 公共领域 traits 与 factory 生成值分开；UART 的通用格式合法性和 F4 支持性分别校验。 SDIO function 请求按 function 地址表达，不再嵌套块设备 LBA 请求；逻辑 GPIO 绑定、编码器 A／B 语义及网络结果也沿各自领域合同收敛。本轮已选软件增量完成了 下述验证；各组回归、ARM、资源与 SDK 保留各自实际输入身份和差异核查范围。"
+msgstr "The source interface epoch is 3; see [migration](migration.md) and the [compatibility contract](../design/source-compatibility.md). Public domain traits are separate from generated factory values; generic UART format validity and F4 support are checked separately. SDIO function requests use function addresses rather than embedding block-device LBA requests. Logical GPIO bindings, encoder A/B semantics and network results follow their respective domain contracts. The selected software increments completed the verification below; domain regressions, ARM, resource and SDK records retain their actual input identities and change-review scope."
+
+msgid "领域 traits、格式校验、独立 SDIO 请求和 epoch 3 消费者已完成迁移，并通过本轮普通提交门禁与完整 SDK 消费。"
+msgstr "Domain traits, format validation, independent SDIO requests and epoch-3 consumers have been migrated and passed this iteration's ordinary commit gates and complete SDK consumption."
+
+msgid "最终 clean-source SDK 的完整维护消费者、搬移前后校验及恢复校验通过；双语文档和 ARM 记录保留原实际输入身份。物理 HIL 与远端 Actions 按用户要求暂缓。"
+msgstr "The final clean-source SDK passed the complete maintained consumer plan, verification before and after relocation, and restored-package verification. Bilingual documentation and ARM records retain their actual original input identities. Physical HIL and remote Actions are deferred at the user's request."
+
+msgid "平台实现的 Debug、Release、ASAN+UBSAN、TSAN 各通过完整 329 个 CTest 项和 5982 个 GoogleTest 用例。两个提交均通过普通提交门禁；最终消费者修正不属于 四种 Native 模式的编译输入，依赖核查保留原执行身份。静态分析覆盖 827 个不同 编译上下文：Cppcheck 完整通过；Clang-Tidy 的 826 个上下文通过，唯一 I2C 发现修复后按原配置重验受影响上下文通过，原始失败记录保留。"
+msgstr "The platform implementation passed the complete 329 CTest entries and 5982 GoogleTest cases in each of Debug, Release, ASAN+UBSAN and TSAN. Both commits passed ordinary commit gates. The final consumer correction is not a compiler input to the four Native modes; the dependency audit preserves the original execution identities. Static analysis covered 827 distinct compilation contexts: the complete Cppcheck scan passed; 826 Clang-Tidy contexts passed, and the sole I2C finding was fixed and its affected context replayed successfully with the original configuration. Original failure records are retained."
+
+msgid "最终 clean-source SDK 的导出、校验、整体搬移、34 个消费者的 165 条命令和 消费后校验均通过；压缩包解压后也通过官方校验。文档工具测试与严格中英文构建、 四个 F407 ARM 参考配置均有通过记录；它们保留当时的源码快照与配置，不重标为 最终 SDK 提交的重新执行。具体命令、输入摘要、差异与原始结果由 PR #62 关联。"
+msgstr "The final clean-source SDK passed export, verification, whole-prefix relocation, all 165 commands for 34 consumers and post-consumption verification. The extracted archive also passed the official verifier. Documentation tool tests, strict English/Chinese builds and four F407 ARM reference configurations have passing records. They retain their original source snapshots and configurations and are not relabeled as new executions at the final SDK commit. PR #62 links concrete commands, input digests, differences and original results."
+
+msgid "下表说明本轮的实现范围和验证要求。实现范围限定为所列精确器件与已声明模式； F407 模式回归不自动扩展到新增料号。源码接入、独立审查与软件验收分别记录； 资源、普通门禁、ARM、双语文档及 SDK 结果绑定各自实际源码、配置和工具，后续 差异按受影响输入核查。上述固定提交的结果由 PR #62 关联；新增变更另行验收。 未选器件与模式保留明确边界，不从厂商库覆盖推导 整个 F4 全功能支持；实板暂缓也不等于已有软件机制未实现。"
+msgstr "The table describes this iteration's implementation scope and verification requirements. Scope is limited to the listed exact parts and declared modes; F407 mode regressions do not automatically extend to added parts. Source integration, independent review and software acceptance are recorded separately. Resource, ordinary gate, ARM, bilingual documentation and SDK results bind their actual source, configuration and tools; later differences are reviewed against affected inputs. PR #62 links results for the fixed commits above; new changes require their own acceptance. Unselected parts and modes retain explicit boundaries. Vendor-library coverage does not establish full F4 functionality; deferring physical tests also does not imply that existing software mechanisms are unimplemented."
+
+msgid "BL01、BL02、BL04 已实现；BL03 的代表装配资源、ABI 和输入身份已记录。固定源码、唯一 Source SDK 消费者策略与空／单／多实例／DMA 代表装配均已有；SAI、图形、加密、SDRAM 和 QSPI 沿同一维护计划接入。新装配仍需自己的成本与资格记录，不把历史测量重标为新执行。"
+msgstr "BL01, BL02 and BL04 are implemented; BL03 records representative assembly resources, ABI and input identities. Fixed source, a single Source SDK consumer policy and empty/single/multiple-instance/DMA representative assemblies exist. SAI, graphics, crypto, SDRAM and QSPI follow the same maintenance plan. New assemblies still need their own cost and qualification records; historical measurements are not relabeled as new executions."
+
+msgid "CF01、CF02、CF03、CF04、CF05 已实现并通过本轮完整工具域与 SDK 消费。DeviceView、模式合同、严格诊断／原子 bundle 与模板已有。SPI 删除 peer 选择、UART 删除 preload 特判；新增模式沿原 typed IR、静态 emitter、资源校验和唯一 System ClockPlan 接入，新增实例不引入行为生成器。"
+msgstr "CF01, CF02, CF03, CF04 and CF05 are implemented and passed this iteration's complete tool domains and SDK consumption. DeviceView, mode contracts, strict diagnostics/atomic bundles and templates exist. SPI peer selection and the UART preload special case were removed. New modes use the existing typed IR, static emitter, resource validation and single System ClockPlan; adding an instance introduces no behavior generator."
+
+msgid "IF01、IF02、IF03、IF04 已实现；IF05、IF06 已取得代表性编译闭包、对象、ARM 布局与 ELF 比较。默认强类型 factory、SDK face／metadata 查询、公共 Nexus 接口及只读配置已有；底层 scalar switch 保留为唯一实现。新模式只扩展所选可选 ops 和自己的状态，不给所有实例增加最大对象。实际成本只适用于所测工具链、ABI 与装配，不据此声称全平台零成本或最优。"
+msgstr "IF01, IF02, IF03 and IF04 are implemented; IF05 and IF06 have representative include-closure, object, ARM-layout and ELF comparisons. Strong typed factory access, SDK face/metadata queries, public Nexus interfaces and readonly configuration exist; the scalar switch remains the single implementation. A new mode adds only its selected optional ops and own state, without maximum-sized objects for every instance. Measured costs apply only to the measured toolchain, ABI and assembly; they establish neither platform-wide zero cost nor optimality."
+
+msgid "BU01、BU02、BU03、BU04 已实现；BU05 的最终 clean-source SDK 按唯一维护计划完成 34 个消费者。provider 私有 include、模式／IP 选源、私有 SDK／callback ABI 和精确器件头／startup 选择已有；新增 IP 按选中目标进入同一源码闭包。首次 SDK 消费暴露的 TMP117 旧 I2C 字段已迁移，完整重新导出与消费通过，原失败记录保留。"
+msgstr "BU01, BU02, BU03 and BU04 are implemented; BU05's final clean-source SDK completed 34 consumers under the single maintenance plan. Provider-private includes, mode/IP source selection, private SDK/callback ABI and exact device-header/startup selection exist. New IP enters the same selected source closure. The old TMP117 I2C fields exposed by the first SDK consumption attempt were migrated; a complete fresh export and consumption passed, while the original failure record is retained."
+
+msgid "QA01 本轮合同保留审查与 QA02 实际 RED／GREEN 已记录；QA03、QA04、QA05、QA06 的已选软件增量具有上述 ARM／资源、分析、普通门禁、审查、双语文档与 clean-source SDK 结果。原始接口编译 RED 与运行期行为 RED 分别保留。按生产合同与编译差异保留回归，不用测试数量、filters 或重复小套件追求完成率。源码版本保持 0.2.1 开发快照；这些结果不建立新发行或实板资格，后续变更保留自己的输入与执行身份。"
+msgstr "QA01's contract-retention review and QA02's actual RED/GREEN are recorded. The selected software increments under QA03, QA04, QA05 and QA06 have the ARM/resource, analysis, ordinary gate, review, bilingual documentation and clean-source SDK results above. Original interface-compilation RED and runtime-behavior RED are retained separately. Regressions are retained by production contract and compilation differences, without pursuing completion through test counts, filters or repeated small suites. The source version remains a 0.2.1 development snapshot; these results establish no new release or physical qualification. Later changes retain their own input and execution identities."
+
+msgid "已有输入、输出、IRQ 事件与 EMR 硬件事件；本轮逻辑信号绑定与按接口归属的 EXTI 来源已实现并通过模型回归。封装、电气、PC13／LSE 和 Board 授权继续受约束，不建立全类物理资格。"
+msgstr "Input, output, IRQ events and EMR hardware events exist. This iteration's logical signal bindings and interface-bound EXTI sources are implemented and passed model regressions. Package, electrical, PC13/LSE and Board authorization constraints remain; no category-wide physical qualification is established."
+
+msgid "已有 SD／MMC 与 SDIO functions。本轮完成 RX PFCTRL／TX 精确计数与 FIFO／IRQ join、memory CMD18／25＋CMD12／13 及静态 ClockPlan 的 RM／勘误联合分频；默认与低 PCLK2 实际程序及 ARM 对象通过。最终 SDK 消费只证明其实际维护装配；这些结果不授予 HS／DDR／HS200 或物理资格。"
+msgstr "SD/MMC and SDIO functions exist. This iteration completed RX PFCTRL/TX exact counts with FIFO/IRQ join, memory CMD18/25 plus CMD12/13, and static ClockPlan division jointly validated against the RM and errata. Actual default/low-PCLK2 programs and ARM objects passed. Final SDK consumption proves only its actual maintained assemblies; these results grant no HS/DDR/HS200 or physical qualification."
+
+msgid "六类新 IP 已接入所选软件范围：F415／F417 基础 CRYP／HASH；F446／F479 SAI1；F479 LTDC、DMA2D 与间接 QuadSPI。图形为并行 scanout 一／二 layer 和 fill／copy／convert／blend，QuadSPI 为 W25Q128JV SDR 1-1-1 PIO。增强加密、crypto DMA／AEAD、SAI2／连续 SAI、DSI／CLUT、QSPI 映射／XIP／quad／DDR／dual 均不在本次已选模式范围。模型和 ARM 结果保留精确配置；最终 SDK 已完成 [完整维护计划](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/consumer_profiles.py) 的全部消费者，不扩大到未选模式。"
+msgstr "Six new IP classes are integrated within the selected software scope: basic CRYP/HASH on F415/F417; SAI1 on F446/F479; and LTDC, DMA2D and indirect QuadSPI on F479. Graphics covers parallel scanout with one/two layers and fill/copy/convert/blend; QuadSPI is W25Q128JV SDR 1-1-1 PIO. Enhanced crypto, crypto DMA/AEAD, SAI2/continuous SAI, DSI/CLUT and QSPI mapped/XIP/quad/DDR/dual modes are outside this iteration's selected scope. Model and ARM results retain exact configurations. The final SDK completed every consumer in the [complete maintenance plan](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/consumer_profiles.py), without extending support to unselected modes."

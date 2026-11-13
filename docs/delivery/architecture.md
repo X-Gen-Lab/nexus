@@ -12,12 +12,14 @@ Nexus 提供静态 C11 通用机制。当前生产 SoC 入口只有 `soc/stm32/s
 系列源码复用不等于每个模式都已执行。厂商依赖保留，只有实际选中闭包进入准备、
 校验、编译与 SDK。
 
-本页以固定源码
-[`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984)
-及 [PR #61](https://github.com/X-Gen-Lab/nexus/pull/61) 保留为前序范围；本轮便携 I/O
-重构基线为 `6eac971a07a5021d25ba57c3b6885e6e789f2910`。本页另行说明当前工作区已接入的
-架构增量，最终同源门禁、SDK 与软件候选仍单独收口。既有接口、局部修复、精确模式
-和整个工作包完成是不同状态，不把历史执行结果重标为当前候选资格。
+本轮便携 I/O 重构以 [PR #61](https://github.com/X-Gen-Lab/nexus/pull/61) 的合并提交
+`6eac971a07a5021d25ba57c3b6885e6e789f2910` 为基线。平台实现固定在
+[`6b59f666`](https://github.com/X-Gen-Lab/nexus/tree/6b59f66628f0dbb415f6203ba917c1fe717bf3fd)，
+最终 Source SDK 固定在
+[`4bf4b5a2`](https://github.com/X-Gen-Lab/nexus/tree/4bf4b5a258b3120c24f6d834545ac3f300ce801b)；
+后一个提交仅迁移 TMP117 参考消费者的 I2C 字段。已选软件增量的执行结果见
+[PR #62](https://github.com/X-Gen-Lab/nexus/pull/62)。本页的后续文档修正不改变这些
+原始执行身份，也不将已选模式的通过扩大为整个 F4 家族或实板资格。
 
 ![FIG-01：平台职责与外部产品边界](../assets/diagrams/platform-architecture.svg)
 
@@ -74,8 +76,8 @@ IRQ 与时钟映射。组件不需理解这些映射，但仍需遵守长度、�
 本轮源码代际为 3，详见[迁移](migration.md)与[兼容性合同](../design/source-compatibility.md)。
 公共领域 traits 与 factory 生成值分开；UART 的通用格式合法性和 F4 支持性分别校验。
 SDIO function 请求按 function 地址表达，不再嵌套块设备 LBA 请求；逻辑 GPIO
-绑定、编码器 A／B 语义及网络结果也沿各自领域合同收敛。源码接入不自动成为完整
-软件候选；各组回归、ARM、资源与 SDK 验证仍需绑定最终相同源码。
+绑定、编码器 A／B 语义及网络结果也沿各自领域合同收敛。本轮已选软件增量完成了
+下述验证；各组回归、ARM、资源与 SDK 保留各自实际输入身份和差异核查范围。
 
 普通同步调用不承担 request、stream、队列或 OS 状态；有限异步、连续流与跨任务
 owner 按所选能力增加存储。原生波形与数据布局可作为显式扩展，仍经同一硬件
@@ -93,11 +95,22 @@ R0–R13 是本轮方案分组，与下方 WP／IO 的既有能力范围交叉�
 
 | 分组 | 本轮退出条件与剩余范围 |
 |---|---|
-| R0–R2 公共合同与原型 | 领域 traits、格式校验、独立 SDIO 请求和 epoch 3 消费者一致；源码接入后仍需最终完整门禁。 |
+| R0–R2 公共合同与原型 | 领域 traits、格式校验、独立 SDIO 请求和 epoch 3 消费者已完成迁移，并通过本轮普通提交门禁与完整 SDK 消费。 |
 | R3–R7 数字、串行、控制与采集 | 逻辑绑定、事务与 native 计划边界、薄包装和生产者／消费者退出分别可用；尚未实现的连续 SAI、完整无缝帧及精确电脉冲仍按支持矩阵保留。 |
 | R8–R11 存储、图形、网络与系统 | 厂商编码留实现，公共结果可解释；CPU-only 内存不自动授权图形访问。显式 `graphics-owned` SDRAM 由所选 LTDC／DMA2D 持有同一私有 bank lease，全部冷退出后归还；不是 MPU 隔离，新增组合仍须独立验证。 |
 | R12 依赖与成本 | 对相同工具链、装配比较实际编译闭包、静态对象及 ELF；不以方法表、inline 或 GC 的存在推断零成本。 |
-| R13 集成交付 | 变更后的 SDK、完整维护消费者、双语文档与源码身份一致；物理 HIL 与远端 Actions 按用户要求暂缓。 |
+| R13 集成交付 | 最终 clean-source SDK 的完整维护消费者、搬移前后校验及恢复校验通过；双语文档和 ARM 记录保留原实际输入身份。物理 HIL 与远端 Actions 按用户要求暂缓。 |
+
+平台实现的 Debug、Release、ASAN+UBSAN、TSAN 各通过完整 329 个 CTest 项和
+5982 个 GoogleTest 用例。两个提交均通过普通提交门禁；最终消费者修正不属于
+四种 Native 模式的编译输入，依赖核查保留原执行身份。静态分析覆盖 827 个不同
+编译上下文：Cppcheck 完整通过；Clang-Tidy 的 826 个上下文通过，唯一 I2C
+发现修复后按原配置重验受影响上下文通过，原始失败记录保留。
+
+最终 clean-source SDK 的导出、校验、整体搬移、34 个消费者的 165 条命令和
+消费后校验均通过；压缩包解压后也通过官方校验。文档工具测试与严格中英文构建、
+四个 F407 ARM 参考配置均有通过记录；它们保留当时的源码快照与配置，不重标为
+最终 SDK 提交的重新执行。具体命令、输入摘要、差异与原始结果由 PR #62 关联。
 
 ## 生命周期与失败
 
@@ -159,25 +172,26 @@ controller 的 plan 在任何 owner 回调前拒绝。它不改变日常 I/O 热
 ### 工作包、当前状态与退出条件
 
 下表说明本轮的实现范围和验证要求。实现范围限定为所列精确器件与已声明模式；
-F407 模式回归不自动扩展到新增料号。源码接入、独立审查与最终候选验收分别记录，
-资源测量、普通完整门禁、ARM、双语文档和 clean-source SDK 消费须绑定同一源码，
-实际执行结果随候选 PR 提交。未选器件与模式保留明确边界，不从厂商库覆盖推导
+F407 模式回归不自动扩展到新增料号。源码接入、独立审查与软件验收分别记录；
+资源、普通门禁、ARM、双语文档及 SDK 结果绑定各自实际源码、配置和工具，后续
+差异按受影响输入核查。上述固定提交的结果由 PR #62 关联；新增变更另行验收。
+未选器件与模式保留明确边界，不从厂商库覆盖推导
 整个 F4 全功能支持；实板暂缓也不等于已有软件机制未实现。
 
 | 工作包 | 保留的原始子任务 | 当前状态与退出条件 |
 |---|---|---|
-| WP01 基线 | BL01 固定源码、支持和消费者；BL02 空／单／多实例／DMA 代表配置；BL03 资源、ABI、身份基线；BL04 合同与任务映射 | 实现已有：BL01、BL02、BL04。集成收口：BL03。固定源码、唯一 Source SDK 消费者策略与空／单／多实例／DMA 代表装配均已有；新增 SAI、图形、加密、SDRAM 和 QSPI 沿同一维护计划接入，不另建验收引擎。BL03 仍须以最终相同输入、工具和 ABI 汇总资源身份，不能把历史测量重标为新候选。 |
+| WP01 基线 | BL01 固定源码、支持和消费者；BL02 空／单／多实例／DMA 代表配置；BL03 资源、ABI、身份基线；BL04 合同与任务映射 | BL01、BL02、BL04 已实现；BL03 的代表装配资源、ABI 和输入身份已记录。固定源码、唯一 Source SDK 消费者策略与空／单／多实例／DMA 代表装配均已有；SAI、图形、加密、SDRAM 和 QSPI 沿同一维护计划接入。新装配仍需自己的成本与资格记录，不把历史测量重标为新执行。 |
 | WP02 精确事实 | FT01 统一宏、头和 startup；FT02 控制器／IRQ／DMA 事实去重；FT03 精确器件与封装；FT04 内存与 DMA 域；FT05 具名勘误 profile；FT06 独立手册／SDK 核验 | 实现已有：FT01、FT02、FT03、FT04、FT05、FT06（当前八料号、七器件视图的已审范围）。精确宏／startup、封装／内存／DMA 域、IRQ enum／number／handler、控制器与路线交集、独立资料及勘误 profile 已贯通。经典 F405／407／415／417 复用 67 项共同事实，F411／446／479 按各自 IP 与时钟审查；厂商 SDK 选择器不是运行期器件支持，未知封装事实不补猜。 |
-| WP03 配置 | CF01 统一器件视图；CF02 模式合同；CF03 去首／次 controller 特判；CF04 严格诊断与原子 bundle；CF05 工程模板与接入说明 | 实现已有：CF01、CF02、CF03、CF04、CF05。DeviceView、模式合同、严格诊断／原子 bundle 与模板已有。SPI 删除 peer 选择、UART 删除 preload 特判；新增模式沿原 typed IR、静态 emitter、资源校验和唯一 System ClockPlan 接入。新增实例不引入行为生成器，最终完整工具域与候选仍待同源收口。 |
-| WP04 接口与成本 | IF01 强类型 factory 默认；IF02 迁移重复数字入口；IF03 公共接口／可选扩展；IF04 只读资源配置；IF05 配置／状态测量；IF06 编译期特化成本 | 实现已有：IF01、IF02、IF03、IF04。集成收口：IF05、IF06。默认强类型 factory、常规 SDK face／metadata 查询、公共 Nexus 接口及只读配置已有；底层 scalar switch 保留为唯一实现。新模式只扩展所选可选 ops 和自己的状态，不给所有实例增加最大对象。局部 ARM 布局／成本已有，最终仍须用同构装配比较状态、只读配置、Flash／RAM／ABI 和反汇编。 |
+| WP03 配置 | CF01 统一器件视图；CF02 模式合同；CF03 去首／次 controller 特判；CF04 严格诊断与原子 bundle；CF05 工程模板与接入说明 | CF01、CF02、CF03、CF04、CF05 已实现并通过本轮完整工具域与 SDK 消费。DeviceView、模式合同、严格诊断／原子 bundle 与模板已有。SPI 删除 peer 选择、UART 删除 preload 特判；新增模式沿原 typed IR、静态 emitter、资源校验和唯一 System ClockPlan 接入，新增实例不引入行为生成器。 |
+| WP04 接口与成本 | IF01 强类型 factory 默认；IF02 迁移重复数字入口；IF03 公共接口／可选扩展；IF04 只读资源配置；IF05 配置／状态测量；IF06 编译期特化成本 | IF01、IF02、IF03、IF04 已实现；IF05、IF06 已取得代表性编译闭包、对象、ARM 布局与 ELF 比较。默认强类型 factory、SDK face／metadata 查询、公共 Nexus 接口及只读配置已有；底层 scalar switch 保留为唯一实现。新模式只扩展所选可选 ops 和自己的状态，不给所有实例增加最大对象。实际成本只适用于所测工具链、ABI 与装配，不据此声称全平台零成本或最优。 |
 | WP05 共享资源 | RS01 共享 IRQ 优先级；RS02 TIM／ADC／CAN／USB 共享域；RS03 DMA 范围、单位、宽度与 FIFO；RS04 取消、迟到 IRQ、失败排空；RS05 部分收条逆序释放；RS06 连续流预算与背压 | 实现已有：RS01、RS02、RS03、RS04、RS05、RS06（已声明模式）。共享 IRQ／硬件域、DMA 范围与单位、借用排空、部分收条和有界流已有。ADC／DCMI 会话、SAI、图形、加密与存储由单 owner 承担源、FIFO、IRQ、地址和终止发布；wire、内存和器件 busy 分别证明。DCMI RAW／JPEG storage blocks 共用 44 B 在途预留和两个 1 µs tick 的观察相位余量，同时收紧旧 RAW 准入。各模式须覆盖冲突、迟到事件、拒撤与耗尽，失败不提前归还存储。 |
 | WP06 Core／OS | OS01 有限 deadline；OS02 启动、停机与换域；OS03 临界区与屏障；OS04 默认 Platform 入口；OS05 裸机推进／RTOS 静态对象；OS06 布局与尺寸 | 实现已有：OS01、OS02、OS03、OS04、OS05、OS06。有限预算、停机换域、mask／屏障、同一 Platform 协调器及静态 RTOS 已有。本轮继续闭合串行／HAL／Ethernet 的有限排空、RS485 最低 hold 故障保留与 UART 配置归还后幂等 stop；实际布局与整程序有证据。新增候选仍须统一门禁，不授予全部 CPU／后端组合。 |
 | WP07 系统 | SY01 时钟、供电与 Flash latency；SY02 回退实际频率；SY03 启动、CCM、外部 SRAM；SY04 STOP／Standby；SY05 恢复时间桥接；SY06 故障记录与恢复 | 实现已有：SY01、SY02、SY03、SY04、SY05、SY06，限已声明器件和模式。既有 F407 静态 ClockPlan、实际 HCLK 回退、pre-C／CCM／外部 SRAM、受约束 STOP／Standby、显式 deadline bridge 与首故障记录保留。新增 F411／446／479 首片限定 HSI16 RUN；F446 独立 M、F479 共用 M 的 PLLSAI Q／R 只由唯一 System owner 校验与撤回，不由 SAI／LTDC 启动第二份 PLL。新器件高频、电源和低功耗仍需独立适配。 |
 | WP08 驱动 | DR01 完整模式 HAL／LL；DR02 拆无关外设依赖；DR03 同 IP 行为复用；DR04 I/O 全清单；DR05 删除已有可靠替代的旧实现 | DR02、DR03、DR05 已有实现；DR01、DR04 按下表已声明路径验收。驱动复用官方 HAL／LL 的完整适用 transport；已核实的等待、FIFO、勘误或借用缺口留在有界 C owner，不生成寄存器算法或无理由逐寄存器重写。六类新 IP 和 CM0 JPEG 无帧界存储流均已接入现有静态路径。重复 START、已知控制元数据别名及私有 UART RTS 重配置的修正属于已有合同的质量闭环，不扩大为全部硬件模式支持；未选范围继续明确保留。 |
 | WP09 Board／组件 | BD01 原理图与安全电平；BD02 未知 PCB／跳线显式；BD03 组件使用公共 endpoint；BD04 中间件按需 | 实现已有：BD01、BD02、BD03、BD04。 四份独立 Board 事实与安全电平、显式未知 PCB／跳线、公共 endpoint 器件组件及按需中间件已有。当前不扩大接线或实装声明，不猜测未知事实。未选择的中间件不进入产物，组件不含厂商寄存器；实板暂缓不阻塞这些软件机制。 |
-| WP10 构建／SDK | BU01 根 CMake 去 F4 私有目录；BU02 模式／IP 选编；BU03 私有 SDK 配置／callback ABI；BU04 SDK 精确器件闭包；BU05 外部消费者 | 实现已有：BU01、BU02、BU03、BU04。集成收口：BU05。provider 私有 include、模式／IP 选源、私有 SDK／callback ABI 和精确器件头／startup 选择已有；新增 IP 按选中目标进入同一源码闭包。Source SDK 消费者以唯一维护计划为准，开发包、单个 ARM 对象或 ELF 不能代替最终 clean-source 包的全部消费验证。 |
+| WP10 构建／SDK | BU01 根 CMake 去 F4 私有目录；BU02 模式／IP 选编；BU03 私有 SDK 配置／callback ABI；BU04 SDK 精确器件闭包；BU05 外部消费者 | BU01、BU02、BU03、BU04 已实现；BU05 的最终 clean-source SDK 按唯一维护计划完成 34 个消费者。provider 私有 include、模式／IP 选源、私有 SDK／callback ABI 和精确器件头／startup 选择已有；新增 IP 按选中目标进入同一源码闭包。首次 SDK 消费暴露的 TMP117 旧 I2C 字段已迁移，完整重新导出与消费通过，原失败记录保留。 |
 | WP11 家族扩展 | FM01 F405／F407／F415／F417 差异复用；FM02 缺失外设／封装负例；FM03 其余 F4 按 IP 扩展；FM04 新 IP | 实现已有：FM01、FM02。本轮已实现 FM03／FM04 在当前八料号及六类新 IP 的所列软件增量，尚有明确后续范围。F411／446／479 按独立资料、封装和时钟政策接入；新 SAI／图形／QuadSPI／基础 CRYP／HASH 分别绑定精确器件与模式，不能由 HAL 覆盖扩大到整个 F4。其余料号、增强 IP 与下表未列模式仍需实际实现、差异负例和相应消费者。 |
-| WP12 验证／交付 | QA01 合同与差异测试精简；QA02 真实 TDD；QA03 ARM、资源与编译上下文；QA04 完整正常门禁和审查；QA05 文档、图、示例与矩阵；QA06 软件候选与版本 | 实现已有：QA02；QA01 的本轮合同保留审查已完成，过时脚手架归并随实际维护目标核对。集成收口：QA03、QA04、QA05、QA06。保留真实故障回归，按生产合同与编译差异分组，不用测试数量、filters 或重复小套件追求完成率。最终 ARM／资源、普通完整门禁、双语文档／SDK 和候选身份仍由相同源码收口；HIL 工装测试不是实板执行，历史失败保留原身份。 |
+| WP12 验证／交付 | QA01 合同与差异测试精简；QA02 真实 TDD；QA03 ARM、资源与编译上下文；QA04 完整正常门禁和审查；QA05 文档、图、示例与矩阵；QA06 软件候选与版本 | QA01 本轮合同保留审查与 QA02 实际 RED／GREEN 已记录；QA03、QA04、QA05、QA06 的已选软件增量具有上述 ARM／资源、分析、普通门禁、审查、双语文档与 clean-source SDK 结果。原始接口编译 RED 与运行期行为 RED 分别保留。按生产合同与编译差异保留回归，不用测试数量、filters 或重复小套件追求完成率。源码版本保持 0.2.1 开发快照；这些结果不建立新发行或实板资格，后续变更保留自己的输入与执行身份。 |
 
 ### I/O 覆盖与未完成边界
 
@@ -187,7 +201,7 @@ F407 模式回归不自动扩展到新增料号。源码接入、独立审查与
 
 | 编号 | 类别 | 既有基础与本轮边界 |
 |---|---|---|
-| IO01 | GPIO／EXTI | 已有输入、输出、IRQ 事件与 EMR 硬件事件；封装、电气、PC13／LSE 和 Board 授权继续受约束，本轮未关闭全类复核。 |
+| IO01 | GPIO／EXTI | 已有输入、输出、IRQ 事件与 EMR 硬件事件；本轮逻辑信号绑定与按接口归属的 EXTI 来源已实现并通过模型回归。封装、电气、PC13／LSE 和 Board 授权继续受约束，不建立全类物理资格。 |
 | IO02 | UART／USART | 已有选定格式、线模式及轮询／IRQ／DMA。UART idle cold、RX／duplex 不可变资源与别名准入、有限排空和归还配置后幂等 stop 保持同一合同；RS485 无法证明最低 hold 时保留 DE／outer loan。私有 live-format helper 无 RTS pad owner，旧／新格式任一启用 RTS 时在副作用前拒绝；静态 wire RTS 支持保持。控制器／格式组合仍按已声明模式验收。 |
 | IO03 | SPI | 已有主／从、帧事务与 DMA。SPI1／2／3 DMA 统一 cold prepare／close，不再根据 peer 存在选择算法；优先级、失败 CR 恢复、CS／pin owner 有实际回归。有限 framed drain／tail 已修正，新增模式仍需自身尾部与取消证据。 |
 | IO04 | I2C | I2C1／2／3 已有选定 master 轮询／IRQ／DMA、target 和 SMBus DEVICE（≤100 kHz／PEC／ARA）。异步 message 尾部请求 repeated START 后，下一 message 不重复置 START；请求、message 表和 payload 准入排除已知 owner、face、DMA／region 事实及控制寄存器范围。这些是原合同的质量修复，须保留异常停止、恢复和无副作用拒绝回归。硬件 SMBus HOST／master PEC、ARP 与 HostNotify 未列入本批选定合同，不声称全部 SMBus 功能。 |
@@ -196,7 +210,7 @@ F407 模式回归不自动扩展到新增料号。源码接入、独立审查与
 | IO07 | DAC | 已有 CPU／timer／DMA 与波形路径；新增 EXTI9 event-only 外部触发的 CPU／循环 DMA，外部 rate 返回 unknown，有限外部尾部未获证明而拒绝。ES0182 pending／underrun 恢复只用声明的 timer 产生内部 idle 转换并完整重启，不计 payload，不承诺模拟无毛刺或请求间持续保持电压。 |
 | IO08 | I2S／音频 | I2S2／3 有限与连续 blocks 保留；新增 F446／F479 的 SAI1 A／B 六种有限 master／slave TX／RX／同步 duplex。layout 明确容器位宽、有效位和存储顺序，SAI 消费唯一 System PLLSAI Q；不转换音频、不默认分配 buffer。SAI2、SAI 连续 blocks、稀疏 slots 与其他音频协议仍未提供。 |
 | IO09 | CAN | 已有 CAN1／2 classic、邮箱和共享 filter domain；共享依赖、bus-off 与恢复仍按具体模式验收，不授予 CAN FD。 |
-| IO10 | SDIO | 已有 SD／MMC 与 SDIO functions。本轮完成 RX PFCTRL／TX 精确计数与 FIFO／IRQ join、memory CMD18／25＋CMD12／13 及静态 ClockPlan 的 RM／勘误联合分频；默认与低 PCLK2 实际程序及 ARM 对象通过。HS／DDR／HS200、linked candidate 和物理资格不在此通过范围。 |
+| IO10 | SDIO | 已有 SD／MMC 与 SDIO functions。本轮完成 RX PFCTRL／TX 精确计数与 FIFO／IRQ join、memory CMD18／25＋CMD12／13 及静态 ClockPlan 的 RM／勘误联合分频；默认与低 PCLK2 实际程序及 ARM 对象通过。最终 SDK 消费只证明其实际维护装配；这些结果不授予 HS／DDR／HS200 或物理资格。 |
 | IO11 | FSMC／FMC | 保留 F407 FSMC 的 SRAM／PSRAM／NOR／NAND／parallel16 与启动 SRAM。F479NI FMC Bank1、8 MiB、16-bit SDRAM 默认提供 CPU 数据窗口；显式 `graphics-owned` 与所选 engine 的 `memory_window` 引用连接 LTDC 只读／DMA2D 读写区域，保留同一 bank lease 直至冷退出。两种模式均检查时序、原 System epoch 与真实自刷新退出；不授予 XIP、启动 RAM、自动 MPU 或实装资格，新几何与协议仍需独立实现。 |
 | IO12 | USB Device | 已有 FS／HS Device PIO／DMA；提前 STATUS、SETUP、wire ACK 与双方向 AHB／地址 join 分开。固定 Device 与 managed Device 阶段均按需支持 remote wake：STATUS ACK 提交 host 许可，真实 suspend 新收条至少 5001 µs，调用者证明有限 service 延迟 B。cancel／stop 不提前缩短最低保持，拒撤保留 request／clock／pins，角色切换不能越过同一 DCD join。无高带宽 ISO、HNP／SRP 或物理脉宽资格。 |
 | IO13 | USB Host／角色 | 已有显式 host／角色及 reset／resume 最低保持；新增实际 HCD 的单 transaction ISO 切片按精确速度、最大包和 DMA 对齐约束接入。未提供自动 OTG 协商、Host split 或周期调度；模型不替代 VBUS／PHY／枚举实测。 |
@@ -206,7 +220,7 @@ F407 模式回归不自动扩展到新增料号。源码接入、独立审查与
 | IO17 | Flash 维护 | 已有精确几何、不可逆维护和显式 recover；物理几何改为完整 erase spans 和 checked 查询，产品 region 独立。F479 2 MiB 事实／查询不授权旧 F407 算法写 bank2，也不自动回滚、重放或替代 POR；新系列写擦须独立证明 bank／sector 编码及执行限制。 |
 | IO18 | 监督／故障 | 已有 IWDG／WWDG、CSS、复位与故障观察机制；安全输出、真实复位、掉电及产品恢复仍分别验收。 |
 | IO19 | RNG／CRC／身份 | 已有 RNG、固定 CRC 字序列与实际身份查询；新具名勘误 profile 不扩大器件范围，UID 不作为秘密，REV_ID 准入不证明 PCB 或封装。 |
-| IO20 | 其他 F4 IP | 六类新 IP 已接入所选软件范围：F415／F417 基础 CRYP／HASH；F446／F479 SAI1；F479 LTDC、DMA2D 与间接 QuadSPI。图形为并行 scanout 一／二 layer 和 fill／copy／convert／blend，QuadSPI 为 W25Q128JV SDR 1-1-1 PIO。增强加密、crypto DMA／AEAD、SAI2／连续 SAI、DSI／CLUT、QSPI 映射／XIP／quad／DDR／dual 均不在本次已选模式范围；模型和 ARM 只证明对应配置，最终候选及 [完整维护计划](../../tools/maintenance/consumer_profiles.py) 的 Source SDK 消费仍待完整门禁。 |
+| IO20 | 其他 F4 IP | 六类新 IP 已接入所选软件范围：F415／F417 基础 CRYP／HASH；F446／F479 SAI1；F479 LTDC、DMA2D 与间接 QuadSPI。图形为并行 scanout 一／二 layer 和 fill／copy／convert／blend，QuadSPI 为 W25Q128JV SDR 1-1-1 PIO。增强加密、crypto DMA／AEAD、SAI2／连续 SAI、DSI／CLUT、QSPI 映射／XIP／quad／DDR／dual 均不在本次已选模式范围。模型和 ARM 结果保留精确配置；最终 SDK 已完成 [完整维护计划](../../tools/maintenance/consumer_profiles.py) 的全部消费者，不扩大到未选模式。 |
 
 本表的未开放范围描述当前软件合同，不从缺少软件证据推断芯片不具备硬件能力。
 CM0 JPEG 的无帧界存储字流由 `jpeg-blocks` 提供；精确完整帧仍需要额外的帧边界

@@ -30,6 +30,12 @@ or a workflow into physical measurements.
 ## Locate actual records
 
 The [delivery index](../../delivery/README.md) retains original results and limitations.
+The portable I/O results in [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62)
+bind platform implementation `6b59f666` and the clean Source SDK at `4bf4b5a2`.
+The SDK completed all 34 maintained consumers after relocation. Its caller-only
+follow-up does not relabel the four Native runs as executions at a different
+commit. Subsequent documentation and test-fixture corrections must retain their
+own applicable checks, merged source and SDK identities in the same PR.
 The build-system result record binds qualified code `cc6a065c`; its document updates
 do not inherit those tests to a new HEAD. Earlier SoC extension evidence binds
 `98270512` independently. Read each linked JSON result and raw receipt for exact

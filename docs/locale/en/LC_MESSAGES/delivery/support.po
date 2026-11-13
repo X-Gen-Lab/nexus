@@ -1,12 +1,9 @@
 # Current canonical messages; semantic review admission is tracked separately.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: d535db3ab70a0b4e1bea4489bd8e6b12214a3acd28b5fdf4e9bced89b768d4d9\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: bf370ffe00e381883e567408bf1a93775814845ab6e59939e17cee28ceaab271\n"
 
 msgid "当前精确支持范围"
 msgstr "Current exact support scope"
-
-msgid "本页帮助消费者选择当前维护的精确器件、Board、后端与外设模式。当前事实包含 STM32F405ZGT6、F407VET6、F407ZGT6、F415ZGT6、F417ZGT6、F411RET6、F446ZET6 和 F479NIH6，组成七个器件视图；厂商 SDK 目录的 23 个选择器不等于这八料号的 全部模式资格。实际模式由同一 TOML／typed IR resolver 对器件、封装、Board、 时钟和资源取交集。当前新 IP 所选 fixture 已有 ARM 链接；最终 clean-source 消费和物理执行分别验收， 不继承 F407 专属模式的结果，也不授予整系列资格。"
-msgstr "This page helps consumers choose maintained exact devices, Boards, backends and peripheral modes. Current facts include STM32F405ZGT6, F407VET6, F407ZGT6, F415ZGT6, F417ZGT6, F411RET6, F446ZET6 and F479NIH6 in seven device views. The vendor SDK catalog's 23 selectors do not establish every mode on these eight parts. One TOML/typed IR resolver intersects device, package, Board, clock and resources. Selected fixtures for new IP have linked on ARM; final clean-source consumption and physical execution remain separately accepted. They inherit no F407-only results or whole-family qualification."
 
 msgid "型号、Board 与 OS 边界"
 msgstr "Part, Board and OS boundaries"
@@ -332,9 +329,6 @@ msgstr "[FSMC contract](../design/f407-fsmc.md), [storage boundaries](../design/
 msgid "FMC SDRAM"
 msgstr "FMC SDRAM"
 
-msgid "F479NI Bank1、8 MiB、16-bit、row12／column8 的 CPU 数据窗口；显式七组时序、上电／刷新／自刷新等待、lease 和原 System epoch。WFDIS 共享约束在取得 gate 后实际观察。不授予 DMA、启动 RAM、XIP、自动 MPU 或实装 RAM 时序资格"
-msgstr "F479NI Bank1, 8 MiB 16-bit row12/column8 CPU data window. Seven explicit timing groups, power-up/refresh/Self-refresh waits, leases and the original System epoch. The shared WFDIS constraint is actually observed after acquiring the gate. No DMA, startup RAM, XIP, automatic MPU configuration or installed-RAM timing qualification."
-
 msgid "[FMC／外部存储](../design/f407-fsmc.md)"
 msgstr "[FMC/external memory](../design/f407-fsmc.md)"
 
@@ -349,9 +343,6 @@ msgstr "[Indirect QuadSPI](../design/f407-fsmc.md)"
 
 msgid "LTDC／DMA2D"
 msgstr "LTDC/DMA2D"
-
-msgid "F479NI 原生并行 RGB565／RGB888；RGB565／ARGB8888 内存，一／二 layer、2 active＋1 全局 pending。IRQ 在真实 blanking 锁存同代退休证明，task join 后才归还旧 frame；visible 不等于 SETTLED。独立 DMA2D 提供 fill／copy／convert／blend。无 DSI、CLUT、隐藏 frame buffers 或对 FMC CPU-only 窗口的 DMA 授权"
-msgstr "F479NI native parallel RGB565/RGB888 with RGB565/ARGB8888 memory. One/two layers, two active frames and one global pending replacement. IRQs latch same-generation retirement proof during actual blanking; task join returns old frames. Visible does not mean SETTLED. Independent DMA2D offers fill/copy/convert/blend. No DSI, CLUT, hidden framebuffers or DMA authorization for an FMC CPU-only window."
 
 msgid "[图形所有权](../design/official-stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations)"
 msgstr "[Graphics ownership](../design/official-stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations)"
@@ -437,11 +428,20 @@ msgstr "Selection, evidence and sources"
 msgid "先确定精确型号和 Board 授权，再选择模式并通过 resolver 检查资源、内存域和时钟。 [派生能力表](capabilities.md)用于追踪声明、路线、装配和生产 ops；它不是第二份 配置输入，也不证明相关运行、排空或物理时序已通过。"
 msgstr "Establish the exact part and Board authorization, then select a mode and pass the resolver's resource, memory-domain and clock checks. The [derived capability table](capabilities.md) traces declarations, routes, assemblies and production operations. It is neither a second configuration input nor proof that the corresponding execution, drain or physical timing passed."
 
-msgid "本次所列模型与 ARM 结果只覆盖各自精确配置，不把单个程序、对象或 ELF 扩大为 全系列／全部模式通过。最终软件候选及 [完整维护消费者计划](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/consumer_profiles.py) 仍须在完整门禁中使用相同源码验证；本页不提前宣布它们已经完成。"
-msgstr "The listed model/ARM results cover their exact configurations only. An individual program, object or ELF does not establish whole-family or all-mode acceptance. The final software candidate and [complete maintained consumer plan](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/consumer_profiles.py) must still validate identical source through the complete gates; this page does not announce that work complete in advance."
-
 msgid "源码维护、分组模型回归、ARM ELF、Source SDK、完整软件候选和物理 station 分别 建立证据，并绑定各自源码与配置。代理的 GREEN 或单个 ELF 不构成全候选通过。 当前 physical HIL 为 `not_executed`；未知 PCB、晶振精度、跳线、负载和波形保持未知。"
 msgstr "Source maintenance, grouped model regressions, ARM ELF, Source SDK, whole software candidates and physical stations establish separate evidence bound to their own source and configuration. An agent's GREEN or a single ELF does not establish whole-candidate acceptance. Current physical HIL is `not_executed`; unknown PCBs, oscillator accuracy, jumpers, loads and waveforms remain unknown."
 
 msgid "所有 vendor、子模块、锁与许可证保留。未选 SDK 不进入默认生产构建闭包； [器件目录](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/devices.json)只描述官方宏、启动和 IRQ 编译事实。 历史范围见[固定重构前源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)， 旧候选、计数和实板结果不重标为当前源码资格。"
 msgstr "All vendors, submodules, locks and licenses are retained. Unselected SDKs do not enter the default production build closure. The [device catalogue](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/devices.json) describes official macro, startup and IRQ compilation facts only. Historical scope is available in the [fixed pre-refactor source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18); old candidates, counts and physical results are not relabeled as qualification for the current source."
+
+msgid "本页帮助消费者选择当前维护的精确器件、Board、后端与外设模式。当前事实包含 STM32F405ZGT6、F407VET6、F407ZGT6、F415ZGT6、F417ZGT6、F411RET6、F446ZET6 和 F479NIH6，组成七个器件视图；厂商 SDK 目录的 23 个选择器不等于这八料号的 全部模式资格。实际模式由同一 TOML／typed IR resolver 对器件、封装、Board、 时钟和资源取交集。所选 fixture 的模型、ARM 和最终 clean-source SDK 消费已有 各自执行记录，见 [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62) 与 [架构说明](architecture.md#本轮重构退出范围)。物理执行仍为 `not_executed`； 新增器件不继承 F407 专属模式结果，也不据此取得整系列资格。"
+msgstr "This page helps consumers select currently maintained exact parts, Boards, backends and peripheral modes. Current facts contain STM32F405ZGT6, F407VET6, F407ZGT6, F415ZGT6, F417ZGT6, F411RET6, F446ZET6 and F479NIH6, forming seven device views. The vendor SDK's 23 selectors do not qualify every mode on these eight parts. The same TOML/typed IR resolver intersects the device, package, Board, clocks and resources. Selected fixtures have separate model, ARM and final clean-source SDK execution records; see [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62) and the [architecture description](architecture.md#本轮重构退出范围). Physical execution remains `not_executed`; added parts neither inherit F407-specific mode results nor receive family-wide qualification."
+
+msgid "F479NI Bank1、8 MiB、16-bit、row12／column8；默认 CPU 数据窗口不授予 DMA。显式 `graphics-owned` 通过 `memory_window` 引用，仅给所选 LTDC 只读、DMA2D 读写区域，共同保留原始 bank lease 直至冷退出。两种模式均检查七组时序、上电／刷新／自刷新等待与原 System epoch；WFDIS 共享约束在取得 gate 后实际观察。不授予启动 RAM、XIP、自动 MPU 或实装 RAM 时序资格"
+msgstr "F479NI Bank1, 8 MiB, 16-bit, row12/column8. The default CPU data window grants no DMA access. Explicit `graphics-owned` connections through `memory_window` references grant readonly regions only to the selected LTDC and read/write regions to DMA2D, jointly retaining the original bank lease until cold exit. Both modes check seven timing groups, power-up/refresh/self-refresh waits and the original System epoch; the shared WFDIS constraint is actually observed after acquiring the gate. Neither startup RAM, XIP, automatic MPU setup nor qualification of installed RAM timing is granted"
+
+msgid "F479NI 原生并行 RGB565／RGB888；RGB565／ARGB8888 内存，一／二 layer、2 active＋1 全局 pending。IRQ 在真实 blanking 锁存同代退休证明，task join 后才归还旧 frame；visible 不等于 SETTLED。独立 DMA2D 提供 fill／copy／convert／blend；所选 SDRAM 需显式 `graphics-owned` 连接并持有同一 bank lease。无 DSI、CLUT、隐藏 frame buffers 或对 FMC CPU-only 窗口的 DMA 授权"
+msgstr "F479NI native parallel RGB565/RGB888; RGB565/ARGB8888 memory, one/two layers, 2 active plus 1 global pending frame. IRQ latches same-generation retirement proof at actual blanking; task join precedes returning an old frame. Visible is not SETTLED. Independent DMA2D provides fill/copy/convert/blend. Selected SDRAM requires an explicit `graphics-owned` connection and the same retained bank lease. No DSI, CLUT, hidden frame buffers or DMA authorization for the FMC CPU-only window"
+
+msgid "本次所列模型与 ARM 结果只覆盖各自精确配置。平台实现固定在 [`6b59f666`](https://github.com/X-Gen-Lab/nexus/tree/6b59f66628f0dbb415f6203ba917c1fe717bf3fd)； 最终 SDK 固定在 [`4bf4b5a2`](https://github.com/X-Gen-Lab/nexus/tree/4bf4b5a258b3120c24f6d834545ac3f300ce801b)， 按 [完整维护消费者计划](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/consumer_profiles.py) 通过 34 个 消费者、165 条命令及搬移前后完整性校验。两提交仅差 TMP117 参考调用者的 I2C 字段迁移；四种 Native 编译输入未受影响的核查已记录。文档、ARM 和领域回归保留 原实际输入身份，不重标为最终 SDK 提交重新执行，也不扩大为全系列／全部模式通过。"
+msgstr "The listed model and ARM results cover only their exact configurations. The platform implementation is fixed at [`6b59f666`](https://github.com/X-Gen-Lab/nexus/tree/6b59f66628f0dbb415f6203ba917c1fe717bf3fd), and the final SDK at [`4bf4b5a2`](https://github.com/X-Gen-Lab/nexus/tree/4bf4b5a258b3120c24f6d834545ac3f300ce801b). Under the [complete maintained consumer plan](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/consumer_profiles.py), it passed 34 consumers, 165 commands and integrity verification before and after relocation. The two commits differ only in the TMP117 reference caller's I2C field migration; the audit confirming unchanged compiler inputs for the four Native modes is recorded. Documentation, ARM and domain regressions retain their actual input identities, are not relabeled as new executions at the final SDK commit, and do not extend passes to the whole family or every mode."

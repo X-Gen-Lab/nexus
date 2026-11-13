@@ -111,7 +111,7 @@ not a promise to assign a separate nominal type to every JSON field.
 
 Factory and emitters consume the same typed result. `to_dict()` derives the
 schema-1 `resolved.json` audit/artifact projection; it is never read back as an
-authored platform input. Private typed source epoch 2 is separate from that
+authored platform input. Private typed source epoch 3 is separate from that
 serialized format and from the public C factory epoch. Old JSON assemblies are
 rejected. Historical evidence keeps its original bytes and read-only verification.
 CMake owns the source dependency graph; resolution does not discover software
