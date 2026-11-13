@@ -65,7 +65,7 @@ class OptionalFactoryTests(unittest.TestCase):
         for compiler, standard in (("cc", "c11"), ("c++", "c++17")):
             with self.subTest(compiler=compiler):
                 arguments = {"getter": "nx_factory_gpio_capability_ref",
-                             "return_type": "const nx_factory_io_capability_t*"}
+                             "return_type": "const nx_io_capability_t*"}
                 valid = self.compile(compiler, standard, "NX_GPIO_REF_LED0",
                                      **arguments)
                 self.assertEqual(valid.returncode, 0, valid.stderr)
@@ -78,7 +78,7 @@ class OptionalFactoryTests(unittest.TestCase):
     def test_default_factory_has_no_capability_descriptors(self):
         result = self.generate()
         self.assertFalse(result["factory"]["capabilities"])
-        self.assertNotIn("nx_factory_io_capability_t",
+        self.assertNotIn("nx_io_capability_t",
                          (self.output / "nexus_factory.h").read_text())
 
     def test_capability_selection_is_explicit_and_immutable(self):
@@ -89,11 +89,18 @@ class OptionalFactoryTests(unittest.TestCase):
             ir.factory.capabilities = False
         source = (self.output / "bindings.c").read_text()
         header = (self.output / "nexus_factory.h").read_text()
-        self.assertIn("nx_factory_io_capability_t", header)
+        self.assertIn("nx_io_capability_t", header)
         self.assertIn("nx_factory_gpio_capability", header)
         self.assertIn("s_nx_capability_gpio_led0", source)
         self.assertNotIn("s_nx_capability_uart_", source)
-        self.assertIn("NX_FACTORY_CAP_MODEL", source)
+        self.assertIn("NX_IO_CAP_MODEL", source)
+
+    def test_capability_contract_is_usable_without_generated_type_definitions(self):
+        self.generate("\n[factory]\ncapabilities = true\n")
+        header = (self.output / "nexus_factory.h").read_text()
+        self.assertIn('#include "nexus/io/traits.h"', header)
+        self.assertIn("const nx_io_capability_t*", header)
+        self.assertNotIn("} nx_io_capability_t", header)
 
     def test_unknown_factory_policy_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "unknown"):
@@ -137,10 +144,10 @@ class OptionalFactoryTests(unittest.TestCase):
                         checks += [f"assert({function}->max_transfer_units == 65534U);",
                                    f"assert({function}->buffer_alignment == 2U);",
                                    f"assert(({function}->features & "
-                                   "NX_FACTORY_CAP_STREAM_GAPS) != 0U);"]
+                                   "NX_IO_CAP_STREAM_GAPS) != 0U);"]
                     elif item.kind == "spi" and item.mode.startswith("dma"):
                         checks.append(f"assert({function}->max_transfer_units == 65535U);")
-                    checks.append(f"assert(({function}->features & NX_FACTORY_CAP_MODEL) == 0U);")
+                    checks.append(f"assert(({function}->features & NX_IO_CAP_MODEL) == 0U);")
                 source = self.root / "caps.c"
                 source.write_text('#include "nexus_factory.h"\n#include <assert.h>\n'
                                   + "\n".join(aliases) + "\n" + getters
@@ -167,10 +174,10 @@ class OptionalFactoryTests(unittest.TestCase):
         include = self.root / 'include/nexus/io'
         include.mkdir(parents=True)
         public = (gate.ROOT / 'io/include/nexus/io/i2c.h').read_text()
-        public = public.replace('NX_I2C_MAX_MESSAGES      8U',
-                                'NX_I2C_MAX_MESSAGES      32U')
-        public = public.replace('NX_I2C_MAX_MESSAGE_BYTES 256U',
-                                'NX_I2C_MAX_MESSAGE_BYTES 64U')
+        public = public.replace('NX_I2C_BOUNDED_MAX_MESSAGES      8U',
+                                'NX_I2C_BOUNDED_MAX_MESSAGES      32U')
+        public = public.replace('NX_I2C_BOUNDED_MAX_MESSAGE_BYTES 256U',
+                                'NX_I2C_BOUNDED_MAX_MESSAGE_BYTES 64U')
         (include / 'i2c.h').write_text(public)
         source = self.root / 'bounds.c'
         source.write_text(
@@ -178,17 +185,17 @@ class OptionalFactoryTests(unittest.TestCase):
             'const nx_i2c_port_t* const nx_binding_bus = NULL;\n'
             'const nx_i2c_endpoint_t* const nx_device_sensor = NULL;\n'
             + getters + '\nint main(void) {\n'
-            'const nx_factory_io_capability_t* port = '
+            'const nx_io_capability_t* port = '
             'nx_factory_i2c_capability(NX_I2C_ID_BUS);\n'
-            'const nx_factory_io_capability_t* endpoint = '
+            'const nx_io_capability_t* endpoint = '
             'nx_factory_i2c_device_capability(NX_I2C_DEVICE_ID_SENSOR);\n'
             'printf("actual units=%u messages=%u; public units=%u messages=%u\\n",'
             '(unsigned)port->max_transfer_units, (unsigned)port->max_messages,'
-            '(unsigned)NX_I2C_MAX_MESSAGE_BYTES, (unsigned)NX_I2C_MAX_MESSAGES);\n'
-            'return port->max_transfer_units != NX_I2C_MAX_MESSAGE_BYTES || '
-            'port->max_messages != NX_I2C_MAX_MESSAGES || '
-            'endpoint->max_transfer_units != NX_I2C_MAX_MESSAGE_BYTES || '
-            'endpoint->max_messages != NX_I2C_MAX_MESSAGES;\n}\n')
+            '(unsigned)NX_I2C_BOUNDED_MAX_MESSAGE_BYTES, (unsigned)NX_I2C_BOUNDED_MAX_MESSAGES);\n'
+            'return port->max_transfer_units != NX_I2C_BOUNDED_MAX_MESSAGE_BYTES || '
+            'port->max_messages != NX_I2C_BOUNDED_MAX_MESSAGES || '
+            'endpoint->max_transfer_units != NX_I2C_BOUNDED_MAX_MESSAGE_BYTES || '
+            'endpoint->max_messages != NX_I2C_BOUNDED_MAX_MESSAGES;\n}\n')
         executable = self.root / 'bounds'
         command = ['cc', '-std=c11', '-Wall', '-Wextra', '-Werror', '-pedantic',
                    '-I' + str(self.root / 'include'), '-I' + str(self.root),

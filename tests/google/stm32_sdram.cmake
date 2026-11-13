@@ -32,7 +32,7 @@ target_include_directories(nexus_stm32_sdram_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 nexus_use_cmsis_core(nexus_stm32_sdram_test)
 target_compile_definitions(nexus_stm32_sdram_test PRIVATE
-    STM32F479xx NEXUS_STM32_SDRAM_MODEL=1
+    STM32F479xx NEXUS_STM32_SDRAM_MODEL=1 NX_STM32_SDRAM_GRAPHICS=1
     nx_arch_is_privileged=nx_sdram_privileged
     nx_arch_in_isr=nx_sdram_in_isr
     nx_arch_irq_is_masked=nx_sdram_masked

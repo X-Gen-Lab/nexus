@@ -17,6 +17,19 @@ typedef enum nx_timer_sequence_layout {
     NX_TIMER_SEQUENCE_ARR_RCR_CCR1_CCR4 = 1
 } nx_timer_sequence_layout_t;
 
+/** \brief Logical period and duties in the selected post-prescaler ticks.
+ * \note duty_ticks follows the statically selected logical channel order.
+ *       A period is positive and each duty is zero through that period.
+ *       Encoding may reject values the selected native format cannot express.
+ *       Descriptors and duty arrays are immutable ordinary memory during the
+ *       synchronous encode call; they are never retained on return.
+ */
+typedef struct {
+    uint32_t period_ticks;
+    const uint32_t* duty_ticks;
+    size_t channel_count;
+} nx_timer_sequence_step_t;
+
 /** \brief One immutable whole frame loan containing complete native rows.
  * \note Initialize/prepare base first. source must be the exact outstanding
  *       frame consumer control. Its single plane has offset zero, contiguous
@@ -83,6 +96,10 @@ typedef struct {
     nx_result_t (*service)(void* context);
     nx_result_t (*stop)(void* context);
     nx_result_t (*state)(const void* context, nx_timer_sequence_state_t* state);
+    /** \brief Optional explicit logical-to-native preparation, without MMIO. */
+    nx_result_t (*encode)(const void* context,
+                          const nx_timer_sequence_step_t* steps, size_t count,
+                          void* storage, size_t capacity, size_t* bytes);
 } nx_timer_sequence_ops_t;
 
 /** \brief Immutable typed identity; vendor state and mutable handles are
@@ -94,6 +111,90 @@ struct nx_timer_sequence_port {
 };
 /** \brief The same typed face for direct operations. */
 typedef nx_timer_sequence_port_t nx_timer_sequence_t;
+/** \brief Admit an already encoded native plan without copying its source.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[in,out] request: Original stable storage under the operation
+ * loan contract. \return Provider result, INVALID for malformed public objects,
+ * or UNSUPPORTED when this selected operation is absent. \note The selected
+ * owner defines context and timing. Dispatch retains no references, starts no
+ * worker and never revokes a live borrow. Provider admission still checks
+ * private state and payload aliases. The original argument reaches that owner
+ * without a temporary or format conversion.
+ */
+nx_result_t nx_timer_sequence_port_submit(const nx_timer_sequence_port_t* port,
+                                          nx_timer_sequence_request_t* request);
+/** \brief Request withdrawal without revoking the source or request loan.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[in,out] request: Original stable storage under the operation
+ * loan contract. \return Provider result, INVALID for malformed public objects,
+ * or UNSUPPORTED when this selected operation is absent. \note The selected
+ * owner defines context and timing. Dispatch retains no references, starts no
+ * worker and never revokes a live borrow. Provider admission still checks
+ * private state and payload aliases. The original argument reaches that owner
+ * without a temporary or format conversion.
+ */
+nx_result_t nx_timer_sequence_port_cancel(const nx_timer_sequence_port_t* port,
+                                          nx_timer_sequence_request_t* request);
+/** \brief Advance bounded tail and withdrawal work; query the request for
+ * settlement. \param[in] port: Stable face under the selected serialized
+ * execution contract. \return Provider result, INVALID for malformed public
+ * objects, or UNSUPPORTED when this selected operation is absent. \note The
+ * selected owner defines context and timing. Dispatch retains no references,
+ * starts no worker and never revokes a live borrow. Provider admission still
+ * checks private state and payload aliases. The original argument reaches that
+ * owner without a temporary or format conversion.
+ */
+nx_result_t
+nx_timer_sequence_port_service(const nx_timer_sequence_port_t* port);
+/** \brief Withdraw the source; failed drain preserves every outstanding loan.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \return Provider result, INVALID for malformed public objects, or
+ *         UNSUPPORTED when this selected operation is absent.
+ * \note The selected owner defines context and timing. Dispatch retains no
+ *       references, starts no worker and never revokes a live borrow. Provider
+ *       admission still checks private state and payload aliases. The original
+ *       argument reaches that owner without a temporary or format conversion.
+ */
+nx_result_t nx_timer_sequence_port_stop(const nx_timer_sequence_port_t* port);
+/** \brief Copy native plan constraints and current owner observations.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[out] state: Independent output, changed only as the provider
+ * contract permits. \return Provider result, INVALID for malformed public
+ * objects, or UNSUPPORTED when this selected operation is absent. \note The
+ * selected owner defines context and timing. Dispatch retains no references,
+ * starts no worker and never revokes a live borrow. Provider admission still
+ * checks private state and payload aliases. The original argument reaches that
+ * owner without a temporary or format conversion.
+ */
+nx_result_t nx_timer_sequence_port_state(const nx_timer_sequence_port_t* port,
+                                         nx_timer_sequence_state_t* state);
+
+/** \brief Encode logical steps into caller-owned native storage before submit.
+ * \param[in] port: Prepared idle owner under its serialized task contract.
+ * \param[in] steps: Positive immutable descriptor array and complete duties.
+ * \param[in] count: Step count within the selected native transfer limit.
+ * \param[out] storage: Exclusive ordinary writable memory, not a live loan.
+ * \param[in] capacity: Complete writable extent, including unused tail bytes.
+ * \param[out] bytes: Separate output receiving the exact encoded byte count.
+ * \return SUCCESS, INVALID for malformed or overlapping storage, UNSUPPORTED
+ *         for absent encoding or unrepresentable values, OVERFLOW for short
+ *         storage, BUSY for an active owner, or STATE/CONTEXT.
+ * \note Synchronous task-only preparation with work bounded by the selected
+ *       step and channel limits. No peripheral MMIO, admission, allocation,
+ *       conversion at submit, retained reference or owner-state change occurs.
+ *       All checks precede writes; rejection leaves storage and bytes
+ * unchanged. All output extents are disjoint from descriptors, duties, private
+ *       metadata and each other. Caller proves ordinary memory ownership and
+ *       stability; the provider rejects known MMIO/private aliases. Success
+ *       writes only the encoded prefix; unused capacity stays unchanged.
+ *       Publish using the existing native frame geometry and loan operations.
+ *       Encoding does not grant DMA reachability or prove waveform timing.
+ */
+nx_result_t nx_timer_sequence_port_encode(const nx_timer_sequence_port_t* port,
+                                          const nx_timer_sequence_step_t* steps,
+                                          size_t count, void* storage,
+                                          size_t capacity, size_t* bytes);
+
 #ifdef __cplusplus
 }
 #endif

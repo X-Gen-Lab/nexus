@@ -109,6 +109,16 @@ class NativeTime : public testing::Test {
     }
 };
 
+TEST_F(NativeTime, PeriodicWakeRequiresAnExplicitProviderCapability) {
+    nx_rtc_period_t actual{123U, 456U};
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_rtc_port_periodic_wakeup(&rtc, 1000000U, 0U, &actual));
+    EXPECT_EQ(123U, actual.ticks);
+    EXPECT_EQ(456U, actual.ticks_per_second);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_rtc_port_periodic_wakeup(&rtc, 1000000U, 0U, nullptr));
+}
+
 TEST_F(NativeTime, ColdConstructionCopiesClockWithoutReadingOrSettingTime) {
     nx_rtc_snapshot_t snapshot;
     std::memset(&snapshot, 0xa5, sizeof(snapshot));

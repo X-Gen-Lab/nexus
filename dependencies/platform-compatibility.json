@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "nexus-platform-compatibility",
   "semantic_version": "0.2.1",
-  "factory_abi_epoch": 2,
+  "factory_abi_epoch": 3,
   "source_sdk": {
     "delivery": "source_only",
     "version_matching": "exact",
@@ -11,7 +11,7 @@
   "schemas": {
     "assembly_authoring": 2,
     "assembly_projection": 1,
-    "typed_ir": 2,
+    "typed_ir": 3,
     "board": 1,
     "soc": 1,
     "routes": 1,

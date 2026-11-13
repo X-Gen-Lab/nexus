@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 6c0c7bd875d819345e9fe2d5e347d728c3d859bd6f75b8e69bcff410592d2afa\n"
+"X-Nexus-Source-SHA256: 30974164689c75bea2274204d52ca79c6045679950d7b41109250ed62ed72316\n"
 
 msgid "Migrate legacy configuration and interface access"
 msgstr "迁移旧配置与接口访问"
@@ -143,14 +143,21 @@ msgstr ""
 "构建独立搬移的 [SDK 消费者](../tutorials/source-sdk.md)，再用锁定编译器链接精确 MCU "
 "配置。保留迁移源码/配置的证据。旧 HAL/OSAL 文档保持历史身份；redirect 不使旧 API 合同等同于新合同。"
 
-msgid "Rebuild for source interface epoch 2"
-msgstr "为源码接口 epoch 2 重新编译"
+#: docs/guides/migration.md:0
+msgid "Rebuild for source interface epoch 3"
+msgstr "按源码接口 epoch 3 重新编译"
 
-msgid "The current development snapshot keeps semantic version `0.2.1` and uses factory/source interface epoch `2`. Pin its exact commit, regenerate the bundle and rebuild every caller, public face/ops, generated factory, provider and component with one configuration and toolchain. Current interface admission rejects epoch-1 SDKs; rebuild old headers and objects rather than mixing them into the new application. No stable binary ABI is supplied. A development-fixture opt-in does not relax interface checks. Existing tags are unchanged."
-msgstr "当前开发快照保持语义版本 `0.2.1`，factory／source interface epoch 为 `2`。固定精确提交，重新生成 bundle，并在同一配置和工具链下重编所有调用者、公共 face／ops、生成 factory、provider 和组件。当前接口准入拒绝 epoch 1 SDK；旧头文件和对象必须重编，不能混入新应用。平台不提供稳定二进制 ABI，development-fixture opt-in 也不会放宽接口检查。现有标签不变。"
+#: docs/guides/migration.md:0
+msgid "The current development snapshot keeps semantic version `0.2.1` and uses factory/source interface epoch `3`. Pin its exact commit, regenerate the bundle and rebuild every caller, public face/ops, generated factory, provider and component with one configuration and toolchain. Current interface admission rejects epoch-1 and epoch-2 SDKs; rebuild old headers and objects rather than mixing them into the new application. No stable binary ABI is supplied. A development-fixture opt-in does not relax interface checks. Existing tags are unchanged."
+msgstr "当前开发快照保持 semantic version `0.2.1`，factory／source interface epoch 为 `3`。固定精确提交，重新生成 bundle，并使用同一配置和工具链重编全部调用者、公共 face／ops、生成 factory、provider 和组件。当前准入拒绝 epoch-1 和 epoch-2 SDK；旧头文件与对象必须重编，不能混入新应用。平台不交付稳定二进制 ABI。development-fixture opt-in 不放宽接口检查；既有标签保持原始身份。"
 
-msgid "For ADC groups, direct `request.frames` access becomes `request.output.frames`. Prefer `nx_adc_group_prepare()` for raw requests: it installs the explicit RAW `results_kind`. Use `nx_adc_group_prepare_results()` for a paired regular/injected result descriptor. Inspect the selected discriminant before reading the union; a raw pointer must never be reinterpreted as a paired descriptor. No compatibility shadow field or runtime layout inference is provided. Request, descriptor and both spans retain one lifetime through acquire-observed SETTLED."
-msgstr "ADC group 的直接 `request.frames` 访问改为 `request.output.frames`。raw 请求优先使用 `nx_adc_group_prepare()`，由它设置明确的 RAW `results_kind`；paired regular／injected descriptor 使用 `nx_adc_group_prepare_results()`。读取 union 前确认所选 discriminant，不能把 raw 指针重新解释成 paired descriptor。不提供兼容影子字段或运行期布局推断。request、descriptor 和两个 span 持续共用一次借用，直到 acquire-observed SETTLED。"
+#: docs/guides/migration.md:0
+msgid "The epoch-2 ADC result migration remains required when upgrading older callers. For ADC groups, direct `request.frames` access becomes `request.output.frames`. Prefer `nx_adc_group_prepare()` for raw requests: it installs the explicit RAW `results_kind`. Use `nx_adc_group_prepare_results()` for a paired regular/injected result descriptor. Inspect the selected discriminant before reading the union; a raw pointer must never be reinterpreted as a paired descriptor. No compatibility shadow field or runtime layout inference is provided. Request, descriptor and both spans retain one lifetime through acquire-observed SETTLED."
+msgstr "升级旧调用者仍须完成 epoch-2 ADC 结果迁移。ADC group 的直接 `request.frames` 访问改为 `request.output.frames`。raw 请求优先使用 `nx_adc_group_prepare()`，由它设置明确的 RAW `results_kind`。regular／injected paired 结果 descriptor 使用 `nx_adc_group_prepare_results()`。读取 union 前先核对 discriminant，raw 指针不得解释为 paired descriptor。不提供兼容影子字段或运行时布局推断。request、descriptor 与两个 span 共同借用到 acquire 观察 SETTLED。"
+
+#: docs/guides/migration.md:0
+msgid "Use public domain traits from `nexus/io/traits.h` instead of generated `nx_factory_*_traits_t` typedefs. Generic capabilities use `nx_io_capability_t` and `NX_IO_CAP_*`; enhanced SPI endpoint traits use `nx_spi_transaction_traits_t`, while I2C provider profiles use `nx_i2c_limits_t`. Factory lookup still returns selected immutable facts; it does not initialize hardware or prove readiness. SDIO function requests now contain `base`, payload and function-local address fields directly. Replace `request.transfer.base` and other nested accesses with the direct fields, remove `first_block = 0`, and never cast an SDIO request to a block request. Follow the public encoder modes, error enums and checksum semantics rather than retaining old numeric encodings."
+msgstr "使用 `nexus/io/traits.h` 的公共领域 traits，替代生成的 `nx_factory_*_traits_t` typedef。通用 capability 使用 `nx_io_capability_t` 和 `NX_IO_CAP_*`；增强 SPI endpoint traits 使用 `nx_spi_transaction_traits_t`，I2C provider profile 使用 `nx_i2c_limits_t`。factory 查询仍只返回所选不可变事实，不初始化硬件或证明 ready。SDIO function 请求直接包含 `base`、payload 和 function-local 地址字段。将 `request.transfer.base` 等嵌套访问改为直接字段，删除 `first_block = 0`，不得将 SDIO 请求转成块设备请求。按公共编码器模式、错误枚举和校验语义迁移，不能保留旧数字编码来猜测含义。"
 
 msgid "Discard old generated output and rebuild from the pinned source. The [compatibility contract](../design/source-compatibility.md) defines epoch and manifest admission; a matching semantic version alone does not permit mixing source generations or binary objects."
 msgstr "丢弃旧生成输出，从固定源码重建。[兼容性合同](../design/source-compatibility.md)定义 epoch 与 manifest 准入；仅语义版本相同不允许混用源码代际或二进制对象。"

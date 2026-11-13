@@ -23,7 +23,7 @@ int main(void) {
     nx_audio_layout_t storage;
     nx_audio_rate_t rate;
     if (audio == NULL || nx_audio_port_layout(audio, &storage) != NX_SUCCESS ||
-        audio->ops->rate(audio->context, &rate) != NX_SUCCESS)
+        nx_audio_port_rate(audio, &rate) != NX_SUCCESS)
         return 2;
     nx_frame_audio_format_t format = {.kind = NX_FRAME_AUDIO_SAI,
                                       .sample = NX_FRAME_PCM_SIGNED,

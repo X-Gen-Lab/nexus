@@ -1,6 +1,6 @@
 # Current canonical messages; semantic review admission is tracked separately.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 5eecec0c67906a5fe192c2b99e936024a5e0a7107653dfbd23d7c0f89e52131e\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: daebe2d3b150300c884e0b9973dacf4c8a6c8ff9c6b3d66345c00ad21fe8a3eb\n"
 
 msgid "F407 物理存储与制造维护"
 msgstr "F407 physical storage and manufacturing maintenance"
@@ -23,8 +23,8 @@ msgstr "OTP data occupies `0x1fff7800..0x1fff79ff`, sixteen 32-byte blocks. The 
 msgid "Option Bytes 和保护"
 msgstr "Option Bytes and protection"
 
-msgid "完整目标 image 包括语义 RDP 级别、按物理密度限定的写保护 sector 集合，以及 BOR/USER 字段。BOR 值是硬件编码：0 为 level3、1 为 level2、2 为 level1、3 为 关闭。USER 明确选择硬件 watchdog、STOP reset 和 STANDBY reset，不推导产品策略。 F407 不提供 PCROP 或双 bank 选项；不能把其它 F4 型号的功能套用到这两个型号。"
-msgstr "The complete target image includes semantic RDP level, write-protected sectors bounded by actual density, and BOR/USER fields. BOR uses hardware encodings: 0=level3, 1=level2, 2=level1 and 3=disabled. USER explicitly selects hardware watchdog, STOP reset and STANDBY reset without inferring product policy. F407 offers neither PCROP nor dual-bank options; features of other F4 parts do not apply to these two parts."
+msgid "完整目标 image 包括语义 RDP 级别、按物理密度限定的写保护 sector 集合，以及 BOR/USER 字段。`brownout` 使用固定宽度语义 profile：DISABLED、SUPPLY_2V1、 SUPPLY_2V4 或 SUPPLY_2V7，provider 独立映射到寄存器编码。零值 UNKNOWN 表示 未选择，在任何硬件效果之前拒绝；关闭 BOR 必须显式选择 DISABLED。所选官方 HAL 将三个 供电 profile 分别关联到 2.10–2.40 V、2.40–2.70 V 和 2.70–3.60 V 工作范围； 这些名称不表示精确复位阈值或实测电压，具体器件限值与容差仍须遵守。USER 明确选择 硬件 watchdog、STOP reset 和 STANDBY reset，不推导产品策略。F407 不提供 PCROP 或双 bank 选项；不能把其它 F4 型号的功能套用到这两个型号。"
+msgstr "The complete target image includes semantic RDP level, write-protected sectors bounded by actual density, and BOR/USER fields. `brownout` uses a fixed-width semantic profile: DISABLED, SUPPLY_2V1, SUPPLY_2V4 or SUPPLY_2V7; the provider independently maps it to register encodings. Zero means UNKNOWN and is rejected before hardware effects; disabling BOR requires explicit DISABLED. The selected official HAL associates these three supply profiles with operating ranges of 2.10–2.40 V, 2.40–2.70 V and 2.70–3.60 V respectively. These names are neither exact reset thresholds nor measured voltages; device limits and tolerances remain authoritative. USER explicitly selects hardware watchdog, STOP reset and STANDBY reset without inferring product policy. F407 offers neither PCROP nor dual-bank options; features of other F4 parts do not apply to these two parts."
 
 msgid "每次操作单独声明已确认的效果：OTP_PROGRAM、OTP_LOCK、OPTIONS、MASS_ERASE、 PERMANENT。缺失对应声明时，在解锁或第一脉冲之前拒绝。这些位只是调用者显式 承担效果的合同，不是认证方案。读取与修改必须由同一特权、未屏蔽中断的 Thread 执行者串行推进，不能与普通 Flash、调试器或另一 HAL owner 并行操作。"
 msgstr "Each operation separately acknowledges its effects: OTP_PROGRAM, OTP_LOCK, OPTIONS, MASS_ERASE and PERMANENT. Missing acknowledgements reject before unlock or the first pulse. These bits express caller responsibility for effects, not authentication. One privileged Thread executor with interrupts unmasked serializes reads and changes with ordinary Flash; debuggers and other HAL owners cannot operate concurrently."

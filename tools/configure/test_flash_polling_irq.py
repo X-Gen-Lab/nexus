@@ -123,8 +123,8 @@ class FlashPollingIrqTests(unittest.TestCase):
                     r"s_nx_capability_flash_physical\s*=\s*\{\s*([^,]+),",
                     capabilities)
                 self.assertIsNotNone(match)
-                self.assertIn("NX_FACTORY_CAP_POLLING", match[1])
-                self.assertNotIn("NX_FACTORY_CAP_IRQ", match[1])
+                self.assertIn("NX_IO_CAP_POLLING", match[1])
+                self.assertNotIn("NX_IO_CAP_IRQ", match[1])
                 for field in ("irq_priority = 5", "calls_os = true"):
                     path = self.directory / f"{label}-irq-option.toml"
                     path.write_text(self.assembly(label).read_text(

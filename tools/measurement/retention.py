@@ -158,6 +158,24 @@ def operations_layout(body):
 def operations_fields(body, slot_names, children):
     """Keep source slot order and permit no opaque pointer expressions."""
     tokens = [token.strip() for token in body.strip().rstrip(",").split(",")]
+    conditional = {}
+    for index, token in enumerate(tokens):
+        if "#" not in token:
+            continue
+        # One direct optional method is the only supported conditional form.
+        # Keep both alternatives; the linked table word selects the observed
+        # branch later, without guessing compiler definitions from source.
+        match = re.fullmatch(
+            r"#if[ \t]+defined[ \t]*\([ \t]*([A-Za-z_]\w*)[ \t]*\)"
+            r"[ \t]*\r?\n[ \t]*(?!NULL\b)([A-Za-z_]\w*)[ \t]*\r?\n"
+            r"[ \t]*#else[ \t]*\r?\n[ \t]*NULL[ \t]*\r?\n"
+            r"[ \t]*#endif", token)
+        if match is None or conditional:
+            raise EvidenceError("unsupported concrete operations initializer")
+        condition, method = match.groups()
+        conditional[index] = {"if_defined": condition, "defined": method,
+                              "undefined": "NULL"}
+        tokens[index] = method
     if all(re.fullmatch(r"&\s*[A-Za-z_]\w*|[A-Za-z_]\w*|0", token)
            for token in tokens):
         if len(tokens) > len(slot_names):
@@ -173,11 +191,15 @@ def operations_fields(body, slot_names, children):
     if (len(fields) != len(dict(fields))
             or not set(dict(fields)).issubset(slot_names)):
         raise EvidenceError("unsupported concrete operations initializer")
-    for name, value in fields:
+    for index, (name, value) in enumerate(fields):
         pattern = (r"&\s*[A-Za-z_]\w*|NULL|0" if name in children else
                    r"[A-Za-z_]\w*|0")
         if re.fullmatch(pattern, value) is None:
             raise EvidenceError("unsupported concrete operations initializer")
+        if index in conditional:
+            if name in children:
+                raise EvidenceError("unsupported concrete operations initializer")
+            fields[index] = name, conditional[index]
     return dict(fields)
 
 
@@ -607,6 +629,12 @@ def operations_table(elf, operations, expected_type, slot_names, provider, *,
             subtables.append(entry)
             continue
         expected = provider["fields"].get(slot_name, "NULL")
+        if isinstance(expected, dict):
+            observed = "defined" if pointer else "undefined"
+            result.setdefault("conditional_methods", []).append({
+                "slot": index, "name": slot_name,
+                "if_defined": expected["if_defined"], "observed": observed})
+            expected = expected[observed]
         if expected in ("NULL", "0"):
             if pointer:
                 raise EvidenceError("uninitialized method unexpectedly linked")

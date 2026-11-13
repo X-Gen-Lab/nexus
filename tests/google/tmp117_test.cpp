@@ -555,11 +555,11 @@ TEST(TMP117I2C, ExactRepeatedStartReadAndWritesAreSettledAndCounted) {
                              size_t* transferred) {
             EXPECT_FALSE(messages[0].read);
             EXPECT_EQ(messages[0].length, 1U);
-            EXPECT_EQ(messages[0].data[0], pointer);
+            EXPECT_EQ(messages[0].buffer.tx[0], pointer);
             EXPECT_TRUE(messages[1].read);
             EXPECT_EQ(messages[1].length, 2U);
-            messages[1].data[0] = 0x01U;
-            messages[1].data[1] = 0x17U;
+            messages[1].buffer.rx[0] = 0x01U;
+            messages[1].buffer.rx[1] = 0x17U;
             *transferred = 3U;
             return NX_SUCCESS;
         }));
@@ -572,7 +572,7 @@ TEST(TMP117I2C, ExactRepeatedStartReadAndWritesAreSettledAndCounted) {
                              size_t* transferred) {
             EXPECT_FALSE(messages[0].read);
             EXPECT_EQ(messages[0].length, 3U);
-            EXPECT_EQ(std::memcmp(messages[0].data, write, 3U), 0);
+            EXPECT_EQ(std::memcmp(messages[0].buffer.tx, write, 3U), 0);
             *transferred = 3U;
             return NX_SUCCESS;
         }));

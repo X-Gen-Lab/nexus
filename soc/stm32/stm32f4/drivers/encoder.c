@@ -84,8 +84,8 @@ nx_result_t nx_stm32_encoder_prepare(nx_stm32_encoder_state_t* state,
         (config->registers != TIM1 && config->registers != TIM8 &&
          config->registers != TIM3 && config->registers != TIM4 &&
          config->registers != TIM5) ||
-        config->mode < NX_ENCODER_MODE_X2_TI1 ||
-        config->mode > NX_ENCODER_MODE_X4_TI12 || config->filter_a > 15U ||
+        config->mode < NX_ENCODER_MODE_X2_A ||
+        config->mode > NX_ENCODER_MODE_X4 || config->filter_a > 15U ||
         config->filter_b > 15U)
         return NX_ERROR_INVALID;
     if (!context_ok())
@@ -267,7 +267,15 @@ static nx_result_t read(void* context, nx_encoder_sample_t* sample) {
         .observed_at = observed};
     return NX_SUCCESS;
 }
-/** \brief Selected filter codes remain distinct from actual enable state. */
+/** \brief RM0090 ICxF sampling with the cold-selected CKD divisor of one. */
+static nx_encoder_filter_t filter_info(uint8_t code) {
+    static const nx_encoder_filter_t filters[] = {
+        {0U, 0U},  {1U, 2U},  {1U, 4U},  {1U, 8U}, {2U, 6U},  {2U, 8U},
+        {4U, 6U},  {4U, 8U},  {8U, 6U},  {8U, 8U}, {16U, 5U}, {16U, 6U},
+        {16U, 8U}, {32U, 5U}, {32U, 6U}, {32U, 8U}};
+    return filters[code];
+}
+/** \brief Keep private silicon encodings out of the public observations. */
 static nx_result_t describe(const void* context, nx_encoder_state_t* result) {
     const nx_stm32_encoder_state_t* state = context;
     nx_result_t status = ready(state);
@@ -287,7 +295,8 @@ static nx_result_t describe(const void* context, nx_encoder_state_t* result) {
 #endif
         .mode = config->mode,
         .counter_bits = config->registers == TIM5 ? 32U : 16U,
-        .filter_a = config->filter_a, .filter_b = config->filter_b,
+        .filter_a = filter_info(config->filter_a),
+        .filter_b = filter_info(config->filter_b),
         .running = LL_TIM_IsEnabledCounter(config->registers) != 0U
     };
     return NX_SUCCESS;

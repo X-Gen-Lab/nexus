@@ -6,8 +6,8 @@
 #ifndef NX_STM32F407_UART_WIRE_H
 #define NX_STM32F407_UART_WIRE_H
 
-#include "nexus/io/uart_wire.h"
-#include "stm32f407_provider.h"
+#include "stm32f4_uart.h"
+#include "stm32f4_uart_wire_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,8 +18,9 @@ extern "C" {
  * \param[in] config: Immutable wire tuple; no pointer is retained.
  * \return Success, INVALID or UNSUPPORTED; no hardware effects on refusal.
  */
-nx_result_t nx_stm32_uart_wire_validate(const nx_stm32_uart_state_t* port,
-                                        const nx_uart_wire_config_t* config);
+nx_result_t
+nx_stm32_uart_wire_validate(const nx_stm32_uart_state_t* port,
+                            const nx_stm32_uart_wire_config_t* config);
 /** \brief Initialize a complete selected wire tuple before UE/IRQ enable.
  * \param[in,out] port: Idle caller-owned static state and ring storage.
  * \param[in] clock_hz: Selected exact APB clock in Hz.
@@ -28,9 +29,9 @@ nx_result_t nx_stm32_uart_wire_validate(const nx_stm32_uart_state_t* port,
  * \note Privileged Thread startup; cold owner owns pads, gate and publisher.
  *       Every mode reuses byte/event TX/RX, cancellation, stop and TC drain.
  */
-nx_result_t nx_stm32_uart_wire_initialize(nx_stm32_uart_state_t* port,
-                                          uint32_t clock_hz,
-                                          const nx_uart_wire_config_t* config);
+nx_result_t
+nx_stm32_uart_wire_initialize(nx_stm32_uart_state_t* port, uint32_t clock_hz,
+                              const nx_stm32_uart_wire_config_t* config);
 
 /** \brief Internal complete pre-enable tuple used by reviewed wire owners.
  * \param[in,out] port: Uninitialized owner with static receive storage.

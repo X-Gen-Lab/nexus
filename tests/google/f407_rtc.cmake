@@ -11,6 +11,7 @@ target_include_directories(nexus_f407_rtc_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 nexus_use_cmsis_core(nexus_f407_rtc_test)
 target_compile_definitions(nexus_f407_rtc_test PRIVATE STM32F407xx
+    NX_STM32_RTC_PERIODIC_WAKEUP=1
     nx_arch_is_privileged=nx_f407_rtc_privileged
     nx_arch_in_isr=nx_f407_rtc_in_isr
     nx_arch_irq_is_masked=nx_f407_rtc_masked

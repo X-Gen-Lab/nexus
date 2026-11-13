@@ -391,10 +391,36 @@ HS Device DMA 使用每方向静态 SRAM staging 和独立 24 B SETUP staging；
 CCM 不可选。完成还必须证明 endpoint disabled、AHB idle、DMA 地址撤回读回和 IRQ
 会合；失败保持 QUARANTINED，不能只看 XFRC 或 timeout 释放调用者存储。
 
-Host 每个所选 channel 同时借用一个 packet；buffer capacity 覆盖 HAL 的完整 word
-访问，IN 还覆盖 MPS。NAK／NYET 返回 NACK，由协议 owner 明确重试。锁定 HCD 的
-回调只锁存事实；取消／超时保守排空整个共享 FIFO controller。旧 channel、DMA
-地址、FIFO 和 IRQ 全部退出才 SETTLED。Host 没有自动 hub split 策略。
+Host 公共操作使用装配局部的 `nx_usb_host_pipe_id_t`，与 endpoint 地址和物理 HCD
+channel 独立。默认逻辑 pipe 与所选 channel 同序，不生成映射数组；可选
+`pipe_channels` 是长度为 `channel_count`、元素为 0 至 `channel_count-1` 的排列。
+固定 Host 和 managed role 的 Host 共用该配置。映射为只读数据，必须存活到完整冷态
+停止后；改变映射前须退出全部 packet、IRQ 和角色使用者。
+
+F4 在 open、close、submit、cancel 边界执行一次逻辑到物理转换；HAL callback、
+硬件排空和保存的 request 始终使用物理 slot，不进行反向搜索。每个所选 Host 的只读
+配置增加一个指针；只有显式映射生成每 pipe 一字节的只读数组，没有新增可变队列、
+反向表或全局设备注册。准入拒绝 request／payload 与活跃配置或映射的已知重叠。
+
+Host 每个所选 pipe 同时借用一个 packet。打开 pipe 后，调用者按 payload 长度查询
+`nx_usb_host_storage_requirements`，取得包含完整访问范围的 capacity 和地址 alignment；
+零长 OUT 也查询真实最小范围。查询不访问外设 MMIO，不准入或借用存储，也不授予
+DMA 可达性。缺少可选查询返回 UNSUPPORTED，调用者不得猜测默认几何。
+
+F4 provider 的 PIO 地址 alignment 为 1，OUT 范围按四字节取整，IN 覆盖四字节取整的
+MPS；HS DMA 的地址 alignment 为 4，零长 OUT 仍需四字节可读范围。实际 DMA 地址还
+必须通过原有内存域检查。查询与 submit 共享同一范围计算；查询输出不得覆盖活跃
+配置、映射、request、payload 或 managed role 保留的非活动 Device 元数据。
+普通公共 prepare 合同不包含这些 F4 编码规则。
+
+官方 Host bridge 在每次 packet 的复制／补零／准入前消费查询结果，验证既有 staging
+的容量和对齐；OUT 只补零声明的额外访问范围。调用者继续提供精确存储预算，桥接
+不自动分配或扩容，也不强制全部后端使用 1024 B 最小存储或四字节对齐。此查询增加
+一个可选只读 ops 项及所选代码，没有新增 provider 可变字段、队列或缓冲区。
+
+NAK／NYET 返回 NACK，由协议 owner 明确重试。锁定 HCD 的回调只锁存事实；
+取消／超时保守排空整个共享 FIFO controller。旧物理 slot、DMA 地址、FIFO 和 IRQ
+全部退出才 SETTLED。Host 没有自动 hub split 策略。
 
 Host control pipe 的 MPS 按实际速度准入：low-speed 为 8，full-speed 为
 8／16／32／64，high-speed 为 64；非法组合在 HAL 和 channel 副作用前拒绝。

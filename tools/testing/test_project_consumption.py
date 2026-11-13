@@ -70,7 +70,7 @@ class CreatedProjectConsumptionTests(unittest.TestCase):
             (template / name).write_bytes(contents)
         manifest = {
             "schema": 1, "version": 1, "templates": {"public-native": {
-                "platform": {"interface_epoch": 2, "assembly_schema": 2},
+                "platform": {"interface_epoch": 3, "assembly_schema": 2},
                 "files": {name: hashlib.sha256(contents).hexdigest()
                           for name, contents in payload.items()}}},
         }

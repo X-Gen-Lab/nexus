@@ -276,8 +276,9 @@ def editor_schema():
         if "irq" in fields:
             properties["irq"] = record({"priority", "calls_os"}, {"priority"})
             properties["irq"]["properties"]["calls_os"] = {"type": "boolean"}
-        from tools.configure import usb_otg
+        from tools.configure import usb_otg, usb_host
         usb_otg.nested_editor_schema(properties, fields, record)
+        usb_host.pipe_editor_schema(properties, fields)
         uart_formats.receive_editor_schema(properties, fields, record)
         from tools.configure import uart_wires
         uart_wires.editor_schema(properties, fields)
@@ -338,10 +339,11 @@ def editor_schema():
         "properties"]["limit_bytes"] = {"type": "integer", "minimum": 4,
                                         "multipleOf": 4}
     properties["can_domain"] = record({"split", "filters"}, {"split", "filters"})
-    filter_fields = {"controller", "bank", "id", "mask", "format", "fifo",
-                     "remote", "match_remote"}
+    filter_fields = can.FILTER_FIELDS
     properties["can_domain"]["properties"]["filters"] = {
-        "type": "array", "items": record(filter_fields, filter_fields)}
+        "type": "array", "items": record(filter_fields, filter_fields - {"tag"})}
+    properties["can_domain"]["properties"]["filters"]["items"]["properties"][
+        "tag"] = {"type": "integer", "minimum": 1, "maximum": 65535}
     properties["os"] = {"anyOf": [kernel.editor_schema(), threadx.editor_schema()]}
     schema["allOf"] = [
         {"if": {"properties": {"backend": {"const": backend}},
@@ -447,7 +449,8 @@ def editor_schema():
                  "not": {"anyOf": [{"required": ["read_timing"]},
                                     {"required": ["write_timing"]}]}}]
             endpoint["properties"]["mode"] = {
-                "enum": ["cpu-window", "startup-memory", "psram-window"]}
+                "enum": ["cpu-window", "startup-memory", "psram-window",
+                         "graphics-owned"]}
         for field in ("read_timing", "write_timing"):
             if field not in fields:
                 continue

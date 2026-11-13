@@ -7,7 +7,7 @@
 #define NEXUS_STM32F407_UART_WORD_H
 
 #include "nexus/io/uart_word.h"
-#include "stm32f407_provider.h"
+#include "stm32f4_uart.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -300,7 +300,8 @@ static bool i2c_transaction_and_recovery(void) {
     CHECK(nx_native_i2c_configure(memory, 32, 0x76) == NX_SUCCESS);
     uint8_t address = 10;
     uint8_t output[2] = {0};
-    nx_i2c_message_t messages[] = {{&address, 1, false}, {output, 2, true}};
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(&address, 1),
+                                   nx_i2c_message_read(output, 2)};
     size_t transferred;
     CHECK(nx_i2c_endpoint_transaction(nx_native_i2c, messages, 2, 100,
                                       &transferred) == NX_SUCCESS);

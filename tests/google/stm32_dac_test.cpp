@@ -207,6 +207,7 @@ TEST_F(DacOwner, PreparationKeepsBothOutputsDisabledAndMapsOnlyAnalogPads) {
     ASSERT_EQ(NX_SUCCESS, nx_dac_port_info(&face, &info));
     EXPECT_EQ(3U, info.channel_mask);
     EXPECT_EQ(4095U, info.maximum_code);
+    EXPECT_EQ(12U, info.code_bits);
     EXPECT_TRUE(info.output_buffer);
 }
 TEST_F(DacOwner, SingleWritesKeepOtherChannelAndUnselectedFields) {
@@ -223,13 +224,18 @@ TEST_F(DacOwner, LeftAlignedStorageDoesNotChangeThePublicRawCodeUnit) {
     EXPECT_EQ(0xabc0U, DAC->DHR12L1);
     EXPECT_EQ(0xabcU, DAC->DOR1);
 }
-TEST_F(DacOwner, EightBitInputReadbackRemainsTwelveBitRightAligned) {
+TEST_F(DacOwner, EightBitReadbackUsesTheSelectedPublicCodeUnit) {
     config.format = NX_DAC_FORMAT_U8;
     ASSERT_EQ(NX_SUCCESS, nx_stm32_dac_prepare(&state, &config));
     ASSERT_EQ(NX_SUCCESS, nx_dac_port_write(&face, 1U, 0xabU));
     nx_dac_state_t sample{};
     ASSERT_EQ(NX_SUCCESS, nx_dac_port_state(&face, &sample));
-    EXPECT_EQ(0xab0U, sample.digital_output12[0]);
+    EXPECT_EQ(0xabU, sample.output_codes[0]);
+    EXPECT_EQ(8U, sample.code_bits);
+    nx_dac_info_t info{};
+    ASSERT_EQ(NX_SUCCESS, nx_dac_port_info(&face, &info));
+    EXPECT_EQ(8U, info.code_bits);
+    EXPECT_EQ(0xab0U, DAC->DOR1);
     const size_t count = writes.size();
     EXPECT_EQ(NX_ERROR_INVALID, nx_dac_port_write(&face, 1U, 256U));
     EXPECT_EQ(count, writes.size());

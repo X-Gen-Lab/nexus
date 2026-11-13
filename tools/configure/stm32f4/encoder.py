@@ -6,9 +6,9 @@ from tools.configure.ir import controller_ir
 from tools.configure.providers.common import Construction, fail, integer
 
 COUNTING = MappingProxyType({
-    'x2-ti1': 'NX_ENCODER_MODE_X2_TI1',
-    'x2-ti2': 'NX_ENCODER_MODE_X2_TI2',
-    'x4-ti12': 'NX_ENCODER_MODE_X4_TI12',
+    'x2-a': 'NX_ENCODER_MODE_X2_A',
+    'x2-b': 'NX_ENCODER_MODE_X2_B',
+    'x4': 'NX_ENCODER_MODE_X4',
 })
 PINS = MappingProxyType({
     'TIM1': (('PA8', 'ti1', 1), ('PA9', 'ti2', 1)),
@@ -26,7 +26,7 @@ def validate(selection, route):
         fail('Encoder requires a reviewed F407 TI1/TI2 pair')
     counting = selection['counting']
     if type(counting) is not str or counting not in COUNTING:
-        fail('Encoder counting must select x2-ti1, x2-ti2 or x4-ti12')
+        fail('Encoder counting must select x2-a, x2-b or x4')
     integer(selection['filter_a'], 0, 15, 'Encoder filter_a')
     integer(selection['filter_b'], 0, 15, 'Encoder filter_b')
     for field in ('invert_a', 'invert_b', 'exclusive'):

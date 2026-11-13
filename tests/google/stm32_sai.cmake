@@ -2,7 +2,8 @@
 # Author: Nexus Team
 nexus_google_test(nexus_audio_layout_test
     SOURCES audio_layout_test.cpp "${NEXUS_SOURCE_DIR}/io/src/api/audio.c"
-    LIBRARIES Nexus::IOAudio Nexus::IOStream)
+    LIBRARIES Nexus::IOAudio Nexus::IOStream
+    INCLUDES "${NEXUS_SOURCE_DIR}/io/private")
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     foreach(slice slave master fraction)
         set(sai_test "nexus_stm32_sai_${slice}_test")

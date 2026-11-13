@@ -4,7 +4,7 @@
 编译器／ABI、工作任务与资源预算；vendor 头和具体 provider 状态私有，不导出通用
 预编译 MCU ABI 或应用生成器。版本唯一权威是
 `dependencies/platform-compatibility.json`；CMake、生成头、安装包从它派生。
-source interface epoch `2` 与 assembly schema `2` 分别计代，不随语义版本自动改变。
+source interface epoch `3` 与 assembly schema `2` 分别计代，不随语义版本自动改变。
 
 ## 打包与消费
 
@@ -72,12 +72,15 @@ runtime 策略，已测路径例如 `-fno-exceptions -fno-rtti`。
 
 ## 当前源码接口代际
 
-当前开发快照保留版本 `0.2.1`，factory／source interface epoch 为 2，SDK manifest
+当前开发快照保留版本 `0.2.1`，factory／source interface epoch 为 3，SDK manifest
 格式为 2；二者由各自 authority 校验，不从相同数字推导兼容。当前消费者明确拒绝
-旧 epoch 1，所有调用者、face／ops、factory 和 provider 必须用同一精确源码重编。
+旧 epoch 1／2，所有调用者、face／ops、factory 和 provider 必须用同一精确源码重编。
 ADC group 的直接 `request.frames` 访问迁为 `request.output.frames`，优先用
 `nx_adc_group_prepare()` 设置 RAW discriminant；paired 请求使用独立 prepare 入口。
-不提供旧字段影子或二进制混用。详细步骤见[迁移指南](../../docs/guides/migration.md)，
+该 epoch-2 ADC 结果合同在 epoch 3 保留。公共 traits 改用 `nexus/io/traits.h`
+领域类型，通用 capability 用 `nx_io_capability_t`／`NX_IO_CAP_*`；增强 SPI 端点 traits
+为 `nx_spi_transaction_traits_t`，I2C profile 使用 `nx_i2c_limits_t`。SDIO function 请求直接持有 `base` 与数据字段，不再借用块设备的 LBA
+结构。不提供旧字段影子或二进制混用。详细步骤见[迁移指南](../../docs/guides/migration.md)，
 策略见[源码兼容性合同](../../docs/design/source-compatibility.md)。
 
 ## 完整安装消费者验证

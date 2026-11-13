@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_uart_wire.h"
+#include "stm32f4_uart_format.h"
 #include "stm32f4xx_ll_usart.h"
 #include "uart_control.h"
 
@@ -113,7 +114,7 @@ nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
 nx_result_t nx_stm32_uart_initialize_format(nx_stm32_uart_state_t* port,
                                             uint32_t clock_hz,
                                             nx_uart_format_t format) {
-    nx_result_t result = nx_uart_format_validate(format);
+    nx_result_t result = nx_stm32_uart_frame_validate(format);
     if (result != NX_SUCCESS) {
         return result;
     }
@@ -672,7 +673,7 @@ nx_result_t nx_stm32_uart_tx_validate(void* context,
  */
 nx_result_t nx_stm32_uart_format_configure(nx_stm32_uart_state_t* state,
                                            nx_uart_format_t format) {
-    nx_result_t result = nx_uart_format_validate(format);
+    nx_result_t result = nx_stm32_uart_frame_validate(format);
     if (state == NULL || state->registers == NULL) {
         return NX_ERROR_INVALID;
     }

@@ -318,7 +318,10 @@ TEST_F(EthernetFramesMac, RxChecksumUsesActualEsaAndRetainsMetadataWithLoan) {
     ASSERT_EQ(NX_SUCCESS, Acquire(&loan, &view, 1U));
     EXPECT_EQ(NX_ETH_FRAMES_RX_CHECKSUM_AVAILABLE |
                   NX_ETH_FRAMES_RX_CHECKSUM_IPV4 |
-                  NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_ERROR | 2U,
+                  NX_ETH_FRAMES_RX_CHECKSUM_HEADER_CHECKED |
+                  NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_CHECKED |
+                  NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_ERROR |
+                  NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_TCP,
               loan.checksum_flags);
     auto altered = loan;
     altered.checksum_flags = 0U;
@@ -329,6 +332,48 @@ TEST_F(EthernetFramesMac, RxChecksumUsesActualEsaAndRetainsMetadataWithLoan) {
     Progress();
     ASSERT_EQ(NX_SUCCESS, Acquire(&loan, &view, 1U));
     EXPECT_EQ(0U, loan.checksum_flags);
+}
+TEST_F(EthernetFramesMac, RxChecksumSeparatesProtocolAndCheckedResults) {
+    mac.checksum_offload = true;
+    Start();
+    constexpr uint32_t available = NX_ETH_FRAMES_RX_CHECKSUM_AVAILABLE;
+    constexpr uint32_t ipv4 = NX_ETH_FRAMES_RX_CHECKSUM_IPV4;
+    constexpr uint32_t ipv6 = NX_ETH_FRAMES_RX_CHECKSUM_IPV6;
+    constexpr uint32_t header = NX_ETH_FRAMES_RX_CHECKSUM_HEADER_CHECKED;
+    constexpr uint32_t payload = NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_CHECKED;
+    struct Observation {
+        uint32_t descriptor;
+        uint32_t semantic;
+    };
+    const Observation cases[] = {
+        {0x41U, available | ipv4 | header | payload |
+                    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_UDP},
+        {0x5aU, available | ipv4 | header | payload |
+                    NX_ETH_FRAMES_RX_CHECKSUM_HEADER_ERROR |
+                    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_ERROR |
+                    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_TCP},
+        {0x83U,
+         available | ipv6 | payload | NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_ICMP},
+        {0x7aU, available | ipv4 | NX_ETH_FRAMES_RX_CHECKSUM_BYPASSED |
+                    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_TCP},
+        {0x40U, available | ipv4 | header},
+        {0U, available},
+        {0x44U, 0U},
+        {0xc1U, 0U},
+        {0x80000041U, 0U},
+    };
+    for (size_t i = 0U; i < std::size(cases); ++i) {
+        const size_t index = i % count;
+        SCOPED_TRACE(i);
+        RxFrame(index, 64U, false, 1U);
+        rx[index].extended = cases[i].descriptor;
+        Progress();
+        nx_eth_frames_rx_loan_t loan{};
+        nx_eth_fragment_t view{};
+        ASSERT_EQ(NX_SUCCESS, Acquire(&loan, &view, 1U));
+        EXPECT_EQ(cases[i].semantic, loan.checksum_flags);
+        EXPECT_EQ(NX_SUCCESS, Release(&loan));
+    }
 }
 #if defined(NX_ETH_FRAMES_TEST_STM32)
 TEST_F(EthernetFramesMac, MiiSelectionAcceptsOnlyTheMatchingSyscfgMode) {

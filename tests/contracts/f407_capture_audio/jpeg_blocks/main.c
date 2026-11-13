@@ -18,7 +18,7 @@ static nx_stream_t s_stream;
  */
 static nx_result_t consume(const nx_capture_t* capture, nx_time_us_t deadline) {
     for (;;) {
-        nx_result_t result = capture->ops->service(capture->context);
+        nx_result_t result = nx_capture_port_service(capture);
         if (result != NX_SUCCESS && result != NX_ERROR_BUSY)
             return result;
         nx_stream_block_t block;
@@ -45,7 +45,7 @@ static nx_result_t join(const nx_capture_t* capture) {
         NX_SUCCESS)
         return NX_ERROR_EXHAUSTED;
     for (;;) {
-        nx_result_t result = capture->ops->stop(capture->context);
+        nx_result_t result = nx_capture_port_stop(capture);
         if (result == NX_SUCCESS)
             return result;
         if (result != NX_ERROR_BUSY)
@@ -79,7 +79,7 @@ int main(void) {
     if (nx_deadline_finite_after(nx_time_now_us(), 1000000U, &deadline) !=
         NX_SUCCESS)
         return (int)NX_ERROR_EXHAUSTED;
-    result = capture->ops->start_blocks(capture->context, &s_stream);
+    result = nx_capture_port_start_blocks(capture, &s_stream);
     if (result == NX_SUCCESS)
         result = consume(capture, deadline);
     nx_result_t stopped = join(capture);

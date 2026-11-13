@@ -8,6 +8,7 @@
 #include "nexus/arch/arch.h"
 #include "nexus/io/display.h"
 #include "stm32f407_system.h"
+#include "stm32f4_graphics_memory.h"
 #if !defined(USE_HAL_LTDC_REGISTER_CALLBACKS)
 #define USE_HAL_LTDC_REGISTER_CALLBACKS 0U
 #elif USE_HAL_LTDC_REGISTER_CALLBACKS != 0U
@@ -81,6 +82,7 @@ typedef struct {
     uint32_t pllsai_divr;
     nx_time_us_t drain_us;
     uint8_t priority;
+    nx_stm32_sdram_graphics_t* graphics_memory;
 } nx_stm32_ltdc_config_t;
 
 /** \brief Exact active/pending storage, HAL context and retryable receipt. */
@@ -111,6 +113,7 @@ typedef struct nx_stm32_ltdc_state {
     volatile bool fault;
     bool draining;
     bool executing;
+    bool memory_attached;
 } nx_stm32_ltdc_state_t;
 
 /** \brief Pure pre-System admission; no gate, pad, snapshot or state effect.

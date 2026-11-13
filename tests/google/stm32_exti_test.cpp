@@ -16,6 +16,11 @@ nx_time_us_t nx_time_now_us(void) {
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
+TEST(ExtiLayout, ASourceBoundEventFitsSixteenBytes) {
+    EXPECT_LE(sizeof(nx_exti_event_t), 16U);
+}
+
 extern "C" {
 nx_stm32_exti_nvic_model_t g_stm32_exti_nvic;
 }
@@ -102,7 +107,7 @@ class Stm32Exti : public testing::Test {
 
 TEST_F(Stm32Exti, LevelSamplesRawPinWithoutConsumingOrAcknowledgingEvents) {
     Start();
-    events[0] = {12U, 0U, 5U, NX_EXTI_FALLING};
+    events[0] = {12U, 0U, NX_EXTI_FALLING};
     first.count = first.head = 1U;
     registers.PR = 1U << 5U;
     const auto before = first;
@@ -355,7 +360,7 @@ TEST_F(Stm32Exti, EveryPadLinePreservesMuxPeersAndDispatchesItsOwnEvent) {
         size_t count = 0U;
         ASSERT_EQ(NX_SUCCESS, nx_exti_port_read(&face, &event, 1U, &count));
         EXPECT_EQ(1U, count);
-        EXPECT_EQ(line, event.line);
+        EXPECT_EQ(NX_EXTI_EVENT_COALESCED, event.flags);
         EXPECT_EQ(NX_EXTI_RISING, event.edge);
         EXPECT_EQ(0U, registers.PR);
         ASSERT_EQ(NX_SUCCESS, nx_stm32_exti_stop(&first));

@@ -434,7 +434,12 @@ class PhysicalFlashMaintenance : public PhysicalFlashProgram {
         PhysicalFlashProgram::TearDown();
     }
     nx_flash_options_t OpenOptions() const {
-        return {NX_FLASH_READ_OPEN, 0U, 3U, false, false, false};
+        return {NX_FLASH_READ_OPEN,
+                0U,
+                NX_FLASH_BROWNOUT_DISABLED,
+                false,
+                false,
+                false};
     }
 };
 
@@ -598,9 +603,41 @@ TEST_F(PhysicalFlashMaintenance, OptionsRequirePorAndNeverResetTheMachine) {
     EXPECT_NE(0U, registers.OPTCR & FLASH_OPTCR_OPTLOCK);
     EXPECT_FALSE(state.active);
 }
+TEST_F(PhysicalFlashMaintenance, BrownoutProfilesMapSupplyIntentToHardware) {
+    const std::array<nx_flash_brownout_t, 4> profiles{
+        NX_FLASH_BROWNOUT_DISABLED, NX_FLASH_BROWNOUT_SUPPLY_2V1,
+        NX_FLASH_BROWNOUT_SUPPLY_2V4, NX_FLASH_BROWNOUT_SUPPLY_2V7};
+    for (size_t index = 0U; index < profiles.size(); ++index) {
+        auto desired = OpenOptions();
+        desired.brownout = profiles[index];
+        ASSERT_EQ(NX_SUCCESS, nx_flash_maintenance_set_options(
+                                  &maintenance, &desired,
+                                  NX_FLASH_MAINTAIN_OPTIONS, 1000U));
+        EXPECT_EQ(3U - index, (registers.OPTCR & FLASH_OPTCR_BOR_LEV) >> 2U);
+        nx_flash_maintenance_snapshot_t snapshot{};
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_flash_maintenance_snapshot(&maintenance, &snapshot));
+        EXPECT_EQ(profiles[index], snapshot.options.brownout);
+    }
+}
+
+TEST_F(PhysicalFlashMaintenance, UnknownBrownoutProfileRejectsBeforeUnlock) {
+    for (uint8_t invalid : std::array<uint8_t, 2>{0U, 0xffU}) {
+        auto desired = OpenOptions();
+        desired.brownout = invalid;
+        const auto before = registers.OPTCR;
+        EXPECT_EQ(NX_ERROR_INVALID, nx_flash_maintenance_set_options(
+                                        &maintenance, &desired,
+                                        NX_FLASH_MAINTAIN_OPTIONS, 1000U));
+        EXPECT_EQ(before, registers.OPTCR);
+        EXPECT_EQ(0U, registers.OPTKEYR);
+        EXPECT_FALSE(state.active);
+    }
+}
+
 TEST_F(PhysicalFlashMaintenance, BorChangeRejectsUnsafeAhbDividerBeforeUnlock) {
     auto desired = OpenOptions();
-    desired.brownout_level = 2U;
+    desired.brownout = NX_FLASH_BROWNOUT_SUPPLY_2V1;
     clock_hpre = RCC_CFGR_HPRE_DIV4;
     uint32_t before = registers.OPTCR;
     EXPECT_EQ(NX_ERROR_UNSUPPORTED,
@@ -623,12 +660,12 @@ TEST_F(PhysicalFlashMaintenance, NonBorOptionsDoNotRequireAnAhbDividerChange) {
 }
 TEST_F(PhysicalFlashMaintenance, BorChangeSupportsBothSafeAhbDividers) {
     auto desired = OpenOptions();
-    desired.brownout_level = 2U;
+    desired.brownout = NX_FLASH_BROWNOUT_SUPPLY_2V1;
     clock_hpre = RCC_CFGR_HPRE_DIV2;
     EXPECT_EQ(NX_SUCCESS,
               nx_flash_maintenance_set_options(
                   &maintenance, &desired, NX_FLASH_MAINTAIN_OPTIONS, 1000U));
-    desired.brownout_level = 1U;
+    desired.brownout = NX_FLASH_BROWNOUT_SUPPLY_2V4;
     clock_hpre = RCC_CFGR_HPRE_DIV1;
     EXPECT_EQ(NX_SUCCESS,
               nx_flash_maintenance_set_options(

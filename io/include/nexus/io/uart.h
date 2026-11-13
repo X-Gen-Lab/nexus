@@ -67,6 +67,17 @@ typedef nx_result_t (*nx_uart_tx_validate_fn)(
     void* context, const nx_uart_tx_request_t* request);
 
 /**
+ * \brief Paired transport and exact-context admission callback.
+ * \note Integration obtains both from one typed identity. This value creates
+ *       no owner, storage loan or authentication guarantee. An unavailable
+ *       binding has both fields NULL; faces and callback outlive their uses.
+ */
+typedef struct {
+    const nx_uart_port_t* transport;
+    nx_uart_tx_validate_fn validate;
+} nx_uart_tx_binding_t;
+
+/**
  * \brief           Shared read-only methods using one provider state.
  *
  * \note            Methods follow each public operation's ownership contract.

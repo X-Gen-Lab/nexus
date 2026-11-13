@@ -86,27 +86,26 @@ TEST_F(NativeFactory, ColdI2CChildrenKeepPureControllerAndAddressIdentity) {
 }
 
 TEST_F(NativeFactory, SelectedCapabilitiesRemainReadonlyAndModelScoped) {
-    const nx_factory_io_capability_t* gpio =
+    const nx_io_capability_t* gpio =
         nx_factory_gpio_capability(NX_GPIO_ID_LED_A);
     ASSERT_NE(gpio, nullptr);
     EXPECT_EQ(gpio, nx_factory_gpio_capability(NX_GPIO_ID_LED_A));
-    EXPECT_EQ(gpio->features, NX_FACTORY_CAP_MODEL);
+    EXPECT_EQ(gpio->features, NX_IO_CAP_MODEL);
     EXPECT_EQ(nx_factory_gpio_capability(NX_GPIO_ID_COUNT), nullptr);
-    const nx_factory_io_capability_t* spi =
+    const nx_io_capability_t* spi =
         nx_factory_spi_capability(NX_SPI_ID_BUS_SPI_A);
     ASSERT_NE(spi, nullptr);
-    EXPECT_EQ(spi->features, NX_FACTORY_CAP_MODEL | NX_FACTORY_CAP_POLLING);
+    EXPECT_EQ(spi->features, NX_IO_CAP_MODEL | NX_IO_CAP_POLLING);
     EXPECT_EQ(spi->max_transfer_units, 0U);
     EXPECT_EQ(spi->unit_bytes, 1U);
     EXPECT_EQ(spi->buffer_alignment, 1U);
-    const nx_factory_io_capability_t* endpoint =
+    const nx_io_capability_t* endpoint =
         nx_factory_spi_device_capability(NX_SPI_DEVICE_ID_SENSOR_SPI_A);
     ASSERT_NE(endpoint, nullptr);
     EXPECT_EQ(endpoint->features, spi->features);
     EXPECT_EQ(nx_factory_spi_device_capability(NX_SPI_DEVICE_ID_COUNT),
               nullptr);
-    const nx_factory_io_capability_t* adc =
-        nx_factory_adc_capability(NX_ADC_ID_ADC0);
+    const nx_io_capability_t* adc = nx_factory_adc_capability(NX_ADC_ID_ADC0);
     ASSERT_NE(adc, nullptr);
     EXPECT_EQ(adc->max_transfer_units, 2U);
     EXPECT_EQ(adc->unit_bytes, 2U);
@@ -308,8 +307,8 @@ TEST_F(NativeFactory, GeneratedBusControllersAndEndpointMemoriesAreDistinct) {
         nx_factory_i2c_device(NX_I2C_DEVICE_ID_SENSOR_I2C_B);
     const nx_i2c_endpoint_t* i2c_child_c =
         nx_factory_i2c_device(NX_I2C_DEVICE_ID_SENSOR_I2C_C);
-    nx_i2c_message_t first_write = {first_data, 2, false};
-    nx_i2c_message_t second_write = {second_data, 2, false};
+    nx_i2c_message_t first_write = nx_i2c_message_write(first_data, 2);
+    nx_i2c_message_t second_write = nx_i2c_message_write(second_data, 2);
     ASSERT_EQ(
         nx_i2c_endpoint_transaction(i2c_child_a, &first_write, 1, 100, &count),
         NX_SUCCESS);
@@ -318,7 +317,8 @@ TEST_F(NativeFactory, GeneratedBusControllersAndEndpointMemoriesAreDistinct) {
         NX_SUCCESS);
     uint8_t address = 0;
     uint8_t value = 0;
-    nx_i2c_message_t messages[] = {{&address, 1, false}, {&value, 1, true}};
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(&address, 1),
+                                   nx_i2c_message_read(&value, 1)};
     ASSERT_EQ(
         nx_i2c_endpoint_transaction(i2c_child_a, messages, 2, 100, &count),
         NX_SUCCESS);
@@ -357,7 +357,7 @@ TEST_F(NativeFactory, StopRevokesOperationsAndRestartRetainsStaticIdentity) {
     size_t count = 0;
     EXPECT_EQ(nx_spi_endpoint_transfer(spi, &tx, nullptr, 1, 100, &count),
               NX_ERROR_STATE);
-    nx_i2c_message_t message = {&tx, 1, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&tx, 1);
     EXPECT_EQ(nx_i2c_endpoint_transaction(i2c, &message, 1, 100, &count),
               NX_ERROR_STATE);
     EXPECT_EQ(nx_native_uart_model_receive(uart, 1, 0), NX_ERROR_STATE);
@@ -415,7 +415,8 @@ TEST_F(NativeFactory, AllNineClassesStopAndRestartWithRetainedWatchdogEffect) {
     nx_exti_event_t event = {};
     size_t count = 0;
     ASSERT_EQ(nx_exti_port_read(exti, &event, 1, &count), NX_SUCCESS);
-    EXPECT_EQ(event.line, 6);
+    EXPECT_EQ(count, 1U);
+    EXPECT_EQ(event.edge, NX_EXTI_RISING);
     nx_watchdog_state_t effect = {};
     nx_result_t enabled =
         nx_watchdog_port_enable(watchdog, 100000, false, &effect);

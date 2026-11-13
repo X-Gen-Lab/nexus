@@ -18,6 +18,10 @@ using testing::_;
 using testing::Invoke;
 using testing::StrictMock;
 
+TEST(InfraredLayout, BoundSourceConfigurationFitsFortyBytes) {
+    EXPECT_LE(sizeof(nx_infrared_nec_config_t), 40U);
+}
+
 class EdgeSource {
   public:
     MOCK_METHOD(nx_result_t, Read, (nx_exti_event_t*, size_t, size_t*), ());
@@ -39,14 +43,13 @@ class Infrared : public testing::Test {
                                     {1400U, 1900U},
                                     120000U,
                                     200000U,
-                                    2U,
                                     NX_INFRARED_NEC_STANDARD,
                                     NX_INFRARED_SOURCE_STRICT};
     nx_time_us_t time = 1000U;
     nx_infrared_nec_result_t Edge(nx_exti_edge_t edge, uint32_t after = 0U,
                                   uint32_t flags = 0U) {
         time += after;
-        const nx_exti_event_t event{time, flags, config.line, edge};
+        const nx_exti_event_t event{time, flags, edge};
         return nx_infrared_nec_feed(&owner, &event);
     }
     void Init() {
@@ -149,7 +152,7 @@ TEST_F(Infrared, LossAndCoalescedEventsInvalidateFramesAndRepeats) {
     for (const auto flag : {NX_EXTI_EVENT_LOSS, NX_EXTI_EVENT_COALESCED}) {
         Init();
         ASSERT_EQ(NX_SUCCESS, Word(UINT32_C(0xCB34ED12)).result);
-        const nx_exti_event_t event{time + 900000U, flag, config.line,
+        const nx_exti_event_t event{time + 900000U, flag,
                                     static_cast<nx_exti_edge_t>(0)};
         EXPECT_EQ(NX_ERROR_OVERFLOW,
                   nx_infrared_nec_feed(&owner, &event).result);
@@ -172,14 +175,13 @@ TEST_F(Infrared, EqualOrBackwardActualTimestampLatchesUntilExplicitRebind) {
     EXPECT_EQ(NX_SUCCESS, Word(UINT32_C(0xCB34ED12)).result);
 }
 
-TEST_F(Infrared, WrongLineUnknownFlagsAndMalformedEdgeRejectUnchanged) {
+TEST_F(Infrared, UnknownFlagsAndMalformedEdgeRejectUnchanged) {
     Init();
     const auto before = owner;
     for (const nx_exti_event_t event :
-         {nx_exti_event_t{time, 0U, 3U, NX_EXTI_FALLING},
-          nx_exti_event_t{time, 8U, 2U, NX_EXTI_FALLING},
-          nx_exti_event_t{time, 0U, 2U, NX_EXTI_BOTH},
-          nx_exti_event_t{NX_DEADLINE_NEVER, 0U, 2U, NX_EXTI_FALLING}}) {
+         {nx_exti_event_t{time, 8U, NX_EXTI_FALLING},
+          nx_exti_event_t{time, 0U, NX_EXTI_BOTH},
+          nx_exti_event_t{NX_DEADLINE_NEVER, 0U, NX_EXTI_FALLING}}) {
         EXPECT_EQ(NX_ERROR_INVALID,
                   nx_infrared_nec_feed(&owner, &event).result);
         EXPECT_EQ(0, std::memcmp(&before, &owner, sizeof(owner)));
@@ -198,7 +200,7 @@ TEST_F(Infrared, ConfigurationRequiresDisjointUnambiguousBoundedWindows) {
         if (fault == 3U)
             invalid.frame_max_us = 1000U;
         if (fault == 4U)
-            invalid.line = 16U;
+            invalid.repeat_max_us = 5000001U;
         EXPECT_EQ(NX_ERROR_INVALID, nx_infrared_nec_init(&owner, &invalid));
         EXPECT_FALSE(owner.initialized);
     }
@@ -225,7 +227,7 @@ TEST_F(Infrared, PollReadsExactlyOneCopiedPublicEventWithoutSourceOwnership) {
     const nx_exti_port_t port{&edge_ops, &source};
     EXPECT_CALL(source, Read(_, 1U, _))
         .WillOnce(Invoke([&](nx_exti_event_t* events, size_t, size_t* count) {
-            *events = {time, 0U, config.line, NX_EXTI_FALLING};
+            *events = {time, 0U, NX_EXTI_FALLING};
             *count = 1U;
             return NX_SUCCESS;
         }));
@@ -239,7 +241,7 @@ TEST_F(Infrared, ReadCallbackCannotReenterFeedInitStopOrPoll) {
     const nx_exti_port_t port{&edge_ops, &source};
     EXPECT_CALL(source, Read(_, 1U, _))
         .WillOnce(Invoke([&](nx_exti_event_t*, size_t, size_t* count) {
-            const nx_exti_event_t event{time, 0U, config.line, NX_EXTI_FALLING};
+            const nx_exti_event_t event{time, 0U, NX_EXTI_FALLING};
             EXPECT_EQ(NX_ERROR_BUSY,
                       nx_infrared_nec_feed(&owner, &event).result);
             EXPECT_EQ(NX_ERROR_BUSY, nx_infrared_nec_init(&owner, &config));
@@ -286,7 +288,7 @@ TEST_F(Infrared, IndependentInstancesKeepNoSharedProtocolOrRepeatState) {
     ASSERT_EQ(NX_SUCCESS, nx_infrared_nec_init(&other, &config));
     ASSERT_EQ(NX_SUCCESS, Word(UINT32_C(0xCB34ED12)).result);
     EXPECT_FALSE(other.last_valid);
-    const nx_exti_event_t event{1U, 0U, config.line, NX_EXTI_FALLING};
+    const nx_exti_event_t event{1U, 0U, NX_EXTI_FALLING};
     EXPECT_EQ(NX_ERROR_EMPTY, nx_infrared_nec_feed(&other, &event).result);
     EXPECT_TRUE(owner.last_valid);
 }
@@ -364,7 +366,7 @@ TEST_F(Infrared, ConsumedInvalidSourceFactCannotPreserveAnOlderRepeatCommand) {
     const nx_exti_port_t port{&edge_ops, &source};
     EXPECT_CALL(source, Read(_, 1U, _))
         .WillOnce(Invoke([&](nx_exti_event_t* event, size_t, size_t* count) {
-            *event = {time + 1U, 8U, config.line, NX_EXTI_FALLING};
+            *event = {time + 1U, 8U, NX_EXTI_FALLING};
             *count = 1U;
             return NX_SUCCESS;
         }));

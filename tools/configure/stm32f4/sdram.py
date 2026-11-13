@@ -25,7 +25,7 @@ def _route(device, bindings, routes):
     route = routes[binding["route"]]
     if (route["id"] != "fmc-sdram-bank1-16" or
             route["controller"] != "FMC" or route["kind"] != "memory_window" or
-            "cpu-window" not in route["modes"] or len(route["pins"]) != 38 or
+            device["mode"] not in route["modes"] or len(route["pins"]) != 38 or
             {pin["pin"] for pin in route["pins"]} != PINS or
             any(pin["af"] != 12 for pin in route["pins"])):
         fail("SDRAM requires the exact reviewed Bank1 AF12 route")
@@ -34,14 +34,14 @@ def _route(device, bindings, routes):
 
 def resolve_endpoint(device, controller, *, authored_kind, bindings, routes,
                      claim, board_conditions, clock):
-    """Admit one exact CPU window without adding an independent bus owner."""
+    """Admit one exact bank window without an independent bus owner."""
     if (set(device) != {"id", "controller", "driver", "binding", "mode", "parameters"} or
             authored_kind != "memory_window" or
             device["driver"] != "memory_window-endpoint" or
-            device["mode"] != "cpu-window" or
+            device["mode"] not in {"cpu-window", "graphics-owned"} or
             controller["controller"] != "FMC" or
             controller["mode"] != "sdram-controller"):
-        fail("SDRAM requires one explicit parameter-based CPU window")
+        fail("SDRAM requires one explicit parameter-based bank window")
     binding, route = _route(device, bindings, routes)
     board_hardware.require_binding(binding, board_conditions)
     validate(device["parameters"], hclk_hz=clock["core_hz"])
@@ -51,7 +51,7 @@ def resolve_endpoint(device, controller, *, authored_kind, bindings, routes,
 def complete_controller(controller, children, *, claim, bindings, routes):
     """The single physical controller owns all endpoint pads through stop."""
     if len(children) != 1:
-        fail("SDRAM requires exactly one explicit Bank1 CPU endpoint")
+        fail("SDRAM requires exactly one explicit Bank1 endpoint")
     _, route = _route(children[0], bindings, routes)
     controller["pins"] = sorted(route["pins"],
         key=lambda pin: (pin["pin"][1], int(pin["pin"][2:])))
@@ -111,7 +111,7 @@ def validate(parameters, *, hclk_hz):
 
 
 def constructor(item, result):
-    """Connect one exact CPU window to the same exclusive FMC cold owner."""
+    """Connect one exact window to the same exclusive FMC cold owner."""
     if (result.part != "STM32F479NIH6" or item.controller != "FMC" or
             item.mode != "sdram-controller" or item.dma or
             len(item.pins) != 38 or
@@ -120,10 +120,11 @@ def constructor(item, result):
         fail("SDRAM requires the reviewed exact F479 Bank1 software route")
     children = [child for child in result.devices if child.controller == item.id]
     if (len(children) != 1 or children[0].driver != "memory_window-endpoint" or
-            children[0].options.mode != "cpu-window"):
-        fail("SDRAM requires one explicit CPU-only endpoint on its owner")
+            children[0].options.mode not in {"cpu-window", "graphics-owned"}):
+        fail("SDRAM requires one explicit endpoint on its owner")
     child = children[0]
     p = child.options.parameters
+    graphics = child.options.mode == "graphics-owned"
     name = item.id.replace("-", "_")
     endpoint = child.id.replace("-", "_")
     owner = f"s_nx_port_{name}"
@@ -147,13 +148,19 @@ def constructor(item, result):
         definitions.append(f"        .{key} = {{ {minimum.nanoseconds}u, "
                            f"{minimum.cycles}u }},")
     definitions += ["    },", f"    .hclk_hz = {result.clock['core_hz']}u,"]
+    if graphics:
+        definitions.append("    .graphics_only = true,")
     for field in ("bytes", "refresh_window_us", "powerup_us", "prepare_budget_us",
                   "stop_budget_us", "row_bits", "column_bits", "internal_banks",
                   "width_bits", "cas", "sdclk_div", "read_pipe",
                   "initial_refreshes"):
         definitions.append(f"    .{field} = {getattr(p, field)}u,")
-    definitions += ["};",
-                    f"static const nx_memory_window_port_t s_nx_sdram_{endpoint} = {{",
+    definitions += ["};"]
+    if graphics:
+        definitions += [f"static nx_stm32_sdram_graphics_t "
+                        f"s_nx_sdram_graphics_{name} = {{",
+                        f"    .owner = &{owner}", "};"]
+    definitions += [f"static const nx_memory_window_port_t s_nx_sdram_{endpoint} = {{",
                     f"    &nx_stm32_sdram_window_ops, &{owner}", "};",
                     f"const nx_memory_window_port_t* const nx_device_{endpoint} = "
                     f"&s_nx_sdram_{endpoint};"]

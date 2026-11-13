@@ -427,6 +427,10 @@ static nx_result_t admission(const nx_stm32_sdram_t* owner,
         return NX_ERROR_BUSY;
     if (!plan(config, timing, refresh))
         return NX_ERROR_INVALID;
+#if !defined(NX_STM32_SDRAM_GRAPHICS)
+    if (config->graphics_only)
+        return NX_ERROR_UNSUPPORTED;
+#endif
     if (config->hclk_hz != NEXUS_CORE_HZ)
         return NX_ERROR_UNSUPPORTED;
     nx_result_t result = pins_valid(owner, config, false);
@@ -654,7 +658,8 @@ static nx_external_bus_state_t state(const void* selected) {
 static nx_result_t stop(void* selected) {
     return nx_stm32_sdram_stop(selected);
 }
-static nx_result_t acquire(void* selected, nx_memory_window_lease_t* lease) {
+static nx_result_t acquire_window(void* selected,
+                                  nx_memory_window_lease_t* lease) {
     nx_stm32_sdram_t* owner = selected;
     if (!context())
         return NX_ERROR_CONTEXT;
@@ -681,8 +686,9 @@ static nx_result_t acquire(void* selected, nx_memory_window_lease_t* lease) {
                                         owner->config->bytes, owner->epoch};
     return NX_SUCCESS;
 }
-static nx_result_t release(void* selected, nx_memory_window_lease_t* lease,
-                           uint64_t epoch) {
+static nx_result_t release_window(void* selected,
+                                  nx_memory_window_lease_t* lease,
+                                  uint64_t epoch) {
     nx_stm32_sdram_t* owner = selected;
     if (!context())
         return NX_ERROR_CONTEXT;
@@ -698,6 +704,156 @@ static nx_result_t release(void* selected, nx_memory_window_lease_t* lease,
     *lease = (nx_memory_window_lease_t){0};
     return NX_SUCCESS;
 }
+/** \brief A graphics-owned bank never publishes its private hold as CPU data.
+ */
+static nx_result_t acquire(void* selected, nx_memory_window_lease_t* lease) {
+    nx_stm32_sdram_t* owner = selected;
+    if (!context())
+        return NX_ERROR_CONTEXT;
+    if (owner_valid(owner) && owner->config != NULL &&
+        owner->config->graphics_only)
+        return NX_ERROR_UNSUPPORTED;
+    return acquire_window(selected, lease);
+}
+/** \brief Public release cannot detach a selected graphics owner's hold. */
+static nx_result_t release(void* selected, nx_memory_window_lease_t* lease,
+                           uint64_t epoch) {
+    nx_stm32_sdram_t* owner = selected;
+    if (!context())
+        return NX_ERROR_CONTEXT;
+    if (owner_valid(owner) && owner->config != NULL &&
+        owner->config->graphics_only)
+        return NX_ERROR_UNSUPPORTED;
+    return release_window(selected, lease, epoch);
+}
+#if defined(NX_STM32_SDRAM_GRAPHICS)
+bool nx_stm32_sdram_graphics_overlaps(const nx_stm32_sdram_graphics_t* binding,
+                                      const void* storage, size_t bytes) {
+    if (!span(binding, sizeof(*binding), _Alignof(nx_stm32_sdram_graphics_t),
+              true) ||
+        !owner_valid(binding->owner) || storage == NULL || bytes == 0U ||
+        bytes > UINTPTR_MAX - (uintptr_t)storage)
+        return true;
+    const nx_stm32_sdram_t* owner = binding->owner;
+    const nx_stm32_sdram_config_t* config = owner->config;
+    if (config == NULL || overlap(storage, bytes, binding, sizeof(*binding)) ||
+        overlap(storage, bytes, owner, sizeof(*owner)) ||
+        overlap(storage, bytes, config, sizeof(*config)) ||
+        overlap(storage, bytes, config->pins,
+                config->pin_count * sizeof(*config->pins)) ||
+        overlap(storage, bytes, config->system, sizeof(*config->system)) ||
+        (owner->lease != NULL &&
+         overlap(storage, bytes, owner->lease, sizeof(*owner->lease))))
+        return true;
+    for (size_t i = 0U; i < config->pin_count; ++i)
+        if (overlap(storage, bytes, config->pins[i].snapshot, sizeof(uint16_t)))
+            return true;
+    return false;
+}
+/** \brief Validate complete stable binding storage before using its owner. */
+static nx_result_t graphics_binding(const nx_stm32_sdram_graphics_t* binding,
+                                    unsigned master, const void* consumer,
+                                    bool admission) {
+    if (!context())
+        return NX_ERROR_CONTEXT;
+    if (!span(binding, sizeof(*binding), _Alignof(nx_stm32_sdram_graphics_t),
+              true) ||
+        master >= NX_STM32_SDRAM_GRAPHICS_MASTER_COUNT || consumer == NULL ||
+        !owner_valid(binding->owner))
+        return NX_ERROR_INVALID;
+    const nx_stm32_sdram_t* owner = binding->owner;
+    if (owner->config == NULL || (admission && !owner->prepared))
+        return NX_ERROR_STATE;
+    if (!output_storage(owner, binding, sizeof(*binding),
+                        _Alignof(nx_stm32_sdram_graphics_t), true))
+        return NX_ERROR_INVALID;
+    if (!owner->config->graphics_only)
+        return NX_ERROR_UNSUPPORTED;
+    return epoch_live(owner) ? NX_SUCCESS : NX_ERROR_STATE;
+}
+nx_result_t
+nx_stm32_sdram_graphics_check(const nx_stm32_sdram_graphics_t* binding,
+                              nx_stm32_sdram_graphics_master_t master,
+                              const void* consumer, const void* system) {
+    nx_result_t result =
+        graphics_binding(binding, (unsigned)master, consumer, true);
+    if (result != NX_SUCCESS)
+        return result;
+    const nx_stm32_sdram_t* owner = binding->owner;
+    if (system != owner->config->system)
+        return NX_ERROR_INVALID;
+    if (binding->consumers[master] != consumer ||
+        owner->lease != &binding->lease || binding->lease.owner != owner ||
+        binding->lease.epoch != owner->epoch ||
+        binding->lease.address != UINT32_C(0xc0000000) ||
+        binding->lease.bytes != owner->config->bytes)
+        return NX_ERROR_STATE;
+    if (!write_fifo_enabled() || !clock_matches(owner->config) ||
+        !mapping_matches() ||
+        (READ_REG(FMC_Bank5_6->SDSR) &
+         (FMC_SDSR_BUSY | FMC_SDSR_RE | FMC_SDSR_MODES1)) != 0U)
+        return NX_ERROR_IO;
+    return NX_SUCCESS;
+}
+nx_result_t
+nx_stm32_sdram_graphics_attach(nx_stm32_sdram_graphics_t* binding,
+                               nx_stm32_sdram_graphics_master_t master,
+                               const void* consumer, const void* system) {
+    nx_result_t result =
+        graphics_binding(binding, (unsigned)master, consumer, true);
+    if (result != NX_SUCCESS)
+        return result;
+    nx_stm32_sdram_t* owner = binding->owner;
+    if (system != owner->config->system)
+        return NX_ERROR_INVALID;
+    if (binding->consumers[master] != NULL ||
+        binding->consumers[1U - (unsigned)master] == consumer)
+        return NX_ERROR_BUSY;
+    if (owner->lease == NULL) {
+        if (binding->consumers[0] != NULL || binding->consumers[1] != NULL)
+            return NX_ERROR_STATE;
+        result = acquire_window(owner, &binding->lease);
+        if (result != NX_SUCCESS)
+            return result;
+    } else if (owner->lease != &binding->lease ||
+               binding->lease.owner != owner ||
+               binding->lease.epoch != owner->epoch) {
+        return NX_ERROR_BUSY;
+    } else {
+        unsigned peer = 1U - (unsigned)master;
+        if (binding->consumers[peer] == NULL)
+            return NX_ERROR_STATE;
+        result = nx_stm32_sdram_graphics_check(
+            binding, (nx_stm32_sdram_graphics_master_t)peer,
+            binding->consumers[peer], system);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+    binding->consumers[master] = consumer;
+    return NX_SUCCESS;
+}
+nx_result_t
+nx_stm32_sdram_graphics_detach(nx_stm32_sdram_graphics_t* binding,
+                               nx_stm32_sdram_graphics_master_t master,
+                               const void* consumer) {
+    nx_result_t result =
+        graphics_binding(binding, (unsigned)master, consumer, false);
+    if (result != NX_SUCCESS)
+        return result;
+    nx_stm32_sdram_t* owner = binding->owner;
+    if (binding->consumers[master] != consumer ||
+        owner->lease != &binding->lease || binding->lease.owner != owner ||
+        binding->lease.epoch != owner->epoch)
+        return NX_ERROR_INVALID;
+    if (binding->consumers[1U - (unsigned)master] == NULL) {
+        result = release_window(owner, &binding->lease, binding->lease.epoch);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+    binding->consumers[master] = NULL;
+    return NX_SUCCESS;
+}
+#endif
 static nx_result_t geometry(const void* selected,
                             nx_memory_window_geometry_t* result) {
     const nx_stm32_sdram_t* owner = selected;

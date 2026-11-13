@@ -59,7 +59,6 @@ class InfraredExti : public testing::Test {
                                     {1400U, 1900U},
                                     120000U,
                                     200000U,
-                                    2U,
                                     NX_INFRARED_NEC_STANDARD,
                                     NX_INFRARED_SOURCE_STRICT};
     const nx_exti_port_t face{&nx_stm32_exti_ops, &source};
@@ -113,7 +112,7 @@ class InfraredExti : public testing::Test {
             (void)Edge(NX_EXTI_FALLING, 2250U);
             return Edge(NX_EXTI_RISING, 560U);
         }
-        nx_exti_event_t event{observed_time + 40000U, 0U, 2U, NX_EXTI_FALLING};
+        nx_exti_event_t event{observed_time + 40000U, 0U, NX_EXTI_FALLING};
         (void)nx_infrared_nec_feed(&decoder, &event);
         event.timestamp_us += 9000U;
         event.edge = NX_EXTI_RISING;

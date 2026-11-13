@@ -83,12 +83,13 @@ static bool filters_valid(const nx_can_filter_domain_t* domain) {
         return false;
     }
     uint32_t claimed = 0U;
+    uint32_t fifo1 = 0U;
     for (size_t i = 0; i < domain->filter_count; ++i) {
         const nx_can_filter_t* filter = &domain->filters[i];
         uint32_t limit =
             filter->format == NX_CAN_STANDARD ? 0x7FFU : 0x1FFFFFFFU;
         if (filter->bank >= 28U || filter->controller > 1U ||
-            filter->fifo > 1U ||
+            filter->tag == 0U || filter->fifo > 1U ||
             (filter->format != NX_CAN_STANDARD &&
              filter->format != NX_CAN_EXTENDED) ||
             filter->id > limit || filter->mask > limit ||
@@ -98,6 +99,28 @@ static bool filters_valid(const nx_can_filter_domain_t* domain) {
             return false;
         }
         claimed |= 1U << filter->bank;
+        if (filter->fifo != 0U)
+            fifo1 |= 1U << filter->bank;
+        for (size_t previous = 0U; previous < i; ++previous) {
+            if (domain->filters[previous].controller == filter->controller &&
+                domain->filters[previous].tag == filter->tag)
+                return false;
+        }
+    }
+    for (size_t i = 0U; i < domain->filter_count; ++i) {
+        const nx_can_filter_t* filter = &domain->filters[i];
+        unsigned expected = 0U;
+        unsigned first = filter->controller == 0U ? 0U : domain->split;
+        /* RM0090 Fig343: independent FIFO numbering counts inactive banks.
+         * Selected banks use 32-bit mask/one entry; other banks retain the
+         * programmed 16-bit mask/FIFO0 reset plan and consume two entries. */
+        for (unsigned bank = first; bank < filter->bank; ++bank) {
+            uint32_t bit = 1U << bank;
+            if (((fifo1 & bit) != 0U) == (filter->fifo != 0U))
+                expected += (claimed & bit) != 0U ? 1U : 2U;
+        }
+        if (filter->match_index != expected)
+            return false;
     }
     return true;
 }
@@ -408,10 +431,15 @@ static void push_loss(nx_can_controller_t* controller) {
 }
 /** \brief Snapshot error state independently from any receive-ring loan. */
 static void errors(nx_can_controller_t* controller) {
+    static const nx_can_protocol_error_t protocol_errors[] = {
+        NX_CAN_PROTOCOL_NONE,          NX_CAN_PROTOCOL_STUFF,
+        NX_CAN_PROTOCOL_FORM,          NX_CAN_PROTOCOL_ACK,
+        NX_CAN_PROTOCOL_BIT_RECESSIVE, NX_CAN_PROTOCOL_BIT_DOMINANT,
+        NX_CAN_PROTOCOL_CRC,           NX_CAN_PROTOCOL_UNKNOWN};
     uint32_t error = NX_CAN_READ(controller->registers, CAN_ERROR);
     controller->snapshot.transmit_errors = (uint8_t)(error >> 16U);
     controller->snapshot.receive_errors = (uint8_t)(error >> 24U);
-    controller->snapshot.last_error = (uint8_t)((error >> 4U) & 7U);
+    controller->snapshot.last_error = protocol_errors[(error >> 4U) & 7U];
     controller->snapshot.bus_off |= (error & 4U) != 0U;
     if ((NX_CAN_READ(controller->registers, CAN_STATUS) & 4U) != 0U) {
         NX_CAN_WRITE(controller->registers, CAN_STATUS, 4U);
@@ -483,6 +511,17 @@ static void mailboxes(nx_can_controller_t* controller, nx_time_us_t now) {
         }
     }
 }
+/** \brief Map one reviewed hardware match to its immutable logical rule. */
+static uint16_t filter_tag(const nx_can_controller_t* controller, unsigned fifo,
+                           uint8_t match_index) {
+    for (size_t i = 0U; i < controller->domain->filter_count; ++i) {
+        const nx_can_filter_t* filter = &controller->domain->filters[i];
+        if (filter->controller == controller->index && filter->fifo == fifo &&
+            filter->match_index == match_index)
+            return filter->tag;
+    }
+    return 0U;
+}
 /** \brief Release at most the initial three facts per FIFO, six total. */
 static void receive(nx_can_controller_t* controller) {
     uintptr_t base = controller->registers;
@@ -500,11 +539,14 @@ static void receive(nx_can_controller_t* controller) {
             uint32_t property = NX_CAN_READ(base, address + 4U);
             uint32_t lower = NX_CAN_READ(base, address + 8U);
             uint32_t upper = NX_CAN_READ(base, address + 12U);
-            nx_can_event_t event = {.timestamp_us = nx_time_now_us(),
-                                    .kind = NX_CAN_EVENT_FRAME,
-                                    .fifo = (uint8_t)fifo,
-                                    .filter = (uint8_t)(property >> 8U),
-                                    .raw_dlc = (uint8_t)(property & 15U)};
+            nx_can_event_t event = {
+                .timestamp_us = nx_time_now_us(),
+                .kind = NX_CAN_EVENT_FRAME,
+                .filter_tag =
+                    filter_tag(controller, fifo, (uint8_t)(property >> 8U)),
+                .raw_dlc = (uint8_t)(property & 15U)};
+            if (event.filter_tag == 0U)
+                event.flags |= NX_CAN_FILTER_UNKNOWN;
             event.frame.format =
                 (identifier & 4U) != 0U ? NX_CAN_EXTENDED : NX_CAN_STANDARD;
             event.frame.kind =

@@ -15,11 +15,57 @@ extern "C" {
 typedef struct {
     nx_request_t base;
     uint64_t first_block;
-    void* data;
+    union {
+        const void* tx;
+        void* rx;
+    } buffer;
     size_t data_bytes;
     uint32_t blocks;
     bool write;
 } nx_block_request_t;
+
+/**
+ * \brief Prepare a finite block receive with writable caller storage.
+ * \param[in,out] request: Initialized READY or consumed SETTLED descriptor.
+ * \param[in] first_block: Logical first block; complete range must not wrap.
+ * \param[out] data: Writable payload; prepare establishes no provider borrow.
+ * \param[in] data_bytes: Positive actual capacity, checked by the provider.
+ * \param[in] blocks: Positive requested count; geometry is provider-owned.
+ * \param[in] deadline: Finite absolute transfer deadline, including queue time.
+ * \return SUCCESS, INVALID or STATE; failure leaves the descriptor unchanged.
+ * \note Task-only preparation creates no hardware effect or provider borrow.
+ *       Caller storage, format and alignment still require actual admission.
+ */
+nx_result_t nx_block_read_prepare(nx_block_request_t* request,
+                                  uint64_t first_block, void* data,
+                                  size_t data_bytes, uint32_t blocks,
+                                  nx_time_us_t deadline);
+/**
+ * \brief Prepare a finite block write from immutable caller storage.
+ * \param[in,out] request: Initialized READY or consumed SETTLED descriptor.
+ * \param[in] first_block: Logical first block; complete range must not wrap.
+ * \param[in] data: Immutable source, kept alive through eventual settlement.
+ * \param[in] data_bytes: Positive actual readable capacity, provider-checked.
+ * \param[in] blocks: Positive requested count; geometry is provider-owned.
+ * \param[in] deadline: Finite absolute transfer deadline, including queue time.
+ * \return SUCCESS, INVALID or STATE; failure leaves the descriptor unchanged.
+ * \note No allocation, payload copy or provider borrow. Prepare again to change
+ *       direction; toggling write alone does not select another union member.
+ */
+nx_result_t nx_block_write_prepare(nx_block_request_t* request,
+                                   uint64_t first_block, const void* data,
+                                   size_t data_bytes, uint32_t blocks,
+                                   nx_time_us_t deadline);
+/** \brief Read the selected payload address without granting write access.
+ * \param[in] request: Nonnull live descriptor with a correctly selected member.
+ * \return Payload address; no bounds, state or hardware check is performed.
+ * \note Pure bounded task/IRQ view. A provider writes only buffer.rx after
+ *       validating the receive direction; TX storage remains immutable.
+ */
+static inline const void*
+nx_block_request_data(const nx_block_request_t* request) {
+    return request->write ? request->buffer.tx : request->buffer.rx;
+}
 
 /** \brief Optional finite transport shares the ordinary block session. */
 typedef struct {
@@ -40,8 +86,9 @@ typedef struct {
  * \param[in] port: Single privileged unmasked Thread execution owner.
  * \param[in,out] request: READY descriptor, finite deadline and aligned span.
  * \return SUCCESS means ACCEPTED; rejection retains nothing and has no effect.
- * \note Initialize base with nx_request_initialize/prepare. Entire descriptor
- *       and payload remain stable until acquire-observed SETTLED. IRQ/DMA
+ * \note Initialize base, then use nx_block_read_prepare/write_prepare. Keep
+ *       the matching buffer member and direction immutable through SETTLED.
+ *       The complete descriptor and payload remain borrowed. IRQ/DMA
  *       completion alone never releases them. The ordinary face owns explicit
  *       activation, sync and stop of the same media session.
  */

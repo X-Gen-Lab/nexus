@@ -92,8 +92,8 @@ class NativeTimeAssemblyTests(unittest.TestCase):
             self.assertEqual(records[name].features, ("MODEL",))
             self.assertFalse(records[name].physical_qualified)
         header, source = factory.emit(self.resolve())
-        self.assertIn("no fixed byte width", header)
-        self.assertIn("NX_FACTORY_CAP_MODEL, 65536U, 0U", source)
+        self.assertIn('#include "nexus/io/traits.h"', header)
+        self.assertIn("NX_IO_CAP_MODEL, 65536U, 0U", source)
 
     def test_empty_keeps_only_zero_count_stubs_and_no_selected_clock(self):
         result = self.resolve(self.empty)
@@ -124,7 +124,8 @@ class NativeTimeAssemblyTests(unittest.TestCase):
         self.assertIn("lptim", schema["properties"])
         self.assertEqual(set(schema["properties"]["rtc"]["additionalProperties"]["properties"]),
                          {"binding", "mode", "allow_set", "timeout_us",
-                          "poll_limit", "initial", "lse_bypass"})
+                          "poll_limit", "initial", "lse_bypass",
+                          "periodic_wakeup"})
         self.assertIn("tick_hz", schema["properties"]["lptim"]["additionalProperties"]["required"])
         self.assertEqual(json.loads((gate.ROOT / "tools/configure/assembly.schema.json").read_text()), schema)
 

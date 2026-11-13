@@ -63,6 +63,9 @@ abort 并等待真实 acknowledgement；deadline 不能撤销借用。drain 超�
 从未上线。RTR 成功的 transferred 为零，DATA 为 DLC。
 
 bus-off/TEC/REC/last-error 的 authoritative snapshot 不依赖 RX ring 是否有空位。
+公共 `last_error` 是单字节 `nx_can_protocol_error_t`：NONE、ACK、STUFF、FORM、
+BIT_DOMINANT、BIT_RECESSIVE、CRC 或 UNKNOWN；provider 转换硅片编码，应用不解释
+LEC 位。BIT 名称表示发送者期望的电平，分类不标识某个 frame，也不证明当前总线状态。
 ABOM 关闭；recover 是显式 controller-local init，在所有 TX loan 与 publisher
 退出后执行，不重发原帧，不 reset 活跃 peer。未完成硬件/IRQ/FIFO drain 的 stop
 返回 BUSY，保留原 storage。成功 stop 后 read_events 拒绝 STATE，不接触已释放
@@ -70,10 +73,21 @@ ABOM 关闭；recover 是显式 controller-local init，在所有 TX loan 与 pu
 
 ## 接收与丢失事实
 
-接收保存 value frame、FIFO/filter、raw DLC 与 IRQ acquisition timestamp。
+接收保存 value frame、逻辑 `filter_tag`、raw DLC 与 IRQ acquisition timestamp。
 raw DLC 9–15 被规范为 8 并加标志，最多复制八字节；不解释为 CAN FD。时间不是
 物理 SOF timestamp。RFOM 必须读回释放完成后才能发布一次事件；卡住时停止 admission
 并保留责任，不能重复发布同一个硬件邮箱。
+
+每条 filter 可显式设置 1–65535 的 `tag`，同一 controller 内不得重复；省略时按该
+controller 的 filter 声明顺序从 1 编号，与物理 bank 无关。需要跨配置调整保持规则身份
+时应显式填写。无法识别的硬件 match 保留 frame，返回 `filter_tag=0` 和
+`NX_CAN_FILTER_UNKNOWN`，不猜测匹配规则。应用按 tag 执行策略前须检查该标志。
+
+F4 私有配置按 RM0090 Rev22 第 1082 页 Figure343 计算 `match_index`：两个 FIFO
+独立编号，未启用的 bank 也占位置；本实现选中 bank 为 32-bit mask，其余为未启用的
+16-bit mask/FIFO0。生成器只输出不可变对应关系，C 冷态预检再次核验，RX 用同一
+controller/FIFO 的已审对应关系转换 tag；没有新增运行期注册表或可变映射数组。
+RX 查找为所选 filter 数量的有界线性工作，最多 28 条；每次 IRQ 至多处理六帧。
 
 事件环不覆盖未消费事实。软件丢失计数是精确值；硬件 FIFO overrun 只报告下界。
 locked FIFO 中先前保存的帧先于 overrun loss marker；pending loss 排在旧 buffered

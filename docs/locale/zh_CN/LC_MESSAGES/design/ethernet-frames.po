@@ -1,6 +1,6 @@
 # Current gettext translation draft; independent review pending.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 2fc49bd9a7a681b0cba19c166d1b492a7a73a5958dd42d95755f4092f524a9c2\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: b9902a7ab59eb57a595cae1ac240d6387260ce7d35c9f714c6dea1709e2f9139\n"
 
 msgid "Ethernet frame loans and the MAC hardware clock"
 msgstr "以太网帧借用与 MAC 硬件时钟"
@@ -47,8 +47,8 @@ msgstr "所选模式不插入或剥离标签。PCP／DEI／VID、接入／干线
 msgid "TX preparation selects `CHECKSUM_NONE`. The READY owner may select IP-header, payload with caller pseudo-header seed, or full hardware pseudo-header insertion. Only the first scatter-gather descriptor receives CIC bits; timestamp selection and all fragments retain their existing whole-frame borrow. An unselected mode or invalid checksum choice rejects before OWN publication. Hardware format/error writeback controls success; the driver supplies no software checksum fallback, packet repair or IP-stack policy."
 msgstr "TX prepare 默认选择 `CHECKSUM_NONE`。READY 状态的 owner 可选择 IP 头校验、调用者提供伪首部初值的 payload 校验，或硬件完整伪首部插入。仅第一个 scatter-gather descriptor 写 CIC 位；时间戳选择和全部片段仍保持原有整帧借用。未选择的模式或非法校验选择在发布 OWN 前拒绝。硬件格式／错误写回决定成功；驱动不提供软件校验回退、报文修复或 IP 栈策略。"
 
-msgid "RX checksum observations require both selected IPC processing and actual last descriptor ESA. The loan retains explicit IPv4/IPv6, header/payload error, bypass and payload-type facts; absent or malformed writeback stays unknown. Checksum-error dropping is disabled so the consumer receives these hardware facts. L2/DMA errors retain the existing whole-frame discard behavior. Altering checksum metadata invalidates release identity, just like altering a timestamp or geometry. Native ingress/egress does not invent computed IP checksums."
-msgstr "RX 校验观测同时要求已选择 IPC 处理和真实末 descriptor 的 ESA。loan 保留明确 IPv4／IPv6、头部／payload 错误、bypass 和 payload 类型；缺少或畸形写回保持 unknown。校验错误丢包被禁用，消费者可取得这些硬件事实。L2／DMA 错误保持原有整帧丢弃行为。修改校验元数据会使 release 身份失效，与修改时间戳或几何信息相同。Native 收发不编造已计算的 IP 校验和。"
+msgid "RX checksum observations require selected IPC processing and actual last descriptor ESA. The provider translates writeback into independent public IPv4/IPv6, UDP/TCP/ICMP, checked and error flags; no public value copies a hardware bit field. `HEADER_CHECKED` or `PAYLOAD_CHECKED` means that checksum was examined; absence of its corresponding error then reports success for that checksum only. IPv6 has no header checksum. Bypass grants neither checked nor error facts, and protocol identification alone grants no checksum assurance. Missing or malformed writeback stays unknown. Checksum-error dropping is disabled so the consumer can inspect the result. L2/DMA errors retain whole-frame discard behavior. Altering checksum metadata invalidates release identity, just like altering a timestamp or geometry. Native ingress/egress does not invent computed IP checksums."
+msgstr "RX 校验观测要求已选择 IPC 处理和真实末 descriptor 的 ESA。provider 将写回转换为独立的公共 IPv4／IPv6、UDP／TCP／ICMP、已检查和错误标志；公共值不复制硬件位域。`HEADER_CHECKED` 或 `PAYLOAD_CHECKED` 表示对应校验已执行；此时没有对应错误才表示该项校验成功。IPv6 没有头部校验和。bypass 不授予已检查或错误事实，仅识别协议也不提供校验保证。缺少或畸形写回保持 unknown。校验错误丢包被禁用，消费者可检查结果。L2／DMA 错误保持整帧丢弃。修改校验元数据会使 release 身份失效，与修改时间戳或几何信息相同。Native 收发不编造已计算的 IP 校验和。"
 
 msgid "Fact"
 msgstr "事实"

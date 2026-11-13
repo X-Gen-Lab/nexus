@@ -623,9 +623,11 @@ TEST_F(FSMCRawNand, RawIDStatusAndOOBHaveNoImplicitGeometryInference) {
     std::array<uint8_t, 5> id{};
     ASSERT_EQ(nx_nand_id(&port, id.data(), id.size()), NX_SUCCESS);
     EXPECT_EQ(id[0], 0x5aU);
-    uint8_t value = 0U;
+    nx_nand_status_t value{};
     EXPECT_EQ(nx_nand_status(&port, &value), NX_SUCCESS);
-    EXPECT_EQ(value, 0xc0U);
+    EXPECT_TRUE(value.ready);
+    EXPECT_FALSE(value.failed);
+    EXPECT_FALSE(value.write_protected);
     ASSERT_EQ(nx_nand_prepare(&request, 100U), NX_SUCCESS);
     request.operation = NX_NAND_READ_OOB;
     request.oob = oob.data();
@@ -663,6 +665,33 @@ TEST_F(FSMCRawNand, ECCCodesWaitForActualFIFOEmptyAndDisableReadback) {
     EXPECT_EQ(code, 0x123456U);
     EXPECT_EQ(FSMC_Bank2_3->PCR2 & FSMC_PCR2_ECCEN, 0U);
     EXPECT_EQ(request.base.result, NX_ERROR_TIMEOUT);
+}
+TEST_F(FSMCRawNand, StatusReportsFailureAndProtectionWithoutRawBitDecoding) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    nx_nand_status_t observed{};
+    status = 0x01U;
+    ASSERT_EQ(NX_SUCCESS, nx_nand_status(&port, &observed));
+    EXPECT_FALSE(observed.ready);
+    EXPECT_TRUE(observed.failed);
+    EXPECT_TRUE(observed.write_protected);
+    status = 0x80U;
+    ASSERT_EQ(NX_SUCCESS, nx_nand_status(&port, &observed));
+    EXPECT_FALSE(observed.ready);
+    EXPECT_FALSE(observed.failed);
+    EXPECT_FALSE(observed.write_protected);
+}
+TEST_F(FSMCRawNand, EccFormatDescribesOpaqueNumericWordsWithoutDeviceCommands) {
+    ASSERT_EQ(open(), NX_SUCCESS);
+    EXPECT_CALL(memory, Write(testing::_, testing::_, testing::_)).Times(0);
+    nx_nand_ecc_format_t format{};
+    ASSERT_EQ(NX_SUCCESS, nx_nand_ecc_format(&port, &format));
+    EXPECT_EQ(NX_NAND_ECC_STM32_FSMC_RAW32, format.encoding);
+    EXPECT_EQ(512U, format.step_bytes);
+    EXPECT_EQ(sizeof(uint32_t), format.code_bytes);
+    auto* alias = reinterpret_cast<nx_nand_ecc_format_t*>(&nand);
+    EXPECT_EQ(NX_ERROR_INVALID, nx_nand_ecc_format(&port, alias));
+    auto* status_alias = reinterpret_cast<nx_nand_status_t*>(&nand);
+    EXPECT_EQ(NX_ERROR_INVALID, nx_nand_status(&port, status_alias));
 }
 TEST_F(FSMCRawNand, MalformedSpansCannotOverwriteEndpointOrAnyBusReceipt) {
     ASSERT_EQ(open(), NX_SUCCESS);

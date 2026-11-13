@@ -6,7 +6,13 @@
 #ifndef NX_STM32F407_UART_HARDWARE_H
 #define NX_STM32F407_UART_HARDWARE_H
 
-#include "stm32f407_provider.h"
+#include "stm32f4_uart.h"
+
+#ifdef NEXUS_STM32_MODEL
+extern GPIO_TypeDef g_nx_stm32_gpioa_model;
+#undef GPIOA
+#define GPIOA (&g_nx_stm32_gpioa_model)
+#endif
 
 /** \brief Static DMA transmit route; completion facts remain in the owner. */
 typedef struct {

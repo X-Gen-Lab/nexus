@@ -534,7 +534,7 @@ static const nx_nand_geometry_t* geometry(const void* context) {
                ? n->config->geometry
                : NULL;
 }
-static nx_result_t idle_check(nx_stm32_fsmc_nand_t* n, void* data,
+static nx_result_t idle_check(const nx_stm32_fsmc_nand_t* n, void* data,
                               size_t bytes) {
     if (n->config == NULL || n->closed)
         return NX_ERROR_STATE;
@@ -562,7 +562,7 @@ static nx_result_t id(void* context, uint8_t* data, size_t bytes) {
     n->in_call = false;
     return NX_SUCCESS;
 }
-static nx_result_t status(void* context, uint8_t* value) {
+static nx_result_t status(void* context, nx_nand_status_t* value) {
     nx_stm32_fsmc_nand_t* n = context;
     if (!nx_fsmc_task())
         return NX_ERROR_CONTEXT;
@@ -572,9 +572,30 @@ static nx_result_t status(void* context, uint8_t* value) {
     if (result != NX_SUCCESS)
         return result;
     n->in_call = true;
-    *value = raw_status(n);
+    uint8_t raw = raw_status(n);
+    *value = (nx_nand_status_t){.ready = (raw & 0x40U) != 0U,
+                                .failed = (raw & 1U) != 0U,
+                                .write_protected = (raw & 0x80U) == 0U};
     n->in_call = false;
     return NX_SUCCESS;
 }
-const nx_nand_ops_t nx_stm32_fsmc_nand_ops = {geometry, id,      status, submit,
-                                              cancel,   service, stop};
+/** \brief A numeric ECCR word is opaque; no decoder or parity layout assumed.
+ */
+static nx_result_t ecc_format(const void* context,
+                              nx_nand_ecc_format_t* format) {
+    const nx_stm32_fsmc_nand_t* n = context;
+    if (!nx_fsmc_task())
+        return NX_ERROR_CONTEXT;
+    if (!state_valid(n))
+        return NX_ERROR_INVALID;
+    nx_result_t result = idle_check(n, format, sizeof(*format));
+    if (result != NX_SUCCESS)
+        return result;
+    *format =
+        (nx_nand_ecc_format_t){.encoding = NX_NAND_ECC_STM32_FSMC_RAW32,
+                               .step_bytes = n->config->geometry->ecc_bytes,
+                               .code_bytes = sizeof(uint32_t)};
+    return NX_SUCCESS;
+}
+const nx_nand_ops_t nx_stm32_fsmc_nand_ops = {
+    geometry, id, status, submit, cancel, service, stop, ecc_format};

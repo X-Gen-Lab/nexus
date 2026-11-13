@@ -169,6 +169,19 @@ nx_result_t nx_rtc_port_wakeup(const nx_rtc_port_t* port,
                ? NX_ERROR_UNSUPPORTED
                : ops->wakeup(port->context, config);
 }
+/** \brief Duration selection remains in the selected hardware provider. */
+nx_result_t nx_rtc_port_periodic_wakeup(const nx_rtc_port_t* port,
+                                        uint64_t period_us,
+                                        uint32_t tolerance_us,
+                                        nx_rtc_period_t* actual) {
+    if (!aux_argument(port, actual, sizeof(*actual), _Alignof(nx_rtc_period_t)))
+        return NX_ERROR_INVALID;
+    const nx_rtc_aux_ops_t* ops = auxiliary(port);
+    return ops == NULL || ops->periodic_wakeup == NULL
+               ? NX_ERROR_UNSUPPORTED
+               : ops->periodic_wakeup(port->context, period_us, tolerance_us,
+                                      actual);
+}
 /** \brief Dispatch capture configuration without retaining caller storage. */
 nx_result_t
 nx_rtc_port_capture_configure(const nx_rtc_port_t* port,

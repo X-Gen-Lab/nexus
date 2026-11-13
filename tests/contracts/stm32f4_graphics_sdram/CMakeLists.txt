@@ -1,0 +1,24 @@
+cmake_minimum_required(VERSION 3.31)
+project(nexus_f4_graphics_sdram_reference C ASM)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(NOT IS_DIRECTORY "${NEXUS_SOURCE_ROOT}/io")
+    message(FATAL_ERROR "Select a Nexus checkout or verified Source SDK")
+endif()
+set(NEXUS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "" FORCE)
+add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+# Reuse the maintained public DMA2D -> LTDC -> join composition unchanged.
+nexus_add_firmware(nexus_f4_graphics_sdram_consumer
+    SOURCES "${CMAKE_CURRENT_LIST_DIR}/../stm32f4_graphics/consumer.c")
+target_compile_definitions(nexus_f4_graphics_sdram_consumer PRIVATE
+    NX_GRAPHICS_SDRAM_REFERENCE=1)
+nexus_target_warnings(nexus_f4_graphics_sdram_consumer STRICT)
+find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
+get_target_property(graphics_config Nexus::Platform NEXUS_CONFIG_DIR)
+add_custom_command(TARGET nexus_f4_graphics_sdram_consumer POST_BUILD
+    COMMAND "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py"
+        --elf "$<TARGET_FILE:nexus_f4_graphics_sdram_consumer>"
+        --bindings "${graphics_config}/bindings.c"
+        --output "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
+    VERBATIM)

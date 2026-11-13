@@ -14,8 +14,8 @@ Nexus 提供静态 C11 通用机制。当前生产 SoC 入口只有 `soc/stm32/s
 
 本页以固定源码
 [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984)
-及 [PR #61](https://github.com/X-Gen-Lab/nexus/pull/61) 保留为前序范围；最近已提交
-基础为 `34480bfe0eacb53f421f29a7da9d86c0068bfb46`。本页另行说明当前工作区已接入的
+及 [PR #61](https://github.com/X-Gen-Lab/nexus/pull/61) 保留为前序范围；本轮便携 I/O
+重构基线为 `6eac971a07a5021d25ba57c3b6885e6e789f2910`。本页另行说明当前工作区已接入的
 架构增量，最终同源门禁、SDK 与软件候选仍单独收口。既有接口、局部修复、精确模式
 和整个工作包完成是不同状态，不把历史执行结果重标为当前候选资格。
 
@@ -64,6 +64,40 @@ IP 私有目录；芯片、模式和供应方源码仍由唯一目标图选择�
 运行中 factory 只返回已有接口。日常 I/O 通过 `ops(context, ...)` 直接进入 F4
 实现，硬件操作优先复用官方 HAL／LL。不会因共享源码引入最大池、动态注册表、
 默认堆或隐藏 worker。应用负责串行执行者、服务进度和 scheduler 启动。
+
+## 领域接口与原生能力边界
+
+[FIG-16](../design/io-evolution.md)区分构建期装配与运行期调用。公共接口表达逻辑
+设备、操作、数据格式、结果和借用；SoC／Board 配置负责寄存器编码、引脚、DMA、
+IRQ 与时钟映射。组件不需理解这些映射，但仍需遵守长度、对齐、时限及归还条件。
+
+本轮源码代际为 3，详见[迁移](migration.md)与[兼容性合同](../design/source-compatibility.md)。
+公共领域 traits 与 factory 生成值分开；UART 的通用格式合法性和 F4 支持性分别校验。
+SDIO function 请求按 function 地址表达，不再嵌套块设备 LBA 请求；逻辑 GPIO
+绑定、编码器 A／B 语义及网络结果也沿各自领域合同收敛。源码接入不自动成为完整
+软件候选；各组回归、ARM、资源与 SDK 验证仍需绑定最终相同源码。
+
+普通同步调用不承担 request、stream、队列或 OS 状态；有限异步、连续流与跨任务
+owner 按所选能力增加存储。原生波形与数据布局可作为显式扩展，仍经同一硬件
+owner，准备／编码使用显式存储，提交不隐藏分配或整缓冲重排。同名公共类型不因
+精简 profile 宏改变布局；未使用能力由实例和构建闭包裁剪，具体成本按 ELF 测量。
+
+SOLID 在此约束实际依赖：每个 owner 只推进自己的硬件责任；provider 通过领域
+合同扩展；可替换实现必须保持单位、原子性、完成与借用；接口按独立消费者划分；
+组件通过静态注入取得窄端口。它不引入设备基类、运行时名称注册或默认线程。
+
+### 本轮重构退出范围
+
+R0–R13 是本轮方案分组，与下方 WP／IO 的既有能力范围交叉核对。它们不是新的
+配置源或验收引擎；只有实现、消费者与对应执行证据齐全才关闭具体子项。
+
+| 分组 | 本轮退出条件与剩余范围 |
+|---|---|
+| R0–R2 公共合同与原型 | 领域 traits、格式校验、独立 SDIO 请求和 epoch 3 消费者一致；源码接入后仍需最终完整门禁。 |
+| R3–R7 数字、串行、控制与采集 | 逻辑绑定、事务与 native 计划边界、薄包装和生产者／消费者退出分别可用；尚未实现的连续 SAI、完整无缝帧及精确电脉冲仍按支持矩阵保留。 |
+| R8–R11 存储、图形、网络与系统 | 厂商编码留实现，公共结果可解释；CPU-only 内存不自动授权图形访问。显式 `graphics-owned` SDRAM 由所选 LTDC／DMA2D 持有同一私有 bank lease，全部冷退出后归还；不是 MPU 隔离，新增组合仍须独立验证。 |
+| R12 依赖与成本 | 对相同工具链、装配比较实际编译闭包、静态对象及 ELF；不以方法表、inline 或 GC 的存在推断零成本。 |
+| R13 集成交付 | 变更后的 SDK、完整维护消费者、双语文档与源码身份一致；物理 HIL 与远端 Actions 按用户要求暂缓。 |
 
 ## 生命周期与失败
 
@@ -163,7 +197,7 @@ F407 模式回归不自动扩展到新增料号。源码接入、独立审查与
 | IO08 | I2S／音频 | I2S2／3 有限与连续 blocks 保留；新增 F446／F479 的 SAI1 A／B 六种有限 master／slave TX／RX／同步 duplex。layout 明确容器位宽、有效位和存储顺序，SAI 消费唯一 System PLLSAI Q；不转换音频、不默认分配 buffer。SAI2、SAI 连续 blocks、稀疏 slots 与其他音频协议仍未提供。 |
 | IO09 | CAN | 已有 CAN1／2 classic、邮箱和共享 filter domain；共享依赖、bus-off 与恢复仍按具体模式验收，不授予 CAN FD。 |
 | IO10 | SDIO | 已有 SD／MMC 与 SDIO functions。本轮完成 RX PFCTRL／TX 精确计数与 FIFO／IRQ join、memory CMD18／25＋CMD12／13 及静态 ClockPlan 的 RM／勘误联合分频；默认与低 PCLK2 实际程序及 ARM 对象通过。HS／DDR／HS200、linked candidate 和物理资格不在此通过范围。 |
-| IO11 | FSMC／FMC | 保留 F407 FSMC 的 SRAM／PSRAM／NOR／NAND／parallel16 与启动 SRAM；新增 F479NI FMC Bank1、8 MiB、16-bit SDRAM 的 CPU 数据窗口，显式时序、自刷新退出、lease 和原 System epoch。不会因 window 存在授予 DMA、XIP、启动 RAM、自动 MPU 或实装资格；新几何与协议仍需独立实现。 |
+| IO11 | FSMC／FMC | 保留 F407 FSMC 的 SRAM／PSRAM／NOR／NAND／parallel16 与启动 SRAM。F479NI FMC Bank1、8 MiB、16-bit SDRAM 默认提供 CPU 数据窗口；显式 `graphics-owned` 与所选 engine 的 `memory_window` 引用连接 LTDC 只读／DMA2D 读写区域，保留同一 bank lease 直至冷退出。两种模式均检查时序、原 System epoch 与真实自刷新退出；不授予 XIP、启动 RAM、自动 MPU 或实装资格，新几何与协议仍需独立实现。 |
 | IO12 | USB Device | 已有 FS／HS Device PIO／DMA；提前 STATUS、SETUP、wire ACK 与双方向 AHB／地址 join 分开。固定 Device 与 managed Device 阶段均按需支持 remote wake：STATUS ACK 提交 host 许可，真实 suspend 新收条至少 5001 µs，调用者证明有限 service 延迟 B。cancel／stop 不提前缩短最低保持，拒撤保留 request／clock／pins，角色切换不能越过同一 DCD join。无高带宽 ISO、HNP／SRP 或物理脉宽资格。 |
 | IO13 | USB Host／角色 | 已有显式 host／角色及 reset／resume 最低保持；新增实际 HCD 的单 transaction ISO 切片按精确速度、最大包和 DMA 对齐约束接入。未提供自动 OTG 协商、Host split 或周期调度；模型不替代 VBUS／PHY／枚举实测。 |
 | IO14 | Ethernet | 基线已有 raw／增强帧、MII／RMII 与计划驱动的 MDC／PTP；计数分辨率不是物理精度或网络同步资格。 |

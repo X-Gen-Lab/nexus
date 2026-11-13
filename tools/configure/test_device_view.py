@@ -98,7 +98,8 @@ class DeviceViewTests(unittest.TestCase):
         self.assertEqual(view.controllers["FMC"].irqs, ("FMC_IRQn",))
         self.assertEqual(dict(view.controllers["FMC"].irq_numbers), {"FMC_IRQn": 48})
         self.assertEqual(view.modes["FMC"].modes, ("sdram-controller",))
-        self.assertEqual(view.modes["FMC"].interfaces["memory_window"], ("cpu-window",))
+        self.assertEqual(view.modes["FMC"].interfaces["memory_window"],
+                         ("cpu-window", "graphics-owned"))
         routes = gate.resolve_routes(gate.load(gate.ROOT /
             "soc/stm32/stm32f4/routes.json"), selected.soc, view.part,
             maintained("stm32f4"), controller_profiles=selected.controller_profiles)

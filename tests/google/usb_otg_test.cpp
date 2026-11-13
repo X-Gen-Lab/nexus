@@ -216,6 +216,10 @@ class UsbOtgCold : public testing::Test {
     const nx_gpio_port_t gpio_faces[3] = {{&gpio_ops, &gpio_contexts[0]},
                                           {&gpio_ops, &gpio_contexts[1]},
                                           {&gpio_ops, &gpio_contexts[2]}};
+    nx_gpio_port_t query_source = gpio_faces[0];
+    alignas(nx_usb_host_storage_requirements_t) uint16_t
+        query_snapshot[sizeof(nx_usb_host_storage_requirements_t) /
+                       sizeof(uint16_t)] = {};
     nx_result_t Prepare() {
         return nx_stm32_usb_otg_prepare(&owner, &config);
     }
@@ -487,10 +491,62 @@ TEST_F(UsbOtgCold, InactiveHostFaceRejectsBeforeHalPowerOrRequestAdmission) {
     EXPECT_CALL(hcd, Submit(_, _, _, _, _, _, _, _)).Times(0);
     EXPECT_EQ(NX_ERROR_STATE, nx_usb_host_open(&owner.host_face, 0U, &pipe));
     EXPECT_EQ(NX_ERROR_STATE, nx_usb_host_submit(&owner.host_face, 0U, &probe));
+    nx_usb_host_storage_requirements_t requirements{13U, 17U};
+    EXPECT_EQ(NX_ERROR_STATE, nx_usb_host_storage_requirements(
+                                  &owner.host_face, 0U, 3U, &requirements));
+    EXPECT_EQ(13U, requirements.capacity);
+    EXPECT_EQ(17U, requirements.alignment);
     EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&probe.base));
     EXPECT_EQ(nullptr, channels[0].request);
     EXPECT_EQ(reads, power_reads);
     EXPECT_EQ(writes, power_writes);
+}
+
+TEST_F(UsbOtgCold, HostStorageQueryPreservesTheCompositeAndInactiveDevice) {
+    ASSERT_EQ(NX_SUCCESS, StartHost());
+    ASSERT_EQ(NX_SUCCESS, BeginHostPacket());
+    const auto* face = nx_usb_otg_host(&port, Snapshot().generation);
+    ASSERT_NE(nullptr, face);
+    nx_usb_host_storage_requirements_t requirements{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_usb_host_storage_requirements(face, 0U, 3U, &requirements));
+    EXPECT_EQ(4U, requirements.capacity);
+    EXPECT_EQ(1U, requirements.alignment);
+    for (void* metadata :
+         {static_cast<void*>(&owner.device), static_cast<void*>(endpoints),
+          static_cast<void*>(events), static_cast<void*>(plan)}) {
+        EXPECT_EQ(
+            NX_ERROR_INVALID,
+            nx_usb_host_storage_requirements(
+                face, 0U, 3U,
+                static_cast<nx_usb_host_storage_requirements_t*>(metadata)));
+    }
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&host_request.base));
+}
+
+TEST_F(UsbOtgCold, HostStorageQueryCannotOverwritePowerOrPinReceipts) {
+    config.source = &query_source;
+    pins[0].snapshot = query_snapshot;
+    ASSERT_EQ(NX_SUCCESS, StartHost());
+    ASSERT_EQ(NX_SUCCESS, BeginHostPacket());
+    const auto* face = nx_usb_otg_host(&port, Snapshot().generation);
+    ASSERT_NE(nullptr, face);
+    const nx_gpio_port_t saved_source = query_source;
+    const nx_result_t source_result = nx_usb_host_storage_requirements(
+        face, 0U, 3U,
+        reinterpret_cast<nx_usb_host_storage_requirements_t*>(&query_source));
+    /* A RED implementation can overwrite these mutable fixture objects.
+     * Restore them before assertions/teardown so the borrowed owner can exit.
+     */
+    query_source = saved_source;
+    EXPECT_EQ(NX_ERROR_INVALID, source_result);
+    uint16_t saved_snapshot[sizeof(query_snapshot) / sizeof(uint16_t)];
+    std::memcpy(saved_snapshot, query_snapshot, sizeof(query_snapshot));
+    const nx_result_t snapshot_result = nx_usb_host_storage_requirements(
+        face, 0U, 3U,
+        reinterpret_cast<nx_usb_host_storage_requirements_t*>(query_snapshot));
+    std::memcpy(query_snapshot, saved_snapshot, sizeof(query_snapshot));
+    EXPECT_EQ(NX_ERROR_INVALID, snapshot_result);
 }
 
 TEST_F(UsbOtgCold, InactiveDeviceFacesRejectWithoutOverwritingCallerState) {

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 931489c007cbea7844a75a771082cb4a39fb56bfe046d090e30cb2ebbd460bc4\n"
+"X-Nexus-Source-SHA256: 0e1261bd867fb2ed6d0e36392b82a93b25ee9c3f48b9674b5f9f66a179aace21\n"
 
 #: docs/design/timer-advanced.md:1
 msgid "Optional timer capture and complementary PWM"
@@ -259,3 +259,6 @@ msgstr "原始捕获值在 TIM5 上保留完整 32 位，其余所列 capture ti
 
 msgid "The reviewed STM32F407 datasheet establishes these alternate functions. They do not establish a connector, external load, safe electrical level or PCB revision. External Board facts must authorize the actual route. The timer kernel frequency comes from the selected static ClockPlan, including the timer multiplier for its actual APB divider. The default HSE8/PLL168 plan gives APB1 timers 84 MHz and APB2 timers 168 MHz; runtime reclocking remains unsupported. Constructors verify enabled clock gates, the selected APB divider and actual AF fields. These observations do not measure crystal tolerance."
 msgstr "经审阅的 STM32F407 数据手册确认这些复用功能。它们不能证明连接器、外部负载、安全电平或 PCB 修订。实际路线必须由外部 Board 事实授权。Timer kernel 频率来自所选静态 ClockPlan，包括实际 APB 分频对应的 timer 倍频。默认 HSE8／PLL168 计划使 APB1 timer 为 84 MHz、APB2 timer 为 168 MHz；不支持运行期变频。构造函数验证已启用时钟门、所选 APB 分频及实际 AF 字段，这些观察不测量晶振容差。"
+
+msgid "The public encoder personalities are `x2-a`, `x2-b` and `x4`. Logical A/B follow the statically bound input order. State reports `clock_divisor` and `consecutive_samples` for each phase, relative to `filter_clock_hz`; zero/zero means filter bypass. These facts describe digital qualification, not a measured debounce interval. The F4 assembly retains explicit silicon filter selections internally; portable consumers do not decode those selections."
+msgstr "公共编码器模式为 `x2-a`、`x2-b` 和 `x4`，逻辑 A/B 遵循静态绑定的输入顺序。状态为每个相位报告相对于 `filter_clock_hz` 的 `clock_divisor` 和 `consecutive_samples`；两者为零表示绕过滤波。这些事实描述数字输入判定，不是实测消抖间隔。F4 装配在内部保留显式硅片滤波选择，可移植消费者不解析这些编码。"

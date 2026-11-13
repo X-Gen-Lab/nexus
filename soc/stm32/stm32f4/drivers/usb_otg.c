@@ -731,6 +731,66 @@ static nx_result_t host_state(void* context, nx_usb_host_state_t* output) {
                : NX_ERROR_INVALID;
 }
 
+/** \brief Query output also preserves resources held for the inactive DCD. */
+static bool host_query_external(const nx_stm32_usb_otg_t* state,
+                                const nx_usb_host_storage_requirements_t* out) {
+    const nx_stm32_usb_otg_config_t* config = state->config;
+    const nx_stm32_usb_cold_config_t* fs = config->device_fs;
+    const nx_stm32_usb_hs_cold_config_t* hs = config->device_hs;
+    const nx_usb_endpoint_t* endpoints =
+        fs != NULL ? fs->endpoints : hs->endpoints;
+    const nx_stm32_usb_endpoint_config_t* plan =
+        fs != NULL ? fs->plan : hs->plan;
+    const nx_usb_event_t* events = fs != NULL ? fs->events : hs->events;
+    const size_t count = fs != NULL ? fs->endpoint_count : hs->endpoint_count;
+    const size_t capacity = fs != NULL ? fs->capacity : hs->capacity;
+    const void* clock =
+        fs != NULL ? (const void*)fs->clock : (const void*)hs->clock;
+    const size_t clock_bytes =
+        fs != NULL ? sizeof(*fs->clock) : sizeof(*hs->clock);
+    const nx_stm32_platform_pin_config_t* pins =
+        fs != NULL ? fs->pins : hs->pins;
+    const uint8_t pin_count = fs != NULL ? 2U : hs->pin_count;
+    if (!outside(state, out, sizeof(*out)) ||
+        overlaps(out, sizeof(*out), endpoints, count * sizeof(*endpoints)) ||
+        overlaps(out, sizeof(*out), plan, count * sizeof(*plan)) ||
+        overlaps(out, sizeof(*out), events, capacity * sizeof(*events)) ||
+        overlaps(out, sizeof(*out), clock, clock_bytes) ||
+        overlaps(out, sizeof(*out), config->source, sizeof(*config->source)) ||
+        overlaps(out, sizeof(*out), config->present,
+                 sizeof(*config->present)) ||
+        overlaps(out, sizeof(*out), config->overcurrent,
+                 sizeof(*config->overcurrent)) ||
+        overlaps(out, sizeof(*out), config->source->ops,
+                 sizeof(*config->source->ops)) ||
+        overlaps(out, sizeof(*out), config->present->ops,
+                 sizeof(*config->present->ops)) ||
+        overlaps(out, sizeof(*out), config->overcurrent->ops,
+                 sizeof(*config->overcurrent->ops)) ||
+        overlaps(out, sizeof(*out), pins, (size_t)pin_count * sizeof(*pins)))
+        return false;
+    for (uint8_t i = 0U; i < pin_count; ++i)
+        if (overlaps(out, sizeof(*out), pins[i].snapshot,
+                     sizeof(*pins[i].snapshot)))
+            return false;
+    return true;
+}
+
+/** \brief Pure Host geometry follows the same current-role admission gate. */
+static nx_result_t
+host_requirements(const void* context, nx_usb_host_pipe_id_t pipe,
+                  size_t length, nx_usb_host_storage_requirements_t* output) {
+    const nx_stm32_usb_otg_t* state = context;
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (!ready(state, NX_USB_ROLE_HOST))
+        return NX_ERROR_STATE;
+    return host_query_external(state, output)
+               ? nx_stm32_usb_host_ops.requirements(&state->host, pipe, length,
+                                                    output)
+               : NX_ERROR_INVALID;
+}
+
 /** \brief Port reset preserves the existing idle and finite deadline checks. */
 static nx_result_t host_reset(void* context, nx_time_us_t deadline) {
     nx_stm32_usb_otg_t* state = context;
@@ -768,7 +828,7 @@ static nx_result_t host_stop(void* context) {
 
 const nx_usb_host_ops_t nx_stm32_usb_otg_host_ops = {
     host_open,  host_close, host_submit,  host_cancel, host_service,
-    host_state, host_reset, host_suspend, host_stop};
+    host_state, host_reset, host_suspend, host_stop,   host_requirements};
 
 /** \brief Bind OFF after checking the exact common plan and inactive source. */
 nx_result_t nx_stm32_usb_otg_prepare(nx_stm32_usb_otg_t* state,

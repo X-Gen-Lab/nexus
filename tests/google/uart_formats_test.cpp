@@ -26,14 +26,34 @@ TEST(UartFormat, ExplicitDataBitsExcludeTheParityBit) {
               NX_SUCCESS);
     EXPECT_EQ(nx_uart_format_validate(
                   {9U, NX_UART_PARITY_ODD, NX_UART_STOP_1, NX_UART_FLOW_NONE}),
-              NX_ERROR_UNSUPPORTED);
+              NX_SUCCESS);
     EXPECT_EQ(nx_uart_format_validate(
                   {7U, NX_UART_PARITY_NONE, NX_UART_STOP_1, NX_UART_FLOW_NONE}),
-              NX_ERROR_UNSUPPORTED);
+              NX_SUCCESS);
     EXPECT_EQ(nx_uart_format_validate({8U, NX_UART_PARITY_NONE,
                                        static_cast<nx_uart_stop_t>(3),
                                        NX_UART_FLOW_NONE}),
               NX_ERROR_INVALID);
+}
+
+TEST(UartFormat, ValidityDoesNotDependOnTheSelectedControllerWordLength) {
+    const uint8_t supported[] = {5U, 6U, 7U, 8U, 9U};
+    for (auto bits : supported) {
+        for (auto parity :
+             {NX_UART_PARITY_NONE, NX_UART_PARITY_EVEN, NX_UART_PARITY_ODD}) {
+            SCOPED_TRACE(static_cast<unsigned>(bits));
+            SCOPED_TRACE(static_cast<unsigned>(parity));
+            EXPECT_EQ(nx_uart_format_validate(
+                          {bits, parity, NX_UART_STOP_1, NX_UART_FLOW_NONE}),
+                      NX_SUCCESS);
+        }
+    }
+    const uint8_t invalid[] = {0U, 4U, 10U, 255U};
+    for (auto bits : invalid) {
+        EXPECT_EQ(nx_uart_format_validate({bits, NX_UART_PARITY_NONE,
+                                           NX_UART_STOP_1, NX_UART_FLOW_NONE}),
+                  NX_ERROR_INVALID);
+    }
 }
 
 class UartWord : public testing::Test {

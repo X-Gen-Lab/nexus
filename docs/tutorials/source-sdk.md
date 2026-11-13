@@ -109,22 +109,27 @@ constraints; do not automatically loosen that version requirement. Rerun the
 product's required Native tests and MCU links before accepting the upgrade. An older SDK's results do not qualify
 the new SDK, and a successful link does not qualify physical hardware.
 
-## Source interface epoch 2
+## Source interface epoch 3
 
-The current `0.2.1` development snapshot uses factory/source interface epoch `2`;
+The current `0.2.1` development snapshot uses factory/source interface epoch `3`;
 its installed SDK manifest uses schema `2` independently. Select the exact
 reviewed commit, regenerate and rebuild all callers, faces/ops, generated code,
 providers and components together. Current interface admission rejects epoch-1
-SDKs; old objects must be rebuilt. `--development-fixture` never bypasses interface
+and epoch-2 SDKs; old objects must be rebuilt. `--development-fixture` never bypasses interface
 checks or permits mixed binaries. No existing tag is moved.
 
+The epoch-2 ADC result migration remains required for older callers.
 Direct ADC group `request.frames` access must become `request.output.frames`.
 Prefer `nx_adc_group_prepare()` for raw requests so it sets the RAW discriminant;
 paired results use `nx_adc_group_prepare_results()`. Check `results_kind` before
 reading the union. There is no old-field shadow or inferred layout. Follow the
-[migration guide](../guides/migration.md#rebuild-for-source-interface-epoch-2) and
+[migration guide](../guides/migration.md#rebuild-for-source-interface-epoch-3) and
 [compatibility contract](../design/source-compatibility.md) before accepting a
-new SDK; a matching semantic version alone is insufficient.
+new SDK; a matching semantic version alone is insufficient. Epoch 3 moves domain
+traits to `nexus/io/traits.h` and gives SDIO function requests direct request and
+payload fields. Rebuild components against those public types and migrate nested
+`request.transfer` accesses; no old-field or numeric-layout compatibility is
+provided.
 
 ## Maintainer: verify the complete SDK consumer
 

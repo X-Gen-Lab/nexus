@@ -620,6 +620,10 @@ class UsbHostOptions:
     init_timeout_us: int
     electrical_handover: str
     irq: IrqOptions
+    pipe_channels: tuple[int, ...] = ()
+
+    def __post_init__(self):
+        object.__setattr__(self, "pipe_channels", tuple(self.pipe_channels))
 
 
 @dataclass(frozen=True)
@@ -664,6 +668,8 @@ class CanFilterIR:
     fifo: int
     remote: bool
     match_remote: bool
+    tag: int
+    match_index: int
 
 
 @dataclass(frozen=True)
@@ -699,6 +705,7 @@ class RtcOptions:
     poll_limit: int
     initial: RtcCalendarOptions | None
     lse_bypass: bool = False
+    periodic_wakeup: bool = False
 
 
 @dataclass(frozen=True)
@@ -856,12 +863,14 @@ class DisplayOptions:
     layers: tuple[DisplayLayerOptions, ...]
     drain_us: int
     irq: IrqOptions
+    memory_window: str | None = None
 
 
 @dataclass(frozen=True)
 class ImageOptions:
     drain_us: int
     irq: IrqOptions
+    memory_window: str | None = None
 
 
 ControllerOptions = (DisplayOptions | ImageOptions | CaptureOptions | AudioOptions | SaiOptions | GpioOptions | BlockOptions | FlashOptions | PinStateOptions | UartOptions | SpiOptions | I2cOptions | I2cTargetOptions |
@@ -898,13 +907,14 @@ def mode_options(values):
         if irq is None:
             raise ValueError("Graphics requires an explicit IRQ policy")
         if kind == "image":
-            return ImageOptions(values["drain_us"], irq)
+            return ImageOptions(values["drain_us"], irq,
+                                values.get("memory_window"))
         return DisplayOptions(
             DisplayTimingOptions(**values["timing"]),
             tuple(DisplayLayerOptions(
                 **{key: value for key, value in layer.items() if key != "formats"},
                 formats=tuple(layer["formats"])) for layer in values["layers"]),
-            values["drain_us"], irq)
+            values["drain_us"], irq, values.get("memory_window"))
     if kind == "capture":
         return CaptureOptions(*(values[key] for key in (
             "pixel_clock_hz", "poll_limit", "frame_divisor", "pclk_falling",
@@ -986,7 +996,8 @@ def mode_options(values):
         return UsbHostOptions(*(values[key] for key in (
             "channel_count", "rx_fifo_words", "nonperiodic_fifo_words",
             "periodic_fifo_words", "engine", "ulpi_clock_hz",
-            "drain_timeout_us", "init_timeout_us", "electrical_handover")), irq)
+            "drain_timeout_us", "init_timeout_us", "electrical_handover")), irq,
+            tuple(values.get("pipe_channels", ())))
     if kind == "encoder":
         return EncoderOptions(*(values[key] for key in (
             "counting", "filter_a", "filter_b", "invert_a", "invert_b", "exclusive")))
@@ -1087,7 +1098,8 @@ def mode_options(values):
                               values["poll_limit"],
                               RtcCalendarOptions(**initial)
                               if initial is not None else None,
-                              values.get("lse_bypass", False))
+                              values.get("lse_bypass", False),
+                              values.get("periodic_wakeup", False))
     if kind == "watchdog" and values["mode"] == "window":
         return WindowWatchdogOptions(values.get("window_ticks", 1))
     if kind in {"watchdog", "rtc", "crc", "entropy"}:
@@ -1235,13 +1247,6 @@ class SpiDMATransactionEndpointOptions:
 
 @dataclass(frozen=True)
 class I2cEndpointOptions:
-    address: int
-    model_bytes: int | None
-    address_bits: int = 7
-
-
-@dataclass(frozen=True)
-class I2cLongEndpointOptions:
     address: int
     model_bytes: int | None
     address_bits: int = 7
@@ -1441,7 +1446,7 @@ class EndpointIR(Record):
     kind: str
     options: (SpiEndpointOptions | SpiTransactionEndpointOptions |
               SpiDMATransactionEndpointOptions |
-              I2cEndpointOptions | I2cLongEndpointOptions | UsbEndpointOptions |
+              I2cEndpointOptions | UsbEndpointOptions |
               MemoryWindowOptions | SdramWindowOptions | Parallel16Options |
               FlashAsyncOptions | QspiFlashOptions | NandOptions)
     source_fields: tuple[str, ...]
@@ -1477,11 +1482,9 @@ class EndpointIR(Record):
                 values.get("cs_binding"), values.get("model_bytes"),
                 values.get("lsb_first", False))
         elif kind == "i2c":
-            option_type = (I2cLongEndpointOptions
-                           if values["driver"] == "i2c-long-endpoint"
-                           else I2cEndpointOptions)
-            options = option_type(values["address"], values.get("model_bytes"),
-                                  values.get("address_bits", 7))
+            options = I2cEndpointOptions(values["address"],
+                                         values.get("model_bytes"),
+                                         values.get("address_bits", 7))
         elif kind == "usb_device":
             options = UsbEndpointOptions(values["endpoint_index"], *(values[key]
                 for key in ("number", "direction", "transfer", "max_packet",
@@ -1721,7 +1724,7 @@ class ExternalMemoryRegionIR(Record):
 
 @dataclass(frozen=True)
 class ConfigurationIR(Record):
-    source_epoch: ClassVar[int] = 2
+    source_epoch: ClassVar[int] = 3
     board: str
     soc_family: str
     cpu_profile: CpuProfileIR

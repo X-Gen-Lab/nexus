@@ -159,6 +159,17 @@ class PowerRtcIntegration : public testing::Test {
 };
 } /* namespace */
 
+TEST_F(PowerRtcIntegration, UnselectedDurationWakeupAddsNoHardwareBehavior) {
+    ASSERT_EQ(NX_SUCCESS,
+              nx_platform_lifecycle_start(&plan, &platform, nullptr).primary);
+    nx_rtc_period_t actual{123U, 456U};
+    const auto writes = g_f407_rtc_model.writes;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_rtc_port_periodic_wakeup(&rtc_port, 1000000U, 0U, &actual));
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+    EXPECT_EQ(123U, actual.ticks);
+    EXPECT_EQ(456U, actual.ticks_per_second);
+}
 TEST_F(PowerRtcIntegration, StandbyReceiptCrossesRealSystemStopAndColdResume) {
     Prepare();
     ASSERT_FALSE(HasFatalFailure());

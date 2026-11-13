@@ -9,6 +9,14 @@ class UartValidatorFactoryTests(unittest.TestCase):
     def resolve(self, relative):
         return gate.resolve_ir(gate.ROOT / relative, test_support=native_fixture(gate.ROOT / relative))
 
+    def test_binding_pairs_transport_and_validator_without_instance_storage(self):
+        result = self.resolve(
+            "boards/stm32f407zg_qiming_v41/assemblies/rs485-transport.toml")
+        strong = factory.emit_strong(result)
+        self.assertIn("nx_factory_uart_tx_binding_ref(nx_uart_ref_t id)", strong)
+        self.assertIn("nx_uart_tx_binding_t binding", strong)
+        self.assertNotIn("static const nx_uart_tx_binding_t", strong)
+
     def test_reviewed_irq_byte_mode_exports_shared_callback_and_strong_lookup(self):
         result = self.resolve(
             "boards/stm32f407zg_qiming_v41/assemblies/rs485-transport.toml")

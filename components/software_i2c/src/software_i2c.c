@@ -428,7 +428,7 @@ static nx_result_t messages_valid(const nx_software_i2c_device_t* device,
         !span(transferred, sizeof(*transferred), _Alignof(size_t))) {
         return NX_ERROR_INVALID;
     }
-    if (count > NX_I2C_MAX_MESSAGES) {
+    if (count > NX_I2C_BOUNDED_MAX_MESSAGES) {
         return NX_ERROR_UNSUPPORTED;
     }
     size_t descriptors = count * sizeof(*messages);
@@ -446,20 +446,23 @@ static nx_result_t messages_valid(const nx_software_i2c_device_t* device,
         if (item->length == 0U) {
             return NX_ERROR_INVALID;
         }
-        if (item->length > NX_I2C_MAX_MESSAGE_BYTES) {
+        if (item->length > NX_I2C_BOUNDED_MAX_MESSAGE_BYTES) {
             return NX_ERROR_UNSUPPORTED;
         }
-        if (!span(item->data, item->length, 1U) ||
-            !separated(owner, item->data, item->length) ||
-            overlap(item->data, item->length, device, sizeof(*device)) ||
-            overlap(item->data, item->length, messages, descriptors) ||
-            overlap(item->data, item->length, transferred,
+        if (!span(nx_i2c_message_data(item), item->length, 1U) ||
+            !separated(owner, nx_i2c_message_data(item), item->length) ||
+            overlap(nx_i2c_message_data(item), item->length, device,
+                    sizeof(*device)) ||
+            overlap(nx_i2c_message_data(item), item->length, messages,
+                    descriptors) ||
+            overlap(nx_i2c_message_data(item), item->length, transferred,
                     sizeof(*transferred))) {
             return NX_ERROR_INVALID;
         }
         for (size_t j = 0U; j < i; ++j) {
             if (item->read != messages[j].read &&
-                overlap(item->data, item->length, messages[j].data,
+                overlap(nx_i2c_message_data(item), item->length,
+                        nx_i2c_message_data(&messages[j]),
                         messages[j].length)) {
                 return NX_ERROR_INVALID;
             }
@@ -509,10 +512,10 @@ static nx_result_t transaction(void* context, nx_i2c_message_t* messages,
             for (size_t j = 0U; j < messages[i].length && result == NX_SUCCESS;
                  ++j) {
                 result = messages[i].read
-                             ? read_byte(owner, &messages[i].data[j],
+                             ? read_byte(owner, &messages[i].buffer.rx[j],
                                          j + 1U == messages[i].length, false,
                                          deadline)
-                             : write_byte(owner, messages[i].data[j], true,
+                             : write_byte(owner, messages[i].buffer.tx[j], true,
                                           deadline);
                 if (result == NX_SUCCESS) {
                     ++*transferred;

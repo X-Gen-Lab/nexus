@@ -327,7 +327,7 @@ TEST_F(I2CRegisters, TenBitReadAddressesTwiceBeforeExistingReceiveWindows) {
         model_starts = model_message = model_received = 0U;
         model_address_bytes.clear();
         EXPECT_CALL(boundary, Call(0U, true));
-        EXPECT_EQ(NX_SUCCESS, transact({{data, length, true}}));
+        EXPECT_EQ(NX_SUCCESS, transact({nx_i2c_message_read(data, length)}));
         EXPECT_EQ(length, transferred);
         EXPECT_EQ(model_address_bytes,
                   std::vector<uint8_t>({0xF4U, 0xABU, 0xF5U}));
@@ -344,7 +344,8 @@ TEST_F(I2CRegisters, TenBitWriteReadPreservesMessageAndWireBoundaries) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_initialize(&state));
     EXPECT_CALL(boundary, Call(0U, false));
     EXPECT_CALL(boundary, Call(1U, true));
-    EXPECT_EQ(NX_SUCCESS, transact({{data, 1U, false}, {data + 1U, 2U, true}}));
+    EXPECT_EQ(NX_SUCCESS, transact({nx_i2c_message_write(data, 1U),
+                                    nx_i2c_message_read(data + 1U, 2U)}));
     EXPECT_EQ(3U, transferred);
     EXPECT_EQ(model_address_bytes,
               std::vector<uint8_t>({0xF4U, 0xABU, 0xF4U, 0xABU, 0xF5U}));
@@ -355,7 +356,7 @@ TEST_F(I2CRegisters, TenBitStandardTimingErratumRejectsBeforeStart) {
     endpoint_state.address = 0x2ABU;
     endpoint_state.address_bits = 10U;
     registers.CCR = 210U;
-    nx_i2c_message_t message = {data, 1U, true};
+    nx_i2c_message_t message = nx_i2c_message_read(data, 1U);
     const auto before = registers;
     EXPECT_EQ(NX_ERROR_UNSUPPORTED,
               nx_i2c_endpoint_transaction(&endpoint, &message, 1U, 1000U,
@@ -369,7 +370,8 @@ TEST_F(I2CRegisters, StandardSevenBitRestartUsesErrataSafeNominalTiming) {
     EXPECT_EQ(239U, registers.CCR);
     EXPECT_CALL(boundary, Call(0U, false));
     EXPECT_CALL(boundary, Call(1U, true));
-    EXPECT_EQ(NX_SUCCESS, transact({{data, 1U, false}, {data + 1U, 2U, true}}));
+    EXPECT_EQ(NX_SUCCESS, transact({nx_i2c_message_write(data, 1U),
+                                    nx_i2c_message_read(data + 1U, 2U)}));
     EXPECT_EQ(3U, transferred);
     EXPECT_EQ(2U, model_starts);
 }
@@ -380,7 +382,7 @@ TEST_F(I2CRegisters, StandardTenBitReadUsesTheSameErrataSafeTiming) {
     model_endpoint_address = endpoint_state.address;
     model_address_bits = 10U;
     EXPECT_CALL(boundary, Call(0U, true));
-    EXPECT_EQ(NX_SUCCESS, transact({{data, 2U, true}}));
+    EXPECT_EQ(NX_SUCCESS, transact({nx_i2c_message_read(data, 2U)}));
     EXPECT_EQ(2U, transferred);
     EXPECT_EQ(2U, model_starts);
     EXPECT_EQ(model_address_bytes, std::vector<uint8_t>({0xF4U, 0xABU, 0xF5U}));
@@ -390,7 +392,8 @@ TEST_F(I2CRegisters, UnsafeSevenBitRestartRejectsBeforeAnyControllerEffect) {
     registers.CCR = 210U;
     const auto before = registers;
     EXPECT_EQ(NX_ERROR_UNSUPPORTED,
-              transact({{data, 1U, false}, {data + 1U, 2U, true}}));
+              transact({nx_i2c_message_write(data, 1U),
+                        nx_i2c_message_read(data + 1U, 2U)}));
     EXPECT_EQ(0U, transferred);
     EXPECT_EQ(0, std::memcmp(&before, &registers, sizeof(registers)));
     EXPECT_FALSE(state.active);
@@ -480,7 +483,7 @@ TEST_F(I2CRegisters, ReceivesThreeFourAndMaximumLengthWithExactPrefix) {
         model_received = 0;
         model_starts = 0;
         EXPECT_CALL(boundary, Call(0, true));
-        ASSERT_EQ(transact({{data, length, true}}), NX_SUCCESS);
+        ASSERT_EQ(transact({nx_i2c_message_read(data, length)}), NX_SUCCESS);
         EXPECT_EQ(transferred, length);
         for (size_t i = 0; i < length; ++i) {
             EXPECT_EQ(data[i], static_cast<uint8_t>(i + 1));
@@ -497,11 +500,11 @@ TEST_F(I2CRegisters, MixedReadsUseRepeatedStartWithoutIntermediateStop) {
     EXPECT_CALL(boundary, Call(1, true));
     EXPECT_CALL(boundary, Call(2, true));
     EXPECT_CALL(boundary, Call(3, false));
-    ASSERT_EQ(transact({{&command, 1, false},
-                        {data, 4, true},
-                        {second, 2, true},
-                        {&command, 1, false}}),
-              NX_SUCCESS);
+    ASSERT_EQ(
+        transact({nx_i2c_message_write(&command, 1),
+                  nx_i2c_message_read(data, 4), nx_i2c_message_read(second, 2),
+                  nx_i2c_message_write(&command, 1)}),
+        NX_SUCCESS);
     EXPECT_EQ(model_starts, 4U);
     EXPECT_EQ(transferred, 8U);
     EXPECT_EQ(second[0], 5U);
@@ -518,10 +521,10 @@ TEST_F(I2CRegisters, NackArbitrationAndBusErrorPreserveCompletedReadPrefix) {
         model_error = error;
         model_error_after = 2;
         EXPECT_CALL(boundary, Call(0, true));
-        EXPECT_EQ(transact({{data, 8, true}}), error == nack ? NX_ERROR_NACK
-                                               : error == arbitration
-                                                   ? NX_ERROR_ARBITRATION
-                                                   : NX_ERROR_IO);
+        EXPECT_EQ(transact({nx_i2c_message_read(data, 8)}),
+                  error == nack          ? NX_ERROR_NACK
+                  : error == arbitration ? NX_ERROR_ARBITRATION
+                                         : NX_ERROR_IO);
         EXPECT_EQ(transferred, 2U);
         EXPECT_EQ(data[0], 1U);
         EXPECT_EQ(data[1], 2U);
@@ -537,7 +540,7 @@ TEST_F(I2CRegisters, NackArbitrationAndBusErrorPreserveCompletedReadPrefix) {
 
 TEST_F(I2CRegisters, ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges) {
     const uint32_t before = control(&state);
-    EXPECT_EQ(transact({{data, 256, true}}, 1), NX_ERROR_TIMEOUT);
+    EXPECT_EQ(transact({nx_i2c_message_read(data, 256)}, 1), NX_ERROR_TIMEOUT);
     EXPECT_EQ(transferred, 0U);
     EXPECT_EQ(control(&state), before);
     EXPECT_EQ(model_starts, 0U);
@@ -546,13 +549,13 @@ TEST_F(I2CRegisters, ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges) {
 TEST_F(I2CRegisters, ContextAndOversizedMessagesRejectBeforeHardwareAccess) {
     const uint32_t before = control(&state);
     model_isr = true;
-    EXPECT_EQ(transact({{data, 3, true}}), NX_ERROR_CONTEXT);
+    EXPECT_EQ(transact({nx_i2c_message_read(data, 3)}), NX_ERROR_CONTEXT);
     model_isr = false;
     model_mask = 1;
-    EXPECT_EQ(transact({{data, 3, true}}), NX_ERROR_CONTEXT);
+    EXPECT_EQ(transact({nx_i2c_message_read(data, 3)}), NX_ERROR_CONTEXT);
     EXPECT_EQ(model_mask, 1U);
     model_mask = 0;
-    EXPECT_NE(transact({{data, 257, true}}), NX_SUCCESS);
+    EXPECT_NE(transact({nx_i2c_message_read(data, 257)}), NX_SUCCESS);
     EXPECT_EQ(transferred, 0U);
     EXPECT_EQ(control(&state), before);
     EXPECT_EQ(model_starts, 0U);
@@ -560,7 +563,7 @@ TEST_F(I2CRegisters, ContextAndOversizedMessagesRejectBeforeHardwareAccess) {
 
 TEST_F(I2CRegisters, NeverDeadlineRejectsBeforeHardwareAccess) {
     const uint32_t before = control(&state);
-    EXPECT_EQ(transact({{data, 3, true}}, NX_DEADLINE_NEVER),
+    EXPECT_EQ(transact({nx_i2c_message_read(data, 3)}, NX_DEADLINE_NEVER),
               NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(control(&state), before);
     EXPECT_EQ(model_starts, 0U);
@@ -575,7 +578,8 @@ TEST_F(I2CRegisters, DeadlineDuringReadReturnsOnlyTheCompletedPrefix) {
         model_starts = 0;
         model_stall_after = length == 3 ? 1 : 2;
         EXPECT_CALL(boundary, Call(0, true));
-        EXPECT_EQ(transact({{data, length, true}}, 40), NX_ERROR_TIMEOUT);
+        EXPECT_EQ(transact({nx_i2c_message_read(data, length)}, 40),
+                  NX_ERROR_TIMEOUT);
         EXPECT_EQ(transferred, model_stall_after);
         for (size_t i = 0; i < model_stall_after; ++i) {
             EXPECT_EQ(data[i], static_cast<uint8_t>(i + 1));
@@ -593,7 +597,8 @@ TEST_F(I2CRegisters, ExhaustedStopBudgetDoesNotWaitForLaterBusRelease) {
     model_hold_stop = true;
     model_release_stop_after = 4U;
     EXPECT_CALL(boundary, Call(0U, true));
-    EXPECT_EQ(transact({{data, 4U, true}}, UINT64_MAX - 1U), NX_ERROR_IO);
+    EXPECT_EQ(transact({nx_i2c_message_read(data, 4U)}, UINT64_MAX - 1U),
+              NX_ERROR_IO);
     EXPECT_EQ(transferred, 4U);
     EXPECT_TRUE(state.fault);
     EXPECT_FALSE(state.active);
@@ -603,7 +608,7 @@ TEST_F(I2CRegisters, ExhaustedStopBudgetDoesNotWaitForLaterBusRelease) {
 TEST_F(I2CRegisters, StuckStopCannotReportSuccessAndRequiresRecovery) {
     model_hold_stop = true;
     EXPECT_CALL(boundary, Call(0, true));
-    EXPECT_NE(transact({{data, 4, true}}, 40), NX_SUCCESS);
+    EXPECT_NE(transact({nx_i2c_message_read(data, 4)}, 40), NX_SUCCESS);
     EXPECT_EQ(transferred, 4U);
     EXPECT_FALSE(state.active);
     EXPECT_TRUE(state.fault);
@@ -617,11 +622,11 @@ TEST_F(I2CRegisters, StuckStopCannotReportSuccessAndRequiresRecovery) {
     model_received = 0;
     model_starts = 0;
     EXPECT_CALL(boundary, Call(0, true));
-    EXPECT_EQ(transact({{data, 4, true}}), NX_SUCCESS);
+    EXPECT_EQ(transact({nx_i2c_message_read(data, 4)}), NX_SUCCESS);
 }
 
 TEST_F(I2CRegisters, EightMessageBoundIsValidatedBeforeTheFirstStart) {
-    std::vector<nx_i2c_message_t> messages(9, {data, 1, true});
+    std::vector<nx_i2c_message_t> messages(9, nx_i2c_message_read(data, 1));
     const uint32_t before = control(&state);
     EXPECT_EQ(transact(messages), NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(control(&state), before);
@@ -638,7 +643,7 @@ TEST_F(I2CRegisters, EightMessageBoundIsValidatedBeforeTheFirstStart) {
 TEST_F(I2CRegisters, CompletedStopDoesNotIssueAnotherStopAfterMasterRelease) {
     model_complete_on_last_read = true;
     EXPECT_CALL(boundary, Call(0, true));
-    EXPECT_EQ(transact({{data, 4, true}}), NX_SUCCESS);
+    EXPECT_EQ(transact({nx_i2c_message_read(data, 4)}), NX_SUCCESS);
     EXPECT_TRUE(model_stop_completed);
     EXPECT_EQ(control(&state) & stop, 0U);
     EXPECT_EQ(transferred, 4U);
@@ -647,7 +652,7 @@ TEST_F(I2CRegisters, CompletedStopDoesNotIssueAnotherStopAfterMasterRelease) {
 TEST_F(I2CRegisters, StopBitClearWithoutMasterReleaseCannotReportSuccess) {
     model_hold_master = true;
     EXPECT_CALL(boundary, Call(0, true));
-    EXPECT_NE(transact({{data, 4, true}}, 40), NX_SUCCESS);
+    EXPECT_NE(transact({nx_i2c_message_read(data, 4)}, 40), NX_SUCCESS);
     EXPECT_EQ(transferred, 4U);
     EXPECT_FALSE(state.active);
 }
@@ -669,7 +674,7 @@ TEST_F(I2CRegisters,
                 uint8_t next[1] = {0x10};
                 EXPECT_CALL(boundary, Call(0, true));
                 EXPECT_CALL(boundary, Call(1, next_read));
-                ASSERT_EQ(transact({{data, length, true},
+                ASSERT_EQ(transact({nx_i2c_message_read(data, length),
                                     {next, sizeof(next), next_read}}),
                           NX_SUCCESS);
                 EXPECT_EQ(transferred, length + 1);
@@ -786,7 +791,8 @@ TEST_F(I2CRegisters, PollingPayloadCannotBorrowMutableProviderControlBytes) {
         .Times(testing::AnyNumber());
     EXPECT_FALSE(state.active);
     auto* control_byte = reinterpret_cast<uint8_t*>(&state.active);
-    EXPECT_EQ(NX_ERROR_INVALID, transact({{control_byte, 1U, false}}));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              transact({nx_i2c_message_write(control_byte, 1U)}));
     EXPECT_EQ(0U, model_starts);
     EXPECT_EQ(0U, registers.DR);
 }
@@ -797,9 +803,9 @@ TEST_F(I2CRegisters, FirstReceiveCannotRewriteALaterValidatedMessageLength) {
     uint8_t guarded[258] = {};
     guarded[256] = 0xA5U;
     model_messages.resize(2U);
-    model_messages[0] = {reinterpret_cast<uint8_t*>(&model_messages[1].length),
-                         1U, true};
-    model_messages[1] = {guarded, 256U, true};
+    model_messages[0] = nx_i2c_message_read(
+        reinterpret_cast<uint8_t*>(&model_messages[1].length), 1U);
+    model_messages[1] = nx_i2c_message_read(guarded, 256U);
     EXPECT_EQ(NX_ERROR_INVALID,
               nx_i2c_endpoint_transaction(&endpoint, model_messages.data(),
                                           model_messages.size(), 10000U,
@@ -810,7 +816,7 @@ TEST_F(I2CRegisters, FirstReceiveCannotRewriteALaterValidatedMessageLength) {
 }
 
 TEST_F(I2CRegisters, ProgressOutputCannotOverwriteDescriptorsOrImmutableTx) {
-    model_messages = {{data, 1U, true}};
+    model_messages = {nx_i2c_message_read(data, 1U)};
     EXPECT_EQ(NX_ERROR_INVALID,
               nx_i2c_endpoint_transaction(&endpoint, model_messages.data(),
                                           model_messages.size(), 1000U,
@@ -820,9 +826,9 @@ TEST_F(I2CRegisters, ProgressOutputCannotOverwriteDescriptorsOrImmutableTx) {
     EXPECT_CALL(boundary, Call(testing::_, testing::_))
         .Times(testing::AnyNumber());
     transferred = 0x37U;
-    EXPECT_EQ(
-        NX_ERROR_INVALID,
-        transact({{reinterpret_cast<uint8_t*>(&transferred), 1U, false}}));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              transact({nx_i2c_message_write(
+                  reinterpret_cast<uint8_t*>(&transferred), 1U)}));
     EXPECT_EQ(0x37U, transferred);
     EXPECT_EQ(0U, model_starts);
 }
@@ -832,7 +838,7 @@ TEST_F(I2CRegisters, UnprivilegedPollingCannotStartProtectedReceiveWindows) {
         .Times(testing::AnyNumber());
     const auto before = registers;
     model_privileged = false;
-    EXPECT_EQ(NX_ERROR_CONTEXT, transact({{data, 2U, true}}));
+    EXPECT_EQ(NX_ERROR_CONTEXT, transact({nx_i2c_message_read(data, 2U)}));
     EXPECT_EQ(0U, model_starts);
     EXPECT_EQ(0, std::memcmp(&before, &registers, sizeof(registers)));
     EXPECT_EQ(0U, model_mask);

@@ -31,9 +31,13 @@ zero-to-one 错误在第一脉冲之前检查。锁定单块用 x8 写入精确�
 ## Option Bytes 和保护
 
 完整目标 image 包括语义 RDP 级别、按物理密度限定的写保护 sector 集合，以及
-BOR/USER 字段。BOR 值是硬件编码：0 为 level3、1 为 level2、2 为 level1、3 为
-关闭。USER 明确选择硬件 watchdog、STOP reset 和 STANDBY reset，不推导产品策略。
-F407 不提供 PCROP 或双 bank 选项；不能把其它 F4 型号的功能套用到这两个型号。
+BOR/USER 字段。`brownout` 使用固定宽度语义 profile：DISABLED、SUPPLY_2V1、
+SUPPLY_2V4 或 SUPPLY_2V7，provider 独立映射到寄存器编码。零值 UNKNOWN 表示
+未选择，在任何硬件效果之前拒绝；关闭 BOR 必须显式选择 DISABLED。所选官方 HAL 将三个
+供电 profile 分别关联到 2.10–2.40 V、2.40–2.70 V 和 2.70–3.60 V 工作范围；
+这些名称不表示精确复位阈值或实测电压，具体器件限值与容差仍须遵守。USER 明确选择
+硬件 watchdog、STOP reset 和 STANDBY reset，不推导产品策略。F407 不提供 PCROP
+或双 bank 选项；不能把其它 F4 型号的功能套用到这两个型号。
 
 每次操作单独声明已确认的效果：OTP_PROGRAM、OTP_LOCK、OPTIONS、MASS_ERASE、
 PERMANENT。缺失对应声明时，在解锁或第一脉冲之前拒绝。这些位只是调用者显式

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: f1e3fa4d7e60569cc2544f3e4a015c4b4d506e211f8ce30ef7bd4b747d2c2691\n"
+"X-Nexus-Source-SHA256: d1e593f5b7b6824e1a681a39db8dcf0b256e34ea624c5e9e6fe27395c338e392\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:1
 msgid "外部工程迁移"
@@ -146,8 +146,9 @@ msgstr ""
 "BUSY/QUARANTINED. Faces may be retained before start; after successful "
 "stop their identity is unchanged and the provider rejects operations."
 
-msgid "当前 factory／source interface epoch 为 2，`0.2.1` 仍为按精确提交消费的开发快照。 ADC group 的直接 `request.frames` 访问迁为 `request.output.frames`；优先使用 `nx_adc_group_prepare()` 设置 RAW 视图，paired 结果由独立 prepare 入口建立。 旧 epoch 1 不作为兼容 fallback，全部调用者、生成代码和 provider 必须一起重编。 具体字段与借用步骤见[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-2)， 代际、manifest 和拒绝规则见[源码兼容性合同](../design/source-compatibility.md)。"
-msgstr "The current factory/source interface epoch is 2; `0.2.1` remains a development snapshot consumed by exact commit. Direct ADC group `request.frames` access migrates to `request.output.frames`. Prefer `nx_adc_group_prepare()` to install the RAW view; a separate prepare entry creates paired results. Old epoch 1 is not a compatibility fallback. All callers, generated code and providers must be rebuilt together. See the [migration guide](../guides/migration.md#rebuild-for-source-interface-epoch-2) for fields and borrowing, and the [source compatibility contract](../design/source-compatibility.md) for generation, manifest and rejection rules."
+#: docs/delivery/migration.md:0
+msgid "当前 factory／source interface epoch 为 3，`0.2.1` 仍为按精确提交消费的开发快照。 ADC group 的直接 `request.frames` 访问迁为 `request.output.frames`；优先使用 `nx_adc_group_prepare()` 设置 RAW 视图，paired 结果由独立 prepare 入口建立。 epoch 3 的公共 traits 使用 `nexus/io/traits.h` 中的领域类型；SDIO 请求直接使用 `base`、数据跨度和 function 地址，删除 `transfer` 包装及无意义 LBA。旧 epoch 1／2 不作为兼容 fallback，全部调用者、生成代码和 provider 必须一起重编。 具体字段与借用步骤见[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-3)， 代际、manifest 和拒绝规则见[源码兼容性合同](../design/source-compatibility.md)。"
+msgstr "The current factory/source interface epoch is 3; `0.2.1` remains a development snapshot consumed by exact commit. Direct ADC group `request.frames` access migrates to `request.output.frames`; prefer `nx_adc_group_prepare()` to install the RAW view, while a separate prepare entry creates paired results. Epoch-3 public traits use domain types from `nexus/io/traits.h`. SDIO requests directly contain `base`, payload spans and function addresses, removing the `transfer` wrapper and meaningless LBA. Epochs 1/2 are not compatibility fallbacks: rebuild all callers, generated code and providers together. See the [migration guide](../guides/migration.md#rebuild-for-source-interface-epoch-3) for fields and borrowing, and the [source compatibility contract](../design/source-compatibility.md) for generation, manifest and rejection rules."
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:32
 msgid ""

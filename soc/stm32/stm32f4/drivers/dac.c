@@ -303,6 +303,7 @@ nx_result_t nx_stm32_dac_info(const void* context, nx_dac_info_t* output) {
                 : config->mode == NX_STM32_DAC_TRIANGLE ? NX_DAC_WAVE_TRIANGLE
                                                         : NX_DAC_WAVE_NONE,
         .maximum_code = maximum(config),
+        .code_bits = config->format == NX_DAC_FORMAT_U8 ? 8U : 12U,
         .amplitude = config->amplitude,
         .channel_mask = config->channels,
         .software_trigger = config->trigger == NX_STM32_DAC_TRIGGER_SOFTWARE,
@@ -638,7 +639,8 @@ nx_result_t nx_stm32_dac_stop(void* context, nx_time_us_t deadline) {
     }
     return context_ok() ? idle(state, deadline) : NX_ERROR_CONTEXT;
 }
-/** \brief Hardware DOR is always right-aligned twelve-bit digital data. */
+/** \brief Project the native digital latch into the selected public code unit.
+ */
 nx_result_t nx_stm32_dac_snapshot(const void* context, nx_dac_state_t* output) {
     const nx_stm32_dac_state_t* state = context;
     if (!ready(state)) {
@@ -654,13 +656,17 @@ nx_result_t nx_stm32_dac_snapshot(const void* context, nx_dac_state_t* output) {
     *output = (nx_dac_state_t){
         .running = state->running,
         .faulted = state->faulted,
+        .code_bits = state->config->format == NX_DAC_FORMAT_U8 ? 8U : 12U,
         .trigger_divisor = state->trigger_divisor,
         .timer_clock_hz = timer(state->config) != NULL ? NX_DAC_TIMER_HZ : 0U};
     for (unsigned index = 0U; index < 2U; ++index) {
         if ((state->config->channels & (1U << index)) != 0U) {
-            output->digital_output12[index] =
-                (uint16_t)LL_DAC_RetrieveOutputData(state->config->registers,
-                                                    channel(index));
+            uint32_t native = LL_DAC_RetrieveOutputData(
+                state->config->registers, channel(index));
+            output->output_codes[index] =
+                (uint16_t)(state->config->format == NX_DAC_FORMAT_U8
+                               ? native >> 4U
+                               : native);
             if (LL_DAC_IsEnabled(state->config->registers, channel(index)) !=
                 0U) {
                 output->enabled_channels |= (uint8_t)(1U << index);

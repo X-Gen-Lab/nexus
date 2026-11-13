@@ -32,7 +32,7 @@ typedef struct {
     uint8_t vector_count;
     uint8_t priority;
     bool kernel_bound;
-    const nx_uart_wire_config_t* wire;
+    const nx_stm32_uart_wire_config_t* wire;
     uint8_t pin_count;
 } nx_stm32_uart_cold_config_t;
 

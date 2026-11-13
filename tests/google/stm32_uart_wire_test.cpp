@@ -36,8 +36,8 @@ class UartWire : public testing::Test {
         state.active = nullptr;
         (void)nx_stm32_uart_stop(&state);
     }
-    nx_uart_wire_config_t config(nx_uart_wire_mode_t mode) {
-        nx_uart_wire_config_t selected = {};
+    nx_stm32_uart_wire_config_t config(nx_uart_wire_mode_t mode) {
+        nx_stm32_uart_wire_config_t selected = {};
         selected.mode = mode;
         if (mode == NX_UART_WIRE_LIN)
             selected.lin_break_bits = 11U;

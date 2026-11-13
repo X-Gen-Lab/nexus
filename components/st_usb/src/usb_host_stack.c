@@ -68,14 +68,24 @@ static nx_result_t submit_packet(nx_st_usb_host_stack_t* state, uint8_t index) {
     if (length > slot->pipe.max_packet)
         length = slot->pipe.max_packet;
     const bool in = (slot->pipe.endpoint_address & 0x80U) != 0U;
+    nx_usb_host_storage_requirements_t storage;
+    nx_result_t result = nx_usb_host_storage_requirements(
+        state->config->transport, index, length, &storage);
+    if (result != NX_SUCCESS)
+        return result;
+    if (storage.alignment == 0U ||
+        (storage.alignment & (storage.alignment - 1U)) != 0U ||
+        (uintptr_t)slot->storage % storage.alignment != 0U ||
+        storage.capacity < length)
+        return NX_ERROR_INVALID;
+    if (storage.capacity > slot->capacity)
+        return NX_ERROR_OVERFLOW;
     if (!in && length != 0U)
         memcpy(slot->storage, slot->bytes + slot->offset, length);
-    /* HAL's last word read is owned even for an odd OUT payload or ZLP. */
-    size_t padded = (length + 3U) & ~(size_t)3U;
-    if (!in && padded > length)
-        memset(slot->storage + length, 0, padded - length);
+    if (!in && storage.capacity > length)
+        memset(slot->storage + length, 0, storage.capacity - length);
     nx_time_us_t deadline;
-    nx_result_t result = nx_deadline_finite_after(
+    result = nx_deadline_finite_after(
         nx_time_now_us(), state->config->transfer_timeout_us, &deadline);
     if (result != NX_SUCCESS)
         return result;
@@ -132,8 +142,7 @@ nx_st_usb_host_stack_initialize(nx_st_usb_host_stack_t* state,
         return NX_ERROR_BUSY;
     for (size_t i = 0U; i < config->slot_count; ++i) {
         nx_st_usb_host_slot_t* slot = &config->slots[i];
-        if (slot->storage == NULL || slot->capacity < 1024U ||
-            ((uintptr_t)slot->storage & 3U) != 0U ||
+        if (slot->storage == NULL || slot->capacity == 0U ||
             overlaps(slot->storage, slot->capacity, state, sizeof(*state)) ||
             overlaps(slot->storage, slot->capacity, config, sizeof(*config)) ||
             overlaps(slot->storage, slot->capacity, config->slots,

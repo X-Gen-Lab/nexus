@@ -18,6 +18,81 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class SDKServicesPolicyTests(unittest.TestCase):
+    def test_graphics_sdram_profile_reuses_public_composition_and_exports_fixture(self):
+        profile = consumer_profiles.ServiceConsumer(
+            "f479ni graphics sdram", "combined.toml", "arm-graphics-sdram-f479ni",
+            True, "f4_graphics_sdram")
+        self.assertIn(profile, consumer_profiles.SERVICE_CONSUMERS)
+        prefix = self.prefix()
+        sdk = prefix / "share/nexus/src"
+        for name in ("stm32f4_graphics", "stm32f4_graphics_sdram"):
+            relative = Path("tests/contracts") / name
+            shutil.copytree(ROOT / relative, sdk / relative)
+        output = self.directory / profile.domain
+        output.mkdir()
+        source, _, _ = self.consumers.prepare_service_consumer(
+            prefix, output, profile, self.command,
+            expected_revision="a" * 40, fixture=True)
+        self.assertEqual((source / "main.c").read_bytes(),
+                         (ROOT / "tests/contracts/stm32f4_graphics/consumer.c").read_bytes())
+        self.assertIn("NX_GRAPHICS_SDRAM_REFERENCE=1",
+                      (source / "CMakeLists.txt").read_text())
+        specification = importlib.util.spec_from_file_location(
+            "graphics_sdram_source_sdk_policy",
+            ROOT / "cmake/package/package_source_sdk.py")
+        source_sdk = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(source_sdk)
+        for name in ("CMakeLists.txt", "combined.toml", "board/board.json"):
+            relative = "tests/contracts/stm32f4_graphics_sdram/" + name
+            self.assertIn(relative, source_sdk.REQUIRED_FILES)
+            self.assertTrue(source_sdk.selected(relative))
+        self.assertFalse(source_sdk.selected(
+            "tests/contracts/stm32f4_graphics_sdram/consumer.c"))
+        self.assertEqual((source / "board/board.json").read_bytes(),
+                         (ROOT / "tests/contracts/stm32f4_graphics_sdram/board/board.json").read_bytes())
+        required = self.consumers.service_symbols(profile)
+        self.assertLessEqual({
+            "nx_image_prepare", "nx_image_port_submit", "nx_image_port_service",
+            "nx_display_prepare", "nx_display_port_submit",
+            "nx_display_port_service", "nx_display_port_stop",
+            "nx_stm32_sdram_graphics_attach", "nx_stm32_sdram_graphics_check",
+            "nx_stm32_sdram_graphics_detach", "nx_stm32_sdram_graphics_overlaps",
+        }, required)
+        scope = self.consumers.service_scope(profile)
+        self.assertIn("DMA2D", scope)
+        self.assertIn("SDRAM", scope)
+        self.assertIn("No physical", scope)
+
+    def test_sdk_required_payload_excludes_the_removed_i2c_long_interface(self):
+        specification = importlib.util.spec_from_file_location(
+            "i2c_source_sdk_policy", ROOT / "cmake/package/package_source_sdk.py")
+        source_sdk = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(source_sdk)
+        for relative in ("io/include/nexus/io/i2c_long.h",
+                         "io/src/mechanisms/i2c_long.c"):
+            with self.subTest(path=relative):
+                self.assertNotIn(relative, source_sdk.REQUIRED_FILES)
+
+    def test_sdk_required_payload_retains_current_io_and_f4_compile_closure(self):
+        specification = importlib.util.spec_from_file_location(
+            "current_io_source_sdk_policy",
+            ROOT / "cmake/package/package_source_sdk.py")
+        source_sdk = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(source_sdk)
+        generic = {"io/include/nexus/io/traits.h", "io/private/dispatch_checks.h",
+                   *("io/src/api/" + name + ".c" for name in
+                     ("capture", "timer_pulse", "timer_sequence"))}
+        private = {"soc/stm32/stm32f4/private/" + name + ".h" for name in (
+            "stm32f4_graphics_memory", "stm32f4_irq_wake", "stm32f4_uart",
+            "stm32f4_uart_format", "stm32f4_uart_wire_config")}
+        self.assertLessEqual(generic | private, set(source_sdk.REQUIRED_FILES))
+        self.assertLessEqual(private, set(source_sdk.provider_descriptors
+                                         .maintained("stm32f4").owned_payload))
+        for name in sorted(generic | private):
+            with self.subTest(path=name):
+                self.assertTrue(source_sdk.selected(name))
+                self.assertTrue((ROOT / name).is_file())
+
     @classmethod
     def setUpClass(cls):
         specification = importlib.util.spec_from_file_location(

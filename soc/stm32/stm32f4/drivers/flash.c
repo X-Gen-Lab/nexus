@@ -458,6 +458,34 @@ static bool maintenance_buffer(const nx_stm32_flash_state_t* port,
              UINT32_C(0x08000000) < last);
 }
 
+/** \brief RM0090 BOR bits implement the reviewed supply-range profile. */
+static bool brownout_bits(nx_flash_brownout_t profile, uint32_t* bits) {
+    switch (profile) {
+        case NX_FLASH_BROWNOUT_DISABLED:
+            *bits = 3U << 2U;
+            return true;
+        case NX_FLASH_BROWNOUT_SUPPLY_2V1:
+            *bits = 2U << 2U;
+            return true;
+        case NX_FLASH_BROWNOUT_SUPPLY_2V4:
+            *bits = 1U << 2U;
+            return true;
+        case NX_FLASH_BROWNOUT_SUPPLY_2V7:
+            *bits = 0U;
+            return true;
+        default:
+            return false;
+    }
+}
+
+/** \brief Decode hardware independently of public semantic profile values. */
+static nx_flash_brownout_t brownout_profile(uint32_t options) {
+    static const nx_flash_brownout_t profiles[] = {
+        NX_FLASH_BROWNOUT_SUPPLY_2V7, NX_FLASH_BROWNOUT_SUPPLY_2V4,
+        NX_FLASH_BROWNOUT_SUPPLY_2V1, NX_FLASH_BROWNOUT_DISABLED};
+    return profiles[(options & FLASH_OPTCR_BOR_LEV) >> 2U];
+}
+
 static nx_result_t
 maintenance_snapshot(void* context, nx_flash_maintenance_snapshot_t* snapshot) {
     nx_stm32_flash_state_t* port = context;
@@ -485,8 +513,7 @@ maintenance_snapshot(void* context, nx_flash_maintenance_snapshot_t* snapshot) {
                 .read_protection = protection(options),
                 .write_protected_sectors =
                     (~(options >> 16U)) & sector_mask(port),
-                .brownout_level =
-                    (uint8_t)((options & FLASH_OPTCR_BOR_LEV) >> 2U),
+                .brownout = brownout_profile(options),
                 .hardware_watchdog = (options & FLASH_OPTCR_WDG_SW) == 0U,
                 .reset_on_stop = (options & FLASH_OPTCR_nRST_STOP) == 0U,
                 .reset_on_standby = (options & FLASH_OPTCR_nRST_STDBY) == 0U,
@@ -616,8 +643,10 @@ static nx_result_t set_options(void* context, const nx_flash_options_t* desired,
     nx_result_t result = maintenance_idle(port);
     if (result != NX_SUCCESS)
         return result;
+    uint32_t bor = 0U;
     if (!maintenance_buffer(port, desired, sizeof(*desired), false) ||
-        deadline == NX_DEADLINE_NEVER || desired->brownout_level > 3U ||
+        deadline == NX_DEADLINE_NEVER ||
+        !brownout_bits(desired->brownout, &bor) ||
         (desired->write_protected_sectors & ~sector_mask(port)) != 0U ||
         (desired->read_protection != NX_FLASH_READ_OPEN &&
          desired->read_protection != NX_FLASH_READ_PROTECTED &&
@@ -626,7 +655,7 @@ static nx_result_t set_options(void* context, const nx_flash_options_t* desired,
     uint32_t before = NX_STM32_FLASH_READ(&port->registers->OPTCR);
     /* ES0182 Rev19 2.2.9: avoid untracked consecutive BOR writes at HPRE>2.
      * Unchanged BOR does not restrict other option maintenance. */
-    if (((before & FLASH_OPTCR_BOR_LEV) >> 2U) != desired->brownout_level &&
+    if ((before & FLASH_OPTCR_BOR_LEV) != bor &&
         NX_STM32_FLASH_HPRE() >= RCC_CFGR_HPRE_DIV4)
         return NX_ERROR_UNSUPPORTED;
     if ((before & (FLASH_OPTCR_OPTLOCK | FLASH_OPTCR_OPTSTRT)) !=
@@ -655,8 +684,7 @@ static nx_result_t set_options(void* context, const nx_flash_options_t* desired,
                     FLASH_OPTCR_OPTLOCK | FLASH_OPTCR_OPTSTRT;
     uint32_t value =
         (before & ~mask) | (rdp << 8U) |
-        ((~desired->write_protected_sectors & sector_mask(port)) << 16U) |
-        ((uint32_t)desired->brownout_level << 2U) |
+        ((~desired->write_protected_sectors & sector_mask(port)) << 16U) | bor |
         (desired->hardware_watchdog ? 0U : FLASH_OPTCR_WDG_SW) |
         (desired->reset_on_stop ? 0U : FLASH_OPTCR_nRST_STOP) |
         (desired->reset_on_standby ? 0U : FLASH_OPTCR_nRST_STDBY);

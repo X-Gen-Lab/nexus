@@ -52,8 +52,8 @@ class I2CMultiple : public testing::Test {
         {&nx_i2c_v1_async_endpoint_ops, &endpoints[0]},
         {&nx_i2c_v1_async_endpoint_ops, &endpoints[1]}};
     uint8_t buffers[2][4]{};
-    nx_i2c_message_t messages[2]{{buffers[0], 3U, true},
-                                 {buffers[1], 3U, true}};
+    nx_i2c_message_t messages[2]{nx_i2c_message_read(buffers[0], 3U),
+                                 nx_i2c_message_read(buffers[1], 3U)};
     nx_i2c_request_t requests[2]{};
     nx_dma_memory_region_t regions[1]{};
     nx_i2c_v1_dma_t dma[2]{};
@@ -340,7 +340,8 @@ TEST_F(I2CMultiple, ThirdTxAndRxPreserveNeighboursAndWaitForWireCompletion) {
     for (bool receive : {false, true}) {
         SCOPED_TRACE(receive);
         I2C3->SR2 = 0U;
-        messages[1].read = receive;
+        messages[1] = receive ? nx_i2c_message_read(buffers[1], 3U)
+                              : nx_i2c_message_write(buffers[1], 3U);
         nx_request_initialize(&requests[1].base);
         ASSERT_EQ(NX_SUCCESS, nx_i2c_request_prepare(&requests[1], &messages[1],
                                                      1U, 1000U));

@@ -1203,10 +1203,40 @@ static bool dma_fifo_available(void) {
            dma_fifo_empty();
 }
 
+/** \brief The accepted personality selects its exact enclosing descriptor. */
+static uint32_t async_blocks(const nx_stm32_sdio_async_state_t* execution) {
+    return execution->function != 0U
+               ? ((const nx_sdio_io_request_t*)execution->active)->blocks
+               : ((const nx_block_request_t*)execution->active)->blocks;
+}
+
+/** \brief Borrowed payload stays in its typed caller-owned descriptor. */
+static const void* async_data(const nx_stm32_sdio_async_state_t* execution) {
+    return execution->function != 0U
+               ? ((const nx_sdio_io_request_t*)execution->active)->data
+               : nx_block_request_data(
+                     (const nx_block_request_t*)execution->active);
+}
+
+/** \brief Only the receive direction can expose mutable caller storage. */
+static uint8_t*
+async_receive_data(const nx_stm32_sdio_async_state_t* execution) {
+    return execution->function != 0U
+               ? ((nx_sdio_io_request_t*)execution->active)->data
+               : ((nx_block_request_t*)execution->active)->buffer.rx;
+}
+
+/** \brief Transfer direction is immutable throughout the accepted loan. */
+static bool async_write(const nx_stm32_sdio_async_state_t* execution) {
+    return execution->function != 0U
+               ? ((const nx_sdio_io_request_t*)execution->active)->write
+               : ((const nx_block_request_t*)execution->active)->write;
+}
+
 /** \brief Memory frames span the request; functions retain one CMD53 unit. */
 static uint32_t async_bytes(const nx_stm32_sdio_async_state_t* execution) {
     return execution->function != 0U ? execution->unit_bytes
-                                     : execution->active->blocks * 512U;
+                                     : async_blocks(execution) * 512U;
 }
 
 /** \brief Count distinct good CRC observations without inventing missed IRQs.
@@ -1215,10 +1245,10 @@ static void data_flags(nx_stm32_sdio_async_state_t* execution,
                        uint32_t status) {
     execution->flags |= status & DATA_FLAGS;
     if (!execution->draining && execution->function == 0U &&
-        execution->active != NULL && !execution->active->write &&
+        execution->active != NULL && !async_write(execution) &&
         (execution->flags & DATA_ERRORS) == 0U &&
         (status & SDIO_STA_DBCKEND) != 0U) {
-        if (execution->completed_blocks < execution->active->blocks)
+        if (execution->completed_blocks < async_blocks(execution))
             ++execution->completed_blocks;
         NX_SDIO_WRITE(SDIO->ICR, SDIO_STA_DBCKEND);
         nx_arch_dsb();
@@ -1234,8 +1264,8 @@ static void data_flags(nx_stm32_sdio_async_state_t* execution,
 /** \brief Interpret the selected flow counter only after memory completion. */
 static uint32_t
 dma_transferred_words(const nx_stm32_sdio_async_state_t* execution) {
-    uint32_t initial = execution->active->write ? async_bytes(execution) / 4U
-                                                : UINT32_C(0xffff);
+    uint32_t initial =
+        async_write(execution) ? async_bytes(execution) / 4U : UINT32_C(0xffff);
     uint32_t remaining = NX_SDIO_READ(DMA2_Stream3->NDTR);
     return remaining <= initial ? initial - remaining : UINT32_MAX;
 }
@@ -1276,8 +1306,7 @@ static void async_drain(nx_stm32_sdio_state_t* state, nx_result_t result) {
             state->config->io->interrupt_armed = false;
         execution->terminal = result;
         execution->draining = true;
-        (void)nx_request_transition(&execution->active->base,
-                                    NX_REQUEST_DRAINING);
+        (void)nx_request_transition(execution->active, NX_REQUEST_DRAINING);
         /* Cancel returns with data publishers quiet. A pending handler may
          * still latch facts, but can no longer touch the borrowed payload. */
         data_irq_quiet(state);
@@ -1307,7 +1336,7 @@ static bool dma_detach(const nx_stm32_sdio_state_t* state) {
          * but still block a later arm or cold close. Neither direction
          * treats a fatal error without TC as proof of memory completion. */
         if (execution->active == NULL || !execution->dma_complete ||
-            (!execution->active->write && !dma_fifo_empty()))
+            (!async_write(execution) && !dma_fifo_empty()))
             return false;
         execution->words = dma_transferred_words(execution);
     }
@@ -1336,9 +1365,11 @@ static bool dma_detach(const nx_stm32_sdio_state_t* state) {
 
 static nx_result_t async_start_transfer(nx_stm32_sdio_state_t* state) {
     nx_stm32_sdio_async_state_t* execution = state->config->async;
-    nx_block_request_t* request = execution->active;
-    uint8_t* data =
-        (uint8_t*)request->data +
+    nx_request_t* request = execution->active;
+    bool write = async_write(execution);
+    uint32_t blocks = async_blocks(execution);
+    const uint8_t* data =
+        (const uint8_t*)async_data(execution) +
         (execution->function != 0U
              ? (size_t)execution->completed_blocks * execution->unit_bytes
              : 0U);
@@ -1349,8 +1380,7 @@ static nx_result_t async_start_transfer(nx_stm32_sdio_state_t* state) {
         if (!dma_fifo_available() || !dma_detach(state))
             return NX_ERROR_IO;
         LL_DMA_SetChannelSelection(DMA2, LL_DMA_STREAM_3, LL_DMA_CHANNEL_4);
-        uint32_t flow =
-            request->write ? LL_DMA_MODE_NORMAL : LL_DMA_MODE_PFCTRL;
+        uint32_t flow = write ? LL_DMA_MODE_NORMAL : LL_DMA_MODE_PFCTRL;
         /* ConfigTransfer does not own DBM, CT or either burst field. A
          * retired stream profile must never introduce a second RAM target
          * or a longer burst into this finite single-buffer owner. */
@@ -1359,8 +1389,8 @@ static nx_result_t async_start_transfer(nx_stm32_sdio_state_t* state) {
                                    LL_DMA_CURRENTTARGETMEM0);
         LL_DMA_ConfigTransfer(
             DMA2, LL_DMA_STREAM_3,
-            (request->write ? LL_DMA_DIRECTION_MEMORY_TO_PERIPH
-                            : LL_DMA_DIRECTION_PERIPH_TO_MEMORY) |
+            (write ? LL_DMA_DIRECTION_MEMORY_TO_PERIPH
+                   : LL_DMA_DIRECTION_PERIPH_TO_MEMORY) |
                 flow | LL_DMA_PERIPH_NOINCREMENT | LL_DMA_MEMORY_INCREMENT |
                 LL_DMA_PDATAALIGN_WORD | LL_DMA_MDATAALIGN_WORD |
                 LL_DMA_PRIORITY_HIGH);
@@ -1380,7 +1410,7 @@ static nx_result_t async_start_transfer(nx_stm32_sdio_state_t* state) {
                                 (uint32_t)(uintptr_t)data);
         /* TX uses DMA flow so its exact count also bounds source prefetch.
          * RX PFCTRL forces FFFF on EN; the software extent is independent. */
-        if (request->write) {
+        if (write) {
             uint32_t words = async_bytes(execution) / 4U;
             LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_3, words);
             if (LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_3) != words)
@@ -1396,31 +1426,33 @@ static nx_result_t async_start_transfer(nx_stm32_sdio_state_t* state) {
         if (LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) == 0U)
             return NX_ERROR_IO;
     }
-    sdio_poll_t poll = {request->base.deadline, state->config->poll_budget, 0U};
-    uint64_t sector = request->first_block;
-    uint32_t argument =
-        (uint32_t)(state->high_capacity ? sector : sector * 512U);
+    sdio_poll_t poll = {request->deadline, state->config->poll_budget, 0U};
+    uint32_t argument = 0U;
+    if (execution->function == 0U) {
+        uint64_t sector = ((const nx_block_request_t*)request)->first_block;
+        argument = (uint32_t)(state->high_capacity ? sector : sector * 512U);
+    }
     nx_result_t result;
     if (execution->function != 0U) {
         uint32_t address = execution->function_address;
         if (execution->increment)
             address += execution->completed_blocks * execution->unit_bytes;
         argument = ((uint32_t)execution->function << 28U) | (address << 9U) |
-                   (request->write ? UINT32_C(1) << 31U : 0U) |
+                   (write ? UINT32_C(1) << 31U : 0U) |
                    (execution->block_mode ? UINT32_C(1) << 27U : 0U) |
                    (execution->increment ? UINT32_C(1) << 26U : 0U) |
                    (execution->block_mode
                         ? 1U
                         : (uint32_t)execution->unit_bytes & UINT32_C(511));
         state->config->io->inflight = execution->function;
-        result = data_configure(
-            state, execution->unit_bytes, !request->write, &poll,
-            state->config->engine == NX_STM32_SDIO_DMA, !execution->block_mode);
+        result = data_configure(state, execution->unit_bytes, !write, &poll,
+                                state->config->engine == NX_STM32_SDIO_DMA,
+                                !execution->block_mode);
         if (result == NX_SUCCESS)
             result = command(53U, argument, RESPONSE_R5, &poll, NULL, NULL);
-    } else if (request->write) {
-        result = command(request->blocks > 1U ? 25U : 24U, argument,
-                         RESPONSE_R1, &poll, NULL, state);
+    } else if (write) {
+        result = command(blocks > 1U ? 25U : 24U, argument, RESPONSE_R1, &poll,
+                         NULL, state);
         if (result == NX_SUCCESS)
             result = data_configure(state, async_bytes(execution), false, &poll,
                                     state->config->engine == NX_STM32_SDIO_DMA,
@@ -1430,8 +1462,8 @@ static nx_result_t async_start_transfer(nx_stm32_sdio_state_t* state) {
             data_configure(state, async_bytes(execution), true, &poll,
                            state->config->engine == NX_STM32_SDIO_DMA, false);
         if (result == NX_SUCCESS)
-            result = command(request->blocks > 1U ? 18U : 17U, argument,
-                             RESPONSE_R1, &poll, NULL, state);
+            result = command(blocks > 1U ? 18U : 17U, argument, RESPONSE_R1,
+                             &poll, NULL, state);
     }
     if (result != NX_SUCCESS)
         return result;
@@ -1439,7 +1471,7 @@ static nx_result_t async_start_transfer(nx_stm32_sdio_state_t* state) {
                         ? 0U
                         : DATA_ERRORS | SDIO_STA_DATAEND | SDIO_STA_DBCKEND;
     if (state->config->engine == NX_STM32_SDIO_IRQ)
-        mask |= request->write ? SDIO_STA_TXFIFOHE : SDIO_STA_RXDAVL;
+        mask |= write ? SDIO_STA_TXFIFOHE : SDIO_STA_RXDAVL;
     if (state->config->engine != NX_STM32_SDIO_POLL &&
         state->config->io != NULL && state->config->io->interrupts != 0U &&
         state->config->io->interrupt_armed)
@@ -1461,14 +1493,15 @@ static nx_result_t async_submit(void* context, nx_block_request_t* request) {
         state->removed)
         return NX_ERROR_STATE;
     size_t length = (size_t)request->blocks * 512U;
+    const void* data = nx_block_request_data(request);
     if (!cpu_storage(request, sizeof(*request), _Alignof(nx_block_request_t)) ||
         !valid_buffer(state, request, sizeof(*request)) ||
         !cpu_write_span(request, sizeof(*request)) || request->blocks == 0U ||
         request->blocks > config->max_blocks || request->data_bytes < length ||
-        !valid_buffer(state, request->data, length) ||
-        (!request->write && !cpu_write_span(request->data, length)) ||
-        overlaps((uintptr_t)request->data, length, request, sizeof(*request)) ||
-        overlaps((uintptr_t)request->data, length, config->async,
+        !valid_buffer(state, data, length) ||
+        (!request->write && !cpu_write_span(data, length)) ||
+        overlaps((uintptr_t)data, length, request, sizeof(*request)) ||
+        overlaps((uintptr_t)data, length, config->async,
                  sizeof(*config->async)) ||
         overlaps((uintptr_t)request, sizeof(*request), config->async,
                  sizeof(*config->async)) ||
@@ -1489,8 +1522,7 @@ static nx_result_t async_submit(void* context, nx_block_request_t* request) {
             !dma_fifo_available())
             return NX_ERROR_BUSY;
         result = nx_dma_buffer_validate(
-            config->dma_regions, config->dma_region_count, request->data,
-            length, 16U,
+            config->dma_regions, config->dma_region_count, data, length, 16U,
             request->write ? NX_DMA_TO_DEVICE : NX_DMA_FROM_DEVICE);
         if (result != NX_SUCCESS)
             return result;
@@ -1502,8 +1534,8 @@ static nx_result_t async_submit(void* context, nx_block_request_t* request) {
         return result;
     nx_arch_irq_state_t previous = nx_arch_irq_save();
     NX_SDIO_WRITE(SDIO->MASK, 0U);
-    *config->async =
-        (nx_stm32_sdio_async_state_t){.active = request, .unit_bytes = 512U};
+    *config->async = (nx_stm32_sdio_async_state_t){.active = &request->base,
+                                                   .unit_bytes = 512U};
     state->state = NX_BLOCK_ACTIVE;
     nx_arch_irq_restore(previous);
     result = async_start_transfer(state);
@@ -1512,7 +1544,7 @@ static nx_result_t async_submit(void* context, nx_block_request_t* request) {
     return NX_SUCCESS;
 }
 
-static nx_result_t async_cancel(void* context, nx_block_request_t* request) {
+static nx_result_t cancel_request(void* context, nx_request_t* request) {
     nx_stm32_sdio_state_t* state = context;
     if (!allowed_context())
         return NX_ERROR_CONTEXT;
@@ -1525,13 +1557,19 @@ static nx_result_t async_cancel(void* context, nx_block_request_t* request) {
     return NX_SUCCESS;
 }
 
+static nx_result_t async_cancel(void* context, nx_block_request_t* request) {
+    return cancel_request(context, &request->base);
+}
+
 static void async_service(void* context) {
     nx_stm32_sdio_state_t* state = context;
     if (!allowed_context() || state->config == NULL ||
         state->config->async == NULL || state->config->async->active == NULL)
         return;
     nx_stm32_sdio_async_state_t* execution = state->config->async;
-    nx_block_request_t* request = execution->active;
+    nx_request_t* request = execution->active;
+    bool write = async_write(execution);
+    uint32_t blocks = async_blocks(execution);
     bool sources_withdrawn = false;
     nx_arch_irq_state_t previous = nx_arch_irq_save();
     uint32_t flags = execution->flags;
@@ -1541,7 +1579,7 @@ static void async_service(void* context) {
     if (state->config->engine == NX_STM32_SDIO_DMA) {
         dma_terminal = execution->dma_complete &&
                        LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) == 0U &&
-                       (request->write || dma_fifo_empty());
+                       (write || dma_fifo_empty());
         memory_done = dma_terminal && dma_transferred_words(execution) ==
                                           async_bytes(execution) / 4U;
     }
@@ -1551,7 +1589,7 @@ static void async_service(void* context) {
     if (!execution->draining && dma_terminal && !memory_done)
         async_drain(state, NX_ERROR_IO);
     nx_arch_irq_restore(previous);
-    if (!execution->draining && nx_time_now_us() >= request->base.deadline)
+    if (!execution->draining && nx_time_now_us() >= request->deadline)
         async_drain(state, NX_ERROR_TIMEOUT);
     if (!execution->draining && memory_done &&
         (flags & (SDIO_STA_DATAEND | SDIO_STA_DBCKEND)) ==
@@ -1561,8 +1599,8 @@ static void async_service(void* context) {
             async_drain(state, NX_SUCCESS);
         } else {
             NX_SDIO_WRITE(SDIO->MASK, 0U);
-            sdio_poll_t unit = {request->base.deadline,
-                                state->config->poll_budget, 0U};
+            sdio_poll_t unit = {request->deadline, state->config->poll_budget,
+                                0U};
             nx_result_t result = host_withdraw(&unit, &execution->flags);
             bool memory_detached = dma_detach(state);
             sources_withdrawn = result == NX_SUCCESS && memory_detached;
@@ -1573,7 +1611,7 @@ static void async_service(void* context) {
             } else {
                 state->config->io->inflight = 0U;
                 ++execution->completed_blocks;
-                if (execution->completed_blocks == request->blocks) {
+                if (execution->completed_blocks == blocks) {
                     async_drain(state, NX_SUCCESS);
                 } else {
                     result = async_start_transfer(state);
@@ -1605,10 +1643,10 @@ static void async_service(void* context) {
             state->transfer_pending = false;
         } else if (execution->function == 0U) {
             if (execution->terminal == NX_SUCCESS) {
-                sdio_poll_t media = {request->base.deadline,
+                sdio_poll_t media = {request->deadline,
                                      state->config->poll_budget, 0U};
-                nx_result_t ready = memory_finish(
-                    state, &media, request->blocks > 1U, request->write);
+                nx_result_t ready =
+                    memory_finish(state, &media, blocks > 1U, write);
                 if (ready != NX_SUCCESS) {
                     execution->terminal = ready;
                     execution->completed_blocks = 0U;
@@ -1620,7 +1658,7 @@ static void async_service(void* context) {
             }
         }
         if (execution->terminal == NX_SUCCESS &&
-            nx_time_now_us() >= request->base.deadline)
+            nx_time_now_us() >= request->deadline)
             execution->terminal = NX_ERROR_TIMEOUT;
         if (execution->terminal == NX_SUCCESS &&
             (execution->flags & DATA_ERRORS) == 0U &&
@@ -1668,7 +1706,7 @@ static void async_service(void* context) {
         detached = NX_SDIO_READ(SDIO->MASK) == restore_mask;
     }
     if (!detached) {
-        (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
+        (void)nx_request_transition(request, NX_REQUEST_QUARANTINED);
         nx_arch_irq_restore(previous);
         return;
     }
@@ -1677,8 +1715,8 @@ static void async_service(void* context) {
         terminal = NX_ERROR_IO;
     if (execution->function == 0U) {
         if (terminal == NX_SUCCESS)
-            execution->completed_blocks = request->blocks;
-        else if (request->write || state->config->engine == NX_STM32_SDIO_DMA ||
+            execution->completed_blocks = blocks;
+        else if (write || state->config->engine == NX_STM32_SDIO_DMA ||
                  state->transfer_pending)
             execution->completed_blocks = 0U;
         else if (execution->completed_blocks > execution->words / 128U)
@@ -1693,7 +1731,7 @@ static void async_service(void* context) {
     state->state = terminal == NX_SUCCESS ? NX_BLOCK_READY : NX_BLOCK_UNCERTAIN;
     /* Every IRQ and hardware buffer reference is gone before this final
      * release publication. A late vector sees only the stable empty owner. */
-    nx_request_settle(&request->base, terminal, transferred);
+    nx_request_settle(request, terminal, transferred);
     nx_arch_irq_restore(previous);
 }
 
@@ -1750,12 +1788,19 @@ static void data_step(nx_stm32_sdio_state_t* state) {
         return;
     }
     if (state->config->engine != NX_STM32_SDIO_DMA) {
-        nx_block_request_t* request = execution->active;
-        uint8_t* data =
-            (uint8_t*)request->data +
-            (execution->function != 0U
-                 ? (size_t)execution->completed_blocks * execution->unit_bytes
-                 : 0U);
+        bool write = async_write(execution);
+        union {
+            const uint8_t* tx;
+            uint8_t* rx;
+        } data;
+        size_t offset =
+            execution->function != 0U
+                ? (size_t)execution->completed_blocks * execution->unit_bytes
+                : 0U;
+        if (write)
+            data.tx = (const uint8_t*)async_data(execution) + offset;
+        else
+            data.rx = async_receive_data(execution) + offset;
         uint32_t words = (async_bytes(execution) + 3U) / 4U;
         for (unsigned count = 0U; count < 8U && execution->words < words;
              ++count) {
@@ -1767,11 +1812,11 @@ static void data_step(nx_stm32_sdio_state_t* state) {
             size_t bytes = async_bytes(execution) - execution->words * 4U;
             if (bytes > 4U)
                 bytes = 4U;
-            if (!request->write && (status & SDIO_STA_RXDAVL) != 0U) {
+            if (!write && (status & SDIO_STA_RXDAVL) != 0U) {
                 word = NX_SDIO_FIFO_READ(SDIO);
-                memcpy(data + (size_t)execution->words * 4U, &word, bytes);
-            } else if (request->write && (status & SDIO_STA_TXFIFOHE) != 0U) {
-                memcpy(&word, data + (size_t)execution->words * 4U, bytes);
+                memcpy(data.rx + (size_t)execution->words * 4U, &word, bytes);
+            } else if (write && (status & SDIO_STA_TXFIFOHE) != 0U) {
+                memcpy(&word, data.tx + (size_t)execution->words * 4U, bytes);
                 if (NX_SDIO_FIFO_WRITE(SDIO, &word) != HAL_OK) {
                     execution->flags |= SDIO_STA_TXUNDERR;
                     break;
@@ -1787,7 +1832,7 @@ static void data_step(nx_stm32_sdio_state_t* state) {
             NX_SDIO_WRITE(SDIO->MASK,
                           NX_SDIO_READ(SDIO->MASK) &
                               ~(uint32_t)(SDIO_STA_RXDAVL | SDIO_STA_TXFIFOHE));
-            if (!request->write && (status & SDIO_STA_RXDAVL) != 0U)
+            if (!write && (status & SDIO_STA_RXDAVL) != 0U)
                 execution->flags |= SDIO_STA_RXOVERR;
         }
     }
@@ -1917,6 +1962,55 @@ static nx_result_t io_fbr_size(uint8_t function, uint16_t* size,
 
 static bool io_block_bytes(uint16_t bytes) {
     return bytes != 0U && bytes <= 2048U && (bytes & (bytes - 1U)) == 0U;
+}
+
+/** \brief Domain lifecycle retains the same host and hardware receipt. */
+static nx_result_t io_lifecycle(void* context, nx_time_us_t deadline,
+                                bool activate) {
+    nx_stm32_sdio_state_t* state = context;
+    if (!allowed_context())
+        return NX_ERROR_CONTEXT;
+    if (state->config == NULL)
+        return NX_ERROR_STATE;
+    if (state->config->protocol != NX_STM32_SDIO_IO ||
+        state->config->io == NULL)
+        return NX_ERROR_UNSUPPORTED;
+    return activate ? block_activate(context, deadline)
+                    : block_stop(context, deadline);
+}
+
+static nx_result_t io_activate(void* context, nx_time_us_t deadline) {
+    return io_lifecycle(context, deadline, true);
+}
+
+static nx_result_t io_stop(void* context, nx_time_us_t deadline) {
+    return io_lifecycle(context, deadline, false);
+}
+
+/** \brief Describe the fixed host without touching card or controller state. */
+static nx_result_t io_limits(const void* context, nx_sdio_io_limits_t* output) {
+    const nx_stm32_sdio_state_t* state = context;
+    if (!allowed_context())
+        return NX_ERROR_CONTEXT;
+    if (!state->infrastructure || state->config == NULL)
+        return NX_ERROR_STATE;
+    const nx_stm32_sdio_config_t* config = state->config;
+    if (config->protocol != NX_STM32_SDIO_IO || config->io == NULL)
+        return NX_ERROR_UNSUPPORTED;
+    if (config->async != NULL && config->async->active != NULL)
+        return NX_ERROR_BUSY;
+    if (!cpu_storage(output, sizeof(*output), _Alignof(nx_sdio_io_limits_t)) ||
+        !io_output(state, output, sizeof(*output)))
+        return NX_ERROR_INVALID;
+    bool dma = config->engine == NX_STM32_SDIO_DMA;
+    *output = (nx_sdio_io_limits_t){
+        .max_blocks = config->max_blocks,
+        .max_block_bytes = 2048U,
+        .buffer_alignment = dma ? 16U : 4U,
+        .unit_bytes_multiple = dma ? 16U : 1U,
+        .power_of_two_block_bytes = true,
+    };
+    return NX_SUCCESS;
 }
 
 static nx_result_t io_inspect(void* context, nx_sdio_io_info_t* output,
@@ -2116,8 +2210,7 @@ static nx_result_t io_pending(void* context, uint8_t* output,
 
 static nx_result_t io_submit(void* context, nx_sdio_io_request_t* request) {
     nx_stm32_sdio_state_t* state = context;
-    nx_block_request_t* transfer = &request->transfer;
-    nx_result_t result = io_check(state, transfer->base.deadline, true);
+    nx_result_t result = io_check(state, request->base.deadline, true);
     if (result != NX_SUCCESS)
         return result;
     const nx_stm32_sdio_config_t* config = state->config;
@@ -2127,10 +2220,9 @@ static nx_result_t io_submit(void* context, nx_sdio_io_request_t* request) {
         !cpu_write_span(request, sizeof(*request)) ||
         !io_function(state, request->function, false) ||
         request->address > UINT32_C(0x1ffff) || request->unit_bytes == 0U ||
-        transfer->first_block != 0U || transfer->blocks == 0U ||
-        transfer->blocks > config->max_blocks ||
+        request->blocks == 0U || request->blocks > config->max_blocks ||
         (!request->block_mode &&
-         (transfer->blocks != 1U || request->unit_bytes > 512U)) ||
+         (request->blocks != 1U || request->unit_bytes > 512U)) ||
         (request->block_mode && !io_block_bytes(request->unit_bytes)))
         return NX_ERROR_INVALID;
     if ((config->io->enabled & (1U << request->function)) == 0U ||
@@ -2138,15 +2230,14 @@ static nx_result_t io_submit(void* context, nx_sdio_io_request_t* request) {
          config->io->block_bytes[request->function - 1U] !=
              request->unit_bytes))
         return NX_ERROR_STATE;
-    size_t length = (size_t)request->unit_bytes * transfer->blocks;
-    if (transfer->data_bytes < length ||
-        !valid_buffer(state, transfer->data, length) ||
-        (!transfer->write && !cpu_write_span(transfer->data, length)) ||
-        overlaps((uintptr_t)transfer->data, length, request,
-                 sizeof(*request)) ||
+    size_t length = (size_t)request->unit_bytes * request->blocks;
+    if (request->data_bytes < length ||
+        !valid_buffer(state, request->data, length) ||
+        (!request->write && !cpu_write_span(request->data, length)) ||
+        overlaps((uintptr_t)request->data, length, request, sizeof(*request)) ||
         (request->increment && length > UINT32_C(0x20000) - request->address))
         return NX_ERROR_INVALID;
-    if (nx_request_state(&transfer->base) != NX_REQUEST_READY)
+    if (nx_request_state(&request->base) != NX_REQUEST_READY)
         return NX_ERROR_STATE;
     if (config->engine == NX_STM32_SDIO_DMA) {
         if ((request->unit_bytes & 15U) != 0U)
@@ -2156,21 +2247,21 @@ static nx_result_t io_submit(void* context, nx_sdio_io_request_t* request) {
             !dma_fifo_available())
             return NX_ERROR_BUSY;
         result = nx_dma_buffer_validate(
-            config->dma_regions, config->dma_region_count, transfer->data,
+            config->dma_regions, config->dma_region_count, request->data,
             length, 16U,
-            transfer->write ? NX_DMA_TO_DEVICE : NX_DMA_FROM_DEVICE);
+            request->write ? NX_DMA_TO_DEVICE : NX_DMA_FROM_DEVICE);
         if (result != NX_SUCCESS)
             return result;
     }
-    if (nx_time_now_us() >= transfer->base.deadline)
+    if (nx_time_now_us() >= request->base.deadline)
         return NX_ERROR_TIMEOUT;
-    result = nx_request_admit(&transfer->base, NX_REQUEST_ACTIVE);
+    result = nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
     if (result != NX_SUCCESS)
         return result;
     nx_arch_irq_state_t previous = nx_arch_irq_save();
     NX_SDIO_WRITE(SDIO->MASK, 0U);
     *config->async = (nx_stm32_sdio_async_state_t){
-        .active = transfer,
+        .active = &request->base,
         .function_address = request->address,
         .unit_bytes = request->unit_bytes,
         .function = request->function,
@@ -2186,7 +2277,7 @@ static nx_result_t io_submit(void* context, nx_sdio_io_request_t* request) {
 }
 
 static nx_result_t io_cancel(void* context, nx_sdio_io_request_t* request) {
-    return async_cancel(context, &request->transfer);
+    return cancel_request(context, &request->base);
 }
 
 static void io_service(void* context) {
@@ -2248,6 +2339,9 @@ const nx_sdio_io_ops_t nx_stm32_sdio_io_ops = {
     .cancel = io_cancel,
     .service = io_service,
     .sync = io_sync,
+    .limits = io_limits,
+    .activate = io_activate,
+    .stop = io_stop,
 };
 
 static bool cold_disjoint(const nx_stm32_sdio_state_t* state,

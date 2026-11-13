@@ -36,20 +36,27 @@ typedef enum {
     NX_ETH_FRAMES_CHECKSUM_FULL,
     NX_ETH_FRAMES_CHECKSUM_RESERVED
 } nx_eth_frames_tx_checksum_t;
-/** \brief Actual enhanced RX descriptor observations, never inferred validity.
- * \note AVAILABLE requires actual ESA writeback with selected IPC offload.
- *       PAYLOAD bits encode 0=unprocessed, 1=UDP, 2=TCP, 3=ICMP. IPv6 has no
- *       header checksum. Bypassed, missing or malformed status grants no
- *       checksum assurance; consumers own protocol admission.
+/** \brief Protocol and checksum results, independent of descriptor encoding.
+ * \note AVAILABLE means the selected provider obtained a valid observation.
+ *       CHECKED means the named checksum was examined; absence of its ERROR
+ *       then reports success for that checksum only. IPv6 has no header
+ *       checksum. BYPASSED never grants CHECKED or ERROR facts. Protocol tags
+ *       alone grant no checksum assurance. Missing or malformed observations
+ *       report zero; consumers still own complete protocol admission.
  */
 enum nx_eth_frames_rx_checksum_flags {
-    NX_ETH_FRAMES_RX_CHECKSUM_AVAILABLE = 1U << 8U,
-    NX_ETH_FRAMES_RX_CHECKSUM_IPV4 = 1U << 6U,
-    NX_ETH_FRAMES_RX_CHECKSUM_IPV6 = 1U << 7U,
-    NX_ETH_FRAMES_RX_CHECKSUM_BYPASSED = 1U << 5U,
-    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_ERROR = 1U << 4U,
-    NX_ETH_FRAMES_RX_CHECKSUM_HEADER_ERROR = 1U << 3U,
-    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_MASK = 7U
+    NX_ETH_FRAMES_RX_CHECKSUM_AVAILABLE = 1U << 0U,
+    NX_ETH_FRAMES_RX_CHECKSUM_IPV4 = 1U << 1U,
+    NX_ETH_FRAMES_RX_CHECKSUM_IPV6 = 1U << 2U,
+    NX_ETH_FRAMES_RX_CHECKSUM_BYPASSED = 1U << 3U,
+    NX_ETH_FRAMES_RX_CHECKSUM_HEADER_CHECKED = 1U << 4U,
+    NX_ETH_FRAMES_RX_CHECKSUM_HEADER_ERROR = 1U << 5U,
+    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_CHECKED = 1U << 6U,
+    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_ERROR = 1U << 7U,
+    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_UDP = 1U << 8U,
+    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_TCP = 1U << 9U,
+    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_ICMP = 1U << 10U,
+    NX_ETH_FRAMES_RX_CHECKSUM_PAYLOAD_MASK = 7U << 8U
 };
 /**
  * \brief One whole L2 frame, excluding preamble, hardware pad and hardware FCS.

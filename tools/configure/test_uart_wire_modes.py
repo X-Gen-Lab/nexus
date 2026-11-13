@@ -33,6 +33,13 @@ class UartWireModes(unittest.TestCase):
         assembly.write_text(contents)
         return configure.resolve_ir(assembly)
 
+    def test_generated_wire_tuple_uses_the_private_f4_configuration_type(self):
+        result = self.resolve("USART1", "usart1-pa9-pa10",
+                              'protocol="irda"\nprescaler=42')
+        source = bindings.emit(result)[1]
+        self.assertIn("static const nx_stm32_uart_wire_config_t", source)
+        self.assertNotIn("static const nx_uart_wire_config_t", source)
+
     def test_six_half_duplex_modes_bind_only_the_open_drain_transmit_pad(self):
         for controller, pad in (("USART1", "pa9"), ("USART2", "pa2"),
                                 ("USART3", "pb10"), ("UART4", "pa0"),

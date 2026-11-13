@@ -40,7 +40,8 @@ typedef struct {
  *       or each JPEG capacity; JPEG words include hardware padding, not an
  *       exact codestream length. frame_count and deadline are positive/finite.
  *       Each frame fully joins source/FIFO/DMA/IRQs/addresses before publish
- *       and rearm. This is CM1 snapshots with gaps, never gapless CM0 capture.
+ *       and rearm. Finite snapshots allow gaps; they do not promise gapless
+ *       continuous frames.
  *       Missing free slots leaves the source off while the session deadline
  *       continues. Stop cancels and joins this session; it cannot revoke
  *       READY/BORROWED consumer frames, which retain their independent loans.
@@ -93,6 +94,85 @@ struct nx_capture_port {
 };
 /** \brief Same immutable typed controller face for direct operation use. */
 typedef nx_capture_port_t nx_capture_t;
+
+/** \brief Admit one snapshot using the selected source and storage contract.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[in,out] request: Original stable storage under the operation
+ * loan contract. \return Provider result, INVALID for malformed public objects,
+ * or UNSUPPORTED when this selected operation is absent. \note The selected
+ * owner defines context and timing. Dispatch retains no references, starts no
+ * worker and never revokes a live borrow. Provider admission still checks
+ * private state and payload aliases. The original argument reaches that owner
+ * without a temporary or format conversion.
+ */
+nx_result_t nx_capture_port_snapshot(const nx_capture_port_t* port,
+                                     nx_capture_request_t* request);
+/** \brief Start an opaque block session using caller-owned stream storage.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[in,out] destination: Original stable storage under the
+ * operation loan contract. \return Provider result, INVALID for malformed
+ * public objects, or UNSUPPORTED when this selected operation is absent. \note
+ * The selected owner defines context and timing. Dispatch retains no
+ *       references, starts no worker and never revokes a live borrow. Provider
+ *       admission still checks private state and payload aliases. The original
+ *       argument reaches that owner without a temporary or format conversion.
+ */
+nx_result_t nx_capture_port_start_blocks(const nx_capture_port_t* port,
+                                         nx_stream_t* destination);
+/** \brief Advance bounded source progress and withdrawal without a hidden
+ * worker. \param[in] port: Stable face under the selected serialized execution
+ * contract. \return Provider result, INVALID for malformed public objects, or
+ *         UNSUPPORTED when this selected operation is absent.
+ * \note The selected owner defines context and timing. Dispatch retains no
+ *       references, starts no worker and never revokes a live borrow. Provider
+ *       admission still checks private state and payload aliases. The original
+ *       argument reaches that owner without a temporary or format conversion.
+ */
+nx_result_t nx_capture_port_service(const nx_capture_port_t* port);
+/** \brief Request snapshot withdrawal without revoking its producer loans.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[in,out] request: Original stable storage under the operation
+ * loan contract. \return Provider result, INVALID for malformed public objects,
+ * or UNSUPPORTED when this selected operation is absent. \note The selected
+ * owner defines context and timing. Dispatch retains no references, starts no
+ * worker and never revokes a live borrow. Provider admission still checks
+ * private state and payload aliases. The original argument reaches that owner
+ * without a temporary or format conversion.
+ */
+nx_result_t nx_capture_port_cancel(const nx_capture_port_t* port,
+                                   nx_capture_request_t* request);
+/** \brief Join the producer; published consumer blocks keep independent loans.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \return Provider result, INVALID for malformed public objects, or
+ *         UNSUPPORTED when this selected operation is absent.
+ * \note The selected owner defines context and timing. Dispatch retains no
+ *       references, starts no worker and never revokes a live borrow. Provider
+ *       admission still checks private state and payload aliases. The original
+ *       argument reaches that owner without a temporary or format conversion.
+ */
+nx_result_t nx_capture_port_stop(const nx_capture_port_t* port);
+/** \brief Attempt exclusive recovery; successful recovery requires Platform
+ * restart. \param[in] port: Stable face under the selected serialized execution
+ * contract. \return Provider result, INVALID for malformed public objects, or
+ *         UNSUPPORTED when this selected operation is absent.
+ * \note The selected owner defines context and timing. Dispatch retains no
+ *       references, starts no worker and never revokes a live borrow. Provider
+ *       admission still checks private state and payload aliases. The original
+ *       argument reaches that owner without a temporary or format conversion.
+ */
+nx_result_t nx_capture_port_recover(const nx_capture_port_t* port);
+/** \brief Admit finite complete snapshots with the selected inter-frame gaps.
+ * \param[in] port: Stable face under the selected serialized execution
+ * contract. \param[in,out] request: Original stable storage under the operation
+ * loan contract. \return Provider result, INVALID for malformed public objects,
+ * or UNSUPPORTED when this selected operation is absent. \note The selected
+ * owner defines context and timing. Dispatch retains no references, starts no
+ * worker and never revokes a live borrow. Provider admission still checks
+ * private state and payload aliases. The original argument reaches that owner
+ * without a temporary or format conversion.
+ */
+nx_result_t nx_capture_port_start_frames(const nx_capture_port_t* port,
+                                         nx_capture_frames_request_t* request);
 
 #ifdef __cplusplus
 }

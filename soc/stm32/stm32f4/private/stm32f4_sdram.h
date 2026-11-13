@@ -1,9 +1,7 @@
 /**
  * \file            stm32f4_sdram.h
- * \brief           One selected SDRAM controller and an explicit CPU data loan
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-11-11
+ * \brief           One selected SDRAM bank with explicit CPU or graphics
+ * ownership \author          Nexus Team \version         1.0.0 \date 2026-11-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #ifndef NEXUS_STM32F4_SDRAM_H
@@ -12,6 +10,7 @@
 #include "nexus/io/external_bus.h"
 #include "nexus/io/memory_window.h"
 #include "stm32f407_platform_cold.h"
+#include "stm32f4_graphics_memory.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,13 +29,15 @@ typedef struct {
     nx_stm32_sdram_minimum_t rp;
     nx_stm32_sdram_minimum_t rcd;
 } nx_stm32_sdram_timing_t;
-/** \brief Exact single Bank1 CPU-data configuration under one static clock.
+/** \brief Exact single Bank1 configuration under one static clock.
  * \note First profile: Bank1, 8MiB, row12/column8, four internal banks, 16bit.
  *       Platform owns GPIO gates/snapshots and the shared SYSCFG gate through
  *       successful stop. System/ClockPlan is already admitted. Default C0000000
- *       CPU data mapping only; natural alignment and the caller's MPU policy
- *       remain required. The explicit started System and its original time
- *       epoch remain live through stop. No DMA, startup objects, XIP or probe.
+ *       mapping uses a CPU-data lease by default. graphics_only instead retains
+ *       a private hold for selected LTDC/DMA2D regions and denies public CPU
+ *       loans. This cooperative contract is not an MPU access firewall. System
+ *       and its original epoch remain live until the CPU or graphics hold joins
+ *       and stop succeeds. No generic DMA, startup objects, XIP or probe.
  */
 typedef struct {
     const nx_stm32_platform_pin_config_t* pins;
@@ -57,9 +58,10 @@ typedef struct {
     uint8_t sdclk_div;
     uint8_t read_pipe;
     uint8_t initial_refreshes;
+    bool graphics_only;
 } nx_stm32_sdram_config_t;
 /** \brief Retained cold progress and the original live loan, never a pool. */
-typedef struct {
+typedef struct nx_stm32_sdram {
     const nx_stm32_sdram_config_t* config;
     nx_memory_window_lease_t* lease;
     uint64_t epoch;

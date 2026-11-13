@@ -83,6 +83,10 @@ def validate(selection, route):
             "Graphics finite drain_us")
     if "irq_priority" not in selection:
         fail("Graphics requires an explicit IRQ policy")
+    if "memory_window" in selection and (
+            type(selection["memory_window"]) is not str or
+            not selection["memory_window"]):
+        fail("Graphics memory_window requires one selected endpoint ID")
     if kind == "image":
         if (selection["mode"] != "irq-blit" or
                 route["controller"] != "DMA2D" or route["pins"] or
@@ -108,6 +112,52 @@ def validate(selection, route):
         fail("LTDC requires explicit timing and physical layers")
     _timing(selection["timing"])
     _layers(selection["layers"], selection["timing"])
+
+
+def complete_memory_plan(controllers, endpoints):
+    """Resolve grants and order bank acquisition before graphics consumers.
+
+    The static controller sequence is the existing lifecycle order. Reverse
+    release joins graphics before bank withdrawal. Chip memory facts stay exact.
+    """
+    windows = {item["id"]: item for item in endpoints}
+    owners = {item["id"]: item for item in controllers}
+    dependencies = {}
+    used = set()
+    for item in controllers:
+        if item["kind"] not in {"display", "image"}:
+            continue
+        endpoint_id = item.get("memory_window")
+        if endpoint_id is None:
+            continue
+        endpoint = windows.get(endpoint_id)
+        owner = (owners.get(endpoint["controller"])
+                 if endpoint is not None else None)
+        if (endpoint is None or
+                endpoint["driver"] != "memory_window-endpoint" or
+                endpoint["mode"] != "graphics-owned" or owner is None or
+                owner["controller"] != "FMC" or
+                owner["mode"] != "sdram-controller"):
+            fail("Graphics memory_window requires a selected graphics-owned "
+                 "SDRAM endpoint")
+        dependencies[item["id"]] = owner["id"]
+        used.add(endpoint_id)
+    for endpoint in endpoints:
+        if (endpoint["driver"] == "memory_window-endpoint" and
+                endpoint.get("mode") == "graphics-owned" and
+                endpoint["id"] not in used):
+            fail("graphics-owned SDRAM requires an explicit graphics consumer")
+    emitted = set()
+    ordered = []
+    for item in controllers:
+        owner = dependencies.get(item["id"])
+        if owner is not None and owner not in emitted:
+            ordered.append(owners[owner])
+            emitted.add(owner)
+        if item["id"] not in emitted:
+            ordered.append(item)
+            emitted.add(item["id"])
+    controllers[:] = ordered
 
 
 def validate_clock(selection, route, clock_plan):
@@ -161,6 +211,19 @@ def constructor(item, result):
     config = "s_nx_graphics_config_" + name
     options = item.options
     definitions, count = dma_regions(name, result)
+    graphics_memory = None
+    if options.memory_window is not None:
+        endpoint = next(child for child in result.devices
+                        if child.id == options.memory_window)
+        flags = "NX_DMA_MEMORY_READ"
+        if not display:
+            flags += " | NX_DMA_MEMORY_WRITE"
+        definitions.insert(-1,
+            f"    {{ (uintptr_t)0x{endpoint.options.address:08x}u, "
+            f"{endpoint.options.bytes}u, {flags} }},")
+        count += 1
+        graphics_memory = "s_nx_sdram_graphics_" + endpoint.controller.replace(
+            "-", "_")
     snapshots = {}
     if display:
         saved = "s_nx_ltdc_snapshots_" + name
@@ -194,6 +257,8 @@ def constructor(item, result):
         "    .system_cfgr = NEXUS_CLOCK_CFGR | NEXUS_CLOCK_SW | (NEXUS_CLOCK_SW << 2u),",
         f"    .drain_us = UINT64_C({options.drain_us}),",
         f"    .priority = {options.irq.priority}u,"]
+    if graphics_memory is not None:
+        definitions.append(f"    .graphics_memory = &{graphics_memory},")
     if display:
         divider = (2, 4, 8, 16).index(result.clock_plan.pll_sai.ltdc.post_divider)
         definitions += [

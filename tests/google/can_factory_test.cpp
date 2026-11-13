@@ -188,7 +188,7 @@ TEST_F(CanFactory, PureLookupPreservesSeparateIdentityBeforeStartup) {
     EXPECT_FALSE(second_state->snapshot.started);
     EXPECT_EQ(first->ops, &nx_classic_can_ops);
     EXPECT_EQ(second->ops, first->ops);
-    const nx_factory_io_capability_t* capability =
+    const nx_io_capability_t* capability =
         nx_factory_can_capability(NX_CAN_ID_BUS0);
     ASSERT_NE(capability, nullptr);
     EXPECT_EQ(capability->max_transfer_units, 8U);

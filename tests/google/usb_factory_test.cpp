@@ -81,13 +81,13 @@ TEST_F(UsbFactory, SelectedUsbProfileIsPureExactAndDistinctFromGenericCaps) {
     EXPECT_FALSE(state->snapshot.started);
 }
 TEST_F(UsbFactory, CapabilityDescribesExactlyOneSelectedPioPacket) {
-    const nx_factory_io_capability_t* capability =
+    const nx_io_capability_t* capability =
         nx_factory_usb_endpoint_capability(NX_USB_ENDPOINT_ID_BULK_IN);
     ASSERT_NE(capability, nullptr);
     EXPECT_EQ(capability->max_transfer_units, 64U);
     EXPECT_EQ(capability->max_messages, 1U);
     EXPECT_EQ(capability->unit_bytes, 1U);
-    EXPECT_EQ(capability->features, NX_FACTORY_CAP_IRQ);
+    EXPECT_EQ(capability->features, NX_IO_CAP_IRQ);
 }
 TEST_F(UsbFactory, RealSelectedDirectionsFifoPlanAndClockConsumerAreBound) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);

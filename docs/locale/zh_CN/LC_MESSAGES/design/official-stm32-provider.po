@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a827f6c39aa3b5dd9aeec4ca56360b9d2f789fbf5f60b86ab743692502e9ff05\n"
+"X-Nexus-Source-SHA256: d4095db74d1a61f6e817fa66c5418e6c7f487336ed9bf0fac096b6ff4c3f4b18\n"
 
 msgid "Official STM32F4 drivers and Nexus contracts"
 msgstr "官方 STM32F4 驱动与 Nexus 合同"
@@ -174,6 +174,12 @@ msgstr "Platform"
 msgid "GPIO gates, original pad snapshots and final pad restoration"
 msgstr "GPIO 时钟、原引脚快照和最终引脚恢复"
 
+msgid "Selected SDRAM bank"
+msgstr "所选 SDRAM bank"
+
+msgid "Original stable lease and System epoch retained through attached graphics controllers' complete cold withdrawal"
+msgstr "原始稳定 lease 与 System 代次保持到已附着图形控制器完成全部冷态退出"
+
 msgid "LTDC"
 msgstr "LTDC"
 
@@ -194,6 +200,9 @@ msgstr "像素存储、面板设置、执行推进、wake 适配和恢复策略"
 
 msgid "The shared source-ownership diagram also applies to these two implementations. Solid edges label runtime interface calls; dashed edges label selected source, SDK and static assembly relationships. It adds no runtime forwarding layer and makes no software or physical qualification claim. The table above states the specific runtime resource ownership for this selected graphics slice."
 msgstr "共享源码归属图也适用于这两个实现。实线标记运行期接口调用，虚线标记所选源码、SDK 和静态装配关系。图不增加运行时转发层，也不建立软件或物理资格。上表说明本图形切片的具体运行期资源所有权。"
+
+msgid "External graphics memory requires the explicit `graphics-owned` SDRAM endpoint and each selected engine's `memory_window` reference. The [SDRAM contract](f407-fsmc.md#显式图形存储模式) defines the bank lease, per-master grants and cold-stop ordering. Unreferenced engines retain their internal-memory domains; ordinary CPU windows grant no graphics access. These are cooperative provider checks, not an MPU or a BusMatrix access firewall."
+msgstr "外部图形存储要求显式选择 `graphics-owned` SDRAM 端点，并由每个所选引擎通过 `memory_window` 引用。[SDRAM 合同](f407-fsmc.md#显式图形存储模式)规定 bank lease、每个总线主设备的授权和冷停止顺序。未引用的引擎保留内部存储域；普通 CPU 窗口不授予图形访问。这是配合式 provider 检查，不是 MPU 或 BusMatrix 访问防火墙。"
 
 msgid "![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)"
 msgstr "![FIG-31：F4 源码归属与接口边界](../assets/diagrams/driver-source-ownership.svg)"
@@ -218,6 +227,12 @@ msgstr "全部源／目标 capacity 都必须通过可达性与别名校验，�
 
 msgid "The authored timing uses pixel/line counts and explicit polarities; the generator only computes static HAL accumulated values. Pixel frequency comes from the single System PLLSAI R plan and must satisfy the selected DS11118 83 MHz nominal limit. This check is not physical oscillator, load or panel qualification. CLUT/extra packed formats, watermark/suspend modes and additional exact parts remain outside this selected graphics slice."
 msgstr "配置时序使用像素／行计数和明确极性；生成器只计算静态 HAL 累计值。像素频率来自唯一 System PLLSAI R 计划，必须满足所选 DS11118 的 83 MHz 名义上限。该检查不是物理振荡器、负载或面板资格。CLUT／额外打包格式、watermark／suspend 模式及其他精确料号仍不在本图形切片范围。"
+
+msgid "The maintained [`graphics_sdram` consumer](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/stm32f4_graphics_sdram/CMakeLists.txt) reuses the public DMA2D-fill → SETTLED → LTDC-scanout → SETTLED → Platform-close sequence with an explicitly selected external framebuffer address. Its ARM compile/link result establishes only that exact software composition; physical execution remains `not_executed`. It does not acquire a public CPU window loan."
+msgstr "维护的 [`graphics_sdram` consumer](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/stm32f4_graphics_sdram/CMakeLists.txt)通过显式选择的外部帧缓冲地址，复用公共 DMA2D 填充 → SETTLED → LTDC 扫描输出 → SETTLED → Platform 关闭流程。它的 ARM 编译／链接结果只证明该精确软件组合；物理执行仍为 `not_executed`。它不取得公共 CPU window loan。"
+
+msgid "That software reference selects HCLK 16 MHz, 8 MHz 16-bit SDRAM and a 64×32 layer within a 320×240 timing at approximately 53.76 Hz. Active pixel reads alone require approximately 0.220 MB/s RGB565 or 0.440 MB/s ARGB8888; DMA2D adds its own traffic. The SDRAM bus has a theoretical 16 MB/s payload ceiling before refresh, row commands, turnaround and arbitration. Read burst is disabled, and ES0321 §2.3.4 requires the shared write FIFO to remain enabled (`WFDIS=0`). Neither the ceiling nor the active-pixel demand proves burst latency or measured throughput. No fitted memory, panel or electrical timing is qualified; an 800×480×60 RGB565 full frame already requires 46.08 MB/s active reads and is outside this profile."
+msgstr "该软件参考选择 HCLK 16 MHz、8 MHz 16 位 SDRAM，以及约 53.76 Hz 的 320×240 时序中的 64×32 图层。仅活动像素读取就需要约 0.220 MB/s RGB565 或 0.440 MB/s ARGB8888；DMA2D 还增加自己的流量。SDRAM 总线在扣除刷新、行命令、方向切换和仲裁成本前的理论有效载荷上限为 16 MB/s。读 burst 已关闭，ES0321 §2.3.4 要求共享写 FIFO 保持启用（`WFDIS=0`）。该上限与活动像素需求均不能证明 burst 延迟或实测吞吐。未授予实装存储器、面板或电气时序资格；800×480×60 RGB565 全帧仅活动读取已需 46.08 MB/s，超出此配置范围。"
 
 msgid "Replace a mode and verify it"
 msgstr "替换并验证一个模式"

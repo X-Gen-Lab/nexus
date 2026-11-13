@@ -1,6 +1,6 @@
 # Current gettext translation draft; current delta independently reviewed.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: ed954429f628f7be7b78df67b931cd7cc470556788ec872b7ee0ea85c5662a06\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 07ee159ed263d67402fb017d773028b8a323ea66ff21daad0256a42a4b17a3e9\n"
 
 msgid "当前系统架构"
 msgstr "Current system architecture"
@@ -8,8 +8,9 @@ msgstr "Current system architecture"
 msgid "Nexus 提供静态 C11 通用机制。当前生产 SoC 入口只有 `soc/stm32/stm32f4/`； [精确支持](support.md)区分八个精确料号、七个器件视图、四个 F407 Board 和显式软件参考。 系列源码复用不等于每个模式都已执行。厂商依赖保留，只有实际选中闭包进入准备、 校验、编译与 SDK。"
 msgstr "Nexus provides statically assembled C11 common mechanisms. The sole production SoC entry is `soc/stm32/stm32f4/`. [Exact support](support.md) separates eight exact parts, seven device views, four F407 Boards and explicit software references. Family source reuse does not mean every mode has executed. Vendor dependencies remain retained; only the selected closure enters preparation, validation, compilation and the SDK."
 
-msgid "本页以固定源码 [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984) 及 [PR #61](https://github.com/X-Gen-Lab/nexus/pull/61) 保留为前序范围；最近已提交 基础为 `34480bfe0eacb53f421f29a7da9d86c0068bfb46`。本页另行说明当前工作区已接入的 架构增量，最终同源门禁、SDK 与软件候选仍单独收口。既有接口、局部修复、精确模式 和整个工作包完成是不同状态，不把历史执行结果重标为当前候选资格。"
-msgstr "This page retains pinned source [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984) and [PR #61](https://github.com/X-Gen-Lab/nexus/pull/61) as the preceding scope. The latest committed foundation is `34480bfe0eacb53f421f29a7da9d86c0068bfb46`. The page separately describes architecture increments integrated in the current worktree. Final same-source gates, SDK and software-candidate closure remain separate. An existing interface, a local fix, an exact mode and a completed work package are different states; historical executions are not relabeled as current-candidate qualification."
+#: docs/delivery/architecture.md:0
+msgid "本页以固定源码 [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984) 及 [PR #61](https://github.com/X-Gen-Lab/nexus/pull/61) 保留为前序范围；本轮便携 I/O 重构基线为 `6eac971a07a5021d25ba57c3b6885e6e789f2910`。本页另行说明当前工作区已接入的 架构增量，最终同源门禁、SDK 与软件候选仍单独收口。既有接口、局部修复、精确模式 和整个工作包完成是不同状态，不把历史执行结果重标为当前候选资格。"
+msgstr "This page retains fixed source [`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984) and [PR #61](https://github.com/X-Gen-Lab/nexus/pull/61) as prior scope. The portable-I/O refactoring baseline is `6eac971a07a5021d25ba57c3b6885e6e789f2910`. The page separately describes architecture increments integrated into the current workspace; final same-source gates, SDK and software-candidate acceptance remain distinct. Existing interfaces, local fixes, exact modes and completion of an entire work package are different states. Historical executions do not qualify the current candidate."
 
 msgid "![FIG-01：平台职责与外部产品边界](../assets/diagrams/platform-architecture.svg)"
 msgstr "![FIG-01: platform responsibilities and external product boundaries](../assets/diagrams/platform-architecture.svg)"
@@ -115,6 +116,82 @@ msgstr "Each firmware selects an exact device macro and startup file. Vendor hea
 
 msgid "运行中 factory 只返回已有接口。日常 I/O 通过 `ops(context, ...)` 直接进入 F4 实现，硬件操作优先复用官方 HAL／LL。不会因共享源码引入最大池、动态注册表、 默认堆或隐藏 worker。应用负责串行执行者、服务进度和 scheduler 启动。"
 msgstr "At runtime the factory only returns existing interfaces. Ordinary I/O calls enter F4 implementations directly through `ops(context, ...)`, preferring official HAL/LL operations. Shared source introduces no maximum-sized pool, dynamic registry, default heap or hidden worker. Applications own serialized execution, service progress and scheduler startup."
+
+#: docs/delivery/architecture.md:0
+msgid "领域接口与原生能力边界"
+msgstr "Domain interfaces and native-capability boundaries"
+
+#: docs/delivery/architecture.md:0
+msgid "[FIG-16](../design/io-evolution.md)区分构建期装配与运行期调用。公共接口表达逻辑 设备、操作、数据格式、结果和借用；SoC／Board 配置负责寄存器编码、引脚、DMA、 IRQ 与时钟映射。组件不需理解这些映射，但仍需遵守长度、对齐、时限及归还条件。"
+msgstr "[FIG-16](../design/io-evolution.md) distinguishes build-time assembly from runtime calls. Public interfaces express logical devices, operations, data formats, results and loans. SoC/Board configuration owns register encodings, pins, DMA, IRQ and clock mapping. Components need not understand these mappings, but must still respect length, alignment, deadline and release conditions."
+
+#: docs/delivery/architecture.md:0
+msgid "本轮源码代际为 3，详见[迁移](migration.md)与[兼容性合同](../design/source-compatibility.md)。 公共领域 traits 与 factory 生成值分开；UART 的通用格式合法性和 F4 支持性分别校验。 SDIO function 请求按 function 地址表达，不再嵌套块设备 LBA 请求；逻辑 GPIO 绑定、编码器 A／B 语义及网络结果也沿各自领域合同收敛。源码接入不自动成为完整 软件候选；各组回归、ARM、资源与 SDK 验证仍需绑定最终相同源码。"
+msgstr "This iteration uses source generation 3; see [migration](migration.md) and the [compatibility contract](../design/source-compatibility.md). Public domain traits are separate from generated factory values; generic UART format validity and F4 support are checked separately. SDIO function requests express function addresses without nesting block-device LBA requests. Logical GPIO bindings, encoder A/B semantics and network results also converge on their domain contracts. Source integration does not establish a complete software candidate: group regressions, ARM, resource and SDK checks must still bind the final same source."
+
+#: docs/delivery/architecture.md:0
+msgid "普通同步调用不承担 request、stream、队列或 OS 状态；有限异步、连续流与跨任务 owner 按所选能力增加存储。原生波形与数据布局可作为显式扩展，仍经同一硬件 owner，准备／编码使用显式存储，提交不隐藏分配或整缓冲重排。同名公共类型不因 精简 profile 宏改变布局；未使用能力由实例和构建闭包裁剪，具体成本按 ELF 测量。"
+msgstr "Ordinary synchronous calls carry no request, stream, queue or OS state; finite asynchronous operations, continuous streams and cross-task owners add storage only for selected capabilities. Native waveforms and data layouts may remain explicit extensions under the same hardware owner. Preparation/encoding uses explicit storage; submission hides neither allocation nor whole-buffer rearrangement. Compact-profile macros do not change the layout of a public type with the same name. Instance and build closure selection removes unused capabilities, and ELF measurements determine actual cost."
+
+#: docs/delivery/architecture.md:0
+msgid "SOLID 在此约束实际依赖：每个 owner 只推进自己的硬件责任；provider 通过领域 合同扩展；可替换实现必须保持单位、原子性、完成与借用；接口按独立消费者划分； 组件通过静态注入取得窄端口。它不引入设备基类、运行时名称注册或默认线程。"
+msgstr "SOLID constrains actual dependencies here: each owner advances only its hardware responsibility; providers extend domain contracts; substitutable implementations retain units, atomicity, completion and borrowing; interfaces follow independent consumers; components receive narrow ports through static injection. This introduces no device base class, runtime name registry or default thread."
+
+#: docs/delivery/architecture.md:0
+msgid "本轮重构退出范围"
+msgstr "Exit scope for this refactoring"
+
+#: docs/delivery/architecture.md:0
+msgid "R0–R13 是本轮方案分组，与下方 WP／IO 的既有能力范围交叉核对。它们不是新的 配置源或验收引擎；只有实现、消费者与对应执行证据齐全才关闭具体子项。"
+msgstr "R0–R13 group this iteration and cross-check the existing WP/IO capability scope below. They are neither another configuration source nor an acceptance engine. Close an item only when its implementation, consumers and corresponding execution evidence are complete."
+
+#: docs/delivery/architecture.md:0
+msgid "分组"
+msgstr "Group"
+
+#: docs/delivery/architecture.md:0
+msgid "本轮退出条件与剩余范围"
+msgstr "Exit conditions and remaining scope"
+
+#: docs/delivery/architecture.md:0
+msgid "R0–R2 公共合同与原型"
+msgstr "R0–R2: public contracts and prototypes"
+
+#: docs/delivery/architecture.md:0
+msgid "领域 traits、格式校验、独立 SDIO 请求和 epoch 3 消费者一致；源码接入后仍需最终完整门禁。"
+msgstr "Domain traits, format validation, independent SDIO requests and epoch-3 consumers agree; source integration still requires final complete gates."
+
+#: docs/delivery/architecture.md:0
+msgid "R3–R7 数字、串行、控制与采集"
+msgstr "R3–R7: digital, serial, control and acquisition"
+
+#: docs/delivery/architecture.md:0
+msgid "逻辑绑定、事务与 native 计划边界、薄包装和生产者／消费者退出分别可用；尚未实现的连续 SAI、完整无缝帧及精确电脉冲仍按支持矩阵保留。"
+msgstr "Logical bindings, transaction/native-plan boundaries, thin wrappers and producer/consumer exits are independently usable. Unimplemented continuous SAI, complete gapless frames and exact electrical pulse counts retain their support-matrix limits."
+
+#: docs/delivery/architecture.md:0
+msgid "R8–R11 存储、图形、网络与系统"
+msgstr "R8–R11: storage, graphics, networking and system"
+
+#: docs/delivery/architecture.md:0
+msgid "厂商编码留实现，公共结果可解释；CPU-only 内存不自动授权图形访问。显式 `graphics-owned` SDRAM 由所选 LTDC／DMA2D 持有同一私有 bank lease，全部冷退出后归还；不是 MPU 隔离，新增组合仍须独立验证。"
+msgstr "Vendor encodings remain in implementations and public results are interpretable. CPU-only memory grants no graphics access. Explicit `graphics-owned` SDRAM retains one private bank lease for selected LTDC/DMA2D engines until all complete cold withdrawal. This is not MPU isolation; new combinations still require independent verification."
+
+#: docs/delivery/architecture.md:0
+msgid "R12 依赖与成本"
+msgstr "R12: dependencies and cost"
+
+#: docs/delivery/architecture.md:0
+msgid "对相同工具链、装配比较实际编译闭包、静态对象及 ELF；不以方法表、inline 或 GC 的存在推断零成本。"
+msgstr "Compare actual compilation closure, static objects and ELF under the same toolchain and assembly. Method tables, inline or GC alone do not establish zero cost."
+
+#: docs/delivery/architecture.md:0
+msgid "R13 集成交付"
+msgstr "R13: integrated delivery"
+
+#: docs/delivery/architecture.md:0
+msgid "变更后的 SDK、完整维护消费者、双语文档与源码身份一致；物理 HIL 与远端 Actions 按用户要求暂缓。"
+msgstr "The changed SDK, complete maintained consumers, bilingual documentation and source identity agree. Physical HIL and hosted Actions remain deferred at the user's request."
 
 msgid "生命周期与失败"
 msgstr "Lifecycle and failure"
@@ -389,8 +466,9 @@ msgstr "IO11"
 msgid "FSMC／FMC"
 msgstr "FSMC/FMC"
 
-msgid "保留 F407 FSMC 的 SRAM／PSRAM／NOR／NAND／parallel16 与启动 SRAM；新增 F479NI FMC Bank1、8 MiB、16-bit SDRAM 的 CPU 数据窗口，显式时序、自刷新退出、lease 和原 System epoch。不会因 window 存在授予 DMA、XIP、启动 RAM、自动 MPU 或实装资格；新几何与协议仍需独立实现。"
-msgstr "F407 FSMC SRAM/PSRAM/NOR/NAND/parallel16 and startup SRAM remain. New F479NI FMC Bank1 provides an 8 MiB 16-bit SDRAM CPU data window with explicit timing, Self-refresh withdrawal, leases and the original System epoch. A window does not grant DMA, XIP, startup RAM, automatic MPU configuration or installed-device qualification. New geometry/protocols still need separate implementation."
+#: docs/delivery/architecture.md:0
+msgid "保留 F407 FSMC 的 SRAM／PSRAM／NOR／NAND／parallel16 与启动 SRAM。F479NI FMC Bank1、8 MiB、16-bit SDRAM 默认提供 CPU 数据窗口；显式 `graphics-owned` 与所选 engine 的 `memory_window` 引用连接 LTDC 只读／DMA2D 读写区域，保留同一 bank lease 直至冷退出。两种模式均检查时序、原 System epoch 与真实自刷新退出；不授予 XIP、启动 RAM、自动 MPU 或实装资格，新几何与协议仍需独立实现。"
+msgstr "F407 FSMC retains SRAM/PSRAM/NOR/NAND/parallel16 and startup SRAM. F479NI FMC Bank1, 8 MiB, 16-bit SDRAM provides a CPU data window by default. Explicit `graphics-owned` and selected engines' `memory_window` references connect LTDC read-only and DMA2D read/write regions, retaining the same bank lease until cold withdrawal. Both modes check timing, the original System epoch and actual self-refresh exit. Neither grants XIP, startup RAM, automatic MPU or fitted-hardware qualification; new geometries and protocols require separate implementation."
 
 msgid "IO12"
 msgstr "IO12"

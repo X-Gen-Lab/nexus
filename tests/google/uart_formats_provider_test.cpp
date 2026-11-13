@@ -404,6 +404,44 @@ TEST(UartColdFormat, F407RejectsUnsupportedFormatBeforeAnyHardwareEffects) {
     EXPECT_EQ(cold_enables, 0U);
 }
 
+TEST(UartColdFormat, GenericFramesStillRequireF407WordLengthAdmission) {
+    const nx_uart_format_t formats[] = {
+        {5U, NX_UART_PARITY_NONE, NX_UART_STOP_1, NX_UART_FLOW_NONE},
+        {6U, NX_UART_PARITY_EVEN, NX_UART_STOP_1, NX_UART_FLOW_NONE},
+        {7U, NX_UART_PARITY_NONE, NX_UART_STOP_1, NX_UART_FLOW_NONE},
+        {9U, NX_UART_PARITY_EVEN, NX_UART_STOP_1, NX_UART_FLOW_NONE},
+    };
+    for (auto format : formats) {
+        reset_ports();
+        USART_TypeDef registers = {};
+        nx_stm32_uart_state_t state = {};
+        uint8_t rx[4] = {};
+        state.registers = &registers;
+        state.irq = USART1_IRQn;
+        state.baud = 115200U;
+        state.rx_storage = rx;
+        state.rx_capacity = sizeof(rx);
+        state.profile = NX_UART_RX_BYTES;
+        SCOPED_TRACE(static_cast<unsigned>(format.data_bits));
+        EXPECT_EQ(nx_stm32_uart_initialize_format(&state, 84000000U, format),
+                  NX_ERROR_UNSUPPORTED);
+        EXPECT_FALSE(state.initialized);
+        EXPECT_EQ(registers.CR1, 0U);
+        EXPECT_EQ(registers.CR2, 0U);
+        EXPECT_EQ(registers.CR3, 0U);
+        EXPECT_EQ(registers.BRR, 0U);
+        EXPECT_EQ(cold_enables, 0U);
+        ASSERT_EQ(nx_stm32_uart_initialize(&state, 84000000U), NX_SUCCESS);
+        const uint32_t before1 = registers.CR1;
+        const uint32_t before2 = registers.CR2;
+        EXPECT_EQ(nx_stm32_uart_format_configure(&state, format),
+                  NX_ERROR_UNSUPPORTED);
+        EXPECT_EQ(registers.CR1, before1);
+        EXPECT_EQ(registers.CR2, before2);
+        ASSERT_EQ(nx_stm32_uart_stop(&state), NX_SUCCESS);
+    }
+}
+
 /** \brief This model boundary observes and performs the actual UE/UEN write. */
 extern "C" void nx_uart_format_model_enable(uintptr_t base, uint32_t control) {
     auto* registers = reinterpret_cast<USART_TypeDef*>(base);

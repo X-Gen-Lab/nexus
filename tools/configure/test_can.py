@@ -59,6 +59,39 @@ class CanConfigurationTests(unittest.TestCase):
         result = gate.resolve_ir(self.authored())
         self.assertTrue(result.controllers[0].options.fifo_order)
 
+    def test_logical_filter_tags_default_per_controller_and_ignore_bank(self):
+        path = self.authored(second=True)
+        path.write_text(path.read_text().replace('bank=0', 'bank=7'))
+        result = gate.resolve_ir(path, test_support=native_fixture(path))
+        self.assertEqual([item.tag for item in result.can_domain.filters], [1, 1])
+        self.assertEqual([item.match_index for item in result.can_domain.filters],
+                         [14, 0])
+
+    def test_explicit_filter_tag_survives_ir_and_static_generation(self):
+        path = self.authored()
+        path.write_text(path.read_text().replace('bank=0', 'bank=0,tag=1234'))
+        output = self.root / 'tagged'
+        result = gate.resolve_ir(path, test_support=native_fixture(path))
+        self.assertEqual(result.can_domain.filters[0].tag, 1234)
+        gate.configure(path, output, test_support=native_fixture(path))
+        self.assertIn('.tag = 1234u', (output / 'bindings.c').read_text())
+
+    def test_filter_tag_must_be_nonzero_and_unique_within_controller(self):
+        for tag in (0, 65536, True):
+            with self.subTest(tag=tag):
+                path = self.authored()
+                value = str(tag).lower()
+                path.write_text(path.read_text().replace('bank=0', f'bank=0,tag={value}'))
+                with self.assertRaisesRegex(ValueError, 'CAN filter tag'):
+                    gate.resolve_ir(path, test_support=native_fixture(path))
+        path = self.authored()
+        source = path.read_text().replace('bank=0', 'bank=0,tag=1')
+        duplicate = ('},{controller="bus0",bank=1,tag=1,id=291,mask=2047,'
+                     'format="standard",fifo=0,remote=false,match_remote=true}')
+        path.write_text(source.replace('match_remote=true}', 'match_remote=true' + duplicate))
+        with self.assertRaisesRegex(ValueError, 'CAN filter tag'):
+            gate.resolve_ir(path, test_support=native_fixture(path))
+
     def test_generated_factory_and_partial_start_cleanup_are_explicit(self):
         path = self.authored(second=True)
         output = self.root / 'generated'

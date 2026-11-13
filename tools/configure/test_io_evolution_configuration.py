@@ -147,7 +147,7 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
         header, getters = factory.emit(result)
         self.assertIn("NX_SPI_DMA_TRANSACTION_ID_OTHER_BUS", header)
         self.assertIn("nx_native_spi_dma_owner_contains", getters)
-        self.assertNotIn("NX_FACTORY_CAP_TX_DMA", source)
+        self.assertNotIn("NX_IO_CAP_TX_DMA", source)
 
     def test_native_async_model_cannot_become_a_register_file_or_legacy_face(self):
         original = configure.ROOT / (
@@ -194,14 +194,7 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
 
 
 
-    def test_long_i2c_rejects_v1_even_when_pins_are_reviewed(self):
-        for fixture in ('stm32_assembly/zg-i2c.toml',):
-            with self.subTest(fixture=fixture):
-                with self.assertRaisesRegex(ValueError,
-                                            "(?i)long.*provider|provider.*long"):
-                    self.resolve(fixture, "i2c-long-endpoint", "i2c")
-
-    def test_default_endpoints_retain_legacy_types(self):
+    def test_standard_endpoints_have_their_domain_types(self):
         result = configure.resolve_ir(configure.ROOT /
             "tests/contracts/native_assembly/multi.toml", test_support=native_fixture(configure.ROOT /
             "tests/contracts/native_assembly/multi.toml"))
@@ -210,7 +203,6 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
                             for item in result.devices))
         header, _ = factory.emit(result)
         self.assertNotIn("nx_factory_spi_transaction_device(", header)
-        self.assertNotIn("nx_factory_i2c_long_device(", header)
 
     def test_dma_transaction_has_distinct_port_and_endpoint_contexts(self):
         for fixture, prefix in (('stm32_assembly/zg-dma.toml', 'stm32'),):
@@ -249,20 +241,16 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
                 merge_spi_controllers=True)
 
     def test_enhanced_traits_report_words_and_per_message_limits(self):
-        for fixture, driver, kind, expected in (('stm32_assembly/zg-spi.toml', 'spi-transaction', 'spi', 'nx_factory_spi_transaction_device_traits_t'), ('stm32_assembly/zg-dma.toml', 'spi-dma-transaction', 'spi', 'nx_factory_spi_dma_transaction_device_traits_t')):
+        for fixture, driver, kind, expected in (('stm32_assembly/zg-spi.toml', 'spi-transaction', 'spi', 'nx_spi_transaction_traits_t'), ('stm32_assembly/zg-dma.toml', 'spi-dma-transaction', 'spi', 'nx_spi_transaction_traits_t')):
             with self.subTest(driver=driver):
                 result = self.resolve(fixture, driver, kind)
                 selected = replace(result, factory=replace(result.factory,
                                                           capabilities=True))
                 header, source = factory.emit(selected)
                 self.assertIn(expected, header)
-                if kind == "spi":
-                    self.assertIn("supported_word_bits", header)
-                    self.assertIn("max_segment_words", header)
-                    self.assertIn("NX_SPI_MAX_SEGMENTS", source)
-                else:
-                    self.assertIn("max_message_bytes", header)
-                    self.assertIn("NX_I2C_LONG_MAX_MESSAGE_BYTES", source)
+                self.assertIn('#include "nexus/io/traits.h"', header)
+                self.assertNotIn("typedef struct", "\n".join(enhanced_endpoints.emit_traits(selected)[0]))
+                self.assertIn("NX_SPI_MAX_SEGMENTS", source)
 
     def test_native_register_model_traits_do_not_claim_sixteen_bit_words(self):
         result = self.resolve("native_assembly/multi.toml",

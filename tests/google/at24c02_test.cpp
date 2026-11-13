@@ -53,11 +53,11 @@ class Bus {
                                  nx_time_us_t, size_t* transferred) {
                 EXPECT_FALSE(messages[0].read);
                 EXPECT_EQ(messages[0].length, bytes.size() + 1U);
-                EXPECT_EQ(messages[0].data[0], address);
-                EXPECT_EQ(
-                    std::vector<uint8_t>(messages[0].data + 1,
-                                         messages[0].data + messages[0].length),
-                    bytes);
+                EXPECT_EQ(messages[0].buffer.tx[0], address);
+                EXPECT_EQ(std::vector<uint8_t>(messages[0].buffer.tx + 1,
+                                               messages[0].buffer.tx +
+                                                   messages[0].length),
+                          bytes);
                 EXPECT_LE((static_cast<size_t>(address) & 7U) + bytes.size(),
                           8U);
                 *transferred = outcome == NX_SUCCESS ? bytes.size() + 1U : 0U;
@@ -75,7 +75,7 @@ class Bus {
                                  nx_time_us_t, size_t* transferred) {
                 EXPECT_TRUE(messages[0].read);
                 EXPECT_EQ(messages[0].length, 1U);
-                messages[0].data[0] = 0xa5U;
+                messages[0].buffer.rx[0] = 0xa5U;
                 *transferred =
                     outcome == NX_SUCCESS && !short_success ? 1U : 0U;
                 if (after) {
@@ -107,10 +107,10 @@ class At24C02Test : public testing::Test {
                                  nx_time_us_t, size_t* transferred) {
                 EXPECT_FALSE(messages[0].read);
                 EXPECT_EQ(messages[0].length, 1U);
-                EXPECT_EQ(messages[0].data[0], offset);
+                EXPECT_EQ(messages[0].buffer.tx[0], offset);
                 EXPECT_TRUE(messages[1].read);
                 EXPECT_EQ(messages[1].length, bytes);
-                std::memset(messages[1].data, 0x5a, bytes);
+                std::memset(messages[1].buffer.rx, 0x5a, bytes);
                 *transferred = short_success ? bytes : bytes + 1U;
                 if (after) {
                     after();

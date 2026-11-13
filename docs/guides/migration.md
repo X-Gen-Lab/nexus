@@ -71,16 +71,17 @@ link the exact MCU configuration with the locked compiler. Retain evidence for
 the migrated source and configuration. Old HAL/OSAL documentation remains historical;
 a redirect does not make an old API contract equivalent to a new one.
 
-## Rebuild for source interface epoch 2
+## Rebuild for source interface epoch 3
 
 The current development snapshot keeps semantic version `0.2.1` and uses
-factory/source interface epoch `2`. Pin its exact commit, regenerate the bundle
+factory/source interface epoch `3`. Pin its exact commit, regenerate the bundle
 and rebuild every caller, public face/ops, generated factory, provider and
 component with one configuration and toolchain. Current interface admission
-rejects epoch-1 SDKs; rebuild old headers and objects rather than mixing them
+rejects epoch-1 and epoch-2 SDKs; rebuild old headers and objects rather than mixing them
 into the new application. No stable binary ABI is supplied. A development-fixture
 opt-in does not relax interface checks. Existing tags are unchanged.
 
+The epoch-2 ADC result migration remains required when upgrading older callers.
 For ADC groups, direct `request.frames` access becomes `request.output.frames`.
 Prefer `nx_adc_group_prepare()` for raw requests: it installs the explicit RAW
 `results_kind`. Use `nx_adc_group_prepare_results()` for a paired regular/injected
@@ -88,6 +89,17 @@ result descriptor. Inspect the selected discriminant before reading the union;
 a raw pointer must never be reinterpreted as a paired descriptor. No compatibility
 shadow field or runtime layout inference is provided. Request, descriptor and
 both spans retain one lifetime through acquire-observed SETTLED.
+
+Use public domain traits from `nexus/io/traits.h` instead of generated
+`nx_factory_*_traits_t` typedefs. Generic capabilities use `nx_io_capability_t`
+and `NX_IO_CAP_*`; enhanced SPI endpoint traits use
+`nx_spi_transaction_traits_t`, while I2C provider profiles use `nx_i2c_limits_t`.
+Factory lookup still returns selected immutable facts; it does not initialize hardware or prove readiness. SDIO function requests
+now contain `base`, payload and function-local address fields directly. Replace
+`request.transfer.base` and other nested accesses with the direct fields, remove
+`first_block = 0`, and never cast an SDIO request to a block request. Follow the
+public encoder modes, error enums and checksum semantics rather than retaining
+old numeric encodings.
 
 Discard old generated output and rebuild from the pinned source. The
 [compatibility contract](../design/source-compatibility.md) defines epoch and

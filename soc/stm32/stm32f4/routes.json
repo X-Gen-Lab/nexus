@@ -16507,7 +16507,7 @@
       "resources": [
         "ip:FMC/control"
       ],
-      "source": "DS11118 Rev8 Table10 TFBGA216 explicit bonded pins; Table11 SDRAM signal identity and Table12 AF12; RM0386 Rev6 FMC SDRAM Bank1 16-bit row12/column8; ES0321 Rev14 2.2.14 selects PC0 SDNWE and never PA7. Software reference route only, no PCB or fitted SDRAM timing qualification."
+      "source": "DS11118 Rev8 Table10 TFBGA216 explicit bonded pins; Table11 SDRAM signal identity and Table12 AF12; RM0386 Rev6 FMC SDRAM Bank1 16-bit row12/column8; ES0321 Rev14 2.2.14 selects PC0 SDNWE and never PA7. RM0386 Rev6 2.1.8-9 p64 explicitly route LTDC/DMA2D to FMC; graphics-owned grants remain per selected consumer. ES0321 Rev14 2.3.4 requires WFDIS=0. Software reference route only, no PCB or fitted SDRAM timing qualification."
     },
     {
       "id": "fmc-sdram-bank1-16",
@@ -16709,9 +16709,10 @@
         }
       ],
       "modes": [
-        "cpu-window"
+        "cpu-window",
+        "graphics-owned"
       ],
-      "source": "DS11118 Rev8 Table10 TFBGA216 explicit bonded pins; Table11 SDRAM signal identity and Table12 AF12; RM0386 Rev6 FMC SDRAM Bank1 16-bit row12/column8; ES0321 Rev14 2.2.14 selects PC0 SDNWE and never PA7. Software reference route only, no PCB or fitted SDRAM timing qualification."
+      "source": "DS11118 Rev8 Table10 TFBGA216 explicit bonded pins; Table11 SDRAM signal identity and Table12 AF12; RM0386 Rev6 FMC SDRAM Bank1 16-bit row12/column8; ES0321 Rev14 2.2.14 selects PC0 SDNWE and never PA7. RM0386 Rev6 2.1.8-9 p64 explicitly route LTDC/DMA2D to FMC; graphics-owned grants remain per selected consumer. ES0321 Rev14 2.3.4 requires WFDIS=0. Software reference route only, no PCB or fitted SDRAM timing qualification."
     },
     {
       "id": "sai1-a-simplex",

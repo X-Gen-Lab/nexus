@@ -1,5 +1,5 @@
 """Select the reviewed external-memory contract before static assembly."""
-from . import fsmc, qspi, sdram
+from . import fsmc, qspi, sdram, graphics
 from tools.configure.providers.common import fail
 
 
@@ -20,3 +20,8 @@ def resolve_endpoint(device, controller, **context):
 
 def complete_controller(controller, children, **context):
     return implementation(controller).complete_controller(controller, children, **context)
+
+
+def complete_plan(controllers, endpoints):
+    """Resolve explicit graphics grants before the immutable graph is frozen."""
+    graphics.complete_memory_plan(controllers, endpoints)

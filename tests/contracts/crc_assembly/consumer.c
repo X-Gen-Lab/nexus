@@ -13,7 +13,11 @@
 /** \brief Linkage fixture; neither execution nor silicon is qualified here. */
 int main(void) {
     nx_chip_info_t info;
-    if (nx_chip_info_read(&info) != NX_SUCCESS) {
+    uint8_t uid[16];
+    size_t uid_bytes = 0U;
+    if (nx_chip_info_read(&info) != NX_SUCCESS ||
+        nx_chip_uid_read(uid, sizeof(uid), &uid_bytes) != NX_SUCCESS ||
+        uid_bytes == 0U) {
         return 1;
     }
     nx_platform_start_result_t start = nx_platform_start();

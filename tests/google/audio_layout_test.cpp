@@ -41,6 +41,23 @@ class AudioLayout : public testing::Test {
     }
 };
 
+TEST_F(AudioLayout, OptionalTransferMethodsRejectBeforeTouchingCallerStorage) {
+    nx_audio_request_t request{};
+    nx_audio_blocks_request_t blocks{};
+    nx_audio_rate_t rate{};
+    EXPECT_EQ(NX_ERROR_INVALID, nx_audio_port_service(nullptr));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_audio_port_submit(&port, nullptr));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_audio_port_submit(&port, &request));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_audio_port_cancel(&port, &request));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_audio_port_service(&port));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_audio_port_stop(&port));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_audio_port_start_blocks(&port, &blocks));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_audio_port_rate(&port, &rate));
+    EXPECT_EQ(
+        NX_ERROR_INVALID,
+        nx_audio_port_rate(&port, reinterpret_cast<nx_audio_rate_t*>(&ops)));
+}
+
 TEST_F(AudioLayout, DispatchPreservesDifferentSampleStorageAndExactContext) {
     EXPECT_CALL(provider, Layout(&output))
         .WillOnce([](nx_audio_layout_t* result) {

@@ -804,6 +804,11 @@
               },
               "remote": {
                 "type": "boolean"
+              },
+              "tag": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
               }
             },
             "required": [
@@ -1535,6 +1540,9 @@
               ],
               "additionalProperties": false
             }
+          },
+          "memory_window": {
+            "type": "string"
           },
           "mode": {
             "type": "string",
@@ -2422,6 +2430,9 @@
             ],
             "additionalProperties": false
           },
+          "memory_window": {
+            "type": "string"
+          },
           "mode": {
             "type": "string",
             "description": "Explicit maintained mode; the product owns service and shutdown."
@@ -2559,7 +2570,8 @@
             "enum": [
               "cpu-window",
               "startup-memory",
-              "psram-window"
+              "psram-window",
+              "graphics-owned"
             ],
             "description": "Explicit maintained mode; the product owns service and shutdown."
           },
@@ -3245,6 +3257,10 @@
             "type": "string",
             "description": "Explicit maintained mode; the product owns service and shutdown."
           },
+          "periodic_wakeup": {
+            "type": "boolean",
+            "default": false
+          },
           "poll_limit": {
             "type": "integer",
             "minimum": 1,
@@ -3300,6 +3316,11 @@
                   {
                     "required": [
                       "lse_bypass"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "periodic_wakeup"
                     ]
                   },
                   {
@@ -3805,6 +3826,8 @@
             "properties": {
               "data_bits": {
                 "enum": [
+                  5,
+                  6,
                   7,
                   8,
                   9
@@ -4087,6 +4110,17 @@
                 "type": "integer",
                 "minimum": 1
               },
+              "pipe_channels": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 12,
+                "uniqueItems": true,
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 11
+                }
+              },
               "rx_fifo_words": {
                 "type": "integer",
                 "minimum": 1
@@ -4290,6 +4324,17 @@
           },
           "periodic_fifo_words": {
             "type": "string"
+          },
+          "pipe_channels": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 12,
+            "uniqueItems": true,
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            }
           },
           "rx_fifo_words": {
             "type": "integer",

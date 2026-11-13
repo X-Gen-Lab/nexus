@@ -44,7 +44,7 @@ class FactoryDiagnosticTests(unittest.TestCase):
         self.assertIn("nx_factory_controller_capability", header)
         self.assertIn("NX_FACTORY_CONTROLLER_HARDWARE", header)
         self.assertEqual(source.count(
-            "static const nx_factory_io_capability_t s_nx_capability_gpio_led0"), 1)
+            "static const nx_io_capability_t s_nx_capability_gpio_led0"), 1)
         self.assertNotIn("nx_factory_controller_descriptor_t", header)
 
     def test_empty_assembly_has_zero_ordinal_count(self):

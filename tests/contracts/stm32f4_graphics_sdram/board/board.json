@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "f479ni-graphics-sdram-software-reference",
+  "soc": "STM32F479NIH6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "panel",
+      "controller": "LTDC",
+      "route": "ltdc-rgb565-reference"
+    },
+    {
+      "id": "blitter",
+      "controller": "DMA2D",
+      "route": "dma2d-memory"
+    },
+    {
+      "id": "control",
+      "controller": "FMC",
+      "route": "fmc-sdram-control"
+    },
+    {
+      "id": "ram",
+      "controller": "FMC",
+      "route": "fmc-sdram-bank1-16"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only; no PCB, external oscillator, electrical measurement or physical qualification",
+    "The authored 3.3 V supply is a software clock/Flash assumption, not an observed supply",
+    "Proposed LCD RGB565 and DMA2D reference routes; no physical PCB, panel or executed graphics qualification",
+    "No fitted SDRAM part, PCB wiring or panel is established; SDRAM geometry and timing remain explicit synthetic assumptions",
+    "Only the explicitly attached LTDC and DMA2D controllers receive external access; no CPU lease, linker allocation or other DMA grant is provided",
+    "The 64x32 layer is a software composition fixture, not a bandwidth, refresh-rate or physical graphics qualification"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f479ni.pdf",
+      "scope": "DS11118 Rev8 exact TFBGA216 AF14 pad facts and maximum83MHz LCD clock; software reference only, no PCB/panel/physical qualification"
+    },
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00127514-stm32f469xx-and-stm32f479xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "scope": "RM0386 Rev6 section2.1 BusMatrix: LTDC and DMA2D may reach FMC; explicit bank lease and engine-specific grants are software policy, not physical qualification"
+    }
+  ]
+}

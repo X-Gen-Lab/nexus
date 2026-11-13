@@ -49,16 +49,41 @@ factory 查询函数返回已有身份。查找、Platform 启动、请求准入
 推进服务、恢复、停止分开。SPI／I2C 控制器与端点身份独立，新产品
 用强类型引用头文件；见[factory 合同](../docs/explanation/factory.md)。
 
-RS485 适配器用同一强类型 UART 引用取得 `nx_factory_uart_ref` 和
-`nx_factory_uart_tx_validator_ref`。仅受审精确模式导出回调，其他模式／
-非法 ID 返回 NULL。查询不分配存储、不操作硬件、不准入传输；回调不是实例认证，调用者
-配对精确上下文并独占 TX，提供稳定适配器／配置、GPIO 方向接口对象、
-极性、方向建立／保持时长。不新增角色框架、每 UART 状态或方法表字段。
+RS485 集成优先用同一强类型 UART 引用取得 `nx_factory_uart_tx_binding_ref()`，
+返回的 `nx_uart_tx_binding_t` 配对 transport 与精确上下文 validator；不支持的模式
+或非法 ID 得到两个 NULL 字段。底层独立 getter 仍沿原查询合同提供。查询不分配、
+不操作硬件、不准入传输；callback 不是实例认证。调用者独占 TX，并提供稳定
+adapter／配置、GPIO 方向绑定、极性及建立／保持时间；不新增隐藏 owner 或任务。
+
+## 逻辑 GPIO 与公共 traits
+
+普通组件可以接收只读 `nx_gpio_signal_t`，用 `nx_gpio_signal_write()`／
+`nx_gpio_signal_read()` 表达逻辑有效状态。Board 集成一次绑定端口、单 bit mask
+与极性；组件不解释物理引脚。绑定不增加可变 owner、锁或分配，端口继续验证授权。
+同端口批量操作仍使用既有 port API；跨端口不承诺原子性。
+
+以下是完整开发检出中[维护回归](../tests/google/polymorphic_mock_test.cpp)的绑定
+片段，省略 mock 与断言，仅说明集成侧连接。Source SDK 不携带该测试；按包 manifest
+的源码提交到原仓库阅读。`port` 已初始化且授权测试 mask `8U`；该值不声明任何
+Board 接线。绑定与端口须覆盖所有使用者生命周期，调用者按返回值处理失败。
+
+```c
+const nx_gpio_signal_t enable = {&port, 8U, false};
+nx_result_t result = nx_gpio_signal_write(&enable, true);
+```
+
+所选实例的公共只读描述位于 `nexus/io/traits.h`：领域 traits、通用
+`nx_io_capability_t`／`NX_IO_CAP_*` 与增强 SPI traits 不再由 factory 定义类型。
+I2C 使用 `nx_i2c_limits_t` 描述所选 provider profile，不另建无实现的长事务接口。
+factory 仅在明确选择 metadata 时生成所选常量与 lookup；未选择不增加该实例数据。
+组件可注入同类型 const 描述，无需包含生成器私有头。不可变能力不表示运行 ready、
+不替代提交准入，也不证明物理资格；未知限额不是无限。详见
+[源码迁移](../docs/guides/migration.md#rebuild-for-source-interface-epoch-3)。
 
 ## 控制器、并行端点和内存窗口
 
 外部总线路径分开共享 `nx_external_bus_port_t`、显示存储体
-`nx_parallel16_endpoint_t`、SRAM 存储体 `nx_memory_window_port_t`。Platform
+`nx_parallel16_endpoint_t`、内存窗口 `nx_memory_window_port_t`。Platform
 在 C 中准备控制器并获取显示存储体；factory 只返回稳定接口对象。并行字
 调用同步完成，每次返回前结束所有 CPU 存储跨度的访问；显示组件消费公共端点／只读配置，
 SoC 不导入组件协议或公开厂商类型。
@@ -71,6 +96,12 @@ Platform 启动前已持有承载内存，上下文／预检／身份／启动�
 抹除。全局停止在撤共享引脚／系统时钟前报告保留责任。几何
 只描述选定事实，不证明实物焊接配置／时序；两类接口对象都不授予 DMA、
 堆、外部栈或可执行内存权限。
+
+F479 SDRAM 另有显式 `graphics-owned` 模式，所选 LTDC／DMA2D 通过
+`memory_window` 引用取得各自的只读／读写区域；同一私有 bank lease 保留到所有
+图形控制器真正完成硬件与 IRQ 冷退出。该模式不发放公共 CPU 借用，SETTLED
+本身不归还 bank；配合式准入不提供 MPU 隔离。精确时钟、容量与带宽边界见
+[FSMC／FMC 合同](../docs/design/f407-fsmc.md#显式图形存储模式)。
 
 ## 借用、进度与排空
 

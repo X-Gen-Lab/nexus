@@ -1,5 +1,7 @@
 # F407 多通道 PWM、单脉冲与 DMA 序列
 
+应用通过 `nx_timer_pulse_port_*` 与 `nx_timer_sequence_port_*` 调用有限波形，公共入口检查接口与参数存储后直接分派到同一个 owner。缺失操作返回 `UNSUPPORTED`，不创建任务、缓冲或第二个生命周期。原生序列布局与零复制合同保持显式；service 成功不代表 request 已结清，取消与停止仍须观察原始借用真正退出。
+
 这里记录 STM32F407VE／ZG 的单一 timer owner 软件合同。寄存器、原生 DMA
 访问宽度和 ITR 表来自 RM0090 Rev22，复用引脚来自 DS8626 Rev12。静态软件参考
 不代表电机、电源级、外部连线、PCB 修订或物理波形已经验证。
@@ -11,6 +13,8 @@
 advanced PWM owner。没有第二套 open、运行时注册表、默认 buffer pool、heap 或
 后台 worker。factory 只返回已存在的对象，prepare 不启动 counter、通道或 DMA。
 Platform close 必须排空同一个 owner，失败会阻止 System 退出并保留完整借用。
+
+普通波形可先用 `nx_timer_sequence_port_encode` 把逻辑周期与按已选通道顺序排列的 duty 数组写入调用者提供的原生存储，再通过既有 frame publish／acquire 提交。编码只在已准备且空闲的同一 owner 上进行，不读取外设寄存器、不修改 owner、不保留输入，也不隐式分配；全部校验先于首个写入。拒绝时输出与 byte count 不变，成功只写有效前缀。F4 当前每行六个原生项、最多 10922 行；16-bit counter／原生窗口限制周期至多 65536 ticks、duty 至多 65535，32-bit DMA 存储不扩大硬件计数位宽。编码回调由所选方法表引用，增加该模式的只读代码成本；直接原生入口仍可使用，提交与每次硬件 UPDATE 不做转换。
 
 ## 实例与硬件边界
 

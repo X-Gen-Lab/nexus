@@ -41,7 +41,7 @@ class ProjectCreationTests(unittest.TestCase):
             "schema": 1, "version": 1, "templates": {"native": {
                 "files": {name: hashlib.sha256(data).hexdigest()
                           for name, data in self.payload.items()},
-                "platform": {"interface_epoch": 2, "assembly_schema": 2}}}}
+                "platform": {"interface_epoch": 3, "assembly_schema": 2}}}}
         self.manifest_path = self.repo / "templates/manifest.json"
         self.manifest_path.write_text(json.dumps(self.manifest))
         (self.repo / "dependencies").mkdir()

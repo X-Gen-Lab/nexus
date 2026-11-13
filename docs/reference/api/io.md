@@ -21,6 +21,7 @@ and mutable provider state remain private.
 
 | Task | Public headers |
 | --- | --- |
+| Selected implementation formats and constraints | `traits.h` |
 | Samples, camera storage and finite/continuous audio | `adc.h`, `adc_group.h`, `capture.h`, `audio.h`, `frame_stream.h` |
 | Serial data and wire formats | `uart.h`, `uart_word.h`, `uart_wire.h`, `uart_rs485.h`, `spi.h`, `spi_transaction.h`, `spi_dma_transaction.h`, `spi_frames.h`, `i2c.h`, `i2c_target.h` |
 | Media and physical storage | `block.h`, `block_async.h`, `sdio_io.h`, `flash.h`, `flash_async.h`, `flash_maintenance.h`, `nand.h`, `external_bus.h`, `memory_window.h`, `parallel16.h` |
@@ -45,6 +46,20 @@ provider. [RTC](../../design/f407-rtc.md),
 [capture/audio](../../design/f407-capture-audio.md) describe their exact
 arming, final-access and recovery boundaries.
 
+I2C master descriptors use `nx_i2c_message_write()` for immutable TX and
+`nx_i2c_message_read()` for writable RX, without adding a second payload
+pointer. Construction performs no admission, allocation or payload access;
+prepare and provider admission still validate spans, limits and ownership.
+Rebuild a descriptor to change direction instead of changing `read` alone;
+the selected union member must match its direction. Accepted descriptors
+and payloads remain borrowed until acquire-observed SETTLED.
+
+I2C request preparation validates message grammar and storage; selected providers
+apply explicit `nx_i2c_limits_t` admission budgets. The maintained bounded
+profile remains eight messages of at most 256 bytes each, with a 2048-byte total.
+A legal descriptor is not permission to exceed that profile. There is no separate
+long-transfer engine, implicit splitting or mode fallback.
+
 I2C target exchanges use `i2c_target.h` and borrow complete bounded requests.
 WRITE_READ supplies a precomputed response across one repeated START. The
 [F407 target contract](../../design/f407-i2c-target.md) defines own addresses,
@@ -58,10 +73,12 @@ startup backing remains held while its static objects exist. See
 [physical storage](../../design/f407-storage.md) and
 [FSMC](../../design/f407-fsmc.md) before selecting those interfaces.
 
-For RS485, pair `nx_factory_uart_ref()` and
-`nx_factory_uart_tx_validator_ref()` with the same exact UART identity and
-transport context. The caller owns DE, setup/hold timing and joined shutdown;
-the {ref}`RS485 contract <uart__rs485_8h>` defines the composition.
+For RS485, prefer `nx_factory_uart_tx_binding_ref()` with one strongly typed
+UART reference. Its `nx_uart_tx_binding_t` pairs the transport and exact-context
+validator; unsupported modes and invalid IDs return two null fields. Lookup
+neither admits a transfer nor authenticates an instance. The caller owns DE,
+setup/hold timing and joined shutdown; the
+{ref}`RS485 contract <uart__rs485_8h>` defines the composition.
 IRQ timestamps and sampled GPIO levels remain observations, with the source
 quality defined by the selected provider and the
 [infrared contract](../../../components/infrared/README.md).
@@ -385,14 +402,6 @@ Platform lifecycle and clock prerequisites. Other retained SDKs do not grant an 
 :project: nexus
 ```
 
-(i2c__long_8h)=
-
-## i2c_long.h
-
-```{doxygenfile} io/include/nexus/io/i2c_long.h
-:project: nexus
-```
-
 (i2c__target_8h)=
 
 ## i2c_target.h
@@ -705,3 +714,20 @@ Platform lifecycle and clock prerequisites. Other retained SDKs do not grant an 
 :project: nexus
 ```
 
+
+(traits_8h)=
+
+## traits.h
+
+Selected readonly facts use stable public domain types. Optional factory lookups
+return concrete records; manually supplied providers can supply the same types.
+Read these constraints when binding a component, then retain the selected
+provider's normal admission checks. A record does not establish readiness,
+resource ownership, measured timing or physical qualification. Unknown bounds
+never mean unlimited support. Generic capabilities use `nx_io_capability_t` and
+`NX_IO_CAP_*`; enhanced SPI endpoints use transaction traits, while I2C uses
+explicit `nx_i2c_limits_t` provider profiles.
+
+```{doxygenfile} io/include/nexus/io/traits.h
+:project: nexus
+```

@@ -274,6 +274,22 @@ static bool config_valid(const nx_stm32_usb_host_t* state,
                 config->channel_count * sizeof(*config->channels))) {
         return false;
     }
+    if (config->pipe_channels != NULL) {
+        const size_t bytes = config->channel_count;
+        if (overlap(config->pipe_channels, bytes, state, sizeof(*state)) ||
+            overlap(config->pipe_channels, bytes, config, sizeof(*config)) ||
+            overlap(config->pipe_channels, bytes, config->channels,
+                    config->channel_count * sizeof(*config->channels)))
+            return false;
+        uint32_t selected = 0U;
+        for (uint8_t pipe = 0U; pipe < config->channel_count; ++pipe) {
+            const uint8_t channel = config->pipe_channels[pipe];
+            if (channel >= config->channel_count ||
+                (selected & (1U << channel)) != 0U)
+                return false;
+            selected |= 1U << channel;
+        }
+    }
     const nx_irq_source_t irq = {
         config->phy == NX_STM32_USB_FS_INTERNAL ? OTG_FS_IRQn : OTG_HS_IRQn,
         config->priority, 3U};
@@ -424,7 +440,7 @@ void nx_stm32_usb_host_irq(nx_stm32_usb_host_t* state) {
 }
 
 /** \brief All task methods reject absent or closing controller ownership. */
-static nx_result_t ready(nx_stm32_usb_host_t* state) {
+static nx_result_t ready(const nx_stm32_usb_host_t* state) {
     if (!task_context()) {
         return NX_ERROR_CONTEXT;
     }
@@ -432,6 +448,67 @@ static nx_result_t ready(nx_stm32_usb_host_t* state) {
                    state->snapshot.closing || state->snapshot.suspended
                ? NX_ERROR_STATE
                : NX_SUCCESS;
+}
+
+/** \brief Boundary-only mapping; IRQ and retained requests use physical slots.
+ */
+static uint8_t physical_pipe(const nx_stm32_usb_host_t* state, uint8_t pipe) {
+    return state->config->pipe_channels == NULL
+               ? pipe
+               : state->config->pipe_channels[pipe];
+}
+
+/** \brief The selected HCD accesses whole words and DMA owns a zero-OUT word.
+ */
+static size_t packet_capacity(const nx_stm32_usb_host_t* state,
+                              const nx_usb_host_pipe_t* pipe, size_t length) {
+    size_t capacity =
+        (pipe->endpoint_address & 0x80U) != 0U ? pipe->max_packet : length;
+    capacity = (capacity + 3U) & ~(size_t)3U;
+    return state->config->dma && capacity == 0U ? 4U : capacity;
+}
+
+/** \brief Geometry output cannot overwrite live transport or packet storage. */
+static nx_result_t requirements(const void* context,
+                                nx_usb_host_pipe_id_t pipe_id, size_t length,
+                                nx_usb_host_storage_requirements_t* output) {
+    const nx_stm32_usb_host_t* state = context;
+    nx_result_t status = ready(state);
+    if (status != NX_SUCCESS)
+        return status;
+    const nx_stm32_usb_host_config_t* config = state->config;
+    const size_t bytes = sizeof(*output);
+    if (pipe_id >= config->channel_count || output == NULL ||
+        (uintptr_t)output % _Alignof(nx_usb_host_storage_requirements_t) !=
+            0U ||
+        config->region_count > SIZE_MAX / sizeof(*config->regions) ||
+        overlap(output, bytes, state, sizeof(*state)) ||
+        overlap(output, bytes, config, sizeof(*config)) ||
+        overlap(output, bytes, config->channels,
+                config->channel_count * sizeof(*config->channels)) ||
+        overlap(output, bytes, config->regions,
+                config->region_count * sizeof(*config->regions)) ||
+        overlap(output, bytes, state->hal.Instance, 0x20000U) ||
+        overlap(output, bytes, RCC, sizeof(*RCC)) ||
+        (config->pipe_channels != NULL &&
+         overlap(output, bytes, config->pipe_channels, config->channel_count)))
+        return NX_ERROR_INVALID;
+    const nx_stm32_usb_host_channel_t* channel =
+        &config->channels[physical_pipe(state, pipe_id)];
+    if (!channel->configured)
+        return NX_ERROR_STATE;
+    if (length > channel->pipe.max_packet)
+        return NX_ERROR_INVALID;
+    for (uint8_t i = 0U; i < config->channel_count; ++i) {
+        const nx_usb_host_request_t* request = config->channels[i].request;
+        if (request != NULL &&
+            (overlap(output, bytes, request, sizeof(*request)) ||
+             overlap(output, bytes, request->bytes, request->capacity)))
+            return NX_ERROR_INVALID;
+    }
+    *output = (nx_usb_host_storage_requirements_t){
+        packet_capacity(state, &channel->pipe, length), config->dma ? 4U : 1U};
+    return NX_SUCCESS;
 }
 
 /** \brief Channel targets are copied, never retained as external metadata. */
@@ -445,6 +522,7 @@ static nx_result_t open_channel(void* context, uint8_t number,
     if (number >= state->config->channel_count || !pipe_valid(state, pipe)) {
         return NX_ERROR_INVALID;
     }
+    number = physical_pipe(state, number);
     nx_stm32_usb_host_channel_t* channel = &state->config->channels[number];
     if (channel->request != NULL || (channel_registers(state, number)->HCCHAR &
                                      USB_OTG_HCCHAR_CHENA) != 0U) {
@@ -471,6 +549,7 @@ static nx_result_t close_channel(void* context, uint8_t number) {
     if (number >= state->config->channel_count) {
         return NX_ERROR_INVALID;
     }
+    number = physical_pipe(state, number);
     nx_stm32_usb_host_channel_t* channel = &state->config->channels[number];
     USB_OTG_HostChannelTypeDef* registers = channel_registers(state, number);
     if (channel->request != NULL ||
@@ -499,30 +578,36 @@ static nx_result_t submit(void* context, uint8_t number,
     if (number >= state->config->channel_count || request == NULL) {
         return NX_ERROR_INVALID;
     }
+    number = physical_pipe(state, number);
     nx_stm32_usb_host_channel_t* channel = &state->config->channels[number];
     const bool in = (channel->pipe.endpoint_address & 0x80U) != 0U;
     if (!channel->configured || request->length > channel->pipe.max_packet ||
         (channel->pipe.transfer == NX_USB_HOST_ISOCHRONOUS && request->data1)) {
         return NX_ERROR_INVALID;
     }
-    /* The pinned PIO writer reads a full final word. DMA also owns padding. */
-    size_t extent = in ? channel->pipe.max_packet : request->length;
-    extent = (extent + 3U) & ~(size_t)3U;
-    if (state->config->dma && extent == 0U) {
-        extent = 4U;
-    }
+    size_t extent = packet_capacity(state, &channel->pipe, request->length);
     if (request->capacity < extent ||
         (extent != 0U && request->bytes == NULL) ||
         (request->setup &&
          (in || channel->pipe.transfer != NX_USB_HOST_CONTROL ||
           request->length != 8U)) ||
         overlap(request, sizeof(*request), state, sizeof(*state)) ||
+        overlap(request, sizeof(*request), state->config,
+                sizeof(*state->config)) ||
         overlap(request, sizeof(*request), state->config->channels,
                 state->config->channel_count * sizeof(*channel)) ||
         overlap(request->bytes, request->capacity, request, sizeof(*request)) ||
         overlap(request->bytes, request->capacity, state, sizeof(*state)) ||
+        overlap(request->bytes, request->capacity, state->config,
+                sizeof(*state->config)) ||
         overlap(request->bytes, request->capacity, state->config->channels,
-                state->config->channel_count * sizeof(*channel))) {
+                state->config->channel_count * sizeof(*channel)) ||
+        (state->config->pipe_channels != NULL &&
+         (overlap(request, sizeof(*request), state->config->pipe_channels,
+                  state->config->channel_count) ||
+          overlap(request->bytes, request->capacity,
+                  state->config->pipe_channels,
+                  state->config->channel_count)))) {
         return NX_ERROR_INVALID;
     }
     if (channel->request != NULL) {
@@ -627,8 +712,11 @@ static nx_result_t cancel(void* context, uint8_t number,
         return NX_ERROR_CONTEXT;
     }
     if (state == NULL || state->config == NULL ||
-        number >= state->config->channel_count || request == NULL ||
-        state->config->channels[number].request != request) {
+        number >= state->config->channel_count || request == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    number = physical_pipe(state, number);
+    if (state->config->channels[number].request != request) {
         return NX_ERROR_INVALID;
     }
     nx_arch_irq_state_t key = nx_arch_irq_save();
@@ -1084,4 +1172,4 @@ static nx_result_t stop(void* context) {
 
 const nx_usb_host_ops_t nx_stm32_usb_host_ops = {
     open_channel, close_channel, submit,  cancel, service,
-    snapshot,     reset,         suspend, stop};
+    snapshot,     reset,         suspend, stop,   requirements};

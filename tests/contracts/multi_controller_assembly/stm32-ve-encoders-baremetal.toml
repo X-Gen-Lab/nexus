@@ -14,7 +14,7 @@ flash_load_limit_bytes = 65536
 [encoder.position3]
 binding = "encoder3"
 mode = "quadrature"
-counting = "x2-ti1"
+counting = "x2-a"
 filter_a = 1
 filter_b = 2
 invert_a = false
@@ -24,7 +24,7 @@ exclusive = true
 [encoder.position4]
 binding = "encoder4"
 mode = "quadrature"
-counting = "x2-ti2"
+counting = "x2-b"
 filter_a = 4
 filter_b = 5
 invert_a = true
@@ -34,7 +34,7 @@ exclusive = true
 [encoder.position5]
 binding = "encoder5"
 mode = "quadrature"
-counting = "x4-ti12"
+counting = "x4"
 filter_a = 0
 filter_b = 15
 invert_a = false

@@ -428,6 +428,74 @@ TEST_F(F407Rtc, WakeupRejectsForbiddenFastZeroBeforeWritesAndUsesWutwf) {
     EXPECT_EQ(0U, g_f407_rtc_model.rtc.ISR & RTC_ISR_WUTF);
     EXPECT_NE(0U, g_f407_rtc_model.rtc.ISR & RTC_ISR_TAMP1F);
 }
+TEST_F(F407Rtc, PeriodicWakeupUsesDurationWithoutDividerKnowledge) {
+    open();
+    nx_rtc_period_t actual{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_rtc_port_periodic_wakeup(&port, 1000000U, 0U, &actual));
+    EXPECT_EQ(32768U, actual.ticks);
+    EXPECT_EQ(32768U, actual.ticks_per_second);
+    EXPECT_NE(0U, g_f407_rtc_model.rtc.CR & RTC_CR_WUTE);
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_periodic_wakeup(&port, 0U, 0U, &actual));
+    EXPECT_EQ(0U, actual.ticks);
+    EXPECT_EQ(0U, g_f407_rtc_model.rtc.CR & RTC_CR_WUTE);
+}
+TEST_F(F407Rtc, PeriodicWakeupQuantizationRequiresExplicitTolerance) {
+    open();
+    nx_rtc_period_t actual{123U, 456U};
+    const auto writes = g_f407_rtc_model.writes;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_rtc_port_periodic_wakeup(&port, 1000U, 0U, &actual));
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+    EXPECT_EQ(123U, actual.ticks);
+    EXPECT_EQ(456U, actual.ticks_per_second);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_rtc_port_periodic_wakeup(&port, 1000U, 24U, &actual));
+    EXPECT_EQ(32U, actual.ticks);
+    EXPECT_EQ(32768U, actual.ticks_per_second);
+    const auto accepted_writes = g_f407_rtc_model.writes;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_rtc_port_periodic_wakeup(&port, 1U, 120U, &actual));
+    EXPECT_EQ(accepted_writes, g_f407_rtc_model.writes);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_rtc_port_periodic_wakeup(&port, 1U, 122U, &actual));
+    EXPECT_EQ(4U, actual.ticks);
+}
+TEST_F(F407Rtc, PeriodicWakeupCoversLongPeriodsAndRejectsOverflow) {
+    open();
+    nx_rtc_period_t actual{};
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_periodic_wakeup(
+                              &port, UINT64_C(131072000000), 0U, &actual));
+    EXPECT_EQ(UINT64_C(4294967296), actual.ticks);
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_periodic_wakeup(
+                              &port, UINT64_C(65536500000), 500000U, &actual));
+    EXPECT_EQ(UINT64_C(2147483648), actual.ticks);
+    ASSERT_EQ(NX_SUCCESS, nx_rtc_port_periodic_wakeup(
+                              &port, UINT64_C(100000000000), 0U, &actual));
+    EXPECT_EQ(UINT64_C(3276800000), actual.ticks);
+    const auto writes = g_f407_rtc_model.writes;
+    EXPECT_EQ(
+        NX_ERROR_UNSUPPORTED,
+        nx_rtc_port_periodic_wakeup(&port, UINT64_MAX, UINT32_MAX, &actual));
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+    EXPECT_EQ(UINT64_C(3276800000), actual.ticks);
+}
+TEST_F(F407Rtc, PeriodicWakeupRejectsAliasesAndRetainsOutputAfterFailedJoin) {
+    open();
+    const auto writes = g_f407_rtc_model.writes;
+    auto* alias = reinterpret_cast<nx_rtc_period_t*>(&state);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_rtc_port_periodic_wakeup(&port, 1000000U, 0U, alias));
+    EXPECT_EQ(writes, g_f407_rtc_model.writes);
+    nx_rtc_period_t actual{123U, 456U};
+    g_f407_rtc_model.rtc.ISR &= ~uint32_t{RTC_ISR_WUTWF};
+    g_f407_rtc_model.hold_wakeup = true;
+    EXPECT_EQ(NX_ERROR_TIMEOUT,
+              nx_rtc_port_periodic_wakeup(&port, 1000000U, 0U, &actual));
+    EXPECT_EQ(123U, actual.ticks);
+    EXPECT_EQ(456U, actual.ticks_per_second);
+    EXPECT_TRUE(state.auxiliary_faulted);
+}
 TEST_F(F407Rtc, TimestampRetainsRawSubsecondsAndOverflowWithoutInventingYear) {
     config.lse_bypass = true;
     g_f407_rtc_model.rcc.BDCR |= RCC_BDCR_LSEBYP;
@@ -1332,7 +1400,7 @@ TEST_F(F407Rtc, BypassProvisionRequiresAndPreservesExternalSourceIdentity) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32_rtc_prepare(&state, &config));
     EXPECT_NE(0U, g_f407_rtc_model.rcc.BDCR & RCC_BDCR_LSEBYP);
     EXPECT_EQ(1U, (g_f407_rtc_model.gpio_c.MODER >> 26U) & 3U);
-    EXPECT_EQ(0U, state.effects & NX_RTC_BACKUP_QUIET_PC13);
+    EXPECT_EQ(0U, state.effects & NX_RTC_BACKUP_QUIET_OSCILLATOR_PAD);
 }
 
 TEST_F(F407Rtc, CrystalAdoptionRequiresAnAlreadyQuietDigitalInput) {

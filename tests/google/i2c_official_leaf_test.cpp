@@ -50,7 +50,7 @@ class I2cDefaultLeaf : public testing::Test {
     nx_i2c_endpoint_t endpoint{&nx_i2c_v1_async_endpoint_ops, &endpoint_state};
     nx_i2c_request_t request{};
     uint8_t byte{};
-    nx_i2c_message_t message{&byte, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&byte, 1U);
 
     void SetUp() override {
         state.registers = reinterpret_cast<volatile uint32_t*>(&registers);
@@ -239,7 +239,7 @@ class I2cDefaultLeaf : public testing::Test {
 
 TEST_F(I2cDefaultLeaf, TransmitUsesDefaultWordStoreForEachSelectedByte) {
     uint8_t bytes[] = {0x26U, 0x39U};
-    nx_i2c_message_t message{bytes, sizeof(bytes), false};
+    nx_i2c_message_t message = nx_i2c_message_write(bytes, sizeof(bytes));
     size_t done{};
     ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_transaction(&endpoint, &message, 1U,
                                                       1000U, &done));
@@ -251,7 +251,7 @@ TEST_F(I2cDefaultLeaf, TransmitUsesDefaultWordStoreForEachSelectedByte) {
 
 TEST_F(I2cDefaultLeaf, ReceiveUsesDefaultLoadAndPreservesUpperDataBits) {
     uint8_t bytes[2]{};
-    nx_i2c_message_t message{bytes, sizeof(bytes), true};
+    nx_i2c_message_t message = nx_i2c_message_read(bytes, sizeof(bytes));
     size_t done{};
     ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_transaction(&endpoint, &message, 1U,
                                                       1000U, &done));

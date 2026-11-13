@@ -246,6 +246,32 @@ static bool config_valid(nx_stm32_ltdc_state_t* s,
         c->timing.AccumulatedActiveW >= c->timing.TotalWidth ||
         c->timing.AccumulatedActiveH >= c->timing.TotalHeigh)
         return false;
+    if (c->graphics_memory != NULL) {
+#if defined(NX_STM32_SDRAM_GRAPHICS)
+        if (!nx_graphics_span(c->graphics_memory, sizeof(*c->graphics_memory),
+                              _Alignof(nx_stm32_sdram_graphics_t)) ||
+            nx_graphics_overlap(c->graphics_memory, sizeof(*c->graphics_memory),
+                                s, sizeof(*s)) ||
+            nx_graphics_overlap(c->graphics_memory, sizeof(*c->graphics_memory),
+                                c, sizeof(*c)) ||
+            nx_graphics_overlap(c->graphics_memory, sizeof(*c->graphics_memory),
+                                c->system, sizeof(*c->system)) ||
+            nx_graphics_overlap(c->graphics_memory, sizeof(*c->graphics_memory),
+                                c->regions,
+                                c->region_count * sizeof(*c->regions)) ||
+            nx_graphics_overlap(c->graphics_memory, sizeof(*c->graphics_memory),
+                                c->layers,
+                                c->layer_count * sizeof(*c->layers)) ||
+            nx_graphics_overlap(c->graphics_memory, sizeof(*c->graphics_memory),
+                                c->snapshots,
+                                c->pin_count * sizeof(*c->snapshots)) ||
+            nx_graphics_overlap(c->graphics_memory, sizeof(*c->graphics_memory),
+                                c->pins, c->pin_count * sizeof(*c->pins)))
+            return false;
+#else
+        return false;
+#endif
+    }
 #ifndef NEXUS_STM32_MODEL
     if (c->registers != LTDC || c->rcc != RCC)
         return false;
@@ -297,6 +323,11 @@ static bool aliases_owner(const nx_stm32_ltdc_state_t* s, const void* p,
         if (nx_graphics_overlap(p, bytes, c->pins[i].registers,
                                 sizeof(*c->pins[i].registers)))
             return true;
+#if defined(NX_STM32_SDRAM_GRAPHICS)
+    if (c->graphics_memory != NULL &&
+        nx_stm32_sdram_graphics_overlaps(c->graphics_memory, p, bytes))
+        return true;
+#endif
     return nx_graphics_overlap(p, bytes, c->pins,
                                c->pin_count * sizeof(*c->pins)) ||
            nx_graphics_overlap(p, bytes, c->snapshots,
@@ -310,6 +341,9 @@ static bool aliases_owner(const nx_stm32_ltdc_state_t* s, const void* p,
            nx_graphics_overlap(p, bytes, c->system, sizeof(*c->system)) ||
            nx_graphics_overlap(p, bytes, c->registers, sizeof(*c->registers)) ||
            nx_graphics_overlap(p, bytes, c->rcc, sizeof(*c->rcc)) ||
+           (c->graphics_memory != NULL &&
+            nx_graphics_overlap(p, bytes, c->graphics_memory,
+                                sizeof(*c->graphics_memory))) ||
            (s->wake != NULL &&
             nx_graphics_overlap(p, bytes, s->wake, sizeof(*s->wake)));
 }
@@ -611,10 +645,67 @@ static void fail_all(nx_stm32_ltdc_state_t* s, nx_result_t result) {
         cause(s->active[i], result);
     cause(s->pending, result);
 }
+/** \brief Return a selected bank hold only after the engine has cold joined. */
+static nx_result_t memory_detach(nx_stm32_ltdc_state_t* s) {
+#if defined(NX_STM32_SDRAM_GRAPHICS)
+    if (s->memory_attached) {
+        nx_result_t result = nx_stm32_sdram_graphics_detach(
+            s->config->graphics_memory, NX_STM32_SDRAM_GRAPHICS_LTDC, s);
+        if (result != NX_SUCCESS)
+            return result;
+        s->memory_attached = false;
+    }
+#else
+    (void)s;
+#endif
+    return NX_SUCCESS;
+}
+/** \brief Return frame/config loans only after the final bank hold joins. */
+static nx_result_t finish_join(nx_stm32_ltdc_state_t* s, bool final) {
+    if (final) {
+        nx_result_t result = memory_detach(s);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+    nx_display_request_t* done[3] = {NULL, NULL, NULL};
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    for (unsigned id = 0U; id < 2U; ++id) {
+        if ((s->retire_mask & (uint8_t)(1U << id)) != 0U) {
+            done[id] = s->active[id];
+            s->active[id] = NULL;
+            s->handle.LayerCfg[id].FBStartAdress = 0U;
+        }
+    }
+    if (s->pending != NULL && (s->retire_mask & GFX_RETIRE_PENDING) != 0U) {
+        done[2] = s->pending;
+        s->pending = NULL;
+    }
+    s->phase =
+        s->active[0] != NULL || s->active[1] != NULL ? GFX_LIVE : GFX_IDLE;
+    s->retire_mask = 0U;
+    s->draining = false;
+    s->events &= ~GFX_EVENT_RELOAD;
+    if (final) {
+        s->wake = NULL;
+        s->initialized = false;
+        s->owned = false;
+        s->config = NULL;
+    }
+    nx_arch_irq_restore(guard);
+    for (unsigned i = 0U; i < 3U; ++i)
+        settle(done[i]);
+    return s->closing && !final ? NX_ERROR_BUSY : NX_SUCCESS;
+}
 /** \brief One bounded owner coordinates global reload and per-layer borrowing.
  */
 static nx_result_t progress(nx_stm32_ltdc_state_t* s) {
     const nx_stm32_ltdc_config_t* c = s->config;
+    if (s->closing && !s->gate_owned) {
+        if (s->fault || !domains(c) || c->system->time_epoch != s->epoch ||
+            (NX_GFX_READ(&c->rcc->APB2ENR) & RCC_APB2ENR_LTDCEN) != 0U)
+            return quarantine(s, NX_ERROR_IO);
+        return finish_join(s, true);
+    }
     if (s->fault || !clocks(c) || c->system->time_epoch != s->epoch ||
         (NX_GFX_READ(&c->registers->ISR) & GFX_ERRORS) != 0U ||
         (s->events & GFX_EVENT_ERROR) != 0U) {
@@ -713,35 +804,7 @@ static nx_result_t progress(nx_stm32_ltdc_state_t* s) {
                 return quarantine(s, NX_ERROR_BUSY);
             if (final && (!pins_release(s) || !gate(s, false)))
                 return quarantine(s, NX_ERROR_BUSY);
-            nx_display_request_t* done[3] = {NULL, NULL, NULL};
-            nx_arch_irq_state_t guard = nx_arch_irq_save();
-            for (unsigned id = 0U; id < 2U; ++id) {
-                if ((s->retire_mask & (uint8_t)(1U << id)) != 0U) {
-                    done[id] = s->active[id];
-                    s->active[id] = NULL;
-                    s->handle.LayerCfg[id].FBStartAdress = 0U;
-                }
-            }
-            if (s->pending != NULL &&
-                (s->retire_mask & GFX_RETIRE_PENDING) != 0U) {
-                done[2] = s->pending;
-                s->pending = NULL;
-            }
-            s->phase = s->active[0] != NULL || s->active[1] != NULL ? GFX_LIVE
-                                                                    : GFX_IDLE;
-            s->retire_mask = 0U;
-            s->draining = false;
-            s->events &= ~GFX_EVENT_RELOAD;
-            if (final) {
-                s->wake = NULL;
-                s->initialized = false;
-                s->owned = false;
-                s->config = NULL;
-            }
-            nx_arch_irq_restore(guard);
-            for (unsigned i = 0U; i < 3U; ++i)
-                settle(done[i]);
-            return s->closing && !final ? NX_ERROR_BUSY : NX_SUCCESS;
+            return finish_join(s, final);
         }
         if (nx_deadline_expired(s->drain_deadline, now))
             return quarantine(s, NX_ERROR_BUSY);
@@ -796,6 +859,15 @@ static nx_result_t submit(void* context, nx_display_request_t* request) {
         return NX_ERROR_STATE;
     if (s->executing || s->pending != NULL)
         return NX_ERROR_BUSY;
+#if defined(NX_STM32_SDRAM_GRAPHICS)
+    if (s->memory_attached) {
+        nx_result_t result = nx_stm32_sdram_graphics_check(
+            s->config->graphics_memory, NX_STM32_SDRAM_GRAPHICS_LTDC, s,
+            s->config->system);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+#endif
     if (s->stage_generation > UINT64_MAX - 4U)
         return NX_ERROR_EXHAUSTED;
     const nx_stm32_ltdc_config_t* c = s->config;
@@ -935,6 +1007,9 @@ nx_result_t nx_stm32_ltdc_close(nx_stm32_ltdc_state_t* s) {
     if (!s->controller_touched) {
         if (!domains(s->config) || !pins_release(s) || !gate(s, false))
             return NX_ERROR_IO;
+        nx_result_t detached = memory_detach(s);
+        if (detached != NX_SUCCESS)
+            return detached;
         s->config = NULL;
         s->owned = false;
         return NX_SUCCESS;
@@ -993,6 +1068,15 @@ nx_result_t nx_stm32_ltdc_prepare(nx_stm32_ltdc_state_t* s,
     s->config = c;
     s->owned = true;
     s->epoch = c->system->time_epoch;
+#if defined(NX_STM32_SDRAM_GRAPHICS)
+    if (c->graphics_memory != NULL) {
+        nx_result_t result = nx_stm32_sdram_graphics_attach(
+            c->graphics_memory, NX_STM32_SDRAM_GRAPHICS_LTDC, s, c->system);
+        if (result != NX_SUCCESS)
+            return result;
+        s->memory_attached = true;
+    }
+#endif
     if (!gate(s, true))
         return NX_ERROR_IO;
     s->controller_touched = true;

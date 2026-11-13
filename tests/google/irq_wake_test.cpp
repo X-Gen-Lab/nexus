@@ -75,7 +75,7 @@ TEST(IrqWakeProvider, ExtiOverflowWakesConsumerWithoutOverwritingEvents) {
     size_t count = 0U;
     EXPECT_EQ(nx_exti_port_read(&port, received, 2U, &count), NX_SUCCESS);
     ASSERT_EQ(count, 2U);
-    EXPECT_EQ(received[0].line, 3U);
+    EXPECT_EQ(received[0].edge, NX_EXTI_RISING);
     EXPECT_EQ(received[1].flags, NX_EXTI_EVENT_LOSS);
     EXPECT_EQ(nx_exti_port_stop(&port), NX_SUCCESS);
 }

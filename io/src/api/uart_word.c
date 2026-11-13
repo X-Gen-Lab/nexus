@@ -17,12 +17,8 @@ nx_result_t nx_uart_format_validate(nx_uart_format_t format) {
         (format.flow != NX_UART_FLOW_NONE && format.flow != NX_UART_FLOW_RTS &&
          format.flow != NX_UART_FLOW_CTS &&
          format.flow != NX_UART_FLOW_RTS_CTS) ||
-        format.data_bits < 7U || format.data_bits > 9U) {
+        format.data_bits < 5U || format.data_bits > 9U) {
         return NX_ERROR_INVALID;
-    }
-    if ((format.data_bits == 7U && format.parity == NX_UART_PARITY_NONE) ||
-        (format.data_bits == 9U && format.parity != NX_UART_PARITY_NONE)) {
-        return NX_ERROR_UNSUPPORTED;
     }
     return NX_SUCCESS;
 }

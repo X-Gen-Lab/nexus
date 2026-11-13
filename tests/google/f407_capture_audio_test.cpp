@@ -92,6 +92,9 @@ class CaptureAudio : public testing::Test {
     nx_stm32_audio_blocks_config_t blocks_config = {};
     nx_stm32_audio_blocks_state_t blocks = {};
     nx_audio_blocks_request_t blocks_request = {};
+    nx_capture_port_t capture_face{&nx_stm32_capture_ops, &capture};
+    nx_audio_port_t audio_face{&nx_stm32_audio_ops, &audio};
+    nx_audio_port_t blocks_face{&nx_stm32_audio_blocks_ops, &blocks};
 
     void SetUp() override {
         model = &hardware;
@@ -282,11 +285,10 @@ class CaptureAudio : public testing::Test {
         }
     }
     void blocks_start() {
-        ASSERT_EQ(
-            nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
-            NX_SUCCESS);
+        ASSERT_EQ(nx_audio_port_start_blocks(&blocks_face, &blocks_request),
+                  NX_SUCCESS);
         hardware.now = 3U;
-        EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+        EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_BUSY);
         EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_ACTIVE);
     }
     void blocks_tc(bool receive, uint8_t bank = 1U) {
@@ -343,18 +345,18 @@ TEST_F(CaptureAudio, ContinuousBothControllersCoverEveryRoleAndDirection) {
                 ASSERT_NO_FATAL_FAILURE(blocks_start());
                 if (rx) {
                     blocks_tc(true);
-                    ASSERT_EQ(nx_stm32_audio_blocks_ops.service(&blocks),
+                    ASSERT_EQ(nx_audio_port_service(&blocks_face),
                               NX_ERROR_BUSY);
                     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_READY);
                 }
                 if (tx) {
                     blocks_tc(false);
-                    ASSERT_EQ(nx_stm32_audio_blocks_ops.service(&blocks),
+                    ASSERT_EQ(nx_audio_port_service(&blocks_face),
                               NX_ERROR_BUSY);
                     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
                 }
                 blocks_quiet();
-                ASSERT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_SUCCESS);
+                ASSERT_EQ(nx_audio_port_stop(&blocks_face), NX_SUCCESS);
                 EXPECT_EQ(nx_request_state(&blocks_request.base),
                           NX_REQUEST_SETTLED);
                 EXPECT_EQ(blocks.active, nullptr);
@@ -372,7 +374,7 @@ TEST_F(CaptureAudio, ContinuousRxPublishesOnlyAfterTheOldBankIsReplaced) {
     EXPECT_NE(hardware.streams[3].CR & DMA_SxCR_DBM, 0U);
     EXPECT_EQ(rx_stream.outstanding, 2U);
     blocks_tc(true);
-    ASSERT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    ASSERT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_BUSY);
     EXPECT_EQ(hardware.streams[3].M0AR,
               static_cast<uint32_t>(reinterpret_cast<uintptr_t>(rx_pool[2])));
     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_READY);
@@ -390,7 +392,7 @@ TEST_F(CaptureAudio, ContinuousTxReturnsOnlyTheDetachedCompletedBank) {
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_BORROWED);
     EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_BORROWED);
     blocks_tc(false);
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_BUSY);
     EXPECT_EQ(hardware.streams[4].M0AR,
               static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pool[2])));
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
@@ -403,11 +405,11 @@ TEST_F(CaptureAudio, ContinuousDuplexAdvancesEachPhysicalBankIndependently) {
     ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(4U));
     ASSERT_NO_FATAL_FAILURE(blocks_start());
     blocks_tc(true);
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_BUSY);
     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_READY);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_BORROWED);
     blocks_tc(false);
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_BUSY);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(blocks.transferred, 256U);
 }
@@ -417,13 +419,13 @@ TEST_F(CaptureAudio, ContinuousTxUnderrunNeverRepeatsAnOldBuffer) {
     ASSERT_NO_FATAL_FAILURE(blocks_start());
     blocks_tc(false);
     hardware.hold_dma = true;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_BORROWED);
     EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_BORROWED);
     hardware.hold_dma = false;
     blocks_quiet();
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_stop(&blocks_face), NX_SUCCESS);
     EXPECT_EQ(blocks_request.base.result, NX_ERROR_OVERFLOW);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_FREE);
@@ -433,13 +435,13 @@ TEST_F(CaptureAudio, ContinuousRxExhaustionPreservesPublishedConsumers) {
     ASSERT_NO_FATAL_FAILURE(blocks_start());
     for (unsigned bank : {1U, 0U, 1U}) {
         blocks_tc(true, static_cast<uint8_t>(bank));
-        ASSERT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+        ASSERT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_BUSY);
     }
     nx_stream_block_t consumer;
     ASSERT_EQ(nx_stream_acquire(&rx_stream, &consumer), NX_SUCCESS);
     blocks_tc(true, 0U);
     blocks_quiet();
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_OVERFLOW);
+    EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_OVERFLOW);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_BORROWED);
     EXPECT_EQ(rx_slots[1].state, NX_STREAM_SLOT_READY);
@@ -451,13 +453,13 @@ TEST_F(CaptureAudio, ContinuousBankRaceKeepsEveryUnprovedLoan) {
     blocks_tc(true);
     hardware.race_bank = true;
     hardware.hold_dma = true;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_FILLING);
     EXPECT_EQ(rx_slots[2].state, NX_STREAM_SLOT_FILLING);
     hardware.hold_dma = false;
     blocks_quiet();
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_stop(&blocks_face), NX_SUCCESS);
     EXPECT_EQ(rx_stream.outstanding, 0U);
 }
 TEST_F(CaptureAudio, ContinuousServiceBudgetCannotHideTwoBankWraps) {
@@ -465,7 +467,7 @@ TEST_F(CaptureAudio, ContinuousServiceBudgetCannotHideTwoBankWraps) {
     ASSERT_NO_FATAL_FAILURE(blocks_start());
     hardware.now = 24U;
     blocks_quiet();
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_OVERFLOW);
+    EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_OVERFLOW);
     EXPECT_EQ(blocks_request.base.result, NX_ERROR_OVERFLOW);
     EXPECT_EQ(rx_stream.losses, 1U);
     EXPECT_EQ(rx_stream.outstanding, 0U);
@@ -475,11 +477,11 @@ TEST_F(CaptureAudio, ContinuousStopRetainsAddressesUntilTheFinalReadback) {
     ASSERT_NO_FATAL_FAILURE(blocks_start());
     hardware.hold_address = true;
     blocks_quiet();
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_stop(&blocks_face), NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(rx_stream.outstanding, 2U);
     hardware.hold_address = false;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_stop(&blocks_face), NX_SUCCESS);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(rx_stream.outstanding, 0U);
     EXPECT_EQ(blocks_request.base.result, NX_ERROR_CANCELLED);
@@ -490,12 +492,12 @@ TEST_F(CaptureAudio, ContinuousStoppedExternalClockRetainsItsWireLoan) {
     ASSERT_NO_FATAL_FAILURE(blocks_start());
     hardware.spi.SR = SPI_SR_BSY;
     hardware.wire_polls = 0U;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_stop(&blocks_face), NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_BORROWED);
     EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_BORROWED);
     hardware.wire_polls = 1U;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_stop(&blocks_face), NX_SUCCESS);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_SETTLED);
 }
 TEST_F(CaptureAudio, ContinuousCloseCannotReopenARefusedDrain) {
@@ -511,7 +513,7 @@ TEST_F(CaptureAudio, ContinuousCloseCannotReopenARefusedDrain) {
     ASSERT_EQ(nx_request_prepare(&another.base, NX_DEADLINE_NEVER), NX_SUCCESS);
     another.tx = &stream;
     another.block_bytes = 256U;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &another),
+    EXPECT_EQ(nx_audio_port_start_blocks(&blocks_face, &another),
               NX_ERROR_STATE);
     hardware.hold_dma = false;
     nx_result_t result = nx_stm32_audio_blocks_close(&blocks);
@@ -529,11 +531,11 @@ TEST_F(CaptureAudio, ContinuousOldEpochNeverReleasesItsBankLoans) {
     ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
     ASSERT_NO_FATAL_FAILURE(blocks_start());
     ++g_nx_stm32_system.time_epoch;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_STATE);
+    EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_STATE);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(rx_stream.outstanding, 2U);
     --g_nx_stm32_system.time_epoch;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_stop(&blocks_face), NX_ERROR_BUSY);
     EXPECT_EQ(rx_stream.outstanding, 2U);
 }
 TEST_F(CaptureAudio,
@@ -542,7 +544,7 @@ TEST_F(CaptureAudio,
     ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(3U));
     blocks_request.rx = &stream;
     unsigned before = hardware.writes;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
+    EXPECT_EQ(nx_audio_port_start_blocks(&blocks_face, &blocks_request),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_READY);
     EXPECT_EQ(hardware.writes, before);
@@ -552,7 +554,7 @@ TEST_F(CaptureAudio, ContinuousClockBoundsRejectAnUnobservableShortBlock) {
     ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
     blocks_request.block_bytes = 4U;
     unsigned before = hardware.writes;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
+    EXPECT_EQ(nx_audio_port_start_blocks(&blocks_face, &blocks_request),
               NX_ERROR_INVALID);
     EXPECT_EQ(hardware.writes, before);
     EXPECT_EQ(rx_stream.outstanding, 0U);
@@ -563,15 +565,14 @@ TEST_F(CaptureAudio, ContinuousRateCannotOverwriteTheSharedClockOwner) {
     ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
     shared_clock.saved_plli2s = 0x12345678U;
     auto* output = reinterpret_cast<nx_audio_rate_t*>(&shared_clock);
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.rate(&blocks, output),
-              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_audio_port_rate(&blocks_face, output), NX_ERROR_INVALID);
     EXPECT_EQ(shared_clock.saved_plli2s, 0x12345678U);
 }
 TEST_F(CaptureAudio, ContinuousDmaCannotOverwriteAColdPinSnapshot) {
     pins[0].snapshot = reinterpret_cast<uint16_t*>(rx_pool[0]);
     ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));
     const unsigned before = hardware.writes;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
+    EXPECT_EQ(nx_audio_port_start_blocks(&blocks_face, &blocks_request),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_READY);
     EXPECT_EQ(rx_stream.outstanding, 0U);
@@ -581,11 +582,11 @@ TEST_F(CaptureAudio, ContinuousDmaCannotOverwriteAColdPinSnapshot) {
 TEST_F(CaptureAudio, ContinuousFrequentServiceCannotRestartTheWarmupClock) {
     ASSERT_NO_FATAL_FAILURE(blocks_open(true, false));
     ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(3U));
-    ASSERT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
+    ASSERT_EQ(nx_audio_port_start_blocks(&blocks_face, &blocks_request),
               NX_SUCCESS);
     for (nx_time_us_t now = 1U; now <= 3U; ++now) {
         hardware.now = now;
-        EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+        EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_BUSY);
     }
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_ACTIVE);
 }
@@ -595,7 +596,7 @@ TEST_F(CaptureAudio,
     ASSERT_NO_FATAL_FAILURE(blocks_start());
     blocks_tc(true);
     hardware.lose_epoch_on_bank_update = true;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_STATE);
+    EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_STATE);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_FILLING);
     EXPECT_EQ(rx_slots[1].state, NX_STREAM_SLOT_FILLING);
@@ -605,9 +606,9 @@ TEST_F(CaptureAudio,
 TEST_F(CaptureAudio, ContinuousMasterArmCannotHideUnobservedBankWraps) {
     ASSERT_NO_FATAL_FAILURE(blocks_open(false, true, true));
     hardware.jump_after_i2s_start = true;
-    ASSERT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
+    ASSERT_EQ(nx_audio_port_start_blocks(&blocks_face, &blocks_request),
               NX_SUCCESS);
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_OVERFLOW);
+    EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_OVERFLOW);
     EXPECT_EQ(blocks_request.base.result, NX_ERROR_OVERFLOW);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(rx_stream.losses, 1U);
@@ -622,11 +623,11 @@ TEST_F(CaptureAudio,
      */
     hardware.time_jump_reads = 3U;
     hardware.time_jump_to = 10000U;
-    nx_result_t result = nx_stm32_audio_blocks_ops.service(&blocks);
+    nx_result_t result = nx_audio_port_service(&blocks_face);
     if (result != NX_ERROR_OVERFLOW) {
         ASSERT_EQ(result, NX_ERROR_BUSY);
         blocks_tc(true);
-        result = nx_stm32_audio_blocks_ops.service(&blocks);
+        result = nx_audio_port_service(&blocks_face);
     }
     EXPECT_EQ(result, NX_ERROR_OVERFLOW);
     EXPECT_EQ(blocks_request.base.result, NX_ERROR_OVERFLOW);
@@ -646,18 +647,17 @@ TEST_F(CaptureAudio, ContinuousSettledSessionCanBecomeInaccessibleBeforeIrqs) {
     request->tx = &stream;
     request->rx = nullptr;
     request->block_bytes = 256U;
-    ASSERT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, request),
-              NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_start_blocks(&blocks_face, request), NX_SUCCESS);
     hardware.now = 3U;
-    ASSERT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_ERROR_BUSY);
+    ASSERT_EQ(nx_audio_port_service(&blocks_face), NX_ERROR_BUSY);
     blocks_quiet();
-    ASSERT_EQ(nx_stm32_audio_blocks_ops.stop(&blocks), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_stop(&blocks_face), NX_SUCCESS);
     ASSERT_EQ(nx_request_state(&request->base), NX_REQUEST_SETTLED);
     ASSERT_EQ(mprotect(mapping, 4096U, PROT_NONE), 0);
     nx_stm32_audio_blocks_irq(&blocks);
     nx_stm32_audio_blocks_dma_irq(&blocks, false);
     nx_stm32_audio_blocks_dma_irq(&blocks, true);
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.service(&blocks), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_service(&blocks_face), NX_SUCCESS);
     EXPECT_EQ(nx_stm32_audio_blocks_close(&blocks), NX_SUCCESS);
     EXPECT_EQ(munmap(mapping, 4096U), 0);
 }
@@ -667,7 +667,7 @@ TEST_F(CaptureAudio, FiniteReceiveOverrunMasksItsLevelSourceBeforeIrqReturn) {
     audio_config.rx = dma(3U, 0U);
     audio_open();
     audio_request.rx = &rx_frame;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     ASSERT_NE(hardware.spi.CR2 & SPI_CR2_ERRIE, 0U);
     hardware.spi.SR = SPI_SR_OVR | SPI_SR_BSY;
     nx_stm32_audio_irq(&audio);
@@ -679,13 +679,13 @@ TEST_F(CaptureAudio, FiniteReceiveOverrunMasksItsLevelSourceBeforeIrqReturn) {
 
 TEST_F(CaptureAudio, RawSnapshotRequiresBothFrameAndExactStorage) {
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     hardware.streams[1].NDTR = 0U;
     flag(1U, 0x20U);
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
     captured();
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_SUCCESS);
     EXPECT_EQ(nx_request_state(&snapshot.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(snapshot.base.transferred, 256U);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_READY);
@@ -695,9 +695,9 @@ TEST_F(CaptureAudio, RawSnapshotRequiresBothFrameAndExactStorage) {
 }
 TEST_F(CaptureAudio, EmptyCropFrameCannotMakeRawImageComplete) {
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     captured(64U);
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_IO);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_IO);
     EXPECT_EQ(snapshot.base.result, NX_ERROR_IO);
     EXPECT_EQ(snapshot.base.transferred, 0U);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
@@ -706,9 +706,9 @@ TEST_F(CaptureAudio, JpegShortImageNeedsNoDmaTcAndReturnsWordPrefix) {
     capture_config.jpeg = true;
     snapshot.raw_frame = nullptr;
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     captured(59U);
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_SUCCESS);
     EXPECT_EQ(snapshot.base.transferred, 20U);
     EXPECT_EQ(slots[0].length, 20U);
 }
@@ -716,32 +716,32 @@ TEST_F(CaptureAudio, JpegFrameWaitsForSourceFifoBusAndBothIrqs) {
     capture_config.jpeg = true;
     snapshot.raw_frame = nullptr;
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     captured(60U);
     hardware.dcmi.SR = DCMI_SR_FNE;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&snapshot.base), NX_REQUEST_QUARANTINED);
     hardware.dcmi.SR = 0U;
     hardware.active[57] = 1U;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
     hardware.active[57] = 0U;
     hardware.active[DCMI_IRQn] = 1U;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     hardware.active[DCMI_IRQn] = 0U;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_SUCCESS);
     EXPECT_EQ(snapshot.base.transferred, 16U);
 }
 TEST_F(CaptureAudio, CancelStoppedSensorRetainsBorrowUntilExclusiveRecovery) {
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     hardware.hold_capture = true;
-    EXPECT_EQ(nx_stm32_capture_ops.cancel(&capture, &snapshot), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_cancel(&capture_face, &snapshot), NX_ERROR_BUSY);
     EXPECT_EQ(nx_stm32_capture_close(&capture), NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&snapshot.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
     hardware.hold_capture = false;
-    EXPECT_EQ(nx_stm32_capture_ops.recover(&capture), NX_ERROR_CANCELLED);
+    EXPECT_EQ(nx_capture_port_recover(&capture_face), NX_ERROR_CANCELLED);
     EXPECT_EQ(nx_request_state(&snapshot.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(hardware.dma_resets, 0U);
@@ -749,24 +749,24 @@ TEST_F(CaptureAudio, CancelStoppedSensorRetainsBorrowUntilExclusiveRecovery) {
 }
 TEST_F(CaptureAudio, FailedDmaStopAndAddressDetachKeepExactBorrow) {
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     captured();
     hardware.hold_dma = true;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     EXPECT_NE(capture.active, nullptr);
     hardware.hold_dma = false;
     hardware.hold_address = true;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
     hardware.hold_address = false;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_SUCCESS);
 }
 TEST_F(CaptureAudio, DmaAndSourceErrorsPublishNoImage) {
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     captured();
     flag(1U, 0x08U);
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_IO);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_IO);
     EXPECT_EQ(snapshot.base.transferred, 0U);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
 }
@@ -816,20 +816,20 @@ TEST_F(CaptureAudio, HighBitSamplesUseSixteenBitContainersAndSnapshotNoFcrc) {
 TEST_F(CaptureAudio, DmaStreamSevenUsesOwnFlagsAndKeepsNeighbor) {
     capture_config.memory = dma(7U, 1U);
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     hardware.dma.HISR = 0x20U;
     captured();
     flag(7U, 0x20U);
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_SUCCESS);
     EXPECT_EQ(hardware.dma.HISR, 0x20U);
 }
 TEST_F(CaptureAudio, ContinuousPublishesOnlyDetachedStorageBlocks) {
     capture_config.continuous = true;
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_start_blocks(&capture_face, &stream), NX_SUCCESS);
     hardware.streams[1].CR |= DMA_SxCR_CT;
     flag(1U, 0x20U);
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_READY);
     EXPECT_EQ(slots[0].length, 256U);
     EXPECT_EQ(slots[0].flags & NX_STREAM_BOUNDARY_TRIGGER, 0U);
@@ -841,9 +841,9 @@ TEST_F(CaptureAudio, ContinuousPublishesOnlyDetachedStorageBlocks) {
 TEST_F(CaptureAudio, AmbiguousCtNeverPublishesOldOrReplacementTarget) {
     capture_config.continuous = true;
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_start_blocks(&capture_face, &stream), NX_SUCCESS);
     flag(1U, 0x20U);
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_OVERFLOW);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_OVERFLOW);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(stream.losses, 1U);
@@ -851,32 +851,32 @@ TEST_F(CaptureAudio, AmbiguousCtNeverPublishesOldOrReplacementTarget) {
 TEST_F(CaptureAudio, ReplacementBankRaceRetainsAllThreeUntilActualDmaDrain) {
     capture_config.continuous = true;
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_start_blocks(&capture_face, &stream), NX_SUCCESS);
     hardware.streams[1].CR |= DMA_SxCR_CT;
     flag(1U, 0x20U);
     hardware.race_bank = true;
     hardware.hold_dma = true;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     EXPECT_EQ(capture.posted.pending, 3U);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
     EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_FILLING);
     EXPECT_EQ(slots[2].state, NX_STREAM_SLOT_FILLING);
     hardware.hold_dma = false;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_OVERFLOW);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_OVERFLOW);
     EXPECT_EQ(stream.outstanding, 0U);
 }
 TEST_F(CaptureAudio, NoReplacementStopsWithoutOverwritingConsumerBlocks) {
     capture_config.continuous = true;
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_start_blocks(&capture_face, &stream), NX_SUCCESS);
     for (unsigned i = 0U; i < 3U; ++i) {
         hardware.streams[1].CR ^= DMA_SxCR_CT;
         flag(1U, 0x20U);
-        ASSERT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+        ASSERT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     }
     hardware.streams[1].CR ^= DMA_SxCR_CT;
     flag(1U, 0x20U);
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_OVERFLOW);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_OVERFLOW);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_READY);
     EXPECT_EQ(slots[3].state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(slots[4].state, NX_STREAM_SLOT_FREE);
@@ -884,18 +884,18 @@ TEST_F(CaptureAudio, NoReplacementStopsWithoutOverwritingConsumerBlocks) {
 TEST_F(CaptureAudio, MissedObservationBudgetStopsEvenWithPlausibleCt) {
     capture_config.continuous = true;
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_start_blocks(&capture_face, &stream), NX_SUCCESS);
     hardware.now = 11U;
     hardware.streams[1].CR |= DMA_SxCR_CT;
     flag(1U, 0x20U);
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_OVERFLOW);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_OVERFLOW);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
 }
 TEST_F(CaptureAudio, LateCaptureIrqCannotTouchSettledRequest) {
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     captured();
-    ASSERT_EQ(nx_stm32_capture_ops.service(&capture), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_service(&capture_face), NX_SUCCESS);
     nx_capture_request_t before = snapshot;
     hardware.dcmi.RISR = DCMI_RISR_OVR_RIS | DCMI_RISR_ERR_RIS;
     flag(1U, 0x08U);
@@ -907,14 +907,14 @@ TEST_F(CaptureAudio, LateCaptureIrqCannotTouchSettledRequest) {
 TEST_F(CaptureAudio, AudioSlaveTxRequiresRealPrefillBeforeActive) {
     audio_open();
     tx_prepare();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_QUEUED);
     hardware.now = 3U;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_ACTIVE);
     EXPECT_NE(tx_loan.owner, nullptr);
     tx_complete();
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(tx_loan.owner, nullptr);
     EXPECT_EQ(audio_request.base.transferred, 16U);
@@ -922,17 +922,17 @@ TEST_F(CaptureAudio, AudioSlaveTxRequiresRealPrefillBeforeActive) {
 TEST_F(CaptureAudio, AudioCancelPrefillKeepsLoanUntilWireAndIrqsDetach) {
     audio_open();
     tx_prepare();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
-    EXPECT_EQ(nx_stm32_audio_ops.cancel(&audio, &audio_request), NX_ERROR_BUSY);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_cancel(&audio_face, &audio_request), NX_ERROR_BUSY);
     EXPECT_EQ(nx_stm32_audio_close(&audio), NX_ERROR_BUSY);
     EXPECT_NE(tx_loan.owner, nullptr);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_QUARANTINED);
     hardware.spi.SR = SPI_SR_TXE;
     hardware.active[SPI2_IRQn] = 1U;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_BUSY);
     EXPECT_NE(tx_loan.owner, nullptr);
     hardware.active[SPI2_IRQn] = 0U;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_CANCELLED);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_CANCELLED);
     EXPECT_EQ(tx_loan.owner, nullptr);
     EXPECT_EQ(audio_request.base.transferred, 0U);
 }
@@ -940,10 +940,10 @@ TEST_F(CaptureAudio, AudioSourceErrorIsLatchedBeforeDestructiveStatusRead) {
     audio_open();
     tx_prepare();
     hardware.spi.SR |= SPI_SR_UDR;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     EXPECT_NE(nx_request_state(&audio_request.base), NX_REQUEST_READY);
     tx_complete();
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_IO);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_IO);
     EXPECT_EQ(audio_request.base.result, NX_ERROR_IO);
     EXPECT_EQ(audio_request.base.transferred, 0U);
 }
@@ -953,10 +953,10 @@ TEST_F(CaptureAudio, AudioSlaveReceivePublishesAfterMemoryAndSourceDetach) {
     audio_config.rx = dma(3U, 0U);
     audio_request.rx = &rx_frame;
     audio_open();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     hardware.streams[3].NDTR = 0U;
     flag(3U, 0x20U);
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_READY);
     EXPECT_EQ(rx_slots[0].length, 16U);
     EXPECT_EQ(hardware.streams[3].M0AR, 0U);
@@ -968,12 +968,12 @@ TEST_F(CaptureAudio, AudioDuplexWaitsForBothDirectionsAndAbortsRxOnError) {
     audio_open();
     tx_prepare();
     audio_request.rx = &rx_frame;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     tx_complete();
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_BUSY);
     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_FILLING);
     flag(3U, 0x08U);
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_IO);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_IO);
     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(tx_loan.owner, nullptr);
 }
@@ -984,14 +984,14 @@ TEST_F(CaptureAudio, AudioDmaDetachFailurePreservesBothDuplexLoans) {
     audio_open();
     tx_prepare();
     audio_request.rx = &rx_frame;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     hardware.hold_dma = true;
-    EXPECT_EQ(nx_stm32_audio_ops.cancel(&audio, &audio_request), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_cancel(&audio_face, &audio_request), NX_ERROR_BUSY);
     EXPECT_NE(tx_loan.owner, nullptr);
     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_FILLING);
     hardware.hold_dma = false;
     hardware.spi.SR = SPI_SR_TXE;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_CANCELLED);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_CANCELLED);
     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_FREE);
 }
 TEST_F(CaptureAudio, AudioMasterPlli2sAndMclkPreserveMainPllAndSharedDma) {
@@ -1005,7 +1005,7 @@ TEST_F(CaptureAudio, AudioMasterPlli2sAndMclkPreserveMainPllAndSharedDma) {
     EXPECT_NE(hardware.spi.I2SPR & SPI_I2SPR_MCKOE, 0U);
     EXPECT_EQ(hardware.rcc.PLLCFGR, main_pll);
     nx_audio_rate_t rate;
-    EXPECT_EQ(nx_stm32_audio_ops.rate(&audio, &rate), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_rate(&audio_face, &rate), NX_SUCCESS);
     EXPECT_EQ(rate.numerator_hz, 46875U);
     EXPECT_EQ(rate.denominator, 1U);
     EXPECT_EQ(nx_stm32_audio_close(&audio), NX_SUCCESS);
@@ -1052,12 +1052,12 @@ TEST_F(CaptureAudio, AudioMasterReceiveDoesNotUseAlwaysLowBusyAsCompletion) {
     audio_config.rx = dma(3U, 0U);
     audio_request.rx = &rx_frame;
     audio_open();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     EXPECT_EQ(hardware.streams[3].NDTR, 7U);
     hardware.streams[3].NDTR = 0U;
     hardware.master_tail = true;
     flag(3U, 0x20U);
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
     EXPECT_TRUE(audio.terminal_stopped);
     EXPECT_GE(hardware.cycles, 100U);
     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_READY);
@@ -1072,19 +1072,19 @@ TEST_F(CaptureAudio, AudioFormatUsesHalfwordsAndHardwareSlotPadding) {
     hardware.gpio.IDR &= ~(1U << 12U);
     audio_open();
     tx_prepare();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     EXPECT_EQ(hardware.spi.I2SCFGR & SPI_I2SCFGR_DATLEN, SPI_I2SCFGR_DATLEN_0);
     EXPECT_NE(hardware.spi.I2SCFGR & SPI_I2SCFGR_CHLEN, 0U);
     EXPECT_EQ(hardware.streams[4].NDTR, 7U);
     tx_complete();
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
 }
 TEST_F(CaptureAudio, AudioLateIrqAndOtherControllerCannotChangeSettledRequest) {
     audio_open();
     tx_prepare();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     tx_complete();
-    ASSERT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
     nx_audio_request_t before = audio_request;
     flag(4U, 0x08U);
     hardware.spi.SR = SPI_SR_UDR;
@@ -1097,12 +1097,12 @@ TEST_F(CaptureAudio, CaptureDeadlineIncludesFinalFifoAndBusWithdrawal) {
     snapshot.raw_frame = nullptr;
     snapshot.base.deadline = 1U;
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     captured(60U);
     hardware.dcmi.SR = DCMI_SR_FNE;
     hardware.advance_time = true;
     hardware.fifo_polls = 2U;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_TIMEOUT);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_TIMEOUT);
     EXPECT_EQ(snapshot.base.result, NX_ERROR_TIMEOUT);
     EXPECT_EQ(snapshot.base.transferred, 0U);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
@@ -1111,12 +1111,12 @@ TEST_F(CaptureAudio, AudioDeadlineIncludesFinalSerializerAndIrqWithdrawal) {
     audio_open();
     tx_prepare();
     audio_request.base.deadline = 1U;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     tx_complete();
     hardware.spi.SR = SPI_SR_BSY;
     hardware.advance_time = true;
     hardware.wire_polls = 2U;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_TIMEOUT);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_TIMEOUT);
     EXPECT_EQ(audio_request.base.result, NX_ERROR_TIMEOUT);
     EXPECT_EQ(audio_request.base.transferred, 0U);
     EXPECT_EQ(tx_loan.owner, nullptr);
@@ -1125,7 +1125,7 @@ TEST_F(CaptureAudio, AudioRateCannotOverwriteAnAcceptedImmutableFrame) {
     audio_open();
     tx_prepare();
     pool[0][0] = 0x5aU;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     EXPECT_EQ(nx_stm32_audio_ops.rate(
                   &audio, reinterpret_cast<nx_audio_rate_t*>(pool[0])),
               NX_ERROR_INVALID);
@@ -1134,9 +1134,9 @@ TEST_F(CaptureAudio, AudioRateCannotOverwriteAnAcceptedImmutableFrame) {
 }
 TEST_F(CaptureAudio, CaptureCannotBorrowAcrossARecreatedSystemEpoch) {
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     ++g_nx_stm32_system.time_epoch;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_STATE);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_STATE);
     EXPECT_EQ(nx_request_state(&snapshot.base), NX_REQUEST_QUARANTINED);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
     EXPECT_NE(nx_stm32_capture_close(&capture), NX_SUCCESS);
@@ -1144,9 +1144,9 @@ TEST_F(CaptureAudio, CaptureCannotBorrowAcrossARecreatedSystemEpoch) {
 TEST_F(CaptureAudio, AudioCannotBorrowAcrossARecreatedSystemEpoch) {
     audio_open();
     tx_prepare();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     ++g_nx_stm32_system.time_epoch;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_STATE);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_STATE);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_NE(tx_loan.owner, nullptr);
     EXPECT_NE(nx_stm32_audio_close(&audio), NX_SUCCESS);
@@ -1163,7 +1163,7 @@ TEST_F(CaptureAudio, RejectedRawLayoutNeverCreatesARequestOrProducerBorrow) {
     frame.layout.planes[0].row_bytes = 0U;
     frame.layout.planes[0].stride = 0U;
     unsigned before = hardware.writes;
-    EXPECT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot),
+    EXPECT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&snapshot.base), NX_REQUEST_READY);
     EXPECT_EQ(stream.outstanding, 0U);
@@ -1177,7 +1177,7 @@ TEST_F(CaptureAudio, RejectedDuplexKeepsNoProviderSourceReference) {
     tx_prepare();
     audio_request.rx = &rx_frame;
     rx_frame.layout.bytes = 24U;
-    EXPECT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request),
+    EXPECT_EQ(nx_audio_port_submit(&audio_face, &audio_request),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_READY);
     EXPECT_EQ(audio.active, nullptr);
@@ -1191,20 +1191,20 @@ TEST_F(CaptureAudio, SettledAudioDetachesEveryProviderPayloadReference) {
     audio_open();
     tx_prepare();
     audio_request.rx = &rx_frame;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     tx_complete();
     hardware.streams[3].NDTR = 0U;
     flag(3U, 0x20U);
-    ASSERT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
     EXPECT_EQ(audio.active, nullptr);
     EXPECT_EQ(audio.transmit.data, nullptr);
     EXPECT_EQ(audio.receive.data, nullptr);
 }
 TEST_F(CaptureAudio, SettledCaptureDetachesPostedAndTargetReferences) {
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     captured();
-    ASSERT_EQ(nx_stm32_capture_ops.service(&capture), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_service(&capture_face), NX_SUCCESS);
     EXPECT_EQ(capture.active, nullptr);
     EXPECT_EQ(capture.stream, nullptr);
     EXPECT_EQ(capture.posted.stream, nullptr);
@@ -1219,9 +1219,9 @@ TEST_F(CaptureAudio, FailedReceiveReservationStillReturnsAnAcceptedTxLoan) {
     tx_prepare();
     audio_request.rx = &rx_frame;
     rx_stream.epoch = UINT64_MAX;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     if (nx_request_state(&audio_request.base) != NX_REQUEST_SETTLED)
-        (void)nx_stm32_audio_ops.service(&audio);
+        (void)nx_audio_port_service(&audio_face);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(audio_request.base.result, NX_ERROR_EXHAUSTED);
     EXPECT_EQ(tx_loan.owner, nullptr);
@@ -1230,11 +1230,11 @@ TEST_F(CaptureAudio, CaptureRestoresExactPriorIrqPrioritiesAtPlatformClose) {
     hardware.priority[DCMI_IRQn] = 3U;
     hardware.priority[57] = 4U;
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     EXPECT_EQ(hardware.priority[DCMI_IRQn], 5U);
     EXPECT_EQ(hardware.priority[57], 5U);
     captured();
-    ASSERT_EQ(nx_stm32_capture_ops.service(&capture), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_service(&capture_face), NX_SUCCESS);
     ASSERT_EQ(nx_stm32_capture_close(&capture), NX_SUCCESS);
     EXPECT_EQ(hardware.priority[DCMI_IRQn], 3U);
     EXPECT_EQ(hardware.priority[57], 4U);
@@ -1244,10 +1244,10 @@ TEST_F(CaptureAudio, AudioRestoresExactPriorIrqPrioritiesAtPlatformClose) {
     hardware.priority[audio_config.tx.irq] = 2U;
     audio_open();
     tx_prepare();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     EXPECT_EQ(hardware.priority[SPI2_IRQn], 5U);
     tx_complete();
-    ASSERT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
     ASSERT_EQ(nx_stm32_audio_close(&audio), NX_SUCCESS);
     EXPECT_EQ(hardware.priority[SPI2_IRQn], 1U);
     EXPECT_EQ(hardware.priority[audio_config.tx.irq], 2U);
@@ -1274,14 +1274,14 @@ TEST_F(CaptureAudio, HalInitInterruptEnablesMustBeActuallyMaskedAndReadBack) {
 }
 TEST_F(CaptureAudio, SnapshotCannotSettleWhileDmaFifoStillOwnsTheBus) {
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     captured();
     hardware.hold_fifo = true;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
     EXPECT_EQ(nx_request_state(&snapshot.base), NX_REQUEST_QUARANTINED);
     hardware.hold_fifo = false;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_SUCCESS);
 }
 TEST_F(CaptureAudio, SlaveReceiverKeepsFillWhileShiftRegisterIsBusy) {
     audio_config.receive = true;
@@ -1289,14 +1289,14 @@ TEST_F(CaptureAudio, SlaveReceiverKeepsFillWhileShiftRegisterIsBusy) {
     audio_config.rx = dma(3U, 0U);
     audio_request.rx = &rx_frame;
     audio_open();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     hardware.streams[3].NDTR = 0U;
     hardware.spi.SR = SPI_SR_BSY;
     flag(3U, 0x20U);
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_BUSY);
     EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_FILLING);
     hardware.spi.SR = 0U;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
 }
 TEST_F(CaptureAudio, FailedLastPlli2sReleaseKeepsItsClockAndGateReceipts) {
     audio_config.master = true;
@@ -1314,9 +1314,9 @@ TEST_F(CaptureAudio, FailedLastPlli2sReleaseKeepsItsClockAndGateReceipts) {
 }
 TEST_F(CaptureAudio, FailedCaptureCloseRevokesFurtherAdmission) {
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot), NX_SUCCESS);
     captured();
-    ASSERT_EQ(nx_stm32_capture_ops.service(&capture), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_service(&capture_face), NX_SUCCESS);
     nx_stream_block_t block;
     ASSERT_EQ(nx_stream_acquire(&stream, &block), NX_SUCCESS);
     ASSERT_EQ(nx_stream_release(&stream, &block), NX_SUCCESS);
@@ -1324,7 +1324,7 @@ TEST_F(CaptureAudio, FailedCaptureCloseRevokesFurtherAdmission) {
     ASSERT_EQ(nx_stm32_capture_close(&capture), NX_ERROR_IO);
     ASSERT_EQ(nx_request_prepare(&snapshot.base, NX_DEADLINE_NEVER),
               NX_SUCCESS);
-    EXPECT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot),
+    EXPECT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&snapshot.base), NX_REQUEST_READY);
     EXPECT_EQ(stream.outstanding, 0U);
@@ -1332,15 +1332,15 @@ TEST_F(CaptureAudio, FailedCaptureCloseRevokesFurtherAdmission) {
 TEST_F(CaptureAudio, FailedAudioCloseRevokesFurtherAdmission) {
     audio_open();
     tx_prepare();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     tx_complete();
-    ASSERT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
     hardware.hold_priority_restore = true;
     ASSERT_EQ(nx_stm32_audio_close(&audio), NX_ERROR_IO);
     tx_prepare();
     ASSERT_EQ(nx_request_prepare(&audio_request.base, NX_DEADLINE_NEVER),
               NX_SUCCESS);
-    EXPECT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request),
+    EXPECT_EQ(nx_audio_port_submit(&audio_face, &audio_request),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_READY);
     EXPECT_NE(tx_loan.owner, nullptr);
@@ -1348,11 +1348,11 @@ TEST_F(CaptureAudio, FailedAudioCloseRevokesFurtherAdmission) {
 TEST_F(CaptureAudio, OverrunDuringTargetReplacementCannotPublishAQuietBlock) {
     capture_config.continuous = true;
     capture_open();
-    ASSERT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_start_blocks(&capture_face, &stream), NX_SUCCESS);
     hardware.streams[1].CR |= DMA_SxCR_CT;
     flag(1U, 0x20U);
     hardware.inject_capture_error = true;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_IO);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_IO);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(slots[2].state, NX_STREAM_SLOT_FREE);
@@ -1361,27 +1361,27 @@ TEST_F(CaptureAudio, OverrunDuringTargetReplacementCannotPublishAQuietBlock) {
 TEST_F(CaptureAudio, SlaveTxWaitsForThreeActualMicroticksAfterEnable) {
     audio_open();
     tx_prepare();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     for (nx_time_us_t tick : {0U, 1U, 2U}) {
         hardware.now = tick;
-        EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_BUSY);
+        EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_BUSY);
         EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_QUEUED);
     }
     hardware.now = 3U;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_ACTIVE);
 }
 TEST_F(CaptureAudio, SlaveWsLostDuringPrefillNeverAuthorizesExternalClocks) {
     audio_open();
     tx_prepare();
     hardware.lose_ws_after_prefill = true;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     hardware.now = 3U;
-    (void)nx_stm32_audio_ops.service(&audio);
+    (void)nx_audio_port_service(&audio_face);
     EXPECT_NE(nx_request_state(&audio_request.base), NX_REQUEST_ACTIVE);
     EXPECT_NE(tx_loan.owner, nullptr);
     hardware.spi.SR = SPI_SR_TXE;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_IO);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_IO);
     EXPECT_EQ(audio_request.base.transferred, 0U);
 }
 TEST_F(CaptureAudio, NeverEnabledSerializerFailureNeedsNoInventedTxe) {
@@ -1389,11 +1389,11 @@ TEST_F(CaptureAudio, NeverEnabledSerializerFailureNeedsNoInventedTxe) {
     tx_prepare();
     hardware.spi.SR = 0U;
     hardware.refuse_txdma_enable = true;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     for (unsigned i = 0U;
          i < 3U && nx_request_state(&audio_request.base) != NX_REQUEST_SETTLED;
          ++i)
-        (void)nx_stm32_audio_ops.service(&audio);
+        (void)nx_audio_port_service(&audio_face);
     EXPECT_EQ(hardware.enable_attempts, 0U);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(audio_request.base.result, NX_ERROR_IO);
@@ -1403,26 +1403,26 @@ TEST_F(CaptureAudio, NeverEnabledSerializerFailureNeedsNoInventedTxe) {
 TEST_F(CaptureAudio, ProvedWireDrainSurvivesDisabledTxeAndAddressRetry) {
     audio_open();
     tx_prepare();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     tx_complete();
     hardware.clear_txe_on_disable = true;
     hardware.hold_address = true;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_BUSY);
     EXPECT_NE(tx_loan.owner, nullptr);
     EXPECT_EQ(hardware.spi.SR & SPI_SR_TXE, 0U);
     hardware.hold_address = false;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
     EXPECT_EQ(tx_loan.owner, nullptr);
 }
 TEST_F(CaptureAudio, ObservedTimebaseResetNeverBecomesARecoveredOldLoan) {
     audio_open();
     tx_prepare();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     hardware.rcc.APB1RSTR |= RCC_APB1RSTR_TIM2RST;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_STATE);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_STATE);
     hardware.rcc.APB1RSTR &= ~static_cast<uint32_t>(RCC_APB1RSTR_TIM2RST);
     tx_complete();
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_STATE);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_STATE);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_NE(tx_loan.owner, nullptr);
 }
@@ -1438,7 +1438,7 @@ TEST_F(CaptureAudio, EveryRejectedCpuContextPreservesAllIncomingMasks) {
         hardware.masks[2] = context == 4U ? 1U : 0U;
         uint32_t incoming[3];
         std::memcpy(incoming, hardware.masks, sizeof(incoming));
-        EXPECT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request),
+        EXPECT_EQ(nx_audio_port_submit(&audio_face, &audio_request),
                   NX_ERROR_CONTEXT);
         EXPECT_EQ(std::memcmp(incoming, hardware.masks, sizeof(incoming)), 0);
         EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_READY);
@@ -1451,21 +1451,21 @@ TEST_F(CaptureAudio, CopiedAndStaleConsumerControlsRejectWithoutAnotherBorrow) {
     nx_frame_dma_loan_t previous = tx_loan;
     nx_frame_dma_loan_t copy = tx_loan;
     audio_request.tx = &copy;
-    EXPECT_NE(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    EXPECT_NE(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     const nx_dma_drain_facts_t proof = {16U, 0U, true, true, true};
     ASSERT_EQ(nx_frame_dma_release(&frame, &tx_loan, &proof), NX_SUCCESS);
     tx_loan = previous;
     audio_request.tx = &tx_loan;
-    EXPECT_NE(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    EXPECT_NE(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_READY);
     EXPECT_EQ(stream.outstanding, 0U);
 }
 TEST_F(CaptureAudio, PlatformCloseCannotDiscardAudioClockHistoryLoss) {
     audio_open();
     tx_prepare();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     hardware.rcc.AHB1RSTR = RCC_AHB1RSTR_DMA1RST;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_STATE);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_STATE);
     hardware.rcc.AHB1RSTR = 0U;
     tx_complete();
     EXPECT_EQ(nx_stm32_audio_close(&audio), NX_ERROR_BUSY);
@@ -1496,7 +1496,7 @@ TEST_F(CaptureAudio, RejectsMalformedWholeLoanGeometryWithoutAdmission) {
             plane.stride = 8U;
             plane.rows = 2U;
         }
-        EXPECT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request),
+        EXPECT_EQ(nx_audio_port_submit(&audio_face, &audio_request),
                   NX_ERROR_INVALID);
         EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_READY);
         EXPECT_EQ(hardware.writes, writes);
@@ -1524,10 +1524,10 @@ TEST_F(CaptureAudio, CanonicalAudioRowsKeepTheWholeConsumerLoan) {
     ASSERT_EQ(nx_frame_stream_publish(&frame, &fill, 0U), NX_SUCCESS);
     ASSERT_EQ(nx_frame_stream_acquire(&frame, &tx_loan), NX_SUCCESS);
     audio_request.tx = &tx_loan;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     EXPECT_EQ(hardware.streams[4].NDTR, 3U);
     tx_complete();
-    ASSERT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
     EXPECT_EQ(audio_request.base.transferred, 8U);
     EXPECT_EQ(tx_loan.owner, nullptr);
 }
@@ -1550,15 +1550,15 @@ TEST_F(CaptureAudio, StereoCounterBoundAcceptsTheLargestWholeBlock) {
         ASSERT_EQ(nx_frame_stream_acquire(&frame, &tx_loan), NX_SUCCESS);
         audio_request.tx = &tx_loan;
         if (bytes == 131068U) {
-            ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request),
+            ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request),
                       NX_SUCCESS);
             EXPECT_EQ(hardware.streams[4].NDTR, 65533U);
             tx_complete();
-            EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+            EXPECT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
             EXPECT_EQ(audio_request.base.transferred, bytes);
         } else {
             const unsigned writes = hardware.writes;
-            EXPECT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request),
+            EXPECT_EQ(nx_audio_port_submit(&audio_face, &audio_request),
                       NX_ERROR_INVALID);
             EXPECT_EQ(hardware.writes, writes);
             const nx_dma_drain_facts_t proof = {bytes / 2U, 0U, true, true,
@@ -1577,7 +1577,7 @@ TEST_F(CaptureAudio, RequestInsideUnusedPoolCapacityCannotBeBorrowed) {
     ASSERT_EQ(nx_request_prepare(&alias->base, NX_DEADLINE_NEVER), NX_SUCCESS);
     alias->tx = &tx_loan;
     const unsigned writes = hardware.writes;
-    EXPECT_EQ(nx_stm32_audio_ops.submit(&audio, alias), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_audio_port_submit(&audio_face, alias), NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&alias->base), NX_REQUEST_READY);
     EXPECT_EQ(hardware.writes, writes);
     EXPECT_EQ(tx_loan.owner, &frame);
@@ -1587,7 +1587,7 @@ TEST_F(CaptureAudio, DmaReadPermissionRejectsCpuOnlyStorageBeforePrefill) {
     tx_prepare();
     regions[0].permissions = NX_DMA_MEMORY_WRITE;
     const unsigned writes = hardware.writes;
-    EXPECT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request),
+    EXPECT_EQ(nx_audio_port_submit(&audio_face, &audio_request),
               NX_ERROR_PERMISSION);
     EXPECT_EQ(hardware.writes, writes);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_READY);
@@ -1597,24 +1597,24 @@ TEST_F(CaptureAudio, UnconfirmedSerializerEnableStillRequiresWireDrain) {
     tx_prepare();
     hardware.spi.SR = 0U;
     hardware.refuse_i2se_enable = true;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     EXPECT_GT(hardware.enable_attempts, 0U);
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_BUSY);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_QUARANTINED);
     EXPECT_NE(tx_loan.owner, nullptr);
-    EXPECT_NE(nx_stm32_audio_ops.stop(&audio), NX_SUCCESS);
+    EXPECT_NE(nx_audio_port_stop(&audio_face), NX_SUCCESS);
 }
 TEST_F(CaptureAudio, BusyMustBeObservedAfterTheFreshTxeObservation) {
     audio_open();
     tx_prepare();
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &audio_request), NX_SUCCESS);
     tx_complete();
     hardware.busy_on_txe_read = true;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_ERROR_BUSY);
     EXPECT_NE(tx_loan.owner, nullptr);
     hardware.busy_on_txe_read = false;
     hardware.spi.SR = SPI_SR_TXE;
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
 }
 TEST_F(CaptureAudio, UnalignedConsumerControlRejectsBeforeDereference) {
     audio_open();
@@ -1626,7 +1626,7 @@ TEST_F(CaptureAudio, UnalignedConsumerControlRejectsBeforeDereference) {
     std::memcpy(bytes + 1U, &copy, sizeof(copy));
     audio_request.tx = misaligned;
     const unsigned writes = hardware.writes;
-    EXPECT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request),
+    EXPECT_EQ(nx_audio_port_submit(&audio_face, &audio_request),
               NX_ERROR_INVALID);
     EXPECT_EQ(hardware.writes, writes);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_READY);
@@ -1650,14 +1650,14 @@ TEST_F(CaptureAudio, SettledAudioControlsCanBecomeInaccessibleBeforeLateIrqs) {
     ASSERT_EQ(nx_request_prepare(&isolated->request.base, NX_DEADLINE_NEVER),
               NX_SUCCESS);
     isolated->request.tx = &isolated->loan;
-    ASSERT_EQ(nx_stm32_audio_ops.submit(&audio, &isolated->request),
+    ASSERT_EQ(nx_audio_port_submit(&audio_face, &isolated->request),
               NX_SUCCESS);
     tx_complete();
-    ASSERT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    ASSERT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
     ASSERT_EQ(mprotect(page, 4096U, PROT_NONE), 0);
     nx_stm32_audio_irq(&audio);
     nx_stm32_audio_dma_irq(&audio, false);
-    EXPECT_EQ(nx_stm32_audio_ops.service(&audio), NX_SUCCESS);
+    EXPECT_EQ(nx_audio_port_service(&audio_face), NX_SUCCESS);
     EXPECT_EQ(nx_stm32_audio_close(&audio), NX_SUCCESS);
     EXPECT_EQ(munmap(page, 4096U), 0);
 }
@@ -1669,7 +1669,7 @@ TEST_F(CaptureAudio, ReceiveRowsCannotDescribeOnlyHalfTheStoredFrame) {
     audio_request.rx = &rx_frame;
     rx_frame.layout.planes[0] = {0U, 4U, 4U, 2U};
     const unsigned writes = hardware.writes;
-    EXPECT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request),
+    EXPECT_EQ(nx_audio_port_submit(&audio_face, &audio_request),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_READY);
     EXPECT_EQ(rx_stream.outstanding, 0U);
@@ -1684,7 +1684,7 @@ TEST_F(CaptureAudio, ReceiveRowExtentCannotWrapToAPlausibleStorageLength) {
     rx_frame.layout.planes[0] = {0U, SIZE_MAX / 2U + 9U, SIZE_MAX / 2U + 9U,
                                  2U};
     const unsigned writes = hardware.writes;
-    EXPECT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request),
+    EXPECT_EQ(nx_audio_port_submit(&audio_face, &audio_request),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_READY);
     EXPECT_EQ(rx_stream.outstanding, 0U);
@@ -1883,14 +1883,14 @@ TEST_F(CaptureAudio, CaptureSnapshotRejectsDmaOverItsPinRestoreReceipt) {
     *pins[0].snapshot = 0x0315U;
     ASSERT_NO_FATAL_FAILURE(capture_open());
     const unsigned before = hardware.writes;
-    EXPECT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot),
+    EXPECT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&snapshot.base), NX_REQUEST_READY);
     EXPECT_EQ(stream.outstanding, 0U);
     EXPECT_EQ(hardware.writes, before);
     EXPECT_EQ(hardware.streams[1].CR & DMA_SxCR_EN, 0U);
     EXPECT_EQ(hardware.dcmi.CR & DCMI_CR_CAPTURE, 0U);
-    EXPECT_EQ(nx_stm32_capture_ops.stop(&capture), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_stop(&capture_face), NX_SUCCESS);
 }
 
 TEST_F(CaptureAudio, CaptureBlocksRejectDmaOverItsPinRestoreReceipt) {
@@ -1899,13 +1899,13 @@ TEST_F(CaptureAudio, CaptureBlocksRejectDmaOverItsPinRestoreReceipt) {
     *pins[0].snapshot = 0x0315U;
     ASSERT_NO_FATAL_FAILURE(capture_open());
     const unsigned before = hardware.writes;
-    EXPECT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream),
+    EXPECT_EQ(nx_capture_port_start_blocks(&capture_face, &stream),
               NX_ERROR_INVALID);
     EXPECT_EQ(stream.outstanding, 0U);
     EXPECT_EQ(hardware.writes, before);
     EXPECT_EQ(hardware.streams[1].CR & DMA_SxCR_EN, 0U);
     EXPECT_EQ(hardware.dcmi.CR & DCMI_CR_CAPTURE, 0U);
-    EXPECT_EQ(nx_stm32_capture_ops.stop(&capture), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_stop(&capture_face), NX_SUCCESS);
 }
 
 } /* namespace */
@@ -2189,7 +2189,7 @@ TEST_F(CaptureAudio, CaptureDmaCannotOverwriteTheLiveSystemOwner) {
     capture_open();
     const nx_stm32_system_t before = g_nx_stm32_system;
     const unsigned writes = hardware.writes;
-    EXPECT_EQ(nx_stm32_capture_ops.snapshot(&capture, &snapshot),
+    EXPECT_EQ(nx_capture_port_snapshot(&capture_face, &snapshot),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&snapshot.base), NX_REQUEST_READY);
     EXPECT_EQ(stream.outstanding, 0U);
@@ -2228,7 +2228,7 @@ TEST_F(CaptureAudio, FiniteAudioReceiveCannotOverwriteTheSystemEpoch) {
     audio_request.rx = &rx_frame;
     const nx_stm32_system_t before = g_nx_stm32_system;
     const unsigned writes = hardware.writes;
-    EXPECT_EQ(nx_stm32_audio_ops.submit(&audio, &audio_request),
+    EXPECT_EQ(nx_audio_port_submit(&audio_face, &audio_request),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&audio_request.base), NX_REQUEST_READY);
     EXPECT_EQ(rx_stream.outstanding, 0U);
@@ -2258,7 +2258,7 @@ TEST_F(CaptureAudio, ContinuousAudioReceiveCannotOverwriteTheSystemEpoch) {
     blocks_request.block_bytes = 16U;
     const nx_stm32_system_t before = g_nx_stm32_system;
     const unsigned writes = hardware.writes;
-    EXPECT_EQ(nx_stm32_audio_blocks_ops.start_blocks(&blocks, &blocks_request),
+    EXPECT_EQ(nx_audio_port_start_blocks(&blocks_face, &blocks_request),
               NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_READY);
     EXPECT_EQ(rx_stream.outstanding, 0U);
@@ -2274,7 +2274,7 @@ TEST_F(CaptureAudio, AudioLayoutReportsEveryI2sStorageRepresentation) {
         ASSERT_NO_FATAL_FAILURE(audio_open());
         ASSERT_NE(nullptr, nx_stm32_audio_ops.layout);
         nx_audio_layout_t output{};
-        ASSERT_EQ(NX_SUCCESS, nx_stm32_audio_ops.layout(&audio, &output));
+        ASSERT_EQ(NX_SUCCESS, nx_audio_port_layout(&audio_face, &output));
         EXPECT_EQ(bits, output.sample_bits);
         EXPECT_EQ(bits == 16U ? 16U : 32U, output.container_bits);
         EXPECT_EQ(bits == 16U ? NX_AUDIO_STORAGE_LITTLE_ENDIAN
@@ -2297,7 +2297,7 @@ TEST_F(CaptureAudio, AudioLayoutRejectsConstConfigAndEveryActiveLoanCapacity) {
               nx_stm32_audio_ops.layout(
                   &audio, reinterpret_cast<nx_audio_layout_t*>(regions)));
     ASSERT_NO_FATAL_FAILURE(tx_prepare());
-    ASSERT_EQ(NX_SUCCESS, nx_stm32_audio_ops.submit(&audio, &audio_request));
+    ASSERT_EQ(NX_SUCCESS, nx_audio_port_submit(&audio_face, &audio_request));
     EXPECT_EQ(
         NX_ERROR_INVALID,
         nx_stm32_audio_ops.layout(
@@ -2310,7 +2310,7 @@ TEST_F(CaptureAudio, ContinuousAudioLayoutDoesNotHideOuterSessionAliases) {
     ASSERT_NO_FATAL_FAILURE(blocks_open(true, true));
     ASSERT_NE(nullptr, nx_stm32_audio_blocks_ops.layout);
     nx_audio_layout_t output{};
-    ASSERT_EQ(NX_SUCCESS, nx_stm32_audio_blocks_ops.layout(&blocks, &output));
+    ASSERT_EQ(NX_SUCCESS, nx_audio_port_layout(&blocks_face, &output));
     EXPECT_EQ(16U, output.container_bits);
     EXPECT_EQ(
         NX_ERROR_INVALID,
@@ -2361,18 +2361,18 @@ TEST_F(CaptureAudio, AudioMetadataNeverOverwritesTheGlobalSystemOwner) {
 TEST_F(CaptureAudio, JpegBlocksPublishWordsWithoutFabricatingAFrameBoundary) {
     capture_config.jpeg = capture_config.continuous = true;
     ASSERT_NO_FATAL_FAILURE(capture_open());
-    ASSERT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_start_blocks(&capture_face, &stream), NX_SUCCESS);
     EXPECT_NE(hardware.dcmi.CR & DCMI_CR_JPEG, 0U);
     EXPECT_EQ(hardware.dcmi.CR & DCMI_CR_CM, 0U);
     EXPECT_EQ(hardware.dcmi.IER,
               static_cast<uint32_t>(DCMI_IER_OVR_IE | DCMI_IER_ERR_IE));
     hardware.dcmi.RISR = DCMI_RISR_FRAME_RIS;
     hardware.streams[1].NDTR = 59U;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
     hardware.streams[1].CR |= DMA_SxCR_CT;
     flag(1U, 0x20U);
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     EXPECT_NE(hardware.dcmi.CR & DCMI_CR_CAPTURE, 0U);
     EXPECT_EQ(hardware.streams[1].M0AR,
               static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pool[2])));
@@ -2381,48 +2381,48 @@ TEST_F(CaptureAudio, JpegBlocksPublishWordsWithoutFabricatingAFrameBoundary) {
     EXPECT_EQ(block.data, pool[0]);
     EXPECT_EQ(block.length, 256U);
     EXPECT_EQ(block.flags, 0U);
-    EXPECT_EQ(nx_stm32_capture_ops.stop(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_stop(&capture_face), NX_ERROR_BUSY);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_BORROWED);
     EXPECT_EQ(nx_stream_release(&stream, &block), NX_SUCCESS);
-    EXPECT_EQ(nx_stm32_capture_ops.stop(&capture), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_stop(&capture_face), NX_SUCCESS);
 }
 TEST_F(CaptureAudio, JpegBlocksBudgetReservesPaddingFifosAndBothClockPhases) {
     capture_config.jpeg = capture_config.continuous = true;
     ASSERT_NO_FATAL_FAILURE(capture_open());
     for (auto& slot : slots)
         slot.capacity = 128U;
-    EXPECT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream),
+    EXPECT_EQ(nx_capture_port_start_blocks(&capture_face, &stream),
               NX_ERROR_INVALID);
     EXPECT_EQ(stream.outstanding, 0U);
     EXPECT_EQ(hardware.streams[1].CR & DMA_SxCR_EN, 0U);
     for (auto& slot : slots)
         slot.capacity = 136U;
-    EXPECT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_start_blocks(&capture_face, &stream), NX_SUCCESS);
     EXPECT_EQ(hardware.streams[1].NDTR, 34U);
-    EXPECT_EQ(nx_stm32_capture_ops.stop(&capture), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_stop(&capture_face), NX_SUCCESS);
 }
 TEST_F(CaptureAudio, JpegBlocksBackpressureRetainsUnjoinedBanksAndConsumers) {
     capture_config.jpeg = capture_config.continuous = true;
     ASSERT_NO_FATAL_FAILURE(capture_open());
-    ASSERT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_start_blocks(&capture_face, &stream), NX_SUCCESS);
     for (unsigned i = 0U; i < 3U; ++i) {
         hardware.streams[1].CR ^= DMA_SxCR_CT;
         flag(1U, 0x20U);
-        ASSERT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+        ASSERT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     }
     hardware.hold_dma = true;
     hardware.streams[1].CR ^= DMA_SxCR_CT;
     flag(1U, 0x20U);
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_BUSY);
     EXPECT_EQ(capture.result, NX_ERROR_OVERFLOW);
     EXPECT_EQ(stream.losses, 1U);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_READY);
     EXPECT_EQ(slots[3].state, NX_STREAM_SLOT_FILLING);
     EXPECT_EQ(slots[4].state, NX_STREAM_SLOT_FILLING);
     EXPECT_NE(hardware.streams[1].M0AR, 0U);
-    EXPECT_EQ(nx_stm32_capture_ops.stop(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_stop(&capture_face), NX_ERROR_BUSY);
     hardware.hold_dma = false;
-    EXPECT_EQ(nx_stm32_capture_ops.stop(&capture), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_capture_port_stop(&capture_face), NX_ERROR_BUSY);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_READY);
     EXPECT_EQ(slots[3].state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(slots[4].state, NX_STREAM_SLOT_FREE);
@@ -2431,16 +2431,16 @@ TEST_F(CaptureAudio, JpegBlocksBackpressureRetainsUnjoinedBanksAndConsumers) {
     nx_stream_block_t block{};
     while (nx_stream_acquire(&stream, &block) == NX_SUCCESS)
         ASSERT_EQ(nx_stream_release(&stream, &block), NX_SUCCESS);
-    EXPECT_EQ(nx_stm32_capture_ops.stop(&capture), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_stop(&capture_face), NX_SUCCESS);
 }
 TEST_F(CaptureAudio, JpegBlocksClockGapCannotConvertATcIntoAValidBlock) {
     capture_config.jpeg = capture_config.continuous = true;
     ASSERT_NO_FATAL_FAILURE(capture_open());
-    ASSERT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_start_blocks(&capture_face, &stream), NX_SUCCESS);
     hardware.now = 11U;
     hardware.streams[1].CR |= DMA_SxCR_CT;
     flag(1U, 0x20U);
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_OVERFLOW);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_OVERFLOW);
     EXPECT_EQ(stream.losses, 1U);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_FREE);
@@ -2448,11 +2448,11 @@ TEST_F(CaptureAudio, JpegBlocksClockGapCannotConvertATcIntoAValidBlock) {
 TEST_F(CaptureAudio, JpegBlocksSourceErrorCannotPublishADetachedWordBank) {
     capture_config.jpeg = capture_config.continuous = true;
     ASSERT_NO_FATAL_FAILURE(capture_open());
-    ASSERT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream), NX_SUCCESS);
+    ASSERT_EQ(nx_capture_port_start_blocks(&capture_face, &stream), NX_SUCCESS);
     hardware.streams[1].CR |= DMA_SxCR_CT;
     flag(1U, 0x20U);
     hardware.inject_capture_error = true;
-    EXPECT_EQ(nx_stm32_capture_ops.service(&capture), NX_ERROR_IO);
+    EXPECT_EQ(nx_capture_port_service(&capture_face), NX_ERROR_IO);
     EXPECT_EQ(stream.losses, 1U);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
     EXPECT_EQ(slots[1].state, NX_STREAM_SLOT_FREE);
@@ -2464,13 +2464,13 @@ TEST_F(CaptureAudio, RawBlocksRejectABankThatCannotCoverTheSharedPipeline) {
     ASSERT_NO_FATAL_FAILURE(capture_open());
     for (auto& slot : slots)
         slot.capacity = 64U;
-    ASSERT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream),
+    ASSERT_EQ(nx_capture_port_start_blocks(&capture_face, &stream),
               NX_ERROR_INVALID);
     EXPECT_EQ(stream.outstanding, 0U);
     EXPECT_EQ(hardware.streams[1].CR & DMA_SxCR_EN, 0U);
     for (auto& slot : slots)
         slot.capacity = 68U;
-    EXPECT_EQ(nx_stm32_capture_ops.start_blocks(&capture, &stream), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_start_blocks(&capture_face, &stream), NX_SUCCESS);
     EXPECT_EQ(hardware.streams[1].NDTR, 17U);
-    EXPECT_EQ(nx_stm32_capture_ops.stop(&capture), NX_SUCCESS);
+    EXPECT_EQ(nx_capture_port_stop(&capture_face), NX_SUCCESS);
 }

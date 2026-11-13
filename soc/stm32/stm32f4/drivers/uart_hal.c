@@ -8,6 +8,7 @@
  */
 #include "stm32f407_hal_profile.h"
 #include "stm32f407_uart_hal.h"
+#include "stm32f4_uart_format.h"
 #include "stm32f4xx_ll_usart.h"
 #include <stddef.h>
 #include <string.h>
@@ -155,7 +156,7 @@ static nx_result_t configuration(const nx_stm32_uart_dma_cold_config_t* config,
                   ? (nx_uart_format_t){8U, NX_UART_PARITY_NONE, NX_UART_STOP_1,
                                        NX_UART_FLOW_NONE}
                   : *config->uart.format;
-    if (nx_uart_format_validate(*format) != NX_SUCCESS ||
+    if (nx_stm32_uart_frame_validate(*format) != NX_SUCCESS ||
         format->data_bits == 9U)
         return NX_ERROR_UNSUPPORTED;
     return NX_SUCCESS;

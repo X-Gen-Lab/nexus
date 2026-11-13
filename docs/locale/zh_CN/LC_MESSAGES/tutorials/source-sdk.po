@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b12c0fc0f4af2570fb477f46b5cddc6386642439ee650ded1e735eb12b1858c5\n"
+"X-Nexus-Source-SHA256: 48d40345bb13b0e952e714ce7869818d31b3c700a7cea883c755b55d9f1171b4\n"
 
 msgid "Build an independent Source SDK consumer"
 msgstr "构建独立的 Source SDK 消费工程"
@@ -154,14 +154,17 @@ msgstr ""
 "版本要求及变化的装配约束；不要自动放宽该版本要求。接受升级前，重新执行产品要求的 Native 测试和 MCU 链接。旧 SDK 的结果不能建立新 "
 "SDK 的资格；链接成功也不能建立物理硬件资格。"
 
-msgid "Source interface epoch 2"
-msgstr "源码接口 epoch 2"
+#: docs/tutorials/source-sdk.md:0
+msgid "Source interface epoch 3"
+msgstr "源码接口 epoch 3"
 
-msgid "The current `0.2.1` development snapshot uses factory/source interface epoch `2`; its installed SDK manifest uses schema `2` independently. Select the exact reviewed commit, regenerate and rebuild all callers, faces/ops, generated code, providers and components together. Current interface admission rejects epoch-1 SDKs; old objects must be rebuilt. `--development-fixture` never bypasses interface checks or permits mixed binaries. No existing tag is moved."
-msgstr "当前 `0.2.1` 开发快照的 factory／source interface epoch 为 `2`，已安装 SDK manifest 独立使用 schema `2`。选择经审核的精确提交，重新生成，并一起重编所有调用者、face／ops、生成代码、provider 和组件。当前接口准入拒绝 epoch 1 SDK，旧对象必须重编；`--development-fixture` 不绕过接口检查，也不允许混合二进制对象。现有标签均不移动。"
+#: docs/tutorials/source-sdk.md:0
+msgid "The current `0.2.1` development snapshot uses factory/source interface epoch `3`; its installed SDK manifest uses schema `2` independently. Select the exact reviewed commit, regenerate and rebuild all callers, faces/ops, generated code, providers and components together. Current interface admission rejects epoch-1 and epoch-2 SDKs; old objects must be rebuilt. `--development-fixture` never bypasses interface checks or permits mixed binaries. No existing tag is moved."
+msgstr "当前 `0.2.1` 开发快照使用 factory／source interface epoch `3`；安装 SDK manifest 独立使用 schema `2`。选择已审精确提交，重新生成，并共同重编全部调用者、face／ops、生成代码、provider 与组件。当前接口准入拒绝 epoch-1 和 epoch-2 SDK，旧对象必须重编。`--development-fixture` 不能绕过接口检查或允许混用二进制；既有标签不移动。"
 
-msgid "Direct ADC group `request.frames` access must become `request.output.frames`. Prefer `nx_adc_group_prepare()` for raw requests so it sets the RAW discriminant; paired results use `nx_adc_group_prepare_results()`. Check `results_kind` before reading the union. There is no old-field shadow or inferred layout. Follow the [migration guide](../guides/migration.md#rebuild-for-source-interface-epoch-2) and [compatibility contract](../design/source-compatibility.md) before accepting a new SDK; a matching semantic version alone is insufficient."
-msgstr "ADC group 的直接 `request.frames` 访问必须改为 `request.output.frames`。raw 请求优先使用 `nx_adc_group_prepare()` 设置 RAW discriminant，paired 结果使用 `nx_adc_group_prepare_results()`。读取 union 前检查 `results_kind`，不提供旧字段影子或推测布局。接受新 SDK 前遵循[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-2)与[兼容性合同](../design/source-compatibility.md)；仅语义版本一致不足以接纳。"
+#: docs/tutorials/source-sdk.md:0
+msgid "The epoch-2 ADC result migration remains required for older callers. Direct ADC group `request.frames` access must become `request.output.frames`. Prefer `nx_adc_group_prepare()` for raw requests so it sets the RAW discriminant; paired results use `nx_adc_group_prepare_results()`. Check `results_kind` before reading the union. There is no old-field shadow or inferred layout. Follow the [migration guide](../guides/migration.md#rebuild-for-source-interface-epoch-3) and [compatibility contract](../design/source-compatibility.md) before accepting a new SDK; a matching semantic version alone is insufficient. Epoch 3 moves domain traits to `nexus/io/traits.h` and gives SDIO function requests direct request and payload fields. Rebuild components against those public types and migrate nested `request.transfer` accesses; no old-field or numeric-layout compatibility is provided."
+msgstr "旧调用者仍须完成 epoch-2 ADC 结果迁移。ADC group 的直接 `request.frames` 访问须改为 `request.output.frames`。raw 请求优先使用 `nx_adc_group_prepare()` 设置 RAW discriminant；paired 结果使用 `nx_adc_group_prepare_results()`。读取 union 前核对 `results_kind`，不提供旧字段影子或布局推断。接纳新 SDK 前，按[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-3)与[兼容性合同](../design/source-compatibility.md)执行；语义版本相同仍不足以接纳。epoch 3 将领域 traits 放入 `nexus/io/traits.h`，SDIO function 请求直接包含 request 与 payload 字段。组件应按公共类型重编，并迁移嵌套 `request.transfer` 访问；不提供旧字段或数字布局兼容。"
 
 msgid "Maintainer: verify the complete SDK consumer"
 msgstr "维护者：验证完整 SDK 消费"

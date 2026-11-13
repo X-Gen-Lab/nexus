@@ -266,6 +266,14 @@ if(NEXUS_USB_REMOTE_WAKEUP)
     target_compile_definitions(nexus_soc_stm32f4 PRIVATE
         NEXUS_STM32F4_USB_REMOTE_WAKEUP=1)
 endif()
+if(NEXUS_RTC_PERIODIC_WAKEUP)
+    target_compile_definitions(nexus_soc_stm32f4 PRIVATE
+        NX_STM32_RTC_PERIODIC_WAKEUP=1)
+endif()
+if(NEXUS_SDRAM_GRAPHICS)
+    target_compile_definitions(nexus_soc_stm32f4 PRIVATE
+        NX_STM32_SDRAM_GRAPHICS=1)
+endif()
 nexus_controller_modes(stm32_timer_pulse_modes timer_pulse)
 if(stm32_timer_pulse_modes)
     target_compile_definitions(nexus_soc_stm32f4 PRIVATE

@@ -78,6 +78,24 @@ class F407RtcConfigurationTests(unittest.TestCase):
                 self.assertIsNone(item.options.initial)
                 self.assertFalse(item.options.allow_set)
 
+    def test_duration_wakeup_is_explicit_and_defaults_to_no_code(self):
+        result = self.resolve()
+        self.assertFalse(result.controllers[0].options.periodic_wakeup)
+        path = self.directory / "assembly.toml"
+        path.write_text(self.text(extra="periodic_wakeup = true\n"))
+        output = self.directory / "periodic"
+        gate.configure(path, output, test_support=native_fixture(path))
+        self.assertIn("set(NEXUS_RTC_PERIODIC_WAKEUP ON)",
+                      (output / "selection.cmake").read_text())
+        self.assertTrue(gate.resolve_ir(
+            path, test_support=native_fixture(path)).controllers[0].options.periodic_wakeup)
+        for value in ("1", '"true"'):
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(gate.ConfigurationError,
+                                            "periodic_wakeup"):
+                    self.resolve(self.text(extra="periodic_wakeup = " +
+                                           value + "\n"))
+
     def test_provision_copies_all_explicit_calendar_fields_including_year_zero(self):
         result = self.resolve(self.text(mode="provision-empty", extra=INITIAL))
         calendar = result.controllers[0].options.initial

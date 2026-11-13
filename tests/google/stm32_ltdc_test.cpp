@@ -9,6 +9,7 @@
 #include "stm32_ltdc_model.h"
 extern "C" {
 #include "stm32f407_system.h"
+#include "stm32f4_graphics_memory.h"
 #include "stm32f4_ltdc.h"
 }
 #include <array>
@@ -31,6 +32,10 @@ struct Hardware {
     bool refuse_gate_enable = false, refuse_gate_disable = false;
     bool refuse_pad_setup = false, refuse_pad_release = false;
     unsigned writes = 0;
+    unsigned graphics_attaches = 0, graphics_checks = 0, graphics_detaches = 0;
+    alignas(8) uint8_t bank_metadata[64]{};
+    nx_result_t attach_result = NX_SUCCESS, check_result = NX_SUCCESS;
+    nx_result_t detach_result = NX_SUCCESS;
 } * hardware;
 
 class LtdcOwner : public testing::Test {
@@ -234,6 +239,19 @@ TEST_F(LtdcOwner, ColdOwnerAcquiresAndReturnsOnlyItsControllerGate) {
     ASSERT_EQ(finish_stop(), NX_SUCCESS);
     EXPECT_FALSE(state.gate_owned);
     EXPECT_EQ(model.rcc.APB2ENR, static_cast<uint32_t>(RCC_APB2ENR_SYSCFGEN));
+}
+
+TEST_F(LtdcOwner, CpuOnlySdramAddressDoesNotGrantAScanoutLoan) {
+    open();
+    prepare(&first, 0U);
+    first.operation.frame.data =
+        reinterpret_cast<const uint8_t*>(UINT32_C(0xc0000000));
+    const auto before = first;
+    const auto registers = model.registers;
+    EXPECT_EQ(NX_ERROR_PERMISSION, nx_display_port_submit(&port, &first));
+    EXPECT_EQ(0, std::memcmp(&before, &first, sizeof(first)));
+    EXPECT_EQ(0, std::memcmp(&registers, &model.registers, sizeof(registers)));
+    EXPECT_EQ(nullptr, state.pending);
 }
 
 TEST_F(LtdcOwner, APreownedControllerGateIsRefusedBeforeColdEffects) {
@@ -1012,6 +1030,77 @@ TEST_F(LtdcOwner, GenerationExhaustionRejectsBeforeAnyBorrowOrEffect) {
     EXPECT_EQ(state.pending, nullptr);
 }
 
+TEST_F(LtdcOwner, GraphicsAttachmentRefusalPrecedesAnyControllerEffect) {
+    nx_stm32_sdram_graphics_t binding{};
+    config.graphics_memory = &binding;
+    model.attach_result = NX_ERROR_STATE;
+    const auto writes = model.writes;
+    EXPECT_EQ(nx_stm32_ltdc_prepare(&state, &config), NX_ERROR_STATE);
+    EXPECT_EQ(model.graphics_attaches, 1U);
+    EXPECT_EQ(model.writes, writes);
+    EXPECT_EQ(model.rcc.APB2ENR & RCC_APB2ENR_LTDCEN, 0U);
+    EXPECT_EQ(nx_stm32_ltdc_close(&state), NX_SUCCESS);
+    EXPECT_EQ(model.graphics_detaches, 0U);
+}
+TEST_F(LtdcOwner, GraphicsHoldSurvivesFailedIrqJoinUntilActualColdClose) {
+    nx_stm32_sdram_graphics_t binding{};
+    config.graphics_memory = &binding;
+    open();
+    ASSERT_EQ(model.graphics_attaches, 1U);
+    model.hold_irq = true;
+    EXPECT_EQ(nx_stm32_ltdc_close(&state), NX_ERROR_BUSY);
+    EXPECT_EQ(model.graphics_detaches, 0U);
+    EXPECT_TRUE(state.memory_attached);
+    model.hold_irq = false;
+    EXPECT_EQ(finish_stop(), NX_SUCCESS);
+    EXPECT_EQ(model.graphics_detaches, 1U);
+    EXPECT_FALSE(state.memory_attached);
+}
+TEST_F(LtdcOwner,
+       GraphicsDetachFailureRetainsOriginalOwnerAndCanRetryAfterGateOff) {
+    nx_stm32_sdram_graphics_t binding{};
+    config.graphics_memory = &binding;
+    open();
+    model.detach_result = NX_ERROR_STATE;
+    EXPECT_EQ(nx_stm32_ltdc_close(&state), NX_ERROR_BUSY);
+    vblank();
+    irq();
+    EXPECT_EQ(nx_stm32_ltdc_close(&state), NX_ERROR_STATE);
+    EXPECT_TRUE(state.owned);
+    EXPECT_TRUE(state.memory_attached);
+    EXPECT_EQ(model.rcc.APB2ENR & RCC_APB2ENR_LTDCEN, 0U);
+    model.detach_result = NX_SUCCESS;
+    EXPECT_EQ(finish_stop(), NX_SUCCESS);
+    EXPECT_EQ(model.graphics_detaches, 2U);
+    EXPECT_FALSE(state.owned);
+}
+TEST_F(LtdcOwner, LostGraphicsBankEvidenceRejectsBeforeRequestBorrow) {
+    nx_stm32_sdram_graphics_t binding{};
+    config.graphics_memory = &binding;
+    open();
+    prepare(&first, 0);
+    model.check_result = NX_ERROR_STATE;
+    const auto writes = model.writes;
+    EXPECT_EQ(nx_display_port_submit(&port, &first), NX_ERROR_STATE);
+    EXPECT_EQ(nx_request_state(&first.base), NX_REQUEST_READY);
+    EXPECT_EQ(model.writes, writes);
+    EXPECT_EQ(model.graphics_checks, 1U);
+    EXPECT_EQ(finish_stop(), NX_SUCCESS);
+}
+
+TEST_F(LtdcOwner, QueryCannotOverwriteTheRetainedBankOwnerMetadata) {
+    nx_stm32_sdram_graphics_t binding{};
+    config.graphics_memory = &binding;
+    open();
+    auto* output =
+        reinterpret_cast<nx_display_constraints_t*>(model.bank_metadata);
+    const auto before = model;
+    EXPECT_EQ(nx_display_port_query(&port, 0, output), NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(model.bank_metadata, before.bank_metadata,
+                          sizeof(model.bank_metadata)),
+              0);
+}
+
 } /* namespace */
 
 extern "C" uint32_t nx_gfx_model_read(volatile uint32_t* reg) {
@@ -1080,4 +1169,44 @@ extern "C" uint32_t nx_gfx_model_irq_priority(IRQn_Type irq) {
 extern "C" void nx_gfx_model_irq_set_priority(IRQn_Type irq, uint32_t value) {
     if (!hardware->hold_priority)
         hardware->priority[irq] = value;
+}
+
+/* The SDRAM owner is an external lifetime dependency in this engine model.
+ * Its original-lease rules are tested by the real SDRAM provider program. */
+extern "C" nx_result_t
+nx_stm32_sdram_graphics_attach(nx_stm32_sdram_graphics_t*,
+                               nx_stm32_sdram_graphics_master_t master,
+                               const void* consumer, const void* system) {
+    EXPECT_EQ(master, NX_STM32_SDRAM_GRAPHICS_LTDC);
+    EXPECT_NE(consumer, nullptr);
+    EXPECT_NE(system, nullptr);
+    EXPECT_EQ(hardware->rcc.APB2ENR & RCC_APB2ENR_LTDCEN, 0U);
+    ++hardware->graphics_attaches;
+    return hardware->attach_result;
+}
+extern "C" nx_result_t
+nx_stm32_sdram_graphics_check(const nx_stm32_sdram_graphics_t*,
+                              nx_stm32_sdram_graphics_master_t master,
+                              const void*, const void*) {
+    EXPECT_EQ(master, NX_STM32_SDRAM_GRAPHICS_LTDC);
+    ++hardware->graphics_checks;
+    return hardware->check_result;
+}
+extern "C" nx_result_t
+nx_stm32_sdram_graphics_detach(nx_stm32_sdram_graphics_t*,
+                               nx_stm32_sdram_graphics_master_t master,
+                               const void*) {
+    EXPECT_EQ(master, NX_STM32_SDRAM_GRAPHICS_LTDC);
+    EXPECT_EQ(hardware->rcc.APB2ENR & RCC_APB2ENR_LTDCEN, 0U);
+    ++hardware->graphics_detaches;
+    return hardware->detach_result;
+}
+
+extern "C" bool
+nx_stm32_sdram_graphics_overlaps(const nx_stm32_sdram_graphics_t*,
+                                 const void* storage, size_t bytes) {
+    const auto first = reinterpret_cast<uintptr_t>(hardware->bank_metadata);
+    const auto start = reinterpret_cast<uintptr_t>(storage);
+    return start < first + sizeof(hardware->bank_metadata) &&
+           first < start + bytes;
 }

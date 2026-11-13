@@ -1,6 +1,6 @@
 /**
  * \file            usb_host.h
- * \brief           Explicit USB host channels and caller-owned packet loans
+ * \brief           Logical USB host pipes and caller-owned packet loans
  * \author          Nexus Team
  */
 #ifndef NEXUS_IO_USB_HOST_H
@@ -23,6 +23,9 @@ typedef enum {
     NX_USB_HOST_BULK,
     NX_USB_HOST_INTERRUPT
 } nx_usb_host_transfer_t;
+/** \brief Assembly-local logical pipe identity, independent of HCD channels. */
+typedef uint8_t nx_usb_host_pipe_id_t;
+
 typedef struct {
     uint16_t max_packet;
     uint8_t device_address;
@@ -32,11 +35,10 @@ typedef struct {
 } nx_usb_host_pipe_t;
 
 /** \brief A single USB packet; no automatic retry, queue or class policy.
- * \note IN capacity covers a complete MPS rounded up to four bytes, even for a
- *       shorter requested length. OUT capacity covers length rounded to four
- *       bytes; DMA zero-length OUT also supplies four readable bytes,
- *       since the core rounds HCTSIZ to whole packets. The provider may report
- *       OVERFLOW while safely draining a packet larger than requested length.
+ * \note Query the selected pipe's storage requirements before submission.
+ *       Capacity may exceed payload length, including for zero-length OUT.
+ *       The provider may report OVERFLOW while safely draining a packet larger
+ *       than requested length.
  */
 typedef struct {
     nx_request_t base;
@@ -57,16 +59,29 @@ typedef struct {
     bool suspended;
 } nx_usb_host_state_t;
 
+/** \brief Minimum complete packet storage and power-of-two address alignment.
+ * \note Capacity includes all selected transport accesses, not just payload.
+ *       Zero capacity permits NULL storage; alignment remains positive.
+ *       These facts grant neither DMA reachability nor a buffer loan.
+ */
 typedef struct {
-    nx_result_t (*open)(void*, uint8_t, const nx_usb_host_pipe_t*);
-    nx_result_t (*close)(void*, uint8_t);
-    nx_result_t (*submit)(void*, uint8_t, nx_usb_host_request_t*);
-    nx_result_t (*cancel)(void*, uint8_t, nx_usb_host_request_t*);
+    size_t capacity;
+    size_t alignment;
+} nx_usb_host_storage_requirements_t;
+
+typedef struct {
+    nx_result_t (*open)(void*, nx_usb_host_pipe_id_t,
+                        const nx_usb_host_pipe_t*);
+    nx_result_t (*close)(void*, nx_usb_host_pipe_id_t);
+    nx_result_t (*submit)(void*, nx_usb_host_pipe_id_t, nx_usb_host_request_t*);
+    nx_result_t (*cancel)(void*, nx_usb_host_pipe_id_t, nx_usb_host_request_t*);
     nx_result_t (*service)(void*);
     nx_result_t (*state)(void*, nx_usb_host_state_t*);
     nx_result_t (*reset)(void*, nx_time_us_t);
     nx_result_t (*suspend)(void*, bool, nx_time_us_t);
     nx_result_t (*stop)(void*);
+    nx_result_t (*requirements)(const void*, nx_usb_host_pipe_id_t, size_t,
+                                nx_usb_host_storage_requirements_t*);
 } nx_usb_host_ops_t;
 struct nx_usb_host_port {
     const nx_usb_host_ops_t* ops;
@@ -79,7 +94,8 @@ struct nx_usb_host_port {
  * \param[in,out] bytes: Packet buffer; NULL only for zero OUT packets.
  * \param[in] capacity: Actual writable IN storage or readable OUT extent.
  * \param[in] length: Requested packet bytes, at most the configured MPS.
- * \param[in] setup: Eight-byte SETUP token on an OUT control channel.
+ * \param[in] setup: Select the eight-byte SETUP data packet on an OUT
+ * control pipe.
  * \param[in] data1: Explicit DATA toggle; false for single-transaction ISO.
  * \param[in] deadline: Absolute Core deadline, independent of USB SOF.
  * \return SUCCESS, INVALID or STATE; rejection retains no storage.
@@ -89,26 +105,45 @@ nx_result_t nx_usb_host_prepare(nx_usb_host_request_t* request, uint8_t* bytes,
                                 bool data1, nx_time_us_t deadline);
 
 /**
- * \brief Configure an idle selected hardware channel for one endpoint target.
+ * \brief Configure an idle logical pipe for one endpoint target.
  * \param[in] port: Stable controller face, successful external power handover.
- * \param[in] channel: Selected physical channel index, separate from endpoint.
- * \param[in] pipe: Readable target facts, copied before return.
+ * \param[in] pipe_id: Selected logical identity, separate from endpoint
+ * address. \param[in] pipe: Readable target facts, copied before return.
  * \return SUCCESS or rejection; no transfer buffer is borrowed.
  * \note Serialized privileged unmasked task; no hub split transaction policy.
  */
-nx_result_t nx_usb_host_open(const nx_usb_host_port_t* port, uint8_t channel,
+nx_result_t nx_usb_host_open(const nx_usb_host_port_t* port,
+                             nx_usb_host_pipe_id_t pipe_id,
                              const nx_usb_host_pipe_t* pipe);
 /**
- * \brief Release an idle channel after its IRQ and hardware references drain.
+ * \brief Release an idle pipe after its IRQ and hardware references drain.
  * \param[in] port: Same serialized controller owner.
- * \param[in] channel: Selected hardware index.
- * \return SUCCESS, BUSY or rejection; failure retains channel responsibility.
+ * \param[in] pipe_id: Same logical identity used to open the pipe.
+ * \return SUCCESS, BUSY or rejection; failure retains pipe responsibility.
  */
-nx_result_t nx_usb_host_close(const nx_usb_host_port_t* port, uint8_t channel);
+nx_result_t nx_usb_host_close(const nx_usb_host_port_t* port,
+                              nx_usb_host_pipe_id_t pipe_id);
+/**
+ * \brief Query selected packet geometry without effects or reference retention.
+ * \param[in] port: Stable started controller under its serialized task owner.
+ * \param[in] pipe_id: Open logical pipe; direction and MPS belong to that pipe.
+ * \param[in] length: Requested packet payload bytes, at most its MPS.
+ * \param[out] requirements: Separate ordinary writable output, unchanged on
+ * rejection. \return SUCCESS, INVALID, STATE, CONTEXT or UNSUPPORTED.
+ * \note Pure bounded task work, no peripheral MMIO, hardware admission,
+ *       allocation or storage borrow. Submit still validates current state,
+ *       the actual extent, alignment, aliases and selected memory domain.
+ *       An absent optional query is explicit UNSUPPORTED, never a default
+ *       alignment or capacity assumption. Zero OUT length queries the real
+ *       minimum extent needed by the selected transport.
+ */
+nx_result_t nx_usb_host_storage_requirements(
+    const nx_usb_host_port_t* port, nx_usb_host_pipe_id_t pipe_id,
+    size_t length, nx_usb_host_storage_requirements_t* requirements);
 /**
  * \brief Admit one packet with no implicit retry or terminating ZLP.
  * \param[in] port: Stable started controller and privileged task executor.
- * \param[in] channel: Configured selected hardware channel.
+ * \param[in] pipe_id: Configured logical pipe identity.
  * \param[in,out] request: READY request alive until acquire-observed SETTLED.
  * \return SUCCESS means ACCEPTED; rejection has no retained references.
  * \note IN capacity must cover MPS. DMA buffers also require aligned reviewed
@@ -118,21 +153,23 @@ nx_result_t nx_usb_host_close(const nx_usb_host_port_t* port, uint8_t channel);
  *       ISO admits one DATA0 opportunity; frame/error failure settles IO after
  *       actual withdrawal, without implicit retry or interval scheduling.
  *       Copied PIO OUT FIFO data may retain recovery responsibility until a
- *       controller stop that also joins its other channels.
+ *       controller stop that also joins its other pipes.
  */
-nx_result_t nx_usb_host_submit(const nx_usb_host_port_t* port, uint8_t channel,
+nx_result_t nx_usb_host_submit(const nx_usb_host_port_t* port,
+                               nx_usb_host_pipe_id_t pipe_id,
                                nx_usb_host_request_t* request);
 /**
- * \brief Request channel halt without revoking a packet loan.
+ * \brief Request pipe halt without revoking a packet loan.
  * \param[in] port: Same serialized controller owner.
- * \param[in] channel: Original selected hardware channel.
+ * \param[in] pipe_id: Original logical identity of the accepted request.
  * \param[in,out] request: Exact accepted incarnation, still alive.
  * \return SUCCESS requests drain; failed drain retains the same request.
  */
-nx_result_t nx_usb_host_cancel(const nx_usb_host_port_t* port, uint8_t channel,
+nx_result_t nx_usb_host_cancel(const nx_usb_host_port_t* port,
+                               nx_usb_host_pipe_id_t pipe_id,
                                nx_usb_host_request_t* request);
 /**
- * \brief Advance all selected channels with bounded task work.
+ * \brief Advance all selected pipes with bounded task work.
  * \param[in] port: Stable privileged unmasked task owner.
  * \return SUCCESS or BUSY; late hardware progress can settle quarantine.
  * \note A callback alone never proves buffer release. No worker is created.
@@ -149,7 +186,7 @@ nx_result_t nx_usb_host_state(const nx_usb_host_port_t* port,
                               nx_usb_host_state_t* state);
 /**
  * \brief Reset a connected idle port using the independent absolute deadline.
- * \param[in] port: Same controller owner; all channel loans are settled.
+ * \param[in] port: Same controller owner; all pipe loans are settled.
  * \param[in] deadline: Finite absolute Core deadline.
  * \return SUCCESS or failure; reset never revokes an active request.
  * \note Admission requires strictly more than 10 ms plus one microsecond of
@@ -165,7 +202,7 @@ nx_result_t nx_usb_host_reset(const nx_usb_host_port_t* port,
                               nx_time_us_t deadline);
 /**
  * \brief Suspend or resume an idle host port without stopping Core time.
- * \param[in] port: Same serialized owner with settled channel loans.
+ * \param[in] port: Same serialized owner with settled pipe loans.
  * \param[in] suspended: Requested suspended state.
  * \param[in] deadline: Finite absolute Core deadline.
  * \return SUCCESS after readback or failure retaining controller ownership.

@@ -22,7 +22,7 @@ calls_os=false
 [encoder.position]
 binding="position1"
 mode="quadrature"
-counting="x4-ti12"
+counting="x4"
 filter_a=3
 filter_b=7
 invert_a=false

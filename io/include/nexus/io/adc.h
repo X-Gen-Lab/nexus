@@ -27,23 +27,19 @@ typedef struct {
 } nx_adc_info_t;
 
 /**
- * \brief           Immutable complete-scan timing facts for the selected mode.
- * \note            sample_times are codes into sample_cycles, in channel order.
- *                  scan_cycles includes each channel's sample and conversion.
- *                  Clock declarations and cycle counts describe scheduling;
- *                  they do not establish electrical accuracy or sample aperture
- *                  timestamps. Arrays remain valid through provider lifetime.
+ * \brief           Logical scan width and nominal conversion duration.
+ * \note            scan_ticks / ticks_per_second is the selected complete
+ *                  scan conversion time, including every sampling window.
+ *                  A positive tick rate describes declared units, not a CPU
+ *                  clock or measured accuracy. This is not the trigger period,
+ *                  delivery latency, sample aperture or an absolute timestamp.
+ *                  Logical results keep the configured order. Hardware channel
+ *                  numbers, sampling codes and timing tables remain private.
  */
 typedef struct {
-    const uint8_t* channels;
-    const uint8_t* sample_times;
-    const uint16_t* sample_cycles;
     size_t channel_count;
-    size_t sample_code_count;
-    uint32_t adc_clock_hz;
-    uint32_t timer_clock_hz;
-    uint32_t scan_cycles;
-    uint16_t conversion_cycles;
+    uint32_t scan_ticks;
+    uint32_t ticks_per_second;
 } nx_adc_sequence_info_t;
 
 /**
@@ -91,9 +87,9 @@ struct nx_adc_port {
  */
 nx_result_t nx_adc_port_info(const nx_adc_port_t* port, nx_adc_info_t* info);
 /**
- * \brief           Read fixed channel order and complete-scan timing facts.
+ * \brief           Read logical scan width and nominal conversion duration.
  * \param[in]       port: Initialized timing-capable provider.
- * \param[out]      info: Cold read-only facts; no acquisition starts.
+ * \param[out]      info: Independent copied facts; no acquisition starts.
  * \return          Success or INVALID/STATE/UNSUPPORTED.
  */
 nx_result_t nx_adc_port_sequence_info(const nx_adc_port_t* port,

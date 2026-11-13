@@ -107,6 +107,7 @@ FMC presence alone never adds an external region to either engine's DMA domains.
 | --- | --- |
 | System | Live bus/time domain and the one PLLSAI plan; LTDC consumes its R output and optional SAI shares Q |
 | Platform | GPIO gates, original pad snapshots and final pad restoration |
+| Selected SDRAM bank | Original stable lease and System epoch retained through attached graphics controllers' complete cold withdrawal |
 | LTDC | One HAL/controller, two IRQs, selected AF14 pad leases, its gate, two active frame loans and one global pending reload |
 | DMA2D | One HAL/controller, its gate/IRQ and one operation with independently checked source/destination spans |
 | Application | Pixel storage, panel setup, execution progress, wake adapter and recovery policy |
@@ -116,6 +117,13 @@ Solid edges label runtime interface calls; dashed edges label selected source,
 SDK and static assembly relationships. It adds no runtime forwarding layer and
 makes no software or physical qualification claim. The table above states the
 specific runtime resource ownership for this selected graphics slice.
+
+External graphics memory requires the explicit `graphics-owned` SDRAM endpoint
+and each selected engine's `memory_window` reference. The
+[SDRAM contract](f407-fsmc.md#显式图形存储模式) defines the bank lease,
+per-master grants and cold-stop ordering. Unreferenced engines retain their
+internal-memory domains; ordinary CPU windows grant no graphics access. These
+are cooperative provider checks, not an MPU or a BusMatrix access firewall.
 
 ![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)
 
@@ -168,6 +176,23 @@ single System PLLSAI R plan and must satisfy the selected DS11118 83 MHz nominal
 limit. This check is not physical oscillator, load or panel qualification.
 CLUT/extra packed formats, watermark/suspend modes and additional exact parts
 remain outside this selected graphics slice.
+
+The maintained
+[`graphics_sdram` consumer](../../tests/contracts/stm32f4_graphics_sdram/CMakeLists.txt)
+reuses the public DMA2D-fill → SETTLED → LTDC-scanout → SETTLED → Platform-close
+sequence with an explicitly selected external framebuffer address. Its ARM
+compile/link result establishes only that exact software composition; physical
+execution remains `not_executed`. It does not acquire a public CPU window loan.
+
+That software reference selects HCLK 16 MHz, 8 MHz 16-bit SDRAM and a 64×32
+layer within a 320×240 timing at approximately 53.76 Hz. Active pixel reads alone
+require approximately 0.220 MB/s RGB565 or 0.440 MB/s ARGB8888; DMA2D adds its own
+traffic. The SDRAM bus has a theoretical 16 MB/s payload ceiling before refresh,
+row commands, turnaround and arbitration. Read burst is disabled, and ES0321
+§2.3.4 requires the shared write FIFO to remain enabled (`WFDIS=0`). Neither the
+ceiling nor the active-pixel demand proves burst latency or measured throughput.
+No fitted memory, panel or electrical timing is qualified; an 800×480×60 RGB565
+full frame already requires 46.08 MB/s active reads and is outside this profile.
 
 ## Replace a mode and verify it
 

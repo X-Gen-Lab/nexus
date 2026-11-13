@@ -36,7 +36,7 @@ class SDKFactoryTemplateTests(unittest.TestCase):
                     code = (source / filename).read_text()
                     self.assertIn('#include "nexus_factory_strong.h"', code)
                     self.assertIn("nx_factory_gpio_ref(NX_GPIO_REF_COUNT)", code)
-                    self.assertIn('#if NEXUS_FACTORY_ABI_EPOCH != 2U', code)
+                    self.assertIn('#if NEXUS_FACTORY_ABI_EPOCH != 3U', code)
 
 
 

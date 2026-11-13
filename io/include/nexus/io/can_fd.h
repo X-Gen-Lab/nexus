@@ -39,6 +39,10 @@ typedef struct {
  *       hardware counter reports raw0 plus TIMESTAMP_UNAVAILABLE. filter is
  *       the hardware index within the frame format's filter list. Hardware
  *       loss proves a lower bound; classic DLC9..15 normalizes to8 with a flag.
+ *       hardware_timestamp, fifo and filter are explicit native diagnostics.
+ *       The raw counter has no portable frequency/domain/wrap contract; use a
+ *       separately reviewed provider extension before interpreting its elapsed
+ *       time. It is not an nx_io_timestamp_t or a portable SOF measurement.
  */
 typedef struct {
     nx_can_fd_frame_t frame;

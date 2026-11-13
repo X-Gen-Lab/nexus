@@ -24,6 +24,31 @@ typedef struct {
     uint8_t column_cycles;
     uint8_t row_cycles;
 } nx_nand_geometry_t;
+/** \brief Device status with protocol bit positions confined to the provider.
+ * \note failed reports the device's failure latch; it does not identify a
+ *       page or classify bit errors. Ready alone never releases a live loan.
+ */
+typedef struct {
+    bool ready;
+    bool failed;
+    bool write_protected;
+} nx_nand_status_t;
+/** \brief Explicit opaque ECC encoding identity, not a portable decoder. */
+typedef enum {
+    NX_NAND_ECC_UNKNOWN = 0,
+    NX_NAND_ECC_STM32_FSMC_RAW32
+} nx_nand_ecc_encoding_t;
+/** \brief Selected ECC step and output container without correction policy.
+ * \note step_bytes is main data covered by one code. code_bytes describes
+ *       storage, not meaningful parity bits. STM32_FSMC_RAW32 is one numeric
+ *       uint32_t per step, not a serialized byte sequence or a standard codec.
+ *       Placement, comparison, correction and bad-block policy stay external.
+ */
+typedef struct {
+    nx_nand_ecc_encoding_t encoding;
+    uint32_t step_bytes;
+    uint8_t code_bytes;
+} nx_nand_ecc_format_t;
 /** \brief Raw one-page, OOB-only, whole-block erase or device reset. */
 typedef enum {
     NX_NAND_READ_PAGE = 0,
@@ -59,11 +84,13 @@ typedef struct {
 typedef struct {
     const nx_nand_geometry_t* (*geometry)(const void* context);
     nx_result_t (*id)(void* context, uint8_t* bytes, size_t count);
-    nx_result_t (*status)(void* context, uint8_t* status);
+    nx_result_t (*status)(void* context, nx_nand_status_t* status);
     nx_result_t (*submit)(void* context, nx_nand_request_t* request);
     nx_result_t (*cancel)(void* context, nx_nand_request_t* request);
     nx_result_t (*service)(void* context);
     nx_result_t (*stop)(void* context);
+    nx_result_t (*ecc_format)(const void* context,
+                              nx_nand_ecc_format_t* format);
 } nx_nand_ops_t;
 /** \brief Immutable raw face; factory returns existing identity only.
  * \note State/facts/faces outlive all calls and retained requests. No hidden
@@ -88,13 +115,24 @@ const nx_nand_geometry_t* nx_nand_geometry(const nx_nand_port_t* port);
  */
 nx_result_t nx_nand_id(const nx_nand_port_t* port, uint8_t* bytes,
                        size_t count);
-/** \brief Read raw device status bits while no finite request owns the bus.
+/** \brief Read semantic device status while no finite request owns the bus.
  * \param[in] port: Idle selected privileged task owner.
- * \param[out] status: Raw status; bit6 ready, bit0 fail, bit7 write-protect.
+ * \param[out] status: Disjoint ready/failure/protection snapshot.
  * \return SUCCESS or exact rejected/hardware result, no retained output.
  * \note A status read alone never revokes any request or bank lease.
  */
-nx_result_t nx_nand_status(const nx_nand_port_t* port, uint8_t* status);
+nx_result_t nx_nand_status(const nx_nand_port_t* port,
+                           nx_nand_status_t* status);
+/** \brief Query the selected ECC container and step without device commands.
+ * \param[in] port: Idle prepared selected owner, serialized with lifecycle.
+ * \param[out] format: Disjoint caller output, unchanged on rejection.
+ * \return SUCCESS, UNSUPPORTED for absent format metadata, or the provider's
+ *         lifecycle/context/bus error. No storage is retained or allocated.
+ * \note This identifies existing raw code output, not a decoder, OOB layout,
+ *       guaranteed correction strength or physical media qualification.
+ */
+nx_result_t nx_nand_ecc_format(const nx_nand_port_t* port,
+                               nx_nand_ecc_format_t* format);
 /** \brief Prepare metadata without touching page/OOB or hardware.
  * \param[in,out] request: Initialized READY or consumed SETTLED storage;
  *                          operation/page/buffers are caller-filled afterward.

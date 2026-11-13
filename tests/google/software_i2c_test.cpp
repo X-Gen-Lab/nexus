@@ -255,7 +255,7 @@ TEST_F(SoftwareI2CTest, InitDoesNotGenerateAStartOrDiscoverADevice) {
 TEST_F(SoftwareI2CTest, StrictWriteHasRealAddressAckAndFinalStop) {
     initialize();
     std::array<uint8_t, 2> data{0x05U, 0xa6U};
-    nx_i2c_message_t message{data.data(), data.size(), false};
+    nx_i2c_message_t message = nx_i2c_message_write(data.data(), data.size());
     size_t transferred = 99U;
     EXPECT_EQ(transfer(&message, 1U, &transferred), NX_SUCCESS);
     EXPECT_EQ(wire.tx_bytes, (std::vector<uint8_t>{0xa0U, 0x05U, 0xa6U}));
@@ -268,8 +268,8 @@ TEST_F(SoftwareI2CTest, RepeatedStartReadAcksAllButTheLastByte) {
     initialize();
     uint8_t address = 0x05U;
     std::array<uint8_t, 2> data{};
-    nx_i2c_message_t messages[2]{{&address, 1U, false},
-                                 {data.data(), data.size(), true}};
+    nx_i2c_message_t messages[2]{nx_i2c_message_write(&address, 1U),
+                                 nx_i2c_message_read(data.data(), data.size())};
     size_t transferred{};
     EXPECT_EQ(transfer(messages, 2U, &transferred), NX_SUCCESS);
     EXPECT_EQ(wire.tx_bytes, (std::vector<uint8_t>{0xa0U, 0x05U, 0xa1U}));
@@ -285,7 +285,7 @@ TEST_F(SoftwareI2CTest,
     initialize();
     wire.acknowledge = {false};
     uint8_t data = 0x24U;
-    nx_i2c_message_t message{&data, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&data, 1U);
     size_t transferred = 99U;
     EXPECT_EQ(transfer(&message, 1U, &transferred), NX_ERROR_NACK);
     EXPECT_EQ(transferred, 0U);
@@ -298,7 +298,7 @@ TEST_F(SoftwareI2CTest, DataNackKeepsOnlyCompletedAckedBytes) {
     initialize();
     wire.acknowledge = {true, true, false};
     std::array<uint8_t, 2> data{0x24U, 0x25U};
-    nx_i2c_message_t message{data.data(), data.size(), false};
+    nx_i2c_message_t message = nx_i2c_message_write(data.data(), data.size());
     size_t transferred{};
     EXPECT_EQ(transfer(&message, 1U, &transferred), NX_ERROR_NACK);
     EXPECT_EQ(transferred, 1U);
@@ -309,7 +309,7 @@ TEST_F(SoftwareI2CTest, ClockStretchObservesTheInputInsteadOfOutputLatch) {
     initialize();
     wire.stretch_each_release = 2U;
     uint8_t data = 0x24U;
-    nx_i2c_message_t message{&data, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&data, 1U);
     size_t transferred{};
     EXPECT_EQ(transfer(&message, 1U, &transferred), NX_SUCCESS);
     EXPECT_EQ(wire.tx_bytes, (std::vector<uint8_t>{0xa0U, 0x24U}));
@@ -320,7 +320,7 @@ TEST_F(SoftwareI2CTest, AStuckClockAndFailedStopRetainThePhysicalOwner) {
     initialize();
     wire.force_scl_low = true;
     uint8_t data = 0x24U;
-    nx_i2c_message_t message{&data, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&data, 1U);
     size_t transferred{};
     nx_result_t result = transfer(&message, 1U, &transferred, wire.now + 100U);
     EXPECT_NE(result, NX_SUCCESS);
@@ -338,7 +338,7 @@ TEST_F(SoftwareI2CTest, FrozenClockWaitIsBoundedEvenWithAFarDeadline) {
     wire.freeze = true;
     unsigned reads = wire.clock_reads;
     uint8_t data = 0x24U;
-    nx_i2c_message_t message{&data, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&data, 1U);
     size_t transferred{};
     EXPECT_EQ(transfer(&message, 1U, &transferred), NX_ERROR_IO);
     EXPECT_LT(wire.clock_reads - reads, 300U);
@@ -349,7 +349,7 @@ TEST_F(SoftwareI2CTest, ArbitrationReleasesWithoutGeneratingStopOrReplay) {
     initialize();
     wire.collide_on_one = true;
     uint8_t data = 0x24U;
-    nx_i2c_message_t message{&data, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&data, 1U);
     size_t transferred{};
     EXPECT_EQ(transfer(&message, 1U, &transferred), NX_ERROR_ARBITRATION);
     EXPECT_EQ(wire.stops, 0U);
@@ -370,7 +370,7 @@ TEST_F(SoftwareI2CTest,
     initialize();
     wire.fail_stop = true;
     uint8_t data = 0x24U;
-    nx_i2c_message_t message{&data, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&data, 1U);
     size_t transferred{};
     EXPECT_EQ(transfer(&message, 1U, &transferred), NX_ERROR_IO);
     EXPECT_EQ(transferred, 1U);
@@ -385,7 +385,7 @@ TEST_F(SoftwareI2CTest, InvalidMessagesAndAliasesRejectBeforeAnyEdge) {
     initialize();
     unsigned writes = wire.writes;
     uint8_t data{};
-    nx_i2c_message_t message{&data, 0U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&data, 0U);
     size_t transferred = 73U;
     EXPECT_EQ(transfer(&message, 1U, &transferred), NX_ERROR_INVALID);
     message.length = 257U;
@@ -393,7 +393,7 @@ TEST_F(SoftwareI2CTest, InvalidMessagesAndAliasesRejectBeforeAnyEdge) {
     message.length = 1U;
     EXPECT_EQ(transfer(&message, 0U, &transferred), NX_ERROR_INVALID);
     EXPECT_EQ(transfer(&message, 9U, &transferred), NX_ERROR_UNSUPPORTED);
-    message.data = reinterpret_cast<uint8_t*>(&owner);
+    message.buffer.tx = reinterpret_cast<uint8_t*>(&owner);
     EXPECT_EQ(transfer(&message, 1U, &transferred), NX_ERROR_INVALID);
     EXPECT_EQ(wire.writes, writes);
     EXPECT_EQ(transferred, 73U);
@@ -404,7 +404,7 @@ TEST_F(SoftwareI2CTest,
     initialize();
     unsigned writes = wire.writes;
     uint8_t data{};
-    nx_i2c_message_t message{&data, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&data, 1U);
     size_t transferred{};
     EXPECT_EQ(transfer(&message, 1U, &transferred, wire.now), NX_ERROR_TIMEOUT);
     EXPECT_EQ(wire.writes, writes);
@@ -440,7 +440,7 @@ TEST_F(SoftwareI2CTest, ReentrantWireCallbacksCannotStopOrRecoverTheOwner) {
         }
     };
     uint8_t data = 0x24U;
-    nx_i2c_message_t message{&data, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&data, 1U);
     size_t transferred{};
     EXPECT_EQ(transfer(&message, 1U, &transferred), NX_SUCCESS);
     EXPECT_TRUE(called);
@@ -472,10 +472,10 @@ TEST_F(SoftwareI2CTest, SccbHasDistinctDontCareAndStopSeparatedReadCycles) {
 TEST_F(SoftwareI2CTest,
        MaximumMessageGeometryHasNoHiddenSmallerTransportLimit) {
     initialize();
-    std::array<uint8_t, NX_I2C_MAX_MESSAGE_BYTES> payload{};
-    std::array<nx_i2c_message_t, NX_I2C_MAX_MESSAGES> messages{};
+    std::array<uint8_t, NX_I2C_BOUNDED_MAX_MESSAGE_BYTES> payload{};
+    std::array<nx_i2c_message_t, NX_I2C_BOUNDED_MAX_MESSAGES> messages{};
     for (auto& message : messages) {
-        message = {payload.data(), payload.size(), false};
+        message = nx_i2c_message_write(payload.data(), payload.size());
     }
     size_t transferred{};
     EXPECT_EQ(
@@ -490,7 +490,7 @@ TEST_F(SoftwareI2CTest,
 TEST_F(SoftwareI2CTest, OneDeadlineIncludesStopAndCannotWithdrawAnIssuedByte) {
     initialize();
     uint8_t data = 0x24U;
-    nx_i2c_message_t message{&data, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&data, 1U);
     size_t transferred{};
     bool interrupted{};
     wire.on_write = [&] {
@@ -515,7 +515,7 @@ TEST_F(SoftwareI2CTest, RegressedClockCannotBeRepairedByANumericalDeadline) {
     wire.now = 0U;
     unsigned writes = wire.writes;
     uint8_t data{};
-    nx_i2c_message_t message{&data, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&data, 1U);
     size_t transferred{};
     EXPECT_EQ(transfer(&message, 1U, &transferred), NX_ERROR_IO);
     EXPECT_EQ(wire.writes, writes);
@@ -531,7 +531,7 @@ TEST_F(SoftwareI2CTest, PinReadFailurePreservesTheActualErrorAndRetainedOwner) {
     initialize();
     wire.fail_read = true;
     uint8_t data{};
-    nx_i2c_message_t message{&data, 1U, false};
+    nx_i2c_message_t message = nx_i2c_message_write(&data, 1U);
     size_t transferred{};
     EXPECT_EQ(transfer(&message, 1U, &transferred), NX_ERROR_IO);
     EXPECT_EQ(transferred, 0U);

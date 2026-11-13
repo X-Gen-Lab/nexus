@@ -1,5 +1,12 @@
 # Optional timer capture and complementary PWM
 
+The public encoder personalities are `x2-a`, `x2-b` and `x4`. Logical A/B
+follow the statically bound input order. State reports `clock_divisor` and
+`consecutive_samples` for each phase, relative to `filter_clock_hz`; zero/zero
+means filter bypass. These facts describe digital qualification, not a
+measured debounce interval. The F4 assembly retains explicit silicon filter
+selections internally; portable consumers do not decode those selections.
+
 These modes are independent of the existing general-purpose `nx_pwm_port_t`.
 They keep the same immutable typed face and shared operations model. Selection
 owns static controller storage; no registry, pool, allocator, worker or OS lock

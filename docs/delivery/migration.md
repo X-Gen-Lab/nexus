@@ -30,11 +30,13 @@ register 类型。SPI／I2C controller 和子设备 endpoint 分开获取，cont
 停机执行 `nx_platform_stop()`；BUSY／QUARANTINED 时保持状态和所有借用存储。
 在 start 前可以保存 face；在成功 stop 后 face 的身份不变，provider 拒绝操作。
 
-当前 factory／source interface epoch 为 2，`0.2.1` 仍为按精确提交消费的开发快照。
+当前 factory／source interface epoch 为 3，`0.2.1` 仍为按精确提交消费的开发快照。
 ADC group 的直接 `request.frames` 访问迁为 `request.output.frames`；优先使用
 `nx_adc_group_prepare()` 设置 RAW 视图，paired 结果由独立 prepare 入口建立。
-旧 epoch 1 不作为兼容 fallback，全部调用者、生成代码和 provider 必须一起重编。
-具体字段与借用步骤见[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-2)，
+epoch 3 的公共 traits 使用 `nexus/io/traits.h` 中的领域类型；SDIO 请求直接使用
+`base`、数据跨度和 function 地址，删除 `transfer` 包装及无意义 LBA。旧 epoch
+1／2 不作为兼容 fallback，全部调用者、生成代码和 provider 必须一起重编。
+具体字段与借用步骤见[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-3)，
 代际、manifest 和拒绝规则见[源码兼容性合同](../design/source-compatibility.md)。
 
 请求迁移必须同时更新所有权：prepare 不意味着 accepted，cancel 不意味着 settled。

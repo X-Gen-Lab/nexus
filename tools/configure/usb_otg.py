@@ -27,7 +27,8 @@ def validate_selection(selection, route, provider):
             fail("USB host/power links require an explicit managed OTG mode")
         return
     host, power = selection.get("host"), selection.get("power")
-    if (not isinstance(host, dict) or set(host) != _HOST_FIELDS or
+    if (not isinstance(host, dict) or not _HOST_FIELDS.issubset(host) or
+            set(host) - _HOST_FIELDS - {"pipe_channels"} or
             not isinstance(power, dict) or set(power) != _POWER_FIELDS):
         fail("Managed OTG requires exact Host limits and all power signal links")
     if selection.get("electrical_handover") != "external-owner":
@@ -96,7 +97,9 @@ def nested_editor_schema(properties, fields, record):
     """Keep editor hints consistent with the authoritative resolver checks."""
     if not {"host", "power"}.issubset(fields):
         return
-    properties["host"] = record(_HOST_FIELDS, _HOST_FIELDS)
+    properties["host"] = record(_HOST_FIELDS | {"pipe_channels"}, _HOST_FIELDS)
+    usb_host.pipe_editor_schema(properties["host"]["properties"],
+                                _HOST_FIELDS | {"pipe_channels"})
     for field in _HOST_FIELDS - {"engine"}:
         properties["host"]["properties"][field] = {"type": "integer", "minimum": 1}
     properties["host"]["properties"]["engine"] = {"enum": ["pio", "dma"]}

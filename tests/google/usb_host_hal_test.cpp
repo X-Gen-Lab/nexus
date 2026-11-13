@@ -20,6 +20,7 @@ extern "C" nx_time_us_t nx_time_now_us(void);
 #include <gtest/gtest.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <utility>
 #include <vector>
 
 using testing::_;
@@ -217,6 +218,7 @@ class UsbHostHal : public testing::Test {
     nx_stm32_usb_host_t state = {};
     nx_stm32_usb_host_channel_t channels[2] = {};
     nx_stm32_usb_host_config_t config = {};
+    alignas(4) uint8_t pipe_storage[64] = {1U, 0U};
     nx_usb_host_port_t port = {&nx_stm32_usb_host_ops, &state};
     nx_usb_host_request_t request = {};
     nx_usb_host_request_t second_request = {};
@@ -305,37 +307,43 @@ class UsbHostHal : public testing::Test {
         EXPECT_GE(port_writes[1].time - port_writes[0].time, minimum);
     }
     void Open(bool in = true, uint16_t mps = 64U) {
+        const uint8_t number =
+            config.pipe_channels == nullptr ? 0U : config.pipe_channels[0];
         nx_usb_host_pipe_t pipe = {mps, 3U,
                                    static_cast<uint8_t>(in ? 0x81U : 1U),
                                    NX_USB_HOST_FULL_SPEED, NX_USB_HOST_BULK};
-        EXPECT_CALL(hal, Open(&state.hal, 0U, pipe.endpoint_address, 3U, 1U,
+        EXPECT_CALL(hal, Open(&state.hal, number, pipe.endpoint_address, 3U, 1U,
                               EP_TYPE_BULK, mps))
-            .WillOnce(Invoke([this](HCD_HandleTypeDef*, uint8_t, uint8_t,
-                                    uint8_t, uint8_t, uint8_t, uint16_t) {
-                Channel(0)->HCINTMSK = 0x55U;
-                auto* host = reinterpret_cast<USB_OTG_HostTypeDef*>(
-                    reinterpret_cast<uintptr_t>(core) + USB_OTG_HOST_BASE);
-                host->HAINTMSK |= 1U;
-                return HAL_OK;
-            }));
+            .WillOnce(
+                Invoke([this, number](HCD_HandleTypeDef*, uint8_t, uint8_t,
+                                      uint8_t, uint8_t, uint8_t, uint16_t) {
+                    Channel(number)->HCINTMSK = 0x55U;
+                    auto* host = reinterpret_cast<USB_OTG_HostTypeDef*>(
+                        reinterpret_cast<uintptr_t>(core) + USB_OTG_HOST_BASE);
+                    host->HAINTMSK |= 1U << number;
+                    return HAL_OK;
+                }));
         ASSERT_EQ(nx_usb_host_open(&port, 0U, &pipe), NX_SUCCESS);
     }
     void Submit(bool in = true, size_t length = 3U) {
+        const uint8_t number =
+            config.pipe_channels == nullptr ? 0U : config.pipe_channels[0];
         ASSERT_EQ(nx_usb_host_prepare(&request, bytes, sizeof(bytes), length,
                                       false, false, 500U),
                   NX_SUCCESS);
         EXPECT_CALL(
-            hal, Submit(&state.hal, 0U, in ? 1U : 0U, EP_TYPE_BULK, 1U, bytes,
-                        static_cast<uint16_t>(in ? channels[0].pipe.max_packet
-                                                 : length),
-                        0U))
-            .WillOnce(
-                Invoke([this](HCD_HandleTypeDef* h, uint8_t, uint8_t, uint8_t,
-                              uint8_t, uint8_t* data, uint16_t, uint8_t) {
-                    h->hc[0].xfer_buff = data;
-                    Channel(0)->HCCHAR |= USB_OTG_HCCHAR_CHENA;
-                    return HAL_OK;
-                }));
+            hal,
+            Submit(&state.hal, number, in ? 1U : 0U, EP_TYPE_BULK, 1U, bytes,
+                   static_cast<uint16_t>(in ? channels[number].pipe.max_packet
+                                            : length),
+                   0U))
+            .WillOnce(Invoke([this, number](HCD_HandleTypeDef* h, uint8_t,
+                                            uint8_t, uint8_t, uint8_t,
+                                            uint8_t* data, uint16_t, uint8_t) {
+                h->hc[number].xfer_buff = data;
+                Channel(number)->HCCHAR |= USB_OTG_HCCHAR_CHENA;
+                return HAL_OK;
+            }));
         ASSERT_EQ(nx_usb_host_submit(&port, 0U, &request), NX_SUCCESS);
     }
     void Complete(uint32_t count = 3U, HCD_URBStateTypeDef result = URB_DONE) {
@@ -374,6 +382,129 @@ class UsbHostHal : public testing::Test {
         HostHal::active = nullptr;
     }
 };
+
+TEST_F(UsbHostHal, LogicalPipeMapsOnceAndPhysicalCallbacksKeepTheirIdentity) {
+    config.pipe_channels = pipe_storage;
+    Start();
+    Open();
+    Submit();
+    EXPECT_EQ(&request, channels[1].request);
+    EXPECT_EQ(nullptr, channels[0].request);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_usb_host_close(&port, 0U));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_usb_host_cancel(&port, 1U, &request));
+    state.hal.HC_NotifyURBChangeCallback(&state.hal, 0U, URB_DONE);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
+    Channel(1U)->HCCHAR &= ~static_cast<uint32_t>(USB_OTG_HCCHAR_CHENA);
+    state.hal.hc[1].xfer_count = 3U;
+    state.hal.HC_NotifyURBChangeCallback(&state.hal, 1U, URB_DONE);
+    EXPECT_EQ(NX_SUCCESS, nx_usb_host_service(&port));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_SUCCESS, request.base.result);
+    EXPECT_EQ(nullptr, channels[1].request);
+    EXPECT_EQ(NX_SUCCESS, nx_usb_host_close(&port, 0U));
+    EXPECT_EQ(0U, Channel(1U)->HCINTMSK);
+    EXPECT_EQ(nullptr, state.hal.hc[1].xfer_buff);
+}
+
+TEST_F(UsbHostHal, LogicalPipeCancellationTargetsMappedHardwareAndKeepsLoan) {
+    config.pipe_channels = pipe_storage;
+    Start();
+    Open(false);
+    Submit(false);
+    EXPECT_CALL(hal, Halt(&state.hal, 1U)).WillOnce(Return(HAL_OK));
+    EXPECT_EQ(NX_SUCCESS, nx_usb_host_cancel(&port, 0U, &request));
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&request.base));
+    EXPECT_EQ(&request, channels[1].request);
+    EXPECT_EQ(nullptr, channels[0].request);
+}
+
+TEST_F(UsbHostHal, PipeMappingMustBeAnUnaliasedPermutationBeforeEffects) {
+    config.pipe_channels = pipe_storage;
+    pipe_storage[0] = 0U;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_usb_host_initialize(&state, &config, 1000U));
+    pipe_storage[0] = 2U;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_usb_host_initialize(&state, &config, 1000U));
+    config.pipe_channels = reinterpret_cast<const uint8_t*>(&state);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_usb_host_initialize(&state, &config, 1000U));
+    EXPECT_EQ(nullptr, state.config);
+    EXPECT_EQ(0U, RCC->AHB2ENR);
+}
+
+TEST_F(UsbHostHal, RxPayloadCannotOverwriteTheLivePipeMapOrConfiguration) {
+    config.pipe_channels = pipe_storage;
+    Start();
+    Open();
+    for (const auto& span :
+         {std::pair<uint8_t*, size_t>{pipe_storage, sizeof(pipe_storage)},
+          {reinterpret_cast<uint8_t*>(&config), sizeof(config)}}) {
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_usb_host_prepare(&request, span.first, span.second, 3U,
+                                      false, false, 500U));
+        EXPECT_EQ(NX_ERROR_INVALID, nx_usb_host_submit(&port, 0U, &request));
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+    }
+    EXPECT_EQ(1U, pipe_storage[0]);
+}
+
+TEST_F(UsbHostHal, StorageQueryUsesLogicalPipeAndSelectedTransportGeometry) {
+    config.pipe_channels = pipe_storage;
+    Start();
+    Open();
+    nx_usb_host_storage_requirements_t requirements{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_usb_host_storage_requirements(&port, 0U, 3U, &requirements));
+    EXPECT_EQ(64U, requirements.capacity);
+    EXPECT_EQ(1U, requirements.alignment);
+    requirements = {123U, 456U};
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_usb_host_storage_requirements(&port, 0U, 65U, &requirements));
+    EXPECT_EQ(123U, requirements.capacity);
+    EXPECT_EQ(456U, requirements.alignment);
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_usb_host_storage_requirements(&port, 1U, 3U, &requirements));
+    EXPECT_EQ(
+        NX_ERROR_INVALID,
+        nx_usb_host_storage_requirements(
+            &port, 0U, 3U,
+            reinterpret_cast<nx_usb_host_storage_requirements_t*>(&state)));
+}
+
+TEST_F(UsbHostHal, StorageQueryReportsPioAndDmaZeroLengthOutRequirements) {
+    Start();
+    Open(false);
+    nx_usb_host_storage_requirements_t requirements{};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_usb_host_storage_requirements(&port, 0U, 0U, &requirements));
+    EXPECT_EQ(0U, requirements.capacity);
+    EXPECT_EQ(1U, requirements.alignment);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_usb_host_storage_requirements(&port, 0U, 3U, &requirements));
+    EXPECT_EQ(4U, requirements.capacity);
+    Stop();
+    config.phy = NX_STM32_USB_HS_INTERNAL_FS;
+    config.dma = true;
+    Start();
+    Open(false);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_usb_host_storage_requirements(&port, 0U, 0U, &requirements));
+    EXPECT_EQ(4U, requirements.capacity);
+    EXPECT_EQ(4U, requirements.alignment);
+}
+
+TEST_F(UsbHostHal, StorageQueryRejectsOutputInsideALivePacketLoan) {
+    Start();
+    Open();
+    Submit();
+    EXPECT_EQ(
+        NX_ERROR_INVALID,
+        nx_usb_host_storage_requirements(
+            &port, 0U, 3U,
+            reinterpret_cast<nx_usb_host_storage_requirements_t*>(bytes)));
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
+}
 
 TEST_F(UsbHostHal, ResetRejectsShortAndExactBudgetBeforePortEffects) {
     Start();

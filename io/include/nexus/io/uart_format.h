@@ -23,7 +23,7 @@ typedef enum {
     NX_UART_FLOW_CTS,
     NX_UART_FLOW_RTS_CTS
 } nx_uart_flow_t;
-/** \brief Immutable wire format; data_bits excludes the parity bit.
+/** \brief Immutable wire format; 5..9 data_bits exclude the parity bit.
  * \note RTS/CTS needs independently reviewed Board routing and peer wiring.
  */
 typedef struct {
@@ -32,11 +32,12 @@ typedef struct {
     nx_uart_stop_t stop;
     nx_uart_flow_t flow;
 } nx_uart_format_t;
-/** \brief Validate the common USART-v1 subset without hardware access.
+/** \brief Validate generic frame values without selecting hardware support.
  * \param[in] format: Explicit payload width, parity, stop and flow selection.
- * \return Success for 7E/O, 8N/E/O or 9N with one/two stop bits; INVALID for
- *         unknown values, UNSUPPORTED for a known incompatible combination.
- * \note Pure, bounded, task/IRQ safe; Board admission remains separate.
+ * \return Success for 5..9 data bits, known parity/flow and one/two stop bits;
+ *         INVALID for unknown values. Success does not authorize a controller.
+ * \note Pure, bounded, task/IRQ safe. The selected provider separately checks
+ *       its frame combinations, storage format and Board routing.
  */
 nx_result_t nx_uart_format_validate(nx_uart_format_t format);
 #ifdef __cplusplus

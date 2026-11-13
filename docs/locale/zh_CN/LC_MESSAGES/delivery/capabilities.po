@@ -1,6 +1,6 @@
 # Current canonical messages; semantic review admission is tracked separately.
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 9d0f9f766e0d3dd51e07bda3d5e967f568ccf3c27efd5a3030c4619512783216\n"
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 1a55615d35c33a66361867c6103d6e180b6c3daf7b06681a3e23b46834da1ed0\n"
 
 msgid "当前派生能力矩阵"
 msgstr "当前派生能力矩阵"
@@ -338,9 +338,6 @@ msgstr "irq-blit"
 msgid "`dma2d-memory`"
 msgstr "`dma2d-memory`"
 
-msgid "`tests/contracts/stm32f4_graphics/combined.toml`, `tests/contracts/stm32f4_graphics/dual-rgb888.toml`, `tests/contracts/stm32f4_graphics/image-only.toml`"
-msgstr "`tests/contracts/stm32f4_graphics/combined.toml`, `tests/contracts/stm32f4_graphics/dual-rgb888.toml`, `tests/contracts/stm32f4_graphics/image-only.toml`"
-
 msgid "`soc/stm32/stm32f4/drivers/dma2d.c`"
 msgstr "`soc/stm32/stm32f4/drivers/dma2d.c`"
 
@@ -568,9 +565,6 @@ msgstr "sdram-controller"
 
 msgid "`fmc-sdram-control`"
 msgstr "`fmc-sdram-control`"
-
-msgid "`tests/contracts/stm32f4_sdram/f479ni-sdram.toml`"
-msgstr "`tests/contracts/stm32f4_sdram/f479ni-sdram.toml`"
 
 msgid "`soc/stm32/stm32f4/drivers/fmc_sdram.c`"
 msgstr "`soc/stm32/stm32f4/drivers/fmc_sdram.c`"
@@ -965,9 +959,6 @@ msgstr "rgb-scanout"
 msgid "`ltdc-rgb565-reference`, `ltdc-rgb888-reference`"
 msgstr "`ltdc-rgb565-reference`, `ltdc-rgb888-reference`"
 
-msgid "`tests/contracts/stm32f4_graphics/combined.toml`, `tests/contracts/stm32f4_graphics/dual-rgb888.toml`"
-msgstr "`tests/contracts/stm32f4_graphics/combined.toml`, `tests/contracts/stm32f4_graphics/dual-rgb888.toml`"
-
 msgid "`soc/stm32/stm32f4/drivers/ltdc.c`"
 msgstr "`soc/stm32/stm32f4/drivers/ltdc.c`"
 
@@ -1108,9 +1099,6 @@ msgstr "adopt-retained"
 
 msgid "`rtc-lse-bypass-pc14`, `rtc-lse-pc14-pc15`"
 msgstr "`rtc-lse-bypass-pc14`, `rtc-lse-pc14-pc15`"
-
-msgid "`tests/contracts/rtc_bypass_assembly/adopt-retained.toml`"
-msgstr "`tests/contracts/rtc_bypass_assembly/adopt-retained.toml`"
 
 msgid "`soc/stm32/stm32f4/drivers/rtc.c`"
 msgstr "`soc/stm32/stm32f4/drivers/rtc.c`"
@@ -1780,3 +1768,18 @@ msgstr "`tests/contracts/io_evolution_assembly/f407-spi-transaction.toml`, `test
 
 msgid "jpeg-blocks"
 msgstr "jpeg-blocks"
+
+msgid "`tests/contracts/stm32f4_graphics/combined.toml`, `tests/contracts/stm32f4_graphics/dual-rgb888.toml`, `tests/contracts/stm32f4_graphics/image-only.toml`, `tests/contracts/stm32f4_graphics_sdram/combined.toml`"
+msgstr "`tests/contracts/stm32f4_graphics/combined.toml`, `tests/contracts/stm32f4_graphics/dual-rgb888.toml`, `tests/contracts/stm32f4_graphics/image-only.toml`, `tests/contracts/stm32f4_graphics_sdram/combined.toml`"
+
+msgid "`tests/contracts/stm32f4_graphics_sdram/combined.toml`, `tests/contracts/stm32f4_sdram/f479ni-sdram.toml`"
+msgstr "`tests/contracts/stm32f4_graphics_sdram/combined.toml`, `tests/contracts/stm32f4_sdram/f479ni-sdram.toml`"
+
+msgid "graphics-owned"
+msgstr "graphics-owned"
+
+msgid "`tests/contracts/stm32f4_graphics/combined.toml`, `tests/contracts/stm32f4_graphics/dual-rgb888.toml`, `tests/contracts/stm32f4_graphics_sdram/combined.toml`"
+msgstr "`tests/contracts/stm32f4_graphics/combined.toml`, `tests/contracts/stm32f4_graphics/dual-rgb888.toml`, `tests/contracts/stm32f4_graphics_sdram/combined.toml`"
+
+msgid "`tests/contracts/rtc_bypass_assembly/adopt-periodic.toml`, `tests/contracts/rtc_bypass_assembly/adopt-retained.toml`"
+msgstr "`tests/contracts/rtc_bypass_assembly/adopt-periodic.toml`, `tests/contracts/rtc_bypass_assembly/adopt-retained.toml`"

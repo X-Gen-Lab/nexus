@@ -127,7 +127,8 @@ class I2CPairFactory : public testing::Test {
         for (unsigned i = 0U; i < 2U; ++i) {
             states[i] = static_cast<nx_i2c_v1_state_t*>(ports[i]->context);
             nx_request_initialize(&requests[i].base);
-            messages[i] = {static_cast<uint8_t*>(sram) + i * 16U, 3U, true};
+            messages[i] =
+                nx_i2c_message_read(static_cast<uint8_t*>(sram) + i * 16U, 3U);
         }
     }
     void TearDown() override {
@@ -530,7 +531,7 @@ TEST_F(I2CPairFactory, ExpiredAndInvisibleBufferAdmissionHasNoPeerEffects) {
     EXPECT_EQ(NX_ERROR_TIMEOUT,
               nx_i2c_endpoint_submit(endpoints[0], &requests[0]));
     uint8_t invisible[3]{};
-    messages[1].data = invisible;
+    messages[1].buffer.rx = invisible;
     ASSERT_EQ(NX_SUCCESS,
               nx_i2c_request_prepare(&requests[1], &messages[1], 1U, 1000U));
     EXPECT_EQ(NX_ERROR_PERMISSION,
@@ -587,15 +588,15 @@ TEST_F(I2CPairFactory, IrqThreeByteWindowCompletesOnlyAfterWireRelease) {
     ReleasedWire(1U);
     EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&requests[1].base));
     EXPECT_EQ(3U, requests[1].base.transferred);
-    EXPECT_EQ(0x71U, messages[1].data[0]);
-    EXPECT_EQ(0x72U, messages[1].data[1]);
-    EXPECT_EQ(0x72U, messages[1].data[2]);
+    EXPECT_EQ(0x71U, messages[1].buffer.rx[0]);
+    EXPECT_EQ(0x72U, messages[1].buffer.rx[1]);
+    EXPECT_EQ(0x72U, messages[1].buffer.rx[2]);
 }
 
 TEST_F(I2CPairFactory, IrqModeCanUseOrdinaryBufferWithoutCreatingDmaOwnership) {
     Start();
     uint8_t payload[3]{};
-    messages[0].data = payload;
+    messages[0].buffer.rx = payload;
     ASSERT_EQ(NX_SUCCESS,
               nx_i2c_request_prepare(&requests[0], &messages[0], 1U, 1000U));
     EXPECT_EQ(NX_SUCCESS, nx_i2c_endpoint_submit(endpoints[0], &requests[0]));

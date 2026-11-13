@@ -90,7 +90,7 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
                 board_path.write_text(json.dumps(board))
                 path.write_text(path.read_text() +
                     '[encoder.position]\nbinding="position"\nmode="quadrature"\n'
-                    'counting="x4-ti12"\nfilter_a=0\nfilter_b=0\n'
+                    'counting="x4"\nfilter_a=0\nfilter_b=0\n'
                     'invert_a=false\ninvert_b=false\nexclusive=true\n')
                 with self.assertRaisesRegex(ValueError, 'controller:' + timer):
                     gate.resolve_ir(path)

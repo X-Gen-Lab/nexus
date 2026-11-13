@@ -1,4 +1,4 @@
-"""Exact F407 UART wire personalities, independent of application protocols."""
+"""F4 provider wire settings, including explicit expert GTPR encodings."""
 from types import MappingProxyType
 
 from tools.configure.providers.common import fail, integer
@@ -100,7 +100,7 @@ def definitions(name, wire):
     """Project immutable settings; hardware ordering remains handwritten C."""
     protocol = wire.protocol.upper().replace("-", "_")
     flow = wire.flow.upper().replace("-", "_")
-    return [f"static const nx_uart_wire_config_t s_nx_uart_wire_{name} = {{",
+    return [f"static const nx_stm32_uart_wire_config_t s_nx_uart_wire_{name} = {{",
             f"    .mode = NX_UART_WIRE_{protocol},",
             f"    .flow = NX_UART_FLOW_{flow},",
             f"    .prescaler = {wire.prescaler}u,",

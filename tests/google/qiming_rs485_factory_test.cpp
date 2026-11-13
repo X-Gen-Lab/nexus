@@ -110,12 +110,10 @@ class QimingRs485 : public testing::Test {
         if (start.primary != NX_SUCCESS)
             return start.primary;
         gpio_latch();
-        config = {nx_factory_uart_ref(NX_UART_REF_SERIAL2),
-                  nx_factory_gpio_ref(NX_GPIO_REF_DIRECTION),
-                  nx_factory_uart_tx_validator_ref(NX_UART_REF_SERIAL2),
-                  DE,
-                  10U,
-                  20U,
+        const auto tx = nx_factory_uart_tx_binding_ref(NX_UART_REF_SERIAL2);
+        config = {tx.transport, nx_factory_gpio_ref(NX_GPIO_REF_DIRECTION),
+                  tx.validate,  DE,
+                  10U,          20U,
                   true};
         if (stopped_transport) {
             nx_result_t stop = nx_uart_port_stop(config.transport);
@@ -173,6 +171,12 @@ TEST_F(QimingRs485, FactoryValidatorLookupIsPureAndExactBeforeStartup) {
     const uint32_t before_de = GPIOG->BSRR;
     const auto validator =
         nx_factory_uart_tx_validator_ref(NX_UART_REF_SERIAL2);
+    const auto binding = nx_factory_uart_tx_binding_ref(NX_UART_REF_SERIAL2);
+    EXPECT_EQ(binding.transport, nx_factory_uart_ref(NX_UART_REF_SERIAL2));
+    EXPECT_EQ(binding.validate, validator);
+    const auto invalid = nx_factory_uart_tx_binding_ref(NX_UART_REF_COUNT);
+    EXPECT_EQ(nullptr, invalid.transport);
+    EXPECT_EQ(nullptr, invalid.validate);
     EXPECT_NE(nullptr, validator);
     EXPECT_EQ(validator, nx_factory_uart_tx_validator(NX_UART_ID_SERIAL2));
     EXPECT_EQ(nullptr, nx_factory_uart_tx_validator_ref(NX_UART_REF_COUNT));

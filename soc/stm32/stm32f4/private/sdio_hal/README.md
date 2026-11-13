@@ -12,6 +12,12 @@ SDIO 的硬件 owner 是 [`sdio.c`](../../drivers/sdio.c)，锁定的官方
 SD memory/MMC 的 `sdio-poll` 使用普通 `block` face 同步访问。`sdio-irq` 和
 `sdio-dma` 在同一个 controller ID 上提供可选 `block_async` face；普通 face 仍拥有显式 activate、
 sync 和 stop。生成器只创建精确状态、配置和固定 IRQ 连接，不发现卡，不创建线程。
+异步块请求用 `nx_block_read_prepare` 绑定可写 `buffer.rx`，用
+`nx_block_write_prepare` 绑定只读 `buffer.tx`；普通组件无需把 const 写源转换为可写
+指针。两个成员共用原指针存储；准备不会借用或访问 payload，实际准入仍检查完整
+块几何、内存和硬件状态。已有请求未退出时不得更改成员或方向，也不能借重新准备
+撤销活跃借用。
+
 factory 查询不启动硬件。1 位和 4 位均保留同一六引脚 socket；只有显式 MMC
 8 位模式使用完整十引脚路线，不虚构卡检测线路或开发板已有八线接线。
 
@@ -76,7 +82,8 @@ PB8／9（D4–5）、PC6／7（D6–7），全为 AF12。Board 必须明确授�
 ## SDIO I/O functions
 
 `protocol="sdio"` 在相同物理 controller ID 上导出独立只读 `sdio_io` face，普通
-`block` face 继续负责 activate/stop；它不发布扇区几何或提供扇区读写。冷态准备和
+`sdio_io` 的 activate/stop 直接管理同一个 host 会话，I/O-only 消费者无需取得
+`block` face；该协议不发布扇区几何或提供扇区读写。冷态准备和
 factory 不发现 function。CMD5/R4 负责电压、ready、function count 和 memory-present
 事实；R4 与 R3 一样没有有效 CRC 字段，CMD52/53 的 R5 必须严格检查 CRC、function
 number、out-of-range 和 error 位。Combo 卡只描述 memory-present，不隐含同时维护
@@ -89,12 +96,20 @@ inspect 返回标准 CIS 指针和接口码，CIS tuple 解释、设备寄存器
 中断确认策略由外部 function driver 持有。七个 FBR 缓存槽是硬件 register facts，
 不创建设备对象、运行期名称 registry、队列或对象池。
 
+准备主机后可用 `nx_sdio_io_limits` 查询固定传输约束，无需探测或激活卡片；
+查询不访问硬件、时间或分配存储。PIO／IRQ 报告 4 字节缓冲对齐和 1 字节单位倍数，
+DMA 报告 16 字节缓冲对齐和 16 字节单位倍数。块大小须为不超过 2048 的二次幂，
+单次块数来自配置；存在未结束请求时查询返回 BUSY，避免输出覆盖活跃 payload。
+这些只读限制不替代 function FBR 检查、内存域校验或每次实际准入。
+
 CMD53 字节模式精确支持 1..512 字节，512 使用标准零 count 编码。block 模式使用
 显式配置的 1..2048 字节 power-of-two FBR 单位，逐单位发送 count=1 的有界请求；
 不四舍五入地址、长度或部分结果。increment 与 fixed-address FIFO 语义分开。
 PIO/IRQ 的最后一个 FIFO 字只复制真实尾字节。DMA 不接纳非完整四字 burst 的单位，
-不分配 bounce buffer。请求复用 `nx_request` 和原有限引擎，整个外层 function request
-与 payload 持续借用到 SETTLED。polling 通过显式 service 每次最多推进八个字，不设置
+不分配 bounce buffer。function request 直接包含 `base`、data、data_bytes、blocks
+和 write，不再嵌套块存储请求，也不要求填写无意义的 LBA。它复用 `nx_request` 和原有限
+引擎；内部只持有公共请求头指针，按已接纳的协议取得对应描述符，未增加每个 owner
+的存储。完整 function request 与 payload 持续借用到 SETTLED。polling 通过显式 service 每次最多推进八个字，不设置
 IRQ MASK，也不消费未取得的 NVIC pending；IRQ/DMA 使用同一固定 host/vector owner。
 
 DATAEND、DBCKEND、DCOUNT、主机 idle 和 DMA drain 共同建立传输确认；function 写入

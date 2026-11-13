@@ -16,15 +16,15 @@ int main(void) {
         return (int)started.primary;
 #if defined(NEXUS_CAMERA_SELECTED)
     const nx_capture_t* capture = nx_factory_capture(NX_CAPTURE_ID_CAMERA);
-    (void)capture->ops->service(capture->context);
-    (void)capture->ops->stop(capture->context);
+    (void)nx_capture_port_service(capture);
+    (void)nx_capture_port_stop(capture);
 #endif
 #if defined(NEXUS_SOUND_SELECTED)
     const nx_audio_t* audio = nx_factory_audio(NX_AUDIO_ID_SOUND);
     nx_audio_rate_t rate = {0U, 0U};
-    (void)audio->ops->rate(audio->context, &rate);
-    (void)audio->ops->service(audio->context);
-    (void)audio->ops->stop(audio->context);
+    (void)nx_audio_port_rate(audio, &rate);
+    (void)nx_audio_port_service(audio);
+    (void)nx_audio_port_stop(audio);
 #endif
     return (int)nx_platform_stop();
 }

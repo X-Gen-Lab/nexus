@@ -18,8 +18,8 @@ static nx_result_t exchange(void* context, const uint8_t* tx, size_t tx_bytes,
         return NX_ERROR_INVALID;
     }
     /* Write data are immutable under the public I2C message contract. */
-    nx_i2c_message_t messages[2] = {{(uint8_t*)tx, tx_bytes, false},
-                                    {rx, rx_bytes, true}};
+    nx_i2c_message_t messages[2] = {nx_i2c_message_write(tx, tx_bytes),
+                                    nx_i2c_message_read(rx, rx_bytes)};
     size_t count = rx_bytes == 0U ? 1U : 2U;
     size_t transferred = 0U;
     nx_result_t result = nx_i2c_endpoint_transaction(context, messages, count,

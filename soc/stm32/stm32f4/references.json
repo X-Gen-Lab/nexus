@@ -111,7 +111,7 @@
         "crc": "Section 4: fixed word CRC unit",
         "clock": "RCC clock tree and HSI16 system source",
         "flash": "Embedded Flash memory organization; geometry does not grant erase/program modes",
-        "sdram": "12.2 shared FIFO; 12.7 SDRAM controller and SDRAM register constraints",
+        "sdram": "12.2 shared FIFO; 12.8 SDRAM controller and SDRAM register constraints; 2.1.8-9 LTDC/DMA2D FMC bus access",
         "qspi": "QUADSPI indirect SDR communication configuration, FIFO, abort and status; no memory-mapped or DMA mode"
       }
     },
@@ -2514,7 +2514,7 @@
       "silicon_revision": "not_observed",
       "mode_workarounds": "audited_with_constraints",
       "hardware_qualification": "not_executed",
-      "identification": "Exact STM32F479NIH6 baremetal HSI16 RUN software slices: internal CRC and explicitly declared 16-bit Bank1 SDRAM CPU window. Table2 revisions A/1 share REV_ID0x1000; actual identity remains required. SDRAM geometry/timing is a synthetic software reference, with no fitted memory/PCB/HIL qualification. All unlisted peripheral/backend modes remain unassessed. The selected System clock policy retains HSI16/main-PLL-off RUN. Any declared PLLSAI must additionally match the exact dedicated-M (F446) or shared-M/minimum-192-MHz (F479) hardware; an auxiliary declaration alone grants no peripheral mode. Selected finite SAI1 A/B and native parallel LTDC RGB565/RGB888 routes use the same shared-M PLLSAI owner. Graphics admits RGB565/ARGB8888 framebuffers and internal-SRAM DMA2D fill/copy/convert/blend. No SAI2, DSI, CLUT, additional pixel format, external framebuffer DMA, panel, clock accuracy or HIL qualification is granted. QUADSPI adds only W25Q128JV Flash1 indirect SDR 1-1-1 PIO, finite budgets and explicit caller service. Public async stop seals and drains; Platform cold stop alone closes the controller. No memory-mapped aperture access by any CPU, IRQ, DMA or debugger is permitted throughout the provider lifetime. This development scope is not a software-candidate or physical qualification.",
+      "identification": "Exact STM32F479NIH6 baremetal HSI16 RUN software slices: internal CRC and explicitly declared 16-bit Bank1 SDRAM CPU or graphics-owned windows. Table2 revisions A/1 share REV_ID0x1000; actual identity remains required. SDRAM geometry/timing is a synthetic software reference, with no fitted memory/PCB/HIL qualification. All unlisted peripheral/backend modes remain unassessed. The selected System clock policy retains HSI16/main-PLL-off RUN. Any declared PLLSAI must additionally match the exact dedicated-M (F446) or shared-M/minimum-192-MHz (F479) hardware; an auxiliary declaration alone grants no peripheral mode. Selected finite SAI1 A/B and native parallel LTDC RGB565/RGB888 routes use the same shared-M PLLSAI owner. Graphics admits RGB565/ARGB8888 framebuffers and DMA2D fill/copy/convert/blend in reviewed internal SRAM. An explicit graphics-owned Bank1 endpoint additionally supplies only per-engine LTDC read and DMA2D read/write regions, under the original private bank lease held until both engines complete cold stop. The ordinary cpu-window never implies this grant. RM0386 2.1.8-9 and 12.8 establish the hardware route and bank mode, not bandwidth or fitted-device qualification. No generic external-memory DMA, SAI2, DSI, CLUT, additional pixel format, panel, clock accuracy or HIL qualification is granted. QUADSPI adds only W25Q128JV Flash1 indirect SDR 1-1-1 PIO, finite budgets and explicit caller service. Public async stop seals and drains; Platform cold stop alone closes the controller. No memory-mapped aperture access by any CPU, IRQ, DMA or debugger is permitted throughout the provider lifetime. This development scope is not a software-candidate or physical qualification.",
       "software_audit": {
         "profile": "es0321-rev14-run-hsi16",
         "document_sha256": "07079c2c18988b4a298237a07516f369d4342ded7143592d755f2b056b1950ad",
@@ -2534,7 +2534,9 @@
           "external_bus:qspi-indirect-sdr",
           "external_bus:sdram-controller",
           "flash_async:nor-indirect",
-          "image:irq-blit"
+          "image:irq-blit",
+          "memory_window:cpu-window",
+          "memory_window:graphics-owned"
         ],
         "items": [
           {
@@ -2684,7 +2686,7 @@
             "revisions": "AA",
             "assessment": "workaround",
             "condition": "First register access immediately follows an RCC peripheral gate enable.",
-            "handling": "System, CRC and the SDRAM cold provider execute DSB and actual RCC gate readback before accessing the selected block. A refused gate retains acquired cleanup responsibility; this is software ordering, not physical timing qualification. The SAI cold owner retains its APB2 gate, uses the actual barrier/readback helper before engine access and shares the existing DMA2 gate. It does not start or rewrite the System PLLSAI plan; failure retains its acquired gate/IRQ/config responsibilities. Selected graphics cold paths must observe their acquired LTDC/APB2 or DMA2D/AHB1 gate before engine register access; failed visibility retains its exact cold receipt. Main SRAM buffer admission never grants the separate FMC CPU-only window to a DMA engine. QUADSPI keeps NVIC disabled, owns its AHB3 gate and uses DSB plus actual gate readback before controller access; failed gate or hardware withdrawal keeps the same config/clock responsibility. No generated hardware algorithm is introduced.",
+            "handling": "System, CRC and the SDRAM cold provider execute DSB and actual RCC gate readback before accessing the selected block. A refused gate retains acquired cleanup responsibility; this is software ordering, not physical timing qualification. The SAI cold owner retains its APB2 gate, uses the actual barrier/readback helper before engine access and shares the existing DMA2 gate. It does not start or rewrite the System PLLSAI plan; failure retains its acquired gate/IRQ/config responsibilities. Selected graphics cold paths must observe their acquired LTDC/APB2 or DMA2D/AHB1 gate before engine register access; failed visibility retains its exact cold receipt. Main SRAM buffer admission never grants the separate FMC CPU-only window to a DMA engine. Explicit graphics-owned admission instead attaches each selected engine to the already prepared FMC owner and its original bank lease before acquiring that engine gate; the original System epoch and bank remain retained until both cold joins. QUADSPI keeps NVIC disabled, owns its AHB3 gate and uses DSB plus actual gate readback before controller access; failed gate or hardware withdrawal keeps the same config/clock responsibility. No generated hardware algorithm is introduced.",
             "implementation": [
               "soc/stm32/stm32f4/system.c",
               "soc/stm32/stm32f4/drivers/crc.c",
@@ -2859,12 +2861,17 @@
             "revisions": "AA",
             "assessment": "workaround",
             "condition": "Shared FMC_BCR1.WFDIS1 disables the common write FIFO and allows read corruption during adjacent writes.",
-            "handling": "RM0386 12.2 makes the write FIFO common to every FMC controller, including SDRAM. After observing its acquired FMCEN gate, C prepare rejects WFDIS1 before pin/command effects; the clock-gated block is never read to invent pure admission proof. Commands and new CPU loans recheck WFDIS0. A live change blocks further exposure and retains stop responsibility; a cold rejection that issued no command restores only its acquired gate. The owner never rewrites or resets the shared WFDIS bit.",
+            "handling": "RM0386 12.2 makes the write FIFO common to every FMC controller, including SDRAM. After observing its acquired FMCEN gate, C prepare rejects WFDIS1 before pin/command effects; the clock-gated block is never read to invent pure admission proof. Commands and new CPU loans recheck WFDIS0. A graphics-owned bank uses that same checked loan internally; each selected LTDC/DMA2D request also rechecks WFDIS0, the original System epoch, mapping and bank state before accepting pixel storage. Failed graphics withdrawal retains the private bank loan and blocks self-refresh until the engines cold join. A live change blocks further exposure and retains stop responsibility; a cold rejection that issued no command restores only its acquired gate. The owner never rewrites or resets the shared WFDIS bit.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/fmc_sdram.c"
+              "soc/stm32/stm32f4/drivers/fmc_sdram.c",
+              "soc/stm32/stm32f4/drivers/ltdc.c",
+              "soc/stm32/stm32f4/drivers/dma2d.c"
             ],
             "regressions": [
-              "tests/google/stm32_sdram_test.cpp"
+              "tests/google/stm32_sdram_test.cpp",
+              "tests/google/stm32_ltdc_test.cpp",
+              "tests/google/stm32_dma2d_test.cpp",
+              "tools/configure/test_graphics_sdram.py"
             ]
           },
           {

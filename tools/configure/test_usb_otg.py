@@ -104,6 +104,14 @@ class UsbOtgConfigurationTests(unittest.TestCase):
         self.assertEqual(properties["power"]["properties"]["source_active_high"]["type"],
                          "boolean")
 
+    def test_managed_host_preserves_explicit_logical_pipe_mapping(self):
+        path = self.assembly()
+        path.write_text(path.read_text().replace('host={channel_count=2',
+                                                 'host={pipe_channels=[1,0],channel_count=2'))
+        result = gate.resolve_ir(path, test_support=native_fixture(path))
+        device = next(item for item in result.controllers if item.kind == "usb_device")
+        self.assertEqual(device.options.host.pipe_channels, (1, 0))
+
     def test_nominal_managed_factory_header_compiles_without_capability_storage(self):
         path = self.assembly()
         path.write_text(path.read_text().replace('capabilities=true', 'capabilities=false'))

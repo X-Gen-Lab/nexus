@@ -22,8 +22,8 @@ class CanSoc : public testing::Test {
     nx_can_controller_t controller = {};
     nx_can_filter_domain_t domain = {};
     nx_can_filter_t filters[2] = {
-        {0x123U, 0x7FFU, 0U, 0U, 0U, NX_CAN_STANDARD, false, true},
-        {0x321U, 0x7FFU, 14U, 1U, 1U, NX_CAN_STANDARD, false, true}};
+        {0x123U, 0x7FFU, NX_CAN_STANDARD, 1U, 0U, 0U, 0U, 0U, false, true},
+        {0x321U, 0x7FFU, NX_CAN_STANDARD, 1U, 14U, 1U, 1U, 0U, false, true}};
     nx_can_event_t events[8] = {};
     const nx_can_port_t port = {&nx_classic_can_ops, &controller};
     nx_can_tx_request_t request = {};
