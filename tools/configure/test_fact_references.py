@@ -1,5 +1,4 @@
 """Reviewed reference indices reject fictitious identity and qualification."""
-from tools.configure.providers.descriptor import source_directory
 import copy
 import json
 from pathlib import Path
@@ -10,22 +9,28 @@ import tempfile
 import unittest
 
 from tools.configure import configure as gate, dependencies, fact_references
-from tools.configure import stm32f4
+from tools.configure.device_view import controller_profiles
+from tools.configure.tests.f4_fixture import load_f4_fixture
 
 
 class FactReferenceContractTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.fixture = load_f4_fixture("STM32F407ZGT6")
+        cls.profiles = cls.fixture.provider.REFERENCE_PROFILES
 
     def references(self, family='stm32f4'):
-        package = gate.ROOT / source_directory(family)
-        return (json.loads((package / "references.json").read_text()),
-                json.loads((package / "soc.json").read_text())["variants"])
+        self.assertEqual(family, self.fixture.package.family)
+        package = self.fixture.package
+        return (json.loads(self.fixture.snapshots[package.fact("references")]),
+                json.loads(self.fixture.snapshots[package.fact("soc")])["variants"])
 
     def test_pin_source_keeps_errata_and_hardware_limits_explicit(self):
         for family in ('stm32f4',):
             with self.subTest(family=family):
                 data, variants = self.references(family)
                 before = copy.deepcopy(data)
-                self.assertEqual(fact_references.validate(data, variants), data)
+                self.assertEqual(fact_references.validate(data, variants, profiles=self.profiles), data)
                 self.assertEqual(data, before)
                 self.assertEqual(fact_references.select_review(data, "stm32f407")["status"],
                                  "software_audited_with_constraints")
@@ -35,7 +40,7 @@ class FactReferenceContractTests(unittest.TestCase):
 
     def test_software_audit_covers_every_locked_section_cut_and_current_mode(self):
         data, variants = self.references()
-        fact_references.validate(data, variants)
+        fact_references.validate(data, variants, profiles=self.profiles)
         audit = fact_references.select_review(data, "stm32f407")["software_audit"]
         expected = {f"2.{group}.{item}"
                     for group, count in enumerate(
@@ -45,8 +50,13 @@ class FactReferenceContractTests(unittest.TestCase):
         self.assertEqual(92, len(audit["items"]))
         self.assertEqual(["A", "Z", "1", "2", "Y", "4", "5", "6"],
                          audit["revision_order"])
-        self.assertEqual(sorted(f"{kind}:{mode}"
-                                for kind, mode in stm32f4._MODE_IMPLEMENTATIONS),
+        declared = {f"{binding.kind}:{mode}" for binding in self.fixture.provider.bindings
+                    for mode in binding.modes}
+        soc = json.loads(self.fixture.snapshots[self.fixture.package.fact("soc")])
+        interfaces = {f"{kind}:{mode}" for profile in controller_profiles(soc).values()
+            for controller in profile.values() for kind, modes in controller.get("interfaces", {}).items()
+            for mode in modes}
+        self.assertEqual(sorted(declared | interfaces),
                          sorted({mode for review in data["device_reviews"]
                                  for mode in review["software_audit"]["maintained_modes"]}))
         self.assertEqual(data["documents"]["es0182"]["sha256"],
@@ -60,7 +70,7 @@ class FactReferenceContractTests(unittest.TestCase):
     def test_f479_fmc_keeps_the_official_not_present_revision_entry(self):
         data, _ = self.references()
         audit = fact_references.select_review(data, "stm32f479")["software_audit"]
-        profile = fact_references.reference_profiles.select(audit["profile"])
+        profile = self.profiles.select(audit["profile"])
         rows = {row["section"]: row for row in audit["items"]}
         # Locked ES0321 Rev14 Table3 marks 2.3.1 N for both A and1.
         self.assertEqual(profile.applicability["2.3.1"], "NN")
@@ -72,7 +82,7 @@ class FactReferenceContractTests(unittest.TestCase):
     def test_f479_indirect_qspi_keeps_partial_revision_and_aperture_duties(self):
         data, variants = self.references()
         audit = fact_references.select_review(data, "stm32f479")["software_audit"]
-        profile = fact_references.reference_profiles.select(audit["profile"])
+        profile = self.profiles.select(audit["profile"])
         rows = {row["section"]: row for row in audit["items"]}
         # ES0321 Rev14 Table3 distinguishes the two partially applicable items.
         for number in range(1, 6):
@@ -85,7 +95,7 @@ class FactReferenceContractTests(unittest.TestCase):
         self.assertIn("debug", rows["2.4.5"]["handling"])
         self.assertIn("external_bus:qspi-indirect-sdr", profile.mode_scope)
         self.assertIn("flash_async:nor-indirect", profile.mode_scope)
-        fact_references.validate(data, variants)
+        fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_audit_rejects_missing_duplicate_foreign_or_unassessed_items(self):
         for mutation in ("missing", "duplicate", "foreign", "unassessed"):
@@ -101,7 +111,7 @@ class FactReferenceContractTests(unittest.TestCase):
                 else:
                     items[0]["assessment"] = "passed"
                 with self.assertRaisesRegex(ValueError, "audit"):
-                    fact_references.validate(data, variants)
+                    fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_audit_revision_and_evidence_cannot_be_invented(self):
         changes = (("revisions", "-------A"),
@@ -115,7 +125,7 @@ class FactReferenceContractTests(unittest.TestCase):
                 data, variants = self.references()
                 fact_references.select_review(data, "stm32f407")["software_audit"]["items"][0][field] = value
                 with self.assertRaisesRegex(ValueError, "audit"):
-                    fact_references.validate(data, variants)
+                    fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_unknown_fields_cannot_invent_workaround_or_document_scope(self):
         for path in ((), ("documents", "ds8626"), ("package_review", 0),
@@ -127,7 +137,7 @@ class FactReferenceContractTests(unittest.TestCase):
                     node = node[name]
                 node["unreviewed_extension"] = True
                 with self.assertRaisesRegex(ValueError, "fields"):
-                    fact_references.validate(data, variants)
+                    fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_reference_identity_requires_https_digest_and_nonzero_bytes(self):
         for field, value in (("url", "http://example.com/doc.pdf"),
@@ -139,7 +149,7 @@ class FactReferenceContractTests(unittest.TestCase):
                 data, variants = self.references()
                 data["documents"]["ds8626"][field] = value
                 with self.assertRaises(ValueError):
-                    fact_references.validate(data, variants)
+                    fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_missing_revision_or_reviewed_section_is_rejected(self):
         for field, value in (("revision", ""), ("document_date", ""),
@@ -149,7 +159,7 @@ class FactReferenceContractTests(unittest.TestCase):
                 data, variants = self.references()
                 data["documents"]["ds8626"][field] = value
                 with self.assertRaises(ValueError):
-                    fact_references.validate(data, variants)
+                    fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_document_kind_and_review_link_cannot_be_swapped(self):
         for field, value in (("document", "not-present"),
@@ -158,11 +168,11 @@ class FactReferenceContractTests(unittest.TestCase):
                 data, variants = self.references()
                 data["package_review"][0][field] = value
                 with self.assertRaisesRegex(ValueError, "package"):
-                    fact_references.validate(data, variants)
+                    fact_references.validate(data, variants, profiles=self.profiles)
         data, variants = self.references()
         data["documents"]["es0182"]["kind"] = "datasheet"
         with self.assertRaisesRegex(ValueError, "kind|errata"):
-            fact_references.validate(data, variants)
+            fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_missing_duplicate_or_foreign_part_cannot_share_review(self):
         for parts in ([], ["STM32F407VET6"], ["OTHER_PACKAGE"],
@@ -171,7 +181,7 @@ class FactReferenceContractTests(unittest.TestCase):
                 data, variants = self.references()
                 data["package_review"][0]["variants"] = parts
                 with self.assertRaisesRegex(ValueError, "variants"):
-                    fact_references.validate(data, variants)
+                    fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_document_availability_never_establishes_errata_or_hil(self):
         for field, value in (("status", "fully_audited"),
@@ -182,7 +192,7 @@ class FactReferenceContractTests(unittest.TestCase):
                 data, variants = self.references()
                 fact_references.select_review(data, "stm32f407")[field] = value
                 with self.assertRaisesRegex(ValueError, "qualification|scope"):
-                    fact_references.validate(data, variants)
+                    fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_named_datasheets_cannot_cover_another_device_group(self):
         for part, wrong in (("STM32F405ZGT6", "ds8597"),
@@ -196,7 +206,7 @@ class FactReferenceContractTests(unittest.TestCase):
                     if package["document"] == wrong:
                         package["variants"].append(part)
                 with self.assertRaisesRegex(ValueError, "datasheet"):
-                    fact_references.validate(data, variants)
+                    fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_review_groups_reject_overlap_missing_and_stale_datasheets(self):
         for change in ("overlap", "missing", "digest", "revision"):
@@ -211,7 +221,7 @@ class FactReferenceContractTests(unittest.TestCase):
                 else:
                     data["documents"]["ds8597"]["revision"] = "11"
                 with self.assertRaises(ValueError):
-                    fact_references.validate(data, variants)
+                    fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_device_reviews_are_disjoint_complete_and_bound_to_their_manual(self):
         for change in ("overlap", "missing", "manual"):
@@ -224,7 +234,7 @@ class FactReferenceContractTests(unittest.TestCase):
                 else:
                     data["device_reviews"][-1]["manual"] = "rm0090"
                 with self.assertRaisesRegex(ValueError, "disjoint|cover|group"):
-                    fact_references.validate(data, variants)
+                    fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_initial_slice_cannot_declare_or_select_another_reviewed_mode(self):
         from types import SimpleNamespace
@@ -237,29 +247,29 @@ class FactReferenceContractTests(unittest.TestCase):
                 changed["device_reviews"][index]["software_audit"]["maintained_modes"].append(
                     "uart:irq-byte-event")
                 with self.assertRaisesRegex(ValueError, "mode scope"):
-                    fact_references.validate(changed, variants)
+                    fact_references.validate(changed, variants, profiles=self.profiles)
                 with self.assertRaisesRegex(ValueError, "reviewed mode"):
                     fact_references.admit_selection(review,
                         (SimpleNamespace(kind="uart", mode="irq-byte-event"),),
-                        "baremetal")
+                        "baremetal", profiles=self.profiles)
                 with self.assertRaisesRegex(ValueError, "reviewed backend"):
-                    fact_references.admit_selection(review, (), "freertos")
+                    fact_references.admit_selection(review, (), "freertos", profiles=self.profiles)
 
     def test_current_audit_requires_its_explicit_review_profile(self):
         data, variants = self.references()
         fact_references.select_review(data, "stm32f407")["software_audit"].pop("profile", None)
         with self.assertRaisesRegex(ValueError, "profile"):
-            fact_references.validate(data, variants)
+            fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_named_profile_binds_the_complete_locked_document(self):
         data, variants = self.references()
         audit = fact_references.select_review(data, "stm32f407")["software_audit"]
         audit["profile"] = "es0182-rev19"
-        self.assertIs(fact_references.validate(data, variants), data)
+        self.assertIs(fact_references.validate(data, variants, profiles=self.profiles), data)
         data["documents"]["es0182"]["sha256"] = "a" * 64
         audit["document_sha256"] = "a" * 64
         with self.assertRaisesRegex(ValueError, "profile.*identity"):
-            fact_references.validate(data, variants)
+            fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_unknown_or_malformed_audit_profile_cannot_select_policy(self):
         for profile in ("es0182-rev20", "../es0182-rev19", False):
@@ -267,7 +277,7 @@ class FactReferenceContractTests(unittest.TestCase):
                 data, variants = self.references()
                 fact_references.select_review(data, "stm32f407")["software_audit"]["profile"] = profile
                 with self.assertRaisesRegex(ValueError, "profile"):
-                    fact_references.validate(data, variants)
+                    fact_references.validate(data, variants, profiles=self.profiles)
 
     def test_external_code_closure_can_execute_complete_review_profile(self):
         code = """
@@ -275,7 +285,9 @@ import json
 import sys
 sys.path.insert(0, sys.argv[1])
 from tools.configure import reference_profiles
-profile = reference_profiles.select('es0182-rev19')
+profiles = reference_profiles.ProfileSet.from_validated(json.loads(
+    __import__('pathlib').Path(sys.argv[2]).read_text()))
+profile = profiles.select('es0182-rev19')
 assert 'tools.configure.stm32f4' not in sys.modules
 try:
     profile.applicability['2.1.3'] = '--------'
@@ -296,8 +308,10 @@ print(json.dumps({
                 target = capsule / name
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(gate.ROOT / name, target)
+            profile_path = capsule / "review_profiles.json"
+            shutil.copyfile(self.fixture.package.fact("review_profiles"), profile_path)
             result = subprocess.run(
-                [sys.executable, "-I", "-S", "-B", "-c", code, directory],
+                [sys.executable, "-I", "-S", "-B", "-c", code, directory, str(profile_path)],
                 cwd=capsule, text=True, capture_output=True, check=False)
         self.assertEqual(result.returncode, 0, result.stderr)
         profile = json.loads(result.stdout)

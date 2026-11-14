@@ -174,6 +174,46 @@ class ToolRunnerTests(unittest.TestCase):
 
 
 class ChangedDomainTests(unittest.TestCase):
+    def test_sdk_code_and_known_fixture_inputs_select_both_complete_domains(self):
+        for name in ("cmake/package/package_source_sdk.py",
+                     "cmake/package/verify_consumers.py",
+                     "cmake/package/verification/example/main.c",
+                     "cmake/package/verification/example/public.h",
+                     "cmake/package/verification/example/assembly.toml",
+                     "cmake/package/verification/example/board.json"):
+            with self.subTest(path=name):
+                self.assertEqual(run_tool_tests.changed_suites([name]),
+                                 ("testing", "configure"))
+
+    def test_sdk_fixture_build_rules_and_unknown_inputs_keep_all_domains(self):
+        for name in ("cmake/package/verification/example/CMakeLists.txt",
+                     "cmake/package/verification/example/custom.cmake",
+                     "cmake/package/verification/example/helper.py",
+                     "cmake/package/verification/example/data.unknown",
+                     "cmake/package/future-policy.py",
+                     "cmake/platform/Firmware.cmake",
+                     "cmake/toolchains/arm-gcc.cmake",
+                     "cmake/presets/native.json",
+                     "cmake/testing/GoogleTest.cmake",
+                     "tools/testing/run_tool_tests.py",
+                     "tools/dev/change_paths.py",
+                     "scripts/ci/tdd_gate.py"):
+            with self.subTest(path=name):
+                self.assertEqual(run_tool_tests.changed_suites([name]),
+                                 tuple(run_tool_tests.SUITES))
+
+    def test_deleted_and_renamed_fixture_paths_retain_their_domain_union(self):
+        self.assertEqual(run_tool_tests.changed_suites([
+            "cmake/package/verification/removed/consumer.c",
+            "cmake/package/verification/new/consumer.c"]),
+            ("testing", "configure"))
+        self.assertEqual(run_tool_tests.changed_suites([
+            "cmake/package/verification/old/consumer.c",
+            "future-location/consumer.c"]), tuple(run_tool_tests.SUITES))
+        self.assertEqual(run_tool_tests.changed_suites([
+            "cmake/package/verify_consumers.py", ".github/workflows/build.yml"]),
+            tuple(run_tool_tests.SUITES))
+
     def test_documentation_does_not_select_behavioral_tool_domains(self):
         self.assertEqual(run_tool_tests.changed_suites([
             ".github/workflows/README.md", "tools/configure/README.md",

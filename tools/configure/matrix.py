@@ -4,6 +4,9 @@ This reports software selections and reviewed routes, never physical execution
 or a source-target graph. Assemblies enter through one explicit catalogue.
 """
 import argparse
+from collections.abc import Mapping
+from dataclasses import dataclass
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -15,60 +18,96 @@ import tempfile
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from tools.configure.providers.descriptor import source_directory
-from tools.configure import authored, configure, factory, selected_contracts
+from tools.configure import authored, configure, factory, packages, selected_contracts
+from tools.configure.data_provider import DataProvider
+from tools.configure.records import freeze
 from tools.configure.contracts import COMPONENTS, FACT_INTERFACE_KINDS
-from tools.configure.providers import descriptor, maintained
 from tools.configure.providers.common import mode_traits
 
 
 CATALOGUE = "tools/configure/assemblies/catalogue.json"
 
 
-def support_catalogue(root):
-    """Reuse complete existing validation, including the real provider gate.
+@dataclass(frozen=True)
+class PartSupport:
+    part: str
+    facts: configure.DeviceFacts
+    routes: Mapping
 
-    Review sources identify the maintained input facts, not complete per-mode
-    errata audits. A missing route remains missing. Profile/Board reservations
-    are still checked by the normal resolver when an actual instance is chosen.
-    """
-    rows = []
-    for integration in descriptor.families():
-        family = integration.family
-        if family == "native":
+
+@dataclass(frozen=True)
+class PackageSupport:
+    """One admitted package and exact-part views from the same input snapshot."""
+    package: packages.Package
+    parts: tuple[PartSupport, ...]
+    review_sources: tuple[str, ...]
+    input_identities: tuple[tuple[str, str], ...]
+
+
+def package_views(root):
+    """Load production declarations; neither folder names nor registries grant support."""
+    root = Path(root).resolve()
+    views = []
+    for candidate in packages.discover(root):
+        if candidate.scope != "production":
             continue
-        provider = maintained(family)
-        soc = configure.load(root / source_directory(family) / "soc.json")
-        routes = configure.load(root / source_directory(family) / "routes.json")
-        catalog = (configure.load(root / integration.source_directory /
-                                  integration.device_catalog)
-                   if integration.device_catalog is not None else None)
+        reader = packages.FactReader()
+        package = packages.load(candidate.manifest_path, read=reader)
+        if package.scope != "production":
+            continue
+        # CMake inputs are bytes, not JSON. Seal all declared inputs before
+        # projecting any facts; a later change cannot acquire the old values.
+        for path in package.inputs:
+            reader.snapshot_bytes(path)
+        soc = reader(package.fact("soc"))
+        provider = DataProvider.from_package(package, soc,
+            reader(package.fact("bindings")), read=reader)
+        route_doc = reader(package.fact("routes"))
+        configure.obj(route_doc, {"schema_version", "routes"}, (), "routes")
+        configure.integer(route_doc["schema_version"], 1, 1, "routes schema")
+        catalog = (reader(package.fact("device_catalog"))
+                   if "device_catalog" in package.facts else None)
+        parts = []
         for part in sorted(soc["variants"]):
-            selected = configure.resolve_device_facts(
-                soc, part, provider, catalog=catalog)
-            device = selected.device
-            reviewed = configure.resolve_routes(
-                routes, selected.soc, part, provider,
-                controller_profiles=selected.controller_profiles)
+            selected = configure.resolve_device_facts(soc, part, provider, catalog=catalog)
+            routes = configure.resolve_routes(route_doc, selected.soc, part,
+                selected.provider, controller_profiles=selected.controller_profiles)
+            parts.append(PartSupport(part, selected, freeze(routes)))
+        inputs = tuple((path.relative_to(root).as_posix(),
+                        hashlib.sha256(reader.snapshot_bytes(path)).hexdigest())
+                       for path in package.inputs)
+        if any(path.read_bytes() != raw for path, raw in reader.snapshots.items()):
+            raise ValueError("Support catalogue input changed during projection")
+        views.append(PackageSupport(package, tuple(parts),
+            tuple(name for name, _ in inputs), inputs))
+    return tuple(views)
+
+
+def _support_contracts(views):
+    rows = []
+    for view in views:
+        for part in view.parts:
+            device = part.facts.device
+            provider = part.facts.provider
             for controller, facts in sorted(device.controllers.items()):
                 policy = device.modes[controller]
-                interfaces = [(facts.kind, policy.modes)]
-                interfaces += sorted(policy.interfaces.items())
+                interfaces = [(facts.kind, policy.modes), *sorted(policy.interfaces.items())]
                 for kind, modes in interfaces:
                     for mode in sorted(modes):
-                        implementation = provider.mode_implementation(
-                            kind, mode)
+                        implementation = provider.mode_implementation(kind, mode, controller)
                         mode_traits(kind, mode)
-                        matches = tuple(sorted(route["id"] for route in
-                            reviewed.values() if part in route["variants"] and
-                            route["controller"] == controller and
-                            route["kind"] == kind and mode in route["modes"]))
+                        matches = tuple(sorted(route["id"] for route in part.routes.values()
+                            if part.part in route["variants"] and route["controller"] == controller
+                            and route["kind"] == kind and mode in route["modes"]))
                         rows.append(selected_contracts.SupportContract(
-                            family, part, controller, kind, mode,
-                            implementation,
-                            matches, integration.fact_files))
+                            view.package.family, part.part, controller, kind, mode,
+                            implementation, matches, view.review_sources))
     return tuple(rows)
 
+
+def support_catalogue(root):
+    """Project exact declared part/mode support without execution qualification."""
+    return _support_contracts(package_views(root))
 
 
 def component_choices(root):
@@ -111,12 +150,13 @@ def check_contracts(root=configure.ROOT):
     selected = component_choices(root)
     if selected != COMPONENTS:
         raise ValueError("Maintained components differ from CMake target selection")
-    for contract in support_catalogue(root):
+    views = package_views(root)
+    for contract in _support_contracts(views):
         if contract.kind not in FACT_INTERFACE_KINDS or contract.kind not in properties:
             raise ValueError("Provider kind has no authored/factory contract: " +
                              contract.kind)
     return {"kinds": sorted(kinds), "components": sorted(COMPONENTS),
-            "families": [item.family for item in descriptor.families()]}
+            "families": sorted(view.package.family for view in views)}
 
 
 def resolve_catalogue(root=configure.ROOT):

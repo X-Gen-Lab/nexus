@@ -103,17 +103,20 @@ const struct Capture {
     uint8_t pin = 0U;
     uint8_t af = 0U;
 } captures[]{{TIM3, nx_stm32_tim3_timer_capture_initialize,
-              nx_stm32_tim3_timer_capture_release, RCC_APB1ENR_TIM3EN},
+              nx_stm32_tim3_timer_capture_release, RCC_APB1ENR_TIM3EN,
+              NEXUS_APB1_TIMER_HZ, false, GPIOA, 6U, 2U},
              {TIM4, nx_stm32_timer_capture_initialize,
-              nx_stm32_timer_capture_release, RCC_APB1ENR_TIM4EN},
+              nx_stm32_timer_capture_release, RCC_APB1ENR_TIM4EN,
+              NEXUS_APB1_TIMER_HZ, false, GPIOB, 6U, 2U},
              {TIM5, nx_stm32_tim5_timer_capture_initialize,
-              nx_stm32_tim5_timer_capture_release, RCC_APB1ENR_TIM5EN},
+              nx_stm32_tim5_timer_capture_release, RCC_APB1ENR_TIM5EN,
+              NEXUS_APB1_TIMER_HZ, false, GPIOA, 0U, 2U},
              {TIM1, nx_stm32_tim1_timer_capture_initialize,
               nx_stm32_tim1_timer_capture_release, RCC_APB2ENR_TIM1EN,
-              NEXUS_APB2_TIMER_HZ, true},
+              NEXUS_APB2_TIMER_HZ, true, GPIOA, 8U, 1U},
              {TIM8, nx_stm32_tim8_timer_capture_initialize,
               nx_stm32_tim8_timer_capture_release, RCC_APB2ENR_TIM8EN,
-              NEXUS_APB2_TIMER_HZ, true},
+              NEXUS_APB2_TIMER_HZ, true, GPIOC, 6U, 3U},
              {TIM9, nx_stm32_tim9_timer_capture_initialize,
               nx_stm32_tim9_timer_capture_release, RCC_APB2ENR_TIM9EN,
               NEXUS_APB2_TIMER_HZ, true, GPIOA, 2U, 3U},
@@ -216,8 +219,13 @@ TEST_F(TimerClock, ComplementaryPwmUsesSelectedPrescalerAndDeadtimeFrequency) {
 TEST_F(TimerClock, EncoderDescribesActualFilterClockOnlyWhileGateRemainsLive) {
     RCC->APB1ENR = 0U;
     nx_stm32_encoder_state_t state{};
-    const nx_stm32_encoder_config_t config{
-        TIM3, NX_ENCODER_MODE_X4, 3U, 7U, false, false};
+    const nx_stm32_encoder_config_t config{TIM3,
+                                           NX_ENCODER_MODE_X4,
+                                           3U,
+                                           7U,
+                                           false,
+                                           false,
+                                           {{GPIOA, 0U, 6U}, {GPIOA, 0U, 7U}}};
     ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_prepare(&state, &config));
     nx_encoder_state_t info{};
     ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_ops.state(&state, &info));

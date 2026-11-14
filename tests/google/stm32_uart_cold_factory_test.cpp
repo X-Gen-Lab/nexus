@@ -101,6 +101,37 @@ bool Enabled(IRQn_Type irq) {
     return (NVIC->ISER[(unsigned)irq / 32U] & (1U << ((unsigned)irq % 32U))) !=
            0U;
 }
+#if !NX_COLD_TX || NX_COLD_RX
+struct ReviewedByteUart {
+    USART_TypeDef* registers;
+    GPIO_TypeDef* tx_gpio;
+    GPIO_TypeDef* rx_gpio;
+    IRQn_Type irq;
+    uint32_t clock_hz;
+    uint32_t gate;
+    uint8_t tx_port;
+    uint8_t tx_pin;
+    uint8_t rx_port;
+    uint8_t rx_pin;
+    uint8_t alternate;
+    bool apb2;
+};
+const std::array<ReviewedByteUart, 6> byte_uarts{{
+    {USART1, GPIOA, GPIOA, USART1_IRQn, 84000000U, RCC_APB2ENR_USART1EN, 0U, 9U,
+     0U, 10U, 7U, true},
+    {USART2, GPIOA, GPIOA, USART2_IRQn, 42000000U, RCC_APB1ENR_USART2EN, 0U, 2U,
+     0U, 3U, 7U, false},
+    {USART3, GPIOB, GPIOB, USART3_IRQn, 42000000U, RCC_APB1ENR_USART3EN, 1U,
+     10U, 1U, 11U, 7U, false},
+    {UART4, GPIOA, GPIOA, UART4_IRQn, 42000000U, RCC_APB1ENR_UART4EN, 0U, 0U,
+     0U, 1U, 8U, false},
+    {UART5, GPIOC, GPIOD, UART5_IRQn, 42000000U, RCC_APB1ENR_UART5EN, 2U, 12U,
+     3U, 2U, 8U, false},
+    {USART6, GPIOC, GPIOC, USART6_IRQn, 84000000U, RCC_APB2ENR_USART6EN, 2U, 6U,
+     2U, 7U, 8U, true},
+}};
+#endif
+
 class UartColdFactory : public testing::Test {
   protected:
     void* mmio = MAP_FAILED;
@@ -241,11 +272,14 @@ TEST_F(UartColdFactory, RejectedAlienReceiptCannotStopTheLiveGeneratedOwner) {
     ColdConfig config = {};
 #if NX_COLD_RX || NX_COLD_TX
     auto& uart = config.uart;
-    config.resources.dma = DMA2;
     config.resources.regions = memory;
     config.resources.region_count = 1U;
-    config.receive = DMA2_Stream2;
-    config.transmit = {DMA2_Stream7, DMA2_Stream7_IRQn, 7U, 4U};
+#if NX_COLD_RX
+    config.resources.receive = {DMA2, DMA2_Stream2, DMA2_Stream2_IRQn, 2U, 4U};
+#endif
+#if NX_COLD_TX
+    config.resources.transmit = {DMA2, DMA2_Stream7, DMA2_Stream7_IRQn, 7U, 4U};
+#endif
 #else
     auto& uart = config;
     (void)memory;
@@ -287,6 +321,26 @@ TEST_F(UartColdFactory, EmptyReceiptDoesNotEraseUnownedColdStorage) {
 }
 
 #if NX_COLD_RX
+namespace {
+struct ReviewedDmaRoutes {
+    nx_stm32_dma_route_t transmit;
+    nx_stm32_dma_route_t receive;
+};
+const std::array<ReviewedDmaRoutes, 6> dma_routes{{
+    {{DMA2, DMA2_Stream7, DMA2_Stream7_IRQn, 7U, 4U},
+     {DMA2, DMA2_Stream2, DMA2_Stream2_IRQn, 2U, 4U}},
+    {{DMA1, DMA1_Stream6, DMA1_Stream6_IRQn, 6U, 4U},
+     {DMA1, DMA1_Stream5, DMA1_Stream5_IRQn, 5U, 4U}},
+    {{DMA1, DMA1_Stream3, DMA1_Stream3_IRQn, 3U, 4U},
+     {DMA1, DMA1_Stream1, DMA1_Stream1_IRQn, 1U, 4U}},
+    {{DMA1, DMA1_Stream4, DMA1_Stream4_IRQn, 4U, 4U},
+     {DMA1, DMA1_Stream2, DMA1_Stream2_IRQn, 2U, 4U}},
+    {{DMA1, DMA1_Stream7, DMA1_Stream7_IRQn, 7U, 4U},
+     {DMA1, DMA1_Stream0, DMA1_Stream0_IRQn, 0U, 4U}},
+    {{DMA2, DMA2_Stream6, DMA2_Stream6_IRQn, 6U, 5U},
+     {DMA2, DMA2_Stream1, DMA2_Stream1_IRQn, 1U, 5U}},
+}};
+} /* namespace */
 TEST_F(UartColdFactory, AdditionalDmaOwnersWithdrawTheirActualNvicAndPads) {
     const uint32_t original_gates = RCC->AHB1ENR;
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN |
@@ -298,14 +352,14 @@ TEST_F(UartColdFactory, AdditionalDmaOwnersWithdrawTheirActualNvicAndPads) {
         selected.registers->SR = USART_SR_TC | USART_SR_TXE;
         uint16_t snapshots[2]{};
         const nx_stm32_platform_pin_config_t pins[] = {
-            {selected.tx_gpio, &snapshots[0], selected.tx_port,
-             selected.tx_pin},
-            {selected.rx_gpio, &snapshots[1], selected.rx_port,
-             selected.rx_pin}};
+            {byte_uarts[i].tx_gpio, &snapshots[0], byte_uarts[i].tx_port,
+             byte_uarts[i].tx_pin},
+            {byte_uarts[i].rx_gpio, &snapshots[1], byte_uarts[i].rx_port,
+             byte_uarts[i].rx_pin}};
         std::array<IRQn_Type, 2U + NX_COLD_TX> publishers {
-            selected.irq, selected.receive_irq,
+            selected.irq, dma_routes[i].receive.irq,
 #if NX_COLD_TX
-                selected.transmit.irq,
+                dma_routes[i].transmit.irq,
 #endif
         };
         const nx_dma_memory_region_t memory{
@@ -326,30 +380,31 @@ TEST_F(UartColdFactory, AdditionalDmaOwnersWithdrawTheirActualNvicAndPads) {
                        false,
                        nullptr,
                        0U};
-        config.resources = {selected.dma, &memory, 1U};
-        config.receive = selected.receive;
+        config.resources.regions = &memory;
+        config.resources.region_count = 1U;
+        config.resources.receive = dma_routes[i].receive;
 #if NX_COLD_TX
-        config.transmit = selected.transmit;
+        config.resources.transmit = dma_routes[i].transmit;
 #endif
         for (IRQn_Type irq : publishers)
             NVIC->IPR[(unsigned)irq] = 0xB0U;
         ColdState state{};
         nx_stm32_uart_cold_receipt_t receipt{};
-        config.receive = DMA2_Stream4;
+        config.resources.receive.stream = DMA2_Stream4;
         const unsigned before = writes;
         EXPECT_EQ(NX_ERROR_INVALID, COLD_PREPARE(&state, &config, &receipt));
         EXPECT_EQ(before, writes);
-        config.receive = selected.receive;
+        config.resources.receive.stream = dma_routes[i].receive.stream;
         ASSERT_EQ(NX_SUCCESS, COLD_PREPARE(&state, &config, &receipt));
         for (IRQn_Type irq : publishers) {
             EXPECT_TRUE(Enabled(irq));
             EXPECT_EQ(0x50U, NVIC->IPR[(unsigned)irq]);
         }
-        const unsigned rx_irq = (unsigned)selected.receive_irq;
+        const unsigned rx_irq = (unsigned)dma_routes[i].receive.irq;
         refused = &NVIC->ICER[rx_irq / 32U];
         held_bits = 1U << (rx_irq % 32U);
         EXPECT_NE(NX_SUCCESS, COLD_CLOSE(&state, &config, &receipt));
-        EXPECT_TRUE(Enabled(selected.receive_irq));
+        EXPECT_TRUE(Enabled(dma_routes[i].receive.irq));
         EXPECT_NE(0U, receipt.effects);
         EXPECT_EQ(NX_ERROR_BUSY, COLD_PREPARE(&state, &config, &receipt));
         refused = nullptr;
@@ -375,10 +430,10 @@ TEST_F(UartColdFactory, AdditionalIrqProfilesReceiveThroughTheirOwnPublisher) {
         const auto& selected = nx_stm32_uart_hardware[i];
         uint16_t snapshots[2]{};
         const nx_stm32_platform_pin_config_t pins[] = {
-            {selected.tx_gpio, &snapshots[0], selected.tx_port,
-             selected.tx_pin},
-            {selected.rx_gpio, &snapshots[1], selected.rx_port,
-             selected.rx_pin}};
+            {byte_uarts[i].tx_gpio, &snapshots[0], byte_uarts[i].tx_port,
+             byte_uarts[i].tx_pin},
+            {byte_uarts[i].rx_gpio, &snapshots[1], byte_uarts[i].rx_port,
+             byte_uarts[i].rx_pin}};
         ColdConfig config{};
         config.registers = selected.registers;
         config.pins = pins;
@@ -445,34 +500,6 @@ TEST_F(UartColdFactory, AdditionalIrqProfilesReceiveThroughTheirOwnPublisher) {
 #if !NX_COLD_RX && !NX_COLD_TX && !defined(NX_COLD_WORDS) &&                   \
     !defined(NX_COLD_BLOCKS)
 namespace {
-struct ReviewedByteUart {
-    USART_TypeDef* registers;
-    GPIO_TypeDef* tx_gpio;
-    GPIO_TypeDef* rx_gpio;
-    IRQn_Type irq;
-    uint32_t clock_hz;
-    uint32_t gate;
-    uint8_t tx_port;
-    uint8_t tx_pin;
-    uint8_t rx_port;
-    uint8_t rx_pin;
-    uint8_t alternate;
-    bool apb2;
-};
-const std::array<ReviewedByteUart, 6> byte_uarts{{
-    {USART1, GPIOA, GPIOA, USART1_IRQn, 84000000U, RCC_APB2ENR_USART1EN, 0U, 9U,
-     0U, 10U, 7U, true},
-    {USART2, GPIOA, GPIOA, USART2_IRQn, 42000000U, RCC_APB1ENR_USART2EN, 0U, 2U,
-     0U, 3U, 7U, false},
-    {USART3, GPIOB, GPIOB, USART3_IRQn, 42000000U, RCC_APB1ENR_USART3EN, 1U,
-     10U, 1U, 11U, 7U, false},
-    {UART4, GPIOA, GPIOA, UART4_IRQn, 42000000U, RCC_APB1ENR_UART4EN, 0U, 0U,
-     0U, 1U, 8U, false},
-    {UART5, GPIOC, GPIOD, UART5_IRQn, 42000000U, RCC_APB1ENR_UART5EN, 2U, 12U,
-     3U, 2U, 8U, false},
-    {USART6, GPIOC, GPIOC, USART6_IRQn, 84000000U, RCC_APB2ENR_USART6EN, 2U, 6U,
-     2U, 7U, 8U, true},
-}};
 struct ByteColdOwner {
     uint16_t saved[2]{};
     uint8_t bytes[8]{};
@@ -558,9 +585,49 @@ TEST_F(UartColdFactory, AdditionalByteControllersDoNotRequireAnUnrelatedGpioA) {
                               &owner.state, &owner.config, &owner.receipt));
 }
 
+TEST_F(UartColdFactory, ConfiguredAlternateRoutesOwnOnlyTheirSelectedPads) {
+    auto routes = byte_uarts;
+    routes[0].tx_gpio = routes[0].rx_gpio = GPIOB;
+    routes[0].tx_port = routes[0].rx_port = 1U;
+    routes[0].tx_pin = 6U;
+    routes[0].rx_pin = 7U;
+    routes[1].tx_gpio = routes[1].rx_gpio = GPIOD;
+    routes[1].tx_port = routes[1].rx_port = 3U;
+    routes[1].tx_pin = 5U;
+    routes[1].rx_pin = 6U;
+    routes[2].tx_gpio = routes[2].rx_gpio = GPIOD;
+    routes[2].tx_port = routes[2].rx_port = 3U;
+    routes[2].tx_pin = 8U;
+    routes[2].rx_pin = 9U;
+    for (size_t index = 0U; index < 3U; ++index) {
+        const auto& route = routes[index];
+        SCOPED_TRACE(index);
+        ByteColdOwner owner(route);
+        RCC->AHB1ENR = 1U << route.tx_port;
+        route.registers->SR = USART_SR_TC | USART_SR_TXE;
+        const auto tx = nx_stm32_pin_capture(route.tx_gpio, route.tx_pin);
+        const auto rx = nx_stm32_pin_capture(route.rx_gpio, route.rx_pin);
+        const uint32_t gpioa_mode = GPIOA->MODER;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_byte_cold_prepare(
+                                  &owner.state, &owner.config, &owner.receipt));
+        EXPECT_EQ(7U, (route.tx_gpio->AFR[route.tx_pin / 8U] >>
+                       ((route.tx_pin % 8U) * 4U)) &
+                          15U);
+        EXPECT_EQ(7U, (route.rx_gpio->AFR[route.rx_pin / 8U] >>
+                       ((route.rx_pin % 8U) * 4U)) &
+                          15U);
+        EXPECT_EQ(gpioa_mode, GPIOA->MODER);
+        ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_byte_cold_close(
+                                  &owner.state, &owner.config, &owner.receipt));
+        EXPECT_EQ(tx, nx_stm32_pin_capture(route.tx_gpio, route.tx_pin));
+        EXPECT_EQ(rx, nx_stm32_pin_capture(route.rx_gpio, route.rx_pin));
+        EXPECT_EQ(1U << route.tx_port, RCC->AHB1ENR);
+    }
+}
+
 TEST_F(UartColdFactory,
        AdditionalControllerRejectsWrongClockVectorAndPadsWithoutWrites) {
-    for (unsigned malformed = 0U; malformed < 5U; ++malformed) {
+    for (unsigned malformed = 0U; malformed < 6U; ++malformed) {
         ByteColdOwner owner(byte_uarts[2]);
         RCC->AHB1ENR = RCC_AHB1ENR_GPIOBEN;
         switch (malformed) {
@@ -571,13 +638,16 @@ TEST_F(UartColdFactory,
                 owner.vector[0] = USART2_IRQn;
                 break;
             case 2U:
-                owner.pins[0].pin = 9U;
+                owner.pins[0].pin = 16U;
                 break;
             case 3U:
                 owner.pins[1].port_index = 0U;
                 break;
-            default:
+            case 4U:
                 owner.pins[1].snapshot = owner.pins[0].snapshot;
+                break;
+            default:
+                owner.pins[1].pin = owner.pins[0].pin;
                 break;
         }
         const auto before = writes;

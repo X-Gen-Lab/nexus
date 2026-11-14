@@ -31,11 +31,12 @@
 #define NX_ADV_RELEASE    nx_stm32_tim8_advanced_pwm_release
 #define NX_ADV_OPS        nx_stm32_tim8_advanced_pwm_ops
 #define NX_ADV_HZ         NEXUS_APB2_TIMER_HZ
-#define NX_ADV_BREAK_MASK 64U
 #define NX_ADV_CLOCK_READY(channel)                                            \
     ((RCC->APB2ENR & RCC_APB2ENR_TIM8EN) != 0U &&                              \
      (RCC->CFGR & RCC_CFGR_PPRE2) == (NEXUS_CLOCK_CFGR & RCC_CFGR_PPRE2) &&    \
      nx_stm32_advanced_pins_ready(TIM8, (channel)))
-#define NX_ADV_INPUT_VALID(p) ((p) == &GPIOA->IDR)
+#define NX_ADV_INPUT_VALID(config)                                             \
+    nx_stm32_advanced_break_valid(TIM8, (config)->channel,                     \
+                                  (config)->break_input, (config)->break_mask)
 #define NX_ADV_ACCESS_READY() ((RCC->APB2ENR & RCC_APB2ENR_TIM8EN) != 0U)
 #include "advanced_pwm_impl.h"

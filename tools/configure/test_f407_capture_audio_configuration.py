@@ -1,6 +1,5 @@
 """Exact capture/audio assembly, typed storage and resource rejection."""
 from dataclasses import FrozenInstanceError
-import importlib
 import json
 from pathlib import Path
 import tempfile
@@ -8,6 +7,7 @@ import unittest
 
 from tools.configure import bindings, factory, selected_contracts
 from tools.configure import configure as gate
+from tools.configure.tests.f4_fixture import provider as f4_provider
 
 
 class CaptureAudioConfigurationTests(unittest.TestCase):
@@ -16,10 +16,13 @@ class CaptureAudioConfigurationTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name)
 
-    def test_f407_owns_capture_and_audio_configuration(self):
-        module = importlib.import_module("tools.configure.stm32f4.capture_audio")
-        self.assertTrue(callable(module.constructor))
-        self.assertTrue(callable(module.validate))
+    def test_selected_package_owns_the_capture_and_audio_c_layouts(self):
+        selected = f4_provider("STM32F407ZGT6")
+        self.assertEqual("nx_stm32_capture_state_t",
+            selected.binding("capture", "snapshot-raw", "DCMI").recipe.state_type)
+        self.assertEqual("nx_stm32_audio_state_t",
+            selected.binding("audio", "slave-tx", "I2S2").recipe.state_type)
+        self.assertIsNotNone(selected.CAPTURE_AUDIO)
 
     def resolve(self, suffix, part="STM32F407ZGT6", routes=None):
         directory = self.directory / "board"

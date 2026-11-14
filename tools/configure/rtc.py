@@ -22,10 +22,12 @@ def validate_board(selection, board):
 
 
 def selected_resources(selection, provider):
-    """ES0182 2.2.18 reserves quiet PC13 while a crystal LSE is selected."""
-    return (("pin:PC13",) if provider.PREFIX == "stm32" and
-            selection["mode"] in POLICY_MODES and
-            not selection.get("lse_bypass", False) else ())
+    """Reserve only the selected package's declared crystal conflicts."""
+    if selection["mode"] not in POLICY_MODES or selection.get("lse_bypass", False):
+        return ()
+    policy = getattr(provider, "SELECTION", None)
+    return tuple(policy.data["rtc"].get("crystal_resources", ())) if policy else ()
+
 
 
 def validate_selection(selection):

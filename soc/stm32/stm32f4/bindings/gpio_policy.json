@@ -1,0 +1,378 @@
+{
+  "schema_version": 1,
+  "bindings": [],
+  "domains": {
+    "gpio_phase": {
+      "types": {
+        "receipt": "nx_stm32_platform_pin_receipt_t",
+        "pin": "nx_stm32_platform_pin_config_t",
+        "config": "nx_stm32_platform_config_t",
+        "dma_stream": "DMA_Stream_TypeDef",
+        "snapshot": "uint16_t"
+      },
+      "excluded_kinds": [
+        "rtc"
+      ],
+      "admission_kinds": [
+        "adc"
+      ],
+      "clock_fields": [
+        "apb1_clocks",
+        "apb2_clocks",
+        "ahb1_clocks",
+        "ahb2_clocks"
+      ],
+      "controller_kinds": [
+        "uart",
+        "spi",
+        "i2c",
+        "i2c_target",
+        "pwm",
+        "encoder",
+        "timer_capture",
+        "advanced_pwm",
+        "can",
+        "dac",
+        "usb_device",
+        "usb_host",
+        "audio"
+      ],
+      "controller_gates": {
+        "ADC123": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_ADC123EN"
+          ]
+        },
+        "USART1": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_USART1EN"
+          ]
+        },
+        "USART2": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_USART2EN"
+          ]
+        },
+        "USART3": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_USART3EN"
+          ]
+        },
+        "UART4": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_UART4EN"
+          ]
+        },
+        "UART5": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_UART5EN"
+          ]
+        },
+        "USART6": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_USART6EN"
+          ]
+        },
+        "SPI1": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_SPI1EN"
+          ]
+        },
+        "SPI2": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_SPI2EN"
+          ]
+        },
+        "SPI3": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_SPI3EN"
+          ]
+        },
+        "I2C1": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_I2C1EN"
+          ]
+        },
+        "I2C2": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_I2C2EN"
+          ]
+        },
+        "I2C3": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_I2C3EN"
+          ]
+        },
+        "TIM3": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM3EN"
+          ]
+        },
+        "TIM4": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM4EN"
+          ]
+        },
+        "TIM5": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM5EN"
+          ]
+        },
+        "TIM9": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_TIM9EN"
+          ]
+        },
+        "TIM10": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_TIM10EN"
+          ]
+        },
+        "TIM11": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_TIM11EN"
+          ]
+        },
+        "TIM12": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM12EN"
+          ]
+        },
+        "TIM13": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM13EN"
+          ]
+        },
+        "TIM14": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM14EN"
+          ]
+        },
+        "TIM1": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_TIM1EN"
+          ]
+        },
+        "TIM8": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_TIM8EN"
+          ]
+        },
+        "TIM6": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM6EN"
+          ]
+        },
+        "TIM7": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM7EN"
+          ]
+        },
+        "DAC": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_DACEN"
+          ]
+        },
+        "CAN1": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_CAN1EN"
+          ]
+        },
+        "CAN2": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_CAN2EN"
+          ]
+        },
+        "SAI1": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_SAI1EN"
+          ]
+        },
+        "SAI2": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_SAI2EN"
+          ]
+        },
+        "I2S2": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_SPI2EN"
+          ]
+        },
+        "I2S3": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_SPI3EN"
+          ]
+        },
+        "OTG_FS": {
+          "ahb2_clocks": [
+            "RCC_AHB2ENR_OTGFSEN"
+          ]
+        },
+        "OTG_HS": {
+          "ahb1_clocks": [
+            "RCC_AHB1ENR_OTGHSEN"
+          ]
+        }
+      },
+      "kind_gates": {
+        "adc": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_ADC1EN",
+            "RCC_APB2ENR_ADC2EN",
+            "RCC_APB2ENR_ADC3EN"
+          ]
+        },
+        "adc_group": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_ADC1EN",
+            "RCC_APB2ENR_ADC2EN",
+            "RCC_APB2ENR_ADC3EN"
+          ]
+        },
+        "capture": {
+          "ahb2_clocks": [
+            "RCC_AHB2ENR_DCMIEN"
+          ]
+        },
+        "block": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_SDIOEN"
+          ]
+        },
+        "eth": {
+          "ahb1_clocks": [
+            "RCC_AHB1ENR_ETHMACEN",
+            "RCC_AHB1ENR_ETHMACTXEN",
+            "RCC_AHB1ENR_ETHMACRXEN"
+          ]
+        },
+        "eth_frames": {
+          "ahb1_clocks": [
+            "RCC_AHB1ENR_ETHMACEN",
+            "RCC_AHB1ENR_ETHMACTXEN",
+            "RCC_AHB1ENR_ETHMACRXEN",
+            "RCC_AHB1ENR_ETHMACPTPEN"
+          ]
+        }
+      },
+      "mode_gates": [
+        {
+          "controller": "OTG_HS",
+          "modes": [
+            "host-hs-ulpi",
+            "device-hs-ulpi",
+            "otg-hs-ulpi"
+          ],
+          "clocks": {
+            "ahb1_clocks": [
+              "RCC_AHB1ENR_OTGHSULPIEN"
+            ]
+          }
+        }
+      ],
+      "claim_gates": {
+        "TIM3": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM3EN"
+          ]
+        },
+        "TIM4": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM4EN"
+          ]
+        },
+        "TIM5": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM5EN"
+          ]
+        },
+        "TIM9": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_TIM9EN"
+          ]
+        },
+        "TIM10": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_TIM10EN"
+          ]
+        },
+        "TIM11": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_TIM11EN"
+          ]
+        },
+        "TIM12": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM12EN"
+          ]
+        },
+        "TIM13": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM13EN"
+          ]
+        },
+        "TIM14": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM14EN"
+          ]
+        },
+        "TIM1": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_TIM1EN"
+          ]
+        },
+        "TIM8": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_TIM8EN"
+          ]
+        },
+        "TIM6": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM6EN"
+          ]
+        },
+        "TIM7": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_TIM7EN"
+          ]
+        }
+      },
+      "resource_gates": {
+        "can:filter-domain": {
+          "apb1_clocks": [
+            "RCC_APB1ENR_CAN1EN"
+          ]
+        }
+      },
+      "exti_lines": {
+        "EXTI0": 1,
+        "EXTI1": 2,
+        "EXTI2": 4,
+        "EXTI3": 8,
+        "EXTI4": 16,
+        "EXTI5": 32,
+        "EXTI6": 64,
+        "EXTI7": 128,
+        "EXTI8": 256,
+        "EXTI9": 512,
+        "EXTI10": 1024,
+        "EXTI11": 2048,
+        "EXTI12": 4096,
+        "EXTI13": 8192,
+        "EXTI14": 16384,
+        "EXTI15": 32768
+      },
+      "output_speeds": {
+        "PC13": [
+          "low"
+        ],
+        "PC14": [
+          "low"
+        ],
+        "PC15": [
+          "low"
+        ]
+      }
+    }
+  }
+}

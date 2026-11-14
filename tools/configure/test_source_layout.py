@@ -21,8 +21,9 @@ class SourceLayoutTests(unittest.TestCase):
             with self.subTest(family=family):
                 item = descriptor.maintained(family)
                 self.assertEqual(item.source_directory, directory)
-                self.assertEqual(item.fact_files[:2], (
-                    directory + "/soc.json", directory + "/routes.json"))
+                self.assertTrue({directory + "/soc.json", directory + "/routes.json",
+                                 directory + "/package.json"}.issubset(item.fact_files))
+                self.assertEqual(item.configuration_modules, ())
                 self.assertTrue(all((ROOT / path).is_file()
                                     for path in item.fact_files))
                 if family != "native":

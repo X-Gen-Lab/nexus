@@ -38,11 +38,13 @@ static bool block(const SAI_Block_TypeDef* b) {
 }
 /** \brief Exact documented DMA2 request routes; no run-time discovery. */
 static bool route(const nx_stm32_av_dma_t* d, const SAI_Block_TypeDef* b) {
-    static const IRQn_Type irq[8] = {DMA2_Stream0_IRQn, DMA2_Stream1_IRQn,
-                                     DMA2_Stream2_IRQn, DMA2_Stream3_IRQn,
-                                     DMA2_Stream4_IRQn, DMA2_Stream5_IRQn,
-                                     DMA2_Stream6_IRQn, DMA2_Stream7_IRQn};
-    if (d->dma != DMA2 || d->lane > 7U || d->irq != irq[d->lane] ||
+    if (!nx_stm32_dma_route_valid(d) || d->dma != DMA2)
+        return false;
+    /* These exact MMIO models retain physical identities too. The common
+     * validator permits relocated models used by other transports. */
+    uint32_t irq = d->lane < 5U ? (uint32_t)DMA2_Stream0_IRQn + d->lane
+                                : (uint32_t)DMA2_Stream5_IRQn + d->lane - 5U;
+    if ((uint32_t)d->irq != irq ||
         d->stream !=
             (DMA_Stream_TypeDef*)(uintptr_t)(DMA2_Stream0_BASE +
                                              0x18U * (uintptr_t)d->lane))
@@ -114,26 +116,6 @@ static uint64_t frame_divider(const nx_stm32_sai_config_t* c) {
 
 #endif
 
-/** \brief Only a selected AF6 MCLK output carries its electrical limit. */
-static bool has_mclk(const nx_stm32_sai_config_t* c) {
-    GPIO_TypeDef* bank = c->source == SAI1_Block_A ? GPIOE : GPIOF;
-    uint8_t number = c->source == SAI1_Block_A ? 2U : 7U;
-    uint8_t af = 6U;
-#if defined(STM32F446xx)
-    if (nx_stm32_sai_controller(c->source) == SAI2) {
-        bank = GPIOE;
-        number = c->source == SAI2_Block_A ? 0U : 14U;
-        af = 10U;
-    }
-#endif
-    for (size_t i = 0U; i < c->common.pin_count; ++i) {
-        const nx_stm32_av_pin_t* pin = &c->common.pins[i];
-        if (pin->registers == bank && pin->pin == number && pin->af == af)
-            return true;
-    }
-    return false;
-}
-
 /** \brief Static master arithmetic consumes the one System auxiliary plan. */
 static nx_result_t master_clock(const nx_stm32_sai_config_t* c) {
 #if NEXUS_CLOCK_PLLSAI_SAI1_ENABLED
@@ -142,11 +124,11 @@ static nx_result_t master_clock(const nx_stm32_sai_config_t* c) {
     if ((!c->no_divider && (c->frame_bits & (c->frame_bits - 1U)) != 0U) ||
         numerator > (uint64_t)c->max_bit_clock_hz * denominator ||
         numerator * 2U >= (uint64_t)c->pclk_hz * denominator ||
-        (has_mclk(c) && (c->no_divider ||
-                         (uint64_t)NEXUS_CLOCK_PLLSAI_SAI1_HZ * 256U <
-                             UINT64_C(2048000) * denominator ||
-                         (uint64_t)NEXUS_CLOCK_PLLSAI_SAI1_HZ * 256U >
-                             UINT64_C(45000000) * denominator)))
+        (c->mclk && (c->no_divider ||
+                     (uint64_t)NEXUS_CLOCK_PLLSAI_SAI1_HZ * 256U <
+                         UINT64_C(2048000) * denominator ||
+                     (uint64_t)NEXUS_CLOCK_PLLSAI_SAI1_HZ * 256U >
+                         UINT64_C(45000000) * denominator)))
         return NX_ERROR_UNSUPPORTED;
     return NX_SUCCESS;
 #else
@@ -223,7 +205,7 @@ nx_result_t nx_stm32_sai_admit(const nx_stm32_sai_state_t* s,
         nx_result_t clock = master_clock(c);
         if (clock != NX_SUCCESS)
             return clock;
-    } else if (has_mclk(c) || c->max_bit_clock_hz >= (c->pclk_hz + 1U) / 2U) {
+    } else if (c->mclk || c->max_bit_clock_hz >= (c->pclk_hz + 1U) / 2U) {
         return NX_ERROR_UNSUPPORTED;
     }
     if (s->owned || s->active != NULL || s->initialized || !cold_free(c))

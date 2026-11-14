@@ -39,7 +39,7 @@ static bool owned_route(const nx_stm32_uart_hal_state_t* state) {
            state->handle.Instance == state->uart.registers &&
            state->handle.Instance == state->config->uart.registers &&
            state->handle.hdmatx == &state->dma &&
-           state->dma.Instance == state->config->transmit.registers &&
+           state->dma.Instance == state->config->resources.transmit.stream &&
            state->dma.Parent == &state->handle;
 }
 
@@ -60,7 +60,7 @@ static void quarantine_domain(nx_stm32_uart_hal_state_t* state) {
     if (uart->terminal == NX_SUCCESS)
         uart->terminal = NX_ERROR_IO;
     NVIC_DisableIRQ(uart->irq);
-    NVIC_DisableIRQ(state->config->transmit.irq);
+    NVIC_DisableIRQ(state->config->resources.transmit.irq);
     if (uart->active != NULL &&
         nx_request_state(&uart->active->base) != NX_REQUEST_QUARANTINED)
         (void)nx_request_transition(&uart->active->base,
@@ -103,7 +103,7 @@ static bool irq_enter(nx_stm32_uart_hal_state_t* state, uint8_t bit) {
         state->masked_vectors |= bit;
         NVIC_DisableIRQ(bit == NX_HAL_UART_VECTOR
                             ? state->uart.irq
-                            : state->config->transmit.irq);
+                            : state->config->resources.transmit.irq);
         nx_arch_dsb();
         nx_arch_irq_restore(saved);
         return false;
@@ -129,7 +129,7 @@ static void leave_hal(nx_stm32_uart_hal_state_t* state) {
         if ((masked & NX_HAL_UART_VECTOR) != 0U)
             NVIC_EnableIRQ(state->uart.irq);
         if ((masked & NX_HAL_DMA_VECTOR) != 0U)
-            NVIC_EnableIRQ(state->config->transmit.irq);
+            NVIC_EnableIRQ(state->config->resources.transmit.irq);
     }
     nx_arch_dsb();
     nx_arch_irq_restore(saved);
@@ -210,7 +210,7 @@ nx_stm32_uart_hal_initialize(nx_stm32_uart_hal_state_t* state,
         return result;
     if (state->uart.initialized || state->uart.active != NULL ||
         state->hal_depth != 0U || state->masked_vectors != 0U ||
-        (config->transmit.registers->CR & DMA_SxCR_EN) != 0U)
+        (config->resources.transmit.stream->CR & DMA_SxCR_EN) != 0U)
         return NX_ERROR_BUSY;
     if (!nx_stm32_uart_dma_powered(config))
         return NX_ERROR_STATE;
@@ -255,9 +255,9 @@ nx_stm32_uart_hal_initialize(nx_stm32_uart_hal_state_t* state,
     state->handle.MspDeInitCallback = callback_noop;
     /* HAL callbacks recover the private owner through this reciprocal link. */
     state->handle.hdmatx = &state->dma;
-    state->dma.Instance = config->transmit.registers;
+    state->dma.Instance = config->resources.transmit.stream;
     state->dma.Parent = &state->handle;
-    state->dma.Init.Channel = (uint32_t)config->transmit.channel
+    state->dma.Init.Channel = (uint32_t)config->resources.transmit.channel
                               << DMA_SxCR_CHSEL_Pos;
     state->dma.Init.Direction = DMA_MEMORY_TO_PERIPH;
     state->dma.Init.PeriphInc = DMA_PINC_DISABLE;
@@ -293,12 +293,12 @@ nx_stm32_uart_hal_initialize(nx_stm32_uart_hal_state_t* state,
     LL_USART_EnableIT_PE(state->handle.Instance);
     LL_USART_EnableIT_ERROR(state->handle.Instance);
     NVIC_SetPriority(state->uart.irq, config->uart.priority);
-    NVIC_SetPriority(config->transmit.irq, config->uart.priority);
+    NVIC_SetPriority(config->resources.transmit.irq, config->uart.priority);
     NVIC_ClearPendingIRQ(state->uart.irq);
-    NVIC_ClearPendingIRQ(config->transmit.irq);
+    NVIC_ClearPendingIRQ(config->resources.transmit.irq);
     state->uart.closing = false;
     NVIC_EnableIRQ(state->uart.irq);
-    NVIC_EnableIRQ(config->transmit.irq);
+    NVIC_EnableIRQ(config->resources.transmit.irq);
     nx_arch_dsb();
     return NX_SUCCESS;
 }
@@ -366,7 +366,7 @@ static bool progress_dma(nx_stm32_uart_hal_state_t* state) {
             nx_arch_dsb();
             if ((dma->Instance->CR & DMA_SxCR_EN) != 0U) {
                 nx_arch_irq_state_t saved = nx_arch_irq_save();
-                NVIC_DisableIRQ(state->config->transmit.irq);
+                NVIC_DisableIRQ(state->config->resources.transmit.irq);
                 state->masked_vectors |=
                     NX_HAL_DMA_VECTOR | NX_HAL_DMA_DRAIN_PENDING;
                 if (uart->active != NULL &&
@@ -517,8 +517,8 @@ static nx_result_t start(nx_stm32_uart_hal_state_t* state,
     state->flags &= (uint8_t)~NX_HAL_MEMORY_COMPLETE;
     state->uart.drain_deadline = NX_DEADLINE_NEVER;
     state->hal_depth = 1U;
-    NVIC_ClearPendingIRQ(state->config->transmit.irq);
-    NVIC_EnableIRQ(state->config->transmit.irq);
+    NVIC_ClearPendingIRQ(state->config->resources.transmit.irq);
+    NVIC_EnableIRQ(state->config->resources.transmit.irq);
     nx_arch_irq_restore(saved);
     HAL_StatusTypeDef started = HAL_UART_Transmit_DMA(
         &state->handle, request->data, (uint16_t)request->length);
@@ -607,7 +607,7 @@ static uint32_t dma_errors(nx_stm32_uart_hal_state_t* state) {
  */
 static bool detach(nx_stm32_uart_hal_state_t* state) {
     DMA_HandleTypeDef* dma = &state->dma;
-    NVIC_DisableIRQ(state->config->transmit.irq);
+    NVIC_DisableIRQ(state->config->resources.transmit.irq);
     LL_USART_DisableIT_TC(state->handle.Instance);
     LL_USART_DisableIT_TXE(state->handle.Instance);
     __HAL_DMA_DISABLE_IT(dma, DMA_IT_TC | DMA_IT_HT | DMA_IT_TE | DMA_IT_DME);
@@ -618,8 +618,8 @@ static bool detach(nx_stm32_uart_hal_state_t* state) {
         (dma->Instance->FCR & DMA_SxFCR_FEIE) != 0U ||
         (state->handle.Instance->CR1 & (USART_CR1_TXEIE | USART_CR1_TCIE)) !=
             0U ||
-        NVIC_GetEnableIRQ(state->config->transmit.irq) != 0U ||
-        NVIC_GetActive(state->config->transmit.irq) != 0U)
+        NVIC_GetEnableIRQ(state->config->resources.transmit.irq) != 0U ||
+        NVIC_GetActive(state->config->resources.transmit.irq) != 0U)
         return false;
     if (state->uart.terminal == NX_SUCCESS &&
         (dma_errors(state) != 0U || dma->ErrorCode != HAL_DMA_ERROR_NONE))
@@ -641,7 +641,7 @@ static bool detach(nx_stm32_uart_hal_state_t* state) {
     uint32_t complete =
         __HAL_DMA_GET_TC_FLAG_INDEX(dma) | __HAL_DMA_GET_HT_FLAG_INDEX(dma);
     __HAL_DMA_CLEAR_FLAG(dma, complete);
-    NVIC_ClearPendingIRQ(state->config->transmit.irq);
+    NVIC_ClearPendingIRQ(state->config->resources.transmit.irq);
     nx_arch_dsb();
     if (state->uart.terminal == NX_SUCCESS && dma_errors(state) != 0U)
         state->uart.terminal = NX_ERROR_IO;
@@ -650,7 +650,7 @@ static bool detach(nx_stm32_uart_hal_state_t* state) {
            (dma->Instance->CR & (DMA_SxCR_EN | DMA_SxCR_TCIE | DMA_SxCR_HTIE |
                                  DMA_SxCR_TEIE | DMA_SxCR_DMEIE)) == 0U &&
            (dma->Instance->FCR & DMA_SxFCR_FEIE) == 0U &&
-           NVIC_GetPendingIRQ(state->config->transmit.irq) == 0U;
+           NVIC_GetPendingIRQ(state->config->resources.transmit.irq) == 0U;
 }
 
 static void service(void* context) {
@@ -764,16 +764,16 @@ static nx_result_t stop(void* context) {
             return NX_ERROR_BUSY;
     }
     NVIC_DisableIRQ(uart->irq);
-    NVIC_DisableIRQ(state->config->transmit.irq);
+    NVIC_DisableIRQ(state->config->resources.transmit.irq);
     NVIC_ClearPendingIRQ(uart->irq);
-    NVIC_ClearPendingIRQ(state->config->transmit.irq);
+    NVIC_ClearPendingIRQ(state->config->resources.transmit.irq);
     nx_arch_dsb();
     if (state->hal_depth != 0U || NVIC_GetEnableIRQ(uart->irq) != 0U ||
-        NVIC_GetEnableIRQ(state->config->transmit.irq) != 0U ||
+        NVIC_GetEnableIRQ(state->config->resources.transmit.irq) != 0U ||
         NVIC_GetPendingIRQ(uart->irq) != 0U ||
-        NVIC_GetPendingIRQ(state->config->transmit.irq) != 0U ||
+        NVIC_GetPendingIRQ(state->config->resources.transmit.irq) != 0U ||
         NVIC_GetActive(uart->irq) != 0U ||
-        NVIC_GetActive(state->config->transmit.irq) != 0U ||
+        NVIC_GetActive(state->config->resources.transmit.irq) != 0U ||
         (state->dma.Instance->CR & DMA_SxCR_EN) != 0U)
         return NX_ERROR_BUSY;
     state->flags |= NX_HAL_DEINITIALIZING;
@@ -798,11 +798,11 @@ static nx_result_t stop(void* context) {
         state->dma.Instance->M0AR != 0U || state->dma.Instance->M1AR != 0U ||
         state->dma.Instance->PAR != 0U || state->dma.Instance->NDTR != 0U ||
         NVIC_GetEnableIRQ(uart->irq) != 0U ||
-        NVIC_GetEnableIRQ(state->config->transmit.irq) != 0U ||
+        NVIC_GetEnableIRQ(state->config->resources.transmit.irq) != 0U ||
         NVIC_GetPendingIRQ(uart->irq) != 0U ||
-        NVIC_GetPendingIRQ(state->config->transmit.irq) != 0U ||
+        NVIC_GetPendingIRQ(state->config->resources.transmit.irq) != 0U ||
         NVIC_GetActive(uart->irq) != 0U ||
-        NVIC_GetActive(state->config->transmit.irq) != 0U)
+        NVIC_GetActive(state->config->resources.transmit.irq) != 0U)
         return NX_ERROR_IO;
     uart->wake = NULL;
     uart->rx_head = uart->rx_tail = uart->rx_count = 0U;
@@ -825,8 +825,8 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     nx_result_t result =
         nx_stm32_irq_wake_validate(wake, state->uart.irq, syscall_ceiling);
     if (result == NX_SUCCESS)
-        result = nx_stm32_irq_wake_validate(wake, state->config->transmit.irq,
-                                            syscall_ceiling);
+        result = nx_stm32_irq_wake_validate(
+            wake, state->config->resources.transmit.irq, syscall_ceiling);
     if (result == NX_SUCCESS) {
         nx_arch_irq_state_t saved = nx_arch_irq_save();
         state->uart.wake = wake;
@@ -865,7 +865,7 @@ nx_stm32_uart_hal_cold_prepare(nx_stm32_uart_hal_state_t* state,
         return result;
     if (!nx_stm32_uart_cold_dma_valid(config, false, true))
         return NX_ERROR_INVALID;
-    if ((config->transmit.registers->CR & DMA_SxCR_EN) != 0U)
+    if ((config->resources.transmit.stream->CR & DMA_SxCR_EN) != 0U)
         return NX_ERROR_BUSY;
     result = nx_stm32_uart_cold_acquire(&config->uart, receipt);
     if (result != NX_SUCCESS)

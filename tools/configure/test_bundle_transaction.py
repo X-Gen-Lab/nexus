@@ -196,13 +196,17 @@ class BundleTransactionTests(unittest.TestCase):
 
     def test_configuration_code_changed_during_resolution_is_rejected(self):
         code_root = self.root / "generator"
-        paths, _ = gate.dependencies.snapshot(mode="platform", test_support=True)
+        paths, _ = gate.dependencies.snapshot(
+            mode="platform", family="native", test_support=True)
         for name, source in paths.items():
             target = code_root / name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
         original = gate.resolve_ir
-        for module in ('tools/configure/factory.py', 'tools/configure/emission.py', 'tests/support/native/configure/emission.py', 'tools/configure/stm32f4/hardware.py'):
+        for module in ('tools/configure/factory.py',
+                       'tools/configure/emission.py',
+                       'tests/support/native/configure/emission.py',
+                       'tools/configure/hardware_bindings.py'):
             with self.subTest(module=module):
                 def changing(*args, **kwargs):
                     result = original(*args, **kwargs)

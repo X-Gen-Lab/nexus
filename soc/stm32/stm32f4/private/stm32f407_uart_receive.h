@@ -1,6 +1,6 @@
 /**
  * \file            stm32f407_uart_receive.h
- * \brief           Selected USART1 DMA receive targets and producer loans
+ * \brief           Selected UART DMA receive targets and producer loans
  * \author          Nexus Team
  */
 #ifndef NEXUS_STM32F407_UART_RECEIVE_H
@@ -12,13 +12,13 @@
 typedef struct {
     nx_stm32_uart_state_t uart;
     const nx_stm32_uart_dma_resources_t* resources;
-    DMA_Stream_TypeDef* receive;
     nx_stream_t* stream;
     nx_stream_producer_t producer;
-    nx_stream_fill_t fill[3];
     uint32_t boundary;
-    unsigned expected_bank;
-    size_t loans;
+    nx_stream_fill_t fill[3];
+    /** \brief Two hardware banks and at most three retained producer loans. */
+    uint8_t expected_bank;
+    uint8_t loans;
     bool continuous;
     bool pending;
     bool fault;
@@ -39,12 +39,12 @@ extern const nx_uart_ops_t nx_stm32_uart_receive_ops;
 extern const nx_uart_ops_t nx_stm32_uart_duplex_ops;
 
 /**
- * \brief           Initialize exact USART1/DMA2 stream2 receive facts.
+ * \brief           Initialize selected UART and immutable RX DMA facts.
  * \param[in,out]   state: Fresh selected state; caller blocks arrive at
  *                  rx_start and remain borrowed through successful rx_stop.
- * \param[in]       clock_hz: Exact USART1 peripheral clock.
+ * \param[in]       clock_hz: Exact selected UART peripheral clock.
  * \return          Success or INVALID/UNSUPPORTED/BUSY without block borrow.
- * \note            Task-only; optional TX DMA uses stream7/channel4. Assembly
+ * \note            Task-only; duplex selects its independent TX route. Assembly
  *                  owns reviewed pins, clocks and all vector priorities.
  */
 nx_result_t
@@ -57,7 +57,7 @@ nx_stm32_uart_receive_initialize(nx_stm32_uart_receive_state_t* state,
  */
 void nx_stm32_uart_receive_irq(nx_stm32_uart_receive_state_t* state);
 /**
- * \brief           Observe only DMA2 stream2 receive completion or faults.
+ * \brief           Observe only the selected RX DMA completion or faults.
  * \param[in,out]   state: Same selected instance as the USART vector.
  * \note            Publication requires removal of every hardware write
  *                  reference; failure to disable keeps the producer loan.

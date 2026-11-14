@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "rtc",
+      "mode": "adopt-retained",
+      "implementation": "rtc",
+      "static_recipe": {
+        "state_type": "nx_stm32_rtc_state_t",
+        "ops": "nx_stm32_rtc_ops",
+        "declarations": [
+          {
+            "role": "rtc_config",
+            "type": "nx_stm32_rtc_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "clock",
+                  {
+                    "record": [
+                      [
+                        "read",
+                        {
+                          "symbol": "nx_stm32_rtc_clock_read"
+                        }
+                      ],
+                      [
+                        "context",
+                        {
+                          "address": "g_nx_stm32_system"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "timeout_us",
+                  {
+                    "source": "item.options.timeout_us"
+                  }
+                ],
+                [
+                  "poll_limit",
+                  {
+                    "source": "item.options.poll_limit"
+                  }
+                ],
+                [
+                  "policy",
+                  {
+                    "symbol": "NX_STM32_RTC_ADOPT_RETAINED"
+                  }
+                ],
+                [
+                  "lse_bypass",
+                  {
+                    "source": "item.options.lse_bypass"
+                  }
+                ],
+                [
+                  "allow_set",
+                  {
+                    "source": "item.options.allow_set"
+                  }
+                ],
+                [
+                  "has_initial",
+                  false
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32_rtc_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "rtc_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_rtc_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "stm32f407_rtc.h"
+      ]
+    },
+    {
+      "kind": "rtc",
+      "mode": "provision-empty",
+      "implementation": "rtc",
+      "static_recipe": {
+        "state_type": "nx_stm32_rtc_state_t",
+        "ops": "nx_stm32_rtc_ops",
+        "declarations": [
+          {
+            "role": "rtc_config",
+            "type": "nx_stm32_rtc_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "clock",
+                  {
+                    "record": [
+                      [
+                        "read",
+                        {
+                          "symbol": "nx_stm32_rtc_clock_read"
+                        }
+                      ],
+                      [
+                        "context",
+                        {
+                          "address": "g_nx_stm32_system"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "timeout_us",
+                  {
+                    "source": "item.options.timeout_us"
+                  }
+                ],
+                [
+                  "poll_limit",
+                  {
+                    "source": "item.options.poll_limit"
+                  }
+                ],
+                [
+                  "policy",
+                  {
+                    "symbol": "NX_STM32_RTC_PROVISION_EMPTY"
+                  }
+                ],
+                [
+                  "lse_bypass",
+                  {
+                    "source": "item.options.lse_bypass"
+                  }
+                ],
+                [
+                  "allow_set",
+                  {
+                    "source": "item.options.allow_set"
+                  }
+                ],
+                [
+                  "has_initial",
+                  true
+                ],
+                [
+                  "initial",
+                  {
+                    "record": [
+                      [
+                        "year",
+                        {
+                          "source": "item.options.initial.year"
+                        }
+                      ],
+                      [
+                        "month",
+                        {
+                          "source": "item.options.initial.month"
+                        }
+                      ],
+                      [
+                        "day",
+                        {
+                          "source": "item.options.initial.day"
+                        }
+                      ],
+                      [
+                        "weekday",
+                        {
+                          "source": "item.options.initial.weekday"
+                        }
+                      ],
+                      [
+                        "hour",
+                        {
+                          "source": "item.options.initial.hour"
+                        }
+                      ],
+                      [
+                        "minute",
+                        {
+                          "source": "item.options.initial.minute"
+                        }
+                      ],
+                      [
+                        "second",
+                        {
+                          "source": "item.options.initial.second"
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32_rtc_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "rtc_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_rtc_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "stm32f407_rtc.h"
+      ]
+    }
+  ]
+}

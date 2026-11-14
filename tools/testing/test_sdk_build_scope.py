@@ -34,6 +34,13 @@ class SDKBuildScopeTests(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertFalse(self.selected(name))
 
+    def test_inventory_verifiers_do_not_enter_the_selected_sdk(self):
+        for name in ("stm32f1_hal_lock", "stm32g4_hal_lock", "stm32g4_lock",
+                     "stm32h5_device_lock", "stm32h5_hal_lock",
+                     "stm32h7_hal_lock", "stm32u5_hal_lock", "stm32_ll_lock"):
+            with self.subTest(name=name):
+                self.assertFalse(self.selected("tools/maintenance/" + name + ".py"))
+
     def test_documentation_tests_are_not_product_build_inputs(self):
         self.assertFalse(self.selected("tools/documentation/test_cli.py"))
 

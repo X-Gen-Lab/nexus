@@ -36,42 +36,36 @@
 #define NX_PLATFORM_PRIORITY_WRITE(reg, value) ((reg) = (uint8_t)(value))
 #endif
 
-/** \brief Selected register identity determines the immutable reviewed route.
- */
-static bool primary(const nx_stm32_spi_dma_state_t* state) {
-    return state->spi.registers != SPI2 && state->spi.registers != SPI3;
+/** \brief The immutable connection selects its own publisher and flag bank. */
+static const nx_stm32_dma_route_t* route(const nx_stm32_spi_dma_state_t* state,
+                                         bool receive) {
+    return receive ? &state->resources->receive : &state->resources->transmit;
 }
-/** \brief Each selected engine's vector is independent of DMA request
- * selectors. */
+
 static IRQn_Type dma_irq(const nx_stm32_spi_dma_state_t* state, bool receive) {
-    if (primary(state))
-        return receive ? DMA2_Stream0_IRQn : DMA2_Stream3_IRQn;
-    if (state->spi.registers == SPI3)
-        return receive ? DMA1_Stream0_IRQn : DMA1_Stream5_IRQn;
-    return receive ? DMA1_Stream3_IRQn : DMA1_Stream4_IRQn;
+    return route(state, receive)->irq;
 }
-/** \brief The second pair straddles low and high status banks. */
+
 static uint32_t flag_shift(const nx_stm32_spi_dma_state_t* state,
                            bool receive) {
-    if (primary(state))
-        return receive ? 0U : 22U;
-    if (state->spi.registers == SPI3)
-        return receive ? 0U : 6U;
-    return receive ? 22U : 0U;
+    const uint8_t shifts[4] = {0U, 6U, 16U, 22U};
+    return shifts[route(state, receive)->lane & 3U];
 }
+
 /** \brief Observe only the exact engine's retained terminal group. */
 static uint32_t flags(const nx_stm32_spi_dma_state_t* state, bool receive) {
+    const nx_stm32_dma_route_t* selected = route(state, receive);
     uint32_t bank =
-        primary(state) || receive ? state->dma->LISR : state->dma->HISR;
+        selected->lane < 4U ? selected->dma->LISR : selected->dma->HISR;
     return (bank >> flag_shift(state, receive)) & 0x3DU;
 }
 
-/** \brief W1C only the maintained SPI streams and preserve UART/ADC neighbours.
- */
+/** \brief W1C only the selected stream and preserve unrelated publishers. */
 static void acknowledge_bits(nx_stm32_spi_dma_state_t* state, bool receive,
                              uint32_t observed) {
+    const nx_stm32_dma_route_t* selected = route(state, receive);
     volatile uint32_t* clear =
-        primary(state) || receive ? &state->dma->LIFCR : &state->dma->HIFCR;
+        selected->lane < 4U ? &selected->dma->LIFCR : &selected->dma->HIFCR;
     NX_STM32_SPI_DMA_ACK(clear, observed << flag_shift(state, receive));
 #ifndef NEXUS_STM32_MODEL
     NVIC_ClearPendingIRQ(dma_irq(state, receive));
@@ -85,7 +79,7 @@ static void acknowledge(nx_stm32_spi_dma_state_t* state, bool receive) {
 
 /** \brief Withdraw DMA requests before disabling their memory engines. */
 static void detach(nx_stm32_spi_dma_state_t* state, bool receive) {
-    DMA_Stream_TypeDef* stream = receive ? state->rx : state->tx;
+    DMA_Stream_TypeDef* stream = route(state, receive)->stream;
     if (receive) {
         LL_SPI_DisableDMAReq_RX(state->spi.registers);
     } else {
@@ -98,24 +92,38 @@ static void detach(nx_stm32_spi_dma_state_t* state, bool receive) {
     acknowledge_bits(state, receive, flags(state, receive) & 0x30U);
 }
 
-/** \brief RM0090 fixed full-duplex routes, without per-instance metadata. */
-static bool route_valid(SPI_TypeDef* registers, DMA_TypeDef* dma,
-                        DMA_Stream_TypeDef* tx, DMA_Stream_TypeDef* rx) {
-    if (registers == SPI1)
-        return dma == DMA2 && tx == DMA2_Stream3 && rx == DMA2_Stream0;
-    if (registers == SPI2)
-        return dma == DMA1 && tx == DMA1_Stream4 && rx == DMA1_Stream3;
-    return registers == SPI3 && dma == DMA1 && tx == DMA1_Stream5 &&
-           rx == DMA1_Stream0;
+/** \brief Validate immutable resource shapes before any register access. */
+static bool resources_valid(const nx_stm32_spi_dma_resources_t* resources) {
+    return resources != NULL &&
+           nx_stm32_dma_route_valid(&resources->transmit) &&
+           nx_stm32_dma_route_valid(&resources->receive) &&
+           resources->transmit.stream != resources->receive.stream &&
+           resources->transmit.irq != resources->receive.irq &&
+           resources->regions != NULL && resources->region_count != 0U &&
+           resources->region_count <= SIZE_MAX / sizeof(*resources->regions);
 }
 
-/** \brief Refuse alternate controller routes before acquiring any request. */
+/** \brief Physical request unit/selectors follow the selected F4 SPI IP.
+ * \note Exact available lanes are SoC route facts; the owner does not choose
+ *       alternatives or infer a stream from the peripheral instance.
+ */
+static bool route_valid(SPI_TypeDef* registers,
+                        const nx_stm32_spi_dma_resources_t* resources) {
+    if (!resources_valid(resources) ||
+        (registers != SPI1 && registers != SPI2 && registers != SPI3))
+        return false;
+    DMA_TypeDef* dma = registers == SPI1 ? DMA2 : DMA1;
+    uint8_t channel = registers == SPI1 ? 3U : 0U;
+    return resources->transmit.dma == dma && resources->receive.dma == dma &&
+           resources->transmit.channel == channel &&
+           resources->receive.channel == channel;
+}
+
+/** \brief Admit resolved resources before acquiring any request. */
 nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state) {
     if (state == NULL || state->spi.registers == NULL ||
         state->spi.rcc == NULL || state->spi.clock_hz == 0U ||
-        state->dma == NULL || state->tx == NULL || state->rx == NULL ||
-        state->tx == state->rx || state->regions == NULL ||
-        state->region_count == 0U) {
+        !resources_valid(state->resources)) {
         return NX_ERROR_INVALID;
     }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
@@ -123,14 +131,16 @@ nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state) {
     }
 #ifndef NEXUS_STM32_MODEL
     bool first = state->spi.registers == SPI1;
-    if (!route_valid(state->spi.registers, state->dma, state->tx, state->rx) ||
+    if (!route_valid(state->spi.registers, state->resources) ||
         state->spi.rcc != RCC ||
         state->spi.clock_hz != (first ? NEXUS_APB2_HZ : NEXUS_APB1_HZ)) {
         return NX_ERROR_UNSUPPORTED;
     }
 #endif
     if (state->initialized || state->spi.active || state->active != NULL ||
-        ((state->tx->CR | state->rx->CR) & DMA_SxCR_EN) != 0U ||
+        ((state->resources->transmit.stream->CR |
+          state->resources->receive.stream->CR) &
+         DMA_SxCR_EN) != 0U ||
         (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
         return NX_ERROR_BUSY;
     }
@@ -195,6 +205,19 @@ static nx_result_t configuration(nx_stm32_spi_dma_endpoint_state_t* device,
     return NX_SUCCESS;
 }
 
+/** \brief Immutable route/domain metadata never becomes transfer storage. */
+static bool resources_storage(const nx_stm32_spi_dma_state_t* state,
+                              const void* storage, size_t bytes) {
+    const nx_stm32_spi_dma_resources_t* resources = state->resources;
+    return resources != NULL && nx_io_dispatch_span(storage, bytes, 1U) &&
+           resources->region_count <= SIZE_MAX / sizeof(*resources->regions) &&
+           !nx_io_dispatch_overlap(storage, bytes, resources,
+                                   sizeof(*resources)) &&
+           !nx_io_dispatch_overlap(storage, bytes, resources->regions,
+                                   resources->region_count *
+                                       sizeof(*resources->regions));
+}
+
 /** \brief The full-duplex mode never allocates scratch buffers or copies
  * payload. */
 static nx_result_t validate_buffers(nx_stm32_spi_dma_state_t* state,
@@ -218,15 +241,19 @@ static nx_result_t validate_buffers(nx_stm32_spi_dma_state_t* state,
     size_t rx_span = (memory_flags & NX_SPI_MEMORY_RX_FIXED) != 0U
                          ? width
                          : request->length * width;
-    nx_result_t result =
-        nx_dma_buffer_validate(state->regions, state->region_count, request->tx,
-                               tx_span, width, NX_DMA_TO_DEVICE);
+    if (!resources_storage(state, request, sizeof(*request)) ||
+        !resources_storage(state, request->tx, tx_span) ||
+        !resources_storage(state, request->rx, rx_span))
+        return NX_ERROR_INVALID;
+    nx_result_t result = nx_dma_buffer_validate(
+        state->resources->regions, state->resources->region_count, request->tx,
+        tx_span, width, NX_DMA_TO_DEVICE);
     if (result != NX_SUCCESS) {
         return result;
     }
-    result =
-        nx_dma_buffer_validate(state->regions, state->region_count, request->rx,
-                               rx_span, width, NX_DMA_FROM_DEVICE);
+    result = nx_dma_buffer_validate(state->resources->regions,
+                                    state->resources->region_count, request->rx,
+                                    rx_span, width, NX_DMA_FROM_DEVICE);
     if (result != NX_SUCCESS) {
         return result;
     }
@@ -239,7 +266,7 @@ static nx_result_t validate_buffers(nx_stm32_spi_dma_state_t* state,
 /** \brief Program exactly one disabled DMA memory engine. */
 static void program(nx_stm32_spi_dma_state_t* state, bool receive,
                     nx_spi_request_t* request, uint8_t bits) {
-    DMA_Stream_TypeDef* stream = receive ? state->rx : state->tx;
+    DMA_Stream_TypeDef* stream = route(state, receive)->stream;
     acknowledge(state, receive);
     stream->PAR = (uint32_t)(uintptr_t)&state->spi.registers->DR;
     stream->M0AR = (uint32_t)(uintptr_t)(receive ? request->rx : request->tx);
@@ -248,10 +275,11 @@ static void program(nx_stm32_spi_dma_state_t* state, bool receive,
     uint8_t fixed = receive ? NX_SPI_MEMORY_RX_FIXED : NX_SPI_MEMORY_TX_FIXED;
     uint32_t increment =
         (state->memory_flags & fixed) != 0U ? 0U : DMA_SxCR_MINC;
-    stream->CR = ((primary(state) ? 3U : 0U) << DMA_SxCR_CHSEL_Pos) |
-                 (bits == 16U ? DMA_SxCR_MSIZE_0 | DMA_SxCR_PSIZE_0 : 0U) |
-                 increment | DMA_SxCR_PL_1 | DMA_SxCR_TCIE | DMA_SxCR_TEIE |
-                 DMA_SxCR_DMEIE | (receive ? 0U : DMA_SxCR_DIR_0);
+    stream->CR =
+        ((uint32_t)route(state, receive)->channel << DMA_SxCR_CHSEL_Pos) |
+        (bits == 16U ? DMA_SxCR_MSIZE_0 | DMA_SxCR_PSIZE_0 : 0U) | increment |
+        DMA_SxCR_PL_1 | DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE |
+        (receive ? 0U : DMA_SxCR_DIR_0);
 }
 
 /** \brief Keep the first terminal error and deadline through every retry. */
@@ -297,6 +325,8 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
         return NX_ERROR_CONTEXT;
     }
     nx_stm32_spi_dma_state_t* state = device->dma;
+    if (!state->initialized || state->stopping)
+        return NX_ERROR_STATE;
     result = validate_buffers(state, request, memory_flags, bits);
     if (result != NX_SUCCESS) {
         return result;
@@ -306,7 +336,9 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
     result = NX_ERROR_STATE;
     if (state->initialized && !state->stopping && !state->spi.fault) {
         if (state->active != NULL || (state->spi.active && !retained_cs) ||
-            ((state->tx->CR | state->rx->CR) & DMA_SxCR_EN) != 0U ||
+            ((state->resources->transmit.stream->CR |
+              state->resources->receive.stream->CR) &
+             DMA_SxCR_EN) != 0U ||
             (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
             result = NX_ERROR_BUSY;
         } else if (!retained_cs ||
@@ -347,8 +379,8 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
         return NX_SUCCESS;
     }
     nx_arch_dsb();
-    state->rx->CR |= DMA_SxCR_EN;
-    state->tx->CR |= DMA_SxCR_EN;
+    state->resources->receive.stream->CR |= DMA_SxCR_EN;
+    state->resources->transmit.stream->CR |= DMA_SxCR_EN;
     state->spi.registers->CR2 = SPI_CR2_RXDMAEN | SPI_CR2_TXDMAEN;
     LL_SPI_Enable(state->spi.registers);
     nx_arch_irq_restore(saved);
@@ -420,7 +452,7 @@ void nx_stm32_spi_dma_irq(nx_stm32_spi_dma_state_t* state, bool receive) {
         }
         return;
     }
-    DMA_Stream_TypeDef* stream = receive ? state->rx : state->tx;
+    DMA_Stream_TypeDef* stream = route(state, receive)->stream;
     if ((status & 0x0DU) != 0U || stream->NDTR != 0U) {
         begin_drain(state, NX_ERROR_IO);
     } else {
@@ -475,10 +507,12 @@ static void service_phase(void* context, bool retained_cs) {
     /* A final DMA beat may affect SPI as EN clears. Observe all withdrawal
      * readbacks before the barrier and the final peripheral-idle snapshot. */
     uint32_t requests = state->spi.registers->CR2;
-    uint32_t tx_control = NX_SPI_DMA_SEQUENCE_ENGINE_READ(&state->tx->CR);
-    uint32_t rx_control = NX_SPI_DMA_SEQUENCE_ENGINE_READ(&state->rx->CR);
-    size_t tx_remaining = state->tx->NDTR;
-    size_t rx_remaining = state->rx->NDTR;
+    uint32_t tx_control =
+        NX_SPI_DMA_SEQUENCE_ENGINE_READ(&state->resources->transmit.stream->CR);
+    uint32_t rx_control =
+        NX_SPI_DMA_SEQUENCE_ENGINE_READ(&state->resources->receive.stream->CR);
+    size_t tx_remaining = state->resources->transmit.stream->NDTR;
+    size_t rx_remaining = state->resources->receive.stream->NDTR;
     bool requests_detached =
         (requests & (SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN)) == 0U;
     nx_arch_dsb();
@@ -561,7 +595,9 @@ static nx_result_t stop(void* context) {
     }
     detach(state, false);
     detach(state, true);
-    if (((state->tx->CR | state->rx->CR) & DMA_SxCR_EN) != 0U ||
+    if (((state->resources->transmit.stream->CR |
+          state->resources->receive.stream->CR) &
+         DMA_SxCR_EN) != 0U ||
         (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
         return NX_ERROR_BUSY;
     }
@@ -587,10 +623,9 @@ static nx_result_t stop(void* context) {
 /** \brief Validate one controller's complete immutable resource tuple. */
 static bool cold_config(const nx_stm32_spi_dma_config_t* config) {
     return config != NULL && nx_stm32_spi_config_valid(&config->spi) &&
-           config->regions != NULL && config->region_count != 0U &&
-           config->priority <= 15U &&
-           route_valid(config->spi.registers, config->dma, config->tx,
-                       config->rx);
+           config->resources.regions != NULL &&
+           config->resources.region_count != 0U && config->priority <= 15U &&
+           route_valid(config->spi.registers, &config->resources);
 }
 
 nx_result_t nx_stm32_spi_dma_prepare(nx_stm32_spi_dma_state_t* state,
@@ -607,14 +642,8 @@ nx_result_t nx_stm32_spi_dma_prepare(nx_stm32_spi_dma_state_t* state,
         nx_stm32_spi_admit(&state->spi, &config->spi, &receipt->spi);
     if (result != NX_SUCCESS)
         return result;
-    const bool first = config->spi.registers == SPI1;
-    const bool third = config->spi.registers == SPI3;
-    const unsigned vectors[2] = {first   ? DMA2_Stream0_IRQn
-                                 : third ? DMA1_Stream0_IRQn
-                                         : DMA1_Stream3_IRQn,
-                                 first   ? DMA2_Stream3_IRQn
-                                 : third ? DMA1_Stream5_IRQn
-                                         : DMA1_Stream4_IRQn};
+    const unsigned vectors[2] = {(unsigned)config->resources.receive.irq,
+                                 (unsigned)config->resources.transmit.irq};
     for (unsigned i = 0U; i < 2U; ++i) {
         const unsigned irq = vectors[i];
         const uint32_t mask = 1UL << (irq % 32U);
@@ -623,7 +652,9 @@ nx_result_t nx_stm32_spi_dma_prepare(nx_stm32_spi_dma_state_t* state,
              mask) != 0U)
             return NX_ERROR_BUSY;
     }
-    if (((config->tx->CR | config->rx->CR) & DMA_SxCR_EN) != 0U)
+    if (((config->resources.transmit.stream->CR |
+          config->resources.receive.stream->CR) &
+         DMA_SxCR_EN) != 0U)
         return NX_ERROR_BUSY;
     if (config->kernel_bound && NVIC_GetPriorityGrouping() > 3U)
         return NX_ERROR_PERMISSION;
@@ -631,11 +662,7 @@ nx_result_t nx_stm32_spi_dma_prepare(nx_stm32_spi_dma_state_t* state,
         nx_stm32_spi_cold_acquire(&state->spi, &config->spi, &receipt->spi);
     if (result != NX_SUCCESS)
         return result;
-    state->dma = config->dma;
-    state->tx = config->tx;
-    state->rx = config->rx;
-    state->regions = config->regions;
-    state->region_count = config->region_count;
+    state->resources = &config->resources;
     for (size_t i = 0U; i < config->spi.endpoint_count; ++i) {
         nx_stm32_spi_dma_endpoint_state_t* endpoint =
             (nx_stm32_spi_dma_endpoint_state_t*)config->spi.endpoints[i]
@@ -737,19 +764,20 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
 static bool polling_storage(const nx_stm32_spi_dma_endpoint_state_t* device,
                             const void* data, size_t bytes) {
     const nx_stm32_spi_dma_state_t* state = device->dma;
-    return nx_io_dispatch_span(data, bytes, 1U) &&
-           state->region_count <= SIZE_MAX / sizeof(*state->regions) &&
+    return resources_storage(state, data, bytes) &&
            !nx_io_dispatch_overlap(data, bytes, device, sizeof(*device)) &&
            !nx_io_dispatch_overlap(data, bytes, state, sizeof(*state)) &&
-           !nx_io_dispatch_overlap(data, bytes, state->dma,
-                                   sizeof(*state->dma)) &&
-           !nx_io_dispatch_overlap(data, bytes, state->tx,
-                                   sizeof(*state->tx)) &&
-           !nx_io_dispatch_overlap(data, bytes, state->rx,
-                                   sizeof(*state->rx)) &&
-           !nx_io_dispatch_overlap(data, bytes, state->regions,
-                                   state->region_count *
-                                       sizeof(*state->regions));
+           !nx_io_dispatch_overlap(data, bytes, state->resources->transmit.dma,
+                                   sizeof(*state->resources->transmit.dma)) &&
+           !nx_io_dispatch_overlap(
+               data, bytes, state->resources->transmit.stream,
+               sizeof(*state->resources->transmit.stream)) &&
+           !nx_io_dispatch_overlap(data, bytes,
+                                   state->resources->receive.stream,
+                                   sizeof(*state->resources->receive.stream)) &&
+           !nx_io_dispatch_overlap(data, bytes, state->resources->regions,
+                                   state->resources->region_count *
+                                       sizeof(*state->resources->regions));
 }
 
 /** \brief Optional polling keeps the same arbitration gate as finite DMA. */
@@ -810,11 +838,14 @@ sequence_validate(void* context, void* child,
         return NX_ERROR_STATE;
     }
     if (state->active != NULL || state->spi.active ||
-        ((state->tx->CR | state->rx->CR) & DMA_SxCR_EN) != 0U ||
+        ((state->resources->transmit.stream->CR |
+          state->resources->receive.stream->CR) &
+         DMA_SxCR_EN) != 0U ||
         (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
         return NX_ERROR_BUSY;
     }
-    if (state->region_count > SIZE_MAX / sizeof(*state->regions)) {
+    if (state->resources->region_count >
+        SIZE_MAX / sizeof(*state->resources->regions)) {
         return NX_ERROR_INVALID;
     }
     result =
@@ -825,8 +856,13 @@ sequence_validate(void* context, void* child,
     }
     if (result == NX_SUCCESS) {
         result = nx_spi_dma_sequence_storage_validate(
-            request, state->regions,
-            state->region_count * sizeof(*state->regions));
+            request, state->resources, sizeof(*state->resources));
+    }
+    if (result == NX_SUCCESS) {
+        result = nx_spi_dma_sequence_storage_validate(
+            request, state->resources->regions,
+            state->resources->region_count *
+                sizeof(*state->resources->regions));
     }
     if (result == NX_SUCCESS) {
         result = nx_spi_dma_sequence_storage_validate(
@@ -875,7 +911,9 @@ static nx_result_t sequence_release(void* context, void* child) {
         return NX_ERROR_INVALID;
     }
     if (state->active != NULL ||
-        ((state->tx->CR | state->rx->CR) & DMA_SxCR_EN) != 0U ||
+        ((state->resources->transmit.stream->CR |
+          state->resources->receive.stream->CR) &
+         DMA_SxCR_EN) != 0U ||
         (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
         return NX_ERROR_BUSY;
     }

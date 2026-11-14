@@ -3,8 +3,10 @@
   "scope": "sdk_device_compile",
   "sdk": {
     "directory": "vendors/st/cmsis_device_f4",
+    "dependency": "cmsis_device_f4",
     "commit": "3c77349ce04c8af401454cc51f85ea9a50e34fc1",
     "core_directory": "vendors/arm/CMSIS_6",
+    "core_dependency": "cmsis_core",
     "core_commit": "af1b110e46a1720349f6f125e386e126767699bd"
   },
   "devices": [

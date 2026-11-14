@@ -124,7 +124,8 @@ def _dac_tx_factory(result):
         'const nx_dac_tx_port_t* nx_factory_dac_tx(nx_dac_id_t id) {',
         '    switch (id) {']
     for item in instances:
-        if for_selection(item).mode_implementation(item.kind, item.mode) == "dac_dma":
+        if for_selection(item).mode_implementation(
+                item.kind, item.mode, item.controller) == "dac_dma":
             name = symbol(item.id)
             source += [f'        case NX_DAC_ID_{name.upper()}:',
                        f'            return &s_nx_dac_tx_{name};']
@@ -236,7 +237,7 @@ def _uart_validator_factory(result):
     selected = []
     for item in instances:
         provider = for_selection(item)
-        implementation = provider.mode_implementation(item.kind, item.mode)
+        implementation = provider.mode_implementation(item.kind, item.mode, item.controller)
         callback = getattr(provider, "UART_TX_VALIDATORS", {}).get(
             (item.provider, item.mode, implementation))
         if callback is not None:
@@ -327,7 +328,7 @@ def emit(result):
         for instance in instances:
             name = symbol(instance.id)
             pointer = (f"nx_device_{name}" if shape == "endpoint"
-                       else f"nx_binding_{name}_mdio" if class_name == "mdio"
+                       else f"g_nx_mdio_binding_{name}" if class_name == "mdio"
                        else f"nx_binding_{name}")
             source += [f"        case {prefix}{name.upper()}:", f"            return {pointer};"]
         source += ["        default:", "            return NULL;", "    }", "}"]
@@ -536,7 +537,7 @@ def emit_smbus(result):
     for item in selected:
         name, controller = symbol(item.id), symbol(item.controller)
         source += [f'static const nx_smbus_binding_t s_nx_smbus_binding_{name} = {{',
-            f'    &s_nx_device_face_{name}, &s_nx_face_{controller}, '
+            f'    &s_nx_device_{name}, &s_nx_face_{controller}, '
             f'{item.options.address}u', '};']
     source += [r'/** \brief Pure lookup of a selected packet PEC connection. */',
         'const nx_smbus_binding_t* nx_factory_smbus_binding(nx_i2c_device_id_t id) {',

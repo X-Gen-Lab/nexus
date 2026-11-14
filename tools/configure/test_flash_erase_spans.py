@@ -8,7 +8,7 @@ import unittest
 
 from tools.configure import configure as gate, memory
 from tools.configure.providers import maintained
-from tools.configure.stm32f4 import fsmc
+from tools.configure.policies import parallel_memory
 from tools.measurement.elf import EvidenceError, image_window
 
 
@@ -132,7 +132,7 @@ class FlashEraseSpanTests(unittest.TestCase):
                       "burst_read": False, "burst_write": False,
                       "burst_page_bytes": 0}
         try:
-            fsmc._reference_protocol(device, "flash_async", parameters)
+            parallel_memory.validate_protocol(device, "flash_async", parameters)
         except ValueError as error:
             self.fail(f"Uniform NOR span was rejected: {error}")
 

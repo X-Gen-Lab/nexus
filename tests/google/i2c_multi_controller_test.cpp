@@ -5,12 +5,12 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/arch/arch.h"
-#include "stm32f407_i2c_async.h"
+#include "stm32_i2c_dma_fixture.h"
 #define PRIMARY_REGS   ((volatile uint32_t*)I2C1)
 #define SECONDARY_REGS ((volatile uint32_t*)I2C2)
 #define LINE_INPUT     GPIOB->IDR
-#define PRIMARY_DMA    NX_STM32_I2C1_DMA
-#define SECONDARY_DMA  NX_STM32_I2C2_DMA
+#define PRIMARY_DMA    I2C1Dma
+#define SECONDARY_DMA  I2C2Dma
 #define INITIALIZE     nx_stm32_i2c_async_initialize
 #define EV0            I2C1_EV_IRQn
 #define ER0            I2C1_ER_IRQn
@@ -43,6 +43,7 @@ bool enabled(IRQn_Type irq) {
 }
 class I2CMultiple : public testing::Test {
   protected:
+    nx_i2c_v1_lines_t line_config[2]{};
     nx_i2c_v1_state_t states[2]{};
     nx_i2c_v1_endpoint_t endpoints[2]{{&states[0], 0x50U, 7U},
                                       {&states[1], 0x51U, 7U}};
@@ -72,13 +73,15 @@ class I2CMultiple : public testing::Test {
         LINE_INPUT = 0xFFFFU;
         regions[0] = {(uintptr_t)buffers, sizeof(buffers),
                       NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
-        dma[0] = nx_i2c_v1_dma_t PRIMARY_DMA(regions, 1U);
-        dma[1] = nx_i2c_v1_dma_t SECONDARY_DMA(regions, 1U);
+        dma[0] = PRIMARY_DMA(regions, 1U);
+        dma[1] = SECONDARY_DMA(regions, 1U);
         states[0].registers = PRIMARY_REGS;
         states[1].registers = SECONDARY_REGS;
         for (unsigned i = 0U; i < 2U; ++i) {
-            states[i].line_inputs = &LINE_INPUT;
-            states[i].line_mask = i == 0U ? 0xC0U : 0xC00U;
+            line_config[i] = {{&LINE_INPUT, &LINE_INPUT},
+                              {static_cast<uint16_t>(i == 0U ? 64U : 1024U),
+                               static_cast<uint16_t>(i == 0U ? 128U : 2048U)}};
+            states[i].lines = &line_config[i];
             states[i].peripheral_mhz = MHZ;
             states[i].dma = &dma[i];
             nx_request_initialize(&requests[i].base);
@@ -112,11 +115,10 @@ class I2CMultiple : public testing::Test {
     }
     void Third() {
         states[1].registers = (volatile uint32_t*)I2C3;
-        states[1].line_inputs = &GPIOA->IDR;
-        states[1].line_mask = (1U << 8U) | (1U << 9U);
+        line_config[1] = {{&GPIOA->IDR, &GPIOC->IDR}, {256U, 512U}};
         GPIOA->IDR = 1U << 8U;
         GPIOC->IDR = 1U << 9U;
-        dma[1] = nx_i2c_v1_dma_t NX_STM32_I2C3_DMA(regions, 1U);
+        dma[1] = I2C3Dma(regions, 1U);
     }
     void Submit(unsigned i) {
         ASSERT_EQ(nx_i2c_request_prepare(&requests[i], &messages[i], 1U, 1000U),
@@ -154,6 +156,33 @@ TEST_F(I2CMultiple, SecondaryColdInitLeavesPrimaryRegistersAndIrqsIntact) {
     EXPECT_EQ(NVIC_GetPriority(EV1), 6U);
 }
 
+TEST_F(I2CMultiple, SelectedAlternateDmaLaneOwnsItsPublisherAndFlagGroup) {
+    dma[1].rx.control = &DMA1_Stream3->CR;
+    dma[1].rx.count = &DMA1_Stream3->NDTR;
+    dma[1].rx.peripheral = &DMA1_Stream3->PAR;
+    dma[1].rx.memory = &DMA1_Stream3->M0AR;
+    dma[1].rx.fifo = &DMA1_Stream3->FCR;
+    dma[1].rx.flag_shift = 22U;
+    dma[1].rx.publisher = (uint16_t)DMA1_Stream3_IRQn;
+    ASSERT_EQ(INITIALIZE(&states[1], 6U), NX_SUCCESS);
+    EXPECT_TRUE(enabled(DMA1_Stream3_IRQn));
+    EXPECT_FALSE(enabled(RX1));
+    EXPECT_EQ(NVIC_GetPriority(DMA1_Stream3_IRQn), 6U);
+    ASSERT_NO_FATAL_FAILURE(Submit(1U));
+    EXPECT_EQ(7U, (*dma[1].rx.control & DMA_SxCR_CHSEL) >> 25U);
+    auto* flags = const_cast<volatile uint32_t*>(dma[1].rx.flags);
+    *flags = (0x20U << 22U) | (0x20U << 16U);
+    *dma[1].rx.count = 0U;
+    nx_i2c_v1_dma_irq(&states[1], true);
+    EXPECT_EQ(0x20U << 16U, *flags);
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&requests[1].base));
+    ASSERT_NO_FATAL_FAILURE(Wire(1U));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&requests[1].base));
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_port_stop(&buses[1]));
+    EXPECT_FALSE(enabled(DMA1_Stream3_IRQn));
+    EXPECT_FALSE(enabled(TX1));
+}
+
 TEST_F(I2CMultiple, DuplicateLiveControllerRefusesBeforePeerMutation) {
     ASSERT_EQ(INITIALIZE(&states[0], 5U), NX_SUCCESS);
     nx_i2c_v1_state_t duplicate = states[0];
@@ -171,7 +200,7 @@ TEST_F(I2CMultiple, SecondaryCannotStealPrimaryDmaTupleOrLineRoute) {
     EXPECT_EQ(SECONDARY_REGS[0], 0U);
     EXPECT_FALSE(enabled(EV1));
     states[1].dma = &dma[1];
-    states[1].line_mask = 0xC0U;
+    line_config[1].masks[1] = line_config[1].masks[0];
     EXPECT_EQ(INITIALIZE(&states[1], 6U), NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(SECONDARY_REGS[0], 0U);
 }
@@ -252,6 +281,10 @@ TEST_F(I2CMultiple, SecondaryRejectsChangedSelectorAndInterruptBitGroup) {
     dma[1].tx.flag_shift = 16U;
     EXPECT_EQ(INITIALIZE(&states[1], 5U), NX_ERROR_UNSUPPORTED);
     EXPECT_FALSE(enabled(EV1));
+    dma[1].tx.flag_shift = 22U;
+    dma[1].rx.publisher = (uint16_t)DMA1_Stream3_IRQn;
+    EXPECT_EQ(INITIALIZE(&states[1], 5U), NX_ERROR_UNSUPPORTED);
+    EXPECT_FALSE(enabled(DMA1_Stream3_IRQn));
 }
 
 TEST_F(I2CMultiple, NonselectedControllerCannotAcquireKnownLineOrDmaFacts) {

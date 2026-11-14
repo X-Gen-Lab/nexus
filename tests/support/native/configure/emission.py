@@ -40,7 +40,7 @@ def instance_declarations(item, result):
                 name = item.id.replace("-", "_")
                 source += [f"static nx_native_spi_dma_endpoint_state_t s_nx_endpoint_{child_name} = {{ .controller = &s_nx_port_{name} }};"]
                 source += enhanced_endpoints.face(device, f"s_nx_endpoint_{child_name}",
-                                                 "nx_spi_dma_sequence_endpoint_ops")
+                                                 "nx_spi_dma_sequence_endpoint_ops", result)
                 continue
             initializer = ""
             if kind == "i2c":

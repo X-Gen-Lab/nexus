@@ -10,6 +10,7 @@ extern "C" {
 #include "nexus/core/fault.h"
 #include "stm32f407_clock.h"
 #include "stm32f407_system.h"
+#include "stm32f4_clock_encoding.h"
 #ifdef NEXUS_FAMILY_I2S_PROBE
 #include "stm32f407_audio.h"
 uint32_t g_av_trace;
@@ -30,6 +31,7 @@ uint32_t masks;
 bool irq_enabled;
 bool foreign_irq;
 bool refuse_power_gate;
+int last_irq;
 uint32_t observed_id;
 uint16_t observed_kib;
 unsigned stores;
@@ -61,6 +63,7 @@ class FamilySystem : public testing::Test {
         nx_family_rng_control = 0U;
         masks = stores = pll_stores = 0U;
         irq_enabled = foreign_irq = refuse_power_gate = false;
+        last_irq = -1;
         hardware = &writes;
         ON_CALL(writes, Call(testing::_, testing::_))
             .WillByDefault([this](volatile uint32_t* reg, uint32_t value) {
@@ -88,7 +91,7 @@ class FamilySystem : public testing::Test {
 };
 } /* namespace */
 
-TEST_F(FamilySystem, ActualHsiClockAndTim2StartAndFullyWithdraw) {
+TEST_F(FamilySystem, ActualHsiClockAndSelectedTimerStartAndFullyWithdraw) {
     ASSERT_EQ(nx_stm32_validate_identity(NX_TEST_FLASH_KIB * 1024U),
               NX_SUCCESS);
     ASSERT_EQ(nx_stm32_system_start(&g_nx_stm32_system, 8U).primary, 0);
@@ -103,6 +106,43 @@ TEST_F(FamilySystem, ActualHsiClockAndTim2StartAndFullyWithdraw) {
     EXPECT_EQ(g_nx_stm32_system.remaining_effects, 0U);
     EXPECT_EQ(power.CR, static_cast<uint32_t>(PWR_CR_DBP));
 }
+
+TEST_F(FamilySystem, SemanticClockTupleUsesReviewedCEncodings) {
+    EXPECT_EQ(NX_STM32F4_PLLCFGR(8U, 336U, 2U, 7U, 1U), 0x07405408U);
+    EXPECT_EQ(NX_STM32F4_PLLCFGR(8U, 300U, 2U, 4U, 1U), 0x04404b08U);
+    EXPECT_EQ(NX_STM32F4_CLOCK_CFGR(64U, 16U, 2U), 0x00009cc0U);
+    EXPECT_EQ(NX_STM32F4_CLOCK_SWITCH(0U, 0U), 0U);
+    EXPECT_EQ(NX_STM32F4_CLOCK_SWITCH(0U, 1U), 1U);
+    EXPECT_EQ(NX_STM32F4_CLOCK_SWITCH(1U, 0U), 2U);
+}
+
+#if defined(NX_TEST_SYSTEM_TIM5)
+TEST_F(FamilySystem, SelectedTimebaseOwnsTim5GateAndVectorOnly) {
+    ASSERT_EQ(nx_stm32_system_start(&g_nx_stm32_system, 8U).primary, 0);
+    EXPECT_EQ(rcc.APB1ENR & RCC_APB1ENR_TIM5EN,
+              static_cast<uint32_t>(RCC_APB1ENR_TIM5EN));
+    EXPECT_EQ(rcc.APB1ENR & RCC_APB1ENR_TIM2EN, 0U);
+    EXPECT_EQ(last_irq, TIM5_IRQn);
+    ASSERT_EQ(nx_stm32_system_stop(&g_nx_stm32_system, 8U), 0);
+    EXPECT_EQ(last_irq, TIM5_IRQn);
+    EXPECT_EQ(rcc.APB1ENR & RCC_APB1ENR_TIM5EN, 0U);
+}
+
+TEST_F(FamilySystem, ForeignSelectedTimebaseGateRejectsBeforeEffects) {
+    rcc.APB1ENR |= RCC_APB1ENR_TIM5EN;
+    EXPECT_EQ(nx_stm32_system_start(&g_nx_stm32_system, 8U).primary, -2);
+    EXPECT_EQ(stores, 0U);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    rcc.APB1ENR &= ~static_cast<uint32_t>(RCC_APB1ENR_TIM5EN);
+}
+
+TEST_F(FamilySystem, ForeignSelectedTimebaseResetRejectsBeforeEffects) {
+    rcc.APB1RSTR |= RCC_APB1RSTR_TIM5RST;
+    EXPECT_EQ(nx_stm32_system_start(&g_nx_stm32_system, 8U).primary, -2);
+    EXPECT_EQ(stores, 0U);
+    rcc.APB1RSTR &= ~static_cast<uint32_t>(RCC_APB1RSTR_TIM5RST);
+}
+#endif
 
 TEST_F(FamilySystem,
        InactivePllParametersAreNeitherOwnedNorWrittenByTheHsiClock) {
@@ -230,10 +270,12 @@ extern "C" void nx_family_write(volatile uint32_t* reg, uint32_t value) {
     ++stores;
     hardware->Call(reg, value);
 }
-extern "C" bool nx_family_irq_available(int) {
+extern "C" bool nx_family_irq_available(int irq) {
+    last_irq = irq;
     return !irq_enabled && !foreign_irq;
 }
-extern "C" int nx_family_irq_control(int, bool enabled) {
+extern "C" int nx_family_irq_control(int irq, bool enabled) {
+    last_irq = irq;
     irq_enabled = enabled;
     return 0;
 }

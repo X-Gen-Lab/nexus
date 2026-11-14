@@ -7,10 +7,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 00145d0b8b7ee19d7e0fd2e1ec4614e2d58a867cef9cd440e107297f98778931\n"
+"X-Nexus-Source-SHA256: 74d5bc8af272ea1dc45bb0b59e248c9ae4d0532d43d66b1c43ebe100f95da5ca\n"
 
 msgid "当前源码与维护边界"
 msgstr "Current source and maintenance boundaries"
+
+msgid "本页定位当前实现，不复制各目录的完整合同。生产 MCU 入口只有 STM32F4，精确 器件与模式以[支持范围](../delivery/support.md)为准；F407 Board 与新增料号的软件 参考分别说明。其他 SDK 原位保留，目录、实现、执行记录和物理资格不相互替代。"
+msgstr "This page locates current implementations without copying each directory contract. STM32F4 is the sole production MCU entry; [support scope](../delivery/support.md) defines exact devices and modes. F407 Boards and software references for added parts remain distinct. Other SDKs stay in place. Directories, implementation, execution records and physical qualification do not replace one another."
+
 
 msgid "维护问题"
 msgstr "Maintenance question"
@@ -88,6 +92,36 @@ msgstr ""
 "[Components](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/components/README.md)"
 
+msgid "包、binding 与接入边界"
+msgstr "Packages, bindings and integration boundaries"
+
+msgid "[接入指南](../guides/provider-porting.md)、[package loader](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/packages.py)"
+msgstr "[Porting guide](../guides/provider-porting.md), [package loader](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/packages.py)"
+
+msgid "资料身份与已审适用范围"
+msgstr "Reference identity and reviewed applicability"
+
+msgid "包内 `review_profiles.json`、[ProfileSet](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/reference_profiles.py)"
+msgstr "Package-local `review_profiles.json` and [ProfileSet](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/reference_profiles.py)"
+
+msgid "领域与私有值"
+msgstr "Domains and private values"
+
+msgid "[DomainPolicies](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/domain_policies.py)、[IR](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/ir.py)"
+msgstr "[DomainPolicies](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/domain_policies.py), [IR](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/ir.py)"
+
+msgid "静态对象与 IRQ／endpoint 连接"
+msgstr "Static objects and IRQ/endpoint connections"
+
+msgid "[StaticRecipe／StaticObjects](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/static_recipe.py)、[SharedIrq](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/shared_irq.py)、[ChildGroups](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/static_endpoints.py)"
+msgstr "[StaticRecipe/StaticObjects](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/static_recipe.py), [SharedIrq](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/shared_irq.py), [ChildGroups](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/static_endpoints.py)"
+
+msgid "单层声明和值片段"
+msgstr "Single-level declaration and value fragments"
+
+msgid "[StaticFragments](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/static_fragments.py)"
+msgstr "[StaticFragments](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/static_fragments.py)"
+
 msgid "配置与构建"
 msgstr "Configuration and build"
 
@@ -119,24 +153,14 @@ msgstr ""
 "I/O and remain in components rather than moving with the MCU support "
 "package."
 
-msgid ""
-"Board 和 SoC 不再加载本地 Python 插件。默认 Python 工具集中校验事实并生成静态连接； Core "
-"`private/platform_lifecycle_impl.h` 维护整平台启动、停止、回滚与诊断，F4 "
-"`private/stm32f4_platform_lifecycle_impl.h` 维护 System 与共享资源的 C 协调；各自的 `.c` "
-"公共入口复用同一实现，固定装配让编译器看到常量并裁剪分支。主机只维护 一套配置实现，其代码不进入 MCU 镜像。实际生成 factory、模型与 ARM"
-" 产物 各自验证，不能把源码移动视为整条链路已经验收。 Native 必须显式启用测试 scope，不进入生产系列目录或能力聚合表。"
-msgstr ""
-"Board and SoC no longer load local Python plugins. Centralized Python tools "
-"validate facts and generate static connections. Core "
-"`private/platform_lifecycle_impl.h` owns platform startup, stop, rollback "
-"and diagnostics; F4 `private/stm32f4_platform_lifecycle_impl.h` owns C "
-"coordination for System and shared resources. Their public `.c` entry points"
-" reuse the same implementation; fixed assemblies expose constants to the "
-"compiler for pruning. The host has one configuration implementation, whose "
-"code is not linked into the MCU image. Generated factories, models and ARM "
-"artifacts require separate validation; moving source does not establish "
-"complete-path acceptance. Native requires explicit test scope and does not "
-"enter production family directories or capability tables."
+msgid "Board 和 SoC 不加载本地 Python 插件。声明式包由通用 DataProvider 读取同一快照的 事实和显式 binding 文件，DomainPolicies 决定已维护公共语义与私有投影，有限静态 节点生成配置、存储、face、IRQ 与固定生命周期连接。CMake 仍拥有唯一 C 源码图， SDK 只按选择的包导出归属收集源码。结构图见 [FIG-03 构建期输入与产物](../assets/diagrams/configuration-generation.svg)， 详细字段与迁移边界由[接入指南](../guides/provider-porting.md)唯一维护。"
+msgstr "Board and SoC load no local Python plugins. Generic DataProvider reads one snapshot of declarative package facts and explicit binding files. DomainPolicies determines maintained public semantics and private projections; bounded static nodes emit configuration, storage, faces, IRQ and fixed lifecycle connections. CMake still owns the sole C source graph. The SDK collects source only by selected package export ownership. See [FIG-03 build-time inputs and artifacts](../assets/diagrams/configuration-generation.svg); the [porting guide](../guides/provider-porting.md) uniquely owns detailed fields and migration boundaries."
+
+msgid "生产默认路径已采用通用 DataProvider，旧 F4 家族 Python 构造模块和导入注册表已 删除。包事实、策略、各模式和消费者仍须本批集成验证；不能从删除旧代码推定整体 资格。主机 Python 不进入固件，硬件算法和执行顺序由 C 维护。"
+msgstr "The production default now uses generic DataProvider; old F4 family Python constructor modules and their import registry have been removed. Package facts, policies, individual modes and consumers still require this batch's integrated validation. Removing old code does not establish overall qualification. Host Python is not linked into firmware; C owns hardware algorithms and execution ordering."
+
+msgid "Core `private/platform_lifecycle_impl.h` 维护整平台启动、停止、回滚与诊断，F4 `private/stm32f4_platform_lifecycle_impl.h` 维护 System 与共享资源的 C 协调；各自的 `.c` 公共入口复用同一实现，固定装配让编译器看到常量并裁剪分支。主机只维护 一套配置实现，其代码不进入 MCU 镜像。实际生成 factory、模型与 ARM 产物 各自验证，不能把源码移动视为整条链路已经验收。 Native 必须显式启用测试 scope，不进入生产系列目录或能力聚合表。"
+msgstr "Core `private/platform_lifecycle_impl.h` owns whole-platform start, stop, rollback and diagnostics. F4 `private/stm32f4_platform_lifecycle_impl.h` owns C coordination of System and shared resources. Their public `.c` entries reuse the same implementation; fixed assembly exposes constants for compiler branch elimination. One host configuration implementation is maintained and is not linked into the MCU image. Generated factories, models and ARM artifacts are verified separately; source movement does not qualify the entire chain. Native requires explicit test scope and stays outside production family directories and capability aggregation."
 
 msgid ""
 "精确支持见[支持参考](../reference/platforms/support.md)。重构前的目录与执行范围可从 "
@@ -150,6 +174,3 @@ msgstr ""
 "Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18). Old records retain"
 " their original identities and do not establish software candidates or "
 "physical-board qualification for this refactor."
-
-msgid "本页定位当前实现，不复制各目录的完整合同。生产 MCU 入口只有 STM32F4，精确 器件与模式以[支持范围](../delivery/support.md)为准；F407 Board 与新增料号的软件 参考分别说明。其他 SDK 原位保留，目录、实现、执行记录和物理资格不相互替代。"
-msgstr "This page locates current implementations without copying each directory contract. STM32F4 is the sole production MCU entry; [support scope](../delivery/support.md) defines exact devices and modes. F407 Boards and software references for added parts remain distinct. Other SDKs stay in place. Directories, implementation, execution records and physical qualification do not replace one another."

@@ -20,7 +20,7 @@ provider、生成 bindings 和调用者；当前不交付稳定二进制 ABI。�
 | resolved JSON projection / typed IR | `1` / `5` | 单向 JSON 输出格式与私有 Python 类型化源码接口分别计代 |
 | Board / SoC / routes | `1` / `1` / `1` | 物理事实文件及生产 validator 必须一致 |
 | CPU runtime assembly / facts / resolved | `1` / `1` / `1` | CPU 软件配置，不能升格 SoC/Board 资格 |
-| installed source SDK manifest | `2` | 既有完整 file-map/源依赖/package-export 校验 |
+| installed source SDK manifest | `3` | 完整 file-map、源依赖、package-export 与包导出成员声明校验 |
 
 这些数字不能互相替代。修改文档或新增可选机制通常不改变配置 schema；改变 schema
 意味着生产 validator/emitter 明确维护了新的格式，并更新策略断言与负测。策略不能
@@ -80,7 +80,7 @@ epoch 2 已将 `nx_adc_group_request_t.frames` 改为显式 `output.frames`，�
 这一步。当前生成头、SDK 及维护消费者只认可 epoch 5；旧 epoch 1／2／3／4 明确拒绝，
 不自动迁移、降级或以
 `--development-fixture` 放宽接口检查。外部产品的迁移步骤见
-[迁移指南](../guides/migration.md)。manifest schema 2 与 interface epoch 5 是独立字段。
+[迁移指南](../guides/migration.md)。当前 manifest schema 3 与 interface epoch 5 是独立字段。
 
 ## epoch 3 的领域接口迁移
 
@@ -125,7 +125,7 @@ Flash 制造选项的 `brownout_level` 原始字段改为 `nx_flash_brownout_t b
 
 使用同一精确提交重新生成配置和 factory，并重编所有调用者、provider、组件与
 SDK 消费者。当前 TOML schema 2、typed IR 源码代际 5、resolved projection 1 和 SDK
-manifest 2 保持各自原合同；源码代际提升不自动扩大芯片、模式或实板支持。
+manifest 3 分别计代；源码代际或包格式变化不自动扩大芯片、模式或实板支持。
 
 ## epoch 4 的逻辑 signal 与 RS485 迁移
 
@@ -178,9 +178,25 @@ System profile、RTC 来源、外来电源状态和 errata 仍分别校验。
 不能重新初始化 owner 使旧 token 再次有效。自定义 backend 和静态集成须按新声明
 重编，并先 join 原调用者与控制操作。
 
-TOML schema 2、resolved projection 1 和 SDK manifest 2 保持原格式。typed IR
-源码代际 5 对应本轮具名配置合同；版本号与前序快照相同也必须固定精确提交，
-重新生成并重编全部源码。前述 epoch 2／3／4 的字段与所有权迁移继续适用。
+epoch 5 引入时使用 TOML schema 2、resolved projection 1 和 SDK manifest 2。当前
+包格式独立演进为 schema 3，不改变 factory／typed IR 代际 5。版本号与前序快照
+相同也必须固定精确提交，重新生成并重编全部源码；epoch 2／3／4 的迁移继续适用。
+
+## SDK manifest schema 3 的包导出归属
+
+当前 manifest 的 `source_exports` 记录本次实际导出的平台源码成员与包身份。
+每个成员必须出现在 `files_sha256`；包声明文件也接受字节及派生一致性校验。包
+声明生产导出范围，CMake 仍是源码编译图的唯一权威。导出范围不是某个固件 ELF
+的编译闭包，消费者可以在包声明范围内重新装配。
+
+SDK 的 `profile` 显式记录 `backend`、`components`、`host_support` 和 `packages`。
+默认包只由兼容性 JSON 的 `source_sdk.default_package_manifests` 选择，新增家族
+不自动扩展 SDK。导出其他包时重复使用 `--package <ID>`；安装验证使用冻结的
+`profile.packages`，不把未选库存补入已安装包。
+
+使用与 SDK 精确源码身份对应的 verifier。schema 3 验证器拒绝其他 manifest 格式，
+不修改旧 SDK 字节或把旧包自动提升为新格式。旧包继续使用自己的固定源码与工具。
+新导出仍需实际完整校验、重定位、消费和恢复；包声明存在不建立执行通过状态。
 
 ## 自动检查
 

@@ -1,6 +1,6 @@
 # Actual-POT messages; changed entries await independent semantic review.
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: afbbe022f685386e90c4bea52105ae9eec1bfa016a8f3d7befedccb5bb67c709\n"
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 6e8b447d45418a6ce9abc669137573e28e6c93fb392fae6ba5d84cb8684d6ec3\n"
 
 msgid "当前派生能力矩阵"
 msgstr "Current derived capability matrix"
@@ -8,8 +8,8 @@ msgstr "Current derived capability matrix"
 msgid "本表由维护工具读取当前 F4 事实、受审路线、四个 Board 包、实际软件装配和生成 face 对应的生产 ops 定义生成。它不是另一份配置输入，也不建立编译、执行或实板 资格。声明模式、允许 route 和本次选择分别核对，空列表示没有该类关联。"
 msgstr "The maintenance tool derives this table from current F4 facts, reviewed routes, four Board packages, actual software assemblies and production ops definitions associated with generated faces. It is not another configuration input and establishes no compile, execution or physical-board qualification. Check declared modes, allowed routes and current selections separately; an empty column means no association of that kind."
 
-msgid "生产聚合只包含 `stm32f4`。Native 属于显式 host-test scope，不计入生产 SoC 支持； 其他保留的 vendor SDK 不进入本表。精确限制见[支持](support.md)。"
-msgstr "Production aggregation contains only `stm32f4`. Native belongs to explicit host-test scope and does not count as production SoC support. Other retained vendor SDKs do not enter this table. See [support](support.md) for exact limitations."
+msgid "生产聚合只包含解析后 scope 为 `production` 的包，当前为 `stm32f4`。 Native 属于显式 host-test fixture，不计入生产 SoC 支持；`scope=reference` 的软件 参考必须显式启用 test support，也不进入生产聚合。其他保留的 vendor SDK 不进入 本表。精确限制见[支持](support.md)。"
+msgstr "Production aggregation includes only packages whose resolved scope is `production`, currently `stm32f4`. Native is an explicit host-test fixture and does not count as production SoC support. Software references with `scope=reference` require explicit test support and also remain outside production aggregation. Other retained vendor SDKs do not enter this table. See [support](support.md) for exact limits."
 
 msgid "从完整仓库根执行，工具按同一原始事实重建表；`--check` 拒绝陈旧内容。修改能力应 先改真实实现、事实与合同回归，再生成此投影，不手工编辑表格行。"
 msgstr "Run from the complete repository root. The tool rebuilds the table from the same original facts; `--check` rejects stale output. Change real implementations, facts and contract regressions first, then regenerate this projection rather than editing rows manually."
@@ -17,8 +17,8 @@ msgstr "Run from the complete repository root. The tool rebuilds the table from 
 msgid "查询与证据"
 msgstr "Queries and evidence"
 
-msgid "选择查询报告精确型号、Board、模式、资源、预算和输入身份，不运行新的编译、测试、 烧录或测量。默认软件阶段保留 `not_assessed`，不表示历史上从未执行，也不表示失败。"
-msgstr "Selection queries report exact parts, Board, modes, resources, budgets and input identity. They do not run a new compilation, test, flash or measurement. The default software stage remains `not_assessed`, which means neither never executed historically nor failed."
+msgid "选择查询报告精确型号、Board、模式、资源、预算和输入身份，并通过 `provider_package` 记录真实 package 的 ID、family 和 scope。事实与 CMake 输入 使用同一快照身份；工具不从家族 Python 注册表或固定文件名猜来源。查询不运行 新的编译、测试、烧录或测量。默认软件阶段保留 `not_assessed`，不表示历史上从未 执行，也不表示失败。显式查询 reference 包仍保留其参考 scope 和未评估的物理状态， 不能升级为生产支持或实板资格。"
+msgstr "Selection queries report the exact part, Board, modes, resources, budgets and input identities. `provider_package` records the actual package ID, family and scope. Facts and CMake inputs use the same snapshot identity; the tool does not infer sources from family Python registries or fixed filenames. A query performs no new compilation, tests, flashing or measurements. Software stages default to `not_assessed`, which means neither that they have never run historically nor that they failed. Explicit reference-package queries retain their reference scope and unassessed physical status; they cannot become production support or physical qualification."
 
 msgid "显式引用原候选或阶段记录时，核对其真实来源、配置、产物和执行 scope；历史源码、 配置不匹配、缺少原件与无效记录不能升级成本次通过。SDK 字节身份、实际消费与完整 软件候选也是不同范围。使用 manifest 输入的 SDK 解析可能与 checkout 具有不同 配置摘要，不能删除该身份以强行匹配。"
 msgstr "When explicitly referencing an original candidate or stage record, verify its real source, configuration, artifacts and execution scope. Historical source, configuration mismatch, missing originals and invalid records cannot become passes for this iteration. SDK byte identity, actual consumption and complete software candidates are also separate scopes. SDK resolution using manifest inputs may have a different configuration digest from a checkout; do not remove that identity to force a match."
@@ -864,23 +864,29 @@ msgstr "`tests/contracts/i2c_target/ve-target-84.toml`, `tests/contracts/i2c_tar
 msgid "I2C2"
 msgstr "I2C2"
 
-msgid "`i2c2-pb10-pb11`"
-msgstr "`i2c2-pb10-pb11`"
+msgid "`i2c2-pb10-pb11`, `i2c2-pf1-pf0`, `i2c2-pf1-pf0-dma-alternate`"
+msgstr "`i2c2-pb10-pb11`, `i2c2-pf1-pf0`, `i2c2-pf1-pf0-dma-alternate`"
 
-msgid "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-tenbit-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`"
-msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-tenbit-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`"
+msgid "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-tenbit-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/uart_rx_compact_assembly/f407-alternate-i2c-dma.toml`"
+msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-tenbit-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/uart_rx_compact_assembly/f407-alternate-i2c-dma.toml`"
 
-msgid "`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-tenbit-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c3-fast-async-freertos.toml`"
-msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-tenbit-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c3-fast-async-freertos.toml`"
+msgid "`i2c2-pb10-pb11`, `i2c2-pf1-pf0`"
+msgstr "`i2c2-pb10-pb11`, `i2c2-pf1-pf0`"
+
+msgid "`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-tenbit-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c3-fast-async-freertos.toml`, `tests/contracts/uart_rx_compact_assembly/f407-alternate-i2c.toml`"
+msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-tenbit-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c3-fast-async-freertos.toml`, `tests/contracts/uart_rx_compact_assembly/f407-alternate-i2c.toml`"
 
 msgid "`tests/contracts/multi_controller_assembly/stm32-ve-buses-poll.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c3-fast-poll-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-buses-dma-freertos.toml`"
 msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-buses-poll.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c3-fast-poll-baremetal.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-buses-dma-freertos.toml`"
 
-msgid "`target-i2c2-pb10-pb11`, `target-i2c2-pb10-pb11-pb12`"
-msgstr "`target-i2c2-pb10-pb11`, `target-i2c2-pb10-pb11-pb12`"
+msgid "`target-i2c2-pb10-pb11`, `target-i2c2-pb10-pb11-pb12`, `target-i2c2-pf1-pf0`"
+msgstr "`target-i2c2-pb10-pb11`, `target-i2c2-pb10-pb11-pb12`, `target-i2c2-pf1-pf0`"
 
-msgid "`target-i2c2-pb10-pb11`"
-msgstr "`target-i2c2-pb10-pb11`"
+msgid "`target-i2c2-pb10-pb11`, `target-i2c2-pf1-pf0`"
+msgstr "`target-i2c2-pb10-pb11`, `target-i2c2-pf1-pf0`"
+
+msgid "`tests/contracts/uart_rx_compact_assembly/f407-alternate-target.toml`"
+msgstr "`tests/contracts/uart_rx_compact_assembly/f407-alternate-target.toml`"
 
 msgid "I2C3"
 msgstr "I2C3"
@@ -1335,11 +1341,11 @@ msgstr "spi"
 msgid "dma"
 msgstr "dma"
 
-msgid "`spi1-pa5-pa6-pa7`, `spi1-pb3-pb4-pb5`"
-msgstr "`spi1-pa5-pa6-pa7`, `spi1-pb3-pb4-pb5`"
+msgid "`spi1-pa5-pa6-pa7`, `spi1-pa5-pa6-pa7-dma-alternate`, `spi1-pb3-pb4-pb5`"
+msgstr "`spi1-pa5-pa6-pa7`, `spi1-pa5-pa6-pa7-dma-alternate`, `spi1-pb3-pb4-pb5`"
 
-msgid "`tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-buses-dma-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml`, `tests/contracts/stm32_assembly/zg-dma.toml`"
-msgstr "`tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-buses-dma-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml`, `tests/contracts/stm32_assembly/zg-dma.toml`"
+msgid "`tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-buses-dma-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml`, `tests/contracts/stm32_assembly/zg-dma.toml`, `tests/contracts/uart_rx_compact_assembly/f407-alternate-spi.toml`"
+msgstr "`tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-buses-dma-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml`, `tests/contracts/stm32_assembly/zg-dma.toml`, `tests/contracts/uart_rx_compact_assembly/f407-alternate-spi.toml`"
 
 msgid "`io/src/mechanisms/spi_dma_sequence.c`, `soc/stm32/stm32f4/drivers/spi_dma.c`"
 msgstr "`io/src/mechanisms/spi_dma_sequence.c`, `soc/stm32/stm32f4/drivers/spi_dma.c`"
@@ -1358,6 +1364,9 @@ msgstr "`soc/stm32/stm32f4/drivers/spi_frames.c`"
 
 msgid "short-poll"
 msgstr "short-poll"
+
+msgid "`spi1-pa5-pa6-pa7`, `spi1-pb3-pb4-pb5`"
+msgstr "`spi1-pa5-pa6-pa7`, `spi1-pb3-pb4-pb5`"
 
 msgid "`tests/contracts/io_evolution_assembly/f407-spi-transaction.toml`, `tests/contracts/io_storage_cost/spi_endpoints/endpoints-1.toml`, `tests/contracts/io_storage_cost/spi_endpoints/endpoints-2.toml`, `tests/contracts/io_storage_cost/spi_endpoints/endpoints-4.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-buses-poll.toml`, `tests/contracts/stm32_assembly/ve-spi.toml`, `tests/contracts/stm32_assembly/zg-spi.toml`"
 msgstr "`tests/contracts/io_evolution_assembly/f407-spi-transaction.toml`, `tests/contracts/io_storage_cost/spi_endpoints/endpoints-1.toml`, `tests/contracts/io_storage_cost/spi_endpoints/endpoints-2.toml`, `tests/contracts/io_storage_cost/spi_endpoints/endpoints-4.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-buses-poll.toml`, `tests/contracts/stm32_assembly/ve-spi.toml`, `tests/contracts/stm32_assembly/zg-spi.toml`"
@@ -1854,6 +1863,12 @@ msgstr "`usart2-pa2-pa3`"
 msgid "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-uart6.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-uart6-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/uart_rx_compact_assembly/f407-mixed-duplex-tx.toml`, `tests/contracts/uart_rx_compact_assembly/f407-mixed-rx-tx.toml`"
 msgstr "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-uart6.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-uart6-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml`, `tests/contracts/uart_rx_compact_assembly/f407-mixed-duplex-tx.toml`, `tests/contracts/uart_rx_compact_assembly/f407-mixed-rx-tx.toml`"
 
+msgid "`usart2-pa2-pa3`, `usart2-pd5-pd6`"
+msgstr "`usart2-pa2-pa3`, `usart2-pd5-pd6`"
+
+msgid "`tests/contracts/qiming_uart_assembly/six-irq-uarts.toml`, `tests/contracts/uart_rx_compact_assembly/f407-alternate-irq.toml`"
+msgstr "`tests/contracts/qiming_uart_assembly/six-irq-uarts.toml`, `tests/contracts/uart_rx_compact_assembly/f407-alternate-irq.toml`"
+
 msgid "`usart2-cts-pa2-pa3-pa0`, `usart2-half-duplex-pa2`, `usart2-pa2-pa3`, `usart2-rts-cts-pa2-pa3-pa0-pa1`, `usart2-rts-pa2-pa3-pa1`, `usart2-smartcard-pa2-pa4`, `usart2-synchronous-pa2-pa3-pa4`"
 msgstr "`usart2-cts-pa2-pa3-pa0`, `usart2-half-duplex-pa2`, `usart2-pa2-pa3`, `usart2-rts-cts-pa2-pa3-pa0-pa1`, `usart2-rts-pa2-pa3-pa1`, `usart2-smartcard-pa2-pa4`, `usart2-synchronous-pa2-pa3-pa4`"
 
@@ -1868,6 +1883,12 @@ msgstr "`usart3-cts-pb10-pb11-pb13`, `usart3-half-duplex-pb10`, `usart3-pb10-pb1
 
 msgid "USART6"
 msgstr "USART6"
+
+msgid "`usart6-pc6-pc7`, `usart6-pc6-pc7-dma-alternate`"
+msgstr "`usart6-pc6-pc7`, `usart6-pc6-pc7-dma-alternate`"
+
+msgid "`tests/contracts/multi_controller_assembly/stm32-zg-uart6-dma-duplex-baremetal.toml`, `tests/contracts/uart_rx_compact_assembly/f407-alternate-dma.toml`"
+msgstr "`tests/contracts/multi_controller_assembly/stm32-zg-uart6-dma-duplex-baremetal.toml`, `tests/contracts/uart_rx_compact_assembly/f407-alternate-dma.toml`"
 
 msgid "`usart6-pc6-pc7`"
 msgstr "`usart6-pc6-pc7`"

@@ -19,13 +19,11 @@ class FactStageTests(unittest.TestCase):
         assembly = configure.load_assembly(path, test_support=native_fixture(path))
         reads = {}
 
-        def read(source):
-            reads[source] = source.read_bytes()
-            return configure.load(source)
+        read = configure._SnapshotReader(reads)
 
         selected = configure._resolve_facts(
             assembly, root=configure.ROOT,
-            assembly_directory=path.parent, read=read)
+            assembly_directory=path.parent, read=read, snapshots=reads)
         return selected, reads
 
     def test_identity_has_one_fact_owner_and_selected_variant_view(self):

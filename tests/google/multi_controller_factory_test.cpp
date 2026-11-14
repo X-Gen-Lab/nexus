@@ -990,14 +990,14 @@ struct IndependentSpiCold {
                                          false};
     nx_dma_memory_region_t region{0x20000000U, 0x20000U,
                                   NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
-    nx_stm32_spi_dma_config_t config{{SPI3, 42000000U, pins, 4U, &child, 1U},
-                                     DMA1,
-                                     DMA1_Stream5,
-                                     DMA1_Stream0,
-                                     &region,
-                                     1U,
-                                     5U,
-                                     false};
+    nx_stm32_spi_dma_config_t config{
+        {SPI3, 42000000U, pins, 4U, &child, 1U},
+        {{DMA1, DMA1_Stream5, DMA1_Stream5_IRQn, 5U, 0U},
+         {DMA1, DMA1_Stream0, DMA1_Stream0_IRQn, 0U, 0U},
+         &region,
+         1U},
+        5U,
+        false};
     nx_stm32_spi_dma_cold_t receipt{};
 };
 

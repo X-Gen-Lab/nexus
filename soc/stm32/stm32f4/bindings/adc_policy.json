@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "bindings": [],
+  "domains": {
+    "adc_group": {
+      "mechanism": "common-sequencer-v1",
+      "controller": "ADC123",
+      "converter_names": [
+        "ADC1",
+        "ADC2",
+        "ADC3"
+      ],
+      "regular": {
+        "dual-simultaneous": [
+          2,
+          "DUAL_REGULAR"
+        ],
+        "triple-simultaneous": [
+          3,
+          "TRIPLE_REGULAR"
+        ],
+        "dual-interleaved": [
+          2,
+          "DUAL_INTERLEAVED"
+        ],
+        "triple-interleaved": [
+          3,
+          "TRIPLE_INTERLEAVED"
+        ]
+      },
+      "injected": {
+        "single": [
+          1,
+          "SINGLE_INJECTED"
+        ],
+        "dual": [
+          2,
+          "DUAL_INJECTED"
+        ],
+        "triple": [
+          3,
+          "TRIPLE_INJECTED"
+        ]
+      },
+      "injected_triggers": {
+        "tim1-ch4": "TIM1",
+        "tim1-trgo": "TIM1",
+        "tim3-ch2": "TIM3",
+        "tim3-ch4": "TIM3",
+        "tim4-ch1": "TIM4",
+        "tim4-ch2": "TIM4",
+        "tim4-ch3": "TIM4",
+        "tim4-trgo": "TIM4",
+        "tim5-ch4": "TIM5",
+        "tim5-trgo": "TIM5",
+        "tim8-ch2": "TIM8",
+        "tim8-ch3": "TIM8",
+        "tim8-ch4": "TIM8"
+      },
+      "timer_domains": {
+        "TIM1": "apb2_timer",
+        "TIM3": "apb1_timer",
+        "TIM4": "apb1_timer",
+        "TIM5": "apb1_timer",
+        "TIM8": "apb2_timer"
+      },
+      "sample_cycles": [
+        3,
+        15,
+        28,
+        56,
+        84,
+        112,
+        144,
+        480
+      ],
+      "resolution_bits": [
+        6,
+        8,
+        10,
+        12
+      ],
+      "reference_mv_max": 3600,
+      "external_channel_max": 15,
+      "regular_ranks": 16,
+      "injected_ranks": 4,
+      "delay_cycles": [
+        5,
+        20
+      ],
+      "default_trigger": "tim3-trgo",
+      "adc_clock_domain": "adc",
+      "layouts": {
+        "dual-simultaneous": {
+          "repeats": 1,
+          "dma_word_bytes": 4,
+          "byte_dma_word_bytes": 2
+        },
+        "triple-simultaneous": {
+          "repeats": 1,
+          "dma_word_bytes": 2,
+          "byte_dma_word_bytes": 2
+        },
+        "dual-interleaved": {
+          "repeats": 1,
+          "dma_word_bytes": 4,
+          "byte_dma_word_bytes": 2
+        },
+        "triple-interleaved": {
+          "repeats": 2,
+          "dma_word_bytes": 4,
+          "byte_dma_word_bytes": 2
+        },
+        "single": {
+          "repeats": 1,
+          "dma_word_bytes": 4,
+          "byte_dma_word_bytes": 2
+        },
+        "dual": {
+          "repeats": 1,
+          "dma_word_bytes": 4,
+          "byte_dma_word_bytes": 2
+        },
+        "triple": {
+          "repeats": 1,
+          "dma_word_bytes": 4,
+          "byte_dma_word_bytes": 2
+        }
+      },
+      "clock_fallbacks": {
+        "adc": [
+          "apb2_hz",
+          1,
+          4
+        ],
+        "apb1_timer": [
+          "apb1_hz",
+          2,
+          1
+        ],
+        "apb2_timer": [
+          "apb2_hz",
+          2,
+          1
+        ]
+      }
+    }
+  }
+}

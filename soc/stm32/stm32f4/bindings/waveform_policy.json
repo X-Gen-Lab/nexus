@@ -1,0 +1,1230 @@
+{
+  "schema_version": 1,
+  "bindings": [],
+  "domains": {
+    "waveform": {
+      "modes": {
+        "pwm_group": "coherent-pwm",
+        "timer_pulse": "one-pulse",
+        "timer_sequence": "dma-burst"
+      },
+      "controllers": {
+        "TIM1": {
+          "counter_bits": 16,
+          "native_bits": 32,
+          "advanced": true,
+          "master": true,
+          "clock_domain": "apb2_hz",
+          "divided_clock_multiplier": 2,
+          "dma": [
+            "DMA2:stream5:channel6"
+          ],
+          "itr_sources": [
+            "TIM5",
+            "TIM2",
+            "TIM3",
+            "TIM4"
+          ],
+          "channel_count": 4
+        },
+        "TIM3": {
+          "counter_bits": 16,
+          "native_bits": 16,
+          "advanced": false,
+          "master": true,
+          "clock_domain": "apb1_hz",
+          "divided_clock_multiplier": 2,
+          "dma": [
+            "DMA1:stream2:channel5"
+          ],
+          "itr_sources": [
+            "TIM1",
+            "TIM2",
+            "TIM5",
+            "TIM4"
+          ],
+          "channel_count": 4
+        },
+        "TIM4": {
+          "counter_bits": 16,
+          "native_bits": 16,
+          "advanced": false,
+          "master": true,
+          "clock_domain": "apb1_hz",
+          "divided_clock_multiplier": 2,
+          "dma": [
+            "DMA1:stream6:channel2"
+          ],
+          "itr_sources": [
+            "TIM1",
+            "TIM2",
+            "TIM3",
+            "TIM8"
+          ],
+          "channel_count": 4
+        },
+        "TIM5": {
+          "counter_bits": 32,
+          "native_bits": 16,
+          "advanced": false,
+          "master": true,
+          "clock_domain": "apb1_hz",
+          "divided_clock_multiplier": 2,
+          "dma": [
+            "DMA1:stream0:channel6"
+          ],
+          "itr_sources": [
+            "TIM2",
+            "TIM3",
+            "TIM4",
+            "TIM8"
+          ],
+          "channel_count": 4
+        },
+        "TIM8": {
+          "counter_bits": 16,
+          "native_bits": 32,
+          "advanced": true,
+          "master": true,
+          "clock_domain": "apb2_hz",
+          "divided_clock_multiplier": 2,
+          "dma": [
+            "DMA2:stream1:channel7"
+          ],
+          "itr_sources": [
+            "TIM1",
+            "TIM2",
+            "TIM4",
+            "TIM5"
+          ],
+          "channel_count": 4
+        },
+        "TIM9": {
+          "counter_bits": 16,
+          "native_bits": 16,
+          "advanced": false,
+          "master": false,
+          "clock_domain": "apb2_hz",
+          "divided_clock_multiplier": 2,
+          "dma": [],
+          "itr_sources": [
+            "TIM2",
+            "TIM3",
+            "TIM10_OC",
+            "TIM11_OC"
+          ],
+          "channel_count": 2
+        },
+        "TIM10": {
+          "counter_bits": 16,
+          "native_bits": 16,
+          "advanced": false,
+          "master": false,
+          "clock_domain": "apb2_hz",
+          "divided_clock_multiplier": 2,
+          "dma": [],
+          "itr_sources": [],
+          "channel_count": 1
+        },
+        "TIM11": {
+          "counter_bits": 16,
+          "native_bits": 16,
+          "advanced": false,
+          "master": false,
+          "clock_domain": "apb2_hz",
+          "divided_clock_multiplier": 2,
+          "dma": [],
+          "itr_sources": [],
+          "channel_count": 1
+        },
+        "TIM12": {
+          "counter_bits": 16,
+          "native_bits": 16,
+          "advanced": false,
+          "master": false,
+          "clock_domain": "apb1_hz",
+          "divided_clock_multiplier": 2,
+          "dma": [],
+          "itr_sources": [
+            "TIM4",
+            "TIM5",
+            "TIM13_OC",
+            "TIM14_OC"
+          ],
+          "channel_count": 2
+        },
+        "TIM13": {
+          "counter_bits": 16,
+          "native_bits": 16,
+          "advanced": false,
+          "master": false,
+          "clock_domain": "apb1_hz",
+          "divided_clock_multiplier": 2,
+          "dma": [],
+          "itr_sources": [],
+          "channel_count": 1
+        },
+        "TIM14": {
+          "counter_bits": 16,
+          "native_bits": 16,
+          "advanced": false,
+          "master": false,
+          "clock_domain": "apb1_hz",
+          "divided_clock_multiplier": 2,
+          "dma": [],
+          "itr_sources": [],
+          "channel_count": 1
+        }
+      },
+      "routes": [
+        {
+          "id": "tim1-group4",
+          "controller": "TIM1",
+          "kind": "pwm_group",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PA8",
+              "ch1",
+              1
+            ],
+            [
+              "PA9",
+              "ch2",
+              1
+            ],
+            [
+              "PA10",
+              "ch3",
+              1
+            ],
+            [
+              "PA11",
+              "ch4",
+              1
+            ],
+            [
+              "PB12",
+              "break",
+              1
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim1-pulse1",
+          "controller": "TIM1",
+          "kind": "timer_pulse",
+          "channels": [
+            1
+          ],
+          "pins": [
+            [
+              "PA8",
+              "ch1",
+              1
+            ],
+            [
+              "PB12",
+              "break",
+              1
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim1-pulse4",
+          "controller": "TIM1",
+          "kind": "timer_pulse",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PA8",
+              "ch1",
+              1
+            ],
+            [
+              "PA9",
+              "ch2",
+              1
+            ],
+            [
+              "PA10",
+              "ch3",
+              1
+            ],
+            [
+              "PA11",
+              "ch4",
+              1
+            ],
+            [
+              "PB12",
+              "break",
+              1
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim1-sequence",
+          "controller": "TIM1",
+          "kind": "timer_sequence",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PA8",
+              "ch1",
+              1
+            ],
+            [
+              "PA9",
+              "ch2",
+              1
+            ],
+            [
+              "PA10",
+              "ch3",
+              1
+            ],
+            [
+              "PA11",
+              "ch4",
+              1
+            ],
+            [
+              "PB12",
+              "break",
+              1
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim3-group4",
+          "controller": "TIM3",
+          "kind": "pwm_group",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PA6",
+              "ch1",
+              2
+            ],
+            [
+              "PA7",
+              "ch2",
+              2
+            ],
+            [
+              "PB0",
+              "ch3",
+              2
+            ],
+            [
+              "PB1",
+              "ch4",
+              2
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim3-pulse1",
+          "controller": "TIM3",
+          "kind": "timer_pulse",
+          "channels": [
+            1
+          ],
+          "pins": [
+            [
+              "PA6",
+              "ch1",
+              2
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim3-pulse4",
+          "controller": "TIM3",
+          "kind": "timer_pulse",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PA6",
+              "ch1",
+              2
+            ],
+            [
+              "PA7",
+              "ch2",
+              2
+            ],
+            [
+              "PB0",
+              "ch3",
+              2
+            ],
+            [
+              "PB1",
+              "ch4",
+              2
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim3-sequence",
+          "controller": "TIM3",
+          "kind": "timer_sequence",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PA6",
+              "ch1",
+              2
+            ],
+            [
+              "PA7",
+              "ch2",
+              2
+            ],
+            [
+              "PB0",
+              "ch3",
+              2
+            ],
+            [
+              "PB1",
+              "ch4",
+              2
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim4-group4",
+          "controller": "TIM4",
+          "kind": "pwm_group",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PB6",
+              "ch1",
+              2
+            ],
+            [
+              "PB7",
+              "ch2",
+              2
+            ],
+            [
+              "PB8",
+              "ch3",
+              2
+            ],
+            [
+              "PB9",
+              "ch4",
+              2
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim4-pulse1",
+          "controller": "TIM4",
+          "kind": "timer_pulse",
+          "channels": [
+            1
+          ],
+          "pins": [
+            [
+              "PB6",
+              "ch1",
+              2
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim4-pulse4",
+          "controller": "TIM4",
+          "kind": "timer_pulse",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PB6",
+              "ch1",
+              2
+            ],
+            [
+              "PB7",
+              "ch2",
+              2
+            ],
+            [
+              "PB8",
+              "ch3",
+              2
+            ],
+            [
+              "PB9",
+              "ch4",
+              2
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim4-sequence",
+          "controller": "TIM4",
+          "kind": "timer_sequence",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PB6",
+              "ch1",
+              2
+            ],
+            [
+              "PB7",
+              "ch2",
+              2
+            ],
+            [
+              "PB8",
+              "ch3",
+              2
+            ],
+            [
+              "PB9",
+              "ch4",
+              2
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim5-group4",
+          "controller": "TIM5",
+          "kind": "pwm_group",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PA0",
+              "ch1",
+              2
+            ],
+            [
+              "PA1",
+              "ch2",
+              2
+            ],
+            [
+              "PA2",
+              "ch3",
+              2
+            ],
+            [
+              "PA3",
+              "ch4",
+              2
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 4294967295,
+          "default_master": "none"
+        },
+        {
+          "id": "tim5-pulse1",
+          "controller": "TIM5",
+          "kind": "timer_pulse",
+          "channels": [
+            1
+          ],
+          "pins": [
+            [
+              "PA0",
+              "ch1",
+              2
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 4294967295,
+          "default_master": "none"
+        },
+        {
+          "id": "tim5-pulse4",
+          "controller": "TIM5",
+          "kind": "timer_pulse",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PA0",
+              "ch1",
+              2
+            ],
+            [
+              "PA1",
+              "ch2",
+              2
+            ],
+            [
+              "PA2",
+              "ch3",
+              2
+            ],
+            [
+              "PA3",
+              "ch4",
+              2
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 4294967295,
+          "default_master": "none"
+        },
+        {
+          "id": "tim5-sequence",
+          "controller": "TIM5",
+          "kind": "timer_sequence",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PA0",
+              "ch1",
+              2
+            ],
+            [
+              "PA1",
+              "ch2",
+              2
+            ],
+            [
+              "PA2",
+              "ch3",
+              2
+            ],
+            [
+              "PA3",
+              "ch4",
+              2
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim8-group4",
+          "controller": "TIM8",
+          "kind": "pwm_group",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PC6",
+              "ch1",
+              3
+            ],
+            [
+              "PC7",
+              "ch2",
+              3
+            ],
+            [
+              "PC8",
+              "ch3",
+              3
+            ],
+            [
+              "PC9",
+              "ch4",
+              3
+            ],
+            [
+              "PA6",
+              "break",
+              3
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim8-pulse1",
+          "controller": "TIM8",
+          "kind": "timer_pulse",
+          "channels": [
+            1
+          ],
+          "pins": [
+            [
+              "PC6",
+              "ch1",
+              3
+            ],
+            [
+              "PA6",
+              "break",
+              3
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim8-pulse4",
+          "controller": "TIM8",
+          "kind": "timer_pulse",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PC6",
+              "ch1",
+              3
+            ],
+            [
+              "PC7",
+              "ch2",
+              3
+            ],
+            [
+              "PC8",
+              "ch3",
+              3
+            ],
+            [
+              "PC9",
+              "ch4",
+              3
+            ],
+            [
+              "PA6",
+              "break",
+              3
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim8-sequence",
+          "controller": "TIM8",
+          "kind": "timer_sequence",
+          "channels": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "pins": [
+            [
+              "PC6",
+              "ch1",
+              3
+            ],
+            [
+              "PC7",
+              "ch2",
+              3
+            ],
+            [
+              "PC8",
+              "ch3",
+              3
+            ],
+            [
+              "PC9",
+              "ch4",
+              3
+            ],
+            [
+              "PA6",
+              "break",
+              3
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim9-group2",
+          "controller": "TIM9",
+          "kind": "pwm_group",
+          "channels": [
+            1,
+            2
+          ],
+          "pins": [
+            [
+              "PA2",
+              "ch1",
+              3
+            ],
+            [
+              "PA3",
+              "ch2",
+              3
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim9-pulse1",
+          "controller": "TIM9",
+          "kind": "timer_pulse",
+          "channels": [
+            1
+          ],
+          "pins": [
+            [
+              "PA2",
+              "ch1",
+              3
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim9-pulse2",
+          "controller": "TIM9",
+          "kind": "timer_pulse",
+          "channels": [
+            1,
+            2
+          ],
+          "pins": [
+            [
+              "PA2",
+              "ch1",
+              3
+            ],
+            [
+              "PA3",
+              "ch2",
+              3
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim10-pulse1",
+          "controller": "TIM10",
+          "kind": "timer_pulse",
+          "channels": [
+            1
+          ],
+          "pins": [
+            [
+              "PB8",
+              "ch1",
+              3
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim11-pulse1",
+          "controller": "TIM11",
+          "kind": "timer_pulse",
+          "channels": [
+            1
+          ],
+          "pins": [
+            [
+              "PB9",
+              "ch1",
+              3
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim12-group2",
+          "controller": "TIM12",
+          "kind": "pwm_group",
+          "channels": [
+            1,
+            2
+          ],
+          "pins": [
+            [
+              "PB14",
+              "ch1",
+              9
+            ],
+            [
+              "PB15",
+              "ch2",
+              9
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim12-pulse1",
+          "controller": "TIM12",
+          "kind": "timer_pulse",
+          "channels": [
+            1
+          ],
+          "pins": [
+            [
+              "PB14",
+              "ch1",
+              9
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim12-pulse2",
+          "controller": "TIM12",
+          "kind": "timer_pulse",
+          "channels": [
+            1,
+            2
+          ],
+          "pins": [
+            [
+              "PB14",
+              "ch1",
+              9
+            ],
+            [
+              "PB15",
+              "ch2",
+              9
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim13-pulse1",
+          "controller": "TIM13",
+          "kind": "timer_pulse",
+          "channels": [
+            1
+          ],
+          "pins": [
+            [
+              "PA6",
+              "ch1",
+              9
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim14-pulse1",
+          "controller": "TIM14",
+          "kind": "timer_pulse",
+          "channels": [
+            1
+          ],
+          "pins": [
+            [
+              "PA7",
+              "ch1",
+              9
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65535,
+          "default_master": "none"
+        },
+        {
+          "id": "tim1-group-complementary",
+          "controller": "TIM1",
+          "kind": "pwm_group",
+          "channels": [
+            1,
+            2,
+            3
+          ],
+          "pins": [
+            [
+              "PA8",
+              "ch1",
+              1
+            ],
+            [
+              "PB13",
+              "ch1n",
+              1
+            ],
+            [
+              "PA9",
+              "ch2",
+              1
+            ],
+            [
+              "PB14",
+              "ch2n",
+              1
+            ],
+            [
+              "PA10",
+              "ch3",
+              1
+            ],
+            [
+              "PB15",
+              "ch3n",
+              1
+            ],
+            [
+              "PB12",
+              "break",
+              1
+            ]
+          ],
+          "complementary": true,
+          "internal_trigger": true,
+          "period_max": 65535,
+          "default_master": "oc4ref"
+        },
+        {
+          "id": "tim8-group-complementary",
+          "controller": "TIM8",
+          "kind": "pwm_group",
+          "channels": [
+            1,
+            2,
+            3
+          ],
+          "pins": [
+            [
+              "PC6",
+              "ch1",
+              3
+            ],
+            [
+              "PA7",
+              "ch1n",
+              3
+            ],
+            [
+              "PC7",
+              "ch2",
+              3
+            ],
+            [
+              "PB0",
+              "ch2n",
+              3
+            ],
+            [
+              "PC8",
+              "ch3",
+              3
+            ],
+            [
+              "PB1",
+              "ch3n",
+              3
+            ],
+            [
+              "PA6",
+              "break",
+              3
+            ]
+          ],
+          "complementary": true,
+          "internal_trigger": true,
+          "period_max": 65535,
+          "default_master": "oc4ref"
+        }
+      ],
+      "deadtime_ranges": [
+        [
+          0,
+          127,
+          1
+        ],
+        [
+          128,
+          254,
+          2
+        ],
+        [
+          256,
+          504,
+          8
+        ],
+        [
+          512,
+          1008,
+          16
+        ]
+      ],
+      "master_modes": [
+        "none",
+        "enable",
+        "update",
+        "oc4ref"
+      ],
+      "sync_modes": [
+        "none",
+        "reset",
+        "gated",
+        "trigger"
+      ],
+      "prescaler_max": 65536,
+      "poll_limit_max": 10000000,
+      "burst_base": 11,
+      "burst_items": 6,
+      "internal_master_modes": [
+        "oc4ref"
+      ]
+    }
+  }
+}

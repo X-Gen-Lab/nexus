@@ -17,7 +17,7 @@ target_include_directories(usb_host_stack_fixture PRIVATE
 target_include_directories(usb_host_stack_fixture SYSTEM PRIVATE
     "${NEXUS_SOURCE_ROOT}/vendors/st/usb_host/Core/Inc"
     "${NEXUS_SOURCE_ROOT}/vendors/st/cmsis_device_f4/Include")
-include("${NEXUS_SOURCE_ROOT}/cmake/platform/STM32Official.cmake")
+include("${NEXUS_SOURCE_ROOT}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
 nexus_stm32f4_official(usb_host_stack_fixture)
 nexus_use_cmsis_core(usb_host_stack_fixture)
 target_compile_definitions(usb_host_stack_fixture PRIVATE STM32F407xx)

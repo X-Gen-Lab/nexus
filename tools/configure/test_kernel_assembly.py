@@ -83,6 +83,7 @@ class KernelAssemblyTests(unittest.TestCase):
         path = self.assembly(uart=False)
         board = gate.load(gate.ROOT / "boards/stm32f407_qiming_v31/board.json")
         board["id"] = "unknown-board"
+        board.pop("backend_support")
         package = self.root / "board"
         package.mkdir()
         (package / "board.json").write_text(json.dumps(board))
@@ -128,7 +129,9 @@ class KernelAssemblyTests(unittest.TestCase):
         output = self.root / "can-generated"
         output.mkdir()
         gate.generate(result, output)
-        self.assertIn(".irq_policy = { NX_IRQ_KERNEL_PRIMASK, 82u, 4u, 0u }",
+        self.assertIn(".irq_policy = { .kernel = NX_IRQ_KERNEL_PRIMASK, "
+                      ".external_irq_count = 82u, .priority_bits = 4u, "
+                      ".syscall_ceiling = 0u }",
                       (output / "bindings.c").read_text())
 
     def test_baremetal_physical_basepri_is_not_a_configured_kernel_policy(self):
@@ -139,7 +142,9 @@ class KernelAssemblyTests(unittest.TestCase):
         output = self.root / "can-baremetal"
         output.mkdir()
         gate.generate(result, output)
-        self.assertIn(".irq_policy = { NX_IRQ_KERNEL_NONE, 82u, 4u, 0u }",
+        self.assertIn(".irq_policy = { .kernel = NX_IRQ_KERNEL_NONE, "
+                      ".external_irq_count = 82u, .priority_bits = 4u, "
+                      ".syscall_ceiling = 0u }",
                       (output / "bindings.c").read_text())
 
 

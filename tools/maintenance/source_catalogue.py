@@ -7,7 +7,7 @@ Nested sources are explicit records, never discovered or implicitly trusted.
 from __future__ import annotations
 import configparser
 from dataclasses import dataclass
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 import re
 from typing import Literal
 
@@ -282,14 +282,22 @@ HOST_TEST_DEPENDENCIES = tuple(item for item in ALL_SOURCE_DEPENDENCIES
                                if item.scope == "host-test")
 
 
-def runtime_selection(family, *, backend, components=(), test_support=False):
+def runtime_selection(family, *, backend, components=(), test_support=False,
+                      package=None, root=None):
     """Select reviewed sources without preparing dormant catalogue inventory.
 
     This is a dependency identity selection, not a second C source graph.
     CMake continues to own translation units and transitive target links.
     """
     from tools.configure.contracts import COMPONENTS
-    if family != "stm32f4" or backend not in {
+    from tools.configure.packages import discover
+    if package is None:
+        root = Path(__file__).resolve().parents[2] if root is None else Path(root)
+        packages = [item for item in discover(root) if item.family == family]
+        if len(packages) != 1:
+            raise ValueError("Unsupported production family/backend dependency selection")
+        package = packages[0]
+    if package.family != family or backend not in {
             "baremetal", "freertos", "threadx"}:
         raise ValueError("Unsupported production family/backend dependency selection")
     if (not isinstance(components, (tuple, list)) or
@@ -298,7 +306,11 @@ def runtime_selection(family, *, backend, components=(), test_support=False):
             not set(components).issubset(COMPONENTS | {
                 "network", "network-loaned-rx", "tls", "mqtt", "mcuboot"})):
         raise ValueError("Unsupported component dependency selection")
-    identifiers = {"cmsis_core", "stm32f4_cmsis", "stm32f4_hal"}
+    identifiers = {identifier for _, identifier in package.dependencies}
+    declared = {item.identifier: item for item in ALL_SOURCE_DEPENDENCIES}
+    if any(identifier not in declared or declared[identifier].scope != "runtime"
+           for identifier in identifiers):
+        raise ValueError("Package requires an unreviewed runtime dependency")
     if backend != "baremetal":
         identifiers.add(backend)
     suppliers = {"network": "lwip", "network-loaned-rx": "lwip",

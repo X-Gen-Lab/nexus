@@ -31,3 +31,16 @@ class BackendMetadataTest(unittest.TestCase):
         policy = self.policy()
         del policy['configured_backends']
         self.assertEqual(metadata.policy_contract(policy), policy)
+
+    def test_sdk_default_manifests_are_explicit_and_controlled(self):
+        policy = self.policy()
+        policy["source_sdk"]["default_package_manifests"] = [
+            "soc/acme/reviewed/package.json"]
+        self.assertEqual(metadata.policy_contract(policy), policy)
+        for manifests in ([], "soc/acme/reviewed/package.json", ["../package.json"],
+                          ["/package.json"], ["soc/a/package.json"] * 2,
+                          ["soc/a/other.json"], ["soc/a/../package.json"]):
+            with self.subTest(manifests=manifests):
+                policy["source_sdk"]["default_package_manifests"] = manifests
+                with self.assertRaises(ValueError):
+                    metadata.policy_contract(policy)

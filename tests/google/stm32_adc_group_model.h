@@ -6,6 +6,7 @@
 #ifndef NEXUS_STM32_ADC_GROUP_MODEL_H
 #define NEXUS_STM32_ADC_GROUP_MODEL_H
 #include "nexus/arch/arch.h"
+#include "stm32_adc_pad_fixture.h"
 #include "stm32_dma_model.h"
 #include "stm32_official_model.h"
 #ifdef __cplusplus

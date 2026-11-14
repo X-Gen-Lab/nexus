@@ -84,12 +84,22 @@ CLI 传 `--test-support`，CMake 测试工程声明 `NEXUS_TEST_SUPPORT=ON`。�
 
 ## 实现与输入权威
 
+`package.json` 的编辑 schema 与运行时字段同源，可用以下只读命令导出：
+
+```sh
+python -m tools.configure.packages --schema
+```
+
+跟踪文件 `soc-package.schema.json` 由此入口生成；它不替代文件归属、输入身份与
+完整装配校验。旧 `nexus-soc.json` Python 插件只用于显式 test support。
+
 | 入口 | 责任 |
 | --- | --- |
 | `authored.py`、公共 resolver | 读取用户意图，严格验证 SoC／Board／资源与冲突 |
 | `records.py`、`ir.py` | 前者只负责不可变值与审计投影；后者声明装配记录，Board 事实独立依赖前者，避免领域互相导入 |
-| `stm32f4_descriptor.py` | 显式 F4 元数据与输入位置 |
-| `stm32f4/` | 当前集中维护的 F4 配置适配 |
+| `packages.py`、`data_provider.py` | 加载同一快照的包、事实和静态 binding，不维护 MCU Python 注册表 |
+| `domain_policies.py`、`policies/` | 通用领域校验；具体能力和限制由选中包的数据声明 |
+| `static_recipe.py`、`static_ir.py` | 有限类型化静态对象、连接、调用与 IRQ，不承载硬件算法 |
 | `emission.py` 等公共生成代码 | 精确静态配置、存储、face、factory 与固定连接 |
 | 根目录 `soc/stm32/stm32f4/` | 实际硬件 C、生命周期、时钟、IRQ／DMA 与私有 SDK |
 | `assemblies/` | 受维护 F407 软件参考，不是产品策略 |
@@ -104,8 +114,8 @@ CLI 传 `--test-support`，CMake 测试工程声明 `NEXUS_TEST_SUPPORT=ON`。�
 保留责任。
 
 原子 bundle 在所有验证和写入成功后才发布；拒绝不留下可用半成品，不覆盖源码、
-事实、活动生成器或其输入。输入摘要与声明配置模块在执行前记录；外部 Python／CMake
-是受信构建代码，哈希保证身份，不是执行沙箱。
+事实、活动生成器或其输入。输入摘要与公共生成机制在执行前记录；生产包不加载
+外部 Python 插件，包内 CMake 仍是受信构建代码，哈希保证身份，不是执行沙箱。
 
 Board／SoC 不含 Python 插件。完整配置生成由集中 Python 工具承担，
 固件硬件算法和生命周期直接使用 C。配置工具不进入 MCU 镜像。详细合同见

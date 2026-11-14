@@ -45,8 +45,9 @@ schema-2 TOML + SoC／Board JSON
 ```
 
 factory 不分配、不初始化、不探测硬件；新工程使用 `nexus_factory_strong.h`。
-本批源码接口代际为 2；从旧 SDK 迁入时按[迁移说明](docs/guides/migration.md)
-更新公开请求字段并重新生成、编译全部调用者。
+源码接口代际和格式以[兼容性事实](dependencies/platform-compatibility.json)为准；
+从旧 SDK 迁入时按[迁移说明](docs/guides/migration.md)更新公开请求字段，并重新生成、
+编译全部调用者。
 CMake 拥有唯一源码和链接图。当前配置工具仍集中在 `tools/configure/` 使用主机
 Python，负责配置校验与静态连接；固件中的硬件算法和生命周期直接使用 C。
 

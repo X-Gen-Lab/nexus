@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.31)
+project(nexus_public_gpio LANGUAGES C ASM)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml"
+    CACHE FILEPATH "This consumer owns its assembly")
+
+if(NEXUS_SOURCE)
+    set(NEXUS_BUILD_TESTS OFF CACHE BOOL "Platform development tests" FORCE)
+    set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Platform workload" FORCE)
+    add_subdirectory("${NEXUS_SOURCE}" nexus EXCLUDE_FROM_ALL)
+else()
+    find_package(Nexus CONFIG REQUIRED)
+endif()
+nexus_add_firmware(nexus_public_gpio SOURCES main.c)

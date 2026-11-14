@@ -7,8 +7,16 @@ from types import SimpleNamespace
 import unittest
 
 
-from tools.configure.stm32f4 import sdram
+from tools.configure.policies import sdram as admission
+from tools.configure.tests.external_memory_fixture import policy, route_pins
 from tools.configure import authored, configure, ir
+
+
+PINS = frozenset(pin["pin"] for pin in route_pins("fmc-sdram-bank1-16"))
+
+def validate(parameters, *, hclk_hz):
+    admission.validate(parameters, hclk_hz=hclk_hz,
+        max_hclk_hz=policy().controllers["FMC"]["max_hclk_hz"])
 
 
 def selection():
@@ -34,7 +42,7 @@ def selection():
 class SdramAdmission(unittest.TestCase):
     def admit(self, value):
         try:
-            sdram.validate(value, hclk_hz=16000000)
+            validate(value, hclk_hz=16000000)
         except ValueError as error:
             self.fail(f"Complete explicit SDRAM input was rejected: {error}")
 
@@ -43,6 +51,17 @@ class SdramAdmission(unittest.TestCase):
         before = deepcopy(value)
         self.admit(value)
         self.assertEqual(before, value)
+
+    def test_supported_geometry_is_computed_from_all_dimensions(self):
+        for rows, columns, banks in ((11, 9, 2), (12, 10, 4)):
+            value = selection()
+            value.update(row_bits=rows, column_bits=columns, internal_banks=banks,
+                         bytes=(1 << (rows + columns)) * banks * 2)
+            with self.subTest(rows=rows, columns=columns, banks=banks):
+                self.admit(value)
+                value["bytes"] //= 2
+                with self.assertRaises(ValueError):
+                    validate(value, hclk_hz=16000000)
 
     def test_shape_units_types_and_exact_first_geometry_never_fall_back(self):
         mutations = [
@@ -62,13 +81,13 @@ class SdramAdmission(unittest.TestCase):
             value = selection()
             mutation(value)
             with self.subTest(value=value), self.assertRaises(ValueError):
-                sdram.validate(value, hclk_hz=16000000)
+                validate(value, hclk_hz=16000000)
 
     def test_selected_sdclk_must_not_exceed_explicit_endpoint_limit(self):
         value = selection()
         value["max_sdclk_hz"] -= 1
         with self.assertRaises(ValueError):
-            sdram.validate(value, hclk_hz=16000000)
+            validate(value, hclk_hz=16000000)
         value["max_sdclk_hz"] += 1
         self.admit(value)
 
@@ -77,30 +96,30 @@ class SdramAdmission(unittest.TestCase):
         value["timing"]["ras"] = {"nanoseconds": 0, "cycles": 16}
         value["timing"]["rp"] = {"nanoseconds": 0, "cycles": 1}
         with self.assertRaises(ValueError):
-            sdram.validate(value, hclk_hz=16000000)
+            validate(value, hclk_hz=16000000)
         value = selection()
         value["timing"]["xsr"]["nanoseconds"] = 2001
         with self.assertRaises(ValueError):
-            sdram.validate(value, hclk_hz=16000000)
+            validate(value, hclk_hz=16000000)
 
     def test_refresh_minimum_and_forbidden_count_do_not_claim_a_legal_plan(self):
         value = selection()
         value["refresh_window_us"] = 1
         with self.assertRaises(ValueError):
-            sdram.validate(value, hclk_hz=16000000)
+            validate(value, hclk_hz=16000000)
         value["refresh_window_us"] = 31232
         for name, cycles in {"ras": 6, "rc": 12, "wr": 8,
                              "rp": 6, "rcd": 11}.items():
             value["timing"][name] = {"nanoseconds": 0, "cycles": cycles}
         with self.assertRaises(ValueError):
-            sdram.validate(value, hclk_hz=16000000)
+            validate(value, hclk_hz=16000000)
         value["refresh_window_us"] += 512
         self.admit(value)
 
     def test_named_endpoint_ir_keeps_original_timing_units_frozen(self):
         value = {"id": "ram", "controller": "memory",
                  "driver": "memory_window-endpoint", "binding": "ram",
-                 "mode": "cpu-window", "parameters": selection()}
+                 "mode": "cpu-window", "parameters": selection(), "address": 0xc0000000}
         owner = SimpleNamespace(id="memory", kind="external_bus",
                                 mode="sdram-controller")
         try:
@@ -138,11 +157,11 @@ class SdramAdmission(unittest.TestCase):
                 configure.integer, configure.text)
 
     def test_endpoint_resolution_claims_exact_window_and_union_of_pads(self):
-        resolve = getattr(sdram, "resolve_endpoint", None)
-        complete = getattr(sdram, "complete_controller", None)
+        resolve = policy().resolve_endpoint
+        complete = policy().complete_controller
         self.assertTrue(callable(resolve), "SDRAM endpoint admission is absent")
         self.assertTrue(callable(complete), "SDRAM controller completion is absent")
-        pads = [{"pin": pin, "af": 12} for pin in sorted(sdram.PINS)]
+        pads = [{"pin": pin, "af": 12} for pin in sorted(PINS)]
         route = {"id": "fmc-sdram-bank1-16", "controller": "FMC",
                  "kind": "memory_window", "modes": ["cpu-window"], "pins": pads}
         bindings = {"ram": {"route": route["id"]}}
@@ -158,10 +177,10 @@ class SdramAdmission(unittest.TestCase):
                 routes=routes, claim=claim, board_conditions={},
                 clock={"core_hz": 16000000})
         complete(owner, [device], claim=claim, bindings=bindings, routes=routes)
-        self.assertEqual(set(sdram.PINS), {p["pin"] for p in owner["pins"]})
+        self.assertEqual(set(PINS), {p["pin"] for p in owner["pins"]})
         self.assertEqual(39, len(claims))
         self.assertEqual("ip:FMC/bank1/data-window", claims[0][0])
-        self.assertNotIn("address", device)
+        self.assertEqual(0xc0000000, device["address"])
         self.assertNotIn("bytes", device)
         for bad in ({**device, "mode": "startup-memory"},
                     {**device, "read_timing": {}},
@@ -176,35 +195,16 @@ class SdramAdmission(unittest.TestCase):
                      bindings=bindings, routes=routes)
 
     def test_constructor_emits_only_static_faces_and_explicit_c_lifecycle(self):
-        def record(value):
-            return (SimpleNamespace(**{key: record(item)
-                                       for key, item in value.items()})
-                    if isinstance(value, dict) else value)
-        masks = {"C": 0x000d, "D": 0xc703, "E": 0xff83,
-                 "F": 0xf83f, "G": 0x8133}
-        pins = tuple({"pin": f"P{port}{pin}", "af": 12}
-                     for port, bits in masks.items() for pin in range(16)
-                     if bits & (1 << pin))
-        child = SimpleNamespace(id="ram", controller="memory",
-                                driver="memory_window-endpoint",
-                                options=SimpleNamespace(
-                                    mode="cpu-window",
-                                    parameters=record(selection())))
-        item = SimpleNamespace(id="memory", controller="FMC",
-                               mode="sdram-controller", dma=(), pins=pins)
-        result = SimpleNamespace(part="STM32F479NIH6", devices=(child,),
-                                 clock={"core_hz": 16000000})
-        try:
-            construction = sdram.constructor(item, result)
-        except ValueError as error:
-            self.fail(f"Complete explicit static SDRAM graph was rejected: {error}")
+        from tools.configure.test_external_memory_recipes import projection
+        construction = projection("sdram", "sdram-controller", "cpu-window")
         self.assertEqual("nx_stm32_sdram_t", construction.state_type)
         self.assertEqual("nx_stm32_sdram_admit", construction.admission[0].function)
         self.assertEqual("nx_stm32_sdram_start", construction.initialize.function)
         self.assertEqual(2, len(construction.initialize.arguments))
         self.assertEqual("nx_stm32_sdram_stop", construction.stop[0].function)
         self.assertEqual(38, len(construction.pin_snapshots))
-        source = "\n".join(construction.definitions)
+        source = "\n".join(line for declaration in construction.static_declarations
+                           for line in declaration.render())
         self.assertIn("nx_stm32_sdram_window_ops", source)
         self.assertIn(".system = &g_nx_stm32_system", source)
         self.assertIn(".prepare_budget_us = 1000u", source)

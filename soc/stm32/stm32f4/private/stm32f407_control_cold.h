@@ -307,6 +307,14 @@ nx_stm32_adc_cold_begin(nx_stm32_adc_state_t* port,
         config->channel_count);
     if (sequence != NX_SUCCESS)
         return sequence;
+    /* Reject an unselected external connection before acquiring any clock.
+     * Internal channels have already been admitted by sequence validation. */
+    for (size_t i = 0U; i < config->channel_count; ++i) {
+        nx_stm32_adc_pad_t pad;
+        if (config->channels[i] <= 15U &&
+            !nx_stm32_adc_pad(config->registers, config->channels[i], &pad))
+            return NX_ERROR_INVALID;
+    }
     uint32_t clock = nx_stm32_adc_clock(config->registers);
     if (port->initialized || port->active || port->cold_effects != 0U ||
         (RCC->APB2ENR & clock) != 0U)

@@ -34,8 +34,7 @@ nx_result_t nx_stm32_i2c_prepare(nx_stm32_i2c_state_t* port,
     if (result != NX_SUCCESS)
         return result;
     port->registers = config->registers;
-    port->line_gpio = config->registers == I2C3 ? GPIOA : GPIOB;
-    port->line_mask = (1U << config->pins[0].pin) | (1U << config->pins[1].pin);
+    port->lines = config->lines;
     port->peripheral_mhz = config->clock_hz / 1000000U;
     port->rate_hz = config->max_hz;
     result = nx_stm32_i2c_initialize(port);
@@ -92,8 +91,8 @@ nx_result_t nx_stm32_i2c_close(nx_stm32_i2c_state_t* port,
 
 /** \brief Apply the selected whole-MHz APB standard/Fast timing. */
 nx_result_t nx_stm32_i2c_initialize(nx_stm32_i2c_state_t* port) {
-    if (port == NULL || port->registers == NULL || port->line_gpio == NULL ||
-        port->line_mask == 0U || (port->line_mask & ~UINT32_C(0xFFFF)) != 0U) {
+    if (port == NULL || port->registers == NULL ||
+        !nx_i2c_v1_lines_valid(port->lines)) {
         return NX_ERROR_INVALID;
     }
     uint16_t ccr;
@@ -257,6 +256,23 @@ static bool drain_stop(nx_stm32_i2c_state_t* port) {
     return true;
 }
 
+/** \brief Polling owns both complete GPIO banks behind its IDR bindings. */
+static bool polling_line_storage(const nx_i2c_v1_lines_t* lines,
+                                 const void* storage, size_t bytes) {
+    if (!nx_i2c_v1_lines_outside(lines, storage, bytes))
+        return false;
+    for (size_t i = 0U; i < 2U; ++i) {
+        uintptr_t input = (uintptr_t)lines->inputs[i];
+        if (input < offsetof(GPIO_TypeDef, IDR) ||
+            !nx_i2c_v1_storage_outside(
+                storage, bytes,
+                (const void*)(input - offsetof(GPIO_TypeDef, IDR)),
+                sizeof(GPIO_TypeDef)))
+            return false;
+    }
+    return true;
+}
+
 /** \brief Polling borrows cannot alias this exact controller's known bytes. */
 static bool polling_storage(const nx_stm32_i2c_endpoint_state_t* endpoint,
                             const void* storage, size_t bytes) {
@@ -270,10 +286,7 @@ static bool polling_storage(const nx_stm32_i2c_endpoint_state_t* endpoint,
                                      sizeof(nx_stm32_i2c_endpoint_ops)) &&
            nx_i2c_v1_storage_outside(storage, bytes, port->registers,
                                      sizeof(*port->registers)) &&
-           nx_i2c_v1_storage_outside(storage, bytes, port->line_gpio,
-                                     sizeof(*port->line_gpio)) &&
-           (port->registers != I2C3 ||
-            nx_i2c_v1_storage_outside(storage, bytes, GPIOC, sizeof(*GPIOC)));
+           polling_line_storage(port->lines, storage, bytes);
 }
 
 /** \brief Reuse public message rules before the first progress/payload write.
@@ -453,8 +466,8 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
  */
 nx_result_t nx_stm32_i2c_recover(void* context) {
     nx_stm32_i2c_state_t* port = context;
-    if (port == NULL || port->registers == NULL || port->line_gpio == NULL ||
-        port->line_mask == 0U || (port->line_mask & ~UINT32_C(0xFFFF)) != 0U) {
+    if (port == NULL || port->registers == NULL ||
+        !nx_i2c_v1_lines_valid(port->lines)) {
         return NX_ERROR_INVALID;
     }
     if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
@@ -472,10 +485,8 @@ nx_result_t nx_stm32_i2c_recover(void* context) {
     port->registers->CR1 = 0U;
     nx_result_t result = nx_stm32_i2c_initialize(port);
     NX_STM32_IO_POLL(2U, port);
-    if (result == NX_SUCCESS &&
-        ((port->registers->SR2 & I2C_SR2_BUSY) != 0U ||
-         !nx_stm32_i2c_lines_high(port->registers, &port->line_gpio->IDR,
-                                  port->line_mask))) {
+    if (result == NX_SUCCESS && ((port->registers->SR2 & I2C_SR2_BUSY) != 0U ||
+                                 !nx_i2c_v1_lines_high(port->lines))) {
         port->fault = true;
         return NX_ERROR_IO;
     }

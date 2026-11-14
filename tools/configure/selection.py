@@ -155,25 +155,28 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
     """
     mode = selection["mode"]
     if route["kind"] in {"display", "image"}:
-        from tools.configure.stm32f4.graphics import validate_clock
-        validate_clock(selection, route, clock_plan)
+        policy = getattr(provider, "EXTERNAL_BUS", None)
+        if policy is None:
+            fail("Selected provider has no graphics clock policy")
+        policy.validate_graphics_clock(selection, route, clock_plan)
     if route["kind"] in {"usb_device", "usb_host"}:
         from tools.configure import usb_host
-        usb_host.validate_clock(route["controller"], clock["core_hz"])
+        usb_host.validate_clock(route["controller"], clock["core_hz"],
+            provider=provider, kind=route["kind"], mode=selection["mode"])
     resolved_timing = None
     if route["kind"] == "uart" and selection["mode"] == "irq-wire":
         from tools.configure import uart_wires
-        uart_wires.validate_clock(selection, route, clock)
+        uart_wires.validate_clock(selection, route, clock, provider)
     if route["kind"] == "spi":
         from tools.configure import spi_frames
-        spi_frames.validate_clock(selection, route, clock)
+        spi_frames.validate_clock(selection, route, clock, provider)
     if route["kind"] == "i2c":
         from tools.configure import i2c_timing_selection
         resolved_timing = i2c_timing_selection.resolve(
             selection, clock, provider, clock_plan=clock_plan)
     from tools.configure import stream_profiles
     resolved_stream = stream_profiles.resolve(
-        selection, route["kind"], provider)
+        selection, route["kind"], provider, controller=route["controller"])
     result = {
         **selection, "controller": route["controller"],
         "kind": route["kind"], "route": route["id"],
@@ -195,9 +198,11 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
         if resolver is None:
             fail("Selected provider has no camera/audio owner")
         result.update(resolver(selection, route, clock, clock_plan))
-    if route["kind"] in {"pwm_group", "timer_pulse", "timer_sequence"} and provider.PREFIX == "stm32":
-        from tools.configure.stm32f4 import waveform
-        result["waveform_resolution"] = waveform.resolve_fields(selection, route, clock)
+    if route["kind"] in {"pwm_group", "timer_pulse", "timer_sequence"}:
+        policy = getattr(provider, "WAVEFORM", None)
+        if policy is None:
+            fail("Selected provider has no timer waveform policy")
+        result["waveform_resolution"] = policy.resolve_fields(selection, route, clock)
     result.update(provider.mode_fields(
         selection, route, clock_profile=clock_profile))
     if route["kind"] == "can_fd":

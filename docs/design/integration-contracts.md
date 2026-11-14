@@ -44,6 +44,8 @@ SoC provider 实现公共 IO/核心合同，并使用 Arch。器件 driver 使�
 
 ```text
 soc/<vendor>/<family>/
+  package.json             # 事实、构建与导出归属的显式入口
+  bindings.json / bindings/ # 公共能力、pad 坐标与有限静态连接
   soc.json                 # 精确 SKU、内存、时钟与控制器事实
   routes.json              # 已复核路由及模式的有限 allowlist
   CMakeLists.txt           # 私有 SDK/provider 的显式目标依赖
@@ -56,14 +58,17 @@ controller groups；物理事实与软件模式分开。`devices.json` 记录官
 IRQ enum／number／handler。型号、封装、Flash、SRAM 域和 IRQ 表不能被家族字符串
 代替，厂商编译目录不扩大运行时模式支持。
 
-当前生产源码只有 `soc/stm32/stm32f4/`，私有共享 IP 位于其 `drivers/ip/`。
-Board／SoC 不放 Python 插件；当前 F4 配置适配集中在 `tools/configure/stm32f4/`，
-通用 schema、resolver、typed IR 与原子输出仍由公共工具维护。Native 仅在
+当前生产 SoC 入口只有 `soc/stm32/stm32f4/`，私有共享 IP 位于其 `drivers/ip/`。
+Board／SoC 不放 Python 插件；声明式 package 由 `tools/configure/` 的通用
+DataProvider、领域政策、typed IR 与有限静态节点解析，不再加载家族 Python
+构造模块。顶层 `pads` 统一显式坐标；字段与同一快照合同见
+[接入指南](../guides/provider-porting.md)。Native 仅在
 `tests/support/native/`，必须显式启用测试 scope；不会进入生产支持枚举。
 CPU 实现按 ISA 位于 `arch/arm/cortex_m/` 或 `arch/native/`，公共头路径保持稳定。
 默认生成入口连接 Core 的手写 C 整平台生命周期和 F4 的 System／共享资源 C 协调器。
-主机保留事实校验与静态连接，不维护硬件算法或启动／撤回控制流，只维护一套配置
-实现。实际生成 factory、C 模型与 ARM 镜像分别验收，不能用目录调整或源码存在
+主机保留事实校验与有限静态连接，不维护寄存器级硬件算法或驱动状态机；固定生命周期
+调用与通用错误传播仍由 typed 节点连接，只维护一套配置实现。实际生成 factory、
+C 模型与 ARM 镜像分别验收，不能用目录调整或源码存在
 宣布整条链路通过。
 
 ## 4. 解析、生成与 CMake 装配
@@ -71,7 +76,7 @@ CPU 实现按 ISA 位于 `arch/arm/cortex_m/` 或 `arch/native/`，公共头路�
 配置过程必须按固定顺序执行：
 
 1. 读取 assembly，定位唯一 Board，按其精确料号定位 SoC；检查 schema、版本和依赖锁。
-2. 校验 package containment、声明 inputs、资料中的已知/未知条件；展开被选中的 binding 与器件。
+2. 经同一受控快照读取 package 声明的事实与 binding 文件，校验包边界、资料中的已知／未知条件；展开选中的静态声明与器件。
 3. 建立资源占用表，检查模式能力、冲突、clock、IRQ、memory、ABI 和 layout。
 4. 原子写入单份 `resolved.json`，记录所有决定、拒绝项和输入摘要。
 5. 从该 IR 导出硬件配置头、只读资源表及 linker 输入；CMake 读取必要选项并按自己声明的目标依赖编译。

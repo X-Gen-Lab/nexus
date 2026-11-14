@@ -215,9 +215,10 @@ class ReviewedMountTests(unittest.TestCase):
         return module
 
     @staticmethod
-    def selected_sdk_sources(_profile=None):
+    def selected_sdk_sources(_profile=None, *, root=None, selection=None):
         # Exercise the generic mount observer with this synthetic reviewed
         # selection; production F4 supplier selection has independent tests.
+        del root, selection
         return {item.path: item for item in catalogue.ALL_DEPENDENCIES
                 if item.scope == "runtime"}
 

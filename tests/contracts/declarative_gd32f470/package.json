@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "interface_version": 1,
+  "id": "gd32f470_reference",
+  "family": "gd32f470_reference",
+  "vendor": "gigadevice",
+  "scope": "reference",
+  "source_directory": ".",
+  "facts": {
+    "soc": "soc.json",
+    "routes": "routes.json",
+    "bindings": "bindings.json",
+    "references": "references.json"
+  },
+  "dependencies": {
+    "cmsis_core": "cmsis_core"
+  },
+  "cmake": {
+    "entry": "CMakeLists.txt",
+    "target": "nexus_soc_gd32f470_reference"
+  },
+  "exports": {
+    "roots": [
+      "."
+    ],
+    "exclude": [
+      "testing"
+    ]
+  }
+}

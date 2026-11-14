@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.configure import configure as gate
-from tools.configure.providers import descriptor
+from tools.configure.tests.f4_fixture import copy_package, load_f4_fixture
 
 
 CATALOG = "soc/stm32/stm32f4/devices.json"
@@ -20,13 +20,13 @@ class DeviceCatalogConfigurationTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
-        for name in ("dependencies/platform-compatibility.json", SOC, CATALOG,
-                     "soc/stm32/stm32f4/routes.json",
-                     "soc/stm32/stm32f4/references.json",
+        copy_package(self.root)
+        for name in ("dependencies/platform-compatibility.json",
                      "boards/stm32f407ve_sky_qingchun/board.json"):
             path = self.root / name
             path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(gate.ROOT / name, path)
+        self.fixture = load_f4_fixture("STM32F407VET6", self.root)
         self.assembly = self.root / "assembly.toml"
         self.assembly.write_text('schema=2\nboard="stm32f407ve_sky_qingchun"\n'
                                  'backend="baremetal"\nclock="hse8-pll168"\n'
@@ -57,7 +57,7 @@ class DeviceCatalogConfigurationTests(unittest.TestCase):
         records = {item["path"]: item["sha256"] for item in result.inputs}
         self.assertEqual(records[CATALOG], hashlib.sha256(
             (self.root / CATALOG).read_bytes()).hexdigest())
-        self.assertIn(CATALOG, descriptor.maintained("stm32f4").fact_files)
+        self.assertIn(self.root / CATALOG, self.fixture.package.inputs)
 
     def test_unknown_catalog_device_id_is_rejected(self):
         self.update(SOC, lambda soc: soc["variants"]["STM32F407VET6"].update(
@@ -93,11 +93,12 @@ class DeviceCatalogConfigurationTests(unittest.TestCase):
         catalog = gate.load(self.root / CATALOG)
         selected = gate.catalog_soc_facts(raw, "STM32F407VET6", catalog)
         self.assertEqual(selected.device.external_irq_count, 82)
+        provider = self.fixture.provider.for_soc(selected.soc)
         with self.assertRaisesRegex(gate.ConfigurationError, "catalog device"):
-            gate.validate_soc(selected.soc, "STM32F407VET6")
+            gate.validate_soc(selected.soc, "STM32F407VET6", provider)
         selected.soc["irq"]["external_count"] += 1
         with self.assertRaisesRegex(gate.ConfigurationError, "IRQ count"):
-            gate.validate_soc(selected.soc, "STM32F407VET6",
+            gate.validate_soc(selected.soc, "STM32F407VET6", provider,
                               catalog_device=selected.device)
 
     def test_duplicate_device_id_and_header_startup_mismatch_are_rejected(self):

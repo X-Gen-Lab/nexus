@@ -4,7 +4,7 @@ from dataclasses import FrozenInstanceError, replace
 import unittest
 
 from tools.configure import bindings, configure as gate
-from tools.configure.providers import maintained
+from tools.configure.providers import for_selection
 from tools.configure.providers.common import owned_claims
 
 
@@ -19,7 +19,7 @@ class ControllerIntegrationTests(unittest.TestCase):
         invalid = (tuple(reversed(lanes)),
                    (replace(lanes[0], owner="foreign"), lanes[1]),
                    (replace(lanes[0], controller="SPI2"), lanes[1]))
-        provider = maintained("stm32f4")
+        provider = for_selection(result)
         for selected in invalid:
             with self.subTest(lanes=selected):
                 changed = replace(item, integration=replace(
@@ -65,7 +65,7 @@ class ControllerIntegrationTests(unittest.TestCase):
                 self.assertIs(selected.clock_inputs, result.clock)
                 self.assertIs(selected.pins, item.pins)
                 self.assertTrue(any(selected.hardware is binding for binding
-                    in maintained(result.soc_family).CONTROLLER_BINDINGS))
+                    in for_selection(result).CONTROLLER_BINDINGS))
                 with self.assertRaises(FrozenInstanceError):
                     selected.controller = "foreign"
 

@@ -20,8 +20,7 @@ if __name__ == "__main__":
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from tools.configure import bindings, configure, documentation  # noqa: E402
-from tools.configure.providers import descriptor  # noqa: E402
+from tools.configure import bindings, configure, documentation, matrix, packages  # noqa: E402
 
 DOCUMENT = "docs/delivery/capabilities.md"
 START = "<!-- nexus-capabilities:start -->"
@@ -151,6 +150,9 @@ def selection(assembly, root=ROOT, *, test_support=False):
                            "backend", "clock_profile", "cpu", "irq",
                            "optimization", "physical_pcb_revision")},
             "configuration_sha256": data["configuration_sha256"],
+            "provider_package": (dict(typed.provider_context.identity)
+                if typed.provider_context.identity is not None else
+                {"family": typed.soc_family, "scope": "native_model"}),
             "os": os_selection(typed, data),
             "silicon_admission": silicon[None],
             "controllers": controllers, "endpoints": endpoints,
@@ -205,34 +207,18 @@ def collect(root=ROOT):
     routes = {}
     declared = defaultdict(set)
     exports = {}
-    for path in sorted((root / "soc").rglob("soc.json")):
-        soc = configure.load(path)
-        if soc["id"] == "native":
-            continue
-        integration = descriptor.maintained(soc["id"])
-        provider = configure.maintained(soc["id"])
-        catalog = (configure.load(path.parent / integration.device_catalog)
-                   if integration.device_catalog is not None else None)
-        selected_parts = {}
-        normalized_parts = {}
-        for part in soc["variants"]:
-            selected = configure.resolve_device_facts(
-                soc, part, provider, catalog=catalog)
-            normalized_parts[part] = selected
-            selected_parts[part] = selected.device
-        facts[soc["id"]] = selected_parts
-        route_doc = configure.load(path.parent / "routes.json")
-        configure.obj(route_doc, {"schema_version", "routes"}, (), "routes")
-        configure.integer(route_doc["schema_version"], 1, 1, "routes schema")
-        # Use the resolver's complete reviewed physical/interface validation.
-        # Union exact-part results without inventing a documentation mode gate.
+    for view in matrix.package_views(root):
+        family = view.package.family
+        facts[family] = {part.part: part.facts.device for part in view.parts}
         route_index = {}
-        for part, selected in normalized_parts.items():
-            route_index.update(configure.resolve_routes(
-                route_doc, selected.soc, part, provider,
-                controller_profiles=selected.controller_profiles))
-        routes[soc["id"]] = route_index
-        for source in sorted((path.parent / "drivers").rglob("*.c")):
+        for part in view.parts:
+            route_index.update(part.routes)
+        routes[family] = route_index
+        # These are owned source definitions, not a reconstruction of CMake's
+        # selected target graph and never execution or physical evidence.
+        sources = {source for directory in view.package.export_roots
+                   for source in directory.rglob("*.c") if view.package.exports(source)}
+        for source in sorted(sources):
             for symbol in source_ops(source, root):
                 if symbol in exports:
                     raise ValueError(f"Duplicate ops definition: {symbol}")
@@ -278,7 +264,15 @@ def collect(root=ROOT):
         authored = tomllib.loads(fixture.read_text(encoding="utf-8"))
         if authored.get("backend") == "native":
             continue
+        package_path = authored.get("soc_package")
+        if isinstance(package_path, str):
+            manifest = fixture.parent / package_path / "package.json"
+            if manifest.is_file() and packages.load(manifest).scope != "production":
+                continue
         typed = configure.resolve_ir(fixture, root)
+        if (typed.provider_context.package is not None and
+                typed.provider_context.package.scope != "production"):
+            raise ValueError("Production capability collection requires a production package")
         result = typed.to_dict()
         source = c_code(bindings.emit(typed)[1])
         for item in result["controllers"]:

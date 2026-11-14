@@ -1,10 +1,7 @@
 """Exact package pad and per-engine memory facts, without route inference."""
 from collections.abc import Mapping
-import re
 
 from tools.configure.providers.common import fail
-
-GPIO_PIN = re.compile(r"P([A-K])([0-9]|1[0-5])")
 
 
 def memory_access(region, engines):
@@ -19,14 +16,19 @@ def memory_access(region, engines):
         fail("Memory DMA facts require a boolean shared reachability contract")
 
 
-def package_pins(pins, conditions, allowed):
+def package_pins(pins, conditions, allowed, *, pad_facts=None):
     """Conditional package pads never silently authorize ordinary GPIO routes."""
     if (not isinstance(pins, list) or not pins or
             any(not isinstance(pin, str) for pin in pins) or
             len(set(pins)) != len(pins)):
         fail("Complete unique GPIO package pins required")
+    from tools.configure.resource_graph import identifier
+    for pin in pins:
+        identifier(pin, "package pin identity")
+    if not isinstance(pad_facts, Mapping) or not isinstance(allowed, Mapping):
+        fail("Package pins require explicit GPIO and conditional coordinates")
     conditional = set(pins).intersection(allowed)
-    if (any(not GPIO_PIN.fullmatch(pin) and pin not in conditional for pin in pins)
+    if (any(pin not in pad_facts and pin not in conditional for pin in pins)
             or not isinstance(conditions, Mapping) or set(conditions) != conditional):
         fail("Complete package pins require exact conditional pad facts")
     fields = {"gpio", "condition", "source", "status"}
@@ -34,7 +36,6 @@ def package_pins(pins, conditions, allowed):
         if (not isinstance(fact, Mapping) or set(fact) != fields or
                 any(not isinstance(value, str) or not value.strip()
                     for value in fact.values()) or
-                fact["gpio"] != pad.removesuffix("_C") or
-                not GPIO_PIN.fullmatch(fact["gpio"]) or
+                fact["gpio"] != allowed[pad] or fact["gpio"] not in pad_facts or
                 fact["status"] != "not_exposed"):
             fail("Conditional pad is not an exposed ordinary GPIO route")

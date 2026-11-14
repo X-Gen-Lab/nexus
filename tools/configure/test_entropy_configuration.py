@@ -65,11 +65,11 @@ class EntropyConfiguration(unittest.TestCase):
                 self.assertEqual(selected_contracts.describe(item).unit_bytes, 4)
 
     def test_direct_input_without_reserved_pll48_rejects_before_generation(self):
-        with self.assertRaisesRegex(ValueError, "RNG.*PLL48"):
+        with self.assertRaisesRegex(ValueError, "Entropy.*nominal kernel clock"):
             self.resolve(parameters=self.direct_hsi(pll48=False))
 
     def test_active_main_pll_with_other_q_frequency_cannot_supply_rng(self):
-        with self.assertRaisesRegex(ValueError, "RNG.*PLL48"):
+        with self.assertRaisesRegex(ValueError, "Entropy.*nominal kernel clock"):
             self.resolve(parameters=self.direct_hsi(pll48=False, sysclk="pll", q=8))
 
     def test_explicit_direct_hsi_pll48_is_a_valid_rng_clock_owner(self):

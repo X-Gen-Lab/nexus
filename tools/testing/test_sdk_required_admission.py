@@ -28,11 +28,12 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
         self.payload.write_bytes(b"reviewed payload bytes\n")
         self.files = {"ordinary.c": self.sdk.digest(self.payload.read_bytes())}
         self.identity = {
-            "schema": 2, "profile": self.sdk.source_profile(),
+            "schema": 3, "profile": self.sdk.source_profile(),
             "kind": "nexus-installed-source-sdk",
             "source_revision": "a" * 40, "source_tree": "b" * 40,
             "publishable": True, "source_dirty": False,
             "files_sha256": self.files, "dependencies": [],
+            "source_exports": {"members": ["ordinary.c"], "packages": []},
             "reviewed_imports": [], "toolchains_lock_sha256": "c" * 64,
             "snapshot_sha256": "", "package_files_sha256": {},
         }
@@ -55,6 +56,19 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
         data = (ROOT / name).read_bytes()
         lock.write_bytes(data)
         self.files[name] = self.sdk.digest(data)
+        # Selection metadata is real payload: the installed verifier must not
+        # discover packages from its importing maintainer checkout.
+        selection = self.sdk.resolve_selection(ROOT, self.identity["profile"])
+        for package in selection.packages:
+            for source in package.inputs:
+                name = source.relative_to(ROOT).as_posix()
+                target = self.root / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                data = source.read_bytes()
+                target.write_bytes(data)
+                self.files[name] = self.sdk.digest(data)
+        self.identity["source_exports"] = self.sdk.source_export_declaration(
+            ROOT, self.files, selection=selection)
 
     def test_missing_required_names_reject_without_opening_payload(self):
         self.write_manifest()
@@ -88,8 +102,8 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
             "boards/stm32f407zg_qiming_core/board.json",
             "boards/stm32f407zg_qiming_v41/board.json",
             "io/include/nexus/io/block.h", "io/src/api/block.c",
-            "cmake/platform/STM32FSMC.cmake",
-            "cmake/platform/STM32SDIO.cmake",
+            "soc/stm32/stm32f4/cmake/STM32FSMC.cmake",
+            "soc/stm32/stm32f4/cmake/STM32SDIO.cmake",
             "soc/stm32/stm32f4/drivers/fsmc.c",
             "soc/stm32/stm32f4/drivers/fsmc_boot.c",
             "soc/stm32/stm32f4/sram_boot.c",
@@ -106,7 +120,7 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
             "soc/stm32/stm32f4/reset.c",
             "soc/stm32/stm32f4/drivers/pvd.c",
             "soc/stm32/stm32f4/private/stm32f407_pvd.h",
-            "tools/configure/stm32f4/pvd.py",
+            "soc/stm32/stm32f4/bindings/pvd.json",
             "soc/stm32/stm32f4/drivers/advanced_pwm_tim8.c",
             "soc/stm32/stm32f4/drivers/timer_capture_tim3.c",
             "soc/stm32/stm32f4/drivers/timer_capture_tim5.c",
@@ -114,7 +128,7 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
             "soc/stm32/stm32f4/private/stm32f4_adc_trigger.h",
             "soc/stm32/stm32f4/private/stm32f4_encoder.h",
             "soc/stm32/stm32f4/private/stm32f407_timer_hardware.h",
-            "tools/configure/stm32f4/encoder.py",
+            "soc/stm32/stm32f4/bindings/encoder.json",
             "components/at24c02/src/at24c02.c",
             "components/w25/src/w25.c",
             "components/ili9341/src/ili9341.c",

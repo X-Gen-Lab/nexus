@@ -1,0 +1,266 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 8ee64985e878d5a0148290a9e2a9fbbf3b66c8b612c8aebe73cbfefec1e6016c\n"
+
+msgid "接入 MCU、IP 与静态实例"
+msgstr "Integrate an MCU, IP and static instances"
+
+msgid "本页帮助维护者扩展已维护 IP 的器件、路线或实现新的硬件模式。当前生产范围仍由 [精确支持](../delivery/support.md)限定；声明式 GD32F470 是独立软件参考，不自动 成为生产系列或实板资格。先读[接入合同](../design/integration-contracts.md)与 [官方库边界](../design/official-stm32-provider.md#build-time-provider-contract)。"
+msgstr "Use this guide to extend devices and routes of maintained IP or implement new hardware modes. [Exact support](../delivery/support.md) still bounds production scope; declarative GD32F470 is a separate software reference, not automatically a production family or physical qualification. Read the [integration contract](../design/integration-contracts.md) and [official-library boundary](../design/official-stm32-provider.md#build-time-provider-contract) first."
+
+msgid "生产默认配置使用声明式 package、通用 DataProvider、DomainPolicies 与有限静态 装配；旧 F4 家族 Python 构造模块已删除，不再由家族导入注册表选择实现。硬件行为 仍由手写 C 拥有。事实权威与全部选定模式的集成仍须实际验收；任务状态见 [当前架构](../delivery/architecture.md#本轮架构迭代任务)，不以一次生成或 ARM 链接关闭全部任务。"
+msgstr "The production default uses declarative packages, generic DataProvider, DomainPolicies and bounded static assembly. Old F4 family Python constructor modules have been removed; no family import registry selects implementations. Handwritten C still owns hardware behavior. Fact authority and integration of all selected modes require actual acceptance. The [current architecture](../delivery/architecture.md#本轮架构迭代任务) owns task status; one generation or ARM link does not close every task."
+
+msgid "先确定最小修改边界"
+msgstr "Choose the smallest modification boundary first"
+
+msgid "增量"
+msgstr "Increment"
+
+msgid "应修改的位置与边界"
+msgstr "Expected modification location and boundary"
+
+msgid "已有 IP、已有 System profile 的新料号或封装"
+msgstr "A new part or package with existing IP and an existing System profile"
+
+msgid "精确器件、内存、封装与差异数据；公共配置引擎不加型号分支"
+msgstr "Exact device, memory, package and distinguishing data; no model branch in the public configuration engine"
+
+msgid "已有能力的新路线或实例"
+msgstr "A new route or instance of existing capabilities"
+
+msgid "route、资源与 Board 授权；C 实现从只读配置取得接线"
+msgstr "Route, resources and Board authorization; C implementation reads wiring from read-only configuration"
+
+msgid "相同料号的新 Board"
+msgstr "A new Board for the same part"
+
+msgid "PCB、晶振、外部器件与安全电平；必要板级行为用 C"
+msgstr "PCB, oscillators, external devices and safe levels; necessary Board behavior stays in C"
+
+msgid "新 SoC 复用已知 IP"
+msgstr "A new SoC reusing known IP"
+
+msgid "复用驱动与 binding，补包内启动、时钟、内存与 CMake 集成"
+msgstr "Reuse drivers and bindings; add package-local startup, clock, memory and CMake integration"
+
+msgid "新 IP 沿用已有公共语义"
+msgstr "New IP using existing public semantics"
+
+msgid "包内 C、binding 与对应能力数据；按真实编程模型复用"
+msgstr "Package-local C, bindings and capability data; share according to the actual programming model"
+
+msgid "新公共语义或未维护的 IP 模型"
+msgstr "New public semantics or an unmaintained IP model"
+
+msgid "显式扩展领域合同／policy，先写实际拒绝与行为测试"
+msgstr "Explicitly extend the domain contract/policy; write actual rejection and behavior tests first"
+
+msgid "新 MCU 复用现有模型不需要复制一套配置器。新时钟拓扑、DMA 模型或公共操作超出现有 合同后，仍需实现其通用领域政策和 C 行为；数据不能替代未知硬件算法。外部器件通过 组件消费公共端口，产品任务、分区和恢复策略保持外置。"
+msgstr "Reusing an existing model for a new MCU does not require another configuration tool. A clock topology, DMA model or public operation beyond existing contracts still needs its common domain policy and C behavior; data cannot replace an unknown hardware algorithm. Components consume public ports for external devices. Product tasks, partitions and recovery policy remain external."
+
+msgid "包、事实与目录"
+msgstr "Packages, facts and directories"
+
+msgid "这是维护责任，不要求仅为外观移动文件。当前 F4 的事实保持原位；共享 IP 就近维护， 跨家族提取需要真实相同编程模型。运行调用不因目录划分增加转发，见 [源码归属图](../assets/diagrams/driver-source-ownership.svg)。"
+msgstr "These are maintenance responsibilities, not a requirement to move files for appearance. Current F4 facts remain in place; shared IP stays local, and cross-family extraction requires the same real programming model. Directory boundaries add no runtime forwarding; see the [source ownership diagram](../assets/diagrams/driver-source-ownership.svg)."
+
+msgid "package 字段"
+msgstr "Package field"
+
+msgid "合同"
+msgstr "Contract"
+
+msgid "`schema_version`／`interface_version`"
+msgstr "`schema_version` / `interface_version`"
+
+msgid "独立格式与工具协议，未知版本拒绝"
+msgstr "Separate format and tool protocol; unknown versions reject"
+
+msgid "`id`／`family`／`vendor`"
+msgstr "`id` / `family` / `vendor`"
+
+msgid "显式身份；重复不能靠搜索优先级覆盖"
+msgstr "Explicit identities; duplicate entries cannot override through search precedence"
+
+msgid "`source_directory`"
+msgstr "`source_directory`"
+
+msgid "相对 manifest 的所属源码目录"
+msgstr "Owned source directory relative to the manifest"
+
+msgid "`facts`"
+msgstr "`facts`"
+
+msgid "`soc`／`routes`；按选定 provider 另给 `device_catalog`／`references`／`review_profiles`／`bindings`"
+msgstr "`soc`/`routes`, plus `device_catalog`/`references`/`review_profiles`/`bindings` as required by the selected provider"
+
+msgid "`binding_files`"
+msgstr "`binding_files`"
+
+msgid "显式有序输入列表，不能重复、越界或冒充其他权威输入"
+msgstr "Explicit ordered inputs; no duplicates, escape or substitution for another authoritative input"
+
+msgid "`dependencies`"
+msgstr "`dependencies`"
+
+msgid "引用既有依赖来源 ID，不另抄 URL、gitlink 或许可"
+msgstr "Reference existing dependency source IDs instead of copying URLs, gitlinks or licenses"
+
+msgid "`cmake.entry`／`cmake.target`"
+msgstr "`cmake.entry` / `cmake.target`"
+
+msgid "选中包的构建入口与 target，不列第二份 `.c` 图"
+msgstr "Selected package build entry and target, without a second `.c` graph"
+
+msgid "`exports.roots`／`exports.exclude`"
+msgstr "`exports.roots` / `exports.exclude`"
+
+msgid "包拥有的生产导出范围，不是当前 ELF 的编译闭包"
+msgstr "Package-owned production export scope, not the current ELF compilation closure"
+
+msgid "`scope`"
+msgstr "`scope`"
+
+msgid "生产或 reference；reference 必须显式启用 test support"
+msgstr "Production or reference; references explicitly require test support"
+
+msgid "生产校验由 [packages.py](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/packages.py)拥有， [编辑器 schema](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/soc-package.schema.json)从同一字段合同派生。 在仓库根执行下列只读命令可打印当前 JSON schema；输出不替代生产加载与资源校验。"
+msgstr "[packages.py](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/packages.py) owns production validation. The [editor schema](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/soc-package.schema.json) derives from the same field contract. From the repository root, this read-only command prints the current JSON schema; its output does not replace production loading and resource validation."
+
+msgid "manifest 的所有路径归属于声明包，拒绝越界与 symlink。选择声明式包不执行家族 Python 模块；CMake 与 C 仍是受信构建代码，哈希只绑定身份，不构成执行沙箱。"
+msgstr "Manifest paths belong to their declared package; escapes and symlinks reject. Selecting a declarative package executes no family Python module. CMake and C remain trusted build code; hashes bind identity rather than forming an execution sandbox."
+
+msgid "同一快照读取"
+msgstr "Read one snapshot"
+
+msgid "manifest、SoC、route、binding 主文件和每个 `binding_files` 都经同一受控 reader 读取并记录字节身份。重复读取不得换成另一代输入，生成结束前复核；资料、器件选择 和私有硬件投影不得绕过该快照重新打开文件并产生第二份决策。事实按 manifest 的 逻辑键读取，不要求文件必须叫 `soc.json` 或 `routes.json`。"
+msgstr "The manifest, SoC, routes, main binding file and every `binding_files` member pass through one controlled reader that records their byte identities. Repeated reads cannot switch input generations; inputs are checked again before generation completes. References, device selection and private hardware projections cannot bypass that snapshot by reopening files to make independent decisions. Facts are read by the manifest's logical keys; filenames need not be `soc.json` or `routes.json`."
+
+msgid "资料审核使用可选的 `facts.review_profiles`；DataProvider 经同一 reader 读取后构造 不可变 ProfileSet，显式持有手册、数据手册、勘误身份与适用范围。通用工具不内置 F4 的资料表，不默认选择某个勘误 profile。未声明审核资料的参考包不能因此取得资料 或执行资格；原始资料身份、软件模式与实际执行仍分别校验。"
+msgstr "Reference review uses optional `facts.review_profiles`. DataProvider reads it through the same reader to construct an immutable ProfileSet holding explicit manual, datasheet and errata identities and applicability. Common tools contain no built-in F4 reference table and select no errata profile by default. A reference package without declared review facts gains neither reference nor execution qualification from their absence. Original document identity, software modes and actual execution are still validated separately."
+
+msgid "binding 文件片段声明 `schema_version`、`bindings`，以及可选 `domains` 和 `static_fragments`。控制器 binding 有序加入；重复 domain key 拒绝，不能用后读覆盖 先读。文件拆分与下文 StaticFragments 的声明复用是两种机制，不能互相替代。"
+msgstr "Binding file fragments declare `schema_version`, `bindings` and optional `domains` and `static_fragments`. Controller bindings append in order; duplicate domain keys reject rather than allowing later reads to override earlier ones. Splitting input files and the StaticFragments declaration reuse below are different mechanisms, not substitutes."
+
+msgid "所选 binding 文档的顶层 `pads` 是 pad 坐标的唯一作者来源，每个显式身份记录 `registers`、`port_index` 和 `number`；不从 `PA0` 一类名字推导坐标。 `hardware.pads` 被拒绝。DataProvider 保存从同一文档构造的 BindingPolicy，资源 校验与静态连接复用它的只读投影；不重新打开事实或维护第二张坐标表。具体 IP 的 硬件模型按实际需要声明，GD32 软件参考不需伪造 F4 的 ADC／DMA 硬件协议。"
+msgstr "The selected binding document's top-level `pads` is the sole authored source of pad coordinates. Each explicit identity records `registers`, `port_index` and `number`; coordinates are not inferred from names such as `PA0`. `hardware.pads` rejects. DataProvider retains the BindingPolicy constructed from that same document, and resource validation and static connections reuse its read-only projections. They do not reopen facts or maintain a second coordinate table. Actual IP needs determine the hardware models declared; the GD32 software reference need not fabricate F4 ADC/DMA hardware protocols."
+
+msgid "公共领域与私有绑定"
+msgstr "Public domains and private bindings"
+
+msgid "[DomainPolicies](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/domain_policies.py)读取包声明的格式、限额、 时钟、共享 IRQ、数据流几何和具体领域／IP 政策。缺失领域不授予可选能力，不从厂家 名称、相似寄存器或目录推断支持。物理事实、可用模式、Board 路线与资源约束仍共同 决定某个完整装配是否合法。"
+msgstr "[DomainPolicies](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/domain_policies.py) reads package-declared formats, limits, clocks, shared IRQs, stream geometry and concrete domain/IP policies. Absent domains grant no optional capabilities. Vendor names, similar registers and directory names do not imply support. Physical facts, maintained modes, Board routes and resource constraints jointly decide whether a complete assembly is valid."
+
+msgid "公共语义在 UART／CAN／USB 等窄合同中维护；采集、SAI、波形、外部总线、存储与 图形政策在 `tools/configure/policies/` 就近校验。新 IP 符合已有模型时增加数据与 C 绑定；模型不同则扩展经过审查的 policy 和测试，不给公共 resolver 增加型号条件。"
+msgstr "Narrow UART/CAN/USB contracts own public semantics. Capture, SAI, waveform, external-bus, storage and graphics policies validate their domains under `tools/configure/policies/`. New IP fitting an existing model adds data and C bindings; a different model extends reviewed policy and tests rather than adding model conditions to the public resolver."
+
+msgid "`DomainPolicies.binding_values()` 的实际投影入口是 `ControllerIntegrationIR.constants`。它是显式私有命名值索引：叶值由具体政策的 schema 校验，包含标量、冻结 dataclass、tuple 与已解析引用。Packet、Graphics 等 记录只服务于所选绑定；外围装配仍使用具名不可变 IR。它不是任意 resolved 字典， 也不新增可随意访问属性的 namespace facade。公共 IR 不为每个 IP 私有字段加成员。"
+msgstr "`ControllerIntegrationIR.constants` is the actual projection entry of `DomainPolicies.binding_values()`. It is an explicit private named-value index. Concrete policy schemas validate its leaves: scalars, frozen dataclasses, tuples and resolved references. Packet, Graphics and similar records serve only selected bindings; the surrounding assembly retains named immutable IR. This is not an arbitrary resolved dictionary or a new namespace facade allowing arbitrary attribute access. Public IR does not gain a member for every private IP field."
+
+msgid "静态布局与模式选择"
+msgstr "Static layouts and mode selection"
+
+msgid "[DataProvider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/data_provider.py)连接已校验事实和 C 实现。 每条 binding 声明 `kind`、`implementation`，并在 `mode` 与 `modes` 中二选一； `modes` 表示同一绑定允许的模式别名。可选 `controllers` 限定实际控制器，候选 重叠或不唯一时拒绝，不按声明先后选一个实现。"
+msgstr "[DataProvider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/data_provider.py) connects validated facts and C implementation. Each binding declares `kind`, `implementation` and exactly one of `mode` or `modes`; `modes` lists aliases allowed by that binding. Optional `controllers` narrows actual controllers. Overlapping or ambiguous candidates reject rather than selecting the first declaration."
+
+msgid "binding 可以选择一个 `static_recipe`，或用 `profiles` 映射已解析的 `execution_profile`。profile 是公共语义与端点关系产生的有限键；未维护键拒绝， 不在固件中创建模式查找器。不同模式只承担自己选择的存储。"
+msgstr "A binding selects one `static_recipe` or uses `profiles` to map the resolved `execution_profile`. A profile is a finite key derived from public semantics and endpoint relationships. Unmaintained keys reject; firmware gains no runtime mode registry. Each mode carries only its selected storage."
+
+msgid "机制"
+msgstr "Mechanism"
+
+msgid "输入、产物和边界"
+msgstr "Inputs, artifacts and boundaries"
+
+msgid "`StaticRecipe`"
+msgstr "`StaticRecipe`"
+
+msgid "为一个 owner 声明真实 C 类型、对象角色、常量、数组、引用及固定 admit／prepare／close／IRQ 连接"
+msgstr "Declares real C types, object roles, constants, arrays, references and fixed admit/prepare/close/IRQ connections for one owner"
+
+msgid "`StaticObjects`"
+msgstr "`StaticObjects`"
+
+msgid "为已选择的共享或平台记录声明固定命名对象和连接，不生成硬件状态机"
+msgstr "Declares fixed named objects and connections for selected shared/platform records, without generating hardware state machines"
+
+msgid "`SharedIrqGroup`"
+msgstr "`SharedIrqGroup`"
+
+msgid "核对实际 handler、相同优先级、互斥 source mask 与不同 state，生成一个有界分发表和薄入口"
+msgstr "Checks the actual handler, matching priority, disjoint source masks and distinct states; emits one bounded dispatch table and thin entry"
+
+msgid "`ChildGroups`"
+msgstr "`ChildGroups`"
+
+msgid "为已有 controller 的有界 endpoint 元组生成私有存储、face 与固定调用，不再取得第二个 controller"
+msgstr "Generates private storage, faces and fixed calls for a bounded endpoint tuple of an existing controller, without acquiring a second controller"
+
+msgid "`IrqConnection`"
+msgstr "`IrqConnection`"
+
+msgid "显式固定 handler、调用与退出屏障，不用正则重写生成 C"
+msgstr "Explicit fixed handler, calls and exit barrier; no regex rewriting of generated C"
+
+msgid "静态 recipe 的 `source` 只遍历命名不可变 IR；`ref` 只能引用当前布局的已声明角色。 有界 map 只展开已解析 tuple，不能嵌套任意循环。明确的可选值和枚举映射用于静态 布局，不会将未支持模式换成别的模式。C 编译器检查私有结构、函数签名、对齐和 初始化；主机工具不猜测 ABI 或 `sizeof`，也不执行任意 C 字符串。"
+msgstr "A static recipe `source` traverses only named immutable IR, and `ref` can address only declared roles in the current layout. Bounded maps expand resolved tuples without arbitrary nested loops. Explicit optional values and enum maps determine static layout; they never replace an unsupported mode with another one. The C compiler checks private structures, function signatures, alignment and initialization. Host tools do not infer ABI or `sizeof`, or execute arbitrary C strings."
+
+msgid "单层 StaticFragments"
+msgstr "Single-level StaticFragments"
+
+msgid "[StaticFragments](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/static_fragments.py)已接入生产 DataProvider。 文件片段顶层 `static_fragments` 合入选中软件的 `software.static_fragments`，分为 `declarations` 与 `values` 两库。每库在整个选中包内使用统一名字，重名拒绝，不允许 后读覆盖。尚未使用的片段也检查有限语法；不据机制接入声称所有 F4 模式已采用。"
+msgstr "[StaticFragments](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/static_fragments.py) is connected to production DataProvider. A file fragment's top-level `static_fragments` joins the selected software's `software.static_fragments`, separating `declarations` and `values` libraries. Each library shares one namespace across the selected package. Duplicate names reject; later reads cannot override earlier ones. Unused fragments also undergo bounded syntax validation. Connecting the mechanism does not establish adoption by every F4 mode."
+
+msgid "使用点只允许完整 `use` 引用：声明列表中的引用平铺声明列表，其他引用只替换一个值。 不能带参数、覆盖字段、merge、引用另一个片段或执行表达式；引用层数为一，有界 record／array 本身仍可嵌套。"
+msgstr "Use sites accept only an exact `use` reference: a reference in a declaration list expands that list; other references substitute one value. Parameters, field overrides, merges, references to another fragment and expressions are forbidden. References have one level; bounded records/arrays themselves may still nest."
+
+msgid "展开只复用作者数据，不创建新模式或硬件行为。在 Binding／Profile 创建前展开，之后仍由 StaticRecipe 校验实际 角色、类型、引用和长度；不能因为片段在另一处合法就跳过本处作用域检查。"
+msgstr "Expansion reuses authored data without creating modes or hardware behavior. Expansion precedes Binding/Profile creation; StaticRecipe then checks actual roles, types, references and lengths. Validity elsewhere does not waive this use site's scope checks."
+
+msgid "固件行为与 C 常量"
+msgstr "Firmware behavior and C constants"
+
+msgid "硬件 admission、MMIO、readback、等待、IRQ 处理、停止、部分清理与恢复全部由 手写 C 执行。优先复用满足完整模式合同的官方 HAL／LL；SDK Handle 保持私有，同一 live 行为域只有一个 owner。factory 只返回已有 face，不取得硬件或创建任务。"
+msgstr "Handwritten C executes hardware admission, MMIO, readback, waiting, IRQ handling, stop, partial cleanup and recovery. Prefer official HAL/LL satisfying the complete mode contract. SDK Handles remain private, with one owner per live behavior domain. Factory returns existing faces without acquiring hardware or creating tasks."
+
+msgid "RCC PLL／分频编码、ADC 分辨率、SAI 帧长度和 LTDC 累加时序在私有 C 常量入口计算。 例如 ClockPlan 保存物理分频与频率，`stm32f4_clock_encoding.h` 使用锁定 CMSIS 位定义形成初始化常量。配置政策先验证合法范围，C 编译器再处理编码；这些常量表达式 不访问寄存器，不增加运行时解释器。实际寄存器顺序、等待与失败仍由 C owner 负责。"
+msgstr "Private C constant entries encode RCC PLL/dividers, ADC resolution, SAI frame length and LTDC accumulated timing. For example, ClockPlan retains physical dividers and frequencies while `stm32f4_clock_encoding.h` forms initialization constants using locked CMSIS bit definitions. Configuration policies first validate legal ranges, then the C compiler handles encoding. These constant expressions access no registers and add no runtime interpreter. C owners still implement real register ordering, waits and failure handling."
+
+msgid "构建、SDK 与验收"
+msgstr "Build, SDK and acceptance"
+
+msgid "![FIG-03：配置输入、静态装配与目标构建](../assets/diagrams/configuration-generation.svg)"
+msgstr "![FIG-03: configuration inputs, static assembly and target build](../assets/diagrams/configuration-generation.svg)"
+
+msgid "FIG-03：配置输入、静态装配与目标构建"
+msgstr "FIG-03: configuration inputs, static assembly and target build"
+
+msgid "图表示当前通用构建流：TOML 与 facts → 具名 IR → 静态连接与原子 bundle → CMake → 实际产物。箭头不是运行调用或物理资格；默认机制切换不代表所有模式与消费者都已 通过本批集成。具体目录归属由[源码地图](../explanation/source-map.md)维护。"
+msgstr "The diagram shows the current generic build flow: TOML and facts → named IR → static connections and atomic bundle → CMake → actual artifacts. Arrows are neither runtime calls nor physical qualification. Switching the default mechanism does not establish integrated acceptance for every mode and consumer in this batch. The [source map](../explanation/source-map.md) owns directory responsibilities."
+
+msgid "CMake 是 C 翻译单元与链接依赖的唯一权威。SDK 按明确选择的包、导出归属和依赖锁 收集源码；不从单一 ELF 推导整个 SDK，也不自动初始化库存。默认 package 清单来自 兼容性事实，安装验证读取冻结的 `profile.packages`；完整合同见 [源码与 SDK 兼容性](../design/source-compatibility.md)。"
+msgstr "CMake uniquely owns C translation units and link dependencies. The SDK collects source by explicitly selected packages, export ownership and dependency locks rather than deriving the whole SDK from one ELF or initializing inventory automatically. Compatibility facts select default packages, and installed verification reads frozen `profile.packages`. See [source and SDK compatibility](../design/source-compatibility.md) for the full contract."
+
+msgid "固定手册、数据手册、勘误与 SDK 的精确身份，再增加事实和所需 C 集成。"
+msgstr "Pin exact manuals, datasheets, errata and SDK identities before adding facts and necessary C integration."
+
+msgid "对新行为先执行实际 RED，再写最小 C 或工具实现并执行 GREEN。"
+msgstr "Execute actual RED for new behavior, then implement the smallest C/tool change and execute GREEN."
+
+msgid "保留拒绝、实例隔离、部分取得、取消、迟到 IRQ、失败排空与借用回归。"
+msgstr "Retain regressions for rejection, instance isolation, partial acquisition, cancellation, late IRQ, failed drain and borrowing."
+
+msgid "用实际编译上下文生成、编译和链接精确 part／mode，核对 ABI、向量、内存与预算。"
+msgstr "Generate, compile and link the exact part/mode using its actual compiler context; check ABI, vectors, memory and budgets."
+
+msgid "演练同 IP 新 part／route 的引擎零修改；源码消费与安装 SDK 各自验证。"
+msgstr "Exercise a same-IP new part/route without engine modifications; verify source and installed-SDK consumption separately."
+
+msgid "完成独立语义与翻译审查，再记录当前任务状态和对应实际执行身份。"
+msgstr "Complete independent semantic and translation review before recording task status and actual execution identity."
+
+msgid "接受后请求与缓冲保持到 acquire-observed SETTLED，控制、观察者和发布者还需 独立 join；失败排空保留 QUARANTINED 与原存储。停机按具体 owner 收条逆序撤回， 不把超时或取消写成借用结束。合同见[所有权](../explanation/ownership.md)。"
+msgstr "Accepted requests and buffers remain valid until acquire-observed SETTLED. Controls, observers and publishers also need independent join; failed drain retains QUARANTINED and original storage. Shutdown withdraws in reverse order according to concrete owner receipts; timeout or cancellation is not the end of borrowing. See [ownership](../explanation/ownership.md)."
+
+msgid "软件参考、配置成功、模型、ARM 链接、SDK 消费与实板分别验收。当前物理 HIL 为 `not_executed`；具体模式、剩余耦合和最终集成按当前任务保留，旧记录可从 [固定前序源码](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b) 追溯，不继承其资格。"
+msgstr "Software references, successful configuration, models, ARM links, SDK consumption and hardware have separate acceptance. Physical HIL is currently `not_executed`. Individual modes, remaining coupling and final integration remain in the current tasks. Original records are traceable at the [fixed previous source](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b), without inheriting its qualification."

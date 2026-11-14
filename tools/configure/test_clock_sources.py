@@ -1,52 +1,65 @@
 """Clock input identity never invents an external Board oscillator."""
 from tools.configure.tests.device_fixture import (load_soc_facts,
                                                    validate_soc_facts)
-from tools.configure.providers.descriptor import source_directory
+from tools.configure.tests.f4_fixture import load_f4_fixture
 import unittest
 
-from tools.configure import configure as gate
 
 
 class ClockSourceContractTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.fixture = load_f4_fixture("STM32F407ZGT6")
+
+    def facts(self):
+        return load_soc_facts(self.fixture.package.fact("soc"), part=self.fixture.part)
+
+    def validate(self, soc):
+        validate_soc_facts(soc, self.fixture.part, self.fixture.provider.for_soc(soc))
 
 
     def test_uart_spi_clock_domains_bind_to_reviewed_apb_facts(self):
-        from tools.configure.stm32f4.hardware import CONTROLLER_BINDINGS
-        soc = load_soc_facts(gate.ROOT / source_directory("stm32f4") / "soc.json")
-        for binding in CONTROLLER_BINDINGS:
+        soc = self.facts()
+        expected = {"USART1": 2, "USART2": 1, "USART3": 1, "UART4": 1,
+                    "UART5": 1, "USART6": 2, "SPI1": 2, "SPI2": 1, "SPI3": 1}
+        bindings = tuple(binding for binding in self.fixture.provider.CONTROLLER_BINDINGS
+                         if binding.kind in {"uart", "spi"})
+        self.assertEqual({binding.controller for binding in bindings}, set(expected))
+        for binding in bindings:
             if binding.kind not in {"uart", "spi"}:
                 continue
             with self.subTest(controller=binding.controller):
                 domain = soc["controllers"][binding.controller]["clock_domain"]
-                self.assertEqual(domain, f"apb{binding.apb}")
+                self.assertEqual(binding.apb, expected[binding.controller])
+                self.assertEqual(domain, f"apb{expected[binding.controller]}")
                 for clock in soc["clock_profiles"].values():
                     self.assertGreater(clock[domain + "_hz"], 0)
-        validate_soc_facts(soc, "STM32F407ZGT6")
+        self.validate(soc)
 
     def test_missing_uart_spi_clock_domain_is_rejected(self):
         for controller in ("USART1", "SPI2"):
-            soc = load_soc_facts(gate.ROOT / source_directory("stm32f4") / "soc.json")
+            soc = self.facts()
             soc["controllers"][controller].pop("clock_domain", None)
             with self.subTest(controller=controller), self.assertRaisesRegex(
                     ValueError, "clock domain"):
-                validate_soc_facts(soc, "STM32F407ZGT6")
+                self.validate(soc)
 
     def test_unknown_or_wrong_reviewed_clock_domain_is_rejected(self):
         for domain in ("ahb", "apb1", False):
-            soc = load_soc_facts(gate.ROOT / source_directory("stm32f4") / "soc.json")
+            soc = self.facts()
             soc["controllers"]["USART1"]["clock_domain"] = domain
             with self.subTest(domain=domain), self.assertRaisesRegex(
                     ValueError, "clock domain"):
-                validate_soc_facts(soc, "STM32F407ZGT6")
+                self.validate(soc)
 
     def test_existing_hse_facts_accept_one_explicit_source_identity(self):
         for family, part in (("stm32f4", "STM32F407ZGT6"),):
             with self.subTest(family=family):
-                soc = load_soc_facts(gate.ROOT / source_directory(family) / "soc.json")
+                soc = self.facts()
                 for profile in soc["clock_profiles"].values():
                     profile["source"] = "hse"
                     profile["input_hz"] = profile.pop("hse_hz")
-                validate_soc_facts(soc, part)
+                self.validate(soc)
 
     def test_legacy_hse_normalizes_once_without_mutating_input(self):
         from tools.configure import clocks

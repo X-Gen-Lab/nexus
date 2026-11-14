@@ -3,9 +3,9 @@
   "family": "external_lifecycle_model",
   "id": "external-lifecycle-reference",
   "inputs": {
-    "configure/__init__.py": "f0d365aad98ed837a234ccfaa1318af7d353f494a4b12c9f5b8a22a31b31750c",
+    "configure/__init__.py": "8cbc705650546f45a2d212ee3a7eab958e829fd7ef864153dd3f0882d78f1b1d",
     "configure/bindings.py": "4e536ff9ffbce0d4e2ce9bd3507263a4e7505aa8c05b0e9e9be5294f3e636821",
-    "configure/contract.py": "26568d515f984a2c47b23a5b874ee84544760647d0cfe41770973a703580a8d4",
+    "configure/contract.py": "f89ece96da0b7c65440e003589cf4c43c62fc83c96ed037bdeb52ecd9919bee7",
     "configure/emission.py": "f04042742a7c3fa5b719f55a5dc5e6534245527fe8d89af9500f31a989deb5fb",
     "include/nexus_reference/lifecycle_probe.h": "c325da2330d85997bddfcc6122b4fa5cbfb8f441b26da47d26d453831c6901ed",
     "soc/CMakeLists.txt": "fffb0314a45531796a5e74203e9020c3691e31913230fdc59e36266f072440cb",

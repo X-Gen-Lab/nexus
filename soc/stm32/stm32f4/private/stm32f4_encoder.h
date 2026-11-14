@@ -8,8 +8,14 @@
 #include "nexus/io/encoder.h"
 #include "stm32f407_provider.h"
 
-/** \brief Immutable selected mode; exact pins follow the controller identity.
- */
+/** \brief One resolved input pad; the Board owns its clock and snapshot. */
+typedef struct {
+    GPIO_TypeDef* registers;
+    uint8_t port_index;
+    uint8_t pin;
+} nx_stm32_encoder_pin_t;
+
+/** \brief Immutable mode and physical TI1/TI2 inputs in logical A/B order. */
 typedef struct {
     TIM_TypeDef* registers;
     nx_encoder_mode_t mode;
@@ -17,6 +23,7 @@ typedef struct {
     uint8_t filter_b;
     bool invert_a;
     bool invert_b;
+    nx_stm32_encoder_pin_t pins[2];
 } nx_stm32_encoder_config_t;
 
 /** \brief Static descriptor borrow and retained cold effects, without buffers.

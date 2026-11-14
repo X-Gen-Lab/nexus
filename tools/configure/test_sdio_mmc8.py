@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 from tools.configure import bindings, configure
-from tools.configure.stm32f4 import block
+from tools.configure.tests.f4_fixture import provider as f4_provider
 from tools.configure.tests.native_fixture import native_fixture
 
 
@@ -37,9 +37,11 @@ class MmcEightBitConfigurationTests(unittest.TestCase):
         return configure.resolve_ir(path, test_support=native_fixture(path))
 
     def test_mmc_width_eight_is_a_valid_explicit_protocol_selection(self):
-        block.validate({"mode": "sdio-poll", "protocol": "mmc", "bus_width": 8,
-                        "max_blocks": 8, "poll_budget": 1000,
-                        "stop_timeout_us": 10000})
+        provider = f4_provider("STM32F407ZGT6")
+        routes = configure.load(provider.package.fact("routes"))["routes"]
+        route = next(row for row in routes if row["id"] == "sdio-mmc8-pc8-pd2")
+        provider.validate_selection({"mode": "sdio-poll", "protocol": "mmc", "bus_width": 8,
+            "max_blocks": 8, "poll_budget": 1000, "stop_timeout_us": 10000}, route)
 
     def test_all_engines_use_precise_ten_pin_static_storage(self):
         expected = ["PC8", "PC9", "PC10", "PC11", "PC12", "PD2",

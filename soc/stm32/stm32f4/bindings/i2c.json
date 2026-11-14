@@ -1,0 +1,1064 @@
+{
+  "schema_version": 1,
+  "static_fragments": {
+    "declarations": {
+      "i2c-pins": [
+        {
+          "role": "i2c_pin_state",
+          "type": "uint16_t",
+          "const": false,
+          "count": {
+            "length": "selected.pads",
+            "limit": 2
+          }
+        },
+        {
+          "role": "i2c_pins",
+          "type": "nx_stm32_i2c_pin_config_t",
+          "const": true,
+          "value": {
+            "map": {
+              "source": "selected.pads",
+              "limit": 2,
+              "value": {
+                "record": [
+                  [
+                    "registers",
+                    {
+                      "source": "entry.registers",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "snapshot",
+                    {
+                      "ref": "i2c_pin_state",
+                      "as": "address",
+                      "index": {
+                        "source": "index",
+                        "as": "u32"
+                      }
+                    }
+                  ],
+                  [
+                    "port_index",
+                    {
+                      "source": "entry.port_index",
+                      "as": "u32"
+                    }
+                  ],
+                  [
+                    "pin",
+                    {
+                      "source": "entry.number",
+                      "as": "u32"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "count": {
+            "length": "selected.pads",
+            "limit": 2
+          }
+        },
+        {
+          "role": "i2c_cold",
+          "type": "nx_stm32_i2c_cold_receipt_t",
+          "const": false
+        },
+        {
+          "role": "i2c_lines",
+          "type": "nx_i2c_v1_lines_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "inputs",
+                {
+                  "map": {
+                    "source": "selected.pads",
+                    "limit": 2,
+                    "value": {
+                      "pointer_member": {
+                        "base": {
+                          "source": "entry.registers",
+                          "as": "symbol"
+                        },
+                        "member": "IDR"
+                      }
+                    }
+                  }
+                }
+              ],
+              [
+                "masks",
+                {
+                  "map": {
+                    "source": "selected.pads",
+                    "limit": 2,
+                    "value": {
+                      "macro": "NX_STM32_IO_PIN_MASK",
+                      "args": [
+                        {
+                          "source": "entry.number",
+                          "as": "u32"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "bindings": [
+    {
+      "kind": "i2c",
+      "mode": "poll-messages",
+      "controllers": [
+        "I2C1",
+        "I2C2",
+        "I2C3"
+      ],
+      "implementation": "i2c",
+      "headers": [
+        "stm32f407_i2c_cold.h",
+        "stm32f4_io_encoding.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_i2c_state_t",
+        "ops": "nx_stm32_i2c_ops",
+        "declarations": [
+          {
+            "use": "i2c-pins"
+          },
+          {
+            "role": "i2c_config",
+            "type": "nx_stm32_i2c_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "pins",
+                  {
+                    "ref": "i2c_pins",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "dma",
+                  null
+                ],
+                [
+                  "clock_hz",
+                  {
+                    "source": "selected.clock_hz",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "max_hz",
+                  {
+                    "source": "item.options.max_hz",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "priority",
+                  0
+                ],
+                [
+                  "asynchronous",
+                  false
+                ],
+                [
+                  "lines",
+                  {
+                    "ref": "i2c_lines",
+                    "as": "address"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_i2c_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "i2c_config",
+                "as": "address"
+              },
+              {
+                "ref": "i2c_cold",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_i2c_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "i2c_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "i2c_cold",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "child_groups": {
+          "limit": 64,
+          "cases": {
+            "i2c-endpoint": {
+              "parents": {
+                "parent_port": "port"
+              },
+              "declarations": [
+                {
+                  "role": "endpoint",
+                  "type": "nx_stm32_i2c_endpoint_state_t",
+                  "const": false,
+                  "value": {
+                    "record": [
+                      [
+                        "port",
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        }
+                      ],
+                      [
+                        "address",
+                        {
+                          "source": "item.child.options.address",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "address_bits",
+                        {
+                          "source": "item.child.options.address_bits",
+                          "as": "u32"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              ],
+              "calls": {
+                "prepare": [],
+                "close": []
+              },
+              "face": {
+                "type": "nx_i2c_endpoint_t",
+                "ops": "nx_stm32_i2c_endpoint_ops",
+                "context": {
+                  "ref": "endpoint",
+                  "as": "address"
+                }
+              }
+            }
+          }
+        },
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "i2c_pin_state",
+          "limit": 2
+        }
+      }
+    },
+    {
+      "kind": "i2c",
+      "mode": "irq-messages",
+      "controllers": [
+        "I2C1",
+        "I2C2",
+        "I2C3"
+      ],
+      "implementation": "i2c_async",
+      "headers": [
+        "stm32f407_i2c_cold.h",
+        "stm32f4_io_encoding.h",
+        "stm32f407_i2c_async.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_i2c_async_state_t",
+        "ops": "nx_i2c_v1_async_ops",
+        "declarations": [
+          {
+            "use": "i2c-pins"
+          },
+          {
+            "role": "i2c_config",
+            "type": "nx_stm32_i2c_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "pins",
+                  {
+                    "ref": "i2c_pins",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "dma",
+                  null
+                ],
+                [
+                  "clock_hz",
+                  {
+                    "source": "selected.clock_hz",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "max_hz",
+                  {
+                    "source": "item.options.max_hz",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "selected.irq.priority",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "asynchronous",
+                  true
+                ],
+                [
+                  "lines",
+                  {
+                    "ref": "i2c_lines",
+                    "as": "address"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_i2c_async_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "i2c_config",
+                "as": "address"
+              },
+              {
+                "ref": "i2c_cold",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_i2c_async_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "i2c_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "i2c_cold",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "child_groups": {
+          "limit": 64,
+          "cases": {
+            "i2c-endpoint": {
+              "parents": {
+                "parent_port": "port"
+              },
+              "declarations": [
+                {
+                  "role": "endpoint",
+                  "type": "nx_stm32_i2c_async_endpoint_state_t",
+                  "const": false,
+                  "value": {
+                    "record": [
+                      [
+                        "port",
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        }
+                      ],
+                      [
+                        "address",
+                        {
+                          "source": "item.child.options.address",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "address_bits",
+                        {
+                          "source": "item.child.options.address_bits",
+                          "as": "u32"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              ],
+              "calls": {
+                "prepare": [],
+                "close": []
+              },
+              "face": {
+                "type": "nx_i2c_endpoint_t",
+                "ops": "nx_i2c_v1_async_endpoint_ops",
+                "context": {
+                  "ref": "endpoint",
+                  "as": "address"
+                }
+              }
+            }
+          }
+        },
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "i2c_pin_state",
+          "limit": 2
+        },
+        "irq": [
+          {
+            "map": {
+              "source": "selected.vector_bindings",
+              "limit": 8,
+              "value": {
+                "name": {
+                  "source": "entry.handler",
+                  "as": "symbol"
+                },
+                "calls": [
+                  {
+                    "function": "nx_i2c_v1_irq",
+                    "args": [
+                      {
+                        "ref": "port",
+                        "as": "address"
+                      }
+                    ]
+                  }
+                ],
+                "barrier": "nx_arch_dsb"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "i2c",
+      "mode": "dma-messages",
+      "controllers": [
+        "I2C1",
+        "I2C2",
+        "I2C3"
+      ],
+      "implementation": "i2c_async",
+      "headers": [
+        "stm32f407_i2c_cold.h",
+        "stm32f4_io_encoding.h",
+        "stm32f407_i2c_async.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_i2c_async_state_t",
+        "ops": "nx_i2c_v1_async_ops",
+        "declarations": [
+          {
+            "use": "i2c-pins"
+          },
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin",
+                        "as": "u32"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size",
+                        "as": "u32"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.readable_regions",
+              "limit": 16
+            }
+          },
+          {
+            "role": "i2c_dma",
+            "type": "nx_i2c_v1_dma_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "tx",
+                  {
+                    "record": [
+                      [
+                        "control",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.1.stream",
+                              "as": "symbol"
+                            },
+                            "member": "CR"
+                          }
+                        }
+                      ],
+                      [
+                        "count",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.1.stream",
+                              "as": "symbol"
+                            },
+                            "member": "NDTR"
+                          }
+                        }
+                      ],
+                      [
+                        "peripheral",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.1.stream",
+                              "as": "symbol"
+                            },
+                            "member": "PAR"
+                          }
+                        }
+                      ],
+                      [
+                        "memory",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.1.stream",
+                              "as": "symbol"
+                            },
+                            "member": "M0AR"
+                          }
+                        }
+                      ],
+                      [
+                        "fifo",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.1.stream",
+                              "as": "symbol"
+                            },
+                            "member": "FCR"
+                          }
+                        }
+                      ],
+                      [
+                        "flags",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.1.registers",
+                              "as": "symbol"
+                            },
+                            "member": {
+                              "source": "selected.dma_bindings.1.status_member",
+                              "as": "symbol"
+                            }
+                          }
+                        }
+                      ],
+                      [
+                        "clear",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.1.registers",
+                              "as": "symbol"
+                            },
+                            "member": {
+                              "source": "selected.dma_bindings.1.clear_member",
+                              "as": "symbol"
+                            }
+                          }
+                        }
+                      ],
+                      [
+                        "configuration",
+                        {
+                          "macro": "NX_STM32_I2C_DMA_CONFIGURATION",
+                          "args": [
+                            {
+                              "source": "selected.dma_bindings.1.request",
+                              "as": "u32"
+                            },
+                            true
+                          ]
+                        }
+                      ],
+                      [
+                        "flag_shift",
+                        {
+                          "source": "selected.dma_bindings.1.flag_shift",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "publisher",
+                        {
+                          "source": "selected.dma_bindings.1.irq",
+                          "as": "symbol"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "rx",
+                  {
+                    "record": [
+                      [
+                        "control",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.0.stream",
+                              "as": "symbol"
+                            },
+                            "member": "CR"
+                          }
+                        }
+                      ],
+                      [
+                        "count",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.0.stream",
+                              "as": "symbol"
+                            },
+                            "member": "NDTR"
+                          }
+                        }
+                      ],
+                      [
+                        "peripheral",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.0.stream",
+                              "as": "symbol"
+                            },
+                            "member": "PAR"
+                          }
+                        }
+                      ],
+                      [
+                        "memory",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.0.stream",
+                              "as": "symbol"
+                            },
+                            "member": "M0AR"
+                          }
+                        }
+                      ],
+                      [
+                        "fifo",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.0.stream",
+                              "as": "symbol"
+                            },
+                            "member": "FCR"
+                          }
+                        }
+                      ],
+                      [
+                        "flags",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.0.registers",
+                              "as": "symbol"
+                            },
+                            "member": {
+                              "source": "selected.dma_bindings.0.status_member",
+                              "as": "symbol"
+                            }
+                          }
+                        }
+                      ],
+                      [
+                        "clear",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.dma_bindings.0.registers",
+                              "as": "symbol"
+                            },
+                            "member": {
+                              "source": "selected.dma_bindings.0.clear_member",
+                              "as": "symbol"
+                            }
+                          }
+                        }
+                      ],
+                      [
+                        "configuration",
+                        {
+                          "macro": "NX_STM32_I2C_DMA_CONFIGURATION",
+                          "args": [
+                            {
+                              "source": "selected.dma_bindings.0.request",
+                              "as": "u32"
+                            },
+                            false
+                          ]
+                        }
+                      ],
+                      [
+                        "flag_shift",
+                        {
+                          "source": "selected.dma_bindings.0.flag_shift",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "publisher",
+                        {
+                          "source": "selected.dma_bindings.0.irq",
+                          "as": "symbol"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "ref": "dma_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "region_count",
+                  {
+                    "length": "selected.readable_regions",
+                    "limit": 16
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "i2c_config",
+            "type": "nx_stm32_i2c_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "pins",
+                  {
+                    "ref": "i2c_pins",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "dma",
+                  {
+                    "ref": "i2c_dma",
+                    "as": "address"
+                  }
+                ],
+                [
+                  "clock_hz",
+                  {
+                    "source": "selected.clock_hz",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "max_hz",
+                  {
+                    "source": "item.options.max_hz",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "selected.irq.priority",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "asynchronous",
+                  true
+                ],
+                [
+                  "lines",
+                  {
+                    "ref": "i2c_lines",
+                    "as": "address"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_i2c_async_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "i2c_config",
+                "as": "address"
+              },
+              {
+                "ref": "i2c_cold",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_i2c_async_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "i2c_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "i2c_cold",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "child_groups": {
+          "limit": 64,
+          "cases": {
+            "i2c-endpoint": {
+              "parents": {
+                "parent_port": "port"
+              },
+              "declarations": [
+                {
+                  "role": "endpoint",
+                  "type": "nx_stm32_i2c_async_endpoint_state_t",
+                  "const": false,
+                  "value": {
+                    "record": [
+                      [
+                        "port",
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        }
+                      ],
+                      [
+                        "address",
+                        {
+                          "source": "item.child.options.address",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "address_bits",
+                        {
+                          "source": "item.child.options.address_bits",
+                          "as": "u32"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              ],
+              "calls": {
+                "prepare": [],
+                "close": []
+              },
+              "face": {
+                "type": "nx_i2c_endpoint_t",
+                "ops": "nx_i2c_v1_async_endpoint_ops",
+                "context": {
+                  "ref": "endpoint",
+                  "as": "address"
+                }
+              }
+            }
+          }
+        },
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "i2c_pin_state",
+          "limit": 2
+        },
+        "irq": [
+          {
+            "map": {
+              "source": "selected.vector_bindings",
+              "limit": 8,
+              "value": {
+                "name": {
+                  "source": "entry.handler",
+                  "as": "symbol"
+                },
+                "calls": [
+                  {
+                    "function": "nx_i2c_v1_irq",
+                    "args": [
+                      {
+                        "ref": "port",
+                        "as": "address"
+                      }
+                    ]
+                  }
+                ],
+                "barrier": "nx_arch_dsb"
+              }
+            }
+          },
+          {
+            "name": {
+              "source": "selected.dma_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_i2c_v1_dma_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  true
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {
+              "source": "selected.dma_bindings.1.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_i2c_v1_dma_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  false
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ]
+      }
+    }
+  ]
+}

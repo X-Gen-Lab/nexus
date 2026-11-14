@@ -1,6 +1,8 @@
 """Explicit family contract and static-construction exports."""
 from .contract import (
+    ADC_PIN_CHANNELS,
     UART_FORMATS,
+    PAD_FACTS,
     PARTS,
     PUBLIC_FORMATS,
     ADC_GROUP,

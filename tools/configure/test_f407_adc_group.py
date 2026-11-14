@@ -5,7 +5,9 @@ import tempfile
 import unittest
 
 from tools.configure import authored, bindings, configure as gate, selected_contracts
-from tools.configure.stm32f4 import adc_group
+from tools.configure.tests.f4_fixture import provider as f4_provider
+
+adc_group = f4_provider("STM32F407ZGT6").ADC_GROUP
 
 
 class F407AdcGroupTests(unittest.TestCase):
@@ -325,7 +327,7 @@ class F407AdcGroupTriggeredTests(unittest.TestCase):
                 self.assertTrue(any(edge.target == "group:injected" for edge in ir.trigger_plan.edges))
                 source = bindings.emit(ir)[1]
                 self.assertIn("nx_stm32_adc_group_injected_timer_t", source)
-                self.assertIn(".injected_timer = &s_nx_adc_group_group_injected_timer", source)
+                self.assertIn(".injected_timer = &s_nx_injected_timer_group", source)
                 self.assertIn(".timer = " + timer_name, source)
                 self.assertIn("nx_stm32_adc_group_combined_prepare", source)
                 self.assertNotIn("->CR1", source)

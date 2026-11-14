@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "exti",
+      "mode": "pvd-level",
+      "implementation": "pvd",
+      "static_recipe": {
+        "state_type": "nx_stm32_pvd_state_t",
+        "declarations": [],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32_pvd_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "source": "item.options.threshold_code"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32_pvd_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "item.options.threshold_code"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_pvd_stop",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32_pvd_ops"
+      },
+      "headers": [
+        "stm32f407_pvd.h"
+      ]
+    },
+    {
+      "kind": "exti",
+      "mode": "pvd-events",
+      "implementation": "pvd_events",
+      "static_recipe": {
+        "state_type": "nx_stm32_pvd_events_state_t",
+        "declarations": [
+          {
+            "role": "events",
+            "type": "nx_exti_event_t",
+            "const": false,
+            "count": {
+              "source": "item.options.event_capacity"
+            }
+          },
+          {
+            "role": "pvd_config",
+            "type": "nx_stm32_pvd_events_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "storage",
+                  {
+                    "ref": "events",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "capacity",
+                  {
+                    "source": "item.options.event_capacity"
+                  }
+                ],
+                [
+                  "edge",
+                  {
+                    "source": "item.options.edge",
+                    "as": "symbol",
+                    "values": {
+                      "rising": "NX_EXTI_RISING",
+                      "falling": "NX_EXTI_FALLING",
+                      "both": "NX_EXTI_BOTH"
+                    }
+                  }
+                ],
+                [
+                  "threshold_code",
+                  {
+                    "source": "item.options.threshold_code"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "pvd_lines",
+            "type": "nx_stm32_exti_state_t",
+            "const": true,
+            "pointer": true,
+            "count": 1,
+            "value": {
+              "array": [
+                {
+                  "ref": "port",
+                  "member": "events",
+                  "as": "address"
+                }
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32_pvd_events_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "pvd_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32_pvd_events_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "pvd_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_pvd_events_stop",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": "PVD_IRQHandler",
+            "calls": [
+              {
+                "function": "nx_stm32_exti_dispatch",
+                "args": [
+                  {
+                    "ref": "pvd_lines",
+                    "as": "symbol"
+                  },
+                  1,
+                  65536
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32_pvd_events_ops"
+      },
+      "headers": [
+        "stm32f407_pvd.h"
+      ]
+    }
+  ]
+}

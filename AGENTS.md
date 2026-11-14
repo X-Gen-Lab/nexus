@@ -119,8 +119,22 @@ no hook bypass or automatic staging is allowed. CI uses the same checks.
 
 Use `python tools/dev/dev.py configure|build|test --preset <name>`; native CMake
 arguments pass through. `doctor` checks tools and `check` runs repository gates.
+Managed `dev.py configure` owns this platform checkout; it rejects a different
+`-S` source root. External product projects use their explicit CMake commands.
 Fresh JUnit, nonzero tests and actual return codes are required. Missing tools,
 empty reports and skipped-only executions fail qualification.
+
+Managed configure/build/test/check, TDD, Native runtime and matrix entries share
+one kernel lock per canonical build directory. Hold it through all owned stages
+and report publication; independent directories may run in parallel. POSIX nested
+commands inherit actual descriptors, not a bypass setting. Same-thread
+composition is reentrant; other threads do not inherit ownership automatically.
+Descriptor inheritance delegates ownership within one orchestration. The parent
+must serialize child stages using the same build directory; children sharing
+one delegated descriptor are not mutually exclusive.
+Windows standalone commands use file locks. Nested managed execution on
+Windows is explicitly rejected. Direct CMake/Ninja/CTest do not participate:
+callers must keep those directories exclusive until the direct command finishes.
 
 TDD is mandatory for new production behavior and defect fixes: write the
 regression/contract first, execute it and record the expected RED failure, then
@@ -151,6 +165,11 @@ execution. It never reuses successful reports. The ordinary commit hook selects
 complete affected tool domains from the complete staged index, including deleted
 paths; it always runs the full Native GoogleTest plan for behavioral changes.
 Broad build/configuration-policy changes select all four tool domains.
+The SDK packager/verifier and C/H/TOML/JSON inputs under
+`cmake/package/verification/` select the complete testing and configure domains;
+CMake build rules, unknown CMake paths or fixture suffixes, and domain-selection
+policy changes retain all four domains. `tools/testing/run_tool_tests.py` owns
+this explicit conservative selection; do not infer a smaller scope ad hoc.
 `--tools none` is available for an explicitly separate Native CI execution only;
 the commit hook uses the ordinary changed-domain policy. Independent CI owns the
 retained tool suites and all four Native runtime modes. Do not disable tests,

@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "id": "gd32f470_reference",
+  "variants": {
+    "GD32F470ZGT6": {
+      "package": "LQFP144",
+      "flash": {
+        "origin": 134217728,
+        "size": 1048576,
+        "erase_spans": [
+          {
+            "offset": 0,
+            "erase_bytes": 4096,
+            "count": 256
+          }
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 196608,
+          "dma": true,
+          "linker": true
+        },
+        {
+          "id": "addsram",
+          "origin": 537067520,
+          "size": 262144,
+          "dma": true,
+          "linker": false
+        },
+        {
+          "id": "tcm",
+          "origin": 268435456,
+          "size": 65536,
+          "dma": false,
+          "linker": false
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD0",
+        "PD1",
+        "PD2",
+        "PD3",
+        "PD4",
+        "PD5",
+        "PD6",
+        "PD7",
+        "PD8",
+        "PD9",
+        "PD10",
+        "PD11",
+        "PD12",
+        "PD13",
+        "PD14",
+        "PD15",
+        "PE0",
+        "PE1",
+        "PE2",
+        "PE3",
+        "PE4",
+        "PE5",
+        "PE6",
+        "PE7",
+        "PE8",
+        "PE9",
+        "PE10",
+        "PE11",
+        "PE12",
+        "PE13",
+        "PE14",
+        "PE15",
+        "PF0",
+        "PF1",
+        "PF2",
+        "PF3",
+        "PF4",
+        "PF5",
+        "PF6",
+        "PF7",
+        "PF8",
+        "PF9",
+        "PF10",
+        "PF11",
+        "PF12",
+        "PF13",
+        "PF14",
+        "PF15",
+        "PG0",
+        "PG1",
+        "PG2",
+        "PG3",
+        "PG4",
+        "PG5",
+        "PG6",
+        "PG7",
+        "PG8",
+        "PG9",
+        "PG10",
+        "PG11",
+        "PG12",
+        "PG13",
+        "PG14",
+        "PG15",
+        "PH0",
+        "PH1"
+      ]
+    }
+  },
+  "cpu": {
+    "arch": "cortex-m4",
+    "fpu": "fpv4-sp-d16",
+    "float_abi": "hard",
+    "dsp": true,
+    "dwt_cyccnt": true,
+    "mpu_version": 7,
+    "mpu_regions": 8,
+    "icache_line_bytes": 0,
+    "dcache_line_bytes": 0,
+    "security": "single",
+    "sau": false,
+    "mve": "none"
+  },
+  "irq": {
+    "priority_bits": 4,
+    "external_count": 91
+  },
+  "clock_profiles": {
+    "irc16": {
+      "source": "hsi",
+      "input_hz": 16000000,
+      "core_hz": 16000000,
+      "apb1_hz": 16000000,
+      "apb2_hz": 16000000
+    }
+  },
+  "controllers": {
+    "GPIOA": {
+      "kind": "gpio",
+      "modes": [
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PA4"
+      ]
+    },
+    "USART0": {
+      "kind": "uart",
+      "modes": [
+        "irq-byte-event"
+      ],
+      "irq": [
+        "USART0"
+      ],
+      "irq_numbers": [
+        37
+      ],
+      "pins": [
+        "PA9",
+        "PA10"
+      ],
+      "clock_hz": 16000000
+    }
+  },
+  "reserved_resources": [
+    "timer:TIMER1",
+    "irq:TIMER1_IRQn"
+  ],
+  "source_lock": {
+    "cmsis_core": "af1b110e46a1720349f6f125e386e126767699bd"
+  }
+}

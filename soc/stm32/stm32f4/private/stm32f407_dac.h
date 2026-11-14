@@ -7,6 +7,7 @@
 #define NEXUS_STM32F407_DAC_H
 #include "nexus/io/dac.h"
 #include "stm32f407_system.h"
+#include "stm32f4_dac_constants.h"
 #include "stm32f4_exti_hardware.h"
 #ifdef __cplusplus
 extern "C" {

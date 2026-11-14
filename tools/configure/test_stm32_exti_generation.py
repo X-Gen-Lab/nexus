@@ -7,8 +7,8 @@ identity, policy data, call ordering and retention rather than emitted algorithm
 from tools.configure.tests.native_fixture import native_fixture
 import unittest
 
-from tools.configure import bindings, configure as gate
-from tools.configure.providers import maintained
+from tools.configure import bindings, configure as gate, gpio_phase
+from tools.configure.providers import for_selection
 
 
 class Stm32ExtiGenerationTests(unittest.TestCase):
@@ -32,7 +32,7 @@ class Stm32ExtiGenerationTests(unittest.TestCase):
 
     def test_partial_effect_construction_retains_the_exact_c_cleanup(self):
         result = self.result()
-        provider = maintained(result.soc_family)
+        provider = for_selection(result)
         for item in result.controllers:
             constructed = provider.constructor(
                 item, result, result.board_bindings, result.routes,
@@ -57,8 +57,14 @@ class Stm32ExtiGenerationTests(unittest.TestCase):
 
     def test_shared_vector_is_selected_and_admitted_before_system_start(self):
         source = self.source()
-        for bank in range(3):
-            self.assertIn(f"NX_STM32_PLATFORM_IRQ_MASK(EXTI9_5_IRQn, {bank}u)", source)
+        result = self.result()
+        declarations = gpio_phase.declarations(result)
+        config = next(node for node in declarations if node.name == "s_nx_platform_config")
+        masks = dict(config.initializer.fields)["irq_masks"].values
+        irq = result.provider_context.binding_policy.irq_facts["EXTI9_5"].number
+        expected = tuple(1 << (irq % 32) if bank == irq // 32 else 0
+                         for bank in range(len(masks)))
+        self.assertEqual(masks, expected)
         self.assertIn(".selected = &s_nx_platform_config", source)
         self.assertIn("nx_stm32f4_platform_system_start_local(", source)
 

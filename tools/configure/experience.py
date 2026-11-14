@@ -5,7 +5,7 @@ or turn hardware facts into qualification. Generation still consumes typed IR.
 """
 
 import argparse
-from dataclasses import asdict
+from dataclasses import asdict, replace
 import hashlib
 import json
 import os
@@ -268,19 +268,14 @@ def board_catalogue(gate, root, *, board=None, board_package=None,
         directory = Path(board_package)
     directory = gate.board_directory(directory)
     snapshots = {}
-    read = lambda path: gate.load(path, snapshots)
-    board_data = gate.obj(read(directory / "board.json"),
-        {"schema_version", "id", "soc", "soc_family", "source_revision",
-         "physical_pcb_revision", "clocks", "bindings", "reserved_resources",
-         "unknowns", "provenance"}, {"inputs", "hardware_options"}, "Board")
-    gate.integer(board_data["schema_version"], 1, 1, "Board schema")
-    gate.identity(board_data["id"], "Board id")
+    read = gate._SnapshotReader(snapshots)
+    board_data = gate.validate_board_declaration(read(directory / "board.json"))
     hardware_conditions = gate.validate_board_context(board_data)
     family = gate.identity(board_data["soc_family"], "SoC family")
     context = gate.integration_package.select(
         str(soc_package) if soc_package is not None else None,
         family=family, root=root, assembly_directory=Path.cwd(),
-        test_support=test_support)
+        test_support=test_support, read=read)
     provider = context.provider
     part = gate.identity(board_data["soc"], "exact part")
     soc_dir = context.source_directory
@@ -289,32 +284,42 @@ def board_catalogue(gate, root, *, board=None, board_package=None,
     if (not context.external and (soc_dir.is_symlink() or
             not soc_dir.resolve().is_relative_to(source_owner))):
         gate.fail("SoC package escapes owned source")
-    soc = read(gate.contained_file(soc_dir, "soc.json"))
-    if context.external and "source_lock" in soc:
+    soc_path = (context.package.fact("soc") if context.package is not None else
+                gate.contained_file(soc_dir, "soc.json"))
+    soc = read(soc_path)
+    if context.external and context.package is None and "source_lock" in soc:
         gate.fail("External SDK sources must be bound by package inputs; "
                   "Nexus source_lock belongs to internal integrations")
     catalog = None
     if context.descriptor.device_catalog is not None:
-        catalog = read(gate.contained_file(
-            soc_dir, context.descriptor.device_catalog))
+        catalog_path = (context.package.fact("device_catalog") if context.package is not None
+                        else gate.contained_file(soc_dir, context.descriptor.device_catalog))
+        catalog = read(catalog_path)
     selected = gate.resolve_device_facts(soc, part, provider, catalog=catalog)
-    soc, device = selected.soc, selected.device
+    soc, device, provider = selected.soc, selected.device, selected.provider
+    policy = getattr(provider, "binding_policy", None)
+    context = replace(context, provider=provider,
+        binding_policy=(policy.with_irq_bindings(selected.irq_bindings,
+            soc["controllers"]) if policy is not None else None))
     if soc["id"] != family:
         gate.fail("Board SoC family differs from the package identity")
-    routes_doc = gate.obj(read(gate.contained_file(soc_dir, "routes.json")),
+    routes_path = (context.package.fact("routes") if context.package is not None else
+                   gate.contained_file(soc_dir, "routes.json"))
+    routes_doc = gate.obj(read(routes_path),
                           {"schema_version", "routes"}, (), "routes")
     gate.integer(routes_doc["schema_version"], 1, 1, "routes schema")
     routes = gate.resolve_routes(routes_doc, soc, part, provider,
                                  controller_profiles=selected.controller_profiles)
-    bindings = gate.resolve_bindings(board_data, routes, part,
-                                     hardware_conditions)
+    bindings = gate.resolve_bindings(board_data, routes, part, hardware_conditions,
+                                     pad_facts=getattr(provider, "PAD_FACTS", None))
     reservations = gate.reserved_claims(soc, board_data, provider)
     inputs = [*snapshots, *context.inputs]
     for name in gate.sequence(board_data.get("inputs", []), "declared Board inputs"):
         inputs.append(gate.contained_file(directory, name))
     if "references" in soc:
         reference = gate.contained_file(soc_dir, soc["references"])
-        gate.fact_references.validate(read(reference), soc["variants"])
+        gate.fact_references.validate(read(reference), soc["variants"],
+            profiles=getattr(provider, "REFERENCE_PROFILES", None))
         inputs.append(reference)
     gate.bind_input_identities(inputs, root, snapshots, None, context)
     return {**({"hardware": hardware_conditions.to_dict()}
@@ -335,34 +340,34 @@ def binding_facts(gate, result, root):
     """Read the exact SoC bytes bound by IR without changing its identity."""
     data = project(result)
     context = getattr(result, "provider_context", None)
-    selected = (context.descriptor if context is not None else
-                gate.descriptor.maintained(data["soc_family"]))
-    relative = ("soc-package/" + context.identity["id"] + "/" +
-                context.descriptor.source_directory + "/soc.json"
-                if context is not None and context.external else
-                selected.source_directory + "/soc.json")
-    expected = next((item["sha256"] for item in data["inputs"]
-                     if item["path"] == relative), None)
-    path = (context.source_directory / "soc.json" if context is not None else
-            gate.contained_file(root.resolve(), relative))
-    snapshot = {}
-    facts = gate.load(path, snapshot)
-    actual = hashlib.sha256(snapshot[path]).hexdigest()
-    if expected is None or actual != expected:
-        gate.fail("Binding query SoC facts differ from the resolved input: "
-                  + str(path))
-    catalog = None
-    if selected.device_catalog is not None:
-        catalog_path = path.parent / selected.device_catalog
-        catalog_relative = str(Path(relative).parent / selected.device_catalog)
-        catalog_expected = next((item["sha256"] for item in data["inputs"]
-                                 if item["path"] == catalog_relative), None)
-        catalog = gate.load(catalog_path, snapshot)
-        if (catalog_expected is None or
-                hashlib.sha256(snapshot[catalog_path]).hexdigest() != catalog_expected):
-            gate.fail("Binding query device catalog differs from the resolved input: "
-                      + str(catalog_path))
-    provider = context.provider if context is not None else maintained(data["soc_family"])
+    metadata = (context.descriptor if context is not None else
+                gate.descriptor.maintained(data["soc_family"], root=root))
+    if context is not None and context.package is not None:
+        path = context.package.fact("soc")
+        catalog_path = (context.package.fact("device_catalog")
+                        if "device_catalog" in context.package.facts else None)
+    else:
+        source = context.source_directory if context is not None else root / metadata.source_directory
+        path = source / "soc.json"
+        catalog_path = source / metadata.device_catalog if metadata.device_catalog is not None else None
+    snapshots = {}
+    read = gate._SnapshotReader(snapshots)
+
+    def bound_fact(source):
+        label = ("soc-package/" + context.identity["id"] + "/" +
+                 source.relative_to(context.directory).as_posix()
+                 if context is not None and context.external else
+                 source.relative_to(root).as_posix())
+        expected = next((item["sha256"] for item in data["inputs"]
+                         if item["path"] == label), None)
+        facts = read(source)
+        if expected is None or hashlib.sha256(read.snapshot_bytes(source)).hexdigest() != expected:
+            gate.fail("Binding query facts differ from the resolved input: " + str(source))
+        return facts
+
+    facts = bound_fact(path)
+    catalog = bound_fact(catalog_path) if catalog_path is not None else None
+    provider = context.provider if context is not None else maintained(data["soc_family"], root=root)
     selected = gate.resolve_device_facts(facts, data["part"], provider,
                                         catalog=catalog)
     return {**data, "controller_facts": thaw(selected.soc["controllers"]),
@@ -413,7 +418,7 @@ def bindings_view(result, *, kind=None):
                 resource_keys.add(normalize_resource(provider.dma_irq(lane)))
             modes[mode] = {
                 "implementation": provider.mode_implementation(
-                    route["kind"], mode),
+                    route["kind"], mode, route["controller"]),
                 "model": provider.MODEL,
                 "execution": asdict(shape), "dma": dma,
                 "resources": resources, "resource_keys": sorted(resource_keys),

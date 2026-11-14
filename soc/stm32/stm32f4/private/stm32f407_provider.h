@@ -30,6 +30,10 @@
 #include "nexus_config.h"
 #endif
 
+/** \brief I2C owns the selected immutable line facts; other ports need no IP.
+ */
+typedef struct nx_i2c_v1_lines nx_i2c_v1_lines_t;
+
 typedef struct {
     GPIO_TypeDef* registers;
     uint32_t mask;
@@ -61,8 +65,7 @@ nx_result_t nx_stm32_spi_select(const nx_stm32_spi_endpoint_state_t* endpoint,
                                 bool selected);
 typedef struct {
     I2C_TypeDef* registers;
-    const GPIO_TypeDef* line_gpio;
-    uint32_t line_mask;
+    const nx_i2c_v1_lines_t* lines;
     uint32_t peripheral_mhz;
     uint32_t rate_hz;
     bool active;

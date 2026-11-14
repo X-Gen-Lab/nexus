@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 import struct
 
-from tools.evidence.common import EvidenceError
+from tools.evidence.common import EvidenceError, load_json
 
 
 class Elf32:
@@ -213,9 +214,19 @@ def image_window(resolved: dict) -> dict:
     result = {"origin": start, "size": end - start}
     if start != physical_start or prefix or suffix:
         from tools.configure.providers import maintained
+        from tools.configure.providers import descriptor
         try:
-            profile = maintained(resolved.get("soc_family"))
-        except (KeyError, TypeError, ValueError) as error:
+            family = resolved.get("soc_family")
+            profile = maintained(family)
+            selected = descriptor.maintained(family)
+            source = Path(__file__).resolve().parents[2]
+            if selected.package_manifest is not None:
+                from tools.configure.packages import load
+                facts = load(source / selected.package_manifest).fact("soc")
+            else:
+                facts = source / selected.source_directory / "soc.json"
+            parts = load_json(facts).get("variants", {})
+        except (OSError, KeyError, TypeError, ValueError) as error:
             raise EvidenceError("image offset has no reviewed startup") from error
         alignment = getattr(profile, "OFFSET_IMAGE_ALIGNMENT", None)
         symbol = getattr(profile, "OFFSET_IMAGE_VECTOR_SYMBOL", None)
@@ -224,7 +235,7 @@ def image_window(resolved: dict) -> dict:
                 alignment & (alignment - 1) or
                 not isinstance(symbol, str) or not symbol or
                 not isinstance(part, str) or
-                part not in getattr(profile, "PARTS", ())):
+                not isinstance(parts, dict) or part not in parts):
             raise EvidenceError("image offset has no reviewed startup")
         if start % alignment or end - start < 8:
             raise EvidenceError("image offset violates reviewed vector bounds")

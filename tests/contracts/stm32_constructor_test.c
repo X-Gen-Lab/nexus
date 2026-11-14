@@ -194,8 +194,10 @@ static void i2c_route_test(void) {
     RCC->APB1ENR = RCC_APB1ENR_TIM2EN;
     RCC->AHB1ENR = 1U << 2U;
     assert(nx_test_prepare_i2c0() == NX_SUCCESS);
-    assert(s_nx_port_i2c0.line_gpio == GPIOB);
-    assert(s_nx_port_i2c0.line_mask == ((1U << 6U) | (1U << 7U)));
+    assert(s_nx_port_i2c0.lines->inputs[0] == &GPIOB->IDR);
+    assert(s_nx_port_i2c0.lines->inputs[1] == &GPIOB->IDR);
+    assert(s_nx_port_i2c0.lines->masks[0] == (1U << 6U));
+    assert(s_nx_port_i2c0.lines->masks[1] == (1U << 7U));
     assert(s_nx_port_i2c0.registers == I2C1);
     assert(nx_test_stop_i2c0() == NX_SUCCESS);
     assert(!s_nx_port_i2c0.initialized);

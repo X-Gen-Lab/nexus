@@ -33,31 +33,25 @@ function(nexus_resolve_assembly)
         string(JSON path GET "${configuration_code}" "${name}")
         set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${path}")
     endforeach()
-    foreach(value NEXUS_SOC_FAMILY NEXUS_SOC_SOURCE_DIRECTORY NEXUS_EXACT_PART NEXUS_BACKEND
-                  NEXUS_STM32_DEVICE NEXUS_STM32_STARTUP
-                  NEXUS_CPU_ARCH NEXUS_CPU_FPU NEXUS_FLOAT_ABI NEXUS_ENUM_ABI
-                  NEXUS_ARCH_HAS_DWT_CYCCNT NEXUS_IRQ_PRIORITY_BITS
-                  NEXUS_ARCH_MPU_VERSION NEXUS_ARCH_ICACHE_LINE_BYTES
-                  NEXUS_ARCH_DCACHE_LINE_BYTES NEXUS_ARCH_SECURITY_STATE
-                  NEXUS_ARCH_HAS_SAU NEXUS_CPU_HAS_BASEPRI NEXUS_CPU_HAS_FPU
-                  NEXUS_CPU_HAS_MVE NEXUS_CPU_HAS_DSP NEXUS_CPU_MPU_REGIONS
-                  NEXUS_CPU_SECURE_ONLY
-                  NEXUS_CPU_EXTERNAL_IRQ_COUNT NEXUS_CPU_ATOMIC_BACKEND_IRQ
-                  NEXUS_CPU_COMPILE_OPTIONS NEXUS_IRQ_KERNEL_POLICY
-                  NEXUS_FREERTOS_PORT NEXUS_THREADX_PORT
-                  NEXUS_OPTIMIZATION NEXUS_SELECTED_KINDS
-                  NEXUS_MEMORY_ADDSRAM NEXUS_MEMORY_TCM NEXUS_MEMORY_CCM
-                  NEXUS_MEMORY_SRAM1 NEXUS_MEMORY_SRAM4
-                  NEXUS_IO_CYCLE_PROBES NEXUS_RUNTIME_POWER
-                  NEXUS_USB_REMOTE_WAKEUP
-                  NEXUS_RTC_PERIODIC_WAKEUP
-                  NEXUS_SDRAM_GRAPHICS
-                  NEXUS_QSPI_QUAD_READ NEXUS_QSPI_CPU_MAP
-                  NEXUS_SELECTED_COMPONENTS NEXUS_CONFIG_SHA256
-                  NEXUS_OS_SELECTION_VARIABLES ${NEXUS_OS_SELECTION_VARIABLES}
-                  NEXUS_SOC_SOURCE_VARIABLES ${NEXUS_SOC_SOURCE_VARIABLES})
+    # The resolver owns this list. Package-private selections cross the bridge
+    # without adding MCU or peripheral names to this common build function.
+    if(NOT NEXUS_SELECTION_VARIABLES)
+        message(FATAL_ERROR "Missing resolver selection contract")
+    endif()
+    set(selection_variables ${NEXUS_SELECTION_VARIABLES})
+    list(LENGTH selection_variables selected_count)
+    list(REMOVE_DUPLICATES selection_variables)
+    list(LENGTH selection_variables unique_count)
+    if(NOT selected_count EQUAL unique_count)
+        message(FATAL_ERROR "Duplicate variable in resolver selection contract")
+    endif()
+    foreach(value IN LISTS selection_variables)
+        if(NOT value MATCHES "^NEXUS_[A-Za-z0-9_]+$" OR NOT DEFINED "${value}")
+            message(FATAL_ERROR "Invalid resolver selection contract: ${value}")
+        endif()
         set(${value} "${${value}}" PARENT_SCOPE)
     endforeach()
+    set(NEXUS_SELECTION_VARIABLES "${selection_variables}" PARENT_SCOPE)
     set(NEXUS_CONFIG_DIR "${bundle}" PARENT_SCOPE)
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${assembly}")
     # Every authored and fact input comes from the same resolver snapshot.

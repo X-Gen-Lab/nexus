@@ -3,7 +3,7 @@ from tools.configure.tests.native_fixture import native_fixture
 import unittest
 
 from tools.configure import configure as gate
-from tools.configure.providers import maintained
+from tools.configure.providers import for_selection
 
 
 class F407ColdBoundaryTests(unittest.TestCase):
@@ -23,7 +23,7 @@ class F407ColdBoundaryTests(unittest.TestCase):
         for relative in inputs:
             with self.subTest(assembly=relative):
                 result = gate.resolve_ir(gate.ROOT / "tests/contracts" / relative, test_support=native_fixture(gate.ROOT / "tests/contracts" / relative))
-                provider = maintained(result.soc_family)
+                provider = for_selection(result)
                 self.assertEqual(result.soc_family, 'stm32f4')
                 for item in result.controllers:
                     if item.kind not in {"can", "usb_device", "eth", "eth_frames",

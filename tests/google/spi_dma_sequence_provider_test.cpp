@@ -52,6 +52,7 @@ bool busy_on_detach;
 bool busy_on_final_disable;
 class SPIDMAProviderSequence : public testing::Test {
   protected:
+    nx_stm32_spi_dma_resources_t dma_resources{};
     DMA_STATE state{};
     DEVICE_STATE child{};
     nx_spi_dma_sequence_state_t sequence{};
@@ -80,16 +81,17 @@ class SPIDMAProviderSequence : public testing::Test {
         busy_on_final_disable = false;
         regions[0] = {(uintptr_t)tx, sizeof(tx), NX_DMA_MEMORY_READ};
         regions[1] = {(uintptr_t)rx, sizeof(rx), NX_DMA_MEMORY_WRITE};
-        state.regions = regions;
-        state.region_count = 2U;
+        dma_resources.regions = regions;
+        dma_resources.region_count = 2U;
+        state.resources = &dma_resources;
         g_nx_stm32_gpioa_model = {};
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         state.spi.registers = SPI1;
         state.spi.rcc = RCC;
         state.spi.clock_hz = 84000000U;
-        state.dma = DMA2;
-        state.rx = DMA2_Stream0;
-        state.tx = DMA2_Stream3;
+        dma_resources.transmit = {DMA2, DMA2_Stream3, DMA2_Stream3_IRQn, 3U,
+                                  3U};
+        dma_resources.receive = {DMA2, DMA2_Stream0, DMA2_Stream0_IRQn, 0U, 3U};
         child.endpoint = {&state.spi, &cs, 1U, 1000000U, 0U, false};
         child.dma = &state;
         ASSERT_EQ(nx_stm32_spi_dma_initialize(&state), NX_SUCCESS);
@@ -153,9 +155,16 @@ class AdditionalSPISequence : public SPIDMAProviderSequence,
         ASSERT_EQ(NX_SUCCESS, nx_spi_port_stop(&raw));
         state.spi.registers = GetParam() == 2U ? SPI2 : SPI3;
         state.spi.clock_hz = 42000000U;
-        state.dma = DMA1;
-        state.rx = GetParam() == 2U ? DMA1_Stream3 : DMA1_Stream0;
-        state.tx = GetParam() == 2U ? DMA1_Stream4 : DMA1_Stream5;
+        dma_resources.transmit =
+            GetParam() == 2U ? nx_stm32_dma_route_t{DMA1, DMA1_Stream4,
+                                                    DMA1_Stream4_IRQn, 4U, 0U}
+                             : nx_stm32_dma_route_t{DMA1, DMA1_Stream5,
+                                                    DMA1_Stream5_IRQn, 5U, 0U};
+        dma_resources.receive =
+            GetParam() == 2U ? nx_stm32_dma_route_t{DMA1, DMA1_Stream3,
+                                                    DMA1_Stream3_IRQn, 3U, 0U}
+                             : nx_stm32_dma_route_t{DMA1, DMA1_Stream0,
+                                                    DMA1_Stream0_IRQn, 0U, 0U};
         state.spi.registers->SR = TXEMPTY;
         ASSERT_EQ(NX_SUCCESS, nx_stm32_spi_dma_initialize(&state));
     }
@@ -163,16 +172,18 @@ class AdditionalSPISequence : public SPIDMAProviderSequence,
         if (sequence.active != nullptr) {
             (void)nx_spi_dma_transaction_cancel(&port, &request);
             held = nullptr;
-            state.rx->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
-            state.tx->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+            state.resources->receive.stream->CR &=
+                ~static_cast<uint32_t>(DMA_SxCR_EN);
+            state.resources->transmit.stream->CR &=
+                ~static_cast<uint32_t>(DMA_SxCR_EN);
             state.spi.registers->SR = TXEMPTY;
             nx_spi_dma_transaction_service(&port);
         }
         SPIDMAProviderSequence::TearDown();
     }
     void CompleteSelected() {
-        state.rx->NDTR = 0U;
-        state.tx->NDTR = 0U;
+        state.resources->receive.stream->NDTR = 0U;
+        state.resources->transmit.stream->NDTR = 0U;
         DMA1->LISR |= 0x20U << (GetParam() == 2U ? 22U : 0U);
         DMA1->HISR |= 0x20U << (GetParam() == 2U ? 0U : 6U);
         nx_stm32_spi_dma_irq(&state, true);
@@ -181,10 +192,12 @@ class AdditionalSPISequence : public SPIDMAProviderSequence,
 };
 TEST_P(AdditionalSPISequence, HalfwordPhasesShareOneCsAndUseBothActualBanks) {
     ASSERT_EQ(NX_SUCCESS, nx_spi_dma_transaction_submit(&endpoint, &request));
-    EXPECT_EQ(1U << DMA_SxCR_MSIZE_Pos, state.rx->CR & DMA_SxCR_MSIZE);
-    EXPECT_EQ(1U << DMA_SxCR_PSIZE_Pos, state.tx->CR & DMA_SxCR_PSIZE);
-    EXPECT_EQ(0U, state.rx->CR & DMA_SxCR_CHSEL);
-    EXPECT_EQ(0U, state.tx->CR & DMA_SxCR_CHSEL);
+    EXPECT_EQ(1U << DMA_SxCR_MSIZE_Pos,
+              state.resources->receive.stream->CR & DMA_SxCR_MSIZE);
+    EXPECT_EQ(1U << DMA_SxCR_PSIZE_Pos,
+              state.resources->transmit.stream->CR & DMA_SxCR_PSIZE);
+    EXPECT_EQ(0U, state.resources->receive.stream->CR & DMA_SxCR_CHSEL);
+    EXPECT_EQ(0U, state.resources->transmit.stream->CR & DMA_SxCR_CHSEL);
     EXPECT_EQ(1U << 16U, CS);
     for (size_t phase = 0U; phase < 2U; ++phase) {
         CompleteSelected();
@@ -200,14 +213,14 @@ TEST_P(AdditionalSPISequence, CancellationRetainsTheRealEngineAndWholeChain) {
     CompleteSelected();
     nx_spi_dma_transaction_service(&port);
     ASSERT_EQ(1U, sequence.phase);
-    held = &state.rx->CR;
+    held = &state.resources->receive.stream->CR;
     ASSERT_EQ(NX_SUCCESS, nx_spi_dma_transaction_cancel(&port, &request));
     nx_spi_dma_transaction_service(&port);
     EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&request.base));
     EXPECT_EQ(&request, sequence.active);
     EXPECT_EQ(1U << 16U, CS);
     held = nullptr;
-    state.rx->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+    state.resources->receive.stream->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
     nx_spi_dma_transaction_service(&port);
     EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
     EXPECT_EQ(NX_ERROR_CANCELLED, request.base.result);
@@ -320,8 +333,8 @@ TEST_F(SPIDMAProviderSequence, DmaDomainCannotAuthorizeProviderStateAsPayload) {
         regions[0],
         regions[1],
         {(uintptr_t)&state, sizeof(state), NX_DMA_MEMORY_WRITE}};
-    state.regions = broad;
-    state.region_count = 3U;
+    dma_resources.regions = broad;
+    dma_resources.region_count = 3U;
     segments[0].rx = &state;
     ASSERT_EQ(nx_spi_dma_transaction_prepare(&request, segments, 2U, 16U,
                                              NX_DEADLINE_NEVER),

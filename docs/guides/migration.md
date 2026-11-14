@@ -102,7 +102,7 @@ checks. Existing tags are unchanged.
 
 The version fields remain independent: authored TOML schema `2`, typed IR source
 epoch `5`, factory/source interface epoch `5`, resolved JSON projection `1` and
-installed SDK manifest schema `2`. A matching semantic version or manifest schema
+installed SDK manifest schema `3`. A matching semantic version or manifest schema
 does not establish matching interface generation.
 
 Epoch 5 replaces the F407-named power integration header with
@@ -179,9 +179,12 @@ names are rejected rather than mapped to a replacement. Existing F407 assemblies
 select `stm32f4` with an exact part. Public C interfaces remain the consumption
 boundary; added internal-CRC references do not change product wiring.
 
-Board and SoC trees contain no Python plugins. Current generation is centralized
-under `tools/configure/stm32f4/`; firmware hardware algorithms and lifecycle
-remain handwritten C. Native fixtures live under
+Board and SoC trees contain no Python plugins. Current production uses a
+declarative `package.json`, explicit fact and binding inputs, and the generic
+DataProvider under `tools/configure/`. Family Python constructors and their
+import registry have been removed; firmware hardware algorithms and lifecycle
+remain handwritten C. Revalidate selected modes and consumers instead of
+inheriting qualification from that source change. Native fixtures live under
 `tests/support/native/` and require explicit test support.
 
 Private F4 IP belongs to `soc/stm32/stm32f4/drivers/ip/`; there is no root MCU

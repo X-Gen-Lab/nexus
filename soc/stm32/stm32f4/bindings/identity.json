@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "entropy",
+      "mode": "rng-words",
+      "implementation": "entropy",
+      "static_recipe": {
+        "state_type": "nx_stm32f407_entropy_state_t",
+        "ops": "nx_stm32f407_entropy_ops",
+        "declarations": [],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f407_entropy_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f407_entropy_start",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f407_entropy_stop",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "stm32f407_entropy.h"
+      ]
+    },
+    {
+      "kind": "crc",
+      "mode": "crc32-words",
+      "implementation": "crc",
+      "static_recipe": {
+        "state_type": "nx_stm32_crc_state_t",
+        "ops": "nx_stm32_crc_ops",
+        "declarations": [],
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32_crc_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_crc_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "stm32f4_crc.h"
+      ]
+    }
+  ]
+}

@@ -11,6 +11,7 @@
 #include "nexus/io/dma.h"
 #include "nexus/io/sdio_io.h"
 #include "stm32f407_platform_cold.h"
+#include "stm32f4_dma_route.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,6 +71,7 @@ typedef struct {
     bool high_speed; /**< Explicit negotiated SDR timing, never fallback. */
     nx_stm32_sdio_engine_t engine;
     nx_stm32_sdio_async_state_t* async;
+    const nx_stm32_dma_route_t* dma; /**< Selected DMA2 channel4, or NULL. */
     const nx_dma_memory_region_t* dma_regions;
     size_t dma_region_count;
     uint8_t irq_priority;
@@ -119,7 +121,7 @@ extern const nx_sdio_io_ops_t nx_stm32_sdio_io_ops;
  */
 void nx_stm32_sdio_irq(nx_stm32_sdio_state_t* state);
 /**
- * \brief Latch only DMA2 stream3 channel4 terminal observations.
+ * \brief Latch only the configured DMA2 channel4 terminal observations.
  * \param[in,out] state: Exact statically bound owner, not a request pointer.
  * \note A DMA TC flag does not prove SDIO CRC, card readiness or settlement.
  */

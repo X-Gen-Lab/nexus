@@ -147,60 +147,124 @@ def resource_budget_projection(resolved):
 
 
 def validate_external_projection(resolved):
-    """Check sealed selected backing without extending physical chip facts.
+    """Audit selected references and quantities without admitting hardware.
 
-    This reads the resolver's one-way audit projection. It does not re-resolve
-    configuration, infer a PCB route or qualify external memory electrically.
+    The producer owns part, bus, startup and electrical permission. This reader
+    checks the same projection's endpoint/owner/memory/budget relationship; it
+    cannot turn an internally consistent record into a new support claim.
     """
+    error = "Invalid external memory backing projection"
+
+    def named(value):
+        return type(value) is str and bool(value)
+
+    def interval(record, origin="origin", size="size"):
+        if not isinstance(record, Mapping):
+            raise ValueError(error)
+        start = _flash_uint32(record.get(origin), context="External memory origin")
+        count = _flash_uint32(record.get(size), 1, context="External memory bytes")
+        if start + count > 1 << 32:
+            raise ValueError(error + ": address interval overflows")
+        return start, count
+
     external = resolved.get("external_memory", [])
-    selected = [region for region in resolved.get("memory", [])
-                if region.get("id") == "addsram"]
+    devices = resolved.get("devices", [])
+    if (not isinstance(external, list) or not isinstance(devices, list) or
+            any(not isinstance(item, Mapping) for item in devices)):
+        raise ValueError(error)
+    startup = [item for item in devices if
+               item.get("driver") == "memory_window-endpoint" and
+               item.get("mode") == "startup-memory"]
     if not external:
-        if resolved.get("soc_family") == "stm32f4" and selected:
-            raise ValueError("F407 addsram requires explicit external startup backing")
+        if startup:
+            raise ValueError(error + ": selected startup endpoint lacks backing")
         return
-    error = "Invalid external SRAM startup projection"
-    if (resolved.get("soc_family") != "stm32f4" or
-            resolved.get("part") != "STM32F407ZGT6" or
-            resolved.get("backend") != "baremetal" or
-            resolved.get("optimization", "Os") not in {"O0", "Og", "O2", "Os", "O3"} or
-            not isinstance(external, list) or len(external) != 1 or
-            set(external[0]) != {"id", "endpoint"} or
-            external[0]["id"] != "addsram"):
+    for name in ("soc_family", "part", "backend", "optimization"):
+        if name in resolved and not named(resolved[name]):
+            raise ValueError(error + ": malformed selection identity")
+    memory = resolved.get("memory")
+    controllers = resolved.get("controllers")
+    budget = resolved.get("memory_budgets")
+    if (not isinstance(memory, list) or not memory or
+            any(not isinstance(item, Mapping) for item in memory) or
+            not isinstance(controllers, list) or
+            any(not isinstance(item, Mapping) for item in controllers) or
+            not isinstance(budget, Mapping) or
+            not isinstance(budget.get("regions"), Mapping)):
         raise ValueError(error)
-    endpoint = external[0]["endpoint"]
-    if (not isinstance(endpoint, dict) or
-            endpoint.get("driver") != "memory_window-endpoint" or
-            endpoint.get("mode") != "startup-memory" or
-            endpoint.get("address") != 0x68000000 or
-            endpoint.get("bytes") != 0x100000 or
-            [child for child in resolved.get("devices", [])
-             if child.get("driver") == "memory_window-endpoint" and
-             child.get("mode") == "startup-memory"] != [endpoint]):
-        raise ValueError(error)
-    parents = [item for item in resolved.get("controllers", [])
-               if item.get("id") == endpoint.get("controller")]
-    if (len(parents) != 1 or parents[0].get("kind") != "external_bus" or
-            parents[0].get("controller") != "FSMC" or
-            parents[0].get("mode") != "async16"):
-        raise ValueError(error)
-    if (selected != [{"id": "addsram", "origin": 0x68000000,
-                      "size": 0x100000, "dma": False, "linker": True}] or
-            selected[0].get("dma") is not False or
-            selected[0].get("linker") is not True):
-        raise ValueError(error)
-    flash, layout = resolved.get("flash", {}), resolved.get("layout", {})
-    budget = resolved.get("memory_budgets", {})
-    choice = budget.get("regions", {}).get("addsram", {})
-    limit = choice.get("limit_bytes")
-    if (flash.get("origin") != 0x08000000 or flash.get("size") != 0x100000 or
-            layout.get("origin") != flash["origin"] or
-            layout.get("size") != flash["size"] or
-            budget.get("image_prefix_bytes", 0) or
-            budget.get("image_suffix_bytes", 0) or
-            type(limit) is not int or not 4 <= limit <= 0x100000 or limit % 4 or
-            budget.get("main_stack_bytes", 0) < 512):
-        raise ValueError(error)
+    domains = {}
+    for region in memory:
+        identity = region.get("id")
+        if not named(identity) or identity in domains:
+            raise ValueError(error + ": memory identities must be distinct")
+        domains[identity] = region
+    selected_regions, selected_endpoints = set(), set()
+    for reference in external:
+        if (not isinstance(reference, Mapping) or
+                set(reference) != {"id", "endpoint"}):
+            raise ValueError(error)
+        identity, endpoint = reference["id"], reference["endpoint"]
+        if (not named(identity) or identity in selected_regions or
+                not isinstance(endpoint, Mapping) or
+                endpoint.get("driver") != "memory_window-endpoint" or
+                endpoint.get("mode") != "startup-memory" or
+                not named(endpoint.get("id")) or
+                endpoint["id"] in selected_endpoints or
+                not named(endpoint.get("controller"))):
+            raise ValueError(error + ": invalid or duplicate backing reference")
+        matches = [item for item in devices if item.get("id") == endpoint["id"]]
+        parents = [item for item in controllers
+                   if item.get("id") == endpoint["controller"]]
+        if (matches != [endpoint] or len(parents) != 1 or
+                parents[0].get("kind") != "external_bus" or
+                not named(parents[0].get("controller")) or
+                not named(parents[0].get("mode"))):
+            raise ValueError(error + ": endpoint or controller owner is not unique")
+        origin, size = interval(endpoint, "address", "bytes")
+        region = domains.get(identity)
+        if (origin % 4 or size % 4 or region != {
+                "id": identity, "origin": origin, "size": size,
+                "dma": False, "linker": True} or
+                region.get("dma") is not False or region.get("linker") is not True):
+            raise ValueError(error + ": selected memory differs from its backing")
+        selected_regions.add(identity)
+        selected_endpoints.add(endpoint["id"])
+    if (len(startup) != len(selected_endpoints) or
+            {item["id"] for item in startup} != selected_endpoints):
+        raise ValueError(error + ": startup endpoints and backing must be one-to-one")
+    for identity, choice in budget["regions"].items():
+        if (identity not in domains or not isinstance(choice, Mapping) or
+                set(choice) != {"limit_bytes"} or
+                domains[identity].get("linker") is not True):
+            raise ValueError(error + ": budget lacks a selected memory domain")
+        limit = _flash_uint32(choice["limit_bytes"], 4, context="External memory budget")
+        if limit % 4 or limit > domains[identity]["size"]:
+            raise ValueError(error + ": memory budget exceeds its selected domain")
+    if not selected_regions.issubset(budget["regions"]):
+        raise ValueError(error + ": external placement requires an explicit budget")
+    primary = next((region for region in memory if region.get("linker") is True), None)
+    if primary is None or primary["id"] in selected_regions:
+        raise ValueError(error + ": primary stack/heap domain must remain independent")
+    _, primary_size = interval(primary)
+    stack = _flash_uint32(budget.get("main_stack_bytes"), 4, context="External memory MSP budget")
+    heap = _flash_uint32(budget.get("libc_heap_bytes", 0), context="External memory heap budget")
+    static = _flash_uint32(budget.get("static_ram_bytes", primary_size), 4,
+                           context="External memory primary budget")
+    if stack % 4 or heap % 4 or static % 4 or stack + heap > static or static > primary_size:
+        raise ValueError(error + ": stack/heap exceed the primary memory budget")
+    flash_origin, flash_size = interval(resolved.get("flash"))
+    image_origin, image_size = interval(resolved.get("layout"))
+    if (image_origin < flash_origin or
+            image_origin + image_size > flash_origin + flash_size):
+        raise ValueError(error + ": image layout leaves physical Flash")
+    prefix = _flash_uint32(budget.get("image_prefix_bytes", 0), context="External memory image prefix")
+    suffix = _flash_uint32(budget.get("image_suffix_bytes", 0), context="External memory image suffix")
+    if prefix % 4 or suffix % 4 or prefix + suffix >= image_size:
+        raise ValueError(error + ": image reservations exceed the selected layout")
+    load = _flash_uint32(budget.get("flash_load_bytes", image_size - prefix - suffix),
+                         1, context="External memory Flash load budget")
+    if load > image_size - prefix - suffix:
+        raise ValueError(error + ": Flash load budget exceeds the selected image")
 
 
 def selections(result):
@@ -362,12 +426,8 @@ def dma_regions(name, result, include_flash=False, *, engine=None):
         flash=result.flash if include_flash else None, engine=engine)
 
 
-def dma_regions_from_facts(name, memory, *, flash=None, engine=None):
-    """Emit exact DMA domains; invalid physical reachability raises ValueError.
-
-    Keep this module usable by independent ELF budget checkers without provider
-    configuration imports. The configuration entry point owns error reporting.
-    """
+def _dma_region_facts(memory, *, flash=None, engine=None):
+    """Select reviewed DMA intervals once for legacy and typed projections."""
     if (flash is not None) and any("dma_engines" in region
                              for region in memory):
         # RAM bus reachability never implies access to the Flash bus. New
@@ -383,13 +443,48 @@ def dma_regions_from_facts(name, memory, *, flash=None, engine=None):
         else:
             reachable = region["dma"]
         if reachable:
-            regions.append(region)
-    if not regions and not (flash is not None):
+            regions.append((region, True))
+    if flash is not None:
+        regions.append((flash, False))
+    return tuple(regions)
+
+
+def dma_region_declarations(name, result, include_flash=False, *, engine=None):
+    """Describe exact static memory-domain records without C expressions."""
+    from tools.configure.static_ir import Array, Declaration, Record
+    regions = dma_region_bindings(result, include_flash=include_flash, engine=engine)
+    if not regions:
+        return (), 0
+    records = []
+    for region in regions:
+        records.append(Record((("begin", region.begin), ("size", region.size),
+                               ("permissions", region.permissions))))
+    declaration = Declaration("nx_dma_memory_region_t", "s_nx_dma_regions_" + name,
+                              Array(tuple(records)), count=len(records), const=True)
+    return (declaration,), len(records)
+
+
+def dma_region_bindings(result, include_flash=False, *, engine=None):
+    """Freeze the same reviewed regions for static recipes and declarations."""
+    from tools.configure.calls import Symbol
+    from tools.configure.ir import DmaMemoryBindingIR
+    from tools.configure.static_ir import Flags
+    regions = _dma_region_facts(result.memory,
+        flash=result.flash if include_flash else None, engine=engine)
+    return tuple(DmaMemoryBindingIR(region["origin"], region["size"],
+        Flags((Symbol("NX_DMA_MEMORY_READ"), Symbol("NX_DMA_MEMORY_WRITE")))
+        if writable else Symbol("NX_DMA_MEMORY_READ"))
+        for region, writable in regions)
+
+
+def dma_regions_from_facts(name, memory, *, flash=None, engine=None):
+    """Render the same reviewed intervals for remaining legacy constructors."""
+    regions = _dma_region_facts(memory, flash=flash, engine=engine)
+    if not regions:
         return [], 0
     lines = [f"static const nx_dma_memory_region_t s_nx_dma_regions_{name}[] = {{"]
-    for region in regions:
-        lines.append(f"    {{ (uintptr_t)0x{region['origin']:08x}u, {region['size']}u, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE }},")
-    if (flash is not None):
-        lines.append(f"    {{ (uintptr_t)0x{flash['origin']:08x}u, {flash['size']}u, NX_DMA_MEMORY_READ }},")
+    for region, writable in regions:
+        permissions = "NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE" if writable else "NX_DMA_MEMORY_READ"
+        lines.append(f"    {{ (uintptr_t)0x{region['origin']:08x}u, {region['size']}u, {permissions} }},")
     lines.append("};")
-    return lines, len(regions) + int((flash is not None))
+    return lines, len(regions)

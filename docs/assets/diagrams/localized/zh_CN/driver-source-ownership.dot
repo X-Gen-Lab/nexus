@@ -1,19 +1,24 @@
-// FIG-31 current: F4 source ownership; labels distinguish calls and build inputs.
+// Current scoped view. Build-time arrows and runtime calls are labeled explicitly.
+// Code basis: soc/stm32/stm32f4/CMakeLists.txt; tools/configure/data_provider.py; bindings.py; tests/support/native/CMakeLists.txt; io/include/nexus/io
 digraph F4SourceOwnership {
-  graph [rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.5, fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, label="FIG-31 F4 源码归属与接口边界\n逐边说明编译或调用；不建立软件／实板资格"];
-  node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];
-  edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11];
-  io [label="io/\n公共类型、请求与借用合同"];
-  f4 [label="soc/stm32/stm32f4/\n资源、生命周期与官方库适配"];
-  ip [label="F4 drivers/ip/\n仍使用的私有硬件实现"];
-  vendor [label="vendors/st/ F4 HAL / Device\n全部库存来源保留，按选择消费"];
-  host [label="tests/support/native/\n显式测试 scope，不是生产 SoC"];
-  components [label="components/\nILI9341 / XPT2046 / W25 等"];
-  config [label="Board JSON + TOML\n事实、模式与实例选择"];
-  io -> f4 [label="运行：ops(context)"];
-  f4 -> ip [label="构建：私有源码选编", style=dashed];
-  f4 -> vendor [label="构建：私有 include / link", style=dashed];
-  host -> ip [label="测试：执行真实 IP 源码", style=dashed];
-  components -> io [label="运行：公共窄端口"];
-  config -> f4 [label="构建：生成静态连接", style=dashed];
+    graph [label="FIG-31 F4 源码归属与接口边界\n逐边区分构建与调用；不建立资格", rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.52, fontname="Noto Sans CJK SC", fontsize=15, labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    io [label="io/：公共类型、请求与借用合同"];
+    f4 [label="soc/stm32/stm32f4/\n控制器 C、生命周期与官方库适配"];
+    ip [label="F4 drivers/ip/：私有共享硬件算法"];
+    vendor [label="vendors/st/：F4 HAL／Device\n保留库存，按选择消费"];
+    host [label="tests/support/native/\n显式测试 scope，不是生产 SoC"];
+    components [label="components/：ILI9341／XPT2046／W25"];
+    facts [label="包内 package／facts／bindings\nBoard JSON 与外部 TOML", fillcolor="#f8fafc"];
+    config [label="tools/configure/：通用 DataProvider\n领域政策、具名 IR 与有限静态装配"];
+    assembly [label="生成 nexus_bindings.c\n静态实例、face、固定生命周期连接"];
+    components -> io [label="运行：按公共窄端口访问"];
+    io -> f4 [label="运行：ops(context)"];
+    f4 -> ip [label="构建：私有源码选编", style=dashed];
+    f4 -> vendor [label="构建：私有 include／link", style=dashed];
+    host -> ip [label="测试：执行真实硬件算法 C", style=dashed];
+    facts -> config [label="构建：同一输入快照", style=dashed];
+    config -> assembly [label="构建：生成有限静态连接", style=dashed];
+    assembly -> f4 [label="构建：私有类型、固定 C 调用与链接", style=dashed];
 }

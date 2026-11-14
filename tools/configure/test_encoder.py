@@ -3,12 +3,24 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
 
-from tools.configure import configure as gate, dependencies
+from tools.configure import configure as gate
+from tools.configure.tests.f4_fixture import provider
 
 
 class EncoderConfigurationTests(unittest.TestCase):
+    def test_reviewed_alternate_ti_pair_is_not_a_constructor_pin_table(self):
+        selected = provider("STM32F407VET6")
+        selection = dict(mode="quadrature", counting="x4", filter_a=0, filter_b=0,
+                         invert_a=False, invert_b=False, exclusive=True)
+        route = {"kind": "encoder", "controller": "TIM4", "pins": [
+            {"pin": "PD12", "function": "ti1", "af": 2},
+            {"pin": "PD13", "function": "ti2", "af": 2}]}
+        selected.validate_selection(selection, route)
+        route["pins"][1]["function"] = "ti1"
+        with self.assertRaises(ValueError):
+            selected.validate_selection(selection, route)
+
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
@@ -85,21 +97,6 @@ class EncoderConfigurationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'TIM3'):
             gate.resolve_ir(path)
 
-    def test_helper_changes_invalidate_frozen_generation_and_identity(self):
-        helper = 'tools/configure/stm32f4/encoder.py'
-        root = self.directory / 'generator-source'
-        for name in set(dependencies.source_names('platform', 'stm32f4')) | {helper}:
-            target = root / name
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes((gate.ROOT / name).read_bytes())
-        with patch.object(dependencies, 'ROOT', root):
-            paths, before = dependencies.snapshot(mode='platform', family='stm32f4')
-            target = root / helper
-            target.write_bytes(target.read_bytes() + b'\n# Edited validation.\n')
-            with self.assertRaisesRegex(ValueError, 'encoder.py'):
-                dependencies.verify(paths, before)
-            _, after = dependencies.snapshot(mode='platform', family='stm32f4')
-        self.assertNotEqual(before['sha256'], after['sha256'])
 
 
 if __name__ == '__main__':

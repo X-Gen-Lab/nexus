@@ -4,7 +4,8 @@
 编译器／ABI、工作任务与资源预算；vendor 头和具体 provider 状态私有，不导出通用
 预编译 MCU ABI 或应用生成器。版本唯一权威是
 `dependencies/platform-compatibility.json`；CMake、生成头、安装包从它派生。
-source interface epoch `3` 与 assembly schema `2` 分别计代，不随语义版本自动改变。
+source interface epoch 与 assembly schema 分别计代，均读取上述兼容文件，
+不在本页复制计代值，也不随语义版本自动改变。
 
 ## 打包与消费
 
@@ -13,6 +14,11 @@ source interface epoch `3` 与 assembly schema `2` 分别计代，不随语义�
 ```sh
 python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-sdk
 ```
+
+默认包范围由 `dependencies/platform-compatibility.json` 的
+`source_sdk.default_package_manifests` 明确选择。新增 SoC 包不会自动扩大 SDK；需要
+其他包时，重复传入 `--package <包 ID>`。选版、依赖与导出均针对 `--source` 指定的
+输入根，安装验证使用 manifest 中记录的 `profile.packages`，不发现额外库存。
 
 包记录源码 commit／tree、每个文件摘要、所选依赖 commit／tree 和许可通知。
 受审导入仍按当前 provider 声明精确验证；当前 F4 使用锁定 Git 依赖，导入记录为空，
@@ -72,16 +78,16 @@ runtime 策略，已测路径例如 `-fno-exceptions -fno-rtti`。
 
 ## 当前源码接口代际
 
-当前开发快照保留版本 `0.2.1`，factory／source interface epoch 为 3，SDK manifest
-格式为 2；二者由各自 authority 校验，不从相同数字推导兼容。当前消费者明确拒绝
-旧 epoch 1／2，所有调用者、face／ops、factory 和 provider 必须用同一精确源码重编。
-ADC group 的直接 `request.frames` 访问迁为 `request.output.frames`，优先用
-`nx_adc_group_prepare()` 设置 RAW discriminant；paired 请求使用独立 prepare 入口。
-该 epoch-2 ADC 结果合同在 epoch 3 保留。公共 traits 改用 `nexus/io/traits.h`
-领域类型，通用 capability 用 `nx_io_capability_t`／`NX_IO_CAP_*`；增强 SPI 端点 traits
-为 `nx_spi_transaction_traits_t`，I2C profile 使用 `nx_i2c_limits_t`。SDIO function 请求直接持有 `base` 与数据字段，不再借用块设备的 LBA
-结构。不提供旧字段影子或二进制混用。详细步骤见[迁移指南](../../docs/guides/migration.md)，
-策略见[源码兼容性合同](../../docs/design/source-compatibility.md)。
+当前开发快照的语义版本、factory／source interface epoch 和 SDK manifest 格式
+均从 `dependencies/platform-compatibility.json` 读取。各协议分别计代，消费者要求
+精确源码一致；全部调用者、face／ops、factory 和 provider 必须使用该源码重新编译。
+历史字段迁移见[迁移指南](../../docs/guides/migration.md)，当前边界见
+[源码兼容性合同](../../docs/design/source-compatibility.md)。
+
+SDK manifest 的 `source_exports.members` 保存从选中包导出范围与精确源树派生的
+文件成员；`source_exports.packages` 标识相应包 manifest。它们不另建 CMake 源码图，
+也不证明可同时重写所有声明的来源可信。安装验证要求成员齐全、逐文件摘要匹配、
+供应商锁一致，并检查完整 prefix 的移动与消费边界。
 
 ## 完整安装消费者验证
 

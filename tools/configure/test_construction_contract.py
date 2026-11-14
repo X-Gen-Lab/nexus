@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from tools.configure import bindings, configure as gate
 from tools.configure.calls import DirectCall, Symbol
-from tools.configure.providers import common, descriptor, maintained
+from tools.configure.providers import common, descriptor, for_selection
 
 
 class ConstructionContractTests(unittest.TestCase):
@@ -16,7 +16,7 @@ class ConstructionContractTests(unittest.TestCase):
         return gate.resolve_ir(gate.ROOT / relative, test_support=native_fixture(gate.ROOT / relative))
 
     def construction(self, result, item):
-        return maintained(result.soc_family, test_support=(result.soc_family == "native")).constructor(
+        return for_selection(result).constructor(
             item, result, result.board_bindings, result.routes,
             result.devices)
 
@@ -65,7 +65,7 @@ class ConstructionContractTests(unittest.TestCase):
 
     def test_storage_type_is_provider_owned_without_prefix_inference(self):
         result = self.resolve("tests/support/native/assemblies/native-gpio.toml")
-        provider = maintained(result.soc_family, test_support=(result.soc_family == "native"))
+        provider = for_selection(result)
         construction = self.construction(result, result.controllers[0])
         construction = replace(construction,
                                state_type="nx_alternate_gpio_state_t")
@@ -82,7 +82,7 @@ class ConstructionContractTests(unittest.TestCase):
 
     def test_failed_initializer_is_in_cleanup_only_when_provider_requires(self):
         result = self.resolve("tests/support/native/assemblies/native-gpio.toml")
-        provider = maintained(result.soc_family, test_support=(result.soc_family == "native"))
+        provider = for_selection(result)
         original = self.construction(result, result.controllers[0])
         for retained in (False, True):
             with self.subTest(retained=retained):
@@ -123,7 +123,7 @@ class ConstructionContractTests(unittest.TestCase):
         marker = Symbol("NX_TEST_PERMANENT_STATE")
         selected = replace(original, initial_state=marker, pre_c_effects=True)
         self.assertIs(selected.initial_state, marker)
-        provider = maintained(result.soc_family, test_support=(result.soc_family == "native"))
+        provider = for_selection(result)
         with patch.object(provider, "constructor", return_value=selected):
             source = bindings.emit(result)[1]
         self.assertIn("s_nx_port_led0 = NX_TEST_PERMANENT_STATE;", source)
@@ -150,7 +150,7 @@ class ConstructionContractTests(unittest.TestCase):
 
     def test_admission_precedes_owned_effects_and_never_enters_cleanup(self):
         result = self.resolve("tests/support/native/assemblies/native-gpio.toml")
-        provider = maintained(result.soc_family, test_support=(result.soc_family == "native"))
+        provider = for_selection(result)
         original = self.construction(result, result.controllers[0])
         check = DirectCall("nx_test_admit")
         constructed = replace(original, admission=(check,),
@@ -192,7 +192,7 @@ class InstanceConstructionIndependenceTests(unittest.TestCase):
                 result = gate.resolve_ir(path)
                 item = next(item for item in result.controllers
                             if item.kind == kind and item.id == selected)
-                provider = maintained(result.soc_family)
+                provider = for_selection(result)
                 constructions.append(provider.constructor(
                     item, result, result.board_bindings, result.routes, result.devices))
             self.assertEqual(constructions[0], constructions[1],

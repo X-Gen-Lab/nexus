@@ -1,0 +1,435 @@
+{
+  "schema_version": 1,
+  "bindings": [],
+  "domains": {
+    "selection": {
+      "schema_version": 1,
+      "internal": [
+        {
+          "kind": "cipher",
+          "modes": [
+            "irq-blocks",
+            "dma-blocks"
+          ],
+          "controller": "CRYP",
+          "irq_required": true
+        },
+        {
+          "kind": "hash",
+          "modes": [
+            "irq-blocks",
+            "dma-blocks"
+          ],
+          "controller": "HASH",
+          "irq_required": true
+        },
+        {
+          "kind": "exti",
+          "modes": [
+            "pvd-level",
+            "pvd-events"
+          ],
+          "controller": "EXTI16",
+          "irq_required": false
+        }
+      ],
+      "encoder": {
+        "controllers": {
+          "TIM1": 1,
+          "TIM8": 3,
+          "TIM3": 2,
+          "TIM4": 2,
+          "TIM5": 2
+        }
+      },
+      "i2c_target": {
+        "controllers": [
+          "I2C1",
+          "I2C2",
+          "I2C3"
+        ],
+        "alternate": 4
+      },
+      "block": {
+        "controller": "SDIO",
+        "alternate": 12,
+        "pins": {
+          "1": [
+            "PC8",
+            "PC9",
+            "PC10",
+            "PC11",
+            "PC12",
+            "PD2"
+          ],
+          "4": [
+            "PC8",
+            "PC9",
+            "PC10",
+            "PC11",
+            "PC12",
+            "PD2"
+          ],
+          "8": [
+            "PC8",
+            "PC9",
+            "PC10",
+            "PC11",
+            "PC12",
+            "PD2",
+            "PB8",
+            "PB9",
+            "PC6",
+            "PC7"
+          ]
+        },
+        "max_blocks": 32,
+        "poll_budget": 1000000
+      },
+      "rtc": {
+        "controller": "RTC",
+        "crystal_route": "rtc-lse-pc14-pc15",
+        "bypass_route": "rtc-lse-bypass-pc14",
+        "default_context": {
+          "backend": "baremetal",
+          "profile": "hse8-pll168"
+        },
+        "part_contexts": {
+          "STM32F411RET6": {
+            "backend": "baremetal",
+            "profile": "custom",
+            "parameters": {
+              "source": "hsi",
+              "input_hz": 16000000,
+              "sysclk_source": "pll",
+              "pll_enabled": true,
+              "ahb_div": 1,
+              "adc_div": 4,
+              "supply_mv": 3300,
+              "css": false,
+              "pll_m": 16,
+              "pll_n": 384,
+              "pll_p": 4,
+              "pll_q": 8,
+              "apb1_div": 2,
+              "apb2_div": 1
+            },
+            "forbidden_options": [
+              "lse_bypass",
+              "periodic_wakeup"
+            ],
+            "forbid_auxiliary": true
+          },
+          "STM32F446ZET6": {
+            "backend": "baremetal",
+            "profile": "custom",
+            "parameters": {
+              "source": "hsi",
+              "input_hz": 16000000,
+              "sysclk_source": "pll",
+              "pll_enabled": true,
+              "ahb_div": 1,
+              "adc_div": 4,
+              "supply_mv": 3300,
+              "css": false,
+              "pll_m": 16,
+              "pll_n": 336,
+              "pll_p": 2,
+              "pll_q": 7,
+              "apb1_div": 4,
+              "apb2_div": 2
+            },
+            "forbidden_options": [
+              "lse_bypass",
+              "periodic_wakeup"
+            ],
+            "forbid_auxiliary": true
+          },
+          "STM32F479NIH6": {
+            "backend": "baremetal",
+            "profile": "custom",
+            "parameters": {
+              "source": "hsi",
+              "input_hz": 16000000,
+              "sysclk_source": "pll",
+              "pll_enabled": true,
+              "ahb_div": 1,
+              "adc_div": 4,
+              "supply_mv": 3300,
+              "css": false,
+              "pll_m": 10,
+              "pll_n": 210,
+              "pll_p": 2,
+              "pll_q": 7,
+              "apb1_div": 4,
+              "apb2_div": 2
+            },
+            "forbidden_options": [
+              "lse_bypass",
+              "periodic_wakeup"
+            ],
+            "forbid_auxiliary": true
+          }
+        },
+        "crystal_resources": [
+          "pin:PC13"
+        ]
+      },
+      "contexts": [
+        {
+          "kind": "external_bus",
+          "modes": [
+            "sdram-controller",
+            "qspi-indirect-sdr",
+            "qspi-indirect-dma"
+          ],
+          "backend": "baremetal",
+          "profile": "custom"
+        },
+        {
+          "kind": "external_bus",
+          "modes": [
+            "async16",
+            "external-memory"
+          ],
+          "backend": "baremetal",
+          "profile": "hse8-pll168"
+        }
+      ],
+      "dma": [
+        {
+          "kind": "block",
+          "controller": "SDIO",
+          "mode": "sdio-dma",
+          "paths": [
+            [
+              "DMA2:stream3:channel4"
+            ],
+            [
+              "DMA2:stream6:channel4"
+            ]
+          ]
+        },
+        {
+          "kind": "external_bus",
+          "controller": "QUADSPI",
+          "mode": "qspi-indirect-dma",
+          "paths": [
+            [
+              "DMA2:stream7:channel3"
+            ]
+          ]
+        },
+        {
+          "kind": "cipher",
+          "controller": "CRYP",
+          "mode": "dma-blocks",
+          "paths": [
+            [
+              "DMA2:stream6:channel2",
+              "DMA2:stream5:channel2"
+            ]
+          ]
+        },
+        {
+          "kind": "hash",
+          "controller": "HASH",
+          "mode": "dma-blocks",
+          "paths": [
+            [
+              "DMA2:stream7:channel2"
+            ]
+          ]
+        }
+      ],
+      "pwm_period_max": {
+        "TIM3": 65535,
+        "TIM4": 65535,
+        "TIM5": 4294967295,
+        "TIM9": 65535,
+        "TIM10": 65535,
+        "TIM11": 65535,
+        "TIM12": 65535,
+        "TIM13": 65535,
+        "TIM14": 65535
+      },
+      "adc_internal_sample": 7,
+      "clock_contexts": {
+        "hse8-pll150-sdio375": {
+          "backends": [
+            "baremetal"
+          ],
+          "allow_power": false,
+          "forbidden_kinds": [
+            "lowpower",
+            "standby",
+            "timebase"
+          ]
+        }
+      },
+      "watchdog_controller": "WWDG",
+      "limits": [
+        {
+          "kind": "uart",
+          "modes": [
+            "irq-byte-event",
+            "irq-wire",
+            "irq-words",
+            "dma-tx",
+            "irq-blocks",
+            "rx-dma-idle",
+            "dma-duplex",
+            "rx-dma-continuous",
+            "dma-duplex-continuous"
+          ],
+          "field": "baud",
+          "minimum": 1282,
+          "maximum": 1000000
+        },
+        {
+          "kind": "spi",
+          "modes": [
+            "irq-frames"
+          ],
+          "field": "max_hz",
+          "minimum": 1,
+          "maximum": 42000000
+        },
+        {
+          "kind": "spi",
+          "modes": [
+            "short-poll",
+            "dma"
+          ],
+          "field": "max_hz",
+          "minimum": 328125,
+          "maximum": 42000000
+        }
+      ],
+      "i2c_nominal": {
+        "clock_quantum_hz": 1000000,
+        "clock_hz": [
+          2000000,
+          50000000
+        ],
+        "fast_min_hz": 4000000,
+        "fast_threshold_hz": 100000,
+        "maximum_hz": 400000,
+        "standard_ceiling_hz": 88000,
+        "standard_factor": 2,
+        "fast_factor": 3,
+        "standard_min_divisor": 4,
+        "maximum_divisor": 4095,
+        "rise_quantum_hz": 10000000,
+        "rise_budget_hz": 1200000
+      },
+      "serial_modes": {
+        "uart_wire": {
+          "controllers": {
+            "USART1": {
+              "protocols": [
+                "asynchronous",
+                "synchronous",
+                "half-duplex",
+                "lin",
+                "irda",
+                "smartcard"
+              ],
+              "flows": [
+                "none",
+                "rts",
+                "cts",
+                "rts-cts"
+              ]
+            },
+            "USART2": {
+              "protocols": [
+                "asynchronous",
+                "synchronous",
+                "half-duplex",
+                "lin",
+                "irda",
+                "smartcard"
+              ],
+              "flows": [
+                "none",
+                "rts",
+                "cts",
+                "rts-cts"
+              ]
+            },
+            "USART3": {
+              "protocols": [
+                "asynchronous",
+                "synchronous",
+                "half-duplex",
+                "lin",
+                "irda",
+                "smartcard"
+              ],
+              "flows": [
+                "none",
+                "rts",
+                "cts",
+                "rts-cts"
+              ]
+            },
+            "UART4": {
+              "protocols": [
+                "asynchronous",
+                "half-duplex",
+                "lin",
+                "irda"
+              ],
+              "flows": [
+                "none"
+              ]
+            },
+            "UART5": {
+              "protocols": [
+                "asynchronous",
+                "half-duplex",
+                "lin",
+                "irda"
+              ],
+              "flows": [
+                "none"
+              ]
+            },
+            "USART6": {
+              "protocols": [
+                "asynchronous",
+                "synchronous",
+                "half-duplex",
+                "lin",
+                "irda",
+                "smartcard"
+              ],
+              "flows": [
+                "none",
+                "rts",
+                "cts",
+                "rts-cts"
+              ]
+            }
+          },
+          "irda_max_baud": 115200,
+          "smartcard_prescaler_max": 31
+        },
+        "spi_frames": {
+          "controllers": [
+            "SPI1",
+            "SPI2",
+            "SPI3"
+          ],
+          "word_bits": [
+            8,
+            16
+          ],
+          "crc_odd_required": true,
+          "crc_one_wire": false
+        }
+      }
+    }
+  }
+}

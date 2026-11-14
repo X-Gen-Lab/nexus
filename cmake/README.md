@@ -7,7 +7,7 @@ CMake 维护唯一源码和链接依赖图。`NEXUS_ASSEMBLY_FILE` 选择 TOML �
 startup 从型号事实导出；官方 HAL／LL、Device 和 Handle 保持私有。未选模块不参与
 编译，section GC 再移除未引用函数，两者分别验证。
 
-`STM32Official.cmake` 在同一次 configure 首次使用官方源码时完整验收选中 HAL／
+[STM32Official.cmake](../soc/stm32/stm32f4/cmake/STM32Official.cmake) 在同一次 configure 首次使用官方源码时完整验收选中 HAL／
 CMSIS 与 SDK 输入，并保存由 SHA256 绑定的唯一 pending 快照；全部根目录延迟操作
 完成后再完整复核内容、文件系统与 Git 身份。同字节重写也会失败。每个 target 的
 类型、器件、ABI、私有 include 和源码选择仍分别检查，不共享对象配置。

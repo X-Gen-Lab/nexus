@@ -81,14 +81,10 @@ class Stm32UartDma : public testing::Test {
         state.uart.profile = NX_UART_RX_BYTES;
         state.uart.baud = 115200U;
         state.uart.irq = USART1_IRQn;
-        resources.dma = &dma;
+        resources.transmit = {&dma, &tx, DMA2_Stream7_IRQn, 7U, 4U};
         state.resources = &resources;
-        state.transmit.tx = &tx;
         resources.regions = &region;
         resources.region_count = 1U;
-        state.transmit.stream = 7U;
-        state.transmit.channel = 4U;
-        state.transmit.dma_irq = DMA2_Stream7_IRQn;
         ASSERT_EQ(nx_stm32_uart_dma_initialize(&state, 84000000U), NX_SUCCESS);
         nx_request_initialize(&request.base);
         ASSERT_EQ(nx_uart_tx_prepare(&request, payload, sizeof(payload), 1000U),
@@ -111,7 +107,7 @@ TEST_F(Stm32UartDma, StoppedOwnerRejectsBeforeReadingRetiredConfiguration) {
             if (mapping == MAP_FAILED)
                 _exit(4);
             auto* retained = new (mapping) nx_stm32_uart_dma_resources_t{};
-            retained->dma = &dma;
+            retained->transmit = resources.transmit;
             retained->regions = &region;
             retained->region_count = 1U;
             state.resources = retained;
@@ -137,13 +133,15 @@ TEST_F(Stm32UartDma, StoppedOwnerRejectsBeforeReadingRetiredConfiguration) {
 
 TEST_F(Stm32UartDma, QueuedRequestCannotOverwriteRetainedDmaFacts) {
     struct Pending {
-        DMA_TypeDef* dma;
+        nx_stm32_dma_route_t transmit;
+        nx_stm32_dma_route_t receive;
         const nx_dma_memory_region_t* regions;
         nx_uart_tx_request_t request;
     } pending{};
     static_assert(offsetof(Pending, request) ==
                   offsetof(nx_stm32_uart_dma_resources_t, region_count));
-    pending.dma = &dma;
+    pending.transmit = resources.transmit;
+    pending.receive = resources.receive;
     pending.regions = &region;
     nx_request_initialize(&pending.request.base);
     ASSERT_EQ(NX_SUCCESS, nx_uart_tx_prepare(&pending.request, payload,

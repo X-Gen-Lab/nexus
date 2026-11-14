@@ -18,15 +18,18 @@ static bool context_ok(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
 }
-/** \brief Exact reviewed TI1/TI2 bank; Platform owns both pad leases. */
-static GPIO_TypeDef* gpio(const nx_stm32_encoder_config_t* config) {
-    return config->registers == TIM4   ? GPIOB
-           : config->registers == TIM8 ? GPIOC
-                                       : GPIOA;
-}
-/** \brief Physical phase order is fixed before optional inversion. */
-static uint8_t first_pin(const nx_stm32_encoder_config_t* config) {
-    return config->registers == TIM5 ? 0U : config->registers == TIM1 ? 8U : 6U;
+/** \brief Validate immutable pad identities before any hardware access. */
+static bool pins_valid(const nx_stm32_encoder_config_t* config) {
+    for (unsigned i = 0U; i < 2U; ++i) {
+        const nx_stm32_encoder_pin_t* pad = &config->pins[i];
+        if (pad->port_index > 8U || pad->pin > 15U ||
+            pad->registers !=
+                (GPIO_TypeDef*)(GPIOA_BASE +
+                                (uintptr_t)pad->port_index * 0x400U))
+            return false;
+    }
+    return config->pins[0].registers != config->pins[1].registers ||
+           config->pins[0].pin != config->pins[1].pin;
 }
 /** \brief Bus helpers share the same selected timer identity as pin routing. */
 static bool clock_enabled(const nx_stm32_encoder_config_t* config) {
@@ -86,22 +89,20 @@ nx_result_t nx_stm32_encoder_prepare(nx_stm32_encoder_state_t* state,
          config->registers != TIM5) ||
         config->mode < NX_ENCODER_MODE_X2_A ||
         config->mode > NX_ENCODER_MODE_X4 || config->filter_a > 15U ||
-        config->filter_b > 15U)
+        config->filter_b > 15U || !pins_valid(config))
         return NX_ERROR_INVALID;
     if (!context_ok())
         return NX_ERROR_CONTEXT;
     if (state->initialized || state->cold_effects != 0U ||
         clock_enabled(config) || !vector_idle(config))
         return NX_ERROR_BUSY;
-    GPIO_TypeDef* bank = gpio(config);
-    const uint32_t gpio_gate = bank == GPIOA   ? RCC_AHB1ENR_GPIOAEN
-                               : bank == GPIOB ? RCC_AHB1ENR_GPIOBEN
-                                               : RCC_AHB1ENR_GPIOCEN;
-    if ((RCC->AHB1ENR & gpio_gate) == 0U)
-        return NX_ERROR_STATE;
-    const uint8_t pin = first_pin(config);
-    if ((bank->LCKR & (3U << pin)) != 0U)
-        return NX_ERROR_BUSY;
+    for (unsigned i = 0U; i < 2U; ++i) {
+        const nx_stm32_encoder_pin_t* pad = &config->pins[i];
+        if ((RCC->AHB1ENR & (RCC_AHB1ENR_GPIOAEN << pad->port_index)) == 0U)
+            return NX_ERROR_STATE;
+        if ((pad->registers->LCKR & (UINT32_C(1) << pad->pin)) != 0U)
+            return NX_ERROR_BUSY;
+    }
     /* Record responsibility before the first fallible hardware write. The
      * immutable descriptor remains borrowed until close proves release. */
     state->config = config;
@@ -116,9 +117,11 @@ nx_result_t nx_stm32_encoder_prepare(nx_stm32_encoder_state_t* state,
         ((regs == TIM1 || regs == TIM8) && regs->BDTR != 0U))
         return NX_ERROR_BUSY;
     state->cold_effects |= NX_ENCODER_CONTROLLER;
-    for (uint8_t i = pin; i < pin + 2U; ++i) {
-        nx_result_t result = nx_stm32_pin_configure(
-            bank, i, 2U, (uint8_t)nx_stm32_timer_af(regs), 0U, false);
+    for (unsigned i = 0U; i < 2U; ++i) {
+        const nx_stm32_encoder_pin_t* pad = &config->pins[i];
+        nx_result_t result =
+            nx_stm32_pin_configure(pad->registers, pad->pin, 2U,
+                                   (uint8_t)nx_stm32_timer_af(regs), 0U, false);
         if (result != NX_SUCCESS)
             return result;
     }
@@ -163,12 +166,15 @@ nx_result_t nx_stm32_encoder_prepare(nx_stm32_encoder_state_t* state,
         regs->CCMR2 != 0U || regs->CCER != polarity || regs->PSC != 0U ||
         regs->ARR != (regs == TIM5 ? UINT32_MAX : UINT16_MAX))
         return NX_ERROR_IO;
-    for (uint8_t i = pin; i < pin + 2U; ++i) {
-        if (((bank->MODER >> ((uint32_t)i * 2U)) & 3U) != 2U ||
-            ((bank->AFR[i / 8U] >> ((uint32_t)(i % 8U) * 4U)) & 15U) !=
+    for (unsigned i = 0U; i < 2U; ++i) {
+        const nx_stm32_encoder_pin_t* pad = &config->pins[i];
+        GPIO_TypeDef* bank = pad->registers;
+        uint32_t pin = pad->pin;
+        if (((bank->MODER >> (pin * 2U)) & 3U) != 2U ||
+            ((bank->AFR[pin / 8U] >> ((pin % 8U) * 4U)) & 15U) !=
                 nx_stm32_timer_af(regs) ||
-            ((bank->PUPDR >> ((uint32_t)i * 2U)) & 3U) != 0U ||
-            (bank->OTYPER & (1U << i)) != 0U)
+            ((bank->PUPDR >> (pin * 2U)) & 3U) != 0U ||
+            (bank->OTYPER & (1U << pin)) != 0U)
             return NX_ERROR_IO;
     }
     state->initialized = true;
@@ -247,7 +253,9 @@ static bool independent(const nx_stm32_encoder_state_t* state,
            !overlap(pointer, bytes, state->config, sizeof(*state->config)) &&
            !overlap(pointer, bytes, state->config->registers,
                     sizeof(TIM_TypeDef)) &&
-           !overlap(pointer, bytes, gpio(state->config),
+           !overlap(pointer, bytes, state->config->pins[0].registers,
+                    sizeof(GPIO_TypeDef)) &&
+           !overlap(pointer, bytes, state->config->pins[1].registers,
                     sizeof(GPIO_TypeDef)) &&
            !overlap(pointer, bytes, RCC, sizeof(*RCC));
 }

@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_uart_wire.h"
+#include "stm32f4_traits.h"
 #include "stm32f4_uart_format.h"
 #include "stm32f4xx_ll_usart.h"
 #include "uart_control.h"
@@ -17,7 +18,17 @@
 
 /** \brief DS8626 Table 5 excludes modem control from UART4 and UART5. */
 static bool flow_supported(const nx_stm32_uart_state_t* port) {
-    return port != NULL && port->irq != UART4_IRQn && port->irq != UART5_IRQn;
+    if (port == NULL)
+        return false;
+#ifdef UART4
+    if (port->irq == UART4_IRQn)
+        return false;
+#endif
+#ifdef UART5
+    if (port->irq == UART5_IRQn)
+        return false;
+#endif
+    return true;
 }
 
 /** \brief Select the complete frame before the first UE and IRQ enable. */
@@ -27,7 +38,7 @@ nx_result_t nx_stm32_uart_initialize_controls(nx_stm32_uart_state_t* port,
                                               uint32_t guard_prescaler) {
     if (port == NULL || port->registers == NULL || port->baud == 0U ||
         port->baud > clock_hz / 16U || port->initialized || port->irq < 0 ||
-        port->irq >= 82 ||
+        (uint32_t)port->irq >= NX_STM32_EXTERNAL_IRQ_COUNT ||
         (port->profile != NX_UART_RX_BYTES &&
          port->profile != NX_UART_RX_EVENTS &&
          port->profile != NX_UART_RX_BLOCKS) ||

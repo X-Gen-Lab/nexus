@@ -70,6 +70,7 @@ def validate_power_links(selected):
 
 def emit_factory(result):
     """Reuse USB Device IDs for optional static composite faces."""
+    from tools.configure.usb_profiles import selected_usb_factory
     selected = [item for item in result.controllers
                 if item.kind == "usb_device" and is_managed(item.mode)]
     if not selected:
@@ -79,9 +80,12 @@ def emit_factory(result):
               'const nx_usb_otg_port_t* nx_factory_usb_otg(nx_usb_device_id_t id);']
     source = []
     for item in selected:
+        operations = selected_usb_factory(item).otg_ops
+        if operations is None:
+            fail("Managed USB factory requires its reviewed role operations")
         name = item.id.replace("-", "_")
         source += [f'static const nx_usb_otg_port_t s_nx_usb_otg_face_{name} = {{',
-                   f'    &nx_stm32_usb_otg_ops, &s_nx_port_{name}', '};']
+                   f'    &{operations}, &s_nx_port_{name}', '};']
     source += [r'/** \brief Static lookup with no initialization or role change. */',
                'const nx_usb_otg_port_t* nx_factory_usb_otg(nx_usb_device_id_t id) {',
                '    switch (id) {']

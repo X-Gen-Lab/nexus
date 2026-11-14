@@ -1,7 +1,7 @@
 /**
  * \file            stm32f407_dma.h
  *
- * \brief           Private STM32F407 finite UART DMA storage and static routes
+ * \brief           Private F4 finite DMA ownership and static resource records
  *
  * \author          Nexus Team
  */
@@ -11,11 +11,12 @@
 #include "nexus/io/dma.h"
 #include "stm32f407_provider.h"
 #include "stm32f407_spi_cold.h"
+#include "stm32f4_dma_route.h"
 
 /**
  * \brief           Exact caller-owned DMA TX instance; no stream allocator.
  *
- * \note            The shared readonly UART hardware table selects reviewed
+ * \note            The selected readonly resources supply reviewed
  *                  stream/channel facts. Clock and pin resources
  *                  remain owned by the platform assembly. Buffer domains
  *                  exclude CPU-only CCM. RX uses the existing independent IRQ
@@ -26,7 +27,8 @@
  *       selected runtime owners retain only a pointer and never modify them.
  */
 typedef struct {
-    DMA_TypeDef* dma;
+    nx_stm32_dma_route_t transmit;
+    nx_stm32_dma_route_t receive;
     const nx_dma_memory_region_t* regions;
     size_t region_count;
 } nx_stm32_uart_dma_resources_t;
@@ -53,12 +55,8 @@ static inline bool nx_stm32_uart_dma_resources_overlap(
            (first < regions + bytes && regions < first + length);
 }
 
-/** \brief Only TX-DMA modes allocate these exact engine and drain facts. */
+/** \brief Only TX-DMA modes retain these completion and drain flags. */
 typedef struct {
-    DMA_Stream_TypeDef* tx;
-    IRQn_Type dma_irq;
-    uint8_t stream;
-    uint8_t channel;
     bool dma_complete;
     bool aborting;
 } nx_stm32_uart_tx_dma_extension_t;
@@ -73,14 +71,21 @@ typedef struct {
 typedef struct nx_stm32_spi_dma_endpoint_state
     nx_stm32_spi_dma_endpoint_state_t;
 
-/** \brief SPI1 DMA2 TX3/RX0 selector3 or SPI2 DMA1 TX4/RX3 selector0. */
+/** \brief Readonly selected routes and domains shared by one SPI owner.
+ * \note Silicon request connections are admitted by reviewed SoC route facts;
+ *       the C owner checks physical stream/vector identity and full withdrawal.
+ */
 typedef struct {
-    nx_stm32_spi_state_t spi;
-    DMA_TypeDef* dma;
-    DMA_Stream_TypeDef* tx;
-    DMA_Stream_TypeDef* rx;
+    nx_stm32_dma_route_t transmit;
+    nx_stm32_dma_route_t receive;
     const nx_dma_memory_region_t* regions;
     size_t region_count;
+} nx_stm32_spi_dma_resources_t;
+
+/** \brief Finite DMA state retains one pointer to immutable integration. */
+typedef struct {
+    nx_stm32_spi_state_t spi;
+    const nx_stm32_spi_dma_resources_t* resources;
     nx_spi_request_t* active;
     const nx_irq_wake_t* wake;
     nx_time_us_t drain_deadline;
@@ -102,11 +107,7 @@ struct nx_stm32_spi_dma_endpoint_state {
 /** \brief Immutable selected SPI assembly and DMA resources. */
 typedef struct {
     nx_stm32_spi_config_t spi;
-    DMA_TypeDef* dma;
-    DMA_Stream_TypeDef* tx;
-    DMA_Stream_TypeDef* rx;
-    const nx_dma_memory_region_t* regions;
-    size_t region_count;
+    nx_stm32_spi_dma_resources_t resources;
     uint8_t priority;
     bool kernel_bound;
 } nx_stm32_spi_dma_config_t;
@@ -131,7 +132,7 @@ extern const nx_spi_ops_t nx_stm32_spi_dma_ops;
 extern const nx_spi_endpoint_ops_t nx_stm32_spi_dma_endpoint_ops;
 
 /**
- * \brief           Initialize one exact SPI1 or SPI2 full-duplex DMA
+ * \brief           Initialize one exact SPI full-duplex DMA
  * controller.
  *
  * \param[in,out]   state: Exact pointers, clocks, domains and caller storage.

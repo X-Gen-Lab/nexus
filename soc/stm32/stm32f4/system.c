@@ -29,8 +29,10 @@ extern const nx_stm32_sram_boot_plan_t g_nx_stm32_sram_boot_plan;
 #endif
 
 #ifndef NEXUS_STM32_MODEL
-nx_stm32_system_t g_nx_stm32_system = {
-    .rcc = RCC, .flash = FLASH, .power = PWR, .timer = TIM2};
+nx_stm32_system_t g_nx_stm32_system = {.rcc = RCC,
+                                       .flash = FLASH,
+                                       .power = PWR,
+                                       .timer = NEXUS_STM32_TIMEBASE_TIMER};
 #endif
 
 extern nx_stm32_system_t g_nx_stm32_system;
@@ -74,7 +76,7 @@ uint32_t HAL_GetTick(void) {
 
 /** \brief Forward the explicitly reserved timer vector to the static context.
  */
-void TIM2_IRQHandler(void) {
+void NEXUS_STM32_TIMEBASE_HANDLER(void) {
 #if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
     nx_arch_irq_state_t saved = nx_arch_irq_save();
 #endif
@@ -243,7 +245,8 @@ static bool power_mode_idle(const PWR_TypeDef* power) {
 /** \brief Check cold ownership before any global clock or Flash change. */
 static nx_result_t preflight_hardware(const nx_stm32_system_t* system) {
     if (system == NULL || system->rcc == NULL || system->flash == NULL ||
-        system->power == NULL || system->timer == NULL) {
+        system->power == NULL || system->timer == NULL ||
+        !nx_stm32_timebase_binding_valid()) {
         return NX_ERROR_INVALID;
     }
     if ((NX_STM32_BOOT_CPACR & UINT32_C(0x00f00000)) != UINT32_C(0x00f00000) ||
@@ -293,11 +296,11 @@ static nx_result_t preflight_hardware(const nx_stm32_system_t* system) {
         (system->rcc->CIR & (UINT32_C(0x7f00) | RCC_CIR_CSSF)) != 0U ||
         (system->rcc->CFGR & bus_mask) != 0U ||
         (system->rcc->SSCGR & RCC_SSCGR_SSCGEN) != 0U ||
-        (system->rcc->APB1ENR & RCC_APB1ENR_TIM2EN) != 0U ||
-        (system->rcc->APB1RSTR & RCC_APB1RSTR_TIM2RST) != 0U ||
+        (system->rcc->APB1ENR & NEXUS_STM32_TIMEBASE_GATE) != 0U ||
+        (system->rcc->APB1RSTR & NEXUS_STM32_TIMEBASE_RESET) != 0U ||
         !timer_mode_idle(system->timer) ||
         (system->flash->SR & FLASH_SR_BSY) != 0U ||
-        !NX_STM32_IRQ_AVAILABLE(TIM2_IRQn)) {
+        !NX_STM32_IRQ_AVAILABLE(NEXUS_STM32_TIMEBASE_IRQ)) {
         return NX_ERROR_BUSY;
     }
     return NX_SUCCESS;
@@ -508,7 +511,8 @@ void NMI_Handler(void) {
 }
 #endif
 
-/** \brief Establish the one supported fixed clock profile and TIM2 source. */
+/** \brief Establish the one supported fixed clock profile and selected timer
+ * source. */
 static nx_stm32_start_result_t start_owned(nx_stm32_system_t* system,
                                            uint32_t poll_limit) {
     nx_stm32_start_result_t result = {0, 0, 0U};
@@ -620,25 +624,26 @@ static nx_stm32_start_result_t start_owned(nx_stm32_system_t* system,
     }
     system->remaining_effects |= NX_STM32_EFFECT_TIMER_GATE;
     if (!write_checked(&system->rcc->APB1ENR,
-                       system->rcc->APB1ENR | RCC_APB1ENR_TIM2EN,
-                       RCC_APB1ENR_TIM2EN)) {
+                       system->rcc->APB1ENR | NEXUS_STM32_TIMEBASE_GATE,
+                       NEXUS_STM32_TIMEBASE_GATE)) {
         result.primary = -6;
         goto rollback;
     }
     /* Gated MMIO may have read as zero during preflight. A foreign timer
      * discovered now lends no register or IRQ ownership to cleanup. */
     if (!timer_mode_idle(system->timer) ||
-        (system->rcc->APB1RSTR & RCC_APB1RSTR_TIM2RST) != 0U) {
+        (system->rcc->APB1RSTR & NEXUS_STM32_TIMEBASE_RESET) != 0U) {
         result.primary = -6;
         goto rollback;
     }
     system->remaining_effects |= NX_STM32_EFFECT_TIMER;
     if (!write_checked(&system->rcc->APB1RSTR,
-                       system->rcc->APB1RSTR | RCC_APB1RSTR_TIM2RST,
-                       RCC_APB1RSTR_TIM2RST) ||
+                       system->rcc->APB1RSTR | NEXUS_STM32_TIMEBASE_RESET,
+                       NEXUS_STM32_TIMEBASE_RESET) ||
         !write_checked(&system->rcc->APB1RSTR,
-                       system->rcc->APB1RSTR & ~(uint32_t)RCC_APB1RSTR_TIM2RST,
-                       RCC_APB1RSTR_TIM2RST) ||
+                       system->rcc->APB1RSTR &
+                           ~(uint32_t)NEXUS_STM32_TIMEBASE_RESET,
+                       NEXUS_STM32_TIMEBASE_RESET) ||
         !timer_mode_idle(system->timer)) {
         result.primary = -6;
         goto rollback;
@@ -677,7 +682,7 @@ static nx_stm32_start_result_t start_owned(nx_stm32_system_t* system,
     valid = write_checked(&system->timer->DIER, TIM_DIER_UIE, UINT32_MAX) &&
             write_checked(&system->timer->CR1, TIM_CR1_CEN, UINT32_MAX) &&
             valid;
-    if (!valid || NX_STM32_IRQ_CONTROL(TIM2_IRQn, true) != 0) {
+    if (!valid || NX_STM32_IRQ_CONTROL(NEXUS_STM32_TIMEBASE_IRQ, true) != 0) {
         result.primary = -6;
         goto rollback;
     }
@@ -736,11 +741,11 @@ int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit) {
         system->started = false;
         /* Initial withdrawal is best effort: an asserted source can repend
          * while it is still enabled. Its final proof follows source clear. */
-        (void)NX_STM32_IRQ_CONTROL(TIM2_IRQn, false);
+        (void)NX_STM32_IRQ_CONTROL(NEXUS_STM32_TIMEBASE_IRQ, false);
         if (!write_checked(&system->rcc->APB1RSTR,
                            system->rcc->APB1RSTR &
-                               ~(uint32_t)RCC_APB1RSTR_TIM2RST,
-                           RCC_APB1RSTR_TIM2RST) ||
+                               ~(uint32_t)NEXUS_STM32_TIMEBASE_RESET,
+                           NEXUS_STM32_TIMEBASE_RESET) ||
             !write_checked(&system->timer->DIER, 0U, UINT32_MAX) ||
             !write_checked(&system->timer->CR1, 0U, UINT32_MAX) ||
             !write_checked(&system->timer->SR, 0U, UINT32_MAX)) {
@@ -753,14 +758,15 @@ int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit) {
         }
         /* The source can repend after the first vector withdrawal. Only a
          * stopped, cleared peripheral permits final vector/owner release. */
-        if (NX_STM32_IRQ_CONTROL(TIM2_IRQn, false) != 0)
+        if (NX_STM32_IRQ_CONTROL(NEXUS_STM32_TIMEBASE_IRQ, false) != 0)
             return -1;
         system->remaining_effects &= ~NX_STM32_EFFECT_TIMER;
     }
     if ((system->remaining_effects & NX_STM32_EFFECT_TIMER_GATE) != 0U) {
         if (!write_checked(&system->rcc->APB1ENR,
-                           system->rcc->APB1ENR & ~(uint32_t)RCC_APB1ENR_TIM2EN,
-                           RCC_APB1ENR_TIM2EN)) {
+                           system->rcc->APB1ENR &
+                               ~(uint32_t)NEXUS_STM32_TIMEBASE_GATE,
+                           NEXUS_STM32_TIMEBASE_GATE)) {
             return -1;
         }
         system->remaining_effects &= ~NX_STM32_EFFECT_TIMER_GATE;
@@ -789,7 +795,7 @@ void nx_stm32_system_timer_irq(nx_stm32_system_t* system) {
             system->timer_error = NX_ERROR_IO;
             (void)write_checked(&system->timer->DIER, 0U, UINT32_MAX);
             (void)write_checked(&system->timer->CR1, 0U, TIM_CR1_CEN);
-            (void)NX_STM32_IRQ_ISOLATE(TIM2_IRQn);
+            (void)NX_STM32_IRQ_ISOLATE(NEXUS_STM32_TIMEBASE_IRQ);
             /* Isolation cannot recover deadlines already held by consumers.
              * Always observe the lost domain and retain terminal ownership. */
             timer_park();

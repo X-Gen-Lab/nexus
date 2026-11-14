@@ -1,0 +1,739 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "display",
+      "mode": "rgb-scanout",
+      "controllers": [
+        "LTDC"
+      ],
+      "implementation": "ltdc",
+      "headers": [
+        "stm32f4_ltdc.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_ltdc_state_t",
+        "ops": "nx_stm32_ltdc_ops",
+        "declarations": [
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.constants.external_bus.regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.constants.external_bus.regions",
+              "limit": 16
+            }
+          },
+          {
+            "role": "ltdc_snapshots",
+            "type": "uint16_t",
+            "const": false,
+            "count": {
+              "length": "selected.pads",
+              "limit": 32
+            }
+          },
+          {
+            "role": "ltdc_pins",
+            "type": "nx_stm32_ltdc_pin_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 32,
+                "value": {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "entry.registers",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "bank",
+                      {
+                        "source": "entry.port_index"
+                      }
+                    ],
+                    [
+                      "pin",
+                      {
+                        "source": "entry.number"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.pads",
+              "limit": 32
+            }
+          },
+          {
+            "role": "ltdc_layers",
+            "type": "nx_stm32_ltdc_layer_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "item.options.layers",
+                "limit": 2,
+                "value": {
+                  "record": [
+                    [
+                      "limits",
+                      {
+                        "record": [
+                          [
+                            "width",
+                            {
+                              "source": "entry.width"
+                            }
+                          ],
+                          [
+                            "height",
+                            {
+                              "source": "entry.height"
+                            }
+                          ],
+                          [
+                            "address_alignment",
+                            4
+                          ],
+                          [
+                            "pitch_alignment",
+                            4
+                          ],
+                          [
+                            "maximum_pitch_bytes",
+                            8191
+                          ],
+                          [
+                            "formats",
+                            {
+                              "macro": "NX_STM32_LTDC_FORMATS",
+                              "args": [
+                                {
+                                  "source": "entry.formats.0",
+                                  "values": {
+                                    "rgb565": "NX_IMAGE_RGB565",
+                                    "argb8888": "NX_IMAGE_ARGB8888"
+                                  },
+                                  "as": "symbol"
+                                },
+                                {
+                                  "source": "entry.formats.1",
+                                  "values": {
+                                    "rgb565": "NX_IMAGE_RGB565",
+                                    "argb8888": "NX_IMAGE_ARGB8888"
+                                  },
+                                  "default": {
+                                    "source": "entry.formats.0",
+                                    "values": {
+                                      "rgb565": "NX_IMAGE_RGB565",
+                                      "argb8888": "NX_IMAGE_ARGB8888"
+                                    },
+                                    "as": "symbol"
+                                  },
+                                  "as": "symbol"
+                                }
+                              ]
+                            }
+                          ],
+                          [
+                            "layer",
+                            {
+                              "source": "entry.layer"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    [
+                      "x",
+                      {
+                        "source": "entry.x"
+                      }
+                    ],
+                    [
+                      "y",
+                      {
+                        "source": "entry.y"
+                      }
+                    ],
+                    [
+                      "alpha",
+                      {
+                        "source": "entry.alpha"
+                      }
+                    ],
+                    [
+                      "pixel_alpha",
+                      {
+                        "source": "entry.pixel_alpha"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "item.options.layers",
+              "limit": 2
+            }
+          },
+          {
+            "role": "graphics_config",
+            "type": "nx_stm32_ltdc_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "rcc",
+                  {
+                    "symbol": "RCC"
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "ref": "dma_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "region_count",
+                  {
+                    "length": "selected.constants.external_bus.regions",
+                    "limit": 16
+                  }
+                ],
+                [
+                  "system",
+                  {
+                    "address": "g_nx_stm32_system"
+                  }
+                ],
+                [
+                  "irq_policy",
+                  {
+                    "record": [
+                      [
+                        "kernel",
+                        {
+                          "source": "selected.kernel_policy",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "external_irq_count",
+                        {
+                          "source": "selected.irq_profile.external_count"
+                        }
+                      ],
+                      [
+                        "priority_bits",
+                        {
+                          "source": "selected.irq_profile.priority_bits"
+                        }
+                      ],
+                      [
+                        "syscall_ceiling",
+                        {
+                          "source": "selected.irq_profile.syscall_priority",
+                          "default": 0
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "system_cfgr",
+                  {
+                    "symbol": "NX_STM32_GRAPHICS_SYSTEM_CFGR"
+                  }
+                ],
+                [
+                  "drain_us",
+                  {
+                    "source": "item.options.drain_us",
+                    "as": "u64"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "graphics_memory",
+                  {
+                    "owner": {
+                      "source": "selected.constants.external_bus.graphics_owner",
+                      "role": "sdram_graphics"
+                    }
+                  }
+                ],
+                [
+                  "pll_source",
+                  {
+                    "symbol": "NX_STM32_GRAPHICS_PLL_SOURCE"
+                  }
+                ],
+                [
+                  "pllsai_cfgr",
+                  {
+                    "symbol": "NX_STM32_GRAPHICS_PLLSAI_CFGR"
+                  }
+                ],
+                [
+                  "pllsai_divr",
+                  {
+                    "symbol": "NX_STM32_GRAPHICS_PLLSAI_DIVR"
+                  }
+                ],
+                [
+                  "pins",
+                  {
+                    "ref": "ltdc_pins",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "snapshots",
+                  {
+                    "ref": "ltdc_snapshots",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "pin_count",
+                  {
+                    "length": "selected.pads",
+                    "limit": 32
+                  }
+                ],
+                [
+                  "layers",
+                  {
+                    "ref": "ltdc_layers",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "layer_count",
+                  {
+                    "length": "item.options.layers",
+                    "limit": 2
+                  }
+                ],
+                [
+                  "timing",
+                  {
+                    "macro": "NX_STM32_LTDC_TIMING",
+                    "args": [
+                      {
+                        "source": "item.options.timing.width"
+                      },
+                      {
+                        "source": "item.options.timing.height"
+                      },
+                      {
+                        "source": "item.options.timing.hsync"
+                      },
+                      {
+                        "source": "item.options.timing.hback_porch"
+                      },
+                      {
+                        "source": "item.options.timing.hfront_porch"
+                      },
+                      {
+                        "source": "item.options.timing.vsync"
+                      },
+                      {
+                        "source": "item.options.timing.vback_porch"
+                      },
+                      {
+                        "source": "item.options.timing.vfront_porch"
+                      },
+                      {
+                        "source": "item.options.timing.hsync_polarity",
+                        "values": {
+                          "active-low": "LTDC_HSPOLARITY_AL",
+                          "active-high": "LTDC_HSPOLARITY_AH"
+                        },
+                        "as": "symbol"
+                      },
+                      {
+                        "source": "item.options.timing.vsync_polarity",
+                        "values": {
+                          "active-low": "LTDC_VSPOLARITY_AL",
+                          "active-high": "LTDC_VSPOLARITY_AH"
+                        },
+                        "as": "symbol"
+                      },
+                      {
+                        "source": "item.options.timing.de_polarity",
+                        "values": {
+                          "active-low": "LTDC_DEPOLARITY_AL",
+                          "active-high": "LTDC_DEPOLARITY_AH"
+                        },
+                        "as": "symbol"
+                      },
+                      {
+                        "source": "item.options.timing.clock_polarity",
+                        "values": {
+                          "normal": "LTDC_PCPOLARITY_IPC",
+                          "inverted": "LTDC_PCPOLARITY_IIPC"
+                        },
+                        "as": "symbol"
+                      }
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32_ltdc_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "graphics_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32_ltdc_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "graphics_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_ltdc_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "map": {
+              "source": "selected.vector_bindings",
+              "limit": 2,
+              "value": {
+                "name": {
+                  "source": "entry.handler",
+                  "as": "symbol"
+                },
+                "calls": [
+                  {
+                    "function": "nx_stm32_ltdc_irq",
+                    "args": [
+                      {
+                        "ref": "port",
+                        "as": "address"
+                      }
+                    ]
+                  }
+                ],
+                "barrier": "nx_arch_dsb"
+              }
+            }
+          }
+        ],
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "ltdc_snapshots",
+          "limit": 32
+        }
+      }
+    },
+    {
+      "kind": "image",
+      "mode": "irq-blit",
+      "controllers": [
+        "DMA2D"
+      ],
+      "implementation": "image",
+      "headers": [
+        "stm32f4_dma2d.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_image_state_t",
+        "ops": "nx_stm32_image_ops",
+        "declarations": [
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.constants.external_bus.regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.constants.external_bus.regions",
+              "limit": 16
+            }
+          },
+          {
+            "role": "graphics_config",
+            "type": "nx_stm32_image_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "rcc",
+                  {
+                    "symbol": "RCC"
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "ref": "dma_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "region_count",
+                  {
+                    "length": "selected.constants.external_bus.regions",
+                    "limit": 16
+                  }
+                ],
+                [
+                  "system",
+                  {
+                    "address": "g_nx_stm32_system"
+                  }
+                ],
+                [
+                  "irq_policy",
+                  {
+                    "record": [
+                      [
+                        "kernel",
+                        {
+                          "source": "selected.kernel_policy",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "external_irq_count",
+                        {
+                          "source": "selected.irq_profile.external_count"
+                        }
+                      ],
+                      [
+                        "priority_bits",
+                        {
+                          "source": "selected.irq_profile.priority_bits"
+                        }
+                      ],
+                      [
+                        "syscall_ceiling",
+                        {
+                          "source": "selected.irq_profile.syscall_priority",
+                          "default": 0
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "system_cfgr",
+                  {
+                    "symbol": "NX_STM32_GRAPHICS_SYSTEM_CFGR"
+                  }
+                ],
+                [
+                  "drain_us",
+                  {
+                    "source": "item.options.drain_us",
+                    "as": "u64"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "graphics_memory",
+                  {
+                    "owner": {
+                      "source": "selected.constants.external_bus.graphics_owner",
+                      "role": "sdram_graphics"
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32_image_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "graphics_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32_image_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "graphics_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_image_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "map": {
+              "source": "selected.vector_bindings",
+              "limit": 2,
+              "value": {
+                "name": {
+                  "source": "entry.handler",
+                  "as": "symbol"
+                },
+                "calls": [
+                  {
+                    "function": "nx_stm32_image_irq",
+                    "args": [
+                      {
+                        "ref": "port",
+                        "as": "address"
+                      }
+                    ]
+                  }
+                ],
+                "barrier": "nx_arch_dsb"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

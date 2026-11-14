@@ -7,8 +7,6 @@ import tempfile
 import unittest
 
 from tools.configure import bindings, configure, enhanced_endpoints, factory
-from tools.configure.calls import Address, DirectCall, Symbol
-from tools.configure.providers.common import Construction
 
 
 class EnhancedEndpointConfiguration(unittest.TestCase):
@@ -77,43 +75,7 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
         result = configure.resolve_ir(selected, test_support=native_fixture(selected))
         self.assertIn("spi-dma-owner", result.components)
 
-    def test_sequence_wraps_selected_direct_engine_call_and_typed_stop(self):
-        result = configure.resolve_ir(configure.ROOT /
-            "tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml", test_support=native_fixture(configure.ROOT /
-            "tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml"))
-        item = next(value for value in result.controllers
-                    if value.interface_kind == "spi_dma_transaction")
-        name = item.id.replace("-", "_")
-        initialize = DirectCall("nx_test_engine_prepare",
-                                (Address("s_engine"), Address("s_config")))
-        close = DirectCall("nx_test_engine_close", (Address("s_engine"),))
-        raw = Construction("nx_engine_t", (), initialize,
-            (DirectCall("nx_spi_port_stop", (Symbol(f"nx_binding_{name}"),)),
-             close), True)
-        adapted = enhanced_endpoints.dma_construction(item, raw, "stm32")
-        self.assertEqual(adapted.initialize_sequences[-1].calls[0], initialize)
-        self.assertIn("status = " + initialize.render() + ";",
-                      "\n".join(adapted.initialize_sequences[-1].render()))
-        self.assertEqual(adapted.initialize,
-                         DirectCall(f"prepare_sequence_{name}"))
-        self.assertEqual(adapted.stop,
-            (DirectCall("nx_spi_dma_transaction_stop",
-                        (Symbol(f"nx_binding_{name}"),)), close))
 
-    def test_sequence_does_not_rename_a_declared_engine_prepare(self):
-        result = configure.resolve_ir(configure.ROOT /
-            "tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml", test_support=native_fixture(configure.ROOT /
-            "tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml"))
-        item = next(value for value in result.controllers
-                    if value.interface_kind == "spi_dma_transaction")
-        name = item.id.replace("-", "_")
-        declaration = f"static nx_result_t prepare_{name}(void);"
-        raw = Construction("nx_engine_t", (declaration,),
-                           DirectCall(f"prepare_{name}"), (), True)
-        adapted = enhanced_endpoints.dma_construction(item, raw, "stm32")
-        self.assertEqual(adapted.definitions[0], declaration)
-        self.assertIn(f"status = prepare_{name}();",
-                      "\n".join(adapted.initialize_sequences[-1].render()))
 
     def test_dma_owner_binding_uses_exact_physical_provider_membership(self):
         for family, prefix in (('f407', 'stm32'),):
@@ -174,19 +136,6 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
                 self.assertIn("nx_spi_transaction_endpoint_t", header)
                 self.assertIn(operations, source)
 
-    def test_transaction_face_requires_exact_family_not_a_vendor_prefix(self):
-        for family, prefix, fixture in (('stm32f4', 'stm32', 'f407-spi-transaction.toml'),):
-            with self.subTest(family=family):
-                result = configure.resolve_ir(configure.ROOT /
-                    "tests/contracts/io_evolution_assembly" / fixture, test_support=native_fixture(configure.ROOT /
-                    "tests/contracts/io_evolution_assembly" / fixture))
-                endpoint = result.devices[0]
-                with self.assertRaises(ValueError):
-                    enhanced_endpoints.face(endpoint, "state", "unused", prefix)
-                source = enhanced_endpoints.face(endpoint, "state", "unused",
-                                                 family)
-                self.assertIn(f"&nx_{prefix}_spi_transaction_ops, &state",
-                              "\n".join(source))
 
     def test_polling_transaction_driver_cannot_silently_use_dma(self):
         with self.assertRaisesRegex(ValueError, "transaction.*poll|poll.*transaction"):

@@ -8,6 +8,7 @@
  */
 #include "stm32f407_clock.h"
 #include "stm32f4_qspi.h"
+#include "w25q128jv.h"
 #if NEXUS_QSPI_CPU_MAP
 #include "stm32f4_qspi_mapped.h"
 #endif
@@ -36,9 +37,6 @@ static const uint32_t interrupt_bits = QUADSPI_CR_TEIE | QUADSPI_CR_TCIE |
                                        QUADSPI_CR_TOIE;
 static const uint32_t terminal_bits =
     QUADSPI_SR_TEF | QUADSPI_SR_TCF | QUADSPI_SR_SMF | QUADSPI_SR_TOF;
-static const nx_flash_erase_span_t erase_span = {0U, 4096U, 4096U};
-static const nx_flash_geometry_t physical = {0U,          0x1000000U, 1U,
-                                             &erase_span, 1U,         0U};
 static const struct {
     uint8_t port;
     uint8_t pad;
@@ -49,9 +47,9 @@ static const struct {
 #endif
 };
 #if NEXUS_QSPI_QUAD_READ
-static const uint8_t read_instruction = 0x6bU;
+static const uint8_t read_instruction = NX_W25Q128JV_QUAD_READ;
 #else
-static const uint8_t read_instruction = 0x03U;
+static const uint8_t read_instruction = NX_W25Q128JV_READ;
 #endif
 _Static_assert(offsetof(nx_stm32_qspi_t, transport) == 0U,
                "A callback belongs to its first-member transport owner");
@@ -82,9 +80,10 @@ static bool epoch_matches(const nx_stm32_qspi_config_t* config,
     const nx_stm32_system_t* system = config->system;
     return system == &g_nx_stm32_system && system->rcc == RCC &&
            system->flash == FLASH && system->power == PWR &&
-           system->timer == TIM2 && system->core_hz == NEXUS_CORE_HZ &&
-           system->started && system->timer_error == NX_SUCCESS &&
-           system->time_epoch != 0U && system->time_epoch == epoch;
+           system->timer == NEXUS_STM32_TIMEBASE_TIMER &&
+           system->core_hz == NEXUS_CORE_HZ && system->started &&
+           system->timer_error == NX_SUCCESS && system->time_epoch != 0U &&
+           system->time_epoch == epoch;
 }
 static bool epoch_live(const nx_stm32_qspi_t* owner) {
     return epoch_matches(owner->config, owner->system_epoch);
@@ -224,7 +223,7 @@ static nx_result_t wire_start(nx_stm32_qspi_t* owner, uint8_t instruction,
 #if NEXUS_QSPI_QUAD_READ
     if (instruction == read_instruction) {
         command.DataMode = QSPI_DATA_4_LINES;
-        command.DummyCycles = 8U;
+        command.DummyCycles = NX_W25Q128JV_QUAD_DUMMY_CYCLES;
     }
 #endif
     command.NbData = (uint32_t)bytes;
@@ -578,30 +577,30 @@ nx_result_t nx_stm32_qspi_prepare(nx_stm32_qspi_t* owner,
     }
     uint32_t cr = QUADSPI_CR_EN | (uint32_t)config->prescaler
                                       << QUADSPI_CR_PRESCALER_Pos;
-    uint32_t dcr =
-        23U << QUADSPI_DCR_FSIZE_Pos | (uint32_t)(config->cs_high_cycles - 1U)
-                                           << QUADSPI_DCR_CSHT_Pos;
+    uint32_t dcr = (NX_W25Q128JV_ADDRESS_BITS - 1U) << QUADSPI_DCR_FSIZE_Pos |
+                   (uint32_t)(config->cs_high_cycles - 1U)
+                       << QUADSPI_DCR_CSHT_Pos;
     if (READ_REG(QUADSPI->CR) != cr || READ_REG(QUADSPI->DCR) != dcr ||
         !hardware_idle())
         return NX_ERROR_IO;
     uint8_t id[3];
-    result = exchange(owner, 0x9fU, 0U, false, id, sizeof(id), deadline);
+    result = exchange(owner, NX_W25Q128JV_READ_ID, 0U, false, id, sizeof(id),
+                      deadline);
     if (result != NX_SUCCESS)
         return result;
-    if (id[0] != 0xefU || id[1] != 0x40U || id[2] != 0x18U)
+    if (!nx_w25q128jv_id_matches(id))
         return NX_ERROR_UNSUPPORTED;
-#if NEXUS_QSPI_QUAD_READ
     uint8_t status2;
-    result =
-        exchange(owner, 0x35U, 0U, false, &status2, sizeof(status2), deadline);
+    result = exchange(owner, NX_W25Q128JV_STATUS2, 0U, false, &status2,
+                      sizeof(status2), deadline);
     if (result != NX_SUCCESS)
         return result;
     /* Winbond RevM 7.1.4: SIQ fixes QE1. The JEDEC ID alone cannot prove
      * that suffix. Adopt QE1/SUS0 without changing status, protection or a
      * foreign suspended operation; no implicit resume or reset is permitted. */
-    if ((status2 & 0x82U) != 2U)
-        return NX_ERROR_UNSUPPORTED;
-#endif
+    result = nx_w25q128jv_adopt(status2, NEXUS_QSPI_QUAD_READ != 0U);
+    if (result != NX_SUCCESS)
+        return result;
     owner->prepared = true;
     owner->async_stopped = false;
 #if NEXUS_QSPI_CPU_MAP
@@ -614,7 +613,7 @@ static const nx_flash_geometry_t* geometry(const void* selected) {
     const nx_stm32_qspi_t* owner = selected;
     return valid(owner) && owner->config != NULL && owner->prepared &&
                    epoch_live(owner)
-               ? &physical
+               ? &nx_w25q128jv_geometry
                : NULL;
 }
 static nx_result_t read_flash(const void* selected, uint32_t offset, void* data,
@@ -634,7 +633,7 @@ static nx_result_t read_flash(const void* selected, uint32_t offset, void* data,
         return NX_ERROR_STATE;
     if (owner->request != NULL || owner->wire_active || owner->pulse_uncertain)
         return NX_ERROR_BUSY;
-    if (offset > physical.size || length > physical.size - offset ||
+    if (offset > NX_W25Q128JV_BYTES || length > NX_W25Q128JV_BYTES - offset ||
         (length != 0U && !isolated(owner, data, length, 1U, true)))
         return NX_ERROR_INVALID;
     if (length == 0U)
@@ -704,25 +703,26 @@ static nx_result_t begin_phase(nx_stm32_qspi_t* owner) {
         case STATUS1:
         case CHECK_WEL:
         case POLL_READY:
-            instruction = 0x05U;
+            instruction = NX_W25Q128JV_STATUS1;
             break;
         case STATUS2:
-            instruction = 0x35U;
+            instruction = NX_W25Q128JV_STATUS2;
             break;
         case STATUS3:
-            instruction = 0x15U;
+            instruction = NX_W25Q128JV_STATUS3;
             break;
         case ENABLE_WRITE:
-            instruction = 0x06U;
+            instruction = NX_W25Q128JV_WRITE_ENABLE;
             bytes = 0U;
             break;
         case DISABLE_WRITE:
-            instruction = 0x04U;
+            instruction = NX_W25Q128JV_WRITE_DISABLE;
             bytes = 0U;
             break;
         case PULSE:
-            instruction =
-                request->operation == NX_FLASH_ASYNC_PROGRAM ? 0x02U : 0x20U;
+            instruction = request->operation == NX_FLASH_ASYNC_PROGRAM
+                              ? NX_W25Q128JV_PROGRAM
+                              : NX_W25Q128JV_ERASE;
             address = request->offset + (uint32_t)owner->completed;
             addressed = true;
             transmit = request->operation == NX_FLASH_ASYNC_PROGRAM;
@@ -734,7 +734,7 @@ static nx_result_t begin_phase(nx_stm32_qspi_t* owner) {
                 true; /* Never infer no pulse after a failed frame. */
             break;
         case VERIFY:
-            instruction = 0x03U;
+            instruction = NX_W25Q128JV_READ;
             addressed = true;
             address = request->offset +
                       (uint32_t)(owner->completed + owner->verified);
@@ -805,9 +805,11 @@ static nx_result_t service(void* selected) {
     owner->complete = false;
     switch (owner->phase) {
         case STATUS1:
-            if ((owner->status & 1U) != 0U)
-                return NX_ERROR_BUSY;
-            if ((owner->status & 0x1cU) != 0U) {
+            result =
+                nx_w25q128jv_write_status(NX_W25Q128JV_STATUS1, owner->status);
+            if (result == NX_ERROR_BUSY)
+                return result;
+            if (result != NX_SUCCESS) {
                 terminal(owner, NX_ERROR_UNSUPPORTED);
                 owner->phase = POLL_READY;
             } else {
@@ -815,7 +817,8 @@ static nx_result_t service(void* selected) {
             }
             break;
         case STATUS2:
-            if ((owner->status & 0x40U) != 0U) {
+            if (nx_w25q128jv_write_status(NX_W25Q128JV_STATUS2,
+                                          owner->status) != NX_SUCCESS) {
                 terminal(owner, NX_ERROR_UNSUPPORTED);
                 owner->phase = POLL_READY;
             } else {
@@ -823,18 +826,15 @@ static nx_result_t service(void* selected) {
             }
             break;
         case STATUS3:
-            if ((owner->status & 4U) != 0U) {
+            if (nx_w25q128jv_write_status(NX_W25Q128JV_STATUS3,
+                                          owner->status) != NX_SUCCESS) {
                 terminal(owner, NX_ERROR_UNSUPPORTED);
                 owner->phase = POLL_READY;
             } else {
-                size_t left = owner->request->length - owner->completed;
-                owner->chunk =
-                    owner->request->operation == NX_FLASH_ASYNC_ERASE
-                        ? 4096U
-                        : 256U - ((owner->request->offset + owner->completed) %
-                                  256U);
-                if (owner->chunk > left)
-                    owner->chunk = left;
+                owner->chunk = nx_w25q128jv_chunk(
+                    owner->request->operation == NX_FLASH_ASYNC_ERASE,
+                    owner->request->offset + (uint32_t)owner->completed,
+                    owner->request->length - owner->completed);
                 owner->phase = ENABLE_WRITE;
                 if (owner->request->operation == NX_FLASH_ASYNC_PROGRAM) {
                     const uint8_t* input = owner->request->data;
@@ -937,14 +937,15 @@ static nx_result_t submit(void* selected, nx_flash_async_request_t* request) {
         return NX_ERROR_BUSY;
     if (!isolated(owner, request, sizeof(*request),
                   _Alignof(nx_flash_async_request_t), true) ||
-        request->length == 0U || request->offset >= physical.size ||
-        request->length > physical.size - request->offset ||
+        request->length == 0U || request->offset >= NX_W25Q128JV_BYTES ||
+        request->length > NX_W25Q128JV_BYTES - request->offset ||
         request->base.deadline == NX_DEADLINE_NEVER ||
         (request->operation != NX_FLASH_ASYNC_PROGRAM &&
          request->operation != NX_FLASH_ASYNC_ERASE) ||
         (request->operation == NX_FLASH_ASYNC_ERASE
-             ? request->data != NULL || request->offset % 4096U != 0U ||
-                   request->length % 4096U != 0U
+             ? request->data != NULL ||
+                   request->offset % NX_W25Q128JV_ERASE_BYTES != 0U ||
+                   request->length % NX_W25Q128JV_ERASE_BYTES != 0U
              : !isolated(owner, request->data, request->length, 1U, false) ||
                    overlap(request, sizeof(*request), request->data,
                            request->length)))
@@ -1198,7 +1199,8 @@ nx_stm32_qspi_mapping_enter(nx_stm32_qspi_t* owner) {
     if (result != NX_SUCCESS)
         return (nx_mapped_storage_map_result_t){result, false};
     uint8_t status = 0U;
-    result = exchange(owner, 0x05U, 0U, false, &status, 1U, deadline);
+    result =
+        exchange(owner, NX_W25Q128JV_STATUS1, 0U, false, &status, 1U, deadline);
     if (result != NX_SUCCESS || (status & 1U) != 0U)
         return (nx_mapped_storage_map_result_t){
             result != NX_SUCCESS ? result : NX_ERROR_BUSY, owner->wire_active};
@@ -1215,12 +1217,12 @@ nx_stm32_qspi_mapping_enter(nx_stm32_qspi_t* owner) {
         return (nx_mapped_storage_map_result_t){
             result != NX_SUCCESS ? result : NX_ERROR_IO, true};
     QSPI_CommandTypeDef command = {0};
-    command.Instruction = 0x6bU;
+    command.Instruction = NX_W25Q128JV_QUAD_READ;
     command.InstructionMode = QSPI_INSTRUCTION_1_LINE;
     command.AddressMode = QSPI_ADDRESS_1_LINE;
     command.AddressSize = QSPI_ADDRESS_24_BITS;
     command.DataMode = QSPI_DATA_4_LINES;
-    command.DummyCycles = 8U;
+    command.DummyCycles = NX_W25Q128JV_QUAD_DUMMY_CYCLES;
     command.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;
     command.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;
     QSPI_MemoryMappedTypeDef memory = {QSPI_TIMEOUT_COUNTER_DISABLE, 0U};
@@ -1230,9 +1232,11 @@ nx_stm32_qspi_mapping_enter(nx_stm32_qspi_t* owner) {
     HAL_StatusTypeDef status_hal =
         HAL_QSPI_MemoryMapped(&owner->transport, &command, &memory);
     owner->transport.Timeout = timeout;
-    uint32_t ccr = 0x6bU | QSPI_INSTRUCTION_1_LINE | QSPI_ADDRESS_1_LINE |
-                   QSPI_ADDRESS_24_BITS | QSPI_DATA_4_LINES |
-                   (8U << QUADSPI_CCR_DCYC_Pos) | QUADSPI_CCR_FMODE;
+    uint32_t ccr = NX_W25Q128JV_QUAD_READ | QSPI_INSTRUCTION_1_LINE |
+                   QSPI_ADDRESS_1_LINE | QSPI_ADDRESS_24_BITS |
+                   QSPI_DATA_4_LINES |
+                   (NX_W25Q128JV_QUAD_DUMMY_CYCLES << QUADSPI_CCR_DCYC_Pos) |
+                   QUADSPI_CCR_FMODE;
     nx_arch_dsb();
     bool good = status_hal == HAL_OK && READ_REG(QUADSPI->CCR) == ccr &&
                 (READ_REG(QUADSPI->CR) &

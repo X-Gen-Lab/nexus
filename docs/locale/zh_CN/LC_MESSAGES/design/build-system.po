@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: d898a911678db8700dca3a417e10a64d64a7959345c95346c7a446642514a923\n"
+"X-Nexus-Source-SHA256: ee1c2f468ffbde08ea555652b7bfa3f3158a15296d2de4c2f4ef69d82de4f9cd\n"
 
 #: ../../../docs/design/build-system.md:1
 msgid "Build system maintenance contract"
@@ -47,6 +47,13 @@ msgid ""
 "configuration digest is not a compiler or generator-source identity."
 msgstr ""
 "配置发布是单写入者事务，在修改所属输出前保护所有作者输入和事实输入。拒绝或中断不能把先前配置作为当前配置暴露。相同成功生成保留内容与时间戳，普通重配置不迫使无关编译。配置摘要不是编译器或生成器源码身份。"
+
+msgid "CMake owns source lists and target dependencies. The resolver emits selected facts and its configuration-code dependencies, never a parallel software build graph. The selected `package.json`, its declared facts and binding files, and the generic configuration-code closure are explicit generation inputs. The package also declares Source SDK export ownership. Board and SoC contain no Python plugins; production uses the generic DataProvider rather than family constructor imports. Package enumeration does not select C source units."
+msgstr "CMake 拥有源码列表和目标依赖。resolver 输出所选事实及其配置代码依赖，不建立第二张软件构建图。所选 `package.json`、声明的事实与 binding 文件、通用配置代码闭包都是明确的生成输入。package 也声明 Source SDK 导出归属。Board 和 SoC 不含 Python 插件；生产配置使用通用 DataProvider，不再导入家族构造模块。枚举包不选择 C 源码单元。"
+
+msgid "The selected provider supplies its actual private include directories through the existing `NEXUS_SYSTEM_PRIVATE_INCLUDES` connection. Root CMake consumes that declaration with PRIVATE scope; it no longer owns a fixed list of F4 IP paths. External provider bindings therefore do not automatically inherit F4 private headers. Mode/IP selection and supplier sources remain in the one CMake graph; this connection adds no registry or second build framework. Private compile templates validate required specialization bindings and preserve wrapper-owned macro scope; CMake still selects and checks each actual translation unit. ABI, optimization, diagnostics and firmware link policy have explicit target boundaries. The firmware target guarantees its declared delivery outputs and resource check. External application warnings are a consumer policy."
+msgstr "所选 provider 通过已有 `NEXUS_SYSTEM_PRIVATE_INCLUDES` 连接提供实际私有 include 目录。根 CMake 以 PRIVATE 范围消费该声明，不再维护固定 F4 IP 路径清单；外置 provider 绑定因而不再自动继承 F4 私有头。模式／IP 与供应方源码仍由唯一 CMake 图选择；该连接不增加 registry 或第二个构建框架。私有编译模板检查必要的特化绑定并保留 wrapper 所有的宏范围；每个实际编译单元仍由 CMake 选择和检查。ABI、优化、诊断和固件链接策略有明确目标边界。固件目标保证声明的交付输出和资源检查，外部应用 warning 属于消费者策略。"
+
 
 #: ../../../docs/design/build-system.md:31
 msgid ""
@@ -466,9 +473,3 @@ msgstr ""
 "tool-support-observations.json` 中记录 scope。当前 locked closure 与最终源码 receipt "
 "索引在 delivery result index。台账的配置、目标、workflow、delivery、transport "
 "报告保留原始执行、失败尝试和源码 scope。整个构建系统维护的物理 HIL 保持 `not_executed`。"
-
-msgid "CMake owns source lists and target dependencies. The resolver emits selected facts and its configuration-code dependencies, never a parallel software build graph. The selected central provider descriptor, currently `tools/configure/stm32f4_descriptor.py`, is an explicit configuration-code input and Source SDK source dependency. Board and SoC packages contain no Python plugins. Descriptor enumeration does not select C source units."
-msgstr "CMake 拥有源码列表和目标依赖。resolver 输出所选事实及配置代码依赖，不维护平行软件构建图。所选中央 provider descriptor（当前为 `tools/configure/stm32f4_descriptor.py`）是明确的配置代码输入和 Source SDK 源码依赖。Board 和 SoC 包没有 Python 插件。descriptor 枚举不选择 C 源文件。"
-
-msgid "The selected provider supplies its actual private include directories through the existing `NEXUS_SYSTEM_PRIVATE_INCLUDES` connection. Root CMake consumes that declaration with PRIVATE scope; it no longer owns a fixed list of F4 IP paths. External provider bindings therefore do not automatically inherit F4 private headers. Mode/IP selection and supplier sources remain in the one CMake graph; this connection adds no registry or second build framework. Private compile templates validate required specialization bindings and preserve wrapper-owned macro scope; CMake still selects and checks each actual translation unit. ABI, optimization, diagnostics and firmware link policy have explicit target boundaries. The firmware target guarantees its declared delivery outputs and resource check. External application warnings are a consumer policy."
-msgstr "所选 provider 通过已有 `NEXUS_SYSTEM_PRIVATE_INCLUDES` 连接提供实际私有 include 目录。根 CMake 以 PRIVATE 范围消费该声明，不再维护固定 F4 IP 路径清单；外置 provider 绑定因而不再自动继承 F4 私有头。模式／IP 与供应方源码仍由唯一 CMake 图选择；该连接不增加 registry 或第二个构建框架。私有编译模板检查必要的特化绑定并保留 wrapper 所有的宏范围；每个实际编译单元仍由 CMake 选择和检查。ABI、优化、诊断和固件链接策略有明确目标边界。固件目标保证声明的交付输出和资源检查，外部应用 warning 属于消费者策略。"

@@ -9,6 +9,7 @@
 #include "eth_mac.h"
 #if defined(NX_ETH_TEST_STM32)
 #include "stm32f407_eth.h"
+#include "stm32f4_eth_facts.h"
 #endif
 #if defined(NX_ETH_TEST_STM32)
 #include <sys/mman.h>
@@ -356,6 +357,26 @@ TEST_F(EthernetMac, CapturedWakeRemainsBorrowedDuringItsCallback) {
 extern "C" nx_result_t nx_eth_model_irq_control(nx_eth_mac_t*, bool) {
     return NX_SUCCESS;
 }
+TEST_F(EthernetMac, SelectedPhysicalRegionsHaveOneSharedAdmissionContract) {
+    nx_dma_memory_region_t selected{UINT32_C(0x20000000), 131072U, 3U};
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_eth_regions_admit(&selected, 1U));
+    selected.begin = UINT32_C(0x2001ffff);
+    selected.size = 1U;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_eth_regions_admit(&selected, 1U));
+    selected.size = 2U;
+    EXPECT_EQ(NX_ERROR_PERMISSION, nx_stm32_eth_regions_admit(&selected, 1U));
+    selected = {UINT32_C(0x10000000), 16U, 3U};
+    EXPECT_EQ(NX_ERROR_PERMISSION, nx_stm32_eth_regions_admit(&selected, 1U));
+    selected = {UINT32_C(0x20000000), 16U, 4U};
+    EXPECT_EQ(NX_ERROR_PERMISSION, nx_stm32_eth_regions_admit(&selected, 1U));
+    selected = {UINT32_C(0x20000000), 0U, 3U};
+    EXPECT_EQ(NX_ERROR_PERMISSION, nx_stm32_eth_regions_admit(&selected, 1U));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_eth_regions_admit(nullptr, 1U));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_eth_regions_admit(&selected, 0U));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_eth_regions_admit(&selected, SIZE_MAX));
+}
+
 TEST_F(EthernetMac, MiiSelectionRequiresAnExplicitMatchingSyscfgHandoff) {
     mac.mii = true;
     *reinterpret_cast<uint32_t*>(UINT32_C(0x40013804)) = 0U;

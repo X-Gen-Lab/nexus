@@ -1,13 +1,12 @@
-"""Explicit immutable family integration contracts, never source build graphs.
+"""Immutable package metadata projections, never a second source build graph.
 
-These descriptors select reviewed configuration modules and SDK identities.
-CMake remains the sole owner of production translation units and dependencies.
-No descriptor performs file discovery, downloads or runtime registration.
+Production identities come only from package.json. The explicit Native fixture
+keeps its host adapter outside production SoC packages. CMake owns translation
+units; this metadata supplies no MCU-specific Python entry or fallback table.
 """
 from dataclasses import dataclass
 from importlib import import_module
-from pathlib import PurePosixPath
-from types import MappingProxyType
+from pathlib import Path, PurePosixPath
 
 from tools.configure.providers.common import fail
 
@@ -29,6 +28,8 @@ class FamilyDescriptor:
     owned_payload: tuple = ()
     configuration_helpers: tuple = ()
     device_catalog: str | None = None
+    package_manifest: str | None = None
+    fact_paths: tuple = ()
 
     @property
     def git_dependencies(self):
@@ -41,6 +42,8 @@ class FamilyDescriptor:
     @property
     def configuration_modules(self):
         directory = self.configuration_directory
+        if not directory:
+            return ()
         packages = tuple(str(parent / "__init__.py") for parent in
                          reversed(PurePosixPath(directory).parents)
                          if str(parent) != ".")
@@ -52,6 +55,8 @@ class FamilyDescriptor:
 
     @property
     def fact_files(self):
+        if self.fact_paths:
+            return self.fact_paths
         directory = self.source_directory
         names = ("soc.json", "routes.json")
         if self.device_catalog is not None:
@@ -61,34 +66,51 @@ class FamilyDescriptor:
         return tuple(f"{directory}/{name}" for name in names)
 
 
-_DESCRIPTOR_MODULES = MappingProxyType({
-    "stm32f4": "tools.configure.stm32f4_descriptor",
-})
+ROOT = Path(__file__).resolve().parents[3]
 
 
-def maintained(family, *, test_support=False):
-    """Load one production family or an explicitly requested host fixture."""
-    selected = _DESCRIPTOR_MODULES.get(family)
+def from_package(package, root):
+    """Project one already loaded package without reopening its facts."""
+    root = Path(root).resolve()
+    return FamilyDescriptor(
+        family=package.family, vendor=package.vendor,
+        source_directory=package.source_directory.relative_to(root).as_posix(),
+        configuration_directory="", git_modules=package.dependencies,
+        import_lock=package.import_lock,
+        references=package.facts.get("references"),
+        device_catalog=package.facts.get("device_catalog"),
+        package_manifest=package.manifest_path.relative_to(root).as_posix(),
+        fact_paths=tuple(path.relative_to(root).as_posix()
+                         for path in package.inputs))
+
+
+def maintained(family, *, test_support=False, root=ROOT):
+    """Query a declared data package or the explicitly selected Native model."""
     if family == "native" and test_support:
-        selected = "tests.support.native.descriptor"
-    if selected is None:
+        module = import_module("tests.support.native.descriptor")
+        result = getattr(module, "DESCRIPTOR", None)
+        if type(result) is not FamilyDescriptor or result.family != family:
+            fail("Invalid Native fixture metadata")
+        return result
+    from tools.configure import packages
+    package = packages.find(root, family)
+    if package is None or package.scope != "production":
         fail(f"Unmaintained SoC integration descriptor: {family}")
-    module = import_module(selected)
-    result = getattr(module, "DESCRIPTOR", None)
-    if (module.__name__ != selected or type(result) is not FamilyDescriptor or
-            result.family != family):
-        fail(f"Invalid local descriptor contract: {family}")
-    return result
+    return from_package(package, root)
 
 
-def family_names():
-    """Project explicit built-in identities without importing local metadata."""
-    return tuple(_DESCRIPTOR_MODULES)
+def family_names(*, root=ROOT):
+    """List explicit production manifest identities, with no Python registry."""
+    from tools.configure import packages
+    return tuple(item.family for item in packages.discover(root)
+                 if item.scope == "production")
 
 
-def families():
-    """Preserve the explicit stable family order without another registry."""
-    return tuple(maintained(family) for family in _DESCRIPTOR_MODULES)
+def families(*, root=ROOT):
+    """Project the declared production packages in stable manifest order."""
+    from tools.configure import packages
+    return tuple(from_package(item, root) for item in packages.discover(root)
+                 if item.scope == "production")
 
 
 def source_directory(family):

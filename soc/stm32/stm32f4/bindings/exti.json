@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "exti",
+      "mode": "edge-event",
+      "implementation": "exti",
+      "static_recipe": {
+        "state_type": "nx_stm32_exti_state_t",
+        "ops": "nx_stm32_exti_ops",
+        "declarations": [
+          {
+            "role": "events",
+            "type": "nx_exti_event_t",
+            "const": false,
+            "count": {
+              "source": "item.options.event_capacity"
+            }
+          },
+          {
+            "role": "control_config",
+            "type": "nx_stm32_exti_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "gpio",
+                  {
+                    "source": "selected.pads.0.registers",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "storage",
+                  {
+                    "ref": "events",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "capacity",
+                  {
+                    "source": "item.options.event_capacity"
+                  }
+                ],
+                [
+                  "edge",
+                  {
+                    "source": "item.options.edge",
+                    "as": "symbol",
+                    "values": {
+                      "rising": "NX_EXTI_RISING",
+                      "falling": "NX_EXTI_FALLING",
+                      "both": "NX_EXTI_BOTH"
+                    }
+                  }
+                ],
+                [
+                  "gpio_index",
+                  {
+                    "source": "selected.pads.0.port_index"
+                  }
+                ],
+                [
+                  "line",
+                  {
+                    "source": "selected.pads.0.number"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "pull",
+                  {
+                    "source": "item.options.pull",
+                    "values": {
+                      "none": 0,
+                      "up": 1,
+                      "down": 2
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32_exti_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "control_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_exti_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "stm32f407_control_cold.h"
+      ],
+      "shared_irq": {
+        "state_type": "nx_stm32_exti_state_t",
+        "dispatch": "nx_stm32_exti_dispatch",
+        "barrier": "nx_arch_dsb",
+        "handler": "selected.vector_bindings.0.handler",
+        "priority": "selected.irq.priority",
+        "mask": "selected.constants.exti_mask"
+      }
+    },
+    {
+      "kind": "exti",
+      "mode": "hardware-event",
+      "implementation": "exti_hardware",
+      "static_recipe": {
+        "state_type": "nx_stm32_exti_hardware_state_t",
+        "ops": "nx_stm32_exti_hardware_ops",
+        "declarations": [
+          {
+            "role": "control_config",
+            "type": "nx_stm32_exti_hardware_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "gpio",
+                  {
+                    "source": "selected.pads.0.registers",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "edge",
+                  {
+                    "source": "item.options.edge",
+                    "as": "symbol",
+                    "values": {
+                      "rising": "NX_EXTI_RISING",
+                      "falling": "NX_EXTI_FALLING",
+                      "both": "NX_EXTI_BOTH"
+                    }
+                  }
+                ],
+                [
+                  "gpio_index",
+                  {
+                    "source": "selected.pads.0.port_index"
+                  }
+                ],
+                [
+                  "line",
+                  {
+                    "source": "selected.pads.0.number"
+                  }
+                ],
+                [
+                  "pull",
+                  {
+                    "source": "item.options.pull",
+                    "values": {
+                      "none": 0,
+                      "up": 1,
+                      "down": 2
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32_exti_hardware_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "control_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32_exti_hardware_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "control_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_exti_hardware_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "stm32f4_exti_hardware.h"
+      ]
+    }
+  ]
+}

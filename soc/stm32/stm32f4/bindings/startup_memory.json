@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "bindings": [],
+  "domains": {
+    "startup_memory": {
+      "schema_version": 1,
+      "region_id": "addsram",
+      "endpoint_profile": "fsmc-ne3-is62wv51216",
+      "endpoint_driver": "memory_window-endpoint",
+      "mode": "startup-memory",
+      "parts": [
+        "STM32F407ZGT6"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "minimum_stack_bytes": 512,
+      "alignment": 4,
+      "bank_role": "fsmc_bank_config",
+      "bank_type": "nx_stm32_fsmc_bank_config_t",
+      "linker_type": "uint8_t",
+      "address_encoder": "NX_STM32_SRAM_ADDRESS",
+      "primary_symbols": [
+        "__nx_primary_region_start",
+        "__nx_primary_region_end",
+        "_sidata",
+        "_sdata",
+        "_edata",
+        "_sbss",
+        "_ebss",
+        "_ebss",
+        "_ebss"
+      ],
+      "region_symbols": {
+        "ccm": [
+          "__nx_ccm_region_start",
+          "__nx_ccm_region_end",
+          "__nx_ccm_data_load",
+          "__nx_ccm_data_start",
+          "__nx_ccm_data_end",
+          "__nx_ccm_bss_start",
+          "__nx_ccm_bss_end",
+          "__nx_ccm_noinit_start",
+          "__nx_ccm_noinit_end"
+        ],
+        "addsram": [
+          "__nx_addsram_region_start",
+          "__nx_addsram_region_end",
+          "__nx_addsram_data_load",
+          "__nx_addsram_data_start",
+          "__nx_addsram_data_end",
+          "__nx_addsram_bss_start",
+          "__nx_addsram_bss_end",
+          "__nx_addsram_noinit_start",
+          "__nx_addsram_noinit_end"
+        ]
+      },
+      "extra_symbols": [
+        "__nx_flash_start",
+        "__nx_flash_end",
+        "__nx_msp_start",
+        "_estack"
+      ],
+      "plan": {
+        "symbols": {
+          "plan": "g_nx_stm32_sram_boot_plan"
+        },
+        "declarations": [
+          {
+            "role": "plan",
+            "type": "nx_stm32_sram_boot_plan_t",
+            "const": true,
+            "static": false,
+            "value": {
+              "record": [
+                [
+                  "version",
+                  {
+                    "symbol": "NX_STM32_SRAM_BOOT_VERSION"
+                  }
+                ],
+                [
+                  "part",
+                  {
+                    "symbol": "NX_STM32_SRAM_IS62WV51216"
+                  }
+                ],
+                [
+                  "maximum_hclk_hz",
+                  168000000
+                ],
+                [
+                  "region_count",
+                  {
+                    "source": "selected.region_count",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "flash_start",
+                  {
+                    "macro": "NX_STM32_SRAM_ADDRESS",
+                    "args": [
+                      {
+                        "symbol": "__nx_flash_start"
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "flash_end",
+                  {
+                    "macro": "NX_STM32_SRAM_ADDRESS",
+                    "args": [
+                      {
+                        "symbol": "__nx_flash_end"
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "vector_address",
+                  {
+                    "macro": "NX_STM32_SRAM_ADDRESS",
+                    "args": [
+                      {
+                        "symbol": "g_pfnVectors"
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "msp_start",
+                  {
+                    "macro": "NX_STM32_SRAM_ADDRESS",
+                    "args": [
+                      {
+                        "symbol": "__nx_msp_start"
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "msp_end",
+                  {
+                    "macro": "NX_STM32_SRAM_ADDRESS",
+                    "args": [
+                      {
+                        "symbol": "_estack"
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "bank",
+                  {
+                    "source": "selected.bank",
+                    "as": "static"
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "source": "selected.regions",
+                    "as": "static"
+                  }
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

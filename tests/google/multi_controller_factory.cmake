@@ -65,7 +65,7 @@ foreach(multi_family stm32)
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c")
-    include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+    include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
     nexus_stm32f4_official(${multi_gpio})
     nexus_stm32f407_uart_hal(${multi_target})
     target_link_options(${multi_target} PRIVATE "-Wl,--gc-sections")

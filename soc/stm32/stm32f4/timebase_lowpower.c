@@ -15,9 +15,9 @@
 
 extern nx_stm32_system_t g_nx_stm32_system;
 
-#define NX_TIMER_STATUS      (&TIM2->SR)
-#define NX_TIMER_INTERRUPTS  (&TIM2->DIER)
-#define NX_TIMER_COMPARE     (&TIM2->CCR1)
+#define NX_TIMER_STATUS      (&NEXUS_STM32_TIMEBASE_TIMER->SR)
+#define NX_TIMER_INTERRUPTS  (&NEXUS_STM32_TIMEBASE_TIMER->DIER)
+#define NX_TIMER_COMPARE     (&NEXUS_STM32_TIMEBASE_TIMER->CCR1)
 #define NX_COMPARE_FLAG      TIM_SR_CC1IF
 #define NX_COMPARE_INTERRUPT TIM_DIER_CC1IE
 
@@ -58,17 +58,21 @@ static bool fixed_run(void) {
 
 /** \brief Inspect the established exclusive profile without repairing it. */
 const nx_freertos_lowpower_port_t* nx_freertos_lowpower_port(void) {
-    uint32_t irq = (uint32_t)TIM2_IRQn;
+    uint32_t irq = (uint32_t)NEXUS_STM32_TIMEBASE_IRQ;
     if (!fixed_run() || configCPU_CLOCK_HZ != NEXUS_CORE_HZ ||
         !g_nx_stm32_system.started ||
         g_nx_stm32_system.core_hz != NEXUS_CORE_HZ ||
-        g_nx_stm32_system.timer != TIM2 ||
-        (RCC->APB1ENR & RCC_APB1ENR_TIM2EN) == 0u ||
-        (RCC->APB1LPENR & RCC_APB1LPENR_TIM2LPEN) == 0u ||
-        TIM2->CR1 != TIM_CR1_CEN || TIM2->SMCR != 0u ||
-        TIM2->PSC != NEXUS_APB1_TIMER_HZ / 1000000U - 1U ||
-        TIM2->ARR != UINT32_MAX || (TIM2->DIER & TIM_DIER_UIE) == 0u ||
-        TIM2->CCMR1 != 0u || TIM2->CCER != 0u ||
+        g_nx_stm32_system.timer != NEXUS_STM32_TIMEBASE_TIMER ||
+        (RCC->APB1ENR & NEXUS_STM32_TIMEBASE_GATE) == 0u ||
+        (RCC->APB1LPENR & NEXUS_STM32_TIMEBASE_GATE) == 0u ||
+        NEXUS_STM32_TIMEBASE_TIMER->CR1 != TIM_CR1_CEN ||
+        NEXUS_STM32_TIMEBASE_TIMER->SMCR != 0u ||
+        NEXUS_STM32_TIMEBASE_TIMER->PSC !=
+            NEXUS_APB1_TIMER_HZ / 1000000U - 1U ||
+        NEXUS_STM32_TIMEBASE_TIMER->ARR != UINT32_MAX ||
+        (NEXUS_STM32_TIMEBASE_TIMER->DIER & TIM_DIER_UIE) == 0u ||
+        NEXUS_STM32_TIMEBASE_TIMER->CCMR1 != 0u ||
+        NEXUS_STM32_TIMEBASE_TIMER->CCER != 0u ||
         (NVIC->ISER[irq / 32u] & (UINT32_C(1) << (irq % 32u))) == 0u) {
         return NULL;
     }

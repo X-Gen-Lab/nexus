@@ -29,11 +29,11 @@ class GeneratedStorageClassificationTests(unittest.TestCase):
 
     def test_enhanced_rings_and_slots_have_disjoint_existing_cost_classes(self):
         report = self.observe((
-            ('s_nx_eth_frames_tx_mac', 256, None),
-            ('s_nx_eth_frames_rx_mac', 256, None),
-            ('s_nx_eth_frames_storage_mac', 2048, None),
-            ('s_nx_eth_frames_tx_slots_mac', 64, None),
-            ('s_nx_eth_frames_rx_slots_mac.lto_priv.7', 96, None),
+            ('s_nx_eth_tx_mac', 256, None),
+            ('s_nx_eth_rx_mac', 256, None),
+            ('s_nx_eth_storage_mac', 2048, None),
+            ('s_nx_eth_tx_slots_mac', 64, None),
+            ('s_nx_eth_rx_slots_mac.lto_priv.7', 96, None),
             ('s_nx_port_mac', 32, None)))
         self.assertEqual(report['bytes']['buffers'], 2560)
         self.assertEqual(report['bytes']['provider_state'], 192)

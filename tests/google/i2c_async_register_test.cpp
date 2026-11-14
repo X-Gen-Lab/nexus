@@ -8,7 +8,7 @@
  */
 #include "i2c_v1_async.h"
 #if defined(NX_I2C_TEST_STM32)
-#include "stm32f407_i2c_async.h"
+#include "stm32_i2c_dma_fixture.h"
 #endif
 #if defined(NX_I2C_TEST_STM32)
 #include <sys/mman.h>
@@ -36,6 +36,7 @@ class I2CAsyncRegisters : public testing::Test {
     uint32_t* registers = backing;
     void* mapping = nullptr;
     uint32_t lines = 3U;
+    nx_i2c_v1_lines_t line_config{};
     nx_i2c_v1_state_t state = {};
     nx_i2c_v1_endpoint_t endpoint_state = {&state, 0x50, 7U};
     const nx_i2c_port_t bus = {&nx_i2c_v1_async_ops, &state};
@@ -111,13 +112,13 @@ class I2CAsyncRegisters : public testing::Test {
                  MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(mapping, reinterpret_cast<void*>(UINT32_C(0x40000000)));
         registers = reinterpret_cast<uint32_t*>(UINT32_C(0x40005400));
-        state.line_mask = (1U << 6U) | (1U << 7U);
-        state.line_inputs = &GPIOB->IDR;
-        GPIOB->IDR = state.line_mask;
+        line_config = {{&GPIOB->IDR, &GPIOB->IDR}, { 64U, 128U }};
+        state.lines = &line_config;
+        GPIOB->IDR = 0xC0U;
         state.peripheral_mhz = 42U;
 #else
-        state.line_inputs = &lines;
-        state.line_mask = 3U;
+        line_config = {{&lines, &lines}, {1U, 2U}};
+        state.lines = &line_config;
         state.peripheral_mhz = 42U;
 #endif
         state.registers = registers;
@@ -707,6 +708,7 @@ class I2CDmaRegisters : public I2CAsyncRegisters {
                                              &engines[i][6],
                                              (1U << 25U) | (1U << 10U) |
                                                  (1U << 16U) | 0x16U,
+                                             0U,
                                              0U};
             if (i == 0U) {
                 engine.configuration |= 1U << 6U;
@@ -718,7 +720,7 @@ class I2CDmaRegisters : public I2CAsyncRegisters {
         dma.regions = &region;
         dma.region_count = 1U;
 #if defined(NX_I2C_TEST_STM32)
-        dma = NX_STM32_I2C1_DMA(&region, 1U);
+        dma = I2C1Dma(&region, 1U);
 #endif
         state.dma = &dma;
         ASSERT_EQ(Initialize(), NX_SUCCESS);
@@ -1132,8 +1134,8 @@ TEST_F(I2CAsyncRegisters,
 
 TEST_F(I2CAsyncRegisters, PayloadCannotUsePhysicalControllerOrLineRegisters) {
     RejectMetadataPayload(reinterpret_cast<uint8_t*>(registers));
-    RejectMetadataPayload(
-        reinterpret_cast<uint8_t*>(const_cast<uint32_t*>(state.line_inputs)));
+    RejectMetadataPayload(reinterpret_cast<uint8_t*>(
+        const_cast<uint32_t*>(state.lines->inputs[0])));
 }
 
 TEST_F(I2CDmaRegisters,

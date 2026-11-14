@@ -111,8 +111,15 @@ drain_us = 1000
             self.assertIn(token, source)
         for token in ("HAL_LTDC_Init(", "HAL_GPIO_Init(", "HAL_DMA2D_Start(", "malloc("):
             self.assertNotIn(token, source)
-        self.assertNotIn("0x10000000u", source)
-        self.assertNotIn("0xc0000000u", source)
+        from tools.configure.tests.external_memory_fixture import construct
+        for item in (display, image):
+            built = construct(item, result)
+            regions = next(value for value in built.static_declarations
+                           if value.type_name == "nx_dma_memory_region_t")
+            addresses = {dict(value.fields)["begin"]
+                         for value in regions.initializer.values}
+            self.assertNotIn(0x10000000, addresses)
+            self.assertNotIn(0xc0000000, addresses)
         header, lookup = factory.emit(result)
         self.assertIn("nx_factory_display", header)
         self.assertIn("nx_factory_image", header)

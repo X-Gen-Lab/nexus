@@ -1,5 +1,5 @@
 """Strict initial ThreadX policy; no FreeRTOS feature/profile substitution."""
-from types import MappingProxyType
+from collections.abc import Mapping
 
 from tools.configure.ir import ThreadXKernelProfileIR
 from tools.configure.providers.common import fail, integer
@@ -7,17 +7,15 @@ from tools.configure.providers.common import fail, integer
 
 FIELDS = frozenset({"tick_source", "tick_hz", "max_priorities",
                     "interrupt_mask", "syscall_priority"})
-PLATFORMS = MappingProxyType({
-    "native-reference": "native",
-    "stm32f407zg-qiming-v31": "stm32f4",
-    "stm32f407ve-sky-qingchun": "stm32f4",
-})
 
-
-def validate_platform(board, family):
+def validate_platform(board, cpu):
     """A CPU port does not authorize arbitrary SoC/Board startup wiring."""
-    if PLATFORMS.get(board) != family:
+    support = board.get("backend_support", ()) if isinstance(board, Mapping) else ()
+    if not isinstance(support, (list, tuple)) or "threadx" not in support:
         fail("Unsupported maintained ThreadX platform")
+    port = {"native": "linux/gnu", "cortex-m4": "cortex_m4/gnu"}.get(cpu.arch)
+    if cpu.backend != "threadx" or port is None or cpu.irq.kernel_port != port:
+        fail("Unsupported maintained ThreadX CPU port")
 
 
 def resolve(choices, cpu, clock_hz):

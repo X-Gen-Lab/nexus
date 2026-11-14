@@ -11,6 +11,7 @@
 #include "nexus/io/frame_stream.h"
 #include "stm32f407_clock.h"
 #include "stm32f407_platform_cold.h"
+#include "stm32f4_dma_route.h"
 
 #ifndef NX_AV_READ
 #define NX_AV_READ(reg)                   (*(reg))
@@ -46,13 +47,7 @@ typedef struct {
 } nx_stm32_av_pin_t;
 
 /** \brief Exact independent DMA stream; no runtime engine discovery. */
-typedef struct {
-    DMA_TypeDef* dma;
-    DMA_Stream_TypeDef* stream;
-    IRQn_Type irq;
-    uint8_t lane;
-    uint8_t channel;
-} nx_stm32_av_dma_t;
+typedef nx_stm32_dma_route_t nx_stm32_av_dma_t;
 
 /** \brief Selected pad/gate/readback budget, not a register script. */
 typedef struct {
@@ -88,8 +83,8 @@ static inline bool nx_stm32_av_timebase(void) {
     RCC_TypeDef* rcc = g_nx_stm32_system.rcc;
     TIM_TypeDef* timer = g_nx_stm32_system.timer;
     return rcc != NULL && timer != NULL &&
-           (NX_AV_READ(&rcc->APB1ENR) & RCC_APB1ENR_TIM2EN) != 0U &&
-           (NX_AV_READ(&rcc->APB1RSTR) & RCC_APB1RSTR_TIM2RST) == 0U &&
+           (NX_AV_READ(&rcc->APB1ENR) & NEXUS_STM32_TIMEBASE_GATE) != 0U &&
+           (NX_AV_READ(&rcc->APB1RSTR) & NEXUS_STM32_TIMEBASE_RESET) == 0U &&
            NX_AV_READ(&timer->PSC) == NEXUS_APB1_TIMER_HZ / 1000000U - 1U &&
            NX_AV_READ(&timer->ARR) == UINT32_MAX &&
            (NX_AV_READ(&timer->CR1) &

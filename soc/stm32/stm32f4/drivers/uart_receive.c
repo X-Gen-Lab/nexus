@@ -32,28 +32,30 @@
         }                                                                      \
     } while (0)
 #endif
-#define RX_MEMORY1(s) ((s)->receive->M1AR)
+#define RX_MEMORY1(s) ((s)->resources->receive.stream->M1AR)
 #define RX_BANK       DMA_SxCR_CT
 #define RX_DOUBLE     (DMA_SxCR_DBM | DMA_SxCR_CIRC)
 #define RX_TARGET(s, bank, address)                                            \
-    NX_STM32_UART_RECEIVE_TARGET((s)->receive, (bank), (address))
+    NX_STM32_UART_RECEIVE_TARGET((s)->resources->receive.stream, (bank),       \
+                                 (address))
 
-#define RX_CONTROL(s)       ((s)->receive->CR)
-#define RX_COUNT(s)         ((s)->receive->NDTR)
-#define RX_MEMORY0(s)       ((s)->receive->M0AR)
-#define RX_PERIPHERAL(s)    ((s)->receive->PAR)
-#define RX_FIFO(s)          ((s)->receive->FCR)
-#define RX_FLAGS(s)         receive_flags(s)
-#define RX_ACK(s, flags)    receive_ack((s), (flags))
-#define RX_DISABLE(s, mask) NX_STM32_DMA_DISABLE((s)->receive, (mask))
-#define RX_ENABLE           DMA_SxCR_EN
-#define RX_INTERRUPTS       (DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE)
+#define RX_CONTROL(s)    ((s)->resources->receive.stream->CR)
+#define RX_COUNT(s)      ((s)->resources->receive.stream->NDTR)
+#define RX_MEMORY0(s)    ((s)->resources->receive.stream->M0AR)
+#define RX_PERIPHERAL(s) ((s)->resources->receive.stream->PAR)
+#define RX_FIFO(s)       ((s)->resources->receive.stream->FCR)
+#define RX_FLAGS(s)      receive_flags(s)
+#define RX_ACK(s, flags) receive_ack((s), (flags))
+#define RX_DISABLE(s, mask)                                                    \
+    NX_STM32_DMA_DISABLE((s)->resources->receive.stream, (mask))
+#define RX_ENABLE     DMA_SxCR_EN
+#define RX_INTERRUPTS (DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE)
 #define RX_SELECTION(s)                                                        \
-    ((uint32_t)rx_hardware(s)->transmit.channel << DMA_SxCR_CHSEL_Pos)
+    ((uint32_t)(s)->resources->receive.channel << DMA_SxCR_CHSEL_Pos)
 #define RX_INCREMENT   DMA_SxCR_MINC
 #define RX_PRIORITY    DMA_SxCR_PL_1
-#define RX_IRQ(s)      (rx_hardware(s)->receive_irq)
-#define TX_DMA_IRQ(s)  (rx_hardware(s)->transmit.irq)
+#define RX_IRQ(s)      ((s)->resources->receive.irq)
+#define TX_DMA_IRQ(s)  ((s)->resources->transmit.irq)
 #define UART_IRQ(s)    ((s)->uart.irq)
 #define UART_CR1(s)    ((s)->uart.registers->CR1)
 #define UART_CR3(s)    ((s)->uart.registers->CR3)
@@ -94,30 +96,32 @@ rx_hardware(const nx_stm32_uart_receive_state_t* state) {
     return nx_stm32_uart_hardware_for_irq(state->uart.irq);
 }
 
-/** \brief Decode only the selected stream's six hardware status bits. */
-static inline uint32_t
-receive_flags(const nx_stm32_uart_receive_state_t* state) {
-    const nx_stm32_uart_hardware_t* selected = rx_hardware(state);
-    uint32_t status = selected->receive_high ? state->resources->dma->HISR
-                                             : state->resources->dma->LISR;
-    return (status >> selected->receive_shift) & 0x3DU;
+/** \brief Decode only the selected immutable RX lane and status bank. */
+static uint32_t receive_flags(nx_stm32_uart_receive_state_t* state) {
+    const nx_stm32_dma_route_t* selected = &state->resources->receive;
+    uint32_t shift = ((selected->lane & 2U) != 0U ? 16U : 0U) +
+                     ((selected->lane & 1U) != 0U ? 6U : 0U);
+    uint32_t status =
+        selected->lane >= 4U ? selected->dma->HISR : selected->dma->LISR;
+    return (status >> shift) & 0x3DU;
 }
 
-/** \brief W1C receives an exact register and mask, never a neighboring lane. */
-static inline void receive_ack(nx_stm32_uart_receive_state_t* state,
-                               uint32_t flags) {
-    const nx_stm32_uart_hardware_t* selected = rx_hardware(state);
-    volatile uint32_t* clear = selected->receive_high
-                                   ? &state->resources->dma->HIFCR
-                                   : &state->resources->dma->LIFCR;
-    NX_STM32_UART_RECEIVE_ACK(clear, flags << selected->receive_shift);
+/** \brief W1C the selected RX group without touching a neighbouring lane. */
+static void receive_ack(nx_stm32_uart_receive_state_t* state, uint32_t flags) {
+    const nx_stm32_dma_route_t* selected = &state->resources->receive;
+    uint32_t shift = ((selected->lane & 2U) != 0U ? 16U : 0U) +
+                     ((selected->lane & 1U) != 0U ? 6U : 0U);
+    volatile uint32_t* clear =
+        selected->lane >= 4U ? &selected->dma->HIFCR : &selected->dma->LIFCR;
+    NX_STM32_UART_RECEIVE_ACK(clear, flags << shift);
 }
 
 /** \brief Validate fixed cold facts before either independent constructor. */
 nx_result_t
 nx_stm32_uart_receive_prepare(nx_stm32_uart_receive_state_t* state) {
-    if (state == NULL || state->receive == NULL || state->resources == NULL ||
-        state->resources->dma == NULL || state->resources->regions == NULL ||
+    if (state == NULL || state->resources == NULL ||
+        !nx_stm32_dma_route_valid(&state->resources->receive) ||
+        state->resources->regions == NULL ||
         state->resources->region_count == 0U ||
         state->uart.profile != NX_UART_RX_BLOCKS) {
         return NX_ERROR_INVALID;
@@ -126,12 +130,12 @@ nx_stm32_uart_receive_prepare(nx_stm32_uart_receive_state_t* state) {
         return NX_ERROR_CONTEXT;
     }
     const nx_stm32_uart_hardware_t* selected = rx_hardware(state);
-    if (selected == NULL) {
+    if (!nx_stm32_uart_dma_connection_valid(selected,
+                                            &state->resources->receive, true)) {
         return NX_ERROR_UNSUPPORTED;
     }
 #ifndef NEXUS_STM32_MODEL
-    if (state->receive != selected->receive ||
-        state->resources->dma != selected->dma ||
+    if (state->resources->receive.dma != selected->dma ||
         state->uart.registers != selected->registers) {
         return NX_ERROR_UNSUPPORTED;
     }
@@ -139,7 +143,7 @@ nx_stm32_uart_receive_prepare(nx_stm32_uart_receive_state_t* state) {
     if (state->uart.initialized) {
         return NX_ERROR_STATE;
     }
-    if ((state->receive->CR & DMA_SxCR_EN) != 0U) {
+    if ((state->resources->receive.stream->CR & DMA_SxCR_EN) != 0U) {
         return NX_ERROR_BUSY;
     }
     return NX_SUCCESS;

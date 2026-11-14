@@ -4,7 +4,10 @@ from pathlib import Path
 from types import SimpleNamespace
 import unittest
 
-from tools.configure.stm32f4 import clocks as clock
+from tools.configure.tests.f4_fixture import provider as f4_provider
+
+contract = f4_provider("STM32F446ZET6")
+clock = contract.domain_policies.clock
 
 
 class SaiClockPlanTests(unittest.TestCase):
@@ -49,14 +52,13 @@ class SaiClockPlanTests(unittest.TestCase):
         result = clock.plan("custom", profile)
         self.assertEqual((), result["reviewed_revision_ids"])
         self.assertEqual(
-            "Selected STM32F4 static RCC plan; exact document/cut scope is "
-            "bound by the selected device review", result["provenance"])
+            "Selected explicit PLL M/N/P/Q clock-domain facts; physical accuracy unmeasured", result["provenance"])
         self.assertFalse(result["physical_qualified"])
 
     def test_fractional_kernel_is_rejected_instead_of_truncated(self):
         profile = self.profile()
         profile["pll_sai"]["sai1"]["q"] = 7
-        with self.assertRaisesRegex(ValueError, "exact integer Hz.*PLLSAI"):
+        with self.assertRaisesRegex(ValueError, "exact integer Hz.*auxiliary"):
             clock.plan("custom", profile)
 
     def test_auxiliary_tuple_rejects_unknown_fields_booleans_and_null(self):
@@ -67,7 +69,7 @@ class SaiClockPlanTests(unittest.TestCase):
                       dict(m=10, n=192),
                       dict(m=10, n=192, sai1=None)):
             with self.subTest(value=value), self.assertRaisesRegex(
-                    ValueError, "PLLSAI"):
+                    ValueError, "(?i)(auxiliary|PLL)"):
                 profile = self.profile()
                 profile["pll_sai"] = value
                 clock.plan("custom", profile)
@@ -79,7 +81,7 @@ class SaiClockPlanTests(unittest.TestCase):
                             (SimpleNamespace(kind="audio", controller="SAI1",
                                              mode="slave-tx"),)):
             with self.subTest(controllers=controllers), self.assertRaisesRegex(
-                    ValueError, "PLLSAI.*SAI1 master"):
+                    ValueError, "Auxiliary Q.*audio master"):
                 clock.validate_consumers(selected, controllers)
 
     def test_selected_sai_master_cannot_claim_an_undeclared_auxiliary_source(self):
@@ -88,7 +90,7 @@ class SaiClockPlanTests(unittest.TestCase):
         selected = clock.plan("custom", profile)
         controller = SimpleNamespace(kind="audio", controller="SAI1",
                                      mode="master-duplex")
-        with self.assertRaisesRegex(ValueError, "SAI1 master.*PLLSAI"):
+        with self.assertRaisesRegex(ValueError, "Audio master.*auxiliary Q"):
             clock.validate_consumers(selected, (controller,))
 
     def test_selected_sai_master_consumes_the_one_system_auxiliary_plan(self):
@@ -112,7 +114,7 @@ class SaiClockPlanTests(unittest.TestCase):
         for mode, enabled in (("master-tx", 1), ("slave-tx", 0)):
             controller = SimpleNamespace(kind="audio", controller="SAI2",
                                          mode=mode)
-            lines = clock.header_lines(replace(
+            lines = contract.configuration_header(replace(
                 assembly, clock_plan=selected, controllers=(controller,)))
             self.assertIn(f"#define NEXUS_CLOCK_PLLSAI_SAI2_ENABLED {enabled}u",
                           lines)
@@ -137,7 +139,7 @@ class SaiClockPlanTests(unittest.TestCase):
         clock.validate_consumers(selected, (
             SimpleNamespace(kind="audio", controller="SAI1", mode="master-tx"),
             SimpleNamespace(kind="display", controller="LTDC", mode="rgb-scanout")))
-        with self.assertRaisesRegex(ValueError, "PLLSAI.*LTDC"):
+        with self.assertRaisesRegex(ValueError, "Auxiliary R.*display consumer"):
             clock.validate_consumers(selected, (SimpleNamespace(
                 kind="audio", controller="SAI1", mode="master-tx"),))
 
@@ -147,7 +149,7 @@ class SaiClockPlanTests(unittest.TestCase):
         selected = clock.plan("custom", profile)
         for kind, mode in (("image", "irq-blit"), ("display", "guessed")):
             with self.subTest(kind=kind, mode=mode), self.assertRaisesRegex(
-                    ValueError, "PLLSAI.*LTDC"):
+                    ValueError, "Auxiliary R.*display consumer"):
                 clock.validate_consumers(selected, (SimpleNamespace(
                     kind=kind, controller="LTDC", mode=mode),))
 
@@ -172,7 +174,7 @@ class SaiClockPlanTests(unittest.TestCase):
         # this does not resolve or qualify this profile for the shell's Board.
         assembly = configure.resolve_ir(configure.ROOT /
             "tools/configure/assemblies/sky-baremetal-gpio.toml")
-        lines = clock.header_lines(replace(assembly, clock_plan=selected))
+        lines = contract.configuration_header(replace(assembly, clock_plan=selected))
         for suffix, value in (("ENABLED", 1), ("SAI1_ENABLED", 1),
                 ("LTDC_ENABLED", 1), ("M", 10), ("N", 192), ("Q", 5),
                 ("DIVQ", 5), ("SAI1_HZ", 12288000), ("R", 4),
@@ -194,7 +196,7 @@ class SaiClockPlanTests(unittest.TestCase):
                     del profile["pll_sai"]
                 selected = ClockPlanIR.from_validated(clock.plan("custom", profile))
                 self.assertTrue(hasattr(selected, "pll_sai"), "typed PLLSAI is absent")
-                text = "\n".join(clock.header_lines(replace(assembly,
+                text = "\n".join(contract.configuration_header(replace(assembly,
                                                           clock_plan=selected)))
                 self.assertEqual(output == "sai1",
                                  "#define NEXUS_CLOCK_PLLSAI_Q " in text)
@@ -212,7 +214,7 @@ class SaiClockPlanTests(unittest.TestCase):
                        dict(r=7, post_divider=16),
                        dict(r=4, post_divider=16, pixel_hz=1)):
             with self.subTest(output=output), self.assertRaisesRegex(
-                    ValueError, "PLLSAI"):
+                    ValueError, "(?i)(auxiliary|PLL)"):
                 profile = self.profile()
                 profile["pll_sai"] = dict(m=10, n=192, ltdc=output)
                 clock.plan("custom", profile)
@@ -225,7 +227,7 @@ class SaiClockPlanTests(unittest.TestCase):
                        dict(sai1=dict(q=5, post_divider=0)),
                        dict(sai1=dict(q=5, post_divider=33))):
             with self.subTest(fields=fields), self.assertRaisesRegex(
-                    ValueError, "PLLSAI"):
+                    ValueError, "(?i)(auxiliary|PLL)"):
                 profile = self.profile()
                 profile["pll_sai"].update(fields)
                 clock.plan("custom", profile)

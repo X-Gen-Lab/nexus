@@ -5,7 +5,6 @@ import tempfile
 import unittest
 
 from tools.configure import bindings, configure
-from tools.configure.stm32f4 import emission
 
 
 class F479FlashTests(unittest.TestCase):
@@ -34,7 +33,6 @@ class F479FlashTests(unittest.TestCase):
         self.assertEqual(2 * 1024 * 1024, result.flash["size"])
         self.assertEqual(24, sum(span["count"]
                                  for span in result.flash["erase_spans"]))
-        self.assertTrue(emission.needs_syscfg(result))
         source = bindings.emit(result)[1]
         self.assertIn("nx_stm32_flash_prepare", source)
         self.assertIn("s_nx_platform_syscfg_clock_added", source)

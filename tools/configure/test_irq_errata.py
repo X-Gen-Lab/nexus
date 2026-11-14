@@ -1,9 +1,9 @@
 """Generated F4 exception exits complete Device stores before returning."""
 import re
 import unittest
+from unittest.mock import patch
 
 from tools.configure import bindings, configure as gate
-from tools.configure.providers.common import _static_definitions
 
 
 FIXTURES = (
@@ -36,31 +36,13 @@ def irq_bodies(source):
 
 
 class F4IrqErrataTests(unittest.TestCase):
-    def test_comment_braces_cannot_hide_an_executable_exit_barrier(self):
-        definition = "void EXTI0_IRQHandler(void) { /* } */ nx_poll(); }"
-        _static_definitions((definition,))
-        source = "\n".join(bindings._irq_exit_barriers([definition]))
-        self.assertEqual(definition[:-1] + "nx_arch_dsb(); }", source)
-        body, = irq_bodies(source)
-        self.assertTrue(body[1].rstrip().endswith("nx_arch_dsb();"))
-
-    def test_irq_spelling_inside_a_literal_is_preserved_as_data(self):
-        definition = ('static const char label[] = '
-                      '"void Fake_IRQHandler(void) { nx_poll(); }";')
-        _static_definitions((definition,))
-        self.assertEqual([definition], bindings._irq_exit_barriers([definition]))
-        self.assertEqual([], list(irq_bodies(definition)))
-
-    def test_valid_static_definition_formatting_cannot_bypass_exit_barrier(self):
-        for definition in ("  void EXTI0_IRQHandler(void) { nx_poll(); }",
-                           "void EXTI0_IRQHandler(void)  { nx_poll(); }",
-                           "void EXTI0_IRQHandler(void)\n{ nx_poll(); }"):
-            with self.subTest(definition=definition):
-                _static_definitions((definition,))
-                source = "\n".join(bindings._irq_exit_barriers(
-                    definition.splitlines()))
-                body, = irq_bodies(source)
-                self.assertTrue(body[1].rstrip().endswith("nx_arch_dsb();"))
+    def test_connections_are_complete_before_rendering_without_text_rewrite(self):
+        result = gate.resolve_ir(gate.ROOT / FIXTURES[0])
+        with patch.object(bindings, "_irq_exit_barriers", create=True,
+                          side_effect=AssertionError("C text rewrite was used")):
+            source = bindings.emit(result)[1]
+        for _, body in irq_bodies(source):
+            self.assertEqual(body.count("nx_arch_dsb()"), 1)
 
     def test_all_selected_irq_exits_complete_device_stores(self):
         observed = 0
@@ -74,6 +56,7 @@ class F4IrqErrataTests(unittest.TestCase):
                     with self.subTest(vector=name):
                         self.assertTrue(body.rstrip().endswith(
                             "nx_arch_dsb();"), body)
+                        self.assertEqual(body.count("nx_arch_dsb()"), 1)
                         observed += 1
         self.assertGreater(observed, 20)
 

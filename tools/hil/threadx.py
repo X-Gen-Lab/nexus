@@ -30,7 +30,6 @@ def contract(resolved):
     require(resolved.get("backend") == "threadx", "ThreadX backend required")
     try:
         board, family = resolved["board"], resolved["soc_family"]
-        policy.validate_platform(board, family)
         # Read the owned Board identity instead of copying a chip/Board table.
         root = Path(__file__).resolve().parents[2]
         if family == "native" and resolved["cpu"]["arch"] == "native":
@@ -38,13 +37,15 @@ def contract(resolved):
         else:
             board_paths = (root / "boards").glob("*/board.json")
         boards = [load_json(path) for path in board_paths]
-        require(any(item.get("id") == board and
-                    item.get("soc_family") == family and
-                    item.get("soc") == resolved.get("part") for item in boards),
+        selected_board = next((item for item in boards
+            if item.get("id") == board and item.get("soc_family") == family
+            and item.get("soc") == resolved.get("part")), None)
+        require(selected_board is not None,
                 "ThreadX exact maintained Board/part identity required")
         irq = resolved["irq"]
         profile = cpu.resolve(resolved["cpu"], {name: irq[name] for name in
                               ("priority_bits", "external_count")}, "threadx")
+        policy.validate_platform(selected_board, profile)
         selected = resolved["kernel_profile"]
         require(isinstance(selected, dict), "ThreadX kernel profile required")
         choices = {name: selected[name] for name in policy.FIELDS}

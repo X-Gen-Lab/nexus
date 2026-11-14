@@ -4,9 +4,12 @@ import tempfile
 import unittest
 
 from tools.configure import bindings, configure
-from tools.configure.stm32f4 import clocks, contract
+from tools.configure.tests.f4_fixture import provider as f4_provider
 from tools.configure import test_f407_block_configuration as fixtures
 from tools.configure.tests.native_fixture import native_fixture
+
+contract = f4_provider("STM32F407ZGT6")
+clocks = contract.domain_policies.clock
 
 
 class SdioHighSpeedConfigurationTests(unittest.TestCase):

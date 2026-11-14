@@ -10,6 +10,10 @@
 extern "C" {
 #endif
 struct nx_stm32_fsmc_bank_config;
+extern const uint32_t g_pfnVectors[];
+/* Linker-owned object addresses are constants, never dereferenced by
+ * generation. */
+#define NX_STM32_SRAM_ADDRESS(symbol) ((uintptr_t) & (symbol))
 /** \brief Exact software-declared SRAM identity, not an inferred speed grade.
  */
 enum {

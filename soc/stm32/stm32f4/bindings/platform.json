@@ -1,0 +1,593 @@
+{
+  "schema_version": 1,
+  "bindings": [],
+  "domains": {
+    "platform": {
+      "schema_version": 1,
+      "headers": [
+        "stm32f407_provider.h",
+        "stm32f407_platform_cold.h",
+        "stm32f4_platform_lifecycle_impl.h"
+      ],
+      "roles": {
+        "syscfg": [
+          {
+            "kinds": [
+              "exti"
+            ],
+            "modes": [
+              "edge-event",
+              "hardware-event"
+            ]
+          },
+          {
+            "kinds": [
+              "flash"
+            ],
+            "parts": [
+              "STM32F479NIH6"
+            ]
+          },
+          {
+            "kinds": [
+              "external_bus"
+            ],
+            "modes": [
+              "sdram-controller"
+            ]
+          }
+        ],
+        "audio": [
+          {
+            "kinds": [
+              "audio"
+            ],
+            "controllers": [
+              "I2S2",
+              "I2S3"
+            ]
+          }
+        ],
+        "ethernet": [
+          {
+            "kinds": [
+              "eth",
+              "eth_frames"
+            ]
+          }
+        ],
+        "ethernet_frames": [
+          {
+            "kinds": [
+              "eth_frames"
+            ]
+          }
+        ],
+        "power": [
+          {
+            "kinds": [
+              "rtc"
+            ]
+          }
+        ]
+      },
+      "dma_clocks": {
+        "DMA1": "RCC_AHB1ENR_DMA1EN",
+        "DMA2": "RCC_AHB1ENR_DMA2EN"
+      },
+      "objects": {
+        "state": {
+          "symbols": {
+            "dma_added": "s_nx_platform_dma_clocks_added",
+            "syscfg_added": "s_nx_platform_syscfg_clock_added",
+            "audio_clock": "s_nx_audio_clock",
+            "can_filters": "s_nx_can_filters",
+            "can_domain": "s_nx_can_domain",
+            "eth_resources": "s_nx_eth_resources",
+            "pin_owner": "s_nx_platform_pin_owner",
+            "clock_owner": "s_nx_platform_clock_owner",
+            "config": "s_nx_platform_lifecycle_config",
+            "permanent_stop": "nx_platform_permanent_stop",
+            "can_close": "nx_platform_can_close"
+          },
+          "declarations": [
+            {
+              "role": "dma_added",
+              "type": "uint32_t",
+              "const": false,
+              "enabled": {
+                "source": "selected.has_dma",
+                "as": "bool"
+              }
+            },
+            {
+              "role": "syscfg_added",
+              "type": "uint32_t",
+              "const": false,
+              "enabled": {
+                "source": "selected.has_syscfg",
+                "as": "bool"
+              }
+            },
+            {
+              "role": "audio_clock",
+              "type": "nx_stm32_audio_clock_t",
+              "const": false,
+              "enabled": {
+                "source": "selected.has_audio",
+                "as": "bool"
+              }
+            },
+            {
+              "role": "can_filters",
+              "type": "nx_can_filter_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.filters",
+                  "limit": 28,
+                  "value": {
+                    "record": [
+                      [
+                        "id",
+                        {
+                          "source": "entry.id",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "mask",
+                        {
+                          "source": "entry.mask",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "format",
+                        {
+                          "source": "entry.format",
+                          "as": "symbol",
+                          "values": {
+                            "standard": {
+                              "symbol": "NX_CAN_STANDARD"
+                            },
+                            "extended": {
+                              "symbol": "NX_CAN_EXTENDED"
+                            }
+                          }
+                        }
+                      ],
+                      [
+                        "tag",
+                        {
+                          "source": "entry.tag",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "bank",
+                        {
+                          "source": "entry.bank",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "controller",
+                        {
+                          "source": "entry.controller_index",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "fifo",
+                        {
+                          "source": "entry.fifo",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "match_index",
+                        {
+                          "source": "entry.match_index",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "remote",
+                        {
+                          "source": "entry.remote",
+                          "as": "bool"
+                        }
+                      ],
+                      [
+                        "match_remote",
+                        {
+                          "source": "entry.match_remote",
+                          "as": "bool"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "enabled": {
+                "source": "selected.has_filters",
+                "as": "bool"
+              },
+              "count": {
+                "source": "selected.filter_count",
+                "as": "u32"
+              }
+            },
+            {
+              "role": "can_domain",
+              "type": "nx_can_filter_domain_t",
+              "const": false,
+              "value": {
+                "record": [
+                  [
+                    "filters",
+                    {
+                      "optional": "selected.filters_present",
+                      "value": {
+                        "ref": "can_filters",
+                        "as": "symbol"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "filter_count",
+                    {
+                      "source": "selected.filter_count",
+                      "as": "u32"
+                    }
+                  ],
+                  [
+                    "split",
+                    {
+                      "source": "selected.can_split",
+                      "as": "u32"
+                    }
+                  ]
+                ]
+              },
+              "enabled": {
+                "source": "selected.has_can",
+                "as": "bool"
+              }
+            },
+            {
+              "role": "eth_resources",
+              "type": "nx_stm32_eth_resource_receipt_t",
+              "const": false,
+              "enabled": {
+                "source": "selected.has_ethernet",
+                "as": "bool"
+              }
+            }
+          ]
+        },
+        "platform": {
+          "symbols": {
+            "dma_added": "s_nx_platform_dma_clocks_added",
+            "syscfg_added": "s_nx_platform_syscfg_clock_added",
+            "audio_clock": "s_nx_audio_clock",
+            "can_filters": "s_nx_can_filters",
+            "can_domain": "s_nx_can_domain",
+            "eth_resources": "s_nx_eth_resources",
+            "pin_owner": "s_nx_platform_pin_owner",
+            "clock_owner": "s_nx_platform_clock_owner",
+            "config": "s_nx_platform_lifecycle_config",
+            "permanent_stop": "nx_platform_permanent_stop",
+            "can_close": "nx_platform_can_close"
+          },
+          "declarations": [
+            {
+              "role": "pin_owner",
+              "type": "nx_stm32f4_platform_pin_owner_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "preflight",
+                    {
+                      "symbol": "nx_stm32_platform_selected_preflight"
+                    }
+                  ],
+                  [
+                    "acquire",
+                    {
+                      "symbol": "nx_stm32_platform_pins_acquire"
+                    }
+                  ],
+                  [
+                    "release_clocks",
+                    {
+                      "symbol": "nx_stm32_platform_gpio_clocks_release"
+                    }
+                  ],
+                  [
+                    "abort",
+                    {
+                      "symbol": "nx_stm32_platform_pins_abort"
+                    }
+                  ],
+                  [
+                    "release",
+                    {
+                      "symbol": "nx_stm32_platform_pins_release"
+                    }
+                  ]
+                ]
+              },
+              "enabled": {
+                "source": "selected.has_pins",
+                "as": "bool"
+              }
+            },
+            {
+              "role": "clock_owner",
+              "type": "nx_stm32f4_platform_clock_owner_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "acquire",
+                    {
+                      "symbol": "nx_stm32_platform_resources_acquire"
+                    }
+                  ],
+                  [
+                    "release",
+                    {
+                      "symbol": "nx_stm32_platform_resources_release"
+                    }
+                  ]
+                ]
+              },
+              "enabled": {
+                "source": "selected.has_clocks",
+                "as": "bool"
+              }
+            },
+            {
+              "role": "config",
+              "type": "nx_stm32f4_platform_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "system",
+                    {
+                      "address": "g_nx_stm32_system"
+                    }
+                  ],
+                  [
+                    "selected",
+                    {
+                      "optional": "selected.pins_present",
+                      "value": {
+                        "address": "s_nx_platform_config"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "pins",
+                    {
+                      "optional": "selected.pins_present",
+                      "value": {
+                        "address": "s_nx_platform_pins"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "pin_owner",
+                    {
+                      "optional": "selected.pins_present",
+                      "value": {
+                        "ref": "pin_owner",
+                        "as": "address"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "clock_owner",
+                    {
+                      "optional": "selected.clocks_present",
+                      "value": {
+                        "ref": "clock_owner",
+                        "as": "address"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "flash_bytes",
+                    {
+                      "source": "selected.flash_bytes",
+                      "as": "u32"
+                    }
+                  ],
+                  [
+                    "poll_limit",
+                    1000000
+                  ],
+                  [
+                    "dma_mask",
+                    {
+                      "source": "selected.dma_mask",
+                      "as": "static"
+                    }
+                  ],
+                  [
+                    "dma_added",
+                    {
+                      "optional": "selected.dma_present",
+                      "value": {
+                        "ref": "dma_added",
+                        "as": "address"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "syscfg_added",
+                    {
+                      "optional": "selected.syscfg_present",
+                      "value": {
+                        "ref": "syscfg_added",
+                        "as": "address"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "permanent_stop",
+                    {
+                      "optional": "selected.boot_present",
+                      "value": {
+                        "ref": "permanent_stop",
+                        "as": "symbol"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "can_close",
+                    {
+                      "optional": "selected.can_present",
+                      "value": {
+                        "ref": "can_close",
+                        "as": "symbol"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "ethernet",
+                    {
+                      "optional": "selected.ethernet_present",
+                      "value": {
+                        "ref": "eth_resources",
+                        "as": "address"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "ethernet_capture",
+                    {
+                      "optional": "selected.ethernet_present",
+                      "value": {
+                        "symbol": "nx_stm32_eth_resources_capture"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "ethernet_close",
+                    {
+                      "optional": "selected.ethernet_present",
+                      "value": {
+                        "symbol": "nx_stm32_eth_resources_close"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "ethernet_frames",
+                    {
+                      "source": "selected.ethernet_frames",
+                      "as": "bool"
+                    }
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        "permanent_close": {
+          "symbols": {
+            "dma_added": "s_nx_platform_dma_clocks_added",
+            "syscfg_added": "s_nx_platform_syscfg_clock_added",
+            "audio_clock": "s_nx_audio_clock",
+            "can_filters": "s_nx_can_filters",
+            "can_domain": "s_nx_can_domain",
+            "eth_resources": "s_nx_eth_resources",
+            "pin_owner": "s_nx_platform_pin_owner",
+            "clock_owner": "s_nx_platform_clock_owner",
+            "config": "s_nx_platform_lifecycle_config",
+            "permanent_stop": "nx_platform_permanent_stop",
+            "can_close": "nx_platform_can_close"
+          },
+          "declarations": [],
+          "sequences": [
+            {
+              "role": "permanent_stop",
+              "sequence": [
+                {
+                  "function": "nx_stm32_fsmc_stop",
+                  "args": [
+                    {
+                      "source": "selected.permanent_port",
+                      "as": "static"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "can_close": {
+          "symbols": {
+            "dma_added": "s_nx_platform_dma_clocks_added",
+            "syscfg_added": "s_nx_platform_syscfg_clock_added",
+            "audio_clock": "s_nx_audio_clock",
+            "can_filters": "s_nx_can_filters",
+            "can_domain": "s_nx_can_domain",
+            "eth_resources": "s_nx_eth_resources",
+            "pin_owner": "s_nx_platform_pin_owner",
+            "clock_owner": "s_nx_platform_clock_owner",
+            "config": "s_nx_platform_lifecycle_config",
+            "permanent_stop": "nx_platform_permanent_stop",
+            "can_close": "nx_platform_can_close"
+          },
+          "declarations": [],
+          "sequences": [
+            {
+              "role": "can_close",
+              "sequence": [
+                {
+                  "function": "nx_stm32_can_domain_close",
+                  "args": [
+                    {
+                      "ref": "can_domain",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "calls": {
+        "system_start": "nx_stm32f4_platform_system_start_local",
+        "resources_acquire": "nx_stm32f4_platform_resources_acquire_local",
+        "resources_resume": "nx_stm32f4_platform_resources_resume_local",
+        "resources_release": "nx_stm32f4_platform_resources_release_local",
+        "system_release": "nx_stm32f4_platform_system_release_local"
+      },
+      "config_symbol": "s_nx_platform_lifecycle_config",
+      "power": {
+        "suspend": "nx_stm32_rtc_suspend",
+        "resume": "nx_stm32_rtc_resume",
+        "retain_on_failed_resume": true
+      }
+    }
+  }
+}

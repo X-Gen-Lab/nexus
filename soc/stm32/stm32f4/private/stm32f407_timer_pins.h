@@ -5,6 +5,7 @@
  */
 #ifndef NX_STM32F407_TIMER_PINS_H
 #define NX_STM32F407_TIMER_PINS_H
+#include "nexus_config.h"
 #include "stm32f407_timer_hardware.h"
 #include "stm32f4xx.h"
 #include <stdbool.h>
@@ -16,64 +17,53 @@ typedef struct {
     uint8_t pin;
 } nx_stm32_timer_pin_t;
 
-/** \brief One TI1--TI4 pad on each maintained four-channel input timer. */
+#if !defined(NEXUS_STM32_CAPTURE_PINS) || !defined(NEXUS_STM32_ADVANCED_PINS)
+#error "Timer modes require the selected package pin connections"
+#endif
+
+/** \brief Resolve a selected capture tuple shared by cold and hot paths. */
 static inline bool nx_stm32_capture_pin(const TIM_TypeDef* timer,
                                         uint8_t channel,
                                         nx_stm32_timer_pin_t* pad) {
-    if (channel < 1U || channel > nx_stm32_capture_channels(timer))
+    if (pad == NULL || channel < 1U ||
+        channel > nx_stm32_capture_channels(timer))
         return false;
-    if (timer == TIM1) {
-        *pad = (nx_stm32_timer_pin_t){GPIOA, 0U, (uint8_t)(channel + 7U)};
-    } else if (timer == TIM8) {
-        *pad = (nx_stm32_timer_pin_t){GPIOC, 2U, (uint8_t)(channel + 5U)};
-    } else if (timer == TIM3) {
-        *pad = channel <= 2U
-                   ? (nx_stm32_timer_pin_t){GPIOA, 0U, (uint8_t)(channel + 5U)}
-                   : (nx_stm32_timer_pin_t){GPIOB, 1U, (uint8_t)(channel - 3U)};
-    } else if (timer == TIM4) {
-        *pad = (nx_stm32_timer_pin_t){GPIOB, 1U, (uint8_t)(channel + 5U)};
-    } else if (timer == TIM5) {
-        *pad = (nx_stm32_timer_pin_t){GPIOA, 0U, (uint8_t)(channel - 1U)};
-    } else if (timer == TIM9) {
-        *pad = (nx_stm32_timer_pin_t){GPIOA, 0U, (uint8_t)(channel + 1U)};
-    } else if (timer == TIM10 || timer == TIM11) {
-        *pad = (nx_stm32_timer_pin_t){GPIOB, 1U,
-                                      (uint8_t)(timer == TIM10 ? 8U : 9U)};
-    } else if (timer == TIM12) {
-        *pad = (nx_stm32_timer_pin_t){GPIOB, 1U, (uint8_t)(channel + 13U)};
-    } else if (timer == TIM13 || timer == TIM14) {
-        *pad = (nx_stm32_timer_pin_t){GPIOA, 0U,
-                                      (uint8_t)(timer == TIM13 ? 6U : 7U)};
-    } else {
-        return false;
+#define NX_CAPTURE_PAD(controller, input, port, bank, pin)                     \
+    if (timer == (controller) && channel == (input)) {                         \
+        *pad = (nx_stm32_timer_pin_t){port, bank, pin};                        \
+        return true;                                                           \
     }
-    return true;
+    NEXUS_STM32_CAPTURE_PINS(NX_CAPTURE_PAD)
+#undef NX_CAPTURE_PAD
+    (void)timer;
+    return false;
 }
 
-/** \brief Select CHx, CHxN, then the common BKIN; no CH4 complement exists. */
+/** \brief Resolve CHx, CHxN or BKIN from the same selected complete route. */
 static inline bool nx_stm32_advanced_pin(const TIM_TypeDef* timer,
                                          uint8_t channel, unsigned index,
                                          nx_stm32_timer_pin_t* pad) {
-    if (channel < 1U || channel > 3U || index > 2U)
+    if (pad == NULL || channel < 1U || channel > 3U || index > 2U)
         return false;
-    if (timer == TIM1) {
-        *pad =
-            index == 0U
-                ? (nx_stm32_timer_pin_t){GPIOA, 0U, (uint8_t)(channel + 7U)}
-                : (nx_stm32_timer_pin_t){
-                      GPIOB, 1U, (uint8_t)(index == 1U ? channel + 12U : 12U)};
-    } else if (timer == TIM8) {
-        if (index == 0U)
-            *pad = (nx_stm32_timer_pin_t){GPIOC, 2U, (uint8_t)(channel + 5U)};
-        else if (index == 2U || channel == 1U)
-            *pad = (nx_stm32_timer_pin_t){GPIOA, 0U,
-                                          (uint8_t)(index == 2U ? 6U : 7U)};
-        else
-            *pad = (nx_stm32_timer_pin_t){GPIOB, 1U, (uint8_t)(channel - 2U)};
-    } else {
-        return false;
+#define NX_ADVANCED_PAD(controller, output, role, port, bank, pin)             \
+    if (timer == (controller) && channel == (output) && index == (role)) {     \
+        *pad = (nx_stm32_timer_pin_t){port, bank, pin};                        \
+        return true;                                                           \
     }
-    return true;
+    NEXUS_STM32_ADVANCED_PINS(NX_ADVANCED_PAD)
+#undef NX_ADVANCED_PAD
+    (void)timer;
+    return false;
+}
+
+/** \brief Validate the selected physical BKIN without a second pin table. */
+static inline bool nx_stm32_advanced_break_valid(const TIM_TypeDef* timer,
+                                                 uint8_t channel,
+                                                 const volatile uint32_t* input,
+                                                 uint32_t mask) {
+    nx_stm32_timer_pin_t pad;
+    return nx_stm32_advanced_pin(timer, channel, 2U, &pad) &&
+           input == &pad.gpio->IDR && mask == (UINT32_C(1) << pad.pin);
 }
 
 /** \brief Observe the exact pad after its bank clock, without writes. */

@@ -1,7 +1,7 @@
 # One exact SDIO owner; the clock variant retains only its crossing contract.
 nexus_google_test(nexus_block_port_test SOURCES block_port_test.cpp
     LIBRARIES Nexus::IO)
-include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32SDIO.cmake")
+include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32SDIO.cmake")
 
 function(nexus_sdio_contract target)
     nexus_google_test(${target} STM32F4_LL
@@ -31,6 +31,14 @@ function(nexus_sdio_contract target)
 endfunction()
 
 nexus_sdio_contract(nexus_stm32_sdio_block_test)
+
+# Only the alternate stream's distinguishing contracts execute in this variant.
+set(sdio_stream_target nexus_stm32_sdio_stream6_test)
+nexus_sdio_contract(${sdio_stream_target})
+foreach(sdio_stream_context ${sdio_stream_target} ${sdio_stream_target}_sdio_ll)
+    target_compile_definitions(${sdio_stream_context} PRIVATE
+        NX_SDIO_STREAM6_ONLY=1)
+endforeach()
 
 set(sdio_clock_input
     "${NEXUS_SOURCE_DIR}/tests/contracts/sdio_clock/low-pclk.toml")

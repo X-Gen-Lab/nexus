@@ -40,7 +40,7 @@ def check(result, *, expected_family=None, expected_part=None):
             "kind": item.kind, "mode": item.mode,
             "public_class": contract.public_class,
             "implementation": provider.mode_implementation(
-                item.kind, item.mode),
+                item.kind, item.mode, item.controller),
         })
     return {
         "schema_version": 1, "kind": "provider_configuration_check",

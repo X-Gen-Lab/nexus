@@ -45,6 +45,7 @@ uint32_t error_mask;
 std::vector<volatile uint32_t*> resets;
 class SPIMultiple : public testing::Test {
   protected:
+    nx_stm32_spi_dma_resources_t dma_resources[2]{};
     DMA_STATE states[2]{};
     DEVICE_STATE children[2]{};
     nx_spi_port_t ports[2]{{&DMA_OPS, &states[0]}, {&DMA_OPS, &states[1]}};
@@ -89,14 +90,22 @@ class SPIMultiple : public testing::Test {
         regions[0] = {(uintptr_t)tx, sizeof(tx), NX_DMA_MEMORY_READ};
         regions[1] = {(uintptr_t)rx, sizeof(rx), NX_DMA_MEMORY_WRITE};
         for (unsigned i = 0U; i < 2U; ++i) {
-            states[i].regions = regions;
-            states[i].region_count = 2U;
+            dma_resources[i].regions = regions;
+            dma_resources[i].region_count = 2U;
+            states[i].resources = &dma_resources[i];
             states[i].spi.registers = spis[i];
             states[i].spi.rcc = RCC;
             states[i].spi.clock_hz = i == 0U ? 84000000U : 42000000U;
-            states[i].dma = i == 0U ? DMA2 : DMA1;
-            states[i].rx = i == 0U ? DMA2_Stream0 : DMA1_Stream3;
-            states[i].tx = i == 0U ? DMA2_Stream3 : DMA1_Stream4;
+            dma_resources[i].transmit =
+                i == 0U ? nx_stm32_dma_route_t{DMA2, DMA2_Stream3,
+                                               DMA2_Stream3_IRQn, 3U, 3U}
+                        : nx_stm32_dma_route_t{DMA1, DMA1_Stream4,
+                                               DMA1_Stream4_IRQn, 4U, 0U};
+            dma_resources[i].receive =
+                i == 0U ? nx_stm32_dma_route_t{DMA2, DMA2_Stream0,
+                                               DMA2_Stream0_IRQn, 0U, 3U}
+                        : nx_stm32_dma_route_t{DMA1, DMA1_Stream3,
+                                               DMA1_Stream3_IRQn, 3U, 0U};
             children[i].endpoint = {&states[i].spi, &cs[i], 1U << i,
                                     1000000U,       0U,     false};
             children[i].dma = &states[i];
@@ -132,8 +141,10 @@ class SPIMultiple : public testing::Test {
     void Third() {
         spis[1] = SPI3;
         states[1].spi.registers = SPI3;
-        states[1].rx = DMA1_Stream0;
-        states[1].tx = DMA1_Stream5;
+        dma_resources[1].receive = {DMA1, DMA1_Stream0, DMA1_Stream0_IRQn, 0U,
+                                    0U};
+        dma_resources[1].transmit = {DMA1, DMA1_Stream5, DMA1_Stream5_IRQn, 5U,
+                                     0U};
         rx_controls[1] = &DMA1_Stream0->CR;
         tx_controls[1] = &DMA1_Stream5->CR;
         rx_counts[1] = &DMA1_Stream0->NDTR;
@@ -163,6 +174,36 @@ class SPIMultiple : public testing::Test {
                 (1U << ((unsigned)irq % 32U))) != 0U;
     }
 };
+TEST_F(SPIMultiple, SelectedAlternateStreamsUseTheirOwnPublishersAndFlagBanks) {
+    dma_resources[0].transmit = {DMA2, DMA2_Stream5, DMA2_Stream5_IRQn, 5U, 3U};
+    dma_resources[0].receive = {DMA2, DMA2_Stream2, DMA2_Stream2_IRQn, 2U, 3U};
+    dma_resources[0].regions = regions;
+    dma_resources[0].region_count = 2U;
+    states[0].resources = &dma_resources[0];
+    ASSERT_EQ(NX_SUCCESS, Initialize(0U));
+    EXPECT_TRUE(Enabled(DMA2_Stream5_IRQn));
+    EXPECT_TRUE(Enabled(DMA2_Stream2_IRQn));
+    EXPECT_FALSE(Enabled(DMA2_Stream3_IRQn));
+    EXPECT_FALSE(Enabled(DMA2_Stream0_IRQn));
+    ASSERT_EQ(NX_SUCCESS, nx_spi_endpoint_submit(&devices[0], &requests[0]));
+    EXPECT_EQ(3U << DMA_SxCR_CHSEL_Pos, DMA2_Stream5->CR & DMA_SxCR_CHSEL);
+    EXPECT_EQ(3U << DMA_SxCR_CHSEL_Pos, DMA2_Stream2->CR & DMA_SxCR_CHSEL);
+    DMA2_Stream5->NDTR = DMA2_Stream2->NDTR = 0U;
+    DMA2->HISR = (0x20U << 6U) | (0x20U << 22U);
+    DMA2->LISR = (0x20U << 16U) | 0x20U;
+    DMA_IRQ(&states[0], false);
+    DMA_IRQ(&states[0], true);
+    STATUS(0U) = TX_EMPTY;
+    nx_spi_port_service(&ports[0]);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&requests[0].base));
+    EXPECT_EQ(NX_SUCCESS, requests[0].base.result);
+    EXPECT_EQ(0x20U << 22U, DMA2->HISR);
+    EXPECT_EQ(0x20U, DMA2->LISR);
+    EXPECT_EQ(NX_SUCCESS, nx_spi_port_stop(&ports[0]));
+    EXPECT_FALSE(Enabled(DMA2_Stream5_IRQn));
+    EXPECT_FALSE(Enabled(DMA2_Stream2_IRQn));
+}
+
 TEST_F(SPIMultiple, SecondaryColdInitPreservesPrimaryConfigAndPublishers) {
     ASSERT_EQ(Initialize(0U), NX_SUCCESS);
     CONTROL(0U) = 0x80U;

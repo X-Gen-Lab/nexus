@@ -527,7 +527,7 @@
             "handling": "Maintained System configures prefetch enabled, so its supported sleep/stop profile excludes the combined condition. A product that changes ACR or supplies its own low-power entry must apply the three-NOP, SRAM-entry or active-AHB workaround; precision ADC advice is not an implicit authorization to mutate the platform clock owner.",
             "implementation": [
               "soc/stm32/stm32f4/system.c",
-              "tools/configure/stm32f4/clocks.py"
+              "soc/stm32/stm32f4/bindings/domain_common.json"
             ],
             "regressions": [
               "tests/google/stm32_ahb_clock_test.cpp",
@@ -560,7 +560,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/gpio.c",
               "soc/stm32/stm32f4/drivers/platform_cold.c",
-              "tools/configure/stm32f4/rtc.py"
+              "soc/stm32/stm32f4/bindings/rtc.json"
             ],
             "regressions": []
           },
@@ -604,7 +604,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/gpio.c",
               "soc/stm32/stm32f4/drivers/platform_cold.c",
-              "tools/configure/stm32f4/rtc.py"
+              "soc/stm32/stm32f4/bindings/rtc.json"
             ],
             "regressions": [
               "tests/google/stm32_platform_cold_test.cpp",
@@ -637,7 +637,7 @@
             "handling": "RTC control uses explicit readback and bounded readiness observations. Do not rely on the MPU nonbufferable attribute alone, particularly for write-only watchdog key commands: when completion is required, the external MPU/critical-sequence owner must issue a same-peripheral read after the write. No universal strongly-ordered MPU claim is made.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/watchdog.c",
-              "tools/configure/stm32f4/clocks.py",
+              "soc/stm32/stm32f4/bindings/domain_common.json",
               "soc/stm32/stm32f4/power.c"
             ],
             "regressions": []
@@ -652,7 +652,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/gpio.c",
               "soc/stm32/stm32f4/drivers/platform_cold.c",
-              "tools/configure/stm32f4/rtc.py",
+              "soc/stm32/stm32f4/bindings/rtc.json",
               "soc/stm32/stm32f4/drivers/cipher.c",
               "soc/stm32/stm32f4/drivers/hash.c",
               "soc/stm32/stm32f4/drivers/crypto_irq.c",
@@ -763,7 +763,7 @@
             "condition": "DMA2 AHB peripheral-port requests to a FIFO-like FSMC/QUADSPI target or GPIO writes run concurrently with APB2 requests.",
             "handling": "Selected F407 DMA paths do not use DMA2 peripheral-port writes to GPIO or FIFO-like FSMC/QUADSPI. FSMC endpoints are CPU controlled and F407 has no QUADSPI provider. Do not prohibit unrelated ADC/SDIO concurrency or mislabel internal-SRAM repeated accesses as this FIFO corruption; a future affected route must choose the memory port explicitly. ADC regular blocks use DMA2_Stream0 channel0 from ADC_CDR to admitted internal SRAM; they add no FIFO-like AHB peripheral-port write route. Combined operation still uses DMA2 only for CDR-to-main-SRAM regular samples; injected JDR values are bounded CPU reads. It introduces no AHB FIFO target or GPIO write through the DMA2 peripheral port. DCMI CM1 frame sessions read DCMI_DR through the DMA2 peripheral port and write admitted main SRAM; they introduce no FIFO-like AHB peripheral-port write. Each independent snapshot joins its source, FIFO, actual DMA EN readback, IRQs and addresses before publishing and rearming. This is not gapless CM0 or a count of exact JPEG codestream bytes. Timer-injected blocks retain only the existing CDR-to-main-SRAM DMA route. The extra timer generates an internal ADC event; injected data are bounded JDR CPU reads, not a new DMA2 AHB FIFO-like destination. The finite JAUTO joint request keeps the existing CDR-to-main-SRAM DMA2 Stream0 channel0 route for regular samples. Injected samples are bounded JDR CPU reads after complete joint withdrawal; no DMA2 FIFO-like AHB peripheral-port destination is introduced. Interleaved blocks use only ADC_CDR peripheral reads into admitted main SRAM: DMA mode2 emits word pairs for 10/12-bit samples, mode3 emits halfword pairs for 6/8-bit samples. Neither is a DMA2 AHB peripheral-port write into a FIFO-like target. CM0 JPEG storage blocks keep only DCMI_DR peripheral reads into admitted main SRAM. They introduce no DMA2 peripheral-port write to a FIFO-like AHB destination. The selected 8-bit hardware-sync path exposes native 32-bit storage words, including EOF padding, and claims neither frame boundaries nor exact JPEG byte lengths. A conservative service bound reserves one partial packer word, four DCMI FIFO words, four DMA FIFO words and one SINGLE transfer on each AHB master; only service gaps and capacities admitted against that bound are selectable. F415/F417 basic CRYP/HASH dma-blocks uses only the exact channel2 CRYP input/output or HASH input registers and admitted main SRAM/readable Flash. ES0182 Rev19 section2.2.19 explicitly lists indirect QUADSPI, external-FIFO FSMC and GPIO peripheral-port writes; these selected crypto paths introduce none of those routes. Their inclusion does not authorize DMA to arbitrary AHB FIFO targets or prohibit unrelated ADC/SDIO concurrency.",
             "implementation": [
-              "tools/configure/stm32f4/hardware.py",
+              "soc/stm32/stm32f4/bindings.json",
               "io/src/mechanisms/dma.c",
               "docs/design/multiple-dma-controllers.md",
               "soc/stm32/stm32f4/drivers/adc_group_blocks.c",
@@ -809,7 +809,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/fsmc.c",
               "soc/stm32/stm32f4/drivers/fsmc_nor.c",
-              "tools/configure/stm32f4/fsmc.py"
+              "soc/stm32/stm32f4/bindings/fsmc.json"
             ],
             "regressions": [
               "tests/google/f407_fsmc_test.cpp",
@@ -826,7 +826,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/fsmc.c",
               "soc/stm32/stm32f4/drivers/fsmc_nor.c",
-              "tools/configure/stm32f4/fsmc.py"
+              "soc/stm32/stm32f4/bindings/fsmc.json"
             ],
             "regressions": [
               "tests/google/f407_fsmc_test.cpp",
@@ -843,7 +843,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/fsmc.c",
               "soc/stm32/stm32f4/drivers/fsmc_nor.c",
-              "tools/configure/stm32f4/fsmc.py"
+              "soc/stm32/stm32f4/bindings/fsmc.json"
             ],
             "regressions": [
               "tests/google/f407_fsmc_test.cpp",
@@ -859,7 +859,7 @@
             "handling": "The only clock constructor explicitly selects HardwareFlowControl DISABLE and driver code handles FIFO overrun/underrun. No API can select HWFC_EN.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio.c",
-              "tools/configure/stm32f4/block.py",
+              "soc/stm32/stm32f4/bindings/sdio.json",
               "docs/design/f407-storage.md"
             ],
             "regressions": [
@@ -875,7 +875,7 @@
             "handling": "The typed response parser ignores CCRCFAIL only for R3/R4, still clears observed flags and keeps CRC-bearing R1/R2/R5/R6/R7 strict. CMD5 IO discovery uses R4 rather than globally suppressing command CRC errors.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio.c",
-              "tools/configure/stm32f4/block.py",
+              "soc/stm32/stm32f4/bindings/sdio.json",
               "docs/design/f407-storage.md"
             ],
             "regressions": [
@@ -891,7 +891,7 @@
             "handling": "Clock construction explicitly disables bypass. The default profile selects reviewed CLKDIV values for initialization below 400 kHz and transfer up to 12 MHz, with exact PLL48 for shared USB/RNG users. Only the exact F407 hse8-pll150-sdio375 plus high-speed four-bit SD-memory/MMC selection admits HCLK150/APB2=PLLQ75 and non-bypass 37.5 MHz data transfer. That closed profile rejects USB, RNG and optional power modes; no implicit shared-clock retuning occurs. Other devices and custom tuples inherit no 37.5 MHz grant.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio.c",
-              "tools/configure/stm32f4/block.py",
+              "soc/stm32/stm32f4/bindings/sdio.json",
               "docs/design/f407-storage.md"
             ],
             "regressions": [
@@ -907,7 +907,7 @@
             "handling": "Clock construction fixes rising edge and exposes no NEGEDGE mode; owned selected-state checks do not authorize a foreign clock tuple.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio.c",
-              "tools/configure/stm32f4/block.py",
+              "soc/stm32/stm32f4/bindings/sdio.json",
               "docs/design/f407-storage.md"
             ],
             "regressions": [
@@ -923,7 +923,7 @@
             "handling": "Supported protocols are SD memory, MMC memory and SDIO functions; no CE-ATA RW_MULTIPLE/FAST_IO protocol is exposed. MMC ready/status polling is not a claim of CE-ATA support.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio.c",
-              "tools/configure/stm32f4/block.py",
+              "soc/stm32/stm32f4/bindings/sdio.json",
               "docs/design/f407-storage.md"
             ],
             "regressions": [
@@ -939,7 +939,7 @@
             "handling": "At the maintained SDIO RUN profile PCLK2=84 MHz, SDIOCLK=48 MHz, divider2 gives SDIO_CK=12 MHz; even width8 has 98.22 ns <333.33 ns. Board rates and future custom-clock acceptance must preserve the strict inequality. FIFO service latency still requires real bandwidth measurement; a CRC/status model is not a physical timing qualification.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio.c",
-              "tools/configure/stm32f4/block.py",
+              "soc/stm32/stm32f4/bindings/sdio.json",
               "docs/design/f407-storage.md"
             ],
             "regressions": [
@@ -1010,7 +1010,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/timer_waveform.c",
               "soc/stm32/stm32f4/drivers/ip/advanced_timer/advanced_pwm_impl.h",
-              "tools/configure/stm32f4/waveform.py"
+              "soc/stm32/stm32f4/bindings/waveform.json"
             ],
             "regressions": [
               "tests/google/f407_timer_waveform_test.cpp",
@@ -1027,7 +1027,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/timer_waveform.c",
               "soc/stm32/stm32f4/drivers/ip/advanced_timer/advanced_pwm_impl.h",
-              "tools/configure/stm32f4/waveform.py",
+              "soc/stm32/stm32f4/bindings/waveform.json",
               "soc/stm32/stm32f4/drivers/adc_group_blocks.c",
               "soc/stm32/stm32f4/drivers/adc_group.c",
               "soc/stm32/stm32f4/drivers/dac.c",
@@ -1052,7 +1052,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/timer_waveform.c",
               "soc/stm32/stm32f4/drivers/ip/advanced_timer/advanced_pwm_impl.h",
-              "tools/configure/stm32f4/waveform.py"
+              "soc/stm32/stm32f4/bindings/waveform.json"
             ],
             "regressions": []
           },
@@ -1066,7 +1066,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/timer_waveform.c",
               "soc/stm32/stm32f4/drivers/ip/advanced_timer/advanced_pwm_impl.h",
-              "tools/configure/stm32f4/waveform.py"
+              "soc/stm32/stm32f4/bindings/waveform.json"
             ],
             "regressions": [
               "tests/google/f407_timer_waveform_test.cpp",
@@ -1082,7 +1082,7 @@
             "handling": "Watchdog activation waits actual SR readiness before success and an enabled watchdog retains an irreversible owner. The drained deep-power contract cannot consume an enabled retained watchdog as an ordinary stopped controller; foreign watchdog ownership must prove SR RVU clear before Stop. No generic low-power claim overrides this hardware restriction.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/watchdog.c",
-              "tools/configure/stm32f4/clocks.py",
+              "soc/stm32/stm32f4/bindings/domain_common.json",
               "soc/stm32/stm32f4/power.c"
             ],
             "regressions": [
@@ -1099,7 +1099,7 @@
             "handling": "The same bounded SR-ready activation and irreversible-owner contract applies to PVU. Foreign/direct watchdog users must establish SR PVU clear before Stop; a source clock flag alone does not prove it.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/watchdog.c",
-              "tools/configure/stm32f4/clocks.py",
+              "soc/stm32/stm32f4/bindings/domain_common.json",
               "soc/stm32/stm32f4/power.c"
             ],
             "regressions": [
@@ -1116,7 +1116,7 @@
             "handling": "Every admitted static RUN plan requires an integer-MHz TIM2 kernel; APB1 is that kernel or half of it and is therefore at least 500 kHz, exceeding twice the DS8626 LSI upper limit. Driver activation also bounds the SR wait. This proof does not authorize external low-frequency RCC changes.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/watchdog.c",
-              "tools/configure/stm32f4/clocks.py",
+              "soc/stm32/stm32f4/bindings/domain_common.json",
               "soc/stm32/stm32f4/power.c"
             ],
             "regressions": [
@@ -1133,7 +1133,7 @@
             "handling": "The same integer-MHz TIM2/APB1 minimum proof covers PR synchronization. Runtime frequency transitions require the joined clock owner; an external clock tree cannot inherit the static proof.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/watchdog.c",
-              "tools/configure/stm32f4/clocks.py",
+              "soc/stm32/stm32f4/bindings/domain_common.json",
               "soc/stm32/stm32f4/power.c"
             ],
             "regressions": [
@@ -1486,7 +1486,7 @@
             "handling": "Master TX requires TXE and BSY clear before disable; receive-only master withdrawal does not rely on BSY. Slave frame ownership uses actual RXNE/NSS or reviewed last-TXE disable sequencing. A peer removing NSS midframe remains an external protocol fault, not a successful completed transfer.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/spi_frames.c",
-              "tools/configure/stm32f4/spi_frames.py",
+              "soc/stm32/stm32f4/bindings/spi_frames.json",
               "docs/design/spi-frame-modes.md"
             ],
             "regressions": [
@@ -1503,7 +1503,7 @@
             "handling": "Each owned frame transaction hardware-resets its selected SPI instance before applying the new role/line configuration, with verified reset ownership. No role transition reuses the residual slave receiver state.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/spi_frames.c",
-              "tools/configure/stm32f4/spi_frames.py",
+              "soc/stm32/stm32f4/bindings/spi_frames.json",
               "docs/design/spi-frame-modes.md"
             ],
             "regressions": [
@@ -1520,7 +1520,7 @@
             "handling": "Both static configuration and C frame admission reject a nonzero even polynomial before effect. The zero value selects CRC disabled rather than an even hardware polynomial.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/spi_frames.c",
-              "tools/configure/stm32f4/spi_frames.py",
+              "soc/stm32/stm32f4/bindings/spi_frames.json",
               "docs/design/spi-frame-modes.md"
             ],
             "regressions": [
@@ -1537,7 +1537,7 @@
             "handling": "SPI/I2S electrical facts select a reviewed fast SCK pad; table5 permits SPI APB up to84 MHz and I2S up to42 MHz at high/very-high speed and30-pF load. Actual capacitance, supply and temperature must satisfy the table or the product must lower APB/increase pad speed. A requested serial bitrate alone does not avoid this issue.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/spi_frames.c",
-              "tools/configure/stm32f4/spi_frames.py",
+              "soc/stm32/stm32f4/bindings/spi_frames.json",
               "docs/design/spi-frame-modes.md"
             ],
             "regressions": []
@@ -1551,7 +1551,7 @@
             "handling": "Slave receive completion uses final RXNE and actual hardware NSS where applicable. Transmit uses the last-TXE early-SPE-disable sequence with the explicit worst-case IRQ budget; no unconditional BSY-based idle proof is used. External SCK/NSS timing remains a required peer contract.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/spi_frames.c",
-              "tools/configure/stm32f4/spi_frames.py",
+              "soc/stm32/stm32f4/bindings/spi_frames.json",
               "docs/design/spi-frame-modes.md"
             ],
             "regressions": [
@@ -1569,7 +1569,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/audio.c",
               "soc/stm32/stm32f4/drivers/audio_blocks.c",
-              "tools/configure/stm32f4/capture_audio.py"
+              "soc/stm32/stm32f4/bindings/capture_audio_policy.json"
             ],
             "regressions": [
               "tests/google/f407_capture_audio_test.cpp",
@@ -1586,7 +1586,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/audio.c",
               "soc/stm32/stm32f4/drivers/audio_blocks.c",
-              "tools/configure/stm32f4/capture_audio.py"
+              "soc/stm32/stm32f4/bindings/capture_audio_policy.json"
             ],
             "regressions": [
               "tests/google/f407_capture_audio_test.cpp",
@@ -2062,7 +2062,7 @@
             "condition": "Debug Sleep/Stop with prefetch disabled and nonzero Flash wait states.",
             "handling": "The reviewed System RUN owner enables FLASH_ACR_PRFTEN and checks it by DSB/readback before the selected clock switch; direct HSI16 uses0 WS and the explicit HSI PLL96 profile uses3 WS. High-profile activation additionally observes PLLRDY then bounded VOSRDY before selecting PLL SYSCLK; failure rolls back without publishing time, retaining responsibility if withdrawal fails. The software profile therefore does not select the prefetch-disabled conjunction; this does not qualify debugger timing or arbitrary external register writes. STOP/Standby for this exact part remains outside the current F407 deep-power slice.",
             "implementation": [
-              "tools/configure/stm32f4/contract.py",
+              "soc/stm32/stm32f4/bindings/headers.json",
               "soc/stm32/stm32f4/system.c"
             ],
             "regressions": [
@@ -2529,7 +2529,7 @@
             "condition": "Debug Sleep/Stop with prefetch disabled and nonzero Flash wait states.",
             "handling": "The reviewed System RUN owner enables FLASH_ACR_PRFTEN and checks it by DSB/readback before the selected clock switch; direct HSI16 uses0 WS and the explicit HSI PLL168 profile uses5 WS. High-profile activation additionally observes PLLRDY then bounded VOSRDY before selecting PLL SYSCLK; failure rolls back without publishing time, retaining responsibility if withdrawal fails. The software profile therefore does not select the prefetch-disabled conjunction; this does not qualify debugger timing or arbitrary external register writes. STOP/Standby for this exact part remains outside the current F407 deep-power slice.",
             "implementation": [
-              "tools/configure/stm32f4/contract.py",
+              "soc/stm32/stm32f4/bindings/headers.json",
               "soc/stm32/stm32f4/system.c"
             ],
             "regressions": [
@@ -2983,7 +2983,7 @@
             "condition": "Debug Sleep/Stop with prefetch disabled and nonzero Flash wait states.",
             "handling": "The reviewed System RUN owner enables FLASH_ACR_PRFTEN and checks it by DSB/readback before the selected clock switch; direct HSI16 uses0 WS and the explicit HSI PLL168 profile uses5 WS. High-profile activation additionally observes PLLRDY then bounded VOSRDY before selecting PLL SYSCLK; failure rolls back without publishing time, retaining responsibility if withdrawal fails. The software profile therefore does not select the prefetch-disabled conjunction; this does not qualify debugger timing or arbitrary external register writes. STOP/Standby for this exact part remains outside the current F407 deep-power slice.",
             "implementation": [
-              "tools/configure/stm32f4/contract.py",
+              "soc/stm32/stm32f4/bindings/headers.json",
               "soc/stm32/stm32f4/system.c"
             ],
             "regressions": [
@@ -3195,7 +3195,7 @@
             "handling": "DS11118 Table11/12 and the exact TFBGA216 bonded pin list select PC0/AF12 as FMC_SDNWE; PA7 is absent from the SDRAM route. No generic AF12 claim overrides the erratum. Software references do not establish PCB wiring or signal integrity.",
             "implementation": [
               "soc/stm32/stm32f4/routes.json",
-              "tools/configure/stm32f4/sdram.py"
+              "soc/stm32/stm32f4/bindings/sdram.json"
             ],
             "regressions": [
               "tools/configure/test_device_view.py"
@@ -3223,7 +3223,7 @@
             "condition": "NAND R/B sampling with MEMSET0 or ATTHOLD0/1 can return wrong data.",
             "handling": "The selected physical endpoint is SDRAM Bank1, row12/column8/16-bit. It grants no NAND bank, NAND timing or NAND transaction path; the exact host and C endpoint geometry reject substitutions.",
             "implementation": [
-              "tools/configure/stm32f4/sdram.py",
+              "soc/stm32/stm32f4/bindings/sdram.json",
               "soc/stm32/stm32f4/drivers/fmc_sdram.c"
             ],
             "regressions": [
@@ -3239,7 +3239,7 @@
             "condition": "Continuous FMC_CLK divided by2 stops on a byte access to a 32-bit asynchronous bank.",
             "handling": "This reviewed route is 16-bit SDRAM on SDCLK, not the asynchronous NOR/PSRAM FMC_CLK path. The endpoint geometry is fixed and no asynchronous bank/continuous-clock mode is selected.",
             "implementation": [
-              "tools/configure/stm32f4/sdram.py",
+              "soc/stm32/stm32f4/bindings/sdram.json",
               "soc/stm32/stm32f4/drivers/fmc_sdram.c"
             ],
             "regressions": [
@@ -3275,7 +3275,7 @@
             "handling": "The selected read profiles are SDR: READ03 one-line or READ6B four-data-line with DDRM verified clear before caller storage reaches HAL. The erratum requires quad DDR at half AHB clock, so that conjunction is excluded. Both profiles still prove abort, FIFO empty and BUSY clear before buffer release; the optional DMA slice transfers program payload only and adds no RX DMA owner.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/qspi.c",
-              "tools/configure/stm32f4/qspi.py"
+              "soc/stm32/stm32f4/bindings/qspi.json"
             ],
             "regressions": [
               "tests/google/stm32_qspi_test.cpp",
@@ -3291,7 +3291,7 @@
             "handling": "The affected indirect-write dummy phase is never selected: status and02h program use one data line and zero dummy cycles. READ6B uses eight dummy cycles in the selected indirect-read or CPU_READ mapping profile; neither adds dummy cycles to program. Exact command CCR readback is required before buffer access; no general register-script command interface is exposed.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/qspi.c",
-              "tools/configure/stm32f4/qspi.py"
+              "soc/stm32/stm32f4/bindings/qspi.json"
             ],
             "regressions": [
               "tests/google/stm32_qspi_test.cpp",
@@ -3307,7 +3307,7 @@
             "handling": "Indirect Flash endpoints admit no memory-mapped access. Their lifetime external aperture prohibition in 2.4.5 also applies during startup, requests, public stop and cold withdrawal; those faces publish no direct Flash pointer. XIP remains excluded for every endpoint. The independent nor-mapped-cpu slice additionally completes all status reads, writes AR=0 and proves ABORT/BUSY/FIFO withdrawal after a preceding indirect read before mapping. No DR access follows before HAL_QSPI_MemoryMapped.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/qspi.c",
-              "tools/configure/stm32f4/qspi.py"
+              "soc/stm32/stm32f4/bindings/qspi.json"
             ],
             "regressions": [
               "tests/google/stm32_qspi_test.cpp",
@@ -3323,7 +3323,7 @@
             "handling": "Indirect Flash endpoints select only indirect transfers and never enable the memory-mapped timeout counter. Its absolute software deadlines govern service/drain; they are not QUADSPI TCEN and do not enable mapped access. The independent CPU_READ mapping slice keeps TCEN and TOIE clear; the final reader joins CPU reads and a same-CPU barrier, then bounded ABORT plus actual FMODE/BUSY/FIFO readback withdraws mapping. Failed withdrawal retains the original owner and loan.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/qspi.c",
-              "tools/configure/stm32f4/qspi.py"
+              "soc/stm32/stm32f4/bindings/qspi.json"
             ],
             "regressions": [
               "tests/google/stm32_qspi_test.cpp",
@@ -3339,7 +3339,7 @@
             "handling": "For indirect Flash endpoints, all accesses to the 0x90000000 QUADSPI aperture are forbidden throughout the provider lifetime, including external CPU code, IRQ handlers, DMA and debug tooling. Those faces publish no mapped pointer and check their own CCR/AR/DLR, but cannot intercept an external bus master. This is an explicit integration precondition, not a runtime sandbox or a modeled silicon proof. Indirect stages continue to forbid every aperture access. Only explicit mapped-storage CPU_READ loans authorize their exact span; integration excludes debugger, DMA and foreign bus masters. Reader tags do not establish hardware isolation.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/qspi.c",
-              "tools/configure/stm32f4/qspi.py"
+              "soc/stm32/stm32f4/bindings/qspi.json"
             ],
             "regressions": [
               "tests/google/stm32_qspi_test.cpp",

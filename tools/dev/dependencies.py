@@ -26,18 +26,15 @@ ROOT = Path(__file__).resolve().parents[2]
 from tools.maintenance.source_catalogue import (
     ALL_SOURCE_DEPENDENCIES, SOURCE_DEPENDENCIES,
 )
-from tools.configure.providers import descriptor
 from tools.maintenance import source_catalogue
 
 MODULES = tuple(dependency.path for dependency in ALL_SOURCE_DEPENDENCIES)
 RUNTIME_MODULES = tuple(dependency.path for dependency in SOURCE_DEPENDENCIES)
-FAMILY_MODULE = {item.family: tuple(path for _, path in item.git_dependencies)
-                 for item in descriptor.families() if item.family != "native"}
 
 
 def required_submodules(scope: str, family: str | None = None,
                         backend: str = "baremetal", *,
-                        components=(), host_support=False) -> tuple[str, ...]:
+                        components=(), host_support=False, root=None) -> tuple[str, ...]:
     """Prepare production choices or the explicit maintained host test graph."""
     if type(host_support) is not bool or (
             host_support and scope not in {"sdk", "candidate"}):
@@ -49,11 +46,18 @@ def required_submodules(scope: str, family: str | None = None,
                      if item.scope in {"runtime", "host-test"})
     if scope not in {"arm", "sdk", "candidate"}:
         raise EvidenceError("unsupported dependency scope")
-    family = "stm32f4" if family is None and scope != "arm" else family
+    root = ROOT if root is None else Path(root)
     try:
+        if family is None and scope != "arm":
+            from tools.configure.metadata import load_policy
+            from tools.configure.packages import load
+            defaults = load_policy(root)["source_sdk"]["default_package_manifests"]
+            if len(defaults) != 1:
+                raise ValueError("Select one explicit dependency family")
+            family = load(root / defaults[0]).family
         return tuple(item.path for item in source_catalogue.runtime_selection(
-            family, backend=backend, components=components))
-    except ValueError as error:
+            family, backend=backend, components=components, root=root))
+    except (OSError, ValueError) as error:
         raise EvidenceError("unsupported dependency scope/family/backend") from error
 
 
@@ -325,7 +329,7 @@ def prepare(root: Path, scope: str, *, family: str | None = None,
             allow_network: bool = False) -> dict:
     root = Path(root).absolute()
     selected = required_submodules(scope, family, backend, components=components,
-                                  host_support=host_support)
+                                  host_support=host_support, root=root)
     closure = _inspect_sources(root, selected, migrating=allow_network)
     if allow_network:
         _available_sources(root, closure)
@@ -416,7 +420,7 @@ def preset_selection(root: Path, preset: str) -> dict:
     else:
         scope = "arm"
     components = list(authored.get("components", ()))
-    required_submodules(scope, family, backend, components=components)
+    required_submodules(scope, family, backend, components=components, root=root)
     return {"components": components, "test_support": test_support,"scope": scope, "family": family, "backend": backend,
             "preset": preset, "assembly": file_identity(path),
             "board": file_identity(board_path)}
@@ -872,7 +876,7 @@ def main(argv=None) -> int:
     child.add_argument("--scope", choices=("native", "arm", "sdk", "candidate",
                                            "preset"), required=True)
     child.add_argument("--preset")
-    child.add_argument("--family", choices=tuple(FAMILY_MODULE))
+    child.add_argument("--family", help="exact family declared by the selected source")
     child.add_argument("--backend", choices=("baremetal", "freertos", "threadx"))
     child.add_argument("--component", action="append", default=[])
     child.add_argument("--host-support", action="store_true")

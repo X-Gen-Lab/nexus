@@ -5,6 +5,7 @@
  */
 #ifndef NX_STM32_ADC_COLD_MODEL_H
 #define NX_STM32_ADC_COLD_MODEL_H
+#include "nexus_config.h"
 #include "stm32_control_cold_model.h"
 /* ADC uses the existing CPU model without the EXTI IRQ fault callbacks. */
 #undef NVIC_SetPriority

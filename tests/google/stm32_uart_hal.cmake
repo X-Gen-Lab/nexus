@@ -21,7 +21,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             "${hal_contract}/atomic_vendor_port.c"
         INCLUDES "${f407_private}" "${NEXUS_SOURCE_DIR}/arch/include"
             "${CMAKE_CURRENT_SOURCE_DIR}")
-    include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+    include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
     foreach(target nexus_stm32_uart_hal_test nexus_stm32_hal_atomic_test)
         target_compile_definitions(${target} PRIVATE STM32F407xx)
         nexus_stm32f407_uart_hal(${target})

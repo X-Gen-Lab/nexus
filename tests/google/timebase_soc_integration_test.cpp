@@ -16,12 +16,12 @@ extern "C" {
 #include "timebase_lowpower.h"
 #include "timebase_soc_model.h"
 nx_stm32_system_t g_nx_stm32_system{};
-#define TIMER_CTRL    TIM2->CR1
-#define TIMER_COUNT   TIM2->CNT
-#define TIMER_FLAGS   TIM2->SR
-#define TIMER_ENABLE  TIM2->DIER
-#define TIMER_IRQ     TIM2_IRQn
-#define TIMER_HANDLER TIM2_IRQHandler
+#define TIMER_CTRL    NEXUS_STM32_TIMEBASE_TIMER->CR1
+#define TIMER_COUNT   NEXUS_STM32_TIMEBASE_TIMER->CNT
+#define TIMER_FLAGS   NEXUS_STM32_TIMEBASE_TIMER->SR
+#define TIMER_ENABLE  NEXUS_STM32_TIMEBASE_TIMER->DIER
+#define TIMER_IRQ     NEXUS_STM32_TIMEBASE_IRQ
+#define TIMER_HANDLER NEXUS_STM32_TIMEBASE_HANDLER
 nx_timebase_model_systick_t g_timebase_model_systick{};
 NVIC_Type g_timebase_model_nvic{};
 SCB_Type g_timebase_model_scb{};
@@ -63,7 +63,7 @@ class TimebaseIntegration : public testing::Test {
         g_nx_stm32_system.rcc = RCC;
         g_nx_stm32_system.flash = FLASH;
         g_nx_stm32_system.power = PWR;
-        g_nx_stm32_system.timer = TIM2;
+        g_nx_stm32_system.timer = NEXUS_STM32_TIMEBASE_TIMER;
         g_nx_stm32_system.started = true;
         g_nx_stm32_system.core_hz = 168000000U;
         RCC->CFGR = RCC_CFGR_SW_PLL | RCC_CFGR_SWS_PLL | RCC_CFGR_PPRE1_DIV4 |
@@ -71,10 +71,10 @@ class TimebaseIntegration : public testing::Test {
         RCC->PLLCFGR = 8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U);
         RCC->CR = RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON | RCC_CR_PLLRDY;
         FLASH->ACR = FLASH_ACR_LATENCY_5WS;
-        RCC->APB1ENR = RCC_APB1ENR_TIM2EN;
-        RCC->APB1LPENR = RCC_APB1LPENR_TIM2LPEN;
-        TIM2->PSC = 83U;
-        TIM2->ARR = UINT32_MAX;
+        RCC->APB1ENR = NEXUS_STM32_TIMEBASE_GATE;
+        RCC->APB1LPENR = NEXUS_STM32_TIMEBASE_GATE;
+        NEXUS_STM32_TIMEBASE_TIMER->PSC = 83U;
+        NEXUS_STM32_TIMEBASE_TIMER->ARR = UINT32_MAX;
         TIMER_ENABLE = 1U;
         TIMER_CTRL = 1U;
         nx_timebase_model_enable_irq(TIMER_IRQ);
@@ -112,7 +112,7 @@ class TimebaseIntegration : public testing::Test {
 };
 
 TEST_F(TimebaseIntegration, VectorDispatchesCompareAfterMonotonicOverflow) {
-    PauseAndArm();
+    ASSERT_NO_FATAL_FAILURE(PauseAndArm());
     TIMER_FLAGS = 3U;
     TIMER_HANDLER();
     EXPECT_EQ(TIMER_FLAGS & 3U, 0U);
@@ -136,7 +136,7 @@ TEST_F(TimebaseIntegration, TickExitCompletesTheRealKernelTickDispatch) {
     EXPECT_EQ(ticks, ticks_at_barrier);
 }
 TEST_F(TimebaseIntegration, FreshCompareBetweenFlagReadAndAckStillWakes) {
-    PauseAndArm();
+    ASSERT_NO_FATAL_FAILURE(PauseAndArm());
     TIMER_FLAGS = 1U;
     inject_compare = true;
     TIMER_HANDLER();

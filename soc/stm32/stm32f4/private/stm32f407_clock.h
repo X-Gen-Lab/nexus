@@ -17,7 +17,7 @@
 /* Maintained host models and the original exact SDK compile fixtures use the
  * reviewed default. Firmware generated from custom inputs always supplies the
  * complete calculated tuple; an incomplete foreign profile is not adopted. */
-#ifndef NEXUS_CLOCK_PLLCFGR
+#ifndef NEXUS_CLOCK_PLLM
 #if !defined(NEXUS_CMSIS_HOST_MODEL) && !defined(NEXUS_STM32_MODEL) &&         \
     !defined(NEXUS_BACKEND_NATIVE) && !defined(NEXUS_TEST_F4_CORE_CM4_H) &&    \
     (!defined(NEXUS_CORE_HZ) || NEXUS_CORE_HZ != 168000000U)
@@ -39,9 +39,10 @@
 #define NEXUS_CLOCK_PLLN        336U
 #define NEXUS_CLOCK_PLLP        2U
 #define NEXUS_CLOCK_PLLQ        7U
-#define NEXUS_CLOCK_PLLCFGR     0x07405408U
-#define NEXUS_CLOCK_CFGR        0x00009400U
 #define NEXUS_CLOCK_AHB_DIV     1U
+#define NEXUS_CLOCK_APB1_DIV    4U
+#define NEXUS_CLOCK_APB2_DIV    2U
+#define NEXUS_CLOCK_SYSCLK_PLL  1U
 #define NEXUS_CLOCK_ADC_DIV     4U
 #define NEXUS_CLOCK_CSS         0U
 #define NEXUS_FLASH_WAIT_STATES 5U
@@ -50,8 +51,38 @@
 #ifndef NEXUS_CLOCK_SOURCE_HSE
 #define NEXUS_CLOCK_SOURCE_HSE 0U
 #endif
+#include "stm32f4_clock_encoding.h"
+
+#ifndef NEXUS_CLOCK_PLLCFGR
+#define NEXUS_CLOCK_PLLCFGR                                                    \
+    NX_STM32F4_PLLCFGR(NEXUS_CLOCK_PLLM, NEXUS_CLOCK_PLLN, NEXUS_CLOCK_PLLP,   \
+                       NEXUS_CLOCK_PLLQ, NEXUS_CLOCK_SOURCE_HSE)
+#endif
+#ifndef NEXUS_CLOCK_CFGR
+#if (NEXUS_CLOCK_AHB_DIV != 1U && NEXUS_CLOCK_AHB_DIV != 2U &&                 \
+     NEXUS_CLOCK_AHB_DIV != 4U && NEXUS_CLOCK_AHB_DIV != 8U &&                 \
+     NEXUS_CLOCK_AHB_DIV != 16U && NEXUS_CLOCK_AHB_DIV != 64U &&               \
+     NEXUS_CLOCK_AHB_DIV != 128U && NEXUS_CLOCK_AHB_DIV != 256U &&             \
+     NEXUS_CLOCK_AHB_DIV != 512U) ||                                           \
+    (NEXUS_CLOCK_APB1_DIV != 1U && NEXUS_CLOCK_APB1_DIV != 2U &&               \
+     NEXUS_CLOCK_APB1_DIV != 4U && NEXUS_CLOCK_APB1_DIV != 8U &&               \
+     NEXUS_CLOCK_APB1_DIV != 16U) ||                                           \
+    (NEXUS_CLOCK_APB2_DIV != 1U && NEXUS_CLOCK_APB2_DIV != 2U &&               \
+     NEXUS_CLOCK_APB2_DIV != 4U && NEXUS_CLOCK_APB2_DIV != 8U &&               \
+     NEXUS_CLOCK_APB2_DIV != 16U)
+#error "F4 clock requires explicit legal AHB and APB divider values"
+#endif
+#define NEXUS_CLOCK_CFGR                                                       \
+    NX_STM32F4_CLOCK_CFGR(NEXUS_CLOCK_AHB_DIV, NEXUS_CLOCK_APB1_DIV,           \
+                          NEXUS_CLOCK_APB2_DIV)
+#endif
 #ifndef NEXUS_CLOCK_SW
+#if defined(NEXUS_CLOCK_SYSCLK_PLL)
+#define NEXUS_CLOCK_SW                                                         \
+    NX_STM32F4_CLOCK_SWITCH(NEXUS_CLOCK_SYSCLK_PLL, NEXUS_CLOCK_SOURCE_HSE)
+#else
 #define NEXUS_CLOCK_SW 2U
+#endif
 #endif
 #ifndef NEXUS_CLOCK_PLL_ENABLED
 #define NEXUS_CLOCK_PLL_ENABLED 1U

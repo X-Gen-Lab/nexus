@@ -1,36 +1,33 @@
-// FIG-10 current: source-backed, scoped engineering view.
-// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
-// Relations and qualification limits are documented in README.md.
+// Current scoped view. Build-time arrows and runtime calls are labeled explicitly.
+// Code basis: cmake/package/package_source_sdk.py; cmake/platform/SDK.cmake; tools/dev/projects.py; cmake/package/verify_consumers.py
 digraph SourceSdkConsumer {
-    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
-           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
-           labelloc=t];
-    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
-          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
-          fontsize=13, margin="0.18,0.12"];
-    edge [color="#475569", fontcolor="#0f172a",
-          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
-
-    graph [label="FIG-10 Independent Source SDK consumers\nrelocate full prefix; Native run != ARM link"];
-    source [label="clean Git source / locked deps / licenses\ndevelopment fixtures require explicit opt-in", fillcolor="#f8fafc"];
-    package [label="package_source_sdk.prepare / verify\nComplete installed prefix / manifest / required-file closure"];
-    move [label="Relocate the complete prefix to an independent root\nNot only share/nexus/src"];
-    consumer [label="find_package(Nexus EXACT CONFIG REQUIRED)\nindependent consumer source / build\nexternal NEXUS_ASSEMBLY_FILE"];
-    verify [label="SDK.cmake / resolver boundary verification\nActual file hashes / source / dependencies / closure"];
-    target [label="nexus_add_firmware()\npublic Nexus targets, no vendor header leaks"];
-    native [label="Native consumer\nactual Native configure / build / run\nexit codes and production contracts", fillcolor="#f0fdf4"];
-    arm [label="ARM consumer\nActual startup / system / linker + ELF / BIN / map\nSelected modes / resources / kernel linkage", fillcolor="#f0fdf4"];
-    reject [label="Stale identity / changed bytes / missing closure / wrong prefix\nReject generation or compilation; never reuse a stale package", fillcolor="#fff7ed"];
-    reports [label="verify_consumers report + raw logs + same-artifact identity\nARM linking is not physical execution", fillcolor="#fefce8"];
-    source -> package [label="actual packaging"];
-    package -> move [label="complete package"];
-    move -> consumer [label="independent installation consumer"];
-    consumer -> verify [label="load public entry"];
-    verify -> target [label="validated"];
-    verify -> reject [label="failure"];
-    target -> native [label="Native assembly"];
-    target -> arm [label="exact MCU assembly"];
-    native -> reports [label="executed results"];
-    arm -> reports [label="executed results"];
-    { rank=same; native; arm; }
+    graph [label="FIG-10 Independent Source SDK consumption\nBuild-time flow; Native execution and ARM linking are separate", rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.52, fontname="Noto Sans CJK SC", fontsize=15, labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    source [label="Clean Git source / locked dependencies / licenses\nDevelopment fixtures require explicit selection", fillcolor="#f8fafc"];
+    scope [label="Selected profile.packages and package export ownership\nOne ELF does not define the complete SDK"];
+    package [label="Package a complete prefix; verify identity/bytes read-only\nManifest schema3: source_exports / profile"];
+    move [label="Relocate the complete prefix\nDo not move only its source subtree"];
+    creator [label="Optional create --public\nCopy canonical GPIO project and explicit assembly"];
+    consumer [label="External consumer source and separate build\nfind_package(Nexus CONFIG REQUIRED)\nOptional NEXUS_EXPECTED_SOURCE_REVISION"];
+    verify [label="Verify SDK identity and bytes at every public boundary\nSource / locks / member scope / hashes"];
+    target [label="nexus_add_firmware() and package CMake\nSole compile target graph; private SDK headers stay private"];
+    native [label="Explicit host-support consumer\nActual configure / build / run", fillcolor="#f0fdf4"];
+    arm [label="Exact MCU consumer\nStartup / linker / ELF / BIN / map / resources", fillcolor="#f0fdf4"];
+    reject [label="Stale identity, changed bytes, missing members or wrong prefix\nReject without reusing stale output", fillcolor="#fff7ed"];
+    reports [label="Actual consumer records and artifact identities\nNo physical HIL or software-candidate qualification", fillcolor="#fefce8"];
+    source -> scope [label="Select packages and dependencies"];
+    source -> package [label="Frozen source inputs"];
+    scope -> package [label="Export ownership, not a compile source graph"];
+    package -> move [label="Complete package"];
+    move -> creator [label="Create a public starter"];
+    creator -> consumer [label="Reviewable source and commands"];
+    move -> consumer [label="Existing external project consumes directly"];
+    consumer -> verify [label="Load public entry"];
+    verify -> target [label="Identity and boundaries accepted"];
+    verify -> reject [label="Verification failed"];
+    target -> native [label="Host support explicitly selected"];
+    target -> arm [label="Selected MCU assembly"];
+    native -> reports [label="Actual execution results"];
+    arm -> reports [label="Actual link and resource results"];
 }

@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from tools.configure.ir import VendorDeviceIR
-from tools.configure.providers.common import fail
+from tools.configure.providers.common import fail, irq_resource_bindings
 from tools.configure.records import freeze
 
 
@@ -84,8 +84,13 @@ def controller_profiles(soc):
     used = set()
     for device, profile in profiles.items():
         if (not isinstance(profile, dict) or
-                set(profile) != {"controller_groups", "clock_policy"}):
+                not {"controller_groups", "clock_policy"}.issubset(profile) or
+                set(profile) - {"controller_groups", "clock_policy", "part_prefix"}):
             fail("Device profile requires explicit controller groups and clock policy")
+        if "part_prefix" in profile and (
+                not isinstance(profile["part_prefix"], str) or
+                not profile["part_prefix"]):
+            fail("Device profile requires an explicit part prefix")
         if not isinstance(profile["clock_policy"], str) or not profile["clock_policy"]:
             fail("Device profile requires a named clock policy")
         names = profile["controller_groups"]
@@ -109,14 +114,15 @@ def validate_controller_irqs(controllers, bindings):
     """Runtime controllers cannot inherit absent or differently numbered IRQs."""
     if not bindings:
         fail("Runtime device requires reviewed IRQ bindings beyond SDK inventory")
+    from tools.configure.resource_graph import normalize_resource
+    resources = irq_resource_bindings(bindings)
     for controller in controllers.values():
         names = controller["irq"]
         if (not isinstance(names, list) or
                 any(not isinstance(name, str) for name in names)):
             fail("Controller IRQ identities require a list of enum names")
-        enums = [name if name.endswith("_IRQn") else name + "_IRQn"
-                 for name in names]
-        if len(set(enums)) != len(enums) or any(name not in bindings for name in enums):
+        enums = [normalize_resource("irq:" + name)[4:] for name in names]
+        if len(set(enums)) != len(enums) or any(name not in resources for name in enums):
             fail("Controller IRQ is absent from the selected device SDK")
         numbers = controller.get("irq_numbers")
         if numbers is None:
@@ -125,7 +131,7 @@ def validate_controller_irqs(controllers, bindings):
             if (len(numbers) != len(enums) or
                     any(not isinstance(key, str) for key in numbers)):
                 fail("Controller IRQ numbers require enum names")
-            actual = {key if key.endswith("_IRQn") else key + "_IRQn": value
+            actual = {normalize_resource("irq:" + key)[4:]: value
                       for key, value in numbers.items()}
         elif isinstance(numbers, list) and len(numbers) == len(enums):
             actual = dict(zip(enums, numbers))
@@ -133,7 +139,7 @@ def validate_controller_irqs(controllers, bindings):
             fail("Controller IRQ numbers require exact selected device slots")
         if (len(actual) != len(enums) or
                 any(type(value) is not int for value in actual.values()) or
-                actual != {name: bindings[name].number for name in enums}):
+                actual != {name: resources[name].number for name in enums}):
             fail("Controller IRQ numbers differ from the selected device SDK")
 
 

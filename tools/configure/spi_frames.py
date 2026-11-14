@@ -1,15 +1,42 @@
-"""Explicit F407 SPI frames, IRQ timing budgets and exact ordered pads."""
+"""Serial frame roles and IRQ budgets over declared controller capabilities."""
 from types import MappingProxyType
 from tools.configure.providers.common import fail, integer
 
-PADS = MappingProxyType({
-    "SPI1": ("PA5", "PA6", "PA7", "PA4", 5),
-    "SPI2": ("PB13", "PB14", "PB15", "PB12", 5),
-    "SPI3": ("PC10", "PC11", "PC12", "PA15", 6),
-})
 DEFAULTS = MappingProxyType(dict(format="motorola", mode=0, lsb_first=False,
                                  crc_polynomial=0))
 REQUIRED = frozenset(("role", "lines", "word_bits", "irq_latency_us"))
+
+
+def validate_policy(value):
+    """Admit finite frame capabilities without owning physical pin routes."""
+    from collections.abc import Mapping
+    from tools.configure.calls import Symbol
+    if (not isinstance(value, Mapping) or set(value) != {
+            "controllers", "word_bits", "crc_odd_required", "crc_one_wire"}):
+        fail("SPI frame policy requires exact controller and format facts")
+    controllers = value["controllers"]
+    if (not isinstance(controllers, (tuple, list)) or not controllers or
+            any(not isinstance(item, str) for item in controllers) or
+            len(set(controllers)) != len(controllers)):
+        fail("SPI frame policy requires distinct controller names")
+    for controller in controllers:
+        Symbol(controller)
+    words = value["word_bits"]
+    if (not isinstance(words, (tuple, list)) or not words or
+            any(type(item) is not int or item not in (8, 16) for item in words) or
+            len(set(words)) != len(words)):
+        fail("SPI frame word formats require reviewed 8/16-bit values")
+    for field in ("crc_odd_required", "crc_one_wire"):
+        if type(value[field]) is not bool:
+            fail("SPI frame CRC capability requires boolean facts")
+
+
+def _policy(provider, controller):
+    selected = getattr(provider, "SELECTION", None)
+    facts = selected.data.get("serial_modes", {}).get("spi_frames") if selected else None
+    if facts is None or controller not in facts["controllers"]:
+        fail("SPI frame controller has no reviewed format policy")
+    return facts
 
 
 def validate(selection, route, provider):
@@ -18,11 +45,11 @@ def validate(selection, route, provider):
         if "frames" in selection:
             fail("SPI frames require the explicit irq-frames mode")
         return
+    policy = _policy(provider, route["controller"])
     options = selection.get("frames")
-    if (provider.PREFIX != "stm32" or route["controller"] not in PADS or
-            not isinstance(options, dict) or REQUIRED - options.keys() or
+    if (not isinstance(options, dict) or REQUIRED - options.keys() or
             options.keys() - REQUIRED - DEFAULTS.keys() - {"dummy"}):
-        fail("SPI irq-frames requires its complete reviewed F407 tuple")
+        fail("SPI irq-frames requires its complete reviewed format tuple")
     options = {**DEFAULTS, **options}
     if options["role"] not in ("master", "slave"):
         fail("SPI frames role must be master or slave")
@@ -30,7 +57,7 @@ def validate(selection, route, provider):
         fail("SPI frames lines must be two-line/receive-only/one-wire")
     if options["format"] not in ("motorola", "ti"):
         fail("SPI frames format must be motorola or ti")
-    if options["word_bits"] not in (8, 16) or type(options["word_bits"]) is not int:
+    if options["word_bits"] not in policy["word_bits"] or type(options["word_bits"]) is not int:
         fail("SPI frames word_bits must be 8 or 16")
     limit = (1 << options["word_bits"]) - 1
     options.setdefault("dummy", limit)
@@ -38,9 +65,11 @@ def validate(selection, route, provider):
     integer(options["mode"], 0, 3, "SPI clock mode")
     integer(options["irq_latency_us"], 1, 1000000, "SPI IRQ latency budget")
     integer(options["crc_polynomial"], 0, limit, "SPI CRC polynomial")
-    if options["crc_polynomial"] and options["crc_polynomial"] % 2 == 0:
-        fail("ES0182 2.12.3 requires an odd SPI CRC polynomial")
-    if options["crc_polynomial"] and options["lines"] == "one-wire":
+    if (policy["crc_odd_required"] and options["crc_polynomial"] and
+            options["crc_polynomial"] % 2 == 0):
+        fail("Selected SPI CRC policy requires an odd polynomial")
+    if (not policy["crc_one_wire"] and options["crc_polynomial"] and
+            options["lines"] == "one-wire"):
         fail("This one-wire owner has no CRC sequence contract")
     if type(options["lsb_first"]) is not bool:
         fail("SPI lsb_first must be boolean")
@@ -48,28 +77,29 @@ def validate(selection, route, provider):
         fail("TI frame sync derives its clock phase and MSB-first format")
     if "irq_priority" not in selection or selection.get("calls_os", False):
         fail("SPI frames requires an explicit IRQ priority and no OS calls")
-    sck, miso, mosi, nss, af = PADS[route["controller"]]
-    pins = [(sck, "sck")]
+    roles = ["sck"]
     if options["lines"] == "two-line":
-        pins += [(miso, "miso"), (mosi, "mosi")]
+        roles += ["miso", "mosi"]
     else:
         input_pad = (options["role"] == "master" if
                      options["lines"] == "receive-only" else
                      options["role"] == "slave")
-        pins.append((miso, "miso") if input_pad else (mosi, "mosi"))
-    pins.append((nss, "nss"))
-    if tuple((p["pin"], p["function"], p["af"]) for p in route["pins"]) != tuple(
-            (pin, function, af) for pin, function in pins):
-        fail("SPI frames requires its exact SCK/data/NSS pad tuple")
+        roles.append("miso" if input_pad else "mosi")
+    roles.append("nss")
+    pins = route["pins"]
+    if (tuple(pin["function"] for pin in pins) != tuple(roles) or
+            len({pin["pin"] for pin in pins}) != len(pins)):
+        fail("SPI frames requires its exact ordered SCK/data/NSS roles")
     selection["frames"] = options
 
 
-def validate_clock(selection, route, clock):
+def validate_clock(selection, route, clock, provider):
     """Bound both one-frame IRQ work and the RM0090 receive-disable window."""
     if selection["mode"] != "irq-frames":
         return
     options = selection["frames"]
-    frequency = clock["apb2_hz" if route["controller"] == "SPI1" else "apb1_hz"]
+    from tools.configure.clocks import controller_frequency
+    frequency = controller_frequency(clock, route["controller"], provider)
     maximum = selection.get("max_hz", 1000000)
     if maximum > frequency // 2:
         fail("SPI maximum clock exceeds the actual APB divide-by-two range")

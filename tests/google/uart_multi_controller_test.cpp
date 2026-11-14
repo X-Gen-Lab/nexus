@@ -77,11 +77,11 @@ class UARTMultiple : public testing::Test {
             states[i].uart.rx_storage = rings[i];
             states[i].uart.rx_capacity = sizeof(rings[i]);
             states[i].uart.irq = i == 0U ? UIRQ0 : UIRQ1;
-            resources[i].dma = i == 0U ? DMA2 : DMA1;
-            states[i].transmit.tx = i == 0U ? DMA2_Stream7 : DMA1_Stream6;
-            states[i].transmit.stream = i == 0U ? 7U : 6U;
-            states[i].transmit.channel = 4U;
-            states[i].transmit.dma_irq = i == 0U ? TXIRQ0 : TXIRQ1;
+            resources[i].transmit =
+                i == 0U ? nx_stm32_dma_route_t{DMA2, DMA2_Stream7,
+                                               DMA2_Stream7_IRQn, 7U, 4U}
+                        : nx_stm32_dma_route_t{DMA1, DMA1_Stream6,
+                                               DMA1_Stream6_IRQn, 6U, 4U};
             nx_request_initialize(&requests[i].base);
             ASSERT_EQ(nx_uart_tx_prepare(&requests[i], payload[i],
                                          sizeof(payload[i]), 1000000U),
@@ -119,6 +119,29 @@ class UARTMultiple : public testing::Test {
                 (1U << ((unsigned)irq % 32U))) != 0U;
     }
 };
+
+TEST_F(UARTMultiple, AlternateTxRouteUsesSelectedChannelPublisherAndWire) {
+    uarts[1] = USART6;
+    states[1].uart.registers = USART6;
+    states[1].uart.irq = USART6_IRQn;
+    resources[1].transmit = {DMA2, DMA2_Stream7, DMA2_Stream7_IRQn, 7U, 5U};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_dma_initialize(&states[1], 84000000U));
+    EXPECT_TRUE(Enabled(DMA2_Stream7_IRQn));
+    EXPECT_FALSE(Enabled(DMA2_Stream6_IRQn));
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&ports[1], &requests[1]));
+    EXPECT_EQ(5U << DMA_SxCR_CHSEL_Pos, DMA2_Stream7->CR & DMA_SxCR_CHSEL);
+    DMA2_Stream7->NDTR = 0U;
+    DMA2->HISR = 0x20U << 22U;
+    DMA_IRQ(&states[1]);
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&requests[1].base));
+    STATUS(1U) = TC;
+    UART_IRQ(&states[1]);
+    nx_uart_port_service(&ports[1]);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&requests[1].base));
+    EXPECT_EQ(NX_SUCCESS, requests[1].base.result);
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_stop(&ports[1]));
+    EXPECT_FALSE(Enabled(DMA2_Stream7_IRQn));
+}
 
 TEST_F(UARTMultiple, SecondaryColdInitPreservesPrimaryRegistersAndIrqs) {
     ASSERT_EQ(Initialize(0U), NX_SUCCESS);
@@ -262,9 +285,9 @@ TEST_F(UARTMultiple, IdleForeignPublisherRejectsBeforeClockOrFlagMutation) {
     EXPECT_TRUE(Enabled(TXIRQ1));
 }
 TEST_F(UARTMultiple, SecondaryCannotAcquireForeignColdControllerFacts) {
-    states[1].transmit.tx = DMA2_Stream7;
+    resources[1].transmit.stream = DMA2_Stream7;
     EXPECT_EQ(Initialize(1U), NX_ERROR_UNSUPPORTED);
-    states[1].transmit.tx = DMA1_Stream6;
+    resources[1].transmit.stream = DMA1_Stream6;
     EXPECT_EQ(nx_stm32_uart_dma_initialize(&states[1], 84000000U),
               NX_ERROR_UNSUPPORTED);
     EXPECT_FALSE(states[1].uart.initialized);

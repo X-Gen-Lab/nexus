@@ -1,0 +1,27 @@
+# Software-only alternate silicon route; no PCB wiring is implied.
+schema = 2
+board_package = "alternate-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0
+
+[uart.serial2]
+binding = "serial2"
+mode = "irq"
+baud = 115200
+
+[uart.serial2.rx]
+format = "bytes"
+capacity = 32
+
+[uart.serial2.irq]
+priority = 5
+
+[factory]
+capabilities = true

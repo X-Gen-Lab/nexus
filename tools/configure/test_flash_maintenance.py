@@ -40,8 +40,15 @@ class FlashMaintenanceConfigurationTests(unittest.TestCase):
         self.assertIn("nx_factory_flash_maintenance", header)
         self.assertIn("return &s_nx_flash_maintenance_physical", source)
         emitted = bindings.emit(result)[1]
-        self.assertIn("&nx_stm32_flash_maintenance_ops, &s_nx_port_physical",
-                      emitted)
+        from tools.configure.calls import Address
+        from tools.configure.providers import for_selection
+        construction = for_selection(result).constructor(
+            item, result, result.board_bindings, result.routes, result.devices)
+        face = next(declaration for declaration in construction.static_declarations
+                    if declaration.name == "s_nx_flash_maintenance_physical")
+        self.assertEqual(dict(face.initializer.fields), {
+            "ops": Address("nx_stm32_flash_maintenance_ops"),
+            "context": Address("s_nx_port_physical")})
         self.assertNotIn("nx_flash_maintenance_set_options(", emitted)
         self.assertNotIn("nx_flash_maintenance_otp_program(", emitted)
 

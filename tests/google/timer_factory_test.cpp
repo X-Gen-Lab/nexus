@@ -292,12 +292,14 @@ class TimerFactory : public testing::Test {
         RCC->CFGR = RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
         NVIC->IPR[30] = 0x20U;
         NVIC->IPR[24] = 0x30U;
+#if !defined(NX_TIMER_DIRECT_REFERENCE)
         cap = nx_factory_timer_capture(NX_TIMER_CAPTURE_ID_ENCODER);
         power = nx_factory_advanced_pwm(NX_ADVANCED_PWM_ID_POWER);
         ASSERT_NE(cap, nullptr);
         ASSERT_NE(power, nullptr);
         capture = static_cast<nx_timer_capture_controller_t*>(cap->context);
         advanced = static_cast<nx_advanced_pwm_controller_t*>(power->context);
+#endif
     }
     void TearDown() override {
         s_refused = nullptr;
@@ -306,12 +308,14 @@ class TimerFactory : public testing::Test {
         s_restore_refused = s_gpio_restore_refused = false;
         s_output_withdraw_refused = false;
         NVIC->IABR[0] = 0U;
+#if !defined(NX_TIMER_DIRECT_REFERENCE)
         if (capture->count != 0U) {
             nx_timer_capture_event_t event{};
             while (nx_timer_capture_read(cap, &event) == NX_SUCCESS) {
             }
         }
         EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+#endif
         EXPECT_EQ(munmap(mapping, 0x30000), 0);
         s_ports = nullptr;
     }
@@ -329,6 +333,7 @@ class TimerFactory : public testing::Test {
     }
 };
 
+#if !defined(NX_TIMER_DIRECT_REFERENCE)
 TEST_F(TimerFactory, BasePreflightRejectsBeforeClockPinAndControllerEffects) {
     const auto* bytes = static_cast<const uint8_t*>(mapping);
     const std::vector<uint8_t> before(bytes, bytes + 0x30000U);
@@ -354,7 +359,10 @@ TEST_F(TimerFactory, LookupIsPureBeforeAnyClockOrPinEffects) {
     EXPECT_EQ(nx_factory_advanced_pwm(NX_ADVANCED_PWM_ID_COUNT), nullptr);
 }
 
-TEST_F(TimerFactory, CaptureColdFourthChannelOwnsPb9AndRestoresOnlyThatPad) {
+#else
+using TimerDirect = TimerFactory;
+
+TEST_F(TimerDirect, CaptureColdFourthChannelOwnsPb9AndRestoresOnlyThatPad) {
     nx_timer_capture_controller_t local{};
     TimerCold cold{};
     uint16_t snapshot{};
@@ -373,7 +381,7 @@ TEST_F(TimerFactory, CaptureColdFourthChannelOwnsPb9AndRestoresOnlyThatPad) {
     EXPECT_EQ(nullptr, cold.configuration);
 }
 
-TEST_F(TimerFactory, CaptureColdRejectsAnotherControllerBeforeAnyEffects) {
+TEST_F(TimerDirect, CaptureColdRejectsAnotherControllerBeforeAnyEffects) {
     nx_timer_capture_controller_t local{};
     TimerCold cold{};
     uint16_t snapshot{};
@@ -388,7 +396,7 @@ TEST_F(TimerFactory, CaptureColdRejectsAnotherControllerBeforeAnyEffects) {
     EXPECT_EQ(nullptr, cold.configuration);
 }
 
-TEST_F(TimerFactory, CaptureColdCloseCannotUseAnotherControllersWrapper) {
+TEST_F(TimerDirect, CaptureColdCloseCannotUseAnotherControllersWrapper) {
     nx_timer_capture_controller_t local{};
     TimerCold cold{};
     uint16_t snapshot{};
@@ -407,8 +415,7 @@ TEST_F(TimerFactory, CaptureColdCloseCannotUseAnotherControllersWrapper) {
     ASSERT_EQ(NX_SUCCESS, CaptureColdClose(&local, &cold, &config));
 }
 
-TEST_F(TimerFactory,
-       CaptureColdIdentitySurvivesHotReleaseAndRefusedPadRestore) {
+TEST_F(TimerDirect, CaptureColdIdentitySurvivesHotReleaseAndRefusedPadRestore) {
     nx_timer_capture_controller_t local{};
     TimerCold cold{};
     uint16_t snapshot{};
@@ -437,7 +444,7 @@ TEST_F(TimerFactory,
     EXPECT_EQ(nullptr, cold.configuration);
 }
 
-TEST_F(TimerFactory, CaptureColdControllersOwnActualPadsAndBankedVectors) {
+TEST_F(TimerDirect, CaptureColdControllersOwnActualPadsAndBankedVectors) {
     for (TIM_TypeDef* timer : {TIM3, TIM5}) {
         nx_timer_capture_controller_t local{};
         TimerCold cold{};
@@ -469,7 +476,7 @@ TEST_F(TimerFactory, CaptureColdControllersOwnActualPadsAndBankedVectors) {
     }
 }
 
-TEST_F(TimerFactory, AdvancedColdThirdPairsOwnSelectedOutputsAndCommonBreak) {
+TEST_F(TimerDirect, AdvancedColdThirdPairsOwnSelectedOutputsAndCommonBreak) {
     for (TIM_TypeDef* timer : {TIM1, TIM8}) {
         nx_advanced_pwm_controller_t local{};
         TimerCold cold{};
@@ -503,7 +510,7 @@ TEST_F(TimerFactory, AdvancedColdThirdPairsOwnSelectedOutputsAndCommonBreak) {
     }
 }
 
-TEST_F(TimerFactory, Tim8ColdRouteOwnsPc6Pa7Pa6AndItsActualSharedVector) {
+TEST_F(TimerDirect, Tim8ColdRouteOwnsPc6Pa7Pa6AndItsActualSharedVector) {
     nx_advanced_pwm_controller_t second{};
     TimerCold cold{};
     uint16_t snapshots[3]{};
@@ -537,7 +544,7 @@ TEST_F(TimerFactory, Tim8ColdRouteOwnsPc6Pa7Pa6AndItsActualSharedVector) {
     EXPECT_EQ(0U, GPIOC->MODER | GPIOA->MODER);
 }
 
-TEST_F(TimerFactory, Tim8ColdAdmissionRejectsPoweredTim12BeforeAnyEffect) {
+TEST_F(TimerDirect, Tim8ColdAdmissionRejectsPoweredTim12BeforeAnyEffect) {
     nx_advanced_pwm_controller_t second{};
     TimerCold cold{};
     uint16_t snapshots[3]{};
@@ -554,7 +561,7 @@ TEST_F(TimerFactory, Tim8ColdAdmissionRejectsPoweredTim12BeforeAnyEffect) {
     EXPECT_EQ(0U, cold.pin_leases);
 }
 
-TEST_F(TimerFactory, ColdCloseCannotCrossTimerIdentity) {
+TEST_F(TimerDirect, ColdCloseCannotCrossTimerIdentity) {
     nx_advanced_pwm_controller_t second{};
     TimerCold cold{};
     uint16_t snapshots[3]{};
@@ -572,7 +579,7 @@ TEST_F(TimerFactory, ColdCloseCannotCrossTimerIdentity) {
               nx_stm32_tim8_advanced_cold_close(&second, &cold, &config));
 }
 
-TEST_F(TimerFactory, ColdCloseRequiresTheExactRetainedConfiguration) {
+TEST_F(TimerDirect, ColdCloseRequiresTheExactRetainedConfiguration) {
     nx_advanced_pwm_controller_t second{};
     TimerCold cold{};
     uint16_t snapshots[3]{};
@@ -589,7 +596,7 @@ TEST_F(TimerFactory, ColdCloseRequiresTheExactRetainedConfiguration) {
               nx_stm32_tim8_advanced_cold_close(&second, &cold, &config));
 }
 
-TEST_F(TimerFactory, ColdConfigurationIdentitySurvivesFailedPadRollback) {
+TEST_F(TimerDirect, ColdConfigurationIdentitySurvivesFailedPadRollback) {
     nx_advanced_pwm_controller_t second{};
     TimerCold cold{};
     uint16_t snapshots[3]{};
@@ -611,7 +618,7 @@ TEST_F(TimerFactory, ColdConfigurationIdentitySurvivesFailedPadRollback) {
               nx_stm32_tim8_advanced_cold_close(&second, &cold, &config));
 }
 
-TEST_F(TimerFactory, PreownedTimerGateIsNeverAdoptedByColdPreparation) {
+TEST_F(TimerDirect, PreownedTimerGateIsNeverAdoptedByColdPreparation) {
     nx_advanced_pwm_controller_t second{};
     TimerCold cold{};
     uint16_t snapshots[3]{};
@@ -627,7 +634,7 @@ TEST_F(TimerFactory, PreownedTimerGateIsNeverAdoptedByColdPreparation) {
     EXPECT_EQ(RCC_APB2ENR_TIM8EN, RCC->APB2ENR);
 }
 
-TEST_F(TimerFactory, PartialPreparationStillRejectsAnotherTimersClose) {
+TEST_F(TimerDirect, PartialPreparationStillRejectsAnotherTimersClose) {
     nx_advanced_pwm_controller_t second{};
     TimerCold cold{};
     uint16_t snapshots[3]{};
@@ -650,7 +657,7 @@ TEST_F(TimerFactory, PartialPreparationStillRejectsAnotherTimersClose) {
     EXPECT_EQ(0U, cold.pin_leases);
 }
 
-TEST_F(TimerFactory, SnapshotsAndAllColdObjectsMustBeDisjointBeforeAnyWrite) {
+TEST_F(TimerDirect, SnapshotsAndAllColdObjectsMustBeDisjointBeforeAnyWrite) {
     for (unsigned overlap = 0U; overlap < 4U; ++overlap) {
         SCOPED_TRACE(overlap);
         /* Each malformed-input probe begins at a fresh model reset. This
@@ -685,7 +692,7 @@ TEST_F(TimerFactory, SnapshotsAndAllColdObjectsMustBeDisjointBeforeAnyWrite) {
     }
 }
 
-TEST_F(TimerFactory, CaptureSnapshotCannotOverwriteItsColdReceipt) {
+TEST_F(TimerDirect, CaptureSnapshotCannotOverwriteItsColdReceipt) {
     nx_timer_capture_controller_t local{};
     TimerCold cold{};
     const CaptureColdConfig config{
@@ -699,6 +706,32 @@ TEST_F(TimerFactory, CaptureSnapshotCannotOverwriteItsColdReceipt) {
     const TimerCold untouched{};
     EXPECT_EQ(0, std::memcmp(&cold, &untouched, sizeof(cold)));
 }
+
+#endif
+
+#if !defined(NX_TIMER_DIRECT_REFERENCE)
+TEST_F(TimerFactory, UnselectedPadAndControllerRejectBeforeAnyEffects) {
+    nx_timer_capture_controller_t local{};
+    TimerCold cold{};
+    uint16_t snapshots[3]{};
+    const CaptureColdConfig capture_config{
+        {84000000U, 1000000U, NX_TIMER_EDGE_BOTH, 3U, true, 4U},
+        snapshots,
+        6U,
+        false,
+        TIM4};
+    EXPECT_EQ(NX_ERROR_INVALID,
+              CaptureColdPrepare(&local, &cold, &capture_config));
+    nx_advanced_pwm_controller_t second{};
+    const auto advanced_config = Tim8Config(snapshots);
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_tim8_advanced_cold_prepare(
+                                    &second, &cold, &advanced_config));
+    EXPECT_EQ(0U, s_writes);
+    EXPECT_EQ(nullptr, cold.configuration);
+    EXPECT_EQ(0U, cold.pin_leases);
+    EXPECT_EQ(0U, RCC->AHB1ENR | RCC->APB1ENR | RCC->APB2ENR);
+}
+
 TEST_F(TimerFactory, UnprivilegedOwnerRejectsBeforeAnyColdSystemEffects) {
     s_privileged = false;
     EXPECT_CALL(ports, Start()).Times(0);
@@ -1090,3 +1123,5 @@ TEST_F(TimerFactory, StopAndColdRestartReuseOnlyAProvedQuiescentSession) {
     EXPECT_TRUE(advanced->initialized);
     EXPECT_EQ(advanced->duty_ticks, 0U);
 }
+
+#endif /* !NX_TIMER_DIRECT_REFERENCE */

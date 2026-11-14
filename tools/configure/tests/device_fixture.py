@@ -19,6 +19,15 @@ def validate_soc_facts(soc, part, provider=None):
     belongs to the independent locked device gate and C compile assertions.
     """
     selected = None
+    if soc["id"] == "stm32f4" and (provider is None or
+            "irq" not in getattr(provider, "soc", {"irq": None})):
+        from tools.configure.tests.f4_fixture import provider as exact_provider
+        baseline = gate.load(gate.ROOT / "soc/stm32/stm32f4/soc.json")
+        reviewed = part if part in baseline["variants"] else next(
+            iter(baseline["variants"]))
+        # The expected CPU/IRQ contract comes from unmodified package bytes,
+        # never from the deliberately corrupted facts under test.
+        provider = exact_provider(reviewed)
     if soc["id"] == "stm32f4" and part in soc["variants"]:
         path = gate.ROOT / "soc/stm32/stm32f4/devices.json"
         devices = gate.vendor_device_catalog(gate.load(path))

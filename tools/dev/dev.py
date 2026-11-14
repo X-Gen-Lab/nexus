@@ -19,7 +19,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from tools.dev import process, provenance
-from tools.dev.presets import Presets, binary_directory
+from tools.dev.build_lock import build_lock
+from tools.dev.presets import Presets
 
 
 class ExecutionResult(int):
@@ -94,22 +95,15 @@ def workspace_identity():
     return None
 
 
-def capture_provenance(action, preset, environment, native, receipt, command):
+def capture_provenance(action, preset, environment, native, receipt, command,
+                       *, build=None):
     """Bind successful native commands to observed bytes, never qualification."""
     try:
         if receipt is None:
             raise ValueError("Actual invocation receipt is missing")
-        kind = "build" if action == "build" else "configure"
-        build = binary_directory(ROOT, preset, kind=kind,
-                                 environment=environment)
-        if action == "configure":
-            for index, argument in enumerate(native):
-                if argument == "-B":
-                    if index + 1 >= len(native):
-                        raise ValueError("Configure -B requires a directory")
-                    build = (ROOT / native[index + 1]).resolve()
-                elif argument.startswith("-B") and len(argument) > 2:
-                    build = (ROOT / argument[2:]).resolve()
+        if build is None:
+            selection = argparse.Namespace(action=action, preset=preset)
+            build = command_build(selection, native, Presets(ROOT, environment))
         provenance.capture(ROOT, build, receipt, action=action,
                            expected_command=command, expected_cwd=ROOT)
     except (OSError, ValueError, KeyError, TypeError) as error:
@@ -201,6 +195,106 @@ def doctor(environment, native):
     return maintenance_checks(environment)
 
 
+def command_build(args, native, presets):
+    """Resolve native directory overrides before acquiring their build lease."""
+    kind = "configure" if args.action == "check" else args.action
+    selected = presets.selected(kind, args.preset)
+    if kind != "configure":
+        selected = presets.selected("configure", selected["configurePreset"])
+    build = Path(selected["binaryDir"])
+    if args.action not in ("configure", "test"):
+        return build
+    options = ("-B", "-S") if args.action == "configure" else ("--test-dir",)
+    for index, argument in enumerate(native):
+        for option in options:
+            if argument == option:
+                if index + 1 >= len(native):
+                    raise ValueError(option + " requires a directory")
+                value = native[index + 1]
+            elif argument.startswith(option + "="):
+                value = argument[len(option) + 1:]
+            elif len(option) == 2 and argument.startswith(option):
+                value = argument[2:]
+            else:
+                continue
+            if not value:
+                raise ValueError(option + " requires a directory")
+            directory = ROOT / value
+            if option == "-S":
+                if directory.resolve() != ROOT.resolve():
+                    raise ValueError("dev configure requires its own source "
+                                     "checkout; use CMake for external projects")
+            else:
+                build = directory
+    return build if build.is_absolute() else ROOT / build
+
+
+def managed_action(args, native, environment, build, selected_test=None):
+    """Run one action while the caller retains its complete build lease."""
+    if args.action == "check":
+        result = execute([sys.executable, "scripts/ci/style_gate.py",
+                          "--all", "--report",
+                          "build/quality/style-gate.json"], environment)
+        if result:
+            return result
+        result = maintenance_checks(environment)
+        if result:
+            return result
+        return execute([sys.executable, "scripts/ci/tdd_gate.py", "--all",
+                        "--preset", args.preset], environment)
+    tool = "ctest" if args.action == "test" else "cmake"
+    command = [executable(tool)]
+    if args.action == "build":
+        command += ["--build"]
+    command += ["--preset", args.preset]
+    if args.action == "test":
+        command += ["--output-on-failure", "--no-tests=error"]
+    if args.action == "test":
+        report = build / "ctest-results.xml"
+        sys.path.insert(0, str(ROOT))
+        from scripts.validation.junit import prepare_report, validate_junit
+        started = prepare_report(report)
+        result = execute(command + ["--output-junit", str(report)] + native,
+                         environment)
+        if result:
+            return result
+        evidence = validate_junit(report, not_before_ns=started)
+        filters = ("-R", "-E", "-I", "-L", "-LE", "--tests-regex",
+                   "--exclude-regex", "--tests-information",
+                   "--label-regex",
+                   "--label-exclude", "--rerun-failed", "--tests-from-file",
+                   "--exclude-from-file")
+        focused = bool(selected_test.get("filter")) or any(
+            arg.split("=", 1)[0] in filters
+            or any(arg.startswith(prefix) and arg != prefix
+                   for prefix in ("-R", "-E", "-I", "-L"))
+            for arg in native)
+        google_selection = {
+            key: environment[key] for key in
+            ("GTEST_FILTER", "GTEST_TOTAL_SHARDS", "GTEST_SHARD_INDEX")
+            if key in environment
+        }
+        focused |= bool(google_selection)
+        scope = "focused-development" if focused else "preset-development"
+        report.with_suffix(".execution.json").write_text(json.dumps({
+            "schema": 1, "kind": scope, "preset": args.preset,
+            "native_arguments": native, "junit": str(report),
+            "google_selection": google_selection,
+            "execution": evidence, "qualification": False,
+        }, indent=2) + "\n")
+        print(f"Validated fresh {scope} execution: "
+              f"{evidence['passed']} test cases; full contract "
+              "qualification "
+              "uses check")
+        return 0
+    result = execute(command + native, environment)
+    if result == 0:
+        capture_provenance(args.action, args.preset, environment, native,
+                           getattr(result, "receipt_path", None),
+                           command + native, build=build)
+    return result
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("configure", "build", "test",
@@ -265,71 +359,12 @@ def main(argv=None):
             if workspace_identity() is not None:
                 raise ValueError("check requires a development checkout with "
                                  "repository tests and governance materials")
-            result = execute([sys.executable, "scripts/ci/style_gate.py",
-                              "--all", "--report",
-                              "build/quality/style-gate.json"], environment)
-            if result:
-                return result
-            result = maintenance_checks(environment)
-            if result:
-                return result
-            return execute([sys.executable, "scripts/ci/tdd_gate.py", "--all",
-                            "--preset", args.preset], environment)
-        tool = "ctest" if args.action == "test" else "cmake"
-        command = [executable(tool)]
-        if args.action == "build":
-            command += ["--build"]
-        command += ["--preset", args.preset]
-        if args.action == "test":
-            command += ["--output-on-failure", "--no-tests=error"]
-        if args.action == "test":
-            presets = Presets(ROOT, environment)
-            selected_test = presets.selected("test", args.preset)
-            build = Path(presets.selected(
-                "configure", selected_test["configurePreset"])["binaryDir"])
-            report = build / "ctest-results.xml"
-            sys.path.insert(0, str(ROOT))
-            from scripts.validation.junit import prepare_report, validate_junit
-            started = prepare_report(report)
-            result = execute(command + ["--output-junit", str(report)] + native,
-                             environment)
-            if result:
-                return result
-            evidence = validate_junit(report, not_before_ns=started)
-            filters = ("-R", "-E", "-I", "-L", "-LE", "--tests-regex",
-                       "--exclude-regex", "--tests-information",
-                       "--label-regex",
-                       "--label-exclude", "--rerun-failed", "--tests-from-file",
-                       "--exclude-from-file")
-            focused = bool(selected_test.get("filter")) or any(
-                arg.split("=", 1)[0] in filters
-                or any(arg.startswith(prefix) and arg != prefix
-                       for prefix in ("-R", "-E", "-I", "-L"))
-                for arg in native)
-            google_selection = {
-                key: environment[key] for key in
-                ("GTEST_FILTER", "GTEST_TOTAL_SHARDS", "GTEST_SHARD_INDEX")
-                if key in environment
-            }
-            focused |= bool(google_selection)
-            scope = "focused-development" if focused else "preset-development"
-            report.with_suffix(".execution.json").write_text(json.dumps({
-                "schema": 1, "kind": scope, "preset": args.preset,
-                "native_arguments": native, "junit": str(report),
-                "google_selection": google_selection,
-                "execution": evidence, "qualification": False,
-            }, indent=2) + "\n")
-            print(f"Validated fresh {scope} execution: "
-                  f"{evidence['passed']} test cases; full contract "
-                  "qualification "
-                  "uses check")
-            return 0
-        result = execute(command + native, environment)
-        if result == 0:
-            capture_provenance(args.action, args.preset, environment, native,
-                               getattr(result, "receipt_path", None),
-                               command + native)
-        return result
+        presets = Presets(ROOT, environment)
+        build = command_build(args, native, presets)
+        selected_test = (presets.selected("test", args.preset)
+                         if args.action == "test" else None)
+        with build_lock(build):
+            return managed_action(args, native, environment, build, selected_test)
     except (OSError, ValueError, subprocess.CalledProcessError,
             subprocess.TimeoutExpired) as error:
         print(f"Nexus developer command rejected: {error}", file=sys.stderr)

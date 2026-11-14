@@ -6,7 +6,15 @@ import tempfile
 import unittest
 
 from tools.configure import bindings, configure, emission, factory
-from tools.configure.stm32f4 import qspi
+from tools.configure.tests.external_memory_fixture import policy, construct
+
+
+def validate(parameters, *, hclk_hz, mode="nor-indirect"):
+    selected = policy()
+    profile = next(name for name, row in selected.endpoints.items()
+        if row["controller"] == "QUADSPI" and mode in row["modes"])
+    selected.validate_serial(parameters, hclk_hz=hclk_hz,
+                             controller="QUADSPI", route=profile, mode=mode)
 
 
 def parameters():
@@ -61,7 +69,7 @@ class QspiAdmission(unittest.TestCase):
             self.assertNotIn("stm32f407_fsmc", source)
             self.assertNotIn("HAL_QSPI_", source)
             self.assertIn("nx_factory_flash_async_flash_ref", factory.emit_strong(result))
-            self.assert_static_construction(qspi.constructor(controller, result))
+            self.assert_static_construction(construct(controller, result))
 
     def test_program_dma_uses_one_exact_stream_and_static_optional_extension(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -74,7 +82,7 @@ class QspiAdmission(unittest.TestCase):
             self.assertIn(".dma = &s_nx_qspi_dma_config_serial", source)
             self.assertNotIn("HAL_DMA_", source)
             self.assertNotIn("DMA2_Stream7_IRQHandler", source)
-            self.assert_static_construction(qspi.constructor(controller, result))
+            self.assert_static_construction(construct(controller, result))
 
     def test_serial_controller_rejects_a_second_endpoint_and_unreviewed_part(self):
         duplicate = ('[flash_async.peer]\ncontroller="serial"\nbinding="flash1"\n'
@@ -171,7 +179,7 @@ class QspiAdmission(unittest.TestCase):
 
     def admit(self, value, hz=16000000):
         try:
-            qspi.validate(value, hclk_hz=hz)
+            validate(value, hclk_hz=hz)
         except ValueError as error:
             self.fail(f"Complete exact serial endpoint was rejected: {error}")
 
@@ -197,18 +205,18 @@ class QspiAdmission(unittest.TestCase):
             value = parameters()
             mutation(value)
             with self.subTest(value=value), self.assertRaises(ValueError):
-                qspi.validate(value, hclk_hz=16000000)
+                validate(value, hclk_hz=16000000)
 
     def test_serial_clock_and_ncs_high_time_preserve_exact_rational_limits(self):
         value = parameters()
         value.update(prescaler=3, cs_high_cycles=2)
         with self.assertRaises(ValueError):
-            qspi.validate(value, hclk_hz=180000000)
+            validate(value, hclk_hz=180000000)
         value["cs_high_cycles"] = 3
         self.admit(value, 180000000)
         value["prescaler"] = 2
         with self.assertRaises(ValueError):
-            qspi.validate(value, hclk_hz=180000000)
+            validate(value, hclk_hz=180000000)
         self.admit(value, 150000000)
 
     def assert_static_construction(self, made):
@@ -218,9 +226,10 @@ class QspiAdmission(unittest.TestCase):
         self.assertEqual(2, len(made.initialize.arguments))
         self.assertEqual("nx_stm32_qspi_stop", made.stop[0].function)
         self.assertEqual(4, len(made.pin_snapshots))
-        source = "\n".join(made.definitions)
-        self.assertIn("nx_stm32_qspi_async_ops, &s_nx_port_serial", source)
-        self.assertIn("nx_stm32_qspi_flash_ops, &s_nx_port_serial", source)
+        source = "\n".join(line for declaration in made.static_declarations
+                           for line in declaration.render())
+        self.assertIn(".ops = &nx_stm32_qspi_async_ops, .context = &s_nx_port_serial", source)
+        self.assertIn(".ops = &nx_stm32_qspi_flash_ops, .context = &s_nx_port_serial", source)
         self.assertIn(".system = &g_nx_stm32_system", source)
         for forbidden in ("clock_read", "nx_deadline", "while (", "WRITE_REG",
                           "IRQHandler"):

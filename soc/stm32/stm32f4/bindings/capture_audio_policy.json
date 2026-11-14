@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "bindings": [],
+  "domains": {
+    "capture_audio": {
+      "mechanism": "capture-i2s-v1",
+      "capture": {
+        "controllers": [
+          "DCMI"
+        ],
+        "alternates": [
+          13
+        ],
+        "widths": [
+          8,
+          10,
+          12,
+          14
+        ],
+        "embedded_widths": [
+          8
+        ],
+        "jpeg_widths": [
+          8
+        ],
+        "pixel_clock_max_hz": 54000000,
+        "pixel_core_ratio": [
+          2,
+          5
+        ],
+        "frame_divisors": [
+          1,
+          2,
+          4
+        ],
+        "crop_limits": {
+          "x_clocks": 16383,
+          "y_lines": 8191,
+          "width_clocks": 16383,
+          "height_lines": 16383
+        }
+      },
+      "audio": {
+        "controllers": {
+          "I2S2": {
+            "ws": [
+              5
+            ],
+            "ck": [
+              5
+            ],
+            "sd": [
+              5
+            ],
+            "ext_sd": [
+              6
+            ],
+            "mclk": [
+              5
+            ]
+          },
+          "I2S3": {
+            "ws": [
+              6
+            ],
+            "ck": [
+              6
+            ],
+            "sd": [
+              6
+            ],
+            "ext_sd": [
+              5
+            ],
+            "mclk": [
+              6
+            ]
+          }
+        },
+        "sample_bits": [
+          16,
+          24,
+          32
+        ],
+        "slot_bits": [
+          16,
+          32
+        ],
+        "sample_rate_hz": [
+          8000,
+          192000
+        ],
+        "pll_n": [
+          192,
+          432
+        ],
+        "pll_r": [
+          2,
+          7
+        ],
+        "pll_input_hz": [
+          1000000,
+          2000000
+        ],
+        "pll_vco_hz": [
+          192000000,
+          432000000
+        ],
+        "pll_output_max_hz": 192000000,
+        "prescaler": [
+          4,
+          511
+        ],
+        "mclk_channel_factor": 128,
+        "external_sources": [
+          "hse"
+        ],
+        "clock_groups": {
+          "plli2s": [
+            "I2S2",
+            "I2S3"
+          ]
+        }
+      }
+    }
+  }
+}

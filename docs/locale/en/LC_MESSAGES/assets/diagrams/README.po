@@ -1,8 +1,12 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 18a5366261e4af8acabbd3cabbf663491bdc5173ddb888038a82dfa0d4b0ce05\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: bb0107f7ef8458b5f8503d07050984c26a59d90ab5a05e030820b1472137330e\n"
 
 msgid "当前架构图册"
 msgstr "Current architecture diagrams"
+
+msgid "图源为可编辑 DOT，输出为本地 SVG；`labels.json` 维护同一拓扑的中英文标签。 实线和虚线以各边标签为准，不能把源码依赖理解为每次 I/O 的转发，也不能由图推导 软件候选、吞吐、低功耗或物理 HIL。当前 MCU 入口为 F4，精确器件与模式见 [支持范围](../../delivery/support.md)；图中参考装配不授权其他配置。"
+msgstr "Editable DOT sources produce local SVG files; `labels.json` maintains English and Chinese labels for the same topology. Edge labels define solid and dashed arrows. Source dependencies do not imply forwarding on every I/O call, and diagrams establish no software candidate, throughput, low-power or physical HIL result. The current MCU entry is F4; see [support scope](../../delivery/support.md) for exact devices and modes. A diagram reference assembly authorizes no other configuration."
+
 
 msgid "纯退役芯片图已退出当前图册，原图可从 [固定旧源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/assets/diagrams) 追溯。机器身份与范围见 {download}`diagram-index.csv <diagram-index.csv>`，原始执行证据不重标。"
 msgstr "Diagrams dedicated to retired chips have left the current gallery. Their originals remain traceable at the [fixed prior source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/assets/diagrams). Machine identities and scope are in {download}`diagram-index.csv <diagram-index.csv>`; original execution evidence is not relabeled."
@@ -13,8 +17,8 @@ msgstr "After editing sources or labels, regenerate and verify with the prepared
 msgid "FIG-01 全平台分层与外部边界"
 msgstr "FIG-01 Whole-platform layers and external boundaries"
 
-msgid "平台职责与产品外置；OS 和组件可选，逐边区分构建事实与日常调用。"
-msgstr "Platform responsibilities and external products; OS and components are optional, with build facts and ordinary calls distinguished on each edge."
+msgid "平台职责与产品外置；Platform 连接静态实例与共享 C 协调器，OS 和组件可选。 逐边区分构建事实与日常调用，生成器不拥有驱动状态机。"
+msgstr "Platform responsibilities and external product ownership; Platform connects static instances with the shared C coordinator, while OS and components remain optional. Edge labels distinguish build-time facts from ordinary calls. The generator does not own driver state machines."
 
 msgid "![FIG-01：全平台分层与外部边界](platform-architecture.svg)"
 msgstr "![FIG-01: Platform layers and external boundaries](platform-architecture.svg)"
@@ -43,8 +47,8 @@ msgstr "{download}`Editable DOT <build-targets.dot>`."
 msgid "FIG-03 配置与原子生成"
 msgstr "FIG-03 Configuration and atomic generation"
 
-msgid "TOML、硬件事实、typed IR 和原子 bundle；失败不发布可用半成品。"
-msgstr "TOML, hardware facts, typed IR and an atomic bundle; failure does not publish usable partial output."
+msgid "包声明、Board 与 TOML 沿同一输入快照进入通用政策与具名 IR，再形成有限静态连接 和原子 bundle。包只选择 CMake 入口，CMake 拥有唯一 C 源码图；失败不继续使用旧 输出或半成品。全部箭头表示构建期数据或产物依赖。"
+msgstr "Package declarations, Board and TOML pass through one input snapshot into generic policies and named IR, then form bounded static connections and an atomic bundle. A package selects the CMake entry; CMake owns the sole C source graph. Failures do not continue with stale or partial output. Every arrow denotes build-time data or artifact dependencies."
 
 msgid "![FIG-03：配置与原子生成](configuration-generation.svg)"
 msgstr "![FIG-03: Configuration and atomic generation](configuration-generation.svg)"
@@ -73,8 +77,8 @@ msgstr "{download}`Editable DOT <factory-instances.dot>`."
 msgid "FIG-05 显式启动停机与失败撤回"
 msgstr "FIG-05 Explicit start, stop and failure cleanup"
 
-msgid "图示显式冷态生命周期与具体 C owner 的清理责任；实际入口以当前 Core／F4 实现为准。"
-msgstr "The diagram shows explicit cold-state lifecycle and concrete C owner cleanup responsibility; actual entries follow the current Core/F4 implementation."
+msgid "运行期由共享 C 协调器先检查上下文，再完成全部 controller 准入，之后才取得 System、共享资源与实例。共享资源／实例失败执行逆序回滚；System 启动结果分别 报告 primary、cleanup 和残效。释放失败保留具体 owner 收条与存储，不能超时强收。"
+msgstr "At runtime the shared C coordinator checks context and completes every controller admission before acquiring System, shared resources and instances. Shared-resource or instance failure triggers reverse rollback. System startup separately reports primary, cleanup and retained effects. A failed release retains the concrete owner's receipts and storage; timeout cannot force reclamation."
 
 msgid "![FIG-05：显式启动停机与失败撤回](platform-lifecycle.svg)"
 msgstr "![FIG-05: Explicit start, stop and failure rollback](platform-lifecycle.svg)"
@@ -133,8 +137,8 @@ msgstr "{download}`Editable DOT <wait-wake-shutdown.dot>`."
 msgid "FIG-10 Source SDK独立消费"
 msgstr "FIG-10 Independent Source SDK consumption"
 
-msgid "所选 Source SDK 的导出、移动与独立消费；主机运行和 ARM 链接分别验证。"
-msgstr "Export, relocation and independent consumption of the selected Source SDK; host execution and ARM linking are verified separately."
+msgid "schema3 按所选 `profile.packages` 与包导出归属收集源码，不从单个 ELF 推导 SDK。 完整 prefix 可用于公开 GPIO 首工程或已有外部工程；实际编译仍由包内 CMake 负责。 主机运行、ARM 链接与物理 HIL 分别判断，图不授予软件候选资格。"
+msgstr "Schema3 collects source by selected `profile.packages` and package export ownership, rather than deriving the SDK from one ELF. The complete prefix serves the public GPIO starter or an existing external project; package CMake still owns actual compilation. Host execution, ARM linking and physical HIL are assessed separately. The diagram grants no software-candidate qualification."
 
 msgid "![FIG-10：Source SDK独立消费](source-sdk-consumer.svg)"
 msgstr "![FIG-10: Independent Source SDK consumption](source-sdk-consumer.svg)"
@@ -268,8 +272,8 @@ msgstr "{download}`Editable DOT <i3c-core-lifecycle.dot>`."
 msgid "FIG-31 F4 源码归属与接口边界"
 msgstr "FIG-31: F4 source ownership and interface boundaries"
 
-msgid "F4 私有实现、官方库、公共 I/O 与测试支撑的源码及调用边界。"
-msgstr "Source and call boundaries among the F4 private implementation, official libraries, public I/O and test support."
+msgid "包内事实、binding、Board 和 TOML 由通用配置器生成静态实例与固定连接；F4 私有 C 拥有硬件算法和官方库适配。虚线是构建／测试依赖，实线是公共 I/O 调用，不增加 运行时转发层，也不把参考模型提升为生产或实板资格。"
+msgstr "The generic configuration tool turns package facts, bindings, Board and TOML into static instances and fixed connections. Private F4 C owns hardware algorithms and official SDK adaptation. Dashed edges mean build/test dependencies; solid edges mean public I/O calls. They add no runtime forwarding layer and do not promote reference models to production or physical qualification."
 
 msgid "![FIG-31：F4 源码归属与接口边界](driver-source-ownership.svg)"
 msgstr "![FIG-31: F4 source ownership and interface boundaries](driver-source-ownership.svg)"
@@ -297,6 +301,3 @@ msgstr "{download}`Editable DOT <lwip-tcp-tls-mqtt-host.dot>`."
 
 msgid "未注册的补充图保留自己的图内范围，仍参加成对输出和双语检查。当前结构的正文 以[架构](../../delivery/architecture.md)和[源码定位](../../explanation/source-map.md)为准。"
 msgstr "Unregistered supplemental diagrams keep their own stated scope and still undergo paired-output and bilingual checks. For the current structure, use [architecture](../../delivery/architecture.md) and the [source map](../../explanation/source-map.md)."
-
-msgid "图源为可编辑 DOT，输出为本地 SVG；`labels.json` 维护同一拓扑的中英文标签。 实线和虚线以各边标签为准，不能把源码依赖理解为每次 I/O 的转发，也不能由图推导 软件候选、吞吐、低功耗或物理 HIL。当前 MCU 入口为 F4，精确器件与模式见 [支持范围](../../delivery/support.md)；图中参考装配不授权其他配置。"
-msgstr "Editable DOT sources produce local SVG files; `labels.json` maintains English and Chinese labels for the same topology. Edge labels define solid and dashed arrows. Source dependencies do not imply forwarding on every I/O call, and diagrams establish no software candidate, throughput, low-power or physical HIL result. The current MCU entry is F4; see [support scope](../../delivery/support.md) for exact devices and modes. A diagram reference assembly authorizes no other configuration."

@@ -1,0 +1,1074 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "block",
+      "mode": "sdio-poll",
+      "implementation": "sdio",
+      "headers": [
+        "stm32f407_sdio.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_sdio_state_t",
+        "ops": "nx_stm32_sdio_ops",
+        "declarations": [
+          {
+            "role": "sdio_async",
+            "type": "nx_stm32_sdio_async_state_t",
+            "const": false,
+            "enabled": {
+              "source": "item.options.protocol",
+              "values": {
+                "sd-memory": false,
+                "mmc": false,
+                "sdio": true
+              }
+            }
+          },
+          {
+            "role": "sdio_functions",
+            "type": "nx_stm32_sdio_io_state_t",
+            "const": false,
+            "enabled": {
+              "source": "item.options.protocol",
+              "values": {
+                "sd-memory": false,
+                "mmc": false,
+                "sdio": true
+              }
+            }
+          },
+          {
+            "role": "sdio_pin_state",
+            "type": "uint16_t",
+            "const": false,
+            "count": {
+              "length": "selected.pads",
+              "limit": 10
+            }
+          },
+          {
+            "role": "sdio_cold",
+            "type": "nx_stm32_sdio_receipt_t",
+            "const": false
+          },
+          {
+            "role": "sdio_pins",
+            "type": "nx_stm32_platform_pin_config_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 10,
+                "value": {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "entry.registers",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "sdio_pin_state",
+                        "as": "address",
+                        "index": {
+                          "source": "index",
+                          "as": "u32"
+                        }
+                      }
+                    ],
+                    [
+                      "port_index",
+                      {
+                        "source": "entry.port_index"
+                      }
+                    ],
+                    [
+                      "pin",
+                      {
+                        "source": "entry.number"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.pads",
+              "limit": 10
+            }
+          },
+          {
+            "role": "sdio_config",
+            "type": "nx_stm32_sdio_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "symbol": "SDIO"
+                  }
+                ],
+                [
+                  "pins",
+                  {
+                    "ref": "sdio_pins",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "max_blocks",
+                  {
+                    "source": "item.options.max_blocks"
+                  }
+                ],
+                [
+                  "poll_budget",
+                  {
+                    "source": "item.options.poll_budget"
+                  }
+                ],
+                [
+                  "stop_timeout_us",
+                  {
+                    "source": "item.options.stop_timeout_us"
+                  }
+                ],
+                [
+                  "bus_width",
+                  {
+                    "source": "item.options.bus_width"
+                  }
+                ],
+                [
+                  "high_speed",
+                  {
+                    "source": "item.options.speed",
+                    "values": {
+                      "default": false,
+                      "high-speed": true
+                    }
+                  }
+                ],
+                [
+                  "engine",
+                  {
+                    "symbol": "NX_STM32_SDIO_POLL"
+                  }
+                ],
+                [
+                  "async",
+                  {
+                    "source": "item.options.protocol",
+                    "values": {
+                      "sd-memory": null,
+                      "mmc": null,
+                      "sdio": {
+                        "ref": "sdio_async",
+                        "as": "address"
+                      }
+                    }
+                  }
+                ],
+                [
+                  "dma_regions",
+                  null
+                ],
+                [
+                  "dma_region_count",
+                  0
+                ],
+                [
+                  "irq_priority",
+                  {
+                    "source": "item.options.irq.priority",
+                    "default": 0
+                  }
+                ],
+                [
+                  "protocol",
+                  {
+                    "source": "item.options.protocol",
+                    "as": "symbol",
+                    "values": {
+                      "sd-memory": "NX_STM32_SDIO_SD_MEMORY",
+                      "mmc": "NX_STM32_SDIO_MMC",
+                      "sdio": "NX_STM32_SDIO_IO"
+                    }
+                  }
+                ],
+                [
+                  "io",
+                  {
+                    "source": "item.options.protocol",
+                    "values": {
+                      "sd-memory": null,
+                      "mmc": null,
+                      "sdio": {
+                        "ref": "sdio_functions",
+                        "as": "address"
+                      }
+                    }
+                  }
+                ],
+                [
+                  "dma",
+                  null
+                ]
+              ]
+            }
+          },
+          {
+            "role": "sdio_io",
+            "type": "nx_sdio_io_port_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "ops",
+                  {
+                    "address": "nx_stm32_sdio_io_ops"
+                  }
+                ],
+                [
+                  "context",
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              ]
+            },
+            "enabled": {
+              "source": "item.options.protocol",
+              "values": {
+                "sd-memory": false,
+                "mmc": false,
+                "sdio": true
+              }
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_sdio_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "sdio_config",
+                "as": "address"
+              },
+              {
+                "ref": "sdio_cold",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_sdio_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "sdio_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "sdio_cold",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "sdio_pin_state",
+          "limit": 10
+        },
+        "retain_on_failed_init": true,
+        "irq": []
+      }
+    },
+    {
+      "kind": "block",
+      "mode": "sdio-irq",
+      "implementation": "sdio",
+      "headers": [
+        "stm32f407_sdio.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_sdio_state_t",
+        "ops": "nx_stm32_sdio_ops",
+        "declarations": [
+          {
+            "role": "sdio_async",
+            "type": "nx_stm32_sdio_async_state_t",
+            "const": false
+          },
+          {
+            "role": "sdio_functions",
+            "type": "nx_stm32_sdio_io_state_t",
+            "const": false,
+            "enabled": {
+              "source": "item.options.protocol",
+              "values": {
+                "sd-memory": false,
+                "mmc": false,
+                "sdio": true
+              }
+            }
+          },
+          {
+            "role": "sdio_pin_state",
+            "type": "uint16_t",
+            "const": false,
+            "count": {
+              "length": "selected.pads",
+              "limit": 10
+            }
+          },
+          {
+            "role": "sdio_cold",
+            "type": "nx_stm32_sdio_receipt_t",
+            "const": false
+          },
+          {
+            "role": "sdio_pins",
+            "type": "nx_stm32_platform_pin_config_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 10,
+                "value": {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "entry.registers",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "sdio_pin_state",
+                        "as": "address",
+                        "index": {
+                          "source": "index",
+                          "as": "u32"
+                        }
+                      }
+                    ],
+                    [
+                      "port_index",
+                      {
+                        "source": "entry.port_index"
+                      }
+                    ],
+                    [
+                      "pin",
+                      {
+                        "source": "entry.number"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.pads",
+              "limit": 10
+            }
+          },
+          {
+            "role": "sdio_config",
+            "type": "nx_stm32_sdio_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "symbol": "SDIO"
+                  }
+                ],
+                [
+                  "pins",
+                  {
+                    "ref": "sdio_pins",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "max_blocks",
+                  {
+                    "source": "item.options.max_blocks"
+                  }
+                ],
+                [
+                  "poll_budget",
+                  {
+                    "source": "item.options.poll_budget"
+                  }
+                ],
+                [
+                  "stop_timeout_us",
+                  {
+                    "source": "item.options.stop_timeout_us"
+                  }
+                ],
+                [
+                  "bus_width",
+                  {
+                    "source": "item.options.bus_width"
+                  }
+                ],
+                [
+                  "high_speed",
+                  {
+                    "source": "item.options.speed",
+                    "values": {
+                      "default": false,
+                      "high-speed": true
+                    }
+                  }
+                ],
+                [
+                  "engine",
+                  {
+                    "symbol": "NX_STM32_SDIO_IRQ"
+                  }
+                ],
+                [
+                  "async",
+                  {
+                    "ref": "sdio_async",
+                    "as": "address"
+                  }
+                ],
+                [
+                  "dma_regions",
+                  null
+                ],
+                [
+                  "dma_region_count",
+                  0
+                ],
+                [
+                  "irq_priority",
+                  {
+                    "source": "item.options.irq.priority",
+                    "default": 0
+                  }
+                ],
+                [
+                  "protocol",
+                  {
+                    "source": "item.options.protocol",
+                    "as": "symbol",
+                    "values": {
+                      "sd-memory": "NX_STM32_SDIO_SD_MEMORY",
+                      "mmc": "NX_STM32_SDIO_MMC",
+                      "sdio": "NX_STM32_SDIO_IO"
+                    }
+                  }
+                ],
+                [
+                  "io",
+                  {
+                    "source": "item.options.protocol",
+                    "values": {
+                      "sd-memory": null,
+                      "mmc": null,
+                      "sdio": {
+                        "ref": "sdio_functions",
+                        "as": "address"
+                      }
+                    }
+                  }
+                ],
+                [
+                  "dma",
+                  null
+                ]
+              ]
+            }
+          },
+          {
+            "role": "sdio_io",
+            "type": "nx_sdio_io_port_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "ops",
+                  {
+                    "address": "nx_stm32_sdio_io_ops"
+                  }
+                ],
+                [
+                  "context",
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              ]
+            },
+            "enabled": {
+              "source": "item.options.protocol",
+              "values": {
+                "sd-memory": false,
+                "mmc": false,
+                "sdio": true
+              }
+            }
+          },
+          {
+            "role": "block_async",
+            "type": "nx_block_async_port_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "ops",
+                  {
+                    "address": "nx_stm32_sdio_async_ops"
+                  }
+                ],
+                [
+                  "context",
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              ]
+            },
+            "enabled": {
+              "source": "item.options.protocol",
+              "values": {
+                "sd-memory": true,
+                "mmc": true,
+                "sdio": false
+              }
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_sdio_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "sdio_config",
+                "as": "address"
+              },
+              {
+                "ref": "sdio_cold",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_sdio_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "sdio_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "sdio_cold",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "sdio_pin_state",
+          "limit": 10
+        },
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": "SDIO_IRQHandler",
+            "calls": [
+              {
+                "function": "nx_stm32_sdio_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "block",
+      "mode": "sdio-dma",
+      "implementation": "sdio",
+      "headers": [
+        "stm32f407_sdio.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_sdio_state_t",
+        "ops": "nx_stm32_sdio_ops",
+        "declarations": [
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.readable_regions",
+              "limit": 16
+            }
+          },
+          {
+            "role": "sdio_dma",
+            "type": "nx_stm32_dma_route_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "dma",
+                  {
+                    "source": "selected.dma_bindings.0.registers",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "stream",
+                  {
+                    "source": "selected.dma_bindings.0.stream",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "irq",
+                  {
+                    "source": "selected.dma_bindings.0.irq",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "lane",
+                  {
+                    "source": "selected.dma_bindings.0.lane"
+                  }
+                ],
+                [
+                  "channel",
+                  {
+                    "source": "selected.dma_bindings.0.request"
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "sdio_async",
+            "type": "nx_stm32_sdio_async_state_t",
+            "const": false
+          },
+          {
+            "role": "sdio_functions",
+            "type": "nx_stm32_sdio_io_state_t",
+            "const": false,
+            "enabled": {
+              "source": "item.options.protocol",
+              "values": {
+                "sd-memory": false,
+                "mmc": false,
+                "sdio": true
+              }
+            }
+          },
+          {
+            "role": "sdio_pin_state",
+            "type": "uint16_t",
+            "const": false,
+            "count": {
+              "length": "selected.pads",
+              "limit": 10
+            }
+          },
+          {
+            "role": "sdio_cold",
+            "type": "nx_stm32_sdio_receipt_t",
+            "const": false
+          },
+          {
+            "role": "sdio_pins",
+            "type": "nx_stm32_platform_pin_config_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 10,
+                "value": {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "entry.registers",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "sdio_pin_state",
+                        "as": "address",
+                        "index": {
+                          "source": "index",
+                          "as": "u32"
+                        }
+                      }
+                    ],
+                    [
+                      "port_index",
+                      {
+                        "source": "entry.port_index"
+                      }
+                    ],
+                    [
+                      "pin",
+                      {
+                        "source": "entry.number"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.pads",
+              "limit": 10
+            }
+          },
+          {
+            "role": "sdio_config",
+            "type": "nx_stm32_sdio_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "symbol": "SDIO"
+                  }
+                ],
+                [
+                  "pins",
+                  {
+                    "ref": "sdio_pins",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "max_blocks",
+                  {
+                    "source": "item.options.max_blocks"
+                  }
+                ],
+                [
+                  "poll_budget",
+                  {
+                    "source": "item.options.poll_budget"
+                  }
+                ],
+                [
+                  "stop_timeout_us",
+                  {
+                    "source": "item.options.stop_timeout_us"
+                  }
+                ],
+                [
+                  "bus_width",
+                  {
+                    "source": "item.options.bus_width"
+                  }
+                ],
+                [
+                  "high_speed",
+                  {
+                    "source": "item.options.speed",
+                    "values": {
+                      "default": false,
+                      "high-speed": true
+                    }
+                  }
+                ],
+                [
+                  "engine",
+                  {
+                    "symbol": "NX_STM32_SDIO_DMA"
+                  }
+                ],
+                [
+                  "async",
+                  {
+                    "ref": "sdio_async",
+                    "as": "address"
+                  }
+                ],
+                [
+                  "dma_regions",
+                  {
+                    "ref": "dma_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "dma_region_count",
+                  {
+                    "length": "selected.readable_regions",
+                    "limit": 16
+                  }
+                ],
+                [
+                  "irq_priority",
+                  {
+                    "source": "item.options.irq.priority",
+                    "default": 0
+                  }
+                ],
+                [
+                  "protocol",
+                  {
+                    "source": "item.options.protocol",
+                    "as": "symbol",
+                    "values": {
+                      "sd-memory": "NX_STM32_SDIO_SD_MEMORY",
+                      "mmc": "NX_STM32_SDIO_MMC",
+                      "sdio": "NX_STM32_SDIO_IO"
+                    }
+                  }
+                ],
+                [
+                  "io",
+                  {
+                    "source": "item.options.protocol",
+                    "values": {
+                      "sd-memory": null,
+                      "mmc": null,
+                      "sdio": {
+                        "ref": "sdio_functions",
+                        "as": "address"
+                      }
+                    }
+                  }
+                ],
+                [
+                  "dma",
+                  {
+                    "ref": "sdio_dma",
+                    "as": "address"
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "sdio_io",
+            "type": "nx_sdio_io_port_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "ops",
+                  {
+                    "address": "nx_stm32_sdio_io_ops"
+                  }
+                ],
+                [
+                  "context",
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              ]
+            },
+            "enabled": {
+              "source": "item.options.protocol",
+              "values": {
+                "sd-memory": false,
+                "mmc": false,
+                "sdio": true
+              }
+            }
+          },
+          {
+            "role": "block_async",
+            "type": "nx_block_async_port_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "ops",
+                  {
+                    "address": "nx_stm32_sdio_async_ops"
+                  }
+                ],
+                [
+                  "context",
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              ]
+            },
+            "enabled": {
+              "source": "item.options.protocol",
+              "values": {
+                "sd-memory": true,
+                "mmc": true,
+                "sdio": false
+              }
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_sdio_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "sdio_config",
+                "as": "address"
+              },
+              {
+                "ref": "sdio_cold",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_sdio_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "sdio_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "sdio_cold",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "sdio_pin_state",
+          "limit": 10
+        },
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": "SDIO_IRQHandler",
+            "calls": [
+              {
+                "function": "nx_stm32_sdio_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {
+              "source": "selected.dma_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32_sdio_dma_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ]
+      }
+    }
+  ]
+}

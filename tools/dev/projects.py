@@ -1,4 +1,4 @@
-"""Create independent projects from explicit, immutable external templates."""
+"""Create public interface consumers or pinned external-template projects."""
 
 from __future__ import annotations
 
@@ -145,6 +145,9 @@ def _commands(output, source, selected, resolved, *, test_support):
     configure.append("-DNEXUS_SOURCE=" + str(source) if selected["kind"] == "source"
                      else "-DNexus_DIR=" + str(Path(selected["sdk_prefix"]) /
                                               "lib/cmake/Nexus"))
+    if "source_revision" in selected:
+        configure.append("-DNEXUS_EXPECTED_SOURCE_REVISION=" +
+                         selected["source_revision"])
     native = resolved["cpu"]["arch"] == "native"
     if native and not test_support:
         raise ValueError("Native projects require explicit test support")
@@ -199,87 +202,11 @@ def _owned_output(output, identity):
             (current.st_dev, current.st_ino) == identity)
 
 
-def create(templates, revision, template, output, *, source_root=None,
-           sdk_prefix=None, test_support=False):
-    """Validate first; rollback only the directory exclusively created here."""
-    if type(test_support) is not bool:
-        raise ValueError("Project test support must be an explicit boolean")
-    root, output = _path(templates), _path(output)
-    if (not isinstance(revision, str)
-            or not re.fullmatch(r"[0-9a-f]{40}", revision)):
-        raise ValueError("Template revision must be an exact commit identity")
-    if output.exists():
-        raise ValueError("Project output already exists")
-    if (root == output or root.is_relative_to(output)
-            or output.is_relative_to(root)):
-        raise ValueError("Project output must be outside the template checkout")
-    head = _git(root, "rev-parse", "HEAD").decode().strip()
-    top = Path(_git(root, "rev-parse", "--show-toplevel").decode().strip())
-    if head != revision or top != root:
-        raise ValueError("Template checkout identity differs from revision")
-    if (not isinstance(template, str)
-            or not re.fullmatch(r"[a-z0-9][a-z0-9_-]*", template)):
-        raise ValueError("Invalid template identifier")
-    raw = _pinned_file(root, revision, "templates/manifest.json")
-    manifest = parse_json(raw)
-    fields(manifest, {"schema", "version", "templates"})
-    if (type(manifest["schema"]) is not int or manifest["schema"] != 1
-            or type(manifest["version"]) is not int or manifest["version"] != 1
-            or not isinstance(manifest["templates"], dict)):
-        raise ValueError("Unsupported template manifest")
-    selected = manifest["templates"].get(template)
-    fields(selected, {"files", "platform"})
-    fields(selected["platform"], {"interface_epoch", "assembly_schema"})
+def _publish(output, payload, source_root, selected_platform, source_snapshot,
+             result, *, test_support, source_check=None):
+    """Share one resolver, copy verification and owned-output rollback path."""
     interpreter = Path(sys.executable).resolve()
     interpreter_identity = file_identity(interpreter)
-    source_root, selected_platform, source_snapshot = _selection(
-        source_root, sdk_prefix, interpreter)
-    compatibility = load_json(
-        source_root / "dependencies/platform-compatibility.json")
-    expected = {
-        "interface_epoch": compatibility["factory_abi_epoch"],
-        "assembly_schema": compatibility["schemas"]["assembly_authoring"],
-    }
-    if (selected["platform"] != expected
-            or any(type(value) is not int
-                   for value in selected["platform"].values())):
-        raise ValueError("Template platform interface/schema is incompatible")
-    files = selected["files"]
-    if (not isinstance(files, dict) or not 3 <= len(files) <= 128
-            or not {"main.c", "CMakeLists.txt", "assembly.toml"} <= files.keys()
-            ):
-        raise ValueError("Template needs a bounded complete project file set")
-    payload, used = {}, 0
-    for name, expected_digest in sorted(files.items()):
-        relative = _relative(name)
-        if relative.parts[0] == ".nexus-template.json":
-            raise ValueError("Template cannot supply its generated origin")
-        sha256_value(expected_digest)
-        data = _pinned_file(
-            root, revision, "templates/" + template + "/" + name,
-            remaining=MAXIMUM_PROJECT_BYTES - used)
-        if hashlib.sha256(data).hexdigest() != expected_digest:
-            raise ValueError("Template file digest differs from manifest")
-        payload[name] = data
-        used += len(data)
-    lock_data = _pinned_file(root, revision, "dependencies/nexus.lock.json")
-    lock = parse_json(lock_data)
-    if any(not isinstance(lock.get(key), str) or
-           not re.fullmatch(r"[0-9a-f]{40}", lock[key])
-           for key in ("commit", "tree")):
-        raise ValueError("Template needs an exact platform source lock")
-    result = {
-        "schema": 1, "kind": "nexus_project_origin", "template": template,
-        "examples_commit": revision,
-        "examples_tree": _git(root, "rev-parse",
-                              "HEAD^{tree}").decode().strip(),
-        "manifest_sha256": hashlib.sha256(raw).hexdigest(),
-        "expected_platform": {"commit": lock["commit"], "tree": lock["tree"]},
-        "platform_lock_sha256": hashlib.sha256(lock_data).hexdigest(),
-        "platform_interface": expected, "files": files,
-        "selected_platform": selected_platform,
-        "qualification": False,
-    }
     # mkdir is exclusive, including when another process creates output late.
     # Validate the actual relocated assembly before returning an origin record.
     output.mkdir()
@@ -330,12 +257,8 @@ def create(templates, revision, template, output, *, source_root=None,
                 output, source_root, selected_platform, resolved,
                 test_support=test_support)
         _unchanged([*source_snapshot, interpreter_identity])
-        if (_git(root, "rev-parse", "HEAD").decode().strip() != revision or
-                (root / "templates/manifest.json").read_bytes() != raw or
-                (root / "dependencies/nexus.lock.json").read_bytes() != lock_data or
-                any(_path(root / "templates" / template / name).read_bytes() != data
-                    for name, data in payload.items())):
-            raise ValueError("Selected template source changed during creation")
+        if source_check is not None:
+            source_check()
         if not _owned_output(output, output_identity):
             raise ValueError("Created project root was replaced or its path changed")
         _verify_copy(output, payload)
@@ -354,11 +277,158 @@ def create(templates, revision, template, output, *, source_root=None,
     return result
 
 
+def create(templates, revision, template, output, *, source_root=None,
+           sdk_prefix=None, test_support=False):
+    """Validate first; rollback only the directory exclusively created here."""
+    if type(test_support) is not bool:
+        raise ValueError("Project test support must be an explicit boolean")
+    root, output = _path(templates), _path(output)
+    if (not isinstance(revision, str)
+            or not re.fullmatch(r"[0-9a-f]{40}", revision)):
+        raise ValueError("Template revision must be an exact commit identity")
+    if output.exists():
+        raise ValueError("Project output already exists")
+    if (root == output or root.is_relative_to(output)
+            or output.is_relative_to(root)):
+        raise ValueError("Project output must be outside the template checkout")
+    head = _git(root, "rev-parse", "HEAD").decode().strip()
+    top = Path(_git(root, "rev-parse", "--show-toplevel").decode().strip())
+    if head != revision or top != root:
+        raise ValueError("Template checkout identity differs from revision")
+    if (not isinstance(template, str)
+            or not re.fullmatch(r"[a-z0-9][a-z0-9_-]*", template)):
+        raise ValueError("Invalid template identifier")
+    raw = _pinned_file(root, revision, "templates/manifest.json")
+    manifest = parse_json(raw)
+    fields(manifest, {"schema", "version", "templates"})
+    if (type(manifest["schema"]) is not int or manifest["schema"] != 1
+            or type(manifest["version"]) is not int or manifest["version"] != 1
+            or not isinstance(manifest["templates"], dict)):
+        raise ValueError("Unsupported template manifest")
+    selected = manifest["templates"].get(template)
+    fields(selected, {"files", "platform"})
+    fields(selected["platform"], {"interface_epoch", "assembly_schema"})
+    interpreter = Path(sys.executable).resolve()
+    source_root, selected_platform, source_snapshot = _selection(
+        source_root, sdk_prefix, interpreter)
+    compatibility = load_json(
+        source_root / "dependencies/platform-compatibility.json")
+    expected = {
+        "interface_epoch": compatibility["factory_abi_epoch"],
+        "assembly_schema": compatibility["schemas"]["assembly_authoring"],
+    }
+    if (selected["platform"] != expected
+            or any(type(value) is not int
+                   for value in selected["platform"].values())):
+        raise ValueError("Template platform interface/schema is incompatible")
+    files = selected["files"]
+    if (not isinstance(files, dict) or not 3 <= len(files) <= 128
+            or not {"main.c", "CMakeLists.txt", "assembly.toml"} <= files.keys()
+            ):
+        raise ValueError("Template needs a bounded complete project file set")
+    payload, used = {}, 0
+    for name, expected_digest in sorted(files.items()):
+        relative = _relative(name)
+        if relative.parts[0] == ".nexus-template.json":
+            raise ValueError("Template cannot supply its generated origin")
+        sha256_value(expected_digest)
+        data = _pinned_file(
+            root, revision, "templates/" + template + "/" + name,
+            remaining=MAXIMUM_PROJECT_BYTES - used)
+        if hashlib.sha256(data).hexdigest() != expected_digest:
+            raise ValueError("Template file digest differs from manifest")
+        payload[name] = data
+        used += len(data)
+    lock_data = _pinned_file(root, revision, "dependencies/nexus.lock.json")
+    lock = parse_json(lock_data)
+    if any(not isinstance(lock.get(key), str) or
+           not re.fullmatch(r"[0-9a-f]{40}", lock[key])
+           for key in ("commit", "tree")):
+        raise ValueError("Template needs an exact platform source lock")
+    result = {
+        "schema": 1, "kind": "nexus_project_origin", "template": template,
+        "examples_commit": revision,
+        "examples_tree": _git(root, "rev-parse",
+                              "HEAD^{tree}").decode().strip(),
+        "manifest_sha256": hashlib.sha256(raw).hexdigest(),
+        "expected_platform": {"commit": lock["commit"], "tree": lock["tree"]},
+        "platform_lock_sha256": hashlib.sha256(lock_data).hexdigest(),
+        "platform_interface": expected, "files": files,
+        "selected_platform": selected_platform,
+        "qualification": False,
+    }
+    def source_check():
+        if (_git(root, "rev-parse", "HEAD").decode().strip() != revision or
+                (root / "templates/manifest.json").read_bytes() != raw or
+                (root / "dependencies/nexus.lock.json").read_bytes() != lock_data or
+                any(_path(root / "templates" / template / name).read_bytes() != data
+                    for name, data in payload.items())):
+            raise ValueError("Selected template source changed during creation")
+
+    return _publish(output, payload, source_root, selected_platform,
+                    source_snapshot, result, test_support=test_support,
+                    source_check=source_check)
+
+
+def create_public(output, *, board, clock, gpio, source_root=None, sdk_prefix=None):
+    """Create a fixed baremetal GPIO consumer; the selected resolver owns facts."""
+    output = _path(output)
+    if output.exists():
+        raise ValueError("Project output already exists")
+    if any(not isinstance(value, str) or not value for value in (board, clock, gpio)):
+        raise ValueError("Public project needs explicit board, clock and GPIO binding")
+    interpreter = Path(sys.executable).resolve()
+    source, selected, observed = _selection(source_root, sdk_prefix, interpreter)
+    roots = [source]
+    if sdk_prefix is not None:
+        roots.append(_path(sdk_prefix))
+    if any(root == output or root.is_relative_to(output)
+           or output.is_relative_to(root) for root in roots):
+        raise ValueError("Project output must be outside the selected platform")
+    compatibility = load_json(source / "dependencies/platform-compatibility.json")
+    if compatibility["schemas"]["assembly_authoring"] != 2:
+        raise ValueError("Public GPIO consumer requires assembly schema 2")
+    canonical = source / "cmake/package/verification/public_gpio"
+    payload = {}
+    for name in ("main.c", "CMakeLists.txt", "README.md"):
+        record = file_identity(_path(canonical / name))
+        if record["size"] > MAXIMUM_FILE_BYTES:
+            raise ValueError("Public consumer file exceeds the file bound")
+        observed.append(record)
+        payload[name] = Path(record["path"]).read_bytes()
+    payload["assembly.toml"] = (
+        f'schema = 2\nboard = {json.dumps(board)}\nbackend = "baremetal"\n'
+        f'clock = {json.dumps(clock)}\noptimization = "Os"\n\n'
+        '[memory]\nmain_stack_bytes = 2048\nlibc_heap_bytes = 0\n'
+        'flash_load_limit_bytes = 65536\nstatic_ram_limit_bytes = 32768\n\n'
+        f'[gpio.status]\nbinding = {json.dumps(gpio)}\nmode = "output"\n'
+    ).encode()
+    if sum(map(len, payload.values())) > MAXIMUM_PROJECT_BYTES:
+        raise ValueError("Public consumer exceeds the project storage bound")
+    result = {
+        "schema": 1, "kind": "nexus_project_origin", "template": "public-gpio",
+        "platform_interface": {
+            "interface_epoch": compatibility["factory_abi_epoch"],
+            "assembly_schema": compatibility["schemas"]["assembly_authoring"]},
+        "selected_platform": selected,
+        "files": {name: hashlib.sha256(data).hexdigest()
+                  for name, data in payload.items()},
+        "qualification": False,
+    }
+    return _publish(output, payload, source, selected, observed, result,
+                    test_support=False)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--templates", type=Path, required=True)
-    parser.add_argument("--revision", required=True)
-    parser.add_argument("--template", required=True)
+    templates = parser.add_mutually_exclusive_group(required=True)
+    templates.add_argument("--templates", type=Path)
+    templates.add_argument("--public", action="store_true")
+    parser.add_argument("--revision")
+    parser.add_argument("--template")
+    parser.add_argument("--board")
+    parser.add_argument("--clock")
+    parser.add_argument("--gpio")
     parser.add_argument("--output", type=Path, required=True)
     sources = parser.add_mutually_exclusive_group()
     sources.add_argument("--source", type=Path)
@@ -367,15 +437,29 @@ def main(argv=None):
                         help="explicitly enable Native test model projects")
     parser.add_argument("--json", action="store_true")
     arguments = parser.parse_args(argv)
-    result = create(arguments.templates, arguments.revision,
-                    arguments.template, arguments.output,
-                    source_root=arguments.source, sdk_prefix=arguments.sdk_prefix,
-                    test_support=arguments.test_support)
+    if arguments.public:
+        if arguments.revision or arguments.template or arguments.test_support:
+            parser.error("--public does not use private templates or Native test support")
+        if not all((arguments.board, arguments.clock, arguments.gpio)):
+            parser.error("--public requires --board, --clock and --gpio")
+        result = create_public(arguments.output, board=arguments.board,
+                               clock=arguments.clock, gpio=arguments.gpio,
+                               source_root=arguments.source,
+                               sdk_prefix=arguments.sdk_prefix)
+    else:
+        if not arguments.revision or not arguments.template:
+            parser.error("--templates requires --revision and --template")
+        if any((arguments.board, arguments.clock, arguments.gpio)):
+            parser.error("--board, --clock and --gpio require --public")
+        result = create(arguments.templates, arguments.revision,
+                        arguments.template, arguments.output,
+                        source_root=arguments.source, sdk_prefix=arguments.sdk_prefix,
+                        test_support=arguments.test_support)
     if arguments.json:
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
     print("Created " + str(arguments.output) + " from "
-          + result["examples_commit"]
+          + result.get("examples_commit", result["template"])
           + "; build and run to validate consumption")
     for name, command in result["commands"].items():
         print(name.capitalize() + ": " + shlex.join(command))

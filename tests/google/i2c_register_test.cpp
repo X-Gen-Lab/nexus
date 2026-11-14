@@ -12,6 +12,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "i2c_v1_async.h"
 #include "stm32f407_provider.h"
 }
 #include <cstring>
@@ -82,6 +83,7 @@ class I2CRegisters : public testing::Test {
     size_t transferred = 0;
     I2C_TypeDef registers = {};
     GPIO_TypeDef lines = {};
+    nx_i2c_v1_lines_t line_config{{&lines.IDR, &lines.IDR}, {64U, 128U}};
 
     void SetUp() override {
         model_time = 0;
@@ -115,9 +117,8 @@ class I2CRegisters : public testing::Test {
         model_boundary = &boundary;
         std::memset(data, 0xCC, sizeof(data));
         state.registers = &registers;
-        state.line_gpio = &lines;
-        state.line_mask = (1U << 6U) | (1U << 7U);
-        lines.IDR = state.line_mask;
+        state.lines = &line_config;
+        lines.IDR = 0xC0U;
         state.peripheral_mhz = 42;
         state.rate_hz = 100000;
         ASSERT_EQ(nx_stm32_i2c_initialize(&state), NX_SUCCESS);
@@ -443,8 +444,7 @@ TEST_F(I2CRegisters, FastModeUsesWholeClockCountsWithoutExceedingTheCeiling) {
         SCOPED_TRACE(rate);
         State cold{};
         cold.registers = &registers;
-        cold.line_gpio = &lines;
-        cold.line_mask = state.line_mask;
+        cold.lines = &line_config;
         cold.peripheral_mhz = 42U;
         cold.rate_hz = rate;
         ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_initialize(&cold));
@@ -466,8 +466,7 @@ TEST_F(I2CRegisters, UnrepresentableClockCeilingRejectsBeforeRegisterStores) {
     for (uint32_t rate : {0U, 5128U, 400001U, UINT32_MAX}) {
         State cold{};
         cold.registers = &registers;
-        cold.line_gpio = &lines;
-        cold.line_mask = state.line_mask;
+        cold.lines = &line_config;
         cold.peripheral_mhz = 42U;
         cold.rate_hz = rate;
         EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_i2c_initialize(&cold));
@@ -689,22 +688,22 @@ TEST_F(I2CRegisters,
 TEST_F(I2CRegisters, RecoveryRequiresBothReleasedLinesWhenBusyFlagIsClear) {
     for (unsigned line = 0; line < 2; ++line) {
         state.registers->SR2 = 0;
-        lines.IDR = state.line_mask & ~(1U << (6U + line));
+        lines.IDR = 0xC0U & ~(1U << (6U + line));
         EXPECT_EQ(nx_i2c_port_recover(&port), NX_ERROR_IO);
         EXPECT_TRUE(state.fault);
-        lines.IDR = state.line_mask;
+        lines.IDR = 0xC0U;
         ASSERT_EQ(nx_i2c_port_recover(&port), NX_SUCCESS);
     }
 }
 
 TEST_F(I2CRegisters, MissingLineFactsRejectInitializationAndRecovery) {
-    state.line_gpio = nullptr;
+    state.lines = nullptr;
     const uint32_t before = control(&state);
     EXPECT_EQ(nx_stm32_i2c_initialize(&state), NX_ERROR_INVALID);
     EXPECT_EQ(nx_i2c_port_recover(&port), NX_ERROR_INVALID);
     EXPECT_EQ(control(&state), before);
-    state.line_gpio = &lines;
-    state.line_mask = 0;
+    state.lines = &line_config;
+    line_config.masks[0] = 0U;
     EXPECT_EQ(nx_stm32_i2c_initialize(&state), NX_ERROR_INVALID);
     EXPECT_EQ(nx_i2c_port_recover(&port), NX_ERROR_INVALID);
     EXPECT_EQ(control(&state), before);
@@ -795,6 +794,19 @@ TEST_F(I2CRegisters, PollingPayloadCannotBorrowMutableProviderControlBytes) {
               transact({nx_i2c_message_write(control_byte, 1U)}));
     EXPECT_EQ(0U, model_starts);
     EXPECT_EQ(0U, registers.DR);
+}
+
+TEST_F(I2CRegisters, PollingPayloadCannotBorrowLineFactsOrGpioRegisters) {
+    EXPECT_CALL(boundary, Call(testing::_, testing::_))
+        .Times(testing::AnyNumber());
+    for (void* metadata :
+         {static_cast<void*>(&line_config),
+          static_cast<void*>(const_cast<uint32_t*>(&lines.MODER)),
+          static_cast<void*>(const_cast<uint32_t*>(&lines.IDR))}) {
+        EXPECT_EQ(NX_ERROR_INVALID, transact({nx_i2c_message_write(
+                                        static_cast<uint8_t*>(metadata), 1U)}));
+        EXPECT_EQ(0U, model_starts);
+    }
 }
 
 TEST_F(I2CRegisters, FirstReceiveCannotRewriteALaterValidatedMessageLength) {

@@ -10,8 +10,25 @@
 
 /** \brief DS8626 Table 5 restricts clock, Smartcard and modem to USARTs. */
 static bool synchronous_instance(IRQn_Type irq) {
-    return irq == USART1_IRQn || irq == USART2_IRQn || irq == USART3_IRQn ||
+    return irq == USART1_IRQn || irq == USART2_IRQn ||
+#ifdef USART3
+           irq == USART3_IRQn ||
+#endif
            irq == USART6_IRQn;
+}
+
+/** \brief Optional asynchronous-only IP exists only on selected devices. */
+static bool asynchronous_instance(IRQn_Type irq) {
+#ifdef UART4
+    if (irq == UART4_IRQn)
+        return true;
+#endif
+#ifdef UART5
+    if (irq == UART5_IRQn)
+        return true;
+#endif
+    (void)irq;
+    return false;
 }
 
 /** \brief Reject irrelevant fields instead of silently changing the tuple. */
@@ -22,8 +39,7 @@ nx_stm32_uart_wire_validate(const nx_stm32_uart_state_t* port,
         config->mode > NX_UART_WIRE_SMARTCARD ||
         config->flow > NX_UART_FLOW_RTS_CTS)
         return NX_ERROR_INVALID;
-    if (!synchronous_instance(port->irq) && port->irq != UART4_IRQn &&
-        port->irq != UART5_IRQn)
+    if (!synchronous_instance(port->irq) && !asynchronous_instance(port->irq))
         return NX_ERROR_INVALID;
     if (port->profile != NX_UART_RX_BYTES && port->profile != NX_UART_RX_EVENTS)
         return NX_ERROR_UNSUPPORTED;

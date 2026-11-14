@@ -40,8 +40,6 @@ typedef struct {
 typedef struct {
     nx_stm32_uart_cold_config_t uart;
     nx_stm32_uart_dma_resources_t resources;
-    nx_stm32_uart_tx_cold_config_t transmit;
-    DMA_Stream_TypeDef* receive;
     bool continuous;
 } nx_stm32_uart_dma_cold_config_t;
 
@@ -321,17 +319,13 @@ nx_stm32_uart_dma_cold_prepare(nx_stm32_uart_dma_state_t* state,
         return NX_ERROR_INVALID;
     if (state->uart.initialized || state->uart.active != NULL)
         return NX_ERROR_BUSY;
-    if ((config->transmit.registers->CR & DMA_SxCR_EN) != 0U)
+    if ((config->resources.transmit.stream->CR & DMA_SxCR_EN) != 0U)
         return NX_ERROR_BUSY;
     nx_result_t result = nx_stm32_uart_cold_acquire(&config->uart, receipt);
     if (result != NX_SUCCESS)
         return result;
     nx_stm32_uart_cold_bind(&state->uart, &config->uart);
     state->resources = &config->resources;
-    state->transmit.tx = config->transmit.registers;
-    state->transmit.dma_irq = config->transmit.irq;
-    state->transmit.stream = config->transmit.stream;
-    state->transmit.channel = config->transmit.channel;
     result = nx_stm32_uart_dma_initialize(state, config->uart.clock_hz);
     if (result == NX_SUCCESS)
         result = nx_stm32_uart_cold_verify(&config->uart, receipt);
@@ -376,14 +370,13 @@ static inline nx_result_t nx_stm32_uart_receive_cold_prepare(
     if (state->uart.initialized || state->uart.active != NULL ||
         state->stream != NULL)
         return NX_ERROR_BUSY;
-    if ((config->receive->CR & DMA_SxCR_EN) != 0U)
+    if ((config->resources.receive.stream->CR & DMA_SxCR_EN) != 0U)
         return NX_ERROR_BUSY;
     nx_result_t result = nx_stm32_uart_cold_acquire(&config->uart, receipt);
     if (result != NX_SUCCESS)
         return result;
     nx_stm32_uart_cold_bind(&state->uart, &config->uart);
     state->resources = &config->resources;
-    state->receive = config->receive;
     state->continuous = config->continuous;
     result = nx_stm32_uart_receive_initialize(state, config->uart.clock_hz);
     if (result == NX_SUCCESS)
@@ -430,20 +423,15 @@ nx_stm32_uart_duplex_cold_prepare(nx_stm32_uart_duplex_state_t* state,
     if (state->receive.uart.initialized || state->receive.uart.active != NULL ||
         state->receive.stream != NULL)
         return NX_ERROR_BUSY;
-    if ((config->receive->CR & DMA_SxCR_EN) != 0U ||
-        (config->transmit.registers->CR & DMA_SxCR_EN) != 0U)
+    if ((config->resources.receive.stream->CR & DMA_SxCR_EN) != 0U ||
+        (config->resources.transmit.stream->CR & DMA_SxCR_EN) != 0U)
         return NX_ERROR_BUSY;
     nx_result_t result = nx_stm32_uart_cold_acquire(&config->uart, receipt);
     if (result != NX_SUCCESS)
         return result;
     nx_stm32_uart_cold_bind(&state->receive.uart, &config->uart);
     state->receive.resources = &config->resources;
-    state->receive.receive = config->receive;
     state->receive.continuous = config->continuous;
-    state->transmit.tx = config->transmit.registers;
-    state->transmit.dma_irq = config->transmit.irq;
-    state->transmit.stream = config->transmit.stream;
-    state->transmit.channel = config->transmit.channel;
     result = nx_stm32_uart_duplex_initialize(state, config->uart.clock_hz);
     if (result == NX_SUCCESS)
         result = nx_stm32_uart_cold_verify(&config->uart, receipt);

@@ -18,10 +18,11 @@ or generator-source identity.
 
 CMake owns source lists and target dependencies. The resolver emits selected
 facts and its configuration-code dependencies, never a parallel software build
-graph. The selected central provider descriptor, currently
-`tools/configure/stm32f4_descriptor.py`, is an explicit configuration-code input
-and Source SDK source dependency. Board and SoC packages contain no Python
-plugins. Descriptor enumeration does not select C source units.
+graph. The selected `package.json`, its declared facts and binding files, and
+the generic configuration-code closure are explicit generation inputs. The
+package also declares Source SDK export ownership. Board and SoC contain no
+Python plugins; production uses the generic DataProvider rather than family
+constructor imports. Package enumeration does not select C source units.
 
 The selected provider supplies its actual private include directories through
 the existing `NEXUS_SYSTEM_PRIVATE_INCLUDES` connection. Root CMake consumes that

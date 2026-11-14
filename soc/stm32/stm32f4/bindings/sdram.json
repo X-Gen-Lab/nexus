@@ -1,0 +1,804 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "external_bus",
+      "mode": "sdram-controller",
+      "controllers": [
+        "FMC"
+      ],
+      "implementation": "sdram",
+      "headers": [
+        "stm32f4_sdram.h"
+      ],
+      "profiles": {
+        "cpu-window": {
+          "state_type": "nx_stm32_sdram_t",
+          "ops": "nx_stm32_sdram_bus_ops",
+          "declarations": [
+            {
+              "role": "sdram_saved",
+              "type": "uint16_t",
+              "const": false,
+              "count": {
+                "length": "selected.pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "sdram_pins",
+              "type": "nx_stm32_platform_pin_config_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.pads",
+                  "limit": 64,
+                  "value": {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "source": "entry.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "snapshot",
+                        {
+                          "ref": "sdram_saved",
+                          "as": "address",
+                          "index": {
+                            "source": "index",
+                            "as": "u32"
+                          }
+                        }
+                      ],
+                      [
+                        "port_index",
+                        {
+                          "source": "entry.port_index"
+                        }
+                      ],
+                      [
+                        "pin",
+                        {
+                          "source": "entry.number"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "sdram_config",
+              "type": "nx_stm32_sdram_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "pins",
+                    {
+                      "ref": "sdram_pins",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "pin_count",
+                    {
+                      "length": "selected.pads",
+                      "limit": 64
+                    }
+                  ],
+                  [
+                    "system",
+                    {
+                      "address": "g_nx_stm32_system"
+                    }
+                  ],
+                  [
+                    "timing",
+                    {
+                      "record": [
+                        [
+                          "mrd",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.mrd.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.mrd.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "xsr",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.xsr.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.xsr.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "ras",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.ras.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.ras.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "rc",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.rc.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.rc.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "wr",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.wr.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.wr.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "rp",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.rp.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.rp.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "rcd",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.rcd.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.rcd.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ]
+                      ]
+                    }
+                  ],
+                  [
+                    "hclk_hz",
+                    {
+                      "source": "selected.clock_inputs.core_hz"
+                    }
+                  ],
+                  [
+                    "graphics_only",
+                    false
+                  ],
+                  [
+                    "bytes",
+                    {
+                      "source": "selected_children.0.options.parameters.bytes"
+                    }
+                  ],
+                  [
+                    "refresh_window_us",
+                    {
+                      "source": "selected_children.0.options.parameters.refresh_window_us"
+                    }
+                  ],
+                  [
+                    "powerup_us",
+                    {
+                      "source": "selected_children.0.options.parameters.powerup_us"
+                    }
+                  ],
+                  [
+                    "prepare_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.prepare_budget_us"
+                    }
+                  ],
+                  [
+                    "stop_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.stop_budget_us"
+                    }
+                  ],
+                  [
+                    "row_bits",
+                    {
+                      "source": "selected_children.0.options.parameters.row_bits"
+                    }
+                  ],
+                  [
+                    "column_bits",
+                    {
+                      "source": "selected_children.0.options.parameters.column_bits"
+                    }
+                  ],
+                  [
+                    "internal_banks",
+                    {
+                      "source": "selected_children.0.options.parameters.internal_banks"
+                    }
+                  ],
+                  [
+                    "width_bits",
+                    {
+                      "source": "selected_children.0.options.parameters.width_bits"
+                    }
+                  ],
+                  [
+                    "cas",
+                    {
+                      "source": "selected_children.0.options.parameters.cas"
+                    }
+                  ],
+                  [
+                    "sdclk_div",
+                    {
+                      "source": "selected_children.0.options.parameters.sdclk_div"
+                    }
+                  ],
+                  [
+                    "read_pipe",
+                    {
+                      "source": "selected_children.0.options.parameters.read_pipe"
+                    }
+                  ],
+                  [
+                    "initial_refreshes",
+                    {
+                      "source": "selected_children.0.options.parameters.initial_refreshes"
+                    }
+                  ]
+                ]
+              }
+            }
+          ],
+          "endpoint_faces": {
+            "limit": 1,
+            "cases": {
+              "memory_window-endpoint": {
+                "type": "nx_memory_window_port_t",
+                "ops": "nx_stm32_sdram_window_ops",
+                "context": {
+                  "ref": "parent_port",
+                  "as": "address"
+                },
+                "parents": {
+                  "parent_port": "port"
+                }
+              }
+            }
+          },
+          "calls": {
+            "admit": [
+              {
+                "function": "nx_stm32_sdram_admit",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "sdram_config",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "prepare": {
+              "function": "nx_stm32_sdram_start",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "sdram_config",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_sdram_stop",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "sdram_saved",
+            "limit": 64
+          }
+        },
+        "graphics-owned": {
+          "state_type": "nx_stm32_sdram_t",
+          "ops": "nx_stm32_sdram_bus_ops",
+          "declarations": [
+            {
+              "role": "sdram_saved",
+              "type": "uint16_t",
+              "const": false,
+              "count": {
+                "length": "selected.pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "sdram_pins",
+              "type": "nx_stm32_platform_pin_config_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.pads",
+                  "limit": 64,
+                  "value": {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "source": "entry.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "snapshot",
+                        {
+                          "ref": "sdram_saved",
+                          "as": "address",
+                          "index": {
+                            "source": "index",
+                            "as": "u32"
+                          }
+                        }
+                      ],
+                      [
+                        "port_index",
+                        {
+                          "source": "entry.port_index"
+                        }
+                      ],
+                      [
+                        "pin",
+                        {
+                          "source": "entry.number"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "sdram_config",
+              "type": "nx_stm32_sdram_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "pins",
+                    {
+                      "ref": "sdram_pins",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "pin_count",
+                    {
+                      "length": "selected.pads",
+                      "limit": 64
+                    }
+                  ],
+                  [
+                    "system",
+                    {
+                      "address": "g_nx_stm32_system"
+                    }
+                  ],
+                  [
+                    "timing",
+                    {
+                      "record": [
+                        [
+                          "mrd",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.mrd.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.mrd.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "xsr",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.xsr.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.xsr.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "ras",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.ras.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.ras.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "rc",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.rc.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.rc.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "wr",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.wr.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.wr.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "rp",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.rp.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.rp.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "rcd",
+                          {
+                            "record": [
+                              [
+                                "nanoseconds",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.rcd.nanoseconds"
+                                }
+                              ],
+                              [
+                                "cycles",
+                                {
+                                  "source": "selected_children.0.options.parameters.timing.rcd.cycles"
+                                }
+                              ]
+                            ]
+                          }
+                        ]
+                      ]
+                    }
+                  ],
+                  [
+                    "hclk_hz",
+                    {
+                      "source": "selected.clock_inputs.core_hz"
+                    }
+                  ],
+                  [
+                    "graphics_only",
+                    true
+                  ],
+                  [
+                    "bytes",
+                    {
+                      "source": "selected_children.0.options.parameters.bytes"
+                    }
+                  ],
+                  [
+                    "refresh_window_us",
+                    {
+                      "source": "selected_children.0.options.parameters.refresh_window_us"
+                    }
+                  ],
+                  [
+                    "powerup_us",
+                    {
+                      "source": "selected_children.0.options.parameters.powerup_us"
+                    }
+                  ],
+                  [
+                    "prepare_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.prepare_budget_us"
+                    }
+                  ],
+                  [
+                    "stop_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.stop_budget_us"
+                    }
+                  ],
+                  [
+                    "row_bits",
+                    {
+                      "source": "selected_children.0.options.parameters.row_bits"
+                    }
+                  ],
+                  [
+                    "column_bits",
+                    {
+                      "source": "selected_children.0.options.parameters.column_bits"
+                    }
+                  ],
+                  [
+                    "internal_banks",
+                    {
+                      "source": "selected_children.0.options.parameters.internal_banks"
+                    }
+                  ],
+                  [
+                    "width_bits",
+                    {
+                      "source": "selected_children.0.options.parameters.width_bits"
+                    }
+                  ],
+                  [
+                    "cas",
+                    {
+                      "source": "selected_children.0.options.parameters.cas"
+                    }
+                  ],
+                  [
+                    "sdclk_div",
+                    {
+                      "source": "selected_children.0.options.parameters.sdclk_div"
+                    }
+                  ],
+                  [
+                    "read_pipe",
+                    {
+                      "source": "selected_children.0.options.parameters.read_pipe"
+                    }
+                  ],
+                  [
+                    "initial_refreshes",
+                    {
+                      "source": "selected_children.0.options.parameters.initial_refreshes"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "role": "sdram_graphics",
+              "type": "nx_stm32_sdram_graphics_t",
+              "const": false,
+              "value": {
+                "record": [
+                  [
+                    "owner",
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                ]
+              }
+            }
+          ],
+          "endpoint_faces": {
+            "limit": 1,
+            "cases": {
+              "memory_window-endpoint": {
+                "type": "nx_memory_window_port_t",
+                "ops": "nx_stm32_sdram_window_ops",
+                "context": {
+                  "ref": "parent_port",
+                  "as": "address"
+                },
+                "parents": {
+                  "parent_port": "port"
+                }
+              }
+            }
+          },
+          "calls": {
+            "admit": [
+              {
+                "function": "nx_stm32_sdram_admit",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "sdram_config",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "prepare": {
+              "function": "nx_stm32_sdram_start",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "sdram_config",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_sdram_stop",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "sdram_saved",
+            "limit": 64
+          }
+        }
+      }
+    }
+  ]
+}

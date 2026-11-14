@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "gpio",
+      "mode": "input",
+      "implementation": "gpio",
+      "static_recipe": {
+        "state_type": "nx_stm32_gpio_state_t",
+        "declarations": [
+          {
+            "role": "gpio_config",
+            "type": "nx_stm32_gpio_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "mask",
+                  {
+                    "source": "item.route_mask",
+                    "default": {
+                      "source": "item.options.mask"
+                    }
+                  }
+                ],
+                [
+                  "initial",
+                  {
+                    "source": "item.route_initial",
+                    "default": {
+                      "source": "item.options.initial"
+                    }
+                  }
+                ],
+                [
+                  "output",
+                  {
+                    "source": "item.mode",
+                    "values": {
+                      "input": false,
+                      "output": true
+                    }
+                  }
+                ],
+                [
+                  "pull",
+                  {
+                    "source": "item.options.pull",
+                    "values": {
+                      "none": 0,
+                      "up": 1,
+                      "down": 2
+                    }
+                  }
+                ],
+                [
+                  "output_type",
+                  {
+                    "source": "item.options.output_type",
+                    "values": {
+                      "push-pull": 0,
+                      "open-drain": 1
+                    }
+                  }
+                ],
+                [
+                  "speed",
+                  {
+                    "source": "item.options.speed",
+                    "values": {
+                      "preserve": "NX_STM32_GPIO_SPEED_PRESERVE",
+                      "low": "NX_STM32_GPIO_SPEED_LOW",
+                      "medium": "NX_STM32_GPIO_SPEED_MEDIUM",
+                      "high": "NX_STM32_GPIO_SPEED_HIGH",
+                      "very-high": "NX_STM32_GPIO_SPEED_VERY_HIGH"
+                    },
+                    "as": "symbol"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_gpio_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "gpio_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_gpio_stop",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "source": "item.route_initial",
+                  "default": {
+                    "source": "item.options.initial"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": false,
+        "ops": "nx_stm32_gpio_ops"
+      },
+      "headers": [
+        "stm32f407_basic_cold.h"
+      ]
+    },
+    {
+      "kind": "gpio",
+      "mode": "output",
+      "implementation": "gpio",
+      "static_recipe": {
+        "state_type": "nx_stm32_gpio_state_t",
+        "declarations": [
+          {
+            "role": "gpio_config",
+            "type": "nx_stm32_gpio_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "mask",
+                  {
+                    "source": "item.route_mask",
+                    "default": {
+                      "source": "item.options.mask"
+                    }
+                  }
+                ],
+                [
+                  "initial",
+                  {
+                    "source": "item.route_initial",
+                    "default": {
+                      "source": "item.options.initial"
+                    }
+                  }
+                ],
+                [
+                  "output",
+                  {
+                    "source": "item.mode",
+                    "values": {
+                      "input": false,
+                      "output": true
+                    }
+                  }
+                ],
+                [
+                  "pull",
+                  {
+                    "source": "item.options.pull",
+                    "values": {
+                      "none": 0,
+                      "up": 1,
+                      "down": 2
+                    }
+                  }
+                ],
+                [
+                  "output_type",
+                  {
+                    "source": "item.options.output_type",
+                    "values": {
+                      "push-pull": 0,
+                      "open-drain": 1
+                    }
+                  }
+                ],
+                [
+                  "speed",
+                  {
+                    "source": "item.options.speed",
+                    "values": {
+                      "preserve": "NX_STM32_GPIO_SPEED_PRESERVE",
+                      "low": "NX_STM32_GPIO_SPEED_LOW",
+                      "medium": "NX_STM32_GPIO_SPEED_MEDIUM",
+                      "high": "NX_STM32_GPIO_SPEED_HIGH",
+                      "very-high": "NX_STM32_GPIO_SPEED_VERY_HIGH"
+                    },
+                    "as": "symbol"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_gpio_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "gpio_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_gpio_stop",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "source": "item.route_initial",
+                  "default": {
+                    "source": "item.options.initial"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": false,
+        "ops": "nx_stm32_gpio_ops"
+      },
+      "headers": [
+        "stm32f407_basic_cold.h"
+      ]
+    }
+  ]
+}

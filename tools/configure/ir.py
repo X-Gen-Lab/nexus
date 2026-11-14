@@ -1399,11 +1399,8 @@ class SdramWindowOptions:
     """One CPU window; physical geometry remains in the endpoint parameters."""
     binding: str
     mode: str
+    address: int
     parameters: SdramParameters
-
-    @property
-    def address(self):
-        return 0xc0000000
 
     @property
     def bytes(self):
@@ -1524,6 +1521,7 @@ class EndpointIR(Record):
             timing = SdramTiming(**{name: SdramMinimum(**minimum)
                                     for name, minimum in parameters["timing"].items()})
             options = SdramWindowOptions(values["binding"], values["mode"],
+                values["address"],
                 SdramParameters(**{**parameters, "timing": timing}))
         elif kind == "external_bus":
             p = values.get("parameters")
@@ -1701,6 +1699,50 @@ class PhysicalPartIR:
 
 
 @dataclass(frozen=True)
+class PadBindingIR:
+    """Selected logical pad and its reviewed private C connection leaves."""
+    identity: str
+    registers: str
+    port_index: int
+    number: int
+    alternate: int
+    function: str
+
+
+@dataclass(frozen=True)
+class DmaBindingIR:
+    """One selected lane; resource ownership and request remain canonical."""
+    engine: str
+    lane: int
+    request: int
+    physical_key: str
+    registers: str
+    stream: str
+    irq: str
+    handler: str
+    flag_bank: str
+    flag_shift: int
+    status_member: str
+    clear_member: str
+
+
+@dataclass(frozen=True)
+class InterruptBindingIR:
+    """Reviewed CMSIS enum and independent startup handler identity."""
+    irq: str
+    handler: str
+    number: int
+
+
+@dataclass(frozen=True)
+class DmaMemoryBindingIR:
+    """One static region projection of the canonical reachability facts."""
+    begin: int
+    size: int
+    permissions: object
+
+
+@dataclass(frozen=True)
 class ControllerIntegrationIR:
     """One selected owner composed from the already validated immutable plans.
 
@@ -1720,6 +1762,17 @@ class ControllerIntegrationIR:
     clock_hz: int | None
     pins: tuple[Mapping, ...]
     hardware: "ControllerBinding | None"
+    pads: tuple[PadBindingIR, ...] = ()
+    dma_bindings: tuple[DmaBindingIR, ...] = ()
+    vector_bindings: tuple[InterruptBindingIR, ...] = ()
+    kernel_bound: bool = False
+    kernel_policy: str = "NX_IRQ_KERNEL_NONE"
+    memory_regions: tuple[DmaMemoryBindingIR, ...] = ()
+    readable_regions: tuple[DmaMemoryBindingIR, ...] = ()
+    constants: Mapping | None = None
+    execution_profile: str = "default"
+    physical_flash: Mapping | None = None
+    named_pads: Mapping | None = None
 
 
 @dataclass(frozen=True)
@@ -1864,7 +1917,12 @@ class ConfigurationIR(Record):
     def with_integrations(self):
         """Reference canonical selected plans without copying or re-resolving."""
         from tools.configure.providers import for_selection
+        from tools.configure.providers.common import kernel_policy_constant
+        from tools.configure.memory import dma_region_bindings
+        from tools.configure.uart_formats import execution_profile
         provider = for_selection(self)
+        policy = (self.provider_context.binding_policy
+                  if self.provider_context is not None else None)
         integrated = []
         for item in self.controllers:
             hardware = next((binding for binding in
@@ -1872,18 +1930,45 @@ class ConfigurationIR(Record):
                 if binding.controller == item.controller and
                 (binding.kind == item.kind or item.kind in
                  provider.CONTROLLER_INTERFACES.get(item.controller, {}))), None)
+            lanes = tuple(lane for lane in self.dma_topology.lanes
+                          if lane.owner == item.id)
+            claims = tuple(claim for claim in self.resource_plan.claims
+                if item.id in claim.owner.split(";") and
+                claim.mode not in {"reserved", "kernel"})
+            pads = policy.pad_bindings(item.pins) if policy is not None else ()
+            dma = policy.dma_bindings(lanes) if policy is not None else ()
+            named, repeated = {}, set()
+            for pad in pads:
+                if pad.function in named:
+                    repeated.add(pad.function)
+                named[pad.function] = pad
+            named_pads = MappingProxyType({name: pad for name, pad in named.items()
+                                          if name not in repeated})
             integration = ControllerIntegrationIR(
                 item.controller,
-                tuple(claim for claim in self.resource_plan.claims
-                      if item.id in claim.owner.split(";") and
-                      claim.mode not in {"reserved", "kernel"}),
-                tuple(lane for lane in self.dma_topology.lanes if lane.owner == item.id),
+                claims,
+                lanes,
                 getattr(item.options, "irq", None), self.irq, self.clock_plan,
                 self.clock,
                 (provider.controller_clock_hz(self, item.controller)
                  if hasattr(provider, "controller_clock_hz") else
                  self.clock[f"apb{hardware.apb}_hz"]
-                 if hardware is not None else None), item.pins, hardware)
+                 if hardware is not None else None), item.pins, hardware,
+                pads,
+                dma,
+                policy.owner_vectors(item.controller, claims, dma) if policy is not None else (),
+                self.kernel is not None, kernel_policy_constant(self),
+                dma_region_bindings(self),
+                dma_region_bindings(self, include_flash=True),
+                self.provider_context.domain_policies.binding_values(item, configuration=self)
+                if self.provider_context is not None and
+                self.provider_context.domain_policies is not None else MappingProxyType({}),
+                self.provider_context.domain_policies.execution_profile(item,
+                    tuple(child for child in self.devices if child.controller == item.id))
+                if self.provider_context is not None and
+                self.provider_context.domain_policies is not None else
+                execution_profile(item) if item.kind == "uart" else "default",
+                self.physical_part.flash, named_pads)
             integrated.append(replace(item, integration=integration,
                                       provider_context=self.provider_context))
         return replace(self, controllers=tuple(integrated))
@@ -1895,4 +1980,46 @@ def controller_ir(item, family):
         raise TypeError("Provider construction requires ControllerIR")
     if item.provider != family:
         raise ValueError("Controller provider differs from the selected family")
+    return item
+
+
+def coherent_controller_ir(item, result, provider):
+    """Require canonical selected references before encoding a private layout."""
+    controller_ir(item, provider.package.family)
+    context = getattr(result, "provider_context", None)
+    if (not isinstance(result, ConfigurationIR) or context is None or
+            context.provider is not provider or item.provider_context is not context or
+            result.soc_family != item.provider):
+        raise ValueError("Controller integration has no matching selected provider context")
+    owners = tuple(selected for selected in result.controllers if selected.id == item.id)
+    selected = item.integration
+    if (len(owners) != 1 or not isinstance(selected, ControllerIntegrationIR) or
+            any(getattr(item, member.name) != getattr(owners[0], member.name)
+                for member in fields(ControllerIR))):
+        raise ValueError("Controller integration differs from its canonical selected owner")
+    claims = tuple(claim for claim in result.resource_plan.claims
+                   if item.id in claim.owner.split(";") and
+                   claim.mode not in {"reserved", "kernel"})
+    lanes = tuple(lane for lane in result.dma_topology.lanes if lane.owner == item.id)
+    if (selected.controller != item.controller or selected.pins is not item.pins or
+            selected.irq is not getattr(item.options, "irq", None) or
+            selected.irq_profile is not result.irq or
+            selected.clock_plan is not result.clock_plan or selected.clock_inputs is not result.clock or
+            selected.physical_flash is not result.physical_part.flash or
+            len(selected.resources) != len(claims) or
+            any(actual is not expected for actual, expected in zip(selected.resources, claims)) or
+            len(selected.dma) != len(lanes) or len(lanes) != len(item.dma) or
+            any(actual is not expected for actual, expected in zip(selected.dma, lanes)) or
+            any(lane.controller != item.controller for lane in lanes) or
+            selected.clock_hz != provider.controller_clock_hz(result, item.controller)):
+        raise ValueError("Controller integration differs from its canonical resource, IRQ or clock plan")
+    policy = context.binding_policy
+    if policy is None or len(selected.dma_bindings) != len(lanes):
+        raise ValueError("Controller integration lacks its selected DMA binding policy")
+    for lane, binding in zip(lanes, selected.dma_bindings):
+        facts = policy.dma_facts.get(lane.physical_key)
+        if (facts is None or any(getattr(binding, name) != getattr(lane, name)
+                                for name in ("engine", "lane", "request", "physical_key")) or
+                any(getattr(binding, name) != value for name, value in facts.items())):
+            raise ValueError("Controller integration DMA leaves differ from the selected route facts")
     return item

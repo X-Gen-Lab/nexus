@@ -211,7 +211,7 @@ def dependency_paths(text, build):
 def empty_retention(elf, bindings, resolved, *, root=ROOT):
     """Prove an explicit empty selection from actual ELF, never a skipped pass."""
     if (resolved["controllers"] or resolved["devices"] or
-            retention.FACE_DECLARATION.search(bindings)):
+            retention.face_declarations(bindings, root=root)):
         raise EvidenceError("empty retention has selected provider declarations")
     _, _, providers, public = retention.source_contracts(root)
     symbols = {item["name"] for item in elf.defined_symbols}
@@ -294,7 +294,7 @@ def inspect(build, fixture, compiler, *, root=ROOT):
     elf = Elf32(elf_path.read_bytes(), float_abi=abi)
     bindings = regular_file(generated / "bindings.c")
     source = bindings.read_text()
-    if retention.FACE_DECLARATION.search(source):
+    if retention.face_declarations(source, root=root):
         original_retention = load_json(build / "bin/provider-retention.json")
         if abi == "soft" or "resolved" in original_retention:
             retained = retention.inspect_files(

@@ -1,5 +1,6 @@
 """Reviewed byte frames and an independent nine-bit IRQ personality."""
 from dataclasses import dataclass
+from tools.configure.calls import DirectCall, Symbol
 
 from tools.configure.providers.common import fail, integer, mode_traits
 
@@ -132,19 +133,33 @@ def changed(item):
             8, "none", 1, "none")
 
 
+def execution_profile(item):
+    """Name the public storage/frame shape, independent of a chip provider."""
+    if item.kind != "uart":
+        fail("UART execution profiles require a UART owner")
+    receive = ("words" if item.mode == "irq-words" else
+               "blocks" if mode_traits("uart", item.mode).block_stream else
+               item.options.rx_profile)
+    profile = receive + ("-formatted" if receive != "words" and changed(item)
+                         else "-default")
+    return profile + ("-probed" if item.options.irq.probe else "")
+
+
 def probed(result):
     """Selected physical word vectors, without changing default provider state."""
     return tuple(item for item in result.controllers if item.kind == "uart" and
                  item.options.irq is not None and item.options.irq.probe)
 
 
-def irq_call(item, call):
+def irq_calls(item, call):
     """Keep the direct dispatch unchanged and optional observation outside it."""
+    if not isinstance(call, DirectCall):
+        fail("UART IRQ requires a typed direct connection")
     if not item.options.irq.probe:
-        return call
+        return (call,)
     vector = item.controller
-    return (f"NX_IO_IRQ_PROBE_BEGIN({vector}); " + call +
-            f" NX_IO_IRQ_PROBE_END({vector});")
+    return (DirectCall("NX_IO_IRQ_PROBE_BEGIN", (Symbol(vector),)), call,
+            DirectCall("NX_IO_IRQ_PROBE_END", (Symbol(vector),)))
 
 
 def emit_probe_factory(result):
@@ -170,7 +185,8 @@ def validate_selection(selection, route, provider, ram_size):
     """Admit frame and receive-storage policy for the selected UART mode."""
     if not {"baud", "rx_profile", "irq_priority"}.issubset(selection):
         fail("UART requires baud, RX profile and IRQ priority")
-    integer(selection["baud"], *provider.LIMITS["uart_baud"], "UART baud")
+    integer(selection["baud"], *provider.LIMITS.get("uart_baud", (1, 0xffffffff)),
+            "UART baud")
     validate(selection, route, provider)
     if selection["mode"] == "irq-words":
         if selection["rx_profile"] != "words":

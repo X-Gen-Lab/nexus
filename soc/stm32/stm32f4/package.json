@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "interface_version": 1,
+  "id": "stm32f4",
+  "family": "stm32f4",
+  "vendor": "stm32",
+  "source_directory": ".",
+  "facts": {
+    "soc": "soc.json",
+    "routes": "routes.json",
+    "device_catalog": "devices.json",
+    "references": "references.json",
+    "bindings": "bindings.json",
+    "review_profiles": "review_profiles.json"
+  },
+  "dependencies": {
+    "cmsis_core": "cmsis_core",
+    "cmsis_device_f4": "stm32f4_cmsis",
+    "hal_driver_f4": "stm32f4_hal"
+  },
+  "cmake": {
+    "entry": "CMakeLists.txt",
+    "target": "nexus_soc_stm32f4"
+  },
+  "exports": {
+    "roots": [
+      "."
+    ],
+    "exclude": [
+      "tests",
+      "testing",
+      "__pycache__"
+    ]
+  },
+  "binding_files": [
+    "bindings/gpio.json",
+    "bindings/pvd.json",
+    "bindings/domain_common.json",
+    "bindings/external_bus_policy.json",
+    "bindings/adc_policy.json",
+    "bindings/capture_audio_policy.json",
+    "bindings/gpio_policy.json",
+    "bindings/crypto.json",
+    "bindings/can.json",
+    "bindings/dac.json",
+    "bindings/selection_policy.json",
+    "bindings/waveform_policy.json",
+    "bindings/sai_policy.json",
+    "bindings/platform.json",
+    "bindings/adc_group.json",
+    "bindings/capture.json",
+    "bindings/audio.json",
+    "bindings/sai.json",
+    "bindings/timer.json",
+    "bindings/exti.json",
+    "bindings/flash.json",
+    "bindings/watchdog.json",
+    "bindings/adc.json",
+    "bindings/rtc.json",
+    "bindings/encoder.json",
+    "bindings/sdio.json",
+    "bindings/identity.json",
+    "bindings/waveform.json",
+    "bindings/pwm.json",
+    "bindings/uart.json",
+    "bindings/headers.json",
+    "bindings/startup_memory.json",
+    "bindings/fsmc.json",
+    "bindings/qspi.json",
+    "bindings/sdram.json",
+    "bindings/graphics.json",
+    "bindings/packet.json",
+    "bindings/spi.json",
+    "bindings/i2c.json",
+    "bindings/spi_frames.json",
+    "bindings/i2c_target.json"
+  ]
+}

@@ -52,7 +52,7 @@ foreach(timebase_family stm32f4)
         "${NEXUS_SOURCE_DIR}/ext/freertos/include"
         "${NEXUS_SOURCE_DIR}/ext/freertos/portable/ThirdParty/GCC/Posix")
     target_compile_definitions(${timebase_target} PRIVATE
-        NEXUS_TIMEBASE_LOWPOWER=1 NX_TIMEBASE_INTEGRATION)
+        NEXUS_TIMEBASE_LOWPOWER=1 NX_TIMEBASE_INTEGRATION NX_TEST_SYSTEM_TIM5=1)
     target_compile_options(${timebase_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/timebase_soc_model.h")
     target_include_directories(${timebase_target} SYSTEM PRIVATE

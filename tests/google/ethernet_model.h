@@ -9,6 +9,17 @@
 #include "nexus/io/wake.h"
 #include <stdbool.h>
 #include <stdint.h>
+#ifdef NX_ETH_TEST_STM32
+/* This provider fixture explicitly selects the F407 physical domain; ordinary
+ * Native models and generated factory fixtures retain their own inputs. */
+#include "nexus_config.h"
+#undef NEXUS_STM32_DMA_SRAM_ORIGIN
+#undef NEXUS_STM32_DMA_SRAM_BYTES
+#undef NEXUS_CPU_EXTERNAL_IRQ_COUNT
+#define NEXUS_STM32_DMA_SRAM_ORIGIN  UINT32_C(0x20000000)
+#define NEXUS_STM32_DMA_SRAM_BYTES   131072U
+#define NEXUS_CPU_EXTERNAL_IRQ_COUNT 82U
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif

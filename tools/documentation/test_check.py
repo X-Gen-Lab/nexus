@@ -338,13 +338,19 @@ class SourceSDKInstructionTests(unittest.TestCase):
         with patch.object(packager, "prepare", return_value=result) as prepare, \
                 redirect_stdout(io.StringIO()):
             self.assertEqual(packager.main(command[2:]), 0)
-        profile = prepare.call_args.kwargs["profile"]
-        self.assertTrue(profile["host_support"],
+        selection = packager.resolve_selection(root, **prepare.call_args.kwargs)
+        self.assertTrue(selection.host_support,
                         "The complete plan starts with a Native consumer")
-        selected = set(packager.runtime_dependency_closure(profile))
+        self.assertEqual(selection.backend, "freertos")
+        self.assertEqual({package.id for package in selection.packages}, {"stm32f4"})
+        self.assertEqual(set(selection.components), {
+            "network", "network-loaned-rx", "tls", "mqtt", "mcuboot",
+            "st-usb-device", "st-usb-host"})
+        selected = set(packager.runtime_dependency_closure(root=root, selection=selection))
         self.assertTrue({"ext/lwip", "ext/mbedtls", "ext/coremqtt",
-                         "ext/mcuboot"}.issubset(selected),
-                        "The complete plan includes network, TLS and boot users")
+                         "ext/mcuboot", "ext/freertos", "vendors/st/usb_device",
+                         "vendors/st/usb_host"}.issubset(selected),
+                        "The complete plan includes network, TLS, MQTT, boot and ST USB users")
 
 
 if __name__ == "__main__":

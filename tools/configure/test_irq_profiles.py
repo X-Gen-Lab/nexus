@@ -76,7 +76,7 @@ class InterruptProfileTests(unittest.TestCase):
         with self.assertRaisesRegex(gate.ConfigurationError, "kernel CPU ABI"):
             selection.validate_interrupt_profile(profile, provider)
         profile = self.selected_cpu_profile(4)
-        with patch.object(provider, "FREERTOS_PORT", "GCC/ARM_CM0"):
+        with patch.object(type(provider), "FREERTOS_PORT", "GCC/ARM_CM0"):
             with self.assertRaisesRegex(gate.ConfigurationError,
                                         "Unmaintained FreeRTOS port"):
                 selection.validate_interrupt_profile(profile, provider)
@@ -146,32 +146,33 @@ class InterruptProfileTests(unittest.TestCase):
 class PreflightIrqGeometryTests(unittest.TestCase):
     """Serializer fragments do not grant new hardware modes or exact parts."""
 
-    def emit(self, count, vector):
+    def emit(self, count, vector, number):
         from types import SimpleNamespace
         from tools.configure import resource_graph
-        from tools.configure.stm32f4 import preflight
+        from tools.configure.ir import InterruptBindingIR
+        from tools.configure.policies.gpio_phase import GpioPhasePolicy
+        facts = gate.load(gate.ROOT / "soc/stm32/stm32f4/bindings/gpio_policy.json")
+        policy = GpioPhasePolicy.from_validated(facts["domains"]["gpio_phase"])
         claim = resource_graph.ResourceClaimIR(
             "irq:" + vector, "serializer-owner", "fixture",
             "serializer-input", "exclusive", (), None)
+        # This is a serializer fixture, not a new selected part/provider.
+        binding = SimpleNamespace(vector_bindings=lambda _irqs: (
+            InterruptBindingIR(vector + "_IRQn", vector + "_IRQHandler", number),))
         selected = SimpleNamespace(
             controllers=(SimpleNamespace(id="serializer-owner", kind="crc",
-                                         controller="CRC"),), can_domain=None,
+                controller="CRC", integration=SimpleNamespace(dma_bindings=())),),
+            provider_context=SimpleNamespace(binding_policy=binding),
             resource_plan=resource_graph.ResourcePlanIR((claim,)),
             cpu_profile=SimpleNamespace(irq=SimpleNamespace(external_count=count)))
-        return "\n".join(preflight.admission_declarations(selected, "NULL", 0))
+        config = policy.admission_declarations(selected, None, 0)[-1]
+        return dict(config.initializer.fields)["irq_masks"].values
 
     def test_existing_82_slot_profile_keeps_three_mask_words(self):
-        source = self.emit(82, "FPU")
-        for bank in range(3):
-            self.assertIn(f"NX_STM32_PLATFORM_IRQ_MASK(FPU_IRQn, {bank}u)", source)
-        self.assertNotIn("FPU_IRQn, 3u", source)
+        self.assertEqual(self.emit(82, "FPU", 81), (0, 0, 1 << 17))
 
     def test_97_slot_profile_keeps_the_fourth_bank_vector(self):
-        source = self.emit(97, "FMPI2C1_ER")
-        for bank in range(4):
-            self.assertIn(
-                f"NX_STM32_PLATFORM_IRQ_MASK(FMPI2C1_ER_IRQn, {bank}u)", source)
-        self.assertNotIn("FMPI2C1_ER_IRQn, 4u", source)
+        self.assertEqual(self.emit(97, "FMPI2C1_ER", 96), (0, 0, 0, 1))
 
 
 if __name__ == "__main__":

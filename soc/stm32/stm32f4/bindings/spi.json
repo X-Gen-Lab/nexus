@@ -1,0 +1,1342 @@
+{
+  "schema_version": 1,
+  "static_fragments": {
+    "declarations": {
+      "spi-pins": [
+        {
+          "role": "spi_pin_state",
+          "type": "uint16_t",
+          "const": false,
+          "count": {
+            "length": "selected.constants.spi.pads",
+            "limit": 64
+          }
+        },
+        {
+          "role": "spi_pins",
+          "type": "nx_stm32_spi_pin_config_t",
+          "const": true,
+          "value": {
+            "map": {
+              "source": "selected.constants.spi.pads",
+              "limit": 64,
+              "value": {
+                "record": [
+                  [
+                    "registers",
+                    {
+                      "source": "entry.registers",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "snapshot",
+                    {
+                      "ref": "spi_pin_state",
+                      "as": "address",
+                      "index": {
+                        "source": "index",
+                        "as": "u32"
+                      }
+                    }
+                  ],
+                  [
+                    "port_index",
+                    {
+                      "source": "entry.port_index",
+                      "as": "u32"
+                    }
+                  ],
+                  [
+                    "pin",
+                    {
+                      "source": "entry.number",
+                      "as": "u32"
+                    }
+                  ],
+                  [
+                    "alternate",
+                    {
+                      "source": "entry.alternate",
+                      "as": "u32"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "count": {
+            "length": "selected.constants.spi.pads",
+            "limit": 64
+          }
+        }
+      ]
+    }
+  },
+  "bindings": [
+    {
+      "kind": "spi",
+      "mode": "short-poll",
+      "controllers": [
+        "SPI1",
+        "SPI2",
+        "SPI3"
+      ],
+      "implementation": "spi",
+      "headers": [
+        "stm32f407_spi_cold.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_spi_state_t",
+        "ops": "nx_stm32_spi_ops",
+        "declarations": [
+          {
+            "role": "spi_cold",
+            "type": "nx_stm32_spi_cold_receipt_t",
+            "const": false
+          },
+          {
+            "use": "spi-pins"
+          },
+          {
+            "role": "spi_endpoints",
+            "type": "nx_stm32_spi_endpoint_config_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.constants.spi.endpoints",
+                "limit": 64,
+                "value": {
+                  "record": [
+                    [
+                      "endpoint",
+                      {
+                        "owner": {
+                          "source": "entry.child.id",
+                          "role": "endpoint"
+                        }
+                      }
+                    ],
+                    [
+                      "chip_select",
+                      {
+                        "owner": {
+                          "source": "entry.child.id",
+                          "role": "cs"
+                        }
+                      }
+                    ],
+                    [
+                      "frequency_hz",
+                      {
+                        "source": "entry.child.options.max_hz",
+                        "as": "u32"
+                      }
+                    ],
+                    [
+                      "mode",
+                      {
+                        "source": "entry.child.options.mode",
+                        "as": "u32"
+                      }
+                    ],
+                    [
+                      "lsb_first",
+                      {
+                        "source": "entry.child.options.lsb_first",
+                        "as": "bool"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.constants.spi.endpoints",
+              "limit": 64
+            }
+          },
+          {
+            "role": "spi_config",
+            "type": "nx_stm32_spi_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "clock_hz",
+                  {
+                    "source": "selected.clock_hz",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "pins",
+                  {
+                    "ref": "spi_pins",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "pin_count",
+                  {
+                    "length": "selected.constants.spi.pads",
+                    "limit": 64
+                  }
+                ],
+                [
+                  "endpoints",
+                  {
+                    "ref": "spi_endpoints",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "endpoint_count",
+                  {
+                    "length": "selected.constants.spi.endpoints",
+                    "limit": 64
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_spi_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "spi_config",
+                "as": "address"
+              },
+              {
+                "ref": "spi_cold",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_spi_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "spi_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "spi_cold",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "child_groups": {
+          "limit": 64,
+          "before_role": "spi_endpoints",
+          "cases": {
+            "spi-endpoint": {
+              "parents": {},
+              "declarations": [
+                {
+                  "role": "endpoint",
+                  "type": "nx_stm32_spi_endpoint_state_t",
+                  "const": false
+                },
+                {
+                  "role": "cs",
+                  "type": "nx_stm32_gpio_state_t",
+                  "const": false
+                }
+              ],
+              "calls": {
+                "prepare": [],
+                "close": []
+              },
+              "face": {
+                "type": "nx_spi_endpoint_t",
+                "ops": "nx_stm32_spi_endpoint_ops",
+                "context": {
+                  "ref": "endpoint",
+                  "as": "address"
+                }
+              }
+            },
+            "bmp280": {
+              "parents": {},
+              "declarations": [
+                {
+                  "role": "endpoint",
+                  "type": "nx_stm32_spi_endpoint_state_t",
+                  "const": false
+                },
+                {
+                  "role": "cs",
+                  "type": "nx_stm32_gpio_state_t",
+                  "const": false
+                }
+              ],
+              "calls": {
+                "prepare": [],
+                "close": []
+              },
+              "face": {
+                "type": "nx_spi_endpoint_t",
+                "ops": "nx_stm32_spi_endpoint_ops",
+                "context": {
+                  "ref": "endpoint",
+                  "as": "address"
+                }
+              }
+            },
+            "spi-transaction": {
+              "parents": {},
+              "declarations": [
+                {
+                  "role": "endpoint",
+                  "type": "nx_stm32_spi_endpoint_state_t",
+                  "const": false
+                },
+                {
+                  "role": "cs",
+                  "type": "nx_stm32_gpio_state_t",
+                  "const": false
+                }
+              ],
+              "calls": {
+                "prepare": [],
+                "close": []
+              },
+              "face": {
+                "type": "nx_spi_transaction_endpoint_t",
+                "ops": "nx_stm32_spi_transaction_ops",
+                "context": {
+                  "ref": "endpoint",
+                  "as": "address"
+                }
+              }
+            }
+          }
+        },
+        "pin_snapshots": {
+          "source": "selected.constants.spi.pads",
+          "key": "entry.identity",
+          "array_role": "spi_pin_state",
+          "limit": 64
+        }
+      }
+    },
+    {
+      "kind": "spi",
+      "mode": "dma",
+      "controllers": [
+        "SPI1",
+        "SPI2",
+        "SPI3"
+      ],
+      "implementation": "spi_dma",
+      "headers": [
+        "stm32f407_spi_cold.h",
+        "stm32f407_dma.h"
+      ],
+      "profiles": {
+        "default": {
+          "state_type": "nx_stm32_spi_dma_state_t",
+          "ops": "nx_stm32_spi_dma_ops",
+          "declarations": [
+            {
+              "role": "spi_cold",
+              "type": "nx_stm32_spi_dma_cold_t",
+              "const": false
+            },
+            {
+              "use": "spi-pins"
+            },
+            {
+              "role": "spi_endpoints",
+              "type": "nx_stm32_spi_endpoint_config_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.constants.spi.endpoints",
+                  "limit": 64,
+                  "value": {
+                    "record": [
+                      [
+                        "endpoint",
+                        {
+                          "owner": {
+                            "source": "entry.child.id",
+                            "role": "endpoint",
+                            "member": "endpoint"
+                          }
+                        }
+                      ],
+                      [
+                        "chip_select",
+                        {
+                          "owner": {
+                            "source": "entry.child.id",
+                            "role": "cs"
+                          }
+                        }
+                      ],
+                      [
+                        "frequency_hz",
+                        {
+                          "source": "entry.child.options.max_hz",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "mode",
+                        {
+                          "source": "entry.child.options.mode",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "lsb_first",
+                        {
+                          "source": "entry.child.options.lsb_first",
+                          "as": "bool"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.constants.spi.endpoints",
+                "limit": 64
+              }
+            },
+            {
+              "role": "dma_regions",
+              "type": "nx_dma_memory_region_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.readable_regions",
+                  "limit": 16,
+                  "value": {
+                    "record": [
+                      [
+                        "begin",
+                        {
+                          "source": "entry.begin",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "size",
+                        {
+                          "source": "entry.size",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "permissions",
+                        {
+                          "source": "entry.permissions",
+                          "as": "static"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.readable_regions",
+                "limit": 16
+              }
+            },
+            {
+              "role": "spi_config",
+              "type": "nx_stm32_spi_dma_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "spi",
+                    {
+                      "record": [
+                        [
+                          "registers",
+                          {
+                            "source": "item.controller",
+                            "as": "symbol"
+                          }
+                        ],
+                        [
+                          "clock_hz",
+                          {
+                            "source": "selected.clock_hz",
+                            "as": "u32"
+                          }
+                        ],
+                        [
+                          "pins",
+                          {
+                            "ref": "spi_pins",
+                            "as": "symbol"
+                          }
+                        ],
+                        [
+                          "pin_count",
+                          {
+                            "length": "selected.constants.spi.pads",
+                            "limit": 64
+                          }
+                        ],
+                        [
+                          "endpoints",
+                          {
+                            "ref": "spi_endpoints",
+                            "as": "symbol"
+                          }
+                        ],
+                        [
+                          "endpoint_count",
+                          {
+                            "length": "selected.constants.spi.endpoints",
+                            "limit": 64
+                          }
+                        ]
+                      ]
+                    }
+                  ],
+                  [
+                    "resources",
+                    {
+                      "record": [
+                        [
+                          "transmit",
+                          {
+                            "record": [
+                              [
+                                "dma",
+                                {
+                                  "source": "selected.dma_bindings.0.registers",
+                                  "as": "symbol"
+                                }
+                              ],
+                              [
+                                "stream",
+                                {
+                                  "source": "selected.dma_bindings.0.stream",
+                                  "as": "symbol"
+                                }
+                              ],
+                              [
+                                "irq",
+                                {
+                                  "source": "selected.dma_bindings.0.irq",
+                                  "as": "symbol"
+                                }
+                              ],
+                              [
+                                "lane",
+                                {
+                                  "source": "selected.dma_bindings.0.lane",
+                                  "as": "u32"
+                                }
+                              ],
+                              [
+                                "channel",
+                                {
+                                  "source": "selected.dma_bindings.0.request",
+                                  "as": "u32"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "receive",
+                          {
+                            "record": [
+                              [
+                                "dma",
+                                {
+                                  "source": "selected.dma_bindings.1.registers",
+                                  "as": "symbol"
+                                }
+                              ],
+                              [
+                                "stream",
+                                {
+                                  "source": "selected.dma_bindings.1.stream",
+                                  "as": "symbol"
+                                }
+                              ],
+                              [
+                                "irq",
+                                {
+                                  "source": "selected.dma_bindings.1.irq",
+                                  "as": "symbol"
+                                }
+                              ],
+                              [
+                                "lane",
+                                {
+                                  "source": "selected.dma_bindings.1.lane",
+                                  "as": "u32"
+                                }
+                              ],
+                              [
+                                "channel",
+                                {
+                                  "source": "selected.dma_bindings.1.request",
+                                  "as": "u32"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "regions",
+                          {
+                            "ref": "dma_regions",
+                            "as": "symbol"
+                          }
+                        ],
+                        [
+                          "region_count",
+                          {
+                            "length": "selected.readable_regions",
+                            "limit": 16
+                          }
+                        ]
+                      ]
+                    }
+                  ],
+                  [
+                    "priority",
+                    {
+                      "source": "selected.irq.priority",
+                      "as": "u32"
+                    }
+                  ],
+                  [
+                    "kernel_bound",
+                    {
+                      "source": "selected.kernel_bound",
+                      "as": "bool"
+                    }
+                  ]
+                ]
+              }
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_spi_dma_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "spi_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "spi_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_spi_port_stop",
+                "args": [
+                  {
+                    "ref": "face",
+                    "as": "address"
+                  }
+                ]
+              },
+              {
+                "function": "nx_stm32_spi_dma_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "spi_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "spi_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "child_groups": {
+            "limit": 64,
+            "before_role": "spi_endpoints",
+            "cases": {
+              "spi-endpoint": {
+                "parents": {},
+                "declarations": [
+                  {
+                    "role": "endpoint",
+                    "type": "nx_stm32_spi_dma_endpoint_state_t",
+                    "const": false
+                  },
+                  {
+                    "role": "cs",
+                    "type": "nx_stm32_gpio_state_t",
+                    "const": false
+                  }
+                ],
+                "calls": {
+                  "prepare": [],
+                  "close": []
+                },
+                "face": {
+                  "type": "nx_spi_endpoint_t",
+                  "ops": "nx_stm32_spi_dma_endpoint_ops",
+                  "context": {
+                    "ref": "endpoint",
+                    "as": "address"
+                  }
+                }
+              },
+              "bmp280": {
+                "parents": {},
+                "declarations": [
+                  {
+                    "role": "endpoint",
+                    "type": "nx_stm32_spi_dma_endpoint_state_t",
+                    "const": false
+                  },
+                  {
+                    "role": "cs",
+                    "type": "nx_stm32_gpio_state_t",
+                    "const": false
+                  }
+                ],
+                "calls": {
+                  "prepare": [],
+                  "close": []
+                },
+                "face": {
+                  "type": "nx_spi_endpoint_t",
+                  "ops": "nx_stm32_spi_dma_endpoint_ops",
+                  "context": {
+                    "ref": "endpoint",
+                    "as": "address"
+                  }
+                }
+              },
+              "spi-transaction": {
+                "parents": {},
+                "declarations": [
+                  {
+                    "role": "endpoint",
+                    "type": "nx_stm32_spi_dma_endpoint_state_t",
+                    "const": false
+                  },
+                  {
+                    "role": "cs",
+                    "type": "nx_stm32_gpio_state_t",
+                    "const": false
+                  }
+                ],
+                "calls": {
+                  "prepare": [],
+                  "close": []
+                },
+                "face": {
+                  "type": "nx_spi_transaction_endpoint_t",
+                  "ops": "nx_stm32_spi_transaction_ops",
+                  "context": {
+                    "ref": "endpoint",
+                    "as": "address"
+                  }
+                }
+              }
+            }
+          },
+          "pin_snapshots": {
+            "source": "selected.constants.spi.pads",
+            "key": "entry.identity",
+            "array_role": "spi_pin_state",
+            "limit": 64
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.dma_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_spi_dma_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    },
+                    false
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            },
+            {
+              "name": {
+                "source": "selected.dma_bindings.1.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_spi_dma_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    },
+                    true
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ]
+        },
+        "sequence": {
+          "state_type": "nx_stm32_spi_dma_state_t",
+          "ops": "nx_spi_dma_sequence_port_ops",
+          "declarations": [
+            {
+              "role": "sequence",
+              "type": "nx_spi_dma_sequence_state_t",
+              "const": false,
+              "value": {
+                "record": [
+                  [
+                    "backend",
+                    {
+                      "address": "nx_stm32_spi_dma_sequence_backend"
+                    }
+                  ],
+                  [
+                    "context",
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "role": "spi_cold",
+              "type": "nx_stm32_spi_dma_cold_t",
+              "const": false
+            },
+            {
+              "use": "spi-pins"
+            },
+            {
+              "role": "spi_endpoints",
+              "type": "nx_stm32_spi_endpoint_config_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.constants.spi.endpoints",
+                  "limit": 64,
+                  "value": {
+                    "record": [
+                      [
+                        "endpoint",
+                        {
+                          "owner": {
+                            "source": "entry.child.id",
+                            "role": "endpoint",
+                            "member": "endpoint"
+                          }
+                        }
+                      ],
+                      [
+                        "chip_select",
+                        {
+                          "owner": {
+                            "source": "entry.child.id",
+                            "role": "cs"
+                          }
+                        }
+                      ],
+                      [
+                        "frequency_hz",
+                        {
+                          "source": "entry.child.options.max_hz",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "mode",
+                        {
+                          "source": "entry.child.options.mode",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "lsb_first",
+                        {
+                          "source": "entry.child.options.lsb_first",
+                          "as": "bool"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.constants.spi.endpoints",
+                "limit": 64
+              }
+            },
+            {
+              "role": "dma_regions",
+              "type": "nx_dma_memory_region_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.readable_regions",
+                  "limit": 16,
+                  "value": {
+                    "record": [
+                      [
+                        "begin",
+                        {
+                          "source": "entry.begin",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "size",
+                        {
+                          "source": "entry.size",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "permissions",
+                        {
+                          "source": "entry.permissions",
+                          "as": "static"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.readable_regions",
+                "limit": 16
+              }
+            },
+            {
+              "role": "spi_config",
+              "type": "nx_stm32_spi_dma_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "spi",
+                    {
+                      "record": [
+                        [
+                          "registers",
+                          {
+                            "source": "item.controller",
+                            "as": "symbol"
+                          }
+                        ],
+                        [
+                          "clock_hz",
+                          {
+                            "source": "selected.clock_hz",
+                            "as": "u32"
+                          }
+                        ],
+                        [
+                          "pins",
+                          {
+                            "ref": "spi_pins",
+                            "as": "symbol"
+                          }
+                        ],
+                        [
+                          "pin_count",
+                          {
+                            "length": "selected.constants.spi.pads",
+                            "limit": 64
+                          }
+                        ],
+                        [
+                          "endpoints",
+                          {
+                            "ref": "spi_endpoints",
+                            "as": "symbol"
+                          }
+                        ],
+                        [
+                          "endpoint_count",
+                          {
+                            "length": "selected.constants.spi.endpoints",
+                            "limit": 64
+                          }
+                        ]
+                      ]
+                    }
+                  ],
+                  [
+                    "resources",
+                    {
+                      "record": [
+                        [
+                          "transmit",
+                          {
+                            "record": [
+                              [
+                                "dma",
+                                {
+                                  "source": "selected.dma_bindings.0.registers",
+                                  "as": "symbol"
+                                }
+                              ],
+                              [
+                                "stream",
+                                {
+                                  "source": "selected.dma_bindings.0.stream",
+                                  "as": "symbol"
+                                }
+                              ],
+                              [
+                                "irq",
+                                {
+                                  "source": "selected.dma_bindings.0.irq",
+                                  "as": "symbol"
+                                }
+                              ],
+                              [
+                                "lane",
+                                {
+                                  "source": "selected.dma_bindings.0.lane",
+                                  "as": "u32"
+                                }
+                              ],
+                              [
+                                "channel",
+                                {
+                                  "source": "selected.dma_bindings.0.request",
+                                  "as": "u32"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "receive",
+                          {
+                            "record": [
+                              [
+                                "dma",
+                                {
+                                  "source": "selected.dma_bindings.1.registers",
+                                  "as": "symbol"
+                                }
+                              ],
+                              [
+                                "stream",
+                                {
+                                  "source": "selected.dma_bindings.1.stream",
+                                  "as": "symbol"
+                                }
+                              ],
+                              [
+                                "irq",
+                                {
+                                  "source": "selected.dma_bindings.1.irq",
+                                  "as": "symbol"
+                                }
+                              ],
+                              [
+                                "lane",
+                                {
+                                  "source": "selected.dma_bindings.1.lane",
+                                  "as": "u32"
+                                }
+                              ],
+                              [
+                                "channel",
+                                {
+                                  "source": "selected.dma_bindings.1.request",
+                                  "as": "u32"
+                                }
+                              ]
+                            ]
+                          }
+                        ],
+                        [
+                          "regions",
+                          {
+                            "ref": "dma_regions",
+                            "as": "symbol"
+                          }
+                        ],
+                        [
+                          "region_count",
+                          {
+                            "length": "selected.readable_regions",
+                            "limit": 16
+                          }
+                        ]
+                      ]
+                    }
+                  ],
+                  [
+                    "priority",
+                    {
+                      "source": "selected.irq.priority",
+                      "as": "u32"
+                    }
+                  ],
+                  [
+                    "kernel_bound",
+                    {
+                      "source": "selected.kernel_bound",
+                      "as": "bool"
+                    }
+                  ]
+                ]
+              }
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "role": "prepare_sequence",
+              "sequence": [
+                {
+                  "function": "nx_stm32_spi_dma_prepare",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    },
+                    {
+                      "ref": "spi_config",
+                      "as": "address"
+                    },
+                    {
+                      "ref": "spi_cold",
+                      "as": "address"
+                    }
+                  ]
+                },
+                {
+                  "function": "nx_spi_dma_sequence_initialize",
+                  "args": [
+                    {
+                      "ref": "sequence",
+                      "as": "address"
+                    },
+                    {
+                      "address": "nx_stm32_spi_dma_sequence_backend"
+                    },
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_spi_dma_transaction_stop",
+                "args": [
+                  {
+                    "ref": "face",
+                    "as": "address"
+                  }
+                ]
+              },
+              {
+                "function": "nx_stm32_spi_dma_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "spi_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "spi_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "admit": [
+              {
+                "function": "nx_spi_dma_sequence_preflight",
+                "args": [
+                  {
+                    "ref": "sequence",
+                    "as": "address"
+                  },
+                  {
+                    "address": "nx_stm32_spi_dma_sequence_backend"
+                  },
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "child_groups": {
+            "limit": 64,
+            "before_role": "spi_endpoints",
+            "cases": {
+              "spi-dma-transaction": {
+                "parents": {
+                  "parent_sequence": "sequence"
+                },
+                "declarations": [
+                  {
+                    "role": "endpoint",
+                    "type": "nx_stm32_spi_dma_endpoint_state_t",
+                    "const": false
+                  },
+                  {
+                    "role": "cs",
+                    "type": "nx_stm32_gpio_state_t",
+                    "const": false
+                  },
+                  {
+                    "role": "sequence_endpoint",
+                    "type": "nx_spi_dma_sequence_endpoint_t",
+                    "const": false,
+                    "value": {
+                      "record": [
+                        [
+                          "controller",
+                          {
+                            "ref": "parent_sequence",
+                            "as": "address"
+                          }
+                        ],
+                        [
+                          "endpoint",
+                          {
+                            "ref": "endpoint",
+                            "as": "address"
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                ],
+                "calls": {
+                  "prepare": [],
+                  "close": []
+                },
+                "face": {
+                  "type": "nx_spi_dma_transaction_endpoint_t",
+                  "ops": "nx_spi_dma_sequence_endpoint_ops",
+                  "context": {
+                    "ref": "sequence_endpoint",
+                    "as": "address"
+                  }
+                }
+              }
+            }
+          },
+          "pin_snapshots": {
+            "source": "selected.constants.spi.pads",
+            "key": "entry.identity",
+            "array_role": "spi_pin_state",
+            "limit": 64
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.dma_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_spi_dma_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    },
+                    false
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            },
+            {
+              "name": {
+                "source": "selected.dma_bindings.1.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_spi_dma_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    },
+                    true
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "face_context": {
+            "ref": "sequence",
+            "as": "address"
+          }
+        }
+      },
+      "profile_headers": {
+        "sequence": [
+          "stm32f4_spi_dma_sequence.h"
+        ]
+      }
+    }
+  ]
+}

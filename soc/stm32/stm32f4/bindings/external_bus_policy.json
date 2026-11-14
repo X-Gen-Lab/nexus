@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "bindings": [],
+  "domains": {
+    "external_bus": {
+      "schema_version": 1,
+      "controllers": {
+        "FSMC": {
+          "ip": "async-banked-v1",
+          "modes": [
+            "async16",
+            "external-memory"
+          ],
+          "alternate": 12,
+          "max_hclk_hz": 168000000,
+          "max_burst_hz": 60000000,
+          "signal_prefix": "FSMC_",
+          "chip_selects": {
+            "1": "NE1_NCE2",
+            "2": "NE2_NCE3",
+            "3": "NE3",
+            "4": "NE4"
+          },
+          "nand_latches": [
+            "A16",
+            "A17"
+          ],
+          "window_origin": 1610612736,
+          "bank_stride": 67108864,
+          "nand_origin": 1879048192,
+          "nand_stride": 268435456,
+          "nand_window_bytes": 262144,
+          "nand_chip_selects": {
+            "2": "NE1_NCE2",
+            "3": "NE2_NCE3"
+          },
+          "contexts": {
+            "async16": {
+              "backends": [
+                "baremetal"
+              ],
+              "clock_profiles": [
+                "hse8-pll168"
+              ]
+            },
+            "external-memory": {
+              "backends": [
+                "baremetal"
+              ],
+              "clock_profiles": [
+                "hse8-pll168"
+              ]
+            }
+          }
+        },
+        "FMC": {
+          "ip": "sdram-v1",
+          "modes": [
+            "sdram-controller"
+          ],
+          "alternate": 12,
+          "max_hclk_hz": 180000000,
+          "contexts": {
+            "sdram-controller": {
+              "backends": [
+                "baremetal"
+              ],
+              "clock_profiles": [
+                "custom"
+              ]
+            }
+          }
+        },
+        "QUADSPI": {
+          "ip": "serial-nor-v1",
+          "modes": [
+            "qspi-indirect-sdr",
+            "qspi-indirect-dma"
+          ],
+          "max_hclk_hz": 180000000,
+          "contexts": {
+            "qspi-indirect-sdr": {
+              "backends": [
+                "baremetal"
+              ],
+              "clock_profiles": [
+                "custom"
+              ]
+            },
+            "qspi-indirect-dma": {
+              "backends": [
+                "baremetal"
+              ],
+              "clock_profiles": [
+                "custom"
+              ]
+            }
+          }
+        }
+      },
+      "endpoints": {
+        "fsmc-ne3-is62wv51216": {
+          "controller": "FSMC",
+          "kind": "memory_window",
+          "modes": [
+            "cpu-window",
+            "startup-memory"
+          ],
+          "protocol": "fixed-window",
+          "bank": 3,
+          "address": 1744830464,
+          "bytes": 1048576
+        },
+        "fsmc-ne4-ili9341": {
+          "controller": "FSMC",
+          "kind": "parallel16",
+          "modes": [
+            "8080-16"
+          ],
+          "protocol": "parallel16",
+          "bank": 4,
+          "command_address": 1811939328,
+          "data_address": 1811947520
+        },
+        "fsmc-reference-memory_window-ve": {
+          "controller": "FSMC",
+          "kind": "memory_window",
+          "modes": [
+            "psram-window"
+          ],
+          "protocol": "psram"
+        },
+        "fsmc-reference-memory_window-zg": {
+          "controller": "FSMC",
+          "kind": "memory_window",
+          "modes": [
+            "psram-window"
+          ],
+          "protocol": "psram"
+        },
+        "fsmc-reference-flash_async-ve": {
+          "controller": "FSMC",
+          "kind": "flash_async",
+          "modes": [
+            "nor-cfi"
+          ],
+          "protocol": "nor-cfi"
+        },
+        "fsmc-reference-flash_async-zg": {
+          "controller": "FSMC",
+          "kind": "flash_async",
+          "modes": [
+            "nor-cfi"
+          ],
+          "protocol": "nor-cfi"
+        },
+        "fsmc-reference-nand2": {
+          "controller": "FSMC",
+          "kind": "nand",
+          "modes": [
+            "raw-page"
+          ],
+          "protocol": "raw-nand",
+          "bank": 2
+        },
+        "fsmc-reference-nand3": {
+          "controller": "FSMC",
+          "kind": "nand",
+          "modes": [
+            "raw-page"
+          ],
+          "protocol": "raw-nand",
+          "bank": 3
+        },
+        "fmc-sdram-bank1-16": {
+          "controller": "FMC",
+          "kind": "memory_window",
+          "modes": [
+            "cpu-window",
+            "graphics-owned"
+          ],
+          "protocol": "sdram",
+          "address": 3221225472
+        },
+        "quadspi-bank1-sdr111": {
+          "controller": "QUADSPI",
+          "kind": "flash_async",
+          "modes": [
+            "nor-indirect"
+          ],
+          "protocol": "serial-nor-read",
+          "part": "W25Q128JV",
+          "max_read_hz": 50000000,
+          "cs_high_ns": 50,
+          "functions": [
+            "QUADSPI_BK1_NCS",
+            "QUADSPI_BK1_IO0",
+            "QUADSPI_BK1_IO1",
+            "QUADSPI_CLK"
+          ]
+        },
+        "quadspi-bank1-sdr114": {
+          "controller": "QUADSPI",
+          "kind": "flash_async",
+          "modes": [
+            "nor-indirect-quad-read"
+          ],
+          "protocol": "serial-nor-read",
+          "part": "W25Q128JVSIQ",
+          "max_read_hz": 50000000,
+          "cs_high_ns": 50,
+          "functions": [
+            "QUADSPI_BK1_NCS",
+            "QUADSPI_BK1_IO0",
+            "QUADSPI_BK1_IO1",
+            "QUADSPI_CLK",
+            "io2",
+            "io3"
+          ]
+        },
+        "quadspi-bank1-mapped114": {
+          "controller": "QUADSPI",
+          "kind": "mapped_storage",
+          "modes": [
+            "nor-mapped-cpu"
+          ],
+          "protocol": "serial-nor-read",
+          "part": "W25Q128JVSIQ",
+          "max_read_hz": 50000000,
+          "cs_high_ns": 50,
+          "functions": [
+            "QUADSPI_BK1_NCS",
+            "QUADSPI_BK1_IO0",
+            "QUADSPI_BK1_IO1",
+            "QUADSPI_CLK",
+            "io2",
+            "io3"
+          ]
+        }
+      },
+      "graphics": {
+        "display_controller": "LTDC",
+        "image_controller": "DMA2D",
+        "image_route": "dma2d-memory",
+        "display_routes": {
+          "ltdc-rgb565-reference": [
+            5,
+            6,
+            5
+          ],
+          "ltdc-rgb888-reference": [
+            8,
+            8,
+            8
+          ]
+        },
+        "alternate": 14,
+        "max_pixel_hz": 83000000,
+        "clock_path": [
+          "pll_sai",
+          "ltdc",
+          "pixel_hz"
+        ],
+        "memory_producers": [
+          {
+            "controller": "FMC",
+            "mode": "sdram-controller",
+            "endpoint_mode": "graphics-owned"
+          }
+        ]
+      },
+      "packages": {
+        "LQFP64": 64,
+        "LQFP100": 100,
+        "LQFP144": 144,
+        "TFBGA216": 216
+      }
+    }
+  }
+}

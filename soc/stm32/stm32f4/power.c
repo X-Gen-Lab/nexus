@@ -234,16 +234,17 @@ static bool hardware_idle(const nx_stm32_power_options_t* options) {
         (NX_POWER_TICK &
          (SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk)) != 0U ||
         (NX_POWER_ICSR & SCB_ICSR_PENDSTSET_Msk) != 0U ||
-        (rcc->APB1ENR & ~(uint32_t)(RCC_APB1ENR_TIM2EN | RCC_APB1ENR_PWREN)) !=
-            0U ||
+        (rcc->APB1ENR &
+         ~(uint32_t)(NEXUS_STM32_TIMEBASE_GATE | RCC_APB1ENR_PWREN)) != 0U ||
         rcc->APB2ENR != 0U || rcc->AHB2ENR != 0U || rcc->AHB3ENR != 0U ||
         (rcc->AHB1ENR & ~allowed_ahb1) != 0U ||
         ((rcc->AHB1ENR & RCC_AHB1ENR_DMA1EN) != 0U &&
          !dma_idle(NX_POWER_DMA1)) ||
         ((rcc->AHB1ENR & RCC_AHB1ENR_DMA2EN) != 0U && !dma_idle(NX_POWER_DMA2)))
         return false;
-    uint32_t timer_index = (uint32_t)TIM2_IRQn / 32U;
-    uint32_t timer_bit = UINT32_C(1) << ((uint32_t)TIM2_IRQn % 32U);
+    uint32_t timer_index = (uint32_t)NEXUS_STM32_TIMEBASE_IRQ / 32U;
+    uint32_t timer_bit = UINT32_C(1)
+                         << ((uint32_t)NEXUS_STM32_TIMEBASE_IRQ % 32U);
     if ((options->wake_irqs[timer_index] & timer_bit) != 0U ||
         ((options->wake_irqs[0] | options->wake_irqs[1] |
           options->wake_irqs[2] | options->wake_irqs[3]) == 0U &&

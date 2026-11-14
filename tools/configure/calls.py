@@ -50,11 +50,24 @@ class Address:
         return "&" + self.name
 
 
+def _typed_argument(value):
+    if isinstance(value, (Address, Symbol, DirectCall)):
+        return True
+    # Static values reuse call symbols. Import their closed set only after both
+    # modules are initialized; accepting arbitrary render methods would reopen
+    # an unchecked C-source escape.
+    from tools.configure.static_ir import (ArrayElementAddress, ConstantMacro,
+        Flags, PointerMemberAddress, Signed32, Unsigned64)
+    return isinstance(value, (ArrayElementAddress, ConstantMacro, Flags,
+                              PointerMemberAddress, Signed32, Unsigned64))
+
+
 @dataclass(frozen=True)
 class DirectCall:
     """Call an explicit C symbol with references, constants or direct calls.
 
-    Integers are unsigned32 values; bool and None emit true/false and NULL.
+    Raw integers are unsigned32; explicit signed/wide nodes retain their type.
+    Bool and None emit true/false and NULL.
     A nested call preserves explicit runtime argument evaluation, such as
     forming an absolute deadline at startup. No branch, assignment, cast,
     operator, string literal or function-pointer expression is accepted.
@@ -69,7 +82,7 @@ class DirectCall:
             raise ValueError("Direct call requires an ordered argument sequence")
         arguments = tuple(self.arguments)
         for argument in arguments:
-            if isinstance(argument, (Address, Symbol, DirectCall)):
+            if _typed_argument(argument):
                 continue
             if argument is None or type(argument) is bool:
                 continue
@@ -81,7 +94,7 @@ class DirectCall:
     def render(self):
         arguments = []
         for value in self.arguments:
-            if isinstance(value, (Address, Symbol, DirectCall)):
+            if _typed_argument(value):
                 arguments.append(value.render())
             elif value is None:
                 arguments.append("NULL")

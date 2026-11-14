@@ -6,7 +6,8 @@ import tempfile
 import unittest
 
 from tools.configure import authored, configure, bindings
-from tools.configure.stm32f4 import bindings as f4_bindings
+from tools.configure.data_provider import DataProvider
+from tools.configure.providers import for_selection
 from tools.configure.tests.native_fixture import native_fixture
 
 
@@ -48,7 +49,10 @@ class WindowWatchdogConfigurationTests(unittest.TestCase):
                     self.assertEqual(item.options.window_ticks, ticks or 1)
                     with self.assertRaises(FrozenInstanceError):
                         item.options.window_ticks = 2
-                    construction = f4_bindings._basic_constructor(item, ir)
+                    provider = for_selection(ir)
+                    self.assertIsInstance(provider, DataProvider)
+                    construction = provider.constructor(item, ir,
+                        ir.board_bindings, ir.routes, ir.devices)
                     self.assertTrue(construction.retain_on_failed_init)
                     self.assertTrue(construction.admission)
                     source = bindings.emit(ir)[1]

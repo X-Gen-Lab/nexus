@@ -61,19 +61,22 @@ class PhysicalFactBoundaryTests(unittest.TestCase):
         condition = {"gpio": "PC2", "condition": "SYSCFG.PMCR switch required",
                      "source": "DS12110 Rev11 p57; RM0433 Rev9",
                      "status": "not_exposed"}
+        pads = {"PB0": {"registers": "GPIOB", "port_index": 1, "number": 0},
+                "PC2": {"registers": "GPIOC", "port_index": 2, "number": 2},
+                "PC3": {"registers": "GPIOC", "port_index": 2, "number": 3}}
         physical_facts.package_pins(["PB0", "PC2_C"], {"PC2_C": condition},
-                                    ("PC2_C",))
+                                    {"PC2_C": "PC2"}, pad_facts=pads)
         for pins, conditions, allowed in (
-                (["PB0", "PC2_C"], {}, ("PC2_C",)),
+                (["PB0", "PC2_C"], {}, {"PC2_C": "PC2"}),
                 (["PB0", "PC2_C"], {"PC2_C": condition}, ()),
                 (["PB0", "PC2_C"], {"PC2_C": {**condition, "gpio": "PC3"}},
-                 ("PC2_C",)),
+                 {"PC2_C": "PC2"}),
                 (["PB0", "PC2_C"], {"PC2_C": {**condition, "status": "ready"}},
-                 ("PC2_C",)),
-                (["PB0", "PC2"], {"PC2_C": condition}, ("PC2_C",))):
+                 {"PC2_C": "PC2"}),
+                (["PB0", "PC2"], {"PC2_C": condition}, {"PC2_C": "PC2"})):
             with self.subTest(pins=pins, conditions=conditions):
                 with self.assertRaises(ValueError):
-                    physical_facts.package_pins(pins, conditions, allowed)
+                    physical_facts.package_pins(pins, conditions, allowed, pad_facts=pads)
 
 
 if __name__ == "__main__":

@@ -71,32 +71,22 @@ static IRQn_Type vector(const nx_stm32_i2c_target_config_t* config,
     return index == 0U ? I2C3_EV_IRQn : I2C3_ER_IRQn;
 }
 
-/** \brief Exact alternate-function facts, including the optional SMBA pad. */
+/** \brief Check admitted AF4 pin storage without duplicating route tables.
+ * \note SoC/package and Board route facts authorize SCL/SDA/optional SMBA.
+ *       C retains bank identity, range and duplicate checks before effects.
+ */
 static bool route_valid(const nx_stm32_i2c_target_config_t* config) {
-    const nx_stm32_platform_pin_config_t* pins = config->pins;
-    unsigned instance = controller(config);
-    if (instance == 0U) {
-        if (pins[0].registers != GPIOB || pins[1].registers != GPIOB ||
-            pins[0].port_index != 1U || pins[1].port_index != 1U ||
-            !((pins[0].pin == 6U && pins[1].pin == 7U) ||
-              (pins[0].pin == 8U && pins[1].pin == 9U)))
+    for (size_t index = 0U; index < config->pin_count; ++index) {
+        const nx_stm32_platform_pin_config_t* pin = &config->pins[index];
+        if (!nx_stm32_platform_pin_valid(pin))
             return false;
-    } else if (instance == 1U) {
-        if (pins[0].registers != GPIOB || pins[1].registers != GPIOB ||
-            pins[0].port_index != 1U || pins[1].port_index != 1U ||
-            pins[0].pin != 10U || pins[1].pin != 11U)
-            return false;
-    } else if (pins[0].registers != GPIOA || pins[1].registers != GPIOC ||
-               pins[0].port_index != 0U || pins[1].port_index != 2U ||
-               pins[0].pin != 8U || pins[1].pin != 9U) {
-        return false;
+        for (size_t previous = 0U; previous < index; ++previous) {
+            if (pin->registers == config->pins[previous].registers &&
+                pin->pin == config->pins[previous].pin)
+                return false;
+        }
     }
-    return !config->alert ||
-           (pins[2].registers == (instance == 2U ? GPIOA : GPIOB) &&
-            pins[2].port_index == (instance == 2U ? 0U : 1U) &&
-            pins[2].pin == (instance == 0U   ? 5U
-                            : instance == 1U ? 12U
-                                             : 9U));
+    return true;
 }
 
 /** \brief Reject inconsistent static facts before any live register access. */

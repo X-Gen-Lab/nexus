@@ -1,0 +1,1426 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "pwm_group",
+      "mode": "coherent-pwm",
+      "implementation": "pwm_group",
+      "headers": [
+        "stm32f407_timer_waveform.h",
+        "stm32f4_timer_encoding.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_waveform_state_t",
+        "ops": "nx_stm32_pwm_group_ops",
+        "declarations": [
+          {
+            "role": "wave_saved",
+            "type": "uint16_t",
+            "const": false,
+            "count": {
+              "length": "selected.pads",
+              "limit": 9
+            }
+          },
+          {
+            "role": "wave_pins",
+            "type": "nx_stm32_av_pin_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 9,
+                "value": {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "entry.registers",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "wave_saved",
+                        "as": "address",
+                        "index": {
+                          "source": "index",
+                          "as": "u32"
+                        }
+                      }
+                    ],
+                    [
+                      "bank",
+                      {
+                        "source": "entry.port_index"
+                      }
+                    ],
+                    [
+                      "pin",
+                      {
+                        "source": "entry.number"
+                      }
+                    ],
+                    [
+                      "af",
+                      {
+                        "source": "entry.alternate"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.pads",
+              "limit": 9
+            }
+          },
+          {
+            "role": "wave_config",
+            "type": "nx_stm32_waveform_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "common",
+                  {
+                    "record": [
+                      [
+                        "pins",
+                        {
+                          "ref": "wave_pins",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "pin_count",
+                        {
+                          "length": "selected.pads",
+                          "limit": 9
+                        }
+                      ],
+                      [
+                        "poll_limit",
+                        {
+                          "source": "item.options.poll_limit"
+                        }
+                      ],
+                      [
+                        "priority",
+                        {
+                          "source": "item.options.irq.priority"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "controller",
+                  {
+                    "source": "item.controller",
+                    "values": {
+                      "TIM1": 1,
+                      "TIM3": 3,
+                      "TIM4": 4,
+                      "TIM5": 5,
+                      "TIM8": 8,
+                      "TIM9": 9,
+                      "TIM10": 10,
+                      "TIM11": 11,
+                      "TIM12": 12,
+                      "TIM13": 13,
+                      "TIM14": 14
+                    }
+                  }
+                ],
+                [
+                  "timer_hz",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol",
+                    "values": {
+                      "TIM1": "NEXUS_APB2_TIMER_HZ",
+                      "TIM3": "NEXUS_APB1_TIMER_HZ",
+                      "TIM4": "NEXUS_APB1_TIMER_HZ",
+                      "TIM5": "NEXUS_APB1_TIMER_HZ",
+                      "TIM8": "NEXUS_APB2_TIMER_HZ",
+                      "TIM9": "NEXUS_APB2_TIMER_HZ",
+                      "TIM10": "NEXUS_APB2_TIMER_HZ",
+                      "TIM11": "NEXUS_APB2_TIMER_HZ",
+                      "TIM12": "NEXUS_APB1_TIMER_HZ",
+                      "TIM13": "NEXUS_APB1_TIMER_HZ",
+                      "TIM14": "NEXUS_APB1_TIMER_HZ"
+                    }
+                  }
+                ],
+                [
+                  "tick_hz",
+                  {
+                    "source": "item.options.tick_hz"
+                  }
+                ],
+                [
+                  "period_ticks",
+                  {
+                    "source": "item.options.period_ticks"
+                  }
+                ],
+                [
+                  "deadtime_ticks",
+                  {
+                    "source": "item.options.deadtime_ticks"
+                  }
+                ],
+                [
+                  "channels",
+                  {
+                    "macro": "NX_STM32_TIMER_CHANNEL_MASK",
+                    "args": [
+                      {
+                        "source": "item.options.channels.0",
+                        "default": 0
+                      },
+                      {
+                        "source": "item.options.channels.1",
+                        "default": 0
+                      },
+                      {
+                        "source": "item.options.channels.2",
+                        "default": 0
+                      },
+                      {
+                        "source": "item.options.channels.3",
+                        "default": 0
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "master_mode",
+                  {
+                    "source": "item.options.master_trigger",
+                    "values": {
+                      "none": 0,
+                      "enable": 1,
+                      "update": 2,
+                      "oc4ref": 7
+                    }
+                  }
+                ],
+                [
+                  "sync_mode",
+                  {
+                    "source": "item.options.sync_mode",
+                    "values": {
+                      "none": 0,
+                      "reset": 4,
+                      "gated": 5,
+                      "trigger": 6
+                    }
+                  }
+                ],
+                [
+                  "itr",
+                  {
+                    "source": "item.options.itr"
+                  }
+                ],
+                [
+                  "kind",
+                  {
+                    "symbol": "NX_STM32_WAVE_GROUP"
+                  }
+                ],
+                [
+                  "complementary",
+                  {
+                    "source": "item.options.complementary"
+                  }
+                ],
+                [
+                  "internal_trigger",
+                  {
+                    "source": "item.options.internal_trigger"
+                  }
+                ],
+                [
+                  "break_active_high",
+                  {
+                    "source": "item.options.break_active_high"
+                  }
+                ],
+                [
+                  "idle_high",
+                  {
+                    "source": "item.options.idle_high"
+                  }
+                ],
+                [
+                  "idle_complement_high",
+                  {
+                    "source": "item.options.idle_complement_high"
+                  }
+                ],
+                [
+                  "break_input",
+                  {
+                    "optional": "selected.named_pads.break",
+                    "value": {
+                      "pointer_member": {
+                        "base": {
+                          "source": "selected.named_pads.break.registers",
+                          "as": "symbol"
+                        },
+                        "member": "IDR"
+                      }
+                    },
+                    "default": null
+                  }
+                ],
+                [
+                  "break_mask",
+                  {
+                    "optional": "selected.named_pads.break",
+                    "value": {
+                      "macro": "NX_STM32_TIMER_PIN_MASK",
+                      "args": [
+                        {
+                          "source": "selected.named_pads.break.number"
+                        }
+                      ]
+                    },
+                    "default": 0
+                  }
+                ],
+                [
+                  "irq",
+                  {
+                    "source": "item.controller",
+                    "values": {
+                      "TIM1": {
+                        "symbol": "TIM1_BRK_TIM9_IRQn"
+                      },
+                      "TIM3": {
+                        "s32": -1
+                      },
+                      "TIM4": {
+                        "s32": -1
+                      },
+                      "TIM5": {
+                        "s32": -1
+                      },
+                      "TIM8": {
+                        "symbol": "TIM8_BRK_TIM12_IRQn"
+                      },
+                      "TIM9": {
+                        "s32": -1
+                      },
+                      "TIM10": {
+                        "s32": -1
+                      },
+                      "TIM11": {
+                        "s32": -1
+                      },
+                      "TIM12": {
+                        "s32": -1
+                      },
+                      "TIM13": {
+                        "s32": -1
+                      },
+                      "TIM14": {
+                        "s32": -1
+                      }
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32_waveform_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "wave_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32_waveform_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "wave_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_waveform_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "enabled": {
+              "source": "item.controller",
+              "values": {
+                "TIM1": true,
+                "TIM3": false,
+                "TIM4": false,
+                "TIM5": false,
+                "TIM8": true,
+                "TIM9": false,
+                "TIM10": false,
+                "TIM11": false,
+                "TIM12": false,
+                "TIM13": false,
+                "TIM14": false
+              }
+            },
+            "name": {
+              "source": "item.controller",
+              "as": "symbol",
+              "values": {
+                "TIM1": "TIM1_BRK_TIM9_IRQHandler",
+                "TIM8": "TIM8_BRK_TIM12_IRQHandler"
+              }
+            },
+            "calls": [
+              {
+                "function": "nx_stm32_waveform_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "wave_saved",
+          "limit": 9
+        },
+        "retain_on_failed_init": true
+      }
+    },
+    {
+      "kind": "timer_pulse",
+      "mode": "one-pulse",
+      "implementation": "timer_pulse",
+      "headers": [
+        "stm32f407_timer_waveform.h",
+        "stm32f4_timer_encoding.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_waveform_state_t",
+        "ops": "nx_stm32_timer_pulse_ops",
+        "declarations": [
+          {
+            "role": "wave_saved",
+            "type": "uint16_t",
+            "const": false,
+            "count": {
+              "length": "selected.pads",
+              "limit": 9
+            }
+          },
+          {
+            "role": "wave_pins",
+            "type": "nx_stm32_av_pin_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 9,
+                "value": {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "entry.registers",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "wave_saved",
+                        "as": "address",
+                        "index": {
+                          "source": "index",
+                          "as": "u32"
+                        }
+                      }
+                    ],
+                    [
+                      "bank",
+                      {
+                        "source": "entry.port_index"
+                      }
+                    ],
+                    [
+                      "pin",
+                      {
+                        "source": "entry.number"
+                      }
+                    ],
+                    [
+                      "af",
+                      {
+                        "source": "entry.alternate"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.pads",
+              "limit": 9
+            }
+          },
+          {
+            "role": "wave_config",
+            "type": "nx_stm32_waveform_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "common",
+                  {
+                    "record": [
+                      [
+                        "pins",
+                        {
+                          "ref": "wave_pins",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "pin_count",
+                        {
+                          "length": "selected.pads",
+                          "limit": 9
+                        }
+                      ],
+                      [
+                        "poll_limit",
+                        {
+                          "source": "item.options.poll_limit"
+                        }
+                      ],
+                      [
+                        "priority",
+                        {
+                          "source": "item.options.irq.priority"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "controller",
+                  {
+                    "source": "item.controller",
+                    "values": {
+                      "TIM1": 1,
+                      "TIM3": 3,
+                      "TIM4": 4,
+                      "TIM5": 5,
+                      "TIM8": 8,
+                      "TIM9": 9,
+                      "TIM10": 10,
+                      "TIM11": 11,
+                      "TIM12": 12,
+                      "TIM13": 13,
+                      "TIM14": 14
+                    }
+                  }
+                ],
+                [
+                  "timer_hz",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol",
+                    "values": {
+                      "TIM1": "NEXUS_APB2_TIMER_HZ",
+                      "TIM3": "NEXUS_APB1_TIMER_HZ",
+                      "TIM4": "NEXUS_APB1_TIMER_HZ",
+                      "TIM5": "NEXUS_APB1_TIMER_HZ",
+                      "TIM8": "NEXUS_APB2_TIMER_HZ",
+                      "TIM9": "NEXUS_APB2_TIMER_HZ",
+                      "TIM10": "NEXUS_APB2_TIMER_HZ",
+                      "TIM11": "NEXUS_APB2_TIMER_HZ",
+                      "TIM12": "NEXUS_APB1_TIMER_HZ",
+                      "TIM13": "NEXUS_APB1_TIMER_HZ",
+                      "TIM14": "NEXUS_APB1_TIMER_HZ"
+                    }
+                  }
+                ],
+                [
+                  "tick_hz",
+                  {
+                    "source": "item.options.tick_hz"
+                  }
+                ],
+                [
+                  "period_ticks",
+                  {
+                    "source": "item.options.period_ticks"
+                  }
+                ],
+                [
+                  "deadtime_ticks",
+                  {
+                    "source": "item.options.deadtime_ticks"
+                  }
+                ],
+                [
+                  "channels",
+                  {
+                    "macro": "NX_STM32_TIMER_CHANNEL_MASK",
+                    "args": [
+                      {
+                        "source": "item.options.channels.0",
+                        "default": 0
+                      },
+                      {
+                        "source": "item.options.channels.1",
+                        "default": 0
+                      },
+                      {
+                        "source": "item.options.channels.2",
+                        "default": 0
+                      },
+                      {
+                        "source": "item.options.channels.3",
+                        "default": 0
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "master_mode",
+                  {
+                    "source": "item.options.master_trigger",
+                    "values": {
+                      "none": 0,
+                      "enable": 1,
+                      "update": 2,
+                      "oc4ref": 7
+                    }
+                  }
+                ],
+                [
+                  "sync_mode",
+                  {
+                    "source": "item.options.sync_mode",
+                    "values": {
+                      "none": 0,
+                      "reset": 4,
+                      "gated": 5,
+                      "trigger": 6
+                    }
+                  }
+                ],
+                [
+                  "itr",
+                  {
+                    "source": "item.options.itr"
+                  }
+                ],
+                [
+                  "kind",
+                  {
+                    "symbol": "NX_STM32_WAVE_PULSE"
+                  }
+                ],
+                [
+                  "complementary",
+                  {
+                    "source": "item.options.complementary"
+                  }
+                ],
+                [
+                  "internal_trigger",
+                  {
+                    "source": "item.options.internal_trigger"
+                  }
+                ],
+                [
+                  "break_active_high",
+                  {
+                    "source": "item.options.break_active_high"
+                  }
+                ],
+                [
+                  "idle_high",
+                  {
+                    "source": "item.options.idle_high"
+                  }
+                ],
+                [
+                  "idle_complement_high",
+                  {
+                    "source": "item.options.idle_complement_high"
+                  }
+                ],
+                [
+                  "break_input",
+                  {
+                    "optional": "selected.named_pads.break",
+                    "value": {
+                      "pointer_member": {
+                        "base": {
+                          "source": "selected.named_pads.break.registers",
+                          "as": "symbol"
+                        },
+                        "member": "IDR"
+                      }
+                    },
+                    "default": null
+                  }
+                ],
+                [
+                  "break_mask",
+                  {
+                    "optional": "selected.named_pads.break",
+                    "value": {
+                      "macro": "NX_STM32_TIMER_PIN_MASK",
+                      "args": [
+                        {
+                          "source": "selected.named_pads.break.number"
+                        }
+                      ]
+                    },
+                    "default": 0
+                  }
+                ],
+                [
+                  "irq",
+                  {
+                    "source": "item.controller",
+                    "values": {
+                      "TIM1": {
+                        "symbol": "TIM1_BRK_TIM9_IRQn"
+                      },
+                      "TIM3": {
+                        "s32": -1
+                      },
+                      "TIM4": {
+                        "s32": -1
+                      },
+                      "TIM5": {
+                        "s32": -1
+                      },
+                      "TIM8": {
+                        "symbol": "TIM8_BRK_TIM12_IRQn"
+                      },
+                      "TIM9": {
+                        "s32": -1
+                      },
+                      "TIM10": {
+                        "s32": -1
+                      },
+                      "TIM11": {
+                        "s32": -1
+                      },
+                      "TIM12": {
+                        "s32": -1
+                      },
+                      "TIM13": {
+                        "s32": -1
+                      },
+                      "TIM14": {
+                        "s32": -1
+                      }
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32_waveform_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "wave_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32_waveform_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "wave_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_waveform_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "enabled": {
+              "source": "item.controller",
+              "values": {
+                "TIM1": true,
+                "TIM3": false,
+                "TIM4": false,
+                "TIM5": false,
+                "TIM8": true,
+                "TIM9": false,
+                "TIM10": false,
+                "TIM11": false,
+                "TIM12": false,
+                "TIM13": false,
+                "TIM14": false
+              }
+            },
+            "name": {
+              "source": "item.controller",
+              "as": "symbol",
+              "values": {
+                "TIM1": "TIM1_BRK_TIM9_IRQHandler",
+                "TIM8": "TIM8_BRK_TIM12_IRQHandler"
+              }
+            },
+            "calls": [
+              {
+                "function": "nx_stm32_waveform_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "wave_saved",
+          "limit": 9
+        },
+        "retain_on_failed_init": true
+      }
+    },
+    {
+      "kind": "timer_sequence",
+      "mode": "dma-burst",
+      "implementation": "timer_sequence",
+      "headers": [
+        "stm32f407_timer_waveform.h",
+        "stm32f4_timer_encoding.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_waveform_state_t",
+        "ops": "nx_stm32_timer_sequence_ops",
+        "declarations": [
+          {
+            "role": "wave_saved",
+            "type": "uint16_t",
+            "const": false,
+            "count": {
+              "length": "selected.pads",
+              "limit": 9
+            }
+          },
+          {
+            "role": "wave_pins",
+            "type": "nx_stm32_av_pin_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 9,
+                "value": {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "entry.registers",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "wave_saved",
+                        "as": "address",
+                        "index": {
+                          "source": "index",
+                          "as": "u32"
+                        }
+                      }
+                    ],
+                    [
+                      "bank",
+                      {
+                        "source": "entry.port_index"
+                      }
+                    ],
+                    [
+                      "pin",
+                      {
+                        "source": "entry.number"
+                      }
+                    ],
+                    [
+                      "af",
+                      {
+                        "source": "entry.alternate"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.pads",
+              "limit": 9
+            }
+          },
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.readable_regions",
+              "limit": 16
+            }
+          },
+          {
+            "role": "wave_config",
+            "type": "nx_stm32_waveform_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "common",
+                  {
+                    "record": [
+                      [
+                        "pins",
+                        {
+                          "ref": "wave_pins",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "pin_count",
+                        {
+                          "length": "selected.pads",
+                          "limit": 9
+                        }
+                      ],
+                      [
+                        "poll_limit",
+                        {
+                          "source": "item.options.poll_limit"
+                        }
+                      ],
+                      [
+                        "priority",
+                        {
+                          "source": "item.options.irq.priority"
+                        }
+                      ],
+                      [
+                        "regions",
+                        {
+                          "ref": "dma_regions",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "region_count",
+                        {
+                          "length": "selected.readable_regions",
+                          "limit": 16
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "controller",
+                  {
+                    "source": "item.controller",
+                    "values": {
+                      "TIM1": 1,
+                      "TIM3": 3,
+                      "TIM4": 4,
+                      "TIM5": 5,
+                      "TIM8": 8,
+                      "TIM9": 9,
+                      "TIM10": 10,
+                      "TIM11": 11,
+                      "TIM12": 12,
+                      "TIM13": 13,
+                      "TIM14": 14
+                    }
+                  }
+                ],
+                [
+                  "timer_hz",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol",
+                    "values": {
+                      "TIM1": "NEXUS_APB2_TIMER_HZ",
+                      "TIM3": "NEXUS_APB1_TIMER_HZ",
+                      "TIM4": "NEXUS_APB1_TIMER_HZ",
+                      "TIM5": "NEXUS_APB1_TIMER_HZ",
+                      "TIM8": "NEXUS_APB2_TIMER_HZ",
+                      "TIM9": "NEXUS_APB2_TIMER_HZ",
+                      "TIM10": "NEXUS_APB2_TIMER_HZ",
+                      "TIM11": "NEXUS_APB2_TIMER_HZ",
+                      "TIM12": "NEXUS_APB1_TIMER_HZ",
+                      "TIM13": "NEXUS_APB1_TIMER_HZ",
+                      "TIM14": "NEXUS_APB1_TIMER_HZ"
+                    }
+                  }
+                ],
+                [
+                  "tick_hz",
+                  {
+                    "source": "item.options.tick_hz"
+                  }
+                ],
+                [
+                  "period_ticks",
+                  {
+                    "source": "item.options.period_ticks"
+                  }
+                ],
+                [
+                  "deadtime_ticks",
+                  {
+                    "source": "item.options.deadtime_ticks"
+                  }
+                ],
+                [
+                  "channels",
+                  {
+                    "macro": "NX_STM32_TIMER_CHANNEL_MASK",
+                    "args": [
+                      {
+                        "source": "item.options.channels.0",
+                        "default": 0
+                      },
+                      {
+                        "source": "item.options.channels.1",
+                        "default": 0
+                      },
+                      {
+                        "source": "item.options.channels.2",
+                        "default": 0
+                      },
+                      {
+                        "source": "item.options.channels.3",
+                        "default": 0
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "master_mode",
+                  {
+                    "source": "item.options.master_trigger",
+                    "values": {
+                      "none": 0,
+                      "enable": 1,
+                      "update": 2,
+                      "oc4ref": 7
+                    }
+                  }
+                ],
+                [
+                  "sync_mode",
+                  {
+                    "source": "item.options.sync_mode",
+                    "values": {
+                      "none": 0,
+                      "reset": 4,
+                      "gated": 5,
+                      "trigger": 6
+                    }
+                  }
+                ],
+                [
+                  "itr",
+                  {
+                    "source": "item.options.itr"
+                  }
+                ],
+                [
+                  "kind",
+                  {
+                    "symbol": "NX_STM32_WAVE_SEQUENCE"
+                  }
+                ],
+                [
+                  "complementary",
+                  {
+                    "source": "item.options.complementary"
+                  }
+                ],
+                [
+                  "internal_trigger",
+                  {
+                    "source": "item.options.internal_trigger"
+                  }
+                ],
+                [
+                  "break_active_high",
+                  {
+                    "source": "item.options.break_active_high"
+                  }
+                ],
+                [
+                  "idle_high",
+                  {
+                    "source": "item.options.idle_high"
+                  }
+                ],
+                [
+                  "idle_complement_high",
+                  {
+                    "source": "item.options.idle_complement_high"
+                  }
+                ],
+                [
+                  "break_input",
+                  {
+                    "optional": "selected.named_pads.break",
+                    "value": {
+                      "pointer_member": {
+                        "base": {
+                          "source": "selected.named_pads.break.registers",
+                          "as": "symbol"
+                        },
+                        "member": "IDR"
+                      }
+                    },
+                    "default": null
+                  }
+                ],
+                [
+                  "break_mask",
+                  {
+                    "optional": "selected.named_pads.break",
+                    "value": {
+                      "macro": "NX_STM32_TIMER_PIN_MASK",
+                      "args": [
+                        {
+                          "source": "selected.named_pads.break.number"
+                        }
+                      ]
+                    },
+                    "default": 0
+                  }
+                ],
+                [
+                  "irq",
+                  {
+                    "source": "item.controller",
+                    "values": {
+                      "TIM1": {
+                        "symbol": "TIM1_BRK_TIM9_IRQn"
+                      },
+                      "TIM3": {
+                        "s32": -1
+                      },
+                      "TIM4": {
+                        "s32": -1
+                      },
+                      "TIM5": {
+                        "s32": -1
+                      },
+                      "TIM8": {
+                        "symbol": "TIM8_BRK_TIM12_IRQn"
+                      },
+                      "TIM9": {
+                        "s32": -1
+                      },
+                      "TIM10": {
+                        "s32": -1
+                      },
+                      "TIM11": {
+                        "s32": -1
+                      },
+                      "TIM12": {
+                        "s32": -1
+                      },
+                      "TIM13": {
+                        "s32": -1
+                      },
+                      "TIM14": {
+                        "s32": -1
+                      }
+                    }
+                  }
+                ],
+                [
+                  "dma",
+                  {
+                    "record": [
+                      [
+                        "dma",
+                        {
+                          "source": "selected.dma_bindings.0.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "stream",
+                        {
+                          "source": "selected.dma_bindings.0.stream",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "irq",
+                        {
+                          "source": "selected.dma_bindings.0.irq",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "lane",
+                        {
+                          "source": "selected.dma_bindings.0.lane"
+                        }
+                      ],
+                      [
+                        "channel",
+                        {
+                          "source": "selected.dma_bindings.0.request"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "burst_budget_hclk_cycles",
+                  {
+                    "source": "item.options.burst_budget_hclk_cycles"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32_waveform_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "wave_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32_waveform_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "wave_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_waveform_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "enabled": {
+              "source": "item.controller",
+              "values": {
+                "TIM1": true,
+                "TIM3": false,
+                "TIM4": false,
+                "TIM5": false,
+                "TIM8": true,
+                "TIM9": false,
+                "TIM10": false,
+                "TIM11": false,
+                "TIM12": false,
+                "TIM13": false,
+                "TIM14": false
+              }
+            },
+            "name": {
+              "source": "item.controller",
+              "as": "symbol",
+              "values": {
+                "TIM1": "TIM1_BRK_TIM9_IRQHandler",
+                "TIM8": "TIM8_BRK_TIM12_IRQHandler"
+              }
+            },
+            "calls": [
+              {
+                "function": "nx_stm32_waveform_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {
+              "source": "selected.dma_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32_waveform_dma_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "wave_saved",
+          "limit": 9
+        },
+        "retain_on_failed_init": true
+      }
+    }
+  ]
+}

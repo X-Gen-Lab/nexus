@@ -30,6 +30,17 @@ class SourceSDKCLIBytecodeTests(unittest.TestCase):
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(source, target)
         shutil.copytree(ROOT / "dependencies", self.sources / "dependencies")
+        from tools.configure.metadata import load_policy
+        from tools.configure.packages import load
+        for name in load_policy(ROOT)["source_sdk"]["default_package_manifests"]:
+            package = load(ROOT / name)
+            for source in package.inputs:
+                target = self.sources / source.relative_to(ROOT)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(source, target)
+            for directory in package.export_roots:
+                (self.sources / directory.relative_to(ROOT)).mkdir(
+                    parents=True, exist_ok=True)
         for name in ("package_source_sdk.py", "verify_consumers.py"):
             target = self.sources / "cmake/package" / name
             target.parent.mkdir(parents=True, exist_ok=True)

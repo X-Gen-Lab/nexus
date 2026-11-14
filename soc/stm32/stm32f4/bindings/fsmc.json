@@ -1,0 +1,2568 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "external_bus",
+      "mode": "async16",
+      "controllers": [
+        "FSMC"
+      ],
+      "implementation": "fsmc",
+      "headers": [
+        "stm32f407_fsmc.h",
+        "stm32f407_fsmc_nor.h",
+        "stm32f407_fsmc_nand.h"
+      ],
+      "profiles": {
+        "runtime": {
+          "state_type": "nx_stm32_fsmc_t",
+          "ops": "nx_stm32_fsmc_external_bus_ops",
+          "declarations": [
+            {
+              "role": "fsmc_pin_state",
+              "type": "uint16_t",
+              "const": false,
+              "enabled": {
+                "source": "selected.constants.external_bus.has_cold_pads",
+                "as": "bool"
+              },
+              "count": {
+                "length": "selected.constants.external_bus.cold_pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "fsmc_pins",
+              "type": "nx_stm32_platform_pin_config_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.constants.external_bus.pins",
+                  "limit": 64,
+                  "value": {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "source": "entry.pad.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "snapshot",
+                        {
+                          "optional": "entry.snapshot_index",
+                          "value": {
+                            "ref": "fsmc_pin_state",
+                            "as": "address",
+                            "index": {
+                              "source": "entry.snapshot_index",
+                              "as": "u32"
+                            }
+                          },
+                          "default": null
+                        }
+                      ],
+                      [
+                        "port_index",
+                        {
+                          "source": "entry.pad.port_index"
+                        }
+                      ],
+                      [
+                        "pin",
+                        {
+                          "source": "entry.pad.number"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.constants.external_bus.pins",
+                "limit": 64
+              }
+            },
+            {
+              "role": "fsmc_bank_config",
+              "type": "nx_stm32_fsmc_bank_config_t",
+              "const": true,
+              "static": true,
+              "value": {
+                "map": {
+                  "source": "selected_children",
+                  "limit": 6,
+                  "value": {
+                    "record": [
+                      [
+                        "kind",
+                        {
+                          "source": "entry.driver",
+                          "values": {
+                            "memory_window-endpoint": {
+                              "source": "entry.options.mode",
+                              "values": {
+                                "cpu-window": "NX_STM32_FSMC_SRAM_NE3",
+                                "startup-memory": "NX_STM32_FSMC_SRAM_NE3",
+                                "psram-window": "NX_STM32_FSMC_PSRAM"
+                              },
+                              "as": "symbol"
+                            },
+                            "parallel16-endpoint": "NX_STM32_FSMC_LCD_NE4",
+                            "flash_async-endpoint": "NX_STM32_FSMC_NOR",
+                            "nand-endpoint": "NX_STM32_FSMC_NAND"
+                          },
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "read",
+                        {
+                          "record": [
+                            [
+                              "address_setup",
+                              {
+                                "source": "entry.options.read_timing.address_setup",
+                                "default": 0
+                              }
+                            ],
+                            [
+                              "address_hold",
+                              {
+                                "source": "entry.options.read_timing.address_hold",
+                                "default": 1
+                              }
+                            ],
+                            [
+                              "data_setup",
+                              {
+                                "source": "entry.options.read_timing.data_setup",
+                                "default": 1
+                              }
+                            ],
+                            [
+                              "bus_turn",
+                              {
+                                "source": "entry.options.read_timing.bus_turn",
+                                "default": 0
+                              }
+                            ]
+                          ]
+                        }
+                      ],
+                      [
+                        "write",
+                        {
+                          "record": [
+                            [
+                              "address_setup",
+                              {
+                                "source": "entry.options.write_timing.address_setup",
+                                "default": 0
+                              }
+                            ],
+                            [
+                              "address_hold",
+                              {
+                                "source": "entry.options.write_timing.address_hold",
+                                "default": 1
+                              }
+                            ],
+                            [
+                              "data_setup",
+                              {
+                                "source": "entry.options.write_timing.data_setup",
+                                "default": 1
+                              }
+                            ],
+                            [
+                              "bus_turn",
+                              {
+                                "source": "entry.options.write_timing.bus_turn",
+                                "default": 0
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected_children",
+                "limit": 6
+              }
+            },
+            {
+              "role": "fsmc_banks",
+              "type": "nx_stm32_fsmc_bank_state_t",
+              "const": false,
+              "count": {
+                "length": "selected_children",
+                "limit": 6
+              }
+            },
+            {
+              "role": "fsmc_config",
+              "type": "nx_stm32_fsmc_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "pins",
+                    {
+                      "ref": "fsmc_pins",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "pin_count",
+                    {
+                      "length": "selected.constants.external_bus.pins",
+                      "limit": 64
+                    }
+                  ],
+                  [
+                    "banks",
+                    {
+                      "ref": "fsmc_bank_config",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "bank_count",
+                    {
+                      "length": "selected_children",
+                      "limit": 6
+                    }
+                  ],
+                  [
+                    "clock",
+                    {
+                      "record": [
+                        [
+                          "read",
+                          {
+                            "symbol": "nx_stm32_system_clock_read"
+                          }
+                        ],
+                        [
+                          "context",
+                          {
+                            "address": "g_nx_stm32_system"
+                          }
+                        ]
+                      ]
+                    }
+                  ],
+                  [
+                    "boot_backed",
+                    false
+                  ]
+                ]
+              }
+            }
+          ],
+          "child_groups": {
+            "limit": 6,
+            "bindings": "selected.constants.external_bus.endpoints",
+            "cases": {
+              "memory_window-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "fsmc_window",
+                    "type": "nx_stm32_fsmc_window_t",
+                    "const": false,
+                    "enabled": {
+                      "optional": "item.child.options.parameters",
+                      "value": true,
+                      "default": false
+                    },
+                    "value": {
+                      "record": [
+                        [
+                          "bus",
+                          {
+                            "ref": "parent_port",
+                            "as": "address"
+                          }
+                        ],
+                        [
+                          "index",
+                          {
+                            "source": "item.index"
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                ],
+                "calls": {
+                  "prepare": [],
+                  "close": []
+                },
+                "face": {
+                  "type": "nx_memory_window_port_t",
+                  "ops": {
+                    "source": "item.child.options.mode",
+                    "values": {
+                      "cpu-window": "nx_stm32_fsmc_memory_window_ops",
+                      "startup-memory": "nx_stm32_fsmc_memory_window_ops",
+                      "psram-window": "nx_stm32_fsmc_window_ops"
+                    },
+                    "as": "symbol"
+                  },
+                  "context": {
+                    "optional": "item.child.options.parameters",
+                    "value": {
+                      "ref": "fsmc_window",
+                      "as": "address"
+                    },
+                    "default": {
+                      "ref": "parent_port",
+                      "as": "address"
+                    }
+                  }
+                }
+              },
+              "parallel16-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "fsmc_lcd",
+                    "type": "nx_stm32_fsmc_lcd_t",
+                    "const": false
+                  }
+                ],
+                "calls": {
+                  "prepare": [
+                    {
+                      "function": "nx_stm32_fsmc_lcd_prepare",
+                      "args": [
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        },
+                        {
+                          "ref": "fsmc_lcd",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ],
+                  "close": [
+                    {
+                      "function": "nx_stm32_fsmc_lcd_close",
+                      "args": [
+                        {
+                          "ref": "fsmc_lcd",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "face": {
+                  "type": "nx_parallel16_endpoint_t",
+                  "ops": "nx_stm32_fsmc_parallel16_ops",
+                  "context": {
+                    "ref": "fsmc_lcd",
+                    "as": "address"
+                  }
+                }
+              },
+              "flash_async-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "fsmc_erase_spans",
+                    "type": "nx_flash_erase_span_t",
+                    "const": true,
+                    "value": {
+                      "map": {
+                        "source": "item.child.options.nor.erase_spans",
+                        "limit": 64,
+                        "value": {
+                          "record": [
+                            [
+                              "offset",
+                              {
+                                "source": "entry.offset"
+                              }
+                            ],
+                            [
+                              "erase_bytes",
+                              {
+                                "source": "entry.erase_bytes"
+                              }
+                            ],
+                            [
+                              "count",
+                              {
+                                "source": "entry.count"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "count": {
+                      "length": "item.child.options.nor.erase_spans",
+                      "limit": 64
+                    }
+                  },
+                  {
+                    "role": "fsmc_geometry",
+                    "type": "nx_flash_geometry_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "base_address",
+                          {
+                            "source": "item.child.options.address"
+                          }
+                        ],
+                        [
+                          "size",
+                          {
+                            "source": "item.child.options.parameters.bytes"
+                          }
+                        ],
+                        [
+                          "program_unit",
+                          {
+                            "source": "item.binding.program_unit"
+                          }
+                        ],
+                        [
+                          "erase_spans",
+                          {
+                            "ref": "fsmc_erase_spans",
+                            "as": "symbol"
+                          }
+                        ],
+                        [
+                          "erase_span_count",
+                          {
+                            "length": "item.child.options.nor.erase_spans",
+                            "limit": 64
+                          }
+                        ],
+                        [
+                          "program_flags",
+                          {
+                            "source": "item.binding.program_flags",
+                            "as": "static"
+                          }
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "role": "fsmc_nor_config",
+                    "type": "nx_stm32_fsmc_nor_config_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "geometry",
+                          {
+                            "ref": "fsmc_geometry",
+                            "as": "address"
+                          }
+                        ],
+                        [
+                          "unlock1",
+                          {
+                            "source": "item.child.options.nor.unlock1"
+                          }
+                        ],
+                        [
+                          "unlock2",
+                          {
+                            "source": "item.child.options.nor.unlock2"
+                          }
+                        ],
+                        [
+                          "cfi_address",
+                          {
+                            "source": "item.child.options.nor.cfi_address"
+                          }
+                        ],
+                        [
+                          "command_set",
+                          {
+                            "source": "item.child.options.nor.command_set"
+                          }
+                        ],
+                        [
+                          "cfi",
+                          {
+                            "source": "item.child.options.nor.cfi"
+                          }
+                        ],
+                        [
+                          "ready_delay_us",
+                          {
+                            "source": "item.child.options.nor.ready_delay_us"
+                          }
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "role": "fsmc_nor",
+                    "type": "nx_stm32_fsmc_nor_t",
+                    "const": false
+                  },
+                  {
+                    "role": "flash_readonly",
+                    "type": "nx_flash_port_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "ops",
+                          {
+                            "address": "nx_stm32_fsmc_nor_flash_ops"
+                          }
+                        ],
+                        [
+                          "context",
+                          {
+                            "ref": "fsmc_nor",
+                            "as": "address"
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                ],
+                "calls": {
+                  "prepare": [
+                    {
+                      "function": "nx_stm32_fsmc_nor_prepare",
+                      "args": [
+                        {
+                          "ref": "fsmc_nor",
+                          "as": "address"
+                        },
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        },
+                        {
+                          "source": "item.index"
+                        },
+                        {
+                          "ref": "fsmc_nor_config",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ],
+                  "close": [
+                    {
+                      "function": "nx_stm32_fsmc_nor_close",
+                      "args": [
+                        {
+                          "ref": "fsmc_nor",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "face": {
+                  "type": "nx_flash_async_port_t",
+                  "ops": "nx_stm32_fsmc_nor_async_ops",
+                  "context": {
+                    "ref": "fsmc_nor",
+                    "as": "address"
+                  }
+                }
+              },
+              "nand-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "fsmc_geometry",
+                    "type": "nx_nand_geometry_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "page_bytes",
+                          {
+                            "source": "item.child.options.geometry.page_bytes"
+                          }
+                        ],
+                        [
+                          "oob_bytes",
+                          {
+                            "source": "item.child.options.geometry.oob_bytes"
+                          }
+                        ],
+                        [
+                          "pages_per_block",
+                          {
+                            "source": "item.child.options.geometry.pages_per_block"
+                          }
+                        ],
+                        [
+                          "blocks",
+                          {
+                            "source": "item.child.options.geometry.blocks"
+                          }
+                        ],
+                        [
+                          "ecc_bytes",
+                          {
+                            "source": "item.child.options.parameters.ecc_bytes"
+                          }
+                        ],
+                        [
+                          "width",
+                          {
+                            "source": "item.child.options.parameters.width"
+                          }
+                        ],
+                        [
+                          "column_cycles",
+                          {
+                            "source": "item.child.options.geometry.column_cycles"
+                          }
+                        ],
+                        [
+                          "row_cycles",
+                          {
+                            "source": "item.child.options.geometry.row_cycles"
+                          }
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "role": "fsmc_nand_config",
+                    "type": "nx_stm32_fsmc_nand_config_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "geometry",
+                          {
+                            "ref": "fsmc_geometry",
+                            "as": "address"
+                          }
+                        ],
+                        [
+                          "ready_delay_us",
+                          {
+                            "source": "item.child.options.ready_delay_us"
+                          }
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "role": "fsmc_nand",
+                    "type": "nx_stm32_fsmc_nand_t",
+                    "const": false
+                  }
+                ],
+                "calls": {
+                  "prepare": [
+                    {
+                      "function": "nx_stm32_fsmc_nand_prepare",
+                      "args": [
+                        {
+                          "ref": "fsmc_nand",
+                          "as": "address"
+                        },
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        },
+                        {
+                          "source": "item.index"
+                        },
+                        {
+                          "ref": "fsmc_nand_config",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ],
+                  "close": [
+                    {
+                      "function": "nx_stm32_fsmc_nand_close",
+                      "args": [
+                        {
+                          "ref": "fsmc_nand",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "face": {
+                  "type": "nx_nand_port_t",
+                  "ops": "nx_stm32_fsmc_nand_ops",
+                  "context": {
+                    "ref": "fsmc_nand",
+                    "as": "address"
+                  }
+                }
+              }
+            }
+          },
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_fsmc_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "fsmc_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "fsmc_banks",
+                  "as": "symbol"
+                },
+                {
+                  "length": "selected_children",
+                  "limit": 6
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_fsmc_stop",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "retain_on_failed_init": true,
+          "pre_c_effects": false,
+          "pin_snapshots": {
+            "source": "selected.constants.external_bus.cold_pads",
+            "key": "entry.identity",
+            "array_role": "fsmc_pin_state",
+            "limit": 64
+          }
+        },
+        "startup-memory": {
+          "state_type": "nx_stm32_fsmc_t",
+          "ops": "nx_stm32_fsmc_external_bus_ops",
+          "declarations": [
+            {
+              "role": "fsmc_pin_state",
+              "type": "uint16_t",
+              "const": false,
+              "enabled": {
+                "source": "selected.constants.external_bus.has_cold_pads",
+                "as": "bool"
+              },
+              "count": {
+                "length": "selected.constants.external_bus.cold_pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "fsmc_pins",
+              "type": "nx_stm32_platform_pin_config_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.constants.external_bus.pins",
+                  "limit": 64,
+                  "value": {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "source": "entry.pad.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "snapshot",
+                        {
+                          "optional": "entry.snapshot_index",
+                          "value": {
+                            "ref": "fsmc_pin_state",
+                            "as": "address",
+                            "index": {
+                              "source": "entry.snapshot_index",
+                              "as": "u32"
+                            }
+                          },
+                          "default": null
+                        }
+                      ],
+                      [
+                        "port_index",
+                        {
+                          "source": "entry.pad.port_index"
+                        }
+                      ],
+                      [
+                        "pin",
+                        {
+                          "source": "entry.pad.number"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.constants.external_bus.pins",
+                "limit": 64
+              }
+            },
+            {
+              "role": "fsmc_bank_config",
+              "type": "nx_stm32_fsmc_bank_config_t",
+              "const": true,
+              "static": false,
+              "value": {
+                "map": {
+                  "source": "selected_children",
+                  "limit": 6,
+                  "value": {
+                    "record": [
+                      [
+                        "kind",
+                        {
+                          "source": "entry.driver",
+                          "values": {
+                            "memory_window-endpoint": {
+                              "source": "entry.options.mode",
+                              "values": {
+                                "cpu-window": "NX_STM32_FSMC_SRAM_NE3",
+                                "startup-memory": "NX_STM32_FSMC_SRAM_NE3",
+                                "psram-window": "NX_STM32_FSMC_PSRAM"
+                              },
+                              "as": "symbol"
+                            },
+                            "parallel16-endpoint": "NX_STM32_FSMC_LCD_NE4",
+                            "flash_async-endpoint": "NX_STM32_FSMC_NOR",
+                            "nand-endpoint": "NX_STM32_FSMC_NAND"
+                          },
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "read",
+                        {
+                          "record": [
+                            [
+                              "address_setup",
+                              {
+                                "source": "entry.options.read_timing.address_setup",
+                                "default": 0
+                              }
+                            ],
+                            [
+                              "address_hold",
+                              {
+                                "source": "entry.options.read_timing.address_hold",
+                                "default": 1
+                              }
+                            ],
+                            [
+                              "data_setup",
+                              {
+                                "source": "entry.options.read_timing.data_setup",
+                                "default": 1
+                              }
+                            ],
+                            [
+                              "bus_turn",
+                              {
+                                "source": "entry.options.read_timing.bus_turn",
+                                "default": 0
+                              }
+                            ]
+                          ]
+                        }
+                      ],
+                      [
+                        "write",
+                        {
+                          "record": [
+                            [
+                              "address_setup",
+                              {
+                                "source": "entry.options.write_timing.address_setup",
+                                "default": 0
+                              }
+                            ],
+                            [
+                              "address_hold",
+                              {
+                                "source": "entry.options.write_timing.address_hold",
+                                "default": 1
+                              }
+                            ],
+                            [
+                              "data_setup",
+                              {
+                                "source": "entry.options.write_timing.data_setup",
+                                "default": 1
+                              }
+                            ],
+                            [
+                              "bus_turn",
+                              {
+                                "source": "entry.options.write_timing.bus_turn",
+                                "default": 0
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected_children",
+                "limit": 6
+              }
+            },
+            {
+              "role": "fsmc_banks",
+              "type": "nx_stm32_fsmc_bank_state_t",
+              "const": false,
+              "count": {
+                "length": "selected_children",
+                "limit": 6
+              }
+            },
+            {
+              "role": "fsmc_config",
+              "type": "nx_stm32_fsmc_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "pins",
+                    {
+                      "ref": "fsmc_pins",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "pin_count",
+                    {
+                      "length": "selected.constants.external_bus.pins",
+                      "limit": 64
+                    }
+                  ],
+                  [
+                    "banks",
+                    {
+                      "ref": "fsmc_bank_config",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "bank_count",
+                    {
+                      "length": "selected_children",
+                      "limit": 6
+                    }
+                  ],
+                  [
+                    "clock",
+                    {
+                      "record": [
+                        [
+                          "read",
+                          {
+                            "symbol": "nx_stm32_system_clock_read"
+                          }
+                        ],
+                        [
+                          "context",
+                          {
+                            "address": "g_nx_stm32_system"
+                          }
+                        ]
+                      ]
+                    }
+                  ],
+                  [
+                    "boot_backed",
+                    true
+                  ]
+                ]
+              }
+            },
+            {
+              "role": "fsmc_boot_plan",
+              "type": "nx_stm32_sram_boot_plan_t",
+              "const": true,
+              "extern": true,
+              "static": false,
+              "symbol": "g_nx_stm32_sram_boot_plan"
+            }
+          ],
+          "child_groups": {
+            "limit": 6,
+            "bindings": "selected.constants.external_bus.endpoints",
+            "cases": {
+              "memory_window-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "fsmc_window",
+                    "type": "nx_stm32_fsmc_window_t",
+                    "const": false,
+                    "enabled": {
+                      "optional": "item.child.options.parameters",
+                      "value": true,
+                      "default": false
+                    },
+                    "value": {
+                      "record": [
+                        [
+                          "bus",
+                          {
+                            "ref": "parent_port",
+                            "as": "address"
+                          }
+                        ],
+                        [
+                          "index",
+                          {
+                            "source": "item.index"
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                ],
+                "calls": {
+                  "prepare": [],
+                  "close": []
+                },
+                "face": {
+                  "type": "nx_memory_window_port_t",
+                  "ops": {
+                    "source": "item.child.options.mode",
+                    "values": {
+                      "cpu-window": "nx_stm32_fsmc_memory_window_ops",
+                      "startup-memory": "nx_stm32_fsmc_memory_window_ops",
+                      "psram-window": "nx_stm32_fsmc_window_ops"
+                    },
+                    "as": "symbol"
+                  },
+                  "context": {
+                    "optional": "item.child.options.parameters",
+                    "value": {
+                      "ref": "fsmc_window",
+                      "as": "address"
+                    },
+                    "default": {
+                      "ref": "parent_port",
+                      "as": "address"
+                    }
+                  }
+                }
+              },
+              "parallel16-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "fsmc_lcd",
+                    "type": "nx_stm32_fsmc_lcd_t",
+                    "const": false
+                  }
+                ],
+                "calls": {
+                  "prepare": [
+                    {
+                      "function": "nx_stm32_fsmc_lcd_prepare",
+                      "args": [
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        },
+                        {
+                          "ref": "fsmc_lcd",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ],
+                  "close": [
+                    {
+                      "function": "nx_stm32_fsmc_lcd_close",
+                      "args": [
+                        {
+                          "ref": "fsmc_lcd",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "face": {
+                  "type": "nx_parallel16_endpoint_t",
+                  "ops": "nx_stm32_fsmc_parallel16_ops",
+                  "context": {
+                    "ref": "fsmc_lcd",
+                    "as": "address"
+                  }
+                }
+              },
+              "flash_async-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "fsmc_erase_spans",
+                    "type": "nx_flash_erase_span_t",
+                    "const": true,
+                    "value": {
+                      "map": {
+                        "source": "item.child.options.nor.erase_spans",
+                        "limit": 64,
+                        "value": {
+                          "record": [
+                            [
+                              "offset",
+                              {
+                                "source": "entry.offset"
+                              }
+                            ],
+                            [
+                              "erase_bytes",
+                              {
+                                "source": "entry.erase_bytes"
+                              }
+                            ],
+                            [
+                              "count",
+                              {
+                                "source": "entry.count"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "count": {
+                      "length": "item.child.options.nor.erase_spans",
+                      "limit": 64
+                    }
+                  },
+                  {
+                    "role": "fsmc_geometry",
+                    "type": "nx_flash_geometry_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "base_address",
+                          {
+                            "source": "item.child.options.address"
+                          }
+                        ],
+                        [
+                          "size",
+                          {
+                            "source": "item.child.options.parameters.bytes"
+                          }
+                        ],
+                        [
+                          "program_unit",
+                          {
+                            "source": "item.binding.program_unit"
+                          }
+                        ],
+                        [
+                          "erase_spans",
+                          {
+                            "ref": "fsmc_erase_spans",
+                            "as": "symbol"
+                          }
+                        ],
+                        [
+                          "erase_span_count",
+                          {
+                            "length": "item.child.options.nor.erase_spans",
+                            "limit": 64
+                          }
+                        ],
+                        [
+                          "program_flags",
+                          {
+                            "source": "item.binding.program_flags",
+                            "as": "static"
+                          }
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "role": "fsmc_nor_config",
+                    "type": "nx_stm32_fsmc_nor_config_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "geometry",
+                          {
+                            "ref": "fsmc_geometry",
+                            "as": "address"
+                          }
+                        ],
+                        [
+                          "unlock1",
+                          {
+                            "source": "item.child.options.nor.unlock1"
+                          }
+                        ],
+                        [
+                          "unlock2",
+                          {
+                            "source": "item.child.options.nor.unlock2"
+                          }
+                        ],
+                        [
+                          "cfi_address",
+                          {
+                            "source": "item.child.options.nor.cfi_address"
+                          }
+                        ],
+                        [
+                          "command_set",
+                          {
+                            "source": "item.child.options.nor.command_set"
+                          }
+                        ],
+                        [
+                          "cfi",
+                          {
+                            "source": "item.child.options.nor.cfi"
+                          }
+                        ],
+                        [
+                          "ready_delay_us",
+                          {
+                            "source": "item.child.options.nor.ready_delay_us"
+                          }
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "role": "fsmc_nor",
+                    "type": "nx_stm32_fsmc_nor_t",
+                    "const": false
+                  },
+                  {
+                    "role": "flash_readonly",
+                    "type": "nx_flash_port_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "ops",
+                          {
+                            "address": "nx_stm32_fsmc_nor_flash_ops"
+                          }
+                        ],
+                        [
+                          "context",
+                          {
+                            "ref": "fsmc_nor",
+                            "as": "address"
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                ],
+                "calls": {
+                  "prepare": [
+                    {
+                      "function": "nx_stm32_fsmc_nor_prepare",
+                      "args": [
+                        {
+                          "ref": "fsmc_nor",
+                          "as": "address"
+                        },
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        },
+                        {
+                          "source": "item.index"
+                        },
+                        {
+                          "ref": "fsmc_nor_config",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ],
+                  "close": [
+                    {
+                      "function": "nx_stm32_fsmc_nor_close",
+                      "args": [
+                        {
+                          "ref": "fsmc_nor",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "face": {
+                  "type": "nx_flash_async_port_t",
+                  "ops": "nx_stm32_fsmc_nor_async_ops",
+                  "context": {
+                    "ref": "fsmc_nor",
+                    "as": "address"
+                  }
+                }
+              },
+              "nand-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "fsmc_geometry",
+                    "type": "nx_nand_geometry_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "page_bytes",
+                          {
+                            "source": "item.child.options.geometry.page_bytes"
+                          }
+                        ],
+                        [
+                          "oob_bytes",
+                          {
+                            "source": "item.child.options.geometry.oob_bytes"
+                          }
+                        ],
+                        [
+                          "pages_per_block",
+                          {
+                            "source": "item.child.options.geometry.pages_per_block"
+                          }
+                        ],
+                        [
+                          "blocks",
+                          {
+                            "source": "item.child.options.geometry.blocks"
+                          }
+                        ],
+                        [
+                          "ecc_bytes",
+                          {
+                            "source": "item.child.options.parameters.ecc_bytes"
+                          }
+                        ],
+                        [
+                          "width",
+                          {
+                            "source": "item.child.options.parameters.width"
+                          }
+                        ],
+                        [
+                          "column_cycles",
+                          {
+                            "source": "item.child.options.geometry.column_cycles"
+                          }
+                        ],
+                        [
+                          "row_cycles",
+                          {
+                            "source": "item.child.options.geometry.row_cycles"
+                          }
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "role": "fsmc_nand_config",
+                    "type": "nx_stm32_fsmc_nand_config_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "geometry",
+                          {
+                            "ref": "fsmc_geometry",
+                            "as": "address"
+                          }
+                        ],
+                        [
+                          "ready_delay_us",
+                          {
+                            "source": "item.child.options.ready_delay_us"
+                          }
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "role": "fsmc_nand",
+                    "type": "nx_stm32_fsmc_nand_t",
+                    "const": false
+                  }
+                ],
+                "calls": {
+                  "prepare": [
+                    {
+                      "function": "nx_stm32_fsmc_nand_prepare",
+                      "args": [
+                        {
+                          "ref": "fsmc_nand",
+                          "as": "address"
+                        },
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        },
+                        {
+                          "source": "item.index"
+                        },
+                        {
+                          "ref": "fsmc_nand_config",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ],
+                  "close": [
+                    {
+                      "function": "nx_stm32_fsmc_nand_close",
+                      "args": [
+                        {
+                          "ref": "fsmc_nand",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "face": {
+                  "type": "nx_nand_port_t",
+                  "ops": "nx_stm32_fsmc_nand_ops",
+                  "context": {
+                    "ref": "fsmc_nand",
+                    "as": "address"
+                  }
+                }
+              }
+            }
+          },
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_fsmc_adopt_boot",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "fsmc_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "fsmc_banks",
+                  "as": "symbol"
+                },
+                {
+                  "length": "selected_children",
+                  "limit": 6
+                },
+                {
+                  "ref": "fsmc_boot_plan",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_fsmc_stop",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "retain_on_failed_init": true,
+          "pre_c_effects": true,
+          "pin_snapshots": {
+            "source": "selected.constants.external_bus.cold_pads",
+            "key": "entry.identity",
+            "array_role": "fsmc_pin_state",
+            "limit": 64
+          },
+          "initial_state": "NX_STM32_FSMC_BOOT_OWNER"
+        }
+      }
+    },
+    {
+      "kind": "external_bus",
+      "mode": "external-memory",
+      "controllers": [
+        "FSMC"
+      ],
+      "implementation": "fsmc",
+      "headers": [
+        "stm32f407_fsmc.h",
+        "stm32f407_fsmc_nor.h",
+        "stm32f407_fsmc_nand.h"
+      ],
+      "profiles": {
+        "parameterized": {
+          "state_type": "nx_stm32_fsmc_t",
+          "ops": "nx_stm32_fsmc_external_bus_ops",
+          "declarations": [
+            {
+              "role": "fsmc_pin_state",
+              "type": "uint16_t",
+              "const": false,
+              "enabled": {
+                "source": "selected.constants.external_bus.has_cold_pads",
+                "as": "bool"
+              },
+              "count": {
+                "length": "selected.constants.external_bus.cold_pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "fsmc_pins",
+              "type": "nx_stm32_platform_pin_config_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.constants.external_bus.pins",
+                  "limit": 64,
+                  "value": {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "source": "entry.pad.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "snapshot",
+                        {
+                          "optional": "entry.snapshot_index",
+                          "value": {
+                            "ref": "fsmc_pin_state",
+                            "as": "address",
+                            "index": {
+                              "source": "entry.snapshot_index",
+                              "as": "u32"
+                            }
+                          },
+                          "default": null
+                        }
+                      ],
+                      [
+                        "port_index",
+                        {
+                          "source": "entry.pad.port_index"
+                        }
+                      ],
+                      [
+                        "pin",
+                        {
+                          "source": "entry.pad.number"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.constants.external_bus.pins",
+                "limit": 64
+              }
+            },
+            {
+              "role": "fsmc_bank_config",
+              "type": "nx_stm32_fsmc_bank_config_t",
+              "const": true,
+              "static": true,
+              "value": {
+                "map": {
+                  "source": "selected_children",
+                  "limit": 6,
+                  "value": {
+                    "record": [
+                      [
+                        "kind",
+                        {
+                          "source": "entry.driver",
+                          "values": {
+                            "memory_window-endpoint": {
+                              "source": "entry.options.mode",
+                              "values": {
+                                "cpu-window": "NX_STM32_FSMC_SRAM_NE3",
+                                "startup-memory": "NX_STM32_FSMC_SRAM_NE3",
+                                "psram-window": "NX_STM32_FSMC_PSRAM"
+                              },
+                              "as": "symbol"
+                            },
+                            "parallel16-endpoint": "NX_STM32_FSMC_LCD_NE4",
+                            "flash_async-endpoint": "NX_STM32_FSMC_NOR",
+                            "nand-endpoint": "NX_STM32_FSMC_NAND"
+                          },
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "read",
+                        {
+                          "record": [
+                            [
+                              "address_setup",
+                              {
+                                "source": "entry.options.read_timing.address_setup",
+                                "default": 0
+                              }
+                            ],
+                            [
+                              "address_hold",
+                              {
+                                "source": "entry.options.read_timing.address_hold",
+                                "default": 1
+                              }
+                            ],
+                            [
+                              "data_setup",
+                              {
+                                "source": "entry.options.read_timing.data_setup",
+                                "default": 1
+                              }
+                            ],
+                            [
+                              "bus_turn",
+                              {
+                                "source": "entry.options.read_timing.bus_turn",
+                                "default": 0
+                              }
+                            ]
+                          ]
+                        }
+                      ],
+                      [
+                        "write",
+                        {
+                          "record": [
+                            [
+                              "address_setup",
+                              {
+                                "source": "entry.options.write_timing.address_setup",
+                                "default": 0
+                              }
+                            ],
+                            [
+                              "address_hold",
+                              {
+                                "source": "entry.options.write_timing.address_hold",
+                                "default": 1
+                              }
+                            ],
+                            [
+                              "data_setup",
+                              {
+                                "source": "entry.options.write_timing.data_setup",
+                                "default": 1
+                              }
+                            ],
+                            [
+                              "bus_turn",
+                              {
+                                "source": "entry.options.write_timing.bus_turn",
+                                "default": 0
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected_children",
+                "limit": 6
+              }
+            },
+            {
+              "role": "fsmc_parameters",
+              "type": "nx_stm32_fsmc_parameters_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected_children",
+                  "limit": 6,
+                  "value": {
+                    "record": [
+                      [
+                        "bank",
+                        {
+                          "source": "entry.options.parameters.bank",
+                          "default": 0
+                        }
+                      ],
+                      [
+                        "width",
+                        {
+                          "source": "entry.options.parameters.width",
+                          "default": 0
+                        }
+                      ],
+                      [
+                        "bytes",
+                        {
+                          "source": "entry.options.parameters.bytes",
+                          "default": 0
+                        }
+                      ],
+                      [
+                        "ecc_bytes",
+                        {
+                          "source": "entry.options.parameters.ecc_bytes",
+                          "default": 0
+                        }
+                      ],
+                      [
+                        "burst_page_bytes",
+                        {
+                          "source": "entry.options.parameters.burst_page_bytes",
+                          "default": 0
+                        }
+                      ],
+                      [
+                        "address_lines",
+                        {
+                          "source": "entry.options.parameters.address_lines",
+                          "default": 0
+                        }
+                      ],
+                      [
+                        "clock_division",
+                        {
+                          "source": "entry.options.parameters.clock_division",
+                          "default": 0
+                        }
+                      ],
+                      [
+                        "data_latency",
+                        {
+                          "source": "entry.options.parameters.data_latency",
+                          "default": 0
+                        }
+                      ],
+                      [
+                        "access_mode",
+                        {
+                          "source": "entry.options.parameters.access_mode",
+                          "default": 0
+                        }
+                      ],
+                      [
+                        "tclr",
+                        {
+                          "source": "entry.options.parameters.tclr",
+                          "default": 0
+                        }
+                      ],
+                      [
+                        "tar",
+                        {
+                          "source": "entry.options.parameters.tar",
+                          "default": 0
+                        }
+                      ],
+                      [
+                        "multiplexed",
+                        {
+                          "source": "entry.options.parameters.multiplexed",
+                          "default": false
+                        }
+                      ],
+                      [
+                        "extended_mode",
+                        {
+                          "source": "entry.options.parameters.extended_mode",
+                          "default": false
+                        }
+                      ],
+                      [
+                        "byte_lanes",
+                        {
+                          "source": "entry.options.parameters.byte_lanes",
+                          "default": false
+                        }
+                      ],
+                      [
+                        "burst_read",
+                        {
+                          "source": "entry.options.parameters.burst_read",
+                          "default": false
+                        }
+                      ],
+                      [
+                        "burst_write",
+                        {
+                          "source": "entry.options.parameters.burst_write",
+                          "default": false
+                        }
+                      ],
+                      [
+                        "wait_signal",
+                        {
+                          "source": "entry.options.parameters.wait_signal",
+                          "default": false
+                        }
+                      ],
+                      [
+                        "asynchronous_wait",
+                        {
+                          "source": "entry.options.parameters.asynchronous_wait",
+                          "default": false
+                        }
+                      ],
+                      [
+                        "wait_high",
+                        {
+                          "source": "entry.options.parameters.wait_high",
+                          "default": false
+                        }
+                      ],
+                      [
+                        "wait_before",
+                        {
+                          "source": "entry.options.parameters.wait_before",
+                          "default": false
+                        }
+                      ],
+                      [
+                        "wrap",
+                        {
+                          "source": "entry.options.parameters.wrap",
+                          "default": false
+                        }
+                      ],
+                      [
+                        "common",
+                        {
+                          "record": [
+                            [
+                              "setup",
+                              {
+                                "source": "entry.options.parameters.common.setup",
+                                "default": 0
+                              }
+                            ],
+                            [
+                              "wait",
+                              {
+                                "source": "entry.options.parameters.common.wait",
+                                "default": 0
+                              }
+                            ],
+                            [
+                              "hold",
+                              {
+                                "source": "entry.options.parameters.common.hold",
+                                "default": 0
+                              }
+                            ],
+                            [
+                              "hiz",
+                              {
+                                "source": "entry.options.parameters.common.hiz",
+                                "default": 0
+                              }
+                            ]
+                          ]
+                        }
+                      ],
+                      [
+                        "attribute",
+                        {
+                          "record": [
+                            [
+                              "setup",
+                              {
+                                "source": "entry.options.parameters.attribute.setup",
+                                "default": 0
+                              }
+                            ],
+                            [
+                              "wait",
+                              {
+                                "source": "entry.options.parameters.attribute.wait",
+                                "default": 0
+                              }
+                            ],
+                            [
+                              "hold",
+                              {
+                                "source": "entry.options.parameters.attribute.hold",
+                                "default": 0
+                              }
+                            ],
+                            [
+                              "hiz",
+                              {
+                                "source": "entry.options.parameters.attribute.hiz",
+                                "default": 0
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected_children",
+                "limit": 6
+              }
+            },
+            {
+              "role": "fsmc_banks",
+              "type": "nx_stm32_fsmc_bank_state_t",
+              "const": false,
+              "count": {
+                "length": "selected_children",
+                "limit": 6
+              }
+            },
+            {
+              "role": "fsmc_config",
+              "type": "nx_stm32_fsmc_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "pins",
+                    {
+                      "ref": "fsmc_pins",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "pin_count",
+                    {
+                      "length": "selected.constants.external_bus.pins",
+                      "limit": 64
+                    }
+                  ],
+                  [
+                    "banks",
+                    {
+                      "ref": "fsmc_bank_config",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "bank_count",
+                    {
+                      "length": "selected_children",
+                      "limit": 6
+                    }
+                  ],
+                  [
+                    "clock",
+                    {
+                      "record": [
+                        [
+                          "read",
+                          {
+                            "symbol": "nx_stm32_system_clock_read"
+                          }
+                        ],
+                        [
+                          "context",
+                          {
+                            "address": "g_nx_stm32_system"
+                          }
+                        ]
+                      ]
+                    }
+                  ],
+                  [
+                    "boot_backed",
+                    false
+                  ],
+                  [
+                    "parameters",
+                    {
+                      "ref": "fsmc_parameters",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "package_pins",
+                    {
+                      "source": "selected.constants.external_bus.package_pins"
+                    }
+                  ]
+                ]
+              }
+            }
+          ],
+          "child_groups": {
+            "limit": 6,
+            "bindings": "selected.constants.external_bus.endpoints",
+            "cases": {
+              "memory_window-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "fsmc_window",
+                    "type": "nx_stm32_fsmc_window_t",
+                    "const": false,
+                    "enabled": {
+                      "optional": "item.child.options.parameters",
+                      "value": true,
+                      "default": false
+                    },
+                    "value": {
+                      "record": [
+                        [
+                          "bus",
+                          {
+                            "ref": "parent_port",
+                            "as": "address"
+                          }
+                        ],
+                        [
+                          "index",
+                          {
+                            "source": "item.index"
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                ],
+                "calls": {
+                  "prepare": [],
+                  "close": []
+                },
+                "face": {
+                  "type": "nx_memory_window_port_t",
+                  "ops": {
+                    "source": "item.child.options.mode",
+                    "values": {
+                      "cpu-window": "nx_stm32_fsmc_memory_window_ops",
+                      "startup-memory": "nx_stm32_fsmc_memory_window_ops",
+                      "psram-window": "nx_stm32_fsmc_window_ops"
+                    },
+                    "as": "symbol"
+                  },
+                  "context": {
+                    "optional": "item.child.options.parameters",
+                    "value": {
+                      "ref": "fsmc_window",
+                      "as": "address"
+                    },
+                    "default": {
+                      "ref": "parent_port",
+                      "as": "address"
+                    }
+                  }
+                }
+              },
+              "parallel16-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "fsmc_lcd",
+                    "type": "nx_stm32_fsmc_lcd_t",
+                    "const": false
+                  }
+                ],
+                "calls": {
+                  "prepare": [
+                    {
+                      "function": "nx_stm32_fsmc_lcd_prepare",
+                      "args": [
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        },
+                        {
+                          "ref": "fsmc_lcd",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ],
+                  "close": [
+                    {
+                      "function": "nx_stm32_fsmc_lcd_close",
+                      "args": [
+                        {
+                          "ref": "fsmc_lcd",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "face": {
+                  "type": "nx_parallel16_endpoint_t",
+                  "ops": "nx_stm32_fsmc_parallel16_ops",
+                  "context": {
+                    "ref": "fsmc_lcd",
+                    "as": "address"
+                  }
+                }
+              },
+              "flash_async-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "fsmc_erase_spans",
+                    "type": "nx_flash_erase_span_t",
+                    "const": true,
+                    "value": {
+                      "map": {
+                        "source": "item.child.options.nor.erase_spans",
+                        "limit": 64,
+                        "value": {
+                          "record": [
+                            [
+                              "offset",
+                              {
+                                "source": "entry.offset"
+                              }
+                            ],
+                            [
+                              "erase_bytes",
+                              {
+                                "source": "entry.erase_bytes"
+                              }
+                            ],
+                            [
+                              "count",
+                              {
+                                "source": "entry.count"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "count": {
+                      "length": "item.child.options.nor.erase_spans",
+                      "limit": 64
+                    }
+                  },
+                  {
+                    "role": "fsmc_geometry",
+                    "type": "nx_flash_geometry_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "base_address",
+                          {
+                            "source": "item.child.options.address"
+                          }
+                        ],
+                        [
+                          "size",
+                          {
+                            "source": "item.child.options.parameters.bytes"
+                          }
+                        ],
+                        [
+                          "program_unit",
+                          {
+                            "source": "item.binding.program_unit"
+                          }
+                        ],
+                        [
+                          "erase_spans",
+                          {
+                            "ref": "fsmc_erase_spans",
+                            "as": "symbol"
+                          }
+                        ],
+                        [
+                          "erase_span_count",
+                          {
+                            "length": "item.child.options.nor.erase_spans",
+                            "limit": 64
+                          }
+                        ],
+                        [
+                          "program_flags",
+                          {
+                            "source": "item.binding.program_flags",
+                            "as": "static"
+                          }
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "role": "fsmc_nor_config",
+                    "type": "nx_stm32_fsmc_nor_config_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "geometry",
+                          {
+                            "ref": "fsmc_geometry",
+                            "as": "address"
+                          }
+                        ],
+                        [
+                          "unlock1",
+                          {
+                            "source": "item.child.options.nor.unlock1"
+                          }
+                        ],
+                        [
+                          "unlock2",
+                          {
+                            "source": "item.child.options.nor.unlock2"
+                          }
+                        ],
+                        [
+                          "cfi_address",
+                          {
+                            "source": "item.child.options.nor.cfi_address"
+                          }
+                        ],
+                        [
+                          "command_set",
+                          {
+                            "source": "item.child.options.nor.command_set"
+                          }
+                        ],
+                        [
+                          "cfi",
+                          {
+                            "source": "item.child.options.nor.cfi"
+                          }
+                        ],
+                        [
+                          "ready_delay_us",
+                          {
+                            "source": "item.child.options.nor.ready_delay_us"
+                          }
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "role": "fsmc_nor",
+                    "type": "nx_stm32_fsmc_nor_t",
+                    "const": false
+                  },
+                  {
+                    "role": "flash_readonly",
+                    "type": "nx_flash_port_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "ops",
+                          {
+                            "address": "nx_stm32_fsmc_nor_flash_ops"
+                          }
+                        ],
+                        [
+                          "context",
+                          {
+                            "ref": "fsmc_nor",
+                            "as": "address"
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                ],
+                "calls": {
+                  "prepare": [
+                    {
+                      "function": "nx_stm32_fsmc_nor_prepare",
+                      "args": [
+                        {
+                          "ref": "fsmc_nor",
+                          "as": "address"
+                        },
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        },
+                        {
+                          "source": "item.index"
+                        },
+                        {
+                          "ref": "fsmc_nor_config",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ],
+                  "close": [
+                    {
+                      "function": "nx_stm32_fsmc_nor_close",
+                      "args": [
+                        {
+                          "ref": "fsmc_nor",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "face": {
+                  "type": "nx_flash_async_port_t",
+                  "ops": "nx_stm32_fsmc_nor_async_ops",
+                  "context": {
+                    "ref": "fsmc_nor",
+                    "as": "address"
+                  }
+                }
+              },
+              "nand-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "fsmc_geometry",
+                    "type": "nx_nand_geometry_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "page_bytes",
+                          {
+                            "source": "item.child.options.geometry.page_bytes"
+                          }
+                        ],
+                        [
+                          "oob_bytes",
+                          {
+                            "source": "item.child.options.geometry.oob_bytes"
+                          }
+                        ],
+                        [
+                          "pages_per_block",
+                          {
+                            "source": "item.child.options.geometry.pages_per_block"
+                          }
+                        ],
+                        [
+                          "blocks",
+                          {
+                            "source": "item.child.options.geometry.blocks"
+                          }
+                        ],
+                        [
+                          "ecc_bytes",
+                          {
+                            "source": "item.child.options.parameters.ecc_bytes"
+                          }
+                        ],
+                        [
+                          "width",
+                          {
+                            "source": "item.child.options.parameters.width"
+                          }
+                        ],
+                        [
+                          "column_cycles",
+                          {
+                            "source": "item.child.options.geometry.column_cycles"
+                          }
+                        ],
+                        [
+                          "row_cycles",
+                          {
+                            "source": "item.child.options.geometry.row_cycles"
+                          }
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "role": "fsmc_nand_config",
+                    "type": "nx_stm32_fsmc_nand_config_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "geometry",
+                          {
+                            "ref": "fsmc_geometry",
+                            "as": "address"
+                          }
+                        ],
+                        [
+                          "ready_delay_us",
+                          {
+                            "source": "item.child.options.ready_delay_us"
+                          }
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "role": "fsmc_nand",
+                    "type": "nx_stm32_fsmc_nand_t",
+                    "const": false
+                  }
+                ],
+                "calls": {
+                  "prepare": [
+                    {
+                      "function": "nx_stm32_fsmc_nand_prepare",
+                      "args": [
+                        {
+                          "ref": "fsmc_nand",
+                          "as": "address"
+                        },
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        },
+                        {
+                          "source": "item.index"
+                        },
+                        {
+                          "ref": "fsmc_nand_config",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ],
+                  "close": [
+                    {
+                      "function": "nx_stm32_fsmc_nand_close",
+                      "args": [
+                        {
+                          "ref": "fsmc_nand",
+                          "as": "address"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "face": {
+                  "type": "nx_nand_port_t",
+                  "ops": "nx_stm32_fsmc_nand_ops",
+                  "context": {
+                    "ref": "fsmc_nand",
+                    "as": "address"
+                  }
+                }
+              }
+            }
+          },
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_fsmc_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "fsmc_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "fsmc_banks",
+                  "as": "symbol"
+                },
+                {
+                  "length": "selected_children",
+                  "limit": 6
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_fsmc_stop",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "retain_on_failed_init": true,
+          "pre_c_effects": false,
+          "pin_snapshots": {
+            "source": "selected.constants.external_bus.cold_pads",
+            "key": "entry.identity",
+            "array_role": "fsmc_pin_state",
+            "limit": 64
+          }
+        }
+      }
+    }
+  ]
+}

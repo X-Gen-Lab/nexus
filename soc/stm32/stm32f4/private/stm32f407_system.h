@@ -12,6 +12,7 @@
 #include "nexus/arch/arch.h"
 #include "nexus/core/status.h"
 #include "nexus_config.h"
+#include "stm32f4_timebase.h"
 #include "stm32f4xx.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -51,18 +52,19 @@ typedef struct {
 } nx_stm32_start_result_t;
 
 /**
- * \brief           Inspect reset-like clocks and an unowned TIM2 without
- * writes. \param[in]       system: Static register-bound context, no external
- * owners. \return          SUCCESS or INVALID/CONTEXT/BUSY before acquisition.
- * \note            Privileged Thread mode with all incoming masks clear.
- *                  GPIO/CCM and an existing PWR interface clock may be shared.
- *                  Unknown live clocks, bootloader handoff and foreign timer
- *                  owners are not adopted. No scheduler or IRQ is changed.
+ * \brief           Inspect reset-like clocks and the unowned system timer
+ * without writes. \param[in]       system: Static register-bound context, no
+ * external owners. \return          SUCCESS or INVALID/CONTEXT/BUSY before
+ * acquisition. \note            Privileged Thread mode with all incoming masks
+ * clear. GPIO/CCM and an existing PWR interface clock may be shared. Unknown
+ * live clocks, bootloader handoff and foreign timer owners are not adopted. No
+ * scheduler or IRQ is changed.
  */
 nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system);
 
 /**
- * \brief           Establish the selected static clock and TIM2 at 1 MHz.
+ * \brief           Establish the selected static clock and the selected timer
+ * at 1 MHz.
  *
  * \param[in,out]   system: Exclusive context with bound registers.
  *
@@ -110,14 +112,15 @@ nx_stm32_start_result_t nx_stm32_system_restore(nx_stm32_system_t* system,
 int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit);
 
 /**
- * \brief           Read TIM2 microseconds, including one pending wrap.
+ * \brief           Read selected timer microseconds, including one pending
+ * wrap.
  *
  * \param[in,out]   system: Started context; no dynamic reclocking.
  *
  * \return          Monotonic microseconds, or zero outside a live epoch.
  *
  * \details         Task/configurable IRQ uses short PRIMASK exclusion.
- *                  TIM2 IRQ must run once per 2^32 microseconds.
+ *                  The timer IRQ must run once per 2^32 microseconds.
  *                  NMI/HardFault callers are unsupported. An observed overflow
  *                  acknowledgement fault ends the epoch; old deadlines cannot
  *                  be recovered by cleanup or restart. Zero is not readiness.
@@ -135,7 +138,7 @@ uint64_t nx_stm32_system_now(nx_stm32_system_t* system);
 uint64_t nx_stm32_system_clock_read(void* context);
 
 /**
- * \brief           Handle the reserved TIM2 overflow interrupt.
+ * \brief           Handle the reserved system timer overflow interrupt.
  *
  * \param[in,out]   system: Static context bound to the vector.
  * \note            Confirm W0C before extending time. Failure latches IO and
@@ -159,8 +162,8 @@ void nx_stm32_system_timer_irq(nx_stm32_system_t* system);
  */
 void SystemInit(void);
 
-/** \brief Reserved TIM2 vector; no other owner may use this timer. */
-void TIM2_IRQHandler(void);
+/** \brief Selected system vector; no other owner may use this timer. */
+void NEXUS_STM32_TIMEBASE_HANDLER(void);
 
 /** \brief Terminal CSS/NMI dispatch; no old time borrower may resume.
  * \param[in,out] system: Exact stable owner, accessible in privileged NMI.

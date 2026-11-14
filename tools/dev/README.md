@@ -40,9 +40,18 @@ CPU affinity／Linux cgroup 限额。并行模式平分预算，例如 4 个 job
 属于并发准入估计，不是操作系统施加的内存上限。可用内存无法确定时须选择
 `--parallel-modes 1`。
 
-各预设必须使用互不包含的独立构建目录。矩阵在运行期间持有各目录的
-`.nexus-build.lock` 内核锁，重复矩阵会立即拒绝。该锁只协调矩阵；普通 `dev.py`、
-TDD、CMake／Ninja／CTest 不自动参与，调用者必须保证这些构建目录在本轮独占。
+各预设必须使用互不包含的独立构建目录。`configure`、`build`、`test`、`check`、
+TDD、Native runtime 和矩阵使用相同的 `.nexus-build.lock` 内核锁；组合命令持锁至
+全部阶段和报告发布结束。同目录的其他托管执行立即拒绝，不同目录可以并行。
+配置的 `-B` 和测试的 `--test-dir` 覆盖也按实际目录加锁。
+`configure` 的 `-S` 只能选择当前平台源码；外部工程使用创建命令给出的 CMake 入口，
+避免从另一份源码的同名预设取得不同构建目录。
+
+POSIX 上，组合命令仅向自己启动的子进程传递真实锁描述符，子进程核对规范路径与
+文件身份后复用锁；环境变量本身不能跳过加锁。同线程调用可以重入，其他线程不
+自动继承所有权。异常或取消完成排空后释放锁。Windows 独立命令使用文件锁；
+嵌套托管命令明确拒绝，需要 POSIX 描述符继承，不能据此声明 Windows 矩阵通过。
+直接运行 CMake／Ninja／CTest 不参与这项协调，调用者仍须保证目录独占。
 任一模式失败即取消本次矩阵的其他在途命令；SIGINT／SIGTERM 会排空本次拥有的子进程并返回 130，不影响其他构建目录的进程。
 
 每轮矩阵使用新的 `build/quality/native-matrix/<执行标识>/`，保留阶段输出、
@@ -67,6 +76,25 @@ ARM 链接和独立 Source SDK 消费者。GoogleTest／GoogleMock 仅链接到�
 `create` 创建外部工程；`artifacts` 读取实际构建来源；`timings` 汇总原始执行耗时。
 `flash`、`debug`、`monitor` 默认准备可审查的操作，通过各自显式执行选项接入设备。
 设备身份、探针、串口和映像必须匹配；规划或链接不能建立物理 HIL 通过状态。
+
+## 最小公开消费工程
+
+```sh
+python tools/dev/dev.py create --public --board stm32f407_qiming_v31 \
+    --clock hse8-pll168 --gpio led0 --source /absolute/path/to/nexus \
+    --output /tmp/my-nexus-gpio
+```
+
+使用所选 Board 已有的 GPIO binding；clock 与 binding 由所选平台自己的 resolver
+验证。该固定 baremetal 工程使用强类型 factory 读取授权 GPIO snapshot，再停止平台，
+不需要私有模板、Native 模型、RTOS 或可选中间件。它是最小公共接口消费资料，不是
+产品闪灯应用，也不建立实板资格。`--output` 必须是平台外的新目录。
+
+可用 `--sdk-prefix /installed/prefix` 替代 `--source`，只能选择已验证的可发布 SDK。
+来源冲突、配置拒绝或输入变化时拒绝创建，并只清理本次独占创建的目录。按终端输出
+先运行 configure，再运行 build；`--json` 的命令数组按名称选择，不依赖 JSON 键顺序。
+所选版本有 commit 身份时，configure 命令固定 `NEXUS_EXPECTED_SOURCE_REVISION`。
+`.nexus-template.json` 保留复制文件摘要、选择来源及本次验证，不表示已经构建或运行。
 
 构建输出保存在 `build/`，成功报告不作为缓存。独立构建树可以复用已验证的工具和
 依赖准备。更多配置、设备操作及 SDK 合同见 [工具参考](../../docs/reference/configuration/tools.md)。

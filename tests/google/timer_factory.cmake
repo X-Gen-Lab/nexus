@@ -39,4 +39,25 @@ foreach(timer_family stm32)
     nexus_use_cmsis_core(${timer_target})
     target_compile_definitions(${timer_target} PRIVATE
         STM32F407xx NX_TIMER_FACTORY_STM32)
+
+    # Mode-independent cold contracts select explicit reference pads once.
+    # No generated factory or Platform bindings enter this direct C harness.
+    set(timer_direct_target nexus_stm32_timer_cold_reference_test)
+    nexus_google_test(${timer_direct_target} SOURCES timer_factory_test.cpp
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture_tim3.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture_tim5.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/advanced_pwm.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/advanced_pwm_tim8.c"
+        LIBRARIES Nexus::IO Nexus::Arch
+        INCLUDES "${timer_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
+            "${NEXUS_SOC_SOURCE_${timer_soc}}/private")
+    target_compile_options(${timer_direct_target} PRIVATE
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/timer_factory_model.h")
+    target_include_directories(${timer_direct_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${timer_direct_target})
+    target_compile_definitions(${timer_direct_target} PRIVATE
+        STM32F407xx NX_TIMER_FACTORY_STM32 NX_TIMER_DIRECT_REFERENCE)
 endforeach()

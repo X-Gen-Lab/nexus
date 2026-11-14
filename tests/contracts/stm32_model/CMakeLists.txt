@@ -17,11 +17,15 @@ execute_process(COMMAND "${Python3_EXECUTABLE}"
     "${CMAKE_CURRENT_SOURCE_DIR}/generate_constructors.py"
     "${NEXUS_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/stm32_constructors.h"
     COMMAND_ERROR_IS_FATAL ANY)
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    "${NEXUS_SOURCE_DIR}/tools/configure/stm32f4/bindings.py"
-    "${NEXUS_SOURCE_DIR}/tools/configure/stm32f4/emission.py"
-    "${NEXUS_SOURCE_DIR}/tools/configure/calls.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/generate_constructors.py")
+# Register the actual common generator and sealed fact inputs used above.
+file(READ "${CMAKE_CURRENT_BINARY_DIR}/stm32_constructors.inputs.json"
+    constructor_inputs)
+string(JSON constructor_count LENGTH "${constructor_inputs}")
+math(EXPR constructor_last "${constructor_count} - 1")
+foreach(index RANGE 0 ${constructor_last})
+    string(JSON input GET "${constructor_inputs}" ${index})
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input}")
+endforeach()
 add_executable(contract_stm32_constructor_model
     "${stm32_root}/drivers/gpio.c" "${stm32_root}/drivers/exti.c"
     "${stm32_root}/drivers/timer.c" "${stm32_root}/drivers/spi.c"
@@ -32,13 +36,14 @@ target_include_directories(contract_stm32_constructor_model PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}")
 foreach(target contract_stm32_system_model contract_stm32_io_model
                contract_stm32_constructor_model)
-    include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+    include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
     nexus_stm32f4_official(${target})
     target_compile_options(${target} PRIVATE
         "-include${NEXUS_SOURCE_DIR}/tests/google/stm32_official_model.h")
     target_include_directories(${target} PRIVATE
         "${stm32_root}/private"
         "${stm32_root}/drivers/ip/i2c_v1_async"
+        "${NEXUS_SOURCE_DIR}/io/private"
         "${NEXUS_SOURCE_DIR}/arch/include")
     target_include_directories(${target} SYSTEM PRIVATE
         "${stm32_device}" "${stm32_cmsis}")

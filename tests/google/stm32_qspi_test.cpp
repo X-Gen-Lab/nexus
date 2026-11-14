@@ -324,6 +324,19 @@ TEST_F(QSPI, ExactJedecAndUniformGeometryNeverGrantCpuMapping) {
     EXPECT_NE(instructions.end(),
               std::find(instructions.begin(), instructions.end(), 0x9fU));
 }
+TEST_F(QSPI, SuspendedForeignPulseCannotBecomePreparedOrdinaryStorage) {
+    sr2 = 0x80U;
+    EXPECT_CALL(io, Instruction(0x9fU, 0U, 3U)).Times(1);
+    EXPECT_CALL(io, Instruction(0x35U, 0U, 1U)).Times(1);
+    EXPECT_CALL(io, Instruction(0x7aU, testing::_, testing::_)).Times(0);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_stm32_qspi_prepare(&owner, &config, 1000U));
+    EXPECT_FALSE(owner.prepared);
+    EXPECT_EQ(0x80U, sr2);
+    EXPECT_EQ(0U, pulses);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_qspi_stop(&owner));
+}
+
 TEST_F(QSPI, ReadUsesRealOfficialReceiveAndNeverRetainsCallerOutput) {
     Open();
     std::array<uint8_t, 17> output{};

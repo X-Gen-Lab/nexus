@@ -1,0 +1,3052 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "uart",
+      "mode": "irq-byte-event",
+      "implementation": "uart",
+      "headers": [
+        "stm32f407_uart_cold.h"
+      ],
+      "profiles": {
+        "bytes-default": {
+          "state_type": "nx_stm32_uart_state_t",
+          "ops": "nx_stm32_uart_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-rx-bytes"
+            },
+            {
+              "use": "uart-vectors-primary"
+            },
+            {
+              "use": "uart-config-irq-byte-event-bytes-default"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_byte_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_byte_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        },
+        "bytes-formatted": {
+          "state_type": "nx_stm32_uart_state_t",
+          "ops": "nx_stm32_uart_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-rx-bytes"
+            },
+            {
+              "use": "uart-vectors-primary"
+            },
+            {
+              "use": "uart-frame"
+            },
+            {
+              "use": "uart-config-irq-byte-event-bytes-formatted"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_byte_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_byte_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_format_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        },
+        "events-default": {
+          "state_type": "nx_stm32_uart_state_t",
+          "ops": "nx_stm32_uart_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-rx-events"
+            },
+            {
+              "use": "uart-vectors-primary"
+            },
+            {
+              "use": "uart-config-irq-byte-event-events-default"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_byte_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_byte_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        },
+        "events-formatted": {
+          "state_type": "nx_stm32_uart_state_t",
+          "ops": "nx_stm32_uart_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-rx-events"
+            },
+            {
+              "use": "uart-vectors-primary"
+            },
+            {
+              "use": "uart-frame"
+            },
+            {
+              "use": "uart-config-irq-byte-event-events-formatted"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_byte_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_byte_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_format_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        }
+      },
+      "validator": "nx_stm32_uart_tx_validate"
+    },
+    {
+      "kind": "uart",
+      "mode": "irq-wire",
+      "implementation": "uart",
+      "headers": [
+        "stm32f407_uart_cold.h"
+      ],
+      "profiles": {
+        "bytes-default": {
+          "state_type": "nx_stm32_uart_state_t",
+          "ops": "nx_stm32_uart_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-rx-bytes"
+            },
+            {
+              "use": "uart-vectors-primary"
+            },
+            {
+              "use": "uart-wire"
+            },
+            {
+              "use": "uart-config-irq-wire-bytes-default"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_wire_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_wire_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        },
+        "events-default": {
+          "state_type": "nx_stm32_uart_state_t",
+          "ops": "nx_stm32_uart_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-rx-events"
+            },
+            {
+              "use": "uart-vectors-primary"
+            },
+            {
+              "use": "uart-wire"
+            },
+            {
+              "use": "uart-config-irq-wire-events-default"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_wire_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_wire_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        }
+      }
+    },
+    {
+      "kind": "uart",
+      "mode": "dma-tx",
+      "implementation": "uart_hal",
+      "headers": [
+        "stm32f407_uart_cold.h",
+        "stm32f407_uart_hal.h"
+      ],
+      "profiles": {
+        "bytes-default": {
+          "state_type": "nx_stm32_uart_hal_state_t",
+          "ops": "nx_stm32_uart_hal_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-rx-bytes"
+            },
+            {
+              "use": "uart-readable-regions"
+            },
+            {
+              "use": "uart-vectors-dma"
+            },
+            {
+              "use": "uart-config-dma-tx-bytes-default"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_hal_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_hal_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_hal_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            },
+            {
+              "name": {
+                "source": "selected.dma_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_hal_dma_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        },
+        "events-default": {
+          "state_type": "nx_stm32_uart_hal_state_t",
+          "ops": "nx_stm32_uart_hal_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-rx-events"
+            },
+            {
+              "use": "uart-readable-regions"
+            },
+            {
+              "use": "uart-vectors-dma"
+            },
+            {
+              "use": "uart-config-dma-tx-events-default"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_hal_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_hal_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_hal_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            },
+            {
+              "name": {
+                "source": "selected.dma_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_hal_dma_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        }
+      }
+    },
+    {
+      "kind": "uart",
+      "modes": [
+        "rx-dma-idle",
+        "rx-dma-continuous"
+      ],
+      "implementation": "uart_receive",
+      "headers": [
+        "stm32f407_uart_cold.h"
+      ],
+      "profiles": {
+        "blocks-default": {
+          "state_type": "nx_stm32_uart_receive_state_t",
+          "ops": "nx_stm32_uart_receive_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-memory-regions"
+            },
+            {
+              "use": "uart-vectors-dma"
+            },
+            {
+              "use": "uart-config-rx-dma-idle-blocks-default"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_receive_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_receive_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_receive_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            },
+            {
+              "name": {
+                "source": "selected.dma_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_receive_dma_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        }
+      }
+    },
+    {
+      "kind": "uart",
+      "modes": [
+        "dma-duplex",
+        "dma-duplex-continuous"
+      ],
+      "implementation": "uart_duplex",
+      "headers": [
+        "stm32f407_uart_cold.h"
+      ],
+      "profiles": {
+        "blocks-default": {
+          "state_type": "nx_stm32_uart_duplex_state_t",
+          "ops": "nx_stm32_uart_duplex_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-readable-regions"
+            },
+            {
+              "use": "uart-vectors-duplex"
+            },
+            {
+              "use": "uart-config-dma-duplex-blocks-default"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_duplex_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_duplex_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_duplex_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            },
+            {
+              "name": {
+                "source": "selected.dma_bindings.1.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_receive_dma_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address",
+                      "member": "receive"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            },
+            {
+              "name": {
+                "source": "selected.dma_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_duplex_dma_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        }
+      }
+    },
+    {
+      "kind": "uart",
+      "mode": "irq-words",
+      "implementation": "uart_word",
+      "headers": [
+        "stm32f407_uart_cold.h"
+      ],
+      "profiles": {
+        "words-default": {
+          "state_type": "nx_stm32_uart_word_state_t",
+          "ops": "nx_stm32_uart_word_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-rx-words"
+            },
+            {
+              "use": "uart-vectors-primary"
+            },
+            {
+              "use": "uart-config-irq-byte-event-bytes-default"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_word_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_word_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_word_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        },
+        "words-default-probed": {
+          "state_type": "nx_stm32_uart_word_state_t",
+          "ops": "nx_stm32_uart_word_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-rx-words"
+            },
+            {
+              "use": "uart-vectors-primary"
+            },
+            {
+              "use": "uart-config-irq-byte-event-bytes-default"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_word_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_word_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "NX_IO_IRQ_PROBE_BEGIN",
+                  "args": [
+                    {
+                      "source": "item.controller",
+                      "as": "symbol"
+                    }
+                  ]
+                },
+                {
+                  "function": "nx_stm32_uart_word_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                },
+                {
+                  "function": "NX_IO_IRQ_PROBE_END",
+                  "args": [
+                    {
+                      "source": "item.controller",
+                      "as": "symbol"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        }
+      }
+    },
+    {
+      "kind": "uart",
+      "mode": "irq-blocks",
+      "implementation": "uart_stream",
+      "headers": [
+        "stm32f407_uart_cold.h"
+      ],
+      "profiles": {
+        "blocks-default": {
+          "state_type": "nx_stm32_uart_stream_state_t",
+          "ops": "nx_stm32_uart_stream_ops",
+          "declarations": [
+            {
+              "use": "uart-pin-state"
+            },
+            {
+              "use": "uart-pins"
+            },
+            {
+              "use": "uart-cold"
+            },
+            {
+              "use": "uart-vectors-primary"
+            },
+            {
+              "use": "uart-config-irq-blocks-blocks-default"
+            }
+          ],
+          "calls": {
+            "prepare": {
+              "function": "nx_stm32_uart_stream_cold_prepare",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_cold",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_uart_stream_cold_close",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_config",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "uart_cold",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "irq": [
+            {
+              "name": {
+                "source": "selected.vector_bindings.0.handler",
+                "as": "symbol"
+              },
+              "calls": [
+                {
+                  "function": "nx_stm32_uart_stream_irq",
+                  "args": [
+                    {
+                      "ref": "port",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ],
+              "barrier": "nx_arch_dsb"
+            }
+          ],
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "uart_pin_state",
+            "limit": 4
+          }
+        }
+      }
+    }
+  ],
+  "static_fragments": {
+    "declarations": {
+      "uart-pin-state": [
+        {
+          "role": "uart_pin_state",
+          "type": "uint16_t",
+          "const": false,
+          "count": {
+            "length": "selected.pads",
+            "limit": 4
+          }
+        }
+      ],
+      "uart-pins": [
+        {
+          "role": "uart_pins",
+          "type": "nx_stm32_platform_pin_config_t",
+          "const": true,
+          "value": {
+            "map": {
+              "source": "selected.pads",
+              "limit": 4,
+              "value": {
+                "record": [
+                  [
+                    "registers",
+                    {
+                      "source": "entry.registers",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "snapshot",
+                    {
+                      "ref": "uart_pin_state",
+                      "as": "address",
+                      "index": {
+                        "source": "index",
+                        "as": "u32"
+                      }
+                    }
+                  ],
+                  [
+                    "port_index",
+                    {
+                      "source": "entry.port_index"
+                    }
+                  ],
+                  [
+                    "pin",
+                    {
+                      "source": "entry.number"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "count": {
+            "length": "selected.pads",
+            "limit": 4
+          }
+        }
+      ],
+      "uart-cold": [
+        {
+          "role": "uart_cold",
+          "type": "nx_stm32_uart_cold_receipt_t",
+          "const": false
+        }
+      ],
+      "uart-rx-bytes": [
+        {
+          "role": "rx",
+          "type": "uint8_t",
+          "const": false,
+          "count": {
+            "source": "item.options.rx_capacity"
+          }
+        }
+      ],
+      "uart-vectors-primary": [
+        {
+          "role": "uart_vectors",
+          "type": "IRQn_Type",
+          "const": true,
+          "value": {
+            "array": [
+              {
+                "source": "selected.vector_bindings.0.irq",
+                "as": "symbol"
+              }
+            ]
+          },
+          "count": 1
+        }
+      ],
+      "uart-config-irq-byte-event-bytes-default": [
+        {
+          "role": "uart_config",
+          "type": "nx_stm32_uart_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "registers",
+                {
+                  "source": "item.controller",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "pins",
+                {
+                  "ref": "uart_pins",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vectors",
+                {
+                  "ref": "uart_vectors",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vector_count",
+                1
+              ],
+              [
+                "rx_storage",
+                {
+                  "ref": "rx",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "rx_capacity",
+                {
+                  "source": "item.options.rx_capacity",
+                  "default": 0
+                }
+              ],
+              [
+                "clock_hz",
+                {
+                  "source": "selected.clock_hz"
+                }
+              ],
+              [
+                "baud",
+                {
+                  "source": "item.options.baud"
+                }
+              ],
+              [
+                "profile",
+                {
+                  "symbol": "NX_UART_RX_BYTES"
+                }
+              ],
+              [
+                "priority",
+                {
+                  "source": "selected.irq.priority"
+                }
+              ],
+              [
+                "kernel_bound",
+                {
+                  "source": "selected.kernel_bound"
+                }
+              ],
+              [
+                "format",
+                null
+              ]
+            ]
+          }
+        }
+      ],
+      "uart-frame": [
+        {
+          "role": "uart_frame",
+          "type": "nx_uart_format_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "data_bits",
+                {
+                  "source": "item.options.frame.data_bits"
+                }
+              ],
+              [
+                "parity",
+                {
+                  "source": "item.options.frame.parity",
+                  "as": "symbol",
+                  "values": {
+                    "none": "NX_UART_PARITY_NONE",
+                    "even": "NX_UART_PARITY_EVEN",
+                    "odd": "NX_UART_PARITY_ODD"
+                  }
+                }
+              ],
+              [
+                "stop",
+                {
+                  "source": "item.options.frame.stop_bits"
+                }
+              ],
+              [
+                "flow",
+                {
+                  "symbol": "NX_UART_FLOW_NONE"
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "uart-config-irq-byte-event-bytes-formatted": [
+        {
+          "role": "uart_config",
+          "type": "nx_stm32_uart_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "registers",
+                {
+                  "source": "item.controller",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "pins",
+                {
+                  "ref": "uart_pins",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vectors",
+                {
+                  "ref": "uart_vectors",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vector_count",
+                1
+              ],
+              [
+                "rx_storage",
+                {
+                  "ref": "rx",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "rx_capacity",
+                {
+                  "source": "item.options.rx_capacity",
+                  "default": 0
+                }
+              ],
+              [
+                "clock_hz",
+                {
+                  "source": "selected.clock_hz"
+                }
+              ],
+              [
+                "baud",
+                {
+                  "source": "item.options.baud"
+                }
+              ],
+              [
+                "profile",
+                {
+                  "symbol": "NX_UART_RX_BYTES"
+                }
+              ],
+              [
+                "priority",
+                {
+                  "source": "selected.irq.priority"
+                }
+              ],
+              [
+                "kernel_bound",
+                {
+                  "source": "selected.kernel_bound"
+                }
+              ],
+              [
+                "format",
+                {
+                  "ref": "uart_frame",
+                  "as": "address"
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "uart-rx-events": [
+        {
+          "role": "rx",
+          "type": "nx_uart_rx_event_t",
+          "const": false,
+          "count": {
+            "source": "item.options.rx_capacity"
+          }
+        }
+      ],
+      "uart-config-irq-byte-event-events-default": [
+        {
+          "role": "uart_config",
+          "type": "nx_stm32_uart_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "registers",
+                {
+                  "source": "item.controller",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "pins",
+                {
+                  "ref": "uart_pins",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vectors",
+                {
+                  "ref": "uart_vectors",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vector_count",
+                1
+              ],
+              [
+                "rx_storage",
+                {
+                  "ref": "rx",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "rx_capacity",
+                {
+                  "source": "item.options.rx_capacity",
+                  "default": 0
+                }
+              ],
+              [
+                "clock_hz",
+                {
+                  "source": "selected.clock_hz"
+                }
+              ],
+              [
+                "baud",
+                {
+                  "source": "item.options.baud"
+                }
+              ],
+              [
+                "profile",
+                {
+                  "symbol": "NX_UART_RX_EVENTS"
+                }
+              ],
+              [
+                "priority",
+                {
+                  "source": "selected.irq.priority"
+                }
+              ],
+              [
+                "kernel_bound",
+                {
+                  "source": "selected.kernel_bound"
+                }
+              ],
+              [
+                "format",
+                null
+              ]
+            ]
+          }
+        }
+      ],
+      "uart-config-irq-byte-event-events-formatted": [
+        {
+          "role": "uart_config",
+          "type": "nx_stm32_uart_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "registers",
+                {
+                  "source": "item.controller",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "pins",
+                {
+                  "ref": "uart_pins",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vectors",
+                {
+                  "ref": "uart_vectors",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vector_count",
+                1
+              ],
+              [
+                "rx_storage",
+                {
+                  "ref": "rx",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "rx_capacity",
+                {
+                  "source": "item.options.rx_capacity",
+                  "default": 0
+                }
+              ],
+              [
+                "clock_hz",
+                {
+                  "source": "selected.clock_hz"
+                }
+              ],
+              [
+                "baud",
+                {
+                  "source": "item.options.baud"
+                }
+              ],
+              [
+                "profile",
+                {
+                  "symbol": "NX_UART_RX_EVENTS"
+                }
+              ],
+              [
+                "priority",
+                {
+                  "source": "selected.irq.priority"
+                }
+              ],
+              [
+                "kernel_bound",
+                {
+                  "source": "selected.kernel_bound"
+                }
+              ],
+              [
+                "format",
+                {
+                  "ref": "uart_frame",
+                  "as": "address"
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "uart-wire": [
+        {
+          "role": "uart_wire",
+          "type": "nx_stm32_uart_wire_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "mode",
+                {
+                  "source": "item.options.wire.protocol",
+                  "as": "symbol",
+                  "values": {
+                    "asynchronous": "NX_UART_WIRE_ASYNCHRONOUS",
+                    "synchronous": "NX_UART_WIRE_SYNCHRONOUS",
+                    "half-duplex": "NX_UART_WIRE_HALF_DUPLEX",
+                    "lin": "NX_UART_WIRE_LIN",
+                    "irda": "NX_UART_WIRE_IRDA",
+                    "smartcard": "NX_UART_WIRE_SMARTCARD"
+                  }
+                }
+              ],
+              [
+                "flow",
+                {
+                  "source": "item.options.wire.flow",
+                  "as": "symbol",
+                  "values": {
+                    "none": "NX_UART_FLOW_NONE",
+                    "rts": "NX_UART_FLOW_RTS",
+                    "cts": "NX_UART_FLOW_CTS",
+                    "rts-cts": "NX_UART_FLOW_RTS_CTS"
+                  }
+                }
+              ],
+              [
+                "prescaler",
+                {
+                  "source": "item.options.wire.prescaler"
+                }
+              ],
+              [
+                "guard_time",
+                {
+                  "source": "item.options.wire.guard_time"
+                }
+              ],
+              [
+                "lin_break_bits",
+                {
+                  "source": "item.options.wire.lin_break_bits"
+                }
+              ],
+              [
+                "clock_polarity",
+                {
+                  "source": "item.options.wire.clock_polarity"
+                }
+              ],
+              [
+                "clock_phase",
+                {
+                  "source": "item.options.wire.clock_phase"
+                }
+              ],
+              [
+                "last_bit_clock",
+                {
+                  "source": "item.options.wire.last_bit_clock"
+                }
+              ],
+              [
+                "irda_low_power",
+                {
+                  "source": "item.options.wire.irda_low_power"
+                }
+              ],
+              [
+                "smartcard_nack",
+                {
+                  "source": "item.options.wire.smartcard_nack"
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "uart-config-irq-wire-bytes-default": [
+        {
+          "role": "uart_config",
+          "type": "nx_stm32_uart_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "registers",
+                {
+                  "source": "item.controller",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "pins",
+                {
+                  "ref": "uart_pins",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vectors",
+                {
+                  "ref": "uart_vectors",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vector_count",
+                1
+              ],
+              [
+                "rx_storage",
+                {
+                  "ref": "rx",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "rx_capacity",
+                {
+                  "source": "item.options.rx_capacity",
+                  "default": 0
+                }
+              ],
+              [
+                "clock_hz",
+                {
+                  "source": "selected.clock_hz"
+                }
+              ],
+              [
+                "baud",
+                {
+                  "source": "item.options.baud"
+                }
+              ],
+              [
+                "profile",
+                {
+                  "symbol": "NX_UART_RX_BYTES"
+                }
+              ],
+              [
+                "priority",
+                {
+                  "source": "selected.irq.priority"
+                }
+              ],
+              [
+                "kernel_bound",
+                {
+                  "source": "selected.kernel_bound"
+                }
+              ],
+              [
+                "format",
+                null
+              ],
+              [
+                "wire",
+                {
+                  "ref": "uart_wire",
+                  "as": "address"
+                }
+              ],
+              [
+                "pin_count",
+                {
+                  "length": "selected.pads",
+                  "limit": 4
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "uart-config-irq-wire-events-default": [
+        {
+          "role": "uart_config",
+          "type": "nx_stm32_uart_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "registers",
+                {
+                  "source": "item.controller",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "pins",
+                {
+                  "ref": "uart_pins",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vectors",
+                {
+                  "ref": "uart_vectors",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vector_count",
+                1
+              ],
+              [
+                "rx_storage",
+                {
+                  "ref": "rx",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "rx_capacity",
+                {
+                  "source": "item.options.rx_capacity",
+                  "default": 0
+                }
+              ],
+              [
+                "clock_hz",
+                {
+                  "source": "selected.clock_hz"
+                }
+              ],
+              [
+                "baud",
+                {
+                  "source": "item.options.baud"
+                }
+              ],
+              [
+                "profile",
+                {
+                  "symbol": "NX_UART_RX_EVENTS"
+                }
+              ],
+              [
+                "priority",
+                {
+                  "source": "selected.irq.priority"
+                }
+              ],
+              [
+                "kernel_bound",
+                {
+                  "source": "selected.kernel_bound"
+                }
+              ],
+              [
+                "format",
+                null
+              ],
+              [
+                "wire",
+                {
+                  "ref": "uart_wire",
+                  "as": "address"
+                }
+              ],
+              [
+                "pin_count",
+                {
+                  "length": "selected.pads",
+                  "limit": 4
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "uart-readable-regions": [
+        {
+          "role": "dma_regions",
+          "type": "nx_dma_memory_region_t",
+          "const": true,
+          "value": {
+            "map": {
+              "source": "selected.readable_regions",
+              "limit": 16,
+              "value": {
+                "record": [
+                  [
+                    "begin",
+                    {
+                      "source": "entry.begin"
+                    }
+                  ],
+                  [
+                    "size",
+                    {
+                      "source": "entry.size"
+                    }
+                  ],
+                  [
+                    "permissions",
+                    {
+                      "source": "entry.permissions",
+                      "as": "static"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "count": {
+            "length": "selected.readable_regions",
+            "limit": 16
+          }
+        }
+      ],
+      "uart-vectors-dma": [
+        {
+          "role": "uart_vectors",
+          "type": "IRQn_Type",
+          "const": true,
+          "value": {
+            "array": [
+              {
+                "source": "selected.vector_bindings.0.irq",
+                "as": "symbol"
+              },
+              {
+                "source": "selected.dma_bindings.0.irq",
+                "as": "symbol"
+              }
+            ]
+          },
+          "count": 2
+        }
+      ],
+      "uart-config-dma-tx-bytes-default": [
+        {
+          "role": "uart_config",
+          "type": "nx_stm32_uart_dma_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "uart",
+                {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "item.controller",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "pins",
+                      {
+                        "ref": "uart_pins",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "vectors",
+                      {
+                        "ref": "uart_vectors",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "vector_count",
+                      2
+                    ],
+                    [
+                      "rx_storage",
+                      {
+                        "ref": "rx",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "rx_capacity",
+                      {
+                        "source": "item.options.rx_capacity",
+                        "default": 0
+                      }
+                    ],
+                    [
+                      "clock_hz",
+                      {
+                        "source": "selected.clock_hz"
+                      }
+                    ],
+                    [
+                      "baud",
+                      {
+                        "source": "item.options.baud"
+                      }
+                    ],
+                    [
+                      "profile",
+                      {
+                        "symbol": "NX_UART_RX_BYTES"
+                      }
+                    ],
+                    [
+                      "priority",
+                      {
+                        "source": "selected.irq.priority"
+                      }
+                    ],
+                    [
+                      "kernel_bound",
+                      {
+                        "source": "selected.kernel_bound"
+                      }
+                    ],
+                    [
+                      "format",
+                      null
+                    ]
+                  ]
+                }
+              ],
+              [
+                "resources",
+                {
+                  "record": [
+                    [
+                      "transmit",
+                      {
+                        "record": [
+                          [
+                            "dma",
+                            {
+                              "source": "selected.dma_bindings.0.registers",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "stream",
+                            {
+                              "source": "selected.dma_bindings.0.stream",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "irq",
+                            {
+                              "source": "selected.dma_bindings.0.irq",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "lane",
+                            {
+                              "source": "selected.dma_bindings.0.lane"
+                            }
+                          ],
+                          [
+                            "channel",
+                            {
+                              "source": "selected.dma_bindings.0.request"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    [
+                      "receive",
+                      {
+                        "record": []
+                      }
+                    ],
+                    [
+                      "regions",
+                      {
+                        "ref": "dma_regions",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "region_count",
+                      {
+                        "length": "selected.readable_regions",
+                        "limit": 16
+                      }
+                    ]
+                  ]
+                }
+              ],
+              [
+                "continuous",
+                {
+                  "source": "item.mode",
+                  "values": {
+                    "dma-tx": false
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "uart-config-dma-tx-events-default": [
+        {
+          "role": "uart_config",
+          "type": "nx_stm32_uart_dma_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "uart",
+                {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "item.controller",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "pins",
+                      {
+                        "ref": "uart_pins",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "vectors",
+                      {
+                        "ref": "uart_vectors",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "vector_count",
+                      2
+                    ],
+                    [
+                      "rx_storage",
+                      {
+                        "ref": "rx",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "rx_capacity",
+                      {
+                        "source": "item.options.rx_capacity",
+                        "default": 0
+                      }
+                    ],
+                    [
+                      "clock_hz",
+                      {
+                        "source": "selected.clock_hz"
+                      }
+                    ],
+                    [
+                      "baud",
+                      {
+                        "source": "item.options.baud"
+                      }
+                    ],
+                    [
+                      "profile",
+                      {
+                        "symbol": "NX_UART_RX_EVENTS"
+                      }
+                    ],
+                    [
+                      "priority",
+                      {
+                        "source": "selected.irq.priority"
+                      }
+                    ],
+                    [
+                      "kernel_bound",
+                      {
+                        "source": "selected.kernel_bound"
+                      }
+                    ],
+                    [
+                      "format",
+                      null
+                    ]
+                  ]
+                }
+              ],
+              [
+                "resources",
+                {
+                  "record": [
+                    [
+                      "transmit",
+                      {
+                        "record": [
+                          [
+                            "dma",
+                            {
+                              "source": "selected.dma_bindings.0.registers",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "stream",
+                            {
+                              "source": "selected.dma_bindings.0.stream",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "irq",
+                            {
+                              "source": "selected.dma_bindings.0.irq",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "lane",
+                            {
+                              "source": "selected.dma_bindings.0.lane"
+                            }
+                          ],
+                          [
+                            "channel",
+                            {
+                              "source": "selected.dma_bindings.0.request"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    [
+                      "receive",
+                      {
+                        "record": []
+                      }
+                    ],
+                    [
+                      "regions",
+                      {
+                        "ref": "dma_regions",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "region_count",
+                      {
+                        "length": "selected.readable_regions",
+                        "limit": 16
+                      }
+                    ]
+                  ]
+                }
+              ],
+              [
+                "continuous",
+                {
+                  "source": "item.mode",
+                  "values": {
+                    "dma-tx": false
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "uart-memory-regions": [
+        {
+          "role": "dma_regions",
+          "type": "nx_dma_memory_region_t",
+          "const": true,
+          "value": {
+            "map": {
+              "source": "selected.memory_regions",
+              "limit": 16,
+              "value": {
+                "record": [
+                  [
+                    "begin",
+                    {
+                      "source": "entry.begin"
+                    }
+                  ],
+                  [
+                    "size",
+                    {
+                      "source": "entry.size"
+                    }
+                  ],
+                  [
+                    "permissions",
+                    {
+                      "source": "entry.permissions",
+                      "as": "static"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "count": {
+            "length": "selected.memory_regions",
+            "limit": 16
+          }
+        }
+      ],
+      "uart-config-rx-dma-idle-blocks-default": [
+        {
+          "role": "uart_config",
+          "type": "nx_stm32_uart_dma_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "uart",
+                {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "item.controller",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "pins",
+                      {
+                        "ref": "uart_pins",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "vectors",
+                      {
+                        "ref": "uart_vectors",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "vector_count",
+                      2
+                    ],
+                    [
+                      "rx_storage",
+                      null
+                    ],
+                    [
+                      "rx_capacity",
+                      {
+                        "source": "item.options.rx_capacity",
+                        "default": 0
+                      }
+                    ],
+                    [
+                      "clock_hz",
+                      {
+                        "source": "selected.clock_hz"
+                      }
+                    ],
+                    [
+                      "baud",
+                      {
+                        "source": "item.options.baud"
+                      }
+                    ],
+                    [
+                      "profile",
+                      {
+                        "symbol": "NX_UART_RX_BLOCKS"
+                      }
+                    ],
+                    [
+                      "priority",
+                      {
+                        "source": "selected.irq.priority"
+                      }
+                    ],
+                    [
+                      "kernel_bound",
+                      {
+                        "source": "selected.kernel_bound"
+                      }
+                    ],
+                    [
+                      "format",
+                      null
+                    ]
+                  ]
+                }
+              ],
+              [
+                "resources",
+                {
+                  "record": [
+                    [
+                      "transmit",
+                      {
+                        "record": []
+                      }
+                    ],
+                    [
+                      "receive",
+                      {
+                        "record": [
+                          [
+                            "dma",
+                            {
+                              "source": "selected.dma_bindings.0.registers",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "stream",
+                            {
+                              "source": "selected.dma_bindings.0.stream",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "irq",
+                            {
+                              "source": "selected.dma_bindings.0.irq",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "lane",
+                            {
+                              "source": "selected.dma_bindings.0.lane"
+                            }
+                          ],
+                          [
+                            "channel",
+                            {
+                              "source": "selected.dma_bindings.0.request"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    [
+                      "regions",
+                      {
+                        "ref": "dma_regions",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "region_count",
+                      {
+                        "length": "selected.memory_regions",
+                        "limit": 16
+                      }
+                    ]
+                  ]
+                }
+              ],
+              [
+                "continuous",
+                {
+                  "source": "item.mode",
+                  "values": {
+                    "rx-dma-idle": false,
+                    "rx-dma-continuous": true
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "uart-vectors-duplex": [
+        {
+          "role": "uart_vectors",
+          "type": "IRQn_Type",
+          "const": true,
+          "value": {
+            "array": [
+              {
+                "source": "selected.vector_bindings.0.irq",
+                "as": "symbol"
+              },
+              {
+                "source": "selected.dma_bindings.1.irq",
+                "as": "symbol"
+              },
+              {
+                "source": "selected.dma_bindings.0.irq",
+                "as": "symbol"
+              }
+            ]
+          },
+          "count": 3
+        }
+      ],
+      "uart-config-dma-duplex-blocks-default": [
+        {
+          "role": "uart_config",
+          "type": "nx_stm32_uart_dma_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "uart",
+                {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "item.controller",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "pins",
+                      {
+                        "ref": "uart_pins",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "vectors",
+                      {
+                        "ref": "uart_vectors",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "vector_count",
+                      3
+                    ],
+                    [
+                      "rx_storage",
+                      null
+                    ],
+                    [
+                      "rx_capacity",
+                      {
+                        "source": "item.options.rx_capacity",
+                        "default": 0
+                      }
+                    ],
+                    [
+                      "clock_hz",
+                      {
+                        "source": "selected.clock_hz"
+                      }
+                    ],
+                    [
+                      "baud",
+                      {
+                        "source": "item.options.baud"
+                      }
+                    ],
+                    [
+                      "profile",
+                      {
+                        "symbol": "NX_UART_RX_BLOCKS"
+                      }
+                    ],
+                    [
+                      "priority",
+                      {
+                        "source": "selected.irq.priority"
+                      }
+                    ],
+                    [
+                      "kernel_bound",
+                      {
+                        "source": "selected.kernel_bound"
+                      }
+                    ],
+                    [
+                      "format",
+                      null
+                    ]
+                  ]
+                }
+              ],
+              [
+                "resources",
+                {
+                  "record": [
+                    [
+                      "transmit",
+                      {
+                        "record": [
+                          [
+                            "dma",
+                            {
+                              "source": "selected.dma_bindings.0.registers",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "stream",
+                            {
+                              "source": "selected.dma_bindings.0.stream",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "irq",
+                            {
+                              "source": "selected.dma_bindings.0.irq",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "lane",
+                            {
+                              "source": "selected.dma_bindings.0.lane"
+                            }
+                          ],
+                          [
+                            "channel",
+                            {
+                              "source": "selected.dma_bindings.0.request"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    [
+                      "receive",
+                      {
+                        "record": [
+                          [
+                            "dma",
+                            {
+                              "source": "selected.dma_bindings.1.registers",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "stream",
+                            {
+                              "source": "selected.dma_bindings.1.stream",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "irq",
+                            {
+                              "source": "selected.dma_bindings.1.irq",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "lane",
+                            {
+                              "source": "selected.dma_bindings.1.lane"
+                            }
+                          ],
+                          [
+                            "channel",
+                            {
+                              "source": "selected.dma_bindings.1.request"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    [
+                      "regions",
+                      {
+                        "ref": "dma_regions",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "region_count",
+                      {
+                        "length": "selected.readable_regions",
+                        "limit": 16
+                      }
+                    ]
+                  ]
+                }
+              ],
+              [
+                "continuous",
+                {
+                  "source": "item.mode",
+                  "values": {
+                    "dma-duplex": false,
+                    "dma-duplex-continuous": true
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "uart-rx-words": [
+        {
+          "role": "rx",
+          "type": "uint16_t",
+          "const": false,
+          "count": {
+            "source": "item.options.rx_capacity"
+          }
+        }
+      ],
+      "uart-config-irq-blocks-blocks-default": [
+        {
+          "role": "uart_config",
+          "type": "nx_stm32_uart_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "registers",
+                {
+                  "source": "item.controller",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "pins",
+                {
+                  "ref": "uart_pins",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vectors",
+                {
+                  "ref": "uart_vectors",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "vector_count",
+                1
+              ],
+              [
+                "rx_storage",
+                null
+              ],
+              [
+                "rx_capacity",
+                {
+                  "source": "item.options.rx_capacity",
+                  "default": 0
+                }
+              ],
+              [
+                "clock_hz",
+                {
+                  "source": "selected.clock_hz"
+                }
+              ],
+              [
+                "baud",
+                {
+                  "source": "item.options.baud"
+                }
+              ],
+              [
+                "profile",
+                {
+                  "symbol": "NX_UART_RX_BLOCKS"
+                }
+              ],
+              [
+                "priority",
+                {
+                  "source": "selected.irq.priority"
+                }
+              ],
+              [
+                "kernel_bound",
+                {
+                  "source": "selected.kernel_bound"
+                }
+              ],
+              [
+                "format",
+                null
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

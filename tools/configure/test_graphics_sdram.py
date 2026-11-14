@@ -5,6 +5,17 @@ import unittest
 
 from tools.configure import authored, bindings, emission
 from tools.configure import test_graphics_configuration as reference
+from tools.configure.calls import Symbol
+from tools.configure.static_ir import Flags
+from tools.configure.tests.external_memory_fixture import construct
+
+
+def region_values(item, result):
+    """Inspect authorization values independently of C literal formatting."""
+    built = construct(item, result)
+    region = next(value for value in built.static_declarations
+                  if value.type_name == "nx_dma_memory_region_t")
+    return [dict(value.fields) for value in region.initializer.values]
 
 
 class GraphicsSdramConfigurationTests(unittest.TestCase):
@@ -60,9 +71,12 @@ class GraphicsSdramConfigurationTests(unittest.TestCase):
         self.assertIn(".graphics_only = true", source)
         self.assertEqual(2, source.count(
             ".graphics_memory = &s_nx_sdram_graphics_memory"))
-        self.assertIn("0xc0000000u, 8388608u, NX_DMA_MEMORY_READ }", source)
-        self.assertIn("0xc0000000u, 8388608u, NX_DMA_MEMORY_READ | "
-                      "NX_DMA_MEMORY_WRITE }", source)
+        self.assertIn({"begin": 0xc0000000, "size": 8388608,
+            "permissions": Symbol("NX_DMA_MEMORY_READ")}, region_values(display, result))
+        self.assertIn({"begin": 0xc0000000, "size": 8388608,
+            "permissions": Flags((Symbol("NX_DMA_MEMORY_READ"),
+                                  Symbol("NX_DMA_MEMORY_WRITE")))},
+            region_values(image, result))
         self.assertLess(source.index("s_nx_sdram_graphics_memory"),
                         source.index("s_nx_graphics_config_panel"))
         acquire = source[source.index("nx_platform_acquire(size_t index)"):]
@@ -77,9 +91,8 @@ class GraphicsSdramConfigurationTests(unittest.TestCase):
     def test_grant_is_local_to_the_explicit_engine_and_optional_by_default(self):
         result = self.resolve(self.assembly(grant_display=False))
         source = bindings.emit(result)[1]
-        regions = source.split(
-            "static const nx_dma_memory_region_t s_nx_dma_regions_panel[]", 1)[1]
-        self.assertNotIn("0xc0000000", regions.split("};", 1)[0])
+        display = next(item for item in result.controllers if item.kind == "display")
+        self.assertNotIn(0xc0000000, {row["begin"] for row in region_values(display, result)})
         self.assertEqual(1, source.count(".graphics_memory = &"))
         plain = reference.GraphicsConfigurationTests(methodName="runTest")
         plain.directory = self.directory

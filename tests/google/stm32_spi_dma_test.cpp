@@ -20,6 +20,9 @@ GPIO_TypeDef g_nx_stm32_gpioa_model;
 #include "nexus/io/native/model.h"
 #include <cstring>
 #include <gtest/gtest.h>
+#include <new>
+#include <sys/mman.h>
+#include <unistd.h>
 
 static bool s_hold_dma_enable;
 
@@ -44,6 +47,7 @@ class Stm32SpiDma : public testing::Test {
     uint8_t destination[4] = {};
     nx_dma_memory_region_t regions[2] = {};
     nx_stm32_gpio_state_t cs = {};
+    nx_stm32_spi_dma_resources_t dma_resources = {};
     nx_stm32_spi_dma_state_t state = {};
     nx_stm32_spi_dma_endpoint_state_t device = {};
     nx_spi_port_t bus = {&nx_stm32_spi_dma_ops, &state};
@@ -61,11 +65,11 @@ class Stm32SpiDma : public testing::Test {
         state.spi.registers = &spi;
         state.spi.rcc = &rcc;
         state.spi.clock_hz = 84000000U;
-        state.dma = &dma;
-        state.tx = &tx;
-        state.rx = &rx;
-        state.regions = regions;
-        state.region_count = 2U;
+        dma_resources = {{&dma, &tx, DMA2_Stream3_IRQn, 3U, 3U},
+                         {&dma, &rx, DMA2_Stream0_IRQn, 0U, 3U},
+                         regions,
+                         2U};
+        state.resources = &dma_resources;
         cs.registers = &gpio;
         cs.mask = 1U;
         cs.output = true;
@@ -324,6 +328,49 @@ TEST_F(Stm32SpiDma, WrongBusIdentityAndInvalidDomainsFailBeforeAdmission) {
     EXPECT_EQ(gpio.BSRR, 0U);
     EXPECT_EQ(tx.CR & DMA_SxCR_EN, 0U);
     EXPECT_EQ(rx.CR & DMA_SxCR_EN, 0U);
+}
+
+TEST_F(Stm32SpiDma, DmaDomainCannotAuthorizeReadonlyRouteStorageAsReceive) {
+    auto* metadata = reinterpret_cast<uint8_t*>(&dma_resources);
+    regions[1] = {reinterpret_cast<uintptr_t>(metadata), sizeof(dma_resources),
+                  NX_DMA_MEMORY_WRITE};
+    request.rx = metadata;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_spi_endpoint_submit(&endpoint, &request));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+    EXPECT_EQ(nullptr, state.active);
+    EXPECT_EQ(0U, tx.CR & DMA_SxCR_EN);
+    EXPECT_EQ(0U, rx.CR & DMA_SxCR_EN);
+}
+
+TEST_F(Stm32SpiDma, StoppedOwnerRejectsBeforeReadingRetiredConfiguration) {
+    ASSERT_EXIT(
+        {
+            if (nx_spi_port_stop(&bus) != NX_SUCCESS)
+                _exit(2);
+            const long page = sysconf(_SC_PAGESIZE);
+            if (page <= 0)
+                _exit(3);
+            void* mapping =
+                mmap(nullptr, static_cast<size_t>(page), PROT_READ | PROT_WRITE,
+                     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+            if (mapping == MAP_FAILED)
+                _exit(4);
+            auto* retained =
+                new (mapping) nx_stm32_spi_dma_resources_t(dma_resources);
+            state.resources = retained;
+            if (nx_stm32_spi_dma_initialize(&state) != NX_SUCCESS)
+                _exit(5);
+            if (nx_spi_port_stop(&bus) != NX_SUCCESS)
+                _exit(6);
+            if (mprotect(mapping, static_cast<size_t>(page), PROT_NONE) != 0)
+                _exit(7);
+            const nx_result_t result =
+                nx_spi_endpoint_submit(&endpoint, &request);
+            const nx_result_t stopped = nx_spi_port_stop(&bus);
+            munmap(mapping, static_cast<size_t>(page));
+            _exit(result == NX_ERROR_STATE && stopped == NX_SUCCESS ? 0 : 8);
+        },
+        testing::ExitedWithCode(0), "");
 }
 
 TEST_F(Stm32SpiDma, PollingEndpointsProveSharedControllerWithoutDmaAlias) {

@@ -1,6 +1,6 @@
 /**
  * \file            stm32f4_adc_pins.h
- * \brief           Shared F407 ADC input-to-pad facts and cold analog setup
+ * \brief           Selected ADC pad connections and shared cold analog setup
  * \author          Nexus Team
  */
 #ifndef NEXUS_STM32F4_ADC_PINS_H
@@ -13,29 +13,26 @@ typedef struct {
     uint8_t pin;
 } nx_stm32_adc_pad_t;
 
-/** \brief Pure pad lookup; package and Board authorization remain in facts. */
+#ifndef NEXUS_STM32_ADC_PINS
+#error "ADC modes require the selected package pad connections"
+#endif
+
+/** \brief Resolve only selected physical inputs, without a second pad map. */
 static inline bool nx_stm32_adc_pad(const ADC_TypeDef* converter,
                                     uint8_t channel,
                                     nx_stm32_adc_pad_t* output) {
-    if (output == NULL || channel > 15U ||
-        (converter != ADC1 && converter != ADC2 && converter != ADC3))
+    if (output == NULL || channel > 15U)
         return false;
-    nx_stm32_adc_pad_t pad;
-    if (converter == ADC3) {
-        static const uint8_t pads[16] = {
-            0x00U, 0x01U, 0x02U, 0x03U, 0x56U, 0x57U, 0x58U, 0x59U,
-            0x5AU, 0x53U, 0x20U, 0x21U, 0x22U, 0x23U, 0x54U, 0x55U};
-        uint8_t value = pads[channel];
-        pad.gpio = value < 0x20U ? GPIOA : value < 0x50U ? GPIOC : GPIOF;
-        pad.pin = value & 15U;
-    } else {
-        pad.gpio = channel < 8U ? GPIOA : channel < 10U ? GPIOB : GPIOC;
-        pad.pin = channel < 8U    ? channel
-                  : channel < 10U ? (uint8_t)(channel - 8U)
-                                  : (uint8_t)(channel - 10U);
+#define NX_ADC_PAD(owner, input, port, number)                                 \
+    if (converter == (owner) && channel == (input)) {                          \
+        output->gpio = (port);                                                 \
+        output->pin = (number);                                                \
+        return true;                                                           \
     }
-    *output = pad;
-    return true;
+    NEXUS_STM32_ADC_PINS(NX_ADC_PAD)
+#undef NX_ADC_PAD
+    (void)converter;
+    return false;
 }
 
 /** \brief Configure a leased/powered analog pad without a second snapshot. */

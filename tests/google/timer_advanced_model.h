@@ -5,6 +5,7 @@
  */
 #ifndef NX_TIMER_ADVANCED_MODEL_H
 #define NX_TIMER_ADVANCED_MODEL_H
+#include "stm32_timer_route_fixture.h"
 #include "stm32f407xx.h"
 #include <stdint.h>
 #ifdef __cplusplus

@@ -4,58 +4,66 @@ from tools.configure.tests.device_fixture import (load_soc_facts,
 from tools.configure.tests.native_fixture import native_fixture
 import copy
 from dataclasses import replace
+import shutil
 import unittest
 
 from tools.configure import bindings, configure as gate
-from tools.configure.ir import freeze
 from tools.configure.providers import descriptor
 
 
 class PartFactsTests(unittest.TestCase):
     def test_ethernet_memory_window_uses_the_selected_physical_domain(self):
-        for fixture in ("stm32-zg",):
-            with self.subTest(fixture=fixture):
-                result = gate.resolve_ir(gate.ROOT /
-                    f"tests/contracts/ethernet_assembly/{fixture}.toml", test_support=native_fixture(gate.ROOT /
-                    f"tests/contracts/ethernet_assembly/{fixture}.toml"))
-                regions = tuple(freeze({**region, "size": 65536})
-                                if region["id"] == "sram" else region
-                                for region in result.physical_part.memory)
-                result = replace(result, physical_part=replace(
-                    result.physical_part, memory=regions))
-                source = bindings.emit(result)[1]
-                self.assertIn("{ 0x20000000u, 65536u,", source)
-                regions = tuple(freeze({**region, "dma": False})
-                                if region["id"] == "sram" else region
-                                for region in result.physical_part.memory)
-                result = replace(result, physical_part=replace(
-                    result.physical_part, memory=regions))
-                with self.assertRaisesRegex(ValueError, "Ethernet.*memory"):
-                    bindings.emit(result)
+        from tools.configure.test_device_catalog import DeviceCatalogConfigurationTests
+        fixture = DeviceCatalogConfigurationTests()
+        fixture.setUp()
+        self.addCleanup(fixture.doCleanups)
+        original = gate.ROOT / "tests/contracts/ethernet_assembly"
+        board = fixture.root / "eth-board"
+        board.mkdir()
+        shutil.copyfile(original / "stm32-zg-board/board.json", board / "board.json")
+        fixture.assembly.write_text((original / "stm32-zg.toml").read_text().replace(
+            'board_package="stm32-zg-board"', 'board_package="eth-board"'))
+
+        def memory(soc, **changes):
+            region = next(item for item in soc["variants"]["STM32F407ZGT6"]["memory"]
+                          if item["id"] == "sram")
+            region.update(changes)
+
+        # Change the author fact and resolve a new sealed selection. Replacing
+        # only one downstream IR projection would leave its provider unchanged.
+        fixture.update("soc/stm32/stm32f4/soc.json", lambda soc: memory(soc, size=65536))
+        source = bindings.emit(fixture.resolve())[1]
+        self.assertIn(".begin = 536870912u, .size = 65536u,", source)
+        fixture.update("soc/stm32/stm32f4/soc.json", lambda soc: memory(soc, dma=False))
+        with self.assertRaisesRegex(ValueError, "Ethernet.*memory"):
+            bindings.emit(fixture.resolve())
 
 
-    def test_unreviewed_part_cannot_copy_a_reviewed_physical_variant(self):
+    def test_variant_schema_does_not_require_a_public_part_whitelist(self):
         for family in descriptor.families():
             with self.subTest(family=family.family):
                 facts = load_soc_facts(gate.ROOT / family.source_directory / "soc.json")
                 unknown = "UNREVIEWED_PART"
                 facts["variants"][unknown] = copy.deepcopy(
                     next(iter(facts["variants"].values())))
-                with self.assertRaisesRegex(ValueError, "part"):
-                    validate_soc_facts(facts, unknown)
+                self.assertIs(validate_soc_facts(facts, unknown),
+                              facts["variants"][unknown])
+                # This is data-schema admission, not a software support grant.
 
-    def test_package_identity_cannot_drift_from_exact_part(self):
+    def test_f407_package_and_ccm_facts_match_reviewed_ds8626_and_rm0090(self):
         facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
-        facts["variants"]["STM32F407VET6"]["package"] = "LQFP144"
-        with self.assertRaisesRegex(ValueError, "package"):
-            validate_soc_facts(facts, "STM32F407VET6")
+        for part, package in (("STM32F407VET6", "LQFP100"),
+                              ("STM32F407ZGT6", "LQFP144")):
+            with self.subTest(part=part):
+                variant = facts["variants"][part]
+                self.assertEqual(variant["package"], package)
+                ccm, = (row for row in variant["memory"] if row["id"] == "ccm")
+                self.assertEqual((ccm["origin"], ccm["size"], ccm["dma"]),
+                                 (0x10000000, 65536, False))
 
     def test_unselected_variant_obeys_the_complete_physical_contract(self):
         def unknown_field(variant):
             variant["capacity_override"] = 1
-
-        def package(variant):
-            variant["package"] = "LQFP100"
 
         def flash_geometry(variant):
             variant["flash"]["erase_spans"].pop()
@@ -66,20 +74,14 @@ class PartFactsTests(unittest.TestCase):
         def overlap(variant):
             variant["memory"][1]["origin"] = variant["memory"][0]["origin"]
 
-        def optional_memory(variant):
-            variant["memory"] = [region for region in variant["memory"]
-                                 if region["id"] != "ccm"]
-
         def linker_domains(variant):
             for region in variant["memory"]:
                 region["linker"] = False
 
         for mutate, error in ((unknown_field, "unknown"),
-                              (package, "package"),
                               (flash_geometry, "geometry"),
                               (dma_access, "DMA"),
                               (overlap, "Overlapping"),
-                              (optional_memory, "Optional memory"),
                               (linker_domains, "default RAM")):
             with self.subTest(contract=mutate.__name__):
                 facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
@@ -106,14 +108,16 @@ class PartFactsTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "memory"):
                     validate_soc_facts(facts, selected)
 
-    def test_unknown_f407_part_cannot_fall_through_to_zg_geometry(self):
+    def test_emitter_uses_resolved_geometry_without_part_name_dispatch(self):
         result = gate.resolve_ir(gate.ROOT /
                               "tests/contracts/stm32_assembly/ve-flash.toml", test_support=native_fixture(gate.ROOT /
                               "tests/contracts/stm32_assembly/ve-flash.toml"))
-        result = replace(result, physical_part=replace(
+        expected = bindings.emit(result)
+        renamed = replace(result, physical_part=replace(
             result.physical_part, part="UNREVIEWED_PART"))
-        with self.assertRaisesRegex(ValueError, "part"):
-            bindings.emit(result)
+        # Unknown authored parts are rejected by fact admission above. Once
+        # resolved, geometry must not be guessed from a part-name suffix.
+        self.assertEqual(bindings.emit(renamed), expected)
 
     def test_f407_emits_selected_geometry_from_physical_facts(self):
         for density, size, count in (("ve", 524288, 8),
@@ -124,14 +128,14 @@ class PartFactsTests(unittest.TestCase):
                     f"tests/contracts/stm32_assembly/{density}-flash.toml"))
                 source = bindings.emit(result)[1]
                 self.assertIn("static const nx_flash_erase_span_t "
-                              "s_nx_flash_erase_spans_flash0[]", source)
-                self.assertIn(".base_address = 0x08000000u", source)
+                              "s_nx_flash_erase_spans_flash0[3]", source)
+                self.assertIn(".base_address = 134217728u", source)
                 self.assertIn(f".size = {size}u", source)
                 self.assertIn(".erase_span_count = 3u", source)
                 self.assertEqual(sum(span["count"] for span in
                                      result.flash["erase_spans"]), count)
                 for span in result.flash["erase_spans"]:
-                    self.assertIn("{ %du, %du, %du }" % (span["offset"],
+                    self.assertIn("{ .offset = %du, .erase_bytes = %du, .count = %du }" % (span["offset"],
                         span["erase_bytes"], span["count"]), source)
                 self.assertEqual(sum(span["erase_bytes"] * span["count"]
                                      for span in result.flash["erase_spans"]), size)

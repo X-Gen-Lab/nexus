@@ -30,7 +30,9 @@ typedef struct {
     nx_stm32_sdram_minimum_t rcd;
 } nx_stm32_sdram_timing_t;
 /** \brief Exact single Bank1 configuration under one static clock.
- * \note First profile: Bank1, 8MiB, row12/column8, four internal banks, 16bit.
+ * \note The 16-bit route has 12 address pads: rows11/12, columns8--11,
+ *       two/four internal banks and an exact geometry-derived byte extent.
+ *       The reference device remains 8MiB, row12/column8 and four banks.
  *       Platform owns GPIO gates/snapshots and the shared SYSCFG gate through
  *       successful stop. System/ClockPlan is already admitted. Default C0000000
  *       mapping uses a CPU-data lease by default. graphics_only instead retains

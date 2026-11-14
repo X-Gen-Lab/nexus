@@ -17,29 +17,67 @@ from tools.measurement.resources import (resolved_float_abi,
                                          input_protection_paths)
 
 ROOT = Path(__file__).resolve().parents[2]
-FACE_DECLARATION = re.compile(
-    r"static\s+const\s+(nx_\w+_t)\s+(s_nx_(?:(?:device_)?face_|flash_readonly_)\w+)\s*="
+_STATIC_OBJECT = re.compile(
+    r"\bstatic\s+const\s+(nx_\w+_t)\s+(s_nx_\w+)\s*([=;\[])"
 )
-FACE_INITIALIZER = re.compile(
-    FACE_DECLARATION.pattern + r"\s*\{\s*&(nx_\w+_ops)\s*,\s*"
-    r"(\(\s*void\s*\*\s*\)\s*&\w+|"
-    r"&\w+(?:\[(?:0|[1-9][0-9]*)\])?)\s*\}\s*;"
-)
+_FACE_NAME = re.compile(r"s_nx_(?:(?:device_)?face_|flash_readonly_|device_)\w+\Z")
+_UNSIGNED_LITERAL = r"(?:0|[1-9][0-9]*)[uU]?"
 
 
-def selected_faces(bindings):
-    """Read emitted connections without a second provider or mode mapping."""
-    declarations = FACE_DECLARATION.findall(bindings)
-    connections = FACE_INITIALIZER.findall(bindings)
+def face_declarations(bindings, *, face_types=None, root=ROOT):
+    """Find actual public face types, retaining unknown named-face rejection."""
+    if face_types is None:
+        face_types = source_contracts(root)[0]
+    source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", bindings, flags=re.DOTALL)
+    objects = tuple(_STATIC_OBJECT.finditer(source))
+    names = {item[2] for item in objects
+             if item[1] in face_types or _FACE_NAME.fullmatch(item[2])}
+    return tuple(item for item in objects if item[2] in names)
+
+
+def selected_faces(bindings, *, face_types=None, root=ROOT):
+    """Read only complete fixed ops/context pairs; C still establishes ABI."""
+    declarations = face_declarations(bindings, face_types=face_types, root=root)
     if not declarations:
         raise EvidenceError("no selected faces in generated bindings")
-    if (len(declarations) != len(set(declarations))
-            or [item[:2] for item in connections] != declarations):
-        raise EvidenceError(
-            "duplicate or unsupported generated face initializer")
-    return [(kind, name, operations,
-             context[1:] if context.startswith("&") else context)
-            for kind, name, operations, context in connections]
+    types, defined, connections = {}, set(), []
+    for declaration in declarations:
+        kind, name, suffix = declaration.groups()
+        if ((name in types and types[name] != kind) or
+                conditional_at(declaration.string, declaration.start())):
+            raise EvidenceError("inconsistent or conditional generated face declaration")
+        types[name] = kind
+        if suffix == ";":
+            continue
+        initializer = re.match(r"\s*\{([^{}]*)\}\s*;",
+                               declaration.string[declaration.end():])
+        if name in defined or initializer is None:
+            raise EvidenceError("duplicate or unsupported generated face initializer")
+        tokens = initializer[1].strip().split(",")
+        if not tokens[-1].strip():
+            tokens.pop()
+        if len(tokens) != 2:
+            raise EvidenceError("generated face requires exactly ops and context")
+        if any(token.lstrip().startswith(".") for token in tokens):
+            fields = [re.fullmatch(r"\s*\.(ops|context)\s*=\s*(.*?)\s*", token)
+                      for token in tokens]
+            if not all(fields) or {field[1] for field in fields} != {"ops", "context"}:
+                raise EvidenceError("unsupported or duplicate generated face fields")
+            values = {field[1]: field[2] for field in fields}
+            operations, context = values["ops"], values["context"]
+        else:
+            operations, context = (token.strip() for token in tokens)
+        operation = re.fullmatch(r"&(nx_\w+_ops)", operations)
+        if (operation is None or re.fullmatch(
+                r"\(\s*void\s*\*\s*\)\s*&\w+|"
+                r"&\w+(?:\[" + _UNSIGNED_LITERAL + r"\])?", context) is None):
+            raise EvidenceError("unsupported generated face ops/context reference")
+        defined.add(name)
+        connections.append((kind, name, operation[1],
+                            context[1:] if context.startswith("&") else context))
+    if defined != set(types):
+        raise EvidenceError("generated face has no complete definition")
+    return connections
 
 
 def conditional_at(source, offset):
@@ -534,7 +572,8 @@ def context_object(elf, bindings, expression, *, root=ROOT):
     reference = re.fullmatch(r"\(\s*void\s*\*\s*\)\s*&(\w+)", expression)
     if reference is not None:
         return readonly_context(elf, bindings, reference[1], root)
-    match = re.fullmatch(r"(\w+)(?:\[([0-9]+)\])?", expression)
+    match = re.fullmatch(r"(\w+)(?:\[(" + _UNSIGNED_LITERAL + r")\])?",
+                         expression)
     if match is None:
         raise EvidenceError("unsupported context expression")
     name, index_text = match.groups()
@@ -545,10 +584,11 @@ def context_object(elf, bindings, expression, *, root=ROOT):
         return state["value"], {}
     declarations = re.findall(
         r"\bstatic\s+\w+\s+" + re.escape(name)
-        + r"\s*\[\s*(0|[1-9][0-9]*)\s*\]", bindings)
+        + r"\s*\[\s*(" + _UNSIGNED_LITERAL + r")\s*\]", bindings)
     if len(declarations) != 1:
         raise EvidenceError("missing or duplicate context array declaration")
-    count, index = int(declarations[0]), int(index_text)
+    count, index = (int(value.rstrip("uU"))
+                    for value in (declarations[0], index_text))
     if not 0 <= index < count <= 0xffffffff:
         raise EvidenceError("context array index exceeds declared bounds")
     if state["size"] % count or state["size"] // count == 0:
@@ -819,8 +859,8 @@ def inspect_provider_retention(elf, bindings, *, root=ROOT, resolved=None,
         return inspect_secure_owner(elf, bindings, resolved, consumer_path, root)
     if component_owner is not None:
         raise EvidenceError("unsupported component owner")
-    connections = selected_faces(bindings)
     face_types, layouts, providers, public_inputs = source_contracts(root)
+    connections = selected_faces(bindings, face_types=face_types)
     faces, tables = [], {}
     for face_type, name, operations, context in connections:
         expected_type = face_types.get(face_type)

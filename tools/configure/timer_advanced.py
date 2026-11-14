@@ -68,9 +68,9 @@ def validate_soc(soc, provider):
                                       for route in binding.routes
                                       for pin, _, _ in route.pins))
             vectors = sorted({(binding.irq, binding.vector) for binding in bindings})
-            if provider.PREFIX == "stm32":
-                from tools.configure.stm32f4.waveform import extra_pins
-                pins = list(dict.fromkeys((*pins, *extra_pins(name))))
+            waveform = getattr(provider, "WAVEFORM", None)
+            if waveform is not None:
+                pins = list(dict.fromkeys((*pins, *waveform.extra_pins(name))))
             if (facts is None or name != facts.controller or modes != [mode] or
                     item["irq"] != [vector for _, vector in vectors] or
                     item.get("irq_numbers") != [irq for irq, _ in vectors] or
@@ -85,8 +85,8 @@ def selected_hardware(route, hardware, provider):
     policy = getattr(provider, 'TIMER_ADVANCED', None)
     if policy is None:
         return hardware
-    if (getattr(provider, 'PREFIX', None) == 'stm32' and
-            route['kind'] in {'pwm_group', 'timer_pulse', 'timer_sequence'}):
+    waveform = getattr(provider, "WAVEFORM", None)
+    if waveform is not None and route["kind"] in waveform.KINDS:
         facts = policy.binding('advanced_pwm', route['controller'])
         if facts is None:
             return {**hardware, 'irq': [], 'irq_numbers': []}

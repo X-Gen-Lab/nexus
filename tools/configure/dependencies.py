@@ -2,13 +2,15 @@
 import hashlib
 import json
 from pathlib import Path
+import tomllib
 
 
 ROOT = Path(__file__).resolve().parents[2]
 COMMON = (
     "__init__", "bundle", "dependencies", "contracts", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "records",
     "threadx", "lowpower", "providers/__init__", "providers/common",
-    "providers/descriptor", "calls",
+    "providers/descriptor", "calls", "packages", "package_policy", "static_ir",
+    "data_provider", "static_recipe", "static_endpoints", "static_fragments", "shared_irq", "domain_policies", "domain_bridge", "header_projection",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",
     "selected_contracts", "integration_package",
     "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles",
@@ -20,8 +22,13 @@ PLATFORM = (
     "fact_references", "reference_profiles", "device_view", "clocks", "physical_facts", "gpio_phase",
     "i2c_timing", "i2c_timing_selection", "pin_states", "runtime_power",
     "adc", "dac", "exti", "board_hardware", "gpio_electrical", "rtc",
-    "providers/hardware",
-    "i2c_target", "spi_frames", "uart_wires",
+    "providers/hardware", "hardware_bindings", "platform_bindings", "startup_memory",
+    "i2c_target", "spi_frames", "spi_connections", "uart_wires", "media_schema",
+    "domains/__init__", "domains/pll_mnpq",
+    "policies/adc_group", "policies/capture_audio", "policies/external_bus",
+    "policies/gpio_phase", "policies/graphics", "policies/parallel_memory",
+    "policies/sdram", "policies/serial_nor", "policies/selection",
+    "policies/timer_waveform", "policies/sai", "policies/packet",
 )
 
 
@@ -30,10 +37,9 @@ SDK = (
     "tools/evidence/common.py",
     "tools/maintenance/cmsis_device_lock.py",
     "tools/maintenance/freertos_transport.py",
-    "tools/maintenance/stm32f1_hal_lock.py",
     "tools/maintenance/stm32f4_hal_lock.py",
     "tools/maintenance/st_usb_lock.py",
-    "tools/maintenance/stm32g4_lock.py", "tools/maintenance/threadx_lock.py",
+    "tools/maintenance/threadx_lock.py",
     "scripts/ci/vendor_import_identity.py", "scripts/ci/verify_vendor_source.py",
 )
 
@@ -52,12 +58,9 @@ def source_names(mode, family, *, sdk=False, external=False,
     else:
         from tools.configure.providers import descriptor
         names.extend("tools/configure/" + name + ".py" for name in PLATFORM)
-        providers = (() if external else
-                     descriptor.families() if family is None else
-                     (descriptor.maintained(family,
-                                            test_support=test_support),))
-        if family is None and test_support and not external:
-            providers += (descriptor.maintained("native", test_support=True),)
+        native = family == "native" and test_support
+        providers = (() if external or not native else
+                     (descriptor.maintained(family, test_support=True),))
         for provider in providers:
             names.extend(provider.configuration_modules)
             if provider.import_lock is not None:
@@ -74,7 +77,7 @@ def _identity(mode, records):
 
 
 def snapshot(*, mode, family=None, sdk=False, test_support=False):
-    """Bind code before resolution; unknown family binds all maintained code."""
+    """Bind common code and only the explicitly selected legacy adapter."""
     paths = {name: str(ROOT / name) for name in source_names(
         mode, family, sdk=sdk, test_support=test_support)}
     records = [{"path": name,
@@ -83,9 +86,39 @@ def snapshot(*, mode, family=None, sdk=False, test_support=False):
     return paths, _identity(mode, records)
 
 
+def family_hint(assembly, root, *, test_support=False):
+    """Protect legacy code before resolution; never choose hardware or a mode.
+
+    Pure-data packages require only the common engine closure. Resolution still
+    validates the exact selectors and their identities independently.
+    """
+    try:
+        path = Path(assembly).resolve()
+        value = tomllib.loads(path.read_text(encoding="utf-8"))
+        if "soc_package" in value:
+            return None
+        if "board_package" in value:
+            board = path.parent / value["board_package"] / "board.json"
+        elif value.get("board") == "native_reference" and test_support:
+            board = Path(root) / "tests/support/native/board/board.json"
+        else:
+            board = Path(root) / "boards" / value["board"] / "board.json"
+        family = json.loads(board.read_bytes())["soc_family"]
+        from tools.configure import packages
+        package = packages.find(root, family)
+        if (package is not None and "bindings" in package.facts and
+                "software" in json.loads(package.fact("bindings").read_bytes())):
+            return None
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+    return "native" if family == "native" and test_support else None
+
+
 def selected(paths, identity, *, family, context=None):
     """Retain the pre-resolution bytes of the selected family, never rehash."""
-    names = source_names("platform", family,
+    scope = (None if context is not None and context.package is not None and
+             not context.descriptor.configuration_directory else family)
+    names = source_names("platform", scope,
                          sdk="cmake/package/package_source_sdk.py" in paths,
                          external=context is not None and context.external,
                          test_support=(family == "native" and

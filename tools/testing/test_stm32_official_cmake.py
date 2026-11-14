@@ -27,7 +27,7 @@ class STM32OfficialCMakeTests(unittest.TestCase):
             'project(official_ll_fixture C)\n'
             'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
             f'set(Python3_EXECUTABLE "{sys.executable}")\n'
-            f'include("{module_root}/cmake/platform/STM32Official.cmake")\n'
+            f'include("{module_root}/soc/stm32/stm32f4/cmake/STM32Official.cmake")\n'
             'add_library(provider STATIC empty.c)\n'
             'target_compile_definitions(provider PRIVATE STM32F407xx)\n' + statement)
         return subprocess.run([
@@ -39,9 +39,9 @@ class STM32OfficialCMakeTests(unittest.TestCase):
 
     def official_fixture(self, name="source"):
         fixture = self.root / name
-        (fixture / "cmake/platform").mkdir(parents=True)
-        shutil.copyfile(ROOT / "cmake/platform/STM32Official.cmake",
-                        fixture / "cmake/platform/STM32Official.cmake")
+        (fixture / "soc/stm32/stm32f4/cmake").mkdir(parents=True)
+        shutil.copyfile(ROOT / "soc/stm32/stm32f4/cmake/STM32Official.cmake",
+                        fixture / "soc/stm32/stm32f4/cmake/STM32Official.cmake")
         (fixture / "dependencies").mkdir()
         (fixture / "dependencies/stm32f4-hal.lock.json").write_text(
             '{"files":{"LICENSE.md":{"bytes":1,"sha256":"fixture"}}}\n')

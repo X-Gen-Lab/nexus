@@ -42,3 +42,22 @@ Fresh reports require nonzero actual executions and original logs. A missing too
 empty XML, skipped-only run, stale output or changed input cannot satisfy a gate.
 Do not filter or shard complete acceptance runs. Development subsets retain their
 limited scope and cannot close a full candidate exit.
+
+## Managed build-directory ownership
+
+Managed configure/build/test/check, TDD, Native runtime and matrix entries share
+one kernel lock per canonical build directory through all stages and report
+publication. An independent managed execution in that directory rejects
+immediately; separate build directories can run in parallel. Independent command logs do not
+make a shared build directory safe.
+
+POSIX nested commands inherit real file descriptors after directory and file
+identity checks. Same-thread composition is reentrant; other threads do not
+automatically inherit ownership. Cancellation drains owned processes before the
+last descriptor releases the lock. Windows supports standalone file locks;
+nested managed execution explicitly requires POSIX descriptor inheritance.
+Descriptor inheritance delegates ownership within one orchestration. The parent
+must serialize child stages using the same build directory; children sharing one
+delegated descriptor are not mutually exclusive. Direct CMake, Ninja and CTest do
+not participate; keep those directories exclusive until direct commands finish.
+This coordination does not establish Windows matrix or firmware qualification.
