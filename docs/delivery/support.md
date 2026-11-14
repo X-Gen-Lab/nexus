@@ -102,11 +102,14 @@ F415／F417。F411、F446、F479 分别绑定独立 RM／ES profile；F446 的 P
 [派生能力表](capabilities.md)用于追踪声明、路线、装配和生产 ops；它不是第二份
 配置输入，也不证明相关运行、排空或物理时序已通过。
 
-本次所列模型与 ARM 结果只覆盖各自精确配置。平台实现固定在
+以下为[前序 PR #62](https://github.com/X-Gen-Lab/nexus/pull/62)的固定历史结果，
+仅覆盖各自精确配置；34 个消费者、165 条命令对应当时维护计划，不代表当前计划
+或本轮新增模式验收。当前软件增量与验收见[交付导航](README.md)，按对应 PR
+的精确源码、配置和原始结果读取。平台实现固定在
 [`6b59f666`](https://github.com/X-Gen-Lab/nexus/tree/6b59f66628f0dbb415f6203ba917c1fe717bf3fd)；
 最终 SDK 固定在
 [`4bf4b5a2`](https://github.com/X-Gen-Lab/nexus/tree/4bf4b5a258b3120c24f6d834545ac3f300ce801b)，
-按 [完整维护消费者计划](../../tools/maintenance/consumer_profiles.py) 通过 34 个
+按 [当时的完整维护消费者计划](https://github.com/X-Gen-Lab/nexus/blob/4bf4b5a258b3120c24f6d834545ac3f300ce801b/tools/maintenance/consumer_profiles.py) 通过 34 个
 消费者、165 条命令及搬移前后完整性校验。两提交仅差 TMP117 参考调用者的 I2C
 字段迁移；四种 Native 编译输入未受影响的核查已记录。文档、ARM 和领域回归保留
 原实际输入身份，不重标为最终 SDK 提交重新执行，也不扩大为全系列／全部模式通过。

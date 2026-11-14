@@ -417,6 +417,14 @@ class SDKServicesPolicyTests(unittest.TestCase):
         output = self.directory / "images"
         output.mkdir()
         profile = consumer_profiles.SERVICE_CONSUMERS[profile_index]
+        sdk = prefix / "share/nexus/src"
+        if profile.scenario.startswith("f4_"):
+            relative = self.consumers.service_directory(
+                ROOT, profile).relative_to(ROOT)
+            shutil.copytree(ROOT / relative, sdk / relative)
+            if profile.scenario == "f4_graphics_sdram":
+                relative = Path("tests/contracts/stm32f4_graphics")
+                shutil.copytree(ROOT / relative, sdk / relative)
         source, build, _ = self.consumers.prepare_service_consumer(
             prefix, output, profile, self.command,
             expected_revision="a" * 40, fixture=True)
@@ -429,10 +437,17 @@ class SDKServicesPolicyTests(unittest.TestCase):
         (config / "bindings.c").write_text("/* compiler port fixture */\n")
         resolved = configure.resolve_ir(source / "assembly.toml", root=ROOT, test_support=True)
         (config / "resolved.json").write_text(json.dumps(resolved.to_dict()))
+        flags = ["-std=c11"]
+        if profile.arm:
+            flags += ["-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16",
+                      "-mfloat-abi=hard", "-fshort-enums"]
+        compiled = [source / "main.c", source / "private_headers.c",
+                    config / "bindings.c"]
+        if (source / "sustained_sequence.c").is_file():
+            compiled.append(source / "sustained_sequence.c")
         rows = [{"directory": str(build), "file": str(path),
-                 "arguments": ["cc", "-c", str(path)]}
-                for path in (source / "main.c", source / "private_headers.c",
-                             config / "bindings.c")]
+                 "arguments": ["cc", *flags, "-c", str(path)]}
+                for path in compiled]
         (build / "compile_commands.json").write_text(json.dumps(rows))
         binary = build / "bin"
         binary.mkdir()
@@ -453,13 +468,17 @@ class SDKServicesPolicyTests(unittest.TestCase):
             if any(str(item).endswith("retention.py") for item in argv):
                 Path(argv[argv.index("--output") + 1]).write_text(json.dumps({
                     "status": "passed", "elf": file_identity(image)}))
-            symbols = "".join(name + " T 1000 10\n"
-                              for name in sorted(self.consumers.SERVICE_SYMBOLS))
+            required = self.consumers.service_symbols(profile)
+            symbols = "".join(name + " T 1000 10\n" for name in sorted(required))
             return subprocess.CompletedProcess(argv, 0, symbols, "")
         return sdk, source, build, config, profile, calls, external
 
     def test_service_checker_runs_only_native_and_binds_arm_resources(self):
-        for index in (0, 1):
+        graphics = tuple(index for index, profile in
+                         enumerate(consumer_profiles.SERVICE_CONSUMERS)
+                         if profile.scenario in {"f4_graphics", "f4_graphics_sdram"}
+                         and profile.assembly == "combined.toml")
+        for index in (0, 1, *graphics):
             with self.subTest(profile=index):
                 fixture = self.image_fixture(index)
                 sdk, source, build, _, profile, calls, external = fixture
@@ -468,17 +487,21 @@ class SDKServicesPolicyTests(unittest.TestCase):
                 self.assertEqual(report["runtime_executed"], not profile.arm)
                 self.assertEqual(report["domain"], profile.domain)
                 self.assertEqual(set(report["symbols"]),
-                                 self.consumers.SERVICE_SYMBOLS)
+                                 self.consumers.service_symbols(profile))
                 self.assertEqual(any(len(call) == 1 for call in calls),
                                  not profile.arm)
                 self.assertEqual(any(str(call[0]) == "arm-none-eabi-nm"
                                      for call in calls), profile.arm)
-                shutil.rmtree(self.directory / "prefix")
-                shutil.rmtree(self.directory / "images")
+            shutil.rmtree(self.directory / "prefix")
+            shutil.rmtree(self.directory / "images")
 
     def test_service_checker_rejects_changed_source_before_execution(self):
-        sdk, source, build, _, profile, calls, external = self.image_fixture()
-        (source / "main.c").write_text("int main(void) { return 0; }\n")
+        index = next(index for index, profile in
+                     enumerate(consumer_profiles.SERVICE_CONSUMERS)
+                     if profile.scenario == "f4_graphics"
+                     and profile.assembly == "combined.toml")
+        sdk, source, build, _, profile, calls, external = self.image_fixture(index)
+        (source / "sustained_sequence.c").write_text("changed helper\n")
         with self.assertRaisesRegex(ValueError, "canonical scenario"):
             self.consumers.check_service_image(sdk, source, build, profile, external)
         self.assertEqual(calls, [])
@@ -518,6 +541,45 @@ class SDKServicesPolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unreviewed source"):
             self.consumers.check_service_image(sdk, source, build, profile, external)
         self.assertEqual(calls, [])
+        shutil.rmtree(self.directory / "prefix")
+        shutil.rmtree(self.directory / "images")
+
+        index = next(index for index, profile in
+                     enumerate(consumer_profiles.SERVICE_CONSUMERS)
+                     if profile.scenario == "f4_graphics"
+                     and profile.assembly == "combined.toml")
+        sdk, source, build, _, profile, calls, external = self.image_fixture(index)
+        database = build / "compile_commands.json"
+        original = database.read_text()
+        helper = source / "sustained_sequence.c"
+        for defect, message in (("missing", "private inputs"),
+                                ("duplicate", "private inputs"),
+                                ("private", "private inputs"),
+                                ("operand", "source and -c"),
+                                ("unexpected", "unreviewed source")):
+            with self.subTest(helper=defect):
+                calls.clear()
+                rows = json.loads(original)
+                row = next(item for item in rows if item["file"] == str(helper))
+                if defect == "missing":
+                    rows.remove(row)
+                elif defect == "duplicate":
+                    rows.append(dict(row))
+                elif defect == "private":
+                    private = sdk / "soc/stm32/stm32f4/private"
+                    row["arguments"].append("-I" + str(private))
+                elif defect == "operand":
+                    row["arguments"][-1] = str(source / "another.c")
+                else:
+                    extra = dict(row, file=str(source / "unexpected.c"))
+                    extra["arguments"] = [*row["arguments"][:-1], extra["file"]]
+                    rows.append(extra)
+                database.write_text(json.dumps(rows))
+                with self.assertRaisesRegex(ValueError, message):
+                    self.consumers.check_service_image(
+                        sdk, source, build, profile, external)
+                self.assertEqual(calls, [])
+        database.write_text(original)
 
     def test_service_checker_rejects_missing_symbol_and_runtime_failure(self):
         sdk, source, build, _, profile, calls, external = self.image_fixture()
@@ -549,12 +611,18 @@ class SDKServicesPolicyTests(unittest.TestCase):
         self.assertEqual(calls, [])
 
     def test_service_checker_rechecks_inputs_after_actual_ports_return(self):
-        sdk, source, build, _, profile, calls, external = self.image_fixture()
+        index = next(index for index, profile in
+                     enumerate(consumer_profiles.SERVICE_CONSUMERS)
+                     if profile.scenario == "f4_graphics"
+                     and profile.assembly == "combined.toml")
+        sdk, source, build, _, profile, calls, external = self.image_fixture(index)
+
+        helper = source / "sustained_sequence.c"
 
         def changing(argv):
             result = external(argv)
-            if str(argv[0]) == "nm":
-                (source / "main.c").write_text("changed during observation\n")
+            if str(argv[0]).endswith("nm"):
+                helper.write_text("changed during observation\n")
             return result
         with self.assertRaisesRegex(ValueError, "changed during execution"):
             self.consumers.check_service_image(sdk, source, build, profile, changing)

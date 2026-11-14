@@ -993,6 +993,10 @@ def check_service_image(sdk, source, build, specification, run_checked):
     products = ({source / "private_headers.c"} if boot else
                 {source / ("application.c" if split else "main.c"),
                  source / "private_headers.c"})
+    if not boot:
+        # Canonical helper C retains the same public boundary as its caller.
+        products.update(source / name for name in canonical_sources
+                        if Path(name).suffix == ".c" and name != "composition.c")
     owned = products | ({source / "composition.c"} if split else set())
     if boot:
         owned.update({source / "main.c", source / "public_key.c"})

@@ -524,7 +524,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
             products = [path for path in (source / "main.c", source / "main.cpp",
                                          source / "private_headers.c",
                                          source / "application.c",
-                                         source / "composition.c", source / "public_key.c")
+                                         source / "composition.c", source / "public_key.c",
+                                         source / "sustained_sequence.c")
                         if path.exists()]
             rows = [{"file": str(path), "directory": str(build),
                      "arguments": ["cc", "-c", str(path)],
