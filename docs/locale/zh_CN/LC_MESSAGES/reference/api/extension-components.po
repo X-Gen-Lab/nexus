@@ -1,6 +1,6 @@
 # Actual-POT messages; changed entries await independent semantic review.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 9f5da1b8c5dc468af98bc967593974a97747bd96076d7413d98d47f9bcb54e8b\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 383c82f3b5288742917b29b430bdde59b6b20bb34481e2a2c3b1f60f29919c5c\n"
 
 msgid "Extension and lifecycle APIs"
 msgstr "扩展与生命周期 API"
@@ -20,8 +20,8 @@ msgstr "Board 提供无引脚的 `rng` binding。配置要求所选标称 PLL48 
 msgid "Readonly admission rejects foreign enabled RNG or IRQ state before System clock effects. Platform prepares the same private RNG owner after System startup, withdraws it before clock shutdown or suspend, and prepares it again in the new epoch on resume. The existing C implementation checks the actual RCC/Flash plan and retains its acquired gate and enable effects through cleanup. Join every entropy, TLS and network consumer before serialized privileged Platform suspend or stop. Failed withdrawal retains that owner and cleanup responsibility; retry the lifecycle operation without resetting its state. A cold or stopped face remains valid and rejects data calls with STATE. Clock failure or an epoch change stops data publication while cleanup remains available."
 msgstr "只读 admission 在 System 时钟产生影响前拒绝外来已使能的 RNG 或 IRQ 状态。Platform 在 System 启动后准备同一个私有 RNG owner，在时钟关闭或 suspend 前撤回，并在 resume 的新 epoch 中重新准备。已有 C 实现核对实际 RCC/Flash 计划，并在清理期间保留已取得 gate 和 enable 影响的责任。在串行化、特权 Platform suspend 或 stop 前，必须 join 所有熵源、TLS 和网络消费者。撤回失败保留 owner 和清理责任；重试生命周期操作时不可重置其状态。冷态或已停止的 face 仍有效，数据调用返回 STATE。时钟故障或 epoch 改变后停止数据发布，清理仍可执行。"
 
-msgid "The [System contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README-system-power.md) defines clock authority and recovery. RNG health checks and software models establish neither physical min-entropy nor HIL qualification."
-msgstr "[System 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README-system-power.md)定义时钟权威与恢复。RNG 健康检查和软件模型均不能证明物理最小熵或 HIL 资格。"
+msgid "The [System contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/system/README.md) defines clock authority and recovery. RNG health checks and software models establish neither physical min-entropy nor HIL qualification."
+msgstr "[System 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/system/README.md)定义时钟权威与恢复。RNG 健康检查和软件模型均不能证明物理最小熵或 HIL 资格。"
 
 msgid "usb_role.h"
 msgstr "usb_role.h"

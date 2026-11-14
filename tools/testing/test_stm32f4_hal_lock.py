@@ -422,6 +422,31 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         self.assertNotIn(str(self.cmsis / ".git"), result["configure_inputs"])
         self.end_session(pending, result["configure_snapshot_sha256"])
 
+    def test_configure_snapshot_tracks_declared_package_cmake_ownership(self):
+        package = self.root / "soc/acme/reviewed"
+        package.mkdir(parents=True)
+        for name in ("soc.json", "routes.json"):
+            (package / name).write_text("{}\n")
+        (package / "CMakeLists.txt").write_text("# Fixture entry.\n")
+        adapter = package / "sdk/private_graph.cmake"
+        adapter.parent.mkdir()
+        adapter.write_text("# Reviewed source graph.\n")
+        (package / "package.json").write_text(json.dumps({
+            "schema_version": 1, "interface_version": 1, "id": "reviewed",
+            "family": "stm32f4", "vendor": "acme", "source_directory": ".",
+            "facts": {"soc": "soc.json", "routes": "routes.json"},
+            "dependencies": {},
+            "cmake": {"entry": "CMakeLists.txt", "target": "reviewed_usb"},
+            "exports": {"roots": ["."], "exclude": []}}))
+        with mock_patch.object(official, "ROOT", self.root), \
+                mock_patch.object(official.dependencies, "source_names", return_value=()):
+            snapshot = official._input_snapshot(self.source, self.lock_path, self.cmsis)
+            self.assertIsNotNone(snapshot["files"][str(adapter)])
+            self.assertIsNotNone(snapshot["files"][str(package / "CMakeLists.txt")])
+            adapter.write_text("# Changed source graph.\n")
+            self.assertNotEqual(snapshot, official._input_snapshot(
+                self.source, self.lock_path, self.cmsis))
+
     def test_configure_admission_cannot_treat_missing_authority_as_optional_git(self):
         with mock_patch.object(official.dependencies, "source_names",
                 return_value=("tools/configure/missing-authority-fixture.py",)):

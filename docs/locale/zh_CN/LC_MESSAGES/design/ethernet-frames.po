@@ -1,6 +1,6 @@
 # Current gettext translation draft; independent review pending.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: b9902a7ab59eb57a595cae1ac240d6387260ce7d35c9f714c6dea1709e2f9139\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: e35feb058d32deb51b9b758a8bbd9b94677f110b5fd2f5079e5e3411bbffc9a8\n"
 
 msgid "Ethernet frame loans and the MAC hardware clock"
 msgstr "以太网帧借用与 MAC 硬件时钟"
@@ -209,8 +209,8 @@ msgstr "已维护的外部 MMIO 模型区分可见寄存器回读与内部锁存
 msgid "The Native source validates active loans under the same exclusion as provider settlement. A deterministic final-access regression lets the real provider settle an accepted request and lets its consumer legally protect the reclaimed page; an old unprotected reader faults. This establishes that software boundary and does not substitute for physical DMA or complete concurrent-system qualification."
 msgstr "Native 源在与 provider 结算相同的排他域中验证活动借用。确定性的最终访问回归让真实 provider 结算已接受请求，随后让消费者合法保护已回收页；旧的未受保护读取会触发故障。这仅证明该软件边界，不代替物理 DMA 或完整并发系统资格。"
 
-msgid "The F407 binding is `soc/stm32/stm32f4/drivers/ethernet_frames.c`; the engine is `soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c`. Current GoogleTest cases under `tests/google/ethernet_frames_*` cover public, engine, F407, Native and factory contracts. Factory tests exercise real System/GPIO/provider code against one clock/timer oracle and explicit DMA-visible addresses. Test counts and linked costs must come from the current commit's execution and ARM artifacts; historical cross-family totals retain their fixed source identity and do not establish current candidate acceptance."
-msgstr "F407 绑定为 `soc/stm32/stm32f4/drivers/ethernet_frames.c`，引擎为 `soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c`。当前 `tests/google/ethernet_frames_*` GoogleTest 覆盖公共、引擎、F407、Native 和 factory 合同。factory 测试在单一时钟／定时器模型和明确 DMA 可见地址下执行真实 System／GPIO／provider。用例数和链接成本必须来自当前提交执行及 ARM 产物；历史跨系列总数保留固定源码身份，不建立当前候选验收。"
+msgid "The F407 binding is `soc/stm32/stm32f4/drivers/ethernet/ethernet_frames.c`; the engine is `soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c`. Current GoogleTest cases under `tests/google/ethernet_frames_*` cover public, engine, F407, Native and factory contracts. Factory tests exercise real System/GPIO/provider code against one clock/timer oracle and explicit DMA-visible addresses. Test counts and linked costs must come from the current commit's execution and ARM artifacts; historical cross-family totals retain their fixed source identity and do not establish current candidate acceptance."
+msgstr "F407 绑定为 `soc/stm32/stm32f4/drivers/ethernet/ethernet_frames.c`，引擎为 `soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c`。当前 `tests/google/ethernet_frames_*` GoogleTest 覆盖公共、引擎、F407、Native 和 factory 合同。factory 测试在单一时钟／定时器模型和明确 DMA 可见地址下执行真实 System／GPIO／provider。用例数和链接成本必须来自当前提交执行及 ARM 产物；历史跨系列总数保留固定源码身份，不建立当前候选验收。"
 
 msgid "Station evidence remains separate: verify PHY clock/reset, routes and electrical levels, both link rates, DMA traffic under load, control-write timing, VLAN preservation, error/drain/reset, PTP capture and measured clock accuracy on actual boards. No board is connected in this environment. Protocol stacks, PHY/PCB policy, time synchronization and application products remain external consumers."
 msgstr "station 证据独立取得：在真实板卡验证 PHY 时钟／reset、路线和电平、两种链路速率、负载 DMA、控制写时序、VLAN 保留、错误／排空／reset、PTP 捕获和实测时钟精度。本环境未连接板卡。协议栈、PHY／PCB 政策、时间同步和应用产品仍是外部消费者。"

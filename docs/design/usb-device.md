@@ -536,7 +536,7 @@ Nexus 枚举值当作官方 wire 类型。Core／class 仍由特权 Thread 显�
 
 ## 实现位置与验收边界
 
-F4 绑定在 `soc/stm32/stm32f4/drivers/usb_device.c`；PIO 控制器机制在
+F4 绑定在 `soc/stm32/stm32f4/drivers/usb/usb_device.c`；PIO 控制器机制在
 `soc/stm32/stm32f4/drivers/ip/fs_device_pio/`。厂商寄存器布局与位定义来自锁定的
 `vendors/st/cmsis_device_f4/`，芯片资料身份由该家族的 `references.json` 固定。
 Native 外部 MMIO 模型位于 `tests/support/native/drivers/usb_device*`，只在测试

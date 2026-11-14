@@ -21,20 +21,20 @@ foreach(multi_family stm32)
     nexus_google_test(${multi_target} ${multi_official}
         SOURCES multi_controller_factory_test.cpp
         "${multi_bundle}/bindings.c"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/uart.c"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/${multi_uart_tx}.c"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi.c"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi_dma.c"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/i2c_async.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/uart/uart.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/uart/${multi_uart_tx}.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi/spi.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi/spi_dma.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/i2c/i2c_async.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${multi_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
             "${NEXUS_SOC_SOURCE_${multi_soc}}"
-            "${NEXUS_SOC_SOURCE_${multi_soc}}/private"
+            "${NEXUS_SOC_SOURCE_${multi_soc}}"
             "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
     target_sources(${multi_target} PRIVATE
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/i2c_cold.c")
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/i2c/i2c_cold.c")
     target_compile_options(${multi_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/${multi_model}"
         "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
@@ -44,11 +44,11 @@ foreach(multi_family stm32)
     # Keep real GPIO methods; only the external cold pin/clock ports are modeled.
     set(multi_gpio "${multi_target}_gpio")
     add_library(${multi_gpio} OBJECT
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/gpio.c")
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/gpio/gpio.c")
     target_link_libraries(${multi_gpio} PRIVATE Nexus::IO Nexus::Arch)
     target_include_directories(${multi_gpio} PRIVATE
         "${multi_bundle}" "${NEXUS_SOC_SOURCE_${multi_soc}}"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/private"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}"
         "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
     target_compile_options(${multi_gpio} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/multi_controller_factory_model.h"
@@ -59,13 +59,13 @@ foreach(multi_family stm32)
     endif()
     target_sources(${multi_target} PRIVATE $<TARGET_OBJECTS:${multi_gpio}>)
     target_sources(${multi_target} PRIVATE
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c")
-    include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hardware.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_cold.c")
+    include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/STM32Official.cmake")
     nexus_stm32f4_official(${multi_gpio})
     nexus_stm32f407_uart_hal(${multi_target})
     target_link_options(${multi_target} PRIVATE "-Wl,--gc-sections")
@@ -102,14 +102,14 @@ foreach(multi_family stm32)
     nexus_google_test(${single_target} ${multi_official}
         SOURCES single_spi_factory_test.cpp
         "${single_bundle}/bindings.c"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi.c"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/platform_cold.c"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/platform_lifecycle.c"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/platform_coordinator.c"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/system_lifecycle.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi/spi.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/system/platform_cold.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/system/platform_lifecycle.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/system/platform_coordinator.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/system/system_lifecycle.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${single_bundle}" "${NEXUS_SOC_SOURCE_${multi_soc}}"
-            "${NEXUS_SOC_SOURCE_${multi_soc}}/private"
+            "${NEXUS_SOC_SOURCE_${multi_soc}}"
             "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
     target_sources(${single_target} PRIVATE $<TARGET_OBJECTS:${multi_gpio}>)
     target_compile_options(${single_target} PRIVATE

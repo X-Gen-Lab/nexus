@@ -27,7 +27,8 @@ def _manifest_contract():
         "not": {"pattern": r"(^|/)(\.|\.\.)(/|$)"}}
     root = {"anyOf": [{"const": "."}, relative]}
     fact_fields = {name: relative for name in (
-        "soc", "routes", "bindings", "references", "device_catalog", "review_profiles")}
+        "soc", "controllers", "clocks", "routes", "bindings", "references",
+        "device_catalog", "review_profiles")}
     return {
         "schema_version": (True, {"type": "integer", "const": 1}),
         "interface_version": (True, {"type": "integer", "const": INTERFACE_VERSION}),
@@ -194,7 +195,8 @@ def load(path, *, read=None):
     source = _contained(path.parent, _relative(value["source_directory"],
                                              allow_root=True), directory=True)
     facts = _record(value["facts"], {"soc", "routes"},
-                    {"device_catalog", "references", "bindings", "review_profiles"})
+                    {"controllers", "clocks", "device_catalog", "references",
+                     "bindings", "review_profiles"})
     for name in facts.values():
         _contained(source, _relative(name))
     source_fact = source / facts["soc"]
@@ -252,6 +254,35 @@ def load(path, *, read=None):
                    selected, cmake_entry, target, roots, excludes,
                    hashlib.sha256(raw).hexdigest(), import_lock,
                    hashlib.sha256(source_raw).hexdigest(), scope, binding_files)
+
+
+def read_soc(package, *, read=None):
+    """Compose explicitly owned SoC fields from one sealed fact reader.
+
+    Optional fragments have fixed responsibilities, not recursive merge rules.
+    Inline declarations remain valid when a package does not select that slot.
+    A field can have exactly one author across the selected inputs.
+    """
+    reader = FactReader() if read is None else read
+    source = reader(package.fact("soc"))
+    if not isinstance(source, Mapping):
+        fail("SoC identity facts require an object")
+    if "references" in source:
+        fail("SoC references must be declared only by package facts.references")
+    result = dict(source)
+    for slot, fields in (
+            ("controllers", {"controller_groups", "controllers", "can_domain"}),
+            ("clocks", {"clock_profiles"})):
+        if slot not in package.facts:
+            continue
+        fragment = _record(reader(package.fact(slot)), {"schema_version"}, fields)
+        if type(fragment["schema_version"]) is not int or fragment["schema_version"] != 1:
+            fail("Unsupported " + slot + " fact schema")
+        owned = set(fragment) - {"schema_version"}
+        if not owned or owned.intersection(result):
+            fail("SoC fact fields require one explicit owner: " + slot)
+        result.update((name, fragment[name]) for name in owned)
+    return result
 
 
 def discover(root):

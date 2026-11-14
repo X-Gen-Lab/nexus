@@ -13,15 +13,15 @@ nexus_google_configuration_inputs("${entropy_bundle}")
 nexus_google_test(nexus_entropy_factory_test STM32F4_LL
     SOURCES entropy_factory_test.cpp
         "${entropy_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/entropy.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/entropy/entropy.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::IO
     INCLUDES "${entropy_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
         "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
         "${NEXUS_SOURCE_DIR}/arch/include")

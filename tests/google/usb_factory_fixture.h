@@ -6,11 +6,13 @@
 #ifndef NEXUS_USB_FACTORY_FIXTURE_H
 #define NEXUS_USB_FACTORY_FIXTURE_H
 extern "C" {
+#include "drivers/gpio/instance.h"
+#include "drivers/gpio/pins.h"
+#include "drivers/usb/stm32f407_usb_device.h"
 #include "nexus/io/native/model.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32f407_provider.h"
-#include "stm32f407_usb_device.h"
+#include "system/stm32f407_system.h"
 #include "usb_device.h"
 }
 #include <array>

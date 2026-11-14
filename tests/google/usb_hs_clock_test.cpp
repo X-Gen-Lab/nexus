@@ -7,9 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_clock.h"
-#include "stm32f407_system.h"
-#include "stm32f407_usb_hs_clock.h"
+#include "drivers/usb/stm32f407_usb_hs_clock.h"
+#include "system/stm32f407_clock.h"
+#include "system/stm32f407_system.h"
 }
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;

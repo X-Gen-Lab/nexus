@@ -13,15 +13,15 @@ nexus_google_configuration_inputs("${flash_bundle}")
 nexus_google_test(nexus_stm32_flash_program_test STM32F4_LL
     SOURCES flash_program_test.cpp flash_capability_test.cpp
         "${flash_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/flash.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/flash/flash.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${flash_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
 target_include_directories(nexus_stm32_flash_program_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
@@ -34,9 +34,9 @@ target_compile_options(nexus_stm32_flash_program_test PRIVATE
 # Bank-two encoding and remap admission are distinct from F407 pulse behavior.
 nexus_google_test(nexus_stm32_flash_bank_test STM32F4_LL
     SOURCES stm32_flash_bank_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/flash/flash.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_flash_bank_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")

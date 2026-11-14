@@ -5,8 +5,9 @@
 ARM 链接与物理资格分开，不能由系列目录名或 SDK 宏推定全部支持。
 
 SoC 拥有启动、时钟、内存、IRQ／DMA、资源收条和控制器私有状态；公共产品接口使用
-Nexus 类型，官方 HAL／LL、Handle 与 Device 类型保持私有。共享 IP 实现已归入
-`stm32/stm32f4/drivers/ip/`，不会产生额外运行时转发。
+Nexus 类型，官方 HAL／LL、Handle 与 Device 类型保持私有。F4 包以 `facts/` 保存
+事实，`system/` 保存启动与系统机制，`drivers/<domain>/` 就近维护 binding、实例
+布局和 C 实现，`sdk/` 选择官方库。跨域共享实现留在包内，不增加运行时转发。
 
 芯片与路线数据由 JSON 维护，PCB 接线由 [Board](../boards/README.md) 声明。配置工具
 集中在 `tools/configure/`；本目录不包含 Python 生成插件。硬件算法和生命周期由

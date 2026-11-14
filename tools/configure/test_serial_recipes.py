@@ -11,7 +11,7 @@ from tools.configure.static_fragments import StaticFragments
 class SerialRecipeTests(unittest.TestCase):
     def test_uart_profiles_preserve_complete_static_construction(self):
         document = json.loads((configure.ROOT /
-            "soc/stm32/stm32f4/bindings/uart.json").read_bytes())
+            "soc/stm32/stm32f4/drivers/uart/binding.json").read_bytes())
         fragments = StaticFragments.from_validated(document.get("static_fragments", {}))
         definitions = tuple(Binding.create(value, fragments=fragments)
                             for value in document["bindings"])

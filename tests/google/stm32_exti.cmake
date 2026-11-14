@@ -1,8 +1,8 @@
 # Real F407 EXTI source with external register/NVIC write acknowledgements.
 nexus_google_test(nexus_stm32_exti_test SOURCES stm32_exti_test.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/exti.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/exti/exti.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_exti_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
@@ -15,9 +15,9 @@ target_compile_options(nexus_stm32_exti_test PRIVATE
 # EMR event mode has no IRQ producer; exercise its actual C owner separately.
 nexus_google_test(nexus_stm32_exti_hardware_test STM32F4_LL
     SOURCES stm32_exti_hardware_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/exti_hardware.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/exti/exti_hardware.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_exti_hardware_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 nexus_use_cmsis_core(nexus_stm32_exti_hardware_test)

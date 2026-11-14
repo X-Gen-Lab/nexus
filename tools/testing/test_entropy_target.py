@@ -62,7 +62,8 @@ class EntropyTargetTests(unittest.TestCase):
                 return result
             commands = json.loads((source / "binary/compile_commands.json").read_text())
             rng = [item for item in commands
-                   if item["file"].endswith("/drivers/entropy.c")]
+                   if Path(item["file"]).resolve() ==
+                   ROOT / "soc/stm32/stm32f4/drivers/entropy/entropy.c"]
             self.assertEqual(len(rng), 1 if selected else 0)
             generated = (source / "binary/nexus-sdk/generated/bindings.c").read_text()
             self.assertEqual("nx_stm32f407_entropy_ops" in generated, selected)
@@ -128,8 +129,8 @@ class EntropyTargetTests(unittest.TestCase):
         source_sdk = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(source_sdk)
         required = set(source_sdk.required_files(ROOT))
-        current = {"soc/stm32/stm32f4/drivers/entropy.c",
-                   "soc/stm32/stm32f4/private/stm32f407_entropy.h",
+        current = {"soc/stm32/stm32f4/drivers/entropy/entropy.c",
+                   "soc/stm32/stm32f4/drivers/entropy/stm32f407_entropy.h",
                    "io/include/nexus/io/entropy.h",
                    "io/src/api/entropy.c"}
         retired = {"soc/stm32/stm32f4/Entropy.cmake",

@@ -13,7 +13,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_dma.h"
+#include "drivers/uart/dma.h"
 }
 #include "nexus/io/native/model.h"
 #include <cstddef>

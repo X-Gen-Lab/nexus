@@ -48,7 +48,7 @@ returns that existing immutable face. There is no caller-created hardware owner
 or additional initialization authority. The public path is exercised by the
 [SDK consumer](../../cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c).
 The broader I2S2/I2S3 format, receive, duplex and master-clock contract is in
-[the F407 capture/audio implementation notes](../../soc/stm32/stm32f4/capture_audio.md).
+[the F407 capture/audio implementation notes](../../soc/stm32/stm32f4/drivers/ip/av/README.md).
 
 ![FIG-31: current F4 source ownership and public call boundaries](../assets/diagrams/driver-source-ownership.svg)
 

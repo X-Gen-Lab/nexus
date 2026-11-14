@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/core/silicon.h"
-#include "stm32_identity.h"
+#include "private/stm32_identity.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 

@@ -5,8 +5,8 @@ digraph ConfigurationGeneration {
     node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];
     edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
     assembly [label="一份 authored TOML\nOne authored TOML assembly", fillcolor="#f8fafc"];
-    package [label="package.json\n事实、binding_files 与构建入口\npackage.json\nFacts, binding_files and build entry", fillcolor="#f8fafc"];
-    socFacts [label="SoC／CPU／route／审核资料\nSoC / CPU / routes / review facts", fillcolor="#f8fafc"];
+    package [label="package.json\nfacts/、相邻 binding 与构建入口\npackage.json\nfacts/, adjacent bindings and build entry", fillcolor="#f8fafc"];
+    socFacts [label="facts/：器件／控制器／时钟／路线／资料\nfacts/: devices / controllers / clocks / routes / references", fillcolor="#f8fafc"];
     boardFacts [label="Board 接线与电气授权\nBoard wiring and electrical authorization", fillcolor="#f8fafc"];
     authored [label="严格字段检查\n冻结 AuthoredAssembly\nStrict field checks\nFrozen AuthoredAssembly"];
     reader [label="所选输入：同一受控快照\n字节身份与发布前复核\nOne controlled snapshot of selected inputs\nByte identities and pre-publication recheck"];

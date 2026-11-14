@@ -7,13 +7,17 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/gpio/pins.h"
+#include "drivers/uart/instance.h"
+#include "drivers/uart/stm32f407_uart_cold.h"
+#include "nexus/arch/arch.h"
+#include "nexus/core/time.h"
 #include "nexus/io/uart_word.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32f407_provider.h"
-#include "stm32f407_uart_cold.h"
+#include "system/stm32f407_system.h"
 #ifdef NX_COLD_HAL
-#include "stm32f407_uart_hal.h"
+#include "drivers/uart/stm32f407_uart_hal.h"
 #endif
 nx_stm32_system_t g_nx_stm32_system;
 #ifdef NX_COLD_HAL

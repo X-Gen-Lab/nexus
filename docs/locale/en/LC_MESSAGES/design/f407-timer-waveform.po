@@ -1,6 +1,6 @@
 # Draft translation from the exact current gettext extraction; review pending.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: ea67e929e4677d61099784e748f24c4b91e49c2b7788102e3859687222b8d872\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 0b0e197bb1f0198ad47d7d6cab257b366c42c2ac503dbfd4c8f2ee52f3faa94c\n"
 
 msgid "F407 多通道 PWM、单脉冲与 DMA 序列"
 msgstr "F407 multi-channel PWM, one-pulse operation and DMA sequences"

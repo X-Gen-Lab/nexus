@@ -9,7 +9,7 @@
 #if defined(NX_POWER_RTC_HIGH_PROFILE)
 #include "stm32_high_clock_profile.h"
 #endif
-#include "stm32f407_clock.h"
+#include "system/stm32f407_clock.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -7,14 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 74d5bc8af272ea1dc45bb0b59e248c9ae4d0532d43d66b1c43ebe100f95da5ca\n"
+"X-Nexus-Source-SHA256: 81bb62226c69291cbd5045b9c41b0cedd215087b6d6659a01e4ca676ef84761b\n"
 
 msgid "当前源码与维护边界"
 msgstr "Current source and maintenance boundaries"
 
 msgid "本页定位当前实现，不复制各目录的完整合同。生产 MCU 入口只有 STM32F4，精确 器件与模式以[支持范围](../delivery/support.md)为准；F407 Board 与新增料号的软件 参考分别说明。其他 SDK 原位保留，目录、实现、执行记录和物理资格不相互替代。"
 msgstr "This page locates current implementations without copying each directory contract. STM32F4 is the sole production MCU entry; [support scope](../delivery/support.md) defines exact devices and modes. F407 Boards and software references for added parts remain distinct. Other SDKs stay in place. Directories, implementation, execution records and physical qualification do not replace one another."
-
 
 msgid "维护问题"
 msgstr "Maintenance question"
@@ -101,9 +100,6 @@ msgstr "[Porting guide](../guides/provider-porting.md), [package loader](https:/
 msgid "资料身份与已审适用范围"
 msgstr "Reference identity and reviewed applicability"
 
-msgid "包内 `review_profiles.json`、[ProfileSet](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/reference_profiles.py)"
-msgstr "Package-local `review_profiles.json` and [ProfileSet](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/reference_profiles.py)"
-
 msgid "领域与私有值"
 msgstr "Domains and private values"
 
@@ -159,9 +155,6 @@ msgstr "Board and SoC load no local Python plugins. Generic DataProvider reads o
 msgid "生产默认路径已采用通用 DataProvider，旧 F4 家族 Python 构造模块和导入注册表已 删除。包事实、策略、各模式和消费者仍须本批集成验证；不能从删除旧代码推定整体 资格。主机 Python 不进入固件，硬件算法和执行顺序由 C 维护。"
 msgstr "The production default now uses generic DataProvider; old F4 family Python constructor modules and their import registry have been removed. Package facts, policies, individual modes and consumers still require this batch's integrated validation. Removing old code does not establish overall qualification. Host Python is not linked into firmware; C owns hardware algorithms and execution ordering."
 
-msgid "Core `private/platform_lifecycle_impl.h` 维护整平台启动、停止、回滚与诊断，F4 `private/stm32f4_platform_lifecycle_impl.h` 维护 System 与共享资源的 C 协调；各自的 `.c` 公共入口复用同一实现，固定装配让编译器看到常量并裁剪分支。主机只维护 一套配置实现，其代码不进入 MCU 镜像。实际生成 factory、模型与 ARM 产物 各自验证，不能把源码移动视为整条链路已经验收。 Native 必须显式启用测试 scope，不进入生产系列目录或能力聚合表。"
-msgstr "Core `private/platform_lifecycle_impl.h` owns whole-platform start, stop, rollback and diagnostics. F4 `private/stm32f4_platform_lifecycle_impl.h` owns C coordination of System and shared resources. Their public `.c` entries reuse the same implementation; fixed assembly exposes constants for compiler branch elimination. One host configuration implementation is maintained and is not linked into the MCU image. Generated factories, models and ARM artifacts are verified separately; source movement does not qualify the entire chain. Native requires explicit test scope and stays outside production family directories and capability aggregation."
-
 msgid ""
 "精确支持见[支持参考](../reference/platforms/support.md)。重构前的目录与执行范围可从 "
 "[固定旧源码](https://github.com/X-Gen-"
@@ -174,3 +167,9 @@ msgstr ""
 "Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18). Old records retain"
 " their original identities and do not establish software candidates or "
 "physical-board qualification for this refactor."
+
+msgid "包内 `facts/review_profiles.json`、[ProfileSet](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/reference_profiles.py)"
+msgstr "Package-local `facts/review_profiles.json` and [ProfileSet](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/reference_profiles.py)"
+
+msgid "Core `private/platform_lifecycle_impl.h` 维护整平台启动、停止、回滚与诊断，F4 `system/stm32f4_platform_lifecycle_impl.h` 维护 System 与共享资源的 C 协调；各自的 `.c` 公共入口复用同一实现，固定装配让编译器看到常量并裁剪分支。主机只维护 一套配置实现，其代码不进入 MCU 镜像。实际生成 factory、模型与 ARM 产物 各自验证，不能把源码移动视为整条链路已经验收。 Native 必须显式启用测试 scope，不进入生产系列目录或能力聚合表。"
+msgstr "Core `private/platform_lifecycle_impl.h` owns whole-platform start, stop, rollback and diagnostics. F4 `system/stm32f4_platform_lifecycle_impl.h` owns C coordination of System and shared resources. Their public `.c` entries reuse the same implementation; fixed assembly exposes constants for compiler branch elimination. One host configuration implementation is maintained and is not linked into the MCU image. Generated factories, models and ARM artifacts are verified separately; source movement does not qualify the entire chain. Native requires explicit test scope and stays outside production family directories and capability aggregation."

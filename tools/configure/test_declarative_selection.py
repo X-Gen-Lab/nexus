@@ -24,17 +24,17 @@ class DeclarativeSelectionTests(unittest.TestCase):
         def add(soc):
             soc["variants"][part] = copy.deepcopy(
                 soc["variants"]["STM32F407ZGT6"])
-        fixture.update("soc/stm32/stm32f4/soc.json", add)
+        fixture.update("soc/stm32/stm32f4/facts/soc.json", add)
         def review(value):
             package = next(item for item in value["package_review"]
                            if "STM32F407ZGT6" in item["variants"])
             package["variants"].append(part)
-        fixture.update("soc/stm32/stm32f4/references.json", review)
+        fixture.update("soc/stm32/stm32f4/facts/references.json", review)
         def routes(value):
             for route in value["routes"]:
                 if "STM32F407ZGT6" in route["variants"]:
                     route["variants"].append(part)
-        fixture.update("soc/stm32/stm32f4/routes.json", routes)
+        fixture.update("soc/stm32/stm32f4/facts/routes.json", routes)
         fixture.update("boards/stm32f407ve_sky_qingchun/board.json",
                        lambda board: board.update(soc=part))
         result = fixture.resolve()
@@ -79,7 +79,7 @@ class DeclarativeSelectionTests(unittest.TestCase):
             route = next(item for item in value["routes"]
                          if item["id"] == "usart2-pd5-pd6")
             route["pins"][0]["af"] = 8
-        fixture.update("soc/stm32/stm32f4/routes.json", invalid)
+        fixture.update("soc/stm32/stm32f4/facts/routes.json", invalid)
         with self.assertRaisesRegex(ValueError, "alternate.function|AF"):
             fixture.resolve()
 
@@ -103,7 +103,7 @@ class DeclarativeSelectionTests(unittest.TestCase):
     def test_loaded_source_fact_identity_cannot_be_rebound_to_new_bytes(self):
         fixture = self.fixture()
         selected = packages.load(fixture.root / "soc/stm32/stm32f4/package.json")
-        fixture.update("soc/stm32/stm32f4/soc.json",
+        fixture.update("soc/stm32/stm32f4/facts/soc.json",
                        lambda soc: soc["provenance"].append("Changed after loading"))
         with patch.object(packages, "load", return_value=selected):
             with self.assertRaisesRegex(ValueError, "[Ss]ource fact.*changed"):
@@ -113,21 +113,16 @@ class DeclarativeSelectionTests(unittest.TestCase):
         # Every fact path is selected from this fixture's actual manifest.
         fixture = self.fixture()
         directory = fixture.root / "soc/stm32/stm32f4"
-        (directory / "facts").mkdir()
-        for name in ("soc.json", "routes.json"):
-            (directory / name).rename(directory / "facts" / name)
-        original = configure.ROOT / "soc/stm32/stm32f4/package.json"
-        value = json.loads(original.read_text())
-        for name in value.get("binding_files", []):
-            target = directory / name
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes((original.parent / name).read_bytes())
-        for key in ("soc", "routes"):
-            value["facts"][key] = "facts/" + value["facts"][key]
-        (directory / "bindings.json").write_bytes((original.parent /
-                                                    "bindings.json").read_bytes())
-        (directory / "CMakeLists.txt").write_text("# fixture package\n")
         manifest = directory / "package.json"
+        value = json.loads(manifest.read_text())
+        relocated = directory / "relocated-facts"
+        relocated.mkdir()
+        old_paths = {}
+        for key in ("soc", "routes"):
+            old_paths[key] = value["facts"][key]
+            target = relocated / (key + ".json")
+            (directory / old_paths[key]).rename(target)
+            value["facts"][key] = target.relative_to(directory).as_posix()
         manifest.write_text(json.dumps(value))
         load = packages.load
         paths = {}
@@ -135,9 +130,9 @@ class DeclarativeSelectionTests(unittest.TestCase):
                           side_effect=lambda path, **options: load(manifest, **options)):
             result = fixture.resolve(input_paths=paths)
         self.assertEqual(result.part, "STM32F407VET6")
-        self.assertIn("soc/stm32/stm32f4/facts/soc.json", paths)
-        self.assertIn("soc/stm32/stm32f4/facts/routes.json", paths)
-        self.assertNotIn("soc/stm32/stm32f4/soc.json", paths)
+        for key in ("soc", "routes"):
+            self.assertIn("soc/stm32/stm32f4/" + value["facts"][key], paths)
+            self.assertNotIn("soc/stm32/stm32f4/" + old_paths[key], paths)
 
     def test_one_resolution_cannot_replace_a_previously_read_fact_snapshot(self):
         with tempfile.TemporaryDirectory() as temporary:

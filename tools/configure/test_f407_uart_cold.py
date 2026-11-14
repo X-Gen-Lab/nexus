@@ -40,7 +40,7 @@ class F407UartColdTests(unittest.TestCase):
             result = gate.resolve_ir(gate.ROOT / relative, test_support=native_fixture(gate.ROOT / relative))
             provider = for_selection(result)
             header, source = bindings.emit(result)
-            self.assertIn('#include "stm32f407_uart_hal.h"', source)
+            self.assertIn('#include "drivers/uart/stm32f407_uart_hal.h"', source)
             for private in ("HAL_", "UART_HandleTypeDef", "uart_hal"):
                 self.assertNotIn(private, header)
             for item in result.controllers:
@@ -112,7 +112,7 @@ class F407UartColdTests(unittest.TestCase):
                 self.assertEqual(provider.mode_implementation(
                     item.kind, item.mode, item.controller), implementation)
                 _, source = bindings.emit(result)
-                self.assertNotIn('#include "stm32f407_uart_hal.h"', source)
+                self.assertNotIn('#include "drivers/uart/stm32f407_uart_hal.h"', source)
                 self.assertNotIn("nx_stm32_uart_hal_", source)
 
     def test_every_maintained_uart_shape_is_static_wiring_to_typed_c(self):

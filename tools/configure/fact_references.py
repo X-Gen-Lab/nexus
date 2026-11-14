@@ -139,14 +139,7 @@ def device_reviews(values, documents, variants, *, profiles):
         fail("Reference device reviews leave an unused manual or errata")
 
 
-def validate(data, variants, *, profiles):
-    """Validate source scope separately from physical silicon observations."""
-    if not isinstance(profiles, reference_profiles.ProfileSet):
-        fail("Reference validation requires an explicit selected profile set")
-    fields(data, {"schema_version", "documents", "package_review",
-                  "device_reviews", "limitations"}, "index")
-    integer(data["schema_version"], 2, 2, "Reference schema")
-    documents = data["documents"]
+def _documents(documents):
     if not isinstance(documents, dict) or not documents:
         fail("Reference documents require a named source index")
     kinds = []
@@ -175,6 +168,17 @@ def validate(data, variants, *, profiles):
             text(value, "Reference section")
     if not {"datasheet", "reference_manual", "errata"}.issubset(kinds):
         fail("Reference documents require datasheets, manuals and errata")
+    return documents
+
+
+def validate(data, variants, *, profiles):
+    """Validate source scope separately from physical silicon observations."""
+    if not isinstance(profiles, reference_profiles.ProfileSet):
+        fail("Reference validation requires an explicit selected profile set")
+    fields(data, {"schema_version", "documents", "package_review",
+                  "device_reviews", "limitations"}, "index")
+    integer(data["schema_version"], 2, 2, "Reference schema")
+    documents = _documents(data["documents"])
     packages = data["package_review"]
     if not isinstance(packages, list) or not packages:
         fail("Reference package review requires explicit document/part groups")
@@ -233,3 +237,53 @@ def admit_clock_policy(review, policy, *, profiles):
     selected = profiles.select(review["software_audit"]["profile"])
     if policy not in selected.clock_policies:
         fail("Selected device has no reviewed clock policy in its software slice")
+
+
+def read_package(package, variants, provider, *, read):
+    """Read the manifest's sole source index without granting reference scope."""
+    profiles = getattr(provider, "REFERENCE_PROFILES", None)
+    if "references" not in package.facts:
+        if profiles is not None:
+            fail("Selected review profiles require package facts.references")
+        return None
+    data = read(package.fact("references"))
+    if not isinstance(data, dict) or type(data.get("schema_version")) is not int:
+        fail("Reference schema must be explicit")
+    if data["schema_version"] == 2:
+        return validate(data, variants, profiles=profiles)
+    if data["schema_version"] != 1 or package.scope != "reference":
+        fail("Reference schema 1 requires an explicit reference package")
+    fields(data, {"schema_version", "documents", "package_review", "errata_review",
+                  "limitations", "supplier"}, "source index")
+    documents = _documents(data["documents"])
+    package_review = data["package_review"]
+    fields(package_review, {"document", "variants", "status", "scope"}, "source package review")
+    if (package_review["document"] not in documents or
+            not isinstance(package_review["variants"], list) or
+            len(package_review["variants"]) != len(variants) or
+            set(package_review["variants"]) != set(variants)):
+        fail("Reference source package review must cover the exact variants")
+    for name in ("status", "scope"):
+        text(package_review[name], "Reference source package " + name)
+    errata = data["errata_review"]
+    fields(errata, {"document", "status", "silicon_revision", "mode_workarounds",
+                   "hardware_qualification", "identification"}, "source errata review")
+    if errata["document"] not in documents or documents[errata["document"]]["kind"] != "errata":
+        fail("Reference source errata review requires its document")
+    for name, value in errata.items():
+        text(value, "Reference source errata " + name)
+    if not isinstance(data["limitations"], list) or not data["limitations"]:
+        fail("Reference source limitations must be explicit")
+    for value in data["limitations"]:
+        text(value, "Reference source limitation")
+    supplier = data["supplier"]
+    fields(supplier, {"lock", "sha256"}, "source supplier")
+    name = supplier["lock"]
+    text(name, "Reference supplier lock")
+    if (PurePosixPath(name).is_absolute() or "\\" in name or
+            any(part in {"", ".", ".."} for part in name.split("/")) or
+            not isinstance(supplier["sha256"], str) or
+            re.fullmatch(r"[0-9a-f]{64}", supplier["sha256"]) is None):
+        fail("Reference supplier requires a contained lock and exact SHA256")
+    # This source/supplier index has no reviewed runtime mode qualification.
+    return None

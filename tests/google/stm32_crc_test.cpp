@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f4_crc.h"
+#include "drivers/crc/stm32f4_crc.h"
 }
 #include <gtest/gtest.h>
 #include <sys/mman.h>

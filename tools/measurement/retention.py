@@ -2,7 +2,7 @@
 """Verify selected faces, operations and methods in an actual linked ARM ELF."""
 
 import argparse
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import struct
 import sys
@@ -91,7 +91,49 @@ def conditional_at(source, offset):
     return depth != 0
 
 
-def provider_initializers(path, source, root):
+def owned_packages(root):
+    """Discover audit ownership, without selecting a CMake source graph."""
+    from tools.configure.packages import discover
+    return tuple(package for package in discover(root)
+                 if package.scope == "production")
+
+
+def package_files(root, suffix, *, packages=None):
+    packages = owned_packages(root) if packages is None else packages
+    return {path for package in packages for directory in package.export_roots
+            for path in directory.rglob("*" + suffix)
+            if path.is_file() and package.exports(path)}
+
+
+def private_headers(root, *, packages=None):
+    paths = package_files(root, ".h", packages=packages)
+    for directory in (root / "io/private", root / "tests/support/native"):
+        paths.update(directory.rglob("*.h"))
+    return paths
+
+
+def include_candidates(root, include, headers, *, packages=None, owner=None):
+    """Resolve a fixed private include inside declared package ownership."""
+    name = PurePosixPath(include)
+    if (name.is_absolute() or name.as_posix() != include or "\\" in include or
+            any(part in {"", ".", ".."} for part in include.split("/"))):
+        raise EvidenceError("provider template must be a canonical private include")
+    packages = owned_packages(root) if packages is None else packages
+    selected = tuple(package for package in packages
+                     if owner is None or package.exports(owner))
+    allowed = headers if len(selected) == len(packages) else {
+        path for path in headers
+        if any(path.is_relative_to(package.source_directory) for package in selected)
+        or not any(path.is_relative_to(package.source_directory) for package in packages)}
+    if len(name.parts) == 1:
+        return {path for path in allowed if path.name == include}
+    roots = [package.source_directory for package in selected]
+    roots.extend((root / "io/private", root / "tests/support/native"))
+    return {directory / include for directory in roots
+            if directory / include in allowed}
+
+
+def provider_initializers(path, source, root, *, packages=None, headers=None):
     """Project only direct ops macros and actual unambiguous private includes.
 
     The wrapper remains the translation unit for local ELF method provenance.
@@ -99,6 +141,8 @@ def provider_initializers(path, source, root):
     table selection is refused rather than inferred from a provider-name map.
     """
     yield source, None
+    packages = owned_packages(root) if packages is None else packages
+    headers = private_headers(root, packages=packages) if headers is None else headers
     definitions = list(re.finditer(
         r"^[ \t]*#[ \t]*define[ \t]+([A-Z]\w*_OPS)\b([^\r\n]*)$",
         source, flags=re.MULTILINE))
@@ -121,12 +165,8 @@ def provider_initializers(path, source, root):
             r'^[ \t]*#[ \t]*include[ \t]+"([^"\r\n]+)"[ \t]*$',
             source, flags=re.MULTILINE):
             name = include.group(1)
-            if Path(name).name != name:
-                raise EvidenceError("provider template must be a direct private include")
-            private = root / "io/private" / name
-            approved = set((root / "soc/stm32/stm32f4/drivers/ip").glob("*/" + name))
-            if private.is_file():
-                approved.add(private)
+            approved = include_candidates(root, name, headers,
+                                          packages=packages, owner=path)
             if not approved:
                 continue
             if len(approved) != 1:
@@ -143,14 +183,9 @@ def provider_initializers(path, source, root):
             if tables:
                 if definition.start() > include.start():
                     raise EvidenceError("provider operations macro must bind before include")
-                owned = set()
-                for directory in (root / "soc/stm32/stm32f4",
-                                  root / "tests/support/native", root / "io"):
-                    owned.update(directory.rglob(name))
                 local = path.parent / name
-                if local.is_file():
-                    owned.add(local)
-                if owned != {template_path}:
+                shadows = set((root / "io").rglob(name)) - {template_path}
+                if shadows or (local.is_file() and local != template_path):
                     raise EvidenceError("ambiguous provider private template include")
             for table in tables:
                 if (conditional_at(source, include.start()) or
@@ -320,28 +355,32 @@ def source_contracts(root=ROOT):
 
     for kind in layouts:
         check_layout(kind, set())
-    provider_sources = set((root / "soc/stm32/stm32f4/drivers").rglob("*.c"))
+    packages = owned_packages(root)
+    inputs.extend(file_identity(path) for package in packages for path in package.inputs)
+    headers = private_headers(root, packages=packages)
+    provider_sources = package_files(root, ".c", packages=packages)
     provider_sources.update((root / "tests/support/native/drivers").rglob("*.c"))
     provider_sources.update((root / "io/src").rglob("*.c"))
-    definitions = {}
+    definitions, private_globals = {}, set()
     for path in sorted(provider_sources):
         source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
                         flags=re.DOTALL)
         initializers = [(local, kind, name, body, template_source)
             for initializer, template_source in provider_initializers(
-                path, source, root)
+                path, source, root, packages=packages, headers=headers)
             for local, kind, name, body in re.findall(
                 r"\b(?:(static)\s+)?const\s+(nx_\w+_ops_t)\s+"
                 r"([A-Za-z_]\w*)\s*=\s*\{([^{}]*)\}\s*;", initializer)]
         for local, kind, name, body, template_source in initializers:
-            # Core cold transactions are not public I/O faces. Their callbacks
-            # never participate in the device face-to-method retention audit.
-            if kind == "nx_lifecycle_ops_t":
+            # Public headers define the audited ABI. Private owner/clock ops
+            # are not device contracts merely because their names end in ops.
+            # A selected face still requires a matching discovered public table.
+            if kind not in layouts:
+                if not local:
+                    private_globals.add(name)
                 continue
             public_name = re.fullmatch(r"nx_\w+_ops", name) is not None
-            if kind not in layouts and not public_name:
-                continue
-            if (path, name) in definitions or kind not in layouts:
+            if (path, name) in definitions:
                 raise EvidenceError(
                     f"unsupported concrete operations initializer: {path}:{name}")
             provider = {"type": kind,
@@ -355,6 +394,9 @@ def source_contracts(root=ROOT):
                 if name in providers:
                     raise EvidenceError("duplicate concrete operations initializer")
                 providers[name] = provider
+
+    if providers.keys() & private_globals:
+        raise EvidenceError("conflicting operations type for public provider")
 
     def resolve_subtables(key, ancestors):
         if key in ancestors:
@@ -468,14 +510,14 @@ def reference_layout(root, bindings, typename):
     conditional definitions require their own explicit auditing support.
     """
     headers = {}
+    packages = owned_packages(root)
+    owned_headers = private_headers(root, packages=packages)
     for directive in re.finditer(
             r'^[ \t]*#[ \t]*include[ \t]+"([^"\r\n]+)"',
             bindings, flags=re.MULTILINE):
         include = directive[1]
-        if Path(include).name != include:
-            continue
-        candidates = set((root / "soc").rglob("private/" + include))
-        for directory in (root / "io/private", root / "io/include/nexus/io"):
+        candidates = include_candidates(root, include, owned_headers, packages=packages)
+        for directory in (root / "io/include/nexus/io", root / "io/include"):
             path = directory / include
             if path.is_file():
                 candidates.add(path)
@@ -844,8 +886,10 @@ def component_owner_input_paths(root):
     paths.update((root / "io/include/nexus/io").glob("*.h"))
     paths.update((root / "components").rglob("include/nexus/components/*.h"))
     paths.update((root / "components").rglob("src/*.c"))
-    paths.update((root / "soc/stm32/stm32f4/drivers").rglob("*.c"))
-    paths.update((root / "soc/stm32/stm32f4/drivers/ip").rglob("*.h"))
+    packages = owned_packages(root)
+    paths.update(path for package in packages for path in package.inputs)
+    paths.update(package_files(root, ".c", packages=packages))
+    paths.update(private_headers(root, packages=packages))
     paths.update((root / "tests/support/native/drivers").rglob("*.c"))
     paths.update((root / "io/src").rglob("*.c"))
     paths.update((root / "io/private").glob("*.h"))

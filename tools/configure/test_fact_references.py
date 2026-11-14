@@ -11,6 +11,7 @@ import unittest
 from tools.configure import configure as gate, dependencies, fact_references
 from tools.configure.device_view import controller_profiles
 from tools.configure.tests.f4_fixture import load_f4_fixture
+from tools.configure.tests.device_fixture import load_authored_soc
 
 
 class FactReferenceContractTests(unittest.TestCase):
@@ -52,7 +53,7 @@ class FactReferenceContractTests(unittest.TestCase):
                          audit["revision_order"])
         declared = {f"{binding.kind}:{mode}" for binding in self.fixture.provider.bindings
                     for mode in binding.modes}
-        soc = json.loads(self.fixture.snapshots[self.fixture.package.fact("soc")])
+        soc = load_authored_soc(self.fixture.package.fact("soc"))
         interfaces = {f"{kind}:{mode}" for profile in controller_profiles(soc).values()
             for controller in profile.values() for kind, modes in controller.get("interfaces", {}).items()
             for mode in modes}

@@ -1,0 +1,1266 @@
+{
+  "schema_version": 1,
+  "domains": {
+    "packet": {
+      "schema_version": 1,
+      "usb_modes": {
+        "device-fs": {
+          "high_speed": false,
+          "managed": false,
+          "phy": "NX_STM32_USB_FS_INTERNAL"
+        },
+        "device-hs-fs": {
+          "high_speed": true,
+          "managed": false,
+          "phy": "NX_STM32_USB_HS_INTERNAL_FS"
+        },
+        "device-hs-ulpi": {
+          "high_speed": true,
+          "managed": false,
+          "phy": "NX_STM32_USB_HS_ULPI"
+        },
+        "otg-fs": {
+          "high_speed": false,
+          "managed": true,
+          "phy": "NX_STM32_USB_FS_INTERNAL"
+        },
+        "otg-hs-fs": {
+          "high_speed": true,
+          "managed": true,
+          "phy": "NX_STM32_USB_HS_INTERNAL_FS"
+        },
+        "otg-hs-ulpi": {
+          "high_speed": true,
+          "managed": true,
+          "phy": "NX_STM32_USB_HS_ULPI"
+        }
+      },
+      "host_modes": {
+        "host-fs": "NX_STM32_USB_FS_INTERNAL",
+        "host-hs-fs": "NX_STM32_USB_HS_INTERNAL_FS",
+        "host-hs-ulpi": "NX_STM32_USB_HS_ULPI"
+      },
+      "dma_alignment": 4,
+      "setup_slots": 3,
+      "setup_bytes": 8,
+      "admission": {
+        "device": {
+          "device-fs": {
+            "controller": "OTG_FS",
+            "pins": [
+              [
+                "PA11",
+                "dm",
+                10
+              ],
+              [
+                "PA12",
+                "dp",
+                10
+              ]
+            ],
+            "engines": [
+              "pio"
+            ],
+            "remote_wakeup": true,
+            "rx_fifo_words": [
+              48,
+              256
+            ],
+            "ulpi_clock_hz": 0,
+            "minimum_core_hz": 14200000
+          },
+          "device-hs-fs": {
+            "controller": "OTG_HS",
+            "pins": [
+              [
+                "PB14",
+                "dm",
+                12
+              ],
+              [
+                "PB15",
+                "dp",
+                12
+              ]
+            ],
+            "engines": [
+              "pio",
+              "dma"
+            ],
+            "remote_wakeup": true,
+            "rx_fifo_words": [
+              48,
+              1024
+            ],
+            "ulpi_clock_hz": 0,
+            "minimum_core_hz": 30000000
+          },
+          "device-hs-ulpi": {
+            "controller": "OTG_HS",
+            "pins": [
+              [
+                "PA3",
+                "d0",
+                10
+              ],
+              [
+                "PA5",
+                "clk",
+                10
+              ],
+              [
+                "PB0",
+                "d1",
+                10
+              ],
+              [
+                "PB1",
+                "d2",
+                10
+              ],
+              [
+                "PB5",
+                "d7",
+                10
+              ],
+              [
+                "PB10",
+                "d3",
+                10
+              ],
+              [
+                "PB11",
+                "d4",
+                10
+              ],
+              [
+                "PB12",
+                "d5",
+                10
+              ],
+              [
+                "PB13",
+                "d6",
+                10
+              ],
+              [
+                "PC0",
+                "stp",
+                10
+              ],
+              [
+                "PC2",
+                "dir",
+                10
+              ],
+              [
+                "PC3",
+                "nxt",
+                10
+              ]
+            ],
+            "engines": [
+              "pio",
+              "dma"
+            ],
+            "remote_wakeup": true,
+            "rx_fifo_words": [
+              48,
+              1024
+            ],
+            "ulpi_clock_hz": 60000000,
+            "minimum_core_hz": 30000000
+          },
+          "otg-fs": {
+            "controller": "OTG_FS",
+            "pins": [
+              [
+                "PA11",
+                "dm",
+                10
+              ],
+              [
+                "PA12",
+                "dp",
+                10
+              ]
+            ],
+            "engines": [
+              "pio"
+            ],
+            "remote_wakeup": true,
+            "rx_fifo_words": [
+              48,
+              256
+            ],
+            "ulpi_clock_hz": 0,
+            "minimum_core_hz": 14200000
+          },
+          "otg-hs-fs": {
+            "controller": "OTG_HS",
+            "pins": [
+              [
+                "PB14",
+                "dm",
+                12
+              ],
+              [
+                "PB15",
+                "dp",
+                12
+              ]
+            ],
+            "engines": [
+              "pio",
+              "dma"
+            ],
+            "remote_wakeup": true,
+            "rx_fifo_words": [
+              48,
+              1024
+            ],
+            "ulpi_clock_hz": 0,
+            "minimum_core_hz": 30000000
+          },
+          "otg-hs-ulpi": {
+            "controller": "OTG_HS",
+            "pins": [
+              [
+                "PA3",
+                "d0",
+                10
+              ],
+              [
+                "PA5",
+                "clk",
+                10
+              ],
+              [
+                "PB0",
+                "d1",
+                10
+              ],
+              [
+                "PB1",
+                "d2",
+                10
+              ],
+              [
+                "PB5",
+                "d7",
+                10
+              ],
+              [
+                "PB10",
+                "d3",
+                10
+              ],
+              [
+                "PB11",
+                "d4",
+                10
+              ],
+              [
+                "PB12",
+                "d5",
+                10
+              ],
+              [
+                "PB13",
+                "d6",
+                10
+              ],
+              [
+                "PC0",
+                "stp",
+                10
+              ],
+              [
+                "PC2",
+                "dir",
+                10
+              ],
+              [
+                "PC3",
+                "nxt",
+                10
+              ]
+            ],
+            "engines": [
+              "pio",
+              "dma"
+            ],
+            "remote_wakeup": true,
+            "rx_fifo_words": [
+              48,
+              1024
+            ],
+            "ulpi_clock_hz": 60000000,
+            "minimum_core_hz": 30000000
+          }
+        },
+        "host": {
+          "host-fs": {
+            "controller": "OTG_FS",
+            "pins": [
+              [
+                "PA11",
+                "dm",
+                10
+              ],
+              [
+                "PA12",
+                "dp",
+                10
+              ]
+            ],
+            "engines": [
+              "pio"
+            ],
+            "channel_count": 8,
+            "fifo_words": 320,
+            "fifo_minima": {
+              "rx": 64,
+              "nonperiodic": 16,
+              "periodic": 16
+            },
+            "dma_reserved_words": 32,
+            "ulpi_clock_hz": 0,
+            "minimum_core_hz": 14200000
+          },
+          "host-hs-fs": {
+            "controller": "OTG_HS",
+            "pins": [
+              [
+                "PB14",
+                "dm",
+                12
+              ],
+              [
+                "PB15",
+                "dp",
+                12
+              ]
+            ],
+            "engines": [
+              "pio",
+              "dma"
+            ],
+            "channel_count": 12,
+            "fifo_words": 1024,
+            "fifo_minima": {
+              "rx": 64,
+              "nonperiodic": 16,
+              "periodic": 16
+            },
+            "dma_reserved_words": 32,
+            "ulpi_clock_hz": 0,
+            "minimum_core_hz": 30000000
+          },
+          "host-hs-ulpi": {
+            "controller": "OTG_HS",
+            "pins": [
+              [
+                "PA3",
+                "d0",
+                10
+              ],
+              [
+                "PA5",
+                "clk",
+                10
+              ],
+              [
+                "PB0",
+                "d1",
+                10
+              ],
+              [
+                "PB1",
+                "d2",
+                10
+              ],
+              [
+                "PB5",
+                "d7",
+                10
+              ],
+              [
+                "PB10",
+                "d3",
+                10
+              ],
+              [
+                "PB11",
+                "d4",
+                10
+              ],
+              [
+                "PB12",
+                "d5",
+                10
+              ],
+              [
+                "PB13",
+                "d6",
+                10
+              ],
+              [
+                "PC0",
+                "stp",
+                10
+              ],
+              [
+                "PC2",
+                "dir",
+                10
+              ],
+              [
+                "PC3",
+                "nxt",
+                10
+              ]
+            ],
+            "engines": [
+              "pio",
+              "dma"
+            ],
+            "channel_count": 12,
+            "fifo_words": 1024,
+            "fifo_minima": {
+              "rx": 64,
+              "nonperiodic": 16,
+              "periodic": 16
+            },
+            "dma_reserved_words": 32,
+            "ulpi_clock_hz": 60000000,
+            "minimum_core_hz": 30000000
+          }
+        }
+      },
+      "faces": {
+        "device": {
+          "setup_ops": "nx_usb_fs_setup_decision_ops",
+          "activation_ops": "nx_usb_fs_activation_ops"
+        },
+        "managed": {
+          "setup_ops": "nx_stm32_usb_otg_setup_decision_ops",
+          "activation_ops": "nx_stm32_usb_otg_activation_ops",
+          "otg_ops": "nx_stm32_usb_otg_ops"
+        }
+      }
+    }
+  },
+  "static_fragments": {
+    "declarations": {
+      "packet-pins": [
+        {
+          "role": "pin_snapshots",
+          "type": "uint16_t",
+          "const": false,
+          "count": {
+            "length": "selected.pads",
+            "limit": 32
+          }
+        },
+        {
+          "role": "pins",
+          "type": "nx_stm32_platform_pin_config_t",
+          "const": true,
+          "value": {
+            "map": {
+              "source": "selected.pads",
+              "limit": 32,
+              "value": {
+                "record": [
+                  [
+                    "registers",
+                    {
+                      "source": "entry.registers",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "snapshot",
+                    {
+                      "ref": "pin_snapshots",
+                      "as": "address",
+                      "index": {
+                        "source": "index",
+                        "as": "u32"
+                      }
+                    }
+                  ],
+                  [
+                    "port_index",
+                    {
+                      "source": "entry.port_index"
+                    }
+                  ],
+                  [
+                    "pin",
+                    {
+                      "source": "entry.number"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "count": {
+            "length": "selected.pads",
+            "limit": 32
+          }
+        }
+      ],
+      "packet-device-queues": [
+        {
+          "role": "usb_endpoints",
+          "type": "nx_usb_endpoint_t",
+          "const": false,
+          "count": {
+            "length": "selected_children",
+            "limit": 12
+          }
+        },
+        {
+          "role": "usb_events",
+          "type": "nx_usb_event_t",
+          "const": false,
+          "count": {
+            "source": "item.options.event_capacity"
+          }
+        },
+        {
+          "role": "usb_remote",
+          "type": "nx_usb_remote_runtime_t",
+          "const": false,
+          "enabled": {
+            "source": "selected.constants.packet.has_remote"
+          }
+        }
+      ],
+      "packet-endpoint-plan": [
+        {
+          "role": "usb_plan",
+          "type": "nx_stm32_usb_endpoint_config_t",
+          "const": true,
+          "value": {
+            "map": {
+              "source": "selected_children",
+              "limit": 12,
+              "value": {
+                "record": [
+                  [
+                    "number",
+                    {
+                      "source": "entry.options.number"
+                    }
+                  ],
+                  [
+                    "in",
+                    {
+                      "source": "entry.options.direction",
+                      "values": {
+                        "in": true,
+                        "out": false
+                      }
+                    }
+                  ],
+                  [
+                    "transfer",
+                    {
+                      "source": "entry.options.transfer",
+                      "values": {
+                        "control": {
+                          "symbol": "NX_USB_PROFILE_CONTROL"
+                        },
+                        "bulk": {
+                          "symbol": "NX_USB_PROFILE_BULK"
+                        },
+                        "interrupt": {
+                          "symbol": "NX_USB_PROFILE_INTERRUPT"
+                        },
+                        "isochronous": {
+                          "symbol": "NX_USB_PROFILE_ISOCHRONOUS"
+                        }
+                      },
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "max_packet",
+                    {
+                      "source": "entry.options.max_packet"
+                    }
+                  ],
+                  [
+                    "fifo_start",
+                    {
+                      "source": "entry.options.fifo_start"
+                    }
+                  ],
+                  [
+                    "fifo_words",
+                    {
+                      "source": "entry.options.fifo_words"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "count": {
+            "length": "selected_children",
+            "limit": 12
+          }
+        }
+      ],
+      "packet-device-dma": [
+        {
+          "role": "usb_dma_storage",
+          "type": "nx_usb_dma_storage_t",
+          "const": true,
+          "value": {
+            "map": {
+              "source": "selected.constants.packet.entries",
+              "limit": 12,
+              "value": {
+                "record": [
+                  [
+                    "bytes",
+                    {
+                      "owner": {
+                        "source": "entry.child.id",
+                        "role": "usb_dma",
+                        "as": "symbol"
+                      }
+                    }
+                  ],
+                  [
+                    "capacity",
+                    {
+                      "source": "entry.dma.extent"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "count": {
+            "length": "selected.constants.packet.entries",
+            "limit": 12
+          },
+          "enabled": {
+            "source": "selected.constants.packet.has_dma"
+          }
+        },
+        {
+          "role": "usb_dma_regions",
+          "type": "nx_dma_memory_region_t",
+          "const": true,
+          "value": {
+            "map": {
+              "source": "selected.memory_regions",
+              "limit": 16,
+              "value": {
+                "record": [
+                  [
+                    "begin",
+                    {
+                      "source": "entry.begin"
+                    }
+                  ],
+                  [
+                    "size",
+                    {
+                      "source": "entry.size"
+                    }
+                  ],
+                  [
+                    "permissions",
+                    {
+                      "source": "entry.permissions",
+                      "as": "static"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "count": {
+            "length": "selected.memory_regions",
+            "limit": 16
+          },
+          "enabled": {
+            "source": "selected.constants.packet.has_dma"
+          }
+        }
+      ],
+      "packet-device-fs-config": [
+        {
+          "role": "usb_config",
+          "type": "nx_stm32_usb_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "clock",
+                {
+                  "ref": "usb_clock",
+                  "as": "address"
+                }
+              ],
+              [
+                "pins",
+                {
+                  "ref": "pins",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "endpoints",
+                {
+                  "ref": "usb_endpoints",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "plan",
+                {
+                  "ref": "usb_plan",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "events",
+                {
+                  "ref": "usb_events",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "endpoint_count",
+                {
+                  "length": "selected_children",
+                  "limit": 12
+                }
+              ],
+              [
+                "capacity",
+                {
+                  "source": "item.options.event_capacity"
+                }
+              ],
+              [
+                "irq_policy",
+                {
+                  "record": [
+                    [
+                      "kernel",
+                      {
+                        "source": "selected.kernel_policy",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "external_irq_count",
+                      {
+                        "source": "selected.irq_profile.external_count"
+                      }
+                    ],
+                    [
+                      "priority_bits",
+                      {
+                        "source": "selected.irq_profile.priority_bits"
+                      }
+                    ],
+                    [
+                      "syscall_ceiling",
+                      {
+                        "source": "selected.irq_profile.syscall_priority",
+                        "default": 0
+                      }
+                    ]
+                  ]
+                }
+              ],
+              [
+                "poll_limit",
+                {
+                  "source": "item.options.poll_limit"
+                }
+              ],
+              [
+                "drain_timeout_us",
+                {
+                  "source": "item.options.drain_timeout_us"
+                }
+              ],
+              [
+                "clock_timeout_us",
+                {
+                  "source": "item.options.clock_timeout_us"
+                }
+              ],
+              [
+                "rx_fifo_words",
+                {
+                  "source": "item.options.rx_fifo_words"
+                }
+              ],
+              [
+                "priority",
+                {
+                  "source": "item.options.irq.priority"
+                }
+              ],
+              [
+                "remote",
+                {
+                  "optional": "selected.constants.packet.remote",
+                  "value": {
+                    "ref": "usb_remote",
+                    "as": "address"
+                  },
+                  "default": null
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "packet-device-hs-config": [
+        {
+          "role": "usb_config",
+          "type": "nx_stm32_usb_hs_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "clock",
+                {
+                  "ref": "usb_clock",
+                  "as": "address"
+                }
+              ],
+              [
+                "pins",
+                {
+                  "ref": "pins",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "endpoints",
+                {
+                  "ref": "usb_endpoints",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "plan",
+                {
+                  "ref": "usb_plan",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "events",
+                {
+                  "ref": "usb_events",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "endpoint_count",
+                {
+                  "length": "selected_children",
+                  "limit": 12
+                }
+              ],
+              [
+                "capacity",
+                {
+                  "source": "item.options.event_capacity"
+                }
+              ],
+              [
+                "irq_policy",
+                {
+                  "record": [
+                    [
+                      "kernel",
+                      {
+                        "source": "selected.kernel_policy",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "external_irq_count",
+                      {
+                        "source": "selected.irq_profile.external_count"
+                      }
+                    ],
+                    [
+                      "priority_bits",
+                      {
+                        "source": "selected.irq_profile.priority_bits"
+                      }
+                    ],
+                    [
+                      "syscall_ceiling",
+                      {
+                        "source": "selected.irq_profile.syscall_priority",
+                        "default": 0
+                      }
+                    ]
+                  ]
+                }
+              ],
+              [
+                "poll_limit",
+                {
+                  "source": "item.options.poll_limit"
+                }
+              ],
+              [
+                "drain_timeout_us",
+                {
+                  "source": "item.options.drain_timeout_us"
+                }
+              ],
+              [
+                "clock_timeout_us",
+                {
+                  "source": "item.options.clock_timeout_us"
+                }
+              ],
+              [
+                "rx_fifo_words",
+                {
+                  "source": "item.options.rx_fifo_words"
+                }
+              ],
+              [
+                "priority",
+                {
+                  "source": "item.options.irq.priority"
+                }
+              ],
+              [
+                "remote",
+                {
+                  "optional": "selected.constants.packet.remote",
+                  "value": {
+                    "ref": "usb_remote",
+                    "as": "address"
+                  },
+                  "default": null
+                }
+              ],
+              [
+                "phy",
+                {
+                  "source": "selected.constants.packet.phy",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "pin_count",
+                {
+                  "length": "selected.pads",
+                  "limit": 32
+                }
+              ],
+              [
+                "ulpi_clock_hz",
+                {
+                  "source": "item.options.ulpi_clock_hz"
+                }
+              ],
+              [
+                "dma",
+                {
+                  "source": "selected.constants.packet.has_dma"
+                }
+              ],
+              [
+                "dma_storage",
+                {
+                  "optional": "selected.constants.packet.dma",
+                  "value": {
+                    "ref": "usb_dma_storage",
+                    "as": "symbol"
+                  },
+                  "default": null
+                }
+              ],
+              [
+                "dma_regions",
+                {
+                  "optional": "selected.constants.packet.dma",
+                  "value": {
+                    "ref": "usb_dma_regions",
+                    "as": "symbol"
+                  },
+                  "default": null
+                }
+              ],
+              [
+                "dma_region_count",
+                {
+                  "optional": "selected.constants.packet.dma",
+                  "value": {
+                    "length": "selected.memory_regions",
+                    "limit": 16
+                  },
+                  "default": 0
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "packet-host-common": [
+        {
+          "role": "usb_channels",
+          "type": "nx_stm32_usb_host_channel_t",
+          "const": false,
+          "count": {
+            "source": "selected.constants.packet.host.channel_count"
+          }
+        },
+        {
+          "role": "usb_pipe_channels",
+          "type": "uint8_t",
+          "const": true,
+          "value": {
+            "map": {
+              "source": "selected.constants.packet.host.pipe_channels",
+              "limit": 16,
+              "value": {
+                "source": "entry"
+              }
+            }
+          },
+          "count": {
+            "length": "selected.constants.packet.host.pipe_channels",
+            "limit": 16
+          },
+          "enabled": {
+            "source": "selected.constants.packet.host_has_pipes"
+          }
+        },
+        {
+          "role": "usb_host_regions",
+          "type": "nx_dma_memory_region_t",
+          "const": true,
+          "value": {
+            "map": {
+              "source": "selected.memory_regions",
+              "limit": 16,
+              "value": {
+                "record": [
+                  [
+                    "begin",
+                    {
+                      "source": "entry.begin"
+                    }
+                  ],
+                  [
+                    "size",
+                    {
+                      "source": "entry.size"
+                    }
+                  ],
+                  [
+                    "permissions",
+                    {
+                      "source": "entry.permissions",
+                      "as": "static"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "count": {
+            "length": "selected.memory_regions",
+            "limit": 16
+          },
+          "enabled": {
+            "source": "selected.constants.packet.host_has_dma"
+          }
+        },
+        {
+          "role": "usb_host_config",
+          "type": "nx_stm32_usb_host_cold_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "transport",
+                {
+                  "record": [
+                    [
+                      "channels",
+                      {
+                        "ref": "usb_channels",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "irq_policy",
+                      {
+                        "record": [
+                          [
+                            "kernel",
+                            {
+                              "source": "selected.kernel_policy",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "external_irq_count",
+                            {
+                              "source": "selected.irq_profile.external_count"
+                            }
+                          ],
+                          [
+                            "priority_bits",
+                            {
+                              "source": "selected.irq_profile.priority_bits"
+                            }
+                          ],
+                          [
+                            "syscall_ceiling",
+                            {
+                              "source": "selected.irq_profile.syscall_priority",
+                              "default": 0
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    [
+                      "drain_timeout_us",
+                      {
+                        "source": "selected.constants.packet.host.drain_timeout_us"
+                      }
+                    ],
+                    [
+                      "ulpi_clock_hz",
+                      {
+                        "source": "selected.constants.packet.host.ulpi_clock_hz"
+                      }
+                    ],
+                    [
+                      "rx_fifo_words",
+                      {
+                        "source": "selected.constants.packet.host.rx_fifo_words"
+                      }
+                    ],
+                    [
+                      "nonperiodic_fifo_words",
+                      {
+                        "source": "selected.constants.packet.host.nonperiodic_fifo_words"
+                      }
+                    ],
+                    [
+                      "periodic_fifo_words",
+                      {
+                        "source": "selected.constants.packet.host.periodic_fifo_words"
+                      }
+                    ],
+                    [
+                      "channel_count",
+                      {
+                        "source": "selected.constants.packet.host.channel_count"
+                      }
+                    ],
+                    [
+                      "priority",
+                      {
+                        "source": "selected.constants.packet.host.irq.priority"
+                      }
+                    ],
+                    [
+                      "phy",
+                      {
+                        "source": "selected.constants.packet.host_phy",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "dma",
+                      {
+                        "source": "selected.constants.packet.host_has_dma"
+                      }
+                    ],
+                    [
+                      "regions",
+                      {
+                        "optional": "selected.constants.packet.host_dma",
+                        "value": {
+                          "ref": "usb_host_regions",
+                          "as": "symbol"
+                        },
+                        "default": null
+                      }
+                    ],
+                    [
+                      "region_count",
+                      {
+                        "optional": "selected.constants.packet.host_dma",
+                        "value": {
+                          "length": "selected.memory_regions",
+                          "limit": 16
+                        },
+                        "default": 0
+                      }
+                    ],
+                    [
+                      "pipe_channels",
+                      {
+                        "optional": "selected.constants.packet.host_pipes",
+                        "value": {
+                          "ref": "usb_pipe_channels",
+                          "as": "symbol"
+                        },
+                        "default": null
+                      }
+                    ]
+                  ]
+                }
+              ],
+              [
+                "pins",
+                {
+                  "ref": "pins",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "pin_count",
+                {
+                  "length": "selected.pads",
+                  "limit": 32
+                }
+              ],
+              [
+                "init_timeout_us",
+                {
+                  "source": "selected.constants.packet.host.init_timeout_us"
+                }
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    "values": {}
+  },
+  "bindings": []
+}

@@ -22,7 +22,7 @@
 只携带 manifest 声明的所选源码；使用 SDK 时，按根 `.nexus-source-sdk.json` 的
 `source_revision` 在原仓库阅读这些合同，不推定所有相对链接都包含在离线 payload 中。
 
-[references.json](references.json)将器件分别绑定到 RM0090／ES0182、
+[facts/references.json](facts/references.json)将器件分别绑定到 RM0090／ES0182、
 RM0383／ES0287、RM0390／ES0298、RM0386／ES0321 的独立资料审核。ES0182 Rev19
 的 92 条勘误保留八种文档硅片标识的适用性、当前模式、C 实现、回归入口与外部
 约束；其他器件使用自己的审核范围。运行期型号／revision 准入由
@@ -33,14 +33,17 @@ RM0383／ES0287、RM0390／ES0298、RM0386／ES0321 的独立资料审核。ES01
 
 | 入口 | 责任 |
 | --- | --- |
-| `soc.json`、`routes.json`、`references.json`、`review_profiles.json` | 已维护精确型号、路线、资料来源与独立审核范围 |
-| `devices.json` | 官方器件宏、启动文件、IRQ 与时基存在性的编译事实 |
-| `package.json`、`bindings.json`、`bindings/` | 事实入口、pad 坐标、领域能力、有限静态对象与固定连接 |
+| `package.json` | 包身份、显式事实与 binding 路径、构建入口和导出归属 |
+| `facts/soc.json`、`facts/controllers.json`、`facts/clocks.json` | 精确型号／内存、控制器组与时钟事实 |
+| `facts/devices.json` | 官方器件宏、启动汇编、IRQ 与时基存在性的编译事实 |
+| `facts/routes.json`、`facts/bindings.json` | 已审路线与唯一 pad 坐标 |
+| `facts/references.json`、`facts/review_profiles.json` | 资料身份与独立审核范围 |
 | 根目录 `tools/configure/` | 通用 DataProvider、领域政策、不可变 IR 与静态生成；无家族导入注册表 |
-| `system.c` | 启动、所选静态时钟、显式 timebase 角色与失败退出 |
-| `private/stm32f4_platform_lifecycle_impl.h`、`drivers/platform_coordinator.c` | System 与共享资源的同源 C 协调实现及通用入口 |
-| `drivers/`、`private/` | 具体模式、实例状态、硬件生命周期与独立回读 |
-| `CMakeLists.txt` | 所选源码、官方库与私有编译依赖 |
+| `system/` | 启动、时钟、内存、电源、timebase 与共享平台生命周期 |
+| `drivers/<domain>/` | 相邻 binding、`instance.h`、私有状态与硬件 C 实现；模式按需选编 |
+| `drivers/ip/`、`private/` | 仍被多个模式或领域使用的私有算法与共享合同 |
+| `sdk/` | 官方库的私有 CMake 选择与 `hal_config/` |
+| `CMakeLists.txt` | 本包唯一源码目标图 |
 
 ![FIG-31：共享 IP 与精确 SoC 的源码责任](../../../docs/assets/diagrams/driver-source-ownership.svg)
 
@@ -63,11 +66,12 @@ F479 分别使用 DS10314、DS10693、DS11118。芯片、封装与所需 pad 分
 ARM／SDK 及物理资格分别判断。Board／SoC 没有 Python 插件，集中主机工具只校验
 并连接静态事实，硬件算法与生命周期由 C 维护。
 
-`package.json` 显式声明事实文件，不由公共工具猜文件名。`bindings.json` 顶层
+`package.json` 显式声明事实文件，不由公共工具猜文件名。`facts/bindings.json` 顶层
 `pads` 是 pad 坐标的唯一来源，DataProvider 复用同一 BindingPolicy，禁止
-`hardware.pads` 的第二份坐标。`review_profiles.json` 经同一输入快照形成不可变
+`hardware.pads` 的第二份坐标。`facts/review_profiles.json` 经同一输入快照形成不可变
 ProfileSet；通用工具不内置 F4 的手册或勘误精确表。生产默认路径不再加载旧 F4
-Python 构造模块；各模式与 SDK 仍须本批最终集成验收。
+Python 构造模块。目录重构保持公共接口、C11、官方启动汇编和静态 factory；本次
+模型、ARM、SDK 与文档结果仍分别验收，不继承前序批次资格。
 
 C 准入对 F405／F407／F415／F417 要求 DEV_ID=`0x413`，仅接纳已审 REV_ID
 `0x1001`、`0x1003`、`0x1007`、`0x100f`、`0x101f`。F411、F446、F479 的
@@ -87,7 +91,7 @@ linker／startup 计划，`NEXUS_MEMORY_CCM` 表达所选域。默认装配不�
 该路径仅依赖 Flash 常量和冷态本地栈，不使用 libc、global 或 heap。`.noinit` 只表示
 不复制／清零，不保证复位或断电保留。
 
-`system.c` 按唯一静态 ClockPlan 启动。F405／F407／F415／F417 的默认 profile
+`system/clock.c` 按唯一静态 ClockPlan 启动。F405／F407／F415／F417 的默认 profile
 为 HSE8／PLL168、APB1 42 MHz、APB2 84 MHz，也可选择经校验的 HSE／HSI、
 直接 SYSCLK、PLL 和总线分频。F411／F446／F479 保留直接 HSI16，并分别接纳显式
 HSI PLL96／PLL168／PLL168 高速 RUN 参数；总线、Flash latency、VOS 与辅助输出
@@ -105,7 +109,7 @@ owner 分开取得；没有消费者的直接输入 profile 不开启主 PLL。
 初始化分别记录 primary、cleanup、remaining effects；HSI 切换失败保留责任，
 不误关活动 PLL。单调时钟尚不存在的 bootstrap 阶段使用明确 poll 界限。不提供
 运行期 DVFS。静态参数、Flash latency、CSS、STOP 新 epoch 和监督详见
-[System 合同](README-system-power.md)。
+[System 合同](system/README.md)。
 
 ## 官方 HAL／LL 复用与 FPU 约束
 
@@ -137,14 +141,14 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 
 | 模块 | 具体合同 |
 | --- | --- |
-| System／内存／监督／低功耗 | [System](README-system-power.md) |
+| System／内存／监督／低功耗 | [System](system/README.md) |
 | UART 协议与收发 | [USART 线模式](../../../docs/design/uart-wire-modes.md)、[UART DMA](../../../docs/design/uart-dma-rs485.md) |
 | SPI master／slave、TI、CRC | [帧事务](../../../docs/design/spi-frame-modes.md) |
-| I2C target／SMBus device | [有限 target 交换](README-i2c-target.md) |
-| 多通道 PWM／单脉冲／DMA 序列 | [定时器波形](timer_waveform.md) |
+| I2C target／SMBus device | [有限 target 交换](drivers/i2c/README-target.md) |
+| 多通道 PWM／单脉冲／DMA 序列 | [定时器波形](drivers/timer/README-waveform.md) |
 | USB Device／Host／显式 OTG | [USB](../../../docs/design/usb-device.md) |
 | 同步／交错／注入多 ADC | [ADC group](../../../docs/design/f407-adc-groups.md) |
-| DCMI 与 I2S2／3 | [capture／audio](capture_audio.md) |
+| DCMI 与 I2S2／3 | [capture／audio](drivers/ip/av/README.md) |
 | F479 LTDC／DMA2D | [图形与归还合同](../../../docs/design/official-stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations) |
 | F415／F417 基础 CRYP／HASH | [官方 transport 与请求所有权](../../../docs/design/official-stm32-provider.md#responsibility-boundary) |
 | RTC／备份／自主唤醒 | [RTC](../../../docs/design/f407-rtc.md) |
@@ -170,7 +174,7 @@ IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征�
 `watchdog` 的 `window` 模式通过同一公共接口与 typed factory 提供 WWDG。
 无写 admit 位于 System 启动前；prepare 在 System 建立真实 ON／RDY／SW／SWS 时钟
 profile 后取得 gate 与 Sleep clock。它拒绝未取得的 gate、reset、vector、WDGA 或外来 EWI，
-不会在 startup 启狗。复位原因从 IWDG 拆入 SoC `reset.c`，只选择 WWDG 也能调用
+不会在 startup 启狗。复位原因从 IWDG 拆入 SoC `system/reset.c`，只选择 WWDG 也能调用
 `nx_reset_cause()`，不需要链接 IWDG transport。
 
 `window_ticks` 为 reload 后至少经过的 counter decrement 数，范围 1–62，默认 1。
@@ -190,7 +194,7 @@ enable 先写并核对 CFR 与 CPU debug freeze，最后一次 CR 写同时提�
 并立即撤销再次激活的准入。已激活或未证实激活的 stop 返回 UNSUPPORTED，真实 Core
 生命周期因此保留 System。只有产品显式选择喂狗／复位策略；没有默认任务、自动喂狗、
 自动 EWI 恢复或 STOP／Standby 保证。可选 EWI 的独占与不可逆责任见
-[监督合同](README-system-power.md)。软件参考为 `*wwdg*.toml` 与 `*watchdogs*.toml`，不建立
+[监督合同](system/README.md)。软件参考为 `*wwdg*.toml` 与 `*watchdogs*.toml`，不建立
 物理复位、窗口时限或安全认证。
 
 外来 EWI enable 为 sticky 位，只能由硬件 reset 清除；该模式不会把普通写入伪装成
@@ -411,7 +415,7 @@ close 先证明 ADC 停止，再只撤回所取模拟路径，最后释放 clock
 这遵循 RM0090 Rev22 §13.10／13.11 与 DS8626 Rev12 的启动和采样时间要求，
 不承诺实际模拟精度、功耗或 VBAT 测量条件。
 
-`drivers/adc_injected.c` 以同一 ADC state／cold config 和共享只读 ops 实现
+`drivers/adc/adc_injected.c` 以同一 ADC state／cold config 和共享只读 ops 实现
 `injected-shot`。一次软件触发完成 1–4 ranks，短组按 RM0090 的 JSQR 位置排列，
 通过官方 LL 取得 JDR1–4，offset 归零；不使用 regular SQR／DR，也不取得 TIM3。
 采样值暂存于有界的 8 字节栈数组；全部采样、deadline 和停止均成功后才发布。
@@ -435,7 +439,7 @@ regular／injected CPU sample 的有限 warmup 也不会饱和成无限等待；
 回读，不保留调用者的 sample／count 指针。
 
 普通 PWM 共用 TIM3／4／5 的四通道、TIM9／12 的双通道，以及 TIM10／11／13／14
-的单通道实现。精确 pad 与 AF2／3／9 路线以 `routes.json` 和所选 Board 绑定为准。
+的单通道实现。精确 pad 与 AF2／3／9 路线以 `facts/routes.json` 和所选 Board 绑定为准。
 TIM9／10／11 使用 APB2 timer，其他所列 timer 使用 APB1 timer，
 默认分别为 168／84 MHz。C 从 controller 身份派生 APB、AF 与 gate，不新增实例字段；配置生成只连接
 精确静态事实。所选 ADC trigger、PWM、capture 与 encoder 按同一 timer personality
@@ -530,7 +534,7 @@ I2C recover 同时检查 BUSY 与已保留 SCL/SDA GPIO 实时输入；即使 BU
 
 ## 原始 Encoder 与资源归属
 
-`drivers/encoder.c` 复用官方 LL，提供 TIM1／3／4／5／8 的硬件 x2 TI1／x2 TI2／x4 TI12
+`drivers/timer/encoder.c` 复用官方 LL，提供 TIM1／3／4／5／8 的硬件 x2 TI1／x2 TI2／x4 TI12
 原始计数。TIM1 使用 PA8／PA9 AF1，TIM8 使用 PC6／PC7 AF3；TIM3／4／5 分别使用
 PA6／PA7、PB6／PB7、PA0／PA1 AF2。filter code 为 0–15，filter clock 来自所选
 APB timer，默认 APB2／APB1 分别为 168／84 MHz。counter 在 prepare 后保持停止，
@@ -550,8 +554,8 @@ Platform 的两份 pin lease 负责。APB／AF／gate 事实与 PWM 共用同一
 ## DAC 输出与触发所有权
 
 `dac.h` 暴露固定格式、物理通道授权、原始码写入、双通道暂存、start／trigger／stop
-及数字状态；公共接口不泄露厂商 Handle。`drivers/dac.c` 使用已锁定官方 LL，
-`private/stm32f407_dac.h` 保存只读配置和按实例定容的 CPU 状态，不预留 DMA buffer、
+及数字状态；公共接口不泄露厂商 Handle。`drivers/dac/dac.c` 使用已锁定官方 LL，
+`drivers/dac/stm32f407_dac.h` 保存只读配置和按实例定容的 CPU 状态，不预留 DMA buffer、
 worker 或请求队列。生成器只声明静态对象、factory 和 prepare／close 调用。
 
 PA4 对应通道 1，PA5 对应通道 2。单通道只取得对应引脚；双通道通过一次官方 dual
@@ -699,7 +703,8 @@ DMA／SYSCFG；释放先检查永久 startup SRAM，再处理 CAN、Ethernet、p
 clock，全部完成后才释放 System。可选 owner 用固定 typed hook 连接，未选项不引入
 相应链接依赖；没有 opcode、动作解释器或第二份可变收条。
 
-`private/stm32f4_lifecycle.h` 与 `drivers/lifecycle_{pins,gpio,uart,spi}.c` 为
+`private/stm32f4_lifecycle.h`、`system/lifecycle_pins.c` 与 GPIO／UART／SPI 领域的
+`lifecycle_*.c` 为
 可选 `nx_lifecycle_*` 资源事务引擎提供独立集成切片：外部 System owner 先建立时钟，共享 pins
 先取得；目前只覆盖 GPIO input／output、8N1 IRQ UART byte／event 和带静态 CS
 的 SPI short-poll。只读配置／ops 与可变资源收条分开，每步只有一份真实资源收条。

@@ -7,10 +7,18 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/adc/cold.h"
+#include "drivers/adc/instance.h"
+#include "drivers/exti/cold.h"
+#include "drivers/exti/instance.h"
+#include "drivers/gpio/instance.h"
+#include "drivers/timer/instance.h"
+#include "drivers/timer/pwm_cold.h"
+#include "nexus/arch/arch.h"
+#include "nexus/core/time.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32f407_control_cold.h"
-#include "stm32f407_provider.h"
+#include "system/stm32f407_system.h"
 nx_stm32_system_t g_nx_stm32_system;
 NVIC_Type g_f4_model_nvic;
 SCB_Type g_f4_model_scb;

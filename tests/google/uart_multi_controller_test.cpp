@@ -8,7 +8,7 @@
  */
 #include "nexus/arch/arch.h"
 extern "C" {
-#include "stm32f407_dma.h"
+#include "drivers/uart/dma.h"
 #define DMA_STATE nx_stm32_uart_dma_state_t
 #define DMA_OPS   nx_stm32_uart_dma_ops
 #define DMA_IRQ   nx_stm32_uart_dma_irq

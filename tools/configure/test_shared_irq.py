@@ -67,7 +67,7 @@ class SharedIrqTests(unittest.TestCase):
         result = configure.resolve_ir(configure.ROOT /
             "tests/contracts/stm32_assembly/ve-exti.toml")
         document = configure.load(configure.ROOT /
-            "soc/stm32/stm32f4/bindings/exti.json")
+            "soc/stm32/stm32f4/drivers/exti/binding.json")
         provider = DataProvider(result.provider_context.package, {}, {
             "enum_abi": "short-enums", "backends": ["baremetal"], "headers": [],
             "bindings": document["bindings"]}, result.provider_context.domain_policies)

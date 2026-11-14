@@ -8,7 +8,7 @@
  */
 extern "C" {
 #include "nexus/io/dma.h"
-#include "private/memory_init.h"
+#include "system/memory_init.h"
 }
 
 #include <array>

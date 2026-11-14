@@ -8,11 +8,13 @@
  */
 extern "C" {
 #include "can.h"
+#include "drivers/can/stm32f407_can_cold.h"
+#include "drivers/gpio/instance.h"
+#include "drivers/gpio/pins.h"
 #include "nexus/io/native/model.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32f407_can_cold.h"
-#include "stm32f407_provider.h"
+#include "system/stm32f407_system.h"
 }
 #include <cstring>
 #include <gmock/gmock.h>

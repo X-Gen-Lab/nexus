@@ -38,29 +38,29 @@ source_language: zh_CN
 
 ```text
 soc/<vendor>/<family>/
-  package.json                 包身份、事实入口、CMake 与导出归属
-  soc.json / devices.json      器件、内存、控制器与精确 SDK 选择
-  routes.json                  pin、AF、IRQ、DMA 与触发连接
-  references.json              独立手册、数据手册与勘误范围
-  review_profiles.json         已审资料身份、适用器件和模式的显式事实
-  bindings.json                所选私有绑定和公共领域能力
-  bindings/*.json              package.binding_files 显式列出的片段
-  drivers/ / private/          硬件算法、真实 C 类型和状态
-  cmake/ / CMakeLists.txt       本包唯一源码目标图
-boards/<board>/board.json       PCB 授权与电气条件
-tools/configure/                通用机制与已维护领域／IP policy
+  package.json
+  facts/
+  system/
+  drivers/<domain>/
+  drivers/ip/
+  private/
+  sdk/
+  CMakeLists.txt
+boards/<board>/board.json
+tools/configure/
 ```
 
-这是维护责任，不要求仅为外观移动文件。当前 F4 的事实保持原位；共享 IP 就近维护，
-跨家族提取需要真实相同编程模型。运行调用不因目录划分增加转发，见
+这是当前 F4 的维护布局。binding 与其私有 C 类型和实现相邻；只有真实共享的
+合同、片段与算法保留共享入口。跨家族提取需要相同编程模型的证据。运行调用保持
+公共 face 到具体 provider 的直接分派，见
 [源码归属图](../assets/diagrams/driver-source-ownership.svg)。
 
 | package 字段 | 合同 |
 | --- | --- |
 | `schema_version`／`interface_version` | 独立格式与工具协议，未知版本拒绝 |
 | `id`／`family`／`vendor` | 显式身份；重复不能靠搜索优先级覆盖 |
-| `source_directory` | 相对 manifest 的所属源码目录 |
-| `facts` | `soc`／`routes`；按选定 provider 另给 `device_catalog`／`references`／`review_profiles`／`bindings` |
+| `source_directory` | 相对 `package.json` 所在目录解析的所属源码根 |
+| `facts` | `soc`／`routes`；按选定 provider 另给 `controllers`／`clocks`／`device_catalog`／`references`／`review_profiles`／`bindings` |
 | `binding_files` | 显式有序输入列表，不能重复、越界或冒充其他权威输入 |
 | `dependencies` | 引用既有依赖来源 ID，不另抄 URL、gitlink 或许可 |
 | `cmake.entry`／`cmake.target` | 选中包的构建入口与 target，不列第二份 `.c` 图 |
@@ -75,7 +75,8 @@ tools/configure/                通用机制与已维护领域／IP policy
 python -m tools.configure.packages --schema
 ```
 
-manifest 的所有路径归属于声明包，拒绝越界与 symlink。选择声明式包不执行家族
+`facts`、`binding_files`、`cmake.entry` 和 `exports` 路径均相对已解析的
+`source_directory`；加载器检查所属边界、文件类型与 symlink。选择声明式包不执行家族
 Python 模块；CMake 与 C 仍是受信构建代码，哈希只绑定身份，不构成执行沙箱。
 
 ### 同一快照读取
@@ -85,10 +86,20 @@ manifest、SoC、route、binding 主文件和每个 `binding_files` 都经同一
 和私有硬件投影不得绕过该快照重新打开文件并产生第二份决策。事实按 manifest 的
 逻辑键读取，不要求文件必须叫 `soc.json` 或 `routes.json`。
 
-资料审核使用可选的 `facts.review_profiles`；DataProvider 经同一 reader 读取后构造
+F4 的 `facts.soc` 保留身份、CPU、精确型号、device profile、封装／内存与供应依赖
+身份；可选
+`facts.controllers` 独占 `controller_groups`／`can_domain`，可选 `facts.clocks`
+独占 `clock_profiles`。通用 `read_soc` 通过同一 reader 组合这些输入；base 与片段
+重复声明同字段、片段未知字段或错误 schema 均拒绝。未声明片段的参考包仍可使用
+内联事实。资料仅由 `facts.references` 选择；timebase 由 System binding 的角色
+选择，Board 查询和生产解析使用同一资源预留结果，不再各自维护默认 timer。
+
+生产 DataProvider 包必须同时声明 `facts.references` 与 `facts.review_profiles`；
+只读取包元数据的 `packages.load` 不受此约束。DataProvider 经同一 reader 读取后构造
 不可变 ProfileSet，显式持有手册、数据手册、勘误身份与适用范围。通用工具不内置
-F4 的资料表，不默认选择某个勘误 profile。未声明审核资料的参考包不能因此取得资料
-或执行资格；原始资料身份、软件模式与实际执行仍分别校验。
+F4 的资料表，不默认选择某个勘误 profile。显式启用 test support 的 reference 包
+可使用仅记录来源的 schema 1 资料，不取得生产资料或执行资格；原始资料身份、软件
+模式与实际执行仍分别校验。
 
 binding 文件片段声明 `schema_version`、`bindings`，以及可选 `domains` 和
 `static_fragments`。控制器 binding 有序加入；重复 domain key 拒绝，不能用后读覆盖

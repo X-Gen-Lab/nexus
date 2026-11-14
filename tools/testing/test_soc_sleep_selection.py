@@ -26,7 +26,7 @@ class SocSleepSelectionTests(unittest.TestCase):
     def configure_properties(self, family, selected, *, lto=True,
                              launcher="scope-launcher;--contract",
                              platform_family="stm32f4", device="STM32F407xx",
-                             rejected=False):
+                             source_metadata=True, rejected=False):
         """Keep the checked SDK variable inside the port's child scope only."""
         with tempfile.TemporaryDirectory(prefix="nexus-sleep-cmake-") as name:
             source = Path(name)
@@ -52,12 +52,14 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" provider)
             selection = (
                 "nexus_add_stm32f4_sleep(selected_sleep)"
                 if selected else "")
+            source_property = (f'NEXUS_SOURCE_DIR "{ROOT.as_posix()}" '
+                               if source_metadata else "")
             platform = ("" if platform_family is None else
                 "add_library(nexus_platform INTERFACE)\n"
                 "add_library(Nexus::Platform ALIAS nexus_platform)\n"
                 'set_target_properties(nexus_platform PROPERTIES '
                 f'NEXUS_SOC_FAMILY "{platform_family}" '
-                f'NEXUS_STM32_DEVICE "{device}")\n')
+                f'{source_property})\n')
             (source / "CMakeLists.txt").write_text(f'''\
 cmake_minimum_required(VERSION 3.31)
 project(sleep_external_scope_contract LANGUAGES C ASM)
@@ -137,7 +139,7 @@ endif()
                     (source / "build/compile_commands.json").read_text())
                 units = [unit for unit in database
                          if Path(unit["file"]) ==
-                         ROOT / source_directory(family) / "sleep.c"]
+                         ROOT / source_directory(family) / "system/sleep.c"]
                 self.assertEqual(len(units), 1)
                 result["compile_arguments"] = (
                     units[0].get("arguments") or
@@ -150,11 +152,11 @@ endif()
         provider = ROOT / source_directory(family)
         self.assertEqual(properties["SOURCES"],
                          ";".join((provider / unit).as_posix()
-                                  for unit in ("sleep.c", "power.c")))
+                                  for unit in ("system/sleep.c", "system/power.c")))
         self.assertEqual(properties["sleep_sources"],
                          properties["SOURCES"])
         private_imports = {
-            (provider / "private").as_posix(),
+            provider.as_posix(),
             (ROOT / "components/clock_domain/private").as_posix(),
         }
         public_imports = {(provider / "include").as_posix()}
@@ -201,6 +203,13 @@ endif()
 
 
 
+
+    def test_sleep_rejects_missing_explicit_source_metadata(self):
+        process = self.configure_properties("stm32f4", True,
+                                            source_metadata=False, rejected=True)
+        self.assertNotEqual(process.returncode, 0)
+        self.assertIn("explicit Platform source metadata",
+                      process.stdout + process.stderr)
 
     def test_sleep_rejects_missing_selected_platform(self):
         process = self.configure_properties("stm32f4", True,

@@ -86,7 +86,7 @@ class ResolutionPhaseTests(unittest.TestCase):
         self.assertEqual(selected.inputs, ())
 
     def test_dependency_phase_passes_exact_git_pins_and_kernel_selection(self):
-        soc = gate.load(gate.ROOT / 'soc/stm32/stm32f4/soc.json')
+        soc = gate.load(gate.ROOT / 'soc/stm32/stm32f4/facts/soc.json')
         result = gate.resolve_ir(
             gate.ROOT / 'tools/configure/assemblies/qiming-baremetal-empty.toml')
         provider = for_selection(result)

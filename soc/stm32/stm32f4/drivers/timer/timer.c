@@ -1,0 +1,164 @@
+/**
+ * \file            timer.c
+ * \brief           Shared fixed-base general timer PWM without capture or DMA
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-09
+ * \copyright       Copyright (c) 2026 Nexus Team
+ */
+#include "drivers/gpio/instance.h"
+#include "drivers/timer/instance.h"
+#include "drivers/timer/stm32f407_timer_hardware.h"
+#include "stm32f4xx_ll_gpio.h"
+#include "stm32f4xx_ll_tim.h"
+
+/** \brief Locate the selected fixed channel compare register. */
+static volatile uint32_t* compare(nx_stm32_pwm_state_t* port) {
+    /* One dynamic-channel store avoids an out-of-line per-channel setter
+     * switch in the maintained size-optimized hot path. */
+    switch (port->channel) {
+        case 1U:
+            return &port->registers->CCR1;
+        case 2U:
+            return &port->registers->CCR2;
+        case 3U:
+            return &port->registers->CCR3;
+        default:
+            return &port->registers->CCR4;
+    }
+}
+
+/** \brief Initialize one base only; another channel cannot silently reconfigure
+ * it. */
+nx_result_t nx_stm32_pwm_initialize(nx_stm32_pwm_state_t* port) {
+    if (port == NULL || port->registers == NULL ||
+        port->inactive_gpio == NULL || port->channel == 0U ||
+        port->channel > 4U || port->period_ticks == 0U ||
+        (port->registers != TIM5 && port->period_ticks > 65535U) ||
+        port->duty_ticks > port->period_ticks || port->tick_hz == 0U ||
+        port->inactive_mask == 0U) {
+        return NX_ERROR_INVALID;
+    }
+    TIM_TypeDef* regs = port->registers;
+    uint32_t enable = 1U << (((uint32_t)port->channel - 1U) * 4U);
+    if ((regs->CCER & enable) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    if ((regs->CR1 & TIM_CR1_CEN) != 0U &&
+        (regs->PSC != port->prescaler ||
+         regs->ARR != port->period_ticks - 1U)) {
+        return NX_ERROR_BUSY;
+    }
+    if ((regs->CR1 & TIM_CR1_CEN) == 0U) {
+        regs->CR1 = TIM_CR1_ARPE;
+        LL_TIM_SetPrescaler(regs, port->prescaler);
+        LL_TIM_SetAutoReload(regs, port->period_ticks - 1U);
+        regs->EGR = TIM_EGR_UG;
+        regs->SR = 0U;
+    }
+    volatile uint32_t* mode = port->channel <= 2U ? &regs->CCMR1 : &regs->CCMR2;
+    uint32_t shift = ((uint32_t)port->channel - 1U) % 2U * 8U;
+    *mode = (*mode & ~(0xFFU << shift)) | (0x68U << shift);
+    *compare(port) = port->duty_ticks;
+    regs->CCER &= ~(15U << (((uint32_t)port->channel - 1U) * 4U));
+    port->initialized = true;
+    port->running = false;
+    return NX_SUCCESS;
+}
+
+/** \brief Stage only duty against the immutable shared period/PSC
+ * configuration. */
+nx_result_t nx_stm32_pwm_set(void* context, uint32_t period_ticks,
+                             uint32_t duty_ticks) {
+    nx_stm32_pwm_state_t* port = context;
+    if (port == NULL || !port->initialized || period_ticks == 0U ||
+        (port->registers != TIM5 && period_ticks > 65535U) ||
+        duty_ticks > period_ticks) {
+        return NX_ERROR_INVALID;
+    }
+    if (period_ticks != port->period_ticks ||
+        port->registers->ARR != period_ticks - 1U ||
+        port->registers->PSC != port->prescaler) {
+        return NX_ERROR_STATE;
+    }
+    *compare(port) = duty_ticks;
+    port->duty_ticks = duty_ticks;
+    return NX_SUCCESS;
+}
+
+/** \brief Connect the reviewed alternate function before enabling output. */
+nx_result_t nx_stm32_pwm_start(void* context) {
+    nx_stm32_pwm_state_t* port = context;
+    if (port == NULL || !port->initialized ||
+        !port->inactive_gpio->initialized) {
+        return NX_ERROR_STATE;
+    }
+    GPIO_TypeDef* gpio = port->inactive_gpio->registers;
+    const uint32_t alternate = nx_stm32_timer_af(port->registers);
+    for (unsigned pin = 0U; pin < 16U; ++pin) {
+        if ((port->inactive_mask & (1U << pin)) != 0U) {
+            uint32_t selected = 1U << pin;
+            if (pin < 8U) {
+                LL_GPIO_SetAFPin_0_7(gpio, selected, alternate);
+            } else {
+                LL_GPIO_SetAFPin_8_15(gpio, selected, alternate);
+            }
+            LL_GPIO_SetPinMode(gpio, selected, LL_GPIO_MODE_ALTERNATE);
+        }
+    }
+    if ((port->registers->CR1 & TIM_CR1_CEN) == 0U) {
+        port->registers->EGR = TIM_EGR_UG;
+    }
+    LL_TIM_CC_EnableChannel(port->registers,
+                            1U << (((uint32_t)port->channel - 1U) * 4U));
+    LL_TIM_EnableCounter(port->registers);
+    port->running = true;
+    return NX_SUCCESS;
+}
+
+/** \brief Disable only this channel and restore its declared GPIO idle level.
+ */
+nx_result_t nx_stm32_pwm_stop(void* context) {
+    nx_stm32_pwm_state_t* port = context;
+    if (port == NULL || !port->initialized) {
+        return NX_ERROR_INVALID;
+    }
+    LL_TIM_CC_DisableChannel(port->registers,
+                             1U << (((uint32_t)port->channel - 1U) * 4U));
+    nx_result_t result = nx_stm32_gpio_write(
+        port->inactive_gpio, port->inactive_high ? port->inactive_mask : 0U,
+        port->inactive_high ? 0U : port->inactive_mask);
+    for (unsigned pin = 0U; pin < 16U; ++pin) {
+        if ((port->inactive_mask & (1U << pin)) != 0U) {
+            GPIO_TypeDef* gpio = port->inactive_gpio->registers;
+            LL_GPIO_SetPinMode(gpio, 1U << pin, LL_GPIO_MODE_OUTPUT);
+        }
+    }
+    if ((port->registers->CCER & 0x1111U) == 0U) {
+        LL_TIM_DisableCounter(port->registers);
+    }
+    port->running = false;
+    return result;
+}
+
+/** \brief Report the staged values, without claiming measured waveform timing.
+ */
+nx_result_t nx_stm32_pwm_state(const void* context, nx_pwm_state_t* state) {
+    const nx_stm32_pwm_state_t* port = context;
+    if (port == NULL || !port->initialized || state == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    *state = (nx_pwm_state_t){.period_ticks = port->period_ticks,
+                              .duty_ticks = port->duty_ticks,
+                              .tick_hz = port->tick_hz,
+                              .running = port->running};
+    return NX_SUCCESS;
+}
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_pwm_ops_t nx_stm32_pwm_ops = {
+    .set = nx_stm32_pwm_set,
+    .start = nx_stm32_pwm_start,
+    .stop = nx_stm32_pwm_stop,
+    .state = nx_stm32_pwm_state,
+};

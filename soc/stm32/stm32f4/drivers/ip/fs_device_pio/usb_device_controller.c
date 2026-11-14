@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "usb_device_controller.h"
+#include "nexus/arch/arch.h"
 #include <string.h>
 
 /** \brief RM0090 Rev22 tables203/213, with the actual core clock floor. */

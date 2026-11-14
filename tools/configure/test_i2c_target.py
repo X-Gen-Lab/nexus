@@ -219,7 +219,7 @@ class I2cTargetConfigurationTests(unittest.TestCase):
     def test_provider_rejects_malformed_logical_af4_wires(self):
         import copy
         route = next(row for row in json.loads((gate.ROOT /
-            "soc/stm32/stm32f4/routes.json").read_text())["routes"]
+            "soc/stm32/stm32f4/facts/routes.json").read_text())["routes"]
             if row["id"] == "target-i2c1-pb6-pb7")
         for field, value in (("af", 7), ("function", "sda"), ("pin", "PB7")):
             changed = copy.deepcopy(route)

@@ -9,10 +9,12 @@
 #ifndef NEXUS_STM32F4_LIFECYCLE_H
 #define NEXUS_STM32F4_LIFECYCLE_H
 
+#include "drivers/flash/cold.h"
+#include "drivers/gpio/cold.h"
+#include "drivers/spi/stm32f407_spi_cold.h"
+#include "drivers/uart/stm32f407_uart_cold.h"
+#include "drivers/watchdog/cold.h"
 #include "nexus/core/lifecycle.h"
-#include "stm32f407_basic_cold.h"
-#include "stm32f407_spi_cold.h"
-#include "stm32f407_uart_cold.h"
 
 #ifdef __cplusplus
 extern "C" {

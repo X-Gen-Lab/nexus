@@ -7,7 +7,7 @@
 #define NX_STM32_CONSTRUCTOR_MODEL_H
 
 #include "io_poll.h"
-#include "stm32f407_provider.h"
+#include "private/model.h"
 
 /* Cold C providers validate physical routes. The harness maps those addresses
  * for every translation unit; only CPU/NVIC leaves and fault injection differ.

@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 9cdfa72626d8197a0bdc57e1a22b61f921819b2f6e7bffe68d33a63a12bf7fd5\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: ae5d7a74fd2abfef2a6dec85397437704c227bceeabecce08823d37a32076f02\n"
 
 msgid "F407 I2C target 与 SMBus device"
 msgstr "F407 I2C target and SMBus device"

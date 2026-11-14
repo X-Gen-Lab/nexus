@@ -224,7 +224,7 @@ class CompatibilityTests(unittest.TestCase):
                  "cmake/package/NexusConfigVersion.cmake.in", "tests/support/native/board/board.json",
                  "tests/support/native/soc.json", "tests/support/native/routes.json",
                  "boards/stm32f407_qiming_v31/board.json",
-                 "soc/stm32/stm32f4/soc.json", "soc/stm32/stm32f4/routes.json"]
+                 "soc/stm32/stm32f4/facts/soc.json", "soc/stm32/stm32f4/facts/routes.json"]
         for name in names:
             target = root / name; target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / name, target)

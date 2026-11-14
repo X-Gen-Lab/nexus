@@ -72,7 +72,7 @@ class DeviceClockPolicyTests(F4ClockFixture):
                 self.resolve(parameters)
 
     def test_declared_classic_policy_cannot_launder_the_exact_initial_review(self):
-        path = self.root / 'soc/stm32/stm32f4/soc.json'
+        path = self.root / 'soc/stm32/stm32f4/facts/soc.json'
         value = json.loads(path.read_text())
         value['device_profiles']['stm32f411xe']['clock_policy'] = 'rm0090-run'
         path.write_text(json.dumps(value))
@@ -80,7 +80,7 @@ class DeviceClockPolicyTests(F4ClockFixture):
             self.resolve(dict(HSI, sysclk_source='pll', pll_p=4, apb1_div=2))
 
     def test_missing_or_unknown_policy_is_not_a_classic_default(self):
-        path = self.root / 'soc/stm32/stm32f4/soc.json'
+        path = self.root / 'soc/stm32/stm32f4/facts/soc.json'
         original = path.read_text()
         for name in (None, 'nearby-f4-clock'):
             data = json.loads(original)
@@ -95,7 +95,7 @@ class DeviceClockPolicyTests(F4ClockFixture):
                 self.resolve(HSI)
 
     def test_auxiliary_policy_is_bound_to_the_exact_independent_review(self):
-        path = self.root / 'soc/stm32/stm32f4/soc.json'
+        path = self.root / 'soc/stm32/stm32f4/facts/soc.json'
         original = path.read_text()
         for board, device, correct, foreign in (
                 ("f446ze", "stm32f446", "rm0390-run", "rm0386-run"),

@@ -302,6 +302,8 @@ class DataProvider(DomainBridge):
     @classmethod
     def from_package(cls, package, soc, document, *, read):
         """Read each declared layout input once through the sealed fact reader."""
+        if package.scope == "production" and not {"references", "review_profiles"} <= set(package.facts):
+            common.fail("Production software packages require references and review profiles")
         from tools.configure.domain_policies import DomainPolicies
         from tools.configure.hardware_bindings import load_hardware
         from tools.configure.package_policy import BindingPolicy

@@ -12,7 +12,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_stream.h"
+#include "drivers/uart/stream.h"
 }
 #include "nexus/io/native/model.h"
 #include <gtest/gtest.h>

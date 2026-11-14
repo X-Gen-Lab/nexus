@@ -146,8 +146,8 @@ class SDKProfilePolicyTests(unittest.TestCase):
             self.assertEqual(calls, [])
 
     def test_uart_hardware_facts_are_required_for_both_sdk_backends(self):
-        expected = {'soc/stm32/stm32f4/drivers/uart_hardware.c',
-                    'soc/stm32/stm32f4/private/stm32f407_uart_hardware.h'}
+        expected = {'soc/stm32/stm32f4/drivers/uart/uart_hardware.c',
+                    'soc/stm32/stm32f4/drivers/uart/stm32f407_uart_hardware.h'}
         for backend in ('baremetal', 'freertos'):
             with self.subTest(backend=backend):
                 profile = self.packager.source_profile(backend=backend)

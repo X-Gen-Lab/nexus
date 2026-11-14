@@ -7,8 +7,11 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_adc_group.h"
-#include "stm32f407_clock.h"
+#include "drivers/adc/stm32f407_adc_group.h"
+#include "nexus/arch/arch.h"
+#include "nexus/core/time.h"
+#include "system/stm32f407_clock.h"
+#include "system/stm32f407_system.h"
 }
 #include "nexus/io/native/model.h"
 #include <cstring>
@@ -860,7 +863,7 @@ TEST_F(Stm32AdcGroup, RegularSixteenRanksNeverProgramInjectedReservedBits) {
 }
 
 extern "C" {
-#include "stm32f407_adc_group_blocks.h"
+#include "drivers/adc/stm32f407_adc_group_blocks.h"
 nx_result_t
 nx_stm32_adc_group_blocks_prepare(nx_stm32_adc_group_blocks_state_t*,
                                   const nx_stm32_adc_group_blocks_config_t*)
@@ -1205,7 +1208,7 @@ TEST_F(AdcGroupBlocks, APreemptedArmCannotEraseItsUnobservedDmaBudget) {
 } /* namespace */
 
 extern "C" {
-#include "stm32f407_adc_group_combined.h"
+#include "drivers/adc/stm32f407_adc_group_combined.h"
 nx_result_t
 nx_stm32_adc_group_combined_prepare(nx_stm32_adc_group_combined_state_t*,
                                     const nx_stm32_adc_group_combined_config_t*)
@@ -1840,7 +1843,7 @@ TEST_F(Stm32AdcGroup,
 } /* namespace */
 
 extern "C" {
-#include "stm32f407_adc_group_automatic.h"
+#include "drivers/adc/stm32f407_adc_group_automatic.h"
 nx_result_t nx_stm32_adc_group_automatic_prepare(
     nx_stm32_adc_group_automatic_state_t*,
     const nx_stm32_adc_group_combined_config_t*) __attribute__((weak));

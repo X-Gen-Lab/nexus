@@ -5,10 +5,10 @@ nexus_google_test(nexus_uart_formats_test SOURCES uart_formats_test.cpp
 
 nexus_google_test(nexus_stm32_uart_formats_test STM32F4_LL
     SOURCES uart_formats_provider_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_word.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_word.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_uart_formats_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
@@ -22,4 +22,4 @@ target_compile_options(nexus_stm32_uart_formats_test PRIVATE
 
 target_sources(nexus_stm32_uart_formats_test PRIVATE
     stm32_uart_wire_test.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_wire.c")
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_wire.c")

@@ -1,6 +1,6 @@
 # Actual-POT messages; changed entries await independent semantic review.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: d3365cd7e55170b441950de88e08ac2859f25ed84b344f2ecdadd3b67f1954e3\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: a00c6fe16cc45d73b5be89f10b61addd7d5993ad8374206689022313e5b72855\n"
 
 msgid "STM32F4 外部存储器"
 msgstr "STM32F4 external memory"
@@ -134,8 +134,8 @@ msgstr "Parameters retain seven minimum `nanoseconds`/`cycles` timing pairs, CAS
 msgid "两种窗口模式都要求 SYSCFG 时钟与 `SWP_FMC=0` 的实际可观察状态，驱动不修改全局 交换或 MPU。原始稳定 lease、代次和派生指针使用者都退出后才能释放；停止以实际 Self-refresh／BUSY 状态证明写 FIFO 排空和 tRAS，随后恢复自己取得的资源。 失去 lease、时间域或读回证据时保留清理责任，不撤销已有 CPU 指针。同一持久 owner 可以恢复自己的 Self-refresh，并从实际 NORMAL 完成之后等待完整 tXSR／上电间隔。"
 msgstr "Both window modes require the SYSCFG clock and an actually observable `SWP_FMC=0`; the driver changes neither global swapping nor MPU configuration. Every original stable lease, generation and derived-pointer user must exit before release. Stop uses actual Self-refresh/BUSY state to prove write-FIFO drain and tRAS, then restores resources acquired by this owner. Lost lease, time-domain or readback proof retains cleanup responsibility and never revokes existing CPU pointers. The same persistent owner can restore its own Self-refresh and wait the full tXSR/power-up interval after actual NORMAL completion."
 
-msgid "ES0321 §2.3.4 要求保持共享 `FMC_BCR1.WFDIS=0`。FMC gate 关闭时不能可靠读取 该位：静态预检不假装完成物理证明，prepare 取得 gate 后在引脚／首条命令前检查， 后续命令与新借用再次检查。驱动不自动修改外来 WFDIS；已初始化后约束失效会阻止 新借用和普通停止并保留 owner／gate。只有尚未发命令／借用的 phase0 冷拒绝， 能够保持原 BCR1 不变并归还自己取得的 gate。实现见 [SDRAM 私有合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/stm32f4_sdram.h)。"
-msgstr "ES0321 §2.3.4 requires shared `FMC_BCR1.WFDIS=0`. This bit cannot be read reliably with the FMC gate off. Static preflight does not pretend to supply physical proof. After acquiring the gate, prepare checks it before pads or the first command; later commands and new borrows recheck it. The driver never silently changes foreign WFDIS. Losing this constraint after initialization blocks new borrows and ordinary stop, retaining the owner/gate. Only a phase 0 cold rejection before any command or borrow can leave the original BCR1 unchanged and return the gate it acquired. See the [private SDRAM contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/stm32f4_sdram.h)."
+msgid "ES0321 §2.3.4 要求保持共享 `FMC_BCR1.WFDIS=0`。FMC gate 关闭时不能可靠读取 该位：静态预检不假装完成物理证明，prepare 取得 gate 后在引脚／首条命令前检查， 后续命令与新借用再次检查。驱动不自动修改外来 WFDIS；已初始化后约束失效会阻止 新借用和普通停止并保留 owner／gate。只有尚未发命令／借用的 phase0 冷拒绝， 能够保持原 BCR1 不变并归还自己取得的 gate。实现见 [SDRAM 私有合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/drivers/memory/stm32f4_sdram.h)。"
+msgstr "ES0321 §2.3.4 requires shared `FMC_BCR1.WFDIS=0`. This bit cannot be read reliably with the FMC gate off. Static preflight does not pretend to supply physical proof. After acquiring the gate, prepare checks it before pads or the first command; later commands and new borrows recheck it. The driver never silently changes foreign WFDIS. Losing this constraint after initialization blocks new borrows and ordinary stop, retaining the owner/gate. Only a phase 0 cold rejection before any command or borrow can leave the original BCR1 unchanged and return the gate it acquired. See the [private SDRAM contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/drivers/memory/stm32f4_sdram.h)."
 
 msgid "显式图形存储模式"
 msgstr "Explicit graphics-owned storage"
@@ -331,7 +331,7 @@ msgid ""
 "CPU、IRQ、 DMA 和调试访问；仅不返回 mapped pointer 不足以满足约束。精确物理验收保持 "
 "`not_executed`，模型与 ARM 软件证据不替代电气／时序／实物验证。实现见 [QuadSPI "
 "私有合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f4/private/stm32f4_qspi.h)。"
+"SOURCE/soc/stm32/stm32f4/drivers/memory/stm32f4_qspi.h)。"
 msgstr ""
 "ES0321 §2.4.5 further requires all access to the `0x90000000` aperture to"
 " be prohibited throughout the provider lifetime, including other CPU, "
@@ -340,7 +340,7 @@ msgstr ""
 "`not_executed`; model and ARM software evidence do not replace "
 "electrical／timing／physical validation. See the [private QuadSPI "
 "contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f4/private/stm32f4_qspi.h) for the implementation."
+"SOURCE/soc/stm32/stm32f4/drivers/memory/stm32f4_qspi.h) for the implementation."
 
 msgid "F479 CPU_READ 映射端点"
 msgstr "F479 CPU_READ mapped endpoint"

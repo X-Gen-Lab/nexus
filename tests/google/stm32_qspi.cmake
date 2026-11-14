@@ -28,16 +28,16 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         endif()
         nexus_google_test(${qspi_test} STM32F4_LL
             SOURCES stm32_qspi_test.cpp
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/qspi.c"
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/w25q128jv.c"
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/qspi_dma.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/memory/qspi.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/memory/w25q128jv.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/memory/qspi_dma.c"
             LIBRARIES Nexus::IO
-            INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/qspi_hal"
+            INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/qspi"
                 "${NEXUS_SOURCE_DIR}/arch/include")
         if(qspi_map)
             target_sources(${qspi_test} PRIVATE
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/qspi_mapped.c")
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/memory/qspi_mapped.c")
             target_link_libraries(${qspi_test} PRIVATE Nexus::MappedStorage)
         endif()
         target_include_directories(${qspi_test} BEFORE PRIVATE
@@ -67,8 +67,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_compile_definitions(nexus_stm32_qspi_test_hal PRIVATE STM32F479xx)
     target_include_directories(nexus_stm32_qspi_test_hal BEFORE PRIVATE
         "${qspi_contract}/model-config"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/qspi_hal"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/qspi"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${CMAKE_CURRENT_SOURCE_DIR}")
     target_include_directories(nexus_stm32_qspi_test_hal SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")

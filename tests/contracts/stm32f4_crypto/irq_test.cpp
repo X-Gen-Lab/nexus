@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f4_crypto_irq.h"
+#include "drivers/crypto/stm32f4_crypto_irq.h"
 #include "stm32f4xx.h"
 alignas(16) uint8_t g_nx_stm32_scs_model[0x2000U] = {};
 void nx_hal_test_cpu_reset(void);

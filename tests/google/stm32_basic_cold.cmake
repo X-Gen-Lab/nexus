@@ -1,12 +1,12 @@
 # Concrete basic C preparation without replacing the implementation under test.
 nexus_google_test(nexus_stm32_basic_cold_test STM32F4_LL
     SOURCES stm32_basic_cold_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/flash.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/watchdog.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/flash/flash.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/watchdog/watchdog.c"
     LIBRARIES Nexus::IO
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_basic_cold_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")

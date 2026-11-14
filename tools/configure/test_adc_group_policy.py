@@ -12,8 +12,8 @@ ROOT = Path(__file__).resolve().parents[2]
 class AdcGroupPolicyTests(unittest.TestCase):
     def policy(self, *, renamed=False):
         from tools.configure.policies.adc_group import AdcGroupPolicy
-        facts = json.loads((ROOT / "soc/stm32/stm32f4/bindings/adc_policy.json").read_text())["domains"]["adc_group"]
-        hardware = gate.load(ROOT / "soc/stm32/stm32f4/bindings.json")["hardware"]
+        facts = json.loads((ROOT / "soc/stm32/stm32f4/drivers/adc/adc_policy.binding.json").read_text())["domains"]["adc_group"]
+        hardware = gate.load(ROOT / "soc/stm32/stm32f4/facts/bindings.json")["hardware"]
         if renamed:
             facts = copy.deepcopy(facts)
             hardware = copy.deepcopy(hardware)
@@ -53,8 +53,8 @@ class AdcGroupPolicyTests(unittest.TestCase):
 
     def test_missing_sample_cycle_or_unreviewed_clock_domain_rejects_facts(self):
         from tools.configure.policies.adc_group import AdcGroupPolicy
-        facts = json.loads((ROOT / "soc/stm32/stm32f4/bindings/adc_policy.json").read_text())["domains"]["adc_group"]
-        hardware = gate.load(ROOT / "soc/stm32/stm32f4/bindings.json")["hardware"]
+        facts = json.loads((ROOT / "soc/stm32/stm32f4/drivers/adc/adc_policy.binding.json").read_text())["domains"]["adc_group"]
+        hardware = gate.load(ROOT / "soc/stm32/stm32f4/facts/bindings.json")["hardware"]
         for field, bad in (("sample_cycles", []), ("timer_domains", {"TIM3": "missing"})):
             with self.subTest(field=field):
                 with self.assertRaisesRegex(ValueError, "ADC"):
@@ -62,8 +62,8 @@ class AdcGroupPolicyTests(unittest.TestCase):
 
     def test_channel_missing_on_one_converter_reports_an_admission_error(self):
         from tools.configure.policies.adc_group import AdcGroupPolicy
-        facts = json.loads((ROOT / "soc/stm32/stm32f4/bindings/adc_policy.json").read_text())["domains"]["adc_group"]
-        hardware = copy.deepcopy(gate.load(ROOT / "soc/stm32/stm32f4/bindings.json")["hardware"])
+        facts = json.loads((ROOT / "soc/stm32/stm32f4/drivers/adc/adc_policy.binding.json").read_text())["domains"]["adc_group"]
+        hardware = copy.deepcopy(gate.load(ROOT / "soc/stm32/stm32f4/facts/bindings.json")["hardware"])
         del hardware["adc_channels"][1]["pins"]["PF5"]
         policy = AdcGroupPolicy.from_validated(facts, hardware)
         selected = {**self.selection(), "operation": "triple-simultaneous",
@@ -73,8 +73,8 @@ class AdcGroupPolicyTests(unittest.TestCase):
 
     def test_board_authorization_selects_an_alternate_pad_for_the_same_channel(self):
         from tools.configure.policies.adc_group import AdcGroupPolicy
-        facts = json.loads((ROOT / "soc/stm32/stm32f4/bindings/adc_policy.json").read_text())["domains"]["adc_group"]
-        hardware = copy.deepcopy(gate.load(ROOT / "soc/stm32/stm32f4/bindings.json")["hardware"])
+        facts = json.loads((ROOT / "soc/stm32/stm32f4/drivers/adc/adc_policy.binding.json").read_text())["domains"]["adc_group"]
+        hardware = copy.deepcopy(gate.load(ROOT / "soc/stm32/stm32f4/facts/bindings.json")["hardware"])
         hardware["adc_channels"][0]["pins"]["PB12"] = 0
         policy = AdcGroupPolicy.from_validated(facts, hardware)
         selected = self.selection()

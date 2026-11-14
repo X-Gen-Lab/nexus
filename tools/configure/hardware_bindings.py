@@ -232,9 +232,13 @@ def load_hardware(package, *, read=None):
             fail("Hardware channel bounds require explicit minimum and maximum")
         low = integer(limits[0], 0, 65535, "Hardware channel minimum")
         integer(limits[1], low, 65535, "Hardware channel maximum")
-    for name in ("soc", "routes", "device_catalog"):
+    for name in ("soc", "routes", "device_catalog", "controllers", "clocks"):
+        if name not in package.facts:
+            continue
         document(name)
-    soc = documents["soc"]
+    from tools.configure.packages import read_soc
+    names = {package.fact(name): name for name in documents}
+    soc = read_soc(package, read=lambda path: documents[names[path]])
     if any(not isinstance(data[name], str) for name in ("controller_group", "irq_device")):
         fail("Hardware group and IRQ device require explicit names")
     group = soc["controller_groups"].get(data["controller_group"])

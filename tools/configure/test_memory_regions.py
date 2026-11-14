@@ -110,7 +110,7 @@ class MemoryRegionConfigurationTests(unittest.TestCase):
                          ["sram"])
 
     def test_extra_selection_cannot_replace_the_authoritative_primary_ram(self):
-        soc = json.loads((gate.ROOT / "soc/stm32/stm32f4/soc.json").read_text())
+        soc = json.loads((gate.ROOT / "soc/stm32/stm32f4/facts/soc.json").read_text())
         physical = soc["variants"]["STM32F407ZGT6"]["memory"]
         original = json.dumps(physical, sort_keys=True)
         selected = memory.select(list(reversed(physical)),

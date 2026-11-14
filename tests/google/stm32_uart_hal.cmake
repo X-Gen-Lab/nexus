@@ -2,17 +2,18 @@
 # Fixed MMIO mappings belong to Linux contract tests, never firmware consumers.
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(hal_contract "${NEXUS_SOURCE_DIR}/tests/contracts/stm32f407_uart_hal")
-    set(f407_private "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    set(f407_private "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
     nexus_google_test(nexus_stm32_uart_hal_test
         SOURCES "${hal_contract}/hal_contract_test.cpp"
             "${hal_contract}/cpu_model.cpp"
             "${hal_contract}/dma_flags_port.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hal.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hal.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hardware.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         LIBRARIES Nexus::IO
         INCLUDES "${f407_private}" "${NEXUS_SOURCE_DIR}/arch/include"
             "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -21,7 +22,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             "${hal_contract}/atomic_vendor_port.c"
         INCLUDES "${f407_private}" "${NEXUS_SOURCE_DIR}/arch/include"
             "${CMAKE_CURRENT_SOURCE_DIR}")
-    include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
+    include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/STM32Official.cmake")
     foreach(target nexus_stm32_uart_hal_test nexus_stm32_hal_atomic_test)
         target_compile_definitions(${target} PRIVATE STM32F407xx)
         nexus_stm32f407_uart_hal(${target})

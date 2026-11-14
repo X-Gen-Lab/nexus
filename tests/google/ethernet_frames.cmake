@@ -15,9 +15,9 @@ foreach(eth_frames_family common stm32)
             NX_ETH_FRAMES_TEST_STM32 STM32F407xx USE_RTOS=0
             USE_HAL_ETH_REGISTER_CALLBACKS=0)
         target_sources(${eth_frames_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ethernet_frames.c")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ethernet/ethernet_frames.c")
         target_include_directories(${eth_frames_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
         target_include_directories(${eth_frames_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
             "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")

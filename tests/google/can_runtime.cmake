@@ -12,9 +12,9 @@ foreach(can_family stm32)
     target_compile_options(${can_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/can_soc_model.h")
     target_sources(${can_target} PRIVATE
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/can.c")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/can/can.c")
     target_include_directories(${can_target} PRIVATE
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
     target_include_directories(${can_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
         "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")

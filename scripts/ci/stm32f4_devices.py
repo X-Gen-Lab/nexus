@@ -18,11 +18,11 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts/ci"))
 from arch_compile import Recorder, digest, tools  # noqa: E402
 from tools.configure.metadata import parse_json, regular  # noqa: E402
+from tools.configure.packages import find as find_package  # noqa: E402
 from tools.configure.providers.common import vendor_device_catalog  # noqa: E402
 from tools.maintenance import cmsis_core_probe  # noqa: E402
 from tools.maintenance.cmsis_device_lock import git  # noqa: E402
 
-CATALOG = Path("soc/stm32/stm32f4/devices.json")
 DEVICE_DIRECTORY = Path("vendors/st/cmsis_device_f4")
 TIMEBASE_NAMES = ("TIM2", "TIM5", "LPTIM1")
 FLAGS = ("-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard")
@@ -76,7 +76,8 @@ def header_facts(text):
 def load_catalog(root, *, catalog_path=None):
     """Admit the reviewed catalog only against matching original SDK bytes."""
     root = Path(root).resolve()
-    path = Path(catalog_path) if catalog_path is not None else root / CATALOG
+    path = (Path(catalog_path) if catalog_path is not None else
+            find_package(root, "stm32f4").fact("device_catalog"))
     catalog = parse_json(regular(path).read_bytes())
     if (set(catalog) != {"schema_version", "scope", "sdk", "devices", "inputs"} or
             type(catalog["schema_version"]) is not int or
@@ -269,7 +270,10 @@ def run(root, compiler, output, *, devices=(), jobs=1):
               "runtime_initialization": "link_stubs_not_executed", "profiles": [],
               "commands": recorder.commands}
     try:
-        control_paths = (CATALOG, Path("scripts/ci/stm32f4_devices.py"),
+        package = find_package(root, "stm32f4")
+        catalog_path = package.fact("device_catalog")
+        control_paths = (*package.inputs, Path("tools/configure/packages.py"),
+                         Path("scripts/ci/stm32f4_devices.py"),
                          Path("scripts/ci/arch_compile.py"),
                          Path("tools/configure/metadata.py"),
                          Path("tools/configure/providers/common.py"),
@@ -283,7 +287,7 @@ def run(root, compiler, output, *, devices=(), jobs=1):
         selected = select_profiles(catalog, devices)
         if jobs not in {1, 2}:
             raise ValueError("SDK probe parallelism must be one or two")
-        report["catalog"] = digest(root / CATALOG)
+        report["catalog"] = digest(catalog_path)
         report["sdk"] = catalog["sdk"]
         reviewed_inputs = {root / DEVICE_DIRECTORY / name: capture(
             root / DEVICE_DIRECTORY / name) for name in catalog["inputs"]}

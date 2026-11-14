@@ -16,23 +16,23 @@ foreach(timer_family stm32)
     set(timer_target "nexus_${timer_family}_timer_factory_test")
     nexus_google_test(${timer_target} SOURCES timer_factory_test.cpp
         "${timer_bundle}/bindings.c"
-        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture.c"
-        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture_tim3.c"
-        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture_tim5.c"
-        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/advanced_pwm.c"
-        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/advanced_pwm_tim8.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/timer_capture.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/timer_capture_tim3.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/timer_capture_tim5.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/advanced_pwm.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/advanced_pwm_tim8.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${timer_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
-            "${NEXUS_SOC_SOURCE_${timer_soc}}/private")
+            "${NEXUS_SOC_SOURCE_${timer_soc}}")
     target_compile_options(${timer_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/timer_factory_model.h")
     target_compile_definitions(${timer_target} PRIVATE
         _init=nx_timer_fixture_init _fini=nx_timer_fixture_fini)
     target_sources(${timer_target} PRIVATE
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c")
     target_include_directories(${timer_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
         "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
@@ -44,14 +44,14 @@ foreach(timer_family stm32)
     # No generated factory or Platform bindings enter this direct C harness.
     set(timer_direct_target nexus_stm32_timer_cold_reference_test)
     nexus_google_test(${timer_direct_target} SOURCES timer_factory_test.cpp
-        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture.c"
-        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture_tim3.c"
-        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture_tim5.c"
-        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/advanced_pwm.c"
-        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/advanced_pwm_tim8.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/timer_capture.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/timer_capture_tim3.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/timer_capture_tim5.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/advanced_pwm.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/advanced_pwm_tim8.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${timer_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
-            "${NEXUS_SOC_SOURCE_${timer_soc}}/private")
+            "${NEXUS_SOC_SOURCE_${timer_soc}}")
     target_compile_options(${timer_direct_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/timer_factory_model.h")
     target_include_directories(${timer_direct_target} SYSTEM PRIVATE

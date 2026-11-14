@@ -1,13 +1,13 @@
 # Actual composite plus both complete existing transports, hardware leaves mocked.
 nexus_google_test(nexus_stm32_usb_otg_test STM32F4_LL
     SOURCES usb_otg_test.cpp
-        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb_otg.c"
-        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb_device.c"
-        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb_host.c"
-        "${NEXUS_SOC_SOURCE_stm32f4}/usb_clock.c"
-        "${NEXUS_SOC_SOURCE_stm32f4}/usb_hs_clock.c"
+        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_otg.c"
+        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_device.c"
+        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_host.c"
+        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_clock.c"
+        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_hs_clock.c"
     LIBRARIES Nexus::IOUSBOTG Nexus::USBRole Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOC_SOURCE_stm32f4}/private"
+    INCLUDES "${NEXUS_SOC_SOURCE_stm32f4}"
         "${NEXUS_SOC_SOURCE_stm32f4}/private/usb_hal"
         "${NEXUS_SOURCE_DIR}/tests/support/native/drivers")
 target_compile_options(nexus_stm32_usb_otg_test PRIVATE

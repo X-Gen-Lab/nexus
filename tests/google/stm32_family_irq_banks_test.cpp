@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_platform_cold.h"
+#include "system/stm32f407_platform_cold.h"
 NVIC_Type g_f4_model_nvic;
 SCB_Type g_f4_model_scb;
 SysTick_Type g_f4_model_systick;

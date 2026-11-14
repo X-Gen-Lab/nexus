@@ -28,6 +28,7 @@ try:
 except ImportError:
     import arch_compile
 from tools.configure.configure import resolve_ir
+from tools.configure.packages import find as find_package
 from tools.dev import process as execution
 from tools.evidence.common import (EvidenceError, atomic_json, load_json,
                                    regular_file)
@@ -240,8 +241,12 @@ def require_usb_remote_selection(resolved, entries, *, root=ROOT):
                if item["kind"] == "usb_device"]
     selected = any(item.get("remote_wakeup", False) for item in devices)
     macro = "NEXUS_STM32F4_USB_REMOTE_WAKEUP"
-    device_source = root / (
-        "soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c")
+    package = find_package(root, resolved["soc_family"])
+    providers = retention.source_contracts(root)[2]
+    provider = providers.get("nx_usb_fs_device_ops")
+    if provider is None:
+        raise EvidenceError("USB remote selection has no actual DCD source")
+    device_source = Path(provider["source"]["path"])
     count = 0
     for entry in entries:
         argv = entry.get("arguments") or shlex.split(entry["command"])
@@ -258,7 +263,7 @@ def require_usb_remote_selection(resolved, entries, *, root=ROOT):
             raise EvidenceError("USB remote selection has ambiguous compiler definitions")
         enabled = definitions == [("-D", "1")]
         output = Path(entry.get("output", ""))
-        private = "nexus_soc_stm32f4.dir" in output.parts
+        private = (package.target + ".dir") in output.parts
         if enabled and (not private or not selected):
             raise EvidenceError("USB remote selection escaped its selected private target")
         path = Path(entry["file"])

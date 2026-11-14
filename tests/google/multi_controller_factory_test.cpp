@@ -7,12 +7,14 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/spi/dma.h"
+#include "drivers/uart/dma.h"
+#include "drivers/uart/stm32f407_uart_hal.h"
 #include "i2c_v1_async.h"
 #include "nexus/arch/arch.h"
+#include "nexus/core/time.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32f407_dma.h"
-#include "stm32f407_uart_hal.h"
 #define UART_STATE             nx_stm32_uart_hal_state_t
 #define SPI_STATE              nx_stm32_spi_dma_state_t
 #define DEVICE_STATE           nx_stm32_spi_dma_endpoint_state_t

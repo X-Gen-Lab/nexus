@@ -1,6 +1,7 @@
 """Verify complete face-to-method retention independently of build success."""
 
 import struct
+import json
 from copy import deepcopy
 from pathlib import Path
 import tempfile
@@ -11,6 +12,23 @@ from tools.evidence.common import EvidenceError
 from tools.measurement import retention
 from tools.measurement.retention import inspect_provider_retention, source_contracts
 from tools.measurement.elf import Elf32
+
+
+def package_tree(root):
+    """A declarative audit scope; CMake still owns the actual source graph."""
+    package = root / "soc/acme/reviewed"
+    package.mkdir(parents=True, exist_ok=True)
+    for name in ("soc.json", "routes.json"):
+        (package / name).write_text("{}\n")
+    (package / "CMakeLists.txt").write_text("# Reviewed fixture target.\n")
+    (package / "package.json").write_text(json.dumps({
+        "schema_version": 1, "interface_version": 1, "id": "reviewed",
+        "family": "reviewed", "vendor": "acme", "source_directory": ".",
+        "facts": {"soc": "soc.json", "routes": "routes.json"},
+        "dependencies": {},
+        "cmake": {"entry": "CMakeLists.txt", "target": "reviewed_provider"},
+        "exports": {"roots": ["."], "exclude": ["testing"]}}))
+    return package
 
 
 BINDINGS = """
@@ -149,7 +167,7 @@ class ComponentPublicContractsTests(unittest.TestCase):
         root = Path(directory)
         base = root / "io/include/nexus/io/base.h"
         header = root / "components/probe/include/nexus/components/probe.h"
-        source = root / "soc/stm32/stm32f4/drivers/probe.c"
+        source = package_tree(root) / "drivers/port/probe.c"
         metadata = header.with_name("metadata.h")
         face = ("struct nx_component_probe { const nx_component_probe_ops_t* ops; "
                 "void* context; };\n" if tagged else
@@ -241,7 +259,7 @@ class ComponentPublicContractsTests(unittest.TestCase):
         from tools.measurement.retention import component_owner_input_paths
         with tempfile.TemporaryDirectory() as directory:
             root, _, source, _ = self.tree(directory)
-            driver = root / "soc/stm32/stm32f4/drivers/ip/reviewed_ip/probe.c"
+            driver = package_tree(root) / "drivers/port/reviewed/probe.c"
             driver.parent.mkdir(parents=True)
             driver.write_text(
                 "const nx_component_probe_ops_t nx_shared_probe_ops = {"
@@ -251,9 +269,44 @@ class ComponentPublicContractsTests(unittest.TestCase):
             self.assertEqual(providers["nx_shared_probe_ops"]["source"],
                              file_identity(driver))
             self.assertEqual(shared_operation_symbols(root),
-                             {"nx_shared_probe_ops"})
+                             {"nx_base_ops", "nx_component_probe_ops",
+                              "nx_shared_probe_ops"})
             self.assertIn(driver, component_owner_input_paths(root))
             self.assertIn(source, component_owner_input_paths(root))
+
+    def test_declared_package_ownership_is_a_protected_audit_input(self):
+        from tools.evidence.common import file_identity
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, _, _ = self.tree(directory)
+            package = package_tree(root)
+            identities = source_contracts(root)[3]
+            protected = retention.component_owner_input_paths(root)
+            for name in ("package.json", "soc.json", "CMakeLists.txt"):
+                path = package / name
+                with self.subTest(path=path, boundary="identity"):
+                    self.assertIn(file_identity(path), identities)
+                with self.subTest(path=path, boundary="output protection"):
+                    self.assertIn(path, protected)
+
+    def test_package_qualified_private_template_uses_its_declared_owner(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, source, _ = self.tree(directory)
+            template = package_tree(root) / "drivers/port/private/operations.h"
+            template.parent.mkdir(parents=True)
+            template.write_text("const nx_component_probe_ops_t NX_PROBE_OPS = {"
+                                ".start = real_start, .stop = real_stop};\n")
+            source.write_text("#define NX_PROBE_OPS nx_component_probe_ops\n"
+                              '#include "drivers/port/private/operations.h"\n')
+            _, _, providers, _ = source_contracts(root)
+            self.assertEqual(providers["nx_component_probe_ops"]["source"]["path"],
+                             str(source))
+            self.assertEqual(providers["nx_component_probe_ops"]["template_source"]
+                             ["path"], str(template))
+            hidden = package_tree(root) / "testing/unselected.c"
+            hidden.parent.mkdir()
+            hidden.write_text("const nx_component_probe_ops_t nx_component_probe_ops"
+                              " = {.start = wrong, .stop = wrong};\n")
+            self.assertEqual(source_contracts(root)[2], providers)
 
     def test_duplicate_component_operations_and_face_types_are_rejected(self):
         for declaration, message in (
@@ -280,8 +333,33 @@ class ComponentPublicContractsTests(unittest.TestCase):
             source.write_text(source.read_text().replace(
                 "nx_component_probe_ops_t nx_component_probe_ops",
                 "nx_unreviewed_ops_t nx_component_probe_ops"))
-            with self.assertRaisesRegex(EvidenceError, "unsupported concrete"):
-                source_contracts(root)
+            bindings = ("static const nx_component_probe_t s_nx_face_component = {"
+                        "&nx_component_probe_ops, &s_nx_port_bus};\n")
+            with self.assertRaisesRegex(EvidenceError, "operations type"):
+                inspect_provider_retention(image(), bindings, root=root)
+
+    def test_unselected_private_operations_do_not_become_public_contracts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, source, _ = self.tree(directory)
+            source.write_text(source.read_text() +
+                "const nx_arbitrary_private_ops_t nx_private_clock_ops = {"
+                ".private_start = private_start};\n")
+            self.assertNotIn("nx_private_clock_ops", source_contracts(root)[2])
+
+    def test_private_global_cannot_replace_a_public_table_but_local_name_is_private(self):
+        for local in (False, True):
+            with self.subTest(local=local), tempfile.TemporaryDirectory() as directory:
+                root, _, source, _ = self.tree(directory)
+                private = source.with_name("private_clock.c")
+                private.write_text(("static " if local else "") +
+                    "const nx_arbitrary_private_ops_t nx_component_probe_ops = {"
+                    ".private_start = private_start};\n")
+                if local:
+                    self.assertEqual(source_contracts(root)[2]
+                        ["nx_component_probe_ops"]["source"]["path"], str(source))
+                else:
+                    with self.assertRaisesRegex(EvidenceError, "operations type"):
+                        source_contracts(root)
 
     def test_component_linked_method_bytes_are_still_audited(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -318,7 +396,7 @@ class OptionalOperationsTests(unittest.TestCase):
     def tree(self, directory):
         root = Path(directory)
         header = root / "io/include/nexus/io/probe.h"
-        source = root / "soc/stm32/stm32f4/drivers/probe.c"
+        source = package_tree(root) / "drivers/port/probe.c"
         header.parent.mkdir(parents=True)
         source.parent.mkdir(parents=True)
         header.write_text("""

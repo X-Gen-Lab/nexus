@@ -6,7 +6,9 @@
 #ifndef NX_F407_ATOMIC_CONTRACT_MODEL_H
 #define NX_F407_ATOMIC_CONTRACT_MODEL_H
 #include "stm32_official_model.h"
-#include "stm32f407_hal_atomic.h"
+
+/* The selected atomic port must replace the host model atomic macros last. */
+#include "drivers/uart/stm32f407_hal_atomic.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

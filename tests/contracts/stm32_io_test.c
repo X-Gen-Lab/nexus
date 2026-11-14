@@ -6,8 +6,20 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "drivers/adc/instance.h"
+#include "drivers/exti/instance.h"
+#include "drivers/flash/instance.h"
+#include "drivers/gpio/instance.h"
+#include "drivers/gpio/pins.h"
+#include "drivers/i2c/instance.h"
+#include "drivers/spi/instance.h"
+#include "drivers/timer/instance.h"
+#include "drivers/uart/instance.h"
+#include "drivers/watchdog/instance.h"
 #include "i2c_v1_async.h"
-#include "stm32f407_provider.h"
+#include "nexus/arch/arch.h"
+#include "nexus/core/time.h"
+#include "system/stm32f407_system.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -205,11 +217,6 @@ static void gpio_test(void) {
     assert(nx_stm32_gpio_clock_enable(4U) == NX_SUCCESS);
     assert((rcc.AHB1ENR & (1U << 4U)) != 0U);
     assert(nx_stm32_gpio_clock_enable(9U) == NX_ERROR_INVALID);
-    g_nx_stm32_gpioa_model.MODER = 3U << 26U;
-    assert(nx_stm32_uart1_pins_prepare() == NX_SUCCESS);
-    assert((rcc.APB2ENR & RCC_APB2ENR_USART1EN) != 0U);
-    assert((g_nx_stm32_gpioa_model.MODER & (3U << 26U)) == (3U << 26U));
-    assert((g_nx_stm32_gpioa_model.AFR[1] & 0xFF0U) == 0x770U);
     GPIO_TypeDef registers = {0};
     s_gpio_latch_bank = &registers;
     nx_stm32_gpio_state_t port = {

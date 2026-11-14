@@ -14,17 +14,17 @@ foreach(timer_clock pll84 hsi16)
     set(timer_clock_target "nexus_stm32_timer_clock_${timer_clock}_test")
     nexus_google_test(${timer_clock_target} STM32F4_LL
         SOURCES timer_clock_test.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer_capture.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer_capture_tim3.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer_capture_tim5.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer_capture_tim1.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer_capture_tim8.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/advanced_pwm.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/advanced_pwm_tim8.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/encoder.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer/timer_capture.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer/timer_capture_tim3.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer/timer_capture_tim5.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer/timer_capture_tim1.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer/timer_capture_tim8.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer/advanced_pwm.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer/advanced_pwm_tim8.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer/encoder.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
         LIBRARIES Nexus::Core
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/io/include"
             "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOURCE_DIR}/arch/include")
@@ -38,6 +38,6 @@ foreach(timer_clock pll84 hsi16)
         "-include${CMAKE_CURRENT_SOURCE_DIR}/timer_clock_model.h")
     foreach(small_timer 9 10 11 12 13 14)
         target_sources(${timer_clock_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer_capture_tim${small_timer}.c")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer/timer_capture_tim${small_timer}.c")
     endforeach()
 endforeach()

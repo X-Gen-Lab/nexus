@@ -7,9 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_clock.h"
-#include "stm32f407_entropy.h"
-#include "stm32f407_system.h"
+#include "drivers/entropy/stm32f407_entropy.h"
+#include "system/stm32f407_clock.h"
+#include "system/stm32f407_system.h"
 RNG_TypeDef nx_entropy_model_rng;
 RCC_TypeDef nx_entropy_model_rcc;
 nx_stm32_system_t g_nx_stm32_system;

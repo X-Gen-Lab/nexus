@@ -9,7 +9,7 @@
 #include "usb_factory_activation_test.h"
 #include "usb_factory_fixture.h"
 extern "C" {
-#include "stm32f407_usb_cold.h"
+#include "drivers/usb/stm32f407_usb_cold.h"
 }
 
 namespace {

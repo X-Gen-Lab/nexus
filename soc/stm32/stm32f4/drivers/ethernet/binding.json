@@ -1,0 +1,737 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "eth",
+      "modes": [
+        "raw-rmii",
+        "raw-mii"
+      ],
+      "implementation": "eth",
+      "headers": [
+        "drivers/ethernet/stm32f407_eth_cold.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_eth_mac_t",
+        "ops": "nx_eth_mac_ops",
+        "declarations": [
+          {
+            "use": "packet-pins"
+          },
+          {
+            "role": "eth_tx",
+            "type": "nx_eth_descriptor_t",
+            "const": false,
+            "count": {
+              "source": "item.options.tx_count"
+            }
+          },
+          {
+            "role": "eth_rx",
+            "type": "nx_eth_descriptor_t",
+            "const": false,
+            "count": {
+              "source": "item.options.rx_count"
+            }
+          },
+          {
+            "role": "eth_tx_slots",
+            "type": "nx_eth_tx_slot_t",
+            "const": false,
+            "count": {
+              "source": "item.options.tx_count"
+            }
+          },
+          {
+            "role": "eth_rx_slots",
+            "type": "nx_eth_rx_slot_t",
+            "const": false,
+            "count": {
+              "source": "item.options.rx_count"
+            }
+          },
+          {
+            "role": "eth_storage",
+            "type": "uint8_t",
+            "const": false,
+            "count": {
+              "source": "selected.constants.packet.rx_storage_extent"
+            },
+            "alignment": 4
+          },
+          {
+            "role": "eth_receipt",
+            "type": "nx_stm32_eth_pin_receipt_t",
+            "const": false
+          },
+          {
+            "role": "eth_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "array": [
+                {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "selected.constants.packet.ethernet_region.origin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "selected.constants.packet.ethernet_region.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "flags": {
+                          "array": [
+                            {
+                              "symbol": "NX_DMA_MEMORY_READ"
+                            },
+                            {
+                              "symbol": "NX_DMA_MEMORY_WRITE"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  ]
+                }
+              ]
+            },
+            "count": 1
+          },
+          {
+            "role": "eth_config",
+            "type": "nx_stm32_eth_cold_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "pins",
+                  {
+                    "ref": "pins",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "ref": "eth_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "tx_descriptors",
+                  {
+                    "ref": "eth_tx",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "rx_descriptors",
+                  {
+                    "ref": "eth_rx",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "tx_slots",
+                  {
+                    "ref": "eth_tx_slots",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "rx_slots",
+                  {
+                    "ref": "eth_rx_slots",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "storage",
+                  {
+                    "ref": "eth_storage",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "rx_storage_bytes",
+                  {
+                    "source": "item.options.rx_storage_bytes"
+                  }
+                ],
+                [
+                  "tx_count",
+                  {
+                    "source": "item.options.tx_count"
+                  }
+                ],
+                [
+                  "rx_count",
+                  {
+                    "source": "item.options.rx_count"
+                  }
+                ],
+                [
+                  "init_timeout_us",
+                  {
+                    "source": "item.options.init_timeout_us"
+                  }
+                ],
+                [
+                  "drain_timeout_us",
+                  {
+                    "source": "item.options.drain_timeout_us"
+                  }
+                ],
+                [
+                  "irq_policy",
+                  {
+                    "record": [
+                      [
+                        "kernel",
+                        {
+                          "source": "selected.kernel_policy",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "external_irq_count",
+                        {
+                          "source": "selected.irq_profile.external_count"
+                        }
+                      ],
+                      [
+                        "priority_bits",
+                        {
+                          "source": "selected.irq_profile.priority_bits"
+                        }
+                      ],
+                      [
+                        "syscall_ceiling",
+                        {
+                          "source": "selected.irq_profile.syscall_priority",
+                          "default": 0
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "mii",
+                  {
+                    "source": "selected.constants.packet.mii"
+                  }
+                ],
+                [
+                  "address",
+                  {
+                    "map": {
+                      "source": "item.options.address",
+                      "limit": 6,
+                      "value": {
+                        "source": "entry"
+                      }
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "mdio_face",
+            "type": "nx_mdio_port_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "ops",
+                  {
+                    "address": "nx_eth_mdio_ops"
+                  }
+                ],
+                [
+                  "context",
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "mdio_binding",
+            "type": "nx_mdio_port_t",
+            "const": true,
+            "value": {
+              "ref": "mdio_face",
+              "as": "address"
+            },
+            "static": false,
+            "pointer": true,
+            "pointee_const": true
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_eth_cold_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "eth_config",
+                "as": "address"
+              },
+              {
+                "ref": "eth_receipt",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_eth_cold_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "eth_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "eth_receipt",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "map": {
+              "source": "selected.vector_bindings",
+              "limit": 2,
+              "value": {
+                "name": {
+                  "source": "entry.handler",
+                  "as": "symbol"
+                },
+                "calls": [
+                  {
+                    "function": "nx_eth_mac_irq",
+                    "args": [
+                      {
+                        "ref": "port",
+                        "as": "address"
+                      }
+                    ]
+                  }
+                ],
+                "barrier": "nx_arch_dsb"
+              }
+            }
+          }
+        ],
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "pin_snapshots",
+          "limit": 32
+        },
+        "exports_from": [
+          "mdio_binding"
+        ],
+        "retain_on_failed_init": true
+      }
+    },
+    {
+      "kind": "eth_frames",
+      "modes": [
+        "rmii-vlan-sg-ptp",
+        "mii-vlan-sg-ptp"
+      ],
+      "implementation": "eth_frames",
+      "headers": [
+        "drivers/ethernet/stm32f407_eth_frames_cold.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_eth_frames_mac_t",
+        "ops": "nx_eth_frames_mac_ops",
+        "declarations": [
+          {
+            "use": "packet-pins"
+          },
+          {
+            "role": "eth_tx",
+            "type": "nx_eth_frames_descriptor_t",
+            "const": false,
+            "count": {
+              "source": "item.options.tx_count"
+            }
+          },
+          {
+            "role": "eth_rx",
+            "type": "nx_eth_frames_descriptor_t",
+            "const": false,
+            "count": {
+              "source": "item.options.rx_count"
+            }
+          },
+          {
+            "role": "eth_tx_slots",
+            "type": "nx_eth_frames_tx_slot_t",
+            "const": false,
+            "count": {
+              "source": "item.options.tx_count"
+            }
+          },
+          {
+            "role": "eth_rx_slots",
+            "type": "nx_eth_frames_rx_slot_t",
+            "const": false,
+            "count": {
+              "source": "item.options.rx_count"
+            }
+          },
+          {
+            "role": "eth_storage",
+            "type": "uint8_t",
+            "const": false,
+            "count": {
+              "source": "selected.constants.packet.rx_storage_extent"
+            },
+            "alignment": 4
+          },
+          {
+            "role": "eth_receipt",
+            "type": "nx_stm32_eth_pin_receipt_t",
+            "const": false
+          },
+          {
+            "role": "eth_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "array": [
+                {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "selected.constants.packet.ethernet_region.origin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "selected.constants.packet.ethernet_region.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "flags": {
+                          "array": [
+                            {
+                              "symbol": "NX_DMA_MEMORY_READ"
+                            },
+                            {
+                              "symbol": "NX_DMA_MEMORY_WRITE"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  ]
+                }
+              ]
+            },
+            "count": 1
+          },
+          {
+            "role": "eth_config",
+            "type": "nx_stm32_eth_frames_cold_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "pins",
+                  {
+                    "ref": "pins",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "ref": "eth_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "tx_descriptors",
+                  {
+                    "ref": "eth_tx",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "rx_descriptors",
+                  {
+                    "ref": "eth_rx",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "tx_slots",
+                  {
+                    "ref": "eth_tx_slots",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "rx_slots",
+                  {
+                    "ref": "eth_rx_slots",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "storage",
+                  {
+                    "ref": "eth_storage",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "rx_storage_bytes",
+                  {
+                    "source": "item.options.rx_storage_bytes"
+                  }
+                ],
+                [
+                  "tx_count",
+                  {
+                    "source": "item.options.tx_count"
+                  }
+                ],
+                [
+                  "rx_count",
+                  {
+                    "source": "item.options.rx_count"
+                  }
+                ],
+                [
+                  "init_timeout_us",
+                  {
+                    "source": "item.options.init_timeout_us"
+                  }
+                ],
+                [
+                  "drain_timeout_us",
+                  {
+                    "source": "item.options.drain_timeout_us"
+                  }
+                ],
+                [
+                  "irq_policy",
+                  {
+                    "record": [
+                      [
+                        "kernel",
+                        {
+                          "source": "selected.kernel_policy",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "external_irq_count",
+                        {
+                          "source": "selected.irq_profile.external_count"
+                        }
+                      ],
+                      [
+                        "priority_bits",
+                        {
+                          "source": "selected.irq_profile.priority_bits"
+                        }
+                      ],
+                      [
+                        "syscall_ceiling",
+                        {
+                          "source": "selected.irq_profile.syscall_priority",
+                          "default": 0
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "mii",
+                  {
+                    "source": "selected.constants.packet.mii"
+                  }
+                ],
+                [
+                  "address",
+                  {
+                    "map": {
+                      "source": "item.options.address",
+                      "limit": 6,
+                      "value": {
+                        "source": "entry"
+                      }
+                    }
+                  }
+                ],
+                [
+                  "clock_domain",
+                  {
+                    "source": "item.options.clock_domain"
+                  }
+                ],
+                [
+                  "checksum_offload",
+                  {
+                    "source": "item.options.checksum_offload"
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "mdio_face",
+            "type": "nx_mdio_port_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "ops",
+                  {
+                    "address": "nx_eth_frames_mdio_ops"
+                  }
+                ],
+                [
+                  "context",
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "mdio_binding",
+            "type": "nx_mdio_port_t",
+            "const": true,
+            "value": {
+              "ref": "mdio_face",
+              "as": "address"
+            },
+            "static": false,
+            "pointer": true,
+            "pointee_const": true
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_eth_frames_cold_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "eth_config",
+                "as": "address"
+              },
+              {
+                "ref": "eth_receipt",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_eth_frames_cold_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "eth_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "eth_receipt",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "map": {
+              "source": "selected.vector_bindings",
+              "limit": 2,
+              "value": {
+                "name": {
+                  "source": "entry.handler",
+                  "as": "symbol"
+                },
+                "calls": [
+                  {
+                    "function": "nx_eth_frames_mac_irq",
+                    "args": [
+                      {
+                        "ref": "port",
+                        "as": "address"
+                      }
+                    ]
+                  }
+                ],
+                "barrier": "nx_arch_dsb"
+              }
+            }
+          }
+        ],
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "pin_snapshots",
+          "limit": 32
+        },
+        "exports_from": [
+          "mdio_binding"
+        ],
+        "retain_on_failed_init": true
+      }
+    }
+  ]
+}

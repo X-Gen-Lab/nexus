@@ -43,7 +43,7 @@ class F407BlockConfigurationTests(unittest.TestCase):
             with self.assertRaises(FrozenInstanceError):
                 selected.options.max_blocks = 32
             source = bindings.emit(result)[1]
-            self.assertIn('#include "stm32f407_sdio.h"', source)
+            self.assertIn('#include "drivers/sdio/stm32f407_sdio.h"', source)
             self.assertIn("nx_stm32_sdio_prepare", source)
             self.assertIn("nx_stm32_sdio_close", source)
             self.assertIn("nx_stm32_sdio_ops", source)

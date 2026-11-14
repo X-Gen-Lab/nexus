@@ -6,7 +6,7 @@
 #ifndef NEXUS_STM32F407_SILICON_H
 #define NEXUS_STM32F407_SILICON_H
 #include "nexus/core/status.h"
-#include "stm32f4_traits.h"
+#include "private/stm32f4_traits.h"
 
 /**
  * \brief Classify one observed IDCODE using the selected SDK device group.

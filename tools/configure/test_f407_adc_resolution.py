@@ -59,7 +59,7 @@ class F407AdcResolutionTests(unittest.TestCase):
                         self.assertIn(".resolution = NX_STM32_ADC_RESOLUTION_CODE("
                                       + str(bits) + "u)", bindings.emit(result)[1])
             path = Path(temporary) / "resolution.c"
-            header = gate.ROOT / "soc/stm32/stm32f4/private/stm32f4_adc_encoding.h"
+            header = gate.ROOT / "soc/stm32/stm32f4/drivers/adc/stm32f4_adc_encoding.h"
             checks = [f'_Static_assert(NX_STM32_ADC_RESOLUTION_CODE({bits}u) == '
                       f'{code}u, "ADC resolution");'
                       for bits, code in ((12, 0), (10, 1), (8, 2), (6, 3))]

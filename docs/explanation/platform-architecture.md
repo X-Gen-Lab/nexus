@@ -38,8 +38,11 @@ The selected device, package and mode come from its reviewed catalogue; see
 internal-CRC software references have distinct evidence. A family directory or
 official HAL macro does not establish another part, mode or physical result.
 
-Private IP sources now belong to the F4 package. SoC targets select and compile
-those sources directly; source ownership adds no runtime dispatch layer.
+The F4 package keeps reviewed facts in `facts/`, system mechanisms in `system/`,
+and each controller's bindings, private instance layout and C implementation in
+`drivers/<domain>/`. Shared IP stays under `drivers/ip/`; `private/` holds shared
+contracts and binding fragments. `sdk/` selects official sources and private HAL
+configuration. SoC targets compile the selected sources directly.
 Native models live under `tests/support/native/` and require explicit
 `test_support=True`, CLI `--test-support` or `NEXUS_TEST_SUPPORT=ON` in CMake.
 They are test support, not a second production SoC.

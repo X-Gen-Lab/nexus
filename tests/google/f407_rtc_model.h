@@ -5,8 +5,8 @@
  */
 #ifndef NX_F407_RTC_MODEL_H
 #define NX_F407_RTC_MODEL_H
+#include "drivers/rtc/stm32f407_rtc.h"
 #include "stm32_official_model.h"
-#include "stm32f407_rtc.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

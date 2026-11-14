@@ -11,14 +11,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND
     foreach(engine ltdc dma2d)
         set(graphics_test "nexus_stm32_${engine}_test")
         set(graphics_profile
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/${engine}_hal")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/${engine}")
         set(graphics_model
             "${CMAKE_CURRENT_SOURCE_DIR}/stm32_${engine}_model.h")
         nexus_google_test(${graphics_test} STM32F4_LL
             SOURCES "stm32_${engine}_test.cpp"
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/${engine}.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/graphics/${engine}.c"
             LIBRARIES Nexus::IO Nexus::Arch
-            INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
                 "${NEXUS_SOURCE_DIR}/io/private"
                 "${graphics_profile}" "${CMAKE_CURRENT_SOURCE_DIR}")
         target_include_directories(${graphics_test} SYSTEM PRIVATE

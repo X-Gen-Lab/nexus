@@ -7,11 +7,11 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/usb/stm32f407_usb_device.h"
 #include "nexus/io/native/model.h"
 #include "nexus/io/usb_activation.h"
-#include "stm32f407_system.h"
-#include "stm32f407_usb_device.h"
 #include "stm32f407xx.h"
+#include "system/stm32f407_system.h"
 #include "usb_device.h"
 }
 extern "C" {

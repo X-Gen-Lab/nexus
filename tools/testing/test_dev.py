@@ -18,6 +18,14 @@ import package_source_sdk as source_sdk
 
 
 class DeveloperCommandTests(unittest.TestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory(prefix="developer dispatch ")
+        self.addCleanup(directory.cleanup)
+        build = Path(directory.name) / "build"
+        selection = patch.object(dev, "command_build", return_value=build)
+        selection.start()
+        self.addCleanup(selection.stop)
+
     def test_check_runs_tdd_for_requested_preset_and_propagates_failure(self):
         with patch.object(dev, "execute", side_effect=[0, 0, 0, 7]) as execute:
             result = dev.main(["check", "--preset", "native-release"])

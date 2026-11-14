@@ -37,13 +37,28 @@ class HeaderProjection:
     @classmethod
     def from_validated(cls, value):
         _fields(value, {"schema_version", "timebase_prefix", "pin_tables", "dma_memory"},
-                {"clock"})
+                {"clock", "physical_capabilities"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
             fail("Unsupported header projection schema")
         Symbol(value["timebase_prefix"])
         _fields(value["pin_tables"], {"capture", "advanced", "adc"})
         for name in value["pin_tables"].values():
             Symbol(name)
+        capabilities = value.get("physical_capabilities", {})
+        if not isinstance(capabilities, Mapping):
+            fail("Physical capability projection requires named controller kinds")
+        for kind, config in capabilities.items():
+            Symbol(kind)
+            _fields(config, {"field", "macro", "values"})
+            Symbol(config["field"])
+            Symbol(config["macro"])
+            allowed = config["values"]
+            if not isinstance(allowed, list) or not allowed:
+                fail("Physical capability projection requires distinct allowed limits")
+            for limit in allowed:
+                integer(limit, 0, 0xffffffff, "physical capability limit")
+            if len(set(allowed)) != len(allowed):
+                fail("Physical capability projection requires distinct allowed limits")
         dma = value["dma_memory"]
         _fields(dma, {"region", "origin_macro", "size_macro", "block_mode", "lane_macro"})
         for name in ("region", "origin_macro", "size_macro", "lane_macro"):
@@ -74,6 +89,15 @@ class HeaderProjection:
 
     def render(self, result, provider):
         lines = []
+        for kind, config in self.data.get("physical_capabilities", {}).items():
+            if not any(item.kind == kind for item in result.controllers):
+                continue
+            capabilities = result.physical_part.capabilities
+            if (not isinstance(capabilities, Mapping) or config["field"] not in capabilities or
+                    capabilities[config["field"]] not in config["values"]):
+                fail("Selected controller requires an explicit physical capability limit")
+            lines.append("#define " + config["macro"] + " " +
+                         _unsigned(capabilities[config["field"]]))
         if self.data.get("clock") is not None:
             lines.extend(self._clock(result))
         policy = result.provider_context.binding_policy

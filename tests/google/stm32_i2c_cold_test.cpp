@@ -7,8 +7,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_clock.h"
-#include "stm32f407_i2c_cold.h"
+#include "drivers/i2c/stm32f407_i2c_cold.h"
+#include "system/stm32f407_clock.h"
 nx_stm32_system_t g_nx_stm32_system;
 GPIO_TypeDef g_nx_stm32_gpioa_model;
 NVIC_Type g_nx_i2c_cold_nvic;

@@ -1,10 +1,10 @@
 # Only external register, reset, NVIC and CPU leaves are replaced by the model.
 nexus_google_test(nexus_stm32_i2c_target_cold_test STM32F4_LL
     SOURCES i2c_target_cold_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c_target.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_target.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::Core
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/io/include"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_i2c_target_cold_test SYSTEM PRIVATE
@@ -41,15 +41,15 @@ foreach(navigation input_paths.json configuration_code_paths.json)
 endforeach()
 nexus_google_test(nexus_stm32_i2c_target_factory_test STM32F4_LL
     SOURCES i2c_target_factory_test.cpp "${target_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c_target.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_target.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::IO
     INCLUDES "${target_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_i2c_target_factory_test SYSTEM PRIVATE

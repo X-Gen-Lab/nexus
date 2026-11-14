@@ -95,7 +95,7 @@ class SerialConstantEncodingTests(unittest.TestCase):
 #define DMA_SxCR_DMEIE (UINT32_C(1) << 1)
 #define DMA_SxCR_DIR_0 (UINT32_C(1) << 6)
 #define DMA_SxCR_CHSEL_Pos 25U
-#include "stm32f4_io_encoding.h"
+#include "private/stm32f4_io_encoding.h"
 _Static_assert(NX_STM32_IO_PIN_MASK(15U) == UINT32_C(0x8000), "pin mask");
 _Static_assert(NX_STM32_I2C_DMA_CONFIGURATION(0U, 0) == UINT32_C(0x10416), "rx");
 _Static_assert(NX_STM32_I2C_DMA_CONFIGURATION(7U, 1) == UINT32_C(0xe010456), "tx");
@@ -107,7 +107,7 @@ _Static_assert(NX_STM32_I2C_ADDRESS_TEN_BIT(10U), "10-bit address");
             path.write_text(source)
             result = subprocess.run([compiler, "-std=c11", "-Wall", "-Wextra", "-Werror",
                 "-pedantic", "-fsyntax-only", "-I",
-                str(configure.ROOT / "soc/stm32/stm32f4/private"), str(path)],
+                str(configure.ROOT / "soc/stm32/stm32f4"), str(path)],
                 capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
 
@@ -116,17 +116,15 @@ class SerialRecipeProjectionTests(unittest.TestCase):
     def library(self):
         from tools.configure.data_provider import Binding
         from tools.configure.static_fragments import StaticFragments
-        documents = [json.loads((configure.ROOT / "soc/stm32/stm32f4/bindings" /
-            (name + ".json")).read_text()) for name in
-            ("spi", "i2c", "spi_frames", "i2c_target")]
+        from tools.configure.tests.device_fixture import load_binding_facts
+        document = load_binding_facts(configure.ROOT / "soc/stm32/stm32f4")
         library = {"declarations": {}, "values": {}}
-        for document in documents:
-            for kind, values in document.get("static_fragments", {}).items():
-                self.assertFalse(set(library[kind]) & set(values))
-                library[kind].update(values)
+        for kind, values in document.get("static_fragments", {}).items():
+            library[kind].update(values)
         fragments = StaticFragments.from_validated(library)
         return tuple(Binding.create(row, fragments=fragments)
-                     for document in documents for row in document["bindings"])
+                     for row in document["bindings"]
+                     if row["kind"] in {"spi", "i2c", "i2c_target"})
 
     def test_every_selected_serial_layout_has_one_c_owner_and_typed_connections(self):
         from tools.configure.static_ir import Declaration

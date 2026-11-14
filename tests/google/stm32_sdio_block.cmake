@@ -1,16 +1,16 @@
 # One exact SDIO owner; the clock variant retains only its crossing contract.
 nexus_google_test(nexus_block_port_test SOURCES block_port_test.cpp
     LIBRARIES Nexus::IO)
-include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32SDIO.cmake")
+include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/STM32SDIO.cmake")
 
 function(nexus_sdio_contract target)
     nexus_google_test(${target} STM32F4_LL
         SOURCES stm32_sdio_block_test.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/sdio.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/sdio/sdio.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
         LIBRARIES Nexus::IO
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/tests/google"
             "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")

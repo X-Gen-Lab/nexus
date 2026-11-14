@@ -6,6 +6,7 @@ import unittest
 from tools.configure import configure as gate, dependencies
 from tools.configure.tests.f4_fixture import provider
 from tools.configure.tests.device_fixture import (load_soc_facts,
+                                                   load_authored_soc,
                                                    validate_soc_facts)
 
 
@@ -16,8 +17,8 @@ class DeviceViewTests(unittest.TestCase):
 
     def inputs(self):
         directory = gate.ROOT / "soc/stm32/stm32f4"
-        return (gate.load(directory / "soc.json"),
-                gate.load(directory / "devices.json"))
+        return (load_authored_soc(directory),
+                gate.load(directory / "facts/devices.json"))
 
     def resolve(self, soc, catalog, part="STM32F407VET6"):
         return gate.resolve_device_facts(
@@ -108,7 +109,7 @@ class DeviceViewTests(unittest.TestCase):
         self.assertEqual(view.modes["FMC"].interfaces["memory_window"],
                          ("cpu-window", "graphics-owned"))
         routes = gate.resolve_routes(gate.load(gate.ROOT /
-            "soc/stm32/stm32f4/routes.json"), selected.soc, view.part,
+            "soc/stm32/stm32f4/facts/routes.json"), selected.soc, view.part,
             self.provider, controller_profiles=selected.controller_profiles)
         route = routes["fmc-sdram-bank1-16"]
         self.assertEqual(route["variants"], ["STM32F479NIH6"])
@@ -124,7 +125,7 @@ class DeviceViewTests(unittest.TestCase):
     def test_f479_sdram_route_cannot_be_assigned_to_the_f446_profile(self):
         soc, catalog = self.inputs()
         selected = self.resolve(soc, catalog, "STM32F479NIH6")
-        routes = gate.load(gate.ROOT / "soc/stm32/stm32f4/routes.json")
+        routes = gate.load(gate.ROOT / "soc/stm32/stm32f4/facts/routes.json")
         route = next(item for item in routes["routes"]
                      if item["id"] == "fmc-sdram-bank1-16")
         route["variants"].append("STM32F446ZET6")
@@ -230,7 +231,7 @@ class DeviceViewTests(unittest.TestCase):
                 ("I2C1", "irq_numbers", True),
                 ("I2C1", "irq_numbers", {False: 31, "I2C1_ER": 32})):
             with self.subTest(controller=controller, field=field):
-                soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
+                soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/facts/soc.json")
                 soc["controllers"][controller][field] = value
                 with self.assertRaisesRegex(ValueError, "IRQ"):
                     validate_soc_facts(soc, "STM32F407VET6", self.provider.for_soc(soc))

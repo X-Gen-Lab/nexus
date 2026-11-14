@@ -3,9 +3,9 @@
 foreach(clock_family stm32f4)
     set(clock_target "nexus_${clock_family}_usb_clock_test")
     nexus_google_test(${clock_target} SOURCES usb_clock_test.cpp
-        "${NEXUS_SOC_SOURCE_${clock_family}}/usb_clock.c"
+        "${NEXUS_SOC_SOURCE_${clock_family}}/drivers/usb/usb_clock.c"
         LIBRARIES Nexus::Core
-        INCLUDES "${NEXUS_SOC_SOURCE_${clock_family}}/private"
+        INCLUDES "${NEXUS_SOC_SOURCE_${clock_family}}"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/io/include"
             "${NEXUS_SOURCE_DIR}/io/private")
@@ -20,9 +20,9 @@ foreach(clock_family stm32f4)
 endforeach()
 nexus_google_test(nexus_stm32f4_usb_hs_clock_test
     SOURCES usb_hs_clock_test.cpp
-        "${NEXUS_SOC_SOURCE_stm32f4}/usb_hs_clock.c"
+        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_hs_clock.c"
     LIBRARIES Nexus::Core
-    INCLUDES "${NEXUS_SOC_SOURCE_stm32f4}/private"
+    INCLUDES "${NEXUS_SOC_SOURCE_stm32f4}"
         "${NEXUS_SOURCE_DIR}/io/include" "${NEXUS_SOURCE_DIR}/arch/include")
 target_compile_options(nexus_stm32f4_usb_hs_clock_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/usb_clock_model.h")
@@ -34,9 +34,9 @@ target_compile_definitions(nexus_stm32f4_usb_hs_clock_test PRIVATE STM32F407xx
 
 nexus_google_test(nexus_stm32_usb_hal_time_test
     SOURCES usb_hal_time_test.cpp
-        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb_hal_time.c"
+        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_hal_time.c"
     LIBRARIES Nexus::Core
-    INCLUDES "${NEXUS_SOC_SOURCE_stm32f4}/private"
+    INCLUDES "${NEXUS_SOC_SOURCE_stm32f4}"
         "${NEXUS_SOURCE_DIR}/arch/include" "${NEXUS_SOURCE_DIR}/io/include")
 target_include_directories(nexus_stm32_usb_hal_time_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")

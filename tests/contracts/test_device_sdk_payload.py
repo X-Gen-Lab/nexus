@@ -184,7 +184,7 @@ class DeviceSDKPayloadTests(unittest.TestCase):
 
     def test_rehashed_omission_cannot_remove_new_provider_inputs(self):
         names = {"soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c",
-                 "soc/stm32/stm32f4/private/stm32f407_system.h",
+                 "soc/stm32/stm32f4/system/stm32f407_system.h",
                  "tests/support/native/descriptor.py",
                  "tests/support/native/drivers/rtc_lptim.c"}
         required = (*sdk.REQUIRED_FILES, *sdk.HOST_SUPPORT_FILES)

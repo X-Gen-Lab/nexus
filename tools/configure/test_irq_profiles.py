@@ -30,14 +30,14 @@ class InterruptProfileTests(unittest.TestCase):
     def test_irq_width_cannot_contradict_verified_soc_facts(self):
         for value in (True, 0, 9, 3):
             with self.subTest(value=value):
-                soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
+                soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/facts/soc.json")
                 soc["irq"]["priority_bits"] = value
                 with self.assertRaisesRegex(gate.ConfigurationError,
                                             "IRQ priority bits"):
                     validate_soc_facts(soc, "STM32F407ZGT6")
 
     def test_unknown_interrupt_fact_is_rejected(self):
-        soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
+        soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/facts/soc.json")
         soc["irq"] = {"priority_bits": 4, "syscall_priority": 1}
         with self.assertRaisesRegex(gate.ConfigurationError, "unknown"):
             validate_soc_facts(soc, "STM32F407ZGT6")
@@ -45,7 +45,7 @@ class InterruptProfileTests(unittest.TestCase):
     def selected_cpu_profile(self, bits):
         from tools.configure import cpu
         provider = maintained("stm32f4")
-        facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
+        facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/facts/soc.json")
         profile = cpu.resolve({**provider.CPU_FEATURES, **provider.CPU_ABI},
                               {**facts["irq"], "priority_bits": bits},
                               "freertos", enum_abi=provider.ENUM_ABI)
@@ -151,7 +151,7 @@ class PreflightIrqGeometryTests(unittest.TestCase):
         from tools.configure import resource_graph
         from tools.configure.ir import InterruptBindingIR
         from tools.configure.policies.gpio_phase import GpioPhasePolicy
-        facts = gate.load(gate.ROOT / "soc/stm32/stm32f4/bindings/gpio_policy.json")
+        facts = gate.load(gate.ROOT / "soc/stm32/stm32f4/drivers/gpio/gpio_policy.binding.json")
         policy = GpioPhasePolicy.from_validated(facts["domains"]["gpio_phase"])
         claim = resource_graph.ResourceClaimIR(
             "irq:" + vector, "serializer-owner", "fixture",

@@ -20,14 +20,15 @@ foreach(eth_frames_family stm32)
         "nexus_${eth_frames_family}_eth_frames_factory_test")
     nexus_google_test(${eth_frames_target}
         SOURCES ethernet_frames_factory_test.cpp "${eth_frames_bundle}/bindings.c"
-            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/system.c"
-            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/drivers/gpio.c"
-            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/drivers/ethernet_frames.c"
+            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/system/clock.c"
+            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/system/startup.c"
+            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/drivers/gpio/gpio.c"
+            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/drivers/ethernet/ethernet_frames.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${eth_frames_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOC_SOURCE_${eth_frames_soc}}"
-            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/private")
+            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}")
     target_compile_options(${eth_frames_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/ethernet_frames_factory_model.h"
         -fdata-sections -ffunction-sections -fno-pie)
@@ -38,10 +39,10 @@ foreach(eth_frames_family stm32)
     set_property(TARGET ${eth_frames_target} APPEND PROPERTY LINK_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/eth_frames_host_dma.ld")
     target_sources(${eth_frames_target} PRIVATE
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c")
     # Model excludes reset-only CPU assembly, never the actual clock/timer
     # transaction. CPP binds the real System context to the same MMIO map.
     target_compile_definitions(${eth_frames_target} PRIVATE

@@ -13,11 +13,11 @@ else()
     return()
 endif()
 add_library(nexus_stm32f407_handoff STATIC EXCLUDE_FROM_ALL
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/handoff.c")
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/handoff.c")
 nexus_apply_target_policy(nexus_stm32f407_handoff)
 target_include_directories(nexus_stm32f407_handoff PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include" PRIVATE
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
     "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
 target_include_directories(nexus_stm32f407_handoff SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")

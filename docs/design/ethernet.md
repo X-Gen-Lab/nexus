@@ -154,7 +154,7 @@ this V3.1 PHY route. In particular, V4.1 oscillator, PHY address and connector
 ambiguities remain recorded Board unknowns. Products must admit their own reviewed
 route and electrical handoff before enabling hardware.
 
-The F4 binding is `soc/stm32/stm32f4/drivers/ethernet.c`; its MAC engine is in
+The F4 binding is `soc/stm32/stm32f4/drivers/ethernet/ethernet.c`; its MAC engine is in
 `soc/stm32/stm32f4/drivers/ip/legacy_mac/`. GoogleTest/GoogleMock tests execute
 that mechanism, the SDK-checked F407 binding and explicit Native
 ingress/egress/MDIO models in `tests/support/native/drivers/`, including W1C and stuck

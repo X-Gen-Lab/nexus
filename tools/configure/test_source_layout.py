@@ -21,7 +21,10 @@ class SourceLayoutTests(unittest.TestCase):
             with self.subTest(family=family):
                 item = descriptor.maintained(family)
                 self.assertEqual(item.source_directory, directory)
-                self.assertTrue({directory + "/soc.json", directory + "/routes.json",
+                self.assertTrue({directory + "/facts/soc.json",
+                                 directory + "/facts/controllers.json",
+                                 directory + "/facts/clocks.json",
+                                 directory + "/facts/routes.json",
                                  directory + "/package.json"}.issubset(item.fact_files))
                 self.assertEqual(item.configuration_modules, ())
                 self.assertTrue(all((ROOT / path).is_file()
@@ -60,13 +63,13 @@ class SourceLayoutTests(unittest.TestCase):
         spec.loader.exec_module(package)
         required = set(package.REQUIRED_FILES)
         expected = {
-            "soc/stm32/stm32f4/usb_hs_clock.c",
-            "soc/stm32/stm32f4/drivers/usb_hal_time.c",
-            "soc/stm32/stm32f4/private/stm32f407_usb_hs_clock.h",
-            "soc/stm32/stm32f4/private/stm32f407_usb_hs_cold.h",
-            "soc/stm32/stm32f4/private/stm32f407_usb_pins.h",
-            "soc/stm32/stm32f4/private/stm32f407_usb_phy.h",
-            "soc/stm32/stm32f4/private/usb_hal/stm32f4xx_hal_conf.h",
+            "soc/stm32/stm32f4/drivers/usb/usb_hs_clock.c",
+            "soc/stm32/stm32f4/drivers/usb/usb_hal_time.c",
+            "soc/stm32/stm32f4/drivers/usb/stm32f407_usb_hs_clock.h",
+            "soc/stm32/stm32f4/drivers/usb/stm32f407_usb_hs_cold.h",
+            "soc/stm32/stm32f4/drivers/usb/stm32f407_usb_pins.h",
+            "soc/stm32/stm32f4/drivers/usb/stm32f407_usb_phy.h",
+            "soc/stm32/stm32f4/sdk/hal_config/usb/stm32f4xx_hal_conf.h",
             "components/st_usb/CMakeLists.txt",
             "components/st_usb/private/usbh_conf.h",
             "components/st_usb/private/usb_host_stack.h",

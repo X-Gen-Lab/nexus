@@ -15,9 +15,9 @@ foreach(eth_family stm32)
     target_compile_options(${eth_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/ethernet_model.h")
     target_sources(${eth_target} PRIVATE
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ethernet.c")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ethernet/ethernet.c")
     target_include_directories(${eth_target} PRIVATE
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
     target_include_directories(${eth_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
         "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")

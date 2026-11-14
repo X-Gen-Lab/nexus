@@ -7,7 +7,11 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_platform_cold.h"
+#include "drivers/gpio/pins.h"
+#include "nexus/arch/arch.h"
+#include "nexus/core/time.h"
+#include "system/stm32f407_platform_cold.h"
+#include "system/stm32f407_system.h"
 nx_stm32_system_t g_nx_stm32_system;
 NVIC_Type g_f4_model_nvic;
 SCB_Type g_f4_model_scb;

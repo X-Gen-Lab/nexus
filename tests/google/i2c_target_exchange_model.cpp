@@ -8,8 +8,8 @@
  */
 #include "i2c_target_exchange_model.h"
 extern "C" {
-#include "stm32f407_clock.h"
-#include "stm32f407_i2c_target.h"
+#include "drivers/i2c/stm32f407_i2c_target.h"
+#include "system/stm32f407_clock.h"
 }
 #include <cstring>
 

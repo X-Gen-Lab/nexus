@@ -9,7 +9,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         set(sai_test "nexus_stm32_sai_${slice}_test")
         set(sai_model "${CMAKE_CURRENT_SOURCE_DIR}/stm32_sai_model.h")
         set(sai_profile
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/sai_hal")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/sai")
         set(sai_definitions STM32F446xx NEXUS_STM32_MODEL=1)
         if(NOT slice STREQUAL "slave")
             list(APPEND sai_definitions NX_SAI_MASTER_TEST=1)
@@ -19,11 +19,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         endif()
         nexus_google_test(${sai_test} STM32F4_LL
             SOURCES stm32_sai_test.cpp
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/audio_sai.c"
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/audio_sai_blocks.c"
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/av.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/audio/audio_sai.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/audio/audio_sai_blocks.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/av/av.c"
             LIBRARIES Nexus::IOAudio Nexus::IOStream Nexus::Arch
-            INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
                 "${sai_profile}" "${CMAKE_CURRENT_SOURCE_DIR}")
         set(sai_hal "${sai_test}_hal")
         add_library(${sai_hal} OBJECT
@@ -35,7 +35,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         nexus_stm32f4_official(${sai_hal})
         target_include_directories(${sai_hal} PRIVATE
             "${sai_profile}" "${CMAKE_CURRENT_SOURCE_DIR}"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/arch/include")
         target_compile_features(${sai_hal} PRIVATE c_std_11)
         set_target_properties(${sai_hal} PROPERTIES C_EXTENSIONS OFF)

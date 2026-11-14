@@ -115,7 +115,7 @@ class ExtiHardwareConfigurationTests(unittest.TestCase):
         from tools.configure.tests.device_fixture import load_soc_facts
         package = configure.ROOT / "soc/stm32/stm32f4"
         soc = load_soc_facts(package / "soc.json")
-        routes = configure.load(package / "routes.json")["routes"]
+        routes = configure.load(package / "facts/routes.json")["routes"]
         for line in range(16):
             self.assertIn("hardware-event",
                           soc["controllers"][f"EXTI{line}"]["modes"])

@@ -20,12 +20,12 @@ foreach(can_family stm32)
     target_compile_definitions(${can_target} PRIVATE
         _init=nx_can_fixture_init _fini=nx_can_fixture_fini)
     target_sources(${can_target} PRIVATE
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c")
-    target_sources(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/can.c")
-    target_include_directories(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c")
+    target_sources(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/can/can.c")
+    target_include_directories(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
     target_include_directories(${can_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
         "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")

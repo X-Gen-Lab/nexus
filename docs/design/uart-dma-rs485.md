@@ -20,7 +20,7 @@ heap、设备扫描、隐藏 worker 或默认 OS 锁。生产 owner 是
 这些接收／双向 DMA 模式按受审路线接入 STM32F407 的 USART1／2／3／6 和
 UART4／5，共用接收与排空算法。每个实例使用自己的 DMA、IRQ、APB 和引脚事实，
 权威元组见
-[`stm32f407_uart_hardware.h`](../../soc/stm32/stm32f4/private/stm32f407_uart_hardware.h)。
+[`stm32f407_uart_hardware.h`](../../soc/stm32/stm32f4/drivers/uart/stm32f407_uart_hardware.h)。
 例如 USART1 默认 RX 是 DMA2 stream2 channel4，TX 是 DMA2 stream7 channel4；
 不能把此路线套用到其他实例。控制器编号来自芯片手册，不能把公共 opaque resource
 ID 的编码当成物理 DMA 编号。配置必须独占 UART、DMA 目标、向量、时钟和引脚，
@@ -151,7 +151,7 @@ status/data 清除竞态、epoch 耗尽、双向取消、flow 配置、RS485 set
 合同，不证明电气波形、总线仲裁或物理延迟。
 
 当前 F4 接收、双向与 TX DMA 实现分别位于
-`soc/stm32/stm32f4/drivers/uart_receive.c`、`uart_duplex.c` 和 `uart_dma.c`，
+`soc/stm32/stm32f4/drivers/uart/uart_receive.c`、`uart_duplex.c` 和 `uart_dma.c`，
 冷态资源归还由同目录的 `uart_cold.c` 管理。公共 RS485 adapter 在 `io/src/`
 实现，Native 叶模型位于 `tests/support/native/drivers/`。模式与 factory 装配测试、
 寄存器模型和 ARM 链接分别验证对应合同。

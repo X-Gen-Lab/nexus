@@ -11,8 +11,8 @@ extern "C" {
 #include "nexus/arch/arch.h"
 #include "nexus/core/time.h"
 #include "nexus/os/lowpower.h"
-#include "stm32f407_lowpower.h"
-#include "stm32f407_system.h"
+#include "system/stm32f407_lowpower.h"
+#include "system/stm32f407_system.h"
 #include "timebase_lowpower.h"
 #include "timebase_soc_model.h"
 nx_stm32_system_t g_nx_stm32_system{};

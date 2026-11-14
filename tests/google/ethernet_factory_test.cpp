@@ -7,12 +7,15 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/ethernet/stm32f407_eth.h"
+#include "drivers/ethernet/stm32f407_eth_cold.h"
+#include "drivers/gpio/instance.h"
+#include "drivers/gpio/pins.h"
 #include "eth_mac.h"
+#include "nexus/core/time.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32f407_eth.h"
-#include "stm32f407_eth_cold.h"
-#include "stm32f407_provider.h"
+#include "system/stm32f407_system.h"
 }
 #include <array>
 #include <cstring>

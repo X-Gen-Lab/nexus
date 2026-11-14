@@ -24,15 +24,15 @@ foreach(adc_variant ve zg ve6 zg10)
     set(adc_target "nexus_stm32_adc_${adc_variant}_cold_factory_test")
     nexus_google_test(${adc_target} STM32F4_LL
         SOURCES stm32_adc_cold_factory_test.cpp "${adc_bundle}/bindings.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c"
         LIBRARIES Nexus::IO
         INCLUDES "${adc_bundle}"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
     target_include_directories(${adc_target} SYSTEM PRIVATE
@@ -49,14 +49,14 @@ endforeach()
 # assembled factories above retain their exact generated channel selection.
 nexus_google_test(nexus_stm32_adc_cold_direct_test STM32F4_LL
     SOURCES stm32_adc_cold_direct_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_stream.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_trigger.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_continuous.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_injected.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_stream.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_trigger.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_continuous.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_injected.c"
     LIBRARIES Nexus::IO
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include"
         "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
 target_include_directories(nexus_stm32_adc_cold_direct_test SYSTEM PRIVATE
@@ -77,17 +77,17 @@ nexus_google_configuration_inputs("${adc_internal_bundle}")
 nexus_google_test(nexus_stm32_adc_internal_cold_factory_test STM32F4_LL
     SOURCES stm32_adc_internal_factory_test.cpp
         "${adc_internal_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_stream.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_trigger.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_stream.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_trigger.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c"
     LIBRARIES Nexus::IO
     INCLUDES "${adc_internal_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include"
         "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
 target_include_directories(nexus_stm32_adc_internal_cold_factory_test

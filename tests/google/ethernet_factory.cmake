@@ -15,22 +15,22 @@ foreach(eth_family stm32)
     set(eth_target "nexus_${eth_family}_eth_factory_test")
     nexus_google_test(${eth_target} SOURCES ethernet_factory_test.cpp
         "${eth_bundle}/bindings.c"
-        "${NEXUS_SOC_SOURCE_${eth_soc}}/drivers/ethernet.c"
+        "${NEXUS_SOC_SOURCE_${eth_soc}}/drivers/ethernet/ethernet.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${eth_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
-            "${NEXUS_SOC_SOURCE_${eth_soc}}/private")
+            "${NEXUS_SOC_SOURCE_${eth_soc}}")
     target_compile_options(${eth_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/ethernet_model.h"
         "-include${CMAKE_CURRENT_SOURCE_DIR}/ethernet_factory_model.h")
     target_compile_definitions(${eth_target} PRIVATE
         _init=nx_eth_fixture_init _fini=nx_eth_fixture_fini)
     target_sources(${eth_target} PRIVATE
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c")
     target_include_directories(${eth_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
         "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")

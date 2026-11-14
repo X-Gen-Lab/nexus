@@ -48,7 +48,7 @@ class GpioPhaseDeclarationTests(unittest.TestCase):
 
 class GpioPhasePolicyTests(unittest.TestCase):
     def facts(self):
-        path = configure.ROOT / "soc/stm32/stm32f4/bindings/gpio_policy.json"
+        path = configure.ROOT / "soc/stm32/stm32f4/drivers/gpio/gpio_policy.binding.json"
         return json.loads(path.read_text())["domains"]["gpio_phase"]
 
     def test_output_speed_limits_are_declared_pad_facts_not_mcu_names(self):

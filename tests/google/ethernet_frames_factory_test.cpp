@@ -7,11 +7,11 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/ethernet/stm32f407_eth_frames_cold.h"
 #include "eth_frames_mac.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32f407_eth_frames_cold.h"
-#include "stm32f407_system.h"
+#include "system/stm32f407_system.h"
 nx_stm32_system_t g_nx_stm32_system;
 NVIC_Type g_nx_eth_frames_factory_nvic;
 uint32_t nx_boot_cpacr;

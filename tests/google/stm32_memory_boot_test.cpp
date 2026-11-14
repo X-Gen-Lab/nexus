@@ -8,7 +8,7 @@
  */
 extern "C" {
 #include "nexus_config.h"
-#include "private/stm32f407_system.h"
+#include "system/stm32f407_system.h"
 nx_stm32_system_t g_nx_stm32_system;
 }
 

@@ -12,7 +12,7 @@ import os
 from pathlib import Path
 import sys
 
-from tools.configure import factory, selected_contracts, board_hardware
+from tools.configure import factory, selected_contracts, board_hardware, packages
 from tools.configure.ir import thaw
 from tools.configure.providers import maintained
 from tools.configure.providers.common import mode_traits, route_dma
@@ -286,7 +286,8 @@ def board_catalogue(gate, root, *, board=None, board_package=None,
         gate.fail("SoC package escapes owned source")
     soc_path = (context.package.fact("soc") if context.package is not None else
                 gate.contained_file(soc_dir, "soc.json"))
-    soc = read(soc_path)
+    soc = (packages.read_soc(context.package, read=read)
+           if context.package is not None else read(soc_path))
     if context.external and context.package is None and "source_lock" in soc:
         gate.fail("External SDK sources must be bound by package inputs; "
                   "Nexus source_lock belongs to internal integrations")
@@ -316,11 +317,8 @@ def board_catalogue(gate, root, *, board=None, board_package=None,
     inputs = [*snapshots, *context.inputs]
     for name in gate.sequence(board_data.get("inputs", []), "declared Board inputs"):
         inputs.append(gate.contained_file(directory, name))
-    if "references" in soc:
-        reference = gate.contained_file(soc_dir, soc["references"])
-        gate.fact_references.validate(read(reference), soc["variants"],
-            profiles=getattr(provider, "REFERENCE_PROFILES", None))
-        inputs.append(reference)
+    if context.package is not None:
+        gate.fact_references.read_package(context.package, soc["variants"], provider, read=read)
     gate.bind_input_identities(inputs, root, snapshots, None, context)
     return {**({"hardware": hardware_conditions.to_dict()}
                 if hardware_conditions is not None else {}),
@@ -365,7 +363,8 @@ def binding_facts(gate, result, root):
             gate.fail("Binding query facts differ from the resolved input: " + str(source))
         return facts
 
-    facts = bound_fact(path)
+    facts = (packages.read_soc(context.package, read=bound_fact)
+             if context is not None and context.package is not None else bound_fact(path))
     catalog = bound_fact(catalog_path) if catalog_path is not None else None
     provider = context.provider if context is not None else maintained(data["soc_family"], root=root)
     selected = gate.resolve_device_facts(facts, data["part"], provider,

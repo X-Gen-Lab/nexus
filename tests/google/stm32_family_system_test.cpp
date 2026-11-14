@@ -8,11 +8,11 @@
  */
 extern "C" {
 #include "nexus/core/fault.h"
-#include "stm32f407_clock.h"
-#include "stm32f407_system.h"
-#include "stm32f4_clock_encoding.h"
+#include "system/stm32f407_clock.h"
+#include "system/stm32f407_system.h"
+#include "system/stm32f4_clock_encoding.h"
 #ifdef NEXUS_FAMILY_I2S_PROBE
-#include "stm32f407_audio.h"
+#include "drivers/audio/stm32f407_audio.h"
 uint32_t g_av_trace;
 uint32_t g_av_counter;
 #endif

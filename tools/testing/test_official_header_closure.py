@@ -335,7 +335,7 @@ class OfficialHeaderClosureTests(unittest.TestCase):
                 timeout=60, stage='f4-exported-nexus-configuration')
             self.assertEqual(configured.returncode, 0, configured.stderr)
             owned_includes = [private, configuration,
-                ROOT / 'soc/stm32/stm32f4/private', ROOT / 'io/private',
+                ROOT / 'soc/stm32/stm32f4', ROOT / 'io/private',
                 ROOT / 'io/include', ROOT / 'core/include', ROOT / 'arch/include']
             system_includes = includes[1:]
             owned_flags = [flag for flag in flags if flag != '-DUSE_HAL_DRIVER']
@@ -345,8 +345,9 @@ class OfficialHeaderClosureTests(unittest.TestCase):
                             '-Wmissing-prototypes']
             checkout_headers = (ROOT / f4.DIRECTORY / 'Inc').resolve()
             exported_headers = exported.resolve()
-            for unit in ('dac_dma', 'crc', 'chip'):
-                source = ROOT / 'soc/stm32/stm32f4/drivers' / (unit + '.c')
+            for unit, relative in (('dac_dma', 'dac/dac_dma.c'),
+                                   ('crc', 'crc/crc.c'), ('chip', 'identity/chip.c')):
+                source = ROOT / 'soc/stm32/stm32f4/drivers' / relative
                 dependencies = root / (unit + '.d')
                 result = run([
                     compiler, *owned_flags,

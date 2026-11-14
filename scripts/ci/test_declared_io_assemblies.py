@@ -5,7 +5,7 @@ from pathlib import Path
 import unittest
 
 from scripts.ci import provider_assemblies
-from tools.configure import configure
+from tools.configure import configure, packages
 from tools.maintenance import capabilities
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -99,12 +99,13 @@ class DeclaredModeIngress(unittest.TestCase):
         ]
         for family, part, controller, kind, mode in cases:
             path = ROOT / "soc/stm32" / family
+            package = packages.load(path / "package.json")
             selected = configure.resolve_device_facts(
-                configure.load(path / "soc.json"), part,
+                packages.read_soc(package, read=configure.load), part,
                 configure.maintained(family),
-                catalog=configure.load(path / "devices.json"))
-            routes = configure.resolve_routes(configure.load(path / "routes.json"),
-                selected.soc, part, configure.maintained(family),
+                catalog=configure.load(package.fact("device_catalog")))
+            routes = configure.resolve_routes(configure.load(package.fact("routes")),
+                selected.soc, part, selected.provider,
                 controller_profiles=selected.controller_profiles)
             candidates = [route for route in routes.values()
                           if route["controller"] == controller

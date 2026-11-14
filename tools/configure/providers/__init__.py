@@ -18,7 +18,7 @@ def maintained(family, *, test_support=False, root=None):
         fail(f"Unmaintained SoC integration provider: {family}")
     if "bindings" not in package.facts:
         fail("Production SoC package requires declarative software bindings")
-    return DataProvider.from_package(package, read(package.fact("soc")),
+    return DataProvider.from_package(package, packages.read_soc(package, read=read),
                                      read(package.fact("bindings")), read=read)
 
 

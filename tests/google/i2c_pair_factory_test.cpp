@@ -7,9 +7,11 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/i2c/stm32f407_i2c_async.h"
+#include "nexus/core/time.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32f407_i2c_async.h"
+#include "system/stm32f407_system.h"
 void I2C1_EV_IRQHandler(void);
 void I2C2_EV_IRQHandler(void);
 void I2C1_ER_IRQHandler(void);

@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_uart_wire.h"
+#include "drivers/uart/stm32f407_uart_wire.h"
 }
 #include "nexus/io/native/model.h"
 #include <gtest/gtest.h>

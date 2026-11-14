@@ -43,10 +43,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         nexus_google_test(${target} STM32F4_LL
             SOURCES "${crypto_contract}/${kind}_test.cpp"
                 "${NEXUS_SOURCE_DIR}/tests/contracts/stm32f407_uart_hal/cpu_model.cpp"
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/${driver}.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/crypto/${driver}.c"
             LIBRARIES Nexus::IO
             INCLUDES "${crypto_contract}"
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
                 "${NEXUS_SOURCE_DIR}/io/private"
                 "${NEXUS_SOURCE_DIR}/arch/include")
         target_compile_definitions(${target} PRIVATE STM32F415xx NEXUS_STM32_MODEL=1)
@@ -86,12 +86,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             nexus_google_test(${dma_target} STM32F4_LL
                 SOURCES "${crypto_contract}/${kind}_test.cpp"
                     "${NEXUS_SOURCE_DIR}/tests/contracts/stm32f407_uart_hal/cpu_model.cpp"
-                    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/${kind}.c"
-                    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/${kind}_dma.c"
-                    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/crypto_dma.c"
+                    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/crypto/${kind}.c"
+                    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/crypto/${kind}_dma.c"
+                    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/crypto/crypto_dma.c"
                 LIBRARIES Nexus::IO
                 INCLUDES "${crypto_contract}"
-                    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+                    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
                     "${NEXUS_SOURCE_DIR}/io/private"
                     "${NEXUS_SOURCE_DIR}/arch/include")
             target_compile_definitions(${dma_target} PRIVATE

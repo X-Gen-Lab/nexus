@@ -14,10 +14,10 @@ nexus_google_test(nexus_clock_domain_test SOURCES clock_domain_test.cpp
 foreach(sleep_family stm32f4)
     set(sleep_target "nexus_${sleep_family}_clock_sleep_test")
     nexus_google_test(${sleep_target} SOURCES clock_sleep_soc_test.cpp
-        "${NEXUS_SOC_SOURCE_${sleep_family}}/sleep.c"
+        "${NEXUS_SOC_SOURCE_${sleep_family}}/system/sleep.c"
         "${NEXUS_SOURCE_DIR}/arch/arm/cortex_m/nx_arch_sleep.c"
         LIBRARIES nexus_clock_domain_test_provider Nexus::Arch
-        INCLUDES "${NEXUS_SOC_SOURCE_${sleep_family}}/private"
+        INCLUDES "${NEXUS_SOC_SOURCE_${sleep_family}}"
             "${CMAKE_CURRENT_SOURCE_DIR}")
     target_compile_definitions(${sleep_target} PRIVATE
         NEXUS_ARCH_SLEEP_MODEL STM32F407xx)

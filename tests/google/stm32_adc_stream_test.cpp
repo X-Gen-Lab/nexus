@@ -13,7 +13,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_stream.h"
+#include "drivers/adc/stream.h"
+#include "nexus/core/time.h"
 }
 #include "nexus/io/native/model.h"
 #include <gtest/gtest.h>

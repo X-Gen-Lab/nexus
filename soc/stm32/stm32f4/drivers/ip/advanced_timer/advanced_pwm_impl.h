@@ -27,7 +27,7 @@
 #define NX_ADV_DEFAULT_TIMER_WRITE 1
 #define NX_TIMER_WRITE(reg, value) ((reg) = (uint32_t)(value))
 #endif
-#include "stm32f407_timer_output.h"
+#include "drivers/timer/stm32f407_timer_output.h"
 #ifndef NX_ADV_ACCESS_READY
 #define NX_ADV_DEFAULT_ACCESS_READY 1
 #define NX_ADV_ACCESS_READY()       (true)

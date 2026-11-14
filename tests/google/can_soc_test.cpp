@@ -8,8 +8,8 @@
  */
 extern "C" {
 #include "can.h"
+#include "drivers/can/stm32f407_can.h"
 #include "nexus/io/native/model.h"
-#include "stm32f407_can.h"
 #include "stm32f407xx.h"
 }
 #include <cstring>

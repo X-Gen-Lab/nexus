@@ -128,7 +128,7 @@ class GraphicsSdramConfigurationTests(unittest.TestCase):
         self.assertIsNone(result.clock_plan.pll_sai)
         source = bindings.emit(result)[1]
         self.assertIn(".graphics_memory = &s_nx_sdram_graphics_memory", source)
-        self.assertNotIn("stm32f4_ltdc.h", source)
+        self.assertNotIn("drivers/graphics/stm32f4_ltdc.h", source)
 
     def test_editor_schema_names_graphics_memory_and_graphics_owned_mode(self):
         schema = authored.editor_schema()

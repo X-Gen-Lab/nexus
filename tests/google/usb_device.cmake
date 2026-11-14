@@ -10,12 +10,12 @@ nexus_google_test(nexus_usb_device_dma_test SOURCES usb_device_dma_test.cpp
 foreach(usb_family stm32f4)
     set(usb_target "nexus_${usb_family}_usb_device_test")
     nexus_google_test(${usb_target} SOURCES usb_device_soc_test.cpp
-        "${NEXUS_SOC_SOURCE_${usb_family}}/drivers/usb_device.c"
-        "${NEXUS_SOC_SOURCE_${usb_family}}/usb_clock.c"
+        "${NEXUS_SOC_SOURCE_${usb_family}}/drivers/usb/usb_device.c"
+        "${NEXUS_SOC_SOURCE_${usb_family}}/drivers/usb/usb_clock.c"
         LIBRARIES Nexus::NativeModel Nexus::Arch
         INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
             "${NEXUS_SOURCE_DIR}/io/private"
-            "${NEXUS_SOC_SOURCE_${usb_family}}/private")
+            "${NEXUS_SOC_SOURCE_${usb_family}}")
     target_compile_options(${usb_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/usb_device_soc_model.h")
     target_include_directories(${usb_target} SYSTEM PRIVATE
@@ -36,10 +36,10 @@ nexus_google_test(nexus_usb_role_test SOURCES usb_role_test.cpp
     LIBRARIES Nexus::USBRole Nexus::NativeModel Nexus::Arch)
 nexus_google_test(nexus_stm32_usb_host_hal_test STM32F4_LL
     SOURCES usb_host_hal_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/usb_host.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/usb/usb_host.c"
     LIBRARIES Nexus::IOUSBHost Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/usb_hal")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/usb")
 target_compile_definitions(nexus_stm32_usb_host_hal_test PRIVATE STM32F407xx
     nx_time_now_us=nx_usb_host_model_now NX_USB_HOST_SIGNAL_MODEL=1)
 target_compile_options(nexus_stm32_usb_host_hal_test PRIVATE
@@ -49,12 +49,12 @@ target_include_directories(nexus_stm32_usb_host_hal_test SYSTEM PRIVATE
 nexus_use_cmsis_core(nexus_stm32_usb_host_hal_test)
 nexus_google_test(nexus_stm32_usb_hs_cold_test
     SOURCES usb_hs_cold_test.cpp
-        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb_device.c"
-        "${NEXUS_SOC_SOURCE_stm32f4}/usb_clock.c"
-        "${NEXUS_SOC_SOURCE_stm32f4}/usb_hs_clock.c"
+        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_device.c"
+        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_clock.c"
+        "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_hs_clock.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
-        "${NEXUS_SOC_SOURCE_stm32f4}/private")
+        "${NEXUS_SOC_SOURCE_stm32f4}")
 target_compile_options(nexus_stm32_usb_hs_cold_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/usb_device_soc_model.h")
 target_include_directories(nexus_stm32_usb_hs_cold_test SYSTEM PRIVATE
@@ -103,10 +103,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         VERBATIM)
     nexus_google_test(${usb_transport_target} STM32F4_LL
         SOURCES usb_host_transport_test.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/usb_host.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/usb/usb_host.c"
         LIBRARIES Nexus::IOUSBHost Nexus::NativeModel Nexus::Arch
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/usb_hal")
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/usb")
     target_compile_definitions(${usb_transport_target} PRIVATE STM32F407xx)
     target_compile_options(${usb_transport_target} PRIVATE
         "-include${usb_transport_model}")
@@ -126,8 +126,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast)
     target_include_directories(${usb_transport_vendor} PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/usb_hal"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/usb"
         "${NEXUS_SOURCE_DIR}/io/include"
         "${NEXUS_SOURCE_DIR}/core/include"
         "${NEXUS_SOURCE_DIR}/arch/include")

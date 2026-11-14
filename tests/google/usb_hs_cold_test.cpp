@@ -7,10 +7,10 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/usb/stm32f407_usb_hs_cold.h"
 #include "nexus/io/native/model.h"
-#include "stm32f407_clock.h"
-#include "stm32f407_system.h"
-#include "stm32f407_usb_hs_cold.h"
+#include "system/stm32f407_clock.h"
+#include "system/stm32f407_system.h"
 #include "usb_device.h"
 }
 extern "C" {

@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f4_sdram.h"
+#include "drivers/memory/stm32f4_sdram.h"
 }
 #include <array>
 #include <cstring>

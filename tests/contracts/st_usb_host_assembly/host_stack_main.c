@@ -6,9 +6,9 @@
  * \date            2026-11-10
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "drivers/usb/stm32f407_usb_host.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32f407_usb_host.h"
 #include "usb_host_stack.h"
 
 typedef struct {

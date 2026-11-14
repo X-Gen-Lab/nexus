@@ -1,5 +1,6 @@
 """Execute preset, change classification and subprocess boundary regressions."""
 
+from contextlib import contextmanager
 import json
 import os
 from pathlib import Path
@@ -769,6 +770,19 @@ class ProcessExecutionTests(unittest.TestCase):
 
 
 class DeveloperWorkflowTests(unittest.TestCase):
+    @contextmanager
+    def dispatch_workspace(self):
+        from tools.dev import dev
+        with tempfile.TemporaryDirectory(prefix="workflow dispatch ") as directory:
+            root = Path(directory)
+            (root / "CMakePresets.json").write_text(json.dumps({"version": 6,
+                "configurePresets": [{"name": "native-debug",
+                    "binaryDir": "${sourceDir}/build/native-debug"}],
+                "buildPresets": [{"name": "native-debug",
+                    "configurePreset": "native-debug"}]}))
+            with patch.object(dev, "ROOT", root):
+                yield root
+
     def test_interleaved_real_commands_keep_each_own_provenance_receipt(self):
         from concurrent.futures import ThreadPoolExecutor
         import threading
@@ -873,35 +887,38 @@ class DeveloperWorkflowTests(unittest.TestCase):
 
     def test_configure_and_build_automatically_capture_actual_command_provenance(self):
         from tools.dev import dev, provenance
-        for action in ("configure", "build"):
-            with self.subTest(action=action):
-                with patch.object(dev, "execute", return_value=dev.ExecutionResult(
-                        0, dev.ROOT / "build/quality/own/receipt.json")), \
-                        patch.object(dev, "executable", return_value="cmake"), \
-                        patch.object(provenance, "capture", return_value={}) as capture:
-                    result = dev.main([action, "--preset", "native-debug"])
-                self.assertEqual(result, 0)
-                capture.assert_called_once_with(dev.ROOT,
-                    dev.ROOT / "build/native-debug",
-                    dev.ROOT / "build/quality/own/receipt.json",
-                    action=action, expected_command=["cmake"] +
-                    (["--build"] if action == "build" else []) +
-                    ["--preset", "native-debug"], expected_cwd=dev.ROOT)
+        with self.dispatch_workspace() as root:
+            for action in ("configure", "build"):
+                with self.subTest(action=action):
+                    with patch.object(dev, "execute", return_value=dev.ExecutionResult(
+                            0, root / "build/quality/own/receipt.json")), \
+                            patch.object(dev, "executable", return_value="cmake"), \
+                            patch.object(provenance, "capture", return_value={}) as capture:
+                        result = dev.main([action, "--preset", "native-debug"])
+                    self.assertEqual(result, 0)
+                    capture.assert_called_once_with(root,
+                        root / "build/native-debug",
+                        root / "build/quality/own/receipt.json",
+                        action=action, expected_command=["cmake"] +
+                        (["--build"] if action == "build" else []) +
+                        ["--preset", "native-debug"], expected_cwd=root)
 
     def test_configure_binary_directory_override_is_preserved_in_provenance(self):
         from tools.dev import dev, provenance
-        with patch.object(dev, "execute", return_value=dev.ExecutionResult(
-                0, dev.ROOT / "build/quality/own/receipt.json")), \
-                patch.object(dev, "executable", return_value="cmake"), \
-                patch.object(provenance, "capture", return_value={}) as capture:
-            self.assertEqual(dev.main(["configure", "-B", "build/override"]), 0)
-        self.assertEqual(capture.call_args.args[1], dev.ROOT / "build/override")
+        with self.dispatch_workspace() as root:
+            with patch.object(dev, "execute", return_value=dev.ExecutionResult(
+                    0, root / "build/quality/own/receipt.json")), \
+                    patch.object(dev, "executable", return_value="cmake"), \
+                    patch.object(provenance, "capture", return_value={}) as capture:
+                self.assertEqual(dev.main(["configure", "-B", "build/override"]), 0)
+            self.assertEqual(capture.call_args.args[1], root / "build/override")
 
     def test_failed_command_never_captures_success_and_capture_failure_is_reported(self):
         from tools.dev import dev, provenance
         from contextlib import redirect_stdout, redirect_stderr
         import io
-        with patch.object(dev, "execute", return_value=7), \
+        with self.dispatch_workspace(), \
+                patch.object(dev, "execute", return_value=7), \
                 patch.object(dev, "executable", return_value="cmake"), \
                 patch.object(provenance, "capture") as capture:
             self.assertEqual(dev.main(["build"]), 7)

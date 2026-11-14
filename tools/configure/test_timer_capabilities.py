@@ -20,15 +20,15 @@ class TimerCapabilityObserverTests(unittest.TestCase):
         for family, prefix in (('stm32f4', 'stm32'),):
             for kind in ("timer_capture", "advanced_pwm"):
                 with self.subTest(family=family, kind=kind):
-                    source = configure.ROOT / f"{source_directory(family)}/drivers/{kind}.c"
+                    source = configure.ROOT / f"{source_directory(family)}/drivers/timer/{kind}.c"
                     self.assertEqual(capabilities.source_ops(source, configure.ROOT),
                                      {f"nx_{prefix}_{kind}_ops"})
-        source = configure.ROOT / 'soc/stm32/stm32f4/drivers/advanced_pwm_tim8.c'
+        source = configure.ROOT / 'soc/stm32/stm32f4/drivers/timer/advanced_pwm_tim8.c'
         self.assertEqual(capabilities.source_ops(source, configure.ROOT),
                          {'nx_stm32_tim8_advanced_pwm_ops'})
         for timer in ('TIM3', 'TIM5'):
             source = configure.ROOT / (
-                'soc/stm32/stm32f4/drivers/timer_capture_'+timer.lower()+'.c')
+                'soc/stm32/stm32f4/drivers/timer/timer_capture_'+timer.lower()+'.c')
             self.assertEqual(capabilities.source_ops(source, configure.ROOT),
                              {f'nx_stm32_{timer.lower()}_timer_capture_ops'})
 
@@ -95,7 +95,7 @@ class TimerCapabilityObserverTests(unittest.TestCase):
                     if row['kind'] == 'advanced_pwm' and row['controller'] == 'TIM8'
                     else row['kind'])
             self.assertEqual(row["exports"],
-                             [f"{source_directory(row['family'])}/drivers/{name}.c"])
+                             [f"{source_directory(row['family'])}/drivers/timer/{name}.c"])
             self.assertFalse(row["boards"])
 
 

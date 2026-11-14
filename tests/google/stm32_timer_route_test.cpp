@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_timer_cold.h"
+#include "drivers/timer/stm32f407_timer_cold.h"
 nx_stm32_system_t g_nx_stm32_system{};
 NVIC_Type g_nx_timer_route_nvic{};
 SCB_Type g_nx_timer_route_scb{};

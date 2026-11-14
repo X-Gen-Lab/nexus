@@ -7,12 +7,14 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/spi/dma.h"
 #include "i2c_v1_async.h"
 #include "nexus/arch/arch.h"
+#include "nexus/core/time.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
 #include "spi_dma_sequence.h"
-#include "stm32f407_dma.h"
+#include "system/stm32f407_system.h"
 #define GPIO_GATE    RCC->AHB1ENR
 #define SPI_GATE     RCC->APB2ENR
 #define SPI_GATE_BIT RCC_APB2ENR_SPI1EN

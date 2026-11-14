@@ -7,9 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/memory/stm32f407_fsmc.h"
 #include "nexus_bindings.h"
 #include "nexus_factory_strong.h"
-#include "stm32f407_fsmc.h"
 nx_stm32_system_t g_nx_stm32_system;
 uint32_t g_f4_model_mask;
 bool g_f4_model_isr;

@@ -8,8 +8,9 @@
  */
 #include "stm32_exti_model.h"
 extern "C" {
+#include "drivers/exti/instance.h"
 #include "nexus/components/infrared.h"
-#include "stm32f407_provider.h"
+#include "nexus/core/time.h"
 nx_stm32_exti_nvic_model_t g_stm32_exti_nvic;
 }
 #include <cstring>

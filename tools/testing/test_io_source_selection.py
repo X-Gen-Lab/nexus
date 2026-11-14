@@ -20,7 +20,7 @@ class IOSourceSelectionTests(unittest.TestCase):
             sources = {
                 "public": ('#include "nexus/io/uart_wire.h"\n'
                            'nx_uart_wire_mode_t mode = NX_UART_WIRE_LIN;\n'),
-                "private": ('#include "stm32f4_uart_wire_config.h"\n'
+                "private": ('#include "drivers/uart/stm32f4_uart_wire_config.h"\n'
                             'const nx_stm32_uart_wire_config_t wire = {\n'
                             ' .mode = NX_UART_WIRE_SMARTCARD,\n'
                             ' .prescaler = 21U, .guard_time = 16U };\n'),
@@ -33,7 +33,7 @@ class IOSourceSelectionTests(unittest.TestCase):
                 command = [compiler, "-std=c11", "-Wall", "-Wextra", "-Werror",
                            "-pedantic", "-I" + str(ROOT / "io/include"),
                            "-I" + str(ROOT / "core/include"),
-                           "-I" + str(ROOT / "soc/stm32/stm32f4/private"),
+                           "-I" + str(ROOT / "soc/stm32/stm32f4"),
                            "-c", str(path), "-o", str(root / (name + ".o"))]
                 result = subprocess.run(command, capture_output=True,
                                         text=True, timeout=30)

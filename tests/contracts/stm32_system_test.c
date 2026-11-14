@@ -6,7 +6,7 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "stm32f407_system.h"
+#include "system/stm32f407_system.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>

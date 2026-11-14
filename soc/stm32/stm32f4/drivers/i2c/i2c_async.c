@@ -1,0 +1,292 @@
+/**
+ * \file            i2c_async.c
+ * \brief           Exact SDK-checked I2C V1 routes and publisher lifecycle
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-11
+ * \copyright       Copyright (c) 2026 Nexus Team
+ */
+#include "drivers/i2c/stm32f407_i2c_async.h"
+#include "drivers/i2c/stm32f407_i2c_cold.h"
+#include "nexus/arch/arch.h"
+#include "private/stm32f4_irq_wake.h"
+#include "system/stm32f407_clock.h"
+#include <stddef.h>
+
+nx_result_t nx_stm32_i2c_async_prepare(nx_i2c_v1_state_t* port,
+                                       const nx_stm32_i2c_config_t* config,
+                                       nx_stm32_i2c_cold_receipt_t* receipt) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || receipt == NULL ||
+        !config->asynchronous)
+        return NX_ERROR_INVALID;
+    if (port->registers != NULL || port->active != NULL || port->initialized ||
+        port->wake != NULL || port->wake_publishers != 0U)
+        return NX_ERROR_BUSY;
+    uint16_t ccr;
+    uint8_t rise;
+    if (config->clock_hz != NEXUS_APB1_HZ || config->clock_hz < 2000000U ||
+        config->clock_hz > 50000000U || config->clock_hz % 1000000U != 0U ||
+        !nx_i2c_v1_timing((uint8_t)(config->clock_hz / 1000000U),
+                          config->max_hz, &ccr, &rise)) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    nx_result_t result = nx_stm32_i2c_async_cold_acquire(config, receipt);
+    if (result != NX_SUCCESS)
+        return result;
+    port->registers = (volatile uint32_t*)config->registers;
+    port->lines = config->lines;
+    port->peripheral_mhz = (uint8_t)(config->clock_hz / 1000000U);
+    port->dma = config->dma;
+    port->timing_ccr = ccr;
+    result = nx_stm32_i2c_async_initialize(port, config->priority);
+    if (result == NX_SUCCESS) {
+        receipt->effects |= NX_STM32_I2C_COLD_PREPARED;
+        result = nx_stm32_i2c_async_cold_verify(config, receipt);
+        if (result != NX_SUCCESS)
+            (void)nx_stm32_i2c_async_close(port, config, receipt);
+    } else if (nx_stm32_i2c_async_cold_release(config, receipt) == NX_SUCCESS) {
+        *port = (nx_i2c_v1_state_t){0};
+    }
+    return result;
+}
+
+nx_result_t nx_stm32_i2c_async_close(nx_i2c_v1_state_t* port,
+                                     const nx_stm32_i2c_config_t* config,
+                                     nx_stm32_i2c_cold_receipt_t* receipt) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (port == NULL || config == NULL || receipt == NULL ||
+        !config->asynchronous)
+        return NX_ERROR_INVALID;
+    /* A rejected prepare did not acquire this existing owner's state. */
+    if ((receipt->effects & NX_STM32_I2C_COLD_OWNED) == 0U)
+        return port->registers == NULL ? NX_SUCCESS : NX_ERROR_BUSY;
+    if ((receipt->effects & NX_STM32_I2C_COLD_PREPARED) != 0U) {
+        if (port->registers != (volatile uint32_t*)config->registers)
+            return NX_ERROR_INVALID;
+        nx_result_t result = nx_i2c_v1_async_ops.stop(port);
+        if (result != NX_SUCCESS)
+            return result;
+        receipt->effects &= (uint8_t)~NX_STM32_I2C_COLD_PREPARED;
+    }
+    nx_result_t result = nx_stm32_i2c_async_cold_release(config, receipt);
+    if (result == NX_SUCCESS)
+        *port = (nx_i2c_v1_state_t){0};
+    return result;
+}
+
+_Static_assert(offsetof(I2C_TypeDef, CR1) == 0U * sizeof(uint32_t),
+               "I2C CR1 layout");
+_Static_assert(offsetof(I2C_TypeDef, CR2) == 1U * sizeof(uint32_t),
+               "I2C CR2 layout");
+_Static_assert(offsetof(I2C_TypeDef, OAR1) == 2U * sizeof(uint32_t),
+               "I2C OAR1 layout");
+_Static_assert(offsetof(I2C_TypeDef, DR) == 4U * sizeof(uint32_t),
+               "I2C DR layout");
+_Static_assert(offsetof(I2C_TypeDef, SR1) == 5U * sizeof(uint32_t),
+               "I2C SR1 layout");
+_Static_assert(offsetof(I2C_TypeDef, SR2) == 6U * sizeof(uint32_t),
+               "I2C SR2 layout");
+_Static_assert(offsetof(I2C_TypeDef, CCR) == 7U * sizeof(uint32_t),
+               "I2C CCR layout");
+_Static_assert(offsetof(I2C_TypeDef, TRISE) == 8U * sizeof(uint32_t),
+               "I2C TRISE layout");
+_Static_assert(I2C_CR1_PE == (UINT32_C(1) << 0U), "I2C/DMA I2C_CR1_PE mask");
+_Static_assert(I2C_CR1_START == (UINT32_C(1) << 8U),
+               "I2C/DMA I2C_CR1_START mask");
+_Static_assert(I2C_CR1_STOP == (UINT32_C(1) << 9U),
+               "I2C/DMA I2C_CR1_STOP mask");
+_Static_assert(I2C_CR1_ACK == (UINT32_C(1) << 10U), "I2C/DMA I2C_CR1_ACK mask");
+_Static_assert(I2C_CR1_POS == (UINT32_C(1) << 11U), "I2C/DMA I2C_CR1_POS mask");
+_Static_assert(I2C_CR1_SWRST == (UINT32_C(1) << 15U),
+               "I2C/DMA I2C_CR1_SWRST mask");
+_Static_assert(I2C_CR2_ITERREN == (UINT32_C(1) << 8U),
+               "I2C/DMA I2C_CR2_ITERREN mask");
+_Static_assert(I2C_CR2_ITEVTEN == (UINT32_C(1) << 9U),
+               "I2C/DMA I2C_CR2_ITEVTEN mask");
+_Static_assert(I2C_CR2_ITBUFEN == (UINT32_C(1) << 10U),
+               "I2C/DMA I2C_CR2_ITBUFEN mask");
+_Static_assert(I2C_CR2_DMAEN == (UINT32_C(1) << 11U),
+               "I2C/DMA I2C_CR2_DMAEN mask");
+_Static_assert(I2C_CR2_LAST == (UINT32_C(1) << 12U),
+               "I2C/DMA I2C_CR2_LAST mask");
+_Static_assert(I2C_SR1_SB == (UINT32_C(1) << 0U), "I2C/DMA I2C_SR1_SB mask");
+_Static_assert(I2C_SR1_ADDR == (UINT32_C(1) << 1U),
+               "I2C/DMA I2C_SR1_ADDR mask");
+_Static_assert(I2C_SR1_BTF == (UINT32_C(1) << 2U), "I2C/DMA I2C_SR1_BTF mask");
+_Static_assert(I2C_SR1_ADD10 == (UINT32_C(1) << 3U),
+               "I2C/DMA I2C_SR1_ADD10 mask");
+_Static_assert(I2C_SR1_RXNE == (UINT32_C(1) << 6U),
+               "I2C/DMA I2C_SR1_RXNE mask");
+_Static_assert(I2C_SR1_TXE == (UINT32_C(1) << 7U), "I2C/DMA I2C_SR1_TXE mask");
+_Static_assert(I2C_SR1_BERR == (UINT32_C(1) << 8U),
+               "I2C/DMA I2C_SR1_BERR mask");
+_Static_assert(I2C_SR1_ARLO == (UINT32_C(1) << 9U),
+               "I2C/DMA I2C_SR1_ARLO mask");
+_Static_assert(I2C_SR1_AF == (UINT32_C(1) << 10U), "I2C/DMA I2C_SR1_AF mask");
+_Static_assert(I2C_SR1_OVR == (UINT32_C(1) << 11U), "I2C/DMA I2C_SR1_OVR mask");
+_Static_assert(I2C_SR2_MSL == (UINT32_C(1) << 0U), "I2C/DMA I2C_SR2_MSL mask");
+_Static_assert(I2C_SR2_BUSY == (UINT32_C(1) << 1U),
+               "I2C/DMA I2C_SR2_BUSY mask");
+_Static_assert(DMA_SxCR_EN == (UINT32_C(1) << 0U), "I2C/DMA DMA_SxCR_EN mask");
+_Static_assert(DMA_SxCR_DMEIE == (UINT32_C(1) << 1U),
+               "I2C/DMA DMA_SxCR_DMEIE mask");
+_Static_assert(DMA_SxCR_TEIE == (UINT32_C(1) << 2U),
+               "I2C/DMA DMA_SxCR_TEIE mask");
+_Static_assert(DMA_SxCR_HTIE == (UINT32_C(1) << 3U),
+               "I2C/DMA DMA_SxCR_HTIE mask");
+_Static_assert(DMA_SxCR_TCIE == (UINT32_C(1) << 4U),
+               "I2C/DMA DMA_SxCR_TCIE mask");
+_Static_assert(DMA_SxCR_MINC == (UINT32_C(1) << 10U),
+               "I2C/DMA DMA_SxCR_MINC mask");
+
+/** \brief Cold publisher facts are selected by the exact retained controller.
+ */
+static bool first_controller(const nx_i2c_v1_state_t* state) {
+    return state->registers == (volatile uint32_t*)(uintptr_t)I2C1;
+}
+/** \brief No shared vector registry or per-byte interrupt indirection. */
+static IRQn_Type event_irq(const nx_i2c_v1_state_t* state) {
+    return first_controller(state)                        ? I2C1_EV_IRQn
+           : state->registers == (volatile uint32_t*)I2C2 ? I2C2_EV_IRQn
+                                                          : I2C3_EV_IRQn;
+}
+/** \brief Error source belongs to the same retained controller identity. */
+static IRQn_Type error_irq(const nx_i2c_v1_state_t* state) {
+    return first_controller(state)                        ? I2C1_ER_IRQn
+           : state->registers == (volatile uint32_t*)I2C2 ? I2C2_ER_IRQn
+                                                          : I2C3_ER_IRQn;
+}
+/** \brief DMA stream ownership and request selectors remain distinct facts. */
+static IRQn_Type dma_irq(const nx_i2c_v1_state_t* state, bool receive) {
+    return (IRQn_Type)(receive ? state->dma->rx.publisher
+                               : state->dma->tx.publisher);
+}
+
+/** \brief Clear only pending publishers owned by this selected controller. */
+static void acknowledge(void* context) {
+    const nx_i2c_v1_state_t* state = context;
+#ifndef NEXUS_STM32_MODEL
+    NVIC_ClearPendingIRQ(event_irq(state));
+    NVIC_ClearPendingIRQ(error_irq(state));
+    if (state->dma != NULL) {
+        NVIC_ClearPendingIRQ(dma_irq(state, true));
+        NVIC_ClearPendingIRQ(dma_irq(state, false));
+    }
+#else
+    (void)state;
+#endif
+}
+
+/** \brief Disabled NVIC sources and pending detach precede sink release. */
+static nx_result_t stop_irqs(void* context) {
+    const nx_i2c_v1_state_t* state = context;
+#ifndef NEXUS_STM32_MODEL
+    NVIC_DisableIRQ(event_irq(state));
+    NVIC_DisableIRQ(error_irq(state));
+    if (state->dma != NULL) {
+        NVIC_DisableIRQ(dma_irq(state, true));
+        NVIC_DisableIRQ(dma_irq(state, false));
+    }
+#else
+    (void)state;
+#endif
+    acknowledge(context);
+#ifndef NEXUS_STM32_MODEL
+    if (NVIC_GetEnableIRQ(event_irq(state)) != 0U ||
+        NVIC_GetEnableIRQ(error_irq(state)) != 0U ||
+        NVIC_GetPendingIRQ(event_irq(state)) != 0U ||
+        NVIC_GetPendingIRQ(error_irq(state)) != 0U ||
+        (state->dma != NULL &&
+         (NVIC_GetEnableIRQ(dma_irq(state, true)) != 0U ||
+          NVIC_GetEnableIRQ(dma_irq(state, false)) != 0U ||
+          NVIC_GetPendingIRQ(dma_irq(state, true)) != 0U ||
+          NVIC_GetPendingIRQ(dma_irq(state, false)) != 0U))) {
+        return NX_ERROR_IO;
+    }
+#endif
+    return NX_SUCCESS;
+}
+
+/** \brief Validate every possible publisher using actual selected IRQ policy.
+ */
+static nx_result_t validate_wake(void* context, const nx_irq_wake_t* wake,
+                                 uint8_t ceiling) {
+    const nx_i2c_v1_state_t* state = context;
+    nx_result_t result =
+        nx_stm32_irq_wake_validate(wake, event_irq(state), ceiling);
+    if (result == NX_SUCCESS) {
+        result = nx_stm32_irq_wake_validate(wake, error_irq(state), ceiling);
+    }
+    if (result == NX_SUCCESS && state->dma != NULL) {
+        result =
+            nx_stm32_irq_wake_validate(wake, dma_irq(state, true), ceiling);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+        result =
+            nx_stm32_irq_wake_validate(wake, dma_irq(state, false), ceiling);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+    }
+    return result;
+}
+
+/** \brief Cold physical validation has no descriptor, clock or pin side
+ * effects. */
+nx_result_t nx_stm32_i2c_async_initialize(nx_i2c_v1_state_t* state,
+                                          uint8_t priority) {
+    if (state == NULL || priority > 15U) {
+        return NX_ERROR_INVALID;
+    }
+    if ((state->registers != (volatile uint32_t*)I2C1 &&
+         state->registers != (volatile uint32_t*)I2C2 &&
+         state->registers != (volatile uint32_t*)I2C3) ||
+        NEXUS_APB1_HZ % 1000000U != 0U ||
+        state->peripheral_mhz != NEXUS_APB1_HZ / 1000000U) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    if (!nx_i2c_v1_lines_valid(state->lines)) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    if (state->dma != NULL &&
+        !nx_stm32_i2c_dma_valid((I2C_TypeDef*)state->registers, state->dma)) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    /* A second private object cannot reinitialize an already enabled
+     * controller. Exact clock/pin/vector ownership still belongs to static cold
+     * assembly. */
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if ((state->registers[0] & 1U) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    nx_result_t result = nx_i2c_v1_initialize(state);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    state->ack_irqs = acknowledge;
+    state->stop_irqs = stop_irqs;
+    state->validate_wake = validate_wake;
+    acknowledge(state);
+#ifndef NEXUS_STM32_MODEL
+    NVIC_SetPriority(event_irq(state), priority);
+    NVIC_EnableIRQ(event_irq(state));
+    NVIC_SetPriority(error_irq(state), priority);
+    NVIC_EnableIRQ(error_irq(state));
+    if (state->dma != NULL) {
+        NVIC_SetPriority(dma_irq(state, true), priority);
+        NVIC_EnableIRQ(dma_irq(state, true));
+        NVIC_SetPriority(dma_irq(state, false), priority);
+        NVIC_EnableIRQ(dma_irq(state, false));
+    }
+#endif
+    return NX_SUCCESS;
+}
+
+_Static_assert(I2C_CCR_FS == 0x8000U && I2C_CCR_CCR == 0xFFFU,
+               "I2C V1 clock mode and count layout");

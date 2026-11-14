@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 GATE = ROOT / "scripts/ci/stm32f4_devices.py"
-CATALOG = ROOT / "soc/stm32/stm32f4/devices.json"
+CATALOG = ROOT / "soc/stm32/stm32f4/facts/devices.json"
 
 
 def implementation():
@@ -137,11 +137,11 @@ class STM32F4DeviceProbeTests(unittest.TestCase):
         gate = implementation()
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            catalog = root / "soc/stm32/stm32f4/devices.json"
+            catalog = root / "soc/stm32/stm32f4/facts/devices.json"
             catalog.parent.mkdir(parents=True)
             catalog.write_bytes(CATALOG.read_bytes())
             with self.assertRaisesRegex(ValueError, "missing|regular"):
-                gate.load_catalog(root)
+                gate.load_catalog(root, catalog_path=catalog)
 
     def test_vector_size_and_reset_entry_cannot_belong_to_another_profile(self):
         gate = implementation()
@@ -204,14 +204,37 @@ class STM32F4DeviceProbeTests(unittest.TestCase):
                 gate.check_compiler_version(text, "14.3.rel1")
 
 
+class CatalogPackagePathTests(unittest.TestCase):
+    def test_default_catalog_uses_declared_package_fact(self):
+        gate = implementation()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            package = root / "soc/acme/reviewed"
+            package.mkdir(parents=True)
+            for name in ("soc.json", "routes.json"):
+                (package / name).write_text("{}\n")
+            (package / "CMakeLists.txt").write_text("# Fixture entry.\n")
+            (package / "catalog-relocated.json").write_text("{}\n")
+            (package / "package.json").write_text(json.dumps({
+                "schema_version": 1, "interface_version": 1, "id": "reviewed",
+                "family": "stm32f4", "vendor": "acme", "source_directory": ".",
+                "facts": {"soc": "soc.json", "routes": "routes.json",
+                          "device_catalog": "catalog-relocated.json"},
+                "dependencies": {},
+                "cmake": {"entry": "CMakeLists.txt", "target": "reviewed_f4"},
+                "exports": {"roots": ["."], "exclude": []}}))
+            with self.assertRaisesRegex(ValueError, "catalog schema"):
+                gate.load_catalog(root)
+
+
 class STM32F4PrivateHeaderCompileTests(unittest.TestCase):
     """Private integration follows the selected SDK; no new runtime support."""
 
     def compile(self, name, text, device, *, preprocess=False):
         gate = implementation()
         compiler = gate.tools("arm-none-eabi-gcc")["gcc"]
-        includes = (ROOT, ROOT / "soc/stm32/stm32f4/private",
-                    ROOT / "soc/stm32/stm32f4/private/usb_hal",
+        includes = (ROOT, ROOT / "soc/stm32/stm32f4",
+                    ROOT / "soc/stm32/stm32f4/sdk/hal_config/usb",
                     ROOT / "soc/stm32/stm32f4/drivers/ip/fs_device_pio",
                     ROOT / "soc/stm32/stm32f4/drivers/ip/legacy_mac",
                     ROOT / "soc/stm32/stm32f4/drivers/ip/classic_can",
@@ -251,17 +274,17 @@ class STM32F4PrivateHeaderCompileTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_private_includes_preserve_the_exact_selected_device(self):
-        headers = ("stm32f407_clock.h", "stm32f407_system.h",
-                   "stm32f407_timer_output.h", "stm32f407_timer_hardware.h",
-                   "stm32f407_eth.h", "stm32f407_eth_frames.h",
-                   "stm32f407_timer_pins.h", "stm32f407_provider.h",
-                   "../drivers/usb_device.c", "../drivers/can.c")
+        headers = ("system/stm32f407_clock.h", "system/stm32f407_system.h",
+                   "drivers/timer/stm32f407_timer_output.h", "drivers/timer/stm32f407_timer_hardware.h",
+                   "drivers/ethernet/stm32f407_eth.h", "drivers/ethernet/stm32f407_eth_frames.h",
+                   "drivers/timer/stm32f407_timer_pins.h", "private/model.h",
+                   "drivers/usb/usb_device.c", "drivers/can/can.c")
         for index, header in enumerate(headers):
             with self.subTest(header=header):
                 # This header-identity probe selects no runnable timer channels.
                 connections = ('#define NEXUS_STM32_CAPTURE_PINS(X)\n'
                                '#define NEXUS_STM32_ADVANCED_PINS(X)\n'
-                               if header == "stm32f407_timer_pins.h" else '')
+                               if header == "drivers/timer/stm32f407_timer_pins.h" else '')
                 self.compile(f"dispatch-{index}", connections + f'#include "{header}"\n'
                              '#if !defined(__STM32F405xx_H) || '
                              'defined(__STM32F407xx_H)\n'
@@ -271,10 +294,10 @@ class STM32F4PrivateHeaderCompileTests(unittest.TestCase):
     def test_usb_cold_headers_do_not_require_an_ethernet_controller(self):
         for device in ("STM32F405xx", "STM32F407xx"):
             with self.subTest(device=device):
-                text = ('#include "stm32f407_usb_cold.h"\n'
-                        '#include "stm32f407_usb_hs_cold.h"\n'
-                        '#include "stm32f407_usb_host_cold.h"\n'
-                        '#include "stm32f4_platform_lifecycle.h"\n')
+                text = ('#include "drivers/usb/stm32f407_usb_cold.h"\n'
+                        '#include "drivers/usb/stm32f407_usb_hs_cold.h"\n'
+                        '#include "drivers/usb/stm32f407_usb_host_cold.h"\n'
+                        '#include "system/stm32f4_platform_lifecycle.h"\n')
                 if device == "STM32F405xx":
                     text += ('#ifdef ETH\n#error "unexpected ETH peripheral"\n'
                              '#endif\n')
@@ -284,9 +307,9 @@ class STM32F4PrivateHeaderCompileTests(unittest.TestCase):
 
     def test_ethernet_cold_headers_keep_their_complete_resource_contract(self):
         self.compile("ethernet-cold-STM32F407xx",
-                     '#include "stm32f407_eth_cold.h"\n'
-                     '#include "stm32f407_eth_frames_cold.h"\n'
-                     '#include "stm32f4_platform_lifecycle.h"\n'
+                     '#include "drivers/ethernet/stm32f407_eth_cold.h"\n'
+                     '#include "drivers/ethernet/stm32f407_eth_frames_cold.h"\n'
+                     '#include "system/stm32f4_platform_lifecycle.h"\n'
                      'static nx_stm32_eth_resource_receipt_t resources;\n'
                      'int main(void) {\n'
                      '    nx_stm32_eth_resources_capture(&resources, true);\n'

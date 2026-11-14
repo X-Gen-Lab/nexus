@@ -219,7 +219,7 @@ class CaptureAudioConfigurationTests(unittest.TestCase):
                     self.assertNotIn("nx_stm32_capture_frames_config_t", source)
                     for operation in ("admit", "prepare", "close"):
                         self.assertIn("nx_stm32_capture_frames_" + operation + "(", source)
-                    self.assertIn('#include "stm32f407_capture_frames.h"', source)
+                    self.assertIn('#include "drivers/capture/stm32f407_capture_frames.h"', source)
                     self.assertIn("nx_stm32_capture_irq(&s_nx_port_camera.base)", source)
                     self.assertIn("nx_stm32_capture_dma_irq(&s_nx_port_camera.base)", source)
                     self.assertIn("&nx_stm32_capture_frames_ops", source)

@@ -109,7 +109,7 @@ class F407RtcConfigurationTests(unittest.TestCase):
     def test_generated_c_owns_no_register_algorithm_or_guessed_initial_date(self):
         result = self.resolve()
         source = bindings.emit(result)[1]
-        self.assertIn('#include "stm32f407_rtc.h"', source)
+        self.assertIn('#include "drivers/rtc/stm32f407_rtc.h"', source)
         self.assertIn(".policy = NX_STM32_RTC_ADOPT_RETAINED", source)
         self.assertIn(".allow_set = false, .has_initial = false", source)
         self.assertIn(".timeout_us = 2000000u, .poll_limit = 1000000u", source)

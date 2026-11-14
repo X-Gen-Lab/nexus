@@ -7,9 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/flash/cold.h"
+#include "drivers/flash/instance.h"
 #include "nexus/io/native/model.h"
-#include "stm32f407_basic_cold.h"
-#include "stm32f407_provider.h"
 }
 #include <array>
 #include <cstring>

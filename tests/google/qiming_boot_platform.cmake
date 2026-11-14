@@ -30,18 +30,18 @@ nexus_google_test(nexus_qiming_boot_platform_test STM32F4_LL
     SOURCES qiming_boot_platform_test.cpp
         "${boot_platform_bundle}/bindings.c"
         "${boot_platform_model}/host-linker-symbols.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/fsmc.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/fsmc_boot.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/memory/fsmc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/memory/fsmc_boot.c"
         "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Src/stm32f4xx_ll_fsmc.c"
     LIBRARIES Nexus::IO
     INCLUDES "${boot_platform_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/fsmc_hal"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/fsmc"
         "${NEXUS_SOURCE_DIR}/arch/include"
         "${CMAKE_CURRENT_SOURCE_DIR}")
 target_include_directories(nexus_qiming_boot_platform_test SYSTEM PRIVATE

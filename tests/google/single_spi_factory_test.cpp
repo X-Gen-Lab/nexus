@@ -7,11 +7,15 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/gpio/instance.h"
+#include "drivers/gpio/pins.h"
+#include "drivers/spi/instance.h"
+#include "drivers/spi/stm32f407_spi_cold.h"
 #include "nexus/arch/arch.h"
+#include "nexus/core/time.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32f407_provider.h"
-#include "stm32f407_spi_cold.h"
+#include "system/stm32f407_system.h"
 #define GPIO_GATE RCC->AHB1ENR
 #define SPI_GATE  RCC->APB2ENR
 #define SPI_BIT   RCC_APB2ENR_SPI1EN

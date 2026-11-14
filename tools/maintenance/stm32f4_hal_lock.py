@@ -26,6 +26,7 @@ sys.path.insert(0, str(ROOT))
 from tools.configure.metadata import fields, parse_json  # noqa: E402
 from tools.maintenance import cmsis_device_lock  # noqa: E402
 from tools.configure import dependencies  # noqa: E402
+from tools.configure.packages import find as find_package  # noqa: E402
 
 ORIGIN = "https://github.com/STMicroelectronics/stm32f4xx-hal-driver.git"
 COMMIT = "b6f0ed3829f3829eb358a2e7417d80bba1a42db7"
@@ -227,7 +228,12 @@ def _input_snapshot(source, lock_path, cmsis):
     source, cmsis = canonical_directory(source), canonical_directory(cmsis)
     sdk = source.parents[2]
     manifest = sdk / ".nexus-source-sdk.json"
-    required = {lock_path, ROOT / "soc/stm32/stm32f4/cmake/STM32Official.cmake"}
+    package = find_package(ROOT, "stm32f4")
+    required = {lock_path, *package.inputs}
+    required.update(path for directory in package.export_roots
+                    for path in directory.rglob("*")
+                    if path.is_file() and package.exports(path) and
+                    (path.name == "CMakeLists.txt" or path.suffix == ".cmake"))
     required.update(ROOT / name for name in
                     dependencies.source_names("platform", "stm32f4", sdk=True))
     paths = {*required, manifest}

@@ -7,10 +7,10 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/timer/stm32f407_timer_advanced.h"
+#include "drivers/timer/stm32f407_timer_cold.h"
+#include "drivers/timer/stm32f407_timer_pins.h"
 #include "nexus/arch/arch.h"
-#include "stm32f407_timer_advanced.h"
-#include "stm32f407_timer_cold.h"
-#include "stm32f407_timer_pins.h"
 #include "stm32f407xx.h"
 nx_stm32_system_t g_nx_stm32_system;
 NVIC_Type g_nx_timer_capture_nvic;

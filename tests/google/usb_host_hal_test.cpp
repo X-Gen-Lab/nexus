@@ -7,10 +7,10 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/usb/stm32f407_usb_host.h"
+#include "drivers/usb/stm32f407_usb_host_cold.h"
 #include "nexus/core/fault.h"
 #include "nexus/io/native/model.h"
-#include "stm32f407_usb_host.h"
-#include "stm32f407_usb_host_cold.h"
 }
 #undef nx_time_now_us
 extern "C" nx_time_us_t nx_time_now_us(void);

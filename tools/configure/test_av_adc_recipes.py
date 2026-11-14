@@ -1,22 +1,19 @@
 """ADC and AV static package recipes preserve the actual selected C layouts."""
-import json
 from pathlib import Path
 import unittest
 
 from tools.configure import configure
 from tools.configure.static_recipe import StaticRecipe
+from tools.configure.tests.device_fixture import load_binding_facts
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 class AdcAvRecipeTests(unittest.TestCase):
     def construct(self, item, result):
-        name = ("adc_group" if item.kind == "adc_group" else
-                "capture" if item.kind == "capture" else
-                "sai" if item.controller.startswith("SAI") else "audio")
-        path = ROOT / "soc/stm32/stm32f4/bindings" / (name + ".json")
-        records = json.loads(path.read_text())["bindings"]
-        selected = next(row for row in records if item.mode in row.get("modes", (row.get("mode"),)) and
+        records = load_binding_facts(ROOT / "soc/stm32/stm32f4")["bindings"]
+        selected = next(row for row in records if row["kind"] == item.kind and
+                        item.mode in row.get("modes", (row.get("mode"),)) and
                         item.controller in row["controllers"])
         recipe = StaticRecipe.from_validated(selected["static_recipe"])
         construction = recipe.construct(item, result, None, None, result.devices)

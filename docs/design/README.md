@@ -34,7 +34,7 @@ source_language: zh_CN
 | 采样、控制与捕获 | [多 ADC／注入组](f407-adc-groups.md)、[高级定时器](timer-advanced.md)、[有限脉冲／波形序列](f407-timer-waveform.md)、[DCMI／I2S2／3](f407-capture-audio.md) |
 | 有限／连续音频与外部时钟协调 | [DCMI／I2S 主合同](f407-capture-audio.md)、[Platform 有限 slave TX 路径](f407-i2s2-slave-tx.md)、[帧与流所有权](io-evolution.md) |
 | 日历、唤醒与备份域 | [RTC 与辅助源](f407-rtc.md)、[System／epoch 恢复](f407-system-power.md) |
-| 物理存储与介质 | [内部 Flash／OTP／保护维护](f407-storage.md)、[SDIO memory／MMC／functions](../../soc/stm32/stm32f4/private/sdio_hal/README.md)、[FSMC](f407-fsmc.md) |
+| 物理存储与介质 | [内部 Flash／OTP／保护维护](f407-storage.md)、[SDIO memory／MMC／functions](../../soc/stm32/stm32f4/sdk/hal_config/sdio/README.md)、[FSMC](f407-fsmc.md) |
 | 网络与 USB | [Classic CAN](classic-can.md)、[Ethernet 帧](ethernet-frames.md)、[MAC／MDIO](ethernet.md)、[USB Device／Host／显式角色](usb-device.md) |
 
 这些入口各自维护调用上下文、存储、deadline、硬件退出与失败后的责任；概述页不再
