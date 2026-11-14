@@ -13,7 +13,21 @@
 原始命令、报告与产物保存在构建输出或外部交付位置，PR 链接准确源码与实际执行范围。
 当前仓库不再维护候选封存、promotion、归档恢复或隔离复现引擎；历史流程从固定源码追溯。
 
-本轮便携 I/O 的结果入口为 [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62)。
+## 本批声明式接入的软件记录
+
+本批实际结果由 [PR #64](https://github.com/X-Gen-Lab/nexus/pull/64)导航。各记录保留实际源码、配置、检查器和原始命令；后续工具或文档变更不把原执行重标为新提交重新执行。
+
+[`f53e767`](https://github.com/X-Gen-Lab/nexus/tree/f53e76784c0bf6d4fc9a876322372dbda6ea04d2) 的安装 SDK 消费记录覆盖 51 个维护消费者；同一计划覆盖八个精确料号、七个器件视图。模型运行、ARM 链接、资源预算与检查器修正分别保留适用范围，不推导全部 F4 硬件模式或 scheduler 的物理执行。
+
+[`f53e767`](https://github.com/X-Gen-Lab/nexus/tree/f53e76784c0bf6d4fc9a876322372dbda6ea04d2) 的独立 GD32F470 GPIO／UART 软件参考完成 26 项 GoogleTest、四项供应负例和两组 ARM 镜像与预算。原始供应锁、逐文件内容、CMSIS pin 和安装路径分别核对；参考不进入生产家族或默认 SDK，物理 HIL 保持 `not_executed`。
+
+USB 的既有 PR 合并镜像保留 `b9ab867e7ed70df06d86377a295af78bc571e518` 来源，其源树与 `f53e767` 相同。新检查器对原始 ELF、bindings 与 resolved 输入独立复验；没有重建镜像，也没有将结果改记为最终工具提交的执行。
+
+最终工具提交 [`f3433f6`](https://github.com/X-Gen-Lab/nexus/tree/f3433f67ea891f45a3c7be672235532723e40677) 修正静态声明的 retention 检查与文档测试的 SDK 选择调用，真实失败和成功记录分别保留。新检查器对原消费者的适用检查重新执行，原 Native 程序和不要求 retention 的 ARM 产物按各自退出条件复核，没有重新编译；这不等于重新构建全部消费者。最终 SDK 从该干净提交重新导出并验证，前述产物仍保留原始执行身份。
+
+外部示例独立验收，私有记录不随公共平台发布。
+
+前序便携 I/O 的结果入口为 [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62)。
 平台实现 `6b59f666` 的四种 Native 模式分别完成完整执行；最终 `4bf4b5a2` 仅修正
 SDK 参考调用者，并在 clean source 上完成 34 个消费者及搬移前后完整性验证。
 原始失败和后续成功记录分别保留，完整 SDK 通过不把先前失败改为成功。静态分析

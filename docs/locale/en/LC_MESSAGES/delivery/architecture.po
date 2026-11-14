@@ -1,15 +1,12 @@
 # Actual-POT messages; independent semantic review completed for this source.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: c2b90f5aaec7d0b2ca8f80c1b598a87637b5ff2dcaef637fb906c1c610f67d1e\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: db228e0013158c2c1f76a907ed90766fe212e94102463bec26f104ed786b5009\n"
 
 msgid "当前系统架构与接入重构"
 msgstr "Current system architecture and integration refactor"
 
 msgid "Nexus 是静态装配的 C11 通用嵌入式平台。当前生产入口是 `soc/stm32/stm32f4/`；[精确支持](support.md)区分八个料号、七个器件视图、 四个 F407 Board、软件参考和实际验证。产品任务、队列、私有 PCB、Flash 分区与 恢复策略由外部工程拥有。Native 是显式测试支撑；未选厂商依赖保留但不进入默认闭包。"
 msgstr "Nexus is a statically assembled C11 embedded platform for reusable mechanisms. The production entry is `soc/stm32/stm32f4/`; [exact support](support.md) distinguishes eight parts, seven device views, four F407 Boards, software references and actual verification. External projects own product tasks, queues, private PCBs, Flash partitions and recovery policy. Native is explicit test support; unselected vendor dependencies remain retained outside the default closure."
-
-msgid "本页先说明现有运行合同，再说明接入重构目标与任务。目标不代表实现已经完成。 本批以 [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b) 为源码基线；前序软件交付见 [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63)。 每项新结果必须绑定实际源码和配置，不能继承基线的测试或 SDK 资格。"
-msgstr "This page first describes existing runtime contracts, then the integration refactor target and tasks. A target does not mean implementation is complete. This batch starts from [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b); [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63) records the preceding software delivery. Every new result must identify its actual source and configuration; baseline test or SDK qualification is not inherited."
 
 msgid "![FIG-01：平台职责与外部产品边界](../assets/diagrams/platform-architecture.svg)"
 msgstr "![FIG-01: platform responsibilities and external product boundaries](../assets/diagrams/platform-architecture.svg)"
@@ -176,9 +173,6 @@ msgstr "![FIG-03: current configuration and atomic generation](../assets/diagram
 msgid "FIG-03：当前配置与原子生成"
 msgstr "FIG-03: current configuration and atomic generation"
 
-msgid "图表示当前构建期输入和产物流，不表示运行期调用。现有 schema-2 TOML、只读 SoC／Board 事实、不可变 typed IR、原子 bundle 和 CMake 唯一目标图继续保留。 生产默认路径由声明式 package、通用 DataProvider、DomainPolicies、私有 `constants` 与有限 StaticRecipe 组成；旧 F4 家族 Python 构造模块已删除，不保留家族导入注册表。 事实与静态连接按同一快照解析，协议见[接入指南](../guides/provider-porting.md)。 字段权威、具体模式和消费者仍须本批集成验收；删除旧模块不等于整包取得软件资格。"
-msgstr "The diagram shows current build-time inputs and artifact flow, not runtime calls. Schema-2 TOML, read-only SoC/Board facts, immutable typed IR, atomic bundles and the sole CMake target graph remain. The production default consists of declarative packages, generic DataProvider, DomainPolicies, private `constants` and bounded StaticRecipe. The old F4 family Python constructor modules have been removed, with no family import registry retained. Facts and static connections resolve from one snapshot; the [porting guide](../guides/provider-porting.md) owns the protocol. Field authority, individual modes and consumers still require this batch's integrated acceptance; deleting old modules does not qualify the whole package."
-
 msgid "当前装配链路为：包与事实、Board 和 assembly → 通用解析与资源决策 → 类型化 IR → 静态 C 与选择结果 → 包内 CMake → 编译链接 → SDK 与外部消费者。箭头表示构建期 数据或产物依赖；各模式和消费者的资格以任务退出条件和本批实际回归为准。"
 msgstr "The current assembly chain is: package facts, Board and assembly → generic resolution and resource decisions → typed IR → static C and selections → package CMake → compilation and linking → SDK and external consumers. Arrows mean build-time data or artifact dependencies. Each mode and consumer qualifies through its task exit conditions and actual regressions for this batch."
 
@@ -278,9 +272,6 @@ msgstr "QuadSPI currently integrates the exact W25Q128JV. The [independent proto
 msgid "本轮重构退出范围"
 msgstr "Exit scope for this refactoring"
 
-msgid "本批要求所有当前承诺模式沿同一装配链迁移，保持公共合同、支持边界和消费者行为。 新增候选模式必须单独实现和验证，不能由头文件、接口或家族目录推定完成。 原有 WP01–WP12、IO01–IO20、R0–R13 与执行结果保留在 [固定基线架构页](https://github.com/X-Gen-Lab/nexus/blob/ba13686b91c94d19ef11acf910653ee2fcc9aa8b/docs/delivery/architecture.md)。 前序 [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62) 和 [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63) 各保留原源码与执行身份；旧计数 不重标为新提交的执行。物理 HIL 与远端 Actions 按用户要求暂缓，本地软件门禁仍必需。"
-msgstr "This batch migrates every currently promised mode through the same assembly chain while preserving public contracts, support boundaries and consumer behavior. New candidate modes require separate implementation and verification; headers, interfaces or family directories do not establish completion. The original WP01–WP12, IO01–IO20, R0–R13 and results remain in the [fixed baseline architecture page](https://github.com/X-Gen-Lab/nexus/blob/ba13686b91c94d19ef11acf910653ee2fcc9aa8b/docs/delivery/architecture.md). Earlier [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62) and [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63) retain their actual source and execution identities; old counts are not relabeled as execution of a new commit. Physical HIL and hosted Actions remain deferred by user request; local software gates remain required."
-
 msgid "本轮架构迭代任务"
 msgstr "Current architecture iteration tasks"
 
@@ -305,9 +296,6 @@ msgstr "A01"
 msgid "固定层依赖 DAG；公共层无反向依赖，SDK 私有"
 msgstr "Fix the layer dependency DAG; no reverse dependencies in public layers; SDK remains private"
 
-msgid "合同已固定，待集成验证"
-msgstr "Contract fixed; integrated validation pending"
-
 msgid "A02"
 msgstr "A02"
 
@@ -320,26 +308,17 @@ msgstr "A03"
 msgid "固定事实权威；每个字段只有一个作者来源"
 msgstr "Fix fact authority; each field has one authored source"
 
-msgid "pad 单一权威已落；其余字段核对中"
-msgstr "Single pad authority implemented; other fields under review"
-
 msgid "A04"
 msgstr "A04"
 
 msgid "区分 assembly、包、binding、IR 与接口兼容协议"
 msgstr "Separate assembly, package, binding, IR and interface compatibility protocols"
 
-msgid "协议已有实现，待集成验证"
-msgstr "Protocol implemented; integrated validation pending"
-
 msgid "A05"
 msgstr "A05"
 
 msgid "固定迁移基线、支持范围和结果身份，不继承旧资格"
 msgstr "Fix migration baseline, support scope and result identity without inherited qualification"
-
-msgid "基线已固定"
-msgstr "Baseline fixed"
 
 msgid "B：硬件事实与包协议"
 msgstr "B: hardware facts and package protocol"
@@ -349,9 +328,6 @@ msgstr "B01"
 
 msgid "统一内外置 package 协议与入口、版本、重复 ID 检查"
 msgstr "Unify internal/external package protocol, entries, versions and duplicate-ID checks"
-
-msgid "已有实现，待集成验证"
-msgstr "Implemented; integrated validation pending"
 
 msgid "B02"
 msgstr "B02"
@@ -365,17 +341,11 @@ msgstr "B03"
 msgid "统一 pin／AF／route 数据，不从路线名称推断能力"
 msgstr "Unify pin/AF/route data without inferring capability from route names"
 
-msgid "显式 pad／route 已落，接线一致性收尾中"
-msgstr "Explicit pads/routes implemented; wiring consistency being finalized"
-
 msgid "B04"
 msgstr "B04"
 
 msgid "统一 DMA／IRQ／trigger 与共享资源，冲突和 owner 可解释"
 msgstr "Unify DMA/IRQ/triggers and shared resources; explain conflicts and owners"
-
-msgid "已有资源模型，待完整冲突与共享验证"
-msgstr "Resource model implemented; complete conflict/shared-resource validation pending"
 
 msgid "B05"
 msgstr "B05"
@@ -383,26 +353,17 @@ msgstr "B05"
 msgid "统一 clock／memory 事实，明确 DMA 可达性和内存属性"
 msgstr "Unify clock/memory facts with explicit DMA reachability and memory attributes"
 
-msgid "已有显式事实，待内存／时钟集成验证"
-msgstr "Explicit facts implemented; integrated memory/clock validation pending"
-
 msgid "B06"
 msgstr "B06"
 
 msgid "Board 电气连接与 signal 统一，极性和安全电平分开"
 msgstr "Unify Board electrical wiring and signals; keep polarity separate from safe levels"
 
-msgid "已有 signal 与电气连接，待集成验证"
-msgstr "Signals and electrical connections implemented; integrated validation pending"
-
 msgid "B07"
 msgstr "B07"
 
 msgid "关联资料、勘误和模式，分开硬件、软件与执行状态"
 msgstr "Associate references, errata and modes; distinguish hardware, software and execution status"
-
-msgid "资料事实已有实现，待独立范围核对"
-msgstr "Reference facts implemented; independent scope review pending"
 
 msgid "C：配置与静态实例"
 msgstr "C: configuration and static instances"
@@ -412,9 +373,6 @@ msgstr "C01"
 
 msgid "通用包加载替代家族 Python 注册，新家族不修改公共注册表"
 msgstr "Replace family Python registration with generic package loading; new families do not edit a public registry"
-
-msgid "已有实现，待完整装配验证"
-msgstr "Implemented; complete assembly validation pending"
 
 msgid "C02"
 msgstr "C02"
@@ -434,17 +392,11 @@ msgstr "C04"
 msgid "清除公共 resolver 的家族分支，限制移入事实或私有 C"
 msgstr "Remove family branches from the public resolver; put constraints in facts or private C"
 
-msgid "公共策略剩余耦合清理中"
-msgstr "Remaining coupling in common policies being removed"
-
 msgid "C05"
 msgstr "C05"
 
 msgid "有限静态初始化替代任意 Construction C 字符串"
 msgstr "Replace arbitrary Construction C strings with bounded static initialization"
-
-msgid "生产路径已迁移，待完整生成与编译验证"
-msgstr "Production path migrated; complete generation and compilation validation pending"
 
 msgid "C06"
 msgstr "C06"
@@ -452,17 +404,11 @@ msgstr "C06"
 msgid "显式 IRQ 与屏障连接，删除正则改写生成 C"
 msgstr "Make IRQ/barrier connections explicit; remove regex rewriting of generated C"
 
-msgid "已有实现，待生成 IRQ 编译与模型验证"
-msgstr "Implemented; generated IRQ compilation and model validation pending"
-
 msgid "C07"
 msgstr "C07"
 
 msgid "默认 strong factory，跨类别 ID 误传在编译阶段失败"
 msgstr "Default to strong factory; reject cross-category IDs at compile time"
-
-msgid "待集成验证"
-msgstr "Integration verification pending"
 
 msgid "C08"
 msgstr "C08"
@@ -478,9 +424,6 @@ msgstr "D01"
 
 msgid "按模式整理 config／runtime／receipt，无最大状态并集或重复收条"
 msgstr "Separate config/runtime/receipt by mode without maximum-state unions or duplicate receipts"
-
-msgid "已有模式拆分，待本批成本与状态审查"
-msgstr "Mode-specific layouts implemented; costs and state review for this batch pending"
 
 msgid "D02"
 msgstr "D02"
@@ -511,9 +454,6 @@ msgstr "D06"
 
 msgid "signal、endpoint、bus owner 由装配统一连接"
 msgstr "Assembly connects signals, endpoints and bus owners consistently"
-
-msgid "固定连接与 signal 已落，待完整消费者验证"
-msgstr "Fixed connections and signals implemented; complete consumer validation pending"
 
 msgid "E：构建、依赖与 SDK"
 msgstr "E: build, dependencies and SDK"
@@ -560,9 +500,6 @@ msgstr "E07"
 msgid "包依赖进入现有来源与锁，未选库存不准备或默认导出"
 msgstr "Package dependencies use existing provenance and locks; unselected inventory is neither prepared nor exported by default"
 
-msgid "按包选依赖已有实现，待完整 SDK 验证"
-msgstr "Package-selected dependencies implemented; complete SDK validation pending"
-
 msgid "F：全部现有外设模式迁移"
 msgstr "F: migration of all existing peripheral modes"
 
@@ -578,17 +515,11 @@ msgstr "F02"
 msgid "UART／RS485：pin／DMA 路线数据化，DE 复用 signal"
 msgstr "UART/RS485: data-driven pin/DMA routes; DE reuses a signal"
 
-msgid "数据绑定与 DE signal 已落，待完整回归"
-msgstr "Data bindings and DE signal implemented; complete regression pending"
-
 msgid "F03"
 msgstr "F03"
 
 msgid "SPI：controller／endpoint／DMA 解耦，尾部与取消正确"
 msgstr "SPI: separate controller/endpoint/DMA; preserve tail and cancellation behavior"
-
-msgid "静态连接已迁移，CS／endpoint 收尾中"
-msgstr "Static connections migrated; CS/endpoint integration being finalized"
 
 msgid "F04"
 msgstr "F04"
@@ -596,17 +527,11 @@ msgstr "F04"
 msgid "I2C：消除固定 pin，明确 master／target／恢复边界"
 msgstr "I2C: remove fixed pins; define master/target/recovery boundaries"
 
-msgid "已有实现，待完整 master／target 回归"
-msgstr "Implemented; complete master/target regression pending"
-
 msgid "F05"
 msgstr "F05"
 
 msgid "DMA／TIM／ADC／DAC：资源与触发图一致，单位准确"
 msgstr "DMA/TIM/ADC/DAC: consistent resource and trigger graphs with accurate units"
-
-msgid "已有实现，待资源与触发组合验证"
-msgstr "Implemented; resource and trigger combination validation pending"
 
 msgid "F06"
 msgstr "F06"
@@ -614,17 +539,11 @@ msgstr "F06"
 msgid "I2S／SAI：slot／clock／DMA 配置化，块所有权保持"
 msgstr "I2S/SAI: configurable slots/clocks/DMA; preserve block ownership"
 
-msgid "已有实现，待选定音频模式集成验证"
-msgstr "Implemented; integrated validation of selected audio modes pending"
-
 msgid "F07"
 msgstr "F07"
 
 msgid "DCMI／LTDC／DMA2D：帧、块、图层、区域与退役语义保持"
 msgstr "DCMI/LTDC/DMA2D: preserve frame, block, layer, region and retirement semantics"
-
-msgid "已有实现，待帧／图层模式集成验证"
-msgstr "Implemented; integrated frame/layer mode validation pending"
 
 msgid "F08"
 msgstr "F08"
@@ -632,17 +551,11 @@ msgstr "F08"
 msgid "FMC／SDRAM：几何、时序、bank 与时间基准解耦"
 msgstr "FMC/SDRAM: separate geometry, timing, bank and timebase"
 
-msgid "几何与时基解耦已落，外存集成收尾中"
-msgstr "Geometry and timebase decoupled; external-memory integration being finalized"
-
 msgid "F09"
 msgstr "F09"
 
 msgid "Flash／NOR／NAND：控制器、协议、区域和维护分离"
 msgstr "Flash/NOR/NAND: separate controller, protocol, region and maintenance"
-
-msgid "已有实现，待本批区域与维护回归"
-msgstr "Implemented; region and maintenance regressions for this batch pending"
 
 msgid "F10"
 msgstr "F10"
@@ -650,17 +563,11 @@ msgstr "F10"
 msgid "QuadSPI：精确 NOR 协议事实与物理边界提纯，间接／映射借用由单一 owner 协调"
 msgstr "QuadSPI: isolate exact NOR protocol facts and physical boundaries; one owner coordinates indirect/mapped borrows"
 
-msgid "已有实现，待同源码回归"
-msgstr "Implemented; regressions on the same source pending"
-
 msgid "F11"
 msgstr "F11"
 
 msgid "SDIO：host／card／function／block 分层与 DMA 路线一致"
 msgstr "SDIO: consistent host/card/function/block layers and DMA routes"
-
-msgid "分层与所选 DMA 路线已落，待完整回归"
-msgstr "Layering and selected DMA routes implemented; complete regression pending"
 
 msgid "F12"
 msgstr "F12"
@@ -668,17 +575,11 @@ msgstr "F12"
 msgid "CAN／Ethernet：共享资源、PHY、内存和 descriptor 归属明确"
 msgstr "CAN/Ethernet: clear ownership of shared resources, PHY, memory and descriptors"
 
-msgid "已有实现，共享资源与投影收尾中"
-msgstr "Implemented; shared-resource and projection integration being finalized"
-
 msgid "F13"
 msgstr "F13"
 
 msgid "USB：底层与中间件唯一 owner，角色与供电显式"
 msgstr "USB: one lower-layer/middleware owner; explicit roles and power"
-
-msgid "已有实现，factory／角色连接收尾中"
-msgstr "Implemented; factory/role connections being finalized"
 
 msgid "F14"
 msgstr "F14"
@@ -695,17 +596,11 @@ msgstr "G01"
 msgid "按独立合同精简测试，每个删除项有失效或等价覆盖依据"
 msgstr "Retain tests by independent contract; justify every deletion by obsolescence or equivalent coverage"
 
-msgid "主要合同已迁移，待完整保留集回归"
-msgstr "Main contracts migrated; complete retained-suite regression pending"
-
 msgid "G02"
 msgstr "G02"
 
 msgid "新行为记录真实 RED／GREEN，对应实际源码与失败"
 msgstr "Record genuine RED/GREEN for new behavior against actual source and failure"
-
-msgid "已记录所改行为 RED／GREEN，待最终证据核对"
-msgstr "Changed behavior has RED/GREEN records; final evidence review pending"
 
 msgid "G03"
 msgstr "G03"
@@ -758,9 +653,6 @@ msgstr "H03"
 msgid "当前文档与教程分清历史身份，中英文一致"
 msgstr "Current documentation and tutorials distinguish historical identity; Chinese and English agree"
 
-msgid "当前协议与双语更新中，待独立审查与严格构建"
-msgstr "Current protocols and bilingual prose being updated; independent review and strict build pending"
-
 msgid "H04"
 msgstr "H04"
 
@@ -773,20 +665,47 @@ msgstr "H05"
 msgid "实际第二家族 SDK 纵向切片验证接口与接入修改面"
 msgstr "A real second-family SDK vertical slice verifies interfaces and integration change surface"
 
-msgid "第二家族参考链已有实现，待最终集成验证"
-msgstr "Second-family reference chain implemented; final integrated validation pending"
-
 msgid "H06"
 msgstr "H06"
 
 msgid "删除过渡路径，源码、SDK、支持范围与实际结果一致"
 msgstr "Remove transition paths; source, SDK, support scope and actual results agree"
 
-msgid "旧家族构造已删除，剩余过渡与声明核对中"
-msgstr "Old family constructors removed; remaining transitions and declarations under review"
-
 msgid "验证与阅读入口"
 msgstr "Verification and reading entries"
 
 msgid "[接入指南](../guides/provider-porting.md)区分新 Board、路线、料号、IP 与公共语义。 [工程手册](../design/engineering-handbook.md)维护 TDD、风格、测试保留与普通提交门禁； [SDK 教程](../tutorials/source-sdk.md)维护公开消费入口。硬件事实、模型行为、ARM 链接、SDK 消费和物理 HIL 分别验收。当前物理执行仍为 `not_executed`，见 [资格边界](qualification.md)。"
 msgstr "The [porting guide](../guides/provider-porting.md) distinguishes a new Board, route, part, IP and public semantics. The [engineering handbook](../design/engineering-handbook.md) owns TDD, style, test retention and ordinary commit gates. The [SDK tutorial](../tutorials/source-sdk.md) owns public consumption. Hardware facts, model behavior, ARM linking, SDK consumption and physical HIL are accepted separately. Physical execution remains `not_executed`; see [qualification boundaries](qualification.md)."
+
+msgid "本批软件范围是将现有支持目录承诺的装配与模式统一到声明式包、同快照事实、不可变 IR、有限静态 C 装配与包内 CMake。未选硬件模式、未知 PCB 条件及未维护的 IP 模型不因本次迁移获得支持或执行资格。"
+msgstr "This batch's software scope unifies assemblies and modes promised by the existing support catalogue through declarative packages, one fact snapshot, immutable IR, bounded static C assembly and package CMake. Unselected hardware modes, unknown PCB conditions and unmaintained IP models gain neither support nor execution qualification from this migration."
+
+msgid "软件实现、模型行为、ARM 链接、安装 SDK 消费与软件候选分别记录来源和范围。部分运行模式或静态分析通过，不替代最终完整门禁与独立消费者验收。实际结果沿现有交付入口关联，不建立第二套资格台账。"
+msgstr "Software implementation, model behavior, ARM linking, installed-SDK consumption and software candidates record their sources and scopes separately. Passing some runtime modes or static analysis does not replace the final complete gates and independent-consumer acceptance. Actual results link through the existing delivery entry rather than another qualification ledger."
+
+msgid "GD32F470 仅作为显式启用的 GPIO／UART 软件参考，用于检验通用包与公共接口的复用。安装 SDK 与外置参考包的消费需要实际执行，不能由 STM32 消费者结果替代；该参考不进入生产系列聚合。"
+msgstr "GD32F470 remains an explicitly enabled GPIO/UART software reference for checking reuse of generic packages and public interfaces. Consumption of an installed SDK with the external reference package requires actual execution and cannot inherit STM32 consumer results. This reference remains outside production-family aggregation."
+
+msgid "物理 HIL 按用户要求暂缓，状态保留为 not_executed。软件结果不证明接线、时钟波形、IRQ 延迟、吞吐、功耗或断电保持；未选外设与模式继续遵循明确支持边界。"
+msgstr "Physical HIL is deferred at the user's request and remains not_executed. Software results do not establish wiring, clock waveforms, IRQ latency, throughput, power or power-loss retention. Unselected peripherals and modes retain their explicit support boundaries."
+
+msgid "本批软件范围已验收，结果见对应交付记录。"
+msgstr "This batch's software scope is accepted; results are in the corresponding delivery record."
+
+msgid "迁移基线与支持边界已固定，历史结果保持原身份。"
+msgstr "The migration baseline and support boundaries are fixed; historical results retain their original identities."
+
+msgid "内容与双语已审，严格构建由独立交付记录验收。"
+msgstr "Content and bilingual text are reviewed; strict-build acceptance belongs to the independent delivery record."
+
+msgid "GPIO／UART 参考软件范围已验收，不授予生产系列或实板资格。"
+msgstr "The GPIO/UART reference-software scope is accepted; this grants neither production-family support nor hardware qualification."
+
+msgid "本批以 [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b) 为源码基线；前序软件交付见 [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63)。 每项新结果必须绑定实际源码和配置，不能继承基线的测试或 SDK 资格。"
+msgstr "This batch starts from [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b); [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63) records the preceding software delivery. Every new result must identify its actual source and configuration; baseline test or SDK qualification is not inherited."
+
+msgid "图表示当前构建期输入和产物流，不表示运行期调用。现有 schema-2 TOML、只读 SoC／Board 事实、不可变 typed IR、原子 bundle 和 CMake 唯一目标图继续保留。 生产默认路径由声明式 package、通用 DataProvider、DomainPolicies、私有 `constants` 与有限 StaticRecipe 组成；旧 F4 家族 Python 构造模块已删除，不保留家族导入注册表。 事实与静态连接按同一快照解析，协议见[接入指南](../guides/provider-porting.md)。 验收范围与实际来源见[资格边界](qualification.md)；删除旧模块本身不授予软件资格。"
+msgstr "The diagram shows current build-time inputs and artifact flow, not runtime calls. Schema-2 TOML, read-only SoC/Board facts, immutable typed IR, atomic bundles and the sole CMake target graph remain. The production default consists of declarative packages, generic DataProvider, DomainPolicies, private `constants` and bounded StaticRecipe. The old F4 family Python constructor modules have been removed, with no family import registry retained. Facts and static connections resolve from one snapshot; the [porting guide](../guides/provider-porting.md) owns the protocol. See [qualification boundaries](qualification.md) for acceptance scope and actual source identities; deleting old modules alone grants no software qualification."
+
+msgid "本批要求所有当前承诺模式沿同一装配链迁移，保持公共合同、支持边界和消费者行为。 新增候选模式必须单独实现和验证，不能由头文件、接口或家族目录推定完成。 原有 WP01–WP12、IO01–IO20、R0–R13 与执行结果保留在 [固定基线架构页](https://github.com/X-Gen-Lab/nexus/blob/ba13686b91c94d19ef11acf910653ee2fcc9aa8b/docs/delivery/architecture.md)。 前序 [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62) 和 [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63) 各保留原源码与执行身份；旧计数 不重标为新提交的执行。物理 HIL 按用户要求暂缓；远端 CI 与本地软件门禁分别保留实际执行记录。"
+msgstr "This batch migrates every currently promised mode through the same assembly chain while preserving public contracts, support boundaries and consumer behavior. New candidate modes require separate implementation and verification; headers, interfaces or family directories do not establish completion. The original WP01–WP12, IO01–IO20, R0–R13 and results remain in the [fixed baseline architecture page](https://github.com/X-Gen-Lab/nexus/blob/ba13686b91c94d19ef11acf910653ee2fcc9aa8b/docs/delivery/architecture.md). Earlier [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62) and [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63) retain their actual source and execution identities; old counts are not relabeled as execution of a new commit. Physical HIL remains deferred at the user's request; remote CI and local software gates retain their respective actual execution records."
