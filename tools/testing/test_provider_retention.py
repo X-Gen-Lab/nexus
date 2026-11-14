@@ -8,6 +8,7 @@ from types import SimpleNamespace
 import unittest
 
 from tools.evidence.common import EvidenceError
+from tools.measurement import retention
 from tools.measurement.retention import inspect_provider_retention, source_contracts
 from tools.measurement.elf import Elf32
 
@@ -958,6 +959,18 @@ class ArrayContextTests(unittest.TestCase):
         with self.assertRaisesRegex(EvidenceError, 'context pointer'):
             inspect_provider_retention(elf, bindings)
 
+    def test_reversed_designated_fields_keep_array_neighbor_rejection(self):
+        elf, bindings = self.fixture()
+        source = bindings.replace(
+            '&nx_stm32_i2c_endpoint_ops, &s_nx_device_sensor[1]',
+            '.context = &s_nx_device_sensor[1], .ops = &nx_stm32_i2c_endpoint_ops')
+        self.assertNotEqual(source, bindings)
+        report = inspect_provider_retention(elf, source)
+        self.assertEqual(report['faces'][1]['context_offset'], 8)
+        struct.pack_into('<I', elf.data, 12, 0x20000020)
+        with self.assertRaisesRegex(EvidenceError, 'context pointer'):
+            inspect_provider_retention(elf, source)
+
     def test_nonconstant_negative_or_noncanonical_index_is_rejected(self):
         elf, bindings = self.fixture()
         for token in ('x', '-1', '01', '0x1', '4294967296'):
@@ -990,6 +1003,134 @@ class ArrayContextTests(unittest.TestCase):
 
 
 
+
+
+class GeneratedFaceInitializerTests(unittest.TestCase):
+    def designated(self, *, reversed_fields=False):
+        source = BINDINGS
+        for operations, owner in (("nx_stm32_i2c_ops", "s_nx_port_bus"),
+                                  ("nx_stm32_i2c_endpoint_ops",
+                                   "s_nx_device_sensor")):
+            fields = [".ops = &" + operations, ".context = &" + owner]
+            if reversed_fields:
+                fields.reverse()
+            source = source.replace("&" + operations + ", &" + owner,
+                                    ", ".join(fields) + ",")
+        return source
+
+    def test_actual_qspi_recipe_exposes_bus_readonly_and_async_faces(self):
+        from tools.configure import bindings, configure
+        result = configure.resolve_ir(configure.ROOT /
+            "tests/contracts/stm32f4_qspi/f479ni-qspi.toml")
+        source = bindings.emit(result)[1]
+        selected = retention.selected_faces(source)
+        self.assertEqual({(kind, name, operations, context) for
+                          kind, name, operations, context in selected}, {
+            ("nx_external_bus_port_t", "s_nx_face_serial",
+             "nx_stm32_qspi_bus_ops", "s_nx_port_serial"),
+            ("nx_flash_port_t", "s_nx_flash_readonly_storage",
+             "nx_stm32_qspi_flash_ops", "s_nx_port_serial"),
+            ("nx_flash_async_port_t", "s_nx_device_storage",
+             "nx_stm32_qspi_async_ops", "s_nx_port_serial")})
+
+    def test_designated_order_preserves_full_linked_table_and_owner_audit(self):
+        for reverse in (False, True):
+            with self.subTest(reversed_fields=reverse):
+                source = self.designated(reversed_fields=reverse)
+                self.assertEqual(inspect_provider_retention(image(), source)
+                                 ["face_count"], 2)
+                for offset, message in ((0, "operations pointer"),
+                                        (4, "context pointer")):
+                    elf = image()
+                    struct.pack_into("<I", elf.data, offset, 0x20000020)
+                    with self.assertRaisesRegex(EvidenceError, message):
+                        inspect_provider_retention(elf, source)
+
+    def test_public_child_names_cannot_hide_a_missing_method(self):
+        for name in ("s_nx_device_storage", "s_nx_channel_sensor",
+                     "s_nx_block_async_sd0"):
+            with self.subTest(name=name):
+                source = BINDINGS.replace("s_nx_device_face_sensor", name)
+                elf = image()
+                elf.defined_symbols[1]["name"] = name
+                report = inspect_provider_retention(elf, source)
+                self.assertEqual(report["face_count"], 2)
+                struct.pack_into("<I", elf.data, 36, 0)
+                with self.assertRaisesRegex(EvidenceError, "initialized method"):
+                    inspect_provider_retention(elf, source)
+
+    def test_tentative_faces_require_one_matching_complete_definition(self):
+        declaration = "static const nx_i2c_port_t s_nx_face_bus;\n"
+        source = declaration + self.designated()
+        with self.subTest(complete=True):
+            self.assertEqual(inspect_provider_retention(image(), source)
+                             ["face_count"], 2)
+        for invalid in (
+                declaration.replace("nx_i2c_port_t", "nx_spi_port_t") + BINDINGS,
+                BINDINGS + "static const nx_i2c_endpoint_t s_nx_channel_orphan;",
+                BINDINGS + BINDINGS,
+                "#if 1\n" + BINDINGS + "#endif\n"):
+            with self.subTest(source=invalid), self.assertRaises(EvidenceError):
+                inspect_provider_retention(image(), invalid)
+
+    def test_block_async_public_face_cannot_escape_empty_selection(self):
+        from scripts.ci.provider_assemblies import empty_retention
+        source = ("static const nx_block_async_port_t s_nx_block_async_sd0 = {"
+                  ".ops = &nx_stm32_sdio_async_ops, "
+                  ".context = &s_nx_port_sd0};\n")
+        with self.subTest(selected=True):
+            self.assertEqual(retention.selected_faces(source), [
+                ("nx_block_async_port_t", "s_nx_block_async_sd0",
+                 "nx_stm32_sdio_async_ops", "s_nx_port_sd0")])
+        with self.subTest(empty=True), self.assertRaisesRegex(
+                EvidenceError, "selected provider"):
+            empty_retention(SimpleNamespace(defined_symbols=[]), source,
+                            {"controllers": [], "devices": []})
+
+    def test_unknown_mixed_and_duplicate_initializer_fields_reject(self):
+        original = "&nx_stm32_i2c_ops, &s_nx_port_bus"
+        for fields in (
+                ".ops = &nx_stm32_i2c_ops",
+                ".ops = &nx_stm32_i2c_ops, .context = &s_nx_port_bus, "
+                ".context = &s_nx_port_bus",
+                ".ops = &nx_stm32_i2c_ops, .unknown = &s_nx_port_bus",
+                "&nx_stm32_i2c_ops, .context = &s_nx_port_bus",
+                ".ops = &nx_stm32_i2c_ops + 1, .context = &s_nx_port_bus",
+                ".ops = &nx_stm32_i2c_ops, .context = owner()",
+                ".ops = &nx_stm32_i2c_ops, .context = &s_nx_port_bus + 1",
+                "0"):
+            with self.subTest(fields=fields), self.assertRaises(EvidenceError):
+                inspect_provider_retention(image(), BINDINGS.replace(
+                    original, fields))
+
+    def test_designated_readonly_reference_preserves_the_cast_owner(self):
+        source = BINDINGS.replace('&nx_stm32_i2c_ops, &s_nx_port_bus',
+            '.context = (void*)&s_nx_reference_bus, .ops = &nx_stm32_i2c_ops')
+        self.assertEqual(retention.selected_faces(source)[0][3],
+                         '(void*)&s_nx_reference_bus')
+
+    def test_private_config_is_not_a_face_and_unknown_named_face_rejects(self):
+        config = "static const nx_private_config_t s_nx_config_bus = {0};\n"
+        self.assertEqual(inspect_provider_retention(image(), config + BINDINGS)
+                         ["face_count"], 2)
+        invalid = BINDINGS.replace("nx_i2c_port_t", "nx_unknown_port_t")
+        with self.assertRaisesRegex(EvidenceError, "operations type"):
+            inspect_provider_retention(image(), invalid)
+
+    def test_new_child_name_retains_all_same_name_type_declarations(self):
+        name = "s_nx_channel_sensor"
+        source = BINDINGS.replace("s_nx_device_face_sensor", name)
+        elf = image()
+        elf.defined_symbols[1]["name"] = name
+        invalid = "static const nx_unknown_private_t " + name + ";\n" + source
+        with self.assertRaisesRegex(EvidenceError, "inconsistent"):
+            inspect_provider_retention(elf, invalid)
+
+    def test_unsupported_public_face_arrays_cannot_be_silently_omitted(self):
+        source = (BINDINGS + "static const nx_i2c_endpoint_t "
+                  "s_nx_channel_array[1] = {{0}};\n")
+        with self.assertRaisesRegex(EvidenceError, "unsupported"):
+            inspect_provider_retention(image(), source)
 
 
 class RetentionInputClosureTests(unittest.TestCase):
