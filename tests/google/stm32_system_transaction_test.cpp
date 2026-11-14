@@ -9,22 +9,22 @@
 extern "C" {
 #include "clock_domain_impl.h"
 #include "nexus/core/fault.h"
-#include "nexus/soc/stm32f407_power.h"
 #include "nexus/soc/stm32f407_supervision.h"
+#include "nexus/soc/stm32f4_power.h"
 #include "stm32f407_clock.h"
 #include "stm32f407_system.h"
-nx_result_t nx_stm32f407_power_enter(nx_clock_barrier_t,
-                                     const nx_stm32_power_options_t*,
-                                     nx_stm32_stop_receipt_t*)
+nx_result_t nx_stm32_power_enter(nx_clock_barrier_t,
+                                 const nx_stm32_power_options_t*,
+                                 nx_stm32_stop_receipt_t*)
     __attribute__((weak));
-nx_result_t nx_stm32f407_standby_enter(nx_clock_barrier_t,
-                                       const nx_stm32_power_options_t*,
-                                       const nx_rtc_port_t*, nx_rtc_standby_t*,
-                                       nx_stm32_stop_receipt_t*)
+nx_result_t nx_stm32_standby_enter(nx_clock_barrier_t,
+                                   const nx_stm32_power_options_t*,
+                                   const nx_rtc_port_t*, nx_rtc_standby_t*,
+                                   nx_stm32_stop_receipt_t*)
     __attribute__((weak));
-nx_result_t nx_stm32f407_deadline_bridge(const nx_stm32_stop_receipt_t*,
-                                         uint64_t, uint64_t, uint64_t, uint64_t,
-                                         nx_stm32_deadline_bridge_t*)
+nx_result_t nx_stm32_deadline_bridge(const nx_stm32_stop_receipt_t*, uint64_t,
+                                     uint64_t, uint64_t, uint64_t,
+                                     nx_stm32_deadline_bridge_t*)
     __attribute__((weak));
 /* A missing CMSIS producer is an observable RED, not a fake clock provider. */
 extern uint32_t SystemCoreClock __attribute__((weak));
@@ -430,12 +430,11 @@ TEST_F(Stm32System, DisabledExtiRouteCannotBecomeASuccessfulWakePublisher) {
     nx_clock_barrier_t barrier{};
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
     nx_stm32_power_options_t options = {
-        {1U << 6U, 0U, 0U}, 8U, true, false, 0U, false, false};
+        {1U << 6U, 0U, 0U, 0U}, 8U, 0U, 0U, true, false, false};
     nx_power_enabled[0] = 1U << 6U;
     nx_power_imr = 0U;
     nx_stm32_stop_receipt_t receipt{};
-    EXPECT_EQ(NX_ERROR_BUSY,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_EQ(0U, deep_waits);
 }
 
@@ -448,11 +447,10 @@ TEST_F(Stm32System, CapturedResetCauseSurvivesExplicitClearAndStopRestore) {
     nx_clock_barrier_t barrier{};
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
     nx_stm32_power_options_t options = {
-        {1U << 6U, 0U, 0U}, 8U, true, false, 0U, false, false};
+        {1U << 6U, 0U, 0U, 0U}, 8U, 0U, 0U, true, false, false};
     nx_power_enabled[0] = 1U << 6U;
     nx_stm32_stop_receipt_t receipt{};
-    ASSERT_EQ(NX_SUCCESS,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_EQ(RCC_CSR_PINRSTF, g_nx_stm32_system.reset_cause);
 }
 
@@ -463,13 +461,13 @@ TEST_F(Stm32System, StandbyRequiresADeclaredIndependentWakeSource) {
     nx_clock_barrier_t barrier{};
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
     nx_stm32_power_options_t options = {
-        {1U << 6U, 0U, 0U}, 8U, true, true, 0U, false, false};
+        {1U << 6U, 0U, 0U, 0U}, 8U, 0U, 0U, true, true, false};
     nx_power_enabled[0] = 1U << 6U;
     rcc.BDCR =
         RCC_BDCR_RTCEN | RCC_BDCR_RTCSEL_0 | RCC_BDCR_LSEON | RCC_BDCR_LSERDY;
     nx_stm32_stop_receipt_t receipt{};
     EXPECT_EQ(NX_ERROR_UNSUPPORTED,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+              nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_EQ(0U, deep_waits);
 }
 
@@ -501,8 +499,7 @@ TEST_F(Stm32System, StandbyRearmsWakePinOnlyAfterClearingItsWakeFlag) {
         EXPECT_EQ(PWR_CSR_EWUP, power.CSR & (PWR_CSR_EWUP | PWR_CSR_WUF));
     };
     nx_stm32_stop_receipt_t receipt{};
-    EXPECT_EQ(NX_ERROR_IO,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_EQ(1U, deep_waits);
     EXPECT_TRUE(g_nx_stm32_system.started);
     EXPECT_NE(receipt.old_epoch, receipt.new_epoch);
@@ -523,8 +520,7 @@ TEST_F(Stm32System, StandbyCannotDiscardAnUnconsumedWakeFlag) {
     testing::Mock::VerifyAndClearExpectations(&hardware_mock);
     EXPECT_CALL(hardware_mock, Write(testing::_, testing::_)).Times(0);
     nx_stm32_stop_receipt_t receipt{};
-    EXPECT_EQ(NX_ERROR_BUSY,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_EQ(0U, deep_waits);
     EXPECT_NE(0U, power.CSR & PWR_CSR_WUF);
 }
@@ -540,8 +536,7 @@ TEST_F(Stm32System, StandbyWakePinDoesNotRequireAnUnrelatedNvicInterrupt) {
     options.standby = true;
     power.CSR = PWR_CSR_EWUP;
     nx_stm32_stop_receipt_t receipt{};
-    EXPECT_EQ(NX_ERROR_IO,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_EQ(1U, deep_waits);
     EXPECT_TRUE(receipt.waited);
     EXPECT_TRUE(g_nx_stm32_system.started);
@@ -555,15 +550,15 @@ TEST_F(Stm32System, ExplicitWakePinSelectionNeedsNoPrivateRegisterSetup) {
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
     nx_stm32_power_options_t options{};
     options.poll_limit = 8U;
-    options.standby = options.wake_pin = true;
+    options.standby = true;
+    options.wake_pins = NX_STM32_WAKE_PIN_PA0;
     EXPECT_EQ(0U, power.CSR & PWR_CSR_EWUP);
     before_power_wait = [&]() {
         EXPECT_NE(0U, power.CSR & PWR_CSR_EWUP);
         EXPECT_EQ(0U, power.CSR & PWR_CSR_WUF);
     };
     nx_stm32_stop_receipt_t receipt{};
-    EXPECT_EQ(NX_ERROR_IO,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_TRUE(receipt.waited);
     EXPECT_EQ(1U, deep_waits);
     EXPECT_EQ(0U, power.CSR & PWR_CSR_EWUP);
@@ -577,10 +572,10 @@ TEST_F(Stm32System, WakePinSelectionCannotPretendToBeAStopWakeInterrupt) {
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
     nx_stm32_power_options_t options{};
     options.poll_limit = 8U;
-    options.wake_pin = true;
+    options.wake_pins = NX_STM32_WAKE_PIN_PA0;
     nx_stm32_stop_receipt_t receipt{};
     EXPECT_EQ(NX_ERROR_INVALID,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+              nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_EQ(0U, deep_waits);
 }
 
@@ -599,13 +594,13 @@ TEST_F(Stm32System, RtcStandbyRequiresItsPreparedOwnerReceiptBeforeAnyEffect) {
     EXPECT_CALL(hardware_mock, Write(testing::_, testing::_)).Times(0);
     nx_stm32_stop_receipt_t receipt{};
     EXPECT_EQ(NX_ERROR_STATE,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+              nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_EQ(0U, deep_waits);
 }
 
 TEST_F(Stm32System,
        RtcStandbyCommitsAfterCwufAndRestoresWithoutClearingEvents) {
-    ASSERT_NE(nullptr, &nx_stm32f407_standby_enter);
+    ASSERT_NE(nullptr, &nx_stm32_standby_enter);
     ASSERT_EQ(0, Start().primary);
     RtcWake();
     power.CSR |= PWR_CSR_WUF;
@@ -658,8 +653,8 @@ TEST_F(Stm32System,
         sequence.push_back('w');
     };
     nx_stm32_stop_receipt_t receipt{};
-    EXPECT_EQ(NX_ERROR_IO, nx_stm32f407_standby_enter(barrier, &options, &rtc,
-                                                      &standby, &receipt));
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_standby_enter(barrier, &options, &rtc,
+                                                  &standby, &receipt));
     EXPECT_EQ((std::vector<char>{'v', 'd', 'c', 'a', 'e', 'w', 'r'}), sequence);
     EXPECT_EQ(1U, deep_waits);
     EXPECT_EQ(0U, event_waits);
@@ -669,7 +664,7 @@ TEST_F(Stm32System,
 }
 
 TEST_F(Stm32System, RtcStandbyValidationFailureKeepsTheExactPreparedReceipt) {
-    ASSERT_NE(nullptr, &nx_stm32f407_standby_enter);
+    ASSERT_NE(nullptr, &nx_stm32_standby_enter);
     ASSERT_EQ(0, Start().primary);
     RtcWake();
     nx_clock_domain_t domain{};
@@ -690,8 +685,8 @@ TEST_F(Stm32System, RtcStandbyValidationFailureKeepsTheExactPreparedReceipt) {
     testing::Mock::VerifyAndClearExpectations(&hardware_mock);
     EXPECT_CALL(hardware_mock, Write(testing::_, testing::_)).Times(0);
     nx_stm32_stop_receipt_t receipt{91U, 92U, 93U, 94U, true};
-    EXPECT_EQ(NX_ERROR_STATE, nx_stm32f407_standby_enter(
-                                  barrier, &options, &rtc, &standby, &receipt));
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32_standby_enter(barrier, &options, &rtc,
+                                                     &standby, &receipt));
     EXPECT_EQ(91U, receipt.old_epoch);
     EXPECT_EQ(&domain, standby.owner);
     EXPECT_EQ(1U, standby.epoch);
@@ -699,7 +694,7 @@ TEST_F(Stm32System, RtcStandbyValidationFailureKeepsTheExactPreparedReceipt) {
 }
 
 TEST_F(Stm32System, FailedRtcCommitRestoresRunBeforeReturningTheRtcReceipt) {
-    ASSERT_NE(nullptr, &nx_stm32f407_standby_enter);
+    ASSERT_NE(nullptr, &nx_stm32_standby_enter);
     ASSERT_EQ(0, Start().primary);
     RtcWake();
     nx_clock_domain_t domain{};
@@ -727,8 +722,8 @@ TEST_F(Stm32System, FailedRtcCommitRestoresRunBeforeReturningTheRtcReceipt) {
         return NX_SUCCESS;
     });
     nx_stm32_stop_receipt_t receipt{};
-    EXPECT_EQ(NX_ERROR_IO, nx_stm32f407_standby_enter(barrier, &options, &rtc,
-                                                      &standby, &receipt));
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_standby_enter(barrier, &options, &rtc,
+                                                  &standby, &receipt));
     EXPECT_EQ(0U, deep_waits);
     EXPECT_FALSE(receipt.waited);
     EXPECT_NE(receipt.old_epoch, receipt.new_epoch);
@@ -738,7 +733,7 @@ TEST_F(Stm32System, FailedRtcCommitRestoresRunBeforeReturningTheRtcReceipt) {
 }
 
 TEST_F(Stm32System, FailedRtcRestoreRetainsItsReceiptAfterANewRunEpoch) {
-    ASSERT_NE(nullptr, &nx_stm32f407_standby_enter);
+    ASSERT_NE(nullptr, &nx_stm32_standby_enter);
     ASSERT_EQ(0, Start().primary);
     RtcWake();
     nx_clock_domain_t domain{};
@@ -764,8 +759,8 @@ TEST_F(Stm32System, FailedRtcRestoreRetainsItsReceiptAfterANewRunEpoch) {
         return NX_SUCCESS;
     });
     nx_stm32_stop_receipt_t receipt{};
-    EXPECT_EQ(NX_ERROR_IO, nx_stm32f407_standby_enter(barrier, &options, &rtc,
-                                                      &standby, &receipt));
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_standby_enter(barrier, &options, &rtc,
+                                                  &standby, &receipt));
     EXPECT_EQ(&domain, standby.owner);
     EXPECT_TRUE(g_nx_stm32_system.started);
     EXPECT_TRUE(receipt.waited);
@@ -776,49 +771,47 @@ TEST_F(Stm32System, FailedRtcRestoreRetainsItsReceiptAfterANewRunEpoch) {
 }
 
 TEST_F(Stm32System, IndependentRtcEnvelopeBridgesOnlyTheRecordedEpoch) {
-    ASSERT_NE(nullptr, &nx_stm32f407_deadline_bridge);
+    ASSERT_NE(nullptr, &nx_stm32_deadline_bridge);
     nx_stm32_stop_receipt_t receipt = {1U, 2U, 100U, 3U, true};
     nx_stm32_deadline_bridge_t output = {9U, 9U, 9U};
-    EXPECT_EQ(NX_ERROR_STATE, nx_stm32f407_deadline_bridge(&receipt, 2U, 150U,
-                                                           10U, 12U, &output));
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_stm32_deadline_bridge(&receipt, 2U, 150U, 10U, 12U, &output));
     EXPECT_EQ(9U, output.epoch);
-    ASSERT_EQ(NX_SUCCESS, nx_stm32f407_deadline_bridge(&receipt, 1U, 150U, 10U,
-                                                       12U, &output));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_deadline_bridge(&receipt, 1U, 150U, 10U, 12U, &output));
     EXPECT_EQ(2U, output.epoch);
     EXPECT_EQ(41U, output.earliest_us);
     EXPECT_EQ(43U, output.latest_us);
-    ASSERT_EQ(NX_SUCCESS, nx_stm32f407_deadline_bridge(&receipt, 1U, 105U, 10U,
-                                                       12U, &output));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_deadline_bridge(&receipt, 1U, 105U, 10U, 12U, &output));
     EXPECT_EQ(3U, output.earliest_us);
     EXPECT_EQ(3U, output.latest_us);
 }
 
 TEST_F(Stm32System, StopRejectsDmaAndPeriodicTickBeforeEffects) {
-    ASSERT_NE(nullptr, &nx_stm32f407_power_enter);
+    ASSERT_NE(nullptr, &nx_stm32_power_enter);
     ASSERT_EQ(0, Start().primary);
     nx_clock_domain_t domain{};
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_construct(&domain, 1U));
     nx_clock_barrier_t barrier{};
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
     nx_stm32_power_options_t options = {
-        {1U << 6U, 0U, 0U}, 8U, true, false, 0U, false, false};
+        {1U << 6U, 0U, 0U, 0U}, 8U, 0U, 0U, true, false, false};
     nx_power_enabled[0] = 1U << 6U;
     nx_stm32_stop_receipt_t receipt{};
     nx_power_tick = SysTick_CTRL_ENABLE_Msk;
     EXPECT_CALL(hardware_mock, Write(testing::_, testing::_)).Times(0);
-    EXPECT_EQ(NX_ERROR_BUSY,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_power_enter(barrier, &options, &receipt));
     nx_power_tick = 0U;
     rcc.AHB1ENR |= RCC_AHB1ENR_DMA2EN;
     nx_power_dma2[4U + 7U * 6U] = DMA_SxCR_EN;
-    EXPECT_EQ(NX_ERROR_BUSY,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_EQ(0U, deep_waits);
     EXPECT_TRUE(g_nx_stm32_system.started);
 }
 
 TEST_F(Stm32System, StopRestoresRunInANewEpochWithUnknownElapsedTime) {
-    ASSERT_NE(nullptr, &nx_stm32f407_power_enter);
+    ASSERT_NE(nullptr, &nx_stm32_power_enter);
     ASSERT_EQ(0, Start().primary);
     timer.CNT = 123U;
     nx_clock_domain_t domain{};
@@ -826,11 +819,10 @@ TEST_F(Stm32System, StopRestoresRunInANewEpochWithUnknownElapsedTime) {
     nx_clock_barrier_t barrier{};
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
     nx_stm32_power_options_t options = {
-        {1U << 6U, 0U, 0U}, 8U, true, false, 0U, false, false};
+        {1U << 6U, 0U, 0U, 0U}, 8U, 0U, 0U, true, false, false};
     nx_power_enabled[0] = 1U << 6U;
     nx_stm32_stop_receipt_t receipt{};
-    ASSERT_EQ(NX_SUCCESS,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_TRUE(receipt.waited);
     EXPECT_EQ(1U, deep_waits);
     EXPECT_EQ(123U, receipt.before_us);
@@ -843,14 +835,14 @@ TEST_F(Stm32System, StopRestoresRunInANewEpochWithUnknownElapsedTime) {
 }
 
 TEST_F(Stm32System, StopClockRestoreFailureRetainsMasksAndEndsOldEpoch) {
-    ASSERT_NE(nullptr, &nx_stm32f407_power_enter);
+    ASSERT_NE(nullptr, &nx_stm32_power_enter);
     ASSERT_EQ(0, Start().primary);
     nx_clock_domain_t domain{};
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_construct(&domain, 1U));
     nx_clock_barrier_t barrier{};
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
     nx_stm32_power_options_t options = {
-        {1U << 6U, 0U, 0U}, 8U, false, false, 0U, false, false};
+        {1U << 6U, 0U, 0U, 0U}, 8U, 0U, 0U, false, false, false};
     nx_power_enabled[0] = 1U << 6U;
     nx_stm32_stop_receipt_t receipt{};
     fail_deep_restore = true;
@@ -860,28 +852,26 @@ TEST_F(Stm32System, StopClockRestoreFailureRetainsMasksAndEndsOldEpoch) {
             EXPECT_EQ(1U, mask);
             throw ParkSignal{};
         });
-    EXPECT_THROW(nx_stm32f407_power_enter(barrier, &options, &receipt),
-                 ParkSignal);
+    EXPECT_THROW(nx_stm32_power_enter(barrier, &options, &receipt), ParkSignal);
     EXPECT_EQ(1U, mask);
     EXPECT_FALSE(g_nx_stm32_system.started);
     EXPECT_EQ(UINT64_MAX, nx_stm32_system_clock_read(&g_nx_stm32_system));
 }
 
 TEST_F(Stm32System, RtcEventOnlyWakeUsesOneWfeWithoutConsumingPendingSource) {
-    ASSERT_NE(nullptr, &nx_stm32f407_power_enter);
+    ASSERT_NE(nullptr, &nx_stm32_power_enter);
     ASSERT_EQ(0, Start().primary);
     nx_clock_domain_t domain{};
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_construct(&domain, 1U));
     nx_clock_barrier_t barrier{};
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
     nx_stm32_power_options_t options = {
-        {0U, 0U, 0U}, 8U, true, false, NX_STM32_WAKE_RTC_TIMER, false, false};
+        {0U, 0U, 0U, 0U}, 8U, NX_STM32_WAKE_RTC_TIMER, 0U, true, false, false};
     nx_power_emr = nx_power_rtsr = NX_STM32_WAKE_RTC_TIMER;
     rcc.BDCR =
         RCC_BDCR_RTCEN | RCC_BDCR_RTCSEL_0 | RCC_BDCR_LSEON | RCC_BDCR_LSERDY;
     nx_stm32_stop_receipt_t receipt{};
-    ASSERT_EQ(NX_SUCCESS,
-              nx_stm32f407_power_enter(barrier, &options, &receipt));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_EQ(1U, event_waits);
     EXPECT_EQ(1U, deep_waits);
     EXPECT_EQ(NX_STM32_WAKE_RTC_TIMER, nx_power_emr);

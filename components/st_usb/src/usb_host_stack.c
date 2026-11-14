@@ -60,10 +60,132 @@ static nx_st_usb_host_slot_t* selected(USBH_HandleTypeDef* host, uint8_t pipe) {
                : NULL;
 }
 
+/** \brief Optional cadence storage shares neither transport nor packet bytes.
+ */
+static bool periodic_storage_valid(const nx_st_usb_host_stack_t* state,
+                                   const nx_st_usb_host_stack_config_t* config,
+                                   const USBH_ClassTypeDef* selected_class) {
+    const nx_st_usb_host_periodic_t* records = config->periodic;
+    size_t bytes = config->slot_count * sizeof(*records);
+    if (records == NULL)
+        return true;
+    if ((uintptr_t)records % _Alignof(nx_st_usb_host_periodic_t) != 0U ||
+        overlaps(records, bytes, state, sizeof(*state)) ||
+        overlaps(records, bytes, config, sizeof(*config)) ||
+        overlaps(records, bytes, config->slots,
+                 config->slot_count * sizeof(*config->slots)) ||
+        overlaps(records, bytes, config->transport,
+                 sizeof(*config->transport)) ||
+        (selected_class != NULL &&
+         overlaps(records, bytes, selected_class, sizeof(*selected_class))))
+        return false;
+    for (size_t i = 0U; i < config->slot_count; ++i) {
+        if (overlaps(records, bytes, config->slots[i].storage,
+                     config->slots[i].capacity))
+            return false;
+    }
+    return true;
+}
+
+/** \brief Only explicit direct-root opportunities use the selected SOF unit. */
+static nx_result_t periodic_frame(nx_st_usb_host_stack_t* state, uint8_t index,
+                                  uint16_t* frame) {
+    nx_usb_host_state_t transport;
+    nx_result_t result =
+        nx_usb_host_state(state->config->transport, &transport);
+    if (result != NX_SUCCESS)
+        return result;
+    if (!transport.started || transport.closing || !transport.connected ||
+        !transport.port_enabled || transport.suspended)
+        return NX_ERROR_STATE;
+    if (transport.speed != state->config->slots[index].pipe.speed)
+        return NX_ERROR_UNSUPPORTED;
+    *frame = (uint16_t)(transport.frame & 0x3FFFU);
+    return NX_SUCCESS;
+}
+
+/** \brief Saturating observed SOF work never invents elapsed full counter
+ * wraps. \note RM0090 FS/HS HFNUM clears at 0x3FFF although the field is 16
+ * bits. Sampling within each wrap supports descriptor intervals up to 32768
+ *       ticks with bounded state. Missing an entire wrap only delays progress.
+ */
+static void periodic_observe(nx_st_usb_host_periodic_t* cadence,
+                             uint16_t frame) {
+    uint16_t elapsed = (uint16_t)((frame - cadence->last_frame) & 0x3FFFU);
+    cadence->last_frame = frame;
+    cadence->remaining = elapsed >= cadence->remaining
+                             ? 0U
+                             : (uint16_t)(cadence->remaining - elapsed);
+}
+
+/** \brief A conservative transaction envelope avoids phase packing state.
+ * \note USB 2.0 sections 5.11.3 and 9.6.6: reserve worst-case payload bit
+ *       stuffing, 64 byte-times for token/data/handshake/turnaround overhead
+ *       and an additional 1 us host gap. This deliberately exceeds the direct
+ *       single-transaction overhead; every selected endpoint is charged in
+ *       every opportunity, even if their descriptor intervals differ.
+ */
+static uint32_t periodic_bus_time(const nx_usb_host_pipe_t* pipe) {
+    const uint32_t rate = pipe->speed == NX_USB_HOST_HIGH_SPEED  ? 480000000U
+                          : pipe->speed == NX_USB_HOST_LOW_SPEED ? 1500000U
+                                                                 : 12000000U;
+    const uint64_t bits = ((uint64_t)pipe->max_packet * 56U + 5U) / 6U + 512U;
+    return (uint32_t)((bits * UINT64_C(1000000000) + rate - 1U) / rate) + 1000U;
+}
+
+nx_result_t nx_st_usb_host_stack_periodic(nx_st_usb_host_stack_t* state,
+                                          uint8_t pipe, uint8_t interval) {
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (state == NULL || state->config == NULL ||
+        pipe >= state->config->slot_count || interval == 0U)
+        return NX_ERROR_INVALID;
+    if (state->closing || state->stopped)
+        return NX_ERROR_STATE;
+    if (state->config->periodic == NULL)
+        return NX_ERROR_UNSUPPORTED;
+    const nx_st_usb_host_slot_t* slot = &state->config->slots[pipe];
+    if (!slot->configured)
+        return NX_ERROR_STATE;
+    if (slot->busy || state->config->periodic[pipe].interval != 0U)
+        return NX_ERROR_BUSY;
+    const bool iso = slot->pipe.transfer == NX_USB_HOST_ISOCHRONOUS;
+    const bool high = slot->pipe.speed == NX_USB_HOST_HIGH_SPEED;
+    const bool low = slot->pipe.speed == NX_USB_HOST_LOW_SPEED;
+    if ((!iso && slot->pipe.transfer != NX_USB_HOST_INTERRUPT) || (iso && low))
+        return NX_ERROR_UNSUPPORTED;
+    if (((iso || high) && interval > 16U) || (low && interval < 10U) ||
+        slot->pipe.max_packet == 0U ||
+        slot->pipe.max_packet > (low    ? 8U
+                                 : high ? 1024U
+                                 : iso  ? 1023U
+                                        : 64U))
+        return NX_ERROR_INVALID;
+    uint16_t frame;
+    nx_result_t result = periodic_frame(state, pipe, &frame);
+    if (result != NX_SUCCESS)
+        return result;
+    const uint32_t bus_time = periodic_bus_time(&slot->pipe);
+    uint32_t total = bus_time;
+    for (size_t i = 0U; i < state->config->slot_count; ++i) {
+        if (i != pipe && state->config->periodic[i].interval != 0U)
+            total += state->config->periodic[i].bus_time_ns;
+    }
+    if (total > (high ? 100000U : 900000U))
+        return NX_ERROR_OVERFLOW;
+    const uint16_t ticks = (uint16_t)((iso || high) ? (1U << (interval - 1U))
+                                                    : (uint32_t)interval);
+    state->config->periodic[pipe] =
+        (nx_st_usb_host_periodic_t){bus_time, ticks, frame, 0U};
+    return NX_SUCCESS;
+}
+
 /** \brief One packet copies only bounded caller bytes into owned DMA staging.
  */
 static nx_result_t submit_packet(nx_st_usb_host_stack_t* state, uint8_t index) {
     nx_st_usb_host_slot_t* slot = &state->config->slots[index];
+    if (nx_deadline_expired(slot->request.base.deadline, nx_time_now_us()))
+        return NX_ERROR_TIMEOUT;
     size_t length = slot->length - slot->offset;
     if (length > slot->pipe.max_packet)
         length = slot->pipe.max_packet;
@@ -84,13 +206,9 @@ static nx_result_t submit_packet(nx_st_usb_host_stack_t* state, uint8_t index) {
         memcpy(slot->storage, slot->bytes + slot->offset, length);
     if (!in && storage.capacity > length)
         memset(slot->storage + length, 0, storage.capacity - length);
-    nx_time_us_t deadline;
-    result = nx_deadline_finite_after(
-        nx_time_now_us(), state->config->transfer_timeout_us, &deadline);
-    if (result != NX_SUCCESS)
-        return result;
     result = nx_usb_host_prepare(&slot->request, slot->storage, slot->capacity,
-                                 length, slot->setup, slot->toggle, deadline);
+                                 length, slot->setup, slot->toggle,
+                                 slot->request.base.deadline);
     if (result == NX_SUCCESS)
         result =
             nx_usb_host_submit(state->config->transport, index, &slot->request);
@@ -111,6 +229,8 @@ static bool retire_slots(nx_st_usb_host_stack_t* state) {
         slot->pending = slot->busy = slot->configured = false;
         slot->bytes = NULL;
         slot->urb = USBH_URB_ERROR;
+        if (state->config->periodic != NULL)
+            state->config->periodic[i] = (nx_st_usb_host_periodic_t){0};
     }
     return true;
 }
@@ -136,7 +256,8 @@ nx_st_usb_host_stack_initialize(nx_st_usb_host_stack_t* state,
                    sizeof(*selected_class)))) ||
         overlaps(state, sizeof(*state), config, sizeof(*config)) ||
         overlaps(state, sizeof(*state), config->slots,
-                 config->slot_count * sizeof(*config->slots)))
+                 config->slot_count * sizeof(*config->slots)) ||
+        !periodic_storage_valid(state, config, selected_class))
         return NX_ERROR_INVALID;
     if (state->config != NULL)
         return NX_ERROR_BUSY;
@@ -165,6 +286,9 @@ nx_st_usb_host_stack_initialize(nx_st_usb_host_stack_t* state,
     memset(state, 0, sizeof(*state));
     state->config = config;
     state->middleware.pData = state;
+    if (config->periodic != NULL)
+        memset(config->periodic, 0,
+               config->slot_count * sizeof(*config->periodic));
     for (size_t i = 0U; i < config->slot_count; ++i) {
         uint8_t* bytes = config->slots[i].storage;
         size_t capacity = config->slots[i].capacity;
@@ -222,7 +346,10 @@ nx_result_t nx_st_usb_host_stack_step(nx_st_usb_host_stack_t* state) {
                 memcpy(slot->bytes + slot->offset, slot->storage, count);
             slot->offset += count;
             slot->transferred = (uint32_t)slot->offset;
-            slot->toggle = slot->setup ? true : !slot->toggle;
+            slot->toggle = slot->pipe.transfer == NX_USB_HOST_ISOCHRONOUS
+                               ? false
+                           : slot->setup ? true
+                                         : !slot->toggle;
             if (slot->setup) {
                 for (size_t peer = 0U; peer < state->config->slot_count;
                      ++peer) {
@@ -261,6 +388,17 @@ nx_result_t nx_st_usb_host_stack_step(nx_st_usb_host_stack_t* state) {
     result = nx_usb_host_state(state->config->transport, &transport);
     if (result != NX_SUCCESS)
         return result;
+    if (state->config->periodic != NULL && transport.started &&
+        !transport.closing && transport.connected && transport.port_enabled &&
+        !transport.suspended) {
+        for (size_t i = 0U; i < state->config->slot_count; ++i) {
+            nx_st_usb_host_periodic_t* cadence = &state->config->periodic[i];
+            if (cadence->interval != 0U &&
+                state->config->slots[i].pipe.speed == transport.speed)
+                periodic_observe(cadence,
+                                 (uint16_t)(transport.frame & 0x3FFFU));
+        }
+    }
     if (transport.connected != state->connected) {
         if (!transport.connected) {
             USBH_StatusTypeDef drained = USBH_LL_Stop(&state->middleware);
@@ -397,6 +535,9 @@ USBH_StatusTypeDef USBH_LL_ResetPort(USBH_HandleTypeDef* host) {
         nx_time_now_us(), state->config->reset_timeout_us, &deadline);
     if (result == NX_SUCCESS)
         result = nx_usb_host_reset(state->config->transport, deadline);
+    if (result == NX_SUCCESS && state->config->periodic != NULL)
+        memset(state->config->periodic, 0,
+               state->config->slot_count * sizeof(*state->config->periodic));
     return status(state, result);
 }
 uint32_t USBH_LL_GetLastXferSize(USBH_HandleTypeDef* host, uint8_t pipe) {
@@ -426,6 +567,8 @@ USBH_StatusTypeDef USBH_LL_OpenPipe(USBH_HandleTypeDef* host, uint8_t pipe,
         slot->configured = true;
         slot->toggle = false;
         slot->urb = USBH_URB_IDLE;
+        if (state->config->periodic != NULL)
+            state->config->periodic[pipe] = (nx_st_usb_host_periodic_t){0};
     }
     return status(state, result);
 }
@@ -439,8 +582,11 @@ USBH_StatusTypeDef USBH_LL_ClosePipe(USBH_HandleTypeDef* host, uint8_t pipe) {
     nx_result_t result =
         state->stopped ? NX_SUCCESS
                        : nx_usb_host_close(state->config->transport, pipe);
-    if (result == NX_SUCCESS)
+    if (result == NX_SUCCESS) {
         slot->configured = false;
+        if (state->config->periodic != NULL)
+            state->config->periodic[pipe] = (nx_st_usb_host_periodic_t){0};
+    }
     return status(state, result);
 }
 USBH_StatusTypeDef USBH_LL_ActivatePipe(USBH_HandleTypeDef* host,
@@ -454,6 +600,12 @@ USBH_StatusTypeDef USBH_LL_SubmitURB(USBH_HandleTypeDef* host, uint8_t pipe,
                                      uint16_t length, uint8_t ping) {
     nx_st_usb_host_stack_t* state = owner(host);
     nx_st_usb_host_slot_t* slot = selected(host, pipe);
+    /* ST ioreq wrappers discard LL rejection. An idle new attempt must not
+     * expose the previous URB's DONE/count as another completed transfer. */
+    if (slot != NULL && !slot->busy) {
+        slot->urb = USBH_URB_ERROR;
+        slot->transferred = 0U;
+    }
     if (slot == NULL || !slot->configured || direction > 1U || token > 1U ||
         type != slot->pipe.transfer ||
         direction != ((slot->pipe.endpoint_address >> 7U) & 1U) ||
@@ -464,6 +616,24 @@ USBH_StatusTypeDef USBH_LL_SubmitURB(USBH_HandleTypeDef* host, uint8_t pipe,
     (void)ping; /* PING/NYET retry remains the explicit official Core policy. */
     if (slot->busy)
         return USBH_BUSY;
+    nx_st_usb_host_periodic_t* periodic =
+        state->config->periodic == NULL ? NULL : &state->config->periodic[pipe];
+    if (periodic != NULL && periodic->interval == 0U &&
+        (type == USB_EP_TYPE_INTR || type == USB_EP_TYPE_ISOC))
+        return status(state, NX_ERROR_STATE);
+    uint16_t frame = 0U;
+    if (periodic != NULL && periodic->interval != 0U) {
+        if (length > slot->pipe.max_packet)
+            return status(state, NX_ERROR_INVALID);
+        nx_result_t cadence = periodic_frame(state, pipe, &frame);
+        if (cadence != NX_SUCCESS)
+            return status(state, cadence);
+        periodic_observe(periodic, frame);
+        if (periodic->remaining != 0U) {
+            slot->urb = USBH_URB_NOTREADY;
+            return USBH_BUSY;
+        }
+    }
     for (size_t i = 0U; i < state->config->slot_count; ++i) {
         const nx_st_usb_host_slot_t* other = &state->config->slots[i];
         if (overlaps(bytes, length, other->storage, other->capacity) ||
@@ -481,8 +651,16 @@ USBH_StatusTypeDef USBH_LL_SubmitURB(USBH_HandleTypeDef* host, uint8_t pipe,
     if ((!core_buffer && overlaps(bytes, length, state, sizeof(*state))) ||
         overlaps(bytes, length, state->config, sizeof(*state->config)) ||
         overlaps(bytes, length, state->config->slots,
-                 state->config->slot_count * sizeof(*slot)))
+                 state->config->slot_count * sizeof(*slot)) ||
+        (state->config->periodic != NULL &&
+         overlaps(bytes, length, state->config->periodic,
+                  state->config->slot_count * sizeof(*periodic))))
         return status(state, NX_ERROR_INVALID);
+    nx_time_us_t deadline;
+    nx_result_t result = nx_deadline_finite_after(
+        nx_time_now_us(), state->config->transfer_timeout_us, &deadline);
+    if (result != NX_SUCCESS)
+        return status(state, result);
     slot->bytes = bytes;
     slot->length = length;
     slot->offset = slot->transferred = 0U;
@@ -490,8 +668,14 @@ USBH_StatusTypeDef USBH_LL_SubmitURB(USBH_HandleTypeDef* host, uint8_t pipe,
     if (slot->setup)
         slot->toggle = false;
     slot->urb = USBH_URB_IDLE;
-    nx_result_t result = submit_packet(state, pipe);
+    /* The existing request carries the whole URB deadline across packets. */
+    slot->request.base.deadline = deadline;
+    result = submit_packet(state, pipe);
     slot->busy = result == NX_SUCCESS;
+    if (slot->busy && periodic != NULL && periodic->interval != 0U) {
+        periodic->last_frame = frame;
+        periodic->remaining = periodic->interval;
+    }
     if (!slot->busy) {
         slot->bytes = NULL;
         slot->urb =
@@ -507,7 +691,8 @@ USBH_URBStateTypeDef USBH_LL_GetURBState(USBH_HandleTypeDef* host,
 USBH_StatusTypeDef USBH_LL_SetToggle(USBH_HandleTypeDef* host, uint8_t pipe,
                                      uint8_t toggle) {
     nx_st_usb_host_slot_t* slot = selected(host, pipe);
-    if (slot == NULL || toggle > 1U)
+    if (slot == NULL || toggle > 1U ||
+        (slot->pipe.transfer == NX_USB_HOST_ISOCHRONOUS && toggle != 0U))
         return USBH_FAIL;
     if (slot->busy)
         return USBH_BUSY;

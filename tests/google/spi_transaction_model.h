@@ -14,6 +14,8 @@ extern "C" {
 void nx_spi_transaction_model_write(void* port, uint16_t word, uint8_t bits);
 /** \brief Observe CS only after the production GPIO operation succeeds. */
 void nx_spi_transaction_model_cs(bool active);
+/** \brief Observe the external CPU privilege independently of SPI behavior. */
+bool nx_spi_transaction_model_privileged(void);
 #ifdef __cplusplus
 }
 #endif
@@ -21,4 +23,5 @@ void nx_spi_transaction_model_cs(bool active);
     nx_spi_transaction_model_write((port), (word), (bits))
 #define NX_STM32_SPI_TRANSACTION_CS(active)                                    \
     nx_spi_transaction_model_cs((active))
+#define nx_arch_is_privileged nx_spi_transaction_model_privileged
 #endif

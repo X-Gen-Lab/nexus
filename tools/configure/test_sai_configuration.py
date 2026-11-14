@@ -24,7 +24,8 @@ class SaiConfigurationTests(unittest.TestCase):
         # Reuse the actual immutable owner/result shape for a pure emitter
         # unit. Complete SAI part/package/route resolution is a separate gate.
         i2s, = self.base.controllers
-        sai = replace(i2s, id="sai", controller="SAI1", mode="slave-duplex")
+        sai = replace(i2s, id="sai", controller="SAI1", mode="slave-duplex",
+                      options=mode_options({**self.raw(), "mode": "slave-duplex"}))
         claims = tuple(ResourceClaimIR(key, sai.id, "exclusive", "unit",
                                        "exclusive", (), None) for key in
                        ("irq:SAI1", "dma:DMA2:stream1", "dma:DMA2:stream4"))
@@ -49,7 +50,7 @@ class SaiConfigurationTests(unittest.TestCase):
         self.assertEqual(24, options.sample_bits)
         self.assertEqual(5, options.irq.priority)
         for field in ("pll_n", "pll_r", "pll_m", "clock", "standard",
-                      "frame_bits", "active_slots", "tx_block", "rx_block"):
+                      "frame_bits", "tx_block", "rx_block"):
             self.assertFalse(hasattr(options, field), field)
         with self.assertRaises(FrozenInstanceError):
             options.source_block = "B"
@@ -60,10 +61,12 @@ class SaiConfigurationTests(unittest.TestCase):
         for key in ("kind", "controller", "source_block"):
             result.pop(key)
         result.update(binding="sound", mode=mode)
+        if mode.endswith("-blocks"):
+            result["max_service_gap_us"] = 10
         return result
 
     @staticmethod
-    def route(block="A", duplex=True, mclk=False):
+    def route(block="A", duplex=True, mclk=False, controller="SAI1"):
         pins = ([('PE4', 'fs_a'), ('PE5', 'ck_a'), ('PE6', 'sd_a')]
                 if block == "A" else
                 [('PF9', 'fs_b'), ('PF8', 'ck_b'), ('PE3', 'sd_b')])
@@ -71,8 +74,13 @@ class SaiConfigurationTests(unittest.TestCase):
             pins += [('PE3', 'sd_b')] if block == "A" else [('PE6', 'sd_a')]
         if mclk:
             pins += [('PE2', 'mclk_a')] if block == "A" else [('PF7', 'mclk_b')]
-        return dict(kind="audio", controller="SAI1", id="sai-unit",
-                    pins=[dict(pin=pad, function=signal, af=6)
+        if controller == "SAI2":
+            pads = dict(PE4="PD12", PE5="PD13", PE6="PD11", PE3="PE11",
+                        PE2="PE0", PF9="PE13", PF8="PE12", PF7="PE14")
+            pins = [(pads[pad], signal) for pad, signal in pins]
+        return dict(kind="audio", controller=controller, id="sai-unit",
+                    pins=[dict(pin=pad, function=signal,
+                               af=10 if controller == "SAI2" else 6)
                           for pad, signal in pins])
 
     @staticmethod
@@ -107,9 +115,9 @@ class SaiConfigurationTests(unittest.TestCase):
                                      else (primary,), sai.dma_paths(route, selected["mode"]))
 
     def test_sai_rejects_unsupported_modes_holes_and_wrong_af_without_repair(self):
-        for change in (dict(mode="slave-duplex-blocks"), dict(slots=17),
+        for change in (dict(mode="slave-spdif"), dict(slots=17),
                        dict(sample_bits=12), dict(slot_bits=8),
-                       dict(active_slots=1), dict(source_block="B"),
+                       dict(active_slots=0), dict(source_block="B"),
                        dict(standard="philips"), dict(first_bit_offset=9),
                        dict(frame_sync_bits=0), dict(mclk=True),
                        dict(no_divider=True), dict(calls_os=True)):
@@ -119,6 +127,47 @@ class SaiConfigurationTests(unittest.TestCase):
         route["pins"][0]["af"] = 5
         with self.assertRaises(ValueError):
             sai.validate(self.selection(), route)
+
+    def test_sparse_slots_preserve_wire_geometry_and_resolve_the_enabled_mask(self):
+        selected = {**self.selection("slave-tx"), "slots": 8,
+                    "frame_sync_bits": 128, "active_slots": 0x81}
+        route = self.route(duplex=False)
+        sai.validate(selected, route)
+        clock, plan = self.clocks(False)
+        resolved = sai.resolve_fields(selected, route, clock, plan)
+        self.assertEqual(0x81, resolved["active_slots"])
+        for invalid in (0, -1, 256, True):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                sai.validate({**selected, "active_slots": invalid}, route)
+
+    def test_sai2_uses_its_exact_af10_pads_and_distinct_dma_requests(self):
+        for block in ("A", "B"):
+            with self.subTest(block=block):
+                route = self.route(block, controller="SAI2")
+                selected = self.selection("slave-duplex")
+                sai.validate(selected, route)
+                primary = (2, 4, 3) if block == "A" else (2, 6, 3)
+                peer = (2, 6, 3) if block == "A" else (2, 4, 3)
+                self.assertEqual((primary, peer),
+                                 sai.dma_paths(route, selected["mode"]))
+                route["pins"][0]["af"] = 6
+                with self.assertRaises(ValueError):
+                    sai.validate(selected, route)
+
+    def test_continuous_sai_resolves_a_separate_personality_and_service_bound(self):
+        selected = self.selection("slave-duplex-blocks")
+        route = self.route()
+        sai.validate(selected, route)
+        clock, plan = self.clocks(False)
+        resolved = sai.resolve_fields(selected, route, clock, plan)
+        self.assertTrue(resolved["continuous"])
+        self.assertEqual(10, resolved["max_service_gap_us"])
+        self.assertEqual(((2, 1, 0), (2, 4, 1)),
+                         sai.dma_paths(route, selected["mode"]))
+        for change in (dict(max_service_gap_us=0),
+                       dict(max_service_gap_us=1000001)):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                sai.validate({**selected, **change}, route)
 
     def test_sai_master_requires_its_one_system_source_and_safe_clock_ratio(self):
         selected = self.selection()
@@ -231,7 +280,7 @@ class SaiConfigurationTests(unittest.TestCase):
         self.assertEqual("nx_stm32_sai_state_t",
                          capture_audio.constructor(item, self.base).state_type)
         with self.assertRaises(ValueError):
-            capture_audio.validate(self.selection("slave-duplex-blocks"), route)
+            capture_audio.validate(self.selection("slave-unknown"), route)
 
     def test_family_dma_gate_uses_the_exact_sai_source_and_peer_order(self):
         for block in ("A", "B"):
@@ -248,18 +297,21 @@ class SaiConfigurationTests(unittest.TestCase):
         # vendor identities. Only the Board/assembly are temporary inputs.
         with tempfile.TemporaryDirectory(prefix="sai assembly ") as temporary:
             root = Path(temporary)
-            for part in ("STM32F446ZET6", "STM32F479NIH6"):
+            for part, controller in (("STM32F446ZET6", "SAI1"),
+                                     ("STM32F446ZET6", "SAI2"),
+                                     ("STM32F479NIH6", "SAI1")):
                 for block in ("A", "B"):
                     for mode in sai.MODES:
-                        with self.subTest(part=part, block=block, mode=mode):
+                        with self.subTest(part=part, controller=controller,
+                                          block=block, mode=mode):
                             directory = root / "board"
                             directory.mkdir(exist_ok=True)
-                            route = "sai1-" + block.lower() + ("-duplex"
-                                if mode.endswith("duplex") else "-simplex")
+                            route = controller.lower() + "-" + block.lower() + ("-duplex"
+                                if mode.removesuffix("-blocks").endswith("duplex") else "-simplex")
                             board = dict(schema_version=1, id="sai-software-fixture",
                                 soc=part, soc_family="stm32f4", source_revision="v1",
                                 physical_pcb_revision=None, clocks={},
-                                bindings=[dict(id="sound", controller="SAI1", route=route)],
+                                bindings=[dict(id="sound", controller=controller, route=route)],
                                 reserved_resources=["PA13", "PA14"],
                                 unknowns=["Software fixture; no PCB or physical qualification"],
                                 provenance=[dict(url="https://www.st.com/",
@@ -297,8 +349,9 @@ class SaiConfigurationTests(unittest.TestCase):
                             self.assertEqual(block, item.options.source_block)
                             self.assertFalse(result.physical_qualified)
                             source = bindings.emit(result)[1]
-                            self.assertIn("nx_stm32_sai_prepare", source)
-                            self.assertIn("nx_stm32_sai_ops", source)
+                            suffix = "_blocks" if mode.endswith("-blocks") else ""
+                            self.assertIn("nx_stm32_sai" + suffix + "_prepare", source)
+                            self.assertIn("nx_stm32_sai" + suffix + "_ops", source)
                             self.assertNotIn("s_nx_audio_clock", source)
                             for body in re.findall(r"void \w+_IRQHandler\(void\) \{([^}]+)\}", source):
                                 self.assertEqual(1, body.count("nx_arch_dsb()"))

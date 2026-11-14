@@ -9,7 +9,7 @@ def implementation(controller):
         return fsmc
     if mode == "sdram-controller":
         return sdram
-    if mode == "qspi-indirect-sdr":
+    if mode in {"qspi-indirect-sdr", "qspi-indirect-dma"}:
         return qspi
     fail("Unknown external-memory controller mode: " + mode)
 

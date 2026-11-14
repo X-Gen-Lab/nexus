@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """One thin entry point that preserves native CMake/CTest command exit codes."""
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -39,13 +40,29 @@ def executable(name):
     return found
 
 
-def execute(command, environment):
+def execute(command, environment, *, cancel_event=None):
+    """Retain isolated output; publish one atomic latest-result navigation."""
     print("+ " + " ".join(command), flush=True)
+    directory = (ROOT / "build/quality/developer-commands" /
+                 (str(time.time_ns()) + "-" + uuid.uuid4().hex))
+    log = directory / "command.txt"
     result = process.run(command, cwd=ROOT, env=environment,
-                         log=ROOT / "build/quality/developer-command.txt",
-                         stage="development")
+                         log=log, stage="development",
+                         cancel_event=cancel_event)
+    # The public JSON is the only latest-result authority. Both its log and
+    # receipt refer to immutable invocation paths, so parallel completions
+    # cannot combine one command's output with another command's identity.
+    record = json.loads(result.receipt_path.read_text())
+    with log.open("rb") as stream:
+        digest = hashlib.file_digest(stream, "sha256").hexdigest()
+    record.update({"attempt_receipt": str(result.receipt_path),
+                   "log": {"path": str(log), "bytes": log.stat().st_size,
+                           "sha256": digest}})
+    provenance.atomic_json(
+        ROOT / "build/quality/developer-command.command.json", record)
     print(result.stdout, end="")
     print(result.stderr, end="", file=sys.stderr)
+    print("Command log: " + str(log), flush=True)
     return ExecutionResult(result.returncode, result.receipt_path)
 
 
@@ -190,10 +207,16 @@ def main(argv=None):
                                           "check", "doctor", "prepare",
                                           "cache", "docs",
                                           "create", "flash", "debug", "monitor",
-                                          "timings", "artifacts", "support"))
+                                          "timings", "artifacts", "support",
+                                          "matrix"))
     parser.add_argument("--preset")
     args, native = parser.parse_known_args(argv)
     try:
+        if args.action == "matrix":
+            if args.preset is not None:
+                raise ValueError("matrix selects --presets, not --preset")
+            from tools.dev import native_matrix
+            return native_matrix.main(native)
         if args.action == "support":
             if args.preset is not None:
                 raise ValueError("support requires an exact --assembly; --preset is not evidence")

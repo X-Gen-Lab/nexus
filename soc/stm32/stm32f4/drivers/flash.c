@@ -11,6 +11,22 @@
 #include <string.h>
 
 static nx_result_t recover(void* context);
+static nx_result_t end(nx_stm32_flash_state_t* port, nx_result_t result);
+
+/** \brief Physical offsets never silently follow a boot-time bank swap. */
+static nx_result_t physical_mapping(const nx_stm32_flash_state_t* port) {
+#if defined(STM32F479xx)
+    if ((RCC->APB2ENR & RCC_APB2ENR_SYSCFGEN) == 0U)
+        return NX_ERROR_STATE;
+    if ((SYSCFG->MEMRMP & SYSCFG_MEMRMP_UFB_MODE) != 0U ||
+        (port->registers->OPTCR & (FLASH_OPTCR_BFB2 | FLASH_OPTCR_SPRMOD)) !=
+            0U)
+        return NX_ERROR_UNSUPPORTED;
+#else
+    (void)port;
+#endif
+    return NX_SUCCESS;
+}
 
 nx_result_t nx_stm32_flash_prepare(nx_stm32_flash_state_t* port,
                                    const nx_flash_geometry_t* geometry,
@@ -22,8 +38,12 @@ nx_result_t nx_stm32_flash_prepare(nx_stm32_flash_state_t* port,
         nx_flash_geometry_sector_count(geometry, &sector_count) != NX_SUCCESS ||
         geometry->base_address != FLASH_BASE || geometry->program_unit != 4U ||
         geometry->program_flags != 0U ||
+#if defined(STM32F479xx)
+        !(geometry->size == 0x200000U && sector_count == 24U))
+#else
         !((geometry->size == 0x80000U && sector_count == 8U) ||
           (geometry->size == 0x100000U && sector_count == 12U)))
+#endif
         return NX_ERROR_INVALID;
     if (supply_mv < 2700U || supply_mv > 3600U)
         return NX_ERROR_UNSUPPORTED;
@@ -31,7 +51,10 @@ nx_result_t nx_stm32_flash_prepare(nx_stm32_flash_state_t* port,
         return NX_ERROR_BUSY;
     uint32_t offset = 0U;
     for (uint32_t i = 0U; i < sector_count; ++i) {
-        uint32_t size = i < 4U ? 0x4000U : i == 4U ? 0x10000U : 0x20000U;
+        uint32_t local = i % 12U;
+        uint32_t size = local < 4U    ? 0x4000U
+                        : local == 4U ? 0x10000U
+                                      : 0x20000U;
         nx_flash_sector_t sector;
         if (nx_flash_geometry_sector_at(geometry, i, &sector) != NX_SUCCESS ||
             sector.offset != offset || sector.size != size)
@@ -100,6 +123,12 @@ static bool clear_irq(void) {
 #define NX_FLASH_ERRORS                                                        \
     ((uint32_t)(FLASH_SR_OPERR | FLASH_SR_WRPERR | FLASH_SR_PGAERR |           \
                 FLASH_SR_PGPERR | FLASH_SR_PGSERR))
+#if defined(STM32F479xx)
+#undef NX_FLASH_ERRORS
+#define NX_FLASH_ERRORS                                                        \
+    ((uint32_t)(FLASH_SR_OPERR | FLASH_SR_WRPERR | FLASH_SR_PGAERR |           \
+                FLASH_SR_PGPERR | FLASH_SR_PGSERR | FLASH_SR_RDERR))
+#endif
 #define NX_FLASH_OWNED_MODES                                                   \
     ((uint32_t)(FLASH_CR_PG | FLASH_CR_SER | FLASH_CR_SNB | FLASH_CR_STRT |    \
                 FLASH_CR_EOPIE))
@@ -116,6 +145,40 @@ static bool control(nx_stm32_flash_state_t* port, uint32_t value) {
     nx_arch_dsb();
     return NX_STM32_FLASH_READ(&port->registers->CR) == value;
 }
+
+#if defined(STM32F479xx)
+/** \brief Preserve latency while proving each cache ownership transition. */
+static bool cache_write(nx_stm32_flash_state_t* port, uint32_t value) {
+    NX_STM32_FLASH_WRITE(&port->registers->ACR, value);
+    nx_arch_dsb();
+    nx_arch_isb();
+    return NX_STM32_FLASH_READ(&port->registers->ACR) == value;
+}
+
+/** \brief ES0321 2.2.12 requires DCEN0 before any cross-bank write pulse. */
+static bool cache_acquire(nx_stm32_flash_state_t* port) {
+    uint32_t acr = NX_STM32_FLASH_READ(&port->registers->ACR);
+    port->cache_flags = (uint8_t)((acr >> 9U) & 3U);
+    port->cache_owned = true;
+    return cache_write(port, acr & ~(uint32_t)FLASH_ACR_DCEN);
+}
+
+/** \brief A failed cache reset/restore retains the same physical owner. */
+static bool cache_release(nx_stm32_flash_state_t* port) {
+    if (!port->cache_owned)
+        return true;
+    uint32_t acr = NX_STM32_FLASH_READ(&port->registers->ACR) &
+                   ~(uint32_t)(FLASH_ACR_ICEN | FLASH_ACR_DCEN |
+                               FLASH_ACR_ICRST | FLASH_ACR_DCRST);
+    if (!cache_write(port, acr) ||
+        !cache_write(port, acr | FLASH_ACR_ICRST | FLASH_ACR_DCRST) ||
+        !cache_write(port, acr) ||
+        !cache_write(port, acr | (uint32_t)port->cache_flags << 9U))
+        return false;
+    port->cache_owned = false;
+    return true;
+}
+#endif
 
 /** \brief Validate physical subtraction bounds before any read or write. */
 static bool range(const nx_stm32_flash_state_t* port, uint32_t offset,
@@ -141,6 +204,9 @@ nx_result_t nx_stm32_flash_read(const void* context, uint32_t offset,
     if (port->active || (port->registers->SR & FLASH_SR_BSY) != 0U) {
         return NX_ERROR_BUSY;
     }
+    nx_result_t result = physical_mapping(port);
+    if (result != NX_SUCCESS)
+        return result;
     uint8_t* output = data;
     for (size_t i = 0U; i < length; ++i) {
         output[i] = port->memory[offset + i];
@@ -161,9 +227,17 @@ static nx_result_t begin(nx_stm32_flash_state_t* port) {
         !NX_STM32_FLASH_IRQ_IDLE() || NX_STM32_FLASH_IRQ_ACTIVE()) {
         return NX_ERROR_BUSY;
     }
+#if defined(STM32F479xx)
+    if (port->cache_owned || (NX_STM32_FLASH_READ(&port->registers->ACR) &
+                              (FLASH_ACR_ICRST | FLASH_ACR_DCRST)) != 0U)
+        return NX_ERROR_BUSY;
+#endif
     if (port->supply_mv < 2700U || port->supply_mv > 3600U) {
         return NX_ERROR_UNSUPPORTED;
     }
+    nx_result_t result = physical_mapping(port);
+    if (result != NX_SUCCESS)
+        return result;
     if ((NX_STM32_FLASH_READ(&port->registers->CR) & FLASH_CR_LOCK) != 0U) {
         NX_STM32_FLASH_WRITE(&port->registers->KEYR, 0x45670123U);
         NX_STM32_FLASH_WRITE(&port->registers->KEYR, 0xCDEF89ABU);
@@ -173,6 +247,10 @@ static nx_result_t begin(nx_stm32_flash_state_t* port) {
         }
     }
     port->active = true;
+#if defined(STM32F479xx)
+    if (!cache_acquire(port))
+        return end(port, NX_ERROR_IO);
+#endif
     return NX_SUCCESS;
 }
 
@@ -199,10 +277,14 @@ static nx_result_t end(nx_stm32_flash_state_t* port, nx_result_t result) {
     withdrawn = clear_status(port) && withdrawn;
     withdrawn = NX_STM32_FLASH_IRQ_CLEAR() && withdrawn;
     withdrawn = !NX_STM32_FLASH_IRQ_ACTIVE() && withdrawn;
+#if defined(STM32F479xx)
+    withdrawn = cache_release(port) && withdrawn;
+#else
     uint32_t cache = port->registers->ACR;
     port->registers->ACR = cache & ~(uint32_t)(FLASH_ACR_ICEN | FLASH_ACR_DCEN);
     port->registers->ACR |= FLASH_ACR_ICRST | FLASH_ACR_DCRST;
     port->registers->ACR = cache;
+#endif
     nx_arch_dsb();
     nx_arch_isb();
     /* A failed source/lock/vector proof retains the concrete instance. The
@@ -341,11 +423,15 @@ nx_result_t nx_stm32_flash_erase(void* context, uint32_t offset, size_t length,
             result = NX_ERROR_TIMEOUT;
             break;
         }
+        /* RM0386 bank two uses SNB16..27 for physical sectors12..23.
+         * Keep the same encoding as the reviewed official FLASH_Erase_Sector.
+         * SNB12..15 are reserved and must never be issued. */
+        uint32_t encoded = sector > 11U ? sector + 4U : sector;
         if (!clear_status(port) || !NX_STM32_FLASH_IRQ_CLEAR() ||
             !control(port, (NX_STM32_FLASH_READ(&port->registers->CR) &
                             ~(uint32_t)(FLASH_CR_PSIZE | FLASH_CR_SNB)) |
                                FLASH_CR_PSIZE_1 | FLASH_CR_SER |
-                               FLASH_CR_EOPIE | ((uint32_t)sector << 3U))) {
+                               FLASH_CR_EOPIE | (encoded << 3U))) {
             result = NX_ERROR_IO;
             break;
         }
@@ -398,9 +484,12 @@ static nx_result_t maintenance_idle(nx_stm32_flash_state_t* port) {
         return NX_ERROR_CONTEXT;
     uint32_t count;
     if (!range(port, 0U, 0U) ||
-        nx_flash_geometry_sector_count(port->geometry, &count) != NX_SUCCESS ||
-        (count != 8U && count != 12U))
+        nx_flash_geometry_sector_count(port->geometry, &count) != NX_SUCCESS)
         return NX_ERROR_STATE;
+    /* The existing option/OTP contract has one OPTCR protection bitmap.
+     * Two-bank parts require their independently reviewed OPTCR1 contract. */
+    if (count != 8U && count != 12U)
+        return NX_ERROR_UNSUPPORTED;
     return port->active || (NX_STM32_FLASH_READ(&port->registers->SR) &
                             FLASH_SR_BSY) != 0U
                ? NX_ERROR_BUSY

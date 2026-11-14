@@ -36,14 +36,22 @@ static nx_result_t idle(void* context) {
     return NX_SUCCESS;
 }
 
+/** \brief A coherent test-local aperture needs explicit final cleanup. */
+static nx_mapped_storage_map_result_t map(void* context) {
+    (void)context;
+    return (nx_mapped_storage_map_result_t){NX_SUCCESS, true};
+}
+
 /** \brief No physical operation is implemented by this link-only fixture. */
 static nx_result_t start(void* context, nx_mapped_storage_operation_t operation,
-                         size_t offset, const void* data, size_t length) {
+                         size_t offset, const void* data, size_t length,
+                         nx_time_us_t deadline) {
     (void)context;
     (void)operation;
     (void)offset;
     (void)data;
     (void)length;
+    (void)deadline;
     return NX_ERROR_UNSUPPORTED;
 }
 
@@ -64,7 +72,7 @@ int main(void) {
         &backend_state,
         sizeof(backend_state),
         {aperture, sizeof(aperture), 4, 16, NX_MAPPED_STORAGE_CPU_READ},
-        idle,
+        map,
         idle,
         start,
         poll,

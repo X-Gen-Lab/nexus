@@ -9,7 +9,7 @@
 #include "clock_domain_impl.h"
 #include "nexus/core/fault.h"
 #include "nexus/core/platform_lifecycle.h"
-#include "nexus/soc/stm32f407_power.h"
+#include "nexus/soc/stm32f4_power.h"
 #include "power_rtc_integration_model.h"
 #include <cstring>
 #include <gtest/gtest.h>
@@ -19,8 +19,8 @@ extern "C" nx_stm32_system_t g_nx_stm32_system;
 uint32_t nx_power_rtc_scr;
 uint32_t nx_power_rtc_icsr;
 uint32_t nx_power_rtc_tick;
-uint32_t nx_power_rtc_enabled[3];
-uint32_t nx_power_rtc_active[3];
+uint32_t nx_power_rtc_enabled[4];
+uint32_t nx_power_rtc_active[4];
 
 namespace {
 nx_stm32_rtc_state_t rtc_state;
@@ -174,9 +174,8 @@ TEST_F(PowerRtcIntegration, StandbyReceiptCrossesRealSystemStopAndColdResume) {
     Prepare();
     ASSERT_FALSE(HasFatalFailure());
     nx_stm32_stop_receipt_t receipt{};
-    EXPECT_EQ(NX_ERROR_IO,
-              nx_stm32f407_standby_enter(barrier, &options, &rtc_port, &standby,
-                                         &receipt));
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_standby_enter(barrier, &options, &rtc_port,
+                                                  &standby, &receipt));
     EXPECT_EQ(1U, waits);
     EXPECT_EQ(nullptr, standby.owner);
     EXPECT_EQ(prior_epoch, receipt.old_epoch);
@@ -199,9 +198,8 @@ TEST_F(PowerRtcIntegration, FailedRtcRestoreRetainsActualOwnerAfterNewEpoch) {
     ASSERT_FALSE(HasFatalFailure());
     refuse_restore = true;
     nx_stm32_stop_receipt_t receipt{};
-    EXPECT_EQ(NX_ERROR_IO,
-              nx_stm32f407_standby_enter(barrier, &options, &rtc_port, &standby,
-                                         &receipt));
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32_standby_enter(barrier, &options, &rtc_port,
+                                                  &standby, &receipt));
     EXPECT_EQ(1U, waits);
     EXPECT_NE(nullptr, standby.owner);
     EXPECT_TRUE(g_nx_stm32_system.started);
@@ -222,6 +220,12 @@ extern "C" void nx_power_rtc_poll(void* raw) {
     rcc->CR = (rcc->CR & ~(uint32_t)(RCC_CR_HSERDY | RCC_CR_PLLRDY)) |
               ((rcc->CR & RCC_CR_HSEON) != 0U ? RCC_CR_HSERDY : 0U) |
               ((rcc->CR & RCC_CR_PLLON) != 0U ? RCC_CR_PLLRDY : 0U);
+#if defined(NX_POWER_RTC_HIGH_PROFILE)
+    if ((rcc->CR & RCC_CR_PLLRDY) != 0U)
+        system->power->CSR |= PWR_CSR_VOSRDY;
+    else
+        system->power->CSR &= ~static_cast<uint32_t>(PWR_CSR_VOSRDY);
+#endif
     rcc->CFGR = (rcc->CFGR & ~(uint32_t)RCC_CFGR_SWS) |
                 ((rcc->CFGR & (uint32_t)RCC_CFGR_SW) << 2U);
 }

@@ -43,7 +43,9 @@ def validate_selection(selection, route, provider, ram_size, *, clock=None,
     unknown = selection.keys() - {"id", "binding", "mode"} - fields
     if contract is None or unknown:
         fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")
-    electrical = {"pull", "output_type", "speed"} & selection.keys()
+    electrical = {"pull", "output_type"} & selection.keys()
+    if kind != "block" and "speed" in selection:
+        electrical.add("speed")
     if electrical:
         if (kind not in {"gpio", "exti"} or
                 not getattr(provider, "PIN_ELECTRICAL", False) or

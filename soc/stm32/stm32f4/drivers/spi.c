@@ -62,7 +62,8 @@ nx_result_t nx_stm32_spi_select(const nx_stm32_spi_endpoint_state_t* endpoint,
     return result;
 }
 
-static bool cold_context(void) {
+/** \brief Direct hardware control requires a privileged unmasked executor. */
+static bool control_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
 }
@@ -143,7 +144,7 @@ bool nx_stm32_spi_config_valid(const nx_stm32_spi_config_t* config) {
 nx_result_t nx_stm32_spi_admit(const nx_stm32_spi_state_t* port,
                                const nx_stm32_spi_config_t* config,
                                const nx_stm32_spi_cold_receipt_t* receipt) {
-    if (!cold_context())
+    if (!control_context())
         return NX_ERROR_CONTEXT;
     if (port == NULL || receipt == NULL || !nx_stm32_spi_config_valid(config))
         return NX_ERROR_INVALID;
@@ -211,7 +212,7 @@ nx_result_t nx_stm32_spi_cold_rollback(nx_stm32_spi_state_t* port,
 nx_result_t nx_stm32_spi_cold_acquire(nx_stm32_spi_state_t* port,
                                       const nx_stm32_spi_config_t* config,
                                       nx_stm32_spi_cold_receipt_t* receipt) {
-    if (!cold_context())
+    if (!control_context())
         return NX_ERROR_CONTEXT;
     if (port == NULL || receipt == NULL)
         return NX_ERROR_INVALID;
@@ -305,7 +306,7 @@ nx_result_t nx_stm32_spi_prepare(nx_stm32_spi_state_t* port,
 nx_result_t nx_stm32_spi_close(nx_stm32_spi_state_t* port,
                                const nx_stm32_spi_config_t* config,
                                nx_stm32_spi_cold_receipt_t* receipt) {
-    if (!cold_context())
+    if (!control_context())
         return NX_ERROR_CONTEXT;
     if (port == NULL || receipt == NULL)
         return NX_ERROR_INVALID;
@@ -410,6 +411,51 @@ static void abort_controller(nx_stm32_spi_state_t* port) {
     port->fault = true;
 }
 
+/** \brief Reject wrapped extents and overlap without touching either span. */
+static bool storage_outside(const void* storage, size_t bytes,
+                            const void* control, size_t control_bytes) {
+    uintptr_t first = (uintptr_t)storage;
+    uintptr_t second = (uintptr_t)control;
+    return storage != NULL && bytes <= UINTPTR_MAX - first &&
+           control_bytes <= UINTPTR_MAX - second &&
+           (first <= second ? second - first >= bytes
+                            : first - second >= control_bytes);
+}
+
+/** \brief Admission never lends this controller's control or live MMIO bytes.
+ */
+static bool polling_storage(const nx_stm32_spi_endpoint_state_t* endpoint,
+                            const void* storage, size_t bytes) {
+    const nx_stm32_spi_state_t* port = endpoint->port;
+    return storage_outside(storage, bytes, endpoint, sizeof(*endpoint)) &&
+           storage_outside(storage, bytes, port, sizeof(*port)) &&
+           storage_outside(storage, bytes, endpoint->cs,
+                           sizeof(*endpoint->cs)) &&
+           storage_outside(storage, bytes, port->registers,
+                           sizeof(*port->registers)) &&
+           storage_outside(storage, bytes, port->rcc, sizeof(*port->rcc)) &&
+           storage_outside(storage, bytes, endpoint->cs->registers,
+                           sizeof(*endpoint->cs->registers));
+}
+
+/** \brief Validate a result and optional byte spans before their first write.
+ */
+static bool polling_buffers(const nx_stm32_spi_endpoint_state_t* endpoint,
+                            const uint8_t* tx, uint8_t* rx, size_t bytes,
+                            size_t* transferred) {
+    if ((uintptr_t)transferred % _Alignof(size_t) != 0U ||
+        !polling_storage(endpoint, transferred, sizeof(*transferred)) ||
+        (tx != NULL &&
+         (!polling_storage(endpoint, tx, bytes) ||
+          !storage_outside(transferred, sizeof(*transferred), tx, bytes))) ||
+        (rx != NULL &&
+         (!polling_storage(endpoint, rx, bytes) ||
+          !storage_outside(transferred, sizeof(*transferred), rx, bytes))))
+        return false;
+    return tx == NULL || rx == NULL || tx == rx ||
+           storage_outside(rx, bytes, tx, bytes);
+}
+
 /** \brief Keep one endpoint's config and CS stable for the complete
  * transaction. */
 nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
@@ -422,14 +468,16 @@ nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
         endpoint->mode > 3U || endpoint->frequency_hz == 0U) {
         return NX_ERROR_INVALID;
     }
-    *transferred = 0U;
     nx_stm32_spi_state_t* port = endpoint->port;
     if (port->registers == NULL || port->rcc == NULL || port->clock_hz == 0U ||
+        endpoint->cs->registers == NULL || !endpoint->cs->output ||
         (endpoint->cs_mask & ~endpoint->cs->mask) != 0U ||
         endpoint->cs_mask == 0U || !endpoint->cs->initialized) {
         return NX_ERROR_INVALID;
     }
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+    if (!polling_buffers(endpoint, tx, rx, length, transferred))
+        return NX_ERROR_INVALID;
+    if (!control_context()) {
         return NX_ERROR_CONTEXT;
     }
     if (length > 256U || deadline == NX_DEADLINE_NEVER) {
@@ -457,6 +505,7 @@ nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
     if (LL_SPI_IsActiveFlag_BSY(port->registers) != 0U) {
         return NX_ERROR_BUSY;
     }
+    *transferred = 0U;
     port->active = true;
     port->registers->CR1 = SPI_CR1_MSTR | SPI_CR1_SSM | SPI_CR1_SSI |
                            (baud_bits << 3U) |
@@ -525,7 +574,7 @@ nx_result_t nx_stm32_spi_recover(void* context) {
     if (port == NULL || port->registers == NULL || port->rcc == NULL) {
         return NX_ERROR_INVALID;
     }
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+    if (!control_context()) {
         return NX_ERROR_CONTEXT;
     }
     if (port->active || LL_SPI_IsActiveFlag_BSY(port->registers) != 0U) {
@@ -582,7 +631,21 @@ static nx_result_t transaction_transfer(void* context,
         (endpoint->cs_mask & ~endpoint->cs->mask) != 0U) {
         return NX_ERROR_INVALID;
     }
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+    if (segments == NULL || count == 0U || count > NX_SPI_MAX_SEGMENTS ||
+        (word_bits != 8U && word_bits != 16U) ||
+        (uintptr_t)transferred % _Alignof(size_t) != 0U ||
+        !polling_storage(endpoint, segments, count * sizeof(*segments)) ||
+        !polling_storage(endpoint, transferred, sizeof(*transferred)))
+        return NX_ERROR_INVALID;
+    for (size_t i = 0U; i < count; ++i) {
+        size_t bytes = segments[i].words * (word_bits / 8U);
+        if ((segments[i].tx != NULL &&
+             !polling_storage(endpoint, segments[i].tx, bytes)) ||
+            (segments[i].rx != NULL &&
+             !polling_storage(endpoint, segments[i].rx, bytes)))
+            return NX_ERROR_INVALID;
+    }
+    if (!control_context()) {
         return NX_ERROR_CONTEXT;
     }
     /* Bound the entire CPU transaction before acquiring CS or touching SPI. */
@@ -616,6 +679,7 @@ static nx_result_t transaction_transfer(void* context,
     if ((port->registers->SR & SPI_SR_BSY) != 0U) {
         return NX_ERROR_BUSY;
     }
+    *transferred = 0U;
     port->active = true;
     /* DFF is programmed with SPE clear, once for the complete transaction. */
     LL_SPI_Disable(port->registers);

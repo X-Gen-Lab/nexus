@@ -3,7 +3,7 @@ import re
 
 from tools.configure.providers import for_selection
 from tools.configure.ir import ConfigurationIR
-from tools.configure.factory import (interface_type, public_header,
+from tools.configure.factory import (interface_type, public_include,
                                      controller_class, controller_ordinals)
 from tools.configure import gpio_phase
 from tools.configure import enhanced_endpoints
@@ -143,13 +143,13 @@ def emit(result):
     if uart_formats.probed(result):
         header.insert(-1, '#include "nexus_config.h"')
     for kind in sorted({controller_class(item) for item in selections}):
-        header.append(f'#include "nexus/io/{public_header(kind)}.h"')
+        header.append(f'#include "{public_include(kind)}"')
     for kind in sorted({enhanced_endpoints.class_name(item)
                         for item in result.devices} &
                        {"spi_transaction_device",
                         "spi_dma_transaction_device", "memory_window",
-                        "parallel16", "flash_async", "nand"}):
-        header.append(f'#include "nexus/io/{public_header(kind)}.h"')
+                        "parallel16", "flash_async", "nand", "mapped_storage"}):
+        header.append(f'#include "{public_include(kind)}"')
     if any(item.kind in {"eth", "eth_frames"} for item in selections):
         header.append('#include "nexus/io/mdio.h"')
     header += ['#ifdef __cplusplus', 'extern "C" {', '#endif',
@@ -280,6 +280,11 @@ def emit(result):
                    f'static const {exported_type} s_nx_face_{name} = {{',
                    f'    &{provider.operations(item)}, {face_context}', '};',
                    f'const {exported_type}* const nx_binding_{name} = &s_nx_face_{name};']
+        if item.kind == "gpio" and getattr(item.options, "active_high", None) is not None:
+            source += [
+                f'static const nx_gpio_signal_t s_nx_signal_{name} = {{',
+                f'    &s_nx_face_{name}, {item.options.mask}u, '
+                f'{str(item.options.active_high).lower()}', '};']
         source.extend(stream_profiles.emit_instance(item))
         source.extend(provider.instance_declarations(item, result))
         source.extend(construction.definitions)

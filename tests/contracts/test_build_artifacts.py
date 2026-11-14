@@ -53,7 +53,7 @@ class ArtifactBuildTests(unittest.TestCase):
                 f'add_subdirectory("{ROOT.as_posix()}" nexus-owned)\n'
                 f'set_property(TARGET nexus_platform PROPERTY NEXUS_SOURCE_DIR '
                 f'"{checker.as_posix()}")\n'
-                'nexus_add_stm32f407_sleep(platform_sleep)\n'
+                'nexus_add_stm32f4_sleep(platform_sleep)\n'
                 'nexus_add_firmware(app SOURCES main.c LIBRARIES platform_sleep)\n'
                 'file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/sleep-policy.txt" '
                 'CONTENT "$<TARGET_PROPERTY:platform_sleep,'

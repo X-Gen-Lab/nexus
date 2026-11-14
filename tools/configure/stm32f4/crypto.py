@@ -1,5 +1,6 @@
 """Static crypto engine connections; C owns gates, vectors and secret cleanup."""
 from tools.configure.calls import Address, DirectCall, InitializeSequence, Symbol
+from tools.configure.memory import dma_regions
 from tools.configure.providers.common import Construction, kernel_policy_constant
 
 
@@ -10,12 +11,25 @@ def constructor(item, result):
     config = 's_nx_crypto_config_' + name
     lease = 's_nx_crypto_irq_' + name
     policy = result.irq
-    definitions = [
+    definitions = []
+    dma_config = 'NULL'
+    if item.mode == 'dma-blocks':
+        regions, count = dma_regions(name, result, include_flash=True,
+                                      engine='DMA2')
+        dma_state = 's_nx_crypto_dma_' + name
+        dma_config = 's_nx_crypto_dma_config_' + name
+        definitions += regions + [
+            f'static nx_stm32f4_{kind}_dma_state_t {dma_state};',
+            f'static const nx_stm32f4_{kind}_dma_config_t {dma_config} = {{',
+            f'    &{dma_state}, s_nx_dma_regions_{name}, {count}u', '};']
+        dma_config = '&' + dma_config
+    definitions += [
         f'static nx_stm32f4_crypto_irq_t {lease};',
         f'static const nx_stm32f4_{kind}_config_t {config} = {{',
         f'    .irq_policy = {{ {kernel_policy_constant(result)}, '
         f'{policy.external_count}u, {policy.priority_bits}u, '
-        f'{policy.syscall_priority or 0}u }}', '};',
+        f'{policy.syscall_priority or 0}u }},',
+        f'    .dma = {dma_config}', '};',
         f'void {irq.name.removesuffix("_IRQn")}_IRQHandler(void);',
         r'/** \brief Dispatch the single statically selected crypto publisher. */',
         f'void {irq.name.removesuffix("_IRQn")}_IRQHandler(void) {{ '

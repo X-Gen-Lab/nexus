@@ -14,8 +14,10 @@ Board 不自动选择唤醒接线。借用结束条件见
 [请求生命周期图](../assets/diagrams/request-lifecycle.svg)，整平台协调见
 [系统架构](../delivery/architecture.md)。图中的借用终止不是时钟域转换凭证。
 
-公共 API 使用 opaque `nx_clock_domain_t`，mutable storage / constructor 只供私有
-装配。消费者提供自然对齐、零初始化的 `nx_clock_lease_t`。接纳成功后，token 的对象
+普通消费者通过 `clock_domain.h` 使用 opaque `nx_clock_domain_t`。可信静态装配
+owner 通过公开的 `clock_domain_owner.h` 提供实际存储并构造，不需要私有 include
+路径；结构字段不是应用控制接口，冷态生命周期和内部 span 协议仍为私有。
+消费者提供自然对齐、零初始化的 `nx_clock_lease_t`。接纳成功后，token 的对象
 身份和存储被借用，字段由 provider 管理；复制字段不能释放原对象。每个 domain 的显式
 capacity 为别名和 retained identity 扫描给出上限，不承诺与容量无关的常数时间。
 
@@ -44,7 +46,7 @@ F407 的默认 profile 为 HSE8／PLL168、APB1 42 MHz、APB2 84 MHz 与 Flash5W
 静态 custom／直接输入使用同一 ClockPlan 的实际常量和只读 RCC 检查，不从默认
 数字推导可用性；晶振频率、供电和温漂也不能由 ready/divisor 读回测得。
 
-深 STOP 使用 `nx_stm32f407_power_enter`，调用者先完整暂停 Platform、排空自己的
+深 STOP 使用 `nx_stm32_power_enter`，调用者先完整暂停 Platform、排空自己的
 ClockDomain 和 OS 时间借用，再显式提供已接纳的唤醒集合。恢复建立新的 Core epoch，
 不能复用旧绝对 deadline；可选独立 RTC elapsed envelope 与 OS 时间恢复分别证明。
 Standby 的复位、存储丢失及 RTC wake 握手由同一 RTC／电源 owner 协作承担。

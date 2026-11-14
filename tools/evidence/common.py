@@ -23,6 +23,21 @@ class EvidenceError(ValueError):
     """A required delivery invariant could not be established."""
 
 
+def git_observation_environment(*, parent_index=False) -> dict:
+    """Observe real Git state without foreign selection or index-stat writes.
+
+    Git still refreshes status in memory. Disabling optional locks prevents
+    observation from rewriting the index after CMake records its timestamp.
+    Only the explicitly admitted parent-index check inherits GIT_INDEX_FILE.
+    """
+    environment = {key: value for key, value in os.environ.items()
+                   if not key.startswith("GIT_")}
+    environment["GIT_OPTIONAL_LOCKS"] = "0"
+    if parent_index and "GIT_INDEX_FILE" in os.environ:
+        environment["GIT_INDEX_FILE"] = os.environ["GIT_INDEX_FILE"]
+    return environment
+
+
 def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     result = {}
     for key, value in pairs:

@@ -221,7 +221,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         from .pvd import constructor as pvd_constructor
         return pvd_constructor(item)
     if item.kind == "external_bus":
-        if item.mode == "qspi-indirect-sdr":
+        if item.mode in {"qspi-indirect-sdr", "qspi-indirect-dma"}:
             from .qspi import constructor as qspi_constructor
             return qspi_constructor(item, result)
         if item.mode == "sdram-controller":

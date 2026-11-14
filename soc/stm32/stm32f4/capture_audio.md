@@ -1,11 +1,11 @@
-# STM32F4 DCMI、I2S2／3 与 SAI1
+# STM32F4 DCMI、I2S2／3 与 SAI
 
 普通消费者通过 `nx_capture_port_*` 与 `nx_audio_port_*` 操作已经绑定的接口，无需解引用可选方法表。公共入口保留原始 request、stream 和输出指针，具体 owner 继续检查私有配置及活动借用别名。缺失能力返回 `UNSUPPORTED`；公共检查不添加复制、队列或线程。停止生产者不撤销已经发布的消费者借用，service 返回值也不替代 request 的终态。
 
-这里记录 `capture.c`、`audio.c`、`audio_blocks.c`、`audio_sai.c` 与同源静态装配的合同。
+这里记录 `capture.c`、`audio.c`、`audio_blocks.c`、`audio_sai.c`、`audio_sai_blocks.c` 与同源静态装配的合同。
 F407 DCMI／I2S 的 AF 路线来自 DS8626 Rev12，寄存器、DMA 与关闭时序来自 RM0090 Rev22，
-精确软件参考为 STM32F407VET6／ZGT6。SAI1 另外限定 STM32F446ZET6 与
-STM32F479NIH6，分别依据 DS10693 Rev11／RM0390 Rev9、DS11118 Rev8／RM0386 Rev6。
+精确软件参考为 STM32F407VET6／ZGT6。SAI1 限定 STM32F446ZET6 与
+STM32F479NIH6；SAI2 限定 STM32F446ZET6，分别依据 DS10693 Rev11／RM0390 Rev9、DS11118 Rev8／RM0386 Rev6。
 这些软件范围不表示摄像头、codec、PCB 接线、电气时序或物理 HIL 已执行。
 
 静态配置、资源责任与公共调用边界参见共享图示。
@@ -115,7 +115,7 @@ BUSY，调用者显式 acquire／release 后重试，才完成整个 stream 的�
 ## 有限 CM1 完整帧会话
 
 `frames-raw`／`frames-jpeg` 使用 `nx_capture_frames_request_t` 和显式
-`capture->ops->start_frames(capture->context, &request)`。调用者提供正
+`nx_capture_port_start_frames(capture, &request)`。调用者提供正
 `frame_count`、有限绝对 deadline、完整 stream 及每帧存储；RAW 要求与 `raw_frame`
 的精确布局相等，JPEG 将
 `storage_bytes` 作为每帧容量。每帧仍受 65535 DMA words 上限和完整 DMA 域约束。
@@ -145,6 +145,16 @@ loans。
 或寄存器 reset 外观当作过去借用已经退出。该合同只规定软件退出与帧发布边界，
 不建立 sensor 配置、电气连接或实测图像质量资格。
 
+`tests/contracts/f407_capture_audio/ve-frames-raw.toml` 与 `frame_session.c`
+组成完整的公共软件消费者：显式提供三个128B slot、8×8 RAW12 的16-bit容器布局、
+两个完整帧和绝对 deadline。输入源必须产生该声明的图像；夹具不猜测或配置 sensor。
+第一个已发布 consumer token 保留到 producer stop 成功后，再单独 release；
+后续帧使用自己的 token。错误仍消费已发布前缀，不能把 session 错误解释成全部帧
+失效，也不能把 stop 成功解释成 consumer 已归还。任何撤回或 release 失败都保留
+静态 request、stream、token、payload 和 Platform 责任，不丢弃仍可恢复的借用。
+这些同一生产 C 路径的前缀、consumer 持有、迟到完成和失败排空由现有完整模型程序
+检查；ARM／SDK 链接额外验证公共 factory、配置和源码闭包，均不替代物理执行。
+
 ## 音频存储布局查询
 
 应用通过同一个 `nx_audio_t` 和 `nx_audio_port_layout` 查询已准备实例的存储事实；
@@ -160,7 +170,9 @@ loans。
 
 `sample_alignment` 表示容器内有效位的位置，不是 buffer 地址对齐；`container_bits`
 表示内存宽度，不是包含 padding 的 wire slot 宽度。`slots` 和 `active_slots` 明确
-每帧的存储 slots 与 wire mask；首批 SAI 只允许全部 slots 有效，不压缩稀疏 mask。
+每帧的 wire slots 与有效 mask。SAI 的 FIFO 只传输有效 slot 的样本；
+`nx_frame_layout_audio` 按有效 mask 的置位数计算紧凑存储，不为未启用 slot 填充。
+I2S 仍保留两个存储 channel slots，PDM lane 的存储规则也不改变。
 SAI 10-bit 数据使用既有 frame planner 的 16-bit 容器，不能把该格式传成 I2S。
 
 layout／rate 的结果不得覆盖完整 System 对象、私有 state／config、资源描述表、引脚
@@ -254,51 +266,93 @@ consumer loans 继续有效，应用需独立 join 它们再回收 stream 或 bu
 不代表实际播放／采样的精确 wire frame 数。整段持续会话可显式使用
 `NX_DEADLINE_NEVER`，或由一个绝对 deadline 触发有界排空。
 
-## F446／F479 SAI1 有限帧
+## F446／F479 SAI 有限帧与连续块
 
-SAI1 复用公共 `audio` request、frame stream 与借用状态机，使用独立 C provider，
-不经过 I2S 运行时转发层。首批只选择六种 `master-*`／`slave-*` 的
-`tx`、`rx`、`duplex`；不声明 SAI2、连续 blocks、稀疏 slots、AC97、SPDIF、PDM
-或软件格式转换。`frame_sync_*`、有效位宽、slot 宽度、偏移、位序和采样边沿都是
-显式静态配置，不能把 I2S 的 `standard` 或 PLLI2S 参数塞入 SAI 配置。
+SAI 复用公共 `audio` request、frame stream 与借用状态机。两个 personality 共用
+同一份冷态配置、System 时钟和 source／sink 关闭实现；有限与连续分别选择静态
+ops 和 state，不经过 I2S 转发层，也不向有限实例添加双 bank 或队列字段。
+SAI1 在 F446ZE／F479NI 提供六种 `master-*`／`slave-*` 的 `tx`、`rx`、`duplex`，
+及对应 `-blocks` 模式；SAI2 在 F446ZE 复用同一实现，保留自己的 gate、IRQ 和
+DMA 路线。AC97、SPDIF、PDM、跨 SAI 同步与运行期格式切换不在所选范围。
 
-| 时钟源 block | AF6 基础 pads | 可选数据与 MCLK | DMA2 |
+`frame_sync_*`、有效位宽、wire slot 宽度、偏移、位序和采样边沿均为静态配置。
+I2S 的 `standard` 或 PLLI2S 字段不属于 SAI。`active_slots` 可以省略，默认全部
+有效；显式值必须是非零且不越过所选 `slots` 的 mask。RM0390 §28.3.7／RM0386
+的同源 SAI slot 合同规定，未启用 slot 不访问 FIFO，也不产生相应 DMA 样本。
+因此查询的 `slots` 保持 wire 几何，`active_slots` 保留 wire 位置；存储每帧包含
+`popcount(active_slots)` 个自然 8／16／32-bit 容器，按有效 slot 升序排列，不做
+软件重排或补零。24-bit 样本为小端 32-bit LSB 对齐，10-bit 样本为 16-bit 容器。
+`nx_frame_layout_audio` 可直接消费查询值，计算相同的紧凑内存长度。
+
+| IP／时钟源 block | 精确 pads | 可选数据与 MCLK | 所选 DMA2 |
 | --- | --- | --- | --- |
-| A | PE4 FS_A、PE5 SCK_A、PE6 SD_A | duplex 接 PE3 SD_B；MCLK_A 为 PE2 | A 为 stream1/channel0 |
-| B | PF9 FS_B、PF8 SCK_B、PE3 SD_B | duplex 接 PE6 SD_A；MCLK_B 为 PF7 | B 为 stream4/channel1 |
+| SAI1 A，AF6 | PE4 FS_A、PE5 SCK_A、PE6 SD_A | duplex 接 PE3 SD_B；PE2 MCLK_A | stream1/channel0 |
+| SAI1 B，AF6 | PF9 FS_B、PF8 SCK_B、PE3 SD_B | duplex 接 PE6 SD_A；PF7 MCLK_B | stream4/channel1 |
+| F446 SAI2 A，AF10 | PD12 FS_A、PD13 SCK_A、PD11 SD_A | duplex 接 PE11 SD_B；PE0 MCLK_A | stream4/channel3 |
+| F446 SAI2 B，AF10 | PE13 FS_B、PE12 SCK_B、PE11 SD_B | duplex 接 PD11 SD_A；PE14 MCLK_B | stream6/channel3 |
 
-source block 由精确 route 推导，不额外维护一份 authored block 选择。simplex 可以
-TX 或 RX；duplex 的 source 为 TX，另一 block 为同步 RX。一个静态 owner 独占整个
-SAI1、两个 blocks 与共享 IRQ87，处理两条 DMA 路线；没有两个相互竞争的全局 owner。
+路线来自 DS10693 Table10／11、DS11118 的精确封装 AF 表，以及 RM0390 Table29／
+RM0386 Table30。SAI2_B 的另一条硬件 DMA 请求未由当前路线选择，不能自行换 stream。
+source block 由 route 推导；duplex 的 source 为 TX，另一 block 同步 RX。
+每个 owner 独占所属 IP 的全局配置、A/B 两个 blocks 及唯一 source vector；SAI1
+为 IRQ87，F446 SAI2 为 IRQ91。关闭 SAI2 不修改仍由 SAI1 持有的寄存器、gate、
+IRQ 或 priority。跨 controller 配对及 DMA 冲突在取得硬件效果前拒绝。
 
-master 只消费 System ClockPlan 的 `pll_sai.sai1`，禁止驱动晚改 PLLM、PLLSRC、
-PLLSAI 或 SAI mux。F446 的 auxiliary M 独立，F479 与主 PLL 输入共享 M；共同
-PLLSAI N／M、SAI Q／postQ 与可选 LTDC R／postR 都由同一个 System owner 校验和撤回。
-LTDC-only 不要求 SAI，SAI-only 不取得 R；兼容 Q＋R 才能同时选择。普通 master 使用
-`mckdiv=0` 的除1或 `2*mckdiv`，frame bits 必须为二次幂；rate 是精确有理数。
-`no_divider=true` 时禁止 MCLK、要求 mckdiv0，rate 为 kernel/frame bits，不强行取整。
+master 只消费 System ClockPlan 的唯一 `pll_sai.sai1` Q 输出；这里的 `sai1` 是现有
+单一 Q 输出字段，SAI2 不另设第二份 PLL 参数。F446 SAI2 的已选 mux 也由 System
+配置、回读和撤回。F446 auxiliary M 独立，F479 与主 PLL 共用 M；Q／postQ 与
+可选 LTDC R／postR 仍归同一 System owner。驱动不修改 PLL 或 RCC mux。
+普通 master 使用 `mckdiv=0` 的除1或 `2*mckdiv`，frame bits 为二次幂；
+`no_divider=true` 禁止 MCLK、要求 mckdiv0，rate 为 kernel/frame bits。
+查询始终返回精确有理数，slave 为0/0 unknown。
 
-所有模式保守要求 APB2 严格大于两倍 SCK；slave 的 `max_bit_clock_hz` 是调用者保证的
-外部上界，rate 仍为0/0 unknown。该全模式约束直接覆盖 DS11118 Table67 脚注2；
-F446 使用同一保守边界，不把其不同脚注说成同一条款。实际选择 PE2／PF7 MCLK 输出时
-还要求共同已审 2.048–45MHz 范围；没有 MCLK pad 的低速精确分数模式不附加任意最小
-采样率。引脚使用两份数据手册表中的 OSPEEDR 二进制10，保留 Platform 原恢复收条。
-这些是静态准入条件，不是外部振荡器精度、吞吐或负载电气测量。
+所有模式保守要求 APB2 严格大于两倍 SCK。`max_bit_clock_hz` 是所选 master 的
+电气 ceiling，或调用者保证的外部 slave 上界，不是实测值。实际选择 MCLK pad
+时还要求共同已审 2.048–45MHz 范围；未选 MCLK 不附加该最低输出频率。引脚
+使用数据手册表中的 OSPEEDR 二进制10，原恢复 snapshot 仍由 Platform 保持。
 
-官方 `HAL_SAI_Init` 负责联合冷态格式配置，Handle 仅在栈上存在。已保留的真实 SDK
-回归表明其 DMA start／stop／abort 路径含私有等待或未完成撤回，不能直接满足 Nexus
-借用合同；热态因此使用有界 C DMA 协议，不自造音频算法或修改厂商库。IRQ 只锁存
-事实与首个错误，显式 service 推进；发送 FIFO prime 不在 IRQ 内忙等。
+官方 `HAL_SAI_Init` 负责联合冷态格式，Handle 仅在栈上存在。已审官方 DMA
+start／stop／abort 的私有等待和回调不直接建立 Nexus 完整归还证明，因此静态
+选中的 C transport 独占 DMA 借用与退出。启用前和每个 source／sink 效果之间
+重新观察绝对 deadline 与原 System epoch，TX FIFO prime 使用显式 service。
+正常有限完成要求 source→sink 退出、FIFO／DMA／IRQ／地址全排空，才返回 TX 或
+发布 RX，并 SETTLED；有限错误／取消不发布有效结果。
 
-启用前后都重新检查绝对 deadline 和 System epoch。已受理后的超时、clock 历史丢失、
-DMA 地址拒清或 serializer／IRQ 未退出，均保留 request 与 loans；不是返回拒绝就
-归还内存。正常关闭先停 source、再同步 sink，确认完整帧／FIFO、DMA、IRQ 与地址全部
-脱离，才发布 SETTLED。System 看到仍在用的 SAI／LTDC gate 会保持时钟与 time epoch。
+### SAI 连续 bank 交接
 
-`tests/contracts/stm32f4_sai/` 提供 F446／F479 的 master／slave 最小软件装配；
-`consumer.c` 只链接 factory、布局、frame planner 与生命周期，不实际传输音频。
-GoogleTest 模型验证 C 生命周期与故障协议，ARM ELF／Source SDK 验证真实选编和符号；
-实板外部时钟、引脚波形、FIFO 余量、音质和长时间运行需要独立物理执行。
+连续配置额外给出 `max_service_gap_us`，包含任务抢占和本次 service 自身的最坏
+间隔。调用者提供 `nx_audio_blocks_request_t`、两个方向独立的 stream 和完整 frame
+整数倍的 `block_bytes`；单方向仍最多65535个自然容器。TX 至少两个 READY blocks，
+RX 至少三个 FREE slots。所有控制、slot 元数据及完整 capacity 在首次接纳前校验，
+不临时分配缓冲，不补静音、不重放，也不创建后台 worker。
+
+| 时点 | 硬件与借用责任 |
+| --- | --- |
+| 接纳 | 原 session、stream 和两个 DMA bank 保持借用；拒绝没有效果或引用残留 |
+| IRQ | 只锁存 TC／error；FIFO error 掩蔽源，不能在 IRQ 里发布或替换借用 |
+| service | 先取得 replacement，再更新非活动地址；重新观察 CT、硬件／锁存事件和时间预算 |
+| 发布／归还 | 上述检查全部成立，旧 RX 才发布、旧 TX 才归还；两个方向独立前进 |
+| 停止 | 先停 source 再 sink，撤回 DMA 请求并排空 DMA／IRQ，清空全部地址与 FIFO，再返回未完成 bank |
+| 失败 | 拒撤或历史丢失保持 QUARANTINED，原 session、旧 bank、replacement 和资源均保留 |
+
+准入用实际 wire frame bits 和有效样本数换算块时长，预留八字 FIFO、一个 serializer
+样本及一个直接 DMA 传输的保守裕量，再要求剩余时长大于两倍 service 上界加两微秒。
+源的真实 clock 不得超过声明值，应用还需按时补 TX、归还 RX。检查预算、CT／TC
+只能建立这些前提下的软件交接，不能追溯保证违反预算之前的物理音频。
+
+缺 replacement、bank 歧义或超预算会停止并报告 OVERFLOW；不能覆盖 READY／BORROWED
+块。已经发布的 RX 前缀在停止后继续有效，需要消费者单独 release；未借用的 TX
+READY 仍留在原队列。连续 `base.transferred` 选择 RX 时统计已发布 RX 字节，否则
+统计已脱离 DMA 的 TX 字节；错误／取消仍可带有效前缀，不代表精确 wire frame 数。
+普通拒撤可在原 epoch 重试，丢失历史不能用恢复寄存器外观解除。SETTLED 是对
+session 和生产／消费权限的最后访问，不撤销先前独立的 RX consumer loans。
+
+`tests/contracts/stm32f4_sai/` 保留原四个有限 reference，并新增 F446 SAI2、F479
+稀疏 mask 的 master／slave duplex blocks。两个公共消费者分别覆盖布局和显式
+caller-owned session。GoogleTest 验证真实 C 的交接、欠供给、替换拒写、CT 竞态、
+epoch 与停止失败；ARM ELF／Source SDK 分别验证实际源码选择及外部消费。
+PCB、codec、外部时钟、波形、FIFO 余量与持续负载仍须物理执行，当前 HIL 为
+`not_executed`。
 
 ## 装配与验证入口
 

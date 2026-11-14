@@ -514,7 +514,14 @@ bridge 根据权威 `control_pending=false` 暂停 EP0 Core 续包派发，先�
 只转交真实已结清的 IN ACK 和 STATUS，不补造 `EP0_TxSent`，不因这段合法间隔
 锁存 INVALID，也不重放下一 IN payload。新 SETUP、deadline 与停止仍须完整排空。
 Host Core 在断开后先排空，再允许 Core reset／class 退出及显式 cold restart。
-两者均锁存官方 Core 忽略的 LL 错误，不建立 ISO 周期调度。Device Core 的 feature
+两者均锁存官方 Core 忽略的 LL 错误。Host 可提供每 pipe 12 字节 caller 存储，
+在 OpenPipe 后显式绑定 descriptor interval；同一次 open 内不可重复绑定来重置
+机会。桥接从真实 14-bit SOF 观察推进有界剩余间隔，要求在完整 counter wrap 前
+调用 `step`。过早请求报告 NOTREADY／零长度且不借用缓冲，防止忽略 LL BUSY 的
+官方调用者误读旧 DONE。所有 endpoint 最坏碰撞预算限制为 FS／LS 900 µs、
+HS 100 µs，每个 URB 至多一个 MPS；无自动派发、相位打包、hub split 或实时保证。
+完整 URB 共用一个绝对 deadline，不在分包时续期。Device 不因此取得 ISO 周期
+调度。Device Core 的 feature
 意图不能替代实际 STATUS ACK，远程唤醒仍服从上述协议许可与 service 合同。
 
 私有 Device Core bridge 把 profile ISO 显式映射到 `USBD_EP_TYPE_ISOC`，不把

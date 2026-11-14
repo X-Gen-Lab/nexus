@@ -9,6 +9,7 @@ import subprocess
 import tempfile
 import unittest
 
+from tools.configure import metadata
 from tools.dev import projects
 
 
@@ -68,9 +69,11 @@ class CreatedProjectConsumptionTests(unittest.TestCase):
         template.mkdir(parents=True)
         for name, contents in payload.items():
             (template / name).write_bytes(contents)
+        policy = metadata.load_policy(ROOT)
         manifest = {
             "schema": 1, "version": 1, "templates": {"public-native": {
-                "platform": {"interface_epoch": 3, "assembly_schema": 2},
+                "platform": {"interface_epoch": policy["factory_abi_epoch"],
+                             "assembly_schema": 2},
                 "files": {name: hashlib.sha256(contents).hexdigest()
                           for name, contents in payload.items()}}},
         }

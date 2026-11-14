@@ -333,7 +333,8 @@
         "STM32F407ZGT6",
         "STM32F405ZGT6",
         "STM32F415ZGT6",
-        "STM32F417ZGT6"
+        "STM32F417ZGT6",
+        "STM32F479NIH6"
       ],
       "controller": "FLASH",
       "kind": "flash",
@@ -341,7 +342,7 @@
       "modes": [
         "poll-word"
       ],
-      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions; DS8597 Rev10 Table9 same reviewed AF mapping and RM0090 shared IP for selected F415/F417"
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions; DS8597 Rev10 Table9 same reviewed AF mapping and RM0090 shared IP for selected F415/F417; RM0386 Rev6 Flash dual-bank 2MiB geometry, logical sector12..23 hardware SNB16..27; no boot swap, PCROP or option maintenance in the selected F479 mode"
     },
     {
       "id": "iwdg",
@@ -1822,7 +1823,10 @@
         "STM32F407ZGT6",
         "STM32F405ZGT6",
         "STM32F415ZGT6",
-        "STM32F417ZGT6"
+        "STM32F417ZGT6",
+        "STM32F411RET6",
+        "STM32F446ZET6",
+        "STM32F479NIH6"
       ],
       "controller": "RTC",
       "kind": "rtc",
@@ -1839,7 +1843,7 @@
         "domain:backup",
         "alarm:RTC_A"
       ],
-      "source": "RM0090 Rev22 RCC_BDCR crystal LSE owns PC14/PC15; ES0182 Rev19 2.2.18 additionally requires the PC13 quiet-input responsibility maintained by the C RTC owner. Crystal and bypass modes remain distinct; no PCB or physical qualification is inferred.; DS8597 Rev10 Table9 same reviewed AF mapping and RM0090 shared IP for selected F415/F417"
+      "source": "RM0090 Rev22 RCC_BDCR crystal LSE owns PC14/PC15; ES0182 Rev19 2.2.18 additionally requires the PC13 quiet-input responsibility maintained by the C RTC owner. Crystal and bypass modes remain distinct; no PCB or physical qualification is inferred.; DS8597 Rev10 Table9 same reviewed AF mapping and RM0090 shared IP for selected F415/F417; RM0383 Rev4 / RM0390 Rev9 / RM0386 Rev6 RTC LSE32768 crystal software profile on exact F411RET6/F446ZET6/F479NIH6: PC14/PC15 oscillator and conservatively quiet PC13, explicit Board source declaration, no fitted oscillator or retention qualification"
     },
     {
       "id": "fsmc-async16",
@@ -16475,9 +16479,16 @@
       ],
       "pins": [],
       "modes": [
-        "irq-blocks"
+        "irq-blocks",
+        "dma-blocks"
       ],
-      "source": "RM0090 Rev22 chapter 23 basic CRYP on F415/F417; original selected CMSIS IRQ slot 79 and startup vector; no PCB or DMA route"
+      "mode_dma": {
+        "dma-blocks": [
+          "DMA2:stream6:channel2",
+          "DMA2:stream5:channel2"
+        ]
+      },
+      "source": "RM0090 Rev22 chapter 23 basic CRYP and Table43 DMA2 channel2 input stream6/output stream5 on F415/F417; selected CMSIS IRQ slot79; no PCB route or physical qualification. DMA vectors remain reserved and disabled; task service dispatches the transport."
     },
     {
       "id": "hash-internal",
@@ -16489,9 +16500,15 @@
       ],
       "pins": [],
       "modes": [
-        "irq-blocks"
+        "irq-blocks",
+        "dma-blocks"
       ],
-      "source": "RM0090 Rev22 chapter 25 basic HASH on F415/F417; original selected CMSIS IRQ slot 80 and startup vector; no PCB or DMA route"
+      "mode_dma": {
+        "dma-blocks": [
+          "DMA2:stream7:channel2"
+        ]
+      },
+      "source": "RM0090 Rev22 chapter 25 basic HASH and Table43 DMA2 channel2 input stream7 on F415/F417; selected CMSIS IRQ slot80; no PCB route or physical qualification. DMA vector remains reserved and disabled; task service dispatches the transport."
     },
     {
       "id": "fmc-sdram-control",
@@ -16743,7 +16760,11 @@
         "master-tx",
         "master-rx",
         "slave-tx",
-        "slave-rx"
+        "slave-rx",
+        "master-tx-blocks",
+        "master-rx-blocks",
+        "slave-tx-blocks",
+        "slave-rx-blocks"
       ],
       "mode_dma": {
         "master-tx": [
@@ -16756,6 +16777,18 @@
           "DMA2:stream1:channel0"
         ],
         "slave-rx": [
+          "DMA2:stream1:channel0"
+        ],
+        "master-tx-blocks": [
+          "DMA2:stream1:channel0"
+        ],
+        "master-rx-blocks": [
+          "DMA2:stream1:channel0"
+        ],
+        "slave-tx-blocks": [
+          "DMA2:stream1:channel0"
+        ],
+        "slave-rx-blocks": [
           "DMA2:stream1:channel0"
         ]
       },
@@ -16793,13 +16826,21 @@
       ],
       "modes": [
         "master-tx",
-        "master-rx"
+        "master-rx",
+        "master-tx-blocks",
+        "master-rx-blocks"
       ],
       "mode_dma": {
         "master-tx": [
           "DMA2:stream1:channel0"
         ],
         "master-rx": [
+          "DMA2:stream1:channel0"
+        ],
+        "master-tx-blocks": [
+          "DMA2:stream1:channel0"
+        ],
+        "master-rx-blocks": [
           "DMA2:stream1:channel0"
         ]
       },
@@ -16837,7 +16878,9 @@
       ],
       "modes": [
         "master-duplex",
-        "slave-duplex"
+        "slave-duplex",
+        "master-duplex-blocks",
+        "slave-duplex-blocks"
       ],
       "mode_dma": {
         "master-duplex": [
@@ -16845,6 +16888,14 @@
           "DMA2:stream4:channel1"
         ],
         "slave-duplex": [
+          "DMA2:stream1:channel0",
+          "DMA2:stream4:channel1"
+        ],
+        "master-duplex-blocks": [
+          "DMA2:stream1:channel0",
+          "DMA2:stream4:channel1"
+        ],
+        "slave-duplex-blocks": [
           "DMA2:stream1:channel0",
           "DMA2:stream4:channel1"
         ]
@@ -16887,10 +16938,15 @@
         }
       ],
       "modes": [
-        "master-duplex"
+        "master-duplex",
+        "master-duplex-blocks"
       ],
       "mode_dma": {
         "master-duplex": [
+          "DMA2:stream1:channel0",
+          "DMA2:stream4:channel1"
+        ],
+        "master-duplex-blocks": [
           "DMA2:stream1:channel0",
           "DMA2:stream4:channel1"
         ]
@@ -16926,7 +16982,11 @@
         "master-tx",
         "master-rx",
         "slave-tx",
-        "slave-rx"
+        "slave-rx",
+        "master-tx-blocks",
+        "master-rx-blocks",
+        "slave-tx-blocks",
+        "slave-rx-blocks"
       ],
       "mode_dma": {
         "master-tx": [
@@ -16939,6 +16999,18 @@
           "DMA2:stream4:channel1"
         ],
         "slave-rx": [
+          "DMA2:stream4:channel1"
+        ],
+        "master-tx-blocks": [
+          "DMA2:stream4:channel1"
+        ],
+        "master-rx-blocks": [
+          "DMA2:stream4:channel1"
+        ],
+        "slave-tx-blocks": [
+          "DMA2:stream4:channel1"
+        ],
+        "slave-rx-blocks": [
           "DMA2:stream4:channel1"
         ]
       },
@@ -16976,13 +17048,21 @@
       ],
       "modes": [
         "master-tx",
-        "master-rx"
+        "master-rx",
+        "master-tx-blocks",
+        "master-rx-blocks"
       ],
       "mode_dma": {
         "master-tx": [
           "DMA2:stream4:channel1"
         ],
         "master-rx": [
+          "DMA2:stream4:channel1"
+        ],
+        "master-tx-blocks": [
+          "DMA2:stream4:channel1"
+        ],
+        "master-rx-blocks": [
           "DMA2:stream4:channel1"
         ]
       },
@@ -17020,7 +17100,9 @@
       ],
       "modes": [
         "master-duplex",
-        "slave-duplex"
+        "slave-duplex",
+        "master-duplex-blocks",
+        "slave-duplex-blocks"
       ],
       "mode_dma": {
         "master-duplex": [
@@ -17028,6 +17110,14 @@
           "DMA2:stream1:channel0"
         ],
         "slave-duplex": [
+          "DMA2:stream4:channel1",
+          "DMA2:stream1:channel0"
+        ],
+        "master-duplex-blocks": [
+          "DMA2:stream4:channel1",
+          "DMA2:stream1:channel0"
+        ],
+        "slave-duplex-blocks": [
           "DMA2:stream4:channel1",
           "DMA2:stream1:channel0"
         ]
@@ -17070,10 +17160,15 @@
         }
       ],
       "modes": [
-        "master-duplex"
+        "master-duplex",
+        "master-duplex-blocks"
       ],
       "mode_dma": {
         "master-duplex": [
+          "DMA2:stream4:channel1",
+          "DMA2:stream1:channel0"
+        ],
+        "master-duplex-blocks": [
           "DMA2:stream4:channel1",
           "DMA2:stream1:channel0"
         ]
@@ -17370,12 +17465,18 @@
       "kind": "external_bus",
       "pins": [],
       "modes": [
-        "qspi-indirect-sdr"
+        "qspi-indirect-sdr",
+        "qspi-indirect-dma"
       ],
       "resources": [
         "ip:QUADSPI/control"
       ],
-      "source": "DS11118 Rev8 Table10 TFBGA216 explicit bonding and Table12 AF9/AF10; RM0386 Rev6 QUADSPI Flash1 indirect SDR 1-1-1. Exact software reference only; W25Q128JV rated supply, power-up readiness and inactive WP/HOLD or suffix RESET remain explicit external prerequisites. No PCB, fitted package or HIL qualification."
+      "source": "DS11118 Rev8 Table10 TFBGA216 explicit bonding and Table12 AF9/AF10; RM0386 Rev6 QUADSPI Flash1 indirect SDR 1-1-1. Exact software reference only; W25Q128JV rated supply, power-up readiness and inactive WP/HOLD or suffix RESET remain explicit external prerequisites. No PCB, fitted package or HIL qualification.; RM0386 Rev6 Table30 QUADSPI DMA2 Stream7 Channel3, finite page-program memory transfer only; reads, status and verification remain PIO",
+      "mode_dma": {
+        "qspi-indirect-dma": [
+          "DMA2:stream7:channel3"
+        ]
+      }
     },
     {
       "id": "quadspi-bank1-sdr111",
@@ -17410,6 +17511,530 @@
         "nor-indirect"
       ],
       "source": "DS11118 Rev8 Table10 TFBGA216 explicit bonding and Table12 AF9/AF10; RM0386 Rev6 QUADSPI Flash1 indirect SDR 1-1-1. Exact software reference only; W25Q128JV rated supply, power-up readiness and inactive WP/HOLD or suffix RESET remain explicit external prerequisites. No PCB, fitted package or HIL qualification."
+    },
+    {
+      "id": "sai2-a-simplex",
+      "variants": [
+        "STM32F446ZET6"
+      ],
+      "controller": "SAI2",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PD12",
+          "function": "fs_a",
+          "af": 10
+        },
+        {
+          "pin": "PD13",
+          "function": "ck_a",
+          "af": 10
+        },
+        {
+          "pin": "PD11",
+          "function": "sd_a",
+          "af": 10
+        }
+      ],
+      "modes": [
+        "master-tx",
+        "master-rx",
+        "slave-tx",
+        "slave-rx",
+        "master-tx-blocks",
+        "master-rx-blocks",
+        "slave-tx-blocks",
+        "slave-rx-blocks"
+      ],
+      "mode_dma": {
+        "master-tx": [
+          "DMA2:stream4:channel3"
+        ],
+        "master-rx": [
+          "DMA2:stream4:channel3"
+        ],
+        "slave-tx": [
+          "DMA2:stream4:channel3"
+        ],
+        "slave-rx": [
+          "DMA2:stream4:channel3"
+        ],
+        "master-tx-blocks": [
+          "DMA2:stream4:channel3"
+        ],
+        "master-rx-blocks": [
+          "DMA2:stream4:channel3"
+        ],
+        "slave-tx-blocks": [
+          "DMA2:stream4:channel3"
+        ],
+        "slave-rx-blocks": [
+          "DMA2:stream4:channel3"
+        ]
+      },
+      "source": "DS10693 Rev11 Table10 LQFP144 bonding and Table11 AF10 mapping: PD12 FS_A, PD13 SCK_A, PD11 SD_A, PE0 MCLK_A, PE13 FS_B, PE12 SCK_B, PE11 SD_B, PE14 MCLK_B. RM0390 Rev9 Table29: SAI2_A DMA2 Stream4 Channel3; SAI2_B DMA2 Stream6 Channel3 (alternative Stream7 Channel0 not selected). Same reviewed free-protocol software geometry as SAI1; no cross-SAI synchronization, fitted codec, PCB, clock accuracy or physical qualification."
+    },
+    {
+      "id": "sai2-a-simplex-mclk",
+      "variants": [
+        "STM32F446ZET6"
+      ],
+      "controller": "SAI2",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PD12",
+          "function": "fs_a",
+          "af": 10
+        },
+        {
+          "pin": "PD13",
+          "function": "ck_a",
+          "af": 10
+        },
+        {
+          "pin": "PD11",
+          "function": "sd_a",
+          "af": 10
+        },
+        {
+          "pin": "PE0",
+          "function": "mclk_a",
+          "af": 10
+        }
+      ],
+      "modes": [
+        "master-tx",
+        "master-rx",
+        "master-tx-blocks",
+        "master-rx-blocks"
+      ],
+      "mode_dma": {
+        "master-tx": [
+          "DMA2:stream4:channel3"
+        ],
+        "master-rx": [
+          "DMA2:stream4:channel3"
+        ],
+        "master-tx-blocks": [
+          "DMA2:stream4:channel3"
+        ],
+        "master-rx-blocks": [
+          "DMA2:stream4:channel3"
+        ]
+      },
+      "source": "DS10693 Rev11 Table10 LQFP144 bonding and Table11 AF10 mapping: PD12 FS_A, PD13 SCK_A, PD11 SD_A, PE0 MCLK_A, PE13 FS_B, PE12 SCK_B, PE11 SD_B, PE14 MCLK_B. RM0390 Rev9 Table29: SAI2_A DMA2 Stream4 Channel3; SAI2_B DMA2 Stream6 Channel3 (alternative Stream7 Channel0 not selected). Same reviewed free-protocol software geometry as SAI1; no cross-SAI synchronization, fitted codec, PCB, clock accuracy or physical qualification."
+    },
+    {
+      "id": "sai2-a-duplex",
+      "variants": [
+        "STM32F446ZET6"
+      ],
+      "controller": "SAI2",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PD12",
+          "function": "fs_a",
+          "af": 10
+        },
+        {
+          "pin": "PD13",
+          "function": "ck_a",
+          "af": 10
+        },
+        {
+          "pin": "PD11",
+          "function": "sd_a",
+          "af": 10
+        },
+        {
+          "pin": "PE11",
+          "function": "sd_b",
+          "af": 10
+        }
+      ],
+      "modes": [
+        "master-duplex",
+        "slave-duplex",
+        "master-duplex-blocks",
+        "slave-duplex-blocks"
+      ],
+      "mode_dma": {
+        "master-duplex": [
+          "DMA2:stream4:channel3",
+          "DMA2:stream6:channel3"
+        ],
+        "slave-duplex": [
+          "DMA2:stream4:channel3",
+          "DMA2:stream6:channel3"
+        ],
+        "master-duplex-blocks": [
+          "DMA2:stream4:channel3",
+          "DMA2:stream6:channel3"
+        ],
+        "slave-duplex-blocks": [
+          "DMA2:stream4:channel3",
+          "DMA2:stream6:channel3"
+        ]
+      },
+      "source": "DS10693 Rev11 Table10 LQFP144 bonding and Table11 AF10 mapping: PD12 FS_A, PD13 SCK_A, PD11 SD_A, PE0 MCLK_A, PE13 FS_B, PE12 SCK_B, PE11 SD_B, PE14 MCLK_B. RM0390 Rev9 Table29: SAI2_A DMA2 Stream4 Channel3; SAI2_B DMA2 Stream6 Channel3 (alternative Stream7 Channel0 not selected). Same reviewed free-protocol software geometry as SAI1; no cross-SAI synchronization, fitted codec, PCB, clock accuracy or physical qualification."
+    },
+    {
+      "id": "sai2-a-duplex-mclk",
+      "variants": [
+        "STM32F446ZET6"
+      ],
+      "controller": "SAI2",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PD12",
+          "function": "fs_a",
+          "af": 10
+        },
+        {
+          "pin": "PD13",
+          "function": "ck_a",
+          "af": 10
+        },
+        {
+          "pin": "PD11",
+          "function": "sd_a",
+          "af": 10
+        },
+        {
+          "pin": "PE11",
+          "function": "sd_b",
+          "af": 10
+        },
+        {
+          "pin": "PE0",
+          "function": "mclk_a",
+          "af": 10
+        }
+      ],
+      "modes": [
+        "master-duplex",
+        "master-duplex-blocks"
+      ],
+      "mode_dma": {
+        "master-duplex": [
+          "DMA2:stream4:channel3",
+          "DMA2:stream6:channel3"
+        ],
+        "master-duplex-blocks": [
+          "DMA2:stream4:channel3",
+          "DMA2:stream6:channel3"
+        ]
+      },
+      "source": "DS10693 Rev11 Table10 LQFP144 bonding and Table11 AF10 mapping: PD12 FS_A, PD13 SCK_A, PD11 SD_A, PE0 MCLK_A, PE13 FS_B, PE12 SCK_B, PE11 SD_B, PE14 MCLK_B. RM0390 Rev9 Table29: SAI2_A DMA2 Stream4 Channel3; SAI2_B DMA2 Stream6 Channel3 (alternative Stream7 Channel0 not selected). Same reviewed free-protocol software geometry as SAI1; no cross-SAI synchronization, fitted codec, PCB, clock accuracy or physical qualification."
+    },
+    {
+      "id": "sai2-b-simplex",
+      "variants": [
+        "STM32F446ZET6"
+      ],
+      "controller": "SAI2",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PE13",
+          "function": "fs_b",
+          "af": 10
+        },
+        {
+          "pin": "PE12",
+          "function": "ck_b",
+          "af": 10
+        },
+        {
+          "pin": "PE11",
+          "function": "sd_b",
+          "af": 10
+        }
+      ],
+      "modes": [
+        "master-tx",
+        "master-rx",
+        "slave-tx",
+        "slave-rx",
+        "master-tx-blocks",
+        "master-rx-blocks",
+        "slave-tx-blocks",
+        "slave-rx-blocks"
+      ],
+      "mode_dma": {
+        "master-tx": [
+          "DMA2:stream6:channel3"
+        ],
+        "master-rx": [
+          "DMA2:stream6:channel3"
+        ],
+        "slave-tx": [
+          "DMA2:stream6:channel3"
+        ],
+        "slave-rx": [
+          "DMA2:stream6:channel3"
+        ],
+        "master-tx-blocks": [
+          "DMA2:stream6:channel3"
+        ],
+        "master-rx-blocks": [
+          "DMA2:stream6:channel3"
+        ],
+        "slave-tx-blocks": [
+          "DMA2:stream6:channel3"
+        ],
+        "slave-rx-blocks": [
+          "DMA2:stream6:channel3"
+        ]
+      },
+      "source": "DS10693 Rev11 Table10 LQFP144 bonding and Table11 AF10 mapping: PD12 FS_A, PD13 SCK_A, PD11 SD_A, PE0 MCLK_A, PE13 FS_B, PE12 SCK_B, PE11 SD_B, PE14 MCLK_B. RM0390 Rev9 Table29: SAI2_A DMA2 Stream4 Channel3; SAI2_B DMA2 Stream6 Channel3 (alternative Stream7 Channel0 not selected). Same reviewed free-protocol software geometry as SAI1; no cross-SAI synchronization, fitted codec, PCB, clock accuracy or physical qualification."
+    },
+    {
+      "id": "sai2-b-simplex-mclk",
+      "variants": [
+        "STM32F446ZET6"
+      ],
+      "controller": "SAI2",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PE13",
+          "function": "fs_b",
+          "af": 10
+        },
+        {
+          "pin": "PE12",
+          "function": "ck_b",
+          "af": 10
+        },
+        {
+          "pin": "PE11",
+          "function": "sd_b",
+          "af": 10
+        },
+        {
+          "pin": "PE14",
+          "function": "mclk_b",
+          "af": 10
+        }
+      ],
+      "modes": [
+        "master-tx",
+        "master-rx",
+        "master-tx-blocks",
+        "master-rx-blocks"
+      ],
+      "mode_dma": {
+        "master-tx": [
+          "DMA2:stream6:channel3"
+        ],
+        "master-rx": [
+          "DMA2:stream6:channel3"
+        ],
+        "master-tx-blocks": [
+          "DMA2:stream6:channel3"
+        ],
+        "master-rx-blocks": [
+          "DMA2:stream6:channel3"
+        ]
+      },
+      "source": "DS10693 Rev11 Table10 LQFP144 bonding and Table11 AF10 mapping: PD12 FS_A, PD13 SCK_A, PD11 SD_A, PE0 MCLK_A, PE13 FS_B, PE12 SCK_B, PE11 SD_B, PE14 MCLK_B. RM0390 Rev9 Table29: SAI2_A DMA2 Stream4 Channel3; SAI2_B DMA2 Stream6 Channel3 (alternative Stream7 Channel0 not selected). Same reviewed free-protocol software geometry as SAI1; no cross-SAI synchronization, fitted codec, PCB, clock accuracy or physical qualification."
+    },
+    {
+      "id": "sai2-b-duplex",
+      "variants": [
+        "STM32F446ZET6"
+      ],
+      "controller": "SAI2",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PE13",
+          "function": "fs_b",
+          "af": 10
+        },
+        {
+          "pin": "PE12",
+          "function": "ck_b",
+          "af": 10
+        },
+        {
+          "pin": "PE11",
+          "function": "sd_b",
+          "af": 10
+        },
+        {
+          "pin": "PD11",
+          "function": "sd_a",
+          "af": 10
+        }
+      ],
+      "modes": [
+        "master-duplex",
+        "slave-duplex",
+        "master-duplex-blocks",
+        "slave-duplex-blocks"
+      ],
+      "mode_dma": {
+        "master-duplex": [
+          "DMA2:stream6:channel3",
+          "DMA2:stream4:channel3"
+        ],
+        "slave-duplex": [
+          "DMA2:stream6:channel3",
+          "DMA2:stream4:channel3"
+        ],
+        "master-duplex-blocks": [
+          "DMA2:stream6:channel3",
+          "DMA2:stream4:channel3"
+        ],
+        "slave-duplex-blocks": [
+          "DMA2:stream6:channel3",
+          "DMA2:stream4:channel3"
+        ]
+      },
+      "source": "DS10693 Rev11 Table10 LQFP144 bonding and Table11 AF10 mapping: PD12 FS_A, PD13 SCK_A, PD11 SD_A, PE0 MCLK_A, PE13 FS_B, PE12 SCK_B, PE11 SD_B, PE14 MCLK_B. RM0390 Rev9 Table29: SAI2_A DMA2 Stream4 Channel3; SAI2_B DMA2 Stream6 Channel3 (alternative Stream7 Channel0 not selected). Same reviewed free-protocol software geometry as SAI1; no cross-SAI synchronization, fitted codec, PCB, clock accuracy or physical qualification."
+    },
+    {
+      "id": "sai2-b-duplex-mclk",
+      "variants": [
+        "STM32F446ZET6"
+      ],
+      "controller": "SAI2",
+      "kind": "audio",
+      "pins": [
+        {
+          "pin": "PE13",
+          "function": "fs_b",
+          "af": 10
+        },
+        {
+          "pin": "PE12",
+          "function": "ck_b",
+          "af": 10
+        },
+        {
+          "pin": "PE11",
+          "function": "sd_b",
+          "af": 10
+        },
+        {
+          "pin": "PD11",
+          "function": "sd_a",
+          "af": 10
+        },
+        {
+          "pin": "PE14",
+          "function": "mclk_b",
+          "af": 10
+        }
+      ],
+      "modes": [
+        "master-duplex",
+        "master-duplex-blocks"
+      ],
+      "mode_dma": {
+        "master-duplex": [
+          "DMA2:stream6:channel3",
+          "DMA2:stream4:channel3"
+        ],
+        "master-duplex-blocks": [
+          "DMA2:stream6:channel3",
+          "DMA2:stream4:channel3"
+        ]
+      },
+      "source": "DS10693 Rev11 Table10 LQFP144 bonding and Table11 AF10 mapping: PD12 FS_A, PD13 SCK_A, PD11 SD_A, PE0 MCLK_A, PE13 FS_B, PE12 SCK_B, PE11 SD_B, PE14 MCLK_B. RM0390 Rev9 Table29: SAI2_A DMA2 Stream4 Channel3; SAI2_B DMA2 Stream6 Channel3 (alternative Stream7 Channel0 not selected). Same reviewed free-protocol software geometry as SAI1; no cross-SAI synchronization, fitted codec, PCB, clock accuracy or physical qualification."
+    },
+    {
+      "id": "quadspi-bank1-sdr114",
+      "variants": [
+        "STM32F479NIH6"
+      ],
+      "controller": "QUADSPI",
+      "kind": "flash_async",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "QUADSPI_BK1_NCS",
+          "af": 10
+        },
+        {
+          "pin": "PF8",
+          "function": "QUADSPI_BK1_IO0",
+          "af": 10
+        },
+        {
+          "pin": "PF9",
+          "function": "QUADSPI_BK1_IO1",
+          "af": 10
+        },
+        {
+          "pin": "PF10",
+          "function": "QUADSPI_CLK",
+          "af": 9
+        },
+        {
+          "pin": "PF7",
+          "function": "io2",
+          "af": 9
+        },
+        {
+          "pin": "PF6",
+          "function": "io3",
+          "af": 9
+        }
+      ],
+      "modes": [
+        "nor-indirect-quad-read"
+      ],
+      "source": "DS11118 Rev8 exact F479NI alternate functions; RM0386 Rev6 QUADSPI; Winbond W25Q128JV RevM W25Q128JVSIQ software reference, observed QE1 required without status writes, 6Bh SDR114 with 24-bit address and8dummy; six-pad software route only, no fitted PCB or electrical/HIL qualification."
+    },
+    {
+      "id": "quadspi-bank1-mapped114",
+      "variants": [
+        "STM32F479NIH6"
+      ],
+      "controller": "QUADSPI",
+      "kind": "mapped_storage",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "QUADSPI_BK1_NCS",
+          "af": 10
+        },
+        {
+          "pin": "PF8",
+          "function": "QUADSPI_BK1_IO0",
+          "af": 10
+        },
+        {
+          "pin": "PF9",
+          "function": "QUADSPI_BK1_IO1",
+          "af": 10
+        },
+        {
+          "pin": "PF10",
+          "function": "QUADSPI_CLK",
+          "af": 9
+        },
+        {
+          "pin": "PF7",
+          "function": "io2",
+          "af": 9
+        },
+        {
+          "pin": "PF6",
+          "function": "io3",
+          "af": 9
+        }
+      ],
+      "modes": [
+        "nor-mapped-cpu"
+      ],
+      "source": "DS11118 Rev8 exact F479NI alternate functions; RM0386 Rev6 QUADSPI; Winbond W25Q128JV RevM W25Q128JVSIQ software reference, observed QE1 required without status writes, 6Bh SDR114 with 24-bit address and8dummy; six-pad software route only, no fitted PCB or electrical/HIL qualification. CPU_READ mapping only under the unique mapped-storage owner and explicit reader slots; no XIP, DMA reader or Flash bypass face."
     }
   ]
 }

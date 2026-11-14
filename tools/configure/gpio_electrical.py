@@ -55,6 +55,14 @@ def validate_binding(binding, route, mask):
 
 def require_selection(selection, binding):
     """Reject a contradiction; do not repair the authored or normalized mode."""
+    if "active_high" in selection:
+        if type(selection["active_high"]) is not bool:
+            fail("GPIO active_high requires a boolean")
+        mask = selection["mask"]
+        if (selection["kind"] != "gpio" or
+                selection["mode"] not in {"input", "output"} or
+                mask == 0 or mask & (mask - 1)):
+            fail("GPIO active_high requires one authorized input/output pin")
     required = binding.get("electrical")
     if required is None:
         return

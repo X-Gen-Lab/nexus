@@ -1,0 +1,36 @@
+# Software reference only; not a physical Board or executed image.
+schema = 2
+board_package = "f446ze-board"
+backend = "baremetal"
+clock = "custom"
+optimization = "Os"
+
+[clock_parameters]
+source = "hsi"
+input_hz = 16000000
+sysclk_source = "pll"
+pll48 = false
+pll_m = 16
+pll_n = 336
+pll_p = 2
+pll_q = 7
+ahb_div = 1
+apb1_div = 4
+apb2_div = 2
+adc_div = 4
+supply_mv = 3300
+css = false
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 16384
+libc_heap_bytes = 0
+
+[rtc.calendar]
+binding = "rtc0"
+mode = "provision-empty"
+allow_set = false
+timeout_us = 2000000
+poll_limit = 1000000
+initial = { year = 25, month = 1, day = 2, weekday = 4, hour = 3, minute = 4, second = 5 }

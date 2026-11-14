@@ -12,6 +12,9 @@ def validate(selection, route=None):
     required = {"bus_width", "max_blocks", "poll_budget", "stop_timeout_us"}
     if not required.issubset(selection):
         fail("SDIO requires explicit bus_width and finite transfer/stop bounds")
+    speed = selection.get("speed", "default")
+    if type(speed) is not str or speed not in {"default", "high-speed"}:
+        fail("SDIO speed must be explicit default or high-speed")
     width = selection["bus_width"]
     protocol = selection.get("protocol", "sd-memory")
     if type(protocol) is not str or protocol not in {"sd-memory", "mmc", "sdio"}:
@@ -78,6 +81,7 @@ def constructor(item, result):
                     f"    .poll_budget = {options.poll_budget}u,",
                     f"    .stop_timeout_us = {options.stop_timeout_us}u,",
                     f"    .bus_width = {options.bus_width}u,",
+                    "    .high_speed = " + ("true," if options.speed == "high-speed" else "false,"),
                     "    .engine = NX_STM32_SDIO_" + {
                         "sdio-poll": "POLL", "sdio-irq": "IRQ",
                         "sdio-dma": "DMA"}[item.mode] + ",",

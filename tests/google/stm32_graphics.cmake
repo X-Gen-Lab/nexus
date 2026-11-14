@@ -34,6 +34,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND
         add_library(${graphics_hal} OBJECT
             "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Src/stm32f4xx_hal_${engine}.c")
         if(engine STREQUAL "ltdc")
+            target_sources(${graphics_test} PRIVATE
+                "${NEXUS_SOURCE_DIR}/tests/contracts/stm32f4_graphics/sustained_sequence.c")
             target_sources(${graphics_hal} PRIVATE
                 "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Src/stm32f4xx_hal_gpio.c")
         endif()

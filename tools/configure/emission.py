@@ -64,7 +64,8 @@ def emit_bundle(result, output):
              'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted(
                  {item.kind for item in result.controllers} |
                  {item.driver.removesuffix("-endpoint") for item in result.devices
-                  if item.kind == "external_bus"})) + '")',
+                  if item.kind == "external_bus" and
+                  item.driver != "mapped_storage-endpoint"})) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result.components) + '")']
     device = result.physical_part.device
     if device is not None:
@@ -95,6 +96,21 @@ def emit_bundle(result, output):
                           for item in result.devices)
     cmake.append("set(NEXUS_SDRAM_GRAPHICS " +
                  ("ON" if graphics_memory else "OFF") + ")")
+    qspi_dma = any(item.kind == "external_bus" and
+                   item.mode == "qspi-indirect-dma"
+                   for item in result.controllers)
+    header.append(f"#define NEXUS_QSPI_PROGRAM_DMA {int(qspi_dma)}")
+    qspi_map = any(item.driver == "mapped_storage-endpoint"
+                   for item in result.devices)
+    header.append(f"#define NEXUS_QSPI_CPU_MAP {int(qspi_map)}")
+    cmake.append("set(NEXUS_QSPI_CPU_MAP " +
+                 ("ON" if qspi_map else "OFF") + ")")
+    qspi_quad = any(item.driver in {"flash_async-endpoint", "mapped_storage-endpoint"} and
+                    item.options.mode in {"nor-indirect-quad-read", "nor-mapped-cpu"}
+                    for item in result.devices)
+    header.append(f"#define NEXUS_QSPI_QUAD_READ {int(qspi_quad)}")
+    cmake.append("set(NEXUS_QSPI_QUAD_READ " +
+                 ("ON" if qspi_quad else "OFF") + ")")
     for selection in result.controllers:
         prefix = "NEXUS_" + selection.id.replace("-", "_").upper()
         header.append(f"#define {prefix}_SELECTED 1")
@@ -111,12 +127,16 @@ def emit_bundle(result, output):
     write("nexus_config.h", "\n".join(header))
     write("selection.cmake", "\n".join(cmake) + "\n")
     from tools.configure.bindings import emit
-    from tools.configure.factory import emit as emit_factory, emit_strong
+    from tools.configure.factory import emit as emit_factory, emit_strong, emit_smbus
     factory_header, factory_source = emit_factory(result)
     write("nexus_factory.h", factory_header)
     write("nexus_factory_strong.h", emit_strong(result))
     bindings_header, bindings_source = emit(result)
     bindings_source += "\n" + factory_source
+    smbus_header, smbus_source = emit_smbus(result)
+    if smbus_header:
+        write("nexus_smbus_factory.h", smbus_header)
+        bindings_source += "\n" + smbus_source
     write("nexus_bindings.h", bindings_header)
     write("bindings.c", bindings_source)
     write("memory.ld", memory_regions.linker(result))

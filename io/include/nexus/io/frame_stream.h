@@ -32,13 +32,14 @@ typedef enum { NX_FRAME_SAMPLE_LSB, NX_FRAME_SAMPLE_MSB } nx_frame_alignment_t;
 /**
  * \brief           Immutable audio memory format, independent of codec policy.
  *
- * \note            PCM frames store every slot, including inactive slots, in
- *                  ascending slot order; slot_bits is the container width.
- *                  I2S has two 16/32-bit slots; SAI has 1..32 8/16/32-bit
- * slots. PDM has 1..8 byte-interleaved lanes; each byte holds eight successive
- * bits of one lane, so frames must divide by eight. active_slots selects valid
- * lanes/slots without compacting storage. Sample byte order is explicitly
- * declared.
+ * \note            slots counts wire slots; slot_bits is the stored container
+ *                  width. I2S stores both 16/32-bit slots even when only one is
+ *                  active. SAI has 1..32 wire slots and stores only enabled
+ *                  active_slots samples in ascending slot order, in 8/16/32-bit
+ *                  containers. PDM has 1..8 byte-interleaved lanes; each byte
+ *                  holds eight successive bits of one lane, so frames must
+ *                  divide by eight. PDM active_slots selects valid lanes
+ * without compacting storage. Sample byte order is explicitly declared.
  */
 typedef struct {
     nx_frame_audio_kind_t kind;

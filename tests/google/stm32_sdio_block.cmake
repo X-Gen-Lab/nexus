@@ -55,3 +55,14 @@ foreach(sdio_clock_compile ${sdio_clock_target} ${sdio_clock_target}_sdio_ll)
     target_compile_options(${sdio_clock_compile} BEFORE PRIVATE
         "-include${sdio_clock_bundle}/nexus_config.h")
 endforeach()
+
+# Distinguishing CMD6/HS_TIMING and 75-MHz domain contracts share the real host.
+set(sdio_hs_target nexus_stm32_sdio_hs375_test)
+nexus_sdio_contract(${sdio_hs_target})
+target_compile_definitions(${sdio_hs_target} PRIVATE
+    NX_SDIO_HIGH_SPEED_ONLY=1 NEXUS_STM32_SDIO_SD_HS=1
+    NEXUS_STM32_SDIO_MMC_HS=1)
+foreach(sdio_hs_context ${sdio_hs_target} ${sdio_hs_target}_sdio_ll)
+    target_compile_options(${sdio_hs_context} BEFORE PRIVATE
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_sdio_hs375_profile.h")
+endforeach()

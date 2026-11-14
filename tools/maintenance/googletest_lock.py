@@ -3,8 +3,8 @@
 from __future__ import annotations
 import argparse
 import configparser
+import glob
 import json
-import os
 from pathlib import Path
 import re
 import subprocess
@@ -16,7 +16,8 @@ sys.path.insert(0, str(ROOT))
 from tools.configure.metadata import (  # noqa: E402
     VERSION, fields, parse_json, regular, snapshot,
 )
-from tools.maintenance import source_catalogue  # noqa: E402
+from tools.evidence.common import git_observation_environment  # noqa: E402
+from tools.maintenance import cmsis_device_lock, source_catalogue  # noqa: E402
 
 ORIGIN = "https://github.com/google/googletest.git"
 UPSTREAM_COMMIT = "6910c9d9165801d8827d628cb72eb7ea9dd538c5"
@@ -46,10 +47,7 @@ def contract(lock):
 
 
 def git(source, *arguments, parent_index=False):
-    environment = {key: value for key, value in os.environ.items()
-                   if not key.startswith("GIT_")}
-    if parent_index and "GIT_INDEX_FILE" in os.environ:
-        environment["GIT_INDEX_FILE"] = os.environ["GIT_INDEX_FILE"]
+    environment = git_observation_environment(parent_index=parent_index)
     result = subprocess.run(["git", "-C", str(source), *arguments],
         capture_output=True, text=True, env=environment, timeout=20)
     if result.returncode:
@@ -121,20 +119,21 @@ def verify(source, lock_path):
             git(source, "config", "--get-all", "remote.origin.url") != approved_fetch or
             git(source, "status", "--porcelain", "--untracked-files=all")):
         raise ValueError("GoogleTest source identity changed during verification")
-    git_directory = Path(git(source, "rev-parse", "--absolute-git-dir"))
-    inputs = [git_directory / "HEAD", git_directory / "index"]
-    reference = git(source, "rev-parse", "--symbolic-full-name", "HEAD")
-    if reference != "HEAD":
-        reference_path = Path(git(source, "rev-parse", "--git-path", reference))
-        if not reference_path.is_absolute():
-            reference_path = source / reference_path
-        if reference_path.is_file():
-            inputs.append(reference_path)
-        if (git_directory / "packed-refs").is_file():
-            inputs.append(git_directory / "packed-refs")
+    parent_index = Path(git(root, "rev-parse", "--git-path", "index",
+                            parent_index=True))
+    if not parent_index.is_absolute():
+        parent_index = root / parent_index
+    # Track identity-bearing files, never a directory changed by index.lock.
+    # Exact optional-file probes also observe a packed branch gaining a loose
+    # ref, or a checkout marker changing between directory and gitfile forms.
+    probes = [*cmsis_device_lock.git_identity_inputs(source, observe=git),
+              root / ".git"]
+    inputs = [parent_index, *[path for path in probes if path.is_file()]]
     return {"commit": lock["commit"], "version": lock["version"],
             "source_kind": "git_submodule", "license": lock["license"],
-            "configure_inputs": [str(path) for path in inputs]}
+            "configure_inputs": [str(regular(path).resolve()) for path in inputs],
+            "configure_file_probes": [glob.escape(path.resolve().as_posix())
+                                      for path in probes]}
 
 
 def main(argv=None):

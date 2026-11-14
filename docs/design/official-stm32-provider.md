@@ -43,6 +43,22 @@ only selected HAL modules and required dependencies, with a consistent private
 configuration and callback ABI. Do not enable every module or modify vendor
 files. All other inventoried vendor sources remain retained and unselected.
 
+Official source admission is shared only within one CMake configure. The first
+official target verifies the complete selected HAL/CMSIS source and SDK identity,
+then retains a unique pending input snapshot bound to its SHA256. After all root
+deferred work, the same complete verification must match the original content,
+filesystem and Git identity. Rewrites with identical bytes also reject the
+configure. Intermediate targets still check their own target, device, ABI and
+private source/include contracts; they do not inherit another target's setup.
+
+The snapshot is build-local input metadata, not a successful test, hardware
+qualification or persistent cache. Final verification consumes a recognized
+pending snapshot on success or failure; unrelated malformed files are not
+deleted. CMake removes its own pending path after every final subprocess result.
+Each new configure starts a fresh admission. Exact existing input files and
+missing Git metadata candidates drive reconfiguration; Git lock directories
+never become timestamp dependencies.
+
 Default host generation remains centralized Python; Board and SoC trees contain
 no Python plugins. The generator emits static configuration and fixed typed
 connections. Core's C platform lifecycle engine owns startup, stop, rollback and
@@ -68,6 +84,55 @@ same storage and recovery responsibility.
 Do not unconditionally call `HAL_Init()`: default SysTick setup and NVIC grouping
 must respect Platform and RTOS ownership. Use the maintained time domain and
 validate any kernel ISR ceiling before entering a kernel API.
+
+## F415/F417 basic crypto transports
+
+`STM32F415ZGT6` and `STM32F417ZGT6` select `cipher/CRYP` and `hash/HASH` through
+the existing static factory. Each controller independently selects
+`irq-blocks` or `dma-blocks`. Selecting one engine's DMA mode does not add the
+other engine's DMA implementation or storage. This contract does not enable
+F479 enhanced crypto, authenticated encryption, key storage, padding or protocol
+policy. SHA1, MD5, DES and TDES availability is a hardware integration fact,
+not a recommendation for new security protocols.
+
+The DMA selection adds separate statically allocated channel state and readonly
+memory-region connections to the same controller owner. CRYP uses DMA2 stream6
+channel2 for input and stream5 channel2 for output. HASH uses stream7 channel2
+for input. Platform reserves these streams and vectors; their NVIC entries stay
+disabled. The sole serialized task executor services DMA callbacks. The existing
+CRYP or HASH_RNG peripheral entry only records its selected engine's facts and
+completion hints. There is no worker, IRQ scan, runtime registry or maximum pool.
+
+CRYP DMA accepts aligned complete algorithm blocks and rejects exact in-place
+input/output: independent DMA channels do not prove a safe read-before-write
+ordering. Key and IV remain standard bytes with the existing format constraints.
+Query the selected algorithm's alignment, length multiple and maximum rather
+than inferring requirements from CTR or AES alone.
+
+The locked HASH DMA HAL reads complete words. DMA messages are positive,
+four-byte aligned and have a byte length divisible by four, at most 262140 B.
+HMAC keys follow the same positive whole-word requirements; plain hashes have
+no key. `input_length_multiple` and `key_length_multiple` report these rules;
+the IRQ transport reports one for both. Digest storage remains byte-aligned:
+the provider reads a proven ready digest through the existing CPU byte copy,
+without a hidden tail pad, full-message copy or output bounce buffer.
+
+Both transports validate complete descriptor, key, IV, input and output spans
+before acceptance. DMA domains come from the selected physical memory facts;
+main SRAM is readable/writable, Flash is readable, and CCM is excluded. Memory
+TC is not cipher-output completion, HASH digest readiness or request SETTLED.
+HMAC retains the caller's key through both official key phases and the message
+phase. Before terminal publication, the owner joins the actual channels and
+peripheral, withdraws callback/pointer references and clears internal secret
+context. Failed withdrawal retains the original request and spans as
+QUARANTINED; cancel, timeout and a successful HAL abort call never authorize
+their reuse. Caller key/IV storage is not erased by the provider.
+
+The `stm32f4_crypto` references include an F415 configuration with both DMA
+transports and an F417 configuration with CRYP DMA and HASH IRQ. They exercise
+factory composition and source selection. Model execution and ARM linking
+retain their own source identities; no PCB, throughput, cryptographic
+certification or physical HIL qualification follows from these references.
 
 ## F407 DAC DMA restart boundary
 
@@ -177,12 +242,40 @@ limit. This check is not physical oscillator, load or panel qualification.
 CLUT/extra packed formats, watermark/suspend modes and additional exact parts
 remain outside this selected graphics slice.
 
-The maintained
-[`graphics_sdram` consumer](../../tests/contracts/stm32f4_graphics_sdram/CMakeLists.txt)
-reuses the public DMA2D-fill → SETTLED → LTDC-scanout → SETTLED → Platform-close
-sequence with an explicitly selected external framebuffer address. Its ARM
-compile/link result establishes only that exact software composition; physical
-execution remains `not_executed`. It does not acquire a public CPU window loan.
+The maintained combined SRAM and
+[`graphics_sdram` consumers](../../tests/contracts/stm32f4_graphics_sdram/CMakeLists.txt)
+use the fixture-local `sustained_sequence.c` with two static framebuffers.
+One explicit caller drives DMA2D fill, observes image SETTLED, submits display,
+and waits for the old display request's SETTLED before rendering into those
+bytes again. Four submissions form a finite replacement sequence; each display
+request explicitly uses NEVER until replacement or stop. The successful path
+then joins both engines, shuts down Platform and runs a second prepared sequence. The
+image-only reference retains its separate single-shot consumer. No fixture
+helper is a platform service, queue, allocator or hidden worker.
+
+| Observed fact | Storage permission |
+| --- | --- |
+| Image request SETTLED successfully | Completed pixels can be submitted to display |
+| Display accepted, pending, visible or a reload hint | Full frame remains borrowed; rendering into it is forbidden |
+| Old display request acquire-observed SETTLED | Its buffer can become the next image destination |
+| One frame retired while graphics bank remains attached | Only that frame is reusable; the bank lease still belongs to its cold engine owners |
+| Error or failed stop without SETTLED | Retain original requests, both buffers and provider recovery responsibilities |
+
+The explicit `graphics-owned` bank lease grants the selected engines access to
+their regions; it never grants simultaneous writes over another engine's
+borrowed frame. The SDRAM consumer uses two admitted hardware addresses without
+acquiring a public CPU window loan or accessing pixel bytes with the CPU.
+Provider snapshots explain a latched failure; neither `visible` nor a snapshot
+grants reuse. A failed image is never submitted as a valid display frame.
+
+Three distinguishing composed regressions execute this same consumer sequence
+with the actual LTDC C/HAL model and a controlled external image port. They
+verify actual retirement before reuse and restart, image failure, and underrun
+with retained frames. The real DMA2D program independently verifies image
+kernel, final memory access and complete withdrawal; the composed tests do not
+replace it or duplicate its pixel model. Fixture controls remain alive through
+every failed test assertion. ARM/SDK compile and link validate the exact
+selected public composition; physical execution remains `not_executed`.
 
 That software reference selects HCLK 16 MHz, 8 MHz 16-bit SDRAM and a 64×32
 layer within a 320×240 timing at approximately 53.76 Hz. Active pixel reads alone

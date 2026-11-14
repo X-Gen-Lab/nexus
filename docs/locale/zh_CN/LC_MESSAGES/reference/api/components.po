@@ -1,4 +1,4 @@
-# Current canonical messages; semantic review admission is tracked separately.
+# Actual-POT delta independently reviewed against current source and contracts.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus documentation\n"
@@ -6,7 +6,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: d964128b3eb3c3003efc5abbd429f3536f2906b20f4451528d89cde8dfef6af9\n"
+"X-Nexus-Source-SHA256: ddbfa67e5f04ad6ebdacb32c2c8d1d37f2283022d46a92ae15451d30b59184db\n"
 
 #: docs/reference/api/components.md:8
 msgid "Optional common components"
@@ -79,6 +79,20 @@ msgid ""
 msgstr ""
 "[相互独立的 GPIO I2C 与 SCCB 协议](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/components/software_i2c/README.md)"
+
+msgid "`Nexus::SMBus`"
+msgstr "`Nexus::SMBus`"
+
+msgid "`smbus.h`"
+msgstr "`smbus.h`"
+
+msgid ""
+"[Bounded packet PEC over an existing asynchronous I2C "
+"endpoint](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/smbus/README.md)"
+msgstr ""
+"[现有异步 I2C 端点上的有界包 PEC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/smbus/README.md)"
 
 #: docs/reference/api/components.md:0
 msgid "`Nexus::SoftwareSPI`"
@@ -4129,6 +4143,9 @@ msgstr "SUCCESS；NVM 更新期间为 BUSY；也可能返回传输或身份错�
 msgid "Start one forced temperature/pressure conversion."
 msgstr "启动一次强制温度／压力转换。"
 
+msgid "Task-only serialized driver owner; oversampling x1/x1. Ready time is finite even with an explicit infinite caller deadline. EXHAUSTED retains no software conversion or MCU buffer; a completed configuration write can still have started the sensor. Retry uses its actual idle status."
+msgstr "仅由串行 Task 驱动 owner 调用，过采样 x1／x1。即使调用方显式选择无限 deadline，ready 等待仍有限。EXHAUSTED 不保留软件转换状态或 MCU buffer；已经完成的配置写入仍可能启动传感器。重试须观察其实际 idle 状态。"
+
 #: docs/reference/api/components.md:482
 msgid "[inout] Initialized non-measuring instance"
 msgstr "[inout] 已初始化且未在测量的实例"
@@ -4136,6 +4153,9 @@ msgstr "[inout] 已初始化且未在测量的实例"
 #: docs/reference/api/components.md:482
 msgid "[in] Absolute deadline covering conversion and reads"
 msgstr "[in] 覆盖转换与读取的绝对截止时间"
+
+msgid "SUCCESS, BUSY, TIMEOUT, EXHAUSTED or transport error"
+msgstr "SUCCESS、BUSY、TIMEOUT、EXHAUSTED 或传输错误"
 
 #: docs/reference/api/components.md:482
 msgid "Poll conversion without an implicit worker or blocking delay."
@@ -4577,6 +4597,253 @@ msgid ""
 "successful reopen invalidates all prior controls without resetting the epoch."
 msgstr ""
 "允许按值复制。该值不是授权令牌，也不能证明未登记消费者的状态。时钟域存储的寿命必须长于每份副本。成功重新开放会使全部旧控制身份失效，但不重置 epoch。"
+
+msgid "clock_domain_owner.h"
+msgstr "clock_domain_owner.h"
+
+msgid ""
+"Trusted static composition includes this public storage header. Ordinary "
+"callers keep the opaque interface; cold helpers and span validation "
+"remain private. Storage fields are implementation state after "
+"construction, not application controls."
+msgstr "可信静态组合包含此公共存储头文件。普通调用方保留不透明接口；冷态辅助函数和范围验证仍为私有。构造后，存储字段属于实现状态，不是应用控制项。"
+
+msgid "Exact static storage for a trusted clock domain owner."
+msgstr "可信时钟域所有者的精确静态存储。"
+
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-11-13   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-11-13   版权  Copyright (c) 2026 "
+"Nexus Team"
+
+msgid "2026-11-13"
+msgstr "2026-11-13"
+
+msgid "Construct unused zero-initialized static owner storage."
+msgstr "构造未使用且已零初始化的静态所有者存储。"
+
+msgid ""
+"Serialized privileged Thread. Positive exact capacity; no allocation, "
+"hardware writes, global registry or worker. Never overwrite a live domain"
+" to recycle its epoch. Caller storage outlives every token and copied "
+"barrier that can still be observed; construct does not stop hardware."
+msgstr ""
+"在串行化的特权 Thread 中调用。容量必须是正的精确值；不分配内存、不写硬件、不增加全局注册表或工作线程。绝不通过覆盖存活域来回收其 "
+"epoch。调用方存储的寿命须超过每个仍可能被观察到的令牌和屏障副本；构造操作不会停止硬件。"
+
+msgid "SUCCESS or INVALID/STATE/CONTEXT without retained consumers"
+msgstr "SUCCESS 或 INVALID/STATE/CONTEXT，均不保留消费者"
+
+msgid "Trusted static owner storage; fields are not controls."
+msgstr "可信的静态所有者存储；字段不是控制项。"
+
+msgid ""
+"Zero-initialize once. Storage outlives every consumer token and copied "
+"barrier. Do not copy, overwrite or reclaim a live domain, or recycle its "
+"monotonically used epoch. Ordinary consumers use the opaque type in "
+"clock_domain.h instead."
+msgstr ""
+"仅零初始化一次。存储的寿命须超过每个消费者令牌和屏障副本。不得复制、覆盖或回收存活域，也不得回收其单调使用的 epoch。普通消费者应使用 "
+"clock_domain.h 中的不透明类型。"
+
+msgid "smbus.h"
+msgstr "smbus.h"
+
+msgid ""
+"The optional component frames bounded packets over an already configured "
+"asynchronous I2C endpoint. Its generated companion reuses existing "
+"endpoint IDs; it does not qualify hardware SMBTYPE, timeout or ALERT "
+"operation. See the [component contract](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/smbus/README.md) for"
+" `nexus_smbus_factory.h`, static binding and borrowing lifetimes."
+msgstr ""
+"此可选组件在已配置的异步 I2C 端点上封装有界包。其生成的配套文件复用现有端点 ID；不认定硬件 SMBTYPE、超时或 ALERT "
+"操作的资格。有关 `nexus_smbus_factory.h`、静态绑定和借用寿命，参见[组件合同](https://github.com/X"
+"-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/smbus/README.md)。"
+
+msgid "Bounded packet PEC over one reviewed asynchronous I2C binding."
+msgstr "一个已审查异步 I2C 绑定上的有界包 PEC。"
+
+msgid "Received-packet integrity, readable only after acquire-SETTLED."
+msgstr "接收包的完整性，仅在以 acquire 语义观察到 SETTLED 后可读。"
+
+msgid ""
+"Writes remain NOT_CHECKED: an ACK does not prove peer PEC policy. CRC8 "
+"detects transmission errors; it provides no authentication."
+msgstr "写操作保持 NOT_CHECKED：ACK 不能证明对端的 PEC 策略。CRC8 检测传输错误，不提供身份认证。"
+
+msgid "Bind a preconfigured endpoint without opening or changing hardware."
+msgstr "绑定已预先配置的端点，不开启或更改硬件。"
+
+msgid ""
+"Task-only. Opaque provider control extents are externally disjoint from "
+"this adapter and every request/payload; public extents are checked."
+msgstr "仅限任务上下文。不透明提供方控制对象的范围须由外部保证与此适配器及每个请求/载荷互不重叠；公共范围会被检查。"
+
+msgid "[inout] Fresh zero or successfully stopped independent control."
+msgstr "[inout] 全新零初始化或已成功停止的独立控制对象。"
+
+msgid "[in] Immutable matching transport/address,08h..77h."
+msgstr "[in] 不可变且匹配的传输/地址，08h..77h。"
+
+msgid "SUCCESS or INVALID/UNSUPPORTED/CONTEXT/BUSY/EXHAUSTED."
+msgstr "SUCCESS 或 INVALID/UNSUPPORTED/CONTEXT/BUSY/EXHAUSTED。"
+
+msgid "Prepare write, read, or write/read with one terminal packet PEC."
+msgstr "准备写、读或写/读操作，使用一个位于包末尾的 PEC。"
+
+msgid ""
+"Task-only, no callback or payload access, hardware or PEC-tail writes. No"
+" SMBus command, dynamic block-count or product register policy."
+msgstr "仅限任务上下文，不调用回调、不访问载荷、不写硬件或 PEC 尾部。不提供 SMBus 命令、动态块计数或产品寄存器策略。"
+
+msgid "[in] Initialized adapter and unchanged transport generation."
+msgstr "[in] 已初始化的适配器和未改变的传输代次。"
+
+msgid "[inout] Initialized/consumed descriptor, disjoint from data."
+msgstr "[inout] 已初始化/已消耗且与数据不重叠的描述符。"
+
+msgid "[in] Immutable payload and optional explicit writable PEC tail."
+msgstr "[in] 不可变载荷及可选的显式可写 PEC 尾部。"
+
+msgid "[in] Writable payload and reserved PEC capacity."
+msgstr "[in] 可写载荷及为 PEC 预留的容量。"
+
+msgid "[in] Finite absolute Core deadline, unchanged clock domain."
+msgstr "[in] 有限的绝对 Core 截止时间，时钟域保持不变。"
+
+msgid "SUCCESS or INVALID/STATE/CONTEXT/BUSY; failure changes no packet."
+msgstr "SUCCESS 或 INVALID/STATE/CONTEXT/BUSY；失败不改变任何包。"
+
+msgid "Accept one packet before writing its PEC tail or submitting I2C."
+msgstr "先接受一个包，再写入其 PEC 尾部或提交 I2C。"
+
+msgid ""
+"Task-only, bounded. An inner start rejection after outer acceptance "
+"settles the outer request with that error; it never leaks a borrow."
+msgstr "仅限任务上下文，操作有界。外层接受后，若内层启动被拒绝，外层请求以该错误结清；绝不遗留未释放的借用。"
+
+msgid ""
+"SUCCESS is ACCEPTED; inspect acquire-SETTLED for final status. Rejection "
+"has no retained reference, PEC write or transport effect."
+msgstr "SUCCESS 表示 ACCEPTED；以 acquire 语义观察 SETTLED 获取最终状态。拒绝不会保留引用、写入 PEC 或产生传输效果。"
+
+msgid "Advance the existing I2C owner and observe its authoritative loan."
+msgstr "推进现有 I2C 所有者并观察其权威借用状态。"
+
+msgid ""
+"Task-only. QUARANTINED storage remains borrowed. Inner SETTLED must prove"
+" complete hardware/IRQ withdrawal before PEC verification and final outer"
+" publication. Only final packet SUCCESS validates RX."
+msgstr ""
+"仅限任务上下文。QUARANTINED 存储仍被借用。在验证 PEC 和最终发布外层结果之前，内层 SETTLED 必须证明硬件/IRQ "
+"已完整撤回。仅最终包结果为 SUCCESS 时 RX 才有效。"
+
+msgid ""
+"BUSY while borrowed, terminal packet result on settlement, or SUCCESS "
+"while idle; CONTEXT/STATE leaves existing ownership intact."
+msgstr "借用期间返回 BUSY，结清时返回包的终态结果，空闲时返回 SUCCESS；CONTEXT/STATE 保持现有所有权不变。"
+
+msgid "Request withdrawal without revoking wire-storage ownership."
+msgstr "请求撤回，不撤销总线字节存储的所有权。"
+
+msgid ""
+"Task-only. Already settled I2C wins a later cancel. Continue service "
+"until outer SETTLED, including after timeout or cancellation failure."
+msgstr "仅限任务上下文。已结清的 I2C 结果优先于后续取消。持续调用 service，直到外层 SETTLED；超时或取消失败后也必须如此。"
+
+msgid ""
+"SUCCESS for requested/already completed cancellation, otherwise the exact"
+" context, identity or underlying cancellation error."
+msgstr "已请求取消或取消已完成时返回 SUCCESS，否则返回确切的上下文错误、身份错误或底层取消错误。"
+
+msgid "Close packet admission and join this adapter's current request."
+msgstr "关闭包准入，并汇合此适配器的当前请求。"
+
+msgid ""
+"Task-only. This does not stop/reset the shared I2C controller or return "
+"its resources. Caller stops that independent owner after all consumers. "
+"Repeated successful stop is a no-op and does not call the transport."
+msgstr "仅限任务上下文。这不会停止/复位共享 I2C 控制器或归还其资源。调用方在所有消费者结束后停止该独立所有者。成功停止后再次停止为空操作，不调用传输。"
+
+msgid ""
+"SUCCESS after settlement, BUSY while withdrawal remains borrowed, "
+"otherwise CONTEXT/STATE. Failure retains the same binding/control."
+msgstr "结清后返回 SUCCESS，撤回期间仍被借用时返回 BUSY，否则返回 CONTEXT/STATE。失败保留同一绑定/控制对象。"
+
+msgid "One immutable transport and its exact seven-bit PEC address."
+msgstr "一个不可变传输及其精确的七位 PEC 地址。"
+
+msgid ""
+"Generated bindings derive all three fields from one I2C endpoint. Manual "
+"integration must supply the same wire address as the endpoint; an opaque "
+"endpoint does not provide runtime address authentication. "
+"Endpoint/controller identity is checked without opening hardware. "
+"Binding, faces, operations and opaque contexts outlive adapter stop. This"
+" is packet framing, not a hardware SMBTYPE/timeout/ALERT owner."
+msgstr ""
+"生成的绑定从同一个 I2C "
+"端点派生全部三个字段。手工集成必须提供与端点相同的总线地址；不透明端点不提供运行时地址认证。检查端点/控制器身份时不打开硬件。绑定、接口面、操作表和不透明上下文的寿命须超过适配器停止。这是包封装，不是硬件"
+" SMBTYPE/超时/ALERT 所有者。"
+
+msgid "Immutable payload and an explicitly writable terminal PEC byte."
+msgstr "不可变载荷和一个显式可写的末尾 PEC 字节。"
+
+msgid ""
+"Empty is {NULL,0,NULL}. Payload is1..32 bytes. A write-only packet "
+"requires pec == data + payload_bytes in the same actual contiguous wire "
+"allocation, with that tail writable. No const cast or payload copy is "
+"made. Write/read uses pec=NULL; its only PEC ends the RX."
+msgstr ""
+"空值为 {NULL,0,NULL}。载荷为 1..32 字节。仅写包要求 pec == data + "
+"payload_bytes，且位于同一实际连续总线存储分配内，该尾部必须可写。不进行 const 强制转换或载荷复制。写/读使用 "
+"pec=NULL；其唯一 PEC 位于 RX 末尾。"
+
+msgid "Caller-owned payload plus one byte reserved for received PEC."
+msgstr "调用方所有的载荷，加上为接收 PEC 预留的一个字节。"
+
+msgid ""
+"Empty is {NULL,0,0}. Payload is1..32 bytes and capacity covers at least "
+"payload_bytes+1. The whole capacity is disjoint from TX and all adapter, "
+"binding and transport metadata. RX bytes are untrusted until acquire-"
+"observed SETTLED reports SUCCESS and PEC_VALID."
+msgstr ""
+"空值为 {NULL,0,0}。载荷为 1..32 字节，capacity 至少覆盖 payload_bytes+1。整个 capacity 范围与"
+" TX 以及全部适配器、绑定和传输元数据互不重叠。以 acquire 语义观察到的 SETTLED 报告 SUCCESS 和 PEC_VALID "
+"之前，RX 字节均不可信。"
+
+msgid "One finite packet, borrowed through acquire-observed SETTLED."
+msgstr "一个有限包，借用持续到以 acquire 语义观察到 SETTLED。"
+
+msgid ""
+"Initialize base before prepare. TX payload stays immutable; only the "
+"explicit PEC tail and RX wire storage may be written after acceptance. "
+"Successful transferred counts TX+RX payload bytes, excluding PEC and "
+"addresses. Errors report zero, with possible remote effects and partial "
+"RX writes. Never replay automatically or consume failed RX as valid. "
+"Fields are private after prepare; READY is bound to one owner epoch."
+msgstr ""
+"在 prepare 前初始化 base。TX 载荷保持不可变；接受后仅允许写入显式 PEC 尾部和 RX 总线存储。成功时 transferred"
+" 计入 TX+RX 载荷字节，不含 PEC 和地址。错误报告零，但可能已产生远端效果和部分 RX 写入。绝不自动重放，也不将失败的 RX "
+"当作有效数据使用。prepare 后字段为私有；READY 绑定一个所有者 epoch。"
+
+msgid "Optional single-executor adapter; zero before its first initialize."
+msgstr "可选的单执行者适配器；首次 initialize 前置零。"
+
+msgid ""
+"Private control after initialization, never copied or zeroed to revoke a "
+"borrow. Exactly two message headers support the one repeated START; there"
+" is no payload scratch, queue, allocation, task or hidden retry. One "
+"unmasked task serializes calls and I2C execution. No reentry or direct "
+"competing submission through this binding while active. The Core clock "
+"domain and underlying I2C owner stay live until stop."
+msgstr ""
+"初始化后为私有控制对象，绝不通过复制或置零来撤销借用。恰好两个消息头支持一次 repeated "
+"START；不设载荷暂存区、队列、分配、任务或隐藏重试。一个未屏蔽中断的任务串行化调用与 I2C "
+"执行。活动期间不得重入，也不得通过此绑定直接竞争提交。Core 时钟域和底层 I2C 所有者须保持存活直到 stop。"
 
 #: docs/reference/api/components.md:512
 msgid "dp83848.h"
@@ -6105,6 +6372,12 @@ msgstr ""
 msgid "Success means ACCEPTED; every failure retains no request or payload."
 msgstr "成功表示 ACCEPTED；任何失败均不保留 request 或 payload。"
 
+msgid "Poll once, submit at most two packets or cancel one loan."
+msgstr "poll 一次，至多提交两个 packet 或取消一个 loan。"
+
+msgid "No queue or worker. All packet deadlines use the outer independent absolute monotonic deadline. Poll while borrowed, even after cancel, reset, SETUP supersession or device stop. Cancel/drain/quarantine retain descriptor bytes and outer context. OUT0 quarantine exposes NEEDS_DEVICE_STOP; only the external controller owner may authorize stop. This adapter never stops the shared controller automatically. Control DATA IN prearms one zero-length STATUS OUT before exposing its first IN packet. A STATUS ACK fixes the wire outcome, but both accepted directions must join before outer SETTLED. Acquired packet facts are folded before observing newer controller epochs."
+msgstr "没有队列或 worker。所有 packet 使用 outer 独立绝对单调 deadline。借用期间持续 poll，包括 cancel、reset、新 SETUP 替代或设备停止后。取消、排空或隔离保留描述符字节和 outer context。OUT0 隔离暴露 NEEDS_DEVICE_STOP，仅外部 controller owner 可授权 stop；adapter 不自动停止共享 controller。control DATA IN 在暴露首个 IN packet 前，先预置一个零长 STATUS OUT。STATUS ACK 确定线上结果，但两个已接纳方向都 join 后才发布 outer SETTLED。先汇总已 acquire 的 packet 事实，再观察更新的 controller epoch。"
+
 #: docs/reference/api/components.md:612
 msgid "[inout] Same serialized executor and lifetime as begin."
 msgstr "[inout] 同一个串行化执行者；沿用 begin 的生命周期要求。"
@@ -6240,6 +6513,9 @@ msgstr "有界描述符视图；产品描述符字节仍由外部提供。"
 msgid "Validate complete device, configuration or string descriptor bytes."
 msgstr "校验完整的 device、configuration 或 string 描述符字节。"
 
+msgid "Configuration views require alternate zero, endpoint plans matching selected bulk, interrupt or ISO ports, consistent totals and unique interface numbers. ISO bInterval is 1..16, an exponent of FS frames or HS microframes; ISO synchronization/usage encodings remain class policy after reserved-value validation. Only one transaction is selected; HS high-bandwidth multipliers return UNSUPPORTED. Interrupt bInterval in external descriptor bytes is a 1..255 linear count of 1 ms frames at FS, or a 1..16 exponent of 125 us microframes at HS. Bulk bInterval is not interpreted; no polling is scheduled. Class-specific subordinate bytes are bounds-checked but not decoded. Class dispatch, VID/PID, strings, policy, CDC/HID and descriptor lookup remain external. Success is structural validation, not enumeration or physical qualification. To send bytes, preserve their lifetime through the control adapter's acquire-observed outer SETTLED. The view struct requires natural C alignment; rejection is not an arbitrary address probe. Descriptor bytes need only byte alignment and remain externally readable."
+msgstr "configuration 视图要求 alternate zero、与选定 bulk、interrupt 或 ISO 端口匹配的 endpoint 计划、一致的总长度及唯一的 interface 编号。ISO bInterval 为 1..16，表示 FS frame 或 HS microframe 的指数；ISO 同步／用途编码在保留值校验后仍属 class 策略。每次仅选择一个 transaction；HS 高带宽 multiplier 返回 UNSUPPORTED。外部 descriptor 字节中的 interrupt bInterval 在 FS 为 1..255 的线性计数，单位为 1 ms frame；在 HS 为 1..16 的指数编码，单位为 125 µs microframe。bulk bInterval 不作解析，也不调度轮询。class-specific 从属字节仅检查边界，不作解码。class 分派、VID/PID、字符串、策略、CDC/HID 及 descriptor 查找仍由外部负责。成功仅表示结构校验通过，不表示枚举或物理资格。发送字节时，必须保持其有效，直到以 acquire 语义观察到 control adapter 的 outer SETTLED。view 结构体须按 C 类型自然对齐；拒绝机制不能用于探测任意地址。descriptor 字节仅需 byte alignment，且须保持外部可读。"
+
 msgid "[in] Immutable exact selected FS/HS endpoint facts."
 msgstr "[in] 选定 FS/HS endpoint 的不可变精确事实。"
 
@@ -6341,18 +6617,3 @@ msgstr ""
 "时，精确的内核调用槽及用户地址空间继续被借用。device_effect_possible 在调用 WRITE "
 "提供者前置位；出错不能授权重放。result 描述准入及器件执行结果；cleanup_result "
 "独立描述最近一次释放尝试。这是软件责任，不是物理引脚证据。"
-
-msgid "Configuration views require alternate zero, endpoint plans matching selected bulk, interrupt or ISO ports, consistent totals and unique interface numbers. ISO bInterval is 1..16, an exponent of FS frames or HS microframes; ISO synchronization/usage encodings remain class policy after reserved-value validation. Only one transaction is selected; HS high-bandwidth multipliers return UNSUPPORTED. Interrupt bInterval in external descriptor bytes is a 1..255 linear count of 1 ms frames at FS, or a 1..16 exponent of 125 us microframes at HS. Bulk bInterval is not interpreted; no polling is scheduled. Class-specific subordinate bytes are bounds-checked but not decoded. Class dispatch, VID/PID, strings, policy, CDC/HID and descriptor lookup remain external. Success is structural validation, not enumeration or physical qualification. To send bytes, preserve their lifetime through the control adapter's acquire-observed outer SETTLED. The view struct requires natural C alignment; rejection is not an arbitrary address probe. Descriptor bytes need only byte alignment and remain externally readable."
-msgstr "configuration 视图要求 alternate zero、与选定 bulk、interrupt 或 ISO 端口匹配的 endpoint 计划、一致的总长度及唯一的 interface 编号。ISO bInterval 为 1..16，表示 FS frame 或 HS microframe 的指数；ISO 同步／用途编码在保留值校验后仍属 class 策略。每次仅选择一个 transaction；HS 高带宽 multiplier 返回 UNSUPPORTED。外部 descriptor 字节中的 interrupt bInterval 在 FS 为 1..255 的线性计数，单位为 1 ms frame；在 HS 为 1..16 的指数编码，单位为 125 µs microframe。bulk bInterval 不作解析，也不调度轮询。class-specific 从属字节仅检查边界，不作解码。class 分派、VID/PID、字符串、策略、CDC/HID 及 descriptor 查找仍由外部负责。成功仅表示结构校验通过，不表示枚举或物理资格。发送字节时，必须保持其有效，直到以 acquire 语义观察到 control adapter 的 outer SETTLED。view 结构体须按 C 类型自然对齐；拒绝机制不能用于探测任意地址。descriptor 字节仅需 byte alignment，且须保持外部可读。"
-
-msgid "Task-only serialized driver owner; oversampling x1/x1. Ready time is finite even with an explicit infinite caller deadline. EXHAUSTED retains no software conversion or MCU buffer; a completed configuration write can still have started the sensor. Retry uses its actual idle status."
-msgstr "仅由串行 Task 驱动 owner 调用，过采样 x1／x1。即使调用方显式选择无限 deadline，ready 等待仍有限。EXHAUSTED 不保留软件转换状态或 MCU buffer；已经完成的配置写入仍可能启动传感器。重试须观察其实际 idle 状态。"
-
-msgid "SUCCESS, BUSY, TIMEOUT, EXHAUSTED or transport error"
-msgstr "SUCCESS、BUSY、TIMEOUT、EXHAUSTED 或传输错误"
-
-msgid "Poll once, submit at most two packets or cancel one loan."
-msgstr "poll 一次，至多提交两个 packet 或取消一个 loan。"
-
-msgid "No queue or worker. All packet deadlines use the outer independent absolute monotonic deadline. Poll while borrowed, even after cancel, reset, SETUP supersession or device stop. Cancel/drain/quarantine retain descriptor bytes and outer context. OUT0 quarantine exposes NEEDS_DEVICE_STOP; only the external controller owner may authorize stop. This adapter never stops the shared controller automatically. Control DATA IN prearms one zero-length STATUS OUT before exposing its first IN packet. A STATUS ACK fixes the wire outcome, but both accepted directions must join before outer SETTLED. Acquired packet facts are folded before observing newer controller epochs."
-msgstr "没有队列或 worker。所有 packet 使用 outer 独立绝对单调 deadline。借用期间持续 poll，包括 cancel、reset、新 SETUP 替代或设备停止后。取消、排空或隔离保留描述符字节和 outer context。OUT0 隔离暴露 NEEDS_DEVICE_STOP，仅外部 controller owner 可授权 stop；adapter 不自动停止共享 controller。control DATA IN 在暴露首个 IN packet 前，先预置一个零长 STATUS OUT。STATUS ACK 确定线上结果，但两个已接纳方向都 join 后才发布 outer SETTLED。先汇总已 acquire 的 packet 事实，再观察更新的 controller epoch。"

@@ -15,6 +15,7 @@ function(_nexus_component_bindings output)
         "log=Nexus::Log"
         "storage=Nexus::Storage"
         "settings=Nexus::Settings"
+        "smbus=Nexus::SMBus"
         "flash-storage=Nexus::FlashStorage"
         "modbus-rtu=Nexus::ModbusRTU"
         "network=Nexus::LwIP"

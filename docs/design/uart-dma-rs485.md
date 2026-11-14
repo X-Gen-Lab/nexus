@@ -17,11 +17,14 @@ heap、设备扫描、隐藏 worker 或默认 OS 锁。生产 owner 是
 | `rx-dma-continuous` | IRQ | 双缓冲 DMA | 两个预置目标与第三个可用替换块 |
 | `dma-duplex-continuous` | DMA | 双缓冲 DMA | 双向独立引擎，连续接收使用相同贷款协议 |
 
-这里的接收／双向 DMA 模式只接入 STM32F407 USART1。RX 是 DMA2 stream2
-channel4，TX 是 DMA2 stream7 channel4。其他 UART 的 IRQ／有限 TX DMA 能力
-须按其独立配置合同选择，不能推导其已支持这里的接收模式。控制器编号来自芯片手册，
-不能把公共 opaque resource ID 的编码当成物理 DMA 编号。配置必须独占 UART、
-DMA 目标、向量、时钟和引脚，冲突在生成阶段拒绝。
+这些接收／双向 DMA 模式按受审路线接入 STM32F407 的 USART1／2／3／6 和
+UART4／5，共用接收与排空算法。每个实例使用自己的 DMA、IRQ、APB 和引脚事实，
+权威元组见
+[`stm32f407_uart_hardware.h`](../../soc/stm32/stm32f4/private/stm32f407_uart_hardware.h)。
+例如 USART1 默认 RX 是 DMA2 stream2 channel4，TX 是 DMA2 stream7 channel4；
+不能把此路线套用到其他实例。控制器编号来自芯片手册，不能把公共 opaque resource
+ID 的编码当成物理 DMA 编号。配置必须独占 UART、DMA 目标、向量、时钟和引脚，
+冲突在生成阶段拒绝；PCB 接线和物理资格仍须分别核对。
 
 接收块容量为 1～65535 字节。连续模式至少有三个等容量块；有限模式允许
 不同容量。DMA 目标必须落在已授权、可写且 DMA 可到达的区域；F407 的
@@ -98,11 +101,29 @@ service 不重新启动 RX。完整 `stop` 也先关闭 TX admission，只有 RX
 
 RS485 选用 `nx_uart_rs485_state_t`、不可变 `nx_uart_rs485_config_t` 和
 `nx_uart_rs485_ops`，默认 UART 状态不增加 DE、timer 或 task。调用方绑定
-真实 GPIO、唯一授权位、DE 极性、setup/hold 时间以及精确底层 provider 的
-纯 TX validator。validator 与 submit/start 共用同一拒绝规则；它不写 GPIO、
-MMIO、不 admit，也不留引用。config、两个 face、ops、context 绑定和电气
-事实全程不可变，所有冷事实与 mutable request/payload/control 必须分离。
+只读 `nx_gpio_signal_t` 方向信号、setup/hold 时间以及精确底层 provider 的
+纯 TX validator。方向配置只保存 signal 指针，不再重复保存 port、mask 或极性。
+adapter 用 `nx_gpio_signal_write()` 断言／撤回逻辑活动状态；电气极性只由信号绑定
+解释。validator 与 submit/start 共用同一拒绝规则；它不写 GPIO、MMIO、不 admit，
+也不留引用。config、signal、两个 face、ops、context 绑定和电气事实全程不可变，
+所有冷事实与 mutable request/payload/control 必须分离。
 同一 executor 独占底层 TX；不得绕过 adapter 直接提交或修改 transport。
+
+静态装配在对应 `[gpio.<id>]` 显式写 `active_high=true` 或 `false`。该字段只允许
+单 bit 授权 mask，生成器据此产生只读 signal，共用已有 GPIO face 和 ops，不增加
+另一份硬件 owner 或逐 pin 方法表。`nx_factory_gpio_signal_ref()` 使用同一个强类型
+GPIO 引用；没有声明逻辑信号或非法 ID 时返回 NULL。初始输出仍来自该 GPIO 的
+初始值配置，`active_high` 不会替代初始值，也不能从初始 HIGH／LOW 猜出极性。
+RS485 必须选择可写输出，接收输入信号不授予 DE 写权限。
+
+强类型 `nx_factory_uart_tx_binding_ref()` 从同一 UART 引用成对取得 transport
+和 validator；查询不启动硬件。完整资源配置见
+[Qiming RS485 装配](../../boards/stm32f407zg_qiming_v41/assemblies/rs485-transport.toml)，
+公共 C 消费入口见
+[维护的 ARM 链接夹具](../../tests/contracts/qiming_rs485_assembly/controller_main.c)。
+集成侧检查两个 UART 字段和 signal 均非 NULL，再启动 Platform、初始化 adapter、
+提交与推进。手工绑定也必须保证 signal 的唯一 bit 属于端口授权视图，并保持绑定
+有效直到完整停止；组件不根据物理 pin 名或 GPIO 初值重新解释极性。
 
 拒绝发生在 DE assertion 前。接受后 DE 建立成功才开始 setup，绝对 transfer
 deadline 包括 setup 与 wire 完成。setup 超时不启动 UART。底层实际 SETTLED

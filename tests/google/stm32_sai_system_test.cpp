@@ -60,6 +60,9 @@ uint32_t mux_mask() {
     result |= RCC_DCKCFGR_PLLSAIDIVQ;
 #if defined(STM32F446xx)
     result |= RCC_DCKCFGR_SAI1SRC;
+#if NEXUS_CLOCK_PLLSAI_SAI2_ENABLED
+    result |= RCC_DCKCFGR_SAI2SRC;
+#endif
 #else
     result |= RCC_DCKCFGR_SAI1ASRC | RCC_DCKCFGR_SAI1BSRC;
 #endif
@@ -158,6 +161,19 @@ class SaiSystem : public testing::Test {
     }
 };
 } /* namespace */
+
+#if defined(STM32F446xx)
+TEST_F(SaiSystem, SelectedSai2MuxIsEstablishedObservedAndRestoredBySystem) {
+    const auto original = rcc.DCKCFGR;
+    ASSERT_EQ(nx_stm32_system_start(&g_nx_stm32_system, 8U).primary, 0);
+    EXPECT_EQ(rcc.DCKCFGR & RCC_DCKCFGR_SAI2SRC, 0U);
+    rcc.DCKCFGR |= RCC_DCKCFGR_SAI2SRC_0;
+    EXPECT_FALSE(nx_stm32_clock_profile_matches(&rcc, &flash));
+    rcc.DCKCFGR &= ~static_cast<uint32_t>(RCC_DCKCFGR_SAI2SRC);
+    ASSERT_EQ(nx_stm32_system_stop(&g_nx_stm32_system, 8U), 0);
+    EXPECT_EQ(rcc.DCKCFGR, original);
+}
+#endif
 
 TEST_F(SaiSystem, SystemOwnsOneExactAuxiliaryPllWithTheMainPllOff) {
     const uint32_t incoming_main = rcc.PLLCFGR;

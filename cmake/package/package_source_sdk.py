@@ -211,6 +211,9 @@ REQUIRED_FILES = (
     'cmake/package/verification/device_tmp117/f407.toml',
     'cmake/package/verification/device_tmp117/native.toml',
     'cmake/package/verification/device_tmp117/services.c',
+    'cmake/package/verification/smbus/f407.toml',
+    'cmake/package/verification/smbus/board/board.json',
+    'cmake/package/verification/smbus/services.c',
     'cmake/package/verification/image_window/assembly.toml',
     'cmake/package/verification/image_window/layout.json',
     'cmake/package/verification/image_window/main.c',
@@ -288,6 +291,7 @@ REQUIRED_FILES = (
     'components/bus_owner/src/uart_owner.c',
     'components/clock_domain/CMakeLists.txt',
     'components/clock_domain/include/nexus/components/clock_domain.h',
+    'components/clock_domain/include/nexus/components/clock_domain_owner.h',
     'components/clock_domain/private/clock_domain_impl.h',
     'components/clock_domain/src/clock_domain.c',
     'components/dp83848/CMakeLists.txt',
@@ -367,6 +371,10 @@ REQUIRED_FILES = (
     'components/software_i2c/include/nexus/components/software_sccb.h',
     'components/software_i2c/references.json',
     'components/software_i2c/src/software_i2c.c',
+    'components/smbus/CMakeLists.txt',
+    'components/smbus/README.md',
+    'components/smbus/include/nexus/components/smbus.h',
+    'components/smbus/src/smbus.c',
     'components/software_spi/CMakeLists.txt',
     'components/software_spi/include/nexus/components/software_spi.h',
     'components/software_spi/src/software_spi.c',
@@ -986,24 +994,46 @@ F4_FAMILY_VERIFICATION_FILES = (
       for stem in ("f411re", "f446ze", "f479ni")),
     *(f"tests/contracts/stm32f4_family/{stem}-board/board.json"
       for stem in ("f411re", "f446ze", "f479ni")),
+    *(f"tests/contracts/stm32f4_power/{name}"
+      for name in ("consumer.c", "CMakeLists.txt", "README.md",
+          *(f"{part}-{mode}.toml" for part in ("f411re", "f446ze", "f479ni")
+            for mode in ("adopt-retained", "provision-empty")),
+          *(f"{part}-board/board.json" for part in ("f411re", "f446ze", "f479ni")))),
     *(f"tests/contracts/stm32f4_crypto/{name}"
       for name in ("consumer.c", "CMakeLists.txt", "f415zg.toml", "f417zg.toml",
+                   "f415zg-dma.toml", "f417zg-dma.toml",
                    "f415zg-board/board.json", "f417zg-board/board.json")),
     *(f"tests/contracts/stm32f4_sdram/{name}"
       for name in ("consumer.c", "CMakeLists.txt", "f479ni-sdram.toml",
                    "f479ni-sdram-board/board.json")),
     *(f"tests/contracts/stm32f4_qspi/{name}"
       for name in ("consumer.c", "CMakeLists.txt", "f479ni-qspi.toml",
-                   "f479ni-qspi-board/board.json")),
+                   "f479ni-qspi-dma.toml", "f479ni-qspi-quad.toml",
+                   "f479ni-qspi-quad-dma.toml", "f479ni-qspi-board/board.json",
+                   "f479ni-qspi-quad-board/board.json",
+                   "mapped_consumer.c", "f479ni-qspi-map.toml",
+                   "f479ni-qspi-map-board/board.json")),
+    *(f"tests/contracts/stm32f4_sdio_hs/{name}"
+      for name in ("consumer.c", "CMakeLists.txt", "sd37-dma.toml",
+                   "mmc37-irq.toml", "board/board.json")),
+    *(f"tests/contracts/f407_capture_audio/{name}"
+      for name in ("CMakeLists.txt", "frame_session.c", "controller_main.c",
+                   "ve-frames-raw.toml", "ve_board/board.json")),
     *(f"tests/contracts/stm32f4_graphics/{name}"
       for name in ("consumer.c", "CMakeLists.txt", "combined.toml",
-                   "dual-rgb888.toml", "image-only.toml", "board/board.json")),
+                   "dual-rgb888.toml", "image-only.toml", "board/board.json",
+                   "sustained_consumer.c", "sustained_sequence.c",
+                   "sustained_sequence.h")),
     *(f"tests/contracts/stm32f4_graphics_sdram/{name}"
       for name in ("CMakeLists.txt", "combined.toml", "board/board.json")),
     *(f"tests/contracts/stm32f4_sai/{name}"
-      for name in ("consumer.c", "CMakeLists.txt", "README.md",
+      for name in ("consumer.c", "blocks_consumer.c", "CMakeLists.txt", "README.md",
                    "f446ze-master.toml", "f446ze-slave.toml",
                    "f479ni-master.toml", "f479ni-slave.toml",
+                   "f446ze-sai2-master-blocks.toml",
+                   "f446ze-sai2-slave-blocks.toml",
+                   "f479ni-sparse-master-blocks.toml",
+                   "f479ni-sparse-slave-blocks.toml",
                    "f446ze-board/board.json", "f479ni-board/board.json")),
 )
 REQUIRED_FILES = tuple(dict.fromkeys((*REQUIRED_FILES,

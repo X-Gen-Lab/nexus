@@ -47,8 +47,8 @@ int main(void) {
         s_nx_slots[i].capacity = sizeof(s_nx_staging[i]);
     }
     const nx_st_usb_host_stack_config_t config = {
-        host,     s_nx_slots, 2U,      source_power,   &s_nx_transport,
-        1000000U, 200000U,    restart, &s_nx_transport};
+        host,     s_nx_slots, 2U,      source_power,    &s_nx_transport,
+        1000000U, 200000U,    restart, &s_nx_transport, NULL};
     nx_result_t result =
         nx_st_usb_host_stack_initialize(&s_nx_stack, &config, NULL, NULL);
     if (result == NX_SUCCESS)

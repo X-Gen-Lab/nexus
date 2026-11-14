@@ -1,13 +1,6 @@
-# Reviewed against the exact current canonical source and gettext messages.
+# Actual-POT messages; changed entries await independent semantic review.
 msgid ""
-msgstr ""
-"Project-Id-Version: Nexus source documentation\n"
-"Language: zh_CN\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 98ef6f0e907dd13530d562ac80152912418d027b88217bf109c8f6fa68ca02e5\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: ebabf3ebe2673bfd54c04a16d77bc6aa18f1d4f23e59ddf5b547e2a0f5af9dec\n"
 
 #: docs/design/io-extension-boundaries.md:9
 msgid "Optional storage, cryptography, frames and F4 handoff"
@@ -35,11 +28,8 @@ msgstr "当前边界"
 msgid "Mapped storage owner"
 msgstr "映射存储所有者"
 
-#: docs/design/io-extension-boundaries.md:0
-msgid ""
-"Caller-owned slots, exact epochs and a sole writer; explicit host model where"
-" selected"
-msgstr "调用方持有的槽位、精确 epoch 与唯一写入者；选用时显式使用主机模型"
+msgid "Caller-owned slots, exact epochs and a sole writer; explicit host model or selected F479 CPU-read adapter"
+msgstr "调用者拥有的 slots、精确 epochs 与唯一 writer；显式选择主机模型或选定 F479 CPU-read 适配器"
 
 #: docs/design/io-extension-boundaries.md:0
 msgid "AMP IPC core"
@@ -106,6 +96,9 @@ msgstr ""
 "CPU、DMA 或 cache 写入者都不得绕过所选后端。主机 NOR 模型建立的是软件规则，不赋予物理 QSPI、XIP、cache 或 Flash "
 "资格。"
 
+msgid "The selected [F479 CPU-read endpoint](f407-fsmc.md) authorizes only the range of each live CPU loan. Indirect Flash endpoints still forbid all aperture access; neither mode grants DMA readers, XIP or access by foreign masters. Failed map cleanup can remain without a readable loan. A failed final release preserves cleanup responsibility, not renewed reads; an invalid System epoch may require product recovery or reset."
+msgstr "选定的 [F479 CPU-read 端点](f407-fsmc.md) 只授权每个有效 CPU loan 的范围。间接 Flash 端点仍禁止全部 aperture 访问；两种模式均不授予 DMA reader、XIP 或外来 master 访问权限。映射失败可能未产生可读 loan，仍保留清理责任。最后一次释放失败保留的是清理责任，不允许恢复读取；System epoch 失效可能需要产品恢复或复位。"
+
 #: docs/design/io-extension-boundaries.md:37
 msgid ""
 "Frame contracts validate complete storage extents, format and stride. A "
@@ -119,21 +112,8 @@ msgstr ""
 msgid "Selected F415/F417 cryptographic engines"
 msgstr "已选 F415/F417 密码引擎"
 
-#: docs/design/io-extension-boundaries.md:43
-msgid ""
-"`cipher.h` and `hash.h` expose separate two-pointer interfaces with shar"
-"ed read-only operations. The typed factory returns statically selected o"
-"bjects; neither lookup nor query acquires clocks or starts hardware. The"
-" F415ZG and F417ZG [software references](https://github.com/X-Gen-Lab/ne"
-"xus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/stm32f4_crypto/f415z"
-"g.toml) select the existing `irq-blocks` mode. F405/F407 do not acquire "
-"these engines merely because the same vendor family library contains the"
-"ir implementation."
-msgstr ""
-"`cipher.h` 与 `hash.h` 提供相互独立、各含两个指针的接口，并共享只读操作表。强类型 factory 返回静态选定的对象；查找"
-"和查询都不会取得时钟或启动硬件。F415ZG 与 F417ZG 的[软件参考](https://github.com/X-Gen-Lab/nex"
-"us/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/stm32f4_crypto/f415zg"
-".toml)选择现有 `irq-blocks` 模式。F405/F407 不会仅因同一厂商系列库包含其实现，就取得这些引擎。"
+msgid "`cipher.h` and `hash.h` expose separate two-pointer interfaces with shared read-only operations. The typed factory returns statically selected objects; neither lookup nor query acquires clocks or starts hardware. The F415ZG and F417ZG [software references](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/stm32f4_crypto/f415zg.toml) select `irq-blocks` or the separately selected DMA mode for each IP. F405/F407 do not acquire these engines merely because the same vendor family library contains their implementation."
+msgstr "`cipher.h` 和 `hash.h` 分别提供双指针接口，共享只读操作表。强类型 factory 返回静态选中的对象；查询和查找均不取得时钟或启动硬件。F415ZG 与 F417ZG 的[软件参考](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/stm32f4_crypto/f415zg.toml) 为每个 IP 分别选择 `irq-blocks` 或 DMA 模式。F405/F407 不因同一厂商系列库包含这些引擎的实现而获得对应能力。"
 
 #: docs/design/io-extension-boundaries.md:50
 msgid ""
@@ -166,19 +146,11 @@ msgstr ""
 "到 SETTLED。输入不能与可变请求、provider 或 System 存储重叠；输出不能覆盖密钥/IV，也不能与输入部分重叠。加解密失败时"
 "，可能留下明确计数的输出前缀。仅在 SUCCESS 时摘要才有效。取消和 deadline 只选择终止原因，均不会提前释放借用。"
 
-#: docs/design/io-extension-boundaries.md:66
-msgid ""
-"CRYP uses the official HAL interrupt transport. HASH uses official initi"
-"alization and a bounded C FIFO protocol because the selected HAL transpo"
-"rt assumes padded word reads and can wait while advancing HMAC phases. E"
-"ach service call reads only bytes inside the declared spans; a partial f"
-"inal word is assembled locally. HMAC needs explicit task service between"
-" phases, even when no final-digest IRQ has arrived. There is no full-mes"
-"sage copy, queue or implicit worker."
-msgstr ""
-"CRYP 使用官方 HAL 中断传输。HASH 使用官方初始化与有界 C FIFO 协议，因为所选 HAL 传输假定可读取填充后的整字，并可能在"
-"推进 HMAC 阶段时等待。每次 service 调用仅读取声明范围内的字节；最后不足一字的数据在本地组装。HMAC 在各阶段之间需要显式任务侧"
-" service，即使最终摘要 IRQ 尚未到达也如此。没有整条消息复制、队列或隐式 worker。"
+msgid "In IRQ mode, CRYP uses the official HAL interrupt transport. HASH uses official initialization and a bounded C FIFO protocol because the selected HAL transport assumes padded word reads and can wait while advancing HMAC phases. Each service call reads only bytes inside the declared spans; a partial final word is assembled locally. HMAC needs explicit task service between phases, even when no final-digest IRQ has arrived. There is no full-message copy, queue or implicit worker."
+msgstr "IRQ 模式下，CRYP 使用官方 HAL 中断传输。HASH 使用官方初始化和有界的 C FIFO 协议，因为选定 HAL 传输假定可读取填充后的 word，并可能在推进 HMAC 阶段时等待。每次 service 只读取声明 span 内的字节；不完整的最后一个 word 在局部组装。即使尚未收到最终 digest IRQ，HMAC 阶段之间也需要显式任务 service。不复制整个消息，不增加队列或隐式 worker。"
+
+msgid "The optional DMA paths retain the same owner and request lifetime. Each selected IP adds only its own static DMA extension and official HAL transport; task service observes its DMA status with the selected DMA NVIC entries disabled. HASH input and HMAC key require word alignment and lengths divisible by four; HMAC keys must also be nonempty. IRQ byte-span constraints remain unchanged."
+msgstr "可选 DMA 路径保留同一 owner 和请求生命周期。每个选中的 IP 只增加自己的静态 DMA 扩展与官方 HAL 传输；任务 service 在所选 DMA 的 NVIC 中断项保持禁用时观察其状态。HASH 输入与 HMAC key 要求 word 对齐，长度为四的倍数；HMAC key 还必须非空。IRQ 的字节 span 约束保持不变。"
 
 #: docs/design/io-extension-boundaries.md:73
 msgid ""

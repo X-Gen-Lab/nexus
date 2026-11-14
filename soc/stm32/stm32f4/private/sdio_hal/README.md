@@ -147,3 +147,24 @@ POWER 后 7 HCLK、时钟变更后的 3 SDIOCLK + 2 PCLK2 间隔由生成常量�
 负责实际源码、资源和链接保留；两者都不证明插卡、电气、时序、吞吐或硬件资格。
 物理 HIL 保持 `not_executed`。启动 SRAM 的永久 owner 和其 DMA 授权边界见
 [FSMC 合同](../fsmc_hal/README.md)。
+
+## F407 高速 SDR 软件参考
+
+`hse8-pll150-sdio375` 是独立的精确 HSE8、M8/N300/P2/Q4 参考：CPU 150 MHz、
+PCLK2 与 PLLQ 75 MHz。它按 ES0182 Rev19 2.4.3 的厂商 workaround 以非旁路
+CLKDIV=0 输出 37.5 MHz，禁止 USB、RNG、STOP、DDR 与 HS200。普通 48 MHz
+profile 保留原行为。识别阶段使用除数 188（约 398.94 kHz），不会沿用 48 MHz
+域的除数 122。该组合不授予实板、电气、吞吐、其它外设或低功耗资格。
+
+`speed="high-speed"` 与现有协议、4-bit bus 和 polling/IRQ/DMA engine 分开选择，
+不增加组合 mode。冷态只准备原有唯一 host；显式 activate 才发现卡并协商。
+SD 检查 CSD SWITCH 类与 SCR 版本，读取完整 64-byte CMD6 check/switch status，
+验证能力、busy 和实际选择，完成 CRC/FIFO/DCOUNT 排空并等待八个旧时钟周期后
+才允许后续命令和提频。MMC 检查 EXT_CSD 的 52 MHz SDR 能力，写 HS_TIMING=1，
+等待 R1b 的 CMD13 READY/TRAN、检查 SWITCH_ERROR，再完整重读 EXT_CSD 确认。
+只有 26 MHz 能力的 MMC 明确返回 UNSUPPORTED，不静默选择其它速率。
+
+控制传输复用现有有限预算、deadline、错误与停止机制，不创建第二 HAL owner、
+worker、DMA bounce buffer 或常驻 512-byte 卡寄存器缓存。SD 与 MMC 高速代码由
+各自生成选择宏选编，未选部分不进入镜像。失败不发布 geometry；响应丢失可能已
+改变卡状态，保留 UNCERTAIN、编程与冷态责任。仅完整停止和排空后释放资源。

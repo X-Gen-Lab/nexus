@@ -19,6 +19,13 @@
 #ifndef NEXUS_CLOCK_PLLSAI_LTDC_ENABLED
 #define NEXUS_CLOCK_PLLSAI_LTDC_ENABLED 0U
 #endif
+#ifndef NEXUS_CLOCK_PLLSAI_SAI2_ENABLED
+#define NEXUS_CLOCK_PLLSAI_SAI2_ENABLED 0U
+#endif
+#if NEXUS_CLOCK_PLLSAI_SAI2_ENABLED &&                                         \
+    (!defined(STM32F446xx) || !NEXUS_CLOCK_PLLSAI_SAI1_ENABLED)
+#error "Selected SAI2 master requires the reviewed F446 shared PLLSAI Q output"
+#endif
 
 #if NEXUS_CLOCK_PLLSAI_ENABLED
 #if !defined(STM32F446xx) && !defined(STM32F479xx)
@@ -75,7 +82,11 @@
 #define NX_STM32_PLLSAI_Q_BITS                                                 \
     (NEXUS_CLOCK_PLLSAI_Q << RCC_PLLSAICFGR_PLLSAIQ_Pos)
 #if defined(STM32F446xx)
+#if NEXUS_CLOCK_PLLSAI_SAI2_ENABLED
+#define NX_STM32_PLLSAI_Q_MUX (RCC_DCKCFGR_SAI1SRC | RCC_DCKCFGR_SAI2SRC)
+#else
 #define NX_STM32_PLLSAI_Q_MUX RCC_DCKCFGR_SAI1SRC
+#endif
 #else
 #define NX_STM32_PLLSAI_Q_MUX (RCC_DCKCFGR_SAI1ASRC | RCC_DCKCFGR_SAI1BSRC)
 #endif

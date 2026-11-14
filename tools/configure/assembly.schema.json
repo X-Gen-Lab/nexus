@@ -428,6 +428,12 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
+          "active_slots": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535,
+            "description": "SAI enabled slot mask; omitted selects every declared slot. Inactive slots have no FIFO storage; this does not reorder samples."
+          },
           "binding": {
             "type": "string",
             "description": "Exact reviewed Board binding; no route fallback."
@@ -629,6 +635,12 @@
           },
           "protocol": {
             "type": "string"
+          },
+          "speed": {
+            "enum": [
+              "default",
+              "high-speed"
+            ]
           },
           "stop_timeout_us": {
             "type": "integer",
@@ -2076,7 +2088,10 @@
             ],
             "properties": {
               "mode": {
-                "const": "nor-indirect",
+                "enum": [
+                  "nor-indirect",
+                  "nor-indirect-quad-read"
+                ],
                 "description": "Explicit maintained mode; the product owns service and shutdown."
               }
             },
@@ -2108,6 +2123,9 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
+          "active_high": {
+            "type": "boolean"
+          },
           "binding": {
             "type": "string",
             "description": "Exact reviewed Board binding; no route fallback."
@@ -2490,6 +2508,36 @@
           "binding",
           "mode",
           "tick_hz"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "mapped_storage": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string",
+            "description": "Exact reviewed Board binding; no route fallback."
+          },
+          "controller": {
+            "type": "string",
+            "description": "Authored controller instance id, not an endpoint id."
+          },
+          "mode": {
+            "const": "nor-mapped-cpu",
+            "description": "Explicit maintained mode; the product owns service and shutdown."
+          },
+          "parameters": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "binding",
+          "controller",
+          "mode",
+          "parameters"
         ],
         "additionalProperties": false
       }

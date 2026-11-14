@@ -82,6 +82,12 @@ target_include_directories(nexus_platform PUBLIC "${NEXUS_CONFIG_DIR}"
         "${NEXUS_SOURCE_DIR}/core/private")
 target_link_libraries(nexus_platform PUBLIC ${nexus_provider}
     PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)
+if(NEXUS_QSPI_CPU_MAP)
+    target_link_libraries(nexus_platform PUBLIC Nexus::MappedStorage)
+endif()
+if("smbus" IN_LIST NEXUS_SELECTED_COMPONENTS)
+    target_link_libraries(nexus_platform PRIVATE Nexus::SMBus)
+endif()
 if(NEXUS_RUNTIME_POWER)
     target_link_libraries(nexus_platform PUBLIC Nexus::ClockDomain)
     target_include_directories(nexus_platform PRIVATE

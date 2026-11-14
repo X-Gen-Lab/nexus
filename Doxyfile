@@ -29,6 +29,7 @@ INPUT                  += components/tmp117/include/nexus
 INPUT                  += components/mcuboot/include/nexus
 INPUT                  += components/at24c02/include/nexus
 INPUT                  += components/software_i2c/include/nexus
+INPUT                  += components/smbus/include/nexus
 INPUT                  += components/software_spi/include/nexus
 INPUT                  += components/w25/include/nexus
 INPUT                  += components/ili9341/include/nexus

@@ -1062,6 +1062,8 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
     family, part = board["soc_family"], board["soc"]
     backend = assembly.backend
     host = soc["cpu"]["arch"] == "native"
+    context_clock_plan = (ClockPlanIR.from_validated(clock_plan)
+                          if clock_plan is not None else None)
     ram = memory.default_ram
     controller_selections = thaw(assembly.controllers)
     endpoint_selections = thaw(assembly.devices)
@@ -1118,6 +1120,9 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             if route["kind"] == "rtc":
                 from tools.configure import rtc
                 rtc.validate_board(selection, board)
+            if (family == "stm32f4" and part == "STM32F479NIH6" and
+                    route["kind"] == "flash" and selection.get("maintenance")):
+                fail("F479 option maintenance has no reviewed OPTCR1 contract")
             validate_selection(selection, route, provider, ram["size"],
                                clock=clock, clock_plan=clock_plan)
             route = adc.selected_route(selection, route, provider)
@@ -1131,7 +1136,8 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
                     clock=assembly.clock_profile, provider=provider)
             provider.validate_mode_context(
                 selection, route, backend=backend,
-                clock_profile=assembly.clock_profile)
+                clock_profile=assembly.clock_profile, part=part,
+                clock_plan=context_clock_plan)
             validate_controller_execution(
                 selection, route, hardware, irq_profile=irq_profile,
                 kernel_profile=kernel_profile, host=host)
@@ -1367,6 +1373,11 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
         kernel_profile=kernel_profile, irq_profile=irq_profile,
         memory=selected_memory, read=read,
         snapshots=snapshots, board_conditions=facts.hardware)
+    if assembly.clock_profile == "hse8-pll150-sdio375" and (
+            assembly.backend != "baremetal" or assembly.power is not None or
+            any(item.kind in {"lowpower", "standby", "timebase"}
+                for item in device_graph.controllers)):
+        fail("F407 SDIO 37.5 MHz profile does not grant optional power modes")
     if references is not None:
         review = fact_references.select_review(references, variant["device"])
         profile = fact_references.admit_selection(

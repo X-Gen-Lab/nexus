@@ -63,6 +63,15 @@ send a raw pointer to storage another task can recycle. Detach control/observer
 references and join observers before releasing the slot and preparing the next
 request. A generation counter detects stale identity but does not itself join a task.
 
+Mapped read loans are distinct from asynchronous request loans. A failed map can
+retain cleanup responsibility without granting any readable loan. Before the
+last release, join every CPU reader; a failed unmap retains the exact token only
+for cleanup retry and grants no renewed access. A writer's backend receives the
+original absolute deadline. After complete cold shutdown, explicit owner reopen
+preserves slot and writer epochs, including exhaustion; initialization must not
+revive old tokens. See the [mapped component contract](../../components/mapped_storage/README.md)
+for serialized execution and recovery responsibilities.
+
 Continuous receive and ADC use explicit caller-owned block loans. A consumer keeps
 a block immutable until matching release. The producer needs a replacement target
 before publishing an old hardware bank. No replacement means visible stop/backpressure;

@@ -111,11 +111,18 @@ not a promise to assign a separate nominal type to every JSON field.
 
 Factory and emitters consume the same typed result. `to_dict()` derives the
 schema-1 `resolved.json` audit/artifact projection; it is never read back as an
-authored platform input. Private typed source epoch 3 is separate from that
+authored platform input. Private typed source epoch 5 is separate from that
 serialized format and from the public C factory epoch. Old JSON assemblies are
 rejected. Historical evidence keeps its original bytes and read-only verification.
 CMake owns the source dependency graph; resolution does not discover software
 from device names or generate product workers.
+
+An explicitly authored GPIO `active_high` value adds an immutable single-pin
+logical signal. It reuses the authorized port face and its shared ops, without
+mutable state, another hardware owner or a per-pin vtable. The strong factory
+returns that static binding or NULL when no signal is declared. Components such
+as RS485 consume logical activity; software buses still use physical levels and
+open-drain release. The GPIO initial safe level remains a separate Board fact.
 
 Firmware execution is C11 plus necessary architecture assembly. Python runs on
 the host to validate inputs and generate static C/H; the MCU has no Python

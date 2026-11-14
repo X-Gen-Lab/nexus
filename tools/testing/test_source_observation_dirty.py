@@ -110,6 +110,22 @@ class DirtyGitSourceObservationTests(unittest.TestCase):
         self.verify(before)
         self.verify(before, clean=True)
 
+    def test_observation_does_not_rewrite_the_parent_index_stat_cache(self):
+        index = self.root / ".git/index"
+        path = self.root / "source.txt"
+        # Git can compare cached timestamps at one-second granularity. Pin an
+        # older mtime so a fast same-byte rewrite must refresh its stat cache.
+        previous = path.stat()
+        os.utime(path, ns=(previous.st_atime_ns,
+                           previous.st_mtime_ns - 2_000_000_000))
+        self.git(self.root, "update-index", "--refresh")
+        path.write_bytes(path.read_bytes())
+        (self.root / "scratch.txt").write_bytes(b"untracked development input\n")
+        before = index.read_bytes(), index.stat().st_mtime_ns
+        self.assertTrue(self.observe("dirty_without_index_refresh")["dirty"])
+        self.assertEqual((index.read_bytes(), index.stat().st_mtime_ns), before,
+                         "A source observer must not refresh index metadata")
+
     def test_unchanged_dirty_record_is_development_only(self):
         (self.root / "source.txt").write_bytes(b"dirty tracked source\n")
         (self.root / "scratch.txt").write_bytes(b"already untracked\n")

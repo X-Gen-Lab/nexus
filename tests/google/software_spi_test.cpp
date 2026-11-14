@@ -258,6 +258,7 @@ TEST_F(SoftwareSPI, InvalidLengthAndExpiredDeadlineNeverSelect) {
     EXPECT_EQ(exchange(&byte, nullptr, 1U, &count, NX_DEADLINE_NEVER),
               NX_ERROR_INVALID);
     EXPECT_EQ(exchange(&byte, nullptr, 1U, &count, wire.now), NX_ERROR_TIMEOUT);
+    EXPECT_EQ(99U, count);
     EXPECT_TRUE(wire.events.empty());
     EXPECT_FALSE(owner.faulted);
 }

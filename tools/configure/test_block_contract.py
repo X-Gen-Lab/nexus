@@ -14,7 +14,7 @@ class BlockContractTests(unittest.TestCase):
         self.assertEqual(selected.authored_fields,
                          frozenset(("binding", "mode", "bus_width", "max_blocks",
                                     "poll_budget", "stop_timeout_us", "irq",
-                                    "protocol")))
+                                    "protocol", "speed")))
         self.assertEqual(factory.interface_type("block", "port"),
                          "nx_block_port_t")
 
@@ -29,7 +29,8 @@ class BlockContractTests(unittest.TestCase):
         self.assertEqual(selected.stop_timeout_us, 25000)
         self.assertEqual(ir.option_projection(selected), {
             "bus_width": 4, "max_blocks": 8, "poll_budget": 1000,
-            "stop_timeout_us": 25000, "protocol": "sd-memory"})
+            "stop_timeout_us": 25000, "protocol": "sd-memory",
+            "speed": "default"})
         with self.assertRaises(FrozenInstanceError):
             selected.max_blocks = 64
 

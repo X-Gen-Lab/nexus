@@ -7,8 +7,8 @@ from tools.configure import can, timer_advanced, gpio_phase
 
 def implementation(item):
     from .contract import mode_implementation
-    if item.kind == "audio" and item.controller == "SAI1":
-        return "sai"
+    if item.kind == "audio" and item.controller in {"SAI1", "SAI2"}:
+        return "sai_blocks" if item.options.continuous else "sai"
     return mode_implementation(item.kind, item.mode)
 
 
@@ -36,7 +36,8 @@ def operations(item):
         return "nx_stm32_usb_host_ops"
     if item.kind == "external_bus":
         return ("nx_stm32_sdram_bus_ops" if item.mode == "sdram-controller"
-                else "nx_stm32_qspi_bus_ops" if item.mode == "qspi-indirect-sdr"
+                else "nx_stm32_qspi_bus_ops" if item.mode in {
+                    "qspi-indirect-sdr", "qspi-indirect-dma"}
                 else "nx_stm32_fsmc_external_bus_ops")
     if selected == "i2c_async":
         return "nx_i2c_v1_async_ops"
@@ -73,9 +74,12 @@ def includes(result):
                 item.controller in {"I2S2", "I2S3"})
     if i2s:
         source.append('#include "stm32f407_audio.h"')
-    if any(item.kind == "audio" and item.controller == "SAI1"
+    if any(item.kind == "audio" and item.controller in {"SAI1", "SAI2"}
            for item in selections):
         source.append('#include "stm32f4_sai.h"')
+    if any(item.kind == "audio" and item.controller in {"SAI1", "SAI2"}
+           and item.options.continuous for item in selections):
+        source.append('#include "stm32f4_sai_blocks.h"')
     if any(item.kind == "capture" and item.mode.startswith("frames-")
            for item in selections):
         source.append('#include "stm32f407_capture_frames.h"')
@@ -168,9 +172,12 @@ def includes(result):
     if any(item.kind == "external_bus" and item.mode == "sdram-controller"
            for item in selections):
         source.append('#include "stm32f4_sdram.h"')
-    if any(item.kind == "external_bus" and item.mode == "qspi-indirect-sdr"
+    if any(item.kind == "external_bus" and item.mode in {
+            "qspi-indirect-sdr", "qspi-indirect-dma"}
            for item in selections):
         source.append('#include "stm32f4_qspi.h"')
+        if any(item.driver == "mapped_storage-endpoint" for item in result.devices):
+            source.append('#include "stm32f4_qspi_mapped.h"')
     if any(item.kind == "external_bus" and item.mode in {"async16", "external-memory"}
            for item in selections):
         source.append('#include "stm32f407_fsmc.h"')
@@ -364,8 +371,9 @@ def _resource_slots(result):
 
 
 def needs_syscfg(result):
-    """EXTI mux and FMC aperture readback share the same cold gate receipt."""
+    """Mux and physical memory mapping readback share one cold gate receipt."""
     return any((item.kind == 'exti' and
                 item.mode in {'edge-event', 'hardware-event'}) or
+               (item.kind == 'flash' and result.part == 'STM32F479NIH6') or
                (item.kind == 'external_bus' and item.mode == 'sdram-controller')
                for item in result.controllers)

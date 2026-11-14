@@ -48,8 +48,9 @@ def admission_declarations(result, pins, pin_count):
         elif item.kind == 'capture':
             clocks.add(('RCC->AHB2ENR', 'RCC_AHB2ENR_DCMIEN'))
         elif item.kind == 'audio':
-            if item.controller == 'SAI1':
-                clocks.add(('RCC->APB2ENR', 'RCC_APB2ENR_SAI1EN'))
+            if item.controller in {'SAI1', 'SAI2'}:
+                clocks.add(('RCC->APB2ENR',
+                            'RCC_APB2ENR_' + item.controller + 'EN'))
             elif item.controller in {'I2S2', 'I2S3'}:
                 clocks.add(('RCC->APB1ENR',
                             f'RCC_APB1ENR_SPI{item.controller[-1]}EN'))

@@ -1,6 +1,106 @@
 # Reviewed LL primitives and explicit HAL selections have private build scopes.
-# Every consuming entry verifies current bytes; a previous success is no cache.
+# One configure verifies exact inputs at first use and again after all deferred
+# work. Targets share only that pending input snapshot, never a past success.
 include_guard(GLOBAL)
+
+function(_nexus_stm32f4_finish_inputs)
+    cmake_language(DEFER DIRECTORY "${CMAKE_SOURCE_DIR}" GET_CALL_IDS remaining)
+    list(LENGTH remaining remaining_count)
+    if(remaining_count GREATER 0)
+        # A later callback can itself enqueue work. Verify only at the actual
+        # tail of root configure, including first use from a child directory.
+        cmake_language(DEFER DIRECTORY "${CMAKE_SOURCE_DIR}"
+            CALL _nexus_stm32f4_finish_inputs)
+        return()
+    endif()
+    get_property(source GLOBAL PROPERTY _NEXUS_STM32F4_INPUT_SOURCE)
+    get_property(python GLOBAL PROPERTY _NEXUS_STM32F4_INPUT_PYTHON)
+    get_property(pending GLOBAL PROPERTY _NEXUS_STM32F4_INPUT_SNAPSHOT)
+    get_property(digest GLOBAL PROPERTY _NEXUS_STM32F4_INPUT_DIGEST)
+    execute_process(COMMAND "${python}" -B
+        "${source}/tools/maintenance/stm32f4_hal_lock.py"
+        --source "${source}/vendors/st/stm32f4_hal"
+        --lock "${source}/dependencies/stm32f4-hal.lock.json"
+        --cmsis-source "${source}/vendors/st/cmsis_device_f4"
+        --end-configure "${pending}" --snapshot-sha256 "${digest}"
+        RESULT_VARIABLE result ERROR_VARIABLE error OUTPUT_QUIET)
+    file(REMOVE "${pending}")
+    set_property(GLOBAL PROPERTY _NEXUS_STM32F4_INPUT_SNAPSHOT "")
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "STM32F4 final official identity failed: ${error}")
+    endif()
+endfunction()
+
+function(_nexus_stm32f4_admit_inputs source)
+    get_property(pending GLOBAL PROPERTY _NEXUS_STM32F4_INPUT_SNAPSHOT)
+    if(pending)
+        get_property(admitted GLOBAL PROPERTY _NEXUS_STM32F4_INPUT_SOURCE)
+        if(NOT admitted STREQUAL source)
+            message(FATAL_ERROR "STM32F4 configure input source changed")
+        endif()
+        return()
+    endif()
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    set(directory "${CMAKE_BINARY_DIR}/CMakeFiles/nexus-official")
+    file(MAKE_DIRECTORY "${directory}")
+    string(RANDOM LENGTH 32 ALPHABET 0123456789abcdef nonce)
+    set(pending "${directory}/${nonce}.pending.json")
+    execute_process(COMMAND "${Python3_EXECUTABLE}" -B
+        "${source}/tools/maintenance/stm32f4_hal_lock.py"
+        --source "${source}/vendors/st/stm32f4_hal"
+        --lock "${source}/dependencies/stm32f4-hal.lock.json"
+        --cmsis-source "${source}/vendors/st/cmsis_device_f4"
+        --begin-configure "${pending}"
+        RESULT_VARIABLE result ERROR_VARIABLE error OUTPUT_VARIABLE identity)
+    if(NOT result EQUAL 0)
+        file(REMOVE "${pending}")
+        message(FATAL_ERROR "STM32F4 official LL identity failed: ${error}")
+    endif()
+    string(JSON digest GET "${identity}" configure_snapshot_sha256)
+    string(LENGTH "${digest}" length)
+    if(NOT length EQUAL 64 OR NOT digest MATCHES "^[0-9a-f]+$")
+        file(REMOVE "${pending}")
+        message(FATAL_ERROR "STM32F4 configure input digest is invalid")
+    endif()
+    # One projection of the admitted inputs owns configure dependencies too.
+    # Exact absent candidates observe packed/loose refs and optional Git files
+    # without depending on directories touched by ordinary Git lock traffic.
+    string(JSON count LENGTH "${identity}" configure_inputs)
+    if(count LESS 1)
+        file(REMOVE "${pending}")
+        message(FATAL_ERROR "STM32F4 configure inputs are empty")
+    endif()
+    math(EXPR last "${count} - 1")
+    foreach(index RANGE 0 ${last})
+        string(JSON path GET "${identity}" configure_inputs ${index})
+        if(NOT IS_ABSOLUTE "${path}" OR NOT EXISTS "${path}" OR
+                IS_DIRECTORY "${path}" OR IS_SYMLINK "${path}")
+            file(REMOVE "${pending}")
+            message(FATAL_ERROR "STM32F4 configure input is not a regular file")
+        endif()
+        set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" APPEND PROPERTY
+            CMAKE_CONFIGURE_DEPENDS "${path}")
+    endforeach()
+    string(JSON count LENGTH "${identity}" configure_file_probes)
+    if(count GREATER 0)
+        math(EXPR last "${count} - 1")
+        foreach(index RANGE 0 ${last})
+            string(JSON pattern GET "${identity}" configure_file_probes ${index})
+            if(NOT IS_ABSOLUTE "${pattern}")
+                file(REMOVE "${pending}")
+                message(FATAL_ERROR "STM32F4 configure probe must be absolute")
+            endif()
+            file(GLOB candidate LIST_DIRECTORIES false CONFIGURE_DEPENDS
+                "${pattern}")
+        endforeach()
+    endif()
+    set_property(GLOBAL PROPERTY _NEXUS_STM32F4_INPUT_SOURCE "${source}")
+    set_property(GLOBAL PROPERTY _NEXUS_STM32F4_INPUT_PYTHON "${Python3_EXECUTABLE}")
+    set_property(GLOBAL PROPERTY _NEXUS_STM32F4_INPUT_SNAPSHOT "${pending}")
+    set_property(GLOBAL PROPERTY _NEXUS_STM32F4_INPUT_DIGEST "${digest}")
+    cmake_language(DEFER DIRECTORY "${CMAKE_SOURCE_DIR}"
+        CALL _nexus_stm32f4_finish_inputs)
+endfunction()
 
 function(nexus_stm32f4_device_definition target output)
     if(NOT TARGET "${target}")
@@ -35,35 +135,12 @@ function(nexus_stm32f4_official target)
     endif()
     get_filename_component(source
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.." ABSOLUTE)
-    find_package(Python3 REQUIRED COMPONENTS Interpreter)
-    execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-        "${source}/tools/maintenance/stm32f4_hal_lock.py"
-        --source "${source}/vendors/st/stm32f4_hal"
-        --lock "${source}/dependencies/stm32f4-hal.lock.json"
-        --cmsis-source "${source}/vendors/st/cmsis_device_f4"
-        RESULT_VARIABLE result ERROR_VARIABLE error OUTPUT_QUIET)
-    if(NOT result EQUAL 0)
-        message(FATAL_ERROR "STM32F4 official LL identity failed: ${error}")
-    endif()
+    _nexus_stm32f4_admit_inputs("${source}")
     target_include_directories("${target}" SYSTEM PRIVATE
         "${source}/vendors/st/stm32f4_hal/Inc")
     set_target_properties("${target}" PROPERTIES
         NEXUS_STM32F4_OFFICIAL_REVISION
         "b6f0ed3829f3829eb358a2e7417d80bba1a42db7")
-    # The reviewed lock owns the selected file map; this does not select any
-    # source or become a second build graph. Changes retrigger verification.
-    file(READ "${source}/dependencies/stm32f4-hal.lock.json" lock)
-    string(JSON count LENGTH "${lock}" files)
-    math(EXPR last "${count} - 1")
-    set(inputs "${source}/dependencies/stm32f4-hal.lock.json"
-        "${source}/tools/maintenance/stm32f4_hal_lock.py"
-        "${source}/tools/maintenance/cmsis_device_lock.py"
-        "${source}/tools/configure/metadata.py")
-    foreach(index RANGE 0 ${last})
-        string(JSON name MEMBER "${lock}" files ${index})
-        list(APPEND inputs "${source}/vendors/st/stm32f4_hal/${name}")
-    endforeach()
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${inputs})
 endfunction()
 
 # One official DMA object per owning SoC target, shared by selected transports.

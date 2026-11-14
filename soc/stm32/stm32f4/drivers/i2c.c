@@ -457,7 +457,8 @@ nx_result_t nx_stm32_i2c_recover(void* context) {
         port->line_mask == 0U || (port->line_mask & ~UINT32_C(0xFFFF)) != 0U) {
         return NX_ERROR_INVALID;
     }
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
     if (!port->initialized) {

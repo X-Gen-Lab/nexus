@@ -14,6 +14,7 @@ extern const nx_spi_transaction_ops_t nx_stm32_spi_transaction_ops;
 nx_stm32_system_t g_nx_stm32_system;
 GPIO_TypeDef g_nx_stm32_gpioa_model;
 }
+#include <cstring>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
 #include <vector>
@@ -25,6 +26,7 @@ size_t fail_after;
 bool selected;
 uint8_t expected_bits;
 bool expected_lsb_first;
+bool privileged;
 class SPITransactionProvider : public testing::Test {
   protected:
     nx_stm32_spi_state_t state{SPI1, RCC, 84000000U, false, false, nullptr};
@@ -46,6 +48,7 @@ class SPITransactionProvider : public testing::Test {
         fail_after = SIZE_MAX;
         expected_bits = 8U;
         expected_lsb_first = false;
+        privileged = true;
         g_nx_stm32_gpioa_model = {};
         SPI1->SR = SPI_SR_TXE | SPI_SR_RXNE;
         GPIOC->ODR = 1U;
@@ -231,15 +234,109 @@ TEST_F(SPITransactionProvider, InvalidLaterSpanRejectsBeforeCsOrAnyWrite) {
                                       {nullptr, nullptr, 0U, 0U}};
     EXPECT_EQ(Transfer(segments, 2U), NX_ERROR_INVALID);
     EXPECT_EQ(rx, 0xAAU);
-    EXPECT_EQ(transferred, 0U);
+    EXPECT_EQ(transferred, 99U);
     EXPECT_TRUE(words.empty());
     EXPECT_TRUE(selections.empty());
     EXPECT_FALSE(state.active);
 }
+
+TEST_F(SPITransactionProvider, BytePollingRejectsProgressAliasingPrivateState) {
+    const uint8_t tx = 0xA5U;
+    const auto before = state;
+    auto* output = reinterpret_cast<size_t*>(&state.clock_hz);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_spi_endpoint_transfer(
+                  &child, &tx, nullptr, 1U, nx_time_now_us() + 10000U, output));
+    EXPECT_EQ(0, std::memcmp(&before, &state, sizeof(state)));
+    EXPECT_TRUE(selections.empty());
+    EXPECT_EQ(0U, SPI1->CR1);
+}
+
+TEST_F(SPITransactionProvider,
+       SegmentedPollingRejectsProgressAliasingPrivateState) {
+    const nx_spi_segment_t segment{nullptr, nullptr, 1U, 0xA5U};
+    const auto before = state;
+    auto* output = reinterpret_cast<size_t*>(&state.clock_hz);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_spi_transaction_transfer(&endpoint, &segment, 1U, 8U,
+                                          nx_time_now_us() + 10000U, output));
+    EXPECT_EQ(0, std::memcmp(&before, &state, sizeof(state)));
+    EXPECT_TRUE(selections.empty());
+    EXPECT_TRUE(words.empty());
+    EXPECT_EQ(0U, SPI1->CR1);
+}
+
+TEST_F(SPITransactionProvider, BytePollingRejectsControlAndImmutableTxAliases) {
+    const uint8_t tx = 0xA5U;
+    const auto before_child = child;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_spi_endpoint_transfer(
+                  &child, &tx, reinterpret_cast<uint8_t*>(&child.frequency_hz),
+                  1U, nx_time_now_us() + 10000U, &transferred));
+    EXPECT_EQ(0, std::memcmp(&before_child, &child, sizeof(child)));
+    size_t aliased = 0xA5U;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_spi_endpoint_transfer(
+                  &child, reinterpret_cast<uint8_t*>(&aliased), nullptr, 1U,
+                  nx_time_now_us() + 10000U, &aliased));
+    EXPECT_EQ(0xA5U, aliased);
+    EXPECT_TRUE(selections.empty());
+    EXPECT_EQ(0U, SPI1->CR1);
+}
+
+TEST_F(SPITransactionProvider, SegmentedReceiveCannotOverwritePrivateControl) {
+    const auto before_child = child;
+    const nx_spi_segment_t segment{nullptr, &child.frequency_hz,
+                                   sizeof(child.frequency_hz), 0xA5U};
+    EXPECT_EQ(NX_ERROR_INVALID, Transfer(&segment, 1U));
+    EXPECT_EQ(0, std::memcmp(&before_child, &child, sizeof(child)));
+    EXPECT_EQ(99U, transferred);
+    EXPECT_TRUE(selections.empty());
+    EXPECT_TRUE(words.empty());
+    EXPECT_EQ(0U, SPI1->CR1);
+}
+
+TEST_F(SPITransactionProvider,
+       BytePollingAllowsExactInPlaceButNotPartialOverlap) {
+    uint8_t data[]{0xA5U, 0x3CU, 0x55U};
+    const uint8_t before[]{0xA5U, 0x3CU, 0x55U};
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_spi_endpoint_transfer(
+                                    &child, data, data + 1U, 2U,
+                                    nx_time_now_us() + 10000U, &transferred));
+    EXPECT_EQ(0, std::memcmp(before, data, sizeof(data)));
+    EXPECT_TRUE(selections.empty());
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_spi_endpoint_transfer(
+                              &child, data, data, sizeof(data),
+                              nx_time_now_us() + 10000U, &transferred));
+    EXPECT_EQ(sizeof(data), transferred);
+    EXPECT_EQ(0, std::memcmp(before, data, sizeof(data)));
+}
+TEST_F(SPITransactionProvider,
+       UnprivilegedPollingAndRecoveryCannotChangeTheHardwareOwner) {
+    const uint8_t tx = 0xA5U;
+    const nx_spi_segment_t segment{nullptr, nullptr, 1U, 0xA5U};
+    privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_stm32_spi_endpoint_transfer(
+                                    &child, &tx, nullptr, 1U,
+                                    nx_time_now_us() + 10000U, &transferred));
+    EXPECT_EQ(NX_ERROR_CONTEXT, Transfer(&segment, 1U));
+    state.fault = true;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_stm32_spi_recover(&state));
+    EXPECT_TRUE(state.fault);
+    EXPECT_FALSE(state.active);
+    EXPECT_EQ(nullptr, state.held_endpoint);
+    EXPECT_EQ(99U, transferred);
+    EXPECT_TRUE(selections.empty());
+    EXPECT_TRUE(words.empty());
+    EXPECT_EQ(0U, SPI1->CR1);
+    EXPECT_EQ(0U, SPI1->CR2);
+    privileged = true;
+}
+
 TEST_F(SPITransactionProvider, UnsupportedTotalRejectsBeforeCs) {
     const nx_spi_segment_t segment{nullptr, nullptr, 257U, 0xFFU};
     EXPECT_EQ(Transfer(&segment, 1U), NX_ERROR_UNSUPPORTED);
-    EXPECT_EQ(transferred, 0U);
+    EXPECT_EQ(transferred, 99U);
     EXPECT_TRUE(words.empty());
     EXPECT_TRUE(selections.empty());
 }
@@ -283,4 +380,9 @@ extern "C" void nx_spi_transaction_model_cs(bool active) {
     }
     selected = active;
     selections.push_back(active);
+}
+
+/** \brief Report the fixture's CPU state without emulating provider control. */
+extern "C" bool nx_spi_transaction_model_privileged(void) {
+    return privileged;
 }

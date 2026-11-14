@@ -49,8 +49,9 @@ class UartRs485 : public testing::Test {
     nx_gpio_ops_t gpio_ops = {};
     const nx_uart_port_t transport = {&transport_ops, &hardware};
     const nx_gpio_port_t gpio = {&gpio_ops, &hardware};
-    const nx_uart_rs485_config_t config = {&transport, &gpio, validate, 8U,
-                                           10U,        20U,   true};
+    const nx_gpio_signal_t direction = {&gpio, 8U, true};
+    const nx_uart_rs485_config_t config = {&transport, &direction, validate,
+                                           10U, 20U};
     nx_uart_rs485_state_t state = {};
     const nx_uart_port_t port = {&nx_uart_rs485_ops, &state};
     nx_uart_tx_request_t request = {};
@@ -296,13 +297,9 @@ class NativeUartRs485 : public testing::Test {
     uint8_t log[8] = {};
     const nx_native_uart_config_t uart_config = {
         NX_UART_RX_BYTES, rx, sizeof(rx), log, sizeof(log), false};
-    const nx_uart_rs485_config_t config = {nx_native_uart,
-                                           nx_native_gpio,
-                                           nx_native_uart_tx_validate,
-                                           8U,
-                                           10U,
-                                           20U,
-                                           true};
+    const nx_gpio_signal_t direction = {nx_native_gpio, 8U, true};
+    const nx_uart_rs485_config_t config = {
+        nx_native_uart, &direction, nx_native_uart_tx_validate, 10U, 20U};
     nx_uart_rs485_state_t adapter = {};
     const nx_uart_port_t port = {&nx_uart_rs485_ops, &adapter};
     nx_uart_tx_request_t request = {};
@@ -376,9 +373,55 @@ TEST_F(UartRs485, InitRejectsConfigOverlappingControlBeforeAnyDirectionStore) {
 TEST_F(UartRs485, InvalidDirectionMaskRejectsBeforeStartupStore) {
     nx_uart_rs485_state_t fresh = {};
     nx_uart_rs485_config_t bad = config;
-    bad.mask = 3U;
+    const nx_gpio_signal_t invalid = {&gpio, 3U, true};
+    bad.direction = &invalid;
     EXPECT_CALL(hardware, Write(testing::_, testing::_)).Times(0);
     EXPECT_EQ(nx_uart_rs485_initialize(&fresh, &bad), NX_ERROR_INVALID);
+}
+
+TEST_F(UartRs485, ActiveLowSignalOwnsPolarityThroughSetupAndWireHold) {
+    nx_uart_rs485_state_t low_state = {};
+    const nx_gpio_signal_t low_direction = {&gpio, 8U, false};
+    nx_uart_rs485_config_t low_config = config;
+    low_config.direction = &low_direction;
+    const nx_uart_port_t low_port = {&nx_uart_rs485_ops, &low_state};
+    EXPECT_CALL(hardware, Write(8U, 0U)).Times(1);
+    ASSERT_EQ(NX_SUCCESS, nx_uart_rs485_initialize(&low_state, &low_config));
+    testing::Mock::VerifyAndClearExpectations(&hardware);
+    EXPECT_CALL(hardware, Write(0U, 8U)).Times(1);
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&low_port, &request));
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(10U));
+    EXPECT_CALL(hardware, Start(testing::_))
+        .WillOnce(testing::Invoke([this](nx_uart_tx_request_t* inner) {
+            executing = inner;
+            return nx_request_transition(&inner->base, NX_REQUEST_ACTIVE);
+        }));
+    nx_uart_port_service(&low_port);
+    ASSERT_NE(nullptr, executing);
+    nx_request_settle(&executing->base, NX_SUCCESS, sizeof(payload));
+    executing = nullptr;
+    nx_uart_port_service(&low_port);
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    testing::Mock::VerifyAndClearExpectations(&hardware);
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(19U));
+    EXPECT_CALL(hardware, Write(testing::_, testing::_)).Times(0);
+    nx_uart_port_service(&low_port);
+    testing::Mock::VerifyAndClearExpectations(&hardware);
+    ASSERT_EQ(NX_SUCCESS, nx_native_clock_advance(1U));
+    EXPECT_CALL(hardware, Write(8U, 0U)).Times(1);
+    nx_uart_port_service(&low_port);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_stop(&low_port));
+}
+
+TEST_F(UartRs485, DirectionBindingCannotOverlapMutableAdapterControl) {
+    nx_uart_rs485_state_t fresh = {};
+    nx_uart_rs485_config_t bad = config;
+    std::memcpy(&fresh.inner, &direction, sizeof(direction));
+    bad.direction = reinterpret_cast<const nx_gpio_signal_t*>(&fresh.inner);
+    EXPECT_CALL(hardware, Write(testing::_, testing::_)).Times(0);
+    EXPECT_EQ(NX_ERROR_INVALID, nx_uart_rs485_initialize(&fresh, &bad));
+    EXPECT_FALSE(fresh.initialized);
 }
 
 TEST_F(UartRs485, FailedTransportStartWithdrawsDirectionBeforeSettlingOuter) {

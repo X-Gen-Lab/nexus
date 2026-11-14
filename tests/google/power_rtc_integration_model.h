@@ -6,6 +6,9 @@
 #ifndef NX_POWER_RTC_INTEGRATION_MODEL_H
 #define NX_POWER_RTC_INTEGRATION_MODEL_H
 #include "f407_rtc_model.h"
+#if defined(NX_POWER_RTC_HIGH_PROFILE)
+#include "stm32_high_clock_profile.h"
+#endif
 #include "stm32f407_clock.h"
 #ifdef __cplusplus
 extern "C" {
@@ -17,8 +20,8 @@ int nx_power_rtc_timer_irq(bool enabled);
 extern uint32_t nx_power_rtc_scr;
 extern uint32_t nx_power_rtc_icsr;
 extern uint32_t nx_power_rtc_tick;
-extern uint32_t nx_power_rtc_enabled[3];
-extern uint32_t nx_power_rtc_active[3];
+extern uint32_t nx_power_rtc_enabled[4];
+extern uint32_t nx_power_rtc_active[4];
 #ifdef __cplusplus
 }
 #endif
@@ -28,6 +31,7 @@ extern uint32_t nx_power_rtc_active[3];
 #define NX_STM32_IRQ_CONTROL(irq, enabled)                                     \
     ((void)(irq), nx_power_rtc_timer_irq(enabled))
 #define NX_STM32_IRQ_ISOLATE(irq) ((void)(irq), nx_power_rtc_timer_irq(false))
+#define NX_POWER_DEBUG            0U
 #define NX_POWER_SCR              nx_power_rtc_scr
 #define NX_POWER_ICSR             nx_power_rtc_icsr
 #define NX_POWER_TICK             nx_power_rtc_tick

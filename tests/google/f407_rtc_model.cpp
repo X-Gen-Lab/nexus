@@ -98,10 +98,12 @@ void nx_f407_rtc_model_write(volatile uint32_t* p, uint32_t v) {
     if (m.observe_write != nullptr)
         m.observe_write(p, v);
     if (p == &m.rcc.AHB1ENR) {
+#if defined(RCC_AHB1ENR_BKPSRAMEN)
         if ((v & RCC_AHB1ENR_BKPSRAMEN) && m.hold_sram_gate)
             return;
         if (!(v & RCC_AHB1ENR_BKPSRAMEN) && m.hold_sram_gate_disable)
             return;
+#endif
         if ((v & RCC_AHB1ENR_GPIOCEN) && m.hold_gpio_clock_enable)
             return;
         if (!(v & RCC_AHB1ENR_GPIOCEN) && m.hold_gpio_clock_restore)
@@ -109,6 +111,13 @@ void nx_f407_rtc_model_write(volatile uint32_t* p, uint32_t v) {
     }
     if (p == &m.power.CSR && !(v & PWR_CSR_BRE) && m.hold_regulator_disable)
         return;
+#if defined(PWR_CSR_UDRDY)
+    if (p == &m.power.CSR) {
+        *p = (v & ~static_cast<uint32_t>(PWR_CSR_UDRDY)) |
+             (*p & PWR_CSR_UDRDY & ~v);
+        return;
+    }
+#endif
     if (p == &m.exti.PR) {
         if (!m.hold_clear)
             m.exti.PR &= ~v;

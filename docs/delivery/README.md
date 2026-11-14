@@ -27,7 +27,8 @@ source_language: zh_CN
 | [能力矩阵](capabilities.md) | 事实、路线、装配与实际生产定义关联 |
 | [源码定位](../explanation/source-map.md) | 各层权威入口与源码归属 |
 | [资格边界](../reference/platforms/qualification.md) | 模型、ARM、SDK、候选和物理验收分开 |
-| [本批变更与验证](https://github.com/X-Gen-Lab/nexus/pull/62) | 便携 I/O 重构、实际源码身份、普通门禁、SDK 与资源结果 |
+| [当前软件增量与验收](https://github.com/X-Gen-Lab/nexus/pulls?q=is%3Apr+head%3Afeature%2Ff4-platform-completion) | 按该分支对应 PR 的实际源码 SHA、配置和执行回执读取本批结果，不转移历史资格 |
+| [前序固定基线](https://github.com/X-Gen-Lab/nexus/pull/62) | PR #62 的便携 I/O 重构、实际源码身份、普通门禁、SDK 与资源结果 |
 | [前序变更](https://github.com/X-Gen-Lab/nexus/pull/61) | PR #61 保留自己的源码与执行范围 |
 | [软件证据导航](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-verification.md) | 按原源码与配置读取执行记录 |
 

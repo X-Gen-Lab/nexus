@@ -1,4 +1,4 @@
-# Exact current gettext entries; the new source delta is independently reviewed.
+# Actual-POT messages; changed entries await independent semantic review.
 msgid ""
 msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 9f5da1b8c5dc468af98bc967593974a97747bd96076d7413d98d47f9bcb54e8b\n"
 
@@ -203,8 +203,8 @@ msgstr "查询不可变几何参数，不启动硬件。"
 msgid "Acquire one bounded, positive read-only span on a serialized executor."
 msgstr "在串行执行器上获取一个有界、长度为正的只读范围。"
 
-msgid "SUCCESS or INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE. Rejection retains no loan. Live read maps exclude all command/program/erase/cache/DMA writers. CPU/XIP/DMA consumers may run concurrently after successful acquisition."
-msgstr "返回 SUCCESS 或 INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE。拒绝不保留借用。活动只读映射排斥全部命令、编程、擦除、缓存及 DMA 写入者。成功获取后，CPU/XIP/DMA 消费者可以并发运行。"
+msgid "SUCCESS, INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE, or a backend map error. Failure retains no loan; partial hardware configuration can close admission and require stop to retry cleanup. Live read maps exclude all command/program/erase/cache/DMA writers. CPU/XIP/DMA consumers may run concurrently after successful acquisition."
+msgstr "SUCCESS、INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE 或 backend 映射错误。失败不保留 loan；部分硬件配置可能关闭准入，需要 stop 重试清理。有效的读取映射排除所有 command/program/erase/cache/DMA writer。成功获取后，CPU/XIP/DMA 消费者可以并发运行。"
 
 msgid "Release an exact live loan after its consumers have joined."
 msgstr "消费者全部会合退出后，释放一个精确的活动借用。"
@@ -233,8 +233,8 @@ msgstr "在以 release 语义发布 SETTLED 前，后端、IRQ 和数据引用�
 msgid "Close admission and request writer cancellation."
 msgstr "关闭准入并请求取消写入操作。"
 
-msgid "SUCCESS only after all map loans and writer sources are gone; BUSY retains storage and needs release/service. Repeated successful stop performs no backend operation. The owner cannot restart or revoke loans."
-msgstr "只有全部映射借用与写入访问源均已退出才返回 SUCCESS；BUSY 保留存储，仍需释放借用或继续推进。成功停止后的重复调用不执行后端操作。此所有者不能重启或撤销借用。"
+msgid "SUCCESS only after all map loans, writer sources and partial map cleanup are gone. BUSY retains storage and needs release/service; another backend cleanup error retains its responsibility for stop retry. Repeated successful stop performs no backend operation. This does not revoke loans or reopen admission; cold restart uses the explicit owner contract."
+msgstr "所有映射 loan、writer 来源和部分映射清理全部退出后才返回 SUCCESS。BUSY 保留存储并需要 release/service；其他 backend 清理错误保留相应责任，供 stop 重试。重复成功 stop 不执行 backend 操作。此操作不撤销 loan，也不重新开放准入；冷重启遵守显式 owner 合同。"
 
 msgid "Exact byte geometry; units divide size and one another."
 msgstr "精确字节几何参数；各单位须整除总大小，且彼此满足整除关系。"
@@ -272,17 +272,29 @@ msgstr "绑定未使用的显式存储，不访问硬件或载荷。"
 msgid "SUCCESS or INVALID; zero capacity, overlapping metadata/aperture, overflowing spans, inconsistent units and missing callbacks reject. Caller constructs a const face with owner_ops and this owner context."
 msgstr "返回 SUCCESS 或 INVALID；容量为零、元数据与映射窗口重叠、跨度溢出、单位不一致或缺少回调时拒绝。调用方使用 owner_ops 和此所有者上下文构造 const 接口对象。"
 
+msgid "Reopen a constructed, closed and fully quiescent owner."
+msgstr "重新开放已构造、关闭且完全静止的 owner。"
+
+msgid "SUCCESS; INVALID for missing construction; STATE if already open; BUSY while a writer, reader loan or map cleanup remains. No hardware is accessed. Preserve slot/free-list and writer epochs, including exhaustion. One serialized executor calls this after the backend's cold restart; all previous controls and consumers must already have joined. init is only for unused storage and must never replace this restart operation."
+msgstr "SUCCESS；未构造时为 INVALID；已开放时为 STATE；仍有 writer、reader loan 或映射清理时为 BUSY。不访问硬件。保留 slot/free-list 和 writer epoch，包括耗尽状态。唯一串行执行者在 backend 冷重启后调用；原控制操作和消费者必须全部 join。init 只用于未使用的存储，绝不能替代此重启操作。"
+
 msgid "Variables"
 msgstr "变量"
 
 msgid "One read-only method table shared by every portable owner instance."
 msgstr "全部可移植所有者实例共享的一张只读方法表。"
 
+msgid "Mapping result and retained controller-cleanup responsibility."
+msgstr "映射结果及保留的控制器清理责任。"
+
+msgid "SUCCESS requires cleanup_required. A failure with cleanup_required closes admission without publishing a loan; stop retries unmap until it succeeds. A failure without cleanup_required has no hardware effects."
+msgstr "SUCCESS 必须同时设置 cleanup_required。失败且设置 cleanup_required 时关闭准入，不发布 loan；stop 重试 unmap，直至成功。失败且未设置 cleanup_required 时没有硬件副作用。"
+
 msgid "Private provider boundary; immutable callbacks and independent context."
 msgstr "私有提供方边界；回调不可变，上下文独立。"
 
-msgid "Context is one explicitly sized private state span. Geometry and mapped address stay fixed. map SUCCESS establishes the readable aperture; map failure leaves no effects. unmap SUCCESS proves all aperture/cache references withdrawn; failure retains the last map loan and closes reader/writer admission. Readers remain joined after a release attempt; a retained loan authorizes cleanup retry, not renewed access. start is called only after request admission and mapping exclusion. start errors may have effects and always proceed through drain. poll advances bounded work, returns BUSY or a terminal result, and supplies monotonically increasing completed bytes. cancel initiates withdrawal but proves no drain. drain SUCCESS detaches every hardware/IRQ/cache/DMA/descriptor/data source; BUSY retains ownership, other errors quarantine it. No callback retains the request itself. Command/cache/DMA writers outside these callbacks are forbidden while the owner exists. Physical adapters own cache-line domains, XIP execution exclusion and hardware-specific drain proof."
-msgstr "Context 是一个具有明确大小的私有状态区间；几何和映射地址保持固定。map SUCCESS 建立可读窗口；map 失败不产生效果。unmap SUCCESS 证明全部窗口/cache 引用已撤回；失败保留最后一个映射借用，并关闭读者/写入者准入。尝试 release 后，读取者必须保持已 join；保留的借用只授权重试清理，不授权重新访问。start 仅在请求准入并排除映射后调用；start 错误可能已有副作用，必须继续 drain。poll 推进有界工作，返回 BUSY 或终态结果，并提供单调增加的完成字节数。cancel 发起撤回，但不证明已排空。drain SUCCESS 脱离全部硬件/IRQ/cache/DMA/描述符/数据来源；BUSY 保留所有权，其他错误保留隔离。Callback 不保留请求本身。Owner 存在期间禁止这些 callback 之外的命令/cache/DMA 写入者。物理适配器负责 cache-line 域、XIP 执行排除和硬件特定的排空证明。"
+msgid "Context is one explicitly sized private state span. Geometry and mapped address stay fixed. map SUCCESS establishes the readable aperture and cleanup responsibility. A partial map failure retains cleanup without granting any readable loan. unmap SUCCESS proves all aperture/cache references withdrawn; failure retains cleanup or the last loan and closes reader/writer admission. Readers remain joined after a release attempt; a retained loan authorizes cleanup retry, not renewed access. start receives the original absolute request deadline, only after request admission and mapping exclusion. It must not restart that budget. start errors may have effects and always proceed through drain. poll advances bounded work, returns BUSY or a terminal result, and supplies monotonically increasing completed bytes. cancel initiates withdrawal but proves no drain. drain SUCCESS detaches every hardware/IRQ/cache/DMA/descriptor/data source; BUSY retains ownership, other errors quarantine it. No callback retains the request itself. Command/cache/DMA writers outside these callbacks are forbidden while the owner exists. Physical adapters own cache-line domains, XIP execution exclusion and hardware-specific drain proof."
+msgstr "context 是一个显式给定大小的私有状态 span。几何与映射地址固定。map SUCCESS 建立可读 aperture 和清理责任。部分映射失败保留清理，但不授予任何可读 loan。unmap SUCCESS 证明全部 aperture/cache 引用已撤回；失败则保留清理或最后一个 loan，并关闭 reader/writer 准入。release 尝试后，reader 仍保持已 join；保留的 loan 只允许重试清理，不允许恢复访问。start 只在请求准入且排除映射后接收原请求的绝对 deadline，不能重启预算。start 错误可能已有副作用，始终继续排空。poll 推进有界工作，返回 BUSY 或终止结果，并提供单调不减的完成字节数。cancel 发起撤回，但不证明排空。drain SUCCESS 撤回全部 hardware/IRQ/cache/DMA/descriptor/data 来源；BUSY 保留所有权，其他错误进入隔离。回调均不保留请求本身。owner 存续期间，禁止在这些回调之外运行 command/cache/DMA writer。物理适配器负责 cache-line 域、XIP 执行排除及硬件特定的排空证明。"
 
 msgid "Exact caller-owned map capacity; fields belong to the owner."
 msgstr "精确的调用方映射容量；各字段归所有者管理。"

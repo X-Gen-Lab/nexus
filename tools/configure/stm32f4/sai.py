@@ -1,16 +1,18 @@
-"""Reviewed SAI1 free-frame choices and thin immutable C connections only."""
+"""Reviewed SAI free-frame choices and thin immutable C connections only."""
 from fractions import Fraction
 
 from tools.configure.calls import Address, DirectCall
 from tools.configure.memory import dma_regions
 from tools.configure.providers.common import Construction, fail, integer
 
-MODES = tuple(role + "-" + direction for role in ("master", "slave")
+MODES = tuple(role + "-" + direction + suffix for suffix in ("", "-blocks")
+              for role in ("master", "slave")
               for direction in ("tx", "rx", "duplex"))
 FIELDS = frozenset(("sample_bits", "slot_bits", "slots", "frame_sync_bits",
     "first_bit_offset", "frame_sync_high", "frame_sync_before",
     "frame_sync_channels", "first_lsb", "sample_rising", "mclk", "no_divider",
-    "mckdiv", "max_bit_clock_hz", "poll_limit"))
+    "mckdiv", "max_bit_clock_hz", "poll_limit", "active_slots",
+    "max_service_gap_us"))
 DEFAULTS = dict(first_bit_offset=0, mclk=False, no_divider=False, mckdiv=0)
 BOOLEANS = ("frame_sync_high", "frame_sync_before", "frame_sync_channels",
             "first_lsb", "sample_rising", "mclk", "no_divider")
@@ -18,8 +20,9 @@ BOOLEANS = ("frame_sync_high", "frame_sync_before", "frame_sync_channels",
 
 def source_block(route, mode, mclk=False):
     """The reviewed clock pads select the sole asynchronous hardware block."""
-    if route["controller"] != "SAI1" or route["kind"] != "audio":
-        fail("SAI requires the reviewed SAI1 audio controller")
+    if route["controller"] not in {"SAI1", "SAI2"} or route["kind"] != "audio":
+        fail("SAI requires a reviewed audio controller")
+    mode = mode.removesuffix("-blocks")
     pins = route["pins"]
     signals = {pin["function"] for pin in pins}
     block = "A" if {"fs_a", "ck_a"}.issubset(signals) else "B"
@@ -30,9 +33,15 @@ def source_block(route, mode, mclk=False):
         expected += [('PE3', 'sd_b')] if block == "A" else [('PE6', 'sd_a')]
     if mclk:
         expected += [('PE2', 'mclk_a')] if block == "A" else [('PF7', 'mclk_b')]
+    af = 6
+    if route["controller"] == "SAI2":
+        pads = dict(PE4="PD12", PE5="PD13", PE6="PD11", PE3="PE11",
+                    PE2="PE0", PF9="PE13", PF8="PE12", PF7="PE14")
+        expected = [(pads[pad], signal) for pad, signal in expected]
+        af = 10
     actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in pins)
-    if actual != tuple((pad, signal, 6) for pad, signal in expected):
-        fail("SAI route must contain its exact AF6 clock/data/optional MCLK pads")
+    if actual != tuple((pad, signal, af) for pad, signal in expected):
+        fail("SAI route must contain its exact clock/data/optional MCLK pads")
     return block
 
 
@@ -40,9 +49,9 @@ def validate(selection, route):
     """Reject unsupported personalities rather than reinterpreting I2S fields."""
     envelope = {"id", "binding", "mode", "irq_priority", "calls_os"}
     if ("irq_priority" not in selection or selection["mode"] not in MODES or
-            FIELDS - DEFAULTS.keys() - selection.keys() or
+            FIELDS - DEFAULTS.keys() - {"active_slots", "max_service_gap_us"} - selection.keys() or
             selection.keys() - FIELDS - envelope):
-        fail("SAI requires one supported finite free-frame selection")
+        fail("SAI requires one supported free-frame selection")
     values = {**DEFAULTS, **selection}
     if values.get("calls_os", False):
         fail("SAI IRQs only latch hardware; calls_os must be false")
@@ -57,6 +66,13 @@ def validate(selection, route):
                            ("slot_bits", (8, 16, 32))):
         if type(values[name]) is not int or values[name] not in choices:
             fail("SAI unsupported " + name)
+    integer(values.get("active_slots", (1 << values["slots"]) - 1),
+            1, (1 << values["slots"]) - 1, "SAI active_slots")
+    if values["mode"].endswith("-blocks"):
+        integer(values.get("max_service_gap_us"), 1, 1000000,
+                "SAI max_service_gap_us")
+    elif "max_service_gap_us" in values:
+        fail("SAI max_service_gap_us requires a continuous blocks mode")
     frame_bits = values["slot_bits"] * values["slots"]
     if (values["sample_bits"] > values["slot_bits"] or frame_bits > 256 or
             values["first_bit_offset"] > values["slot_bits"] - values["sample_bits"] or
@@ -98,17 +114,23 @@ def resolve_fields(selection, route, clock, clock_plan):
     if 2 * bit_clock >= clock["apb2_hz"]:
         fail("SAI APB2 must remain strictly above twice the bit clock")
     return {**{key: values[key] for key in DEFAULTS},
+            "active_slots": values.get("active_slots", (1 << values["slots"]) - 1),
+            "continuous": values["mode"].endswith("-blocks"),
+            "max_service_gap_us": values.get("max_service_gap_us", 0),
             "source_block": source_block(route, values["mode"], values["mclk"])}
 
 
 def dma_paths(route, mode):
-    """Both exact IPs use DMA2 S1/C0 for A and S4/C1 for B."""
+    """Select one exact request per block, retaining source-before-peer order."""
     block = source_block(route, mode,
                          any(pin["function"].startswith("mclk_")
                              for pin in route["pins"]))
     primary = (2, 1, 0) if block == "A" else (2, 4, 1)
     peer = (2, 4, 1) if block == "A" else (2, 1, 0)
-    return (primary, peer) if mode.endswith("duplex") else (primary,)
+    if route["controller"] == "SAI2":
+        primary = (2, 4, 3) if block == "A" else (2, 6, 3)
+        peer = (2, 6, 3) if block == "A" else (2, 4, 3)
+    return (primary, peer) if mode.removesuffix("-blocks").endswith("duplex") else (primary,)
 
 
 def constructor(item, result):
@@ -129,7 +151,8 @@ def constructor(item, result):
     regions, count = dma_regions(name, result, include_flash=True)
     definitions += regions
     o = item.options
-    duplex, receive = item.mode.endswith("duplex"), item.mode.endswith("rx")
+    mode = item.mode.removesuffix("-blocks")
+    duplex, receive = mode.endswith("duplex"), mode.endswith("rx")
     source, peer = o.source_block, "B" if o.source_block == "A" else "A"
     tx_block = None if receive else source
     rx_block = peer if duplex else source if receive else None
@@ -138,15 +161,20 @@ def constructor(item, result):
                             ("DMA", "stream", "channel"))) for path in item.dma)
     tx_path, rx_path = (paths[0] if tx_block is not None else None,
                        paths[1] if duplex else paths[0] if receive else None)
-    definitions += [f"static const nx_stm32_sai_config_t {config} = {{",
+    suffix = "_blocks" if o.continuous else ""
+    definitions += [f"static const nx_stm32_sai{suffix}_config_t {config} = {{"]
+    if o.continuous:
+        definitions += [f"    .max_service_gap_us = {o.max_service_gap_us}u,",
+                        "    .audio = {"]
+    definitions += [
         "    .common = {",
         f"        .pins = {pins}, .pin_count = {len(item.pins)}u,",
         f"        .regions = s_nx_dma_regions_{name}, .region_count = {count}u,",
         f"        .poll_limit = {o.poll_limit}u, .priority = {o.irq.priority}u",
         "    },", "    .hclk_hz = NEXUS_CORE_HZ, .pclk_hz = NEXUS_APB2_HZ,",
-        f"    .source = SAI1_Block_{source},",
+        f"    .source = {item.controller}_Block_{source},",
         f"    .frame_bits = {o.slot_bits * o.slots}u,",
-        f"    .active_slots = {(1 << o.slots) - 1}u,",
+        f"    .active_slots = {o.active_slots}u,",
         f"    .max_bit_clock_hz = {o.max_bit_clock_hz}u,"]
     for field in ("sample_bits", "slot_bits", "slots", "frame_sync_bits",
                   "first_bit_offset", "mckdiv"):
@@ -155,20 +183,22 @@ def constructor(item, result):
         if field != "mclk":
             definitions.append(f"    .{field} = {str(getattr(o, field)).lower()},")
     definitions.append(f"    .master = {str(item.mode.startswith('master-')).lower()},")
-    irqs = [("SAI1", f"nx_stm32_sai_irq(&{state})")]
+    irqs = [(item.controller, f"nx_stm32_sai{suffix}_irq(&{state})")]
     for direction, block, path in (("tx", tx_block, tx_path), ("rx", rx_block, rx_path)):
         if path is not None:
             definitions += [f"    .{direction} = {_dma_initializer(path)},",
-                f"    .{'transmit' if direction == 'tx' else 'receive'} = SAI1_Block_{block},"]
+                f"    .{'transmit' if direction == 'tx' else 'receive'} = {item.controller}_Block_{block},"]
             irqs.append((f"DMA{path[0]}_Stream{path[1]}",
-                         f"nx_stm32_sai_dma_irq(&{state}, {str(direction == 'rx').lower()})"))
+                         f"nx_stm32_sai{suffix}_dma_irq(&{state}, {str(direction == 'rx').lower()})"))
+    if o.continuous:
+        definitions.append("    }")
     definitions.append("};")
     for vector, call in irqs:
         definitions += [f"void {vector}_IRQHandler(void);",
             r"/** \brief One selected source; the callee owns complete retirement. */",
             f"void {vector}_IRQHandler(void) {{ {call}; }}"]
-    return Construction(state_type="nx_stm32_sai_state_t", definitions=definitions,
-        admission=(DirectCall("nx_stm32_sai_admit", (Address(state), Address(config))),),
-        initialize=DirectCall("nx_stm32_sai_prepare", (Address(state), Address(config))),
-        stop=(DirectCall("nx_stm32_sai_close", (Address(state),)),),
+    return Construction(state_type=f"nx_stm32_sai{suffix}_state_t", definitions=definitions,
+        admission=(DirectCall(f"nx_stm32_sai{suffix}_admit", (Address(state), Address(config))),),
+        initialize=DirectCall(f"nx_stm32_sai{suffix}_prepare", (Address(state), Address(config))),
+        stop=(DirectCall(f"nx_stm32_sai{suffix}_close", (Address(state),)),),
         retain_on_failed_init=True, pin_snapshots=snapshots)

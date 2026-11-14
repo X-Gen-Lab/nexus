@@ -16,6 +16,16 @@
       "id": "source_b",
       "controller": "SAI1",
       "route": "sai1-b-simplex"
+    },
+    {
+      "id": "source_a_duplex",
+      "controller": "SAI1",
+      "route": "sai1-a-duplex"
+    },
+    {
+      "id": "source_b_duplex",
+      "controller": "SAI1",
+      "route": "sai1-b-duplex"
     }
   ],
   "reserved_resources": [

@@ -1,0 +1,40 @@
+/**
+ * \file            stm32_sdio_hs375_profile.h
+ * \brief           Exact ES0182 F407 SDIO software reference model clocks
+ * \author          Nexus Team
+ */
+#ifndef NEXUS_STM32_SDIO_HS375_PROFILE_H
+#define NEXUS_STM32_SDIO_HS375_PROFILE_H
+#include "nexus_config.h"
+#undef NEXUS_CORE_HZ
+#define NEXUS_CORE_HZ 150000000U
+#undef NEXUS_CLOCK_INPUT_HZ
+#define NEXUS_CLOCK_INPUT_HZ 8000000U
+#undef NEXUS_CLOCK_SOURCE_HSE
+#define NEXUS_CLOCK_SOURCE_HSE 1U
+#undef NEXUS_APB1_HZ
+#define NEXUS_APB1_HZ 37500000U
+#undef NEXUS_APB2_HZ
+#define NEXUS_APB2_HZ 75000000U
+#undef NEXUS_APB1_TIMER_HZ
+#define NEXUS_APB1_TIMER_HZ 75000000U
+#undef NEXUS_APB2_TIMER_HZ
+#define NEXUS_APB2_TIMER_HZ 150000000U
+#undef NEXUS_ADC_HZ
+#define NEXUS_ADC_HZ 18750000U
+#undef NEXUS_PLL48_HZ
+#define NEXUS_PLL48_HZ          75000000U
+#define NEXUS_CLOCK_PLLM        8U
+#define NEXUS_CLOCK_PLLN        300U
+#define NEXUS_CLOCK_PLLP        2U
+#define NEXUS_CLOCK_PLLQ        4U
+#define NEXUS_CLOCK_PLLCFGR     0x04404b08U
+#define NEXUS_CLOCK_CFGR        0x00009400U
+#define NEXUS_CLOCK_AHB_DIV     1U
+#define NEXUS_CLOCK_ADC_DIV     4U
+#define NEXUS_CLOCK_CSS         0U
+#define NEXUS_CLOCK_SW          2U
+#define NEXUS_CLOCK_PLL_ENABLED 1U
+#define NEXUS_CLOCK_SDIO_HS375  1U
+#define NEXUS_FLASH_WAIT_STATES 4U
+#endif /* NEXUS_STM32_SDIO_HS375_PROFILE_H */

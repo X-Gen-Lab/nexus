@@ -19,7 +19,7 @@ UPSTREAM_COMMIT = "6910c9d9165801d8827d628cb72eb7ea9dd538c5"
 
 class GoogleTestSubmoduleTests(unittest.TestCase):
     def setUp(self):
-        self.temporary = tempfile.TemporaryDirectory(prefix="google source lock ")
+        self.temporary = tempfile.TemporaryDirectory(prefix="google source lock [fixture] ")
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         self.source = self.root / "ext/googletest"
@@ -213,7 +213,7 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "regular"):
             self.verify()
 
-    def configure(self, *, cross=False):
+    def configure(self, *, cross=False, ninja=False):
         helper = self.root / "cmake/testing/GoogleTest.cmake"
         helper.parent.mkdir(parents=True)
         shutil.copy2(ROOT / "cmake/testing/GoogleTest.cmake", helper)
@@ -224,6 +224,12 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         shutil.copy2(ROOT / "tools/maintenance/googletest_lock.py", verifier)
         shutil.copy2(ROOT / "tools/maintenance/source_catalogue.py",
                      verifier.with_name("source_catalogue.py"))
+        shutil.copy2(ROOT / "tools/maintenance/cmsis_device_lock.py",
+                     verifier.with_name("cmsis_device_lock.py"))
+        for name in ("common.py", "identity.py"):
+            helper = self.root / "tools/evidence" / name
+            helper.parent.mkdir(exist_ok=True)
+            shutil.copy2(ROOT / "tools/evidence" / name, helper)
         metadata = self.root / "tools/configure/metadata.py"
         metadata.parent.mkdir(parents=True)
         shutil.copy2(ROOT / "tools/configure/metadata.py", metadata)
@@ -231,6 +237,7 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         (self.root / "CMakeLists.txt").write_text(
             "cmake_minimum_required(VERSION 3.31)\n"
             "project(host_admission NONE)\n"
+            'file(APPEND "${CMAKE_BINARY_DIR}/configure-count.txt" "configure\\n")\n'
             "include(cmake/testing/GoogleTest.cmake)\n"
             "nexus_host_google_test()\n"
             "if(NOT TARGET GTest::gmock_main)\n"
@@ -241,9 +248,124 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
             "target_link_libraries(host_smoke PRIVATE GTest::gmock_main)\n")
         command = [shutil.which("cmake"), "-S", str(self.root),
                    "-B", str(self.root / "build")]
+        if ninja:
+            command += ["-G", "Ninja"]
         if cross:
             command.append("-DCMAKE_SYSTEM_NAME=Generic")
         return subprocess.run(command, capture_output=True, text=True, timeout=60)
+
+    def build(self):
+        return subprocess.run([shutil.which("cmake"), "--build",
+            str(self.root / "build"), "--target", "host_smoke", "--parallel", "1"],
+            capture_output=True, text=True, timeout=60)
+
+    def configure_count(self):
+        return len((self.root / "build/configure-count.txt").read_text().splitlines())
+
+    def test_git_directory_observation_is_quiet_but_identity_changes_rerun(self):
+        from tools.evidence.identity import observe_git_source
+        directory = Path(self.git(self.source, "rev-parse", "--absolute-git-dir"))
+        self.git(self.source, "config", "--unset", "core.worktree")
+        (self.source / ".git").unlink()
+        shutil.move(directory, self.source / ".git")
+        directory = self.source / ".git"
+        result = self.configure(ninja=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(self.configure_count(), 1)
+        self.assertTrue(observe_git_source(self.root)["dirty"])
+        built = self.build()
+        self.assertEqual(built.returncode, 0, built.stdout + built.stderr)
+        self.assertEqual(self.configure_count(), 1, built.stdout + built.stderr)
+        # Only real metadata files invalidate the graph; status lock churn does
+        # not. Identical-byte rewrites still require a fresh admission.
+        branch = self.git(self.source, "symbolic-ref", "HEAD")
+        for index, relative in enumerate(("HEAD", "index", branch, "config"), 2):
+            with self.subTest(metadata=relative):
+                (directory / relative).touch()
+                built = self.build()
+                self.assertEqual(built.returncode, 0, built.stdout + built.stderr)
+                self.assertEqual(self.configure_count(), index,
+                                 built.stdout + built.stderr)
+        self.git(self.source, "remote", "set-url", "origin", "https://invalid.test/src")
+        rejected = self.build()
+        self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
+        self.assertIn("checkout origin differs", rejected.stdout + rejected.stderr)
+
+    def test_gitfile_redirect_cannot_reuse_the_previous_checkout_admission(self):
+        directory = Path(self.git(self.source, "rev-parse", "--absolute-git-dir"))
+        alternate = directory.with_name("alternate-googletest")
+        changed = self.git(self.source, "commit-tree", "HEAD^{tree}", "-p", "HEAD",
+                           "-m", "different commit with identical source tree")
+        shutil.copytree(directory, alternate)
+        (alternate / "HEAD").write_text(changed + "\n")
+        result = self.configure(ninja=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        marker = self.source / ".git"
+        marker.write_text("gitdir: " + str(alternate) + "\n")
+        self.assertEqual(self.git(self.source, "rev-parse", "HEAD"), changed)
+        rejected = self.build()
+        self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
+        self.assertIn("checkout commit differs", rejected.stdout + rejected.stderr)
+
+    def test_packed_branch_advance_cannot_hide_a_new_loose_reference(self):
+        self.git(self.source, "pack-refs", "--all", "--prune")
+        result = self.configure(ninja=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        # HEAD and packed-refs retain their bytes. Only a new loose ref carries
+        # this commit, whose source tree deliberately remains identical.
+        branch = self.git(self.source, "symbolic-ref", "HEAD")
+        reference = Path(self.git(self.source, "rev-parse", "--git-path", branch))
+        if not reference.is_absolute():
+            reference = self.source / reference
+        self.assertFalse(reference.exists())
+        self.git(self.source, "commit", "--quiet", "--allow-empty", "-m",
+                 "advanced packed branch with identical source tree")
+        self.assertTrue(reference.is_file())
+        rejected = self.build()
+        self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
+        self.assertIn("checkout commit differs", rejected.stdout + rejected.stderr)
+
+    def test_worktree_origin_and_common_directory_change_rerun_admission(self):
+        common = Path(self.git(self.source, "rev-parse", "--absolute-git-dir"))
+        linked = self.root / "linked-checkout"
+        self.git(self.source, "worktree", "add", "--quiet", "--detach",
+                 str(linked), self.lock["commit"])
+        original = self.root / "original-checkout"
+        self.source.rename(original)
+        self.git(self.root, "--git-dir=" + str(common),
+                 "--work-tree=" + str(original), "worktree", "move",
+                 str(linked), str(self.source))
+        worktree = Path(self.git(self.source, "rev-parse", "--absolute-git-dir"))
+        self.assertNotEqual(worktree, common)
+        result = self.configure(ninja=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.git(self.source, "remote", "set-url", "origin", "https://invalid.test/src")
+        rejected = self.build()
+        self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
+        self.assertIn("checkout origin differs", rejected.stdout + rejected.stderr)
+
+        self.git(self.source, "remote", "set-url", "origin", FETCH)
+        restored = self.build()
+        self.assertEqual(restored.returncode, 0, restored.stdout + restored.stderr)
+        # Neither gitfile, HEAD nor index changes. The commondir file alone
+        # redirects origin/object lookup to another common Git directory.
+        alternate = common.with_name("alternate-common")
+        shutil.copytree(common, alternate)
+        self.git(self.root, "--git-dir=" + str(alternate), "config",
+                 "remote.origin.url", "https://invalid.test/src")
+        (worktree / "commondir").write_text(str(alternate) + "\n")
+        rejected = self.build()
+        self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
+        self.assertIn("checkout origin differs", rejected.stdout + rejected.stderr)
+
+    def test_parent_index_gitlink_change_reruns_source_admission(self):
+        result = self.configure(ninja=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.git(self.root, "update-index", "--cacheinfo", "160000",
+                 "a" * 40, "ext/googletest")
+        rejected = self.build()
+        self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
+        self.assertIn("parent index gitlink differs", rejected.stdout + rejected.stderr)
 
     def test_shared_cmake_loads_verified_checkout_offline(self):
         result = self.configure()

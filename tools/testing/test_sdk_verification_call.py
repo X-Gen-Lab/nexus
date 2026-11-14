@@ -70,12 +70,43 @@ class SDKPublicCompileInputTests(unittest.TestCase):
                 with self.subTest(path=path, command=command):
                     self.assertFalse(self.private_input(["-I", path], command=command))
 
+    def test_clock_owner_storage_compiles_with_only_public_headers(self):
+        source = self.root / "clock-owner.c"
+        source.write_text(
+            '#include "nexus/components/clock_domain_owner.h"\n'
+            '#if __has_include("clock_domain_impl.h")\n'
+            '#error Private clock protocol leaked into the owner closure\n'
+            '#endif\n'
+            'static nx_clock_domain_t domain;\n'
+            'nx_result_t construct_clock_owner(void);\n'
+            'nx_result_t construct_clock_owner(void) {\n'
+            '    return nx_clock_domain_construct(&domain, 2);\n'
+            '}\n')
+        environment = os.environ.copy()
+        for key in ("CPATH", "C_INCLUDE_PATH", "CPLUS_INCLUDE_PATH"):
+            environment.pop(key, None)
+        public = ROOT / "components/clock_domain/include"
+        core = ROOT / "core/include"
+        for language, compiler, standard in (("c", "cc", "c11"),
+                                              ("c++", "c++", "c++17")):
+            with self.subTest(language=language):
+                tool = shutil.which(compiler)
+                self.assertIsNotNone(tool, "Prepared host compiler required")
+                command = [tool, "-x", language, f"-std={standard}",
+                           "-Wall", "-Wextra", "-Werror", "-Wpedantic",
+                           "-I", str(public), "-I", str(core),
+                           "-fsyntax-only", str(source)]
+                result = subprocess.run(command, env=environment, text=True,
+                                        capture_output=True, timeout=30)
+                self.assertEqual(result.returncode, 0,
+                                 result.stdout + result.stderr)
+
     def test_f407_soc_public_export_accepts_directories_and_headers(self):
         for root in (self.sdk, ROOT):
             public = root / "soc/stm32/stm32f4/include"
             for option, path in (
                     ("-I", public),
-                    ("-include", public / "nexus/soc/stm32f407_power.h")):
+                    ("-include", public / "nexus/soc/stm32f4_power.h")):
                 with self.subTest(root=root, option=option):
                     self.assertFalse(self.private_input(
                         [option, path], command=True))
@@ -456,13 +487,15 @@ class SDKConsumerParallelTests(unittest.TestCase):
         shutil.copytree(ROOT / "cmake/package/verification/secure_services",
                         self.sdk / "cmake/package/verification/secure_services")
         for scenario in ("device_tmp117", "image_window", "loaned_rx",
-                         "mcuboot_control", "mcuboot_boot"):
+                         "mcuboot_control", "mcuboot_boot", "smbus"):
             shutil.copytree(ROOT / "cmake/package/verification" / scenario,
                             self.sdk / "cmake/package/verification" / scenario)
         family = Path("tests/contracts/stm32f4_family")
         shutil.copytree(ROOT / family, self.sdk / family)
         for name in ("stm32f4_crypto", "stm32f4_sdram", "stm32f4_graphics",
-                     "stm32f4_graphics_sdram", "stm32f4_sai", "stm32f4_qspi"):
+                     "stm32f4_graphics_sdram", "stm32f4_sai", "stm32f4_qspi",
+                     "stm32f4_power", "stm32f4_sdio_hs",
+                     "f407_capture_audio"):
             relative = Path("tests/contracts") / name
             shutil.copytree(ROOT / relative, self.sdk / relative)
         crc = Path("tests/contracts/crc_assembly/consumer.c")
@@ -491,7 +524,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
             products = [path for path in (source / "main.c", source / "main.cpp",
                                          source / "private_headers.c",
                                          source / "application.c",
-                                         source / "composition.c", source / "public_key.c")
+                                         source / "composition.c", source / "public_key.c",
+                                         source / "sustained_sequence.c")
                         if path.exists()]
             rows = [{"file": str(path), "directory": str(build),
                      "arguments": ["cc", "-c", str(path)],

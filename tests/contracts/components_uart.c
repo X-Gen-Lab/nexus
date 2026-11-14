@@ -345,6 +345,7 @@ static void publication_reclaims_outer(void) {
 typedef struct {
     fixture_t* fixture;
     uint32_t done;
+    uint32_t settled;
 } concurrent_t;
 
 /**
@@ -365,8 +366,9 @@ static void producer_task(void* context) {
     nx_owner_ticket_t old = {0, 0};
     uint8_t bytes[2] = {producer->identity, 0};
     nx_uart_owner_operation_t operation = {bytes, sizeof(bytes)};
-    uint64_t bound = nx_native_now_us() + UINT64_C(5000000);
     for (unsigned i = 0; i < 1000; ++i) {
+        /* Bound each operation's admission and settlement, not throughput. */
+        uint64_t bound = nx_native_now_us() + UINT64_C(5000000);
         bytes[1] = (uint8_t)i;
         CHECK(nx_request_prepare(&request, NX_DEADLINE_NEVER) == NX_SUCCESS);
         nx_owner_ticket_t ticket;
@@ -393,6 +395,7 @@ static void producer_task(void* context) {
         size_t transferred;
         CHECK(nx_request_result(&request, &result, &transferred) == NX_SUCCESS);
         CHECK(result == NX_SUCCESS && transferred == sizeof(bytes));
+        __atomic_fetch_add(&concurrent->settled, 1, __ATOMIC_RELEASE);
         old = ticket;
     }
     __atomic_fetch_add(&concurrent->done, 1, __ATOMIC_RELEASE);
@@ -402,7 +405,15 @@ static void producer_task(void* context) {
 static void executor_task(void* context) {
     concurrent_t* concurrent = context;
     uint64_t bound = nx_native_now_us() + UINT64_C(5000000);
+    uint32_t settled = 0;
     for (;;) {
+        uint32_t progress =
+            __atomic_load_n(&concurrent->settled, __ATOMIC_ACQUIRE);
+        if (progress != settled) {
+            /* Only a checked successful frame renews the inactivity bound. */
+            settled = progress;
+            bound = nx_native_now_us() + UINT64_C(5000000);
+        }
         CHECK(nx_native_now_us() < bound);
         nx_result_t result = nx_bus_owner_service(&concurrent->fixture->owner);
         CHECK(result == NX_SUCCESS || result == NX_ERROR_BUSY);
@@ -418,7 +429,7 @@ static void executor_task(void* context) {
 static void multi_producer(void) {
     fixture_t fixture;
     initialize(&fixture, true);
-    concurrent_t concurrent = {&fixture, 0};
+    concurrent_t concurrent = {&fixture, 0, 0};
     producer_t producers[3] = {
         {&concurrent, 1}, {&concurrent, 2}, {&concurrent, 3}};
     nx_native_task_t tasks[4] = {0};
@@ -438,6 +449,7 @@ static void multi_producer(void) {
     }
     CHECK(nx_native_task_join(&tasks[0]) == NX_SUCCESS);
     free(stacks[0]);
+    CHECK(__atomic_load_n(&concurrent.settled, __ATOMIC_ACQUIRE) == 3000);
     CHECK(nx_native_uart_transmitted() == sizeof(fixture.transmitted));
     unsigned sequence[3] = {0};
     for (size_t i = 0; i < sizeof(fixture.transmitted); i += 2) {

@@ -30,3 +30,17 @@ target_compile_definitions(nexus_stm32_flash_program_test PRIVATE
     _init=nx_flash_fixture_init _fini=nx_flash_fixture_fini)
 target_compile_options(nexus_stm32_flash_program_test PRIVATE
     "-include${NEXUS_SOURCE_DIR}/tests/contracts/flash_program_model.h")
+
+# Bank-two encoding and remap admission are distinct from F407 pulse behavior.
+nexus_google_test(nexus_stm32_flash_bank_test STM32F4_LL
+    SOURCES stm32_flash_bank_test.cpp
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/flash.c"
+    LIBRARIES Nexus::IO Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/arch/include")
+target_include_directories(nexus_stm32_flash_bank_test SYSTEM PRIVATE
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+nexus_use_cmsis_core(nexus_stm32_flash_bank_test)
+target_compile_definitions(nexus_stm32_flash_bank_test PRIVATE STM32F479xx)
+target_compile_options(nexus_stm32_flash_bank_test PRIVATE
+    "-include${NEXUS_SOURCE_DIR}/tests/contracts/flash_program_model.h")

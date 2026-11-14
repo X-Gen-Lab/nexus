@@ -22,18 +22,17 @@ extern "C" {
  */
 typedef struct {
     const nx_uart_port_t* transport;
-    const nx_gpio_port_t* direction;
+    const nx_gpio_signal_t* direction;
     nx_uart_tx_validate_fn validate;
-    uint32_t mask;
     nx_time_us_t setup_us;
     nx_time_us_t hold_us;
-    bool active_high;
 } nx_uart_rs485_config_t;
 
 /**
  * \brief           Caller-owned opt-in adapter, zero-initialize before init.
  * \note            Control is private after initialization. Immutable config,
- *                  both faces, pin ownership and all storage outlive successful
+ *                  both faces, signal, pin ownership and all storage outlive
+ *                  successful
  *                  stop plus external observers. Default UART state is
  * unchanged.
  */

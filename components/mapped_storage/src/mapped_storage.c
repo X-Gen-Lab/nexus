@@ -46,6 +46,13 @@ static bool valid(const nx_mapped_storage_port_t* port) {
     return port != NULL && port->ops != NULL && port->context != NULL;
 }
 
+/** \brief Keep caller spans outside the dispatch face and immutable methods. */
+static bool external(const nx_mapped_storage_port_t* port, const void* data,
+                     size_t size) {
+    return separate(data, size, port, sizeof(*port)) &&
+           separate(data, size, port->ops, sizeof(*port->ops));
+}
+
 /** \brief Dispatch immutable geometry using exact instance state. */
 const nx_mapped_storage_geometry_t*
 nx_mapped_storage_geometry(const nx_mapped_storage_port_t* port) {
@@ -59,7 +66,7 @@ nx_result_t nx_mapped_storage_acquire(const nx_mapped_storage_port_t* port,
                                       nx_mapped_storage_reader_t reader,
                                       size_t offset, size_t length,
                                       nx_mapped_storage_loan_t* loan) {
-    if (!valid(port)) {
+    if (!valid(port) || !external(port, loan, sizeof(*loan))) {
         return NX_ERROR_INVALID;
     }
     return port->ops->acquire == NULL
@@ -71,7 +78,7 @@ nx_result_t nx_mapped_storage_acquire(const nx_mapped_storage_port_t* port,
 /** \brief Dispatch exact loan release. */
 nx_result_t nx_mapped_storage_release(const nx_mapped_storage_port_t* port,
                                       const nx_mapped_storage_loan_t* loan) {
-    if (!valid(port)) {
+    if (!valid(port) || !external(port, loan, sizeof(*loan))) {
         return NX_ERROR_INVALID;
     }
     return port->ops->release == NULL ? NX_ERROR_UNSUPPORTED
@@ -82,7 +89,12 @@ nx_result_t nx_mapped_storage_release(const nx_mapped_storage_port_t* port,
 nx_result_t nx_mapped_storage_submit(const nx_mapped_storage_port_t* port,
                                      nx_mapped_storage_request_t* request,
                                      nx_mapped_storage_ticket_t* ticket) {
-    if (!valid(port)) {
+    if (!valid(port) || !external(port, request, sizeof(*request)) ||
+        !external(port, ticket, sizeof(*ticket))) {
+        return NX_ERROR_INVALID;
+    }
+    if (request->operation == NX_MAPPED_STORAGE_PROGRAM &&
+        !external(port, request->data, request->length)) {
         return NX_ERROR_INVALID;
     }
     return port->ops->submit == NULL

@@ -18,7 +18,7 @@
 | 软件总线 | [SPI](software_spi/README.md)、[I2C／SCCB](software_i2c/README.md)、[OneWire](onewire/README.md) | GPIO 电气、上拉、时钟与实测时序 |
 | 外部存储器件 | [AT24C02](at24c02/README.md)、[W25](w25/README.md)、[MappedStorage](mapped_storage/README.md) | 精确型号、区域、写保护、恢复与耐久策略 |
 | 通用数据机制 | [Storage](storage/README.md)、[Settings](settings/README.md)（`Nexus::Settings`）、[Log](log/README.md)、[Modbus RTU](modbus/README.md) | schema、授权、寄存器表、提交频率和日志去向 |
-| 总线与访问组合 | [DP83848](dp83848/README.md)、[USB control](usb_control/README.md)、[I3C controller](i3c_controller/README.md)、[User I/O broker](user_io_broker/README.md)、[AMP IPC](amp_ipc/README.md) | 硬件 owner、身份、内存权限和完整退出证明 |
+| 总线与访问组合 | [SMBus packet PEC](smbus/README.md)、[DP83848](dp83848/README.md)、[USB control](usb_control/README.md)、[I3C controller](i3c_controller/README.md)、[User I/O broker](user_io_broker/README.md)、[AMP IPC](amp_ipc/README.md) | 硬件 owner、身份、内存权限和完整退出证明 |
 | 网络与镜像 | [lwIP](network/README.md)、[TLS](tls/README.md)、[MQTT](mqtt/README.md)、[MCUboot](mcuboot/README.md) | 网络执行进度、信任根、产品布局与恢复 |
 
 通用机制保留在具名组件目录。精确 STM32 扩展位于 `components/soc/stm32/`，包括

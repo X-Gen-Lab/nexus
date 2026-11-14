@@ -1,6 +1,7 @@
 """Public SDK consumer templates choose nominal factory references."""
 
 import importlib.util
+import json
 from pathlib import Path
 import shutil
 import tempfile
@@ -36,7 +37,19 @@ class SDKFactoryTemplateTests(unittest.TestCase):
                     code = (source / filename).read_text()
                     self.assertIn('#include "nexus_factory_strong.h"', code)
                     self.assertIn("nx_factory_gpio_ref(NX_GPIO_REF_COUNT)", code)
-                    self.assertIn('#if NEXUS_FACTORY_ABI_EPOCH != 3U', code)
+                    self.assertIn('#if NEXUS_FACTORY_ABI_EPOCH != 5U', code)
+
+    def test_explicit_version_still_binds_the_installed_policy_epoch(self):
+        policy = (self.prefix / "share/nexus/src/dependencies"
+                  / "platform-compatibility.json")
+        value = json.loads(policy.read_text())
+        value["factory_abi_epoch"] = 7
+        policy.write_text(json.dumps(value))
+        source, _, _ = CONSUMERS.prepare_consumer(
+            self.prefix, self.root, "selected-policy", lambda _: None,
+            version=value["semantic_version"])
+        self.assertIn('#if NEXUS_FACTORY_ABI_EPOCH != 7U',
+                      (source / "main.c").read_text())
 
 
 

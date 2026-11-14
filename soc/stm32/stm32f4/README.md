@@ -48,13 +48,15 @@ RM0383／ES0287、RM0390／ES0298、RM0386／ES0321 的独立资料审核。ES01
 
 `variants.<part>.device` 选择唯一器件 profile，再显式组合不重叠的 controller groups。
 F405／F407／F415／F417 的 67 项基础事实共享维护，ETH／DCMI 由 F407／F417 选择；
-F415／F417 已接入基础 CRYP／HASH 的 `irq-blocks` 与 typed factory，F479 的增强
+F415／F417 的基础 CRYP／HASH 分别选择 `irq-blocks` 或 `dma-blocks`，共用原有
+typed factory 和 controller owner；DMA 扩展状态只在选中时分配。精确通道、整字约束、
+停止与密钥清理见[基础加密 transport 合同](../../../docs/design/official-stm32-provider.md#f415f417-basic-crypto-transports)。F479 的增强
 加密 IP 继续保留在厂商库存，未由基础实现授予模式。F411／F446／F479 选择各自
 经过审核的 controller groups，不继承上述全部基础外设。
 
 DS8626 Rev12 对应 F405／F407，DS8597 Rev10 对应 F415／F417；新增 F411、F446、
 F479 分别使用 DS10314、DS10693、DS11118。芯片、封装与所需 pad 分别校验，
-不把组的并集授权给单颗器件。[内部 HSI16／CRC 软件参考](../../../tests/contracts/stm32f4_family/README.md)
+不把组的并集授权给单颗器件。[内部时钟／CRC 软件参考](../../../tests/contracts/stm32f4_family/README.md)
 为精确器件建立基础入口，图形、音频等模式仍按各自合同与配置验证，不证明外部 PCB
 接线。System、预 C 内存与 handoff 使用所选硅片准入；资料、C 实现、模型、
 ARM／SDK 及物理资格分别判断。Board／SoC 没有 Python 插件，集中主机工具只校验
@@ -80,10 +82,13 @@ linker／startup 计划，`NEXUS_MEMORY_CCM` 表达所选域。默认装配不�
 
 `system.c` 按唯一静态 ClockPlan 启动。F405／F407／F415／F417 的默认 profile
 为 HSE8／PLL168、APB1 42 MHz、APB2 84 MHz，也可选择经校验的 HSE／HSI、
-直接 SYSCLK、PLL 和总线分频。F411／F446／F479 的首片参考限定 HSI16 RUN、
-主 PLL 关闭、AHB／APB 16 MHz。F446 可显式选择独立 M 的 PLLSAI Q 供 SAI1；
-F479 使用与主 PLL 共用的 M，可选择 Q 供 SAI1、R 供 LTDC 或同时选择两路。
-这些输出仍由唯一 System 管理，并在器件 profile 校验。下文未另说明的
+直接 SYSCLK、PLL 和总线分频。F411／F446／F479 保留直接 HSI16，并分别接纳显式
+HSI PLL96／PLL168／PLL168 高速 RUN 参数；总线、Flash latency、VOS 与辅助输出
+仍按精确器件校验。F446 的独立 M PLLSAI Q 可供所选 SAI1／2 master；F479 的
+PLLSAI 与主 PLL 共用 M，可同时提供 SAI1 的 Q 与 LTDC 的 R。F479 的 M10/N210
+高速参数保留既有 M10 辅助计划的 12.288 MHz 音频时钟与 4.8 MHz 像素时钟。
+这些输出由唯一 System 管理；高速参考不授予其他外设、180 MHz overdrive 或新料号
+STOP／Standby 支持。完整参数和失败顺序见下方 System 合同。下文未另说明的
 MHz 数字均是原 HSE8／PLL168 示例，实际 C 与生成常量使用所选计划。TIM2 始终整数分频为 1 MHz，通过 overflow IRQ 扩展 32-bit
 counter，IRQ 至少每 2^32 微秒服务一次，不占 RTOS SysTick。PLL48 与 USB 功能
 owner 分开取得；没有消费者的直接输入 profile 不开启主 PLL。

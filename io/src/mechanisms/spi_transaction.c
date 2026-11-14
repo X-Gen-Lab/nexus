@@ -112,7 +112,6 @@ nx_spi_transaction_transfer(const nx_spi_transaction_endpoint_t* endpoint,
                 sizeof(*endpoint->ops))) {
         return NX_ERROR_INVALID;
     }
-    *transferred = 0U;
     nx_result_t result =
         nx_spi_transaction_validate(segments, count, word_bits);
     if (result != NX_SUCCESS) {

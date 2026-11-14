@@ -85,9 +85,10 @@ typedef enum {
  *       alignment. HIGH_HALFWORD_FIRST stores two little endian halfwords,
  *       the most significant one first. I2S24 therefore reports container32,
  *       MSB alignment and HIGH_HALFWORD_FIRST; SAI24 reports container32,
- *       LSB alignment and LITTLE_ENDIAN. slots is 1..16 stored slots per frame;
- *       active_slots is their wire mask. The first F4 SAI mode requires every
- *       slot active and never compacts a sparse mask. No conversion is done.
+ *       LSB alignment and LITTLE_ENDIAN. slots is 1..16 wire slots per frame;
+ *       active_slots is their mask. Sparse SAI frames store only enabled
+ *       slots in increasing wire-slot order, with no inactive-slot padding.
+ *       The hardware FIFO supplies that order; no software conversion is done.
  */
 typedef struct {
     nx_audio_storage_order_t storage_order;

@@ -77,9 +77,12 @@ extern uint32_t nx_family_rng_control;
 #endif
 #if NX_TEST_AUX_KIND != 2U
 #define NEXUS_CLOCK_PLLSAI_SAI1_ENABLED 1U
-#define NEXUS_CLOCK_PLLSAI_Q            5U
-#define NEXUS_CLOCK_PLLSAI_DIVQ         5U
-#define NEXUS_CLOCK_PLLSAI_SAI1_HZ      12288000U
+#if defined(STM32F446xx)
+#define NEXUS_CLOCK_PLLSAI_SAI2_ENABLED 1U
+#endif
+#define NEXUS_CLOCK_PLLSAI_Q       5U
+#define NEXUS_CLOCK_PLLSAI_DIVQ    5U
+#define NEXUS_CLOCK_PLLSAI_SAI1_HZ 12288000U
 #else
 #define NEXUS_CLOCK_PLLSAI_SAI1_ENABLED 0U
 #endif

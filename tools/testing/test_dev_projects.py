@@ -13,6 +13,11 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from tools.configure import metadata
+
+
+ROOT = Path(__file__).resolve().parents[2]
+
 
 class ProjectCreationTests(unittest.TestCase):
     def setUp(self):
@@ -37,11 +42,13 @@ class ProjectCreationTests(unittest.TestCase):
         self.template.mkdir(parents=True)
         for name, data in self.payload.items():
             (self.template / name).write_bytes(data)
+        policy = metadata.load_policy(ROOT)
         self.manifest = {
             "schema": 1, "version": 1, "templates": {"native": {
                 "files": {name: hashlib.sha256(data).hexdigest()
                           for name, data in self.payload.items()},
-                "platform": {"interface_epoch": 3, "assembly_schema": 2}}}}
+                "platform": {"interface_epoch": policy["factory_abi_epoch"],
+                             "assembly_schema": 2}}}}
         self.manifest_path = self.repo / "templates/manifest.json"
         self.manifest_path.write_text(json.dumps(self.manifest))
         (self.repo / "dependencies").mkdir()
@@ -73,6 +80,19 @@ class ProjectCreationTests(unittest.TestCase):
         self.assertIn("--test-support", result["validation"]["argv"])
         self.assertIn("-DNEXUS_TEST_SUPPORT=ON",
                       result["commands"]["configure"])
+
+    def test_old_future_and_boolean_interface_epochs_reject_before_copy(self):
+        current = metadata.load_policy(ROOT)["factory_abi_epoch"]
+        platform = self.manifest["templates"]["native"]["platform"]
+        for epoch in (3, current + 1, True):
+            with self.subTest(epoch=epoch):
+                self.assertNotEqual(epoch, current)
+                platform["interface_epoch"] = epoch
+                self.manifest_path.write_text(json.dumps(self.manifest))
+                self.commit()
+                with self.assertRaisesRegex(ValueError, "interface/schema"):
+                    self.create()
+                self.assertFalse(self.output.exists())
 
     def selected_source(self, *, family="native", arch=None, mutation=""):
         source = self.root / "independent platform with spaces"

@@ -1,5 +1,6 @@
 # Query validated resolved facts only. Source ownership stays in SoC CMake.
 function(nexus_controller_values output kind field)
+    set(controller "${ARGV3}")
     file(READ "${NEXUS_CONFIG_DIR}/resolved.json" resolved)
     string(JSON count LENGTH "${resolved}" controllers)
     set(values)
@@ -9,6 +10,13 @@ function(nexus_controller_values output kind field)
             string(JSON selected_kind GET "${resolved}"
                 controllers ${index} kind)
             if(selected_kind STREQUAL kind)
+                if(controller)
+                    string(JSON selected_controller GET "${resolved}"
+                        controllers ${index} controller)
+                    if(NOT selected_controller STREQUAL controller)
+                        continue()
+                    endif()
+                endif()
                 string(JSON value GET "${resolved}"
                     controllers ${index} "${field}")
                 list(APPEND values "${value}")
@@ -20,7 +28,7 @@ function(nexus_controller_values output kind field)
 endfunction()
 
 function(nexus_controller_modes output kind)
-    nexus_controller_values(values "${kind}" mode)
+    nexus_controller_values(values "${kind}" mode "${ARGV2}")
     set(${output} "${values}" PARENT_SCOPE)
 endfunction()
 

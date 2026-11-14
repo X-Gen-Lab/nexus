@@ -72,10 +72,12 @@ nx_result_t nx_spi_transaction_validate(const nx_spi_segment_t* segments,
  * \param[in]       word_bits: Common hardware frame width, 8 or 16 bits.
  * \param[in]       deadline: Absolute monotonic deadline for all phases.
  * \param[out]      transferred: Complete received words, never bytes; separate
- *                  writable size_t storage, reset before provider execution.
+ *                  writable size_t storage, reset after complete admission.
+ *                  Preflight rejection leaves this result unchanged.
  * \return          SUCCESS or
  * INVALID/UNSUPPORTED/CONTEXT/STATE/BUSY/TIMEOUT/IO. \note            Task-only
- * single executor; polling is CPU-active. Return releases descriptor/payload
+ * single executor; polling is CPU-active. Spans and result are disjoint from
+ * provider control and MMIO storage. Return releases descriptor/payload
  * borrows after wire drain or provider reset and CS release. Deadline cannot
  * preempt an in-flight word. Errors never replay prior segments. No allocation,
  * OS lock, hidden scratch, width changes or CS toggles occur between phases.

@@ -67,6 +67,7 @@ typedef struct {
     uint32_t poll_budget;
     uint32_t stop_timeout_us;
     uint8_t bus_width;
+    bool high_speed; /**< Explicit negotiated SDR timing, never fallback. */
     nx_stm32_sdio_engine_t engine;
     nx_stm32_sdio_async_state_t* async;
     const nx_dma_memory_region_t* dma_regions;
@@ -131,8 +132,10 @@ void nx_stm32_sdio_dma_irq(nx_stm32_sdio_state_t* state);
  * \param[in,out] receipt: Zero entry owner, retained through failed cleanup.
  * \return Success or refusal with any partial effects in the same receipt.
  * \note Privileged unmasked Thread startup. Platform already owns GPIOC/D (and
- * GPIOB for MMC8) clocks and the selected static ClockPlan: nominal PLL48 is
- * exactly 48 MHz; PCLK2 supports an even wire divider satisfying RM0090
+ * GPIOB for MMC8) clocks and the selected static ClockPlan: the normal kernel
+ * is 48 MHz; only the exact ES0182 HS375 profile permits 75 MHz with a
+ * non-bypass 37.5 MHz wire clock. PCLK2 supports an even divider satisfying
+ * RM0090
  * section 31.2 and ES0182 section 2.4.6 for the selected bus width.
  * The finite engine leases fixed IRQ vectors. Platform owns
  *       the DMA2 gate before DMA preparation; only submit enables a stream.

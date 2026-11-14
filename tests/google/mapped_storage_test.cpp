@@ -308,6 +308,50 @@ TEST_F(MappedStorage, PrivateBackendStateCannotBecomePayloadOrLoanOutput) {
               NX_ERROR_INVALID);
 }
 
+TEST_F(MappedStorage, MappingOutputCannotOverwriteItsFaceOrMethodTable) {
+    struct ProtectedFace {
+        nx_mapped_storage_port_t face;
+        std::array<uint8_t, sizeof(nx_mapped_storage_loan_t)> tail;
+    } protected_face{port, {}};
+    struct ProtectedOps {
+        nx_mapped_storage_ops_t ops;
+        std::array<uint8_t, sizeof(nx_mapped_storage_loan_t)> tail;
+    } protected_ops{nx_mapped_storage_owner_ops, {}};
+    const nx_mapped_storage_port_t second{&protected_ops.ops, &owner};
+    for (bool in_face : {true, false}) {
+        const auto* face = in_face ? &protected_face.face : &second;
+        void* output = in_face ? static_cast<void*>(&protected_face.face)
+                               : static_cast<void*>(&protected_ops.ops);
+        const nx_result_t result = nx_mapped_storage_acquire(
+            face, NX_MAPPED_STORAGE_CPU_READ, 0, 4,
+            static_cast<nx_mapped_storage_loan_t*>(output));
+        EXPECT_EQ(result, NX_ERROR_INVALID);
+        EXPECT_FALSE(native.mapped);
+        if (result == NX_SUCCESS) {
+            nx_mapped_storage_loan_t retained{};
+            std::memcpy(&retained, output, sizeof(retained));
+            EXPECT_EQ(nx_mapped_storage_release(&port, &retained), NX_SUCCESS);
+        }
+    }
+}
+
+TEST_F(MappedStorage, WriterTicketCannotOverwriteItsInterfaceFace) {
+    struct ProtectedFace {
+        nx_mapped_storage_port_t face;
+        std::array<uint8_t, sizeof(nx_mapped_storage_ticket_t)> tail;
+    } protected_face{port, {}};
+    prepare();
+    const nx_result_t admitted = nx_mapped_storage_submit(
+        &protected_face.face, &request,
+        reinterpret_cast<nx_mapped_storage_ticket_t*>(&protected_face.face));
+    EXPECT_EQ(admitted, NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    EXPECT_FALSE(native.active);
+    if (admitted == NX_SUCCESS) {
+        settle();
+    }
+}
+
 TEST_F(MappedStorage, DeadlineEqualityCancelsBeforeTheNextMutation) {
     now = 9;
     prepare(0, 16, 10);
@@ -348,6 +392,55 @@ TEST_F(MappedStorage, StopClosesAdmissionWithoutRevokingExistingReadLoans) {
     EXPECT_EQ(nx_mapped_storage_stop(&port), NX_SUCCESS);
 }
 
+TEST_F(MappedStorage, ReopenPreservesLoanAndWriterIncarnations) {
+    EXPECT_EQ(nx_mapped_storage_owner_reopen(nullptr), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_mapped_storage_owner_reopen(&owner), NX_ERROR_STATE);
+    nx_mapped_storage_loan_t first{}, second{};
+    ASSERT_EQ(nx_mapped_storage_acquire(&port, NX_MAPPED_STORAGE_CPU_READ, 0, 4,
+                                        &first),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_mapped_storage_stop(&port), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_mapped_storage_owner_reopen(&owner), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_mapped_storage_release(&port, &first), NX_SUCCESS);
+    EXPECT_EQ(nx_mapped_storage_stop(&port), NX_SUCCESS);
+    EXPECT_EQ(nx_mapped_storage_owner_reopen(&owner), NX_SUCCESS);
+    ASSERT_EQ(nx_mapped_storage_acquire(&port, NX_MAPPED_STORAGE_CPU_READ, 0, 4,
+                                        &second),
+              NX_SUCCESS);
+    EXPECT_NE(second.epoch, first.epoch);
+    EXPECT_EQ(nx_mapped_storage_release(&port, &first), NX_ERROR_STATE);
+    ASSERT_EQ(nx_mapped_storage_release(&port, &second), NX_SUCCESS);
+    prepare();
+    ASSERT_EQ(nx_mapped_storage_submit(&port, &request, &ticket), NX_SUCCESS);
+    const auto old_ticket = ticket;
+    EXPECT_EQ(nx_mapped_storage_stop(&port), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_mapped_storage_owner_reopen(&owner), NX_ERROR_BUSY);
+    settle();
+    ASSERT_EQ(nx_mapped_storage_stop(&port), NX_SUCCESS);
+    ASSERT_EQ(nx_mapped_storage_owner_reopen(&owner), NX_SUCCESS);
+    prepare();
+    ASSERT_EQ(nx_mapped_storage_submit(&port, &request, &ticket), NX_SUCCESS);
+    EXPECT_NE(ticket.epoch, old_ticket.epoch);
+    EXPECT_EQ(nx_mapped_storage_cancel(&port, old_ticket), NX_ERROR_STATE);
+    settle();
+}
+
+TEST_F(MappedStorage, ReopenCannotResetExhaustedStorageIdentities) {
+    slots[0].epoch = UINT64_MAX;
+    slots[1].epoch = UINT64_MAX;
+    owner.writer_epoch = UINT64_MAX;
+    ASSERT_EQ(nx_mapped_storage_stop(&port), NX_SUCCESS);
+    ASSERT_EQ(nx_mapped_storage_owner_reopen(&owner), NX_SUCCESS);
+    nx_mapped_storage_loan_t loan{};
+    EXPECT_EQ(nx_mapped_storage_acquire(&port, NX_MAPPED_STORAGE_CPU_READ, 0, 4,
+                                        &loan),
+              NX_ERROR_EXHAUSTED);
+    prepare();
+    EXPECT_EQ(nx_mapped_storage_submit(&port, &request, &ticket),
+              NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(owner.writer_epoch, UINT64_MAX);
+}
+
 TEST_F(MappedStorage, FaultReportsPartialBytesAndNeverReplaysMutation) {
     native.fault_after = 6;
     prepare();
@@ -364,10 +457,12 @@ TEST_F(MappedStorage, FaultReportsPartialBytesAndNeverReplaysMutation) {
 class Backend {
   public:
     std::array<uint8_t, sizeof(nx_mapped_storage_loan_t)> scratch{};
+    bool partial_map = false;
     MOCK_METHOD(nx_result_t, map, ());
     MOCK_METHOD(nx_result_t, unmap, ());
     MOCK_METHOD(nx_result_t, start,
-                (nx_mapped_storage_operation_t, size_t, const void*, size_t));
+                (nx_mapped_storage_operation_t, size_t, const void*, size_t,
+                 nx_time_us_t));
     MOCK_METHOD(nx_result_t, poll, (size_t*));
     MOCK_METHOD(nx_result_t, cancel, ());
     MOCK_METHOD(nx_result_t, drain, ());
@@ -376,12 +471,17 @@ class Backend {
         return {this,
                 sizeof(*this),
                 {bytes, size, 4, 16, 7},
-                [](void* p) { return static_cast<Backend*>(p)->map(); },
+                [](void* p) {
+                    auto* backend = static_cast<Backend*>(p);
+                    const nx_result_t result = backend->map();
+                    return nx_mapped_storage_map_result_t{
+                        result, result == NX_SUCCESS || backend->partial_map};
+                },
                 [](void* p) { return static_cast<Backend*>(p)->unmap(); },
                 [](void* p, nx_mapped_storage_operation_t op, size_t offset,
-                   const void* data, size_t length) {
+                   const void* data, size_t length, nx_time_us_t deadline) {
                     return static_cast<Backend*>(p)->start(op, offset, data,
-                                                           length);
+                                                           length, deadline);
                 },
                 [](void* p, size_t* completed) {
                     return static_cast<Backend*>(p)->poll(completed);
@@ -450,6 +550,83 @@ TEST_F(MappedStorage, FailedUnmapClosesAdmissionBeforeExplicitStop) {
     EXPECT_EQ(nx_mapped_storage_stop(&port), NX_SUCCESS);
 }
 
+TEST_F(MappedStorage, PartialMapFailureRetainsCleanupWithoutPublishingLoan) {
+    testing::StrictMock<Backend> backend;
+    ASSERT_EQ(nx_mapped_storage_owner_init(&owner, slots, 2,
+                                           backend.bind(bytes.data(), 64),
+                                           {clock, &now}),
+              NX_SUCCESS);
+    bool hardware_effects = false;
+    EXPECT_CALL(backend, map()).WillOnce([&hardware_effects, &backend]() {
+        hardware_effects = true;
+        backend.partial_map = true;
+        return NX_ERROR_IO;
+    });
+    EXPECT_CALL(backend, unmap())
+        .WillOnce(Return(NX_ERROR_BUSY))
+        .WillOnce([&hardware_effects]() {
+            hardware_effects = false;
+            return NX_SUCCESS;
+        });
+    nx_mapped_storage_loan_t loan{};
+    loan.epoch = 77;
+    EXPECT_EQ(nx_mapped_storage_acquire(&port, NX_MAPPED_STORAGE_CPU_READ, 0, 4,
+                                        &loan),
+              NX_ERROR_IO);
+    EXPECT_EQ(loan.epoch, 77U);
+    EXPECT_EQ(loan.instance, nullptr);
+    EXPECT_EQ(owner.loans, 0U);
+    EXPECT_FALSE(owner.accepting);
+    EXPECT_EQ(nx_mapped_storage_owner_reopen(&owner), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_mapped_storage_stop(&port), NX_ERROR_BUSY);
+    EXPECT_TRUE(hardware_effects);
+    EXPECT_EQ(nx_mapped_storage_stop(&port), NX_SUCCESS);
+    EXPECT_FALSE(hardware_effects);
+    EXPECT_EQ(nx_mapped_storage_owner_reopen(&owner), NX_SUCCESS);
+}
+
+TEST_F(MappedStorage, EffectFreeMapRejectionDoesNotCloseAdmission) {
+    testing::StrictMock<Backend> backend;
+    ASSERT_EQ(nx_mapped_storage_owner_init(&owner, slots, 2,
+                                           backend.bind(bytes.data(), 64),
+                                           {clock, &now}),
+              NX_SUCCESS);
+    EXPECT_CALL(backend, map())
+        .WillOnce(Return(NX_ERROR_BUSY))
+        .WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(backend, unmap()).WillOnce(Return(NX_SUCCESS));
+    nx_mapped_storage_loan_t loan{};
+    EXPECT_EQ(nx_mapped_storage_acquire(&port, NX_MAPPED_STORAGE_CPU_READ, 0, 4,
+                                        &loan),
+              NX_ERROR_BUSY);
+    EXPECT_TRUE(owner.accepting);
+    EXPECT_EQ(owner.loans, 0U);
+    ASSERT_EQ(nx_mapped_storage_acquire(&port, NX_MAPPED_STORAGE_CPU_READ, 0, 4,
+                                        &loan),
+              NX_SUCCESS);
+    EXPECT_EQ(loan.epoch, 1U);
+    EXPECT_EQ(nx_mapped_storage_release(&port, &loan), NX_SUCCESS);
+}
+
+TEST_F(MappedStorage, BackendReceivesOriginalAbsoluteWriterDeadline) {
+    testing::StrictMock<Backend> backend;
+    ASSERT_EQ(nx_mapped_storage_owner_init(&owner, slots, 2,
+                                           backend.bind(bytes.data(), 64),
+                                           {clock, &now}),
+              NX_SUCCESS);
+    now = 900;
+    prepare(0, 4, 1234);
+    EXPECT_CALL(backend,
+                start(NX_MAPPED_STORAGE_PROGRAM, 0, input.data(), 4, 1234))
+        .WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(backend, cancel()).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(backend, drain()).WillOnce(Return(NX_SUCCESS));
+    ASSERT_EQ(nx_mapped_storage_submit(&port, &request, &ticket), NX_SUCCESS);
+    EXPECT_EQ(nx_mapped_storage_cancel(&port, ticket), NX_SUCCESS);
+    settle();
+    result(NX_ERROR_CANCELLED, 0);
+}
+
 TEST_F(MappedStorage,
        ReleaseRejectsTokensInsideApertureAndPrivateBackendState) {
     for (bool in_aperture : {true, false}) {
@@ -485,8 +662,8 @@ TEST_F(MappedStorage, FailedStartIsAcceptedAndQuarantinedUntilBackendDetaches) {
               NX_SUCCESS);
     {
         InSequence order;
-        EXPECT_CALL(backend,
-                    start(NX_MAPPED_STORAGE_PROGRAM, 0, input.data(), 16))
+        EXPECT_CALL(backend, start(NX_MAPPED_STORAGE_PROGRAM, 0, input.data(),
+                                   16, NX_DEADLINE_NEVER))
             .WillOnce(Return(NX_ERROR_IO));
         EXPECT_CALL(backend, cancel()).WillOnce(Return(NX_SUCCESS));
         EXPECT_CALL(backend, drain()).WillOnce(Return(NX_ERROR_IO));
@@ -508,7 +685,7 @@ TEST_F(MappedStorage, InvalidProgressCancelsAndCannotPublishAnOverflowCount) {
                                            backend.bind(bytes.data(), 64),
                                            {clock, &now}),
               NX_SUCCESS);
-    EXPECT_CALL(backend, start(_, _, _, _)).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(backend, start(_, _, _, _, _)).WillOnce(Return(NX_SUCCESS));
     EXPECT_CALL(backend, poll(_)).WillOnce([](size_t* count) {
         *count = SIZE_MAX;
         return NX_SUCCESS;

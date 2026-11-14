@@ -26,7 +26,7 @@
     "Software reference only; no PCB, electrical measurement or physical qualification",
     "The authored 3.3V supply, power-up readiness and all required WP#/HOLD#/exact suffix RESET# inactive conditions are external assumptions, not observed wiring",
     "W25Q128JV functional profile only; exact package/suffix or fitted Flash is not established",
-    "No DMA, quad/DDR, dual Flash, mapped execution or product persistence region is granted",
+    "Only selected software PIO/page-program DMA is provided; physical DMA behavior, quad/DDR, dual Flash, mapped execution and product persistence are not granted",
     "ES0321 2.4.5 requires every 0x90000000 aperture access to be excluded, including external CPU/IRQ/DMA/debug agents"
   ],
   "provenance": [

@@ -222,6 +222,24 @@ static bool timer_mode_idle(const TIM_TypeDef* timer) {
            timer->CCER == 0U && timer->DCR == 0U;
 }
 
+#if defined(PWR_CR_ODEN) || defined(PWR_CR_ADCDC1)
+/** \brief The selected scale-1/prefetch plan never adopts a foreign mode. */
+static bool power_mode_idle(const PWR_TypeDef* power) {
+    uint32_t mask = 0U;
+#if defined(PWR_CR_ODEN)
+    mask |= PWR_CR_ODEN | PWR_CR_ODSWEN;
+#endif
+#if defined(PWR_CR_ADCDC1)
+    /* RM0383/0390/0386 permit ADCDC1 only with Flash prefetch disabled. */
+    mask |= PWR_CR_ADCDC1;
+#endif
+#if defined(PWR_CR_FISSR)
+    mask |= PWR_CR_FISSR | PWR_CR_FMSSR;
+#endif
+    return (power->CR & mask) == 0U;
+}
+#endif
+
 /** \brief Check cold ownership before any global clock or Flash change. */
 static nx_result_t preflight_hardware(const nx_stm32_system_t* system) {
     if (system == NULL || system->rcc == NULL || system->flash == NULL ||
@@ -233,6 +251,14 @@ static nx_result_t preflight_hardware(const nx_stm32_system_t* system) {
         NX_STM32_BOOT_VTOR != NX_STM32_BOOT_VECTOR ||
         (NX_STM32_BOOT_VECTOR & 511U) != 0U)
         return NX_ERROR_STATE;
+#if defined(NEXUS_CLOCK_SDIO_HS375) && NEXUS_CLOCK_SDIO_HS375
+    /* The closed 75 MHz PLLQ profile cannot retarget a foreign 48 MHz owner. */
+    if ((system->rcc->AHB2ENR & (RCC_AHB2ENR_OTGFSEN | RCC_AHB2ENR_RNGEN)) !=
+            0U ||
+        (system->rcc->AHB1ENR &
+         (RCC_AHB1ENR_OTGHSEN | RCC_AHB1ENR_OTGHSULPIEN)) != 0U)
+        return NX_ERROR_BUSY;
+#endif
 #if NEXUS_CLOCK_PLLSAI_ENABLED
     if (!aux_consumers_quiet(system->rcc) ||
         !nx_stm32_aux_clock_outputs_valid(system->rcc))
@@ -247,6 +273,11 @@ static nx_result_t preflight_hardware(const nx_stm32_system_t* system) {
 #endif
 #if defined(RCC_DCKCFGR_TIMPRE)
     if ((system->rcc->DCKCFGR & RCC_DCKCFGR_TIMPRE) != 0U)
+        return NX_ERROR_BUSY;
+#endif
+#if defined(PWR_CR_ODEN) || defined(PWR_CR_ADCDC1)
+    if ((system->rcc->APB1ENR & RCC_APB1ENR_PWREN) != 0U &&
+        !power_mode_idle(system->power))
         return NX_ERROR_BUSY;
 #endif
     uint32_t bus_mask = (uint32_t)(RCC_CFGR_SW | RCC_CFGR_SWS | RCC_CFGR_HPRE |
@@ -508,6 +539,15 @@ static nx_stm32_start_result_t start_owned(nx_stm32_system_t* system,
         result.primary = -6;
         goto rollback;
     }
+#if defined(PWR_CR_ODEN) || defined(PWR_CR_ADCDC1)
+    /* A previously gated PWR block cannot prove absence of a foreign mode.
+     * No selected clock plan adopts or clears foreign overdrive/ADC DC modes.
+     */
+    if (!power_mode_idle(system->power)) {
+        result.primary = -6;
+        goto rollback;
+    }
+#endif
     system->saved_power = system->power->CR & PWR_CR_VOS;
     system->power_snapshotted = true;
     if (!write_checked(&system->power->CR, system->power->CR | PWR_CR_VOS,
@@ -550,6 +590,15 @@ static nx_stm32_start_result_t start_owned(nx_stm32_system_t* system,
         result.primary = -4;
         goto rollback;
     }
+#if defined(PWR_CR_VOS_1)
+    /* RM0383/0390/0386: the two-bit voltage scale becomes active only after
+     * PLLON. PLLRDY alone does not authorize the faster system-clock switch. */
+    if (!wait_bits(system, &system->power->CSR, PWR_CSR_VOSRDY, PWR_CSR_VOSRDY,
+                   poll_limit)) {
+        result.primary = -8;
+        goto rollback;
+    }
+#endif
 #endif
     NX_STM32_WRITE(&system->rcc->CFGR,
                    (system->rcc->CFGR & ~(uint32_t)RCC_CFGR_SW) |

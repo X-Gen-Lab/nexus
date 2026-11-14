@@ -11,6 +11,7 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "dispatch_checks.h"
 #include "nexus/arch/arch.h"
 #include "nexus/io/spi_transaction.h"
 #include "provider.h"
@@ -22,6 +23,36 @@ const nx_spi_port_t* const nx_native_spi_port = &g_nx_native_spi_port;
 const nx_spi_endpoint_t g_nx_native_spi = {&nx_native_spi_endpoint_ops,
                                            &s_endpoint};
 const nx_spi_endpoint_t* const nx_native_spi = &g_nx_native_spi;
+
+/** \brief A modeled transfer cannot borrow the controller's own bookkeeping. */
+static bool polling_storage(const nx_native_spi_endpoint_state_t* endpoint,
+                            const void* pointer, size_t bytes) {
+    return nx_io_dispatch_span(pointer, bytes, 1U) &&
+           !nx_io_dispatch_overlap(pointer, bytes, endpoint,
+                                   sizeof(*endpoint)) &&
+           !nx_io_dispatch_overlap(pointer, bytes, endpoint->port,
+                                   sizeof(*endpoint->port)) &&
+           (endpoint->registers == NULL ||
+            !nx_io_dispatch_overlap(pointer, bytes, endpoint->registers,
+                                    endpoint->register_count));
+}
+
+/** \brief Preserve output and immutable TX before any model-side effects. */
+static bool polling_buffers(const nx_native_spi_endpoint_state_t* endpoint,
+                            const uint8_t* tx, uint8_t* rx, size_t length,
+                            const size_t* transferred) {
+    if ((uintptr_t)transferred % _Alignof(size_t) != 0U ||
+        !polling_storage(endpoint, transferred, sizeof(*transferred)) ||
+        (tx != NULL && (!polling_storage(endpoint, tx, length) ||
+                        nx_io_dispatch_overlap(
+                            transferred, sizeof(*transferred), tx, length))) ||
+        (rx != NULL && (!polling_storage(endpoint, rx, length) ||
+                        nx_io_dispatch_overlap(
+                            transferred, sizeof(*transferred), rx, length))))
+        return false;
+    return tx == NULL || rx == NULL || tx == rx ||
+           !nx_io_dispatch_overlap(tx, length, rx, length);
+}
 
 /** \brief Prepare independent arbitration state without selecting a device. */
 nx_result_t nx_native_spi_port_configure_instance(nx_native_spi_state_t* port) {
@@ -132,7 +163,8 @@ static nx_result_t native_spi_transfer(void* context, const uint8_t* tx,
         length == 0 || (tx == NULL && rx == NULL)) {
         return NX_ERROR_INVALID;
     }
-    *transferred = 0;
+    if (!polling_buffers(endpoint, tx, rx, length, transferred))
+        return NX_ERROR_INVALID;
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
@@ -146,6 +178,7 @@ static nx_result_t native_spi_transfer(void* context, const uint8_t* tx,
     if (nx_deadline_expired(deadline, nx_time_now_us())) {
         return NX_ERROR_TIMEOUT;
     }
+    *transferred = 0U;
     port->active = true;
     endpoint->cs = true;
     nx_result_t result = NX_SUCCESS;
@@ -286,6 +319,20 @@ static nx_result_t native_spi_transaction(void* context,
     if (endpoint == NULL || endpoint->port == NULL) {
         return NX_ERROR_INVALID;
     }
+    if (segments == NULL || count == 0U || count > NX_SPI_MAX_SEGMENTS ||
+        (word_bits != 8U && word_bits != 16U) ||
+        (uintptr_t)transferred % _Alignof(size_t) != 0U ||
+        !polling_storage(endpoint, segments, count * sizeof(*segments)) ||
+        !polling_storage(endpoint, transferred, sizeof(*transferred)))
+        return NX_ERROR_INVALID;
+    for (size_t i = 0U; i < count; ++i) {
+        size_t bytes = segments[i].words * (word_bits / 8U);
+        if ((segments[i].tx != NULL &&
+             !polling_storage(endpoint, segments[i].tx, bytes)) ||
+            (segments[i].rx != NULL &&
+             !polling_storage(endpoint, segments[i].rx, bytes)))
+            return NX_ERROR_INVALID;
+    }
     nx_native_spi_state_t* port = endpoint->port;
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
@@ -302,6 +349,7 @@ static nx_result_t native_spi_transaction(void* context,
     if (nx_deadline_expired(deadline, nx_time_now_us())) {
         return NX_ERROR_TIMEOUT;
     }
+    *transferred = 0U;
     port->active = true;
     endpoint->cs = true;
     nx_result_t result = NX_SUCCESS;

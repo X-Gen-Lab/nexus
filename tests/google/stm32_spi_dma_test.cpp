@@ -18,6 +18,7 @@ nx_stm32_system_t g_nx_stm32_system;
 GPIO_TypeDef g_nx_stm32_gpioa_model;
 }
 #include "nexus/io/native/model.h"
+#include <cstring>
 #include <gtest/gtest.h>
 
 static bool s_hold_dma_enable;
@@ -110,6 +111,35 @@ TEST_F(Stm32SpiDma, HardwareBitOrderDoesNotReverseMemoryOrChangeDmaWidth) {
         ASSERT_EQ(NX_SUCCESS, nx_spi_request_prepare(&request, source,
                                                      destination, 4U, 1000U));
     }
+}
+
+TEST_F(Stm32SpiDma, PollingProgressCannotOverwriteTheDmaOwnerExtension) {
+    spi.SR = SPI_SR_TXE | SPI_SR_RXNE;
+    state.drain_deadline = 77U;
+    const auto before = state;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_spi_endpoint_transfer(
+                  &endpoint, source, nullptr, 1U, 1000U,
+                  reinterpret_cast<size_t*>(&state.drain_deadline)));
+    EXPECT_EQ(0, std::memcmp(&before, &state, sizeof(state)));
+    EXPECT_EQ(0U, spi.CR1);
+    EXPECT_EQ(0U, gpio.BSRR);
+}
+
+TEST_F(Stm32SpiDma, PollingReceiveCannotOverwriteTheDmaOwnerExtension) {
+    spi.SR = SPI_SR_TXE | SPI_SR_RXNE;
+    state.drain_deadline = 77U;
+    const auto before = state;
+    size_t count = 99U;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_spi_endpoint_transfer(
+                  &endpoint, source,
+                  reinterpret_cast<uint8_t*>(&state.drain_deadline), 1U, 1000U,
+                  &count));
+    EXPECT_EQ(0, std::memcmp(&before, &state, sizeof(state)));
+    EXPECT_EQ(99U, count);
+    EXPECT_EQ(0U, spi.CR1);
+    EXPECT_EQ(0U, gpio.BSRR);
 }
 
 TEST_F(Stm32SpiDma, RefusedAssertIsAcceptedWithoutStartingEitherEngine) {

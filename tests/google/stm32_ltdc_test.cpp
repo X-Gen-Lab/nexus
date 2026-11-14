@@ -6,7 +6,11 @@
  * \date            2026-11-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "../contracts/stm32f4_graphics/sustained_sequence.h"
 #include "stm32_ltdc_model.h"
+#pragma weak nx_graphics_reference_initialize
+#pragma weak nx_graphics_reference_step
+#pragma weak nx_graphics_reference_stop
 extern "C" {
 #include "stm32f407_system.h"
 #include "stm32f4_graphics_memory.h"
@@ -198,6 +202,172 @@ class LtdcOwner : public testing::Test {
         return result;
     }
 };
+
+/** \brief Only the external image port is controlled; LTDC/HAL stays real. */
+class GraphicsSequence : public LtdcOwner {
+  protected:
+    struct ImageLeaf {
+        nx_graphics_reference_t* sequence = nullptr;
+        nx_image_request_t* active = nullptr;
+        nx_result_t result = NX_SUCCESS;
+        unsigned submitted = 0U;
+        bool complete = false;
+        bool stopped = false;
+    } leaf;
+    nx_graphics_reference_t sequence{};
+    nx_image_port_t image{&image_ops, &leaf};
+    nx_image_destination_t destinations[2]{};
+    static nx_result_t Query(void*, nx_image_kind_t, nx_image_format_t,
+                             nx_image_format_t, nx_image_format_t,
+                             nx_image_constraints_t* out) {
+        *out = {4U, 4U, 8191U, 65535U, 16383U};
+        return NX_SUCCESS;
+    }
+    static nx_result_t Submit(void* context, nx_image_request_t* request) {
+        auto* l = static_cast<ImageLeaf*>(context);
+        if (l->active != nullptr || l->stopped)
+            return NX_ERROR_STATE;
+        for (unsigned i = 0U; i < 2U; ++i) {
+            nx_request_state_t state =
+                nx_request_state(&l->sequence->scanout[i].base);
+            if (state != NX_REQUEST_READY && state != NX_REQUEST_SETTLED &&
+                request->operation.destination.data ==
+                    l->sequence->scanout[i].operation.frame.data) {
+                ADD_FAILURE() << "Image write overlaps a still-borrowed frame";
+                return NX_ERROR_PERMISSION;
+            }
+        }
+        nx_result_t result =
+            nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+        if (result == NX_SUCCESS) {
+            l->active = request;
+            ++l->submitted;
+        }
+        return result;
+    }
+    static nx_result_t Service(void* context) {
+        auto* l = static_cast<ImageLeaf*>(context);
+        if (l->active == nullptr)
+            return NX_SUCCESS;
+        if (!l->complete)
+            return NX_ERROR_BUSY;
+        nx_image_request_t* request = l->active;
+        l->active = nullptr;
+        l->complete = false;
+        size_t bytes =
+            l->result == NX_SUCCESS
+                ? request->operation.width * request->operation.height * 2U
+                : 0U;
+        nx_request_settle(&request->base, l->result, bytes);
+        return l->result;
+    }
+    static nx_result_t Stop(void* context) {
+        auto* l = static_cast<ImageLeaf*>(context);
+        l->stopped = true;
+        if (l->active != nullptr) {
+            nx_image_request_t* request = l->active;
+            l->active = nullptr;
+            nx_request_settle(&request->base, NX_ERROR_CANCELLED, 0U);
+        }
+        return NX_SUCCESS;
+    }
+    static const nx_image_ops_t image_ops;
+    void Connect() {
+        ASSERT_NE(nullptr, &nx_graphics_reference_initialize);
+        config.graphics_memory = &graphics_binding;
+        ASSERT_NO_FATAL_FAILURE(open());
+        destinations[0] = {memory, 256U, 16U, NX_IMAGE_RGB565};
+        destinations[1] = {memory + 4096U, 256U, 16U, NX_IMAGE_RGB565};
+        leaf.sequence = &sequence;
+        ASSERT_EQ(NX_SUCCESS, nx_graphics_reference_initialize(
+                                  &sequence, &image, &port, destinations, 4U));
+    }
+    void FirstVisible() {
+        ASSERT_NO_FATAL_FAILURE(Connect());
+        ASSERT_TRUE(sequence.initialized);
+        EXPECT_EQ(NX_ERROR_BUSY, nx_graphics_reference_step(&sequence, 1000U));
+        EXPECT_EQ(0U, sequence.presented);
+        leaf.complete = true;
+        EXPECT_EQ(NX_ERROR_BUSY, nx_graphics_reference_step(&sequence, 1000U));
+        vblank();
+        irq();
+        EXPECT_EQ(NX_ERROR_BUSY, nx_graphics_reference_step(&sequence, 1000U));
+        EXPECT_TRUE(sequence.display_loan[0]);
+    }
+    nx_result_t Join() {
+        nx_result_t result = nx_graphics_reference_stop(&sequence);
+        if (result != NX_SUCCESS) {
+            vblank();
+            irq();
+            result = nx_graphics_reference_stop(&sequence);
+        }
+        return result;
+    }
+};
+const nx_image_ops_t GraphicsSequence::image_ops = {Query,   Submit, Service,
+                                                    nullptr, Stop,   nullptr};
+TEST_F(GraphicsSequence, TwoBuffersWaitForActualRetirementAndRestartCleanly) {
+    ASSERT_NO_FATAL_FAILURE(FirstVisible());
+    ASSERT_EQ(2U, leaf.submitted);
+    leaf.complete = true;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_graphics_reference_step(&sequence, 1000U));
+    EXPECT_TRUE(sequence.display_loan[0]);
+    EXPECT_TRUE(sequence.display_loan[1]);
+    EXPECT_EQ(2U, leaf.submitted);
+    EXPECT_EQ(1U, model.graphics_attaches);
+    EXPECT_EQ(0U, model.graphics_detaches);
+    vblank(false);
+    irq();
+    EXPECT_EQ(NX_ERROR_BUSY, nx_graphics_reference_step(&sequence, 1000U));
+    EXPECT_EQ(2U, leaf.submitted);
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&sequence.scanout[0].base));
+    model.registers.CDSR = LTDC_CDSR_VSYNCS;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_graphics_reference_step(&sequence, 1000U));
+    EXPECT_EQ(3U, leaf.submitted);
+    ASSERT_NE(nullptr, leaf.active);
+    EXPECT_EQ(destinations[0].data, leaf.active->operation.destination.data);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&sequence.scanout[0].base));
+    EXPECT_EQ(0U, model.graphics_detaches);
+    ASSERT_EQ(NX_SUCCESS, Join());
+    EXPECT_TRUE(sequence.stopped);
+    EXPECT_EQ(1U, model.graphics_detaches);
+    leaf.stopped = false;
+    ASSERT_NO_FATAL_FAILURE(open());
+    ASSERT_EQ(NX_SUCCESS, nx_graphics_reference_initialize(
+                              &sequence, &image, &port, destinations, 2U));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_graphics_reference_step(&sequence, 1000U));
+    EXPECT_NE(nullptr, leaf.active);
+    EXPECT_EQ(NX_SUCCESS, Join());
+}
+TEST_F(GraphicsSequence, FailedImageNeverBecomesAPendingDisplayFrame) {
+    ASSERT_NO_FATAL_FAILURE(FirstVisible());
+    ASSERT_EQ(2U, leaf.submitted);
+    leaf.result = NX_ERROR_IO;
+    leaf.complete = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_graphics_reference_step(&sequence, 1000U));
+    EXPECT_EQ(NX_ERROR_IO, sequence.first_failure);
+    EXPECT_EQ(1U, sequence.presented);
+    EXPECT_TRUE(sequence.display_loan[0]);
+    EXPECT_FALSE(sequence.display_loan[1]);
+    EXPECT_EQ(NX_SUCCESS, Join());
+    EXPECT_EQ(NX_ERROR_IO, sequence.first_failure);
+}
+TEST_F(GraphicsSequence, UnderrunAndFailedRetirementKeepBothFrameRights) {
+    ASSERT_NO_FATAL_FAILURE(FirstVisible());
+    leaf.complete = true;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_graphics_reference_step(&sequence, 1000U));
+    model.registers.ISR |= LTDC_ISR_FUIF;
+    irq();
+    EXPECT_NE(NX_SUCCESS, nx_graphics_reference_step(&sequence, 1000U));
+    EXPECT_NE(NX_SUCCESS, nx_graphics_reference_stop(&sequence));
+    EXPECT_TRUE(sequence.display_loan[0]);
+    EXPECT_TRUE(sequence.display_loan[1]);
+    EXPECT_FALSE(sequence.stopped);
+    EXPECT_EQ(2U, leaf.submitted);
+    EXPECT_EQ(0U, model.graphics_detaches);
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&sequence.scanout[0].base));
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&sequence.scanout[1].base));
+}
 
 TEST_F(LtdcOwner, PlatformAdmissionRunsBeforeSystemOrGPIOPowerWithoutEffects) {
     system->started = false;

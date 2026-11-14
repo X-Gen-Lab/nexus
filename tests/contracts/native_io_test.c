@@ -278,9 +278,10 @@ static bool spi_transaction(void) {
                                    &transferred) == NX_ERROR_IO);
     CHECK(transferred == 2 && !nx_native_spi_cs_active());
     nx_native_spi_fault(SIZE_MAX, true);
+    transferred = 77;
     CHECK(nx_spi_endpoint_transfer(nx_native_spi, tx, rx, 4, 100,
                                    &transferred) == NX_ERROR_BUSY);
-    CHECK(transferred == 0 && !nx_native_spi_cs_active());
+    CHECK(transferred == 77 && !nx_native_spi_cs_active());
     nx_native_spi_fault(SIZE_MAX, false);
     nx_time_us_t deadline = nx_time_now_us() + 2;
     CHECK(nx_spi_endpoint_transfer(nx_native_spi, tx, rx, 4, deadline,
