@@ -12,6 +12,24 @@
 #include "stm32f4xx_ll_sdmmc.h"
 #include <string.h>
 
+#ifndef NEXUS_CLOCK_SDIO_HS375
+#define NEXUS_CLOCK_SDIO_HS375 0U
+#endif
+#ifndef NEXUS_STM32_SDIO_SD_HS
+#define NEXUS_STM32_SDIO_SD_HS 0U
+#endif
+#ifndef NEXUS_STM32_SDIO_MMC_HS
+#define NEXUS_STM32_SDIO_MMC_HS 0U
+#endif
+#if NEXUS_CLOCK_SDIO_HS375 &&                                                  \
+    (!defined(STM32F407xx) || NEXUS_CORE_HZ != 150000000U ||                   \
+     NEXUS_APB2_HZ != 75000000U || NEXUS_PLL48_HZ != 75000000U ||              \
+     NEXUS_CLOCK_PLLM != 8U || NEXUS_CLOCK_PLLN != 300U ||                     \
+     NEXUS_CLOCK_PLLP != 2U || NEXUS_CLOCK_PLLQ != 4U ||                       \
+     !NEXUS_CLOCK_SOURCE_HSE || NEXUS_CLOCK_INPUT_HZ != 8000000U)
+#error "SDIO 37.5 MHz requires its exact F407 HSE8 PLL75 software profile"
+#endif
+
 #ifndef NX_SDIO_READ
 #define NX_SDIO_READ(reg) (reg)
 #endif
@@ -54,6 +72,12 @@ static bool valid_config(const nx_stm32_sdio_config_t* config) {
         (config->bus_width != 1U && config->bus_width != 4U &&
          config->bus_width != 8U) ||
         (config->bus_width == 8U && config->protocol != NX_STM32_SDIO_MMC) ||
+        config->high_speed != (NEXUS_CLOCK_SDIO_HS375 != 0U) ||
+        (config->high_speed &&
+         (config->bus_width != 4U ||
+          (config->protocol == NX_STM32_SDIO_SD_MEMORY ? !NEXUS_STM32_SDIO_SD_HS
+           : config->protocol == NX_STM32_SDIO_MMC ? !NEXUS_STM32_SDIO_MMC_HS
+                                                   : true))) ||
         config->max_blocks == 0U || config->max_blocks > 32U ||
         config->poll_budget == 0U || config->poll_budget > 1000000U ||
         config->stop_timeout_us == 0U ||
@@ -105,8 +129,8 @@ static bool valid_config(const nx_stm32_sdio_config_t* config) {
 static uint32_t clock_divider(uint8_t width, uint32_t minimum_divisor) {
     const uint64_t kernel = NEXUS_PLL48_HZ;
     const uint64_t peripheral = NEXUS_APB2_HZ;
-    if (kernel != 48000000U || peripheral == 0U ||
-        (width != 1U && width != 4U && width != 8U))
+    if (kernel != (NEXUS_CLOCK_SDIO_HS375 ? 75000000U : 48000000U) ||
+        peripheral == 0U || (width != 1U && width != 4U && width != 8U))
         return UINT32_MAX;
     /* RM0090 31.2: 8*PCLK2*q >= 3*SDIOCLK. ES0182 2.4.6 adds the
      * strict 32*PCLK2*q > 3*width*(SDIOCLK+PCLK2), q=CLKDIV+2. */
@@ -114,7 +138,8 @@ static uint32_t clock_divider(uint8_t width, uint32_t minimum_divisor) {
         (3U * kernel + 8U * peripheral - 1U) / (8U * peripheral);
     uint64_t fifo_minimum =
         UINT64_C(3) * width * (kernel + peripheral) / (32U * peripheral) + 1U;
-    uint64_t divisor = minimum_divisor < 4U ? 4U : minimum_divisor;
+    uint64_t floor = NEXUS_CLOCK_SDIO_HS375 ? 2U : 4U;
+    uint64_t divisor = minimum_divisor < floor ? floor : minimum_divisor;
     if (divisor < bus_minimum)
         divisor = bus_minimum;
     if (divisor < fifo_minimum)
@@ -126,8 +151,16 @@ static uint32_t clock_divider(uint8_t width, uint32_t minimum_divisor) {
 }
 
 static bool live_clock(uint8_t width) {
-    return clock_divider(width, 4U) != UINT32_MAX &&
-           clock_divider(1U, 122U) != UINT32_MAX &&
+#if NEXUS_CLOCK_SDIO_HS375
+    if ((NX_SDIO_READ(RCC->AHB2ENR) &
+         (RCC_AHB2ENR_OTGFSEN | RCC_AHB2ENR_RNGEN)) != 0U ||
+        (NX_SDIO_READ(RCC->AHB1ENR) &
+         (RCC_AHB1ENR_OTGHSEN | RCC_AHB1ENR_OTGHSULPIEN)) != 0U)
+        return false;
+#endif
+    return clock_divider(width, NEXUS_CLOCK_SDIO_HS375 ? 2U : 4U) !=
+               UINT32_MAX &&
+           clock_divider(1U, NEXUS_PLL48_HZ / 400000U + 1U) != UINT32_MAX &&
            nx_stm32_clock_profile_matches(RCC, NULL);
 }
 
@@ -238,7 +271,9 @@ static nx_result_t command(uint32_t index, uint32_t argument,
      * responses retain the exact session effect; they never revoke it. */
     if (effect_owner != NULL) {
         effect_owner->transfer_pending = true;
-        if (index == 24U || index == 25U)
+        if (index == 24U || index == 25U ||
+            (index == 6U &&
+             effect_owner->config->protocol == NX_STM32_SDIO_MMC))
             effect_owner->programming_pending = true;
     }
     if (SDIO_SendCommand(SDIO, &selected) != HAL_OK)
@@ -551,7 +586,7 @@ static nx_result_t configured_clock(const nx_stm32_sdio_state_t* state,
                    : width == SDIO_BUS_WIDE_8B ? 8U
                                                : 0U;
     if (divider > 254U || (divider & 1U) != 0U ||
-        divider < clock_divider(bits, 4U))
+        divider < clock_divider(bits, NEXUS_CLOCK_SDIO_HS375 ? 2U : 4U))
         return NX_ERROR_UNSUPPORTED;
     if (!host_idle() ||
         (NX_SDIO_READ(SDIO->DCTRL) & (SDIO_DCTRL_DTEN | SDIO_DCTRL_DMAEN)) !=
@@ -694,6 +729,89 @@ static nx_result_t io_shutdown(nx_stm32_sdio_state_t* state,
     return result;
 }
 
+#if NEXUS_CLOCK_SDIO_HS375
+/** \brief One protocol payload shares the existing host, budget and CRC drain.
+ */
+static nx_result_t speed_data(nx_stm32_sdio_state_t* state, uint32_t index,
+                              uint32_t argument, void* bytes, uint32_t count,
+                              sdio_poll_t* poll) {
+    nx_result_t result = data_configure(state, count, true, poll, false, false);
+    if (result == NX_SUCCESS)
+        result = command(index, argument, RESPONSE_R1, poll, NULL, state);
+    if (result == NX_SUCCESS)
+        result = fifo_transfer(bytes, count, true, poll, NULL);
+    return result;
+}
+#if NEXUS_STM32_SDIO_SD_HS
+/** \brief SD changes its function within eight old-clock cycles after data. */
+static nx_result_t sd_switch_settled(sdio_poll_t* poll) {
+    uint64_t divisor = (NX_SDIO_READ(SDIO->CLKCR) & SDIO_CLKCR_CLKDIV) + 2U;
+    uint64_t ticks =
+        (8U * divisor * 1000000U + NEXUS_PLL48_HZ - 1U) / NEXUS_PLL48_HZ + 1U;
+    nx_result_t result = poll_next(poll);
+    nx_time_us_t settled;
+    if (result == NX_SUCCESS)
+        result = nx_deadline_finite_after(poll->observed, ticks, &settled);
+    if (result != NX_SUCCESS)
+        return result;
+    do {
+        result = poll_next(poll);
+        if (result != NX_SUCCESS)
+            return result;
+    } while (poll->observed < settled);
+    return NX_SUCCESS;
+}
+/** \brief Explicit SD High Speed is admitted only by a complete CMD6 status. */
+static nx_result_t sd_high_speed(nx_stm32_sdio_state_t* state,
+                                 sdio_poll_t* poll) {
+    uint32_t words[16];
+    const uint8_t* bytes = (const uint8_t*)words;
+    nx_result_t result;
+    for (;;) {
+        result = speed_data(state, 6U, UINT32_C(0x00fffff1), words, 64U, poll);
+        if (result != NX_SUCCESS)
+            return result;
+        if ((bytes[13] & 2U) == 0U || bytes[17] > 1U)
+            return NX_ERROR_UNSUPPORTED;
+        if (bytes[17] == 0U || (bytes[29] & 2U) == 0U)
+            break;
+    }
+    result = speed_data(state, 6U, UINT32_C(0x80fffff1), words, 64U, poll);
+    if (result != NX_SUCCESS)
+        return result;
+    if ((bytes[16] & 15U) != 1U)
+        return NX_ERROR_UNSUPPORTED;
+    result = sd_switch_settled(poll);
+    return result == NX_SUCCESS ? card_ready(state, poll, false) : result;
+}
+#endif
+#if NEXUS_STM32_SDIO_MMC_HS
+/** \brief Only explicitly reported 52-MHz SDR capability admits 37.5 MHz. */
+static nx_result_t mmc_high_speed(nx_stm32_sdio_state_t* state,
+                                  uint32_t extended[128], sdio_poll_t* poll) {
+    const uint8_t* bytes = (const uint8_t*)extended;
+    if (bytes[192] < 2U || bytes[192] > 8U || (bytes[196] & 2U) == 0U ||
+        bytes[185] != 0U)
+        return NX_ERROR_UNSUPPORTED;
+    const uint8_t revision = bytes[192];
+    uint32_t status = 0U;
+    nx_result_t result =
+        command(6U, UINT32_C(0x03b90100), RESPONSE_R1, poll, &status, state);
+    if (result == NX_SUCCESS && (status & MMC_SWITCH_ERROR) != 0U)
+        result = NX_ERROR_IO;
+    if (result == NX_SUCCESS)
+        result = card_ready(state, poll, false);
+    if (result == NX_SUCCESS)
+        result = speed_data(state, 8U, 0U, extended, 512U, poll);
+    if (result != NX_SUCCESS)
+        return result;
+    if (bytes[185] != 1U || bytes[192] != revision || (bytes[196] & 2U) == 0U)
+        return NX_ERROR_IO;
+    return card_ready(state, poll, false);
+}
+#endif
+#endif
+
 static nx_result_t initialize_mmc(nx_stm32_sdio_state_t* state,
                                   sdio_poll_t* poll) {
     uint32_t ocr = 0U;
@@ -727,7 +845,8 @@ static nx_result_t initialize_mmc(nx_stm32_sdio_state_t* state,
     response_bytes(csd);
     /* MMC v4 introduces the extended bus-width field. Reserved CSD version
      * values are not permission to send an unsupported SWITCH command. */
-    if (state->config->bus_width == 8U && ((csd[0] >> 2U) & 15U) != 4U)
+    if ((state->config->bus_width == 8U || state->config->high_speed) &&
+        ((csd[0] >> 2U) & 15U) != 4U)
         return NX_ERROR_UNSUPPORTED;
     if (!state->high_capacity) {
         result = decode_csd(state);
@@ -740,7 +859,7 @@ static nx_result_t initialize_mmc(nx_stm32_sdio_state_t* state,
         result = card_ready(state, poll, false);
     if (result != NX_SUCCESS)
         return result;
-    if (state->high_capacity) {
+    if (state->high_capacity || state->config->high_speed) {
         /* EXT_CSD is one fixed 512-byte transfer in the identification bus
          * width. No heap, hidden DMA bounce buffer or stale geometry cache. */
         uint32_t extended[128];
@@ -755,16 +874,25 @@ static nx_result_t initialize_mmc(nx_stm32_sdio_state_t* state,
         uint32_t sectors = (uint32_t)bytes[212] | ((uint32_t)bytes[213] << 8U) |
                            ((uint32_t)bytes[214] << 16U) |
                            ((uint32_t)bytes[215] << 24U);
-        if (bytes[192] < 2U || sectors == 0U)
+        if (bytes[192] < 2U || (state->high_capacity && sectors == 0U))
             return NX_ERROR_UNSUPPORTED;
-        state->geometry = (nx_block_geometry_t){
-            .block_count = sectors,
-            .block_bytes = 512U,
-            .buffer_alignment =
-                state->config->engine == NX_STM32_SDIO_DMA ? 16U : 4U,
-            .writable = (csd[14] & 48U) == 0U,
-        };
-    } else {
+#if NEXUS_STM32_SDIO_MMC_HS
+        if (state->config->high_speed) {
+            result = mmc_high_speed(state, extended, poll);
+            if (result != NX_SUCCESS)
+                return result;
+        }
+#endif
+        if (state->high_capacity)
+            state->geometry = (nx_block_geometry_t){
+                .block_count = sectors,
+                .block_bytes = 512U,
+                .buffer_alignment =
+                    state->config->engine == NX_STM32_SDIO_DMA ? 16U : 4U,
+                .writable = (csd[14] & 48U) == 0U,
+            };
+    }
+    if (!state->high_capacity) {
         result = command(16U, 512U, RESPONSE_R1, poll, NULL, NULL);
         if (result != NX_SUCCESS)
             return result;
@@ -781,7 +909,9 @@ static nx_result_t initialize_mmc(nx_stm32_sdio_state_t* state,
         if (result != NX_SUCCESS)
             return result;
     }
-    return configured_clock(state, clock_divider(state->config->bus_width, 4U),
+    return configured_clock(state,
+                            clock_divider(state->config->bus_width,
+                                          state->config->high_speed ? 2U : 4U),
                             state->config->bus_width == 8U   ? SDIO_BUS_WIDE_8B
                             : state->config->bus_width == 4U ? SDIO_BUS_WIDE_4B
                                                              : SDIO_BUS_WIDE_1B,
@@ -797,8 +927,9 @@ static nx_result_t initialize_card(nx_stm32_sdio_state_t* state,
     if (SDIO_PowerState_ON(SDIO) != HAL_OK ||
         NX_SDIO_READ(SDIO->POWER) != SDIO_POWER_PWRCTRL)
         return NX_ERROR_IO;
-    result = configured_clock(state, clock_divider(1U, 122U), SDIO_BUS_WIDE_1B,
-                              poll);
+    result = configured_clock(state,
+                              clock_divider(1U, NEXUS_PLL48_HZ / 400000U + 1U),
+                              SDIO_BUS_WIDE_1B, poll);
     if (result != NX_SUCCESS)
         return result;
     /* At 400 kHz this exceeds 74 clocks and the power-on settling interval.
@@ -859,6 +990,12 @@ static nx_result_t initialize_card(nx_stm32_sdio_state_t* state,
         result = decode_csd(state);
     if (result != NX_SUCCESS)
         return result;
+#if NEXUS_STM32_SDIO_SD_HS
+    uint8_t csd[16];
+    response_bytes(csd);
+    if ((csd[4] & 64U) == 0U)
+        return NX_ERROR_UNSUPPORTED;
+#endif
     /* Selection may have reached the card even if the response is lost. */
     state->selected = true;
     result =
@@ -884,11 +1021,21 @@ static nx_result_t initialize_card(nx_stm32_sdio_state_t* state,
             return result;
         if ((((uint8_t*)scr)[1] & 4U) == 0U)
             return NX_ERROR_UNSUPPORTED;
+#if NEXUS_STM32_SDIO_SD_HS
+        uint8_t spec = ((const uint8_t*)scr)[0] & 15U;
+        if (spec != 1U && spec != 2U)
+            return NX_ERROR_UNSUPPORTED;
+        result = sd_high_speed(state, poll);
+        if (result != NX_SUCCESS)
+            return result;
+#endif
         result = app_command(state, 6U, 2U, RESPONSE_R1, poll, NULL);
         if (result != NX_SUCCESS)
             return result;
     }
-    return configured_clock(state, clock_divider(state->config->bus_width, 4U),
+    return configured_clock(state,
+                            clock_divider(state->config->bus_width,
+                                          state->config->high_speed ? 2U : 4U),
                             state->config->bus_width == 4U ? SDIO_BUS_WIDE_4B
                                                            : SDIO_BUS_WIDE_1B,
                             poll);

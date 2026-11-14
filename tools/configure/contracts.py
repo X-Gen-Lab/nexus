@@ -6,7 +6,7 @@ from types import MappingProxyType
 COMPONENTS = frozenset({
     "owner-observer", "bus-owner", "spi-owner", "spi-async-owner", "spi-dma-owner",
     "uart-owner", "bmp280", "bmp280-spi", "log", "storage",
-    "flash-storage", "modbus-rtu", "settings",
+    "flash-storage", "modbus-rtu", "settings", "smbus",
     "network", "network-loaned-rx", "tls", "mqtt", "mcuboot",
     "st-usb-host", "st-usb-device",
 })
@@ -23,8 +23,9 @@ class ControllerContract:
 # Declaration order preserves factory enumeration and generated declarations.
 CONTROLLER_CONTRACTS = MappingProxyType({
     'gpio': ControllerContract(
-        frozenset(('binding', 'mode', 'pull', 'output_type', 'speed')),
-        frozenset(('pull', 'output_type', 'speed')), 'gpio'),
+        frozenset(('binding', 'mode', 'pull', 'output_type', 'speed',
+                   'active_high')),
+        frozenset(('pull', 'output_type', 'speed', 'active_high')), 'gpio'),
     'uart': ControllerContract(
         frozenset((
             'baud', 'binding', 'fifo', 'frame', 'irq', 'mode', 'rx', 'stream', 'wire',
@@ -251,9 +252,9 @@ CONTROLLER_CONTRACTS = MappingProxyType({
         frozenset(('tick_hz',)), 'lptim'),
     'block': ControllerContract(
         frozenset(('binding', 'mode', 'bus_width', 'max_blocks',
-                   'poll_budget', 'stop_timeout_us', 'irq', 'protocol')),
+                   'poll_budget', 'stop_timeout_us', 'irq', 'protocol', 'speed')),
         frozenset(('bus_width', 'max_blocks', 'poll_budget',
-                   'stop_timeout_us', 'irq_priority', 'calls_os', 'protocol')),
+                   'stop_timeout_us', 'irq_priority', 'calls_os', 'protocol', 'speed')),
         'block'),
     'capture': ControllerContract(
         frozenset(('binding', 'mode', 'irq', 'pixel_clock_hz', 'poll_limit',
@@ -269,14 +270,16 @@ CONTROLLER_CONTRACTS = MappingProxyType({
                    'max_sample_rate_hz', 'max_service_gap_us', 'slots',
                    'frame_sync_bits', 'first_bit_offset', 'frame_sync_high',
                    'frame_sync_before', 'frame_sync_channels', 'first_lsb',
-                   'sample_rising', 'no_divider', 'mckdiv', 'max_bit_clock_hz')),
+                   'sample_rising', 'no_divider', 'mckdiv', 'max_bit_clock_hz',
+                   'active_slots')),
         frozenset(('irq_priority', 'calls_os', 'standard', 'sample_bits',
                    'slot_bits', 'mclk', 'cpol_high', 'poll_limit',
                    'sample_rate_hz', 'pll_n', 'pll_r', 'max_error_ppm',
                    'max_sample_rate_hz', 'max_service_gap_us', 'slots',
                    'frame_sync_bits', 'first_bit_offset', 'frame_sync_high',
                    'frame_sync_before', 'frame_sync_channels', 'first_lsb',
-                   'sample_rising', 'no_divider', 'mckdiv', 'max_bit_clock_hz')), 'audio'),
+                   'sample_rising', 'no_divider', 'mckdiv', 'max_bit_clock_hz',
+                   'active_slots')), 'audio'),
     'external_bus': ControllerContract(
         frozenset(('binding', 'mode')), frozenset(), 'external_bus'),
 })
@@ -294,9 +297,11 @@ ENDPOINT_FIELDS = MappingProxyType({
 })
 EXTERNAL_ENDPOINT_FIELDS = frozenset((
     "controller", "binding", "read_timing", "write_timing"))
-EXTERNAL_ENDPOINT_KINDS = ("memory_window", "parallel16", "flash_async", "nand")
+EXTERNAL_ENDPOINT_KINDS = ("memory_window", "parallel16", "flash_async", "nand",
+                           "mapped_storage")
 SERIAL_FLASH_FIELDS = frozenset(("controller", "binding", "mode", "parameters"))
 EXTERNAL_ENDPOINT_REQUIRED = MappingProxyType({
+    "mapped_storage": SERIAL_FLASH_FIELDS,
     "memory_window": EXTERNAL_ENDPOINT_FIELDS | {"mode"},
     "parallel16": EXTERNAL_ENDPOINT_FIELDS,
     "flash_async": EXTERNAL_ENDPOINT_FIELDS | {"parameters", "nor"},

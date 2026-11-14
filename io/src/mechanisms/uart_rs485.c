@@ -25,12 +25,9 @@ static nx_result_t control(const nx_uart_rs485_state_t* state) {
     return state->initialized ? NX_SUCCESS : NX_ERROR_STATE;
 }
 
-/** \brief One authorized output store implements the declared polarity. */
+/** \brief The immutable logical binding owns the physical DE polarity. */
 static nx_result_t direction(const nx_uart_rs485_state_t* state, bool active) {
-    const nx_uart_rs485_config_t* config = state->config;
-    bool high = active == config->active_high;
-    return nx_gpio_port_write(config->direction, high ? config->mask : 0U,
-                              high ? 0U : config->mask);
+    return nx_gpio_signal_write(state->config->direction, active);
 }
 
 /** \brief Reject an overlap with adapter control before payload is borrowed. */
@@ -55,17 +52,21 @@ nx_result_t nx_uart_rs485_initialize(nx_uart_rs485_state_t* state,
         config->direction == NULL ||
         overlaps_state(state, config->direction, sizeof(*config->direction)) ||
         config->transport->ops == NULL || config->transport->context == NULL ||
-        config->direction == NULL || config->direction->ops == NULL ||
-        config->direction->context == NULL || config->validate == NULL ||
-        config->mask == 0U || (config->mask & (config->mask - 1U)) != 0U ||
+        config->direction->port == NULL ||
+        overlaps_state(state, config->direction->port,
+                       sizeof(*config->direction->port)) ||
+        config->direction->port->ops == NULL ||
+        config->direction->port->context == NULL || config->validate == NULL ||
+        config->direction->mask == 0U ||
+        (config->direction->mask & (config->direction->mask - 1U)) != 0U ||
         config->setup_us > UINT32_MAX || config->hold_us > UINT32_MAX ||
         overlaps_state(state, config->transport->context, 1U) ||
-        overlaps_state(state, config->direction->context, 1U) ||
+        overlaps_state(state, config->direction->port->context, 1U) ||
         config->transport->ops->start_admitted == NULL ||
         config->transport->ops->cancel == NULL ||
         config->transport->ops->service == NULL ||
         config->transport->ops->stop == NULL ||
-        config->direction->ops->write == NULL) {
+        config->direction->port->ops->write == NULL) {
         return NX_ERROR_INVALID;
     }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
@@ -74,9 +75,7 @@ nx_result_t nx_uart_rs485_initialize(nx_uart_rs485_state_t* state,
     if (state->initialized) {
         return NX_ERROR_STATE;
     }
-    nx_result_t result = nx_gpio_port_write(
-        config->direction, config->active_high ? 0U : config->mask,
-        config->active_high ? config->mask : 0U);
+    nx_result_t result = nx_gpio_signal_write(config->direction, false);
     if (result != NX_SUCCESS) {
         return result;
     }

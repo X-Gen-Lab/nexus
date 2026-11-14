@@ -82,6 +82,10 @@ typedef struct {
     bool active;
     bool power_on_reset_required;
     bool options_owned;
+#if defined(STM32F479xx)
+    uint8_t cache_flags;
+    bool cache_owned;
+#endif
 } nx_stm32_flash_state_t;
 /** \brief Explicitly assembled optional face shares the physical pulse owner.
  */

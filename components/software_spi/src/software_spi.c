@@ -237,7 +237,6 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
         !buffers_valid(owner, tx, rx, length, transferred)) {
         return NX_ERROR_INVALID;
     }
-    *transferred = 0U;
     owner->in_call = true;
     nx_result_t result = observe(owner, deadline);
     if (result != NX_SUCCESS) {
@@ -245,6 +244,7 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
         owner->in_call = false;
         return result;
     }
+    *transferred = 0U;
     result = set_pin(owner->config->cs, false);
     if (result == NX_SUCCESS) {
         result = delay(owner, owner->config->select_setup_us, deadline);

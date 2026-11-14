@@ -1928,6 +1928,8 @@ class CaptureFrames : public CaptureAudio {
   protected:
     nx_stm32_capture_frames_state_t frames{};
     nx_capture_frames_request_t session{};
+    nx_stream_block_t held_prefix{};
+    const nx_capture_port_t frame_face{&nx_stm32_capture_frames_ops, &frames};
     void SetUp() override {
         CaptureAudio::SetUp();
         nx_request_initialize(&session.base);
@@ -2070,6 +2072,35 @@ TEST_F(CaptureFrames, AFailedMemoryJoinRetainsSessionAndItsFillingImage) {
     EXPECT_EQ(session.base.result, NX_ERROR_CANCELLED);
     EXPECT_EQ(stream.outstanding, 0U);
     EXPECT_EQ(nx_stm32_capture_frames_close(&frames), NX_SUCCESS);
+}
+TEST_F(CaptureFrames, FailedSecondFrameStopPreservesTheBorrowedFirstPrefix) {
+    ASSERT_NO_FATAL_FAILURE(Open());
+    ASSERT_EQ(NX_SUCCESS, nx_capture_port_start_frames(&frame_face, &session));
+    captured();
+    ASSERT_EQ(NX_SUCCESS, nx_capture_port_service(&frame_face));
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &held_prefix));
+    hardware.hold_dma = true;
+    EXPECT_NE(NX_SUCCESS, nx_capture_port_stop(&frame_face));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&session.base));
+    EXPECT_EQ(NX_STREAM_SLOT_BORROWED, slots[0].state);
+    EXPECT_EQ(NX_STREAM_SLOT_FILLING, slots[1].state);
+    EXPECT_EQ(2U, stream.outstanding);
+    EXPECT_EQ(pool[0], held_prefix.data);
+    hardware.hold_dma = false;
+    ASSERT_EQ(NX_SUCCESS, nx_capture_port_stop(&frame_face));
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&session.base));
+    nx_result_t result;
+    size_t complete_frames;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_request_result(&session.base, &result, &complete_frames));
+    EXPECT_EQ(NX_ERROR_CANCELLED, result);
+    EXPECT_EQ(1U, complete_frames);
+    EXPECT_EQ(NX_STREAM_SLOT_BORROWED, slots[0].state);
+    EXPECT_EQ(256U, held_prefix.length);
+    EXPECT_EQ(0U, hardware.streams[1].M0AR | hardware.streams[1].M1AR);
+    ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &held_prefix));
+    EXPECT_EQ(0U, stream.outstanding);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_capture_frames_close(&frames));
 }
 TEST_F(CaptureFrames, AnInvalidLaterRawFrameCannotInvalidateItsEarlierPrefix) {
     ASSERT_NO_FATAL_FAILURE(Start());

@@ -842,10 +842,10 @@ TEST_F(Stm32UartReceive,
        Rs485ActualProviderPrevalidatesAndWaitsWireTcBeforeDeWithdrawal) {
     nx_gpio_ops_t gpio_ops = {};
     gpio_ops.write = nx_stm32_rs485_direction;
-    const nx_gpio_port_t direction = {&gpio_ops, &hardware};
+    const nx_gpio_port_t direction_port = {&gpio_ops, &hardware};
+    const nx_gpio_signal_t direction = {&direction_port, 8U, true};
     const nx_uart_rs485_config_t config = {
-        &port, &direction, nx_stm32_uart_receive_tx_validate, 8U, 10U,
-        20U,   true};
+        &port, &direction, nx_stm32_uart_receive_tx_validate, 10U, 20U};
     nx_uart_rs485_state_t adapter = {};
     const nx_uart_port_t rs485 = {&nx_uart_rs485_ops, &adapter};
     EXPECT_CALL(hardware, Direction(0U, 8U))

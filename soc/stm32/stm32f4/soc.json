@@ -1229,6 +1229,12 @@
       "core_hz": 168000000,
       "apb1_hz": 42000000,
       "apb2_hz": 84000000
+    },
+    "hse8-pll150-sdio375": {
+      "hse_hz": 8000000,
+      "core_hz": 150000000,
+      "apb1_hz": 37500000,
+      "apb2_hz": 75000000
     }
   },
   "device_profiles": {
@@ -1246,7 +1252,7 @@
         "dcmi-v1",
         "crc-fixed-polynomial"
       ],
-      "clock_policy": "rm0090-run"
+      "clock_policy": "rm0090-f407-run"
     },
     "stm32f415": {
       "controller_groups": [
@@ -1268,16 +1274,19 @@
     },
     "stm32f411xe": {
       "controller_groups": [
-        "crc-fixed-polynomial"
+        "crc-fixed-polynomial",
+        "rtc-reviewed-lse"
       ],
-      "clock_policy": "hsi16-only"
+      "clock_policy": "rm0383-run"
     },
     "stm32f446": {
       "controller_groups": [
         "crc-fixed-polynomial",
-        "sai1-framed"
+        "sai1-framed",
+        "sai2-framed",
+        "rtc-reviewed-lse"
       ],
-      "clock_policy": "hsi16-pllsai-independent-m"
+      "clock_policy": "rm0390-run"
     },
     "stm32f479": {
       "controller_groups": [
@@ -1285,9 +1294,11 @@
         "f479-fmc-sdram",
         "sai1-framed",
         "f479-graphics",
-        "f479-quadspi-indirect"
+        "f479-quadspi-indirect",
+        "f479-internal-flash",
+        "rtc-reviewed-lse"
       ],
-      "clock_policy": "hsi16-pllsai-shared-m"
+      "clock_policy": "rm0386-run"
     }
   },
   "reserved_resources": [
@@ -3300,6 +3311,23 @@
         }
       }
     },
+    "rtc-reviewed-lse": {
+      "controllers": {
+        "RTC": {
+          "kind": "rtc",
+          "irq": [],
+          "pins": []
+        }
+      },
+      "modes": {
+        "RTC": {
+          "modes": [
+            "adopt-retained",
+            "provision-empty"
+          ]
+        }
+      }
+    },
     "crc-fixed-polynomial": {
       "controllers": {
         "CRC": {
@@ -3342,12 +3370,14 @@
       "modes": {
         "CRYP": {
           "modes": [
-            "irq-blocks"
+            "irq-blocks",
+            "dma-blocks"
           ]
         },
         "HASH": {
           "modes": [
-            "irq-blocks"
+            "irq-blocks",
+            "dma-blocks"
           ]
         }
       }
@@ -3449,7 +3479,13 @@
             "master-duplex",
             "slave-tx",
             "slave-rx",
-            "slave-duplex"
+            "slave-duplex",
+            "master-tx-blocks",
+            "master-rx-blocks",
+            "master-duplex-blocks",
+            "slave-tx-blocks",
+            "slave-rx-blocks",
+            "slave-duplex-blocks"
           ]
         }
       }
@@ -3533,22 +3569,95 @@
           },
           "pins": [
             "PB6",
+            "PF10",
+            "PF6",
+            "PF7",
             "PF8",
-            "PF9",
-            "PF10"
+            "PF9"
           ]
         }
       },
       "modes": {
         "QUADSPI": {
           "modes": [
-            "qspi-indirect-sdr"
+            "qspi-indirect-sdr",
+            "qspi-indirect-dma"
           ],
           "interfaces": {
             "flash_async": [
-              "nor-indirect"
+              "nor-indirect",
+              "nor-indirect-quad-read"
+            ],
+            "mapped_storage": [
+              "nor-mapped-cpu"
             ]
           }
+        }
+      }
+    },
+    "f479-internal-flash": {
+      "controllers": {
+        "FLASH": {
+          "kind": "flash",
+          "irq": [
+            "FLASH_IRQn"
+          ],
+          "pins": [],
+          "irq_numbers": {
+            "FLASH_IRQn": 4
+          },
+          "resources": [
+            "irq:FLASH_IRQn"
+          ]
+        }
+      },
+      "modes": {
+        "FLASH": {
+          "modes": [
+            "poll-word"
+          ]
+        }
+      }
+    },
+    "sai2-framed": {
+      "controllers": {
+        "SAI2": {
+          "kind": "audio",
+          "irq": [
+            "SAI2_IRQn"
+          ],
+          "irq_numbers": {
+            "SAI2_IRQn": 91
+          },
+          "pins": [
+            "PD11",
+            "PD12",
+            "PD13",
+            "PE0",
+            "PE11",
+            "PE12",
+            "PE13",
+            "PE14"
+          ],
+          "clock_domain": "apb2"
+        }
+      },
+      "modes": {
+        "SAI2": {
+          "modes": [
+            "master-tx",
+            "master-rx",
+            "master-duplex",
+            "slave-tx",
+            "slave-rx",
+            "slave-duplex",
+            "master-tx-blocks",
+            "master-rx-blocks",
+            "master-duplex-blocks",
+            "slave-tx-blocks",
+            "slave-rx-blocks",
+            "slave-duplex-blocks"
+          ]
         }
       }
     }

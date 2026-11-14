@@ -1,13 +1,13 @@
 /**
- * \file            stm32f407_power.h
+ * \file            stm32f4_power.h
  * \brief           Explicit drained STOP/Standby and time-domain receipts
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-10
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#ifndef NEXUS_STM32F407_POWER_H
-#define NEXUS_STM32F407_POWER_H
+#ifndef NEXUS_STM32F4_POWER_H
+#define NEXUS_STM32F4_POWER_H
 #include "nexus/components/clock_domain.h"
 #include "nexus/io/rtc_aux.h"
 #ifdef __cplusplus
@@ -15,23 +15,57 @@ extern "C" {
 #endif
 
 /** \brief Explicit regulator, wake routes and authorization to discard WUF.
- * \note wake_pin temporarily arms PA0 WKUP for Standby. The caller owns its
- *       pad/electrical plan; the original EWUP state is restored on return.
+ * \note wake_pins temporarily arms explicitly selected physical wake pins.
+ *       The caller owns their pad/electrical plan and every pre-enabled wake
+ *       source. Original enable bits survive a spurious Standby return.
+ *       Unimplemented IRQ words/bits must be zero. F446 PC13 conflicts with
+ *       crystal LSE on the maintained LQFP package; no source is substituted.
  *       discard_wakeup permits clearing existing PWR WUF only for Standby.
  */
 typedef struct {
-    uint32_t wake_irqs[3];
+    uint32_t wake_irqs[4];
     uint32_t poll_limit;
+    uint32_t wake_events;
+    uint8_t wake_pins;
     bool low_power_regulator;
     bool standby;
-    uint32_t wake_events;
     bool discard_wakeup;
-    bool wake_pin;
 } nx_stm32_power_options_t;
+
+#define NX_STM32_WAKE_PIN_PA0  UINT8_C(1)
+#define NX_STM32_WAKE_PIN_PC13 UINT8_C(2)
 
 #define NX_STM32_WAKE_RTC_ALARM  (UINT32_C(1) << 17U)
 #define NX_STM32_WAKE_RTC_TAMPER (UINT32_C(1) << 21U)
 #define NX_STM32_WAKE_RTC_TIMER  (UINT32_C(1) << 22U)
+
+/** \brief Read-only retained PWR observations, not a physical wake-cause proof.
+ * \note F479 conservatively requires a product-authorized reset before RTC
+ *       Standby rearm when Standby/wake flags remain. WKUP-only is unaffected.
+ */
+typedef struct {
+    bool standby_observed;
+    bool wake_pending;
+    bool rtc_reset_required;
+} nx_stm32_power_wake_status_t;
+
+/** \brief Observe live retained flags without acknowledging or clearing them.
+ * \param[out] status: Separate caller-owned output, never retained.
+ * \return SUCCESS or INVALID/CONTEXT/STATE, output unchanged on rejection.
+ * \note Privileged unmasked Thread with the selected System/PWR owner live.
+ */
+nx_result_t nx_stm32_power_wake_status(nx_stm32_power_wake_status_t* status);
+
+/** \brief Prepare the explicit F479 RTC-Standby reset workaround.
+ * \param[in] poll_limit: Positive bound for observing SBF acknowledgment.
+ * \return SUCCESS after SBF is cleared; IO on refused acknowledgment;
+ *         INVALID/CONTEXT/STATE or UNSUPPORTED on other maintained parts.
+ * \note Product-authorized privileged unmasked Thread with live System/PWR.
+ *       Clears only SBF, leaving WUF, RTC and other retained state intact.
+ *       SUCCESS obliges the caller to perform its authorized system reset;
+ *       it never means RTC Standby is rearmed. This function never resets.
+ */
+nx_result_t nx_stm32_power_standby_reset_prepare(uint32_t poll_limit);
 
 /** \brief STOP ends one boot timer epoch; no continuous Core time is claimed.
  */
@@ -58,9 +92,12 @@ typedef struct {
  * \param[in] options: Stable call-owned options and exact enabled wake IRQs.
  * \param[out] receipt: Distinct call-owned output, never retained.
  * \return SUCCESS after STOP restoration; BUSY/STATE/CONTEXT before effects;
- *         IO if Standby WFI returns and a new RUN epoch is restored.
+ *         UNSUPPORTED for a RUN-only profile; IO if Standby WFI returns and
+ *         a new RUN epoch is restored.
  * \note Privileged serialized Thread, incoming masks clear. The owner joins
  *       devices and DMA, disables SysTick and suspends/rebuilds OS timing.
+ *       The closed 150 MHz RUN/SDIO high-speed profile rejects deep sleep
+ *       without hardware writes, epoch changes or retained references.
  *       An assembled Platform must successfully suspend first. A disabled
  *       hardware gate does not prove that logical deadline borrowers drained.
  *       STOP wake_events selects EXTI17/21/22 EMR/RTSR and one WFE; otherwise
@@ -75,9 +112,9 @@ typedef struct {
  *       An unrecoverable restore keeps masks/owners, observes and parks.
  *       Real Standby resets and does not return; SRAM/CCM retention is absent.
  */
-nx_result_t nx_stm32f407_power_enter(nx_clock_barrier_t barrier,
-                                     const nx_stm32_power_options_t* options,
-                                     nx_stm32_stop_receipt_t* receipt);
+nx_result_t nx_stm32_power_enter(nx_clock_barrier_t barrier,
+                                 const nx_stm32_power_options_t* options,
+                                 nx_stm32_stop_receipt_t* receipt);
 
 /**
  * \brief Request Standby using the unique RTC owner's prepared wake receipt.
@@ -96,11 +133,11 @@ nx_result_t nx_stm32f407_power_enter(nx_clock_barrier_t barrier,
  *       Spurious return restores RUN and RTC ownership without clearing new
  *       wake events. No pending business event is implicitly consumed.
  */
-nx_result_t nx_stm32f407_standby_enter(nx_clock_barrier_t barrier,
-                                       const nx_stm32_power_options_t* options,
-                                       const nx_rtc_port_t* rtc,
-                                       nx_rtc_standby_t* rtc_receipt,
-                                       nx_stm32_stop_receipt_t* receipt);
+nx_result_t nx_stm32_standby_enter(nx_clock_barrier_t barrier,
+                                   const nx_stm32_power_options_t* options,
+                                   const nx_rtc_port_t* rtc,
+                                   nx_rtc_standby_t* rtc_receipt,
+                                   nx_stm32_stop_receipt_t* receipt);
 
 /**
  * \brief Translate a deadline across the exact recorded old/new epochs.
@@ -115,13 +152,12 @@ nx_result_t nx_stm32f407_standby_enter(nx_clock_barrier_t barrier,
  *       RTC and accounts for sample windows, drift and unavailable intervals.
  *       The result is an envelope, not permission to restart OS/request state.
  */
-nx_result_t nx_stm32f407_deadline_bridge(const nx_stm32_stop_receipt_t* receipt,
-                                         uint64_t old_epoch,
-                                         uint64_t deadline_us,
-                                         uint64_t elapsed_min_us,
-                                         uint64_t elapsed_max_us,
-                                         nx_stm32_deadline_bridge_t* output);
+nx_result_t nx_stm32_deadline_bridge(const nx_stm32_stop_receipt_t* receipt,
+                                     uint64_t old_epoch, uint64_t deadline_us,
+                                     uint64_t elapsed_min_us,
+                                     uint64_t elapsed_max_us,
+                                     nx_stm32_deadline_bridge_t* output);
 #ifdef __cplusplus
 }
 #endif
-#endif /* NEXUS_STM32F407_POWER_H */
+#endif /* NEXUS_STM32F4_POWER_H */

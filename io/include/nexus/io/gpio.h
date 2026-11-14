@@ -37,10 +37,16 @@ struct nx_gpio_port {
 };
 
 /**
- * \brief Immutable logical signal binding supplied by Board integration.
+ * \brief Immutable logical signal binding supplied by static integration.
  * \note One nonzero mask bit names the authorized pin. Consumers use logical
  *       activity; physical polarity stays in this binding. Binding and port
  *       outlive calls; this adds no mutable state, lock or resource ownership.
+ *       Generated signals prove the bit belongs to their selected GPIO view.
+ *       A manually constructed signal must satisfy the same authorization
+ *       precondition. A port read returns only its authorized snapshot and
+ *       cannot distinguish an unauthorized bit from a low physical input.
+ *       Logical inactivity does not imply electrical input/high impedance;
+ *       software wire protocols keep their physical-level contracts.
  */
 typedef struct {
     const nx_gpio_port_t* port;
@@ -54,7 +60,8 @@ typedef struct {
  * \param[in] active: Logical activity, independent of electrical polarity.
  * \return SUCCESS or the port error; malformed binding returns INVALID.
  * \note Same bounded Task/IRQ and serialized-writer contract as port write.
- *       No storage is retained; the underlying provider checks authorization.
+ *       No storage is retained; the underlying provider checks output mode and
+ *       write authorization. A malformed mask rejects before dispatch.
  */
 nx_result_t nx_gpio_signal_write(const nx_gpio_signal_t* signal, bool active);
 

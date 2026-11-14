@@ -48,8 +48,10 @@ class DeviceViewTests(unittest.TestCase):
                 self.assertEqual("CRYP" in view.modes, crypto)
                 self.assertEqual("HASH" in view.modes, crypto)
                 if crypto:
-                    self.assertEqual(view.modes["CRYP"].modes, ("irq-blocks",))
-                    self.assertEqual(view.modes["HASH"].modes, ("irq-blocks",))
+                    self.assertEqual(view.modes["CRYP"].modes,
+                                     ("irq-blocks", "dma-blocks"))
+                    self.assertEqual(view.modes["HASH"].modes,
+                                     ("irq-blocks", "dma-blocks"))
                 self.assertIs(selected.soc["controllers"],
                               selected.controller_profiles[view.physical["device"]])
 
@@ -69,7 +71,8 @@ class DeviceViewTests(unittest.TestCase):
                 policy = selected_contracts.silicon_policy(result)
                 self.assertIn(document, policy.review_scope)
                 self.assertNotIn("DEV_ID 0x413", policy.review_scope)
-                self.assertEqual(result.clock["core_hz"], 16000000)
+                self.assertEqual(result.clock["core_hz"],
+                                 96000000 if stem == "f411re" else 168000000)
                 self.assertEqual([(item.kind, item.controller)
                                   for item in result.controllers], [("crc", "CRC")])
                 self.assertIsNone(result.physical_pcb_revision)

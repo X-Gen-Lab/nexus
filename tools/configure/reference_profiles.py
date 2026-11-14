@@ -110,7 +110,8 @@ ES0182_REV19 = ErrataProfile(
         for section in _SECTIONS}),
     devices=frozenset(("stm32f405", "stm32f407", "stm32f415", "stm32f417")),
     reference_manual="RM0090",
-    reviewed_revision_ids=(0x1001, 0x1003, 0x1007, 0x100F, 0x101F))
+    reviewed_revision_ids=(0x1001, 0x1003, 0x1007, 0x100F, 0x101F),
+    clock_policies=frozenset(("rm0090-run", "rm0090-f407-run")))
 
 
 def _crc_slice(document, revision, sha256, device, manual, markings,
@@ -137,6 +138,8 @@ def _crc_slice(document, revision, sha256, device, manual, markings,
 _SAI_FINITE_MODES = frozenset((
     "audio:master-tx", "audio:master-rx", "audio:master-duplex",
     "audio:slave-tx", "audio:slave-rx", "audio:slave-duplex"))
+_SAI_MODES = _SAI_FINITE_MODES | frozenset(
+    mode + "-blocks" for mode in _SAI_FINITE_MODES)
 
 _F479_RUN = _crc_slice(
     "ES0321", "14", "07079c2c18988b4a298237a07516f369d4342ded7143592d755f2b056b1950ad",
@@ -150,24 +153,41 @@ _F479_RUN = replace(
         "2.4.1": "AA", "2.4.2": "AA", "2.4.3": "AA", "2.4.4": "PP",
         "2.4.5": "PP"}),
     mode_scope=frozenset(("crc:crc32-words", "external_bus:sdram-controller",
-                          "external_bus:qspi-indirect-sdr", "flash_async:nor-indirect",
+                          "external_bus:qspi-indirect-sdr",
+                          "external_bus:qspi-indirect-dma", "flash_async:nor-indirect",
+                          "flash_async:nor-indirect-quad-read",
+                          "mapped_storage:nor-mapped-cpu",
                           "display:rgb-scanout", "image:irq-blit",
                           "memory_window:cpu-window",
-                          "memory_window:graphics-owned")) | _SAI_FINITE_MODES,
-    clock_policies=frozenset(("hsi16-pllsai-shared-m",)))
+                          "memory_window:graphics-owned", "flash:poll-word")) |
+    _SAI_MODES,
+    clock_policies=frozenset(("rm0386-run",)))
+
+
+def _with_rtc(profile, group, count):
+    """Extend only the reviewed primary RTC modes and their exact errata."""
+    sections = frozenset(f"2.{group}.{item}" for item in range(1, count + 1))
+    revisions = len(profile.revision_order)
+    return replace(profile, sections=profile.sections | sections,
+        applicability=MappingProxyType({**profile.applicability,
+            **{section: ("N" if section.rsplit(".", 1)[1] in {"1", "5"}
+                         else "A") * revisions for section in sections}}),
+        mode_scope=profile.mode_scope | frozenset(("rtc:adopt-retained",
+                                                   "rtc:provision-empty")))
 
 
 _PROFILES = MappingProxyType({
     "es0182-rev19": ES0182_REV19,
-    "es0287-rev6-crc-hsi16": _crc_slice(
+    "es0287-rev6-crc-hsi16": _with_rtc(replace(_crc_slice(
         "ES0287", "6", "ec266d54ab842f1d4246308b473c806223478b6021cc82f958a7a59043175673",
         "stm32f411xe", "RM0383", ("A", "1", "2"), 15, "2.6.2"),
-    "es0298-rev8-run-hsi16": replace(_crc_slice(
+        clock_policies=frozenset(("rm0383-run",))), 8, 5),
+    "es0298-rev8-run-hsi16": _with_rtc(replace(_crc_slice(
         "ES0298", "8", "83eeb33a12dc29f5868b78fbc0d87a4ac255e9c4e96fe12d76d8531a78ed108c",
         "stm32f446", "RM0390", ("A", "1"), 12, "2.8.2"),
-        clock_policies=frozenset(("hsi16-pllsai-independent-m",)),
-        mode_scope=frozenset(("crc:crc32-words",)) | _SAI_FINITE_MODES),
-    "es0321-rev14-run-hsi16": _F479_RUN,
+        clock_policies=frozenset(("rm0390-run",)),
+        mode_scope=frozenset(("crc:crc32-words",)) | _SAI_MODES), 10, 6),
+    "es0321-rev14-run-hsi16": _with_rtc(_F479_RUN, 11, 6),
 })
 
 

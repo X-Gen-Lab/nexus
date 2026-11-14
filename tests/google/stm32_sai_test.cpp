@@ -8,6 +8,7 @@
  */
 #include "stm32_sai_model.h"
 #include "stm32f4_sai.h"
+#include "stm32f4_sai_blocks.h"
 #include <array>
 #include <cstring>
 #include <gtest/gtest.h>
@@ -21,6 +22,12 @@ extern "C" const nx_audio_ops_t nx_stm32_sai_ops __attribute__((weak));
 #pragma weak nx_stm32_sai_close
 #pragma weak nx_stm32_sai_irq
 #pragma weak nx_stm32_sai_dma_irq
+#pragma weak nx_stm32_sai_blocks_prepare
+#pragma weak nx_stm32_sai_blocks_ops
+#pragma weak nx_stm32_sai_blocks_admit
+#pragma weak nx_stm32_sai_blocks_close
+#pragma weak nx_stm32_sai_blocks_irq
+#pragma weak nx_stm32_sai_blocks_dma_irq
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
 }
@@ -36,6 +43,7 @@ struct Hardware {
     bool expire_on_irq_enable = false, expire_on_fifo_read = false;
     bool break_epoch_on_irq_enable = false, interrupt_during_now = false;
     bool break_epoch_on_fifo_read = false;
+    bool refuse_replacement = false, rotate_during_replacement = false;
     unsigned fifo_reads_before_expiry = 0U;
     nx_stm32_sai_state_t* owner = nullptr;
     unsigned enables = 0U;
@@ -178,7 +186,266 @@ class Sai : public testing::Test {
         nx_stm32_sai_dma_irq(&state, receive);
     }
 };
+class SaiBlocks : public Sai {
+  protected:
+    nx_stm32_sai_blocks_state_t continuous{};
+    nx_stm32_sai_blocks_config_t selected{};
+    nx_audio_blocks_request_t session{};
+    nx_audio_port_t streaming{&nx_stm32_sai_blocks_ops, &continuous};
+    nx_stream_slot_t tx_blocks[4]{}, rx_blocks[4]{};
+    void OpenBlocks(bool receive = false, bool duplex = false) {
+        auto* const prepare = &nx_stm32_sai_blocks_prepare;
+        ASSERT_NE(nullptr, prepare);
+        selected.audio = config;
+        selected.max_service_gap_us = 10U;
+        if (receive) {
+            selected.audio.receive = SAI1_Block_A;
+            selected.audio.transmit = nullptr;
+            selected.audio.rx = config.tx;
+        } else if (duplex) {
+            selected.audio.receive = SAI1_Block_B;
+            selected.audio.common.pin_count = 4U;
+        }
+        ASSERT_EQ(NX_SUCCESS, prepare(&continuous, &selected));
+        nx_request_initialize(&session.base);
+        ASSERT_EQ(NX_SUCCESS, nx_request_prepare(&session.base, 1000U));
+        session.block_bytes = 128U;
+        for (size_t i = 0U; i < 4U; ++i) {
+            tx_blocks[i].data =
+                reinterpret_cast<uint8_t*>(0x23000000U + 256U * i);
+            tx_blocks[i].capacity = 256U;
+            rx_blocks[i].data =
+                reinterpret_cast<uint8_t*>(0x23001000U + 256U * i);
+            rx_blocks[i].capacity = 256U;
+        }
+        ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&tx_stream, tx_blocks, 4U));
+        ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&rx_stream, rx_blocks, 4U));
+        session.tx = receive ? nullptr : &tx_stream;
+        session.rx = receive || duplex ? &rx_stream : nullptr;
+        if (session.tx != nullptr)
+            for (unsigned i = 0U; i < 4U; ++i) {
+                nx_stream_fill_t fill{};
+                ASSERT_EQ(NX_SUCCESS, nx_stream_reserve(&tx_stream, &fill));
+                ASSERT_EQ(NX_SUCCESS,
+                          nx_stream_publish(&tx_stream, &fill, 128U, 0U));
+            }
+    }
+    void Boundary(bool receive) {
+        const auto& d = receive ? selected.audio.rx : selected.audio.tx;
+        d.stream->CR ^= DMA_SxCR_CT;
+        (d.lane < 4U ? DMA2->LISR : DMA2->HISR) |= 0x20U << shifts[d.lane];
+        nx_stm32_sai_blocks_dma_irq(&continuous, receive);
+    }
+};
+#ifdef NX_SAI_MASTER_TEST
+TEST_F(SaiBlocks, MasterSai2ReusesTheSystemQClockAndTheSameBankProtocol) {
+    config.transmit = config.source = SAI2_Block_B;
+    config.tx = {DMA2, DMA2_Stream6, DMA2_Stream6_IRQn, 6U, 3U};
+    for (size_t i = 0U; i < 3U; ++i)
+        pins[i] = {GPIOE, &snapshots[i], 4U, static_cast<uint8_t>(13U - i),
+                   10U};
+    OpenBlocks();
+    ASSERT_TRUE(continuous.cold.initialized);
+    nx_audio_rate_t rate{};
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->rate(&continuous, &rate));
+    EXPECT_EQ(NEXUS_CLOCK_PLLSAI_SAI1_HZ, rate.numerator_hz);
+    EXPECT_EQ(256U, rate.denominator);
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->start_blocks(&continuous, &session));
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&session.base));
+    EXPECT_EQ(32U, hw.initial_ndtr[6]);
+    Boundary(false);
+    EXPECT_EQ(NX_ERROR_BUSY, streaming.ops->service(&continuous));
+    EXPECT_EQ(NX_STREAM_SLOT_FREE, tx_blocks[0].state);
+    EXPECT_EQ(NX_SUCCESS, streaming.ops->stop(&continuous));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&session.base));
+    EXPECT_EQ(128U, session.base.transferred);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_sai_blocks_close(&continuous));
+}
+#endif
 #ifndef NX_SAI_MASTER_TEST
+TEST_F(SaiBlocks, TransmitReplacesInactiveAddressBeforeReturningTheLoan) {
+    OpenBlocks();
+    ASSERT_TRUE(continuous.cold.initialized);
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->start_blocks(&continuous, &session));
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&session.base));
+    EXPECT_EQ(3U, continuous.tx_loans);
+    Boundary(false);
+    ASSERT_EQ(NX_ERROR_BUSY, streaming.ops->service(&continuous));
+    EXPECT_EQ(reinterpret_cast<uintptr_t>(tx_blocks[2].data),
+              DMA2_Stream1->M0AR);
+    EXPECT_EQ(NX_STREAM_SLOT_FREE, tx_blocks[0].state);
+    EXPECT_EQ(128U, continuous.transferred);
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&session.base));
+    EXPECT_EQ(NX_SUCCESS, streaming.ops->stop(&continuous));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&session.base));
+    EXPECT_EQ(128U, session.base.transferred);
+    EXPECT_EQ(0U, DMA2_Stream1->M0AR);
+    EXPECT_EQ(0U, DMA2_Stream1->M1AR);
+}
+TEST_F(SaiBlocks,
+       ReceivePublishesDetachedBlocksAndPreservesConsumersAfterStop) {
+    OpenBlocks(true);
+    ASSERT_TRUE(continuous.cold.initialized);
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->start_blocks(&continuous, &session));
+    Boundary(true);
+    ASSERT_EQ(NX_ERROR_BUSY, streaming.ops->service(&continuous));
+    nx_stream_block_t ready{};
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&rx_stream, &ready));
+    EXPECT_EQ(rx_blocks[0].data, ready.data);
+    EXPECT_NE(reinterpret_cast<uintptr_t>(ready.data), DMA2_Stream1->M0AR);
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->stop(&continuous));
+    EXPECT_EQ(1U, rx_stream.outstanding);
+    EXPECT_EQ(NX_SUCCESS, nx_stream_release(&rx_stream, &ready));
+    EXPECT_EQ(0U, rx_stream.outstanding);
+}
+TEST_F(SaiBlocks, MissedServiceBudgetWithdrawsWithoutReturningAddressedBlocks) {
+    OpenBlocks();
+    ASSERT_TRUE(continuous.cold.initialized);
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->start_blocks(&continuous, &session));
+    hw.now += 11U;
+    hw.dma_held = true;
+    EXPECT_EQ(NX_ERROR_BUSY, streaming.ops->service(&continuous));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&session.base));
+    EXPECT_EQ(NX_STREAM_SLOT_BORROWED, tx_blocks[0].state);
+    hw.dma_held = false;
+    EXPECT_EQ(NX_ERROR_OVERFLOW, streaming.ops->service(&continuous));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&session.base));
+}
+TEST_F(SaiBlocks, FifoFailureAndLateIrqCannotPublishOrRestartASession) {
+    OpenBlocks(true);
+    ASSERT_TRUE(continuous.cold.initialized);
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->start_blocks(&continuous, &session));
+    SAI1_Block_A->SR |= SAI_xSR_OVRUDR;
+    nx_stm32_sai_blocks_irq(&continuous);
+    EXPECT_EQ(NX_ERROR_IO, streaming.ops->service(&continuous));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&session.base));
+    EXPECT_EQ(0U, rx_stream.outstanding);
+    Boundary(true);
+    EXPECT_EQ(NX_SUCCESS, streaming.ops->service(&continuous));
+    EXPECT_EQ(0U, rx_stream.outstanding);
+}
+TEST_F(SaiBlocks, ReceivePoolExhaustionPreservesThePublishedPrefix) {
+    OpenBlocks(true);
+    ASSERT_TRUE(continuous.cold.initialized);
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->start_blocks(&continuous, &session));
+    for (unsigned i = 0U; i < 2U; ++i) {
+        Boundary(true);
+        ASSERT_EQ(NX_ERROR_BUSY, streaming.ops->service(&continuous));
+    }
+    Boundary(true);
+    EXPECT_EQ(NX_ERROR_OVERFLOW, streaming.ops->service(&continuous));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&session.base));
+    EXPECT_EQ(256U, session.base.transferred);
+    EXPECT_EQ(2U, rx_stream.outstanding);
+    EXPECT_EQ(1U, rx_stream.losses);
+    for (unsigned i = 0U; i < 2U; ++i) {
+        nx_stream_block_t ready{};
+        ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&rx_stream, &ready));
+        EXPECT_EQ(rx_blocks[i].data, ready.data);
+        ASSERT_EQ(NX_SUCCESS, nx_stream_release(&rx_stream, &ready));
+    }
+    EXPECT_EQ(0U, rx_stream.outstanding);
+}
+TEST_F(SaiBlocks, DuplexKeepsIndependentBanksAndCountsTheReceivePrefixOnce) {
+    OpenBlocks(false, true);
+    ASSERT_TRUE(continuous.cold.initialized);
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->start_blocks(&continuous, &session));
+    Boundary(false);
+    ASSERT_EQ(NX_ERROR_BUSY, streaming.ops->service(&continuous));
+    EXPECT_EQ(0U, continuous.transferred);
+    EXPECT_EQ(NX_STREAM_SLOT_FREE, tx_blocks[0].state);
+    EXPECT_EQ(NX_STREAM_SLOT_FILLING, rx_blocks[0].state);
+    Boundary(true);
+    ASSERT_EQ(NX_ERROR_BUSY, streaming.ops->service(&continuous));
+    EXPECT_EQ(128U, continuous.transferred);
+    EXPECT_EQ(NX_STREAM_SLOT_READY, rx_blocks[0].state);
+    EXPECT_EQ(NX_SUCCESS, streaming.ops->stop(&continuous));
+    EXPECT_EQ(128U, session.base.transferred);
+    EXPECT_EQ(0U, DMA2_Stream1->M0AR);
+    EXPECT_EQ(0U, DMA2_Stream4->M0AR);
+}
+TEST_F(SaiBlocks, LayoutQueriesCannotOverwriteSessionOrBankLoanControls) {
+    OpenBlocks();
+    ASSERT_TRUE(continuous.cold.initialized);
+    EXPECT_EQ(
+        NX_ERROR_INVALID,
+        streaming.ops->layout(&continuous, reinterpret_cast<nx_audio_layout_t*>(
+                                               &continuous.next_transmit)));
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->start_blocks(&continuous, &session));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              streaming.ops->layout(
+                  &continuous,
+                  reinterpret_cast<nx_audio_layout_t*>(tx_blocks[3].data)));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              streaming.ops->rate(
+                  &continuous, reinterpret_cast<nx_audio_rate_t*>(&session)));
+    EXPECT_EQ(NX_SUCCESS, streaming.ops->stop(&continuous));
+}
+TEST_F(SaiBlocks, ShortBlockAndPartialStoredFrameRejectBeforeAnyLoanOrWrite) {
+    OpenBlocks(true);
+    ASSERT_TRUE(continuous.cold.initialized);
+    const unsigned before = hw.writes;
+    for (size_t bytes : {2U, 8U, 12U}) {
+        session.block_bytes = bytes;
+        EXPECT_EQ(NX_ERROR_INVALID,
+                  streaming.ops->start_blocks(&continuous, &session));
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&session.base));
+        EXPECT_EQ(0U, rx_stream.outstanding);
+    }
+    EXPECT_EQ(before, hw.writes);
+}
+TEST_F(SaiBlocks, RefusedTransmitReplacementRetainsBothLoansUntilDmaJoins) {
+    OpenBlocks();
+    ASSERT_TRUE(continuous.cold.initialized);
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->start_blocks(&continuous, &session));
+    Boundary(false);
+    hw.refuse_replacement = true;
+    hw.dma_held = true;
+    EXPECT_EQ(NX_ERROR_BUSY, streaming.ops->service(&continuous));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&session.base));
+    EXPECT_EQ(NX_STREAM_SLOT_BORROWED, tx_blocks[0].state);
+    EXPECT_EQ(NX_STREAM_SLOT_BORROWED, tx_blocks[2].state);
+    EXPECT_EQ(reinterpret_cast<uintptr_t>(tx_blocks[0].data),
+              DMA2_Stream1->M0AR);
+    EXPECT_EQ(0U, continuous.transferred);
+    hw.refuse_replacement = hw.dma_held = false;
+    EXPECT_EQ(NX_ERROR_OVERFLOW, streaming.ops->service(&continuous));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&session.base));
+    EXPECT_EQ(NX_STREAM_SLOT_FREE, tx_blocks[0].state);
+    EXPECT_EQ(NX_STREAM_SLOT_FREE, tx_blocks[2].state);
+    EXPECT_EQ(1U, tx_stream.outstanding);
+}
+TEST_F(SaiBlocks, ReceiveBankRaceCannotPublishBeforeEveryAddressIsDetached) {
+    OpenBlocks(true);
+    ASSERT_TRUE(continuous.cold.initialized);
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->start_blocks(&continuous, &session));
+    Boundary(true);
+    hw.rotate_during_replacement = hw.dma_held = true;
+    EXPECT_EQ(NX_ERROR_BUSY, streaming.ops->service(&continuous));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&session.base));
+    EXPECT_EQ(NX_STREAM_SLOT_FILLING, rx_blocks[0].state);
+    EXPECT_EQ(NX_STREAM_SLOT_FILLING, rx_blocks[2].state);
+    EXPECT_EQ(3U, continuous.producer.pending);
+    EXPECT_EQ(0U, continuous.transferred);
+    hw.dma_held = false;
+    EXPECT_EQ(NX_ERROR_OVERFLOW, streaming.ops->service(&continuous));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&session.base));
+    EXPECT_EQ(0U, rx_stream.outstanding);
+    EXPECT_EQ(0U, session.base.transferred);
+}
+TEST_F(SaiBlocks, EpochLossAfterArmingKeepsTheSessionAndEveryBankBorrowed) {
+    OpenBlocks();
+    ASSERT_TRUE(continuous.cold.initialized);
+    hw.break_epoch_on_irq_enable = true;
+    ASSERT_EQ(NX_SUCCESS, streaming.ops->start_blocks(&continuous, &session));
+    EXPECT_EQ(0U, hw.enables);
+    EXPECT_EQ(NX_ERROR_STATE, streaming.ops->service(&continuous));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&session.base));
+    EXPECT_EQ(NX_STREAM_SLOT_BORROWED, tx_blocks[0].state);
+    EXPECT_EQ(NX_STREAM_SLOT_BORROWED, tx_blocks[1].state);
+    EXPECT_NE(0U, DMA2_Stream1->M0AR);
+    EXPECT_NE(0U, DMA2_Stream1->M1AR);
+}
 TEST_F(Sai, MetadataQueriesNeverOverwriteTheCompleteSystemOwner) {
     Open();
     const auto before = g_nx_stm32_system;
@@ -334,13 +601,100 @@ TEST_F(Sai, ColdPadsMatchTheDatasheetCharacterizationSlewWithoutChangingPeers) {
     }
 }
 TEST_F(Sai, UnsupportedGeometryAndDmaRouteRejectBeforeWrites) {
-    config.active_slots = 1U;
+    config.active_slots = 0U;
     EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_sai_admit(&state, &config));
     config.active_slots = 3U;
     config.tx.channel = 1U;
     EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_sai_admit(&state, &config));
     EXPECT_EQ(0U, hw.writes);
     EXPECT_FALSE(state.owned);
+}
+TEST_F(Sai, SparseSlotsStoreOnlyEnabledSamplesAndKeepWireGeometry) {
+    config.slots = 8U;
+    config.active_slots = 0x81U;
+    config.frame_bits = 128U;
+    config.frame_sync_bits = 64U;
+    Open();
+    ASSERT_TRUE(state.initialized);
+    EXPECT_EQ(0x81U, SAI1_Block_A->SLOTR >> SAI_xSLOTR_SLOTEN_Pos);
+    nx_audio_layout_t layout{};
+    ASSERT_EQ(NX_SUCCESS, port.ops->layout(&state, &layout));
+    EXPECT_EQ(8U, layout.slots);
+    EXPECT_EQ(0x81U, layout.active_slots);
+    nx_frame_audio_format_t format{};
+    format.kind = NX_FRAME_AUDIO_SAI;
+    format.sample = NX_FRAME_PCM_SIGNED;
+    format.alignment = layout.sample_alignment;
+    format.frames = 1U;
+    format.active_slots = layout.active_slots;
+    format.slots = layout.slots;
+    format.sample_bits = layout.sample_bits;
+    format.slot_bits = layout.container_bits;
+    nx_frame_layout_t framed{};
+    ASSERT_EQ(NX_SUCCESS, nx_frame_layout_audio(&format, &framed));
+    EXPECT_EQ(4U, framed.bytes);
+    Tx(4U);
+    ASSERT_EQ(NX_SUCCESS, port.ops->submit(&state, &request));
+    EXPECT_EQ(2U, hw.initial_ndtr[1]);
+    Complete(false);
+    ASSERT_EQ(NX_SUCCESS, port.ops->service(&state));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(4U, request.base.transferred);
+}
+TEST_F(Sai, SparsePayloadRejectsPartialStoredFramesBeforeAdmission) {
+    config.slots = 8U;
+    config.active_slots = 0x55U;
+    config.frame_bits = 128U;
+    config.frame_sync_bits = 64U;
+    Open();
+    ASSERT_TRUE(state.initialized);
+    Tx(6U);
+    const unsigned before = hw.writes;
+    EXPECT_EQ(NX_ERROR_INVALID, port.ops->submit(&state, &request));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+    EXPECT_EQ(before, hw.writes);
+}
+TEST_F(Sai, SparseMaskCannotSelectAnUnconfiguredWireSlot) {
+    config.active_slots = 0x5U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_sai_admit(&state, &config));
+    EXPECT_EQ(0U, hw.writes);
+    EXPECT_FALSE(state.owned);
+}
+TEST_F(Sai, Sai2ReusesTheOwnerWithoutTouchingSai1GateVectorOrBlocks) {
+    config.source = config.transmit = SAI2_Block_B;
+    config.tx = {DMA2, DMA2_Stream6, DMA2_Stream6_IRQn, 6U, 3U};
+    for (size_t i = 0U; i < 3U; ++i)
+        pins[i] = {GPIOE, &snapshots[i], 4U, static_cast<uint8_t>(13U - i),
+                   10U};
+    RCC->APB2ENR |= RCC_APB2ENR_SAI1EN;
+    SAI1_Block_A->CR1 = SAI_xCR1_SAIEN;
+    hw.enabled[SAI1_IRQn] = 1U;
+    hw.priority[SAI1_IRQn] = 7U;
+    Open();
+    ASSERT_TRUE(state.initialized);
+    EXPECT_NE(0U, RCC->APB2ENR & RCC_APB2ENR_SAI2EN);
+    Tx();
+    ASSERT_EQ(NX_SUCCESS, port.ops->submit(&state, &request));
+    EXPECT_EQ(1U, hw.enabled[SAI2_IRQn]);
+    EXPECT_EQ(8U, hw.initial_ndtr[6]);
+    Complete(false);
+    ASSERT_EQ(NX_SUCCESS, port.ops->service(&state));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_sai_close(&state));
+    EXPECT_EQ(0U, RCC->APB2ENR & RCC_APB2ENR_SAI2EN);
+    EXPECT_NE(0U, RCC->APB2ENR & RCC_APB2ENR_SAI1EN);
+    EXPECT_EQ(SAI_xCR1_SAIEN, SAI1_Block_A->CR1);
+    EXPECT_EQ(1U, hw.enabled[SAI1_IRQn]);
+    EXPECT_EQ(7U, hw.priority[SAI1_IRQn]);
+}
+TEST_F(Sai, Sai2RejectsCrossControllerPeersAndIncorrectRequestRoutes) {
+    config.source = config.transmit = SAI2_Block_A;
+    config.tx = {DMA2, DMA2_Stream4, DMA2_Stream4_IRQn, 4U, 3U};
+    config.receive = SAI1_Block_B;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_sai_admit(&state, &config));
+    config.receive = nullptr;
+    config.tx.channel = 0U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_sai_admit(&state, &config));
+    EXPECT_EQ(0U, hw.writes);
 }
 TEST_F(Sai, SharedFrameSynchronizationRequiresApbStrictlyAboveTwiceBitClock) {
     config.receive = SAI1_Block_B;
@@ -708,7 +1062,8 @@ extern "C" uint32_t nx_sai_read(volatile uint32_t* reg) {
 }
 extern "C" void nx_sai_write(volatile uint32_t* reg, uint32_t value) {
     ++hardware->writes;
-    const bool a = reg == &SAI1_Block_A->CR1, b = reg == &SAI1_Block_B->CR1;
+    const bool a = reg == &SAI1_Block_A->CR1 || reg == &SAI2_Block_A->CR1;
+    const bool b = reg == &SAI1_Block_B->CR1 || reg == &SAI2_Block_B->CR1;
     if ((a || b) && (*reg & SAI_xCR1_SAIEN) == 0U &&
         (value & SAI_xCR1_SAIEN) != 0U) {
         if (hardware->enables < 2U)
@@ -717,7 +1072,8 @@ extern "C" void nx_sai_write(volatile uint32_t* reg, uint32_t value) {
     }
     if ((a || b) && hardware->refuse_enable && (*reg & SAI_xCR1_SAIEN) == 0U)
         value &= ~static_cast<uint32_t>(SAI_xCR1_SAIEN);
-    if ((reg == &SAI1_Block_A->IMR || reg == &SAI1_Block_B->IMR) &&
+    if ((reg == &SAI1_Block_A->IMR || reg == &SAI1_Block_B->IMR ||
+         reg == &SAI2_Block_A->IMR || reg == &SAI2_Block_B->IMR) &&
         hardware->refuse_error_mask && value == 0U)
         return;
 
@@ -742,6 +1098,17 @@ extern "C" void nx_sai_write(volatile uint32_t* reg, uint32_t value) {
              reg == &stream->PAR) &&
             value == 0U)
             return;
+        if ((reg == &stream->M0AR || reg == &stream->M1AR) && value != 0U &&
+            (stream->CR & (DMA_SxCR_EN | DMA_SxCR_DBM)) ==
+                (DMA_SxCR_EN | DMA_SxCR_DBM)) {
+            if (hardware->refuse_replacement)
+                return;
+            if (hardware->rotate_during_replacement) {
+                hardware->rotate_during_replacement = false;
+                stream->CR ^= DMA_SxCR_CT;
+                (i < 4U ? DMA2->LISR : DMA2->HISR) |= 0x20U << shifts[i];
+            }
+        }
     }
     *reg = value;
     if (reg == &RCC->APB2RSTR && (value & RCC_APB2RSTR_SAI1RST) != 0U) {
@@ -753,11 +1120,21 @@ extern "C" void nx_sai_write(volatile uint32_t* reg, uint32_t value) {
             block->SR = 0U;
         }
     }
+    if (reg == &RCC->APB2RSTR && (value & RCC_APB2RSTR_SAI2RST) != 0U) {
+        SAI2->GCR = 0U;
+        for (auto* block : {SAI2_Block_A, SAI2_Block_B}) {
+            block->CR1 = 0U;
+            block->CR2 = 0U;
+            block->IMR = 0U;
+            block->SR = 0U;
+        }
+    }
     if (reg == &DMA2->LIFCR)
         DMA2->LISR &= ~value;
     if (reg == &DMA2->HIFCR)
         DMA2->HISR &= ~value;
-    for (auto* block : {SAI1_Block_A, SAI1_Block_B}) {
+    for (auto* block :
+         {SAI1_Block_A, SAI1_Block_B, SAI2_Block_A, SAI2_Block_B}) {
         if (reg == &block->CLRFR && !hardware->sticky_error)
             block->SR &= ~value;
         if (reg == &block->CR2 && (value & SAI_xCR2_FFLUSH) != 0U) {

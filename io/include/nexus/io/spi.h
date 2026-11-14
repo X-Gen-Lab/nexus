@@ -91,7 +91,8 @@ struct nx_spi_endpoint {
  *
  * \param[in]       endpoint: Fixed CS/mode/rate binding on one controller.
  *
- * \param[in]       tx: Transmit bytes, or NULL to send 0xff.
+ * \param[in]       tx: Transmit bytes, or NULL to send 0xff. Exact in-place
+ *                  TX/RX is permitted; partial overlap is invalid.
  *
  * \param[out]      rx: Receive bytes, or NULL to discard.
  *
@@ -101,7 +102,8 @@ struct nx_spi_endpoint {
  * \param[in]       deadline: Absolute deadline; includes adapter queue
  *                  residence.
  *
- * \param[out]      transferred: Complete bytes; reset to zero before execution.
+ * \param[out]      transferred: Separate complete-byte result, reset after
+ *                  complete admission; unchanged on preflight rejection.
  *
  * \return          Success, BUSY/INVALID/TIMEOUT/IO. Every return ends CPU
  *                  access to the supplied buffers; polling is CPU-active,
@@ -113,7 +115,9 @@ struct nx_spi_endpoint {
  *                  or reports that failure as successful release.
  *
  * \note            Task-only single executor, no allocation/OS lock. One CS
- *                  interval covers the entire transfer. Deadline cannot preempt
+ *                  interval covers the entire transfer. Payloads and result
+ *                  are disjoint from provider control and MMIO storage.
+ *                  Deadline cannot preempt
  *                  an in-flight hardware byte; peripheral drain may exceed it.
  */
 nx_result_t nx_spi_endpoint_transfer(const nx_spi_endpoint_t* endpoint,

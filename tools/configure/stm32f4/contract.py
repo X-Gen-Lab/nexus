@@ -87,7 +87,9 @@ _BASE_CONTROLLER_INTERFACES = MappingProxyType({
         'flash_async': ('nor-cfi',), 'nand': ('raw-page',),
         'parallel16': ('8080-16',)}),
     'FMC': MappingProxyType({'memory_window': ('cpu-window', 'graphics-owned')}),
-    'QUADSPI': MappingProxyType({'flash_async': ('nor-indirect',)})})
+    'QUADSPI': MappingProxyType({'flash_async': (
+        'nor-indirect', 'nor-indirect-quad-read'),
+        'mapped_storage': ('nor-mapped-cpu',)})})
 CONTROLLER_INTERFACES = MappingProxyType({
     name: MappingProxyType({**_BASE_CONTROLLER_INTERFACES.get(name, {}),
                             **waveform.controller_interfaces().get(name, {})})
@@ -98,6 +100,10 @@ CAN_CONTROLLERS = ('CAN1', 'CAN2')
 CAN_CLOCK_HZ = 42000000
 # Capability assertion for the actual fixed system.c cold implementation.
 CLOCK_PROFILES = MappingProxyType({
+    'hse8-pll150-sdio375': MappingProxyType({
+        'hse_hz': 8000000, 'core_hz': 150000000,
+        'apb1_hz': 37500000, 'apb2_hz': 75000000,
+    }),
     'hse8-pll168': MappingProxyType({
         'hse_hz': 8000000, 'core_hz': 168000000,
         'apb1_hz': 42000000, 'apb2_hz': 84000000,
@@ -135,7 +141,9 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('encoder', 'quadrature'): 'encoder',
     ('crc', 'crc32-words'): 'crc',
     ('cipher', 'irq-blocks'): 'cipher',
+    ('cipher', 'dma-blocks'): 'cipher',
     ('hash', 'irq-blocks'): 'hash',
+    ('hash', 'dma-blocks'): 'hash',
     ('display', 'rgb-scanout'): 'ltdc',
     ('image', 'irq-blit'): 'image',
     ('entropy', 'rng-words'): 'entropy',
@@ -150,7 +158,10 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('external_bus', 'external-memory'): 'fsmc',
     ('external_bus', 'sdram-controller'): 'sdram',
     ('external_bus', 'qspi-indirect-sdr'): 'qspi',
+    ('external_bus', 'qspi-indirect-dma'): 'qspi',
+    ('mapped_storage', 'nor-mapped-cpu'): 'qspi',
     ('flash_async', 'nor-indirect'): 'qspi',
+    ('flash_async', 'nor-indirect-quad-read'): 'qspi',
     ('memory_window', 'psram-window'): 'fsmc',
     ('flash_async', 'nor-cfi'): 'fsmc',
     ('nand', 'raw-page'): 'fsmc',
@@ -297,11 +308,17 @@ def validate_dma(route, mode, normalize):
     elif route['kind'] == 'timer_sequence':
         engine, stream, channel = waveform.DMA[int(route['controller'][3:])]
         expected = (f'DMA{engine}:stream{stream}:channel{channel}',)
+    elif route['kind'] == 'external_bus' and mode == 'qspi-indirect-dma':
+        expected = ('DMA2:stream7:channel3',)
+    elif route['kind'] == 'cipher' and mode == 'dma-blocks':
+        expected = ('DMA2:stream6:channel2', 'DMA2:stream5:channel2')
+    elif route['kind'] == 'hash' and mode == 'dma-blocks':
+        expected = ('DMA2:stream7:channel2',)
     elif route['kind'] == 'capture':
         stream = 7 if route['id'].endswith('-s7') else 1
         expected = (f'DMA2:stream{stream}:channel1',)
     elif route['kind'] == 'audio':
-        if route['controller'] == 'SAI1':
+        if route['controller'] in {'SAI1', 'SAI2'}:
             from .sai import dma_paths
             paths = dma_paths(route, mode)
         else:
@@ -346,13 +363,15 @@ ENDPOINT_POLICY = common.EndpointPolicy(
 TIMEBASE_ALARM = True
 
 
-def validate_mode_context(selection, route, *, backend, clock_profile):
+def validate_mode_context(selection, route, *, backend, clock_profile,
+                          part=None, clock_plan=None):
     """Selected policies may narrow the ordinary family RUN contract."""
     from .rtc import validate_context
     validate_context(selection, route, backend=backend,
-                     clock_profile=clock_profile)
+                     clock_profile=clock_profile, part=part,
+                     clock_plan=clock_plan)
     if route['kind'] == 'external_bus' and selection['mode'] in {
-            'sdram-controller', 'qspi-indirect-sdr'}:
+            'sdram-controller', 'qspi-indirect-sdr', 'qspi-indirect-dma'}:
         if backend != 'baremetal' or clock_profile != 'custom':
             common.fail('External memory requires explicit baremetal custom RUN ownership')
     elif route['kind'] == 'external_bus' and (
@@ -382,30 +401,45 @@ def configuration_header(result):
 def validate_clock_policy(policy, selected=None):
     """Apply exact device input/output limits before any selected consumer.
 
-    The current new-device RUN scope is HSI16 without an active main PLL.
+    New parts admit direct HSI16 or one explicit high-speed HSI PLL tuple.
+    This review never supplies crystal accuracy, overdrive or dynamic scaling.
     Auxiliary output availability and electrical ranges remain device-specific.
     """
     if not isinstance(policy, str) or policy not in {
-            "rm0090-run", "hsi16-only", "hsi16-pllsai-independent-m",
-            "hsi16-pllsai-shared-m"}:
+            "rm0090-run", "rm0090-f407-run", "rm0383-run", "rm0390-run", "rm0386-run"}:
         common.fail("Unknown selected STM32F4 clock policy")
     if selected is None:
         return
     auxiliary = selected.get("pll_sai")
-    if policy in {"rm0090-run", "hsi16-only"} and auxiliary is not None:
+    if policy in {"rm0090-run", "rm0090-f407-run", "rm0383-run"} and auxiliary is not None:
         common.fail("Selected STM32F4 clock policy forbids PLLSAI")
-    if policy == "rm0090-run":
-        return
     p, domains = selected["parameters"], selected["domains"]
-    if (p["source"] != "hsi" or p["input_hz"] != 16000000 or
-            p["sysclk_source"] != "input" or p["pll_enabled"] or p["css"] or
-            p["ahb_div"] != 1 or p["apb1_div"] != 1 or p["apb2_div"] != 1 or
-            any(domains[name]["nominal_hz"] != 16000000
-                for name in ("sysclk", "core", "apb1", "apb2"))):
-        common.fail("Selected STM32F4 clock policy requires direct HSI16 RUN")
+    if selected["profile"] == "hse8-pll150-sdio375" and policy != "rm0090-f407-run":
+        common.fail("37.5 MHz SDIO profile requires exact F407 clock policy")
+    if policy in {"rm0090-run", "rm0090-f407-run"}:
+        if (domains["apb1"]["nominal_hz"] > 42000000 or
+                domains["apb2"]["nominal_hz"] > 84000000):
+            common.fail("RM0090 clock policy exceeds its APB limits")
+        return
+    direct = (p["sysclk_source"] == "input" and not p["pll_enabled"] and
+              p["apb1_div"] == p["apb2_div"] == 1)
+    high_tuples = [dict(pll_m=16, pll_n=384, pll_p=4, pll_q=8,
+                       apb1_div=2, apb2_div=1) if policy == "rm0383-run" else dict(
+                           pll_m=16, pll_n=336, pll_p=2, pll_q=7,
+                           apb1_div=4, apb2_div=2)]
+    if policy == "rm0386-run":
+        high_tuples.append(dict(pll_m=10, pll_n=210, pll_p=2, pll_q=7,
+                                apb1_div=4, apb2_div=2))
+    high = (p["sysclk_source"] == "pll" and p["pll_enabled"] and
+            any(all(p[key] == value for key, value in row.items())
+                for row in high_tuples))
+    if (p["source"] != "hsi" or p["input_hz"] != 16000000 or p["css"] or
+            p["ahb_div"] != 1 or not (direct or high)):
+        common.fail("Selected STM32F4 clock policy requires reviewed HSI16 "
+                    "or its exact high-speed PLL tuple")
     if auxiliary is None:
         return
-    if policy == "hsi16-pllsai-shared-m":
+    if policy == "rm0386-run":
         if auxiliary["m"] != p["pll_m"]:
             common.fail("F479 shared PLLM differs from the selected System input")
         if p["input_hz"] * auxiliary["n"] < 192000000 * auxiliary["m"]:

@@ -15,7 +15,7 @@ executed and source presence does not create a software candidate.
 
 | Mechanism | Current boundary |
 | --- | --- |
-| Mapped storage owner | Caller-owned slots, exact epochs and a sole writer; explicit host model where selected |
+| Mapped storage owner | Caller-owned slots, exact epochs and a sole writer; explicit host model or selected F479 CPU-read adapter |
 | AMP IPC core | Public lane/epoch/cache contract with external boot and coherency proof; no current production dual-core adapter |
 | Frame layout | Public dimensions, stride and full-frame loans; no retained H743 DMA2D adapter |
 | Cipher and hash | F415ZG/F417ZG selected CRYP/HASH owners; explicit byte spans and cleanup, without a key store or protocol policy |
@@ -34,6 +34,13 @@ the exact cleanup token. No CPU, DMA or cache writer may bypass the selected
 backend. A host NOR model establishes software rules, not physical QSPI, XIP,
 cache or Flash qualification.
 
+The selected [F479 CPU-read endpoint](f407-fsmc.md) authorizes only the range of
+each live CPU loan. Indirect Flash endpoints still forbid all aperture access;
+neither mode grants DMA readers, XIP or access by foreign masters. Failed map
+cleanup can remain without a readable loan. A failed final release preserves
+cleanup responsibility, not renewed reads; an invalid System epoch may require
+product recovery or reset.
+
 Frame contracts validate complete storage extents, format and stride. A format
 conversion API or generic frame description does not establish an MCU accelerator
 or Board connection. Storage and execution progress stay caller-owned.
@@ -44,7 +51,7 @@ or Board connection. Storage and execution progress stay caller-owned.
 read-only operations. The typed factory returns statically selected objects;
 neither lookup nor query acquires clocks or starts hardware. The F415ZG and
 F417ZG [software references](../../tests/contracts/stm32f4_crypto/f415zg.toml)
-select the existing `irq-blocks` mode. F405/F407 do not acquire these engines
+select `irq-blocks` or the separately selected DMA mode for each IP. F405/F407 do not acquire these engines
 merely because the same vendor family library contains their implementation.
 
 CRYP supplies AES ECB/CBC/CTR and DES/TDES ECB/CBC. Query reports the actual
@@ -63,12 +70,18 @@ cannot overwrite key/IV or partially overlap input. Cipher failures can leave
 an explicitly counted output prefix. A digest is valid only on SUCCESS.
 Cancel and deadline select a terminal cause; neither releases the loan early.
 
-CRYP uses the official HAL interrupt transport. HASH uses official initialization
+In IRQ mode, CRYP uses the official HAL interrupt transport. HASH uses official initialization
 and a bounded C FIFO protocol because the selected HAL transport assumes padded
 word reads and can wait while advancing HMAC phases. Each service call reads
 only bytes inside the declared spans; a partial final word is assembled locally.
 HMAC needs explicit task service between phases, even when no final-digest IRQ
 has arrived. There is no full-message copy, queue or implicit worker.
+
+The optional DMA paths retain the same owner and request lifetime. Each selected
+IP adds only its own static DMA extension and official HAL transport; task
+service observes its DMA status with the selected DMA NVIC entries disabled.
+HASH input and HMAC key require word alignment and lengths divisible by four;
+HMAC keys must also be nonempty. IRQ byte-span constraints remain unchanged.
 
 Every terminal path withdraws IRQ and peripheral references, clears provider
 scratch and HAL pointers, and proves the exclusive hardware reset that removes

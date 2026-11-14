@@ -19,13 +19,13 @@ static bool separate(const void* a, size_t a_size, const void* b,
 }
 
 /** \brief Establish only a coherent Native CPU-readable aperture. */
-static nx_result_t map(void* context) {
+static nx_mapped_storage_map_result_t map(void* context) {
     nx_native_mapped_storage_t* model = context;
     if (model->active || model->mapped) {
-        return NX_ERROR_STATE;
+        return (nx_mapped_storage_map_result_t){NX_ERROR_STATE, false};
     }
     model->mapped = true;
-    return NX_SUCCESS;
+    return (nx_mapped_storage_map_result_t){NX_SUCCESS, true};
 }
 
 /** \brief All Native consumers have joined before this explicit withdrawal. */
@@ -40,7 +40,9 @@ static nx_result_t unmap(void* context) {
 
 /** \brief Retain only the selected input span after unique owner admission. */
 static nx_result_t start(void* context, nx_mapped_storage_operation_t operation,
-                         size_t offset, const void* data, size_t length) {
+                         size_t offset, const void* data, size_t length,
+                         nx_time_us_t deadline) {
+    (void)deadline;
     nx_native_mapped_storage_t* model = context;
     if (model->active || model->mapped) {
         return NX_ERROR_STATE;

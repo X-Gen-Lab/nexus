@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "f407-zg-sdio-hs375-software-reference",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-only-es0182-sdio375",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "sdio",
+      "controller": "SDIO",
+      "route": "sdio-pc8-pd2"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only: card, PCB, 3.3-V supply, pull-ups, pad load, signal integrity and physical throughput are not qualified.",
+    "The exact 150/75-MHz clock profile forbids USB, RNG, STOP, DDR and HS200."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "DS8626 F407 bonded package pads and SDIO alternate functions only; the actual electrical design is not specified."
+    }
+  ]
+}

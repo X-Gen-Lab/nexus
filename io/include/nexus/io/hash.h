@@ -21,6 +21,9 @@ typedef enum {
 /** \brief Readonly algorithm/transport constraints, no hidden readable padding.
  * \note Alignment applies only to the named start address. A message/key with
  *       a nonmultiple-of-four length never implies extra readable bytes.
+ *       Positive length multiples describe the selected transport,
+ * independently of empty_message/empty_key. One accepts every byte length; a
+ * larger multiple rejects other lengths before borrowing, without implicit pad.
  */
 typedef struct {
     size_t input_alignment;
@@ -31,6 +34,8 @@ typedef struct {
     uint8_t digest_bytes;
     bool empty_message;
     bool empty_key;
+    uint16_t input_length_multiple;
+    uint16_t key_length_multiple;
 } nx_hash_constraints_t;
 /** \brief Value tuple; referenced spans remain explicit caller storage.
  * \note An empty input may use NULL. Plain hash requires NULL key/zero key

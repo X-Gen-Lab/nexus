@@ -13,7 +13,7 @@ import subprocess
 import sys
 
 from tools.evidence.common import (EvidenceError, digest, file_identity, load_json,
-                                   stream_digest)
+                                   stream_digest, git_observation_environment)
 
 
 def canonical_digest(value: dict) -> str:
@@ -22,8 +22,7 @@ def canonical_digest(value: dict) -> str:
 
 
 def _git_environment() -> dict:
-    return {key: value for key, value in os.environ.items()
-            if not key.startswith("GIT_")}
+    return git_observation_environment()
 
 
 def _git_output(root: Path, *args) -> bytes:
@@ -75,7 +74,10 @@ def _dirty_worktree_digest(root: Path) -> str:
     # Stream Git's actual binary worktree patch; do not buffer large patches or
     # invoke configured external diff/textconv commands. The index records bind
     # staged modes/blob identities, including an index-only dirty transition.
-    command = ["git", "-C", str(root), "diff", "--binary", "--full-index",
+    # Git diff's automatic stat refresh can write despite optional locks being
+    # disabled. Keep this observation read-only even after a same-byte rewrite.
+    command = ["git", "-c", "diff.autoRefreshIndex=false", "-C", str(root),
+               "diff", "--binary", "--full-index",
                "--no-color", "--no-ext-diff", "--no-textconv", "HEAD", "--"]
     with subprocess.Popen(command, stdout=subprocess.PIPE,
                           stderr=subprocess.STDOUT, env=_git_environment()) as process:

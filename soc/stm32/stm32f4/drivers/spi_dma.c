@@ -12,6 +12,7 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "dispatch_checks.h"
 #include "spi_dma_sequence_owner.h"
 #include "stm32f407_clock.h"
 #include "stm32f407_dma.h"
@@ -732,6 +733,25 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     return result;
 }
 
+/** \brief The polling companion cannot borrow its enclosing DMA control. */
+static bool polling_storage(const nx_stm32_spi_dma_endpoint_state_t* device,
+                            const void* data, size_t bytes) {
+    const nx_stm32_spi_dma_state_t* state = device->dma;
+    return nx_io_dispatch_span(data, bytes, 1U) &&
+           state->region_count <= SIZE_MAX / sizeof(*state->regions) &&
+           !nx_io_dispatch_overlap(data, bytes, device, sizeof(*device)) &&
+           !nx_io_dispatch_overlap(data, bytes, state, sizeof(*state)) &&
+           !nx_io_dispatch_overlap(data, bytes, state->dma,
+                                   sizeof(*state->dma)) &&
+           !nx_io_dispatch_overlap(data, bytes, state->tx,
+                                   sizeof(*state->tx)) &&
+           !nx_io_dispatch_overlap(data, bytes, state->rx,
+                                   sizeof(*state->rx)) &&
+           !nx_io_dispatch_overlap(data, bytes, state->regions,
+                                   state->region_count *
+                                       sizeof(*state->regions));
+}
+
 /** \brief Optional polling keeps the same arbitration gate as finite DMA. */
 static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
                             size_t length, nx_time_us_t deadline,
@@ -741,6 +761,10 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
         device->dma->stopping) {
         return NX_ERROR_STATE;
     }
+    if (!polling_storage(device, transferred, sizeof(*transferred)) ||
+        (tx != NULL && !polling_storage(device, tx, length)) ||
+        (rx != NULL && !polling_storage(device, rx, length)))
+        return NX_ERROR_INVALID;
     return nx_stm32_spi_endpoint_transfer(&device->endpoint, tx, rx, length,
                                           deadline, transferred);
 }

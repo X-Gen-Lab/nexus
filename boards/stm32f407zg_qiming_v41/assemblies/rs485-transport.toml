@@ -15,6 +15,7 @@ flash_load_limit_bytes=65536
 [gpio.direction]
 binding="rs485-de"
 mode="output"
+active_high=true
 [uart.serial2]
 binding="uart2"
 mode="irq-byte-event"

@@ -47,13 +47,13 @@ python tools/configure/configure.py check \
 python tools/configure/configure.py generate \
     --assembly tools/configure/assemblies/qiming-baremetal-uart.toml \
     --output /tmp/nexus-migration-config
-python tools/maintenance/compatibility.py --expected-factory-epoch 3 \
+python tools/maintenance/compatibility.py --expected-factory-epoch 5 \
     --generated /tmp/nexus-migration-config/nexus_config.h
 ```
 
 Use a new output path you own, and stop if any command returns nonzero. Successful
 resolution reports the selected part, Board, backend and configuration digest;
-the compatibility check must accept epoch 3. Inspect `resolved.json`,
+the compatibility check must accept epoch 5. Inspect `resolved.json`,
 `nexus_config.h`, `nexus_factory.h`, `nexus_factory_strong.h` and
 `nexus_bindings.h`. The version macros checked by `--generated` are in
 `nexus_config.h`. These commands validate and generate configuration; they do not
@@ -88,22 +88,43 @@ link the exact MCU configuration with the locked compiler. Retain evidence for
 the migrated source and configuration. Old HAL/OSAL documentation remains historical;
 a redirect does not make an old API contract equivalent to a new one.
 
-## Rebuild for source interface epoch 3
+## Rebuild for source interface epoch 5
 
 The current development snapshot keeps semantic version `0.2.1` and uses
-factory/source interface epoch `3`. Pin its exact commit, regenerate the bundle
+factory/source interface epoch `5`. Pin its exact commit, regenerate the bundle
 and rebuild every caller, public face/ops, generated factory, provider and
 component with one configuration and toolchain. Current interface admission
-rejects epoch-1 and epoch-2 SDKs. Select a new build directory so old CMake caches,
+rejects epoch-1 through epoch-4 SDKs. Select a new build directory so old CMake caches,
 generated headers and objects cannot enter the new application. Keep the old
 build separate until the migrated consumer passes its required checks. No stable
 binary ABI is supplied. A development-fixture opt-in does not relax interface
 checks. Existing tags are unchanged.
 
 The version fields remain independent: authored TOML schema `2`, typed IR source
-epoch `3`, factory/source interface epoch `3`, resolved JSON projection `1` and
+epoch `5`, factory/source interface epoch `5`, resolved JSON projection `1` and
 installed SDK manifest schema `2`. A matching semantic version or manifest schema
 does not establish matching interface generation.
+
+Epoch 5 replaces the F407-named power integration header with
+`nexus/soc/stm32f4_power.h` and family power entry points. Hash constraints now
+report input/key length multiples separately from address alignment. Rebuild all
+query callers and validate the selected instance's limits. Optional SMBus static
+bindings are supplied by `nexus_smbus_factory.h`; ordinary factory headers do not
+depend on the component. The
+[epoch-5 contract](../design/source-compatibility.md#epoch-5-的家族电源接口与密码查询迁移)
+owns the exact migration and selection limits.
+
+Epoch 4 changes `nx_uart_rs485_config_t.direction` to
+`const nx_gpio_signal_t*`; remove the adapter's old `mask` and `active_high`
+fields. Declare `active_high` explicitly on the single-pin GPIO selection and
+obtain its immutable binding with `nx_factory_gpio_signal_ref()` using the same
+GPIO strong reference. Check for NULL: an ordinary GPIO without an authored
+polarity has no generated signal. Do not infer polarity from its initial level.
+Manually assembled signals must name one authorized pin and outlive the adapter,
+successful stop and all external observers. Timing, wire completion and retained
+borrows remain unchanged. The
+[epoch-4 migration contract](../design/source-compatibility.md#epoch-4-的逻辑-signal-与-rs485-迁移)
+owns the full binding and rebuild requirements.
 
 The epoch-2 ADC result migration remains required when upgrading older callers.
 For ADC groups, direct `request.frames` access becomes `request.output.frames`.

@@ -10,6 +10,7 @@ extern "C" {
 #include "nexus/io/native/model.h"
 #include "usb_host_stack.h"
 #include "usbh_ctlreq.h"
+#include "usbh_ioreq.h"
 }
 #include <cstring>
 #include <gmock/gmock.h>
@@ -29,6 +30,7 @@ class StackTransport {
     MOCK_METHOD(nx_result_t, Submit, (uint8_t, nx_usb_host_request_t*));
     MOCK_METHOD(nx_result_t, Service, ());
     MOCK_METHOD(nx_result_t, Restart, (nx_time_us_t));
+    MOCK_METHOD(nx_result_t, Reset, (nx_time_us_t));
     MOCK_METHOD(nx_result_t, Requirements,
                 (uint8_t, size_t, nx_usb_host_storage_requirements_t*),
                 (const));
@@ -57,20 +59,19 @@ class StackTransport {
     static nx_result_t Close(void* p) {
         return static_cast<StackTransport*>(p)->Stop();
     }
+    static nx_result_t ResetPort(void* p, nx_time_us_t deadline) {
+        return static_cast<StackTransport*>(p)->Reset(deadline);
+    }
     static nx_result_t Power(void* p, bool on) {
         return static_cast<StackTransport*>(p)->Vbus(on);
     }
 };
-static const nx_usb_host_ops_t stack_ops = {StackTransport::OpenPipe,
-                                            nullptr,
-                                            StackTransport::SubmitPacket,
-                                            nullptr,
-                                            StackTransport::Poll,
-                                            StackTransport::Read,
-                                            nullptr,
-                                            nullptr,
-                                            StackTransport::Close,
-                                            StackTransport::Storage};
+static const nx_usb_host_ops_t stack_ops = {
+    StackTransport::OpenPipe,     nullptr,
+    StackTransport::SubmitPacket, nullptr,
+    StackTransport::Poll,         StackTransport::Read,
+    StackTransport::ResetPort,    nullptr,
+    StackTransport::Close,        StackTransport::Storage};
 
 class StUsbHostStack : public testing::Test {
   protected:
@@ -78,11 +79,13 @@ class StUsbHostStack : public testing::Test {
     const nx_usb_host_port_t port = {&stack_ops, &transport};
     nx_st_usb_host_stack_t stack = {};
     nx_st_usb_host_slot_t slots[2] = {};
+    nx_st_usb_host_periodic_t periodic[2] = {};
     alignas(4) uint8_t staging[2][1024] = {};
+    uint8_t periodic_bytes[128] = {};
     nx_st_usb_host_stack_config_t config = {
-        &port,      slots, 2U,      StackTransport::Power,
-        &transport, 1000U, 100000U, StackTransport::StartAgain,
-        &transport};
+        &port,      slots,  2U,      StackTransport::Power,
+        &transport, 1000U,  100000U, StackTransport::StartAgain,
+        &transport, nullptr};
     void SetUp() override {
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         for (size_t i = 0U; i < 2U; ++i) {
@@ -130,6 +133,24 @@ class StUsbHostStack : public testing::Test {
             }));
         ASSERT_EQ(USBH_LL_OpenPipe(&stack.middleware, 0U, in ? 0x81U : 1U, 3U,
                                    USBH_SPEED_FULL, USB_EP_TYPE_BULK, 64U),
+                  USBH_OK);
+    }
+    void PeriodicState(uint16_t frame,
+                       nx_usb_host_speed_t speed = NX_USB_HOST_FULL_SPEED) {
+        EXPECT_CALL(transport, State(_))
+            .WillOnce(Invoke([frame, speed](auto* out) {
+                *out = nx_usb_host_state_t{};
+                out->started = out->connected = out->port_enabled = true;
+                out->speed = speed;
+                out->frame = frame;
+                return NX_SUCCESS;
+            }));
+    }
+    void OpenPeriodic(uint8_t index = 0U, uint8_t type = USB_EP_TYPE_INTR,
+                      uint16_t mps = 64U, uint8_t speed = USBH_SPEED_FULL) {
+        EXPECT_CALL(transport, Open(index, _)).WillOnce(Return(NX_SUCCESS));
+        ASSERT_EQ(USBH_LL_OpenPipe(&stack.middleware, index, 1U, 3U, speed,
+                                   type, mps),
                   USBH_OK);
     }
     void TearDown() override {
@@ -259,6 +280,30 @@ TEST_F(StUsbHostStack, OutAggregatesPacketsAndOwnsSourceUntilSettlement) {
     EXPECT_EQ(USBH_LL_GetLastXferSize(&stack.middleware, 0U), 96U);
     EXPECT_EQ(USBH_LL_GetToggle(&stack.middleware, 0U), 0U);
     EXPECT_EQ(slots[0].bytes, nullptr);
+}
+
+TEST_F(StUsbHostStack, WholeUrbKeepsItsFirstAbsoluteDeadlineAcrossPackets) {
+    Start();
+    Open(false);
+    EXPECT_CALL(transport, Submit(0U, &slots[0].request))
+        .WillOnce(Invoke([](uint8_t, auto* request) {
+            EXPECT_EQ(request->base.deadline, 1100U);
+            return nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+        }));
+    ASSERT_EQ(USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_BULK, 1U,
+                                periodic_bytes, 96U, 0U),
+              USBH_OK);
+    nx_request_settle(&slots[0].request.base, NX_SUCCESS, 64U);
+    ASSERT_EQ(nx_native_clock_configure(true, 900U), NX_SUCCESS);
+    EXPECT_CALL(transport, Submit(0U, &slots[0].request))
+        .WillOnce(Invoke([](uint8_t, auto* request) {
+            EXPECT_EQ(request->base.deadline, 1100U);
+            return nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+        }));
+    Step();
+    nx_request_settle(&slots[0].request.base, NX_SUCCESS, 32U);
+    Step();
+    EXPECT_EQ(USBH_LL_GetURBState(&stack.middleware, 0U), USBH_URB_DONE);
 }
 
 TEST_F(StUsbHostStack, ShortInCopiesOnlyActualBytesAfterAcquireSettlement) {
@@ -472,4 +517,293 @@ TEST_F(StUsbHostStack, MissingRequiredClassCallbackRejectsBeforeAnyEffect) {
         if (stack.config != nullptr)
             return;
     }
+}
+
+TEST_F(StUsbHostStack, IsochronousPacketsAlwaysUseDataZero) {
+    Start();
+    EXPECT_CALL(transport, Open(0U, _)).WillOnce(Return(NX_SUCCESS));
+    ASSERT_EQ(USBH_LL_OpenPipe(&stack.middleware, 0U, 1U, 3U, USBH_SPEED_FULL,
+                               USB_EP_TYPE_ISOC, 64U),
+              USBH_OK);
+    for (unsigned packet = 0U; packet < 2U; ++packet) {
+        EXPECT_CALL(transport, Submit(0U, &slots[0].request))
+            .WillOnce(Invoke([](uint8_t, auto* request) {
+                EXPECT_FALSE(request->data1);
+                return nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+            }));
+        ASSERT_EQ(USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_ISOC,
+                                    1U, periodic_bytes, 64U, 0U),
+                  USBH_OK);
+        nx_request_settle(&slots[0].request.base, NX_SUCCESS, 64U);
+        Step();
+    }
+}
+
+TEST_F(StUsbHostStack, PeriodicCadenceWrapsWithoutBorrowingAnEarlyPacket) {
+    config.periodic = periodic;
+    Start();
+    OpenPeriodic();
+    PeriodicState(16382U);
+    ASSERT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 3U), NX_SUCCESS);
+    const uint16_t frames[] = {16382U, 1U};
+    for (uint16_t frame : frames) {
+        PeriodicState(frame);
+        EXPECT_CALL(transport, Submit(0U, &slots[0].request))
+            .WillOnce(Invoke([](uint8_t, auto* request) {
+                return nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+            }));
+        ASSERT_EQ(USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_INTR,
+                                    1U, periodic_bytes, 64U, 0U),
+                  USBH_OK);
+        nx_request_settle(&slots[0].request.base, NX_SUCCESS, 64U);
+        Step();
+        PeriodicState(static_cast<uint16_t>(frame + 1U));
+        EXPECT_EQ(USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_INTR,
+                                    1U, periodic_bytes, 64U, 0U),
+                  USBH_BUSY);
+        EXPECT_FALSE(slots[0].busy);
+        EXPECT_EQ(nullptr, slots[0].bytes);
+    }
+}
+
+TEST_F(StUsbHostStack, TransportBusyDoesNotConsumeThePeriodicOpportunity) {
+    config.periodic = periodic;
+    Start();
+    OpenPeriodic();
+    PeriodicState(10U);
+    ASSERT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 4U), NX_SUCCESS);
+    PeriodicState(10U);
+    EXPECT_CALL(transport, Submit(0U, &slots[0].request))
+        .WillOnce(Return(NX_ERROR_BUSY));
+    EXPECT_EQ(USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_INTR, 1U,
+                                periodic_bytes, 64U, 0U),
+              USBH_BUSY);
+    PeriodicState(10U);
+    EXPECT_CALL(transport, Submit(0U, &slots[0].request))
+        .WillOnce(Invoke([](uint8_t, auto* request) {
+            return nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+        }));
+    ASSERT_EQ(USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_INTR, 1U,
+                                periodic_bytes, 64U, 0U),
+              USBH_OK);
+    nx_request_settle(&slots[0].request.base, NX_SUCCESS, 64U);
+    Step();
+}
+
+TEST_F(StUsbHostStack, PeriodicAdmissionRejectsOverbookedWorstCaseFrame) {
+    config.periodic = periodic;
+    Start();
+    OpenPeriodic(0U, USB_EP_TYPE_ISOC, 1023U);
+    OpenPeriodic(1U, USB_EP_TYPE_ISOC, 1023U);
+    PeriodicState(10U);
+    ASSERT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 1U), NX_SUCCESS);
+    EXPECT_LE(periodic[0].bus_time_ns, 900000U);
+    PeriodicState(10U);
+    EXPECT_EQ(nx_st_usb_host_stack_periodic(&stack, 1U, 16U),
+              NX_ERROR_OVERFLOW);
+    EXPECT_EQ(0U, periodic[1].interval);
+    EXPECT_EQ(1U, periodic[0].interval);
+}
+
+TEST_F(StUsbHostStack, DescriptorIntervalsAndDirectRootSpeedAreExplicit) {
+    config.periodic = periodic;
+    Start();
+    OpenPeriodic(0U, USB_EP_TYPE_ISOC, 64U);
+    EXPECT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 0U), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 17U), NX_ERROR_INVALID);
+    PeriodicState(10U, NX_USB_HOST_HIGH_SPEED);
+    EXPECT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 2U),
+              NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(0U, periodic[0].interval);
+    PeriodicState(10U);
+    ASSERT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 16U), NX_SUCCESS);
+    EXPECT_EQ(32768U, periodic[0].interval);
+}
+
+TEST_F(StUsbHostStack, PeriodicMetadataAndPacketStorageCannotAlias) {
+    config.periodic = reinterpret_cast<nx_st_usb_host_periodic_t*>(staging);
+    EXPECT_EQ(
+        nx_st_usb_host_stack_initialize(&stack, &config, nullptr, nullptr),
+        NX_ERROR_INVALID);
+    EXPECT_EQ(nullptr, stack.config);
+}
+
+TEST_F(StUsbHostStack, ScheduledUrbCannotHideAMultiplePacketQueue) {
+    config.periodic = periodic;
+    Start();
+    OpenPeriodic();
+    PeriodicState(10U);
+    ASSERT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 1U), NX_SUCCESS);
+    EXPECT_EQ(USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_INTR, 1U,
+                                periodic_bytes, 128U, 0U),
+              USBH_FAIL);
+    EXPECT_FALSE(slots[0].busy);
+    EXPECT_EQ(nullptr, slots[0].bytes);
+}
+
+TEST_F(StUsbHostStack, PeriodicStateRequiresExplicitOptionalStorage) {
+    Start();
+    OpenPeriodic();
+    EXPECT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 1U),
+              NX_ERROR_UNSUPPORTED);
+}
+
+TEST_F(StUsbHostStack, PeriodicStateIsWithdrawnOnlyAfterStopJoins) {
+    config.periodic = periodic;
+    Start();
+    OpenPeriodic();
+    PeriodicState(10U);
+    ASSERT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 1U), NX_SUCCESS);
+    EXPECT_CALL(transport, Stop()).WillOnce(Return(NX_ERROR_BUSY));
+    EXPECT_EQ(USBH_LL_Stop(&stack.middleware), USBH_BUSY);
+    EXPECT_NE(0U, periodic[0].interval);
+    EXPECT_CALL(transport, Stop()).WillOnce(Return(NX_SUCCESS));
+    EXPECT_EQ(USBH_LL_Stop(&stack.middleware), USBH_OK);
+    EXPECT_EQ(0U, periodic[0].interval);
+}
+
+TEST_F(StUsbHostStack, ResetWithdrawsCadenceOnlyAfterActualSuccess) {
+    config.periodic = periodic;
+    Start();
+    OpenPeriodic();
+    PeriodicState(10U);
+    ASSERT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 1U), NX_SUCCESS);
+    EXPECT_CALL(transport, Reset(_)).WillOnce(Return(NX_ERROR_BUSY));
+    EXPECT_EQ(USBH_LL_ResetPort(&stack.middleware), USBH_BUSY);
+    EXPECT_NE(0U, periodic[0].interval);
+    EXPECT_CALL(transport, Reset(_)).WillOnce(Return(NX_SUCCESS));
+    EXPECT_EQ(USBH_LL_ResetPort(&stack.middleware), USBH_OK);
+    EXPECT_EQ(0U, periodic[0].interval);
+}
+
+TEST_F(StUsbHostStack, ScheduledModeCannotDispatchAnUnreservedEndpoint) {
+    config.periodic = periodic;
+    Start();
+    OpenPeriodic();
+    EXPECT_EQ(USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_INTR, 1U,
+                                periodic_bytes, 64U, 0U),
+              USBH_FAIL);
+    EXPECT_FALSE(slots[0].busy);
+    EXPECT_EQ(nullptr, slots[0].bytes);
+}
+
+TEST_F(StUsbHostStack, IsochronousDoesNotExposeADataOneToggle) {
+    Start();
+    OpenPeriodic(0U, USB_EP_TYPE_ISOC);
+    EXPECT_EQ(USBH_LL_SetToggle(&stack.middleware, 0U, 1U), USBH_FAIL);
+    EXPECT_EQ(USBH_LL_GetToggle(&stack.middleware, 0U), 0U);
+    EXPECT_EQ(USBH_LL_SetToggle(&stack.middleware, 0U, 0U), USBH_OK);
+}
+
+TEST_F(StUsbHostStack, EarlyOfficialWrapperCannotRepublishAnOldCompletion) {
+    config.periodic = periodic;
+    Start();
+    OpenPeriodic();
+    PeriodicState(10U);
+    ASSERT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 4U), NX_SUCCESS);
+    PeriodicState(10U);
+    EXPECT_CALL(transport, Submit(0U, &slots[0].request))
+        .WillOnce(Invoke([](uint8_t, auto* request) {
+            return nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+        }));
+    ASSERT_EQ(
+        USBH_InterruptSendData(&stack.middleware, periodic_bytes, 64U, 0U),
+        USBH_OK);
+    nx_request_settle(&slots[0].request.base, NX_SUCCESS, 64U);
+    Step();
+    ASSERT_EQ(USBH_LL_GetURBState(&stack.middleware, 0U), USBH_URB_DONE);
+    PeriodicState(11U);
+    EXPECT_EQ(
+        USBH_InterruptSendData(&stack.middleware, periodic_bytes, 64U, 0U),
+        USBH_OK);
+    EXPECT_EQ(USBH_LL_GetURBState(&stack.middleware, 0U), USBH_URB_NOTREADY);
+    EXPECT_EQ(USBH_LL_GetLastXferSize(&stack.middleware, 0U), 0U);
+    EXPECT_FALSE(slots[0].busy);
+}
+
+TEST_F(StUsbHostStack, FourteenBitCounterWrapCannotDispatchBeforeItsInterval) {
+    config.periodic = periodic;
+    Start();
+    OpenPeriodic();
+    PeriodicState(16382U);
+    ASSERT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 4U), NX_SUCCESS);
+    PeriodicState(16382U);
+    EXPECT_CALL(transport, Submit(0U, &slots[0].request))
+        .WillOnce(Invoke([](uint8_t, auto* request) {
+            return nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+        }));
+    ASSERT_EQ(USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_INTR, 1U,
+                                periodic_bytes, 64U, 0U),
+              USBH_OK);
+    nx_request_settle(&slots[0].request.base, NX_SUCCESS, 64U);
+    Step();
+    PeriodicState(0U);
+    ON_CALL(transport, Submit(0U, &slots[0].request))
+        .WillByDefault(Return(NX_ERROR_BUSY));
+    EXPECT_CALL(transport, Submit(0U, &slots[0].request)).Times(0);
+    EXPECT_EQ(USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_INTR, 1U,
+                                periodic_bytes, 64U, 0U),
+              USBH_BUSY);
+}
+
+TEST_F(StUsbHostStack, LongDescriptorIntervalCountsObservedCounterWraps) {
+    config.periodic = periodic;
+    Start();
+    OpenPeriodic(0U, USB_EP_TYPE_ISOC);
+    PeriodicState(1U);
+    ASSERT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 16U), NX_SUCCESS);
+    for (unsigned packet = 0U; packet < 2U; ++packet) {
+        PeriodicState(1U);
+        EXPECT_CALL(transport, Submit(0U, &slots[0].request))
+            .WillOnce(Invoke([](uint8_t, auto* request) {
+                return nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+            }));
+        ASSERT_EQ(USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_ISOC,
+                                    1U, periodic_bytes, 64U, 0U),
+                  USBH_OK);
+        nx_request_settle(&slots[0].request.base, NX_SUCCESS, 64U);
+        Step();
+        if (packet == 0U) {
+            stack.connected = stack.enabled = true;
+            for (uint16_t frame : {uint16_t{8193U}, uint16_t{1U},
+                                   uint16_t{8193U}, uint16_t{1U}}) {
+                EXPECT_CALL(transport, Service()).WillOnce(Return(NX_SUCCESS));
+                PeriodicState(frame);
+                ASSERT_EQ(nx_st_usb_host_stack_step(&stack), NX_SUCCESS);
+            }
+            stack.connected = stack.enabled = false;
+        }
+    }
+}
+
+TEST_F(StUsbHostStack, RebindingCannotRestartAnAdmittedDescriptorInterval) {
+    config.periodic = periodic;
+    Start();
+    OpenPeriodic();
+    PeriodicState(10U);
+    ASSERT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 4U), NX_SUCCESS);
+    PeriodicState(10U);
+    EXPECT_CALL(transport, Submit(0U, &slots[0].request))
+        .WillOnce(Invoke([](uint8_t, auto* request) {
+            return nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+        }));
+    ASSERT_EQ(USBH_LL_SubmitURB(&stack.middleware, 0U, 0U, USB_EP_TYPE_INTR, 1U,
+                                periodic_bytes, 64U, 0U),
+              USBH_OK);
+    nx_request_settle(&slots[0].request.base, NX_SUCCESS, 64U);
+    Step();
+    const auto before = periodic[0];
+    ON_CALL(transport, State(_)).WillByDefault(Invoke([](auto* out) {
+        *out = nx_usb_host_state_t{};
+        out->started = out->connected = out->port_enabled = true;
+        out->speed = NX_USB_HOST_FULL_SPEED;
+        out->frame = 10U;
+        return NX_SUCCESS;
+    }));
+    EXPECT_CALL(transport, State(_)).Times(0);
+    EXPECT_EQ(nx_st_usb_host_stack_periodic(&stack, 0U, 1U), NX_ERROR_BUSY);
+    EXPECT_EQ(periodic[0].interval, before.interval);
+    EXPECT_EQ(periodic[0].remaining, before.remaining);
+    EXPECT_EQ(periodic[0].last_frame, before.last_frame);
+    EXPECT_EQ(periodic[0].bus_time_ns, before.bus_time_ns);
 }

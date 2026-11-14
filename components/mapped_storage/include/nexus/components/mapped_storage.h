@@ -103,8 +103,10 @@ const nx_mapped_storage_geometry_t*
 nx_mapped_storage_geometry(const nx_mapped_storage_port_t* port);
 /**
  * \brief Acquire one bounded, positive read-only span on a serialized executor
- * \return SUCCESS or INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE. Rejection
- * retains no loan. Live read maps exclude all command/program/erase/cache/DMA
+ * \return SUCCESS, INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE, or a backend map
+ * error. Failure retains no loan; partial hardware configuration can close
+ * admission and require stop to retry cleanup. Live read maps exclude all
+ * command/program/erase/cache/DMA
  * writers. CPU/XIP/DMA consumers may run concurrently after successful
  * acquisition.
  */
@@ -144,9 +146,11 @@ nx_result_t nx_mapped_storage_cancel(const nx_mapped_storage_port_t* port,
 void nx_mapped_storage_service(const nx_mapped_storage_port_t* port);
 /**
  * \brief Close admission and request writer cancellation
- * \return SUCCESS only after all map loans and writer sources are gone;
- * BUSY retains storage and needs release/service. Repeated successful stop
- * performs no backend operation. The owner cannot restart or revoke loans.
+ * \return SUCCESS only after all map loans, writer sources and partial map
+ * cleanup are gone. BUSY retains storage and needs release/service; another
+ * backend cleanup error retains its responsibility for stop retry. Repeated
+ * successful stop performs no backend operation. This does not revoke loans
+ * or reopen admission; cold restart uses the explicit owner contract.
  */
 nx_result_t nx_mapped_storage_stop(const nx_mapped_storage_port_t* port);
 #ifdef __cplusplus

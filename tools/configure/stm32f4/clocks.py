@@ -11,6 +11,9 @@ DEFAULT = dict(source="hse", input_hz=8000000, pll_m=8, pll_n=336,
 AHB = {1: 0, 2: 8, 4: 9, 8: 10, 16: 11, 64: 12, 128: 13,
        256: 14, 512: 15}
 APB = {1: 0, 2: 4, 4: 5, 8: 6, 16: 7}
+SDIO375_PROFILE = "hse8-pll150-sdio375"
+SDIO375 = {**DEFAULT, "pll_n": 300, "pll_q": 4}
+
 USB_CLOCKS = {
     ("usb_device", "device-fs"): ("OTG_FS", True, 14200000),
     ("usb_host", "host-fs"): ("OTG_FS", True, 14200000),
@@ -29,6 +32,12 @@ def _divide(numerator, denominator, label):
 
 
 def _parameters(name, profile):
+    if name == SDIO375_PROFILE:
+        expected = dict(source="hse", input_hz=8000000, core_hz=150000000,
+                        apb1_hz=37500000, apb2_hz=75000000)
+        if clocks.normalize(profile) != expected:
+            fail("F407 SDIO 37.5 MHz requires its exact reviewed HSE8 tuple")
+        return dict(SDIO375)
     if name == "hse8-pll168":
         expected = dict(source="hse", input_hz=8000000, core_hz=168000000,
                         apb1_hz=42000000, apb2_hz=84000000)
@@ -132,8 +141,8 @@ def plan(profile_name, profile):
     apb2 = _divide(core, p["apb2_div"], "PCLK2")
     adc = _divide(apb2, p["adc_div"], "ADC")
     if (pll_sysclk > 168000000 or core > 168000000 or
-            apb1 > 42000000 or apb2 > 84000000):
-        fail("F407 SYSCLK/AHB/APB clock exceeds the device limit")
+            apb1 > 50000000 or apb2 > 100000000):
+        fail("STM32F4 clock exceeds the reviewed family calculation limits")
     if adc > 36000000:
         fail("F407 ADC clock exceeds 36 MHz")
     tim1 = apb1 * (1 if p["apb1_div"] == 1 else 2)
@@ -185,7 +194,8 @@ def projection(selected):
 
 def controller_hz(result, controller):
     """Derive a selected peripheral clock from the one resolved plan."""
-    if controller in {"USART1", "USART6", "SPI1", "ADC1", "ADC2", "ADC3", "SAI1"}:
+    if controller in {"USART1", "USART6", "SPI1", "ADC1", "ADC2", "ADC3",
+                      "SAI1", "SAI2"}:
         return result.clock["apb2_hz"]
     if controller.startswith("TIM"):
         return result.clock_plan.domains[timer_domain(controller)].nominal_hz
@@ -217,7 +227,15 @@ def header_lines(result):
     selected = result.clock_plan
     p = selected.parameters
     auxiliary = selected.pll_sai
-    lines = [f"#define NEXUS_{key.upper()}_HZ {value.nominal_hz}u"
+    lines = ["#define NEXUS_CLOCK_SDIO_HS375 " +
+             str(int(selected.profile == SDIO375_PROFILE)) + "u"]
+    for protocol, macro in (("sd-memory", "SD"), ("mmc", "MMC")):
+        enabled = any(item.kind == "block" and
+                      item.options.protocol == protocol and
+                      item.options.speed == "high-speed"
+                      for item in result.controllers)
+        lines.append(f"#define NEXUS_STM32_SDIO_{macro}_HS {int(enabled)}u")
+    lines += [f"#define NEXUS_{key.upper()}_HZ {value.nominal_hz}u"
              for key, value in selected.domains.items() if key != "core"]
     for field in ("pll_m", "pll_n", "pll_p", "pll_q"):
         macro = field.replace('_', '').upper()
@@ -229,6 +247,11 @@ def header_lines(result):
     for name in ("sai1", "ltdc"):
         enabled = auxiliary is not None and getattr(auxiliary, name) is not None
         lines.append(f"#define NEXUS_CLOCK_PLLSAI_{name.upper()}_ENABLED {int(enabled)}u")
+    sai2_master = any(item.kind == "audio" and item.controller == "SAI2" and
+                      item.mode.startswith("master-")
+                      for item in result.controllers)
+    lines.append("#define NEXUS_CLOCK_PLLSAI_SAI2_ENABLED " +
+                 str(int(sai2_master)) + "u")
     if auxiliary is not None:
         for macro, value in (("M", auxiliary.m), ("N", auxiliary.n)):
             lines.append(f"#define NEXUS_CLOCK_PLLSAI_{macro} {value}u")
@@ -253,13 +276,16 @@ def _sdio_divider(selected, width, minimum_divisor):
     """Require a legal even wire divider from the selected static domains."""
     kernel = selected["domains"]["pll48"]["nominal_hz"]
     peripheral = selected["domains"]["apb2"]["nominal_hz"]
-    if (kernel != 48000000 or peripheral <= 0 or type(width) is not int or
+    sdio375 = selected["profile"] == SDIO375_PROFILE
+    if (kernel != (75000000 if sdio375 else 48000000) or
+            peripheral <= 0 or type(width) is not int or
             width not in {1, 4, 8}):
         fail("F407 SDIO requires exact PLL48, PCLK2 and bus width")
     # RM0090 31.2 is non-strict; ES0182 2.4.6 must be strictly satisfied.
     bus_minimum = (3 * kernel + 8 * peripheral - 1) // (8 * peripheral)
     fifo_minimum = 3 * width * (kernel + peripheral) // (32 * peripheral) + 1
-    divisor = max(4, minimum_divisor, bus_minimum, fifo_minimum)
+    divisor = max(2 if sdio375 else 4, minimum_divisor,
+                  bus_minimum, fifo_minimum)
     divisor = (divisor + 1) & ~1
     if divisor > 256:
         fail("F407 RM0090/ES0182 SDIO has no legal divider for PCLK2")
@@ -270,24 +296,29 @@ def validate_consumers(selected, controllers):
     """Reject impossible selected consumers before generating an image."""
     domain = lambda name: selected["domains"][name]["nominal_hz"]
     auxiliary = selected.get("pll_sai")
-    sai_master = any(item.kind == "audio" and item.controller == "SAI1" and
+    sai_master = any(item.kind == "audio" and item.controller in {"SAI1", "SAI2"} and
                      item.mode.startswith("master-") for item in controllers)
     ltdc = any(item.kind == "display" and item.controller == "LTDC" and
                item.mode == "rgb-scanout" for item in controllers)
     if auxiliary is not None and auxiliary["sai1"] is not None and not sai_master:
-        fail("PLLSAI Q requires its explicitly selected SAI1 master consumer")
+        fail("PLLSAI Q requires its explicitly selected SAI1 master or SAI2 master consumer")
     if sai_master and (auxiliary is None or auxiliary["sai1"] is None):
-        fail("SAI1 master requires the one declared System PLLSAI Q plan")
+        fail("SAI1 master or SAI2 master requires the one declared System PLLSAI Q plan")
     if auxiliary is not None and auxiliary["ltdc"] is not None and not ltdc:
         fail("PLLSAI R requires its explicitly selected LTDC consumer")
     if ltdc and (auxiliary is None or auxiliary["ltdc"] is None):
         fail("LTDC requires the one declared System PLLSAI R plan")
+    sdio375 = selected["profile"] == SDIO375_PROFILE
+    if sdio375 and not any(item.kind == "block" for item in controllers):
+        fail("F407 SDIO 37.5 MHz profile requires its selected memory host")
     for item in controllers:
+        if sdio375 and item.kind in {"usb_device", "usb_host", "entropy"}:
+            fail("F407 SDIO 75 MHz workaround forbids every USB and RNG owner")
         if item.kind in {"eth", "eth_frames"} and domain("core") < 25000000:
             fail("F407 Ethernet requires an AHB clock of at least 25 MHz")
         if item.kind == "entropy" and domain("pll48") != 48000000:
             fail("F407 RNG requires selected nominal PLL48=48MHz")
-        kernel48 = item.kind == "block"
+        kernel48 = item.kind == "block" and not sdio375
         if item.kind in {"usb_device", "usb_host"}:
             policy = USB_CLOCKS.get((item.kind, usb_otg.device_mode(item.mode)))
             if policy is None or item.controller != policy[0]:
@@ -300,8 +331,14 @@ def validate_consumers(selected, controllers):
         if kernel48 and domain("pll48") != 48000000:
             fail("F407 selected USB/SDIO requires exact nominal PLL48")
         if item.kind == "block":
-            _sdio_divider(selected, item.options.bus_width, 4)
-            _sdio_divider(selected, 1, 122)
+            high_speed = getattr(item.options, "speed", "default") == "high-speed"
+            if high_speed != sdio375:
+                fail("SDIO high-speed requires its exact F407 37.5 MHz profile")
+            if sdio375 and (item.options.bus_width != 4 or
+                    item.options.protocol not in {"sd-memory", "mmc"}):
+                fail("F407 SDIO high-speed admits only four-bit SDR memory")
+            _sdio_divider(selected, item.options.bus_width, 2 if sdio375 else 4)
+            _sdio_divider(selected, 1, domain("pll48") // 400000 + 1)
         if (item.kind in {"adc", "adc_group", "pwm_adc"} and
                 domain("adc") < 600000):
             fail("F407 selected ADC clock must be at least 0.6 MHz")

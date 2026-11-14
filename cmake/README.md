@@ -3,9 +3,16 @@
 CMake 维护唯一源码和链接依赖图。`NEXUS_ASSEMBLY_FILE` 选择 TOML 装配，生成结果
 只提供严格解析的选择、静态连接、布局与输入身份，不维护另一套源码列表。
 
-当前生产 provider 为 `nexus_soc_stm32f4`，具体实现限定 F407VE／ZG。精确器件宏与
+当前生产 provider 为 `nexus_soc_stm32f4`，具体实现由精确器件和模式事实限定。器件宏与
 startup 从型号事实导出；官方 HAL／LL、Device 和 Handle 保持私有。未选模块不参与
 编译，section GC 再移除未引用函数，两者分别验证。
+
+`STM32Official.cmake` 在同一次 configure 首次使用官方源码时完整验收选中 HAL／
+CMSIS 与 SDK 输入，并保存由 SHA256 绑定的唯一 pending 快照；全部根目录延迟操作
+完成后再完整复核内容、文件系统与 Git 身份。同字节重写也会失败。每个 target 的
+类型、器件、ABI、私有 include 和源码选择仍分别检查，不共享对象配置。
+快照只在本次 configure 内有效，不缓存测试或资格结果；下一次 configure 重新验收。
+输入依赖从同一快照投影，Git 的缺失候选使用精确文件 probe，不依赖锁目录时间戳。
 
 外部工程自身提供 `main.c` 与 `assembly.toml`：
 

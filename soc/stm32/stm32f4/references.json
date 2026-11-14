@@ -237,9 +237,9 @@
     "The ES0182 software audit records current mode dispositions, exclusions and external constraints; it is not a blanket workaround or physical pass.",
     "The five-cut runtime admission policy does not establish the observed physical cut. Hardware qualification remains not_executed.",
     "ADC accuracy, bus electrical timing, peer protocol compliance and linked external ISR behavior require their stated integration checks; software models cannot establish physical limits.",
-    "F411RE/F446ZE/F479NI entries are exact initial baremetal HSI16/CRC software references, not whole-device peripheral support or measured hardware qualification. Other document sections and unused modes remain not_assessed.",
+    "F411RE/F446ZE/F479NI are exact baremetal software references with reviewed direct HSI16 or HSI-derived PLL96/168 RUN profiles. Only explicitly maintained peripheral modes are admitted; all other document sections and unused modes remain not_assessed. No fitted PCB, oscillator accuracy or measured hardware qualification is implied.",
     "The named F479 package GPIO audit and exact source anchors are recorded in package_review. The inconsistent Table2 aggregate count grants no additional pad and changes no separately maintained peripheral mode, Board or physical scope.",
-    "New-device maximum-frequency PLL, voltage/overdrive, Flash-latency and peripheral clock policies require separate implementation and verification. The initial hsi16-only policy also gates custom clock parameters."
+    "Maximum-frequency, overdrive and dynamic clock policies are not granted by the reviewed HSI96/168 profiles. Exact voltage, Flash latency, PLL and auxiliary clock constraints are validated before System selects a clock. HSI-derived nominal frequencies do not establish an external-interface accuracy budget."
   ],
   "device_reviews": [
     {
@@ -304,6 +304,7 @@
           "capture:raw-blocks",
           "capture:snapshot-jpeg",
           "capture:snapshot-raw",
+          "cipher:dma-blocks",
           "cipher:irq-blocks",
           "crc:crc32-words",
           "dac:direct",
@@ -328,6 +329,7 @@
           "flash_async:nor-cfi",
           "gpio:input",
           "gpio:output",
+          "hash:dma-blocks",
           "hash:irq-blocks",
           "i2c:dma-messages",
           "i2c:irq-messages",
@@ -646,7 +648,7 @@
             "revisions": "AAAAAAAA",
             "assessment": "workaround",
             "condition": "A peripheral register is accessed immediately after its RCC interface gate is enabled.",
-            "handling": "Cold GPIO/platform and independent peripheral owners retain acquired gates, issue DSB and read RCC gate state before peripheral access. Failed gate visibility retains cleanup responsibility; this is not replaced with an uncalibrated NOP delay. Basic CRYP/HASH C start executes DSB and observes the actual AHB2 gate before first engine access. Complete stop first joins the engine/source, then withdraws the unique vector receipt and restores only its saved priority. No stream DMA is enabled. Complete frame sessions reuse the existing DCMI prepare gate/readback. They do not cycle the shared DMA2 controller or adopt an unobserved clock. A separately selected injected timer records only its added gate, executes barrier and readback before timer access, and preserves an inherited gate. A refused gate cleanup keeps its receipt and prevents false close success. Finite regular-auto-injected uses the same retained ADC123/DMA2/timer gate receipt and source-off preparation. There is no second clock owner, asynchronous worker or automatic recovery from lost clock history. Interleaved regular blocks use the existing ADC123 and shared DMA2 clock owners, no timer gate or implicit trigger source. Clock/reset history loss keeps the original source and buffer withdrawal responsibility rather than reopening a numerical facade. CM0 JPEG storage blocks reuse the same retained DCMI/DMA2 gate path. They do not cycle DMA2 or introduce another clock owner; a failed source withdrawal retains the original stream and pin/clock responsibility.",
+            "handling": "Cold GPIO/platform and independent peripheral owners retain acquired gates, issue DSB and read RCC gate state before peripheral access. Failed gate visibility retains cleanup responsibility; this is not replaced with an uncalibrated NOP delay. Basic CRYP/HASH C start executes DSB and observes the actual AHB2 gate before first engine access. Complete stop first joins the engine/source, then withdraws the unique vector receipt and restores only its saved priority. IRQ-blocks enables no stream DMA. F415/F417 dma-blocks consumes the Platform-owned DMA2 gate and exact reserved streams; per-channel admission/readback and task-driven withdrawal never reset or gate a sibling channel. No request is released before both engine and DMA references have been detached. Complete frame sessions reuse the existing DCMI prepare gate/readback. They do not cycle the shared DMA2 controller or adopt an unobserved clock. A separately selected injected timer records only its added gate, executes barrier and readback before timer access, and preserves an inherited gate. A refused gate cleanup keeps its receipt and prevents false close success. Finite regular-auto-injected uses the same retained ADC123/DMA2/timer gate receipt and source-off preparation. There is no second clock owner, asynchronous worker or automatic recovery from lost clock history. Interleaved regular blocks use the existing ADC123 and shared DMA2 clock owners, no timer gate or implicit trigger source. Clock/reset history loss keeps the original source and buffer withdrawal responsibility rather than reopening a numerical facade. CM0 JPEG storage blocks reuse the same retained DCMI/DMA2 gate path. They do not cycle DMA2 or introduce another clock owner; a failed source withdrawal retains the original stream and pin/clock responsibility.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/gpio.c",
               "soc/stm32/stm32f4/drivers/platform_cold.c",
@@ -658,7 +660,10 @@
               "soc/stm32/stm32f4/drivers/adc_group_blocks.c",
               "soc/stm32/stm32f4/drivers/adc_group.c",
               "soc/stm32/stm32f4/private/stm32f4_adc_trigger.h",
-              "soc/stm32/stm32f4/drivers/adc_group_automatic.c"
+              "soc/stm32/stm32f4/drivers/adc_group_automatic.c",
+              "soc/stm32/stm32f4/drivers/cipher_dma.c",
+              "soc/stm32/stm32f4/drivers/hash_dma.c",
+              "soc/stm32/stm32f4/drivers/crypto_dma.c"
             ],
             "regressions": [
               "tests/google/stm32_platform_cold_test.cpp",
@@ -670,7 +675,8 @@
               "tools/configure/test_f407_crypto.py",
               "tests/google/f407_capture_audio_test.cpp",
               "tests/google/stm32_adc_group_test.cpp",
-              "tools/configure/test_f407_capture_audio_configuration.py"
+              "tools/configure/test_f407_capture_audio_configuration.py",
+              "tools/testing/test_stm32_official_cmake.py"
             ]
           },
           {
@@ -755,7 +761,7 @@
             "revisions": "AAAAAAAA",
             "assessment": "excluded_mode",
             "condition": "DMA2 AHB peripheral-port requests to a FIFO-like FSMC/QUADSPI target or GPIO writes run concurrently with APB2 requests.",
-            "handling": "Selected F407 DMA paths do not use DMA2 peripheral-port writes to GPIO or FIFO-like FSMC/QUADSPI. FSMC endpoints are CPU controlled and F407 has no QUADSPI provider. Do not prohibit unrelated ADC/SDIO concurrency or mislabel internal-SRAM repeated accesses as this FIFO corruption; a future affected route must choose the memory port explicitly. ADC regular blocks use DMA2_Stream0 channel0 from ADC_CDR to admitted internal SRAM; they add no FIFO-like AHB peripheral-port write route. Combined operation still uses DMA2 only for CDR-to-main-SRAM regular samples; injected JDR values are bounded CPU reads. It introduces no AHB FIFO target or GPIO write through the DMA2 peripheral port. DCMI CM1 frame sessions read DCMI_DR through the DMA2 peripheral port and write admitted main SRAM; they introduce no FIFO-like AHB peripheral-port write. Each independent snapshot joins its source, FIFO, actual DMA EN readback, IRQs and addresses before publishing and rearming. This is not gapless CM0 or a count of exact JPEG codestream bytes. Timer-injected blocks retain only the existing CDR-to-main-SRAM DMA route. The extra timer generates an internal ADC event; injected data are bounded JDR CPU reads, not a new DMA2 AHB FIFO-like destination. The finite JAUTO joint request keeps the existing CDR-to-main-SRAM DMA2 Stream0 channel0 route for regular samples. Injected samples are bounded JDR CPU reads after complete joint withdrawal; no DMA2 FIFO-like AHB peripheral-port destination is introduced. Interleaved blocks use only ADC_CDR peripheral reads into admitted main SRAM: DMA mode2 emits word pairs for 10/12-bit samples, mode3 emits halfword pairs for 6/8-bit samples. Neither is a DMA2 AHB peripheral-port write into a FIFO-like target. CM0 JPEG storage blocks keep only DCMI_DR peripheral reads into admitted main SRAM. They introduce no DMA2 peripheral-port write to a FIFO-like AHB destination. The selected 8-bit hardware-sync path exposes native 32-bit storage words, including EOF padding, and claims neither frame boundaries nor exact JPEG byte lengths. A conservative service bound reserves one partial packer word, four DCMI FIFO words, four DMA FIFO words and one SINGLE transfer on each AHB master; only service gaps and capacities admitted against that bound are selectable.",
+            "handling": "Selected F407 DMA paths do not use DMA2 peripheral-port writes to GPIO or FIFO-like FSMC/QUADSPI. FSMC endpoints are CPU controlled and F407 has no QUADSPI provider. Do not prohibit unrelated ADC/SDIO concurrency or mislabel internal-SRAM repeated accesses as this FIFO corruption; a future affected route must choose the memory port explicitly. ADC regular blocks use DMA2_Stream0 channel0 from ADC_CDR to admitted internal SRAM; they add no FIFO-like AHB peripheral-port write route. Combined operation still uses DMA2 only for CDR-to-main-SRAM regular samples; injected JDR values are bounded CPU reads. It introduces no AHB FIFO target or GPIO write through the DMA2 peripheral port. DCMI CM1 frame sessions read DCMI_DR through the DMA2 peripheral port and write admitted main SRAM; they introduce no FIFO-like AHB peripheral-port write. Each independent snapshot joins its source, FIFO, actual DMA EN readback, IRQs and addresses before publishing and rearming. This is not gapless CM0 or a count of exact JPEG codestream bytes. Timer-injected blocks retain only the existing CDR-to-main-SRAM DMA route. The extra timer generates an internal ADC event; injected data are bounded JDR CPU reads, not a new DMA2 AHB FIFO-like destination. The finite JAUTO joint request keeps the existing CDR-to-main-SRAM DMA2 Stream0 channel0 route for regular samples. Injected samples are bounded JDR CPU reads after complete joint withdrawal; no DMA2 FIFO-like AHB peripheral-port destination is introduced. Interleaved blocks use only ADC_CDR peripheral reads into admitted main SRAM: DMA mode2 emits word pairs for 10/12-bit samples, mode3 emits halfword pairs for 6/8-bit samples. Neither is a DMA2 AHB peripheral-port write into a FIFO-like target. CM0 JPEG storage blocks keep only DCMI_DR peripheral reads into admitted main SRAM. They introduce no DMA2 peripheral-port write to a FIFO-like AHB destination. The selected 8-bit hardware-sync path exposes native 32-bit storage words, including EOF padding, and claims neither frame boundaries nor exact JPEG byte lengths. A conservative service bound reserves one partial packer word, four DCMI FIFO words, four DMA FIFO words and one SINGLE transfer on each AHB master; only service gaps and capacities admitted against that bound are selectable. F415/F417 basic CRYP/HASH dma-blocks uses only the exact channel2 CRYP input/output or HASH input registers and admitted main SRAM/readable Flash. ES0182 Rev19 section2.2.19 explicitly lists indirect QUADSPI, external-FIFO FSMC and GPIO peripheral-port writes; these selected crypto paths introduce none of those routes. Their inclusion does not authorize DMA to arbitrary AHB FIFO targets or prohibit unrelated ADC/SDIO concurrency.",
             "implementation": [
               "tools/configure/stm32f4/hardware.py",
               "io/src/mechanisms/dma.c",
@@ -764,13 +770,20 @@
               "soc/stm32/stm32f4/drivers/adc_group.c",
               "soc/stm32/stm32f4/drivers/capture.c",
               "soc/stm32/stm32f4/private/stm32f4_adc_trigger.h",
-              "soc/stm32/stm32f4/drivers/adc_group_automatic.c"
+              "soc/stm32/stm32f4/drivers/adc_group_automatic.c",
+              "soc/stm32/stm32f4/drivers/cipher_dma.c",
+              "soc/stm32/stm32f4/drivers/hash_dma.c",
+              "soc/stm32/stm32f4/drivers/crypto_dma.c"
             ],
             "regressions": [
               "tools/configure/test_f407_clocks.py",
               "tests/google/stm32_adc_group_test.cpp",
               "tests/google/f407_capture_audio_test.cpp",
-              "tools/configure/test_f407_capture_audio_configuration.py"
+              "tools/configure/test_f407_capture_audio_configuration.py",
+              "tests/contracts/stm32f4_crypto/cipher_test.cpp",
+              "tests/contracts/stm32f4_crypto/hash_test.cpp",
+              "tools/configure/test_f407_crypto.py",
+              "tools/testing/test_stm32_official_cmake.py"
             ]
           },
           {
@@ -875,7 +888,7 @@
             "revisions": "AAAAAAAA",
             "assessment": "workaround",
             "condition": "48-MHz bypass SDIO clock violates SD/MMC hold timing.",
-            "handling": "Clock construction explicitly disables bypass and selects reviewed CLKDIV values for 400-kHz initialization and 12-MHz transfer. PLL48 remains exact for shared USB/RNG users; no implicit 75-MHz retuning occurs.",
+            "handling": "Clock construction explicitly disables bypass. The default profile selects reviewed CLKDIV values for initialization below 400 kHz and transfer up to 12 MHz, with exact PLL48 for shared USB/RNG users. Only the exact F407 hse8-pll150-sdio375 plus high-speed four-bit SD-memory/MMC selection admits HCLK150/APB2=PLLQ75 and non-bypass 37.5 MHz data transfer. That closed profile rejects USB, RNG and optional power modes; no implicit shared-clock retuning occurs. Other devices and custom tuples inherit no 37.5 MHz grant.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio.c",
               "tools/configure/stm32f4/block.py",
@@ -1936,7 +1949,7 @@
       "silicon_revision": "not_observed",
       "mode_workarounds": "audited_with_constraints",
       "hardware_qualification": "not_executed",
-      "identification": "Initial exact STM32F411RET6 baremetal CRC/HSI16 software slice only. Table 2 marks revisions A, 1, 2 with REV_ID=0x1000; the C rule reads actual DEV_ID/REV_ID. Other document sections remain not_assessed and grant no peripheral/backend support.",
+      "identification": "Initial exact STM32F411RET6 baremetal CRC/HSI16 software slice only. Table 2 marks revisions A, 1, 2 with REV_ID=0x1000; the C rule reads actual DEV_ID/REV_ID. Other document sections remain not_assessed and grant no peripheral/backend support. The reviewed System RUN profiles additionally admit explicit HSI PLL96 (M16/N384/P4/Q8), VOS1, 3.3 V, APB1 48 MHz and APB2 96 MHz; direct HSI16 remains available. Main PLL readiness, voltage scaling readiness, Flash latency and bounded rollback are owned by System. HSI precision is not USB crystal accuracy or physical qualification. The selected RTC LSE32768 crystal primary retained/provision modes additionally require the exact integrated HSI96/168 tuple, baremetal, no PLLSAI and no optional duration wakeup. F411 has20 backup registers and no backup SRAM; F446/F479 optional SRAM borrowing remains explicit. Software models and builds establish no actual oscillator, VBAT retention, low-power-debug or physical HIL qualification.",
       "software_audit": {
         "profile": "es0287-rev6-crc-hsi16",
         "document_sha256": "ec266d54ab842f1d4246308b473c806223478b6021cc82f958a7a59043175673",
@@ -1946,7 +1959,9 @@
           "2"
         ],
         "maintained_modes": [
-          "crc:crc32-words"
+          "crc:crc32-words",
+          "rtc:adopt-retained",
+          "rtc:provision-empty"
         ],
         "items": [
           {
@@ -1999,15 +2014,22 @@
             "section": "2.2.1",
             "title": "Debugging Stop mode and SysTick timer",
             "revisions": "AAA",
-            "assessment": "excluded_mode",
+            "assessment": "workaround",
             "condition": "STOP/Standby debug entry or multiple deep-power wake sources.",
-            "handling": "The reviewed slice admits baremetal HSI16 RUN plus the ordinary timebase/CRC path. It exposes no deep-power controller or RTC wake source; STOP/Standby and their debug behavior remain unassessed and unsupported for this slice.",
+            "handling": "The drained power admission rejects enabled/pending SysTick before ending the Core epoch. OS users must explicitly suspend and rebuild their time state; no kernel tick resumes across STOP.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2016,13 +2038,20 @@
             "revisions": "AAA",
             "assessment": "excluded_mode",
             "condition": "STOP/Standby debug entry or multiple deep-power wake sources.",
-            "handling": "The reviewed slice admits baremetal HSI16 RUN plus the ordinary timebase/CRC path. It exposes no deep-power controller or RTC wake source; STOP/Standby and their debug behavior remain unassessed and unsupported for this slice.",
+            "handling": "Selected STOP rejects DBGMCU_CR.DBG_STOP and selected Standby rejects DBG_STANDBY before effects. The release WFE path does not claim the dedicated debug WFE/NOP/BX workaround or debugger low-power qualification.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2031,29 +2060,37 @@
             "revisions": "AAA",
             "assessment": "excluded_mode",
             "condition": "Debug Sleep/Stop with prefetch disabled and nonzero Flash wait states.",
-            "handling": "The hsi16-only policy fixes HCLK/APB to 16 MHz and the selected 2.7..3.6 V Flash plan to zero wait states; the stated conjunction is absent. STOP is outside this slice. No general debugger timing qualification is claimed.",
+            "handling": "The reviewed System RUN owner enables FLASH_ACR_PRFTEN and checks it by DSB/readback before the selected clock switch; direct HSI16 uses0 WS and the explicit HSI PLL96 profile uses3 WS. High-profile activation additionally observes PLLRDY then bounded VOSRDY before selecting PLL SYSCLK; failure rolls back without publishing time, retaining responsibility if withdrawal fails. The software profile therefore does not select the prefetch-disabled conjunction; this does not qualify debugger timing or arbitrary external register writes. STOP/Standby for this exact part remains outside the current F407 deep-power slice.",
             "implementation": [
               "tools/configure/stm32f4/contract.py",
               "soc/stm32/stm32f4/system.c"
             ],
             "regressions": [
               "tools/configure/test_device_clocks.py",
-              "tests/google/stm32_family_system_test.cpp"
+              "tests/google/stm32_family_system_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp"
             ]
           },
           {
             "section": "2.2.4",
             "title": "Wake-up sequence from Standby mode when using more than one wake-up source",
             "revisions": "AAA",
-            "assessment": "excluded_mode",
+            "assessment": "workaround",
             "condition": "STOP/Standby debug entry or multiple deep-power wake sources.",
-            "handling": "The reviewed slice admits baremetal HSI16 RUN plus the ordinary timebase/CRC path. It exposes no deep-power controller or RTC wake source; STOP/Standby and their debug behavior remain unassessed and unsupported for this slice.",
+            "handling": "One C power transaction validates every implemented NVIC bank and exact wake route, withdraws original/selected wake pin enables, acknowledges PWR WUF only with explicit discard authorization, then commits the unique RTC receipt and rearms wake controls. Newly arrived WUF/RTC/EXTI evidence is preserved after returning WFI; F446 PA0 and PC13 map to EWUP1/EWUP2 respectively.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2119,15 +2156,22 @@
             "section": "2.2.9",
             "title": "Possible delay in backup domain protection disabling/enabling after programming the DBP bit",
             "revisions": "AAA",
-            "assessment": "excluded_mode",
+            "assessment": "workaround",
             "condition": "DBP programming followed immediately by a backup-domain access.",
-            "handling": "System retains unrelated PWR/backup bits and the CRC slice does not program DBP or access backup registers. RTC/backup-domain lifecycle is not admitted.",
+            "handling": "Provisioning performs an immediate PWR_CR readback after programming DBP before any BDCR/calendar operation; writes and ready-state waits are bounded and retained effects are reported. Adopt requires externally prepared live backup access and asserted provenance.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2136,13 +2180,20 @@
             "revisions": "NNN",
             "assessment": "excluded_mode",
             "condition": "PC13 transitions disturb the crystal LSE on affected packages.",
-            "handling": "The slice assigns no GPIO, enables no LSE and exposes no RTC. Crystal LSE plus PC13 capture is not implicitly allowed by the family implementation.",
+            "handling": "The crystal LSE software profile conservatively claims quiet PC13 and verifies or acquires analog silence before oscillator effects. Selected F446 LQFP PC13 Standby wake conflicts with live crystal LSE, including a pre-enabled EWUP2, and is rejected. F479NIH6 TFBGA is not physically subject to the LQFP limitation, but this first RTC profile retains the same conservative pad contract; no broad package grant follows.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2166,12 +2217,20 @@
             "revisions": "AAA",
             "assessment": "external_constraint",
             "condition": "Supply falls into the backup reset window and rises before a reliable backup-domain POR.",
-            "handling": "No backup retention or RTC content is consumed by this internal CRC reference. Board/product power sequencing must satisfy the documented discharge condition or perform its explicit backup-domain recovery; startup does not erase retained data as an implicit fix.",
+            "handling": "Backup provenance after a VDD/VBAT brownout is a product/Board electrical responsibility. Adopt requires externally established valid retained calendar and access; provision accepts only an explicitly empty backup domain. This provider never erases retained data or resets backup hardware automatically. Qualifying power discharge/reinitialization policy and physical retention remains external and not_executed.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
-            "regressions": []
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
           },
           {
             "section": "2.2.13",
@@ -2192,12 +2251,20 @@
             "revisions": "AAA",
             "assessment": "external_constraint",
             "condition": "PB5 input exceeds VDD, or PA0 exceeds VDD in Standby.",
-            "handling": "The reference binds no GPIO and admits no Standby. External PCB voltage limits remain mandatory when those pads are connected; a package pin list never grants an electrical mode.",
+            "handling": "The product must keep PA0 Standby input at or below VDD according to the exact datasheet/erratum; ordinary RUN 5V-tolerant assumptions do not carry into Standby. Software does not measure pad voltage or qualify external circuitry.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
-            "regressions": []
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
           },
           {
             "section": "2.2.15",
@@ -2227,6 +2294,101 @@
             "regressions": [
               "tests/google/stm32_family_system_test.cpp"
             ]
+          },
+          {
+            "section": "2.8.1",
+            "title": "Spurious tamper detection when disabling the tamper channel",
+            "revisions": "NNN",
+            "assessment": "excluded_mode",
+            "condition": "Unfiltered falling-edge tamper can falsely erase backup data when disabled while high.",
+            "handling": "The selected primary calendar profile does not require tamper. The shared auxiliary C admission independently rejects unfiltered falling-edge tamper and unavailable second-pad/tamper2 modes; no no-workaround mode is enabled.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.8.2",
+            "title": "RTC calendar registers are not locked properly",
+            "revisions": "AAA",
+            "assessment": "workaround",
+            "condition": "Shadow SSR/TR/DR can be inconsistent at an RTC update boundary.",
+            "handling": "The selected retained/provisioned calendar uses BYPSHAD1 with bounded coherent readback of the complete snapshot; no shadow-lock assumption or inferred calendar provenance is made.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.8.3",
+            "title": "RTC interrupt can be masked by another RTC interrupt",
+            "revisions": "AAA",
+            "assessment": "excluded_mode",
+            "condition": "Two RTC publishers share a single EXTI interrupt request.",
+            "handling": "This slice supplies polling and explicitly owned EXTI event wake routes, not an RTC ISR publisher. Standby sources are withdrawn before WUF acknowledgment and restored by the same RTC receipt; returning WFI preserves new RTC/EXTI flags for explicit business-event inspection.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.8.4",
+            "title": "Calendar initialization may fail in case of consecutive INIT mode entry",
+            "revisions": "AAA",
+            "assessment": "workaround",
+            "condition": "Consecutive INIT acquisition can observe a stale INITF crossing.",
+            "handling": "Every selected calendar programming/coarse-calibration INIT session first clears BYPSHAD, clears RSF and actually waits for RSF with one finite budget before reacquiring INITF. Original bypass personality is restored; no fixed delay or synthetic date is used.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.8.5",
+            "title": "Alarm flag may be repeatedly set when the core is stopped in debug",
+            "revisions": "NNN",
+            "assessment": "excluded_mode",
+            "condition": "A nonzero subsecond alarm mask can retrigger while the core is halted.",
+            "handling": "The selected whole-second Alarm A/B contract writes zero subsecond masks. Deep-power debug is excluded by a read-only DBG_STOP/DBG_STANDBY admission guard, and debug timing is not physically qualified.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
           }
         ]
       }
@@ -2241,7 +2403,7 @@
       "silicon_revision": "not_observed",
       "mode_workarounds": "audited_with_constraints",
       "hardware_qualification": "not_executed",
-      "identification": "Initial exact STM32F446ZET6 baremetal CRC/HSI16 software slice only. Table 2 marks revisions A, 1 with REV_ID=0x1000; the C rule reads actual DEV_ID/REV_ID. Other document sections remain not_assessed and grant no peripheral/backend support. The selected System clock policy retains HSI16/main-PLL-off RUN. Any declared PLLSAI must additionally match the exact dedicated-M (F446) or shared-M/minimum-192-MHz (F479) hardware; an auxiliary declaration alone grants no peripheral mode. Selected finite SAI1 A/B master/slave TX/RX/synchronized duplex follows the exact AF6 routes and dedicated-M clock policy; SAI2, continuous blocks, sparse slots, cross-SAI, AC97/SPDIF and physical audio timing remain ungranted.",
+      "identification": "Initial exact STM32F446ZET6 baremetal CRC/HSI16 software slice only. Table 2 marks revisions A, 1 with REV_ID=0x1000; the C rule reads actual DEV_ID/REV_ID. Other document sections remain not_assessed and grant no peripheral/backend support. The reviewed System RUN profiles admit direct HSI16/main-PLL-off or explicit HSI PLL168 (M16/N336/P2/Q7), VOS1, 3.3 V, APB1 42 MHz and APB2 84 MHz, without overdrive. HSI-derived nominal 48 MHz does not establish USB clock accuracy. System owns bounded PLL/voltage readiness and rollback; auxiliary PLL constraints remain exact to the device. Any declared PLLSAI must additionally match the exact dedicated-M (F446) or shared-M/minimum-192-MHz (F479) hardware; an auxiliary declaration alone grants no peripheral mode. Selected finite SAI1 A/B and SAI2 A/B master/slave TX/RX/synchronized duplex follow their exact AF6/AF10 routes and dedicated-M clock policy. SAI2 uses IRQ91 and DMA2 Stream4/6 Channel3, independent from SAI1 state, gates and vectors. Explicit sparse slots use compact active-slot FIFO storage. Cross-SAI synchronization, AC97/SPDIF and physical audio timing remain ungranted. The selected RTC LSE32768 crystal primary retained/provision modes additionally require the exact integrated HSI96/168 tuple, baremetal, no PLLSAI and no optional duration wakeup. F411 has20 backup registers and no backup SRAM; F446/F479 optional SRAM borrowing remains explicit. Software models and builds establish no actual oscillator, VBAT retention, low-power-debug or physical HIL qualification.",
       "software_audit": {
         "profile": "es0298-rev8-run-hsi16",
         "document_sha256": "83eeb33a12dc29f5868b78fbc0d87a4ac255e9c4e96fe12d76d8531a78ed108c",
@@ -2251,12 +2413,20 @@
         ],
         "maintained_modes": [
           "audio:master-duplex",
+          "audio:master-duplex-blocks",
           "audio:master-rx",
+          "audio:master-rx-blocks",
           "audio:master-tx",
+          "audio:master-tx-blocks",
           "audio:slave-duplex",
+          "audio:slave-duplex-blocks",
           "audio:slave-rx",
+          "audio:slave-rx-blocks",
           "audio:slave-tx",
-          "crc:crc32-words"
+          "audio:slave-tx-blocks",
+          "crc:crc32-words",
+          "rtc:adopt-retained",
+          "rtc:provision-empty"
         ],
         "items": [
           {
@@ -2295,7 +2465,7 @@
             "revisions": "AA",
             "assessment": "workaround",
             "condition": "A buffered immediate-offset store overlaps exception return and a late interrupt priority change.",
-            "handling": "The maintained baremetal TIM2 entry executes a final DSB after the true overflow handler. Generated thin F4 entries keep their final DSB rule. Any external or overridden exception entry must preserve that rule; a software result does not observe the physical interrupt interleaving. SAI1 IRQ87 dispatches the one static A/B owner; selected DMA2 stream1/stream4 dispatch their source-specific handlers and keep the generated outer DSB. There is no second per-block NVIC owner.",
+            "handling": "The maintained baremetal TIM2 entry executes a final DSB after the true overflow handler. Generated thin F4 entries keep their final DSB rule. Any external or overridden exception entry must preserve that rule; a software result does not observe the physical interrupt interleaving. SAI1 IRQ87 dispatches the one static A/B owner; selected DMA2 stream1/stream4 dispatch their source-specific handlers and keep the generated outer DSB. There is no second per-block NVIC owner. Selected SAI2 IRQ91 and DMA2 Stream4/6 Channel3 dispatch only the SAI2 owner and keep the same final DSB; no SAI1 gate or vector is acquired by a standalone SAI2 selection.",
             "implementation": [
               "soc/stm32/stm32f4/system.c",
               "tools/configure/bindings.py",
@@ -2311,15 +2481,22 @@
             "section": "2.2.1",
             "title": "Debugging Stop mode and SysTick timer",
             "revisions": "AA",
-            "assessment": "excluded_mode",
+            "assessment": "workaround",
             "condition": "STOP/Standby debug entry or multiple deep-power wake sources.",
-            "handling": "The reviewed slice admits baremetal HSI16 RUN plus the ordinary timebase/CRC path. It exposes no deep-power controller or RTC wake source; STOP/Standby and their debug behavior remain unassessed and unsupported for this slice.",
+            "handling": "The drained power admission rejects enabled/pending SysTick before ending the Core epoch. OS users must explicitly suspend and rebuild their time state; no kernel tick resumes across STOP.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2328,13 +2505,20 @@
             "revisions": "AA",
             "assessment": "excluded_mode",
             "condition": "STOP/Standby debug entry or multiple deep-power wake sources.",
-            "handling": "The reviewed slice admits baremetal HSI16 RUN plus the ordinary timebase/CRC path. It exposes no deep-power controller or RTC wake source; STOP/Standby and their debug behavior remain unassessed and unsupported for this slice.",
+            "handling": "Selected STOP rejects DBGMCU_CR.DBG_STOP and selected Standby rejects DBG_STANDBY before effects. The release WFE path does not claim the dedicated debug WFE/NOP/BX workaround or debugger low-power qualification.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2343,29 +2527,37 @@
             "revisions": "AA",
             "assessment": "excluded_mode",
             "condition": "Debug Sleep/Stop with prefetch disabled and nonzero Flash wait states.",
-            "handling": "The selected HSI16 RUN policy fixes HCLK/APB to 16 MHz and the selected 2.7..3.6 V Flash plan to zero wait states; the stated conjunction is absent. STOP is outside this slice. No general debugger timing qualification is claimed.",
+            "handling": "The reviewed System RUN owner enables FLASH_ACR_PRFTEN and checks it by DSB/readback before the selected clock switch; direct HSI16 uses0 WS and the explicit HSI PLL168 profile uses5 WS. High-profile activation additionally observes PLLRDY then bounded VOSRDY before selecting PLL SYSCLK; failure rolls back without publishing time, retaining responsibility if withdrawal fails. The software profile therefore does not select the prefetch-disabled conjunction; this does not qualify debugger timing or arbitrary external register writes. STOP/Standby for this exact part remains outside the current F407 deep-power slice.",
             "implementation": [
               "tools/configure/stm32f4/contract.py",
               "soc/stm32/stm32f4/system.c"
             ],
             "regressions": [
               "tools/configure/test_device_clocks.py",
-              "tests/google/stm32_family_system_test.cpp"
+              "tests/google/stm32_family_system_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp"
             ]
           },
           {
             "section": "2.2.4",
             "title": "Wake-up sequence from Standby mode when using more than one wake-up source",
             "revisions": "AA",
-            "assessment": "excluded_mode",
+            "assessment": "workaround",
             "condition": "STOP/Standby debug entry or multiple deep-power wake sources.",
-            "handling": "The reviewed slice admits baremetal HSI16 RUN plus the ordinary timebase/CRC path. It exposes no deep-power controller or RTC wake source; STOP/Standby and their debug behavior remain unassessed and unsupported for this slice.",
+            "handling": "One C power transaction validates every implemented NVIC bank and exact wake route, withdraws original/selected wake pin enables, acknowledges PWR WUF only with explicit discard authorization, then commits the unique RTC receipt and rearms wake controls. Newly arrived WUF/RTC/EXTI evidence is preserved after returning WFI; F446 PA0 and PC13 map to EWUP1/EWUP2 respectively.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2433,15 +2625,22 @@
             "section": "2.2.9",
             "title": "Possible delay in backup domain protection disabling/enabling after programming the DBP bit",
             "revisions": "AA",
-            "assessment": "excluded_mode",
+            "assessment": "workaround",
             "condition": "DBP programming followed immediately by a backup-domain access.",
-            "handling": "System retains unrelated PWR/backup bits and the selected RUN slice does not program DBP or access backup registers. RTC/backup-domain lifecycle is not admitted.",
+            "handling": "Provisioning performs an immediate PWR_CR readback after programming DBP before any BDCR/calendar operation; writes and ready-state waits are bounded and retained effects are reported. Adopt requires externally prepared live backup access and asserted provenance.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2450,13 +2649,20 @@
             "revisions": "NN",
             "assessment": "excluded_mode",
             "condition": "PC13 transitions disturb the crystal LSE on affected packages.",
-            "handling": "The slice assigns no GPIO, enables no LSE and exposes no RTC. Crystal LSE plus PC13 capture is not implicitly allowed by the family implementation.",
+            "handling": "The crystal LSE software profile conservatively claims quiet PC13 and verifies or acquires analog silence before oscillator effects. Selected F446 LQFP PC13 Standby wake conflicts with live crystal LSE, including a pre-enabled EWUP2, and is rejected. F479NIH6 TFBGA is not physically subject to the LQFP limitation, but this first RTC profile retains the same conservative pad contract; no broad package grant follows.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2465,12 +2671,20 @@
             "revisions": "AA",
             "assessment": "external_constraint",
             "condition": "Supply falls into the backup reset window and rises before a reliable backup-domain POR.",
-            "handling": "No backup retention or RTC content is consumed by this internal CRC reference. Board/product power sequencing must satisfy the documented discharge condition or perform its explicit backup-domain recovery; startup does not erase retained data as an implicit fix.",
+            "handling": "Backup provenance after a VDD/VBAT brownout is a product/Board electrical responsibility. Adopt requires externally established valid retained calendar and access; provision accepts only an explicitly empty backup domain. This provider never erases retained data or resets backup hardware automatically. Qualifying power discharge/reinitialization policy and physical retention remains external and not_executed.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
-            "regressions": []
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
           },
           {
             "section": "2.2.12",
@@ -2500,6 +2714,120 @@
             "regressions": [
               "tests/google/stm32_family_system_test.cpp"
             ]
+          },
+          {
+            "section": "2.10.1",
+            "title": "Spurious tamper detection when disabling the tamper channel",
+            "revisions": "NN",
+            "assessment": "excluded_mode",
+            "condition": "Unfiltered falling-edge tamper can falsely erase backup data when disabled while high.",
+            "handling": "The selected primary calendar profile does not require tamper. The shared auxiliary C admission independently rejects unfiltered falling-edge tamper and unavailable second-pad/tamper2 modes; no no-workaround mode is enabled.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.10.2",
+            "title": "RTC calendar registers are not locked properly",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "Shadow SSR/TR/DR can be inconsistent at an RTC update boundary.",
+            "handling": "The selected retained/provisioned calendar uses BYPSHAD1 with bounded coherent readback of the complete snapshot; no shadow-lock assumption or inferred calendar provenance is made.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.10.3",
+            "title": "RTC interrupt can be masked by another RTC interrupt",
+            "revisions": "AA",
+            "assessment": "excluded_mode",
+            "condition": "Two RTC publishers share a single EXTI interrupt request.",
+            "handling": "This slice supplies polling and explicitly owned EXTI event wake routes, not an RTC ISR publisher. Standby sources are withdrawn before WUF acknowledgment and restored by the same RTC receipt; returning WFI preserves new RTC/EXTI flags for explicit business-event inspection.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.10.4",
+            "title": "Calendar initialization may fail in case of consecutive INIT mode entry",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "Consecutive INIT acquisition can observe a stale INITF crossing.",
+            "handling": "Every selected calendar programming/coarse-calibration INIT session first clears BYPSHAD, clears RSF and actually waits for RSF with one finite budget before reacquiring INITF. Original bypass personality is restored; no fixed delay or synthetic date is used.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.10.5",
+            "title": "Alarm flag may be repeatedly set when the core is stopped in debug",
+            "revisions": "NN",
+            "assessment": "excluded_mode",
+            "condition": "A nonzero subsecond alarm mask can retrigger while the core is halted.",
+            "handling": "The selected whole-second Alarm A/B contract writes zero subsecond masks. Deep-power debug is excluded by a read-only DBG_STOP/DBG_STANDBY admission guard, and debug timing is not physically qualified.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.10.6",
+            "title": "Detection of a tamper event occurring before enabling the tamper detection is not supported in edge detection mode",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "An edge predating detector enable is not recorded.",
+            "handling": "No historical edge capture is promised. The optional selected TAMP1 input has an explicit pin handoff and live post-enable pad observation; timestamp/tamper2 and package-specific modes outside the declared profile remain ungranted.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
           }
         ]
       }
@@ -2514,7 +2842,7 @@
       "silicon_revision": "not_observed",
       "mode_workarounds": "audited_with_constraints",
       "hardware_qualification": "not_executed",
-      "identification": "Exact STM32F479NIH6 baremetal HSI16 RUN software slices: internal CRC and explicitly declared 16-bit Bank1 SDRAM CPU or graphics-owned windows. Table2 revisions A/1 share REV_ID0x1000; actual identity remains required. SDRAM geometry/timing is a synthetic software reference, with no fitted memory/PCB/HIL qualification. All unlisted peripheral/backend modes remain unassessed. The selected System clock policy retains HSI16/main-PLL-off RUN. Any declared PLLSAI must additionally match the exact dedicated-M (F446) or shared-M/minimum-192-MHz (F479) hardware; an auxiliary declaration alone grants no peripheral mode. Selected finite SAI1 A/B and native parallel LTDC RGB565/RGB888 routes use the same shared-M PLLSAI owner. Graphics admits RGB565/ARGB8888 framebuffers and DMA2D fill/copy/convert/blend in reviewed internal SRAM. An explicit graphics-owned Bank1 endpoint additionally supplies only per-engine LTDC read and DMA2D read/write regions, under the original private bank lease held until both engines complete cold stop. The ordinary cpu-window never implies this grant. RM0386 2.1.8-9 and 12.8 establish the hardware route and bank mode, not bandwidth or fitted-device qualification. No generic external-memory DMA, SAI2, DSI, CLUT, additional pixel format, panel, clock accuracy or HIL qualification is granted. QUADSPI adds only W25Q128JV Flash1 indirect SDR 1-1-1 PIO, finite budgets and explicit caller service. Public async stop seals and drains; Platform cold stop alone closes the controller. No memory-mapped aperture access by any CPU, IRQ, DMA or debugger is permitted throughout the provider lifetime. This development scope is not a software-candidate or physical qualification.",
+      "identification": "Exact STM32F479NIH6 baremetal HSI16 RUN software slices: internal CRC and explicitly declared 16-bit Bank1 SDRAM CPU or graphics-owned windows. Table2 revisions A/1 share REV_ID0x1000; actual identity remains required. SDRAM geometry/timing is a synthetic software reference, with no fitted memory/PCB/HIL qualification. All unlisted peripheral/backend modes remain unassessed. The reviewed System RUN profiles admit direct HSI16/main-PLL-off or explicit HSI PLL168 (M16/N336/P2/Q7 or M10/N210/P2/Q7; shared M10 permits the reviewed auxiliary SAI clock), VOS1, 3.3 V, APB1 42 MHz and APB2 84 MHz, without overdrive. HSI-derived nominal 48 MHz does not establish USB clock accuracy. System owns bounded PLL/voltage readiness and rollback; auxiliary PLL constraints remain exact to the device. Any declared PLLSAI must additionally match the exact dedicated-M (F446) or shared-M/minimum-192-MHz (F479) hardware; an auxiliary declaration alone grants no peripheral mode. Selected finite SAI1 A/B and native parallel LTDC RGB565/RGB888 routes use the same shared-M PLLSAI owner. Graphics admits RGB565/ARGB8888 framebuffers and DMA2D fill/copy/convert/blend in reviewed internal SRAM. An explicit graphics-owned Bank1 endpoint additionally supplies only per-engine LTDC read and DMA2D read/write regions, under the original private bank lease held until both engines complete cold stop. The ordinary cpu-window never implies this grant. RM0386 2.1.8-9 and 12.8 establish the hardware route and bank mode, not bandwidth or fitted-device qualification. No generic external-memory DMA, SAI2, DSI, CLUT, additional pixel format, panel, clock accuracy or HIL qualification is granted. QUADSPI selects W25Q128JV Flash1 indirect SDR 1-1-1, finite budgets and explicit caller service. Read/status/verify remain PIO; the optional qspi-indirect-dma mode transfers page-program payload through the exact RM0386 Table30 DMA2 Stream7 Channel3 route. F479 uses the normal peripheral-port DMA path; the F412 QSPI1_V2_1L memory-port workaround is not a F479 fact. Optional DMA state belongs to this same QSPI owner; DMA TC, controller idle and external WIP are joined separately before settled publication. Public async stop seals and drains; Platform cold stop alone closes the controller. For indirect Flash endpoints, no memory-mapped aperture access by any CPU, IRQ, DMA or debugger is permitted throughout the provider lifetime. The separate mapped_storage:nor-mapped-cpu endpoint grants only explicit CPU_READ loans under the unique QSPI owner and exact reader slots; no Flash bypass face, XIP, DMA reader, DDR or writable aperture is granted. This development scope is not a software-candidate or physical qualification. Internal Flash poll-word uses the exact 2MiB dual-bank geometry with explicit ES0321 section2.2.12 DCEN disable/reset/restore around each real pulse, physical mapping admission and complete retained cleanup; F479 option maintenance remains unavailable. Optional nor-indirect-quad-read selects only W25Q128JVSIQ software facts, an explicit six-pad SDR114 route and observed SR2.QE1. It does not write status/protection, select DDR or establish fitted suffix identity from JEDEC alone. The selected RTC LSE32768 crystal primary retained/provision modes additionally require the exact integrated HSI96/168 tuple, baremetal, no PLLSAI and no optional duration wakeup. F411 has20 backup registers and no backup SRAM; F446/F479 optional SRAM borrowing remains explicit. Software models and builds establish no actual oscillator, VBAT retention, low-power-debug or physical HIL qualification.",
       "software_audit": {
         "profile": "es0321-rev14-run-hsi16",
         "document_sha256": "07079c2c18988b4a298237a07516f369d4342ded7143592d755f2b056b1950ad",
@@ -2524,19 +2852,31 @@
         ],
         "maintained_modes": [
           "audio:master-duplex",
+          "audio:master-duplex-blocks",
           "audio:master-rx",
+          "audio:master-rx-blocks",
           "audio:master-tx",
+          "audio:master-tx-blocks",
           "audio:slave-duplex",
+          "audio:slave-duplex-blocks",
           "audio:slave-rx",
+          "audio:slave-rx-blocks",
           "audio:slave-tx",
+          "audio:slave-tx-blocks",
           "crc:crc32-words",
           "display:rgb-scanout",
+          "external_bus:qspi-indirect-dma",
           "external_bus:qspi-indirect-sdr",
           "external_bus:sdram-controller",
+          "flash:poll-word",
           "flash_async:nor-indirect",
+          "flash_async:nor-indirect-quad-read",
           "image:irq-blit",
+          "mapped_storage:nor-mapped-cpu",
           "memory_window:cpu-window",
-          "memory_window:graphics-owned"
+          "memory_window:graphics-owned",
+          "rtc:adopt-retained",
+          "rtc:provision-empty"
         ],
         "items": [
           {
@@ -2595,15 +2935,22 @@
             "section": "2.2.1",
             "title": "Debugging Stop mode and SysTick timer",
             "revisions": "AA",
-            "assessment": "excluded_mode",
+            "assessment": "workaround",
             "condition": "STOP/Standby debug entry or multiple deep-power wake sources.",
-            "handling": "The reviewed slice admits baremetal HSI16 RUN plus the ordinary timebase/CRC path. It exposes no deep-power controller or RTC wake source; STOP/Standby and their debug behavior remain unassessed and unsupported for this slice.",
+            "handling": "The drained power admission rejects enabled/pending SysTick before ending the Core epoch. OS users must explicitly suspend and rebuild their time state; no kernel tick resumes across STOP.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2612,13 +2959,20 @@
             "revisions": "AA",
             "assessment": "excluded_mode",
             "condition": "STOP/Standby debug entry or multiple deep-power wake sources.",
-            "handling": "The reviewed slice admits baremetal HSI16 RUN plus the ordinary timebase/CRC path. It exposes no deep-power controller or RTC wake source; STOP/Standby and their debug behavior remain unassessed and unsupported for this slice.",
+            "handling": "Selected STOP rejects DBGMCU_CR.DBG_STOP and selected Standby rejects DBG_STANDBY before effects. The release WFE path does not claim the dedicated debug WFE/NOP/BX workaround or debugger low-power qualification.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2627,29 +2981,37 @@
             "revisions": "AA",
             "assessment": "excluded_mode",
             "condition": "Debug Sleep/Stop with prefetch disabled and nonzero Flash wait states.",
-            "handling": "The selected HSI16 RUN policy fixes HCLK/APB to 16 MHz and the selected 2.7..3.6 V Flash plan to zero wait states; the stated conjunction is absent. STOP is outside this slice. No general debugger timing qualification is claimed.",
+            "handling": "The reviewed System RUN owner enables FLASH_ACR_PRFTEN and checks it by DSB/readback before the selected clock switch; direct HSI16 uses0 WS and the explicit HSI PLL168 profile uses5 WS. High-profile activation additionally observes PLLRDY then bounded VOSRDY before selecting PLL SYSCLK; failure rolls back without publishing time, retaining responsibility if withdrawal fails. The software profile therefore does not select the prefetch-disabled conjunction; this does not qualify debugger timing or arbitrary external register writes. STOP/Standby for this exact part remains outside the current F407 deep-power slice.",
             "implementation": [
               "tools/configure/stm32f4/contract.py",
               "soc/stm32/stm32f4/system.c"
             ],
             "regressions": [
               "tools/configure/test_device_clocks.py",
-              "tests/google/stm32_family_system_test.cpp"
+              "tests/google/stm32_family_system_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp"
             ]
           },
           {
             "section": "2.2.4",
             "title": "Wake-up sequence from Standby mode when using more than one wake-up source",
             "revisions": "AA",
-            "assessment": "excluded_mode",
+            "assessment": "workaround",
             "condition": "STOP/Standby debug entry or multiple deep-power wake sources.",
-            "handling": "The reviewed slice admits baremetal HSI16 RUN plus the ordinary timebase/CRC path. It exposes no deep-power controller or RTC wake source; STOP/Standby and their debug behavior remain unassessed and unsupported for this slice.",
+            "handling": "One C power transaction validates every implemented NVIC bank and exact wake route, withdraws original/selected wake pin enables, acknowledges PWR WUF only with explicit discard authorization, then commits the unique RTC receipt and rearms wake controls. Newly arrived WUF/RTC/EXTI evidence is preserved after returning WFI; F446 PA0 and PC13 map to EWUP1/EWUP2 respectively.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2725,15 +3087,22 @@
             "section": "2.2.9",
             "title": "Possible delay in backup domain protection disabling/enabling after programming the DBP bit",
             "revisions": "AA",
-            "assessment": "excluded_mode",
+            "assessment": "workaround",
             "condition": "DBP programming followed immediately by a backup-domain access.",
-            "handling": "System retains unrelated PWR/backup bits and the selected RUN slice does not program DBP or access backup registers. RTC/backup-domain lifecycle is not admitted.",
+            "handling": "Provisioning performs an immediate PWR_CR readback after programming DBP before any BDCR/calendar operation; writes and ready-state waits are bounded and retained effects are reported. Adopt requires externally prepared live backup access and asserted provenance.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2742,13 +3111,20 @@
             "revisions": "NN",
             "assessment": "excluded_mode",
             "condition": "PC13 transitions disturb the crystal LSE on affected packages.",
-            "handling": "The exact TFBGA216 package is excluded by the erratum package note; nevertheless the current slice assigns no GPIO and enables no LSE. No RTC mode is granted.",
+            "handling": "The crystal LSE software profile conservatively claims quiet PC13 and verifies or acquires analog silence before oscillator effects. Selected F446 LQFP PC13 Standby wake conflicts with live crystal LSE, including a pre-enabled EWUP2, and is rejected. F479NIH6 TFBGA is not physically subject to the LQFP limitation, but this first RTC profile retains the same conservative pad contract; no broad package grant follows.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2757,41 +3133,57 @@
             "revisions": "AA",
             "assessment": "external_constraint",
             "condition": "Supply falls into the backup reset window and rises before a reliable backup-domain POR.",
-            "handling": "No backup retention or RTC content is consumed by this internal CRC reference. Board/product power sequencing must satisfy the documented discharge condition or perform its explicit backup-domain recovery; startup does not erase retained data as an implicit fix.",
+            "handling": "Backup provenance after a VDD/VBAT brownout is a product/Board electrical responsibility. Adopt requires externally established valid retained calendar and access; provision accepts only an explicitly empty backup domain. This provider never erases retained data or resets backup hardware automatically. Qualifying power discharge/reinitialization policy and physical retention remains external and not_executed.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
-            "regressions": []
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
           },
           {
             "section": "2.2.12",
             "title": "Data cache might be corrupted during flash memory read-while-write operation",
             "revisions": "AA",
-            "assessment": "excluded_mode",
+            "assessment": "workaround",
             "condition": "Dual-bank Flash read-while-write with data cache enabled.",
-            "handling": "The reference exposes physical geometry only and selects no Flash programming/erase provider. CRC runs from normal read-only internal Flash; physical multi-bank geometry does not authorize write/erase or RWW maintenance.",
+            "handling": "The exact 2MiB/24-sector poll-word owner acquires the Flash pulse lease and disables FLASH_ACR_DCEN with barrier/readback before every PG or STRT effect, for both banks. After the non-abortable pulse is actually idle it resets the data cache with DCRST while DCEN remains clear, restores the incoming enable state and verifies readback before releasing the lease. Failed cache reset, restore, locking or drain retains the same owner for explicit recovery. Bank2 ordinals12..23 encode SNB16..27; swapped UFB_MODE, BFB2 and PCROP are rejected without changing protection policy. Same-bank code, IRQs and literals may stall during a pulse; no parallel pulse, bounded CPU execution, option maintenance or physical qualification is granted.",
             "implementation": [
-              "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "soc/stm32/stm32f4/drivers/flash.c",
+              "soc/stm32/stm32f4/private/stm32f407_provider.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tests/google/stm32_flash_bank_test.cpp",
+              "tools/configure/test_f479_flash.py"
             ]
           },
           {
             "section": "2.2.13",
             "title": "Wake-up from Standby mode with RTC",
             "revisions": "AA",
-            "assessment": "excluded_mode",
+            "assessment": "workaround",
             "condition": "RTC event wakes the chip from Standby and WUPF remains pending.",
-            "handling": "Neither Standby nor RTC wake is available in this slice. A later deep-power mode must implement and test the exact reset/wake sequence.",
+            "handling": "RTC Standby rearm rejects retained SBF or WUF rather than clearing sticky state implicitly. The product-authorized nx_stm32_power_standby_reset_prepare acknowledges SBF only, with bounded readback, leaves WUF/RTC/backup intact and never resets. SUCCESS obliges the caller to perform its authorized system reset next; it is not proof of rearm. WKUP-only Standby is separate and does not inherit this automatic-maintenance policy.",
             "implementation": [
               "tools/configure/fact_references.py",
-              "tools/configure/reference_profiles.py"
+              "tools/configure/reference_profiles.py",
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/test_fact_references.py",
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2880,7 +3272,7 @@
             "revisions": "AA",
             "assessment": "excluded_mode",
             "condition": "Indirect read with PRESCALER=1, quad DMODE and DDR enabled can insert extra FIFO data.",
-            "handling": "The only selected transport uses one data line and SDR. CCR is verified before a caller buffer reaches the official HAL; quad and DDR are never selected. Withdrawal separately joins real BUSY, FIFO and abort state before releasing buffers.",
+            "handling": "The selected read profiles are SDR: READ03 one-line or READ6B four-data-line with DDRM verified clear before caller storage reaches HAL. The erratum requires quad DDR at half AHB clock, so that conjunction is excluded. Both profiles still prove abort, FIFO empty and BUSY clear before buffer release; the optional DMA slice transfers program payload only and adds no RX DMA owner.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/qspi.c",
               "tools/configure/stm32f4/qspi.py"
@@ -2896,7 +3288,7 @@
             "revisions": "AA",
             "assessment": "excluded_mode",
             "condition": "Indirect writes with at least one dummy cycle lose the first nibble.",
-            "handling": "Selected commands use dummy=0, no alternate bytes, and single-line instruction/address/data. The exact CCR is checked before HAL transmission. No general command interface can request an affected dummy phase.",
+            "handling": "The affected indirect-write dummy phase is never selected: status and02h program use one data line and zero dummy cycles. READ6B uses eight dummy cycles in the selected indirect-read or CPU_READ mapping profile; neither adds dummy cycles to program. Exact command CCR readback is required before buffer access; no general register-script command interface is exposed.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/qspi.c",
               "tools/configure/stm32f4/qspi.py"
@@ -2912,7 +3304,7 @@
             "revisions": "AA",
             "assessment": "excluded_mode",
             "condition": "Transition from indirect operation to memory-mapped mode can return an incorrect first read.",
-            "handling": "Memory-mapped mode and XIP are not implemented or admitted. The lifetime external aperture prohibition in 2.4.5 also applies during startup, requests, public stop and cold withdrawal; no direct Flash pointer is published.",
+            "handling": "Indirect Flash endpoints admit no memory-mapped access. Their lifetime external aperture prohibition in 2.4.5 also applies during startup, requests, public stop and cold withdrawal; those faces publish no direct Flash pointer. XIP remains excluded for every endpoint. The independent nor-mapped-cpu slice additionally completes all status reads, writes AR=0 and proves ABORT/BUSY/FIFO withdrawal after a preceding indirect read before mapping. No DR access follows before HAL_QSPI_MemoryMapped.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/qspi.c",
               "tools/configure/stm32f4/qspi.py"
@@ -2928,7 +3320,7 @@
             "revisions": "PP",
             "assessment": "excluded_mode",
             "condition": "Memory-mapped mode with TCEN can hang when timeout and a new read coincide.",
-            "handling": "The provider selects only indirect transfers and never enables the memory-mapped timeout counter. Its absolute software deadlines govern service/drain; they are not QUADSPI TCEN and do not enable mapped access.",
+            "handling": "Indirect Flash endpoints select only indirect transfers and never enable the memory-mapped timeout counter. Its absolute software deadlines govern service/drain; they are not QUADSPI TCEN and do not enable mapped access. The independent CPU_READ mapping slice keeps TCEN and TOIE clear; the final reader joins CPU reads and a same-CPU barrier, then bounded ABORT plus actual FMODE/BUSY/FIFO readback withdraws mapping. Failed withdrawal retains the original owner and loan.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/qspi.c",
               "tools/configure/stm32f4/qspi.py"
@@ -2944,7 +3336,7 @@
             "revisions": "PP",
             "assessment": "external_constraint",
             "condition": "Any access through the memory-mapped QUADSPI aperture during an indirect transfer can clear AR.",
-            "handling": "All accesses to the 0x90000000 QUADSPI aperture are forbidden for the entire provider lifetime, including external CPU code, IRQ handlers, DMA and debug tooling. The provider publishes no mapped pointer and checks its own CCR/AR/DLR, but cannot intercept an external bus master. This is an explicit integration precondition, not a runtime sandbox or a modeled silicon proof.",
+            "handling": "For indirect Flash endpoints, all accesses to the 0x90000000 QUADSPI aperture are forbidden throughout the provider lifetime, including external CPU code, IRQ handlers, DMA and debug tooling. Those faces publish no mapped pointer and check their own CCR/AR/DLR, but cannot intercept an external bus master. This is an explicit integration precondition, not a runtime sandbox or a modeled silicon proof. Indirect stages continue to forbid every aperture access. Only explicit mapped-storage CPU_READ loans authorize their exact span; integration excludes debugger, DMA and foreign bus masters. Reader tags do not establish hardware isolation.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/qspi.c",
               "tools/configure/stm32f4/qspi.py"
@@ -2966,6 +3358,120 @@
             ],
             "regressions": [
               "tests/google/stm32_family_system_test.cpp"
+            ]
+          },
+          {
+            "section": "2.11.1",
+            "title": "Spurious tamper detection when disabling the tamper channel",
+            "revisions": "NN",
+            "assessment": "excluded_mode",
+            "condition": "Unfiltered falling-edge tamper can falsely erase backup data when disabled while high.",
+            "handling": "The selected primary calendar profile does not require tamper. The shared auxiliary C admission independently rejects unfiltered falling-edge tamper and unavailable second-pad/tamper2 modes; no no-workaround mode is enabled.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.11.2",
+            "title": "RTC calendar registers are not locked properly",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "Shadow SSR/TR/DR can be inconsistent at an RTC update boundary.",
+            "handling": "The selected retained/provisioned calendar uses BYPSHAD1 with bounded coherent readback of the complete snapshot; no shadow-lock assumption or inferred calendar provenance is made.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.11.3",
+            "title": "RTC interrupt can be masked by another RTC interrupt",
+            "revisions": "AA",
+            "assessment": "excluded_mode",
+            "condition": "Two RTC publishers share a single EXTI interrupt request.",
+            "handling": "This slice supplies polling and explicitly owned EXTI event wake routes, not an RTC ISR publisher. Standby sources are withdrawn before WUF acknowledgment and restored by the same RTC receipt; returning WFI preserves new RTC/EXTI flags for explicit business-event inspection.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.11.4",
+            "title": "Calendar initialization may fail in case of consecutive INIT mode entry",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "Consecutive INIT acquisition can observe a stale INITF crossing.",
+            "handling": "Every selected calendar programming/coarse-calibration INIT session first clears BYPSHAD, clears RSF and actually waits for RSF with one finite budget before reacquiring INITF. Original bypass personality is restored; no fixed delay or synthetic date is used.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.11.5",
+            "title": "Alarm flag may be repeatedly set when the core is stopped in debug",
+            "revisions": "NN",
+            "assessment": "excluded_mode",
+            "condition": "A nonzero subsecond alarm mask can retrigger while the core is halted.",
+            "handling": "The selected whole-second Alarm A/B contract writes zero subsecond masks. Deep-power debug is excluded by a read-only DBG_STOP/DBG_STANDBY admission guard, and debug timing is not physically qualified.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
+            ]
+          },
+          {
+            "section": "2.11.6",
+            "title": "Detection of a tamper event occurring before enabling the tamper detection is not supported in edge detection mode",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "An edge predating detector enable is not recorded.",
+            "handling": "No historical edge capture is promised. The optional selected TAMP1 input has an explicit pin handoff and live post-enable pad observation; timestamp/tamper2 and package-specific modes outside the declared profile remain ungranted.",
+            "implementation": [
+              "soc/stm32/stm32f4/drivers/rtc.c",
+              "soc/stm32/stm32f4/power.c",
+              "soc/stm32/stm32f4/private/stm32f4_power_traits.h"
+            ],
+            "regressions": [
+              "tests/google/stm32_family_rtc_test.cpp",
+              "tests/google/power_rtc_integration_test.cpp",
+              "tests/google/stm32_high_clock_test.cpp",
+              "tools/configure/test_f4_rtc_configuration.py"
             ]
           }
         ]

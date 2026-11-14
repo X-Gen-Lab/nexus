@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "f479ni-qspi-quad-software-reference",
+  "soc": "STM32F479NIH6",
+  "soc_family": "stm32f4",
+  "source_revision": "rm0386-ds11118-winbond-revm-software-reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "control",
+      "controller": "QUADSPI",
+      "route": "quadspi-indirect-control"
+    },
+    {
+      "id": "storage",
+      "controller": "QUADSPI",
+      "route": "quadspi-bank1-sdr114"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "W25Q128JVSIQ is an explicit software profile, not an observed fitted suffix; JEDEC EF4018 does not identify the suffix",
+    "Six-pad SDR114 route is a silicon software reference only; no PCB, power-up, electrical timing or physical qualification",
+    "prepare observes QE1 and rejects QE0 without writing status or protection; external reset/protection owners must be quiescent",
+    "No DDR, dual Flash, memory mapping, XIP or product persistence policy; the provider-lifetime aperture access prohibition remains"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f479ni.pdf",
+      "scope": "Exact F479NI TFBGA216 six-pad alternate functions only; no PCB/fitted Flash/electrical qualification"
+    },
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00127514-stm32f469xx-and-stm32f479xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "scope": "QUADSPI controller facts and selected software1-1-4 SDR read mode only"
+    },
+    {
+      "url": "https://www.winbond.com/resource-files/W25Q128JV%20RevM%2012242024%20Plus.pdf",
+      "scope": "W25Q128JV RevM (2024-12-24), SHA256 b51bb4303e17a17750c9cbcafc9a776dea842a8971d7cdd5edc70ff738efb1fe; SIQ software protocol/ordering reference only, fitted device, wiring and HIL unobserved"
+    }
+  ]
+}

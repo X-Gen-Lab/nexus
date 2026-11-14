@@ -1,6 +1,6 @@
 /**
  * \file            rtc.c
- * \brief           F407 explicit backup calendar and polling Alarm A owner
+ * \brief           Reviewed F4 backup calendar and polling Alarm A owner
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-07
@@ -8,6 +8,7 @@
  */
 #include "rtc_lptim_internal.h"
 #include "stm32f407_rtc.h"
+#include "stm32f4_power_traits.h"
 #include "stm32f4xx_ll_rtc.h"
 #ifndef NX_F407_RTC
 #define NX_F407_RTC       RTC
@@ -16,8 +17,13 @@
 #define NX_F407_RTC_EXTI  EXTI
 #define NX_F407_RTC_GPIOC GPIOC
 #endif
+#if defined(RCC_AHB1ENR_BKPSRAMEN) && defined(BKPSRAM_BASE)
+#define NX_RTC_BACKUP_SRAM 1
 #ifndef NX_F407_RTC_SRAM
 #define NX_F407_RTC_SRAM ((void*)BKPSRAM_BASE)
+#endif
+#else
+#define NX_RTC_BACKUP_SRAM 0
 #endif
 #ifndef NX_F407_RTC_READ
 #define NX_F407_RTC_READ(p)     READ_REG(*(p))
@@ -104,7 +110,9 @@ static bool outside_private(const nx_stm32_rtc_state_t* s, const void* p,
                 !OVERLAP(NX_F407_RTC_PWR, sizeof(PWR_TypeDef)) &&
                 !OVERLAP(NX_F407_RTC_EXTI, sizeof(EXTI_TypeDef)) &&
                 !OVERLAP(NX_F407_RTC_GPIOC, sizeof(GPIO_TypeDef)) &&
+#if NX_RTC_BACKUP_SRAM
                 !OVERLAP(NX_F407_RTC_SRAM, 4096U) &&
+#endif
                 !OVERLAP(&g_nx_stm32_system, sizeof(g_nx_stm32_system)) &&
                 !OVERLAP(&auxiliary_ops, sizeof(auxiliary_ops)) &&
                 !OVERLAP(&nx_stm32_rtc_ops, sizeof(nx_stm32_rtc_ops));
@@ -1008,6 +1016,10 @@ static nx_result_t wake_route(void* raw, uint32_t selected) {
         return r;
     if (selected & ~UINT32_C(119))
         return NX_ERROR_INVALID;
+    /* The selected pad profile admits TAMP1/PC13 only. A family bit macro
+     * cannot establish a second bonded and handed-off tamper source. */
+    if ((selected & NX_RTC_EVENT_TAMPER2) != 0U)
+        return NX_ERROR_UNSUPPORTED;
     uint32_t lines = 0U;
     uint32_t cr = s->auxiliary_cr & ~(uint32_t)(RTC_CR_ALRAIE | RTC_CR_ALRBIE |
                                                 RTC_CR_WUTIE | RTC_CR_TSIE);
@@ -1079,6 +1091,7 @@ static nx_result_t backup_write(void* raw, uint8_t index, uint32_t value) {
         return NX_ERROR_INVALID;
     return checked(backup_word(index), value) ? NX_SUCCESS : NX_ERROR_IO;
 }
+#if NX_RTC_BACKUP_SRAM
 /** \brief SRAM gate and regulator are explicit reversible owned effects. */
 static nx_result_t sram_prepare(void* raw, bool retained) {
     nx_stm32_rtc_state_t* s = raw;
@@ -1105,9 +1118,10 @@ static nx_result_t sram_prepare(void* raw, bool retained) {
     if (retained) {
         if (!(NX_F407_RTC_READ(&NX_F407_RTC_PWR->CSR) & PWR_CSR_BRE)) {
             s->sram_effects |= 2U;
-            NX_F407_RTC_WRITE(&NX_F407_RTC_PWR->CSR,
-                              NX_F407_RTC_READ(&NX_F407_RTC_PWR->CSR) |
-                                  PWR_CSR_BRE);
+            NX_F407_RTC_WRITE(
+                &NX_F407_RTC_PWR->CSR,
+                nx_stm32_power_csr_control(
+                    NX_F407_RTC_READ(&NX_F407_RTC_PWR->CSR) | PWR_CSR_BRE));
         }
         r = wait_bits(s->config, &NX_F407_RTC_PWR->CSR,
                       PWR_CSR_BRE | PWR_CSR_BRR, PWR_CSR_BRE | PWR_CSR_BRR,
@@ -1166,6 +1180,7 @@ static nx_result_t sram_release(void* raw, nx_memory_window_lease_t* lease,
     s->sram_lease = NULL;
     return NX_SUCCESS;
 }
+#endif /* NX_RTC_BACKUP_SRAM */
 /** \brief Restore sources and owned power only after every user exits. */
 static nx_result_t auxiliary_close(nx_stm32_rtc_state_t* s) {
     if (s->sram_lease != NULL)
@@ -1213,10 +1228,12 @@ static nx_result_t auxiliary_close(nx_stm32_rtc_state_t* s) {
     }
     s->sram_ready = false;
     s->sram_retention = false;
+#if NX_RTC_BACKUP_SRAM
     if (s->sram_effects & 2U) {
-        NX_F407_RTC_WRITE(&NX_F407_RTC_PWR->CSR,
-                          NX_F407_RTC_READ(&NX_F407_RTC_PWR->CSR) &
-                              ~(uint32_t)PWR_CSR_BRE);
+        NX_F407_RTC_WRITE(
+            &NX_F407_RTC_PWR->CSR,
+            nx_stm32_power_csr_control(NX_F407_RTC_READ(&NX_F407_RTC_PWR->CSR) &
+                                       ~(uint32_t)PWR_CSR_BRE));
         nx_arch_dsb();
         if (NX_F407_RTC_READ(&NX_F407_RTC_PWR->CSR) & PWR_CSR_BRE)
             return NX_ERROR_BUSY;
@@ -1231,6 +1248,7 @@ static nx_result_t auxiliary_close(nx_stm32_rtc_state_t* s) {
             return NX_ERROR_BUSY;
         s->sram_effects &= (uint8_t)~1U;
     }
+#endif
     return NX_SUCCESS;
 }
 /** \brief Transfer only proved autonomous provisioning, never failed cleanup.
@@ -1495,11 +1513,16 @@ static nx_result_t standby_restore(void* raw, nx_rtc_standby_t* receipt) {
     return NX_SUCCESS;
 }
 static const nx_rtc_aux_ops_t auxiliary_ops = {
-    alarm_b,        wakeup,          capture_configure, capture_read,
-    events,         acknowledge,     calibrate,         wake_route,
-    backup_read,    backup_write,    sram_prepare,      sram_acquire,
-    sram_release,   handoff,         standby_prepare,   standby_validate,
-    standby_commit, standby_restore,
+    alarm_b,         wakeup,          capture_configure, capture_read,
+    events,          acknowledge,     calibrate,         wake_route,
+    backup_read,     backup_write,
+#if NX_RTC_BACKUP_SRAM
+    sram_prepare,    sram_acquire,    sram_release,
+#else
+    NULL,           NULL,            NULL,
+#endif
+    handoff,         standby_prepare, standby_validate,  standby_commit,
+    standby_restore,
 #if defined(NX_STM32_RTC_PERIODIC_WAKEUP)
     periodic_wakeup
 #else
@@ -1750,6 +1773,7 @@ nx_result_t nx_stm32_rtc_resume(nx_stm32_rtc_state_t* s) {
     if (!s->opened || s->closing || !s->suspended || s->tainted ||
         s->auxiliary_faulted || !live(s))
         return NX_ERROR_STATE;
+#if NX_RTC_BACKUP_SRAM
     if (s->sram_ready &&
         (!(NX_F407_RTC_READ(&NX_F407_RTC_RCC->AHB1ENR) &
            RCC_AHB1ENR_BKPSRAMEN) ||
@@ -1757,6 +1781,7 @@ nx_result_t nx_stm32_rtc_resume(nx_stm32_rtc_state_t* s) {
           (NX_F407_RTC_READ(&NX_F407_RTC_PWR->CSR) &
            (PWR_CSR_BRE | PWR_CSR_BRR)) != (PWR_CSR_BRE | PWR_CSR_BRR))))
         return NX_ERROR_STATE;
+#endif
     if (s->generation == UINT64_MAX)
         return NX_ERROR_EXHAUSTED;
     ++s->generation;

@@ -79,9 +79,17 @@ static nx_result_t acquire(void* context, nx_mapped_storage_reader_t reader,
         return NX_ERROR_EXHAUSTED;
     }
     if (owner->loans == 0) {
-        nx_result_t result = owner->backend.map(owner->backend.context);
-        if (result != NX_SUCCESS) {
-            return result;
+        nx_mapped_storage_map_result_t mapping =
+            owner->backend.map(owner->backend.context);
+        owner->map_cleanup_pending =
+            mapping.cleanup_required || mapping.result == NX_SUCCESS;
+        if (mapping.result != NX_SUCCESS || !mapping.cleanup_required) {
+            if (owner->map_cleanup_pending) {
+                /* No loan was granted, but the controller still needs cleanup.
+                 */
+                owner->accepting = false;
+            }
+            return mapping.result == NX_SUCCESS ? NX_ERROR_IO : mapping.result;
         }
     }
     owner->free_head = slot->next;
@@ -119,6 +127,7 @@ static nx_result_t release(void* context,
             owner->accepting = false;
             return result;
         }
+        owner->map_cleanup_pending = false;
     }
     slot->live = false;
     slot->data = NULL;
@@ -199,9 +208,9 @@ static nx_result_t submit(void* context, nx_mapped_storage_request_t* request,
     owner->terminal = NX_SUCCESS;
     owner->draining = false;
     *ticket = (nx_mapped_storage_ticket_t){owner, owner->writer_epoch};
-    result =
-        owner->backend.start(owner->backend.context, request->operation,
-                             request->offset, request->data, request->length);
+    result = owner->backend.start(owner->backend.context, request->operation,
+                                  request->offset, request->data,
+                                  request->length, request->base.deadline);
     if (result != NX_SUCCESS) {
         /* Hardware start errors are accepted terminal facts, never rejection.
          */
@@ -284,7 +293,17 @@ static nx_result_t stop(void* context) {
         }
         return NX_ERROR_BUSY;
     }
-    return owner->loans == 0 ? NX_SUCCESS : NX_ERROR_BUSY;
+    if (owner->loans != 0) {
+        return NX_ERROR_BUSY;
+    }
+    if (owner->map_cleanup_pending) {
+        nx_result_t result = owner->backend.unmap(owner->backend.context);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+        owner->map_cleanup_pending = false;
+    }
+    return NX_SUCCESS;
 }
 
 /** \brief One immutable operations table, independent of instance capacity. */
@@ -330,5 +349,22 @@ nx_result_t nx_mapped_storage_owner_init(nx_mapped_storage_owner_t* owner,
         slots[index] = (nx_mapped_storage_slot_t){
             .next = index + 1 < capacity ? index + 1 : SIZE_MAX};
     }
+    return NX_SUCCESS;
+}
+
+/** \brief Reopen only after full withdrawal, without repeating an identity. */
+nx_result_t nx_mapped_storage_owner_reopen(nx_mapped_storage_owner_t* owner) {
+    if (owner == NULL || owner->slots == NULL || owner->capacity == 0 ||
+        owner->backend.context == NULL || owner->clock.read == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (owner->accepting) {
+        return NX_ERROR_STATE;
+    }
+    if (owner->active != NULL || owner->loans != 0 ||
+        owner->map_cleanup_pending) {
+        return NX_ERROR_BUSY;
+    }
+    owner->accepting = true;
     return NX_SUCCESS;
 }

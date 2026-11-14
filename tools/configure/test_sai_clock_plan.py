@@ -97,6 +97,26 @@ class SaiClockPlanTests(unittest.TestCase):
         selected = clock.plan("custom", self.profile())
         clock.validate_consumers(selected, (controller,))
 
+    def test_sai2_master_consumes_the_same_q_tuple_without_another_pll(self):
+        selected = clock.plan("custom", self.profile())
+        controller = SimpleNamespace(kind="audio", controller="SAI2",
+                                     mode="master-duplex")
+        clock.validate_consumers(selected, (controller,))
+
+    def test_generated_sai2_mux_ownership_follows_the_actual_master(self):
+        from tools.configure import configure
+        from tools.configure.ir import ClockPlanIR
+        assembly = configure.resolve_ir(configure.ROOT /
+            "tools/configure/assemblies/sky-baremetal-gpio.toml")
+        selected = ClockPlanIR.from_validated(clock.plan("custom", self.profile()))
+        for mode, enabled in (("master-tx", 1), ("slave-tx", 0)):
+            controller = SimpleNamespace(kind="audio", controller="SAI2",
+                                         mode=mode)
+            lines = clock.header_lines(replace(
+                assembly, clock_plan=selected, controllers=(controller,)))
+            self.assertIn(f"#define NEXUS_CLOCK_PLLSAI_SAI2_ENABLED {enabled}u",
+                          lines)
+
     def test_ltdc_only_retains_no_q_output_and_has_an_exact_pixel_clock(self):
         profile = self.profile()
         profile["pll_sai"] = dict(m=10, n=192,

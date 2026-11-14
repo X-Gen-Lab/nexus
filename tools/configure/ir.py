@@ -160,6 +160,7 @@ class GpioOptions:
     pull: str = "none"
     output_type: str = "push-pull"
     speed: str = "preserve"
+    active_high: bool | None = None
 
 
 @dataclass(frozen=True)
@@ -170,6 +171,7 @@ class BlockOptions:
     stop_timeout_us: int
     irq: IrqOptions | None = None
     protocol: str = "sd-memory"
+    speed: str = "default"
 
 
 @dataclass(frozen=True)
@@ -827,6 +829,9 @@ class SaiOptions:
     poll_limit: int
     source_block: str
     irq: IrqOptions
+    active_slots: int = 0
+    continuous: bool = False
+    max_service_gap_us: int = 0
 
 
 @dataclass(frozen=True)
@@ -893,7 +898,8 @@ def mode_options(values):
                             IrqOptions(values["irq_priority"],
                                        values.get("calls_os", False))
                             if "irq_priority" in values else None,
-                            values.get("protocol", "sd-memory"))
+                            values.get("protocol", "sd-memory"),
+                            values.get("speed", "default"))
     if kind == "flash":
         return FlashOptions(values.get("maintenance", False))
     irq = (IrqOptions(values["irq_priority"], values.get("calls_os", False),
@@ -922,13 +928,16 @@ def mode_options(values):
             tuple(values["codes"]),
             CaptureCropOptions(**values["crop"]) if values["crop"] is not None else None,
             values["max_service_gap_us"], irq)
-    if kind == "audio" and values["controller"] == "SAI1":
+    if kind == "audio" and values["controller"] in {"SAI1", "SAI2"}:
         return SaiOptions(*(values[key] for key in (
             "sample_bits", "slot_bits", "slots", "frame_sync_bits",
             "first_bit_offset", "frame_sync_high", "frame_sync_before",
             "frame_sync_channels", "first_lsb", "sample_rising", "mclk",
             "no_divider", "mckdiv", "max_bit_clock_hz", "poll_limit",
-            "source_block")), irq)
+            "source_block")), irq,
+            values.get("active_slots", (1 << values["slots"]) - 1),
+            values.get("continuous", False),
+            values.get("max_service_gap_us", 0))
     if kind == "audio":
         return AudioOptions(*(values[key] for key in (
             "standard", "sample_bits", "slot_bits", "mclk", "cpol_high",
@@ -1032,7 +1041,8 @@ def mode_options(values):
         return GpioOptions(values["mask"], values["initial"],
                            values.get("pull", "none"),
                            values.get("output_type", "push-pull"),
-                           values.get("speed", "preserve"))
+                           values.get("speed", "preserve"),
+                           values.get("active_high"))
     if kind == "uart":
         return UartOptions(values["baud"], values["rx_profile"],
                            values.get("rx_capacity"), irq,
@@ -1432,6 +1442,18 @@ class QspiParameters:
 
 
 @dataclass(frozen=True)
+class QspiMappedParameters(QspiParameters):
+    read_slots: int
+
+
+@dataclass(frozen=True)
+class QspiMappedOptions:
+    binding: str
+    mode: str
+    parameters: QspiMappedParameters
+
+
+@dataclass(frozen=True)
 class QspiFlashOptions:
     binding: str
     mode: str
@@ -1448,7 +1470,7 @@ class EndpointIR(Record):
               SpiDMATransactionEndpointOptions |
               I2cEndpointOptions | UsbEndpointOptions |
               MemoryWindowOptions | SdramWindowOptions | Parallel16Options |
-              FlashAsyncOptions | QspiFlashOptions | NandOptions)
+              FlashAsyncOptions | QspiFlashOptions | QspiMappedOptions | NandOptions)
     source_fields: tuple[str, ...]
 
     def projection(self):
@@ -1489,9 +1511,14 @@ class EndpointIR(Record):
             options = UsbEndpointOptions(values["endpoint_index"], *(values[key]
                 for key in ("number", "direction", "transfer", "max_packet",
                             "fifo_start", "fifo_words")))
-        elif kind == "external_bus" and controller.mode == "qspi-indirect-sdr":
-            options = QspiFlashOptions(values["binding"], values["mode"],
-                QspiParameters(**values["parameters"]))
+        elif kind == "external_bus" and controller.mode in {
+                "qspi-indirect-sdr", "qspi-indirect-dma"}:
+            if values["driver"] == "mapped_storage-endpoint":
+                options = QspiMappedOptions(values["binding"], values["mode"],
+                    QspiMappedParameters(**values["parameters"]))
+            else:
+                options = QspiFlashOptions(values["binding"], values["mode"],
+                    QspiParameters(**values["parameters"]))
         elif kind == "external_bus" and controller.mode == "sdram-controller":
             parameters = values["parameters"]
             timing = SdramTiming(**{name: SdramMinimum(**minimum)
@@ -1724,7 +1751,7 @@ class ExternalMemoryRegionIR(Record):
 
 @dataclass(frozen=True)
 class ConfigurationIR(Record):
-    source_epoch: ClassVar[int] = 3
+    source_epoch: ClassVar[int] = 5
     board: str
     soc_family: str
     cpu_profile: CpuProfileIR

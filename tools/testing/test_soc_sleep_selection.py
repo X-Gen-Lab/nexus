@@ -25,7 +25,8 @@ class SocSleepSelectionTests(unittest.TestCase):
 
     def configure_properties(self, family, selected, *, lto=True,
                              launcher="scope-launcher;--contract",
-                             platform_family="stm32f4", rejected=False):
+                             platform_family="stm32f4", device="STM32F407xx",
+                             rejected=False):
         """Keep the checked SDK variable inside the port's child scope only."""
         with tempfile.TemporaryDirectory(prefix="nexus-sleep-cmake-") as name:
             source = Path(name)
@@ -38,7 +39,7 @@ class SocSleepSelectionTests(unittest.TestCase):
             (port / "CMakeLists.txt").write_text(f'''\
 set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")
 set(NEXUS_CONFIG_DIR "{generated.as_posix()}")
-set(NEXUS_STM32_DEVICE STM32F407xx)
+set(NEXUS_STM32_DEVICE {device})
 set(NEXUS_STM32_STARTUP startup_stm32f407xx.s)
 set(Python3_EXECUTABLE "{Path(sys.executable).as_posix()}")
 include("{(ROOT / 'cmake/platform/TargetPolicy.cmake').as_posix()}")
@@ -49,14 +50,14 @@ set_target_properties(nexus_build_options PROPERTIES
 add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" provider)
 ''', encoding="utf-8")
             selection = (
-                "nexus_add_stm32f407_sleep(selected_sleep)"
+                "nexus_add_stm32f4_sleep(selected_sleep)"
                 if selected else "")
             platform = ("" if platform_family is None else
                 "add_library(nexus_platform INTERFACE)\n"
                 "add_library(Nexus::Platform ALIAS nexus_platform)\n"
                 'set_target_properties(nexus_platform PROPERTIES '
                 f'NEXUS_SOC_FAMILY "{platform_family}" '
-                'NEXUS_STM32_DEVICE "STM32F407xx")\n')
+                f'NEXUS_STM32_DEVICE "{device}")\n')
             (source / "CMakeLists.txt").write_text(f'''\
 cmake_minimum_required(VERSION 3.31)
 project(sleep_external_scope_contract LANGUAGES C ASM)
@@ -218,6 +219,15 @@ endif()
     def test_stm32_external_selection_uses_private_checked_sdk_paths(self):
         self.assert_selected_private_imports("stm32f4")
 
+
+    def test_new_parts_select_the_same_power_sources_with_exact_device_macros(self):
+        for device in ("STM32F411xE", "STM32F446xx", "STM32F479xx"):
+            with self.subTest(device=device):
+                properties = self.configure_properties("stm32f4", True,
+                                                       device=device)
+                self.assertEqual(properties["COMPILE_DEFINITIONS"], device)
+                self.assertIn("power.c", properties["SOURCES"])
+                self.assertIn("-D" + device, properties["compile_arguments"])
 
     def test_stm32_default_declares_no_automatic_sleep_target(self):
         properties = self.configure_properties("stm32f4", False)

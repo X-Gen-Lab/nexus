@@ -228,7 +228,8 @@ class EndpointPolicy:
                      "without model_bytes")
 
 
-def validate_mode_context(selection, route, *, backend, clock_profile):
+def validate_mode_context(selection, route, *, backend, clock_profile,
+                          part=None, clock_plan=None):
     """Default families impose no additional mode/profile coupling here."""
 
 
@@ -401,7 +402,9 @@ _MODE_TRAITS = MappingProxyType({
     ("dac", "direct"): ModeTraits(polling=True),
     ("crc", "crc32-words"): ModeTraits(polling=True),
     ("cipher", "irq-blocks"): ModeTraits(irq=True),
+    ("cipher", "dma-blocks"): ModeTraits(irq=True, tx_dma=True, rx_dma=True),
     ("hash", "irq-blocks"): ModeTraits(irq=True),
+    ("hash", "dma-blocks"): ModeTraits(irq=True, tx_dma=True),
     ("display", "rgb-scanout"): ModeTraits(irq=True, bus_master=True,
                                           continuous=True),
     ("image", "irq-blit"): ModeTraits(irq=True, bus_master=True),
@@ -416,7 +419,10 @@ _MODE_TRAITS = MappingProxyType({
     ("external_bus", "external-memory"): ModeTraits(polling=True),
     ("external_bus", "sdram-controller"): ModeTraits(polling=True),
     ("external_bus", "qspi-indirect-sdr"): ModeTraits(polling=True),
+    ("external_bus", "qspi-indirect-dma"): ModeTraits(polling=True, tx_dma=True),
+    ("mapped_storage", "nor-mapped-cpu"): ModeTraits(polling=True),
     ("flash_async", "nor-indirect"): ModeTraits(polling=True),
+    ("flash_async", "nor-indirect-quad-read"): ModeTraits(polling=True),
     ("memory_window", "psram-window"): ModeTraits(),
     ("flash_async", "nor-cfi"): ModeTraits(polling=True),
     ("nand", "raw-page"): ModeTraits(polling=True),

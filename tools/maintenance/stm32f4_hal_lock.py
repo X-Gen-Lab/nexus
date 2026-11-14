@@ -11,8 +11,10 @@ expands any exact part's declared runtime modes or physical support.
 """
 from __future__ import annotations
 import argparse
+import glob
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -23,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.configure.metadata import fields, parse_json  # noqa: E402
 from tools.maintenance import cmsis_device_lock  # noqa: E402
+from tools.configure import dependencies  # noqa: E402
 
 ORIGIN = "https://github.com/STMicroelectronics/stm32f4xx-hal-driver.git"
 COMMIT = "b6f0ed3829f3829eb358a2e7417d80bba1a42db7"
@@ -184,38 +187,213 @@ def verify_sdk(root):
     return package_source_sdk.verify(root)
 
 
+def _current_verification(source, lock_path, cmsis):
+    """Keep standalone and configure-boundary admission equally complete."""
+    _, lock_identity = cmsis_device_lock.stable_snapshot(lock_path)
+    sdk = source.parents[2]
+    manifest_path = sdk / ".nexus-source-sdk.json"
+    manifest_identity = None
+    packaged = {}
+    if manifest_path.exists() or manifest_path.is_symlink():
+        if (source != sdk / DIRECTORY or lock_path != sdk / LOCK_NAME or
+                cmsis != sdk / CMSIS_DIRECTORY):
+            raise ValueError("STM32F4 requires exact SDK source and lock paths")
+        _, manifest_identity = cmsis_device_lock.stable_snapshot(manifest_path)
+        manifest = verify_sdk(sdk)
+        records = {path: [record for record in manifest["dependencies"]
+                          if record["path"] == path]
+                   for path in (DIRECTORY, CMSIS_DIRECTORY)}
+        if any(len(records[path]) != 1 for path in records):
+            raise ValueError("SDK lacks exact paired STM32F4 dependencies")
+        packaged = {"packaged_commit": records[DIRECTORY][0]["commit"],
+                    "packaged_cmsis_commit": records[CMSIS_DIRECTORY][0]["commit"]}
+    result = verify(source, lock_path, cmsis, **packaged)
+    if cmsis_device_lock.stable_snapshot(lock_path)[1] != lock_identity or (
+            manifest_identity is not None and
+            cmsis_device_lock.stable_snapshot(manifest_path)[1] != manifest_identity):
+        raise ValueError("STM32F4 lock or SDK manifest changed during proof")
+    return result
+
+
+def _input_snapshot(source, lock_path, cmsis):
+    """Observe exact input bytes and filesystem identity, never a success flag.
+
+    The selected Git checkouts include all their files, so restored edits in
+    paired headers or unselected vendor files cannot hide behind clean status.
+    SDK mode covers its complete source tree and declared package exports.
+    Git administrative directories are not tree inputs: only actual identity
+    files are observed, avoiding transient index.lock directory timestamps.
+    """
+    source, cmsis = canonical_directory(source), canonical_directory(cmsis)
+    sdk = source.parents[2]
+    manifest = sdk / ".nexus-source-sdk.json"
+    required = {lock_path, ROOT / "cmake/platform/STM32Official.cmake"}
+    required.update(ROOT / name for name in
+                    dependencies.source_names("platform", "stm32f4", sdk=True))
+    paths = {*required, manifest}
+    trees = (sdk,) if manifest.exists() or manifest.is_symlink() else (source, cmsis)
+    directories = {}
+
+    def directory_identity(path):
+        if path.resolve() != path or path.is_symlink() or not path.is_dir():
+            raise ValueError("Configure input directory changed: " + str(path))
+        state = path.stat()
+        return [state.st_dev, state.st_ino, state.st_mode, state.st_size,
+                state.st_mtime_ns, state.st_ctime_ns]
+
+    for tree in trees:
+        for directory, names, files in os.walk(tree, followlinks=False):
+            path = Path(directory)
+            directories[str(path)] = directory_identity(path)
+            for name in names:
+                if (path / name).is_symlink():
+                    raise ValueError("Configure input directory is a symlink")
+            names[:] = [name for name in names if name != ".git"]
+            paths.update(path / name for name in files)
+    if trees == (sdk,):
+        # Paths are constrained before any file is opened; complete SDK
+        # validation below remains the authority for schema and provenance.
+        from pathlib import PurePosixPath
+        value = parse_json(cmsis_device_lock.stable_snapshot(manifest)[0])
+        for name in value.get("package_files_sha256", {}):
+            relative = PurePosixPath(name)
+            if (not name or relative.is_absolute() or ".." in relative.parts or
+                    "\\" in name or relative.as_posix() != name):
+                raise ValueError("Unsafe SDK export configure input")
+            prefix = sdk.parents[2]
+            exported = prefix / relative
+            paths.add(exported)
+            for directory in exported.parents:
+                if not directory.is_relative_to(prefix):
+                    break
+                directories[str(directory)] = directory_identity(directory)
+    else:
+        for checkout in (source, cmsis):
+            paths.update(cmsis_device_lock.git_identity_inputs(checkout))
+    files = {str(path): (cmsis_device_lock.stable_snapshot(path)[1]
+                         if path.exists() or path.is_symlink() else None)
+             for path in sorted(paths)}
+    if any(files[str(path)] is None for path in required):
+        raise ValueError("Configure authority input is missing")
+    # Hashing a later file must not hide a rewrite of an earlier one. Close
+    # the whole sweep with filesystem identities, including absent optional
+    # Git metadata and directory membership; this never reuses past success.
+    for name, identity in files.items():
+        path = Path(name)
+        if identity is None:
+            changed = path.exists() or path.is_symlink()
+        else:
+            state = cmsis_device_lock.regular(path).stat()
+            changed = (state.st_dev, state.st_ino, state.st_size,
+                       state.st_mtime_ns, state.st_ctime_ns) != identity["filesystem"]
+        if changed:
+            raise ValueError("Configure input changed during snapshot: " + name)
+    if any(directory_identity(Path(name)) != identity
+           for name, identity in directories.items()):
+        raise ValueError("Configure input directories changed during snapshot")
+    return {"source": str(source), "lock": str(lock_path), "cmsis": str(cmsis),
+            "files": files, "directories": directories}
+
+
+def _snapshot_bytes(value):
+    return (json.dumps(value, sort_keys=True, indent=2) + "\n").encode()
+
+
+def begin_configure(source, lock_path, cmsis, pending):
+    """Verify fresh inputs; retain a one-use, digest-bound pending snapshot."""
+    source, lock_path, cmsis, pending = (Path(path).absolute() for path in
+                                       (source, lock_path, cmsis, pending))
+    if (pending.resolve() != pending or pending.is_symlink() or
+            pending.is_relative_to(source) or pending.is_relative_to(cmsis) or
+            ((source.parents[2] / ".nexus-source-sdk.json").exists() and
+             pending.is_relative_to(source.parents[2]))):
+        raise ValueError("Configure snapshot must be outside verified inputs")
+    if pending.exists():
+        raise ValueError("Configure snapshot already exists")
+    before = _snapshot_bytes(_input_snapshot(source, lock_path, cmsis))
+    result = _current_verification(source, lock_path, cmsis)
+    if before != _snapshot_bytes(_input_snapshot(source, lock_path, cmsis)):
+        raise ValueError("Configure inputs changed during initial verification")
+    data = _snapshot_bytes({"schema": 1,
+        "kind": "nexus-pending-stm32f4-configure-inputs",
+        "software_qualified": False, "inputs": json.loads(before)})
+    created = False
+    try:
+        with pending.open("xb") as stream:
+            created = True
+            stream.write(data)
+    except OSError:
+        if created:
+            pending.unlink(missing_ok=True)
+        raise
+    observed = json.loads(before)["files"]
+    return {**result, "configure_snapshot_sha256": hashlib.sha256(data).hexdigest(),
+            "configure_inputs": [name for name, identity in observed.items()
+                                 if identity is not None],
+            "configure_file_probes": [glob.escape(Path(name).as_posix())
+                                      for name, identity in observed.items()
+                                      if identity is None]}
+
+
+def end_configure(source, lock_path, cmsis, pending, expected_digest):
+    """Fully reverify unchanged inputs, then consume the pending snapshot."""
+    source, lock_path, cmsis, pending = (Path(path).absolute() for path in
+                                       (source, lock_path, cmsis, pending))
+    raw, _ = cmsis_device_lock.stable_snapshot(pending)
+    record = parse_json(raw)
+    # Only a recognized pending input outside the verified source can be
+    # consumed here. Unrelated/unreadable files remain untouched; CMake also
+    # removes its own generated path after every final subprocess outcome.
+    owned = (isinstance(record, dict) and
+        record.get("kind") == "nexus-pending-stm32f4-configure-inputs" and
+        record.get("software_qualified") is False and
+        isinstance(record.get("inputs"), dict) and
+        all(record["inputs"].get(name) == str(path) for name, path in
+            (("source", source), ("lock", lock_path), ("cmsis", cmsis))) and
+        not pending.is_relative_to(source) and not pending.is_relative_to(cmsis) and
+        not ((source.parents[2] / ".nexus-source-sdk.json").exists() and
+             pending.is_relative_to(source.parents[2])))
+    try:
+        if hashlib.sha256(raw).hexdigest() != expected_digest:
+            raise ValueError("Configure snapshot digest changed")
+        fields(record, {"schema", "kind", "software_qualified", "inputs"},
+               "configure input snapshot")
+        if not owned or type(record["schema"]) is not int or record["schema"] != 1:
+            raise ValueError("Configure snapshot scope changed")
+        expected = _snapshot_bytes(record["inputs"])
+        if expected != _snapshot_bytes(_input_snapshot(source, lock_path, cmsis)):
+            raise ValueError("Configure inputs changed since initial verification")
+        result = _current_verification(source, lock_path, cmsis)
+        if expected != _snapshot_bytes(_input_snapshot(source, lock_path, cmsis)):
+            raise ValueError("Configure inputs changed during final verification")
+        return result
+    finally:
+        if owned:
+            pending.unlink(missing_ok=True)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", required=True, type=Path)
     parser.add_argument("--lock", required=True, type=Path)
     parser.add_argument("--cmsis-source", required=True, type=Path)
+    session = parser.add_mutually_exclusive_group()
+    session.add_argument("--begin-configure", type=Path)
+    session.add_argument("--end-configure", type=Path)
+    parser.add_argument("--snapshot-sha256")
     args = parser.parse_args(argv)
+    if bool(args.end_configure) != bool(args.snapshot_sha256):
+        parser.error("Final configure verification requires its snapshot digest")
     try:
         source, lock_path = args.source.absolute(), args.lock.absolute()
         cmsis = args.cmsis_source.absolute()
-        _, lock_identity = cmsis_device_lock.stable_snapshot(lock_path)
-        sdk = source.parents[2]
-        manifest_path = sdk / ".nexus-source-sdk.json"
-        manifest_identity = None
-        packaged = {}
-        if manifest_path.exists() or manifest_path.is_symlink():
-            if (source != sdk / DIRECTORY or lock_path != sdk / LOCK_NAME or
-                    cmsis != sdk / CMSIS_DIRECTORY):
-                raise ValueError("STM32F4 requires exact SDK source and lock paths")
-            _, manifest_identity = cmsis_device_lock.stable_snapshot(manifest_path)
-            manifest = verify_sdk(sdk)
-            records = {path: [record for record in manifest["dependencies"]
-                              if record["path"] == path]
-                       for path in (DIRECTORY, CMSIS_DIRECTORY)}
-            if any(len(records[path]) != 1 for path in records):
-                raise ValueError("SDK lacks exact paired STM32F4 dependencies")
-            packaged = {"packaged_commit": records[DIRECTORY][0]["commit"],
-                        "packaged_cmsis_commit": records[CMSIS_DIRECTORY][0]["commit"]}
-        result = verify(source, lock_path, cmsis, **packaged)
-        if cmsis_device_lock.stable_snapshot(lock_path)[1] != lock_identity or (
-                manifest_identity is not None and
-                cmsis_device_lock.stable_snapshot(manifest_path)[1] != manifest_identity):
-            raise ValueError("STM32F4 lock or SDK manifest changed during proof")
+        if args.begin_configure:
+            result = begin_configure(source, lock_path, cmsis, args.begin_configure)
+        elif args.end_configure:
+            result = end_configure(source, lock_path, cmsis, args.end_configure,
+                                   args.snapshot_sha256)
+        else:
+            result = _current_verification(source, lock_path, cmsis)
     except (OSError, ValueError, TypeError, KeyError, IndexError, ImportError,
             subprocess.SubprocessError) as error:
         print("STM32F4 official source rejected: " + str(error), file=sys.stderr)

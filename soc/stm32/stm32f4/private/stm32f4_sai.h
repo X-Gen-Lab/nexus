@@ -12,8 +12,11 @@ extern "C" {
 #include "stm32f407_av.h"
 /** \brief Complete selected free-protocol geometry; no live format changes.
  * \note SAI1 on exact F446/F479 uses external slave clocks or the selected
- *       System-owned PLLSAI Q kernel in master mode, with all slots
- *       active. One logical owner reserves global configuration and both SAI1
+ *       System-owned PLLSAI Q kernel in master mode. active_slots is a nonzero
+ *       subset of the configured wire slots. Only enabled slots exchange
+ *       samples with the FIFO, in increasing wire-slot order; their compact
+ *       storage contains no inactive-slot padding. One logical owner reserves
+ *       global configuration and both SAI1
  *       blocks, selecting A or B simplex or a synchronous A/B duplex pair.
  *       Shared GPIO and DMA2 gates/snapshots are acquired by Platform first.
  *       max_bit_clock_hz is the electrical SCK ceiling, never a measurement.

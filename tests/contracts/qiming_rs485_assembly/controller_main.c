@@ -32,14 +32,15 @@ int main(void) {
     const nx_uart_port_t* transport = nx_factory_uart_ref(identity);
     nx_uart_tx_validate_fn validate =
         nx_factory_uart_tx_validator_ref(identity);
-    const nx_gpio_port_t* direction =
-        nx_factory_gpio_ref(NX_GPIO_REF_DIRECTION);
+    const nx_gpio_signal_t* direction =
+        nx_factory_gpio_signal_ref(NX_GPIO_REF_DIRECTION);
     const volatile nx_uart_port_t* observed_uart = transport;
-    const volatile nx_gpio_port_t* observed_gpio = direction;
+    const volatile nx_gpio_signal_t* observed_signal = direction;
     if (validate == NULL || observed_uart == NULL ||
         observed_uart->ops == NULL || observed_uart->context == NULL ||
-        observed_gpio == NULL || observed_gpio->ops == NULL ||
-        observed_gpio->context == NULL)
+        observed_signal == NULL || observed_signal->port == NULL ||
+        observed_signal->port->ops == NULL ||
+        observed_signal->port->context == NULL)
         return 1;
     nx_platform_start_result_t started = nx_platform_start();
     if (started.primary != NX_SUCCESS)
@@ -49,10 +50,8 @@ int main(void) {
     s_config = (nx_uart_rs485_config_t){.transport = transport,
                                         .direction = direction,
                                         .validate = validate,
-                                        .mask = NEXUS_DIRECTION_MASK,
                                         .setup_us = 10U,
-                                        .hold_us = 20U,
-                                        .active_high = true};
+                                        .hold_us = 20U};
     if (nx_uart_rs485_initialize(&s_owner, &s_config) != NX_SUCCESS)
         retain();
     nx_time_us_t deadline;

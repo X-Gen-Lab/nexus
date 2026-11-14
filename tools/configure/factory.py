@@ -12,7 +12,7 @@ from tools.configure import stream_profiles, uart_formats, usb_profiles
 from tools.configure.calls import Symbol
 from tools.configure import usb_otg
 
-FACTORY_ABI_EPOCH = 3
+FACTORY_ABI_EPOCH = 5
 
 KINDS = CONTROLLER_KINDS
 
@@ -38,7 +38,8 @@ def interface_type(class_name, shape):
     """Use actual public types where controller/direction names differ."""
     if class_name in {"timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc"}:
         return f"nx_{class_name}_t"
-    if class_name in {"eth", "mdio", "memory_window", "flash_async", "nand"}:
+    if class_name in {"eth", "mdio", "memory_window", "flash_async", "nand",
+                      "mapped_storage"}:
         return f"nx_{class_name}_port_t"
     if class_name in {"usb_device", "usb_host"}:
         return f"nx_{class_name}_port_t"
@@ -54,6 +55,12 @@ def public_header(kind):
             "usb_endpoint": "usb_device",
             "spi_transaction_device": "spi_transaction",
             "spi_dma_transaction_device": "spi_dma_transaction"}.get(kind, kind)
+
+
+def public_include(kind):
+    """Select a public domain without leaking optional component headers."""
+    domain = "components" if kind == "mapped_storage" else "io"
+    return f"nexus/{domain}/{public_header(kind)}.h"
 
 
 def _typed(result):
@@ -83,7 +90,8 @@ def classes(result):
             records.append((name, "endpoint", instances))
     records.append(("usb_endpoint", "endpoint", [item for item in result.devices
                     if item.kind == "usb_device"]))
-    for name in ("memory_window", "parallel16", "flash_async", "nand"):
+    for name in ("memory_window", "parallel16", "flash_async", "nand",
+                 "mapped_storage"):
         instances = [item for item in result.devices
                      if selected_contracts.endpoint_class(item) == name]
         if instances:
@@ -163,6 +171,25 @@ def _block_async_factory(result):
             name = symbol(item.id)
             source += [f'        case NX_BLOCK_ID_{name.upper()}:',
                        f'            return &s_nx_block_async_{name};']
+    source += ['        default:', '            return NULL;', '    }', '}']
+    return header, source
+
+
+def _gpio_signal_factory(result):
+    """A logical signal borrows one authorized face, without mutable state."""
+    instances = [item for item in result.controllers if item.kind == "gpio"]
+    if not instances:
+        return [], []
+    header = [r'/** \brief Pure optional signal lookup; polarity is authored. */',
+              'const nx_gpio_signal_t* nx_factory_gpio_signal(nx_gpio_id_t id);']
+    source = [r'/** \brief Return an existing signal without touching hardware. */',
+              'const nx_gpio_signal_t* nx_factory_gpio_signal(nx_gpio_id_t id) {',
+              '    switch (id) {']
+    for item in instances:
+        if getattr(item.options, "active_high", None) is not None:
+            name = symbol(item.id)
+            source += [f'        case NX_GPIO_ID_{name.upper()}:',
+                       f'            return &s_nx_signal_{name};']
     source += ['        default:', '            return NULL;', '    }', '}']
     return header, source
 
@@ -268,11 +295,11 @@ def emit(result):
               '#include "nexus/io/fwd.h"']
     if uart_formats.probed(result):
         header.append('#include "nexus_config.h"')
-    selected_headers = sorted({public_header(name)
+    selected_headers = sorted({public_include(name)
                                for name, _, instances in classes(result)
                                if instances})
     for name in selected_headers:
-        header.append(f'#include "nexus/io/{name}.h"')
+        header.append(f'#include "{name}"')
     header += ['#ifdef __cplusplus', 'extern "C" {', '#endif']
     source = []
     for class_name, shape, instances in classes(result):
@@ -307,6 +334,9 @@ def emit(result):
     validator_header, validator_source = _uart_validator_factory(result)
     header.extend(validator_header)
     source.extend(validator_source)
+    signal_header, signal_source = _gpio_signal_factory(result)
+    header.extend(signal_header)
+    source.extend(signal_source)
     if result.factory.capabilities:
         cap_header, cap_source = emit_capabilities(result)
         header.extend(cap_header)
@@ -425,6 +455,12 @@ def emit_strong(result):
                    'static inline const nx_usb_otg_port_t*',
                    'nx_factory_usb_otg_ref(nx_usb_device_ref_t id) {',
                    '    return nx_factory_usb_otg(id.value);', '}']
+    if any(item.kind == "gpio" for item in result.controllers):
+        header += [
+            r'/** \brief Pure optional logical signal on the same GPIO ref. */',
+            'static inline const nx_gpio_signal_t*',
+            'nx_factory_gpio_signal_ref(nx_gpio_ref_t id) {',
+            '    return nx_factory_gpio_signal(id.value);', '}']
     if any(item.kind == "dac" for item in result.controllers):
         header += [
             r'/** \brief Pure optional transfer lookup using the same DAC ref. */',
@@ -465,6 +501,52 @@ def emit_strong(result):
             '    return binding;', '}']
     header += ["#ifdef __cplusplus", "}", "#endif", "#endif", ""]
     return "\n".join(header)
+
+
+def emit_smbus(result):
+    """An opt-in component companion reuses immutable I2C endpoint facts."""
+    result = _typed(result)
+    if "smbus" not in result.components:
+        return "", ""
+    from tools.configure.providers.common import mode_traits
+    controllers = {item.id: item for item in result.controllers}
+    selected = [item for item in result.devices if item.kind == "i2c"
+                and item.options.address_bits == 7
+                and 0x08 <= item.options.address <= 0x77
+                and mode_traits("i2c", controllers[item.controller].mode).irq]
+    header = ["/**", " * \\file            nexus_smbus_factory.h",
+        " * \\brief           Optional packet PEC bindings on existing I2C IDs.",
+        " * \\author          Nexus Team", " */",
+        "#ifndef NEXUS_SMBUS_FACTORY_H", "#define NEXUS_SMBUS_FACTORY_H",
+        '#include "nexus_factory_strong.h"',
+        '#include "nexus/components/smbus.h"',
+        '#ifdef __cplusplus', 'extern "C" {', '#endif',
+        '/** \\brief Pure lookup; NULL for polling, ten-bit or invalid IDs.',
+        ' * \\note Static borrowed metadata; no hardware access or initialization.',
+        ' *       Faces and binding remain live through adapter stop. Addresses',
+        ' *       derive from the same selected endpoint, without rediscovery.',
+        ' */',
+        'const nx_smbus_binding_t* nx_factory_smbus_binding(nx_i2c_device_id_t id);',
+        '/** \\brief Same endpoint identity; never a controller reference. */',
+        'static inline const nx_smbus_binding_t*',
+        'nx_factory_smbus_binding_ref(nx_i2c_device_ref_t id) {',
+        '    return nx_factory_smbus_binding(id.value);', '}',
+        '#ifdef __cplusplus', '}', '#endif', '#endif', '']
+    source = ['#include "nexus_smbus_factory.h"']
+    for item in selected:
+        name, controller = symbol(item.id), symbol(item.controller)
+        source += [f'static const nx_smbus_binding_t s_nx_smbus_binding_{name} = {{',
+            f'    &s_nx_device_face_{name}, &s_nx_face_{controller}, '
+            f'{item.options.address}u', '};']
+    source += [r'/** \brief Pure lookup of a selected packet PEC connection. */',
+        'const nx_smbus_binding_t* nx_factory_smbus_binding(nx_i2c_device_id_t id) {',
+        '    switch (id) {']
+    for item in selected:
+        name = symbol(item.id)
+        source += [f'        case NX_I2C_DEVICE_ID_{name.upper()}:',
+                   f'            return &s_nx_smbus_binding_{name};']
+    source += ['        default:', '            return NULL;', '    }', '}']
+    return "\n".join(header), "\n".join(source) + "\n"
 
 
 def _capability(item, model, endpoint=None, *, public_class=None):

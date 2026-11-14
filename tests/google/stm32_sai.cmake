@@ -20,6 +20,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         nexus_google_test(${sai_test} STM32F4_LL
             SOURCES stm32_sai_test.cpp
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/audio_sai.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/audio_sai_blocks.c"
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/av.c"
             LIBRARIES Nexus::IOAudio Nexus::IOStream Nexus::Arch
             INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"

@@ -37,6 +37,9 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
             shutil.copyfile(ROOT / "vendors/st/stm32f4_hal" / name, file)
         for source in (self.source, self.cmsis):
             (source / ".git").mkdir()
+            for name in ("HEAD", "index", "config", "commondir"):
+                (source / ".git" / name).write_text("fixture " + name)
+        (self.cmsis / "device.h").write_text("/* paired device input */\n")
         self.states = {
             self.source: {"HEAD": official.COMMIT, "origin": source_catalogue.dependency(
                 official.DIRECTORY).fetch_url,
@@ -63,6 +66,10 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
             return state["origin"]
         if arguments == ("status", "--porcelain", "--untracked-files=all"):
             return state["status"]
+        if len(arguments) == 3 and arguments[:2] == ("rev-parse", "--git-path"):
+            return str(source / ".git" / arguments[2])
+        if arguments == ("rev-parse", "--absolute-git-dir"):
+            return str(source / ".git")
         self.fail("Unexpected Git identity query: " + repr(arguments))
 
     def verify(self, **options):
@@ -236,6 +243,190 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.verify(packaged_commit=official.COMMIT,
                         packaged_cmsis_commit=official.CMSIS_COMMIT)
+
+    def begin_session(self, path=None):
+        pending = path or self.root / "build/session.pending.json"
+        pending.parent.mkdir(exist_ok=True)
+        result = official.begin_configure(self.source, self.lock_path,
+                                          self.cmsis, pending)
+        return pending, result["configure_snapshot_sha256"]
+
+    def end_session(self, pending, digest):
+        return official.end_configure(self.source, self.lock_path, self.cmsis,
+                                      pending, digest)
+
+    def test_configure_snapshot_is_pending_inputs_consumed_by_final_proof(self):
+        pending, digest = self.begin_session()
+        value = json.loads(pending.read_text())
+        self.assertEqual(value["kind"], "nexus-pending-stm32f4-configure-inputs")
+        self.assertFalse(value["software_qualified"])
+        result = self.end_session(pending, digest)
+        self.assertFalse(result["software_qualified"])
+        self.assertFalse(pending.exists())
+        with self.assertRaises((ValueError, OSError)):
+            self.end_session(pending, digest)
+
+    def test_configure_final_proof_rejects_rewrites_and_replacements(self):
+        for path in (self.source / "LICENSE.md", self.lock_path,
+                     self.cmsis / "device.h", self.cmsis / ".git/HEAD",
+                     self.cmsis / ".git/commondir"):
+            for replacement in (False, True):
+                with self.subTest(path=path, replacement=replacement):
+                    pending, digest = self.begin_session()
+                    data = path.read_bytes()
+                    if replacement:
+                        path.unlink()
+                    path.write_bytes(data)
+                    with self.assertRaisesRegex(ValueError, "changed"):
+                        self.end_session(pending, digest)
+                    self.assertFalse(pending.exists())
+
+    def test_configure_final_proof_rejects_source_change_even_when_restored(self):
+        pending, digest = self.begin_session()
+        path = self.source / "LICENSE.md"
+        data = path.read_bytes()
+        path.write_bytes(data + b"changed")
+        path.write_bytes(data)
+        with self.assertRaisesRegex(ValueError, "changed"):
+            self.end_session(pending, digest)
+        self.assertFalse(pending.exists())
+
+    def test_configure_final_proof_rejects_paired_git_identity_changes(self):
+        for state in self.states.values():
+            for name in ("HEAD", "origin", "status"):
+                with self.subTest(name=name):
+                    pending, digest = self.begin_session()
+                    before = state[name]
+                    state[name] = "changed"
+                    with self.assertRaises(ValueError):
+                        self.end_session(pending, digest)
+                    state[name] = before
+                    self.assertFalse(pending.exists())
+
+    def test_configure_snapshot_cannot_be_substituted_or_clobbered(self):
+        pending, digest = self.begin_session()
+        before = pending.read_bytes()
+        with self.assertRaises((ValueError, OSError)):
+            self.begin_session(pending)
+        self.assertEqual(pending.read_bytes(), before)
+        pending.write_bytes(before.replace(b'"software_qualified": false',
+                                           b'"software_qualified": true'))
+        with self.assertRaisesRegex(ValueError, "digest"):
+            self.end_session(pending, digest)
+
+    def test_packaged_configure_binds_whole_manifest_and_exported_inputs(self):
+        for source in self.states:
+            shutil.rmtree(source / ".git")
+        prefix = self.root / "prefix"
+        sdk = prefix / "share/nexus/src"
+        (sdk / "vendors/st").mkdir(parents=True)
+        for attribute, name in (("source", official.DIRECTORY),
+                                ("cmsis", official.CMSIS_DIRECTORY)):
+            shutil.move(str(getattr(self, attribute)), str(sdk / name))
+            setattr(self, attribute, sdk / name)
+        (sdk / "dependencies").mkdir()
+        shutil.move(str(self.lock_path), str(sdk / official.LOCK_NAME))
+        self.lock_path = sdk / official.LOCK_NAME
+        manifest_path = sdk / ".nexus-source-sdk.json"
+        manifest_path.write_text("{}")
+        extra = sdk / "other-selected-source.c"
+        extra.write_text("/* selected SDK input */\n")
+        exported = prefix / "lib/cmake/Nexus/NexusConfig.cmake"
+        exported.parent.mkdir(parents=True)
+        exported.write_text("# verified SDK export\n")
+        manifest = {"dependencies": [
+            {"path": official.DIRECTORY, "commit": official.COMMIT},
+            {"path": official.CMSIS_DIRECTORY, "commit": official.CMSIS_COMMIT}],
+            "files_sha256": {"other-selected-source.c": "verified by SDK port"},
+            "package_files_sha256": {
+                "lib/cmake/Nexus/NexusConfig.cmake": "verified by SDK port"}}
+        manifest_path.write_text(json.dumps(manifest))
+        outside = tempfile.TemporaryDirectory()
+        self.addCleanup(outside.cleanup)
+        pending_path = Path(outside.name) / "session.pending.json"
+        for path in (extra, manifest_path, exported):
+            with self.subTest(path=path), mock_patch.object(
+                    official, "verify_sdk", return_value=manifest):
+                pending, digest = self.begin_session(pending_path)
+                path.write_bytes(path.read_bytes())
+                with self.assertRaisesRegex(ValueError, "changed"):
+                    self.end_session(pending, digest)
+                self.assertFalse(pending.exists())
+
+    def test_final_snapshot_closes_mutation_of_an_already_hashed_input(self):
+        pending, digest = self.begin_session()
+        early = self.cmsis / "device.h"
+        late = self.source / "Src/stm32f4xx_ll_sdmmc.c"
+        snapshot = official.cmsis_device_lock.stable_snapshot
+        observations = 0
+
+        def mutate(path):
+            nonlocal observations
+            result = snapshot(path)
+            if Path(path) == early:
+                observations += 1
+            if Path(path) == late and observations == 2:
+                early.write_bytes(early.read_bytes())
+            return result
+
+        with mock_patch.object(official.cmsis_device_lock, "stable_snapshot",
+                               side_effect=mutate):
+            with self.assertRaisesRegex(ValueError, "changed"):
+                self.end_session(pending, digest)
+        self.assertFalse(pending.exists())
+
+    def test_git_snapshot_observer_cannot_refresh_or_inherit_git_state(self):
+        self.git_patch.stop()
+        completed = subprocess.CompletedProcess([], 0, "observed", "")
+        with mock_patch.dict("os.environ", {"GIT_DIR": "wrong",
+                                           "GIT_OPTIONAL_LOCKS": "1"}):
+            with mock_patch.object(official.cmsis_device_lock.subprocess, "run",
+                                   return_value=completed) as execute:
+                official.cmsis_device_lock.git(self.source, "rev-parse", "HEAD")
+        environment = execute.call_args.kwargs["env"]
+        self.assertNotIn("GIT_DIR", environment)
+        self.assertEqual(environment.get("GIT_OPTIONAL_LOCKS"), "0")
+
+    def test_configure_snapshot_closes_recursive_symbolic_git_refs(self):
+        marker = self.cmsis / ".git"
+        (marker / "refs/heads").mkdir(parents=True)
+        (marker / "HEAD").write_text("ref: refs/heads/alias\n")
+        (marker / "refs/heads/alias").write_text("ref: refs/heads/selected\n")
+        target = marker / "refs/heads/selected"
+        target.write_text(official.CMSIS_COMMIT + "\n")
+        pending, digest = self.begin_session()
+        target.write_bytes(target.read_bytes())
+        with self.assertRaisesRegex(ValueError, "changed"):
+            self.end_session(pending, digest)
+        self.assertFalse(pending.exists())
+
+    def test_failed_end_consumes_only_recognized_own_pending_input(self):
+        pending, digest = self.begin_session()
+        pending.write_bytes(pending.read_bytes() + b"\n")
+        with self.assertRaisesRegex(ValueError, "digest"):
+            self.end_session(pending, digest)
+        self.assertFalse(pending.exists())
+        unrelated = self.root / "unrelated.json"
+        unrelated.write_text('{"not": "configure inputs"}')
+        with self.assertRaises(ValueError):
+            self.end_session(unrelated, "0" * 64)
+        self.assertTrue(unrelated.exists())
+
+    def test_begin_returns_the_same_exact_input_closure_for_cmake(self):
+        pending = self.root / "build/session.pending.json"
+        pending.parent.mkdir(exist_ok=True)
+        result = official.begin_configure(self.source, self.lock_path,
+                                          self.cmsis, pending)
+        self.assertIn(str(self.cmsis / "device.h"), result["configure_inputs"])
+        self.assertIn(str(self.cmsis / ".git/index"), result["configure_inputs"])
+        self.assertNotIn(str(self.cmsis / ".git"), result["configure_inputs"])
+        self.end_session(pending, result["configure_snapshot_sha256"])
+
+    def test_configure_admission_cannot_treat_missing_authority_as_optional_git(self):
+        with mock_patch.object(official.dependencies, "source_names",
+                return_value=("tools/configure/missing-authority-fixture.py",)):
+            with self.assertRaisesRegex(ValueError, "missing"):
+                self.begin_session()
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@ table is an API navigation aid.
 | --- | --- | --- |
 | `Nexus::AT24C02` | `at24c02.h` | [Settled EEPROM access and write-cycle responsibility](../../../components/at24c02/README.md) |
 | `Nexus::SoftwareI2C`, `Nexus::SoftwareSCCB` | `software_i2c.h`, `software_sccb.h` | [Separate GPIO I2C and SCCB protocols](../../../components/software_i2c/README.md) |
+| `Nexus::SMBus` | `smbus.h` | [Bounded packet PEC over an existing asynchronous I2C endpoint](../../../components/smbus/README.md) |
 | `Nexus::SoftwareSPI` | `software_spi.h` | [Bounded GPIO mode-zero SPI](../../../components/software_spi/README.md) |
 | `Nexus::W25` | `w25.h` | [Explicit W25Q128JV profile and retained Flash completion](../../../components/w25/README.md) |
 | `Nexus::ILI9341` | `ili9341.h` | [Settled RGB565 command/data access](../../../components/ili9341/README.md) |
@@ -504,6 +505,33 @@ reference, offset, clock identity, failure injection and joined shutdown result.
 ## clock_domain.h
 
 ```{doxygenfile} clock_domain.h
+:project: nexus
+```
+
+(clock__domain__owner_8h)=
+
+## clock_domain_owner.h
+
+Trusted static composition includes this public storage header. Ordinary callers
+keep the opaque interface; cold helpers and span validation remain private.
+Storage fields are implementation state after construction, not application
+controls.
+
+```{doxygenfile} clock_domain_owner.h
+:project: nexus
+```
+
+(smbus_8h)=
+
+## smbus.h
+
+The optional component frames bounded packets over an already configured
+asynchronous I2C endpoint. Its generated companion reuses existing endpoint IDs;
+it does not qualify hardware SMBTYPE, timeout or ALERT operation.
+See the [component contract](../../../components/smbus/README.md) for
+`nexus_smbus_factory.h`, static binding and borrowing lifetimes.
+
+```{doxygenfile} smbus.h
 :project: nexus
 ```
 

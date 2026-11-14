@@ -157,25 +157,38 @@ def operations_layout(body):
 
 def operations_fields(body, slot_names, children):
     """Keep source slot order and permit no opaque pointer expressions."""
-    tokens = [token.strip() for token in body.strip().rstrip(",").split(",")]
     conditional = {}
-    for index, token in enumerate(tokens):
-        if "#" not in token:
-            continue
-        # One direct optional method is the only supported conditional form.
-        # Keep both alternatives; the linked table word selects the observed
-        # branch later, without guessing compiler definitions from source.
-        match = re.fullmatch(
-            r"#if[ \t]+defined[ \t]*\([ \t]*([A-Za-z_]\w*)[ \t]*\)"
-            r"[ \t]*\r?\n[ \t]*(?!NULL\b)([A-Za-z_]\w*)[ \t]*\r?\n"
-            r"[ \t]*#else[ \t]*\r?\n[ \t]*NULL[ \t]*\r?\n"
-            r"[ \t]*#endif", token)
-        if match is None or conditional:
+    # Project direct equal-length function/NULL lists only. Actual ELF words
+    # select their observed branch; no source macro value is evaluated here.
+    block = re.compile(
+        r"#if[ \t]+(defined[ \t]*\([ \t]*([A-Za-z_]\w*)[ \t]*\)|"
+        r"([A-Za-z_]\w*))[ \t]*\r?\n([^#{}]*?)"
+        r"^[ \t]*#else[ \t]*\r?\n([^#{}]*?)"
+        r"^[ \t]*#endif\b", re.MULTILINE)
+    while "#" in body:
+        match = block.search(body)
+        if match is None:
             raise EvidenceError("unsupported concrete operations initializer")
-        condition, method = match.groups()
-        conditional[index] = {"if_defined": condition, "defined": method,
-                              "undefined": "NULL"}
-        tokens[index] = method
+        _, defined, expression, yes, no = match.groups()
+        methods = [value.strip() for value in yes.strip().rstrip(",").split(",")]
+        absent = [value.strip() for value in no.strip().rstrip(",").split(",")]
+        if (len(methods) != len(absent) or
+                yes.rstrip().endswith(",") != no.rstrip().endswith(",") or
+                not all(re.fullmatch(r"(?!NULL\b)[A-Za-z_]\w*", value)
+                        for value in methods) or
+                any(value != "NULL" for value in absent)):
+            raise EvidenceError("unsupported concrete operations initializer")
+        index = body[:match.start()].count(",")
+        for offset, method in enumerate(methods):
+            condition = {"defined": method, "undefined": "NULL"}
+            condition["if_defined" if defined else "if_expression"] = (
+                defined or expression)
+            if len(methods) > 1:
+                condition["group"] = index
+            conditional[index + offset] = condition
+        replacement = ", ".join(methods) + ("," if yes.rstrip().endswith(",") else "")
+        body = body[:match.start()] + replacement + body[match.end():]
+    tokens = [token.strip() for token in body.strip().rstrip(",").split(",")]
     if all(re.fullmatch(r"&\s*[A-Za-z_]\w*|[A-Za-z_]\w*|0", token)
            for token in tokens):
         if len(tokens) > len(slot_names):
@@ -597,6 +610,7 @@ def operations_table(elf, operations, expected_type, slot_names, provider, *,
     if not any(slots):
         raise EvidenceError("concrete operations table has no methods")
     methods, subtables = [], []
+    observed_groups = {}
     result = {"name": operations, "type": expected_type,
               "source": provider["source"], "address": table["value"],
               "bytes": table["size"], "slots": slot_names, "methods": methods,
@@ -631,9 +645,15 @@ def operations_table(elf, operations, expected_type, slot_names, provider, *,
         expected = provider["fields"].get(slot_name, "NULL")
         if isinstance(expected, dict):
             observed = "defined" if pointer else "undefined"
+            if "group" in expected:
+                group = expected["group"]
+                if observed_groups.setdefault(group, observed) != observed:
+                    raise EvidenceError("mixed conditional operations group")
+            condition_key = ("if_defined" if "if_defined" in expected
+                             else "if_expression")
             result.setdefault("conditional_methods", []).append({
                 "slot": index, "name": slot_name,
-                "if_defined": expected["if_defined"], "observed": observed})
+                condition_key: expected[condition_key], "observed": observed})
             expected = expected[observed]
         if expected in ("NULL", "0"):
             if pointer:

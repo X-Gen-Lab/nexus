@@ -415,6 +415,42 @@ const nx_probe_ops_t nx_probe_ops = {start, &child_operations, stop};
                     "slot": 1, "name": "pong", "if_defined": "NX_PROBE_OPTIONAL",
                     "observed": "defined" if enabled else "undefined"}])
 
+    def grouped_method(self, root, header, source, data):
+        header.write_text(header.read_text().replace(
+            "struct nx_leaf_ops {", "struct nx_leaf_ops { int (*anchor)(void*);"))
+        source.write_text(source.read_text().replace(
+            ".ping = ping, .pong = pong",
+            "ping,\n#if NX_PROBE_GROUP\nping, pong\n#else\nNULL, NULL\n#endif\n"))
+        struct.pack_into("<I", data, 0x238, 12)
+        struct.pack_into("<3I", data, 0x11c,
+                         0x08002031, 0x08002031, 0x08002041)
+
+    def test_grouped_methods_follow_one_actual_linked_branch(self):
+        for enabled in (False, True):
+            with self.subTest(enabled=enabled), tempfile.TemporaryDirectory() as directory:
+                root, header, source = self.tree(directory)
+                data = self.image()
+                self.grouped_method(root, header, source, data)
+                if not enabled:
+                    struct.pack_into("<2I", data, 0x120, 0, 0)
+                report = inspect_provider_retention(Elf32(data), self.bindings,
+                                                    root=root)
+                leaf = next(item for item in report["tables"]
+                            if item["name"] == "leaf_operations")
+                self.assertEqual(leaf["null_methods"], 0 if enabled else 2)
+                self.assertEqual([item["observed"] for item in
+                                  leaf["conditional_methods"]],
+                                 ["defined" if enabled else "undefined"] * 2)
+
+    def test_grouped_methods_reject_mixed_null_and_code_branches(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, header, source = self.tree(directory)
+            data = self.image()
+            self.grouped_method(root, header, source, data)
+            struct.pack_into("<I", data, 0x120, 0)
+            with self.assertRaisesRegex(EvidenceError, "mixed conditional"):
+                inspect_provider_retention(Elf32(data), self.bindings, root=root)
+
     def test_conditional_method_still_requires_exact_code_and_local_source(self):
         with tempfile.TemporaryDirectory() as directory:
             root, _, source = self.tree(directory)
@@ -431,7 +467,7 @@ const nx_probe_ops_t nx_probe_ops = {start, &child_operations, stop};
 
     def test_conditional_method_grammar_refuses_ambiguous_preprocessing(self):
         for expression in (
-                "#if NX_PROBE_OPTIONAL\npong\n#else\nNULL\n#endif",
+                "#if NX_PROBE_OPTIONAL + 0\npong\n#else\nNULL\n#endif",
                 "#if defined(NX_PROBE_OPTIONAL)\npong\n#else\nping\n#endif",
                 "#if defined(NX_PROBE_OPTIONAL)\nNULL\n#else\npong\n#endif",
                 "#if defined(NX_PROBE_OPTIONAL)\npong\n#elif OTHER\nNULL\n#endif",

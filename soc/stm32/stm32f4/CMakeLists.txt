@@ -41,18 +41,22 @@ foreach(kind gpio uart spi i2c i2c_target flash watchdog exti pwm encoder adc ad
         list(APPEND stm32_sources drivers/av.c)
         nexus_controller_names(audio_controllers audio)
         foreach(controller IN LISTS audio_controllers)
-            if(controller STREQUAL "SAI1")
+            nexus_controller_modes(controller_modes audio "${controller}")
+            if(controller MATCHES "^SAI[12]$")
                 list(APPEND stm32_sources drivers/audio_sai.c)
+                if("${controller_modes}" MATCHES "-blocks")
+                    list(APPEND stm32_sources drivers/audio_sai_blocks.c)
+                endif()
                 set(stm32_sai_hal ON)
             elseif(controller MATCHES "^I2S[23]$")
                 list(APPEND stm32_sources drivers/audio.c)
+                if("${controller_modes}" MATCHES "-blocks")
+                    list(APPEND stm32_sources drivers/audio_blocks.c)
+                endif()
             else()
                 message(FATAL_ERROR "Unreviewed audio controller: ${controller}")
             endif()
         endforeach()
-        if("${modes}" MATCHES "-blocks")
-            list(APPEND stm32_sources drivers/audio_blocks.c)
-        endif()
     elseif(kind STREQUAL "eth")
         list(APPEND stm32_sources drivers/ethernet.c)
     elseif(kind STREQUAL "eth_frames")
@@ -111,8 +115,12 @@ foreach(kind gpio uart spi i2c i2c_target flash watchdog exti pwm encoder adc ad
     elseif(kind STREQUAL "block")
         list(APPEND stm32_sources drivers/sdio.c)
     elseif(kind STREQUAL "external_bus")
-        if("qspi-indirect-sdr" IN_LIST modes)
+        if("qspi-indirect-sdr" IN_LIST modes OR
+                "qspi-indirect-dma" IN_LIST modes)
             list(APPEND stm32_sources drivers/qspi.c)
+        endif()
+        if("qspi-indirect-dma" IN_LIST modes)
+            list(APPEND stm32_sources drivers/qspi_dma.c)
         endif()
         if("sdram-controller" IN_LIST modes)
             list(APPEND stm32_sources drivers/fmc_sdram.c)
@@ -230,6 +238,10 @@ foreach(kind gpio uart spi i2c i2c_target flash watchdog exti pwm encoder adc ad
         endif()
     elseif(kind STREQUAL "cipher" OR kind STREQUAL "hash")
         list(APPEND stm32_sources drivers/crypto_irq.c)
+        if("dma-blocks" IN_LIST modes)
+            list(APPEND stm32_sources "drivers/${kind}_dma.c"
+                drivers/crypto_dma.c)
+        endif()
     endif()
 endforeach()
 list(REMOVE_DUPLICATES stm32_sources)
@@ -262,6 +274,21 @@ target_include_directories(nexus_soc_stm32f4 SYSTEM PRIVATE
     "${stm32_device}/Include")
 nexus_use_cmsis_core(nexus_soc_stm32f4)
 target_compile_definitions(nexus_soc_stm32f4 PRIVATE ${NEXUS_STM32_DEVICE})
+if(NEXUS_QSPI_CPU_MAP)
+    target_sources(nexus_soc_stm32f4 PRIVATE drivers/qspi_mapped.c)
+    target_link_libraries(nexus_soc_stm32f4 PRIVATE
+        Nexus::MappedStorage Nexus::IOFlashAsync)
+    target_compile_definitions(nexus_soc_stm32f4 PRIVATE NEXUS_QSPI_CPU_MAP=1)
+endif()
+if(NEXUS_QSPI_QUAD_READ)
+    target_compile_definitions(nexus_soc_stm32f4 PRIVATE
+        NEXUS_QSPI_QUAD_READ=1)
+endif()
+if("qspi-indirect-dma" IN_LIST stm32_external_bus_modes)
+    target_link_libraries(nexus_soc_stm32f4 PRIVATE Nexus::IODMA)
+    target_compile_definitions(nexus_soc_stm32f4 PRIVATE
+        NEXUS_QSPI_PROGRAM_DMA=1)
+endif()
 if(NEXUS_USB_REMOTE_WAKEUP)
     target_compile_definitions(nexus_soc_stm32f4 PRIVATE
         NEXUS_STM32F4_USB_REMOTE_WAKEUP=1)
@@ -308,7 +335,8 @@ if(stm32_block_modes)
     include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32SDIO.cmake")
     nexus_stm32f407_sdio_ll(nexus_soc_stm32f4)
 endif()
-if("qspi-indirect-sdr" IN_LIST stm32_external_bus_modes)
+if("qspi-indirect-sdr" IN_LIST stm32_external_bus_modes OR
+        "qspi-indirect-dma" IN_LIST stm32_external_bus_modes)
     include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32QSPI.cmake")
     nexus_stm32f4_qspi_hal(nexus_soc_stm32f4)
 endif()
@@ -353,6 +381,7 @@ if(stm32_uart_hal)
 endif()
 if(stm32_usb_host_hal OR stm32_sai_hal
         OR "qspi-indirect-sdr" IN_LIST stm32_external_bus_modes
+        OR "qspi-indirect-dma" IN_LIST stm32_external_bus_modes
         OR "cipher" IN_LIST NEXUS_SELECTED_KINDS
         OR "hash" IN_LIST NEXUS_SELECTED_KINDS
         OR "display" IN_LIST NEXUS_SELECTED_KINDS
@@ -378,7 +407,7 @@ endif()
 set(NEXUS_SYSTEM_SOURCE ${stm32_system_sources} PARENT_SCOPE)
 
 # Fixed clock profile sleep is an explicitly selected caller-owned component.
-function(nexus_add_stm32f407_sleep target)
+function(nexus_add_stm32f4_sleep target)
     if(NOT ARGC EQUAL 1 OR TARGET "${target}")
         message(FATAL_ERROR "Sleep target requires one unused target name")
     endif()
@@ -387,10 +416,12 @@ function(nexus_add_stm32f407_sleep target)
     endif()
     get_target_property(sleep_family Nexus::Platform NEXUS_SOC_FAMILY)
     get_target_property(sleep_device Nexus::Platform NEXUS_STM32_DEVICE)
+    set(sleep_devices STM32F405xx STM32F407xx STM32F415xx STM32F417xx
+        STM32F411xE STM32F446xx STM32F479xx)
     if(NOT sleep_family STREQUAL "stm32f4" OR
-            NOT sleep_device STREQUAL "STM32F407xx")
+            NOT sleep_device IN_LIST sleep_devices)
         message(FATAL_ERROR
-            "Sleep requires a selected F4 Platform with the maintained F407 device")
+            "Sleep requires a selected F4 Platform with a maintained exact device")
     endif()
     get_filename_component(sleep_source
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../.." ABSOLUTE)

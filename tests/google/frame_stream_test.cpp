@@ -44,7 +44,7 @@ TEST(FrameLayout, I2sIncludesEverySlotAndWholeStorageContainer) {
     EXPECT_EQ(layout.bytes, 384U);
 }
 
-TEST(FrameLayout, SaiSparseSlotsDoNotCompactStorage) {
+TEST(FrameLayout, SaiSparseSlotsStoreOnlyTheEnabledFifoSamples) {
     auto f = pcm();
     f.kind = NX_FRAME_AUDIO_SAI;
     f.slots = 32U;
@@ -52,8 +52,17 @@ TEST(FrameLayout, SaiSparseSlotsDoNotCompactStorage) {
     f.frames = 3U;
     nx_frame_layout_t layout = {};
     ASSERT_EQ(nx_frame_layout_audio(&f, &layout), NX_SUCCESS);
-    EXPECT_EQ(layout.bytes, 384U);
-    EXPECT_EQ(layout.planes[0].row_bytes, 128U);
+    EXPECT_EQ(layout.bytes, 24U);
+    EXPECT_EQ(layout.planes[0].row_bytes, 8U);
+    f.active_slots = 0x80000005U;
+    ASSERT_EQ(nx_frame_layout_audio(&f, &layout), NX_SUCCESS);
+    EXPECT_EQ(layout.bytes, 36U);
+    EXPECT_EQ(layout.planes[0].row_bytes, 12U);
+    f.frames = SIZE_MAX / 12U + 1U;
+    const auto before = layout;
+    EXPECT_EQ(nx_frame_layout_audio(&f, &layout), NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(before.bytes, layout.bytes);
+    EXPECT_EQ(before.planes[0].row_bytes, layout.planes[0].row_bytes);
 }
 
 TEST(FrameLayout, PdmStoresEightBitsPerLaneByte) {

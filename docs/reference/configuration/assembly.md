@@ -16,7 +16,7 @@ are rejected as inputs, not retained as an alternate authoring interface.
 
 The parser creates immutable `AuthoredAssembly` intent. Production consumers use
 `resolve_ir()` and named immutable `ConfigurationIR` decisions; only audit and
-artifact-boundary consumers request `to_dict()`. Typed source epoch 3 and the
+artifact-boundary consumers request `to_dict()`. Typed source epoch 5 and the
 schema-1 JSON output projection are separate contracts. The
 [source compatibility policy](../../design/source-compatibility.md) owns their
 version declarations; neither introduces firmware metadata or runtime dispatch.
@@ -62,6 +62,32 @@ include it and use nominal references such as `NX_UART_REF_UART0` with
 `capabilities = true` selection emits immutable mode metadata separately from
 the interface faces. Factory getters return existing static objects and do not
 start hardware.
+
+## Logical GPIO signals
+
+On an authorized single-pin `gpio` input or output, the optional boolean
+`active_high` selects an immutable logical signal in addition to the existing
+port face. Omit it to retain only the physical-level port. Unknown values and
+multi-bit masks reject; no polarity is inferred from the Board's initial level.
+
+The following fragment belongs in an independently complete assembly whose
+Board authorizes the output binding `rs485-de`; it declares no new wiring.
+
+<!-- nexus-toml-fragment: GPIO signal within an independently complete Board-authorized assembly -->
+```toml
+[gpio.direction]
+binding = "rs485-de"
+mode = "output"
+active_high = true
+```
+
+Include `nexus_factory_strong.h` and obtain the binding with
+`nx_factory_gpio_signal_ref(NX_GPIO_REF_DIRECTION)`. Check for NULL before use;
+undeclared signals and invalid IDs return NULL. The getter neither initializes
+hardware nor changes the physical safe level. A signal reuses its authorized
+port and shared ops, with no mutable state, per-pin vtable or new owner. The
+RS485 adapter accepts this binding as `direction`; software wire protocols keep
+their physical-level and open-drain contracts.
 
 ## I2C endpoint address width
 

@@ -296,6 +296,58 @@ class F407ClockTests(unittest.TestCase):
             self.assertIn("#define NEXUS_CLOCK_PLLM 16u", header)
 
     @staticmethod
+    def sdio375_parameters():
+        return dict(source="hse", input_hz=8000000, pll_m=8, pll_n=300,
+                    pll_p=2, pll_q=4, ahb_div=1, apb1_div=4, apb2_div=2,
+                    adc_div=4, supply_mv=3300, css=False)
+
+    @staticmethod
+    def sdio375_summary():
+        return dict(hse_hz=8000000, core_hz=150000000,
+                    apb1_hz=37500000, apb2_hz=75000000)
+
+    def test_sdio375_profile_has_an_exact_separate_pllq_domain(self):
+        selected = stm32f4.clock_plan("hse8-pll150-sdio375",
+                                     self.sdio375_summary())
+        expected = {"core": 150000000, "apb1": 37500000,
+                    "apb2": 75000000, "pll48": 75000000,
+                    "apb1_timer": 75000000, "apb2_timer": 150000000}
+        for name, hz in expected.items():
+            self.assertEqual(selected["domains"][name]["nominal_hz"], hz)
+        self.assertEqual(selected["parameters"]["pllcfgr"], 0x04404b08)
+        self.assertFalse(selected["physical_qualified"])
+
+    def test_sdio375_profile_cannot_select_a_nearby_tuple(self):
+        for change in ({"core_hz": 149000000}, {"apb1_hz": 42000000},
+                       {"apb2_hz": 84000000}, {"hse_hz": 16000000}):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                stm32f4.clock_plan("hse8-pll150-sdio375",
+                    {**self.sdio375_summary(), **change})
+
+    def test_sdio375_is_an_explicit_high_speed_four_bit_memory_consumer(self):
+        from types import SimpleNamespace
+        from tools.configure.stm32f4.clocks import _sdio_divider
+        selected = stm32f4.clock_plan("hse8-pll150-sdio375",
+                                     self.sdio375_summary())
+        def block(protocol="sd-memory", speed="high-speed", width=4):
+            return SimpleNamespace(kind="block", controller="SDIO",
+                mode="sdio-dma", options=SimpleNamespace(bus_width=width,
+                    protocol=protocol, speed=speed))
+        for protocol in ("sd-memory", "mmc"):
+            stm32f4.validate_clock_consumers(selected, (block(protocol),))
+        self.assertEqual(_sdio_divider(selected, 4, 2), 0)
+        self.assertEqual(_sdio_divider(selected, 1, 188), 186)
+        for bad in (block(speed="default"), block(width=8), block("sdio"),
+                    SimpleNamespace(kind="entropy", controller="RNG"),
+                    SimpleNamespace(kind="usb_device", controller="OTG_HS",
+                                    mode="otg-hs-ulpi", options=None)):
+            with self.subTest(consumer=bad), self.assertRaises(ValueError):
+                stm32f4.validate_clock_consumers(selected, (bad,))
+        custom = stm32f4.clock_plan("custom", self.sdio375_parameters())
+        with self.assertRaises(ValueError):
+            stm32f4.validate_clock_consumers(custom, (block(),))
+
+    @staticmethod
     def parameters():
         return dict(source="hsi", input_hz=16000000, pll_m=16, pll_n=336,
                     pll_p=4, pll_q=7, ahb_div=1, apb1_div=4, apb2_div=2,

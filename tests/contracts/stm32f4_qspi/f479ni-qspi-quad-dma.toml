@@ -1,0 +1,42 @@
+# SDR 1-1-4 read6Bh with eight dummy clocks; program/status/verify stay single-line.
+# Finite page-program DMA reference; reads, status and verify stay PIO.
+# Software reference only; not a physical Board or executed image.
+schema = 2
+board_package = "f479ni-qspi-quad-board"
+backend = "baremetal"
+clock = "custom"
+optimization = "Os"
+
+[clock_parameters]
+source = "hsi"
+input_hz = 16000000
+sysclk_source = "input"
+pll48 = false
+pll_m = 16
+pll_n = 336
+pll_p = 4
+pll_q = 7
+ahb_div = 1
+apb1_div = 1
+apb2_div = 1
+adc_div = 4
+supply_mv = 3300
+css = false
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 16384
+libc_heap_bytes = 0
+
+# Exact W25Q128JVSIQ software reference; no fitted device or PCB claim.
+# QE=1 is adopted after readback; no status/protection write is permitted.
+[external_bus.serial]
+binding = "control"
+mode = "qspi-indirect-dma"
+
+[flash_async.storage]
+controller = "serial"
+binding = "storage"
+mode = "nor-indirect-quad-read"
+parameters = { part = "W25Q128JVSIQ", prescaler = 1, cs_high_cycles = 2, read_budget_us = 1000, prepare_budget_us = 1000, stop_budget_us = 1000 }

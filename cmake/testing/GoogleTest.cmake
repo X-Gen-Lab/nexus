@@ -30,7 +30,8 @@ macro(nexus_host_google_test)
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
         "${_nexus_google_lock}" "${_nexus_google_verifier}"
         "${_nexus_google_source}/.gitmodules"
-        "${_nexus_google_source}/ext/googletest/.git"
+        "${_nexus_google_source}/tools/maintenance/cmsis_device_lock.py"
+        "${_nexus_google_source}/tools/evidence/common.py"
         "${_nexus_google_source}/tools/maintenance/source_catalogue.py"
         "${_nexus_google_source}/tools/configure/metadata.py")
     string(JSON _nexus_google_count LENGTH
@@ -41,6 +42,18 @@ macro(nexus_host_google_test)
             "${_nexus_google_identity}" configure_inputs ${_nexus_google_index})
         set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
             "${_nexus_google_input}")
+    endforeach()
+    # Observe only exact file membership, not Git lock-container timestamps.
+    # A newly created loose ref must invalidate an earlier packed-ref proof.
+    string(JSON _nexus_google_probe_count LENGTH
+        "${_nexus_google_identity}" configure_file_probes)
+    math(EXPR _nexus_google_probe_last "${_nexus_google_probe_count} - 1")
+    foreach(_nexus_google_probe_index RANGE 0 ${_nexus_google_probe_last})
+        string(JSON _nexus_google_probe GET
+            "${_nexus_google_identity}" configure_file_probes
+            ${_nexus_google_probe_index})
+        file(GLOB _nexus_google_existing LIST_DIRECTORIES false
+            CONFIGURE_DEPENDS "${_nexus_google_probe}")
     endforeach()
     set(INSTALL_GTEST OFF CACHE BOOL "GoogleTest is test-only" FORCE)
     set(BUILD_GMOCK ON CACHE BOOL "GoogleMock contract tests" FORCE)

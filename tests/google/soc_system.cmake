@@ -54,6 +54,33 @@ foreach(ahb_div 2 4)
         "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_ahb_clock_model.h")
 endforeach()
 
+# Compare the closed 75 MHz PLLQ context with the ordinary 48 MHz domain.
+foreach(sdio_high_speed 0 1)
+    set(sdio_system_target "nexus_stm32_sdio_system_${sdio_high_speed}_test")
+    nexus_google_test(${sdio_system_target}
+        SOURCES stm32_sdio_system_test.cpp
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+        LIBRARIES Nexus::Core
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
+            "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
+            "${NEXUS_SOURCE_DIR}/components/clock_domain/private"
+            "${NEXUS_SOURCE_DIR}/arch/include"
+            "${NEXUS_SOURCE_DIR}/io/include")
+    if(sdio_high_speed)
+        target_sources(${sdio_system_target} PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/power.c"
+            "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c")
+    endif()
+    target_include_directories(${sdio_system_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+    nexus_use_cmsis_core(${sdio_system_target})
+    target_compile_definitions(${sdio_system_target} PRIVATE
+        STM32F407xx NEXUS_STM32_MODEL NX_TEST_SDIO_HS375=${sdio_high_speed})
+    target_compile_options(${sdio_system_target} PRIVATE
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_sdio_system_model.h")
+endforeach()
+
 nexus_google_test(nexus_stm32_silicon_identity_test
     SOURCES stm32_silicon_identity_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
@@ -67,35 +94,55 @@ target_compile_definitions(nexus_stm32_silicon_identity_test PRIVATE
 target_compile_options(nexus_stm32_silicon_identity_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_silicon_identity_model.h")
 
-nexus_google_test(nexus_stm32_power_rtc_integration_test STM32F4_LL
-    SOURCES power_rtc_integration_test.cpp f407_rtc_model.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/power.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/rtc.c"
-        "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c"
-    LIBRARIES Nexus::IO
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
-        "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
-        "${NEXUS_SOURCE_DIR}/components/clock_domain/private"
-        "${NEXUS_SOURCE_DIR}/arch/include"
-        "${NEXUS_SOURCE_DIR}/io/private")
-target_include_directories(nexus_stm32_power_rtc_integration_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-nexus_use_cmsis_core(nexus_stm32_power_rtc_integration_test)
-target_compile_definitions(nexus_stm32_power_rtc_integration_test PRIVATE
-    STM32F407xx NEXUS_STM32_MODEL NX_F407_RTC_REAL_SYSTEM
-    nx_arch_is_privileged=nx_f407_rtc_privileged
-    nx_arch_in_isr=nx_f407_rtc_in_isr
-    nx_arch_irq_is_masked=nx_f407_rtc_masked
-    nx_arch_irq_masks=nx_f407_rtc_masks
-    nx_arch_dsb=nx_f407_rtc_dsb)
-target_compile_options(nexus_stm32_power_rtc_integration_test PRIVATE
-    "-include${CMAKE_CURRENT_SOURCE_DIR}/power_rtc_integration_model.h")
-foreach(cpu_leaf irq_save irq_restore irq_is_masked irq_masks is_privileged
-                 in_isr dsb isb)
-    target_link_options(nexus_stm32_power_rtc_integration_test PRIVATE
-        "LINKER:--wrap=nx_arch_${cpu_leaf}")
+foreach(power_rtc_part f407 f411 f446 f479)
+    if(power_rtc_part STREQUAL "f407")
+        set(power_rtc_target nexus_stm32_power_rtc_integration_test)
+        set(power_rtc_macro STM32F407xx)
+    elseif(power_rtc_part STREQUAL "f411")
+        set(power_rtc_target nexus_stm32_f411_power_rtc_integration_test)
+        set(power_rtc_macro STM32F411xE)
+    elseif(power_rtc_part STREQUAL "f446")
+        set(power_rtc_target nexus_stm32_f446_power_rtc_integration_test)
+        set(power_rtc_macro STM32F446xx)
+    else()
+        set(power_rtc_target nexus_stm32_f479_power_rtc_integration_test)
+        set(power_rtc_macro STM32F479xx)
+    endif()
+    nexus_google_test(${power_rtc_target} STM32F4_LL
+        SOURCES power_rtc_integration_test.cpp f407_rtc_model.cpp
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/power.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/rtc.c"
+            "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c"
+        LIBRARIES Nexus::IO
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
+            "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
+            "${NEXUS_SOURCE_DIR}/components/clock_domain/private"
+            "${NEXUS_SOURCE_DIR}/arch/include"
+            "${NEXUS_SOURCE_DIR}/io/private")
+    target_include_directories(${power_rtc_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+    nexus_use_cmsis_core(${power_rtc_target})
+    target_compile_definitions(${power_rtc_target} PRIVATE
+        ${power_rtc_macro} NEXUS_STM32_MODEL NX_F407_RTC_REAL_SYSTEM
+        nx_arch_is_privileged=nx_f407_rtc_privileged
+        nx_arch_in_isr=nx_f407_rtc_in_isr
+        nx_arch_irq_is_masked=nx_f407_rtc_masked
+        nx_arch_irq_masks=nx_f407_rtc_masks
+        nx_arch_dsb=nx_f407_rtc_dsb)
+    target_compile_options(${power_rtc_target} PRIVATE
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/power_rtc_integration_model.h")
+    foreach(cpu_leaf irq_save irq_restore irq_is_masked irq_masks is_privileged
+                     in_isr dsb isb)
+        target_link_options(${power_rtc_target} PRIVATE
+            "LINKER:--wrap=nx_arch_${cpu_leaf}")
+    endforeach()
+
+    if(NOT power_rtc_part STREQUAL "f407")
+        target_compile_definitions(${power_rtc_target} PRIVATE
+            NX_POWER_RTC_HIGH_PROFILE=1)
+    endif()
 endforeach()
 
 foreach(input_profile hsi hse hsi_pll48 hse_pll48)
@@ -163,6 +210,27 @@ foreach(family_profile f407 f411 f446 f479)
         NX_TEST_CUT=${family_cut} NX_TEST_FLASH_KIB=${family_kib})
     target_compile_options(${family_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_family_system_model.h")
+    if(NOT family_profile STREQUAL "f407")
+        set(high_target "nexus_stm32_${family_profile}_high_clock_test")
+        nexus_google_test(${high_target}
+            SOURCES stm32_high_clock_test.cpp
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/power.c"
+                "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c"
+            LIBRARIES Nexus::IO Nexus::Arch
+            INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
+                "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
+                "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
+        target_include_directories(${high_target} SYSTEM PRIVATE
+            "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+        nexus_use_cmsis_core(${high_target})
+        target_compile_definitions(${high_target} PRIVATE ${family_macro}
+            NEXUS_STM32_MODEL NX_TEST_DEVICE=${family_device}
+            NX_TEST_CUT=${family_cut} NX_TEST_FLASH_KIB=${family_kib})
+        target_compile_options(${high_target} PRIVATE
+            "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_high_clock_model.h")
+    endif()
 endforeach()
 
 

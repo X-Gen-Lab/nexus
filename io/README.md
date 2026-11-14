@@ -54,6 +54,8 @@ RS485 集成优先用同一强类型 UART 引用取得 `nx_factory_uart_tx_bindi
 或非法 ID 得到两个 NULL 字段。底层独立 getter 仍沿原查询合同提供。查询不分配、
 不操作硬件、不准入传输；callback 不是实例认证。调用者独占 TX，并提供稳定
 adapter／配置、GPIO 方向绑定、极性及建立／保持时间；不新增隐藏 owner 或任务。
+RS485 的方向字段接收只读 `nx_gpio_signal_t*`，极性与单 bit 只由信号绑定保存；
+完整接入与停止合同见 [RS485 电气适配](../docs/design/uart-dma-rs485.md#rtscts-与-rs485)。
 
 ## 逻辑 GPIO 与公共 traits
 
@@ -61,6 +63,12 @@ adapter／配置、GPIO 方向绑定、极性及建立／保持时间；不新�
 `nx_gpio_signal_read()` 表达逻辑有效状态。Board 集成一次绑定端口、单 bit mask
 与极性；组件不解释物理引脚。绑定不增加可变 owner、锁或分配，端口继续验证授权。
 同端口批量操作仍使用既有 port API；跨端口不承诺原子性。
+
+TOML 的 `[gpio.<id>]` 可显式设置 `active_high`，仅接受单 bit mask。
+`nx_factory_gpio_signal_ref()` 使用原 GPIO 强类型引用查询生成的只读信号；未声明
+信号或非法 ID 返回 NULL。生成器证明信号属于该授权视图，手工绑定由集成侧保证。
+读接口无法把未授权 bit 与实际 LOW 区分，不能用读取结果替代绑定校验。GPIO 初值
+与逻辑极性独立；软件 I2C／SPI／OneWire 继续使用所需的物理电平和开漏释放合同。
 
 以下是完整开发检出中[维护回归](../tests/google/polymorphic_mock_test.cpp)的绑定
 片段，省略 mock 与断言，仅说明集成侧连接。Source SDK 不携带该测试；按包 manifest
@@ -78,7 +86,21 @@ I2C 使用 `nx_i2c_limits_t` 描述所选 provider profile，不另建无实现�
 factory 仅在明确选择 metadata 时生成所选常量与 lookup；未选择不增加该实例数据。
 组件可注入同类型 const 描述，无需包含生成器私有头。不可变能力不表示运行 ready、
 不替代提交准入，也不证明物理资格；未知限额不是无限。详见
-[源码迁移](../docs/guides/migration.md#rebuild-for-source-interface-epoch-3)。
+[源码迁移](../docs/guides/migration.md#rebuild-for-source-interface-epoch-5)。
+
+## SPI 轮询准入
+
+普通 byte polling 允许精确原地 TX／RX，拒绝部分重叠；分段 transaction 保持 TX
+不可变、RX 与各阶段元数据分离。完成结果必须与 payload、provider 控制状态和其
+已知 MMIO 存储分离。实现先完成跨度与实例准入，再清零计数并执行；准入拒绝保留
+原计数，不允许通过输出指针提前覆盖控制器或将不可变 TX 清零。传输开始后的错误
+仍返回已完成前缀，CS／时钟撤回失败保留原静态恢复责任。
+
+STM32F4 的直接 polling transfer 和 recover 要求未屏蔽的特权 Thread；非特权
+调用返回 `NX_ERROR_CONTEXT`，不操作外设或清除原故障。该要求属于选定硬件
+provider，公共接口仍允许软件或外部 provider 声明自己的合法上下文。公共合同以
+[`spi.h`](include/nexus/io/spi.h) 和
+[`spi_transaction.h`](include/nexus/io/spi_transaction.h) 为准。
 
 ## 控制器、并行端点和内存窗口
 

@@ -75,6 +75,23 @@ bool clock_advances;
 bool silence_commands;
 bool r3_crc;
 bool card_four_bit;
+bool high_speed_supported;
+bool high_speed_accept;
+bool high_speed_response_lost;
+bool high_speed_crc_error;
+bool high_speed_readback;
+bool high_speed_selected;
+uint8_t mmc_card_type;
+uint8_t mmc_hs_timing;
+unsigned high_speed_commands;
+unsigned high_speed_ext_reads;
+unsigned high_speed_switch_write;
+unsigned high_speed_clock_write;
+unsigned high_speed_busy_polls;
+unsigned sd_busy_checks;
+bool sd_status_busy;
+nx_time_us_t sd_status_finished_at;
+nx_time_us_t sd_first_followup_at;
 bool bad_csd;
 bool write_busy;
 bool host_stuck;
@@ -127,7 +144,7 @@ void PrefetchTxDmaWords() {
 }
 
 /** \brief The external memory bus completes a previously held RX FIFO write. */
-#ifndef NX_SDIO_LOW_CLOCK_ONLY
+#if !defined(NX_SDIO_LOW_CLOCK_ONLY) && !defined(NX_SDIO_HIGH_SPEED_ONLY)
 void CompleteRxDmaFlush() {
     if (dma_rx_word_pending) {
         *reinterpret_cast<volatile uint32_t*>(dma_memory_cursor) =
@@ -142,11 +159,14 @@ void CompleteRxDmaFlush() {
 }
 #endif
 
+#ifndef NX_SDIO_HIGH_SPEED_ONLY
 uint32_t WordAt(const uint8_t* data, size_t index) {
     uint32_t word;
     std::memcpy(&word, data + index * sizeof(word), sizeof(word));
     return word;
 }
+
+#endif
 
 void SetResponse(const std::array<uint8_t, 16>& bytes) {
     volatile uint32_t* response = const_cast<volatile uint32_t*>(&SDIO->RESP1);
@@ -178,6 +198,10 @@ void CardCommand(uint32_t cmd) {
             ? static_cast<uint32_t>(SDIO_STA_CMDSENT)
             : static_cast<uint32_t>(SDIO_STA_CMDREND);
     *const_cast<volatile uint32_t*>(&SDIO->RESP1) = 0U;
+    if (cmd == 0U) {
+        high_speed_selected = false;
+        mmc_hs_timing = 0U;
+    }
     if (cmd == 7U) {
         card_selected = SDIO->ARG != 0U;
         if (!card_selected && expire_after_deselect != 0U)
@@ -230,7 +254,37 @@ void CardCommand(uint32_t cmd) {
         *const_cast<volatile uint32_t*>(&SDIO->RESP1) =
             UINT32_C(0x80ff8000) | (card_sdsc ? 0U : UINT32_C(0x40000000));
     } else if (cmd == 8U && card_mmc) {
+        ++high_speed_ext_reads;
         DataStarted(128U, true);
+    } else if (cmd == 6U && card_mmc && ((SDIO->ARG >> 16U) & 255U) == 185U) {
+        high_speed_switch_write = writes;
+        if (high_speed_accept)
+            mmc_hs_timing = static_cast<uint8_t>(SDIO->ARG >> 8U);
+        if (high_speed_response_lost) {
+            *const_cast<volatile uint32_t*>(&SDIO->STA) &=
+                ~static_cast<uint32_t>(SDIO_STA_CMDREND);
+            *const_cast<volatile uint32_t*>(&SDIO->STA) |= SDIO_STA_CTIMEOUT;
+        }
+    } else if (cmd == 6U && !card_mmc &&
+               (commands.size() < 2U ||
+                commands[commands.size() - 2U] != 55U)) {
+        ++high_speed_commands;
+        sd_status_busy =
+            (SDIO->ARG & (UINT32_C(1) << 31U)) == 0U && sd_busy_checks != 0U;
+        if (sd_status_busy && sd_busy_checks != UINT32_MAX)
+            --sd_busy_checks;
+        if ((SDIO->ARG & (UINT32_C(1) << 31U)) != 0U) {
+            high_speed_switch_write = writes;
+            high_speed_selected = high_speed_accept && high_speed_supported;
+            if (high_speed_crc_error)
+                last_packet_crc_error = true;
+        }
+        DataStarted(16U, true);
+        if (high_speed_response_lost && high_speed_switch_write != 0U) {
+            *const_cast<volatile uint32_t*>(&SDIO->STA) &=
+                ~static_cast<uint32_t>(SDIO_STA_CMDREND);
+            *const_cast<volatile uint32_t*>(&SDIO->STA) |= SDIO_STA_CTIMEOUT;
+        }
     } else if (cmd == 8U) {
         if (card_sdsc && legacy_illegal) {
             *const_cast<volatile uint32_t*>(&SDIO->RESP1) = 1U << 22U;
@@ -269,12 +323,21 @@ void CardCommand(uint32_t cmd) {
             bytes[8] = static_cast<uint8_t>(csd_size >> 8U);
             bytes[9] = static_cast<uint8_t>(csd_size);
         }
+        bytes[4] |= 0x40U; /* CCC SWITCH class. */
         if (card_read_only)
             bytes[14] = 0x20U;
         SetResponse(bytes);
     } else if (cmd == 55U) {
         *const_cast<volatile uint32_t*>(&SDIO->RESP1) = 1U << 5U;
     } else if (cmd == 13U) {
+        if (!card_mmc && high_speed_selected && sd_status_finished_at != 0U &&
+            sd_first_followup_at == 0U)
+            sd_first_followup_at = now;
+        if (card_mmc && mmc_hs_timing == 1U && high_speed_busy_polls != 0U) {
+            --high_speed_busy_polls;
+            *const_cast<volatile uint32_t*>(&SDIO->RESP1) = 7U << 9U;
+            return;
+        }
         *const_cast<volatile uint32_t*>(&SDIO->RESP1) =
             card_recovery_state != 0U ? card_recovery_state << 9U
             : write_busy              ? (7U << 9U)
@@ -370,6 +433,16 @@ class SdioBlock : public testing::Test {
         clock_advances = true;
         silence_commands = r3_crc = bad_csd = write_busy = host_stuck = false;
         card_four_bit = true;
+        high_speed_supported = high_speed_accept = high_speed_readback = true;
+        high_speed_response_lost = high_speed_crc_error = false;
+        high_speed_selected = false;
+        mmc_card_type = 2U;
+        mmc_hs_timing = 0U;
+        high_speed_commands = high_speed_ext_reads = 0U;
+        high_speed_switch_write = high_speed_clock_write = 0U;
+        high_speed_busy_polls = sd_busy_checks = 0U;
+        sd_status_busy = false;
+        sd_status_finished_at = sd_first_followup_at = 0U;
         dataend_early = missing_crc_end = card_read_only = false;
         terminal_crc_emitted = last_packet_crc_error = false;
         terminal_tail = 0U;
@@ -446,7 +519,7 @@ class SdioBlock : public testing::Test {
 };
 } /* namespace */
 
-#ifndef NX_SDIO_LOW_CLOCK_ONLY
+#if !defined(NX_SDIO_LOW_CLOCK_ONLY) && !defined(NX_SDIO_HIGH_SPEED_ONLY)
 TEST_F(SdioBlock, GeometryUnavailableUntilExplicitCardActivation) {
     EXPECT_EQ(nullptr, nx_block_port_geometry(&face));
     EXPECT_EQ(NX_BLOCK_UNAVAILABLE, nx_block_port_state(&face));
@@ -994,7 +1067,7 @@ class SdioAsync : public SdioBlock {
     }
 };
 
-#ifndef NX_SDIO_LOW_CLOCK_ONLY
+#if !defined(NX_SDIO_LOW_CLOCK_ONLY) && !defined(NX_SDIO_HIGH_SPEED_ONLY)
 TEST_F(SdioAsync, TypedWriteConsumesConstSourceUntilActualSettlement) {
     Activate();
     alignas(4) const std::array<uint8_t, 512> source{1U, 2U, 3U, 4U};
@@ -1256,7 +1329,7 @@ class SdioDma : public SdioAsync {
     }
 };
 
-#ifndef NX_SDIO_LOW_CLOCK_ONLY
+#if !defined(NX_SDIO_LOW_CLOCK_ONLY) && !defined(NX_SDIO_HIGH_SPEED_ONLY)
 TEST_F(SdioDma, DmaCompletionWaitsForSdioCrcAndCounter) {
     Activate();
     ASSERT_EQ(NX_SUCCESS, nx_block_async_submit(&async_face, &request));
@@ -1582,7 +1655,7 @@ class MmcBlock : public SdioBlock {
     }
 };
 
-#ifndef NX_SDIO_LOW_CLOCK_ONLY
+#if !defined(NX_SDIO_LOW_CLOCK_ONLY) && !defined(NX_SDIO_HIGH_SPEED_ONLY)
 TEST_F(MmcBlock, SectorMmcUsesExtCsdWithoutSdApplicationCommands) {
     Activate();
     const auto* geometry = nx_block_port_geometry(&face);
@@ -1646,7 +1719,7 @@ class MmcEight : public MmcBlock {
     }
 };
 
-#ifndef NX_SDIO_LOW_CLOCK_ONLY
+#if !defined(NX_SDIO_LOW_CLOCK_ONLY) && !defined(NX_SDIO_HIGH_SPEED_ONLY)
 TEST_F(MmcEight, CardSwitchAndReadyPrecedeHostEightBitClock) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32_sdio_prepare(&owner, &config, &receipt));
     EXPECT_EQ(1023U, receipt.pin_mask);
@@ -1780,7 +1853,7 @@ class MmcEightAsync : public MmcEight {
     }
 };
 
-#ifndef NX_SDIO_LOW_CLOCK_ONLY
+#if !defined(NX_SDIO_LOW_CLOCK_ONLY) && !defined(NX_SDIO_HIGH_SPEED_ONLY)
 TEST_F(MmcEightAsync, IrqAndDmaRetainTheSameEightBitDataAndDrainContract) {
     const nx_block_async_port_t async_face{&nx_stm32_sdio_async_ops, &owner};
     for (const auto engine : {NX_STM32_SDIO_IRQ, NX_STM32_SDIO_DMA}) {
@@ -1927,7 +2000,7 @@ class SdioIo : public SdioAsync {
     }
 };
 
-#ifndef NX_SDIO_LOW_CLOCK_ONLY
+#if !defined(NX_SDIO_LOW_CLOCK_ONLY) && !defined(NX_SDIO_HIGH_SPEED_ONLY)
 TEST_F(SdioIo, LimitsDescribePreparedHostWithoutDiscoveringOrStartingACard) {
     nx_sdio_io_limits_t limits{};
     limits.max_blocks = 7U;
@@ -2392,7 +2465,7 @@ class SdioIoDma : public SdioDma {
     }
 };
 
-#ifndef NX_SDIO_LOW_CLOCK_ONLY
+#if !defined(NX_SDIO_LOW_CLOCK_ONLY) && !defined(NX_SDIO_HIGH_SPEED_ONLY)
 TEST_F(SdioIoDma, LimitsExposeSelectedDmaStorageWithoutStartingTheEngine) {
     Prepare();
     nx_sdio_io_limits_t limits{};
@@ -2571,7 +2644,7 @@ TEST_F(SdioIoDma, ProducerRequestsStopBeforeTheDmaMemoryEngine) {
 }
 #endif
 
-#ifndef NX_SDIO_LOW_CLOCK_ONLY
+#if !defined(NX_SDIO_LOW_CLOCK_ONLY) && !defined(NX_SDIO_HIGH_SPEED_ONLY)
 TEST_F(SdioBlock, ContinuousMemoryReadIsOne512BytePacketStreamWithAStop) {
     Activate();
     addressed_payload = true;
@@ -2880,6 +2953,161 @@ TEST_F(SdioBlock, LowPclkUsesFourDataBitsAtAReviewedSlowerWireClock) {
 }
 #endif
 
+#ifdef NX_SDIO_HIGH_SPEED_ONLY
+class SdioHighSpeed : public SdioBlock {
+  protected:
+    void SetUp() override {
+        SdioBlock::SetUp();
+        RCC->PLLCFGR = NEXUS_CLOCK_PLLCFGR;
+        RCC->CFGR = NEXUS_CLOCK_CFGR | NEXUS_CLOCK_SW | (NEXUS_CLOCK_SW << 2U);
+        SystemCoreClock = NEXUS_CORE_HZ;
+        config.high_speed = true;
+    }
+};
+TEST_F(SdioHighSpeed, SdSwitchSelectionAndCrcPrecedeTheFastHostClock) {
+    Activate();
+    ASSERT_EQ(NX_BLOCK_READY, nx_block_port_state(&face));
+    EXPECT_EQ(2U, high_speed_commands);
+    EXPECT_TRUE(high_speed_selected);
+    EXPECT_GT(high_speed_clock_write, high_speed_switch_write);
+    EXPECT_EQ(SDIO_BUS_WIDE_4B | SDIO_CLKCR_CLKEN, SDIO->CLKCR);
+    const auto first = std::find_if(
+        control_trace.begin(), control_trace.end(),
+        [](const ControlObservation& value) {
+            return value.address == reinterpret_cast<uintptr_t>(&SDIO->CLKCR);
+        });
+    ASSERT_NE(control_trace.end(), first);
+    EXPECT_EQ(186U, first->value & SDIO_CLKCR_CLKDIV);
+}
+TEST_F(SdioHighSpeed, SdFunctionBusyUsesTheSameBoundedCheckBeforeSwitch) {
+    sd_busy_checks = 1U;
+    Activate();
+    EXPECT_EQ(3U, high_speed_commands);
+    EXPECT_EQ(0U, sd_busy_checks);
+    EXPECT_TRUE(high_speed_selected);
+}
+TEST_F(SdioHighSpeed, BusyForeverCannotResetTheSharedControlBudget) {
+    Prepare();
+    card_enabled = true;
+    sd_busy_checks = UINT32_MAX;
+    EXPECT_EQ(NX_ERROR_TIMEOUT, nx_block_port_activate(&face, 1000000U));
+    EXPECT_GT(high_speed_commands, 1U);
+    EXPECT_EQ(0U, high_speed_switch_write);
+    EXPECT_EQ(0U, high_speed_clock_write);
+    EXPECT_EQ(nullptr, nx_block_port_geometry(&face));
+    EXPECT_LT(now, 1000000U);
+}
+TEST_F(SdioHighSpeed, SdSwitchWaitsEightOldClockCyclesBeforeFollowingCommand) {
+    Activate();
+    ASSERT_GT(sd_status_finished_at, 0U);
+    ASSERT_GT(sd_first_followup_at, sd_status_finished_at);
+    EXPECT_GE(sd_first_followup_at - sd_status_finished_at, 21U);
+}
+TEST_F(SdioHighSpeed, MissingSdCapabilityNeverSwitchesOrSilentlyFallsBack) {
+    Prepare();
+    card_enabled = true;
+    high_speed_supported = false;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_block_port_activate(&face, 1000000U));
+    EXPECT_EQ(nullptr, nx_block_port_geometry(&face));
+    EXPECT_EQ(NX_BLOCK_UNCERTAIN, nx_block_port_state(&face));
+    EXPECT_EQ(0U, high_speed_switch_write);
+    EXPECT_EQ(0U, high_speed_clock_write);
+}
+TEST_F(SdioHighSpeed, RejectedSdSwitchDoesNotRaiseTheClock) {
+    Prepare();
+    card_enabled = true;
+    high_speed_accept = false;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_block_port_activate(&face, 1000000U));
+    EXPECT_EQ(0U, high_speed_clock_write);
+    EXPECT_EQ(nullptr, nx_block_port_geometry(&face));
+}
+TEST_F(SdioHighSpeed, LostSdSwitchResponseRetainsTheUncertainSession) {
+    Prepare();
+    card_enabled = true;
+    high_speed_response_lost = true;
+    EXPECT_EQ(NX_ERROR_TIMEOUT, nx_block_port_activate(&face, 1000000U));
+    EXPECT_TRUE(high_speed_selected);
+    EXPECT_EQ(NX_BLOCK_UNCERTAIN, nx_block_port_state(&face));
+    EXPECT_EQ(0U, high_speed_clock_write);
+    EXPECT_TRUE(receipt.owned);
+}
+TEST_F(SdioHighSpeed, SdSwitchDataCrcFailureCannotPublishGeometry) {
+    Prepare();
+    card_enabled = true;
+    high_speed_crc_error = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_block_port_activate(&face, 1000000U));
+    EXPECT_EQ(nullptr, nx_block_port_geometry(&face));
+    EXPECT_EQ(0U, high_speed_clock_write);
+}
+TEST_F(SdioHighSpeed, MmcHs52RequiresTimingWriteAndExtCsdReadback) {
+    card_mmc = true;
+    high_speed_busy_polls = 2U;
+    config.protocol = NX_STM32_SDIO_MMC;
+    Activate();
+    EXPECT_EQ(1U, mmc_hs_timing);
+    EXPECT_EQ(0U, high_speed_busy_polls);
+    EXPECT_EQ(2U, high_speed_ext_reads);
+    EXPECT_GT(high_speed_clock_write, high_speed_switch_write);
+    EXPECT_EQ(SDIO_BUS_WIDE_4B | SDIO_CLKCR_CLKEN, SDIO->CLKCR);
+}
+TEST_F(SdioHighSpeed, ByteAddressedMmcUsesCsdCapacityAndTheSameTimingProof) {
+    card_mmc = card_sdsc = true;
+    config.protocol = NX_STM32_SDIO_MMC;
+    mmc_sectors = 0U;
+    Activate();
+    ASSERT_NE(nullptr, nx_block_port_geometry(&face));
+    EXPECT_GT(nx_block_port_geometry(&face)->block_count, 0U);
+    EXPECT_EQ(1U, mmc_hs_timing);
+    EXPECT_EQ(2U, high_speed_ext_reads);
+}
+TEST_F(SdioHighSpeed, FailedControlDrainKeepsTheOriginalGateAndPads) {
+    Prepare();
+    card_enabled = true;
+    high_speed_crc_error = true;
+    ASSERT_EQ(NX_ERROR_IO, nx_block_port_activate(&face, 1000000U));
+    refused_write = &SDIO->DCTRL;
+    EXPECT_NE(NX_SUCCESS, nx_stm32_sdio_close(&owner, &config, &receipt));
+    EXPECT_TRUE(receipt.owned);
+    EXPECT_NE(0U, receipt.pin_mask);
+    EXPECT_EQ(nullptr, nx_block_port_geometry(&face));
+    refused_write = nullptr;
+}
+TEST_F(SdioHighSpeed, MmcHs26CannotBecomeAnImplicitSlowerSelection) {
+    card_mmc = true;
+    config.protocol = NX_STM32_SDIO_MMC;
+    mmc_card_type = 1U;
+    Prepare();
+    card_enabled = true;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_block_port_activate(&face, 1000000U));
+    EXPECT_EQ(0U, high_speed_switch_write);
+    EXPECT_EQ(0U, high_speed_clock_write);
+    EXPECT_EQ(nullptr, nx_block_port_geometry(&face));
+}
+TEST_F(SdioHighSpeed, LostMmcTimingResponseRetainsProgrammingResponsibility) {
+    card_mmc = true;
+    config.protocol = NX_STM32_SDIO_MMC;
+    high_speed_response_lost = true;
+    Prepare();
+    card_enabled = true;
+    EXPECT_EQ(NX_ERROR_TIMEOUT, nx_block_port_activate(&face, 1000000U));
+    EXPECT_EQ(1U, mmc_hs_timing);
+    EXPECT_TRUE(owner.programming_pending);
+    EXPECT_TRUE(receipt.owned);
+    EXPECT_EQ(NX_BLOCK_UNCERTAIN, nx_block_port_state(&face));
+    EXPECT_EQ(0U, high_speed_clock_write);
+}
+TEST_F(SdioHighSpeed, MmcReadbackMismatchNeverRaisesTheHostClock) {
+    card_mmc = true;
+    config.protocol = NX_STM32_SDIO_MMC;
+    high_speed_readback = false;
+    Prepare();
+    card_enabled = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_block_port_activate(&face, 1000000U));
+    EXPECT_EQ(0U, high_speed_clock_write);
+    EXPECT_EQ(nullptr, nx_block_port_geometry(&face));
+}
+#endif
+
 extern "C" bool nx_arch_is_privileged(void) {
     return privileged;
 }
@@ -2935,7 +3163,10 @@ extern "C" uint32_t nx_sdio_model_read(volatile const uint32_t* reg) {
                 ~static_cast<uint32_t>(SDIO_STA_RXACT | SDIO_STA_TXACT |
                                        SDIO_STA_RXDAVL | SDIO_STA_TXFIFOHE);
             status |= SDIO_STA_DATAEND;
-            if (last_packet_crc_error && multi_card_active) {
+            if (last_packet_crc_error &&
+                (multi_card_active ||
+                 (!commands.empty() && commands.back() == 6U &&
+                  high_speed_commands != 0U))) {
                 status |= SDIO_STA_DCRCFAIL;
             } else if (!missing_crc_end && !terminal_crc_emitted) {
                 status |= SDIO_STA_DBCKEND;
@@ -2983,6 +3214,13 @@ extern "C" void nx_sdio_model_write(volatile uint32_t* reg, uint32_t value) {
         control_seen = true;
         last_control_write = now;
     }
+    if (card_enabled && reg == &SDIO->DCTRL && value == 0U &&
+        !commands.empty() && commands.back() == 6U && high_speed_selected &&
+        fifo_words == 16U)
+        sd_status_finished_at = now;
+    if (card_enabled && reg == &SDIO->CLKCR &&
+        (value & (SDIO_CLKCR_CLKDIV | SDIO_CLKCR_WIDBUS)) == SDIO_BUS_WIDE_4B)
+        high_speed_clock_write = writes;
     if (card_mmc && reg == &SDIO->CLKCR &&
         (value & SDIO_CLKCR_WIDBUS) == SDIO_BUS_WIDE_8B)
         mmc_host_width_write = writes;
@@ -3085,9 +3323,22 @@ extern "C" uint32_t nx_sdio_model_fifo_read(SDIO_TypeDef* registers) {
                         ? (card_four_bit ? 0x00000502U : 0x00000102U)
                         : 0U;
         if (card_mmc && !commands.empty() && commands.back() == 8U)
-            value = fifo_words == 48U   ? 8U
+            value = fifo_words == 46U
+                        ? (high_speed_readback
+                               ? static_cast<uint32_t>(mmc_hs_timing) << 8U
+                               : 0U)
+                    : fifo_words == 48U ? 8U
+                    : fifo_words == 49U ? mmc_card_type
                     : fifo_words == 53U ? mmc_sectors
                                         : 0U;
+        if (!card_mmc && !commands.empty() && commands.back() == 6U &&
+            high_speed_commands != 0U) {
+            value = fifo_words == 3U ? (high_speed_supported ? 0x00000200U : 0U)
+                    : fifo_words == 4U
+                        ? (high_speed_selected ? 1U : 0U) | 0x100U
+                    : fifo_words == 7U ? (sd_status_busy ? 0x200U : 0U)
+                                       : 0U;
+        }
         if (card_io && !commands.empty() && commands.back() == 53U) {
             value = 0U;
             for (unsigned byte = 0U; byte < 4U; ++byte) {

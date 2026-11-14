@@ -67,7 +67,7 @@ TEST_F(SPITransaction, LateMalformedSegmentRejectsBeforeEarlierWrite) {
     const nx_spi_segment_t segments[]{{nullptr, &rx, 1U, 0x11U},
                                       {nullptr, nullptr, 0U, 0U}};
     EXPECT_EQ(Transfer(segments, 2U), NX_ERROR_INVALID);
-    EXPECT_EQ(transferred, 0U);
+    EXPECT_EQ(transferred, 99U);
     EXPECT_EQ(rx, 0xA5U);
     EXPECT_FALSE(device.cs);
     EXPECT_FALSE(state.active);
@@ -108,7 +108,7 @@ TEST_F(SPITransaction, LegacyBusyControllerBlocksEnhancedEndpoint) {
     const nx_spi_segment_t segment{nullptr, nullptr, 1U, 0x11U};
     state.active = true;
     EXPECT_EQ(Transfer(&segment, 1U), NX_ERROR_BUSY);
-    EXPECT_EQ(transferred, 0U);
+    EXPECT_EQ(transferred, 99U);
     EXPECT_FALSE(device.cs);
     state.active = false;
 }
@@ -121,5 +121,24 @@ TEST_F(SPITransaction, RejectionNeverDispatchesProvider) {
     endpoint = {&ops, &observer};
     const nx_spi_segment_t empty{nullptr, nullptr, 0U, 0U};
     EXPECT_EQ(Transfer(&empty, 1U), NX_ERROR_INVALID);
+}
+
+TEST_F(SPITransaction, BothPollingFacesRejectBorrowingTheirPrivateControl) {
+    const nx_spi_segment_t segment{nullptr, nullptr, 1U, 0xA5U};
+    const size_t before = state.fail_after;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_spi_transaction_transfer(&endpoint, &segment, 1U, 8U,
+                                          nx_time_now_us() + 1000U,
+                                          &state.fail_after));
+    EXPECT_EQ(before, state.fail_after);
+    const nx_spi_endpoint_t bytes{&nx_native_spi_endpoint_ops, &device};
+    const uint8_t tx = 0xA5U;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_spi_endpoint_transfer(&bytes, &tx, nullptr, 1U,
+                                       nx_time_now_us() + 1000U,
+                                       &state.fail_after));
+    EXPECT_EQ(before, state.fail_after);
+    EXPECT_FALSE(device.cs);
+    EXPECT_FALSE(state.active);
 }
 } /* namespace */

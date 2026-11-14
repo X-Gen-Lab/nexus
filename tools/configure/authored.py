@@ -120,7 +120,8 @@ def normalize(data, path, root, fail, obj, integer, text, *,
             required = EXTERNAL_ENDPOINT_REQUIRED[kind]
             optional = {"parameters"} if kind == "memory_window" else set()
             if (kind == "flash_async" and isinstance(definition, dict) and
-                    definition.get("mode") == "nor-indirect"):
+                    definition.get("mode") in {
+                        "nor-indirect", "nor-indirect-quad-read"}):
                 required = SERIAL_FLASH_FIELDS
             if (kind == "memory_window" and isinstance(definition, dict) and
                     not ({"read_timing", "write_timing"} & set(definition))):
@@ -226,6 +227,12 @@ def editor_schema():
         if "address_bits" in fields:
             properties["address_bits"] = {
                 "type": "integer", "enum": [7, 10], "default": 7}
+        if "active_slots" in fields:
+            properties["active_slots"] = {
+                "type": "integer", "minimum": 1, "maximum": 65535,
+                "description": "SAI enabled slot mask; omitted selects every "
+                               "declared slot. Inactive slots have no FIFO "
+                               "storage; this does not reorder samples."}
         if "window_ticks" in fields:
             properties["window_ticks"] = {
                 "type": "integer", "minimum": 1, "maximum": 62, "default": 1}
@@ -235,7 +242,7 @@ def editor_schema():
                 "description": "PVD PLS encoding; consult the exact datasheet "
                                "threshold bounds and hysteresis. No voltage "
                                "policy is selected by default."}
-        for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing", "remote_wakeup",
+        for name in fields & {"active_high", "fifo_order", "remote", "match_remote", "vbus_sensing", "remote_wakeup",
                              "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b", "lsb_first", "maintenance", "checksum_offload"}:
             properties[name] = {"type": "boolean"}
         if "lsb_first" in fields:
@@ -384,6 +391,9 @@ def editor_schema():
         "required": list(DEFAULT), "properties": clock_fields}
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
+        if kind == "block":
+            properties[kind]["additionalProperties"]["properties"]["speed"] = {
+                "enum": ["default", "high-speed"]}
         if kind in {"pwm_group", "timer_pulse", "timer_sequence"}:
             shape = properties[kind]["additionalProperties"]["properties"]
             shape["master_trigger"] = {"enum": ["none", "enable", "update", "oc4ref"]}
@@ -432,9 +442,12 @@ def editor_schema():
             endpoint["oneOf"] = [
                 {"required": sorted(required), "not": {"required": ["mode"]}},
                 {"required": sorted(SERIAL_FLASH_FIELDS),
-                 "properties": {"mode": {"const": "nor-indirect"}},
+                 "properties": {"mode": {"enum": [
+                     "nor-indirect", "nor-indirect-quad-read"]}},
                  "not": {"anyOf": [{"required": [field]} for field in
                                    ("read_timing", "write_timing", "nor")]}}]
+        if kind == "mapped_storage":
+            endpoint["properties"]["mode"] = {"const": "nor-mapped-cpu"}
         if "ready_delay_us" in fields:
             endpoint["properties"]["ready_delay_us"] = {
                 "type": "integer", "minimum": 1, "maximum": 1000000}

@@ -32,23 +32,30 @@ register 类型。SPI／I2C controller 和子设备 endpoint 分开获取，cont
 停机执行 `nx_platform_stop()`；BUSY／QUARANTINED 时保持状态和所有借用存储。
 在 start 前可以保存 face；在成功 stop 后 face 的身份不变，provider 拒绝操作。
 
-当前 factory／source interface epoch 为 3，`0.2.1` 仍为按精确提交消费的开发快照。
+当前 factory／source interface epoch 为 5，`0.2.1` 仍为按精确提交消费的开发快照。
 ADC group 的直接 `request.frames` 访问迁为 `request.output.frames`；优先使用
 `nx_adc_group_prepare()` 设置 RAW 视图，paired 结果由独立 prepare 入口建立。
 epoch 3 的公共 traits 使用 `nexus/io/traits.h` 中的领域类型；SDIO 请求直接使用
 `base`、数据跨度和 function 地址，删除 `transfer` 包装及无意义 LBA。旧 epoch
-1／2 不作为兼容 fallback，全部调用者、生成代码和 provider 必须一起重编。
+1／2／3／4 不作为兼容 fallback，全部调用者、生成代码和 provider 必须一起重编。
 I2C message 和 block request 按方向使用 const TX／mutable RX，优先由各自 write／read
 构造或 prepare 入口设置，不能只翻转方向标志。EXTI 按接口绑定来源，UART 原生配置
 留在私有边界；CAN 使用逻辑 filter tag，USB Host 使用装配内逻辑 pipe，ADC／DAC
 查询按公共时间／数字码单位解释。完整字段映射仍由源码兼容性合同统一维护。
-具体字段与借用步骤见[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-3)，
+epoch 5 将电源 owner 集成移至 `nexus/soc/stm32f4_power.h` 和家族命名入口；hash
+查询新增输入／key 长度倍数，必须与地址对齐分别校验。可选 SMBus 绑定由独立
+`nexus_smbus_factory.h` 提供，不使普通 factory 依赖组件。精确限制见源码兼容性合同。
+epoch 4 将 RS485 的 `direction` 改为 `const nx_gpio_signal_t*`，删除 adapter 配置
+的 `mask` 和 `active_high`。GPIO 的单 pin 选择显式声明 `active_high`，再用
+`nx_factory_gpio_signal_ref()` 获取只读绑定并检查非 NULL；极性不能从初始电平推导。
+手工 signal 必须满足授权和生命周期合同，软件总线继续使用物理电平接口。
+具体字段与借用步骤见[迁移指南](../guides/migration.md#rebuild-for-source-interface-epoch-5)，
 代际、manifest 和拒绝规则见[源码兼容性合同](../design/source-compatibility.md)。
 
 迁移时选择新的 build 目录，重新生成 bundle，并用同一配置、工具链和 ABI 重编全部
 调用者、公共 face／ops、factory、provider 与组件。旧工程和构建输出分开保留，不能
-混入新的 CMake cache、生成头或目标文件。作者 TOML schema 2、typed IR 代际 3、
-factory 代际 3、resolved projection 1 与 SDK manifest schema 2 各自独立，版本号
+混入新的 CMake cache、生成头或目标文件。作者 TOML schema 2、typed IR 代际 5、
+factory 代际 5、resolved projection 1 与 SDK manifest schema 2 各自独立，版本号
 相同也不能混用不同接口代际。按[现有产品升级步骤](../tutorials/source-sdk.md#upgrade-an-existing-product)
 验证所选 SDK 的精确源码身份，再执行产品自己的 Native 合同和选定 MCU 构建。
 

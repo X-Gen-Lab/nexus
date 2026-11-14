@@ -111,10 +111,9 @@ class QimingRs485 : public testing::Test {
             return start.primary;
         gpio_latch();
         const auto tx = nx_factory_uart_tx_binding_ref(NX_UART_REF_SERIAL2);
-        config = {tx.transport, nx_factory_gpio_ref(NX_GPIO_REF_DIRECTION),
-                  tx.validate,  DE,
-                  10U,          20U,
-                  true};
+        config = {tx.transport,
+                  nx_factory_gpio_signal_ref(NX_GPIO_REF_DIRECTION),
+                  tx.validate, 10U, 20U};
         if (stopped_transport) {
             nx_result_t stop = nx_uart_port_stop(config.transport);
             if (stop != NX_SUCCESS)

@@ -28,6 +28,20 @@ static bool valid_state(const nx_stm32f4_cipher_state_t* state) {
 /** \brief No client span can overwrite private owners or fixed MMIO. */
 static bool isolated(const nx_stm32f4_cipher_state_t* state,
                      const void* pointer, size_t bytes) {
+#if NEXUS_STM32_CIPHER_DMA
+    if (state->config != NULL && state->config->dma != NULL) {
+        const nx_stm32f4_cipher_dma_config_t* dma = state->config->dma;
+        if (nx_crypto_overlap(pointer, bytes, (const void*)(uintptr_t)DMA2_BASE,
+                              0xD0U) ||
+            nx_crypto_overlap(pointer, bytes, NVIC, sizeof(*NVIC)) ||
+            nx_crypto_overlap(pointer, bytes, dma, sizeof(*dma)) ||
+            nx_crypto_overlap(pointer, bytes, dma->state,
+                              sizeof(*dma->state)) ||
+            nx_crypto_overlap(pointer, bytes, dma->regions,
+                              dma->region_count * sizeof(*dma->regions)))
+            return false;
+    }
+#endif
     return !nx_crypto_overlap(pointer, bytes, state, sizeof(*state)) &&
            (state->config == NULL ||
             !nx_crypto_overlap(pointer, bytes, state->config,
@@ -80,7 +94,13 @@ nx_result_t nx_stm32f4_cipher_admit(const nx_stm32f4_cipher_state_t* state,
         (RCC->AHB2ENR & RCC_AHB2ENR_CRYPEN) != 0U ||
         (RCC->AHB2RSTR & RCC_AHB2RSTR_CRYPRST) != 0U)
         return NX_ERROR_BUSY;
+#if NEXUS_STM32_CIPHER_DMA
+    return nx_stm32f4_cipher_dma_admit(state, config);
+#else
+    if (config->dma != NULL)
+        return NX_ERROR_UNSUPPORTED;
     return NX_SUCCESS;
+#endif
 }
 /** \brief Record gate responsibility before the first shared RCC write. */
 nx_result_t nx_stm32f4_cipher_start(nx_stm32f4_cipher_state_t* state,
@@ -102,6 +122,11 @@ nx_result_t nx_stm32f4_cipher_start(nx_stm32f4_cipher_state_t* state,
     if ((CRYP->CR & CRYP_CR_CRYPEN) != 0U || CRYP->IMSCR != 0U ||
         CRYP->DMACR != 0U)
         return NX_ERROR_IO;
+#if NEXUS_STM32_CIPHER_DMA
+    result = nx_stm32f4_cipher_dma_prepare(state);
+    if (result != NX_SUCCESS)
+        return result;
+#endif
     state->running = true;
     state->faulted = false;
     return NX_SUCCESS;
@@ -134,13 +159,18 @@ static void terminal(nx_stm32f4_cipher_state_t* state, nx_result_t result) {
     }
 }
 /** \brief Reset is the exclusive engine's documented FIFO/context withdrawal.
- * \note This provider never enables DMA. Reset assertion/release and the
+ * \note IRQ mode has no DMA; the selected DMA transport is fully withdrawn
+ *       before reset. Reset assertion/release and the
  *       reset-visible control, FIFO and IV state must all be observed before
  *       the final request access. A refused reset leaves the borrow intact.
  */
 static bool reset_engine(nx_stm32f4_cipher_state_t* state) {
     if ((RCC->AHB2ENR & RCC_AHB2ENR_CRYPEN) == 0U)
         return false;
+#if NEXUS_STM32_CIPHER_DMA
+    if (nx_stm32f4_cipher_dma_withdraw(state) != NX_SUCCESS)
+        return false;
+#endif
     WRITE_REG(CRYP->IMSCR, 0U);
     WRITE_REG(CRYP->DMACR, 0U);
     CLEAR_BIT(CRYP->CR, CRYP_CR_CRYPEN);
@@ -212,6 +242,10 @@ static nx_result_t query(void* context, nx_cipher_algorithm_t algorithm,
             : aes ? 16U
                   : 8U,
         .exact_in_place = true};
+#if NEXUS_STM32_CIPHER_DMA
+    if (state->config != NULL && state->config->dma != NULL)
+        constraints.exact_in_place = false;
+#endif
     *output = constraints;
     return NX_SUCCESS;
 }
@@ -255,6 +289,22 @@ static nx_result_t submit(void* context, nx_cipher_request_t* request) {
         operation->bytes % constraints.length_multiple != 0U ||
         operation->bytes > constraints.maximum_bytes)
         return NX_ERROR_INVALID;
+    if (!constraints.exact_in_place && operation->input == operation->output)
+        return NX_ERROR_UNSUPPORTED;
+#if NEXUS_STM32_CIPHER_DMA
+    if (state->config->dma != NULL) {
+        const nx_stm32f4_cipher_dma_config_t* dma = state->config->dma;
+        result = nx_dma_buffer_validate(dma->regions, dma->region_count,
+                                        operation->input, operation->bytes, 4U,
+                                        NX_DMA_TO_DEVICE);
+        if (result == NX_SUCCESS)
+            result = nx_dma_buffer_validate(dma->regions, dma->region_count,
+                                            operation->output, operation->bytes,
+                                            4U, NX_DMA_FROM_DEVICE);
+        if (result != NX_SUCCESS)
+            return result;
+    }
+#endif
     nx_time_us_t now = nx_time_now_us();
     if (now == NX_DEADLINE_NEVER)
         return NX_ERROR_IO;
@@ -297,16 +347,27 @@ static nx_result_t submit(void* context, nx_cipher_request_t* request) {
     handle->Init.KeyIVConfigSkip = CRYP_KEYIVCONFIG_ALWAYS;
     HAL_StatusTypeDef status = HAL_CRYP_Init(handle);
     if (status == HAL_OK) {
-        uint32_t* input = (uint32_t*)(uintptr_t)operation->input;
-        status =
-            operation->direction == NX_CIPHER_ENCRYPT
-                ? HAL_CRYP_Encrypt_IT(handle, input, (uint16_t)operation->bytes,
-                                      operation->output)
-                : HAL_CRYP_Decrypt_IT(handle, input, (uint16_t)operation->bytes,
-                                      operation->output);
+#if NEXUS_STM32_CIPHER_DMA
+        if (state->config->dma != NULL)
+            status = nx_stm32f4_cipher_dma_submit(state) == NX_SUCCESS
+                         ? HAL_OK
+                         : HAL_ERROR;
+        else
+#endif
+        {
+            uint32_t* input = (uint32_t*)(uintptr_t)operation->input;
+            status = operation->direction == NX_CIPHER_ENCRYPT
+                         ? HAL_CRYP_Encrypt_IT(handle, input,
+                                               (uint16_t)operation->bytes,
+                                               operation->output)
+                         : HAL_CRYP_Decrypt_IT(handle, input,
+                                               (uint16_t)operation->bytes,
+                                               operation->output);
+        }
     }
-    /* Basic-mode IT entry consumes all key/IV words synchronously. Neither
-     * the IRQ nor completion consults these pointers after this call. */
+    /* Selected basic-mode entry consumes all key/IV words synchronously.
+     * Neither the IRQ nor completion consults these pointers after this call.
+     */
     handle->Init.pKey = NULL;
     handle->Init.pInitVect = NULL;
     clear_bytes(key, sizeof(key));
@@ -331,6 +392,14 @@ void nx_stm32f4_cipher_irq(nx_stm32f4_cipher_state_t* state) {
     } else if (now >= state->active->base.deadline) {
         terminal(state, NX_ERROR_TIMEOUT);
     } else {
+#if NEXUS_STM32_CIPHER_DMA
+        if (state->config->dma != NULL) {
+            /* DMA vectors remain disabled. The task owner dispatches their
+             * callbacks; this peripheral IRQ must never feed the same FIFO. */
+            nx_arch_irq_restore(mask);
+            return;
+        }
+#endif
         HAL_CRYP_IRQHandler(&state->handle);
         if (state->handle.ErrorCode != HAL_CRYP_ERROR_NONE)
             terminal(state, NX_ERROR_IO);
@@ -387,6 +456,49 @@ static nx_result_t service(void* context) {
             terminal(state, NX_ERROR_IO);
         else if (now >= request->base.deadline)
             terminal(state, NX_ERROR_TIMEOUT);
+#if NEXUS_STM32_CIPHER_DMA
+        else if (state->config->dma != NULL) {
+            const nx_stm32f4_cipher_config_t* config = state->config;
+            uint64_t epoch = state->epoch;
+            nx_time_us_t deadline = request->base.deadline;
+            nx_arch_irq_restore(mask);
+            /* One task owns the transport; its DMA vectors stay disabled.
+             * HAL's bounded transfer-error wait must not mask unrelated IRQs.
+             */
+            nx_result_t progress = NX_ERROR_BUSY;
+            now = nx_time_now_us();
+            if (!clock_live() || epoch != g_nx_stm32_system.time_epoch ||
+                now == NX_DEADLINE_NEVER)
+                progress = NX_ERROR_IO;
+            else if (now >= deadline)
+                progress = NX_ERROR_TIMEOUT;
+            else if (!state->terminal_pending)
+                progress = nx_stm32f4_cipher_dma_observe(state);
+            mask = nx_arch_irq_save();
+            if (state->active != request || state->config != config ||
+                state->epoch != epoch || !state->running) {
+                nx_arch_irq_restore(mask);
+                return NX_ERROR_STATE;
+            }
+            nx_request_state_t retained = nx_request_state(&request->base);
+            if (retained != NX_REQUEST_ACTIVE &&
+                retained != NX_REQUEST_DRAINING &&
+                retained != NX_REQUEST_QUARANTINED) {
+                nx_arch_irq_restore(mask);
+                return NX_ERROR_STATE;
+            }
+            if (!state->terminal_pending) {
+                now = nx_time_now_us();
+                if (!clock_live() || epoch != g_nx_stm32_system.time_epoch ||
+                    now == NX_DEADLINE_NEVER)
+                    terminal(state, NX_ERROR_IO);
+                else if (now >= deadline)
+                    terminal(state, NX_ERROR_TIMEOUT);
+                else if (progress != NX_ERROR_BUSY)
+                    terminal(state, progress);
+            }
+        }
+#endif
     }
     if (!state->terminal_pending) {
         nx_arch_irq_restore(mask);
@@ -431,6 +543,13 @@ static nx_result_t stop(void* context) {
         }
     }
     state->running = false;
+#if NEXUS_STM32_CIPHER_DMA
+    nx_result_t dma_stop = nx_stm32f4_cipher_dma_stop(state);
+    if (dma_stop != NX_SUCCESS) {
+        nx_arch_irq_restore(mask);
+        return dma_stop;
+    }
+#endif
     if (state->gate_owned) {
         CLEAR_BIT(RCC->AHB2ENR, RCC_AHB2ENR_CRYPEN);
         nx_arch_dsb();

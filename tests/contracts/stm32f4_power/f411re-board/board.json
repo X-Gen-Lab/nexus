@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "f411re-rtc-lse-software-reference",
+  "soc": "STM32F411RET6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-reference-draft",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "lse_hz": 32768
+  },
+  "bindings": [
+    {
+      "id": "rtc0",
+      "controller": "RTC",
+      "route": "rtc-lse-pc14-pc15"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only; no PCB, fitted LSE oscillator, electrical measurement or physical qualification",
+    "LSE32768 and3.3V are explicitly authored software assumptions; actual oscillator/voltage/VBAT retention requires product acceptance",
+    "The crystal reference reserves quiet PC13; no alternate capture pad or LSE bypass is granted"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f411re.pdf",
+      "scope": "Exact device RTC crystal/LSE pin and register software reference; no board wiring, fitted oscillator, physical execution or retention qualification"
+    },
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00119316.pdf",
+      "scope": "Exact device RTC crystal/LSE pin and register software reference; no board wiring, fitted oscillator, physical execution or retention qualification"
+    }
+  ]
+}

@@ -97,7 +97,14 @@ nx_result_t nx_frame_layout_audio(const nx_frame_audio_format_t* format,
             return NX_ERROR_INVALID;
         }
     }
-    size_t row_bytes = (size_t)format->slots * (format->slot_bits / 8U);
+    size_t stored_slots = format->slots;
+    if (format->kind == NX_FRAME_AUDIO_SAI) {
+        stored_slots = 0U;
+        for (uint32_t mask = format->active_slots; mask != 0U; mask >>= 1U) {
+            stored_slots += mask & 1U;
+        }
+    }
+    size_t row_bytes = stored_slots * (format->slot_bits / 8U);
     const nx_frame_plane_t plane = {
         .row_bytes = row_bytes, .stride = row_bytes, .rows = rows};
     return nx_frame_layout_planar(&plane, 1U, layout);

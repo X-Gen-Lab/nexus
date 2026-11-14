@@ -1,0 +1,26 @@
+# Software reference only; no fitted card or PCB qualification.
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hse8-pll150-sdio375"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 4096
+libc_heap_bytes = 0
+static_ram_limit_bytes = 32768
+flash_load_limit_bytes = 98304
+
+[block.sd0]
+binding = "sdio"
+mode = "sdio-irq"
+protocol = "mmc"
+speed = "high-speed"
+bus_width = 4
+max_blocks = 32
+poll_budget = 1000000
+stop_timeout_us = 100000
+
+[block.sd0.irq]
+priority = 6
+calls_os = false

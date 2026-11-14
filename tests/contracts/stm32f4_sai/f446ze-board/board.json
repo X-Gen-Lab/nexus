@@ -16,6 +16,16 @@
       "id": "source_b",
       "controller": "SAI1",
       "route": "sai1-b-simplex"
+    },
+    {
+      "id": "source_2_a",
+      "controller": "SAI2",
+      "route": "sai2-a-duplex-mclk"
+    },
+    {
+      "id": "source_2_a_slave",
+      "controller": "SAI2",
+      "route": "sai2-a-duplex"
     }
   ],
   "reserved_resources": [
@@ -29,11 +39,11 @@
   "provenance": [
     {
       "url": "https://www.st.com/resource/en/datasheet/stm32f446ze.pdf",
-      "scope": "Reviewed exact SAI1 package/AF6 pads only; no PCB connection inferred"
+      "scope": "Reviewed exact SAI1 AF6 and SAI2 AF10 package pads only; no PCB connection inferred"
     },
     {
       "url": "https://www.st.com/resource/en/reference_manual/rm0390-stm32f446xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
-      "scope": "Reviewed SAI1 A/B and DMA2 request routes; no hardware execution"
+      "scope": "Reviewed SAI1/SAI2 A/B and exact DMA2 request routes; no hardware execution"
     }
   ]
 }

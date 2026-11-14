@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import textwrap
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -35,6 +36,110 @@ class STM32OfficialCMakeTests(unittest.TestCase):
             *(["-DCMAKE_TOOLCHAIN_FILE=" + str(
                 ROOT / "cmake/toolchains/arm-gcc.cmake")] if arm else [])],
             capture_output=True, text=True, timeout=60)
+
+    def official_fixture(self, name="source"):
+        fixture = self.root / name
+        (fixture / "cmake/platform").mkdir(parents=True)
+        shutil.copyfile(ROOT / "cmake/platform/STM32Official.cmake",
+                        fixture / "cmake/platform/STM32Official.cmake")
+        (fixture / "dependencies").mkdir()
+        (fixture / "dependencies/stm32f4-hal.lock.json").write_text(
+            '{"files":{"LICENSE.md":{"bytes":1,"sha256":"fixture"}}}\n')
+        (fixture / "tools/maintenance").mkdir(parents=True)
+        (fixture / "tools/maintenance/cmsis_device_lock.py").write_text("")
+        (fixture / "tools/configure").mkdir()
+        (fixture / "tools/configure/metadata.py").write_text("")
+        (fixture / "vendors/st/stm32f4_hal").mkdir(parents=True)
+        (fixture / "vendors/st/stm32f4_hal/LICENSE.md").write_text("x")
+        # The verifier is an external subprocess port. Its independent suite
+        # checks real source identities; this fixture checks CMake boundaries.
+        (fixture / "tools/maintenance/stm32f4_hal_lock.py").write_text(
+            textwrap.dedent('''\
+                import argparse
+                import glob
+                import hashlib
+                import json
+                from pathlib import Path
+                import sys
+
+                root = Path(__file__).resolve().parents[2]
+                parser = argparse.ArgumentParser()
+                for option in ("source", "lock", "cmsis-source",
+                               "begin-configure", "end-configure",
+                               "snapshot-sha256"):
+                    parser.add_argument("--" + option)
+                args = parser.parse_args()
+                phase = ("begin" if args.begin_configure else
+                         "end" if args.end_configure else "verify")
+                pending = args.begin_configure or args.end_configure
+                call = {"phase": phase, "pending": pending,
+                        "source": args.source, "lock": args.lock,
+                        "cmsis_source": args.cmsis_source,
+                        "snapshot_sha256": args.snapshot_sha256}
+                error = None
+                try:
+                    payload = root / "payload"
+                    stat = payload.stat()
+                    current = [payload.read_text(), stat.st_ino,
+                               stat.st_size, stat.st_mtime_ns,
+                               stat.st_ctime_ns]
+                    if phase == "end":
+                        raw = Path(pending).read_bytes()
+                        digest = hashlib.sha256(raw).hexdigest()
+                        if digest != args.snapshot_sha256:
+                            raise ValueError("configure snapshot substituted")
+                        if json.loads(raw) != current:
+                            raise ValueError("configure inputs changed")
+                    else:
+                        if current[0] != "approved":
+                            raise ValueError("current source bytes changed")
+                        if phase == "begin":
+                            raw = json.dumps(current).encode()
+                            Path(pending).parent.mkdir(parents=True,
+                                                       exist_ok=True)
+                            Path(pending).write_bytes(raw)
+                            (root / "pending-path").write_text(pending)
+                            digest = hashlib.sha256(raw).hexdigest()
+                            call["snapshot_sha256"] = digest
+                            print(json.dumps({
+                                "configure_snapshot_sha256": digest,
+                                "configure_inputs": [payload.as_posix(),
+                                    args.lock, Path(__file__).as_posix()],
+                                "configure_file_probes": [glob.escape(
+                                    (root / "optional [metadata]?.lock")
+                                    .as_posix())]}))
+                except (OSError, ValueError) as failure:
+                    error = str(failure)
+                finally:
+                    if phase == "end":
+                        Path(pending).unlink(missing_ok=True)
+                    call["error"] = error
+                    with (root / "calls.jsonl").open("a") as stream:
+                        stream.write(json.dumps(call) + "\\n")
+                if error:
+                    sys.exit(error)
+                '''))
+        (fixture / "payload").write_text("approved")
+        return fixture
+
+    def session_calls(self, fixture):
+        return [json.loads(line) for line in
+                (fixture / "calls.jsonl").read_text().splitlines()]
+
+    def assert_session_pair(self, fixture, calls):
+        self.assertEqual([call["phase"] for call in calls], ["begin", "end"])
+        begin, end = calls
+        self.assertEqual(begin["pending"], end["pending"])
+        self.assertEqual(begin["snapshot_sha256"], end["snapshot_sha256"])
+        self.assertRegex(begin["snapshot_sha256"], r"^[0-9a-f]{64}$")
+        self.assertFalse(Path(begin["pending"]).exists())
+        for call in calls:
+            self.assertEqual(call["source"],
+                             str(fixture / "vendors/st/stm32f4_hal"))
+            self.assertEqual(call["lock"],
+                             str(fixture / "dependencies/stm32f4-hal.lock.json"))
+            self.assertEqual(call["cmsis_source"],
+                             str(fixture / "vendors/st/cmsis_device_f4"))
 
     def test_selected_target_has_private_official_headers_without_hal_source(self):
         result = self.configure(
@@ -137,6 +242,39 @@ class STM32OfficialCMakeTests(unittest.TestCase):
                     else:
                         self.assertIn("stm32f407_hal_profile.h", entry["command"])
                         self.assertIn("/private/hal", entry["command"])
+
+    def test_real_crypto_dma_graph_keeps_each_selected_engine_independent(self):
+        self.assertIsNotNone(shutil.which("arm-none-eabi-gcc"),
+                             "Prepared ARM compiler required")
+        fixture = ROOT / "tests/contracts/stm32f4_crypto"
+        for part, hash_dma in (("f415zg", True), ("f417zg", False)):
+            with self.subTest(part=part):
+                build = self.root / part
+                result = subprocess.run([
+                    shutil.which("cmake"), "-S", str(fixture), "-B", str(build),
+                    "-G", "Ninja",
+                    "-DCMAKE_TOOLCHAIN_FILE=" + str(
+                        ROOT / "cmake/toolchains/arm-gcc.cmake"),
+                    "-DNEXUS_SOURCE_ROOT=" + str(ROOT),
+                    "-DNEXUS_ASSEMBLY_FILE=" + str(fixture / (part + "-dma.toml"))],
+                    capture_output=True, text=True, timeout=90)
+                self.assertEqual(result.returncode, 0,
+                                 result.stdout + result.stderr)
+                commands = json.loads((build / "compile_commands.json").read_text())
+                selected = {Path(entry["file"]).name: entry for entry in commands
+                            if "/soc/stm32/stm32f4/drivers/" in entry["file"]}
+                self.assertIn("cipher_dma.c", selected)
+                self.assertIn("crypto_dma.c", selected)
+                self.assertEqual("hash_dma.c" in selected, hash_dma)
+                for entry in selected.values():
+                    self.assertIn("-DNEXUS_STM32_CIPHER_DMA=1", entry["command"])
+                    self.assertIn("-DNEXUS_STM32_CRYPTO_DMA=1", entry["command"])
+                    self.assertEqual("-DNEXUS_STM32_HASH_DMA=1" in entry["command"],
+                                     hash_dma)
+                dma = [entry for entry in commands if Path(entry["file"]).name ==
+                       "stm32f4xx_hal_dma.c"]
+                self.assertEqual(len(dma), 1)
+                self.assertIn("/private/dma_hal", dma[0]["command"])
 
     def test_real_usb_products_select_remote_wakeup_only_inside_soc_target(self):
         fixtures = (
@@ -276,33 +414,246 @@ class STM32OfficialCMakeTests(unittest.TestCase):
                 self.assertNotEqual(0, result.returncode)
                 self.assertIn(reason, result.stdout + result.stderr)
 
-    def test_repeated_entry_rechecks_current_bytes_without_cached_success(self):
-        fixture = self.root / "source"
-        (fixture / "cmake/platform").mkdir(parents=True)
-        shutil.copyfile(ROOT / "cmake/platform/STM32Official.cmake",
-                        fixture / "cmake/platform/STM32Official.cmake")
-        (fixture / "dependencies").mkdir()
-        (fixture / "dependencies/stm32f4-hal.lock.json").write_text(
-            '{"files":{"LICENSE.md":{"bytes":1,"sha256":"fixture"}}}\n')
-        (fixture / "tools/maintenance").mkdir(parents=True)
-        # Verification is an external subprocess port here. The real locked
-        # sources are exercised above and by the source-verifier test suite.
-        (fixture / "tools/maintenance/stm32f4_hal_lock.py").write_text(
-            'from pathlib import Path\nimport sys\n'
-            'root=Path(__file__).resolve().parents[2]\n'
-            'count=root/"calls"\n'
-            'count.write_text(str(int(count.read_text())+1) '
-            'if count.exists() else "1")\n'
-            'if (root/"payload").read_text() != "approved":\n'
-            '    sys.exit("current source bytes changed")\n')
-        (fixture / "payload").write_text("approved")
+    def test_configure_session_verifies_three_targets_once_at_each_boundary(self):
+        fixture = self.official_fixture()
+        (self.root / "child").mkdir()
+        (self.root / "child/CMakeLists.txt").write_text(
+            'add_library(third STATIC ../empty.c)\n'
+            'nexus_stm32f4_official(third)\n')
+        statement = (
+            'nexus_stm32f4_official(provider)\n'
+            'add_library(second STATIC empty.c)\n'
+            'nexus_stm32f4_official(second)\n'
+            'add_subdirectory(child)\n')
+        result = self.configure(statement, module_root=fixture)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = self.session_calls(fixture)
+        self.assert_session_pair(fixture, calls)
+        result = self.configure(statement, module_root=fixture)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        repeated = self.session_calls(fixture)
+        self.assertEqual(len(repeated), 4)
+        self.assert_session_pair(fixture, repeated[2:])
+        self.assertNotEqual(calls[0]["pending"], repeated[2]["pending"])
+
+    def test_configure_session_repeated_helper_keeps_headers_private(self):
+        fixture = self.official_fixture()
         result = self.configure(
             'nexus_stm32f4_official(provider)\n'
-            f'file(WRITE "{fixture}/payload" "changed")\n'
-            'nexus_stm32f4_official(provider)\n', module_root=fixture)
+            'nexus_stm32f4_official(provider)\n'
+            'get_target_property(private provider INCLUDE_DIRECTORIES)\n'
+            'get_target_property(public provider INTERFACE_INCLUDE_DIRECTORIES)\n'
+            'get_target_property(sources provider SOURCES)\n'
+            'file(WRITE "${CMAKE_BINARY_DIR}/repeated-properties" '
+            '"${private}\\n${public}\\n${sources}\\n")\n', module_root=fixture)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        private, public, sources = (
+            self.root / "build/repeated-properties").read_text().splitlines()
+        self.assertEqual(set(private.split(";")),
+                         {str(fixture / "vendors/st/stm32f4_hal/Inc")})
+        self.assertEqual(public, "public-NOTFOUND")
+        self.assertEqual(sources, "empty.c")
+        self.assert_session_pair(fixture, self.session_calls(fixture))
+
+    def test_configure_session_registers_exact_inputs_once_on_root(self):
+        fixture = self.official_fixture()
+        (self.root / "child").mkdir()
+        (self.root / "child/CMakeLists.txt").write_text(
+            'add_library(third STATIC ../empty.c)\n'
+            'nexus_stm32f4_official(third)\n')
+        result = self.configure(
+            'add_subdirectory(child)\n'
+            'nexus_stm32f4_official(provider)\n'
+            'nexus_stm32f4_official(provider)\n'
+            'get_property(inputs DIRECTORY PROPERTY CMAKE_CONFIGURE_DEPENDS)\n'
+            'file(WRITE "${CMAKE_BINARY_DIR}/configure-inputs" "${inputs}")\n',
+            module_root=fixture)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        inputs = (self.root / "build/configure-inputs").read_text().split(";")
+        self.assertCountEqual(inputs, [str(fixture / "payload"),
+            str(fixture / "dependencies/stm32f4-hal.lock.json"),
+            str(fixture / "tools/maintenance/stm32f4_hal_lock.py")])
+        self.assertTrue(all(Path(name).is_file() for name in inputs))
+        self.assert_session_pair(fixture, self.session_calls(fixture))
+
+    def test_configure_session_exact_missing_probe_triggers_reconfigure(self):
+        fixture = self.official_fixture()
+        result = self.configure('nexus_stm32f4_official(provider)\n',
+                                module_root=fixture)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = self.session_calls(fixture)
+        self.assert_session_pair(fixture, calls)
+
+        def refresh():
+            result = subprocess.run([
+                shutil.which("cmake"), "--build", str(self.root / "build"),
+                "--target", "help"], capture_output=True, text=True, timeout=60)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+        (fixture / "optional me.lock").write_text("near match")
+        refresh()
+        self.assertEqual(self.session_calls(fixture), calls)
+        (fixture / "optional [metadata]?.lock").write_text("exact candidate")
+        refresh()
+        updated = self.session_calls(fixture)
+        self.assertEqual(len(updated), 4)
+        self.assert_session_pair(fixture, updated[2:])
+        self.assertNotEqual(calls[0]["pending"], updated[2]["pending"])
+
+    def test_configure_session_repeated_helper_still_rejects_invalid_targets(self):
+        statements = (
+            'nexus_stm32f4_official(missing)\n',
+            'add_library(face INTERFACE)\n'
+            'nexus_stm32f4_official(face)\n',
+            'add_library(alias ALIAS provider)\n'
+            'nexus_stm32f4_official(alias)\n',
+            'add_library(foreign STATIC IMPORTED)\n'
+            'nexus_stm32f4_official(foreign)\n',
+            'nexus_stm32f4_official(provider HAL)\n')
+        for index, statement in enumerate(statements):
+            with self.subTest(statement=statement):
+                fixture = self.official_fixture("source-" + str(index))
+                result = self.configure(
+                    'nexus_stm32f4_official(provider)\n'
+                    'nexus_stm32f4_official(provider)\n' + statement,
+                    module_root=fixture)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("official LL requires",
+                              result.stdout + result.stderr)
+                self.assertEqual([call["phase"] for call in
+                                  self.session_calls(fixture)], ["begin"])
+
+    def test_configure_session_final_check_rejects_midway_changes_and_rewrites(self):
+        for index, content in enumerate(("changed", "approved")):
+            with self.subTest(content=content):
+                fixture = self.official_fixture("source-" + str(index))
+                marker = fixture / "repeated-entry-returned"
+                result = self.configure(
+                    'nexus_stm32f4_official(provider)\n'
+                    f'file(WRITE "{fixture}/payload" "{content}")\n'
+                    'nexus_stm32f4_official(provider)\n'
+                    f'file(WRITE "{marker}" "returned")\n',
+                    module_root=fixture)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("configure inputs changed",
+                              result.stdout + result.stderr)
+                self.assertTrue(marker.exists(),
+                                "the final boundary must reject the mutation")
+                self.assert_session_pair(fixture, self.session_calls(fixture))
+
+    def test_configure_session_final_check_follows_late_deferred_mutations(self):
+        for index, nested in enumerate((False, True)):
+            with self.subTest(nested=nested):
+                fixture = self.official_fixture("source-" + str(index))
+                mutation = (
+                    'cmake_language(DEFER CALL file WRITE '
+                    f'"{fixture}/payload" "changed")\n')
+                if nested:
+                    mutation = (
+                        'function(schedule_mutation)\n' + mutation +
+                        'endfunction()\n'
+                        'cmake_language(DEFER CALL schedule_mutation)\n')
+                result = self.configure(
+                    'nexus_stm32f4_official(provider)\n' + mutation,
+                    module_root=fixture)
+                self.assertEqual((fixture / "payload").read_text(), "changed")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("configure inputs changed",
+                              result.stdout + result.stderr)
+                self.assert_session_pair(fixture, self.session_calls(fixture))
+
+    def test_configure_session_child_first_use_survives_root_deferred_mutation(
+            self):
+        fixture = self.official_fixture()
+        (self.root / "child").mkdir()
+        (self.root / "child/CMakeLists.txt").write_text(
+            'add_library(third STATIC ../empty.c)\n'
+            'nexus_stm32f4_official(third)\n')
+        result = self.configure(
+            'add_subdirectory(child)\n'
+            'function(schedule_mutation)\n'
+            'cmake_language(DEFER CALL file WRITE '
+            f'"{fixture}/payload" "changed")\n'
+            'endfunction()\n'
+            'cmake_language(DEFER CALL schedule_mutation)\n',
+            module_root=fixture)
+        self.assertEqual((fixture / "payload").read_text(), "changed")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("configure inputs changed", result.stdout + result.stderr)
+        self.assert_session_pair(fixture, self.session_calls(fixture))
+
+    def test_configure_session_final_check_follows_false_like_deferred_id(self):
+        fixture = self.official_fixture()
+        result = self.configure(
+            'nexus_stm32f4_official(provider)\n'
+            'cmake_language(DEFER ID off CALL file WRITE '
+            f'"{fixture}/payload" "changed")\n', module_root=fixture)
+        self.assertEqual((fixture / "payload").read_text(), "changed")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("configure inputs changed", result.stdout + result.stderr)
+        self.assert_session_pair(fixture, self.session_calls(fixture))
+
+    def test_configure_session_rejects_substituted_pending_snapshot(self):
+        fixture = self.official_fixture()
+        substitute = fixture / "substitute.py"
+        substitute.write_text(textwrap.dedent('''\
+            import json
+            from pathlib import Path
+            root = Path(__file__).resolve().parent
+            payload = root / "payload"
+            payload.write_text("changed")
+            stat = payload.stat()
+            current = [payload.read_text(), stat.st_ino, stat.st_size,
+                       stat.st_mtime_ns, stat.st_ctime_ns]
+            pending = root / "pending-path"
+            if pending.exists():
+                Path(pending.read_text()).write_text(json.dumps(current))
+            '''))
+        result = self.configure(
+            'nexus_stm32f4_official(provider)\n'
+            f'execute_process(COMMAND "{sys.executable}" "{substitute}" '
+            'COMMAND_ERROR_IS_FATAL ANY)\n', module_root=fixture)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("configure snapshot substituted",
+                      result.stdout + result.stderr)
+        self.assert_session_pair(fixture, self.session_calls(fixture))
+
+    def test_configure_session_failed_final_check_has_no_reusable_success(self):
+        fixture = self.official_fixture()
+        result = self.configure(
+            'nexus_stm32f4_official(provider)\n'
+            f'file(WRITE "{fixture}/payload" "changed")\n',
+            module_root=fixture)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("configure inputs changed", result.stdout + result.stderr)
+        failed = self.session_calls(fixture)
+        self.assert_session_pair(fixture, failed)
+        result = self.configure('nexus_stm32f4_official(provider)\n',
+                                module_root=fixture)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("current source bytes changed", result.stdout + result.stderr)
-        self.assertEqual((fixture / "calls").read_text(), "2")
+        calls = self.session_calls(fixture)
+        self.assertEqual([call["phase"] for call in calls],
+                         ["begin", "end", "begin"])
+        self.assertNotEqual(failed[0]["pending"], calls[2]["pending"])
+
+    def test_configure_session_deferred_failure_cannot_record_final_success(self):
+        fixture = self.official_fixture()
+        result = self.configure(
+            'nexus_stm32f4_official(provider)\n'
+            'cmake_language(DEFER CALL message FATAL_ERROR "fixture failure")\n',
+            module_root=fixture)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("fixture failure", result.stdout + result.stderr)
+        calls = self.session_calls(fixture)
+        self.assertEqual([call["phase"] for call in calls], ["begin"])
+        result = self.configure('nexus_stm32f4_official(provider)\n',
+                                module_root=fixture)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = self.session_calls(fixture)
+        self.assertEqual(len(calls), 3)
+        self.assert_session_pair(fixture, calls[1:])
+        self.assertNotEqual(calls[0]["pending"], calls[1]["pending"])
 
 
 if __name__ == "__main__":

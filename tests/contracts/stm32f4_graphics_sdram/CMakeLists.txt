@@ -7,9 +7,10 @@ endif()
 set(NEXUS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "" FORCE)
 add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
-# Reuse the maintained public DMA2D -> LTDC -> join composition unchanged.
+# Reuse the public two-buffer replacement and restart composition.
 nexus_add_firmware(nexus_f4_graphics_sdram_consumer
-    SOURCES "${CMAKE_CURRENT_LIST_DIR}/../stm32f4_graphics/consumer.c")
+    SOURCES "${CMAKE_CURRENT_LIST_DIR}/../stm32f4_graphics/sustained_consumer.c"
+        "${CMAKE_CURRENT_LIST_DIR}/../stm32f4_graphics/sustained_sequence.c")
 target_compile_definitions(nexus_f4_graphics_sdram_consumer PRIVATE
     NX_GRAPHICS_SDRAM_REFERENCE=1)
 nexus_target_warnings(nexus_f4_graphics_sdram_consumer STRICT)

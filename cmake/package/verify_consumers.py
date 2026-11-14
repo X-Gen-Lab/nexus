@@ -147,8 +147,9 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
     sdk = prefix / "share/nexus/src"
     if chip not in {"native", "stm32"}:
         raise ValueError("Only STM32F4 and explicit host consumers are maintained")
+    policy = load_policy(sdk)
     if version is None:
-        version = load_policy(sdk)["semantic_version"]
+        version = policy["semantic_version"]
     source = directory / (name + " source")
     build = directory / (name + " build")
     source.mkdir()
@@ -177,7 +178,7 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
             '#ifndef NEXUS_PLATFORM_VERSION\n'
             '#error "Missing source interface version"\n'
             '#endif\n'
-            '#if NEXUS_FACTORY_ABI_EPOCH != 3U\n'
+            f'#if NEXUS_FACTORY_ABI_EPOCH != {policy["factory_abi_epoch"]}U\n'
             '#error "Unsupported factory interface epoch"\n'
             '#endif\n'
             '#if __has_include("stm32f4xx.h") || __has_include("gd32f4xx.h")\n'
@@ -244,6 +245,10 @@ def service_profile(specification):
 
 def service_directory(sdk, specification):
     """Use the single owned scenario tree, including shared F4 references."""
+    if specification.scenario == "f4_qspi_mapped":
+        return Path(sdk) / "tests/contracts/stm32f4_qspi"
+    if specification.scenario == "f4_capture_audio":
+        return Path(sdk) / "tests/contracts/f407_capture_audio"
     return (Path(sdk) / "tests/contracts" / ("stm32" + specification.scenario)
             if specification.scenario.startswith("f4_") else
             Path(sdk) / "cmake/package/verification" / specification.scenario)
@@ -263,8 +268,18 @@ def service_sources(sdk, specification):
         name = (board / "board.json").as_posix()
         if specification.scenario == "f4_family":
             consumer = Path(sdk) / "tests/contracts/crc_assembly/consumer.c"
-        elif specification.scenario == "f4_graphics_sdram":
-            consumer = Path(sdk) / "tests/contracts/stm32f4_graphics/consumer.c"
+        elif (specification.scenario == "f4_graphics_sdram" or
+              (specification.scenario == "f4_graphics" and
+               specification.assembly != "image-only.toml")):
+            graphics = Path(sdk) / "tests/contracts/stm32f4_graphics"
+            return {"main.c": graphics / "sustained_consumer.c",
+                    "sustained_sequence.c": graphics / "sustained_sequence.c",
+                    "sustained_sequence.h": graphics / "sustained_sequence.h",
+                    name: verification / name}
+        elif specification.scenario == "f4_capture_audio":
+            consumer = verification / "frame_session.c"
+        elif specification.scenario == "f4_qspi_mapped":
+            consumer = verification / "mapped_consumer.c"
         else:
             consumer = verification / "consumer.c"
         return {"main.c": consumer,
@@ -278,6 +293,9 @@ def service_sources(sdk, specification):
     if specification.scenario == "image_window":
         return {"main.c": verification / "main.c",
                 "layout.json": verification / "layout.json"}
+    if specification.scenario == "smbus":
+        return {"main.c": verification / "services.c",
+                "board/board.json": verification / "board/board.json"}
     if specification.scenario in {"loaned_rx", "mcuboot_control"}:
         composition = ("composition.c" if specification.scenario == "loaned_rx"
                        else Path(specification.assembly).stem + ".c")
@@ -345,11 +363,16 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
     libraries = {
         "common_services": "Nexus::Settings Nexus::OSWait Nexus::LwIPStorage",
         "device_tmp117": "Nexus::TMP117I2C",
+        "smbus": "Nexus::SMBus",
         "image_window": "",
         "f4_family": "",
         "f4_crypto": "",
         "f4_sdram": "",
         "f4_qspi": "",
+        "f4_qspi_mapped": "Nexus::MappedStorage",
+        "f4_sdio_hs": "",
+        "f4_power": "",
+        "f4_capture_audio": "",
         "f4_graphics": "",
         "f4_graphics_sdram": "",
         "f4_sai": "",
@@ -369,6 +392,11 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
             + 'nexus_target_warnings(installed_public STRICT)\n'
             + 'nexus_add_firmware(installed_services SOURCES composition.c\n'
             + f'  LIBRARIES installed_public {storage})\n')
+    elif specification.scenario == "f4_power":
+        selected_setup = (
+            'nexus_add_stm32f4_sleep(selected_power)\n'
+            'nexus_add_firmware(installed_services SOURCES main.c private_headers.c\n'
+            '  LIBRARIES selected_power)\n')
     elif boot:
         selected_setup = (
             'nexus_add_mcuboot_boot()\n'
@@ -415,7 +443,9 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
            + 'nexus_add_firmware(installed_services SOURCES composition.c\n'
            '  LIBRARIES installed_public Nexus::TLSStorage Nexus::CoreMQTTStorage\n'
            '  Nexus::LwIPStorage)\n' if secure else selected_setup if selected_setup else
-           'nexus_add_firmware(installed_services SOURCES main.c private_headers.c\n'
+           'nexus_add_firmware(installed_services SOURCES main.c private_headers.c'
+           + (' sustained_sequence.c' if "sustained_sequence.c" in canonical_sources else '')
+           + '\n'
            + ('  LIBRARIES ' + libraries[specification.scenario]
               if libraries[specification.scenario] else '') + ')\n')
         + ('target_compile_definitions(installed_services PRIVATE '
@@ -680,6 +710,12 @@ def service_symbols(specification):
     service_profile(specification)
     if specification.scenario == "secure_services":
         return secure_service_symbols(specification)
+    if specification.scenario == "smbus":
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_factory_smbus_binding", "nx_factory_i2c_device",
+                          "nx_factory_i2c", "nx_smbus_initialize",
+                          "nx_smbus_prepare", "nx_smbus_submit",
+                          "nx_smbus_service", "nx_smbus_stop"})
     if specification.scenario == "device_tmp117":
         return frozenset({"nx_tmp117_init", "nx_tmp117_begin", "nx_tmp117_poll",
                           "nx_tmp117_cancel", "nx_tmp117_stop",
@@ -707,6 +743,14 @@ def service_symbols(specification):
         return frozenset({"nx_platform_start", "nx_platform_stop",
                           "nx_chip_info_read", "nx_factory_crc",
                           "nx_crc_port_compute", "nx_stm32_crc_ops"})
+    if specification.scenario == "f4_power":
+        return frozenset({"nx_platform_start", "nx_platform_suspend",
+                          "nx_platform_resume", "nx_platform_stop", "nx_factory_rtc",
+                          "nx_clock_domain_construct", "nx_clock_domain_close",
+                          "nx_clock_domain_reopen", "nx_stm32_standby_enter",
+                          "nx_stm32_power_wake_status", "nx_stm32_rtc_ops",
+                          "nx_rtc_port_wakeup", "nx_rtc_port_wake_route",
+                          "nx_rtc_port_standby_prepare"})
     if specification.scenario == "f4_crypto":
         return frozenset({"nx_platform_start", "nx_platform_stop",
                           "nx_factory_cipher", "nx_factory_hash",
@@ -717,6 +761,22 @@ def service_symbols(specification):
                           "nx_factory_external_bus", "nx_factory_memory_window",
                           "nx_external_bus_port_state", "nx_memory_window_port_acquire",
                           "nx_memory_window_port_release", "nx_memory_window_port_geometry"})
+    if specification.scenario == "f4_qspi_mapped":
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_factory_external_bus", "nx_external_bus_port_state",
+                          "nx_factory_mapped_storage", "nx_mapped_storage_geometry",
+                          "nx_mapped_storage_acquire", "nx_mapped_storage_release",
+                          "nx_mapped_storage_stop",
+                          "nx_stm32_qspi_mapped_ops", "HAL_QSPI_MemoryMapped"})
+    if specification.scenario == "f4_sdio_hs":
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_factory_block", "nx_block_port_activate",
+                          "nx_factory_block_async", "nx_block_read_prepare",
+                          "nx_block_async_submit", "nx_block_async_cancel",
+                          "nx_block_async_service", "nx_request_result",
+                          "nx_block_port_sync", "nx_block_port_stop",
+                          "nx_stm32_sdio_prepare",
+                          "nx_stm32_sdio_ops"})
     if specification.scenario == "f4_qspi":
         return frozenset({"nx_platform_start", "nx_platform_stop",
                           "nx_factory_external_bus", "nx_factory_flash_async",
@@ -729,12 +789,26 @@ def service_symbols(specification):
                           "nx_flash_async_service", "nx_flash_async_stop",
                           "nx_stm32_qspi_bus_ops", "nx_stm32_qspi_async_ops",
                           "nx_stm32_qspi_flash_ops", "HAL_QSPI_Init"})
+    if specification.scenario == "f4_capture_audio":
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_factory_capture", "nx_capture_port_start_frames",
+                          "nx_capture_port_service", "nx_capture_port_stop",
+                          "nx_stream_initialize", "nx_frame_layout_planar",
+                          "nx_frame_stream_initialize", "nx_stream_acquire",
+                          "nx_stream_release", "nx_stm32_capture_frames_ops"})
     if specification.scenario in {"f4_graphics", "f4_graphics_sdram"}:
         symbols = {"nx_platform_start", "nx_platform_stop", "nx_factory_image",
                    "nx_image_port_query", "nx_stm32_image_ops"}
         if specification.assembly != "image-only.toml":
             symbols.update({"nx_factory_display", "nx_display_port_query",
-                            "nx_display_port_snapshot", "nx_stm32_ltdc_ops"})
+                            "nx_display_port_snapshot", "nx_stm32_ltdc_ops",
+                            "nx_graphics_reference_initialize",
+                            "nx_graphics_reference_step", "nx_graphics_reference_stop"})
+            symbols.update({
+                "nx_image_prepare", "nx_image_port_submit", "nx_image_port_service",
+                "nx_display_prepare", "nx_display_port_submit",
+                "nx_display_port_service", "nx_display_port_stop",
+            })
         if specification.scenario == "f4_graphics_sdram":
             symbols.update({
                 "nx_image_prepare", "nx_image_port_submit", "nx_image_port_service",
@@ -758,16 +832,42 @@ def service_symbols(specification):
 
 def service_scope(specification):
     """Describe the executed software boundary without physical claims."""
+    if specification.scenario == "f4_power":
+        return ("Selected exact F411/F446/F479 HSI96/168 System plus RTC primary "
+                "crystal LSE and explicit static ClockDomain owner; public C11 link, "
+                "resources and method retention only. No physical power entry, "
+                "oscillator accuracy, RTC retention, wake latency, reset or HIL execution.")
+    if specification.scenario == "f4_qspi_mapped":
+        return ("Selected F479NI/W25Q128JVSIQ CPU_READ mapping under explicit "
+                "reader slots and unique owner; ARM C11 link, resources and "
+                "method retention only. No XIP, DMA reader, physical memory, "
+                "pin wiring, fitted suffix or HIL qualification.")
+    if specification.scenario == "f4_sdio_hs":
+        return ("Selected F407 HSE8 PLL150/PLLQ75 with 37.5 MHz four-bit SDR "
+                "SD high-speed or MMC HS52; ARM C11 link, resources and "
+                "method retention only. No physical card, electrical margin, "
+                "throughput, power entry or HIL qualification.")
     if specification.scenario == "f4_family":
         return ("Selected exact F4 internal HSI16/CRC C11 link, "
                 "resources and method retention only. No external PCB, "
                 "startup execution, measured stack or physical timing.")
     if specification.scenario == "f4_graphics_sdram":
-        return ("Selected F479NI public DMA2D to LTDC composition with an "
+        return ("Selected F479NI two-buffer public DMA2D to LTDC replacement "
+                "and restart composition with an "
                 "explicit graphics-owned SDRAM endpoint; ARM C11 link, "
                 "resources and graphics-memory bridge retention only. "
                 "No physical SDRAM, panel, startup execution, bandwidth, "
                 "measured stack or physical timing qualification.")
+    if specification.scenario == "f4_capture_audio":
+        return ("Selected F407 finite RAW frame session with independent "
+                "consumer loans through producer stop; ARM C11 link, resources "
+                "and method retention only. No physical camera execution, "
+                "seamless frames, bandwidth or measured stack qualification.")
+    if specification.scenario == "f4_graphics" and specification.assembly != "image-only.toml":
+        return ("Selected F479NI two-buffer public DMA2D to LTDC replacement "
+                "and restart composition in main SRAM; ARM C11 link, resources "
+                "and method retention only. No physical display execution, "
+                "bandwidth or measured stack qualification.")
     if specification.scenario in {"f4_crypto", "f4_sdram", "f4_graphics",
                                    "f4_sai", "f4_qspi"}:
         return ("Selected exact F4 public factory C11 link, resources and "
@@ -795,6 +895,11 @@ def service_scope(specification):
     if specification.scenario == "device_tmp117":
         return ("Software I2C endpoint model only; Native runtime or ARM link. "
                 "No physical sensor, bus, measured stack or timing.")
+    if specification.scenario == "smbus":
+        return ("Public packet PEC adapter and generated asynchronous I2C "
+                "binding; ARM link only. No physical bus/device, SMBTYPE, "
+                "SMBus timeout/ALERT or protocol compliance qualification. "
+                "No measured stack or timing.")
     return (("Public CA only; no client identity, authenticated connection "
              "or broker exchange. "
              if specification.scenario == "secure_services" else "")

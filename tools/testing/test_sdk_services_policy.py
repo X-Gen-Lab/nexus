@@ -18,6 +18,48 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class SDKServicesPolicyTests(unittest.TestCase):
+    def test_power_profiles_keep_public_owner_boundary_and_exact_payload(self):
+        profiles = tuple(item for item in consumer_profiles.SERVICE_CONSUMERS
+                         if item.scenario == "f4_power")
+        self.assertEqual([item.assembly for item in profiles],
+                         [part + "-provision-empty.toml" for part in
+                          ("f411re", "f446ze", "f479ni")])
+        prefix = self.prefix()
+        sdk = prefix / "share/nexus/src"
+        relative = Path("tests/contracts/stm32f4_power")
+        shutil.copytree(ROOT / relative, sdk / relative)
+        for profile in profiles:
+            with self.subTest(profile=profile.name):
+                output = self.directory / profile.domain
+                output.mkdir()
+                source, _, _ = self.consumers.prepare_service_consumer(
+                    prefix, output, profile, self.command,
+                    expected_revision="a" * 40, fixture=True)
+                self.assertEqual((source / "main.c").read_bytes(),
+                                 (ROOT / relative / "consumer.c").read_bytes())
+                cmake = (source / "CMakeLists.txt").read_text()
+                self.assertIn("nexus_add_stm32f4_sleep(selected_power)", cmake)
+                self.assertIn("LIBRARIES selected_power", cmake)
+                self.assertNotIn("clock_domain/private", cmake)
+                self.assertLessEqual({"nx_stm32_standby_enter",
+                                      "nx_stm32_power_wake_status",
+                                      "nx_clock_domain_construct"},
+                                     self.consumers.service_symbols(profile))
+                self.assertIn("No physical", self.consumers.service_scope(profile))
+        specification = importlib.util.spec_from_file_location(
+            "power_source_sdk_policy", ROOT / "cmake/package/package_source_sdk.py")
+        package = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(package)
+        names = {"CMakeLists.txt", "consumer.c", "README.md"}
+        for part in ("f411re", "f446ze", "f479ni"):
+            names.add(part + "-board/board.json")
+            names.update(part + "-" + mode + ".toml" for mode in
+                         ("adopt-retained", "provision-empty"))
+        for name in names:
+            self.assertIn((relative / name).as_posix(), package.REQUIRED_FILES)
+            self.assertTrue(package.selected((relative / name).as_posix()))
+        self.assertFalse(package.selected((relative / "unreviewed.c").as_posix()))
+
     def test_graphics_sdram_profile_reuses_public_composition_and_exports_fixture(self):
         profile = consumer_profiles.ServiceConsumer(
             "f479ni graphics sdram", "combined.toml", "arm-graphics-sdram-f479ni",
@@ -34,7 +76,12 @@ class SDKServicesPolicyTests(unittest.TestCase):
             prefix, output, profile, self.command,
             expected_revision="a" * 40, fixture=True)
         self.assertEqual((source / "main.c").read_bytes(),
-                         (ROOT / "tests/contracts/stm32f4_graphics/consumer.c").read_bytes())
+                         (ROOT / "tests/contracts/stm32f4_graphics/sustained_consumer.c").read_bytes())
+        for name in ("sustained_sequence.c", "sustained_sequence.h"):
+            self.assertEqual((source / name).read_bytes(),
+                             (ROOT / "tests/contracts/stm32f4_graphics" / name).read_bytes())
+        self.assertIn("sustained_sequence.c",
+                      (source / "CMakeLists.txt").read_text())
         self.assertIn("NX_GRAPHICS_SDRAM_REFERENCE=1",
                       (source / "CMakeLists.txt").read_text())
         specification = importlib.util.spec_from_file_location(
@@ -48,6 +95,11 @@ class SDKServicesPolicyTests(unittest.TestCase):
             self.assertTrue(source_sdk.selected(relative))
         self.assertFalse(source_sdk.selected(
             "tests/contracts/stm32f4_graphics_sdram/consumer.c"))
+        for name in ("sustained_consumer.c", "sustained_sequence.c",
+                     "sustained_sequence.h"):
+            relative = "tests/contracts/stm32f4_graphics/" + name
+            self.assertIn(relative, source_sdk.REQUIRED_FILES)
+            self.assertTrue(source_sdk.selected(relative))
         self.assertEqual((source / "board/board.json").read_bytes(),
                          (ROOT / "tests/contracts/stm32f4_graphics_sdram/board/board.json").read_bytes())
         required = self.consumers.service_symbols(profile)
@@ -57,6 +109,8 @@ class SDKServicesPolicyTests(unittest.TestCase):
             "nx_display_port_service", "nx_display_port_stop",
             "nx_stm32_sdram_graphics_attach", "nx_stm32_sdram_graphics_check",
             "nx_stm32_sdram_graphics_detach", "nx_stm32_sdram_graphics_overlaps",
+            "nx_graphics_reference_initialize", "nx_graphics_reference_step",
+            "nx_graphics_reference_stop",
         }, required)
         scope = self.consumers.service_scope(profile)
         self.assertIn("DMA2D", scope)
@@ -198,13 +252,29 @@ class SDKServicesPolicyTests(unittest.TestCase):
             shutil.copytree(ROOT / relative, sdk / relative)
         expected = (("f415zg crypto", "f415zg.toml", "arm-crypto-f415zg", "f4_crypto"),
                     ("f417zg crypto", "f417zg.toml", "arm-crypto-f417zg", "f4_crypto"),
+                    ("f415zg crypto dma", "f415zg-dma.toml",
+                     "arm-crypto-dma-f415zg", "f4_crypto"),
+                    ("f417zg crypto dma", "f417zg-dma.toml",
+                     "arm-crypto-dma-f417zg", "f4_crypto"),
                     ("f479ni sdram", "f479ni-sdram.toml", "arm-sdram-f479ni", "f4_sdram"),
                     ("f479ni qspi", "f479ni-qspi.toml", "arm-qspi-f479ni", "f4_qspi"),
+                    ("f479ni qspi dma", "f479ni-qspi-dma.toml",
+                     "arm-qspi-dma-f479ni", "f4_qspi"),
+                    ("f479ni qspi quad", "f479ni-qspi-quad.toml",
+                     "arm-qspi-quad-f479ni", "f4_qspi"),
+                    ("f479ni qspi quad dma", "f479ni-qspi-quad-dma.toml",
+                     "arm-qspi-quad-dma-f479ni", "f4_qspi"),
                     ("f479ni graphics", "combined.toml", "arm-graphics-f479ni", "f4_graphics"),
                     ("f479ni image", "image-only.toml", "arm-image-f479ni", "f4_graphics"),
                     *((f"{part} sai {role}", f"{part}-{role}.toml",
                        f"arm-sai-{part}-{role}", "f4_sai")
-                      for part in ("f446ze", "f479ni") for role in ("master", "slave")))
+                      for part in ("f446ze", "f479ni") for role in ("master", "slave")),
+                    *((f"{part} {slice_name} {role} blocks",
+                       f"{part}-{slice_name}-{role}-blocks.toml",
+                       f"arm-{slice_name}-{part}-{role}-blocks", "f4_sai")
+                      for part, slice_name in (("f446ze", "sai2"),
+                                               ("f479ni", "sparse"))
+                      for role in ("master", "slave")))
         for name, assembly, domain, scenario in expected:
             with self.subTest(name=name):
                 profile = consumer_profiles.ServiceConsumer(
@@ -216,8 +286,17 @@ class SDKServicesPolicyTests(unittest.TestCase):
                     prefix, output, profile, self.command,
                     expected_revision="a" * 40, fixture=True)
                 directory = ROOT / "tests/contracts" / ("stm32" + scenario)
+                sustained = scenario == "f4_graphics" and assembly != "image-only.toml"
+                consumer = "sustained_consumer.c" if sustained else "consumer.c"
                 self.assertEqual((source / "main.c").read_bytes(),
-                                 (directory / "consumer.c").read_bytes())
+                                 (directory / consumer).read_bytes())
+                for helper in ("sustained_sequence.c", "sustained_sequence.h"):
+                    self.assertEqual((source / helper).exists(), sustained)
+                    if sustained:
+                        self.assertEqual((source / helper).read_bytes(),
+                                         (directory / helper).read_bytes())
+                self.assertEqual("sustained_sequence.c" in
+                                 (source / "CMakeLists.txt").read_text(), sustained)
                 resolved = configure.resolve_ir(source / "assembly.toml")
                 self.assertFalse(resolved.physical_qualified)
                 self.assertEqual(resolved.memory_budget.libc_heap_bytes, 0)
@@ -235,12 +314,15 @@ class SDKServicesPolicyTests(unittest.TestCase):
         owned = {
             "cmake/platform/STM32QSPI.cmake",
             "soc/stm32/stm32f4/drivers/qspi.c",
+            "soc/stm32/stm32f4/drivers/qspi_dma.c",
             "soc/stm32/stm32f4/private/stm32f4_qspi.h",
             "soc/stm32/stm32f4/private/qspi_hal/stm32f4xx_hal_conf.h",
         }
         reference = {"tests/contracts/stm32f4_qspi/" + name for name in (
             "consumer.c", "CMakeLists.txt", "f479ni-qspi.toml",
-            "f479ni-qspi-board/board.json")}
+            "f479ni-qspi-dma.toml", "f479ni-qspi-quad.toml",
+            "f479ni-qspi-quad-dma.toml", "f479ni-qspi-board/board.json",
+            "f479ni-qspi-quad-board/board.json")}
         payload = source_sdk.provider_descriptors.maintained("stm32f4").owned_payload
         self.assertLessEqual(owned, set(payload))
         self.assertLessEqual(owned | reference, set(source_sdk.REQUIRED_FILES))
@@ -252,6 +334,43 @@ class SDKServicesPolicyTests(unittest.TestCase):
         for name in ("vendor_model.py", "model-config/nexus_config.h"):
             self.assertFalse(source_sdk.selected(
                 "tests/contracts/stm32f4_qspi/" + name))
+
+    def test_capture_frames_consumer_preserves_public_session_and_board(self):
+        profile = consumer_profiles.ServiceConsumer(
+            "f407 capture frames", "ve-frames-raw.toml", "arm-capture-frames-f407",
+            True, "f4_capture_audio")
+        self.assertIn(profile, consumer_profiles.SERVICE_CONSUMERS)
+        prefix = self.prefix()
+        sdk = prefix / "share/nexus/src"
+        relative = Path("tests/contracts/f407_capture_audio")
+        shutil.copytree(ROOT / relative, sdk / relative)
+        output = self.directory / profile.domain
+        output.mkdir()
+        source, _, _ = self.consumers.prepare_service_consumer(
+            prefix, output, profile, self.command,
+            expected_revision="a" * 40, fixture=True)
+        for copied, canonical in (("main.c", "frame_session.c"),
+                                  ("ve_board/board.json", "ve_board/board.json")):
+            self.assertEqual((source / copied).read_bytes(),
+                             (ROOT / relative / canonical).read_bytes())
+        resolved = configure.resolve_ir(source / "assembly.toml")
+        self.assertFalse(resolved.physical_qualified)
+        self.assertEqual(resolved.memory_budget.libc_heap_bytes, 0)
+        self.assertLessEqual({
+            "nx_capture_port_start_frames", "nx_capture_port_service",
+            "nx_capture_port_stop", "nx_frame_stream_initialize",
+            "nx_stream_acquire", "nx_stream_release", "nx_platform_stop",
+        }, self.consumers.service_symbols(profile))
+        self.assertIn("No physical", self.consumers.service_scope(profile))
+        specification = importlib.util.spec_from_file_location(
+            "capture_source_sdk_policy", ROOT / "cmake/package/package_source_sdk.py")
+        source_sdk = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(source_sdk)
+        for name in ("CMakeLists.txt", "frame_session.c", "controller_main.c",
+                     "ve-frames-raw.toml", "ve_board/board.json"):
+            member = (relative / name).as_posix()
+            self.assertIn(member, source_sdk.REQUIRED_FILES)
+            self.assertTrue(source_sdk.selected(member))
 
     def test_family_sources_prepare_exact_public_crc_and_board_bytes(self):
         prefix = self.prefix()

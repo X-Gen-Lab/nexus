@@ -31,7 +31,7 @@ def boolean(value, name):
 
 def validate(selection, route):
     """No inferred synchronization, unselected pads or silent format changes."""
-    if route["kind"] == "audio" and route["controller"] == "SAI1":
+    if route["kind"] == "audio" and route["controller"] in {"SAI1", "SAI2"}:
         from .sai import validate as validate_sai
         return validate_sai(selection, route)
     kind, mode = route["kind"], selection["mode"]
@@ -131,7 +131,7 @@ def validate(selection, route):
 
 def resolve_fields(selection, route, clock, clock_plan):
     """Resolve arithmetic once into named immutable option fields."""
-    if route["kind"] == "audio" and route["controller"] == "SAI1":
+    if route["kind"] == "audio" and route["controller"] in {"SAI1", "SAI2"}:
         from .sai import resolve_fields as resolve_sai
         return resolve_sai(selection, route, clock, clock_plan)
     if route["kind"] == "capture":
@@ -203,7 +203,7 @@ def _dma_initializer(path):
 
 def constructor(item, result):
     """Emit constants and fixed calls only; C owns all register algorithms."""
-    if item.kind == "audio" and item.controller == "SAI1":
+    if item.kind == "audio" and item.controller in {"SAI1", "SAI2"}:
         from .sai import constructor as construct_sai
         return construct_sai(item, result)
     name, kind = item.id.replace("-", "_"), item.kind

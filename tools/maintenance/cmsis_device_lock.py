@@ -23,6 +23,7 @@ sys.path.insert(0, str(ROOT))
 from tools.configure.metadata import (  # noqa: E402
     fields, parse_json, regular, snapshot,
 )
+from tools.evidence.common import git_observation_environment  # noqa: E402
 from tools.maintenance import source_catalogue  # noqa: E402
 
 REVIEWED_DEVICES = {
@@ -111,8 +112,7 @@ def contract(lock):
 
 def git(source, *arguments):
     """Read Git identity without inheriting caller-selected Git directories."""
-    environment = {k: v for k, v in os.environ.items()
-                   if not k.startswith("GIT_")}
+    environment = git_observation_environment()
     result = subprocess.run(["git", "-C", str(source), *arguments],
                             capture_output=True, text=True, env=environment,
                             timeout=20)
@@ -143,6 +143,49 @@ def stable_snapshot(path):
     if before != after or len(raw) != after[2]:
         raise ValueError("CMSIS-device input changed during read: " + str(path))
     return raw, {**recorded, "filesystem": after}
+
+
+def git_identity_inputs(source, *, observe=None):
+    """Return exact Git identity file candidates, including absent optional ones.
+
+    Follow worktree/common-directory resolution through Git itself and retain
+    recursive symbolic HEAD refs. Never register a Git directory timestamp:
+    observer-created lock files are not source identity changes. Callers keep
+    their own byte admission and existing/missing file projection contracts.
+    """
+    source = Path(source).absolute()
+    observe = git if observe is None else observe
+
+    def resolved(name):
+        value = Path(observe(source, "rev-parse", "--git-path", name))
+        return Path(os.path.abspath(value if value.is_absolute() else source / value))
+
+    marker = source / ".git"
+    if marker.is_symlink():
+        raise ValueError("Git identity marker must not be a symlink")
+    directory = Path(observe(source, "rev-parse", "--absolute-git-dir"))
+    if not directory.is_absolute():
+        directory = source / directory
+    paths = {resolved(name) for name in
+             ("HEAD", "index", "config", "config.worktree", "packed-refs")}
+    paths.add(Path(os.path.abspath(directory / "commondir")))
+    if marker.is_file():
+        paths.add(marker)
+    name, visited = "HEAD", set()
+    while name not in visited and len(visited) < 32:
+        visited.add(name)
+        path = resolved(name)
+        paths.add(path)
+        if not path.is_file():
+            return tuple(sorted(paths))
+        text = stable_snapshot(path)[0].decode("utf-8").strip()
+        if not text.startswith("ref: "):
+            return tuple(sorted(paths))
+        name = text.removeprefix("ref: ")
+        if (not name.startswith("refs/") or "\\" in name or
+                any(part in {"", ".", ".."} for part in name.split("/"))):
+            raise ValueError("Invalid symbolic Git identity reference")
+    raise ValueError("Cyclic or excessive symbolic Git identity references")
 
 
 def verify_git(source, lock, review):

@@ -10,7 +10,8 @@ from tools.configure import bindings, configure as gate, factory
 
 class F407CryptoTests(unittest.TestCase):
     def resolve(self, directory, *, part="STM32F415ZGT6", extra="",
-                cipher_mode="irq-blocks", priority=5):
+                cipher_mode="irq-blocks", hash_mode="irq-blocks", priority=5,
+                reserved=()):
         board = gate.load(gate.ROOT /
             "tests/contracts/stm32f4_family/f415zg-board/board.json")
         board["soc"] = part
@@ -18,6 +19,7 @@ class F407CryptoTests(unittest.TestCase):
             {"id": "cipher", "controller": "CRYP", "route": "cryp-internal"},
             {"id": "digest", "controller": "HASH", "route": "hash-internal"},
         ]
+        board["reserved_resources"] += list(reserved)
         (directory / "board.json").write_text(json.dumps(board))
         template = (gate.ROOT / "tests/contracts/stm32f4_family/f415zg.toml").read_text()
         template = template[:template.index("[crc.signature]")]
@@ -27,9 +29,59 @@ class F407CryptoTests(unittest.TestCase):
         source.write_text(template +
             f'[cipher.encrypt]\nbinding="cipher"\nmode="{cipher_mode}"\n'
             f'[cipher.encrypt.irq]\npriority={priority}\ncalls_os=false\n'
-            '[hash.digest]\nbinding="digest"\nmode="irq-blocks"\n'
+            f'[hash.digest]\nbinding="digest"\nmode="{hash_mode}"\n'
             '[hash.digest.irq]\npriority=5\ncalls_os=false\n' + extra)
         return gate.resolve_ir(source)
+
+    def test_dma_modes_connect_only_selected_extensions_and_exact_memory(self):
+        for part in ("STM32F415ZGT6", "STM32F417ZGT6"):
+            with self.subTest(part=part), tempfile.TemporaryDirectory() as tmp:
+                result = self.resolve(Path(tmp), part=part,
+                    cipher_mode="dma-blocks", hash_mode="dma-blocks")
+                cipher, digest = result.controllers
+                self.assertEqual(cipher.dma, ("DMA2:stream6:channel2",
+                                               "DMA2:stream5:channel2"))
+                self.assertEqual(digest.dma, ("DMA2:stream7:channel2",))
+                source = bindings.emit(result)[1]
+                for kind in ("cipher", "hash"):
+                    self.assertIn(f"nx_stm32f4_{kind}_dma_state_t", source)
+                    self.assertIn(f"nx_stm32f4_{kind}_dma_config_t", source)
+                    self.assertIn(f".dma = &s_nx_crypto_dma_config_"
+                                  f"{'encrypt' if kind == 'cipher' else 'digest'}",
+                                  source)
+                self.assertIn("0x20000000u, 131072u", source)
+                self.assertIn("0x08000000u, 1048576u, NX_DMA_MEMORY_READ", source)
+                self.assertNotIn("0x10000000u", source)
+                for forbidden in ("HAL_DMA_", "HAL_CRYP_", "HAL_HASH_",
+                                  "DMA2_Stream5_IRQHandler",
+                                  "DMA2_Stream6_IRQHandler",
+                                  "DMA2_Stream7_IRQHandler"):
+                    self.assertNotIn(forbidden, source)
+
+    def test_mixed_modes_keep_irq_owner_free_of_optional_dma_state(self):
+        for dma_kind in ("cipher", "hash"):
+            with self.subTest(dma_kind=dma_kind), tempfile.TemporaryDirectory() as tmp:
+                result = self.resolve(Path(tmp),
+                    cipher_mode="dma-blocks" if dma_kind == "cipher" else "irq-blocks",
+                    hash_mode="dma-blocks" if dma_kind == "hash" else "irq-blocks")
+                source = bindings.emit(result)[1]
+                other = "hash" if dma_kind == "cipher" else "cipher"
+                self.assertIn(f"nx_stm32f4_{dma_kind}_dma_state_t", source)
+                self.assertNotIn(f"nx_stm32f4_{other}_dma_state_t", source)
+                self.assertIn(".dma = NULL", source)
+                self.assertEqual(bool(result.controllers[0].dma),
+                                 dma_kind == "cipher")
+                self.assertEqual(bool(result.controllers[1].dma), dma_kind == "hash")
+
+    def test_dma_lane_reservation_rejects_without_affecting_irq_mode(self):
+        for lane, kind in ((5, "cipher"), (6, "cipher"), (7, "hash")):
+            with self.subTest(lane=lane), tempfile.TemporaryDirectory() as tmp:
+                reserved = (f"dma:DMA2:stream{lane}",)
+                self.resolve(Path(tmp), reserved=reserved)
+                with self.assertRaisesRegex(ValueError, "conflict|reserved"):
+                    self.resolve(Path(tmp), reserved=reserved,
+                        cipher_mode="dma-blocks" if kind == "cipher" else "irq-blocks",
+                        hash_mode="dma-blocks" if kind == "hash" else "irq-blocks")
 
     def test_two_exact_parts_resolve_distinct_engines_without_dma_or_pads(self):
         for part in ("STM32F415ZGT6", "STM32F417ZGT6"):

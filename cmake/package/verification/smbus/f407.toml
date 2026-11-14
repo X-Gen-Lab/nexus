@@ -1,0 +1,24 @@
+# Public packet-PEC software reference; physical bus/device is not qualified.
+schema = 2
+components = ["smbus"]
+board_package = "board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+
+[i2c.bus]
+binding = "i2c0"
+mode = "irq-messages"
+max_hz = 100000
+[i2c.bus.irq]
+priority = 5
+calls_os = false
+
+[i2c_device.sensor]
+controller = "bus"
+driver = "i2c-endpoint"
+address = 42

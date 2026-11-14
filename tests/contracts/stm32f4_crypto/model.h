@@ -16,6 +16,7 @@ void nx_crypto_model_cryp_input(void* instance, uint32_t word);
 uint32_t nx_crypto_model_cryp_output(void* instance);
 void nx_crypto_model_hash_input(uint32_t word);
 uint32_t nx_crypto_model_hash_digest(unsigned index);
+void nx_crypto_model_irq_clear(IRQn_Type irq);
 #ifdef __cplusplus
 }
 #endif
@@ -28,4 +29,6 @@ uint32_t nx_crypto_model_hash_digest(unsigned index);
 #define CLEAR_BIT(REG, BIT) WRITE_REG(REG, READ_REG(REG) & ~(BIT))
 #define MODIFY_REG(REG, CLEAR, SET)                                            \
     WRITE_REG(REG, (READ_REG(REG) & ~(CLEAR)) | (SET))
+#undef NVIC_ClearPendingIRQ
+#define NVIC_ClearPendingIRQ(irq) nx_crypto_model_irq_clear(irq)
 #endif

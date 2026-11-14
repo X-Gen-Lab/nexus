@@ -1,6 +1,9 @@
-# F407 System、时钟与监督
+# F4 System、静态 RUN 时钟与显式低功耗
 
-本页描述 F407VE／ZG 的静态 C 机制。产品喂狗、复位、任务重启、低压保护和
+本页描述维护中 F4 的静态 C System／RUN，以及独立审查的 STOP／Standby 机制。
+F411RET6／F446ZET6／F479NIH6 的精确低功耗范围列在下文；监督与未另说明的
+外设合同仍按各自支持矩阵，不由通用 Cortex-M 或高速时钟推导。
+产品喂狗、复位、任务重启、低压保护和
 VBAT 策略由外部工程提供。主机模型与 ARM 构建分别建立软件和链接证据；本轮
 physical HIL 为 `not_executed`，不声明晶振精度、功耗或复位后的物理保留资格。
 
@@ -69,6 +72,51 @@ source ready、PLL、总线、CSS、SSCG、所需 Flash latency 和 HSI reset tr
 已选 ADC 另外要求至少 0.6 MHz；DS8626 Table67 的模拟供电条件与最高频率仍须
 由具体模拟供电/Board 验收，不把名义时钟算术当作 VDDA 测量。
 
+## F411／F446／F479 的高速 RUN 参考
+
+三种精确器件策略保留直接 HSI16／AHB16／APB16、主 PLL 关闭的路径，并接纳下表
+的显式 HSI PLL 元组。它们仍使用 `clock = "custom"` 与完整
+`[clock_parameters]`，不会自动从型号推断最高频率。可构建的完整 CRC 装配见
+[器件软件参考](../../../tests/contracts/stm32f4_family/README.md)。
+
+| 精确型号 | PLL M/N/P/Q | SYSCLK／AHB | APB1／APB2 | ADC 域（除 4 参考） | Flash wait states |
+| --- | --- | --- | --- | --- | --- |
+| STM32F411RET6 | 16/384/4/8 | 96 MHz | 48／96 MHz | 24 MHz | 3 |
+| STM32F446ZET6 | 16/336/2/7 | 168 MHz | 42／84 MHz | 21 MHz | 5 |
+| STM32F479NIH6 | 16/336/2/7 或 10/210/2/7 | 168 MHz | 42／84 MHz | 21 MHz | 5 |
+
+这些高速参数固定 HSI 名义 16 MHz、AHB 除 1，关闭 CSS，并声明 2.7–3.6 V 供电
+范围；维护参考使用 3.3 V、ADC 除 4，其他合法 ADC 分频仍由同一 ClockPlan 校验。
+ADC 域只表示计划算术，不授予 ADC
+provider／模拟供电资格。主 PLL 作为 SYSCLK 源启用，Q 产生名义 48 MHz；该频率
+不证明 HSI 温漂或 USB 精度，内置 USB PHY 仍要求已审外部 HSE 晶振。
+
+F446 的 PLLSAI 具有独立 M，所选 SAI1／2 master 可共用一个 Q 计划。F479 的
+PLLSAI 与主 PLL 共用 source/M；选择 M10/N210 的主 PLL 后，可另行声明
+PLLSAI M10/N192、Q5/post5 得到 12.288 MHz，R4/post16 得到 4.8 MHz。
+单个 System owner 保存、设置、回读并撤回所选 Q／R 及 mux；音频／显示 owner
+只消费自己的时钟。未选消费者不能留下辅助输出，不能由示例频率推断实际音频误差、
+面板或外部存储时序。
+
+冷启动在主 PLL 关闭时设置 VOS scale 1，先建立并读回 Flash latency 与
+`PRFTEN`，再等待 `PLLRDY`。F411／F446／F479 的双位 VOS 在 PLL 开启后才生效；
+C 继续有界等待 `VOSRDY`，观察就绪后才切换 PLL SYSCLK 并建立 TIM2 时间域。
+这些顺序来自 RM0383／RM0390／RM0386 的 `PWR_CR.VOS`、`PWR_CSR.VOSRDY` 与
+Flash/RCC 合同；锁定 HAL PWREx 也保留 PLL 开启后等待 VOS 的顺序。bootstrap
+尚无单调时间，因此使用每阶段 poll 上限，不调用依赖 TIM2 的 HAL tick 等待。
+
+外来 overdrive 位，以及与所选 prefetch 冲突的 `ADCDC1` 位，在可读冷态准入时拒绝；
+前者适用于 F446／F479，后者适用于这三种新料号。若 PWR gate 原先关闭，
+取得并读回 gate 后再次检查，不靠 gated MMIO 零值推定没有 owner。就绪失败不发布
+有效时间域；退出先观察 HSI/SWS，再撤主／辅助 PLL 并恢复本 owner 的快照。退出
+失败保留原责任与存储，只有真实成功重试才能回收，不把超时包装成已撤回。
+
+这些策略只授权直接 HSI16 与列出的高速元组，不包含运行期 DVFS、F411 100 MHz
+或 F446／F479 180 MHz overdrive。180 MHz 的主 PLL Q 不能整数产生 48 MHz，
+不能仅改 SYSCLK 数值继续复用本模式的 CLK48 合同。新料号低功耗经过下述独立
+资源、寄存器和勘误审查；System restart／restore 单项结果不替代完整深睡眠路径
+或实板验收。
+
 ## 冷启动与内存域
 
 `SystemInit` 在普通 DATA/BSS 之前启用并读回 CP10/CP11，拒绝继承的有效 MPU，
@@ -101,7 +149,7 @@ DEV／密度不符返回 IO，未审 cut 返回 UNSUPPORTED，均不建立平台
 ## STOP、Standby 与时间域
 
 浅 Sleep 保留运行时钟、TIM2 和现有 tickless 合同。深 STOP 通过可选
-`nexus_add_stm32f407_sleep()` 的 `nx_stm32f407_power_enter` 显式执行。
+`nexus_add_stm32f4_sleep()` 的 `nx_stm32_power_enter` 显式执行。
 调用者先关闭自己的 ClockDomain，加入所有设备、DMA、deadline 和 OS borrowers，
 实际停止周期 SysTick 并处理其旧 pending。接口验证 closed/empty barrier、全 DMA
 stream、外设 gate、无 active handler 和精确已使能 wake IRQ 集合后才发生效果。
@@ -120,12 +168,15 @@ calendar、aux wake route 与持久 backup effects；活动 AlarmA/内存 loan �
 取得 USB gate，却仍保留旧域 deadline，必须先 close/cancel 并完成排空。ClockDomain
 只证明调用者实际登记并排空的借用，不发现遗漏 owner，也不替调用者暂停任务或 OS。
 
-Standby 的 WKUP／RTC 序列遵循 ES0182 Rev19 §2.2.6。`wake_pin = true`
-显式选入 PA0 WKUP，入口在所有源禁用时清 WUF，再重开所选 EWUP；返回时恢复原
-EWUP。已有 WUF 默认 BUSY，只有 `discard_wakeup = true` 才授权确认它。WKUP
-不要求额外 NVIC IRQ；引脚、电气与 VBAT 条件由产品证明。
+Standby 的 WKUP／RTC 序列遵循 ES0182 Rev19 §2.2.6，以及新料号勘误 §2.2.4。
+`wake_pins = NX_STM32_WAKE_PIN_PA0` 显式选入 PA0；仅 F446 另外接受
+`NX_STM32_WAKE_PIN_PC13`。入口在所有源禁用时清 WUF，再重开所选 EWUP；返回时
+恢复原 enable bits。已有 WUF 默认 BUSY，只有 `discard_wakeup = true` 才授权
+确认它；F479 的保留 RTC-Standby 状态另有下述复位限制。WKUP 不要求额外 NVIC
+IRQ；调用者拥有所有已使能源、引脚和电气条件。PA0 Standby 电压不得套用 RUN
+的 5 V 容忍假设；软件参考要求输入不超过 VDD，实际电路与 VBAT 由产品验收。
 
-RTCEN 已开启的 Standby 使用 `nx_stm32f407_standby_enter()`。应用在
+RTCEN 已开启的 Standby 使用 `nx_stm32_standby_enter()`。应用在
 Platform.suspend 后先调用同一 RTC owner 的 `standby_prepare`，显式提供允许
 丢弃的 RTC 事件 mask。RTC 独占前端禁源、必要的 flags/EXTI PR 确认及 receipt；
 Power 只读 validate，在 CWUF 后调用 commit，再执行 WFI，不直接写 RTC/EXTI。
@@ -146,11 +197,56 @@ PRIMASK 保护下恢复已选 PLL/总线/Flash，重新建立 1 MHz TIM2 并递�
 Core 暂停的时间始终未知，不把 timer 归零包装成连续单调时间。恢复失败不返回到
 旧 IRQ/deadline 消费者：保留 mask、资源与 storage，观测平台故障并 park。
 
-`nx_stm32f407_deadline_bridge` 只接受匹配的旧 epoch，以及由独立 RTC 提供的
+`nx_stm32_deadline_bridge` 只接受匹配的旧 epoch，以及由独立 RTC 提供的
 elapsed min/max，输出新域中最早／最晚 deadline 包络。采样窗口、晶振误差、RTC
 失效和量化误差必须计入外部界限。它不自动补 kernel tick、恢复请求或重新启动任务。
 Standby 必须已有明确 wake source；真实进入后通过复位重建整个 boot。若 WFI
 立即返回，机制恢复新 RUN epoch 并报告 IO，不假称已经发生复位。
+
+## F411／F446／F479 的低功耗范围
+
+公共入口为 `nexus/soc/stm32f4_power.h`，沿用同一 C 启停与收据算法；器件差异只在
+私有编译期 traits。`wake_irqs[4]` 配合重排的 options 仍占 28 B，不建立运行期
+型号分派、动态对象或第二个时钟 owner。普通消费者持有 opaque ClockDomain；
+可信集成通过公开 `clock_domain_owner.h` 显式提供原有静态存储。
+
+| 精确器件 | 外部 IRQ 数／NVIC words | CCM／Backup SRAM | Standby pin |
+| --- | --- | --- | --- |
+| STM32F411RET6 | 86／3 | 无／无；保留 20 个备份寄存器 | PA0，EWUP bit8 |
+| STM32F446ZET6 | 97／4 | 无／4 KiB | PA0→EWUP1 bit8；PC13→EWUP2 bit7 |
+| STM32F479NIH6 | 93／3 | 64 KiB／4 KiB | PA0，EWUP bit8 |
+
+不存在的 IRQ words／bits 返回 INVALID；额外已使能或 active IRQ、运行中 DMA 和
+未撤回 gate 返回 BUSY。新料号的 FPDS、低压／underdrive、overdrive、F411／F446
+的 FISSR／FMSSR 等外来电源模式不被继承。所选 STOP／Standby debug 位开启时
+拒绝进入；未提供 WFE/NOP/BX 的独立 debug workaround。普通运行与无低功耗 debug
+位的调试连接不因此被禁止。
+
+F446ZE LQFP 的 PC13 transitions 会干扰晶体 LSE，所选或预使能的 PC13 wake
+与 live crystal LSE 冲突时均拒绝；不自动换源。普通 CSR 控制写入还将 F446／F479
+的 `UDRDY[19:18]` 写值置零，保留其 rc_w1 历史状态；同一规则用于 RTC backup
+regulator 的 BRE 控制，不把无关标志读改写为确认。
+
+首批 RTC 配置只接纳上表精确器件、baremetal、已集成验证的高速 RUN tuple：
+F411 M16/N384/P4/Q8，F446 M16/N336/P2/Q7，F479 M10/N210/P2/Q7；AHB 除1，
+APB 与前述 RUN 表一致，ADC 除4、声明 3.3 V、CSS 关闭、无 PLLSAI。Board 必须
+显式声明 LSE32768 晶体。`adopt-retained` 与 `provision-empty` 仍分别要求既有
+保留数据来源和明确初始日期；没有隐式清空备份域。F411 的 SRAM 操作为 UNSUPPORTED，
+不由公共 PWR.BRE 宏推断 SRAM。第二 tamper route、LSE bypass、duration wakeup、
+直接 HSI16 的 RTC 组合与 RTOS 深睡眠尚未授予本切片。
+
+RTC 的 BYPSHAD 读取、RSF／INIT 交接、DBP 即时读回与独立事件 receipt 复用真实 C
+实现。主机回归覆盖新料号的 Power admission、失败恢复以及 RTC/System/Platform
+共同路径。独立软件消费者见 [F4 Power 参考](../../../tests/contracts/stm32f4_power/README.md)。
+软件构建不证明 LSE 精度、唤醒延迟、实际低功耗、VDD/VBAT 保留或复位行为。
+
+F479 的 ES0321 §2.2.13 要求 RTC Standby 唤醒后先清 SBF、再系统复位，才能可靠
+再次进入 RTC Standby。`nx_stm32_power_wake_status()` 只观察保留标志，不确认或
+推断具体唤醒原因；RTC rearm 遇到 SBF 或 WUF 时保守拒绝。产品先保存和评估业务
+原因，明确授权后可调用 `nx_stm32_power_standby_reset_prepare()`，再执行自己的
+系统复位。该函数只清 SBF，并有界读回；不清 WUF／RTC／备份数据，也不发起复位。
+SUCCESS 不能替代随后的复位，不能用 `discard_wakeup` 绕过。WKUP-only Standby
+是独立入口范围，仍须遵守自身唤醒和电气约束。
 
 ## EWI、CSS、故障与 trace
 

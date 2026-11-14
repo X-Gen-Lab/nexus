@@ -109,27 +109,40 @@ constraints; do not automatically loosen that version requirement. Rerun the
 product's required Native tests and MCU links before accepting the upgrade. An older SDK's results do not qualify
 the new SDK, and a successful link does not qualify physical hardware.
 
-## Source interface epoch 3
+## Source interface epoch 5
 
-The current `0.2.1` development snapshot uses factory/source interface epoch `3`;
+The current `0.2.1` development snapshot uses factory/source interface epoch `5`;
 its installed SDK manifest uses schema `2` independently. Select the exact
 reviewed commit, regenerate and rebuild all callers, faces/ops, generated code,
-providers and components together. Current interface admission rejects epoch-1
-and epoch-2 SDKs; old objects must be rebuilt. `--development-fixture` never bypasses interface
+providers and components together. Current interface admission rejects epoch-1,
+epoch-2, epoch-3 and epoch-4 SDKs; old objects must be rebuilt. `--development-fixture` never bypasses interface
 checks or permits mixed binaries. No existing tag is moved.
+
+Epoch 5 moves power owner integration to `nexus/soc/stm32f4_power.h` and the
+family entry points. Hash constraint queries add input/key length multiples;
+address alignment alone does not establish a legal DMA length. Rebuild every
+query caller. Optional SMBus bindings use `nexus_smbus_factory.h` and existing I2C
+endpoint strong references without changing ordinary factory dependencies.
 
 The epoch-2 ADC result migration remains required for older callers.
 Direct ADC group `request.frames` access must become `request.output.frames`.
 Prefer `nx_adc_group_prepare()` for raw requests so it sets the RAW discriminant;
 paired results use `nx_adc_group_prepare_results()`. Check `results_kind` before
 reading the union. There is no old-field shadow or inferred layout. Follow the
-[migration guide](../guides/migration.md#rebuild-for-source-interface-epoch-3) and
+[migration guide](../guides/migration.md#rebuild-for-source-interface-epoch-5) and
 [compatibility contract](../design/source-compatibility.md) before accepting a
 new SDK; a matching semantic version alone is insufficient. Epoch 3 moves domain
 traits to `nexus/io/traits.h` and gives SDIO function requests direct request and
 payload fields. Rebuild components against those public types and migrate nested
 `request.transfer` accesses; no old-field or numeric-layout compatibility is
 provided.
+
+Epoch 4 replaces the RS485 adapter's port/mask/polarity tuple with one immutable
+`const nx_gpio_signal_t*` direction binding. Select a single-pin GPIO with an
+explicit `active_high` value, use `nx_factory_gpio_signal_ref()` and remove the
+old adapter fields. An undeclared signal returns NULL. Rebuild the complete
+bundle and its consumers; changing only the pointer spelling cannot establish
+authorized pin ownership, safe initial levels or storage lifetime.
 
 ## Maintainer: verify the complete SDK consumer
 

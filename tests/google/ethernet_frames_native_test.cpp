@@ -241,6 +241,69 @@ TEST_F(EthernetFramesNative, CoreTimeDoesNotBecomeMissingHardwareTimestamp) {
     EXPECT_EQ(NX_IO_TIMESTAMP_ACQUIRE_OBSERVATION, loan.acquired_source);
 }
 TEST_F(EthernetFramesNative,
+       SustainedRingWrapReturnsEveryLoanAcrossPoolExhaustionAndLinkChanges) {
+    first.Start();
+    for (unsigned round = 0U; round < 32U; ++round) {
+        SCOPED_TRACE(round);
+        ASSERT_EQ(NX_SUCCESS, nx_native_eth_frames_tick(&first.instance,
+                                                        UINT64_C(10000000)));
+        for (unsigned frame = 0U; frame < 4U; ++frame) {
+            ASSERT_EQ(NX_SUCCESS,
+                      nx_native_eth_frames_receive(
+                          &first.instance, bytes.data(), bytes.size(), true));
+        }
+        first.Progress();
+        for (unsigned frame = 0U; frame < 4U; ++frame) {
+            nx_eth_frames_rx_loan_t loan{};
+            nx_eth_fragment_t views[2]{};
+            ASSERT_EQ(NX_SUCCESS, first.Acquire(&loan, views, 2U));
+            EXPECT_EQ(loan.length, bytes.size());
+            EXPECT_EQ(loan.stamp.source, NX_IO_TIMESTAMP_HARDWARE_EVENT);
+            EXPECT_EQ(
+                0, std::memcmp(views[0].data, bytes.data(), views[0].length));
+        }
+        EXPECT_EQ(NX_ERROR_OVERFLOW,
+                  nx_native_eth_frames_receive(&first.instance, bytes.data(),
+                                               bytes.size(), true));
+        while (first.borrowed_count != 0U) {
+            auto loan = first.borrowed[first.borrowed_count - 1U];
+            ASSERT_EQ(NX_SUCCESS,
+                      nx_eth_frames_port_release(&first.face, &loan));
+            --first.borrowed_count;
+            EXPECT_EQ(NX_ERROR_STATE,
+                      nx_eth_frames_port_release(&first.face, &loan));
+        }
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_eth_frames_tx_prepare(
+                      &request, fragments, 2U, true,
+                      nx_deadline_after(nx_time_now_us(), 1000000U)));
+        ASSERT_EQ(NX_SUCCESS, nx_eth_frames_port_submit(&first.face, &request));
+        uint8_t output[64]{};
+        size_t length = 0U;
+        const nx_result_t wire = round % 8U == 7U ? NX_ERROR_IO : NX_SUCCESS;
+        ASSERT_EQ(NX_SUCCESS, nx_native_eth_frames_transmit(
+                                  &first.instance, output, sizeof(output),
+                                  &length, wire, true));
+        first.Progress();
+        nx_result_t terminal;
+        size_t transferred = 0U;
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_request_result(&request.base, &terminal, &transferred));
+        EXPECT_EQ(wire, terminal);
+        if (round % 8U == 7U) {
+            const nx_eth_link_t down{false, false, 0U};
+            ASSERT_EQ(NX_SUCCESS,
+                      nx_eth_frames_port_apply_link(&first.face, &down));
+            first.Progress();
+            const nx_eth_link_t up{true, true, 10U};
+            ASSERT_EQ(NX_SUCCESS,
+                      nx_eth_frames_port_apply_link(&first.face, &up));
+        }
+        EXPECT_EQ(first.instance.mac.snapshot.mac.held_rx, 0U);
+        EXPECT_EQ(first.instance.mac.snapshot.mac.pending_tx, 0U);
+    }
+}
+TEST_F(EthernetFramesNative,
        TwoRealModelsHaveIndependentCounterAndForeignLoanIdentity) {
     other.instance.mac.clock_domain = 2U;
     first.Start();

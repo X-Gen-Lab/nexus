@@ -292,6 +292,51 @@ TEST_F(ClassicCan, FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames) {
     ASSERT_EQ(nx_can_port_read_events(&port, output, 1U, &count), NX_SUCCESS);
     EXPECT_EQ(output[0].frame.id, 0x126U);
 }
+TEST_F(ClassicCan, SustainedRingWrapAndBusOffRecoveryKeepExactLoanOwnership) {
+    const uint32_t filter_word = model.hardware.registers[0x240U / 4U];
+    for (unsigned round = 0U; round < 64U; ++round) {
+        SCOPED_TRACE(round);
+        Receive();
+        Receive();
+        Receive();
+        nx_can_event_t output[3] = {};
+        size_t count = 0U;
+        ASSERT_EQ(nx_can_port_read_events(&port, output, 3U, &count),
+                  NX_SUCCESS);
+        ASSERT_EQ(count, 3U);
+        EXPECT_EQ(output[0].filter_tag, filter.tag);
+        EXPECT_EQ(output[1].kind, NX_CAN_EVENT_FRAME);
+        EXPECT_EQ(output[2].kind, NX_CAN_EVENT_LOSS);
+        EXPECT_EQ(output[2].lost, 1U);
+        ASSERT_EQ(nx_can_tx_prepare(&requests[0], &frame, 200U), NX_SUCCESS);
+        ASSERT_EQ(nx_can_port_submit(&port, &requests[0]), NX_SUCCESS);
+        const bool bus_off = round % 8U == 7U;
+        if (bus_off) {
+            model.hardware.hold_abort = true;
+            nx_native_can_error(&model, true, 255U, 128U, 3U);
+            nx_can_controller_irq(&model.controller);
+            EXPECT_EQ(nx_can_port_recover(&port), NX_ERROR_BUSY);
+            EXPECT_NE(nx_request_state(&requests[0].base), NX_REQUEST_SETTLED);
+        }
+        ASSERT_EQ(nx_native_can_complete(&model, 0U,
+                                         bus_off ? NX_ERROR_IO : NX_SUCCESS),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_can_port_service(&port), NX_SUCCESS);
+        nx_result_t terminal;
+        size_t transferred = 99U;
+        ASSERT_EQ(nx_request_result(&requests[0].base, &terminal, &transferred),
+                  NX_SUCCESS);
+        EXPECT_EQ(terminal, bus_off ? NX_ERROR_IO : NX_SUCCESS);
+        EXPECT_EQ(transferred, bus_off ? 0U : 8U);
+        EXPECT_EQ(model.controller.slots[0].request, nullptr);
+        if (bus_off) {
+            model.hardware.hold_abort = false;
+            ASSERT_EQ(nx_can_port_recover(&port), NX_SUCCESS);
+        }
+        EXPECT_EQ(domain.active_mask, 1U);
+        EXPECT_EQ(model.hardware.registers[0x240U / 4U], filter_word);
+    }
+}
 TEST_F(ClassicCan, HardwareOverrunReportsLowerBoundWithoutInventedExactCount) {
     model.hardware.registers[0x0CU / 4U] |= 1U << 4U;
     nx_can_controller_irq(&model.controller);

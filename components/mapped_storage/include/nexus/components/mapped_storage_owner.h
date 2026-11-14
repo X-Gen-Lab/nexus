@@ -11,14 +11,27 @@ extern "C" {
 #endif
 
 /**
+ * \brief Mapping result and retained controller-cleanup responsibility
+ * \note SUCCESS requires cleanup_required. A failure with cleanup_required
+ * closes admission without publishing a loan; stop retries unmap until it
+ * succeeds. A failure without cleanup_required has no hardware effects.
+ */
+typedef struct {
+    nx_result_t result;
+    bool cleanup_required;
+} nx_mapped_storage_map_result_t;
+
+/**
  * \brief Private provider boundary; immutable callbacks and independent context
  * \note Context is one explicitly sized private state span. Geometry and
  * mapped address stay fixed. map SUCCESS establishes the
- * readable aperture; map failure leaves no effects. unmap SUCCESS proves all
- * aperture/cache references withdrawn; failure retains the last map loan and
- * closes reader/writer admission. Readers remain joined after a release
+ * readable aperture and cleanup responsibility. A partial map failure retains
+ * cleanup without granting any readable loan. unmap SUCCESS proves all
+ * aperture/cache references withdrawn; failure retains cleanup or the last loan
+ * and closes reader/writer admission. Readers remain joined after a release
  * attempt; a retained loan authorizes cleanup retry, not renewed access.
- * start is called only after request admission and mapping exclusion. start
+ * start receives the original absolute request deadline, only after request
+ * admission and mapping exclusion. It must not restart that budget. start
  * errors may have effects and always proceed through drain. poll advances
  * bounded work, returns BUSY or a terminal result, and supplies monotonically
  * increasing completed bytes. cancel initiates withdrawal but proves no drain.
@@ -32,10 +45,11 @@ typedef struct {
     void* context;
     size_t context_size;
     nx_mapped_storage_geometry_t geometry;
-    nx_result_t (*map)(void* context);
+    nx_mapped_storage_map_result_t (*map)(void* context);
     nx_result_t (*unmap)(void* context);
     nx_result_t (*start)(void* context, nx_mapped_storage_operation_t operation,
-                         size_t offset, const void* data, size_t length);
+                         size_t offset, const void* data, size_t length,
+                         nx_time_us_t deadline);
     nx_result_t (*poll)(void* context, size_t* completed);
     nx_result_t (*cancel)(void* context);
     nx_result_t (*drain)(void* context);
@@ -70,6 +84,7 @@ typedef struct {
     nx_result_t terminal;
     bool draining;
     bool accepting;
+    bool map_cleanup_pending;
 } nx_mapped_storage_owner_t;
 
 /** \brief One read-only method table shared by every portable owner instance.
@@ -87,6 +102,17 @@ nx_result_t nx_mapped_storage_owner_init(nx_mapped_storage_owner_t* owner,
                                          size_t capacity,
                                          nx_mapped_storage_backend_t backend,
                                          nx_clock_t clock);
+
+/**
+ * \brief Reopen a constructed, closed and fully quiescent owner
+ * \return SUCCESS; INVALID for missing construction; STATE if already open;
+ * BUSY while a writer, reader loan or map cleanup remains. No hardware is
+ * accessed. Preserve slot/free-list and writer epochs, including exhaustion.
+ * One serialized executor calls this after the backend's cold restart; all
+ * previous controls and consumers must already have joined. init is only for
+ * unused storage and must never replace this restart operation.
+ */
+nx_result_t nx_mapped_storage_owner_reopen(nx_mapped_storage_owner_t* owner);
 #ifdef __cplusplus
 }
 #endif

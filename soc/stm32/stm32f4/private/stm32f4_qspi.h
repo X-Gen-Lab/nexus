@@ -8,6 +8,7 @@
  */
 #ifndef NEXUS_STM32F4_QSPI_H
 #define NEXUS_STM32F4_QSPI_H
+#include "nexus/io/dma.h"
 #include "nexus/io/external_bus.h"
 #include "nexus/io/flash_async.h"
 #include "stm32f407_platform_cold.h"
@@ -20,24 +21,63 @@
 #if USE_HAL_QSPI_REGISTER_CALLBACKS != 1U
 #error "Selected QSPI storage requires the per-handle callback ABI"
 #endif
+#ifndef NEXUS_QSPI_PROGRAM_DMA
+#define NEXUS_QSPI_PROGRAM_DMA 0U
+#endif
+#ifndef NEXUS_QSPI_QUAD_READ
+#define NEXUS_QSPI_QUAD_READ 0U
+#endif
+#ifndef NEXUS_QSPI_CPU_MAP
+#define NEXUS_QSPI_CPU_MAP 0U
+#endif
+#if NEXUS_QSPI_CPU_MAP
+typedef struct nx_stm32_qspi_mapped_config nx_stm32_qspi_mapped_config_t;
+#endif
 #include "stm32f4xx_hal_dma.h"
 #include "stm32f4xx_hal_qspi.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-/** \brief Exact single-line serial endpoint under one immutable ClockPlan.
+/** \brief Only the selected program-DMA mode allocates this mutable extension.
+ * \note DMA2 stream7/channel3 has one task-serviced owner with NVIC disabled.
+ *       Memory completion never establishes controller or external Flash idle.
+ */
+typedef struct {
+    DMA_HandleTypeDef transport;
+    nx_time_us_t drain_deadline;
+    bool captured;
+    bool prepared;
+    bool active;
+} nx_stm32_qspi_dma_t;
+/** \brief Immutable DMA storage and memory-domain connection for this owner. */
+typedef struct {
+    nx_stm32_qspi_dma_t* state;
+    const nx_dma_memory_region_t* regions;
+    size_t region_count;
+} nx_stm32_qspi_dma_config_t;
+/** \brief Exact selected serial endpoint under one immutable ClockPlan.
  * \note Platform retains GPIO clocks/snapshots; QSPI IRQ starts disabled,
  *       inactive and unpended, remains disabled through this task-only mode.
  *       Pins: PB6/NCS AF10, PF10/CLK AF9, PF8/IO0 and PF9/IO1 AF10.
- *       No DMA, mapping, XIP, QPI/DDR or implicit protection changes.
+ *       Selected quad read adds PF7/IO2 and PF6/IO3 AF9, using the SIQ
+ *       software reference and observed QE1/SUS0 without any status mutation.
+ *       Optional program DMA has its own static extension and disabled vector.
+ *       Read/status/verify stay PIO. Quad changes only synchronous read to
+ *       6Bh/24-bit address/eight dummy cycles/four data lines. Status, verify
+ *       and 02h page program stay single-line. No XIP, QPI/DDR or implicit
+ *       protection changes. CPU_MAP selects a separate readonly loan face;
+ *       it has no ordinary Flash/FlashAsync face and excludes program DMA.
  *       FlashAsync.stop seals requests and joins them, retaining this bank
  *       and its readonly Flash face; only Platform cold stop releases them.
- *       ES0321 2.4.5: all 0x90000000 aperture accesses are forbidden throughout
- *       this lifetime, including external CPU/IRQ/DMA/debug accesses. Merely
- *       withholding a mapped pointer does not satisfy that integration duty.
+ *       ES0321 2.4.5: indirect phases forbid all 0x90000000 aperture accesses,
+ *       including external CPU/IRQ/DMA/debug accesses. CPU_MAP grants only
+ *       explicit CPU reader loans while mapped; all other masters remain
+ *       excluded. Withholding a pointer alone does not establish isolation.
  *       External integration provides rated stable power/powerup readiness
- *       and holds WP#/HOLD# or the exact suffix's RESET# at allowed inactive
- *       levels. This four-pad software reference does not establish wiring.
+ *       Four-pad integration holds WP#/HOLD# or the exact suffix's RESET# at
+ *       allowed inactive levels. Quad requires both actual IO2/IO3 wires,
+ *       rather than inactive straps on their former functions. Neither
+ *       software reference establishes a fitted suffix or physical wiring.
  */
 typedef struct {
     const nx_stm32_platform_pin_config_t* pins;
@@ -49,6 +89,10 @@ typedef struct {
     uint32_t stop_budget_us;
     uint8_t prescaler;
     uint8_t cs_high_cycles;
+    const nx_stm32_qspi_dma_config_t* dma;
+#if NEXUS_QSPI_CPU_MAP
+    const nx_stm32_qspi_mapped_config_t* mapping;
+#endif
 } nx_stm32_qspi_config_t;
 /** \brief Private single-transport owner; requests remain caller-owned. */
 typedef struct {
@@ -79,6 +123,39 @@ typedef struct {
     bool wire_active;
     bool async_stopped;
 } nx_stm32_qspi_t;
+#if NEXUS_QSPI_PROGRAM_DMA
+/** \brief Admit the exact disabled DMA vector without register writes.
+ * \param[in] config: Validated immutable optional engine configuration.
+ * \return SUCCESS or BUSY retaining all foreign resources.
+ */
+nx_result_t nx_stm32_qspi_dma_admit(const nx_stm32_qspi_dma_config_t* config);
+/** \brief Prepare one DMA2 stream7/channel3 after its shared clock is held.
+ * \param[in,out] owner: Original exclusive QSPI owner with static config.
+ * \return SUCCESS or retained failure requiring cold close.
+ */
+nx_result_t nx_stm32_qspi_dma_prepare(nx_stm32_qspi_t* owner);
+/** \brief Start one already-admitted byte-wide program page transfer.
+ * \param[in,out] owner: Original owner; complete buffer is already borrowed.
+ * \param[in] data: The current page within the retained readable DMA domain.
+ * \return SUCCESS or retained failure; no completion or borrow release.
+ */
+nx_result_t nx_stm32_qspi_dma_transmit(nx_stm32_qspi_t* owner, uint8_t* data);
+/** \brief Dispatch only the disabled vector's owned latched DMA facts.
+ * \param[in,out] owner: Serialized task-service owner, never an IRQ call.
+ * \return SUCCESS or STATE if the owned clock/vector is no longer usable.
+ */
+nx_result_t nx_stm32_qspi_dma_service(nx_stm32_qspi_t* owner);
+/** \brief Join the actual stream and clear addresses/callback references.
+ * \param[in,out] owner: Original owner, retaining storage on failed join.
+ * \return SUCCESS, BUSY or IO; neither error releases any borrow.
+ */
+nx_result_t nx_stm32_qspi_dma_withdraw(nx_stm32_qspi_t* owner);
+/** \brief Restore the admitted cold stream after all transfers have joined.
+ * \param[in,out] owner: Original owner before Platform releases DMA2 clock.
+ * \return SUCCESS or retained failure; never resets the shared DMA engine.
+ */
+nx_result_t nx_stm32_qspi_dma_stop(nx_stm32_qspi_t* owner);
+#endif
 /** \brief Read-only static admission before System/GPIO resource effects.
  * \param[in] owner: Original idle stable exclusive controller owner.
  * \param[in] config: Immutable exact endpoint and static System binding.

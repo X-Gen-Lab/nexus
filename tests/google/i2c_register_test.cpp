@@ -843,3 +843,15 @@ TEST_F(I2CRegisters, UnprivilegedPollingCannotStartProtectedReceiveWindows) {
     EXPECT_EQ(0, std::memcmp(&before, &registers, sizeof(registers)));
     EXPECT_EQ(0U, model_mask);
 }
+
+TEST_F(I2CRegisters, UnprivilegedRecoveryCannotResetOrClearTheRetainedFault) {
+    state.fault = true;
+    const auto before_registers = registers;
+    const auto before_state = state;
+    const nx_time_us_t before_time = model_time;
+    model_privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_i2c_port_recover(&port));
+    EXPECT_EQ(0, std::memcmp(&before_registers, &registers, sizeof(registers)));
+    EXPECT_EQ(0, std::memcmp(&before_state, &state, sizeof(state)));
+    EXPECT_EQ(before_time, model_time);
+}
